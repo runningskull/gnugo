@@ -143,6 +143,10 @@ loadsgf games/owl43.sgf
 295 owl_attack C4
 #? [1 C3]
 
+loadsgf games/owl44.sgf
+296 owl_attack D6
+#? [1 E5|D8]
+
 
 ########### end of tests #####################
 
