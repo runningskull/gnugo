@@ -1703,7 +1703,7 @@ is_false_eye(struct half_eye_data heye[BOARDMAX], int pos)
 void
 find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
-			 char find_mask[BOARDMAX])
+			 int find_mask[BOARDMAX])
 {
   int eye_color = color;
   int pos;

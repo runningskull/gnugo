@@ -249,7 +249,8 @@ void run_testsuite(string suite_name, string engine,
   }
 
   if (options["valgrind"])
-    program_start_array = ({"valgrind"}) + program_start_array;
+    program_start_array = ({"valgrind", "--tool=memcheck", "--leak-check=yes"})
+			  + program_start_array;
 
   if (options["check-unoccupied-answers"])
     testsuite = modify_testsuite(testsuite);

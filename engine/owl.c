@@ -189,7 +189,7 @@ static void owl_determine_life(struct local_owl_data *owl,
 			       struct eyevalue *probable_eyes,
 			       int *eyemin, int *eyemax);
 static void owl_find_relevant_eyespaces(struct local_owl_data *owl,
-					char mw[BOARDMAX], char mz[BOARDMAX]);
+					int mw[BOARDMAX], int mz[BOARDMAX]);
 static int owl_estimate_life(struct local_owl_data *owl,
 			     struct local_owl_data *second_owl,
     		  	     struct owl_move_data vital_moves[MAX_MOVES],
@@ -351,12 +351,10 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   int dummy_semeai_move;
   double start = 0.0;
   int reading_nodes_when_called = get_reading_node_counter();
-  int nodes_used;
   int new_dragons[BOARDMAX];
   
   struct local_owl_data *owla;
   struct local_owl_data *owlb;
-  Hash_data goal_hash;
   
   if (!resulta)
     resulta = &dummy_resulta;
@@ -364,7 +362,7 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     resultb = &dummy_resultb;
   if (!semeai_move)
     semeai_move = &dummy_semeai_move;
-
+  
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
 
@@ -399,8 +397,6 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
       }
     }
   }
-
-
   
   sgf_dumptree = NULL;
   if (verbose > 0)
@@ -452,9 +448,9 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   ASSERT1(board[apos] == OTHER_COLOR(board[bpos]), apos);
   count_variations = 1;
   if (move == PASS_MOVE)
-    DEBUG(DEBUG_SEMEAI, "owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
+    TRACE("owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
   else
-    DEBUG(DEBUG_SEMEAI, "owl_analyze_semeai_after_move %C %1m: %1m vs. %1m\n",
+    TRACE("owl_analyze_semeai_after_move %C %1m: %1m vs. %1m\n",
 	  color, move, apos, bpos);
   
   if (owl) {
@@ -477,29 +473,6 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   }
 
   result_certain = 1;
-
-  {
-    Hash_data temp = goal_to_hashvalue(owla->goal);
-    goal_hash = goal_to_hashvalue(owlb->goal);
-    hashdata_xor(goal_hash, temp);
-  }
-  if (owl
-      && search_persistent_semeai_cache(ANALYZE_SEMEAI,
-					apos, bpos, move, color, &goal_hash,
-					resulta, resultb, semeai_move,
-					semeai_result_certain)) {
-    if (move == PASS_MOVE) {
-      DEBUG(DEBUG_OWL_PERFORMANCE,
-	    "analyze_semeai %1m vs. %1m, result %d %d %1m (cached)\n",
-	    apos, bpos, *resulta, *resultb, *semeai_move);
-    }
-    else {
-      DEBUG(DEBUG_OWL_PERFORMANCE,
-	    "analyze_semeai_after_move %C %1m: %1m vs. %1m, result %d %d %1m (cached)\n",
-	    color, move, apos, bpos, *resulta, *resultb, *semeai_move);
-    }
-    return;
-  }
 
   /* In some semeai situations one or both players have the option to
    * choose between seki and ko for the life and death of both. In
@@ -531,30 +504,24 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     *resultb = REVERSE_RESULT(*resultb);
   }
 
-  nodes_used = get_reading_node_counter() - reading_nodes_when_called;
   if (move == PASS_MOVE) {
     DEBUG(DEBUG_OWL_PERFORMANCE,
 	  "analyze_semeai %1m vs. %1m, result %d %d %1m (%d, %d nodes, %f seconds)\n",
 	  apos, bpos, *resulta, *resultb, *semeai_move, local_owl_node_counter,
-	  nodes_used, gg_cputime() - start);
+	  get_reading_node_counter() - reading_nodes_when_called,
+	  gg_cputime() - start);
   }
   else {
     DEBUG(DEBUG_OWL_PERFORMANCE,
 	  "analyze_semeai_after_move %C %1m: %1m vs. %1m, result %d %d %1m (%d, %d nodes, %f seconds)\n",
 	  color, move, apos, bpos, *resulta, *resultb, *semeai_move,
 	  local_owl_node_counter,
-	  nodes_used, gg_cputime() - start);
+	  get_reading_node_counter() - reading_nodes_when_called,
+	  gg_cputime() - start);
   }
   
   if (semeai_result_certain)
     *semeai_result_certain = result_certain;
-
-  if (owl)
-    store_persistent_semeai_cache(ANALYZE_SEMEAI, apos, bpos, move, color,
-				  &goal_hash,
-				  *resulta, *resultb, *semeai_move,
-				  result_certain, nodes_used,
-				  owla->goal, owlb->goal);
 }
 
 
@@ -1398,8 +1365,8 @@ semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
 {
   int color = OTHER_COLOR(owlb->color);
   int pos;
-  char mw[BOARDMAX];
-  char mz[BOARDMAX];
+  int mw[BOARDMAX];
+  int mz[BOARDMAX];
 
   owl_find_relevant_eyespaces(owlb, mw, mz);
 
@@ -2916,8 +2883,8 @@ owl_determine_life(struct local_owl_data *owl,
 {
   int color = owl->color;
   struct eye_data *eye = owl->my_eye;
-  char mw[BOARDMAX];  /* mark relevant eye origins */
-  char mz[BOARDMAX];  /* mark potentially irrelevant eye origins */
+  int mw[BOARDMAX];  /* mark relevant eye origins */
+  int mz[BOARDMAX];  /* mark potentially irrelevant eye origins */
   int vital_values[BOARDMAX];
   int dummy_eyemin = 0;
   int dummy_eyemax = 0;
@@ -3271,7 +3238,7 @@ owl_determine_life(struct local_owl_data *owl,
 
 static void
 owl_find_relevant_eyespaces(struct local_owl_data *owl,
-			    char mw[BOARDMAX], char mz[BOARDMAX])
+			    int mw[BOARDMAX], int mz[BOARDMAX])
 {
   int pos;
   int eye_color;

@@ -1022,7 +1022,7 @@ void make_domains(struct eye_data b_eye[BOARDMAX],
 void partition_eyespaces(struct eye_data eye[BOARDMAX], int color);
 void find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
 			      struct half_eye_data heye[BOARDMAX],
-			      char find_mask[BOARDMAX]);
+			      int find_mask[BOARDMAX]);
 
 void set_eyevalue(struct eyevalue *e, int a, int b, int c, int d);
 int min_eye_threat(struct eyevalue *e);
