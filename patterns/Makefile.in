@@ -85,7 +85,7 @@ EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	
 
 mkpat_SOURCES = mkpat.c transform.c
 
-mkpat_LDADD = ./libdfa.a ../utils/libutils.a
+mkpat_LDADD = libdfa.a ../utils/libutils.a
 @DFA_ENABLED_TRUE@DFAFLAGS = -D -m
 @DFA_ENABLED_FALSE@DFAFLAGS = 
 
@@ -144,7 +144,7 @@ transpat_OBJECTS =  transpat.o patlib.o transform.o
 transpat_DEPENDENCIES = 
 transpat_LDFLAGS = 
 mkpat_OBJECTS =  mkpat.o transform.o
-mkpat_DEPENDENCIES =  ./libdfa.a ../utils/libutils.a
+mkpat_DEPENDENCIES =  libdfa.a ../utils/libutils.a
 mkpat_LDFLAGS = 
 joseki_OBJECTS =  joseki.o
 joseki_DEPENDENCIES =  ../engine/libboard.a ../sgf/libsgf.a \

@@ -30,7 +30,7 @@ EXTRA_DIST = $(DSP)\
 
 mkpat_SOURCES  = mkpat.c transform.c
 
-mkpat_LDADD = ./libdfa.a ../utils/libutils.a
+mkpat_LDADD = libdfa.a ../utils/libutils.a
 
 if DFA_ENABLED
 DFAFLAGS = -D -m
