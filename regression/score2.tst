@@ -109,3 +109,7 @@ loadsgf games/scoring/score57.sgf
 loadsgf games/scoring/score58.sgf
 58 final_score
 #? [B\+103.5]
+
+loadsgf games/nngs/gnugo-3.3.8-evand-200209090532.sgf
+59 final_score
+#? [W\+15.5]
