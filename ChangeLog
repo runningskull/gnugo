@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revision of critical worms to inessential in make_dragons() revised
 - owl vital attack patterns now also used for owl defense
 - major revision of connection_value(), using new function
   crude_dragon_weakness()

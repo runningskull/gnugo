@@ -619,7 +619,45 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   /* Revise essentiality of critical worms. Specifically, a critical
    * worm which is adjacent to no enemy dragon with status
    * better than DEAD, is considered INESSENTIAL.
+   *
+   * A typical case of this is
+   *
+   * |.XXXX
+   * |.OO.X
+   * |X.O.X
+   * |.OO.X
+   * +-----
+   *
+   * However, to be able to deal with the position
+   *
+   * |.XXXX
+   * |.OOOO
+   * |..O.O
+   * |X.OOO
+   * |..O.O
+   * +-----
+   *
+   * we need to extend "adjacent" to "adjacent or shares a liberty",
+   * which is why we use extended_chainlinks() rather than
+   * chainlinks().
+   *
+   * Finally, if the position above is slightly modified to
+   *
+   * |.XXXXX
+   * |.OOOOO
+   * |...O.O
+   * |X..OOO
+   * |...O.O
+   * +------
+   *
+   * we have a position where the critical X stone doesn't share a
+   * liberty with any string at all. Thus the revised rule is:
+   *
+   * A critical worm which is adjacent to or share a liberty with at
+   * least one dead opponent dragon and no opponent dragon which is
+   * not dead, is considered inessential.
    */
+
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
       if (is_worm_origin(str, str)
@@ -631,14 +669,14 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	int r;
 	int essential = 0;
 	
-	neighbors = chainlinks(str, adjs);
+	neighbors = extended_chainlinks(str, adjs, 0);
 	for (r = 0; r < neighbors; r++)
 	  if (dragon[adjs[r]].status != DEAD) {
 	    essential = 1;
 	    break;
 	  }
 
-	if (!essential) {
+	if (!essential && neighbors > 0) {
 	  DEBUG(DEBUG_WORMS, "Worm %1m revised to be inessential.\n", str);
 	  worm[str].inessential = 1;
 	  propagate_worm(str);
