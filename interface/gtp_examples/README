@@ -29,5 +29,9 @@ metamachine.c : This program sits between a gtp controller and an
 
 sgf2tst   : A perl script that produces a gtp test script from an sgf file
 
+matcher_check : A perl script that plays a gnugo process against itself,
+		watching for inconsistencies in the dragon_status field.
+		It flags these for further analysis by a person, and attempts
+		to generate regression tests from them.
                 
 

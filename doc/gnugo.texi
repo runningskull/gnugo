@@ -20,8 +20,10 @@
 @vskip 0pt plus 1filll
 @image{logo-34}
 @vskip 0pt plus 1filll
-@author By Arend Bayer, Daniel Bump, David Denholm, Jerome Dumonteil, 
-@author Gunnar Farneb@"ack, Thomas Traber, Tanguy Urvoy, Inge Wallin
+@author By Arend Bayer, Daniel Bump, Evan Berggren Daniel, 
+@author David Denholm, Jerome Dumonteil, Gunnar Farneb@"ack,
+@author Paul Pogonyshev, Thomas Traber, Tanguy Urvoy, Inge Wallin
+
 @sp 1
 @page
 @title{GNU GO 3.4}
