@@ -11,7 +11,8 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
 EXTRA_DIST = golois games $(TST) $(noinst_SCRIPTS) regress.awk \
-             STRATEGY NICKLAS READING rot0 rot1 rot5 BREAKAGE
+             STRATEGY NICKLAS READING rot0 rot1 rot5 BREAKAGE \
+	     regress.pl
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *.orig *~
@@ -30,6 +31,16 @@ owl: owl.tst
 
 owl_rot: owl_rot.tst
 	$(srcdir)/eval.sh owl_rot.tst
+
+owl_rotall: owl.tst
+	$(srcdir)/eval.sh owl.tst --gtp-initial-orientation 0
+	$(srcdir)/eval.sh owl.tst --gtp-initial-orientation 1
+	$(srcdir)/eval.sh owl.tst --gtp-initial-orientation 2
+	$(srcdir)/eval.sh owl.tst --gtp-initial-orientation 3
+	$(srcdir)/eval.sh owl.tst --gtp-initial-orientation 4
+	$(srcdir)/eval.sh owl.tst --gtp-initial-orientation 5
+	$(srcdir)/eval.sh owl.tst --gtp-initial-orientation 6
+	$(srcdir)/eval.sh owl.tst --gtp-initial-orientation 7
 
 optics: optics.tst
 	$(srcdir)/eval.sh optics.tst

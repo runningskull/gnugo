@@ -236,6 +236,7 @@ play_gtp(FILE *gtp_input, int gtp_initial_orientation)
   board_size = 19;
   gtp_internal_set_boardsize(19);
   gtp_orientation = gtp_initial_orientation;
+  gtp_set_vertex_transform_hooks(rotate_on_input, rotate_on_output);
   
   /* Prepare pattern matcher and reading code. */
   reset_engine();

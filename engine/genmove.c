@@ -43,6 +43,13 @@ static int slowest_j = -1;
 static int slowest_movenum = 0;
 static double total_time = 0.;
 
+/* Position numbers for which various examinations were last made. */
+static int worms_examined = -1;
+static int initial_influence_examined = -1;
+static int dragons_examined_without_owl = -1;
+static int dragons_examined = -1;
+static int initial_influence2_examined = -1;
+
 void sgfShowConsideredMoves(void);
 
 
@@ -58,6 +65,11 @@ reset_engine()
   /* Initialize things for hashing of positions. */
   reading_cache_clear();
   hashdata_recalc(&hashdata, board, board_ko_pos);
+  worms_examined = -1;
+  initial_influence_examined = -1;
+  dragons_examined_without_owl = -1;
+  dragons_examined = -1;
+  initial_influence2_examined = -1;
 
   /* Prepare our table of move reasons. */
   clear_move_reasons();
@@ -83,13 +95,6 @@ void
 examine_position(int color, int how_much)
 {
   int save_verbose;
-
-  /* Position numbers for which various examinations were last made. */
-  static int worms_examined = -1;
-  static int initial_influence_examined = -1;
-  static int dragons_examined_without_owl = -1;
-  static int dragons_examined = -1;
-  static int initial_influence2_examined = -1;
 
   purge_persistent_reading_cache();
   
