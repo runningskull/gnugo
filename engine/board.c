@@ -1900,7 +1900,6 @@ is_edge_vertex(int pos)
 int
 countlib(int str)
 {
-  ASSERT_ON_BOARD1(str);
   ASSERT1(IS_STONE(board[str]), str);
   
   if (!strings_initialized)
@@ -1927,7 +1926,6 @@ findlib(int str, int maxlib, int *libs)
   int liberties;
   int s;
   
-  ASSERT_ON_BOARD1(str);
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(libs != NULL, str);
   
@@ -2019,7 +2017,6 @@ fastlib(int pos, int color, int ignore_capture)
   int fast_liberties = 0;
   int other = OTHER_COLOR(color);
 
-  ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
 
@@ -2097,7 +2094,6 @@ approxlib(int pos, int color, int maxlib, int *libs)
   int liberties = 0;
   int fast_liberties = 0;
 
-  ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
 
@@ -2586,9 +2582,8 @@ neighbor_of_string(int pos, int str)
   int s;
   int color = board[str];
 
-  ASSERT_ON_BOARD1(str);
-  ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), str);
+  ASSERT_ON_BOARD1(pos);
 
   if (!strings_initialized)
     init_board();

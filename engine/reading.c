@@ -231,7 +231,7 @@ attack(int str, int *move)
   int result;
   int nodes;
   int origin;
-  int the_move;
+  int the_move = NO_MOVE;
 
   nodes_when_called = reading_node_counter;
   /* Don't even spend time looking in the cache if there are more than
@@ -287,7 +287,7 @@ find_defense(int str, int *move)
   int result;
   int nodes;
   int origin;
-  int the_move;
+  int the_move = NO_MOVE;
 
   nodes_when_called = reading_node_counter;
   /* Don't even spend time looking in the cache if there are more than

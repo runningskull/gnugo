@@ -2,7 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- doc revision
+- owl speedup: owl data immediately stored in owl_stack
+- bugfix in do_owl_defense()
+- attack() now always returns PASS as move if there is no attack
+- some ASSERTs removed in board.c.
+- revision in get_next_move_from_list
 - bugfix in find_connection_moves()
 - begin_sgftreedump() can take a NULL pointer parameter
 - new gtp command ladder_attack
@@ -10,6 +14,7 @@
 - seed field removed from Gameinfo struct
 - new global variable random_seed
 - joseki tuning
+- doc revision
 
 3.1.30 released March 30, 2002
 
