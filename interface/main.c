@@ -83,6 +83,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_SURROUNDED,
       OPT_DECIDE_TACTICAL_SEMEAI,
+      OPT_DECIDE_ORACLE,
       OPT_EXPERIMENTAL_SEMEAI,
       OPT_EXPERIMENTAL_OWL_EXT,
       OPT_SEMEAI_VARIATIONS,
@@ -109,6 +110,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_NOFUSEKI,
       OPT_NOJOSEKIDB,
       OPT_LEVEL,
+      OPT_LIMIT_SEARCH,
       OPT_SHOWTIME,
       OPT_SHOWSCORE,
       OPT_DEBUG_INFLUENCE,
@@ -125,7 +127,8 @@ enum {OPT_BOARDSIZE=127,
       OPT_ATTACK_BY_PATTERN,
       OPT_DEFEND_BY_PATTERN,
       OPT_MIRROR,
-      OPT_MIRROR_LIMIT
+      OPT_MIRROR_LIMIT,
+      OPT_METAMACHINE
 };
 
 /* names of playing modes */
@@ -151,7 +154,8 @@ enum mode {
   MODE_DECIDE_POSITION,
   MODE_DECIDE_EYE,
   MODE_DECIDE_COMBINATION,
-  MODE_DECIDE_SURROUNDED
+  MODE_DECIDE_SURROUNDED,
+  MODE_DECIDE_ORACLE
 };
 
 
@@ -201,6 +205,7 @@ static struct gg_option const long_options[] =
   {"owl-reading",    required_argument, 0, OPT_OWL_READING},
   {"owl-node-limit", required_argument, 0, OPT_OWL_NODE_LIMIT},
   {"level",          required_argument, 0, OPT_LEVEL},
+  {"limit-search",   required_argument, 0, OPT_LIMIT_SEARCH},
   {"clock",          required_argument, 0, OPT_CLOCK_TIME},
   {"byo-time",       required_argument, 0, OPT_CLOCK_BYO_TIME},
   {"byo-period",     required_argument, 0, OPT_CLOCK_BYO_PERIOD},
@@ -238,6 +243,7 @@ static struct gg_option const long_options[] =
   {"decide-surrounded",  required_argument, 0, OPT_DECIDE_SURROUNDED},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
   {"decide-combination", no_argument,   0, OPT_DECIDE_COMBINATION},
+  {"decide-oracle",  no_argument,       0, OPT_DECIDE_ORACLE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
   {"nofuseki",       no_argument,       0, OPT_NOFUSEKI},
   {"nojosekidb",     no_argument,       0, OPT_NOJOSEKIDB},
@@ -251,6 +257,7 @@ static struct gg_option const long_options[] =
   {"defend-by-pattern", no_argument,    0, OPT_DEFEND_BY_PATTERN},
   {"mirror",         no_argument,       0, OPT_MIRROR},
   {"mirror-limit",   required_argument, 0, OPT_MIRROR_LIMIT},
+  {"metamachine",    no_argument,       0, OPT_METAMACHINE},
   {NULL, 0, NULL, 0}
 };
 
@@ -330,6 +337,7 @@ main(int argc, char *argv[])
   allow_suicide = 0;
   capture_all_dead = 0;
   play_out_aftermath = 0;
+  limit_search = 0;
 
   /* Default parameters for clock and auto level systems. */
   clock_init(3600, 0, 0);      /* One hour sudden death. */
@@ -496,6 +504,9 @@ main(int argc, char *argv[])
 	owl_threats = 0;
 	break;
 
+      case OPT_METAMACHINE:
+        metamachine = 1;
+
       case OPT_JAPANESE_RULES: 
 	chinese_rules = 0;
 	break;
@@ -634,7 +645,6 @@ main(int argc, char *argv[])
 		  "usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
 	  return EXIT_FAILURE;
 	}
-
 	playmode = MODE_DECIDE_TACTICAL_SEMEAI;
 	break;
 	
@@ -662,6 +672,10 @@ main(int argc, char *argv[])
 	}
 	strcpy(decide_this, gg_optarg);
 	playmode = MODE_DECIDE_SURROUNDED;
+	break;
+	
+      case OPT_DECIDE_ORACLE:
+	playmode = MODE_DECIDE_ORACLE;
 	break;
 	
       case OPT_BRANCH_DEPTH:
@@ -709,6 +723,19 @@ main(int argc, char *argv[])
 	
       case OPT_LEVEL:
 	level = atoi(gg_optarg);
+	break;
+
+      case OPT_LIMIT_SEARCH:
+	{
+	  int m, n;
+
+	  if (!string_to_location(board_size, gg_optarg, &m, &n)) {
+	    fprintf(stderr, "gnugo: use --limit-search <pos>\n");
+	    return EXIT_FAILURE;
+	  }
+	  rotate(m, n, &m, &n, board_size, orientation);
+	  set_search_diamond(POS(m, n));
+	}
 	break;
 
       case OPT_CLOCK_TIME:
@@ -914,7 +941,19 @@ main(int argc, char *argv[])
   
   switch (playmode) {
   case MODE_GMP:     
+    
+#if ORACLE
+    if (metamachine)
+      summon_oracle();
+#endif
+
     play_gmp(&gameinfo);
+
+#if ORACLE
+    if (metamachine)
+      dismiss_oracle();
+#endif
+
     break;
     
   case MODE_SOLO:
@@ -937,7 +976,21 @@ main(int argc, char *argv[])
       fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
       exit(EXIT_FAILURE);
     }
+
+#if ORACLE
+    if (metamachine) {
+      summon_oracle();
+      oracle_loadsgf(infilename, untilstring);
+    }
+#endif
+
     load_and_analyze_sgf_file(&gameinfo);
+
+#if ORACLE
+    if (metamachine)
+      dismiss_oracle();
+#endif
+
     break;
     
   case MODE_LOAD_AND_SCORE:
@@ -1165,6 +1218,22 @@ main(int argc, char *argv[])
       break;
     }
 
+#if ORACLE
+  case MODE_DECIDE_ORACLE:
+    {
+      if (mandated_color != EMPTY)
+	gameinfo.to_move = mandated_color;
+      
+      if (!infilename) {
+	fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
+	exit(EXIT_FAILURE);
+      }
+
+      decide_oracle(&gameinfo, infilename, untilstring);
+      break;
+    }
+#endif
+
   case MODE_GTP:  
     if (gtpfile != NULL) {
       gtp_input_FILE = fopen(gtpfile, "r");
@@ -1385,6 +1454,7 @@ DEBUG_TERRITORY             0x100000\n\
 DEBUG_OWL_PERSISTENT_CACHE  0X200000\n\
 DEBUG_TOP_MOVES             0x400000\n\
 DEBUG_MISCELLANEOUS         0x800000\n\
+DEBUG_ORACLE_STREAM         0x1000000\n\
 "
 
 /*

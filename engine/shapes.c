@@ -50,6 +50,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   
   int k, l;
   int move;
+  /* For restricted search, the pattern must intersect the search area */
   
   /* Dragons of our color. */
   int my_dragons[MAX_DRAGONS_PER_PATTERN];
@@ -80,24 +81,26 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   /* Pick up the location of the move */
   move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
   
+  if (limit_search && !within_search_area(move))
+    return;
+
   /* For some classes of patterns we need to find all dragons present
    * in the pattern.
    */
   if ((class & (CLASS_B | CLASS_C | CLASS_c | CLASS_a | CLASS_d | CLASS_O |
-		CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t)) != 0)
-  {
+		CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t)) != 0) {
     /* Match each point. */
-    for (k = 0; k < pattern->patlen; ++k) { 
+    for (k = 0; k < pattern->patlen; ++k) {
       int pos; /* absolute (board) co-ord of (transformed) pattern element */
       int origin; /* dragon origin */
       
       /* all the following stuff (currently) applies only at occupied cells */
       if (pattern->patn[k].att == ATT_dot)
 	continue;
-
+      
       /* transform pattern real coordinate */
       pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, ll, m, n);
-
+      
       /* Already, matchpat rejects O patterns containing a friendly stone with
        * DEAD or CRITICAL matcher_status. If the stone is tactically
        * CRITICAL it still could have matcher_status ALIVE since it might

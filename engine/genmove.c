@@ -283,6 +283,13 @@ genmove(int *i, int *j, int color)
   int move;
   int retval;
 
+#if ORACLE
+  if (metamachine) {
+    metamachine_genmove(i, j, color);
+    return 1;
+  }
+#endif
+
   retval = do_genmove(&move, color, 0.4);
   gg_assert(retval < 0 || ON_BOARD1(move));
 

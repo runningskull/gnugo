@@ -599,7 +599,7 @@ gtp_playwhite(char *s)
 
 
 /* Function:  Play a stone of the given color at the given vertex.
- * Arguments: vertex
+ * Arguments: color, vertex
  * Fails:     invalid vertex, illegal move
  * Returns:   nothing
  *
