@@ -40,7 +40,7 @@
  * Other accepted formats are
  * %H: Print a hashvalue.
  * %C: Print a color as a string.
- * %M: Like %m but three characters wide for all moves (pads with spaces).
+ * %r: Print a result as a string.
  * Nasty bodge: %o at the start means outdent, i.e. cancel indent.
  */
 

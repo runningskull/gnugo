@@ -14,8 +14,8 @@ functions underlie autohelper functions (@pxref{Autohelper Functions}).
 
 
 @itemize @bullet
-@item @code{void change_matcher_status(int dr, int status)}
-@findex change_matcher_status
+@item @code{void change_dragon_status(int dr, int status)}
+@findex change_dragon_status
 @quotation
 Change the status of all the stones in the dragon at @code{dr}.
 @end quotation
@@ -26,9 +26,9 @@ Check whether a move at @code{move} stops the enemy from playing at (apos).
 @end quotation
 @item @code{int cut_possible(int pos, int color)}
 @quotation
-Returns true if color can cut at @code{pos}, or if connection through @code{pos}
-is inhibited. This information is collected by @code{find_cuts()}, using the B
-patterns in the connections database.
+Returns true if @code{color} can cut at @code{pos}, or if connection through
+@code{pos} is inhibited. This information is collected by @code{find_cuts()},
+using the B patterns in the connections database.
 @end quotation
 @item @code{int does_attack(int move, int str)}
 @findex does_attack
@@ -46,57 +46,66 @@ defends @code{str}. This means that it defends the string, and that
 @item @code{int somewhere(int color, int last_move, ...)}
 @findex somewhere
 @quotation
-Returns true if one of the vertices listed satisfies
-@code{board[pos]==color}. Here last_move is the number of moves minus one.
 Example: @code{somewhere(WHITE, 2, apos, bpos, cpos)}.
+Returns true if one of the vertices listed satisfies
+@code{board[pos]==color}. Here num_moves is the number of moves minus one.
+If the check is true the dragon is not allowed to be dead. This
+check is only valid if @code{stackp==0}.
+@end quotation
+@item @code{int visible_along_edge(int color, int apos, int bpos)}
+@quotation
+Search along the edge for the first visible stone. Start at apos
+and move in the direction of bpos. Return 1 if the first visible
+stone is of the given color. It is required that apos and bpos are
+at the same distance from the edge.
 @end quotation
 @item @code{int play_break_through_n(int color, int num_moves, ...)}
 @findex play_break_through_n
 @quotation
-Plays a sequence of moves, alternating between the players and starting with
-color. After having played through the sequence, the three last coordinate
-pairs gives a position to be analyzed by @code{break_through()}, to see whether
-either color has managed to enclose some stones and/or connected his own
-stones. If any of the three last positions is empty, it's assumed that the
-enclosure has failed, as well as the attempt to connect. If one or more of the
-moves to play turns out to be illegal for some reason, the rest of the
-sequence is played anyway, and @code{break_through()} is called as if nothing
-special happened. Like @code{break_through()}, this function returns 1 if the
-attempt to break through was succesful and 2 if it only managed to cut
+The function @code{play_break_through_n()} plays a sequence of moves,
+alternating between the players and starting with color. After
+having played through the sequence, the three last coordinate pairs
+gives a position to be analyzed by @code{break_through()}, to see whether
+either color has managed to enclose some stones and/or connected
+his own stones. If any of the three last positions is empty, it's
+assumed that the enclosure has failed, as well as the attempt to
+connect. If one or more of the moves to play turns out to be illegal for
+some reason, the rest of the sequence is played anyway, and
+@code{break_through()} is called as if nothing special happened.
+Like @code{break_through()}, this function returns 1 if the attempt to
+break through was succesful and 2 if it only managed to cut
 through.
 @end quotation
 @item @code{int play_attack_defend_n(int color, int do_attack, int num_moves, ...)}
-@findex play_attack_defend_n
-@quotation
-Plays a sequence of moves, alternating between the players and starting with
-color. After having played through the sequence, the last coordinate pair
-gives a target to attack or defend, depending on the value of do_attack. If
-there is no stone present to attack or defend, it is assumed that it has
-already been captured. If one or more of the moves to play turns out to be
-illegal for some reason, the rest of the sequence is played anyway, and
-attack/defense is tested as if nothing special happened.  A typical use for
-these functions is to set up a ladder in an autohelper and see whether it
-works or not.
-@end quotation
 @item @code{int play_attack_defend2_n(int color, int do_attack, int num_moves, ...)}
 @findex play_attack_defend2_n
+@findex play_attack_defend_n
 @quotation
-Plays a sequence of moves, alternating
-between the players and starting with color. After having played through the
-sequence, the two last coordinate pairs give two targets to simultaneously
-attack or defend, depending on the value of do_attack. If there is no stone
-present to attack or defend, it is assumed that it has already been
-captured. If one or more of the moves to play turns out to be illegal for some
-reason, the rest of the sequence is played anyway, and attack/defense is
-tested as if nothing special happened. A typical use for these functions is to
-set up a crosscut in an autohelper and see whether at least one cutting stone
-can be captured.
+The function @code{play_attack_defend_n()} plays a sequence of moves,
+alternating between the players and starting with @code{color}. After
+having played through the sequence, the last coordinate pair gives
+a target to attack or defend, depending on the value of do_attack.
+If there is no stone present to attack or defend, it is assumed
+that it has already been captured. If one or more of the moves to
+play turns out to be illegal for some reason, the rest of the
+sequence is played anyway, and attack/defense is tested as if
+nothing special happened. Conversely, 
+@code{play_attack_defend2_n()} plays a sequence of moves,
+alternating between the players and starting with @code{color}. After
+having played through the sequence, the two last coordinate pairs
+give two targets to simultaneously attack or defend, depending on
+the value of do_attack. If there is no stone present to attack or
+defend, it is assumed that it has already been captured. If one or
+more of the moves to play turns out to be illegal for some reason,
+the rest of the sequence is played anyway, and attack/defense is
+tested as if nothing special happened.  A typical use of these functions is to
+set up a ladder in an autohelper and see whether it works or not.  
 @end quotation
 @item @code{int play_connect_n(int color, int do_connect, int num_moves, ...)}
 @findex play_connect_n
 @quotation
 Plays a sequence of moves, alternating between the players and starting
-with color. After having played through the sequence, the two last
+with @code{color}. After having played through the sequence, the two last
 coordinates give two targets that should be connected or disconnected,
 depending on the value of do_connect. If there is no stone present to
 connect or disconnect, it is assumed that the connection has failed. If
@@ -104,15 +113,23 @@ one or more of the moves to play turns out to be illegal for some
 reason, the rest of the sequence is played anyway, and
 connection/disconnection is tested as if nothing special happened.
 @end quotation
-
 @item @code{void set_depth_values(int level)}
 @findex set_depth_values
 @quotation
-Set the various reading depth parameters. If @code{mandated_depth_value}
-is not -1 that value is used; otherwise the depth values are
-set as a function of level. The parameter @code{mandated_depth_value}
-can be set at the command line to force a particular value of
-depth; normally it is -1.
+It is assumed in reading a ladder if @code{stackp >= depth} that
+as soon as a bounding stone is in atari, the string is safe.
+Similar uses are made of the other depth parameters such
+as @code{backfill_depth} and so forth. In short, simplifying
+assumptions are made when @code{stackp} is large. Unfortunately any such
+scheme invites the ``horizon effect,'' in which a stalling move is perceived
+as a win, by pushing the refutation past the ``horizon''---the value of
+@code{stackp} in which the reading assumptions are relaxed. To avoid the depth
+it is sometimes necessary to increase the depth parameters. This
+function can be used to set the various reading depth parameters. If
+@code{mandated_depth_value} is not -1 that value is used; otherwise the depth
+values are set as a function of level. The parameter
+@code{mandated_depth_value} can be set at the command line to force a
+particular value of depth; normally it is -1.
 @end quotation
 @item @code{void modify_depth_values(int n)}
 @findex modify_depth_values
@@ -139,84 +156,90 @@ moves.
 @quotation
 Sets @code{depth} and so forth to their saved values.
 @end quotation
-@item @code{int accurate_approxlib(int pos, int color, int maxlib, int *libs)}
-@findex accurate_approxlib
+@item @code{void set_temporary_depth_values(int d, int b, int b2, int bc, int ss, int br, int f, int k)}
 @quotation
-Play a stone at @code{pos} and count the number of liberties for the
-resulting string. This requires @code{pos} to be empty. This function 
-differs from @code{approxlib()} by the fact that it removes captured 
-stones before counting the liberties.
+Explicitly set the depth values. This function is currently never
+called.
 @end quotation
-@item @code{int confirm_safety(int move, int color, int size, int *defense_point, int saved_dragons[BOARDMAX], int saved_worms[BOARDMAX])}
+@item @code{int confirm_safety(int move, int color, int *defense_point, char safe_stones[BOARDMAX])}
 @findex confirm_safety
+@quotation
+Check that the move at color doesn't involve any kind of blunder,
+regardless of size.
+@end quotation
+@item @code{float blunder_size(int move, int color, int *defense_point, char safe_stones[BOARDMAX])}
+@findex blunder_size
 @quotation
 This function will detect some blunders. If the move reduces the number of
 liberties of an adjacent friendly string, there is a danger that the move
 could backfire, so the function checks that no friendly worm which was
 formerly not attackable becomes attackable, and it checks that no opposing
-worm which was not defendable becomes defendable. Only worms with
-@code{worm.size>size} are checked. The arrays @code{saved_dragons[]} and 
-@code{saved_worms[]} should be one for stones belonging to dragons or worms
-respectively, which are supposedly saved by @code{move}. These may be 
-@code{NULL} if no stones are supposed to gaving been saved.  For use when
-called from @code{fill_liberty()}, this function may optionally return a point
-of defense, which, if taken, will presumably make the move at @code{(move)}
-safe on a subsequent turn.
+worm which was not defendable becomes defendable.  It returns the estimated
+size of the blunder, or 0.0 if nothing bad has happened.  The array
+@code{safe_stones[]} contains the stones that are supposedly safe after
+@code{move}. It may be @code{NULL}. For use when called from
+@code{fill_liberty()}, this function may optionally return a point of defense,
+which, if taken, will presumably make the move at @code{move} safe on a
+subsequent turn.
 @end quotation
-@item @code{int double_atari(int move, int color)}
+@item @code{int double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])}
 @findex double_atari
 @quotation
-Returns true if a move by @code{color} fits the following shape:
+Returns true if a move by (color) fits the following shape:
 @example
     X*        (O=color)
     OX
 @end example
-capturing one of the two @samp{X} strings. The name is a slight
-misnomer since this includes attacks which are not necessarily
-double ataris, though the common double atari is the most
-important special case.
+capturing one of the two @samp{X} strings. The name is a slight misnomer since
+this includes attacks which are not necessarily double ataris, though the
+common double atari is the most important special case. If @code{safe_stones
+!= NULL}, then only attacks on stones marked as safe are tried. The value of
+the double atari attack is returned in value (unless value is @code{NULL}),
+and the attacked stones are marked unsafe.
 @end quotation
 @item @code{void unconditional_life(int unconditional_territory[BOARDMAX], int color)}
 @findex unconditional_life
 @quotation
-Find those worms of the given color that can never be captured,
-even if the opponent is allowed an arbitrary number of consecutive
-moves. The coordinates of the origins of these worms are written to
-the worm arrays and the number of non-capturable worms is
-returned. The algorithm is to cycle through the worms until none remains or
-no more can be captured. A worm is removed when it is found to be
-capturable, by letting the opponent try to play on all its
-liberties. If the attack fails, the moves are undone. When no more
-worm can be removed in this way, the remaining ones are
-unconditionally alive.  After this, unconditionally dead opponent worms and
-unconditional territory are identified. To find these, we continue from the
-position obtained at the end of the previous operation (only unconditionally
-alive strings remain for color) with the following steps:
+Find those worms of the given color that can never be captured, even if the
+opponent is allowed an arbitrary number of consecutive moves. The coordinates
+of the origins of these worms are written to the worm arrays and the number of
+non-capturable worms is returned.  The algorithm is to cycle through the worms
+until none remains or no more can be captured. A worm is removed when it is
+found to be capturable, by letting the opponent try to play on all its
+liberties. If the attack fails, the moves are undone. When no more worm can be
+removed in this way, the remaining ones are unconditionally alive.  After
+this, unconditionally dead opponent worms and unconditional territory are
+identified. To find these, we continue from the position obtained at the end
+of the previous operation (only unconditionally alive strings remain for
+color) with the following steps:
+
 @enumerate
 @item Play opponent stones on all liberties of the unconditionally
 alive strings except where illegal. (That the move order may
 determine exactly which liberties can be played legally is not
 important. Just pick an arbitrary order).
-@item Recursively extend opponent strings in atari, except where this
+@item
+Recursively extend opponent strings in atari, except where this
 would be suicide.
-@item Play an opponent stone anywhere it can get two empty
+@item
+Play an opponent stone anywhere it can get two empty
 neighbors. (I.e. split big eyes into small ones).
-@item 4. Play an opponent stone anywhere it can get one empty
+@item
+an opponent stone anywhere it can get one empty
 neighbor. (I.e. reduce two space eyes to one space eyes.)
-@end enumerate
 Remaining opponent strings in atari and remaining liberties of the
 unconditionally alive strings constitute the unconditional
-territory. Opponent strings from the initial position placed on
+territory.
+Opponent strings from the initial position placed on
 unconditional territory are unconditionally dead.
 On return, @code{unconditional_territory[][]} is 1 where color has
 unconditionally alive stones, 2 where it has unconditional
 territory, and 0 otherwise.
+@end enumerate
 @end quotation
 @item @code{void who_wins(int color, FILE *outfile)}
-@findex who_wins
 @quotation
-Score the game and determine the winner. Result is printed on
-@code{outfile}.
+Score the game and determine the winner
 @end quotation
 @item @code{void find_superstring(int str, int *num_stones, int *stones)}
 @findex find_superstring
@@ -237,7 +260,8 @@ where an opponent move would be suicide or self-atari.
     XOX
     X.X
 @end example
-@item Bamboo joint.
+@item
+Bamboo joint.
 @example
     OO
     ..
@@ -250,27 +274,27 @@ where an opponent move would be suicide or self-atari.
 @end example
 @item Connection through adjacent or diagonal tactically captured stones.
 Connections of this type are omitted when the superstring code is
-called from @file{reading.c}, but included when the superstring code is
-called from @file{owl.c}.
+called from reading.c, but included when the superstring code is
+called from owl.c
 @end enumerate
 @end quotation
 @item @code{void find_superstring_liberties(int str, int *num_libs, int *libs, int liberty_cap)}
 @findex find_superstring_liberties
 @quotation
-This function computes the superstring at @code{str} as described above,
-but omitting connections of type 5. Then it constructs a list of
-liberties of the superstring which are not already liberties of
-@code{str}. If @code{liberty_cap} is nonzero, only liberties of substrings of the
-superstring which have fewer than @code{liberty_cap} liberties are
-generated.
+This function computes the superstring at @code{str} as described above, but
+omitting connections of type 5. Then it constructs a list of liberties of the
+superstring which are not already liberties of @code{str}.  If
+@code{liberty_cap} is nonzero, only liberties of substrings of the superstring
+which have fewer than @code{liberty_cap} liberties are generated.
 @end quotation
 @item @code{void find_proper_superstring_liberties(int str, int *num_libs, int *libs, int liberty_cap)}
 @findex find_proper_superstring_liberties
 @quotation
-This function is the same as @code{find_superstring_liberties()}, but it omits those
+This function is the same as find_superstring_liberties, but it omits those
 liberties of the string @code{str}, presumably since those have already been
-treated elsewhere. If @code{liberty_cap} is nonzero, only liberties of substrings of
-the superstring which have at most @code{liberty_cap} liberties are generated.
+treated elsewhere.  If @code{liberty_cap} is nonzero, only liberties of
+substrings of the superstring which have at most @code{liberty_cap} liberties
+are generated.
 @end quotation
 @item @code{void find_superstring_stones_and_liberties(int str, int *num_stones, int *stones, int *num_libs, int *libs, int liberty_cap)}
 @findex find_superstring_stones_and_liberties
@@ -278,31 +302,32 @@ the superstring which have at most @code{liberty_cap} liberties are generated.
 This function computes the superstring at @code{str} as described above,
 but omitting connections of type 5. Then it constructs a list of
 liberties of the superstring which are not already liberties of
-@code{str}. If @code{liberty_cap} is nonzero, only liberties of substrings of the
-superstring which have fewer than @code{liberty_cap} liberties are
+@code{str}. If liberty_cap is nonzero, only liberties of substrings of the
+superstring which have fewer than liberty_cap liberties are
 generated.
 @end quotation
 @item @code{void superstring_chainlinks(int str, int *num_adj, int adjs[MAXCHAIN], int liberty_cap)}
 @findex superstring_chainlinks
 @quotation
-Analogous to chainlinks, this function finds boundary chains of the
+analogous to chainlinks, this function finds boundary chains of the
 superstring at @code{str}, including those which are boundary chains of
 @code{str} itself. If @code{liberty_cap != 0}, only those boundary chains with
 @code{<= liberty_cap} liberties are reported.
 @end quotation
 @item @code{void proper_superstring_chainlinks(int str, int *num_adj, int adjs[MAXCHAIN], int liberty_cap)}
-@findex proper_superstring_chainlinks
+@findex proper_superstring_chainlingks
 @quotation
-Analogous to chainlinks, this function finds boundary chains of the
+analogous to chainlinks, this function finds boundary chains of the
 superstring at @code{str}, omitting those which are boundary chains of
 @code{str} itself. If @code{liberty_cap != 0}, only those boundary chains with
 @code{<= liberty_cap} liberties are reported.
 @end quotation
 @item @code{void start_timer(int n)}
 @findex start_timer
+@cindex timers
 @quotation
-Start a timer. Internal timers are used for assessing time spent on
-various tasks.
+Start a timer. GNU Go has four internal timers available for
+assessing the time spent on various tasks.
 @end quotation
 @item @code{double time_report(int n, const char *occupation, int move, double mintime)}
 @findex time_report
@@ -313,46 +338,130 @@ time is less than mintime.
 @end itemize
 
 @node Print Utilities
-@section Print utilities
+@section Print Utilities
+@cindex formatted printing
 
-Some utility functions from @file{engine/printutils.c}.
-@findex TRACE
-@findex DEBUG
-
-The functions such as @code{gprintf} and the @code{TRACE} and
-@code{DEBUG} macros are derived from @code{vgprintf}, which is
-local to the file. Any one of these functions simulates the
-formatted @code{printf} functions in the standard C library,
-but the formats are slightly modified. One can use %c, %d, %f,
-%s, and %x as usual. But there are some other formats:
+Functions in @file{engine/printutils.c} do formatted printing similar to
+@code{printf} and its allies.  The following formats are recognized:
 
 @itemize @bullet
-@item %m: which takes TWO integers and writes a move;
-@item %1m: which takes one integer and prints a move;
-@item %H: Print a hashvalue.
-@item %C: Print a color as a string.
-@item %M: Like %m but three characters wide for all moves (pads with spaces).
-@item %o at the start means outdent, i.e. cancel indent.
+@item @code{%c}, @code{%d}, @code{%f}, @code{%s}, @code{%x}
+@quotation
+These have their usual meaning in formatted output, printing
+a character, integer, float, string or hexadecimal, respectively.
+@end quotation
+@item @code{%o}
+@quotation
+`Outdent.' Normally output is indented by @code{2*stackp} spaces,
+so that the depth can be seen at a glance in traces. At the
+beginning of a format, this @code{%o} inhibits the indentation.
+@end quotation
+@item @code{%H}
+@quotation
+Print a hashvalue.
+@end quotation
+@item @code{%C}
+@quotation
+Print a color as a string.
+@end quotation
+@item @code{%m}, @code{%2m} (synonyms)
+@quotation
+Takes 2 integers and writes a move, using the two dimensional
+board representation (@pxref{The Board Array})
+@end quotation
+@item @code{%1m}
+@quotation
+Takes 1 integers and writes a move, using the one dimensional
+board representation (@pxref{The Board Array})
+@end quotation
+@item @code{%r}
+@quotation
+Takes 1 integers and writes a move, using the one dimensional
+Print a read result as a string. Possible outcomes are:
+@itemize @minus
+@item 0
+@item KO_B
+@item LOSS
+@item GAIN
+@item KO_A
+@item WIN
+@item SEKI
+@item ERROR
+@end itemize
+@end quotation
 @end itemize
 
-The indentation referred to in the last item displays the stack depth.
+We list the non statically declared functions in @file{printutils.c}.
 
 @itemize @bullet
-@item @code{int gprintf(const char *fmt, ...)}
-@findex gprintf
-@quotation
-The most common formatted print function, writes to stderr.
-@end quotation
 @item @code{void gfprintf(FILE *outfile, const char *fmt, ...)}
 @findex gfprintf
 @quotation
-Wrapper around @code{vgprintf}, writes to outfile.
+Formatted output to @file{outfile}.
 @end quotation
-void
-mprintf(const char *fmt, ...)
-Wrapper around @code{vgprintf}, in contrast to @code{gprintf} this one
-writes to stdout.
-TRACE(const char *fmt, ...)
-Like @code{gprintf}, but silent if the global variable @code{verbose} is
-zero.
+@item @code{int gprintf(const char *fmt, ...)}
+@findex gprintf
+@quotation
+Formatted output to stderr. Always returns 1 to allow use in short-circuit
+logical expressions.
+@end quotation
+@item @code{int mprintf(const char *fmt, ...)}
+@findex mprintf
+@quotation
+Formatted output to stdout. 
+@end quotation
+@item @code{DEBUG(level, fmt, args...)}
+@findex DEBUG
+@quotation
+If @code{level & debug}, do formatted output to stderr. Otherwise, ignore.
+@end quotation
+@item @code{void abortgo(const char *file, int line, const char *msg, int pos)}
+@findex abortgo
+@quotation
+Print debugging output in an error situation, then exit.
+@end quotation
+@item @code{const char * color_to_string(int color)}
+@findex color_to_string
+@quotation
+Convert a color value to a string
+@end quotation
+@item @code{const char * location_to_string(int pos)}
+@findex location_to_string
+@quotation
+Convert a location to a string
+@end quotation
+@item @code{void location_to_buffer(int pos, char *buf)}
+@findex location_to_buffer
+@quotation
+Convert a location to a string, writing to a buffer.
+@end quotation
+@item @code{const char * status_to_string(int status)}
+@findex status_to_string
+@quotation
+Convert a status value to a string.
+@end quotation
+@item @code{const char * safety_to_string(int status)}
+@findex safety_to_string
+@quotation
+Convert a safety value to a string.
+@end quotation
+@item @code{const char * routine_to_string(int routine)}
+@findex routine_to_string
+@quotation
+Convert a routine to a string.
+@end quotation
+@item @code{const char * result_to_string(int result)}
+@findex result_to_string
+@quotation
+Convert a read result to a string
+@end quotation
+@item @code{int string_to_location(int boardsize, char *str, int *m, int *n)}
+@findex string_to_location
+@quotation
+Get the @code{(m, n)} coordinates in the standard GNU Go coordinate system
+from the string @code{str}. This means that @samp{m} is the @samp{n}th row
+from the top and @samp{n} is the column. Both coordinates are between 0 and
+@code{boardsize-1}, inclusive. Return 1 if ok, otherwise return 0;
+@end quotation
 @end itemize
+
