@@ -1540,9 +1540,6 @@ do_owl_attack(int str, int *move, int *wormid,
 	   triggered when the capture is immediate (the tactical reading
 	   code should take care of these) */
 	else if (experimental_owl_ext && goal_worms_computed
-#if 0
-		 && stackp>1
-#endif
 		 && captured >= 3) {
 	  int w = MAX_GOAL_WORMS;
 	  int size = 0;
@@ -2506,20 +2503,6 @@ owl_determine_life(struct local_owl_data *owl,
 
 	/* Fill in the value field for use by the owl_eyespace() function. */
 	eye[pos].value = eyevalue;
-	
-	/* This shortcut has been disabled for two reasons:
-	 * 1. Due to the vital attack moves being able to later reduce
-	 * the *eyemin, we can't say that a certain *eyemin is
-	 * sufficient.
-	 * 2. This part of the code is in no way time critical.
-	 */
-#if 0
-	/* Found two certain eyes---look no further. */
-	if (*eyemin >= 2) {
-	  debug = save_debug;
-	  return 2;
-	}
-#endif
 	
 	if (eye_move_urgency(&eyevalue)) {
 	  value = 50;

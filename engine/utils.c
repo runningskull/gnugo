@@ -323,13 +323,6 @@ play_break_through_n(int color, int num_moves, ...)
   ypos = va_arg(ap, int);
   zpos = va_arg(ap, int);
     
-  /* Temporarily increase the depth values with the number of explicitly
-   * placed stones.
-   */
-#if 0
-  modify_depth_values(played_moves);
-#endif
-  
   if (board[xpos] == EMPTY
       || board[ypos] == EMPTY
       || board[zpos] == EMPTY)
@@ -337,10 +330,6 @@ play_break_through_n(int color, int num_moves, ...)
   else
     success = break_through(xpos, ypos, zpos);
 
-#if 0
-  modify_depth_values(-played_moves);
-#endif
-  
   /* Pop all the moves we could successfully play. */
   for (i = 0; i < played_moves; i++)
     popgo();
@@ -392,17 +381,6 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
   /* Now do the real work. */
   zpos = va_arg(ap, int);
 
-  /* Temporarily increase the depth values with the number of explicitly
-   * placed stones.
-   *
-   * This improves the reading of pattern constraints but
-   * unfortunately tends to be too expensive. For the time being it is
-   * disabled.
-   */
-#if 0
-  modify_depth_values(played_moves);
-#endif
-  
   if (do_attack) {
     if (board[zpos] == EMPTY)
       success = WIN;
@@ -421,10 +399,6 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
     }
   }
 
-#if 0
-  modify_depth_values(-played_moves);
-#endif
-  
   /* Pop all the moves we could successfully play. */
   for (i = 0; i < played_moves; i++)
     popgo();
@@ -479,14 +453,6 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
   ypos = va_arg(ap, int);
   zpos = va_arg(ap, int);
 
-  /* Temporarily increase the depth values with the number of explicitly
-   * placed stones.
-   */
-#if 0
-  modify_depth_values(played_moves);
-#endif
-  
-
   /* FIXED: tm - returns ko results correctly (3.1.22) */
   if (do_attack) {
     if (board[ypos] == EMPTY || board[zpos] == EMPTY)
@@ -501,10 +467,6 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
       success = defend_both(ypos, zpos);
   }
 
-#if 0
-  modify_depth_values(-played_moves);
-#endif
-  
   /* Pop all the moves we could successfully play. */
   for (i = 0; i < played_moves; i++)
     popgo();
@@ -555,17 +517,6 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
   ypos = va_arg(ap, int);
   zpos = va_arg(ap, int);
 
-  /* Temporarily increase the depth values with the number of explicitly
-   * placed stones.
-   *
-   * This improves the reading of pattern constraints but
-   * unfortunately tends to be too expensive. For the time being it is
-   * disabled.
-   */
-#if 0
-  modify_depth_values(played_moves);
-#endif
-  
   /* See if ypos and zpos can be connected (or disconnected). */
   if (do_connect) {
     if (board[ypos] == EMPTY || board[zpos] == EMPTY)
@@ -580,10 +531,6 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
       success = disconnect(ypos, zpos, NULL);
   }
 
-#if 0
-  modify_depth_values(-played_moves);
-#endif
-  
   /* Pop all the moves we could successfully play. */
   for (i = 0; i < played_moves; i++)
     popgo();
@@ -1421,27 +1368,8 @@ who_wins(int color, FILE *outfile)
 {
   float result;
 
-#if 0
-  float white_score;
-  float black_score;
-  int winner;
-#endif
-
   if (color != BLACK && color != WHITE)
     color = BLACK;
-
-#if 0
-  /* Use the aftermath code to compute the final score. (Slower but
-   * more reliable.) 
-   */
-  result = aftermath_compute_score(color, komi);
-  if (result > 0.0)
-    winner = WHITE;
-  else {
-    winner = BLACK;
-    result = -result;
-  }
-#endif
 
   result = estimate_score(NULL, NULL);
   if (result == 0.0)

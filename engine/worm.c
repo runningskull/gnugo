@@ -241,9 +241,6 @@ make_worms(void)
   gg_assert(stackp == 0);
 
   /* We try first to resolve small semeais. */
-#if 0
-  small_semeai(save_verbose);
-#endif
   gg_assert(stackp == 0);
 
   /* Now we try to improve the values of worm.attack and worm.defend.
@@ -893,32 +890,6 @@ find_worm_threats()
       attack_threats(str, MAX_TACTICAL_POINTS,
 		     worm[str].attack_threat_points,
 		     worm[str].attack_threat_codes);
-#if 0
-      /* Threaten to attack by saving weak neighbors. */
-      num_adj = chainlinks(str, adjs);
-      for (k = 0; k < num_adj; k++) {
-	if (worm[adjs[k]].attack_codes[0] != 0
-	    && worm[adjs[k]].defense_codes[0] != 0)
-	  for (r = 0; r < MAX_TACTICAL_POINTS; r++) {
-	    int bb;
-	    
-	    if (worm[adjs[k]].defense_codes[r] == 0)
-	      break;
-	    bb = worm[adjs[k]].defense_points[r];
-	    if (trymove(bb, other, "threaten attack", str,
-			EMPTY, NO_MOVE)) {
-	      int acode;
-	      if (board[str] == EMPTY)
-		acode = WIN;
-	      else
-		acode = attack(str, NULL);
-	      if (acode != 0)
-		change_attack_threat(str, bb, acode);
-	      popgo();
-	    }
-	  }
-      }
-#endif
       /* FIXME: Try other moves also (patterns?). */
     }
     
@@ -1604,11 +1575,6 @@ attack_callback(int anchor, int color, struct pattern *pattern, int ll,
 	continue;
 
       /* No defenses are known at this time, so defend_code is always 0. */
-#if 0
-      /* If the string can be attacked but not defended, ignore it. */
-      if (worm[str].attack_codes[0] == WIN && worm[str].defense_codes[0] == 0)
-	continue;
-#endif
       
       /* FIXME: Don't attack the same string more than once.
        * Play (ti, tj) and see if there is a defense.

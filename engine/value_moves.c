@@ -1195,9 +1195,6 @@ strategic_penalty(int pos, int color)
      *        stones.  Remove later when that change is done.
      */
     switch (move_reasons[r].type) {
-#if 0
-    case EXPAND_TERRITORY_MOVE:
-#endif
     case EXPAND_MOYO_MOVE:
     case STRATEGIC_ATTACK_MOVE:
     case INVASION_MOVE:
@@ -2198,44 +2195,6 @@ estimate_strategical_value(int pos, int color, float score)
 	break;
 	
       case VITAL_EYE_MOVE:
-#if 0
-	/*
-	 * The value of the threatened group itself has already been
-	 * accounted for in territorial_value. Now we need to determine
-	 * the effect this has on surrounding groups.
-	 *
-	 * FIXME: Valuation not implemented.
-	 */
-	aa = eyes[move_reasons[r].what];
-	ecolor = eyecolor[move_reasons[r].what];
-
-	if (ecolor == WHITE) 
-	  bb = white_eye[aa].dragon;
-	else
-	  bb = black_eye[aa].dragon;
-
-	if (bb == NO_MOVE) /* Maybe we should assert this not to happen. */
-	  break; 
-
-	/* If there is an owl attack/defend move reason for this location,
-	 * we don't care about it, since otherwise we would count the
-	 * points twice.
-	 */
-	if (owl_defense_move_reason_known(pos, bb)
-	    || owl_attack_move_reason_known(pos, bb)) {
-	  TRACE_MOVE_REASONS(
-		"    %1m: 0.0 - vital for %1m: owl attack/defense as well\n",
-		pos, bb);
-	  break;
-	}
-
-       if (dragon[bb].status == CRITICAL) {
-	  this_value = ???
-         TRACE("  %1m: %f - vital for %1m\n",
-               pos, this_value, bb);
-	  tot_value += this_value;
-	}
-#endif
 	break;
 
       case STRATEGIC_ATTACK_MOVE:

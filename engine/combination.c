@@ -100,10 +100,6 @@ find_double_threats(int color)
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
     int num_a_threatened_groups;
     int a_threatened_groups[MAX_THREATENED_STRINGS];
-#if 0
-    int num_d_threatened_groups;
-    int d_threatened_groups[MAX_THREATENED_STRINGS];
-#endif
 
     if (!ON_BOARD(ii))
       continue;
@@ -894,17 +890,6 @@ atari_atari_attack_patterns(int color, int minsize,
   if (goal == NULL && update_aa_goal(goal, revised_goal, NO_MOVE, color))
     goal = revised_goal;
 
-#if 0
-  if (goal != NULL) {
-    int pos;
-    gprintf("goal:");
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-      if (ON_BOARD(pos) && goal[pos])
-	gprintf("%o %1m", pos);
-    gprintf("%o\n");
-  }
-#endif
-  
   matchpat(atari_atari_attack_callback, color, &aa_attackpat_db, NULL, goal);
 }
 
@@ -1234,21 +1219,6 @@ update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
     queue[queue_end++] = apos;
   }
 
-#if 0
-  /* Disabled for now, since it does nothing but break atari_atari:16
-   * and trevorc:1540. It could be reactivated when the rest of the
-   * function would be modified in order to garanty that a forbidden
-   * move is strictly equivalent to a played move in terms of goal
-   * mapping. I doubt it would be anything worth though...
-   */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(pos) && forbidden[pos]) {
-      dists[pos] = 1;
-      queue[queue_end++] = pos;
-    }
-  }
-#endif
-
   if (queue_end == 0)
     return 0;
   
@@ -1454,43 +1424,6 @@ aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES])
   number_of_attacks = k;
   gg_sort(attacks, number_of_attacks, sizeof(attacks[0]), move_comp_func);
 }
-
-
-#if 0
-
-/* Returns true if a move by (color) at (pos) is atari on something.
- * Currently unused.
- */
-
-static int
-is_atari(int pos, int color)
-{
-  int other = OTHER_COLOR(color);
-
-  if (!is_legal(pos, color))
-    return 0;
-  
-  if (board[SOUTH(pos)] == other 
-      && countlib(SOUTH(pos)) == 2)
-    return 1;
-  
-  if (board[WEST(pos)] == other 
-      && countlib(WEST(pos)) == 2)
-    return 1;
-  
-  if (board[NORTH(pos)] == other 
-      && countlib(NORTH(pos)) == 2)
-    return 1;
-  
-  if (board[EAST(pos)] == other 
-      && countlib(EAST(pos)) == 2)
-    return 1;
-  
-  return 0;
-}
-
-#endif
-
 
 /*
  * Local Variables:

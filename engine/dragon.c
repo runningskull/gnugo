@@ -1068,35 +1068,12 @@ dragon_invincible(int dr)
 static int
 dragon_looks_inessential(int origin)
 {
-#if 0
-  int d;
-  int k;
-#endif
-  
   if (dragon[origin].size != worm[origin].size)
     return 0;
 
   if (owl_substantial(origin))
     return 0;
 
-#if 0
-  /* This is a proposed modification which solves 13x13:72 but
-   * breaks buzco:5. It adds the two requirements:
-   *
-   * 3. Has no opponent neighbor with status better than DEAD.
-   * 4. Has no opponent neighbor with escape value bigger than 0.
-   *
-   * This probably needs to be revised before it's enabled.
-   */
-  for (k = 0; k < DRAGON2(origin).neighbors; k++) {
-    d = DRAGON2(origin).adjacent[k];
-    if (DRAGON(d).color != board[origin]
-	&& (DRAGON(d).status != DEAD
-	    || dragon2[d].escape_route > 0))
-      return 0;
-  }
-#endif
-  
   return 1;
 }
 

@@ -1469,68 +1469,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
     }
   }
 
-  /* This looks a little too expensive. */
-#if 0
-  /* Look for backfilling moves. */
-  if (stackp <= backfill_depth) {
-    int liberties2;
-    int libs2[6];
-    int r;
-    int s;
-    for (k = 0; k < liberties; k++) {
-      if (is_self_atari(libs[k], other)) {
-	liberties2 = approxlib(libs[k], color, 6, libs2);
-	for (r = 0; r < liberties2; r++) {
-	  xpos = libs2[r];
-	  /* Don't reconsider previously tested moves. */
-	  for (s = 0; s < moves.num; s++)
-	    if (xpos == moves.pos[s])
-	      break;
-	  if (s < moves.num)
-	    continue;
-	  
-	  if (trymove(xpos, color, "defend3-D", str, komaster, kom_pos)) {
-	    int acode;
-	    /* If the newly placed stone is in atari, we give up
-             * without fight.
-	     */
-	    if (countlib(xpos) == 1)
-	      acode = WIN;
-	    else
-	      acode = do_attack(str, NULL, komaster, kom_pos);
-
-	    popgo();
-	    CHECK_RESULT(savecode, savemove, acode, xpos, move,
-	      		 "backfill effective");
-	  }
-	}
-      }
-      else {
-	liberties2 = approxlib(libs[k], other, 3, libs2);
-	if (liberties2 <= 3) {
-	  for (r = 0; r < liberties2; r++) {
-	    xpos = libs2[r];
-	    /* Don't reconsider previously tested moves. */
-	    for (s = 0; s < moves.num; s++)
-	      if (xpos == moves.pos[s])
-		break;
-	    if (s < moves.num)
-	      continue;
-	    
-	    if (!is_self_atari(xpos, color)
-		&& trymove(xpos, color, "defend2-G", str, komaster, kom_pos)) {
-	      int acode = do_attack(str, NULL, komaster, kom_pos);
-	      popgo();
-	      CHECK_RESULT(savecode, savemove, acode, xpos, move
-			   "backfill effective");
-	    }
-	  }
-	}
-      }
-    }
-  }
-#endif
-  
   /* If nothing else works, try to defend with second order liberties. */
 
   saved_num_moves = moves.num;
@@ -1700,9 +1638,6 @@ defend4(int str, int *move, int komaster, int kom_pos)
 
   if (stackp <= backfill_depth) {
     break_chain2_defense_moves(str, &moves);
-#if 0 
-    hane_rescue_moves(str, libs, &moves);
-#endif
   }
 
   order_moves(str, &moves, color, read_function_name, 0);
@@ -2896,9 +2831,6 @@ attack3(int str, int *move, int komaster, int kom_pos)
   ASSERT1(liberties == 3, str);
   
   for (k = 0; k < 3; k++) {
-#if 0
-    int libs2[2];
-#endif
     int apos = libs[k];
     /* we only want to consider the move at (apos) if:
      * stackp <= backfill_depth
@@ -2917,14 +2849,6 @@ attack3(int str, int *move, int komaster, int kom_pos)
     if (edge_closing_backfill(str, apos, &xpos))
       ADD_CANDIDATE_MOVE(xpos, 0, moves);
 
-#if 0
-    /* Try backfilling if atari is impossible. */
-    if (stackp <= backfill_depth
-	&& approxlib(apos, other, 2, libs2) == 1) {
-      ADD_CANDIDATE_MOVE(libs2[0], 0, moves);
-    }
-#endif
-    
     /* Look for edge blocking moves. */
     edge_block_moves(str, apos, &moves);
   }
@@ -3743,117 +3667,6 @@ edge_closing_backfill(int str, int apos, int *move)
 }
 
 
-/* The first version of this function seemed to induce too many
- * variations and has therefore been replaced by a much more limited
- * version.
- */
-#if 0
-
-/* In positions like
- *
- * OO...
- * XXO*.
- * x.X*.
- * -----
- *
- * where the X stones to the left are being attacked, it is often a
- * good idea to first consider either or both of the moves marked by *
- * in the diagram. Notice that propose_edge_moves() doesn't help with
- * this, since the rightmost X stone is not part of the attacked
- * string, only the corresponding superstring.
- *
- * This function identifies the situation
- *
- * ?XO.?   ?bdf?
- * ?.X.o   haceg
- * -----   -----
- *
- * where a is a liberty of the attacked string, b is a stone of the
- * attacked string, and e and f are the considered moves. Also
- * considered is the situation where the conditions to the right are
- * not correct but c has only two liberties anyway. If safe, the move
- * to make atari on c is proposed.
- *
- * Notice, this code is disabled, as commented above.
- */
-
-static void
-edge_block_moves(int str, int apos, struct reading_moves *moves)
-{
-  int color = board[str];
-  int other = OTHER_COLOR(color);
-  int cpos;
-  int dpos;
-  int epos;
-  int fpos;
-  int gpos;
-  int hpos;
-  int score;
-  int k, l;
-
-  /* Search for the right orientation. */
-  for (k = 0; k < 4; k++) {
-    int up = delta[k];
-    if (ON_BOARD(apos - up))
-      continue;
-    if (board[apos + up] != color || !same_string(apos + up, str))
-      return;
-    
-    for (l = 0; l < 2; l++) {
-      int right = delta[(k+1)%4];
-      if (l == 1)
-	right = -right;
-
-      cpos = apos + right;
-      dpos = apos + right + up;
-
-      if (board[cpos] != color || board[dpos] != other)
-	continue;
-
-      epos = cpos + right;
-      fpos = dpos + right;
-      gpos = epos + right;
-      hpos = apos - right;
-      
-      if (!ON_BOARD(epos))
-	continue;
-      
-      if (board[epos] == EMPTY && board[fpos] == EMPTY 
-	  && (board[gpos] != color)) {
-	/* Everything is set up, suggest moves at e and f. */
-	if (!ON_BOARD(hpos) || board[hpos] == color)
-	  score = 0;
-	else
-	  score = -5;
-	if (countlib(str) == 2)
-	  score -= 10;
-	ADD_CANDIDATE_MOVE(epos, score, *moves);
-
-	if (countlib(dpos) == 1)
-	  score = 25;
-	else
-	  score = 0;
-	if (countlib(str) == 2)
-	  score -= 10;
-	ADD_CANDIDATE_MOVE(fpos, score, *moves);
-      }
-      else if (countlib(cpos) == 2 && countlib(dpos) > 1) {
-	int libs[2];
-	int move;
-	findlib(cpos, 2, libs);
-	if (libs[0] == apos)
-	  move = libs[1];
-	else
-	  move = libs[0];
-	if (!is_self_atari(move, other))
-	  ADD_CANDIDATE_MOVE(move, 0, *moves);
-      }
-    }
-  }
-}
-
-#else
-
 /* In positions like
  *
  * OOX..
@@ -3921,8 +3734,6 @@ edge_block_moves(int str, int apos, struct reading_moves *moves)
     }
   }
 }
-
-#endif
 
 /* ================================================================ */
 /*            Defending by attacking surrounding strings            */
