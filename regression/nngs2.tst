@@ -45,6 +45,11 @@ loadsgf games/nngs/tobyiii-gnugo-3.3.2-200206041432.sgf 162
 80 gg_genmove black
 #? [O4|P1]*
 
+#CATEGORY=BLUNDER (incorrectly rejected move)
+loadsgf games/nngs/tobyiii-gnugo-3.3.2-200206041432.sgf 166
+90 gg_genmove black
+#? [N1]*
+
 
 ############ End of Tests #################
 
