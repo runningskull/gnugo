@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new command line option --decide-dragon-data
 - consistency checking of replacement patterns reenabled for unstable line
 - tuning
 
