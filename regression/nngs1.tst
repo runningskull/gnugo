@@ -94,3 +94,8 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 130
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203121818.sgf 88
 24 gg_genmove white
 #? [L7|J5|M6]
+
+loadsgf games/nngs/gnugo-3.1.27-wingjk-200203101039.sgf 78
+25 gg_genmove white
+#? [C9]
+

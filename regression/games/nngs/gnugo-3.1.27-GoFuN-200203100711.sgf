@@ -1,0 +1,33 @@
+(;GM[1]FF[4]
+SZ[19]HA[0]KM[0.5]
+PW[GnuGo (GNU Go 3.1.27)]WR[13k*]
+PB[GoFuN]BR[NR]
+PC[NNGS]DT[2002-03-10]AP[gnugoclient:2.0]
+RE[B+95.5]
+;B[pd];W[dd];B[qp];W[dq];B[oq];W[qc];B[qd];W[pc];B[oc];W[ob];B[nc]
+;W[nb];B[mc];W[rd];B[re];W[rc];B[qf];W[do];B[jp];W[hq];B[pk];W[oo]
+;B[mn];W[qo];B[pp];W[po];B[qm];W[hc];B[cj];W[np];B[nq];W[om];B[nl]
+;W[df];B[cm];W[co];B[jr];W[jd];B[lf];W[ih];B[lh];W[ec];B[jf];W[ki]
+;B[li];W[ir];B[iq];W[ip];B[jq];W[io];B[jo];W[hr];B[hf];W[em];B[dh]
+;W[ij];B[in];W[il];B[hn];W[go];B[gl];W[lk];B[lj];W[mk];B[nk];W[mj]
+;B[kj];W[kl];B[jm];W[jl];B[gj];W[jg];B[kg];W[ig];B[if];W[gh];B[fg]
+;W[cg];B[fh];W[bi];B[ci];W[bj]C[L:8];B[ck];W[mb];B[bk];W[ch]C[L:9]
+;B[gn];W[kc]C[L:10];B[fe];W[js];B[ks];W[is];B[lr];W[ld];B[md];W[ho]
+;B[fn];W[dm];B[fo];W[fq];B[fp];W[gp];B[ep];W[eq];B[dp];W[cp];B[cn]
+;W[dn];B[ek];W[bn];B[bm];W[ao];B[fl];W[me];B[le];W[lc];B[od];W[dl]
+;B[dk];W[ke];B[kf];W[je];B[fc];W[fb];B[gc];W[gb];B[hd];W[ic];B[ef]
+;W[ee];B[dg];W[cf];B[fd];W[ed];B[aj];W[ah];B[am];W[an];B[cl];W[sd]
+;B[se];W[fm];B[gm];W[ie];B[he];W[ai];B[ak];W[id];B[el];W[eo];B[en]
+;W[ap];B[hi];W[]
+C[final_score: B+94.5
+N15 removed
+J13 removed
+G12 removed
+L11 removed
+J10 removed
+N10 removed
+J8 removed
+P7 removed
+P5 removed
+O4 removed]
+)
