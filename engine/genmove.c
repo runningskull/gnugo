@@ -643,6 +643,9 @@ revise_semeai(int color)
   int found_one = 0;
   int other = OTHER_COLOR(color);
 
+  if (stones_on_board(BLACK | WHITE) == 0)
+    return 0;
+  
   gg_assert(dragon2 != NULL);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {

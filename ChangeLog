@@ -2,7 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-
+- bugfix in revise_semeai()
 - find_half_and_false_eyes() bugfixed
 - improve_lunch_attack() revised
 - new type of marginal vertices INESSENTIAL_MARGINAL 
