@@ -110,9 +110,9 @@ sub genmove {
 
     my $cmd;
     if ($color =~ /^b/i) {
-    	$cmd = "genmove_black";
+    	$cmd = "genmove black";
     } elsif ($color =~ /^w/i) {
-    	$cmd = "genmove_white";
+    	$cmd = "genmove white";
     } else {
     	die "Illegal color $color\n";
     }
@@ -123,14 +123,14 @@ sub black {
     my $self = shift;
     my $move = shift;
 
-    GTP::exec_cmd($self->{in}, $self->{out}, "black $move");
+    GTP::exec_cmd($self->{in}, $self->{out}, "play black $move");
 }
 
 sub white {
     my $self = shift;
     my $move = shift;
 
-    GTP::exec_cmd($self->{in}, $self->{out}, "white $move");
+    GTP::exec_cmd($self->{in}, $self->{out}, "play white $move");
 }
 
 sub komi {
@@ -145,6 +145,12 @@ sub boardsize {
     my $size = shift;
 
     GTP::exec_cmd($self->{in}, $self->{out}, "boardsize $size");
+}
+
+sub clear_board {
+    my $self = shift;
+
+    GTP::exec_cmd($self->{in}, $self->{out}, "clear_board");
 }
 
 sub handicap {
@@ -202,10 +208,10 @@ sub score {
     return GTP::exec_cmd($self->{in}, $self->{out}, "score");
 }
 
-sub estimate_score {
+sub final_score {
     my $self = shift;
 
-    my $ret = GTP::exec_cmd($self->{in}, $self->{out}, "estimate_score");
+    my $ret = GTP::exec_cmd($self->{in}, $self->{out}, "final_score");
     my ($result, $rest) = split(' ', $ret, 2);
     return $result;
 }
@@ -298,10 +304,12 @@ sub play {
 
     print "Setting boardsize and komi for black\n" if $verbose;
     $self->black->boardsize($size);
+    $self->black->clear_board();
     $self->black->komi($komi);
 
     print "Setting boardsize and komi for white\n" if $verbose;
     $self->white->boardsize($size);
+    $self->white->clear_board();
     $self->white->komi($komi);
 
     my $pass = 0;
@@ -387,8 +395,8 @@ sub play {
 	$resultb = $toplay eq 'B' ? 'B+R' : 'W+R';
 	$resultw = $resultb;
     } else {
-	$resultw = $self->white->estimate_score;
-	$resultb = $self->black->estimate_score;
+	$resultw = $self->white->final_score;
+	$resultb = $self->black->final_score;
     }
     if ($resultb eq $resultw) {
 	print "Result: $resultw\n";
