@@ -187,6 +187,20 @@ loadsgf games/gunnar/rbm-bobk-200303111815.sgf -L 159
 306 owl_attack M17
 #? [0]*
 
+loadsgf games/nngs/guestn-gnugo-3.3.17-200304200323.sgf 52
+307 owl_attack S10
+#? [1 S11]
+
+308 owl_defend S10
+#? [1 S11]
+
+loadsgf games/nngs/gnugo-3.3.18-spewnboy-200304291635.sgf 91
+309 owl_attack N5
+#? [1 L2|L4]
+
+310 owl_defend N5
+#? [1 L2|L4]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

@@ -146,7 +146,7 @@ loadsgf games/semeai2.sgf 152
 #? [Q11]*
 
 loadsgf games/strategy21.sgf 86
-77 gg_genmove black
+77 restricted_genmove black N4 H3 G3 J2 H2 G2
 #? [H3]
 
 # Compare reading test 131.

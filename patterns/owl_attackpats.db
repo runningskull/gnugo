@@ -2312,6 +2312,21 @@ Pattern A619
 
 :8,-,value(75)
 
+Pattern A620
+#evand New Pattern. (3.3.18)
+
+.XO	push in to destroy eyespace
+*Ox
+---
+
+:8,s,value(65)
+
+aXO
+*Ox
+---
+
+;!obvious_false_xeye(a)
+
 
 #########################################################
 #                                                       #
@@ -3453,6 +3468,41 @@ B*A
 ?O.
 
 ;!owl_goal_dragon(A) && !oplay_connect(*,A,B)
+
+
+Pattern A1022
+# evand New pattern. (3.3.18)
+
+oY.O
+..*.
+.X.X
+...o
+
+:8,-,value(55)
+
+oA.O
+..*.
+.X.B
+...o
+
+;!oplay_connect(*,A,B)
+
+Pattern A1023
+# evand New pattern. (3.3.18)
+
+?Xx?
+O*.?
+?..?
+xYxx
+
+:8,-,value(45)
+
+?Bx?
+O*a?
+?..?
+xCxx
+
+;oplay_disconnect(*,a,B,C)
 
 
 #########################################################

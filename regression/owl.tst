@@ -6,7 +6,7 @@ reset_reading_node_counter
 # incident 66
 loadsgf games/incident66.sgf 52
 1 owl_attack D8
-#? [1 (F8|E8)]
+#? [1 (F8|E8|E9)]
 2 owl_defend D8
 #? [1 E9]
 

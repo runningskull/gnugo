@@ -1050,6 +1050,18 @@ cdOeF
 ;lib(F)>=3 && owl_topological_eye(a,b)<=2 && !xplay_attack(c,d,e,c)
 
 
+Pattern D233
+# evand New pattern. (3.3.18)
+# see owl:257
+
+oooO?	block
+oo.*X
+ooo..
+-----
+
+:8,n,value(35)
+
+
 #########################################################
 #                                                       #
 #          Expanding moves in the center                #

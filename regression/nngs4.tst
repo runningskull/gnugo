@@ -40,7 +40,7 @@ loadsgf games/nngs/gnugo-3.3.12-jimm-200211261724.sgf 20
 
 loadsgf games/nngs/gnugo-3.3.12-jimm-200211261724.sgf 170
 90 gg_genmove white
-#? [D12|C11|E14]
+#? [D12|C11|E14|B12]
 
 loadsgf games/nngs/leftd-gnugo-3.3.12-200211292017.sgf 184
 100 gg_genmove black

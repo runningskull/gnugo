@@ -7,6 +7,8 @@
   GTP commands
 - adjust conection and semeai depth parameters according to levels
 - don't forget to switch exchange sgf_messages in order_moves()
+- owl tuning
+- new tests and test revisions
 
 3.3.19 released April 28, 2003
 
