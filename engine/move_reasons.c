@@ -2485,8 +2485,7 @@ adjusted_worm_attack_value(int pos, int ww)
   for (s = 0; s < num_adj; s++) {
     int adj = adjs[s];
 
-    if (dragon[adj].matcher_status == ALIVE
-	|| dragon[adj].matcher_status == CRITICAL)
+    if (dragon[adj].matcher_status != DEAD)
       has_live_neighbor = 1;
 
     if (dragon[adj].matcher_status == DEAD

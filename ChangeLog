@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- adjusted_worm_attack_value() revised
 - indented debug output of secondary move values
 - new local struct aa_move in combinations.c
 - new pattern class 'c' for conditional moves in aa_attackspats.db
