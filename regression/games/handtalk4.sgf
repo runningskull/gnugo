@@ -1,10 +1,10 @@
-(;GM[1]FF[3]
-RU[Japanese]BR[]WR[]SZ[19]HA[2]KM[0.5]
-PW[Handtalk]
+(;GM[1]FF[4]
+RU[Japanese]SZ[19]HA[2]KM[0.5]
+PW[Handtalk 95.10]
 PB[GNU Go 3.1.29]
-GN[White (W) vs. Black (B)]
+GN[Game supplied by Jessie Annala]
 DT[2002-03-30]
-SY[Cgoban 1.9.12]TM[1:00:00(5x1:00)]AB[pd][dp]
+SY[Cgoban 1.9.12]AB[pd][dp]
 RE[B+1.5]
 ;W[de];B[pp];W[dc];B[jc];W[jq];B[cg];W[cj];B[eg];W[cm];B[co];W[qj];
 B[be];W[hc];B[mc];W[gq];B[gg];W[qg];B[mq];W[qm];B[qo];W[dr];B[qe];

@@ -1,9 +1,11 @@
-(;GM[1]FF[3]
-RU[Japanese]BR[]WR[]CP[]SZ[19]HA[0]KM[5.5]
-PW[Handtalk]
+(;GM[1]FF[4]
+RU[Japanese]SZ[19]HA[0]KM[5.5]
+PW[Handtalk 95.10]
 PB[GNU Go 3.1.29]
 DT[2002-03-28]
-SY[Cgoban 1.9.12]TM[1:00:00(5x1:00)];B[pd];W[pp];B[dc];W[cq];B[ce];
+GN[Game supplied by Jessie Annala]
+RE[W+67.5]
+;B[pd];W[pp];B[dc];W[cq];B[ce];
 W[jc];B[nq];W[oq];B[np];W[kq];B[dp];W[dq];B[ep];W[hq];B[bo];W[bp];
 B[co];W[eq];B[nn];W[pn];B[ql];W[pl];B[pk];W[ol];B[qm];W[ro];B[di];
 W[on];B[mc];W[nm];B[fl];W[qh];B[mn];W[pi];B[oj];W[oi];B[ri];W[rh];
