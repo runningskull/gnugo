@@ -1117,6 +1117,8 @@ x.........?
 
 
 Pattern F410c
+# evand changed from j to t class. (3.5.2)
+# It was causing too many slow moves early.  See nngs4:660
 
 x.........xx
 x.........xx
@@ -1127,7 +1129,7 @@ x...........
 x...........
 ------------
 
-:8,FEdj
+:8,FEdt
 
 x.........cd
 x.........ef
