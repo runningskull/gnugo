@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.34 released April 20, 2002
+
 - "choose best anchor"-platform dependency patch in mkpat.c
 - bogus (int) conversion removed in get_next_move_from_list
 - 3.0 replaced by 3.2 in WINDOWS
