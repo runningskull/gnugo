@@ -1731,7 +1731,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
 	  int lib;
 
 	  if (board[diagonal] == other && findlib(diagonal, 1, &lib) == 1) {
-	    if (does_secure(color, lib, pos)) {
+	    if (lib != pos && does_secure(color, lib, pos)) {
 	      value = 1.0;
 	      apos = lib;
 	      break;
