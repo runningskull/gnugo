@@ -2,9 +2,9 @@ VERSION 3.5.9
 
 New in 3.6 (since 3.4)
 
-- slightly stronger, many small improvements
+- slightly stronger than 3.4, many small improvements
 - GNU Go can now resign games
-- several crashes fixed
+- basic knowledge of how to break out of mirror go
 
 New in 3.4 (since 3.2)
 

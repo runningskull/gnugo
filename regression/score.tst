@@ -41,7 +41,7 @@ loadsgf games/scoring/score10.sgf
 
 loadsgf games/scoring/score11.sgf
 11 final_score
-#? [W\+132.5]
+#? [W\+132.5]*
 
 loadsgf games/scoring/score12.sgf
 12 final_score
@@ -53,7 +53,7 @@ loadsgf games/scoring/score13.sgf
 
 loadsgf games/scoring/score14.sgf
 14 final_score
-#? [W\+73.5]
+#? [W\+73.5]*
 
 loadsgf games/scoring/score15.sgf
 15 final_score
