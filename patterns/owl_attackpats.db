@@ -4572,10 +4572,11 @@ Pattern A1124a
 # tm New Pattern (3.1.22) (see nngs:770 decide-dragon K4)
 #   see also D1140
 # gf Revised. Might still be too general. (3.5.4)
+# spl revised (3.5.5)
 
 ?OY
 x*.
-xx.
+xxx
 
 :8,-,value(70)
 
