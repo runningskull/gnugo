@@ -5747,6 +5747,20 @@ Pattern A1350
 ;lib(A)==3
 
 
+Pattern A1351
+# mh New Pattern (3.5.4)
+# see ld_owl:406-412
+
+|OO??   better than capturing
+|XOX?
+|.X.X
+|*.X?
+|..X?
++----
+
+:8,s,value(75)
+
+
 #########################################################
 #                                                       #
 #               Invasion patterns                       #
