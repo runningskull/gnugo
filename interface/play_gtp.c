@@ -1648,7 +1648,7 @@ gtp_owl_analyze_semeai(char *s)
   int i, j;
   int k;
   int dragona, dragonb;
-  int resulta, resultb, move;
+  int resulta, resultb, move, result_certain;
   
   k = gtp_decode_coord(s, &i, &j);
 
@@ -1669,12 +1669,15 @@ gtp_owl_analyze_semeai(char *s)
   if (sgf_dumptree)
     reading_cache_clear();
 
-  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 1);
+  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 1,
+  		     &result_certain);
   gtp_start_response(GTP_SUCCESS);
   gtp_mprintf("%s %s %m", 
 	      safety_to_string(resulta),
 	      safety_to_string(resultb),
 	      I(move), J(move));
+  if (!result_certain && report_uncertainty)
+    gtp_printf(" uncertain");
 
   return gtp_finish_response();
 }  
@@ -1691,7 +1694,7 @@ gtp_tactical_analyze_semeai(char *s)
   int i, j;
   int k;
   int dragona, dragonb;
-  int resulta, resultb, move;
+  int resulta, resultb, move, result_certain;
   
   k = gtp_decode_coord(s, &i, &j);
 
@@ -1712,12 +1715,15 @@ gtp_tactical_analyze_semeai(char *s)
   if (sgf_dumptree)
     reading_cache_clear();
 
-  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 0);
+  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 0,
+                     &result_certain);
   gtp_start_response(GTP_SUCCESS);
   gtp_mprintf("%s %s %m", 
 	      safety_to_string(resulta),
 	      safety_to_string(resultb),
 	      I(move), J(move));
+  if (!result_certain && report_uncertainty)
+    gtp_printf(" uncertain");
 
   return gtp_finish_response();
 }  

@@ -437,8 +437,6 @@ int is_suicide(int pos, int color);
 int is_illegal_ko_capture(int pos, int color);
 int trymove(int pos, int color, const char *message, int str, 
 	    int komaster, int kom_pos);
-int semeai_trymove(int pos, int color, const char *message, 
-		   int str1, int str2, int owl_phase, int value);
 int tryko(int pos, int color, const char *message, 
 	  int komaster, int kom_pos);
 void popgo(void);

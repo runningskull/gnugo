@@ -86,32 +86,32 @@ reset_reading_node_counter
 
 loadsgf games/semeai/semeai6.sgf
 1 owl_analyze_semeai C1 E1
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI (F1|F2|F3|F4|F5|PASS)]
+#? [ALIVE ALIVE (F1|F2|F3|F4|F5|PASS)]
 
 2 owl_analyze_semeai E1 C1
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI (B5|B4|B3|PASS)]
+#? [ALIVE ALIVE (B5|B4|B3|PASS)]
 
 3 owl_analyze_semeai L1 N1
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI (O5|O4|O3|P3|Q2|Q1|PASS)]
+#? [ALIVE ALIVE (O5|O4|O3|P3|Q2|Q1|PASS)]
 
 4 owl_analyze_semeai N1 L1
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI (H2|J3|K3|PASS)]
+#? [ALIVE ALIVE (H2|J3|K3|PASS)]
 
 5 owl_analyze_semeai A14 A12
 #? [ALIVE DEAD (A13|B13|C13|D13)]
 
 6 owl_analyze_semeai A12 A14
-#? [ALIVE DEAD (A15|B15|C15|D15)]
+#? [ALIVE DEAD (A15|B15|C15|D15|E15)]
 
 loadsgf games/semeai/semeai7.sgf
 7 owl_analyze_semeai C1 E1
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI (F1|F2|F3|F4|F5|PASS)]
+#? [ALIVE ALIVE (F1|F2|F3|F4|F5|PASS)]
 
 8 owl_analyze_semeai E1 C1
 #? [ALIVE DEAD (B2|B3)]
 
 9 owl_analyze_semeai L1 N1
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI (O5|O4|O3|P3|Q2|Q1)]
+#? [ALIVE ALIVE (O5|O4|O3|P3|Q2|Q1)]
 
 10 owl_analyze_semeai N1 L1
 #? [ALIVE DEAD (H2|K3)]
@@ -139,7 +139,7 @@ loadsgf games/semeai/semeai8.sgf
 #? [DEAD ALIVE PASS]
 
 18 owl_analyze_semeai A12 A14
-#? [ALIVE DEAD (A15|B15|D15|PASS)]
+#? [ALIVE DEAD (A15|B15|D15|E15|PASS)]
 
 loadsgf games/semeai/semeai9.sgf
 
@@ -153,7 +153,7 @@ loadsgf games/semeai/semeai9.sgf
 #? [ALIVE DEAD (T17|T19)]
 
 22 owl_analyze_semeai O19 N19
-#? [ALIVE DEAD (L15|L17|L18)]
+#? [ALIVE DEAD (L16|L17|L18|M19)]
 
 loadsgf golois/Goemate990902-1.sgf
 
@@ -191,7 +191,7 @@ loadsgf games/strategy11.sgf 127
 
 loadsgf games/nicklas/nicklas14.sgf 55
 32 owl_analyze_semeai B8 D9
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI B6]
+#? [ALIVE ALIVE B6]
 
 loadsgf games/nicklas/nicklas14.sgf 55
 33 owl_analyze_semeai D9 B8
@@ -205,7 +205,7 @@ loadsgf games/bretz.sgf 130
 # ab added (3.1.22)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 35 owl_analyze_semeai M13 M11
-#? [ALIVE DEAD PASS]*
+#? [ALIVE DEAD (PASS|N13|N10|H11)]*
 
 # See also reading:166
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
@@ -218,10 +218,11 @@ loadsgf games/semeai/semeai10.sgf
 
 loadsgf games/semeai/semeai11.sgf
 38 owl_analyze_semeai B9 B8
-#? [ALIVE DEAD PASS]*
+#? [ALIVE DEAD (PASS|B1|A9)]*
 
 # See also global:3.
 loadsgf golois/Aya991113-13.sgf
+# Correct answer is ko dependent (2 2 H4).
 39 owl_analyze_semeai R12 H9
 #? [!ALIVE DEAD J4]*
 

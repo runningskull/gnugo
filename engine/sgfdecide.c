@@ -313,7 +313,7 @@ void
 decide_semeai(int apos, int bpos)
 {
   SGFTree tree;
-  int resulta, resultb, move;
+  int resulta, resultb, move, result_certain;
   int color = board[apos];
 
   if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
@@ -335,20 +335,24 @@ decide_semeai(int apos, int bpos)
   if (*outfilename)
     sgffile_begindump(&tree);
 
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1);
-  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
+  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1,
+		     &result_certain);
+  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)%s\n",
 	  color == BLACK ? "black" : "white",
 	  move,
 	  apos, safety_to_string(resulta),
   	  bpos, safety_to_string(resultb),
-	  count_variations);
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 1);
-  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
+	  count_variations,
+	  result_certain ? "" : ", uncertain");
+  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 1,
+		     &result_certain);
+  gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)%s\n",
 	  color == BLACK ? "white" : "black",
 	  move,
 	  apos, safety_to_string(resulta),
   	  bpos, safety_to_string(resultb),
-	  count_variations);
+	  count_variations,
+	  result_certain ? "" : ", uncertain");
 
   sgffile_enddump(outfilename);
   count_variations = 0;
@@ -359,7 +363,7 @@ void
 decide_tactical_semeai(int apos, int bpos)
 {
   SGFTree tree;
-  int resulta, resultb, move;
+  int resulta, resultb, move, dummy;
   int color = board[apos];
 
   if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
@@ -381,14 +385,14 @@ decide_tactical_semeai(int apos, int bpos)
   if (*outfilename)
     sgffile_begindump(&tree);
 
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0);
+  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
   gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color == BLACK ? "black" : "white",
 	  move,
 	  apos, safety_to_string(resulta),
   	  bpos, safety_to_string(resultb),
 	  count_variations);
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0);
+  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0, &dummy);
   gprintf("After %s at %1m, %1m is %s, %1m is %s (%d nodes)\n",
 	  color == BLACK ? "white" : "black",
 	  move,

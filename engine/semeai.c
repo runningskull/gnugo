@@ -102,12 +102,15 @@ new_semeai()
   int semeai_results_first[MAX_DRAGONS][MAX_DRAGONS];
   int semeai_results_second[MAX_DRAGONS][MAX_DRAGONS];
   int semeai_move[MAX_DRAGONS][MAX_DRAGONS];
+  char semeai_certain[MAX_DRAGONS][MAX_DRAGONS];
   int d1, d2;
   int k;
   int num_dragons = number_of_dragons;
 
-  if (num_dragons > MAX_DRAGONS)
+  if (num_dragons > MAX_DRAGONS) {
+    TRACE("Too many dragons!!! Might disregard some semeais.");
     num_dragons = MAX_DRAGONS;
+  }
 
   for (d1 = 0; d1 < num_dragons; d1++)
     for (d2 = 0; d2 < num_dragons; d2++) {
@@ -119,6 +122,7 @@ new_semeai()
     for (k = 0; k < dragon2[d1].neighbors; k++) {
       int apos = DRAGON(d1).origin;
       int bpos = DRAGON(dragon2[d1].adjacent[k]).origin;
+      int result_certain;
       
       d2 = dragon[bpos].id;
 
@@ -173,12 +177,13 @@ new_semeai()
       owl_analyze_semeai(apos, bpos,
 			 &(semeai_results_first[d1][d2]), 
 			 &(semeai_results_second[d2][d1]),
-			 &(semeai_move[d1][d2]), 1);
-      DEBUG(DEBUG_SEMEAI, "results if %s moves first: %s %s, %1m\n",
+			 &(semeai_move[d1][d2]), 1, &result_certain);
+      DEBUG(DEBUG_SEMEAI, "results if %s moves first: %s %s, %1m%s\n",
 	    board[apos] == BLACK ? "black" : "white",
 	    safety_to_string(semeai_results_first[d1][d2]),
 	    safety_to_string(semeai_results_second[d2][d1]),
-	    semeai_move[d1][d2]);
+	    semeai_move[d1][d2], result_certain ? "" : " (uncertain)");
+      semeai_certain[d1][d2] = result_certain;
     }
   
   for (d1 = 0; d1 < num_dragons; d1++) {
@@ -187,6 +192,8 @@ new_semeai()
     int worst_result = UNKNOWN;
     int defense_move = PASS_MOVE;
     int attack_move = PASS_MOVE;
+    int defense_certain = 0;
+    int attack_certain = 0;
     
     for (d2 = 0; d2 < num_dragons; d2++) {
       if (semeai_results_first[d1][d2] == -1)
@@ -197,16 +204,22 @@ new_semeai()
       if (best_result == DEAD
 	  || best_result == UNKNOWN
 	  || (best_result == ALIVE_IN_SEKI 
-	      && semeai_results_first[d1][d2] != DEAD)) {
+	      && semeai_results_first[d1][d2] != DEAD)
+	  || (best_result == semeai_results_first[d1][d2]
+	      && semeai_certain[d1][d2] > attack_certain)) {
 	best_result = semeai_results_first[d1][d2];
 	defense_move = semeai_move[d1][d2];
+	attack_certain = semeai_certain[d1][d2];
       }
       if (worst_result == ALIVE
 	  || worst_result == UNKNOWN
 	  || (worst_result == ALIVE_IN_SEKI 
-	      && semeai_results_second[d1][d2] != ALIVE)) {
+	      && semeai_results_second[d1][d2] != ALIVE)
+	  || (worst_result == semeai_results_second[d1][d2]
+	      && semeai_certain[d2][d1] > defense_certain)) {
 	worst_result = semeai_results_second[d1][d2];
 	attack_move = semeai_move[d2][d1];
+	defense_certain = semeai_certain[d2][d1];
       }
     }
     if (semeai_found) {
@@ -214,7 +227,9 @@ new_semeai()
       if (best_result != DEAD && worst_result == DEAD) {
 	update_status(DRAGON(d1).origin, CRITICAL, CRITICAL);
 	dragon2[d1].semeai_defense_point = defense_move;
+	dragon2[d1].semeai_defense_certain = defense_certain;
 	dragon2[d1].semeai_attack_point = attack_move;
+	dragon2[d1].semeai_attack_certain = attack_certain;
       }
       else if (worst_result == ALIVE_IN_SEKI)
 	update_status(DRAGON(d1).origin, ALIVE, ALIVE_IN_SEKI);
@@ -224,6 +239,12 @@ new_semeai()
   }
 }
 
+/* This function adds the semeai related move reasons, using the information
+ * stored in the dragon2 array.
+ *
+ * If the semeai had an uncertain result, and there is a owl move with
+ * certain result doing the same, we don't trust the semeai move.
+ */
 void
 semeai_move_reasons(int color)
 {
@@ -232,12 +253,19 @@ semeai_move_reasons(int color)
 
   for (d = 0; d < number_of_dragons; d++)
     if (dragon2[d].semeai && DRAGON(d).status == CRITICAL) {
-      if (DRAGON(d).color == color && dragon2[d].semeai_defense_point) {
+      if (DRAGON(d).color == color
+          && dragon2[d].semeai_defense_point
+	  && (dragon2[d].owl_defense_point == NO_MOVE
+	      || dragon2[d].semeai_defense_certain >= 
+	         dragon2[d].owl_defense_certain)) {
 	add_semeai_move(dragon2[d].semeai_defense_point, dragon2[d].origin);
 	DEBUG(DEBUG_SEMEAI, "Adding semeai defense move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_defense_point);
       }
-      else if (DRAGON(d).color == other && dragon2[d].semeai_attack_point) {
+      else if (DRAGON(d).color == other && dragon2[d].semeai_attack_point
+	       && (dragon2[d].owl_attack_point == NO_MOVE
+		   || dragon2[d].semeai_attack_certain >= 
+		      dragon2[d].owl_attack_certain)) {
 	add_semeai_move(dragon2[d].semeai_attack_point, dragon2[d].origin);
 	DEBUG(DEBUG_SEMEAI, "Adding owl attack move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_attack_point);
@@ -842,12 +870,13 @@ small_semeai_analyzer(int apos, int bpos, int save_verbose)
 {
   int move;
   int resulta, resultb;
+  int dummy;
 
   /* FIXME: Not ko aware yet (since owl_analyze_semeai isn't).
    * Should be more careful if there is already a defense point.
    */
 
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0);
+  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
   if (resulta != DEAD
       && worm[apos].defense_codes[0] == 0
       && move != NO_MOVE) {

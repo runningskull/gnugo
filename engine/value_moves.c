@@ -278,7 +278,7 @@ find_more_attack_and_defense_moves(int color)
  * 4. Moves connecting the dragon to something else.
  */
 static void
-find_more_owl_attack_and_defense_moves(int color)
+find_more_owl_attack_and_defense_moves(int color, int save_verbose)
 {
   int pos, pos2;
   int k;
@@ -287,7 +287,8 @@ find_more_owl_attack_and_defense_moves(int color)
   int dd = NO_MOVE;
   int worth_trying;
   
-  TRACE("\nTrying to upgrade strategical attack and defense moves.\n");
+  if (save_verbose)
+    gprintf("\nTrying to upgrade strategical attack and defense moves.\n");
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos))
@@ -365,7 +366,9 @@ find_more_owl_attack_and_defense_moves(int color)
 	      add_gain_move(pos, dd, kworm);
 	    else
 	      add_owl_attack_move(pos, dd, acode);
-	    TRACE("Move at %1m owl attacks %1m, result %d.\n", pos, dd, acode);
+	    if (save_verbose)
+	      gprintf("Move at %1m upgraded to owl attack on %1m (%r).\n",
+	      	      pos, dd, acode);
 	  }
 	}
 	
@@ -385,7 +388,9 @@ find_more_owl_attack_and_defense_moves(int color)
 	      add_loss_move(pos, dd, kworm);
 	    else
 	      add_owl_defense_move(pos, dd, dcode);
-	    TRACE("Move at %1m owl defends %1m, result %d.\n", pos, dd, dcode);
+	    if (save_verbose)
+	      gprintf("Move at %1m upgraded to owl defense for %1m (%r).\n",
+	      	      pos, dd, dcode);
 	  }
 	}
       }
@@ -398,7 +403,7 @@ find_more_owl_attack_and_defense_moves(int color)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (IS_STONE(board[pos])
 	&& dragon[pos].origin == pos
-	&& dragon[pos].status == CRITICAL) {
+	&& DRAGON2(pos).owl_status == CRITICAL) {
       for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
 	if (board[pos2] != EMPTY)
 	  continue;
@@ -435,6 +440,9 @@ find_more_owl_attack_and_defense_moves(int color)
 		add_loss_move(pos2, pos, kworm);
 	      else
 		add_owl_defense_move(pos2, pos, dcode);
+	      if (save_verbose)
+	        gprintf("Move at %1m also owl defends %1m (%r).\n",
+		        pos2, pos, dcode);
 	    }
 
 	  }
@@ -447,6 +455,9 @@ find_more_owl_attack_and_defense_moves(int color)
 		add_gain_move(pos2, pos, kworm);
 	      else
 		add_owl_attack_move(pos2, pos, acode);
+	      if (save_verbose)
+	        gprintf("Move at %1m also owl attacks %1m (%r).\n",
+		        pos2, pos, acode);
 	    }
 	  }
 	}
@@ -3136,7 +3147,7 @@ review_move_reasons(int *the_move, float *val, int color,
   if (verbose > 0)
     verbose--;
   if (level >= 6) {
-    find_more_owl_attack_and_defense_moves(color);
+    find_more_owl_attack_and_defense_moves(color, save_verbose);
     time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);
   }
   verbose = save_verbose;

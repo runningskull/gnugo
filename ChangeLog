@@ -2,6 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- major revision of do_owl_analyze_semeai()
+- do_owl_analyze_semeai tracks ko results and result certainty
+- semeai tactical phase deprecated
+- semeai_trymove() eliminated
+- semeai worms redefined
+- new r format character supported by vgprintf
+- uncertain semeais treated as critical
+- new function sgf_trace_semeai() in cache.c used by SGFTRACE_SEMEAI() macro
+- new dragon2 fields semeai_attack_certain and semeai_defense_certain
+- owl_estimate_life() revised for use in semeai reading
 - don't attack unconditionally dead stones, even if thrashing
 - never play on vertices which are unconditional territory for either player
 - bugfix in attack_either()

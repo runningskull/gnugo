@@ -557,52 +557,6 @@ trymove(int pos, int color, const char *message, int str,
 
 
 /*
- * Special version for semeai reading.
- */
-
-int 
-semeai_trymove(int pos, int color, const char *message, int str1, int str2,
-	       int owl_phase, int value)
-{
-  /* Do the real work elsewhere. */
-  if (!do_trymove(pos, color, 0))
-    return 0;
-
-  if (message == NULL)
-    message = "UNKNOWN";
-  
-  /* Store the move in an sgf tree if one is available. */
-  if (sgf_dumptree) {
-    char buf[100];
-    char sbuf1[5], sbuf2[5];
-    /* Simply calling location_to_string three times doesn't work
-     * because the internal buffer of that function gets overwritten
-     * too soon. So we allocate our own char buffers.
-     */
-    location_to_buffer(str1, sbuf1);
-    location_to_buffer(str2, sbuf2);
-
-    if (owl_phase)
-      gg_snprintf(buf, 100, 
-		  "%s in semeai %s-%s (variation %d, value %d, owl_phase)",
-		  message, sbuf1, sbuf2, count_variations, value);
-    else
-      gg_snprintf(buf, 100, 
-		  "%s in semeai %s-%s (variation %d, value %d)",
-		  message, sbuf1, sbuf2, count_variations, value);
-    sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
-    sgftreeAddComment(sgf_dumptree, buf);
-  }
-  
-  if (count_variations)
-    count_variations++;
-  stats.nodes++;
-
-  return 1;
-}
-
-
-/*
  * tryko pushes the position onto the stack, and makes a move
  * at (pos) of (color). The move is allowed even if it is an
  * illegal ko capture. It is to be imagined that (color) has

@@ -18,5 +18,5 @@ loadsgf games/semeai/semeai9.sgf
 orientation 1
 loadsgf games/nicklas/nicklas14.sgf 55
 32 owl_analyze_semeai B8 D9
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI B6]*
+#? [ALIVE ALIVE B6]*
 

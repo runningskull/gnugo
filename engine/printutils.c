@@ -158,6 +158,12 @@ vgprintf(FILE *outputfile, const char *fmt, va_list ap)
 	fputs(color_to_string(color), outputfile);
 	break;
       }
+      case 'r':
+      {
+	int result = va_arg(ap, int);
+	fputs(result_to_string(result), outputfile);
+	break;
+      }
       default:
 	fprintf(outputfile, "\n\nUnknown format character '%c'\n", *fmt);
 	break;

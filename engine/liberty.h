@@ -571,7 +571,7 @@ int owl_connection_defends(int move, int target1, int target2);
 int owl_substantial(int str);
 void owl_analyze_semeai(int apos, int bpos, 
 			int *resulta, int *resultb, int *move,
-			int owl);
+			int owl, int *semeai_result_certain);
 
 void set_search_diamond(int pos);
 void reset_search_mask(void);
@@ -958,7 +958,9 @@ struct dragon_data2 {
   int semeai;              /* true if a dragon is part of a semeai           */
   int semeai_margin_of_safety; /* if small, the semeai is close              */
   int semeai_defense_point;/* Move found by semeai code to rescue dragon     */
-  int semeai_attack_point;  /* Move found by semeai code to kill dragon       */
+  int semeai_defense_certain;
+  int semeai_attack_point; /* Move found by semeai code to kill dragon       */
+  int semeai_attack_certain;
   int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
   int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
   int owl_attack_point;    /* vital point for attack                         */
