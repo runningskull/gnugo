@@ -314,6 +314,17 @@ static void
 include_eyepoint(int i, int j, int proper, int restrictions)
 {
   if (eyeindex[i][j] == -1) {
+    /* FIXME: This is only a temporary workaround to avoid a crash in
+     * the assertion below.
+     */
+    if (eyesize > MAX_EYE_SIZE)
+      return;
+    /* FIXME:
+     * Should this be < MAX_EYE_SIZE?
+     * The list of eyes in eyei, eyej is ended
+     * with (-1, -1)
+     */
+    ASSERT2(eyesize <= MAX_EYE_SIZE, i, j);
     eyeindex[i][j] = eyesize;
     eyei[eyesize] = i;
     eyej[eyesize] = j;
