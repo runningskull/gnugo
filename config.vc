@@ -65,6 +65,6 @@
 #define ORACLE 0
 
 /* Version number of package */
-#define VERSION "3.3.17"
+#define VERSION "3.3.18"
 
 #pragma warning(disable: 4244 4305)

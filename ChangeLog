@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.18 released April 22, 2003
+
+- don't even try 'wrong' liberties in simple_ladder_attack()
 - major revision of do_owl_analyze_semeai()
 - do_owl_analyze_semeai tracks ko results and result certainty
 - semeai tactical phase deprecated
