@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function special_rescue6() in reading.c
+- defend3() revised
 - avoid giving followup values to non-sente threats in
   threaten_to_capture_helper() and in estimate_territorial_value()
 - regression revisions

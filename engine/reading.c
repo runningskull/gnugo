@@ -89,6 +89,8 @@ static int special_rescue4(int str, int libs[3], int *move,
 			   int komaster, int kom_pos);
 static void special_rescue5(int str, int libs[3], int moves[MAX_MOVES],
 			    int scores[MAX_MOVES], int *num_moves);
+static void special_rescue6(int str, int libs[3], int moves[MAX_MOVES],
+			    int scores[MAX_MOVES], int *num_moves);
 static void edge_clamp(int str, int moves[MAX_MOVES],
 		       int scores[MAX_MOVES], int *num_moves);
 static int do_attack(int str, int *move, int komaster, int kom_pos);
@@ -1786,6 +1788,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
   if (stackp <= backfill_depth) {
     int saved_num_moves = num_moves;
     special_rescue5(str, libs, moves, scores, &num_moves);
+    special_rescue6(str, libs, moves, scores, &num_moves);
     
     /* Only order and test the new set of moves. */
     order_moves(str, num_moves-saved_num_moves,
@@ -2334,6 +2337,83 @@ special_rescue5(int str, int libs[3], int moves[MAX_MOVES],
   
 	/* Defend against double atari in the surrounding chain early. */
 	double_atari_chain2(bpos, moves, scores, num_moves);
+      }
+    }
+  }
+}
+
+
+/* In situations like this
+ *
+ *   |.bOX
+ *   |.Xa.
+ *   |.OXX
+ *   |.O..
+ *   |.XX.
+ *
+ * the lower O string can often be defended at a or b.
+ *
+ * This function may be called for strings with 3 or 4 liberties and
+ * returns the * moves in the configuration below:
+ *
+ * |..O   |.*O
+ * |.X.   |.c*
+ * |.O?   |ab?
+ *
+ */
+static void
+special_rescue6(int str, int libs[3], int moves[MAX_MOVES],
+		int scores[MAX_MOVES], int *num_moves)
+{
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int apos, bpos, cpos;
+  int right, up;
+  int k, l, r;
+  int liberties = countlib(str);
+
+  ASSERT1(liberties == 3 || liberties == 4, str);
+  
+  for (r = 0; r < liberties; r++) {
+    apos = libs[r];
+    
+    for (k = 0; k < 4; k++) {
+      right = delta[k];
+      
+      if (ON_BOARD(apos - right))
+	continue;
+      
+      bpos = apos + right;
+      if (board[bpos] != color || !same_string(str, bpos))
+	continue;
+
+      for (l = 0; l < 2; l++) {
+	up = delta[(k+1) % 4];
+	if (l == 1)
+	  up = -up;
+
+	cpos = bpos + up;
+	if (board[cpos] != other)
+	  continue;
+
+	if (board[apos + up] != EMPTY)
+	  continue;
+
+	if (board[cpos + right] != EMPTY)
+	  continue;
+
+	if (board[apos + up + up] != EMPTY)
+	  continue;
+	
+	if (board[cpos + up] != EMPTY)
+	  continue;
+	
+	if (board[cpos + up + right] != color)
+	  continue;
+	
+	
+	ADD_CANDIDATE_MOVE(cpos + right, 0, moves, scores, *num_moves);
+	ADD_CANDIDATE_MOVE(cpos + up, 0, moves, scores, *num_moves);
       }
     }
   }
