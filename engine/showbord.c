@@ -51,7 +51,7 @@
  */
 
 /* Element at origin of each worm stores allocated worm number. */
-static unsigned char dragon_num[MAX_BOARD][MAX_BOARD];
+static unsigned char dragon_num[BOARDMAX];
 
 static int next_white;		/* next worm number to allocate */
 static int next_black;
@@ -305,14 +305,14 @@ showchar(int i, int j, int empty, int xo)
     /* Figure out ascii character for this dragon. This is the
      * dragon number allocated to the origin of this worm. */
 
-    w = dragon_num[I(d->origin)][J(d->origin)];
+    w = dragon_num[d->origin];
     if (!w) {
       /* Not yet allocated - allocate next one. */
       /* Count upwards for black, downwards for white to reduce confusion. */
       if (BOARD(i, j) == BLACK)
-	w = dragon_num[I(d->origin)][J(d->origin)] = next_black++;
+	w = dragon_num[d->origin] = next_black++;
       else
-	w = dragon_num[I(d->origin)][J(d->origin)] = next_white--; 
+	w = dragon_num[d->origin] = next_white--; 
     }
 
     w = w%26 + (BOARD(i, j) == BLACK ? 'A' : 'a');

@@ -67,6 +67,7 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX],
       else
 	gb[ii] = 0;
     }
+  
   /* dilate */
   memcpy(work, gb, sizeof(work));
   for (n = 0; n < dilations; n++) {
@@ -75,31 +76,32 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX],
 	ii = POS(i, j);
 
 	if (gb[ii] >= 0
-	    && (i == 0 || gb[ii-NS] >= 0)
-	    && (i == board_size-1 || gb[ii+NS] >= 0)
-	    && (j == 0 || gb[ii-1] >= 0)
-	    && (j == board_size-1 || gb[ii+1] >= 0)) {
-	  if (i > 0 && gb[ii-NS] > 0)
+	    && (!ON_BOARD(SOUTH(ii)) || gb[SOUTH(ii)] >= 0)
+	    && (!ON_BOARD(WEST(ii))  || gb[WEST(ii)]  >= 0)
+	    && (!ON_BOARD(NORTH(ii)) || gb[NORTH(ii)] >= 0)
+	    && (!ON_BOARD(EAST(ii))  || gb[EAST(ii)]  >= 0)) {
+	  if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] > 0)
 	    work[ii]++;
-	  if (i < board_size-1 && gb[ii+NS] > 0)
+	  if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  > 0)
 	    work[ii]++;
-	  if (j > 0 && gb[ii-1] > 0)
+	  if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] > 0)
 	    work[ii]++;
-	  if (j < board_size-1 && gb[ii+1] > 0)
+	  if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  > 0)
 	    work[ii]++;
 	}
+	
 	if (gb[ii] <= 0
-	    && (i == 0 || gb[ii-NS] <= 0)
-	    && (i == board_size-1 || gb[ii+NS] <= 0)
-	    && (j == 0 || gb[ii-1] <= 0)
-	    && (j == board_size-1 || gb[ii+1] <= 0)) {
-	  if (i > 0 && gb[ii-NS] < 0)
+	    && (!ON_BOARD(SOUTH(ii)) || gb[SOUTH(ii)] <= 0)
+	    && (!ON_BOARD(WEST(ii))  || gb[WEST(ii)]  <= 0)
+	    && (!ON_BOARD(NORTH(ii)) || gb[NORTH(ii)] <= 0)
+	    && (!ON_BOARD(EAST(ii))  || gb[EAST(ii)]  <= 0)) {
+	  if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] < 0)
 	    work[ii]--;
-	  if (i < board_size-1 && gb[ii+NS] < 0)
+	  if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  < 0)
 	    work[ii]--;
-	  if (j > 0 && gb[ii-1] < 0)
+	  if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] < 0)
 	    work[ii]--;
-	  if (j < board_size-1 && gb[ii+1] < 0)
+	  if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  < 0)
 	    work[ii]--;
 	}
       }
@@ -113,28 +115,30 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX],
 	ii = POS(i, j);
 
 	if (work[ii] > 0) {
-	  if (i > 0 && gb[ii-NS] <= 0)
+	  if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] <= 0)
 	    work[ii]--;
-	  if (i < board_size-1 && gb[ii+NS] <= 0 && work[ii] > 0)
+	  if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  <= 0 && work[ii] > 0)
 	    work[ii]--;
-	  if (j > 0 && gb[ii-1] <= 0 && work[ii] > 0)
+	  if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] <= 0 && work[ii] > 0)
 	    work[ii]--;
-	  if (j < board_size-1 && gb[ii+1] <= 0 && work[ii] > 0)
+	  if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  <= 0 && work[ii] > 0)
 	    work[ii]--;
 	}
+	  
 	if (work[ii] < 0) {
-	  if (i > 0 && gb[ii-NS] >= 0)
+	  if (ON_BOARD(SOUTH(ii)) && gb[SOUTH(ii)] >= 0)
 	    work[ii]++;
-	  if (i < board_size-1 && gb[ii+NS] >= 0 && work[ii] < 0)
+	  if (ON_BOARD(WEST(ii))  && gb[WEST(ii)]  >= 0 && work[ii] < 0)
 	    work[ii]++;
-	  if (j > 0 && gb[ii-1] >= 0 && work[ii] < 0)
+	  if (ON_BOARD(NORTH(ii)) && gb[NORTH(ii)] >= 0 && work[ii] < 0)
 	    work[ii]++;
-	  if (j < board_size-1 && gb[ii+1] >= 0 && work[ii] < 0)
+	  if (ON_BOARD(EAST(ii))  && gb[EAST(ii)]  >= 0 && work[ii] < 0)
 	    work[ii]++;
 	}
       }
     memcpy(gb, work, sizeof(work));
   }
+  
   return critical_found;
 }
 
@@ -174,36 +178,39 @@ close_bubbles(int gb[BOARDMAX])
 
 	if (gb[ii] || bubbles[ii] == GRAY)
 	  continue;
+	
 	/* If any neighbor is gray, mark the spot gray */
-	if ((i > 0 && bubbles[ii-NS] == GRAY)
-	    || (i < board_size-1 && bubbles[ii+NS] == GRAY)
-	    || (j > 0 && bubbles[ii-1] == GRAY)
-	    || (j < board_size-1 && bubbles[ii+1] == GRAY)) {
+	if ((ON_BOARD(SOUTH(ii)) && bubbles[SOUTH(ii)] == GRAY)
+	    || (ON_BOARD(WEST(ii)) && bubbles[WEST(ii)] == GRAY)
+	    || (ON_BOARD(NORTH(ii)) && bubbles[NORTH(ii)] == GRAY)
+	    || (ON_BOARD(EAST(ii)) && bubbles[EAST(ii)] == GRAY)) {
 	  found_one = 1;
 	  bubbles[ii] = GRAY;
 	}
 	else {
 	  /* Look for white neighbors, including the spot itself */
 	  if (bubbles[ii] == WHITE
-	      || (i > 0 
-		  && (gb[ii-NS] > 0 || bubbles[ii-NS] == WHITE))
-	      || (i < board_size-1
-		  && (gb[ii+NS] > 0 || bubbles[ii+NS] == WHITE))
-	      || (j > 0 
-		  && (gb[ii-1] > 0 || bubbles[ii-1] == WHITE))
-	      || (j < board_size-1
-		  && (gb[ii+1] > 0 || bubbles[ii+1] == WHITE)))
+	      || (ON_BOARD(SOUTH(ii))
+		  && (gb[SOUTH(ii)] > 0 || bubbles[SOUTH(ii)] == WHITE))
+	      || (ON_BOARD(WEST(ii))
+		  && (gb[WEST(ii)] > 0 || bubbles[WEST(ii)] == WHITE))
+	      || (ON_BOARD(NORTH(ii))
+		  && (gb[NORTH(ii)] > 0 || bubbles[NORTH(ii)] == WHITE))
+	      || (ON_BOARD(EAST(ii))
+		  && (gb[EAST(ii)] > 0 || bubbles[EAST(ii)] == WHITE)))
 	    white_neighbor = 1;
+	  
 	  if (bubbles[ii] == BLACK
-	      || (i > 0 
-		  && (gb[ii-NS] < 0 || bubbles[ii-NS] == BLACK))
-	      || (i < board_size-1
-		  && (gb[ii+NS] < 0 || bubbles[ii+NS] == BLACK))
-	      || (j > 0 
-		  && (gb[ii-1] < 0 || bubbles[ii-1] == BLACK))
-	      || (j < board_size-1
-		  && (gb[ii+1] < 0 || bubbles[ii+1] == BLACK)))
+	      || (ON_BOARD(SOUTH(ii))
+		  && (gb[SOUTH(ii)] > 0 || bubbles[SOUTH(ii)] == BLACK))
+	      || (ON_BOARD(WEST(ii))
+		  && (gb[WEST(ii)] > 0 || bubbles[WEST(ii)] == BLACK))
+	      || (ON_BOARD(NORTH(ii))
+		  && (gb[NORTH(ii)] > 0 || bubbles[NORTH(ii)] == BLACK))
+	      || (ON_BOARD(EAST(ii))
+		  && (gb[EAST(ii)] > 0 || bubbles[EAST(ii)] == BLACK)))
 	    black_neighbor = 1;
+	  
 	  if (white_neighbor) {
 	    if (black_neighbor)
 	      new_color = GRAY;
@@ -212,6 +219,7 @@ close_bubbles(int gb[BOARDMAX])
 	  }
 	  else if (black_neighbor)
 	    new_color = BLACK;
+	  
 	  if (new_color && new_color != bubbles[ii]) {
 	    found_one = 1;
 	    bubbles[ii] = new_color;
@@ -227,8 +235,10 @@ close_bubbles(int gb[BOARDMAX])
 
       if (gb[ii])
 	continue;
+      
       if (bubbles[ii] == WHITE)
 	gb[ii] = 1;
+      
       if (bubbles[ii] == BLACK)
 	gb[ii] = -1;
     }
@@ -296,8 +306,10 @@ print_moyo(void)
 {
   if (printmoyo & PRINTMOYO_TERRITORY)
     print_new_moyo(5, 21);
+  
   if (printmoyo & PRINTMOYO_MOYO)
     print_new_moyo(5, 10);
+  
   if (printmoyo & PRINTMOYO_AREA) {
     print_new_moyo(4, 0);
   }
@@ -419,6 +431,7 @@ estimate_score(float *upper, float *lower)
 	  }
 	}
       }
+      
       if (0)
 	fprintf(stderr, "in row %d, white territory=%.1f, black=%.1f\n",
 		board_size-i, white_territory, black_territory);
