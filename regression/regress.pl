@@ -922,7 +922,7 @@ sub allTargets {
       chop($_ = <MAKEFILE>);
       while ($_) {
         push @files, $_ =~ /\s+(\w+\.tst)/;
-        chop($_ = <MAKEFILE>);
+        chop if defined($_ = <MAKEFILE>);
       }
     }
   }
