@@ -22,6 +22,7 @@ class Testsuite
   int owl_nodes;
   int connection_nodes;
   float time;
+  float cputime;
   
   array(int) pass;
   array(int) fail;
@@ -62,7 +63,7 @@ void Send(string|void s)
 static void Finish()
 {
   write("%-37s %7.2f %9d %7d %8d\n", current_testsuite->name,
-	current_testsuite->time,
+	current_testsuite->cputime,
 	current_testsuite->reading_nodes, current_testsuite->owl_nodes,
 	current_testsuite->connection_nodes);
   cond->signal();
@@ -88,7 +89,7 @@ static void ProgramReader(object f)
     int number;
     string answer;
     if (sscanf(s, "=%d %s", number, answer)) {
-      if (number < 10000 || number > 10003) {
+      if (number < 10000 || number > 10004) {
 	test_number = (int) number;
 	string correct = correct_results[test_number];
 	int negate = 0;
@@ -122,6 +123,8 @@ static void ProgramReader(object f)
       else if (number == 10002)
 	current_testsuite->connection_nodes += (int) answer;
       else if (number == 10003)
+	current_testsuite->cputime = (float) answer;
+      else if (number == 10004)
 	break;
     }
     else if (sscanf(s, "?%s", answer))
@@ -229,6 +232,7 @@ void run_testsuite(string suite_name, array(string) program_args,
       Send("10000 get_reading_node_counter");
       Send("10001 get_owl_node_counter");
       Send("10002 get_connection_node_counter");
+      Send("10003 cputime");
     }
     else if (sscanf(s, "#? [%[^]]]%s", answer, expected)) {
       correct_results[(int)number] = answer;
@@ -239,7 +243,7 @@ void run_testsuite(string suite_name, array(string) program_args,
       Send(s);
   }
   
-  Send("10003 quit");
+  Send("10004 quit");
   Send();
   cond->wait(condmutexkey);
 }
@@ -247,6 +251,7 @@ void run_testsuite(string suite_name, array(string) program_args,
 void final_report()
 {
   float total_time = 0.0;
+  float total_cputime = 0.0;
   int reading_nodes = 0;
   int owl_nodes = 0;
   int connection_nodes = 0;
@@ -255,6 +260,7 @@ void final_report()
 
   foreach (testsuites, Testsuite t) {
     total_time       += t->time;
+    total_cputime    += t->cputime;
     reading_nodes    += t->reading_nodes;
     owl_nodes        += t->owl_nodes;
     connection_nodes += t->connection_nodes;
@@ -263,7 +269,7 @@ void final_report()
   }
   write("Total nodes: %d %d %d\n", reading_nodes, owl_nodes,
 	connection_nodes);
-  write("Total time: %7.2f\n", total_time);
+  write("Total time: %.2f (%.2f)\n", total_cputime, total_time);
   if (number_unexpected_pass > 0)
     write("%d PASS\n", number_unexpected_pass);
   if (number_unexpected_fail > 0)

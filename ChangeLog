@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- cpu time support for regress.pike
 - new function spread_connection_distances() broken out of
   compute_connection_distances() and tuned
 - t moves degraded to value 16
