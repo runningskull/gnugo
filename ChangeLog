@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- debug output and valuation of attack on defenseless stones corrected
 - TODO revised
 - fixed value of J patterns no longer scaled with board_size
 - bugfix in owl_attackpats.db pattern D1137
