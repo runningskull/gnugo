@@ -284,6 +284,7 @@ extern int capture_all_dead;         /* capture all dead opponent stones */
 extern int play_out_aftermath; /* make everything unconditionally settled */
 extern int play_mirror_go;           /* try to play mirror go if possible */
 extern int mirror_stones_limit;      /* but stop at this number of stones */
+extern int gtp_version;              /* version of Go Text Protocol */
 
 #if EXPERIMENTAL_READING
 extern int defend_by_pattern;  /* use patterns for tactical reading defense */
@@ -330,7 +331,8 @@ void start_draw_board(void);
 void draw_color_char(int m, int n, int c, int color);
 void draw_char(int m, int n, int c);
 void end_draw_board(void);
-void showboard(int xo);  /* ascii rep. of board to stdout */
+void showboard(int xo);  /* ascii rep. of board to stderr */
+void simple_showboard(FILE *outfile);  /* ascii rep. of board to outfile */
 
 /* printutils.c */
 int gprintf(const char *fmt, ...);
@@ -434,6 +436,7 @@ void remove_stone(int pos);
 void play_move(int pos, int color);
 int undo_move(int n);
 int get_last_move(void);
+int get_last_player(void);
 int get_last_opponent_move(int color);
 int is_pass(int pos);
 int is_legal(int pos, int color);

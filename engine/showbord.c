@@ -149,16 +149,16 @@ is_hoshi_point(int m, int n)
 
 /* Print a line with coordinate letters above the board. */
 static void
-draw_letter_coordinates(void)
+draw_letter_coordinates(FILE *outfile)
 {
   int i;
   int ch;
   
-  fprintf(stderr, "  ");
+  fprintf(outfile, "  ");
   for (i = 0, ch = 'A'; i < board_size; i++, ch++) {
     if (ch == 'I')
       ch++;
-    fprintf(stderr, " %c", ch);
+    fprintf(outfile, " %c", ch);
   }
 }
 
@@ -186,7 +186,7 @@ void
 start_draw_board()
 {
   gg_init_color();
-  draw_letter_coordinates();
+  draw_letter_coordinates(stderr);
 }
 
 /* Draw a colored character. If c has the value EMPTY, either a "." or
@@ -234,7 +234,7 @@ void
 end_draw_board()
 {
   fprintf(stderr, "\n");
-  draw_letter_coordinates();
+  draw_letter_coordinates(stderr);
   fprintf(stderr, "\n");
 }
 
@@ -368,14 +368,14 @@ showboard(int xo)
     
     fprintf(stderr, " %d", ii);
     
-    if ((xo == 0) && ((board_size < 10 && i == board_size-2)
-	|| (board_size >= 10 && i == 8)))
+    if (xo == 0 && ((board_size < 10 && i == board_size-2)
+		    || (board_size >= 10 && i == 8)))
       fprintf(stderr, "     WHITE has captured %d stones", black_captured);
     
-    if ((xo == 0) && ((board_size < 10 && i == board_size-1)
-	|| (board_size >= 10 && i == 9)))
+    if (xo == 0 && ((board_size < 10 && i == board_size-1)
+		    || (board_size >= 10 && i == 9)))
       fprintf(stderr, "     BLACK has captured %d stones", white_captured);
-  
+    
     if (xo == 3) {
       if (i == board_size-5)
 	write_color_string(GG_COLOR_GREEN, "    green=alive");
@@ -394,6 +394,40 @@ showboard(int xo)
 }
 
 
+/* Bare bones version of showboard(0). No fancy options, no hint of
+ * color, and you can choose where to write it.
+ */
+void
+simple_showboard(FILE *outfile)
+{
+  int i, j;
+
+  draw_letter_coordinates(outfile);
+  
+  for (i = 0; i < board_size; i++) {
+    fprintf(outfile, "\n%2d", board_size - i);
+    
+    for (j = 0; j < board_size; j++) {
+      if (BOARD(i, j) == EMPTY)
+	fprintf(outfile, " %c", is_hoshi_point(i, j) ? '+' : '.');
+      else
+	fprintf(outfile, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
+    }
+
+    fprintf(outfile, " %d", board_size - i);
+    
+    if ((board_size < 10 && i == board_size-2)
+	|| (board_size >= 10 && i == 8))
+      fprintf(outfile, "     WHITE has captured %d stones", black_captured);
+    
+    if ((board_size < 10 && i == board_size-1)
+	|| (board_size >= 10 && i == 9))
+      fprintf(outfile, "     BLACK has captured %d stones", white_captured);
+  }
+  
+  fprintf(outfile, "\n");
+  draw_letter_coordinates(outfile);
+}
 
 /*
  * Local Variables:

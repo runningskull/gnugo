@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new global variable gtp_version
+- new option --gtp_version
+- new function simple_showboard() in showbord.c
+- new function get_last_player() in board.c
+- gtp code revised for GTP version 2 and uses this by default
 - new function delete_persistent_reading_entry()
 - inconsistent results in attack_and_defend() resolved
 - compilation errors for EXPERIMENTAL_READING fixed

@@ -73,6 +73,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_QUIET,
       OPT_GTP_INPUT,
       OPT_GTP_INITIAL_ORIENTATION,
+      OPT_GTP_VERSION,
       OPT_SHOWCOPYRIGHT,
       OPT_REPLAY_GAME,
       OPT_DECIDE_STRING,
@@ -171,6 +172,7 @@ static struct gg_option const long_options[] =
   {"orientation",    required_argument, 0, OPT_GTP_INITIAL_ORIENTATION},
   {"gtp-initial-orientation",
   		     required_argument, 0, OPT_GTP_INITIAL_ORIENTATION},
+  {"gtp-version",    required_argument, 0, OPT_GTP_VERSION},
   {"infile",         required_argument, 0, 'l'},
   {"until",          required_argument, 0, 'L'},
   {"outfile",        required_argument, 0, 'o'},
@@ -336,7 +338,7 @@ main(int argc, char *argv[])
   sgftree_clear(&sgftree);
   gameinfo_clear(&gameinfo, board_size, komi);
   
-  /* Now weed through all of the command line options. */
+  /* Weed through all of the command line options. */
   while ((i = gg_getopt_long(argc, argv, 
                             "-ab:B:d:D:EF:gh::H:K:l:L:M:m:o:O:p:r:fsStTvw",
 			     long_options, NULL)) != EOF)
@@ -407,6 +409,10 @@ main(int argc, char *argv[])
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  exit(EXIT_FAILURE);
 	}
+	break;
+	
+      case OPT_GTP_VERSION:
+	gtp_version = atoi(gg_optarg);
 	break;
 	
       case OPT_OPTIONS:

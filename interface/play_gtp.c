@@ -33,7 +33,10 @@
 #include "gg_utils.h"
 
 /* Internal state that's not part of the engine. */
-int handicap;
+static int handicap = 0;
+static int main_time = 0;
+static int byo_yomi_time = 0;
+static int byo_yomi_stones = 0;
 
 static int report_uncertainty = 0;
 static int gtp_orientation = 0;
@@ -53,6 +56,7 @@ static void rotate_on_output(int ai, int aj, int *bi, int *bj);
 DECLARE(gtp_aa_confirm_safety);
 DECLARE(gtp_all_legal);
 DECLARE(gtp_attack);
+DECLARE(gtp_clear_board);
 DECLARE(gtp_combination_attack);
 DECLARE(gtp_connect);
 DECLARE(gtp_countlib);
@@ -84,15 +88,17 @@ DECLARE(gtp_get_life_node_counter);
 DECLARE(gtp_get_owl_node_counter);
 DECLARE(gtp_get_reading_node_counter);
 DECLARE(gtp_get_trymove_counter);
-DECLARE(gtp_help);
+DECLARE(gtp_gg_genmove);
+DECLARE(gtp_gg_undo);
 DECLARE(gtp_increase_depths);
 DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
+DECLARE(gtp_known_command);
 DECLARE(gtp_ladder_attack);
+DECLARE(gtp_list_commands);
 DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
 DECLARE(gtp_name);
-DECLARE(gtp_new_game);
 DECLARE(gtp_estimate_score);
 DECLARE(gtp_experimental_score);
 DECLARE(gtp_owl_analyze_semeai);
@@ -106,6 +112,7 @@ DECLARE(gtp_owl_substantial);
 DECLARE(gtp_owl_threaten_attack);
 DECLARE(gtp_owl_threaten_defense);
 DECLARE(gtp_place_free_handicap);
+DECLARE(gtp_play);
 DECLARE(gtp_playblack);
 DECLARE(gtp_playwhite);
 DECLARE(gtp_popgo);
@@ -114,6 +121,7 @@ DECLARE(gtp_protocol_version);
 DECLARE(gtp_query_boardsize);
 DECLARE(gtp_query_orientation);
 DECLARE(gtp_quit);
+DECLARE(gtp_reg_genmove);
 DECLARE(gtp_report_uncertainty);
 DECLARE(gtp_reset_connection_node_counter);
 DECLARE(gtp_reset_life_node_counter);
@@ -125,6 +133,7 @@ DECLARE(gtp_is_surrounded);
 DECLARE(gtp_does_surround);
 DECLARE(gtp_surround_map);
 DECLARE(gtp_set_boardsize);
+DECLARE(gtp_set_free_handicap);
 DECLARE(gtp_set_orientation);
 DECLARE(gtp_set_komi);
 DECLARE(gtp_get_komi);
@@ -132,6 +141,8 @@ DECLARE(gtp_set_level);
 DECLARE(gtp_showboard);
 DECLARE(gtp_start_sgftrace);
 DECLARE(gtp_test_eyeshape);
+DECLARE(gtp_time_left);
+DECLARE(gtp_time_settings);
 DECLARE(gtp_top_moves);
 DECLARE(gtp_top_moves_white);
 DECLARE(gtp_top_moves_black);
@@ -139,7 +150,7 @@ DECLARE(gtp_trymove);
 DECLARE(gtp_tryko);
 DECLARE(gtp_tune_move_ordering);
 DECLARE(gtp_undo);
-DECLARE(gtp_version);
+DECLARE(gtp_program_version);
 DECLARE(gtp_what_color);
 DECLARE(gtp_worm_cutstone);
 DECLARE(gtp_worm_data);
@@ -153,6 +164,7 @@ static struct gtp_command commands[] = {
   {"black",            	      gtp_playblack},
   {"boardsize",        	      gtp_set_boardsize},
   {"captures",        	      gtp_captures},
+  {"clear_board",      	      gtp_clear_board},
   {"color",            	      gtp_what_color},
   {"combination_attack",      gtp_combination_attack},
   {"connect",         	      gtp_connect},
@@ -179,6 +191,7 @@ static struct gtp_command commands[] = {
   {"get_handicap",   	      gtp_get_handicap},
   {"get_random_seed",  	      gtp_get_random_seed},
   {"set_random_seed",  	      gtp_set_random_seed},
+  {"genmove",                 gtp_genmove},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
   {"get_connection_node_counter", gtp_get_connection_node_counter},
@@ -186,19 +199,21 @@ static struct gtp_command commands[] = {
   {"get_owl_node_counter",    gtp_get_owl_node_counter},
   {"get_reading_node_counter",gtp_get_reading_node_counter},
   {"get_trymove_counter",     gtp_get_trymove_counter},
-  {"gg_genmove",              gtp_genmove},
-  {"help",                    gtp_help},
+  {"gg_genmove",              gtp_gg_genmove},
+  {"gg-undo",                 gtp_gg_undo},
+  {"help",                    gtp_list_commands},
   {"increase_depths",  	      gtp_increase_depths},
   {"influence",               gtp_influence},
   {"is_legal",         	      gtp_is_legal},
+  {"known_command",    	      gtp_known_command},
   {"komi",        	      gtp_set_komi},
   {"get_komi",        	      gtp_get_komi},
   {"ladder_attack",    	      gtp_ladder_attack},
   {"level",        	      gtp_set_level},
+  {"list_commands",    	      gtp_list_commands},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
   {"name",                    gtp_name},
-  {"new_game",                gtp_new_game},
   {"new_score",               gtp_estimate_score},
   {"owl_analyze_semeai",      gtp_owl_analyze_semeai},
   {"tactical_analyze_semeai", gtp_tactical_analyze_semeai},
@@ -210,13 +225,15 @@ static struct gtp_command commands[] = {
   {"owl_substantial", 	      gtp_owl_substantial},
   {"owl_threaten_attack",     gtp_owl_threaten_attack},
   {"owl_threaten_defense",    gtp_owl_threaten_defense},
+  {"play",            	      gtp_play},
   {"popgo",            	      gtp_popgo},
   {"orientation",     	      gtp_set_orientation},
-  {"protocol_version",        gtp_protocol_version},
   {"place_free_handicap",     gtp_place_free_handicap},
+  {"protocol_version",        gtp_protocol_version},
   {"query_boardsize",         gtp_query_boardsize},
   {"query_orientation",       gtp_query_orientation},
   {"quit",             	      gtp_quit},
+  {"reg_genmove",             gtp_reg_genmove},
   {"report_uncertainty",      gtp_report_uncertainty},
   {"reset_connection_node_counter", gtp_reset_connection_node_counter},
   {"reset_life_node_counter", gtp_reset_life_node_counter},
@@ -224,12 +241,15 @@ static struct gtp_command commands[] = {
   {"reset_reading_node_counter", gtp_reset_reading_node_counter},
   {"reset_trymove_counter",   gtp_reset_trymove_counter},
   {"same_dragon",    	      gtp_same_dragon},
+  {"set_free_handicap",       gtp_set_free_handicap},
   {"showboard",        	      gtp_showboard},
   {"is_surrounded",           gtp_is_surrounded},
   {"does_surround",           gtp_does_surround},
   {"surround_map",            gtp_surround_map},
   {"start_sgftrace",  	      gtp_start_sgftrace},
   {"test_eyeshape",           gtp_test_eyeshape},
+  {"time_left",               gtp_time_left},
+  {"time_settings",           gtp_time_settings},
   {"top_moves",               gtp_top_moves},
   {"top_moves_black",         gtp_top_moves_black},
   {"top_moves_white",         gtp_top_moves_white},
@@ -237,7 +257,7 @@ static struct gtp_command commands[] = {
   {"tryko",          	      gtp_tryko},
   {"tune_move_ordering",      gtp_tune_move_ordering},
   {"undo",                    gtp_undo},
-  {"version",                 gtp_version},
+  {"version",                 gtp_program_version},
   {"white",            	      gtp_playwhite},
   {"worm_cutstone",           gtp_worm_cutstone},
   {"worm_data",               gtp_worm_data},
@@ -276,6 +296,8 @@ play_gtp(FILE *gtp_input, int gtp_initial_orientation)
  * Arguments: none
  * Fails:     never
  * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_quit(char *s)
@@ -290,24 +312,14 @@ gtp_quit(char *s)
  * Arguments: none
  * Fails:     never
  * Returns:   protocol version number
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_protocol_version(char *s)
 {
   UNUSED(s);
-  return gtp_success("1");
-}
-
-/* Function:  Start a new game
- * Arguments: none
- * Fails:     always
- * Returns:   nothing
- */
-static int
-gtp_new_game(char *s)
-{
-  UNUSED(s);
-  return gtp_failure("not implemented");
+  return gtp_success("%d", gtp_version);
 }
 
 
@@ -319,6 +331,8 @@ gtp_new_game(char *s)
  * Arguments: none
  * Fails:     never
  * Returns:   program name
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_name(char *s)
@@ -334,9 +348,11 @@ gtp_name(char *s)
  * Arguments: none
  * Fails:     never
  * Returns:   version number
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
-gtp_version(char *s)
+gtp_program_version(char *s)
 {
   UNUSED(s);
   return gtp_success(VERSION);
@@ -351,28 +367,29 @@ gtp_version(char *s)
  * Arguments: integer
  * Fails:     board size outside engine's limits
  * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_set_boardsize(char *s)
 {
   int boardsize;
-  int pos;
 
   if (sscanf(s, "%d", &boardsize) < 1)
     return gtp_failure("boardsize not an integer");
   
-  if (boardsize < MIN_BOARD || boardsize > MAX_BOARD)
-    return gtp_failure("unacceptable boardsize");
+  if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
+    if (gtp_version == 1)
+      return gtp_failure("unacceptable boardsize");
+    else
+      return gtp_failure("unacceptable size");
+  }
 
   /* If this is called with a non-empty board, we assume that a new
    * game will be started, for which we want a new random seed.
    */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(pos) && board[pos] != EMPTY) {
-      update_random_seed();
-      break;
-    }
-  }
+  if (stones_on_board(BLACK | WHITE) > 0)
+    update_random_seed();
 
   board_size = boardsize;
   clear_board();
@@ -392,6 +409,32 @@ gtp_query_boardsize(char *s)
   UNUSED(s);
 
   return gtp_success("%d", board_size);
+}
+
+/***********************
+ * Clearing the board. *
+ ***********************/
+
+/* Function:  Clear the board.
+ * Arguments: none
+ * Fails:     never
+ * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
+ */
+static int
+gtp_clear_board(char *s)
+{
+  UNUSED(s);
+
+  /* If this is called with a non-empty board, we assume that a new
+   * game will be started, for which we want a new random seed.
+   */
+  if (stones_on_board(BLACK | WHITE) > 0)
+    update_random_seed();
+
+  clear_board();
+  return gtp_success("");
 }
 
 /****************************
@@ -440,6 +483,8 @@ gtp_query_orientation(char *s)
  * Arguments: float
  * Fails:     incorrect argument
  * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_set_komi(char *s)
@@ -476,6 +521,8 @@ gtp_get_komi(char *s)
  * Arguments: vertex
  * Fails:     invalid vertex, illegal move
  * Returns:   nothing
+ *
+ * Status:    Obsolete GTP version 1 command.
  */
 static int
 gtp_playblack(char *s)
@@ -505,6 +552,8 @@ gtp_playblack(char *s)
  * Arguments: vertex
  * Fails:     invalid vertex, illegal move
  * Returns:   nothing
+ *
+ * Status:    Obsolete GTP version 1 command.
  */
 static int
 gtp_playwhite(char *s)
@@ -530,23 +579,59 @@ gtp_playwhite(char *s)
 }
 
 
+/* Function:  Play a black stone at the given vertex.
+ * Arguments: vertex
+ * Fails:     invalid vertex, illegal move
+ * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
+ */
+static int
+gtp_play(char *s)
+{
+  int i, j;
+  int color;
+
+  if (!gtp_decode_move(s, &color, &i, &j))
+    return gtp_failure("invalid color or coordinate");
+
+  if (!is_legal(POS(i, j), color))
+    return gtp_failure("illegal move");
+
+  play_move(POS(i, j), color);
+  return gtp_success("");
+}
+
+
 /* Function:  Set up fixed placement handicap stones.
  * Arguments: number of handicap stones
  * Fails:     invalid number of stones for the current boardsize
  * Returns:   list of vertices with handicap stones
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_fixed_handicap(char *s)
 {
   int m, n;
   int first = 1;
-  int handicap;
-  if (sscanf(s, "%d", &handicap) < 1)
+  int this_handicap;
+
+  if (gtp_version == 1)
+    clear_board();
+  else if (stones_on_board(BLACK | WHITE) > 0)
+    return gtp_failure("board not empty");
+
+  if (sscanf(s, "%d", &this_handicap) < 1)
     return gtp_failure("handicap not an integer");
   
-  clear_board();
-  if (place_fixed_handicap(handicap) != handicap)
+  if (this_handicap < 2 && (gtp_version > 1 || this_handicap != 0))
     return gtp_failure("invalid handicap");
+
+  if (place_fixed_handicap(this_handicap) != this_handicap)
+    return gtp_failure("invalid handicap");
+
+  handicap = this_handicap;
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -564,25 +649,29 @@ gtp_fixed_handicap(char *s)
 }
 
 
-/* Function:  Set up free placement handicap stones.
+/* Function:  Choose free placement handicap stones and put them on the board.
  * Arguments: number of handicap stones
  * Fails:     invalid number of stones
  * Returns:   list of vertices with handicap stones
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_place_free_handicap(char *s)
 {
   int m, n;
   int first = 1;
-  int handicap;
-  if (sscanf(s, "%d", &handicap) < 1)
+  int this_handicap;
+  if (sscanf(s, "%d", &this_handicap) < 1)
     return gtp_failure("handicap not an integer");
   
-  clear_board();
-  if (handicap < 0 || handicap == 1)
+  if (stones_on_board(BLACK | WHITE) > 0)
+    return gtp_failure("board not empty");
+
+  if (this_handicap < 2)
     return gtp_failure("invalid handicap");
 
-  place_free_handicap(handicap);
+  handicap = place_free_handicap(this_handicap);
 
   gtp_start_response(GTP_SUCCESS);
 
@@ -597,6 +686,50 @@ gtp_place_free_handicap(char *s)
       }
   
   return gtp_finish_response();
+}
+
+
+/* Function:  Put free placement handicap stones on the board.
+ * Arguments: list of vertices with handicap stones
+ * Fails:     board not empty, bad list of vertices
+ * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
+ */
+static int
+gtp_set_free_handicap(char *s)
+{
+  int n;
+  int i, j;
+  int k;
+  
+  if (stones_on_board(BLACK | WHITE) > 0)
+    return gtp_failure("board not empty");
+
+  for (k = 0; k < MAX_BOARD * MAX_BOARD; k++) {
+    n = gtp_decode_coord(s, &i, &j);
+    if (n > 0) {
+      if (board[POS(i, j)] != EMPTY) {
+	clear_board();
+	return gtp_failure("repeated vertex");
+      }
+      add_stone(POS(i, j), BLACK);
+      s += n;
+    }
+    else if (sscanf(s, "%*s") != EOF)
+      return gtp_failure("invalid coordinate");
+    else
+      break;
+  }
+
+  if (k < 2) {
+    clear_board();
+    return gtp_failure("invalid handicap");
+  }
+
+  handicap = k;
+  
+  return gtp_success("");
 }
 
 
@@ -618,6 +751,8 @@ gtp_get_handicap(char *s)
  * Arguments: filename + move number, vertex, or nothing
  * Fails:     missing filename or failure to open or parse file
  * Returns:   color to play
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_loadsgf(char *s)
@@ -834,7 +969,7 @@ gtp_trymove(char *s)
 {
   int i, j;
   int color;
-  if (!gtp_decode_move(s, &color, &i, &j))
+  if (!gtp_decode_move(s, &color, &i, &j) || POS(i, j) == PASS_MOVE)
     return gtp_failure("invalid color or coordinate");
 
   if (!trymove(POS(i, j), color, "gtp_trymove", NO_MOVE, EMPTY, NO_MOVE))
@@ -854,7 +989,7 @@ gtp_tryko(char *s)
 {
   int i, j;
   int color;
-  if (!gtp_decode_move(s, &color, &i, &j))
+  if (!gtp_decode_move(s, &color, &i, &j) || POS(i, j) == PASS_MOVE)
     return gtp_failure("invalid color or coordinate");
 
   if (!tryko(POS(i, j), color, "gtp_tryko", EMPTY, NO_MOVE))
@@ -1691,7 +1826,7 @@ gtp_aa_confirm_safety(char *s)
   char saved_worms[BOARDMAX];
 
   n = gtp_decode_move(s, &color, &i, &j);
-  if (n == 0)
+  if (n == 0 || POS(i, j) == NO_MOVE)
     return gtp_failure("invalid color or coordinate");
 
   sscanf(s + n, "%d", &minsize);
@@ -1721,6 +1856,8 @@ gtp_aa_confirm_safety(char *s)
  * Arguments: none
  * Fails:     never
  * Returns:   a move coordinate (or "PASS")
+ *
+ * Status:    Obsolete GTP version 1 command.
  */
 static int
 gtp_genmove_black(char *s)
@@ -1745,6 +1882,8 @@ gtp_genmove_black(char *s)
  * Arguments: none
  * Fails:     never
  * Returns:   a move coordinate (or "PASS")
+ *
+ * Status:    Obsolete GTP version 1 command.
  */
 static int
 gtp_genmove_white(char *s)
@@ -1765,13 +1904,79 @@ gtp_genmove_white(char *s)
   return gtp_finish_response();
 }
 
+/* Function:  Generate and play the supposedly best move for either color.
+ * Arguments: color to move
+ * Fails:     invalid color
+ * Returns:   a move coordinate (or "PASS")
+ *
+ * Status:    GTP version 2 standard command.
+ */
+static int
+gtp_genmove(char *s)
+{
+  int i, j;
+  int color;
+  int n;
+
+  n = gtp_decode_color(s, &color);
+  if (!n)
+    return gtp_failure("invalid color");
+
+  if (stackp > 0)
+    return gtp_failure("genmove cannot be called when stackp > 0");
+
+  genmove(&i, &j, color);
+  play_move(POS(i, j), color);
+
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_vertex(i, j);
+  return gtp_finish_response();
+}
+
+
+/* Function:  Generate the supposedly best move for either color.
+ * Arguments: color to move
+ * Fails:     invalid color
+ * Returns:   a move coordinate (or "PASS")
+ *
+ * Status:    GTP version 2 standard command.
+ */
+static int
+gtp_reg_genmove(char *s)
+{
+  int i, j;
+  int color;
+  int n;
+
+  n = gtp_decode_color(s, &color);
+  if (!n)
+    return gtp_failure("invalid color");
+
+  if (stackp > 0)
+    return gtp_failure("genmove cannot be called when stackp > 0");
+
+  /* This is intended for regression purposes and should therefore be
+   * deterministic. The best way to ensure this is to reset the random
+   * number generator before calling genmove(). It is always seeded by
+   * 0.
+   */
+  random_seed = 0;
+  
+  genmove_conservative(&i, &j, color);
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_vertex(i, j);
+  return gtp_finish_response();
+}
+
 /* Function:  Generate the supposedly best move for either color.
  * Arguments: color to move, optionally a random seed
  * Fails:     invalid color
  * Returns:   a move coordinate (or "PASS")
+ *
+ * This differs from reg_genmove in the optional random seed.
  */
 static int
-gtp_genmove(char *s)
+gtp_gg_genmove(char *s)
 {
   int i, j;
   int color;
@@ -1881,13 +2086,35 @@ gtp_set_level(char *s)
 }
 
 /* Function:  Undo a number of moves
+ * Arguments: none
+ * Fails:     If move history is too short.
+ * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
+ */
+
+static int
+gtp_undo(char *s)
+{
+  UNUSED(s);
+
+  if (!undo_move(1))
+    return gtp_failure("cannot undo");
+
+  reset_engine();
+  
+  return gtp_success("");
+}
+
+
+/* Function:  Undo a number of moves
  * Arguments: optional int
  * Fails:     If move history is too short.
  * Returns:   nothing
  */
 
 static int
-gtp_undo(char *s)
+gtp_gg_undo(char *s)
 {
   int number_moves = 1;
 
@@ -1897,10 +2124,69 @@ gtp_undo(char *s)
     return gtp_failure("can't undo a negative number of moves");
 
   if (!undo_move(number_moves))
-    return gtp_failure("undo failed");
+    return gtp_failure("cannot undo");
 
   reset_engine();
   
+  return gtp_success("");
+}
+
+
+/*****************
+ * time handling *
+ *****************/
+
+/* Function:  Set time allowance
+ * Arguments: int main_time, int byo_yomi_time, int byo_yomi_stones
+ * Fails:     syntax error
+ * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
+ *
+ * FIXME: This command stores the time settings but noone ever takes notice.
+ */
+
+static int
+gtp_time_settings(char *s)
+{
+  int a, b, c;
+  
+  if (sscanf(s, "%d %d %d", &a, &b, &c) < 3)
+    return gtp_failure("not three integers");
+
+  main_time = a;
+  byo_yomi_time = b;
+  byo_yomi_stones = c;
+
+  return gtp_success("");
+}
+
+
+/* Function:  Report remaining time
+ * Arguments: color color, int time, int stones
+ * Fails:     syntax error
+ * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
+ *
+ * FIXME: This command does not take any action.
+ */
+
+static int
+gtp_time_left(char *s)
+{
+  int color;
+  int time;
+  int stones;
+  int n;
+
+  n = gtp_decode_color(s, &color);
+  if (!n)
+    return gtp_failure("invalid color");
+  
+  if (sscanf(s+n, "%d %d", &time, &stones) < 2)
+    return gtp_failure("time and stones not two integers");
+
   return gtp_success("");
 }
 
@@ -1953,8 +2239,14 @@ finish_and_score_game(int seed)
   doing_scoring = 1;
   store_board(&saved_pos);
 
-  /* FIXME: Letting black always start is a preliminary solution. */
-  next = BLACK;
+  /* Let black start if we have no move history. Otherwise continue
+   * alternation.
+   */
+  if (get_last_player() == EMPTY)
+    next = BLACK;
+  else
+    next = OTHER_COLOR(get_last_player());
+
   do {
     move_val = genmove_conservative(&i, &j, next);
     play_move(POS(i, j), next);
@@ -2025,6 +2317,8 @@ finish_and_score_game(int seed)
  * Arguments: Optional random seed
  * Fails:     never
  * Returns:   Score in SGF format (RE property).
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_final_score(char *s)
@@ -2103,6 +2397,10 @@ gtp_final_status(char *s)
  * Returns:   Vertices having the specified status. These are split with
  *            one string on each line if the vertices are nonempty (i.e.
  *            for "alive", "dead", and "seki").
+ *
+ * Status:    GTP version 2 standard command.
+ *            However, "dame", "white_territory", and "black_territory"
+ *            are private extensions.
  */
 static int
 gtp_final_status_list(char *s)
@@ -2430,17 +2728,22 @@ gtp_cputime(char *s)
 
 
 
-/* Function:  Write the position to stderr.
+/* Function:  Write the position to stdout.
  * Arguments: none
  * Fails:     never
  * Returns:   nothing
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
 gtp_showboard(char *s)
 {
   UNUSED(s);
-  showboard(0);
-  return gtp_success("");
+  
+  gtp_start_response(GTP_SUCCESS);
+  gtp_printf("\n");
+  simple_showboard(stdout);
+  return gtp_finish_response();
 }
 
 
@@ -2896,9 +3199,11 @@ gtp_echo_err(char *s)
  * Arguments: none
  * Fails:     never
  * Returns:   list of known commands, one per line
+ *
+ * Status:    GTP version 2 standard command.
  */
 static int
-gtp_help(char *s)
+gtp_list_commands(char *s)
 {
   int k;
   UNUSED(s);
@@ -2910,6 +3215,25 @@ gtp_help(char *s)
 
   gtp_printf("\n");
   return GTP_OK;
+}
+
+
+/* Function:  Tell whether a command is known.
+ * Arguments: command name
+ * Fails:     never
+ * Returns:   "true" if command exists, "false" if not
+ *
+ * Status:    GTP version 2 standard command.
+ */
+static int
+gtp_known_command(char *s)
+{
+  int k;
+  for (k = 0; commands[k].name != NULL; k++)
+    if (strcmp(s, commands[k].name) == 0)
+      return gtp_success("true");
+
+  return gtp_success("false");
 }
 
 

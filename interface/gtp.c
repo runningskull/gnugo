@@ -90,7 +90,7 @@ gtp_main_loop(struct gtp_command commands[], FILE *gtp_input)
       /* Convert HT (9) to SPACE (32). */
       if (c == 9)
 	*p++ = 32;
-      /* Remove CR (13) and all other control characters except for LF (10). */
+      /* Remove CR (13) and all other control characters except LF (10). */
       else if ((c > 0 && c <= 9)
 	       || (c >= 11 && c <= 31)
 	       || c == 127)
@@ -128,7 +128,7 @@ gtp_main_loop(struct gtp_command commands[], FILE *gtp_input)
       }
     }
     if (commands[i].name == NULL)
-      gtp_failure("unknown command: '%s'", command);
+      gtp_failure("unknown command");
 
     if (status == GTP_FATAL)
       gtp_panic();
@@ -157,7 +157,7 @@ gtp_set_vertex_transform_hooks(gtp_transform_ptr in, gtp_transform_ptr out)
 /*
  * This function works like printf, except that it only understands
  * very few of the standard formats, to be precise %c, %d, %f, %s.
- * But it also accepts %m, which takes two integers and writes a move,
+ * But it also accepts %m, which takes two integers and writes a vertex,
  * and %C, which takes a color value and writes a color string.
  */
 void 
@@ -365,12 +365,13 @@ gtp_decode_coord(char *s, int *i, int *j)
 
 /* Convert a move, i.e. "b" or "w" followed by a vertex to a color and
  * coordinates. Return the number of characters read from the string
- * s.
+ * s. The vertex may be "pass" and then the coordinates are set to (-1, -1).
  */
 int
 gtp_decode_move(char *s, int *color, int *i, int *j)
 {
   int n1, n2;
+  int k;
 
   assert(gtp_boardsize > 0);
 
@@ -379,9 +380,18 @@ gtp_decode_move(char *s, int *color, int *i, int *j)
     return 0;
 
   n2 = gtp_decode_coord(s + n1, i, j);
-  if (n2 == 0)
-    return 0;
-
+  if (n2 == 0) {
+    char buf[6];
+    if (sscanf(s + n1, "%5s%n", buf, &n2) != 1)
+      return 0;
+    for (k = 0; k < (int) strlen(buf); k++)
+      buf[k] = tolower((int) buf[k]);
+    if (strcmp(buf, "pass") != 0)
+      return 0;
+    *i = -1;
+    *j = -1;
+  }
+  
   return n1 + n2;
 }
 

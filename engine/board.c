@@ -1047,6 +1047,19 @@ get_last_move()
   return move_history_pos[move_history_pointer - 1];
 }
 
+/* Return the color of the player doing the last move. If no move was
+ * found, EMPTY is returned.
+ */
+int
+get_last_player()
+{
+  if (move_history_pointer == 0)
+    return EMPTY;
+
+  return move_history_color[move_history_pointer - 1];
+}
+
+
 /* ================================================================ */
 /*                        Utility functions                         */
 /* ================================================================ */

@@ -142,6 +142,8 @@ int play_out_aftermath  = 0;    /* make everything unconditionally settled */
 int play_mirror_go      = 0;    /* try to play mirror go if possible */
 int mirror_stones_limit = -1;   /* but stop at this number of stones */
 
+int gtp_version         = 2;    /* Use GTP version 2 by default. */
+
 float best_move_values[10];
 int   best_moves[10];
 
