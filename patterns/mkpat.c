@@ -1416,7 +1416,7 @@ main(int argc, char *argv[])
 #if DFA_ENABLED
     while ( (i=gg_getopt(argc, argv, "i:o:V:vcbXfmtD")) != EOF) {
 #else
-    while ( (i=gg_getopt(argc, argv, "vcbXfm")) != EOF) {
+    while ( (i=gg_getopt(argc, argv, "i:o:vcbXfm")) != EOF) {
 #endif
       switch(i) {
       case 'v': verbose = 1; break;
@@ -1672,7 +1672,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "%d patterns\n", patno);
 
     strcpy(dfa.name,argv[gg_optind]);
-    print_c_dfa(argv[gg_optind], &dfa);
+    print_c_dfa(output_FILE, argv[gg_optind], &dfa);
     fprintf(stderr, "---------------------------\n");
 
     if (DFA_MAX_MATCHED/8 < patno)

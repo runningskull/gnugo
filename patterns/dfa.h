@@ -116,7 +116,7 @@ void dfa_end (void);	/* between calls of those 2 functions. */
 void buildSpiralOrder (order_t order[8][MAX_ORDER]); /* Needed by matchpat */
 
 /* basic dfa manipulation */
-void print_c_dfa (const char *name, dfa_t * pdfa);
+void print_c_dfa (FILE* of, const char *name, dfa_t * pdfa);
 void new_dfa (dfa_t * pdfa, const char *name);
 void copy_dfa (dfa_t * p_to, dfa_t * p_from);
 void kill_dfa (dfa_t * pdfa);

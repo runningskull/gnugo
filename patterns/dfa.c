@@ -491,34 +491,34 @@ copy_dfa (dfa_t * p_to, dfa_t * p_from)
  */
 
 void
-print_c_dfa (const char *name, dfa_t * pdfa)
+print_c_dfa (FILE *of, const char *name, dfa_t * pdfa)
 {
   int i;
 
-  printf("\n#include \"dfa.h\"\n");
+  fprintf(of,"\n#include \"dfa.h\"\n");
 
-  printf("static state_t state_%s[%d] = {\n",name,pdfa->lastState + 1);
+  fprintf(of,"static state_t state_%s[%d] = {\n",name,pdfa->lastState + 1);
   for (i = 0; i != pdfa->lastState + 1; i++)
     {
-      printf("{%d,",pdfa->states[i].att);
-      printf("{%d,",pdfa->states[i].next[0]);
-      printf("%d,",pdfa->states[i].next[1]);
-      printf("%d,",pdfa->states[i].next[2]);
-      printf("%d}},\n",pdfa->states[i].next[3]);
+      fprintf(of,"{%d,",pdfa->states[i].att);
+      fprintf(of,"{%d,",pdfa->states[i].next[0]);
+      fprintf(of,"%d,",pdfa->states[i].next[1]);
+      fprintf(of,"%d,",pdfa->states[i].next[2]);
+      fprintf(of,"%d}},\n",pdfa->states[i].next[3]);
     }
-  printf("};\n\n");
+  fprintf(of,"};\n\n");
 
 
-  printf("static attrib_t idx_%s[%d] = {\n",name,pdfa->lastIndex + 1);
+  fprintf(of,"static attrib_t idx_%s[%d] = {\n",name,pdfa->lastIndex + 1);
   for (i = 0; i != pdfa->lastIndex + 1; i++)
-    printf("{%d,%d},\n",pdfa->indexes[i].val,pdfa->indexes[i].next);
-  printf("};\n\n");
+    fprintf(of,"{%d,%d},\n",pdfa->indexes[i].val,pdfa->indexes[i].next);
+  fprintf(of,"};\n\n");
 
-  printf("static struct dfa dfa_%s = {\n",name);
-  printf(" \"%s\",\n", name);
-  printf("state_%s, %d, %d,\n",name, pdfa->lastState + 1, pdfa->lastState);
-  printf("idx_%s, %d, %d",name, pdfa->lastIndex + 1, pdfa->lastIndex);
-  printf("};\n");
+  fprintf(of,"static struct dfa dfa_%s = {\n",name);
+  fprintf(of," \"%s\",\n", name);
+  fprintf(of,"state_%s, %d, %d,\n",name, pdfa->lastState + 1, pdfa->lastState);
+  fprintf(of,"idx_%s, %d, %d",name, pdfa->lastIndex + 1, pdfa->lastIndex);
+  fprintf(of,"};\n");
 
 }
 
