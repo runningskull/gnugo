@@ -437,7 +437,7 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_QUIET:
-	quiet = 1;
+	quiet = 2;
 	break;
 	
       case OPT_GTP_INPUT:
@@ -621,8 +621,11 @@ main(int argc, char *argv[])
 	break;
 
       case OPT_MODE: 
-	if (strcmp(gg_optarg, "ascii") == 0) 
+	if (strcmp(gg_optarg, "ascii") == 0) {
 	  playmode = MODE_ASCII;
+	  if (quiet == 1)
+	    quiet = 0;
+	}
 	else if (strcmp(gg_optarg, "emacs") == 0)
 	  playmode = MODE_ASCII_EMACS;
 	else if (strcmp(gg_optarg, "gtp") == 0)
@@ -975,7 +978,8 @@ main(int argc, char *argv[])
     }
 
 
-  /* Display copyright message unless --quiet option used. */
+
+  /* Display copyright message in ASCII mode unless --quiet option used. */
   if (!quiet) {
     fprintf(stderr, "\n");
     show_version();

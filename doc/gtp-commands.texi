@@ -1301,6 +1301,34 @@
 
 @end example
 
+@cindex move_probabilities
+@item move_probabilities
+
+@example
+
+ Function:  List probabilities of each move being played (when non-zero).
+            If no previous genmove command has been issued, the result
+            of this command will be meaningless.
+ Arguments: none
+ Fails:     never
+ Returns:   Move, probabilty pairs, one per row.
+
+@end example
+
+@cindex move_uncertainty
+@item move_uncertainty
+
+@example
+
+ Function:  Return the number of bits of uncertainty in the move.
+            If no previous genmove command has been issued, the result
+            of this command will be meaningless.
+ Arguments: none
+ Fails:     never
+ Returns:   bits of uncertainty
+
+@end example
+
 @cindex followup_influence
 @item followup_influence
 
