@@ -194,7 +194,7 @@ loadsgf games/endgame11.sgf
 #? [K5]
 # T4 is one point in ko, while T5 and S6 are filling dame only.
 890 restricted_genmove white T4 T5 S6
-$? [T4]
+#? [T4]
 
 
 ############ End of Tests #################
