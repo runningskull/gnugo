@@ -90,186 +90,147 @@ semeai(int color)
 }
 
 
-/* Experimental alternative to semeai() using owl reading */
+/* revision of semeai(). Differs from the old program in calling
+ * owl_analyze_semeai() instead of relying on static analysis.
+ */
+
+#define MAX_DRAGONS MAX_BOARD*MAX_BOARD
 
 void
 new_semeai(int color)
 {
+  int semeai_results_first[MAX_DRAGONS][MAX_DRAGONS];
+  int semeai_results_second[MAX_DRAGONS][MAX_DRAGONS];
+  int semeai_move[MAX_DRAGONS][MAX_DRAGONS];
   int d1, d2;
   int k;
-  int apos = NO_MOVE;
-  int bpos = NO_MOVE;
   int other = OTHER_COLOR(color);
-  int best_result_a[MAX_NEIGHBOR_DRAGONS];
-  int best_result_b[MAX_NEIGHBOR_DRAGONS];
-  int worst_result_a[MAX_NEIGHBOR_DRAGONS];
-  int worst_result_b[MAX_NEIGHBOR_DRAGONS];
-  int a_best_status = UNKNOWN;  /* status if a plays first */
-  int b_worst_status = UNKNOWN; /* status if a plays first */
-  int a_worst_status = UNKNOWN; /* status if b plays first */
-  int b_best_status = UNKNOWN;  /* status if b plays first */
 
-  int move[MAX_NEIGHBOR_DRAGONS];
-  int a_status = UNKNOWN;
-  int b_status = UNKNOWN;
-  int pass;
+  gg_assert (number_of_dragons <= MAX_DRAGONS);
 
-  TRACE("Experimental Semeai Module is THINKING for %s!\n", 
-	color_to_string(color));
+  for (d1 = 0; d1 < number_of_dragons; d1++)
+    for (d2 = 0; d2 < number_of_dragons; d2++) {
+      semeai_results_first[d1][d2] = -1;
+      semeai_results_second[d1][d2] = -1;
+    }
+
+  for (d1 = 0; d1 < number_of_dragons; d1++)
+    for (k = 0; k < dragon2[d1].neighbors; k++) {
+      int apos = DRAGON(d1).origin;
+      int bpos = DRAGON(dragon2[d1].adjacent[k]).origin;
+      
+      d2 = dragon[bpos].id;
+
+      /* Look for semeais */
+      
+      if (dragon[apos].color == dragon[bpos].color
+	  || (dragon[apos].status != DEAD
+	      && dragon[apos].status != CRITICAL)
+	  ||(dragon[bpos].status != DEAD
+	     && dragon[bpos].status != CRITICAL))
+	continue;
+      
+      /* A dragon consisting of a single worm which is tactically dead or
+       * critical and having just one neighbor should be ignored, since
+       * the owl code is more reliable than the semeai code in such cases.
+       * We do allow these cases if the worm has 4 liberties and can be
+       * defended.
+       */
+      
+      if (dragon[apos].size == worm[apos].size
+	  && worm[apos].attack_codes[0]
+	  && (worm[apos].liberties < 4
+	      || worm[apos].defense_codes[0] == 0))
+	continue;
+      
+      if (dragon[bpos].size == worm[bpos].size
+	  && worm[bpos].attack_codes[0]
+	  && (worm[bpos].liberties < 4
+	      || worm[bpos].defense_codes[0] == 0))
+	continue;
+      /* Ignore inessential worms or dragons */
+      
+      if (worm[apos].inessential 
+	  || DRAGON2(apos).safety == INESSENTIAL
+	  || worm[bpos].inessential 
+	  || DRAGON2(bpos).safety == INESSENTIAL)
+	continue;
+
+      /* If either dragon is a single stone, this is best left
+       * to the owl code */
+      if (dragon[apos].size == 1 || dragon[bpos].size == 1)
+	continue;
+
+      /* The array semeai_results_first[d1][d2] will contain the status
+       * of d1 after the d1 d2 semeai, giving d1 the first move.
+       * The array semeai_results_second[d1][d2] will contain the status
+       * of d1 after the d1 d2 semeai, giving d2 the first move.
+       */
+      
+      owl_analyze_semeai(apos, bpos,
+			 &(semeai_results_first[d1][d2]), 
+			 &(semeai_results_second[d2][d1]),
+			 &(semeai_move[d1][d2]), 1);
+      DEBUG(DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
+	    apos, bpos);
+      DEBUG(DEBUG_SEMEAI, "results if %s moves first: %s %s\n",
+	    board[apos] == BLACK ? "black" : "white",
+	    safety_to_string(semeai_results_first[d1][d2]),
+	    safety_to_string(semeai_results_second[d2][d1]));
+    }
   
   for (d1 = 0; d1 < number_of_dragons; d1++) {
     int semeai_found = 0;
-    if (DRAGON(d1).color != color
-	|| (DRAGON(d1).status != DEAD
-	    && DRAGON(d1).status != CRITICAL))
-      continue;
+    int best_result = UNKNOWN;
+    int worst_result = UNKNOWN;
+    int defense_move = PASS_MOVE;
+    int attack_move = PASS_MOVE;
     
-    /* First pass : collect data
-     * Second pass: update statuses
-     */
-    
-    for (k = 0; k < dragon2[d1].neighbors; k++) {
-      best_result_a[k] = DEAD;
-      worst_result_b[k] = ALIVE;
-      move[k] = NO_MOVE;
-    }
-
-    for (pass = 0; pass < 2; pass ++) {
-      for (k = 0; k < dragon2[d1].neighbors; k++) {
-	d2 = dragon2[d1].adjacent[k];
-	if (DRAGON(d2).color != other
-	    || (DRAGON(d2).status != DEAD
-		&& DRAGON(d2).status != CRITICAL))
-	  continue;
-	
-	/* Dragons d1 (our) and d2 (opponent) are adjacent and both DEAD
-	 * or CRITICAL.
-	 */
-	apos = DRAGON(d1).origin;
-	bpos = DRAGON(d2).origin;
-	
-	/* The following is something we want to do but
-	 * better wait until we have the semeai stuff working
-	 * with ko. See nicklas2 test 1401.
-	 */
-#if 0
-	if (DRAGON(d1).status == CRITICAL
-	    && DRAGON(d2).status == DEAD) {
-	  update_status(bpos, CRITICAL, CRITICAL);
-	  add_owl_attack_move(dragon[apos].owl_attack_point,
-			      bpos, WIN);
-	  continue;
-	}
-#endif
-
-	/* Ignore inessential worms or dragons */
-	if (worm[apos].inessential 
-	    || DRAGON2(apos).safety == INESSENTIAL
-	    || worm[bpos].inessential 
-	    || DRAGON2(bpos).safety == INESSENTIAL)
-	  continue;
-	
-	/* A dragon consisting of a single worm which is tactically dead or
-	 * critical and having just one neighbor should be ignored, since
-	 * the owl code is more reliable than the semeai code in such cases.
-	 * We do allow these cases if the worm has 4 liberties and can be
-	 * defended.
-	 */
-	if (dragon[apos].size == worm[apos].size
-	    && worm[apos].attack_codes[0]
-	    && (worm[apos].liberties < 4
-		|| worm[apos].defense_codes[0] == 0))
-	  continue;
-	if (dragon[bpos].size == worm[bpos].size
-	    && worm[bpos].attack_codes[0]
-	    && (worm[bpos].liberties < 4
-		|| worm[bpos].defense_codes[0] == 0))
-	  continue;
-	
-	/* If one dragon consist of a single stone, don't treat it
-	 * as a semeai. (But see nicklas1:1405 for an example where
-	 * this rule is bad.
-	 */
-
-	if (dragon[apos].size == 1 || dragon[bpos].size == 1)
-	  continue;
-
+    for (d2 = 0; d2 < number_of_dragons; d2++) {
+      if (semeai_results_first[d1][d2] == -1)
+	continue;
+      gg_assert (semeai_results_second[d1][d2] != -1)
 	semeai_found = 1;
-	a_best_status = UNKNOWN;
-	b_best_status = UNKNOWN;
-	a_worst_status = UNKNOWN;
-	b_worst_status = UNKNOWN;
 
-	if (pass == 0) {
-	  DEBUG(DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
-		apos, bpos);
-	  owl_analyze_semeai(apos, bpos,
-			     best_result_a+k, worst_result_b+k, move+k, 1);
-	  DEBUG(DEBUG_SEMEAI, "Result1: %s %s %1m, ",
-	        safety_to_string(best_result_a[k]),
-	        safety_to_string(worst_result_b[k]), move[k]);
-	  if (a_best_status == DEAD
-	      || a_best_status == UNKNOWN
-	      || (a_best_status == ALIVE_IN_SEKI 
-		  && best_result_a[k] == ALIVE)) {
-	    a_best_status = best_result_a[k];
-	    b_worst_status = worst_result_b[k];
-	  }
-	  owl_analyze_semeai(bpos, apos, 
-			     best_result_b+k, worst_result_a+k, NULL, 1);
-	  DEBUG(DEBUG_SEMEAI, "Result2 %s %s.\n",
-	        safety_to_string(best_result_b[k]),
-	        safety_to_string(worst_result_a[k]));
-	  if (b_best_status == DEAD
-	      || b_best_status == UNKNOWN
-	      || (b_best_status == ALIVE_IN_SEKI
-		  && best_result_b[k] == ALIVE)) {
-	    b_best_status = best_result_b[k];
-	    a_worst_status = worst_result_a[k];
-	  }
-	}
-	else { /* pass == 1 */
-	  if (a_status == CRITICAL
-	      && best_result_a[k] != DEAD) {
-	    add_owl_defense_move(move[k], apos, WIN);
-	    DEBUG(DEBUG_SEMEAI, "Adding owl defense move for %1m at %1m\n",
-		  apos, move[k]);
-	  }
-	  if (b_status == CRITICAL
-	      && worst_result_b[k] == DEAD) {
-	    add_owl_attack_move(move[k], bpos, WIN);
-	    DEBUG(DEBUG_SEMEAI, "Adding owl attack move for %1m at %1m\n",
-		  bpos, move[k]);
-	  }
-	}
-      } /* loop over neighbor dragons */
-      if (pass == 0 && semeai_found) {
-	int a_status;
-	int b_status;
-
-	if (a_best_status != DEAD && a_worst_status == DEAD)
-	  a_status = CRITICAL;
-	else
-	  a_status = a_worst_status;
-	
-	if (b_best_status != DEAD && b_worst_status == DEAD)
-	  b_status = CRITICAL;
-	else
-	  b_status = b_worst_status;
-	
-	a_status = a_status;
-	b_status = b_status;
-	if (a_status == ALIVE_IN_SEKI)
-	  a_status = ALIVE;
-	if (b_status == ALIVE_IN_SEKI)
-	  b_status = ALIVE;
-	
-	update_status(apos, a_status, a_status);
-	update_status(bpos, b_status, b_status);
+      if (best_result == DEAD
+	  || best_result == UNKNOWN
+	  || (best_result == ALIVE_IN_SEKI 
+	      && semeai_results_first[d1][d2] != DEAD)) {
+	best_result = semeai_results_first[d1][d2];
+	defense_move = semeai_move[d1][d2];
       }
+      if (worst_result == ALIVE
+	  || worst_result == UNKNOWN
+	  || (worst_result == ALIVE_IN_SEKI 
+	      && semeai_results_second[d1][d2] != ALIVE)) {
+	worst_result = semeai_results_second[d1][d2];
+	attack_move = semeai_move[d2][d1];
+      }
+    }
+    if (semeai_found) {
+      if (best_result != DEAD && worst_result == DEAD) {
+	update_status(DRAGON(d1).origin, CRITICAL, CRITICAL);
+	if (DRAGON(d1).color == color
+	    && defense_move != PASS_MOVE) {
+	  add_owl_defense_move(defense_move, DRAGON(d1).origin, WIN);
+	  DEBUG(DEBUG_SEMEAI, "Adding owl defense move for %1m at %1m\n",
+		DRAGON(d1).origin, defense_move);
+	}
+	if (DRAGON(d1).color == other
+	    && attack_move != PASS_MOVE) {
+	  add_owl_attack_move(attack_move, DRAGON(d1).origin, WIN);
+	  DEBUG(DEBUG_SEMEAI, "Adding owl attack move for %1m at %1m\n",
+		DRAGON(d1).origin, attack_move);
+	}
+      }
+      else if (worst_result == ALIVE_IN_SEKI)
+	update_status(DRAGON(d1).origin, ALIVE, ALIVE);
+      else if (worst_result != UNKNOWN)
+	update_status(DRAGON(d1).origin, worst_result, worst_result);
     }
   }
 }
+
 
 /* liberty_of_dragon(pos, origin) returns true if the vertex at (pos) is a
  * liberty of the dragon with origin at (origin).
