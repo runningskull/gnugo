@@ -54,8 +54,8 @@
  *   flags          :  4 bits
  */
 typedef struct {
-  Hashvalue_ng  key;
-  uint32_t      data;
+  Hashvalue_ng key;
+  int data;
 } Hashnode_ng;
 
 #define HN_MAX_REMAINING_DEPTH  31

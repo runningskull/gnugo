@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- don't use stdint.h
 - revised hash table scheme
 - new tests
 - new COSMIC_GNUGO function choose_best_strategy() sets tuning parameters

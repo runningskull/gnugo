@@ -163,11 +163,11 @@ tt_update(Transposition_table *table,
 	  int remaining_depth,
 	  int result, int move)
 {
-  Hashvalue_ng  hashval;
+  Hashvalue_ng hashval;
   Hashentry_ng *entry;
-  Hashnode_ng  *deepest;
-  Hashnode_ng  *newest;
-  uint32_t      data;
+  Hashnode_ng *deepest;
+  Hashnode_ng *newest;
+  int data;
 
   /* Calculate the hash value. */
   hashval = calculate_hashval_ng(komaster, kom_pos, routine, target);
