@@ -60,17 +60,17 @@ W[qe]MA[ok]C[0];B[rg]MA[ok]C[U]
 ]MA[mj];C[#hasami]
 (;W[qc]C[S]MA[mj];C[#w invades]
 (;B[pc]C[#Not good unless B has stone around K17];C[#b blocks on left]
-;W[qd]C[S]MA[mj];B[pe]C[U
-]MA[mj]
+;W[qd]C[S]MA[nh];B[pe]C[U
+]MA[nh]
 (;W[qb]C[S]MA[mj];B[pf]C[S]MA[mj]
 (;W[rf]C[S]MA[mj];B[oh]C[S]MA[mj])
 
 (;W[qg]C[0]MA[mj];B[pg]C[S]MA[mj])
 )
 
-(;W[rf]C[S]MA[mj];B[og]C[S]MA[mj])
+(;W[rf]C[S]MA[mj];B[og]C[S]MA[ni])
 
-(;W[qe]C[0]MA[mj];B[og]C[S]MA[mj])
+(;W[qe]C[0]MA[mj];B[og]C[S]MA[ni])
 )
 
 (;B[qd]C[S]MA[ij];C[#b blocks below];W[pc]C[S]MA[mj]
@@ -129,16 +129,29 @@ MA[mj]
 ]MA[mi])
 
 (;B[qh]C[S]MA[mj]
-(;W[qc]C[S]MA[mj];B[qe]C[S]MA[mj];W[re]C[S]MA[mj];B[pf]C[S]MA[lj];
-W[pg]C[S;D]MA[mj]
-(;B[qg]C[S]MA[mj];W[rf]C[S]MA[mj];B[og]C[S]MA[mj];W[tt]MA[mj];B[ph]
-C[S]MA[mj])
+(;W[qc]C[S]MA[mj];B[qe]C[S]MA[mj];W[re]C[S]MA[mj];B[pf]C[S]MA[lj]
+(;W[pg]C[;!xplay_attack(A,B)
+]MA[mj]LB[qg:A][pg:B]
+(;B[qg]C[S]MA[mj];W[rf]C[S]MA[mj]
+(;B[og]C[S]MA[mj];W[tt]MA[mj];B[ph]C[S]MA[mj])
+
+(;B[of])
+)
 
 (;B[of]MA[mi]C[A
 ])
 )
 
-(;W[of]C[0];B[qc]C[S]MA[mj])
+(;W[nb]MA[lj];B[rf]MA[lj];W[oc]MA[lj])
+
+(;W[ob]C[j
+]MA[lj];B[rf]MA[lj])
+
+(;W[rf]C[0
+];B[pg]MA[lj])
+)
+
+(;W[of]C[0]MA[mi];B[qc]C[S]MA[mj])
 )
 
 (;B[qc]C[S]MA[mh]
@@ -206,7 +219,12 @@ MA[mg];W[od]MA[mg]C[S];B[oc]MA[mg];W[pe]MA[mg]C[U
 ])
 )
 
-(;W[qc];B[qd]MA[mg])
+(;W[qc]
+(;B[qd]MA[mg])
+
+(;B[pc]MA[mg]C[0
+])
+)
 )
 
 (;B[pj]C[0]PL[B];B[pf]MA[ml];C[#tsuke nobi 6-9 stone games];W[pg];
@@ -217,7 +235,11 @@ B[of]MA[ml]C[U];C[#tsuke nobi 6-9 stone games])
 (;W[pg]MA[mi]C[U]
 (;B[of]MA[mh]C[U];C[#nobi]
 (;W[qe]MA[mi]C[U];C[#w crawls];B[qd]MA[mh]C[U]PL[W]
-(;W[qj]MA[nk]C[U];C[#standard joseki];B[nd]MA[mh]C[U])
+(;W[qj]MA[nk]C[U];C[#standard joseki];B[nd]
+C[U
+; !oterri(A)
+#overconcentrated in this case
+]MA[mk]LB[md:A])
 
 (;W[qh]MA[nk]C[S];C[#alternative joseki];B[nd]MA[mh]C[U
 ]PL[B]
@@ -638,5 +660,71 @@ MA[mf];B[re]C[S]MA[mf];W[rc]C[S]MA[mf];B[qf]C[S]MA[mg]
 )
 
 (;W[pe];B[od]MA[lh];W[qd];B[qc]MA[mh])
+
+(;W[pg]C[j
+]MA[li];B[nd]MA[li]
+(;W[qd]MA[li]
+(;B[qc]MA[li]
+(;W[qe]MA[li];B[rc]MA[li];W[pe]MA[li];B[od]MA[li];W[qk]MA[ll];B[jc]
+MA[hi])
+
+(;W[pe]MA[li];B[od]MA[li];W[re]MA[li];B[rc]MA[li];W[qk]MA[lm];B[jc]
+MA[hi])
+
+(;W[rc]MA[li]
+(;B[pc]MA[li];W[qe]MA[li];B[rb]MA[li];W[qk]MA[lm];B[jc]MA[hi])
+
+(;B[qe]MA[li];W[rd]MA[li];B[pc]MA[li];W[pe]MA[li]
+(;B[pf]MA[li];W[oe]MA[li];B[qg]MA[li];W[of]MA[li];B[qf]MA[li];W[ph]
+MA[li];B[ri]MA[lk];W[od]MA[lj];B[oc]MA[lj];W[nc]MA[kj];B[nb]MA[kj];
+W[mc]MA[kj];B[mb]MA[jj];W[lc]MA[jj];B[rb]MA[kj])
+
+(;B[oe]MA[li];W[pf]MA[li];B[rb]MA[li]
+(;W[re]MA[li])
+
+(;W[sb]C[0
+]MA[li];B[re]MA[li];W[qb]MA[li];B[ra]MA[li])
+)
+)
+)
+)
+
+(;B[qe]MA[li];W[pe]MA[li];B[re]MA[li]
+(;W[rd]MA[li];B[rg]MA[li];W[pc]MA[li];B[od]MA[li];W[ob]MA[li];B[nb]
+MA[li]
+(;W[rb]MA[li];B[pf]MA[li])
+
+(;W[pf];B[qc]MA[li];W[rc];B[qb]MA[li];W[rb];B[pb]MA[li];W[qa];B[oc]
+MA[li]
+(;W[rh];B[qh]MA[li];W[rf];B[ri]MA[li];W[qf];B[pk]MA[lm])
+
+(;W[rf];B[qf]MA[li];W[qg];B[sf]MA[li];W[rh];B[ri]MA[lk];W[sd];B[se]
+MA[lk];W[qh];B[sh]MA[lk];W[qj];B[sb]MA[lk])
+)
+)
+
+(;W[pc]MA[li]C[0
+];B[od]MA[li];W[rc];B[pf]MA[li];W[nb]
+(;B[og]MA[li]C[j
+])
+
+(;B[mb]MA[ki]
+(;W[ob];B[qb]MA[ki]
+(;W[rb];B[nc]MA[ki];W[qc];B[lc]MA[ki])
+
+(;W[qc];B[mc]MA[ki];W[rb])
+)
+
+(;W[mc]C[0
+];B[ob]MA[ki];W[lb];B[oc]MA[ki])
+)
+)
+)
+)
+
+(;W[qk]MA[km]C[j
+];B[jc]MA[hl]C[j
+])
+)
 
 )
