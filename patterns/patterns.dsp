@@ -275,7 +275,7 @@ IntDir=.\Debug
 InputPath=.\aa_attackpats.db
 
 "aa_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -D -m -b aa_attackpat -i ..\patterns\aa_attackpats.db -o aa_attackpat.c
+	$(IntDir)\mkpat -D -m -b -t ..\patterns\aa_attackpats.dtr aa_attackpat -i ..\patterns\aa_attackpats.db -o aa_attackpat.c
 
 # End Custom Build
 
@@ -709,7 +709,7 @@ IntDir=.\Debug
 InputPath=.\owl_attackpats.db
 
 "owl_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -D -m -b owl_attackpat -i ..\patterns\owl_attackpats.db -o owl_attackpat.c
+	$(IntDir)\mkpat -D -m -b -t ..\patterns\owl_attackpats.dtr owl_attackpat -i ..\patterns\owl_attackpats.db -o owl_attackpat.c
 
 # End Custom Build
 
@@ -740,7 +740,7 @@ IntDir=.\Debug
 InputPath=.\owl_defendpats.db
 
 "owl_defendpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -D -m -b owl_defendpat -i ..\patterns\owl_defendpats.db -o owl_defendpat.c
+	$(IntDir)\mkpat -D -m -b -t ..\patterns\owl_defendpats.dtr owl_defendpat -i ..\patterns\owl_defendpats.db -o owl_defendpat.c
 
 # End Custom Build
 
@@ -771,7 +771,7 @@ IntDir=.\Debug
 InputPath=.\owl_vital_apats.db
 
 "owl_vital_apat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -D -m -b owl_vital_apat -i ..\patterns\owl_vital_apats.db -o owl_vital_apat.c
+	$(IntDir)\mkpat -D -m -b -t ..\patterns\owl_vital_apats.dtr owl_vital_apat -i ..\patterns\owl_vital_apats.db -o owl_vital_apat.c
 
 # End Custom Build
 
