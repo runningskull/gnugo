@@ -4,11 +4,11 @@ loadsgf games/handtalk/handtalk1.sgf 113
 #? [2 T15]
 
 loadsgf games/handtalk/handtalk2.sgf 35
-4 owl_defend r8
+4 owl_defend R8
 #? [1 P10]*
 
 loadsgf games/handtalk/handtalk2.sgf 70
-5 owl_defend p18
+5 owl_defend P18
 #? [2 (S18|O17|N18)]*
 
 # O18 might work, but I don't think so. /ab
@@ -23,13 +23,13 @@ loadsgf games/handtalk/handtalk2.sgf 78
 #? [1 1 (N18|O17|S15)]*
 
 loadsgf games/handtalk/handtalk2.sgf 134
-9 owl_attack r8
+9 owl_attack R8
 #? [1 (T6|T7)]
 
 loadsgf games/handtalk/handtalk2.sgf 136
-10 owl_defend q4
+10 owl_defend Q4
 #? [0]
 
 #loadsgf games/handtalk/handtalk2.sgf 160
-#11 owl_defend g15
+#11 owl_defend G15
 ##? [1 E13]*

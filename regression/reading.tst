@@ -763,8 +763,8 @@ loadsgf games/reading41.sgf 118
 183 defend C19
 #? [1 (A19|E11)]
 
-# Playing E11 immedidately gives bad ko. A18 obviously is totally
-# ineffective. Necessary to start at A16
+# Playing E11 immediately gives bad ko. A18 obviously is totally
+# ineffective. Necessary to start at A16.
 loadsgf games/reading41.sgf 130
 184 attack C19
 #? [2 A16]
@@ -858,6 +858,12 @@ trymove W E12
 202 attack E13
 #? [2 F13]*
 popgo
+
+loadsgf games/reading46.sgf
+203 attack H9
+#? [1 E9]
+204 defend H9
+#? [1 (C6|E9|G9)]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

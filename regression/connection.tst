@@ -411,6 +411,10 @@ trymove white C15
 #? [1 B15]*
 popgo
 
+loadsgf games/gunnar/gunnar9.sgf 4
+115 disconnect D10 J7
+#? [1 H7]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

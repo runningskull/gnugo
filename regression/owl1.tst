@@ -380,6 +380,10 @@ loadsgf games/scoring/score14.sgf
 352 owl_attack B19
 #? [0]*
 
+loadsgf games/owl53.sgf
+353 owl_attack G6
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

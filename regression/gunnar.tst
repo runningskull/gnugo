@@ -157,7 +157,7 @@ loadsgf games/nngs/gnugo-3.3.17-joshj-200304172202.sgf 226
 
 # H5 is the only move. H11 can connect to either of two invincible
 # dragons and is therefore not weak at all.
-loadsgf games/gunnar/gunnar9.sgf
+loadsgf games/gunnar/gunnar9.sgf 1
 29 reg_genmove white
 #? [H5]*
 
@@ -321,6 +321,22 @@ loadsgf games/gunnar/gunnar15.sgf
 play black R1
 56 reg_genmove white
 #? [P18|E15|O12|N11|T12|T10|S7|T5]*
+
+# No territory to contest around J12. Connect ko at Q19 instead.
+loadsgf games/gunnar/gunnar16.sgf
+57 restricted_genmove black J13 J12 H11 J11 K11 Q19
+#? [Q19]
+
+# No territory to contest around J15. E12 worth one point.
+loadsgf games/gunnar/gunnar17.sgf
+58 reg_genmove black
+#? [E12]
+
+# Do not defend against combination attack inside potential territory
+# unless we have to.
+loadsgf games/gunnar/gunnar18.sgf
+59 reg_genmove black
+#? [P13]
 
 ############ End of Tests #################
 

@@ -513,9 +513,15 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 194
 #? [!H7]
 
 
+# White must defend against a combination attack. M8 works but is only
+# a temporary measure until the M6 liberty is filled. Otherwise there
+# are a number of effective moves which only differ with respect to
+# the number and size of ko threats left behind.
+# R7 looks like the most solid alternative, with N9 as second choice.
+# We may want to add more moves as acceptable.
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 224
 1090 reg_genmove white
-#? [!S6]*
+#? [R7|N9|M8]*
 
 
 # Moved to filllib:41.

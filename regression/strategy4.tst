@@ -33,9 +33,14 @@ loadsgf games/ssstator.sgf 133
 156 reg_genmove black
 #? [B14|B16]
 
+# This problem is interesting. First there's a combination attack
+# at B16/B14/C18/B12. Second there's a combination breakin attack
+# G9+E9+F10 together with the cuts at B10,B12,B14.
+# The only moves defending against both combinations are B14, B13,
+# B12, A14, and A12.
 loadsgf games/ssstator.sgf 136
 157 reg_genmove white
-#? [B14|B16|C18]
+#? [B14|B13|B12|A14|A12]
 
 # E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51

@@ -416,9 +416,20 @@ loadsgf games/semeai/semeai17.sgf 64
 #? [1 0 PASS]*
 
 loadsgf games/kgs/yagr-nigiri.sgf 214
-117 analyze_semeai F19 F16
+116 analyze_semeai F19 F16
 #? [3 3 E16]*
 
+loadsgf games/semeai/semeai18.sgf
+117 analyze_semeai H3 H5
+#? [0 0 PASS]
+
+play white H2
+118 analyze_semeai H3 H5
+#? [1 0 (H1|G1)]
+
+# Black H1 doesn't work. White plays G1 and gets seki or ko.
+119 analyze_semeai H5 H3
+#? [1 1 G1]
 
 
 ########### semeai gen_move tests #################

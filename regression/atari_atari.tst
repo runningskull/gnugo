@@ -119,3 +119,8 @@ loadsgf games/filllib14.sgf
 play white H5
 27 combination_attack black
 #? [0]*
+
+# See also nngs:1060. Black has no combination attack at R3.
+loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
+28 combination_attack black
+#? [0]
