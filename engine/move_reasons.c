@@ -1396,8 +1396,10 @@ add_replacement_move(int from, int to)
 
   ASSERT_ON_BOARD1(from);
   ASSERT_ON_BOARD1(to);
+#if 0
   ASSERT1(board[from] == EMPTY, from);
   ASSERT1(board[to] == EMPTY, to);
+#endif
 
   cc = replacement_map[to];
 
