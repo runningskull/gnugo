@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- RTRACE and VTRACE retired
 - corrected format of AP property in sgf_write_header()
 - new game records and test cases
 

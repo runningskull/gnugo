@@ -359,8 +359,6 @@ void debug_influence_move(int i, int j);
 
 
 #define TRACE  (!(verbose)) ? (void)0 : (void)gprintf
-#define RTRACE (!(verbose >= 3)) ? (void)0 : (void)gprintf
-#define VTRACE (!(verbose >= 4)) ? (void)0 : (void)gprintf
 
 #ifdef HAVE_VARIADIC_DEFINE
 

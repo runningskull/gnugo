@@ -1055,8 +1055,6 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
   
   SETUP_TRACE_INFO("find_defense", str);
   
-  RTRACE("Can we rescue %1m?\n", str);
-
   if (move)
     xpos = *move;
 
@@ -1110,7 +1108,6 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
     dcode = defend4(str, &xpos, komaster, kom_pos);
 
   if (dcode) {
-    RTRACE("saving move for %1m found at %1m!\n", str, xpos);
     READ_RETURN(read_result, move, xpos, dcode);
   }
     
@@ -1183,7 +1180,6 @@ defend1(int str, int *move, int komaster, int kom_pos)
   
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 1, str);
-  RTRACE("try to escape atari on %1m.\n", str);
 
   /* lib will be the liberty of the string. */
   liberties = findlib(str, 1, &lib);
@@ -1292,7 +1288,6 @@ defend2(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("defend2", str);
   reading_node_counter++;
 
-  RTRACE("trying to rescue %1m\n", str);
   color = board[str];
   other = OTHER_COLOR(color);
 
@@ -1473,7 +1468,6 @@ defend2(int str, int *move, int komaster, int kom_pos)
   if (savecode != 0)
     RETURN_RESULT(savecode, savemove, move, "saved move");
 
-  RTRACE("failed to find rescuing move.\n");
   RETURN_RESULT(savecode, savemove, move, NULL);
 }
 
@@ -1500,7 +1494,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("defend3", str);
   reading_node_counter++;
 
-  RTRACE("trying to rescue %1m\n", str);
   color = board[str];
   other = OTHER_COLOR(color);
 
@@ -1720,7 +1713,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
   if (savecode != 0)
     RETURN_RESULT(savecode, savemove, move, "saved move");
 
-  RTRACE("failed to find rescuing move.\n");
   RETURN_RESULT(0, 0, move, NULL);
 }
 
@@ -1747,7 +1739,6 @@ defend4(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("defend4", str);
   reading_node_counter++;
 
-  RTRACE("trying to rescue %1m\n", str);
   color = board[str];
   other = OTHER_COLOR(color);
 
@@ -1815,7 +1806,6 @@ defend4(int str, int *move, int komaster, int kom_pos)
   if (savecode != 0)
     RETURN_RESULT(savecode, savemove, move, "saved move");
 
-  RTRACE("failed to find rescuing move.\n");
   RETURN_RESULT(0, 0, move, NULL);
 }
 
@@ -2826,8 +2816,6 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 			 stackp <= ko_depth && best_other_tactic == WIN)) {
       int other_tactic;
       ASSERT1(countlib(str) >= 1, str);
-      RTRACE("%sing %1m at %1m (Pattern %s)\n", attack_defend_str, str, 
-	     moves[k].pos, moves[k].name);
       if (sgf_dumptree) {
         char buf[500];
         sprintf(buf, "tactical_pat komaster: %d %s  new_komaster: %d %s ko_move: %d", 
@@ -3255,8 +3243,6 @@ attack2(int str, int *move, int komaster, int kom_pos)
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
 
-  RTRACE("checking attack on %1m with 2 liberties\n", str);
-
   for (pass = 0; pass < 4; pass++) {
     
     switch (pass) {
@@ -3430,7 +3416,6 @@ attack2(int str, int *move, int komaster, int kom_pos)
 
 
   if (savecode == 0) {
-    RTRACE("ALIVE!!\n");
     RETURN_RESULT(0, 0, move, NULL);
   }
 
@@ -4559,7 +4544,6 @@ break_chain3_moves(int str, struct reading_moves *moves)
 
   memset(mw, 0, sizeof(mw));
   
-  RTRACE("in break_chain3 at %1m\n", str);
   adj = chainlinks2(str, adjs, 3);
   for (r = 0; r < adj; r++) {
     int lib1 = 0, lib2 = 0, lib3 = 0;
@@ -4741,8 +4725,6 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 1, str);
 
-  RTRACE("try to escape atari on %1m.\n", str);
-
   /* (lib) will be the liberty of the string. */
   liberties = findlib(str, 1, &lib);
   ASSERT1(liberties == 1, str);
@@ -4871,8 +4853,6 @@ restricted_attack2(int str, int *move, int komaster, int kom_pos,
   str = find_origin(str);
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
-
-  RTRACE("restricted attack on %1m with 2 liberties\n", str);
 
   /* The attack may fail if a boundary string is in atari and cannot 
    * be defended.  First we must try defending such a string. 

@@ -650,16 +650,13 @@ do_trymove(int pos, int color, int ignore_ko)
   if (!ignore_ko && pos == board_ko_pos) {
     if (board[WEST(pos)] == OTHER_COLOR(color)
 	|| board[EAST(pos)] == OTHER_COLOR(color)) {
-      RTRACE("%1m would violate the ko rule\n", pos);
       return 0;
     }
   }
 
   /* 4. Test for suicide. */
-  if (is_suicide(pos, color)) {
-    RTRACE("%1m would be suicide\n", pos);
+  if (is_suicide(pos, color))
     return 0;
-  }
   
   /* Check for stack overflow. */
   if (stackp >= MAXSTACK-2) {
@@ -1103,7 +1100,6 @@ is_legal(int pos, int color)
   if (pos == board_ko_pos)
     if (board[WEST(pos)] == OTHER_COLOR(color)
 	|| board[EAST(pos)] == OTHER_COLOR(color)) {
-      RTRACE("%1m would violate the ko rule\n", pos);
       return 0;
     }
 
@@ -1119,10 +1115,8 @@ is_legal(int pos, int color)
   }
 
   /* Check for suicide. */
-  if (!allow_suicide && is_suicide(pos, color)) {
-    RTRACE("%1m would be suicide\n", pos);
+  if (!allow_suicide && is_suicide(pos, color))
     return 0;
-  }
   
   return 1;
 }
