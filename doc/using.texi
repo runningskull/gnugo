@@ -572,7 +572,10 @@ documented elsewhere (@pxref{Influential Display}).
 @end quotation
 @item @option{-b}, @option{--benchmark @var{number}} 
 @quotation
-benchmarking mode - can be used with @option{-l}.
+benchmarking mode - can be used with @option{-l}. Causes GNU Go to play itself
+repeatedly, seeding the start of the game with a few random moves. This method
+of testing the program is largely superceded by use of the @command{twogtp}
+program.
 @end quotation
 @item @option{-S}, @option{--statistics}
 @quotation

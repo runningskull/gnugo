@@ -193,7 +193,7 @@ Indices
 
 @node Pattern Based Reading, Influence, Tactical Reading, Top
 @comment  node-name,  next,  previous,  up
-@chapter Life and Death Reading
+@chapter Pattern Based Reading
 
 @include owl.texi
 

@@ -7,6 +7,7 @@
 * The Influence Algorithm::     The algorithm of @code{accumlate_influence()}
 * Permeability::                Permeability
 * Escape::                      Escape
+* Surrounded Dragons::          Surrounded Dragons
 * Influential Patterns::	Patterns used by the Influence module
 * Influential Functions::       Functions in @file{engine/influence.c}
 * Influential Display::         Colored display and debugging of influence
@@ -462,7 +463,6 @@ called once for each influence source. These invocations are
 totally independent and the influence contributions from the
 different sources are added together.
 
-
 @node Permeability, Escape, The Influence Algorithm, Influence
 @comment  node-name,  next,  previous,  up
 @section Permeability
@@ -510,7 +510,7 @@ We don't want @samp{X} influence to be spread from @samp{a} to
 @samp{b}, and since the permeability at both c and d is zero, the
 rule above stops this.
 
-@node Escape, Influential Patterns, Permeability, Influence
+@node Escape, Surrounded Dragons, Permeability, Influence
 @comment  node-name,  next,  previous,  up
 @section Escape
 
@@ -518,7 +518,11 @@ One application of the influence code is in computing the
 @code{dragon.escape_route} field. This is computed by the function
 @code{compute_escape()} as follows.  First, every intersection is
 assigned an escape value, ranging between 0 and 4, depending on
-the influence value of the opposite color. 
+the influence value of the opposite color.
+
+The @code{escape_route} field is modified by the code in @file{surround.c}
+(@pxref{Surrounded Dragons}). It is divided by two for weakly surrounded
+dragons, and set to zero for surrounded ones.
 
 In addition to assiging an escape value to empty vertices,
 we also assign an escape value to friendly dragons. This
@@ -599,8 +603,95 @@ The current escape route mechanism seems good enough to be useful
 but is not completely reliable. Mostly it seems to err on the side of
 being too optimistic.
 
+@node Surrounded Dragons, Influential Patterns, Escape, Influence
 
-@node Influential Patterns, Influential Functions, Escape, Influence
+When is a dragon surrounded?
+
+As has been pointed out by Bruce Wilcox, the geometric lines connecting groups
+of the opposite color are often important. It is very hard to prevent the
+escape of this @samp{O} dragon:
+
+@example
+..........
+.....O....
+.X.......X
+.X...O...X
+..........
+..........
+----------
+@end example
+
+On the other hand, this dragon is in grave danger:
+
+@example
+..........
+..........
+.X.......X
+.....O....
+.X.......X
+.X...O...X
+..........
+..........
+----------
+@end example
+
+The difference between these two positions is that in the first, the @samp{O}
+dragon crosses the line connecting the top two @samp{X} stones.
+
+Code in @file{surround.c} implements a test for when a dragon is surrounded.
+The idea is to compute the convex hull of the @emph{surround set}, that is,
+the set stones belonging to unfriendly neighbor dragons. If the dragon is
+contained within that hull. If it is, it is said to be @emph{surrounded}.
+
+In practice this scheme is modified slightly. The implementation uses various
+algorithms to compute distances and hostile stones are discarded from the 
+surround set when a pair other hostile ones can be found which makes the
+considered one useless. For example, in the following position
+the bottom @samp{O} stone would get discarded.
+
+@example
+O.X.O  
+.....
+.O.O.
+.....
+..O..
+@end example
+
+Also, points are added to the surround set below stones on the
+second and third lines. This should account for the edge being a
+natural barrier.
+
+In order to compute distances between corners of the convex hull
+a sorting by angle algorithm has been implemented. If the distance
+between a pair enclosing stones is large, the surround status gets
+decreased to @code{WEAKLY_SURROUNDED}, or even 0 for very large ones.
+
+The following position:
+
+@example
+O.X.O
+.....
+.O.O.
+@end example      
+
+This is "more" surrounded than the following position:
+
+@example
+O.XXXXXX.O
+..........
+.O......O.
+@end example
+
+In the second case, the surround status would be lowered to
+@code{WEAKLY_SURROUNDED}.
+
+The surround code is used to modify the escape_route field
+in the dragon2 data array. When a dragon is WEAKLY_SURROUNDED,
+the escape_route is divided by 2. If the dragon is SURROUNDED,
+escape_route is simply set to 0.
+
+
+@node Influential Patterns, Influential Functions, Surrounded Dragons, Influence
 @comment  node-name,  next,  previous,  up
 @section Patterns used by the Influence module
 

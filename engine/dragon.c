@@ -320,6 +320,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	gprintf ("surrounded dragon found at %1m\n", dragon2[d].origin);
     }
     else if (dragon2[d].surround_status == WEAKLY_SURROUNDED) {
+      /* divide by 2 */
       dragon2[d].escape_route >>= 1;
       if (debug & DEBUG_DRAGONS)
 	gprintf ("weakly surrounded dragon found at %1m\n", dragon2[d].origin);
