@@ -65,7 +65,7 @@ static int do_get_read_result(int routine, int komaster, int kom_pos,
 void
 read_result_dump(Read_result *result, FILE *outfile)
 {
-  fprintf(outfile, "Komaster %d (%d, %d) Routine %d, (%d, %d), depth: %d ",
+  fprintf(outfile, "Komaster %u (%d, %d) Routine %u, (%d, %d), depth: %u ",
 	  rr_get_komaster(*result),
 	  I(rr_get_kom_pos(*result)),
 	  J(rr_get_kom_pos(*result)),
@@ -73,7 +73,7 @@ read_result_dump(Read_result *result, FILE *outfile)
 	  I(rr_get_str(*result)),
 	  J(rr_get_str(*result)),
 	  rr_get_stackp(*result));
-  fprintf(outfile, "Result: %d %d, (%d, %d)\n",
+  fprintf(outfile, "Result: %u %u, (%d, %d)\n",
 	  rr_get_status(*result),
 	  rr_get_result(*result),
 	  I(rr_get_move(*result)),

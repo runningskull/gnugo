@@ -456,7 +456,7 @@ gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head)
   if (handicap > bsize * bsize - 1 || handicap < 0) {
     fprintf(stderr, " Handicap HA[%d] is unreasonable.\n", handicap);
     fprintf(stderr, " Modify SGF file.\n");
-    exit (1);
+    exit(EXIT_FAILURE);
   }
 }
 

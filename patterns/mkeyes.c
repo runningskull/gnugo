@@ -333,7 +333,7 @@ main(void)
 	
 	
 	printf("  {%d, %d, %2d, %d, {%2d, %2d, %2d, %2d}}",
-	       marginal[i][j], edge[i][j], flags[i][j],
+	       marginal[i][j], (int) edge[i][j], (int) flags[i][j],
 	       neighbors[l], nb[0], nb[1], nb[2], nb[3]);
 	
 	if (l < esize[patno]-1)

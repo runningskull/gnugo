@@ -256,7 +256,7 @@ ascii_showboard(void)
 	  last_pos_was_move = 0;
 	  break;
 	default: 
-	  fprintf(stderr, "Illegal board value %d\n", BOARD(i, j));
+	  fprintf(stderr, "Illegal board value %d\n", (int) BOARD(i, j));
 	  exit(EXIT_FAILURE);
 	  break;
       }

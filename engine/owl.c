@@ -5271,7 +5271,12 @@ prepare_goal_list(int str, struct local_owl_data *owl,
   if (kworm) {
     if (do_list)
       list_goal_worms(owl, list);
-    memcpy(dragon_goal_worms[dragon[str].id], list, sizeof (list));
+    /* N.B. We cannot use sizeof(list) below because a formal array
+     * parameter implicitly is converted to a pointer and sizeof(list)
+     * thus equals sizeof(int *), which is not what we want.
+     */
+    memcpy(dragon_goal_worms[dragon[str].id], list,
+	   sizeof(dragon_goal_worms[dragon[str].id]));
     *flag = 1;
   }
   else

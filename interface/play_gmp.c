@@ -71,12 +71,12 @@ play_gmp(Gameinfo *gameinfo)
   
   if (message == gmp_err)  {
     fprintf(stderr, "gnugo-gmp: Error \"%s\" occurred.\n", error);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   else if (message != gmp_newGame)  {
     fprintf(stderr, "gnugo-gmp: Expecting a newGame, got %s\n",
 	    gmp_resultString(message));
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   gameinfo->handicap = gmp_handicap(ge);

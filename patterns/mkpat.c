@@ -141,7 +141,7 @@ int callback_unneeded[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 int maxi, maxj;                 /* (i,j) offsets of largest element */
 int mini, minj;                 /* offset of top-left element
 				   (0,0) unless there are edge constraints */
-int where;                      /* NORTH_EDGE | WEST_EDGE, etc */
+unsigned int where;             /* NORTH_EDGE | WEST_EDGE, etc */
 int el;                         /* next element number in current pattern */
 struct patval_b elements[MAX_BOARD*MAX_BOARD]; /* elements of current pattern */
 int num_stars;
@@ -2660,7 +2660,7 @@ main(int argc, char *argv[])
 
   /* Forward declaration, which autohelpers might need. */
   if (database_type != DB_FULLBOARD && database_type != DB_CORNER)
-    fprintf(output_FILE, "struct pattern %s[];\n\n", prefix);
+    fprintf(output_FILE, "extern struct pattern %s[];\n\n", prefix);
 
   /* Write the autohelper code. */
   fprintf(output_FILE, "%s", autohelper_code);

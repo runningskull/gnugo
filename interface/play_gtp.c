@@ -2569,7 +2569,7 @@ gtp_final_score(char *s)
    * the command after the color, this is used as seed instead.
    */
   seed = 0;
-  sscanf(s, "%u", &seed);
+  sscanf(s, "%d", &seed);
   random_seed = seed;
 
   finish_and_score_game(seed);
@@ -2611,7 +2611,7 @@ gtp_final_status(char *s)
    * the command after the color, this is used as seed instead.
    */
   seed = 0;
-  sscanf(s + n, "%u", &seed);
+  sscanf(s + n, "%d", &seed);
   random_seed = seed;
 
   finish_and_score_game(seed);
@@ -2669,7 +2669,7 @@ gtp_final_status_list(char *s)
    * the command after the color, this is used as seed instead.
    */
   seed = 0;
-  sscanf(s + n, "%u", &seed);
+  sscanf(s + n, "%d", &seed);
   random_seed = seed;
 
   finish_and_score_game(seed);

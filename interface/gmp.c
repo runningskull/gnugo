@@ -37,6 +37,10 @@
 # endif
 #endif
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -308,7 +312,7 @@ static GmpResult  parsePacket(Gmp *ge, int *out1, int *out2,
   if (ge->recvData[2] & 0x08)  {  /* Not-understood command. */
     if (gmp_debug) {
       fprintf(stderr, "GMP: Unknown command byte 0x%x received.\n",
-	      ge->recvData[2]);
+	      (unsigned int) ge->recvData[2]);
     }
     return(gmp_nothing);
   }
@@ -461,7 +465,7 @@ static void  putCommand(Gmp *ge, Command cmd, int val)  {
     } else  {
       if (gmp_debug)
 	fprintf(stderr, "GMP: Send buffer full.  Catastrophic error.");
-      exit(1);
+      exit(EXIT_FAILURE);
     }
     return;
   }

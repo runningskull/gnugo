@@ -787,8 +787,8 @@ static int dfa_board_size = -1;
 extern int dfa_p[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
 extern int spiral[MAX_ORDER][8];
 
-/* FIXME: what is this for? */
-const int convert[3][4];
+/* This is used by the EXPECTED_COLOR macro. */
+extern const int convert[3][4];
 
 /* Forward declarations. */
 static void dfa_prepare_for_match(int color);

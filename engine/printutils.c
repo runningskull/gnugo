@@ -69,7 +69,7 @@ vgprintf(FILE* outputfile, const char *fmt, va_list ap)
       }
       case 'x':
       {
-	int d = va_arg(ap, int);
+	unsigned int d = va_arg(ap, unsigned int);
 	fprintf(outputfile, "%x", d);
 	break;
       }
@@ -147,7 +147,7 @@ vgprintf(FILE* outputfile, const char *fmt, va_list ap)
       }
       case 'H':
       {
-	long h = va_arg(ap, int);
+	unsigned long h = va_arg(ap, unsigned long);
 	fprintf(outputfile, "%lx", h);
 	break;
       }

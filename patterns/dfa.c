@@ -27,6 +27,7 @@
 #include "patterns.h"
 #include "dfa.h"
 #include <assert.h>
+#include <stdlib.h>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -394,7 +395,7 @@ resize_dfa(dfa_t *pdfa, int maxStates, int maxIndexes)
   pBuf2 = realloc(pdfa->indexes, maxIndexes * sizeof(attrib_t));
   if (pBuf == NULL || pBuf2 == NULL) {
     fprintf(stderr, "No memory left for dfa: %s", pdfa->name);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   for (i = pdfa->maxStates; i < maxStates; i++)
@@ -550,20 +551,20 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
   if (sizeof(unsigned short) < 2) {
     fprintf(of, "#error shorts too short");
     fprintf(stderr, "Error: shorts are expected to be at least 2 bytes long.\n");
-    exit(2);
+    exit(EXIT_FAILURE);
   }
 
   assert (dfa_minmax_delta(pdfa, -1, 1) > 0);
   if (dfa_minmax_delta(pdfa, -1, 0)  > 65535) {
     fprintf(of, "#error too many states");
     fprintf(stderr, "Error: The dfa states are too disperse. Can't fit delta into a short.\n");
-    exit(2);
+    exit(EXIT_FAILURE);
   }
 
   if (pdfa->lastIndex + 1 > 65535) {
     fprintf(of, "#error too many states");
     fprintf(stderr, "Error: Too many index entries. Can't fit delta into a short.\n");
-    exit(2);
+    exit(EXIT_FAILURE);
   }
 
 
@@ -739,7 +740,7 @@ add_to_entry_list(entry_t **pplist, int l, int r, int val)
   new_entry = malloc(sizeof(entry_t));
   if (new_entry == NULL) {
     fprintf(stderr, "No memory left for new entry\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   new_entry->pnext = *pplist;
   new_entry->l = l;

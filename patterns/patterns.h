@@ -207,7 +207,8 @@ struct pattern {
   int mini, minj;       /* min and max (relative to anchor) extent of ... */
   int maxi, maxj;       /* ...the pattern */
   int height, width;    /* differences between max and min extents */
-  int edge_constraints; /* and combinations of NORTH, EAST etc. for edges */
+  unsigned int edge_constraints; /* and combinations of NORTH, EAST etc.
+				  * for edges */
 
   int move_offset;      /* offset of the suggested move (relative to anchor) */
 

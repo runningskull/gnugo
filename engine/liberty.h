@@ -692,7 +692,6 @@ void move_considered(int move, float value);
 
 
 /* SGF routines for debugging purposes in sgffile.c */
-void sgffile_printboard(struct SGFTree_t *tree);
 void sgffile_begindump(struct SGFTree_t *tree);
 void sgffile_enddump(const char *filename);
 
