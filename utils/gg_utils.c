@@ -276,7 +276,6 @@ double gg_cputime(void)
 #elif defined(WIN32)
     FILETIME creationTime, exitTime, kernelTime, userTime;
     ULARGE_INTEGER uKernelTime,uUserTime,uElapsedTime;
-    unsigned long ulElapsedTime;
     GetProcessTimes(GetCurrentProcess(), &creationTime, &exitTime,
                     &kernelTime, &userTime);
     uKernelTime.LowPart = kernelTime.dwLowDateTime;
@@ -286,7 +285,7 @@ double gg_cputime(void)
     uElapsedTime.QuadPart = uKernelTime.QuadPart + uUserTime.QuadPart;
     /*_ASSERTE(0 && "Debug Times");*/
     /* convert from multiples of 100nanosecs to seconds: */
-    return uElapsedTime.QuadPart * 1.e-7;
+    return (signed __int64)(uElapsedTime.QuadPart) * 1.e-7;
 #else
     /* return wall clock seconds */
     return gg_gettimeofday();
