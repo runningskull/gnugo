@@ -921,4 +921,19 @@ Pattern VA53
 ;lib(A)==2
 
 
+Pattern VA54
+# mh New pattern (3.5.4)
+# See ld_owl:413/414
+
+X.X    play atari inside one eye to destroy the other eye
+*XO
+
+:8,s,value(45)
+
+XaX
+*BO
+
+;lib(B)==2 && olib(*)>=2 && owl_proper_eye(*) && owl_maxeye(a)>0
+
+
 # END OF FILE
