@@ -270,7 +270,6 @@ extern int disable_fuseki;      /* do not generate fuseki moves */
 extern int josekidb;            /* use joseki database */
 extern int level;		/* controls depth of reading */
 extern int semeai_variations;   /* max variations considered reading semeai */
-extern int urgent;              /* urgent move on board */
 extern int showtime;		/* print genmove time */
 extern int showscore;		/* print score */
 extern float score;

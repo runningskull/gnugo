@@ -451,7 +451,6 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
       add_strategical_defense_move(move, my_dragons[k]);
       TRACE("...strategical defense of %1m\n", my_dragons[k]);
     }
-    urgent = 1;
     for (k = 0; k < your_ndragons; k++) {
       add_strategical_attack_move(move, your_dragons[k]);
       TRACE("...strategical attack on %1m\n", your_dragons[k]);
@@ -688,7 +687,6 @@ joseki_callback(int move, int color, struct corner_pattern *pattern,
       add_strategical_defense_move(move, my_dragons[k]);
       TRACE("...strategical defense of %1m\n", my_dragons[k]);
     }
-    urgent = 1;
     for (k = 0; k < your_ndragons; k++) {
       add_strategical_attack_move(move, your_dragons[k]);
       TRACE("...strategical attack on %1m\n", your_dragons[k]);

@@ -676,7 +676,6 @@ set_depth_values(int level)
     owl_distrust_depth  = gg_max(1, (2*OWL_DISTRUST_DEPTH-1 + depth_level) / 2);
   owl_branch_depth    = gg_max(2, (2 * OWL_BRANCH_DEPTH   + depth_level) / 2);
   owl_reading_depth   = gg_max(5, (2 * OWL_READING_DEPTH  + depth_level) / 2);
-  urgent              = 0;
 
   /* Atari-atari depth levels are unchanged only between levels 7/8: */
   if (level >= 8)

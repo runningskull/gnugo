@@ -113,7 +113,6 @@ float score           = 0.0;
 float lower_bound     = 0.0;
 float upper_bound     = 0.0;
 int level             = DEFAULT_LEVEL; /* strength; up to 10 supported */
-int urgent            = 0;  /* urgent move on board */
 int debug             = 0;  /* controls debug output */
 int verbose           = 0;  /* trace level */
 char outfilename[128] = ""; /* output file (-o option) */

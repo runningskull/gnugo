@@ -2527,9 +2527,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     return 0.0;
   
   /* If this move has no reason at all, we can skip some steps. */
-  if ((!urgent || allpats)
-      && (move[pos].reason[0] >= 0
-	  || move[pos].min_territory > 0.0)) {
+  if (move[pos].reason[0] >= 0
+      || move[pos].min_territory > 0.0) {
     int num_reasons;
 
     /* Sort the move reasons. This makes it easier to visually compare
@@ -3138,10 +3137,8 @@ review_move_reasons(int *the_move, float *val, int color,
   int save_verbose;
   
   start_timer(2);
-  if (!urgent || allpats) {
-    find_more_attack_and_defense_moves(color);
-    time_report(2, "  find_more_attack_and_defense_moves", NO_MOVE, 1.0);
-  }
+  find_more_attack_and_defense_moves(color);
+  time_report(2, "  find_more_attack_and_defense_moves", NO_MOVE, 1.0);
 
   save_verbose = verbose;
   if (verbose > 0)
