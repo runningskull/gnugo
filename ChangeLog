@@ -5,6 +5,7 @@
 - dragon table in movereason.c now 1D
 - replacement map in movereason.c now 1D
 - domain calculation in optics.c now 1D
+- hash.c is more 1D
 - new function is_ko_point() in board.c
 - computation of cavities removed from worm.c
 - computation of caves removed from dragon.c
@@ -22,10 +23,11 @@
 - revision of fuseki.c
 - bugfix in break_chain3
 - warning fixed in mkpat
-- formatting error fixed in decidestring
+- formatting errors fixed in decidestring and other places: use %1m
 - twogtp-a writes html
 - tuning
 - owl tuning
+- eye tuning
 - one new test case in reading.tst
 
 3.1.7 released September 24, 2001
