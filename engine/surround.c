@@ -238,7 +238,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	/* left edge in this row is on segment (ti,tj) -> (bi, bj) */
 	
 	/* FIXME: Rewrite this to avoid floating point arithmetic */
-	left_boundary = ceil(tj + (m - ti) * (bj - tj) / (bi - ti));
+	left_boundary = ceil(-0.001 + tj + (m - ti) * (bj - tj) / (bi - ti));
 	break;
       }
     }
@@ -254,7 +254,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 		  m, right_corner[k-1], right_corner[k]);
 
 	/* FIXME: Rewrite this to avoid floating point arithmetic */
-	right_boundary = floor(tj + (m - ti) * (bj - tj) / (bi - ti));
+	right_boundary = floor(0.001 + tj + (m - ti) * (bj - tj) / (bi - ti));
 	break;
       }
     }
