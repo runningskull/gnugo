@@ -43,6 +43,7 @@
 
 #include "sgftree.h"
 #include "clock.h"
+#include "winsocket.h"
 
 /* interface.c */
 /* Initialize the whole thing. Should be called once. */

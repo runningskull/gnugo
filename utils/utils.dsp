@@ -130,6 +130,10 @@ SOURCE=.\gg_utils.c
 
 SOURCE=.\random.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\winsocket.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -145,6 +149,10 @@ SOURCE=.\gg_utils.h
 # Begin Source File
 
 SOURCE=.\random.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\winsocket.h
 # End Source File
 # End Group
 # End Target

@@ -80,9 +80,9 @@ noinst_LIBRARIES = libutils.a
 
 EXTRA_DIST = utils.dsp
 
-libutils_a_SOURCES = getopt.c getopt1.c random.c gg_utils.c
+libutils_a_SOURCES = getopt.c getopt1.c random.c gg_utils.c winsocket.c
 
-noinst_HEADERS = gg-getopt.h random.h gg_utils.h
+noinst_HEADERS = gg-getopt.h random.h gg_utils.h winsocket.h
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *~
@@ -95,7 +95,7 @@ LIBRARIES = $(noinst_LIBRARIES)
 libutils_a_AR = $(AR) cru
 libutils_a_LIBADD =
 am_libutils_a_OBJECTS = getopt.$(OBJEXT) getopt1.$(OBJEXT) \
-	random.$(OBJEXT) gg_utils.$(OBJEXT)
+	random.$(OBJEXT) gg_utils.$(OBJEXT) winsocket.$(OBJEXT)
 libutils_a_OBJECTS = $(am_libutils_a_OBJECTS)
 
 DEFS = @DEFS@
@@ -105,7 +105,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/getopt.Po $(DEPDIR)/getopt1.Po \
-@AMDEP_TRUE@	$(DEPDIR)/gg_utils.Po $(DEPDIR)/random.Po
+@AMDEP_TRUE@	$(DEPDIR)/gg_utils.Po $(DEPDIR)/random.Po \
+@AMDEP_TRUE@	$(DEPDIR)/winsocket.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -148,6 +149,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/getopt1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gg_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/random.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/winsocket.Po@am__quote@
 
 distclean-depend:
 	-rm -rf $(DEPDIR)

@@ -21,6 +21,9 @@
 /* Default hash table size in megabytes */
 #define DEFAULT_MEMORY 8
 
+/* Compile support for GTP communication over TCP/IP channel. */
+#define ENABLE_SOCKET_SUPPORT 1
+
 /* Connection module. Default experimental. */
 #define EXPERIMENTAL_CONNECTIONS 1
 

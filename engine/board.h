@@ -24,6 +24,7 @@
 #define _BOARD_H_
 
 #include "sgftree.h"
+#include "winsocket.h"
 #include "config.h"
 #include <stdarg.h>
 

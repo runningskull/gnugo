@@ -26,6 +26,7 @@
 #include "board.h"
 #include "hash.h"
 #include "gnugo.h"
+#include "winsocket.h"
 
 /* ================================================================ */
 /*                           public variables                       */

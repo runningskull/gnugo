@@ -53,6 +53,7 @@ joseki_SOURCES = joseki.c
 joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a 
 joseki_INCLUDES = -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
+mkeyes_LDADD = ../utils/libutils.a
 extract_fuseki_SOURCES  = extract_fuseki.c
 # Yes, we currently need duplicate libengine.a and libpatterns.a.
 extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\

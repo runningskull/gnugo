@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "liberty.h"
-
+#include "winsocket.h"
 
 
 /* The cosmic style uses more influence than the defaults attenuation 

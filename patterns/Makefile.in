@@ -130,6 +130,7 @@ joseki_SOURCES = joseki.c
 joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a 
 joseki_INCLUDES = -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
+mkeyes_LDADD = ../utils/libutils.a
 extract_fuseki_SOURCES = extract_fuseki.c
 # Yes, we currently need duplicate libengine.a and libpatterns.a.
 extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
@@ -212,8 +213,7 @@ joseki_DEPENDENCIES = ../engine/libboard.a ../sgf/libsgf.a \
 joseki_LDFLAGS =
 am_mkeyes_OBJECTS = mkeyes.$(OBJEXT)
 mkeyes_OBJECTS = $(am_mkeyes_OBJECTS)
-mkeyes_LDADD = $(LDADD)
-mkeyes_DEPENDENCIES =
+mkeyes_DEPENDENCIES = ../utils/libutils.a
 mkeyes_LDFLAGS =
 am_mkpat_OBJECTS = mkpat.$(OBJEXT) transform.$(OBJEXT) dfa.$(OBJEXT)
 mkpat_OBJECTS = $(am_mkpat_OBJECTS)

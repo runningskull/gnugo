@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- added support for GTP over TCP/IP sockets on Windows
 - new static function all_own_neighbors_inessential() in aftermath.c
 - do_aftermath_genmove() revised
 - breakage2tst.py now produces command line for regress.pike

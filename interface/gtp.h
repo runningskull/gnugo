@@ -38,6 +38,9 @@
  * without prior written authorization of the copyright holder.  *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/* NOTE: GNU Go specific, workarounds dumb Windows sockets. */
+#include "winsocket.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 

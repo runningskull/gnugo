@@ -49,6 +49,7 @@
 
 #include "gg-getopt.h"
 #include "gg_utils.h"
+#include "winsocket.h"
 
 #include "interface.h"
 #include "sgftree.h"
@@ -1687,10 +1688,36 @@ show_copyright(void)
 #if ENABLE_SOCKET_SUPPORT
 
 
+#if !defined(_WIN32) && !defined(_WIN32_WCE)
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+
+#define closesocket	close
+#define init_sockets()
+
+#else	/* on Windows */
+
+
+#include <winsocket.h>
+
+
+static void
+init_sockets(void)
+{
+  WSADATA data;
+  WORD version = MAKEWORD(1, 1);
+
+  if (WSAStartup(version, &data) != NO_ERROR) {
+    fprintf(stderr, "WSAStartup() failed with error %d\n", WSAGetLastError());
+    exit(EXIT_FAILURE);
+  }
+}
+
+
+#endif	/* on Windows */
 
 
 static void
@@ -1701,6 +1728,8 @@ socket_connect_to(const char *host_name, unsigned int port,
   int connection_socket;
   struct hostent *host_data;
   char **address_pointer;
+
+  init_sockets();
 
   if (!host_name)
     host_name = "127.0.0.1";
@@ -1732,12 +1761,23 @@ socket_connect_to(const char *host_name, unsigned int port,
 
   if (! *address_pointer) {
     fprintf(stderr, "Failed to connect to %s:%d\n", host_data->h_name, port);
-    close(connection_socket);
+    closesocket(connection_socket);
     exit(EXIT_FAILURE);
   }
 
+#if !USE_WINDOWS_SOCKET_CLUDGE
+
   *input_file  = fdopen(connection_socket, "r");
   *output_file = fdopen(dup(connection_socket), "w");
+
+#else	/* USE_WINDOWS_SOCKET_CLUDGE */
+
+  winsocket_activate(connection_socket);
+
+  *input_file  = NULL;
+  *output_file = NULL;
+
+#endif	/* USE_WINDOWS_SOCKET_CLUDGE */
 }
 
 
@@ -1748,6 +1788,8 @@ socket_listen_at(const char *host_name, unsigned int port,
   struct sockaddr_in address;
   int listening_socket;
   int connection_socket;
+
+  init_sockets();
 
   if (host_name) {
     struct hostent *host_data;
@@ -1794,14 +1836,25 @@ socket_listen_at(const char *host_name, unsigned int port,
     else
       fprintf(stderr, "Failed to listen on port %d\n", port);
 
-    close(listening_socket);
+    closesocket(listening_socket);
     exit(EXIT_FAILURE);
   }
 
-  close(listening_socket);
+  closesocket(listening_socket);
+
+#if !USE_WINDOWS_SOCKET_CLUDGE
 
   *input_file  = fdopen(connection_socket, "r");
   *output_file = fdopen(dup(connection_socket), "w");
+
+#else	/* USE_WINDOWS_SOCKET_CLUDGE */
+
+  winsocket_activate(connection_socket);
+
+  *input_file  = NULL;
+  *output_file = NULL;
+
+#endif	/* USE_WINDOWS_SOCKET_CLUDGE */
 }
 
 
