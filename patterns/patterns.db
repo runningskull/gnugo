@@ -8823,6 +8823,7 @@ OX?
 
 
 Pattern CB328
+#ab Revised constraint (3.3.3)
 
 ?.?         seal opponent in and connect
 ...      
@@ -8836,7 +8837,7 @@ OX?
 a*O
 OB?
 
-; oplay_attack(*,a,a) && (!attack(B) || does_attack(*,B))
+; oplay_attack_either(*,a,a,B) && (!attack(B) || does_attack(*,B))
 
 
 #tm - removed this pattern (3.1.20)

@@ -1538,6 +1538,8 @@ bax
 
 
 Pattern Shape13
+# Such huge shape values can cause problems. See handtalk12.sgf, move 37
+# (where * is actually an owl defense). -Arend
 
 ?X?     don't set up double cut
 *.O

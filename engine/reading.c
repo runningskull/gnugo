@@ -6591,7 +6591,7 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
 	}
       }
       else {
-	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	if (simple_ladder_defend(str, NULL, new_komaster, new_kom_pos) != WIN) {
 	  savemove = apos;
 	  savecode = KO_B;
 	}

@@ -1808,6 +1808,22 @@ dXa
 ;!oplay_attack_either(a,b,c,c,d)
 
 
+Pattern Intrusion 51
+
+?Q?
+X.X
+.!.
+
+:|,B,value(30)
+
+?Q?
+cad
+.b.
+
+;oplay_break_through(a,b,c,b,d)
+>return(!xplay_attack(a,b));
+
+
 Pattern Nonterritory1
 
 OxO
