@@ -654,10 +654,10 @@ add_vital_eye_move(int ti, int tj, int ai, int aj, int color)
   int eye;
   ASSERT_ON_BOARD2(ai, aj);
   if (color == WHITE)
-    eye = find_eye(white_eye[ai][aj].origini, white_eye[ai][aj].originj,
+    eye = find_eye(I(white_eye[ai][aj].origin), J(white_eye[ai][aj].origin),
 		   color);
   else
-    eye = find_eye(black_eye[ai][aj].origini, black_eye[ai][aj].originj,
+    eye = find_eye(I(black_eye[ai][aj].origin), J(black_eye[ai][aj].origin),
 		   color);
   add_move_reason(ti, tj, VITAL_EYE_MOVE, eye);
 }
@@ -1354,12 +1354,12 @@ find_more_owl_attack_and_defense_moves(int color)
 	  int ecolor = eyecolor[move_reasons[r].what];
       
 	  if (ecolor == WHITE) {
-	    di = white_eye[ei][ej].dragoni;
-	    dj = white_eye[ei][ej].dragonj;
+	    di = I(white_eye[ei][ej].dragon);
+	    dj = J(white_eye[ei][ej].dragon);
 	  }
 	  else {
-	    di = black_eye[ei][ej].dragoni;
-	    dj = black_eye[ei][ej].dragonj;
+	    di = I(black_eye[ei][ej].dragon);
+	    dj = J(black_eye[ei][ej].dragon);
 	  }
       
 	  if (di == -1) /* Maybe we should assert this not to happen. */
@@ -1926,13 +1926,11 @@ list_move_reasons(int color)
 	  aj = eyej[move_reasons[r].what];
 	  ecolor = eyecolor[move_reasons[r].what];
 	  if (ecolor == WHITE)
-	    gprintf("Move at %m vital eye point for dragon %m (eye %m)\n",
-		    m, n, white_eye[ai][aj].dragoni,
-		    white_eye[ai][aj].dragonj, ai, aj);
+	    gprintf("Move at %m vital eye point for dragon %1m (eye %m)\n",
+		    m, n, white_eye[ai][aj].dragon, ai, aj);
 	  else
-	    gprintf("Move at %m vital eye point for dragon %m (eye %m)\n",
-		    m, n, black_eye[ai][aj].dragoni,
-		    black_eye[ai][aj].dragonj, ai, aj);
+	    gprintf("Move at %m vital eye point for dragon %1m (eye %m)\n",
+		    m, n, black_eye[ai][aj].dragon, ai, aj);
 	  break;
 	  
 	case NON_ATTACK_MOVE:
@@ -2655,12 +2653,12 @@ estimate_territorial_value(int m, int n, int color,
       ecolor = eyecolor[move_reasons[r].what];
       
       if (ecolor == WHITE) {
-	bi = white_eye[ai][aj].dragoni;
-	bj = white_eye[ai][aj].dragonj;
+	bi = I(white_eye[ai][aj].dragon);
+	bj = J(white_eye[ai][aj].dragon);
       }
       else {
-	bi = black_eye[ai][aj].dragoni;
-	bj = black_eye[ai][aj].dragonj;
+	bi = I(black_eye[ai][aj].dragon);
+	bj = J(black_eye[ai][aj].dragon);
       }
       
       if (bi == -1) /* Maybe we should assert this not to happen. */
@@ -3147,12 +3145,12 @@ estimate_strategical_value(int m, int n, int color, float score)
 	ecolor = eyecolor[move_reasons[r].what];
 
 	if (ecolor == WHITE) {
-	  bi = white_eye[ai][aj].dragoni;
-	  bj = white_eye[ai][aj].dragonj;
+	  bi = I(white_eye[ai][aj].dragon);
+	  bj = J(white_eye[ai][aj].dragon);
 	}
 	else {
-	  bi = black_eye[ai][aj].dragoni;
-	  bj = black_eye[ai][aj].dragonj;
+	  bi = I(black_eye[ai][aj].dragon);
+	  bj = J(black_eye[ai][aj].dragon);
 	}
 
 	if (bi == -1) /* Maybe we should assert this not to happen. */

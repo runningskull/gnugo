@@ -328,12 +328,11 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
   gg_wprintw(info_window, "%s ", location_to_string2(i, j));
 
   wmove(info_window, 2, 24);
-  if (eyedata[i][j].origini == -1)
+  if (eyedata[i][j].origin == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ", 
-	    location_to_string2(eyedata[i][j].origini,
-			       eyedata[i][j].originj));
+	       location_to_string(eyedata[i][j].origin));
 
   wmove(info_window, 4, 18);
   gg_wprintw(info_window, "%-12s", color_to_string(eyedata[i][j].color));
@@ -342,12 +341,11 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
   wmove(info_window, 6, 18);
   gg_wprintw(info_window, "%d   ", eyedata[i][j].msize);
   wmove(info_window, 7, 18);
-  if (eyedata[i][j].dragoni == -1)
+  if (eyedata[i][j].dragon == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ",
-	    location_to_string2(eyedata[i][j].dragoni,
-			       eyedata[i][j].dragonj));
+	       location_to_string(eyedata[i][j].dragon));
 
   wmove(info_window, 11, 18);
   gg_wprintw(info_window, "%d  ", eyedata[i][j].type);
@@ -362,20 +360,18 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
   gg_wprintw(info_window, "%d ", eyedata[i][j].mineye);
 
   wmove(info_window, 6, 55);
-  if (eyedata[i][j].attacki == -1)
+  if (eyedata[i][j].attack_point == NO_MOVE)
     gg_wprintw(info_window, "---          ");
   else
     gg_wprintw(info_window, "%3s", 
-	    location_to_string2(eyedata[i][j].attacki,
-			       eyedata[i][j].attackj));
+	       location_to_string(eyedata[i][j].attack_point));
 
   wmove(info_window, 7, 55);
-  if (eyedata[i][j].defendi == -1)
+  if (eyedata[i][j].defense_point == NO_MOVE)
     gg_wprintw(info_window, "---          ");
   else
     gg_wprintw(info_window, "%3s", 
-	    location_to_string2(eyedata[i][j].defendi,
-			       eyedata[i][j].defendj));
+	       location_to_string(eyedata[i][j].defense_point));
   
   wmove(info_window, 11, 55);
   gg_wprintw(info_window, "%d ", eyedata[i][j].neighbors);

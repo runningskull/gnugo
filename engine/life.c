@@ -459,7 +459,7 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
    */
   for (i = 0; i < board_size; ++i)
     for (j = 0; j < board_size; ++j) {
-      if (eyedata[i][j].origini == m && eyedata[i][j].originj == n) {
+      if (eyedata[i][j].origin == POS(m, n)) {
 	include_eyepoint(i, j, eyedata[i][j].marginal == 0, 0);
 	if (halfeye(heye, i, j)) {
 	  for (k=0; k<heye[i][j].num_attacks; k++)

@@ -672,18 +672,14 @@ struct aftermath_data {
 
 struct eye_data {
   int color;/* BLACK, WHITE, BLACK_BORDERED, WHITE_BORDERED or GRAY_BORDERED */
-  int esize;      /* size of the eyespace                                 */
-  int msize;      /* number of marginal vertices                          */
-  int origini;    /* The origin                                           */
-  int originj;    /*                                                      */
-  int maxeye;     /* number of eyes if defender plays first               */
-  int mineye;     /* number of eyes if attacker plays first               */
-  int attacki;    /* vital point for attack                               */
-  int attackj;    /*                                                      */
-  int defendi;    /* vital point for defense                              */
-  int defendj;    /*                                                      */
-  int dragoni;    /* origin of the surrounding dragon                     */
-  int dragonj;
+  int esize;         /* size of the eyespace                                 */
+  int msize;         /* number of marginal vertices                          */
+  int origin;        /* The origin                                           */
+  int maxeye;        /* number of eyes if defender plays first               */
+  int mineye;        /* number of eyes if attacker plays first               */
+  int attack_point;  /* vital point for attack                               */
+  int defense_point; /* vital point for defense                              */
+  int dragon;        /* origin of the surrounding dragon                     */
 
   /* The above fields are constant on the whole eyespace. */
   /* ---------------------------------------------------------------- */
