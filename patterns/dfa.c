@@ -878,7 +878,6 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
   dfa_t *old_dfa = &(aux_dfa[(aux_count+1) % DFA_BINS]);
   float ratio;
   char strrot[MAX_ORDER+1];
-  int len = strlen(str);
 
   if (ll == 0) {
     strcpy(strrot, str);

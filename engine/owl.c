@@ -4817,13 +4817,14 @@ eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
 	
       /* Following is completely ad hoc. Another set of tests might
        * very well get better results. */
-      if (after - before >= 3)
+      if (after - before >= 3) {
 	if (after >= 8 || (before == 0 && after >= 5)) {
 	  *probable = 2;
 	  *max = 2;
 	}
 	else if (*max < 2)
 	  (*max)++;
+      }
     }
   }
 }

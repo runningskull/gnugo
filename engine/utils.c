@@ -876,7 +876,6 @@ detect_owl_blunder(int move, int color, int *defense_point,
   int k;
   int ii;
   int trouble = 0;
-  int current_verbose = verbose;
   int dragon_analyzed[4] = {0, 0, 0, 0};
   
   for (k = 0; k < 4; k++) {

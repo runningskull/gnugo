@@ -83,7 +83,7 @@ static void build_worms(void);
  */
 
 void
-make_worms(int save_verbose)
+make_worms(void)
 {
   int pos;
 

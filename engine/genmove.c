@@ -120,7 +120,7 @@ examine_position(int color, int how_much)
 
   if (NEEDS_UPDATE(worms_examined)) {
     start_timer(0);
-    make_worms(save_verbose);
+    make_worms();
     time_report(0, "  make worms", NO_MOVE, 1.0);
   }
   if (how_much == EXAMINE_WORMS) {
