@@ -52,7 +52,7 @@ strategy3: strategy3.tst
 	$(srcdir)/eval.sh strategy3.tst
 
 strategy4: strategy4.tst
-	$(srcdir)/eval.sh strategy3.tst
+	$(srcdir)/eval.sh strategy4.tst
 
 tactics: tactics.tst
 	$(srcdir)/eval.sh tactics.tst
