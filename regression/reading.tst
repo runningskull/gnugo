@@ -704,6 +704,15 @@ trymove white A4
 #? [1 (A2|C7|B1)]*
 popgo
 
+# Although gnugo plays N16, the fact it doesn't see that the move
+# is also a defense for N13 causes owl misreads.
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
+trymove black T8
+trymove white P16
+174 defend N13
+#? [1 N16]*
+popgo
+popgo
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
