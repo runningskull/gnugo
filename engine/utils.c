@@ -1616,7 +1616,7 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
       continue;
     
     findstones(pos, 2, stones);
-    for (k = 0; k < 1 && isolated; k++) {
+    for (k = 0; k < 2 && isolated; k++) {
       for (r = 0; r < 8 && isolated; r++) {
 	pos2 = stones[k] + delta[r];
 	if (!ON_BOARD(pos2)
