@@ -30,9 +30,26 @@
 
 static SGFTree *aftermath_sgftree;
 
+
 static int do_aftermath_genmove(int color,
 				int under_control[BOARDMAX],
 				int do_capture_dead_stones);
+
+
+static int
+all_own_neighbors_inessential(int pos, int color)
+{
+  int k;
+  for (k = 0; k < 4; k++)
+    if (board[pos + delta[k]] == color
+	&& DRAGON2(pos + delta[k]).safety != INESSENTIAL
+	&& (DRAGON2(pos + delta[k]).safety != ALIVE
+	    || DRAGON2(pos + delta[k]).owl_status != DEAD))
+      return 0;
+
+  return 1;
+}
+
 
 /* External interface to do_aftermath_genmove().
  *
@@ -648,7 +665,7 @@ do_aftermath_genmove(int color,
     if (board[pos] != EMPTY || distance[pos] != -1)
       continue;
     target = NO_MOVE;
-    for (k = 0; k < 4; k++) {
+    for (k = 0; k < 8; k++) {
       int pos2 = pos + delta[k];
       if (!ON_BOARD(pos2))
 	continue;
@@ -657,8 +674,10 @@ do_aftermath_genmove(int color,
 	  && (do_capture_dead_stones 
 	      || worm[pos2].unconditional_status != DEAD)
 	  && DRAGON2(pos2).safety != INESSENTIAL) {
-	target = pos2;
-	break;
+	if (k < 4 || all_own_neighbors_inessential(pos, color)) {
+	  target = pos2;
+	  break;
+	}
       }
     }
     if (target == NO_MOVE)
@@ -745,8 +764,13 @@ do_aftermath_genmove(int color,
       /* If we have an adjacent own dragon, which is not inessential,
        * verify that it remains safe.
        */
-      if (cc != NO_MOVE && !owl_does_defend(move, cc, NULL))
-	continue;
+      if (cc != NO_MOVE && !owl_does_defend(move, cc, NULL)) {
+	int resulta, resultb;
+	owl_analyze_semeai_after_move(move, color, target, cc,
+				      &resulta, &resultb, NULL, 1, NULL, 1);
+	if (resulta != 0)
+	  continue;
+      }
 
       /* If we don't allow self atari, also call confirm safety to
        * avoid setting up combination attacks.
