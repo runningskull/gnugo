@@ -1067,11 +1067,22 @@ string_connect(int str1, int str2, int *move)
   *move = PASS_MOVE;
   
   if (alternate_connections) {
+    int reading_nodes_when_called = get_reading_node_counter();
+    double start = 0;
+    int tactical_nodes;
     save_verbose = verbose;
     if (verbose > 0)
       verbose--;
+    start = gg_cputime();
     result = recursive_connect2(str1, str2, move, EMPTY, NO_MOVE, 0);
     verbose = save_verbose;
+    tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+
+    if (0)
+      gprintf("%oconnect    %1M %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
+	      str1, str2, result, *move,
+	      nodes_connect, tactical_nodes, gg_cputime() - start);
+
     return result;
   }
 
@@ -1189,11 +1200,22 @@ disconnect(int str1, int str2, int *move)
   *move = PASS_MOVE;
   
   if (alternate_connections) {
+    int reading_nodes_when_called = get_reading_node_counter();
+    double start = 0;
+    int tactical_nodes;
     save_verbose = verbose;
     if (verbose > 0)
-      verbose --;
+      verbose--;
+    start = gg_cputime();
     result = recursive_disconnect2(str1, str2, move, EMPTY, NO_MOVE, 0);
     verbose = save_verbose;
+    tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+
+    if (0)
+      gprintf("%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+	      str1, str2, result, *move,
+	      nodes_connect, tactical_nodes, gg_cputime() - start);
+
     return result;
   }
 
@@ -2168,7 +2190,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
     }
     
     if (board[pos] == EMPTY) {
-      if (!is_self_atari(pos, color_to_move)) {
+      if (!is_self_atari(pos, color_to_move)
+	  || is_ko(pos, color_to_move, NULL)) {
 	ADD_CANDIDATE_MOVE(pos, distance, moves, distances, num_moves);
       }
       else {

@@ -105,26 +105,28 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   find_connections();
   time_report(2, "  time to find connections", NO_MOVE, 1.0);
 
-  /* Amalgamate dragons sharing an eyespace (not ko). */
+  if (!experimental_connections) {
+    /* Amalgamate dragons sharing an eyespace (not ko). */
 
-  for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
+    for (str = BOARDMIN; str < BOARDMAX; str++)
+      if (ON_BOARD(str)) {
 
-      if (black_eye[str].color == BLACK_BORDER
-	  && black_eye[str].origin == str) {
-	if (!is_ko_point(str)
-	    || black_eye[str].esize > 1) /* Only exclude living kos. */
-	  dragon_eye(str, black_eye);
+	if (black_eye[str].color == BLACK_BORDER
+	    && black_eye[str].origin == str) {
+	  if (!is_ko_point(str)
+	      || black_eye[str].esize > 1) /* Only exclude living kos. */
+	    dragon_eye(str, black_eye);
+	}
+	
+	if (white_eye[str].color == WHITE_BORDER
+	    && white_eye[str].origin == str) {
+	  if (!is_ko_point(str)
+	      || white_eye[str].esize > 1) /* Only exclude living kos. */
+	    dragon_eye(str, white_eye);
+	}
       }
-	  
-      if (white_eye[str].color == WHITE_BORDER
-	  && white_eye[str].origin == str) {
-	if (!is_ko_point(str)
-	    || white_eye[str].esize > 1) /* Only exclude living kos. */
-	  dragon_eye(str, white_eye);
-      }
-    }
-  time_report(2, "  time to amalgamate dragons", NO_MOVE, 1.0);
+    time_report(2, "  time to amalgamate dragons", NO_MOVE, 1.0);
+  }
 
   /* At this time, all dragons have been finalized and we can
    * initialize the dragon2[] array. After that we can no longer allow

@@ -46,6 +46,14 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 
   int other = OTHER_COLOR(color);
   UNUSED(data);
+
+  /* Only match W patterns with standard connections. */
+  if ((pattern->class & CLASS_W) && experimental_connections)
+    return;
+
+  /* Only match Y patterns with experimental connections. */
+  if ((pattern->class & CLASS_Y) && !experimental_connections)
+    return;
   
   move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
   
@@ -94,7 +102,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
       return;
   }
 
-  if ((pattern->class & (CLASS_B | CLASS_E | CLASS_e))
+  if ((pattern->class & (CLASS_B | CLASS_I))
       && !(pattern->class & CLASS_s)) {
     /* Require that the X stones in the pattern are tactically safe. */
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
@@ -120,11 +128,8 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
   else if (pattern->class & CLASS_C)
     TRACE("Connecting pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
-  else if (pattern->class & CLASS_E)
-    TRACE("Eye space modifying pattern %s+%d found at %1m\n",
-	  pattern->name, ll, anchor);
-  else if (pattern->class & CLASS_e)
-    TRACE("Eye space modifying pattern %s+%d found at %1m\n",
+  else if (pattern->class & CLASS_I)
+    TRACE("Lunch invalidating pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
 
   /* does the pattern have an action? */
@@ -168,8 +173,9 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
     /* Look for dragons to amalgamate. Never amalgamate stones which
      * can be attacked.
      */
-    if ((pattern->class & CLASS_C) && (board[pos] == color)
-	&& (worm[pos].attack_codes[0] == 0)) {
+    if ((pattern->class & CLASS_C)
+	&& board[pos] == color
+	&& ((pattern->class & CLASS_s) || worm[pos].attack_codes[0] == 0)) {
       if (first_dragon == NO_MOVE)
 	first_dragon = dragon[pos].origin;
       else if (second_dragon == NO_MOVE
@@ -216,7 +222,7 @@ static void
 conn_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	      void *data)
 {
-  if (!(pattern->class & (CLASS_B | CLASS_e)))
+  if (!(pattern->class & (CLASS_B | CLASS_I)))
     cut_connect_callback(m, n, color, pattern, ll, data);
 }
   
@@ -225,7 +231,7 @@ static void
 modify_eye_callback(int m, int n, int color, struct pattern *pattern,
 		     int ll, void *data)
 {
-  if (pattern->class & CLASS_e)
+  if (pattern->class & CLASS_I)
     cut_connect_callback(m, n, color, pattern, ll, data);
 }
   

@@ -36,12 +36,18 @@
 #
 # Classification
 #
-# The connection database contains patterns of four different classes,
+# The connection database contains patterns of three different classes,
 # which also are matched separately.
 #
 #  B - Indicate cutting points and inhibit connections.
-#  C - Amalgamate worms into dragons
-#  e - Modify eye space, late matching
+#  C - Amalgamate worms into dragons.
+#  I - Invalidate lunches, late matching.
+#
+# Additionally there are a few acceptance modifiers. 
+#
+#  s - Accept even if the pattern includes tactically unsafe strings
+#  W - Only used with standard connections.
+#  Y - Only used with experimental connections.
 #
 ###################################
 #
@@ -56,8 +62,7 @@
 #  CB    - Center B patterns
 #  EC    - Edge C patterns
 #  CC    - Center C patterns
-#  Eye   - eye modification patterns of e classification
-#  Lunch - patterns that invalidate lunches, matched with e patterns
+#  Lunch - patterns that invalidate lunches, matched with I patterns
 #
 ###################################
 
@@ -73,7 +78,7 @@ Pattern EB1
 O*!
 ---
 
-:8,B
+:8,BW
 
 
 Pattern EB2
@@ -83,7 +88,7 @@ O*!
 .!.
 ---
 
-:8,B
+:8,BW
 
 
 Pattern EB3
@@ -94,7 +99,7 @@ XO*!
 x.!?
 ----
 
-:8,B
+:8,BW
 
 
 Pattern EB4
@@ -104,7 +109,7 @@ X.O?
 ..!!
 ----
 
-:8,B
+:8,BW
 
 
 Pattern EB5
@@ -114,7 +119,7 @@ OXO
 .!.
 ---
 
-:|,B
+:|,BW
 
 
 Pattern EB6
@@ -125,7 +130,7 @@ O*!
 .!.
 ---
 
-:8,B
+:8,BW
 
 ?XO
 O*!
@@ -144,7 +149,7 @@ O*O
 .!.
 ---
 
-:8,B
+:8,BW
 
 Xx?
 c*O
@@ -162,7 +167,7 @@ X*!
 O!.
 ---
 
-:8,B
+:8,BW
 
 
 Pattern EB9
@@ -173,7 +178,7 @@ O*O
 .!.
 ---
 
-:8,B
+:8,BW
 
 ?X?
 XOX
@@ -191,7 +196,7 @@ O.X
 .!.
 ---
 
-:8,B
+:8,BW
 
 OaX
 !*b
@@ -209,7 +214,7 @@ O*O.
 .!..
 ----
 
-:8,B
+:8,BW
 
 ?XX?
 O*Oc
@@ -228,7 +233,7 @@ O.*O
 ..!.
 ----
 
-:8,B
+:8,BW
 
 ??X?
 Oc*O
@@ -246,7 +251,7 @@ O*O
 o!o
 ---
 
-:|,B
+:|,BW
 
 ?X?
 b*c
@@ -265,7 +270,7 @@ O.*O
 ..!.
 ----
 
-:8,B
+:8,BW
 
 ??X?
 Oc*O
@@ -284,7 +289,7 @@ Pattern EB15
 ..!O
 ----
 
-:8,B
+:8,BW
 
 
 Pattern EB16
@@ -294,7 +299,7 @@ O.*O
 ..!o
 ----
 
-:8,B
+:8,BW
 
 ??X?
 Oc*O
@@ -313,7 +318,7 @@ OXO
 .!.
 ---
 
-:8,B
+:8,BW
 
 
 Pattern EB18
@@ -323,7 +328,7 @@ O*!
 .!.
 ---
 
-:8,B
+:8,BW
 
 XaO
 d*b
@@ -340,7 +345,7 @@ X!O
 O*.
 ---
 
-:8,B
+:8,BW
 
 XaO
 b*.
@@ -358,7 +363,7 @@ OX.?
 .!.?
 ----
 
-:8,B
+:8,BW
 
 
 Pattern EB21
@@ -369,7 +374,7 @@ Pattern EB21
 ..!.
 ----
 
-:8,B
+:8,BW
 
 ??X?
 .D*O
@@ -389,7 +394,7 @@ Pattern EB22
 ..!.
 ----
 
-:8,B
+:8,BW
 
 ??X?
 ?XOX
@@ -408,7 +413,7 @@ O.X
 .!O
 ---
 
-:8,B
+:8,BW
 
 
 Pattern EB24
@@ -420,7 +425,7 @@ Pattern EB24
 .!o
 ---
 
-:8,B
+:8,BW
 
 ??X
 ?!.
@@ -439,7 +444,7 @@ O!.  cutable keima on edge.
 .!.
 ---
 
-:8,B
+:8,BW
 
 ca.
 b*d
@@ -462,13 +467,28 @@ Pattern CB1
 X*O
 ?O.
 
-:8,B
+:8,BW
 
 ?Oa
 X*O
 ?Ob
 
 ;!xplay_attack_either(*,a,b,*,b) && !xplay_attack_either(*,b,a,*,a)
+
+
+Pattern CB1b
+
+?O.          fragile double connection 
+X*O
+?O.
+
+:8,BY
+
+?b.
+X*O
+?a.
+
+;!xplay_connect(*,a,b)
 
 
 Pattern CB2
@@ -478,7 +498,7 @@ Pattern CB2
 X*O
 ?O.
 
-:8,B
+:8,BW
 
 ?O.
 ?ca
@@ -488,13 +508,30 @@ X*O
 ;!xplay_attack_either(*,a,b,*,b) && xplay_defend_both(*,b,a,c,*,a)
 
 
+Pattern CB2b
+
+?O.
+?..          fragile double connection 
+X*O
+?O.
+
+:8,BY
+
+?b.
+?..
+X*O
+?a.
+
+;!xplay_connect(*,a,b)
+
+
 Pattern CB3
 
 O!O
 !*X
 .O?
 
-:8,B
+:8,BW
 
 O!a
 !*X
@@ -503,13 +540,28 @@ O!a
 ;lib(a)==2 || lib(b) == 2
 
 
+Pattern CB3b
+
+O!O
+.*X
+.O?
+
+:8,BY
+
+O!a
+.*X
+.b?
+
+;!xplay_connect(*,a,b)
+
+
 Pattern CB4
 
 XO?
 O*!
 ?!?
 
-:\,B,basic_cut_helper
+:\,BW,basic_cut_helper
 
 
 Pattern CB5
@@ -525,7 +577,7 @@ Pattern CB5
 XO
 O*
 
-:\,B,basic_cut_helper
+:\,BW,basic_cut_helper
 
 
 Pattern CB6
@@ -537,7 +589,7 @@ Pattern CB6
 XO
 O*
 
-:\,B,ugly_cutstone_helper
+:\,BW,ugly_cutstone_helper
 
 AO
 O*
@@ -568,7 +620,7 @@ Pattern CB8
 .!O
 xOo
 
-:8,B
+:8,BW
 
 
 Pattern CB9
@@ -578,7 +630,7 @@ O*.
 O!.
 ?XX
 
-:8,B
+:8,BW
 
 BaO
 O*.
@@ -594,7 +646,7 @@ o!X
 O*O
 X!o
 
-:8,B
+:8,BW
 
 oaB
 O*O
@@ -610,7 +662,7 @@ O!OX
 ?*!O
 ??O?
 
-:8,B
+:8,BW
 
 ?OA?
 OaOB
@@ -620,13 +672,30 @@ OaOB
 ;!attack(A) && !attack(B) && !xplay_attack(*,a,b,*) && !xplay_attack(*,b,a,*)
 
 
+Pattern CB11b
+
+?OX?
+O!OX
+?*!O
+??O?
+
+:8,BY
+
+?bX?
+O!OX
+?*!a
+??O?
+
+;!xplay_connect(*,a,b)
+
+
 Pattern CB12
 # tm New pattern. (3.1.13)
 
 O*.         another way to cut!
 X!O
 
-:8,B
+:8,BW
 
 O*.
 BaO
@@ -642,7 +711,7 @@ xxx	cut!
 O*O
 Xxx
 
-:8,B
+:8,BW
 
 xxx
 dae
@@ -662,7 +731,7 @@ Pattern CB14
 XO*O	double cut.
 O!O!
 
-:8,XB
+:8,XBW
 
 XA*O
 ObOc
@@ -680,7 +749,7 @@ Pattern CB15
 OXO
 !O!
 
-:8,B
+:8,BW
 
 ?*?
 OXO
@@ -688,6 +757,58 @@ aOb
 
 ; !xplay_attack_either(*,b,a,*,a)
 ; && !xplay_attack_either(*,a,b,*,b)
+
+
+Pattern CB15b
+# tm New Pattern (3.1.23)  (see global:17, )
+#   careful not to break trevord:730
+# FIXME:  Need to use amalgamate_most_valuable helper.
+# xplay_disconnect helper also might be useful here.
+
+?*?   save cutting stone.
+OXO
+!O!
+
+:8,BY
+
+?*?
+aXb
+!O!
+
+;!xplay_connect(*,a,b)
+
+
+Pattern CB16
+
+?O
+x*          fragile double connection 
+XO
+O!
+
+:8,BY
+
+?a
+x*
+XO
+b!
+
+;!xplay_connect(*,a,b)
+
+
+Pattern CB17
+
+O!O
+!*?        fragile double connection 
+O??
+
+
+:\,BY
+
+O!a
+!*?
+b??
+
+;!xplay_connect(*,a,b)
 
 
 ########################
@@ -726,7 +847,7 @@ O.O
 ...
 ---
 
-:|,C
+:|,CW
 
 OaO
 dbc
@@ -766,7 +887,7 @@ o...?
 ....o
 -----
 
-:8,C
+:8,CW
 
 ojc.?
 iOaO?
@@ -784,7 +905,7 @@ O..?     monkey jump connection
 ...O
 ----
 
-:8,C
+:8,CW
 
 Oae?
 cbdf
@@ -823,7 +944,7 @@ OO
 ..
 OO
 
-:+,C
+:+,CW
 
 
 Pattern CC103
@@ -899,6 +1020,7 @@ efg
 
 
 Pattern CC109
+# gf Revised constraint. (3.3.3)
 
 O.oo
 ..oo
@@ -907,12 +1029,12 @@ O.oo
 
 :8,C
 
-O.oo
+c.oo
 .aoo
 .boo
-.Ooo
+.doo
 
-;omoyo(a) && omoyo(b)
+;omoyo(a) && omoyo(b) && lib(c)>=4 && lib(d)>=4
 
 
 ##########################################################
@@ -927,7 +1049,7 @@ OO
 ..
 O.
 
-:8,C
+:8,CW
 
 OO
 ab
@@ -942,7 +1064,7 @@ OO
 ..
 OX
 
-:8,C
+:8,CW
 
 OO
 ab
@@ -957,7 +1079,7 @@ XO
 ..
 OX
 
-:8,C
+:8,CW
 
 DO
 ab
@@ -972,7 +1094,7 @@ O
 .
 O
 
-:+,C
+:+,CW
 
 O
 A
@@ -988,7 +1110,7 @@ Pattern CC205
 ?XO
 ?O.
 
-:\,C
+:\,CW
 
 ?c?
 dAO
@@ -1008,7 +1130,7 @@ O..
 ..O
 ooo
 
-:8,C
+:8,CW
 
 Obc
 daO
@@ -1025,7 +1147,7 @@ oOO..
 .....
 .O..O
 
-:8,C
+:8,CW
 
 oOO..
 feca.
@@ -1039,7 +1161,7 @@ Pattern CC207
 XO
 OX
 
-:X,C
+:X,CW
 
 AO
 OB
@@ -1057,26 +1179,13 @@ OB
 #
 ####################################
 
-#Pattern CC301
-#
-#O.O
-#...
-#
-#:8,C
-#
-#OaO
-#dbc
-#
-#;xplay_attack(a,b,c,c) && xplay_attack(a,b,d,d)
-
-
 Pattern CC302
 
 ?O.
 ...
 ?O.
 
-:-,C
+:-,CW
 
 ?gd
 cab
@@ -1100,7 +1209,7 @@ Pattern CC311
 O..
 ..O
 
-:8,C
+:8,CW
 
 Ebc
 daF
@@ -1117,7 +1226,7 @@ Pattern CC312
 O.
 oO
 
-:8,C
+:8,CW
 
 dO
 ab
@@ -1138,7 +1247,7 @@ O..
 ..O
 ...
 
-:8,C
+:8,CW
 
 Obc
 daf
@@ -1159,7 +1268,7 @@ Pattern CC321
 O..O
 O..O
 
-:+,C
+:+,CW
 
 OadO
 ObcO
@@ -1172,7 +1281,7 @@ Pattern CC322
 O..O
 O...
 
-:8,C
+:8,CW
 
 OacO
 Obde
@@ -1186,7 +1295,7 @@ Pattern CC323
 O..O
 O...
 
-:8,C
+:8,CW
 
 Oadf
 Obce
@@ -1258,6 +1367,208 @@ Xaf
 >  amalgamate_most_valuable_helper(e,f,g);
 
 
+####################################################################
+#
+# CC5xx - experimental connection patterns
+#
+####################################################################
+
+Pattern CC501
+# Connect even if stones not tactically safe.
+
+xO
+O.
+
+:\,sCY
+
+xO
+Oc
+
+;x_suicide(c)
+
+
+Pattern CC502
+# Connect even if stones not tactically safe.
+
+XO
+O.
+
+:\,sCY
+
+Xb
+ac
+
+;lib(a)>1 && lib(b)>1 && !xcut(c) && xlib(c)==1 && xplay_attack(c,c)==WIN
+
+
+Pattern CC502b
+# Connect even if stones not tactically safe.
+
+.O
+O.
+
+:\,sCY
+
+db
+ac
+
+;lib(a)>1 && lib(b)>1 && !xcut(c) && !xcut(d)
+;&& xlib(c)==1 && xplay_attack(c,c)
+
+
+Pattern CC503
+
+O
+.
+O
+
+:+,CY
+
+c
+a
+b
+
+;!xcut(a) && !oplay_disconnect(b,c)
+
+
+Pattern CC504
+
+XO
+O.
+
+:\,CY
+
+Xb
+ca
+
+;!xcut(a) && !oplay_disconnect(b,c)
+
+
+Pattern CC505
+
+XO
+OX
+
+:X,CY
+
+Bc
+dA
+
+;(attack(A) || attack(B)) && !oplay_disconnect(c,d)
+
+
+Pattern CC506
+
+O
+.
+.
+O
+
+:+,CY
+
+c
+a
+b
+d
+
+;!xcut(a) && !xcut(b) && !oplay_disconnect(c,d)
+
+
+Pattern CC506b
+
+O.
+Xo
+..
+O.
+
+:+,CY
+
+c.
+Eo
+ab
+d.
+
+;!xcut(a) && !xcut(b) && lib(E)<=2 && !oplay_disconnect(c,d)
+
+
+Pattern CC507
+
+Ox
+..
+xO
+
+:O,CY
+
+cx
+ab
+xd
+
+;!xcut(a) && !xcut(b) && !oplay_disconnect(c,d)
+
+
+Pattern CC508
+
+O?
+.X
+xO
+
+:8,CY
+
+b?
+aX
+?c
+
+;!xcut(a) && !oplay_disconnect(b,c)
+
+
+Pattern CC509
+
+Ox
+..
+..
+xO
+
+:O,CY
+
+ex
+ab
+cd
+xf
+
+;!xcut(a) && !xcut(b) && !xcut(c) && !xcut(d) && !oplay_disconnect(e,f)
+
+
+# Pattern CC510
+# 
+# O?
+# .x
+# .X
+# ?O
+# 
+# :8,CY
+# 
+# c?
+# ax
+# bX
+# ?d
+# 
+# ;!xcut(a) && !xcut(b) && !oplay_disconnect(c,d)
+
+
+Pattern CC511
+# Connect even if stones not tactically safe.
+
+.O
+O.
+
+:\,sCY
+
+db
+ac
+
+;attack(a) && attack(b) && !xcut(c) && !xcut(d)
+
+
 #############################
 #
 # lunch invalidating patterns
@@ -1272,7 +1583,7 @@ O.|
 oo|
 ?o|
 
-:8,se
+:8,sI
 
 ba|
 O.|
@@ -1289,7 +1600,7 @@ XO|            not lunch!
 OX|
 o.|
 
-:8,se
+:8,sI
 
 ba|
 cX|
@@ -1307,7 +1618,7 @@ O.|
 oo|
 --+
 
-:8,se
+:8,sI
 
 ba|
 O.|
