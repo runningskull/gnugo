@@ -1049,7 +1049,8 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	      char goal[BOARDMAX])
 {
   int k;			/* Iterate over elements of pattern */
-  int found_goal, found_nongoal;
+  int found_goal = 0;
+  int found_nongoal = 0;
   
 #if PROFILE_PATTERNS
   int nodes_before;
@@ -1058,10 +1059,17 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 #ifdef PROFILE_MATCHER
   ++totals[1];
 #endif
- 
+
+  /* Throw out duplicating orientations of symmetric patterns. */
+  if (pattern->trfno == 5) {
+    if (ll < 2 || ll >= 6)
+      return;
+  }
+  else
+    if (ll >= pattern->trfno)
+      return;
+
   /* Now iterate over the elements of the pattern. */
-  found_goal = 0;
-  found_nongoal = 0;
   for (k = 0; k < pattern->patlen; k++) {
   				/* match each point */
     int x, y;			/* absolute (board) co-ords of 
@@ -1087,7 +1095,7 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	 & class_mask[dragon[POS(x, y)].matcher_status][p[x][y]]) != 0)
       goto match_failed;
     
-  }/* loop over elements */
+  } /* loop over elements */
   
   /* Make it here ==> We have matched all the elements to the board. */
   if (goal != NULL && !found_goal)

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- dfa doesn't report symmetric patterns multiple times
 - escape patterns in owl_defendpats.db given E classification
 - owl_determine_life() not called during escape attempt
 - only print debug output for eyes during owl reading if owl debug is on
