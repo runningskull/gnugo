@@ -3,8 +3,14 @@
 -------------------------------------------------------------------------
 
 
-- new functions blunder_size(), atari_atari_blunder_size() report the
-  size of a blunder as exactly as possible
+- new option --output-flags <flags>
+- output using sgf trees with -o option
+- cleaning and minor bugfixes in play ascii
+- sgf handling is disconnected from engine again
+- moved sgfAddDebugInfo -> sgffile_debuginfo, outputsgf -> sgffile_output
+- write "forced" as comment when this ascii mode command is used
+- sgftree_readfile does not change root node to NULL
+- new blunder_size(), atari_atari_blunder_size() compute the blunder size
 - remove vital_string logic in atari_atari code
 - remove allowed_blunder_size heuristic in review_move_reasons()
 - instead use blunder size more exactly in new function find_best_move()

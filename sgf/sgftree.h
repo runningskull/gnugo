@@ -88,10 +88,13 @@ void sgfFreeProperty(SGFProperty *prop);
 SGFNode *sgfAddStone(SGFNode *node, int color, int movex, int movey);
 SGFNode *sgfAddPlay(SGFNode *node, int who, int movex, int movey);
 SGFNode *sgfAddPlayLast(SGFNode *node, int who, int movex, int movey);
+
 int sgfPrintCharProperty(FILE *file, SGFNode *node, const char *name);
 int sgfPrintCommentProperty(FILE *file, SGFNode *node, const char *name);
 void sgfWriteResult(SGFNode *node, float score, int overwrite);
 
+SGFNode *sgfLabel(SGFNode *node, char *label, int i, int j);
+SGFNode *sgfLabelInt(SGFNode *node, int num, int i, int j);
 SGFNode *sgfCircle(SGFNode *node, int i, int j);
 SGFNode *sgfSquare(SGFNode *node, int i, int j);
 SGFNode *sgfTriangle(SGFNode *node, int i, int j);
@@ -113,7 +116,7 @@ SGFNode *readsgffilefuseki(const char *filename, int moves_per_game);
 
 /* Write SGF tree to a file. */
 void sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
-		      int level);
+                     int level, int rules);
 int writesgf(SGFNode *root, const char *filename);
 
 

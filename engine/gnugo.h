@@ -165,7 +165,8 @@ typedef struct {
 
   int       computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
 
-  char      outfilename[128];	/* Trickle file */
+  /* FIXME: remove these fields once all sgf output goes through trees */
+  char     outfilename[128];
   FILE      *outfile;
 } Gameinfo;
 
@@ -196,6 +197,14 @@ extern int printdragons;	/* print full data on each dragon */
 extern int printboard;		/* print board each move */
 extern int showstatistics;	/* print statistics */
 extern int profile_patterns;	/* print statistics of pattern usage */
+extern char outfilename[128];  /* output file (-o option) */
+extern int output_flags;       /* amount of output to outfile */
+
+/* output flag bits */
+#define OUTPUT_MARKDRAGONS         0x0001  /* mark dead and critical dragons */
+#define OUTPUT_MOVEVALUES          0x0002  /* output values of all moves in list */
+
+#define OUTPUT_DEFAULT             0 /* no debug output  by default */
 
 /* debug flag bits */
 /* NOTE : can specify -d0x... */
@@ -468,6 +477,9 @@ void prepare_pattern_profiling(void);
 void report_pattern_profiling(void);
 
 /* sgffile.c */
+void sgffile_debuginfo(SGFNode *node, int value);
+void sgffile_output(SGFNode *root);
+
 void sgffile_move_made(int i, int j, int color, int value);
 void sgffile_put_stone(int i, int j, int color);
 

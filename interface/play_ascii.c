@@ -63,7 +63,7 @@ static void ascii_goto(Gameinfo *gameinfo, char *line);
 static int ascii2pos(char *line, int *i, int *j);
 
 /* If sgf game info is written can't reset parameters like handicap, etc. */
-static int sgf_initialized = 0;
+static int sgf_initialized;
 
 /*
  * Create letterbar for the top and bottom of the ASCII board.
@@ -114,14 +114,6 @@ set_handicap_spots(int boardsize)
   
   memset(hspots, '.', sizeof(hspots));
 
-  /* small sizes are easier to hardwire... */
-  if (boardsize == 2 || boardsize == 4)
-    return;
-  if (boardsize == 3) {
-    /* just the middle one */
-    hspots[boardsize/2][boardsize/2] = '+';
-    return;
-  }
   if (boardsize == 5) {
     /* place the outer 4 */
     hspots[1][1] = '+';
@@ -430,11 +422,10 @@ init_sgf(Gameinfo *ginfo, SGFNode *root)
     return;
   sgf_initialized = 1;
 
-  sgffile_write_gameinfo(ginfo, "ascii");
+  sgf_write_header(root, 1, random_seed, komi, level, chinese_rules);
+  sgfOverwritePropertyInt(root, "HA", ginfo->handicap);
   if (ginfo->handicap > 0)
     gnugo_recordboard(root);
-  else
-    ginfo->to_move = BLACK;
 }
 
 
@@ -468,10 +459,10 @@ computer_move(Gameinfo *gameinfo, int *passes)
     *passes = 0;
 
   gnugo_play_move(i, j, gameinfo->to_move);
+  sgffile_debuginfo(curnode, move_val);
   curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
+  sgffile_output(sgftree.root);
 
-  sgffile_move_made(i, j, gameinfo->to_move, move_val);
-  
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 }
 
@@ -497,11 +488,11 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
 
   *passes = 0;
   TRACE("\nyour move: %m\n\n", i, j);
-  gnugo_play_move(i, j, gameinfo->to_move);
-  /* FIXME: This call to init_sgf should not be here. */
   init_sgf(gameinfo, sgftree.root);
-  sgffile_move_made(i, j, gameinfo->to_move, 0);
+  gnugo_play_move(i, j, gameinfo->to_move);
+  sgffile_debuginfo(curnode, 0);
   curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
+  sgffile_output(sgftree.root);
 
   last_move_i = i;
   last_move_j = j;
@@ -513,6 +504,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
   if (force) {
     gameinfo->computer_player = OTHER_COLOR(gameinfo->computer_player);
     gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
+    sgfAddComment(curnode, "forced");
     return;
   }
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
@@ -528,14 +520,16 @@ static void
 do_pass(Gameinfo *gameinfo, int *passes, int force)
 {
   (*passes)++;
-  gnugo_play_move(-1, -1, gameinfo->to_move);
   init_sgf(gameinfo, sgftree.root);
-  sgffile_move_made(-1, -1, gameinfo->to_move, 0);
+  gnugo_play_move(-1, -1, gameinfo->to_move);
+  sgffile_debuginfo(curnode, 0);
   curnode = sgfAddPlay(curnode, gameinfo->to_move, -1, -1);
+  sgffile_output(sgftree.root);
 
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
   if (force) {
     gameinfo->computer_player = OTHER_COLOR(gameinfo->computer_player);
+    sgfAddComment(curnode, "forced");
     return;
   }
   computer_move(gameinfo, passes);
@@ -550,7 +544,7 @@ void
 play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 {
   int m, num;
-  int sz = 0;
+  int sz;
   float fnum;
   int passes = 0;  /* two passes and its over */
   int tmp;
@@ -575,25 +569,20 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
     
     if (filename) {
       gameinfo_load_sgfheader(gameinfo, sgftree.root);
-      sgffile_write_gameinfo(gameinfo, "ascii");
       gameinfo->to_move = gameinfo_play_sgftree(gameinfo, sgftree.root, until);
-      sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
       sgf_initialized = 1;
       curnode = sgftreeNodeCheck(&sgftree, 0);
     }
     else {
-      if (sz)
-	sgfOverwritePropertyInt(sgftree.root, "SZ", sz);
       if (sgfGetIntProperty(sgftree.root, "SZ", &sz)) 
 	gnugo_clear_board(sz);
       if (gameinfo->handicap == 0)
 	gameinfo->to_move = BLACK;
       else {
 	gameinfo->handicap = gnugo_placehand(gameinfo->handicap);
-	sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	gameinfo->to_move = WHITE;
       }
-      
+      sgf_initialized = 0;
       curnode = sgftree.root;
     }
     
@@ -648,10 +637,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  gameinfo_print(gameinfo);
 	  break;
 	case SETBOARDSIZE:
-	  if (movenum > 0) {
-	    printf("Boardsize can be modified on move 1 only!\n");
-	    break;
-	  }
 	  if (sgf_initialized) {
 	    printf("Boardsize cannot be changed after record is started!\n");
 	    break;
@@ -674,10 +659,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	  break;
 	case SETHANDICAP:
-	  if (movenum > 0) {
-	    printf("Handicap can be modified on move 1 only!\n");
-	    break;
-	  }
 	  if (sgf_initialized) {
 	    printf("Handicap cannot be changed after game is started!\n");
 	    break;
@@ -696,15 +677,10 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  /* Place stones on board but don't record sgf 
 	   * in case we change more info. */
 	  gameinfo->handicap = gnugo_placehand(num);
-	  sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	  printf("\nSet handicap to %d\n", gameinfo->handicap);
-	  gameinfo->to_move = WHITE;
+          gameinfo->to_move = (gameinfo->handicap ? WHITE : BLACK);
 	  break;
 	case SETKOMI:
-	  if (movenum > 0) {
-	    printf("Komi can be modified on move 1 only!\n");
-	    break;
-	  }
 	  if (sgf_initialized) {
 	    printf("Komi cannot be modified after game record is started!\n");
 	    break;
@@ -816,7 +792,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case UNDO:
 	case CMD_BACK:
 	  if (gnugo_undo_move(1)) {
-	    sgffile_write_comment("undo");
+           sgfAddComment(curnode, "undone");
 	    curnode = curnode->parent;
 	    gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 	  }
@@ -895,9 +871,9 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  if (tmpstring) {
 	    /* discard newline */
 	    tmpstring[strlen(tmpstring)-1] = 0;
-	    sgf_write_header(sgftree.root, 1, random_seed, komi, level);
+           /* make sure we are saving proper handicap */
+           init_sgf(gameinfo, sgftree.root);
 	    writesgf(sgftree.root, tmpstring);
-	    sgf_initialized = 0;
 	    printf("You may resume the game");
 	    printf(" with -l %s --mode ascii\n", tmpstring);
 	    printf("or load %s\n", tmpstring);
@@ -915,9 +891,10 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	      fprintf(stderr, "Cannot open or parse '%s'\n", tmpstring);
 	      break;
 	    }
-	    sgf_initialized = 0;
-	    gameinfo_load_sgfheader(gameinfo, sgftree.root);
-	    gameinfo_play_sgftree(gameinfo, sgftree.root, NULL);
+            /* to avoid changing handicap etc. */
+            sgf_initialized = 1;
+            gameinfo_load_sgfheader(gameinfo, sgftree.root);
+            gameinfo_play_sgftree(gameinfo, sgftree.root, NULL);
 	    sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	    curnode = sgftreeNodeCheck(&sgftree, 0);
 	  }
@@ -963,9 +940,8 @@ Type \"save <filename>\" to save,\n\
 	if (tmpstring) {
 	  /* discard newline */
 	  tmpstring[strlen(tmpstring)-1] = 0;
-	  sgf_write_header(sgftree.root, 1, random_seed, komi, level);
+         init_sgf(gameinfo,sgftree.root);
 	  writesgf(sgftree.root, tmpstring);
-	    sgf_initialized = 0;
 	}
 	else
 	  printf("Please specify filename\n");
@@ -989,7 +965,6 @@ Type \"save <filename>\" to save,\n\
     }
     passes = 0;
     showdead = 0;
-    sgf_initialized = 0;
     /* Play a different game next time. */
     update_random_seed();
   }

@@ -418,23 +418,21 @@ sgfAddPlay(SGFNode *node, int who, int movex, int movey)
 {
   char move[3];
   SGFNode *new;
-
+  
   /* a pass move? */
   if (movex == -1 && movey == -1)
     move[0] = 0;
   else
     sprintf(move, "%c%c", movey + 'a', movex + 'a');
 
-  if (node->child) {
-    node = sgfStartVariantFirst(node->child);
-    sgfAddProperty(node, (who == BLACK) ? "B" : "W", move);
-
-    return node;
+  if (node->child)
+    new = sgfStartVariantFirst(node->child);
+  else {
+    new = sgfNewNode();
+    node->child = new;
+    new->parent = node;
   }
-
-  new = sgfNewNode();
-  node->child = new;
-  new->parent = node;
+  
   sgfAddProperty(new, (who == BLACK) ? "B" : "W", move);
 
   return new;
@@ -550,6 +548,39 @@ sgfTriangle(SGFNode *node, int i, int j)
 
   gg_snprintf(text, 3, "%c%c", j+'a', i+'a');
   sgfAddProperty(node, "TR", text);
+
+  return node;
+}
+
+
+/*
+ * Place a label on the board at position (i, j).
+ */
+
+SGFNode *
+sgfLabel(SGFNode *node, char *label, int i, int j)
+{
+  /* allows 12 chars labels - more than enough */
+  char text[16];
+
+  gg_snprintf(text, 16, "%c%c:%s", j+'a', i+'a', label);
+  sgfAddProperty(node, "LB", text);
+
+  return node;
+}
+
+
+/*
+ * Place a numeric label on the board at position (i, j).
+ */
+
+SGFNode *
+sgfLabelInt(SGFNode *node, int num, int i, int j)
+{
+  char text[16];
+
+  gg_snprintf(text, 16, "%c%c:%d", j+'a', i+'a', num);
+  sgfAddProperty(node, "LB", text);
 
   return node;
 }
@@ -1264,6 +1295,26 @@ sgfWriteResult(SGFNode *node, float score, int overwrite)
 }
 
 
+static void
+restore_property(SGFProperty *prop)
+{
+  if(prop) {
+    restore_property(prop->next);
+    prop->name&=~0x20;
+  }
+}
+
+
+static void
+restore_node(SGFNode *node)
+{
+  if (node) {
+    restore_property(node->props);
+    restore_node(node->child);
+    restore_node(node->next);
+  }
+}
+
 
 static void
 unparse_node(FILE *file, SGFNode *node)
@@ -1335,7 +1386,7 @@ unparse_game(FILE *file, SGFNode *node, int root)
 }
 
 void
-sgf_write_header(SGFNode *root, int overwrite, int seed, float komi, int level)
+sgf_write_header(SGFNode *root, int overwrite, int seed, float komi, int level, int rules)
 {
   time_t curtime = time(NULL);
   struct tm *loctime = localtime(&curtime);
@@ -1353,7 +1404,7 @@ sgf_write_header(SGFNode *root, int overwrite, int seed, float komi, int level)
   if (overwrite || !sgfGetIntProperty(root, "AP", &dummy))
     sgfOverwriteProperty(root, "AP", PACKAGE":"VERSION);
   if (overwrite || !sgfGetIntProperty(root, "RU", &dummy))
-    sgfOverwriteProperty(root, "RU", "Japanese");
+    sgfOverwriteProperty(root, "RU", rules ? "Chinese" : "Japanese");
   sgfOverwriteProperty(root, "FF", "4");
   sgfOverwritePropertyFloat(root, "KM", komi);
 }
@@ -1379,6 +1430,9 @@ writesgf(SGFNode *root, const char *filename)
 
   unparse_game(outfile, root, 1);
   fclose(outfile);
+  /* remove "printed" marks so that the tree can be written multiple
+     times */
+  restore_node(root);
   return 1;
 }
 

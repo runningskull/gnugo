@@ -177,6 +177,7 @@ static struct gg_option const long_options[] =
   {"infile",         required_argument, 0, 'l'},
   {"until",          required_argument, 0, 'L'},
   {"outfile",        required_argument, 0, 'o'},
+  {"output-flags",   required_argument, 0, 'O'},
   {"boardsize",      required_argument, 0, OPT_BOARDSIZE},
   {"color",          required_argument, 0, OPT_COLOR},
   {"handicap",       required_argument, 0, OPT_HANDICAPSTONES},
@@ -274,6 +275,7 @@ main(int argc, char *argv[])
   char *untilstring = NULL;
   char *scoringmode = NULL;
   char *outfile = NULL;
+  char *outflags = NULL;
   char *gtpfile = NULL;
   
   char *printsgffile = NULL;
@@ -348,7 +350,7 @@ main(int argc, char *argv[])
   
   /* Now weed through all of the command line options. */
   while ((i = gg_getopt_long(argc, argv, 
-			     "-ab:B:d:D:EF:gh::H:K:l:L:M:m:o:p:r:fsStTvw",
+                            "-ab:B:d:D:EF:gh::H:K:l:L:M:m:o:O:p:r:fsStTvw",
 			     long_options, NULL)) != EOF)
     {
       switch (i) {
@@ -382,7 +384,28 @@ main(int argc, char *argv[])
 	
       case 'o':
 	outfile = gg_optarg;
+	strcpy(outfilename, gg_optarg);
+
+        /* FIXME: remove this line once all sgf output goes through trees */
 	strcpy(gameinfo.outfilename, gg_optarg);
+
+	break;
+
+      case 'O':
+	outflags = gg_optarg;
+	output_flags = 0;
+	if (outflags)
+	  while (*outflags){
+	    switch (*outflags) {
+	    case 'd':
+	      output_flags |= OUTPUT_MARKDRAGONS;
+	      break;
+	    case 'v':
+	      output_flags |= OUTPUT_MOVEVALUES;
+	      break;
+	    }
+	    outflags++;
+	  }
 	break;
 	
       case OPT_QUIET:
@@ -1339,6 +1362,10 @@ Debugging Options:\n\
    -b, --benchmark num           benchmarking mode - can be used with -l\n\
    -S, --statistics              print statistics (for debugging purposes)\n\n\
    -t, --trace                   verbose tracing\n\
+   -O, --output-flags <flags>    optional output (use with -o)\n\
+                    d: mark dead and critical dragons\n\
+                    v: show values of considered moves\n\
+                    specify either no flags (default), 'd', 'v' or 'dv'\n\
    --showtime                    print timing diagnostic\n\
    --replay <color>              replay game. Use with -o.\n\
    --showscore                   print estimated score\n\

@@ -51,6 +51,7 @@ static int sgffile_flush_file(void);
 
 /*
  * Handling of the SGF file itself (open, close, etc).
+ * FIXME: remove this part once it isn't used anymore
  */
 
 
@@ -103,8 +104,12 @@ sgffile_close_file()
 {
   if (!sgfout)
     return 0;
-  
-  fprintf(sgfout, ")\n");
+
+  /* enable if we ever return to creating of sgf files on the fly */
+#if 0
+  fprintf(sgfout, ")\n"); 
+#endif
+
   /* Don't close sgfout if it happens to be stdout. */
   if (sgfout != stdout)
     fclose(sgfout);
@@ -286,6 +291,57 @@ sgffile_dragon_status(int i, int j, int status)
 	break;
     }
   }
+}
+
+/* ---------------------------------------------------------------- */
+
+/*
+ * Add debug information to a node if user requested it from command
+ * line.
+ */
+
+void
+sgffile_debuginfo(SGFNode *node, int value)
+{
+  int m, n;
+  char comment[24];
+
+  if (outfilename[0]) {
+    for (m = 0; m < board_size; ++m)
+      for (n = 0; n < board_size; ++n) {
+        if (BOARD(m,n) && (output_flags & OUTPUT_MARKDRAGONS))
+          switch (dragon[POS(m, n)].crude_status) {
+            case DEAD:
+             sgfLabel(node, "X", m, n);
+             break;
+           case CRITICAL:
+             sgfLabel(node, "!", m, n);
+             break;
+          }
+       if (potential_moves[m][n] > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
+         if (potential_moves[m][n] < 1.0)
+           sgfLabel(node, "<1", m, n);
+         else
+           sgfLabelInt(node, (int) potential_moves[m][n], m, n);
+       }
+      }
+    if (value) {
+      sprintf(comment, "Value of move: %d", value);
+      sgfAddComment(node, comment);
+    }
+  }
+}
+
+
+/*
+ * Write sgf tree to output file specified with -o option
+ */
+
+void
+sgffile_output(SGFNode *root)
+{
+  if (outfilename[0])
+    writesgf(root, outfilename);
 }
 
 

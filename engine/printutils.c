@@ -251,7 +251,7 @@ abortgo(const char *file, int line, const char *msg, int x, int y)
 
 #if 0
   if (sgf_root) {
-    sgf_write_header(sgf_root, 1, random_seed, komi, level);
+    sgf_write_header(sgf_root, 1, random_seed, komi, level, chinese_rules);
     writesgf(sgf_root, "abortgo.sgf");
   }
 #endif

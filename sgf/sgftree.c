@@ -34,10 +34,15 @@ sgftree_clear(SGFTree *tree)
 int
 sgftree_readfile(SGFTree *tree, const char *infilename)
 {
+  SGFNode *savetree = tree->root;
+
   tree->root = readsgffile(infilename);
   tree->lastnode = NULL;
-
-  return tree->root != NULL;
+  if (tree->root == NULL) {
+    tree->root = savetree;
+    return NULL;
+  }
+  return 1;
 }
 
 /* ================================================================ */

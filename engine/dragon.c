@@ -336,7 +336,10 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     if (ON_BOARD(str)) {
       if (dragon[str].origin == str && board[str]) {
 	dragon[str].crude_status = compute_crude_status(str);
+       /* FIXME: delete this once all sgf output goes through trees */
+#if 0
 	sgffile_dragon_status(I(str), J(str), dragon[str].crude_status);
+#endif
       }
     }
   time_report(2, "  compute_crude_status", NO_MOVE, 1.0);
