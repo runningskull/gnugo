@@ -152,23 +152,25 @@ MA[li];B[lc]MA[ki])
 )
 
 (;B[rd]MA[mg]C[0
-#not very good for b.];W[nd]MA[lg];B[re];W[qf]MA[lg])
+#not very good for b.];W[nd]MA[lg];B[re];W[qf]MA[lg];
+B[nc];W[md]MA[kg];B[lc])
+
+(;B[pe]C[0
+#we need answers to this.
+]MA[lh];W[qf]
+C[0
+#very bad, but gnugo likes it.
+]MA[lh];B[nd];W[oe];B[ne];W[of];
+B[rd])
 )
 )
 
 (;B[pf]MA[lh]
 (;W[qc]MA[lh]C[:-,shape(3)];B[rc]MA[lh];W[pc]MA[lh]C[U]
-(;B[re]MA[lh]C[:-,shape(8)]
-(;W[kc]MA[jg]C[:-,shape(10)])
+(;B[re]MA[lh]C[:-,shape(8)];W[kc]MA[jg]C[
+])
 
-(;W[lc]MA[kh]C[:-,shape(10)])
-)
-
-(;B[rb]MA[kg]
-(;W[kc]MA[jg]C[:-,shape(10)];B[qj]MA[jk]C[:-,shape(10)])
-
-(;W[lc]MA[kh]C[:-,shape(10)];B[qj]MA[jk]C[:-,shape(10)])
-)
+(;B[rb]MA[kg];W[kc]MA[jg];B[qj]MA[jk])
 )
 
 (;W[lc]MA[lh]C[0])
@@ -232,6 +234,21 @@ W[qb]MA[ki])
 # Bad];B[pf]MA[ki];W[qe]MA[ki];B[nd]MA[ki];W[rf]
 MA[ki];B[rg]MA[ki];W[re]MA[ki];B[qg]MA[ki];W[nc]MA[ki];B[md]MA[ki])
 )
+)
+)
+
+(;B[qf]MA[ii];W[qc]MA[ii]
+(;B[rc];W[pc]MA[ii];B[rb]MA[ii];W[kc]MA[ii])
+
+(;B[pc]C[0
+]MA[ih];W[pd]MA[ih];B[qb]MA[ih];W[rc]MA[ih];B[rd]MA[ih]
+(;W[pb]C[0
+]MA[ih];B[oc]MA[ih];W[rb];B[ob]MA[ih];W[qa];B[mc]MA[ih])
+
+(;W[rb]C[0
+]MA[mg];B[pb]MA[mg])
+
+(;W[oc]MA[ih];B[pb]MA[ih];W[ob]MA[ih];B[rb]MA[ih];W[kc]MA[ih])
 )
 )
 )
@@ -344,6 +361,12 @@ MA[kh];B[nc]MA[kh])
 
 (;B[ic]MA[hj];W[qc]MA[hj];B[rc]MA[hj];W[pd]MA[hj];B[qe]MA[hj];W[qb]
 MA[hj];B[qj]MA[hl])
+
+(;B[mc]MA[ii]C[#are there other continuations of note here?
+];W[mb]
+MA[ii];B[lb]MA[jh];W[lc]MA[jh];B[nb]MA[jh];W[md]MA[jh];B[nc]MA[jh];
+W[nd]MA[jh];B[od]MA[jh];W[ob]MA[jh];B[ma]MA[jh];W[oa]MA[jh];B[na]
+MA[jh];W[kb]MA[jh];B[pc]MA[jh];W[oe]MA[jh];B[pd]MA[jh])
 )
 
 (;W[qh]C[j
