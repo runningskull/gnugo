@@ -3246,6 +3246,24 @@ a*B
 >prevent_attack_threat(c);
 
 
+Pattern Sente24
+# pp New pattern (3.5.8)
+
+?*?
+XO.
+?O.
+---
+
+:8,OX,reverse_followup(8)
+
+?*?
+XAb
+?A.
+---
+
+; lib(A)==3 && safe_xmove(*) && !xplay_defend(*,?,b,A)
+
+
 ########################################################
 #
 # Double threat moves and defense against double threats

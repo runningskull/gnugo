@@ -11023,6 +11023,26 @@ A...c
 ;x_alive_somewhere(b,c) && weak(A)
 
 
+Pattern ED99a
+# pp New pattern (3.5.8)
+
+|..X.?	    stabilize the corner in double sente
+|..XO.
+|.XO.O
+|.*...
++-----
+
+:8,OXd,reverse_followup(3)
+
+|..X.?
+|..XA.
+|.XO.O
+|.*...
++-----
+
+; weak(A)
+
+
 #####################################################################
 #
 # Center defend/attack patterns
