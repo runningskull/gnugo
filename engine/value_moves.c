@@ -2004,23 +2004,98 @@ estimate_territorial_value(int pos, int color, float our_score,
 	    && find_defense(aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
 	  int bad_followup;
-	  if (trymove(defense_move, other,
-		      "estimate_territorial_value-b", NO_MOVE)) {
-	    if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
+	  int attack_move;
+
+	  if (attack(pos, &attack_move) != WIN) {
+	    int i;
+
+	    if (trymove(defense_move, other,
+			"estimate_territorial_value-b", NO_MOVE)) {
+	      if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
+		popgo();
+		popgo();
+		break;
+	      }
+
+	      /* Now check all `ATTACK_MOVE' reasons for this same
+	       * move.  If the defense against current threat makes a
+	       * string attacked by this move defendable, we reduce
+	       * the followup.
+	       *
+	       * Adjustments done later are concerned with current
+	       * dragon states.  Here we actually try to check if
+	       * opponent's reply to our move will have a followup in
+	       * turn.
+	       */
+	      for (i = 0; i < MAX_REASONS; i++) {
+		int reason = move[pos].reason[i];
+		int attacked_string;
+		if (reason < 0)
+		  break;
+
+		attacked_string = move_reasons[reason].what;
+		if (move_reasons[reason].type == ATTACK_MOVE
+		    && board[attacked_string] == other) {
+		  int defense_code = find_defense(attacked_string, NULL);
+		  double down_coefficient = 0.0;
+
+		  switch (defense_code) {
+		  case WIN:
+		    down_coefficient = 2.0;
+		    break;
+
+		  case KO_A:
+		    down_coefficient = 2.0 * 0.5;
+		    break;
+
+		  case KO_B:
+		    down_coefficient = 2.0 * 0.7;
+		    break;
+		  }
+
+		  if (adjustment_down
+		      < (worm[attacked_string].effective_size
+			 * down_coefficient)) {
+		    adjustment_down = (worm[attacked_string].effective_size
+				       * down_coefficient);
+		  }
+		}
+	      }
+
 	      popgo();
-	      popgo();
-	      break;
 	    }
-	    popgo();
 	  }
-	  
+	  else {
+	    /* Our move is attackable to begin with.  However, maybe
+	     * the attack is not sufficient to defend opponent's
+	     * string?
+	     */
+	    if (trymove(attack_move, other,
+			"estimate_territorial_value-c", NO_MOVE)) {
+	      if (attack(aa, NULL) == 0) {
+		/* It is sufficient, no followup. */
+		popgo();
+		popgo();
+		break;
+	      }
+
+	      popgo();
+	    }
+
+	    /* Heuristically reduce the followup, since our string
+	     * will be still attackable if opponent defends his
+	     * string.
+	     */
+	    adjustment_down = 2 * countstones(pos);
+	  }
+
 	  bad_followup = 0;
 	  for (s = 0; s < num_adj; s++) {
 	    int lib;
 	    if (countlib(adjs[s]) == 1) {
 	      findlib(adjs[s], 1, &lib);
 	      if (trymove(lib, other,
-		    	  "estimate_territorial_value-c", NO_MOVE)) {
+		    	  "estimate_territorial_value-d", NO_MOVE)) {
 		if (!attack(aa, NULL)
 		    && (board[pos] == EMPTY || attack(pos, NULL) != 0)) {
 		  popgo();
