@@ -77,9 +77,10 @@ loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 91
 236 gg_genmove black
 #? [R12]*
 
-loadsgf games/nngs/gnugo-3.3.6-evand-200208290255.sgf 73
-272 gg_genmove white
-#? [C7]*
+# Not a valid problem
+# loadsgf games/nngs/gnugo-3.3.6-evand-200208290255.sgf 73
+# 272 gg_genmove white
+# #? [C7]*
 
 # Black has a combination attack which must be defended correctly against.
 # F8 and F7 both fail.
