@@ -553,6 +553,8 @@ int influence_moyo_color_opposite(int pos);
 int influence_area_color(int pos);
 int influence_get_moyo_size(int pos, int color);
 void influence_get_moyo_segmentation(int opposite, struct moyo_data *moyo);
+void influence_get_moyo_data(int opposite, int moyo_color[BOARDMAX],
+			     float territory_value[BOARDMAX]);
 float influence_estimate_score(float moyo_coeff, float area_coeff);
 void influence_mark_non_territory(int pos, int color);
 float influence_initial_territory(int pos, int color);
@@ -657,6 +659,25 @@ extern int goallib;
 extern int stackp;                /* stack pointer */
 extern int count_variations;      /* count (decidestring) */
 extern SGFTree *sgf_dumptree;
+
+/* Arrays pointing out the closest worms from each vertex.  The first
+ * one is the closest worms of either color, the last two ones ignore
+ * worms of the other color.  Beyond a certain distance from any worm
+ * no close worm is listed at all.  Only the closest worm is listed
+ * and if more than one are equally close they are all listed. The
+ * number of equally close worms is given in the number_*_worms
+ * arrays. If more than MAX_CLOSE_WORMS are equally close, none is
+ * listed.
+ *
+ * See compute_effective_worm_sizes() in worm.c for details.
+ */
+#define MAX_CLOSE_WORMS 4
+extern int close_worms[BOARDMAX][MAX_CLOSE_WORMS];
+extern int number_close_worms[BOARDMAX];
+extern int close_black_worms[BOARDMAX][MAX_CLOSE_WORMS];
+extern int number_close_black_worms[BOARDMAX];
+extern int close_white_worms[BOARDMAX][MAX_CLOSE_WORMS];
+extern int number_close_white_worms[BOARDMAX];
 
 
 struct stats_data {

@@ -29,6 +29,9 @@
 #include "patterns.h"
 
 static void compute_effective_worm_sizes(void);
+static void do_compute_effective_worm_sizes(int color,
+					    int (*cw)[MAX_CLOSE_WORMS],
+					    int *ncw, int max_distance);
 static void compute_unconditional_status(void);
 static void find_worm_attacks_and_defenses(void);
 static void find_worm_threats(void);
@@ -526,10 +529,26 @@ build_worms()
  * shared are counted with equal fractional values for each worm.
  *
  * We never count intersections further away than distance 3.
+ *
+ * This function is also used to compute arrays with information about
+ * the distances to worms of both or either color. In the latter case
+ * we count intersections up to a distance of 5.
  */
 
 static void
 compute_effective_worm_sizes()
+{
+  do_compute_effective_worm_sizes(BLACK | WHITE, close_worms,
+				  number_close_worms, 3);
+  do_compute_effective_worm_sizes(BLACK, close_black_worms,
+				  number_close_black_worms, 5);
+  do_compute_effective_worm_sizes(WHITE, close_white_worms,
+				  number_close_white_worms, 5);
+}
+
+static void
+do_compute_effective_worm_sizes(int color, int (*cw)[MAX_CLOSE_WORMS],
+				int *ncw, int max_distance)
 {
   int pos;
 
@@ -558,18 +577,18 @@ compute_effective_worm_sizes()
     
     nworms[pos] = 0;
     
-    if (board[pos] == EMPTY)
-      distance[pos] = -1;
-    else {
+    if (board[pos] & color) {
       distance[pos] = 0;
       worms[pos][0] = worm[pos].origin;
       nworms[pos]++;
     }
+    else
+      distance[pos] = -1;
   }
   
   dist = 0;
   found_one = 1;
-  while (found_one && dist <= 3) {
+  while (found_one && dist <= max_distance) {
     found_one = 0;
     dist++;
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -599,25 +618,44 @@ compute_effective_worm_sizes()
       }
     }
   }
-  
-  /* Distribute (fractional) contributions to the worms. */
+
+  /* Compute the effective sizes but only when all worms are considered. */
+  if (color == (BLACK | WHITE)) {
+    /* Distribute (fractional) contributions to the worms. */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos))
+	continue;
+      
+      for (k = 0; k < nworms[pos]; k++) {
+	int w = worms[pos][k];
+	if (board[pos] == EMPTY)
+	  worm[w].effective_size += 0.5/nworms[pos];
+	else
+	  worm[w].effective_size += 1.0;
+      }
+    }
+    
+    /* Propagate the effective size values all over the worms. */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (IS_STONE(board[pos]) && is_worm_origin(pos, pos))
+	propagate_worm(pos);
+  }
+
+  /* Fill in the appropriate close_*_worms (cw) and
+   * number_close_*_worms (ncw) arrays.
+   */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos))
       continue;
-    
-    for (k = 0; k < nworms[pos]; k++) {
-      int w = worms[pos][k];
-      if (board[pos] == EMPTY)
-	worm[w].effective_size += 0.5/nworms[pos];
-      else
-	worm[w].effective_size += 1.0;
-    }
+
+    if (nworms[pos] > MAX_CLOSE_WORMS)
+      ncw[pos] = 0;
+    else
+      ncw[pos] = nworms[pos];
+
+    for (k = 0; k < ncw[pos]; k++)
+      cw[pos][k] = worms[pos][k];
   }
-    
-  /* Propagate the effective size values all over the worms. */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (IS_STONE(board[pos]) && is_worm_origin(pos, pos))
-      propagate_worm(pos);
 }
 
 /* Identify worms which are unconditionally uncapturable in the

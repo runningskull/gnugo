@@ -2,6 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new arrays close_worms[][], close_white_worms[][],
+  close_black_worms[][], number_close_worms[],
+  number_close_white_worms[], number_close_black_worms[]
+- compute_surrounding_moyo_sizes() revised
+- alternative implementation of compute_surrounding_moyo_sizes() for
+  experimental-connections option
+- new function influence_get_moyo_data()
+
 3.3.8 released September 5, 2002
 
 - remove unneeded inclusion of stdlib.h in helpers.c

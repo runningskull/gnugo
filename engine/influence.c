@@ -1540,6 +1540,33 @@ influence_get_moyo_segmentation(int opposite, struct moyo_data *moyos)
   }
 }
 
+/* Another function to export a certain amount of moyo data. */
+void
+influence_get_moyo_data(int opposite, int moyo_color[BOARDMAX],
+			float territory_value[BOARDMAX])
+{
+  int m, n;
+  struct influence_data *q;
+
+  if (opposite)
+    q = &initial_opposite_influence;
+  else
+    q = &initial_influence;
+
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      if (whose_moyo_restricted(q, m, n) == BLACK)
+	moyo_color[POS(m, n)] = BLACK;
+      else if (whose_moyo_restricted(q, m, n) == WHITE)
+	moyo_color[POS(m, n)] = WHITE;
+      else
+	moyo_color[POS(m, n)] = EMPTY;
+      
+      territory_value[POS(m, n)] = gg_abs(q->territory_value[m][n]);
+    }
+}
+
+
 /* Export the territory valuation at an intersection from initial_influence;
  * it is given from (color)'s point of view.
  */

@@ -1597,46 +1597,115 @@ compute_escape(int pos, int dragon_status_known)
  * is true, we use initial_opposite_influence, otherwise initial_influence.
  * If dragons_known is false, then .moyo_size_pre_owl is set, otherwise
  * .moyo_size_post_owl and .moyo_territorial_value.
+ *
+ * Currently this is implemented differently depending on whether
+ * experimental connections are used or not. The reason why this is
+ * needed is that most of the B patterns in conn.db are disabled for
+ * experimental connections, which may cause the moyo segmentation to
+ * pass through cutting points between dragons, making the surrounding
+ * moyo size mostly useless. Instead we only use the part of the
+ * surrounding moyo which is closest to some worm of the dragon.
  */
 static void
 compute_surrounding_moyo_sizes(int opposite, int dragon_status_known)
 {
   int pos;
   int d;
-  int mx[MAX_MOYOS + 1];
-  struct moyo_data moyos;
 
-  influence_get_moyo_segmentation(opposite, &moyos);
+  if (!experimental_connections) {
+    int mx[MAX_MOYOS + 1];
+    struct moyo_data moyos;
 
-  memset(mx, 0, sizeof(mx));
-  for (d = 0; d < number_of_dragons; d++) {
-    int this_moyo_size = 0;
-    float this_moyo_value = 0.0;
+    influence_get_moyo_segmentation(opposite, &moyos);
+
+    memset(mx, 0, sizeof(mx));
+    for (d = 0; d < number_of_dragons; d++) {
+      int this_moyo_size = 0;
+      float this_moyo_value = 0.0;
+      for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+	int moyo_number = moyos.segmentation[pos];
+	if (board[pos] != DRAGON(d).color
+	    || moyo_number == 0
+	    || dragon[pos].id != d
+	    || moyos.owner[moyo_number] != board[pos])
+	  continue;
+	
+	if (mx[moyo_number] != d + 1) {
+	  mx[moyo_number] = d + 1;
+	  this_moyo_size += moyos.size[moyo_number];
+	  this_moyo_value += moyos.territorial_value[moyo_number];
+	}
+      }
+      
+      if (!dragon_status_known) {
+	if (this_moyo_size < dragon2[d].moyo_size_pre_owl) {
+	  dragon2[d].moyo_size_pre_owl = this_moyo_size;
+	}
+      }
+      else
+	if (this_moyo_size < dragon2[d].moyo_size_post_owl) {
+	  dragon2[d].moyo_size_post_owl = this_moyo_size;
+	  dragon2[d].moyo_territorial_value = this_moyo_value;
+	}
+    }
+  }
+  else {
+    int k;
+    int moyo_color[BOARDMAX];
+    float territory_value[BOARDMAX];
+    float moyo_sizes[BOARDMAX];
+    float moyo_values[BOARDMAX];
+    
+    influence_get_moyo_data(opposite, moyo_color, territory_value);
+
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      int moyo_number = moyos.segmentation[pos];
-      if (board[pos] != DRAGON(d).color
-          || moyo_number == 0
-          || dragon[pos].id != d
-          || moyos.owner[moyo_number] != board[pos])
-        continue;
-
-      if (mx[moyo_number] != d + 1) {
-        mx[moyo_number] = d + 1;
-        this_moyo_size += moyos.size[moyo_number];
-	this_moyo_value += moyos.territorial_value[moyo_number];
+      moyo_sizes[pos] = 0.0;
+      moyo_values[pos] = 0.0;
+    }
+    
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos))
+	continue;
+      
+      if (moyo_color[pos] == board[pos])
+	continue;
+      
+      if (moyo_color[pos] == WHITE) {
+	for (k = 0; k < number_close_white_worms[pos]; k++) {
+	  int w = close_white_worms[pos][k];
+	  int dr = dragon[w].origin;
+	  
+	  moyo_sizes[dr] += 1.0 / number_close_white_worms[pos];
+	  moyo_values[dr] += (territory_value[pos]
+			      / number_close_white_worms[pos]);
+	}
+      }
+      
+      if (moyo_color[pos] == BLACK) {
+	for (k = 0; k < number_close_black_worms[pos]; k++) {
+	  int w = close_black_worms[pos][k];
+	  int dr = dragon[w].origin;
+	  
+	  moyo_sizes[dr] += 1.0 / number_close_black_worms[pos];
+	  moyo_values[dr] += (territory_value[pos]
+			      / number_close_black_worms[pos]);
+	}
       }
     }
 
-    if (!dragon_status_known) {
-      if (this_moyo_size < dragon2[d].moyo_size_pre_owl) {
-	dragon2[d].moyo_size_pre_owl = this_moyo_size;
+    for (d = 0; d < number_of_dragons; d++) {
+      int this_moyo_size = (int) moyo_sizes[dragon2[d].origin];
+      float this_moyo_value = moyo_values[dragon2[d].origin];
+      
+      if (!dragon_status_known) {
+	if (this_moyo_size < dragon2[d].moyo_size_pre_owl)
+	  dragon2[d].moyo_size_pre_owl = this_moyo_size;
       }
-    }
-    else
-      if (this_moyo_size < dragon2[d].moyo_size_post_owl) {
+      else if (this_moyo_size < dragon2[d].moyo_size_post_owl) {
 	dragon2[d].moyo_size_post_owl = this_moyo_size;
 	dragon2[d].moyo_territorial_value = this_moyo_value;
       }
+    }
   }
 }
 

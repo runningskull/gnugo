@@ -145,6 +145,13 @@ int mirror_stones_limit = -1;   /* but stop at this number of stones */
 float best_move_values[10];
 int   best_moves[10];
 
+int close_worms[BOARDMAX][4];
+int number_close_worms[BOARDMAX];
+int close_black_worms[BOARDMAX][4];
+int number_close_black_worms[BOARDMAX];
+int close_white_worms[BOARDMAX][4];
+int number_close_white_worms[BOARDMAX];
+
 /* Various statistics are collected here. */
 struct stats_data stats;
 
