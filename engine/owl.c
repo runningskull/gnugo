@@ -2362,7 +2362,7 @@ owl_determine_life(struct local_owl_data *owl,
   /* FIXME: use MAX_EYES from move_reasons.h ? */
   struct eyevalue eyevalue_list[BOARDMAX/2];
   int eyes_attack_points[BOARDMAX/2];
-  char pessimistic_min;
+  int pessimistic_min;
   int attack_point;
   int defense_point;
   int m, n;

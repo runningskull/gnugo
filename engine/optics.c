@@ -67,7 +67,7 @@ static int recognize_eye(int pos, int *attack_point, int *defense_point,
 			 struct vital_points *vp);
 static void guess_eye_space(int pos, int effective_eyesize, int margins,
 			    struct eye_data eye[BOARDMAX],
-			    struct eyevalue *value, char *pessimistic_min);
+			    struct eyevalue *value, int *pessimistic_min);
 static void reset_map(int size);
 static void first_map(int* map_value);
 static int next_map(int *q, int map[MAXEYE]);
@@ -804,7 +804,7 @@ compute_eyes(int pos, struct eyevalue *value,
  */
 void
 compute_eyes_pessimistic(int pos, struct eyevalue *value,
-			 char *pessimistic_min,
+			 int *pessimistic_min,
 			 int *attack_point, int *defense_point,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX])
@@ -961,7 +961,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 static void
 guess_eye_space(int pos, int effective_eyesize, int margins,
 		struct eye_data eye[BOARDMAX],
-		struct eyevalue *value, char *pessimistic_min)
+		struct eyevalue *value, int *pessimistic_min)
 {
   if (effective_eyesize > 3) {
     set_eyevalue(value, 2, 2, 2, 2);

@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- fix unsigned char bug in compute_eyes_pessimistic()
 - tests results updated; CVS tag SPEC-tests_update2
 - floating point computations in readconnect.c converted to fixed point
 - remove unused functions influence_score(), get_influence(), 

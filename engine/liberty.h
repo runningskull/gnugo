@@ -987,7 +987,7 @@ void compute_eyes(int pos, struct eyevalue *value,
                   struct half_eye_data heye[BOARDMAX],
                   int add_moves, int color);
 void compute_eyes_pessimistic(int pos, struct eyevalue *value,
-                              char *pessimistic_min,
+                              int *pessimistic_min,
                               int *attack_point, int *defense_point,
                               struct eye_data eye[BOARDMAX],
                               struct half_eye_data heye[BOARDMAX]);
