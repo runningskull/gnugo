@@ -37,9 +37,6 @@
    */
 #define GRID_OPT 1
 
-/* Hashing scheme. Default scheme 2 (new). */
-#define HASHING_SCHEME 2
-
 /* Oracle. Default not enabled. */
 #define ORACLE 0
 
@@ -55,7 +52,7 @@
 /* Semeai Variations. 500 default */
 #define SEMEAI_NODE_LIMIT 500
 
-/* Break-in module. Default not enabled. */
+/* Break-in module. Enabled by default. */
 #define USE_BREAK_IN 1
 
 

@@ -362,9 +362,6 @@ hashnode_dump(Hashnode *node, FILE *outfile)
 
   /* Data about the node itself. */
   fprintf(outfile, "Hash value: %lx\n", (unsigned long) node->key.hashval);
-#if FULL_POSITION_IN_HASH
-  hashposition_dump(&(node->key.hashpos), outfile);
-#endif
 
   for (result = node->results; result != NULL; result = result->next) {
     read_result_dump(result, outfile);
@@ -802,12 +799,7 @@ hashtable_search(Hashtable *table, Hash_data *hd)
 	break;
       }
     if (i >= NUM_HASHVALUES)
-#if FULL_POSITION_IN_HASH
-      if (hashposition_compare(&hd->hashpos, &node->key.hashpos) == 0)
-	break;
-#else
       break;
-#endif
   }
 
   return node;
@@ -1047,11 +1039,7 @@ do_get_read_result(enum routine_id routine, int komaster, int kom_pos,
 
   /* Assert that hash data really corresponds to the state of the board. */
   hashdata_recalc(&key, board, board_ko_pos);
-#if FULL_POSITION_IN_HASH
-  gg_assert(hashdata_diff_dump(&key, &hashdata) == 0);
-#else
   gg_assert(hashdata_compare(&key, &hashdata) == 0);
-#endif
 
 #endif /* CHECK_HASHING */
 

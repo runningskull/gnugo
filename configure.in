@@ -493,17 +493,6 @@ else
    AC_DEFINE(OWL_THREATS, 0)
 fi
 
-dnl ------------ Influence -------------------
-
-AH_TEMPLATE([HASHING_SCHEME],
-[Hashing scheme. Default scheme 2 (new).])
-
-if test "$enable_experimental_hashing" = "no" ; then
-   AC_DEFINE(HASHING_SCHEME, 1)
-else
-   AC_DEFINE(HASHING_SCHEME, 2)
-fi
-
 dnl  ----------- special-case use of gcc ---------
 
 dnl Not sure if we are supposed to be accessing this variable, but...

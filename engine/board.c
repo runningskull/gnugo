@@ -831,11 +831,7 @@ play_move_no_history(int pos, int color, int update_internals)
 
   /* Check the hash table to see if it corresponds to the cumulative one. */
   hashdata_recalc(&oldkey, board, board_ko_pos);
-#if FULL_POSITION_IN_HASH
-  gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
-#else
   gg_assert(hashdata_compare(&oldkey, &hashdata) == 0);
-#endif
 #endif
 
   if (board_ko_pos != NO_MOVE)
@@ -856,11 +852,7 @@ play_move_no_history(int pos, int color, int update_internals)
 #if CHECK_HASHING
     /* Check the hash table to see if it equals the previous one. */
     hashdata_recalc(&oldkey, board, board_ko_pos);
-#if FULL_POSITION_IN_HASH
-    gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
-#else
     gg_assert(hashdata_compare(&oldkey, &hashdata) == 0);
-#endif
 #endif
   }
 
@@ -1583,7 +1575,7 @@ fastlib(int pos, int color, int ignore_captures)
 
 
 /* Effectively true unless we store full position in hash. */
-#define USE_BOARD_CACHES	(NUM_HASHVALUES <= 4 && !FULL_POSITION_IN_HASH)
+#define USE_BOARD_CACHES	(NUM_HASHVALUES <= 4)
 
 struct board_cache_entry {
   int threshold;
