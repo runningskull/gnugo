@@ -297,13 +297,17 @@ static int string_mark;
 /* Forward declarations. */
 static int do_trymove(int pos, int color, int ignore_ko);
 static void undo_trymove(void);
+
+static int do_approxlib(int pos, int color, int maxlib, int *libs);
+static int slow_approxlib(int pos, int color, int maxlib, int *libs);
+static int do_accuratelib(int pos, int color, int maxlib, int *libs);
+
 static void new_position(void);
 static int propagate_string(int stone, int str);
 static void find_liberties_and_neighbors(int s);
 static int do_remove_string(int s);
 static void do_commit_suicide(int pos, int color);
 static void do_play_move(int pos, int color);
-static int slow_approxlib(int pos, int color, int maxlib, int *libs);
 
 
 /* Statistics. */
@@ -2183,137 +2187,147 @@ fastlib(int pos, int color, int ignore_captures)
 }
 
 
-/* Enable this to check that the newer implementation above gives
- * correct answers (using the older implementation). Don't forget to
- * rename the newer implementation to `fastlib_new'.
+/* Effectively true unless we store full position in hash. */
+#define USE_BOARD_CACHES	(NUM_HASHVALUES <= 4 && !FULL_POSITION_IN_HASH)
+
+struct board_cache_entry {
+  int threshold;
+  int liberties;
+  Hash_data position_hash;
+};
+
+
+/* approxlib() cache. */
+struct board_cache_entry approxlib_cache[BOARDMAX][2];
+
+
+/* Clears approxlib() cache. This function should be called only once
+ * during engine initialization. Sets thresholds to zero.
  */
-#if 0
-static int
-fastlib_old(int pos, int color, int ignore_capture)
+void
+clear_approxlib_cache(void)
 {
-  int k;
-  int ally1 = NO_MOVE;
-  int ally2 = NO_MOVE;
-  int fast_liberties = 0;
-  int other = OTHER_COLOR(color);
+  int pos;
 
-  ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(color), pos);
-
-  for (k = 0; k < 4; k++) {
-    int neighbor = pos + delta[k];
-    if (board[neighbor] == color) {
-      if (ally1 != NO_MOVE) {
-        if (string_number[ally1] != string_number[neighbor]) { 
-          if (ally2 != NO_MOVE) {
-            if (string_number[ally2] != string_number[neighbor]) {
-	      /* More than 2 allies not implemented (yet).*/
-              return -1;
-            }
-          }
-	  else
-            ally2 = neighbor;
-        }
-      }
-      else
-        ally1 = neighbor;
-    }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    approxlib_cache[pos][0].threshold = 0;
+    approxlib_cache[pos][1].threshold = 0;
   }
-  
-  for (k = 0; k < 4; k++) {
-    int neighbor = pos + delta[k];
-    int neighbor_color = board[neighbor];
-    if (!ignore_capture
-        && neighbor_color == other
-	&& LIBERTIES(neighbor) == 1) {
-      int neighbor_size = COUNTSTONES(neighbor);
-#if 0
-      if ((neighbor_size <= 2 && !ally1)
-       || (neighbor_size == 1
-              && ally1 
-              && !ally2
-              && COUNTSTONES(ally1) == 1)) {
-#else
-      if (neighbor_size == 1
-         || (neighbor_size == 2 && !ally1)) {
-#endif
-        /* Here, we can gain only the adjacent new liberty. */
-        fast_liberties++;
-      }
-      else
-        return -1;
-    }
-    if (neighbor_color == EMPTY) {
-      if ((!ally1 || !neighbor_of_string(neighbor, ally1))
-          && (!ally2 || !neighbor_of_string(neighbor, ally2))) {
-	fast_liberties++;
-      }
-    }
-  }
-
-  if (ally1)
-    fast_liberties += LIBERTIES(ally1) - 1;
-  if (ally2)
-    fast_liberties += LIBERTIES(ally2) - count_common_libs(ally1, ally2);
-  
-  return fast_liberties;
 }
 
-
-int
-fastlib(int pos, int color, int ignore_captures)
-{
-  int liberties1 = fastlib_old(pos, color, ignore_captures);
-  int liberties2 = fastlib_new(pos, color, ignore_captures);
-
-  ASSERT1(liberties1 == liberties2, pos);
-
-  return liberties1;
-}
-#endif
 
 /* Find the liberties a stone of the given color would get if played
  * at (pos), ignoring possible captures of opponent stones. (pos)
  * must be empty. If libs != NULL, the locations of up to maxlib
- * liberties are written into libs[]. The counting of
- * liberties may or may not be halted when maxlib is reached. The
- * number of liberties found is returned.
+ * liberties are written into libs[]. The counting of liberties may
+ * or may not be halted when maxlib is reached. The number of liberties
+ * found is returned.
  *
  * If you want the number or the locations of all liberties, however
  * many they are, you should pass MAXLIBS as the value for maxlib and
  * allocate space for libs[] accordingly.
  */
-
 int
 approxlib(int pos, int color, int maxlib, int *libs)
 {
-  int k;
-  int liberties = 0;
+  int liberties;
+
+#ifdef USE_BOARD_CACHES
+
+  struct board_cache_entry *entry = &approxlib_cache[pos][color - 1];
 
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
 
   if (!libs) {
-    int fast_liberties = fastlib(pos, color, 1);
-    if (fast_liberties >= 0)
-      return fast_liberties;
+    /* First see if this result is cached. */
+    if (hashdata.hashval[0] == entry->position_hash.hashval[0]
+	&& maxlib <= entry->threshold) {
+      int k;
+      for (k = 1; k < NUM_HASHVALUES; k++) {
+	if (hashdata.hashval[k] != entry->position_hash.hashval[k])
+	  break;
+      }
+
+      /* If position hash values match and `maxlib' is not greater than
+       * the threshold, we already know the result.
+       */
+      if (k == NUM_HASHVALUES)
+	return entry->liberties;
+    }
+
+    liberties = fastlib(pos, color, 1);
+    if (liberties >= 0) {
+      /* Since fastlib() always returns precise result and doesn't take
+       * `maxlib' into account, we set threshold to MAXLIBS so that this
+       * result is used regardless of any `maxlib' passed.
+       */
+      entry->threshold = MAXLIBS;
+      entry->liberties = liberties;
+      entry->position_hash = hashdata;
+
+      return liberties;
+    }
   }
+
+  /* We initialize the cache entry threshold to `maxlib'. If do_appoxlib()
+   * or slow_approxlib() finds all the liberties (that is, they don't use
+   * `maxlib' value for an early return), they will set threshold to
+   * MAXLIBS themselves.
+   */
+  entry->threshold = maxlib;
+
+  if (maxlib <= MAX_LIBERTIES)
+    liberties = do_approxlib(pos, color, maxlib, libs);
+  else
+    liberties = slow_approxlib(pos, color, maxlib, libs);
+
+  entry->liberties = liberties;
+  entry->position_hash = hashdata;
+
+#else /* not USE_BOARD_CACHES */
+
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (!libs) {
+    liberties = fastlib(pos, color, 1);
+    if (liberties >= 0)
+      return liberties;
+  }
+
+  if (maxlib <= MAX_LIBERTIES)
+    liberties = do_approxlib(pos, color, maxlib, libs);
+  else
+    liberties = slow_approxlib(pos, color, maxlib, libs);
+
+#endif /* not USE_BOARD_CACHES */
+
+  return liberties;
+}
+
+
+/* Does the real work of approxlib(). */
+static int
+do_approxlib(int pos, int color, int maxlib, int *libs)
+{
+  int k;
+  int liberties = 0;
 
   /* Look for empty neighbors and the liberties of the adjacent
    * strings of the given color. The algorithm below won't work
    * correctly if any of the adjacent strings have more than
    * MAX_LIBERTIES liberties AND maxlib is larger than MAX_LIBERTIES.
-   * If this might be the case, we use a more robust fallback.
+   * therefore approxlib() calls more robust slow_approxlib() if
+   * this might be the case.
    */
-  if (maxlib > MAX_LIBERTIES)
-    return slow_approxlib(pos, color, maxlib, libs);
-  
+
   /* Start by marking pos itself so it isn't counted among its own
    * liberties.
    */
   liberty_mark++;
   MARK_LIBERTY(pos);
-    
+
   if (UNMARKED_LIBERTY(SOUTH(pos))) {
     if (libs != NULL)
       libs[liberties] = SOUTH(pos);
@@ -2390,11 +2404,10 @@ approxlib(int pos, int color, int maxlib, int *libs)
     if (libs != NULL)
       libs[liberties] = EAST(pos);
     liberties++;
-    /* Stop counting if we reach maxlib. */
-    if (liberties >= maxlib)
-      return liberties;
     /* Unneeded since we're about to leave. */
 #if 0
+    if (liberties >= maxlib)
+      return liberties;
     MARK_LIBERTY(EAST(pos));
 #endif
   }
@@ -2413,7 +2426,95 @@ approxlib(int pos, int color, int maxlib, int *libs)
     }
   }  
 
+#if USE_BOARD_CACHES
+  /* If we reach here, then we have counted _all_ the liberties, so
+   * we set threshold to MAXLIBS (the result is the same regardless
+   * of `maxlib' value).
+   */
+  if (!libs)
+    approxlib_cache[pos][color - 1].threshold = MAXLIBS;
+#endif
   return liberties;
+}
+
+
+/* Find the liberties a move of the given color at pos would have,
+ * excluding possible captures, by traversing all adjacent friendly
+ * strings. This is a fallback used by approxlib() when a faster
+ * algorithm can't be used.
+ */
+static int
+slow_approxlib(int pos, int color, int maxlib, int *libs)
+{
+  int k;
+  int liberties = 0;
+
+  liberty_mark++;
+  MARK_LIBERTY(pos);
+  string_mark++;
+  for (k = 0; k < 4; k++) {
+    int d = delta[k];
+    if (UNMARKED_LIBERTY(pos + d)) {
+      if (libs)
+	libs[liberties] = pos + d;
+      liberties++;
+      if (liberties == maxlib)
+	return liberties;
+      MARK_LIBERTY(pos + d);
+    }
+    else if (board[pos + d] == color
+	     && UNMARKED_STRING(pos + d)) {
+      int s = string_number[pos + d];
+      int pos2;
+      pos2 = FIRST_STONE(s);
+      do {
+	int l;
+	for (l = 0; l < 4; l++) {
+	  int d2 = delta[l];
+	  if (UNMARKED_LIBERTY(pos2 + d2)) {
+	    if (libs)
+	      libs[liberties] = pos2 + d2;
+	    liberties++;
+	    if (liberties == maxlib)
+	      return liberties;
+	    MARK_LIBERTY(pos2 + d2);
+	  }
+	}
+
+	pos2 = NEXT_STONE(pos2);
+      } while (!BACK_TO_FIRST_STONE(s, pos2));
+      MARK_STRING(pos + d);
+    }
+  }
+
+#if USE_BOARD_CACHES
+  /* If we reach here, then we have counted _all_ the liberties, so
+   * we set threshold to MAXLIBS (the result is the same regardless
+   * of `maxlib' value).
+   */
+  if (!libs)
+    approxlib_cache[pos][color - 1].threshold = MAXLIBS;
+#endif
+  return liberties;
+}
+
+
+/* accuratelib() cache. */
+struct board_cache_entry accuratelib_cache[BOARDMAX][2];
+
+
+/* Clears accuratelib() cache. This function should be called only once
+ * during engine initialization. Sets thresholds to zero.
+ */
+void
+clear_accuratelib_cache(void)
+{
+  int pos;
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    accuratelib_cache[pos][0].threshold = 0;
+    accuratelib_cache[pos][1].threshold = 0;
+  }
 }
 
 
@@ -2434,24 +2535,87 @@ approxlib(int pos, int color, int maxlib, int *libs)
  * many they are, you should pass MAXLIBS as the value for maxlib and
  * allocate space for libs[] accordingly.
  */
-
 int
 accuratelib(int pos, int color, int maxlib, int *libs)
+{
+  int liberties;
+
+#ifdef USE_BOARD_CACHES
+
+  struct board_cache_entry *entry = &accuratelib_cache[pos][color - 1];
+
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (!libs) {
+    /* First see if this result is cached. */
+    if (hashdata.hashval[0] == entry->position_hash.hashval[0]
+	&& maxlib <= entry->threshold) {
+      int k;
+      for (k = 1; k < NUM_HASHVALUES; k++) {
+	if (hashdata.hashval[k] != entry->position_hash.hashval[k])
+	  break;
+      }
+
+      /* If position hash values match and `maxlib' is not greater than
+       * the threshold, we already know the result.
+       */
+      if (k == NUM_HASHVALUES)
+	return entry->liberties;
+    }
+
+    liberties = fastlib(pos, color, 0);
+    if (liberties >= 0) {
+      /* Since fastlib() always returns precise result and doesn't take
+       * `maxlib' into account, we set threshold to MAXLIBS so that this
+       * result is used regardless of any `maxlib' passed.
+       */
+      entry->threshold = MAXLIBS;
+      entry->liberties = liberties;
+      entry->position_hash = hashdata;
+
+      return liberties;
+    }
+  }
+
+  liberties = do_accuratelib(pos, color, maxlib, libs);
+
+  /* If accuratelib() found less than `maxlib' liberties, then its
+   * result is certainly independent of `maxlib' and we set threshold
+   * to MAXLIBS.
+   */
+  entry->threshold = liberties < maxlib ? MAXLIBS : maxlib;
+  entry->liberties = liberties;
+  entry->position_hash = hashdata;
+
+#else /* not USE_BOARD_CACHES */
+
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (!libs) {
+    liberties = fastlib(pos, color, 0);
+    if (liberties >= 0)
+      return liberties;
+  }
+
+  liberties = do_accuratelib(pos, color, maxlib, libs);
+
+#endif /* not USE_BOARD_CACHES */
+
+  return liberties;
+}
+
+
+/* Does the real work of accuratelib(). */
+static int
+do_accuratelib(int pos, int color, int maxlib, int *libs)
 {
   int k, l;
   int liberties = 0;
   int lib;
   int captured[4];
   int captures = 0;
-
-  ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(color), pos);
-
-  if (!libs) {
-    int fast_liberties = fastlib(pos, color, 0);
-    if (fast_liberties >= 0)
-      return fast_liberties;
-  }
 
   string_mark++;
   liberty_mark++;
@@ -2601,76 +2765,6 @@ accuratelib(int pos, int color, int maxlib, int *libs)
   return liberties;
 }
 
-
-#if 0
-
-/* Functionally identical to accuratelib(), within the flexibility
- * allowed by maxlib. Older implementation.
- *
- * Play a stone at (pos) and count the number of liberties for the
- * resulting string. This requires (pos) to be empty.
- *
- * This function differs from approxlib() by the fact that it removes
- * captured stones before counting the liberties.
- */
-
-int
-accurate_approxlib(int pos, int color, int maxlib, int *libs)
-{
-  int fast_liberties = -1;
-  int liberties = 0;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
-
-  ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(color), pos);
-
-  if (!libs) {
-    fast_liberties = fastlib(pos, color, 0);
-    if (fast_liberties >= 0) {
-      /* uncomment to confirm equivalence with accuratelib */
-      if (0) {
-	int dlibs[MAXLIBS];
-	int accuratelib_result = accuratelib(pos, color, maxlib, dlibs);
-
-	ASSERT1(gg_min(maxlib, fast_liberties)
-		== gg_min(maxlib, accuratelib_result), pos);
-      }
-      return fast_liberties;
-    } 
-  }
-
-  sgf_dumptree = 0;
-  /* Use tryko() since we don't care whether the move would violate
-   * the ko rule.
-   */
-  if (tryko(pos, color, "accurate approxlib", EMPTY, 0)) {
-    if (libs != NULL)
-      liberties = findlib(pos, maxlib, libs);
-    else
-      liberties = countlib(pos);
-    popgo();
-  }
-
-  if (fast_liberties >= 0 && liberties > 0) {
-    ASSERT1(fast_liberties == liberties, pos);
-  }
-
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
-
-  /* uncomment to confirm equivalence with accuratelib */
-  if (0) {
-    int dlibs[MAXLIBS];
-    int accuratelib_result = accuratelib(pos, color, maxlib, dlibs);
-
-    ASSERT1(gg_min(maxlib, liberties)
-	    == gg_min(maxlib, accuratelib_result), pos);
-  }
-  return liberties;
-}
-
-#endif
 
 /* Find the number of common liberties of the two strings at str1 and str2.
  */
@@ -3145,42 +3239,6 @@ is_self_atari(int pos, int color)
   return accuratelib(pos, color, 2, NULL) <= 1;
 }
 
-
-/* Alternative implementation.
- * Note that incremental_sloppy_self_atari() is already integrated
- * into the newer implementation above.
- */
-
-#if 0
-
-int
-is_self_atari(int pos, int color)
-{
-  int liberties;
-  int result;
-  
-  ASSERT_ON_BOARD1(pos);
-  ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(color), pos);
-
-  /* 1. Try first without really putting the stone on the board. */
-  /* FIXME: Integrate incremental_sloppy_self_atari() here. */
-  result = incremental_sloppy_self_atari(pos, color);
-  if (result != -1)
-    return result;
-
-  /* 2. It was not so easy.  Now see if we can put the stone on the board.
-   *    If we can't, this is a self atari.
-   */
-  if (!do_trymove(pos, color, 1))
-    return 1;
-  liberties = string[string_number[pos]].liberties;
-  silent_popgo();
-  
-  return liberties <= 1;
-}
-
-#endif
 
 /*
  * Returns true if pos is a liberty of the string at str.
@@ -4388,59 +4446,6 @@ do_play_move(int pos, int color)
     board_ko_pos = string[s].libs[0];
     hashdata_invert_ko(&hashdata, board_ko_pos);
   }
-}
-
-
-/* Find the liberties a move of the given color at pos would have,
- * excluding possible captures, by traversing all adjacent friendly
- * strings. This is a fallback used by approxlib() when a
- * faster algorithm can't be used.
- */
-
-static int
-slow_approxlib(int pos, int color, int maxlib, int *libs)
-{
-  int liberties = 0;
-  int k;
-
-  liberty_mark++;
-  MARK_LIBERTY(pos);
-  string_mark++;
-  for (k = 0; k < 4; k++) {
-    int d = delta[k];
-    if (UNMARKED_LIBERTY(pos + d)) {
-      if (libs)
-	libs[liberties] = pos + d;
-      liberties++;
-      if (liberties == maxlib)
-	return liberties;
-      MARK_LIBERTY(pos + d);
-    }
-    else if (board[pos + d] == color
-	     && UNMARKED_STRING(pos + d)) {
-      int s = string_number[pos + d];
-      int pos2;
-      pos2 = FIRST_STONE(s);
-      do {
-	int l;
-	for (l = 0; l < 4; l++) {
-	  int d2 = delta[l];
-	  if (UNMARKED_LIBERTY(pos2 + d2)) {
-	    if (libs)
-	      libs[liberties] = pos2 + d2;
-	    liberties++;
-	    if (liberties == maxlib)
-	      return liberties;
-	    MARK_LIBERTY(pos2 + d2);
-	  }
-	}
-	
-	pos2 = NEXT_STONE(pos2);
-      } while (!BACK_TO_FIRST_STONE(s, pos2));
-      MARK_STRING(pos + d);
-    }
-  }
-  return liberties;
 }
 
 

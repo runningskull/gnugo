@@ -202,6 +202,10 @@ void incremental_order_moves(int move, int color, int string,
 			     int *captured_stones, int *threatened_stones,
 			     int *saved_stones, int *number_open);
 
+/* Board caches initialization functions. */
+void clear_approxlib_cache(void);
+void clear_accuratelib_cache(void);
+
 
 void transformation_init(void);
 

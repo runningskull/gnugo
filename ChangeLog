@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- added cache for results of approxlib() and accuratelib()
+- new static functions do_approxlib() and do_accuratelib() in board.c
 - finish_sgftrace() will not free the trace tree if not written successfully
 - remove tabs from twogtp.py
 - twogtp.py checks that board is not empty before indexing it

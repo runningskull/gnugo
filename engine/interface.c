@@ -48,6 +48,9 @@ init_gnugo(float memory, unsigned int seed)
 #if EXPERIMENTAL_READING
   tree_match_init();
 #endif
+
+  clear_approxlib_cache();
+  clear_accuratelib_cache();
 }
 
 
