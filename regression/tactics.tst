@@ -33,7 +33,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 32
 trymove black D12
 trymove white C13
 trymove white C12
-trymove white C11
+trymove black C11
 101 attack_either C11 D12
 #? [1 D12]
 popgo
