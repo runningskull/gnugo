@@ -188,7 +188,7 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
        * 2. Not occupied.
        * 3. Directed outwards. For the origin all directions are outwards.
        */
-      if (ON_BOARD(i+di, j+dj)
+      if (ON_BOARD2(i+di, j+dj)
 	  && q->p[i+di][j+dj] == EMPTY
 	  && (di*(i-m) + dj*(j-n) > 0
 	      || queue_start == 1)) {
@@ -350,9 +350,9 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       q->black_permeability[i][j] = 1.0;
       q->white_strength[i][j] = 0.0;
       q->black_strength[i][j] = 0.0;
-      q->p[i][j] = p[i][j];
+      q->p[i][j] = BOARD(i, j);
       
-      if (p[i][j] != EMPTY) {
+      if (BOARD(i, j) != EMPTY) {
 	if (worm[i][j].attack_code == WIN
 	    && (OTHER_COLOR(q->p[i][j]) == color
 		|| worm[i][j].defend_code == 0)) {
@@ -372,8 +372,8 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 	}
 	
 	/* Stop influence radiation through saved stones. */
-	if (saved_stones && saved_stones[i][j] && p[i][j] != color) {
-	  if (p[i][j] == WHITE)
+	if (saved_stones && saved_stones[i][j] && BOARD(i, j) != color) {
+	  if (BOARD(i, j) == WHITE)
 	    q->black_permeability[i][j] = 0.0;
 	  else
 	    q->white_permeability[i][j] = 0.0;
@@ -383,7 +383,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       /* When evaluating influence after a move, the newly placed
        * stone will have the invalid dragon id -1.
        */
-      if (p[i][j] != EMPTY) {
+      if (BOARD(i, j) != EMPTY) {
 	if (!dragons_known || dragon[i][j].id == -1) {
 	  if (q->p[i][j] == WHITE)
 	    q->white_strength[i][j] = DEFAULT_STRENGTH;
@@ -402,8 +402,8 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 	/* Stop influence radiation from captured stones.
 	 * (Yes, saved_stones now also includes captured stones.)
 	 */
-	if (saved_stones && saved_stones[i][j] && p[i][j] == color) {
-	  if (p[i][j] == WHITE)
+	if (saved_stones && saved_stones[i][j] && BOARD(i, j) == color) {
+	  if (BOARD(i, j) == WHITE)
 	    q->white_strength[i][j] = 0.0;
 	  else
 	    q->black_strength[i][j] = 0.0;
@@ -665,15 +665,15 @@ find_influence_patterns(struct influence_data *q, int color)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (p[m][n] != EMPTY) {
+      if (BOARD(m, n) != EMPTY) {
 	int k;
 	for (k = 0; k < 8; k++) {
 	  int dm = deltai[k];
 	  int dn = deltaj[k];
-	  if (ON_BOARD(m+dm, n+dn) && q->p[m+dm][n+dn] == EMPTY) {
+	  if (ON_BOARD2(m+dm, n+dn) && q->p[m+dm][n+dn] == EMPTY) {
 	    /* Reduce less diagonally. */
 	    float reduction = (k < 4) ? 0.25 : 0.5;
-	    if (p[m][n] == BLACK)
+	    if (BOARD(m, n) == BLACK)
 	      q->white_permeability[m+dm][n+dn] *= reduction;
 	    else
 	      q->black_permeability[m+dm][n+dn] *= reduction;
@@ -907,7 +907,7 @@ segment_region(struct influence_data *q, owner_function_ptr region_owner,
 	  for (k = 0; k < 4; k++) {
 	    int di = deltai[k];
 	    int dj = deltaj[k];
-	    if (ON_BOARD(i+di, j+dj)
+	    if (ON_BOARD2(i+di, j+dj)
 		&& q->w[i+di][j+dj] == UNMARKED
 		&& region_owner(q, i+di, j+dj) == color) {
 	      q->queuei[queue_end] = i+di;
@@ -1021,7 +1021,7 @@ compute_move_influence(int m, int n, int color,
       && influence_color == color)
     return;
 
-  if (tryko(m, n, color, "compute_move_influence", EMPTY, -1, -1)) {
+  if (tryko2(m, n, color, "compute_move_influence", EMPTY, -1, -1)) {
     increase_depth_values();
     compute_influence(&move_influence, OTHER_COLOR(color), m, n, 1,
 		      NULL, saved_stones);
@@ -1298,7 +1298,7 @@ influence_estimate_score(float moyo_coeff, float area_coeff)
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (p[i][j] == EMPTY) {
+      if (BOARD(i, j) == EMPTY) {
 	if (whose_territory(&initial_influence, i, j) == BLACK) {
 	  if (DEBUG_INFLUENCE_SCORE)
 	    gprintf("%m black 1t\n", i, j);
@@ -1330,13 +1330,13 @@ influence_estimate_score(float moyo_coeff, float area_coeff)
 	  white_area++;
 	}
       }
-      else if (p[i][j] == BLACK
+      else if (BOARD(i, j) == BLACK
 	       && initial_influence.black_strength[i][j] == 0) {
 	if (DEBUG_INFLUENCE_SCORE)
 	  gprintf("%m white 2t\n", i, j);
 	white_territory += 2;
       }
-      else if (p[i][j] == WHITE
+      else if (BOARD(i, j) == WHITE
 	       && initial_influence.white_strength[i][j] == 0) {
 	if (DEBUG_INFLUENCE_SCORE)
 	  gprintf("%m black 2t\n", i, j);

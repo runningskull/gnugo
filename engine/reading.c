@@ -32,34 +32,32 @@
 /* Size of array where candidate moves are stored. */
 #define MAX_MOVES 50
 
-#define ADD_CANDIDATE_MOVE(ti, tj, score, movei, movej, scores, moves)\
+#define ADD_CANDIDATE_MOVE(move, score, moves, scores, num_moves)\
   do {\
     int l;\
-    for (l = 0; l < moves; l++)\
-      if (movei[l] == (ti) && movej[l] == (tj)) {\
+    for (l = 0; l < num_moves; l++)\
+      if (moves[l] == (move)) {\
         if (scores[l] < score)\
           scores[l] = score;\
 	break;\
       }\
-    if ((l == moves) && (moves < MAX_MOVES)) {\
-      movei[moves] = ti;\
-      movej[moves] = tj;\
-      scores[moves] = score;\
-      (moves)++;\
+    if ((l == num_moves) && (num_moves < MAX_MOVES)) {\
+      moves[num_moves] = move;\
+      scores[num_moves] = score;\
+      (num_moves)++;\
     }\
   } while(0) \
 
-#define REMOVE_CANDIDATE_MOVE(ti, tj, movei, movej, scores, moves)\
+#define REMOVE_CANDIDATE_MOVE(move, moves, scores, num_moves)\
   do {\
     int k, l;\
-    for (k = 0; k < moves; k++) {\
-      if (movei[k] == (ti) && movej[k] == (tj)) {\
-        for (l = k; l < moves-1; l++) {\
-	  movei[l] = movei[l+1];\
-	  movej[l] = movej[l+1];\
+    for (k = 0; k < num_moves; k++) {\
+      if (moves[k] == (move)) {\
+        for (l = k; l < num_moves-1; l++) {\
+	  moves[l] = moves[l+1];\
 	  scores[l] = scores[l+1];\
 	}\
-        (moves)--;\
+        (num_moves)--;\
 	break;\
       }\
     }\
@@ -76,103 +74,68 @@
  * set NULL in which case these values are not returned.
  */
 
-static int do_find_defense(int si, int sj, int *i, int *j, 
-			   int komaster, int kom_i, int kom_j);
-static int defend1(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j);
-static int restricted_defend1(int si, int sj, int *i, int *j, 
-			      int komaster, int kom_i, int kom_j,
-			      int forbidden_moves, 
-			      int *forbidden_movei, int *forbidden_movej);
-static int defend2(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j);
-static int defend3(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j);
-static int defend4(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j);
-static int special_rescue(int si, int sj, int ai, int aj, 
-			  int *ti, int *tj, 
-			  int komaster, int kom_i, int kom_j);
-static int special_rescue2(int si, int sj, int libi[2], int libj[2], 
-			   int *ti, int *tj, 
-			   int komaster, int kom_i, int kom_j);
-static int special_rescue3(int si, int sj, int libi[3], int libj[3],
-			   int *ti, int *tj, 
-			   int komaster, int kom_i, int kom_j);
-static int special_rescue4(int si, int sj, int libi[3], int libj[3],
-			   int *ti, int *tj, 
-			   int komaster, int kom_i, int kom_j);
-static void edge_clamp(int si, int sj,
-		       int movei[MAX_MOVES], int movej[MAX_MOVES],
-		       int scores[MAX_MOVES], int *moves);
-static int do_attack(int si, int sj, int *i, int *j, 
-		     int komaster, int kom_i, int kom_j);
-static int attack1(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j);
-static int attack2(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j);
-static int restricted_attack2(int si, int sj, int *i, int *j, 
-			      int komaster, int kom_i, int kom_j,
-			      int forbidden_moves, 
-			      int *forbidden_movei, int *forbidden_movej);
-static int attack3(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j);
-static int attack4(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j);
-static int find_cap2(int si, int sj, int ai, int aj, int bi, int bj,
-		     int *i, int *j, 
-		     int komaster, int kom_i, int kom_j);
-static int find_cap3(int si, int sj, int *i, int *j, 
-		     int komaster, int kom_i, int kom_j);
-static int special_attack2(int si, int sj, int libi[2], int libj[2], 
-			   int *ti, int *tj, 
-			   int komaster, int kom_i, int kom_j);
-static int special_attack3(int si, int sj, int libi[2], int libj[2], 
-			   int *ti, int *tj, 
-			   int komaster, int kom_i, int kom_j);
-static int special_attack4(int si, int sj, int libi[2], int libj[2],
-			   int *ti, int *tj, 
-			   int komaster, int kom_i, int kom_j);
-static int draw_back(int si, int sj, int *ti, int *tj, 
-		     int komaster, int kom_i, int kom_j);
-static int edge_closing_backfill(int si, int sj, int ai, int aj,
-				 int *ti, int *tj);
-static void edge_block(int si, int sj, int ai, int aj,
-		       int movei[MAX_MOVES], int movej[MAX_MOVES],
-		       int scores[MAX_MOVES], int *moves);
-static void propose_edge_moves(int si, int sj, int *libi, int *libj, int libs,
-			       int movei[MAX_MOVES], int movej[MAX_MOVES],
-			       int scores[MAX_MOVES], int *moves, int color);
-static void break_chain_moves(int si, int sj,
-			      int movei[MAX_MOVES], int movej[MAX_MOVES],
-			      int scores[MAX_MOVES], int *moves);
-static void break_chain2_efficient_moves(int si, int sj,
-					 int movei[MAX_MOVES],
-					 int movej[MAX_MOVES],
+static int do_find_defense(int str, int *move, int komaster, int kom_pos);
+static int defend1(int str, int *move, int komaster, int kom_pos);
+static int restricted_defend1(int str, int *move, int komaster, int kom_pos,
+			      int num_forbidden_moves, int *forbidden_moves);
+static int defend2(int str, int *move, int komaster, int kom_pos);
+static int defend3(int str, int *move, int komaster, int kom_pos);
+static int defend4(int str, int *move, int komaster, int kom_pos);
+static int special_rescue(int str, int lib, int *move, 
+			  int komaster, int kom_pos);
+static int special_rescue2(int str, int libs[2], int *move, 
+			   int komaster, int kom_pos);
+static int special_rescue3(int str, int libs[3], int *move, 
+			   int komaster, int kom_pos);
+static int special_rescue4(int str, int libs[3], int *move, 
+			   int komaster, int kom_pos);
+static void edge_clamp(int str, int moves[MAX_MOVES],
+		       int scores[MAX_MOVES], int *num_moves);
+static int do_attack(int str, int *move, int komaster, int kom_pos);
+static int attack1(int str, int *move, int komaster, int kom_pos);
+static int attack2(int str, int *move, int komaster, int kom_pos);
+static int restricted_attack2(int str, int *move, int komaster, int kom_pos,
+			      int num_forbidden_moves, int *forbidden_moves);
+static int attack3(int str, int *move, int komaster, int kom_pos);
+static int attack4(int str, int *move, int komaster, int kom_pos);
+static int find_cap2(int str, int alib, int blib, int *move,
+		     int komaster, int kom_pos);
+static int find_cap3(int str, int *move, int komaster, int kom_pos);
+static int special_attack2(int str, int libs[2], int *move,
+			   int komaster, int kom_pos);
+static int special_attack3(int str, int libs[2], int *move,
+			   int komaster, int kom_pos);
+static int special_attack4(int str, int libs[2], int *move,
+			   int komaster, int kom_pos);
+static int draw_back(int str, int *move, int komaster, int kom_pos);
+static int edge_closing_backfill(int str, int apos, int *move);
+static void edge_block(int str, int apos, int moves[MAX_MOVES],
+		       int scores[MAX_MOVES], int *num_moves);
+static void propose_edge_moves(int str, int *libs, int liberties,
+			       int moves[MAX_MOVES], int scores[MAX_MOVES],
+			       int *num_moves, int color);
+static void break_chain_moves(int str, int moves[MAX_MOVES],
+			      int scores[MAX_MOVES], int *num_moves);
+static void break_chain2_efficient_moves(int str, int moves[MAX_MOVES],
 					 int scores[MAX_MOVES],
-					 int *moves);
-static void break_chain2_moves(int si, int sj,
-			       int movei[MAX_MOVES], int movej[MAX_MOVES],
-			       int scores[MAX_MOVES], int *moves,
+					 int *num_moves);
+static void break_chain2_moves(int str, int moves[MAX_MOVES],
+			       int scores[MAX_MOVES], int *num_moves,
 			       int require_safe);
-static int break_chain2(int si, int sj, int *i, int *j, 
-			int komaster, int kom_i, int kom_j);
-static int break_chain3(int si, int sj, int *i, int *j, 
-			int komaster, int kom_i, int kom_j);
-static int superstring_breakchain(int si, int sj, int *i, int *j,
-				  int komaster, int kom_i, int kom_j,
+static int break_chain2(int str, int *move, int komaster, int kom_pos);
+static int break_chain3(int str, int *move, int komaster, int kom_pos);
+static int superstring_breakchain(int str, int *move,
+				  int komaster, int kom_pos,
 				  int liberty_cap);
-static void double_atari_chain2(int si, int sj,
-				int movei[MAX_MOVES], int movej[MAX_MOVES],
-				int scores[MAX_MOVES], int *moves);
-static void order_moves(int si, int sj, int num_moves, int *movei, int *movej,
+static void double_atari_chain2(int str, int moves[MAX_MOVES],
+				int scores[MAX_MOVES], int *num_moves);
+static void order_moves(int str, int num_moves, int *moves,
 			int *scores, int color, const char *funcname);
-static int naive_ladder(int si, int sj, int *i, int *j);
-static int naive_ladder_defense(int si, int sj, int ai, int aj,
-				int bi, int bj, int color, int other);
-static int naive_ladder_break_through(int si, int sj, int ai, int aj,
-				      int color, int other);
-static int in_list(int m, int n, int moves, int *movei, int *movej);
+static int naive_ladder(int str, int *move);
+static int naive_ladder_defense(int str, int apos, int bpos,
+				int color, int other);
+static int naive_ladder_break_through(int str, int apos, int color, int other);
+static int in_list(int move, int num_moves, int *moves);
 
 
 /* Persistent reading cache to reuse read results between moves and
@@ -183,17 +146,16 @@ static int in_list(int m, int n, int moves, int *movei, int *movej);
 #define MAX_CACHE_DEPTH 5
 
 struct reading_cache {
-  char board[MAX_BOARD][MAX_BOARD];
+  char board[BOARDMAX];
   int movenum;
   int nodes;
   int score;
   int remaining_depth;
   int routine; /* ATTACK or FIND_DEFENSE */
-  int si, sj;  /* contested string (origin) */
+  int str;  /* contested string (origin) */
   int result;
-  int i, j;    /* attack/defense point */
-  int stacki[MAX_CACHE_DEPTH];
-  int stackj[MAX_CACHE_DEPTH];
+  int move;    /* attack/defense point */
+  int stack[MAX_CACHE_DEPTH];
   int move_color[MAX_CACHE_DEPTH];
 };
 
@@ -201,13 +163,12 @@ struct reading_cache {
 static struct reading_cache persistent_reading_cache[MAX_READING_CACHE_SIZE];
 static int persistent_reading_cache_size = 0;
 
-static void draw_active_area(char board[MAX_BOARD][MAX_BOARD]);
-static int verify_stored_board(char board[MAX_BOARD][MAX_BOARD]);
-static int search_persistent_reading_cache(int routine, int si, int sj,
-					   int *result, int *i, int *j);
-static void store_persistent_reading_cache(int routine, int si, int sj,
-					   int result, int i, int j,
-					   int nodes);
+static void draw_active_area(char p[BOARDMAX]);
+static int verify_stored_board(char p[BOARDMAX]);
+static int search_persistent_reading_cache(int routine, int str,
+					   int *result, int *move);
+static void store_persistent_reading_cache(int routine, int str,
+					   int result, int move, int nodes);
 static void print_persistent_reading_cache_entry(int k);
 static void mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
 				       int m, int n, float contribution);
@@ -256,46 +217,49 @@ attack(int si, int sj, int *i, int *j)
   int nodes_when_called = reading_node_counter;
   int result;
   int nodes;
-  int oi, oj;
-  int temp_i, temp_j;
+  int origin;
+  int str = POS(si, sj);
+  int move;
 
   /* Don't even spend time looking in the cache if there are more than
    * four liberties.
    */
-  if (countlib(si, sj) > 4)
+  if (countlib(str) > 4)
     return 0;
 
-  find_origin(si, sj, &oi, &oj);
-  if (search_persistent_reading_cache(ATTACK, oi, oj, &result, i, j))
+  origin = find_origin(str);
+  if (search_persistent_reading_cache(ATTACK, origin, &result, &move)) {
+    if (i) *i = I(move);
+    if (j) *j = J(move);
     return result;
+  }
 
   memset(shadow, 0, sizeof(shadow));
-  result = do_attack(si, sj, &temp_i, &temp_j, EMPTY, -1, -1);
+  result = do_attack(str, &move, EMPTY, 0);
   nodes = reading_node_counter - nodes_when_called;
 
   if (debug & DEBUG_READING_PERFORMANCE) {
     if (reading_node_counter - nodes_when_called >= MIN_NODES_TO_REPORT) {
       if (result != 0)
-	gprintf("%oattack %m(%m) = %d %M, %d nodes ", si, sj, oi, oj, result,
-		temp_i, temp_j, nodes);
+	gprintf("%oattack %1m(%1m) = %d %1M, %d nodes ", str, origin, result,
+		move, nodes);
       else
-	gprintf("%oattack %m(%m) = %d, %d nodes ", si, sj, oi, oj, result,
+	gprintf("%oattack %1m(%1m) = %d, %d nodes ", str, origin, result,
 		nodes);
       dump_stack();
     }
   }
 
-  store_persistent_reading_cache(ATTACK, oi, oj, result,
-				 temp_i, temp_j, nodes);
+  store_persistent_reading_cache(ATTACK, origin, result, move, nodes);
   
-  if (i) *i = temp_i;
-  if (j) *j = temp_j;
+  if (i) *i = I(move);
+  if (j) *j = J(move);
   return result;
 }
 
 
-/* find_defense(m, n, *i, *j) attempts to find a move that will save
- * the string at (m,n). It returns WIN if such a move is found, with
+/* find_defense(si, sj, *i, *j) attempts to find a move that will save
+ * the string at (si, sj). It returns WIN if such a move is found, with
  * (*i, *j) the location of the saving move, unless (*i, *j) are
  * null pointers. It is not checked that tenuki defends, so this may 
  * give an erroneous answer if !attack(m,n).
@@ -312,43 +276,46 @@ find_defense(int si, int sj, int *i, int *j)
   int nodes_when_called = reading_node_counter;
   int result;
   int nodes;
-  int oi, oj;
-  int temp_i, temp_j;
+  int origin;
+  int move;
+  int str = POS(si, sj);
 
   /* Don't even spend time looking in the cache if there are more than
    * four liberties.
    */
-  if (countlib(si, sj) > 4) {
+  if (countlib(str) > 4) {
     if (i) *i = -1;
     if (j) *j = -1;
     return WIN;
   }
 
-  find_origin(si, sj, &oi, &oj);
-  if (search_persistent_reading_cache(FIND_DEFENSE, oi, oj, &result, i, j))
+  origin = find_origin(str);
+  if (search_persistent_reading_cache(FIND_DEFENSE, origin, &result, &move)) {
+    if (i) *i = I(move);
+    if (j) *j = J(move);
     return result;
+  }
 
   memset(shadow, 0, sizeof(shadow));
-  result = do_find_defense(si, sj, &temp_i, &temp_j, EMPTY, -1, -1);
+  result = do_find_defense(str, &move, EMPTY, 0);
   nodes = reading_node_counter - nodes_when_called;
 
   if (debug & DEBUG_READING_PERFORMANCE) {
     if (reading_node_counter - nodes_when_called >= MIN_NODES_TO_REPORT) {
       if (result != 0)
-	gprintf("%odefend %m(%m) = %d %M, %d nodes ", si, sj, oi, oj, result,
-		temp_i, temp_j, nodes);
+	gprintf("%odefend %1m(%1m) = %d %1M, %d nodes ", str, origin, result,
+		move, nodes);
       else
-	gprintf("%odefend %m(%m) = %d, %d nodes ", si, sj, oi, oj, result,
+	gprintf("%odefend %1m(%1m) = %d, %d nodes ", str, origin, result,
 		nodes);
       dump_stack();
     }
   }
 
-  store_persistent_reading_cache(FIND_DEFENSE, oi, oj, result,
-				 temp_i, temp_j, nodes);
+  store_persistent_reading_cache(FIND_DEFENSE, origin, result, move, nodes);
   
-  if (i) *i = temp_i;
-  if (j) *j = temp_j;
+  if (i) *i = I(move);
+  if (j) *j = J(move);
   return result;
 }
 
@@ -367,9 +334,10 @@ find_defense(int si, int sj, int *i, int *j)
  * may occasionally give this result, due to irregularities introduced
  * by the persistent reading cache.
  */
-int attack_and_defend(int si, int sj,
-		      int *attack_code, int *attacki, int *attackj,
-		      int *defend_code, int *defendi, int *defendj)
+int
+attack_and_defend(int si, int sj,
+		  int *attack_code, int *attacki, int *attackj,
+		  int *defend_code, int *defendi, int *defendj)
 {
   int acode = 0;
   int ai = -1, aj = -1;
@@ -425,14 +393,14 @@ int attack_and_defend(int si, int sj,
 int
 attack_either(int ai, int aj, int bi, int bj)
 {
-  int color = p[ai][aj];
-  ASSERT(color != EMPTY , ai, aj);
-  ASSERT(color == p[bi][bj], bi, bj);
+  int color = BOARD(ai, aj);
+  ASSERT2(color != EMPTY , ai, aj);
+  ASSERT2(color == BOARD(bi, bj), bi, bj);
 
   /* Start by attacking the string with the fewest liberties. On
    * average this seems to be slightly more efficient.
    */
-  if (countlib(ai, aj) <= countlib(bi, bj))
+  if (countlib2(ai, aj) <= countlib2(bi, bj))
     return attack(ai, aj, NULL, NULL) || attack(bi, bj, NULL, NULL);
   else
     return attack(bi, bj, NULL, NULL) || attack(ai, aj, NULL, NULL);
@@ -459,9 +427,9 @@ defend_both(int ai, int aj, int bi, int bj)
   int acode = 0;
   int dcode = 0;
   
-  int color = p[ai][aj];
-  ASSERT(color != EMPTY , ai, aj);
-  ASSERT(color == p[bi][bj], bi, bj);
+  int color = BOARD(ai, aj);
+  ASSERT2(color != EMPTY , ai, aj);
+  ASSERT2(color == BOARD(bi, bj), bi, bj);
 
   attack_and_defend(ai, aj, &acode, NULL, NULL, &dcode, &ci, &cj);
   if (acode != 0) {
@@ -500,16 +468,16 @@ defend_both(int ai, int aj, int bi, int bj)
    * somewhat pessimistic estimation.
    */
 
-  if (trymove(ci, cj, color, "defend_both-A", ai, aj, EMPTY, -1, -1)) {
-    if (p[bi][bj] && !attack(bi, bj, NULL, NULL)) {
+  if (trymove2(ci, cj, color, "defend_both-A", ai, aj, EMPTY, -1, -1)) {
+    if (BOARD(bi, bj) && !attack(bi, bj, NULL, NULL)) {
       popgo();
       return WIN;
     }
     popgo();
   }
   
-  if (trymove(di, dj, color, "defend_both-B", bi, bj, EMPTY, -1, -1)) {
-    if (p[ai][aj] && !attack(ai, aj, NULL, NULL)) {
+  if (trymove2(di, dj, color, "defend_both-B", bi, bj, EMPTY, -1, -1)) {
+    if (BOARD(ai, aj) && !attack(ai, aj, NULL, NULL)) {
       popgo();
       return WIN;
     }
@@ -518,37 +486,35 @@ defend_both(int ai, int aj, int bi, int bj)
 
   /* The next improvement is to try to attack a common adjacent string. */
   {
-    int adj1i[MAXCHAIN];
-    int adj1j[MAXCHAIN];
+    int adjs1[MAXCHAIN];
     int neighbors1;
-    int adj2i[MAXCHAIN];
-    int adj2j[MAXCHAIN];
+    int adjs2[MAXCHAIN];
     int neighbors2;
     int r;
     int s;
     int ei, ej;
     int fi, fj;
     
-    neighbors1 = chainlinks(ai, aj, adj1i, adj1j);
-    neighbors2 = chainlinks(bi, bj, adj2i, adj2j);
+    neighbors1 = chainlinks(POS(ai, aj), adjs1);
+    neighbors2 = chainlinks(POS(bi, bj), adjs2);
     
     for (r = 0; r < neighbors1; r++) {
-      ei = adj1i[r];
-      ej = adj1j[r];
-      if (countlib(ei, ej) <= 4
+      ei = I(adjs1[r]);
+      ej = J(adjs1[r]);
+      if (countlib2(ei, ej) <= 4
 	  && (ei != ci || ej != cj)
 	  && (ei != di || ej != dj)) {
 	/* Is (ei, ej) also adjacent to (bi, bj)? */
 	for (s = 0; s < neighbors2; s++) {
-	  if (adj2i[s] == ei && adj2j[s] == ej)
+	  if (adjs2[s] == adjs1[r])
 	    break;
 	}
 	if (s == neighbors2)
 	  continue;   /* No, it wasn't. */
 
 	if (attack(ei, ej, &fi, &fj)) {
-	  if (trymove(fi, fj, color, "defend_both-C", ai, aj, EMPTY, -1, -1)) {
-	    if (p[ai][aj] && p[bi][bj]
+	  if (trymove2(fi, fj, color, "defend_both-C", ai, aj, EMPTY, -1, -1)) {
+	    if (BOARD(ai, aj) && BOARD(bi, bj)
 		&& !attack(ai, aj, NULL, NULL) 
 		&& !attack(bi, bj, NULL, NULL)) {
 	      popgo();
@@ -595,21 +561,21 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
 int
 break_through(int ai, int aj, int bi, int bj, int ci, int cj)
 {
+  int color = BOARD(ai, aj);
+  int other = OTHER_COLOR(color);
+
   int di, dj;
   int ei, ej;
   int Fi, Fj;
   int gi, gj;
   
-  int color = p[ai][aj];
-  int other = OTHER_COLOR(color);
-
   int success = 0;
   int success2 = 0;
   
   /* Basic sanity checking. */
-  ASSERT(color != EMPTY , ai, aj);
-  ASSERT(color == p[bi][bj], bi, bj);
-  ASSERT(color == p[ci][cj], ci, cj);
+  ASSERT2(color != EMPTY , ai, aj);
+  ASSERT2(color == BOARD(bi, bj), bi, bj);
+  ASSERT2(color == BOARD(ci, cj), ci, cj);
 
   /* Construct the rest of the points in the pattern. */
   Fi = (ai + ci) / 2;    /* F midpoint between a and c. */
@@ -620,16 +586,16 @@ break_through(int ai, int aj, int bi, int bj, int ci, int cj)
   ej = bj + cj - Fj;
 
   /* More sanity checking. */
-  ASSERT(p[di][dj] == EMPTY , di, dj);
-  ASSERT(p[ei][ej] == EMPTY , ei, ej);
+  ASSERT2(BOARD(di, dj) == EMPTY , di, dj);
+  ASSERT2(BOARD(ei, ej) == EMPTY , ei, ej);
 
   /* F might already have been captured. (play_break_through_n() can't
    * detect this.
    */
-  if (p[Fi][Fj] == EMPTY)
+  if (BOARD(Fi, Fj) == EMPTY)
     return 0;
   
-  ASSERT(p[Fi][Fj] == other , Fi, Fj);
+  ASSERT2(BOARD(Fi, Fj) == other , Fi, Fj);
 
   /* First X tries to play at d. */
   success = break_through_helper(ai, aj, bi, bj, ci, cj,
@@ -655,26 +621,26 @@ break_through(int ai, int aj, int bi, int bj, int ci, int cj)
    */
   success2 = 0;
   if (attack_and_defend(Fi, Fj, NULL, NULL, NULL, NULL, &gi, &gj)) {
-    if (trymove(gi, gj, other, "break_through-A", Fi, Fj, EMPTY, -1, -1)) {
+    if (trymove2(gi, gj, other, "break_through-A", Fi, Fj, EMPTY, -1, -1)) {
       /* Now we let O defend his position by playing either d or e.
        * FIXME: There may be other plausible moves too.
        */
-      if (trymove(di, dj, color, "break_through-B", Fi, Fj, EMPTY, -1, -1)) {
+      if (trymove2(di, dj, color, "break_through-B", Fi, Fj, EMPTY, -1, -1)) {
 	/* O connects at d, so X cuts at e. */
-	if (safe_move(ei, ej, other)) {
+	if (safe_move2(ei, ej, other)) {
 	  success2 = CUT;
-	  if (!p[ci][cj] || attack(ci, cj, NULL, NULL))
+	  if (!BOARD(ci, cj) || attack(ci, cj, NULL, NULL))
 	    success2 = WIN;
 	}
 	popgo();
       }
 
-      if (success2 > 0 && trymove(ei, ej, color, "break_through-C", Fi, Fj,
+      if (success2 > 0 && trymove2(ei, ej, color, "break_through-C", Fi, Fj,
 				  EMPTY, -1, -1)) {
 	/* O connects at e, so X cuts at d. */
-	if (safe_move(di, dj, other)) {
+	if (safe_move2(di, dj, other)) {
 	  /* success2 is already WIN or CUT. */
-	  if (p[ai][aj] && !attack(ai, aj, NULL, NULL))
+	  if (BOARD(ai, aj) && !attack(ai, aj, NULL, NULL))
 	    success2 = CUT;
 	}
 	else
@@ -703,7 +669,7 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
   int success = 0;
   int gi, gj;
 
-  if (trymove(di, dj, other, "break_through_helper-A", Fi, Fj, 
+  if (trymove2(di, dj, other, "break_through_helper-A", Fi, Fj, 
 	      EMPTY, -1, -1)) {
     /* If F can be attacked we can't start in this way. */
     if (!attack(Fi, Fj, NULL, NULL)) {
@@ -711,7 +677,7 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
       if (!attack(di, dj, &gi, &gj)) {
 	success = CUT;
 	/* So now we can try to capture something. */
-	if (!p[ai][aj] || !p[bi][bj] || !defend_both(ai, aj, bi, bj))
+	if (!BOARD(ai, aj) || !BOARD(bi, bj) || !defend_both(ai, aj, bi, bj))
 	  success = WIN;
 	else {
 	  /* Both a and b could be defended, or didn't need to be.
@@ -720,7 +686,7 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
 	  int attack_on_b = 0;
 	  int attack_on_a = 0;
 
-	  if (trymove(ei, ej, color, "break_through_helper-B", Fi, Fj,
+	  if (trymove2(ei, ej, color, "break_through_helper-B", Fi, Fj,
 		      EMPTY, -1, -1)) {
 	    if (attack(bi, bj, NULL, NULL))
 	      attack_on_b = 1;
@@ -736,14 +702,16 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
 	    if (((attack_on_a && find_defense(ai, aj, &hi, &hj))
 		|| (attack_on_b && find_defense(bi, bj, &hi, &hj)))
 		&& hi != -1
-		&& trymove(hi, hj, color, "break_through_helper-C", Fi, Fj,
+		&& trymove2(hi, hj, color, "break_through_helper-C", Fi, Fj,
 			   EMPTY, -1, -1)) {
 	      /* Now we make a second cut at e, trying to capture
 	       * either b or c.
 	       */
-	      if (trymove(ei, ej, other, "break_through_helper-D", Fi, Fj,
+	      if (trymove2(ei, ej, other, "break_through_helper-D", Fi, Fj,
 			  EMPTY, -1, -1)) {
-		if (!p[bi][bj] || !p[ci][cj] || !defend_both(bi, bj, ci, cj))
+		if (!BOARD(bi, bj) 
+		    || !BOARD(ci, cj) 
+		    || !defend_both(bi, bj, ci, cj))
 		  success = WIN;
 		popgo();
 	      }
@@ -761,9 +729,9 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
        * O at e is sufficient to capture d.
        */
       else {
-	if (trymove(ei, ej, color, "break_through_helper-E", Fi, Fj,
+	if (trymove2(ei, ej, color, "break_through_helper-E", Fi, Fj,
 		    EMPTY, -1, -1)) {
-	  if (!p[di][dj] || !find_defense(di, dj, NULL, NULL)) {
+	  if (!BOARD(di, dj) || !find_defense(di, dj, NULL, NULL)) {
 	    popgo();
 	    popgo();
 	    return 0;
@@ -776,13 +744,15 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
 	  return 0;
 	}
 
-	if (trymove(gi, gj, color, "break_through_helper-F", Fi, Fj,
+	if (trymove2(gi, gj, color, "break_through_helper-F", Fi, Fj,
 		    EMPTY, -1, -1)) {
-	  if (trymove(ei, ej, other, "break_through_helper-G", Fi, Fj,
+	  if (trymove2(ei, ej, other, "break_through_helper-G", Fi, Fj,
 		      EMPTY, -1, -1)) {
 	    if (!attack(ei, ej, NULL, NULL)) {
 	      success = CUT;
-	      if (!p[bi][bj] || !p[ci][cj] || !defend_both(bi, bj, ci, cj))
+	      if (!BOARD(bi, bj) 
+		  || !BOARD(ci, cj) 
+		  || !defend_both(bi, bj, ci, cj))
 		success = WIN;
 	    }
 	    popgo();
@@ -851,7 +821,7 @@ atari_atari(int color, int *i, int *j, int save_verbose)
   memset(forbidden, 0, sizeof(forbidden));
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n] == other) {
+      if (BOARD(m, n) == other) {
 	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
@@ -873,7 +843,7 @@ atari_atari(int color, int *i, int *j, int save_verbose)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
-      if (p[m][n] == other
+      if (BOARD(m, n) == other
 	  && worm[m][n].origini == m
 	  && worm[m][n].originj == n
 	  && worm[m][n].liberties == 2
@@ -891,7 +861,7 @@ atari_atari(int color, int *i, int *j, int save_verbose)
     gprintf("aa_status: (ALIVE worms not listed)\n");
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (p[m][n] == other && is_worm_origin(m, n, m, n)) {
+	if (BOARD(m, n) == other && is_worm_origin(m, n, m, n)) {
 	  const char *status = "UNKNOWN (shouldn't happen)";
 	  if (aa_status[m][n] == DEAD)
 	    status = "DEAD";
@@ -950,18 +920,17 @@ atari_atari(int color, int *i, int *j, int save_verbose)
 static int
 get_aa_status(int m, int n)
 {
-  int stonei[MAX_BOARD * MAX_BOARD];
-  int stonej[MAX_BOARD * MAX_BOARD];
-  int stones;
+  int stones[MAX_BOARD * MAX_BOARD];
+  int num_stones;
   int k;
 
   if (aa_status[m][n] != UNKNOWN)
     return aa_status[m][n];
 
-  stones = findstones(m, n, MAX_BOARD * MAX_BOARD, stonei, stonej);
-  for (k = 0; k < stones; k++)
-    if (aa_status[stonei[k]][stonej[k]] != UNKNOWN)
-      return aa_status[stonei[k]][stonej[k]];
+  num_stones = findstones(POS(m, n), MAX_BOARD * MAX_BOARD, stones);
+  for (k = 0; k < num_stones; k++)
+    if (aa_status[I(stones[k])][J(stones[k])] != UNKNOWN)
+      return aa_status[I(stones[k])][J(stones[k])];
 
   return UNKNOWN;
 }
@@ -1009,21 +978,19 @@ do_atari_atari(int color, int *attacki, int *attackj,
   if (ci != -1)
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	int om, on;
 	int ai, aj;
 
-	if (p[m][n] != other)
+	if (BOARD(m, n) != other)
 	  continue;
 
-	find_origin(m, n, &om, &on);
-	if (m != om || n != on)
+	if (POS(m, n) != find_origin(POS(m, n)))
 	  continue;
 
-	if (minsize > 0 && countstones(m, n) < minsize)
+	if (minsize > 0 && countstones2(m, n) < minsize)
 	  continue;
 
 	if (get_aa_status(m, n) != ALIVE
-	    || !neighbor_of_string(ci, cj, m, n))
+	    || !neighbor_of_string2(ci, cj, m, n))
 	  continue;
 	
 	if (debug & DEBUG_ATARI_ATARI)
@@ -1044,7 +1011,7 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	   */
 	  if (defendi) {
 	    if (!find_defense(m, n, defendi, defendj)) {
-	      if (safe_move(ai, aj, other)) {
+	      if (safe_move2(ai, aj, other)) {
 		*defendi = ai;
 		*defendj = aj;
 	      }
@@ -1057,8 +1024,8 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	  }
 
 	  DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
-		countstones(m, n), m, n);
-	  return countstones(m, n);
+		countstones2(m, n), m, n);
+	  return countstones2(m, n);
 	}
       }
 
@@ -1071,35 +1038,33 @@ do_atari_atari(int color, int *attacki, int *attackj,
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      int om, on;
-      int libi[2], libj[2];
+      int libs[2];
       int status;
 
-      if (p[m][n] != other) 
+      if (BOARD(m, n) != other) 
 	continue;
 
-      find_origin(m, n, &om, &on);
-      if (m != om || n != on)
+      if (POS(m, n) != find_origin(POS(m, n)))
 	continue;
       
-      if (minsize > 0 && countstones(m, n) < minsize)
+      if (minsize > 0 && countstones2(m, n) < minsize)
 	continue;
 
       status = get_aa_status(m, n);
       if (status != ALIVE)
 	continue;
 
-      if (findlib(m, n, 2, libi, libj) != 2)
+      if (findlib(POS(m, n), 2, libs) != 2)
 	continue;
 
       for (k = 0; k < 2; k++) {
-	int ai = libi[k];
-	int aj = libj[k];
+	int ai = I(libs[k]);
+	int aj = J(libs[k]);
 	int bi, bj;
 	if (!forbidden[ai][aj]
-	    && accurate_approxlib(ai, aj, color, 2, NULL, NULL) > 1) {
-	  if (trymove(ai, aj, color, "do_atari_atari-A", m, n,
-		      EMPTY, -1, -1)) {
+	    && accurate_approxlib(POS(ai, aj), color, 2, NULL) > 1) {
+	  if (trymove2(ai, aj, color, "do_atari_atari-A", m, n,
+		       EMPTY, -1, -1)) {
 	    /* try to defend the stone (m,n) which is in atari */
 	    int aa_val = 0;
 
@@ -1113,8 +1078,8 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	     * already been successful.
 	     */
 	    if (find_defense(m, n, &bi, &bj)
-		&& trymove(bi, bj, other, "do_atari_atari-B", m, n,
-			   EMPTY, -1, -1)) {
+		&& trymove2(bi, bj, other, "do_atari_atari-B", m, n,
+			    EMPTY, -1, -1)) {
 	      /* These moves may have been irrelevant for later
                * reading, so in order to avoid horizon problems, we
                * need to temporarily increase the depth values.
@@ -1143,18 +1108,23 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	      }
 	      
 	      DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
-		    countstones(m, n), m, n);
-	      return countstones(m, n);
+		    countstones2(m, n), m, n);
+	      return countstones2(m, n);
 	    }
 
 	    if (aa_val) {
 	      /* The atari at (ai,aj) seems to work but we still
 	       * must check there is not a better defense.
 	       */
-	      if (restricted_defend1(m, n, &ci, &cj, EMPTY, -1, -1,
-				     1, &bi, &bj)) {
-		if (trymove(ci, cj, other, "do_atari_atari-C", 
-			    m, n, EMPTY, -1, -1)) {
+	      int bpos = POS(bi, bj);
+	      int cpos;
+	      int res = restricted_defend1(POS(m, n), &cpos, EMPTY, 0, 
+					   1, &bpos);
+	      ci = I(cpos);
+	      cj = J(cpos);
+	      if (res) {
+		if (trymove2(ci, cj, other, "do_atari_atari-C", 
+			     m, n, EMPTY, -1, -1)) {
 		  increase_depth_values();
 		  increase_depth_values();
 		  if (!do_atari_atari(color, NULL, NULL, defendi, defendj,
@@ -1171,18 +1141,18 @@ do_atari_atari(int color, int *attacki, int *attackj,
 		popgo();
 		DEBUG(DEBUG_ATARI_ATARI, 
 		      "%oreturn value:%d (min %d, %d (%m))\n",
-		      gg_min(aa_val, countstones(m, n)), aa_val,
-		      countstones(m, n), m, n);
-		/* If no defense point is know and (ai,aj) is a safe
+		      gg_min(aa_val, countstones2(m, n)), aa_val,
+		      countstones2(m, n), m, n);
+		/* If no defense point is known and (ai,aj) is a safe
 		 * move for other, it probably defends the combination.
 		 */
 		if (defendi 
 		    && *defendi == -1
-		    && safe_move(ai, aj, other)) {
+		    && safe_move2(ai, aj, other)) {
 		  *defendi = ai;
 		  *defendj = aj;
 		}
-		return gg_min(aa_val, countstones(m, n));
+		return gg_min(aa_val, countstones2(m, n));
 	      }
 	    }
 	    popgo();
@@ -1227,7 +1197,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   memset(forbidden, 0, sizeof(forbidden));
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n] == color) {
+      if (BOARD(m, n) == color) {
 	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
@@ -1248,7 +1218,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
-      if (p[m][n] == color
+      if (BOARD(m, n) == color
 	  && worm[m][n].origini == m
 	  && worm[m][n].originj == n
 	  && worm[m][n].liberties == 2
@@ -1266,7 +1236,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
     gprintf("aa_status: (ALIVE worms not listed)\n");
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (p[m][n] == color && is_worm_origin(m, n, m, n)) {
+	if (BOARD(m, n) == color && is_worm_origin(m, n, m, n)) {
 	  const char *status = "UNKNOWN (shouldn't happen)";
 	  if (aa_status[m][n] == DEAD)
 	    status = "DEAD";
@@ -1282,7 +1252,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   }
   
   /* Accept illegal ko capture here. */
-  if (!tryko(ti, tj, color, NULL, EMPTY, -1, -1))
+  if (!tryko2(ti, tj, color, NULL, EMPTY, -1, -1))
     /* Really shouldn't happen. */
     abortgo(__FILE__, __LINE__, "trymove", ti, tj); 
   increase_depth_values();
@@ -1359,7 +1329,7 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
       
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n] == other) {
+      if (BOARD(m, n) == other) {
 	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
@@ -1381,7 +1351,7 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
-      if (p[m][n] == other
+      if (BOARD(m, n) == other
 	  && worm[m][n].origini == m
 	  && worm[m][n].originj == n
 	  && worm[m][n].liberties == 2
@@ -1394,8 +1364,8 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
 	      aa_status[ti][tj] = INSUBSTANTIAL;
       }
 
-  if (trymove(ai, aj, color, NULL, -1, -1, EMPTY, -1, -1)) {
-    if (trymove(bi, bj, other, NULL, -1, -1, EMPTY, -1, -1)) {
+  if (trymove2(ai, aj, color, NULL, -1, -1, EMPTY, -1, -1)) {
+    if (trymove2(bi, bj, other, NULL, -1, -1, EMPTY, -1, -1)) {
       aa_val = do_atari_atari(color, NULL, NULL, NULL, NULL,
 			      ai, aj, 0, 0);
       popgo();
@@ -1420,47 +1390,45 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
  */
 
 static int
-do_find_defense(int si, int sj, int *i, int *j, 
-		int komaster, int kom_i, int kom_j)
+do_find_defense(int str, int *move, int komaster, int kom_pos)
 {
-  int xi, xj;
+  int xpos;
   int dcode = 0;
   int liberties;
   int found_read_result;
   Read_result *read_result;
   
-  SETUP_TRACE_INFO("find_defense", si, sj);
+  SETUP_TRACE_INFO("find_defense", str);
   
-  RTRACE("Can we rescue %m?\n", si, sj);
+  RTRACE("Can we rescue %1m?\n", str);
 
   /* We first check if the number of liberties is larger than four. In
    * that case we don't cache the result and to avoid needlessly
    * storing the position in the hash table, we must do this test
    * before we look for cached results.
    */
-  liberties = countlib(si, sj);
+  liberties = countlib(str);
   
   if (liberties > 4
       || (liberties == 4 && stackp > depth)
       || (liberties == 3 && stackp > depth)) {
     /* No need to cache the result in these cases. */
-    SGFTRACE(-1, -1, WIN, "too many liberties or stackp > depth");
-    if (i) *i = -1;
-    if (j) *j = -1;
+    SGFTRACE(0, WIN, "too many liberties or stackp > depth");
+    if (move)
+      *move = 0;
     return WIN;
   }
 
   if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)) {
-    found_read_result = get_read_result(FIND_DEFENSE, komaster, kom_i, kom_j, 
-					&si, &sj, &read_result);
+    found_read_result = get_read_result(FIND_DEFENSE, komaster, kom_pos, 
+					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (i) *i = rr_get_result_i(*read_result);
-	if (j) *j = rr_get_result_j(*read_result);
-      }
+      if (rr_get_result(*read_result) != 0)
+	if (move)
+	  *move = rr_get_move(*read_result);
 
-      SGFTRACE(rr_get_result_i(*read_result), rr_get_result_j(*read_result),
+      SGFTRACE(rr_get_move(*read_result),
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
@@ -1468,30 +1436,31 @@ do_find_defense(int si, int sj, int *i, int *j,
     /* This data should always be recorded. */
     if (read_result) {
       rr_set_compressed_data(*read_result, FIND_DEFENSE, 
-			     komaster, kom_i, kom_j, si, sj, stackp);
+			     komaster, kom_pos, str, stackp);
     }
-  } else
+  }
+  else
     read_result = NULL;
 
   if (liberties == 1)
-    dcode = defend1(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    dcode = defend1(str, &xpos, komaster, kom_pos);
   else if (liberties == 2)
-    dcode = defend2(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    dcode = defend2(str, &xpos, komaster, kom_pos);
   else if (liberties == 3)
-    dcode = defend3(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    dcode = defend3(str, &xpos, komaster, kom_pos);
   else if (liberties == 4)
-    dcode = defend4(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    dcode = defend4(str, &xpos, komaster, kom_pos);
 
   if (dcode) {
-    RTRACE("saving move for %m found at %m!\n", si, sj, xi, xj);
-    READ_RETURN(read_result, i, j, xi, xj, dcode);
+    RTRACE("saving move for %1m found at %1m!\n", str, xpos);
+    READ_RETURN(read_result, move, xpos, dcode);
   }
     
   READ_RETURN0(read_result);
 }
 
 
-/* If si, sj points to a string with exactly one liberty, defend1 
+/* If str points to a string with exactly one liberty, defend1 
  * determines whether it can be saved by extending or capturing
  * a boundary chain having one liberty. The function returns WIN if the string
  * can be saved, otherwise 0. It returns KO_A or KO_B if it can be saved,
@@ -1510,100 +1479,92 @@ do_find_defense(int si, int sj, int *i, int *j,
  * */
 
 static int
-defend1(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+defend1(int str, int *move, int komaster, int kom_pos)
 {
-  int color, other;
-  int xi, xj;
-  int libi, libj;
-  int movei[MAX_MOVES], movej[MAX_MOVES];
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int xpos;
+  int lib;
+  int moves[MAX_MOVES];
   int scores[MAX_MOVES];
-  int moves = 0;
-  int savei = -1, savej = -1;
+  int num_moves = 0;
+  int savemove = 0;
   int savecode = 0;
   int liberties;
   int k;
   int found_read_result;
   Read_result *read_result;
 
-  SETUP_TRACE_INFO("defend1", si, sj);
+  SETUP_TRACE_INFO("defend1", str);
   reading_node_counter++;
   
-  gg_assert(p[si][sj] != EMPTY);
-  ASSERT(countlib(si, sj) == 1, si, sj);
-  RTRACE("try to escape atari on %m.\n",  si, sj);
-
-  color = p[si][sj];
-  other = OTHER_COLOR(color);
+  gg_assert(board[str] != EMPTY);
+  ASSERT1(countlib(str) == 1, str);
+  RTRACE("try to escape atari on %1m.\n", str);
 
   if ((stackp <= depth) && (hashflags & HASH_DEFEND1)) {
   
-    found_read_result = get_read_result(DEFEND1, komaster, kom_i, kom_j,
-					&si, &sj, &read_result);
+    found_read_result = get_read_result(DEFEND1, komaster, kom_pos,
+					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (i) *i = rr_get_result_i(*read_result);
-	if (j) *j = rr_get_result_j(*read_result);
-      }
+      if (rr_get_result(*read_result) != 0)
+	*move = rr_get_move(*read_result);
 
-      SGFTRACE(rr_get_result_i(*read_result), rr_get_result_j(*read_result),
+      SGFTRACE(rr_get_move(*read_result),
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
 
     /* This data should always be recorded. */
     if (read_result) {
-      rr_set_compressed_data(*read_result, DEFEND1, komaster, kom_i, kom_j,
-			     si, sj, stackp);
+      rr_set_compressed_data(*read_result, DEFEND1, komaster, kom_pos,
+			     str, stackp);
     }
-  } else
+  }
+  else
     read_result = NULL;
 
-  /* (libi, libj) will be the liberty of the string. */
-  liberties = findlib(si, sj, 1, &libi, &libj);
-  ASSERT(liberties == 1, si, sj);
+  /* lib will be the liberty of the string. */
+  liberties = findlib(str, 1, &lib);
+  ASSERT1(liberties == 1, str);
 
   /* Collect moves to try in the first batch.
    * 1. First order liberty.
    * 2. Chain breaking moves.
    */
-  movei[0] = libi;
-  movej[0] = libj;
+  moves[0] = lib;
   scores[0] = 0;
-  moves = 1;
+  num_moves = 1;
   
-  break_chain_moves(si, sj, movei, movej, scores, &moves);
+  break_chain_moves(str, moves, scores, &num_moves);
 
-  order_moves(si, sj, moves, movei, movej, scores, color, read_function_name);
+  order_moves(str, num_moves, moves, scores, color, read_function_name);
 
-  for (k = 0; k < moves; k++) {
-    int new_komaster, new_kom_i, new_kom_j;
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
     int ko_move;
 
-    xi = movei[k];
-    xj = movej[k];
-    if (komaster_trymove(xi, xj, color, "defend1-A", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    xpos = moves[k];
+    if (komaster_trymove(xpos, color, "defend1-A", str, komaster, kom_pos,
+			 &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       if (!ko_move) {
-	int acode = do_attack(si, sj, NULL, NULL,
-			      new_komaster, new_kom_i, new_kom_j);
+	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	popgo();
 	if (acode == 0) {
-	  SGFTRACE(xi, xj, WIN, "defense effective - A");
-	  READ_RETURN(read_result, i, j, xi, xj, WIN);
+	  SGFTRACE(xpos, WIN, "defense effective - A");
+	  READ_RETURN(read_result, move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
 	 * better.
 	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
       }
       else {
-	if (do_attack(si, sj, NULL, NULL,
-		      new_komaster, new_kom_i, new_kom_j) != WIN) {
-	  savei = xi;
-	  savej = xj;
+	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	  savemove = xpos;
 	  savecode = KO_B;
 	}
 	popgo();
@@ -1618,25 +1579,22 @@ defend1(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    *           return value is WIN and not KO_A or KO_B?
    */
   if (stackp <= backfill_depth
-      && countstones(si, sj) == 1
-      && is_ko(libi, libj, other, NULL, NULL)) {
-    int lib2i[6];
-    int lib2j[6];
-    liberties = approxlib(libi, libj, color, 6, lib2i, lib2j);
+      && countstones(str) == 1
+      && is_ko(lib, other, NULL)) {
+    int libs2[6];
+    liberties = approxlib(lib, color, 6, libs2);
     if (liberties <= 5) {
       for (k = 0; k < liberties; k++) {
-	int ai = lib2i[k];
-	int aj = lib2j[k];
-	if ((liberties == 1 || !is_self_atari(ai, aj, other))
-	    && trymove(ai, aj, color, "attack1-C", si, sj,
-		       komaster, kom_i, kom_j)) {
-	  int acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+	int apos = libs2[k];
+	if ((liberties == 1 || !is_self_atari(apos, other))
+	    && trymove(apos, color, "attack1-C", str, komaster, kom_pos)) {
+	  int acode = do_attack(str, NULL, komaster, kom_pos);
 	  if (acode == 0) {
 	    popgo();
-	    SGFTRACE(ai, aj, WIN, "backfilling");
-	    READ_RETURN(read_result, i, j, ai, aj, WIN);
+	    SGFTRACE(apos, WIN, "backfilling");
+	    READ_RETURN(read_result, move, apos, WIN);
 	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, ai, aj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, apos);
 	  popgo();
 	}
       }
@@ -1644,17 +1602,17 @@ defend1(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   }
   
   if (savecode != 0) {
-    SGFTRACE(savei, savej, savecode, "saved move");
-    READ_RETURN(read_result, i, j, savei, savej, savecode);
+    SGFTRACE(savemove, savecode, "saved move");
+    READ_RETURN(read_result, move, savemove, savecode);
   }
   
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   READ_RETURN0(read_result);
 }
 
 
 
-/* If si, sj points to a group with two liberties, defend2 determines
+/* If str points to a group with two liberties, defend2 determines
  * whether the group can be saved by extending, or by capturing part of
  * its surrounding chain. A group is considered safe if either part of
  * the surrounding chain may be captured, or if it can get 3
@@ -1662,23 +1620,22 @@ defend1(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
  * If both extensions work, it prefers the one which maximizes 
  * liberties.
  *
- * i and j return the move to save the stones. Can be NULL if caller
- * is not interested in the details.
-*/
+ * *move returns the move to save the stones.
+ */
 
 static int 
-defend2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+defend2(int str, int *move, int komaster, int kom_pos)
 {
   int color, other;
-  int xi, xj;
+  int xpos;
   int liberties;
-  int libi[2], libj[2];
+  int libs[2];
   int liberties2;
-  int lib2i[6], lib2j[6];
-  int movei[MAX_MOVES], movej[MAX_MOVES];
+  int libs2[6];
+  int moves[MAX_MOVES];
   int scores[MAX_MOVES];
-  int moves = 0;
-  int savei = -1, savej = -1;
+  int num_moves = 0;
+  int savemove = 0;
   int savecode = 0;
   int bc;
   int k;
@@ -1687,42 +1644,41 @@ defend2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   int found_read_result;
   Read_result *read_result;
 
-  SETUP_TRACE_INFO("defend2", si, sj);
+  SETUP_TRACE_INFO("defend2", str);
   reading_node_counter++;
   
-  RTRACE("trying to rescue %m\n",  si, sj);
-  color = p[si][sj];
+  RTRACE("trying to rescue %1m\n", str);
+  color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(p[si][sj] != EMPTY);
-  gg_assert(countlib(si, sj) == 2);
+  gg_assert(board[str] != EMPTY);
+  gg_assert(countlib(str) == 2);
 
   if ((stackp <= depth) && (hashflags & HASH_DEFEND2)) {
   
-    found_read_result = get_read_result(DEFEND2, komaster, kom_i, kom_j,
-					&si, &sj, &read_result);
+    found_read_result = get_read_result(DEFEND2, komaster, kom_pos,
+					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (i) *i = rr_get_result_i(*read_result);
-	if (j) *j = rr_get_result_j(*read_result);
-      }
+      if (rr_get_result(*read_result) != 0)
+	*move = rr_get_move(*read_result);
 
-      SGFTRACE(rr_get_result_i(*read_result), rr_get_result_j(*read_result),
+      SGFTRACE(rr_get_move(*read_result),
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
 
     /* This data should always be recorded. */
     if (read_result) {
-      rr_set_compressed_data(*read_result, DEFEND2, komaster, kom_i, kom_j,
-			     si, sj, stackp);
+      rr_set_compressed_data(*read_result, DEFEND2, komaster, kom_pos,
+			     str, stackp);
     }
-  } else
+  }
+  else
     read_result = NULL;
 
-  liberties = findlib(si, sj, 2, libi, libj);
-  ASSERT(liberties == 2, si, sj);
+  liberties = findlib(str, 2, libs);
+  ASSERT1(liberties == 2, str);
 
   /* Collect moves to try in the first batch.
    * 1. First order liberties.
@@ -1731,49 +1687,43 @@ defend2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    * 4. Edge clamps.
    */
   for (k = 0; k < liberties; k++) {
-    movei[k] = libi[k];
-    movej[k] = libj[k];
+    moves[k] = libs[k];
     scores[k] = 0;
   }
-  moves = liberties;
+  num_moves = liberties;
   
-  break_chain_moves(si, sj, movei, movej, scores, &moves);
-  break_chain2_efficient_moves(si, sj, movei, movej, scores, &moves);
-  propose_edge_moves(si, sj, libi, libj, liberties, movei, movej, scores,
-		     &moves, color);
-  edge_clamp(si, sj, movei, movej, scores, &moves);
+  break_chain_moves(str, moves, scores, &num_moves);
+  break_chain2_efficient_moves(str, moves, scores, &num_moves);
+  propose_edge_moves(str, libs, liberties, moves, scores, &num_moves, color);
+  edge_clamp(str, moves, scores, &num_moves);
 
-  order_moves(si, sj, moves, movei, movej, scores, color, read_function_name);
+  order_moves(str, num_moves, moves, scores, color, read_function_name);
 
-  for (k = 0; k < moves; k++) {
-    int new_komaster, new_kom_i, new_kom_j;
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
     int ko_move;
 
-    xi = movei[k];
-    xj = movej[k];
+    xpos = moves[k];
     
-    if (komaster_trymove(xi, xj, color, "defend2-A", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    if (komaster_trymove(xpos, color, "defend2-A", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       if (!ko_move) {
-	int acode = do_attack(si, sj, NULL, NULL,
-			      new_komaster, new_kom_i, new_kom_j);
+	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	popgo();
 	if (acode == 0) {
-	  SGFTRACE(xi, xj, WIN, "defense effective - A");
-	  READ_RETURN(read_result, i, j, xi, xj, WIN);
+	  SGFTRACE(xpos, WIN, "defense effective - A");
+	  READ_RETURN(read_result, move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
 	 * better.
 	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
       }
       else {
-	if (do_attack(si, sj, NULL, NULL,
-		      new_komaster, new_kom_i, new_kom_j) != WIN) {
-	  savei = xi;
-	  savej = xj;
+	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	  savemove = xpos;
 	  savecode = KO_B;
 	}
 	popgo();
@@ -1783,146 +1733,134 @@ defend2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
 
   /* Look for backfilling moves. */
   for (k = 0; k < liberties; k++) {
-    if (is_self_atari(libi[k], libj[k], other)) {
-      liberties2 = approxlib(libi[k], libj[k], color, 6, lib2i, lib2j);
+    if (is_self_atari(libs[k], other)) {
+      liberties2 = approxlib(libs[k], color, 6, libs2);
       for (r = 0; r < liberties2; r++) {
-	xi = lib2i[r];
-	xj = lib2j[r];
+	xpos = libs2[r];
 	/* Don't reconsider previously tested moves. */
-	for (s = 0; s < moves; s++)
-	  if (xi == movei[s] && xj == movej[s])
+	for (s = 0; s < num_moves; s++)
+	  if (xpos == moves[s])
 	    break;
-	if (s < moves)
+	if (s < num_moves)
 	  continue;
 
-	if (trymove(xi, xj, color, "defend2-C", si, sj,
-		    komaster, kom_i, kom_j)) {
+	if (trymove(xpos, color, "defend2-C", str, komaster, kom_pos)) {
 	  int acode;
 	  /* If the newly placed stone is in atari, we give up without
            * fight.
 	   */
-	  if (countlib(xi, xj) == 1 && countstones(xi, xj) > 1)
+	  if (countlib(xpos) == 1 && countstones(xpos) > 1)
 	    acode = WIN;
 	  else
-	    acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+	    acode = do_attack(str, NULL, komaster, kom_pos);
 
 	  popgo();
 	  if (acode == 0) {
-	    SGFTRACE(xi, xj, WIN, "backfill effective");
-	    READ_RETURN(read_result, i, j, xi, xj, WIN);
+	    SGFTRACE(xpos, WIN, "backfill effective");
+	    READ_RETURN(read_result, move, xpos, WIN);
 	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
 	}
       }
     }
-    else if (approxlib(libi[k], libj[k], other, 3, lib2i, lib2j) == 2) {
+    else if (approxlib(libs[k], other, 3, libs2) == 2) {
       for (r = 0; r < 2; r++) {
-	xi = lib2i[r];
-	xj = lib2j[r];
+	xpos = libs2[r];
 	/* Don't reconsider previously tested moves. */
-	for (s = 0; s < moves; s++)
-	  if (xi == movei[s] && xj == movej[s])
+	for (s = 0; s < num_moves; s++)
+	  if (xpos == moves[s])
 	    break;
-	if (s < moves)
+	if (s < num_moves)
 	  continue;
 
-	if (!is_self_atari(xi, xj, color)
-	    && trymove(xi, xj, color, "defend2-D", si, sj,
-		       komaster, kom_i, kom_j)) {
-	  int acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+	if (!is_self_atari(xpos, color)
+	    && trymove(xpos, color, "defend2-D", str, komaster, kom_pos)) {
+	  int acode = do_attack(str, NULL, komaster, kom_pos);
 	  popgo();
 	  if (acode == 0) {
-	    SGFTRACE(xi, xj, WIN, "backfill effective");
-	    READ_RETURN(read_result, i, j, xi, xj, WIN);
+	    SGFTRACE(xpos, WIN, "backfill effective");
+	    READ_RETURN(read_result, move, xpos, WIN);
 	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
 	}
       }      
     }
   }
 
   if (stackp <= depth) {
-    for (k = 0; k < liberties; ++k) {
-      int dcode = special_rescue(si, sj, libi[k], libj[k], &xi, &xj, 
-				 komaster, kom_i, kom_j);
+    for (k = 0; k < liberties; k++) {
+      int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos);
       if (dcode == WIN) {
-	SGFTRACE(xi, xj, WIN, "special rescue");
-	READ_RETURN(read_result, i, j, xi, xj, WIN);
+	SGFTRACE(xpos, WIN, "special rescue");
+	READ_RETURN(read_result, move, xpos, WIN);
       }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode, xi, xj);
+      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
     }
   }
   
   if (stackp <= backfill_depth) {
-    int dcode = special_rescue2(si, sj, libi, libj, &xi, &xj, 
-				komaster, kom_i, kom_j);
+    int dcode = special_rescue2(str, libs, &xpos, komaster, kom_pos);
     if (dcode == WIN) {
-      SGFTRACE(xi, xj, WIN, "special rescue2");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "special rescue2");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
   }
   
   if (level >= 10 && stackp <= superstring_depth) {
-    int dcode = superstring_breakchain(si, sj, &xi, &xj,
-				       komaster, kom_i, kom_j, 4);
+    int dcode = superstring_breakchain(str, &xpos, komaster, kom_pos, 4);
     if (dcode == WIN) {
-      SGFTRACE(xi, xj, WIN, "superstring_breakchain");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "superstring_breakchain");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
   }
 
   /* If nothing else works, we try playing a liberty of the
    * super_string.
    */
   if (level >= 10 && stackp <= superstring_depth) {
-    int libs;
-    int libi[MAX_LIBERTIES + 4], libj[MAX_LIBERTIES + 4];
+    int liberties;
+    int libs[MAX_LIBERTIES + 4];
 
-    find_superstring_liberties(si, sj, &libs, libi, libj, 3);
-    for (k = 0; k < libs; k++) {
-      int ai = libi[k];
-      int aj = libj[k];
+    find_superstring_liberties(str, &liberties, libs, 3);
+    for (k = 0; k < liberties; k++) {
+      int apos = libs[k];
 	
-      if (liberty_of_string(ai, aj, si, sj))
+      if (liberty_of_string(apos, str))
 	continue;
-      if (trymove(ai, aj, color, "defend2-E", si, sj,
-		    komaster, kom_i, kom_j)) {
+      if (trymove(apos, color, "defend2-E", str, komaster, kom_pos)) {
 	int acode;
 	/* If the newly placed stone is in atari, we give up without fight. */
-	if (countlib(ai, aj) == 1)
+	if (countlib(apos) == 1)
 	  acode = WIN;
 	else
-	  acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+	  acode = do_attack(str, NULL, komaster, kom_pos);
 	popgo();
 	if (acode == 0) {
-	  SGFTRACE(ai, aj, WIN, "superstring liberty");
-	  READ_RETURN(read_result, i, j, ai, aj, WIN);
+	  SGFTRACE(apos, WIN, "superstring liberty");
+	  READ_RETURN(read_result, move, apos, WIN);
 	}
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, ai, aj);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, apos);
       }
     }
     
     /* Now we are truly desperate. Try playing second order liberties of
      * the superstring.
      */
-    for (k = 0; k < libs; k++) {
-      int ai = libi[k];
-      int aj = libj[k];
+    for (k = 0; k < liberties; k++) {
+      int apos = libs[k];
       int dcode;
 	
-      if (liberty_of_string(ai, aj, si, sj))
+      if (liberty_of_string(apos, str))
 	continue;
       
-      dcode = special_rescue(si, sj, ai, aj, &xi, &xj, 
-			     komaster, kom_i, kom_j);
+      dcode = special_rescue(str, apos, &xpos, komaster, kom_pos);
       if (dcode == WIN) {
-	SGFTRACE(xi, xj, WIN, "special rescue");
-	READ_RETURN(read_result, i, j, xi, xj, WIN);
+	SGFTRACE(xpos, WIN, "special rescue");
+	READ_RETURN(read_result, move, xpos, WIN);
       }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode,
-					xi, xj);
+      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
     }
   }
 
@@ -1931,54 +1869,53 @@ defend2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    * really relevant.
    */
   
-  bc = break_chain2(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+  bc = break_chain2(str, &xpos, komaster, kom_pos);
   if (bc == WIN) {
-    SGFTRACE(xi, xj, bc, "break chain2");
-    READ_RETURN(read_result, i, j, xi, xj, bc);
+    SGFTRACE(xpos, bc, "break chain2");
+    READ_RETURN(read_result, move, xpos, bc);
   }
-  UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, bc, xi, xj);
+  UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   
   if (stackp <= backfill2_depth) {
-    bc = break_chain3(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    bc = break_chain3(str, &xpos, komaster, kom_pos);
     if (bc == WIN) {
-      SGFTRACE(xi, xj, bc, "break chain3");
-      READ_RETURN(read_result, i, j, xi, xj, bc);
+      SGFTRACE(xpos, bc, "break chain3");
+      READ_RETURN(read_result, move, xpos, bc);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, bc, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
   
   if (savecode != 0) {
-    SGFTRACE(savei, savej, savecode, "saved move");
-    READ_RETURN(read_result, i, j, savei, savej, savecode);
+    SGFTRACE(savemove, savecode, "saved move");
+    READ_RETURN(read_result, move, savemove, savecode);
   }
 
   RTRACE("failed to find rescuing move.\n");
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   READ_RETURN0(read_result);
 }
 
 
-/* defend3(si, sj, *i, *j) attempts to find a move rescuing the 
- * string at (si, sj) with 3 liberties.  If such a move can be found,
- * it returns true, and if the pointers i, j are not NULL, 
- * then it returns the saving move in (*i, *j).
+/* defend3(str, *move) attempts to find a move rescuing the 
+ * string at (str) with 3 liberties.  If such a move can be found,
+ * it returns true and the saving move in *move.
  */
 
 static int 
-defend3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+defend3(int str, int *move, int komaster, int kom_pos)
 {
   int color, other;
-  int xi, xj;
+  int xpos;
   int liberties;
-  int libi[3], libj[3];
+  int libs[3];
 #if 0
   int liberties2;
-  int lib2i[6], lib2j[6];
+  int libs2[6];
 #endif
-  int movei[MAX_MOVES], movej[MAX_MOVES];
+  int moves[MAX_MOVES];
   int scores[MAX_MOVES];
-  int moves = 0;
-  int savei = -1, savej = -1;
+  int num_moves = 0;
+  int savemove = 0;
   int savecode = 0;
   int bc;
   int k;
@@ -1989,41 +1926,40 @@ defend3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   int found_read_result;
   Read_result *read_result;
 
-  SETUP_TRACE_INFO("defend3", si, sj);
+  SETUP_TRACE_INFO("defend3", str);
   reading_node_counter++;
 
-  RTRACE("trying to rescue %m\n",  si, sj);
-  color = p[si][sj];
+  RTRACE("trying to rescue %1m\n", str);
+  color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(p[si][sj] != EMPTY);
-  gg_assert(countlib(si, sj) == 3);
+  gg_assert(board[str] != EMPTY);
+  gg_assert(countlib(str) == 3);
 
   if ((stackp <= depth) && (hashflags & HASH_DEFEND3)) {
-    found_read_result = get_read_result(DEFEND3, komaster, kom_i, kom_j,
-					&si, &sj, &read_result);
+    found_read_result = get_read_result(DEFEND3, komaster, kom_pos,
+					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (i) *i = rr_get_result_i(*read_result);
-	if (j) *j = rr_get_result_j(*read_result);
-      }
+      if (rr_get_result(*read_result) != 0)
+	*move = rr_get_move(*read_result);
 
-      SGFTRACE(rr_get_result_i(*read_result), rr_get_result_j(*read_result),
+      SGFTRACE(rr_get_move(*read_result),
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
 
     /* This data should always be recorded. */
     if (read_result) {
-      rr_set_compressed_data(*read_result, DEFEND3, komaster, kom_i, kom_j, 
-			     si, sj, stackp);
+      rr_set_compressed_data(*read_result, DEFEND3, komaster, kom_pos, 
+			     str, stackp);
     }
-  } else
+  }
+  else
     read_result = NULL;
 
-  liberties = findlib(si, sj, 3, libi, libj);
-  ASSERT(liberties == 3, si, sj);
+  liberties = findlib(str, 3, libs);
+  ASSERT1(liberties == 3, str);
 
   /* Collect moves to try in the first batch.
    * 1. First order liberties.
@@ -2032,52 +1968,46 @@ defend3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    * 4. Edge clamps.
    */
   for (k = 0; k < liberties; k++) {
-    movei[k] = libi[k];
-    movej[k] = libj[k];
+    moves[k] = libs[k];
     scores[k] = 0;
   }
-  moves = liberties;
+  num_moves = liberties;
   
-  break_chain_moves(si, sj, movei, movej, scores, &moves);
-  break_chain2_efficient_moves(si, sj, movei, movej, scores, &moves);
-  propose_edge_moves(si, sj, libi, libj, liberties, movei, movej, scores, 
-		     &moves, color);
-  edge_clamp(si, sj, movei, movej, scores, &moves);
+  break_chain_moves(str, moves, scores, &num_moves);
+  break_chain2_efficient_moves(str, moves, scores, &num_moves);
+  propose_edge_moves(str, libs, liberties, moves, scores, &num_moves, color);
+  edge_clamp(str, moves, scores, &num_moves);
 
-  order_moves(si, sj, moves, movei, movej, scores, color, read_function_name);
+  order_moves(str, num_moves, moves, scores, color, read_function_name);
 
-  for (k = 0; k < moves; k++) {
-    int new_komaster, new_kom_i, new_kom_j;
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
     int ko_move;
 
     if (stackp >= branch_depth && k > 0)
       break;
     
-    xi = movei[k];
-    xj = movej[k];
+    xpos = moves[k];
     
-    if (komaster_trymove(xi, xj, color, "defend3-A", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    if (komaster_trymove(xpos, color, "defend3-A", str, komaster, kom_pos,
+			 &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       if (!ko_move) {
-	int acode = do_attack(si, sj, NULL, NULL,
-			      new_komaster, new_kom_i, new_kom_j);
+	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	popgo();
 	if (acode == 0) {
-	  SGFTRACE(xi, xj, WIN, "defense effective - A");
-	  READ_RETURN(read_result, i, j, xi, xj, WIN);
+	  SGFTRACE(xpos, WIN, "defense effective - A");
+	  READ_RETURN(read_result, move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
 	 * better.
 	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
       }
       else {
-	if (do_attack(si, sj, NULL, NULL,
-		      new_komaster, new_kom_i, new_kom_j) != WIN) {
-	  savei = xi;
-	  savej = xj;
+	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	  savemove = xpos;
 	  savecode = KO_B;
 	}
 	popgo();
@@ -2087,21 +2017,21 @@ defend3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
 
 #if 0
   if (stackp <= backfill_depth) {
-    bc = break_chain2(si, sj, &xi, &xj, komaster);
+    bc = break_chain2(str, &xpos, komaster);
     if (bc == WIN) {
-      SGFTRACE(xi, xj, bc, "break chain2");
-      READ_RETURN(read_result, i, j, xi, xj, bc);
+      SGFTRACE(xpos, bc, "break chain2");
+      READ_RETURN(read_result, move, xpos, bc);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, bc, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
   
   if (stackp <= backfill2_depth) {
-    bc = break_chain3(si, sj, &xi, &xj, komaster);
+    bc = break_chain3(str, &xpos, komaster);
     if (bc == WIN) {
-      SGFTRACE(xi, xj, bc, "break chain3");
-      READ_RETURN(read_result, i, j, xi, xj, bc);
+      SGFTRACE(xpos, bc, "break chain3");
+      READ_RETURN(read_result, move, xpos, bc);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, bc, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
 #endif
   
@@ -2110,62 +2040,57 @@ defend3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   /* Look for backfilling moves. */
   if (stackp <= backfill_depth) {
     for (k = 0; k < liberties; k++) {
-      if (is_self_atari(libi[k], libj[k], other)) {
-	liberties2 = approxlib(libi[k], libj[k], color, 6, lib2i, lib2j);
+      if (is_self_atari(libs[k], other)) {
+	liberties2 = approxlib(libs[k], color, 6, libs2);
 	for (r = 0; r < liberties2; r++) {
-	  xi = lib2i[r];
-	  xj = lib2j[r];
+	  xpos = libs2[r];
 	  /* Don't reconsider previously tested moves. */
-	  for (s = 0; s < moves; s++)
-	    if (xi == movei[s] && xj == movej[s])
+	  for (s = 0; s < num_moves; s++)
+	    if (xpos == moves[s])
 	      break;
-	  if (s < moves)
+	  if (s < num_moves)
 	    continue;
 	  
-	  if (trymove(xi, xj, color, "defend3-D", si, sj,
-		      komaster, kom_i, kom_j)) {
+	  if (trymove(xpos, color, "defend3-D", str, komaster, kom_pos)) {
 	    int acode;
 	    /* If the newly placed stone is in atari, we give up
              * without fight.
 	     */
-	    if (countlib(xi, xj) == 1)
+	    if (countlib(xpos) == 1)
 	      acode = WIN;
 	    else
-	      acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+	      acode = do_attack(str, NULL, komaster, kom_pos);
 
 	    popgo();
 	    if (acode == 0) {
-	      SGFTRACE(xi, xj, WIN, "backfill effective");
-	      READ_RETURN(read_result, i, j, xi, xj, WIN);
+	      SGFTRACE(xpos, WIN, "backfill effective");
+	      READ_RETURN(read_result, move, xpos, WIN);
 	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	    UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
 	  }
 	}
       }
       else {
-	liberties2 = approxlib(libi[k], libj[k], other, 3, lib2i, lib2j);
+	liberties2 = approxlib(libs[k], other, 3, libs2);
 	if (liberties2 <= 3) {
 	  for (r = 0; r < liberties2; r++) {
-	    xi = lib2i[r];
-	    xj = lib2j[r];
+	    xpos = libs2[r];
 	    /* Don't reconsider previously tested moves. */
-	    for (s = 0; s < moves; s++)
-	      if (xi == movei[s] && xj == movej[s])
+	    for (s = 0; s < num_moves; s++)
+	      if (xpos == moves[s])
 		break;
-	    if (s < moves)
+	    if (s < num_moves)
 	      continue;
 	    
-	    if (!is_self_atari(xi, xj, color)
-		&& trymove(xi, xj, color, "defend2-D", si, sj,
-			   komaster, kom_i, kom_j)) {
-	      int acode = do_attack(si, sj, NULL, NULL, 
-				    komaster, kom_i, kom_j);
+	    if (!is_self_atari(xpos, color)
+		&& trymove(xpos, color, "defend2-D", str, komaster, kom_pos)) {
+	      int acode = do_attack(str, NULL, komaster, kom_pos);
 	      popgo();
 	      if (acode == 0) {
-		SGFTRACE(xi, xj, WIN, "backfill effective");
-		READ_RETURN(read_result, i, j, xi, xj, WIN);
+		SGFTRACE(xpos, WIN, "backfill effective");
+		READ_RETURN(read_result, move, xpos, WIN);
 	      }
-	      UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	      UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
 	    }
 	  }
 	}
@@ -2176,97 +2101,89 @@ defend3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   
   /* If nothing else works, try to defend with second order liberties. */
   if (stackp <= depth) {
-    for (k = 0; k < liberties; ++k) {
-      int dcode = special_rescue(si, sj, libi[k], libj[k], &xi, &xj, 
-				 komaster, kom_i, kom_j);
+    for (k = 0; k < liberties; k++) {
+      int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos);
       if (dcode == WIN) {
-	SGFTRACE(xi, xj, WIN, "special rescue");
-	READ_RETURN(read_result, i, j, xi, xj, WIN);
+	SGFTRACE(xpos, WIN, "special rescue");
+	READ_RETURN(read_result, move, xpos, WIN);
       }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode, xi, xj);
+      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
     }
   }
 
   if (stackp <= backfill_depth) {
-    int dcode = special_rescue3(si, sj, libi, libj, &xi, &xj, 
-				komaster, kom_i, kom_j);
+    int dcode = special_rescue3(str, libs, &xpos, komaster, kom_pos);
     if (dcode == WIN) {
-      SGFTRACE(xi, xj, WIN, "special rescue2");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "special rescue2");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
   }
     
   if (stackp <= backfill_depth) {
-    int dcode = special_rescue4(si, sj, libi, libj, &xi, &xj, 
-				komaster, kom_i, kom_j);
+    int dcode = special_rescue4(str, libs, &xpos, komaster, kom_pos);
     if (dcode == WIN) {
-      SGFTRACE(xi, xj, WIN, "special rescue4");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "special rescue4");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
   }
     
   if (level >= 10 && stackp <= backfill2_depth) {
-    int dcode = superstring_breakchain(si, sj, &xi, &xj,
-				       komaster, kom_i, kom_j, 4);
+    int dcode = superstring_breakchain(str, &xpos, komaster, kom_pos, 4);
     if (dcode == WIN) {
-      SGFTRACE(xi, xj, WIN, "superstring_breakchain");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "superstring_breakchain");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
   }
 
   /* If nothing else works, we try playing a liberty of the
    * super_string.
    */
   if (level >= 10 && stackp <= backfill2_depth) {
-    int libs;
-    int libi[MAX_LIBERTIES + 4], libj[MAX_LIBERTIES + 4];
+    int liberties;
+    int libs[MAX_LIBERTIES + 4];
 
-    find_superstring_liberties(si, sj, &libs, libi, libj, 3);
-    for (k = 0; k < libs; k++) {
-      int ai = libi[k];
-      int aj = libj[k];
+    find_superstring_liberties(str, &liberties, libs, 3);
+    for (k = 0; k < liberties; k++) {
+      int apos = libs[k];
 	
-      if (liberty_of_string(ai, aj, si, sj))
+      if (liberty_of_string(apos, str))
 	continue;
-      if (trymove(ai, aj, color, "defend3-C", si, sj, 
-		  komaster, kom_i, kom_j)) {
+      if (trymove(apos, color, "defend3-C", str, komaster, kom_pos)) {
 	int acode;
 	/* If the newly placed stone is in atari, we give up without fight. */
-	if (countlib(ai, aj) == 1)
+	if (countlib(apos) == 1)
 	  acode = WIN;
 	else
-	  acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+	  acode = do_attack(str, NULL, komaster, kom_pos);
 
 	popgo();
 	if (acode == 0) {
-	  SGFTRACE(ai, aj, WIN, "superstring liberty");
-	  READ_RETURN(read_result, i, j, ai, aj, WIN);
+	  SGFTRACE(apos, WIN, "superstring liberty");
+	  READ_RETURN(read_result, move, apos, WIN);
 	}
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, ai, aj);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, apos);
       }
     }
 
     /* Now we are truly desperate. Try playing second order liberties of
      * the superstring.
      */
-    for (k = 0; k < libs; k++) {
-      int ai = libi[k];
-      int aj = libj[k];
+    for (k = 0; k < liberties; k++) {
+      int apos = libs[k];
       int dcode;
 	
-      if (liberty_of_string(ai, aj, si, sj))
+      if (liberty_of_string(apos, str))
 	continue;
       
-      dcode = special_rescue(si, sj, ai, aj, &xi, &xj, komaster, kom_i, kom_j);
+      dcode = special_rescue(str, apos, &xpos, komaster, kom_pos);
       if (dcode == WIN) {
-	SGFTRACE(xi, xj, WIN, "special rescue");
-	READ_RETURN(read_result, i, j, xi, xj, WIN);
+	SGFTRACE(xpos, WIN, "special rescue");
+	READ_RETURN(read_result, move, xpos, WIN);
       }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, dcode,
-					xi, xj);
+      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
     }
   }
 
@@ -2276,141 +2193,135 @@ defend3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    */
 #if 1
   if (stackp <= backfill2_depth) {
-    bc = break_chain2(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    bc = break_chain2(str, &xpos, komaster, kom_pos);
     if (bc == WIN) {
-      SGFTRACE(xi, xj, bc, "break chain2");
-      READ_RETURN(read_result, i, j, xi, xj, bc);
+      SGFTRACE(xpos, bc, "break chain2");
+      READ_RETURN(read_result, move, xpos, bc);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, bc, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
   
   if (stackp <= backfill2_depth) {
-    bc = break_chain3(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    bc = break_chain3(str, &xpos, komaster, kom_pos);
     if (bc == WIN) {
-      SGFTRACE(xi, xj, bc, "break chain3");
-      READ_RETURN(read_result, i, j, xi, xj, bc);
+      SGFTRACE(xpos, bc, "break chain3");
+      READ_RETURN(read_result, move, xpos, bc);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, bc, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
 #endif
   
   if (savecode != 0) {
-    SGFTRACE(savei, savej, savecode, "saved move");
-    READ_RETURN(read_result, i, j, savei, savej, savecode);
+    SGFTRACE(savemove, savecode, "saved move");
+    READ_RETURN(read_result, move, savemove, savecode);
   }
 
   RTRACE("failed to find rescuing move.\n");
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   READ_RETURN0(read_result);
 }
 
 
-/* defend4(si, sj, *i, *j) attempts to find a move rescuing the 
- * string at (si, sj) with 4 liberties.  If such a move can be found,
- * it returns true, and if the pointers i, j are not NULL, 
- * then it returns the saving move in (*i, *j).
+/* defend4(str, *move) attempts to find a move rescuing the 
+ * string at (str) with 4 liberties.  If such a move can be found,
+ * it returns true, and if the pointer move is not NULL, 
+ * then it returns the saving move in *move.
  */
 
 static int 
-defend4(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+defend4(int str, int *move, int komaster, int kom_pos)
 {
   int color, other;
-  int xi, xj;
+  int xpos;
   int liberties;
-  int libi[4], libj[4];
-  int movei[MAX_MOVES], movej[MAX_MOVES];
+  int libs[4];
+  int moves[MAX_MOVES];
   int scores[MAX_MOVES];
-  int moves = 0;
-  int savei = -1, savej = -1;
+  int num_moves = 0;
+  int savemove = 0;
   int savecode = 0;
   int k;
   int found_read_result;
   Read_result *read_result;
   
-  SETUP_TRACE_INFO("defend4", si, sj);
+  SETUP_TRACE_INFO("defend4", str);
   reading_node_counter++;
 
-  RTRACE("trying to rescue %m\n",  si, sj);
-  color = p[si][sj];
+  RTRACE("trying to rescue %1m\n", str);
+  color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(p[si][sj] != EMPTY);
-  gg_assert(countlib(si, sj) == 4);
+  gg_assert(board[str] != EMPTY);
+  gg_assert(countlib(str) == 4);
 
   if ((stackp <= depth) && (hashflags & HASH_DEFEND4)) {
-    found_read_result = get_read_result(DEFEND4, komaster, kom_i, kom_j,
-					&si, &sj, &read_result);
+    found_read_result = get_read_result(DEFEND4, komaster, kom_pos,
+					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (i) *i = rr_get_result_i(*read_result);
-	if (j) *j = rr_get_result_j(*read_result);
-      }
+      if (rr_get_result(*read_result) != 0)
+	*move = rr_get_move(*read_result);
 
-      SGFTRACE(rr_get_result_i(*read_result), rr_get_result_j(*read_result),
+      SGFTRACE(rr_get_move(*read_result),
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
 
     /* This data should always be recorded. */
     if (read_result) {
-      rr_set_compressed_data(*read_result, DEFEND4, komaster, kom_i, kom_j, 
-			     si, sj, stackp);
+      rr_set_compressed_data(*read_result, DEFEND4, komaster, kom_pos, 
+			     str, stackp);
     }
-  } else
+  }
+  else
     read_result = NULL;
 
-  liberties = findlib(si, sj, 4, libi, libj);
-  ASSERT(liberties == 4, si, sj);
+  liberties = findlib(str, 4, libs);
+  ASSERT1(liberties == 4, str);
 
   /* Collect moves to try in the first batch.
    * 1. First order liberties.
    * 2. Chain breaking moves.
    */
   for (k = 0; k < liberties; k++) {
-    movei[k] = libi[k];
-    movej[k] = libj[k];
+    moves[k] = libs[k];
     scores[k] = 0;
   }
-  moves = liberties;
+  num_moves = liberties;
   
-  break_chain_moves(si, sj, movei, movej, scores, &moves);
-  break_chain2_efficient_moves(si, sj, movei, movej, scores, &moves);
+  break_chain_moves(str, moves, scores, &num_moves);
+  break_chain2_efficient_moves(str, moves, scores, &num_moves);
 
-  order_moves(si, sj, moves, movei, movej, scores, color, read_function_name);
+  order_moves(str, num_moves, moves, scores, color, read_function_name);
 
-  for (k = 0; k < moves; k++) {
-    int new_komaster, new_kom_i, new_kom_j;
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
     int ko_move;
 
     if (stackp >= branch_depth && k > 0)
       break;
     
-    xi = movei[k];
-    xj = movej[k];
+    xpos = moves[k];
     
-    if (komaster_trymove(xi, xj, color, "defend4-A", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    if (komaster_trymove(xpos, color, "defend4-A", str, komaster, kom_pos,
+			 &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       if (!ko_move) {
-	int acode = do_attack(si, sj, NULL, NULL,
-			      new_komaster, new_kom_i, new_kom_j);
+	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	popgo();
 	if (acode == 0) {
-	  SGFTRACE(xi, xj, WIN, "defense effective - A");
-	  READ_RETURN(read_result, i, j, xi, xj, WIN);
+	  SGFTRACE(xpos, WIN, "defense effective - A");
+	  READ_RETURN(read_result, move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
 	 * better.
 	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
       }
       else {
-	if (do_attack(si, sj, NULL, NULL,
-		      new_komaster, new_kom_i, new_kom_j) != WIN) {
-	  savei = xi;
-	  savej = xj;
+	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	  savemove = xpos;
 	  savecode = KO_B;
 	}
 	popgo();
@@ -2419,29 +2330,29 @@ defend4(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   }
 
   if (stackp <= backfill_depth) {
-    int bc = break_chain2(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    int bc = break_chain2(str, &xpos, komaster, kom_pos);
     if (bc == WIN) {
-      SGFTRACE(xi, xj, WIN, "break chain2");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "break chain2");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, bc, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
 
   if (savecode != 0) {
-    SGFTRACE(savei, savej, savecode, "saved move");
-    READ_RETURN(read_result, i, j, savei, savej, savecode);
+    SGFTRACE(savemove, savecode, "saved move");
+    READ_RETURN(read_result, move, savemove, savecode);
   }
 
   RTRACE("failed to find rescuing move.\n");
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   READ_RETURN0(read_result);
 }
 
 
 /*
- * special_rescue(si, sj, ai, aj, *ti, *tj) is called with (si, sj) a
- * string having a liberty at (ai, aj). The saving move is returned
- * in (*ti, *tj).
+ * special_rescue(str, lib, *move) is called with (str) a
+ * string having a liberty at (lib). The saving move is returned
+ * in (*move).
  *
  * This checks whether a move on a second order liberty is a rescuing
  * move, e.g. in shapes like:
@@ -2458,50 +2369,43 @@ defend4(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
  */
 
 static int
-special_rescue(int si, int sj, int ai, int aj, int *ti, int *tj, 
-	       int komaster, int kom_i, int kom_j)
+special_rescue(int str, int lib, int *move, int komaster, int kom_pos)
 {
-  int other = OTHER_COLOR(p[si][sj]);
+  int color = board[str];
+  int other = OTHER_COLOR(color);
   int k;
-  int savei = -1, savej = -1;
+  int savemove = 0;
   int savecode = 0;
 
-  /* Loop over the four neighbours of the liberty, (ai+di, aj+dj). */
+  /* Loop over the four neighbours of the liberty, (lib + d). */
   for (k = 0; k < 4; k++) {
-    int di = deltai[k];
-    int dj = deltaj[k];
-    if (ON_BOARD(ai+di, aj+dj)
-	&& p[ai+di][aj+dj] == EMPTY) {
+    int d = delta[k];
+    if (board[lib + d] == EMPTY) {
       /* Use approxlib() to test for trivial capture. */
-      if (approxlib(ai, aj, other, 3, NULL, NULL) > 2)
+      if (approxlib(lib, other, 3, NULL) > 2)
 	continue;
 
       /* Don't play into a self atari. */
-      if (is_self_atari(ai+di, aj+dj, p[si][sj]))
+      if (is_self_atari(lib + d, color))
 	continue;
-
-      if (trymove(ai+di, aj+dj, p[si][sj], "special_rescue", si, sj,
-		  komaster, kom_i, kom_j)) {
-	int acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+      
+      if (trymove(lib + d, color, "special_rescue", str, komaster, kom_pos)) {
+	int acode = do_attack(str, NULL, komaster, kom_pos);
 	if (acode == 0) {
 	  popgo();
-	  if (ti) *ti = ai+di;
-	  if (tj) *tj = aj+dj;
+	  *move = lib + d;
 	  return WIN;
 	}
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, ai+di, aj+dj);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, lib + d);
 	popgo();
       }
     }
   }
 
-  if (savecode != 0) {
-    if (ti) *ti = savei;
-    if (tj) *tj = savej;
-    return savecode;
-  }
-  
-  return 0;
+  if (savecode != 0)
+    *move = savemove;
+
+  return savecode;
 }
 
 
@@ -2514,61 +2418,49 @@ special_rescue(int si, int sj, int ai, int aj, int *ti, int *tj,
  *   ------
  */
 static int
-special_rescue2(int si, int sj, int libi[2], int libj[2], int *ti, int *tj, 
-		int komaster, int kom_i, int kom_j)
+special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int newlibi[3];
-  int newlibj[3];
-  int xi, xj;
-  int savei = -1, savej = -1;
+  int newlibs[3];
+  int xpos;
+  int savemove = 0;
   int savecode = 0;
   int k;
 
-  for (k = 0; k < 2; ++k) {
+  for (k = 0; k < 2; k++) {
     /* Let (ai, aj) and (bi, bj) be the two liberties. Reverse the
      * order during the second pass through the loop.
      */
-    int ai = libi[k];
-    int aj = libj[k];
-    int bi = libi[1-k];
-    int bj = libj[1-k];
-    if (is_suicide(ai, aj, other) 
-	&& (approxlib(ai, aj, color, 3, newlibi, newlibj) == 2)) {
-      if ((newlibi[0] != bi) || (newlibj[0] != bj)) {
-	xi = newlibi[0];
-	xj = newlibj[0];
-      } else {
-	xi = newlibi[1];
-	xj = newlibj[1];
-      }
+    int alib = libs[k];
+    int blib = libs[1-k];
+    if (is_suicide(alib, other) 
+	&& (approxlib(alib, color, 3, newlibs) == 2)) {
+      if (newlibs[0] != blib)
+	xpos = newlibs[0];
+      else
+	xpos = newlibs[1];
 
-      if (!is_self_atari(xi, xj, color)
-	  && trymove(xi, xj, color, "special_rescue2", si, sj,
-		     komaster, kom_i, kom_j)) {
-	int acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+      if (!is_self_atari(xpos, color)
+	  && trymove(xpos, color, "special_rescue2", str, komaster, kom_pos)) {
+	int acode = do_attack(str, NULL, komaster, kom_pos);
 	if (acode != WIN) {
 	  if (acode == 0) {
 	    popgo();
-	    if (ti) *ti = xi;
-	    if (tj) *tj = xj;
+	    *move = xpos;
 	    return WIN;
 	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
 	}
 	popgo();
       }
     }
   }
 
-  if (savecode) {
-    if (ti) *ti = savei;
-    if (tj) *tj = savej;
-    return savecode;
-  }
+  if (savecode != 0)
+    *move = savemove;
 
-  return 0;
+  return savecode;
 }
 
 
@@ -2585,85 +2477,71 @@ special_rescue2(int si, int sj, int libi[2], int libj[2], int *ti, int *tj,
  *   ---   b--
  */
 static int
-special_rescue3(int si, int sj, int libi[3], int libj[3], int *ti, int *tj, 
-		int komaster, int kom_i, int kom_j)
+special_rescue3(int str, int libs[3], int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int ai, aj, bi, bj, ci, cj, di, dj, ei, ej, fi, fj, gi, gj, oi, oj;
-  int savei = -1, savej = -1;
+  int apos, bpos, cpos, dpos, epos, fpos, gpos;
+  int savemove = 0;
   int savecode = 0;
   int k, l, r;
 
-  ASSERT(countlib(si, sj) == 3, si, sj);
+  ASSERT1(countlib(str) == 3, str);
   
   for (r = 0; r < 3; r++) {
     /* Let (ai, aj) be one of the three liberties. */
-    ai = libi[r];
-    aj = libj[r];
+    apos = libs[r];
     /* Try to find the configuration above. */
     for (k = 0; k < 4; k++) {
-      bi = ai + deltai[k];
-      bj = aj + deltaj[k];
-      if (ON_BOARD(bi, bj))
+      bpos = apos + delta[k];
+      if (ON_BOARD(bpos))
 	continue;
 
-      ci = ai - deltai[k];
-      cj = aj - deltaj[k];
-      if (p[ci][cj] != color)
+      cpos = apos - delta[k];
+      if (board[cpos] != color)
 	continue;
       
-      find_origin(ci, cj, &oi, &oj);
-      if (oi != si || oj != sj)
+      if (!same_string(cpos, str))
 	continue;
 
       for (l = 0; l < 2; l++) {
-	int normali = deltaj[k];
-	int normalj = -deltai[k];
-	if (l == 1) {
-	  normali = -normali;
-	  normalj = -normalj;
-	}
+	int normal = delta[(k+1)%4];
+	if (l == 1)
+	  normal = -normal;
 	
-	di = ci + normali;
-	dj = cj + normalj;
-	if (!ON_BOARD(di, dj) || p[di][dj] != other)
+	dpos = cpos + normal;
+	if (board[dpos] != other)
 	  continue;
 
-	ei = di + normali;
-	ej = dj + normalj;
-	if (!ON_BOARD(ei, ej) || p[ei][ej] != color)
+	epos = dpos + normal;
+	if (board[epos] != color)
 	  continue;
 
-	fi = ai + normali;
-	fj = aj + normalj;
-	if (!ON_BOARD(fi, fj) || p[fi][fj] != EMPTY)
+	fpos = apos + normal;
+	if (board[fpos] != EMPTY)
 	  continue;
 
-	gi = fi + normali;
-	gj = fj + normalj;
-	if (!ON_BOARD(gi, gj) || p[gi][gj] != EMPTY)	
+	gpos = fpos + normal;
+	if (board[gpos] != EMPTY)	
 	  continue;
 
 	/* Configuration found. Now require an X move at 'a' not
-	 * getting too many liberties
+	 * getting too many liberties.
 	 */
 
-	if (approxlib(ai, aj, other, 4, NULL, NULL) > 3)
+	if (approxlib(apos, other, 4, NULL) > 3)
 	  continue;
 	
-	/* Try to play at (fi, fj). */
-	if (trymove(fi, fj, color, "special_rescue3", si, sj,
-		    komaster, kom_i, kom_j)) {
-	  int acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+	/* Try to play at (fpos). */
+	if (trymove(fpos, color, "special_rescue3", str, komaster, kom_pos)) {
+	  int acode = do_attack(str, NULL, komaster, kom_pos);
 	  if (acode != WIN) {
 	    if (acode == 0) {
 	      popgo();
-	      if (ti) *ti = fi;
-	      if (tj) *tj = fj;
+	      *move = fpos;
 	      return WIN;
 	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, fi, fj);
+	    UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, fpos);
 	  }
 	  popgo();
 	}
@@ -2671,13 +2549,10 @@ special_rescue3(int si, int sj, int libi[3], int libj[3], int *ti, int *tj,
     }
   }
 
-  if (savecode) {
-    if (ti) *ti = savei;
-    if (tj) *tj = savej;
-    return savecode;
-  }
-  
-  return 0;
+  if (savecode != 0)
+    *move = savemove;
+
+  return savecode;
 }
 
 
@@ -2693,78 +2568,66 @@ special_rescue3(int si, int sj, int libi[3], int libj[3], int *ti, int *tj,
  *   OX.   be.
  */
 static int
-special_rescue4(int si, int sj, int libi[3], int libj[3], int *ti, int *tj, 
-		int komaster, int kom_i, int kom_j)
+special_rescue4(int str, int libs[3], int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int ai, aj, bi, bj, ci, cj, di, dj, ei, ej, oi, oj;
-  int savei = -1, savej = -1;
+  int apos, bpos, cpos, dpos, epos;
+  int savemove = 0;
   int savecode = 0;
   int k, l, r;
 
-  ASSERT(countlib(si, sj) == 3, si, sj);
+  ASSERT1(countlib(str) == 3, str);
   
   for (r = 0; r < 3; r++) {
-    /* Let (ai, aj) be one of the three liberties. */
-    ai = libi[r];
-    aj = libj[r];
+    /* Let (apos) be one of the three liberties. */
+    apos = libs[r];
     /* Try to find the configuration above. */
     for (k = 0; k < 4; k++) {
-      bi = ai + deltai[k];
-      bj = aj + deltaj[k];
-      if (!ON_BOARD(bi, bj) || p[bi][bj] != color)
+      bpos = apos + delta[k];
+      if (board[bpos] != color)
 	continue;
 
-      find_origin(bi, bj, &oi, &oj);
-      if (oi != si || oj != sj)
+      if (!same_string(bpos, str))
 	continue;
 
       for (l = 0; l < 2; l++) {
-	int normali = deltaj[k];
-	int normalj = -deltai[k];
-	if (l == 1) {
-	  normali = -normali;
-	  normalj = -normalj;
-	}
-	
-	ci = ai + normali;
-	cj = aj + normalj;
-	if (!ON_BOARD(ci, cj) || p[ci][cj] != EMPTY)
+	int normal = delta[(k+1)%4];
+	if (l == 1)
+	  normal = -normal;
+
+	cpos = apos + normal;
+	if (board[cpos] != EMPTY)
 	  continue;
 
-	di = ci + normali;
-	dj = cj + normalj;
-	if (!ON_BOARD(di, dj) || p[di][dj] != color)
+	dpos = cpos + normal;
+	if (board[dpos] != color)
 	  continue;
 
-	ei = bi + normali;
-	ej = bj + normalj;
-	if (!ON_BOARD(ei, ej) || p[ei][ej] != other)
+	epos = bpos + normal;
+	if (board[epos] != other)
 	  continue;
 
-	/* Configuration found. Now require that (di, dj) has at least 3
-         * liberties and (ei, ej) at most 3 liberties.
+	/* Configuration found. Now require that (dpos) has at least 3
+         * liberties and (epos) at most 3 liberties.
 	 */
 
-	if (countlib(di, dj) < 3)
+	if (countlib(dpos) < 3)
 	  continue;
 	
-	if (countlib(ei, ej) > 3)
+	if (countlib(epos) > 3)
 	  continue;
 	
-	/* Try to play at (ci, cj). */
-	if (trymove(ci, cj, color, "special_rescue4", si, sj,
-		    komaster, kom_i, kom_j)) {
-	  int acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+	/* Try to play at (cpos). */
+	if (trymove(cpos, color, "special_rescue4", str, komaster, kom_pos)) {
+	  int acode = do_attack(str, NULL, komaster, kom_pos);
 	  if (acode != WIN) {
 	    if (acode == 0) {
 	      popgo();
-	      if (ti) *ti = ci;
-	      if (tj) *tj = cj;
+	      *move = cpos;
 	      return WIN;
 	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, ci, cj);
+	    UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, cpos);
 	  }
 	  popgo();
 	}
@@ -2772,13 +2635,10 @@ special_rescue4(int si, int sj, int libi[3], int libj[3], int *ti, int *tj,
     }
   }
 
-  if (savecode) {
-    if (ti) *ti = savei;
-    if (tj) *tj = savej;
-    return savecode;
-  }
-  
-  return 0;
+  if (savecode != 0)
+    *move = savemove;
+
+  return savecode;
 }
 
 
@@ -2792,14 +2652,14 @@ special_rescue4(int si, int sj, int libi[3], int libj[3], int *ti, int *tj,
  *
  * the O stones to the left are best defended by the move at *.
  *
- * This function tries to find an adjacent string (ai, aj) with
- * exactly three liberties. One of the liberties (bi, bj) must be on
- * the edge (but not in the corner). Diagonal to this liberty must be
- * one stone of the attacked string (ci, cj) and another liberty (di,
- * dj) of the adjacent string. The third liberty (ei, ej) must be
- * adjacent to (di, dj). Furthermore must an O stone at (di, dj) get
- * at least three liberties and and X stone at (ei, ej) must get at
- * most three liberties.
+ * This function tries to find an adjacent string (apos) with exactly
+ * three liberties. One of the liberties (bpos) must be on the edge
+ * (but not in the corner). Diagonal to this liberty must be one stone
+ * of the attacked string (cpos) and another liberty (dpos) of the
+ * adjacent string. The third liberty (epos) must be adjacent to
+ * (dpos). Furthermore must an O stone at (dpos) get at least three
+ * liberties and and X stone at (epos) must get at most three
+ * liberties.
  *
  * |.XXOO.
  * |XXOXe.
@@ -2807,94 +2667,81 @@ special_rescue4(int si, int sj, int libi[3], int libj[3], int *ti, int *tj,
  * |...b..
  * +------
  *
- * The defense move at (di, dj) is proposed if the above conditions
+ * The defense move at (dpos) is proposed if the above conditions
  * are satisfied.
  */
 
 static void
-edge_clamp(int si, int sj, int movei[MAX_MOVES], int movej[MAX_MOVES],
-	   int scores[MAX_MOVES], int *moves)
+edge_clamp(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
+	   int *num_moves)
 {
-  int k, l, r;
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int ai, aj;
-  int bi, bj;
-  int ci, cj;
-  int di, dj;
-  int ei, ej;
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-  int libi[3], libj[3];
+  int apos;
+  int bpos;
+  int cpos;
+  int dpos;
+  int epos;
+  int adj, adjs[MAXCHAIN];
+  int libs[3];
+  int k, l, r;
   
   /* Pick up neighbors with three liberties. */
-  adj = chainlinks2(si, sj, adji, adjj, 3);
+  adj = chainlinks2(str, adjs, 3);
 
   for (r = 0; r < adj; r++) {
-    ai = adji[r];
-    aj = adjj[r];
+    apos = adjs[r];
     /* Find a liberty at the edge. */
-    bi = -1;
-    bj = -1;
-    findlib(ai, aj, 3, libi, libj);
+    bpos = 0;
+    findlib(apos, 3, libs);
     for (k = 0; k < 3; k++) {
-      if (libi[k] == 0 || libi[k] == board_size-1
-	  || libj[k] == 0 || libj[k] == board_size-1) {
-	bi = libi[k];
-	bj = libj[k];
+      int i = I(libs[k]);
+      int j = J(libs[k]);
+      if (i == 0 || i == board_size-1 || j == 0 || j == board_size-1) {
+	bpos = libs[k];
 	break;
       }
     }
-    if (bj == -1)
+    if (bpos == 0)
       continue;
 
     /* Edge liberty found. Establish up and right directions. */
     for (k = 0; k < 4; k++) {
-      int upi = deltai[k];
-      int upj = deltaj[k];
-      if (ON_BOARD(bi-upi, bj-upj))
+      int up = delta[k];
+      if (ON_BOARD(bpos - up))
 	continue;
-      if (p[bi+upi][bj+upj] != other)
+      if (board[bpos + up] != other)
 	continue;
        
       for (l = 0; l < 2; l++) {
-	int righti = upj;
-	int rightj = -upi;
-	if (l == 1) {
-	  righti = -righti;
-	  rightj = -rightj;
-	}
+	int right = delta[(k+4)%4];
+	if (l == 1)
+	  right = -right;
 
-	ci = bi + upi - righti;
-	cj = bj + upj - rightj;
-	di = bi + upi + righti;
-	dj = bj + upj + rightj;
+	cpos = bpos + up - right;
+	dpos = bpos + up + right;
 
-	if (!ON_BOARD(ci, cj) 
-	    || p[ci][cj] != color 
-	    || !same_string(ci, cj, si, sj))
+	if (board[cpos] != color || !same_string(cpos, str))
 	  continue;
 
-	if (!ON_BOARD(di, dj) 
-	    || p[di][dj] != EMPTY 
-	    || !liberty_of_string(di, dj, ai, aj))
+	if (board[dpos] != EMPTY || !liberty_of_string(dpos, apos))
 	  continue;
 
-	ei = di + upi;
-	ej = dj + upj;
+	epos = dpos + up;
 
-	if (p[ei][ej] != EMPTY || !liberty_of_string(ei, ej, ai, aj))
+	if (board[epos] != EMPTY || !liberty_of_string(epos, apos))
 	  continue;
 
-	if (approxlib(di, dj, color, 3, NULL, NULL) < 3)
+	if (approxlib(dpos, color, 3, NULL) < 3)
 	  continue;
 	
-	if (approxlib(ei, ej, other, 4, NULL, NULL) > 3)
+	if (approxlib(epos, other, 4, NULL) > 3)
 	  continue;
 
-	/* (di, dj) looks like a good move. Add it to the list with a
+	/* (dpos) looks like a good move. Add it to the list with a
          * substantial initial score.
 	 */
-	ADD_CANDIDATE_MOVE(di, dj, 10, movei, movej, scores, *moves);
+	ADD_CANDIDATE_MOVE(dpos, 10, moves, scores, *num_moves);
       }
     }
   }
@@ -2904,7 +2751,7 @@ edge_clamp(int si, int sj, int movei[MAX_MOVES], int movej[MAX_MOVES],
 /* 
  * This function handles some special cases on the edge.
  *
- * 1. If (si, sj) points to a string and 'a' an edge liberty of it,
+ * 1. If (str) points to a string and 'a' an edge liberty of it,
  *    there is no point of trying to defend the string by crawling 
  *    along the edge if there is no hope of ever getting more liberties.
  *    This is of course if the blocking enemy group has enough liberties
@@ -2916,9 +2763,9 @@ edge_clamp(int si, int sj, int movei[MAX_MOVES], int movej[MAX_MOVES],
  *
  *    This function searches the edge towards the corner and sees if there
  *    is a friendly stone on one of the two first lines. If not, the move
- *    is removed from the  list of moves (movei[], movej[]).
+ *    is removed from the  list of moves.
  *
- * 2. If (si, sj) points to a string and 'a' an edge liberty of it,
+ * 2. If (str) points to a string and 'a' an edge liberty of it,
  *    the drawing back/climbing up move 'b' is often correct attack or
  *    defense. Another good move to try is 'c' (but usually not for
  *    defense of a 2 liberty string).
@@ -2928,158 +2775,79 @@ edge_clamp(int si, int sj, int movei[MAX_MOVES], int movej[MAX_MOVES],
  *      ---        ---
  *
  *    This function adds the points configured like 'b' and 'c' relative to
- *    (si, sj) to the list of moves (movei[], movej[]).
+ *    (str) to the list of moves.
  *
  * color is the color to move.
  */
 
 static void
-propose_edge_moves(int si, int sj, int *libi, int *libj, int libs,
-		   int movei[MAX_MOVES], int movej[MAX_MOVES], 
-		   int scores[MAX_MOVES], int *moves, int to_move)
+propose_edge_moves(int str, int *libs, int liberties, int moves[MAX_MOVES], 
+		   int scores[MAX_MOVES], int *num_moves, int to_move)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int rightdir = 0;
-  int righti, rightj;
-  int updir = 0;
-  int upi, upj;
-  int found_it;
-  int ai, aj;
-  int k;
+  int right;
+  int up;
+  int apos;
+  int k, l;
+  int r;
 
-  for (k = 0; k < libs; k++) {
-    ai = libi[k];
-    aj = libj[k];
-    
-    /* Find out some directions.  We call the directions `rightdir and
-     * `updir', as in the figure below, but in reality, they can have
-     * any one of the standard eight directons through rotation.
-     * rightdir and updir are indices into (deltai[],deltaj[]).
-     *
-     *     X.?        Xbc
-     *     O..        Oa.
-     *     ---        ---
-     *
-     * deltai, deltaj store directions in the order SOUTH, WEST, NORTH, EAST.
-     */
-    found_it = 0;
-    if (ai == 0) {
-      /* Top edge */
-      if (aj > 0 && p[ai][aj-1] == color) {
-	/* Group to the left */
-	found_it = 1;
-	updir = 0;
-	rightdir = 3;
-      }
-      else if (aj < board_size - 1 && p[ai][aj+1] == color) {
-	/* Group to the left */
-	found_it = 1;
-	updir = 0;
-	rightdir = 1;
-      }
-    }
-    else if (ai == board_size - 1) {
-      /* Bottom edge */
-      if (aj > 0 && p[ai][aj-1] == color) {
-	/* Group to the left */
-	found_it = 1;
-	updir = 2;
-	rightdir = 3;
-      }
-      else if (aj < board_size - 1 && p[ai][aj+1] == color) {
-	/* Group to the left */
-	found_it = 1;
-	updir = 2;
-	rightdir = 1;
-      }
-    }
+  for (r = 0; r < liberties; r++) {
+    apos = libs[r];
+    for (k = 0; k < 4; k++) {
+      up = delta[k];
+      if (ON_BOARD(apos - up))
+	continue;
+      
+      for (l = 0; l < 2; l++) {
+	right = delta[(k+1)%4];
+	if (l == 1)
+	  right = -right;
+       
+	if (board[apos + up] == other	   /* other on top of liberty */
+	    && countlib(apos + up) > 4     /* blocking group must be secure */
+	    && color == to_move) {         /* only applicable as defense */
 
-    if (aj == 0) {
-      /* Left edge */
-      if (ai > 0 && p[ai-1][aj] == color) {
-	/* Group to the top */
-	found_it = 1;
-	updir = 3;
-	rightdir = 0;
-      }
-      else if (ai < board_size - 1 && p[ai+1][aj] == color) {
-	/* Group to the bottom */
-	found_it = 1;
-	updir = 3;
-	rightdir = 2;
-      }
-    }
-    else if (aj == board_size - 1) {
-      /* Right edge */
-      if (ai > 0 && p[ai-1][aj] == color) {
-	/* Group to the top */
-	found_it = 1;
-	updir = 1;
-	rightdir = 0;
-      }
-      else if (ai < board_size - 1 && p[ai+1][aj] == color) {
-	/* Group to the bottom */
-	found_it = 1;
-	updir = 1;
-	rightdir = 2;
-      }
-    }
-
-    if (!found_it)
-      continue;
-
-    upi = deltai[updir];
-    upj = deltaj[updir];
-    righti = deltai[rightdir];
-    rightj = deltaj[rightdir];
-
-    if (p[ai+upi][aj+upj] == other	   /* other on top of liberty */
-	&& countlib(ai+upi, aj+upj) > 4    /* blocking group must be secure */
-	&& p[si][sj] == to_move)           /* only applicable as defense */
-    {
-      /* Case 1: other above the liberty (crawl along the edge). */
-      int  xi, xj;
+	  /* Case 1: other above the liberty (crawl along the edge). */
+	  int  xpos = apos;
 	
-      xi = ai;
-      xj = aj;
-      while (ON_BOARD(xi, xj)) {
-	if (p[xi][xj] == color
-	    || p[xi+upi][xj+upj] == color)
-	  break;
+	  while (ON_BOARD(xpos)) {
+	    if (board[xpos] == color
+		|| board[xpos + up] == color)
+	      break;
 
-	xi += righti;
-	xj += rightj;
-      }
+	    xpos += right;
+	  }
 
-      /* If no friendly stone found, then it is pointless and we
-       * can just as well remove the move.
-       */
-      if (!ON_BOARD(xi, xj)) {
-	REMOVE_CANDIDATE_MOVE(ai, aj, movei, movej, scores, *moves);
-      }
-    }
-    else if (p[ai+upi][aj+upj] == EMPTY           /* empty above the liberty */
-	     && p[ai-righti+upi][aj-rightj+upj] == other
-	     && ON_BOARD(ai+righti, aj+rightj)    /* c is on board */
-	     && p[ai+righti][aj+rightj] == EMPTY) /* empty to the right */
-    {
-      /* Case 2: Try to escape or contain. */
+	  /* If no friendly stone found, then it is pointless and we
+	   * can just as well remove the move.
+	   */
+	  if (!ON_BOARD(xpos)) {
+	    REMOVE_CANDIDATE_MOVE(apos, moves, scores, *num_moves);
+	  }
+	}
+	else if (board[apos + up] == EMPTY  /* empty above the liberty */
+		 && board[apos - right + up] == other
+		 && board[apos + right] == EMPTY) { /* empty to the right */
 
-      /* Add b 
-       * If adjacent X stone in atari, boost the initial score of this
-       * move.
-       */
-      if (countlib(ai+upi-righti, aj+upj-rightj) == 1)
-	ADD_CANDIDATE_MOVE(ai+upi, aj+upj, 10, movei, movej, scores, *moves);
-      else {
-	ADD_CANDIDATE_MOVE(ai+upi, aj+upj, 0, movei, movej, scores, *moves);
-
-	/* Add c if empty */
-	if (p[ai+righti+upi][aj+rightj+upj] == EMPTY
-	    && (libs != 2 || p[si][sj] != to_move))
-	  ADD_CANDIDATE_MOVE(ai+righti+upi, aj+rightj+upj, 0,
-			     movei, movej, scores, *moves);
+	  /* Case 2: Try to escape or contain. */
+	  
+	  /* Add b 
+	   * If adjacent X stone in atari, boost the initial score of this
+	   * move.
+	   */
+	  if (countlib(apos + up - right) == 1)
+	    ADD_CANDIDATE_MOVE(apos + up, 10, moves, scores, *num_moves);
+	  else {
+	    ADD_CANDIDATE_MOVE(apos + up, 0, moves, scores, *num_moves);
+	    
+	    /* Add c if empty */
+	    if (board[apos + right + up] == EMPTY
+		&& (liberties != 2 || color != to_move))
+	      ADD_CANDIDATE_MOVE(apos + right + up, 0,
+				 moves, scores, *num_moves);
+	  }
+	}
       }
     }
   }
@@ -3097,77 +2865,77 @@ propose_edge_moves(int si, int sj, int *libi, int *libj, int libs,
  */
 
 static int 
-do_attack(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+do_attack(int str, int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
-  int xi, xj;
+  int color = board[str];
+  int xpos;
   int libs;
   int result = 0;
   int found_read_result;
   Read_result *read_result;
 
-  SETUP_TRACE_INFO("attack", si, sj);
+  SETUP_TRACE_INFO("attack", str);
 
-  ASSERT(color != 0, si, sj);
+  ASSERT1(color != 0, str);
 
   if (color == 0)      /* if assertions are turned off, silently fails */
     return 0;
 
-  libs = countlib(si, sj);
+  libs = countlib(str);
 
   if (libs > 4
       || (libs == 4 && stackp > fourlib_depth)) {
     /* No need to cache the result in these cases. */
-    SGFTRACE(0, 0, 0, "too many liberties");
+    SGFTRACE(0, 0, "too many liberties");
     return 0;
   }
 
   if ((stackp <= depth) && (hashflags & HASH_ATTACK)) {
-    found_read_result = get_read_result(ATTACK, komaster, kom_i, kom_j, 
-					&si, &sj, &read_result);
+    found_read_result = get_read_result(ATTACK, komaster, kom_pos, 
+					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (i) *i = rr_get_result_i(*read_result);
-	if (j) *j = rr_get_result_j(*read_result);
-      }
+      if (rr_get_result(*read_result) != 0)
+	if (move)
+	  *move = rr_get_move(*read_result);
 
-      SGFTRACE(rr_get_result_i(*read_result), rr_get_result_j(*read_result),
+      SGFTRACE(rr_get_move(*read_result),
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
 
     /* This data should always be recorded. */
     if (read_result) {
-      rr_set_compressed_data(*read_result, ATTACK, komaster, kom_i, kom_j, 
-			     si, sj, stackp);
+      rr_set_compressed_data(*read_result, ATTACK, komaster, kom_pos, 
+			     str, stackp);
     }
-  } else
+  }
+  else
     read_result = NULL;
 
   /* Treat the attack differently depending on how many liberties the 
-     string at (si, sj) has. */
+     string at (str) has. */
   if (libs == 1)
-    result = attack1(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    result = attack1(str, &xpos, komaster, kom_pos);
   else if (libs == 2)
-    result = attack2(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    result = attack2(str, &xpos, komaster, kom_pos);
   else if (libs == 3)
-    result = attack3(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    result = attack3(str, &xpos, komaster, kom_pos);
   else if (libs == 4)
-    result = attack4(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    result = attack4(str, &xpos, komaster, kom_pos);
 
-  ASSERT(result >= 0 && result <= 3, si, sj);
+  ASSERT1(result >= 0 && result <= 3, str);
   
   if (result)
-    READ_RETURN(read_result, i, j, xi, xj, result);
+    READ_RETURN(read_result, move, xpos, result);
 
   READ_RETURN0(read_result);
 }
 
 
-/* If (si, sj) points to a group with exactly one liberty, attack1
+/* If (str) points to a group with exactly one liberty, attack1
  * determines whether it can be captured by playing at this liberty.
- * If yes, (*i, *j) is the killing move. i & j may be NULL if caller is
+ * If yes, (*move) is the killing move. move may be NULL if caller is
  * only interested in whether it can be captured.
  *
  * The attack may fail for two different reasons. The first one is
@@ -3213,40 +2981,39 @@ do_attack(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
  */
 
 static int
-attack1(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+attack1(int str, int *move, int komaster, int kom_pos)
 {
-  int xi, xj;
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
+  int xpos;
   int result = -1;
   
-  SETUP_TRACE_INFO("attack1", si, sj);
+  SETUP_TRACE_INFO("attack1", str);
   reading_node_counter++;
   
   /* Pick up the position of the liberty. */
-  findlib(si, sj, 1, &xi, &xj);
+  findlib(str, 1, &xpos);
 
   /* If the attacked string consists of more than one stone, the
    * attack never fails. (This assumes simple ko rule. With superko
    * rule it could still be a ko violation.)
    */
-  if (countstones(si, sj) > 1)
+  if (countstones(str) > 1)
     result = WIN;
   
   /* Try to play on the liberty. This fails if and only if it is an
    * illegal ko capture.
    */
-  else if (trymove(xi, xj, other, "attack1-A", si, sj,
-		   komaster, kom_i, kom_j)) {
+  else if (trymove(xpos, other, "attack1-A", str, komaster, kom_pos)) {
     /* Is the attacker in atari? If not the attack was successful. */
-    if (countlib(xi, xj) > 1)
+    if (countlib(xpos) > 1)
       result = WIN;
 
     /* If the attacking string is also a single stone, a possible
      * recapture would be a ko violation, so the defender has to make
      * a ko threat first.
      */
-    else if (countstones(xi, xj) == 1) {
+    else if (countstones(xpos) == 1) {
       /* If the defender is allowed to take the ko the result is KO_A. */
       if (komaster != other)
 	result = KO_A;
@@ -3256,17 +3023,15 @@ attack1(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
     }
       
     /* Otherwise, do recapture. Notice that the liberty must be
-     * at (si, sj) since we have already established that this string
+     * at (str) since we have already established that this string
      * was a single stone.
      */
-    else if (trymove(si, sj, color, "attack1-B", si, sj,
-		     komaster, kom_i, kom_j)) {
-      /* If this was a proper snapback, (si, sj) will now have more
+    else if (trymove(str, color, "attack1-B", str, komaster, kom_pos)) {
+      /* If this was a proper snapback, (str) will now have more
        * than one liberty.
        */
-      if (countlib(si, sj) > 1) {
+      if (countlib(str) > 1) {
 	/* Proper snapback, attack fails. */
-	RTRACE("SNAPBACK at %m!\n", i, j);
 	result = 0;
       }
       else
@@ -3287,29 +3052,23 @@ attack1(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    */
   if (result != WIN) {
     int liberties;
-    int libi[6];
-    int libj[6];
+    int libs[6];
     int k;
-    liberties = approxlib(xi, xj, color, 6, libi, libj);
+    liberties = approxlib(xpos, color, 6, libs);
     if (liberties <= 5)
       for (k = 0; k < liberties; k++) {
-	int ai = libi[k];
-	int aj = libj[k];
-	if (!is_self_atari(ai, aj, other)
-	    && trymove(ai, aj, other, "attack1-C", si, sj,
-		       komaster, kom_i, kom_j)) {
-	  int dcode = do_find_defense(si, sj, NULL, NULL, 
-				      komaster, kom_i, kom_j);
-	  if (dcode != WIN && do_attack(si, sj, NULL, NULL, 
-				      komaster, kom_i, kom_j)) {
+	int apos = libs[k];
+	if (!is_self_atari(apos, other)
+	    && trymove(apos, other, "attack1-C", str, komaster, kom_pos)) {
+	  int dcode = do_find_defense(str, NULL, komaster, kom_pos);
+	  if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 	    if (dcode == 0) {
 	      popgo();
-	      SGFTRACE(ai, aj, WIN, "backfilling");
-	      if (i) *i = ai;
-	      if (j) *j = aj;
+	      SGFTRACE(apos, WIN, "backfilling");
+	      *move = apos;
 	      return WIN;
 	    }
-	    UPDATE_SAVED_KO_RESULT(result, xi, xj, dcode, ai, aj);
+	    UPDATE_SAVED_KO_RESULT(result, xpos, dcode, apos);
 	  }
 	  popgo();
 	}
@@ -3317,92 +3076,88 @@ attack1(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   }
   
   if (result > 0) {
-    if (i) *i = xi;
-    if (j) *j = xj;
-    SGFTRACE(xi, xj, result, NULL);
+    *move = xpos;
+    SGFTRACE(xpos, result, NULL);
   }
   else {
-    SGFTRACE(-1, -1, 0, NULL);
+    SGFTRACE(0, 0, NULL);
   }
   
   return result;
 }
 
 
-/* If si, sj points to a group with exactly two liberties
+/* If str points to a group with exactly two liberties
  * attack2 determines whether it can be captured in ladder or net.
- * If yes, *i, *j is the killing move. i & j may be null if caller 
+ * If yes, *move is the killing move. move may be null if caller 
  * is only interested in whether it can be captured.
  *  
  * Returns KO_A or KO_B if it can be killed conditioned on ko. Returns
- * KO_A if it can be killed provided (other) is willing to ignore
- * any ko threat. Returns KO_B if (other) wins provided he has a
- * ko threat which must be answered. Can give a return code KO_B 
- * yet (*i,*j)=(-1,-1) if the winning move is an illegal
- * ko capture. In this case, making a ko threat and having it
- * answered should transform the position to one where the return
- * code is KO_A. 
+ * KO_A if it can be killed provided (other) is willing to ignore any
+ * ko threat. Returns KO_B if (other) wins provided he has a ko threat
+ * which must be answered. Can give a return code KO_B yet *move=0 if
+ * the winning move is an illegal ko capture. In this case, making a
+ * ko threat and having it answered should transform the position to
+ * one where the return code is KO_A.
  *
- * See the comment before defend1 about ladders and reading depth.  */
+ * See the comment before defend1 about ladders and reading depth.
+ */
 
 static int 
-attack2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+attack2(int str, int *move, int komaster, int kom_pos)
 {
-  int color, other;
-  int ai, aj;
-  int hi, hj;
-  int xi, xj;
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int apos;
+  int hpos;
+  int xpos;
   int liberties, r;
-  int libi[2], libj[2];
-  int lib2i[2], lib2j[2];
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-  int savei = -1, savej = -1;
+  int libs[2];
+  int libs2[2];
+  int adj, adjs[MAXCHAIN];
+  int savemove = 0;
   int savecode = 0;
   int acode;
   int dcode;
   int k;
   int atari_possible = 0;
-  int movei[MAX_MOVES], movej[MAX_MOVES];
+  int moves[MAX_MOVES];
   int scores[MAX_MOVES];
-  int moves = 0;
+  int num_moves = 0;
   int adjacent_liberties = 0;
   int found_read_result;
   Read_result *read_result;
 
-  SETUP_TRACE_INFO("attack2", si, sj);
+  SETUP_TRACE_INFO("attack2", str);
   reading_node_counter++;
 
-  find_origin(si, sj, &si, &sj);
-  gg_assert(p[si][sj] != EMPTY);
-  gg_assert(countlib(si, sj) == 2);
+  str = find_origin(str);
+  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(countlib(str) == 2, str);
 
-  RTRACE("checking attack on %m with 2 liberties\n", si, sj);
-
-  color = p[si][sj];
-  other = OTHER_COLOR(color);
+  RTRACE("checking attack on %1m with 2 liberties\n", str);
 
   if ((stackp <= depth) && (hashflags & HASH_ATTACK2)) {
   
-    found_read_result = get_read_result(ATTACK2, komaster, kom_i, kom_j,
-					&si, &sj, &read_result);
+    found_read_result = get_read_result(ATTACK2, komaster, kom_pos,
+					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (i) *i = rr_get_result_i(*read_result);
-	if (j) *j = rr_get_result_j(*read_result);
-      }
+      if (rr_get_result(*read_result) != 0)
+	*move = rr_get_move(*read_result);
 
-      SGFTRACE(rr_get_result_i(*read_result), rr_get_result_j(*read_result),
+      SGFTRACE(rr_get_move(*read_result),
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
 
     /* This data should always be recorded. */
     if (read_result) {
-      rr_set_compressed_data(*read_result, ATTACK2, komaster, kom_i, kom_j, 
-			     si, sj, stackp);
+      rr_set_compressed_data(*read_result, ATTACK2, komaster, kom_pos, 
+			     str, stackp);
     }
-  } else
+  }
+  else
     read_result = NULL;
 
   /* The attack may fail if a boundary string is in atari and cannot 
@@ -3411,72 +3166,63 @@ attack2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    * We start by trying to defend the boundary string by looking for an
    * adjacent string which is in atari. 
    */
-  adj = chainlinks2(si, sj, adji, adjj, 1);
+  adj = chainlinks2(str, adjs, 1);
   for (r = 0; r < adj; r++) {
     /* if stackp > depth and any boundary chain is in atari, assume safe.
      * However, if the captured chain is only of size 1, there can still
      * be a working ladder, so continue if that is the case.
      */
-    if (stackp > depth && countstones(adji[r], adjj[r]) > 1) {
-      SGFTRACE(-1, -1, 0, "boundary in atari");
+    if (stackp > depth && countstones(adjs[r]) > 1) {
+      SGFTRACE(0, 0, "boundary in atari");
       READ_RETURN0(read_result);
     }
 
     /* Pick up moves breaking the second order chain. */
     if (stackp <= depth)
-      break_chain_moves(adji[r], adjj[r], movei, movej, scores, &moves);
+      break_chain_moves(adjs[r], moves, scores, &num_moves);
     
-    findlib(adji[r], adjj[r], 1, &hi, &hj);
-    ADD_CANDIDATE_MOVE(hi, hj, 0, movei, movej, scores, moves);
+    findlib(adjs[r], 1, &hpos);
+    ADD_CANDIDATE_MOVE(hpos, 0, moves, scores, num_moves);
   }
 
-  /* Get the two liberties of (si, sj). */
-  liberties = findlib(si, sj, 2, libi, libj);
-  ASSERT(liberties == 2, si, sj);
+  /* Get the two liberties of (str). */
+  liberties = findlib(str, 2, libs);
+  ASSERT1(liberties == 2, str);
 
-  {
-    int di = libi[1] - libi[0];
-    int dj = libj[1] - libj[0];
-    if (di < 0)
-      di = -di;
-    if (dj < 0)
-      dj = -dj;
-    if (di + dj == 1)
-      adjacent_liberties = 1;
-  }
+  if (libs[0] == SOUTH(libs[1])
+      || libs[0] == WEST(libs[1])
+      || libs[0] == NORTH(libs[1])
+      || libs[0] == EAST(libs[1]))
+    adjacent_liberties = 1;
   
   for (k = 0; k < 2; k++) {
-    ai = libi[k];
-    aj = libj[k];
-    if (!is_self_atari(ai, aj, other))
+    apos = libs[k];
+    if (!is_self_atari(apos, other))
       atari_possible = 1;
-    /* we only want to consider the move at (ai,aj) if:
+    /* we only want to consider the move at (apos) if:
      * stackp <= backfill_depth
      * -or-  stackp <= depth and it is an isolated stone
      * -or-  it is not in immediate atari
      */
-    if ((stackp <= backfill_depth) 
+    if (stackp <= backfill_depth
 	|| ((stackp <= depth || adjacent_liberties) 
-	    && ((ai == 0) || (p[ai-1][aj] != other))
-	    && ((ai == board_size-1) || (p[ai+1][aj] != other))
-	    && ((aj == 0) || (p[ai][aj-1] != other))
-	    && ((aj == board_size-1) || (p[ai][aj+1] != other)))
-	|| !is_self_atari(ai, aj, other))
-      ADD_CANDIDATE_MOVE(ai, aj, 0, movei, movej, scores, moves);
+	    && board[SOUTH(apos)] != other
+	    && board[WEST(apos)] != other
+	    && board[NORTH(apos)] != other
+	    && board[EAST(apos)] != other)
+	|| !is_self_atari(apos, other))
+      ADD_CANDIDATE_MOVE(apos, 0, moves, scores, num_moves);
 
     /* Try backfilling if atari is impossible. */
-    if (stackp <= backfill_depth
-	&& approxlib(ai, aj, other, 2, lib2i, lib2j) == 1) {
-      int ui = lib2i[0];
-      int uj = lib2j[0];
-      ADD_CANDIDATE_MOVE(ui, uj, 0, movei, movej, scores, moves);
+    if (stackp <= backfill_depth && approxlib(apos, other, 2, libs2) == 1) {
+      ADD_CANDIDATE_MOVE(libs2[0], 0, moves, scores, num_moves);
     }
   }
 
   /* If we can't make a direct atari, look for edge blocking moves. */
   if (!atari_possible)
     for (k = 0; k < 2; k++) 
-      edge_block(si, sj, libi[k], libj[k], movei, movej, scores, &moves);
+      edge_block(str, libs[k], moves, scores, &num_moves);
     
 
   /* If one of the surrounding chains have only two liberties, which
@@ -3484,50 +3230,42 @@ attack2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    * backcapture.
    */
   
-  adj = chainlinks2(si, sj, adji, adjj, 2);
-  for (r = 0; r<adj; r++) {
-    ai = adji[r];
-    aj = adjj[r];
-    if (liberty_of_string(libi[0], libj[0], ai, aj)
-	&& liberty_of_string(libi[1], libj[1], ai, aj))
-      break_chain_moves(ai, aj, movei, movej, scores, &moves);
+  adj = chainlinks2(str, adjs, 2);
+  for (r = 0; r < adj; r++) {
+    apos = adjs[r];
+    if (liberty_of_string(libs[0], apos)
+	&& liberty_of_string(libs[1], apos))
+      break_chain_moves(apos, moves, scores, &num_moves);
   }
   
-  propose_edge_moves(si, sj, libi, libj, liberties, movei, movej, scores,
-		     &moves, other);
-  order_moves(si, sj, moves, movei, movej, scores, other, read_function_name);
+  propose_edge_moves(str, libs, liberties, moves, scores, &num_moves, other);
+  order_moves(str, num_moves, moves, scores, other, read_function_name);
 
-  for (k = 0; k < moves; k++) {
-    int new_komaster, new_kom_i, new_kom_j;
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
     int ko_move;
 
-    ai = movei[k];
-    aj = movej[k];
-    if (komaster_trymove(ai, aj, other, "attack2-A", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    apos = moves[k];
+    if (komaster_trymove(apos, other, "attack2-A", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       if (!ko_move) {
-	dcode = do_find_defense(si, sj, NULL, NULL,
-				new_komaster, new_kom_i, new_kom_j);
+	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
 	if (dcode != WIN
-	    && do_attack(si, sj, NULL, NULL,
-			 new_komaster, new_kom_i, new_kom_j)) {
+	    && do_attack(str, NULL, new_komaster, new_kom_pos)) {
 	  if (dcode == 0) {
 	    popgo();
-	    SGFTRACE(ai, aj, WIN, "attack effective");
-	    READ_RETURN(read_result, i, j, ai, aj, WIN);
+	    SGFTRACE(apos, WIN, "attack effective");
+	    READ_RETURN(read_result, move, apos, WIN);
 	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, ai, aj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, apos);
 	}
       }
       else {
-	if (do_find_defense(si, sj, NULL, NULL,
-			    new_komaster, new_kom_i, new_kom_j) != WIN
-	    && do_attack(si, sj, NULL, NULL,
-			 new_komaster, new_kom_i, new_kom_j) != 0) {
-	  savei = ai;
-	  savej = aj;
+	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
+	    && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	  savemove = apos;
 	  savecode = KO_B;
 	}
       }
@@ -3536,42 +3274,38 @@ attack2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   }
   
   /* The simple ataris didn't work. Try something more fancy. */
-  acode = find_cap2(si, sj, libi[0], libj[0], libi[1], libj[1], &xi, &xj,
-		    komaster, kom_i, kom_j);
+  acode = find_cap2(str, libs[0], libs[1], &xpos, komaster, kom_pos);
   if (acode == WIN) {
-    SGFTRACE(xi, xj, WIN, "find cap2");
-    READ_RETURN(read_result, i, j, xi, xj, WIN);
+    SGFTRACE(xpos, WIN, "find cap2");
+    READ_RETURN(read_result, move, xpos, WIN);
   }
-  UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, acode, xi, xj);
+  UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
 
   if (stackp <= backfill_depth) {
-    acode = special_attack2(si, sj, libi, libj, &xi, &xj, 
-			    komaster, kom_i, kom_j);
+    acode = special_attack2(str, libs, &xpos, komaster, kom_pos);
     if (acode == WIN) {
-      SGFTRACE(xi, xj, WIN, "special attack2");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "special attack2");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, acode, xi, xj);
-  }
-
-  if (stackp <= backfill_depth) {
-    acode = special_attack3(si, sj, libi, libj, &xi, &xj, 
-			    komaster, kom_i, kom_j);
-    if (acode == WIN) {
-      SGFTRACE(xi, xj, WIN, "special attack3");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, acode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
   }
 
   if (stackp <= backfill_depth) {
-    acode = special_attack4(si, sj, libi, libj, &xi, &xj, 
-			    komaster, kom_i, kom_j);
+    acode = special_attack3(str, libs, &xpos, komaster, kom_pos);
     if (acode == WIN) {
-      SGFTRACE(xi, xj, WIN, "special attack4");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "special attack3");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, acode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
+  }
+
+  if (stackp <= backfill_depth) {
+    acode = special_attack4(str, libs, &xpos, komaster, kom_pos);
+    if (acode == WIN) {
+      SGFTRACE(xpos, WIN, "special attack4");
+      READ_RETURN(read_result, move, xpos, WIN);
+    }
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
   }
 
   /* If it is not possible to make a direct atari, we try filling
@@ -3580,46 +3314,35 @@ attack2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   if (level >= 10
       && stackp <= backfill_depth
       && (stackp <= superstring_depth || !atari_possible)) {
-    int libs;
-    int libi[MAX_LIBERTIES + 4], libj[MAX_LIBERTIES + 4];
+    int liberties;
+    int libs[MAX_LIBERTIES + 4];
     int liberty_cap = 2;
 
     if (stackp <= backfill2_depth)
       liberty_cap = 3;
     
-    find_superstring_liberties(si, sj, &libs, libi, libj, liberty_cap);
-    if (libs <= 5) {
-      for (k = 0; k < libs; k++) {
-	int ai = libi[k];
-	int aj = libj[k];
+    find_superstring_liberties(str, &liberties, libs, liberty_cap);
+    if (liberties <= 5) {
+      for (k = 0; k < liberties; k++) {
+	int apos = libs[k];
 	
-	if (liberty_of_string(ai, aj, si, sj))
+	if (liberty_of_string(apos, str))
 	  continue;
-	if (trymove(ai, aj, other, "attack2-C", si, sj, 
-		    komaster, kom_i, kom_j)) {
-	  if (countlib(ai, aj) == 1) {
+	if (trymove(apos, other, "attack2-C", str, komaster, kom_pos)) {
+	  if (countlib(apos) == 1) {
 	    /* can't atari, try backfilling. */
-#if 0
-	    if (restricted_defend1(ai, aj, &xi, &xj, komaster, kom_i, kom_j,
-				   libs, libi, libj)) {
-#else
-	    findlib(ai, aj, 1, &xi, &xj);
-	    if (approxlib(xi, xj, other, 2, NULL, NULL) > 1) {
-#endif
+	    findlib(apos, 1, &xpos);
+	    if (approxlib(xpos, other, 2, NULL) > 1) {
 	      popgo();
-	      if (trymove(xi, xj, other, "attack2-D", si, sj,
-			  komaster, kom_i, kom_j)) {
-		dcode = do_find_defense(si, sj, NULL, NULL, 
-					komaster, kom_i, kom_j);
-		if (dcode != WIN && do_attack(si, sj, NULL, NULL, 
-					    komaster, kom_i, kom_j)) {
+	      if (trymove(xpos, other, "attack2-D", str, komaster, kom_pos)) {
+		dcode = do_find_defense(str, NULL, komaster, kom_pos);
+		if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 		  if (dcode == 0) {
 		    popgo();
-		    SGFTRACE(xi, xj, WIN, "attack effective");
-		    READ_RETURN(read_result, i, j, xi, xj, WIN);
+		    SGFTRACE(xpos, WIN, "attack effective");
+		    READ_RETURN(read_result, move, xpos, WIN);
 		  }
-		  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode,
-					 xi, xj);
+		  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
 		}
 		popgo();
 	      }
@@ -3628,16 +3351,15 @@ attack2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
 	      popgo();
 	  }
 	  else {
-	    dcode = do_find_defense(si, sj, NULL, NULL, 
-				    komaster, kom_i, kom_j);
+	    dcode = do_find_defense(str, NULL, komaster, kom_pos);
 	    if (dcode != WIN 
-		&& do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j)) {
+		&& do_attack(str, NULL, komaster, kom_pos)) {
 	      if (dcode == 0) {
 		popgo();
-		SGFTRACE(ai, aj, WIN, "attack effective");
-		READ_RETURN(read_result, i, j, ai, aj, WIN);
+		SGFTRACE(apos, WIN, "attack effective");
+		READ_RETURN(read_result, move, apos, WIN);
 	      }
-	      UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, ai, aj);
+	      UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, apos);
 	    }
 	    popgo();
 	  }
@@ -3648,17 +3370,17 @@ attack2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
 
   if (savecode == 0) {
     RTRACE("ALIVE!!\n");
-    SGFTRACE(-1, -1, 0, NULL);
+    SGFTRACE(0, 0, NULL);
     READ_RETURN0(read_result);
   }
 
-  SGFTRACE(savei, savej, savecode, "saved move");
-  READ_RETURN(read_result, i, j, savei, savej, savecode);
+  SGFTRACE(savemove, savecode, "saved move");
+  READ_RETURN(read_result, move, savemove, savecode);
 }
 
 
 
-/* attack3(si, sj, *i, *j) is used when (si, sj) points to a group with
+/* attack3(str, *move) is used when (str) points to a group with
  * three liberties. It returns true if it finds a way to kill the group.
  *
  * Return code is KO_A if the group can be killed if the attacker is 
@@ -3667,156 +3389,143 @@ attack2(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
  * Return code is KO_B if the group can be killed if the attacker is 
  * able to find a ko threat which must be answered.
  *
- * If non-NULL (*i, *j) will be set to the move which makes the
+ * If non-NULL (*move) will be set to the move which makes the
  * attack succeed.
  */
 
 static int 
-attack3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+attack3(int str, int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-  int xi, xj;
+  int adj, adjs[MAXCHAIN];
+  int xpos;
   int liberties;
-  int libi[3], libj[3];
+  int libs[3];
   int r;
   int dcode = 0;
   int k;
-  int movei[MAX_MOVES], movej[MAX_MOVES];
+  int moves[MAX_MOVES];
   int scores[MAX_MOVES];
-  int moves = 0;
-  int savei = -1, savej = -1;
+  int num_moves = 0;
+  int savemove = 0;
   int savecode = 0;
   int found_read_result;
   Read_result *read_result;
   
-  SETUP_TRACE_INFO("attack3", si, sj);
+  SETUP_TRACE_INFO("attack3", str);
   reading_node_counter++;
   
-  gg_assert(p[si][sj] != EMPTY);
+  gg_assert(board[str] != EMPTY);
   
   if ((stackp <= depth) && (hashflags & HASH_ATTACK3)) {
-    found_read_result = get_read_result(ATTACK3, komaster, kom_i, kom_j,
-					&si, &sj, &read_result);
+    found_read_result = get_read_result(ATTACK3, komaster, kom_pos,
+					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (i) *i = rr_get_result_i(*read_result);
-	if (j) *j = rr_get_result_j(*read_result);
-      }
+      if (rr_get_result(*read_result) != 0)
+	*move = rr_get_move(*read_result);
       
-      SGFTRACE(rr_get_result_i(*read_result), rr_get_result_j(*read_result),
+      SGFTRACE(rr_get_move(*read_result),
 	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
     
     /* This data should always be recorded. */
     if (read_result) {
-      rr_set_compressed_data(*read_result, ATTACK3, komaster, kom_i, kom_j, 
-			     si, sj, stackp);
+      rr_set_compressed_data(*read_result, ATTACK3, komaster, kom_pos, 
+			     str, stackp);
     }
-  } else
+  }
+  else
     read_result = NULL;
   
   if (stackp > depth) {
-    SGFTRACE(-1, -1, 0, "stackp > depth");
+    SGFTRACE(0, 0, "stackp > depth");
     READ_RETURN0(read_result);
   }
   
-  adj = chainlinks2(si, sj, adji, adjj, 1);
+  adj = chainlinks2(str, adjs, 1);
   for (r = 0; r < adj; r++) {
-    int hi, hj;
-    break_chain_moves(adji[r], adjj[r], movei, movej, scores, &moves);
+    int hpos;
+    break_chain_moves(adjs[r], moves, scores, &num_moves);
     
-    findlib(adji[r], adjj[r], 1, &hi, &hj);
-    ADD_CANDIDATE_MOVE(hi, hj, 0, movei, movej, scores, moves);
+    findlib(adjs[r], 1, &hpos);
+    ADD_CANDIDATE_MOVE(hpos, 0, moves, scores, num_moves);
   }
   
   /* Defend against double atari in the surrounding chain early. */
-  double_atari_chain2(si, sj, movei, movej, scores, &moves);
+  double_atari_chain2(str, moves, scores, &num_moves);
   
-  /* Get the three liberties of (si, sj). */
-  liberties = findlib(si, sj, 3, libi, libj);
-  ASSERT(liberties == 3, si, sj);
+  /* Get the three liberties of (str). */
+  liberties = findlib(str, 3, libs);
+  ASSERT1(liberties == 3, str);
   
   for (k = 0; k < 3; k++) {
 #if 0
-    int lib2i[2];
-    int lib2j[2];
+    int libs2[2];
 #endif
-    int ai = libi[k];
-    int aj = libj[k];
+    int apos = libs[k];
     /* we only want to consider the move at (ai,aj) if:
      * stackp <= backfill_depth
      * -or-  stackp <= depth and it is an isolated stone
      * -or-  it is not in immediate atari
      */
-    if ((stackp <= backfill_depth) 
-	|| ((stackp <= depth) 
-	    && ((ai == 0) || (p[ai-1][aj] != other))
-	    && ((ai == board_size-1) || (p[ai+1][aj] != other))
-	    && ((aj == 0) || (p[ai][aj-1] != other))
-	    && ((aj == board_size-1) || (p[ai][aj+1] != other)))
-	|| !is_self_atari(ai, aj, other))
-      ADD_CANDIDATE_MOVE(ai, aj, 0, movei, movej, scores, moves);
+    if (stackp <= backfill_depth
+	|| (stackp <= depth
+	    && board[SOUTH(apos)] != other
+	    && board[WEST(apos)] != other
+	    && board[NORTH(apos)] != other
+	    && board[EAST(apos)] != other)
+	|| !is_self_atari(apos, other))
+      ADD_CANDIDATE_MOVE(apos, 0, moves, scores, num_moves);
 
-    if (edge_closing_backfill(si, sj, ai, aj, &xi, &xj))
-      ADD_CANDIDATE_MOVE(xi, xj, 0, movei, movej, scores, moves);
+    if (edge_closing_backfill(str, apos, &xpos))
+      ADD_CANDIDATE_MOVE(xpos, 0, moves, scores, num_moves);
 
 #if 0
     /* Try backfilling if atari is impossible. */
     if (stackp <= backfill_depth
-	&& approxlib(ai, aj, other, 2, lib2i, lib2j) == 1) {
-      int ui = lib2i[0];
-      int uj = lib2j[0];
-      ADD_CANDIDATE_MOVE(ui, uj, 0, movei, movej, scores, moves);
+	&& approxlib(apos, other, 2, libs2) == 1) {
+      ADD_CANDIDATE_MOVE(libs2[0], 0, moves, scores, num_moves);
     }
 #endif
     
     /* Look for edge blocking moves. */
-    edge_block(si, sj, ai, aj, movei, movej, scores, &moves);
+    edge_block(str, apos, moves, scores, &num_moves);
   }
   
   /* Pick up some edge moves. */
-  propose_edge_moves(si, sj, libi, libj, liberties, movei, movej, scores,
-		     &moves, other);
-  order_moves(si, sj, moves, movei, movej, scores, other, read_function_name);
+  propose_edge_moves(str, libs, liberties, moves, scores, &num_moves, other);
+  order_moves(str, num_moves, moves, scores, other, read_function_name);
 
   /* Try the moves collected so far. */
-  for (k = 0; k < moves; k++) {
-    int new_komaster, new_kom_i, new_kom_j;
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
     int ko_move;
     
     if (stackp >= branch_depth && k > 0)
       break;
-    xi = movei[k];
-    xj = movej[k];
-    if (komaster_trymove(xi, xj, other, "attack3-A", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    xpos = moves[k];
+    if (komaster_trymove(xpos, other, "attack3-A", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       if (!ko_move) {
-	dcode = do_find_defense(si, sj, NULL, NULL,
-				new_komaster, new_kom_i, new_kom_j);
-	if (dcode != WIN
-	    && do_attack(si, sj, NULL, NULL,
-			 new_komaster, new_kom_i, new_kom_j)) {
+	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
+	if (dcode != WIN && do_attack(str, NULL, new_komaster, new_kom_pos)) {
 	  if (dcode == 0) {
 	    popgo();
-	    SGFTRACE(xi, xj, WIN, "attack effective");
-	    READ_RETURN(read_result, i, j, xi, xj, WIN);
+	    SGFTRACE(xpos, WIN, "attack effective");
+	    READ_RETURN(read_result, move, xpos, WIN);
 	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, xi, xj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
 	}
       }
       else {
-	if (do_find_defense(si, sj, NULL, NULL,
-			    new_komaster, new_kom_i, new_kom_j) != WIN
-	    && do_attack(si, sj, NULL, NULL,
-			 new_komaster, new_kom_i, new_kom_j) != 0) {
-	  savei = xi;
-	  savej = xj;
+	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
+	    && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	  savemove = xpos;
 	  savecode = KO_B;
 	}
       }
@@ -3826,77 +3535,70 @@ attack3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
     
   /* The simple ataris didn't work. Try something more fancy. */
   if (stackp <= backfill_depth) {
-    int acode = find_cap3(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    int acode = find_cap3(str, &xpos, komaster, kom_pos);
     if (acode == WIN) {
-      SGFTRACE(xi, xj, WIN, "find cap3");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "find cap3");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, acode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
   }
 
   if (stackp <= fourlib_depth) {
-    int acode = draw_back(si, sj, &xi, &xj, komaster, kom_i, kom_j);
+    int acode = draw_back(str, &xpos, komaster, kom_pos);
     if (acode == WIN) {
-      SGFTRACE(xi, xj, WIN, "draw back");
-      READ_RETURN(read_result, i, j, xi, xj, WIN);
+      SGFTRACE(xpos, WIN, "draw back");
+      READ_RETURN(read_result, move, xpos, WIN);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, acode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
   }
 
   /* Try to defend chain links with two liberties. */
   if (stackp <= backfill2_depth) {
-    int saved_moves = moves;
-    adj = chainlinks2(si, sj, adji, adjj, 2);
+    int saved_num_moves = num_moves;
+    adj = chainlinks2(str, adjs, 2);
     for (r = 0; r < adj; r++) {
-      int lib2i[2], lib2j[2];
-      findlib(adji[r], adjj[r], 2, lib2i, lib2j);
-      if (approxlib(lib2i[0], lib2j[0], other, 4, NULL, NULL) > 3
-	  && approxlib(lib2i[1], lib2j[1], other, 4, NULL, NULL) > 3)
+      int libs2[2];
+      findlib(adjs[r], 2, libs2);
+      if (approxlib(libs2[0], other, 4, NULL) > 3
+	  && approxlib(libs2[1], other, 4, NULL) > 3)
 	continue;
-      break_chain_moves(adji[r], adjj[r], movei, movej, scores, &moves);
-      break_chain2_moves(adji[r], adjj[r], movei, movej, scores, &moves, 1);
+      break_chain_moves(adjs[r], moves, scores, &num_moves);
+      break_chain2_moves(adjs[r], moves, scores, &num_moves, 1);
       for (k = 0; k < 2; k++)
-	ADD_CANDIDATE_MOVE(lib2i[k], lib2j[k], 0,
-			   movei, movej, scores, moves);
+	ADD_CANDIDATE_MOVE(libs2[k], 0, moves, scores, num_moves);
     }
     /* Only order and test the new set of moves. */
-    order_moves(si, sj, moves-saved_moves,
-		&(movei[saved_moves]), &(movej[saved_moves]),
-		&(scores[saved_moves]), other, read_function_name);
-    for (k = saved_moves; k < moves; k++) {
-      int new_komaster, new_kom_i, new_kom_j;
+    order_moves(str, num_moves-saved_num_moves,
+		&(moves[saved_num_moves]),
+		&(scores[saved_num_moves]), other, read_function_name);
+    for (k = saved_num_moves; k < num_moves; k++) {
+      int new_komaster;
+      int new_kom_pos;
       int ko_move;
 
       if (stackp >= branch_depth && k > 0)
 	break;
-      xi = movei[k];
-      xj = movej[k];
+      xpos = moves[k];
       
-      if (komaster_trymove(xi, xj, other, "attack3-C", si, sj,
-			   komaster, kom_i, kom_j,
-			   &new_komaster, &new_kom_i, &new_kom_j,
+      if (komaster_trymove(xpos, other, "attack3-C", str,
+			   komaster, kom_pos, &new_komaster, &new_kom_pos,
 			   &ko_move, stackp <= ko_depth && savecode == 0)) {
 	if (!ko_move) {
-	  dcode = do_find_defense(si, sj, NULL, NULL,
-				  new_komaster, new_kom_i, new_kom_j);
+	  dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
 	  if (dcode != WIN
-	      && do_attack(si, sj, NULL, NULL,
-			   new_komaster, new_kom_i, new_kom_j)) {
+	      && do_attack(str, NULL, new_komaster, new_kom_pos)) {
 	    if (dcode == 0) {
 	      popgo();
-	      SGFTRACE(xi, xj, WIN, "attack effective");
-	      READ_RETURN(read_result, i, j, xi, xj, WIN);
+	      SGFTRACE(xpos, WIN, "attack effective");
+	      READ_RETURN(read_result, move, xpos, WIN);
 	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, xi, xj);
+	    UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
 	  }
 	}
-      else {
-	if (do_find_defense(si, sj, NULL, NULL,
-			    new_komaster, new_kom_i, new_kom_j) != WIN
-	    && do_attack(si, sj, NULL, NULL,
-			 new_komaster, new_kom_i, new_kom_j) != 0) {
-	    savei = xi;
-	    savej = xj;
+	else {
+	  if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
+	      && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	    savemove = xpos;
 	    savecode = KO_B;
 	  }
 	}
@@ -3909,42 +3611,31 @@ attack3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
    * super_string.
    */
   if (level >= 10 && stackp <= backfill2_depth) {
-    int libs;
-    int libi[MAX_LIBERTIES + 4], libj[MAX_LIBERTIES + 4];
+    int liberties;
+    int libs[MAX_LIBERTIES + 4];
 
-    find_superstring_liberties(si, sj, &libs, libi, libj, 3);
-    if (libs <= 5) {
-      for (k = 0; k < libs; k++) {
-	int ai = libi[k];
-	int aj = libj[k];
+    find_superstring_liberties(str, &liberties, libs, 3);
+    if (liberties <= 5) {
+      for (k = 0; k < liberties; k++) {
+	int apos = libs[k];
 	
-	if (liberty_of_string(ai, aj, si, sj))
+	if (liberty_of_string(apos, str))
 	  continue;
-	if (trymove(ai, aj, other, "attack3-E", si, sj,
-		    komaster, kom_i, kom_j)) {
-	  if (countlib(ai, aj) == 1) {
+	if (trymove(apos, other, "attack3-E", str, komaster, kom_pos)) {
+	  if (countlib(apos) == 1) {
 	    /* can't atari, try backfilling */
-#if 0
-	    if (restricted_defend1(ai, aj, &xi, &xj, komaster, kom_i, kom_j,
-				   libs, libi, libj)) {
-#else
-	    findlib(ai, aj, 1, &xi, &xj);
-	    if (approxlib(xi, xj, other, 2, NULL, NULL) > 1) {
-#endif
+	    findlib(apos, 1, &xpos);
+	    if (approxlib(xpos, other, 2, NULL) > 1) {
 	      popgo();
-	      if (trymove(xi, xj, other, "attack3-F", si, sj,
-			  komaster, kom_i, kom_j)) {
-		dcode = do_find_defense(si, sj, NULL, NULL, 
-					komaster, kom_i, kom_j);
-		if (dcode != WIN && do_attack(si, sj, NULL, NULL, 
-					    komaster, kom_i, kom_j)) {
+	      if (trymove(xpos, other, "attack3-F", str, komaster, kom_pos)) {
+		dcode = do_find_defense(str, NULL, komaster, kom_pos);
+		if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 		  if (dcode == 0) {
 		    popgo();
-		    SGFTRACE(xi, xj, WIN, "attack effective");
-		    READ_RETURN(read_result, i, j, xi, xj, WIN);
+		    SGFTRACE(xpos, WIN, "attack effective");
+		    READ_RETURN(read_result, move, xpos, WIN);
 		  }
-		  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode,
-					 xi, xj);
+		  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
 		}
 		popgo();
 	      }
@@ -3953,16 +3644,14 @@ attack3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
 	      popgo();
 	  }
 	  else {
-	    dcode = do_find_defense(si, sj, NULL, NULL, 
-				    komaster, kom_i, kom_j);
-	    if (dcode != WIN && do_attack(si, sj, NULL, NULL, 
-					komaster, kom_i, kom_j)) {
+	    dcode = do_find_defense(str, NULL, komaster, kom_pos);
+	    if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 	      if (dcode == 0) {
 		popgo();
-		SGFTRACE(ai, aj, WIN, "attack effective");
-		READ_RETURN(read_result, i, j, ai, aj, WIN);
+		SGFTRACE(apos, WIN, "attack effective");
+		READ_RETURN(read_result, move, apos, WIN);
 	      }
-	      UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, ai, aj);
+	      UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, apos);
 	    }
 	    popgo();
 	  }
@@ -3972,11 +3661,11 @@ attack3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   }
 
   if (savecode != 0) {
-    SGFTRACE(savei, savej, savecode, "saved move");
-    READ_RETURN(read_result, i, j, savei, savej, savecode);
+    SGFTRACE(savemove, savecode, "saved move");
+    READ_RETURN(read_result, move, savemove, savecode);
   }
   
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   READ_RETURN0(read_result);
 }
 
@@ -3986,119 +3675,110 @@ attack3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
  */
 
 static int 
-attack4(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+attack4(int str, int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int xi, xj;
+  int xpos;
   int r;
   int k;
   int liberties;
-  int libi[4], libj[4];
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
+  int libs[4];
+  int adj, adjs[MAXCHAIN];
   int dcode = 0;
-  int movei[MAX_MOVES], movej[MAX_MOVES];
+  int moves[MAX_MOVES];
   int scores[MAX_MOVES];
-  int moves = 0;
+  int num_moves = 0;
   Read_result *read_result = NULL;
+  int savemove = 0;
   int savecode = 0;
-  int savei = -1, savej = -1;
 
-  SETUP_TRACE_INFO("attack4", si, sj);
+  SETUP_TRACE_INFO("attack4", str);
   
-  gg_assert(p[si][sj] != EMPTY);
+  gg_assert(board[str] != EMPTY);
   reading_node_counter++;
   
   if (stackp > depth) {
-    SGFTRACE(-1, -1, 0, "stackp > depth");
+    SGFTRACE(0, 0, "stackp > depth");
     return 0;
   }
 
-  adj = chainlinks2(si, sj, adji, adjj, 1);
+  adj = chainlinks2(str, adjs, 1);
   for (r = 0; r < adj; r++) {
-    int hi, hj;
-    break_chain_moves(adji[r], adjj[r], movei, movej, scores, &moves);
+    int hpos;
+    break_chain_moves(adjs[r], moves, scores, &num_moves);
     
-    findlib(adji[r], adjj[r], 1, &hi, &hj);
-    ADD_CANDIDATE_MOVE(hi, hj, 0, movei, movej, scores, moves);
+    findlib(adjs[r], 1, &hpos);
+    ADD_CANDIDATE_MOVE(hpos, 0, moves, scores, num_moves);
   }
 
 
   /* Defend against double atari in the surrounding chain early. */
-  double_atari_chain2(si, sj, movei, movej, scores, &moves);
+  double_atari_chain2(str, moves, scores, &num_moves);
 
   /* Give a score bonus to the chain preserving moves. */
-  for (k = 0; k < moves; k++)
+  for (k = 0; k < num_moves; k++)
     scores[k] += 5;
   
-  /* Get the four liberties of (si, sj). */
-  liberties = findlib(si, sj, 4, libi, libj);
-  ASSERT(liberties == 4, si, sj);
+  /* Get the four liberties of (str). */
+  liberties = findlib(str, 4, libs);
+  ASSERT1(liberties == 4, str);
 
   for (k = 0; k < 4; k++) {
-    int ai = libi[k];
-    int aj = libj[k];
-    /* we only want to consider the move at (ai,aj) if:
+    int apos = libs[k];
+    /* we only want to consider the move at (apos) if:
      * stackp <= backfill_depth
      * -or-  stackp <= depth and it is an isolated stone
      * -or-  it is not in immediate atari
      */
-    if ((stackp <= backfill_depth) 
+    if (stackp <= backfill_depth
 	|| (stackp <= depth
-	    && (ai == 0 || p[ai-1][aj] != other)
-	    && (ai == board_size-1 || p[ai+1][aj] != other)
-	    && (aj == 0 || p[ai][aj-1] != other)
-	    && (aj == board_size-1 || p[ai][aj+1] != other))
-	|| !is_self_atari(ai, aj, other))
-      ADD_CANDIDATE_MOVE(ai, aj, 0, movei, movej, scores, moves);
+	    && board[SOUTH(apos)] != other
+	    && board[WEST(apos)] != other
+	    && board[NORTH(apos)] != other
+	    && board[EAST(apos)] != other)
+	|| !is_self_atari(apos, other))
+      ADD_CANDIDATE_MOVE(apos, 0, moves, scores, num_moves);
 
-    if (edge_closing_backfill(si, sj, ai, aj, &xi, &xj))
-      ADD_CANDIDATE_MOVE(xi, xj, 10, movei, movej, scores, moves);
+    if (edge_closing_backfill(str, apos, &xpos))
+      ADD_CANDIDATE_MOVE(xpos, 10, moves, scores, num_moves);
 
     /* Look for edge blocking moves. */
-    edge_block(si, sj, ai, aj, movei, movej, scores, &moves);
+    edge_block(str, apos, moves, scores, &num_moves);
   }
 
   /* Pick up some edge moves. */
-  propose_edge_moves(si, sj, libi, libj, liberties, movei, movej, scores,
-		     &moves, other);
-  order_moves(si, sj, moves, movei, movej, scores, other, read_function_name);
+  propose_edge_moves(str, libs, liberties, moves, scores, &num_moves, other);
+  order_moves(str, num_moves, moves, scores, other, read_function_name);
 
   /* Try the moves collected so far. */
-  for (k = 0; k < moves; k++) {
-    int new_komaster, new_kom_i, new_kom_j;
+  for (k = 0; k < num_moves; k++) {
+    int new_komaster;
+    int new_kom_pos;
     int ko_move;
 
     if (stackp >= branch_depth && k > 0)
       break;
-    xi = movei[k];
-    xj = movej[k];
+    xpos = moves[k];
     /* Conditional ko capture is disabled because it seems to expensive. */
-    if (komaster_trymove(xi, xj, other, "attack4-A", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    if (komaster_trymove(xpos, other, "attack4-A", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, 0 && stackp <= ko_depth && savecode == 0)) {
       if (!ko_move) {
-	dcode = do_find_defense(si, sj, NULL, NULL,
-				new_komaster, new_kom_i, new_kom_j);
-	if (dcode != WIN
-	    && do_attack(si, sj, NULL, NULL,
-			 new_komaster, new_kom_i, new_kom_j)) {
+	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
+	if (dcode != WIN && do_attack(str, NULL, new_komaster, new_kom_pos)) {
 	  if (dcode == 0) {
 	    popgo();
-	    SGFTRACE(xi, xj, WIN, "attack effective");
-	    READ_RETURN(read_result, i, j, xi, xj, WIN);
+	    SGFTRACE(xpos, WIN, "attack effective");
+	    READ_RETURN(read_result, move, xpos, WIN);
 	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, xi, xj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
 	}
       }
       else {
-	if (do_find_defense(si, sj, NULL, NULL,
-			    new_komaster, new_kom_i, new_kom_j) != WIN
-	    && do_attack(si, sj, NULL, NULL,
-			 new_komaster, new_kom_i, new_kom_j) != 0) {
-	  savei = xi;
-	  savej = xj;
+	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
+	    && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	  savemove = xpos;
 	  savecode = KO_B;
 	}
       }
@@ -4107,19 +3787,18 @@ attack4(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
   }
 
   if (savecode != 0) {
-    SGFTRACE(savei, savej, savecode, "saved move");
-    if (i) *i = savei;
-    if (j) *j = savej;
+    SGFTRACE(savemove, savecode, "saved move");
+    *move = savemove;
     return savecode;
   }
 
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   return 0;
 }
 
 
-/* If (si, sj) points to a string with 2 or 3 liberties,
- * find_cap2(si, sj, ai, aj, bi, bj, &i, &j, komaster)
+/* If (str) points to a string with 2 or 3 liberties,
+ * find_cap2(str, ai, aj, bi, bj, &i, &j, komaster)
  * looks for a configuration of the following type:
  *
  *  X.
@@ -4131,60 +3810,56 @@ attack4(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
  */
 
 static int
-find_cap2(int si, int sj, int ai, int aj, int bi, int bj, int *i, int *j,
-	  int komaster, int kom_i, int kom_j)
+find_cap2(int str, int alib, int blib, int *move, int komaster, int kom_pos)
 {
-  int ti = -1, tj = -1;
+  int ai, aj;
+  int bi, bj;
 
   /* Check if the two liberties are located like the figure above. */
-  if ((ai == bi+1 || ai == bi-1)
-      && (aj == bj+1 || aj == bj-1))
-  {
-    /* Which of the two corner points should we use? One of them is 
-     * always occupied by the string at (m, n), the other one is either
-     * free or occupied by something else.
-     */
-    if (p[bi][aj] == EMPTY) {
-      ti = bi;
-      tj = aj;
-    }
-    if (p[ai][bj] == EMPTY) {
-      ti = ai;
-      tj = bj;
-    }
+  if (alib != SW(blib)
+      && alib != NW(blib)
+      && alib != NE(blib)
+      && alib != SE(blib))
+    return 0;
 
-    /* If we didn't find a free intersection, we couldn't make the move. */
-    if (ti == -1)
+  ai = I(alib);
+  aj = J(alib);
+  bi = I(blib);
+  bj = J(blib);
+  /* Which of the two corner points should we use? One of them is 
+   * always occupied by the string at (str), the other one is either
+   * free or occupied by something else.
+   */
+  if (BOARD(bi, aj) == EMPTY)
+    *move = POS(bi, aj);
+  else if (BOARD(ai, bj) == EMPTY)
+    *move = POS(ai, bj);
+  else
+    return 0;
+  
+  /* Ok, we found the spot. Now see if the move works. */
+  RTRACE("trying to capture %1m with capping move at %1m\n", str, *move);
+  if (trymove(*move, OTHER_COLOR(board[str]), "find_cap2", str,
+	      komaster, kom_pos)) {
+    int dcode = do_find_defense(str, NULL, komaster, kom_pos);
+    popgo();
+    switch (dcode) {
+    case 0:
+      RTRACE("cap2 succeeded!\n");
+      return WIN;
+      break;
+    case WIN:
+      RTRACE("cap2 failed!\n");
       return 0;
-
-    /* Ok, we found the spot. Now see if the move works. */
-    RTRACE("trying to capture %m with capping move at %m\n", si, sj, ti, tj);
-    if (trymove(ti, tj, OTHER_COLOR(p[si][sj]),"find_cap2", si, sj,
-		komaster, kom_i, kom_j)) {
-      int dcode = do_find_defense(si, sj, NULL, NULL, komaster, kom_i, kom_j);
-      popgo();
-      if (dcode != WIN) {
-	if (i) *i = ti;
-	if (j) *j = tj;
-      }
-      switch (dcode) {
-      case 0:
-	RTRACE("cap2 succeeded!\n");
-	return WIN;
-	break;
-      case WIN:
-	RTRACE("cap2 failed!\n");
-	return 0;
-	break;
-      case KO_B:
-	RTRACE("cap2 succeeded with ko return code KO_B\n");
-	return KO_B;
-	break;
-      case KO_A:
-	RTRACE("cap2 succeeded with ko return code KO_A\n");
-	return KO_A;
-	break;
-      }
+      break;
+    case KO_B:
+      RTRACE("cap2 succeeded with ko return code KO_B\n");
+      return KO_B;
+      break;
+    case KO_A:
+      RTRACE("cap2 succeeded with ko return code KO_A\n");
+      return KO_A;
+      break;
     }
   }
 
@@ -4192,7 +3867,7 @@ find_cap2(int si, int sj, int ai, int aj, int bi, int bj, int *i, int *j,
 }    
 
 
-/* If (si,sj) points to a string with 3 liberties, find_cap3(si,sj,&i,&j)
+/* If (str) points to a string with 3 liberties, find_cap3(str, &move)
  * looks for a configuration of the following type:
  *
  *  XXa
@@ -4200,47 +3875,41 @@ find_cap2(int si, int sj, int ai, int aj, int bi, int bj, int *i, int *j,
  *
  * where X are elements of the string in question and a, b and c are
  * its liberties. It tries the move at * and returns true this move
- * captures the string, leaving (i,j) pointing to *.
+ * captures the string, leaving (*move) pointing to *.
  */
 
 static int
-find_cap3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
+find_cap3(int str, int *move, int komaster, int kom_pos)
 {
-  int ai, aj, bi, bj;
-  int libi[3], libj[3];
-  int xi = -1, xj = -1;
+  int alib, blib;
+  int libs[3];
+  int xpos = 0;
   int k;
+  int savemove = 0;
   int savecode = 0;
-  int savei = -1;
-  int savej = -1;
   int acode;
 
-  if (findlib(si, sj, 3, libi, libj) != 3)
+  if (findlib(str, 3, libs) != 3)
     return 0;
 
-  for (k = 0; k < 3; ++k) {
+  for (k = 0; k < 3; k++) {
     /* k and k+1 mod 3 will be (0,1), (1,2) and (2,0); These are the 
      * three combinations of indices that we have to send to find_cap2.
      */
-    ai = libi[k];
-    aj = libj[k];
-    bi = libi[(k+1)%3];
-    bj = libj[(k+1)%3];
+    alib = libs[k];
+    blib = libs[(k+1)%3];
 
-    acode = find_cap2(si, sj, ai, aj, bi, bj, &xi, &xj, 
-		      komaster, kom_i, kom_j);
+    acode = find_cap2(str, alib, blib, &xpos, komaster, kom_pos);
     if (acode == WIN) {
-      if (i) *i = xi;
-      if (j) *j = xj;
+      *move = xpos;
       return WIN;
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, acode, xi, xj);
+    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
   }
 
-  if (savecode != 0) {
-    if (i) *i = savei;
-    if (j) *j = savej;
-  }
+  if (savecode != 0)
+    *move = savemove;
+
   return savecode;
 }
 
@@ -4259,55 +3928,44 @@ find_cap3(int si, int sj, int *i, int *j, int komaster, int kom_i, int kom_j)
  */
 
 static int
-special_attack2(int si, int sj, int libi[2], int libj[2], 
-		int *ti, int *tj, int komaster, int kom_i, int kom_j)
+special_attack2(int str, int libs[2], int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
+  int newlibs[3];
+  int xpos;
+  int savemove = 0;
   int savecode = 0;
-  int newlibi[3], newlibj[3];
-  int xi, xj;
-  int savei = -1, savej = -1;
   int k;
 
-  for (k = 0; k < 2; ++k) {
-    if (is_suicide(libi[k], libj[k], other) 
-	&& (approxlib(libi[k], libj[k], color, 3, newlibi, newlibj) == 2)) {
-      if (newlibi[0] != libi[1-k] || newlibj[0] != libj[1-k]) {
-	xi = newlibi[0];
-	xj = newlibj[0];
-      } else {
-	xi = newlibi[1];
-	xj = newlibj[1];
-      }
+  for (k = 0; k < 2; k++) {
+    if (is_suicide(libs[k], other) 
+	&& (approxlib(libs[k], color, 3, newlibs) == 2)) {
+      if (newlibs[0] != libs[1-k])
+	xpos = newlibs[0];
+      else
+	xpos = newlibs[1];
 
-      if (!is_self_atari(xi, xj, other)
-	  && trymove(xi, xj, other, "special_attack2", si, sj,
-		     komaster, kom_i, kom_j)) {
-	int dcode = do_find_defense(si, sj, NULL, NULL, 
-				    komaster, kom_i, kom_j);
-	if (dcode != WIN 
-	    && do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j)) {
+      if (!is_self_atari(xpos, other)
+	  && trymove(xpos, other, "special_attack2", str, komaster, kom_pos)) {
+	int dcode = do_find_defense(str, NULL, komaster, kom_pos);
+	if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 	  if (dcode == 0) {
 	    popgo();
-	    if (ti) *ti = xi;
-	    if (tj) *tj = xj;
+	    *move = xpos;
 	    return WIN;
 	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, xi, xj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
 	}
 	popgo();
       }
     }
   }
 
-  if (savecode) {
-    if (ti) *ti = savei;
-    if (tj) *tj = savej;
-    return savecode;
-  }
+  if (savecode != 0)
+    *move = savemove;
 
-  return 0;
+  return savecode;
 }
 
 
@@ -4320,105 +3978,91 @@ special_attack2(int si, int sj, int libi[2], int libj[2],
  * XO.c.OX   XXXX.
  * -------
  *
- * the code that follows can find the attacking move at 'c=(xi,xj)'.
+ * the code that follows can find the attacking move at c.
  */
 
 static int
-special_attack3(int si, int sj, int libi[2], int libj[2], 
-		int *ti, int *tj, int komaster, int kom_i, int kom_j)
+special_attack3(int str, int libs[2], int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
   int acode;
   int dcode;
+  int savemove = 0;
   int savecode = 0;
-  int savei = -1, savej = -1;
-  int newlibi[2], newlibj[2];
-  int xi, xj;
-  int yi, yj;
-  int ai, aj;
-  int bi, bj;
+  int newlibs[2];
+  int xpos;
+  int ypos;
+  int apos;
+  int bpos;
   int k;
 
-  gg_assert(countlib(si, sj) == 2);
+  gg_assert(countlib(str) == 2);
 
-  for (k = 0; k < 2; ++k) {
-    ai = libi[k];
-    aj = libj[k];
-    bi = libi[1-k];
-    bj = libj[1-k];
-
-    if (ai == bi && (aj == bj+1 || aj == bj-1)) {
-      xj = aj;
-      if (ai < board_size-1 && p[ai+1][aj] == EMPTY)
-	xi = ai+1;
-      else if (ai > 0 && p[ai-1][aj] == EMPTY)
-	xi = ai-1;
+  for (k = 0; k < 2; k++) {
+    apos = libs[k];
+    bpos = libs[1-k];
+    
+    if (apos == SOUTH(bpos) || apos == NORTH(bpos)) {
+      if (board[WEST(apos)] == EMPTY)
+	xpos = WEST(apos);
+      else if (board[EAST(apos)] == EMPTY)
+	xpos = EAST(apos);
       else
 	continue;
     }
-    else if (aj == bj && (ai == bi+1 || ai == bi-1)) {
-      xi = ai;
-      if (aj < board_size-1 && p[ai][aj+1] == EMPTY)
-	xj = aj+1;
-      else if (aj > 0 && p[ai][aj-1] == EMPTY)
-	xj = aj-1;
+    else if (apos == WEST(bpos) || apos == EAST(bpos)) {
+      if (board[SOUTH(apos)] == EMPTY)
+	xpos = SOUTH(apos);
+      else if (board[NORTH(apos)] == EMPTY)
+	xpos = NORTH(apos);
       else
 	continue;
     }
     else
       return 0; /* Incorrect configuration, give up. */
-      
-    if (is_self_atari(xi, xj, other)
-	|| !trymove(xi, xj, other, "special_attack3-A", si, sj,
-		    komaster, kom_i, kom_j))
+
+    if (is_self_atari(xpos, other)
+	|| !trymove(xpos, other, "special_attack3-A", str, komaster, kom_pos))
       continue;
     
-    if (countlib(xi, xj) == 2) {
-      findlib(xi, xj, 2, newlibi, newlibj);
-      if (newlibi[0] == ai && newlibj[0] == aj) {
-	yi = newlibi[1];
-	yj = newlibj[1];
-      }
-      else {
-	yi = newlibi[0];
-	yj = newlibj[0];
-      }
-      if (!is_self_atari(yi, yj, color)
-	  && trymove(yi, yj, color, "special_attack3-B", si, sj,
-		     komaster, kom_i, kom_j)) {
-	acode = do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j);
+    if (countlib(xpos) == 2) {
+      findlib(xpos, 2, newlibs);
+      if (newlibs[0] == apos)
+	ypos = newlibs[1];
+      else
+	ypos = newlibs[0];
+
+      if (!is_self_atari(ypos, color)
+	  && trymove(ypos, color, "special_attack3-B", str,
+		     komaster, kom_pos)) {
+	acode = do_attack(str, NULL, komaster, kom_pos);
 	if (acode == 0) {
 	  popgo();
 	  popgo();
 	  continue;
 	}
-	UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej,
-					  acode, xi, xj);
+	UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
 	popgo();
       }
     }
     
-    dcode = do_find_defense(si, sj, NULL, NULL, komaster, kom_i, kom_j);
-    if (dcode != WIN && do_attack(si, sj, NULL, NULL, komaster, kom_i, kom_j)) {
+    dcode = do_find_defense(str, NULL, komaster, kom_pos);
+    if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
       if (dcode == 0) {
 	popgo();
-	if (ti) *ti = xi;
-	if (tj) *tj = xj;
+	*move = xpos;
 	return WIN;
       }
-      UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, xi, xj);
+      UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
     }
     popgo();
   }
 
-  if (savecode) {
-    if (ti) *ti = savei;
-    if (tj) *tj = savej;
-    return savecode;
-  }
-
-  return 0;
+  if (savecode != 0)
+    *move = savemove;
+  
+  return savecode;
 }
 
 
@@ -4434,47 +4078,44 @@ special_attack3(int si, int sj, int libi[2], int libj[2],
  */
 
 static int
-special_attack4(int si, int sj, int libi[2], int libj[2],
-		int *ti, int *tj, int komaster, int kom_i, int kom_j)
+special_attack4(int str, int libs[2], int *move, int komaster, int kom_pos)
 {
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
   int dcode;
+  int savemove = 0;
   int savecode = 0;
-  int savei = -1, savej = -1;
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-  int adj2, adj2i[MAXCHAIN], adj2j[MAXCHAIN];
-  int lib2i[2], lib2j[2];
-  int ai, aj;
-  int bi = -1, bj = -1;
-  int ci, cj;
-  int di, dj;
-  int ei, ej;
+  int adj, adjs[MAXCHAIN];
+  int adj2, adjs2[MAXCHAIN];
+  int libs2[2];
+  int apos;
+  int bpos = 0;
+  int cpos;
+  int dpos;
+  int epos;
   int k, s, t;
 
-  gg_assert(countlib(si, sj) == 2);
+  gg_assert(countlib(str) == 2);
 
   /* To avoid making this too general, we require that both
    * liberties are self ataris for X.
    */
-  if (!is_self_atari(libi[0], libj[0], other) 
-      || !is_self_atari(libi[1], libj[1], other))
+  if (!is_self_atari(libs[0], other) 
+      || !is_self_atari(libs[1], other))
     return 0;
 
   /* Pick up chain links with 2 liberties. */
-  adj = chainlinks2(si, sj, adji, adjj, 2);
+  adj = chainlinks2(str, adjs, 2);
   
-  for (k = 0; k < 2; ++k) {
-    ai = libi[k];
-    aj = libj[k];
+  for (k = 0; k < 2; k++) {
+    apos = libs[k];
 
-    /* Check that (ai, aj) also is a liberty of one of the two liberty
+    /* Check that (apos) also is a liberty of one of the two liberty
      * chain links.
      */
     for (s = 0; s < adj; s++)
-      if (liberty_of_string(ai, aj, adji[s], adjj[s])) {
-	bi = adji[s];
-	bj = adjj[s];
+      if (liberty_of_string(apos, adjs[s])) {
+	bpos = adjs[s];
 	break;
       }
 
@@ -4482,45 +4123,40 @@ special_attack4(int si, int sj, int libi[2], int libj[2],
     if (s == adj)
       continue;
 
-    /* Now require that (bi, bj) has a chain link, different from (si,
-     * sj), also with two liberties.
+    /* Now require that (bpos) has a chain link, different from (str),
+     * also with two liberties.
      */
-    adj2 = chainlinks2(bi, bj, adj2i, adj2j, 2);
+    adj2 = chainlinks2(bpos, adjs2, 2);
 
     for (s = 0; s < adj2; s++) {
-      find_origin(adj2i[s], adj2j[s], &ci, &cj);
-      if (ci == si && cj == sj)
+      cpos = adjs2[s];
+      if (same_string(cpos, str))
 	continue;
       
-      /* Pick up the liberties of (ci, cj). */
-      findlib(ci, cj, 2, lib2i, lib2j);
+      /* Pick up the liberties of (cpos). */
+      findlib(cpos, 2, libs2);
 
-      /* Try playing at a liberty. Before doing this, verify that (ci,
-       * cj) cannot get more than two liberties by answering on the
+      /* Try playing at a liberty. Before doing this, verify that
+       * (cpos) cannot get more than two liberties by answering on the
        * other liberty and that we are not putting ourselves in atari.
        */
       for (t = 0; t < 2; t++) {
-	di = lib2i[t];
-	dj = lib2j[t];
-	ei = lib2i[1-t];
-	ej = lib2j[1-t];
-	if (is_self_atari(di, dj, other))
+	dpos = libs2[t];
+	epos = libs2[1-t];
+	if (is_self_atari(dpos, other))
 	  break;
-	if (approxlib(ei, ej, color, 4, NULL, NULL) > 3)
+	if (approxlib(epos, color, 4, NULL) > 3)
 	  break;
 
-	if (trymove(di, dj, other, "special_attack4", si, sj,
-		    komaster, kom_i, kom_j)) {
-	  dcode = do_find_defense(si, sj, NULL, NULL, komaster, kom_i, kom_j);
-	  if (dcode != WIN && do_attack(si, sj, NULL, NULL, 
-				      komaster, kom_i, kom_j)) {
+	if (trymove(dpos, other, "special_attack4", str, komaster, kom_pos)) {
+	  dcode = do_find_defense(str, NULL, komaster, kom_pos);
+	  if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 	    if (dcode == 0) {
 	      popgo();
-	      if (ti) *ti = di;
-	      if (tj) *tj = dj;
+	      *move = dpos;
 	      return WIN;
 	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savei, savej, dcode, di, dj);
+	    UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, dpos);
 	  }
 	  popgo();
 	}
@@ -4528,18 +4164,15 @@ special_attack4(int si, int sj, int libi[2], int libj[2],
     }
   }
 
-  if (savecode) {
-    if (ti) *ti = savei;
-    if (tj) *tj = savej;
-    return savecode;
-  }
+  if (savecode != 0)
+    *move = savemove;
 
-  return 0;
+  return savecode;
 }
 
 
 /* 
- * If (si, sj) points to a string, draw_back(si, sj, &ti, &tj, komaster)
+ * If (str) points to a string, draw_back(str, &move, komaster)
  * looks for a move in the following configuration which attacks
  * the string:
  *
@@ -4552,39 +4185,33 @@ special_attack4(int si, int sj, int libi[2], int libj[2],
  */
 
 static int
-draw_back(int si, int sj, int *ti, int *tj, int komaster, int kom_i, int kom_j)
+draw_back(int str, int *move, int komaster, int kom_pos)
 {
   int r, k;
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-  int xi[2], xj[2];
-  int savei = -1, savej = -1;
+  int adj, adjs[MAXCHAIN];
+  int libs[2];
+  int savemove = 0;
   int savecode = 0;
 
-  adj = chainlinks2(si, sj, adji, adjj, 2);
+  adj = chainlinks2(str, adjs, 2);
   for (r = 0; r < adj; r++) {
-    findlib(adji[r], adjj[r], 2, xi, xj);
+    findlib(adjs[r], 2, libs);
     for (k = 0; k < 2; k++) {
-      if (!liberty_of_string(xi[k], xj[k], si, sj) &&
-	  ((xi[k] > 0 && liberty_of_string(xi[k]-1, xj[k], si, sj))
-	   || (xi[k] < board_size-1 
-	       && liberty_of_string(xi[k]+1, xj[k], si, sj))
-	   || (xj[k] > 0 && liberty_of_string(xi[k], xj[k]-1, si, sj))
-	   || (xj[k] < board_size-1 
-	       && liberty_of_string(xi[k], xj[k]+1, si, sj)))) {
-	if (trymove(xi[k], xj[k], OTHER_COLOR(p[si][sj]),
-		    "draw_back", si, sj, komaster, kom_i, kom_j)) {
-	  int dcode = do_find_defense(si, sj, NULL, NULL, 
-				      komaster, kom_i, kom_j);
-	  if (dcode != WIN && do_attack(si, sj, NULL, NULL, 
-				      komaster, kom_i, kom_j)) {
+      if (!liberty_of_string(libs[k], str)
+	  && (liberty_of_string(SOUTH(libs[k]), str)
+	      || liberty_of_string(WEST(libs[k]), str)
+	      || liberty_of_string(NORTH(libs[k]), str)
+	      || liberty_of_string(EAST(libs[k]), str))) {
+	if (trymove(libs[k], OTHER_COLOR(board[str]), "draw_back", str,
+		    komaster, kom_pos)) {
+	  int dcode = do_find_defense(str, NULL, komaster, kom_pos);
+	  if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 	    if (dcode == 0) {
 	      popgo();
-	      if (ti) *ti = xi[k];
-	      if (tj) *tj = xj[k];
+	      *move = libs[k];
 	      return WIN;
 	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savei, savej,
-				   dcode, xi[k], xj[k]);
+	    UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, libs[k]);
 	  }
 	  popgo();
 	}
@@ -4592,13 +4219,10 @@ draw_back(int si, int sj, int *ti, int *tj, int komaster, int kom_i, int kom_j)
     }
   }
 
-  if (savecode) {
-    if (ti) *ti = savei;
-    if (tj) *tj = savej;
-    return savecode;
-  }
+  if (savecode != 0)
+    *move = savemove;
 
-  return 0;
+  return savecode;
 }
 
 /* In the following position the reading is much simplifed if we start
@@ -4622,72 +4246,60 @@ draw_back(int si, int sj, int *ti, int *tj, int komaster, int kom_i, int kom_j)
  */
 
 static int
-edge_closing_backfill(int si, int sj, int ai, int aj, int *ti, int *tj)
+edge_closing_backfill(int str, int apos, int *move)
 {
-  int k;
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int bi, bj;
-  int ci, cj;
+  int k;
+  int bpos;
+  int cpos;
   int number_x, number_o;
 
-  /* Liberty must be on an edge. */
-  if (ai != 0 && ai != board_size - 1 && aj != 0 && aj != board_size - 1)
-    return 0;
-
   for (k = 0; k < 4; k++) {
-    int upi = deltai[k];
-    int upj = deltaj[k];
-    int righti = upj;
-    int rightj = -upi;
-    if (ON_BOARD(ai-upi, aj-upj))
+    int up = delta[k];
+    int right = delta[(k+1)%4];
+    if (ON_BOARD(apos - up))
       continue;
-    if (p[ai+upi][aj+upj] != color)
+    if (board[apos + up] != color)
       return 0;
-    if (ON_BOARD(ai+righti, aj+rightj)
-	&& p[ai+righti][aj+rightj] == EMPTY
-	&& (!ON_BOARD(ai-righti, aj-rightj) 
-	    || p[ai-righti][aj-rightj] == color))
+    if (board[apos + right] == EMPTY
+	&& (!ON_BOARD(apos - right) 
+	    || board[apos - right] == color))
       ; /* Everything ok so far. */
-    else if (ON_BOARD(ai-righti, aj-rightj)
-	     && p[ai-righti][aj-rightj] == EMPTY
-	     && (!ON_BOARD(ai+righti, aj+rightj) 
-		 || p[ai+righti][aj+rightj] == color)) {
+    else if (board[apos - right] == EMPTY
+	     && (!ON_BOARD(apos + right) 
+		 || board[apos + right] == color)) {
       /* Negate right direction. */
-      righti = -righti;
-      rightj = -rightj;
+      right = -right;
     }
     else
       return 0;
     
-    if (p[ai+upi+righti][aj+upj+rightj] != other)
+    if (board[apos + up + right] != other)
       return 0;
 
-    bi = ai + upi + 2 * righti;
-    bj = aj + upj + 2 * rightj;
-    if (!ON_BOARD(bi, bj))
+    bpos = apos + up + 2 * right;
+    if (!ON_BOARD(bpos))
       return 0;
 
-    ci = ai + 2 * righti;
-    cj = aj + 2 * rightj;
+    cpos = apos + 2 * right;
 
     number_x = 0;
     number_o = 0;
-    if (p[bi][bj] == color)
+    if (board[bpos] == color)
       number_x++;
-    else if (p[bi][bj] == other)
+    else if (board[bpos] == other)
       number_o++;
 
-    if (p[ci][cj] == color)
+    if (board[cpos] == color)
       number_x++;
-    else if (p[ci][cj] == other)
+    else if (board[cpos] == other)
       number_o++;
 
     if (number_o > number_x)
       return 0;
 
-    *ti = ai + righti;
-    *tj = aj + rightj;
+    *move = apos + right;
     return WIN;
   }
 
@@ -4730,95 +4342,76 @@ edge_closing_backfill(int si, int sj, int ai, int aj, int *ti, int *tj)
  */
 
 static void
-edge_block(int si, int sj, int ai, int aj,
-	   int movei[MAX_MOVES], int movej[MAX_MOVES],
-	   int scores[MAX_MOVES], int *moves)
+edge_block(int str, int apos, int moves[MAX_MOVES], int scores[MAX_MOVES],
+	   int *num_moves)
 {
-  int k, l;
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int ci, cj;
-  int di, dj;
-  int ei, ej;
-  int fi, fj;
-  int gi, gj;
-  int hi, hj;
+  int cpos;
+  int dpos;
+  int epos;
+  int fpos;
+  int gpos;
+  int hpos;
   int score;
-
-  /* Liberty must be on an edge. */
-  if (ai != 0 && ai != board_size - 1 && aj != 0 && aj != board_size - 1)
-    return;
+  int k, l;
 
   /* Search for the right orientation. */
   for (k = 0; k < 4; k++) {
-    int upi = deltai[k];
-    int upj = deltaj[k];
-    if (ON_BOARD(ai-upi, aj-upj))
+    int up = delta[k];
+    if (ON_BOARD(apos - up))
       continue;
-    if (p[ai+upi][aj+upj] != color || !same_string(ai+upi, aj+upj, si, sj))
+    if (board[apos + up] != color || !same_string(apos + up, str))
       return;
     
     for (l = 0; l < 2; l++) {
-      int righti = upj;
-      int rightj = -upi;
-      if (l == 1) {
-	righti = -righti;
-	rightj = -rightj;
-      }
+      int right = delta[(k+1)%4];
+      if (l == 1)
+	right = -right;
 
-      ci = ai + righti;
-      cj = aj + rightj;
-      di = ai + righti + upi;
-      dj = aj + rightj + upj;
+      cpos = apos + right;
+      dpos = apos + right + up;
 
-      if (!ON_BOARD(ci, cj) || p[ci][cj] != color || p[di][dj] != other)
+      if (board[cpos] != color || board[dpos] != other)
 	continue;
 
-      ei = ci + righti;
-      ej = cj + rightj;
-      fi = di + righti;
-      fj = dj + rightj;
-      gi = ei + righti;
-      gj = ej + rightj;
-      hi = ai - righti;
-      hj = aj - rightj;
+      epos = cpos + right;
+      fpos = dpos + right;
+      gpos = epos + right;
+      hpos = apos - right;
       
-      if (!ON_BOARD(ei, ej))
+      if (!ON_BOARD(epos))
 	continue;
       
-      if (p[ei][ej] == EMPTY && p[fi][fj] == EMPTY 
-	  && (!ON_BOARD(gi, gj) || p[gi][gj] != color)) {
+      if (board[epos] == EMPTY && board[fpos] == EMPTY 
+	  && (board[gpos] != color)) {
 	/* Everything is set up, suggest moves at e and f. */
-	if (!ON_BOARD(hi, hj) || p[hi][hj] == color)
+	if (!ON_BOARD(hpos) || board[hpos] == color)
 	  score = 0;
 	else
 	  score = -5;
-	if (countlib(si, sj) == 2)
+	if (countlib(str) == 2)
 	  score -= 10;
-	ADD_CANDIDATE_MOVE(ei, ej, score, movei, movej, scores, *moves);
+	ADD_CANDIDATE_MOVE(epos, score, moves, scores, *num_moves);
 
-	if (countlib(di, dj) == 1)
+	if (countlib(dpos) == 1)
 	  score = 25;
 	else
 	  score = 0;
-	if (countlib(si, sj) == 2)
+	if (countlib(str) == 2)
 	  score -= 10;
-	ADD_CANDIDATE_MOVE(fi, fj, score, movei, movej, scores, *moves);
+	ADD_CANDIDATE_MOVE(fpos, score, moves, scores, *num_moves);
       }
-      else if (countlib(ci, cj) == 2 && countlib(di, dj) > 1) {
-	int libi[2], libj[2];
-	int ti, tj;
-	findlib(ci, cj, 2, libi, libj);
-	if (libi[0] == ai && libj[0] == aj) {
-	  ti = libi[1];
-	  tj = libj[1];
-	}
-	else {
-	  ti = libi[0];
-	  tj = libj[0];
-	}
-	if (!is_self_atari(ti, tj, other))
-	  ADD_CANDIDATE_MOVE(ti, tj, 0, movei, movej, scores, *moves);
+      else if (countlib(cpos) == 2 && countlib(dpos) > 1) {
+	int libs[2];
+	int move;
+	findlib(cpos, 2, libs);
+	if (libs[0] == apos)
+	  move = libs[1];
+	else
+	  move = libs[0];
+	if (!is_self_atari(move, other))
+	  ADD_CANDIDATE_MOVE(move, 0, moves, scores, *num_moves);
       }
     }
   }
@@ -4844,68 +4437,53 @@ edge_block(int si, int sj, int ai, int aj,
  * ----   ----
  *
  * where a is a liberty of the attacked string, b is a stone of the
- * attacked string, and f is the considered moves.  */
+ * attacked string, and f is the considered moves.
+ */
 
 static void
-edge_block(int si, int sj, int ai, int aj,
-	   int movei[MAX_MOVES], int movej[MAX_MOVES],
-	   int scores[MAX_MOVES], int *moves)
+edge_block(int str, int apos, int moves[MAX_MOVES], int scores[MAX_MOVES],
+	   int *num_moves)
 {
-  int k, l;
-  int color = p[si][sj];
+  int color = board[str];
   int other = OTHER_COLOR(color);
-  int ci, cj;
-  int di, dj;
-  int ei, ej;
-  int fi, fj;
-  int gi, gj;
-  int hi, hj;
-
-  /* Liberty must be on an edge. */
-  if (ai != 0 && ai != board_size - 1 && aj != 0 && aj != board_size - 1)
-    return;
+  int k, l;
+  int cpos;
+  int dpos;
+  int epos;
+  int fpos;
+  int gpos;
+  int hpos;
 
   /* Search for the right orientation. */
   for (k = 0; k < 4; k++) {
-    int upi = deltai[k];
-    int upj = deltaj[k];
-    if (ON_BOARD(ai-upi, aj-upj))
+    int up = delta[k];
+    if (ON_BOARD(apos - up))
       continue;
-    if (p[ai+upi][aj+upj] != color || !same_string(ai+upi, aj+upj, si, sj))
+    if (board[apos + up] != color || !same_string(apos + up, str))
       return;
     
     for (l = 0; l < 2; l++) {
-      int righti = upj;
-      int rightj = -upi;
-      if (l == 1) {
-	righti = -righti;
-	rightj = -rightj;
-      }
+      int right = delta[(k+1)%4];
+      if (l == 1)
+	right = -right;
 
-      ci = ai + righti;
-      cj = aj + rightj;
-      di = ai + righti + upi;
-      dj = aj + rightj + upj;
+      cpos = apos + right;
+      dpos = apos + right + up;
 
-      if (!ON_BOARD(ci, cj) || p[ci][cj] != color 
-	  || p[di][dj] != other || countlib(di, dj) > 1)
+      if (board[cpos] != color || board[dpos] != other || countlib(dpos) > 1)
 	continue;
 
-      ei = ci + righti;
-      ej = cj + rightj;
-      fi = di + righti;
-      fj = dj + rightj;
-      gi = ei + righti;
-      gj = ej + rightj;
-      hi = ai - righti;
-      hj = aj - rightj;
+      epos = cpos + right;
+      fpos = dpos + right;
+      gpos = epos + right;
+      hpos = apos - right;
       
-      if (!ON_BOARD(ei, ej))
+      if (!ON_BOARD(epos))
 	continue;
       
-      if (p[ei][ej] == EMPTY && p[fi][fj] == EMPTY 
-	  && (!ON_BOARD(gi, gj) || p[gi][gj] != color))
-	ADD_CANDIDATE_MOVE(fi, fj, 30, movei, movej, scores, *moves);
+      if (board[epos] == EMPTY && board[fpos] == EMPTY 
+	  && (board[gpos] != color))
+	ADD_CANDIDATE_MOVE(fpos, 30, moves, scores, *num_moves);
     }
   }
 }
@@ -4916,23 +4494,23 @@ edge_block(int si, int sj, int ai, int aj,
 /*            Defending by attacking surrounding strings            */
 /* ================================================================ */
 
-/* Add the chainbreaking moves relative to the string (si, sj) to the
- * (movei[], movej[]) arrays.
+/* Add the chainbreaking moves relative to the string (str) to the
+ * (moves[]) array.
  */
 static void
-break_chain_moves(int si, int sj, int movei[MAX_MOVES], int movej[MAX_MOVES],
-		  int scores[MAX_MOVES], int *moves)
+break_chain_moves(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
+		  int *num_moves)
 {
   int r;
-  int xi, xj;
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
+  int xpos;
+  int adj, adjs[MAXCHAIN];
   
   /* Find links in atari. */
-  adj = chainlinks2(si, sj, adji, adjj, 1);
+  adj = chainlinks2(str, adjs, 1);
   
   for (r = 0; r < adj; r++) {
-    findlib(adji[r], adjj[r], 1, &xi, &xj);
-    ADD_CANDIDATE_MOVE(xi, xj, 0, movei, movej, scores, *moves);
+    findlib(adjs[r], 1, &xpos);
+    ADD_CANDIDATE_MOVE(xpos, 0, moves, scores, *num_moves);
   }
 }
 
@@ -4946,35 +4524,37 @@ break_chain_moves(int si, int sj, int movei[MAX_MOVES], int movej[MAX_MOVES],
  * worse performance but not to incorrect results.
  */
 static void
-break_chain2_efficient_moves(int si, int sj,
-			     int movei[MAX_MOVES], int movej[MAX_MOVES],
-			     int scores[MAX_MOVES], int *moves)
+break_chain2_efficient_moves(int str, int moves[MAX_MOVES],
+			     int scores[MAX_MOVES], int *num_moves)
 {
   int r;
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-  int adj2, adj2i[MAXCHAIN], adj2j[MAXCHAIN];
-  int libi[2], libj[2];
+  int adj, adjs[MAXCHAIN];
+  int adj2, adjs2[MAXCHAIN];
+  int libs[2];
+  int ai, aj;
+  int bi, bj;
+  int ci, cj;
   
   /* Find links with 2 liberties. */
-  adj = chainlinks2(si, sj, adji, adjj, 2);
+  adj = chainlinks2(str, adjs, 2);
   
   for (r = 0; r < adj; r++) {
-    adj2 = chainlinks2(adji[r], adjj[r], adj2i, adj2j, 1);
-    if (adj2 == 1 && countlib(si, sj) > 2) {
-      int ai, aj;
-      findlib(adj2i[0], adj2j[0], 1, &ai, &aj);
-      ADD_CANDIDATE_MOVE(ai, aj, 0, movei, movej, scores, *moves);
+    adj2 = chainlinks2(adjs[r], adjs2, 1);
+    if (adj2 == 1 && countlib(str) > 2) {
+      int apos;
+      findlib(adjs2[0], 1, &apos);
+      ADD_CANDIDATE_MOVE(apos, 0, moves, scores, *num_moves);
       continue;
     }
     
     if (adj2 > 1)
       continue;
     
-    findlib(adji[r], adjj[r], 2, libi, libj);
-    if (approxlib(libi[0], libj[0], p[adji[r]][adjj[r]], 3, NULL, NULL) <= 2)
-      ADD_CANDIDATE_MOVE(libi[1], libj[1], 0, movei, movej, scores, *moves);
-    if (approxlib(libi[1], libj[1], p[adji[r]][adjj[r]], 3, NULL, NULL) <= 2)
-      ADD_CANDIDATE_MOVE(libi[0], libj[0], 0, movei, movej, scores, *moves);
+    findlib(adjs[r], 2, libs);
+    if (approxlib(libs[0], board[adjs[r]], 3, NULL) <= 2)
+      ADD_CANDIDATE_MOVE(libs[1], 0, moves, scores, *num_moves);
+    if (approxlib(libs[1], board[adjs[r]], 3, NULL) <= 2)
+      ADD_CANDIDATE_MOVE(libs[0], 0, moves, scores, *num_moves);
     
     /* A common special case is this kind of edge position
      * 
@@ -4997,62 +4577,67 @@ break_chain2_efficient_moves(int si, int sj,
      * Update: This was too crude. Also require that the X stone is on
      * the second line and that the proposed move is not a self-atari.
      */
-    if (gg_abs(libi[0] - libi[1]) == 1
-	&& gg_abs(libj[0] - libj[1]) == 1
-	&& (adji[r] == 1 || adji[r] == board_size - 2
-	    || adjj[r] == 1 || adjj[r] == board_size - 2)) {
+    ai = I(libs[0]);
+    aj = J(libs[0]);
+    bi = I(libs[1]);
+    bj = J(libs[1]);
+    ci = I(adjs[r]);
+    cj = J(adjs[r]);
+    if (gg_abs(ai - bi) == 1
+	&& gg_abs(aj - bj) == 1
+	&& (ci == 1 || ci == board_size - 2
+	    || cj == 1 || cj == board_size - 2)) {
 
-      if ((libi[0] == 0 || libi[0] == board_size - 1
-	   || libj[0] == 0 || libj[0] == board_size - 1)
-	  && !is_self_atari(libi[1], libj[1], p[si][sj]))
-	ADD_CANDIDATE_MOVE(libi[1], libj[1], 0, movei, movej, scores, *moves);
+      if ((ai == 0 || ai == board_size - 1
+	   || aj == 0 || aj == board_size - 1)
+	  && !is_self_atari(libs[1], board[str]))
+	ADD_CANDIDATE_MOVE(libs[1], 0, moves, scores, *num_moves);
 
-      if ((libi[1] == 0 || libi[1] == board_size - 1
-	   || libj[1] == 0 || libj[1] == board_size - 1)
-	  && !is_self_atari(libi[0], libj[0], p[si][sj]))
-	ADD_CANDIDATE_MOVE(libi[0], libj[0], 0, movei, movej, scores, *moves);
+      if ((bi == 0 || bi == board_size - 1
+	   || bj == 0 || bj == board_size - 1)
+	  && !is_self_atari(libs[0], board[str]))
+	ADD_CANDIDATE_MOVE(libs[0], 0, moves, scores, *num_moves);
     }
   }
 }
 
 static void
-break_chain2_moves(int si, int sj, int movei[MAX_MOVES], int movej[MAX_MOVES],
-		   int scores[MAX_MOVES], int *moves, int require_safe)
+break_chain2_moves(int str, int moves[MAX_MOVES],
+		   int scores[MAX_MOVES], int *num_moves, int require_safe)
 {
+  int color = board[str];
+  int other = OTHER_COLOR(color);
   int r;
   int k;
-  int ai, aj;
+  int apos;
   int adj;
-  int adji[MAXCHAIN], adjj[MAXCHAIN];
-  int libi[2], libj[2];
-  int color = p[si][sj];
-  int other = OTHER_COLOR(color);
+  int adjs[MAXCHAIN];
+  int libs[2];
 
-  adj = chainlinks2(si, sj, adji, adjj, 2);
+  adj = chainlinks2(str, adjs, 2);
   
   for (r = 0; r < adj; r++) {
-    ai = adji[r];
-    aj = adjj[r];
+    apos = adjs[r];
 
-    findlib(ai, aj, 2, libi, libj);
-    for (k = 0; k < 2; ++k) {
-      int unsafe = is_self_atari(libi[k], libj[k], color);
+    findlib(apos, 2, libs);
+    for (k = 0; k < 2; k++) {
+      int unsafe = is_self_atari(libs[k], color);
       if (!unsafe
 	  || (!require_safe
-	      && approxlib(libi[k], libj[k], other, 5, NULL, NULL) < 5))
-	ADD_CANDIDATE_MOVE(libi[k], libj[k], 0, movei, movej, scores, *moves);
+	      && approxlib(libs[k], other, 5, NULL) < 5))
+	ADD_CANDIDATE_MOVE(libs[k], 0, moves, scores, *num_moves);
     }
 
     if (stackp <= backfill2_depth)
-      break_chain_moves(ai, aj, movei, movej, scores, moves);
+      break_chain_moves(apos, moves, scores, num_moves);
   }
 }
 
 /*
- * (si,sj) points to a group. break_chain2(si, sj, *i, *j)
+ * (str) points to a group. break_chain2(str, &move)
  * returns WIN if there is a string in the surrounding chain having
  * exactly two liberties whose attack leads to the rescue of
- * (si, sj). Then (*i, *j) points to the location of the attacking move.
+ * (str). Then (*move) points to the location of the attacking move.
  * 
  * Returns KO_A if the saving move depends on ignoring a ko threat;
  * 
@@ -5061,30 +4646,25 @@ break_chain2_moves(int si, int sj, int movei[MAX_MOVES], int movej[MAX_MOVES],
  */
 
 static int 
-break_chain2(int si, int sj, int *i, int *j, 
-	     int komaster, int kom_i, int kom_j)
+break_chain2(int str, int *move, int komaster, int kom_pos)
 {
-  int color, other;
+  int color = board[str];
+  int other = OTHER_COLOR(color);
   int v;
-  int savei = -1, savej = -1;
-  int libi[2], libj[2];
+  int libs[2];
   int liberties;
-  int ti[MAXCHAIN], tj[MAXCHAIN];
-  int scores[MAXCHAIN];
-  int moves = 0;
-  int mw[MAX_BOARD][MAX_BOARD];
+  int moves[MAX_MOVES];
+  int scores[MAX_MOVES];
+  int num_moves = 0;
+  int savemove = 0;
   int savecode = 0;
 
-  SETUP_TRACE_INFO("break_chain2", si, sj);
+  SETUP_TRACE_INFO("break_chain2", str);
   
-  memset(mw, 0, sizeof(mw));
-
-  RTRACE("in break_chain2 at %m\n", si, sj);
-  color = p[si][sj];
-  other = OTHER_COLOR(color);
+  RTRACE("in break_chain2 at %1m\n", str);
   
-  break_chain2_moves(si, sj, ti, tj, scores, &moves, 0);
-  order_moves(si, sj, moves, ti, tj, scores, color, read_function_name);
+  break_chain2_moves(str, moves, scores, &num_moves, 0);
+  order_moves(str, num_moves, moves, scores, color, read_function_name);
 
   /* We do not wish to consider the move if it can be 
    * immediately recaptured, unless stackp <= backfill_depth.
@@ -5095,20 +4675,18 @@ break_chain2(int si, int sj, int *i, int *j,
    * see how many liberties we obtained.
    */
 
-  for (v = 0; v < moves; v++) {
-    int new_komaster, new_kom_i, new_kom_j;
+  for (v = 0; v < num_moves; v++) {
+    int new_komaster;
+    int new_kom_pos;
     int ko_move;
 
-    if (komaster_trymove(ti[v], tj[v], color, "break_chain2-A", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    if (komaster_trymove(moves[v], color, "break_chain2-A", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, savecode == 0 && stackp <= ko_depth)) {
       if (ko_move) {
-	if (do_attack(si, sj, NULL, NULL,
-		      new_komaster, new_kom_i, new_kom_j) != WIN) {
+	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
 	  savecode = KO_B;
-	  savei = ti[v];
-	  savej = tj[v];
+	  savemove = moves[v];
 	}
 	popgo();
 	continue;
@@ -5120,100 +4698,92 @@ break_chain2(int si, int sj, int *i, int *j,
     /* If we reach here, we have made a move, which was not a
      * conditional ko capture.
      */
-    liberties = findlib(ti[v], tj[v], 2, libi, libj);
+    liberties = findlib(moves[v], 2, libs);
     if (liberties > 1) {
-      int acode = do_attack(si, sj, i, j,
-			    new_komaster, new_kom_i, new_kom_j);
+      int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
       if (acode == 0) {
-	if (i) *i = ti[v];
-	if (j) *j = tj[v];
+	*move = moves[v];
 	popgo();
-	SGFTRACE(ti[v], tj[v], 1, "attack defended-A");
+	SGFTRACE(moves[v], 1, "attack defended-A");
 	return WIN;
       }
-      UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, ti[v], tj[v]);
+      UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, moves[v]);
     }
     else if (stackp <= backfill_depth) {
-      int newer_komaster, newer_kom_i, newer_kom_j;
-      int bi = libi[0];
-      int bj = libj[0];
+      int newer_komaster;
+      int newer_kom_pos;
+      int bpos = libs[0];
       int try_harder = 0;
 
-      gg_assert(liberties == 1);
+      ASSERT1(liberties == 1, str);
 
-      if (komaster_trymove(bi, bj, other, "break_chain2-C", si, sj,
-			   new_komaster, new_kom_i, new_kom_j,
-			   &newer_komaster, &newer_kom_i, &newer_kom_j,
+      if (komaster_trymove(bpos, other, "break_chain2-C", str,
+			   new_komaster, new_kom_pos,
+			   &newer_komaster, &newer_kom_pos,
 			   &ko_move, savecode == 0 && stackp <= ko_depth)) {
 	if (!ko_move) {
-	  if (countlib(bi, bj) <= 2)
+	  if (countlib(bpos) <= 2)
 	    try_harder = 1;
-	  if (p[si][sj] != EMPTY) {
-	    int dcode = do_find_defense(si, sj, NULL, NULL, newer_komaster,
-					newer_kom_i, newer_kom_j);
+	  if (board[str] != EMPTY) {
+	    int dcode = do_find_defense(str, NULL, newer_komaster,
+					newer_kom_pos);
 	    if (dcode == WIN && !try_harder) {
-	      if (i) *i = ti[v];
-	      if (j) *j = tj[v];
+	      *move = moves[v];
 	      popgo();
 	      popgo();
-	      SGFTRACE(ti[v], tj[v], WIN, "attack defended-B");
+	      SGFTRACE(moves[v], WIN, "attack defended-B");
 	      return WIN;
 	    }
 	    /* FIXME: Possibly the ko result codes are not handled
 	     * correctly in the presence of two trymove().
 	     */
-	    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej,
-					      dcode, ti[v], tj[v]);
+	    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove,
+					      dcode, moves[v]);
 	  }
 	  popgo();
 	}
 	else {
 	  try_harder = 1;
-	  gg_assert(p[si][sj] != EMPTY);
-	  if (do_find_defense(si, sj, NULL, NULL, newer_komaster,
-			      newer_kom_i, newer_kom_j) != 0) {
+	  ASSERT1(board[str] != EMPTY, str);
+	  if (do_find_defense(str, NULL, newer_komaster, newer_kom_pos) != 0) {
 	    savecode = KO_A; /* Not KO_B since we are one move deeper 
 			      * than usual. */
-	    savei = ti[v];
-	    savej = tj[v];
+	    savemove = moves[v];
 	  }
 	  popgo();
 	}
       }
 
       if (try_harder) {
-	int acode = do_attack(si, sj, i, j,
-			      new_komaster, new_kom_i, new_kom_j);
+	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	if (acode == 0) {
-	  if (i) *i = ti[v];
-	  if (j) *j = tj[v];
+	  *move = moves[v];
 	  popgo();
-	  SGFTRACE(ti[v], tj[v], WIN, "attack defended-C");
+	  SGFTRACE(moves[v], WIN, "attack defended-C");
 	  return WIN;
 	}
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, ti[v], tj[v]);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, moves[v]);
       }
     }
-    popgo(); /* (ti[v], tj[v]) */
+    popgo(); /* (moves[v]) */
   }
 
   if (savecode != 0) {
-    if (i) *i = savei;
-    if (j) *j = savej;
-    SGFTRACE(savei, savej, savecode, "saved move");
+    *move = savemove;
+    SGFTRACE(savemove, savecode, "saved move");
     return savecode;
   }
 
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   return 0;
 }
 
 
 /*
- * (si,sj) points to a group. break_chain3(si, sj, *i, *j)
+ * (si,sj) points to a group. break_chain3(str, *i, *j)
  * returns 1 if there is a string in the surrounding chain having
  * exactly three liberties whose attack leads to the rescue of
- * (si, sj). Then (*i, *j) points to the location of the attacking move.
+ * (str). Then (*i, *j) points to the location of the attacking move.
  * 
  * Returns KO_A if the saving move depends on ignoring a ko threat;
  * 
@@ -5222,86 +4792,75 @@ break_chain2(int si, int sj, int *i, int *j,
  */
 
 static int 
-break_chain3(int si, int sj, int *i, int *j, 
-	     int komaster, int kom_i, int kom_j)
+break_chain3(int str, int *move, int komaster, int kom_pos)
 {
-  int color, other;
+  int color = board[str];
+  int other = OTHER_COLOR(color);
   int r;
   int k;
   int u = 0, v;
-  int ai, aj;
-  int savei = -1, savej = -1;
+  int apos;
   int adj;
-  int adji[MAXCHAIN], adjj[MAXCHAIN];
-  int libi[3], libj[3];
-  int ti[MAXCHAIN], tj[MAXCHAIN];
-  int mw[MAX_BOARD][MAX_BOARD];
+  int adjs[MAXCHAIN];
+  int libs[3];
+  int moves[MAX_MOVES];
+  int mw[BOARDMAX];
+  int savemove = 0;
   int savecode = 0;
-  int liberties = countlib(si, sj);
+  int liberties = countlib(str);
 
-  SETUP_TRACE_INFO("break_chain3", si, sj);
+  SETUP_TRACE_INFO("break_chain3", str);
 
   memset(mw, 0, sizeof(mw));
   
-  RTRACE("in break_chain3 at %m\n", si, sj);
-  color = p[si][sj];
-  other = OTHER_COLOR(color);
-  adj = chainlinks2(si, sj, adji, adjj, 3);
+  RTRACE("in break_chain3 at %1m\n", str);
+  adj = chainlinks2(str, adjs, 3);
   for (r = 0; r < adj; r++) {
     int lib1 = 0, lib2 = 0, lib3 = 0;
-    ai = adji[r];
-    aj = adjj[r];
+    apos = adjs[r];
 
-    /* We make a list in the (adji, adjj) array of the liberties
+    /* We make a list in the (adjs) array of the liberties
      * of boundary strings having exactly three liberties. We mark
      * each liberty in the mw array so that we do not list any
      * more than once.
      */
-    findlib(ai, aj, 3, libi, libj);
+    findlib(apos, 3, libs);
 
     /* If the 3 liberty chain easily can run away through one of the
      * liberties, we don't play on any of the other liberties.
      */
-    lib1 = approxlib(libi[0], libj[0], other, 4, NULL, NULL);
-    lib2 = approxlib(libi[1], libj[1], other, 4, NULL, NULL);
+    lib1 = approxlib(libs[0], other, 4, NULL);
+    lib2 = approxlib(libs[1], other, 4, NULL);
     if (lib1 >= 4 && lib2 >= 4)
       continue;
-    lib3 = approxlib(libi[2], libj[2], other, 4, NULL, NULL);
+    lib3 = approxlib(libs[2], other, 4, NULL);
 
     if ((lib1 >= 4 || lib2 >= 4) && lib3 >= 3)
       continue;
 
-    if (lib1 >= 4 && !mw[libi[0]][libj[0]]) {
-      mw[libi[0]][libj[0]] = 1;
-      ti[u] = libi[0];
-      tj[u] = libj[0];
-      u++;
+    if (lib1 >= 4 && !mw[libs[0]]) {
+      mw[libs[0]] = 1;
+      moves[u++] = libs[0];
       continue;
     }
     
-    if (lib2 >= 4 && !mw[libi[1]][libj[1]]) {
-      mw[libi[1]][libj[1]] = 1;
-      ti[u] = libi[1];
-      tj[u] = libj[1];
-      u++;
+    if (lib2 >= 4 && !mw[libs[1]]) {
+      mw[libs[1]] = 1;
+      moves[u++] = libs[1];
       continue;
     }
     
-    if (lib3 >= 4 && !mw[libi[2]][libj[2]]) {
-      mw[libi[2]][libj[2]] = 1;
-      ti[u] = libi[2];
-      tj[u] = libj[2];
-      u++;
+    if (lib3 >= 4 && !mw[libs[2]]) {
+      mw[libs[2]] = 1;
+      moves[u++] = libs[2];
       continue;
     }
 
     /* No easy escape, try all liberties. */
-    for (k = 0; k < 3; ++k) {
-      if (!mw[libi[k]][libj[k]]) {
-	mw[libi[k]][libj[k]] = 1;
-	ti[u] = libi[k];
-	tj[u] = libj[k];
-	u++;
+    for (k = 0; k < 3; k++) {
+      if (!mw[libs[k]]) {
+	mw[libs[k]] = 1;
+	moves[u++] = libs[k];
       }
     }
   }
@@ -5311,38 +4870,35 @@ break_chain3(int si, int sj, int *i, int *j,
    */
 
   for (v = 0; v < u; v++) {
-    if (!trymove(ti[v], tj[v], color, "break_chain3-A", si, sj,
-		 komaster, kom_i, kom_j))
+    if (!trymove(moves[v], color, "break_chain3-A", str, komaster, kom_pos))
       continue;
 
-    if (countlib(ti[v], tj[v]) == 1 && stackp > backfill2_depth) {
+    if (countlib(moves[v]) == 1 && stackp > backfill2_depth) {
       popgo();
       continue;
     }
     
     /* If we just filled our own liberty we back out now */
-    if (countlib(si, sj) >= liberties) {
-      int acode = do_attack(si, sj, i, j, komaster, kom_i, kom_j);
+    if (countlib(str) >= liberties) {
+      int acode = do_attack(str, NULL, komaster, kom_pos);
       if (acode == 0) {
-	if (i) *i = ti[v];
-	if (j) *j = tj[v];
+	*move = moves[v];
 	popgo();
-	SGFTRACE(ti[v], tj[v], WIN, "attack defended");
+	SGFTRACE(moves[v], WIN, "attack defended");
 	return WIN;
       }
-      UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, ti[v], tj[v]);
+      UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, moves[v]);
     }
-    popgo(); /* (ti[v], tj[v]) */
+    popgo(); /* (moves[v]) */
   }
 
   if (savecode != 0) {
-    if (i) *i = savei;
-    if (j) *j = savej;
-    SGFTRACE(savei, savej, savecode, "saved move");
+    *move = savemove;
+    SGFTRACE(savemove, savecode, "saved move");
     return savecode;
   }
 
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   return 0;
 }
 
@@ -5352,57 +4908,51 @@ break_chain3(int si, int sj, int *i, int *j,
  * and which are not adjacent to the string itself, since those
  * are tested by break_chain. If such a boundary chain can be
  * attacked, and if attacking the boundary results in saving
- * the (si,sj) string, then success is reported.
+ * the (str) string, then success is reported.
  */
 /* FIXME: Consider ko captures */
 static int
-superstring_breakchain(int si, int sj, int *i, int *j, int komaster,
-		       int kom_i, int kom_j, int liberty_cap)
+superstring_breakchain(int str, int *move, int komaster, int kom_pos,
+		       int liberty_cap)
 {
+  int color = board[str];
   int adj;
-  int adji[MAXCHAIN], adjj[MAXCHAIN];
-  int k, ai, aj;
-  int color = p[si][sj];
-  int savei = -1;
-  int savej = -1;
+  int adjs[MAXCHAIN];
+  int k;
+  int apos;
+  int savemove = 0;
   int savecode = 0;
 
-  SETUP_TRACE_INFO("superstring_breakchain", si, sj);
+  SETUP_TRACE_INFO("superstring_breakchain", str);
 
-  proper_superstring_chainlinks(si, sj, &adj, adji, adjj, liberty_cap);
+  proper_superstring_chainlinks(str, &adj, adjs, liberty_cap);
   for (k = 0; k < adj; k++) {
-    int new_komaster, new_kom_i, new_kom_j;
+    int new_komaster, new_kom_pos;
     int ko_move;
 
-    if (countlib(adji[k], adjj[k]) > 1)
+    if (countlib(adjs[k]) > 1)
       continue;
-    findlib(adji[k], adjj[k], 1, &ai, &aj);
+    findlib(adjs[k], 1, &apos);
 
-    if (komaster_trymove(ai, aj, color, "superstring_break_chain", si, sj,
-			 komaster, kom_i, kom_j,
-			 &new_komaster, &new_kom_i, &new_kom_j,
+    if (komaster_trymove(apos, color, "superstring_break_chain", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, savecode == 0 && stackp <= ko_depth)) {
       if (!ko_move) {
-	int acode = do_attack(si, sj, NULL, NULL,
-			      new_komaster, new_kom_i, new_kom_j);
+	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	if (acode == 0) {
 	  popgo();
-	  if (i) *i = ai;
-	  if (j) *j = aj;
-	  SGFTRACE(ai, aj, WIN, "attack defended");
+	  *move = apos;
+	  SGFTRACE(apos, WIN, "attack defended");
 	  return WIN;
 	}
 	else if (acode != WIN) {
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, 
-				 ai, aj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, apos);
 	}
 	popgo();
       }
       else {
-	if (do_attack(si, sj, NULL, NULL,
-		      new_komaster, new_kom_i, new_kom_j) != WIN) {
-	  savei = ai;
-	  savej = aj;
+	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	  savemove = apos;
 	  savecode = KO_B;
 	}
 	popgo();
@@ -5410,51 +4960,47 @@ superstring_breakchain(int si, int sj, int *i, int *j, int komaster,
     }
   }
   
-  if (savecode) {
-    if (i) *i = savei;
-    if (j) *j = savej;
-    SGFTRACE(savei, savej, savecode, "saved move");
+  if (savecode != 0) {
+    *move = savemove;
+    SGFTRACE(savemove, savecode, "saved move");
     return savecode;
   }
 
-  SGFTRACE(-1, -1, 0, NULL);
+  SGFTRACE(0, 0, NULL);
   return 0;
 }
 
 /*
- * If si, sj points to a group, double_atari_chain2() adds all moves
+ * If str points to a group, double_atari_chain2() adds all moves
  * which make a double atari on some strings in the surrounding chain
  * to the (movei[], movej[]) arrays.
  */
 
 static void
-double_atari_chain2(int si, int sj,
-		    int movei[MAX_MOVES], int movej[MAX_MOVES],
-		    int scores[MAX_MOVES], int *moves)
+double_atari_chain2(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
+		    int *num_moves)
 {
   int r, k;
-  int ai, aj;
+  int apos;
   int adj;
-  int adji[MAXCHAIN], adjj[MAXCHAIN];
-  int libi[2], libj[2];
-  int mw[MAX_BOARD][MAX_BOARD];
+  int adjs[MAXCHAIN];
+  int libs[2];
+  int mw[BOARDMAX];
 
   memset(mw, 0, sizeof(mw));
 
-  adj = chainlinks2(si, sj, adji, adjj, 2);
+  adj = chainlinks2(str, adjs, 2);
   for (r = 0; r < adj; r++) {
-    ai = adji[r];
-    aj = adjj[r];
-    findlib(ai, aj, 2, libi, libj);
-    for (k = 0; k < 2; ++k) {
-      mw[libi[k]][libj[k]]++;
-      if (mw[libi[k]][libj[k]] == 2) {
+    apos = adjs[r];
+    findlib(apos, 2, libs);
+    for (k = 0; k < 2; k++) {
+      mw[libs[k]]++;
+      if (mw[libs[k]] == 2) {
 	/* Found a double atari, but don't play there unless the move
          * is safe for the defender.
 	 */
-	if (!is_self_atari(libi[k], libj[k], p[si][sj]))
-	  ADD_CANDIDATE_MOVE(libi[k], libj[k], 0,
-			     movei, movej, scores, *moves);
+	if (!is_self_atari(libs[k], board[str]))
+	  ADD_CANDIDATE_MOVE(libs[k], 0, moves, scores, *num_moves);
       }
     }
   }
@@ -5485,214 +5031,196 @@ double_atari_chain2(int si, int sj,
  */
 
 /* Given a list of moves, restricted_defend1 tries to find a 
- * move that defends the string (si, sj) with one liberty,
+ * move that defends the string (str) with one liberty,
  * not considering moves from the list.
  */
 static int
-restricted_defend1(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j,
-		   int forbidden_moves, 
-		   int *forbidden_movei, int *forbidden_movej)
+restricted_defend1(int str, int *move, int komaster, int kom_pos,
+		   int num_forbidden_moves, int *forbidden_moves)
 {
-  int color, other;
-  int xi, xj;
-  int libi, libj;
-  int movei[MAX_MOVES], movej[MAX_MOVES];
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int xpos;
+  int lib;
+  int moves[MAX_MOVES];
   int scores[MAX_MOVES];
-  int moves = 0;
-  int savei = -1, savej = -1;
+  int num_moves = 0;
+  int savemove = 0;
   int savecode = 0;
   int liberties;
   int k;
 
-  SETUP_TRACE_INFO("restricted_defend1", si, sj);
+  SETUP_TRACE_INFO("restricted_defend1", str);
   reading_node_counter++;
   
-  gg_assert(p[si][sj] != EMPTY);
-  ASSERT(countlib(si, sj) == 1, si, sj);
+  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(countlib(str) == 1, str);
 
-  RTRACE("try to escape atari on %m.\n",  si, sj);
+  RTRACE("try to escape atari on %1m.\n", str);
 
-  color = p[si][sj];
-  other = OTHER_COLOR(color);
-
-  /* (libi, libj) will be the liberty of the string. */
-  liberties = findlib(si, sj, 1, &libi, &libj);
-  ASSERT(liberties == 1, si, sj);
+  /* (lib) will be the liberty of the string. */
+  liberties = findlib(str, 1, &lib);
+  ASSERT1(liberties == 1, str);
 
   /* Collect moves to try in the first batch.
    * 1. First order liberty.
    * 2. Chain breaking moves.
    */
-  movei[0] = libi;
-  movej[0] = libj;
+  moves[0] = lib;
   scores[0] = 0;
-  moves = 1;
+  num_moves = 1;
   
-  break_chain_moves(si, sj, movei, movej, scores, &moves);
-  order_moves(si, sj, moves, movei, movej, scores, color, read_function_name);
-  for (k = 0; k < moves; k++) {
+  break_chain_moves(str, moves, scores, &num_moves);
+  order_moves(str, num_moves, moves, scores, color, read_function_name);
+  for (k = 0; k < num_moves; k++) {
     int ko_capture;
-    int ko_i, ko_j;
 
-    xi = movei[k];
-    xj = movej[k];
-    if (in_list(xi, xj, forbidden_moves, forbidden_movei, forbidden_movej))
+    xpos= moves[k];
+    if (in_list(xpos, num_forbidden_moves, forbidden_moves))
       continue;
     /* To avoid loops with double ko, we do not allow any ko captures,
      * even legal ones, if the opponent is komaster.
      */
-    if (is_ko(xi, xj, color, &ko_i, &ko_j))
+    if (is_ko(xpos, color, NULL))
       ko_capture = 1;
     else
       ko_capture = 0;
 
     if ((komaster != other || !ko_capture)
-	&& trymove(xi, xj, color, "restricted_defend1-A", si, sj,
-		   komaster, kom_i, kom_j)) {
-      int libs = countlib(si, sj);
+	&& trymove(xpos, color, "restricted_defend1-A", str,
+		   komaster, kom_pos)) {
+      int libs = countlib(str);
       if (libs > 2) {
 	popgo();
-	SGFTRACE(xi, xj, WIN, "defense effective");
-	if (i) *i = xi;
-	if (j) *j = xj;
+	SGFTRACE(xpos, WIN, "defense effective");
+	if (move)
+	  *move = xpos;
 	return WIN;
       }
       if (libs == 2) {
 	int acode;
 
 	if (!ko_capture)
-	  acode = restricted_attack2(si, sj, NULL, NULL, 
-				     komaster, kom_i, kom_j,
-				     forbidden_moves,
-				     forbidden_movei, forbidden_movej);
+	  acode = restricted_attack2(str, NULL, komaster, kom_pos,
+				     num_forbidden_moves, forbidden_moves);
 	else
-	  acode = restricted_attack2(si, sj, NULL, NULL, color, xi, xj,
-				     forbidden_moves,
-				     forbidden_movei, forbidden_movej);
+	  acode = restricted_attack2(str, NULL, color, xpos,
+				     num_forbidden_moves, forbidden_moves);
 	popgo();
 	if (acode == 0) {
-	  SGFTRACE(xi, xj, WIN, "defense effective");
-	  if (i) *i = xi;
-	  if (j) *j = xj;
+	  SGFTRACE(xpos, WIN, "defense effective");
+	  if (move)
+	    *move = xpos;
 	  return WIN;
 	}
 	/* if the move works with ko we save it, then look for something
 	 * better.
 	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
       }
       else
 	popgo();
     }
     else {
-      int ko_i, ko_j;
+      int ko_pos;
       if (stackp <= ko_depth
 	  && savecode == 0 
 	  && (komaster == EMPTY
 	      || (komaster == color
-		  && kom_i == xi
-		  && kom_j == xj))
-	  && is_ko(xi, xj, color, &ko_i, &ko_j)
-	  && tryko(xi, xj, color, "restricted_defend1-B",
-		   color, ko_i, ko_j)) {
-	int libs = countlib(si, sj);
+		  && kom_pos == xpos))
+	  && is_ko(xpos, color, &ko_pos)
+	  && tryko(xpos, color, "restricted_defend1-B", color, ko_pos)) {
+	int libs = countlib(str);
 	if (libs > 2) {
 	  popgo();
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, 2, xi, xj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, 2, xpos);
 	}
 	else if (libs == 2) {
 	  int acode;
-	  acode = restricted_attack2(si, sj, NULL, NULL, color, xi, xj,
-				     forbidden_moves,
-				     forbidden_movei, forbidden_movej);
+	  acode = restricted_attack2(str, NULL, color, xpos,
+				     num_forbidden_moves, forbidden_moves);
 	  popgo();
-	  UPDATE_SAVED_KO_RESULT(savecode, savei, savej, acode, xi, xj);
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
 	}
 	else
 	  popgo();
       }
     }
   }
+
   if (savecode != 0) {
-    SGFTRACE(savei, savej, savecode, "saved move");
-    if (i) *i = savei;
-    if (j) *j = savej;
+    if (move)
+      *move = savemove;
+    SGFTRACE(savemove, savecode, "saved move");
     return savecode;
   }
-  SGFTRACE(-1, -1, 0, NULL);
+
+  SGFTRACE(0, 0, NULL);
   return 0;
 }
 
 
 /* Given a list of moves, restricted_attack2 tries to find a 
- * move that attacks the string (si, sj) with two liberties,
+ * move that attacks the string (str) with two liberties,
  * not considering moves from the list.
  */
 static int
-restricted_attack2(int si, int sj, int *i, int *j, 
-		   int komaster, int kom_i, int kom_j,
-		   int forbidden_moves, 
-		   int *forbidden_movei, int *forbidden_movej)
+restricted_attack2(int str, int *move, int komaster, int kom_pos,
+		   int num_forbidden_moves, int *forbidden_moves)
 {
-  int color, other;
-  int ai, aj;
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int apos;
   int liberties;
-  int libi[2], libj[2];
-  int savei = -1, savej = -1;
+  int libs[2];
+  int savemove = 0;
   int savecode = 0;
   int k;
 
-  SETUP_TRACE_INFO("restricted_attack2", si, sj);
+  SETUP_TRACE_INFO("restricted_attack2", str);
   reading_node_counter++;
 
-  find_origin(si, sj, &si, &sj);
-  gg_assert(p[si][sj] != EMPTY);
-  gg_assert(countlib(si, sj) == 2);
+  str = find_origin(str);
+  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(countlib(str) == 2, str);
 
-  RTRACE("restricted attack on %m with 2 liberties\n", si, sj);
-
-  color = p[si][sj];
-  other = OTHER_COLOR(color);
+  RTRACE("restricted attack on %1m with 2 liberties\n", str);
 
   /* The attack may fail if a boundary string is in atari and cannot 
    * be defended.  First we must try defending such a string. 
    */
-  /* Get the two liberties of (si, sj). */
-  liberties = findlib(si, sj, 2, libi, libj);
-  ASSERT(liberties == 2, si, sj);
+  /* Get the two liberties of (str). */
+  liberties = findlib(str, 2, libs);
+  ASSERT1(liberties == 2, str);
 
   for (k = 0; k < 2; k++) {
-    int ko_i, ko_j;
+    int ko_pos;
     int ko_capture;
 
-    ai = libi[k];
-    aj = libj[k];
-    if (in_list(ai, aj, forbidden_moves, forbidden_movei, forbidden_movej))
+    apos = libs[k];
+    if (in_list(apos, num_forbidden_moves, forbidden_moves))
       continue;
     /* To avoid loops with double ko, we do not allow any ko captures,
      * even legal ones, if the opponent is komaster. 
      */
-    if (is_ko(ai, aj, other, &ko_i, &ko_j))
+    if (is_ko(apos, other, &ko_pos))
       ko_capture = 1;
     else
       ko_capture = 0;
 
     if ((komaster != color || !ko_capture)
-	&& trymove(ai, aj, other, "restricted_attack2", si, sj,
-		   komaster, kom_i, kom_j)) {
+	&& trymove(apos, other, "restricted_attack2", str,
+		   komaster, kom_pos)) {
       if ((!ko_capture 
-	   && !restricted_defend1(si, sj, NULL, NULL, komaster, kom_i, kom_j,
-				  forbidden_moves,
-				  forbidden_movei, forbidden_movej))
+	   && !restricted_defend1(str, NULL, komaster, kom_pos,
+				  num_forbidden_moves, forbidden_moves))
 	  || (ko_capture
-	      && !restricted_defend1(si, sj, NULL, NULL, other, ko_i, ko_j,
-				     forbidden_moves,
-				     forbidden_movei, forbidden_movej))) {
+	      && !restricted_defend1(str, NULL, other, ko_pos,
+				     num_forbidden_moves, forbidden_moves))) {
 	popgo();
-	SGFTRACE(ai, aj, WIN, "attack effective");
-	if (i) *i = ai;
-	if (j) *j = aj;
+	SGFTRACE(apos, WIN, "attack effective");
+	if (move)
+	  *move = apos;
 	return WIN;
       }
       popgo();
@@ -5700,41 +5228,39 @@ restricted_attack2(int si, int sj, int *i, int *j,
     else if (savecode == 0
 	     && (komaster == EMPTY
 		 || (komaster == other
-		     && kom_i == ai
-		     && kom_j == aj))
-	     && tryko(ai, aj, other, "restricted_attack2",
-		      komaster, kom_i, kom_j)) {
-      if (!restricted_defend1(si, sj, NULL, NULL, other, ko_i, ko_j,
-			      forbidden_moves,
-			      forbidden_movei, forbidden_movej)) {
+		     && kom_pos == apos))
+	     && tryko(apos, other, "restricted_attack2", komaster, kom_pos)) {
+      if (!restricted_defend1(str, NULL, other, ko_pos,
+			      num_forbidden_moves, forbidden_moves)) {
 	popgo();
 	savecode = KO_B;
-	savei = ai;
-	savej = aj;
+	savemove = apos;
       }
       else
 	popgo();
     }
   }
-  if (savecode) {
-    SGFTRACE(savei, savej, savecode, "saved move");
-    if (i) *i = savei;
-    if (j) *j = savej;
+
+  if (savecode != 0) {
+    if (move)
+      *move = savemove;
+    SGFTRACE(savemove, savecode, "saved move");
     return savecode;
   }
-  SGFTRACE(-1, -1, 0, NULL);
+
+  SGFTRACE(0, 0, NULL);
   return 0;
 }
 
-/* Returns true if the move at (m, n) is in a given list of moves */
+/* Returns true if the move is in a given list of moves. */
 
 static int
-in_list(int m, int n, int moves, int *movei, int *movej)
+in_list(int move, int num_moves, int *moves)
 {
   int k;
 
-  for (k = 0; k < moves; k++)
-    if (movei[k] == m && movej[k] == n)
+  for (k = 0; k < num_moves; k++)
+    if (moves[k] == move)
       return 1;
   return 0;
 }
@@ -5767,7 +5293,7 @@ static int cannot_defend_penalty            = -20;
 static int safe_atari_score                 = 5;
 
 
-/* The string at (si, sj) is under attack. The num_moves moves in
+/* The string at (str) is under attack. The num_moves moves in
  * (movei[], movej[]) for color color have been deemed interesting in
  * the attack or defense of the group. Most of these moves will be
  * immediate liberties of the group.
@@ -5785,24 +5311,23 @@ static int safe_atari_score                 = 5;
  */
 
 static void
-order_moves(int si, int sj, int num_moves, int *movei, int *movej,
-	    int *scores, int color, const char *funcname)
+order_moves(int str, int num_moves, int *moves, int *scores, int color,
+	    const char *funcname)
 {
-  int move;
+  int string_color = board[str];
+  int string_libs = countlib(str);
+  int r;
   int i, j;
   int maxscore;
   int max_at;
-  int string_color = p[si][sj];
-  int string_libs = countlib(si, sj);
 
   /* don't bother sorting if only one move, or none at all */
   if (num_moves < 2)
     return;
 
   /* Assign a score to each move. */
-  for (move = 0; move < num_moves; ++move) {
-    int mi = movei[move];
-    int mj = movej[move];
+  for (r = 0; r < num_moves; r++) {
+    int move = moves[r];
 
     /* Look at the neighbors of this move and count the things we
      * find. Friendly and opponent stones are related to color, i.e.
@@ -5818,13 +5343,13 @@ order_moves(int si, int sj, int num_moves, int *movei, int *movej,
     int number_open        = 0; /* empty intersection */
 
     /* We let the incremental_board code do the heavy work. */
-    incremental_order_moves(mi, mj, color, si, sj, &number_edges,
+    incremental_order_moves(move, color, str, &number_edges,
 			    &number_same_string, &number_own,
 			    &number_opponent, &captured_stones,
 			    &threatened_stones, &saved_stones, &number_open);
 
     if (0)
-      gprintf("%o %m values: %d %d %d %d %d %d %d %d\n", mi, mj, number_edges,
+      gprintf("%o %1m values: %d %d %d %d %d %d %d %d\n", move, number_edges,
 	      number_same_string, number_own, number_opponent, captured_stones,
 	      threatened_stones, saved_stones, number_open);
     
@@ -5839,53 +5364,53 @@ order_moves(int si, int sj, int num_moves, int *movei, int *movej,
        *    Only applicable if the move is adjacent to the group.
        */
       
-      int libs = approxlib(mi, mj, color, 5, NULL, NULL);
+      int libs = approxlib(move, color, 5, NULL);
       if (number_same_string > 0) {
 	if (libs > 5 || (libs == 4 && stackp > fourlib_depth))
-	  scores[move] += defend_lib_score[5];
+	  scores[r] += defend_lib_score[5];
 	else
-	  scores[move] += defend_lib_score[libs];
+	  scores[r] += defend_lib_score[libs];
       }
       else {
 	/* Add points for the number of liberties the played stone
          * obtains when not adjacent to the attacked string.
 	 */
 	if (libs > 4)
-	  scores[move] += defend_not_adjacent_lib_score[4];
+	  scores[r] += defend_not_adjacent_lib_score[4];
 	else
-	  scores[move] += defend_not_adjacent_lib_score[libs];
+	  scores[r] += defend_not_adjacent_lib_score[libs];
       }
       
       /* 2) Add the number of open liberties near the move to its score. */
       gg_assert(number_open <= 4);
-      scores[move] += defend_open_score[number_open];
+      scores[r] += defend_open_score[number_open];
       
       /* 3) Add a bonus if the move is not on the edge. 
        */
       if (number_edges == 0 || captured_stones > 0)
-	scores[move] += defend_not_edge_score;
+	scores[r] += defend_not_edge_score;
       
       /* 4) Add thrice the number of captured stones. */
       if (captured_stones <= 5)
-	scores[move] += defend_capture_score[captured_stones];
+	scores[r] += defend_capture_score[captured_stones];
       else
-	scores[move] += defend_capture_score[5] + captured_stones;
+	scores[r] += defend_capture_score[5] + captured_stones;
 
       /* 5) Add points for stones put into atari, unless this is a
        *    self atari.
        */
       if (libs + captured_stones > 1) {
 	if (threatened_stones <= 5)
-	  scores[move] += defend_atari_score[threatened_stones];
+	  scores[r] += defend_atari_score[threatened_stones];
 	else
-	  scores[move] += defend_atari_score[5] + threatened_stones;
+	  scores[r] += defend_atari_score[5] + threatened_stones;
       }
 
       /* 6) Add a bonus for saved stones. */
       if (saved_stones <= 5)
-	scores[move] += defend_save_score[saved_stones];
+	scores[r] += defend_save_score[saved_stones];
       else
-	scores[move] += defend_save_score[5];
+	scores[r] += defend_save_score[5];
     }
     else {
       /* Attack move.
@@ -5893,13 +5418,13 @@ order_moves(int si, int sj, int num_moves, int *movei, int *movej,
        * 1) Add the number of liberties the attacker gets when playing
        *    there, but never more than four.
        */
-      int libs = approxlib(mi, mj, color, 4, NULL, NULL);
+      int libs = approxlib(move, color, 4, NULL);
       if (libs > 4)
 	libs = 4;
-      scores[move] += attack_own_lib_score[libs];
+      scores[r] += attack_own_lib_score[libs];
 
       if (libs == 0 && captured_stones == 1)
-	scores[move] += attack_ko_score;
+	scores[r] += attack_ko_score;
       
       /* 2) If the move is not a self atari and adjacent to the
        *    string, add the number of liberties the opponent would
@@ -5910,44 +5435,44 @@ order_moves(int si, int sj, int num_moves, int *movei, int *movej,
       if ((libs + captured_stones > 1 || (string_libs <= 2 && number_own == 0))
 	  && number_same_string > 0) {
 	int safe_atari;
-	int liberties = approxlib(mi, mj, string_color, 5, NULL, NULL);
+	int liberties = approxlib(move, string_color, 5, NULL);
 	if (liberties > 5 || (liberties == 4 && stackp > fourlib_depth))
 	  liberties = 5;
-	scores[move] += attack_string_lib_score[liberties];
+	scores[r] += attack_string_lib_score[liberties];
 
 	safe_atari = (string_libs <= 2 && libs + captured_stones > 1);
 	/* The defender can't play here without getting into atari, so
          * we probably souldn't either.
 	 */
 	if (liberties == 1 && saved_stones == 0 && !safe_atari)
-	  scores[move] += cannot_defend_penalty;
+	  scores[r] += cannot_defend_penalty;
 
 	/* Bonus if we put the attacked string into atari without
          * ourselves getting into atari.
 	 */
 	if (safe_atari)
-	  scores[move] += safe_atari_score;
+	  scores[r] += safe_atari_score;
       }
       
       /* 3) Add the number of open liberties near the move to its score. */
       gg_assert(number_open <= 4);
-      scores[move] += attack_open_score[number_open];
+      scores[r] += attack_open_score[number_open];
       
       /* 4) Add a bonus if the move is not on the edge. */
       if (number_edges == 0)
-	scores[move] += attack_not_edge_score;
+	scores[r] += attack_not_edge_score;
       
       /* 5) Add twice the number of captured stones. */
       if (captured_stones <= 5)
-	scores[move] += attack_capture_score[captured_stones];
+	scores[r] += attack_capture_score[captured_stones];
       else
-	scores[move] += attack_capture_score[5];
+	scores[r] += attack_capture_score[5];
 
       /* 6) Add a bonus for saved stones. */
       if (saved_stones <= 5)
-	scores[move] += attack_save_score[saved_stones];
+	scores[r] += attack_save_score[saved_stones];
       else
-	scores[move] += attack_save_score[5];
+	scores[r] += attack_save_score[5];
     }
   }
   
@@ -5957,12 +5482,12 @@ order_moves(int si, int sj, int num_moves, int *movei, int *movej,
    * given by the O(n*log(n)) behaviour over the O(n^2) behaviour of
    * selection sort.
    */
-  for (i = 0; i < num_moves-1; ++i) {
+  for (i = 0; i < num_moves-1; i++) {
 
     /* Find the move with the biggest score. */
     maxscore = scores[i];
     max_at = i;
-    for (j = i+1; j < num_moves; ++j) {
+    for (j = i+1; j < num_moves; j++) {
       if (scores[j] > maxscore) {
 	maxscore = scores[j];
 	max_at = j;
@@ -5973,16 +5498,13 @@ order_moves(int si, int sj, int num_moves, int *movei, int *movej,
      * Don't forget to exchange the scores as well.
      */
     if (max_at != i) {
-      int tempi = movei[i];
-      int tempj = movej[i];
+      int temp = moves[i];
       int tempmax = scores[i];
 
-      movei[i] = movei[max_at];
-      movej[i] = movej[max_at];
+      moves[i] = moves[max_at];
       scores[i] = scores[max_at];
 
-      movei[max_at] = tempi;
-      movej[max_at] = tempj;
+      moves[max_at] = temp;
       scores[max_at] = tempmax;
     }
   }
@@ -5990,7 +5512,7 @@ order_moves(int si, int sj, int num_moves, int *movei, int *movej,
   if (0) {
     gprintf("%oVariation %d:\n", count_variations);
     for (i = 0; i < num_moves; i++)
-      gprintf("%o  %M %d\n", movei[i], movej[i], scores[i]);
+      gprintf("%o  %1M %d\n", moves[i], scores[i]);
   }
 
   if (sgf_dumptree) {
@@ -6000,8 +5522,8 @@ order_moves(int si, int sj, int num_moves, int *movei, int *movej,
     sprintf(buf, "Move order for %s: %n", funcname, &chars);
     pos = buf + chars;
     for (i = 0; i < num_moves; i++) {
-      sprintf(pos, "%c%d (%d) %n", movej[i] + 'A' + (movej[i] >= 8),
-	      board_size - movei[i], scores[i], &chars);
+      sprintf(pos, "%c%d (%d) %n", J(moves[i]) + 'A' + (J(moves[i]) >= 8),
+	      board_size - I(moves[i]), scores[i], &chars);
       pos += chars;
     }
     sgftreeAddComment(sgf_dumptree, NULL, buf);
@@ -6098,23 +5620,22 @@ tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS])
 /* ================================================================ */
 
 
-static int safe_move_cache[MAX_BOARD][MAX_BOARD][2];
-static int safe_move_cache_when[MAX_BOARD][MAX_BOARD][2];
+static int safe_move_cache[BOARDMAX][2];
+static int safe_move_cache_when[BOARDMAX][2];
 static void clear_safe_move_cache(void);
 
 static void
 clear_safe_move_cache(void)
 {
-  int i,j;
+  int k;
 
-  for (i = 0; i < MAX_BOARD;i++)
-    for (j = 0; j < MAX_BOARD;j++) {
-      safe_move_cache_when[i][j][0] = -1;
-      safe_move_cache_when[i][j][1] = -1;
-    }
+  for (k = BOARDMIN; k < BOARDMAX; k++) {
+    safe_move_cache_when[k][0] = -1;
+    safe_move_cache_when[k][1] = -1;
+  }
 }
 
-/* safe_move(i, j, color) checks whether a move at (i, j) is illegal
+/* safe_move(move, color) checks whether a move at (move) is illegal
  * or can immediately be captured. If stackp==0 the result is cached.
  * If the move only can be captured by a ko, it's considered safe.
  * This may or may not be a good convention.
@@ -6123,11 +5644,10 @@ clear_safe_move_cache(void)
  */
 
 int 
-safe_move(int i, int j, int color)
+safe_move(int move, int color)
 {
   int safe = 0;
   static int initialized = 0;
-  int ko_i, ko_j;
   
   if (!initialized) {
     clear_safe_move_cache();
@@ -6136,12 +5656,12 @@ safe_move(int i, int j, int color)
 
   /* If we have this position cached, use the previous value. */
   if (stackp == 0
-      && safe_move_cache_when[i][j][color==BLACK] == position_number)
-    return safe_move_cache[i][j][color==BLACK];
+      && safe_move_cache_when[move][color==BLACK] == position_number)
+    return safe_move_cache[move][color==BLACK];
 
   /* Otherwise calculate the value... */
-  if (trymove(i, j, color, "safe_move-A", -1, -1, EMPTY, -1, -1)) {
-    int acode = attack(i, j, NULL, NULL);
+  if (trymove(move, color, "safe_move-A", 0, EMPTY, 0)) {
+    int acode = attack(I(move), J(move), NULL, NULL);
     if (acode == 0)
       safe = WIN;
     else if (acode == WIN)
@@ -6152,16 +5672,15 @@ safe_move(int i, int j, int color)
       safe = KO_A;
     popgo();
   }
-#if 1
-  else if (is_ko(i, j, color, &ko_i, &ko_j)
-	   && tryko(i, j, color, "safe_move-B", EMPTY, -1, -1)) {
-    if (do_attack(i, j, NULL, NULL, color, i, j) != WIN)
+  else if (is_ko(move, color, NULL)
+	   && tryko(move, color, "safe_move-B", EMPTY, 0)) {
+    if (do_attack(move, NULL, color, move) != WIN)
       safe = KO_B;
     else
       safe = 0;
     popgo();
   }
-#endif  
+
   /* ...and store it in the cache.
    * FIXME: Only store result in cache when we're working at
    * full depth.
@@ -6171,10 +5690,10 @@ safe_move(int i, int j, int color)
    */
   if (stackp == 0) {
     if (0)
-      gprintf("Safe move at %m for %s cached when depth=%d, position number=%d\n",
-	      i, j, color_to_string(color), depth, position_number);
-    safe_move_cache_when[i][j][color==BLACK] = position_number;
-    safe_move_cache[i][j][color==BLACK] = safe;
+      gprintf("Safe move at %1m for %s cached when depth=%d, position number=%d\n",
+	      move, color_to_string(color), depth, position_number);
+    safe_move_cache_when[move][color==BLACK] = position_number;
+    safe_move_cache[move][color==BLACK] = safe;
   }
 
   return safe;
@@ -6214,17 +5733,17 @@ draw_reading_shadow()
     fprintf(stderr, "\n%2d", ii);
     
     for (j = 0; j < board_size; j++) {
-      if (!shadow[i][j] && p[i][j] == EMPTY)
+      if (!shadow[POS(i, j)] && BOARD(i, j) == EMPTY)
 	c = '.';
-      else if (!shadow[i][j] && p[i][j] == WHITE)
+      else if (!shadow[POS(i, j)] && BOARD(i, j) == WHITE)
 	c = 'O';
-      else if (!shadow[i][j] && p[i][j] == BLACK)
+      else if (!shadow[POS(i, j)] && BOARD(i, j) == BLACK)
 	c = 'X';
-      if (shadow[i][j] && p[i][j] == EMPTY)
+      if (shadow[POS(i, j)] && BOARD(i, j) == EMPTY)
 	c = ',';
-      else if (shadow[i][j] && p[i][j] == WHITE)
+      else if (shadow[POS(i, j)] && BOARD(i, j) == WHITE)
 	c = 'o';
-      else if (shadow[i][j] && p[i][j] == BLACK)
+      else if (shadow[POS(i, j)] && BOARD(i, j) == BLACK)
 	c = 'x';
       
       fprintf(stderr, " %c", c);
@@ -6237,7 +5756,7 @@ draw_reading_shadow()
 }
 
 static void
-draw_active_area(char board[MAX_BOARD][MAX_BOARD])
+draw_active_area(char p[BOARDMAX])
 {
   int i, j, ii;
   int c = ' ';
@@ -6249,13 +5768,13 @@ draw_active_area(char board[MAX_BOARD][MAX_BOARD])
     fprintf(stderr, "\n%2d", ii);
     
     for (j = 0; j < board_size; j++) {
-      if (board[i][j] == EMPTY)
+      if (p[POS(i, j)] == EMPTY)
 	c = '.';
-      else if (board[i][j] == WHITE)
+      else if (p[POS(i, j)] == WHITE)
 	c = 'O';
-      else if (board[i][j] == BLACK)
+      else if (p[POS(i, j)] == BLACK)
 	c = 'X';
-      if (board[i][j] == GRAY)
+      if (p[POS(i, j)] == GRAY)
 	c = '?';
       
       fprintf(stderr, " %c", c);
@@ -6271,13 +5790,12 @@ draw_active_area(char board[MAX_BOARD][MAX_BOARD])
  * 0 otherwise.
  */
 static int
-verify_stored_board(char board[MAX_BOARD][MAX_BOARD])
+verify_stored_board(char p[BOARDMAX])
 {
-  int m, n;
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (board[m][n] != GRAY && board[m][n] != p[m][n])
-	return 0;
+  int k;
+  for (k = BOARDMIN; k < BOARDMAX; k++)
+    if (ON_BOARD(k) && p[k] != GRAY && p[k] != board[k])
+      return 0;
   
   return 1;
 }
@@ -6303,15 +5821,13 @@ void purge_persistent_reading_cache()
     int entry_ok = 1;
 
     for (r = 0; r < MAX_CACHE_DEPTH; r++) {
-      int ai = persistent_reading_cache[k].stacki[r];
-      int aj = persistent_reading_cache[k].stackj[r];
+      int apos = persistent_reading_cache[k].stack[r];
       int color = persistent_reading_cache[k].move_color[r];
-      if (ai == -1)
+      if (apos == 0)
 	break;
-      if (ON_BOARD(ai, aj)
-	  && p[ai][aj] == EMPTY
-	  && trymove(ai, aj, color, "purge_persistent_reading_cache", -1, -1,
-		     EMPTY, -1, -1))
+      if (board[apos] == EMPTY
+	  && trymove(apos, color, "purge_persistent_reading_cache", 0,
+		     EMPTY, 0))
 	played_moves++;
       else {
 	entry_ok = 0;
@@ -6342,8 +5858,7 @@ void purge_persistent_reading_cache()
 
 /* Look for a valid read result in the persistent cache. */
 static int
-search_persistent_reading_cache(int routine, int si, int sj,
-				int *result, int *i, int *j)
+search_persistent_reading_cache(int routine, int str, int *result, int *move)
 {
   int k;
   int r;
@@ -6351,24 +5866,21 @@ search_persistent_reading_cache(int routine, int si, int sj,
   for (k = 0; k < persistent_reading_cache_size; k++) {
     /* Check that everything matches. */
     struct reading_cache *entry = &(persistent_reading_cache[k]);
-    int ai = -1;
-    int aj = -1;
+    int apos = 0;
     if (entry->routine != routine
-	|| entry->si != si
-	|| entry->sj != sj
+	|| entry->str != str
 	|| entry->remaining_depth < (depth - stackp))
       continue;
     
     for (r = 0; r < MAX_CACHE_DEPTH; r++) {
-      ai = entry->stacki[r];
-      aj = entry->stackj[r];
-      if (ai == -1 
-	  || (entry->board[ai][aj] != GRAY
-	      && p[ai][aj] != entry->board[ai][aj]))
+      apos = entry->stack[r];
+      if (apos == 0
+	  || (entry->board[apos] != GRAY
+	      && board[apos] != entry->board[apos]))
 	break;
     }
 
-    if (r < MAX_CACHE_DEPTH && ai != -1)
+    if (r < MAX_CACHE_DEPTH && apos != 0)
       continue;
 
     if (!verify_stored_board(entry->board))
@@ -6377,41 +5889,38 @@ search_persistent_reading_cache(int routine, int si, int sj,
     /* Matched alright. Increase score, fill in the answer, and return. */
     entry->score += entry->nodes;
     *result = entry->result;
-    if (i) *i = entry->i;
-    if (j) *j = entry->j;
-    ASSERT(entry->result == 0
-	   || (entry->i == -1 && entry->j == -1)
-	   || ON_BOARD(entry->i, entry->j),
-	   entry->i, entry->j);
+    if (move)
+      *move = entry->move;
+    ASSERT1(entry->result == 0 || (entry->move == 0) || ON_BOARD(entry->move),
+	    entry->move);
 
     if ((debug & DEBUG_READING_PERFORMANCE)
 	&& entry->nodes >= MIN_NODES_TO_REPORT) {
       if (entry->result != 0)
-	gprintf("%o%s %m = %d %m, cached (%d nodes) ",
+	gprintf("%o%s %1m = %d %1m, cached (%d nodes) ",
 		routine == ATTACK ? "attack" : "defend",
-		si, sj,	entry->result, entry->i, entry->j, entry->nodes);
+		str, entry->result, entry->move, entry->nodes);
       else 
-	gprintf("%o%s %m = %d, cached (%d nodes) ",
+	gprintf("%o%s %1m = %d, cached (%d nodes) ",
 		routine == ATTACK ? "attack" : "defend",
-		si, sj, entry->result, entry->nodes);
+		str, entry->result, entry->nodes);
       dump_stack();
     }
 
     if (0) {
       /* Check that the cached value is correct. */
       int result2;
-      int i2;
-      int j2;
+      int move2;
 
       if (routine == ATTACK) 
-	result2 = do_attack(si, sj, &i2, &j2, EMPTY, -1, -1);
+	result2 = do_attack(str, &move2, EMPTY, 0);
       else
-	result2 = do_find_defense(si, sj, &i2, &j2, EMPTY, -1, -1);
+	result2 = do_find_defense(str, &move2, EMPTY, 0);
       
       if (result2 != entry->result ||
-	  (result2 != 0 && (i2 != entry->i || j2 != entry->j))) {
-	gprintf("%oIncorrect cached result %d %m, should be %d %m\n",
-		entry->result, entry->i, entry->j, result2, i2, j2);
+	  (result2 != 0 && (move2 != entry->move))) {
+	gprintf("%oIncorrect cached result %d %1m, should be %d %1m\n",
+		entry->result, entry->move, result2, move2);
 	print_persistent_reading_cache_entry(k);
 	dump_stack();
 	showboard(0);
@@ -6426,18 +5935,16 @@ search_persistent_reading_cache(int routine, int si, int sj,
 
 /* Store a new read result in the persistent cache. */
 static void
-store_persistent_reading_cache(int routine, int si, int sj,
-			       int result, int i, int j,
+store_persistent_reading_cache(int routine, int str, int result, int move,
 			       int nodes)
 {
-  char active[MAX_BOARD][MAX_BOARD];
-  int m, n;
+  char active[BOARDMAX];
   int k;
   int r;
   int score = nodes;
   struct reading_cache *entry;
 
-  ASSERT(result == 0 || (i == -1 && j == -1) || ON_BOARD(i, j), i, j);
+  ASSERT1(result == 0 || (move == 0) || ON_BOARD(move), move);
 
   /* Never cache results at too great depth. */
   if (stackp > MAX_CACHE_DEPTH)
@@ -6473,19 +5980,15 @@ store_persistent_reading_cache(int routine, int si, int sj,
   entry->score   = score;
   entry->remaining_depth = depth - stackp;
   entry->routine = routine;
-  entry->si	  = si;
-  entry->sj	  = sj;
+  entry->str	 = str;
   entry->result  = result;
-  entry->i	  = i;
-  entry->j	  = j;
+  entry->move	 = move;
 
   for (r = 0; r < MAX_CACHE_DEPTH; r++) {
     if (r < stackp)
-      get_move_from_stack(r, &(entry->stacki[r]), &(entry->stackj[r]),
-			  &(entry->move_color[r]));
+      get_move_from_stack(r, &(entry->stack[r]), &(entry->move_color[r]));
     else {
-      entry->stacki[r] = -1;
-      entry->stackj[r] = -1;
+      entry->stack[r] = 0;
       entry->move_color[r] = EMPTY;
     }
   }
@@ -6495,76 +5998,79 @@ store_persistent_reading_cache(int routine, int si, int sj,
    * neighbors of active area so far + one more expansion from empty
    * to empty.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      active[m][n] = shadow[m][n];
+  for (k = BOARDMIN; k < BOARDMAX; k++)
+    active[k] = shadow[k];
 
-  mark_string(si, sj, active, 1);
+  mark_string(str, active, 1);
 
   /* To be safe, also add the successful move. */
-  if (result != 0 && i != -1)
-    active[i][j] = 1;
+  if (result != 0 && move != 0)
+    active[move] = 1;
 
   /* Add adjacent strings and empty. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (active[m][n] != 0) 
-	continue;
-      if ((m > 0 && active[m-1][n] == 1)
-	  || (m < board_size-1 && active[m+1][n] == 1)
-	  || (n > 0 && active[m][n-1] == 1)
-	  || (n < board_size-1 && active[m][n+1] == 1)) {
-	if (p[m][n] != EMPTY)
-	  mark_string(m, n, active, 2);
-	else
-	  active[m][n] = 2;
-      }
+  for (k = BOARDMIN; k < BOARDMAX; k++) {
+    if (!ON_BOARD(k))
+      continue;
+    if (active[k] != 0) 
+      continue;
+    if ((ON_BOARD(SOUTH(k)) && active[SOUTH(k)] == 1)
+	|| (ON_BOARD(WEST(k)) && active[WEST(k)] == 1)
+	|| (ON_BOARD(NORTH(k)) && active[NORTH(k)] == 1)
+	|| (ON_BOARD(EAST(k)) && active[EAST(k)] == 1)) {
+      if (board[k] != EMPTY)
+	mark_string(k, active, 2);
+      else
+	active[k] = 2;
     }
+  }
 
   /* Remove invincible strings. No point adding their liberties and
    * neighbors.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (p[m][n] != EMPTY && worm[m][n].invincible)
-	active[m][n] = 0;
+  for (k = BOARDMIN; k < BOARDMAX; k++) {
+    if (!ON_BOARD(k))
+      continue;
+    if (board[k] != EMPTY && worm[I(k)][J(k)].invincible)
+      active[k] = 0;
+  }
   
   /* Expand empty to empty. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (p[m][n] != EMPTY || active[m][n] != 0) 
-	continue;
-      if ((m > 0 && active[m-1][n] == 2 && p[m-1][n] == EMPTY)
-	  || (m < board_size-1 && active[m+1][n] == 2 && p[m+1][n] == EMPTY)
-	  || (n > 0 && active[m][n-1] == 2 && p[m][n-1] == EMPTY)
-	  || (n < board_size-1 && active[m][n+1] == 2 && p[m][n+1] == EMPTY)) {
-	active[m][n] = 3;
-      }
-    }
+  for (k = BOARDMIN; k < BOARDMAX; k++) {
+    if (board[k] != EMPTY || active[k] != 0) 
+      continue;
+    if ((board[SOUTH(k)] == EMPTY && active[SOUTH(k)] == 2)
+	|| (board[WEST(k)] == EMPTY && active[WEST(k)] == 2)
+	|| (board[NORTH(k)] == EMPTY && active[NORTH(k)] == 2)
+	|| (board[EAST(k)] == EMPTY && active[EAST(k)] == 2))
+      active[k] = 3;
+  }
   
   /* Add neighbors of active area so far. 
    * By using -1 as mark in this step, the test for old marks is
    * simplified.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (active[m][n] != 0)
-	continue;
-      if ((m > 0 && active[m-1][n] > 0)
-	  || (m < board_size-1 && active[m+1][n] > 0)
-	  || (n > 0 && active[m][n-1] > 0)
-	  || (n < board_size-1 && active[m][n+1] > 0))
-	active[m][n] = -1;
-    }
+  for (k = BOARDMIN; k < BOARDMAX; k++) {
+    if (!ON_BOARD(k))
+      continue;
+    if (active[k] != 0) 
+      continue;
+    if ((ON_BOARD(SOUTH(k)) && active[SOUTH(k)] > 0)
+	|| (ON_BOARD(WEST(k)) && active[WEST(k)] > 0)
+	|| (ON_BOARD(NORTH(k)) && active[NORTH(k)] > 0)
+	|| (ON_BOARD(EAST(k)) && active[EAST(k)] > 0))
+      active[k] = -1;
+  }
 
   /* Also add the previously played stones to the active area. */
   for (r = 0; r < stackp; r++)
-    active[entry->stacki[r]][entry->stackj[r]] = 4;
+    active[entry->stack[r]] = 4;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      entry->board[m][n] = 
-	active[m][n] != 0 ? p[m][n] : GRAY;
+  for (k = BOARDMIN; k < BOARDMAX; k++) {
+    if (!ON_BOARD(k))
+      continue;
+    entry->board[k] = 
+      active[k] != 0 ? board[k] : GRAY;
+  }
 
   if (0) {
     gprintf("%o Stored result in cache (entry %d):\n",
@@ -6583,20 +6089,20 @@ print_persistent_reading_cache_entry(int k)
 {
   struct reading_cache *entry = &(persistent_reading_cache[k]);
   int r;
-  gprintf("%omovenum         = %d\n", entry->movenum);
-  gprintf("%onodes           = %d\n", entry->nodes);
-  gprintf("%oscore           = %d\n", entry->score);
-  gprintf("%oremaining_depth = %d\n", entry->remaining_depth);
-  gprintf("%oroutine         = %d\n", entry->routine);
-  gprintf("%o(si, sj)        = %m\n", entry->si, entry->sj);
-  gprintf("%oresult          = %d\n", entry->result);
-  gprintf("%o(i, j)          = %m\n", entry->i, entry->j);
+  gprintf("%omovenum         = %d\n",  entry->movenum);
+  gprintf("%onodes           = %d\n",  entry->nodes);
+  gprintf("%oscore           = %d\n",  entry->score);
+  gprintf("%oremaining_depth = %d\n",  entry->remaining_depth);
+  gprintf("%oroutine         = %d\n",  entry->routine);
+  gprintf("%ostr             = %1m\n", entry->str);
+  gprintf("%oresult          = %d\n",  entry->result);
+  gprintf("%omove            = %1m\n", entry->move);
   
   for (r = 0; r < MAX_CACHE_DEPTH; r++) {
-    if (entry->stacki[r] == -1)
+    if (entry->stack[r] == 0)
       break;
-    gprintf("%ostack[%d]      = %C %m\n", r, entry->move_color[r],
-	    entry->stacki[r], entry->stackj[r]);
+    gprintf("%ostack[%d]      = %C %1m\n", r, entry->move_color[r],
+	    entry->stack[r]);
   }
 
   draw_active_area(entry->board);
@@ -6612,10 +6118,10 @@ mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
   /* If p[m][n] is EMPTY, we just give the contribution to close empty
    * vertices. This is a rough simplification.
    */
-  if (p[m][n] == EMPTY) {
+  if (BOARD(m, n) == EMPTY) {
     for (i = -1; i <= 1; i++)
       for (j = -1; j <= 1; j++)
-	if (ON_BOARD(m+i, n+j) && p[m+i][n+j] == EMPTY)
+	if (ON_BOARD2(m+i, n+j) && BOARD(m+i, n+j) == EMPTY)
 	  values[m+i][n+j] += contribution;
     return;
   }
@@ -6625,21 +6131,21 @@ mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
    */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] != EMPTY)
+      if (BOARD(i, j) != EMPTY)
 	continue;
       for (k = 0; k < 8; k++) {
 	int di = deltai[k];
 	int dj = deltaj[k];
-	if (ON_BOARD(i+di, j+dj)
-	    && p[i+di][j+dj] != EMPTY
-	    && same_string(i+di, j+dj, m, n)) {
+	if (ON_BOARD2(i+di, j+dj)
+	    && BOARD(i+di, j+dj) != EMPTY
+	    && same_string2(i+di, j+dj, m, n)) {
 	  if (k < 4) {
 	    values[i][j] += contribution;
 	    break;
 	  }
 	  else {
-	    if (p[i+di][j] == EMPTY || countlib(i+di, j) <= 2
-		|| p[i][j+dj] == EMPTY || countlib(i, j+dj) <= 2)
+	    if (BOARD(i+di, j) == EMPTY || countlib2(i+di, j) <= 2
+		|| BOARD(i, j+dj) == EMPTY || countlib2(i, j+dj) <= 2)
 	      values[i][j] += 1.0 * contribution;
 	    break;
 	  }
@@ -6677,13 +6183,14 @@ reading_hotspots(float values[MAX_BOARD][MAX_BOARD])
     struct reading_cache *entry = &(persistent_reading_cache[k]);
     float contribution = entry->nodes / (float) sum_nodes;
     if (0) {
-      gprintf("Reading hotspots: %d %m %f\n", entry->routine, entry->si,
-	      entry->sj, contribution);
+      gprintf("Reading hotspots: %d %1m %f\n", entry->routine, entry->str,
+	      contribution);
     }
     switch (entry->routine) {
     case ATTACK:
     case FIND_DEFENSE:
-      mark_string_hotspot_values(values, entry->si, entry->sj, contribution);
+      mark_string_hotspot_values(values, I(entry->str), J(entry->str),
+				 contribution);
       break;
     default:
       gg_assert(0); /* Shouldn't happen. */
@@ -6698,7 +6205,7 @@ reading_hotspots(float values[MAX_BOARD][MAX_BOARD])
 /* ================================================================ */
 
 
-/* naive_ladder(si, sj, &i, &j) tries to capture a string (si, sj)
+/* naive_ladder(str, &move) tries to capture a string (str)
  * with exactly two liberties under simplified assumptions, which are
  * adequate in a ladder. The rules are as follows:
  *
@@ -6723,8 +6230,8 @@ reading_hotspots(float values[MAX_BOARD][MAX_BOARD])
  *    illegal move for the attacker: failed attack
  *
  * Return codes are as usual 0 for failure and 1 for success. If the
- * attack was successful, (*i, *j) contains the attacking move, unless
- * i and j are null pointers.
+ * attack was successful, (*move) contains the attacking move, unless
+ * it is a null pointer.
  *
  * The differences compared to the attack2()/defend1() combination for
  * reading ladders is that this one really always reads them to the
@@ -6737,80 +6244,73 @@ reading_hotspots(float values[MAX_BOARD][MAX_BOARD])
  */
 
 static int
-naive_ladder(int si, int sj, int *i, int *j)
+naive_ladder(int str, int *move)
 {
-  int color, other;
-  int ai, aj, bi, bj;
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int apos, bpos;
   int acount = 0, bcount = 0;
   int liberties;
-  int libi[2], libj[2];
+  int libs[2];
   
-  gg_assert(p[si][sj] != EMPTY);
-  gg_assert(countlib(si, sj) == 2);
-  DEBUG(DEBUG_READING, "naive_ladder(%m)\n", si, sj);
+  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(countlib(str) == 2, str);
+  DEBUG(DEBUG_READING, "naive_ladder(%1m)\n", str);
 
-  RTRACE("checking ladder attack on %m with 2 liberties\n", si, sj);
+  RTRACE("checking ladder attack on %1m with 2 liberties\n", str);
 
-  color = p[si][sj];
-  other = OTHER_COLOR(color);
+  /* Get the two liberties of (str) into (apos) and (bpos). */ 
+  liberties = findlib(str, 2, libs);
+  ASSERT1(liberties == 2, str);
+  apos = libs[0];
+  bpos = libs[1];
 
-  /* Get the two liberties of (si, sj) into (ai, aj) and (bi, bj). */ 
-  liberties = findlib(si, sj, 2, libi, libj);
-  ASSERT(liberties == 2, si, sj);
-  ai = libi[0];
-  aj = libj[0];
-  bi = libi[1];
-  bj = libj[1];
-
-  /* if (bi, bj) looks more promising we wish to switch the two liberties.
-   * We check whether (bi, bj) is adjacent to more open liberties than
-   * (ai, aj).
+  /* if (bpos) looks more promising we wish to switch the two liberties.
+   * We check whether (bpos) is adjacent to more open liberties than
+   * (apos).
    *
    * FIXME: Use order_moves() instead.
    */
 
-  if (ai > 0 && p[ai-1][aj] == EMPTY)
+  if (board[SOUTH(apos)] == EMPTY)
     acount++;
-  if (ai < board_size-1 && p[ai+1][aj] == EMPTY)
+  if (board[WEST(apos)] == EMPTY)
     acount++;
-  if (aj > 0 && p[ai][aj-1] == EMPTY)
+  if (board[NORTH(apos)] == EMPTY)
     acount++;
-  if (aj < board_size-1 && p[ai][aj+1] == EMPTY)
+  if (board[EAST(apos)] == EMPTY)
     acount++;
-  if (bi > 0 && p[bi-1][bj] == EMPTY)
+  if (board[SOUTH(bpos)] == EMPTY)
     bcount++;
-  if (bi < board_size-1 && p[bi+1][bj] == EMPTY)
+  if (board[WEST(bpos)] == EMPTY)
     bcount++;
-  if (bj > 0 && p[bi][bj-1] == EMPTY)
+  if (board[NORTH(bpos)] == EMPTY)
     bcount++;
-  if (bj < board_size-1 && p[bi][bj+1] == EMPTY)
+  if (board[EAST(bpos)] == EMPTY)
     bcount++;
 
   if (bcount > acount) {
-    ai = libi[1];
-    aj = libj[1];
-    bi = libi[0];
-    bj = libj[0];
+    apos = libs[1];
+    bpos = libs[0];
   }
 
-  RTRACE("considering atari at %m\n", ai, aj);
+  RTRACE("considering atari at %1m\n", apos);
   
-  if (trymove(ai, aj, other, "naive_ladder-A", si, sj, EMPTY, -1, -1)) {
-    if (!naive_ladder_defense(si, sj, ai, aj, bi, bj, color, other)) {
+  if (trymove(apos, other, "naive_ladder-A", str, EMPTY, 0)) {
+    if (!naive_ladder_defense(str, apos, bpos, color, other)) {
       popgo();
-      if (i) *i = ai;
-      if (j) *j = aj;
+      if (move)
+	*move = apos;
       return WIN;
     }
     popgo();
   }
 	  
-  if (trymove(bi, bj, other, "naive_ladder-B", si, sj,
-	      EMPTY, -1, -1)) {
-    if (!naive_ladder_defense(si, sj, bi, bj, ai, aj, color, other)) {
+  if (trymove(bpos, other, "naive_ladder-B", str, EMPTY, 0)) {
+    if (!naive_ladder_defense(str, bpos, apos, color, other)) {
       popgo();
-      if (i) *i = bi;
-      if (j) *j = bj;
+      if (move)
+	*move = bpos;
       return WIN;
     }
     popgo();
@@ -6821,27 +6321,26 @@ naive_ladder(int si, int sj, int *i, int *j)
 }
 
 
-/* Try to save the one-liberty string (si, sj) from being caught in a
- * ladder. (ai, aj) is the last played attacking stone and (bi, bj) is
+/* Try to save the one-liberty string (str) from being caught in a
+ * ladder. (apos) is the last played attacking stone and (bpos) is
  * the last remaining liberty.
  */
 
 static int
-naive_ladder_defense(int si, int sj, int ai, int aj, int bi, int bj,
-		     int color, int other) {
+naive_ladder_defense(int str, int apos, int bpos, int color, int other)
+{
   int liberties;
   
   /* Try to capture the just played stone. */
-  if (naive_ladder_break_through(si, sj, ai, aj, color, other))
+  if (naive_ladder_break_through(str, apos, color, other))
     return WIN;
 
   /* Try to run away by extending on the last liberty. */
-  if (trymove(bi, bj, color, "naive_ladder_defense", si, sj,
-	      EMPTY, -1, -1)) {
-    liberties = countlib(si, sj);
+  if (trymove(bpos, color, "naive_ladder_defense", str, EMPTY, 0)) {
+    liberties = countlib(str);
     if (liberties >= 3
 	|| (liberties == 2
-	    && !naive_ladder(si, sj, NULL, NULL))) {
+	    && !naive_ladder(str, NULL))) {
       popgo();
       return WIN;
     }
@@ -6851,65 +6350,57 @@ naive_ladder_defense(int si, int sj, int ai, int aj, int bi, int bj,
   /* Try to capture a string at distance two (Manhattan metric) from
    * the last liberty.
    */
-  if (naive_ladder_break_through(si, sj, bi-2, bj, color, other))
+  if (naive_ladder_break_through(str, SW(bpos), color, other))
     return WIN;
 
-  if (naive_ladder_break_through(si, sj, bi-1, bj-1, color, other))
+  if (naive_ladder_break_through(str, NW(bpos), color, other))
     return WIN;
-  
-  if (naive_ladder_break_through(si, sj, bi, bj-2, color, other))
+
+  if (naive_ladder_break_through(str, NE(bpos), color, other))
     return WIN;
-  
-  if (naive_ladder_break_through(si, sj, bi+1, bj-1, color, other))
+
+  if (naive_ladder_break_through(str, SE(bpos), color, other))
     return WIN;
-  
-  if (naive_ladder_break_through(si, sj, bi+2, bj, color, other))
+
+  if (naive_ladder_break_through(str, SS(bpos), color, other))
     return WIN;
-  
-  if (naive_ladder_break_through(si, sj, bi+1, bj+1, color, other))
+
+  if (naive_ladder_break_through(str, WW(bpos), color, other))
     return WIN;
-  
-  if (naive_ladder_break_through(si, sj, bi, bj+2, color, other))
+
+  if (naive_ladder_break_through(str, NN(bpos), color, other))
     return WIN;
-  
-  if (naive_ladder_break_through(si, sj, bi-1, bj+1, color, other))
+
+  if (naive_ladder_break_through(str, EE(bpos), color, other))
     return WIN;
-  
+
   /* Nothing worked. */
   return 0;
 }
 
 
-/* Try to break out of the ladder by capturing (ai, aj). We must first
+/* Try to break out of the ladder by capturing (apos). We must first
  * verify that there is an opponent stone there and that it is in
  * atari so we can capture it immediately. After the capture we count
- * liberties for (si, sj) to see if the ladder is decided yet.
+ * liberties for (str) to see if the ladder is decided yet.
  */
 static int
-naive_ladder_break_through(int si, int sj, int ai, int aj,
-			   int color, int other)
+naive_ladder_break_through(int str, int apos, int color, int other)
 {
   int liberties;
-  int bi, bj;
+  int bpos;
   
-  if (ai < 0
-      || ai >= board_size
-      || aj < 0
-      || aj >= board_size)
-    return 0;
-
-  if (p[ai][aj] != other)
+  if (board[apos] != other)
     return 0;
   
-  if (findlib(ai, aj, 1, &bi, &bj) != 1)
+  if (findlib(apos, 1, &bpos) != 1)
     return 0;
 
-  if (trymove(bi, bj, color, "naive_ladder_break_through", si, sj,
-	      EMPTY, -1, -1)) {
-    liberties = countlib(si, sj);
+  if (trymove(bpos, color, "naive_ladder_break_through", str, EMPTY, 0)) {
+    liberties = countlib(str);
     if (liberties >= 3
 	|| (liberties == 2
-	    && !naive_ladder(si, sj, NULL, NULL))) {
+	    && !naive_ladder(str, NULL))) {
       popgo();
       return WIN;
     }

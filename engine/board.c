@@ -48,11 +48,10 @@
 struct string_data {
   int color;                       /* Color of string, BLACK or WHITE */
   int size;                        /* Number of stones in string. */
-  int origini;                     /* Coordinates of "origin", i.e. */
-  int originj;                     /* "upper left" stone. */
+  int origin;                      /* Coordinates of "origin", i.e. */
+                                   /* "upper left" stone. */
   int liberties;                   /* Number of liberties. */
-  int libi[MAX_LIBERTIES];         /* Coordinates of liberties. */
-  int libj[MAX_LIBERTIES];
+  int libs[MAX_LIBERTIES];         /* Coordinates of liberties. */
   int neighbors;                   /* Number of neighbor strings */
   int neighborlist[MAXCHAIN];      /* List of neighbor string numbers. */
   int mark;                        /* General purpose mark. */
@@ -128,14 +127,13 @@ static struct vertex_stack_entry *vertex_stack_pointer;
 /* Index into list of strings. The index is only valid if there is a
  * stone at the vertex.
  */
-static int string_number[MAX_BOARD][MAX_BOARD];
+static int string_number[BOARDMAX];
 
 
 /* The stones in a string are linked together in a cyclic list. 
  * These are the coordinates to the next stone in the string.
  */
-static int next_stonei[MAX_BOARD][MAX_BOARD];
-static int next_stonej[MAX_BOARD][MAX_BOARD];
+static int next_stone[BOARDMAX];
 
 
 /* ---------------------------------------------------------------- */
@@ -144,27 +142,22 @@ static int next_stonej[MAX_BOARD][MAX_BOARD];
 /* Macros to traverse the stones of a string.
  *
  * Usage:
- * int s;
- * s=find_the_string()
- * FIRST_STONE(s, i, j);
+ * int s, pos;
+ * s = find_the_string()
+ * pos = FIRST_STONE(s);
  *   do {
- *    use_stone(i, j);
- *    NEXT_STONE(i, j);
- *  } while (!BACK_TO_FIRST_STONE(s, i, j));
+ *    use_stone(pos);
+ *    pos = NEXT_STONE(pos);
+ *  } while (!BACK_TO_FIRST_STONE(s, pos));
  */
-#define FIRST_STONE(s, i, j) \
-  (i = string[s].origini, j = string[s].originj)
+#define FIRST_STONE(s) \
+  (string[s].origin)
 
-#define NEXT_STONE(i, j) \
-  do {\
-    int nexti = next_stonei[i][j];\
-    j = next_stonej[i][j];\
-    i = nexti;\
-  } while (0)
+#define NEXT_STONE(pos) \
+  (next_stone[pos])
 
-#define BACK_TO_FIRST_STONE(s, i, j) \
-  (i == string[s].origini &&\
-   j == string[s].originj)
+#define BACK_TO_FIRST_STONE(s, pos) \
+  ((pos) == string[s].origin)
 
 
 /* Assorted useful macros.
@@ -173,68 +166,64 @@ static int next_stonej[MAX_BOARD][MAX_BOARD];
  * macros for speed.
  */
 
-#define LIBERTY(i, j) \
-  (p[i][j] == EMPTY)
+#define LIBERTY(pos) \
+  (board[pos] == EMPTY)
 
-#define UNMARKED_LIBERTY(i, j) \
-  (p[i][j] == EMPTY && ml[i][j] != liberty_mark)
+#define UNMARKED_LIBERTY(pos) \
+  (board[pos] == EMPTY && ml[pos] != liberty_mark)
 
-#define MARK_LIBERTY(i, j) \
-  ml[i][j] = liberty_mark
+#define MARK_LIBERTY(pos) \
+  ml[pos] = liberty_mark
 
-#define UNMARKED_STRING(i, j) \
-  (string[string_number[i][j]].mark != string_mark)
+#define UNMARKED_STRING(pos) \
+  (string[string_number[pos]].mark != string_mark)
 
-#define UNMARKED_OPPONENT_STRING(s, i, j)\
-  (p[i][j] == OTHER_COLOR(string[s].color)\
-   && string[string_number[i][j]].mark != string_mark)
+#define UNMARKED_OPPONENT_STRING(s, pos)\
+  (board[pos] == OTHER_COLOR(string[s].color)\
+   && string[string_number[pos]].mark != string_mark)
 
-#define UNMARKED_OWN_STRING(s, i, j)\
-  (p[i][j] == string[s].color\
-   && string[string_number[i][j]].mark != string_mark)
+#define UNMARKED_OWN_STRING(s, pos)\
+  (board[pos] == string[s].color\
+   && string[string_number[pos]].mark != string_mark)
 
-#define MARK_STRING(i, j) string[string_number[i][j]].mark = string_mark
+#define MARK_STRING(pos) string[string_number[pos]].mark = string_mark
 
-#define STRING_AT_VERTEX(i, j, s)\
-  (p[i][j] != EMPTY && string_number[i][j] == (s))
+#define STRING_AT_VERTEX(pos, s)\
+  (board[pos] != EMPTY && board[pos] != GRAY && string_number[pos] == (s))
   
-#define LIBERTIES(i, j)\
-  string[string_number[i][j]].liberties
+#define LIBERTIES(pos)\
+  string[string_number[pos]].liberties
 
-#define ADD_LIBERTY(s, i, j)\
+#define ADD_LIBERTY(s, pos)\
   do {\
-    if (string[s].liberties < MAX_LIBERTIES) {\
-      string[s].libi[string[s].liberties] = i;\
-      string[s].libj[string[s].liberties] = j;\
-    }\
+    if (string[s].liberties < MAX_LIBERTIES)\
+      string[s].libs[string[s].liberties] = pos;\
     string[s].liberties++;\
   } while (0)
 
-#define ADD_AND_MARK_LIBERTY(s, i, j)\
+#define ADD_AND_MARK_LIBERTY(s, pos)\
   do {\
-    if (string[s].liberties < MAX_LIBERTIES) {\
-      string[s].libi[string[s].liberties] = i;\
-      string[s].libj[string[s].liberties] = j;\
-    }\
+    if (string[s].liberties < MAX_LIBERTIES)\
+      string[s].libs[string[s].liberties] = pos;\
     string[s].liberties++;\
-    ml[i][j] = liberty_mark;\
+    ml[pos] = liberty_mark;\
   } while (0)
 
-#define ADD_NEIGHBOR(s, i, j)\
-  string[s].neighborlist[string[s].neighbors++] = string_number[i][j]
+#define ADD_NEIGHBOR(s, pos)\
+  string[s].neighborlist[string[s].neighbors++] = string_number[pos]
 
-#define DO_ADD_STONE(i, j, color)\
+#define DO_ADD_STONE(pos, color)\
   do {\
-    PUSH_VERTEX(p[i][j]);\
-    p[i][j] = color;\
-    hashdata_invert_stone(&hashdata, i, j, color);\
+    PUSH_VERTEX(board[pos]);\
+    board[pos] = color;\
+    hashdata_invert_stone(&hashdata, pos, color);\
   } while (0)
 
-#define DO_REMOVE_STONE(i, j)\
+#define DO_REMOVE_STONE(pos)\
   do {\
-    PUSH_VERTEX(p[i][j]);\
-    hashdata_invert_stone(&hashdata, i, j, p[i][j]);\
-    p[i][j] = EMPTY;\
+    PUSH_VERTEX(board[pos]);\
+    hashdata_invert_stone(&hashdata, pos, board[pos]);\
+    board[pos] = EMPTY;\
   } while (0)
 
 
@@ -252,35 +241,33 @@ static int next_string;
 
 
 /* For marking purposes. */
-static int ml[MAX_BOARD][MAX_BOARD];
+static int ml[BOARDMAX];
 static int liberty_mark;
 static int string_mark;
 
 
 /* Forward declaration. */
-static int  do_trymove(int i, int j, int color, int ignore_ko);
+static int  do_trymove(int pos, int color, int ignore_ko);
 static void undo_move(void);
 static void new_position(void);
 static void init_board(void);
-static int  propagate_string(int i, int j, int m, int n);
+static int  propagate_string(int stone, int str);
 static void find_liberties_and_neighbors(int s);
 static int  do_remove_string(int s);
-static void do_play_move(int i, int j, int color);
-static int  slow_approxlib(int i, int j, int color, int maxlib, 
-			   int *libi, int *libj);
-static int  incremental_sloppy_self_atari(int m, int n, int color);
+static void do_play_move(int pos, int color);
+static int  slow_approxlib(int pos, int color, int maxlib, int *libs);
+static int  incremental_sloppy_self_atari(int pos, int color);
 
 
 /* Statistics. */
 static int trymove_counter = 0;
-
 
 /* Coordinates for the eight directions, ordered
  * south, west, north, east, southwest, northwest, northeast, southeast.
  */
 int deltai[8] = { 1,  0, -1,  0,  1, -1, -1, 1};
 int deltaj[8] = { 0, -1,  0,  1, -1, -1,  1, 1};
-
+int delta[8]  = { NS, -1, -NS, 1, NS-1, -NS-1, -NS+1, NS+1};
 
 /* ================================================================ */
 /*                         External functions                       */
@@ -292,28 +279,29 @@ int deltaj[8] = { 0, -1,  0,  1, -1, -1,  1, 1};
  */
 
 void
-setup_board(Intersection new_p[MAX_BOARD][MAX_BOARD], int koi, int koj,
-	    int *last_i, int *last_j, 
-	    float new_komi, int w_captured, int b_captured)
+setup_board(Intersection new_board[MAX_BOARD][MAX_BOARD], int ko_pos,
+	    int *last, float new_komi, int w_captured, int b_captured)
 {
   int k;
 
-  memcpy(p, new_p, sizeof(p));
-  board_ko_i = koi;
-  board_ko_j = koj;
-
-  for (k = 0; k < 2; k++) {
-    if (last_i[k] != -1) {
-      last_moves_i[k] = last_i[k];
-      last_moves_j[k] = last_j[k];
-    }
+  for (k = 0; k < BOARDSIZE; k++) {
+    if (!ON_BOARD2(I(k), J(k)))
+      board[k] = GRAY;
+    else
+      board[k] = new_board[I(k)][J(k)];
   }
+
+  board_ko_pos = ko_pos;
+
+  for (k = 0; k < 2; k++)
+    if (last[k] != 0)
+      last_moves[k] = last[k];
 
   komi = new_komi;
   white_captured = w_captured;
   black_captured = b_captured;
 
-  hashdata_recalc(&hashdata, p, board_ko_i, board_ko_j);
+  hashdata_recalc(&hashdata, board, board_ko_pos);
   new_position();
 }
 
@@ -329,19 +317,20 @@ clear_board(void)
 
   gg_assert(board_size > 0 && board_size <= MAX_BOARD);
   
-  memset(p, EMPTY, sizeof(p));
-  board_ko_i = -1;
-  board_ko_j = -1;
+  memset(board, EMPTY, sizeof(board));
+  for (k = 0; k < BOARDSIZE; k++)
+    if (I(k) < 0 || I(k) >= board_size || J(k) < 0 || J(k) >= board_size)
+      board[k] = GRAY;
 
-  for (k = 0; k < 2; k++) {
-    last_moves_i[k] = -1;
-    last_moves_j[k] = -1;
-  }
+  board_ko_pos = 0;
+
+  for (k = 0; k < 2; k++)
+    last_moves[k] = 0;
 
   white_captured = 0;
   black_captured = 0;
 
-  hashdata_recalc(&hashdata, p, board_ko_i, board_ko_j);
+  hashdata_recalc(&hashdata, board, board_ko_pos);
   new_position();
   movenum = 0;
 }
@@ -356,8 +345,7 @@ clear_board(void)
  * position and which color made them. Perhaps 
  * this should be one array of a structure 
  */
-static int      stacki[MAXSTACK];
-static int      stackj[MAXSTACK];
+static int      stack[MAXSTACK];
 static int      move_color[MAXSTACK];
 
 static Hash_data  hashdata_stack[MAXSTACK];
@@ -365,56 +353,54 @@ static Hash_data  hashdata_stack[MAXSTACK];
 
 /*
  * trymove pushes the position onto the stack, and makes a move
- * at (i, j) of color. Returns one if the move is legal. The
+ * at pos of color. Returns one if the move is legal. The
  * stack pointer is only incremented if the move is legal.
  *
  * The way to use this is:
  *
- *   if (trymove(i, j, color, [message], k, l)) {
+ *   if (trymove(...)) {
  *      ...
  *      popgo();
  *   }   
  *
  * The message can be written as a comment to an sgf file using 
- * sgfdump().  (k, l) can be -1 if they are not needed but if they are 
- * not the location of (k, l) is included in the comment.
+ * sgfdump(). str can be 0 if it is not needed but otherwise  
+ * the location of str is included in the comment.
  */
 
 int 
-trymove(int i, int j, int color, const char *message, int k, int l,
-	int komaster, int kom_i, int kom_j)
+trymove(int pos, int color, const char *message, int str,
+	int komaster, int kom_pos)
 {
   /* Do the real work elsewhere. */
-  if (!do_trymove(i, j, color, 0))
+  if (!do_trymove(pos, color, 0))
     return 0;
   
   /* Store the move in an sgf tree if one is available. */
   if (sgf_dumptree) {
     char buf[100];
-    if (k == -1) {
+    if (str == 0) {
       if (komaster != EMPTY)
-	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%c%d)", 
+	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, count_variations, hashdata.hashval,
 		    color_to_string(komaster),
-		    kom_j + 'A' + (kom_j >= 8), board_size - kom_i);
+		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx)", 
 		    message, count_variations, hashdata.hashval);
     }
     else {
       if (komaster != EMPTY)
-	gg_snprintf(buf, 100, "%s at %c%d (variation %d, hash %lx, komaster %s:%c%d)", 
-		    message,
-		    l + 'A' + (l >= 8), board_size - k, count_variations,
+	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
+		    message, location_to_string(str), count_variations,
 		    hashdata.hashval, color_to_string(komaster),
-		    kom_j + 'A' + (kom_j >= 8), board_size - kom_i);
+		    location_to_string(kom_pos));
       else
-	gg_snprintf(buf, 100, "%s at %c%d (variation %d, hash %lx)", 
-		    message,
-		    l + 'A' + (l>=8), board_size - k, count_variations,
+	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx)", 
+		    message, location_to_string(str), count_variations,
 		    hashdata.hashval);
     }
-    sgftreeAddPlayLast(sgf_dumptree, NULL, color, i, j);
+    sgftreeAddPlayLast(sgf_dumptree, NULL, color, I(pos), J(pos));
     sgftreeAddComment(sgf_dumptree, NULL, buf);
   }
   
@@ -438,11 +424,10 @@ trymove(int i, int j, int color, const char *message, int k, int l,
  */
 
 int 
-tryko(int i, int j, int color, const char *message, 
-      int komaster, int kom_i, int kom_j)
+tryko(int pos, int color, const char *message, int komaster, int kom_pos)
 {
   /* Do the real work elsewhere. */
-  if (!do_trymove(i, j, color, 1))
+  if (!do_trymove(pos, color, 1))
     return 0;
 
   if (sgf_dumptree) {
@@ -450,22 +435,17 @@ tryko(int i, int j, int color, const char *message,
     if (!message)
       message = "???";
     if (komaster != EMPTY)
-      gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%c%d)", 
-		  message,
-		  count_variations,
-		  hashdata.hashval,
-		  color_to_string(komaster),
-		  kom_i + 'A' + (kom_i >= 8), board_size - kom_j);
+      gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
+		  message, count_variations, hashdata.hashval,
+		  color_to_string(komaster), location_to_string(kom_pos));
     else
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx)", 
-		  message,
-		  count_variations,
-		  hashdata.hashval);
+		  message, count_variations, hashdata.hashval);
     sgftreeAddPlayLast(sgf_dumptree, NULL, color, -1, -1);
     sgftreeAddComment(sgf_dumptree, NULL, "tenuki (ko threat)");
     sgftreeAddPlayLast(sgf_dumptree, NULL, OTHER_COLOR(color), -1, -1);
     sgftreeAddComment(sgf_dumptree, NULL, "tenuki (answers ko threat)");
-    sgftreeAddPlayLast(sgf_dumptree, NULL, color, i, j);
+    sgftreeAddPlayLast(sgf_dumptree, NULL, color, I(pos), J(pos));
     sgftreeAddComment(sgf_dumptree, NULL, buf);
   }
   
@@ -484,34 +464,33 @@ tryko(int i, int j, int color, const char *message,
  */
 
 static int 
-do_trymove(int i, int j, int color, int ignore_ko)
+do_trymove(int pos, int color, int ignore_ko)
 {
   /* 1. The move must be inside the board and the color must be BLACK
    * or WHITE.
    */
-  ASSERT_ON_BOARD(i, j);
+  ASSERT_ON_BOARD1(pos);
   gg_assert(color == BLACK || color == WHITE);
   
   /* Update the reading tree shadow. */
-  shadow[i][j] = 1;
+  shadow[pos] = 1;
 
   /* 2. The location must be empty. */
-  if (p[i][j] != EMPTY)
+  if (board[pos] != EMPTY)
     return 0;
 
   /* 3. The location must not be the ko point, unless ignore_ko==1. */
-  if (!ignore_ko
-      && i == board_ko_i && j == board_ko_j) {
-    if (((i > 0) && (p[i-1][j] != color))
-	|| ((i == 0) && (p[i+1][j] != color))) {
-      RTRACE("%m would violate the ko rule\n", i, j);
+  if (!ignore_ko && pos == board_ko_pos) {
+    if (board[WEST(pos)] == OTHER_COLOR(color)
+	|| board[EAST(pos)] == OTHER_COLOR(color)) {
+      RTRACE("%1m would violate the ko rule\n", pos);
       return 0;
     }
   }
 
   /* 4. Test for suicide. */
-  if (is_suicide(i, j, color)) {
-    RTRACE("%m would be suicide\n", i, j);
+  if (is_suicide(pos, color)) {
+    RTRACE("%1m would be suicide\n", pos);
     return 0;
   }
   
@@ -532,8 +511,7 @@ do_trymove(int i, int j, int color, int ignore_ko)
   /* So far, so good. Now push the move on the move stack. These are
    * needed for dump_stack().
    */
-  stacki[stackp] = i;
-  stackj[stackp] = j;
+  stack[stackp] = pos;
   move_color[stackp] = color;
 
   /*
@@ -550,12 +528,10 @@ do_trymove(int i, int j, int color, int ignore_ko)
    *         this is not an urgent FIXME.
    */
   BEGIN_CHANGE_RECORD();
-  PUSH_VALUE(board_ko_i);
-  PUSH_VALUE(board_ko_j);
+  PUSH_VALUE(board_ko_pos);
   memcpy(&hashdata_stack[stackp], &hashdata, sizeof(hashdata));
 
-  board_ko_i = -1;
-  board_ko_j = -1;
+  board_ko_pos = 0;
   hashdata_remove_ko(&hashdata);
   
   PUSH_VALUE(black_captured);
@@ -568,7 +544,7 @@ do_trymove(int i, int j, int color, int ignore_ko)
   if (verbose == 4)
     dump_stack();
 
-  do_play_move(i, j, color);
+  do_play_move(pos, color);
 
   return 1;
 }
@@ -643,8 +619,7 @@ dump_stack(void)
   int n;
 
   for (n = 0; n < stackp; n++)
-    gprintf("%o%s:%m ", move_color[n] == BLACK ? "B" : "W",
-	    stacki[n], stackj[n]);
+    gprintf("%o%s:%1m ", move_color[n] == BLACK ? "B" : "W", stack[n]);
   
 #if !TRACE_READ_RESULTS
   if (count_variations)
@@ -667,16 +642,16 @@ dump_stack(void)
  * efficiency reasons.
  */
 
-#define do_add_stone(i, j, color) \
+#define do_add_stone(pos, color) \
   do { \
-    p[i][j] = color; \
-    hashdata_invert_stone(&hashdata, i, j, color); \
+    board[pos] = color; \
+    hashdata_invert_stone(&hashdata, pos, color); \
   } while (0)
 
-#define do_remove_stone(i, j) \
+#define do_remove_stone(pos) \
   do { \
-    hashdata_invert_stone(&hashdata, i, j, p[i][j]); \
-    p[i][j] = EMPTY; \
+    hashdata_invert_stone(&hashdata, pos, board[pos]); \
+    board[pos] = EMPTY; \
   } while (0)
 
 
@@ -687,13 +662,13 @@ dump_stack(void)
 /* place a stone on the board and update the hashdata. */
 
 void
-add_stone(int i, int j, int color)
+add_stone(int pos, int color)
 {
-  ASSERT(stackp == 0, i, j);
-  ASSERT_ON_BOARD(i, j);
-  ASSERT(p[i][j] == EMPTY, i, j);
+  ASSERT1(stackp == 0, pos);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
 
-  do_add_stone(i, j, color);
+  do_add_stone(pos, color);
   new_position();
 }
 
@@ -701,13 +676,13 @@ add_stone(int i, int j, int color)
 /* remove a stone from the board and update the hashdata. */
 
 void
-remove_stone(int i, int j)
+remove_stone(int pos)
 {
-  ASSERT(stackp == 0, i, j);
-  ASSERT_ON_BOARD(i, j);
-  ASSERT(p[i][j] != EMPTY, i, j);
+  ASSERT1(stackp == 0, pos);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] != EMPTY, pos);
 
-  do_remove_stone(i, j);
+  do_remove_stone(pos);
   new_position();
 }
 
@@ -724,38 +699,35 @@ remove_stone(int i, int j)
  * can't be easily unplayed.
  */
 void
-play_move(int i, int j, int color)
+play_move(int pos, int color)
 {
 #if CHECK_HASHING
   Hash_data oldkey;
 
   /* Check the hash table to see if it corresponds to the cumulative one. */
-  hashdata_recalc(&oldkey, p, board_ko_i, board_ko_j);
+  hashdata_recalc(&oldkey, board, board_ko_pos);
   gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
 #endif
   
   gg_assert(stackp == 0);
   
-  last_moves_i[1] = last_moves_i[0];
-  last_moves_j[1] = last_moves_j[0];
-  last_moves_i[0] = i;
-  last_moves_j[0] = j;
+  last_moves[1] = last_moves[0];
+  last_moves[0] = pos;
 
-  board_ko_i = -1;
-  board_ko_j = -1;
+  board_ko_pos = 0;
   hashdata_remove_ko(&hashdata);
 
   /* If the move is a pass, we can skip some steps. */
-  if (i != -1 || j != -1) {
-    ASSERT_ON_BOARD(i, j);
-    ASSERT(p[i][j] == EMPTY, i, j);
+  if (pos != 0) {
+    ASSERT_ON_BOARD1(pos);
+    ASSERT1(board[pos] == EMPTY, pos);
 
     /* Do play the move. */
-    do_play_move(i, j, color);
+    do_play_move(pos, color);
 
 #if CHECK_HASHING
     /* Check the hash table to see if it equals the previous one. */
-    hashdata_recalc(&oldkey, p, board_ko_i, board_ko_j);
+    hashdata_recalc(&oldkey, board, board_ko_pos);
     gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
 #endif
   }
@@ -776,41 +748,36 @@ play_move(int i, int j, int color)
  */
 
 int
-is_pass(int i, int j)
+is_pass(int pos)
 {
-  if (i < 0) {
-    gg_assert(j < 0);
-    return 1;
-  }
-
-  return 0;
+  return pos == 0;
 }
 
 
 /*
- * is_legal(i, j, color) determines whether the move (color) at
- * (i, j) is legal.
+ * is_legal(pos, color) determines whether the move (color) at
+ * pos is legal.
  */
 
 int 
-is_legal(int i, int j, int color)
+is_legal(int pos, int color)
 {
   /* 0. A pass move is always legal. */
-  if (i == -1 && j == -1)
+  if (pos == 0)
     return 1;
 
   /* 1. The move must be inside the board. */
-  ASSERT_ON_BOARD(i, j);
+  ASSERT_ON_BOARD1(pos);
 
   /* 2. The location must be empty. */
-  if (p[i][j]!=EMPTY) 
+  if (board[pos] != EMPTY) 
     return 0;
 
   /* 3. The location must not be the ko point. */
-  if (i == board_ko_i && j == board_ko_j)
-    if ((i > 0 && p[i-1][j] != color)
-	|| (i == 0 && p[i+1][j] != color)) {
-      RTRACE("%m would violate the ko rule\n", i, j);
+  if (pos == board_ko_pos)
+    if (board[WEST(pos)] == OTHER_COLOR(color)
+	|| board[EAST(pos)] == OTHER_COLOR(color)) {
+      RTRACE("%1m would violate the ko rule\n", pos);
       return 0;
     }
 
@@ -822,8 +789,8 @@ is_legal(int i, int j, int color)
   }
 
   /* Check for suicide. */
-  if (!allow_suicide && is_suicide(i, j, color)) {
-    RTRACE("%m would be suicide\n", i, j);
+  if (!allow_suicide && is_suicide(pos, color)) {
+    RTRACE("%1m would be suicide\n", pos);
     return 0;
   }
   
@@ -832,8 +799,8 @@ is_legal(int i, int j, int color)
 
 
 /*
- * is_suicide(i, j, color) determines whether the move (color) at
- * (i, j) would be a  suicide.
+ * is_suicide(pos, color) determines whether the move (color) at
+ * (pos) would be a suicide.
  *
  * This is the case if
  * 1. There is no neighboring empty intersection.
@@ -841,33 +808,33 @@ is_legal(int i, int j, int color)
  * 3. There is no neighboring friendly string with more than one liberty.
  */
 int 
-is_suicide(int m, int n, int color)
+is_suicide(int pos, int color)
 {
-  ASSERT_ON_BOARD(m, n);
-  gg_assert(p[m][n] == EMPTY);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
 
   if (!strings_initialized)
     init_board();
   
   /* Check for suicide. */
-  if (m > 0
-      && (LIBERTY(m-1, n)
-	  || ((p[m-1][n] == color) ^ (LIBERTIES(m-1, n) == 1))))
+  if (LIBERTY(SOUTH(pos))
+      || (ON_BOARD(SOUTH(pos))
+	  && ((board[SOUTH(pos)] == color) ^ (LIBERTIES(SOUTH(pos)) == 1))))
     return 0;
 
-  if (m < board_size-1
-      && (LIBERTY(m+1, n)
-	  || ((p[m+1][n] == color) ^ (LIBERTIES(m+1, n) == 1))))
+  if (LIBERTY(WEST(pos))
+      || (ON_BOARD(WEST(pos))
+	  && ((board[WEST(pos)] == color) ^ (LIBERTIES(WEST(pos)) == 1))))
     return 0;
 
-  if (n > 0
-      && (LIBERTY(m, n-1)
-	  || ((p[m][n-1] == color) ^ (LIBERTIES(m, n-1) == 1))))
+  if (LIBERTY(NORTH(pos))
+      || (ON_BOARD(NORTH(pos))
+	  && ((board[NORTH(pos)] == color) ^ (LIBERTIES(NORTH(pos)) == 1))))
     return 0;
 
-  if (n < board_size-1
-      && (LIBERTY(m, n+1)
-	  || ((p[m][n+1] == color) ^ (LIBERTIES(m, n+1) == 1))))
+  if (LIBERTY(EAST(pos))
+      || (ON_BOARD(EAST(pos))
+	  && ((board[EAST(pos)] == color) ^ (LIBERTIES(EAST(pos)) == 1))))
     return 0;
 
   return 1;
@@ -875,18 +842,18 @@ is_suicide(int m, int n, int color)
 
 
 /*
- * is_illegal_ko_capture(i, j, color) determines whether the move
- * (color) at (i, j) would be an illegal ko capture.
+ * is_illegal_ko_capture(pos, color) determines whether the move
+ * (color) at (pos) would be an illegal ko capture.
  */
 int 
-is_illegal_ko_capture(int i, int j, int color)
+is_illegal_ko_capture(int pos, int color)
 {
-  ASSERT_ON_BOARD(i, j);
-  ASSERT(p[i][j] == EMPTY, i, j);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
 
-  return (i == board_ko_i && j == board_ko_j
-	  && ((i > 0 && p[i-1][j] != color)
-	      || (i == 0 && p[i+1][j] != color)));
+  return (pos == board_ko_pos
+	  && ((board[WEST(pos)] == OTHER_COLOR(color))
+	      || (board[EAST(pos)] == OTHER_COLOR(color))));
 }
 
 
@@ -906,33 +873,32 @@ is_illegal_ko_capture(int i, int j, int color)
  * 1. Komaster is EMPTY.
  * 1a) Unconditional ko capture is allowed. Komaster remains EMPTY.
  * 1b) Conditional ko capture is allowed. Komaster is set to O and
- *     (kom_i, kom_j) to the location of the ko, where a stone was
+ *     kom_pos to the location of the ko, where a stone was
  *     just removed.
  * 
  * 2. Komaster is O:
  * 2a) Only nested ko captures are allowed.
- * 2b) If komaster fills the ko at (kom_i,kom_j) then komaster reverts to
+ * 2b) If komaster fills the ko at kom_pos then komaster reverts to
  *     EMPTY.
  * 
  * 3. Komaster is X:
- *    Play at (kom_i,kom_j) is not allowed. Any other ko capture
+ *    Play at kom_pos is not allowed. Any other ko capture
  *    is allowed. If O takes another ko, komaster becomes GRAY.
  * 
  * 4. Komaster is GRAY:
- *    Ko captures are not allowed. If the ko at (kom_i,kom_j) is
+ *    Ko captures are not allowed. If the ko at kom_pos is
  *    filled then the komaster reverts to EMPTY.
  * 
  */
 int
-komaster_trymove(int i, int j, int color,
-		 const char *message, int si, int sj,
-		 int komaster, int kom_i, int kom_j,
-		 int *new_komaster, int *new_kom_i, int *new_kom_j,
+komaster_trymove(int pos, int color, const char *message, int str,
+		 int komaster, int kom_pos,
+		 int *new_komaster, int *new_kom_pos,
 		 int *is_conditional_ko, int consider_conditional_ko)
 {
   int other = OTHER_COLOR(color);
   int ko_move;
-  int ki, kj;
+  int kpos;
 
   /* First we check whether the ko claimed by komaster has been
    * resolved. If that is the case, we revert komaster to EMPTY.
@@ -943,33 +909,29 @@ komaster_trymove(int i, int j, int color,
    * owns the ko so we have to try both colors.
    */
   if (komaster != EMPTY 
-      && (p[kom_i][kom_j] != EMPTY
+      && (board[kom_pos] != EMPTY
 	  || (komaster != GRAY
-	      && !is_ko(kom_i, kom_j, OTHER_COLOR(komaster), NULL, NULL)
-	      && is_suicide(kom_i, kom_j, OTHER_COLOR(komaster)))
+	      && !is_ko(kom_pos, OTHER_COLOR(komaster), NULL)
+	      && is_suicide(kom_pos, OTHER_COLOR(komaster)))
 	  || (komaster == GRAY
-	      && !is_ko(kom_i, kom_j, BLACK, NULL, NULL)
-	      && !is_ko(kom_i, kom_j, WHITE, NULL, NULL)
-	      && (is_suicide(kom_i, kom_j, BLACK)
-		  || is_suicide(kom_i, kom_j, WHITE))))) {
+	      && !is_ko(kom_pos, BLACK, NULL)
+	      && !is_ko(kom_pos, WHITE, NULL)
+	      && (is_suicide(kom_pos, BLACK)
+		  || is_suicide(kom_pos, WHITE))))) {
     komaster = EMPTY;
-    kom_i = -1;
-    kom_j = -1;
+    kom_pos = 0;
   }
 
   /* Usually the komaster parameters are unchanged. */
   *new_komaster = komaster;
-  *new_kom_i = kom_i;
-  *new_kom_j = kom_j;
+  *new_kom_pos = kom_pos;
 
   *is_conditional_ko = 0;
-  ko_move = is_ko(i, j, color, &ki, &kj);
+  ko_move = is_ko(pos, color, &kpos);
 
   if (ko_move) {
     /* If opponent is komaster we may not capture his ko. */
-    if (komaster == other
-	&& i == kom_i
-	&& j == kom_j)
+    if (komaster == other && pos == kom_pos)
       return 0;
 
     /* If opponent is komaster we may not capture ko at all. */
@@ -978,16 +940,16 @@ komaster_trymove(int i, int j, int color,
 
     /* If we are komaster, we may only do nested captures. */
     if (komaster == color
-	&& !((ki == kom_i+1 || ki == kom_i-1)
-	     && (kj == kom_j+1 || kj == kom_j-1)))
+	&& !(kpos == SW(kom_pos) || kpos == NW(kom_pos)
+	     || kpos == NE(kom_pos) || kpos == SE(kom_pos)))
       return 0;
   }
 
-  if (!trymove(i, j, color, message, si, sj, komaster, kom_i, kom_j)) {
+  if (!trymove(pos, color, message, str, komaster, kom_pos)) {
     if (!consider_conditional_ko)
       return 0;
 
-    if (!tryko(i, j, color, message, komaster, kom_i, kom_j))
+    if (!tryko(pos, color, message, komaster, kom_pos))
       return 0; /* Suicide. */
       
     *is_conditional_ko = 1;
@@ -995,8 +957,7 @@ komaster_trymove(int i, int j, int color,
     /* Conditional ko capture, set komaster parameters. */
     if (komaster == EMPTY) {
       *new_komaster = color;
-      *new_kom_i = ki;
-      *new_kom_j = kj;
+      *new_kom_pos = kpos;
       return 1;
     }
   }
@@ -1006,10 +967,8 @@ komaster_trymove(int i, int j, int color,
 
   if (komaster == other)
     *new_komaster = GRAY;
-  else if (komaster == color) {
-    *new_kom_i = ki;
-    *new_kom_j = kj;
-  }
+  else if (komaster == color)
+    *new_kom_pos = kpos;
 
   return 1;
 }
@@ -1027,7 +986,7 @@ komaster_trymove(int i, int j, int color,
  * 1. Komaster is EMPTY.
  * 1a) Unconditional ko capture is allowed. Komaster remains EMPTY.
  * 1b) Conditional ko capture is allowed. Komaster is set to O and
- *     (kom_i, kom_j) to the location of the ko, where a stone was
+ *     kom_pos to the location of the ko, where a stone was
  *     just removed.
  * 
  * 2. Komaster is O:
@@ -1036,49 +995,42 @@ komaster_trymove(int i, int j, int color,
  * 
  * 3. Komaster is X:
  * 3a) Conditional ko capture is not allowed.
- * 3b) Unconditional ko capture is allowed except for a move at (kom_i,
- *     kom_j). Komaster parameters unchanged.
+ * 3b) Unconditional ko capture is allowed except for a move at kom_pos.
+ *     Komaster parameters unchanged.
  * 
  * 4. Komaster is GRAY:
  *    Doesn't happen.
  */
 int
-komaster_trymove(int i, int j, int color,
-		 const char *message, int si, int sj,
-		 int komaster, int kom_i, int kom_j,
-		 int *new_komaster, int *new_kom_i, int *new_kom_j,
+komaster_trymove(int pos, int color, const char *message, int str,
+		 int komaster, int kom_pos,
+		 int *new_komaster, int *new_kom_pos,
 		 int *is_conditional_ko, int consider_conditional_ko)
 {
   int other = OTHER_COLOR(color);
-  int ki, kj;
+  int kpos;
 
   /* Usually the komaster parameters are unchanged. */
   *new_komaster = komaster;
-  *new_kom_i = kom_i;
-  *new_kom_j = kom_j;
+  *new_kom_pos = kom_pos;
 
   *is_conditional_ko = 0;
 
   /* If opponent is komaster we may not capture his ko. */
-  if (is_ko(i, j, color, &ki, &kj)) {
-    if (komaster == other
-	&& i == kom_i
-	&& j == kom_j)
-      return 0;
-  }
+  if (is_ko(pos, color, &kpos) && komaster == other && pos == kom_pos)
+    return 0;
 
-  if (trymove(i, j, color, message, si, sj, komaster, kom_i, kom_j))
+  if (trymove(pos, color, message, str, komaster, kom_pos))
     return 1;
 
   /* Conditional ko captures are only allowed if the komaster is EMPTY. */
   if (!consider_conditional_ko || komaster != EMPTY)
     return 0;
 
-  if (tryko(i, j, color, message, komaster, kom_i, kom_j)) {
+  if (tryko(pos, color, message, komaster, kom_pos)) {
     /* Conditional ko capture, set komaster parameters. */
     *new_komaster = color;
-    *new_kom_i = ki;
-    *new_kom_j = kj;
+    *new_kom_pos = kpos;
     *is_conditional_ko = 1;
     return 1;
   }
@@ -1100,58 +1052,53 @@ komaster_trymove(int i, int j, int color,
  * 1. Komaster is EMPTY.
  * 1a) Unconditional ko capture is allowed. Komaster remains EMPTY.
  * 1b) Conditional ko capture is allowed. Komaster is set to O and
- *     (kom_i, kom_j) to the location of the ko, where a stone was
+ *     kom_pos to the location of the ko, where a stone was
  *     just removed.
  * 
  * 2. Komaster is O:
  *    Ko capture (both kinds) is allowed only if after playing the move,
- *    is_ko(kom_i, kom_j, X) returns false. In that case, (kom_i, kom_j)
+ *    is_ko(kom_pos, X) returns false. In that case, kom_pos
  *    is updated to the new ko position, i.e. the stone captured by this
  *    move. 
  * 
  * 3. Komaster is X:
  * 3a) Conditional ko capture is not allowed.
- * 3b) Unconditional ko capture is allowed except for a move at (kom_i,
- *     kom_j). Komaster parameters unchanged.
+ * 3b) Unconditional ko capture is allowed except for a move at kom_pos.
+ *     Komaster parameters unchanged.
  * 
  * 4. Komaster is GRAY:
  *    Doesn't happen.
  * 
  */
 int
-komaster_trymove(int i, int j, int color,
-		 const char *message, int si, int sj,
-		 int komaster, int kom_i, int kom_j,
-		 int *new_komaster, int *new_kom_i, int *new_kom_j,
+komaster_trymove(int pos, int color, const char *message, int str,
+		 int komaster, int kom_pos,
+		 int *new_komaster, int *new_kom_pos,
 		 int *is_conditional_ko, int consider_conditional_ko)
 {
   int other = OTHER_COLOR(color);
   int ko_move;
-  int ki, kj;
+  int kpos;
 
   /* Usually the komaster parameters are unchanged. */
   *new_komaster = komaster;
-  *new_kom_i = kom_i;
-  *new_kom_j = kom_j;
+  *new_kom_pos = kom_pos;
 
   *is_conditional_ko = 0;
 
   /* If opponent is komaster we may not capture his ko. */
-  ko_move = is_ko(i, j, color, &ki, &kj);
-  if (ko_move
-      && komaster == other
-      && i == kom_i
-      && j == kom_j)
+  ko_move = is_ko(pos, color, &kpos);
+  if (ko_move && komaster == other && pos == kom_pos)
     return 0;
 
-  if (!trymove(i, j, color, message, si, sj, komaster, kom_i, kom_j)) {
+  if (!trymove(pos, color, message, str, komaster, kom_pos)) {
     /* Conditional ko captures are allowed if komaster is EMPTY or our
      * color.
      */
     if (!consider_conditional_ko || komaster == other)
       return 0;
 
-    if (!tryko(i, j, color, message, komaster, kom_i, kom_j))
+    if (!tryko(pos, color, message, komaster, kom_pos))
       return 0; /* Suicide. */
       
     *is_conditional_ko = 1;
@@ -1159,8 +1106,7 @@ komaster_trymove(int i, int j, int color,
     /* Conditional ko capture, set komaster parameters. */
     if (komaster == EMPTY) {
       *new_komaster = color;
-      *new_kom_i = ki;
-      *new_kom_j = kj;
+      *new_kom_pos = kpos;
     }
   }
 
@@ -1171,9 +1117,8 @@ komaster_trymove(int i, int j, int color,
   if (komaster != color)
     return 1;
   
-  if (!is_ko(kom_i, kom_j, other, NULL, NULL)) {
-    *new_kom_i = ki;
-    *new_kom_j = kj;
+  if (!is_ko(kom_pos, other, NULL)) {
+    *new_kom_pos = kpos;
     return 1;
   }
 
@@ -1185,65 +1130,64 @@ komaster_trymove(int i, int j, int color,
 #endif
 
 
-/* Count the number of liberties of the string at (m, n). (m, n) must
- * not be empty.
+/* Count the number of liberties of the string at pos. pos must not be
+ * empty.
  */
 
 int
-countlib(int m, int n)
+countlib(int str)
 {
-  ASSERT_ON_BOARD(m, n);
-  ASSERT(p[m][n] != EMPTY, m, n);
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(board[str] != EMPTY, str);
   
   if (!strings_initialized)
     init_board();
 
   /* We already know the number of liberties. Just look it up. */
-  return string[string_number[m][n]].liberties;
+  return string[string_number[str]].liberties;
 }
 
 
-/* Find the liberties of the string at (m, n). (m, n) must not be
+/* Find the liberties of the string at str. str must not be
  * empty. The locations of up to maxlib liberties are written into
- * (libi[], libj[]). The full number of liberties is returned.
+ * libs[]. The full number of liberties is returned.
  *
  * If you want the locations of all liberties, whatever their number,
  * you should pass MAXLIBS as the value for maxlib and allocate space
- * for libi[], libj[] accordingly.
+ * for libs[] accordingly.
  */
 
 int
-findlib(int m, int n, int maxlib, int *libi, int *libj)
+findlib(int str, int maxlib, int *libs)
 {
   int k;
-  int libs;
+  int liberties;
   int s;
   
-  ASSERT_ON_BOARD(m, n);
-  ASSERT(p[m][n] != EMPTY, m, n);
-  ASSERT(libi != NULL && libj != NULL, m, n);
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(libs != NULL, str);
   
   if (!strings_initialized)
     init_board();
 
   /* We already have the list of liberties and only need to copy it to
-   * (libi[], libj[]).
+   * libs[].
    *
    * However, if the string has more than MAX_LIBERTIES liberties the
    * list is truncated and if maxlib is also larger than MAX_LIBERTIES
    * we have to traverse the stones in the string in order to find
    * where the liberties are.
    */
-  s = string_number[m][n];
-  libs = string[s].liberties;
-  if (libs <= MAX_LIBERTIES || maxlib <= MAX_LIBERTIES) {
+  s = string_number[str];
+  liberties = string[s].liberties;
+
+  if (liberties <= MAX_LIBERTIES || maxlib <= MAX_LIBERTIES) {
     /* The easy case, it suffices to copy liberty locations from the
      * incrementally updated list.
      */
-    for (k = 0; k < maxlib && k < libs; k++) {
-      libi[k] = string[s].libi[k];
-      libj[k] = string[s].libj[k];
-    }
+    for (k = 0; k < maxlib && k < liberties; k++)
+      libs[k] = string[s].libs[k];
   }
   else {
     /* The harder case, where we have to traverse the stones in the
@@ -1251,54 +1195,47 @@ findlib(int m, int n, int maxlib, int *libi, int *libj)
      * the start of the chain since we will run out of liberties
      * before that happens.
      */
-    int i, j;
+    int pos;
     liberty_mark++;
-    for (k = 0, FIRST_STONE(s, i, j); k < maxlib && k < libs; ) {
-      if (i > 0 && UNMARKED_LIBERTY(i-1, j)) {
-	libi[k] = i-1;
-	libj[k++] = j;
-	MARK_LIBERTY(i-1, j);
+    for (k = 0, pos = FIRST_STONE(s);
+	 k < maxlib && k < liberties;
+	 pos = NEXT_STONE(pos)) {
+      if (UNMARKED_LIBERTY(SOUTH(pos))) {
+	libs[k++] = SOUTH(pos);
+	MARK_LIBERTY(SOUTH(pos));
 	if (k >= maxlib)
 	  break;
       }
       
-      if (i < board_size-1 && UNMARKED_LIBERTY(i+1, j)) {
-	libi[k] = i+1;
-	libj[k++] = j;
-	MARK_LIBERTY(i+1, j);
+      if (UNMARKED_LIBERTY(WEST(pos))) {
+	libs[k++] = WEST(pos);
+	MARK_LIBERTY(WEST(pos));
 	if (k >= maxlib)
 	  break;
       }
       
-      if (j > 0 && UNMARKED_LIBERTY(i, j-1)) {
-	libi[k] = i;
-	libj[k++] = j-1;
-	MARK_LIBERTY(i, j-1);
+      if (UNMARKED_LIBERTY(NORTH(pos))) {
+	libs[k++] = NORTH(pos);
+	MARK_LIBERTY(NORTH(pos));
 	if (k >= maxlib)
 	  break;
       }
       
-      if (j < board_size-1 && UNMARKED_LIBERTY(i, j+1)) {
-	libi[k] = i;
-	libj[k++] = j+1;
-	MARK_LIBERTY(i, j+1);
+      if (UNMARKED_LIBERTY(EAST(pos))) {
+	libs[k++] = EAST(pos);
+	MARK_LIBERTY(EAST(pos));
 	if (k >= maxlib)
 	  break;
       }
-      /* We can't use this macro within the for statement, so we have
-       * to put it at the end of the loop instead.
-       */
-      NEXT_STONE(i, j);
-      ASSERT(k == libs || !BACK_TO_FIRST_STONE(s, i, j), i, j);
     }
   }
       
-  return libs;
+  return liberties;
 }
 
 
 /* Find the liberties a stone of the given color would get if played
- * at (m, n), ignoring possible captures of opponent stones. (m, n)
+ * at pos, ignoring possible captures of opponent stones. (m, n)
  * must be empty. If libi!=NULL, the locations of up to maxlib
  * liberties are written into (libi[], libj[]). The counting of
  * liberties may or may not be halted when maxlib is reached. The
@@ -1310,18 +1247,15 @@ findlib(int m, int n, int maxlib, int *libi, int *libj)
  */
 
 int
-approxlib(int m, int n, int color, int maxlib, int *libi, int *libj)
+approxlib(int pos, int color, int maxlib, int *libs)
 {
   int k;
-  int libs = 0;
+  int liberties = 0;
 
-  ASSERT_ON_BOARD(m, n);
-  ASSERT(p[m][n] == EMPTY, m,n);
-  ASSERT(color != EMPTY, m, n);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(color != EMPTY, pos);
 
-  /* Either both NULL or neither NULL. */
-  ASSERT(((libi != NULL) ^ (libj != NULL)) == 0, m, n);
-  
   if (!strings_initialized)
     init_board();
 
@@ -1332,139 +1266,114 @@ approxlib(int m, int n, int color, int maxlib, int *libi, int *libj)
    * If this might be the case, we use a more robust fallback.
    */
   if (maxlib > MAX_LIBERTIES)
-    return slow_approxlib(m, n, color, maxlib, libi, libj);
+    return slow_approxlib(pos, color, maxlib, libs);
   
-  /* Start by marking (m, n) itself so it isn't counted among its own
+  /* Start by marking pos itself so it isn't counted among its own
    * liberties.
    */
   liberty_mark++;
-  MARK_LIBERTY(m, n);
+  MARK_LIBERTY(pos);
     
-  if (m > 0) {
-    if (UNMARKED_LIBERTY(m-1, n)) {
-      if (libi != NULL && libs < maxlib) {
-	libi[libs] = m-1;
-	libj[libs] = n;
-      }
-      libs++;
-      /* Stop counting if we reach maxlib. */
-      if (libs >= maxlib)
-	return libs;
-      MARK_LIBERTY(m-1, n);
-    }
-    else if (p[m-1][n] == color) {
-      int s = string_number[m-1][n];
-      for (k = 0; k < string[s].liberties; k++) {
-	int ai = string[s].libi[k];
-	int aj = string[s].libj[k];
-	if (UNMARKED_LIBERTY(ai, aj)) {
-	  if (libi != NULL && libs < maxlib) {
-	    libi[libs] = ai;
-	    libj[libs] = aj;
-	  }
-	  libs++;
-	  if (libs >= maxlib)
-	    return libs;
-	  MARK_LIBERTY(ai, aj);
-	}
+  if (UNMARKED_LIBERTY(SOUTH(pos))) {
+    if (libs != NULL && liberties < maxlib)
+      libs[liberties] = SOUTH(pos);
+    liberties++;
+    /* Stop counting if we reach maxlib. */
+    if (liberties >= maxlib)
+      return liberties;
+    MARK_LIBERTY(SOUTH(pos));
+  }
+  else if (board[SOUTH(pos)] == color) {
+    int s = string_number[SOUTH(pos)];
+    for (k = 0; k < string[s].liberties; k++) {
+      int lib = string[s].libs[k];
+      if (UNMARKED_LIBERTY(lib)) {
+	if (libs != NULL && liberties < maxlib)
+	  libs[liberties] = lib;
+	liberties++;
+	if (liberties >= maxlib)
+	  return liberties;
+	MARK_LIBERTY(lib);
       }
     }
   }
   
-  if (m < board_size-1) {
-    if (UNMARKED_LIBERTY(m+1, n)) {
-      if (libi != NULL && libs < maxlib) {
-	libi[libs] = m+1;
-	libj[libs] = n;
-      }
-      libs++;
-      if (libs >= maxlib)
-	return libs;
-      MARK_LIBERTY(m+1, n);
-    }
-    else if (p[m+1][n] == color) {
-      int s = string_number[m+1][n];
-      for (k = 0; k < string[s].liberties; k++) {
-	int ai = string[s].libi[k];
-	int aj = string[s].libj[k];
-	if (UNMARKED_LIBERTY(ai, aj)) {
-	  if (libi != NULL && libs < maxlib) {
-	    libi[libs] = ai;
-	    libj[libs] = aj;
-	  }
-	  libs++;
-	  if (libs >= maxlib)
-	    return libs;
-	  MARK_LIBERTY(ai, aj);
-	}
+  if (UNMARKED_LIBERTY(WEST(pos))) {
+    if (libs != NULL && liberties < maxlib)
+      libs[liberties] = WEST(pos);
+    liberties++;
+    /* Stop counting if we reach maxlib. */
+    if (liberties >= maxlib)
+      return liberties;
+    MARK_LIBERTY(WEST(pos));
+  }
+  else if (board[WEST(pos)] == color) {
+    int s = string_number[WEST(pos)];
+    for (k = 0; k < string[s].liberties; k++) {
+      int lib = string[s].libs[k];
+      if (UNMARKED_LIBERTY(lib)) {
+	if (libs != NULL && liberties < maxlib)
+	  libs[liberties] = lib;
+	liberties++;
+	if (liberties >= maxlib)
+	  return liberties;
+	MARK_LIBERTY(lib);
       }
     }
   }
   
-  if (n > 0) {
-    if (UNMARKED_LIBERTY(m, n-1)) {
-      if (libi != NULL && libs < maxlib) {
-	libi[libs] = m;
-	libj[libs] = n-1;
-      }
-      libs++;
-      if (libs >= maxlib)
-	return libs;
-      MARK_LIBERTY(m, n-1);
-    }
-    else if (p[m][n-1] == color) {
-      int s = string_number[m][n-1];
-      for (k = 0; k < string[s].liberties; k++) {
-	int ai = string[s].libi[k];
-	int aj = string[s].libj[k];
-	if (UNMARKED_LIBERTY(ai, aj)) {
-	  if (libi != NULL && libs < maxlib) {
-	    libi[libs] = ai;
-	    libj[libs] = aj;
-	  }
-	  libs++;
-	  if (libs >= maxlib)
-	    return libs;
-	  MARK_LIBERTY(ai, aj);
-	}
+  if (UNMARKED_LIBERTY(NORTH(pos))) {
+    if (libs != NULL && liberties < maxlib)
+      libs[liberties] = NORTH(pos);
+    liberties++;
+    /* Stop counting if we reach maxlib. */
+    if (liberties >= maxlib)
+      return liberties;
+    MARK_LIBERTY(NORTH(pos));
+  }
+  else if (board[NORTH(pos)] == color) {
+    int s = string_number[NORTH(pos)];
+    for (k = 0; k < string[s].liberties; k++) {
+      int lib = string[s].libs[k];
+      if (UNMARKED_LIBERTY(lib)) {
+	if (libs != NULL && liberties < maxlib)
+	  libs[liberties] = lib;
+	liberties++;
+	if (liberties >= maxlib)
+	  return liberties;
+	MARK_LIBERTY(lib);
       }
     }
   }
   
-  if (n < board_size-1) {
-    if (UNMARKED_LIBERTY(m, n+1)) {
-      if (libi != NULL && libs < maxlib) {
-	libi[libs] = m;
-	libj[libs] = n+1;
-      }
-      libs++;
-      if (libs >= maxlib)
-	return libs;
-      /* Unneeded since we're about to leave. */
+  if (UNMARKED_LIBERTY(EAST(pos))) {
+    if (libs != NULL && liberties < maxlib)
+      libs[liberties] = EAST(pos);
+    liberties++;
+    /* Stop counting if we reach maxlib. */
+    if (liberties >= maxlib)
+      return liberties;
+    /* Unneeded since we're about to leave. */
 #if 0
-      MARK_LIBERTY(m, n+1);
+    MARK_LIBERTY(EAST(pos));
 #endif
-    }
-    else if (p[m][n+1] == color) {
-      int s = string_number[m][n+1];
-      for (k = 0; k < string[s].liberties; k++) {
-	int ai = string[s].libi[k];
-	int aj = string[s].libj[k];
-	if (UNMARKED_LIBERTY(ai, aj)) {
-	  if (libi != NULL && libs < maxlib) {
-	    libi[libs] = ai;
-	    libj[libs] = aj;
-	  }
-	  libs++;
-	  if (libs >= maxlib)
-	    return libs;
-	  MARK_LIBERTY(ai, aj);
-	}
+  }
+  else if (board[EAST(pos)] == color) {
+    int s = string_number[EAST(pos)];
+    for (k = 0; k < string[s].liberties; k++) {
+      int lib = string[s].libs[k];
+      if (UNMARKED_LIBERTY(lib)) {
+	if (libs != NULL && liberties < maxlib)
+	  libs[liberties] = lib;
+	liberties++;
+	if (liberties >= maxlib)
+	  return liberties;
+	MARK_LIBERTY(lib);
       }
     }
-  }
+  }  
 
-  return libs;
+  return liberties;
 }
 
 
@@ -1473,63 +1382,62 @@ approxlib(int m, int n, int color, int maxlib, int *libi, int *libj)
  */
 
 int
-countstones(int m, int n)
+countstones(int str)
 {
-  ASSERT_ON_BOARD(m, n);
-  ASSERT(p[m][n] != EMPTY, m, n);
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(board[str] != EMPTY, str);
 
   if (!strings_initialized)
     init_board();
 
-  return string[string_number[m][n]].size;
+  return string[string_number[str]].size;
 }
 
 
-/* Find the stones of the string at (m, n). (m, n) must not be
+/* Find the stones of the string at str. str must not be
  * empty. The locations of up to maxstones stones are written into
- * (stonei[], stonej[]). The full number of stones is returned.
+ * stones[]. The full number of stones is returned.
  */
 
 int
-findstones(int m, int n, int maxstones, int *stonei, int *stonej)
+findstones(int str, int maxstones, int *stones)
 {
   int s;
   int size;
-  int i, j;
+  int pos;
   int k;
   
-  ASSERT_ON_BOARD(m, n);
-  ASSERT(p[m][n] != EMPTY, m, n);
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(board[str] != EMPTY, str);
 
   if (!strings_initialized)
     init_board();
 
-  s = string_number[m][n];
+  s = string_number[str];
   size = string[s].size;
   
   /* Traverse the stones of the string, by following the cyclic chain. */
-  FIRST_STONE(s, i, j);
+  pos = FIRST_STONE(s);
   for (k = 0; k < maxstones && k < size; k++) {
-    stonei[k] = i;
-    stonej[k] = j;
-    NEXT_STONE(i, j);
+    stones[k] = pos;
+    pos = NEXT_STONE(pos);
   }
 
   return size;
 }
 
 
-/* chainlinks returns (in adji, adjj arrays) the chains surrounding
- * the string at (m, n). The number of chains is returned.
+/* chainlinks returns (in adj array) the chains surrounding
+ * the string at str. The number of chains is returned.
  */
 
 int 
-chainlinks(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN])
+chainlinks(int str, int adj[MAXCHAIN])
 {
-  struct string_data *s, *t;
+  struct string_data *s;
   int k;
 
-  ASSERT(p[m][n] != EMPTY, m, n);
+  ASSERT1(board[str] != EMPTY, str);
 
   if (!strings_initialized)
     init_board();
@@ -1537,29 +1445,27 @@ chainlinks(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN])
   /* We already have the list ready, just copy it and fill in the
    * desired information.
    */
-  s = &string[string_number[m][n]];
-  for (k = 0; k < s->neighbors; k++) {
-    t = &string[s->neighborlist[k]];
-    adji[k] = t->origini;
-    adjj[k] = t->originj;
-  }
+  s = &string[string_number[str]];
+  for (k = 0; k < s->neighbors; k++)
+    adj[k] = string[s->neighborlist[k]].origin;
+
   return s->neighbors;
 }
 
 
-/* chainlinks2 returns (in adji, adjj arrays) the chains surrounding
- * the string at (m, n), which have exactly lib liberties. The number
+/* chainlinks2 returns (in adj array) the chains surrounding
+ * the string at str, which has exactly lib liberties. The number
  * of such chains is returned.
  */
 
 int
-chainlinks2(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN], int lib)
+chainlinks2(int str, int adj[MAXCHAIN], int lib)
 {
   struct string_data *s, *t;
   int k;
-  int adj;
+  int neighbors;
 
-  ASSERT(p[m][n] != EMPTY, m, n);
+  ASSERT1(board[str] != EMPTY, str);
 
   if (!strings_initialized)
     init_board();
@@ -1567,17 +1473,14 @@ chainlinks2(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN], int lib)
   /* We already have the list ready, just copy the strings with the
    * right number of liberties.
    */
-  adj = 0;
-  s = &string[string_number[m][n]];
+  neighbors = 0;
+  s = &string[string_number[str]];
   for (k = 0; k < s->neighbors; k++) {
     t = &string[s->neighborlist[k]];
-    if (t->liberties == lib) {
-      adji[adj] = t->origini;
-      adjj[adj] = t->originj;
-      adj++;
-    }
+    if (t->liberties == lib)
+      adj[neighbors++] = t->origin;
   }
-  return adj;
+  return neighbors;
 }
 
 
@@ -1587,19 +1490,15 @@ chainlinks2(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN], int lib)
  * The idea is to have a canonical reference point for a string.
  */
 
-void
-find_origin(int m, int n, int *origini, int *originj)
+int
+find_origin(int str)
 {
-  struct string_data *s;
-
-  gg_assert(p[m][n] != EMPTY);
+  ASSERT1(board[str] != EMPTY, str);
 
   if (!strings_initialized)
     init_board();
   
-  s = &string[string_number[m][n]];
-  *origini = s->origini;
-  *originj = s->originj;
+  return string[string_number[str]].origin;
 }
 
 
@@ -1609,26 +1508,27 @@ find_origin(int m, int n, int *origini, int *originj)
  */
 
 int
-is_self_atari(int m, int n, int color)
+is_self_atari(int pos, int color)
 {
   int liberties;
   int result;
   
-  ASSERT_ON_BOARD(m, n);
-  ASSERT(p[m][n] == EMPTY, m, n);
-  ASSERT(color != EMPTY, m, n);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(color != EMPTY, pos);
 
   /* 1. Try first without really putting the stone on the board. */
   /* FIXME: Integrate incremental_sloppy_self_atari() here. */
-  result = incremental_sloppy_self_atari(m, n, color);
+  result = incremental_sloppy_self_atari(pos, color);
   if (result != -1)
     return result;
 
   /* 2. It was not so easy.  Now see if we can put the stone on the board.
-   *    If we can't, this is a self atari.*/
-  if (!do_trymove(m, n, color, 1))
+   *    If we can't, this is a self atari.
+   */
+  if (!do_trymove(pos, color, 1))
     return 1;
-  liberties = countlib(m, n);
+  liberties = countlib(pos);
   silent_popgo();
   
   return liberties <= 1;
@@ -1636,80 +1536,78 @@ is_self_atari(int m, int n, int color)
 
 
 /*
- * Returns true if (ai, aj) is a liberty of the string at (si, sj).
+ * Returns true if pos is a liberty of the string at str.
  */
 
 int
-liberty_of_string(int ai, int aj, int si, int sj)
+liberty_of_string(int pos, int str)
 {
-  if (p[ai][aj] != EMPTY)
+  if (board[pos] != EMPTY)
     return 0;
 
-  return neighbor_of_string(ai, aj, si, sj);
+  return neighbor_of_string(pos, str);
 }
 
 
 /*
- * Returns true if (ai, aj) is adjacent to the string at (si, sj).
+ * Returns true if pos is adjacent to the string at str.
  */
 
 int
-neighbor_of_string(int ai, int aj, int si, int sj)
+neighbor_of_string(int pos, int str)
 {
   int s;
+  int color = board[str];
 
-  gg_assert(p[si][sj] != EMPTY);
+  ASSERT1(color != EMPTY, str);
 
   if (!strings_initialized)
     init_board();
 
-  s = string_number[si][sj];
+  s = string_number[str];
   
-  if (ai > 0
-      && p[ai-1][aj] == p[si][sj]
-      && string_number[ai-1][aj] == s)
+  if (board[SOUTH(pos)] == color
+      && string_number[SOUTH(pos)] == s)
     return 1;
 
-  if (ai < board_size-1
-      && p[ai+1][aj] == p[si][sj]
-      && string_number[ai+1][aj] == s)
+  if (board[WEST(pos)] == color
+      && string_number[WEST(pos)] == s)
     return 1;
 
-  if (aj > 0
-      && p[ai][aj-1] == p[si][sj]
-      && string_number[ai][aj-1] == s)
+  if (board[NORTH(pos)] == color
+      && string_number[NORTH(pos)] == s)
     return 1;
 
-  if (aj < board_size-1
-      && p[ai][aj+1] == p[si][sj]
-      && string_number[ai][aj+1] == s)
+  if (board[EAST(pos)] == color
+      && string_number[EAST(pos)] == s)
     return 1;
-  
+
   return 0;
 }
 
 
 /*
- * Returns true if (ai, aj) and (bi, bj) belong to the same string.
+ * Returns true if str1 and str2 belong to the same string.
  */
 
 int
-same_string(int ai, int aj, int bi, int bj)
+same_string(int str1, int str2)
 {
-  ASSERT_ON_BOARD(ai, aj);
-  ASSERT_ON_BOARD(bi, bj);
-  ASSERT(p[ai][aj] != EMPTY, ai, aj);
-  ASSERT(p[bi][bj] != EMPTY, bi, bj);
-  return string_number[ai][aj] == string_number[bi][bj];
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(board[str1] != EMPTY, str1);
+  ASSERT1(board[str2] != EMPTY, str2);
+
+  return string_number[str1] == string_number[str2];
 }
 
 
 /*
- * Return true if the move (i,j) by (color) is a ko capture
+ * Return true if the move (pos) by (color) is a ko capture
  * (whether capture is legal on this move or not). If so,
- * and if (*ko_i,*ko_j) are not NULL pointers, then
- * (*ko_i,*ko_j) returns the location of the captured ko stone.
- * If the move is not a ko capture, (ko_i,ko_j) is set to (-1,-1).
+ * and if ko_pos is not a NULL pointer, then
+ * *ko_pos returns the location of the captured ko stone.
+ * If the move is not a ko capture, *ko_pos is set to 0.
  *
  * A move is a ko capture if and only if
  *    1. All neighbors are opponent stones.
@@ -1717,133 +1615,143 @@ same_string(int ai, int aj, int bi, int bj)
  */
 
 int
-is_ko(int m, int n, int color, int *ko_i, int *ko_j)
+is_ko(int pos, int color, int *ko_pos)
 {
   int other = OTHER_COLOR(color);
   int captures = 0;
-  int ki = -1, kj = -1;
+  int kpos = 0;
   
-  ASSERT_ON_BOARD(m, n);
-  ASSERT(color == WHITE || color == BLACK, m, n);
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(color == WHITE || color == BLACK, pos);
 
   if (!strings_initialized)
     init_board();
   
-  if (m > 0) {
-    if (p[m-1][n] != other)
+  if (ON_BOARD(SOUTH(pos))) {
+    if (board[SOUTH(pos)] != other)
       return 0;
-    else if (LIBERTIES(m-1, n) == 1) {
-      ki = m-1;
-      kj = n;
-      captures += string[string_number[m-1][n]].size;
+    else if (LIBERTIES(SOUTH(pos)) == 1) {
+      kpos = SOUTH(pos);
+      captures += string[string_number[SOUTH(pos)]].size;
       if (captures > 1)
 	return 0;
     }
   }
   
-  if (m < board_size-1) {
-    if (p[m+1][n] != other)
+  if (ON_BOARD(WEST(pos))) {
+    if (board[WEST(pos)] != other)
       return 0;
-    else if (LIBERTIES(m+1, n) == 1) {
-      ki = m+1;
-      kj = n;
-      captures += string[string_number[m+1][n]].size;
+    else if (LIBERTIES(WEST(pos)) == 1) {
+      kpos = WEST(pos);
+      captures += string[string_number[WEST(pos)]].size;
       if (captures > 1)
 	return 0;
     }
   }
   
-  if (n > 0) {
-    if (p[m][n-1] != other)
+  if (ON_BOARD(NORTH(pos))) {
+    if (board[NORTH(pos)] != other)
       return 0;
-    else if (LIBERTIES(m, n-1) == 1) {
-      ki = m;
-      kj = n-1;
-      captures += string[string_number[m][n-1]].size;
+    else if (LIBERTIES(NORTH(pos)) == 1) {
+      kpos = NORTH(pos);
+      captures += string[string_number[NORTH(pos)]].size;
       if (captures > 1)
 	return 0;
     }
   }
   
-  if (n < board_size-1) {
-    if (p[m][n+1] != other)
+  if (ON_BOARD(EAST(pos))) {
+    if (board[EAST(pos)] != other)
       return 0;
-    else if (LIBERTIES(m, n+1) == 1) {
-      ki = m;
-      kj = n+1;
-      captures += string[string_number[m][n+1]].size;
+    else if (LIBERTIES(EAST(pos)) == 1) {
+      kpos = EAST(pos);
+      captures += string[string_number[EAST(pos)]].size;
       if (captures > 1)
 	return 0;
     }
   }
-
+  
   if (captures == 1) {
-    if (ko_i) *ko_i = ki;
-    if (ko_j) *ko_j = kj;
+    if (ko_pos)
+      *ko_pos = kpos;
     return 1;
   }
   return 0;
 }
 
 
-/* Returns 1 if at least one string is captured when color plays at (m, n).
+/* Returns 1 if at least one string is captured when color plays at pos.
  */
 int
-does_capture_something(int m, int n, int color)
+does_capture_something(int pos, int color)
 {
   int other = OTHER_COLOR(color);
 
-  gg_assert(p[m][n] == EMPTY);
+  ASSERT1(board[pos] == EMPTY, pos);
 
   if (!strings_initialized)
     init_board();
 
-  if (m > 0              && p[m-1][n] == other && LIBERTIES(m-1, n) == 1)
+  if (board[SOUTH(pos)] == other && LIBERTIES(SOUTH(pos)) == 1)
     return 1;
   
-  if (m < board_size - 1 && p[m+1][n] == other && LIBERTIES(m+1, n) == 1)
+  if (board[WEST(pos)] == other && LIBERTIES(WEST(pos)) == 1)
     return 1;
   
-  if (n > 0              && p[m][n-1] == other && LIBERTIES(m, n-1) == 1)
+  if (board[NORTH(pos)] == other && LIBERTIES(NORTH(pos)) == 1)
     return 1;
   
-  if (n < board_size - 1 && p[m][n+1] == other && LIBERTIES(m, n+1) == 1)
+  if (board[EAST(pos)] == other && LIBERTIES(EAST(pos)) == 1)
     return 1;
 
   return 0;
 }
 
 
-/* For each stone in the string at (i, j), set mx to value mark. If
+/* For each stone in the string at pos, set mx to value mark. If
  * some of the stones in the string are marked prior to calling this
- * function, only the connected unmarked stones starting from (i, j)
+ * function, only the connected unmarked stones starting from pos
  * are guaranteed to become marked. The rest of the string may or may
  * not become marked. (In the current implementation, it will.)
  */
 void
-mark_string(int m, int n, char mx[MAX_BOARD][MAX_BOARD], char mark)
+mark_string(int str, char mx[BOARDMAX], char mark)
 {
-  int i = m;
-  int j = n;
+  int pos = str;
 
-  gg_assert(p[m][n] != EMPTY);
+  ASSERT1(board[str] != EMPTY, str);
 
   do {
-    mx[i][j] = mark;
-    NEXT_STONE(i, j);
-  } while (i != m || j != n);
+    mx[pos] = mark;
+    pos = NEXT_STONE(pos);
+  } while (pos != str);
+}
+
+/* Preliminary workaround while transitioning 2D to 1D board. */
+void
+mark_string2(int m, int n, char mx[MAX_BOARD][MAX_BOARD], char mark)
+{
+  int str = POS(m, n);
+  int pos = str;
+
+  ASSERT1(board[str] != EMPTY, str);
+
+  do {
+    mx[I(pos)][J(pos)] = mark;
+    pos = NEXT_STONE(pos);
+  } while (pos != str);
 }
 
 
-/* Returns true if at least one move has been played at @code{(m, n)}
+/* Returns true if at least one move has been played at pos
  * at deeper than level 'cutoff' in the reading tree.
  */
 int
-move_in_stack(int m, int n, int cutoff)
+move_in_stack(int pos, int cutoff)
 {
   int k;
-  for (k=cutoff; k<stackp; k++)
-    if (stacki[k] == m && stackj[k] == n)
+  for (k = cutoff; k < stackp; k++)
+    if (stack[k] == pos)
       return 1;
   
   return 0;
@@ -1852,16 +1760,15 @@ move_in_stack(int m, int n, int cutoff)
 
 /* Retrieve a move from the move stack. */
 void
-get_move_from_stack(int k, int *i, int *j, int *color)
+get_move_from_stack(int k, int *move, int *color)
 {
   gg_assert(k < stackp);
-  *i = stacki[k];
-  *j = stackj[k];
+  *move = stack[k];
   *color = move_color[k];
 }
 
 /* Return the number of stones of the indicated color(s) on the board.
- * This only count stones in the permanent position, not stones placed
+ * This only counts stones in the permanent position, not stones placed
  * by trymove() or tryko(). Use stones_on_board(BLACK | WHITE) to get
  * the total number of stones on the board.
  */
@@ -1871,18 +1778,19 @@ stones_on_board(int color)
   static int stone_count_for_position = -1;
   static int white_stones = 0;
   static int black_stones = 0;
-  
+
+  gg_assert(stackp == 0);
+
   if (stone_count_for_position != position_number) {
-    int m, n;
+    int pos;
     white_stones = 0;
     black_stones = 0;
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	if (p[m][n] == WHITE)
-	  white_stones++;
-	else if (p[m][n] == BLACK)
-	  black_stones++;
-      }
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (board[pos] == WHITE)
+	white_stones++;
+      else if (board[pos] == BLACK)
+	black_stones++;
+    }
     
     stone_count_for_position = position_number;
   }
@@ -1946,7 +1854,8 @@ new_position(void)
 static void
 init_board()
 {
-  int i, j, s;
+  int pos;
+  int s;
   next_string = 0;
   liberty_mark = 0;
   string_mark = 0;
@@ -1958,22 +1867,23 @@ init_board()
   /* propagate_string relies on non-assigned stones to have
    * string_number -1.
    */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      string_number[i][j] = -1;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos))
+      string_number[pos] = -1;
 
   /* Find the existing strings. */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      if (p[i][j] != EMPTY && string_number[i][j] == -1) {
-	string_number[i][j] = next_string;
-	string[next_string].size = propagate_string(i, j, i, j);
-	string[next_string].color = p[i][j];
-	string[next_string].origini = i;
-	string[next_string].originj = j;
-	string[next_string].mark = 0;
-	next_string++;
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    if (board[pos] != EMPTY && string_number[pos] == -1) {
+      string_number[pos] = next_string;
+      string[next_string].size = propagate_string(pos, pos);
+      string[next_string].color = board[pos];
+      string[next_string].origin = pos;
+      string[next_string].mark = 0;
+      next_string++;
+    }
+  }
   
   /* Fill in liberty and neighbor info. */
   for (s = 0; s < next_string; s++) {
@@ -1994,42 +1904,44 @@ init_board()
 static void
 dump_incremental_board(void)
 {
-  int i, j, s;
+  int pos;
+  int s;
+  int i;
   
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++)
-      if (p[i][j] == EMPTY)
-	fprintf(stderr, " . ");
-      else
-	fprintf(stderr, "%2d ", string_number[i][j]);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    if (board[pos] == EMPTY)
+      fprintf(stderr, " . ");
+    else
+      fprintf(stderr, "%2d ", string_number[pos]);
     fprintf(stderr, "\n");
   }
 
   for (s = 0; s < next_string; s++) {
-    if (p[string[s].origini][string[s].originj] == EMPTY)
+    if (board[string[s].origin] == EMPTY)
       continue;
     
-    gprintf("%o%d %s %m size %d, %d liberties, %d neighbors\n", s,
+    gprintf("%o%d %s %1m size %d, %d liberties, %d neighbors\n", s,
 	    color_to_string(string[s].color),
-	    string[s].origini, string[s].originj, string[s].size,
+	    string[s].origin, string[s].size,
 	    string[s].liberties, string[s].neighbors);
     gprintf("%ostones:");
 
-    FIRST_STONE(s, i, j);
+    pos = FIRST_STONE(s);
     do {
-      gprintf("%o %m", i, j);
-      NEXT_STONE(i, j);
-    } while (!BACK_TO_FIRST_STONE(s, i, j));
+      gprintf("%o %1m", pos);
+      pos = NEXT_STONE(pos);
+    } while (!BACK_TO_FIRST_STONE(s, pos));
     
     gprintf("%o\nliberties:");
     for (i = 0; i < string[s].liberties; i++)
-      gprintf("%o %m", string[s].libi[i], string[s].libj[i]);
+      gprintf("%o %1m", string[s].libs[i]);
     
     gprintf("%o\nneighbors:");
     for (i = 0; i < string[s].neighbors; i++)
-      gprintf("%o %d(%m)", string[s].neighborlist[i],
-	      string[string[s].neighborlist[i]].origini,
-	      string[string[s].neighborlist[i]].originj);
+      gprintf("%o %d(%1m)", string[s].neighborlist[i],
+	      string[string[s].neighborlist[i]].origin);
     gprintf("%o\n\n");
   }
 }
@@ -2037,40 +1949,36 @@ dump_incremental_board(void)
 
 
 /* Build a string and its cyclic list representation from scratch.
- * propagate_string(i, j, m, n) adds the stone (i, j) to the string
- * (m, n) and recursively continues with not already included friendly
- * neighbors. To start a new string at (i, j), use
- * propagate_string(i, j, i, j). The size of the string is returned.
+ * propagate_string(stone, str) adds the stone (stone) to the string
+ * (str) and recursively continues with not already included friendly
+ * neighbors. To start a new string at (stone), use
+ * propagate_string(stone, stone). The size of the string is returned.
  */
 
 static int
-propagate_string(int i, int j, int m, int n)
+propagate_string(int stone, int str)
 {
   int size = 1;
   int k;
   
-  if (i == m && j == n) {
+  if (stone == str) {
     /* Start a new string. */
-    next_stonei[i][j] = i;
-    next_stonej[i][j] = j;
+    next_stone[stone] = stone;
   }
   else {
-    /* Link the stone at (i, j) to the string including (m, n) */
-    string_number[i][j] = string_number[m][n];
-    next_stonei[i][j] = next_stonei[m][n];
-    next_stonej[i][j] = next_stonej[m][n];
-    next_stonei[m][n] = i;
-    next_stonej[m][n] = j;
+    /* Link the stone at (stone) to the string including (str) */
+    string_number[stone] = string_number[str];
+    next_stone[stone] = next_stone[str];
+    next_stone[str] = stone;
   }
 
   /* Look in all four directions for more stones to add. */
   for (k = 0; k < 4; k++) {
-    int di = deltai[k];
-    int dj = deltaj[k];
-    if (ON_BOARD(i+di, j+dj)
-	&& p[i+di][j+dj] == p[i][j]
-	&& string_number[i+di][j+dj] == -1)
-      size += propagate_string(i+di, j+dj, m, n);
+    int d = delta[k];
+    if (ON_BOARD(stone + d)
+	&& board[stone + d] == board[stone]
+	&& string_number[stone + d] == -1)
+      size += propagate_string(stone + d, str);
   }
   
   return size;
@@ -2084,60 +1992,52 @@ propagate_string(int i, int j, int m, int n)
 static void
 find_liberties_and_neighbors(int s)
 {
-  int i, j;
+  int pos;
 
   /* Clear the marks. */
   liberty_mark++;
   string_mark++;
 
   /* Traverse the stones of the string, by following the cyclic chain. */
-  FIRST_STONE(s, i, j);
+  pos = FIRST_STONE(s);
   do {
     /* Look in each direction for new liberties or new neighbors. Mark
      * already visited liberties and neighbors.
      */
-    if (i > 0) {
-      if (UNMARKED_LIBERTY(i-1, j)) {
-	ADD_AND_MARK_LIBERTY(s, i-1, j);
-      }
-      else if (UNMARKED_OPPONENT_STRING(s, i-1, j)) {
-	ADD_NEIGHBOR(s, i-1, j);
-	MARK_STRING(i-1, j);
-      }
+    if (UNMARKED_LIBERTY(SOUTH(pos))) {
+      ADD_AND_MARK_LIBERTY(s, SOUTH(pos));
+    }
+    else if (UNMARKED_OPPONENT_STRING(s, SOUTH(pos))) {
+      ADD_NEIGHBOR(s, SOUTH(pos));
+      MARK_STRING(SOUTH(pos));
     }
     
-    if (i < board_size-1) {
-      if (UNMARKED_LIBERTY(i+1, j)) {
-	ADD_AND_MARK_LIBERTY(s, i+1, j);
-      }
-      else if (UNMARKED_OPPONENT_STRING(s, i+1, j)) {
-	ADD_NEIGHBOR(s, i+1, j);
-	MARK_STRING(i+1, j);
-      }
+    if (UNMARKED_LIBERTY(WEST(pos))) {
+      ADD_AND_MARK_LIBERTY(s, WEST(pos));
+    }
+    else if (UNMARKED_OPPONENT_STRING(s, WEST(pos))) {
+      ADD_NEIGHBOR(s, WEST(pos));
+      MARK_STRING(WEST(pos));
     }
     
-    if (j > 0) {
-      if (UNMARKED_LIBERTY(i, j-1)) {
-	ADD_AND_MARK_LIBERTY(s, i, j-1);
-      }
-      else if (UNMARKED_OPPONENT_STRING(s, i, j-1)) {
-	ADD_NEIGHBOR(s, i, j-1);
-	MARK_STRING(i, j-1);
-      }
+    if (UNMARKED_LIBERTY(NORTH(pos))) {
+      ADD_AND_MARK_LIBERTY(s, NORTH(pos));
+    }
+    else if (UNMARKED_OPPONENT_STRING(s, NORTH(pos))) {
+      ADD_NEIGHBOR(s, NORTH(pos));
+      MARK_STRING(NORTH(pos));
     }
     
-    if (j < board_size-1) {
-      if (UNMARKED_LIBERTY(i, j+1)) {
-	ADD_AND_MARK_LIBERTY(s, i, j+1);
-      }
-      else if (UNMARKED_OPPONENT_STRING(s, i, j+1)) {
-	ADD_NEIGHBOR(s, i, j+1);
-	MARK_STRING(i, j+1);
-      }
+    if (UNMARKED_LIBERTY(EAST(pos))) {
+      ADD_AND_MARK_LIBERTY(s, EAST(pos));
     }
-
-    NEXT_STONE(i, j);
-  } while (!BACK_TO_FIRST_STONE(s, i, j));
+    else if (UNMARKED_OPPONENT_STRING(s, EAST(pos))) {
+      ADD_NEIGHBOR(s, EAST(pos));
+      MARK_STRING(EAST(pos));
+    }
+    
+    pos = NEXT_STONE(pos);
+  } while (!BACK_TO_FIRST_STONE(s, pos));
 }
 
 
@@ -2148,13 +2048,13 @@ find_liberties_and_neighbors(int s)
 static void
 update_liberties(int s)
 {
-  int i, j, k;
+  int pos;
+  int k;
 
   /* Push the old information. */
   PUSH_VALUE(string[s].liberties);
   for (k = 0; k < string[s].liberties && k < MAX_LIBERTIES; k++) {
-    PUSH_VALUE(string[s].libi[k]);
-    PUSH_VALUE(string[s].libj[k]);
+    PUSH_VALUE(string[s].libs[k]);
   }
   string[s].liberties = 0;
 
@@ -2162,29 +2062,29 @@ update_liberties(int s)
   liberty_mark++;
 
   /* Traverse the stones of the string, by following the cyclic chain. */
-  FIRST_STONE(s, i, j);
+  pos = FIRST_STONE(s);
   do {
     /* Look in each direction for new liberties. Mark already visited
      * liberties. 
      */
-    if (i > 0 && UNMARKED_LIBERTY(i-1, j)) {
-      ADD_AND_MARK_LIBERTY(s, i-1, j);
+    if (UNMARKED_LIBERTY(SOUTH(pos))) {
+      ADD_AND_MARK_LIBERTY(s, SOUTH(pos));
     }
     
-    if (i < board_size-1 && UNMARKED_LIBERTY(i+1, j)) {
-      ADD_AND_MARK_LIBERTY(s, i+1, j);
+    if (UNMARKED_LIBERTY(WEST(pos))) {
+      ADD_AND_MARK_LIBERTY(s, WEST(pos));
     }
     
-    if (j > 0 && UNMARKED_LIBERTY(i, j-1)) {
-      ADD_AND_MARK_LIBERTY(s, i, j-1);
+    if (UNMARKED_LIBERTY(NORTH(pos))) {
+      ADD_AND_MARK_LIBERTY(s, NORTH(pos));
     }
     
-    if (j < board_size-1 && UNMARKED_LIBERTY(i, j+1)) {
-      ADD_AND_MARK_LIBERTY(s, i, j+1);
+    if (UNMARKED_LIBERTY(EAST(pos))) {
+      ADD_AND_MARK_LIBERTY(s, EAST(pos));
     }
-
-    NEXT_STONE(i, j);
-  } while (!BACK_TO_FIRST_STONE(s, i, j));
+    
+    pos = NEXT_STONE(pos);
+  } while (!BACK_TO_FIRST_STONE(s, pos));
 }
 
 
@@ -2193,11 +2093,11 @@ update_liberties(int s)
  */
 
 static void
-remove_neighbor(int str, int n)
+remove_neighbor(int str_number, int n)
 {
   int k;
   int done = 0;
-  struct string_data *s = &string[str];
+  struct string_data *s = &string[str_number];
   for (k = 0; k < s->neighbors; k++)
     if (s->neighborlist[k] == n) {
       /* We need to push the last entry too because it may become
@@ -2221,26 +2121,23 @@ remove_neighbor(int str, int n)
  */
 
 static void
-remove_liberty(int str, int i, int j)
+remove_liberty(int str_number, int pos)
 {
   int k;
-  struct string_data *s = &string[str];
+  struct string_data *s = &string[str_number];
   
   if (s->liberties > MAX_LIBERTIES)
-    update_liberties(str);
+    update_liberties(str_number);
   else {
     for (k = 0; k < s->liberties; k++)
-      if (s->libi[k] == i && s->libj[k] == j) {
+      if (s->libs[k] == pos) {
 	/* We need to push the last entry too because it may become
 	 * destroyed later.
 	 */
-	PUSH_VALUE(s->libi[s->liberties - 1]);
-	PUSH_VALUE(s->libj[s->liberties - 1]);
-	PUSH_VALUE(s->libi[k]);
-	PUSH_VALUE(s->libj[k]);
+	PUSH_VALUE(s->libs[s->liberties - 1]);
+	PUSH_VALUE(s->libs[k]);
 	PUSH_VALUE(s->liberties);
-	s->libi[k] = s->libi[s->liberties - 1];
-	s->libj[k] = s->libj[s->liberties - 1];
+	s->libs[k] = s->libs[s->liberties - 1];
 	s->liberties--;
 	break;
       }
@@ -2255,18 +2152,18 @@ remove_liberty(int str, int i, int j)
 static int
 do_remove_string(int s)
 {
-  int i, j, k;
+  int pos;
+  int k;
 
   /* Traverse the stones of the string, by following the cyclic chain. */
-  FIRST_STONE(s, i, j);
+  pos = FIRST_STONE(s);
   do {
     /* Push color, string number and cyclic chain pointers. */
-    PUSH_VALUE(string_number[i][j]);
-    PUSH_VALUE(next_stonei[i][j]);
-    PUSH_VALUE(next_stonej[i][j]);
-    DO_REMOVE_STONE(i, j);
-    NEXT_STONE(i, j);
-  } while (!BACK_TO_FIRST_STONE(s, i, j));
+    PUSH_VALUE(string_number[pos]);
+    PUSH_VALUE(next_stone[pos]);
+    DO_REMOVE_STONE(pos);
+    pos = NEXT_STONE(pos);
+  } while (!BACK_TO_FIRST_STONE(s, pos));
 
   /* The neighboring strings have obtained some new liberties and lost
    * a neighbor.
@@ -2292,24 +2189,22 @@ do_remove_string(int s)
  * string for it.
  */
 static void
-create_new_string(int i, int j)
+create_new_string(int pos)
 {
   int s;
-  int color = p[i][j];
+  int color = board[pos];
 
   /* Get the next free string number. */
   PUSH_VALUE(next_string);
   s = next_string++;
-  string_number[i][j] = s;
+  string_number[pos] = s;
   /* Set up a size one cycle for the string. */
-  next_stonei[i][j] = i;
-  next_stonej[i][j] = j;
+  next_stone[pos] = pos;
 
   /* Set trivially known values and initialize the rest to zero. */
   string[s].color = color;
   string[s].size = 1;
-  string[s].origini = i;
-  string[s].originj = j;
+  string[s].origin = pos;
   string[s].liberties = 0;
   string[s].neighbors = 0;
   string[s].mark = 0;
@@ -2320,59 +2215,59 @@ create_new_string(int i, int j)
   /* In each direction, look for a liberty or a nonmarked opponent
    * neighbor. Mark visited neighbors. There is no need to mark the
    * liberties since we can't find them twice. */
-  if (i > 0) {
-    if (LIBERTY(i-1, j)) {
-      ADD_LIBERTY(s, i-1, j);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i-1, j)) {
-      int s2 = string_number[i-1][j];
-      /* Add the neighbor to our list. */
-      ADD_NEIGHBOR(s, i-1, j);
-      /* Add us to our neighbor's list. */
-      PUSH_VALUE(string[s2].neighbors);
-      ADD_NEIGHBOR(s2, i, j);
-      MARK_STRING(i-1, j);
-    }
+  if (LIBERTY(SOUTH(pos))) {
+    ADD_LIBERTY(s, SOUTH(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, SOUTH(pos))) {
+    int s2 = string_number[SOUTH(pos)];
+    /* Add the neighbor to our list. */
+    ADD_NEIGHBOR(s, SOUTH(pos));
+    /* Add us to our neighbor's list. */
+    PUSH_VALUE(string[s2].neighbors);
+    ADD_NEIGHBOR(s2, pos);
+    MARK_STRING(SOUTH(pos));
   }
   
-  if (i < board_size-1) {
-    if (LIBERTY(i+1, j)) {
-      ADD_LIBERTY(s, i+1, j);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i+1, j)) {
-      int s2 = string_number[i+1][j];
-      ADD_NEIGHBOR(s, i+1, j);
-      PUSH_VALUE(string[s2].neighbors);
-      ADD_NEIGHBOR(s2, i, j);
-      MARK_STRING(i+1, j);
-    }
+  if (LIBERTY(WEST(pos))) {
+    ADD_LIBERTY(s, WEST(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, WEST(pos))) {
+    int s2 = string_number[WEST(pos)];
+    /* Add the neighbor to our list. */
+    ADD_NEIGHBOR(s, WEST(pos));
+    /* Add us to our neighbor's list. */
+    PUSH_VALUE(string[s2].neighbors);
+    ADD_NEIGHBOR(s2, pos);
+    MARK_STRING(WEST(pos));
   }
   
-  if (j > 0) {
-    if (LIBERTY(i, j-1)) {
-      ADD_LIBERTY(s, i, j-1);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i, j-1)) {
-      int s2 = string_number[i][j-1];
-      ADD_NEIGHBOR(s, i, j-1);
-      PUSH_VALUE(string[s2].neighbors);
-      ADD_NEIGHBOR(s2, i, j);
-      MARK_STRING(i, j-1);
-    }
+  if (LIBERTY(NORTH(pos))) {
+    ADD_LIBERTY(s, NORTH(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, NORTH(pos))) {
+    int s2 = string_number[NORTH(pos)];
+    /* Add the neighbor to our list. */
+    ADD_NEIGHBOR(s, NORTH(pos));
+    /* Add us to our neighbor's list. */
+    PUSH_VALUE(string[s2].neighbors);
+    ADD_NEIGHBOR(s2, pos);
+    MARK_STRING(NORTH(pos));
   }
   
-  if (j < board_size-1) {
-    if (LIBERTY(i, j+1)) {
-      ADD_LIBERTY(s, i, j+1);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i, j+1)) {
-      int s2 = string_number[i][j+1];
-      ADD_NEIGHBOR(s, i, j+1);
-      PUSH_VALUE(string[s2].neighbors);
-      ADD_NEIGHBOR(s2, i, j);
-      /* No need to mark since no visits left. */
-/*      MARK_STRING(i, j+1);*/
-    }
+  if (LIBERTY(EAST(pos))) {
+    ADD_LIBERTY(s, EAST(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, EAST(pos))) {
+    int s2 = string_number[EAST(pos)];
+    /* Add the neighbor to our list. */
+    ADD_NEIGHBOR(s, EAST(pos));
+    /* Add us to our neighbor's list. */
+    PUSH_VALUE(string[s2].neighbors);
+    ADD_NEIGHBOR(s2, pos);
+    /* No need to mark since no visits left. */
+#if 0
+    MARK_STRING(EAST(pos));
+#endif
   }
 }
 
@@ -2381,30 +2276,24 @@ create_new_string(int i, int j)
  * new stone to that string.
  */
 static void
-extend_neighbor_string(int i, int j, int s)
+extend_neighbor_string(int pos, int s)
 {
   int k;
   int liberties_updated = 0;
 
   /* Link in the stone in the cyclic list. */
-  int m = string[s].origini;
-  int n = string[s].originj;
-  next_stonei[i][j] = next_stonei[m][n];
-  next_stonej[i][j] = next_stonej[m][n];
-  PUSH_VALUE(next_stonei[m][n]);
-  PUSH_VALUE(next_stonej[m][n]);
-  next_stonei[m][n] = i;
-  next_stonej[m][n] = j;
+  int pos2 = string[s].origin;
+  next_stone[pos] = next_stone[pos2];
+  PUSH_VALUE(next_stone[pos2]);
+  next_stone[pos2] = pos;
   
   /* Do we need to update the origin? */
-  if (i < m || (i == m && j < n)) {
-    PUSH_VALUE(string[s].origini);
-    PUSH_VALUE(string[s].originj);
-    string[s].origini = i;
-    string[s].originj = j;
+  if (pos < pos2) {
+    PUSH_VALUE(string[s].origin);
+    string[s].origin = pos;
   }
   
-  string_number[i][j] = s;
+  string_number[pos] = s;
 
   /* The size of the string has increased by one. */
   PUSH_VALUE(string[s].size);
@@ -2421,7 +2310,7 @@ extend_neighbor_string(int i, int j, int s)
   }
   else {
     /* The place of the new stone is no longer a liberty. */
-    remove_liberty(s, i, j);
+    remove_liberty(s, pos);
   }
 
   /* Mark old neighbors of the string. */
@@ -2429,128 +2318,115 @@ extend_neighbor_string(int i, int j, int s)
   for (k = 0; k < string[s].neighbors; k++)
     string[string[s].neighborlist[k]].mark = string_mark;
 
-  /* Look at the neighbor locations of (i, j) for new liberties and/or
+  /* Look at the neighbor locations of pos for new liberties and/or
    * neighbor strings.
    */
-  if (i > 0) {
-    /* If we find a liberty, look two steps away to determine whether
-     * this already is a liberty of s.
-     */
-    if (LIBERTY(i-1, j)) {
-      if (!liberties_updated
-	  && !((i > 1 && STRING_AT_VERTEX(i-2, j, s))
-	       || (j > 0 && STRING_AT_VERTEX(i-1, j-1, s))
-	       || (j < board_size-1 && STRING_AT_VERTEX(i-1, j+1, s))))
-	ADD_LIBERTY(s, i-1, j);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i-1, j)) {
-      int s2 = string_number[i-1][j];
-      PUSH_VALUE(string[s].neighbors);
-      ADD_NEIGHBOR(s, i-1, j);
-      PUSH_VALUE(string[s2].neighbors);
-      ADD_NEIGHBOR(s2, i, j);
-      MARK_STRING(i-1, j);
-    }
+
+  /* If we find a liberty, look two steps away to determine whether
+   * this already is a liberty of s.
+   */
+  if (LIBERTY(SOUTH(pos))) {
+    if (!liberties_updated
+	&& !(STRING_AT_VERTEX(SS(pos), s)
+	     || STRING_AT_VERTEX(SW(pos), s)
+	     || STRING_AT_VERTEX(SE(pos), s)))
+      ADD_LIBERTY(s, SOUTH(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, SOUTH(pos))) {
+    int s2 = string_number[SOUTH(pos)];
+    PUSH_VALUE(string[s].neighbors);
+    ADD_NEIGHBOR(s, SOUTH(pos));
+    PUSH_VALUE(string[s2].neighbors);
+    ADD_NEIGHBOR(s2, pos);
+    MARK_STRING(SOUTH(pos));
   }
   
-  if (i < board_size-1) {
-    if (LIBERTY(i+1, j)) {
-      if (!liberties_updated
-	  && !((i < board_size-2 && STRING_AT_VERTEX(i+2, j, s))
-	       || (j > 0 && STRING_AT_VERTEX(i+1, j-1, s))
-	       || (j < board_size-1 && STRING_AT_VERTEX(i+1, j+1, s))))
-	ADD_LIBERTY(s, i+1, j);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i+1, j)) {
-      int s2 = string_number[i+1][j];
-      PUSH_VALUE(string[s].neighbors);
-      ADD_NEIGHBOR(s, i+1, j);
-      PUSH_VALUE(string[s2].neighbors);
-      ADD_NEIGHBOR(s2, i, j);
-      MARK_STRING(i+1, j);
-    }
+  if (LIBERTY(WEST(pos))) {
+    if (!liberties_updated
+	&& !(STRING_AT_VERTEX(WW(pos), s)
+	     || STRING_AT_VERTEX(NW(pos), s)
+	     || STRING_AT_VERTEX(SW(pos), s)))
+      ADD_LIBERTY(s, WEST(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, WEST(pos))) {
+    int s2 = string_number[WEST(pos)];
+    PUSH_VALUE(string[s].neighbors);
+    ADD_NEIGHBOR(s, WEST(pos));
+    PUSH_VALUE(string[s2].neighbors);
+    ADD_NEIGHBOR(s2, pos);
+    MARK_STRING(WEST(pos));
   }
   
-  if (j > 0) {
-    if (LIBERTY(i, j-1)) {
-      if (!liberties_updated
-	  && !((j > 1 && STRING_AT_VERTEX(i, j-2, s))
-	       || (i > 0 && STRING_AT_VERTEX(i-1, j-1, s))
-	       || (i < board_size-1 && STRING_AT_VERTEX(i+1, j-1, s))))
-	ADD_LIBERTY(s, i, j-1);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i, j-1)) {
-      int s2 = string_number[i][j-1];
-      PUSH_VALUE(string[s].neighbors);
-      ADD_NEIGHBOR(s, i, j-1);
-      PUSH_VALUE(string[s2].neighbors);
-      ADD_NEIGHBOR(s2, i, j);
-      MARK_STRING(i, j-1);
-    }
+  if (LIBERTY(NORTH(pos))) {
+    if (!liberties_updated
+	&& !(STRING_AT_VERTEX(NN(pos), s)
+	     || STRING_AT_VERTEX(NW(pos), s)
+	     || STRING_AT_VERTEX(NE(pos), s)))
+      ADD_LIBERTY(s, NORTH(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, NORTH(pos))) {
+    int s2 = string_number[NORTH(pos)];
+    PUSH_VALUE(string[s].neighbors);
+    ADD_NEIGHBOR(s, NORTH(pos));
+    PUSH_VALUE(string[s2].neighbors);
+    ADD_NEIGHBOR(s2, pos);
+    MARK_STRING(NORTH(pos));
   }
   
-  if (j < board_size-1) {
-    if (LIBERTY(i, j+1)) {
-      if (!liberties_updated
-	  && !((j < board_size-2 && STRING_AT_VERTEX(i, j+2, s))
-	       || (i > 0 && STRING_AT_VERTEX(i-1, j+1, s))
-	       || (i < board_size-1 && STRING_AT_VERTEX(i+1, j+1, s))))
-	ADD_LIBERTY(s, i, j+1);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i, j+1)) {
-      int s2 = string_number[i][j+1];
-      PUSH_VALUE(string[s].neighbors);
-      ADD_NEIGHBOR(s, i, j+1);
-      PUSH_VALUE(string[s2].neighbors);
-      ADD_NEIGHBOR(s2, i, j);
-/*      MARK_STRING(i, j+1);*/
-    }
+  if (LIBERTY(EAST(pos))) {
+    if (!liberties_updated
+	&& !(STRING_AT_VERTEX(EE(pos), s)
+	     || STRING_AT_VERTEX(NE(pos), s)
+	     || STRING_AT_VERTEX(SE(pos), s)))
+      ADD_LIBERTY(s, EAST(pos));
   }
+  else if (UNMARKED_OPPONENT_STRING(s, EAST(pos))) {
+    int s2 = string_number[EAST(pos)];
+    PUSH_VALUE(string[s].neighbors);
+    ADD_NEIGHBOR(s, EAST(pos));
+    PUSH_VALUE(string[s2].neighbors);
+    ADD_NEIGHBOR(s2, pos);
+#if 0
+    MARK_STRING(EAST(pos));
+#endif
+  }
+  
 }
 
 
-/* Incorporate the string at (i, j) with the string s.
+/* Incorporate the string at pos with the string s.
  */
 
 static void
-assimilate_string(int s, int i, int j)
+assimilate_string(int s, int pos)
 {
   int k;
-  int lasti, lastj;
-  int s2 = string_number[i][j];
+  int last;
+  int s2 = string_number[pos];
   string[s].size += string[s2].size;
 
   /* Walk through the s2 stones and change string number. Also pick up
    * the last stone in the cycle for later use.
    */
-  FIRST_STONE(s2, i, j);
+  pos = FIRST_STONE(s2);
   do {
-    PUSH_VALUE(string_number[i][j]);
-    string_number[i][j] = s;
-    lasti = i;
-    lastj = j;
-    NEXT_STONE(i, j);
-  } while(!BACK_TO_FIRST_STONE(s2, i, j));
+    PUSH_VALUE(string_number[pos]);
+    string_number[pos] = s;
+    last = pos;
+    pos = NEXT_STONE(pos);
+  } while(!BACK_TO_FIRST_STONE(s2, pos));
 
   /* Link the two cycles together. */
   {
-    int m = string[s].origini;
-    int n = string[s].originj;
-    PUSH_VALUE(next_stonei[lasti][lastj]);
-    PUSH_VALUE(next_stonej[lasti][lastj]);
-    PUSH_VALUE(next_stonei[m][n]);
-    PUSH_VALUE(next_stonej[m][n]);
-    next_stonei[lasti][lastj] = next_stonei[m][n];
-    next_stonej[lasti][lastj] = next_stonej[m][n];
-    next_stonei[m][n] = string[s2].origini;
-    next_stonej[m][n] = string[s2].originj;
+    int pos2 = string[s].origin;
+    PUSH_VALUE(next_stone[last]);
+    PUSH_VALUE(next_stone[pos2]);
+    next_stone[last] = next_stone[pos2];
+    next_stone[pos2] = string[s2].origin;
     
     /* Do we need to update the origin? */
-    if (string[s2].origini < m || (string[s2].origini == m
-				   && string[s2].originj < n)) {
-      string[s].origini = string[s2].origini;
-      string[s].originj = string[s2].originj;
-    }
+    if (string[s2].origin < pos2)
+      string[s].origin = string[s2].origin;
   }
 
   /* Pick up the liberties of s2 that we don't already have.
@@ -2559,17 +2435,16 @@ assimilate_string(int s, int i, int j)
    */
   if (string[s2].liberties <= MAX_LIBERTIES) {
     for (k = 0; k < string[s2].liberties; k++) {
-      int m = string[s2].libi[k];
-      int n = string[s2].libj[k];
-      if (UNMARKED_LIBERTY(m, n)) {
-	ADD_AND_MARK_LIBERTY(s, m, n);
+      int pos2 = string[s2].libs[k];
+      if (UNMARKED_LIBERTY(pos2)) {
+	ADD_AND_MARK_LIBERTY(s, pos2);
       }
     }
   }
   else {
     /* If s2 had too many liberties the above strategy wouldn't be
      * effective, since not all liberties are listed in
-     * (libi[], libj[]). Moreover, the chain of stones for s2 is no
+     * libs[] the chain of stones for s2 is no
      * longer available (it has already been merged with s) so we
      * can't reconstruct the s2 liberties. Instead we capitulate and
      * rebuild the list of liberties for s (including the neighbor
@@ -2599,29 +2474,27 @@ assimilate_string(int s, int i, int j)
 }
 
 
-/* Create a new string for the stone at (i, j) and assimilate all
+/* Create a new string for the stone at pos and assimilate all
  * friendly neighbor strings.
  */
 
 static void
-assimilate_neighbor_strings(int i, int j)
+assimilate_neighbor_strings(int pos)
 {
   int s;
-  int color = p[i][j];
+  int color = board[pos];
 
   /* Get the next free string number. */
   PUSH_VALUE(next_string);
   s = next_string++;
-  string_number[i][j] = s;
+  string_number[pos] = s;
   /* Set up a size one cycle for the string. */
-  next_stonei[i][j] = i;
-  next_stonej[i][j] = j;
+  next_stone[pos] = pos;
   
   /* Set trivially known values and initialize the rest to zero. */
   string[s].color = color;
   string[s].size = 1;
-  string[s].origini = i;
-  string[s].originj = j;
+  string[s].origin = pos;
   string[s].liberties = 0;
   string[s].neighbors = 0;
 
@@ -2639,85 +2512,77 @@ assimilate_neighbor_strings(int i, int j)
    *    neighbors, unless already visited.
    * 3. friendly string: Assimilate.
    */
-  if (i > 0) {
-    if (UNMARKED_LIBERTY(i-1, j)) {
-      ADD_AND_MARK_LIBERTY(s, i-1, j);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i-1, j)) {
-      ADD_NEIGHBOR(s, i-1, j);
-      PUSH_VALUE(string[string_number[i-1][j]].neighbors);
-      ADD_NEIGHBOR(string_number[i-1][j], i, j);
-      MARK_STRING(i-1, j);
-    }
-    else if (UNMARKED_OWN_STRING(s, i-1, j)) {
-      assimilate_string(s, i-1, j);
-    }
+  if (UNMARKED_LIBERTY(SOUTH(pos))) {
+    ADD_AND_MARK_LIBERTY(s, SOUTH(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, SOUTH(pos))) {
+    ADD_NEIGHBOR(s, SOUTH(pos));
+    PUSH_VALUE(string[string_number[SOUTH(pos)]].neighbors);
+    ADD_NEIGHBOR(string_number[SOUTH(pos)], pos);
+    MARK_STRING(SOUTH(pos));
+  }
+  else if (UNMARKED_OWN_STRING(s, SOUTH(pos))) {
+    assimilate_string(s, SOUTH(pos));
   }
 
-  if (i < board_size-1) {
-    if (UNMARKED_LIBERTY(i+1, j)) {
-      ADD_AND_MARK_LIBERTY(s, i+1, j);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i+1, j)) {
-      ADD_NEIGHBOR(s, i+1, j);
-      PUSH_VALUE(string[string_number[i+1][j]].neighbors);
-      ADD_NEIGHBOR(string_number[i+1][j], i, j);
-      MARK_STRING(i+1, j);
-    }
-    else if (UNMARKED_OWN_STRING(s, i+1, j)) {
-      assimilate_string(s, i+1, j);
-    }
+  if (UNMARKED_LIBERTY(WEST(pos))) {
+    ADD_AND_MARK_LIBERTY(s, WEST(pos));
   }
-
-  if (j > 0) {
-    if (UNMARKED_LIBERTY(i, j-1)) {
-      ADD_AND_MARK_LIBERTY(s, i, j-1);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i, j-1)) {
-      ADD_NEIGHBOR(s, i, j-1);
-      PUSH_VALUE(string[string_number[i][j-1]].neighbors);
-      ADD_NEIGHBOR(string_number[i][j-1], i, j);
-      MARK_STRING(i, j-1);
-    }
-    else if (UNMARKED_OWN_STRING(s, i, j-1)) {
-      assimilate_string(s, i, j-1);
-    }
+  else if (UNMARKED_OPPONENT_STRING(s, WEST(pos))) {
+    ADD_NEIGHBOR(s, WEST(pos));
+    PUSH_VALUE(string[string_number[WEST(pos)]].neighbors);
+    ADD_NEIGHBOR(string_number[WEST(pos)], pos);
+    MARK_STRING(WEST(pos));
   }
-
-  if (j < board_size-1) {
-    if (UNMARKED_LIBERTY(i, j+1)) {
-      ADD_AND_MARK_LIBERTY(s, i, j+1);
-    }
-    else if (UNMARKED_OPPONENT_STRING(s, i, j+1)) {
-      ADD_NEIGHBOR(s, i, j+1);
-      PUSH_VALUE(string[string_number[i][j+1]].neighbors);
-      ADD_NEIGHBOR(string_number[i][j+1], i, j);
-      MARK_STRING(i, j+1);
-    }
-    else if (UNMARKED_OWN_STRING(s, i, j+1)) {
-      assimilate_string(s, i, j+1);
-    }
+  else if (UNMARKED_OWN_STRING(s, WEST(pos))) {
+    assimilate_string(s, WEST(pos));
+  }
+  
+  if (UNMARKED_LIBERTY(NORTH(pos))) {
+    ADD_AND_MARK_LIBERTY(s, NORTH(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, NORTH(pos))) {
+    ADD_NEIGHBOR(s, NORTH(pos));
+    PUSH_VALUE(string[string_number[NORTH(pos)]].neighbors);
+    ADD_NEIGHBOR(string_number[NORTH(pos)], pos);
+    MARK_STRING(NORTH(pos));
+  }
+  else if (UNMARKED_OWN_STRING(s, NORTH(pos))) {
+    assimilate_string(s, NORTH(pos));
+  }
+  
+  if (UNMARKED_LIBERTY(EAST(pos))) {
+    ADD_AND_MARK_LIBERTY(s, EAST(pos));
+  }
+  else if (UNMARKED_OPPONENT_STRING(s, EAST(pos))) {
+    ADD_NEIGHBOR(s, EAST(pos));
+    PUSH_VALUE(string[string_number[EAST(pos)]].neighbors);
+    ADD_NEIGHBOR(string_number[EAST(pos)], pos);
+    MARK_STRING(EAST(pos));
+  }
+  else if (UNMARKED_OWN_STRING(s, EAST(pos))) {
+    assimilate_string(s, EAST(pos));
   }
 }
 
 
-/* Suicide at (i, j). Remove the neighboring friendly strings.
+/* Suicide at pos. Remove the neighboring friendly strings.
  */
 
 static void
-do_commit_suicide(int i, int j, int color)
+do_commit_suicide(int pos, int color)
 {
-  if (i > 0 && p[i-1][j] == color)
-    do_remove_string(string_number[i-1][j]);
+  if (board[SOUTH(pos)] == color)
+    do_remove_string(string_number[SOUTH(pos)]);
 
-  if (i < board_size-1 && p[i+1][j] == color)
-    do_remove_string(string_number[i+1][j]);
+  if (board[WEST(pos)] == color)
+    do_remove_string(string_number[WEST(pos)]);
 
-  if (j > 0 && p[i][j-1] == color)
-    do_remove_string(string_number[i][j-1]);
+  if (board[NORTH(pos)] == color)
+    do_remove_string(string_number[NORTH(pos)]);
 
-  if (j < board_size-1 && p[i][j+1] == color)
-    do_remove_string(string_number[i][j+1]);
+  if (board[EAST(pos)] == color)
+    do_remove_string(string_number[EAST(pos)]);
 }
 
 
@@ -2725,7 +2590,7 @@ do_commit_suicide(int i, int j, int color)
  */
 
 static void
-do_play_move(int i, int j, int color)
+do_play_move(int pos, int color)
 {
   int other = OTHER_COLOR(color);
   int captured_stones = 0;
@@ -2737,176 +2602,169 @@ do_play_move(int i, int j, int color)
     init_board();
     
   /* Remove captured stones and check for suicide.*/
-  if (i > 0) {
-    if (p[i-1][j] == other && LIBERTIES(i-1, j) == 1)
-      captured_stones += do_remove_string(string_number[i-1][j]);
-    else if (LIBERTY(i-1, j) || (p[i-1][j] == color && LIBERTIES(i-1, j) > 1))
-      have_liberties = 1;
-  }
+  if (board[SOUTH(pos)] == other && LIBERTIES(SOUTH(pos)) == 1)
+    captured_stones += do_remove_string(string_number[SOUTH(pos)]);
+  else if (LIBERTY(SOUTH(pos)) || (board[SOUTH(pos)] == color
+				   && LIBERTIES(SOUTH(pos)) > 1))
+    have_liberties = 1;
 
-  if (i < board_size-1) {
-    if (p[i+1][j] == other && LIBERTIES(i+1, j) == 1)
-      captured_stones += do_remove_string(string_number[i+1][j]);
-    else if (LIBERTY(i+1, j) || (p[i+1][j] == color && LIBERTIES(i+1, j) > 1))
-      have_liberties = 1;
-  }
+  if (board[WEST(pos)] == other && LIBERTIES(WEST(pos)) == 1)
+    captured_stones += do_remove_string(string_number[WEST(pos)]);
+  else if (LIBERTY(WEST(pos)) || (board[WEST(pos)] == color
+				  && LIBERTIES(WEST(pos)) > 1))
+    have_liberties = 1;
 
-  if (j > 0) {
-    if (p[i][j-1] == other && LIBERTIES(i, j-1) == 1)
-      captured_stones += do_remove_string(string_number[i][j-1]);
-    else if (LIBERTY(i, j-1) || (p[i][j-1] == color && LIBERTIES(i, j-1) > 1))
-      have_liberties = 1;
-  }
+  if (board[NORTH(pos)] == other && LIBERTIES(NORTH(pos)) == 1)
+    captured_stones += do_remove_string(string_number[NORTH(pos)]);
+  else if (LIBERTY(NORTH(pos)) || (board[NORTH(pos)] == color
+				   && LIBERTIES(NORTH(pos)) > 1))
+    have_liberties = 1;
 
-  if (j < board_size-1) {
-    if (p[i][j+1] == other && LIBERTIES(i, j+1) == 1)
-      captured_stones += do_remove_string(string_number[i][j+1]);
-    else if (LIBERTY(i, j+1) || (p[i][j+1] == color && LIBERTIES(i, j+1) > 1))
-      have_liberties = 1;
-  }
+  if (board[EAST(pos)] == other && LIBERTIES(EAST(pos)) == 1)
+    captured_stones += do_remove_string(string_number[EAST(pos)]);
+  else if (LIBERTY(EAST(pos)) || (board[EAST(pos)] == color
+				  && LIBERTIES(EAST(pos)) > 1))
+    have_liberties = 1;
 
   /* No captures and no liberties -> suicide. */
   if (have_liberties == 0 && captured_stones == 0) {
-    do_commit_suicide(i, j, color);
+    do_commit_suicide(pos, color);
     return;
   }
   
   /* Put down the stone. */
-  DO_ADD_STONE(i, j, color);
+  DO_ADD_STONE(pos, color);
 
   /* Count the number of adjacent strings of my color and remove
-   * (i, j) as liberty for the adjacent opponent strings.
+   * pos as liberty for the adjacent opponent strings.
    */
   string_mark++;
-  if (i > 0 && p[i-1][j] != EMPTY && UNMARKED_STRING(i-1, j)) {
-    if (p[i-1][j] == color) {
-      neighbor_allies++;
-      s = string_number[i-1][j];
-    }
-    else
-      remove_liberty(string_number[i-1][j], i, j);
-    MARK_STRING(i-1, j);
+
+  if (board[SOUTH(pos)] == color && UNMARKED_STRING(SOUTH(pos))) {
+    neighbor_allies++;
+    s = string_number[SOUTH(pos)];
+    MARK_STRING(SOUTH(pos));
   }
+  else if (board[SOUTH(pos)] == other && UNMARKED_STRING(SOUTH(pos))) {
+    remove_liberty(string_number[SOUTH(pos)], pos);
+    MARK_STRING(SOUTH(pos));
+  }    
   
-  if (i < board_size-1 && p[i+1][j] != EMPTY && UNMARKED_STRING(i+1, j)) {
-    if (p[i+1][j] == color) {
-      neighbor_allies++;
-      s = string_number[i+1][j];
-    }
-    else
-      remove_liberty(string_number[i+1][j], i, j);
-    MARK_STRING(i+1, j);
+  if (board[WEST(pos)] == color && UNMARKED_STRING(WEST(pos))) {
+    neighbor_allies++;
+    s = string_number[WEST(pos)];
+    MARK_STRING(WEST(pos));
   }
+  else if (board[WEST(pos)] == other && UNMARKED_STRING(WEST(pos))) {
+    remove_liberty(string_number[WEST(pos)], pos);
+    MARK_STRING(WEST(pos));
+  }    
   
-  if (j > 0 && p[i][j-1] != EMPTY && UNMARKED_STRING(i, j-1)) {
-    if (p[i][j-1] == color) {
-      neighbor_allies++;
-      s = string_number[i][j-1];
-    }
-    else
-      remove_liberty(string_number[i][j-1], i, j);
-    MARK_STRING(i, j-1);
+  if (board[NORTH(pos)] == color && UNMARKED_STRING(NORTH(pos))) {
+    neighbor_allies++;
+    s = string_number[NORTH(pos)];
+    MARK_STRING(NORTH(pos));
   }
+  else if (board[NORTH(pos)] == other && UNMARKED_STRING(NORTH(pos))) {
+    remove_liberty(string_number[NORTH(pos)], pos);
+    MARK_STRING(NORTH(pos));
+  }    
   
-  if (j < board_size-1 && p[i][j+1] != EMPTY && UNMARKED_STRING(i, j+1)) {
-    if (p[i][j+1] == color) {
-      neighbor_allies++;
-      s = string_number[i][j+1];
-    }
-    else
-      remove_liberty(string_number[i][j+1], i, j);
-/*    MARK_STRING(i, j+1);*/
+  if (board[EAST(pos)] == color && UNMARKED_STRING(EAST(pos))) {
+    neighbor_allies++;
+    s = string_number[EAST(pos)];
+#if 0
+    MARK_STRING(EAST(pos));
+#endif
   }
+  else if (board[EAST(pos)] == other && UNMARKED_STRING(EAST(pos))) {
+    remove_liberty(string_number[EAST(pos)], pos);
+#if 0
+    MARK_STRING(EAST(pos));
+#endif
+  }    
+  
 
   /* Choose strategy depending on the number of friendly neighbors. */
   if (neighbor_allies == 0)
-    create_new_string(i, j);
+    create_new_string(pos);
   else if (neighbor_allies == 1) {
     gg_assert(s >= 0);
-    extend_neighbor_string(i, j, s);
+    extend_neighbor_string(pos, s);
   }
   else
-    assimilate_neighbor_strings(i, j);
+    assimilate_neighbor_strings(pos);
 
   /* Check whether this move was a ko capture and if so set 
-   * (board_ko_i, board_ko_j).
+   * board_ko_pos.
    *
-   * No need to push (board_ko_i, board_ko_j) on the stack, 
+   * No need to push board_ko_pos on the stack, 
    * because this has been done earlier.
    */
-  s = string_number[i][j];
+  s = string_number[pos];
   if (string[s].liberties == 1
       && string[s].size == 1
       && captured_stones == 1) {
-    board_ko_i = string[s].libi[0];
-    board_ko_j = string[s].libj[0];
-    hashdata_set_ko(&hashdata, board_ko_i, board_ko_j);
+    board_ko_pos = string[s].libs[0];
+    hashdata_set_ko(&hashdata, board_ko_pos);
   }
 }
 
 
-/* Find the liberties a move of the given color at (i, j) would have,
+/* Find the liberties a move of the given color at pos would have,
  * excluding possible captures, by traversing all adjacent friendly
  * strings. This is a fallback used by approxlib() when a
  * faster algorithm can't be used.
  */
 
 static int
-slow_approxlib(int i, int j, int color, int maxlib, int *libi, int *libj)
+slow_approxlib(int pos, int color, int maxlib, int *libs)
 {
-  int libs = 0;
+  int liberties = 0;
   int k;
 
   liberty_mark++;
-  MARK_LIBERTY(i, j);
+  MARK_LIBERTY(pos);
   string_mark++;
   for (k = 0; k < 4; k++) {
-    int di = deltai[k];
-    int dj = deltaj[k];
-    if (ON_BOARD(i+di, j+dj)) {
-      if (UNMARKED_LIBERTY(i+di, j+dj)) {
-	if (libi) {
-	  libi[libs] = i+di;
-	  libj[libs] = j+dj;
-	}
-	libs++;
-	if (libs == maxlib)
-	  return libs;
-	MARK_LIBERTY(i+di, j+dj);
-      }
-      else if (p[i+di][j+dj] == color
-	       && UNMARKED_STRING(i+di, j+dj)) {
-	int s = string_number[i+di][j+dj];
-	int m, n;
-	FIRST_STONE(s, m, n);
-	do {
-	  int l;
-	  for (l = 0; l < 4; l++) {
-	    int dm = deltai[l];
-	    int dn = deltaj[l];
-	    if (ON_BOARD(m+dm, n+dn) && UNMARKED_LIBERTY(m+dm, n+dn)) {
-	      if (libi) {
-		libi[libs] = m+dm;
-		libj[libs] = n+dn;
-	      }
-	      libs++;
-	      if (libs == maxlib)
-		return libs;
-	      MARK_LIBERTY(m+dm, n+dn);
-	    }
+    int d = delta[k];
+    if (UNMARKED_LIBERTY(pos + d)) {
+      if (libs)
+	libs[liberties] = pos + d;
+      liberties++;
+      if (liberties == maxlib)
+	return liberties;
+      MARK_LIBERTY(pos + d);
+    }
+    else if (board[pos + d] == color
+	     && UNMARKED_STRING(pos + d)) {
+      int s = string_number[pos + d];
+      int pos2;
+      pos2 = FIRST_STONE(s);
+      do {
+	int l;
+	for (l = 0; l < 4; l++) {
+	  int d2 = delta[l];
+	  if (UNMARKED_LIBERTY(pos2 + d2)) {
+	    if (libs)
+	      libs[liberties] = pos2 + d2;
+	    liberties++;
+	    if (liberties == maxlib)
+	      return liberties;
+	    MARK_LIBERTY(pos2 + d2);
 	  }
-	  
-	  NEXT_STONE(m, n);
-	} while (!BACK_TO_FIRST_STONE(s, m, n));
-	MARK_STRING(i+di, j+dj);
-      }
+	}
+	
+	pos2 = NEXT_STONE(pos2);
+      } while (!BACK_TO_FIRST_STONE(s, pos2));
+      MARK_STRING(pos + d);
     }
   }
-  return libs;
+  return liberties;
 }
 
 
-/* Determine whether a move by color at (m, n) might be a self atari.
+/* Determine whether a move by color at pos might be a self atari.
  * This function is sloppy in that it only does a quick check for two
  * liberties and might miss certain cases.
  * Return value 0 means it cannot be a self atari.
@@ -2915,8 +2773,9 @@ slow_approxlib(int i, int j, int color, int maxlib, int *libi, int *libj)
  */
 
 static int
-incremental_sloppy_self_atari(int m, int n, int color)
+incremental_sloppy_self_atari(int pos, int color)
 {
+  int other = OTHER_COLOR(color);
   /* number of empty neighbors */
   int trivial_liberties = 0;
   /* number of captured opponent strings */
@@ -2929,64 +2788,60 @@ incremental_sloppy_self_atari(int m, int n, int color)
   /* Clear string mark. */
   string_mark++;
   
-  if (m > 0) {
-    if (p[m-1][n] == EMPTY)
-      trivial_liberties++;
-    else if (p[m-1][n] == color) {
-      if (LIBERTIES(m-1, n) > 2)
-	return 0;
-      if (LIBERTIES(m-1, n) == 2)
-	far_liberties++;
-    }
-    else if (LIBERTIES(m-1, n) == 1 && UNMARKED_STRING(m-1, n)) {
-      captures++;
-      MARK_STRING(m-1, n);
-    }
+  if (board[SOUTH(pos)] == EMPTY)
+    trivial_liberties++;
+  else if (board[SOUTH(pos)] == color) {
+    if (LIBERTIES(SOUTH(pos)) > 2)
+      return 0;
+    if (LIBERTIES(SOUTH(pos)) == 2)
+      far_liberties++;
+  }
+  else if (board[SOUTH(pos)] == other
+	   && LIBERTIES(SOUTH(pos)) == 1 && UNMARKED_STRING(SOUTH(pos))) {
+    captures++;
+    MARK_STRING(SOUTH(pos));
   }
 
-  if (m < board_size-1) {
-    if (p[m+1][n] == EMPTY)
-      trivial_liberties++;
-    else if (p[m+1][n] == color) {
-      if (LIBERTIES(m+1, n) > 2)
-	return 0;
-      if (LIBERTIES(m+1, n) == 2)
-	far_liberties++;
-    }
-    else if (LIBERTIES(m+1, n) == 1 && UNMARKED_STRING(m+1, n)) {
-      captures++;
-      MARK_STRING(m+1, n);
-    }
+  if (board[WEST(pos)] == EMPTY)
+    trivial_liberties++;
+  else if (board[WEST(pos)] == color) {
+    if (LIBERTIES(WEST(pos)) > 2)
+      return 0;
+    if (LIBERTIES(WEST(pos)) == 2)
+      far_liberties++;
+  }
+  else if (board[WEST(pos)] == other
+	   && LIBERTIES(WEST(pos)) == 1 && UNMARKED_STRING(WEST(pos))) {
+    captures++;
+    MARK_STRING(WEST(pos));
   }
 
-  if (n > 0) {
-    if (p[m][n-1] == EMPTY)
-      trivial_liberties++;
-    else if (p[m][n-1] == color) {
-      if (LIBERTIES(m, n-1) > 2)
-	return 0;
-      if (LIBERTIES(m, n-1) == 2)
-	far_liberties++;
-    }
-    else if (LIBERTIES(m, n-1) == 1 && UNMARKED_STRING(m, n-1)) {
-      captures++;
-      MARK_STRING(m, n-1);
-    }
+  if (board[NORTH(pos)] == EMPTY)
+    trivial_liberties++;
+  else if (board[NORTH(pos)] == color) {
+    if (LIBERTIES(NORTH(pos)) > 2)
+      return 0;
+    if (LIBERTIES(NORTH(pos)) == 2)
+      far_liberties++;
+  }
+  else if (board[NORTH(pos)] == other
+	   && LIBERTIES(NORTH(pos)) == 1 && UNMARKED_STRING(NORTH(pos))) {
+    captures++;
+    MARK_STRING(NORTH(pos));
   }
 
-  if (n < board_size-1) {
-    if (p[m][n+1] == EMPTY)
-      trivial_liberties++;
-    else if (p[m][n+1] == color) {
-      if (LIBERTIES(m, n+1) > 2)
-	return 0;
-      if (LIBERTIES(m, n+1) == 2)
-	far_liberties++;
-    }
-    else if (LIBERTIES(m, n+1) == 1 && UNMARKED_STRING(m, n+1)) {
-      captures++;
-      MARK_STRING(m, n+1);
-    }
+  if (board[EAST(pos)] == EMPTY)
+    trivial_liberties++;
+  else if (board[EAST(pos)] == color) {
+    if (LIBERTIES(EAST(pos)) > 2)
+      return 0;
+    if (LIBERTIES(EAST(pos)) == 2)
+      far_liberties++;
+  }
+  else if (board[EAST(pos)] == other
+	   && LIBERTIES(EAST(pos)) == 1 && UNMARKED_STRING(EAST(pos))) {
+    captures++;
+    MARK_STRING(EAST(pos));
   }
 
   /* Each captured string is guaranteed to produce at least one
@@ -3019,32 +2874,31 @@ incremental_sloppy_self_atari(int m, int n, int color)
  */
 #define NO_UNROLL 0
 void
-incremental_order_moves(int mi, int mj, int color, int si, int sj,
+incremental_order_moves(int move, int color, int str,
 			int *number_edges, int *number_same_string,
 			int *number_own, int *number_opponent,
 			int *captured_stones, int *threatened_stones,
 			int *saved_stones, int *number_open)
 {
 #if NO_UNROLL == 1
-  int i, j;
-  int  k;
+  int pos;
+  int k;
 
   /* Clear the string mark. */
   string_mark++;
 
   for (k = 0; k < 4; k++) {
-    i = mi + deltai[k];
-    j = mj + deltaj[k];
-    if (!ON_BOARD(i, j))
+    pos = move + delta[k];
+    if (!ON_BOARD(pos))
       (*number_edges)++;
-    else if (p[i][j] == EMPTY)
+    else if (board[pos] == EMPTY)
       (*number_open)++;
     else {
-      int s = string_number[i][j];
-      if (string_number[si][sj] == s)
+      int s = string_number[pos];
+      if (string_number[str] == s)
 	(*number_same_string)++;
       
-      if (p[i][j] == color) {
+      if (board[pos] == color) {
 	(*number_own)++;
 	if (string[s].liberties == 1)
 	  (*saved_stones) += string[s].size;
@@ -3061,23 +2915,25 @@ incremental_order_moves(int mi, int mj, int color, int si, int sj,
 	      (*saved_stones) += t->size;
 	  }
 	}
-	else if (string[s].liberties == 2 && UNMARKED_STRING(i, j)) {
+	else if (string[s].liberties == 2 && UNMARKED_STRING(pos)) {
 	  (*threatened_stones) += string[s].size;
-	  MARK_STRING(i, j);
+	  MARK_STRING(pos);
 	}
       }
     }
   }
   
 #else
-#define code1(argi,argj) \
-  if (p[argi][argj] == EMPTY) \
+#define code1(arg) \
+  if (!ON_BOARD(arg)) \
+    (*number_edges)++; \
+  else if (board[arg] == EMPTY) \
     (*number_open)++; \
   else { \
-    int s = string_number[argi][argj]; \
-    if (string_number[si][sj] == s) \
+    int s = string_number[arg]; \
+    if (string_number[str] == s) \
       (*number_same_string)++; \
-    if (p[argi][argj] == color) { \
+    if (board[arg] == color) { \
       (*number_own)++; \
       if (string[s].liberties == 1) \
 	(*saved_stones) += string[s].size; \
@@ -3094,9 +2950,9 @@ incremental_order_moves(int mi, int mj, int color, int si, int sj,
 	    (*saved_stones) += t->size; \
 	} \
       } \
-      else if (string[s].liberties == 2 && UNMARKED_STRING(argi, argj)) { \
+      else if (string[s].liberties == 2 && UNMARKED_STRING(arg)) { \
 	(*threatened_stones) += string[s].size; \
-        MARK_STRING(argi, argj); \
+        MARK_STRING(arg); \
       } \
     } \
   }
@@ -3104,29 +2960,10 @@ incremental_order_moves(int mi, int mj, int color, int si, int sj,
   /* Clear the string mark. */
   string_mark++;
 
-  if (mi > 0) {
-    code1(mi-1, mj);
-  }
-  else
-    (*number_edges)++;
-
-  if (mi < board_size-1) {
-    code1(mi+1, mj);
-  }
-  else
-    (*number_edges)++;
-
-  if (mj > 0) {
-    code1(mi, mj-1);
-  }
-  else
-    (*number_edges)++;
-
-  if (mj < board_size-1) {
-    code1(mi, mj+1);
-  }
-  else
-    (*number_edges)++;
+  code1(SOUTH(move));
+  code1(WEST(move));
+  code1(NORTH(move));
+  code1(EAST(move));
 #endif
 }
 

@@ -63,8 +63,8 @@ static void
 position_to_globals(Position *pos)
 {
   board_size = pos->boardsize;
-  setup_board(pos->board, pos->ko_i, pos->ko_j, pos->last_i, pos->last_j,
-	      pos->komi, pos->white_captured, pos->black_captured);
+  setup_board(pos->board, pos->ko_pos, pos->last, pos->komi,
+	      pos->white_captured, pos->black_captured);
 }
 
 
@@ -77,15 +77,17 @@ static void
 globals_to_position(Position *pos)
 {
   int k;
+  int m, n;
 
   pos->boardsize = board_size;
-  memcpy(pos->board, p, sizeof(p));
-  pos->ko_i = board_ko_i;
-  pos->ko_j = board_ko_j;
-  for (k = 0; k < 2; k++) {
-    (pos->last_i)[k] = last_moves_i[k];
-    (pos->last_j)[k] = last_moves_j[k];
-  }
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++)
+      pos->board[m][n] = BOARD(m, n);
+
+  pos->ko_pos = board_ko_pos;
+  for (k = 0; k < 2; k++)
+    pos->last[k] = last_moves[k];
+
   pos->komi = komi;
   pos->white_captured = white_captured;
   pos->black_captured = black_captured;
@@ -111,23 +113,15 @@ restore_position(Position *pos)
 /*
  * Clear a position.
  */
-
+/* FIXME: komi is already included among the globals? */
 void
 gnugo_clear_position(Position *pos, int boardsize, float komi)
 {
   gg_assert(MIN_BOARD <= boardsize && boardsize <= MAX_BOARD);
-  pos->boardsize = boardsize;
-  memset(pos->board, EMPTY, sizeof(pos->board));
-  pos->ko_i = -1;
-  pos->ko_j = -1;
-  pos->last_i[0] = -1;
-  pos->last_j[0] = -1;
-  pos->last_i[1] = -1;
-  pos->last_j[1] = -1;
-
+  board_size = boardsize;
+  clear_board();
+  globals_to_position(pos);
   pos->komi = komi;
-  pos->white_captured = 0;
-  pos->black_captured = 0;
 }
 
 
@@ -150,7 +144,7 @@ void
 gnugo_add_stone(Position *pos, int i, int j, int color)
 {
   position_to_globals(pos);
-  add_stone(i, j, color);
+  add_stone(POS(i, j), color);
   globals_to_position(pos);
 }
 
@@ -160,10 +154,15 @@ void
 gnugo_remove_stone(Position *pos, int i, int j)
 {
   position_to_globals(pos);
-  remove_stone(i, j);
+  remove_stone(POS(i, j));
   globals_to_position(pos);
 }
 
+int
+gnugo_is_pass(int i, int j)
+{
+  return is_pass(POS(i, j));
+}
 
 /* Interface to play_move */
 void
@@ -171,7 +170,7 @@ gnugo_play_move(Position *pos, int i, int j, int color)
 {
   position_to_globals(pos);
 
-  play_move(i, j, color);
+  play_move(POS(i, j), color);
   clock_push_button(color);
 
   globals_to_position(pos);
@@ -291,7 +290,7 @@ gnugo_is_legal(Position *pos, int i, int j, int color)
   int  retval;
 
   position_to_globals(pos);
-  retval = is_legal(i, j, color);
+  retval = is_legal(POS(i, j), color);
 
   return retval;
 }
@@ -304,7 +303,7 @@ gnugo_is_suicide(Position *pos, int i, int j, int color)
   int  retval;
 
   position_to_globals(pos);
-  retval = is_suicide(i, j, color);
+  retval = is_suicide(POS(i, j), color);
 
   return retval;
 }
@@ -590,10 +589,8 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	 * without reference to the order in which the stones are
 	 * placed on the board.
 	 */
-	last_moves_i[0] = -1;
-	last_moves_j[0] = -1;
-	last_moves_i[1] = -1;
-	last_moves_j[1] = -1;
+	last_moves[0] = 0;
+	last_moves[1] = 0;
 	gnugo_add_stone(&gameinfo->position, i, j, BLACK);
 	sgffile_put_stone(i, j, BLACK);
 	addstone = 1;
@@ -601,10 +598,8 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	      
       case SGFAW:
 	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
-	last_moves_i[0] = -1;
-	last_moves_j[0] = -1;
-	last_moves_i[1] = -1;
-	last_moves_j[1] = -1;
+	last_moves[0] = 0;
+	last_moves[1] = 0;
 	gnugo_add_stone(&gameinfo->position, i, j, WHITE);
 	sgffile_put_stone(i, j, WHITE);
 	addstone = 1;
@@ -665,16 +660,14 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	{
 	  int move_color;
 
-	  if (!ON_BOARD(i, j))
+	  if (!ON_BOARD2(i, j))
 	    break;
 	  if (i > 0)
-	    move_color = OTHER_COLOR(p[i-1][j]);
+	    move_color = OTHER_COLOR(BOARD(i-1, j));
 	  else 
-	    move_color = OTHER_COLOR(p[1][j]);
-	  if (is_ko(i, j, move_color, NULL, NULL)) {
-	    board_ko_i = i;
-	    board_ko_j = j;
-	  }
+	    move_color = OTHER_COLOR(BOARD(i+1, j));
+	  if (is_ko(POS(i, j), move_color, NULL))
+	    board_ko_pos = POS(i, j);
 	}
 	break;
       }

@@ -51,7 +51,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
   TRANSFORM(pattern->movei, pattern->movej, &stari, &starj, ll);
   stari += m;
   starj += n;
-  if ((pattern->class & CLASS_B) && !safe_move(stari, starj, other))
+  if ((pattern->class & CLASS_B) && !safe_move2(stari, starj, other))
     return;
 
   /* If C pattern, test if there are more than one dragon in this
@@ -180,7 +180,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
     /* Look for dragons to amalgamate. Never amalgamate stones which
      * can be attacked.
      */
-    if ((pattern->class & CLASS_C) && (p[x][y] == color)
+    if ((pattern->class & CLASS_C) && (BOARD(x, y) == color)
 	&& (worm[x][y].attack_code == 0)) {
       if (first_dragoni == -1) {
 	first_dragoni = dragon[x][y].origini;

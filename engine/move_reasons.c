@@ -145,7 +145,7 @@ static int
 find_worm(int ai, int aj)
 {
   int k;
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   for (k = 0; k < next_worm; k++)
     if ((wormi[k] == ai) && (wormj[k] == aj))
       return k;
@@ -166,7 +166,7 @@ static int
 find_dragon(int ai, int aj)
 {
   int k;
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   for (k = 0; k < next_dragon; k++)
     if ((dragoni[k] == ai) && (dragonj[k] == aj))
       return k;
@@ -244,7 +244,7 @@ static int
 find_eye(int i, int j, int color)
 {
   int k;
-  ASSERT(ON_BOARD(i, j), i, j);
+  ASSERT_ON_BOARD2(i, j);
   
   for (k = 0; k < next_eye; k++)
     if ((eyei[k] == i) && (eyej[k] == j) && eyecolor[k] == color)
@@ -270,8 +270,8 @@ add_lunch(int ai, int aj, int bi, int bj)
   int k;
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
   int worm1 = find_worm(worm[bi][bj].origini, worm[bi][bj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
-  ASSERT(ON_BOARD(bi, bj), bi, bj);
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
   
   for (k = 0; k < next_lunch; k++)
     if ((lunch_dragon[k] == dragon1) && (lunch_worm[k] == worm1))
@@ -295,8 +295,8 @@ remove_lunch(int ai, int aj, int bi, int bj)
   int k;
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
   int worm1 = find_worm(worm[bi][bj].origini, worm[bi][bj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
-  ASSERT(ON_BOARD(bi, bj), bi, bj);
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
   
   for (k = 0; k < next_lunch; k++)
     if ((lunch_dragon[k] == dragon1) && (lunch_worm[k] == worm1))
@@ -338,9 +338,9 @@ static void
 add_move_reason(int ti, int tj, int type, int what)
 {
   int k;
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   if (stackp == 0) {
-    ASSERT(p[ti][tj] == EMPTY, ti, tj);
+    ASSERT2(BOARD(ti, tj) == EMPTY, ti, tj);
   }
   for (k = 0; k < MAX_REASONS; k++) {
     int r = move[ti][tj].reason[k];
@@ -364,7 +364,7 @@ remove_move_reason(int ti, int tj, int type, int what)
 {
   int k;
   int n = -1; /* Position of the move reason to be deleted. */
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   for (k = 0; k < MAX_REASONS; k++) {
     int r = move[ti][tj].reason[k];
     if (r < 0)
@@ -394,7 +394,7 @@ move_reason_known(int ti, int tj, int type, int what)
 {
   int k;
   int r;
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   for (k = 0; k < MAX_REASONS; k++) {
     r = move[ti][tj].reason[k];
     if (r < 0)
@@ -415,7 +415,7 @@ void
 add_attack_move(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, ATTACK_MOVE, worm_number);
 }
 
@@ -424,7 +424,7 @@ int
 attack_move_known(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   return move_reason_known(ti, tj, ATTACK_MOVE, worm_number);
 }
 
@@ -442,7 +442,7 @@ void
 remove_attack_move(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   if (move_reason_known(ti, tj, ATTACK_MOVE, worm_number))
     add_move_reason(ti, tj, NON_ATTACK_MOVE, worm_number);
 }
@@ -456,7 +456,7 @@ add_defense_move(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini,
 			      worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, DEFEND_MOVE, worm_number);
 }
 
@@ -465,7 +465,7 @@ int
 defense_move_known(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   return move_reason_known(ti, tj, DEFEND_MOVE, worm_number);
 }
 
@@ -483,7 +483,7 @@ void
 remove_defense_move(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   if (move_reason_known(ti, tj, DEFEND_MOVE, worm_number))
     add_move_reason(ti, tj, NON_DEFEND_MOVE, worm_number);
 }
@@ -497,7 +497,7 @@ void
 add_attack_threat_move(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, ATTACK_THREAT_MOVE, worm_number);
 }
 
@@ -506,7 +506,7 @@ int
 attack_threat_move_known(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   return move_reason_known(ti, tj, ATTACK_THREAT_MOVE, worm_number);
 }
 
@@ -519,7 +519,7 @@ add_defense_threat_move(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini,
 			      worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, DEFEND_THREAT_MOVE, worm_number);
 }
 
@@ -528,7 +528,7 @@ int
 defense_threat_move_known(int ti, int tj, int ai, int aj)
 {
   int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   return move_reason_known(ti, tj, DEFEND_THREAT_MOVE, worm_number);
 }
 
@@ -544,8 +544,8 @@ add_connection_move(int ti, int tj, int ai, int aj, int bi, int bj)
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
   int dragon2 = find_dragon(dragon[bi][bj].origini, dragon[bi][bj].originj);
   int connection;
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
-  ASSERT(ON_BOARD(bi, bj), bi, bj);
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
   gg_assert (dragon[ai][aj].color == dragon[bi][bj].color);
   if (dragon1 == dragon2)
     return;
@@ -564,8 +564,8 @@ add_cut_move(int ti, int tj, int ai, int aj, int bi, int bj)
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
   int dragon2 = find_dragon(dragon[bi][bj].origini, dragon[bi][bj].originj);
   int connection;
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
-  ASSERT(ON_BOARD(bi, bj), bi, bj);
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
   gg_assert (dragon[ai][aj].color == dragon[bi][bj].color);
   if (dragon1 == dragon2)
     return;
@@ -605,7 +605,7 @@ void
 add_semeai_move(int ti, int tj, int ai, int aj)
 {
   int the_dragon = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, SEMEAI_MOVE, the_dragon);
 }
 
@@ -620,7 +620,7 @@ void
 add_semeai_threat(int ti, int tj, int ai, int aj)
 {
   int the_dragon = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, SEMEAI_THREAT, the_dragon);
 }
 
@@ -632,7 +632,7 @@ void
 add_vital_eye_move(int ti, int tj, int ai, int aj, int color)
 {
   int eye;
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   if (color == WHITE)
     eye = find_eye(white_eye[ai][aj].origini, white_eye[ai][aj].originj,
 		   color);
@@ -656,8 +656,8 @@ add_attack_either_move(int ti, int tj, int ai, int aj, int bi, int bj)
   int worm1 = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
   int worm2 = find_worm(worm[bi][bj].origini, worm[bi][bj].originj);
   int worm_pair;
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
-  ASSERT(ON_BOARD(bi, bj), bi, bj);
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
   if (worm1 == worm2)
     return;
   if (worm[ai][aj].attack_code != 0 && worm[ai][aj].defend_code == 0)
@@ -679,8 +679,8 @@ add_defend_both_move(int ti, int tj, int ai, int aj, int bi, int bj)
   int worm1 = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
   int worm2 = find_worm(worm[bi][bj].origini, worm[bi][bj].originj);
   int worm_pair = find_worm_pair(worm1, worm2);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
-  ASSERT(ON_BOARD(bi, bj), bi, bj);
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
   add_move_reason(ti, tj, DEFEND_BOTH_MOVE, worm_pair);
 }
 
@@ -726,7 +726,7 @@ add_expand_moyo_move(int ti, int tj)
 void
 add_shape_value(int ti, int tj, float value)
 {
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   if (value > 0.0) {
     if (value > move[ti][tj].maxpos_shape)
       move[ti][tj].maxpos_shape = value;
@@ -769,7 +769,7 @@ static float
 compute_shape_factor(int m, int n)
 {
   float exponent = move[m][n].maxpos_shape - move[m][n].maxneg_shape;
-  ASSERT(ON_BOARD(m, n), m, n);
+  ASSERT_ON_BOARD2(m, n);
   if (move[m][n].numpos_shape > 1)
     exponent += move[m][n].numpos_shape - 1;
   if (move[m][n].numneg_shape > 1)
@@ -786,7 +786,7 @@ void
 add_strategical_attack_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, STRATEGIC_ATTACK_MOVE, dragon1);
 }
 
@@ -798,7 +798,7 @@ void
 add_strategical_defense_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, STRATEGIC_DEFEND_MOVE, dragon1);
 }
 
@@ -810,7 +810,7 @@ void
 add_owl_attack_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_ATTACK_MOVE, dragon1);
 }
 
@@ -822,7 +822,7 @@ void
 add_owl_defense_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_DEFEND_MOVE, dragon1);
 }
 
@@ -836,7 +836,7 @@ void
 add_owl_attack_threat_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_ATTACK_THREAT, dragon1);
   add_worthwhile_threat_move(ti, tj);
 }
@@ -850,7 +850,7 @@ void
 add_owl_uncertain_defense_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, UNCERTAIN_OWL_DEFENSE, dragon1);
 }
 
@@ -863,7 +863,7 @@ void
 add_owl_uncertain_attack_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, UNCERTAIN_OWL_ATTACK, dragon1);
 }
 
@@ -877,7 +877,7 @@ void
 add_owl_defense_threat_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_DEFENSE_THREAT, dragon1);
   add_worthwhile_threat_move(ti, tj);
 }
@@ -917,7 +917,7 @@ void
 add_owl_prevent_threat_move(int ti, int tj, int ai, int aj)
 {
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  ASSERT(ON_BOARD(ai, aj), ai, aj);
+  ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_PREVENT_THREAT, dragon1);
 }
 
@@ -927,7 +927,7 @@ add_owl_prevent_threat_move(int ti, int tj, int ai, int aj)
 void
 add_followup_value(int ti, int tj, float value)
 {
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   if (value > move[ti][tj].followup_value)
     move[ti][tj].followup_value = value;
 }
@@ -938,7 +938,7 @@ add_followup_value(int ti, int tj, float value)
 void
 add_reverse_followup_value(int ti, int tj, float value)
 {
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   if (value > move[ti][tj].reverse_followup_value)
     move[ti][tj].reverse_followup_value = value;
 }
@@ -949,7 +949,7 @@ add_reverse_followup_value(int ti, int tj, float value)
 void
 set_minimum_move_value(int ti, int tj, float value)
 {
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   if (value > move[ti][tj].min_value)
     move[ti][tj].min_value = value;
 }
@@ -960,7 +960,7 @@ set_minimum_move_value(int ti, int tj, float value)
 void
 set_maximum_move_value(int ti, int tj, float value)
 {
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   if (value < move[ti][tj].max_value)
     move[ti][tj].max_value = value;
 }
@@ -971,7 +971,7 @@ set_maximum_move_value(int ti, int tj, float value)
 void
 set_minimum_territorial_value(int ti, int tj, float value)
 {
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   if (value > move[ti][tj].min_territory)
     move[ti][tj].min_territory = value;
 }
@@ -982,7 +982,7 @@ set_minimum_territorial_value(int ti, int tj, float value)
 void
 set_maximum_territorial_value(int ti, int tj, float value)
 {
-  ASSERT(ON_BOARD(ti, tj), ti, tj);
+  ASSERT_ON_BOARD2(ti, tj);
   if (value < move[ti][tj].max_territory)
     move[ti][tj].max_territory = value;
 }
@@ -996,8 +996,8 @@ add_replacement_move(int ai, int aj, int bi, int bj)
 {
   int ci, cj;
   int m, n;
-  ASSERT_ON_BOARD(ai, aj);
-  ASSERT_ON_BOARD(bi, bj);
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
   ci = replacement_mapi[bi][bj];
   cj = replacement_mapj[bi][bj];
 
@@ -1006,7 +1006,7 @@ add_replacement_move(int ai, int aj, int bi, int bj)
     int di = replacement_mapi[ai][aj];
     int dj = replacement_mapj[ai][aj];
     /* Crash if the old rule isn't compatible with the new one. */
-    ASSERT((bi == di && bj == dj)
+    ASSERT2((bi == di && bj == dj)
 	   || (bi == replacement_mapi[di][dj]
 	       && bj == replacement_mapj[di][dj]), ai, aj);
     /* There already is a compatible redistribution in effect so we
@@ -1020,7 +1020,7 @@ add_replacement_move(int ai, int aj, int bi, int bj)
   /* Verify that we don't introduce a cyclic redistribution. */
   if (ci == ai && cj == aj) {
     gprintf("Cyclic point redistribution detected.\n");
-    ASSERT(0, ai, aj);
+    ASSERT2(0, ai, aj);
   }
 
   /* Update the replacement map. Make sure that all replacements
@@ -1066,7 +1066,7 @@ find_more_attack_and_defense_moves(int color)
   /* Identify the unstable worms and store them in a list. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n  <board_size; n++)
-      if (p[m][n]
+      if (BOARD(m, n)
 	  && worm[m][n].origini == m
 	  && worm[m][n].originj == n
 	  && worm[m][n].attack_code != 0
@@ -1087,9 +1087,9 @@ find_more_attack_and_defense_moves(int color)
 	  break;
 	what = move_reasons[r].what;
 	if ((   move_reasons[r].type == ATTACK_MOVE
-		&& p[wormi[what]][wormj[what]] == other)
+		&& BOARD(wormi[what], wormj[what]) == other)
 	    || (move_reasons[r].type == DEFEND_MOVE
-		&& p[wormi[what]][wormj[what]] == color)
+		&& BOARD(wormi[what], wormj[what]) == color)
 	    || move_reasons[r].type == CONNECT_MOVE
 	    || move_reasons[r].type == CUT_MOVE
 	    || move_reasons[r].type == ATTACK_EITHER_MOVE
@@ -1101,15 +1101,15 @@ find_more_attack_and_defense_moves(int color)
 	/* Try the move at (m,n) and see what happens. */
 	int cursor_at_start_of_line = 0;
 	TRACE("%m ",m ,n);
-	if (trymove(m, n, color, "find_more_attack_and_defense_moves",
-		    -1, -1, EMPTY, -1, -1)) {
+	if (trymove2(m, n, color, "find_more_attack_and_defense_moves",
+		     -1, -1, EMPTY, -1, -1)) {
 	  for (k = 0; k < N; k++) {
 	    int ai = wormi[unstable_worms[k]];
 	    int aj = wormj[unstable_worms[k]];
 	    /* string of our color, see if there still is an attack,
 	     * unless we already know the move works as defense move.
 	     */
-	    if (p[ai][aj] == color
+	    if (BOARD(ai, aj) == color
 		&& !move_reason_known(m, n, DEFEND_MOVE, unstable_worms[k]))
 	      if (!attack(ai, aj, NULL, NULL)) {
 		if (!cursor_at_start_of_line)
@@ -1123,16 +1123,17 @@ find_more_attack_and_defense_moves(int color)
 	    /* string of opponent color, see if there still is a defense,
 	     * unless we already know the move works as attack move.
 	     */
-	    if (p[ai][aj] == other
+	    if (BOARD(ai, aj) == other
 		&& !move_reason_known(m, n, ATTACK_MOVE, unstable_worms[k]))
 	      if (!find_defense(ai, aj, NULL, NULL)) {
 		/* Maybe find_defense() doesn't find the defense. Try to
 		 * defend with the stored defense move.
 		 */
 		int attack_works = 1;
-		if (trymove(worm[ai][aj].defendi, worm[ai][aj].defendj, other, 
-			    "find_more_attack_and_defense_moves", -1, -1,
-			    EMPTY, -1, -1)) {
+		if (trymove2(worm[ai][aj].defendi, worm[ai][aj].defendj,
+			     other, 
+			     "find_more_attack_and_defense_moves", -1, -1,
+			     EMPTY, -1, -1)) {
 		  if (!attack(ai, aj, NULL, NULL))
 		    attack_works = 0;
 		  popgo();
@@ -1189,13 +1190,13 @@ remove_opponent_attack_and_defense_moves(int color)
 	  ai = wormi[move_reasons[r].what];
 	  aj = wormj[move_reasons[r].what];
 	  if (move_reasons[r].type == ATTACK_MOVE
-	      && p[ai][aj] == color) {
+	      && BOARD(ai, aj) == color) {
 	    remove_move_reason(m, n, ATTACK_MOVE, move_reasons[r].what);
 	    found_one = 1;
 	    break;
 	  }
 	  else if (move_reasons[r].type == DEFEND_MOVE
-		   && p[ai][aj] == OTHER_COLOR(color)) {
+		   && BOARD(ai, aj) == OTHER_COLOR(color)) {
 	    remove_move_reason(m, n, DEFEND_MOVE, move_reasons[r].what);
 	    found_one = 1;
 	    break;
@@ -1393,9 +1394,9 @@ induce_secondary_move_reasons(int color)
 	aj = wormj[move_reasons[r].what];
 	
 	if ((   (move_reasons[r].type == ATTACK_MOVE)
-		&& (p[ai][aj] == color))
+		&& (BOARD(ai, aj) == color))
 	    || ((move_reasons[r].type == DEFEND_MOVE)
-		&& (p[ai][aj] != color)))
+		&& (BOARD(ai, aj) != color)))
 	  continue; /* Only a move for the opponent. */
 	
 	if (worm[ai][aj].defend_code == 0)
@@ -1478,15 +1479,17 @@ induce_secondary_move_reasons(int color)
            * is that it only counts neighbors in direct contact with
            * the worm, which is not always sufficient.
 	   */
-	  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-	  adj = chainlinks(ai, aj, adji, adjj);
+	  int adj, adjs[MAXCHAIN];
+	  adj = chainlinks(POS(ai, aj), adjs);
 	  for (i = 0; i < adj; i++) {
-	    if (dragon[adji[i]][adjj[i]].color == dragon[ai][aj].color)
+	    int adji = I(adjs[i]);
+	    int adjj = J(adjs[i]);
+	    if (dragon[adji][adjj].color == dragon[ai][aj].color)
 	      continue;
-	    if (dragon[adji[i]][adjj[i]].size > biggest) {
-	      di = dragon[adji[i]][adjj[i]].origini;
-	      dj = dragon[adji[i]][adjj[i]].originj;
-	      biggest = dragon[adji[i]][adjj[i]].size;
+	    if (dragon[adji][adjj].size > biggest) {
+	      di = dragon[adji][adjj].origini;
+	      dj = dragon[adji][adjj].originj;
+	      biggest = dragon[adji][adjj].size;
 	    }
 	  }
 	  
@@ -1494,9 +1497,11 @@ induce_secondary_move_reasons(int color)
 	    continue;
 	  
 	  for (i = 0; i < adj; i++) {
-	    int ei = dragon[adji[i]][adjj[i]].origini;
-	    int ej = dragon[adji[i]][adjj[i]].originj;
-	    if (dragon[adji[i]][adjj[i]].color == dragon[ai][aj].color)
+	    int adji = I(adjs[i]);
+	    int adjj = J(adjs[i]);
+	    int ei = dragon[adji][adjj].origini;
+	    int ej = dragon[adji][adjj].originj;
+	    if (dragon[adji][adjj].color == dragon[ai][aj].color)
 	      continue;
 	    
 	    if (di != ei || dj != ej) {
@@ -1602,26 +1607,29 @@ examine_move_safety(int color)
                * below if we were certain that the capturable string
                * had not been amalgamated with a living dragon.
 	       */
-	      int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-	      adj = chainlinks(ai, aj, adji, adjj);
-	      for (k = 0; k < adj; k++)
-		if (p[adji[k]][adjj[k]] == color) {
+	      int adj, adjs[MAXCHAIN];
+	      adj = chainlinks(POS(ai, aj), adjs);
+	      for (k = 0; k < adj; k++) {
+		int adji = I(adjs[k]);
+		int adjj = J(adjs[k]);
+		if (BOARD(adji, adjj) == color) {
 		  /* Check whether this string is part of the same
                    * dragon as an earlier string. We only want to
                    * count distinct neighbor dragons.
 		   */
 		  int l;
 		  for (l = 0; l < k; l++)
-		    if (dragon[adji[l]][adjj[l]].id
-			== dragon[adji[k]][adjj[k]].id)
+		    if (dragon[I(adjs[l])][J(adjs[l])].id
+			== dragon[adji][adjj].id)
 		      break;
 		  if (l == k) {
 		    /* New dragon. */
 		    our_color_neighbors++;
-		    bi = adji[k];
-		    bj = adjj[k];
+		    bi = adji;
+		    bj = adjj;
 		  }
 		}
+	      }
 	    }
 	    else {
 	      for (k = 0; k < DRAGON2(ai, aj).neighbors; k++)
@@ -1655,7 +1663,7 @@ examine_move_safety(int color)
 	    for (k = 0; k < 4; k++) {
 	      int di = deltai[k];
 	      int dj = deltaj[k];
-	      if (ON_BOARD(i+di, j+dj) && p[i+di][j+dj] == color) {
+	      if (BOARD(i+di, j+dj) == color) {
 		bi = i + di;
 		bj = j + dj;
 		break;
@@ -1735,11 +1743,11 @@ examine_move_safety(int color)
 	    break;
 	  }
 	}
-	if (safety == 1 && (tactical_safety == 1 || safe_move(i, j, color)))
+	if (safety == 1 && (tactical_safety == 1 || safe_move2(i, j, color)))
 	  break;
       }
       
-      if (safety == 1 && (tactical_safety || safe_move(i, j, color)))
+      if (safety == 1 && (tactical_safety || safe_move2(i, j, color)))
 	move[i][j].move_safety = 1;
       else
 	move[i][j].move_safety = 0;
@@ -1781,11 +1789,11 @@ list_move_reasons(int color)
 	  aj = wormj[move_reasons[r].what];
 	  
 	  if (move_reasons[r].type == ATTACK_MOVE
-	      && p[ai][aj] != color)
+	      && BOARD(ai, aj) != color)
 	    gprintf("Move at %m attacks %m%s\n", m, n, ai, aj,
 		    (worm[ai][aj].defend_code == 0) ? " (defenseless)" : "");
 	  else if ((move_reasons[r].type == DEFEND_MOVE
-		    && p[ai][aj] == color))
+		    && BOARD(ai, aj) == color))
 	    gprintf("Move at %m defends %m\n", m, n, ai, aj);
 	  break;
 	  
@@ -1795,17 +1803,17 @@ list_move_reasons(int color)
 	  aj = wormj[move_reasons[r].what];
 	  
 	  if (move_reasons[r].type == ATTACK_THREAT_MOVE
-	      && p[ai][aj] != color)
+	      && BOARD(ai, aj) != color)
 	    gprintf("Move at %m threatens to attack %m\n", m, n, ai, aj);
 	  else if ((move_reasons[r].type == DEFEND_THREAT_MOVE
-		    && p[ai][aj] == color))
+		    && BOARD(ai, aj) == color))
 	    gprintf("Move at %m threatens to defend %m\n", m, n, ai, aj);
 	  break;
 
 	case UNCERTAIN_OWL_DEFENSE:
 	  ai = wormi[move_reasons[r].what];
 	  aj = wormj[move_reasons[r].what];
-	  if (p[ai][aj] == color)
+	  if (BOARD(ai, aj) == color)
 	    gprintf("%m found alive but not certainly, %m defends it again\n",
 		    ai, aj, m, n);
 	  else
@@ -1865,10 +1873,10 @@ list_move_reasons(int color)
 	  aj = wormj[move_reasons[r].what];
 	  
 	  if (move_reasons[r].type == NON_ATTACK_MOVE
-	      && p[ai][aj] != color)
+	      && BOARD(ai, aj) != color)
 	    gprintf("Move at %m does in fact not attack %m\n", m, n, ai, aj);
 	  else if ((move_reasons[r].type == NON_DEFEND_MOVE
-		    && p[ai][aj] == color))
+		    && BOARD(ai, aj) == color))
 	    gprintf("Move at %m does in fact not defend %m\n", m, n, ai, aj);
 	  break;
 	  
@@ -1984,20 +1992,20 @@ find_stones_saved_by_move(int m, int n, int color,
       int aj = wormj[move_reasons[r].what];
       
       /* Defense of enemy stones. */
-      if (p[ai][aj] != color)
+      if (BOARD(ai, aj) != color)
 	continue;
 
-      mark_string(ai, aj, saved_stones, 1);
+      mark_string2(ai, aj, saved_stones, 1);
     }
     else if (move_reasons[r].type == ATTACK_MOVE) {
       int ai = wormi[move_reasons[r].what];
       int aj = wormj[move_reasons[r].what];
       
       /* Attack on our stones. */
-      if (p[ai][aj] == color)
+      if (BOARD(ai, aj) == color)
 	continue;
 
-      mark_string(ai, aj, saved_stones, 1);
+      mark_string2(ai, aj, saved_stones, 1);
     }
   }
 }
@@ -2232,7 +2240,7 @@ estimate_territorial_value(int m, int n, int color,
       aj = wormj[move_reasons[r].what];
       
       /* Attack on our stones. */
-      if (p[ai][aj] == color)
+      if (BOARD(ai, aj) == color)
 	break;
       
       /* Defenseless stone. */
@@ -2287,7 +2295,7 @@ estimate_territorial_value(int m, int n, int color,
       aj = wormj[move_reasons[r].what];
       
       /* Defense of enemy stones. */
-      if (p[ai][aj] != color)
+      if (BOARD(ai, aj) != color)
 	break;
       
       /* 
@@ -2344,7 +2352,7 @@ estimate_territorial_value(int m, int n, int color,
       aj = wormj[move_reasons[r].what];
 
       /* Threat on our stones. */
-      if (p[ai][aj] == color)
+      if (BOARD(ai, aj) == color)
 	break;
       
       if (dragon[ai][aj].matcher_status == DEAD) {
@@ -2374,26 +2382,28 @@ estimate_territorial_value(int m, int n, int color,
        * of each type.
        */	 
 
-      if (trymove(m, n, color, "estimate_territorial_value",
-		    -1, -1, EMPTY, -1, -1)) {
-	int adji[MAXCHAIN], adjj[MAXCHAIN];
+      if (trymove2(m, n, color, "estimate_territorial_value",
+		   -1, -1, EMPTY, -1, -1)) {
+	int adjs[MAXCHAIN];
 	int adjusted_value = 2 * worm[ai][aj].effective_size;
 	int adjustment_up = 0;
 	int adjustment_down = 0;
 	int s;
-	int adj = chainlinks(ai, aj, adji, adjj);
+	int adj = chainlinks(POS(ai, aj), adjs);
 
 	for (s = 0; s < adj; s++) {
-	  if (same_string(m, n, adji[s], adjj[s]))
+	  int adji = I(adjs[s]);
+	  int adjj = J(adjs[s]);
+	  if (same_string2(m, n, adji, adjj))
 	    continue;
-	  if (dragon[adji[s]][adjj[s]].color == color
-	      && dragon[adji[s]][adjj[s]].matcher_status == DEAD
-	      && 2*dragon[adji[s]][adjj[s]].effective_size > adjustment_up)
-	    adjustment_up = 2*dragon[adji[s]][adjj[s]].effective_size;
-	  if (dragon[adji[s]][adjj[s]].color == color
-	      && attack(adji[s], adjj[s], NULL, NULL)
-	      && 2*worm[adji[s]][adjj[s]].effective_size > adjustment_down)
-	    adjustment_down = 2*worm[adji[s]][adjj[s]].effective_size;
+	  if (dragon[adji][adjj].color == color
+	      && dragon[adji][adjj].matcher_status == DEAD
+	      && 2*dragon[adji][adjj].effective_size > adjustment_up)
+	    adjustment_up = 2*dragon[adji][adjj].effective_size;
+	  if (dragon[adji][adjj].color == color
+	      && attack(adji, adjj, NULL, NULL)
+	      && 2*worm[adji][adjj].effective_size > adjustment_down)
+	    adjustment_down = 2*worm[adji][adjj].effective_size;
 	}
 	adjusted_value += adjustment_up;
 	adjusted_value -= adjustment_down;
@@ -2411,7 +2421,7 @@ estimate_territorial_value(int m, int n, int color,
       aj = wormj[move_reasons[r].what];
 
       /* Threat on our stones. */
-      if (p[ai][aj] == color)
+      if (BOARD(ai, aj) == color)
 	break;
       
       if (dragon[ai][aj].matcher_status == DEAD) {
@@ -2610,9 +2620,9 @@ estimate_territorial_value(int m, int n, int color,
 
 	if (2 * dragon[bi][bj].genus + dragon[bi][bj].heyes == 3
 	    && (dragon[bi][bj].owl_status == CRITICAL
-		&& ((p[bi][bj] == color
+		&& ((BOARD(bi, bj) == color
 		     && owl_does_defend(m, n, bi, bj))
-		    || (p[bi][bj] == OTHER_COLOR(color)
+		    || (BOARD(bi, bj) == OTHER_COLOR(color)
 			&& owl_does_attack(m, n, bi, bj))))) {
 	  verbose = save_verbose;
 	  this_value = 2 * dragon[bi][bj].effective_size;
@@ -2690,10 +2700,10 @@ estimate_territorial_value(int m, int n, int color,
        */
 
       if (!doing_scoring
-	  && same_dragon(last_moves_i[0], last_moves_j[0], ai, aj)) {
+	  && same_dragon(I(last_moves[0]), J(last_moves[0]), ai, aj)) {
 	this_value = 1.5 * dragon[ai][aj].effective_size;
 	TRACE("  %m: %f - attack last move played, although it seems dead\n",
-	      m, n, this_value, ai, aj);
+	      m, n, this_value);
 	tot_value += this_value;
       }
       else if (!doing_scoring && ((color == BLACK && score < -0.)
@@ -2701,7 +2711,7 @@ estimate_territorial_value(int m, int n, int color,
 	this_value = gg_min(1.5 * dragon[ai][aj].effective_size,
 			    gg_abs(score/2));
 	TRACE("  %m: %f - attack last move played, although it seems dead\n",
-	      m, n, this_value, ai, aj);
+	      m, n, this_value);
 	tot_value += this_value;
       }
       else {
@@ -2715,7 +2725,7 @@ estimate_territorial_value(int m, int n, int color,
 	  this_value = gg_min(2*dragon[ai][aj].effective_size, gg_abs(score/2));
 	
 	add_reverse_followup_value(m, n, 2 * dragon[ai][aj].effective_size);
-	if (p[ai][aj] == color)
+	if (BOARD(ai, aj) == color)
 	  TRACE("  %m: %f (reverse followup) - prevent threat to attack %m\n",
 		m, n, 2 * dragon[ai][aj].effective_size, ai, aj);
 	else 
@@ -2772,7 +2782,7 @@ estimate_territorial_value(int m, int n, int color,
     
   tot_value += this_value;
   /* subtract one point for a sacrifice (playing in opponent's territory) */
-  if (tot_value > 1.0 && !safe_move(m, n, color))
+  if (tot_value > 1.0 && !safe_move2(m, n, color))
     tot_value -= 1;
 
   move[m][n].territorial_value = tot_value;
@@ -2875,12 +2885,12 @@ estimate_strategical_value(int m, int n, int color, float score)
       
 	/* Attack on our stones. */
 	if (move_reasons[r].type == ATTACK_MOVE
-	    && p[ai][aj] == color)
+	    && BOARD(ai, aj) == color)
 	  break;
 	
 	/* Defense of enemy stones. */
 	if (move_reasons[r].type == DEFEND_MOVE
-	    && p[ai][aj] != color)
+	    && BOARD(ai, aj) != color)
 	  break;
 	
 	/* Defenseless stone */
@@ -3214,10 +3224,14 @@ move_connects_strings(int m, int n, int color)
   for (k = 0; k < 4; k++) {
     int i = m + deltai[k];
     int j = n + deltaj[k];
-    if (!ON_BOARD(i, j) || p[i][j] == EMPTY)
+    int origin;
+
+    if (!ON_BOARD2(i, j) || BOARD(i, j) == EMPTY)
       continue;
 
-    find_origin(i, j, &oi, &oj);
+    origin = find_origin(POS(i, j));
+    oi = I(origin);
+    oj = J(origin);
 
     for (l = 0; l < strings; l++)
       if (si[l] == oi && sj[l] == oj)
@@ -3231,20 +3245,20 @@ move_connects_strings(int m, int n, int color)
   }
 
   for (k = 0; k < strings; k++) {
-    if (p[si[k]][sj[k]] == color) {
-      int newlibs = approxlib(m, n, color, MAXLIBS, NULL, NULL);
+    if (BOARD(si[k], sj[k]) == color) {
+      int newlibs = approxlib(POS(m, n), color, MAXLIBS, NULL);
       own_strings++;
-      if (newlibs >= countlib(si[k], sj[k])) {
-	if (countlib(si[k], sj[k]) <= 4)
+      if (newlibs >= countlib2(si[k], sj[k])) {
+	if (countlib2(si[k], sj[k]) <= 4)
 	  fewlibs++;
-	if (countlib(si[k], sj[k]) <= 2)
+	if (countlib2(si[k], sj[k]) <= 2)
 	  fewlibs++;
       }
     }
     else {
-      if (countlib(si[k], sj[k]) <= 2)
+      if (countlib2(si[k], sj[k]) <= 2)
 	fewlibs++;
-      if (countlib(si[k], sj[k]) <= 1)
+      if (countlib2(si[k], sj[k]) <= 1)
 	fewlibs++;
     }
   }
@@ -3413,9 +3427,9 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
   if (pure_threat_value > 0.0 
       && move[m][n].worthwhile_threat
       && tot_value <= pure_threat_value
-      && p[m][n] == EMPTY
+      && BOARD(m, n) == EMPTY
       && move[m][n].additional_ko_value > 0.0
-      && is_legal(m, n, color)
+      && is_legal2(m, n, color)
       && confirm_safety(m, n, color, 0, NULL, NULL)) {
     float new_tot_value = gg_min(pure_threat_value,
 				 tot_value
@@ -3481,7 +3495,7 @@ value_moves(int color, float pure_threat_value, float score)
        * captures here though, because if that is the best move, we
        * should reevaluate ko threats.
        */
-      if (!(is_illegal_ko_capture(m, n, color) || is_legal(m, n, color))) {
+      if (!(is_illegal_ko_capture2(m, n, color) || is_legal2(m, n, color))) {
 	move[m][n].value = 0.0;
 	TRACE("Move at %m wasn't legal.\n", m, n);
       }
@@ -3652,7 +3666,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
 	tval = move[m][n].value;
 	
 	if (tval > bestval) {
-	  if (is_legal(m, n, color) || is_illegal_ko_capture(m, n, color)) {
+	  if (is_legal2(m, n, color) || is_illegal_ko_capture2(m, n, color)) {
 	    bestval = tval;
 	    best_i = m;
 	    best_j = n;
@@ -3669,11 +3683,11 @@ review_move_reasons(int *i, int *j, float *val, int color,
      * effects. If ko threat values have been added, only the base
      * value of the move must be taken into account here.
      */
-    if (!ko_values_have_been_added || !ON_BOARD(best_i, best_j))
+    if (!ko_values_have_been_added || !ON_BOARD2(best_i, best_j))
       allowed_blunder_size = (int) (bestval / 2);
     else {
       int base_value;
-      ASSERT_ON_BOARD(best_i, best_j);
+      ASSERT_ON_BOARD2(best_i, best_j);
       base_value = bestval - move[best_i][best_j].additional_ko_value;
       allowed_blunder_size = (int) (base_value / 2);
     }
@@ -3681,7 +3695,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
     /* If the best move is an illegal ko capture, reevaluate ko
      * threats and search again.
      */
-    if (bestval > 0.0 && is_illegal_ko_capture(best_i, best_j, color)) {
+    if (bestval > 0.0 && is_illegal_ko_capture2(best_i, best_j, color)) {
       TRACE("Move at %m would be an illegal ko capture.\n", best_i, best_j);
       reevaluate_ko_threats();
       redistribute_points();

@@ -469,7 +469,7 @@ computer_move(Gameinfo *gameinfo, int *passes)
   
   mprintf("%s(%d): %m\n", color_to_string(gameinfo->to_move),
 	  gameinfo->move_number+1, i, j);
-  if (is_pass(i, j))
+  if (is_pass(POS(i, j)))
     (*passes)++;
   else
     *passes = 0;

@@ -261,10 +261,8 @@ main(int argc, char *argv[])
   mandated_owl_reading_depth   = -1;
   mandated_owl_node_limit      = -1;
   mandated_aa_depth            = -1;
-  last_moves_i[0]              = -1;
-  last_moves_j[0]              = -1;
-  last_moves_i[1]              = -1;
-  last_moves_j[1]              = -1;
+  last_moves[0]                = 0;
+  last_moves[1]                = 0;
 
   debug = 0;
   life  = 0;
@@ -837,15 +835,17 @@ main(int argc, char *argv[])
   case MODE_GTP:  
     if (!sgftree.root)
       sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
+
     if (gtpfile != NULL) {
       gtp_input_FILE = fopen(gtpfile, "r");
       if (gtp_input_FILE == NULL) {
 	fprintf(stderr, "gnugo: Cannot open file %s\n", gtpfile);
 	return (EXIT_FAILURE);
       } 
-    } else {
-      gtp_input_FILE = stdin;
     }
+    else
+      gtp_input_FILE = stdin;
+
     play_gtp(gtp_input_FILE);
     break;
 

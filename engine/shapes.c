@@ -95,14 +95,14 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
        * known by matchpat().
        */
       if ((class & CLASS_O)
-	  && p[x][y] == color
+	  && BOARD(x, y) == color
 	  && worm[x][y].attacki != -1
 	  && !does_defend(ti, tj, x, y))
 	return;
 
       di = dragon[x][y].origini;
       dj = dragon[x][y].originj;
-      if (p[x][y] == color && my_ndragons < MAX_DRAGONS_PER_PATTERN) {
+      if (BOARD(x, y) == color && my_ndragons < MAX_DRAGONS_PER_PATTERN) {
 	for (l = 0; l < my_ndragons; l++) {
 	  if (my_dragoni[l] == di && my_dragonj[l] == dj)
 	    break;
@@ -121,7 +121,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	}
       }
 
-      if (p[x][y] == other && your_ndragons < MAX_DRAGONS_PER_PATTERN) {
+      if (BOARD(x, y) == other && your_ndragons < MAX_DRAGONS_PER_PATTERN) {
 	for (l = 0; l < your_ndragons; l++) {
 	  if (your_dragoni[l] == di && your_dragonj[l] == dj)
 	    break;
@@ -162,7 +162,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (!(class & CLASS_s)) {
     /* Don't allow ko unsafety. */
-    if (safe_move(ti, tj, color) != WIN) {
+    if (safe_move2(ti, tj, color) != WIN) {
       if (0)
 	TRACE("  move at %m wasn't safe, discarded\n", ti, tj);
       return;
@@ -170,7 +170,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
   else {
     /* Allow illegal ko captures at this stage. */
-    if (!is_ko(ti, tj, color, NULL, NULL) && !is_legal(ti, tj, color)) {
+    if (!is_ko(POS(ti, tj), color, NULL) && !is_legal(POS(ti, tj), color)) {
       if (0)
 	TRACE("  move at %m wasn't legal, discarded\n", ti, tj);
       return;
@@ -182,7 +182,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (class & CLASS_n) {
     /* Allow ko unsafety. */
-    if (safe_move(ti, tj, OTHER_COLOR(color)) == 0) {
+    if (safe_move2(ti, tj, OTHER_COLOR(color)) == 0) {
       if (0)
 	TRACE("  opponent can't play safely at %m, move discarded\n", ti, tj);
       return;

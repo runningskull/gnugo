@@ -83,22 +83,22 @@ flippat(Textpattern *tp)
   switch (tp->edge_constraints) {
   case 0:     return;		  /* Nothing to do here */
 
-  case NORTH: transno = 5; break; /* Flip up-down */
-  case SOUTH: return;		  /* Nothing to do here */
-  case EAST:  transno = 1; break; /* Rotate 270 degrees */
-  case WEST:  transno = 3; break; /* Rotate 90  degrees */
+  case NORTH_EDGE: transno = 5; break; /* Flip up-down */
+  case SOUTH_EDGE: return;		  /* Nothing to do here */
+  case EAST_EDGE:  transno = 1; break; /* Rotate 270 degrees */
+  case WEST_EDGE:  transno = 3; break; /* Rotate 90  degrees */
 
-  case NORTH | SOUTH: return;
-  case NORTH | WEST:  transno = 3; break;
-  case NORTH | EAST:  transno = 2; break;
-  case WEST  | EAST:  return;
-  case WEST  | SOUTH: return;
-  case EAST  | SOUTH: transno = 1; break;
+  case NORTH_EDGE | SOUTH_EDGE: return;
+  case NORTH_EDGE | WEST_EDGE:  transno = 3; break;
+  case NORTH_EDGE | EAST_EDGE:  transno = 2; break;
+  case WEST_EDGE  | EAST_EDGE:  return;
+  case WEST_EDGE  | SOUTH_EDGE: return;
+  case EAST_EDGE  | SOUTH_EDGE: transno = 1; break;
 
-  case NORTH | WEST | EAST:  transno = 2; break;
-  case NORTH | WEST | SOUTH: transno = 3; break;
-  case NORTH | EAST | SOUTH: transno = 1; break;
-  case WEST  | EAST | SOUTH: return;
+  case NORTH_EDGE | WEST_EDGE | EAST_EDGE:  transno = 2; break;
+  case NORTH_EDGE | WEST_EDGE | SOUTH_EDGE: transno = 3; break;
+  case NORTH_EDGE | EAST_EDGE | SOUTH_EDGE: transno = 1; break;
+  case WEST_EDGE  | EAST_EDGE | SOUTH_EDGE: return;
 
   default: return;
   }

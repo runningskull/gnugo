@@ -33,12 +33,10 @@
 
 
 /* The go board and position. */
-Intersection p[MAX_BOARD][MAX_BOARD];
-Intersection shadow[MAX_BOARD][MAX_BOARD];
-int          board_ko_i;
-int          board_ko_j;
-int          last_moves_i[2];
-int          last_moves_j[2];
+Intersection board[BOARDSIZE];
+Intersection shadow[BOARDMAX];
+int          board_ko_pos;
+int          last_moves[2];
 
 float        komi;
 int          white_captured;    /* number of black and white stones captured */
@@ -91,6 +89,7 @@ int printmoyo        = 0;  /* print moyo board each move */
 int printboard       = 0;  /* print board each move */
 int board_size       = 19; /* board size */
 int count_variations = 0;  /* used by decide_string */
+int sgf_dump         = 0;  /* used by decide_string */
 SGFTree *sgf_dumptree = NULL;
 int loading          = 0;  /* TRUE if last loaded move comes from file */
 int life             = 0;  /* use eye reading code */

@@ -782,7 +782,8 @@ propvalue(char *buffer, int size)
 	lookahead = sgf_getch();
 	if (lookahead == '\n') 
 	  lookahead = sgf_getch();
-      } else if (lookahead == '\n') {
+      }
+      else if (lookahead == '\n') {
 	lookahead = sgf_getch();
 	if (lookahead == '\r') 
 	  lookahead = sgf_getch();
@@ -1110,7 +1111,8 @@ sgfPrintCommentProperty(FILE *file, SGFNode *node, const char *name)
   if (!first) {
     fprintf(file, "]");
     return 1;
-  } else
+  }
+  else
     return 0;
 }
 
@@ -1294,7 +1296,8 @@ main()
     fprintf(stderr, "Parse error:");
     fprintf(stderr, sgferr, sgferrarg);
     fprintf(stderr, " at position %d\n", sgferrpos);
-  } else {
+  }
+  else {
     unparse_game(stdin, game, 1);
     write(1, output, outputp - output);
   }

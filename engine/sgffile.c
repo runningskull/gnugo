@@ -71,7 +71,7 @@ sgffile_open_file(const char *sgf_filename)
   if (sgfout)
     sgffile_close_file();
   
-  if (strcmp(sgf_filename, "-")==0)
+  if (strcmp(sgf_filename, "-") == 0)
     sgfout = stdout;
   else
     sgfout = fopen(sgf_filename, "w");
@@ -112,7 +112,7 @@ sgffile_close_file()
   /* Don't close sgfout if it happens to be stdout. */
   if (sgfout != stdout)
     fclose(sgfout);
-  sgfout=NULL;
+  sgfout = NULL;
   
   return 1;
 }
@@ -156,7 +156,7 @@ sgffile_write_comment(const char *comment)
   if (!sgfout)
     return ;
   
-  fprintf(sgfout,"C[%s]",comment);
+  fprintf(sgfout, "C[%s]", comment);
 }
 
 
@@ -168,7 +168,8 @@ void
 sgffile_put_stone(int i, int j, int color)
 {
   if (sgfout)
-    fprintf(sgfout, "A%c[%c%c]", color==WHITE ? 'W' : 'B', 'a'+j, 'a'+i);
+    fprintf(sgfout, "A%c[%c%c]", color==WHITE ? 'W' : 'B',
+	    'a' + j, 'a' + i);
 }
 
 
@@ -220,9 +221,9 @@ sgffile_write_gameinfo(Gameinfo *ginfo, const char *gametype)
  */
 
 void 
-sgffile_move_made(int i, int j, int who, int value)
+sgffile_move_made(int i, int j, int color, int value)
 {
-  int m,n;
+  int m, n;
   int done_label = 0;
   
   if (!sgfout)
@@ -248,14 +249,15 @@ sgffile_move_made(int i, int j, int who, int value)
     fprintf(sgfout, "\nC[Value of move: %d]", value);
 
   /* If it is a pass move */
-  if (is_pass(i, j)) {
+  if (is_pass(POS(i, j))) {
     if (board_size > 19)
-      fprintf(sgfout, "\n;%c[]\n", who==WHITE ? 'W' : 'B');
+      fprintf(sgfout, "\n;%c[]\n", color == WHITE ? 'W' : 'B');
     else
-      fprintf(sgfout, "\n;%c[tt]\n", who==WHITE ? 'W' : 'B');
+      fprintf(sgfout, "\n;%c[tt]\n", color == WHITE ? 'W' : 'B');
   }
   else
-    fprintf(sgfout, "\n;%c[%c%c]\n", who==WHITE ? 'W' : 'B', 'a'+j, 'a'+i);
+    fprintf(sgfout, "\n;%c[%c%c]\n", color == WHITE ? 'W' : 'B',
+	    'a' + j, 'a' + i);
 
   fflush(sgfout);  /* in case cgoban terminates us without notice */
 }  
@@ -269,7 +271,7 @@ void
 sgffile_dragon_status(int i, int j, int status)
 {
   if (sgfout) {
-    switch(status) {
+    switch (status) {
       case DEAD:
 	fprintf(sgfout, "LB[%c%c:X]\n", 'a'+j, 'a'+i);
 	break;
@@ -300,7 +302,7 @@ sgffile_printboard(int next)
   /* Write the white stones to the file. */
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] == WHITE) {
+      if (BOARD(i, j) == WHITE) {
 	if (!start) {
 	  fprintf(sgfout, "AW");
 	  start = 1;
@@ -315,7 +317,7 @@ sgffile_printboard(int next)
   start = 0;
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] == BLACK) {
+      if (BOARD(i, j) == BLACK) {
 	if (!start) {
 	  fprintf(sgfout, "AB");
 	  start = 1;
@@ -340,7 +342,7 @@ sgffile_printboard(int next)
   start = 0;
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] == EMPTY && !is_legal(i,j,next)) {
+      if (BOARD(i, j) == EMPTY && !is_legal2(i, j, next)) {
 	if (!start) {
 	  fprintf(sgfout, "IL");
 	  start = 1;
@@ -363,8 +365,8 @@ static void
 sgftree_printboard(SGFTree *tree);
 
 /*
- * begin_sgftreedump begins outputting all moves considered by
- * trymove and tryko into an internal sgf tree.
+ * begin_sgfdump begins outputting all moves considered by
+ * trymove and tryko to an sgf file.
  */
 
 void
@@ -381,7 +383,7 @@ begin_sgftreedump(SGFTree *tree)
 
 
 /*
- * end_sgftreedump ends the dump and writes it to a file.
+ * end_sgfdump ends the dump and closes the sgf file.
  */
 
 void 
@@ -408,7 +410,7 @@ sgftree_printboard(SGFTree *tree)
   /* Write the white stones to the file. */
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] == WHITE)
+      if (BOARD(i, j) == WHITE)
 	sgfAddStone(node, WHITE, i, j);
     }
   }
@@ -416,7 +418,7 @@ sgftree_printboard(SGFTree *tree)
   /* Write the black stones to the file. */
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] == BLACK)
+      if (BOARD(i, j) == BLACK)
 	sgfAddStone(node, BLACK, i, j);
     }
   }
@@ -428,11 +430,11 @@ sgftree_printboard(SGFTree *tree)
 void
 sgffile_recordboard(SGFNode *node)
 {
-  int i,j;
+  int i, j;
 
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] == BLACK) {
+      if (BOARD(i, j) == BLACK) {
 	sgffile_put_stone(i, j, BLACK);
 	if (node)
 	  sgfAddStone(node, BLACK, i, j);

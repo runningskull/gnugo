@@ -97,7 +97,7 @@ liberty_of_dragon(int i, int j, int m, int n)
   if (i == -1)
     return 0;
 
-  if (p[i][j] != EMPTY)
+  if (BOARD(i, j) != EMPTY)
     return 0;
 
   if (i > 0
@@ -136,7 +136,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
   int mylibs = 1, yourlibs = 1, commonlibs = 0; 
   int yourlibi = -1, yourlibj = -1;
   int commonlibi = -1, commonlibj = -1;
-  int color = p[ai][aj];
+  int color = BOARD(ai, aj);
   int i, j;
   int m, n;
   int my_status = UNKNOWN;
@@ -175,7 +175,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
       if (dragon[bi][bj].owl_status == DEAD) {
 	for (m = 0; m < board_size; m++)
 	  for (n = 0; n < board_size; n++)
-	    if (p[m][n] == p[bi][bj] && same_dragon(m, n, bi, bj)) {
+	    if (BOARD(m, n) == BOARD(bi, bj) && same_dragon(m, n, bi, bj)) {
 	      dragon[m][n].owl_status = CRITICAL;
 	      dragon[m][n].matcher_status = CRITICAL;
 	    }
@@ -230,7 +230,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
       if (dragon[ai][aj].owl_status == DEAD) {
 	for (m = 0; m < board_size; m++)
 	  for (n = 0; n < board_size; n++)
-	    if (p[m][n] == p[ai][aj] && same_dragon(m, n, ai, aj)) {
+	    if (BOARD(m, n) == BOARD(ai, aj) && same_dragon(m, n, ai, aj)) {
 	      dragon[m][n].owl_status = CRITICAL;
 	      dragon[m][n].matcher_status = CRITICAL;
 	    }
@@ -294,20 +294,22 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 	    (dragon[m][n].origini == bi
 	     && dragon[m][n].originj == bj)) {
 	  int adj;
-	  int adji[MAXCHAIN];
-	  int adjj[MAXCHAIN];
+	  int adjs[MAXCHAIN];
 	  int r;
 	  
-	  adj = chainlinks(m, n, adji, adjj);
-	  for (r = 0; r < adj; r++)
-	    if ((dragon[adji[r]][adjj[r]].origini == ai
-		 && dragon[adji[r]][adjj[r]].originj == aj)
-		|| (dragon[adji[r]][adjj[r]].origini == bi
-		    && dragon[adji[r]][adjj[r]].originj == bj))
+	  adj = chainlinks(POS(m, n), adjs);
+	  for (r = 0; r < adj; r++) {
+	    int ci = I(adjs[r]);
+	    int cj = J(adjs[r]);
+	    if ((dragon[ci][cj].origini == ai
+		 && dragon[ci][cj].originj == aj)
+		|| (dragon[ci][cj].origini == bi
+		    && dragon[ci][cj].originj == bj))
 	      if (owl_substantial(m, n)) {
 		DEBUG(DEBUG_SEMEAI, "...tactical situation detected, exiting\n");
 		return;
 	      }
+	  }
 	}
     }
   
@@ -328,7 +330,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (p[i][j]
+      if (BOARD(i, j)
 	  && worm[i][j].origini == i
 	  && worm[i][j].originj == j) {
 	if (same_dragon(i, j, ai, aj))
@@ -336,7 +338,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 	if (same_dragon(i, j, bi, bj))
 	  yourlibs--;
       }
-      else if (p[i][j] == EMPTY) {
+      else if (BOARD(i, j) == EMPTY) {
 	if (liberty_of_dragon(i, j, bi, bj)) {
 	  yourlibs ++;
 	  if (liberty_of_dragon(i, j, ai, aj)) {
@@ -361,13 +363,13 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    */
 
   if (dragon[ai][aj].owl_status == CRITICAL
-      && !liberty_of_string(dragon[ai][aj].owl_attacki, 
-			    dragon[ai][aj].owl_attackj, ai, aj))
+      && !liberty_of_string2(dragon[ai][aj].owl_attacki, 
+			     dragon[ai][aj].owl_attackj, ai, aj))
     mylibs++;
   
   if (dragon[bi][bj].owl_status == CRITICAL
-      && !liberty_of_string(dragon[bi][bj].owl_attacki, 
-			    dragon[bi][bj].owl_attackj, bi, bj))
+      && !liberty_of_string2(dragon[bi][bj].owl_attacki, 
+			     dragon[bi][bj].owl_attackj, bi, bj))
     yourlibs++;
   
   /* Now we compute the statuses which result from a
@@ -670,7 +672,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 	for (j = 0; j < board_size-1; j++)
 	  if (liberty_of_dragon(i, j, bi, bj) 
 	      && !liberty_of_dragon(i, j, ai, aj)
-	      && safe_move(i, j, color)) {
+	      && safe_move2(i, j, color)) {
 	    /* add move reasons for EVERY outside liberty where we can
              * play safely. A move to win a semeai might not be a
              * safe move if it is inside the opponent's eyespace. 
@@ -693,7 +695,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 	for (i = 0; i < board_size-1; i++)
 	  for (j = 0; j < board_size-1; j++)
 	    if (liberty_of_dragon(i, j, bi, bj)
-		&& safe_move(i, j, color))
+		&& safe_move2(i, j, color))
 	      add_appropriate_semeai_moves(i, j, ai, aj, bi, bj, 
 					   my_status, your_status,
 					   margin_of_safety);
@@ -772,16 +774,17 @@ small_semeai()
   int i, j;
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (p[i][j]
+      if (BOARD(i, j)
 	  && (worm[i][j].liberties == 3 || worm[i][j].liberties == 4)
 	  && worm[i][j].attack_code != 0) {
-	if (i > 0 && p[i-1][j] == OTHER_COLOR(p[i][j]))
+	int other = OTHER_COLOR(BOARD(i, j));
+	if (i > 0 && BOARD(i-1, j) == other)
 	  small_semeai_analyzer(i, j, i-1, j);
-	if (i < board_size-1 && p[i+1][j] == OTHER_COLOR(p[i][j]))
+	if (i < board_size-1 && BOARD(i+1, j) == other)
 	  small_semeai_analyzer(i, j, i+1, j);
-	if (j > 0 && p[i][j-1] == OTHER_COLOR(p[i][j]))
+	if (j > 0 && BOARD(i, j-1) == other)
 	  small_semeai_analyzer(i, j, i, j-1);
-	if (j < board_size-1 && p[i][j+1] == OTHER_COLOR(p[i][j]))
+	if (j < board_size-1 && BOARD(i, j+1) == other)
 	  small_semeai_analyzer(i, j, i, j+1);
       }
 }
@@ -795,8 +798,8 @@ void
 small_semeai_analyzer(int i, int j, int m, int n)
 {
   int ai, aj;
-  int color = p[i][j];
-  int other = p[m][n];
+  int color = BOARD(i, j);
+  int other = BOARD(m, n);
 
   if (worm[m][n].attack_code == 0 || worm[m][n].liberties < 3)
     return;
@@ -805,14 +808,14 @@ small_semeai_analyzer(int i, int j, int m, int n)
 
 
   /* FIXME: There are many more possibilities to consider */
-  if (trymove(worm[i][j].attacki, worm[i][j].attackj, other, 
+  if (trymove2(worm[i][j].attacki, worm[i][j].attackj, other, 
 	      "small_semeai_analyzer", i, j, EMPTY, -1, -1)) {
     int acode = attack(m, n, &ai, &aj);
     if (acode == 0) {
       popgo();
       change_defense(m, n, worm[i][j].attacki, worm[i][j].attackj, 1);
     }
-    else if (trymove(ai, aj, color, "small_semeai_analyzer", i, j,
+    else if (trymove2(ai, aj, color, "small_semeai_analyzer", i, j,
 		     EMPTY, -1, -1)) {
       if (attack(i, j, NULL, NULL) == 0) {
 	popgo();
@@ -829,14 +832,14 @@ small_semeai_analyzer(int i, int j, int m, int n)
   }
   gg_assert(stackp == 0);
   
-  if (trymove(worm[m][n].attacki, worm[m][n].attackj, color, 
+  if (trymove2(worm[m][n].attacki, worm[m][n].attackj, color, 
 	      "small_semeai_analyzer", m, n, EMPTY, -1, -1)) {
     int acode = attack(i, j, &ai, &aj);
     if (acode == 0) {
       popgo();
       change_defense(i, j, worm[m][n].attacki, worm[m][n].attackj, 1);
     }
-    else if (trymove(ai, aj, other, "small_semeai_analyzer", m, n,
+    else if (trymove2(ai, aj, other, "small_semeai_analyzer", m, n,
 		     EMPTY, -1, -1)) {
       if (attack(m, n, NULL, NULL) == 0) {
 	popgo();

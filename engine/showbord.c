@@ -256,7 +256,7 @@ static void
 showchar(int i, int j, int empty, int xo)
 {
   struct dragon_data *d = &(dragon[i][j]);  /* dragon data at i,j */
-  int x = p[i][j];
+  int x = BOARD(i, j);
 
   if (x == EMPTY) {
     if (xo != 2)
@@ -297,30 +297,30 @@ showchar(int i, int j, int empty, int xo)
     int w = dragon_num[d->origini][d->originj];
 
     if (xo == 0)
-      fprintf(stderr, " %c", p[i][j] == BLACK ? 'X' : 'O');
+      fprintf(stderr, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
 
     if (!w) {
       /* Not yet allocated - allocate next one. */
       /* Count upwards for black, downwards for white to reduce confusion. */
-      if (p[i][j] == BLACK)
+      if (BOARD(i, j) == BLACK)
 	w = dragon_num[d->origini][d->originj] = next_black++;
       else
 	w = dragon_num[d->origini][d->originj] = next_white--; 
     }
 
-    w = w%26 + (p[i][j] == BLACK ? 'A' : 'a');
+    w = w%26 + (BOARD(i, j) == BLACK ? 'A' : 'a');
     
     /* Now draw it. */
     if (xo == 1)
-      write_color_char(colors[p[i][j]][d->status], w);
+      write_color_char(colors[BOARD(i, j)][d->status], w);
     else if (xo == 2) {
-      if (p[i][j] == BLACK)
+      if (BOARD(i, j) == BLACK)
 	write_color_char(domain_colors[1], 'X');
       else
 	write_color_char(domain_colors[2], 'O');
     }
     else if (xo == 3)
-      write_color_char(colors[p[i][j]][d->owl_status], w);
+      write_color_char(colors[BOARD(i, j)][d->owl_status], w);
   }
 }
 

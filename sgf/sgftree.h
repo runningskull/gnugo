@@ -162,7 +162,6 @@ void     sgftreeSetLastNode(SGFTree *tree, SGFNode *lastnode);
 int get_moveX(SGFProperty *property, int boardsize);
 int get_moveY(SGFProperty *property, int boardsize);
 int get_moveXY(SGFProperty *property, int *i, int *j, int boardsize);
-int is_pass(int i, int j);
 
 int show_sgf_properties(SGFNode *node);
 int show_sgf_tree(SGFNode *node);

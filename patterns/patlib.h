@@ -53,7 +53,8 @@ typedef struct textpattern_t {
   
   int      num_elements;	/* Number of elements in the pattern */
   char    *elements;		/* The elements */
-  int      edge_constraints;	/* NORTH | WEST | SOUTH | EAST */
+  int      edge_constraints;	/* NORTH_EDGE | WEST_EDGE */
+                                /* | SOUTH_EDGE | EAST_EDGE */
   char    *explanation;		/* Optional explanation */
   char    *comment2;
 

@@ -644,7 +644,7 @@ get_from_entry_list(entry_t *plist, int l, int r)
 static int
 get_from_test_array(test_array_t *pta, int l, int r)
 {
-  return get_from_entry_list(pta->hash[(l+r)%MAX_HASH_VALUE],l,r);
+  return get_from_entry_list(pta->hash[(l+r) % MAX_HASH_VALUE], l, r);
 }
 
 
@@ -668,7 +668,7 @@ add_to_entry_list(entry_t **pplist, int l, int r, int val)
 static void
 add_to_test_array(test_array_t *pta, int l, int r, int val)
 {
-  add_to_entry_list(&(pta->hash[(l+r)%MAX_HASH_VALUE]),l,r,val);
+  add_to_entry_list(&(pta->hash[(l+r) % MAX_HASH_VALUE]), l, r, val);
 }
 
 static void
@@ -676,7 +676,7 @@ free_entry_list(entry_t *plist)
 {
   entry_t *pentry;
   
-  while (plist !=NULL) {
+  while (plist != NULL) {
     pentry = plist;
     plist = plist->pnext;
     free(pentry);
@@ -906,7 +906,7 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
   /* more advanced edge constraints */
 
   /* South constraint */
-  if (pat->edge_constraints & SOUTH)
+  if (pat->edge_constraints & SOUTH_EDGE)
     {
       for (i = m + pat->maxi + 1; i != DFA_MAX_BOARD * 3; i++)
 	for (j = 0; j != DFA_MAX_BOARD * 3; j++)
@@ -914,7 +914,7 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
     }
 
   /* East constraint */
-  if (pat->edge_constraints & EAST)
+  if (pat->edge_constraints & EAST_EDGE)
     {
       for (i = 0; i != DFA_MAX_BOARD * 3; i++)
 	for (j = n + pat->maxj + 1; j != DFA_MAX_BOARD * 3; j++)
@@ -922,7 +922,7 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
     }
 
   /* North constraint */
-  if (pat->edge_constraints & NORTH)
+  if (pat->edge_constraints & NORTH_EDGE)
     {
       for (i = 0; i != m + pat->mini; i++)
 	for (j = 0; j != DFA_MAX_BOARD * 4; j++)
@@ -930,7 +930,7 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
     }
 
   /* West constraint */
-  if (pat->edge_constraints & WEST)
+  if (pat->edge_constraints & WEST_EDGE)
     {
       /* take care not to erase the south edge constraint */
       for (i = 0; i != m + pat->maxi + 1; i++)
@@ -938,7 +938,7 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
 	  work_space[i][j] = '|';
 
       /* complete the last corner only if necessary */
-      if (!(pat->edge_constraints & SOUTH))
+      if (!(pat->edge_constraints & SOUTH_EDGE))
 	{
 	  for (i = m + pat->maxi + 1; i != DFA_MAX_BOARD * 3; i++)
 	    for (j = 0; j != n + pat->minj; j++)
@@ -1013,13 +1013,13 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
       j = spiral[trans][k].j;
 
       if (i == pat->maxi)
-	borders &= ~SOUTH;
+	borders &= ~SOUTH_EDGE;
       if (i == pat->mini)
-	borders &= ~NORTH;
+	borders &= ~NORTH_EDGE;
       if (j == pat->maxj)
-	borders &= ~EAST;
+	borders &= ~EAST_EDGE;
       if (j == pat->minj)
-	borders &= ~WEST;
+	borders &= ~WEST_EDGE;
 
       gg_assert (m + i < DFA_MAX_BOARD * 3 && m + i < DFA_MAX_BOARD * 3);
       str[k] = work_space[m + i][n + j];
@@ -1030,13 +1030,13 @@ pattern_2_string (struct pattern *pat, char *str, int trans, int ci,
       if (strchr ("#|-+", str[k]))
 	{
 	  if (i > pat->maxi)
-	    edges &= ~SOUTH;
+	    edges &= ~SOUTH_EDGE;
 	  if (i < pat->mini)
-	    edges &= ~NORTH;
+	    edges &= ~NORTH_EDGE;
 	  if (j > pat->maxj)
-	    edges &= ~EAST;
+	    edges &= ~EAST_EDGE;
 	  if (j < pat->minj)
-	    edges &= ~WEST;
+	    edges &= ~WEST_EDGE;
 	}
     }
 

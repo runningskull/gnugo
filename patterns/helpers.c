@@ -31,7 +31,7 @@
 #include "patterns.h"
 
 
-#define TRYMOVE(x, y, z) trymove(x, y, z, "helper", -1, -1, EMPTY, -1, -1)
+#define TRYMOVE(x, y, z) trymove2(x, y, z, "helper", -1, -1, EMPTY, -1, -1)
 #define OFFSET(x, y, z, w) offset(x, y, ti, tj, &z, &w, transformation)
 #define ARGS struct pattern *pattern, int transformation, int ti, int tj, int color
 
@@ -68,12 +68,12 @@ basic_cut_helper (ARGS)
   OFFSET(-1, 0, bi, bj);  /* O to north */
   OFFSET(-1, -1, ci, cj); /* X to northwest */
 
-  acolor=p[ai][aj];
-  ccolor=OTHER_COLOR(acolor);
+  acolor = BOARD(ai, aj);
+  ccolor = OTHER_COLOR(acolor);
 
-  ASSERT(p[ai][aj]!=EMPTY, ai, aj);
-  ASSERT(p[bi][bj]==acolor, bi, bj);
-  ASSERT(p[ci][cj]==ccolor, ci, cj);
+  ASSERT2(BOARD(ai, aj) != EMPTY, ai, aj);
+  ASSERT2(BOARD(bi, bj) == acolor, bi, bj);
+  ASSERT2(BOARD(ci, cj) == ccolor, ci, cj);
 
   /* If c is a ko stone, assume that we would lose the ko. */
   if (worm[ci][cj].attack_code != 0
@@ -94,7 +94,7 @@ basic_cut_helper (ARGS)
   else
     return 0;
 
-  if (safe_move(ti, tj, acolor) == 0)
+  if (safe_move2(ti, tj, acolor) == 0)
     return 0;
 
   /* Cut ok. */
@@ -165,7 +165,7 @@ reinforce_helper (ARGS)
   UNUSED(transformation); UNUSED(pattern);
   
   return (!lively_dragon_exists(OTHER_COLOR(color)) 
-	  && safe_move(ti, tj, color));
+	  && safe_move2(ti, tj, color));
 }
 
 
@@ -201,7 +201,7 @@ throw_in_atari_helper(ARGS)
   int ai, aj, bi, bj, ci, cj, di, dj, ei, ej;
   int success = 0;
   int other = OTHER_COLOR(color);
-  int libi[2], libj[2];
+  int libs[2];
   UNUSED(pattern);
   
   OFFSET(0, 1, ai, aj);
@@ -210,19 +210,19 @@ throw_in_atari_helper(ARGS)
   OFFSET(0, -1, ei, ej);
 
   /* Find second liberty of the stone a. */
-  findlib(ai, aj, 2, libi, libj);
-  if ((libi[0] != ti) || (libj[0] != tj)) {
-    bi = libi[0];
-    bj = libj[0];
+  findlib(POS(ai, aj), 2, libs);
+  if (libs[0] != POS(ti, tj)) {
+    bi = I(libs[0]);
+    bj = J(libs[0]);
   }
   else {
-    bi = libi[1];
-    bj = libj[1];
+    bi = I(libs[1]);
+    bj = J(libs[1]);
   }
   
   if (TRYMOVE(ti, tj, color)) {
     if (!attack(ci, cj, NULL, NULL) &&
-	!(ON_BOARD(di, dj) && attack(di, dj, NULL, NULL))) {
+	!(ON_BOARD2(di, dj) && attack(di, dj, NULL, NULL))) {
       if (TRYMOVE(bi, bj, other)) {
 	if (attack(ai, aj, NULL, NULL))
 	  success = 1;
@@ -319,12 +319,11 @@ seki_helper(int ai, int aj)
 {
   int r;
   int adj;
-  int adji[MAXCHAIN];
-  int adjj[MAXCHAIN];
+  int adjs[MAXCHAIN];
   
-  adj = chainlinks(ai, aj, adji, adjj);
+  adj = chainlinks(POS(ai, aj), adjs);
   for (r = 0; r < adj; r++)
-    if (worm[adji[r]][adjj[r]].attack_code != 0)
+    if (worm[I(adjs[r])][J(adjs[r])].attack_code != 0)
       return 0;
 
   return 1;
@@ -382,10 +381,10 @@ cutstone2_helper (ARGS)
   di = worm[ai][aj].defendi;
   dj = worm[ai][aj].defendj;
 
-  if (TRYMOVE(di, dj, p[ai][aj])) {
-    if (!p[bi][bj] || attack(bi, bj, NULL, NULL)
-	|| !p[ci][cj] || attack(ci, cj, NULL, NULL)
-	|| safe_move(ti, tj, p[ai][aj]) != 0) {
+  if (TRYMOVE(di, dj, BOARD(ai, aj))) {
+    if (!BOARD(bi, bj) || attack(bi, bj, NULL, NULL)
+	|| !BOARD(ci, cj) || attack(ci, cj, NULL, NULL)
+	|| safe_move2(ti, tj, BOARD(ai, aj)) != 0) {
       popgo();
       worm[worm[ai][aj].origini][worm[ai][aj].originj].cutstone2++;
       propagate_worm(worm[ai][aj].origini, worm[ai][aj].originj);
@@ -411,7 +410,7 @@ edge_double_sente_helper(ARGS)
   int ai, aj;
   int bi, bj;
   int ci, cj;
-  int di, dj;
+  int dpos;
   int other = OTHER_COLOR(color);
   int success = 0;
   UNUSED(pattern);
@@ -422,11 +421,11 @@ edge_double_sente_helper(ARGS)
 
   if (TRYMOVE(ti, tj, color)) {
     if (TRYMOVE(ai, aj, other)) {
-      ASSERT(countlib(ti, tj) == 1, ti, tj);
-      findlib(ti, tj, 1, &di, &dj);
-      if (TRYMOVE(di, dj, color)) {
+      ASSERT2(countlib2(ti, tj) == 1, ti, tj);
+      findlib(POS(ti, tj), 1, &dpos);
+      if (TRYMOVE(I(dpos), J(dpos), color)) {
 	if (TRYMOVE(bi, bj, color)) {
-	  if (p[ci][cj] == EMPTY || !defend_both(ai, aj, ci, cj))
+	  if (BOARD(ci, cj) == EMPTY || !defend_both(ai, aj, ci, cj))
 	    success = 1;
 	  popgo();
 	}
@@ -473,13 +472,13 @@ threaten_to_save_helper(int ti, int tj, int ai, int aj)
 void
 threaten_to_capture_helper(int ti, int tj, int ai, int aj)
 {
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
+  int adj, adjs[MAXCHAIN];
   int k;
   
-  adj = chainlinks2(ai, aj, adji, adjj, 1);
+  adj = chainlinks2(POS(ai, aj), adjs, 1);
   for (k = 0; k < adj; k++)
-    if (worm[adji[k]][adjj[k]].defend_code != 0
-	&& !does_defend(ti, tj, adji[k], adjj[k]))
+    if (worm[I(adjs[k])][J(adjs[k])].defend_code != 0
+	&& !does_defend(ti, tj, I(adjs[k]), J(adjs[k])))
       return;
     
   add_followup_value(ti, tj, 2 * worm[ai][aj].effective_size);
@@ -496,23 +495,23 @@ threaten_to_capture_helper(int ti, int tj, int ai, int aj)
 void
 defend_against_atari_helper(int ti, int tj, int ai, int aj)
 {
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
-  int libi[2], libj[2];
+  int adj, adjs[MAXCHAIN];
+  int libs[2];
   int k;
 
-  ASSERT(countlib(ai, aj) == 2, ai, aj);
+  ASSERT2(countlib2(ai, aj) == 2, ai, aj);
 
   /* No value if the string can capture out of atari. */
-  adj = chainlinks2(ai, aj, adji, adjj, 1);
+  adj = chainlinks2(POS(ai, aj), adjs, 1);
   for (k = 0; k < adj; k++)
-    if (worm[adji[k]][adjj[k]].defend_code != 0
-	&& !does_defend(ti, tj, adji[k], adjj[k]))
+    if (worm[I(adjs[k])][J(adjs[k])].defend_code != 0
+	&& !does_defend(ti, tj, I(adjs[k]), J(adjs[k])))
       return;
 
   /* No value if opponent has no safe atari. */
-  findlib(ai, aj, 2, libi, libj);
-  if (is_self_atari(libi[0], libj[0], OTHER_COLOR(p[ai][aj]))
-      && is_self_atari(libi[1], libj[1], OTHER_COLOR(p[ai][aj])))
+  findlib(POS(ai, aj), 2, libs);
+  if (is_self_atari(libs[0], OTHER_COLOR(BOARD(ai, aj)))
+      && is_self_atari(libs[1], OTHER_COLOR(BOARD(ai, aj))))
     return;
   
   add_reverse_followup_value(ti, tj, 2 * worm[ai][aj].effective_size);
@@ -550,17 +549,16 @@ amalgamate_most_valuable_helper(int ai, int aj, int bi, int bj, int ci, int cj)
 int
 finish_ko_helper(int ai, int aj)
 {
-  int adj, adji[MAXCHAIN], adjj[MAXCHAIN];
+  int adj, adjs[MAXCHAIN];
   int k;
 
-  adj = chainlinks2(ai, aj, adji, adjj, 1);
+  adj = chainlinks2(POS(ai, aj), adjs, 1);
   for (k = 0; k < adj; k++) {
-    int bi = adji[k];
-    int bj = adjj[k];
-    int xi, xj;
-    if (countstones(bi, bj) == 1) {
-      findlib(bi, bj, 1, &xi, &xj);
-      if (is_ko(xi, xj, p[ai][aj], NULL, NULL))
+    int bpos = adjs[k];
+    int xpos;
+    if (countstones(bpos) == 1) {
+      findlib(bpos, 1, &xpos);
+      if (is_ko(xpos, BOARD(ai, aj), NULL))
 	return 1;
     }
   }
@@ -578,17 +576,16 @@ finish_ko_helper(int ai, int aj)
 int
 squeeze_ko_helper(int ai, int aj)
 {
-  int libi[2], libj[2];
-  int libs;
+  int libs[2];
+  int liberties;
   int k;
 
-  libs = findlib(ai, aj, 2, libi, libj);
-  ASSERT(libs==2, ai, aj);
+  liberties = findlib(POS(ai, aj), 2, libs);
+  ASSERT2(liberties==2, ai, aj);
 
-  for (k = 0; k < libs; k++) {
-    int bi = libi[k];
-    int bj = libj[k];
-    if (is_ko(bi, bj, OTHER_COLOR(p[ai][aj]), NULL, NULL))
+  for (k = 0; k < liberties; k++) {
+    int bpos = libs[k];
+    if (is_ko(bpos, OTHER_COLOR(BOARD(ai, aj)), NULL))
       return 1;
   }
 
@@ -606,7 +603,7 @@ squeeze_ko_helper(int ai, int aj)
 int
 backfill_helper(int ai, int aj, int bi, int bj, int ci, int cj)
 {
-  int color = p[ci][cj];
+  int color = BOARD(ci, cj);
   int other = OTHER_COLOR(color);
   int di = -1;
   int dj = -1;

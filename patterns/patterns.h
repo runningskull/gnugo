@@ -184,10 +184,10 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 			   | VALUE_FOLLOWUP | VALUE_REV_FOLLOWUP)
 
 /* directions for applying edge-constraints */
-#define NORTH 1
-#define SOUTH 2
-#define EAST  4
-#define WEST  8
+#define NORTH_EDGE 1
+#define SOUTH_EDGE 2
+#define EAST_EDGE  4
+#define WEST_EDGE  8
 
 /* different kinds of autohelpers */
 #define HAVE_CONSTRAINT 1

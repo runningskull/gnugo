@@ -45,7 +45,7 @@ decidestring(int m, int n, const char *sgf_output)
   int i, j, acode, dcode;
   SGFTree tree;
   
-  if (p[m][n] == EMPTY) {
+  if (BOARD(m, n) == EMPTY) {
     fprintf(stderr, "gnugo: --decidestring called on an empty vertex\n");
     return ;
   }
@@ -126,7 +126,7 @@ decidedragon(int m, int n, const char *sgf_output)
   SGFTree tree;
   int result_certain;
 
-  if (p[m][n] == EMPTY) {
+  if (BOARD(m, n) == EMPTY) {
     fprintf(stderr, "gnugo: --decidedragon called on an empty vertex\n");
     return ;
   }
@@ -135,7 +135,7 @@ decidedragon(int m, int n, const char *sgf_output)
   reset_engine();
 
   verbose = 0;
-  examine_position(p[m][n], EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(BOARD(m, n), EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
   verbose=save_verbose;
 
@@ -208,8 +208,8 @@ decidesemeai(int ai, int aj, int bi, int bj, const char *sgf_output)
   int save_verbose = verbose;
   SGFTree tree;
 
-  if ((p[ai][aj] == EMPTY)
-      || (p[bi][bj] == EMPTY)) {
+  if ((BOARD(ai, aj) == EMPTY)
+      || (BOARD(bi, bj) == EMPTY)) {
     fprintf(stderr, "gnugo: --decidesemeai called on an empty vertex\n");
     return ;
   }
@@ -218,7 +218,7 @@ decidesemeai(int ai, int aj, int bi, int bj, const char *sgf_output)
   reset_engine();
 
   verbose = 0;
-  examine_position(p[ai][aj], EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(BOARD(ai, aj), EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
   verbose=save_verbose;
   count_variations = 1;
@@ -274,7 +274,7 @@ decideposition(int color, const char *sgf_output)
     for (n = 0; n < board_size; n++) {
       if ((dragon[m][n].origini != m)
 	  || (dragon[m][n].originj != n)
-	  || (p[m][n] == EMPTY)
+	  || (BOARD(m, n) == EMPTY)
 	  || (dragon[m][n].escape_route >= 6))
 	continue;
 

@@ -1,4 +1,16 @@
-========================== 3.1.4  =========================
+========================== 3.1.5 =========================
+
+./regress.sh . strategy.tst
+26 unexpected PASS!
+./regress.sh . neurogo.tst
+13 unexpected PASS!
+./regress.sh . strategy3.tst
+144 unexpected PASS!
+149 unexpected PASS!
+
+Test results updated.
+
+========================== 3.1.4 =========================
 
 ./regress.sh . blunder.tst
 15 unexpected FAIL: Correct 'H3', got 'J1'
@@ -36,7 +48,9 @@
 ./regress.sh niki.tst
 13 unexpected PASS!
 
-========================== 3.1.3  =========================
+Test results updated.
+
+========================== 3.1.3 =========================
 
 ./regress.sh . endgame.tst
 211 unexpected FAIL: Correct 'A5', got 'O2'
@@ -63,7 +77,7 @@
 172 unexpected PASS!
 174 unexpected PASS!
 
-========================== 3.1.2  =========================
+========================== 3.1.2 =========================
 
 ./regress.sh . owl.tst
 217 unexpected PASS!
@@ -85,7 +99,7 @@
 ./regress.sh . strategy3.tst
 117 unexpected PASS!
 
-========================== 3.1.1  =========================
+========================== 3.1.1 =========================
 
 ./regress.sh . owl.tst
 217 unexpected PASS!

@@ -43,7 +43,7 @@ static int dragon2_initialized;
 static int lively_white_dragons;
 static int lively_black_dragons;
 
-#define occupied(m, n) (m != -1 && p[m][n] != EMPTY)
+#define occupied(m, n) (m != -1 && BOARD(m, n) != EMPTY)
 
 
 /* This basic function finds all dragons and collects some basic information
@@ -139,11 +139,12 @@ make_dragons(int color, int stop_before_owl)
    *   OOOOO
    *
    * we find two graybordered cavities of size one. The X string is
-   * inessential, so these two cavities are amalgamated into a single cave.  */
+   * inessential, so these two cavities are amalgamated into a single cave.
+   */
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n]
+      if (BOARD(m, n)
 	  && worm[m][n].origini == m
 	  && worm[m][n].originj == n
 	  && worm[m][n].genus == 0
@@ -181,9 +182,9 @@ make_dragons(int color, int stop_before_owl)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
 
-      if ((black_eye[m][n].color == BLACK_BORDER) 
-	  && (black_eye[m][n].origini == m)
-	  && (black_eye[m][n].originj == n)) {
+      if (black_eye[m][n].color == BLACK_BORDER
+	  && black_eye[m][n].origini == m
+	  && black_eye[m][n].originj == n) {
 	if (!worm[m][n].ko
 	   || (black_eye[m][n].esize > 1)) /* Only exclude living kos. */
 	  dragon_eye(m, n, black_eye);
@@ -207,9 +208,9 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
 	  
-      if ((white_eye[m][n].color == WHITE_BORDER)
-	  && (white_eye[m][n].origini == m)
-	  && (white_eye[m][n].originj == n)) {
+      if (white_eye[m][n].color == WHITE_BORDER
+	  && white_eye[m][n].origini == m
+	  && white_eye[m][n].originj == n) {
 	if (!worm[m][n].ko
 	    || (white_eye[m][n].esize > 1)) /* Only exclude living kos. */
 	  dragon_eye(m, n, white_eye);
@@ -247,7 +248,7 @@ make_dragons(int color, int stop_before_owl)
     for (n = 0; n < board_size; n++) {
       if (worm[m][n].origini != m
 	  || worm[m][n].originj != n
-	  || p[m][n] == EMPTY
+	  || BOARD(m, n) == EMPTY
 	  || worm[m][n].lunchi == -1)
 	continue;
 
@@ -346,8 +347,8 @@ make_dragons(int color, int stop_before_owl)
 	if (sum >= 4) {
 	  half_eye[m][n].type = FALSE_EYE;
 	  if ((black_eye[m][n].esize == 1)
-	      || is_legal(m, n, WHITE)
-	      || p[m][n] == WHITE)
+	      || is_legal2(m, n, WHITE)
+	      || BOARD(m, n) == WHITE)
 	    add_half_eye(m, n, black_eye, half_eye);
 	}
 	else if (sum == 3)
@@ -363,8 +364,8 @@ make_dragons(int color, int stop_before_owl)
 	if (sum >= 4) {
 	  half_eye[m][n].type = FALSE_EYE;
 	  if ((white_eye[m][n].esize == 1)
-	      || is_legal(m, n, BLACK)
-	      || p[m][n] == BLACK)
+	      || is_legal2(m, n, BLACK)
+	      || BOARD(m, n) == BLACK)
 	    add_half_eye(m, n, white_eye, half_eye);
 	}
 	else if (sum == 3)
@@ -430,7 +431,7 @@ make_dragons(int color, int stop_before_owl)
       {
 	m = black_eye[i][j].dragoni;
 	n = black_eye[i][j].dragonj;
-	gg_assert (p[m][n] == BLACK);
+	gg_assert (BOARD(m, n) == BLACK);
 	TRACE("eye at %m found for dragon at %m--augmenting genus\n",
 	      i, j, m, n);
 	dragon[m][n].genus += (black_eye[i][j].mineye);
@@ -447,7 +448,7 @@ make_dragons(int color, int stop_before_owl)
       {
 	m = white_eye[i][j].dragoni;
 	n = white_eye[i][j].dragonj;
-	gg_assert (p[m][n] == WHITE);
+	gg_assert (BOARD(m, n) == WHITE);
 	TRACE("eye at %m found for dragon at %m--augmenting genus\n",
 	      i, j, m, n);
 	dragon[m][n].genus += (white_eye[i][j].mineye);
@@ -472,7 +473,7 @@ make_dragons(int color, int stop_before_owl)
     for (n = 0; n < board_size; n++) 
       if (dragon[m][n].origini == m
 	  && dragon[m][n].originj == n 
-	  && p[m][n] != EMPTY) {
+	  && BOARD(m, n) != EMPTY) {
 	dragon[m][n].escape_route = compute_escape(m, n, 0);
       }
 
@@ -498,7 +499,7 @@ make_dragons(int color, int stop_before_owl)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if ((dragon[m][n].origini == m)
-	  && (dragon[m][n].originj == n) && p[m][n])
+	  && (dragon[m][n].originj == n) && BOARD(m, n))
 	{
 	  dragon[m][n].status = compute_dragon_status(m, n);
 	  sgffile_dragon_status(m, n, dragon[m][n].status);
@@ -536,7 +537,7 @@ make_dragons(int color, int stop_before_owl)
       int second_defendi = -1;
       int second_defendj = -1;
       
-      if (p[m][n] == EMPTY
+      if (BOARD(m, n) == EMPTY
 	  || (dragon[m][n].origini != m)
 	  || (dragon[m][n].originj != n))
 	continue;
@@ -652,7 +653,7 @@ make_dragons(int color, int stop_before_owl)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (p[m][n] != EMPTY) {
+      if (BOARD(m, n) != EMPTY) {
 	if (dragon[m][n].owl_status != UNCHECKED)
 	  dragon[m][n].matcher_status = dragon[m][n].owl_status;
 	else if (dragon[m][n].status == DEAD 
@@ -740,15 +741,14 @@ make_dragons(int color, int stop_before_owl)
 	  && worm[m][n].attack_code != 0
 	  && worm[m][n].defend_code != 0
 	  && !worm[m][n].inessential) {
-	int adji[MAXCHAIN];
-	int adjj[MAXCHAIN];
+	int adjs[MAXCHAIN];
 	int neighbors;
 	int r;
 	int essential = 0;
 	
-	neighbors = chainlinks(m, n, adji, adjj);
+	neighbors = chainlinks(POS(m, n), adjs);
 	for (r = 0; r < neighbors; r++)
-	  if (dragon[adji[r]][adjj[r]].matcher_status != DEAD) {
+	  if (dragon[I(adjs[r])][J(adjs[r])].matcher_status != DEAD) {
 	    essential = 1;
 	    break;
 	  }
@@ -788,7 +788,7 @@ initialize_supplementary_dragon_data()
   number_of_dragons = 0;
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n] == EMPTY)
+      if (BOARD(m, n) == EMPTY)
 	continue;
       i = dragon[m][n].origini;
       j = dragon[m][n].originj;
@@ -815,7 +815,7 @@ initialize_supplementary_dragon_data()
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n] != EMPTY
+      if (BOARD(m, n) != EMPTY
 	  && dragon[m][n].origini == m
 	  && dragon[m][n].originj == n) {
 	DRAGON2(m, n).origini = m;
@@ -860,7 +860,7 @@ find_neighbor_dragons()
   /* Initialize the arrays. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n] != EMPTY) {
+      if (BOARD(m, n) != EMPTY) {
 	dragons[m][n] = dragon[m][n].id;
 	distances[m][n] = 0;
       }
@@ -884,7 +884,7 @@ find_neighbor_dragons()
 	for (k = 0; k < 4; k++) {
 	  i = m + deltai[k];
 	  j = n + deltaj[k];
-	  if (!ON_BOARD(i, j))
+	  if (!ON_BOARD2(i, j))
 	    continue;
 	  /* Consider expansion from (m, n) to adjacent intersection
 	   * (i, j).
@@ -944,7 +944,7 @@ find_neighbor_dragons()
 	for (k = 0; k < 4; k++) {
 	  i = m + deltai[k];
 	  j = n + deltaj[k];
-	  if (ON_BOARD(i, j) && dragons[i][j] >= 0)
+	  if (ON_BOARD2(i, j) && dragons[i][j] >= 0)
 	    adjacent[neighbors++] = dragons[i][j];
 	}
 	for (i = 0; i < neighbors; i++)
@@ -1026,7 +1026,7 @@ dragon_invincible(int m, int n)
 
   int strong_eyes = 0;
 
-  gg_assert(p[m][n] != EMPTY);
+  gg_assert(BOARD(m, n) != EMPTY);
 
   /* First look for invincible strings in the dragon. */
   for (i = 0; i < board_size; i++)
@@ -1037,7 +1037,7 @@ dragon_invincible(int m, int n)
   /* Examine the eye spaces.
    * FIXME: The check for half eyes or false eyes may be too weak.
    */
-  if (p[m][n] == BLACK)
+  if (BOARD(m, n) == BLACK)
     eye = black_eye;
   else
     eye = white_eye;
@@ -1079,11 +1079,11 @@ show_dragons(void)
     for (n = 0; n < board_size; n++) {
       struct worm_data *w = &(worm[m][n]);
 
-      if (((w->origini)==m)&&((w->originj)==n)) {
-	if (p[m][n]) {
+      if (w->origini == m && w->originj == n) {
+	if (BOARD(m, n)) {
 	  gprintf("%m : (dragon %m) %s string of size %d (%f), genus %d: (%d,%d,%d,%d)",
 		  m, n, dragon[m][n].origini, dragon[m][n].originj,
-		  color_to_string(p[m][n]),
+		  color_to_string(BOARD(m, n)),
 		  w->size,
 		  w->effective_size,
 		  w->genus,
@@ -1132,11 +1132,11 @@ show_dragons(void)
       struct dragon_data2 *d2 = &(dragon2[d->id]);
       int k;
 
-      if (((d->origini)==m) && ((d->originj)==n)) {
-	if (p[m][n]) {
+      if (d->origini == m && d->originj == n) {
+	if (BOARD(m, n)) {
 	  gprintf("%m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, status %s, matcher status %s, moyo size %d safety %s",
-		  m,n,
-		  p[m][n]==BLACK ? "B" : "W",
+		  m, n,
+		  BOARD(m, n)==BLACK ? "B" : "W",
 		  d->size,
 		  d->effective_size,
 		  d->genus,
@@ -1189,42 +1189,44 @@ show_dragons(void)
  */
 
 static void
-dragon_ring(int m, int n, int *di, int *dj)
+dragon_ring(int m, int n, int *ddi, int *ddj)
 {
   int i, j;
   int dragoni = -1, dragonj = -1;
   int k;
 
-  ASSERT(p[m][n] != EMPTY, m, n);
+  ASSERT2(BOARD(m, n) != EMPTY, m, n);
   DEBUG(DEBUG_DRAGONS, "amalgamate dragons around %m\n", m, n);
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       if (worm[i][j].origini == m && worm[i][j].originj == n) {
-	ASSERT(p[i][j] != EMPTY, i, j);
+	ASSERT2(BOARD(i, j) != EMPTY, i, j);
 	for (k = 0; k < 4; k++) {
 	  int di = deltai[k];
 	  int dj = deltaj[k];
-	  if (ON_BOARD(i+di, j+dj) && (p[i+di][j+dj] == EMPTY)) {
+	  if (BOARD(i+di, j+dj) == EMPTY) {
 	    if (dragoni == -1) {
 	      dragoni = dragon[i+di][j+dj].origini;
 	      dragonj = dragon[i+di][j+dj].originj;
-	      ASSERT(p[dragoni][dragonj] == EMPTY, dragoni, dragonj);
+	      ASSERT_ON_BOARD2(dragoni, dragonj);
+	      ASSERT2(BOARD(dragoni, dragonj) == EMPTY, dragoni, dragonj);
 	    }
 	    else if (dragoni != dragon[i+di][j+dj].origini
 		     || dragonj != dragon[i+di][j+dj].originj) {
 	      join_dragons(i+di, j+dj, dragoni, dragonj);
 	      dragoni = dragon[i+di][j+dj].origini;
 	      dragonj = dragon[i+di][j+dj].originj;
-	      ASSERT(p[dragoni][dragonj] == EMPTY, dragoni, dragonj);
+	      ASSERT_ON_BOARD2(dragoni, dragonj);
+	      ASSERT2(BOARD(dragoni, dragonj) == EMPTY, dragoni, dragonj);
 	    }
 	  }
 	}
       }
     }
 
-  *di = dragoni;   /* (m, n) is an inessential string. */
-  *dj = dragonj;
+  *ddi = dragoni;   /* (m, n) is an inessential string. */
+  *ddj = dragonj;
 }
 
 
@@ -1268,7 +1270,7 @@ dragon_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD])
 	for (k = 0; k < 4; k++) {
 	  int di = deltai[k];
 	  int dj = deltaj[k];
-	  if (ON_BOARD(i+di, j+dj) && p[i+di][j+dj] == color) {
+	  if (BOARD(i+di, j+dj) == color) {
 	    if (dragoni == -1) {
 	      dragoni = dragon[i+di][j+dj].origini;
 	      dragonj = dragon[i+di][j+dj].originj;
@@ -1315,17 +1317,18 @@ join_dragons(int ai, int aj, int bi, int bj)
   int oi; /* new origini */
   int oj; /* new originj */
   
-  gg_assert(p[i][j] == p[m][n]);
+  gg_assert(BOARD(i, j) == BOARD(m, n));
   gg_assert(dragon2_initialized == 0);
 
-  if (p[i][j] == EMPTY) {
+  if (BOARD(i, j) == EMPTY) {
     /* Joining caves. */
     oi = m;
     oj = n;
   }
   else {
-    /* We want to have the origin pointing to the largest string of the dragon.
-     * If this is not unique, we take the "upper leftmost" one.
+    /* We want to have the origin pointing to the largest string of
+     * the dragon.  If this is not unique, we take the "upper
+     * leftmost" one.
      */
     if (worm[i][j].size > worm[m][n].size
 	|| (worm[i][j].size == worm[m][n].size
@@ -1345,7 +1348,7 @@ join_dragons(int ai, int aj, int bi, int bj)
   
   dragon[oi][oj].size  = dragon[m][n].size + dragon[i][j].size;
   dragon[oi][oj].effective_size  = (dragon[m][n].effective_size
-				  + dragon[i][j].effective_size);
+				    + dragon[i][j].effective_size);
   dragon[oi][oj].genus = dragon[m][n].genus + dragon[i][j].genus;
 
   for (t = 0; t < board_size; t++)
@@ -1513,38 +1516,38 @@ dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
       else {
 	if (i > 0
 	    && !mx[i-1][j]
-	    && (p[i-1][j] == color
-		|| (p[i-1][j] == EMPTY
-		    && i > 1 && p[i-2][j] != other
-		    && j > 0 && p[i-1][j-1] != other
-		    && j < board_size-1 && p[i-1][j+1] != other)))
+	    && (BOARD(i-1, j) == color
+		|| (BOARD(i-1, j) == EMPTY
+		    && i > 1 && BOARD(i-2, j) != other
+		    && j > 0 && BOARD(i-1, j-1) != other
+		    && j < board_size-1 && BOARD(i-1, j+1) != other)))
 	  ENQUEUE(i-1, j);
 
       	if (i < board_size-1
 	    && !mx[i+1][j]
-	    && (p[i+1][j] == color
-		|| (p[i+1][j] == EMPTY
-		    && i < board_size-2 && p[i+2][j] != other
-		    && j > 0 && p[i+1][j-1] != other
-		    && j < board_size-1 && p[i+1][j+1] != other)))
+	    && (BOARD(i+1, j) == color
+		|| (BOARD(i+1, j) == EMPTY
+		    && i < board_size-2 && BOARD(i+2, j) != other
+		    && j > 0 && BOARD(i+1, j-1) != other
+		    && j < board_size-1 && BOARD(i+1, j+1) != other)))
 	  ENQUEUE(i+1, j);
 
 	if (j > 0
 	    && !mx[i][j-1]
-	    && (p[i][j-1] == color
-		|| (p[i][j-1] == EMPTY
-		    && j > 1 && p[i][j-2] != other
-		    && i > 0 && p[i-1][j-1] != other
-		    && i < board_size-1 && p[i+1][j-1] != other)))
+	    && (BOARD(i, j-1) == color
+		|| (BOARD(i, j-1) == EMPTY
+		    && j > 1 && BOARD(i, j-2) != other
+		    && i > 0 && BOARD(i-1, j-1) != other
+		    && i < board_size-1 && BOARD(i+1, j-1) != other)))
 	  ENQUEUE(i, j-1);
 
 	if (j < board_size-1
 	    && !mx[i][j+1]
-	    && (p[i][j+1] == color
-		|| (p[i][j+1] == EMPTY
-		    && j < board_size-2 && p[i][j+2] != other
-		    && i > 0 && p[i-1][j+1] != other
-		    && i < board_size-1 && p[i+1][j+1] != other)))
+	    && (BOARD(i, j+1) == color
+		|| (BOARD(i, j+1) == EMPTY
+		    && j < board_size-2 && BOARD(i, j+2) != other
+		    && i > 0 && BOARD(i-1, j+1) != other
+		    && i < board_size-1 && BOARD(i+1, j+1) != other)))
 	  ENQUEUE(i, j+1);
 
 	/* For distance one intersections, allow kosumi to move out. I.e.
@@ -1557,31 +1560,35 @@ dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
 	 */
 	if (distance == 0) {
 	  if (i > 1 && j > 1
-	      && p[i][j-1] == EMPTY && p[i-1][j] == EMPTY
-	      && (p[i-1][j-1] == color
-		  || (p[i-1][j-1] == EMPTY
-		      && p[i-2][j-1] != other && p[i-1][j-2] != other)))
+	      && BOARD(i, j-1) == EMPTY && BOARD(i-1, j) == EMPTY
+	      && (BOARD(i-1, j-1) == color
+		  || (BOARD(i-1, j-1) == EMPTY
+		      && BOARD(i-2, j-1) != other
+		      && BOARD(i-1, j-2) != other)))
 	    ENQUEUE(i-1, j-1);
 
 	  if (i > 1 && j < board_size-2
-	      && p[i][j+1] == EMPTY && p[i-1][j] == EMPTY
-	      && (p[i-1][j+1] == color
-		  || (p[i-1][j+1] == EMPTY
-		      && p[i-2][j+1] != other && p[i-1][j+2] != other)))
+	      && BOARD(i, j+1) == EMPTY && BOARD(i-1, j) == EMPTY
+	      && (BOARD(i-1, j+1) == color
+		  || (BOARD(i-1, j+1) == EMPTY
+		      && BOARD(i-2, j+1) != other
+		      && BOARD(i-1, j+2) != other)))
 	    ENQUEUE(i-1, j+1);
 
 	  if (i < board_size-2 && j < board_size-2
-	      && p[i][j+1] == EMPTY && p[i+1][j] == EMPTY
-	      && (p[i+1][j+1] == color
-		  || (p[i+1][j+1] == EMPTY
-		      && p[i+2][j+1] != other && p[i+1][j+2] != other)))
+	      && BOARD(i, j+1) == EMPTY && BOARD(i+1, j) == EMPTY
+	      && (BOARD(i+1, j+1) == color
+		  || (BOARD(i+1, j+1) == EMPTY
+		      && BOARD(i+2, j+1) != other
+		      && BOARD(i+1, j+2) != other)))
 	    ENQUEUE(i+1, j+1);
 
 	  if (i < board_size-2 && j > 1
-	      && p[i][j-1] == EMPTY && p[i+1][j] == EMPTY
-	      && (p[i+1][j-1] == color
-		  || (p[i+1][j-1] == EMPTY
-		      && p[i+2][j-1] != other && p[i+1][j-2] != other)))
+	      && BOARD(i, j-1) == EMPTY && BOARD(i+1, j) == EMPTY
+	      && (BOARD(i+1, j-1) == color
+		  || (BOARD(i+1, j-1) == EMPTY
+		      && BOARD(i+2, j-1) != other
+		      && BOARD(i+1, j-2) != other)))
 	    ENQUEUE(i+1, j-1);
 	}
       }
@@ -1605,14 +1612,14 @@ compute_escape(int m, int n, int dragon_status_known)
   char goal[MAX_BOARD][MAX_BOARD];
   int escape_value[MAX_BOARD][MAX_BOARD];
 
-  ASSERT(p[m][n] != EMPTY, m, n);
+  ASSERT2(BOARD(m, n) != EMPTY, m, n);
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       goal[i][j] = same_dragon(i, j, m, n);
     }
 
-  compute_escape_influence(goal, p[m][n], escape_value, dragon_status_known);
+  compute_escape_influence(goal, BOARD(m, n), escape_value, dragon_status_known);
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
@@ -1624,14 +1631,14 @@ compute_escape(int m, int n, int dragon_status_known)
 	  escape_value[i][j] = 4;
       }
       else {
-	if (p[i][j] == p[m][n]
+	if (BOARD(i, j) == BOARD(m, n)
 	    && !goal[i][j]
 	    && worm[i][j].attack_code == 0)
 	  escape_value[i][j] = 2;
       }
     }
 
-  return dragon_escape(goal, p[m][n], escape_value);
+  return dragon_escape(goal, BOARD(m, n), escape_value);
 }
 
 
@@ -1645,8 +1652,8 @@ same_dragon(int ai, int aj, int bi, int bj)
   if (ai == -1 || aj == -1 || bi == -1 || bj == -1)
     return (ai == bi && aj == bj);
   
-  ASSERT_ON_BOARD(ai, aj);
-  ASSERT_ON_BOARD(bi, bj);
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
 
   return (dragon[ai][aj].origini == dragon[bi][bj].origini
 	  && dragon[ai][aj].originj == dragon[bi][bj].originj);
@@ -1715,7 +1722,7 @@ report_dragon(int m, int n)
 {
   int i, j, k;
 
-  if (p[m][n] == EMPTY) {
+  if (BOARD(m, n) == EMPTY) {
     gprintf("There is no dragon at %m\n", m, n);
     return;
   }
@@ -1801,8 +1808,3 @@ report_dragon(int m, int n)
  * c-basic-offset: 2
  * End:
  */
-
-
-
-
-

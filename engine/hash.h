@@ -81,7 +81,7 @@ typedef unsigned long Compacttype;
  * stone was captured.  It is illegal for the player to move to place
  * a stone on this point.  To do so would either be suicide, which is
  * illegal anyhow, or a violation of the ko rule.  If there is no ko
- * going on, ko_i == -1;
+ * going on, ko_pos == -1;
  */
 
 #define POINTSPERCOMPACT    ((int) sizeof(Compacttype) * 4)
@@ -90,9 +90,7 @@ typedef unsigned long Compacttype;
 
 typedef struct hashposition_t {
   Compacttype  board[COMPACT_BOARD_SIZE];
-  int          ko_i;
-  int          ko_j;
-  /*  int          to_move;   DISABLED  */
+  int          ko_pos;
 } Hashposition;
 
 
@@ -111,12 +109,11 @@ void hash_init(void);
 int hashposition_compare(Hashposition *pos1, Hashposition *pos2);
 void hashposition_dump(Hashposition *pos, FILE *outfile);
 
-void hashdata_recalc(Hash_data *hd, Intersection board[MAX_BOARD][MAX_BOARD],
-		     int ko_i, int ko_j);
+void hashdata_recalc(Hash_data *hd, Intersection *board, int ko_pos);
 int  hashdata_compare(Hash_data *hd1, Hash_data *hd2);
-void hashdata_set_ko(Hash_data *hd, int i, int j);
+void hashdata_set_ko(Hash_data *hd, int pos);
 void hashdata_remove_ko(Hash_data *hd);
-void hashdata_invert_stone(Hash_data *hd, int i, int j, int color);
+void hashdata_invert_stone(Hash_data *hd, int pos, int color);
 void hashdata_set_tomove(Hash_data *hd, int to_move);
 
 int hashdata_diff_dump(Hash_data *key1, Hash_data *key2);

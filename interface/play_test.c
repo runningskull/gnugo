@@ -161,10 +161,10 @@ replay_node(SGFNode *node, Gameinfo *gameinfo, int color_to_replay)
       mprintf("Move %d (%C): ", gameinfo->move_number + 1, color);
     
       mprintf("GNU Go plays %m ", i, j);
-      if (!is_pass(i, j))
+      if (!gnugo_is_pass(i, j))
 	printf("(%.2f) ", potential_moves[i][j]);
       mprintf("- Game move %m ", m, n);
-      if (!is_pass(m, n) && potential_moves[m][n] > 0.0)
+      if (!gnugo_is_pass(m, n) && potential_moves[m][n] > 0.0)
 	printf("(%.2f) ", potential_moves[m][n]);
       printf("\n");
     }

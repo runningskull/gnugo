@@ -41,20 +41,18 @@ static Hashnode *hashtable_enter_position(Hashtable *table, Hash_data *hd);
 static Hashnode *hashtable_search(Hashtable *table, Hash_data *hd);
 
 static Read_result *hashnode_search(Hashnode *node, int routine, int komaster,
-				    int kom_i, int kom_j, int i, int j);
+				    int kom_pos, int str);
 static Read_result *hashnode_new_result(Hashtable *table, Hashnode *node, 
-					int routine, 
-					int komaster, int kom_i, int kom_j,
-					int ri, int rj);
+					int routine, int komaster,
+					int kom_pos, int move);
 
 static void hashtable_unlink_closed_results(Hashnode *node, 
 					    int exclusions, 
 					    unsigned int stackplimit,
 					    int statistics[][20]);
 static void hashtable_partially_clear(Hashtable *table);
-static int do_get_read_result(int routine, int komaster, int kom_i, int kom_j,
-			      int *si, int *sj,
-			      Read_result **read_result);
+static int do_get_read_result(int routine, int komaster, int kom_pos,
+			      int *str, Read_result **read_result);
 
 /*
  * Dump an ASCII representation of the contents of a Read_result onto
@@ -67,18 +65,18 @@ void
 read_result_dump(Read_result *result, FILE *outfile)
 {
   fprintf(outfile, "Komaster %d (%d, %d) Routine %d, (%d, %d), depth: %d ",
-	  ((result->compressed_data) >> 29) & 0x03,
-	  (((result->compressed_data) >> 24) & 0x1f) - 1,
-	  (((result->compressed_data) >> 19) & 0x1f) - 1,
-	  ((result->compressed_data) >> 15) & 0x0f,
-	  ((result->compressed_data) >> 10) & 0x1f,
-	  ((result->compressed_data) >> 5)  & 0x1f,
-	  ((result->compressed_data) >> 0)  & 0x1f);
+	  rr_get_komaster(*result),
+	  I(rr_get_kom_pos(*result)),
+	  J(rr_get_kom_pos(*result)),
+	  rr_get_routine(*result),
+	  I(rr_get_str(*result)),
+	  J(rr_get_str(*result)),
+	  rr_get_stackp(*result));
   fprintf(outfile, "Result: %d %d, (%d, %d)\n",
-	  ((result->result_ri_rj) >> 24) & 0xff,
-	  ((result->result_ri_rj) >> 16) & 0xff,
-	  ((result->result_ri_rj) >> 8) & 0xff,
-	  ((result->result_ri_rj) >> 0) & 0xff);
+	  rr_get_status(*result),
+	  rr_get_result(*result),
+	  I(rr_get_move(*result)),
+	  J(rr_get_move(*result)));
 }
 
 
@@ -90,7 +88,7 @@ read_result_dump(Read_result *result, FILE *outfile)
 void
 hashnode_dump(Hashnode *node, FILE *outfile)
 {
-  Read_result  * result;
+  Read_result *result;
 
   /* Data about the node itself. */
   fprintf(outfile, "Hash value: %lx\n", (unsigned long) node->key.hashval);
@@ -112,7 +110,7 @@ void
 hashtable_dump(Hashtable *table, FILE *outfile)
 {
   int i;
-  Hashnode * hn;
+  Hashnode *hn;
 
   /* Data about the table itself. */
   fprintf(outfile, "Dump of hashtable\n");
@@ -194,7 +192,7 @@ hashtable_dump2(Hashtable *table, FILE *outfile)
  */
 
 static int
-hashtable_init(Hashtable *table, 
+hashtable_init(Hashtable *table,
 	       int tablesize, int num_nodes, int num_results)
 {
   /* Make sure the hash system is initialized. */
@@ -244,7 +242,7 @@ hashtable_init(Hashtable *table,
 static Hashtable *
 hashtable_new(int tablesize, int num_nodes, int num_results)
 {
-  Hashtable  * table;
+  Hashtable *table;
 
   /* Make sure the hash system is initialized. */
   hash_init();
@@ -352,7 +350,8 @@ hashtable_partially_clear(Hashtable *table)
   
   int statistics[NUM_ROUTINES][20];
 
-  DEBUG(DEBUG_READING_PERFORMANCE, "Hashtable cleared because it was full.\n");
+  DEBUG(DEBUG_READING_PERFORMANCE,
+	"Hashtable cleared because it was full.\n");
 
   for (k = 0; k < NUM_ROUTINES; ++k)
     for (l = 0; l < 20; ++l)
@@ -424,7 +423,8 @@ hashtable_partially_clear(Hashtable *table)
 
   /* FIXME: This is not entirely safe although it probably works more
    * than 99.999% of all cases.  If result no 0 or node no 0 is not
-   * free after the partial clearing, this will explode into our face. */
+   * free after the partial clearing, this will explode into our face.
+   */
   table->free_result = 0;
   table->free_node = 0;
 }
@@ -433,13 +433,14 @@ hashtable_partially_clear(Hashtable *table)
 /*
  * Enter a position with a given hash value into the table.  Return 
  * a pointer to the hash node where it was stored.  If it is already
- * there, don't enter it again, but return a pointer to the old one. */
+ * there, don't enter it again, but return a pointer to the old one.
+ */
 
 static Hashnode *
 hashtable_enter_position(Hashtable *table, Hash_data *hd)
 {
-  Hashnode  * node;
-  int         bucket;
+  Hashnode *node;
+  int bucket;
 
   /* If the position is already in the table, return a pointer to it. */
   node = hashtable_search(table, hd);
@@ -456,7 +457,7 @@ hashtable_enter_position(Hashtable *table, Hash_data *hd)
   if (table->free_node == table->num_nodes)
     return NULL;
 
-  /* It wasn't there and there is still room.  Allocate a new node for it... */
+  /* It wasn't there and there is still room. Allocate a new node for it... */
   node = &(table->all_nodes[table->free_node++]);
   node->key = *hd;
   node->results = NULL;
@@ -507,14 +508,13 @@ hashtable_search(Hashtable *table, Hash_data *hd)
  */
 
 static Read_result *
-hashnode_search(Hashnode *node, int routine, 
-		int komaster, int kom_i, int kom_j, int i, int j)
+hashnode_search(Hashnode *node, int routine, int komaster, int kom_pos,
+		int str)
 {
-  Read_result  * result;
-  unsigned int   search_for;
+  Read_result *result;
+  unsigned int search_for;
 
-  search_for = rr_compress_data(rr, routine, komaster, kom_i, kom_j,
-				i, j, stackp);
+  search_for = rr_compress_data(rr, routine, komaster, kom_pos,	str, stackp);
 
   for (result = node->results; result != NULL; result = result->next) {
     if (result->compressed_data == search_for)
@@ -534,9 +534,9 @@ hashnode_search(Hashnode *node, int routine,
 
 static Read_result *
 hashnode_new_result(Hashtable *table, Hashnode *node, int routine, 
-		    int komaster, int kom_i, int kom_j, int i, int j)
+		    int komaster, int kom_pos, int str)
 {
-  Read_result  * result;
+  Read_result *result;
 
   /* If the next result is not free, skip until we find one which is free. */
   while (table->free_result < table->num_results
@@ -556,7 +556,7 @@ hashnode_new_result(Hashtable *table, Hashnode *node, int routine,
 
   /* Now, put the routine number into it. */
   result->compressed_data = rr_compress_data(rr, routine, komaster,
-					     kom_i, kom_j, i, j, stackp);
+					     kom_pos, str, stackp);
 
   /* And set the status to open. */
   result->result_ri_rj = 1 << 24;
@@ -592,8 +592,9 @@ reading_cache_init(int bytes)
 			   (int) (1.4 * nodes)); /* read results */
   
   if (!movehash) {
-    fprintf(stderr, "Warning: failed to allocate hashtable, caching disabled.\n");
-      hashflags = HASH_NOTHING;
+    fprintf(stderr,
+	    "Warning: failed to allocate hashtable, caching disabled.\n");
+    hashflags = HASH_NOTHING;
   }
 }
 
@@ -610,8 +611,8 @@ reading_cache_clear()
  */
 
 int
-get_read_result(int routine, int komaster, int kom_i, int kom_j,
-		int *si, int *sj, Read_result **read_result)
+get_read_result(int routine, int komaster, int kom_pos, int *str,
+		Read_result **read_result)
 {
   int result;
   /* Only store the result if stackp <= depth. Above that, there
@@ -625,31 +626,29 @@ get_read_result(int routine, int komaster, int kom_i, int kom_j,
   /* Find the origin of the string containing (si, sj),
    * in order to make the caching of read results work better.
    */
-  find_origin(*si, *sj, si, sj);
+  *str = find_origin(*str);
   
-  result = do_get_read_result(routine, komaster, kom_i, kom_j,
-			      si, sj, read_result);
+  result = do_get_read_result(routine, komaster, kom_pos, str, read_result);
   if (*read_result == NULL) {
     /* Clean up the hashtable and try once more. */
     hashtable_partially_clear(movehash);
-    result = do_get_read_result(routine, komaster, kom_i, kom_j, si, sj,
-				read_result);
+    result = do_get_read_result(routine, komaster, kom_pos, str, read_result);
   }
   return result;
 }
 
 static int
-do_get_read_result(int routine, int komaster, int kom_i, int kom_j,
-		   int *si, int *sj, Read_result **read_result)
+do_get_read_result(int routine, int komaster, int kom_pos,
+		   int *str, Read_result **read_result)
 {
-  Hashnode      * hashnode;
-  int             retval;
+  Hashnode *hashnode;
+  int retval;
 
 #if CHECK_HASHING
   Hash_data    key;
 
   /* Check the hash table to see if we have had this position before. */
-  hashdata_recalc(&key, p, ko_i, ko_j);
+  hashdata_recalc(&key, board, board_ko_pos);
   gg_assert(hashdata_diff_dump(&key, &hashdata) == 0);
 
   /* Find this position in the table.  If it wasn't found, enter it. */
@@ -658,7 +657,8 @@ do_get_read_result(int routine, int komaster, int kom_i, int kom_j,
     stats.position_hits++;
     RTRACE("We found position %H in the hash table...\n",
 	   (unsigned long) hashdata.hashval);
-  } else {
+  }
+  else {
     hashnode = hashtable_enter_position(movehash, &hashdata);
     if (hashnode)
       RTRACE("Created position %H in the hash table...\n",
@@ -671,7 +671,8 @@ do_get_read_result(int routine, int komaster, int kom_i, int kom_j,
     stats.position_hits++;
     RTRACE("We found position %H in the hash table...\n",
 	   (unsigned long) hashdata.hashval);
-  } else {
+  }
+  else {
     hashnode = hashtable_enter_position(movehash, &hashdata);
     if (hashnode)
       RTRACE("Created position %H in the hash table...\n",
@@ -684,21 +685,23 @@ do_get_read_result(int routine, int komaster, int kom_i, int kom_j,
     /* No hash node, so we can't enter a result into it. */
     *read_result = NULL;
 
-  } else {
+  }
+  else {
 
     /* We found it!  Now see if we can find a previous result. */
-    *read_result = hashnode_search(hashnode, routine, komaster, kom_i, kom_j,
-				   *si, *sj);
+    *read_result = hashnode_search(hashnode, routine, komaster, kom_pos,
+				   *str);
 
     if (*read_result != NULL) {
       stats.read_result_hits++;
       retval = 1;
-    } else {
-      RTRACE("...but no previous result for routine %d and (%m)...",
-	     routine, *si, *sj);
+    }
+    else {
+      RTRACE("...but no previous result for routine %d and (%1m)...",
+	     routine, *str);
 
       *read_result = hashnode_new_result(movehash, hashnode, routine,
-					 komaster, kom_i, kom_j, *si, *sj);
+					 komaster, kom_pos, *str);
       
       if (*read_result == NULL)
 	RTRACE("%o...and unfortunately there was no room for one.\n");
@@ -716,29 +719,30 @@ do_get_read_result(int routine, int komaster, int kom_i, int kom_j,
  */
 
 void
-sgf_trace(const char *func, int si, int sj, int i, int j,
-	  int result, const char *message)
+sgf_trace(const char *func, int str, int move, int result,
+	  const char *message)
 {
   char buf[100];
 
-  sprintf(buf, "%s %c%d: ", func, sj + 'A' + (sj>=8), board_size - si);
+  sprintf(buf, "%s %c%d: ", func, J(str) + 'A' + (J(str) >= 8),
+	  board_size - I(str));
   
   if (result == 0)
     sprintf(buf + strlen(buf), "0");
-  else if (ON_BOARD(i, j))
+  else if (ON_BOARD(move))
     sprintf(buf + strlen(buf), "%s %c%d", result_to_string(result), 
-	    j + 'A' + (j>=8),
-	    board_size - i);
-  else if (i == -1 && j == -1)
+	    J(move) + 'A' + (J(move) >= 8),
+	    board_size - I(move));
+  else if (is_pass(move))
     sprintf(buf + strlen(buf), "%s PASS", result_to_string(result));
   else
-    sprintf(buf + strlen(buf), "%s [%d,%d]", result_to_string(result), i, j);
+    sprintf(buf + strlen(buf), "%s [%d]", result_to_string(result), move);
 
   if (message)
     sprintf(buf + strlen(buf), " (%s)", message);
   
   sgftreeAddComment(sgf_dumptree, NULL, buf);
-}  
+}
 
 /*
  * Local Variables:
@@ -746,5 +750,3 @@ sgf_trace(const char *func, int si, int sj, int i, int j,
  * c-basic-offset: 2
  * End:
  */
-
-

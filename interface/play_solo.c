@@ -159,7 +159,7 @@ load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo,
   else {
     genmove(&i, &j, next);
     
-    if (is_pass(i, j)) {
+    if (is_pass(POS(i, j))) {
       gprintf("%s move: PASS!\n", next == WHITE ? "white (o)" : "black (X)");
       sgffile_move_made(i, j, next, 0);
     }
@@ -210,7 +210,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
     until = 9999;
     do {
       move_val = genmove_conservative(&i, &j, next);
-      play_move(i, j, next);
+      play_move(POS(i, j), next);
       if (move_val >= 0) {
 	pass = 0;
 	gprintf("%d %s move %m\n", gameinfo->move_number,

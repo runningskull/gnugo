@@ -164,6 +164,12 @@ static void matchpat_loop(matchpat_callback_fn_ptr callback,
 void transform(int i, int j, int *ti, int *tj, int trans);
 void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 
+/* The pattern matcher still works in 2D and has a private copy of the
+ * board here.
+ */
+static Intersection p[MAX_BOARD][MAX_BOARD];
+static void board_to_p(void);
+
 /* Precomputed tables to allow rapid checks on the piece at
  * the board. This table relies on the fact that color is
  * 1 or 2.
@@ -244,16 +250,16 @@ fixup_patterns_for_board_size(struct pattern *pattern)
        * called, this step is effectively a no-op.
        */
       
-      if (pattern->edge_constraints & NORTH)
+      if (pattern->edge_constraints & NORTH_EDGE)
 	pattern->maxi = pattern->mini + pattern->height;
 	
-      if (pattern->edge_constraints & SOUTH)
+      if (pattern->edge_constraints & SOUTH_EDGE)
 	pattern->mini = pattern->maxi - pattern->height;
 	
-      if (pattern->edge_constraints & WEST)
+      if (pattern->edge_constraints & WEST_EDGE)
 	pattern->maxj = pattern->minj + pattern->width;
       
-      if (pattern->edge_constraints & EAST)
+      if (pattern->edge_constraints & EAST_EDGE)
 	pattern->minj = pattern->maxj - pattern->width;
       
       /* we extend the pattern in the direction opposite the constraint,
@@ -262,19 +268,19 @@ fixup_patterns_for_board_size(struct pattern *pattern)
        * we need to be a bit careful !
        */
       
-      if (pattern->edge_constraints & NORTH)
+      if (pattern->edge_constraints & NORTH_EDGE)
 	if (pattern->maxi < (board_size-1) + pattern->mini)
 	  pattern->maxi = (board_size-1) + pattern->mini;
       
-      if (pattern->edge_constraints & SOUTH)
+      if (pattern->edge_constraints & SOUTH_EDGE)
 	if (pattern->mini > pattern->maxi - (board_size-1))
 	  pattern->mini = pattern->maxi - (board_size-1);
       
-      if (pattern->edge_constraints & WEST)
+      if (pattern->edge_constraints & WEST_EDGE)
 	if (pattern->maxj <  (board_size-1) + pattern->minj)
 	  pattern->maxj = (board_size-1) + pattern->minj;
       
-      if (pattern->edge_constraints & EAST)
+      if (pattern->edge_constraints & EAST_EDGE)
 	if (pattern->minj > pattern->maxj - (board_size-1))
 	  pattern->minj = pattern->maxj - (board_size-1);
     }
@@ -371,7 +377,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
   int merged_val;
 
   /* Basic sanity checks. */
-  ASSERT_ON_BOARD(m, n);
+  ASSERT_ON_BOARD2(m, n);
 
   /* calculate the merged value around [m][n] for the grid opt */
   {
@@ -382,7 +388,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
     for (i = m-1; i <= m+2; ++i)
       for (j = n-1; j <= n+2; shift -= 2, ++j) {
 	uint32 this;
-	if (!ON_BOARD(i, j))
+	if (!ON_BOARD2(i, j))
 	  this = 3;
 	else if ((this=p[i][j]) == 0)
 	  continue;
@@ -496,7 +502,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 		pattern->name, ll, m, n, mi, mj, xi, xj);
 
 	  /* now do the range-check */
-	  if (!ON_BOARD(m+mi, n+mj) || !ON_BOARD(m+xi, n+xj))
+	  if (!ON_BOARD2(m+mi, n+mj) || !ON_BOARD2(m+xi, n+xj))
 	    continue;  /* out of range */
 	}
 
@@ -520,7 +526,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	  x += m;
 	  y += n;
 
-	  ASSERT_ON_BOARD(x, y);
+	  ASSERT_ON_BOARD2(x, y);
 
 	  /* ...and check that p[x][y] matches (see above). */
 	  if ((p[x][y] & and_mask[color-1][att]) != val_mask[color-1][att])
@@ -547,7 +553,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 
 	/* Make sure the grid optimisation wouldn't have 
            rejected this pattern */
-	ASSERT((merged_val & pattern->and_mask[ll])
+	ASSERT2((merged_val & pattern->and_mask[ll])
 	       == pattern->val_mask[ll], m, n);
 
 #endif /* we don't trust the grid optimisation */
@@ -675,6 +681,11 @@ static const char *s=" --> using dfa\n";
 void
 dfa_match_init(void)
 {
+  /* Copy the board to the p array.
+   * FIXME: Check whether this is needed here.
+   */
+  board_to_p();
+
   buildSpiralOrder (spiral);
 
   if (owl_vital_apat_db.pdfa != NULL && !quiet)
@@ -805,7 +816,7 @@ scan_for_patterns(dfa_t *pdfa, int l, int m, int n, int *pat_list)
 
     }
 
-  ASSERT(row < MAX_ORDER,m,n);
+  ASSERT2(row < MAX_ORDER,m,n);
   return id;
 }
 
@@ -837,7 +848,7 @@ do_dfa_matchpat(dfa_t *pdfa,
   int maxr = 0, k;
 
   /* Basic sanity checks. */
-  ASSERT_ON_BOARD(m, n);
+  ASSERT_ON_BOARD2(m, n);
 
   /* Geometrical pattern matching */
   maxr = 0;
@@ -849,7 +860,7 @@ do_dfa_matchpat(dfa_t *pdfa,
       preorder = reorder + maxr;
     }
 
-  ASSERT(maxr < DFA_MAX_MATCHED,m,n);
+  ASSERT2(maxr < DFA_MAX_MATCHED,m,n);
 
   /* Sorting patterns keep the same order as 
    * standard pattern matching algorithm */
@@ -909,7 +920,7 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
     TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
     x += m;
     y += n;
-    ASSERT_ON_BOARD(x, y);
+    ASSERT_ON_BOARD2(x, y);
 
     /* goal check */
     if (goal != NULL) {
@@ -1011,6 +1022,9 @@ global_matchpat(matchpat_callback_fn_ptr callback, int color,
   loop_fn_ptr_t loop = matchpat_loop;
   prepare_fn_ptr_t prepare = prepare_for_match;
 
+  /* Copy the board to the p array. */
+  board_to_p();
+
   /* check board size */
   if (pdb->fixed_for_size != board_size) {
     fixup_patterns_for_board_size(pdb->patterns);
@@ -1073,6 +1087,9 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
   gg_assert(color != EMPTY);
   gg_assert(board_size%2 == 1);
   
+  /* Copy the board to the p array. */
+  board_to_p();
+
   /* Count the number of stones on the board. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
@@ -1100,7 +1117,7 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
 	x += mid;
 	y += mid;
 
-        ASSERT_ON_BOARD(x, y);
+        ASSERT_ON_BOARD2(x, y);
 
 	if ((att == ATT_O && p[x][y] != color)
 	    || (att == ATT_X && p[x][y] != other))
@@ -1120,6 +1137,14 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
   }
 }
 
+/* Copy the 1D board array to the 2D p array. */
+static void board_to_p(void)
+{
+  int m, n;
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++)
+      p[m][n] = BOARD(m, n);
+}
 
 /*
  * Local Variables:

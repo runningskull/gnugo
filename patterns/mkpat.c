@@ -116,7 +116,7 @@ const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPQ
 int maxi, maxj;                 /* (i,j) offsets of largest element */
 int mini, minj;                 /* offset of top-left element
 				   (0,0) unless there are edge constraints */
-int where;                      /* NORTH | WEST, etc */
+int where;                      /* NORTH_EDGE | WEST_EDGE, etc */
 int el;                         /* next element number in current pattern */
 struct patval elements[MAX_BOARD*MAX_BOARD]; /* elements of current pattern */
 int num_stars;
@@ -160,7 +160,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"lib2",            1, "worm[%ci][%cj].liberties2"},
   {"lib3",            1, "worm[%ci][%cj].liberties3"},
   {"lib4",            1, "worm[%ci][%cj].liberties4"},
-  {"lib",             1, "countlib(%ci,%cj)"},
+  {"lib",             1, "countlib2(%ci,%cj)"},
   {"alive",           1, "(dragon[%ci][%cj].matcher_status == ALIVE)"},
   {"unknown",         1, "(dragon[%ci][%cj].matcher_status == UNKNOWN)"},
   {"critical",        1, "(dragon[%ci][%cj].matcher_status == CRITICAL)"},
@@ -175,10 +175,10 @@ static struct autohelper_func autohelper_functions[] = {
   {"attack",          1, "ATTACK_MACRO(%ci,%cj)"},
   {"defend",          1, "DEFEND_MACRO(%ci,%cj)"},
   {"weak",            1, "DRAGON_WEAK(%ci,%cj)"},
-  {"safe_xmove",      1, "safe_move(%ci,%cj,OTHER_COLOR(color))"},
-  {"safe_omove",      1, "safe_move(%ci,%cj,color)"},
-  {"legal_xmove",     1, "is_legal(%ci,%cj,other)"},
-  {"legal_omove",     1, "is_legal(%ci,%cj,color)"},
+  {"safe_xmove",      1, "safe_move2(%ci,%cj,OTHER_COLOR(color))"},
+  {"safe_omove",      1, "safe_move2(%ci,%cj,color)"},
+  {"legal_xmove",     1, "is_legal2(%ci,%cj,other)"},
+  {"legal_omove",     1, "is_legal2(%ci,%cj,color)"},
   {"x_somewhere",     -1, "somewhere(OTHER_COLOR(color), %d"},
   {"o_somewhere",     -1, "somewhere(color, %d"},
   {"xmoyo",           1, "(influence_moyo_color(%ci,%cj) == OTHER_COLOR(color))"},
@@ -188,8 +188,8 @@ static struct autohelper_func autohelper_functions[] = {
   {"xterri",          1, "(influence_territory_color(%ci,%cj) == OTHER_COLOR(color))"},
   {"oterri",          1, "(influence_territory_color(%ci,%cj) == color)"},
   {"genus",           1, "dragon[%ci][%cj].genus"},
-  {"xlib",            1, "accurate_approxlib(%ci,%cj,OTHER_COLOR(color), MAXLIBS, NULL, NULL)"},
-  {"olib",            1, "accurate_approxlib(%ci,%cj,color, MAXLIBS, NULL, NULL)"},
+  {"xlib",            1, "accurate_approxlib(POS(%ci,%cj),OTHER_COLOR(color), MAXLIBS, NULL)"},
+  {"olib",            1, "accurate_approxlib(POS(%ci,%cj),color, MAXLIBS, NULL)"},
   {"xcut",            1, "cut_possible(%ci,%cj,OTHER_COLOR(color))"},
   {"ocut",            1, "cut_possible(%ci,%cj,color)"},
   {"xplay_defend_both",   -2,
@@ -215,7 +215,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"marginal_eye",    1, "marginal_eye_space(%ci,%cj)"},
   {"halfeye",         1, "halfeye(half_eye,%ci,%cj)"},
   {"max_eye_value",   1, "max_eye_value(%ci,%cj)"},
-  {"owl_topological_eye", 2, "owl_topological_eye(%ci,%cj,p[%ci][%cj])"},
+  {"owl_topological_eye", 2, "owl_topological_eye(%ci,%cj,BOARD(%ci,%cj))"},
   {"obvious_false_oeye", 1, "obvious_false_eye(%ci,%cj,color)"},
   {"obvious_false_xeye", 1, "obvious_false_eye(%ci,%cj,OTHER_COLOR(color))"},
   {"antisuji",        1, "add_antisuji_move(%ci,%cj)"},
@@ -227,7 +227,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"same_dragon",     2, "same_dragon(%ci,%cj,%ci,%cj)"},
   {"same_worm",       2, "same_worm(%ci,%cj,%ci,%cj)"},
   {"dragonsize",      1, "dragon[%ci][%cj].size"},
-  {"wormsize",        1, "countstones(%ci,%cj)"},
+  {"wormsize",        1, "countstones2(%ci,%cj)"},
   {"effective_size",  1, "dragon[%ci][%cj].effective_size"},
   {"vital_chain",     1, "vital_chain(%ci,%cj)"},
   {"potential_cutstone",1,"worm[%ci][%cj].cutstone2>1"},
@@ -359,7 +359,7 @@ find_extents(void)
 
   /* apply edge constraints to the size of the pattern */
 
-  if (where & (NORTH|SOUTH|EAST|WEST))
+  if (where & (NORTH_EDGE|SOUTH_EDGE|EAST_EDGE|WEST_EDGE))
     ++pats_with_constraints;
 
   if (verbose)
@@ -476,8 +476,8 @@ read_pattern_line(char *p)
   int j;
   int width;
 
-  if (where & SOUTH)
-    /* something wrong here : pattern line after a SOUTH constraint */
+  if (where & SOUTH_EDGE)
+    /* something wrong here : pattern line after a SOUTH_EDGE constraint */
     goto fatal;
 
 
@@ -485,16 +485,16 @@ read_pattern_line(char *p)
     /* must be a north/south constraint */
 
     if (maxi == 0)
-      where |= NORTH;
+      where |= NORTH_EDGE;
     else
-      where |= SOUTH;
+      where |= SOUTH_EDGE;
 
     if (*p == '+') {
-      if (maxi > 0 && !(where & WEST))
+      if (maxi > 0 && !(where & WEST_EDGE))
 	/* if this is end of pattern, must already know about west */
 	goto fatal;
 
-      where |= WEST;
+      where |= WEST_EDGE;
       ++p;
     }
 
@@ -506,10 +506,10 @@ read_pattern_line(char *p)
       goto fatal;
 
     if (*p == '+') {
-      if (maxi > 0 && !(where & EAST))
+      if (maxi > 0 && !(where & EAST_EDGE))
 	/* if this is end of pattern, must already know about west */
 	goto fatal;
-      where |= EAST;
+      where |= EAST_EDGE;
     }
 
     if (maxi > 0 && width != maxj)
@@ -527,14 +527,14 @@ read_pattern_line(char *p)
     /* if this is not the first line, or if there is a north
      * constraint, we should already know about it
      */
-    if (!(where & WEST) && ((where & NORTH) || maxi > 0))
+    if (!(where & WEST_EDGE) && ((where & NORTH_EDGE) || maxi > 0))
       /* we should already know about this constraint */
       goto fatal;
 
-    where |= WEST;
+    where |= WEST_EDGE;
     ++p;
   }
-  else if (where & WEST)
+  else if (where & WEST_EDGE)
     /* need a | if we are already constrained to west */
     goto fatal;
 
@@ -606,13 +606,13 @@ read_pattern_line(char *p)
     /* if this is not the first line, or if there is a north
      * constraint, we should already know about it
      */
-    if (!(where & EAST) && ((where & NORTH) || maxi > 0))
+    if (!(where & EAST_EDGE) && ((where & NORTH_EDGE) || maxi > 0))
       goto fatal;  /* we should already know about this constraint */
 
-    where |= EAST;
+    where |= EAST_EDGE;
 
   }
-  else if (where & EAST)
+  else if (where & EAST_EDGE)
     goto fatal;  /* need a | if we are already constrained to east */
 
 
@@ -853,7 +853,7 @@ finish_pattern(char *line)
   
   switch(symmetry) {
   case '+' :
-    if (where & (NORTH|EAST|SOUTH|WEST))
+    if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
 	      "Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
 	      pattern_names[patno]);
@@ -861,7 +861,7 @@ finish_pattern(char *line)
     break;
 
   case 'X' : 
-    if (where & (NORTH|EAST|SOUTH|WEST))
+    if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
 	      "Warning : X symmetry inconsistent with edge constraints (pattern %s)\n", 
 	      pattern_names[patno]);
@@ -873,7 +873,7 @@ finish_pattern(char *line)
     break;
 
   case '-' :
-    if (where & (NORTH|SOUTH))
+    if (where & (NORTH_EDGE|SOUTH_EDGE))
       fprintf(stderr,
 	      "Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
 	      pattern_names[patno]);
@@ -881,7 +881,7 @@ finish_pattern(char *line)
     break;
     
   case '|' :
-    if (where & (EAST|WEST))
+    if (where & (EAST_EDGE|WEST_EDGE))
       fprintf(stderr,
 	      "Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
 	      pattern_names[patno]);
@@ -902,7 +902,7 @@ finish_pattern(char *line)
     break;
 
   case 'O' :
-    if (where & (NORTH|EAST|SOUTH|WEST))
+    if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
 	      "Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
 	      pattern_names[patno]);

@@ -289,9 +289,9 @@ common_hash_board(struct invariant_hash *hash, int color_to_play)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       for (k = 0; k < 8; k++) {
-	if (p[m][n] == color_to_play)
+	if (BOARD(m, n) == color_to_play)
 	  hash->values[k] ^= O_hash[k][m][n];
-	else if (p[m][n] != EMPTY)
+	else if (BOARD(m, n) != EMPTY)
 	  hash->values[k] ^= X_hash[k][m][n];
       }
     }
@@ -344,7 +344,7 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
     case SGFAB:
       get_moveXY(prop, &i, &j, board_size);
       /* Put handicap stones on the board at once. */
-      add_stone(i, j, BLACK);
+      add_stone2(i, j, BLACK);
       break;
       
     case SGFAW:
@@ -468,9 +468,9 @@ store_pattern_if_winner(struct invariant_hash *pre,
       int i,j;
       for (i = 0; i < board_size; i++)
 	for (j = 0; j < board_size; j++) {
-	  if (p[i][j] == EMPTY)
+	  if (BOARD(i, j) == EMPTY)
 	    winning_moves[k].pattern[i][j] = '.';
-	  else if (p[i][j] == color)
+	  else if (BOARD(i, j) == color)
 	    winning_moves[k].pattern[i][j] = 'O';
 	  else
 	    winning_moves[k].pattern[i][j] = 'X';
@@ -511,7 +511,7 @@ examine_game(SGFNode *sgf, int collect_statistics)
       add_situation(&prehash, &posthash);
     else
       store_pattern_if_winner(&prehash, &posthash, color, m, n);
-    play_move(m, n, color);
+    play_move(POS(m, n), color);
 
     /* Debug output. */
     if (0) {

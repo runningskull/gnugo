@@ -62,7 +62,7 @@ loadsgf games/FSF-neurogo.sgf 176
 # This may be hard to fix at this point but since we
 # can't win the ko we shouldn't start it.
 13 gg_genmove white
-#? [!P7]*
+#? [!P7]
 
 loadsgf games/FSF-neurogo.sgf 178
 14 gg_genmove white

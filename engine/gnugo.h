@@ -123,10 +123,8 @@ typedef unsigned char Intersection;
 typedef struct {
   int          boardsize;
   Intersection board[MAX_BOARD][MAX_BOARD];
-  int          ko_i;
-  int          ko_j;
-  int          last_i[2];
-  int          last_j[2];
+  int          ko_pos;
+  int          last[2];
 
   float        komi;
   int          white_captured;
@@ -137,6 +135,7 @@ void gnugo_clear_position(Position *pos, int boardsize, float komi);
 void gnugo_copy_position(Position *to, Position *from);
 void gnugo_add_stone(Position *pos, int i, int j, int color);
 void gnugo_remove_stone(Position *pos, int i, int j);
+int  gnugo_is_pass(int i, int j);
 void gnugo_play_move(Position *pos, int i, int j, int color);
 int  gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move);
 int  gnugo_play_sgftree(Position *position, SGFNode *root, int *until, 
@@ -205,8 +204,8 @@ extern int showstack;		/* debug stack pointer */
 extern int showstatistics;	/* print statistics */
 extern int profile_patterns;	/* print statistics of pattern usage */
 
-extern int last_moves_i[2];
-extern int last_moves_j[2];
+/* FIXME: This should be in liberty.h. */
+extern int last_moves[2];
 
 /* debug flag bits */
 /* NOTE : can specify -d0x... */
@@ -317,7 +316,8 @@ void showboard(int xo);  /* ascii rep. of board to stdout */
 void gprintf(const char *fmt, ...);
 void mprintf(const char *fmt, ...);
 const char *color_to_string(int color);
-const char *location_to_string(int i, int j);
+const char *location_to_string(int pos);
+const char *location_to_string2(int i, int j);
 const char *status_to_string(int status);
 const char *safety_to_string(int status);
 const char *result_to_string(int result);
@@ -388,28 +388,26 @@ int  get_trymove_counter(void);
 /* board.c */
 /* General board handling. */
 void clear_board(void);
-void setup_board(Intersection new_p[MAX_BOARD][MAX_BOARD], int koi, int koj,
-		 int *last_i, int *last_j, 
-		 float new_komi, int w_captured, int b_captured);
+void setup_board(Intersection new_board[MAX_BOARD][MAX_BOARD], int ko_pos,
+		 int *last, float new_komi, int w_captured, int b_captured);
 
 
 /* Putting stones on the board.. */
-void add_stone(int i, int j, int color);
-void remove_stone(int i, int j);
-void play_move(int i, int j, int color);
-int is_legal(int i, int j, int color);
-int is_suicide(int i, int j, int color);
-int is_illegal_ko_capture(int i, int j, int color);
-int trymove(int i, int j, int color, const char *message, int k, int l, 
-	    int komaster, int kom_i, int kom_j);
-int tryko(int i, int j, int color, const char *message, 
-	  int komaster, int kom_i, int kom_j);
+void add_stone(int pos, int color);
+void remove_stone(int pos);
+void play_move(int pos, int color);
+int is_pass(int pos);
+int is_legal(int pos, int color);
+int is_suicide(int pos, int color);
+int is_illegal_ko_capture(int pos, int color);
+int trymove(int pos, int color, const char *message, int str, 
+	    int komaster, int kom_pos);
+int tryko(int pos, int color, const char *message, 
+	  int komaster, int kom_pos);
 void popgo(void);
 
 /* utils.c */
-void change_matcher_status(int x, int y, int status);
-int same_dragon(int ai, int aj, int bi, int bj);
-int is_worm_origin(int wi, int wj, int i, int j);
+void change_matcher_status(int m, int n, int status);
 void who_wins(int color, FILE* outfile);
 
 /* high-level routine to generate the best move for the given color */
@@ -421,15 +419,18 @@ float aftermath_compute_score(int color, float komi);
 int aftermath_final_status(int color, int m, int n);
 
 /* Basic information gathering. */
-/* worms.c */
+/* worm.c */
 void build_worms(void);
 void make_worms(void);
 int is_same_worm(int ai, int aj, int bi, int bj);
+int is_worm_origin(int wi, int wj, int i, int j);
 
+/* dragon.c */
 void make_dragons(int color, int stop_before_owl);
 void show_dragons(void);
 int dragon_status(int i, int j);
 int matcher_status(int i, int j);
+int same_dragon(int ai, int aj, int bi, int bj);
 
 /* moyo functions */
 void print_moyo(void);
@@ -449,8 +450,8 @@ void sgffile_write_comment(const char *comment);
 void sgffile_printboard(int next);
 void sgffile_recordboard(SGFNode *node);
 
-void decidestring(int i, int j, const char *sgf_output);
-void decidedragon(int i, int j, const char *sgf_output);
+void decidestring(int m, int n, const char *sgf_output);
+void decidedragon(int m, int n, const char *sgf_output);
 void decidesemeai(int ai, int aj, int bi, int bj, const char *sgf_output);
 void decideposition(int color, const char *sgf_output);
 void decideeye(int m, int n, const char *sgf_output);

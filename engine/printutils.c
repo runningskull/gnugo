@@ -91,18 +91,47 @@ vgprintf(FILE* outputfile, const char *fmt, va_list ap)
 	int n = va_arg(ap, int);
 	if (m == -1 && n == -1)
 	  fputs("PASS", outputfile);
-	else if (m < 0 || n < 0 || m >= board_size || n >= board_size)
+	else if (!ON_BOARD2(m, n))
 	  fprintf(outputfile, "[%d,%d]", m, n);
 	else {
 	  /* Generate the move name. */
-	  if (n<8)
-	    movename[0] = n+65;
+	  if (n < 8)
+	    movename[0] = n + 65;
 	  else
-	    movename[0] = n+66;
+	    movename[0] = n + 66;
 	  if (*fmt == 'm')
-	    sprintf(movename+1, "%d", board_size-m);
+	    sprintf(movename+1, "%d", board_size - m);
 	  else
-	    sprintf(movename+1, "%-2d", board_size-m);
+	    sprintf(movename+1, "%-2d", board_size - m);
+	  fputs(movename, outputfile);
+	}
+	break;
+      }
+      case '1':
+      fmt++;
+      if (*fmt != 'm' && *fmt != 'M') {
+	fprintf(outputfile, "\n\nUnknown format string '1%c'\n", *fmt);
+	break;
+      }
+      else {
+	char movename[4];
+	int pos = va_arg(ap, int);
+	int m = I(pos);
+	int n = J(pos);
+	if (pos == 0)
+	  fputs("PASS", outputfile);
+	else if (!ON_BOARD1(pos))
+	  fprintf(outputfile, "[%d]", pos);
+	else {
+	  /* Generate the move name. */
+	  if (n < 8)
+	    movename[0] = n + 65;
+	  else
+	    movename[0] = n + 66;
+	  if (*fmt == 'm')
+	    sprintf(movename + 1, "%d", board_size - m);
+	  else
+	    sprintf(movename + 1, "%-2d", board_size - m);
 	  fputs(movename, outputfile);
 	}
 	break;
@@ -279,12 +308,14 @@ color_to_string(int color)
 
 /* Convert a location to a string. */
 const char *
-location_to_string(int i, int j)
+location_to_string(int pos)
 {
   static char buf[4];
   char *bufp = &buf[0];
+  int i = I(pos);
+  int j = J(pos);
 
-  if (is_pass(i, j))
+  if (is_pass(pos))
     return "Pass";
 
   *bufp = 'A'+j;
@@ -300,6 +331,12 @@ location_to_string(int i, int j)
   *bufp = 0;
 
   return buf;
+}
+
+const char *
+location_to_string2(int i, int j)
+{
+  return location_to_string(POS(i, j));
 }
 
 /* Convert a status value to a string. */
@@ -325,7 +362,7 @@ status_to_string(int status)
 }
 
 
-/* Convert a status value to a string. */
+/* Convert a safety value to a string. */
 const char *
 safety_to_string(int status)
 {

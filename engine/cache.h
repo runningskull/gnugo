@@ -55,11 +55,9 @@
  * fields:
  *
  * komaster: 2 bits (EMPTY, BLACK, WHITE, or GRAY)
- * kom_i   : 5 bits
- * kom_j   : 5 bits
+ * kom_pos : 10 bits (allows MAX_BOARD up to 31)
  * routine : 4 bits (currently 10 different choices)
- * i       : 5 bits
- * j       : 5 bits
+ * str     : 10 bits
  * stackp  : 5 bits
  */
 
@@ -68,10 +66,9 @@ typedef struct read_result_t {
 
   int result_ri_rj;		/* ...then this was the result. */
   /*
-  unsigned char  status;        // 0 free, 1 open, 2 closed
-  unsigned char  result;
-  unsigned char  ri;
-  unsigned char  rj;
+  status:  8 bits        // 0 free, 1 open, 2 closed
+  result:  8 bits
+  move  : 16 bits
   */
 
   struct read_result_t *next;
@@ -79,35 +76,30 @@ typedef struct read_result_t {
 
 
 /* Get parts of a Read_result identifying the routine and position. */
-#define rr_get_komaster(rr)   (((rr).compressed_data >> 29) & 0x03)
-#define rr_get_kom_i(rr)      ((((rr).compressed_data >> 24) & 0x1f) - 1)
-#define rr_get_kom_j(rr)      ((((rr).compressed_data >> 19) & 0x1f) - 1)
-#define rr_get_routine(rr)    (((rr).compressed_data >> 15) & 0x0f)
-#define rr_get_pos_i(rr)      (((rr).compressed_data >> 10) & 0x1f)
-#define rr_get_pos_j(rr)      (((rr).compressed_data >>  5) & 0x1f)
-#define rr_get_stackp(rr)     (((rr).compressed_data >>  0) & 0x1f)
+#define rr_get_komaster(rr)   (((rr).compressed_data  >> 29) & 0x03)
+#define rr_get_kom_pos(rr)    (((rr).compressed_data  >> 19) & 0x2ff)
+#define rr_get_routine(rr)    (((rr).compressed_data  >> 15) & 0x0f)
+#define rr_get_str(rr)        (((rr).compressed_data  >>  5) & 0x2ff)
+#define rr_get_stackp(rr)     (((rr).compressed_data  >>  0) & 0x1f)
 
 /* Set corresponding parts. */
-#define rr_compress_data(rr, routine, komaster, kom_i, kom_j, i, j, stackp) \
-	(((((((((((((komaster) << 5) | ((kom_i) + 1)) << 5) \
-	  | ((kom_j) + 1)) << 4) | (routine)) << 5) | (i)) << 5) \
-	    | (j)) << 5) | stackp);
+#define rr_compress_data(rr, routine, komaster, kom_pos, str, stackp) \
+	(((((((((komaster) << 10) | (kom_pos)) << 4) \
+	  | (routine)) << 10) | (str)) << 5) | stackp);
 
-#define rr_set_compressed_data(rr, routine, komaster, kom_i, kom_j, i, j, stackp) \
+#define rr_set_compressed_data(rr, routine, komaster, kom_pos, str, stackp) \
        (rr).compressed_data \
-	= rr_compress_data(rr, routine, komaster, kom_i, kom_j, i, j, stackp)
+	= rr_compress_data(rr, routine, komaster, kom_pos, str, stackp)
 
 /* Get parts of a Read_result constituting the result of a search. */
-#define rr_get_status(rr)   (((rr).result_ri_rj >> 24) & 0xff)
-#define rr_get_result(rr)   (((rr).result_ri_rj >> 16) & 0xff)
-#define rr_get_result_i(rr) (((rr).result_ri_rj >>  8) & 0xff)
-#define rr_get_result_j(rr) (((rr).result_ri_rj >>  0) & 0xff)
+#define rr_get_status(rr)      (((rr).result_ri_rj >> 24) & 0xff)
+#define rr_get_result(rr)      (((rr).result_ri_rj >> 16) & 0xff)
+#define rr_get_move(rr)        (((rr).result_ri_rj >>  0) & 0xffff)
 
 /* Set corresponding parts. */
-#define rr_set_result_ri_rj(rr, result, ri, rj) \
+#define rr_set_result_ri_rj(rr, result, move) \
 	(rr).result_ri_rj \
-	    = (2 << 24 \
-              | (((((result) << 8) | ((ri) & 0xff)) << 8) | ((rj) & 0xff)))
+	    = (2 << 24 | (((result) & 0xff) << 16) | ((move) & 0xffff))
 
 /*
  * The hash table consists of hash nodes.  Each hash node consists of
@@ -165,55 +157,44 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 #if TRACE_READ_RESULTS
 
 #define TRACE_CACHED_RESULT(rr) \
-      gprintf("%o%s %m %d %d %d %d (cached) ", read_function_name, \
+      gprintf("%o%s %m %d %d %m (cached) ", read_function_name, \
 	      qi, qj, stackp, \
 	      rr_get_result(rr), \
-	      rr_get_result_i(rr), \
-	      rr_get_result_j(rr)); \
+	      rr_get_result_move(rr)); \
       dump_stack();
 
-#define SETUP_TRACE_INFO(name, si, sj) \
+#define SETUP_TRACE_INFO(name, str) \
   const char *read_function_name = name; \
-  int qi, qj; \
-  find_origin(si, sj, &qi, &qj);
+  int q = find_origin(str);
 
 #else
 
 #define TRACE_CACHED_RESULT(rr)
 
-#define SETUP_TRACE_INFO(name, si, sj) \
+#define SETUP_TRACE_INFO(name, str) \
   const char *read_function_name = name; \
-  int qi = si; \
-  int qj = sj;
+  int q = str;
 
 #endif
 
-/* The caching of read results currently mangle negative move
- * coordinates, effectively returning the value as a 2-complement
- * 8-bit pattern in an int. To correct this we need to translate the
- * interval [128,255] to [-128,-1].
- */
-#define FIXUP_CACHED_VALUE(x) ((x >= 128) ? (((int) x) - 256) : (x))
-
 /* Trace messages in decidestring/decidedragon sgf file. */
-void sgf_trace(const char *func, int si, int sj, int i, int j,
-	       int result, const char *message);
+void sgf_trace(const char *func, int str, int move, int result,
+	       const char *message);
 
 /* Macro to hide the call to sgf_trace(). Notice that a little black
  * magic is going on here. Before using this macro, SETUP_TRACE_INFO
- * must have been called to provide the variables read_function_name,
- * qi, and qj. These must of course not be used for anything else in
+ * must have been called to provide the variables read_function_name
+ * and q. These must of course not be used for anything else in
  * the function.
  */
-#define SGFTRACE(i, j, result, message) \
+#define SGFTRACE(move, result, message) \
   if (sgf_dumptree) \
-    sgf_trace(read_function_name, qi, qj, i, j, result, message)
+    sgf_trace(read_function_name, q, move, result, message)
 
 extern Hashtable *movehash;
 
-int get_read_result(int routine, int komaster, int kom_i, int kom_j,
-		    int *si, int *sj,
-		    Read_result **read_result);
+int get_read_result(int routine, int komaster, int kom_pos,
+		    int *str, Read_result **read_result);
 
 /* ================================================================ */
 
@@ -227,17 +208,16 @@ int get_read_result(int routine, int komaster, int kom_i, int kom_j,
 #define READ_RETURN0(read_result) \
   do { \
     if (read_result) { \
-      rr_set_result_ri_rj(*(read_result), 0, 0, 0); \
+      rr_set_result_ri_rj(*(read_result), 0, 0); \
     } \
     return 0; \
   } while (0)
 
-#define READ_RETURN(read_result, pointi, pointj, resulti, resultj, value) \
+#define READ_RETURN(read_result, point, move, value) \
   do { \
-    if ((value) != 0 && (pointi) != 0) *(pointi)=(resulti); \
-    if ((value) != 0 && (pointj) != 0) *(pointj)=(resultj); \
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
     if (read_result) { \
-      rr_set_result_ri_rj(*(read_result), (value), (resulti), (resultj)); \
+      rr_set_result_ri_rj(*(read_result), (value), (move)); \
     } \
     return (value); \
   } while (0)
@@ -247,22 +227,21 @@ int get_read_result(int routine, int komaster, int kom_i, int kom_j,
 #define READ_RETURN0(read_result) \
   do { \
     if (read_result) { \
-      rr_set_result_ri_rj(*(read_result), 0, 0, 0); \
+      rr_set_result_ri_rj(*(read_result), 0, 0); \
     } \
-    gprintf("%o%s %m %d 0 0 0 ", read_function_name, qi, qj, stackp); \
+    gprintf("%o%s %m %d 0 0 0 ", read_function_name, q, stackp); \
     dump_stack(); \
     return 0; \
   } while (0)
 
-#define READ_RETURN(read_result, pointi, pointj, resulti, resultj, value) \
+#define READ_RETURN(read_result, point, move, value) \
   do { \
-    if ((value) != 0 && (pointi) != 0) *(pointi)=(resulti); \
-    if ((value) != 0 && (pointj) != 0) *(pointj)=(resultj); \
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
     if (read_result) { \
-      rr_set_result_ri_rj(*(read_result), (value), (resulti), (resultj)); \
+      rr_set_result_ri_rj(*(read_result), (value), (move)); \
     } \
-    gprintf("%o%s %m %d %d %d %d ", read_function_name, qi, qj, stackp, \
-	    (value), (resulti), (resultj)); \
+    gprintf("%o%s %m %d %d %d ", read_function_name, q, stackp, \
+	    (value), (move)); \
     dump_stack(); \
     return (value); \
   } while (0)
@@ -315,26 +294,23 @@ int get_read_result(int routine, int komaster, int kom_i, int kom_j,
  */
 
 
-#define UPDATE_SAVED_KO_RESULT(savecode, savei, savej, code, i, j) \
+#define UPDATE_SAVED_KO_RESULT(savecode, save, code, move) \
   if (code == KO_B && (savecode == 0 || savecode == KO_B)) { \
-    savei = i; \
-    savej = j; \
+    save = move; \
     savecode = KO_A; \
   } \
   else if (code == KO_A && savecode == 0) { \
-    savei = i; \
-    savej = j; \
+    save = move; \
     savecode = KO_B; \
   }
 
 /* Same as above, except this should be used when there's no
  * intervening trymove(). Thus we shouldn't reverse the save code.
  */
-#define UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savei, savej, code, i, j) \
+#define UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, save, code, move) \
   if ((code == KO_B && savecode == 0) \
       || (code == KO_A && (savecode == 0 || savecode == KO_B))) { \
-    savei = i; \
-    savej = j; \
+    save = move; \
     savecode = code; \
   }
 

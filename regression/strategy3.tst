@@ -197,7 +197,7 @@ loadsgf games/strategy34.sgf 59
 
 loadsgf games/strategy34.sgf 61
 144 gg_genmove black
-#? [F8]*
+#? [F8]
 
 # Incident 209. Semeai mistake.
 loadsgf games/incident209.sgf 193
@@ -221,7 +221,7 @@ loadsgf games/strategy35.sgf 140
 loadsgf games/gwe.sgf 225
 # see also reading test 149
 149 gg_genmove white
-#? [!O1]*
+#? [!O1]
 
 loadsgf games/gwe.sgf 203
 150 gg_genmove white

@@ -55,11 +55,11 @@ dilate_erode(int dilations, int erosions, int gb[MAX_BOARD][MAX_BOARD],
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] && dragon[i][j].matcher_status == CRITICAL)
+      if (BOARD(i, j) && dragon[i][j].matcher_status == CRITICAL)
 	critical_found = 1;
-      if (p[i][j] == WHITE && !captured_territory(i, j, color))
+      if (BOARD(i, j) == WHITE && !captured_territory(i, j, color))
 	gb[i][j] = 128;
-      else if (p[i][j] == BLACK && !captured_territory(i, j, color))      
+      else if (BOARD(i, j) == BLACK && !captured_territory(i, j, color))      
 	gb[i][j] = -128;
       else
 	gb[i][j] = 0;
@@ -235,8 +235,8 @@ print_regions(int gb[MAX_BOARD][MAX_BOARD])
   start_draw_board();
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] && dragon[i][j].matcher_status != DEAD)
-	k = p[i][j];
+      if (BOARD(i, j) && dragon[i][j].matcher_status != DEAD)
+	k = BOARD(i, j);
       else
 	k = EMPTY;
 
@@ -318,7 +318,7 @@ estimate_score(float *upper, float *lower)
   close_bubbles(gb);
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] == BLACK) {
+      if (BOARD(i, j) == BLACK) {
 	if (captured_territory(i, j, WHITE)) {
 	  white_territory += 2;
 	  white_area++;
@@ -326,7 +326,7 @@ estimate_score(float *upper, float *lower)
 	else
 	  black_area++;
       }
-      else if (p[i][j] == WHITE) {
+      else if (BOARD(i, j) == WHITE) {
 	if (captured_territory(i, j, WHITE)) {
 	  black_territory += 2;
 	  black_area++;
@@ -369,7 +369,7 @@ estimate_score(float *upper, float *lower)
     close_bubbles(gb);
     for (i = 0; i < board_size; i++) {
       for (j = 0; j < board_size; j++) {
-	if (p[i][j] == BLACK) {
+	if (BOARD(i, j) == BLACK) {
 	  if (captured_territory(i, j, BLACK)) {
 	    white_territory += 2;
 	    white_area++;
@@ -377,7 +377,7 @@ estimate_score(float *upper, float *lower)
 	  else
 	    black_area++;
 	}
-	else if (p[i][j] == WHITE) {
+	else if (BOARD(i, j) == WHITE) {
 	  if (captured_territory(i, j, BLACK)) {
 	    black_territory += 2;
 	    black_area++;
@@ -435,16 +435,16 @@ captured_territory(int i, int j, int color)
 {
   int d;
 
-  if (p[i][j] == EMPTY 
+  if (BOARD(i, j) == EMPTY 
       || dragon[i][j].matcher_status == ALIVE
       || dragon[i][j].matcher_status == UNKNOWN
-      || (p[i][j] == color && dragon[i][j].matcher_status == CRITICAL))
+      || (BOARD(i, j) == color && dragon[i][j].matcher_status == CRITICAL))
     return 0;
 
   for (d = 0; d < DRAGON2(i, j).neighbors; d++)
-    if (DRAGON(DRAGON2(i, j).adjacent[d]).color == OTHER_COLOR(p[i][j])
+    if (DRAGON(DRAGON2(i, j).adjacent[d]).color == OTHER_COLOR(BOARD(i, j))
 	&& (DRAGON(DRAGON2(i, j).adjacent[d]).matcher_status == ALIVE
-	|| (p[i][j] != color
+	|| (BOARD(i, j) != color
 	    && DRAGON(DRAGON2(i, j).adjacent[d]).matcher_status == CRITICAL)))
       return 1;
 

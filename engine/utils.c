@@ -38,11 +38,11 @@
  */
 
 void
-change_matcher_status(int x, int y, int status)
+change_matcher_status(int m, int n, int status)
 {
-  int i,j;
-  int origini = dragon[x][y].origini;
-  int originj = dragon[x][y].originj;
+  int i, j;
+  int origini = dragon[m][n].origini;
+  int originj = dragon[m][n].originj;
 
   for (i = 0; i < board_size; i++) 
     for (j = 0; j < board_size; j++) {
@@ -79,8 +79,8 @@ change_defense(int ai, int aj, int ti, int tj, int dcode)
     TRACE("Moved defense of %m from %m to %m.\n", origini, originj,
 	  si, sj, ti, tj);
   
-  gg_assert (ti == -1 || p[ti][tj] == EMPTY);
-  gg_assert (p[ai][aj] != EMPTY);
+  gg_assert(ti == -1 || BOARD(ti, tj) == EMPTY);
+  gg_assert(BOARD(ai, aj) != EMPTY);
 
   if ((worm[ai][aj].attack_code != 0)
       && (worm[ai][aj].defend_code != 0)
@@ -129,8 +129,8 @@ change_attack(int ai, int aj, int ti, int tj, int acode)
     TRACE("Moved attack of %m from %m to %m.\n", origini, originj,
 	  si, sj, ti, tj);
 
-  gg_assert (ti == -1 || p[ti][tj] == EMPTY);
-  gg_assert (p[ai][aj] != EMPTY);
+  gg_assert (ti == -1 || BOARD(ti, tj) == EMPTY);
+  gg_assert (BOARD(ai, aj) != EMPTY);
 
   worm[origini][originj].attacki = ti;
   worm[origini][originj].attackj = tj;
@@ -151,9 +151,8 @@ change_attack(int ai, int aj, int ti, int tj, int acode)
 int
 defend_against(int ti, int tj, int color, int ai, int aj)
 {
-  if (trymove(ti, tj, color, "defend_against", -1, -1,
-	      EMPTY, -1, -1)) {
-    if (safe_move(ai, aj, OTHER_COLOR(color)) == 0) {
+  if (trymove2(ti, tj, color, "defend_against", -1, -1, EMPTY, -1, -1)) {
+    if (safe_move2(ai, aj, OTHER_COLOR(color)) == 0) {
       popgo();
       return 1;
     }
@@ -188,7 +187,7 @@ cut_possible(int i, int j, int color)
 int
 does_attack(int ti, int tj, int ai, int aj)
 {
-  int color = p[ai][aj];
+  int color = BOARD(ai, aj);
   int other = OTHER_COLOR(color);
   int result = 0;
   int acode = 0;
@@ -208,14 +207,14 @@ does_attack(int ti, int tj, int ai, int aj)
       return 0;
   }
   
-  if (trymove(ti, tj, other, "does_attack-A", ai, aj,
+  if (trymove2(ti, tj, other, "does_attack-A", ai, aj,
 	      EMPTY, -1, -1)) {
-    if (!p[ai][aj] || !find_defense(ai, aj, NULL, NULL)) {
+    if (!BOARD(ai, aj) || !find_defense(ai, aj, NULL, NULL)) {
       result = WIN;
       increase_depth_values();
-      if (si != -1 && trymove(si, sj, color, "does_attack-B", ai, aj,
+      if (si != -1 && trymove2(si, sj, color, "does_attack-B", ai, aj,
 			      EMPTY, -1, -1)) {
-	if (p[ai][aj] && !attack(ai, aj, NULL, NULL))
+	if (BOARD(ai, aj) && !attack(ai, aj, NULL, NULL))
 	  result = 0;
 	popgo();
       }
@@ -237,7 +236,7 @@ does_attack(int ti, int tj, int ai, int aj)
 int
 does_defend(int ti, int tj, int ai, int aj)
 {
-  int color = p[ai][aj];
+  int color = BOARD(ai, aj);
   int other = OTHER_COLOR(color);
   int result = 0;
   int si = -1;
@@ -256,14 +255,14 @@ does_defend(int ti, int tj, int ai, int aj)
 
   gg_assert(si != -1 && sj != -1);
   
-  if (trymove(ti, tj, color, "does_defend-A", ai, aj,
+  if (trymove2(ti, tj, color, "does_defend-A", ai, aj,
 	      EMPTY, -1, -1)) {
     if (!attack(ai, aj, NULL, NULL)) {
       result = 1;
       increase_depth_values();
-      if (trymove(si, sj, other, "does_defend-B", ai, aj,
+      if (trymove2(si, sj, other, "does_defend-B", ai, aj,
 		  EMPTY, -1, -1)) {
-	if (!p[ai][aj] || !find_defense(ai, aj, NULL, NULL))
+	if (!BOARD(ai, aj) || !find_defense(ai, aj, NULL, NULL))
 	  result = 0;
 	popgo();
       }
@@ -297,7 +296,7 @@ somewhere(int color, int last_move, ...)
     ai = va_arg(ap, int);
     aj = va_arg(ap, int);
 
-    if (p[ai][aj] == color && 
+    if (BOARD(ai, aj) == color && 
 	(stackp > 0 || dragon[ai][aj].matcher_status != DEAD))
       return 1;
   }
@@ -345,9 +344,9 @@ play_break_through_n(int color, int num_moves, ...)
     ai = va_arg(ap, int);
     aj = va_arg(ap, int);
 
-    if (ai != -1 && (trymove(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
+    if (ai != -1 && (trymove2(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
 			     EMPTY, -1, -1)
-		     || tryko(ai, aj, mcolor, "play_attack_defend_n",
+		     || tryko2(ai, aj, mcolor, "play_attack_defend_n",
 			      EMPTY, -1, -1)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
@@ -368,7 +367,7 @@ play_break_through_n(int color, int num_moves, ...)
   modify_depth_values(played_moves);
 #endif
   
-  if (!p[xi][xj] || !p[yi][yj] || !p[zi][zj])
+  if (!BOARD(xi, xj) || !BOARD(yi, yj) || !BOARD(zi, zj))
     success = 1;
   else
     success = break_through(xi, xj, yi, yj, zi, zj);
@@ -419,9 +418,9 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
     ai = va_arg(ap, int);
     aj = va_arg(ap, int);
 
-    if (ai != -1 && (trymove(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
+    if (ai != -1 && (trymove2(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
 			     EMPTY, -1, -1)
-		     || tryko(ai, aj, mcolor, "play_attack_defend_n",
+		     || tryko2(ai, aj, mcolor, "play_attack_defend_n",
 			      EMPTY, -1, -1)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
@@ -443,13 +442,13 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
 #endif
   
   if (do_attack) {
-    if (!p[zi][zj])
+    if (!BOARD(zi, zj))
       success = 1;
     else
       success = attack(zi, zj, NULL, NULL);
   }
   else {
-    if (!p[zi][zj])
+    if (!BOARD(zi, zj))
       success = 0;
     else {
       int dcode = find_defense(zi, zj, NULL, NULL);
@@ -508,9 +507,9 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
     ai = va_arg(ap, int);
     aj = va_arg(ap, int);
 
-    if (ai != -1 && (trymove(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
+    if (ai != -1 && (trymove2(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
 			     EMPTY, -1, -1)
-		     || tryko(ai, aj, mcolor, "play_attack_defend_n",
+		     || tryko2(ai, aj, mcolor, "play_attack_defend_n",
 			      EMPTY, -1, -1)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
@@ -530,11 +529,11 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 #endif
   
   if (do_attack) {
-    if (!p[yi][yj] || !p[zi][zj] || attack_either(yi, yj, zi, zj))
+    if (!BOARD(yi, yj) || !BOARD(zi, zj) || attack_either(yi, yj, zi, zj))
       success = 1;
   }
   else {
-    if (p[yi][yj] && p[zi][zj] && defend_both(yi, yj, zi, zj))
+    if (BOARD(yi, yj) && BOARD(zi, zj) && defend_both(yi, yj, zi, zj))
       success = 1;
   }
 
@@ -566,14 +565,14 @@ find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)
 {
   int i, j, vi, vj;
 
-  ASSERT(p[m][n] != 0, m, n);
-  ASSERT(stackp == 0, m, n);
+  ASSERT2(BOARD(m, n) != 0, m, n);
+  ASSERT2(stackp == 0, m, n);
 
   vi = -1;
   vj = -1;
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (p[i][j] == OTHER_COLOR(p[m][n]))
+      if (BOARD(i, j) == OTHER_COLOR(BOARD(m, n)))
 	if ((   i > 0            && is_same_worm(i-1, j, m, n))
 	    || (i < board_size-1 && is_same_worm(i+1, j, m, n))
 	    || (j > 0            && is_same_worm(i, j-1, m, n))
@@ -854,26 +853,25 @@ restore_depth_values()
  */
 
 int
-accurate_approxlib(int m, int n, int color, int maxlib, int *libi, int *libj)
+accurate_approxlib(int pos, int color, int maxlib, int *libs)
 {
-  int libs = 0;
+  int liberties = 0;
 
-  gg_assert(p[m][n] == EMPTY);
-  gg_assert(color != EMPTY);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(color != EMPTY, pos);
 
   /* Use tryko() since we don't care whether the move would violate
    * the ko rule.
    */
-  if (tryko(m, n, color, "accurate approxlib",
-	    EMPTY, -1, -1)) {
-    if (libi != NULL)
-      libs = findlib(m, n, maxlib, libi, libj);
+  if (tryko(pos, color, "accurate approxlib", EMPTY, 0)) {
+    if (libs != NULL)
+      liberties = findlib(pos, maxlib, libs);
     else
-      libs = countlib(m, n);
+      liberties = countlib(pos);
     popgo();
   }
   
-  return libs;
+  return liberties;
 }
 
 
@@ -892,8 +890,9 @@ accurate_approxlib(int m, int n, int color, int maxlib, int *libi, int *libj)
 int
 confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 {
-  int libi[5], libj[5];
-  int libs = accurate_approxlib(i, j, color, 5, libi, libj);
+  int pos = POS(i, j);
+  int libs[5];
+  int liberties = accurate_approxlib(pos, color, 5, libs);
   int other = OTHER_COLOR(color);
   int issafe = 1;
   int m, n;
@@ -912,7 +911,7 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
     verbose--;
   
   if (!atari_atari_confirm_safety(color, i, j, &ai, &aj, size)) {
-    ASSERT_ON_BOARD(ai, aj);
+    ASSERT_ON_BOARD2(ai, aj);
     if (di) *di = ai;
     if (dj) *dj = aj;
     TRACE("Combination attack appears at %m.\n", ai, aj);
@@ -920,7 +919,7 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
     return 0;
   }
 
-  if (libs > 4) {
+  if (liberties > 4) {
     verbose = save_verbose;
     return 1;
   }
@@ -928,9 +927,9 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
   for (k = 0; k < 4; k++) {
     int bi = i + deltai[k];
     int bj = j + deltaj[k];
-    if (ON_BOARD(bi, bj)
-	&& p[bi][bj] == color
-	&& libs <= worm[bi][bj].liberties) {
+    if (ON_BOARD2(bi, bj)
+	&& BOARD(bi, bj) == color
+	&& liberties <= worm[bi][bj].liberties) {
       trouble = 1;
       if (dragon[bi][bj].matcher_status == ALIVE
 	  && DRAGON2(bi, bj).safety != INVINCIBLE
@@ -953,15 +952,15 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
    */
   increase_depth_values();
   
-  if (trymove(i, j, color, NULL, -1, -1, EMPTY, -1, -1)) {
+  if (trymove2(i, j, color, NULL, -1, -1, EMPTY, -1, -1)) {
     for (m = 0; issafe && m < board_size; m++)
       for (n = 0; issafe && n < board_size; n++)
 	if (issafe
-	    && p[m][n]
+	    && BOARD(m, n)
 	    && worm[m][n].origini == m
 	    && worm[m][n].originj == n
 	    && (m != i || n != j)) {
-	  if (p[m][n] == color
+	  if (BOARD(m, n) == color
 	      && worm[m][n].attack_code == 0
 	      && worm[m][n].size >= size
 	      && attack(m, n, NULL, NULL)) {
@@ -970,20 +969,20 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 	    issafe = 0;
 	    TRACE("After %m Worm at %m becomes attackable.\n", i, j, m, n);
 	  }
-	  else if (p[m][n] == other
+	  else if (BOARD(m, n) == other
 		   && worm[m][n].attack_code != 0
 		   && worm[m][n].defend_code == 0
 		   && worm[m][n].size >= size
 		   && find_defense(m, n, NULL, NULL)) {
 	    /* Also ask the owl code whether the string can live
 	     * strategically. To do this we need to temporarily undo
-	     * the trymove().
+	     * the trymove2().
 	     */
 	    popgo();
 	    decrease_depth_values();
 	    if (owl_does_attack(i, j, m, n) != WIN)
 	      issafe = 0;
-	    trymove(i, j, color, NULL, -1, -1, EMPTY, -1, -1);
+	    trymove2(i, j, color, NULL, -1, -1, EMPTY, -1, -1);
 	    increase_depth_values();
 	    
 	    if (!issafe) {
@@ -996,22 +995,22 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 	  }
 	}
     
-    if (libs == 2) {
-      if (double_atari(libi[0], libj[0], other)) {
-	if (di && safe_move(libi[0], libj[0], color) == WIN) {
-	  *di = libi[0];
-	  *dj = libj[0];
+    if (liberties == 2) {
+      if (double_atari(I(libs[0]), J(libs[0]), other)) {
+	if (di && safe_move(libs[0], color) == WIN) {
+	  *di = I(libs[0]);
+	  *dj = J(libs[0]);
 	}
 	issafe = 0;
-	TRACE("Double threat appears at %m.\n", libi[0], libj[0]);
+	TRACE("Double threat appears at %1m.\n", libs[0]);
       }
-      else if (double_atari(libi[1], libj[1], other)) {
-	if (di && safe_move(libi[1], libj[1], color) == WIN) {
-	  *di = libi[1];
-	  *dj = libj[1];
+      else if (double_atari(I(libs[1]), J(libs[1]), other)) {
+	if (di && safe_move(libs[1], color) == WIN) {
+	  *di = I(libs[1]);
+	  *dj = J(libs[1]);
 	}
 	issafe = 0;
-	TRACE("Double threat appears at %m.\n", libi[1], libj[1]);
+	TRACE("Double threat appears at %1m.\n", libs[1]);
       }
     }
     popgo();
@@ -1042,7 +1041,7 @@ double_atari(int m, int n, int color)
   int other = OTHER_COLOR(color);
   int k;
 
-  if (!ON_BOARD(m, n))
+  if (!ON_BOARD2(m, n))
     return 0;
 
   /* Loop over the diagonal directions. */
@@ -1051,16 +1050,16 @@ double_atari(int m, int n, int color)
     int dn = deltaj[k];
     
     /* because (m,n) and (m+dm,n+dn) are opposite
-     * corners of a square, ON_BOARD(m,n) && ON_BOARD(m+dm,n+dn)
-     * implies ON_BOARD(m+dm,n) and ON_BOARD(n,n+dn)
+     * corners of a square, ON_BOARD2(m,n) && ON_BOARD2(m+dm,n+dn)
+     * implies ON_BOARD2(m+dm,n) and ON_BOARD2(n,n+dn)
      */
-    if (ON_BOARD(m+dm, n+dn) && ON_BOARD(m, n)
-        && p[m+dm][n+dn] == color
-	&& p[m][n+dn] == other
-	&& p[m+dm][n] == other
-	&& trymove(m, n, color, "double_atari", -1, -1, EMPTY, -1, -1)) {
-      if (countlib(m, n) > 1
-	  && (p[m][n+dn] == EMPTY || p[m+dm][n] == EMPTY 
+    if (ON_BOARD2(m+dm, n+dn) && ON_BOARD2(m, n)
+        && BOARD(m+dm, n+dn) == color
+	&& BOARD(m, n+dn) == other
+	&& BOARD(m+dm, n) == other
+	&& trymove2(m, n, color, "double_atari", -1, -1, EMPTY, -1, -1)) {
+      if (countlib2(m, n) > 1
+	  && (BOARD(m, n+dn) == EMPTY || BOARD(m+dm, n) == EMPTY 
 	      || !defend_both(m, n+dn, m+dm, n))) {
 	popgo();
 	return 1;
@@ -1125,9 +1124,8 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
   int save_moves;
   int m, n;
   int k;
-  int libi[MAXLIBS];
-  int libj[MAXLIBS];
-  int libs;
+  int libs[MAXLIBS];
+  int liberties;
   int other = OTHER_COLOR(color);
   
   while (something_captured) {
@@ -1137,24 +1135,24 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
     /* Visit all friendly strings on the board. */
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (p[m][n] != color || !is_worm_origin(m, n, m, n))
+	int pos = POS(m, n);
+	if (board[pos] != color || !is_worm_origin(m, n, m, n))
 	  continue;
 	
 	/* Try to capture the worm at (m, n). */
-	libs = findlib(m, n, MAXLIBS, libi, libj);
+	liberties = findlib(pos, MAXLIBS, libs);
 	save_moves = moves_played;
-	for (k = 0; k < libs; k++) {
-	  if (trymove(libi[k], libj[k], other, "unconditional_life", m, n,
-		      EMPTY, -1, -1))
+	for (k = 0; k < liberties; k++) {
+	  if (trymove(libs[k], other, "unconditional_life", pos, EMPTY, 0))
 	    moves_played++;
 	}
 
 	/* Successful if already captured or a single liberty remains.
 	 * Otherwise we must rewind and take back the last batch of moves.
 	 */
-	if (p[m][n] == EMPTY)
+	if (board[pos] == EMPTY)
 	  something_captured = 1;
-	else if (findlib(m, n, 2, libi, libj) == 1) {
+	else if (findlib(pos, 2, libs) == 1) {
 	  /* Need to use tryko as a defense against the extreme case
            * when the only opponent liberty that is not suicide is an
            * illegal ko capture, like in this 5x5 position:
@@ -1166,8 +1164,7 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
 	   * |.XO.O|
 	   * +-----+
 	   */
-	  int success = tryko(libi[0], libj[0], other, "unconditional_life",
-			      EMPTY, -1, -1);
+	  int success = tryko(libs[0], other, "unconditional_life", EMPTY, 0);
 	  gg_assert(success);
 	  moves_played++;
 	  something_captured++;
@@ -1188,14 +1185,14 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n] != color || !is_worm_origin(m, n, m, n))
+      int pos = POS(m, n);
+      if (board[pos] != color || !is_worm_origin(m, n, m, n))
 	continue;
       
-      /* Play as many liberties we can. */
-      libs = findlib(m, n, MAXLIBS, libi, libj);
-      for (k = 0; k < libs; k++) {
-	if (trymove(libi[k], libj[k], other, "unconditional_life", m, n,
-		    EMPTY, -1, -1))
+      /* Play as many liberties as we can. */
+      liberties = findlib(pos, MAXLIBS, libs);
+      for (k = 0; k < liberties; k++) {
+	if (trymove(libs[k], other, "unconditional_life", pos, EMPTY, 0))
 	  moves_played++;
       }
     }
@@ -1210,13 +1207,13 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
 
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (p[m][n] != other || countlib(m, n) > 1)
+	int pos = POS(m, n);
+	if (board[pos] != other || countlib(pos) > 1)
 	  continue;
 	
 	/* Try to extend the string at (m, n). */
-	findlib(m, n, 1, libi, libj);
-	if (trymove(libi[0], libj[0], other, "unconditional_life", m, n,
-		    EMPTY, -1, -1)) {
+	findlib(pos, 1, libs);
+	if (trymove(libs[0], other, "unconditional_life", pos, EMPTY, 0)) {
 	  moves_played++;
 	  found_one = 1;
 	}
@@ -1225,18 +1222,17 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      int ai, aj;
-      int bi, bj;
+      int pos = POS(m, n);
+      int apos;
+      int bpos;
       int aopen, bopen;
       int alib, blib;
-      if (p[m][n] != other || countlib(m, n) != 2)
+      if (board[pos] != other || countlib(pos) != 2)
 	continue;
-      findlib(m, n, 2, libi, libj);
-      ai = libi[0];
-      aj = libj[0];
-      bi = libi[1];
-      bj = libj[1];
-      if (abs(ai - bi) + abs(aj - bj) != 1)
+      findlib(pos, 2, libs);
+      apos = libs[0];
+      bpos = libs[1];
+      if (abs(I(apos) - I(bpos)) + abs(J(apos) - J(bpos)) != 1)
 	continue;
 
       /* Only two liberties and these are adjacent. Play one. We want
@@ -1252,17 +1248,17 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
        * |..OX    |..OO.OX
        * +----    +-------
        */
-      aopen = approxlib(ai, aj, color, 4, NULL, NULL);
-      bopen = approxlib(bi, bj, color, 4, NULL, NULL);
-      alib  = approxlib(ai, aj, other, 4, NULL, NULL);
-      blib  = approxlib(bi, bj, other, 4, NULL, NULL);
+      aopen = approxlib(apos, color, 4, NULL);
+      bopen = approxlib(bpos, color, 4, NULL);
+      alib  = approxlib(apos, other, 4, NULL);
+      blib  = approxlib(bpos, other, 4, NULL);
 
       if (aopen > bopen || (aopen == bopen && alib >= blib)) {
-	trymove(ai, aj, other, "unconditional_life", m, n, EMPTY, -1, -1);
+	trymove(apos, other, "unconditional_life", pos, EMPTY, 0);
 	moves_played++;
       }
       else {
-	trymove(bi, bj, other, "unconditional_life", m, n, EMPTY, -1, -1);
+	trymove(bpos, other, "unconditional_life", pos, EMPTY, 0);
 	moves_played++;
       }
     }
@@ -1271,18 +1267,19 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
   memset(unconditional_territory, 0, sizeof(int) * MAX_BOARD * MAX_BOARD);
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (p[m][n] == color) {
+      int pos = POS(m, n);
+      if (board[pos] == color) {
 	unconditional_territory[m][n] = 1;
 	if (is_worm_origin(m, n, m, n)) {
-	  libs = findlib(m, n, MAXLIBS, libi, libj);
-	  for (k = 0; k < libs; k++)
-	    unconditional_territory[libi[k]][libj[k]] = 2;
+	  liberties = findlib(pos, MAXLIBS, libs);
+	  for (k = 0; k < liberties; k++)
+	    unconditional_territory[I(libs[k])][J(libs[k])] = 2;
 	}
       }
-      else if (p[m][n] == other && countlib(m, n) == 1) {
+      else if (board[pos] == other && countlib(pos) == 1) {
 	unconditional_territory[m][n] = 2;
-	findlib(m, n, 1, libi, libj);
-	unconditional_territory[libi[0]][libj[0]] = 2;
+	findlib(pos, 1, libs);
+	unconditional_territory[I(libs[0])][J(libs[0])] = 2;
       }
     }
 
@@ -1366,36 +1363,36 @@ who_wins(int color, FILE *outfile)
  */
 
 static void
-do_find_superstring(int m, int n, int *stones, int *stonei, int *stonej,
-		    int *libs, int *libi, int *libj, int maxlibs,
-		    int *adj, int *adji, int *adjj, int liberty_cap,
+do_find_superstring(int str, int *num_stones, int *stones,
+		    int *num_lib, int *libs, int maxlibs,
+		    int *num_adj, int *adjs, int liberty_cap,
 		    int proper, int type);
 
 static void
-superstring_add_string(int m, int n,
-		       int *my_stones, int *my_stonei, int *my_stonej,
-		       int *stones, int *stonei, int *stonej,
-		       int *libs, int *libi, int *libj, int maxlibs,
-		       int *adj, int *adji, int *adjj, int liberty_cap,
-		       char mx[MAX_BOARD][MAX_BOARD],
-		       char ml[MAX_BOARD][MAX_BOARD],
-		       char ma[MAX_BOARD][MAX_BOARD],
+superstring_add_string(int str,
+		       int *num_my_stones, int *my_stones,
+		       int *num_stones, int *stones,
+		       int *num_libs, int *libs, int maxlibs,
+		       int *num_adj, int *adjs, int liberty_cap,
+		       char mx[BOARDMAX],
+		       char ml[BOARDMAX],
+		       char ma[BOARDMAX],
 		       int do_add);
 
 void
-find_superstring(int m, int n, int *stones, int *stonei, int *stonej)
+find_superstring(int str, int *num_stones, int *stones)
 {
-  do_find_superstring(m, n, stones, stonei, stonej,
-		      NULL, NULL, NULL, 0,
-		      NULL, NULL, NULL, 0,
+  do_find_superstring(str, num_stones, stones,
+		      NULL, NULL, 0,
+		      NULL, NULL, 0,
 		      0, 1);
 }
 
 
-/* This function computes the superstring at (m, n) as described above,
+/* This function computes the superstring at (str) as described above,
  * but omitting connections of type 5. Then it constructs a list of
  * liberties of the superstring which are not already liberties of
- * (m, n).
+ * (str).
  *
  * If liberty_cap is nonzero, only liberties of substrings of the
  * superstring which have fewer than liberty_cap liberties are
@@ -1403,17 +1400,17 @@ find_superstring(int m, int n, int *stones, int *stonei, int *stonej)
  */
 
 void
-find_superstring_liberties(int m, int n, 
-			   int *libs, int *libi, int *libj, int liberty_cap)
+find_superstring_liberties(int str,
+			   int *num_libs, int *libs, int liberty_cap)
 {
-  do_find_superstring(m, n, NULL, NULL, NULL,
-		      libs, libi, libj, MAX_LIBERTIES,
-		      NULL, NULL, NULL, liberty_cap,
+  do_find_superstring(str, NULL, NULL,
+		      num_libs, libs, MAX_LIBERTIES,
+		      NULL, NULL, liberty_cap,
 		      0, 0);
 }
 
 /* This function is the same as find_superstring_liberties, but it
- * omits those liberties of the string (m,n), presumably since
+ * omits those liberties of the string (str), presumably since
  * those have already been treated elsewhere.
  *
  * If liberty_cap is nonzero, only liberties of substrings of the
@@ -1422,20 +1419,20 @@ find_superstring_liberties(int m, int n,
  */
 
 void
-find_proper_superstring_liberties(int m, int n, 
-				  int *libs, int *libi, int *libj, 
+find_proper_superstring_liberties(int str, 
+				  int *num_libs, int *libs, 
 				  int liberty_cap)
 {
-  do_find_superstring(m, n, NULL, NULL, NULL,
-		      libs, libi, libj, MAX_LIBERTIES,
-		      NULL, NULL, NULL, liberty_cap,
+  do_find_superstring(str, NULL, NULL,
+		      num_libs, libs, MAX_LIBERTIES,
+		      NULL, NULL, liberty_cap,
 		      1, 0);
 }
 
-/* This function computes the superstring at (m, n) as described above,
+/* This function computes the superstring at (str) as described above,
  * but omitting connections of type 5. Then it constructs a list of
  * liberties of the superstring which are not already liberties of
- * (m, n).
+ * (str).
  *
  * If liberty_cap is nonzero, only liberties of substrings of the
  * superstring which have fewer than liberty_cap liberties are
@@ -1443,14 +1440,14 @@ find_proper_superstring_liberties(int m, int n,
  */
 
 void
-find_superstring_stones_and_liberties(int m, int n, 
-				      int *stones, int *stonei, int *stonej,
-				      int *libs, int *libi, int *libj,
+find_superstring_stones_and_liberties(int str,
+				      int *num_stones, int *stones,
+				      int *num_libs, int *libs,
 				      int liberty_cap)
 {
-  do_find_superstring(m, n, stones, stonei, stonej,
-		      libs, libi, libj, MAX_LIBERTIES,
-		      NULL, NULL, NULL, liberty_cap,
+  do_find_superstring(str, num_stones, stones,
+		      num_libs, libs, MAX_LIBERTIES,
+		      NULL, NULL, liberty_cap,
 		      0, 0);
 }
 
@@ -1461,13 +1458,13 @@ find_superstring_stones_and_liberties(int m, int n,
  */
 
 void
-superstring_chainlinks(int m, int n, 
-		       int *adj, int adji[MAXCHAIN], int adjj[MAXCHAIN],
+superstring_chainlinks(int str, 
+		       int *num_adj, int adjs[MAXCHAIN],
 		       int liberty_cap)
 {
-  do_find_superstring(m, n, NULL, NULL, NULL,
-		      NULL, NULL, NULL, 0,
-		      adj, adji, adjj, liberty_cap,
+  do_find_superstring(str, NULL, NULL,
+		      NULL, NULL, 0,
+		      num_adj, adjs, liberty_cap,
 		      0, 2);
 }
 
@@ -1479,13 +1476,13 @@ superstring_chainlinks(int m, int n,
  */
 
 void
-proper_superstring_chainlinks(int m, int n, int *adj,
-			      int adji[MAXCHAIN], int adjj[MAXCHAIN],
+proper_superstring_chainlinks(int str,
+			      int *num_adj, int adjs[MAXCHAIN],
 			      int liberty_cap)
 {
-  do_find_superstring(m, n, NULL, NULL, NULL,
-		      NULL, NULL, NULL, 0,
-		      adj, adji, adjj, liberty_cap,
+  do_find_superstring(str, NULL, NULL,
+		      NULL, NULL, 0,
+		      num_adj, adjs, liberty_cap,
 		      1, 2);
 }
 
@@ -1493,42 +1490,41 @@ proper_superstring_chainlinks(int m, int n, int *adj,
  * liberties, and/or adjacent strings.
  */
 static void
-do_find_superstring(int m, int n, int *stones, int *stonei, int *stonej,
-		    int *libs, int *libi, int *libj, int maxlibs,
-		    int *adj, int *adji, int *adjj, int liberty_cap,
+do_find_superstring(int str, int *num_stones, int *stones,
+		    int *num_libs, int *libs, int maxlibs,
+		    int *num_adj, int *adjs, int liberty_cap,
 		    int proper, int type)
 {
-  int my_stones;
-  int my_stonei[MAX_BOARD * MAX_BOARD];
-  int my_stonej[MAX_BOARD * MAX_BOARD];
+  int num_my_stones;
+  int my_stones[MAX_BOARD * MAX_BOARD];
   
-  char mx[MAX_BOARD][MAX_BOARD]; /* stones */
-  char ml[MAX_BOARD][MAX_BOARD]; /* liberties */
-  char ma[MAX_BOARD][MAX_BOARD]; /* adjacent strings */
+  char mx[BOARDMAX]; /* stones */
+  char ml[BOARDMAX]; /* liberties */
+  char ma[BOARDMAX]; /* adjacent strings */
 
   int k, l, r;
-  int color = p[m][n];
+  int color = board[str];
   int other = OTHER_COLOR(color);
 
   memset(mx, 0, sizeof(mx));
   memset(ml, 0, sizeof(ml));
   memset(ma, 0, sizeof(ma));
 
-  if (stones)
-    *stones = 0;
-  if (libs)
-    *libs = 0;
-  if (adj)
-    *adj = 0;
+  if (num_stones)
+    *num_stones = 0;
+  if (num_libs)
+    *num_libs = 0;
+  if (num_adj)
+    *num_adj = 0;
 
   /* Include the string itself in the superstring. Only record stones,
    * liberties, and/or adjacent strings if proper==0.
    */
-  my_stones = 0;
-  superstring_add_string(m, n, &my_stones, my_stonei, my_stonej,
-			 stones, stonei, stonej,
-			 libs, libi, libj, maxlibs,
-			 adj, adji, adjj, liberty_cap,
+  num_my_stones = 0;
+  superstring_add_string(str, &num_my_stones, my_stones,
+			 num_stones, stones,
+			 num_libs, libs, maxlibs,
+			 num_adj, adjs, liberty_cap,
 			 mx, ml, ma,
 			 !proper);
 
@@ -1536,12 +1532,11 @@ do_find_superstring(int m, int n, int *stones, int *stonei, int *stonej,
    * in the superstring. The loop is automatically extended over later
    * found stones as well.
    */
-  for (r = 0; r < my_stones; r++) {
-    int i = my_stonei[r];
-    int j = my_stonej[r];
+  for (r = 0; r < num_my_stones; r++) {
+    int pos = my_stones[r];
 
     for (k = 0; k < 4; k++) {
-      /* List of relative coordinates. (i, j) is marked by *.
+      /* List of relative coordinates. (pos) is marked by *.
        *
        *  ef.
        *  gb.
@@ -1549,134 +1544,120 @@ do_find_superstring(int m, int n, int *stones, int *stonei, int *stonej,
        *  .d.
        *
        */
-      int normali = -deltaj[k];
-      int normalj = deltai[k];
+      int right = delta[k];
+      int up = delta[(k+1)%4];
       
-      int ai = i + deltai[k];
-      int aj = j + deltaj[k];
-      int bi = i + deltai[k] + normali;
-      int bj = j + deltaj[k] + normalj;
-      int ci = i + 2*deltai[k];
-      int cj = j + 2*deltaj[k];
-      int di = i + deltai[k] - normali;
-      int dj = j + deltaj[k] - normalj;
-      int ei = i + 2*normali;
-      int ej = j + 2*normalj;
-      int fi = i + deltai[k] + 2*normali;
-      int fj = j + deltaj[k] + 2*normalj;
-      int gi = i + normali;
-      int gj = j + normalj;
+      int apos = pos + right;
+      int bpos = pos + right + up;
+      int cpos = pos + 2*right;
+      int dpos = pos + right - up;
+      int epos = pos + 2*up;
+      int fpos = pos + right + 2*up;
+      int gpos = pos + up;
       int unsafe_move;
       
-      if (!ON_BOARD(ai, aj))
+      if (!ON_BOARD(apos))
 	continue;
       
       /* Case 1. Nothing to do since stones are added string by string. */
             
       /* Case 2. */
-      if (p[ai][aj] == EMPTY) {
+      if (board[apos] == EMPTY) {
 	if (type == 2)
-	  unsafe_move = (approxlib(ai, aj, other, 2, NULL, NULL) < 2);
+	  unsafe_move = (approxlib(apos, other, 2, NULL) < 2);
 	else
-	  unsafe_move = is_self_atari(ai, aj, other);
+	  unsafe_move = is_self_atari(apos, other);
 	
-	if (unsafe_move && type == 1 && is_ko(ai, aj, other, NULL, NULL))
+	if (unsafe_move && type == 1 && is_ko(apos, other, NULL))
 	  unsafe_move = 0;
 	
 	if (unsafe_move) {
-	  if (ON_BOARD(bi, bj) && p[bi][bj] == color && !mx[bi][bj])
-	    superstring_add_string(bi, bj, &my_stones, my_stonei, my_stonej,
-				   stones, stonei, stonej,
-				   libs, libi, libj, maxlibs,
-				   adj, adji, adjj, liberty_cap,
+	  if (board[bpos] == color && !mx[bpos])
+	    superstring_add_string(bpos, &num_my_stones, my_stones,
+				   num_stones, stones,
+				   num_libs, libs, maxlibs,
+				   num_adj, adjs, liberty_cap,
 				   mx, ml, ma, 1);
-	  if (ON_BOARD(ci, cj) && p[ci][cj] == color && !mx[ci][cj])
-	    superstring_add_string(ci, cj, &my_stones, my_stonei, my_stonej,
-				   stones, stonei, stonej,
-				   libs, libi, libj, maxlibs,
-				   adj, adji, adjj, liberty_cap,
+	  if (board[cpos] == color && !mx[cpos])
+	    superstring_add_string(cpos, &num_my_stones, my_stones,
+				   num_stones, stones,
+				   num_libs, libs, maxlibs,
+				   num_adj, adjs, liberty_cap,
 				   mx, ml, ma, 1);
-	  if (ON_BOARD(di, dj) && p[di][dj] == color && !mx[di][dj])
-	    superstring_add_string(di, dj, &my_stones, my_stonei, my_stonej,
-				   stones, stonei, stonej,
-				   libs, libi, libj, maxlibs,
-				   adj, adji, adjj, liberty_cap,
+	  if (board[dpos] == color && !mx[dpos])
+	    superstring_add_string(dpos, &num_my_stones, my_stones,
+				   num_stones, stones,
+				   num_libs, libs, maxlibs,
+				   num_adj, adjs, liberty_cap,
 				   mx, ml, ma, 1);
 	}
       }
       
       /* Case 3. */
-      if (ON_BOARD(fi, fj) && !mx[ei][ej] && p[ai][aj] == color
-	  && p[ei][ej] == color && p[fi][fj] == color
-	  && p[bi][bj] == EMPTY && p[gi][gj] == EMPTY)
-	superstring_add_string(ei, ej, &my_stones, my_stonei, my_stonej,
-			       stones, stonei, stonej,
-			       libs, libi, libj, maxlibs,
-			       adj, adji, adjj, liberty_cap,
+      if (board[fpos] == color && !mx[epos]
+	  && board[apos] == color && board[epos] == color
+	  && board[bpos] == EMPTY && board[gpos] == EMPTY)
+	superstring_add_string(epos, &num_my_stones, my_stones,
+			       num_stones, stones,
+			       num_libs, libs, maxlibs,
+			       num_adj, adjs, liberty_cap,
 			       mx, ml, ma, 1);
       /* Don't bother with f, it is part of the string just added. */
       
       /* Case 4. */
-      if (ON_BOARD(bi, bj) && !mx[bi][bj] && p[bi][bj] == color
-	  && p[ai][aj] == EMPTY && p[gi][gj] == EMPTY)
-	superstring_add_string(bi, bj, &my_stones, my_stonei, my_stonej,
-			       stones, stonei, stonej,
-			       libs, libi, libj, maxlibs,
-			       adj, adji, adjj, liberty_cap,
+      if (board[bpos] == color && !mx[bpos]
+	  && board[apos] == EMPTY && board[gpos] == EMPTY)
+	superstring_add_string(bpos, &num_my_stones, my_stones,
+			       num_stones, stones,
+			       num_libs, libs, maxlibs,
+			       num_adj, adjs, liberty_cap,
 			       mx, ml, ma, 1);
       
       /* Case 5. */
       if (type == 1)
 	for (l = 0; l < 2; l++) {
-	  int ui, uj;
+	  int upos;
 	  
 	  if (l == 0) {
 	    /* adjacent lunch */
-	    ui = ai;
-	    uj = aj;
+	    upos = apos;
 	  }
 	  else {
 	    /* diagonal lunch */
-	    ui = bi;
-	    uj = bj;
+	    upos = bpos;
 	  }
 	  
-	  if (!ON_BOARD(ui, uj))
+	  if (board[upos] != other)
 	    continue;
 	  
-	  if (p[ui][uj] != other)
-	    continue;
-	  
-	  find_origin(ui, uj, &ui, &uj);
+	  upos = find_origin(upos);
 	  
 	  /* Only do the reading once. */
-	  if (mx[ui][uj] == 1)
+	  if (mx[upos] == 1)
 	    continue;
 	  
-	  mx[ui][uj] = 1;
+	  mx[upos] = 1;
 	  
-	  if (attack(ui, uj, NULL, NULL)
-	      && !find_defense(ui, uj, NULL, NULL)) {
-	    int lunch_stonei[MAX_BOARD*MAX_BOARD];
-	    int lunch_stonej[MAX_BOARD*MAX_BOARD];
-	    int lunch_stones = findstones(ui, uj, MAX_BOARD*MAX_BOARD,
-					  lunch_stonei, lunch_stonej);
+	  if (attack(I(upos), J(upos), NULL, NULL)
+	      && !find_defense(I(upos), J(upos), NULL, NULL)) {
+	    int lunch_stones[MAX_BOARD*MAX_BOARD];
+	    int num_lunch_stones = findstones(upos, MAX_BOARD*MAX_BOARD,
+					      lunch_stones);
 	    int r, s;
-	    for (r = 0; r < lunch_stones; r++)
+	    for (r = 0; r < num_lunch_stones; r++)
 	      for (s = 0; s < 8; s++) {
-		int vi = lunch_stonei[r] + deltai[s];
-		int vj = lunch_stonej[r] + deltaj[s];
-		if (ON_BOARD(vi, vj) && p[vi][vj] == color && !mx[vi][vj])
-		  superstring_add_string(vi, vj,
-					 &my_stones, my_stonei, my_stonej,
-					 stones, stonei, stonej,
-					 libs, libi, libj, maxlibs,
-					 adj, adji, adjj, liberty_cap,
+		int vpos = lunch_stones[r] + delta[s];
+		if (board[vpos] == color && !mx[vpos])
+		  superstring_add_string(vpos,
+					 &num_my_stones, my_stones,
+					 num_stones, stones,
+					 num_libs, libs, maxlibs,
+					 num_adj, adjs, liberty_cap,
 					 mx, ml, ma, 1);
 	      }
 	  }
 	}
-      if (libs && maxlibs > 0 && *libs >= maxlibs)
+      if (num_libs && maxlibs > 0 && *num_libs >= maxlibs)
 	return;
     }
   }
@@ -1686,85 +1667,79 @@ do_find_superstring(int m, int n, int *stones, int *stonei, int *stonej,
  * adjacent strings as asked for.
  */
 static void
-superstring_add_string(int m, int n,
-		       int *my_stones, int *my_stonei, int *my_stonej,
-		       int *stones, int *stonei, int *stonej,
-		       int *libs, int *libi, int *libj, int maxlibs,
-		       int *adj, int *adji, int *adjj, int liberty_cap,
-		       char mx[MAX_BOARD][MAX_BOARD],
-		       char ml[MAX_BOARD][MAX_BOARD],
-		       char ma[MAX_BOARD][MAX_BOARD],
+superstring_add_string(int str,
+		       int *num_my_stones, int *my_stones,
+		       int *num_stones, int *stones,
+		       int *num_libs, int *libs, int maxlibs,
+		       int *num_adj, int *adjs, int liberty_cap,
+		       char mx[BOARDMAX],
+		       char ml[BOARDMAX],
+		       char ma[BOARDMAX],
 		       int do_add)
 {
-  int my_libs;
-  int my_libi[MAXLIBS];
-  int my_libj[MAXLIBS];
-  int my_adj;
-  int my_adji[MAXCHAIN];
-  int my_adjj[MAXCHAIN];
+  int num_my_libs;
+  int my_libs[MAXLIBS];
+  int num_my_adj;
+  int my_adjs[MAXCHAIN];
   int new_stones;
   int k;
   
-  ASSERT(mx[m][n] == 0, m, n);
+  ASSERT1(mx[str] == 0, str);
 
   /* Pick up the stones of the new string. */
-  new_stones = findstones(m, n, board_size * board_size,
-			  &(my_stonei[*my_stones]),
-			  &(my_stonej[*my_stones]));
+  new_stones = findstones(str, board_size * board_size,
+			  &(my_stones[*num_my_stones]));
   
-  mark_string(m, n, mx, 1);
-  if (stonei) {
-    gg_assert(stonej && stones);
+  mark_string(str, mx, 1);
+  if (stones) {
+    gg_assert(num_stones);
     for (k = 0; k < new_stones; k++) {
       if (do_add) {
-	stonei[*stones] = my_stonei[*my_stones + k];
-	stonej[*stones] = my_stonej[*my_stones + k];
-	(*stones)++;
+	stones[*num_stones] = my_stones[*num_my_stones + k];
+	(*num_stones)++;
       }
     }
   }
-  (*my_stones) += new_stones;
+  (*num_my_stones) += new_stones;
 
   /* Pick up the liberties of the new string. */
-  if (libi) {
-    gg_assert(libj && libs);
+  if (libs) {
+    gg_assert(num_libs);
     /* Get the liberties of the string. */
-    my_libs = findlib(m, n, MAXLIBS, my_libi, my_libj);
+    num_my_libs = findlib(str, MAXLIBS, my_libs);
 
     /* Remove this string from the superstring if it has too many
      * liberties.
      */
-    if (liberty_cap > 0 && my_libs > liberty_cap)
-      (*my_stones) -= new_stones;
+    if (liberty_cap > 0 && num_my_libs > liberty_cap)
+      (*num_my_stones) -= new_stones;
 
-    for (k = 0; k < my_libs; k++) {
-      if (ml[my_libi[k]][my_libj[k]])
+    for (k = 0; k < num_my_libs; k++) {
+      if (ml[my_libs[k]])
 	continue;
-      ml[my_libi[k]][my_libj[k]] = 1;
-      if (do_add && (liberty_cap == 0 || my_libs <= liberty_cap)) {
-	libi[*libs] = my_libi[k];
-	libj[*libs] = my_libj[k];
-	(*libs)++;
-	if (*libs == maxlibs)
+      ml[my_libs[k]] = 1;
+      if (do_add && (liberty_cap == 0 || num_my_libs <= liberty_cap)) {
+	libs[*num_libs] = my_libs[k];
+	(*num_libs)++;
+	if (*num_libs == maxlibs)
 	  break;
       }
     }
   }
 
   /* Pick up adjacent strings to the new string. */
-  if (adji) {
-    gg_assert(adjj && adj);
-    my_adj = chainlinks(m, n, my_adji, my_adjj);
-    for (k = 0; k < my_adj; k++) {
-      if (liberty_cap > 0 && countlib(my_adji[k], my_adjj[k]) > liberty_cap)
+  if (adjs) {
+    gg_assert(num_adj);
+    num_my_adj = chainlinks(str, my_adjs);
+    for (k = 0; k < num_my_adj; k++) {
+      if (liberty_cap > 0 && countlib(my_adjs[k]) > liberty_cap)
 	continue;
-      if (ma[my_adji[k]][my_adjj[k]])
+      if (ma[my_adjs[k]])
 	continue;
-      ma[my_adji[k]][my_adjj[k]] = 1;
+      ma[my_adjs[k]] = 1;
       if (do_add) {
-	adji[*adj] = my_adji[k];
-	adjj[*adj] = my_adjj[k];
-	(*adj)++;
+	adjs[*num_adj] = my_adjs[k];
+	(*num_adj)++;
       }
     }
   }
@@ -1799,7 +1774,7 @@ time_report(int n, const char *occupation, int i, int j)
   dt = t - timers[n];
   if (dt > 1.0) {
     gprintf("%s", occupation);
-    if (!is_pass(i, j))
+    if (!is_pass(POS(i, j)))
       gprintf("%m", i, j);
     fprintf(stderr, ": %.2f sec\n", dt);
   }

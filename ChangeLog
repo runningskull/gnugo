@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+3.1.5 released September 15, 2001
+
+- board changed from 2D to 1D array representation
+- major revisions of board.c and reading.c
+- smaller revisions more or less anywhere
+
 3.1.4 released September 14, 2001
 
 - do_atari_atari tries harder to find defenses

@@ -57,7 +57,7 @@ reset_engine()
 {
   /* Initialize things for hashing of positions. */
   reading_cache_clear();
-  hashdata_recalc(&hashdata, p, board_ko_i, board_ko_j);
+  hashdata_recalc(&hashdata, board, board_ko_pos);
 
   /* Prepare our table of move reasons. */
   clear_move_reasons();
@@ -159,7 +159,7 @@ examine_position(int color, int how_much)
   else if (verbose) {
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
-	if (p[m][n]
+	if (BOARD(m, n)
 	    && worm[m][n].origini == m
 	    && worm[m][n].originj == n
 	    && worm[m][n].cutstone) {
@@ -366,7 +366,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     if (aa_val)
       add_my_atari_atari_move(ai, aj, aa_val);
     aa_val = atari_atari(other, &ai, &aj, save_verbose);
-    if (aa_val && safe_move(ai, aj, color))
+    if (aa_val && safe_move2(ai, aj, color))
       add_your_atari_atari_move(ai, aj, aa_val);
     verbose = save_verbose;
   }
@@ -668,7 +668,7 @@ placehand(int handicap)
 
   /* special cases: 5 and 7 */
   if (handicap == 5 || handicap == 7) {
-    add_stone(mid, mid, BLACK);
+    add_stone2(mid, mid, BLACK);
     handicap--;
   }
 
@@ -689,7 +689,7 @@ placehand(int handicap)
     if ( i < 0) i += board_size-1;
     if ( j < 0) j += board_size-1;
 
-    add_stone(i, j, BLACK);
+    add_stone2(i, j, BLACK);
   }
 
   return retval;

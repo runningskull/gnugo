@@ -36,7 +36,7 @@
 
 /*
  * This file, together with engine/hash.h implements hashing of go positions
- * using a method known as Zorbrist hashing.  See the Texinfo documentation
+ * using a method known as Zobrist hashing.  See the Texinfo documentation
  * (Reading/Hashing) for more information.  
  */
 
@@ -46,37 +46,13 @@ static int is_initialized = 0;
 
 
 /* Random values for the hash function.  For stones and ko position. */
-static Hashvalue  white_hash[MAX_BOARD][MAX_BOARD];	
-static Hashvalue  black_hash[MAX_BOARD][MAX_BOARD];	
-static Hashvalue  ko_hash[MAX_BOARD][MAX_BOARD];
+static Hashvalue white_hash[MAX_BOARD][MAX_BOARD];	
+static Hashvalue black_hash[MAX_BOARD][MAX_BOARD];	
+static Hashvalue ko_hash[MAX_BOARD][MAX_BOARD];
 
 
 static Compacttype white_patterns[4 * sizeof(Compacttype)];
 static Compacttype black_patterns[4 * sizeof(Compacttype)];
-
-
-/* Enable if you like to watch the hashing. */
-#if 0
-#define ECHOBEEP(_c) fputc(_c,stderr)
-#else
-#define ECHOBEEP(_c)
-#endif
-
-
-#if 0
-static Hashvalue
-board_hash(Intersection board[MAX_BOARD][MAX_BOARD], int koi, int koj);
-
-static void
-board_to_position(Intersection board[MAX_BOARD][MAX_BOARD], 
-		  int koi, int koj, Hashposition *pos);
-
-static void 
-hashdata_recalc_old(Hash_data *target, 
-		    Intersection board[MAX_BOARD][MAX_BOARD],
-		    int koi, int koj);
-
-#endif
 
 
 /* Get a random Hashvalue, where all bits are used. */
@@ -107,9 +83,8 @@ hash_init(void)
     return;
   
   /* Since the hash initialization consumes a varying number of random
-   * numbers depending on the size of the Hashvalue type, or none at
-   * all if hashing is disabled, we save the state of the random
-   * generator now and restore it afterwards.
+   * numbers depending on the size of the Hashvalue type, we save the
+   * state of the random generator now and restore it afterwards.
    */
   gg_get_rand_state(&state);
   
@@ -140,102 +115,6 @@ hash_init(void)
 }
 
 
-#if 0
-/* Temporarily disabled, but kept for future reference. */
-
-/*
- * Take a go position consisting of the board and a possible ko,
- * and generate a hash value from it.
- * 
- * See the Texinfo documentation (Reading/Hashing) for more information.
- */
-
-static Hashvalue
-board_hash(Intersection board[MAX_BOARD][MAX_BOARD], 
-	   int koi, int koj)
-{
-  Hashvalue  hash;
-  int           i;
-  int           j;
-
-  /* If the hash system is not initialized, do so now. */
-  if (!is_initialized)
-    hash_init();
-
-  /* Get the hash value for all the stones on the board. */
-  hash = 0;
-  for (i = 0; i < board_size; ++i)
-    for (j = 0; j < board_size; ++j) {
-      switch (board[i][j]) {
-      case WHITE:
-	hash = hash ^ white_hash[i][j];
-	break;
-      case BLACK:
-	hash = hash ^ black_hash[i][j];
-	break;
-      default:
-	break;
-      }
-    }
-
-  /* If there is a ko going on, take this into consideration too. */
-  if (koi != -1) 
-    hash ^= ko_hash[koi][koj];
-
-  return hash;
-}
-
-
-/*
- * Take a go position consisting of the board and a possible ko,
- * and store this in a compact form into *pos.
- */
-
-static void
-board_to_position(Intersection board[MAX_BOARD][MAX_BOARD], 
-		  int koi, int koj,  Hashposition *pos)
-{
-  int            index;
-  int            subindex;
-  Compacttype    bits;
-  int            i, j;
-
-  /* Initialize the compact board. */
-  for (i = 0; i < (int) COMPACT_BOARD_SIZE; i++)
-    pos->board[i] = 0;
-
-  /* Put 16 locations into one long using 2 bits per location. */
-  /* AvK 16 should read: 4* sizeof(Compacttype) long should read: Compacttype */
-  index = 0;
-  subindex = 0;
-  bits = 0;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      if (board[i][j] != EMPTY) {
-	if (board[i][j] == WHITE)
-	  bits |= white_patterns[subindex];
-	else if (board[i][j] == BLACK)
-	  bits |= black_patterns[subindex];
-      }
-
-      if (++subindex == POINTSPERCOMPACT) {
-	pos->board[index++] = bits;
-	bits = 0;
-	subindex = 0;
-      }
-    }
-  /* Store the last long into the compact board. 
-     We only need to do this if we didn't just store it inside the loop. */
-  if (subindex != 0)
-    pos->board[index] = bits;
-
-  /* The rest of the info, beside the board. */
-  pos->ko_i    = koi;
-  pos->ko_j    = koj;
-}
-#endif
-
-
 /* ---------------------------------------------------------------- */
 
 
@@ -252,18 +131,15 @@ hashposition_compare(Hashposition *pos1, Hashposition *pos2)
   /* We need only compare to board_size.  MAX_BOARD is not necessary. */
   for (i = 0; i < (int) (board_size * board_size / POINTSPERCOMPACT + 1); i++)
     if (pos1->board[i] != pos2->board[i]) {
-      ECHOBEEP('A' + i);
       stats.hash_collisions++;
       return 1;
     }
 
-  if (pos1->ko_i != pos2->ko_i || pos1->ko_j != pos2->ko_j) {
-    ECHOBEEP('*');
+  if (pos1->ko_pos != pos2->ko_pos) {
     stats.hash_collisions++;
     return 1;
   }
 
-  ECHOBEEP(' ');
   return 0;
 }
 
@@ -282,10 +158,11 @@ hashposition_dump(Hashposition *pos, FILE *outfile)
   for (i = 0; i < (int) COMPACT_BOARD_SIZE; ++i)
      fprintf(outfile, " %lx", (unsigned long) pos->board[i]);
 
-  if (pos->ko_i == -1)
+  if (pos->ko_pos == 0)
     fprintf(outfile, "  No ko");
   else
-    fprintf(outfile, "  Ko position: (%d, %d)", pos->ko_i, pos->ko_j);
+    fprintf(outfile, "  Ko position: (%d, %d)",
+	    I(pos->ko_pos), J(pos->ko_pos));
 }
 
 
@@ -298,10 +175,9 @@ hashposition_dump(Hashposition *pos, FILE *outfile)
  */
 
 void 
-hashdata_recalc(Hash_data *target, Intersection board[MAX_BOARD][MAX_BOARD],
-		int koi, int koj)
+hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 {
-  /* USE_SHIFTING is a (CPU dependant?) optimization.
+  /* USE_SHIFTING is a (CPU dependent?) optimization.
    * The theory behind it is that shifting is relatively cheap.
    * Referencing a precomputed array uses the bus, and might consume 
    * a cacheslot. 
@@ -326,7 +202,7 @@ hashdata_recalc(Hash_data *target, Intersection board[MAX_BOARD][MAX_BOARD],
   target->hashpos.board[index] = 0;
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      switch (board[i][j]) {
+      switch (p[POS(i, j)]) {
       default:
       case EMPTY: 
 	bits <<= 2;
@@ -355,7 +231,8 @@ hashdata_recalc(Hash_data *target, Intersection board[MAX_BOARD][MAX_BOARD],
   }
 
   /* This cleans up garbage bits at the (unused) end of the array.
-     It probably should not really be necessary. */
+   * It probably should not really be necessary.
+   */
   for ( ;++index < COMPACT_BOARD_SIZE; )
     target->hashpos.board[index] = 0;
 
@@ -372,7 +249,7 @@ hashdata_recalc(Hash_data *target, Intersection board[MAX_BOARD][MAX_BOARD],
   bits = 0;
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      switch (board[i][j] ) {
+      switch (p[POS(i, j)]) {
       default:
       case EMPTY: 
 	break;
@@ -397,27 +274,13 @@ hashdata_recalc(Hash_data *target, Intersection board[MAX_BOARD][MAX_BOARD],
     target->hashpos.board[index] = bits;
 #endif /* USE_SHIFTING */
 
-  if (koi >= 0) {
-    target->hashval ^= ko_hash[koi][koj];
-    target->hashpos.ko_i = koi;
-    target->hashpos.ko_j = koj;
-  } else {
-    target->hashpos.ko_i = -1;
-    target->hashpos.ko_j = -1;
+  if (ko_pos >= 0) {
+    target->hashval ^= ko_hash[I(ko_pos)][J(ko_pos)];
+    target->hashpos.ko_pos = ko_pos;
   }
+  else
+    target->hashpos.ko_pos = 0;
 }
-
-
-#if 0
-static void 
-hashdata_recalc_old(Hash_data *target, 
-		    Intersection board[MAX_BOARD][MAX_BOARD],
-		    int koi, int koj)
-{
-  target->hashval = board_hash(board, koi, koj);
-  board_to_position(board, koi, koj, &(target->hashpos));
-}
-#endif
 
 
 /*
@@ -425,12 +288,10 @@ hashdata_recalc_old(Hash_data *target,
  */
 
 void
-hashdata_set_ko(Hash_data *hd, int i, int j)
+hashdata_set_ko(Hash_data *hd, int pos)
 {
-  hd->hashval ^= ko_hash[i][j];
-
-  hd->hashpos.ko_i = i;
-  hd->hashpos.ko_j = j;
+  hd->hashval ^= ko_hash[I(pos)][J(pos)];
+  hd->hashpos.ko_pos = pos;
 }
 
 
@@ -441,28 +302,30 @@ hashdata_set_ko(Hash_data *hd, int i, int j)
 void
 hashdata_remove_ko(Hash_data *hd)
 {
-  if (hd->hashpos.ko_i != -1) {
-    hd->hashval ^= ko_hash[hd->hashpos.ko_i][hd->hashpos.ko_j];
-    hd->hashpos.ko_i = -1;
-    hd->hashpos.ko_j = -1;
+  if (hd->hashpos.ko_pos != 0) {
+    hd->hashval ^= ko_hash[I(hd->hashpos.ko_pos)][J(hd->hashpos.ko_pos)];
+    hd->hashpos.ko_pos = 0;
   }
 }
 
 
 /*
- * Set or remove a stone of COLOR at (I, J) in a Hash_data.
+ * Set or remove a stone of COLOR at pos in a Hash_data.
  */
 
 void
-hashdata_invert_stone(Hash_data *hd, int i, int j, int color)
+hashdata_invert_stone(Hash_data *hd, int pos, int color)
 {
-  int  index = (i * board_size + j) / POINTSPERCOMPACT;
-  int  subindex = (i * board_size + j) % POINTSPERCOMPACT;
+  int i = I(pos);
+  int j = J(pos);
+  int index = (i * board_size + j) / POINTSPERCOMPACT;
+  int subindex = (i * board_size + j) % POINTSPERCOMPACT;
 
   if (color == BLACK) {
     hd->hashval ^= black_hash[i][j];
     hd->hashpos.board[index] ^= black_patterns[subindex];
-  } else if (color == WHITE) {
+  }
+  else if (color == WHITE) {
     hd->hashval ^= white_hash[i][j];
     hd->hashpos.board[index] ^= white_patterns[subindex];
   }
@@ -484,7 +347,6 @@ hashdata_diff_dump(Hash_data *hd1, Hash_data *hd2)
   static const char letter[] = "abcdefghjklmnopqrstuvwxyz";
   static const char *hashcolors[] = {"Empty", "White", "Black", "Grey!"};
 
-  ECHOBEEP(':');
   retval = hashdata_compare(hd1, hd2);
   if (retval == 0)
     return retval;
@@ -520,16 +382,15 @@ hashdata_diff_dump(Hash_data *hd1, Hash_data *hd2)
     }
   }
 
-  if (hd1->hashpos.ko_i == -1 && hd2->hashpos.ko_i == -1)
+  if (hd1->hashpos.ko_pos == 0 && hd2->hashpos.ko_pos == 0)
     fprintf(stderr, "\nNo ko\n");
-  else if (hd1->hashpos.ko_i == hd2->hashpos.ko_i
-	   && hd1->hashpos.ko_j == hd2->hashpos.ko_j )
+  else if (hd1->hashpos.ko_pos == hd2->hashpos.ko_pos)
     fprintf(stderr, "\nEqual Ko position:[%c%d]\n",
-	    letter[hd1->hashpos.ko_i], hd1->hashpos.ko_j);
+	    letter[I(hd1->hashpos.ko_pos)], J(hd1->hashpos.ko_pos));
   else
     fprintf(stderr, "\nDifferent Ko position:[%c%d] <==> [%c%d]\n",
-	    letter[hd1->hashpos.ko_i], hd1->hashpos.ko_j,
-	    letter[hd2->hashpos.ko_i], hd2->hashpos.ko_j);
+	    letter[I(hd1->hashpos.ko_pos)], J(hd1->hashpos.ko_pos),
+	    letter[I(hd2->hashpos.ko_pos)], J(hd2->hashpos.ko_pos));
 
   fprintf(stderr, "Total [%d,%d,%d,%d]",
 	  count1[0], count1[1], count1[2], count1[3]);
@@ -545,11 +406,9 @@ hashdata_compare(Hash_data *hd1, Hash_data *hd2)
 {
   int  rc;
 
-  ECHOBEEP('<');
   rc = (hd1->hashval == hd2->hashval) ? 0 : 2;
   if (rc == 0)
     rc = hashposition_compare(&hd1->hashpos, &hd2->hashpos);
-  ECHOBEEP('>');
 
   return rc;
 }

@@ -76,7 +76,8 @@ void play_gmp(int boardsize, Gameinfo *gameinfo)
   if (message == gmp_err)  {
     fprintf(stderr, "gnugo-gmp: Error \"%s\" occurred.\n", error);
     exit(1);
-  } else if (message != gmp_newGame)  {
+  }
+  else if (message != gmp_newGame)  {
     fprintf(stderr, "gnugo-gmp: Expecting a newGame, got %s\n",
 	    gmp_resultString(message));
     exit(1);
@@ -159,7 +160,8 @@ void play_gmp(int boardsize, Gameinfo *gameinfo)
 	gnugo_play_move(&gameinfo->position, -1, -1, yourcolor);
 	sgffile_move_made(-1, -1, to_move, moveval);
 	gameinfo->move_number++;
-      } else {
+      }
+      else {
 	/* not pass */
 	passes = 0;
         curnode = sgfAddPlay(curnode, to_move, i, j);
@@ -169,7 +171,8 @@ void play_gmp(int boardsize, Gameinfo *gameinfo)
 	gameinfo->move_number++;
       }
 
-    } else {
+    }
+    else {
       /* Generate my next move. */
       moveval = gnugo_genmove(&gameinfo->position, &i, &j, mycolor,
 			      gameinfo->move_number);
@@ -182,7 +185,8 @@ void play_gmp(int boardsize, Gameinfo *gameinfo)
 	gmp_sendPass(ge);
 	sgffile_move_made(-1, -1, to_move, moveval);
 	++passes;
-      } else {
+      }
+      else {
 	/* not pass */
         curnode = sgfAddPlay(curnode, to_move, i, j);
 	gmp_sendMove(ge, j, i);

@@ -69,10 +69,10 @@ display_worm(Position *pos, int i, int j)
   UNUSED(pos);
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s worm   ",
-	     location_to_string(i, j),
+	     location_to_string2(i, j),
 	     color_to_string(worm[i][j].color));
   gg_wprintw(info_window, "(origin %s) ",
-	     location_to_string(worm[i][j].origini,
+	     location_to_string2(worm[i][j].origini,
 				worm[i][j].originj));
 
   wmove(info_window, 3, 16);
@@ -97,7 +97,7 @@ display_worm(Position *pos, int i, int j)
 	       worm[i][j].attack_code);
   else
     gg_wprintw(info_window, "%3s [code %d]", 
-	    location_to_string(worm[i][j].attacki,
+	    location_to_string2(worm[i][j].attacki,
 			       worm[i][j].attackj),
 	    worm[i][j].attack_code);
   
@@ -107,7 +107,7 @@ display_worm(Position *pos, int i, int j)
 	       worm[i][j].defend_code);
   else
     gg_wprintw(info_window, "%3s [code %d]", 
-	    location_to_string(worm[i][j].defendi,
+	    location_to_string2(worm[i][j].defendi,
 			       worm[i][j].defendj),
 	    worm[i][j].defend_code);
 
@@ -116,7 +116,7 @@ display_worm(Position *pos, int i, int j)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%3s", 
-	    location_to_string(worm[i][j].lunchi,
+	    location_to_string2(worm[i][j].lunchi,
 			       worm[i][j].lunchj));
 
   wmove(info_window, 7, 55);
@@ -188,10 +188,10 @@ display_dragon(int i, int j)
 {
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s dragon ",
-	     location_to_string(i, j),
+	     location_to_string2(i, j),
 	     color_to_string(dragon[i][j].color));
   gg_wprintw(info_window, "(origin %s)  id %d   ",
-	     location_to_string(dragon[i][j].origini,
+	     location_to_string2(dragon[i][j].origini,
 				dragon[i][j].originj),
 	     dragon[i][j].id);
 
@@ -204,7 +204,7 @@ display_dragon(int i, int j)
   wmove(info_window, 8, 21);
   if (dragon[i][j].heyes > 0)
     gg_wprintw(info_window, "[%s] ", 
-	       location_to_string(dragon[i][j].heyei, dragon[i][j].heyej));
+	       location_to_string2(dragon[i][j].heyei, dragon[i][j].heyej));
   else
     gg_wprintw(info_window, "[---]");
 
@@ -217,7 +217,7 @@ display_dragon(int i, int j)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%3s", 
-	    location_to_string(dragon[i][j].lunchi,
+	    location_to_string2(dragon[i][j].lunchi,
 			       dragon[i][j].lunchj));
 
   wmove(info_window, 3, 55);
@@ -229,13 +229,13 @@ display_dragon(int i, int j)
     gg_wprintw(info_window, "[---] ");
   else
     gg_wprintw(info_window, "[%3s] ", 
-	    location_to_string(dragon[i][j].owl_attacki,
+	    location_to_string2(dragon[i][j].owl_attacki,
 			       dragon[i][j].owl_attackj));
   if (dragon[i][j].owl_attacki == -1)
     gg_wprintw(info_window, "[---] ");
   else
     gg_wprintw(info_window, "[%3s] ", 
-	    location_to_string(dragon[i][j].owl_defendi,
+	    location_to_string2(dragon[i][j].owl_defendi,
 			       dragon[i][j].owl_defendj));
 
   wmove(info_window, 5, 55);
@@ -245,12 +245,12 @@ display_dragon(int i, int j)
     break;
   case CAN_THREATEN_ATTACK:
     gg_wprintw(info_window, "att. threat [%3s] [---]",
-	       location_to_string(dragon[i][j].owl_second_attacki,
+	       location_to_string2(dragon[i][j].owl_second_attacki,
 				  dragon[i][j].owl_second_attackj));
     break;
   case CAN_THREATEN_DEFENSE:
     gg_wprintw(info_window, "def. threat [---] [%3s]",
-	       location_to_string(dragon[i][j].owl_second_defendi,
+	       location_to_string2(dragon[i][j].owl_second_defendi,
 				  dragon[i][j].owl_second_defendj));
     break;
   default:
@@ -332,14 +332,14 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
   wmove(info_window, 1, 24);
   gg_wprintw(info_window, "%s", color == WHITE ? "WHITE" : "BLACK");
   wmove(info_window, 2, 9);
-  gg_wprintw(info_window, "%s ", location_to_string(i, j));
+  gg_wprintw(info_window, "%s ", location_to_string2(i, j));
 
   wmove(info_window, 2, 24);
   if (eyedata[i][j].origini == -1)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ", 
-	    location_to_string(eyedata[i][j].origini,
+	    location_to_string2(eyedata[i][j].origini,
 			       eyedata[i][j].originj));
 
   wmove(info_window, 4, 18);
@@ -353,7 +353,7 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ",
-	    location_to_string(eyedata[i][j].dragoni,
+	    location_to_string2(eyedata[i][j].dragoni,
 			       eyedata[i][j].dragonj));
 
   wmove(info_window, 11, 18);
@@ -373,7 +373,7 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
     gg_wprintw(info_window, "---          ");
   else
     gg_wprintw(info_window, "%3s", 
-	    location_to_string(eyedata[i][j].attacki,
+	    location_to_string2(eyedata[i][j].attacki,
 			       eyedata[i][j].attackj));
 
   wmove(info_window, 7, 55);
@@ -381,7 +381,7 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
     gg_wprintw(info_window, "---          ");
   else
     gg_wprintw(info_window, "%3s", 
-	    location_to_string(eyedata[i][j].defendi,
+	    location_to_string2(eyedata[i][j].defendi,
 			       eyedata[i][j].defendj));
   
   wmove(info_window, 11, 55);

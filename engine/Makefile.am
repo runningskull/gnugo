@@ -30,9 +30,9 @@ libengine_a_SOURCES = \
       interface.c \
       life.c \
       matchpat.c \
-      owl.c \
       move_reasons.c \
       optics.c \
+      owl.c \
       printutils.c \
       reading.c \
       score.c \

@@ -58,7 +58,7 @@ openregion(int i1, int i2, int j1, int j2)
    return openregion(i1, i2, j2, j1);
  for (x = i1; x <= i2; x++)
      for (y = j1; y <= j2; y++)
-       if (p[x][y] != EMPTY)
+       if (BOARD(x, y) != EMPTY)
 	 return 0;
  return 1;
 }
@@ -172,7 +172,7 @@ static void
 announce_move(int i, int j, int val)
 {
   /* This shouldn't happen. */
-  if (p[i][j])
+  if (BOARD(i, j))
     return;
 
   TRACE("Fuseki Player suggests %m with value %d\n", i, j, val);

@@ -79,7 +79,10 @@ get_moveXY(SGFProperty *property, int *i, int *j, int boardsize)
   *i = get_moveX(property, boardsize);
   *j = get_moveY(property, boardsize);
   
-  return !is_pass(*i, *j);
+  if (*i == -1 && *j == -1)
+    return 0;
+
+  return 1;
 }
 
 

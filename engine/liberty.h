@@ -74,13 +74,58 @@ extern Hash_data    hashdata;
 #define MAXSTACK  MAX_BOARD * MAX_BOARD
 #define MAXCHAIN  160
 
+/* 1D board macros. */
+#define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1))
+#define BOARDMIN     (MAX_BOARD + 2)
+#define BOARDMAX     (MAX_BOARD + 1) * (MAX_BOARD + 1)
+#define POS(i, j)    ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))
+#define I(pos)       ((pos) / (MAX_BOARD + 1) - 1)
+#define J(pos)       ((pos) % (MAX_BOARD + 1) - 1)
+#define NS           (MAX_BOARD + 1)
+#define WE           1
+#define SOUTH(pos)   ((pos) + NS)
+#define WEST(pos)    ((pos) - 1)
+#define NORTH(pos)   ((pos) - NS)
+#define EAST(pos)    ((pos) + 1)
+#define SW(pos)      ((pos) + NS - 1)
+#define NW(pos)      ((pos) - NS - 1)
+#define NE(pos)      ((pos) - NS + 1)
+#define SE(pos)      ((pos) + NS + 1)
+#define SS(pos)      ((pos) + 2 * NS)
+#define WW(pos)      ((pos) - 2)
+#define NN(pos)      ((pos) - 2 * NS)
+#define EE(pos)      ((pos) + 2)
+
+#define BOARD(i, j)  board[POS(i, j)]
+
+/* 2D workaround macros for 1D functions. */
+#define countlib2(m, n) countlib(POS(m, n))
+#define countstones2(m, n) countstones(POS(m, n))
+#define same_string2(m, n, i, j) same_string(POS(m, n), POS(i, j))
+#define safe_move2(m, n, color) safe_move(POS(m, n), color)
+#define is_legal2(m, n, color) is_legal(POS(m, n), color)
+#define is_suicide2(m, n, color) is_suicide(POS(m, n), color)
+#define is_self_atari2(m, n, color) is_self_atari(POS(m, n), color)
+#define is_illegal_ko_capture2(m, n, color) \
+        is_illegal_ko_capture(POS(m, n), color)
+#define trymove2(m, n, color, message, i, j, komaster, kom_i, kom_j) \
+        trymove(POS(m, n), color, message, POS(i, j), \
+                komaster, POS(kom_i, kom_j))
+#define tryko2(m, n, color, message, komaster, kom_i, kom_j) \
+        tryko(POS(m, n), color, message, komaster, POS(kom_i, kom_j))
+#define neighbor_of_string2(m, n, i, j) \
+        neighbor_of_string(POS(m, n), POS(i, j))
+#define liberty_of_string2(m, n, i, j) \
+        liberty_of_string(POS(m, n), POS(i, j))
+#define does_capture_something2(m, n, color) \
+        does_capture_something(POS(m, n), color)
+#define add_stone2(m, n, color) add_stone(POS(m, n), color)
 
 /* board utility functions */
 
-void find_origin(int i, int j, int *origini, int *originj);
-int chainlinks(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN]);
-int chainlinks2(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN],
-		int lib);
+int find_origin(int str);
+int chainlinks(int str, int adj[MAXCHAIN]);
+int chainlinks2(int str, int adj[MAXCHAIN], int lib);
 
 /* This is increased by one anytime a move is (permanently) played or
  * the board is cleared.
@@ -88,29 +133,29 @@ int chainlinks2(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN],
 extern int position_number;
 
 /* Count and/or find liberties at (i, j). */
-int countlib(int m, int n);
-int findlib(int m, int n, int maxlib, int *libi, int *libj);
-int approxlib(int m, int n, int color, int maxlib, int *libi, int *libj);
+int countlib(int str);
+int findlib(int str, int maxlib, int *libs);
+int approxlib(int pos, int color, int maxlib, int *libs);
 
+void start_timer(int n);
+double time_report(int n, const char *occupation, int i, int j);
 
 /* Play at (m, n) and then count the liberties. */
-int accurate_approxlib(int m, int n, int color, int maxlib,
-                       int *libi, int *libj);
+int accurate_approxlib(int pos, int color, int maxlib, int *libs);
 
 /* Check for self atari. */
-int is_self_atari(int m, int n, int color);
+int is_self_atari(int pos, int color);
 
 /* Count the number of stones in a string. */
-int countstones(int m, int n);
-int findstones(int m, int n, int maxstones, int *stonei, int *stonej);
+int countstones(int str);
+int findstones(int str, int maxstones, int *stones);
 
 /* Exported from incremental_board.c so that reading.c can use it. */
-void
-incremental_order_moves(int mi, int mj, int color, int si, int sj,
-			int *number_edges, int *number_same_string,
-			int *number_own, int *number_opponent,
-			int *captured_stones, int *threatened_stones,
-			int *saved_stones, int *number_open);
+void incremental_order_moves(int move, int color, int string,
+			     int *number_edges, int *number_same_string,
+			     int *number_own, int *number_opponent,
+			     int *captured_stones, int *threatened_stones,
+			     int *saved_stones, int *number_open);
 
   
 void dump_stack(void);
@@ -121,7 +166,7 @@ void ascii_report_dragon(char *string);
 
 /* Is this point inside the board? */
 #if 0
-#define ON_BOARD(i, j) ((i)>=0 && (j)>=0 && (i)<board_size && (j)<board_size)
+#define ON_BOARD2(i, j) ((i)>=0 && (j)>=0 && (i)<board_size && (j)<board_size)
 #else
 /*
  * For the case when expr can only be slightly negative,
@@ -132,11 +177,15 @@ void ascii_report_dragon(char *string);
  * (I think gcc knows this trick, but it does no harm to
  *  encode it explicitly since it saves typing !)
  */
-#define ON_BOARD(i, j) ((unsigned) (i) < (unsigned) board_size &&\
-		        (unsigned) (j) < (unsigned) board_size)
+#define ON_BOARD2(i, j) ((unsigned) (i) < (unsigned) board_size &&\
+		         (unsigned) (j) < (unsigned) board_size)
 #endif
 
-#define ASSERT_ON_BOARD(i, j) ASSERT(ON_BOARD((i), (j)), (i), (j))
+#define ASSERT_ON_BOARD2(i, j) ASSERT2(ON_BOARD2((i), (j)), (i), (j))
+
+#define ON_BOARD1(pos) (((unsigned) (pos) < BOARDSIZE) && board[pos] != GRAY)
+#define ON_BOARD(pos) (board[pos] != GRAY)
+#define ASSERT_ON_BOARD1(pos) ASSERT1(ON_BOARD1(pos), (pos))
 
 /* Coordinates for the eight directions, ordered
  * south, west, north, east, southwest, northwest, northeast, southeast.
@@ -144,6 +193,7 @@ void ascii_report_dragon(char *string);
  */
 extern int deltai[8]; /* = { 1,  0, -1,  0,  1, -1, -1, 1}; */
 extern int deltaj[8]; /* = { 0, -1,  0,  1, -1, -1,  1, 1}; */
+extern int delta[8];  /* = { NS, -1, -NS, 1, NS-1, -NS-1, -NS+1, NS+1}; */
 
 void store_position(Position *pos);
 void restore_position(Position *pos);
@@ -155,7 +205,9 @@ struct fullboard_pattern;
 struct half_eye_data;
 
 /*
- * try to match a pattern in the database to the board. Callback for each match */
+ * Try to match a pattern in the database to the board. Callback for
+ * each match
+ */
 typedef void (*matchpat_callback_fn_ptr)(int m, int n, int color,
                                          struct pattern *, int rotation,
                                          void *data);
@@ -172,8 +224,8 @@ void reading_cache_init(int bytes);
 void reading_cache_clear(void);
 
 /* reading.c */
-int attack(int m, int n, int *i, int *j);
-int find_defense(int m, int n, int *i, int *j);
+int attack(int si, int sj, int *i, int *j);
+int find_defense(int si, int sj, int *i, int *j);
 int attack_and_defend(int si, int sj,
 		      int *attack_code, int *attacki, int *attackj,
 		      int *defend_code, int *defendi, int *defendj);
@@ -186,21 +238,25 @@ void draw_reading_shadow(void);
 void purge_persistent_reading_cache(void);
 void reading_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 
-int is_ko(int i, int j, int color, int *ko_i, int *ko_j);
-int komaster_trymove(int i, int j, int color,
-		     const char *message, int si, int sj,
-		     int komaster, int kom_i, int kom_j,
-		     int *new_komaster, int *new_kom_i, int *new_kom_j,
+int liberty_of_string(int pos, int str);
+int neighbor_of_string(int pos, int str);
+int same_string(int str1, int str2);
+int is_ko(int pos, int color, int *ko_pos);
+int komaster_trymove(int pos, int color,
+		     const char *message, int str,
+		     int komaster, int kom_pos,
+		     int *new_komaster, int *new_kom_pos,
 		     int *is_conditional_ko, int consider_conditional_ko);
-int does_capture_something(int m, int n, int color);
-void mark_string(int i, int j, char mx[MAX_BOARD][MAX_BOARD], char mark);
-int move_in_stack(int m, int n, int cutoff);
-void get_move_from_stack(int k, int *i, int *j, int *color);
+int does_capture_something(int pos, int color);
+void mark_string(int str, char mx[BOARDMAX], char mark);
+void mark_string2(int m, int n, char mx[MAX_BOARD][MAX_BOARD], char mark);
+int move_in_stack(int pos, int cutoff);
+void get_move_from_stack(int k, int *move, int *color);
 int stones_on_board(int color);
-int obvious_false_eye(int m, int n, int color);
-int owl_topological_eye(int m, int n, int color);
+int obvious_false_eye(int i, int j, int color);
+int owl_topological_eye(int i, int j, int color);
 int vital_chain(int m, int n);
-int confirm_safety(int i, int j, int color, int size, int *di, int *dj);
+int confirm_safety(int m, int n, int color, int size, int *di, int *dj);
 void set_depth_values(int level);
 void modify_depth_values(int n);
 void increase_depth_values(void);
@@ -208,14 +264,14 @@ void decrease_depth_values(void);
 void set_temporary_depth_values(int d, int b, int f, int k, 
 				int br, int b2, int ss);
 void restore_depth_values(void);
-int safe_move(int i, int j, int color);
+int safe_move(int move, int color);
 void join_dragons(int ai, int aj, int bi, int bj);
 int dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
-                  int escape_value[MAX_BOARD][MAX_BOARD]);
+		  int escape_value[MAX_BOARD][MAX_BOARD]);
 int lively_dragon_exists(int color);
 int examine_cavity(int m, int n, int *edge, int *size,
-                   int *vertexi, int *vertexj);
-void propagate_worm(int m, int n);
+		   int *vertexi, int *vertexj);
+void propagate_worm(int wormi, int wormj);
 void transform(int i, int j, int *ti, int *tj, int trans);
 void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 void find_cuts(void);
@@ -272,36 +328,30 @@ void find_stones_saved_by_move(int i, int j, int color,
                                char saved_stones[MAX_BOARD][MAX_BOARD]);
 
 int owl_lively(int i, int j);
-int owl_escape_value(int m, int n);
-int owl_goal_dragon(int m, int n);
+int owl_escape_value(int i, int j);
+int owl_goal_dragon(int i, int j);
 int owl_eyespace(int ai, int aj, int bi, int bj);
 int owl_big_eyespace(int ai, int aj, int bi, int bj);
 void owl_reasons(int color);
 
 void unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
 			int color);
-void find_superstring(int m, int n, int *stones, int *stonei, int *stonej);
-void find_superstring_liberties(int m, int n, 
-                                int *libs, int *libi, int *libj, 
+void find_superstring(int str, int *num_stones, int *stones);
+void find_superstring_liberties(int str, int *liberties, int *libs,
                                 int liberty_cap);
-void find_proper_superstring_liberties(int m, int n, 
-                                       int *libs, int *libi, int *libj, 
+void find_proper_superstring_liberties(int str, int *liberties, int *libs, 
                                        int liberty_cap);
-void find_superstring_stones_and_liberties(int m, int n, int *stones, 
-					   int *stonei, int *stonej,
-					   int *libs, int *libi, int *libj,
-					   int liberty_cap);
-void superstring_chainlinks(int m, int n, 
-                            int *adj, int adji[MAXCHAIN], int adjj[MAXCHAIN],
+void find_superstring_stones_and_liberties(int str, int *num_stones,
+					   int *stones, int *liberties,
+					   int *libs, int liberty_cap);
+void superstring_chainlinks(int str, int *num_adj, int adj[MAXCHAIN],
                             int liberty_cap);
-void proper_superstring_chainlinks(int m, int n, int *adj, 
-                                   int adji[MAXCHAIN], int adjj[MAXCHAIN],
-                                   int liberty_cap);
+void proper_superstring_chainlinks(int str, int *num_adj, 
+                                   int adj[MAXCHAIN], int liberty_cap);
 
 int placehand(int handicap);          /* place stones on board only */
 
-void start_timer(int n);
-double time_report(int n, const char *occupation, int i, int j);
+/* FIXME: Continue below here. */
 
 /* Various different strategies for finding a move */
 void fuseki(int color);
@@ -310,7 +360,7 @@ void small_semeai(void);
 void small_semeai_analyzer(int, int, int, int);
 void shapes(int color);
 void endgame_shapes(int color);
-int atari_atari(int color, int *i, int *j, int verbose);
+int atari_atari(int color, int *i, int *j, int save_verbose);
 int atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
 			       int minsize);
 int atari_atari_try_combination(int color, int ai, int aj, int bi, int bj);
@@ -323,8 +373,8 @@ int aftermath_genmove(int *i, int *j, int color,
 int revise_semeai(int color);
 int find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj);
 
-int owl_attack(int m, int n, int *i, int *j, int *certain);
-int owl_defend(int m, int n, int *i, int *j, int *certain);
+int owl_attack(int m, int n, int *ui, int *uj, int *certain);
+int owl_defend(int m, int n, int *ui, int *uj, int *certain);
 int owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj);
 int owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj);
 int owl_does_defend(int ti, int tj, int m, int n);
@@ -347,9 +397,6 @@ int play_break_through_n(int color, int num_moves, ...);
 int cut_possible(int i, int j, int color);
 int defend_against(int ti, int tj, int color, int ai, int aj);
 int somewhere(int color, int num_moves, ...);
-int liberty_of_string(int ai, int aj, int si, int sj);
-int neighbor_of_string(int ai, int aj, int si, int sj);
-int same_string(int ai, int aj, int bi, int bj);
 
 /* moyo.c */
 int area_color(int m, int n);
@@ -441,10 +488,9 @@ void end_sgftreedump(const char *filename);
 
 /* The board and the other parameters deciding the current position. */
 extern int           board_size;             /* board size (usually 19) */
-extern Intersection  p[MAX_BOARD][MAX_BOARD];  /* go board */
-extern Intersection  shadow[MAX_BOARD][MAX_BOARD];  /* reading tree shadow */
-extern int           board_ko_i;
-extern int           board_ko_j;
+extern Intersection  board[BOARDSIZE];       /* go board */
+extern Intersection  shadow[BOARDMAX];      /* reading tree shadow */
+extern int           board_ko_pos;
 
 extern float         komi;
 extern int           black_captured;   /* num. of black stones captured */
@@ -698,12 +744,14 @@ void abortgo(const char *file, int line, const char *msg, int i, int j);
 
 #ifndef NDEBUG
 /* avoid dangling else */
-#define ASSERT(x, i, j) if (x) ; else abortgo(__FILE__, __LINE__, #x, i, j)
+#define ASSERT2(x, i, j) if (x) ; else abortgo(__FILE__, __LINE__, #x, i, j)
+#define ASSERT1(x, pos) if (x) ; else abortgo(__FILE__, __LINE__, #x, I(pos), J(pos))
 #else
-#define ASSERT(x, i, j)
+#define ASSERT2(x, i, j)
+#define ASSERT1(x, i, j)
 #endif
 
-#define gg_assert(x) ASSERT(x, -1, -1);
+#define gg_assert(x) ASSERT2(x, -1, -1);
 
 #endif  /* _LIBERTY_H_ */
 

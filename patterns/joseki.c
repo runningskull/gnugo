@@ -140,9 +140,9 @@ write_diagram(int movei, int movej, int color, int marki, int markj,
 	printf("%c", labels[i][j]);
       else if (i == movei && j == movej)
 	printf("*");
-      else if (p[i][j] == color)
+      else if (BOARD(i, j) == color)
 	printf("O");
-      else if (p[i][j] == OTHER_COLOR(color))
+      else if (BOARD(i, j) == OTHER_COLOR(color))
 	printf("X");
       else
 	printf(".");
@@ -254,7 +254,7 @@ make_pattern(int movei, int movej, int color,
     fprintf(stderr, "Warning: Multiple square marks in pattern %s%d\n",
 	    prefix, pattern_number);
 
-  if (is_suicide(movei, movej, color)) {
+  if (is_suicide2(movei, movej, color)) {
     fprintf(stderr, "Error: Illegal move in pattern %s%d\n",
 	    prefix, pattern_number);
     exit(EXIT_FAILURE);
@@ -328,7 +328,7 @@ analyze_node(SGFNode *node, const char *prefix)
   /* Traverse child, if any. */
   if (node->child) {
     if (movei != -1)
-      tryko(movei, movej, color, NULL, EMPTY, -1, -1);
+      tryko2(movei, movej, color, NULL, EMPTY, -1, -1);
     analyze_node(node->child, prefix);
     if (movei != -1)
       popgo();

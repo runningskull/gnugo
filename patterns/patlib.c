@@ -103,11 +103,11 @@ textpattern_ns_edge_print(FILE *outfile, Textpattern *tp)
 {
   int  i;
 
-  if (tp->edge_constraints & WEST)
+  if (tp->edge_constraints & WEST_EDGE)
     fputc('+', outfile);
   for (i = 0; i < tp->width; ++i)
     fputc('-', outfile);
-  if (tp->edge_constraints & EAST)
+  if (tp->edge_constraints & EAST_EDGE)
     fputc('+', outfile);
   fputc('\n', outfile);
 }
@@ -126,15 +126,15 @@ textpattern_print(FILE *outfile, Textpattern *tp)
     fprintf(outfile, tp->comment);
 
   /* Print the pattern diagram */
-  if (tp->edge_constraints & NORTH)
+  if (tp->edge_constraints & NORTH_EDGE)
     textpattern_ns_edge_print(outfile, tp);
 
   for (i = 0; i < tp->height; ++i) {
-    if (tp->edge_constraints & WEST)
+    if (tp->edge_constraints & WEST_EDGE)
       fputc('|', outfile);
     for (j = 0; j < tp->width; ++j)
       fputc(tp->elements[i*tp->width+j], outfile);
-    if (tp->edge_constraints & EAST)
+    if (tp->edge_constraints & EAST_EDGE)
       fputc('|', outfile);
 
     if (i == 0 && tp->explanation)
@@ -142,7 +142,7 @@ textpattern_print(FILE *outfile, Textpattern *tp)
 
     fputc('\n', outfile);
   }
-  if (tp->edge_constraints & SOUTH) 
+  if (tp->edge_constraints & SOUTH_EDGE) 
     textpattern_ns_edge_print(outfile, tp);
   if (tp->comment2)
     fprintf(outfile, tp->comment2);
@@ -153,19 +153,19 @@ textpattern_print(FILE *outfile, Textpattern *tp)
 
   /* Print the constraint diagram */
   if (tp->num_constraint_elements > 0) {
-    if (tp->edge_constraints & NORTH)
+    if (tp->edge_constraints & NORTH_EDGE)
       textpattern_ns_edge_print(outfile, tp);
 
     for (i = 0; i < tp->height; ++i) {
-      if (tp->edge_constraints & WEST)
+      if (tp->edge_constraints & WEST_EDGE)
 	fputc('|', outfile);
       for (j = 0; j < tp->width; ++j)
 	fputc(tp->constraint_elements[i*tp->width+j], outfile);
-      if (tp->edge_constraints & EAST)
+      if (tp->edge_constraints & EAST_EDGE)
 	fputc('|', outfile);
       fputc('\n', outfile);
     }
-    if (tp->edge_constraints & SOUTH) 
+    if (tp->edge_constraints & SOUTH_EDGE) 
       textpattern_ns_edge_print(outfile, tp);
 
     if (tp->comment4)
@@ -391,7 +391,8 @@ parse_to_end_of_line(int cont)
   if (strbuffer_index == MAXBUFFER) {
     parse_error("Too long line");
     return 0;
-  } else
+  }
+  else
     get_next_char();
 
   return 1;
@@ -441,7 +442,7 @@ parse_north_south_constraint(Textpattern *tp)
   if (tp->width >0) {
     /* This has to be the south border */
     if (width != tp->width
-	|| (next_char == '+' && (tp->edge_constraints & EAST) == 0)) {
+	|| (next_char == '+' && (tp->edge_constraints & EAST_EDGE) == 0)) {
       parse_error("Error in south constraint");
       return 0;
     }
@@ -450,7 +451,7 @@ parse_north_south_constraint(Textpattern *tp)
     /* North constraint -> set width. */
     tp->width = width;
     if (next_char == '+')
-      tp->edge_constraints |= EAST;
+      tp->edge_constraints |= EAST_EDGE;
   }
 
   /* Finish the line */
@@ -469,9 +470,9 @@ parse_pattern_diagram(Textpattern *tp)
 
   /* See if there is a north border constraint. */
   if (next_char == '+' || next_char == '-') {
-    tp->edge_constraints |= NORTH;
+    tp->edge_constraints |= NORTH_EDGE;
     if (next_char == '+') {
-      tp->edge_constraints |= WEST;
+      tp->edge_constraints |= WEST_EDGE;
       get_next_char();
     }
     if (parse_north_south_constraint(tp) == 0)
@@ -483,13 +484,13 @@ parse_pattern_diagram(Textpattern *tp)
   while (next_char == '|'
 	 || strchr(VALID_PATTERN_CHARS, next_char)) {
 
-    /* Handle WEST constraint. */
+    /* Handle WEST_EDGE constraint. */
     if (next_char == '|') {
-      tp->edge_constraints |= WEST;
+      tp->edge_constraints |= WEST_EDGE;
       get_next_char();
     }
     else {
-      if (tp->edge_constraints & WEST) {
+      if (tp->edge_constraints & WEST_EDGE) {
 	parse_error("Missing west constraint");
 	return 0;
       }
@@ -507,7 +508,7 @@ parse_pattern_diagram(Textpattern *tp)
     if (tp->height == 0) {
       tp->width = width;
       if (next_char == '|')
-	tp->edge_constraints |= EAST;
+	tp->edge_constraints |= EAST_EDGE;
     }
 
     if (tp->width != width) {
@@ -516,9 +517,9 @@ parse_pattern_diagram(Textpattern *tp)
     }
     tp->height++;
 
-    /* Handle EAST constraint. */
+    /* Handle EAST_EDGE constraint. */
     if (next_char == '|') {
-      if (tp->edge_constraints & EAST)
+      if (tp->edge_constraints & EAST_EDGE)
 	get_next_char();
       else {
 	parse_error("Unexpected east constraint");
@@ -526,7 +527,7 @@ parse_pattern_diagram(Textpattern *tp)
       }
     }
     else {
-      if (tp->edge_constraints & EAST) {
+      if (tp->edge_constraints & EAST_EDGE) {
 	parse_error("Missing east constraint");
 	return 0;
       }
@@ -562,9 +563,9 @@ parse_pattern_diagram(Textpattern *tp)
   tp->elements = strdup(strbuffer);
 
   /* Check a possible south constraint. */
-  if (tp->edge_constraints & WEST) {
+  if (tp->edge_constraints & WEST_EDGE) {
     if (next_char == '+') {
-      tp->edge_constraints |= SOUTH;
+      tp->edge_constraints |= SOUTH_EDGE;
       get_next_char();
     }
   }
@@ -574,19 +575,19 @@ parse_pattern_diagram(Textpattern *tp)
       return 0;
     }
     else if (next_char == '-') 
-      tp->edge_constraints |= SOUTH;
+      tp->edge_constraints |= SOUTH_EDGE;
   }
 
-  if (tp->edge_constraints & SOUTH) {
+  if (tp->edge_constraints & SOUTH_EDGE) {
     if (parse_north_south_constraint(tp) == 0)
       return 0;
   }
       
 
   if (next_char == '+' || next_char == '-') {
-    tp->edge_constraints |= SOUTH;
+    tp->edge_constraints |= SOUTH_EDGE;
     if (next_char == '+') {
-      tp->edge_constraints |= WEST;
+      tp->edge_constraints |= WEST_EDGE;
       get_next_char();
     }
     if (parse_north_south_constraint(tp) == 0)
@@ -624,8 +625,8 @@ parse_constraint_diagram(Textpattern *tp)
 
   /* See if there is a north border constraint. */
   if (next_char == '+') {
-    if ((tp->edge_constraints & NORTH) == 0
-	|| (tp->edge_constraints & WEST) == 0) {
+    if ((tp->edge_constraints & NORTH_EDGE) == 0
+	|| (tp->edge_constraints & WEST_EDGE) == 0) {
       parse_error("Edge error in constraint diagram");
       return 0;
 
@@ -634,7 +635,7 @@ parse_constraint_diagram(Textpattern *tp)
   }
    
   if (next_char == '-') {
-    if ((tp->edge_constraints & WEST) == 1) {
+    if ((tp->edge_constraints & WEST_EDGE) == 1) {
       parse_error("Edge error in constraint diagram");
       return 0;
     }
@@ -649,16 +650,16 @@ parse_constraint_diagram(Textpattern *tp)
 	 || strchr(VALID_PATTERN_CHARS, next_char)
 	 || strchr(VALID_CONSTRAINT_LABELS, next_char)) {
 
-    /* Handle WEST constraint. */
+    /* Handle WEST_EDGE constraint. */
     if (next_char == '|') {
-      if ((tp->edge_constraints & WEST) == 0) {
+      if ((tp->edge_constraints & WEST_EDGE) == 0) {
 	parse_error("Edge error in constraint diagram");
 	return 0;
       }
       get_next_char();
     }
     else {
-      if (tp->edge_constraints & WEST) {
+      if (tp->edge_constraints & WEST_EDGE) {
 	parse_error("Missing west constraint");
 	return 0;
       }
@@ -693,9 +694,9 @@ parse_constraint_diagram(Textpattern *tp)
   tp->constraint_elements = strdup(strbuffer);
 
   /* Check a possible south constraint. */
-  if (tp->edge_constraints & WEST) {
+  if (tp->edge_constraints & WEST_EDGE) {
     if (next_char == '+') {
-      tp->edge_constraints |= SOUTH;
+      tp->edge_constraints |= SOUTH_EDGE;
       get_next_char();
     }
   }
@@ -705,10 +706,10 @@ parse_constraint_diagram(Textpattern *tp)
       return 0;
     }
     else if (next_char == '-') 
-      tp->edge_constraints |= SOUTH;
+      tp->edge_constraints |= SOUTH_EDGE;
   }
 
-  if (tp->edge_constraints & SOUTH) {
+  if (tp->edge_constraints & SOUTH_EDGE) {
     if (parse_north_south_constraint(tp) == 0)
       return 0;
   }
@@ -871,25 +872,25 @@ textpattern_transform(Textpattern *tp, int transform)
   for (r = 0; r < 4; ++r) {
     switch (tp->edge_constraints & (1<<r)) {
     case 0:     i =  0; j =  0; break;
-    case NORTH: i = -1; j =  0; break;
-    case SOUTH: i =  1; j =  0; break;
-    case EAST:  i =  0; j =  1; break;
-    case WEST:  i =  0; j = -1; break;
+    case NORTH_EDGE: i = -1; j =  0; break;
+    case SOUTH_EDGE: i =  1; j =  0; break;
+    case EAST_EDGE:  i =  0; j =  1; break;
+    case WEST_EDGE:  i =  0; j = -1; break;
     }
     
     if (i != 0 || j != 0) {
       TRANSFORM(i, j, &i1, &j1, transform);
       if (i1 == 0) {
 	if (j1 < 0)
-	  newedge |= WEST;
+	  newedge |= WEST_EDGE;
 	else
-	  newedge |= EAST;
+	  newedge |= EAST_EDGE;
       } 
       else {
 	if (i1 < 0)
-	  newedge |= NORTH;
+	  newedge |= NORTH_EDGE;
 	else
-	  newedge |= SOUTH;
+	  newedge |= SOUTH_EDGE;
       }
     }
   }

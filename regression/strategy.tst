@@ -135,7 +135,7 @@ loadsgf games/incident291.sgf 250
 
 loadsgf games/strategy5.sgf 12
 26 gg_genmove black
-#? [D3]*
+#? [D3]
 
 loadsgf games/strategy5.sgf 14
 27 gg_genmove black

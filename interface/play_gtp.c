@@ -45,6 +45,7 @@ print_influence(float white_influence[MAX_BOARD][MAX_BOARD],
 		float black_influence[MAX_BOARD][MAX_BOARD],
 		int influence_regions[MAX_BOARD][MAX_BOARD]);
 static void gtp_print_code(int c);
+static void gtp_print_vertices2(int n, int *moves);
 static int report_uncertainty = 0;
 
 /* For undo, we keep the starting position, and a stack
@@ -364,10 +365,10 @@ gtp_playblack(char *s, int id)
   else if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (!is_legal(i, j, BLACK))
+  if (!is_legal2(i, j, BLACK))
     return gtp_failure(id, "illegal move");
 
-  play_move(i, j, BLACK);
+  play_move(POS(i, j), BLACK);
   game_move[move_stack_pointer].i = i;
   game_move[move_stack_pointer].j = j;
   game_move[move_stack_pointer].color = BLACK;
@@ -398,10 +399,10 @@ gtp_playwhite(char *s, int id)
   else if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
   
-  if (!is_legal(i, j, WHITE))
+  if (!is_legal2(i, j, WHITE))
     return gtp_failure(id, "illegal move");
 
-  play_move(i, j, WHITE);
+  play_move(POS(i, j), WHITE);
   game_move[move_stack_pointer].i = i;
   game_move[move_stack_pointer].j = j;
   game_move[move_stack_pointer].color = WHITE;
@@ -433,7 +434,7 @@ gtp_fixed_handicap(char *s, int id)
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (p[m][n] != EMPTY) {
+      if (BOARD(m, n) != EMPTY) {
 	if (!first)
 	  gtp_printf(" ");
 	else
@@ -470,11 +471,12 @@ gtp_loadsgf(char *s, int id)
 
   gameinfo_clear(&gameinfo, 19, 5.5); /* Probably unnecessary. */
   gameinfo_load_sgfheader(&gameinfo, sgf);
-  if (nread == 1) {
+
+  if (nread == 1)
     color_to_move = gameinfo_play_sgftree(&gameinfo, sgf, NULL);
-  } else {
+  else
     color_to_move = gameinfo_play_sgftree(&gameinfo, sgf, untilstring);
-  }
+
   gnugo_force_to_globals(&gameinfo.position);
   movenum = gameinfo.move_number;
   komi = gameinfo.position.komi;
@@ -507,7 +509,7 @@ gtp_what_color(char *s, int id)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
   
-  return gtp_success(id, color_to_string(p[i][j]));
+  return gtp_success(id, color_to_string(BOARD(i, j)));
 }
 
 
@@ -523,10 +525,10 @@ gtp_countlib(char *s, int id)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[i][j] == EMPTY)
+  if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  return gtp_success(id, "%d", countlib(i, j));
+  return gtp_success(id, "%d", countlib2(i, j));
 }
 
 
@@ -539,19 +541,18 @@ static int
 gtp_findlib(char *s, int id)
 {
   int i, j;
-  int libi[MAXLIBS];
-  int libj[MAXLIBS];
-  int libs;
+  int libs[MAXLIBS];
+  int liberties;
   
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[i][j] == EMPTY)
+  if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  libs = findlib(i, j, MAXLIBS, libi, libj);
+  liberties = findlib(POS(i, j), MAXLIBS, libs);
   gtp_printid(id, GTP_SUCCESS);
-  gtp_print_vertices(libs, libi, libj);
+  gtp_print_vertices2(liberties, libs);
   return gtp_finish_response();
 }
 
@@ -570,7 +571,7 @@ gtp_is_legal(char *s, int id)
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure(id, "invalid color or coordinate");
 
-  return gtp_success(id, "%d", is_legal(i, j, color));
+  return gtp_success(id, "%d", is_legal2(i, j, color));
 }
 
 
@@ -593,7 +594,7 @@ gtp_all_legal(char *s, int id)
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (p[i][j] == EMPTY && is_legal(i, j, color)) {
+      if (BOARD(i, j) == EMPTY && is_legal2(i, j, color)) {
 	movei[moves] = i;
 	movej[moves++] = j;
       }
@@ -641,7 +642,7 @@ gtp_trymove(char *s, int id)
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure(id, "invalid color or coordinate");
 
-  if (!trymove(i, j, color, "gtp_trymove", -1, -1, EMPTY, -1, -1))
+  if (!trymove2(i, j, color, "gtp_trymove", -1, -1, EMPTY, -1, -1))
     return gtp_failure(id, "illegal move");
 
   return gtp_success(id, "");
@@ -685,7 +686,7 @@ gtp_attack(char *s, int id)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[i][j] == EMPTY)
+  if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
   attack_code = attack(i, j, &ai, &aj);
@@ -714,7 +715,7 @@ gtp_defend(char *s, int id)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[i][j] == EMPTY)
+  if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
   defend_code = find_defense(i, j, &di, &dj);
@@ -777,11 +778,11 @@ gtp_owl_attack(char *s, int id)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[i][j] == EMPTY)
+  if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
   verbose = 0;
-  examine_position(p[i][j], EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
   
   attack_code = owl_attack(i, j, &ai, &aj, &result_certain);
@@ -814,11 +815,11 @@ gtp_owl_defend(char *s, int id)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[i][j] == EMPTY)
+  if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
   verbose = 0;
-  examine_position(p[i][j], EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
 
   defend_code = owl_defend(i, j, &di, &dj, &result_certain);
@@ -917,7 +918,7 @@ gtp_dragon_status(char *s, int id)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[i][j] == EMPTY)
+  if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
   verbose = 0;
@@ -982,7 +983,7 @@ gtp_same_dragon(char *s, int id)
   if (!gtp_decode_coord(s + n, &bi, &bj))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[ai][aj] == EMPTY || p[bi][bj] == EMPTY)
+  if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
   verbose = 0;
@@ -1047,7 +1048,7 @@ gtp_genmove_black(char *s, int id)
   UNUSED(s);
   
   if (genmove(&i, &j, BLACK) >= 0)
-    play_move(i, j, BLACK);
+    play_move(POS(i, j), BLACK);
 
   game_move[move_stack_pointer].i = i;
   game_move[move_stack_pointer].j = j;
@@ -1071,7 +1072,7 @@ gtp_genmove_white(char *s, int id)
   int i, j;
   UNUSED(s);
   if (genmove(&i, &j, WHITE) >= 0)
-    play_move(i, j, WHITE);
+    play_move(POS(i, j), WHITE);
 
   game_move[move_stack_pointer].i = i;
   game_move[move_stack_pointer].j = j;
@@ -1200,7 +1201,7 @@ gtp_undo(char *s, int id)
 
   move_stack_pointer--;
   for (k = 0; k < move_stack_pointer; k++)
-    play_move(game_move[k].i, game_move[k].j, game_move[k].color);
+    play_move(POS(game_move[k].i, game_move[k].j), game_move[k].color);
 
   return gtp_success(id, "");
 }
@@ -1240,8 +1241,8 @@ finish_and_score_game(int seed)
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (p[i][j] != current_board[i][j]) {
-	current_board[i][j] = p[i][j];
+      if (BOARD(i, j) != current_board[i][j]) {
+	current_board[i][j] = BOARD(i, j);
 	cached_board = 0;
       }
 
@@ -1258,7 +1259,7 @@ finish_and_score_game(int seed)
   next = BLACK;
   do {
     move_val = genmove_conservative(&i, &j, next);
-    play_move(i, j, next);
+    play_move(POS(i, j), next);
     if (move_val >= 0) {
       pass = 0;
       moves++;
@@ -1273,7 +1274,7 @@ finish_and_score_game(int seed)
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       final_status[i][j] = aftermath_final_status(next, i, j);
-      saved_board[i][j] = p[i][j];
+      saved_board[i][j] = BOARD(i, j);
     }
 
   restore_position(&saved_pos);
@@ -1284,10 +1285,10 @@ finish_and_score_game(int seed)
    */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (p[i][j] == saved_board[i][j])
+      if (BOARD(i, j) == saved_board[i][j])
 	continue;
 
-      if (p[i][j] == EMPTY) {
+      if (BOARD(i, j) == EMPTY) {
 	if (final_status[i][j] == ALIVE
 	    || final_status[i][j] == ALIVE_IN_SEKI)
 	  final_status[i][j] = DAME;
@@ -1298,7 +1299,7 @@ finish_and_score_game(int seed)
 	    final_status[i][j] = BLACK_TERRITORY;
 	}
       }
-      else if (p[i][j] == BLACK) {
+      else if (BOARD(i, j) == BLACK) {
 	if (final_status[i][j] == WHITE_TERRITORY)
 	  final_status[i][j] = DEAD;
 	else if (final_status[i][j] == DAME)
@@ -1308,7 +1309,7 @@ finish_and_score_game(int seed)
 	else
 	  final_status[i][j] = DEAD;
       }
-      else if (p[i][j] == WHITE) {
+      else if (BOARD(i, j) == WHITE) {
 	if (final_status[i][j] == BLACK_TERRITORY)
 	  final_status[i][j] = DEAD;
 	else if (final_status[i][j] == DAME)
@@ -1446,7 +1447,7 @@ gtp_final_status_list(char *s, int id)
     for (j = 0; j < board_size; j++) {
       if (final_status[i][j] != status)
 	continue;
-      if (p[i][j] == EMPTY) {
+      if (BOARD(i, j) == EMPTY) {
 	if (!first)
 	  gtp_printf(" ");
 	else
@@ -1454,19 +1455,16 @@ gtp_final_status_list(char *s, int id)
 	gtp_print_vertex(i, j);
       }
       else {
-	int stones;
-	int stonei[MAX_BOARD * MAX_BOARD];
-	int stonej[MAX_BOARD * MAX_BOARD];
-	int oi, oj;
-	find_origin(i, j, &oi, &oj);
-	if (i != oi || j != oj)
+	int num_stones;
+	int stones[MAX_BOARD * MAX_BOARD];
+	if (find_origin(POS(i, j)) != POS(i, j))
 	  continue;
 	if (!first)
 	  gtp_printf("\n");
 	else
 	  first = 0;
-	stones = findstones(i, j, board_size * board_size, stonei, stonej);
-	gtp_print_vertices(stones, stonei, stonej);
+	num_stones = findstones(POS(i, j), board_size * board_size, stones);
+	gtp_print_vertices2(num_stones, stones);
       }
     }
 
@@ -1951,7 +1949,7 @@ gtp_worm_cutstone(char *s, int id)
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (p[i][j] == EMPTY)
+  if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
   examine_position(EMPTY, EXAMINE_WORMS);
@@ -2119,7 +2117,20 @@ gtp_print_code(int c)
   gtp_printf("%d", c ? 4-c : c);
 }
 
+static void
+gtp_print_vertices2(int n, int *moves)
+{
+  int movei[MAX_BOARD * MAX_BOARD];
+  int movej[MAX_BOARD * MAX_BOARD];
+  int k;
 
+  for (k = 0; k < n; k++) {
+    movei[k] = I(moves[k]);
+    movej[k] = J(moves[k]);
+  }
+  
+  gtp_print_vertices(n, movei, movej);
+}
 
 
 /*

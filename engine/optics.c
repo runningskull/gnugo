@@ -29,13 +29,6 @@
 #include "liberty.h"
 #include "eyes.h"
 
-#define lively(owl_call, i, j) (((owl_call == 0) && \
-			       ((!worm[i][j].inessential \
-				  && ((worm[i][j].attack_code == 0) \
-				      || (worm[i][j].defend_code != 0))))) \
-			      || ((owl_call == 1) && owl_lively(i, j)))
-
-
 /* This macro is not fully generalized. It works because it is used only where
  * c, d match the first vital attack/defend point of the the half eye or none
  * at all.
@@ -63,11 +56,13 @@ compute_primary_domains(int color,
 			int domain[MAX_BOARD][MAX_BOARD],
 			struct eye_data color_eye[MAX_BOARD][MAX_BOARD],
 			struct eye_data other_eye[MAX_BOARD][MAX_BOARD],
-			int owl_call, int first_time);
+			int lively[MAX_BOARD][MAX_BOARD], int first_time);
 static void count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD]);
+static int is_lively(int owl_call, int i, int j);
 static int has_inf(int color, int i, int j, int domain[MAX_BOARD][MAX_BOARD],
-		   int owl_call);
-static int false_margin(int i, int j, int color, int owl_call);
+		   int lively[MAX_BOARD][MAX_BOARD]);
+static int false_margin(int i, int j, int color,
+			int lively[MAX_BOARD][MAX_BOARD]);
 
 static int recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 			 int *max, int *min, 
@@ -136,20 +131,22 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 	     int owl_call)
 {
   int i, j;
+  int lively[MAX_BOARD][MAX_BOARD];
   
   memset(black_domain, 0, sizeof(black_domain));
   memset(white_domain, 0, sizeof(white_domain));
 
-  /* Initialize eye data. */
+  /* Initialize eye data and compute the lively array. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       clear_eye(&(b_eye[i][j]));
       clear_eye(&(w_eye[i][j]));
+      lively[i][j] = is_lively(owl_call, i, j);
     }
 
   /* Compute the domains of influence of each color. */
-  compute_primary_domains(BLACK, black_domain, b_eye, w_eye, owl_call, 1);
-  compute_primary_domains(WHITE, white_domain, w_eye, b_eye, owl_call, 0);
+  compute_primary_domains(BLACK, black_domain, b_eye, w_eye, lively, 1);
+  compute_primary_domains(WHITE, white_domain, w_eye, b_eye, lively, 0);
 
   /* Now we fill out the arrays b_eye and w_eye with data describing
    * each eye shape.
@@ -157,7 +154,7 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if ((p[i][j]==EMPTY) || !lively(owl_call, i, j)) {
+      if (BOARD(i, j) == EMPTY || !lively[i][j]) {
 	if ((black_domain[i][j] == 0) && (white_domain[i][j] == 0)) {
 	  w_eye[i][j].color = GRAY;
 	  b_eye[i][j].color = GRAY;
@@ -202,14 +199,14 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 	  else
 	    w_eye[i][j].marginal = 0;
 	}
-	else if ((black_domain[i][j] == 1) && (white_domain[i][j]==1)) {
-	  if (((i > 0) && (black_domain[i-1][j]) && (!white_domain[i-1][j])) 
-	      || ((i < board_size-1) && (black_domain[i+1][j])
-		  && (!white_domain[i+1][j])) 
-	      || ((j > 0) && (black_domain[i][j-1])
-		  && (!white_domain[i][j-1])) 
-	      || ((j < board_size-1) && (black_domain[i][j+1])
-		  && (!white_domain[i][j+1])))
+	else if (black_domain[i][j] == 1 && white_domain[i][j] == 1) {
+	  if ((i > 0 && black_domain[i-1][j] && !white_domain[i-1][j]) 
+	      || (i < board_size-1 && black_domain[i+1][j]
+		  && !white_domain[i+1][j])
+	      || (j > 0 && black_domain[i][j-1]
+		  && !white_domain[i][j-1])
+	      || (j < board_size-1 && black_domain[i][j+1]
+		  && !white_domain[i][j+1]))
 	    {
 	      b_eye[i][j].marginal = 1;
 	      b_eye[i][j].color = BLACK_BORDER;
@@ -217,13 +214,13 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 	  else
 	    b_eye[i][j].color = GRAY;
 
-	  if (((i > 0) && (white_domain[i-1][j]) && (!black_domain[i-1][j]))
-	      || ((i < board_size-1) && (white_domain[i+1][j]) 
-		  && (!black_domain[i+1][j])) 
-	      || ((j > 0) && (white_domain[i][j-1])
-		  && (!black_domain[i][j-1])) 
-	      || ((j < board_size-1) && (white_domain[i][j+1])
-		  && (!black_domain[i][j+1])))
+	  if ((i > 0 && white_domain[i-1][j] && !black_domain[i-1][j])
+	      || (i < board_size-1 && white_domain[i+1][j]
+		  && !black_domain[i+1][j])
+	      || (j > 0 && white_domain[i][j-1]
+		  && !black_domain[i][j-1])
+	      || (j < board_size-1 && white_domain[i][j+1]
+		  && !black_domain[i][j+1]))
 	    {
 	      w_eye[i][j].marginal = 1;
 	      w_eye[i][j].color = WHITE_BORDER;
@@ -246,8 +243,8 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
  /* The eye spaces are all found. Now we need to find the origins. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if ((b_eye[i][j].origini == -1)
-	  && (b_eye[i][j].color == BLACK_BORDER)) 
+      if (b_eye[i][j].origini == -1
+	  && b_eye[i][j].color == BLACK_BORDER)
       {
 	int esize = 0;
 	int msize = 0;
@@ -260,8 +257,8 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if ((w_eye[i][j].origini == -1)
-	  && (w_eye[i][j].color == WHITE_BORDER)) 
+      if (w_eye[i][j].origini == -1
+	  && w_eye[i][j].color == WHITE_BORDER)
       {
 	int esize = 0;
 	int msize = 0;
@@ -330,7 +327,7 @@ compute_primary_domains(int color,
 			int domain[MAX_BOARD][MAX_BOARD],
 			struct eye_data color_eye[MAX_BOARD][MAX_BOARD],
 			struct eye_data other_eye[MAX_BOARD][MAX_BOARD],
-			int owl_call, int first_time)
+			int lively[MAX_BOARD][MAX_BOARD], int first_time)
 {
   int other = OTHER_COLOR(color);
   int found_one;
@@ -343,36 +340,33 @@ compute_primary_domains(int color,
 	/* First we handle the trivial cases. */
 	if (domain[i][j])
 	  continue;
-	if (!(p[i][j] == EMPTY 
-	      || (p[i][j] == other && !lively(owl_call, i, j))))
+	if (!(BOARD(i, j) == EMPTY 
+	      || (BOARD(i, j) == other && !lively[i][j])))
 	  continue;
 
 	/* Case (1) above. */
-	if (p[i][j] == color && lively(owl_call, i, j)) {
+	if (BOARD(i, j) == color && lively[i][j]) {
 	  domain[i][j] = 1;
 	  found_one = 1;
 	  continue;
 	}
 
 	/* Case (2) above. */
-	if ((i > 0            && p[i-1][j] == color
-	     && lively(owl_call, i-1, j))
-	    || (i < board_size-1 && p[i+1][j] == color
-		&& lively(owl_call, i+1, j))
-	    || (j > 0            && p[i][j-1] == color
-		&& lively(owl_call, i, j-1))
-	    || (j < board_size-1 && p[i][j+1] == color
-		&& lively(owl_call, i, j+1))) 
-	  {
+	if ((   BOARD(i-1, j) == color && lively[i-1][j])
+	    || (BOARD(i+1, j) == color && lively[i+1][j])
+	    || (BOARD(i, j-1) == color && lively[i][j-1])
+	    || (BOARD(i, j+1) == color && lively[i][j+1])) 
+	{
 	  /* To explain the asymmetry between the first time around
 	   * this loop and subsequent ones, a false margin is adjacent
 	   * to both B and W lively stones, so it's found on the first
 	   * pass through the loop. 
 	   */
 	  if (first_time) {
-	    if (p[i][j] == EMPTY && false_margin(i, j, color, owl_call))
+	    if (BOARD(i, j) == EMPTY && false_margin(i, j, color, lively))
 	      color_eye[i][j].false_margin = 1;
-	    else if (p[i][j] == EMPTY && false_margin(i, j, other, owl_call))
+	    else if (BOARD(i, j) == EMPTY
+		     && false_margin(i, j, other, lively))
 	      other_eye[i][j].false_margin = 1;
 	    else {
 	      domain[i][j] = 1;
@@ -380,7 +374,7 @@ compute_primary_domains(int color,
 	    }
 	  }
 	  else {
-	    if (p[i][j] != EMPTY
+	    if (BOARD(i, j) != EMPTY
 		|| (color_eye[i][j].false_margin != 1
 		    && other_eye[i][j].false_margin != 1)) {
 	      found_one = 1;
@@ -392,129 +386,128 @@ compute_primary_domains(int color,
 
 	/* Case (3) above. */
 
-	if (((i == 0) && (j == 0)
-	     && (has_inf(color, 1, 0, domain, owl_call)
-		 || has_inf(color, 0, 1, domain, owl_call))
-	     && ((p[1][0] != other) || !lively(owl_call, 1, 0))
-	     && ((p[1][1] != other) || !lively(owl_call, 1, 1))
-	     && ((p[0][1] != other) || !lively(owl_call, 0, 1)))
-	    || ((i == board_size-1) && (j == 0)
-		&& (has_inf(color, board_size-2, 0, domain, owl_call)
-		 || has_inf(color, board_size-1, 1, domain, owl_call))
-	     && ((p[board_size-2][0] != other)
-		 || !lively(owl_call, board_size-2, 0))
-	     && ((p[board_size-2][1] != other)
-		 || !lively(owl_call, board_size-2, 1))
-	     && ((p[board_size-1][1] != other)
-		 || !lively(owl_call, board_size-1, 1)))
-	    ||((i == 0) && (j == board_size-1)
-	     && (has_inf(color, 1, board_size-1, domain, owl_call)
-		 || has_inf(color, 0, board_size-2, domain, owl_call))
-	     && ((p[1][board_size-1] != other)
-		 || !lively(owl_call, 1, board_size-1))
-	     && ((p[1][board_size-2] != other)
-		 || !lively(owl_call, 1, board_size-2))
-	     && ((p[0][board_size-2] != other)
-		 || !lively(owl_call, 0, board_size-2)))
-	    || ((i == board_size-1) && (j == board_size-1)
-		&& (has_inf(color, board_size-2, board_size-1, domain, owl_call)
-		 || has_inf(color, board_size-1, board_size-2, domain, owl_call))
-	     && ((p[board_size-2][board_size-1] != other) 
-		 || !lively(owl_call, board_size-2, board_size-1))
-	     && ((p[board_size-2][board_size-2] != other) 
-		 || !lively(owl_call, board_size-2, board_size-2))
-	     && ((p[board_size-1][board_size-2] != other) 
-		 || !lively(owl_call, board_size-1, board_size-2))))
+	if ((i == 0 && j == 0
+	     && (has_inf(color, 1, 0, domain, lively)
+		 || has_inf(color, 0, 1, domain, lively))
+	     && (BOARD(1, 0) != other || !lively[1][0])
+	     && (BOARD(1, 1) != other || !lively[1][1])
+	     && (BOARD(0, 1) != other || !lively[0][1]))
+	    || (i == board_size-1 && j == 0
+		&& (has_inf(color, board_size-2, 0, domain, lively)
+		    || has_inf(color, board_size-1, 1, domain, lively))
+		&& (BOARD(board_size-2, 0) != other
+		    || !lively[board_size-2][0])
+		&& (BOARD(board_size-2, 1) != other 
+		    || !lively[board_size-2][1])
+		&& (BOARD(board_size-1, 1) != other
+		    || !lively[board_size-1][1]))
+	    || (i == 0 && j == board_size-1
+		&& (has_inf(color, 1, board_size-1, domain, lively)
+		    || has_inf(color, 0, board_size-2, domain, lively))
+		&& (BOARD(1, board_size-1) != other
+		    || !lively[1][board_size-1])
+		&& (BOARD(1, board_size-2) != other
+		    || !lively[1][board_size-2])
+		&& (BOARD(0, board_size-2) != other
+		   || !lively[0][board_size-2]))
+	    || (i == board_size-1 && j == board_size-1
+		&& (has_inf(color, board_size-2, board_size-1, domain, lively)
+		    || has_inf(color, board_size-1, board_size-2, domain, lively))
+		&& (BOARD(board_size-2, board_size-1) != other
+		    || !lively[board_size-2][board_size-1])
+		&& (BOARD(board_size-2, board_size-2) != other
+		    || !lively[board_size-2][board_size-2])
+		&& (BOARD(board_size-1, board_size-2) != other
+		    || !lively[board_size-1][board_size-2])))
+	{
+	  domain[i][j] = 1;
+	  found_one = 1;
+	} 
+	else 
+	  if (((i > 1 && j > 0 && j < board_size-1
+		&& has_inf(color, i-1, j, domain, lively))
+	       && ((j > 1 && has_inf(color, i-1, j-1, domain, lively)
+		    && (BOARD(i, j-1) != other
+			|| !lively[i][j-1]) /* 1st CAVEAT */
+		    && (j > board_size-2 
+			|| BOARD(i-1, j+1) != other 
+			|| !lively[i-1][j+1]
+			|| j < 2
+			|| BOARD(i-1, j-2) != other 
+			|| !lively[i-1][j-2]))   /* 2nd CAVEAT */
+		   || (j < board_size-2
+		       && has_inf(color, i-1, j+1, domain, lively)
+		       && (BOARD(i, j+1) != other || !lively[i][j+1])
+		       && (j > board_size-3
+			   || BOARD(i-1, j+2) != other
+			   || !lively[i-1][j+2]
+			   || j < 1
+			   || BOARD(i-1, j-1) != other
+			   || !lively[i-1][j-1]))))
+	      ||
+	      ((i < board_size-2 && j > 0 && j < board_size-1
+		&& has_inf(color, i+1, j, domain, lively))
+	       && ((j > 1 && has_inf(color, i+1, j-1, domain, lively)
+		    && (BOARD(i, j-1) != other || !lively[i][j-1])
+		    && (j > board_size-2 
+			|| BOARD(i+1, j+1) != other 
+			|| !lively[i+1][j+1]
+			|| j < 2
+			|| BOARD(i+1, j-2) != other 
+			|| !lively[i+1][j-2]))
+		   || (j < board_size-2
+		       && has_inf(color, i+1, j+1, domain, lively)
+		       && (BOARD(i, j+1) != other || !lively[i][j+1])
+		       && (j > board_size-3
+			   || BOARD(i+1, j+2) != other
+			   || !lively[i+1][j+2]
+			   || j < 1
+			   || BOARD(i+1, j-1) != other
+			   || !lively[i+1][j-1]))))
+	      ||
+	      ((j > 1 && i > 0 && i < board_size-1
+		&& has_inf(color, i, j-1, domain, lively))
+	       && ((i > 1 && has_inf(color, i-1, j-1, domain, lively)
+		    && (BOARD(i-1, j) != other || !lively[i-1][j])
+		    && (i > board_size-2 
+			|| BOARD(i+1, j-1) != other 
+			|| !lively[i+1][j-1]
+			|| i < 2
+			|| BOARD(i-2, j-1) != other 
+			|| !lively[i-2][j-1]))
+		   || (i < board_size-2
+		       && has_inf(color, i+1, j-1, domain, lively)
+		       && (BOARD(i+1, j) != other || !lively[i+1][j])
+		       && (i > board_size-3
+			   || BOARD(i+2, j-1) != other
+			   || !lively[i+2][j-1]
+			   || i < 1
+			   || BOARD(i-1, j-1) != other
+			   || !lively[i-1][j-1]))))
+	      ||
+	      ((j < board_size-2 && i > 0 && i < board_size-1
+		&& has_inf(color, i, j+1, domain, lively))
+	       && ((i > 1 && has_inf(color, i-1, j+1, domain, lively)
+		    && (BOARD(i-1, j) != other || !lively[i-1][j])
+		    && (i > board_size-2 
+			|| BOARD(i+1, j+1) != other 
+			|| !lively[i+1][j+1]
+			|| i < 2
+			|| BOARD(i-2, j+1) != other 
+			|| !lively[i-2][j+1]))
+		   || (i < board_size-2
+		       && has_inf(color, i+1, j+1, domain, lively)
+		       && (BOARD(i+1, j) != other || !lively[i+1][j])
+		       && (j > board_size-3
+			   || BOARD(i+2, j+1) != other
+			   || !lively[i+2][j+1]
+			   || i < 1
+			   || BOARD(i-1, j+1) != other
+			   || !lively[i-1][j+1])))))
 	  {
 	    domain[i][j] = 1;
 	    found_one = 1;
-	  } 
-	else 
-	  if (((i > 1 && j > 0 && j < board_size-1
-		&& has_inf(color, i-1, j, domain, owl_call))
-	       && ((j > 1 && has_inf(color, i-1, j-1, domain, owl_call)
-		    && (p[i][j-1] != other
-			|| !lively(owl_call, i, j-1)) /* 1st CAVEAT */
-		    && (j > board_size-2 
-			|| p[i-1][j+1] != other 
-			|| !lively(owl_call, i-1, j+1)
-			|| j < 2
-			|| p[i-1][j-2] != other 
-			|| !lively(owl_call, i-1, j-2)))   /* 2nd CAVEAT */
-		   || (j < board_size-2
-		       && has_inf(color, i-1, j+1, domain, owl_call)
-		       && (p[i][j+1] != other || !lively(owl_call, i, j+1))
-		       && (j > board_size-3
-			   || p[i-1][j+2] != other
-			   || !lively(owl_call, i-1, j+2)
-			   || j < 1
-			   || p[i-1][j-1] != other
-			   || !lively(owl_call, i-1,j-1)))))
-	      ||
-	      ((i < board_size-2 && j > 0 && j < board_size-1
-		&& has_inf(color, i+1, j, domain, owl_call))
-	       && ((j > 1 && has_inf(color, i+1, j-1, domain, owl_call)
-		    && (p[i][j-1] != other || !lively(owl_call, i, j-1))
-		    && (j > board_size-2 
-			|| p[i+1][j+1] != other 
-			|| !lively(owl_call, i+1, j+1)
-			|| j < 2
-			|| p[i+1][j-2] != other 
-			|| !lively(owl_call, i+1, j-2)))
-		   || (j < board_size-2
-		       && has_inf(color, i+1, j+1, domain, owl_call)
-		       && (p[i][j+1] != other || !lively(owl_call, i, j+1))
-		       && (j > board_size-3
-			   || p[i+1][j+2] != other
-			   || !lively(owl_call, i+1, j+2)
-			   || j < 1
-			   || p[i+1][j-1] != other
-			   || !lively(owl_call, i+1,j-1)))))
-	      ||
-	      ((j > 1 && i > 0 && i < board_size-1
-		&& has_inf(color, i, j-1, domain, owl_call))
-	       && ((i > 1 && has_inf(color, i-1, j-1, domain, owl_call)
-		    && (p[i-1][j] != other || !lively(owl_call, i-1, j))
-		    && (i > board_size-2 
-			|| p[i+1][j-1] != other 
-			|| !lively(owl_call, i+1, j-1)
-			|| i < 2
-			|| p[i-2][j-1] != other 
-			|| !lively(owl_call, i-2, j-1)))
-		   || (i < board_size-2
-		       && has_inf(color, i+1, j-1, domain, owl_call)
-		       && (p[i+1][j] != other || !lively(owl_call, i+1, j))
-		       && (i > board_size-3
-			   || p[i+2][j-1] != other
-			   || !lively(owl_call, i+2, j-1)
-			   || i < 1
-			   || p[i-1][j-1] != other
-			   || !lively(owl_call, i-1,j-1)))))
-	      ||
-	      ((j < board_size-2 && i > 0 && i < board_size-1
-		&& has_inf(color, i, j+1, domain, owl_call))
-	       && ((i > 1 && has_inf(color, i-1, j+1, domain, owl_call)
-		    && (p[i-1][j] != other || !lively(owl_call, i-1, j))
-		    && (i > board_size-2 
-			|| p[i+1][j+1] != other 
-			|| !lively(owl_call, i+1, j+1)
-			|| i < 2
-			|| p[i-2][j+1] != other 
-			|| !lively(owl_call, i-2, j+1)))
-		   || (i < board_size-2
-		       && has_inf(color, i+1, j+1, domain, owl_call)
-		       && (p[i+1][j] != other || !lively(owl_call, i+1, j))
-		       && (j > board_size-3
-			   || p[i+2][j+1] != other
-			   || !lively(owl_call, i+2, j+1)
-			   || i < 1
-			   || p[i-1][j+1] != other
-			   || !lively(owl_call, i-1,j+1))))))
-	    
-	    {
-	      domain[i][j] = 1;
-	      found_one = 1;
-	    }
+	  }
       }
   } while (found_one);
 }
@@ -574,9 +567,26 @@ count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD])
 
 
 static int
-has_inf(int color, int i, int j, int domain[MAX_BOARD][MAX_BOARD], int owl_call)
+is_lively(int owl_call, int i, int j)
 {
-  return domain[i][j] || (p[i][j] == color && lively(owl_call, i, j));
+  int result;
+
+  if (owl_call)
+    result = owl_lively(i, j);
+  else
+    result = (!worm[i][j].inessential
+	      && (worm[i][j].attack_code == 0
+		  || worm[i][j].defend_code != 0));
+
+  return result;
+}
+
+
+static int
+has_inf(int color, int i, int j, int domain[MAX_BOARD][MAX_BOARD],
+	int lively[MAX_BOARD][MAX_BOARD])
+{
+  return domain[i][j] || (BOARD(i, j) == color && lively[i][j]);
 }
 
 
@@ -609,7 +619,7 @@ has_inf(int color, int i, int j, int domain[MAX_BOARD][MAX_BOARD], int owl_call)
  */
 
 static int
-false_margin(int i, int j, int color, int owl_call)
+false_margin(int i, int j, int color, int lively[MAX_BOARD][MAX_BOARD])
 {
   int other = OTHER_COLOR(color);
   int neighbors = 0;
@@ -620,47 +630,43 @@ false_margin(int i, int j, int color, int owl_call)
   
   /* Require neighbors of both colors. */
   if (i > 0)
-    neighbors |= p[i-1][j];
+    neighbors |= BOARD(i-1, j);
   if (i < board_size-1)
-    neighbors |= p[i+1][j];
+    neighbors |= BOARD(i+1, j);
   if (j > 0)
-    neighbors |= p[i][j-1];
+    neighbors |= BOARD(i, j-1);
   if (j < board_size-1)
-    neighbors |= p[i][j+1];
+    neighbors |= BOARD(i, j+1);
 
   if (neighbors != (WHITE | BLACK))
     return 0;
 
   /* At least one opponent neighbor should be not lively. */
-  if (!((   i > 0            && p[i-1][j] == other && !lively(owl_call, i-1, j))
-	|| (i < board_size-1 && p[i+1][j] == other && !lively(owl_call, i+1, j))
-	|| (j > 0            && p[i][j-1] == other && !lively(owl_call, i, j-1))
-	|| (j < board_size-1 && p[i][j+1] == other && !lively(owl_call, i, j+1))))
+  if (!((   BOARD(i-1, j) == other && !lively[i-1][j])
+	|| (BOARD(i+1, j) == other && !lively[i+1][j])
+	|| (BOARD(i, j-1) == other && !lively[i][j-1])
+	|| (BOARD(i, j+1) == other && !lively[i][j+1])))
     return 0;
   
-  if (((stackp == 0)
-       && ((   (i > 0) && (p[i-1][j] == other) && lively(owl_call, i-1, j)
-	       && (worm[i-1][j].attack_code == 0))
-	   || ((i < board_size-1) && (p[i+1][j] == other)
-	       && lively(owl_call, i+1, j)
-	       && (worm[i+1][j].attack_code == 0))
-	   || ((j > 0) && (p[i][j-1] == other) && lively(owl_call, i, j-1)
-	       && (worm[i][j-1].attack_code == 0))
-	   || ((j < board_size-1) && (p[i][j+1] == other)
-	       && lively(owl_call, i, j+1)
-	       && (worm[i][j+1].attack_code == 0))))
-      || ((stackp > 0)
-	  && (((i > 0) && (p[i-1][j] == other) && lively(owl_call, i-1, j)
-	       && (!attack(i-1, j, NULL, NULL)))
-	      || ((i < board_size-1) && (p[i+1][j] == other)
-		  && lively(owl_call, i+1, j)
-		  && (!attack(i+1, j, NULL, NULL)))
-	      || ((j > 0) && (p[i][j-1] == other) && lively(owl_call, i, j-1)
-		  && (!attack(i, j-1, NULL, NULL)))
-	      || ((j < board_size-1) && (p[i][j+1] == other)
-		  && lively(owl_call, i, j+1)
-		  && (!attack(i, j+1, NULL, NULL)))))) {
-    if (safe_move(i, j, other) == 0) {
+  if ((stackp == 0
+       && ((   BOARD(i-1, j) == other && lively[i-1][j]
+	       && worm[i-1][j].attack_code == 0)
+	   || (BOARD(i+1, j) == other && lively[i+1][j]
+	       && worm[i+1][j].attack_code == 0)
+	   || (BOARD(i, j-1) == other && lively[i][j-1]
+	       && worm[i][j-1].attack_code == 0)
+	   || (BOARD(i, j+1) == other && lively[i][j+1]
+	       && worm[i][j+1].attack_code == 0)))
+      || (stackp > 0
+	  && ((BOARD(i-1, j) == other && lively[i-1][j] 
+	       && !attack(i-1, j, NULL, NULL))
+	      || (BOARD(i+1, j) == other && lively[i+1][j]
+		  && !attack(i+1, j, NULL, NULL))
+	      || (BOARD(i, j-1) == other && lively[i][j-1]
+		  && !attack(i, j-1, NULL, NULL))
+	      || (BOARD(i, j+1) == other && lively[i][j+1]
+		  && !attack(i, j+1, NULL, NULL))))) {
+    if (safe_move2(i, j, other) == 0) {
       DEBUG(DEBUG_EYES, "False margin for %s at %m.\n",
 	    color_to_string(color), i, j);
       return 1;
@@ -758,18 +764,20 @@ print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
     gprintf(""); /* Get the indentation right. */
     for (n = minj; n <= maxj; n++) {
       if (eye[m][n].origini == origini && eye[m][n].originj == originj) {
-	if (p[m][n] == EMPTY) {
+	if (BOARD(m, n) == EMPTY) {
 	  if (eye[m][n].marginal)
 	    gprintf("%o!");
 	  else if (halfeye(heye, m, n))
 	    gprintf("%oh");
 	  else
 	    gprintf("%o.");
-	} else if (halfeye(heye, m, n))
+	}
+	else if (halfeye(heye, m, n))
 	  gprintf("%oH");
 	else
 	  gprintf("%oX");
-      } else
+      }
+      else
 	gprintf("%o ");
     }
     gprintf("\n");
@@ -811,15 +819,15 @@ compute_eyes(int i, int  j, int *max, int *min, int *attacki, int *attackj,
 	if ((eye[m][n].origini != i) || (eye[m][n].originj != j)) 
 	  continue;
 
-	if (eye[m][n].marginal && p[m][n] != EMPTY)
+	if (eye[m][n].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X!)\n", m, n);
-	else if (eye[m][n].marginal && p[m][n] == EMPTY)
+	else if (eye[m][n].marginal && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (!)\n", m, n);
-	else if (!eye[m][n].marginal && p[m][n] != EMPTY)
+	else if (!eye[m][n].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X)\n", m, n);
-	else if (halfeye(heye, m, n) && p[m][n] == EMPTY)
+	else if (halfeye(heye, m, n) && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (H)\n", m, n);
-	else if (halfeye(heye, m, n) && p[m][n] != EMPTY)
+	else if (halfeye(heye, m, n) && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (XH)\n", m, n);
 	else
 	  DEBUG(DEBUG_EYES, "%m\n", m, n);
@@ -971,15 +979,15 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 	if ((eye[m][n].origini != i) || (eye[m][n].originj != j)) 
 	  continue;
 
-	if (eye[m][n].marginal && p[m][n] != EMPTY)
+	if (eye[m][n].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X!)\n", m, n);
-	else if (eye[m][n].marginal && p[m][n] == EMPTY)
+	else if (eye[m][n].marginal && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (!)\n", m, n);
-	else if (!eye[m][n].marginal && p[m][n] != EMPTY)
+	else if (!eye[m][n].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X)\n", m, n);
-	else if (halfeye(heye, m, n) && p[m][n] == EMPTY)
+	else if (halfeye(heye, m, n) && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (H)\n", m, n);
-	else if (halfeye(heye, m, n) && p[m][n] != EMPTY)
+	else if (halfeye(heye, m, n) && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (XH)\n", m, n);
 	else
 	  DEBUG(DEBUG_EYES, "%m\n", m, n);
@@ -1005,8 +1013,8 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 
     /* A single point eye which is part of a ko can't be trusted. */
     if (eye[i][j].esize == 1
-	&& is_ko(i, j, 
-		 eye[i][j].color == WHITE_BORDER ? BLACK : WHITE, NULL, NULL))
+	&& is_ko(POS(i, j), 
+		 eye[i][j].color == WHITE_BORDER ? BLACK : WHITE, NULL))
       *pessimistic_min = 0;
   }
   
@@ -1062,12 +1070,12 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 	if (eye[m][n].origini == i
 	    && eye[m][n].originj == j) {
 	  if (eye[m][n].marginal
-	      && p[m][n] == EMPTY) {
+	      && BOARD(m, n) == EMPTY) {
 	    if (defendi) *defendi = m;
 	    if (defendj) *defendj = n;
 	    if (attacki) *attacki = m;
 	    if (attackj) *attackj = n;
-	    ASSERT_ON_BOARD(m, n);
+	    ASSERT_ON_BOARD2(m, n);
 	    return;
 	  }
 	  else if (halfeye(heye, m, n)) {
@@ -1075,8 +1083,8 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 	    if (defendj) *defendj = heye[m][n].dj[0];
 	    if (attacki) *attacki = heye[m][n].ai[0];
 	    if (attackj) *attackj = heye[m][n].aj[0];
-	    ASSERT_ON_BOARD(heye[m][n].di[0], heye[m][n].dj[0]);
-	    ASSERT_ON_BOARD(heye[m][n].ai[0], heye[m][n].aj[0]);
+	    ASSERT_ON_BOARD2(heye[m][n].di[0], heye[m][n].dj[0]);
+	    ASSERT_ON_BOARD2(heye[m][n].ai[0], heye[m][n].aj[0]);
 	    return;
 	  }
 	}
@@ -1084,10 +1092,10 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
   }
 
   if (defendi && defendj && *defendi != -1) {
-    ASSERT_ON_BOARD(*defendi, *defendj);
+    ASSERT_ON_BOARD2(*defendi, *defendj);
   }
   if (attacki && attackj && *attacki != -1) {
-    ASSERT_ON_BOARD(*attacki, *attackj);
+    ASSERT_ON_BOARD2(*attacki, *attackj);
   }
 }
 
@@ -1195,7 +1203,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
     }
     if (esize == 3) {
       gg_assert (middlei != -1);
-      if (p[middlei][middlej] == EMPTY) {
+      if (BOARD(middlei, middlej) == EMPTY) {
 	*max = 2;
 	*min = 1;
 	*attacki = middlei;
@@ -1249,8 +1257,8 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 	abort();
       }
 
-      if (p[middlei][middlej] == EMPTY) {
-	if (p[farmiddlei][farmiddlej] == EMPTY) {
+      if (BOARD(middlei, middlej) == EMPTY) {
+	if (BOARD(farmiddlei, farmiddlej) == EMPTY) {
 	  *max = 2;
 	  *min = 2;
 	  return 1;
@@ -1264,7 +1272,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 	}
       }
       else
-	if (p[farmiddlei][farmiddlej] == EMPTY) {
+	if (BOARD(farmiddlei, farmiddlej) == EMPTY) {
 	  *max = 2;
 	  *min = 1;
 	  *attacki = farmiddlei;
@@ -1296,7 +1304,8 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
       if (eye[end1i][end1j].marginal) {
 	*attacki = end1i;
 	*attackj = end1j;
-      } else {
+      }
+      else {
 	*attacki = end2i;
 	*attackj = end2j;
       }
@@ -1306,7 +1315,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
        * .OX.O
        * -----
        */
-      if (p[*attacki][*attackj] != EMPTY) {
+      if (BOARD(*attacki, *attackj) != EMPTY) {
 	*max = 0;
 	*attacki = -1;
 	*attackj = -1;
@@ -1315,17 +1324,17 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
     }
 
     if (esize == 3) {
-      if (p[middlei][middlej] == EMPTY) {
+      if (BOARD(middlei, middlej) == EMPTY) {
 	*max = 1;
 	*min = 1;
 
 	/* Exceptional cases. (eyes.tst:312) */
 	if ((eye[end1i][end1j].marginal
-	     && p[end1i][end1j] != EMPTY
-	     && p[end2i][end2j] == EMPTY)
+	     && BOARD(end1i, end1j) != EMPTY
+	     && BOARD(end2i, end2j) == EMPTY)
 	    || (eye[end2i][end2j].marginal
-		&& p[end2i][end2j] != EMPTY
-		&& p[end1i][end1j] == EMPTY)) {
+		&& BOARD(end2i, end2j) != EMPTY
+		&& BOARD(end1i, end1j) == EMPTY)) {
 	  *min = 0;
 	  *attacki = middlei;
 	  *attackj = middlej;
@@ -1336,23 +1345,24 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 	*max = 1;
 	*min = 0;
 	if (eye[end1i][end1j].marginal) {
-	  if (p[end1i][end1j] == EMPTY) {
+	  if (BOARD(end1i, end1j) == EMPTY) {
 	    *attacki = end1i;
 	    *attackj = end1j;
 	  }
 	  else {
-	    if (p[end2i][end2j] != EMPTY)
+	    if (BOARD(end2i, end2j) != EMPTY)
 	      *min = 1; /* three tactically dead stones in a row. */
 	    else
 	      *max = 0;
 	  }
-	} else {
-	  if (p[end2i][end2j] == EMPTY) {
+	}
+	else {
+	  if (BOARD(end2i, end2j) == EMPTY) {
 	    *attacki = end2i;
 	    *attackj = end2j;
 	  }
 	  else {
-	    if (p[end1i][end1j] != EMPTY)
+	    if (BOARD(end1i, end1j) != EMPTY)
 	      *min = 1; /* three tactically dead stones in a row. */
 	    else
 	      *max = 0;
@@ -1363,7 +1373,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
     }
 
     if (esize == 4) {
-      if (p[middlei][middlej] == EMPTY) {
+      if (BOARD(middlei, middlej) == EMPTY) {
 	*max=1;
 	*min=1;
 	return 1;
@@ -1409,7 +1419,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 	  abort();
 	}
 
-	if (p[farmiddlei][farmiddlej] == EMPTY) {
+	if (BOARD(farmiddlei, farmiddlej) == EMPTY) {
 	  *max = 1;
 	  *min = 1;
 	  return 1;
@@ -1571,11 +1581,12 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	  if (eye_color == color) {
 	    ki = heye[m][n].di[0];
 	    kj = heye[m][n].dj[0];
-	  } else {
+	  }
+	  else {
 	    ki = heye[m][n].ai[0];
 	    kj = heye[m][n].aj[0];
 	  }
-	  ASSERT_ON_BOARD(ki, kj);
+	  ASSERT_ON_BOARD2(ki, kj);
 	  vi[eye_size] = ki;
 	  vj[eye_size] = kj;
 	  marginal[eye_size] = 1;
@@ -1626,12 +1637,12 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	      (graphs[graph].vertex[q].type == '@')))
 	ok = 0;
       
-      if (ok && (p[vi[map[q]]][vj[map[q]]] != EMPTY) 
+      if (ok && (BOARD(vi[map[q]], vj[map[q]]) != EMPTY) 
 	  && (graphs[graph].vertex[q].type != 'X')
 	  && (graphs[graph].vertex[q].type != 'x'))
 	ok = 0;
       
-      if (ok && (p[vi[map[q]]][vj[map[q]]]==EMPTY) 
+      if (ok && (BOARD(vi[map[q]], vj[map[q]]) == EMPTY) 
 	  && (graphs[graph].vertex[q].type == 'X'))
 	ok = 0;
 
@@ -1704,7 +1715,8 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 		  graphs[graph].vertex[k].type == '<') {
 		/* add attack vital move */
 		add_vital_eye_move(vi[map[k]], vj[map[k]], i, j, eye_color);
-	      } else if (graphs[graph].vertex[k].type == '@' ||
+	      }
+	      else if (graphs[graph].vertex[k].type == '@' ||
 		       graphs[graph].vertex[k].type == '(') {
  
  		/* check for marginal matching half eye diagonal
@@ -1721,11 +1733,13 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 				       this_half_eye->aj[ix], 
 				       i, j, eye_color);
 		  }
-		} else {
+		}
+		else {
 		  add_vital_eye_move(vi[map[k]], vj[map[k]], i, j, eye_color);
 		}
 	      }
-	    } else {
+	    }
+	    else {
 	      if (graphs[graph].vertex[k].type == '*' ||
 		  graphs[graph].vertex[k].type == '>')
 		/* add defense vital move */
@@ -1743,7 +1757,8 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 				       this_half_eye->dj[ix], 
 				       i, j, eye_color);
 		  }
-		} else {
+		}
+		else {
 		  add_vital_eye_move(vi[map[k]], vj[map[k]], i, j, eye_color);
 		}
 	      }
@@ -2163,19 +2178,19 @@ evaluate_diagonal_intersection(int m, int n, int color,
   if (color == BLACK
       && b_eye[m][n].color == BLACK_BORDER
       && !b_eye[m][n].marginal
-      && !(p[m][n] == EMPTY && does_capture_something(m, n, WHITE)))
+      && !(BOARD(m, n) == EMPTY && does_capture_something2(m, n, WHITE)))
     return 0;
   if (color == WHITE
       && w_eye[m][n].color == WHITE_BORDER
       && !w_eye[m][n].marginal
-      && !(p[m][n] == EMPTY && does_capture_something(m, n, BLACK)))
+      && !(BOARD(m, n) == EMPTY && does_capture_something2(m, n, BLACK)))
     return 0;
 
-  if (p[m][n] == EMPTY && safe_move(m, n, other) != 0)
+  if (BOARD(m, n) == EMPTY && safe_move2(m, n, other) != 0)
     value = 1;
   else {
     if (stackp == 0) {
-      if (p[m][n] == other) {
+      if (BOARD(m, n) == other) {
 	if (worm[m][n].attack_code == 0)
 	  value = 2;
 	else if (worm[m][n].defend_code != 0) {
@@ -2188,7 +2203,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
       }
     }
     else {
-      if (p[m][n] == other) {
+      if (BOARD(m, n) == other) {
 	attack_and_defend(m, n, &acode, &ai, &aj, &dcode, &di, &dj);
 	if (acode == 0)
 	  value = 2;
@@ -2199,7 +2214,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
   }
 
   if (value == 1) {
-    if (p[m][n] == EMPTY) {
+    if (BOARD(m, n) == EMPTY) {
       if (attacki) *attacki = m;
       if (attackj) *attackj = n;
       if (defendi) *defendi = m;
@@ -2215,8 +2230,8 @@ evaluate_diagonal_intersection(int m, int n, int color,
       if (attackj) *attackj = aj;
       if (defendi) *defendi = di;
       if (defendj) *defendj = dj;
-      ASSERT_ON_BOARD(ai, aj);
-      ASSERT_ON_BOARD(di, dj);
+      ASSERT_ON_BOARD2(ai, aj);
+      ASSERT_ON_BOARD2(di, dj);
     }
   }
   return value;
