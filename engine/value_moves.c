@@ -1065,7 +1065,8 @@ strategic_penalty(int pos, int color)
    * whether all neighboring intersections belong to the opponent's moyo.
    */
   for (k = 0; k < 4; k++)
-    if (board[pos + delta[k]] != OTHER_COLOR(color)
+    if (ON_BOARD(pos + delta[k])
+	&& board[pos + delta[k]] != OTHER_COLOR(color)
         && influence_moyo_color(pos + delta[k]) != OTHER_COLOR(color))
       return 0.0;
 
@@ -1110,11 +1111,15 @@ strategic_penalty(int pos, int color)
 	  return 0.0;
 	/* Third line moves (or lower) are ok -- they try to live, not run
          * away.
+	 *
+	 * FIXME: Add an "edge_distance()" function in board.c which can
+	 *        be used here.
          */
         if (gg_min(gg_min(I(pos), board_size-1 - I(pos)),
                    gg_min(J(pos), board_size-1 - J(pos)))
             < 3)
 	  return 0.0;
+	
 	for (i = 0; i < 4; i++)
 	  if (board[target + delta[i]] == OTHER_COLOR(color)) {
 	    if (dragon[target + delta[i]].size == 1) {

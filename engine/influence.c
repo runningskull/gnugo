@@ -1086,6 +1086,8 @@ whose_territory(struct influence_data *q, int m, int n)
   float bi = q->black_influence[m][n];
   float wi = q->white_influence[m][n];
 
+  ASSERT_ON_BOARD2(m, n);
+  
   if (bi > 0.0 && wi == 0.0)
     return BLACK;
 

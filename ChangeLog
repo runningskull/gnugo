@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in strategic_penalty()
 - owl speedup: owl data immediately stored in owl_stack
 - bugfix in do_owl_defense()
 - attack() now always returns PASS as move if there is no attack
