@@ -284,8 +284,10 @@ static void edge_block_moves(int str, int apos,
 static void propose_edge_moves(int str, int *libs, int liberties,
 			       struct reading_moves *moves, int color);
 static void break_chain_moves(int str, struct reading_moves *moves);
-static void defend_secondary_chain_moves(int str, struct reading_moves *moves,
-					 int min_liberties);
+static int  defend_secondary_chain1_moves(int str, struct reading_moves *moves,
+					  int min_liberties);
+static void defend_secondary_chain2_moves(int str, struct reading_moves *moves,
+					  int min_liberties);
 static void break_chain2_efficient_moves(int str, 
 					 struct reading_moves *moves);
 static void do_find_break_chain2_efficient_moves(int str, int adj,
@@ -3926,6 +3928,10 @@ special_attack3_moves(int str, int libs[2], struct reading_moves *moves)
  * ---------   ---------
  *
  * the code that follows can find the attacking move at *.
+ *
+ * Also for situations in which c has three liberties, one of which in common
+ * with b, the respective attacking move is found (see reading:52 for an 
+ * example).
  */
 
 static void
@@ -3935,15 +3941,17 @@ special_attack4_moves(int str, int libs[2], struct reading_moves *moves)
   int other = OTHER_COLOR(color);
   int adj, adjs[MAXCHAIN];
   int adj2, adjs2[MAXCHAIN];
-  int libs2[2];
+  int libs2[3];
   int apos;
   int bpos = 0;
   int cpos;
   int dpos;
   int epos;
+  int clibs;
   int dlibs;
   int elibs;
-  int k, s, t;
+  int bc_common_lib;
+  int k, s, t, u;
 
   ASSERT1(countlib(str) == 2, str);
 
@@ -3974,9 +3982,10 @@ special_attack4_moves(int str, int libs[2], struct reading_moves *moves)
       continue;
 
     /* Now require that (bpos) has a chain link, different from (str),
-     * also with two liberties.
+     * also with two liberties, or with three liberties, but one in common 
+     * with (bpos). 
      */
-    adj2 = chainlinks2(bpos, adjs2, 2);
+    adj2 = chainlinks3(bpos, adjs2, 3);
 
     for (s = 0; s < adj2; s++) {
       cpos = adjs2[s];
@@ -3984,30 +3993,47 @@ special_attack4_moves(int str, int libs[2], struct reading_moves *moves)
 	continue;
       
       /* Pick up the liberties of (cpos). */
-      findlib(cpos, 2, libs2);
+      clibs = findlib(cpos, 3, libs2);
+
+      /* No need to do something fancy if it is in atari already. */
+      if (clibs < 2)
+	continue;
+
+      /* (cpos) has three liberties, none of which in commmon with (bpos)
+       * attacking it seems too difficult. */
+      bc_common_lib = have_common_lib(bpos, cpos, NULL);
+      if (clibs > 2 && !bc_common_lib)
+	continue;
 
       /* Try playing at a liberty. Before doing this, verify that
-       * (cpos) cannot get more than two liberties by answering on the
-       * other liberty and that we are not putting ourselves in atari.
-       * We also shouldn't allow ourselves to get fewer liberties than
-       * the defender.
+       * (cpos) cannot get more than three liberties by answering on 
+       * another liberty and that we are not putting ourselves in atari.
+       * We also should only allow ourselves to get fewer liberties than
+       * the defender in case (bpos) and (cpos) have a common liberty.
        */
-      for (t = 0; t < 2; t++) {
+      for (t = 0; t < clibs; t++) {
 	dpos = libs2[t];
-	epos = libs2[1-t];
 
 	if (is_self_atari(dpos, other))
 	  continue;
 
-	elibs = approxlib(epos, color, 4, NULL);
-	if (elibs > 3)
-	  continue;
+	for (u = 0; u < clibs; u++) {
+	  if (t == u)
+	    continue;
 
-	dlibs = approxlib(dpos, other, 3, NULL);
-	if (elibs > dlibs)
-	  continue;
+	  epos = libs2[u];
 
-	ADD_CANDIDATE_MOVE(dpos, 0, *moves, "special_attack4");
+	  elibs = approxlib(epos, color, 4, NULL);
+	  if (elibs > 3)
+	    break;
+
+	  dlibs = approxlib(dpos, other, 3, NULL);
+	  if (elibs > dlibs && !bc_common_lib)
+	    break;
+	}
+
+	if (u >= clibs) /* No break occurred. */
+	  ADD_CANDIDATE_MOVE(dpos, 0, *moves, "special_attack4");
       }
     }
   }
@@ -4361,34 +4387,113 @@ break_chain_moves(int str, struct reading_moves *moves)
 }
 
 
-/* defend_secondary_chain_moves() tries to break a chain by defending
+/* defend_secondary_chain1_moves() tries to break a chain by defending
  * "secondary chain", that is, own strings surrounding a given
  * opponent string (which is in turn a chainlink for another own
- * string, phew... :).  Currently, it only defends own strings in
- * atari.
+ * string, phew... :).  It only defends own strings in atari.
  *
- * It is required that the defending stone played gets at least
- * `min_liberties', or one less if it is adjacent to the opponent
- * chainlink.
+ * When defending is done by stretching, it is required that the defending
+ * stone played gets at least `min_liberties', or one less if it is 
+ * adjacent to the opponent chainlink.
+ *
+ * Returns true if there where any secondary strings that needed defence 
+ * (which does not imply they actually where defended).
  */
-static void
-defend_secondary_chain_moves(int str, struct reading_moves *moves,
-			     int min_liberties)
+static int
+defend_secondary_chain1_moves(int str, struct reading_moves *moves,
+    int min_liberties)
 {
-  int r;
+  int r, s;
   int color = OTHER_COLOR(board[str]);
   int xpos;
   int adj;
+  int adj2;
   int adjs[MAXCHAIN];
+  int adjs2[MAXCHAIN];
 
   /* Find links in atari. */
   adj = chainlinks2(str, adjs, 1);
 
   for (r = 0; r < adj; r++) {
+    /* Stretch out. */
     findlib(adjs[r], 1, &xpos);
     if (approxlib(xpos, color, min_liberties, NULL)
 	+ neighbor_of_string(xpos, str) >= min_liberties)
-      ADD_CANDIDATE_MOVE(xpos, 0, *moves, "defend_secondary_chain");
+      ADD_CANDIDATE_MOVE(xpos, 0, *moves, "defend_secondary_chain1-A");
+
+    /* Capture adjacent stones in atari, if any. */
+    adj2 = chainlinks2(adjs[r], adjs2, 1);
+    for (s = 0; s < adj2; s++) {
+      findlib(adjs2[s], 1, &xpos);
+      if (!is_self_atari(xpos, color))
+	ADD_CANDIDATE_MOVE(xpos, 0, *moves, "defend_secondary_chain1-B");
+    }
+  }
+
+  return adj;
+}
+
+
+/* defend_secondary_chain2_moves() tries to break a chain by defending
+ * "secondary chain", that is, own strings surrounding a given
+ * opponent string (which is in turn a chainlink for another own
+ * string, phew... :).  It only defends own strings in
+ * with two liberties.
+ *
+ * When defending is done by stretching, it is required that the defending
+ * stone played gets at least `min_liberties', or one less if it is 
+ * adjacent to the opponent chainlink. Defence can also be done by capturing
+ * opponent stones or trying to capture them with an atari.
+ */
+static void
+defend_secondary_chain2_moves(int str, struct reading_moves *moves,
+    int min_liberties)
+{
+  int r, s, t;
+  int color = OTHER_COLOR(board[str]);
+  int xpos;
+  int adj;
+  int adj2;
+  int adjs[MAXCHAIN];
+  int adjs2[MAXCHAIN];
+  int libs[2];
+
+  /* Find links with two liberties. */
+  adj = chainlinks2(str, adjs, 2);
+
+  for (r = 0; r < adj; r++) {
+    if (!have_common_lib(str, adjs[r], NULL))
+      continue;
+
+    /* Stretch out. */
+    findlib(adjs[r], 2, libs);
+    for (t = 0; t < 2; t++) {
+      xpos = libs[t];
+      if (approxlib(xpos, color, min_liberties, NULL)
+	  + neighbor_of_string(xpos, str) >= min_liberties)
+	ADD_CANDIDATE_MOVE(xpos, 0, *moves, "defend_secondary_chain2-A");
+    }
+
+    /* Capture adjacent stones in atari, if any. */
+    adj2 = chainlinks2(adjs[r], adjs2, 1);
+    for (s = 0; s < adj2; s++) {
+      findlib(adjs2[s], 1, &xpos);
+      if (!is_self_atari(xpos, color))
+	ADD_CANDIDATE_MOVE(xpos, 0, *moves, "defend_secondary_chain2-B");
+    }
+
+    /* Look for neighbours we can atari. */
+    adj2 = chainlinks2(adjs[r], adjs2, 2);
+    for (s = 0; s < adj2; s++) {
+      findlib(adjs2[s], 2, libs);
+      for (t = 0; t < 2; t++) {
+	/* Only atari if target has no easy escape with his other liberty. */
+	if (approxlib(libs[1-t], OTHER_COLOR(color), 3, NULL) < 3 
+	    &&  !is_self_atari(libs[t], color)) {
+	  ADD_CANDIDATE_MOVE(libs[t], 0, *moves, "defend_secondary_chain2-C");
+	}
+      }
+    }
   }
 }
 
@@ -4543,11 +4648,14 @@ break_chain2_moves(int str, struct reading_moves *moves, int require_safe,
     if (stackp <= break_chain_depth
 	|| (be_aggressive && stackp <= backfill_depth)) {
       /* If the chain link cannot escape easily, try to defend all adjacent
-       * friendly stones in atari (if any).
+       * friendly stones in atari (if any). If there are none, defend 
+       * adjacent friendly stones with only two liberties.
        */
       if (approxlib(libs[0], other, 4, NULL) < 4
-	  && approxlib(libs[1], other, 4, NULL) < 4)
-	defend_secondary_chain_moves(adjs[r], moves, 2);
+	  && approxlib(libs[1], other, 4, NULL) < 4) {
+	if (!defend_secondary_chain1_moves(adjs[r], moves, 2))
+	  defend_secondary_chain2_moves(adjs[r], moves, 2);
+      }
     }
 
     if (unsafe[0] && unsafe[1]
@@ -4692,7 +4800,7 @@ break_chain3_moves(int str, struct reading_moves *moves, int be_aggressive)
 
     if (stackp <= backfill2_depth
 	|| (be_aggressive && stackp <= backfill_depth))
-      defend_secondary_chain_moves(adjs[r], moves, 3);
+      defend_secondary_chain1_moves(adjs[r], moves, 3);
   }
 
   for (v = 0; v < u; v++) {
@@ -4800,7 +4908,7 @@ break_chain4_moves(int str, struct reading_moves *moves, int be_aggressive)
 
     if (stackp <= backfill2_depth
 	|| (be_aggressive && stackp <= backfill_depth))
-      defend_secondary_chain_moves(adjs[r], moves, 4);
+      defend_secondary_chain1_moves(adjs[r], moves, 4);
   }
 
   for (v = 0; v < u; v++) {

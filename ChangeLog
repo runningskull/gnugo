@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- break_chain2_moves() revised
+- special_attack4_moves() revised
+- defend_secondary_chain_moves() revised and split into two functions
 - check_self_atari() in readconnect.c revised
 - devalue tactical defenses of owl critical dragons when there are
   better owl defenses elsewhere 
