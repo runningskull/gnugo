@@ -269,7 +269,7 @@ if test "$with_curses" != no -a "$enable_color" != no ; then
   dnl DJGPP does have pdcurses, but not termcap
 
   dnl make sure that both curses.h and term.h are available
-  dnl FIXME PRE3.0: better to actually figure out here what headers
+  dnl FIXME: better to actually figure out here what headers
   dnl are really required
   if test "$term_header" != "no" -a "$curses_header" != "no" ; then
 
@@ -495,7 +495,7 @@ fi
 dnl Now lines in Makefile.am can be prefixed @GCC_ONLY@, and
 dnl we can specify either @GNUGO_SOME_WARNINGS@ or @GNUGO_ALL_WARNINGS@
 
-dnl FIXME POST3.0: please add warnings for other compilers !
+dnl FIXME: please add warnings for other compilers !
 
 
 

@@ -1208,7 +1208,7 @@ Obce
 #
 # CC4xx -  fragile double connections
 #
-# FIXME POST3.0: These shouldn't be matched until all other amalgamation has
+# FIXME: These shouldn't be matched until all other amalgamation has
 # been completed.
 #
 ####################################################################

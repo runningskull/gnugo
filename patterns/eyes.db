@@ -757,7 +757,7 @@ Pattern 527
 :1,1
 
 
-# FIXME PRE3.0:
+# FIXME:
 # Continue here.  I believe everything above this line is correct.
 
 
@@ -947,7 +947,7 @@ x<X!
 :1,0
 
 
-# FIXME PRE3.0: Pattern 
+# FIXME: Pattern 
 #
 #  X
 # .X.!
@@ -1305,8 +1305,8 @@ Pattern 6019
 :1,1
 
 
-# FIXME POST3.0: Do all size 6 linear patterns with 2 or more marginal eye
-#                points.
+# FIXME: Do all size 6 linear patterns with 2 or more marginal eye
+#       points.
 
 
 Pattern 6030
@@ -1772,7 +1772,7 @@ xXx
 #
 
 Pattern 6601
-# FIXME PRE/POST3.0: Do all patterns of this type.
+# FIXME: Do all patterns of this type.
 
  ...
 ...

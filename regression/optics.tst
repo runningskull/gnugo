@@ -147,7 +147,7 @@ loadsgf games/marginal.sgf
 
 # incident 73
 # This is a problem with make_domains(). The position is a seki.
-# FIXME PRE/POST3.0: Is "2 2" correct response for a seki?
+# FIXME: Is "2 2" correct response for a seki?
 loadsgf games/incident73.sgf 210
 1101 eval_eye T10
 #? [2 2]*

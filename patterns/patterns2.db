@@ -2729,7 +2729,7 @@ Pattern Sente9
 
 
 Pattern Sente10
-# FIXME PRE/POST3.0: The followup value should be related to the size of A.
+# FIXME: The followup value should be related to the size of A.
 
 .O.?
 ...X
