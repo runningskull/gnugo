@@ -897,6 +897,59 @@ as @code{(X)}, not @code{(X!)}.
 @node Eye Functions
 @section Functions in @file{optics.c}
 
+The public function @code{make_domains()} calls the function
+@code{make_primary_domains()} which is static in @file{optics.c}. It's purpose
+is to compute the domains of influence of each color, used in determining eye
+shapes. @strong{Note:} the term influence as used here is distinct from the
+influence in influence.c.
+
+For this algorithm the strings which are not lively are invisible. Ignoring
+these, the algorithm assigns friendly influence to
+
+@enumerate
+@item every vertex which is occupied by a (lively) friendly stone, 
+@item every empty vertex adjoining a (lively) friendly stone,
+@item every empty vertex for which two adjoining vertices (not
+on the first line) in the (usually 8) surrounding ones have friendly
+influence, with two CAVEATS explained below.
+@end enumerate
+
+Thus in the following diagram, @samp{e} would be assigned friendly influence
+if @samp{a} and @samp{b} have friendly influence, or @samp{a} and @samp{d}. It
+is not sufficent for @samp{b} and @samp{d} to have friendly influence, because
+they are not adjoining.
+
+@example
+       uabc
+        def
+        ghi
+@end example
+
+The constraint that the two adjoining vertices not lie on the first
+line prevents influence from leaking under a stone on the third line.
+
+The first CAVEAT alluded to above is that even if @samp{a} and @samp{b} have
+friendly influence, this does not cause @samp{e} to have friendly influence if
+there is a lively opponent stone at @samp{d}. This constraint prevents
+influence from leaking past knight's move extensions.
+
+The second CAVEAT is that even if @samp{a} and @samp{b} have friendly influence
+this does not cause @samp{e} to have influence if there are lively opponent
+stones at @samp{u} and at @samp{c}. This prevents influence from leaking past
+nikken tobis (two space jumps).  
+
+The corner vertices are handled slightly different.
+
+@example
+   +---
+   |ab
+   |cd
+@end example
+
+We get friendly influence at @samp{a} if we have friendly influence
+at @samp{b} or @samp{c} and no lively unfriendly stone at @samp{b}, @samp{c}
+or @samp{d}.
+
 Here are the public functions in @file{optics.c}, except some simple
 access functions used by autohelpers. The statically declared functions
 are documented in the source code.
@@ -909,56 +962,179 @@ This function is called from @code{make_dragons()} and from
 @code{owl_determine_life()}. It marks the black and white domains
 (eyeshape regions) and collects some statistics about each one.
 @end quotation
-@item @code{void compute_eyes(int pos, int *max, int *min, int *attack_point, int *defense_point, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX], int add_moves, int color)}
+@item @code{void partition_eyespaces(struct eye_data eye[BOARDMAX], int color)}
+@findex partition_eyespaces
+@quotation
+Find connected eyespace components and compute relevant statistics.
+@end quotation
+@item @code{void propagate_eye(int origin, struct eye_data eye[BOARDMAX])}
+@findex propagate_eye
+@quotation
+propagate_eye(origin) copies the data at the (origin) to the
+rest of the eye (invariant fields only).
+@end quotation
+@item @code{int find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color, int dragons[], int max_dragons)}
+@findex find_eye_dragons
+@quotation
+Find the dragon or dragons surrounding an eye space. Up to
+max_dragons dragons adjacent to the eye space are added to
+the dragon array, and the number of dragons found is returned.
+@end quotation
+@item @code{void compute_eyes(int pos, struct eyevalue *value, int *attack_point, int *defense_point, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX], int add_moves)}
 @findex compute_eyes
 @quotation
 Given an eyespace with origin @code{pos}, this function computes the
 minimum and maximum numbers of eyes the space can yield. If max and
 min are different, then vital points of attack and defense are also
-generated.
+generated. If @code{add_moves == 1}, this function may add a move_reason for
+@code{color} at a vital point which is found by the function. If 
+@code{add_moves == 0}, set @code{color = EMPTY.}
 @end quotation
-@item @code{void compute_eyes_pessimistic(int pos, int *max, int *min, int *pessimistic_min, int *attack_point, int *defense_point, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX])}
+@item @code{void compute_eyes_pessimistic(int pos, struct eyevalue *value, int *pessimistic_min, int *attack_point, int *defense_point, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX])}
 @findex compute_eyes_pessimistic
 @quotation
 This function works like @code{compute_eyes()}, except that it also gives
-a pessimistic view of the chances to make eyes.
-@end quotation
-@item @code{void propagate_eye(int origin, struct eye_data eye[BOARDMAX])}
-@findex propagate_eye
-@quotation
-Copies the data at @code{origin} to the rest of the eye (invariant
-fields only).
-@end quotation
-@item @code{static int recognize_eye(int pos, int *attack_point, int *defense_point, int *max, int *min, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX], int add_moves, int color)}
-@quotation
-Declared static but documented here because of its importance. The life
-code supplies an alternative version of this function called
-@code{recognize_eye2()}.  Here @code{pos} is the origin of an
-eyespace. Returns 1 if there is a pattern in @file{eyes.db} matching the
-eyespace, or 0 if no match is found. If there is a key point for attack,
-@code{*attack_point} is set to its location, or @code{NO_MOVE} if there is
-none.  Similarly @code{*defense_point} is the location of a vital defense
-point. @code{*min} and @code{*max} are the minimum and maximum number of eyes
-that can be made in this eyespace respectively. Vital attack/defense points
-exist if and only if @code{*min != *max}. If @code{add_moves==1}, this
-function may add a move_reason for @code{color} at a vital point which
-is found by the function. If @code{add_moves==0}, set @code{color==EMPTY}.
+a pessimistic view of the chances to make eyes. Since it is intended
+to be used from the owl code, the option to add move reasons has
+been removed.
 @end quotation
 @item @code{void add_false_eye(int pos, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX])}
 @findex add_false_eye
 @quotation
-This function turns a proper eyespace into a margin.
+turns a proper eyespace into a margin. 
 @end quotation
-@item @code{float topological_eye(int pos, int color, struct eye_data b_eye[BOARDMAX], struct eye_data w_eye[BOARDMAX], struct half_eye_data heye[BOARDMAX])}
+@item @code{int is_eye_space(int pos)}
+@item @code{int is_proper_eye_space(int pos)}
+@findex is_proper_eye_space
+@findex is_eye_space
+@quotation
+These functions are used from constraints to identify eye spaces,
+primarily for late endgame moves.
+@end quotation
+@item @code{int max_eye_value(int pos)}
+@findex max_eye_value
+@quotation
+Return the maximum number of eyes that can be obtained from the
+eyespace at @code{(i, j)}. This is most useful in order to determine
+whether the eyespace can be assumed to produce any territory at
+all.
+@end quotation
+@item @code{int is_marginal_eye_space(int pos)}
+@item @code{int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos)}
+@item @code{int is_false_eye(struct half_eye_data heye[BOARDMAX], int pos)}
+@findex is_marginal_eye_space
+@findex is_halfeye
+@findex is_false_eye
+@quotation
+These functions simply return information about an eyeshape that
+has already been analyzed. (They do no real work.)
+@end quotation
+@item @code{void find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX], int find_mask[BOARDMAX])}
+@findex find_half_and_false_eyes
+@quotation
+Find topological half eyes and false eyes by analyzing the
+diagonal intersections, as described in the Texinfo
+documentation (Eyes/Eye Topology).
+@end quotation
+@item @code{float topological_eye(int pos, int color, struct eye_data my_eye[BOARDMAX],struct half_eye_data heye[BOARDMAX])}
 @findex topological_eye
-@quotation 
-See @xref{Eye Topology}. Evaluate the eye space at @code{pos}
-topologically (@pxref{Eye Topology}). Returns 2 or less if @code{pos}
-is a proper eye for @code{color}; between 2 and 3 if the eye can be made
-false only by ko; 3 if @code{pos} is a half eye; between 3 and 4 if the
-eye can be made real only by ko; 4 if @code{pos} is a false eye. Attack
-and defense points for control of the diagonals are stored in the
-@code{heye[]} array.
+@quotation
+See Texinfo documentation (Eyes:Eye Topology). Returns:
+@itemize @bullet
+@item 2 or less if @code{pos} is a proper eye for @code{color};
+@item between 2 and 3 if the eye can be made false only by ko
+@item 3 if @code{pos} is a half eye;
+@item between 3 and 4 if the eye can be made real only by ko
+@item 4 or more if @code{pos} is a false eye.
+@end itemize
+Attack and defense points for control of the diagonals are stored
+in the @code{heye[]} array.
+@code{my_eye} is the eye space information with respect to @code{color}.
+@end quotation
+@item @code{int obvious_false_eye(int pos, int color)}
+@findex obvious_false_eye
+@quotation
+Conservative relative of @code{topological_eye()}. Essentially the same
+algorithm is used, but only tactically safe opponent strings on
+diagonals are considered. This may underestimate the false/half eye
+status, but it should never be overestimated.
+@end quotation
+@item @code{void set_eyevalue(struct eyevalue *e, int a, int b, int c, int d)}
+@findex set_eyevalue
+@quotation set parameters into the @code{struct eyevalue} as follows
+(@pxref{Eye Local Game Values}):
+@example
+struct eyevalue @{ /* number of eyes if: */
+  unsigned char a; /* attacker plays first twice */
+  unsigned char b; /* attacker plays first */
+  unsigned char c; /* defender plays first */
+  unsigned char d; /* defender plays first twice */
+@};
+@end example
+@end quotation
+@item @code{int min_eye_threat(struct eyevalue *e)}
+@findex min_eye_threat
+@quotation
+Number of eyes if attacker plays first twice (the threat of the first
+move by attacker).
+@end quotation
+@item @code{int min_eyes(struct eyevalue *e)}
+@findex min_eyes
+@quotation
+Number of eyes if attacker plays first followed by alternating play. 
+@end quotation
+@item @code{int max_eyes(struct eyevalue *e)}
+@findex max_eyes
+@quotation
+Number of eyes if defender plays first followed by alternating play. 
+@end quotation
+@item @code{int max_eye_threat(struct eyevalue *e)}
+@findex max_eye_threat
+@quotation
+Number of eyes if defender plays first twice (the threat of the first
+move by defender).
+@end quotation
+@item @code{void add_eyevalues(struct eyevalue *e1, struct eyevalue *e2, struct eyevalue *sum)}
+@findex add_eyevalues
+@quotation
+Add the eyevalues @code{*e1} and @code{*e2}, leaving the result in *sum. It is
+safe to let @code{sum} be the same as @code{e1} or @code{e2}.
+@end quotation
+@item @code{char * eyevalue_to_string(struct eyevalue *e)}
+@findex eyevalue_to_string
+@quotation
+Produces a string containing the eyevalue. @strong{Note}: the result string is
+stored in a statically allocated buffer which will be overwritten the next
+time this function is called.
+@end quotation
+@item @code{void test_eyeshape(int eyesize, int *eye_vertices)}
+@findex test_eyeshape
+/* Test whether the optics code evaluates an eyeshape consistently. */
+@item @code{int analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value, char *analyzed_eyegraph)}
+@findex analyze_eyegraph
+@quotation
+Analyze an eye graph to determine the eye value and vital moves.
+The eye graph is given by a string which is encoded with @samp{%} for
+newlines and @samp{O} for spaces. E.g., the eye graph
 
+@example
+  !
+ .X
+!...
+@end example
+	
+is encoded as @code{OO!%O.X%!...}. (The encoding is needed for the GTP
+interface to this function.) The result is an eye value and a (nonencoded)
+pattern showing the vital moves, using the same notation as eyes.db. In the
+example above we would get the eye value 0112 and the graph (showing ko threat
+moves)
+
+@example
+  @  
+ .X  
+!.*.
+@end example
+
+If the eye graph cannot be realized, 0 is returned, 1 otherwise.
 @end quotation
 @end itemize

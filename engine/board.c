@@ -1139,7 +1139,7 @@ is_illegal_ko_capture(int pos, int color)
  * Historical note: Up to GNU Go 3.4 five different komaster schemes
  * were implemented and could easily be switched between. In GNU Go
  * 3.5.1 four of them were removed to simplify the code and because it
- * did no longer seem interesting to be able to switch. The remaining
+ * no longer seemed interesting to be able to switch. The remaining
  * komaster scheme was previously known as komaster scheme 5 (or V).
  *
  * FIXME: This function could be optimized by integrating the

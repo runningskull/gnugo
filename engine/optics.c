@@ -1009,7 +1009,7 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
 
 
 /* This function does some minor reading to improve the results of
- * recognize_eye(). Currently, it has to duties. One is to read
+ * recognize_eye(). Currently, it has two duties. One is to read
  * positions like this:
  *
  *     .XXXX|        with half eye         with proper eye
@@ -2127,6 +2127,13 @@ obvious_false_eye(int pos, int color)
 }
 
 
+/* Set the parameters into struct eyevalue as follows:
+a = number of eyes if attacker plays first twice
+b = number of eyes if attacker plays first
+c = number of eyes if defender plays first
+d =number of eyes if defender plays first twice
+*/
+
 void
 set_eyevalue(struct eyevalue *e, int a, int b, int c, int d)
 {
@@ -2222,7 +2229,9 @@ eye_move_urgency(struct eyevalue *e)
     return d + c - b - a;
 }
 
-/* Note: the result string is stored in a statically allocated buffer
+/* Produces a string representing the eyevalue.
+ * 
+ * Note: the result string is stored in a statically allocated buffer
  * which will be overwritten the next time this function is called.
  */
 char *

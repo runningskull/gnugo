@@ -540,7 +540,7 @@ struct dragon_data2 @{
   int lunch;
   int surround_status;
   int surround_size;
-  int semeai;
+  int semeais;
   int semeai_margin_of_safety;
   int semeai_defense_point;
   int semeai_defense_certain;  
@@ -768,14 +768,12 @@ the comments in @file{surround.c} for more information about the
 algorithm.  Used in computing the escape_route, and also callable
 from patterns (currently used by CB258).  
 @end quotation
-@item semeai
-@item semeai_margin_of_safety
+@item semeais
 @item semeai_defense_point
 @item semeai_defense_certain
 @item semeai_attack_point
 @item semeai_attack_certain
 @cindex semeai
-@cindex semeai_margin_of_safety
 @cindex semeai_defense_point
 @cindex semeai_defense_certain
 @cindex semeai_attack_point
@@ -789,8 +787,9 @@ determine which is alive, which dead, or if the result is
 seki, and whether it is important who moves first. The
 function @file{new_semeai()} in @file{semeai.c} attempts
 to revise the statuses and to generate move reasons based
-on these results. The field @code{dragon2.semeai} is nonzero
-if the dragon is an element of a semeai. The semeai defense
+on these results. The field @code{dragon2.semeais} is nonzero
+if the dragon is an element of a semeai, and equals the
+number of semeais (seldom more than one). The semeai defense
 and attack points are locations the defender or attacker
 must move to win the semeai. The field @code{semeai_margin_of_safety}
 is intended to indicate whether the semeai is close or not

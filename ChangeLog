@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- doc revision
 - revision of configure options (some experimental options removed)
 - removed pattern matcher from oracle.c
 - removed patterns/oracle.db

@@ -12,6 +12,7 @@
 * Surrounded Dragons::          Surrounded Dragons
 * Influential Patterns::	Patterns used by the Influence module
 * Influential Display::         Colored display and debugging of influence
+* Influence Tuning::            Influence tuning with view.pike
 @end menu
 
 @node Influential Concepts
@@ -1082,3 +1083,71 @@ it tedious to navigate the output. However, if you discover an influence
 source with @option{-m 0x80} that looks wrong, the debug output can
 help you to quickly find out the responsible pattern.
 
+@node Influence Tuning
+@section Influence Tuning with @code{view.pike}
+
+A useful program in the regression directory is @code{view.pike}.
+To run it, you need Pike, which you may download from
+@url{http://pike.ida.liu.se/}.
+
+The test case @file{endgame:920} fails in GNU Go 3.6. We will
+explain how to fix it.
+
+Start by firing up view.pike on testcase endgame:920, e.g. by running
+@command{pike view.pike endgame:920} in the regression directory.
+
+We see from the first view of move values that filling dame at P15 is
+valued highest with 0.17 points while the correct move at C4 is valued
+slightly lower with 0.16. The real problem is of course that C4 is
+worth a full point and thus should be valued about 1.0.
+
+Now click on C4 to get a list of move reasons and move valuation
+information. Everything looks okay except that change in territory is
+0.00 rather than 1.00 as it ought to be.
+
+We can confirm this by choosing the ``delta territory for...'' button
+and again clicking C4. Now B5 should have been marked as one point of
+change in territory, but it's not.
+
+Next step is to enter the influence debug tool. Press the ``influence''
+button, followed by ``black influence, dragons known,'' and ``territory
+value.'' This shows the expected territory if black locally moves first
+everywhere (thus ``black influence''). Here we can see that B5 is
+incorrectly considered as 1.0 points of white territory.
+
+We can compare this with the territory after a white move at C4 (still
+assuming that black locally moves first everywhere after that) by
+pressing ``after move influence for...'' and clicking C4. This looks
+identical, as expected since delta territory was 0, but here it is
+correct that B5 is 1.0 points of territory for white.
+
+The most straightforward solution to this problem is to add a
+non-territory pattern, saying that white can't get territory on B5 if
+black moves first. The nonterritory patterns are in @file{barriers.db}.
+
+@example
+Pattern Nonterritory56
+
+...
+X.O
+?O.
+
+:8,t
+
+eac
+XbO
+?Od
+
+;oplay_attack(a,b,c,d,d)
+
+>non_xterritory(e);
+@end example
+
+In these patterns it's always assumed that @samp{O} moves first and thus it
+says that @samp{X} can't get territory at @code{B5} (@samp{e} in the
+pattern). Now we need to be a bit careful however since after @samp{O} plays
+at @samp{a} and @samp{X} cuts in at @samp{b}, it may well happen that @samp{O}
+needs to defend around @samp{d}, allowing @samp{X} to cut at @samp{c}, possibly
+making the nonterritory assumption invalid. It's difficult to do this entirely
+accurate, but the constraint above is fairly conservative and should guarantee
+that @samp{a} is safe in most, although not all, cases.

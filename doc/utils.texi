@@ -61,6 +61,16 @@ and move in the direction of bpos. Return 1 if the first visible
 stone is of the given color. It is required that apos and bpos are
 at the same distance from the edge.
 @end quotation
+@item @code{int test_symmetry_after_move(int move, int color, int strict)}
+@findex test_symmetry_after_move
+@quotation
+Is the board symmetric (or rather antisymmetric) with respect to
+mirroring in tengen after a specific move has been played? If the
+move is PASS_MOVE, check the current board.
+If strict is set we require that each stone is matched by a stone
+of the opposite color at the mirrored vertex. Otherwise we only
+require that each stone is matched by a stone of either color.
+@end quotation
 @item @code{int play_break_through_n(int color, int num_moves, ...)}
 @findex play_break_through_n
 @quotation
@@ -186,7 +196,7 @@ size of the blunder, or 0.0 if nothing bad has happened.  The array
 which, if taken, will presumably make the move at @code{move} safe on a
 subsequent turn.
 @end quotation
-@item @code{int double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])}
+i@item @code{int double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])}
 @findex double_atari
 @quotation
 Returns true if a move by (color) fits the following shape:
@@ -424,6 +434,44 @@ Convert a location to a string
 @quotation
 Convert a location to a string, writing to a buffer.
 @end quotation
+@item @code{int string_to_location(int boardsize, char *str, int *m, int *n)}
+@findex string_to_location
+@quotation
+Get the @code{(m, n)} coordinates in the standard GNU Go coordinate system
+from the string @code{str}.  This means that @samp{m} is the nth row from the
+top and @samp{n} is the column. Both coordinates are between 0 and
+@code{boardsize-1}, inclusive. Return 1 if ok, otherwise return 0;
+@end quotation
+@item @code{int is_hoshi_point(int m, int n)}
+@findex is_hoshi_point
+True if the coordinate is a hoshi point.
+@item @code{void draw_letter_coordinates(FILE *outfile)}
+@findex draw_letter_coordinates
+Print a line with coordinate letters above the board.
+@item @code{void simple_showboard(FILE *outfile)}
+@findex simple_showboard
+@quotation
+Bare bones version of @code{showboard(0)}. No fancy options, no hint of
+color, and you can choose where to write it.
+@end quotation
+@end itemize
+
+The following functions are in @file{showbord.c}. Not all public
+functions in that file are listed here.
+
+@itemize
+@item @code{void showboard(int xo)}
+@findex showboard
+@quotation
+Show go board.
+@example
+xo=0:      black and white XO board for ascii game
+xo=1:      colored dragon display
+xo=2:      colored eye display
+xo=3:      colored owl display
+xo=4:      colored matcher status display
+@end example
+@end quotation
 @item @code{const char * status_to_string(int status)}
 @findex status_to_string
 @quotation
@@ -434,23 +482,10 @@ Convert a status value to a string.
 @quotation
 Convert a safety value to a string.
 @end quotation
-@item @code{const char * routine_to_string(int routine)}
-@findex routine_to_string
-@quotation
-Convert a routine to a string.
-@end quotation
 @item @code{const char * result_to_string(int result)}
 @findex result_to_string
 @quotation
 Convert a read result to a string
-@end quotation
-@item @code{int string_to_location(int boardsize, char *str, int *m, int *n)}
-@findex string_to_location
-@quotation
-Get the @code{(m, n)} coordinates in the standard GNU Go coordinate system
-from the string @code{str}. This means that @samp{m} is the @samp{n}th row
-from the top and @samp{n} is the column. Both coordinates are between 0 and
-@code{boardsize-1}, inclusive. Return 1 if ok, otherwise return 0;
 @end quotation
 @end itemize
 
@@ -461,6 +496,38 @@ The functions documented in this section are from @file{board.c}. Other
 functions in @file{board.c} are described in @xref{Some Board Functions}.
 
 @itemize @bullet
+@item @code{void store_board(struct board_state *state)}
+@findex store_board
+@quotation
+Save board state.
+@end quotation
+@item @code{void restore_board(struct board_state *state)}
+@findex restore_board
+@quotation
+Restore a saved board state.
+@end quotation
+@item @code{void clear_board(void)}
+@findex clear_board
+@quotation
+Clear the internal board.
+@end quotation
+@item @code{void dump_stack(void)}
+@findex dump_stack
+@quotation
+for use under gdb prints the move stack.
+@end quotation
+@item @code{void add_stone(int pos, int color)}
+@findex add_stone
+@quotation
+Place a stone on the board and update the board_hash. This operation
+destroys all move history.
+@end quotation
+@item @code{void remove_stone(int pos)}
+@findex remove_stone
+@quotation
+Remove a stone from the board and update the board_hash. This
+operation destroys the move history.
+@end quotation
 @item @code{int is_pass(int pos)}
 @findex is_pass
 @quotation
@@ -493,10 +560,23 @@ capture.
 @quotation
 Determine whether vertex is on the edge.
 @end quotation
+@item @code{int edge_distance(int pos)}
+@findex edge_distance
+@quotation
+Distance to the edge.
+@end quotation
 @item @code{int is_corner_vertex(int pos)}
 @findex is_corner_vertex
 @quotation
 Determine whether vertex is a corner.
+@end quotation
+@item @code{int get_komaster()}
+@findex get_komaster
+@item @code{int get_kom_pos()}
+@findex get_kom_pos
+@quotation
+Public functions to access the variable @code{komaster} and @code{kom_pos},
+which are static in @file{board.c}.
 @end quotation
 @end itemize
 

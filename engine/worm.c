@@ -388,8 +388,8 @@ make_worms(void)
    * strings which both can be attacked but not defended. (The reason
    * seems to be that the attacker tries harder to attack a string,
    * than the defender tries to capture it's neighbors.) When this
-   * happens, the eyes code produces overlapping eye spaces and still
-   * worse all the nondefendable stones actually get amalgamated with
+   * happens, the eyes code produces overlapping eye spaces and, still
+   * worse, all the nondefendable stones actually get amalgamated with
    * their allies on the outside.
    *
    * To solve this we scan through the strings which can't be defended

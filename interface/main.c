@@ -1366,7 +1366,13 @@ main(int argc, char *argv[])
       oracle_loadsgf(infilename, untilstring);
     }
 #endif
+
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
+
+#if ORACLE
+    dismiss_oracle();
+#endif
+
     break;
   }
   

@@ -578,15 +578,16 @@ This function is like @code{trymove()} except that
 it does not require legality of the move in question.
 
 The static reading functions, and the global functions @code{do_attack}
-and @code{do_find_defense} have arguments @code{komaster},
-@code{kom_pos}. These mediate ko captures to prevent the
-occurrence of infinite loops.
+and @code{do_find_defense} consult parameters @code{komaster},
+@code{kom_pos}, which are declared static in @file{board.c}. These mediate ko
+captures to prevent the occurrence of infinite loops. During
+reading, the komaster values are pushed and popped from a stack.
 
 Normally @code{komaster} is @code{EMPTY} but it can also be
-@code{BLACK}, @code{WHITE} or @code{GRAY}. The komaster is set to @code{color}
-when @code{color} makes a conditional ko capture. In this case
-@code{kom_pos} is set to the location of the captured ko
-stone.
+@samp{BLACK}, @samp{WHITE}, @code{GRAY_BLACK}, @code{GRAY_WHITE} or
+@code{WEAK_KO}. The komaster is set to @code{color} when @code{color} makes a
+conditional ko capture. In this case @code{kom_pos} is set to the location of
+the captured ko stone.
 
 If the opponent is komaster, the reading functions will not try to
 take the ko at @code{kom_pos}. Also, the komaster is normally not
@@ -613,46 +614,16 @@ komaster he has already chosen which ko he wants to win. But in the
 case of a nested ko, taking one ko is a precondition to taking the
 other one, so we allow this.
 
-If the komaster's opponent takes a ko, then both players have taken
-one ko. In this case @code{komaster} is set to @code{GRAY} and after this further
-ko captures are not allowed.
+If the komaster's opponent takes a ko, then both players have taken one ko. In
+this case @code{komaster} is set to @code{GRAY_BLACK} or @code{GRAY_WHITE} and
+after this further ko captures are even further restricted.
 
-If the ko at @code{kom_pos} is filled, then the komaster
-reverts to @code{EMPTY}.
-
-Several different komaster schemes may be found in @file{board.c}.
-The komaster scheme used in GNU Go 3.0 was known as komaster scheme 1.
-It may be summarized as follows. It is assumed that @samp{O} is about to move.
-
-@itemize @bullet
-@item 1. Komaster is @code{EMPTY}.
-@itemize @minus
-@item 1a) Unconditional ko capture is allowed. Komaster remains @code{EMPTY}.
-@item 1b) Conditional ko capture is allowed. Komaster is set to @samp{O} and
-@code{kom_pos} to the location of the ko, where a stone was
-just removed.
-@end itemize
-@item 2. Komaster is @samp{O}:
-@itemize @minus 
-@item 2a) Only nested ko captures are allowed.
-@item 2b) If komaster fill the ko at @code{kom_pos} then komaster reverts to
+If the ko at @code{kom_pos} is filled, then the komaster reverts to
 @code{EMPTY}.
-@end itemize
-@item 3. Komaster is @samp{X}:
-@itemize @minus
-@item
-Play at @code{kom_pos} is not allowed. Any other ko capture
-is allowed. If @samp{O} takes another ko, komaster becomes @code{GRAY}.
-@end itemize
-@item 4. Komaster is @code{GRAY}:
-@itemize @minus
-@item Ko captures are not allowed. If the ko at @code{kom_pos} is
-filled then the komaster reverts to @code{EMPTY}.
-@end itemize
-@end itemize
 
-In GNU Go 3.2 and later, komaster scheme 5 is used. It may be described as
-follows.
+In detail, the komaster scheme is as follows. Color @samp{O} is to move.
+This scheme is known as scheme 5 since in versions of GNU Go through
+3.4, several different schemes were included.
 
 @itemize @bullet
 @item 1. Komaster is EMPTY.
