@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in update_status in semeai.c
 - bugfix in estimate_time_by_move
 - replay added to debug helpstring
 - revised nonvariadic versions of TRACE and allies

@@ -240,7 +240,7 @@ new_semeai(int color)
 	  if (b_matcher_status == ALIVE_IN_SEKI)
 	    b_matcher_status = ALIVE;
 	  update_status(apos, a_matcher_status, a_status);
-	  update_status(bpos, b_matcher_status, a_status);
+	  update_status(bpos, b_matcher_status, b_status);
 	}
       }
     }
