@@ -477,7 +477,6 @@ void make_worms(void);
 
 /* dragon.c */
 void make_dragons(int color, int stop_before_owl, int save_verbose);
-void compute_refined_dragon_weaknesses(void);
 void initialize_dragon_data(void);
 void show_dragons(void);
 int crude_status(int pos);

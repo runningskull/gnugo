@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- major revision of connection_value(), using new function
+  crude_dragon_weakness()
 - reading.c: new move for defend1(): try to set up snap back
 - reading.c: special_rescue4() generalized to hane_rescue_moves()
 - a connection move where amalgamtion is inhibited by cut_possible() may

@@ -395,6 +395,7 @@ gg_sort(void *base, size_t nel, size_t width,
   } while (gap > 1 || swap_made);
 }
 
+
 /* Linearly interpolate f(x) from the data given in interpolation_data. */
 float
 gg_interpolate(struct interpolation_data *f, float x)
@@ -416,6 +417,16 @@ gg_interpolate(struct interpolation_data *f, float x)
 	      ratio, i, diff);
     return ((1 - diff) * f->values[i] + diff * f->values[i+1]);
   }
+}
+
+
+/* This is the simplest function that returns appr. a when a is small,
+ * and approximately b when a is large.
+ */
+float
+soft_cap(float a, float b)
+{
+  return ((a * b) / ( a + b));
 }
 
 

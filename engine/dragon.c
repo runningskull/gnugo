@@ -1951,64 +1951,33 @@ struct interpolation_data escape_route2weakness =
 struct interpolation_data genus2weakness =
   { 6, 0.0, 3.0, {1.0, 0.95, 0.8, 0.5, 0.2, 0.1, 0.0}};
 
-/* This function tries to guess a coefficient measuring the weakness of
- * a dragon. This coefficient * the effective size of the dragon can be
- * used to award a strategic penalty for weak dragons.
- */
-static float
-compute_dragon_weakness_value(int d)
+float
+crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
+    		      float moyo_value, float escape_route)
 {
   /* FIXME: We lose information when constructing true_genus. This
    * code can be improved.
    */
-  struct eyevalue *genus = &dragon2[d].genus;
   float true_genus = 0.5 * (max_eyes(genus) + min_eyes(genus)
-			    + (dragon2[d].lunch != NO_MOVE));
-  int origin = dragon2[d].origin;
-  float escape_route = (float) dragon2[d].escape_route;
-  int dragon_safety = dragon2[d].safety;
-  int i, j;
-
+      			    + (has_lunch != 0));
   float weakness_value[3];
   float weakness;
+  int i, j;
 
-  if (dragon_safety == INVINCIBLE || dragon_safety == INESSENTIAL)
+  if (safety == INVINCIBLE || safety == INESSENTIAL)
     return 0.0;
-  if (dragon_safety == TACTICALLY_DEAD)
+  if (safety == TACTICALLY_DEAD || safety == DEAD || safety == CRITICAL)
     return 1.0;
 
-  if (dragon_safety == DEAD)
-    return 1.0;
-
-  if (dragon_safety == CRITICAL)
-    return 0.9;
-
-  /* Possible ingredients for the computation:
-   * 	'+' means currently used, '-' means not (yet?) used
-   * - pre-owl moyo_size
-   * + post-owl moyo_size and its territory value!
-   * + escape factor
-   * + number of eyes
-   *   - minus number of vital attack moves?
-   * + from owl:
-   *   + attack certain?
-   *   - number of owl nodes
-   *   - maybe reading shadow?
-   *   + threat to attack?
-   * - possible connections to neighbour dragons
-   */
-
-  weakness_value[0] = gg_interpolate(&moyo_value2weakness,
-      				     dragon2[d].moyo_territorial_value);
-  weakness_value[1] = gg_interpolate(&escape_route2weakness,
-      				     escape_route);
+  weakness_value[0] = gg_interpolate(&moyo_value2weakness, moyo_value);
+  weakness_value[1] = gg_interpolate(&escape_route2weakness, escape_route);
   weakness_value[2] = gg_interpolate(&genus2weakness, true_genus);
 
-  DEBUG(DEBUG_DRAGONS, "Computing weakness of dragon at %1m:\n", origin);
   DEBUG(DEBUG_DRAGONS,
 	"  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f,",
-	dragon2[d].moyo_territorial_value, weakness_value[0],
-	escape_route, weakness_value[1], true_genus, weakness_value[2]);
+	moyo_value, weakness_value[0],
+	escape_route, weakness_value[1],
+	true_genus, weakness_value[2]);
 
   for (i = 0; i < 3; i++)
     for (j = i + 1; j < 3; j++)
@@ -2024,6 +1993,43 @@ compute_dragon_weakness_value(int d)
   weakness = gg_min(0.7 * weakness_value[0] + 0.3 * weakness_value[1],
                     1.3 * weakness_value[0]);
 
+  gg_assert(weakness >= 0.0 && weakness <= 1.0);
+
+  return weakness;
+}
+
+/* This function tries to guess a coefficient measuring the weakness of
+ * a dragon. This coefficient * the effective size of the dragon can be
+ * used to award a strategic penalty for weak dragons.
+ */
+static float
+compute_dragon_weakness_value(int d)
+{
+  int origin = dragon2[d].origin;
+  float weakness;
+
+  /* Possible ingredients for the computation:
+   * 	'+' means currently used, '-' means not (yet?) used
+   * - pre-owl moyo_size
+   * + post-owl moyo_size and its territory value
+   * + escape factor
+   * + number of eyes
+   *   - minus number of vital attack moves?
+   * + from owl:
+   *   + attack certain?
+   *   - number of owl nodes
+   *   - maybe reading shadow?
+   *   + threat to attack?
+   * - possible connections to neighbour dragons
+   */
+
+  DEBUG(DEBUG_DRAGONS, "Computing weakness of dragon at %1m:\n", origin);
+
+  weakness = crude_dragon_weakness(dragon2[d].safety, &dragon2[d].genus,
+				   dragon2[d].lunch != NO_MOVE,
+      				   dragon2[d].moyo_territorial_value, 
+				   (float) dragon2[d].escape_route);
+
   /* Now corrections due to (uncertain) owl results resp. owl threats. */
   if (!dragon[origin].owl_attack_certain)
     weakness += gg_min(0.25 * (1.0 - weakness), 0.25 * weakness);
@@ -2038,9 +2044,9 @@ compute_dragon_weakness_value(int d)
     weakness = 1.0;
 
   DEBUG(DEBUG_DRAGONS, " result: %f.\n", weakness);
-
   return weakness;
 }
+
 
 /* This function has to be called _after_ the owl analysis and the
  * subsequent re-run of the influence code.

@@ -351,6 +351,10 @@ void restore_depth_values(void);
 int safe_move(int move, int color);
 void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, char escape_value[BOARDMAX]);
+void compute_refined_dragon_weaknesses(void);
+struct eyevalue;
+float crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
+			    float moyo_value, float escape_route);
 int is_same_dragon(int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
 int first_worm_in_dragon(int w);

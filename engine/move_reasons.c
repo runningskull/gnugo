@@ -1986,16 +1986,6 @@ scale_randomness(int pos, float scaling)
 }
 
 
-/* Returns a capped effective size of the dragon at pos for use in
- * the strategic effect.
- */
-float
-strategic_effective_size(int pos)
-{
-  float eff = dragon[pos].effective_size;
-  return ((15.0 * eff) / (15.0 + eff));
-}
-
 /*
  * Local Variables:
  * tab-width: 8

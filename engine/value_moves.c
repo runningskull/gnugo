@@ -354,6 +354,7 @@ find_more_owl_attack_and_defense_moves(int color)
 		 && board[dd] == color))
 	    && !owl_defense_move_reason_known(pos, find_dragon(dd))) {
 	  int kworm = NO_MOVE;
+	  /* FIXME: Better use owl_connection_defend() for CONNECT_MOVE ? */
 	  int dcode = owl_does_defend(pos, dd, &kworm);
 	  if (dcode >= dragon[dd].owl_defense_code) {
 	    if (dcode == LOSS)
@@ -940,77 +941,27 @@ dragon_weakness(int dr, int ignore_dead_dragons)
  * + max(connection_value(C, A), connection_value(C, B))
  *
  * The parameter 'margin' is the margin by which we are ahead.
- * If this exceeds 20 points we use the cautious impact values,
- * which value connections more.  This is because we can afford
- * to waste a move making sure of safety. If the margin is between
- * 0 and 20 points we interpret linearly between the two sets of
- * impact values.
+ * If this exceeds 20 points we value connections more.  This is because
+ * we can afford to waste a move making sure of safety.
  */
 
-/* Values higher than 1.0 to give connections a bonus over other vital
- * moves.
- */
-static float impact_values[10][10] = {
-/*      (dragonb) DEAD ALIV CRIT INES TACT WEAK WE_A SEKI STRO INVI */
-/* DEAD        */ {0.0, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
-/* ALIVE       */ {0.0, 0.08,0.05,0.0, 0.0, 0.05,0.07,0.05,0.09,0.1 },
-/* CRITICAL    */ {0.0, 1.04,0.85,0.0, 0.0, 0.75,0.9, 0.85,1.08,1.1 },
-/* INESSENTIAL */ {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-/* TACT. DEAD  */ {0.0, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
-/* WEAK        */ {0.1, 0.6, 0.25,0.0, 0.0, 0.2, 0.25,0.25,0.65,0.65},
-/* WEAK ALIVE  */ {0.0, 0.4, 0.3, 0.0, 0.0, 0.15,0.2, 0.2 ,0.45,0.45},
-/* SEKI        */ {0.0, 0.2, 0.15,0.0, 0.0, 0.1, 0.15,0.2, 0.25,0.3 },
-/* STR. ALIVE  */ {0.0, 0.01,0.01,0.0, 0.0, 0.01,0.01,0.01,0.01,0.01},
-/* INVINCIBLE  */ {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
-/* (dragona)    */
-		  
-static float cautious_impact_values[10][10] = {
-/*      (dragonb) DEAD ALIV CRIT INES TACT WEAK WE_A SEKI STRO INVI */
-/* DEAD        */ {0.3, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
-/* ALIVE       */ {0.0, 0.2, 0.05,0.0, 0.0, 0.1,0.15, 0.10,0.2 ,0.2 },
-/* CRITICAL    */ {0.0, 1.04,0.85,0.0, 0.0, 0.75,0.9, 0.85,1.08,1.1 },
-/* INESSENTIAL */ {0.1, 0.6, 0.0, 0.0, 0.0, 0.3, 0.5, 0.5, 0.6, 0.6 },
-/* TACT. DEAD  */ {0.2, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
-/* WEAK        */ {0.1, 0.6, 0.25,0.0, 0.0, 0.2, 0.25,0.25,0.65,0.65},
-/* WEAK ALIVE  */ {0.0, 0.4, 0.3, 0.0, 0.0, 0.2, 0.2, 0.2 ,0.45,0.45},
-/* SEKI        */ {0.0, 0.2, 0.15,0.0, 0.0, 0.1, 0.15,0.2, 0.25,0.3 },
-/* STR. ALIVE  */ {0.0, 0.02,0.01,0.0, 0.0, 0.01,0.01,0.01,0.02,0.02},
-/* INVINCIBLE  */ {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
-/* (dragona)    */
-		  
 static float
 connection_value(int dragona, int dragonb, int tt, float margin)
 {
-  int safety1 = DRAGON2(dragona).safety;
-  int safety2 = DRAGON2(dragonb).safety;
-  /* FIXME: We lose information when constructing true_genus. This
-   * code can be improved.
-   */
-  struct eyevalue *genus1 = &DRAGON2(dragona).genus;
-  struct eyevalue *genus2 = &DRAGON2(dragonb).genus;
-  int true_genus1 = max_eyes(genus1) + min_eyes(genus1);
-  int true_genus2 = max_eyes(genus2) + min_eyes(genus2);
-  float impact;
-
-  /* If the connected dragon gets sufficient eyespace to live on its
-   * own, although neither of the unconnected ones did, we simulate
-   * this by upgrading the safety of the second dragon to ALIVE.
-   */
-  if (true_genus1 < 4 && true_genus2 < 4) {
-    if (true_genus1 + true_genus2 >= 4
-	||  (true_genus1 + true_genus2 >= 3
-	     && (DRAGON2(dragona).heye == tt
-		 || DRAGON2(dragonb).heye == tt)))
-      safety2 = ALIVE;
-  }
-
-  /* If the b dragon is critical but has genus 0 and no moyo, we
-   * assume it doesn't help dragon a to connect to b.
-   */
-  if (safety2 == CRITICAL && true_genus2 == 0
-      && DRAGON2(dragonb).moyo_size_pre_owl == 0)
-    return 0.0;
-  
+  struct dragon_data2* da = &DRAGON2(dragona);
+  struct dragon_data2* db = &DRAGON2(dragonb);
+  float sizea = dragon[dragona].effective_size;
+  float sizeb = dragon[dragonb].effective_size;
+  int safetya = da->safety;
+  int safetyb = db->safety;
+  float crude_weakness_a
+    = crude_dragon_weakness(da->safety, &da->genus, da->lunch != NO_MOVE, 
+			    da->moyo_territorial_value,
+			    (float) da->escape_route);
+  float crude_weakness_sum;
+  struct eyevalue genus_sum;
+  float terr_val = move[tt].territorial_value;
+  float return_value;
 
   /* When scoring, we want to be restrictive with reinforcement moves
    * inside own territory. Thus if both dragons are weakly_alive,
@@ -1018,37 +969,66 @@ connection_value(int dragona, int dragonb, int tt, float margin)
    *
    * Notice that this requires that the territorial value is computed
    * before the strategical value.
+   *
+   * FIXME: Shouldn't it be sufficient to check this for dragon a?
    */
-  if (doing_scoring && move[tt].territorial_value < 0.0) {
-    if ((safety1 == WEAKLY_ALIVE
-	 || safety1 == ALIVE
-	 || safety1 == STRONGLY_ALIVE
-	 || safety1 == INVINCIBLE)
-	&& (safety2 == WEAKLY_ALIVE
-	    || safety2 == ALIVE
-	    || safety2 == STRONGLY_ALIVE
-	    || safety2 == INVINCIBLE))
+  if (doing_scoring && terr_val < 0.0) {
+    if ((safetya == WEAKLY_ALIVE
+	 || safetya == ALIVE
+	 || safetya == STRONGLY_ALIVE
+	 || safetya == INVINCIBLE)
+	&& (safetyb == WEAKLY_ALIVE
+	    || safetyb == ALIVE
+	    || safetyb == STRONGLY_ALIVE
+	    || safetyb == INVINCIBLE))
       return 0.0;
   }
 
-  if (doing_scoring || margin < 0.0)
-    impact = impact_values[safety1][safety2];
-  else if (margin > 20.0)
-    impact = cautious_impact_values[safety1][safety2];
-  else
-    impact = (0.05 * margin * cautious_impact_values[safety1][safety2]
-	      + (1 - 0.05 * margin) * impact_values[safety1][safety2]);
+  if (crude_weakness_a == 0.0
+      || dragon[dragona].status == CRITICAL
+      || dragon[dragona].status == DEAD)
+    return 0.0;
+  if (terr_val < 0.0)
+    terr_val = 0.0;
 
-
-  /* Trying to connect an inessential string to something else with a
-   * self atari is almost certainly worthless.
+  add_eyevalues(&da->genus, &db->genus, &genus_sum);
+  /* FIXME: There is currently no sane way to take the escape values
+   * into account. Hence we simply pretend they do not change.
+   *
+   * FIXME: terr_val is a very crude approximation to the expected
+   * increase in moyo size. It's especially way off if the move at (tt)
+   * (owl) defends some stones.
    */
-  if (impact > 0.0
-      && safety1 == INESSENTIAL
-      && is_self_atari(tt, board[dragona]))
-    impact = 0.0;
-  
-  return impact * 2.0 * dragon[dragona].effective_size;
+  crude_weakness_sum
+    = crude_dragon_weakness(safetyb, &genus_sum,
+			    (da->lunch != NO_MOVE || db->lunch != NO_MOVE), 
+			    da->moyo_territorial_value
+			    + db->moyo_territorial_value
+			    + terr_val,
+			    (float) da->escape_route);
+
+  {
+    float old_burden = 2.0 * crude_weakness_a * soft_cap(sizea, 15.0);
+
+    /* The new burden is the burden of defending new joint dragon; but
+     * we share this burden proportionally with the other dragon.
+     */
+    float new_burden = 2.0 * crude_weakness_sum * soft_cap(sizea + sizeb, 15.0)
+		       * sizea / (sizea + sizeb);
+
+    return_value = 1.05 * (old_burden - new_burden);
+  }
+
+  if (return_value < 0.0)
+    return_value = 0.0;
+
+  /* If ahead, give extra bonus to connections. */
+  if (margin > 20.0)
+    margin = 20.0;
+  if (margin > 0.0)
+    return_value *= 1.0 + 0.02 * margin;
+
+  return return_value;
 }
 
 
@@ -1982,8 +1962,8 @@ estimate_strategical_value(int pos, int color, float score)
 	     * alone is not enough. The question is whether the dragon is
 	     * threatened or defended by the move or not.  
 	     */
-	    this_value = (1.8 * strategic_effective_size(bb)
-			  * dragon_weakness(bb, 0));
+	    this_value = 1.8 * soft_cap(dragon[bb].effective_size, 15.0)
+			 * dragon_weakness(bb, 0);
 
 	    /* If this dragon consists of only one worm and that worm
 	     * can be tactically captured or defended by this move, we
@@ -2252,8 +2232,8 @@ estimate_strategical_value(int pos, int color, float score)
 	 * dragon safety alone is not enough. The question is whether
 	 * the dragon is threatened by the move or not.
 	 */
-	this_value = (1.8 * strategic_effective_size(aa)
-		      * dragon_weakness(aa, 1));
+	this_value = 1.8 * soft_cap(dragon[aa].effective_size, 15.0)
+		     * dragon_weakness(aa, 1);
 
 	/* No strategical attack value is awarded if the dragon at (aa)
 	 * has an adjacent (friendly) critical dragon, which is not
