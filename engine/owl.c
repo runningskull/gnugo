@@ -579,7 +579,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
       && !pass && owl_phase
       && tt_get(&ttable, SEMEAI, apos, bpos, depth - stackp, NULL,
-		&value1, &value2, &xpos)) {
+		&value1, &value2, &xpos) == 2) {
     TRACE_CACHED_RESULT2(value1, value2, xpos);
     if (value1 != 0)
       *move = xpos;
