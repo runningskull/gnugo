@@ -289,7 +289,10 @@ loadsgf games/lordofpi.sgf 56
 211 gg_genmove black
 #? [H8]
 
-
+# Pattern LE14 gives an unreasonable value to H3.
+loadsgf games/owl31.sgf 28
+212 gg_genmove white
+#? [G2]
 
 ############ End of Tests #################
 

@@ -47,7 +47,7 @@ loadsgf games/mfgg2.sgf 45
 
 
 #CATEGORY=OWL_TUNING
-#DESCRIPTION=GnuGo doesn't understand this type of corner position!
+#DESCRIPTION=GNU Go doesn't understand this type of corner position!
 #SEVERITY=10
 #GG often messes up in this type of corner position.
 loadsgf games/mfgg2.sgf 117

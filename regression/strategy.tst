@@ -289,9 +289,10 @@ loadsgf games/strategy10.sgf
 #    the bottom at G2 or (worse but still OK) at J2 is better but
 #    I would class this result as ACCEPTABLE.
 #
-#    3.1.9: Best move here is tough.  GnuGo correctly tries
-#    to stabalize G3 group.
+#    3.1.9: Best move here is tough.  GNO Go correctly tries
+#    to stabilize G3 group.
 #
+# See also reading:158
 loadsgf games/strategy11.sgf 77
 44 gg_genmove black
 #? [G2]*

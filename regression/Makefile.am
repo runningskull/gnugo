@@ -1,5 +1,5 @@
 TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
-      ld_owl.tst ld_owl_life.tst connection.tst  \
+      ld_owl.tst connection.tst  \
       neurogo.tst arb.tst strategy2.tst strategy3.tst rosebud.tst \
       heikki.tst golife.tst dniwog.tst strategy4.tst \
       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
@@ -75,9 +75,6 @@ cutstone: cutstone.tst
 
 ld_owl: ld_owl.tst
 	$(srcdir)/eval.sh ld_owl.tst
-
-ld_owl_life: ld_owl_life.tst
-	$(srcdir)/eval.sh ld_owl_life.tst --life
 
 connection: connection.tst
 	$(srcdir)/eval.sh connection.tst
@@ -178,13 +175,12 @@ vie: vie.tst
 
 all_batches: first_batch second_batch third_batch fourth_batch
 
-first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst life.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
+first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
 	$(srcdir)/regress.sh $(srcdir) reading.tst
 	$(srcdir)/regress.sh $(srcdir) owl.tst
 	$(srcdir)/regress.sh $(srcdir) owl_rot.tst
 	$(srcdir)/regress.sh $(srcdir) ld_owl.tst
 	$(srcdir)/regress.sh $(srcdir) optics.tst
-	$(srcdir)/regress.sh $(srcdir) life.tst --life
 	$(srcdir)/regress.sh $(srcdir) filllib.tst
 	$(srcdir)/regress.sh $(srcdir) atari_atari.tst
 	$(srcdir)/regress.sh $(srcdir) connection.tst

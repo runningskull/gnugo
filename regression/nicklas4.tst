@@ -26,6 +26,7 @@ loadsgf games/nicklas/nicklas8.sgf 242
 812 gg_genmove black
 #? [J12]
 
+# O9 does leave a ko but is not out of the question. /gf
 loadsgf games/nicklas/nicklas11.sgf 56
 1102 gg_genmove black
 #? [P9]*
@@ -45,9 +46,10 @@ loadsgf games/nicklas/nicklas12.sgf 95
 
 loadsgf games/nicklas/nicklas12.sgf 215
 1215 dragon_status A4
-#? [critical]*
+#? [critical A6 (A1|A6)]*
 
-loadsgf games/nicklas/nicklas15.sgf 185
+# Changed move number from 185 to 186. /gf
+loadsgf games/nicklas/nicklas15.sgf 186
 1501 gg_genmove black
 #? [D17]*
 

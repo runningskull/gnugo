@@ -37,10 +37,12 @@ loadsgf games/nicklas/nicklas12.sgf 89
 1204 gg_genmove black
 #? [H15]*
 
+# This is presumably a semeai problem.
 loadsgf games/nicklas/nicklas12.sgf 182
 1211 dragon_status L8
 #? [critical]*
 
+# This is presumably a semeai problem.
 loadsgf games/nicklas/nicklas12.sgf 199
 1212 dragon_status P13
 #? [critical]*

@@ -615,6 +615,10 @@ loadsgf games/reading33.sgf
 157 attack R3
 #? [0]
 
+loadsgf games/strategy11.sgf 77
+158 attack H2
+#? [1 G2]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

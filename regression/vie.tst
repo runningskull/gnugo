@@ -45,8 +45,9 @@ loadsgf golois/Goemate990902-15.sgf
 11 owl_defend T8
 #? [1 T7]
 
+# R4 is alive as it stands. Changed the test to defend T11. /gf
 loadsgf golois/Goemate990902-15.sgf
-12 owl_defend R4
+12 owl_defend T11
 #? [1 T7]
 
 loadsgf golois/Goemate990902-3.sgf
@@ -82,7 +83,7 @@ loadsgf golois/Goemate990911-3.sgf
 # B can tenuki. J8 and H9 are miai.
 loadsgf golois/Goemate991106-3.sgf
 20 owl_defend K8
-#? [1 H9]*
+#? [1 (H9|J8|PASS)]*
 
 loadsgf golois/Goemate991106-4.sgf
 21 owl_defend L13
@@ -172,7 +173,7 @@ loadsgf golois/MeilleurCoup0007.sgf
 
 loadsgf golois/Neurogo97-1.sgf
 42 owl_defend H2
-#? [1 J2]
+#? [1 (J3|G4|J2)]
 
 loadsgf golois/Neurogo97-1.sgf
 43 owl_attack H2

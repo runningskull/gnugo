@@ -75,8 +75,11 @@ loadsgf golois/Goemate990904-3.sgf
 19 gg_genmove black
 #? [F14]
 
+# This test should surely have white to move. Still R15 doesn't look
+# like the only move. Changed from "gg_genmove black" to "gg_genmove
+# white" /gf
 loadsgf golois/Goemate990907-2.sgf
-20 gg_genmove black
+20 gg_genmove white
 #? [R15]*
 
 loadsgf golois/Goemate990911-1.sgf

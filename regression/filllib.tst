@@ -12,7 +12,7 @@ loadsgf games/incident72.sgf 255
 # incident 187
 loadsgf games/incident187.sgf 227
 3 gg_genmove white
-#? [B15|A15|A17]
+#? [B15|A15|A17|B14]
 4 gg_genmove black
 #? [B19|A17]
 

@@ -841,6 +841,10 @@ loadsgf games/incident240.sgf 69
 229 owl_attack B12
 #? [1 D9]
 
+loadsgf games/owl31.sgf 20
+230 owl_defend G7
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

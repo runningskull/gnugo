@@ -30,6 +30,7 @@ loadsgf games/arb/dumonteil-1.sgf 184
 150 gg_genmove white
 #? [J5]
 
+# Why is this move so urgent? /gf
 loadsgf games/arb/dumonteil-2.sgf 229
 200 gg_genmove black
 #? [F14]*

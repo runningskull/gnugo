@@ -49,11 +49,13 @@ loadsgf games/nicklas/nicklas7.sgf 29
 #? [F1]*
 
 
-#CATEGORY=OWL_TUNING
+#CATEGORY=SEMEAI_MODULE
 #DESCRIPTION=Tough for white to see attacking B, and linking w/ attack stone.
 #SEVERITY=3
 #    The only way to live is to attack a neighbour dragon, e.g. the one
 #    at F8. But does the owl code really do this by default?
+#
+#    No, this is up to the semeai module to resolve. /gf
 #
 loadsgf games/nicklas/nicklas9.sgf 28
 902 dragon_status E9
