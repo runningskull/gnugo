@@ -1,3 +1,66 @@
+# Here is a list of other regressions which should afford
+# semeai tuning. The regressions were run with the version
+# of November 6, 2001 with three different versions of the
+# semeai module. The patch in question was semeai_1_16.5
+# which is now in the CVS.
+#
+#                   Standard  Experimental Patched
+#
+# Strategy 1            f         P          P
+# Strategy 37           p         F          F
+# Neurogo 11            p         F          F
+# Neurogo 12            p         F          F
+# Arb 104               p         F          F
+# Golife 1              f         P          P
+# Golife 2              f         P          P
+# Dniwog 5              f         P          f
+# Strategy2 66          p         F          F
+# Strategy2 72          f         P          P
+# Strategy2 73          F         p          F
+# Strategy2 93          f         P          P
+# Nicklas1 501          p         F          F
+# Nicklas1 1213         f         P          P
+# Nicklas1 1405         p         F          F
+# Nicklas1 1406         p         F          F
+# Nicklas2 904          p         p          F
+# Nicklas2 1407         f         P          f
+# Manyfaces 7           p         F          F
+# Buzco 6               p         F          p
+# Strategy3 110         f         P          P
+# Strategy3 113         p         F          p
+# Strategy3 124         f         P          f
+# Strategy3 126         p         F          F
+# Arend 30              p         F          F
+# Trevora 530           f         P          P
+# Strategy4 168         P         f          f
+# Strategy4 179         F         F          F (*)
+# Strategy4 199         p         F          F
+# Strategy4 200         p         F          F
+#
+# (*) All tests fail, but differently
+#
+# Here is a supplemental list of problems where a comment in the .tst
+# file indicates a semeai:
+# 
+# Strategy 31
+# Strategy 44
+# Strategy2 72
+# Strategy2 80
+# Strategy2 86
+# Strategy3 109
+# Strategy3 110
+# Strategy3 124
+# Strategy3 128
+# Strategy3 129
+# Strategy3 139
+# Strategy3 145
+# Strategy3 146
+# Strategy4 156
+# Strategy4 163
+# Strategy4 168
+# Strategy4 185
+# Strategy4 206
+
 # for any of these problems, if PASS is a solution it is the best
 # solution. However the other solutions are acceptable.
 

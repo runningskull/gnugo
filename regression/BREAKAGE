@@ -7,8 +7,6 @@ Patches: gunnar_1_16.7, gunnar_1_16.6, trevor_1_16.1, trevor_1_16.2,
 
 23 P + 13 F
 
-meep gnugo-3.1.16$ cd regression/
-meep regression$ make all_batches
 ./regress.sh . reading.tst
 ./regress.sh . owl.tst
 254 unexpected FAIL: Correct '1 (M16|O14|N16|N17)', got '0'
