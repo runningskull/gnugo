@@ -2,7 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.5.5 released April 23, 2004
+3.5.6 released April 23, 2004
 
 - new configure and runtime option large-scale
 - new change_owl_nodes()
