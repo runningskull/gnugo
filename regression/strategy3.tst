@@ -136,7 +136,7 @@ loadsgf games/incident74.sgf 236
 # Semeai problem.
 loadsgf games/strategy30.sgf 171
 128 gg_genmove black
-#? [O8]*
+#? [O8]
 
 # Semeai problem.
 # tm - S12 also works ok.

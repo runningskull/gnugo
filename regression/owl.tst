@@ -436,7 +436,7 @@ loadsgf games/ko1.sgf
 
 loadsgf games/owl10.sgf
 117 owl_attack N11
-#? [1 (G12|L14|N13)]*
+#? [1 (G12|L14|N13)]
 
 loadsgf games/owl11.sgf 126
 118 owl_attack H5

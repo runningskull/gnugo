@@ -1,3 +1,48 @@
+========================== 3.1.19 =========================
+
+./regress.sh . owl.tst
+117 unexpected PASS!
+./regress.sh . owl_rot.tst
+150 unexpected PASS!
+./regress.sh . ld_owl.tst
+199 unexpected FAIL: Correct 'alive', got 'critical T3 S1'
+./regress.sh . trevor.tst
+430 unexpected PASS!
+./regress.sh . strategy3.tst
+128 unexpected PASS!
+./regress.sh . global.tst
+16 unexpected FAIL: Correct 'O10', got 'Q11'
+37 unexpected PASS!
+41 unexpected PASS!
+./regress.sh . vie.tst
+41 unexpected PASS!
+./regress.sh . arend.tst
+10 unexpected PASS!
+37 unexpected PASS!
+./regress.sh . trevorb.tst
+160 unexpected PASS!
+./regress.sh . trevorc.tst
+110 unexpected PASS!
+130 unexpected PASS!
+180 unexpected PASS!
+200 unexpected PASS!
+360 unexpected FAIL: Correct 'H11', got 'G13'
+400 unexpected FAIL: Correct '!J11', got 'J11'
+410 unexpected FAIL: Correct '!H13', got 'H13'
+460 unexpected PASS!
+610 unexpected FAIL: Correct '!N3', got 'N3'
+970 unexpected PASS!
+./regress.sh . trevord.tst
+100 unexpected PASS!
+130 unexpected PASS!
+150 unexpected PASS!
+360 unexpected PASS!
+690 unexpected PASS!
+720 unexpected PASS!
+930 unexpected PASS!
+1080 unexpected PASS!
+1100 unexpected PASS!
+
 ===================== 3.1.18, experimental =========================
 
 After the test results are updated, we have the following

@@ -74,7 +74,7 @@ dfa_c = @dfa_c@
 glibconfig = @glibconfig@
 perl = @perl@
 
-TST = life.tst owl.tst optics.tst reading.tst strategy.tst       ld_owl.tst connection.tst        neurogo.tst arb.tst strategy2.tst strategy3.tst rosebud.tst       heikki.tst golife.tst dniwog.tst strategy4.tst       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst       score.tst manyfaces.tst cutstone.tst newscore.tst blunder.tst       niki.tst trevor.tst tactics.tst buzco.tst       capture.tst connect.tst global.tst vie.tst       owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst arend.tst       trevora.tst trevorb.tst trevorc.tst semeai.tst 13x13.tst
+TST = life.tst owl.tst optics.tst reading.tst strategy.tst       ld_owl.tst connection.tst        neurogo.tst arb.tst strategy2.tst strategy3.tst rosebud.tst       heikki.tst golife.tst dniwog.tst strategy4.tst       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst       score.tst manyfaces.tst cutstone.tst newscore.tst blunder.tst       niki.tst trevor.tst tactics.tst buzco.tst       capture.tst connect.tst global.tst vie.tst       owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst arend.tst       trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst
 
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
@@ -94,7 +94,7 @@ DIST_COMMON =  README Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:

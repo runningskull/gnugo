@@ -42,7 +42,7 @@ loadsgf games/trevor/auto/b08.sgf 16
 
 loadsgf games/trevor/auto/b08.sgf 32
 160 owl_attack M9
-#? [1 ..*]*
+#? [1 ..*]
 
 
 loadsgf games/trevor/auto/b08.sgf 94

@@ -54,7 +54,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 61
 # J7 is extremely overvalued. This is caused by pattern CB11.
 loadsgf games/arend/gnugo-gnugo2.sgf 73
 10 gg_genmove black
-#? [!J7]*
+#? [!J7]
 
 #CATEGORY=STRATEGY
 # K6 is overvalued by GNU Go 3.0.0.
@@ -194,7 +194,7 @@ loadsgf games/arend/constructed1.sgf
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/arend/constructed2.sgf
 37 gg_genmove black
-#? [A5]*
+#? [A5]
  
 #CATEGORY=STRATEGY
 # I think this problem summarizes well two common misjudgements 

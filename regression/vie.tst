@@ -171,7 +171,7 @@ loadsgf golois/MeilleurCoup0005.sgf
 
 loadsgf golois/MeilleurCoup0007.sgf
 41 owl_defend B6
-#? [1 B4]*
+#? [1 B4]
 
 loadsgf golois/Neurogo97-1.sgf
 42 owl_defend H2

@@ -464,7 +464,7 @@ loadsgf games/trevor/trevor_42.sgf 191
 #SEVERITY=10
 loadsgf games/trevor/trevor_43.sgf
 430 owl_attack F4
-#? [1 G4]*
+#? [1 G4]
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Simple double atari

@@ -8,7 +8,7 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       niki.tst trevor.tst tactics.tst buzco.tst \
       capture.tst connect.tst global.tst vie.tst \
       owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst arend.tst \
-      trevora.tst trevorb.tst trevorc.tst semeai.tst 13x13.tst
+      trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 

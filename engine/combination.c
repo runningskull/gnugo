@@ -60,9 +60,6 @@ static void aa_add_move(struct aa_move attacks[AA_MAX_MOVES],
 static int aa_move_known(struct aa_move attacks[AA_MAX_MOVES],
 			 int move, int target);
 static void aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES]);
-#if 0
-static int is_atari(int pos, int color);
-#endif
 
 /* Generate move reasons for combination attacks and defenses against
  * them.
@@ -791,7 +788,7 @@ atari_atari_find_attack_moves(int color, int minsize,
 {
   int k;
   int r;
-  
+
   aa_init_moves(attacks);
 
   atari_atari_attack_patterns(color, minsize, attacks);
@@ -1161,8 +1158,9 @@ aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES])
 
 
 #if 0
+
 /* Returns true if a move by (color) at (pos) is atari on something.
- * FIXME: Move this to an appropriate location.
+ * Currently unused.
  */
 
 static int
@@ -1191,8 +1189,8 @@ is_atari(int pos, int color)
   
   return 0;
 }
-#endif
 
+#endif
 
 
 /*

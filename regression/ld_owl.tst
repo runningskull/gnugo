@@ -296,7 +296,7 @@ loadsgf games/life_and_death/tripod8.sgf
 192 dragon_status R17
 #? [critical (T19|S19) (S17|S19)]
 193 dragon_status R3
-#? [critical (S4|T4|T5) S4]
+#? [critical (S4|T4|T5) S4]*
 194 owl_attack C3
 #? [3 B1]
 195 owl_defend C3
@@ -310,7 +310,7 @@ loadsgf games/life_and_death/tripod9.sgf
 198 dragon_status R17
 #? [dead]
 199 dragon_status R3
-#? [alive]
+#? [alive]*
 200 dragon_status C3
 #? [dead]
 
