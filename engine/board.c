@@ -2168,7 +2168,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
     for (k = 0; k < string[s].liberties; k++) {
       int lib = string[s].libs[k];
       if (UNMARKED_LIBERTY(lib)) {
-	if (libs != NULL && liberties < maxlib)
+	if (libs != NULL)
 	  libs[liberties] = lib;
 	liberties++;
 	if (liberties >= maxlib)
@@ -2192,7 +2192,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
     for (k = 0; k < string[s].liberties; k++) {
       int lib = string[s].libs[k];
       if (UNMARKED_LIBERTY(lib)) {
-	if (libs != NULL && liberties < maxlib)
+	if (libs != NULL)
 	  libs[liberties] = lib;
 	liberties++;
 	if (liberties >= maxlib)
@@ -2216,7 +2216,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
     for (k = 0; k < string[s].liberties; k++) {
       int lib = string[s].libs[k];
       if (UNMARKED_LIBERTY(lib)) {
-	if (libs != NULL && liberties < maxlib)
+	if (libs != NULL)
 	  libs[liberties] = lib;
 	liberties++;
 	if (liberties >= maxlib)
@@ -2227,7 +2227,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
   }
   
   if (UNMARKED_LIBERTY(EAST(pos))) {
-    if (libs != NULL && liberties < maxlib)
+    if (libs != NULL)
       libs[liberties] = EAST(pos);
     liberties++;
     /* Stop counting if we reach maxlib. */
@@ -2243,7 +2243,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
     for (k = 0; k < string[s].liberties; k++) {
       int lib = string[s].libs[k];
       if (UNMARKED_LIBERTY(lib)) {
-	if (libs != NULL && liberties < maxlib)
+	if (libs != NULL)
 	  libs[liberties] = lib;
 	liberties++;
 	if (liberties >= maxlib)
