@@ -21,12 +21,6 @@
 /* Semeai module. Default standard. */
 #undef EXPERIMENTAL_SEMEAI
 
-/* Give the directory where gnugo was compiled */
-#undef GNUGO_PATH
-
-/* The concatenation of the strings "GNU ", and PACKAGE. */
-#undef GNU_PACKAGE
-
 /* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
    */
 #undef GRID_OPT
@@ -58,15 +52,6 @@
 /* Define if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define if the preprocessor recognizes __FUNCTION__ */
-#undef HAVE___FUNCTION__
-
-/* Define if `major', `minor', and `makedev' are declared in <mkdev.h>. */
-#undef MAJOR_IN_MKDEV
-
-/* Define if `major', `minor', and `makedev' are declared in <sysmacros.h>. */
-#undef MAJOR_IN_SYSMACROS
-
 /* Owl Node Limit */
 #undef OWL_NODE_LIMIT
 
@@ -90,6 +75,3 @@
 
 /* Version number of package */
 #undef VERSION
-
-/* Define to empty if `const' does not conform to ANSI C. */
-#undef const

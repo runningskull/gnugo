@@ -8,19 +8,11 @@ AC_CONFIG_SRCDIR([engine/dragon.c])
 AM_CONFIG_HEADER(config.h)
 AC_PREREQ(2.50)dnl               dnl Minimum Autoconf version required.
 
-AH_TEMPLATE([PACKAGE],
-[Define to the name of the distribution.])
-
-AH_TEMPLATE([GNU_PACKAGE],
-[The concatenation of the strings "GNU ", and PACKAGE.])
-
 AH_TEMPLATE([VERSION],
 [Define to the version of the distribution.])
 
 dnl this defines VERSION and PACKAGE
 AM_INIT_AUTOMAKE([gnugo], [3.3.14])
-GNU_PACKAGE="GNU $PACKAGE"
-AC_DEFINE_UNQUOTED(GNU_PACKAGE, "$GNU_PACKAGE")
 
 AM_MAINTAINER_MODE
 
@@ -84,43 +76,17 @@ dnl math functions such as pow and fabs
 
 AC_SEARCH_LIBS(pow,m)
 
-AC_PROG_CPP
-AC_PROG_GCC_TRADITIONAL
 AC_PROG_RANLIB
 
 dnl required since we use SUBDIRS in Makefile.am
 AC_PROG_MAKE_SET
 
-AC_HEADER_MAJOR
 AC_HEADER_TIME
-
-AC_C_CONST
 
 AC_CHECK_HEADERS(unistd.h)
 
-AC_PATH_PROG(perl, perl)
-
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
-
-dnl AM_FUNC_ERROR_AT_LINE
-
-AH_TEMPLATE([HAVE___FUNCTION__],
-[Define if the preprocessor recognizes __FUNCTION__])
-
-AC_CACHE_CHECK(
-	[for __FUNCTION__],
-	gnugo_cv_c___function__,
-	AC_TRY_COMPILE(,
-		[char *s=__FUNCTION__],
-		gnugo_cv_c___function__="yes",
-		gnugo_cv_c___function__="no")
-)
-if test "$gnugo_cv_c___function__" = "yes";then
-      AC_DEFINE(HAVE___FUNCTION__)
-fi
-
-dnl check for a working curses library for use in debugboard
 
 dnl ---------- grid optimisation ------------
 
@@ -183,14 +149,6 @@ rm -f \
        patterns/owl_defendpat.c \
        patterns/owl_vital_apat.c
 
-
-dnl ------------ gnugo_path -------------------
-
-
-AH_TEMPLATE([GNUGO_PATH],
-[Give the directory where gnugo was compiled])
-
-AC_DEFINE_UNQUOTED(GNUGO_PATH, "`pwd`")
 
 dnl ------------ Chinese Rules -------------------
 
