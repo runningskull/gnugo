@@ -310,6 +310,14 @@ loadsgf games/owl31.sgf 28
 212 gg_genmove white
 #? [G2]
 
+loadsgf games/strategy46.sgf 172
+213 gg_genmove white
+#? [F1]
+
+loadsgf games/strategy46.sgf 174
+214 gg_genmove white
+#? [D2]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
