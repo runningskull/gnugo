@@ -2607,7 +2607,7 @@ gtp_worm_data(char *s)
 		    I(w->lunch), J(w->lunch));
 	gtp_mprintf("defense_point   %m\n",  
 		    I(w->defense_points[0]), J(w->defense_points[0]));
-       gtp_printf("defense_code    %d\n",   w->defense_codes[0]);
+	gtp_printf("defense_code    %d\n",   w->defense_codes[0]);
 	gtp_printf("cutstone        %d\n",   w->cutstone);
 	gtp_printf("cutstone2       %d\n",   w->cutstone2);
 	gtp_printf("genus           %d\n",   w->genus);

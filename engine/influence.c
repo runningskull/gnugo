@@ -404,7 +404,7 @@ init_influence(struct influence_data *q, int color,
 	    || (saved_stones[pos] == INFLUENCE_UNCHANGED_STONE
 		&& ((worm[pos].attack_codes[0] != 0
 		    && (OTHER_COLOR(q->p[i][j]) == color
-                       || worm[pos].defense_codes[0] == 0))
+			|| worm[pos].defense_codes[0] == 0))
 		    || (q->dragons_known
 			&& dragon[pos].id != -1
 			&& (DRAGON2(pos).safety == DEAD

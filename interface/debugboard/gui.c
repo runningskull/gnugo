@@ -122,7 +122,7 @@ display_worm(int w)
     else
       gg_wprintw(info_window, "%3s:%d ", 
 		 location_to_string(worm[w].defense_points[i]),
-                worm[w].defense_codes[i]);
+		 worm[w].defense_codes[i]);
 
     wmove(info_window, 11, 19 + i * 6);
     if (worm[w].attack_threat_points[i] == 0)

@@ -303,21 +303,21 @@ make_worms(int save_verbose)
 	   */
 	  if (worm[str].color == OTHER_COLOR(color)
 	      && worm[str].attack_codes[0] != 0
-             && worm[str].defense_codes[0] != 0) {
+	      && worm[str].defense_codes[0] != 0) {
 	    int dcode = find_defense(str, NULL);
-           if (dcode < worm[str].defense_codes[0]) {
+	    if (dcode < worm[str].defense_codes[0]) {
 	      int attack_works = 1;
 	      /* Sometimes find_defense() fails to find a
 	       * defense which has been found by other means.
 	       * Try if the old defense move still works.
 	       */
-             if (worm[str].defense_codes[0] != 0
+	      if (worm[str].defense_codes[0] != 0
 		  && trymove(worm[str].defense_points[0],
 			     OTHER_COLOR(color), "make_worms", 0, EMPTY, 0)) {
 		int this_dcode = REVERSE_RESULT(attack(str, NULL));
 		if (this_dcode > dcode) {
 		  dcode = this_dcode;
-                 if (dcode >= worm[str].defense_codes[0])
+		  if (dcode >= worm[str].defense_codes[0])
 		    attack_works = 0;
 		}
 		popgo();
@@ -381,12 +381,12 @@ make_worms(int save_verbose)
 	&& !is_same_worm(pos, SOUTH(pos))) {
       if (worm[pos].attack_codes[0] != 0
 	  && worm[SOUTH(pos)].attack_codes[0] != 0) {
-       if (worm[pos].defense_codes[0] == 0
+	if (worm[pos].defense_codes[0] == 0
 	    && does_defend(worm[SOUTH(pos)].attack_points[0], pos)) {
 	  /* FIXME: need to check ko relationship here */
 	  change_defense(pos, worm[SOUTH(pos)].attack_points[0], WIN);
 	}
-       if (worm[SOUTH(pos)].defense_codes[0] == 0
+	if (worm[SOUTH(pos)].defense_codes[0] == 0
 	    && does_defend(worm[pos].attack_points[0], SOUTH(pos))) {
 	  /* FIXME: need to check ko relationship here */	    
 	  change_defense(SOUTH(pos), worm[pos].attack_points[0], WIN);
@@ -402,12 +402,12 @@ make_worms(int save_verbose)
 	&& !is_same_worm(pos, EAST(pos))) {
       if (worm[pos].attack_codes[0] != 0
 	  && worm[EAST(pos)].attack_codes[0] != 0) {
-       if (worm[pos].defense_codes[0] == 0
+	if (worm[pos].defense_codes[0] == 0
 	    && does_defend(worm[EAST(pos)].attack_points[0], pos)) {
 	  /* FIXME: need to check ko relationship here */	    
 	  change_defense(pos, worm[EAST(pos)].attack_points[0], WIN);
 	}
-       if (worm[EAST(pos)].defense_codes[0] == 0
+	if (worm[EAST(pos)].defense_codes[0] == 0
 	    && does_defend(worm[pos].attack_points[0], EAST(pos))) {
 	  /* FIXME: need to check ko relationship here */	    
 	  change_defense(EAST(pos), worm[pos].attack_points[0], WIN);
@@ -823,7 +823,7 @@ find_worm_attacks_and_defenses()
       }
       /* Try to defend at the liberty. */
       if (!defense_move_known(pos, str)) {
-       if (worm[str].defense_codes[0] != 0)
+	if (worm[str].defense_codes[0] != 0)
 	  if (trymove(pos, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
 	    acode = attack(str, NULL);
 	    if (acode != WIN)
@@ -871,11 +871,11 @@ find_worm_threats()
       num_adj = chainlinks(str, adjs);
       for (k = 0; k < num_adj; k++) {
 	if (worm[adjs[k]].attack_codes[0] != 0
-           && worm[adjs[k]].defense_codes[0] != 0)
+	    && worm[adjs[k]].defense_codes[0] != 0)
 	  for (r = 0; r < MAX_TACTICAL_POINTS; r++) {
 	    int bb;
 	    
-           if (worm[adjs[k]].defense_codes[r] == 0)
+	    if (worm[adjs[k]].defense_codes[r] == 0)
 	      break;
 	    bb = worm[adjs[k]].defense_points[r];
 	    if (trymove(bb, other, "threaten attack", str,
@@ -898,7 +898,7 @@ find_worm_threats()
     /* 2. Continue with finding defense threats. */
     /* Only try those worms that have an attack. */
     if (worm[str].attack_codes[0] != 0
-       && worm[str].defense_codes[0] == 0) {
+	&& worm[str].defense_codes[0] == 0) {
       
       liberties = findlib(str, MAXLIBS, libs);
       
@@ -1033,7 +1033,7 @@ change_defense(int str, int move, int dcode)
 {
   str = worm[str].origin;
   change_tactical_point(str, move, dcode,
-                       worm[str].defense_points, worm[str].defense_codes);
+			worm[str].defense_points, worm[str].defense_codes);
 }
 
 
@@ -1112,7 +1112,7 @@ defense_move_known(int move, int str)
 {
   return movelist_move_known(move, MAX_TACTICAL_POINTS,
 			     worm[str].defense_points,
-                            worm[str].defense_codes);
+			     worm[str].defense_codes);
 }
 
 /* Check whether (move) is listed as an attack threat point for (str)
@@ -1231,9 +1231,9 @@ worm_reasons(int color)
       
     if (board[pos] == color) {
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-       if (worm[pos].defense_codes[k] != 0)
+	if (worm[pos].defense_codes[k] != 0)
 	  add_defense_move(worm[pos].defense_points[k], pos,
-                          worm[pos].defense_codes[k]);
+			   worm[pos].defense_codes[k]);
 
 	if (worm[pos].defense_threat_codes[k] != 0)
 	  add_defense_threat_move(worm[pos].defense_threat_points[k], pos,
@@ -1737,9 +1737,9 @@ report_worm(int m, int n)
     i = 0;
     while (worm[pos].attack_points[i] != NO_MOVE) {
       if (i > 0)
-       gprintf(",");
+	gprintf(",");
       gprintf(" %1m: %s", worm[pos].attack_points[i],
-             result_to_string(worm[pos].attack_codes[i]));
+	      result_to_string(worm[pos].attack_codes[i]));
       i++;
     }
     gprintf("\n;");
@@ -1753,9 +1753,9 @@ report_worm(int m, int n)
     i = 0;
     while (worm[pos].defense_points[i] != NO_MOVE) {
       if (i > 0)
-       gprintf(",");
+	gprintf(",");
       gprintf(" %1m: %s", worm[pos].defense_points[i],
-             result_to_string(worm[pos].defense_codes[i]));
+	      result_to_string(worm[pos].defense_codes[i]));
       i++;
     }
     gprintf("\n;");
@@ -1769,14 +1769,13 @@ report_worm(int m, int n)
     i = 0;
     while (worm[pos].attack_threat_points[i] != NO_MOVE) {
       if (i > 0)
-       gprintf(",");
+	gprintf(",");
       gprintf(" %1m: %s", worm[pos].attack_threat_points[i],
-             result_to_string(worm[pos].attack_threat_codes[i]));
+	      result_to_string(worm[pos].attack_threat_codes[i]));
       i++;
     }
     gprintf("\n;");
   }
-
 
   /* List all defense threat points. */
   if (worm[pos].defense_threat_points[0] == NO_MOVE)
@@ -1786,9 +1785,9 @@ report_worm(int m, int n)
     i = 0;
     while (worm[pos].defense_threat_points[i] != NO_MOVE) {
       if (i > 0)
-       gprintf(",");
+	gprintf(",");
       gprintf(" %1m: %s", worm[pos].defense_threat_points[i],
-             result_to_string(worm[pos].defense_threat_codes[i]));
+	      result_to_string(worm[pos].defense_threat_codes[i]));
       i++;
     }
     gprintf("\n;");

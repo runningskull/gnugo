@@ -586,7 +586,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	    for (r = 0; r < neighbors; r++) {
 	      if (worm[adjs[r]].attack_codes[0] != 0
 		  && (find_defense(adjs[r], NULL)
-                     > worm[adjs[r]].defense_codes[0])) {
+		      > worm[adjs[r]].defense_codes[0])) {
 		DEBUG(DEBUG_AFTERMATH,
 		      "Blunder: %1m becomes tactically safer after %1m\n",
 		      adjs[r], move);

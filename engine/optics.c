@@ -453,7 +453,7 @@ is_lively(int owl_call, int pos)
   else
     result = (!worm[pos].inessential
 	      && (worm[pos].attack_codes[0] == 0
-                 || worm[pos].defense_codes[0] != 0));
+		  || worm[pos].defense_codes[0] != 0));
 
   return result;
 }

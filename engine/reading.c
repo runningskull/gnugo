@@ -941,7 +941,7 @@ attack_threats(int str, int max_points, int moves[], int codes[])
       if (stackp == 0) {
 	if (r == -1)
 	  continue;
-       if (worm[adjs[k]].defense_codes[r] == 0)
+	if (worm[adjs[k]].defense_codes[r] == 0)
 	  break;
 	bb = worm[adjs[k]].defense_points[r];
       }

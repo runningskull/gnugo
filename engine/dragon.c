@@ -538,7 +538,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       dragon2[d].safety = INESSENTIAL;
     else if (dragon[origin].size == worm[origin].size
 	     && worm[origin].attack_codes[0] != 0
-            && worm[origin].defense_codes[0] == 0)
+	     && worm[origin].defense_codes[0] == 0)
       dragon2[d].safety = TACTICALLY_DEAD;
     else if (0) /* Seki is detected by the call to semeai() below. */
       dragon2[d].safety = ALIVE_IN_SEKI;
@@ -591,7 +591,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     if (ON_BOARD(str)) {
       if (is_worm_origin(str, str)
 	  && worm[str].attack_codes[0] != 0
-         && worm[str].defense_codes[0] != 0
+	  && worm[str].defense_codes[0] != 0
 	  && !worm[str].inessential) {
 	int adjs[MAXCHAIN];
 	int neighbors;
@@ -1083,11 +1083,11 @@ show_dragons(void)
       }
       
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
-       if (w->defense_codes[k] == 0)
+	if (w->defense_codes[k] == 0)
 	  break;
-       if (w->defense_codes[k] != 0)
+	if (w->defense_codes[k] != 0)
 	  gprintf("- defendable at %1m, defend code = %d\n",
-                 w->defense_points[k], w->defense_codes[k]);
+		  w->defense_points[k], w->defense_codes[k]);
       }
       
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
