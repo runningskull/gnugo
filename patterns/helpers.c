@@ -685,6 +685,25 @@ test_attack_either_move(int move, int color, int worma, int wormb)
 }
 
 /* True if str is adjacent to a stone in atari, which is tactically
+ * attackable (to exclude pointless captures of snapback stones).
+ */
+int
+adjacent_to_stone_in_atari(int str)
+{
+  int adj;
+  int adjs[MAXCHAIN];
+  int k;
+
+  adj = chainlinks2(str, adjs, 1);
+  for (k = 0; k < adj; k++)
+    if (attack(adjs[k], NULL))
+      return 1;
+  
+  return 0;
+}
+
+
+/* True if str is adjacent to a stone in atari, which is tactically
  * defendable.
  */
 int

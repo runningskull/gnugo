@@ -366,6 +366,8 @@ static struct autohelper_func autohelper_functions[] = {
   {"surround_map",		2, 0, 0.01, "surround_map(%s, %s)"},
   {"oracle_threatens",		2, 0, 0.01, "oracle_threatens(%s, %s)"},
   {"value",			0, 2, 0.0,  "(%s->value)"},
+  {"adjacent_to_stone_in_atari",1, 0, 1.0,
+                "adjacent_to_stone_in_atari(%s)"},
   {"adjacent_to_defendable_stone_in_atari", 1, 0, 1.0,
                 "adjacent_to_defendable_stone_in_atari(%s)"},
   {"good_attack_threat",	2, 0, 0.01, "register_good_attack_threat(%s, %s)"}

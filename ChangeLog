@@ -2,6 +2,23 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- compute_crude_status() revised to consider dragons with big
+  territorial moyo value as alive
+- semeai moves considered safe in mark_changed_dragon
+- compare number of eyes when both colors pass in
+  do_owl_analyze_semeai() instead of always consider it a seki
+- do not use the attack point from owl if owl considers a dragon dead
+  but semeai revises it to critical
+- bugfix in break_through_helper() in reading.c
+- new static function close_enough_for_proper_semeai() in semeai.c
+- liberty_of_dragon() transformed into neighbor_of_dragon() in semeai.c
+- in semeai(), be more careful when considering two dragons involved
+  in a semeai
+- new static function max_lunch_eye_value() in value_moves.c
+- when restraining thrashing dragons, do not bother connecting
+  inessential strings which cannot provide an eye (in
+  estimate_strategical_value()) 
+- new autohelper function adjacent_to_stone_in_atari
 - new static bamboo_rescue_moves() in `reading.c'.
 - computation of safety and status values in make_dragons() revised to
   more robustly handle invincible dragons

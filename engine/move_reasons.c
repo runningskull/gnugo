@@ -1524,7 +1524,7 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
 	      worm_is_safe = 1;
 	    popgo();
 	}
-	if (worm_is_safe) {
+	if (worm_is_safe || move_reason_type == SEMEAI_MOVE) {
 	  /* This string can now be considered safe. Hence we mark the
 	   * whole string as such:
 	   */

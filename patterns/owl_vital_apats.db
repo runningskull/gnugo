@@ -754,6 +754,7 @@ Pattern VA44
 # tm New Pattern (3.1.17)
 # gf Fixed symmetry. (3.3.6)
 # nn Modified constraint (3.3.14)
+# gf Revised constraint. (3.5.3)
 
 XoX
 o*o
@@ -766,7 +767,7 @@ a*c
 ; owl_proper_eye(*)
 ; && (owl_proper_eye(a) + owl_proper_eye(b) + owl_proper_eye(c) > 2)
 ; && safe_xmove(*)
-; && (owl_eye_size(*) <= 8 || !oplay_attack(*,*))
+; && ((owl_eye_size(*) <= 8 && owl_maxeye(*)>1) || !oplay_attack(*,*))
 
 
 Pattern VA45

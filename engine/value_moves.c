@@ -1345,6 +1345,16 @@ adjacent_to_nondead_stone(int pos, int color)
   return result;
 }
 
+static int
+max_lunch_eye_value(int pos)
+{
+  int min;
+  int probable;
+  int max;
+  
+  estimate_lunch_eye_value(pos, &min, &probable, &max, 0);
+  return max;
+}
 
 /*
  * Estimate the direct territorial value of a move at (pos).
@@ -2097,15 +2107,8 @@ estimate_strategical_value(int pos, int color, float our_score)
 	  break;
 
 	/* If the lunch has no potential to create eyes, no points. */
-	{
-	  int min;
-	  int probable;
-	  int max;
-
-	  estimate_lunch_eye_value(aa, &min, &probable, &max, 0);
-	  if (max == 0)
-	    break;
-	}
+	if (max_lunch_eye_value(aa) == 0)
+	  break;
 	
 	/* Can't use k in this loop too. */
 	for (l = 0; l < next_lunch; l++)
@@ -2232,8 +2235,6 @@ estimate_strategical_value(int pos, int color, float our_score)
 	 * This does not apply if we are doing scoring.
 	 *
 	 * FIXME: The margin of victory limit is not implemented.
-	 * FIXME: We need some heuristic whether this connection is
-	 * relevant at all, see e.g. thrash:4.
 	 */
       
 	if (!doing_scoring) {
@@ -2241,7 +2242,7 @@ estimate_strategical_value(int pos, int color, float our_score)
 	  aa = dragon[conn_worm1[move_reasons[r].what]].origin;
 	  bb = dragon[conn_worm2[move_reasons[r].what]].origin;
 	  cc = get_last_opponent_move(color);
-	  
+
 	  if (cc != NO_MOVE
 	      && dragon[cc].status == DEAD
 	      && are_neighbor_dragons(aa, cc)
@@ -2249,8 +2250,15 @@ estimate_strategical_value(int pos, int color, float our_score)
 	    if (aa == bb)
 	      this_value = 1.6 * dragon[cc].effective_size;
 	    else if (DRAGON2(aa).safety == INESSENTIAL
-		     || DRAGON2(bb).safety == INESSENTIAL)
-	      this_value = 0.8 * dragon[cc].effective_size;
+		     || DRAGON2(bb).safety == INESSENTIAL) {
+	      if ((DRAGON2(aa).safety == INESSENTIAL
+		   && max_lunch_eye_value(aa) == 0)
+		  || (DRAGON2(bb).safety == INESSENTIAL
+		      && max_lunch_eye_value(bb) == 0))
+		this_value = 0.0;
+	      else
+		this_value = 0.8 * dragon[cc].effective_size;
+	    }
 	    else
 	      this_value = 1.7 * dragon[cc].effective_size;
 	    

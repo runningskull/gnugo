@@ -1186,6 +1186,26 @@ o.*o
 ;!oplay_disconnect(*,a,b)
 
 
+Pattern A242
+# gf New pattern. (3.5.3).
+# See e.g. nngs:1090.
+
+
+...o?
+..*O?
+...Xx
+-----
+
+:8,-,value(35)
+
+...o?
+ba*c?
+...Xx
+-----
+
+;xplay_disconnect(*,a,a,c) && xplay_disconnect(*,b,b,c)
+
+
 #########################################################
 #                                                       #
 #          Limiting moves on the first line             #
@@ -1448,11 +1468,30 @@ eYO
 
 
 Pattern A407
+# gf Added constraint. (3.5.3)
 
-O.X
-*Y.
-...
-...
+?O.X
+?*Y.
+?...
+?...
+
+:8,-,value(45)
+
+aO.X
+b*Y.
+c...
+?...
+
+;!(o_somewhere(a) && o_somewhere(b)) || x_somewhere(c)
+
+
+Pattern A407b
+# gf New pattern. (3.5.3)
+
+OO.X
+O.Y.
+o*..
+?...
 
 :8,-,value(45)
 
@@ -2124,6 +2163,18 @@ Pattern A517
 :8,-,value(5)
 
 
+Pattern A518
+# gf New pattern. (3.5.3)
+# See nngs2:460
+
+O.xx?      destroye eye
+.*.XX
+....X
+-----
+
+:8,-,value(45)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the first line         #
@@ -2499,6 +2550,24 @@ X..*.
 -----
 
 ;lib(A)<3 && owl_eyespace(*)
+
+
+Pattern A622
+# gf New patterm. (3.5.3)
+# Compare D704b. See nngs3:450.
+
+xX.O	    half eye sometimes missed
+X.*o
+----
+
+:8,-,value(35)
+
+bXaO
+X.*o
+----
+
+; xplay_attack(*,a,a)
+; && (x_somewhere(b) || !safe_omove(b))
 
 
 #########################################################
@@ -3237,6 +3306,7 @@ Pattern A909
 
 
 Pattern A910
+# gf Revised constraint. (3.5.3)
 
 XYX|          try nakade in corner
 .*.|
@@ -3248,7 +3318,7 @@ XYX|
 a*.|
 ---+
 
-;!obvious_false_xeye(a)
+;!obvious_false_xeye(a) && owl_maxeye(*)>1
 
 
 Pattern A911
@@ -4432,18 +4502,20 @@ XOYo
 
 
 Pattern A1126
-# tm New Pattern (3.1.23)  (see Pattern D1378)
+# tm New Pattern (3.1.23)
+# gf Revised constraint. (3.5.3)
+# See also D1378.
 
 O*O   prevent breakout & attack
 ?Y?
 
 :|,-,value(55)
 
-A*B
+a*b
 ?Y?
 
-; vital_chain(A) && vital_chain(B)
-; && xplay_attack_either(*,A,B)
+; vital_chain(a) && vital_chain(b)
+; && xplay_attack_either(*,a,b) && !xplay_connect(*,a,b)
 
 
 Pattern A1127
@@ -4598,18 +4670,68 @@ cd??
 Pattern A1134
 # pp New pattern (3.5.3).  See trevorb:120.
 # FIXME: is it better to do this algorithmically with owl boundaries?
+# gf Added explicit anchoring. (3.5.3)
 
-XOX	    prevent escaping by capturing
+XOY	    prevent escaping by capturing
 .*O
 ---
 
 :8,-,value(75)
 
-BOX
-.*A
+BOY
+.*a
 ---
 
-; lib(A) == 1 && owl_escape_value(B) > 0
+; lib(a) == 1 && owl_escape_value(B) > 0
+
+
+Pattern A1134b
+# gf New pattern. (3.5.3).
+
+YOX	    prevent escaping by capturing
+.*O
+---
+
+:8,-,value(75)
+
+YOB
+.*a
+---
+
+; lib(a) == 1 && owl_escape_value(B) > 0
+
+
+Pattern A1134c
+# gf New pattern. (3.5.3).
+
+XOY	    prevent escaping by capturing
+.*O
+---
+
+:8,-,value(40)
+
+BOY
+.*a
+---
+
+; lib(a) == 1
+
+
+Pattern A1134d
+# gf New pattern. (3.5.3).
+# See 13x13b:23
+
+YOX	    prevent escaping by capturing
+.*O
+---
+
+:8,-,value(40)
+
+YOB
+.*a
+---
+
+; lib(a) == 1
 
 
 Pattern A1135
@@ -4644,6 +4766,25 @@ O*O
 ?A?
 
 ;owl_escape_value(A)>0 && !xplay_disconnect(*,A,B) && !oplay_connect(*,A,B)
+
+
+Pattern A1137
+# gf New pattern. (3.5.3)
+# Converse to D1125.
+
+xxx?
+...x
+.*O.
+?XXO
+
+:8,-,value(79)
+
+abc?
+...x
+.*O.
+?XXO
+
+;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
 
 
 #########################################################

@@ -335,9 +335,10 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   int save_verbose = verbose;
   int dummy_resulta;
   int dummy_resultb;
+  int dummy_semeai_move;
   double start = 0.0;
   int reading_nodes_when_called = get_reading_node_counter();
-
+  
   struct local_owl_data *owla;
   struct local_owl_data *owlb;
   
@@ -345,7 +346,9 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     resulta = &dummy_resulta;
   if (!resultb)
     resultb = &dummy_resultb;
-
+  if (!semeai_move)
+    semeai_move = &dummy_semeai_move;
+  
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
   
@@ -474,14 +477,14 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   if (move == PASS_MOVE) {
     DEBUG(DEBUG_OWL_PERFORMANCE,
 	  "analyze_semeai %1m vs. %1m, result %d %d %1m (%d, %d nodes, %f seconds)\n",
-	  apos, bpos, *resulta, *resultb, semeai_move, local_owl_node_counter,
+	  apos, bpos, *resulta, *resultb, *semeai_move, local_owl_node_counter,
 	  get_reading_node_counter() - reading_nodes_when_called,
 	  gg_cputime() - start);
   }
   else {
     DEBUG(DEBUG_OWL_PERFORMANCE,
 	  "analyze_semeai_after_move %C %1m: %1m vs. %1m, result %d %d %1m (%d, %d nodes, %f seconds)\n",
-	  color, move, apos, bpos, *resulta, *resultb, semeai_move,
+	  color, move, apos, bpos, *resulta, *resultb, *semeai_move,
 	  local_owl_node_counter,
 	  get_reading_node_counter() - reading_nodes_when_called,
 	  gg_cputime() - start);
@@ -547,6 +550,11 @@ do_owl_analyze_semeai(int apos, int bpos,
   int dummy_move;
   int tested_moves;
   int critical_semeai_worms[MAX_SEMEAI_WORMS];
+  int sworm;
+  int we_might_be_inessential;
+  struct eyevalue probable_eyes_a;
+  struct eyevalue probable_eyes_b;
+  struct eyevalue dummy_eyes;
   
   SETUP_TRACE_INFO2("do_owl_analyze_semeai", apos, bpos);
 
@@ -614,8 +622,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 
   {
     int upos;
-    int sworm;
-
+    
     for (sworm = 0; sworm < s_worms; sworm++) {
       critical_semeai_worms[sworm] = 0;
       if (board[semeai_worms[sworm]] == other) {
@@ -644,14 +651,19 @@ do_owl_analyze_semeai(int apos, int bpos,
      * threatened, try to save it.
      */
 
+    we_might_be_inessential = 1;
     for (sworm = 0; sworm < s_worms; sworm++)
-      if (board[semeai_worms[sworm]] == color
-	  && attack(semeai_worms[sworm], NULL)
-	  && find_defense(semeai_worms[sworm], &upos)) {
-	critical_semeai_worms[sworm] = 1;
-	owl_add_move(moves, upos, 85, "defend semeai worm", 1, 0, NO_MOVE,
-		     MAX_SEMEAI_MOVES);
-	TRACE("Added %1m %d (0)\n", upos, 85);
+      if (board[semeai_worms[sworm]] == color) {
+	if (important_semeai_worms[sworm])
+	  we_might_be_inessential = 0;
+	
+	if (attack(semeai_worms[sworm], NULL)
+	    && find_defense(semeai_worms[sworm], &upos)) {
+	  critical_semeai_worms[sworm] = 1;
+	  owl_add_move(moves, upos, 85, "defend semeai worm", 1, 0, NO_MOVE,
+		       MAX_SEMEAI_MOVES);
+	  TRACE("Added %1m %d (0)\n", upos, 85);
+	}
       }
   }
 
@@ -662,13 +674,15 @@ do_owl_analyze_semeai(int apos, int bpos,
    * of filling liberties until one of the dragons may be removed,
    * or a seki results. The first stage we call the owl phase.
    */
-  if (owl_phase) {
+  if (!owl_phase) {
+    set_eyevalue(&probable_eyes_a, 0, 0, 0, 0);
+    set_eyevalue(&probable_eyes_b, 0, 0, 0, 0);
+  }
+  else {
     /* First the vital moves. These include moves to attack or
      * defend the eyespace (e.g. nakade, or hane to reduce the
      * number of eyes) or moves to capture a lunch. 
      */
-    struct eyevalue probable_eyes_a;
-    struct eyevalue probable_eyes_b;
     int eyemin_a;
     int eyemin_b;
     int eyemax_a;
@@ -795,10 +809,10 @@ do_owl_analyze_semeai(int apos, int bpos,
      * opponent semeai worms are allowed to be included for vital
      * moves.
      */
-    if (moves[0].pos == NO_MOVE) {
+    if (moves[0].pos == NO_MOVE || we_might_be_inessential) {
       include_semeai_worms_in_eyespace = 1;
       if (!owl_estimate_life(owlb, owla, vital_offensive_moves,
-			     &live_reasonb, komaster, 1, &probable_eyes_b,
+			     &live_reasonb, komaster, 1, &dummy_eyes,
 			     &eyemin_b, &eyemax_b))
 	semeai_review_owl_moves(vital_offensive_moves, owla, owlb, color,
 				&safe_outside_liberty_found,
@@ -1002,10 +1016,8 @@ do_owl_analyze_semeai(int apos, int bpos,
    */
   if (tested_moves == 0) {
     const char *live_reasona;
-    struct eyevalue probable_eyes_a;
     int eyemin_a;
     int eyemax_a;
-    int sworm;
     for (sworm = 0; sworm < s_worms; sworm++) {
       if (board[semeai_worms[sworm]] == other) {
 	if (important_semeai_worms[sworm])
@@ -1016,7 +1028,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     if (sworm == s_worms) {
       include_semeai_worms_in_eyespace = 1;
       if (!owl_estimate_life(owla, owlb, vital_defensive_moves,
-			     &live_reasona, komaster, 0, &probable_eyes_a,
+			     &live_reasona, komaster, 0, &dummy_eyes,
 			     &eyemin_a, &eyemax_a)) {
 	include_semeai_worms_in_eyespace = 0;
 	*resulta = 0;
@@ -1029,14 +1041,34 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
   }
 
-  /* If we can't find a move and opponent passed, it's seki */
+  /* If we can't find a move and opponent passed, it's seki, unless
+   * one dragon has more eyes than the other.
+   */
   if (tested_moves == 0 && pass == 1) {
-    *resulta = WIN;
-    *resultb = 0;
-    *move = PASS_MOVE;
-    TRACE("Seki\n");
-    SGFTRACE_SEMEAI(PASS_MOVE, WIN, 0, "Seki");
-    READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, 0);
+    if (max_eyes(&probable_eyes_a) < min_eyes(&probable_eyes_b)) {
+      *resulta = 0;
+      *resultb = 0;
+      *move = PASS_MOVE;
+      TRACE("You have more eyes.\n");
+      SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You have more eyes");
+      READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
+    }
+    else if (max_eyes(&probable_eyes_b) < min_eyes(&probable_eyes_a)) {
+      *resulta = WIN;
+      *resultb = WIN;
+      *move = PASS_MOVE;
+      TRACE("I have more eyes\n");
+      SGFTRACE_SEMEAI(PASS_MOVE, WIN, WIN, "I have more eyes");
+      READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, WIN);
+    }
+    else {
+      *resulta = WIN;
+      *resultb = 0;
+      *move = PASS_MOVE;
+      TRACE("Seki\n");
+      SGFTRACE_SEMEAI(PASS_MOVE, WIN, 0, "Seki");
+      READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, 0);
+    }
   }
   
   /* If no move was found, then pass. */
@@ -1489,7 +1521,7 @@ owl_attack(int target, int *attack_point, int *certain, int *kworm)
   int result;
   struct local_owl_data *owl;
   int reading_nodes_when_called = get_reading_node_counter();
-  double start = 0;
+  double start = 0.0;
   int tactical_nodes;
   int move = NO_MOVE;
   int wpos = NO_MOVE;
@@ -2011,7 +2043,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
   char saved_boundary[BOARDMAX];
-  double start = 0;
+  double start = 0.0;
   int tactical_nodes;
   int move = 0;
   int move2 = 0;
@@ -2137,7 +2169,7 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
   int result;
   static struct local_owl_data *owl;
   int reading_nodes_when_called = get_reading_node_counter();
-  double start = 0;
+  double start = 0.0;
   int tactical_nodes;
   int move = NO_MOVE;
   int wpos = NO_MOVE;
@@ -2343,7 +2375,6 @@ do_owl_defend(int str, int *move, int *wormid,
       break;
 
     case 3:
-#if 1
       {
 	int goalcount = 0;
 
@@ -2384,7 +2415,6 @@ do_owl_defend(int str, int *move, int *wormid,
 	if (!moves)
 	  continue;
       }
-#endif
     } /* switch (pass) */
 
     /* For the up to MAX_MOVES best moves with value equal to
@@ -2531,7 +2561,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   struct local_owl_data *owl;
   int reading_nodes_when_called = get_reading_node_counter();
   char saved_goal[BOARDMAX];
-  double start = 0;
+  double start = 0.0;
   int tactical_nodes;
   int move = 0;
   int move2 = 0;
@@ -4182,6 +4212,16 @@ owl_reasons(int color)
 	    continue;
 	  }
 	}
+
+	/* If owl thinks the dragon is dead but the semeai code has
+         * revised the status to critical, then the owl attack point
+         * tends to be unreliable. Don't add it in that case.
+	 *
+	 * FIXME: Instead of just discarding it, we may want to test
+	 *        whether it also wins the semeai.
+	 */
+	if (DRAGON2(pos).owl_status != CRITICAL)
+	  continue;
 	
 	/* If we've reached this far, the attack is okay. */
 	if (DRAGON2(pos).owl_attack_code == GAIN) {
@@ -4318,7 +4358,7 @@ owl_does_defend(int move, int target, int *kworm)
   int acode;
   int wpos = NO_MOVE;
   int wid = MAX_GOAL_WORMS;
-  double start = 0;
+  double start = 0.0;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();

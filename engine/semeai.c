@@ -32,7 +32,7 @@
 static void find_moves_to_make_seki(void);
 static void update_status(int dr, enum dragon_status new_status, 
    			  enum dragon_status new_safety);
-
+static int close_enough_for_proper_semeai(int apos, int bpos);
 
 /* semeai() searches for pairs of dragons of opposite color which
  * have safety DEAD. If such a pair is found, owl_analyze_semeai is
@@ -94,6 +94,15 @@ semeai()
 	  || DRAGON2(bpos).safety == INESSENTIAL)
 	continue;
 
+      /* Sometimes the dragons are considered neighbors but are too
+       * distant to constitute a proper semeai, e.g. in nngs4:650, P2
+       * vs. R3. Then the result of semeai reading may be meaningless
+       * and can confuse the analysis. In order to avoid this we check
+       * that the dragons either are directly adjacent or at least
+       * have one common liberty.
+       */
+      if (!close_enough_for_proper_semeai(apos, bpos))
+	continue;
 
       /* The array semeai_results_first[d1][d2] will contain the status
        * of d1 after the d1 d2 semeai, giving d1 the first move.
@@ -235,7 +244,7 @@ find_moves_to_make_seki()
 	&& DRAGON2(str).hostile_neighbors == 1) {
       int k;
       int color = board[str];
-      int opponent;
+      int opponent = NO_MOVE;
       int certain;
       
       for (k = 0; k < DRAGON2(str).neighbors; k++) {
@@ -243,6 +252,8 @@ find_moves_to_make_seki()
 	if (board[opponent] != color)
 	  break;
       }
+
+      ASSERT1(opponent != NO_MOVE, opponent);
 
       if (dragon[opponent].status != ALIVE)
 	continue;
@@ -284,17 +295,14 @@ find_moves_to_make_seki()
 }
 
 
-/* liberty_of_dragon(pos, origin) returns true if the vertex at (pos) is a
- * liberty of the dragon with origin at (origin).
+/* neighbor_of_dragon(pos, origin) returns true if the vertex at (pos) is a
+ * neighbor of the dragon with origin at (origin).
  */
 static int 
-liberty_of_dragon(int pos, int origin)
+neighbor_of_dragon(int pos, int origin)
 {
   int k;
   if (pos == NO_MOVE)
-    return 0;
-
-  if (board[pos] != EMPTY)
     return 0;
 
   for (k = 0; k < 4; k++)
@@ -304,6 +312,28 @@ liberty_of_dragon(int pos, int origin)
   return 0;
 }
 
+/* Check whether two dragons are directly adjacent or have at least
+ * one common liberty.
+ */
+static int
+close_enough_for_proper_semeai(int apos, int bpos)
+{
+  int pos;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == EMPTY
+	&& neighbor_of_dragon(pos, apos)
+	&& neighbor_of_dragon(pos, bpos))
+      return 1;
+    else if (IS_STONE(board[pos])) {
+      if (is_same_dragon(pos, apos) && neighbor_of_dragon(pos, bpos))
+	return 1;
+      if (is_same_dragon(pos, bpos) && neighbor_of_dragon(pos, apos))
+	return 1;
+    }
+  }
+  
+  return 0;
+}
 
 /* This function adds the semeai related move reasons, using the information
  * stored in the dragon2 array.
@@ -332,10 +362,10 @@ semeai_move_reasons(int color)
 	add_semeai_move(dragon2[d].semeai_defense_point, dragon2[d].origin);
 	DEBUG(DEBUG_SEMEAI, "Adding semeai defense move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_defense_point);
-	if (liberty_of_dragon(dragon2[d].semeai_defense_point,
-			      dragon2[d].semeai_target)
-	    && !liberty_of_dragon(dragon2[d].semeai_defense_point,
-				  dragon2[d].origin)
+	if (neighbor_of_dragon(dragon2[d].semeai_defense_point,
+			       dragon2[d].semeai_target)
+	    && !neighbor_of_dragon(dragon2[d].semeai_defense_point,
+				   dragon2[d].origin)
 	    && !is_self_atari(dragon2[d].semeai_defense_point, color)) {
 	  
 	  /* If this is a move to fill the non-common liberties of the
@@ -347,7 +377,7 @@ semeai_move_reasons(int color)
           liberties = findlib(dragon2[d].semeai_target, MAXLIBS, libs);
 
           for (r = 0; r < liberties; r++) {
-            if (!liberty_of_dragon(libs[r], dragon2[d].origin)
+            if (!neighbor_of_dragon(libs[r], dragon2[d].origin)
 		&& !is_self_atari(libs[r], color)
 		&& libs[r] != dragon2[d].semeai_defense_point) {
               owl_analyze_semeai_after_move(libs[r], color,
@@ -375,16 +405,16 @@ semeai_move_reasons(int color)
 	add_semeai_move(dragon2[d].semeai_attack_point, dragon2[d].origin);
 	DEBUG(DEBUG_SEMEAI, "Adding semeai attack move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_attack_point);
-	if (liberty_of_dragon(dragon2[d].semeai_attack_point,
-			      dragon2[d].origin)
-	    && !liberty_of_dragon(dragon2[d].semeai_attack_point,
+	if (neighbor_of_dragon(dragon2[d].semeai_attack_point,
+			       dragon2[d].origin)
+	    && !neighbor_of_dragon(dragon2[d].semeai_attack_point,
 				  dragon2[d].semeai_target)
 	    && !is_self_atari(dragon2[d].semeai_attack_point, color)) {
 
           liberties = findlib(dragon2[d].origin, MAXLIBS, libs);
 
           for (r = 0; r < liberties; r++) {
-            if (!liberty_of_dragon(libs[r], dragon2[d].semeai_target)
+            if (!neighbor_of_dragon(libs[r], dragon2[d].semeai_target)
 		&& !is_self_atari(libs[r], color)
 		&& libs[r] != dragon2[d].semeai_attack_point) {
               owl_analyze_semeai_after_move(libs[r], color, dragon2[d].origin,

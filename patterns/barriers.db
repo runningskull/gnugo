@@ -3255,7 +3255,7 @@ Oab
 >non_oterritory(d);
 
 
-Pattern Nonterritory51
+Pattern Nonterritory49
 # gf New pattern. (3.5.3)
 # See gifu03:205.
 
@@ -3274,7 +3274,7 @@ dc?
 >non_xterritory(d);
 
 
-Pattern Nonterritory52
+Pattern Nonterritory50
 # gf New pattern. (3.5.3)
 # See gifu03:205.
 
@@ -3293,7 +3293,7 @@ Xba
 >non_xterritory(d);
 
 
-Pattern Nonterritory54
+Pattern Nonterritory51
 # gf New pattern. (3.5.3)
 # See gifu03:206.
 
@@ -3310,5 +3310,65 @@ cdX
 ;!safe_omove(a) && !oplay_defend_both(b,a,?,c,b,d)
 
 >non_oterritory(c);
+
+
+Pattern Nonterritory52
+# gf New pattern. (3.5.3)
+# See blunder:17.
+
+O??
+.XO
+?.?
+
+:8,t
+
+O??
+aCb
+?d?
+
+;lib(C)==2 && !adjacent_to_stone_in_atari(C) && !oplay_attack_either(a,a,b)
+
+>non_xterritory(d);
+
+
+Pattern Nonterritory53
+# gf New pattern. (3.5.3)
+# See gifu03:205.
+
+O.O
+.XO
+?.?
+
+:8,t
+
+Obc
+aXc
+?d?
+
+;oplay_attack(a,b,b) && !oplay_attack_either(a,a,c)
+
+>non_xterritory(d);
+
+
+Pattern Nonterritory54
+# gf New pattern. (3.5.3)
+# See nicklas4:1103
+
+OX.
+...
+...
+---
+
+:8,t
+
+ODc
+eab
+...
+---
+
+;oplay_defend_both(a,b,c,D,b) && oplay_attack(a,b,a)
+
+>non_oterritory(e);
+
 
 # END OF FILE

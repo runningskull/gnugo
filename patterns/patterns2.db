@@ -1070,6 +1070,22 @@ C*a
 ;(alive(a) || alive(b)) && !xplay_disconnect(*,C,D) && !oplay_connect(*,C,D)
 
 
+Pattern Cut304
+# gf New pattern. (3.5.3)
+
+?OO
+X..         cut through keima
+?*X
+
+:8,OB
+
+?OO
+Dab
+?*C
+
+;!oplay_defend_both(*,a,b,C,D) && !oplay_connect(*,C,D)
+
+
 #######################################
 #
 # Cut of one space jump from two stones
@@ -2371,6 +2387,7 @@ aO..
 Pattern Shape66
 # db increased negative shape (3.1.7)
 # ab added ??? lines added as jump is often good on 3rd line
+# gf This is way too general. Added constraint. (3.5.3)
 
 xX.         often bad to leave a gap
 O.*
@@ -2379,6 +2396,14 @@ O.*
 ???
 
 :8,-,shape(-3)
+
+xX.
+ca*
+.b.
+???
+???
+
+;oplay_disconnect(*,a,b,*,c)
 
 
 Pattern Shape67
@@ -2985,6 +3010,7 @@ Pattern Sente13
 Pattern Sente13b
 # gf Revised constraint. (3.1.10)
 # gf Revised constraint. (3.3.16)
+# gf Revised constraint. (3.5.3)
 
 .O
 *?
@@ -2992,11 +3018,12 @@ Pattern Sente13b
 :8,sO
 
 ba
-*?
+*c
 
 ;lib(a) == 2 && !attack(a) && olib(b) > 2 && safe_omove(*)
 ;&& (safe_xmove(*) || safe_xmove(b))
-;&& oplay_attack(*,b,b)==WIN
+;&& (oplay_attack(*,b,b)==WIN
+;    || (x_somewhere(c) && oplay_attack_either(*,b,b,c)))
 # Action adds a reverse followup value.
 >defend_against_atari(a)
 

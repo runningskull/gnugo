@@ -1023,7 +1023,12 @@ dragon_invincible(int dr)
   }
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (mx[pos] == 1)
+    /* Necessary to check eye margins here since the loop above only
+     * considers margins which are directly adjacent to some stone of
+     * the dragon.
+     */
+    if (mx[pos] == 1
+	&& eye[pos].msize == 0)
       strong_eyes++;
   }
 
@@ -1665,6 +1670,9 @@ compute_crude_status(int pos)
       return CRITICAL;
   }
 
+  if (DRAGON2(pos).moyo_territorial_value > 9.99)
+    return ALIVE;
+  
   return UNKNOWN;
 }
 

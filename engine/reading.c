@@ -921,7 +921,7 @@ break_through_helper(int apos, int bpos, int cpos,
       /* If d is safe too, we have at least managed to break through. */
       if (!attack(dpos, &gpos))
 	success = CUT;
-
+      
       /* Too bad, d could be attacked. We let O play the attack and
        * then try to make a second cut at e. But first we must test if
        * O at e is sufficient to capture d.
@@ -941,7 +941,7 @@ break_through_helper(int apos, int bpos, int cpos,
 	  popgo();
 	  return 0;
 	}
-
+	
 	if (trymove(gpos, color, "break_through_helper-F", Fpos,
 		    EMPTY, NO_MOVE)) {
 	  if (trymove(epos, other, "break_through_helper-G", Fpos,
@@ -969,55 +969,62 @@ break_through_helper(int apos, int bpos, int cpos,
 	    }
 	    popgo();
 	  }
+	  else {
+	    /* Failed to cut at all. */
+	    popgo();
+	    popgo();
+	    return 0;
+	  }
 	  popgo();
 	}
       }
       
       /* By now, we're sure a cut works, so now we can try 
-       * to capture something. */
-	if (!board[apos] || !board[bpos] || !defend_both(apos, bpos))
-	  success = WIN;
-	else {
-	  /* Both a and b could be defended, or didn't need to be.
-	   * Let's see if a move at e is sufficient for O.
-	   */
-	  int attack_on_b = 0;
-	  int attack_on_a = 0;
-
-	  if (trymove(epos, color, "break_through_helper-B", Fpos, 
-		      EMPTY, NO_MOVE)) {
-	    if (attack(bpos, NULL))
-	      attack_on_b = 1;
-	    else if (attack(apos, NULL))
-	      attack_on_a = 1;
-	    popgo();
-	  }
-
-	  /* Let O find a defense and play it. */
-	  if (attack_on_a || attack_on_b) {
-	    int hpos = NO_MOVE;
-
-	    if (((attack_on_a && find_defense(apos, &hpos))
-		|| (attack_on_b && find_defense(bpos, &hpos)))
-		&& hpos != NO_MOVE
-		&& trymove(hpos, color, "break_through_helper-C", Fpos,
-			   EMPTY, NO_MOVE)) {
-	      /* Now we make a second cut at e, trying to capture
-	       * either b or c.
-	       */
-	      if (trymove(epos, other, "break_through_helper-D", Fpos,
-			  EMPTY, NO_MOVE)) {
-		if (!board[bpos]
-		    || !board[cpos] 
-		    || !defend_both(bpos, cpos))
-		  success = WIN;
-		popgo();
-	      }
+       * to capture something.
+       */
+      if (!board[apos] || !board[bpos] || !defend_both(apos, bpos))
+	success = WIN;
+      else {
+	/* Both a and b could be defended, or didn't need to be.
+	 * Let's see if a move at e is sufficient for O.
+	 */
+	int attack_on_b = 0;
+	int attack_on_a = 0;
+	
+	if (trymove(epos, color, "break_through_helper-B", Fpos, 
+		    EMPTY, NO_MOVE)) {
+	  if (attack(bpos, NULL))
+	    attack_on_b = 1;
+	  else if (attack(apos, NULL))
+	    attack_on_a = 1;
+	  popgo();
+	}
+	
+	/* Let O find a defense and play it. */
+	if (attack_on_a || attack_on_b) {
+	  int hpos = NO_MOVE;
+	  
+	  if (((attack_on_a && find_defense(apos, &hpos))
+	       || (attack_on_b && find_defense(bpos, &hpos)))
+	      && hpos != NO_MOVE
+	      && trymove(hpos, color, "break_through_helper-C", Fpos,
+			 EMPTY, NO_MOVE)) {
+	    /* Now we make a second cut at e, trying to capture
+	     * either b or c.
+	     */
+	    if (trymove(epos, other, "break_through_helper-D", Fpos,
+			EMPTY, NO_MOVE)) {
+	      if (!board[bpos]
+		  || !board[cpos] 
+		  || !defend_both(bpos, cpos))
+		success = WIN;
 	      popgo();
 	    }
-	    else
-	      success = WIN; /* This should have been covered by
-			      * defend_both(), so probably unnecessary. */
+	    popgo();
+	  }
+	  else
+	    success = WIN; /* This should have been covered by
+			    * defend_both(), so probably unnecessary. */
 	}
       }
     }

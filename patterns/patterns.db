@@ -4088,6 +4088,7 @@ OO.*.
 
 
 Pattern EB407
+# gf Added constraint. (3.5.3)
 
 oO....        jump along edge
 O...*.
@@ -4095,6 +4096,13 @@ O...*.
 ------
 
 :8,Oe,jump_out_helper
+
+oa....
+O...*.
+......
+------
+
+;!oplay_disconnect(*,*,a)
 
 
 Pattern EB408
@@ -5117,7 +5125,7 @@ X*...
 X*a..
 -----
 
-;(xplay_attack(*,a,a) || weak(b))
+;xplay_attack(*,a,a) || weak(b)
 
 
 Pattern EB706
@@ -5333,6 +5341,23 @@ Xb.
 ---
 
 ;!oplay_defend_both(b,c,a,b) && oplay_defend_both(*,c,a,*)
+
+
+Pattern EB719
+# gf New pattern. (3.5.3)
+# Inexact followup but usually big.
+
+.XXO             block
+XOO*
+----
+
+:8,Xe,followup(6)
+
+aBBd
+Cee*
+----
+
+;alive(d) && critical(e) && !oplay_defend_both(*,?,a,B,C)
 
 
 ############################################################
@@ -13472,6 +13497,19 @@ Pattern EJ100
 |..XOO..
 
 :8,jda
+
+
+Pattern EJ101
+# gf New pattern. (3.5.3)
+# See nngs:1020.
+
+......X
+.O..OX.
+.....*O
+.......
+-------
+
+:8,jcd
 
 
 ######################################################################
