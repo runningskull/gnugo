@@ -51,6 +51,7 @@
 #include <liberty.h>
 
 #include "gg-getopt.h"
+#include <gg_utils.h>
 
 #include "interface.h"
 #include "gmp.h"
@@ -150,6 +151,7 @@ static struct gg_option const long_options[] =
   {"quiet",          no_argument,       0, OPT_QUIET},
   {"silent",         no_argument,       0, OPT_QUIET},
   {"gtp-input",      required_argument, 0, OPT_GTP_INPUT},
+  {"orientation",    required_argument, 0, OPT_GTP_INITIAL_ORIENTATION},
   {"gtp-initial-orientation",
   		     required_argument, 0, OPT_GTP_INITIAL_ORIENTATION},
   {"infile",         required_argument, 0, 'l'},
@@ -246,7 +248,7 @@ main(int argc, char *argv[])
   int benchmark = 0;  /* benchmarking mode (-b) */
   float komi = 0.0;
   FILE *gtp_input_FILE;
-  int gtp_initial_orientation = 0;
+  int orientation = 0;
   
   int seed = 0;      /* If seed is zero, GNU Go will play a different game 
 			each time. If it is set using -r, GNU Go will play the
@@ -347,10 +349,9 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_GTP_INITIAL_ORIENTATION:
-	gtp_initial_orientation = atoi(gg_optarg);
-	if (gtp_initial_orientation < 0 || gtp_initial_orientation > 7) {
-	  fprintf(stderr, "Illegal orientation: %d.\n",
-                  gtp_initial_orientation);
+	orientation = atoi(gg_optarg);
+	if (orientation < 0 || orientation > 7) {
+	  fprintf(stderr, "Illegal orientation: %d.\n", orientation);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  exit(EXIT_FAILURE);
 	}
@@ -774,7 +775,8 @@ main(int argc, char *argv[])
 
       gameinfo_load_sgfheader(&gameinfo, sgftree.root);
       sgffile_write_gameinfo(&gameinfo, "load and print"); 
-      to_move = gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      to_move = gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      					untilstring, orientation);
       sgffile_close_file();
       sgffile_open_file(printsgffile);
       sgffile_write_gameinfo(&gameinfo, "load and print"); 
@@ -791,7 +793,8 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
       
-      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+				untilstring, orientation);
       boardsize = gameinfo.position.boardsize;
       
       if (!string_to_location(boardsize, decide_this, &m, &n)) {
@@ -799,6 +802,7 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
 
+      rotate(m, n, &m, &n, boardsize, orientation);
       decidestring(m, n, outfile);
     }
   break;
@@ -812,7 +816,8 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
       
-      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      				untilstring, orientation);
       boardsize = gameinfo.position.boardsize;
       
       if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
@@ -825,6 +830,8 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
 
+      rotate(ai, aj, &ai, &aj, boardsize, orientation);
+      rotate(bi, bj, &bi, &bj, boardsize, orientation);
       decideconnection(ai, aj, bi, bj, outfile);
     }
   break;
@@ -838,7 +845,8 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
       
-      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      				untilstring, orientation);
       boardsize = gameinfo.position.boardsize;
       
       if (!string_to_location(boardsize, decide_this, &m, &n)) {
@@ -846,6 +854,7 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
 
+      rotate(m, n, &m, &n, boardsize, orientation);
       decidedragon(m, n, outfile);
     }
     break;
@@ -859,7 +868,8 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
       
-      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      				untilstring, orientation);
       boardsize = gameinfo.position.boardsize;
       
       if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
@@ -872,6 +882,8 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
 
+      rotate(ai, aj, &ai, &aj, boardsize, orientation);
+      rotate(bi, bj, &bi, &bj, boardsize, orientation);
       decidesemeai(ai, aj, bi, bj, outfile);
     }
     break;
@@ -884,7 +896,8 @@ main(int argc, char *argv[])
 	fprintf(stderr, "gnugo: --decide-position must be used with -l\n");
 	return (EXIT_FAILURE);
       }
-      color=gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      color=gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      					untilstring, orientation);
       decideposition(color, outfile);
     }
     break;
@@ -898,7 +911,8 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
       
-      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      		untilstring, orientation);
       boardsize = gameinfo.position.boardsize;
       
       if (!string_to_location(boardsize, decide_this, &m, &n)) {
@@ -906,6 +920,7 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
       
+      rotate(m, n, &m, &n, boardsize, orientation);
       decideeye(m, n, outfile);
     }
     break;
@@ -924,7 +939,7 @@ main(int argc, char *argv[])
     else
       gtp_input_FILE = stdin;
 
-    play_gtp(gtp_input_FILE, gtp_initial_orientation);
+    play_gtp(gtp_input_FILE, orientation);
     break;
 
   case MODE_ASCII_EMACS:  

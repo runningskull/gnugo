@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- do_atari_atari confirms the *defense_point is safe before returning
+- atari_atari_confirm_safety initializes defense_point
+- trivial bugfix in move_reasons.c
+- important bugfix in semeai.c, could cause a crash
+- tuning
+- owl tuning
+- one revised regression test
+- new command-line option --orientation
+- -l and decide-* options can be combined with --orientation
+- tuning and regression revisions
+
 3.1.12 released October 28, 2001
 
 - break_chain2_efficient_moves() and break_chain2_moves() revised
