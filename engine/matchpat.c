@@ -170,6 +170,9 @@ void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 static Intersection p[MAX_BOARD][MAX_BOARD];
 static void board_to_p(void);
 
+static int matchpat_call_level = 0;
+static Intersection saved_p[MAX_BOARD][MAX_BOARD];
+
 /* Precomputed tables to allow rapid checks on the piece at
  * the board. This table relies on the fact that color is
  * 1 or 2.
@@ -1022,6 +1025,30 @@ global_matchpat(matchpat_callback_fn_ptr callback, int color,
   loop_fn_ptr_t loop = matchpat_loop;
   prepare_fn_ptr_t prepare = prepare_for_match;
 
+  /*
+   * Caution, dangerous workaround ahead.
+   *
+   * It's almost certainly not safe to make recursive calls to this
+   * function, but if we just make sure that we don't corrupt the
+   * contents of the p[][] array because of this, it seems to work
+   * anyway.
+   *
+   * Therefore we backup p[][] to saved_p[][] when we are called
+   * recursively and restore it when we are ready.
+   *
+   * FIXME: This is not a proper solution. In any case this
+   * implementation can only handle one level of recursion, which on
+   * the other hand is all we need.
+   */
+
+  /* Don't accept a second recursive call. */
+  gg_assert(matchpat_call_level <= 1);
+
+  if (matchpat_call_level == 1)
+    memcpy(saved_p, p, sizeof(p));
+
+  matchpat_call_level++;
+
   /* Copy the board to the p array. */
   board_to_p();
 
@@ -1066,6 +1093,10 @@ global_matchpat(matchpat_callback_fn_ptr callback, int color,
 	loop(callback, color, BLACK, pdb, callback_data, goal);
       }
     }
+
+  matchpat_call_level--;
+  if (matchpat_call_level == 1)
+    memcpy(p, saved_p, sizeof(p));
 }
 
 

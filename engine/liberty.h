@@ -136,6 +136,7 @@ extern int position_number;
 int countlib(int str);
 int findlib(int str, int maxlib, int *libs);
 int approxlib(int pos, int color, int maxlib, int *libs);
+int find_common_libs(int str1, int str2, int maxlib, int *libs);
 
 void start_timer(int n);
 double time_report(int n, const char *occupation, int i, int j);
@@ -241,6 +242,7 @@ void reading_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 int liberty_of_string(int pos, int str);
 int neighbor_of_string(int pos, int str);
 int same_string(int str1, int str2);
+int are_neighbor_strings(int str1, int str2);
 int is_ko(int pos, int color, int *ko_pos);
 int komaster_trymove(int pos, int color,
 		     const char *message, int str,
@@ -351,7 +353,6 @@ void proper_superstring_chainlinks(int str, int *num_adj,
 
 int placehand(int handicap);          /* place stones on board only */
 
-/* FIXME: Continue below here. */
 
 /* Various different strategies for finding a move */
 void fuseki(int color);

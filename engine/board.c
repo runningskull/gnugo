@@ -1377,6 +1377,49 @@ approxlib(int pos, int color, int maxlib, int *libs)
 }
 
 
+/* Find the common liberties of the two strings at str1 and str2. The
+ * locations of up to maxlib common liberties are written into libs[].
+ * The full number of common liberties is returned.
+ *
+ * If you want the locations of all common liberties, whatever their
+ * number, you should pass MAXLIBS as the value for maxlib and
+ * allocate space for libs[] accordingly.
+ */
+
+int
+find_common_libs(int str1, int str2, int maxlib, int *libs)
+{
+  int libs1[MAXLIBS];
+  int liberties1;
+  int commonlibs;
+  int k;
+  
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(board[str1] != EMPTY, str1);
+  ASSERT1(board[str2] != EMPTY, str2);
+  ASSERT1(libs != NULL, str1);
+  
+  if (countlib(str1) > countlib(str2)) {
+    int tmp = str1;
+    str1 = str2;
+    str2 = tmp;
+  }
+
+  liberties1 = findlib(str1, MAXLIBS, libs1);
+  commonlibs = 0;
+  for (k = 0; k < liberties1; k++) {
+    if (neighbor_of_string(libs1[k], str2)) {
+      if (commonlibs < maxlib)
+	libs[commonlibs] = libs1[k];
+      commonlibs++;
+    }
+  }
+  
+  return commonlibs;
+}
+
+
 /*
  * Report the number of stones in a string.
  */
@@ -1599,6 +1642,30 @@ same_string(int str1, int str2)
   ASSERT1(board[str2] != EMPTY, str2);
 
   return string_number[str1] == string_number[str2];
+}
+
+
+/*
+ * Returns true if the strings at str1 and str2 are adjacent.
+ */
+
+int
+are_neighbor_strings(int str1, int str2)
+{
+  int s1, s2;
+  int k;
+
+  if (!strings_initialized)
+    init_board();
+
+  s1 = string_number[str1];
+  s2 = string_number[str2];
+
+  for (k = 0; k < string[s1].neighbors; k++)
+    if (string[s1].neighborlist[k] == s2)
+      return 1;
+
+  return 0;
 }
 
 

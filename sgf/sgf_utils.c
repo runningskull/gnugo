@@ -37,7 +37,7 @@ int
 get_moveX(SGFProperty *property, int boardsize)
 {
   int i;
-  if (!property->value[1])
+  if (strlen(property->value) < 2)
     return -1;
 
   i = toupper((int) property->value[1]) - 'A';
@@ -55,7 +55,7 @@ int
 get_moveY(SGFProperty *property, int boardsize)
 {
   int j;
-  if (!property->value[0])
+  if (strlen(property->value) < 2)
     return -1;
 
   j = toupper((int) property->value[0]) - 'A';
