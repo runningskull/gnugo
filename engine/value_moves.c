@@ -2789,8 +2789,8 @@ find_best_move(int *the_move, float *val, int color)
   int good_move_found = 0;
   int ko_values_have_been_added = 0;
   char blunder_tested[BOARDMAX];
-  float bestval;
-  int best_move;
+  float bestval = 0.0;
+  int best_move = NO_MOVE;
   int pos;
 
   memset(blunder_tested, 0, sizeof(blunder_tested));
@@ -2801,10 +2801,9 @@ find_best_move(int *the_move, float *val, int color)
 
     /* Search through all board positions for the highest valued move. */
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      float tval = move[pos].final_value;
       if (!ON_BOARD(pos) || move[pos].final_value == 0.0)
 	  continue;
-	
-      float tval = move[pos].final_value;
 	
       if (tval > bestval) {
 	if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
