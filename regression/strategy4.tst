@@ -272,7 +272,7 @@ loadsgf games/owl30.sgf 84
 207 gg_genmove black
 #? [!T6]*
 
-loadsgf games/lordofpi.sgf 32
+loadsgf games/lordofpi.sgf 36
 208 gg_genmove black
 #? [A5|A2|B1]*
 
