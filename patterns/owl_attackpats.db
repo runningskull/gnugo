@@ -848,7 +848,7 @@ Pattern A225
 
 Pattern A226
 
-.OX?       descend to prevent hane and eye in sente
+.OY?       descend to prevent hane and eye in sente
 .*.X
 ...x
 ----
@@ -1082,7 +1082,6 @@ X..
 xO.
 
 ; !oplay_attack(*,*)
-
 
 
 #########################################################
@@ -1321,7 +1320,7 @@ o...o
 o.Ybc
 
 ;owl_escape_value(a)>0
-;&& (!x_somewhere(b,c) 
+;&& (!x_somewhere(b,c)
 ;    || o_somewhere(b,d)
 ;    || (o_somewhere(c) && !safe_xmove(d)))
 
@@ -1431,7 +1430,7 @@ Pattern A411
 ??j.Y???
 ??bc????
 
-;owl_escape_value(a)>0 
+;owl_escape_value(a)>0
 ;&& ((o_somewhere(b,c,j) && o_somewhere(d,e,f,g,h,i))
 ;   || (o_somewhere(j) && owl_escape_value(d)==0 && owl_escape_value(e)==0))
 
@@ -1543,7 +1542,7 @@ a.....b
 ..*...d
 ef.Y.oo
 
-;owl_escape_value(a)>0 
+;owl_escape_value(a)>0
 ;&& owl_escape_value(b)==0
 ;&& owl_escape_value(c)==0
 ;&& owl_escape_value(d)==0
@@ -1617,10 +1616,10 @@ Y.O
 
 :8,-,value(68)
 
-Acd
-.*B
+Ycd
+.*A
 
-;(owl_escape_value(B)>0)
+;(owl_escape_value(A)>0)
 ; && oplay_defend_both(*,c,*,d)
 
 
@@ -1633,11 +1632,10 @@ X.O
 :8,-,value(68)
 
 Acd
-.*B
+.*Y
 
 ;(owl_escape_value(A)>0)
 ; && oplay_defend_both(*,c,*,d)
-
 
 
 Pattern A420
@@ -1675,6 +1673,7 @@ OY?
 
 ;owl_escape_value(a)>0 || owl_escape_value(b)>0
 
+
 Pattern A422
 # ab New pattern. (3.3.10)
 
@@ -1709,8 +1708,6 @@ a*.b
 ;&& !xplay_disconnect(*,a,b)
 
 
-
-
 Pattern A423
 # db New pattern (3.3.9)
 # complementary to D1358
@@ -1721,8 +1718,8 @@ Y.*X
 
 :8,-,value(61)
 
-bde?
-bc*a
+X..?
+Y.*a
 ??O?
 
 ;(owl_escape_value(a) > 0)
@@ -1737,11 +1734,11 @@ X.*Y
 
 :8,-,value(61)
 
-bde?
-bc*a
+a..?
+a.*Y
 ??O?
 
-;(owl_escape_value(b) > 0)
+;(owl_escape_value(a) > 0)
 
 
 #########################################################
@@ -3093,7 +3090,7 @@ XOY        push out in reverse sente
 .*.
 ?.?
 
-:|,-,value(75)
+:8,-,value(75)
 
 XaY
 .*.
@@ -3273,7 +3270,6 @@ AfgB
 ; && oplay_defend_both(*,g,f,e,f,*)
 
 
-
 Pattern A1016
 # gf New pattern. (3.1.22)
 # Converse to D1376. See lazarus:114 for an example.
@@ -3334,7 +3330,7 @@ O.Y      separate
 .*.
 X.o
 
-:\,-,value(35)
+:8,-,value(35)
 
 
 Pattern A1019
@@ -3761,7 +3757,6 @@ Y*b
 ;!xplay_defend_both(*,a,b)
 
 
-
 Pattern A1118
 # tm New pattern (3.1.17)
 
@@ -3862,6 +3857,7 @@ a.
 
 ;!same_dragon(a,b) && !oplay_connect(*,a,b)
 
+
 Pattern A1122a
 # same as A1122 - different anchor.
 
@@ -3876,6 +3872,7 @@ a.
 .b
 
 ;!same_dragon(a,b) && !oplay_connect(*,a,b)
+
 
 Pattern A1123
 # tm New Pattern (3.1.22) (see D1376)
@@ -3924,12 +3921,12 @@ Pattern A1124
 :8,-,value(70)
 
 ?AY
-be*
-cd?
+bd*
+?c?
 
-;(owl_escape_value(d) > 0
+;(owl_escape_value(c) > 0
 ; || owl_escape_value(b) > 0)
-;&& oplay_defend_both(*,e,A,*)
+;&& oplay_defend_both(*,d,A,*)
 
 
 Pattern A1124a
@@ -3994,7 +3991,6 @@ O*b
 ; && (!owl_goal_dragon(b) || !owl_goal_dragon(c))
 
 
-
 Pattern A1127a
 # Same as A1127 - differnt anchor.
 
@@ -4008,8 +4004,6 @@ O*b
 
 ; (attack(A) != WIN || (wormsize(A)<=2 && does_attack(*,A)))
 ; && (!owl_goal_dragon(b) || !owl_goal_dragon(c))
-
-
 
 
 Pattern A1128
@@ -4911,6 +4905,7 @@ Y...|       don't let opponent live easily in the corner
 
 :\,-,value(46)
 
+
 # nn Removed (3.3.13)
 #   Success rate in regressions : 0% (0/40)
 # 
@@ -4923,6 +4918,7 @@ Y...|       don't let opponent live easily in the corner
 # -----+
 # 
 # :8,-,value(45)
+
 
 Pattern A1403
 #evand new pattern 3.3.13
@@ -4985,7 +4981,6 @@ OXO
 ?O?
 
 ;owl_escape_value(A) > 0 || owl_escape_value(B) > 0
-
 
 
 Pattern A1503a

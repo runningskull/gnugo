@@ -1806,7 +1806,6 @@ Pattern Intrusion44b
 eFho
 cab?
 
-
 ;safe_omove(a)
 ;&& (o_somewhere(b) || oplay_attack(a,b,b))
 ;&& !oplay_defend_both(a,c,d,e,F,G)
@@ -2001,12 +2000,12 @@ Pattern Intrusion54
 
 :8,B,value(40)
 
-.fH?
-gXQb
-edac
+.eG?
+fXQb
+!dac
 
 ;(o_somewhere(a) || o_somewhere(b) || o_somewhere(c))
-;&& (o_somewhere(a) || oplay_attack(d,a,a)) && oplay_attack(f,g,H)
+;&& (o_somewhere(a) || oplay_attack(d,a,a)) && oplay_attack(e,f,G)
 
 
 Pattern Nonterritory1
@@ -2047,8 +2046,8 @@ OxO
 
 :8,t
 
-Ox.
-XaX
+Xo.
+OaO
 
 >if (false_eye(a)
 >    && !false_eye_territory(a)) non_oterritory(a);

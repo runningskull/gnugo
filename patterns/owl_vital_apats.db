@@ -204,14 +204,14 @@ Pattern VA11
 
 ?XX???       chance to get nakade
 XOOXXx
-.OX*.x
+!OX*.x
 ------
 
 :8,s,value(65)
 
 ?XX???
 XaaXXx
-!aX*.x
+.aX*.x
 ------
 
 ;attack(a) && !defend(a)

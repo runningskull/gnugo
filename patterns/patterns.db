@@ -851,7 +851,7 @@ Pattern CC52b
 :8,c
 
 ?????
-.aX.? 
+.aX.?
 ..*.b
 ?..oo
 
@@ -6096,7 +6096,7 @@ Pattern EB1404a
 #
 # This has the same followup value as EB1403 has. This might make
 #    EB1404b superfluous.
-
+#
 # gf Revised pattern. (3.1.3)
 # eb revised constraint (3.3.13)
 # see nngs3:1110
@@ -6137,6 +6137,7 @@ ecBa?
 
 ;!dead(a) && xmoyo(e) && !oplay_defend_both(*,?,c,A,B) && !oplay_attack(*,c,*) && !attack(A)
 
+
 Pattern EB1404c
 #cut followup to sente hane
 #evand new pattern (3.3.13)
@@ -6148,12 +6149,13 @@ Pattern EB1404c
 
 :8,Xe,value(12)
 
-?oB??
-e*Ba?
-?AO.o
+?oX??
+c*Xa?
+?BO.o
 -----
 
-;!dead(a) && xmoyo(e) && !oplay_defend(*,A) && !oplay_attack_either(*,*,a)
+;!dead(a) && xmoyo(c) && !oplay_defend(*,B) && !oplay_attack_either(*,*,a)
+
 
 Pattern EB1405
 
@@ -9017,7 +9019,7 @@ abh
 ;&& !oplay_disconnect(*,b,*,a) && !oplay_disconnect(*,c,*,a)
 
 
-Pattern CB339
+Pattern CB340
 # db added (3.3.14)
 # compare CB242
 
@@ -9029,7 +9031,7 @@ o...
 :8,OXda,shape(3)
 
 
-Pattern CB340
+Pattern CB341
 # db added (3.3.14)
 # compare CB242
 
@@ -9039,7 +9041,6 @@ o...
 ..X.
 
 :8,OXda,shape(3)
-
 
 
 ######################################################################
@@ -12985,7 +12986,6 @@ cde.XX
 Pattern EJ98
 # db added (3.3.7)
 
-
 O..X.?           connect
 O..*O.
 ......
@@ -14012,15 +14012,14 @@ O.XO..
 
 :8,-,shape(3)
 
-???aC.
+???aX.
 O.Ba..
-..d.*.
+..c.*.
 ......
 ------
 
 ; lib(a)==2 && lib(B)>=2 && !oplay_attack(*,a)
-> replace(d,*)
-
+> replace(c,*)
 
 
 # END OF FILE
