@@ -52,6 +52,19 @@ trymove white G3
 popgo
 popgo
 
+# C9 is errouneously thought to be an owl-attack against G13,
+# which could indicate a semeai reading problem. On the other
+# hand, since G13 is judged owl-defenseless, it seems to me
+# that C9 is strangely overvalued.
+loadsgf games/tactics07.sgf
+105 gg_genmove white
+[F7]
+
+loadsgf games/tactics08.sgf
+106 gg_genmove white
+[F8|F9]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
