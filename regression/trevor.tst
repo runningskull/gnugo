@@ -566,6 +566,28 @@ loadsgf games/trevor/trevor_67.sgf
 671 defend G1
 #? [1 (D1|C3)]*
 
+loadsgf games/trevor/trevor_68.sgf
+680 owl_attack H3
+#? [1 H1]*
+
+loadsgf games/trevor/trevor_69.sgf
+690 owl_attack H3
+#? [1 G2]*
+
+
+#CATEGORY=OWL_OPTICS
+#DESCRIPTION=Black plays on the incorrect marginal eye space.
+#SEVERITY=10
+loadsgf games/trevor/trevor_70.sgf
+700 owl_attack H1
+#? [1 G5]*
+
+#CATEGORY=OWL_ESCAPE
+#DESCRIPTION=black gets the killing move, creating a missed cutting point.
+#SEVERITY=9
+loadsgf games/trevor/trevor_71.sgf
+710 owl_attack H1
+#? [1 G5]*
 
 
 #CATEGORY=OWL_EYES

@@ -1955,6 +1955,16 @@ XA*
 ; oplay_defend_both(*,A,b,*)
 
 
+Pattern A618
+#tm New Pattern (3.1.17)
+
+|.X
+|.*
++--
+
+:8,-,value(75)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves in the center             #
@@ -2204,6 +2214,23 @@ X.X
 xXx
 
 ;xplay_attack(*,a)
+
+
+Pattern A717
+# tm New Pattern (3.1.17)
+
+?.??
+XO*X
+?X.X
+
+:8,s,value(75)
+
+?.??
+XO*X
+?XAb
+
+; owl_big_eyespace(A,b) 
+; && oplay_attack(*,b)
 
 
 #########################################################
@@ -3279,6 +3306,23 @@ AX*
 ---
 
 ; attack(A) && !oplay_attack(*,A)
+
+
+Pattern A1119
+# tm New Pattern (3.1.17)
+#   analog to defense pattern D1348
+
+X*?	    cut off escape route.
+..X
+
+:8,n,value(36)
+
+a*E
+Dcb
+
+;(owl_escape_value(a)>0 || owl_escape_value(b)>0)
+; && oplay_defend_both(*,c,D,*,D) &&
+; ( (o_somewhere(E) || x_somewhere(E)) || owl_escape_value(a) < 0)
 
 
 #########################################################
@@ -4393,5 +4437,16 @@ Pattern A1612
 -----
 
 ;lib(A) > 2 && !oplay_defend(*,?,B,?,C,?,D,e)
+
+
+Pattern A1613
+# tm New Pattern (3.1.17)
+
+?XX?
+XO.x
+OX*X
+----
+
+:8,s,value(75)
 
 # END OF FILE

@@ -2399,6 +2399,7 @@ Pattern EC76
 
 Pattern EC77
 #tm New Pattern (3.1.16)
+#tm modified (3.1.17)
 
 |..x
 |.*.
@@ -2412,7 +2413,7 @@ Pattern EC77
 |.A.
 |XOO
 
-;oplay_attack(*,A)
+;oplay_defend(*,A) != WIN
 
 
 ##############################################
@@ -13218,5 +13219,22 @@ Pattern RE3
 
 > replace(a,*)
 
+
+Pattern RE4
+# tm New Pattern (3.1.17)
+
+?O.|	push before blocking
+*XX|
+OO.|
+
+:8,-
+
+?O.|
+*BX|
+OOa|
+
+; oplay_attack(*,a,B)
+
+> replace(a,*)
 
 # END OF FILE

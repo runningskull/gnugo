@@ -3521,6 +3521,18 @@ aO
 ; safe_xmove(*) && !xplay_attack(*,a)
 
 
+Pattern D1000a
+
+O*          save large section
+
+:8,-,value(95)
+
+A*
+
+; lib(A) == 1 && wormsize(A) > 2
+
+
+
 Pattern D1001
 
 X*O       connect
@@ -4841,7 +4853,8 @@ O*O      connect to friendly dragon
 
 a*b
 
-;!owl_goal_dragon(a) || !owl_goal_dragon(b)
+; !owl_goal_dragon(a) || !owl_goal_dragon(b)
+
 
 
 Pattern D1321
@@ -5145,18 +5158,17 @@ odoo
 
 
 Pattern D1339
+# tm modified (3.1.17)
 
 ?O?          break out into the center, followup
 X*X
 oOo
-ooo
 
-:|,-,value(90)
+:|,-,value(93)
 
 ?O?
 X*X
-.O.
-odo
+.d.
 
 ;owl_escape_value(d)>0
 
@@ -5346,8 +5358,8 @@ AO*
 
 Pattern D1348
 
-O.?
-.*O      connect to friendly dragon to escape
+O.?	    connect to friendly dragon to escape
+.*O
 
 :8,n,value(36)
 

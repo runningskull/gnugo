@@ -1034,15 +1034,18 @@ X*.
 
 Pattern EF102
 #tm New Pattern (3.1.16)
+#tm modified (3.1.17)
+
 O.
 *O
 
-:8,O,reverse_followup(1)
+:8,O,terri(1),reverse_followup(3)
 
 Ac
 *B
 
-;proper_eye(c) && !oplay_attack(*,*) && xplay_attack_either(*,A,B) 
+;proper_eye(c) && oterri(c) && !oplay_attack(*,*) && 
+;safe_xmove(*) && xplay_attack_either(*,A,B) 
 
 ######################################################################
 #
@@ -1241,12 +1244,14 @@ xX
 
 
 Pattern CE18
+# tm removed reverse_followup value
+#   see trevorb:700
 
 OX          endgame move
-.*          one point reverse sente
+.*          one point gote.
 oO
 
-:8,bXO,terri(1),reverse_followup(2)
+:8,bXO,terri(1)
 
 OX
 ba
