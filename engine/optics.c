@@ -1469,10 +1469,10 @@ topological_eye(int pos, int color,
 	}
 	else if (val < 1.0) {
 	  attack_value = 2;
-	  defense_value = 3;
+	  defense_value = 1;
 	}
 	else {
-	  attack_value = 3;
+	  attack_value = 1;
 	  defense_value = 2;
 	}
 
