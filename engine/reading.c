@@ -2887,7 +2887,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
           SGFTRACE(moves[k].pos, 0, "Too deep, aborting attack");
         }
 	/* This defense assignment may be incorrect. */
-	other_tactic = gg_max(other_tactic, WIN - same_tactic);
+	other_tactic = gg_max(other_tactic, REVERSE_RESULT(same_tactic));
       }
       if (!other_tactic) {
 	if (ko_move) {
@@ -2933,9 +2933,9 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 
 
   /* FIXME: Add explicit attack/defense verbage here. */
-  SGFTRACE(best_move, WIN - best_other_tactic, "No good tactic.");
+  SGFTRACE(best_move, REVERSE_RESULT(best_other_tactic), "No good tactic.");
   *move = best_move;
-  return WIN - best_other_tactic;
+  return REVERSE_RESULT(best_other_tactic);
 }
 
 #endif /*EXPERIMENTAL_READING*/

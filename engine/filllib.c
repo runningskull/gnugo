@@ -58,12 +58,12 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
     case EMPTY:
       if (!(*found_black)
 	  && living_neighbor(pos, BLACK)
-	  && safe_move(pos, WHITE) != 3)
+	  && safe_move(pos, WHITE) != WIN)
 	*found_black = 1;
       
       if (!(*found_white)
 	  && living_neighbor(pos, WHITE)
-	  && safe_move(pos, BLACK) != 3)
+	  && safe_move(pos, BLACK) != WIN)
 	*found_white = 1;
       
       break;

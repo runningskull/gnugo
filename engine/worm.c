@@ -1603,11 +1603,11 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
          * possible that it only has a ko defense and then we would
          * risk to find an irrelevant move to attack with ko.
 	 */
-	if (dcode != WIN && 3 - dcode >= worm[str].attack_codes[0]) {
-	  change_attack(str, move, 3 - dcode);
+	if (dcode != WIN && REVERSE_RESULT(dcode) >= worm[str].attack_codes[0]) {
+	  change_attack(str, move, REVERSE_RESULT(dcode));
 	  DEBUG(DEBUG_WORMS,
 		"Attack pattern %s+%d found attack on %1m at %1m with code %d\n",
-		pattern->name, ll, str, move, 3 - dcode);
+		pattern->name, ll, str, move, REVERSE_RESULT(dcode));
 	}
       }
     }
@@ -1673,10 +1673,10 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	popgo();
 	
 	if (acode < worm[str].attack_codes[0]) {
-	  change_defense(str, move, 3 - acode);
+	  change_defense(str, move, REVERSE_RESULT(acode));
 	  DEBUG(DEBUG_WORMS,
 		"Defense pattern %s+%d found defense of %1m at %1m with code %d\n",
-		pattern->name, ll, str, move, 3 - acode);
+		pattern->name, ll, str, move, REVERSE_RESULT(acode));
 	}
       }
     }

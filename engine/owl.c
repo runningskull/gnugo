@@ -3631,12 +3631,12 @@ owl_does_defend(int move, int target)
     if (search_persistent_owl_cache(OWL_ATTACK, origin, 0, 0,
 				    &result, NULL, NULL, NULL)) {
       popgo();
-      return 3 - result;
+      return REVERSE_RESULT(result);
     }
     
     init_owl(&owl, target, NO_MOVE, move, 1);
     acode = do_owl_attack(target, NULL, owl, EMPTY, 0, 0);
-    result = 3 - acode;
+    result = REVERSE_RESULT(acode);
     popgo();
   }
   else
@@ -3773,7 +3773,7 @@ owl_does_attack(int move, int target)
     if (search_persistent_owl_cache(OWL_DEFEND, origin, 0, 0,
 				    &result, NULL, NULL, NULL)) {
       popgo();
-      return 3 - result;
+      return REVERSE_RESULT(result);
     }
 
 #if 0
@@ -3792,7 +3792,7 @@ owl_does_attack(int move, int target)
       dcode = 0;
     else
       dcode = do_owl_defend(target, NULL, owl, EMPTY, 0, 0);
-    result = 3 - dcode;
+    result = REVERSE_RESULT(dcode);
     owl->lunches_are_current = 0;
     popgo();
   }
