@@ -175,7 +175,7 @@ loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 166
 
 loadsgf games/gunnar/gunnar6.sgf 135
 304 owl_defend Q14
-#? [0]*
+#? [0]
 
 loadsgf games/gunnar/gunnar7.sgf
 305 owl_defend P8
@@ -192,14 +192,14 @@ loadsgf games/nngs/guestn-gnugo-3.3.17-200304200323.sgf 52
 #? [1 S11]
 
 308 owl_defend S10
-#? [1 S11]
+#? [1 S11]*
 
 loadsgf games/nngs/gnugo-3.3.18-spewnboy-200304291635.sgf 91
 309 owl_attack N5
-#? [1 L2|L4]
+#? [1 L2|L4]*
 
 310 owl_defend N5
-#? [1 L2|L4]
+#? [1 L2|L4]*
 
 ########### end of tests #####################
 

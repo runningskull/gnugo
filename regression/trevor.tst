@@ -611,7 +611,7 @@ loadsgf games/trevor/trevor_73.sgf
 
 loadsgf games/trevor/trevor_74.sgf
 740 owl_attack B4
-#? [1 A1]*
+#? [1 A1]
 
 loadsgf games/trevor/trevor_75.sgf
 750 disconnect O9 O7

@@ -1,3 +1,31 @@
+========================== 3.3.20 pre 2 =====================================
+
+./regress.sh . owl.tst 
+150 unexpected PASS!
+./regress.sh . atari_atari.tst 
+23 unexpected PASS!
+./regress.sh . strategy.tst 
+36 unexpected FAIL: Correct '!D18', got 'D18'
+./regress.sh . strategy2.tst 
+80 unexpected FAIL: Correct 'P4|Q4|Q3', got 'S8'
+./regress.sh . trevor.tst 
+740 unexpected PASS!
+./regress.sh . owl1.tst 
+304 unexpected PASS!
+308 unexpected FAIL: Correct '1 S11', got '1 R10'
+309 unexpected FAIL: Correct '1 L2|L4', got '0'
+310 unexpected FAIL: Correct '1 L2|L4', got '1 S4'
+./regress.sh . nngs3.tst 
+740 unexpected FAIL: Correct '!F2', got 'F2'
+./regress.sh . nngs4.tst 
+340 unexpected FAIL: Correct 'D2', got 'B1'
+./regress.sh . century2002.tst 
+240 unexpected PASS!
+./regress.sh . ninestones.tst 
+150 unexpected PASS!
+./regress.sh . 13x13b.tst 
+27 unexpected PASS!
+
 ========================== 3.3.20 pre 1 =====================================
 
 ./regress.sh . owl.tst 

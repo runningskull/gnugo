@@ -204,7 +204,7 @@ loadsgf games/mertin13x13/GMGN2.sgf 30
 # B2 inefficient way to live.
 loadsgf games/mertin13x13/GMGN2.sgf 92
 27 gg_genmove white
-#? [C4]*
+#? [C4]
 
 # H9 can be cut off.
 loadsgf games/mertin13x13/GMGN3.sgf 30

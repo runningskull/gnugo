@@ -134,7 +134,7 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 40
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 76
 340 restricted_genmove black B1 D2
-#? [D2]
+#? [D2]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 102
 350 gg_genmove black
