@@ -26,7 +26,7 @@
 ;;;
 ;;; Maintainer: Thien-Thi Nguyen
 ;;;
-;;; Rel:standalone-gnugo-el-2-2-5
+;;; Rel:standalone-gnugo-el-2-2-6
 ;;;
 ;;; Description: Run GNU Go in a buffer.
 
@@ -47,12 +47,13 @@
 ;; both komi and handicap.
 ;;
 ;; To play a stone, move the cursor to the desired vertice and type `SPC' or
-;; `RET'; to pass, `P' (note: uppercase); to quit, `q'.  Other keybindings are
-;; described in the `gnugo-board-mode' documentation, which you may view with
-;; the command `describe-mode' (normally `C-h m') in that buffer.  The buffer
-;; name shows the last move and who is currently to play.  Capture counts and
-;; other info are shown on the mode line immediately following the major mode
-;; name.
+;; `RET'; to pass, `P' (note: uppercase); to quit, `q'.  To undo, place the
+;; cursor on a stone that you played and type `U' (note: uppercase).  Other
+;; keybindings are described in the `gnugo-board-mode' documentation, which
+;; you may view with the command `describe-mode' (normally `C-h m') in that
+;; buffer.  The buffer name shows the last move and who is currently to play.
+;; Capture counts and other info are shown on the mode line immediately
+;; following the major mode name.
 ;;
 ;; While GNU Go is pondering its next move, certain commands that rely on its
 ;; assistence will result in a "still waiting" error.  Do not be alarmed; that
@@ -140,12 +141,13 @@
 ;; 2.2.x -- uncluttered, letters and numbers hidden, board centered
 ;;          buffer name shows last move and current player
 ;;          mode-line customization (var `gnugo-mode-line')
-;;          new commands: `=', `h', `s', `F'
+;;          new commands: `=', `h', `s', `F', `R', `l', `U'
 ;;          program option customization (var `gnugo-program')
 ;;          new hooks (vars `gnugo-post-move-hook', `gnugo-board-mode-hook')
 ;;          multiple independent buffers/games
 ;;          XPM set can be changed on the fly (global and/or local)
 ;;          font-locking for "X", "O", "[xo]"
+;;          undo by count or by board position
 ;;
 ;;
 ;; History Predicted
@@ -168,7 +170,7 @@
 ;;;---------------------------------------------------------------------------
 ;;; Political arts
 
-(defconst gnugo-version "2.2.5"
+(defconst gnugo-version "2.2.6"
   "Version of gnugo.el currently loaded.
 Note that more than two dots in the value indicates \"pre-release\",
 or \"alpha\" or \"hackers-invited-all-else-beware\"; use at your own risk!
@@ -1142,6 +1144,8 @@ by how many stones)."
              black black-captures white white-captures est)))
 
 (defun gnugo-write-sgf-file (filename)
+  "Save the game history to FILENAME (even if unfinished).
+If FILENAME already exists, Emacs confirms that you wish to overwrite it."
   (interactive "FWrite game as SGF file: ")
   (when (and (file-exists-p filename)
              (not (y-or-n-p "File exists. Continue? ")))
@@ -1168,9 +1172,66 @@ by how many stones)."
     (save-buffer)
     (kill-buffer nil)))
 
+(defun gnugo-read-sgf-file (filename)
+  "Load a game tree from FILENAME, a file in SGF format."
+  (interactive "fSGF file to load: ")
+  (gnugo-command (format "loadsgf %s" (expand-file-name filename))))
+
+(defun gnugo-magic-undo (spec)
+  "Undo moves on the GNUGO Board, based on SPEC, a string.
+If SPEC has the form of a board position (begins with a letter),
+check that the position is occupied by a stone of the user's color,
+and if so, remove moves from the history until that position is clear.
+If SPEC has the form of a positive number, remove exactly that many
+moves from the history, signaling an error if the history is exhausted
+before finishing.  Otherwise, signal \"bad spec\" error.
+
+Refresh the board for each move undone.  If (in the case where SPEC is
+a number) after finishing, the color to play is not the user's color,
+schedule a move by GNU Go."
+  (gnugo-gate)
+  (let ((n 0) done ans)
+    (cond ((string-match "^[a-z]" spec)
+           (let ((pos (upcase spec)))
+             (setq done `(lambda ()
+                           (gnugo-goto-pos ,pos)
+                           (memq (char-after) '(?. ?+))))
+             (when (funcall done)
+               (error "%s already clear" pos))
+             (let ((u (gnugo-get :user-color)))
+               (when (= (save-excursion
+                          (gnugo-goto-pos pos)
+                          (char-after))
+                        (if (string= "black" u)
+                            ?O
+                          ?X))
+                 (error "%s not occupied by %s" pos u)))))
+          ((not (= 0 (setq n (string-to-number spec))))
+           (setq done (lambda () (= 0 n))))
+          (t (error "bad spec: %S" spec)))
+    (when (gnugo-get :game-over)
+      ;; fixme: clean up :sgf-tree here.
+      (gnugo-put :game-over nil))
+    (while (not (funcall done))
+      (setq ans (cdr (gnugo-synchronous-send/return "undo")))
+      (unless (= ?= (aref ans 0))
+        (error ans))
+      (gnugo-put :move-history (cdr (gnugo-get :move-history)))
+      (gnugo-put :sgf-tree (cdr (gnugo-get :sgf-tree)))
+      (gnugo-put :last-mover (gnugo-other (gnugo-get :last-mover)))
+      (gnugo-merge-showboard-results)   ; all
+      (gnugo-refresh)                   ; this
+      (decf n)                          ; is
+      (sit-for 0)))                     ; eye candy
+  (gnugo-refresh t)
+  (when (string= (gnugo-get :last-mover) (gnugo-get :user-color))
+    (gnugo-get-move (gnugo-get :gnugo-color))))
+
 (defun gnugo-display-final-score ()
   "Display final score and other info in another buffer (when game over).
-If the game is still ongoing, Emacs asks if you wish to stop play."
+If the game is still ongoing, Emacs asks if you wish to stop play (by
+making sure two \"pass\" moves are played consecutively, if necessary).
+This info is also added to the game tree.  See `gnugo-write-sgf-file'."
   (interactive)
   (unless (or (gnugo-get :game-over)
               (and (not (gnugo-get :waitingp))
@@ -1300,7 +1361,18 @@ If the game is still ongoing, Emacs asks if you wish to stop play."
 ;; :post-hook -- normal hook run after output processing (at the very end).
 
 (defun gnugo-command (command)
-  "Send the Go Text Protocol COMMAND (a string) to GNU Go."
+  "Send the Go Text Protocol COMMAND (a string) to GNU Go.
+Output and Emacs behavior depend on which command is given (some
+commands are handled completely by Emacs w/o using the subprocess;
+some commands have their output displayed in specially prepared
+buffers or in the echo area; some commands are instrumented to do
+gnugo.el-specific housekeeping).
+
+For example, for the command \"help\", Emacs visits the
+GTP command reference info page.
+
+NOTE: At this time, GTP command handling specification is still
+      incomplete.  Thus, some commands WILL confuse gnugo.el."
   (interactive "sCommand: ")
   (if (string= "" command)
       (message "(no command given)")
@@ -1341,38 +1413,36 @@ In this mode, keys do not self insert.  Default keybindings:
 
   ?             View this help.
 
-  RET or SPC    Select point as the next move.
-                An error is signalled for invalid locations.
+  RET or SPC    Run `gnugo-move'.
 
   q or Q        Quit (the latter without confirmation).
 
   R             Resign.
 
-  C-l           Refresh board.  Actually, while the subprocess
-                is thinking, this only refreshes the mode line.
+  U             Pass to `gnugo-magic-undo' either the board position
+                at point (if no prefix arg), or the prefix arg converted
+                to a number.  E.g., to undo 16 moves: `C-u C-u U' (see
+                `universal-argument'); to undo 42 moves: `M-4 M-2 U'.
+
+  C-l           Run `gnugo-refresh'.
 
   _ or M-_      Bury the Board buffer (when the boss is near).
 
-  P             Pass; i.e., select no location for your move.
+  P             Run `gnugo-pass'.
 
   i             Toggle display using XPM images (if supported).
 
-  w             Animate current position's worm stones.
-  d             Animate current position's dragon stones.
-                See variable `gnugo-animation-string'.
+  w             Run `gnugo-worm-stones'.
+  d             Run `gnugo-dragon-stones'.
 
-  W             Display current position's worm data in another buffer.
-  D             Display current position's dragon data in another buffer.
+  W             Run `gnugo-worm-data'.
+  D             Run `gnugo-dragon-data'.
 
-  t             Toggle dead groups (when the game is over).
+  t             Run `gnugo-toggle-dead-group'.
 
-  !             Estimate score (at any time).
+  !             Run `gnugo-estimate-score'.
 
-  : or ;        Extended command.  Type in a string to be passed (quite
-                indirectly) to the GNUGO subprocess.  Output and emacs
-                behavior depend on which command is given.  Try `help'
-                to get a list of all commands.  Note that some commands
-                may confuse gnugo.el.
+  : or ;        Run `gnugo-command' (for GTP commands to GNU Go).
 
   =             Display board position under point (if valid).
 
@@ -1380,13 +1450,13 @@ In this mode, keys do not self insert.  Default keybindings:
                 move history, most recent move first.  This line is
                 subsequently available in the *Messages* buffer.
 
-  F             Switch to *GNUGO Final Score* buffer and display the
-                final score there.  If the game is still in play, Emacs
-                confirms that you wish to stop play.
+  F             Run `gnugo-display-final-score'.
 
-  s             Save the game history to a file (even if the game is not
-  or C-x C-w    finished).  If the file already exists, Emacs confirms
-  or C-x C-s    that you wish to overwrite it."
+  s             Run `gnugo-write-sgf-file'.
+  or C-x C-w
+  or C-x C-s
+
+  l             Run `gnugo-read-sgf-file'."
   (switch-to-buffer (generate-new-buffer "(Uninitialized GNUGO Board)"))
   (buffer-disable-undo)                 ; todo: undo undo undoing
   (kill-all-local-variables)
@@ -1580,6 +1650,11 @@ starting a new one.  See `gnugo-board-mode' documentation for more info."
                               (message "(not quitting)"))))
             ("Q"        . (lambda () (interactive)
                             (kill-buffer nil)))
+            ("U"        . (lambda (x) (interactive "P")
+                            (gnugo-magic-undo
+                             (cond ((numberp x) (number-to-string x))
+                                   ((consp x) (number-to-string (car x)))
+                                   (t (gnugo-position))))))
             ("\C-l"     . gnugo-refresh)
             ("\M-_"     . bury-buffer)
             ("_"        . bury-buffer)
@@ -1604,89 +1679,103 @@ starting a new one.  See `gnugo-board-mode' documentation for more info."
             ("s"        . gnugo-write-sgf-file)
             ("\C-x\C-s" . gnugo-write-sgf-file)
             ("\C-x\C-w" . gnugo-write-sgf-file)
+            ("l"        . gnugo-read-sgf-file)
             ("F"        . gnugo-display-final-score)
             ;; mouse
             ([(down-mouse-1)] . gnugo-mouse-move)
             ([(down-mouse-3)] . gnugo-mouse-pass))))
 
-(flet ((sget (x) (get x :gnugo-gtp-command-spec))
-       (jam (cmd prop val) (put cmd :gnugo-gtp-command-spec
-                                (plist-put (sget cmd) prop val)))
-       (add (cmd prop val) (jam cmd prop (let ((cur (plist-get
-                                                     (sget cmd)
-                                                     prop)))
-                                           (if (null cur)
-                                               (list val)
-                                             (cons val (delete val cur)))))))
-  (jam 'help :full
-       (lambda (sel)
-         (info "(gnugo)GTP command reference")
-         (when sel (setq sel (intern (car sel))))
-         (let (buffer-read-only pad cur spec output found)
-           (flet ((note (s) (insert pad "[NOTE: gnugo.el " s ".]\n")))
-             (goto-char (point-min))
-             (save-excursion
-               (while (re-search-forward "^ *[*] \\([a-zA-Z_]+\\)\\(:.*\\)*\n"
-                                         (point-max) t)
-                 (unless pad
-                   (setq pad (make-string (- (match-beginning 1)
-                                             (match-beginning 0))
-                                          32)))
-                 (when (plist-get
-                        (setq spec
-                              (get (setq cur (intern (match-string 1)))
-                                   :gnugo-gtp-command-spec))
-                        :full)
-                   (note "handles this command completely"))
-                 (when (setq output (plist-get spec :output))
-                   (cond ((functionp output)
-                          (note "handles the output specially"))
-                         ((eq :discard output)
-                          (note "discards the output"))
-                         ((eq :message output)
-                          (note "displays the output in the echo area"))))
-                 (when (eq sel cur)
-                   (setq found (match-beginning 0))))))
-           (cond (found (goto-char found))
-                 ((not sel))
-                 (t (message "(no such command: %s)" sel))))))
-  (jam 'final_score :full
-       (lambda (sel) (gnugo-display-final-score)))
-  (dolist (command '(boardsize
-                     clear_board
-                     fixed_handicap
-                     loadsgf))
-    (jam command :output :discard)
-    (add command :post-hook (lambda ()
-                              (dolist (prop '(:game-over
-                                              :last-mover
-                                              :move-history))
-                                (gnugo-put prop nil))
-                              (flet ((n! (p q) (gnugo-put p
-                                                 (string-to-number
-                                                  (gnugo-query q)))))
-                                (n! :komi "get_komi")
-                                (n! :handicap "get_handicap")
-                                (n! :board-size "query_boardsize"))
-                              (gnugo-refresh t))))
-  (jam 'loadsgf :output
-       (lambda (ans)
-         (unless (string= "" ans)
-           (if (= ?= (aref ans 0))
-               (let* ((play (substring ans 2))
-                      (wait (gnugo-other play))
-                      (samep (string= (gnugo-get :user-color) play)))
-                 (unless samep
-                   (gnugo-put :gnugo-color wait)
-                   (gnugo-put :user-color play))
-                 ;; fixme: re-init :sgf-tree and :move-history here.
-                 (message "GNU Go %splays as %s, you as %s (%s)"
-                          (if samep "" "now ")
-                          wait play
-                          (if samep
-                              "as before"
-                            "NOTE: this is a switch!")))
-             (error ans))))))
+(unless (get 'help :gnugo-gtp-command-spec)
+  (flet ((sget (x) (get x :gnugo-gtp-command-spec))
+         (jam (cmd prop val) (put cmd :gnugo-gtp-command-spec
+                                  (plist-put (sget cmd) prop val)))
+         (add (cmd prop val) (jam cmd prop (let ((cur (plist-get
+                                                       (sget cmd)
+                                                       prop)))
+                                             (append (delete val cur)
+                                                     (list val)))))
+         (defgtp (x &rest props) (dolist (cmd (if (symbolp x) (list x) x))
+                                   (let ((ls props))
+                                     (while ls
+                                       (funcall (if (eq :post-hook (car ls))
+                                                    'add
+                                                  'jam)
+                                                cmd (car ls) (cadr ls))
+                                       (setq ls (cddr ls)))))))
+
+    (defgtp 'help :full
+      (lambda (sel)
+        (info "(gnugo)GTP command reference")
+        (when sel (setq sel (intern (car sel))))
+        (let (buffer-read-only pad cur spec output found)
+          (flet ((note (s) (insert pad "[NOTE: gnugo.el " s ".]\n")))
+            (goto-char (point-min))
+            (save-excursion
+              (while (re-search-forward "^ *[*] \\([a-zA-Z_]+\\)\\(:.*\\)*\n"
+                                        (point-max) t)
+                (unless pad
+                  (setq pad (make-string (- (match-beginning 1)
+                                            (match-beginning 0))
+                                         32)))
+                (when (plist-get
+                       (setq spec
+                             (get (setq cur (intern (match-string 1)))
+                                  :gnugo-gtp-command-spec))
+                       :full)
+                  (note "handles this command completely"))
+                (when (setq output (plist-get spec :output))
+                  (cond ((functionp output)
+                         (note "handles the output specially"))
+                        ((eq :discard output)
+                         (note "discards the output"))
+                        ((eq :message output)
+                         (note "displays the output in the echo area"))))
+                (when (eq sel cur)
+                  (setq found (match-beginning 0))))))
+          (cond (found (goto-char found))
+                ((not sel))
+                (t (message "(no such command: %s)" sel))))))
+
+    (defgtp 'final_score :full
+      (lambda (sel) (gnugo-display-final-score)))
+
+    (defgtp '(boardsize
+              clear_board
+              fixed_handicap
+              loadsgf)
+      :output :discard
+      :post-hook (lambda ()
+                   (dolist (prop '(:game-over
+                                   :last-mover
+                                   :move-history))
+                     (gnugo-put prop nil))
+                   (flet ((n! (p q) (gnugo-put p
+                                      (string-to-number
+                                       (gnugo-query q)))))
+                     (n! :komi "get_komi")
+                     (n! :handicap "get_handicap")
+                     (n! :board-size "query_boardsize"))
+                   (gnugo-refresh t)))
+
+    (defgtp 'loadsgf
+      :output (lambda (ans)
+                (unless (= ?= (aref ans 0))
+                  (error ans))
+                (let* ((play (substring ans 2))
+                       (wait (gnugo-other play))
+                       (samep (string= (gnugo-get :user-color) play)))
+                  (unless samep
+                    (gnugo-put :gnugo-color wait)
+                    (gnugo-put :user-color play))
+                  ;; fixme: re-init :sgf-tree and :move-history here.
+                  (message "GNU Go %splays as %s, you as %s (%s)"
+                           (if samep "" "now ")
+                           wait play (if samep
+                                         "as before"
+                                       "NOTE: this is a switch!")))))
+
+    (defgtp '(undo gg-undo) :full
+      (lambda (sel) (gnugo-magic-undo (if sel (car sel) "1"))))))
 
 (provide 'gnugo)
 
