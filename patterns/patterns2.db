@@ -2773,6 +2773,23 @@ Pattern Shape87
 ;!dead(a) && !dead(b) && weak(a) && weak(b) && oplay_disconnect(*,a,b)
 
 
+Pattern Shape88
+# gf New pattern. (3.7.2)
+# See gunnar:55.
+
+?X.X        more potential for followup ko threats one step to the right
+X*.X
+?XXO
+
+:8,sX,shape(-1)
+
+?XbX
+X*.X
+?AAO
+
+;lib(A)==2 && olib(*)==1 && olib(b)==1
+
+
 ###########################
 #
 # Followup moves. 
