@@ -189,10 +189,30 @@ loadsgf games/nngs/looknglass-ggl-200302271041.sgf 99
 470 gg_genmove black
 #? [R9]*
 
+loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 6
+480 gg_genmove black 2
+#? [R16]
 
+loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 12
+485 gg_genmove black 3
+#? [D17]
 
+loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 28
+487 gg_genmove black
+#? [P12]
 
+loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 38
+490 gg_genmove black
+#? [M14|N17|M16]
 
+loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 52
+510 owl_attack R8
+#? [0]
+
+#do something to help the C16 group
+loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 54
+520 restricted_genmove black J8 J9 H14 F13 E13 B16 G13 J15 C14
+#? [!J8|J9]
 
 
 
