@@ -66,11 +66,19 @@ void init_gnugo(float memory);
 
 /* Return codes for reading functions */
 
-#define WIN  3
-#define KO_A 2
+#define WIN  5
+#define KO_A 4
+#define GAIN 3
+#define LOSS 2
 #define KO_B 1
 #define LOSE 0
+
+/* FIXME: should this be changed too or not ? */
+#if 1
+#define CUT  4
+#else
 #define CUT  2
+#endif
 
 /* Group statuses */
 #define DEAD        0

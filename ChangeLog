@@ -6,6 +6,7 @@
 - break_chain2() removed; use new function break_chain2_defense_moves()
   instead
 - defend2() and defend3() simplified
+- new reading codes GAIN/LOSS for later use in owl
 - more consistent use of WIN and REVERSE_RESULT() macros
 - new function sgffile_load_and_print()
 - new call convention for sgftree* functions

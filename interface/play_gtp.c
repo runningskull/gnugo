@@ -2923,7 +2923,15 @@ gtp_report_uncertainty(char *s)
 static void
 gtp_print_code(int c)
 {
-  gtp_printf("%d", c ? 4-c : c);
+  static int conversion[6] = { 
+    0, /* LOSE */
+    3, /* KO_B */
+    5, /* LOSS */
+    4, /* GAIN */
+    2, /* KO_A */
+    1, /* WIN  */
+  };
+  gtp_printf("%d", conversion[c]);
 }
 
 static void
