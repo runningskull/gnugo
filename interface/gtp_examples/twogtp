@@ -188,6 +188,14 @@ sub get_random_seed {
     return $result;
 }
 
+sub get_program_name {
+    my $self = shift;
+
+    my $name = GTP::exec_cmd(${$self->in}, ${$self->out}, "name");
+    my $version = GTP::exec_cmd(${$self->in}, ${$self->out}, "version");
+    return "$name $version";
+}
+
 sub score {
     my $self = shift;
 
@@ -250,17 +258,22 @@ sub writesgf {
     my $handle = new FileHandle;
     $handle->open(">$sgffile") or
     	die "Can't write to $sgffile\n";
+    my $black_name = $self->black->get_program_name;
+    my $white_name = $self->white->get_program_name;
     my $black_seed = $self->black->get_random_seed;
     my $white_seed = $self->white->get_random_seed;
+    my $handicap = $self->handicap;
+    my $komi = $self->komi;
+    my $result = $self->result->resultw;
 
-    printf $handle "(;GM[1]FF[4]RU[Japanese]SZ[%s]HA[%s]KM[%s]RE[%s]GN[black seed:%s white seed:%s]",
-    $size, $self->handicap, $self->komi, $self->result->resultw, $self->black->get_random_seed,
-    $self->white->get_random_seed;
-    for my $stone (@{$self->handicap_stones}) {
-	printf $handle "AB[%s]", GTP::standard_to_sgf($self->size, $stone);
+    print $handle "(;GM[1]FF[4]RU[Japanese]SZ[$size]HA[$handicap]KM[$komi]RE[$result]\n";
+    print $handle "PW[$white_name (random seed $white_seed)]PB[$black_name (random seed $black_seed)]\n";
+    if ($handicap > 1) {
+	for my $stone (@{$self->handicap_stones}) {
+	    printf $handle "AB[%s]", GTP::standard_to_sgf($self->size, $stone);
+	}
+	print $handle "\n";
     }
-    print $handle "\n";
-
     my $toplay = $self->handicap < 2 ? 'B' : 'W';
     for my $move (@{$self->moves}) {
 	my $sgfmove = GTP::standard_to_sgf($size, $move);
