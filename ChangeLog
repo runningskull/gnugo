@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- influence debug output enhanced
 - defense functions in reading.c reorganized
 - eye_vertex and eye_graph structures reorganized
 - mkeyes.c rewritten to conform the changes in eyes.h

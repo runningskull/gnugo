@@ -38,8 +38,8 @@ static void print_influence(struct influence_data *q,
 			    const char *info_string);
 static void print_numeric_influence(struct influence_data *q,
 				    float values[BOARDMAX],
-				    const char *format, int draw_stones,
-				    int mark_epsilon);
+				    const char *format, int width,
+				    int draw_stones, int mark_epsilon);
 static void print_influence_areas(struct influence_data *q);
  
 static void value_territory(struct influence_data *q, int pos, int color);
@@ -1777,10 +1777,10 @@ compute_escape_influence(char goal[BOARDMAX], int color,
   if (0 && (debug & DEBUG_ESCAPE) && verbose > 0) {
     print_numeric_influence(&escape_influence,
 			    escape_influence.white_influence,
-			    "%3.0f", 3, 1);
+			    "%3.0f", 3, 1, 1);
     print_numeric_influence(&escape_influence,
 			    escape_influence.black_influence,
-			    "%3.0f", 3, 1);
+			    "%3.0f", 3, 1, 1);
   }    
 
   /* Save the computed values in the cache. */
@@ -2055,48 +2055,48 @@ print_influence(struct influence_data *q, const char *info_string)
   if (printmoyo & PRINTMOYO_ATTENUATION) {
     /* Print the attenuation values. */
     fprintf(stderr, "white attenuation (%s):\n", info_string);
-    print_numeric_influence(q, q->white_attenuation, "%3.2f", 0, 0);
+    print_numeric_influence(q, q->white_attenuation, "%3.2f", 3, 0, 0);
     fprintf(stderr, "black attenuation (%s):\n", info_string);
-    print_numeric_influence(q, q->black_attenuation, "%3.2f", 0, 0);
+    print_numeric_influence(q, q->black_attenuation, "%3.2f", 3, 0, 0);
   }
 
   if (printmoyo & PRINTMOYO_PERMEABILITY) {
     /* Print the white permeability values. */
     fprintf(stderr, "white permeability:\n");
-    print_numeric_influence(q, q->white_permeability, "%3.1f", 0, 0);
+    print_numeric_influence(q, q->white_permeability, "%3.1f", 3, 0, 0);
     
     /* Print the black permeability values. */
     fprintf(stderr, "black permeability:\n");
-    print_numeric_influence(q, q->black_permeability, "%3.1f", 0, 0);
+    print_numeric_influence(q, q->black_permeability, "%3.1f", 3, 0, 0);
   }
 
   if (printmoyo & PRINTMOYO_STRENGTH) {
     /* Print the strength values. */
     fprintf(stderr, "white strength:\n");
     if (q->is_territorial_influence)
-      print_numeric_influence(q, q->white_strength, "%5.1f", 0, 0);
+      print_numeric_influence(q, q->white_strength, "%5.1f", 5, 0, 0);
     else
-      print_numeric_influence(q, q->white_strength, "%3.0f", 0, 1);
+      print_numeric_influence(q, q->white_strength, "%3.0f", 3, 0, 1);
     fprintf(stderr, "black strength:\n");
     if (q->is_territorial_influence)
-      print_numeric_influence(q, q->black_strength, "%5.1f", 0, 0);
+      print_numeric_influence(q, q->black_strength, "%5.1f", 5, 0, 0);
     else
-      print_numeric_influence(q, q->black_strength, "%3.0f", 0, 1);
+      print_numeric_influence(q, q->black_strength, "%3.0f", 3, 0, 1);
   }
 
   if (printmoyo & PRINTMOYO_NUMERIC_INFLUENCE) {
     /* Print the white influence values. */
     fprintf(stderr, "white influence (%s):\n", info_string);
     if (q->is_territorial_influence)
-      print_numeric_influence(q, q->white_influence, "%5.1f", 5, 0);
+      print_numeric_influence(q, q->white_influence, "%5.1f", 5, 1, 0);
     else
-      print_numeric_influence(q, q->white_influence, "%3.0f", 3, 1);
+      print_numeric_influence(q, q->white_influence, "%3.0f", 3, 1, 1);
     /* Print the black influence values. */
     fprintf(stderr, "black influence (%s):\n", info_string);
     if (q->is_territorial_influence)
-      print_numeric_influence(q, q->black_influence, "%5.1f", 5, 0);
+      print_numeric_influence(q, q->black_influence, "%5.1f", 5, 1, 0);
     else
-      print_numeric_influence(q, q->black_influence, "%3.0f", 3, 1);
+      print_numeric_influence(q, q->black_influence, "%3.0f", 3, 1, 1);
   }
 
   if (printmoyo & PRINTMOYO_PRINT_INFLUENCE) {
@@ -2110,33 +2110,45 @@ static void
 print_influence_territory(struct influence_data *q, const char *info_string)
 {
   fprintf(stderr, info_string);
-  print_numeric_influence(q, q->territory_value, "%5.2f", 5, 0);
+  print_numeric_influence(q, q->territory_value, "%5.2f", 5, 1, 0);
 }
 
 
-char black_stone[8][10] = { "X", " X", "  X", "  X ", "  X  ", "   X  ",
-                         "   X   ", "    X   "};
-char white_stone[8][10] = { "O", " O", "  O", "  O ", "  O  ", "   O  ",
-                         "   O   ", "    O   "};
-/* Print numeric influence values.
- * If draw_stones is not zero, then it denotes the lenght (in characters)
- * of the numeric output fields.
- */ 
+/*
+ * Print numeric influence values.
+ */
 static void
 print_numeric_influence(struct influence_data *q,
 			float values[BOARDMAX],
-			const char *format,
-			int draw_stones,
-			int mark_epsilon)
+			const char *format, int width,
+			int draw_stones, int mark_epsilon)
 {
   int i, j;
+  char ch;
+  char format_stone[20];
+
+  memset(format_stone, ' ', 20);
+  format_stone[(width + 1) / 2] = '%';
+  format_stone[(width + 3) / 2] = 'c';
+  format_stone[width + 2] = 0;
+
+  fprintf(stderr, "   ");
+  for (i = 0, ch = 'A'; i < board_size; i++, ch++) {
+    if (ch == 'I')
+      ch++;
+    fprintf(stderr, format_stone, ch);
+  }
+  fprintf(stderr, "\n");
+
   for (i = 0; i < board_size; i++) {
+    int ii = board_size - i;
+    fprintf(stderr, "%2d ", ii);
     for (j = 0; j < board_size; j++) {
       int ii = POS(i, j);
       if (draw_stones && q->p[ii] == WHITE)
-	fprintf(stderr, white_stone[draw_stones]);
+	fprintf(stderr, format_stone, 'O');
       else if (draw_stones && q->p[ii] == BLACK)
-	fprintf(stderr, black_stone[draw_stones]);
+	fprintf(stderr, format_stone, 'X');
       else {
 	if (mark_epsilon && values[ii] > 0.0 && values[ii] < 1.0)
 	  fprintf(stderr, "eps");
@@ -2145,7 +2157,14 @@ print_numeric_influence(struct influence_data *q,
 	fprintf(stderr, " ");
       }
     }
-    fprintf(stderr, "\n");
+    fprintf(stderr, "%2d\n", ii);
+  }
+
+  fprintf(stderr, "   ");
+  for (i = 0, ch = 'A'; i < board_size; i++, ch++) {
+    if (ch == 'I')
+      ch++;
+    fprintf(stderr, format_stone, ch);
   }
   fprintf(stderr, "\n");
 }
