@@ -110,13 +110,13 @@ new_semeai(int color)
   if (num_dragons > MAX_DRAGONS)
     num_dragons = MAX_DRAGONS;
 
-  for (d1 = 0; d1 < number_of_dragons; d1++)
-    for (d2 = 0; d2 < number_of_dragons; d2++) {
+  for (d1 = 0; d1 < num_dragons; d1++)
+    for (d2 = 0; d2 < num_dragons; d2++) {
       semeai_results_first[d1][d2] = -1;
       semeai_results_second[d1][d2] = -1;
     }
 
-  for (d1 = 0; d1 < number_of_dragons; d1++)
+  for (d1 = 0; d1 < num_dragons; d1++)
     for (k = 0; k < dragon2[d1].neighbors; k++) {
       int apos = DRAGON(d1).origin;
       int bpos = DRAGON(dragon2[d1].adjacent[k]).origin;
@@ -181,14 +181,14 @@ new_semeai(int color)
 	    safety_to_string(semeai_results_second[d2][d1]));
     }
   
-  for (d1 = 0; d1 < number_of_dragons; d1++) {
+  for (d1 = 0; d1 < num_dragons; d1++) {
     int semeai_found = 0;
     int best_result = UNKNOWN;
     int worst_result = UNKNOWN;
     int defense_move = PASS_MOVE;
     int attack_move = PASS_MOVE;
     
-    for (d2 = 0; d2 < number_of_dragons; d2++) {
+    for (d2 = 0; d2 < num_dragons; d2++) {
       if (semeai_results_first[d1][d2] == -1)
 	continue;
       gg_assert (semeai_results_second[d1][d2] != -1)
