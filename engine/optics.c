@@ -65,13 +65,13 @@ static void originate_eye(int origin, int pos,
 			  int *esize, int *msize,
 			  struct eye_data eye[BOARDMAX]);
 static int recognize_eye(int pos, int *attack_point, int *defense_point,
-			 int *max, int *min, 
+			 char *max, char *min, 
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
 			 int add_moves, int color);
 static void guess_eye_space(int pos, int effective_eyesize, int margins,
 			    struct eye_data eye[BOARDMAX],
-			    int *max, int *min, int *pessimistic_min);
+			    char *max, char *min, char *pessimistic_min);
 static void first_map(int q, int map[MAXEYE]);
 static int next_map(int *q, int map[MAXEYE], int esize);
 static void print_eye(struct eye_data eye[BOARDMAX],
@@ -79,8 +79,7 @@ static void print_eye(struct eye_data eye[BOARDMAX],
 static float 
 evaluate_diagonal_intersection(int m, int n, int color,
 			       int *attack_point, int *defense_point,
-			       struct eye_data b_eye[BOARDMAX],
-			       struct eye_data w_eye[BOARDMAX]);
+			       struct eye_data my_eye[BOARDMAX]);
 
 
 /* These are used during the calculations of eye spaces. */
@@ -135,8 +134,10 @@ make_domains(struct eye_data b_eye[BOARDMAX],
   /* Initialize eye data and compute the lively array. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos)) {
-      clear_eye(&(b_eye[pos]));
-      clear_eye(&(w_eye[pos]));
+      if (b_eye)
+        clear_eye(&(b_eye[pos]));
+      if (w_eye)
+        clear_eye(&(w_eye[pos]));
       lively[pos] = is_lively(owl_call, pos);
     }
 
@@ -153,10 +154,12 @@ make_domains(struct eye_data b_eye[BOARDMAX],
       pos = POS(i, j);
       if (board[pos] == EMPTY || !lively[pos]) {
 	if (black_domain[pos] == 0 && white_domain[pos] == 0) {
-	  w_eye[pos].color = GRAY;
-	  b_eye[pos].color = GRAY;
+	  if (w_eye)
+	    w_eye[pos].color = GRAY;
+	  if (b_eye)
+	    b_eye[pos].color = GRAY;
 	}
-	else if (black_domain[pos] == 1 && white_domain[pos] == 0) {
+	else if (black_domain[pos] == 1 && white_domain[pos] == 0 && b_eye) {
 	  b_eye[pos].color = BLACK_BORDER;
 	  for (k = 0; k < 4; k++) {
 	    int apos = pos + delta[k];
@@ -166,7 +169,7 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	    }
 	  }
 	}
-	else if (black_domain[pos] == 0 && white_domain[pos] == 1) {
+	else if (black_domain[pos] == 0 && white_domain[pos] == 1 && w_eye) {
 	  w_eye[pos].color = WHITE_BORDER;
 	  for (k = 0; k < 4; k++) {
 	    int apos = pos + delta[k];
@@ -177,27 +180,33 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	  }
 	}
 	else if (black_domain[pos] == 1 && white_domain[pos] == 1) {
-	  for (k = 0; k < 4; k++) {
-	    int apos = pos + delta[k];
-	    if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
-	      b_eye[pos].marginal = 1;
-	      b_eye[pos].color = BLACK_BORDER;
-	      break;
+	  if (b_eye) {
+	    for (k = 0; k < 4; k++) {
+	      int apos = pos + delta[k];
+	      if (ON_BOARD(apos) && black_domain[apos]
+		  && !white_domain[apos]) {
+		b_eye[pos].marginal = 1;
+		b_eye[pos].color = BLACK_BORDER;
+		break;
+	      }
 	    }
+	    if (k == 4)
+	      b_eye[pos].color = GRAY;
 	  }
-	  if (k == 4)
-	    b_eye[pos].color = GRAY;
-	  
-	  for (k = 0; k < 4; k++) {
-	    int apos = pos + delta[k];
-	    if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
-	      w_eye[pos].marginal = 1;
-	      w_eye[pos].color = WHITE_BORDER;
-	      break;
+
+	  if (w_eye) {
+	    for (k = 0; k < 4; k++) {
+	      int apos = pos + delta[k];
+	      if (ON_BOARD(apos) && white_domain[apos]
+		  && !black_domain[apos]) {
+		w_eye[pos].marginal = 1;
+		w_eye[pos].color = WHITE_BORDER;
+		break;
+	      }
 	    }
+	    if (k == 4)
+	      w_eye[pos].color = GRAY;
 	  }
-	  if (k == 4)
-	    w_eye[pos].color = GRAY;
 	}
       }
     }
@@ -208,13 +217,14 @@ make_domains(struct eye_data b_eye[BOARDMAX],
    * reflect the weakness in the position. The following test fails
    * if called from the owl code.
    */
-  if (b_eye == black_eye)
+  if (!owl_call)
     find_cuts();
   
  /* The eye spaces are all found. Now we need to find the origins. */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      pos = POS(i, j);
+  if (b_eye)
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos))
+	continue;
       if (b_eye[pos].origin == NO_MOVE 
 	  && b_eye[pos].color == BLACK_BORDER)
       {
@@ -227,9 +237,10 @@ make_domains(struct eye_data b_eye[BOARDMAX],
       }
     }
 
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      pos = POS(i, j);
+  if (w_eye)
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos))
+	continue;
       if (w_eye[pos].origin == NO_MOVE
 	  && w_eye[pos].color == WHITE_BORDER)
       {
@@ -245,8 +256,10 @@ make_domains(struct eye_data b_eye[BOARDMAX],
   /* Now we count the number of neighbors and marginal neighbors
    * of each vertex.
    */
-  count_neighbours(b_eye);
-  count_neighbours(w_eye);
+  if (b_eye)
+    count_neighbours(b_eye);
+  if (w_eye)
+    count_neighbours(w_eye);
 }
 
 
@@ -729,7 +742,7 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
  */
 
 void
-compute_eyes(int pos, int *max, int *min,
+compute_eyes(int pos, char *max, char *min,
 	     int *attack_point, int *defense_point,
 	     struct eye_data eye[BOARDMAX],
 	     struct half_eye_data heye[BOARDMAX],
@@ -747,7 +760,7 @@ compute_eyes(int pos, int *max, int *min,
   
   /* First we try to let the life code evaluate the eye space. */
   if (life && eye[pos].esize <= life_eyesize) {
-    int max1, min1;
+    char max1, min1;
     int attack_point1;
     int defense_point1;
     int status;
@@ -829,8 +842,8 @@ compute_eyes(int pos, int *max, int *min,
  * been removed.
  */
 void
-compute_eyes_pessimistic(int pos, int *max, int *min,
-			 int *pessimistic_min,
+compute_eyes_pessimistic(int pos, char *max, char *min,
+			 char *pessimistic_min,
 			 int *attack_point, int *defense_point,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX])
@@ -1000,7 +1013,7 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
 static void
 guess_eye_space(int pos, int effective_eyesize, int margins,
 		struct eye_data eye[BOARDMAX],
-		int *max, int *min, int *pessimistic_min)
+		char *max, char *min, char *pessimistic_min)
 {
   if (effective_eyesize > 3) {
     *min = 2;
@@ -1047,7 +1060,7 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
 
 static int
 recognize_eye(int pos, int *attack_point, int *defense_point,
-	      int *max, int *min, 
+	      char *max, char *min, 
 	      struct eye_data eye[BOARDMAX], 
 	      struct half_eye_data heye[BOARDMAX], 
 	      int add_moves, int color)
@@ -1470,12 +1483,13 @@ is_halfeye(struct half_eye_data heye[BOARDMAX], int pos)
  *
  * Attack and defense points for control of the diagonals are stored
  * in the heye[] array.
+ *
+ * my_eye is the eye space information with respect to (color).
  */
 
 float
 topological_eye(int pos, int color,
-		struct eye_data b_eye[BOARDMAX],
-		struct eye_data w_eye[BOARDMAX],
+		struct eye_data my_eye[BOARDMAX],
 		struct half_eye_data heye[BOARDMAX])
 {
   float sum = 0.0;
@@ -1499,7 +1513,7 @@ topological_eye(int pos, int color,
     val = evaluate_diagonal_intersection(I(pos) + deltai[k],
 					 J(pos) + deltaj[k], color,
 					 &attack_point, &defense_point, 
-					 b_eye, w_eye);
+					 my_eye);
     sum += val;
     if (val > 0.0 && val < 2.0) {
       /* Diagonals off the edge has value 1.0 but no attack or defense
@@ -1592,12 +1606,13 @@ topological_eye(int pos, int color,
  * Notice that it's necessary to pass the coordinates separately
  * instead of as a 1D coordinate. The reason is that the 1D mapping
  * can't uniquely identify "off the corner" points.
+ *
+ * my_eye has to be the eye_data with respect to color.
  */
 static float
 evaluate_diagonal_intersection(int m, int n, int color,
 			       int *attack_point, int *defense_point,
-			       struct eye_data b_eye[BOARDMAX],
-			       struct eye_data w_eye[BOARDMAX])
+			       struct eye_data my_eye[BOARDMAX])
 {
   float value = 0;
   int other = OTHER_COLOR(color);
@@ -1663,17 +1678,10 @@ evaluate_diagonal_intersection(int m, int n, int color,
    * so we can clearly see why having two marginal vertices makes a
    * difference.)
    */
-  if (color == BLACK
-      && b_eye[pos].color == BLACK_BORDER
-      && !b_eye[pos].marginal
-      && b_eye[pos].marginal_neighbors < 2
-      && !(board[pos] == EMPTY && does_capture_something(pos, WHITE)))
-    return 0.0;
-  if (color == WHITE
-      && w_eye[pos].color == WHITE_BORDER
-      && !w_eye[pos].marginal
-      && w_eye[pos].marginal_neighbors < 2
-      && !(board[pos] == EMPTY && does_capture_something(pos, BLACK)))
+   if (my_eye[pos].color == BORDER_COLOR(color)
+       && !my_eye[pos].marginal
+       && my_eye[pos].marginal_neighbors < 2
+       && !(board[pos] == EMPTY && does_capture_something(pos, other)))
     return 0.0;
 
   if (board[pos] == EMPTY) {

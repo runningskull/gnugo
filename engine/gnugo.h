@@ -60,8 +60,9 @@ void init_gnugo(float memory);
 #define ANCHOR_OTHER 7
 
 
-#define OTHER_COLOR(color)  (WHITE+BLACK-(color))
-#define IS_STONE(arg)  ((arg) == WHITE || (arg) == BLACK)
+#define OTHER_COLOR(color)  	(WHITE+BLACK-(color))
+#define IS_STONE(arg)   	((arg) == WHITE || (arg) == BLACK)
+#define BORDER_COLOR(color)	(color + WHITE_BORDER - WHITE)
 
 /* Return codes for reading functions */
 

@@ -545,7 +545,7 @@ void
 decide_eye(int pos, const char *sgf_output)
 {
   int color;
-  int max, min;
+  char max, min;
   int attack_point;
   int defense_point;
   int eyepos;

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- struct local_owl_data for speedup only holds eye space of relevant color
+- owl_eyespace() and allies use only one eyespace
 - dfa doesn't report symmetric patterns multiple times
 - escape patterns in owl_defendpats.db given E classification
 - owl_determine_life() not called during escape attempt

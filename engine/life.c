@@ -604,7 +604,7 @@ prepare_eyespace(int pos, struct eye_data eyedata[BOARDMAX],
 
 int
 recognize_eye2(int pos, int *attack_point, int *defense_point,
-	       int *max, int *min, 
+	       char *max, char *min, 
 	       struct eye_data eyedata[BOARDMAX],
 	       struct half_eye_data heye[BOARDMAX],
  	       int add_moves, int color)

@@ -1455,7 +1455,7 @@ static int
 gtp_eval_eye(char *s, int id)
 {
   int m, n;
-  int max, min;
+  char max, min;
   int attack_point;
   int defense_point;
   int pos;

@@ -192,7 +192,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       if (black_eye[str].color == BLACK_BORDER
 	  && (!black_eye[str].marginal || life)
 	  && black_eye[str].neighbors <= 1) {
-	sum = topological_eye(str, BLACK, black_eye, white_eye, half_eye);
+	sum = topological_eye(str, BLACK, black_eye, half_eye);
 	if (sum >= 4.0) {
 	  half_eye[str].type = FALSE_EYE;
 	  if (black_eye[str].esize == 1
@@ -207,7 +207,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       if (white_eye[str].color == WHITE_BORDER
 	  && (!white_eye[str].marginal || life)
 	  && white_eye[str].neighbors <= 1) {
-	sum = topological_eye(str, WHITE, black_eye, white_eye, half_eye);
+	sum = topological_eye(str, WHITE, white_eye, half_eye);
 	if (sum >= 4.0) {
 	  half_eye[str].type = FALSE_EYE;
 	  if (white_eye[str].esize == 1
@@ -233,7 +233,8 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       if (black_eye[str].color == BLACK_BORDER
 	  && black_eye[str].origin == str)
       {
-	int max, min, attack_point, defense_point;
+	char max, min;
+	int attack_point, defense_point;
 
 	compute_eyes(str, &max, &min, &attack_point, &defense_point, 
 		     black_eye, half_eye, 1, color);
@@ -249,7 +250,8 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       if (white_eye[str].color == WHITE_BORDER
 	  && white_eye[str].origin == str)
       {
-	int max, min, attack_point, defense_point;
+	char max, min;
+	int attack_point, defense_point;
 
 	compute_eyes(str, &max, &min, &attack_point, &defense_point,
 		     white_eye, half_eye, 1, color);

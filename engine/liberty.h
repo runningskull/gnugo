@@ -413,9 +413,9 @@ void get_saved_dragons(int pos, int saved[BOARDMAX]);
 int owl_lively(int pos);
 int owl_escape_value(int pos);
 int owl_goal_dragon(int pos);
-int owl_eyespace(int apos, int bpos);
-int owl_big_eyespace(int apos, int bpos);
-int owl_proper_eye(int apos, int bpos);
+int owl_eyespace(int apos);
+int owl_big_eyespace(int apos);
+int owl_proper_eye(int apos);
 void owl_reasons(int color);
 
 void unconditional_life(int unconditional_territory[BOARDMAX], int color);
@@ -659,7 +659,7 @@ extern struct stats_data stats;
 
 struct half_eye_data {
   float value;      /* Topological eye value. */
-  int type;         /* HALF_EYE or FALSE_EYE; */
+  char type;         /* HALF_EYE or FALSE_EYE; */
   int num_attacks;  /* number of attacking points */
   int attack_point[4];  /* the move to attack a topological halfeye */
   int num_defends;      /* number of defending points */
@@ -804,8 +804,8 @@ struct eye_data {
   int esize;         /* size of the eyespace                                 */
   int msize;         /* number of marginal vertices                          */
   int origin;        /* The origin                                           */
-  int maxeye;        /* number of eyes if defender plays first               */
-  int mineye;        /* number of eyes if attacker plays first               */
+  char maxeye;       /* number of eyes if defender plays first               */
+  char mineye;       /* number of eyes if attacker plays first               */
   int attack_point;  /* vital point for attack                               */
   int defense_point; /* vital point for defense                              */
 
@@ -813,11 +813,11 @@ struct eye_data {
   /* ---------------------------------------------------------------- */
   /* The below fields are not. */
 
-  int marginal;             /* This vertex is marginal                    */
-  int type;                 /* Various characteristics of the eyespace    */
-  int neighbors;            /* number of neighbors in eyespace            */
-  int marginal_neighbors;   /* number of marginal neighbors               */
-  int cut;                  /* Opponent can cut at vertex.                */
+  char marginal;             /* This vertex is marginal                    */
+  char type;                 /* Various characteristics of the eyespace    */
+  char neighbors;            /* number of neighbors in eyespace            */
+  char marginal_neighbors;   /* number of marginal neighbors               */
+  char cut;                  /* Opponent can cut at vertex.                */
 };
 
 typedef struct eye_data row_of_eye_data[BOARDMAX];
@@ -829,18 +829,18 @@ extern struct eye_data black_eye[BOARDMAX];
  * definition of struct eye_data or struct half_eye_data.
  */
 
-void compute_eyes(int pos, int *max, int *min,
+void compute_eyes(int pos, char *max, char *min,
                   int *attack_point, int *defense_point,
                   struct eye_data eye[BOARDMAX],
                   struct half_eye_data heye[BOARDMAX],
                   int add_moves, int color);
-void compute_eyes_pessimistic(int pos, int *max, int *min,
-                              int *pessimistic_min,
+void compute_eyes_pessimistic(int pos, char *max, char *min,
+                              char *pessimistic_min,
                               int *attack_point, int *defense_point,
                               struct eye_data eye[BOARDMAX],
                               struct half_eye_data heye[BOARDMAX]);
 int recognize_eye2(int pos, int *attack_point,
-		   int *defense_point, int *max, int *min,
+		   int *defense_point, char *max, char *min,
 		   struct eye_data eye[BOARDMAX],
 		   struct half_eye_data heye[BOARDMAX],
                     int add_moves, int color);
@@ -848,8 +848,7 @@ void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
 int find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
 		     int dragons[], int max_dragons);
 float topological_eye(int pos, int color,
-		      struct eye_data b_eye[BOARDMAX],
-		      struct eye_data w_eye[BOARDMAX],
+		      struct eye_data my_eye[BOARDMAX],
 		      struct half_eye_data heye[BOARDMAX]);
 void add_false_eye(int pos, struct eye_data eye[BOARDMAX], 
 		   struct half_eye_data heye[BOARDMAX]);

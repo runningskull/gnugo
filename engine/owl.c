@@ -71,8 +71,7 @@ struct local_owl_data {
   int escape_values[BOARDMAX];
   int color;
 
-  struct eye_data black_eye[BOARDMAX];
-  struct eye_data white_eye[BOARDMAX];
+  struct eye_data my_eye[BOARDMAX];
   /* array of half-eye data for use during owl reading */
   struct half_eye_data half_eye[BOARDMAX];
   
@@ -81,7 +80,7 @@ struct local_owl_data {
   int lunch_attack_point[MAX_LUNCHES];
   int lunch_defend_code[MAX_LUNCHES];
   int lunch_defense_point[MAX_LUNCHES];
-  int inessential[BOARDMAX];
+  char inessential[BOARDMAX];
   
   int lunches_are_current; /* If true, owl lunch data is current */  
 
@@ -463,27 +462,15 @@ do_owl_analyze_semeai(int apos, int bpos,
       }
     }
 #endif
-    if (color == BLACK)
-      owl_determine_life(owla, owlb, owla->black_eye,
-			 BLACK, komaster, 1, 
-			 vital_defensive_moves,
-			 &probable_mina, &probable_maxa);
-    else
-      owl_determine_life(owla, owlb, owla->white_eye,
-			 WHITE, komaster, 1, 
-			 vital_defensive_moves,
-			 &probable_mina, &probable_maxa);
-    if (other == BLACK)
-      owl_determine_life(owlb, owla, owlb->black_eye,
-			 BLACK, komaster, 1,
-			 vital_offensive_moves,
-			 &probable_minb, &probable_maxb);
-    else
-      owl_determine_life(owlb, owla, owlb->white_eye,
-			 WHITE, komaster, 1, 
-			 vital_offensive_moves,
-			 &probable_minb, &probable_maxb);
-    
+    owl_determine_life(owla, owlb, owla->my_eye,
+		       color, komaster, 1, 
+		       vital_defensive_moves,
+		       &probable_mina, &probable_maxa);
+    owl_determine_life(owlb, owla, owlb->my_eye,
+		       other, komaster, 1,
+		       vital_offensive_moves,
+		       &probable_minb, &probable_maxb);
+
     /* Certain cases can be handled immediately. */
     /* I live, you die, no move needed. */
     if ((probable_mina >= 2) && (probable_maxb < 2)) {
@@ -1209,15 +1196,10 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
     
     sgf_dumptree = NULL;
     count_variations = 0;
-    if (color == BLACK)
-      true_genus = owl_determine_life(owl, NULL, owl->black_eye,
-				      BLACK, komaster, 1, vital_moves,
-				      &probable_min, &probable_max);
-    else 
-      true_genus = owl_determine_life(owl, NULL, owl->white_eye,
-				      WHITE, komaster, 1, vital_moves,
-				      &probable_min, &probable_max);
-    
+    true_genus = owl_determine_life(owl, NULL, owl->my_eye,
+				    color, komaster, 1, vital_moves,
+				    &probable_min, &probable_max);
+
     current_owl_data = owl;
     memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
 
@@ -1823,15 +1805,11 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     
     sgf_dumptree = NULL;
     count_variations = 0;
+
     if (escape < MAX_ESCAPE) {
-      if (color == BLACK)
-	true_genus = owl_determine_life(owl, NULL, owl->black_eye,
-					BLACK, komaster, 0, vital_moves,
-					&probable_min, &probable_max);
-      else 
-	true_genus = owl_determine_life(owl, NULL, owl->white_eye,
-					WHITE, komaster, 0, vital_moves,
-					&probable_min, &probable_max);
+      true_genus = owl_determine_life(owl, NULL, owl->my_eye,
+				      color, komaster, 0, vital_moves,
+				      &probable_min, &probable_max);
     }
     else {
       vital_moves[0].pos = 0;
@@ -2216,9 +2194,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
  * moves or vital defense moves.
  *
  * The dragon is specified by the information in the owl struct. The
- * color of the dragon is passed in the color parameter. If color is
- * BLACK, eye should be owl->black_eye and if color is WHITE, eye
- * should be owl->white_eye.
+ * color of the dragon is passed in the color parameter.
  *
  * For use in the semeai code, a second dragon 
  *
@@ -2242,7 +2218,7 @@ owl_determine_life(struct local_owl_data *owl,
   signed char mx[BOARDMAX]; /* mark potential half or false eyes */
   int vital_values[BOARDMAX];
   int true_genus = 0;
-  int max, min, pessimistic_min;
+  char max, min, pessimistic_min;
   int attack_point;
   int defense_point;
   int m, n;
@@ -2354,8 +2330,7 @@ owl_determine_life(struct local_owl_data *owl,
 	mx[pos] = -1;
 	topological_intersections--;
 	
-	sum = topological_eye(pos, color, owl->black_eye, owl->white_eye,
-			      owl->half_eye);
+	sum = topological_eye(pos, color, owl->my_eye, owl->half_eye);
 	
 	if (sum >= 4.0) {
 	  /* False eye. */
@@ -3997,18 +3972,29 @@ static void
 owl_make_domains(struct local_owl_data *owla, struct local_owl_data *owlb)
 {
   /* We need to set this so that owl_lively() can be used. */
+  struct eye_data *black_eye = NULL;
+  struct eye_data *white_eye = NULL;
+  
   current_owl_data = owla;
   other_owl_data = owlb;
-  
+
   if (!owla->lunches_are_current)
     owl_find_lunches(owla);
-  make_domains(owla->black_eye, owla->white_eye, 1);
+  if (owla->color == BLACK)
+    black_eye = owla->my_eye;
+  else
+    white_eye = owla->my_eye;
   
   if (owlb) {
+    gg_assert(owla->color == OTHER_COLOR(owlb->color));
     if (!owlb->lunches_are_current)
       owl_find_lunches(owlb);
-    make_domains(owlb->black_eye, owlb->white_eye, 1);
+    if (owlb->color == BLACK)
+      black_eye = owlb->my_eye;
+    else
+      white_eye = owlb->my_eye;
   }
+  make_domains(black_eye, white_eye, 1);
 }
 
 /* True unless (pos) is EMPTY or occupied by a lunch for the goal dragon.  
@@ -4424,73 +4410,53 @@ owl_goal_dragon(int pos)
 }
 
 /* Used by autohelpers.
- * Returns 1 if (apos) is an eyespace for the color having a stone
- * at (bpos), but only if it's worth at least a half eye.
+ * Returns 1 if (apos) is an eyespace for the color of the dragon currently
+ * under owl investigation.
  */
 int
-owl_eyespace(int apos, int bpos)
+owl_eyespace(int apos)
 {
   int origin;
-  ASSERT1(IS_STONE(board[bpos]), bpos);
   ASSERT_ON_BOARD1(apos);
   
-  if (board[bpos] == WHITE) {
-    origin = current_owl_data->white_eye[apos].origin;
-    return (ON_BOARD(origin)
-	    && current_owl_data->white_eye[origin].color == WHITE_BORDER
-	    && current_owl_data->white_eye[origin].maxeye > 0);
-  }
-  else {
-    origin = current_owl_data->black_eye[apos].origin;
-    return (ON_BOARD(origin)
-	    && current_owl_data->black_eye[origin].color == BLACK_BORDER
-	    && current_owl_data->black_eye[origin].maxeye > 0);
-  }
+  origin = current_owl_data->my_eye[apos].origin;
+  return (ON_BOARD(origin)
+	  && current_owl_data->my_eye[origin].color
+	  	== BORDER_COLOR(current_owl_data->color)
+	  && current_owl_data->my_eye[origin].maxeye > 0);
 }
-  
+
 
 /* Used by autohelpers.
- * Returns 1 if (apos) is an eyespace for the color having a stone
- * at (bpos), which is possibly worth 2 eyes.
+ * Returns 1 if (apos) is an eyespace for the color of the dragon currently
+ * under owl inverstigation, which is possibly worth 2 eyes.
  */
 int
-owl_big_eyespace(int apos, int bpos)
+owl_big_eyespace(int apos)
 {
   int origin;
-  ASSERT1(IS_STONE(board[bpos]), bpos);
   ASSERT_ON_BOARD1(apos);
 
-  if (board[bpos] == WHITE) {
-    origin = current_owl_data->white_eye[apos].origin;
-    return (ON_BOARD(origin) 
-	    && current_owl_data->white_eye[origin].color == WHITE_BORDER
-	    && current_owl_data->white_eye[origin].maxeye == 2);
-  }
-  else {
-    origin = current_owl_data->black_eye[apos].origin;
-    return (ON_BOARD(origin)
-	    && current_owl_data->black_eye[origin].color == BLACK_BORDER
-	    && current_owl_data->black_eye[origin].maxeye == 2);
-  }
+  origin = current_owl_data->my_eye[apos].origin;
+  return (ON_BOARD(origin) 
+	  && current_owl_data->my_eye[origin].color
+	  	== BORDER_COLOR(current_owl_data->color)
+	  && current_owl_data->my_eye[origin].maxeye == 2);
 }
-  
+
 
 /* Used by autohelpers.
- * Returns 1 if (apos) is a non-marginal eyespace for the color having
- * a stone at (bpos).
+ * Returns 1 if (apos) is a non-marginal eyespace for the color of the
+ * dragon currently under owl investigation.
  */
 int
-owl_proper_eye(int apos, int bpos)
+owl_proper_eye(int apos)
 {
-  ASSERT1(IS_STONE(board[bpos]), bpos);
   ASSERT_ON_BOARD1(apos);
 
-  if (board[bpos] == WHITE)
-    return (current_owl_data->white_eye[apos].color == WHITE_BORDER
-	    && !current_owl_data->white_eye[apos].marginal);
-  else
-    return (current_owl_data->black_eye[apos].color == BLACK_BORDER
-	    && !current_owl_data->black_eye[apos].marginal);
+  return (current_owl_data->my_eye[apos].color
+            == BORDER_COLOR(current_owl_data->color)
+	  && !current_owl_data->my_eye[apos].marginal);
 }
   
 

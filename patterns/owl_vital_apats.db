@@ -178,7 +178,7 @@ X*           atari inside eyespace
 
 A*
 
-;lib(A)==2 && olib(*)>1 && owl_big_eyespace(*,A)
+;lib(A)==2 && olib(*)>1 && owl_big_eyespace(*)
 
 
 Pattern VA10
@@ -189,7 +189,7 @@ X*           atari inside eyespace with ko
 
 A*
 
-;lib(A)==2 && olib(*)==1 && owl_big_eyespace(*,A) && oplay_attack(*,*)!=WIN
+;lib(A)==2 && olib(*)==1 && owl_big_eyespace(*) && oplay_attack(*,*)!=WIN
 
 
 Pattern VA11
@@ -255,7 +255,7 @@ ODa
 *Dc
 ---
 
-;lib(b)>1 && lib(c)>1 && owl_eyespace(a,D) && !attack(D)
+;lib(b)>1 && lib(c)>1 && owl_eyespace(a) && !attack(D)
 
 
 Pattern VA15
@@ -287,7 +287,7 @@ X..?
 .*Xx
 X..?
 
-;owl_eyespace(*,A)
+;owl_eyespace(*)
 
 
 Pattern VA17
@@ -335,7 +335,7 @@ A.*.
 AA..
 ----
 
-;lib(A)==2 && owl_big_eyespace(*,A)
+;lib(A)==2 && owl_big_eyespace(*)
 
 
 Pattern VA20
@@ -376,7 +376,7 @@ XO?
 .a.
 ---
 
-;owl_big_eyespace(a,B)
+;owl_big_eyespace(a)
 
 
 Pattern VA22
@@ -394,7 +394,7 @@ xaO
 ...
 ---
 
-;owl_big_eyespace(*,B) && oplay_attack(*,a,B)
+;owl_big_eyespace(*) && oplay_attack(*,a,B)
 
 
 Pattern VA23
@@ -414,7 +414,7 @@ xc*D
 ....
 ----
 
-;owl_big_eyespace(*,D) && oplay_attack(*,a,b,c,a)
+;owl_big_eyespace(*) && oplay_attack(*,a,b,c,a)
 
 
 Pattern VA24
@@ -426,7 +426,7 @@ X*           capture inside eyespace, not ko
 
 A*
 
-;lib(A)==1 && owl_eyespace(*,A) && olib(*) > 0
+;lib(A)==1 && owl_eyespace(*) && olib(*) > 0
 
 
 Pattern VA25
@@ -529,7 +529,7 @@ X.*X
 Xa*X
 ?CC?
 
-;lib(C)==2 && owl_eyespace(a,C) && oplay_attack(*,a,b,b)!=WIN
+;lib(C)==2 && owl_eyespace(a) && oplay_attack(*,a,b,b)!=WIN
 
 
 Pattern VA31
@@ -651,7 +651,7 @@ x..
 ...
 ---
 
-;owl_big_eyespace(*,A) && !oplay_defend(*,A)
+;owl_big_eyespace(*) && !oplay_defend(*,A)
 
 
 Pattern VA39
@@ -667,7 +667,7 @@ XO*|
 ABX|
 XOO|
 
-; owl_eyespace(A,B)
+; owl_eyespace(A)
 
 
 Pattern VA40
@@ -750,8 +750,8 @@ o*o
 XBd
 A*C
 
-; owl_proper_eye(*,d)
-; && (owl_proper_eye(A,d) + owl_proper_eye(B,d) + owl_proper_eye(C,d) > 2)
+; owl_proper_eye(*)
+; && (owl_proper_eye(A) + owl_proper_eye(B) + owl_proper_eye(C) > 2)
 ; && safe_xmove(*)
 
 
@@ -826,7 +826,7 @@ oX
 X*
 AB
 
-; lib(B) <= 2 && owl_eyespace(A,B)
+; lib(B) <= 2 && owl_eyespace(A)
 
 
 # END OF FILE

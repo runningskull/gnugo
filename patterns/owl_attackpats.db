@@ -1612,7 +1612,7 @@ O*ax
 ...x
 ----
 
-;owl_eyespace(a,B)
+;owl_eyespace(a)
 
 
 Pattern A512
@@ -1705,8 +1705,8 @@ xCX.a
 DB*..
 -----
 
-;!attack(a) && owl_proper_eye(B,C)
-;&& (x_somewhere(D) || owl_proper_eye(D,C))
+;!attack(a) && owl_proper_eye(B)
+;&& (x_somewhere(D) || owl_proper_eye(D))
 
 
 Pattern A603b
@@ -1722,7 +1722,7 @@ xC.x
 b*.a
 ----
 
-;owl_eyespace(b,C) && !attack(a)
+;owl_eyespace(b) && !attack(a)
 
 
 Pattern A604
@@ -1786,7 +1786,7 @@ xCa
 b*a
 ---
 
-;!oplay_attack(*,b,a) && owl_eyespace(b,C)
+;!oplay_attack(*,b,a) && owl_eyespace(b)
 
 
 Pattern A608
@@ -2054,7 +2054,7 @@ OXOX
 #X.B
 #?a?
 #
-#;owl_eyespace(a,B)
+#;owl_eyespace(a)
 
 
 Pattern A705b
@@ -2069,7 +2069,7 @@ X*X
 X*B
 ?a?
 
-;owl_eyespace(a,B) && xlib(c) <= 2 && oplay_attack(*,c,c)
+;owl_eyespace(a) && xlib(c) <= 2 && oplay_attack(*,c,c)
 
 
 Pattern A706
@@ -2215,7 +2215,7 @@ x..x
 x.bx
 ?xCa
 
-;owl_eyespace(b,C) && !owl_proper_eye(*,C) && !attack(a)
+;owl_eyespace(b) && !owl_proper_eye(*) && !attack(a)
 
 
 Pattern A716
@@ -2247,7 +2247,7 @@ XO*X
 XO*X
 ?XAb
 
-; owl_big_eyespace(A,b)
+; owl_big_eyespace(A)
 ; && oplay_attack(*,b)
 
 
@@ -2403,7 +2403,7 @@ X.X        safe invasion into eye
 A.X
 ?*?
 
-;owl_eyespace(*,A) && safe_omove(*)
+;owl_eyespace(*) && safe_omove(*)
 
 
 Pattern A811
@@ -2420,8 +2420,8 @@ XbD
 .*X
 
 ; lib(D) <= 3
-; && owl_proper_eye(a,C)
-; && owl_proper_eye(b,C)
+; && owl_proper_eye(a)
+; && owl_proper_eye(b)
 
 
 #########################################################
@@ -3701,7 +3701,7 @@ OAA*
 .O..
 ----
 
-;owl_proper_eye(*,A)
+;owl_proper_eye(*)
 
 
 #########################################################

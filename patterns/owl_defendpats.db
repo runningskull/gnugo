@@ -983,7 +983,7 @@ OX*o
 ...a
 ----
 
-;owl_eyespace(a,b)
+;owl_eyespace(a)
 
 
 Pattern D230
@@ -1860,7 +1860,7 @@ occA
 ?b*x
 ----
 
-#;owl_eyespace(b,c) && 
+#;owl_eyespace(b) && 
 ;(!obvious_false_oeye(b) || oplay_attack(*,A))
 ;&& !xplay_attack(*,A)
 
@@ -1951,7 +1951,7 @@ oob.X
 aC*..
 -----
 
-;owl_eyespace(a,b) && does_attack(*,C)
+;owl_eyespace(a) && does_attack(*,C)
 
 
 Pattern D609
@@ -2624,7 +2624,7 @@ OO*
 O.a
 ?bb
 
-;!owl_big_eyespace(a,b) && !obvious_false_oeye(a)
+;!owl_big_eyespace(a) && !obvious_false_oeye(a)
 
 
 Pattern D711
@@ -2685,7 +2685,7 @@ O*           defend against atari inside eyespace
 
 a*
 
-; lib(a)==2 && xlib(*)>1 && owl_big_eyespace(*,a)
+; lib(a)==2 && xlib(*)>1 && owl_big_eyespace(*)
 
 
 Pattern D715b
@@ -2701,7 +2701,7 @@ O.*
 Xab
 ---
 
-;xlib(b)>1 && owl_big_eyespace(b,a) && oplay_attack(*,b,b)
+;xlib(b)>1 && owl_big_eyespace(b) && oplay_attack(*,b,b)
 
 
 Pattern D716
@@ -2717,7 +2717,7 @@ O..o
 O.bo
 ?oaX
 
-;owl_eyespace(b,a) && !owl_big_eyespace(b,a)
+;owl_eyespace(b) && !owl_big_eyespace(b)
 
 
 Pattern D717
@@ -2778,7 +2778,7 @@ O.*o
 ?O.o
 Ba*o
 
-; owl_proper_eye(a,B)
+; owl_proper_eye(a)
 
 
 #########################################################
@@ -3585,7 +3585,7 @@ O*           stop capture inside eyespace, not ko
 
 a*
 
-;lib(a)==1 && owl_eyespace(*,a) && olib(*) > 0
+;lib(a)==1 && owl_eyespace(*) && olib(*) > 0
 
 
 Pattern D910a
