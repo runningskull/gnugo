@@ -96,14 +96,14 @@ The remaining SGF files are either copyright by the FSF or are in the public dom
 
 GNU Go maintainers are Daniel Bump, Gunnar Farneback and Arend
 Bayer. GNU Go authors (in chronological order of contribution)
-are Man Li, Daniel Bump, David Denholm, Gunnar Farneb@"ack,
-Nils Lohner, Jerome Dumonteil, Tommy Thorn, Nicklas Ekstrand,
-Inge Wallin, Thomas Traber, Douglas Ridgway, Teun Burgers,
-Tanguy Urvoy, Thien-Thi Nguyen, Heikki Levanto, Mark Vytlacil,
-Adriaan van Kessel, Wolfgang Manner, Jens Yllman, Don Dailey,
-M@aa{}ns Ullerstam, Arend Bayer, Trevor Morris, Evan Berggren
-Daniel, Fernando Portela, Paul Pogonyshev, S.P. Lee and
-Stephane Nicolet.
+are Man Li, Wayne Iba, Daniel Bump, David Denholm, Gunnar
+Farneb@"ack, Nils Lohner, Jerome Dumonteil, Tommy Thorn,
+Nicklas Ekstrand, Inge Wallin, Thomas Traber, Douglas Ridgway,
+Teun Burgers, Tanguy Urvoy, Thien-Thi Nguyen, Heikki Levanto,
+Mark Vytlacil, Adriaan van Kessel, Wolfgang Manner, Jens
+Yllman, Don Dailey, M@aa{}ns Ullerstam, Arend Bayer, Trevor
+Morris, Evan Berggren Daniel, Fernando Portela, Paul
+Pogonyshev, S.P. Lee and Stephane Nicolet.
 
 @node Thanks
 @section Thanks
