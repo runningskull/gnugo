@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in mkpat.c
 - new static functions analyze_false_eye_territory(),
   connected_to_eye(), and connected_to_eye_recurse() in dragon.c.
 - new global array false_eye_territory[]
