@@ -5,7 +5,7 @@ TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst blunder.tst \
        heikki.tst lazarus.tst ld_owl.tst ld_owl_rot.tst \
        life.tst manyfaces.tst neurogo.tst newscore.tst nicklas1.tst \
        nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst niki.tst \
-       nngs.tst nngs1.tst optics.tst optics_rot.tst \
+       nngs.tst nngs1.tst nngs2.tst optics.tst optics_rot.tst \
        owl.tst owl1.tst owl_rot.tst reading.tst reading_rot.tst \
        rosebud.tst score.tst score2.tst score_rot.tst semeai.tst \
        semeai2.tst strategy.tst strategy2.tst strategy3.tst strategy4.tst \
@@ -145,6 +145,9 @@ nngs: nngs.tst
 
 nngs1: nngs1.tst
 	$(srcdir)/eval.sh nngs1.tst $(GG_OPTIONS)
+
+nngs2: nngs2.tst
+	$(srcdir)/eval.sh nngs2.tst $(GG_OPTIONS)
 
 optics: optics.tst
 	$(srcdir)/eval.sh optics.tst $(GG_OPTIONS)
@@ -295,4 +298,5 @@ fourth_batch:
 fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) owl1.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) handtalk.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) nngs2.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) strategy5.tst $(GG_OPTIONS)
