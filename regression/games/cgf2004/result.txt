@@ -1,0 +1,43 @@
+CGF special Meeting 2004 result
+
+CGF special meeting(small computer Go tournament in Japan) was held
+ at the University of Electro-Communications, Tokyo in January 10-11th.
+We had nine participants include GnuGo 3.5.3 as a guest.
+There were two new programs, gargoyle and GoriMutyu.
+
+And GnuGo won perfectly.
+Runners up was Goro, and 3rd was Katsunari.
+Haruka did not participate this year.
+
+
+CGF special meeting 2004 result.
+2003-01-10,11. The University of Electro-Communications, Tokyo
+
+                  Gnu GOR Kat Aya Car Shi Mar gar Gori Wins Rank
+GnuGo 3.5.3(Guest)     1   1   1   1   1   1   1   1   8-0   1
+GORO               0       1   1   1   1   1   1   1   7-1   2
+Katsunari          0   0       1   1   1   1   1   1   6-2   3
+Aya                0   0   0       1   1   1   1   1   5-4   4
+Caren's Whisper    0   0   0   0       1   1   1   1   4-4   5
+ShikoSakugo        0   0   0   0   0       1   1   1   3-5   6
+Martha             0   0   0   0   0   0       1   1   2-6   7
+gargoyle           0   0   0   0   0   0   0       1   1-7   8
+GoriMutyu          0   0   0   0   0   0   0   0       0-8   9
+
+
+   Program         Author             Nation Machine      CPU       Clock
+
+1. GnuGo 3.5.3     Gnu                Japan  DOS/V        Celeron    850MHz
+2. GORO            Yasuo OISHI        Japan  INSPIRON     Pentium4  1.6 GHz
+3. Katsunari       Shinichi SEI       Japan  Vaio         PentiumM   900MHz
+4. Aya             Hiroshi YAMASHITA  Japan  ThinkPad X24 Pentium3M 1.13GHz
+5. Caren's Whisper Katsumi KOBAYASHI  Japan  Endeavor     Pentium4  2.4 GHz
+6. ShikoSakugo     Morihiko TAJIMA    Japan  ThinkPad T30 Pentium4  2.0 GHz
+7. Martha          Ichiro UJIIE       Japan  Vaio         PentiumM  1.3 GHz
+8. gargoyle        Nariaki MATSUMURA  Japan  ThinkPad X40 PentiumM  1.0 GHz
+9. GoriMutyu       Hiroyuki NAGAYOSHI Japan  NotePC       Celeron   1.2 GHz
+
+I used following option in cgoban.
+/home/yss/gnugo-3.5.3/interface/gnugo --mode gmp --autolevel --clock 2400
+
+Hiroshi Yamashita
