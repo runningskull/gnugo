@@ -3067,24 +3067,6 @@ collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
   matched_patterns->counter++;
 }
 
-#define USE_BDIST 0
-#if USE_BDIST
-
-/* compute the squared of the distance of a point on the board
- * to the center of the board
- */
-
-static int
-bdist(int move)
-{
-  /* i = 0:              idist = - (board_size - 1)
-     i = board_size -1 : idist =    board_size - 1
-     */
-  int idist = 2*I(move) - board_size + 1;
-  int jdist = 2*J(move) - board_size + 1;
-  return idist*idist + jdist*jdist;
-}
-#endif
 
 /* This function searches in the previously stored list of matched patterns
  * for the highest valued unused patterns that have a valid constraint.
@@ -3129,9 +3111,6 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
     float top_val = list->pattern_list[top].pattern->value;
     struct pattern *top_pattern = list->pattern_list[top].pattern;
     int top_move = list->pattern_list[top].move;
-#if USE_BDIST
-    int top_dist = bdist(list->pattern_list[top].move);
-#endif
 
     /* Maybe we already know the top entry (if previous call was ended
      * by a value cutoff.
@@ -3142,35 +3121,16 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 	float bot_val = list->pattern_list[bottom].pattern->value;
 	struct pattern *bot_pattern = NULL;
 	int bot_move = NO_MOVE;
-#if USE_BDIST
-	int bot_dist = 0;
-#endif
 	if (bot_val >= top_val) {
 	  bot_pattern = list->pattern_list[bottom].pattern;
 	  bot_move = list->pattern_list[bottom].move;
-#if USE_BDIST
-	  bot_dist = bdist(list->pattern_list[bottom].move);
-#endif
 	}
-#if USE_BDIST
-        if (bot_val > top_val
-           || (bot_val == top_val
-               && bot_pattern < top_pattern)
-           || (bot_val == top_val
-               && bot_pattern == top_pattern
-               && bot_dist < top_dist)
-           || (bot_val == top_val
-               && bot_pattern == top_pattern
-               && bot_dist == top_dist
-	       && bot_move < top_move)) {
-#else
         if (bot_val > top_val
            || (bot_val == top_val
                && bot_pattern < top_pattern)
            || (bot_val == top_val
                && bot_pattern == top_pattern
                && bot_move < top_move)) {
-#endif
 
 	  matched_pattern = list->pattern_list[bottom];
 	  list->pattern_list[bottom] = list->pattern_list[top];
@@ -3179,9 +3139,6 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 	  top_val = bot_val;
           top_pattern = bot_pattern;
           top_move = bot_move;
-#if USE_BDIST
-          top_dist = bot_dist;
-#endif
 	}
       }
       list->ordered_up_to++;
