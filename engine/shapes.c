@@ -67,7 +67,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   int your_ndragons = 0;
 
   /* Make a local copy of the classification that we may modify. */
-  int class = pattern->class;
+  unsigned int class = pattern->class;
   
   /* Y patterns get rejected if F flag does not match with
    * experimental_influence mode.

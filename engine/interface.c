@@ -42,7 +42,9 @@ init_gnugo(float memory)
   clear_board();
 
   dfa_match_init();
+#if EXPERIMENTAL_READING
   tree_match_init();
+#endif
 }
 
 

@@ -1407,10 +1407,12 @@ add_replacement_move(int from, int to)
   /* First check for an incompatible redistribution rule. */
   if (replacement_map[from] != NO_MOVE) {
     int dd = replacement_map[from];
-
-    /* Crash if the old rule isn't compatible with the new one. */
-    ASSERT1(dd == to || to == replacement_map[dd], from);
-    /* There already is a compatible redistribution in effect so we
+    /* Abort if the old rule isn't compatible with the new one.
+     * (But not in the stable release.)
+     */
+    if (0)
+      ASSERT1(dd == to || to == replacement_map[dd], from);
+    /* There already is a redistribution in effect so we
      * have nothing more to do.
      */
     return;

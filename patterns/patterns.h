@@ -25,6 +25,10 @@
  * describing the patterns.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #ifndef __PATTERN_H__
 #define __PATTERN_H__
 
@@ -233,7 +237,7 @@ struct pattern {
   unsigned int val_mask[8]; /* 4x4 grid around anchor */
 #endif
 
-  int class;            /* classification of pattern */
+  unsigned int class;   /* classification of pattern */
   float value;          /* value for pattern, if matched */
   float maxvalue;
   float minterritory;
@@ -259,13 +263,17 @@ struct pattern {
 };
 
 
+#if EXPERIMENTAL_READING
 struct tree_node_list;
+#endif
 
 struct pattern_db {
   int fixed_for_size;
   struct pattern *patterns;
   struct dfa *pdfa;
+#if EXPERIMENTAL_READING
   struct tree_node_list *tnl; /* For tree-based pattern matching */
+#endif
 };
 
 
@@ -351,11 +359,13 @@ extern struct fullboard_pattern fuseki19[];
 extern struct fullboard_pattern fuseki13[];
 extern struct fullboard_pattern fuseki9[];
 
+#if EXPERIMENTAL_READING
+
 /* Experimental reading */
 extern struct pattern_db read_attack_db;
 extern struct pattern_db read_defend_db;
 
-
+#endif
 
 /* Tree-based pattern matching structures*/
 

@@ -213,7 +213,7 @@ static const int val_mask[2][8] = {
  * we care about each time.
  */
   
-static int class_mask[MAX_DRAGON_STATUS][3];
+static unsigned int class_mask[MAX_DRAGON_STATUS][3];
 
 
 /* In the current implementation, the edge constraints depend on
@@ -619,6 +619,8 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 		    pdb->patterns, callback_data, goal);
 }
 
+#if EXPERIMENTAL_READING
+
 /**************************************************************************/
 /* Tree matcher:                                                           */
 /**************************************************************************/
@@ -801,7 +803,9 @@ tree_initialize_pointers(struct tree_node_list *tnl,
   } while (++matches_walk < matches + matches_size);  
 }
 
+#endif
 
+#
 
 /**************************************************************************/
 /* DFA matcher:                                                           */
@@ -1211,10 +1215,12 @@ matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
     prepare = dfa_prepare_for_match;
   }
 
+#if EXPERIMENTAL_READING
   if (pdb->tnl) {
     loop = tree_matchpat_loop;
     prepare = tree_prepare_for_match;
   }
+#endif
 
   /* select strategy */
   switch (color) {

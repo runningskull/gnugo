@@ -353,8 +353,9 @@ int fullboard = 0;   /* Whether this is a database of fullboard patterns. */
 int dfa_generate = 0; /* if 1 a dfa is created. */
 int dfa_c_output = 0; /* if 1 the dfa is saved as a c file */
 dfa_t dfa;
+#if EXPERIMENTAL_READING
 int tree_output = 0;  /* if 1, the tree data structure is output */
-
+#endif
 
 /**************************
  *
@@ -1416,7 +1417,7 @@ finish_constraint_and_action(char *name)
 /*           stuff to write the elements of a pattern               */
 /* ================================================================ */
 
-
+#ifdef EXPERIMENTAL_READING
 
 /* callback function used to sort the elements in a pattern. 
  * We want to sort the patterns by attribute.
@@ -1469,6 +1470,7 @@ struct element_node {
   struct element_node *next;
 };
 
+#endif
 
 /* flush out the pattern stored in elements[]. Don't forget
  * that elements[].{x,y} and min/max{i,j} are still relative
@@ -1508,10 +1510,14 @@ write_elements(FILE *outfile, char *name)
 	    node < el-1 ? ",\n" : "};\n\n");
   }
 
+#if EXPERIMENTAL_READING
   if (tree_output)
     tree_push_pattern();
+#endif
 }
 
+
+#if EXPERIMENTAL_READING
 
 struct tree_node graph[2];
 int tree_next = 0;
@@ -1962,6 +1968,7 @@ tree_write_patterns(FILE *outfile, char *name)
   fprintf(outfile, "}\n\n");
 }
 
+#endif
 
 /* sort and write out the patterns */
 static void
@@ -1969,13 +1976,14 @@ write_patterns(FILE *outfile, char *name)
 {
   int j;
 
+#if EXPERIMENTAL_READING
   if (tree_output)
     tree_write_patterns(outfile, name);
   else
+#endif
     fprintf(outfile, "\nvoid\ninit_tree_%s(void)\n{\n"
 	    "  /* nothing to do - tree option not compiled */\n"
 	    "}\n\n", name);
-  
 
   /* Write out the patterns. */
   if (fullboard)
@@ -2086,10 +2094,12 @@ write_pattern_db(FILE *outfile, char *name)
     fprintf(outfile, " ,& dfa_%s\n", name); /* pointer to the wired dfa */
   else
     fprintf(outfile, " , NULL\n"); /* pointer to a possible dfa */
+#if EXPERIMENTAL_READING
   if (tree_output)
     fprintf(outfile, " , tnl_%s", name);
   else
     fprintf(outfile, " , NULL\n");
+#endif
 
   fprintf(outfile, "};\n");
 }
@@ -2101,8 +2111,8 @@ main(int argc, char *argv[])
   char line[MAXLINE];  /* current line from file */
   char *input_file_names[MAX_INPUT_FILE_NAMES];
   char *output_file_name = NULL;
-  FILE *input_FILE;
-  FILE *output_FILE;
+  FILE *input_FILE = NULL;
+  FILE *output_FILE = NULL;
   int state = 0;
   int ifc = 0;
   int i;
@@ -2135,8 +2145,9 @@ main(int argc, char *argv[])
 	dfa_generate = 1; dfa_c_output = 1; 
 	break;
       case 'V': dfa_verbose = strtol(gg_optarg, NULL, 10); break;
+#if EXPERIMENTAL_READING
       case 'T': tree_output = 1; break;
-
+#endif
       default:
 	fprintf(stderr, "Invalid argument ignored\n");
       }

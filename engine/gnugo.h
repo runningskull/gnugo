@@ -270,10 +270,11 @@ extern int experimental_influence;   /* use experimental influence module */
 extern int allow_suicide;            /* allow opponent to make suicide moves */
 extern int capture_all_dead;         /* capture all dead opponent stones */
 extern int play_out_aftermath; /* make everything unconditionally settled */
+
+#if EXPERIMENTAL_READING
 extern int defend_by_pattern;  /* use patterns for tactical reading defense */
 extern int attack_by_pattern;  /* use patterns for tactical reading attack */
-
-
+#endif
 
 /* Mandatory values of reading parameters. Normally -1, if set at 
  * these override the values derived from the level. */

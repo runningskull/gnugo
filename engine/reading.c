@@ -31,10 +31,18 @@
 #include "patterns.h"
 #include "gg_utils.h"
 
+#if EXPERIMENTAL_READING
+
 /* When to use pattern-base reading */
 int defend_by_pattern = 0;
 int attack_by_pattern = 1;
 
+static int do_tactical_pat(int is_attack, int str, int *move, 
+			   int komaster, int kom_pos);
+static int do_defend_pat(int str, int *move, int komaster, int kom_pos);
+static int do_attack_pat(int str, int *move, int komaster, int kom_pos);
+
+#endif
 
 /* Size of array where candidate moves are stored. */
 #define MAX_MOVES 50

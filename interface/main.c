@@ -763,6 +763,8 @@ main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 	break;
 	
+#if EXPERIMENTAL_READING
+
       case OPT_ATTACK_BY_PATTERN:
         attack_by_pattern = 1;
         break;
@@ -771,6 +773,7 @@ main(int argc, char *argv[])
         defend_by_pattern = 1;
         break;
 
+#endif
 
       case 'v':
 	show_version();
