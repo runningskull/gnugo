@@ -279,11 +279,8 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     TRACE("...shape value 1\n");
   }
 
-  /* Pattern class b, block to secure territory. */
-  if (class & CLASS_b) {
-    add_block_territory_move(move);
-    TRACE("...blocks territory\n");
-  }
+  /* Pattern class b is obsolete in the pattern databases handled here. */
+  gg_assert(!(class & CLASS_b));
 
   /* Pattern class e, expand to make territory. */
   if (class & CLASS_e) {

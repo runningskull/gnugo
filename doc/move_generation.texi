@@ -139,10 +139,9 @@ Declare an antisuji or forbidden move.
 @itemx SEMEAI_THREAT
 Win or threaten to win a semeai.
 @item EXPAND_TERRITORY_MOVE
-@itemx BLOCK_TERRITORY_MOVE
 @item EXPAND_MOYO_MOVE
-Move expanding/blocking our territory/moyo. These reasons are at the
-moment treated identically.
+Move expanding our territory/moyo. These reasons are at the moment
+treated identically.
 @item VITAL_EYE_MOVE
 A vital point for life and death.
 @item STRATEGIC_ATTACK_MOVE
@@ -307,13 +306,12 @@ no circumstances will be played.
 @comment  node-name,  next,  previous,  up
 @subsection Territorial moves
 
-Any move that increases territory gets a move reason. These are
-the block territory and expand territory move reasons. Such move
-reasons are added by the @samp{b} and @samp{e} patterns in
-@file{patterns/patterns.db}. Similarly the @samp{E} patterns attempt to
-generate or mitigate an moyo, which is a region of influence not yet secure
-territory, yet valuable. Such a pattern sets the ``expand moyo'' move
-reason.
+Any move that increases territory gets a move reason. This is the expand
+territory move reason. That move reason is added by the @samp{e}
+patterns in @file{patterns/patterns.db}. Similarly the @samp{E} patterns
+attempt to generate or mitigate a moyo, which is a region of influence
+not yet secure territory, yet valuable. Such a pattern sets the ``expand
+moyo'' move reason.
 
 @node Owl attack and defense, Combination Attacks, Territorial moves, MG Details
 @comment  node-name,  next,  previous,  up
@@ -680,23 +678,10 @@ both of two things: @code{reason1} on @code{target1} and @code{reason2} on
 @code{target2}. At this time, @code{reason} can only be @code{DEFEND_STRING}.
 More reasons will be implemented in the future.
 @end quotation
-@item @code{void add_block_territory_move(int pos)}
-@findex add_block_territory_move
-@quotation
-Add to the reasons for the move at @code{pos} that it secures
-territory by blocking.
-@end quotation
-@item @code{void add_block_territory_move(int pos)}
-@findex add_block_territory_move
-@quotation
-Add to the reasons for the move at @code{pos} that it secures
-territory by blocking.
-@end quotation
 @item @code{void add_expand_territory_move(int pos)}
 @findex add_expand_territory_move
 @quotation
-Add to the reasons for the move at @code{pos} that it expands
-territory.
+Add to the reasons for the move at @code{pos} that it expands territory.
 @end quotation
 @item @code{void add_expand_moyo_move(int pos) }
 @findex add_expand_moyo_move

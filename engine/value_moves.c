@@ -654,7 +654,6 @@ examine_move_safety(int color)
 	tactical_safety = 1;
 	safety = 1;
 	break;
-      case BLOCK_TERRITORY_MOVE:
       case EXPAND_TERRITORY_MOVE:
       case EXPAND_MOYO_MOVE:
         safety = 1;
@@ -1186,7 +1185,6 @@ strategic_penalty(int pos, int color)
      */
     switch (move_reasons[r].type) {
     case EXPAND_TERRITORY_MOVE:
-    case BLOCK_TERRITORY_MOVE:
     case EXPAND_MOYO_MOVE:
     case STRATEGIC_ATTACK_MOVE:
       continue;
@@ -1538,19 +1536,8 @@ estimate_territorial_value(int pos, int color, float score)
     case CUT_MOVE:
     case STRATEGIC_ATTACK_MOVE:
     case STRATEGIC_DEFEND_MOVE:
-    case BLOCK_TERRITORY_MOVE:
-      does_block = 1;
-      break;
-      
     case EXPAND_MOYO_MOVE:
     case EXPAND_TERRITORY_MOVE:
-      /* We don't make any difference between blocking and expanding
-       * territory.
-       *
-       * FIXME: Fuse the BLOCK_TERRITORY and EXPAND_TERRITORY move
-       * reasons to one and do the same with the b and e class
-       * patterns.
-       */
       does_block = 1;
       break;
       

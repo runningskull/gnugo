@@ -215,13 +215,9 @@ If two or more distinct @samp{X} dragons occur in the pattern, the
 move is given the move reasons that it cuts each pair of
 dragons.
 @end quotation
-@item @samp{b}
-@quotation
-The move secures territory by blocking it from intrusion.
-@end quotation
 @item @samp{e}
 @quotation
-The move makes territory by expanding, e.g. along the edge.
+The move makes or secures territory.
 @end quotation
 @item @samp{E}
 @quotation

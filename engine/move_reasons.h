@@ -37,7 +37,7 @@
 #define SEMEAI_MOVE             18
 #define SEMEAI_THREAT           (SEMEAI_MOVE | THREAT_BIT)
 
-#define BLOCK_TERRITORY_MOVE    20
+/*      BLOCK_TERRITORY_MOVE    20   OBSOLETE */
 #define EXPAND_TERRITORY_MOVE   22
 #define EXPAND_MOYO_MOVE        24
 

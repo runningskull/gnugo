@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- doc revisions
+- add_block_territory_move() removed
+- BLOCK_TERRITORY_MOVE reason removed
 - compute_shape_factor() and move_connects_strings() moved from
   move_reasons.c to value_moves.c
 - move_reasons_confirm_safety() moved likewise and renamed to

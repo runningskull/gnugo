@@ -371,7 +371,6 @@ get_pos(int reason, int what)
   case CUT_MOVE:
     return dragons[conn_dragon1[what]];
   case ANTISUJI_MOVE:
-  case BLOCK_TERRITORY_MOVE:
   case EXPAND_TERRITORY_MOVE:
   case EXPAND_MOYO_MOVE:
   case MY_ATARI_ATARI_MOVE:
@@ -1061,17 +1060,6 @@ add_all_move(int pos, int reason1, int target1, int reason2, int target2)
 
 
 /*
- * Add to the reasons for the move at (pos) that it secures
- * territory by blocking.
- */
-void
-add_block_territory_move(int pos)
-{
-  gg_assert(0 && "block_territory move reason obsolete");
-  add_move_reason(pos, BLOCK_TERRITORY_MOVE, 0);
-}
-
-/*
  * Add to the reasons for the move at (pos) that it expands
  * territory.
  */
@@ -1658,10 +1646,6 @@ list_move_reasons(int color)
 		  pos, aa);
 	  break;
 
-	case BLOCK_TERRITORY_MOVE:
-	  gprintf("Move at %1m blocks territory\n", pos);
-	  break;
-	  
 	case EXPAND_TERRITORY_MOVE:
 	  gprintf("Move at %1m expands territory\n", pos);
 	  break;
