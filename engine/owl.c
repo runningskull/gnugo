@@ -3526,7 +3526,6 @@ pattern_list_build_heap(struct matched_patterns_list_data *list)
 {
   int k;
   int limit;
-  struct matched_pattern_data **heap;
 
   list->pattern_heap = malloc(list->counter
 			      * sizeof(struct matched_pattern_data*));
@@ -3539,28 +3538,28 @@ pattern_list_build_heap(struct matched_patterns_list_data *list)
     list->pattern_heap[k] = &list->pattern_list[k];
   }
 
-  heap = list->pattern_heap - 1;
   list->heap_num_patterns = list->counter;
   limit = list->heap_num_patterns / 2;
 
-  for (k = limit; k >= 1; k--) {
+  for (k = limit; --k >= 0;) {
     int parent;
     int child;
-    struct matched_pattern_data *pattern_data = heap[k];
+    struct matched_pattern_data *pattern_data = list->pattern_heap[k];
 
-    for (parent = k; parent <= limit; parent = child) {
-      child = 2 * parent;
-      if (child < list->heap_num_patterns
-	  && BETTER_PATTERN(heap[child + 1], heap[child]))
+    for (parent = k; parent < limit; parent = child) {
+      child = 2 * parent + 1;
+      if (child + 1 < list->heap_num_patterns
+	  && BETTER_PATTERN(list->pattern_heap[child + 1],
+			    list->pattern_heap[child]))
 	child++;
 
-      if (BETTER_PATTERN(pattern_data, heap[child]))
+      if (BETTER_PATTERN(pattern_data, list->pattern_heap[child]))
 	break;
 
-      heap[parent] = heap[child];
+      list->pattern_heap[parent] = list->pattern_heap[child];
     }
 
-    heap[parent] = pattern_data;
+    list->pattern_heap[parent] = pattern_data;
   }
 }
 
@@ -3573,23 +3572,24 @@ pattern_list_get_next_pattern(struct matched_patterns_list_data *list)
 {
   int parent;
   int child;
-  struct matched_pattern_data **heap = list->pattern_heap - 1;
 
-  list->next_pattern = heap[1];
+  list->next_pattern = list->pattern_heap[0];
 
-  for (parent = 1; 2 * parent < list->heap_num_patterns; parent = child) {
-    child = 2 * parent;
-    if (BETTER_PATTERN(heap[child + 1], heap[child]))
+  list->heap_num_patterns--;
+  for (parent = 0; 2 * parent + 1 < list->heap_num_patterns; parent = child) {
+    child = 2 * parent + 1;
+    if (BETTER_PATTERN(list->pattern_heap[child + 1],
+		       list->pattern_heap[child]))
       child++;
 
-    if (BETTER_PATTERN(heap[list->heap_num_patterns], heap[child]))
+    if (BETTER_PATTERN(list->pattern_heap[list->heap_num_patterns],
+		       list->pattern_heap[child]))
       break;
 
-    heap[parent] = heap[child];
+    list->pattern_heap[parent] = list->pattern_heap[child];
   }
 
-  heap[parent] = heap[list->heap_num_patterns];
-  list->heap_num_patterns--;
+  list->pattern_heap[parent] = list->pattern_heap[list->heap_num_patterns];
 }
 
 

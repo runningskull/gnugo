@@ -3077,7 +3077,6 @@ push_connection_heap_entry(struct connection_data *conn, float distance,
   int k;
   int parent;
   struct heap_entry *new_entry = &conn->heap_data[conn->heap_data_size];
-  struct heap_entry **heap = conn->heap - 1;
 
   gg_assert(conn->heap_data_size < 4 * BOARDMAX);
   gg_assert(conn->heap_size < BOARDMAX);
@@ -3090,17 +3089,16 @@ push_connection_heap_entry(struct connection_data *conn, float distance,
 
   /* And insert it into the heap. */
   conn->heap_data_size++;
-  conn->heap_size++;
 
-  for (k = conn->heap_size; k > 1; k = parent) {
-    parent = k / 2;
-    if (heap[parent]->distance <= distance)
+  for (k = conn->heap_size++; k > 0; k = parent) {
+    parent = (k - 1) / 2;
+    if (conn->heap[parent]->distance <= distance)
       break;
 
-    heap[k] = heap[parent];
+    conn->heap[k] = conn->heap[parent];
   }
 
-  heap[k] = new_entry;
+  conn->heap[k] = new_entry;
 }
 
 
@@ -3109,20 +3107,19 @@ pop_connection_heap_entry(struct connection_data *conn)
 {
   int k;
   int child;
-  struct heap_entry **heap = conn->heap - 1;
 
-  for (k = 1; 2 * k < conn->heap_size; k = child) {
-    child = 2 * k;
-    if (heap[child]->distance > heap[child + 1]->distance)
+  conn->heap_size--;
+  for (k = 0; 2 * k + 1 < conn->heap_size; k = child) {
+    child = 2 * k + 1;
+    if (conn->heap[child]->distance > conn->heap[child + 1]->distance)
       child++;
-    if (heap[child]->distance >= heap[conn->heap_size]->distance)
+    if (conn->heap[child]->distance >= conn->heap[conn->heap_size]->distance)
       break;
 
-    heap[k] = heap[child];
+    conn->heap[k] = conn->heap[child];
   }
 
-  heap[k] = heap[conn->heap_size];
-  conn->heap_size--;
+  conn->heap[k] = conn->heap[conn->heap_size];
 }
 
 
