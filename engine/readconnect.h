@@ -21,6 +21,19 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+struct heap_entry;
+struct connection_data;
+
+typedef void (*connection_helper_fn_ptr) (struct connection_data *conn,
+					  int color);
+
+struct heap_entry {
+  float distance;
+  int coming_from;
+  int target;
+  connection_helper_fn_ptr helper;
+};
+
 struct connection_data {
   float distances[BOARDMAX];
   float deltas[BOARDMAX];
@@ -30,16 +43,27 @@ struct connection_data {
   int queue[BOARDMAX];
   int queue_start;
   int queue_end;
+
+  int heap_data_size;
+  int heap_size;
+  struct heap_entry heap_data[4 * BOARDMAX];
+  struct heap_entry *heap[BOARDMAX];
+
+  int target;
+  float cutoff_distance;
+  int speculative;
 };
 
+
 void compute_connection_distances(int str, int target, float cutoff,
-				  struct connection_data *conn);
+				  struct connection_data *conn,
+				  int speculative);
 void init_connection_data(int color, const char goal[BOARDMAX],
-		                     struct connection_data *conn);
-void spread_connection_distances(int color, int target,
-				 struct connection_data *conn,
-    			    	 float cutoff_distance,
-				 int speculative);
+			  int target, float cutoff,
+			  struct connection_data *conn, int speculative);
+void spread_connection_distances(int color, struct connection_data *conn);
+void sort_connection_queue_tail(struct connection_data *conn);
+void expand_connection_queue(struct connection_data *conn);
 void print_connection_distances(struct connection_data *conn);
 
 

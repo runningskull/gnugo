@@ -111,9 +111,23 @@ compute_smaller_goal(int owner, int color_to_move,
 	/* How many stones have we used to jump from coming_from to pos?
 	 * Use Manhattan metric as a guess.
 	 */
-	if (!goal[pos] && board[pos] == OTHER_COLOR(owner))
-	  own_stones_visited[pos] += gg_abs(I(pos) - I(coming_from))
-	    			     + gg_abs(J(pos) - J(coming_from));
+	if (!goal[pos] && board[pos] == OTHER_COLOR(owner)) {
+	  int i;
+	  int stones[MAX_BOARD * MAX_BOARD];
+	  int num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones);
+	  int smallest_distance = 3;
+
+	  for (i = 0; i < num_stones; i++) {
+	    int distance = (gg_abs(I(stones[i]) - I(coming_from))
+			    + gg_abs(J(stones[i]) - J(coming_from)));
+
+	    if (distance < smallest_distance)
+	      smallest_distance = distance;
+	  }
+
+	  own_stones_visited[pos] += smallest_distance;
+	}
+
 	if (own_stones_visited[pos] > 2)
 	  continue;
       }
@@ -213,9 +227,12 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 
   /* When blocking off, we use a somewhat smaller goal area. */
   if (color_to_move == board[str])
-    compute_connection_distances(str, NO_MOVE, 3.01, &conn);
+    compute_connection_distances(str, NO_MOVE, 3.01, &conn, 1);
   else
-    compute_connection_distances(str, NO_MOVE, 2.81, &conn);
+    compute_connection_distances(str, NO_MOVE, 2.81, &conn, 1);
+
+  sort_connection_queue_tail(&conn);
+  expand_connection_queue(&conn);
   compute_smaller_goal(OTHER_COLOR(board[str]), color_to_move,
       		       &conn, goal, smaller_goal);
   if (0 && (debug & DEBUG_BREAKIN))
@@ -312,9 +329,10 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
   if (debug & DEBUG_BREAKIN)
     goaldump(goal);
   /* Compute nearby fields of goal. */
-  init_connection_data(intruder, goal, &conn);
+  init_connection_data(intruder, goal, NO_MOVE, 3.01, &conn, 1);
   k = conn.queue_end;
-  spread_connection_distances(intruder, NO_MOVE, &conn, 3.01, 1);
+  spread_connection_distances(intruder, &conn);
+  sort_connection_queue_tail(&conn);
   if (0 && (debug & DEBUG_BREAKIN))
     print_connection_distances(&conn);
 
@@ -325,18 +343,21 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
     if (conn.distances[pos] > min_distance + 1.001)
       break;
     if (board[pos] == intruder
-	&& influence_considered_lively(q, pos)
-	&& !used[pos]) {
+	&& influence_considered_lively(q, pos)) {
       /* Discard this string in case the shortest path goes via a string
        * that we have in the candidate list already.
        */
       int pos2 = pos;
       while (ON_BOARD(pos2)) {
         pos2 = conn.coming_from[pos2];
+	if (IS_STONE(board[pos2]))
+	  pos2 = find_origin(pos2);
+
 	if (used[pos2])
 	  break;
       }
-      mark_string(pos, used, 1);
+
+      used[pos] = 1;
       if (ON_BOARD(pos2))
 	continue;
       if (candidates == 0)
