@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- comments added, cleanup around discard_redundant_move_reasons
+- unsafe tactical moves now taken care by discard_redundant_move_reasons
+- FIXME added for reevaluate_ko_threats
 - atari_atari_attack_patterns() uses a goal array to limit search area
 - new functions compute_aa_values(), get_aa_value(), and update_aa_goal()
 - ko contingent defenses excluded in get_saved_worms() and
