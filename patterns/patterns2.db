@@ -1568,13 +1568,13 @@ Pattern Shape13
 *.O
 .O.
 
-:8,-,shape(-20)
+:8,-,shape(-10)
 
 ?X?
-*aO
+*aB
 cOb
 
-;!oplay_attack_either(*,a,b,c,a,c) && !oplay_attack_either(*,a,c,b,a,b)
+;!oplay_attack_either(*,a,b,c,a,c) && !oplay_attack_either(*,a,c,b,a,b) && !alive(B)
 
 
 Pattern Shape14

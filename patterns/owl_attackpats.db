@@ -1488,6 +1488,23 @@ OX?
 ;owl_escape_value(a)>0 || owl_escape_value(b)>0
 
 
+Pattern A422
+# db New pattern (3.3.9)
+# complementary to D1358
+
+X..?         try to cut
+X.*X
+??O?
+
+:8,-,value(61)
+
+bde?
+bc*a
+??O?
+
+;(owl_escape_value(a) > 0 || owl_escape_value(b) > 0)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the second line        #

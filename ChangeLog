@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new configure option experimental-owl-ext
 - code simplification in safe_move (use REVERSE_RESULT)
 - new randomness_scaling field in struct move_data and new scale_randomness()
 - moves matching Fj and Ft patterns get extra randomness
@@ -74,6 +75,7 @@
 - compute_surrounding_moyo_sizes() revised
 - compute_surrounding_moyo_sizes() variant for experimental-connections option
 - new function influence_get_moyo_data()
+- tuning
 - owl tuning
 - new game records and regression tests
 
