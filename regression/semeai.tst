@@ -1,3 +1,6 @@
+reset_owl_node_counter
+reset_reading_node_counter
+
 # Here is a list of other regressions which should afford
 # semeai tuning. The regressions were run with the version
 # of November 6, 2001 with three different versions of the
@@ -49,6 +52,7 @@
 # Strategy3 109
 # Strategy3 110
 # Strategy3 124
+
 # Strategy3 128
 # Strategy3 129
 # Strategy3 139
@@ -162,7 +166,7 @@ loadsgf golois/Goemate990902-1.sgf
 
 # A6 gives an unfavorable ko while F10 gives seki.
 # Since there are no ko threats, and F10 is enough to win, it is preferred.
-loadsgf games/semeaiko1.sgf
+loadsgf games/semeai/semeaiko1.sgf
 29 gg_genmove black
 #? [F10]*
 
@@ -192,3 +196,12 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 35 owl_analyze_semeai M13 M11
 #? [ALIVE DEAD PASS]*
 
+########### end of tests #####################
+
+# Report number of nodes visited by the tactical reading
+10000 get_reading_node_counter
+#? [0]&
+
+# Report number of nodes visited by the owl code
+10001 get_owl_node_counter
+#? [0]&
