@@ -701,6 +701,7 @@ extern int branch_depth;        /* deep reading cutoff */
 extern int fourlib_depth;       /* deep reading cutoff */
 extern int ko_depth;            /* deep ko reading cutoff */
 extern int aa_depth;            /* deep global reading cutoff */
+extern int depth_offset;        /* keeps track of temporary depth changes */
 extern int owl_distrust_depth;  /* below this owl trusts the optics code */
 extern int owl_branch_depth;    /* below this owl tries only one variation */
 extern int owl_reading_depth;   /* owl does not read below this depth */

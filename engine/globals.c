@@ -49,6 +49,7 @@ int fourlib_depth;      /* deep reading cut off */
 int ko_depth;           /* deep reading cut off */
 int branch_depth;       /* deep reading cut off */
 int aa_depth;
+int depth_offset;       /* keeps track of temporary depth changes */
 int owl_distrust_depth;   /* below this owl trusts the optics code */
 int owl_branch_depth;     /* below this owl tries only one variation */
 int owl_reading_depth;    /* owl does not read below this depth */

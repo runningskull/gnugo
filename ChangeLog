@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new global variable depth_offset
+- only cache safe_move() results when reading depth is unmodified
 - revision of interface/emacs.el
 - new interface/xpms/*xpm, make-gnugo-xpms.el and gnugo-xpms.el
 

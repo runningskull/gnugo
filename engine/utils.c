@@ -806,6 +806,8 @@ set_depth_values(int level, int report_levels)
   if (mandated_owl_node_limit != -1)
     owl_node_limit = mandated_owl_node_limit;
 
+  depth_offset = 0;
+  
   if (report_levels) {
     fprintf(stderr, "at level %d:\n\n\
 depth: %d\n\
@@ -861,6 +863,7 @@ modify_depth_values(int n)
   fourlib_depth      += n;
   ko_depth           += n;
   breakin_depth	     += n;
+  depth_offset       += n;
 }
 
 void
