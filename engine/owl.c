@@ -4766,7 +4766,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       int closest_dist = HUGE_CONNECTION_DISTANCE;
       int closest_component = -1;
-      if (!goal[pos] || board[pos] != color)
+      if (board[pos] != color || !goal[pos])
 	continue;
       if (pos != find_origin(pos))
 	continue;
@@ -6099,7 +6099,8 @@ estimate_lunch_half_eye_bonus(int lunch,
     int d;
     for (d = 4; d < 8; d++) {
       int pos = stone + delta[d];
-      if (is_halfeye(half_eye, pos) || is_false_eye(half_eye, pos))
+      if (ON_BOARD(pos)
+	  && (is_halfeye(half_eye, pos) || is_false_eye(half_eye, pos)))
 	half_eyes++;
     }
   }
