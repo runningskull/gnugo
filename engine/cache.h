@@ -167,6 +167,11 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
   const char *read_function_name = name; \
   int q = find_origin(str);
 
+#define SETUP_TRACE_INFO2(name, str1, str2) \
+  const char *read_function_name = name; \
+  int q1 = find_origin(str1); \
+  int q2 = find_origin(str2);
+
 #else
 
 #define TRACE_CACHED_RESULT(rr)
@@ -175,11 +180,19 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
   const char *read_function_name = name; \
   int q = str;
 
+#define SETUP_TRACE_INFO2(name, str1, str2) \
+  const char *read_function_name = name; \
+  int q1 = str1; \
+  int q2 = str2;
+
 #endif
 
 /* Trace messages in decidestring/decidedragon sgf file. */
 void sgf_trace(const char *func, int str, int move, int result,
 	       const char *message);
+/* Trace messages in decideconnection/decidesemeai sgf file. */
+void sgf_trace2(const char *func, int str1, int str2, int move, int result,
+		const char *message);
 
 /* Macro to hide the call to sgf_trace(). Notice that a little black
  * magic is going on here. Before using this macro, SETUP_TRACE_INFO
@@ -190,6 +203,14 @@ void sgf_trace(const char *func, int str, int move, int result,
 #define SGFTRACE(move, result, message) \
   if (sgf_dumptree) \
     sgf_trace(read_function_name, q, move, result, message)
+
+/* Corresponding macro for use in connection or semeai reading, where
+ * two groups are involved.
+ */
+#define SGFTRACE2(move, result, message) \
+  if (sgf_dumptree) \
+    sgf_trace2(read_function_name, q1, q2, move, result, message)
+
 
 extern Hashtable *movehash;
 

@@ -916,9 +916,9 @@ gtp_connect(char *s, int id)
   if (BOARD(ai, aj) != BOARD(bi, bj))
     return gtp_failure(id, "vertices must have same color");
 
-  result = recursive_connect(POS(ai, aj), POS(bi, bj), &connect_move);
+  result = connect(POS(ai, aj), POS(bi, bj), &connect_move);
   gtp_printid(id, GTP_SUCCESS);
-  gtp_printf("%d", result);
+  gtp_print_code(result);
   if (result != 0)
     gtp_mprintf(" %m", I(connect_move), J(connect_move));
 
@@ -953,9 +953,9 @@ gtp_disconnect(char *s, int id)
   if (BOARD(ai, aj) != BOARD(bi, bj))
     return gtp_failure(id, "vertices must have same color");
 
-  result = recursive_disconnect(POS(ai, aj), POS(bi, bj), &disconnect_move);
+  result = disconnect(POS(ai, aj), POS(bi, bj), &disconnect_move);
   gtp_printid(id, GTP_SUCCESS);
-  gtp_printf("%d", result);
+  gtp_print_code(result);
   if (result != 0)
     gtp_mprintf(" %m", I(disconnect_move), J(disconnect_move));
 

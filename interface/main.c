@@ -80,6 +80,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_SHOWCOPYRIGHT,
       OPT_REPLAY_GAME,
       OPT_DECIDE_STRING,
+      OPT_DECIDE_CONNECTION,
       OPT_DECIDE_DRAGON,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_POSITION,
@@ -126,6 +127,7 @@ enum mode {
   MODE_SOLO,
   MODE_REPLAY,
   MODE_DECIDE_STRING,
+  MODE_DECIDE_CONNECTION,
   MODE_DECIDE_DRAGON,
   MODE_DECIDE_SEMEAI,
   MODE_DECIDE_POSITION,
@@ -191,15 +193,16 @@ static struct gg_option const long_options[] =
   {"statistics",     no_argument,       0, 'S'},
   {"trace",          no_argument,       0, 't'},
   {"seed",           required_argument, 0, 'r'},
-  {"decide-string",   required_argument, 0, OPT_DECIDE_STRING},
-  {"decide-dragon",   required_argument, 0, OPT_DECIDE_DRAGON},
-  {"decide-semeai",   required_argument, 0, OPT_DECIDE_SEMEAI},
+  {"decide-string",  required_argument, 0, OPT_DECIDE_STRING},
+  {"decide-connection", required_argument, 0, OPT_DECIDE_CONNECTION},
+  {"decide-dragon",  required_argument, 0, OPT_DECIDE_DRAGON},
+  {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
   {"decide-position", no_argument,       0, OPT_DECIDE_POSITION},
-  {"decide-eye",      required_argument, 0, OPT_DECIDE_EYE},
+  {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
   {"life",           no_argument,       0, OPT_LIFE},
   {"life-eyesize",   required_argument, 0, OPT_LIFE_EYESIZE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
-  {"nofuseki",     no_argument,         0, OPT_NOFUSEKI},
+  {"nofuseki",       no_argument,         0, OPT_NOFUSEKI},
   {"nojosekidb",     no_argument,       0, OPT_NOJOSEKIDB},
   {"debug-influence", required_argument, 0, OPT_DEBUG_INFLUENCE},
   {"showtime",       no_argument,       0, OPT_SHOWTIME},
@@ -426,6 +429,24 @@ main(int argc, char *argv[])
 	playmode = MODE_DECIDE_STRING;
 	break;
 	
+      case OPT_DECIDE_CONNECTION:
+	if (strlen(gg_optarg) > 7) {
+	  fprintf(stderr, 
+		  "usage: --decide-connection [first string]/[second string]\n");
+	  return (EXIT_FAILURE);
+	}
+	strcpy(decide_this, gg_optarg);
+	strtok(decide_this, "/");
+	decide_that = strtok(NULL, "/");
+	if (!decide_that) {
+	  fprintf(stderr, 
+		  "usage: --decide-connection [first string]/[second string]\n");
+	  return (EXIT_FAILURE);
+	}
+
+	playmode = MODE_DECIDE_CONNECTION;
+	break;
+	
       case OPT_DECIDE_DRAGON:
 	if (strlen(gg_optarg) > 3) {
 	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
@@ -438,7 +459,7 @@ main(int argc, char *argv[])
       case OPT_DECIDE_SEMEAI:
 	if (strlen(gg_optarg) > 7) {
 	  fprintf(stderr, 
-		  "usage: --decidedragon [first dragon]/[second dragon]\n");
+		  "usage: --decide-semeai [first dragon]/[second dragon]\n");
 	  return (EXIT_FAILURE);
 	}
 	strcpy(decide_this, gg_optarg);
@@ -446,7 +467,7 @@ main(int argc, char *argv[])
 	decide_that = strtok(NULL, "/");
 	if (!decide_that) {
 	  fprintf(stderr, 
-		  "usage: --decidedragon [first dragon]/[second dragon]\n");
+		  "usage: --decide-semeai [first dragon]/[second dragon]\n");
 	  return (EXIT_FAILURE);
 	}
 
@@ -679,6 +700,7 @@ main(int argc, char *argv[])
   
   if (outfile) {
     if (playmode != MODE_DECIDE_STRING
+	&& playmode != MODE_DECIDE_CONNECTION
 	&& playmode != MODE_DECIDE_DRAGON
 	&& playmode != MODE_DECIDE_POSITION
 	&& playmode != MODE_DECIDE_SEMEAI
@@ -750,6 +772,11 @@ main(int argc, char *argv[])
     {
       int m, n;
       
+      if (!infilename) {
+	fprintf(stderr, "gnugo: --decide-string must be used with -l\n");
+	return (EXIT_FAILURE);
+      }
+      
       gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
       boardsize = gameinfo.position.boardsize;
       
@@ -758,11 +785,33 @@ main(int argc, char *argv[])
 	return (EXIT_FAILURE);
       }
 
+      decidestring(m, n, outfile);
+    }
+  break;
+  
+  case MODE_DECIDE_CONNECTION:
+    {
+      int ai, aj, bi, bj;
+      
       if (!infilename) {
-	fprintf(stderr, "gnugo: --decide-string must be used with -l\n");
+	fprintf(stderr, "gnugo: --decide-connection must be used with -l\n");
 	return (EXIT_FAILURE);
       }
-      decidestring(m, n, outfile);
+      
+      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      boardsize = gameinfo.position.boardsize;
+      
+      if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
+	fprintf(stderr, "usage: --decide-connection [first string]/[second string]\n");
+	return (EXIT_FAILURE);
+      }
+      
+      if (!string_to_location(boardsize, decide_that, &bi, &bj)) {
+	fprintf(stderr, "usage: --decide-connection [first string]/[second string]\n");
+	return (EXIT_FAILURE);
+      }
+
+      decideconnection(ai, aj, bi, bj, outfile);
     }
   break;
   
@@ -770,16 +819,19 @@ main(int argc, char *argv[])
     {
       int m, n;
       
-      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
-      boardsize = gameinfo.position.boardsize;
-      if (!string_to_location(boardsize, decide_this, &m, &n)) {
-	fprintf(stderr, "gnugo: --decide-dragon: strange coordinate \n");
-	return (EXIT_FAILURE);
-      }
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-dragon must be used with -l\n");
 	return (EXIT_FAILURE);
       }
+      
+      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      boardsize = gameinfo.position.boardsize;
+      
+      if (!string_to_location(boardsize, decide_this, &m, &n)) {
+	fprintf(stderr, "gnugo: --decide-dragon: strange coordinate \n");
+	return (EXIT_FAILURE);
+      }
+
       decidedragon(m, n, outfile);
     }
     break;
@@ -788,20 +840,24 @@ main(int argc, char *argv[])
     {
       int ai, aj, bi, bj;
       
-      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
-      boardsize = gameinfo.position.boardsize;
-      if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
-	fprintf(stderr, "usage: --decide-dragon [first dragon]/[second dragon]\n");
-	return (EXIT_FAILURE);
-      }
-      if (!string_to_location(boardsize, decide_that, &bi, &bj)) {
-	fprintf(stderr, "usage: --decide-dragon [first dragon]/[second dragon]\n");
-	return (EXIT_FAILURE);
-      }
       if (!infilename) {
 	fprintf(stderr, "gnugo: --decide-semeai must be used with -l\n");
 	return (EXIT_FAILURE);
       }
+      
+      gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
+      boardsize = gameinfo.position.boardsize;
+      
+      if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
+	fprintf(stderr, "usage: --decide-semeai [first dragon]/[second dragon]\n");
+	return (EXIT_FAILURE);
+      }
+      
+      if (!string_to_location(boardsize, decide_that, &bi, &bj)) {
+	fprintf(stderr, "usage: --decide-semeai [first dragon]/[second dragon]\n");
+	return (EXIT_FAILURE);
+      }
+
       decidesemeai(ai, aj, bi, bj, outfile);
     }
     break;
@@ -823,18 +879,19 @@ main(int argc, char *argv[])
     {
       int m, n;
       
+      if (!infilename) {
+	fprintf(stderr, "gnugo: --decide-eye must be used with -l\n");
+	return (EXIT_FAILURE);
+      }
+      
       gameinfo_play_sgftree(&gameinfo, sgftree.root, untilstring);
       boardsize = gameinfo.position.boardsize;
       
       if (!string_to_location(boardsize, decide_this, &m, &n)) {
-	fprintf(stderr, "gnugo: --decideeye: strange coordinate \n");
+	fprintf(stderr, "gnugo: --decide-eye: strange coordinate \n");
 	return (EXIT_FAILURE);
       }
       
-      if (!infilename) {
-	fprintf(stderr, "gnugo: --decideeye must be used with -l\n");
-	return (EXIT_FAILURE);
-      }
       decideeye(m, n, outfile);
     }
     break;
@@ -1047,6 +1104,7 @@ Debugging Options:\n\
    --showscore                   print estimated score\n\
    -r, --seed number             set random number seed\n\
        --decide-string <string>  can this string live? (try with -o)\n\
+       --decide-connection <string/string> can these strings be connected? (try with -o)\n\
        --decide-dragon <dragon>  can this dragon live? (try with -o or -t)\n\
        --decide-position         evaluate all dragons (try with -o or -t)\n\
        --decide-eye <string>     evaluate the eye\n\

@@ -744,6 +744,37 @@ sgf_trace(const char *func, int str, int move, int result,
   sgftreeAddComment(sgf_dumptree, NULL, buf);
 }
 
+/* Write two group reading (connection or semeai) trace data to an SGF
+ * file. Normally called through the macro SGFTRACE2 in cache.h.
+ */
+
+void
+sgf_trace2(const char *func, int str1, int str2, int move, int result,
+	   const char *message)
+{
+  char buf[100];
+
+  sprintf(buf, "%s %c%d %c%d: ", func,
+	  J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
+	  J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
+  
+  if (result == 0)
+    sprintf(buf + strlen(buf), "0");
+  else if (ON_BOARD(move))
+    sprintf(buf + strlen(buf), "%s %c%d", result_to_string(result), 
+	    J(move) + 'A' + (J(move) >= 8),
+	    board_size - I(move));
+  else if (is_pass(move))
+    sprintf(buf + strlen(buf), "%s PASS", result_to_string(result));
+  else
+    sprintf(buf + strlen(buf), "%s [%d]", result_to_string(result), move);
+
+  if (message)
+    sprintf(buf + strlen(buf), " (%s)", message);
+  
+  sgftreeAddComment(sgf_dumptree, NULL, buf);
+}
+
 /*
  * Local Variables:
  * tab-width: 8

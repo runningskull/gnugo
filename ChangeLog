@@ -32,6 +32,10 @@
 - attack.db and defense.db revised
 - indirect_helper() removed from helpers.c
 - tuning
+- new function have_common_lib() in board.c
+- new option --decide-connection
+- new function decideconnection() in sgfdecide.c
+- bugfixes in board.c, sgfdecide.c, and main.c
 
 3.1.9 released October 7, 2001
 

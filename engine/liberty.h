@@ -143,6 +143,7 @@ int findlib(int str, int maxlib, int *libs);
 int approxlib(int pos, int color, int maxlib, int *libs);
 int count_common_libs(int str1, int str2);
 int find_common_libs(int str1, int str2, int maxlib, int *libs);
+int have_common_lib(int str1, int str2, int *lib);
 
 void start_timer(int n);
 double time_report(int n, const char *occupation, int i, int j);
@@ -254,8 +255,8 @@ void purge_persistent_reading_cache(void);
 void reading_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 
 /* readconnect.c */
-int recursive_connect(int str1, int str2, int *move);
-int recursive_disconnect(int str1, int str2, int *move);
+int connect(int str1, int str2, int *move);
+int disconnect(int str1, int str2, int *move);
 
 
 int liberty_of_string(int pos, int str);

@@ -47,7 +47,7 @@ decidestring(int m, int n, const char *sgf_output)
   SGFTree  tree;
   
   if (BOARD(m, n) == EMPTY) {
-    fprintf(stderr, "gnugo: --decidestring called on an empty vertex\n");
+    fprintf(stderr, "gnugo: --decide-string called on an empty vertex\n");
     return ;
   }
 
@@ -114,6 +114,73 @@ decidestring(int m, int n, const char *sgf_output)
 
 
 /* 
+ * decideconnection tries to connect and disconnect the strings at
+ * (ai, aj) and (bi, bj), and then writes the number of variations
+ * considered in the attack and defence to the sgf file.
+ */
+
+void
+decideconnection(int ai, int aj, int bi, int bj, const char *sgf_output)
+{
+  int move;
+  int result;
+  SGFTree tree;
+
+  ASSERT_ON_BOARD2(ai, aj);
+  ASSERT_ON_BOARD2(bi, bj);
+  
+  if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY) {
+    fprintf(stderr, "gnugo: --decide-connection called on an empty vertex\n");
+    return ;
+  }
+
+  if (BOARD(ai, aj) != BOARD(bi, bj)) {
+    fprintf(stderr, "gnugo: --decide-connection called for strings of different colors\n");
+    return ;
+  }
+
+  if (sgf_output)
+    begin_sgftreedump(&tree);
+
+  /* Prepare pattern matcher and reading code. */
+  reset_engine();
+
+  count_variations = 1;
+  result = connect(POS(ai, aj), POS(bi, bj), &move);
+  if (result == WIN) {
+    if (move == NO_MOVE)
+      gprintf("%m and %m are connected as it stands (%d variations)\n", 
+	      ai, aj, bi, bj, count_variations);
+    else
+	gprintf("%m and %m can be connected at %1m (%d variations)\n", 
+		ai, aj, bi, bj, move, count_variations);
+  }
+  else
+    gprintf("%m and %m cannot be connected (%d variations)\n", 
+	    ai, aj, bi, bj, count_variations);
+  
+  count_variations = 1;
+  result = disconnect(POS(ai, aj), POS(bi, bj), &move);
+  if (result == WIN) {
+    if (move == NO_MOVE)
+      gprintf("%m and %m are disconnected as it stands (%d variations)\n", 
+	      ai, aj, bi, bj, count_variations);
+    else
+	gprintf("%m and %m can be disconnected at %1m (%d variations)\n", 
+		ai, aj, bi, bj, move, count_variations);
+  }
+  else
+    gprintf("%m and %m cannot be disconnected (%d variations)\n", 
+	    ai, aj, bi, bj, count_variations);
+  
+  if (sgf_output) {
+    end_sgftreedump(sgf_output);
+    count_variations = 0;
+  }
+}
+
+
+/* 
  * decidedragon tries to attack and defend the dragon at (m, n),
  * and then writes the number of variations considered in the attack
  * and defence to the sgf file.
@@ -128,7 +195,7 @@ decidedragon(int m, int n, const char *sgf_output)
   int result_certain;
 
   if (BOARD(m, n) == EMPTY) {
-    fprintf(stderr, "gnugo: --decidedragon called on an empty vertex\n");
+    fprintf(stderr, "gnugo: --decide-dragon called on an empty vertex\n");
     return ;
   }
 
@@ -211,7 +278,7 @@ decidesemeai(int ai, int aj, int bi, int bj, const char *sgf_output)
 
   if ((BOARD(ai, aj) == EMPTY)
       || (BOARD(bi, bj) == EMPTY)) {
-    fprintf(stderr, "gnugo: --decidesemeai called on an empty vertex\n");
+    fprintf(stderr, "gnugo: --decide-semeai called on an empty vertex\n");
     return ;
   }
 
