@@ -1419,6 +1419,13 @@ show_version(void)
 
 #define USAGE "\n\
 Usage: gnugo [-opts]\n\
+Examples:\
+  gnugo --mode gtp --level 5\n\
+         To play against gnugo in level 5 from a GTP client\n\
+  gnugo --mode ascii -l game.sgf -L 123\n\
+         Resume game at move 123 in ASCII mode\n\
+  gnugo --score estimate -l game.sgf\n\
+         Give a rough score estimate of the end position in game.sgf\n\
 \n\
 Main Options:\n\
        --mode <mode>     Force the playing mode ('ascii', 'gmp', 'sgmp',\n\
@@ -1427,28 +1434,14 @@ Main Options:\n\
                          will be assumed.\n\
        --quiet           Don't print copyright and informational messages\n\
        --level <amount>  strength (default %d)\n\
+       --never-resign    Forbid GNU Go to resign\n\
+       --allow-resign	 Allow resignation (default)\n\
        --gtp-input <file>Read gtp commands from file instead of stdin\n\
    -l, --infile <file>   Load name sgf file\n\
    -L, --until <move>    Stop loading just before move is played. <move>\n\
                          can be the move number or location (eg L10).\n\
    -o, --outfile <file>  Write sgf output to file\n\
    --printsgf <file>     Write position as a diagram to file (use with -l)\n\
-\n\
-Other options affecting strength (higher = stronger, slower):\n\
-(Unless you are working on the program --level <n> is all you need.)\n\
-   -D, --depth <depth>          deep reading cutoff (default %d)\n\
-   -B, --backfill-depth <depth> deep reading cutoff (default %d)\n\
-   -F, --fourlib-depth <depth>  deep reading cutoff (default %d)\n\
-   -K, --ko-depth <depth>       deep reading cutoff (default %d)\n\
-   --branch-depth <depth>       deep reading cutoff (default %d)\n\
-   --backfill2-depth <depth>    deep reading cutoff (default %d)\n\
-   --break_chain-depth <depth>  deep reading cutoff (default %d)\n\
-   --superstring-depth <depth>  deep reading cutoff (default %d)\n\
-   --aa-depth <depth>           deep reading cutoff (default %d)\n\
-   --owl-distrust <depth>       owl distrust depth (default %d)\n\
-   --owl-branch <depth>         owl branching depth (default %d)\n\
-   --owl-reading <depth>        owl reading depth (default %d)\n\
-   --owl-node-limit <limit>     max nodes for owl reading (default %d)\n\
 "
 
 #define USAGE1 "\
@@ -1460,9 +1453,9 @@ Experimental options:\n\
    --with-break-in         use the break-in code (on at level 10 by default)\n\
    --without-break-in      do not use the break-in code\n\
    --cosmic-gnugo          use center oriented influence\n\
-   --no-cosmic-gnugo       don't use center oriented influence\n\
+   --no-cosmic-gnugo       don't use center oriented influence (default)\n\
    --large-scale           look for large scale captures\n\
-   --no-large-scape        don't seek large scale captures\n\
+   --no-large-scale        don't seek large scale captures (default)\n\
    --nofusekidb            turn off fuseki database\n\
    --nofuseki              turn off fuseki moves entirely\n\
    --nojosekidb            turn off joseki database\n\
@@ -1522,40 +1515,51 @@ Debugging Options:\n\
    -T, --printboard              colored display of dragons\n\
    -E, --printeyes               colored display of eye spaces\n\
    -d, --debug <flags>           debugging output (see next item for bits)\n\
-   --debug-flags                 print the debug flags for previous item\n\
+       --debug-flags             print the debug flags for previous item\n\
    -H, --hash <level>            hash (see gnugo.h for bits)\n\
    -w, --worms                   print worm and dragon data and move reasons\n\
    -m, --moyo <level>            moyo debugging, show moyo board\n\
+       --debuginfluence <move>   print influence map after making a move\n\
    -b, --benchmark num           benchmarking mode - can be used with -l\n\
    -S, --statistics              print statistics (for debugging purposes)\n\n\
+       --profile-patterns        print statistics for pattern usage\n\
+       --showtime                print timing diagnostic\n\
    -t, --trace                   verbose tracing\n\
    -O, --output-flags <flags>    optional output (use with -o)\n\
                     d: mark dead and critical dragons\n\
                     v: show values of considered moves\n\
                     specify either 'd', 'v' or 'dv' (nothing by default)\n\
-   --showtime                    print timing diagnostic\n\
-   --replay <color>              replay game. Use with -o.\n\
-   --showscore                   print estimated score\n\
+       --showscore               print estimated score\n\
    -r, --seed number             set random number seed\n\
-   --gtp-dump-commands <file>    dump commands received in GTP mode\n\
+       --gtp-dump-commands <file>dump commands received in GTP mode\n\
 "
 
 #define USAGE_DEBUG2 "\
-       --decide-string <string>  can this string live? (try with -o)\n\
-       --decide-connection <str/str> can these strings connect? (try with -o)\n\
-       --decide-dragon <dragon>  can this dragon live? (try with -o or -t)\n\
-       --decide-position         evaluate all dragons (try with -o or -t)\n\
-       --decide-eye <string>     evaluate the eye\n\
-       --decide-combination      search for combination attack (try with -o)\n\
-       --genmove <color>         generate a move for color\n\
-       --nofusekidb              turn off fuseki database\n\
-       --nofuseki                turn off fuseki moves entirely\n\
-       --nojosekidb              turn off joseki database\n\
-       --debuginfluence <move>   print influence map after making a move\n\
-       --score <end|last|move>   count or estimate territory\n\
-       --profile-patterns        print statistics for pattern usage\n\
-       --attack-by-pattern       use pattern-based tactical reading for attack\n\
-       --defend-by-pattern       use pattern-based tactical reading for defense\n\
+Options affecting depth settings and playing strength:\n\
+   -D, --depth <depth>          deep reading cutoff (default %d)\n\
+   -B, --backfill-depth <depth> deep reading cutoff (default %d)\n\
+   -F, --fourlib-depth <depth>  deep reading cutoff (default %d)\n\
+   -K, --ko-depth <depth>       deep reading cutoff (default %d)\n\
+   --branch-depth <depth>       deep reading cutoff (default %d)\n\
+   --backfill2-depth <depth>    deep reading cutoff (default %d)\n\
+   --break_chain-depth <depth>  deep reading cutoff (default %d)\n\
+   --superstring-depth <depth>  deep reading cutoff (default %d)\n\
+   --aa-depth <depth>           deep reading cutoff (default %d)\n\
+   --owl-distrust <depth>       owl distrust depth (default %d)\n\
+   --owl-branch <depth>         owl branching depth (default %d)\n\
+   --owl-reading <depth>        owl reading depth (default %d)\n\
+   --owl-node-limit <limit>     max nodes for owl reading (default %d)\n\
+Options providing detailed reading results etc.:\n\
+   --decide-string <string>     can this string live? (try with -o)\n\
+   --decide-connection <str/str> can these strings connect? (try with -o)\n\
+   --decide-dragon <dragon>     can this dragon live? (try with -o or -t)\n\
+   --decide-position            evaluate all dragons (try with -o or -t)\n\
+   --decide-eye <string>        evaluate the eye\n\
+   --decide-combination         search for combination attack (try with -o)\n\
+   --genmove <color>            generate a move for color\n\
+Other options:\n\
+   --attack-by-pattern          use pattern-based tactical reading for attack\n\
+   --defend-by-pattern          use pattern-based tactical reading for defense\n\
 "
 
 #define DEBUG_FLAGS "\
@@ -1595,11 +1599,7 @@ static void
 show_help(void)
 {
   set_depth_values(DEFAULT_LEVEL, 0);
-  printf(USAGE, level,
-	 depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
-	 backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
-	 owl_distrust_depth, owl_branch_depth,
-	 owl_reading_depth, owl_node_limit);
+  printf(USAGE, level);
   printf(USAGE1, (float) DEFAULT_MEMORY);
   printf(USAGE2, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }
@@ -1608,7 +1608,11 @@ show_help(void)
 static void
 show_debug_help(void)
 {
-  printf(USAGE_DEBUG USAGE_DEBUG2);
+  printf(USAGE_DEBUG USAGE_DEBUG2, 
+	 depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
+	 backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
+	 owl_distrust_depth, owl_branch_depth,
+	 owl_reading_depth, owl_node_limit);
 }
 
 static void 
