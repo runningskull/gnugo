@@ -410,9 +410,10 @@ x*Yx
 
 
 Pattern A204
+# gf Pattern revised. (3.5.1)
 
 ??O??              second line block
-..*Y?
+?.*Y?
 .....
 -----
 
