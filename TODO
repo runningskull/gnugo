@@ -117,14 +117,12 @@ playing strength of the program and/or enhance certain aspects of it.
  * Extend and tune the Joseki database. It might be very useful to implement
    a semi-automatic way of doing this.
 
- * The semeai module is still in need of improvement.
-   (This is underway.)
+ * The semeai module is still in need of improvement. (This is underway.)
 
  * The connection analysis is today completely static and has a hard
    time identifying mutually dependent connections or moves that
    simultaneously threatens two or more connections. This could be
-   improved by writing a connection reader.
-   (This is underway.)
+   improved by writing a connection reader. (This is underway.)
 
  * GNU Go does not have a move generator that tries explicitly to build
    moyos, or reduce/invade opponent's moyos. Such a move generator could

@@ -10,6 +10,8 @@
 - EXP_J_VALUE increased to 35 in shapes.c
 - tuning
 - influence tuning
+- new logo-32.jpg and logo-32.eps
+- newlogo.eps made smaller using level 2 postscript
 - doc revision
 
 3.1.29 released March 26, 2002

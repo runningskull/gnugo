@@ -17,13 +17,13 @@
 @subtitle Edition @value{EDITION}
 @subtitle April, 2002
 @vskip 0pt plus 1filll
-@image{newlogo}
+@image{logo-32}
 @vskip 0pt plus 1filll
 @author By Arend Bayer, Daniel Bump, David Denholm, Jerome Dumonteil, 
 @author Gunnar Farneb@"ack, Thomas Traber, Tanguy Urvoy, Inge Wallin
 @sp 1
 @page
-@title{GNU GO 3.0}
+@title{GNU GO 3.2}
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 @sp 2
