@@ -14,7 +14,7 @@ loadsgf games/arend/gnugo-gnugo1.sgf 112
 # SEVERITY=10
 loadsgf games/arend/gnugo-gnugo1.sgf 139
 3 gg_genmove black
-#? [P6|O5|Q5]*
+#? [P6|Q5]*
 
 # These kind of fights might be very difficult to do well
 # with current GnuGo methods (How should it choose between the different
@@ -175,10 +175,9 @@ loadsgf games/arend/gnugo-gnugo7.sgf 140
 #? [F9]*
  
 #CATEGORY=ENDGAME_TUNING
-# This throws awsay 4 pts -- quite a lot for an endgame move!
 loadsgf games/arend/gnugo-gnugo7.sgf 173
 34 gg_genmove black
-#? [H7]*
+#? [!K8]*
  
 # This is a serious mistake. H17 is not huge, its HUGE.
 loadsgf games/arend/gnugo-gnugo8.sgf 32
@@ -216,3 +215,16 @@ loadsgf games/arend/constructed3.sgf
 loadsgf games/arend/constructed4.sgf
 39 gg_genmove black 3
 #? [G10|H10|F13]*
+
+#CATEGORY=ENDGAME_TUNING
+# EB714 is necessary here; without it, GnuGo played B6, only for the
+# reason of filling a liberty
+loadsgf games/arend/constructed5.sgf
+40 gg_genmove white
+#? [B7]*
+
+#CATEGORY=ENDGAME_TUNING
+# EB715 necessary
+loadsgf games/arend/constructed6.sgf
+41 gg_genmove white
+#? [B6]*

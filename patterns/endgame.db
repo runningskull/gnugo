@@ -451,7 +451,7 @@ cb
 da
 --
 
-;eye(a) && eye(b) && !oplay_attack(a,b,b)
+;eye(a) && eye(b) && oplay_defend_both(a,b,a,c)
 
 
 # first line corner moves
