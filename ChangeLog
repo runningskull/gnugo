@@ -62,6 +62,7 @@
 - new autohelper functions o_captures_something(),
   x_captures_something(), false_eye_territory(), and false_eye()
 - owl_tuning
+- eye tuning
 - influence tuning
 - tuning
 - new game records and regression tests

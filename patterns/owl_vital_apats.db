@@ -830,4 +830,16 @@ AB
 ; lib(B) <= 2 && owl_eyespace(A)
 
 
+Pattern VA50
+# pp New pattern (3.3.10)
+
+|xx??
+|Ox??        try to kill with bent four in the corner
+|OXXx
+|X*.x
++----
+
+:8,s,value(45)
+
+
 # END OF FILE
