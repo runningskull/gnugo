@@ -11,7 +11,7 @@ loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 22
 10 gg_genmove black
-#? [!H6]
+#? [!H6]*
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 96
 20 gg_genmove black
@@ -56,7 +56,7 @@ loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 214
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 34
 110 gg_genmove black
-#? [B14|B13]
+#? [B14|B13]*
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 42
 120 gg_genmove black
@@ -73,7 +73,7 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 130
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
 150 gg_genmove black
-#? [M3|L3]*
+#? [M3|L3]
 
 # same bug as century-2002:30
 loadsgf games/nngs/gnugo-3.3.2-Programmer-200206021522.sgf 52
@@ -151,12 +151,12 @@ loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 240
 # C10 is important enough to be saved, D10 only move.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 34
 400 gg_genmove white
-#? [D10]
+#? [D10]*
 
 # stones at C10 are critical, don't tenuki.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 42
 410 gg_genmove white
-#? [D7]
+#? [D7]*
 
 # don't get into the snap back!
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 115
@@ -166,29 +166,29 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 115
 # missed vital snap back after black's mistake.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 116
 430 gg_genmove white
-#? [M11]
+#? [M11]*
 
 # all these moves should kill at least some of black stones
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 144
 440 gg_genmove white
-#? [B18|C18|E16|E18|F16|F17]
+#? [B18|C18|E16|E18|F16|F17]*
 
 # prevent loss of four stones a couple of moves later. E16 doesn't
 # look very good, but it works.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 170
 450 gg_genmove white
-#? [E14|D15|E16]
+#? [E14|D15|E16]*
 
 # black is getting to deep, time to defend.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 196
 460 gg_genmove white
-#? [J4|K2|K3|K4|K5|L2]
+#? [J4|K2|K3|K4|K5|L2]*
 
 #CATEGORY=SEMEAI
 # If we move first, black can only get a ko in the semeai.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 212
 470 gg_genmove white
-#? [H6|H5|H3]
+#? [H6|H5|H3]*
 
 
 ############ End of Tests #################

@@ -57,7 +57,7 @@ loadsgf games/scoring/score14.sgf
 
 loadsgf games/scoring/score15.sgf
 15 final_score
-#? [W\+45.5]
+#? [W\+45.5]*
 
 loadsgf games/scoring/score16.sgf
 16 final_score

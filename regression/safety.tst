@@ -6,7 +6,7 @@
 
 loadsgf games/nngs/gnugo-3.3.6-xtc-200208301619.sgf 16
 1 gg_genmove white
-#? [R6|S2]
+#? [R6|S2]*
 
 loadsgf games/nngs/gnugo-3.3.6-xtc-200208301619.sgf 20
 2 gg_genmove white

@@ -192,7 +192,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 202
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 22
 460 gg_genmove black
-#? [N17|M17|Q17|Q18]*
+#? [N17|M17|Q17|Q18]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 24
@@ -218,7 +218,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 42
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 190
 510 gg_genmove black
-#? [P4]
+#? [P4]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 208
@@ -307,7 +307,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 44
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 54
 700 gg_genmove black
-#? [Q2]
+#? [Q2]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 56

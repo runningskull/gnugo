@@ -77,7 +77,7 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 43
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 45
 130 gg_genmove black
-#? [N4]
+#? [N4]*
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 57
 140 gg_genmove black

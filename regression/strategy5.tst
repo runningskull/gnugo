@@ -59,7 +59,7 @@ loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 107
 # If tuning this position be sure GNU Go plays subsequent moves acceptably
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 17
 232 gg_genmove black
-#? [D11|E11]*
+#? [D11|E11]
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 23
 233 gg_genmove black
@@ -85,25 +85,25 @@ loadsgf games/nngs/gnugo-3.3.6-evand-200208290255.sgf 73
 # F8 and F7 both fail.
 loadsgf games/strategy47.sgf
 273 gg_genmove white
-#? [E8|E9|F9|E7|F6|E6|D7|C7]
+#? [E8|E9|F9|E7|F6|E6|D7|C7]*
 
 # Black has a combination attack which must be defended correctly against.
 # In particular L5 fails.
 loadsgf games/strategy48.sgf
 274 gg_genmove white
-#? [!L5|M5|N5]
+#? [!L5|M5|N5]*
 
 # Semeai problem. White can make seki, black can kill.
 loadsgf games/strategy49.sgf
 275 gg_genmove white
-#? [A18]
+#? [A18]*
 276 gg_genmove black
 #? [A18]
 
 # R19 defends everything.
 loadsgf games/strategy50.sgf
 277 gg_genmove white
-#? [R19]
+#? [R19]*
 
 
 

@@ -36,7 +36,7 @@ loadsgf games/owl36.sgf
 
 loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 192
 269 owl_defend D11
-#? [1 E9]*
+#? [1 E9]
 
 # tests 270 - 276 refer to badly connected dragon eyespaces
 loadsgf games/owl37.sgf
@@ -67,7 +67,7 @@ loadsgf games/owl39.sgf
 # GNU Go tries to "eat lunch" at B1 instead of recognizing this as seki.
 loadsgf games/owl40.sgf
 277 owl_defend A3
-#? [1 PASS]
+#? [1 PASS]*
 
 ########### end of tests #####################
 

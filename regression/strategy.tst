@@ -49,7 +49,7 @@ loadsgf games/incident108b.sgf 172
 # incident 110
 loadsgf games/incident108b.sgf 176
 10 gg_genmove black
-#? [Q7]*
+#? [Q7]
 
 #CATEGORY=BAD_PROBLEM
 #DESCRIPTION=Not clear enough.
@@ -181,7 +181,7 @@ loadsgf games/strategy5.sgf 20
 
 loadsgf games/strategy5.sgf 40
 29 gg_genmove black
-#? [R4]
+#? [R4]*
 
 loadsgf games/strategy5.sgf 44
 30 gg_genmove black

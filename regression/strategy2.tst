@@ -172,7 +172,7 @@ loadsgf games/strategy23.sgf
 
 loadsgf games/dragon1.sgf 206
 82 gg_genmove black
-#? [L5]*
+#? [L5]
 
 loadsgf games/heikki/heikki01.sgf 17
 # P15 is a joseki, but GNU should at least see that P14 is urgent

@@ -37,9 +37,9 @@ loadsgf games/golife.sgf 46
 orientation 3
 loadsgf games/marginal_ko.sgf
 244 owl_attack D11
-#? [(2|3) F11]*
+#? [(2|3) F11]
 
 orientation 3
 loadsgf games/marginal_ko.sgf
 245 owl_defend D11
-#? [1 (F11|H8|F8)]*
+#? [1 (F11|H8|F8)]

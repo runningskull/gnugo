@@ -28,7 +28,7 @@ loadsgf games/scoring/score37.sgf
 
 loadsgf games/scoring/score38.sgf
 38 final_score
-#? [B\+8.5]
+#? [B\+8.5]*
 
 loadsgf games/scoring/score39.sgf
 39 final_score
@@ -76,7 +76,7 @@ loadsgf games/scoring/score49.sgf
 
 loadsgf games/scoring/score50.sgf
 50 final_score
-#? [B\+14.5]
+#? [B\+14.5]*
 
 loadsgf games/scoring/score51.sgf
 51 final_score
@@ -108,7 +108,7 @@ loadsgf games/scoring/score57.sgf
 
 loadsgf games/scoring/score58.sgf
 58 final_score
-#? [B\+103.5]
+#? [B\+103.5]*
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209090532.sgf
 59 final_score
@@ -116,4 +116,4 @@ loadsgf games/nngs/gnugo-3.3.8-evand-200209090532.sgf
 
 loadsgf games/nngs/silverado-gnugo-3.3.8-200209120723.sgf
 60 final_score
-#? [B\+19.5]
+#? [B\+19.5]*

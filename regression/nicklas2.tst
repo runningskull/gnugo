@@ -46,7 +46,7 @@ loadsgf games/nicklas/nicklas6.sgf 23
 #to better isolate the inherent problem. - trevor
 loadsgf games/nicklas/nicklas7.sgf 29
 701 gg_genmove black
-#? [F1]
+#? [F1]*
 
 
 #CATEGORY=SEMEAI_MODULE

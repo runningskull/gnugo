@@ -34,17 +34,17 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 72
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 80
 150 gg_genmove black
-#? [!J13|M5]*
+#? [!J13|M5]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 84
 160 gg_genmove black
-#? [!P14|P13|M5|P12]*
+#? [!P14|P13|M5|P12]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 86
 170 gg_genmove black
-#? [!N13|M5]*
+#? [!N13|M5]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 152
@@ -127,7 +127,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 8
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 12
 320 gg_genmove black
-#? [B15|B16]*
+#? [B15|B16]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 14
@@ -208,12 +208,12 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 86
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 90
 500 gg_genmove black
-#? [J17]*
+#? [J17]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 92
 510 gg_genmove black
-#? [G14]*
+#? [G14]
 
 
 
@@ -777,7 +777,7 @@ loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 60
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 68
 1700 gg_genmove black
-#? [!J18]*
+#? [!J18]
 
 
 
@@ -818,7 +818,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 57
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 59
 1800 gg_genmove black
-#? [!H5|G4|F6|F7]
+#? [!H5|G4|F6|F7]*
 
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 67

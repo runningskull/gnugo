@@ -21,7 +21,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 70
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 96
 6 gg_genmove black
-#? [H3]
+#? [H3]*
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 114
 7 gg_genmove black
@@ -60,7 +60,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 102
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 108
 15 gg_genmove black
-#? [Q15|T5|H5|H3]
+#? [Q15|T5|H5|H3]*
 
 # Locally, L16 is better than L17.
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 192

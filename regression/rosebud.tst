@@ -6,7 +6,7 @@ reset_trymove_counter
 
 loadsgf games/rosebud.sgf 10
 1 gg_genmove black
-#? [E16]*
+#? [E16]
 
 ############ End of Tests #################
 

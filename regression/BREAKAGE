@@ -1,3 +1,95 @@
+======================= 3.3.9 pre 2  =========================   
+
+./regress.sh . owl.tst
+23 unexpected FAIL: Correct '0', got '1 S10'
+262 unexpected PASS!
+./regress.sh . owl_rot.tst
+244 unexpected PASS!
+245 unexpected PASS!
+./regress.sh . atari_atari.tst
+16 unexpected FAIL: Correct 'K3', got 'A1' 
+./regress.sh . blunder.tst
+23 unexpected FAIL: Correct '!F4|F5|F6', got 'F6'
+24 unexpected FAIL: Correct '!P5', got 'P5'
+25 unexpected FAIL: Correct '!P9|M5|T9', got 'P9'
+26 unexpected FAIL: Correct '!D19|F17', got 'D19'
+27 unexpected FAIL: Correct '!R3', got 'R3'
+./regress.sh . strategy.tst
+10 unexpected PASS!
+29 unexpected FAIL: Correct 'R4', got 'E16'
+./regress.sh . rosebud.tst
+1 unexpected PASS!
+./regress.sh . lazarus.tst
+6 unexpected FAIL: Correct 'H3', got 'H2'  
+15 unexpected FAIL: Correct 'Q15|T5|H5|H3', got 'S13'
+./regress.sh . trevorb.tst
+270 unexpected FAIL: Correct 'G11', got 'G4'
+./regress.sh . strategy2.tst
+82 unexpected PASS!
+./regress.sh . nicklas2.tst
+701 unexpected FAIL: Correct 'F1', got 'B5'
+./regress.sh . nngs.tst
+150 unexpected PASS!
+160 unexpected PASS!
+170 unexpected PASS!
+320 unexpected PASS!
+500 unexpected PASS!
+510 unexpected PASS!
+1700 unexpected PASS!
+1800 unexpected FAIL: Correct '!H5|G4|F6|F7', got 'G4'
+./regress.sh . trevorc.tst
+560 unexpected PASS!
+1080 unexpected FAIL: Correct '!L8|K10|K9', got 'L8'
+./regress.sh . strategy3.tst
+111 unexpected FAIL: Correct 'K3', got 'P3'
+./regress.sh . global.tst
+14 unexpected PASS!
+./regress.sh . 13x13.tst
+16 unexpected FAIL: Correct 'C6|C5', got 'J4'
+40 unexpected FAIL: Correct 'K13', got 'M12'
+43 unexpected PASS!
+149 unexpected PASS!
+63 unexpected PASS!
+65 unexpected FAIL: Correct 'H4', got 'L4' 
+./regress.sh . trevord.tst
+340 unexpected FAIL: Correct 'H10', got 'F8'
+./regress.sh . strategy4.tst
+199 unexpected FAIL: Correct 'N5|S18', got 'B2'
+216 unexpected PASS!
+./regress.sh . owl1.tst
+269 unexpected PASS!
+277 unexpected FAIL: Correct '1 PASS', got '0'
+./regress.sh . handtalk.tst
+3 unexpected PASS!
+8 unexpected PASS!
+./regress.sh . nngs2.tst
+10 unexpected FAIL: Correct '!H6', got 'H6'
+110 unexpected FAIL: Correct 'B14|B13', got 'L15'
+150 unexpected PASS!
+400 unexpected FAIL: Correct 'D10', got 'B8'
+410 unexpected FAIL: Correct 'D7', got 'F15'
+430 unexpected FAIL: Correct 'M11', got 'M15'
+440 unexpected FAIL: Correct 'B18|C18|E16|E18|F16|F17', got 'B19'
+450 unexpected FAIL: Correct 'E14|D15|E16', got 'D12'
+460 unexpected FAIL: Correct 'J4|K2|K3|K4|K5|L2', got 'J9'
+470 unexpected FAIL: Correct 'H6|H5|H3', got 'J9'
+./regress.sh . nngs3.tst
+460 unexpected PASS!
+510 unexpected FAIL: Correct 'P4', got 'N3'
+700 unexpected FAIL: Correct 'Q2', got 'P7'
+./regress.sh . strategy5.tst
+232 unexpected PASS!
+273 unexpected FAIL: Correct 'E8|E9|F9|E7|F6|E6|D7|C7', got 'F8'
+274 unexpected FAIL: Correct '!L5|M5|N5', got 'L5'
+275 unexpected FAIL: Correct 'A18', got 'PASS'
+277 unexpected FAIL: Correct 'R19', got 'O18'
+./regress.sh . century2002.tst
+130 unexpected FAIL: Correct 'N4', got 'P9'
+./regress.sh . auto04.tst
+2 unexpected FAIL: Correct '!0', got '0'   
+./regress.sh . safety.tst
+1 unexpected FAIL: Correct 'R6|S2', got 'O14'
+
 ======================= 3.3.9 pre 1  =========================   
 
 ./regress.sh . owl.tst

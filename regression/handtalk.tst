@@ -19,7 +19,7 @@ loadsgf games/handtalk/handtalk12.sgf 37
 # seems more urgent.
 loadsgf games/handtalk/handtalk12.sgf 55
 3 gg_genmove black
-#? [!F18]*
+#? [!F18]
 
 # Have to try this ko!
 loadsgf games/handtalk/handtalk12.sgf 91
@@ -40,7 +40,7 @@ loadsgf games/handtalk/handtalk21.sgf 14
 
 loadsgf games/handtalk/handtalk21.sgf 24
 8 gg_genmove white
-#? [!G14]*
+#? [!G14]
 
 loadsgf games/handtalk/handtalk21.sgf 46
 9 gg_genmove white

@@ -54,7 +54,7 @@ loadsgf golois/Goemate990902-15.sgf
 # Semeai problem.
 loadsgf golois/Goemate990902-1.sgf
 14 gg_genmove black
-#? [S9]*
+#? [S9]
 
 loadsgf golois/Goemate990903-10.sgf
 15 gg_genmove black

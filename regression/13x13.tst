@@ -95,7 +95,7 @@ loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
 16 gg_genmove white
-#? [C6|C5]
+#? [C6|C5]*
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
@@ -204,7 +204,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 40 gg_genmove white
-#? [K13]
+#? [K13]*
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 41 gg_genmove white
@@ -220,7 +220,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
 # the gap at D7 (by playing D6) should often be bad.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 25
 43 gg_genmove black
-#? [D6]*
+#? [D6]
 
 #CATEGORY=ENDGAME_TUNING
 # To get better evaluation for B6 one would need to
@@ -262,7 +262,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 # Renumbered since there were 2 test 49's
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
 149 gg_genmove black
-#? [L7]*
+#? [L7]
 
 # Here N11 is generated as an "additional attack/defense move", although
 # the black dragon is still dead after black connects at N11.
@@ -335,7 +335,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 13
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 25
 63 gg_genmove black
-#? [K4]*
+#? [K4]
 
 #CATEGORY=OWL_TUNING
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 33
@@ -345,7 +345,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 33
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 35
 65 gg_genmove black
-#? [H4]
+#? [H4]*
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 47
 66 gg_genmove black

@@ -56,7 +56,7 @@ loadsgf games/strategy27.sgf 220
 
 loadsgf games/me.sgf 44
 111 gg_genmove black
-#? [K3]
+#? [K3]*
 
 loadsgf games/me.sgf 84
 112 gg_genmove black
