@@ -209,6 +209,58 @@ mprintf(const char *fmt, ...)
   va_end(ap);
 }
 
+/* This writes the move history information in sgf format to stderr.
+ * This is only intended as a stand-alone debug tool for use in
+ * abortgo(). Anywhere else you should use the normal sgf library.
+ */
+static void
+dump_board_sgf(void)
+{
+  int pos;
+  int initial_colors_found = EMPTY;
+  int color;
+  int k;
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos))
+      initial_colors_found |= initial_board[pos];
+  
+  fprintf(stderr, "(;GM[1]FF[4]SZ[%d]KM[%.1f]GN[GNU Go %s stepped on a bug]\n",
+	  board_size, komi, gg_version());
+
+  for (color = WHITE; color <= BLACK; color++) {
+    if (initial_colors_found & color) {
+      fprintf(stderr, "A%s", color == WHITE ? "W" : "B");
+      for (k = 0, pos = BOARDMIN; pos < BOARDMAX; pos++) {
+	if (ON_BOARD(pos) && initial_board[pos] == color) {
+	  fprintf(stderr, "[%c%c]", 'a' + J(pos), 'a' + I(pos));
+	  k++;
+	  if (k % 16 == 0)
+	    fprintf(stderr, "\n");
+	}
+      }
+      if (k % 16 != 0)
+	fprintf(stderr, "\n");
+    }
+  }
+
+  if (move_history_pointer > 0) {
+    for (k = 0; k < move_history_pointer; k++) {
+      fprintf(stderr, ";%s", move_history_color[k] == WHITE ? "W" : "B");
+      if (move_history_pos[k] == PASS_MOVE)
+	fprintf(stderr, "[]");
+      else
+	fprintf(stderr, "[%c%c]", 'a' + J(move_history_pos[k]),
+		'a' + I(move_history_pos[k]));
+      
+      if (k % 12 == 11)
+	fprintf(stderr, "\n");
+    }
+    if (k % 12 != 0)
+      fprintf(stderr, "\n");
+  }
+  fprintf(stderr, ")\n");
+}
 
 /*
  * A wrapper around abort() which shows the state variables at the time
@@ -222,27 +274,18 @@ abortgo(const char *file, int line, const char *msg, int pos)
 	  file, line, msg, pos);
   dump_stack();
 
-  /* Dump the stack as board images. */
+  /* Print the board at the top of the stack. */
   simple_showboard(stderr);
-  while (stackp > 0) {
-    popgo();
-    simple_showboard(stderr);
-  }
+  fprintf(stderr, "\n");
 
-#if 0
-  if (sgf_root) {
-    sgf_write_header(sgf_root, 1, get_random_seed()
-		     komi, level, chinese_rules);
-    writesgf(sgf_root, "abortgo.sgf");
-  }
-#endif
+  dump_board_sgf();
 
-  fprintf(stderr, "\ngnugo %s (seed %d): You stepped on a bug.\n",
+  fprintf(stderr, "gnugo %s (seed %d): You stepped on a bug.\n",
           gg_version(), get_random_seed());
   if (board_size >= 9 && board_size <= 19) {
     fprintf(stderr, "\
-Please save this game as an sgf file and mail it to gnugo@gnu.org\n\
-If you can, please also include the debug output above this message.\n");
+Please mail this message, including the debug output above, \
+to gnugo@gnu.org\n");
   }
   fprintf(stderr, "\n");
 

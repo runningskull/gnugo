@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static function dump_board_sgf() in printutils.c
+- abortgo() revised to no longer unwind the stack and to print an sgf
+  of the move history
+
 3.5.8 released June 8, 2004
 
 - make `mkpat' detect duplicate pattern names

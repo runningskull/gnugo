@@ -284,7 +284,6 @@ void draw_color_char(int m, int n, int c, int color);
 void draw_char(int m, int n, int c);
 void end_draw_board(void);
 void showboard(int xo);  /* ascii rep. of board to stderr */
-void simple_showboard(FILE *outfile);  /* ascii rep. of board to outfile */
 
 double gg_gettimeofday(void);
 
