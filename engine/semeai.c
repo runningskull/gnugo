@@ -190,46 +190,6 @@ analyze_semeai(int my_dragon, int your_dragon)
   DEBUG(DEBUG_SEMEAI, "semeai_analyzer: %1m (me) vs %1m (them)\n",
 	my_dragon, your_dragon);
 
-  /* If both dragons are owl-critical, or my dragon is owl-critical
-   * and your dragon is owl-dead, and the attack point for my dragon
-   * owl_does_defend your dragon, add another owl defend move reason
-   * and possibly change the owl status of your dragon to critical.
-   *
-   * Correction: We can't add an owl defense move reason here because
-   * this would be a defense of an opponent dragon.
-   */
-  if (dragon[my_dragon].owl_status == CRITICAL
-      && (dragon[your_dragon].owl_status == CRITICAL
-	  || dragon[your_dragon].owl_status == DEAD)) {
-    if (dragon[your_dragon].owl_defense_point
-	== dragon[my_dragon].owl_attack_point)
-      return;
-    if (dragon[my_dragon].owl_attack_point != NO_MOVE
-	&& owl_does_defend(dragon[my_dragon].owl_attack_point, your_dragon)) {
-#if 0
-      add_owl_defense_move(dragon[my_dragon].owl_attack_point, your_dragon,
-			   WIN);
-      DEBUG(DEBUG_SEMEAI, "added owl defense of %1m at %1m\n",
-	    your_dragon, dragon[my_dragon].owl_defense_point);
-#endif
-      if (dragon[your_dragon].owl_status == DEAD) {
-	for (m = 0; m < board_size; m++)
-	  for (n = 0; n < board_size; n++) {
-	    int pos = POS(m, n);
-	    if (board[pos] == board[your_dragon]
-		&& is_same_dragon(pos, your_dragon)) {
-	      dragon[pos].owl_status = CRITICAL;
-	      dragon[pos].matcher_status = CRITICAL;
-	    }
-	  }
-	DEBUG(DEBUG_SEMEAI,
-	      "changed owl_status and matcher_status of %1m to CRITICAL\n",
-	      your_dragon);
-      }
-      owl_code_sufficient = 1;
-    }
-  }
-
   /* If both dragons are owl-critical, and the defense point for my
    * dragon owl_does_attack your dragon, add another owl attack move
    * reason.
@@ -282,30 +242,6 @@ analyze_semeai(int my_dragon, int your_dragon)
 	      "changed owl_status and matcher_status of %1m to CRITICAL\n",
 	      my_dragon);
       }
-      owl_code_sufficient = 1;
-    }
-  }
-
-  /* If both dragons are owl-critical, and the defense point for your
-   * dragon owl_does_attack my dragon, add another owl attack move
-   * reason.
-   *
-   * Correction: We can't add an owl attack move reason here because
-   * this would be an attack on our own dragon.
-   */
-  if (dragon[my_dragon].owl_status == CRITICAL
-      && dragon[your_dragon].owl_status == CRITICAL) {
-    if (dragon[your_dragon].owl_defense_point
-	== dragon[my_dragon].owl_attack_point)
-      return;
-    if (dragon[your_dragon].owl_defense_point != NO_MOVE
-	&& owl_does_attack(dragon[your_dragon].owl_defense_point, my_dragon)) {
-#if 0
-      add_owl_attack_move(dragon[your_dragon].owl_defense_point, my_dragon,
-			  WIN);
-      DEBUG(DEBUG_SEMEAI, "added owl attack of %1m at %1m\n",
-	    my_dragon, dragon[your_dragon].owl_attack_point);
-#endif
       owl_code_sufficient = 1;
     }
   }
