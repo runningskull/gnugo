@@ -160,21 +160,22 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 #define CLASS_U 0x100000 /* very urgent joseki move */
 #define CLASS_T 0x200000 /* joseki trick move */
 #define CLASS_W 0x400000 /* worthwhile threat move */
+#define CLASS_F 0x800000 /* a fuseki pattern */
 
 /* Collection of the classes inducing move reasons. */
 #define CLASS_MOVE_REASONS (CLASS_C | CLASS_B | CLASS_b | \
                             CLASS_e | CLASS_E | CLASS_a | CLASS_d | \
 			    CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t | \
-                            CLASS_W | CLASS_c)
+                            CLASS_W | CLASS_c | CLASS_F)
 
 /* Values associated with patterns. Stored together with classes. */
-#define VALUE_MINVAL       0x00800000 /* pattern has a minimum value */
-#define VALUE_MAXVAL       0x01000000 /* pattern has a maximum value */
-#define VALUE_MINTERRITORY 0x02000000 /* pattern has a min territorial value */
-#define VALUE_MAXTERRITORY 0x04000000 /* pattern has a max territorial value */
-#define VALUE_SHAPE        0x08000000 /* pattern has a shape value */
-#define VALUE_FOLLOWUP     0x10000000 /* pattern has a followup value */
-#define VALUE_REV_FOLLOWUP 0x20000000 /* pattern has a reverse followup value */
+#define VALUE_MINVAL       0x01000000 /* pattern has a minimum value */
+#define VALUE_MAXVAL       0x02000000 /* pattern has a maximum value */
+#define VALUE_MINTERRITORY 0x04000000 /* pattern has a min territorial value */
+#define VALUE_MAXTERRITORY 0x08000000 /* pattern has a max territorial value */
+#define VALUE_SHAPE        0x10000000 /* pattern has a shape value */
+#define VALUE_FOLLOWUP     0x20000000 /* pattern has a followup value */
+#define VALUE_REV_FOLLOWUP 0x40000000 /* pattern has a reverse followup value */
 
 /* Collection of the classes inducing move values. */
 #define CLASS_MOVE_VALUES (VALUE_MINVAL | VALUE_MAXVAL | VALUE_MINTERRITORY \

@@ -1598,7 +1598,7 @@ Pattern Nonterritory12
 .?
 O.
 
-:|,t
+:/,t
 
 bc
 Oa
@@ -1613,7 +1613,7 @@ Pattern Nonterritory13
 .?
 X.
 
-:|,t
+:/,t
 
 a?
 Xb
@@ -1628,7 +1628,7 @@ Pattern Nonterritory14
 ..
 OX
 
-:|,t
+:8,t
 
 c?
 ab
@@ -1648,7 +1648,7 @@ Pattern Nonterritory15
 |..
 |OX
 
-:|,t
+:8,t
 
 |ef
 |cd
@@ -1672,7 +1672,7 @@ Pattern Nonterritory16
 |..
 |OX
 
-:|,t
+:8,t
 
 |ef
 |cd

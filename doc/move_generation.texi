@@ -512,6 +512,11 @@ prescribed in this way, or ones with a @code{value} field.
 One prefers not to use this approach but in practice it is
 sometimes needed.
 
+In the fuseki, there are often several moves with identical minimum
+value. GNU Go chooses randomly between such moves, which ensures
+some indeterminacy of GNU Go's play. Later in the game, GNU Go's
+genuine valuation of such a move is used as a secondary criterium.
+
 @node Secondary Value, Threats and Followup Value, Minimum Value, Valuation
 @comment  node-name,  next,  previous,  up
 @subsection Secondary Value

@@ -169,7 +169,7 @@ static int owl_determine_life(struct local_owl_data *owl,
 			      int color, int komaster, int does_attack,
 			      struct owl_move_data *moves, int *probable_min,
 			      int *probable_max);
-static int modify_stupid_eye_vital_point(int *vital_point, int color);
+static int modify_stupid_eye_vital_point(int *vital_point);
 static void owl_mark_dragon(int apos, int bpos,
 			    struct local_owl_data *owl);
 static void owl_mark_boundary(struct local_owl_data *owl);
@@ -2048,8 +2048,7 @@ owl_determine_life(struct local_owl_data *owl,
 		  pessimistic_min);
 	    
 	    if (eye[attack_point].marginal
-		&& modify_stupid_eye_vital_point(&attack_point,
-						  OTHER_COLOR(color)))
+		&& modify_stupid_eye_vital_point(&attack_point))
 	      TRACE("vital point looked stupid, moved it to %1m\n",
 		    attack_point);
 	    
@@ -2071,7 +2070,7 @@ owl_determine_life(struct local_owl_data *owl,
 		  pessimistic_min);
 
 	    if (eye[defense_point].marginal
-		&& modify_stupid_eye_vital_point(&defense_point, color))
+		&& modify_stupid_eye_vital_point(&defense_point))
 	      TRACE("vital point looked stupid, moved it to %1m\n",
 		    defense_point);
 	    
@@ -2142,12 +2141,11 @@ owl_determine_life(struct local_owl_data *owl,
  * .O.a|
  * ....|
  *
- * This function moves such moves to the second line. The color
- * parameter is the color of the player to move.
+ * This function moves such moves to the second line.
  *
  */
 static int
-modify_stupid_eye_vital_point(int *vital_point, int color)
+modify_stupid_eye_vital_point(int *vital_point)
 {
   int up;
   int right;

@@ -306,10 +306,11 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
 
   /* Pattern class j, less urgent joseki move. Add expand territory and
-   * moyo, but set the value at 20.
+   * moyo, set a minimum value of 20. If it is a fuseki pattern, set also
+   * the maximum value to 20.
    */
   if (class & CLASS_j) {
-    float fixed_value = 20;
+    float min_value = 20;
     TRACE("...less urgent joseki move\n");
     add_expand_territory_move(move);
     TRACE("...expands territory\n");
@@ -317,41 +318,50 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     TRACE("...expands moyo\n");
 
     /* Board size modification. */
-    fixed_value *= board_size / 19.0;
+    min_value *= board_size / 19.0;
     
     if (class & VALUE_SHAPE) {
-      fixed_value *= (1 + 0.01 * pattern->shape);
-      TRACE("...move value %f (shape %f)\n", fixed_value, pattern->shape);
+      min_value *= (1 + 0.01 * pattern->shape);
       class &= ~VALUE_SHAPE;
-    }
-    else
-      TRACE("...move value %f\n", fixed_value);
+    };
 
-    set_minimum_move_value(move, fixed_value);
-    if (board_size >= 17)
-      set_maximum_move_value(move, fixed_value);
+    if ((board_size >= 17) && (class & CLASS_F)) {
+      min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
+                          /* get preferred in value_move_reasons */
+      set_maximum_move_value(move, min_value);
+      TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
+    }
+    else 
+      TRACE("...minimum move value %f (shape %f)\n",
+            min_value, pattern->shape);
+    set_minimum_move_value(move, min_value);
   }
 
-  /* Pattern class t, minor joseki move (tenuki OK). Set the value at 15.
+  /* Pattern class t, minor joseki move (tenuki OK).
+   * Set the (min-)value at 15.
    */
   if (class & CLASS_t) {
-    float fixed_value = 15;
+    float min_value = 15;
     TRACE("...minor joseki move\n");
     
     /* Board size modification. */
-    fixed_value *= board_size / 19.0;
+    min_value *= board_size / 19.0;
     
     if (class & VALUE_SHAPE) {
-      fixed_value *= (1 + 0.01 * pattern->shape);
-      TRACE("...move value %f (shape %f)\n", fixed_value, pattern->shape);
+      min_value *= (1 + 0.01 * pattern->shape);
       class &= ~VALUE_SHAPE;
-    }
-    else
-      TRACE("...move value %f\n", fixed_value);
+    };
     
-    set_minimum_move_value(move, fixed_value);
-    if (board_size >= 17)
-      set_maximum_move_value(move, fixed_value);
+    if ((board_size >= 17) && (class & CLASS_F)) {
+      min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
+                          /* get preferred in value_move_reasons */
+      set_maximum_move_value(move, min_value);
+      TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
+    }
+    else 
+      TRACE("...minimum move value %f (shape %f)\n",
+            min_value, pattern->shape);
+    set_minimum_move_value(move, min_value);
   }
 
   /* Pattern class U, very urgent move joseki. Add strategical defense

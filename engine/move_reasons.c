@@ -3602,16 +3602,29 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     }
   }
   
-  /* Test if min_value or max_value values constrain the total value. */
+  /* Test if min_value or max_value values constrain the total value.
+   * First avoid contradictions between min_value and max_value,
+   * assuming that min_value is right.
+   */
+  if (move[pos].min_value > move[pos].max_value)
+    move[pos].max_value = move[pos].min_value;
+  /* If several moves have an identical minimum value, then GNU Go uses the
+   * following secondary criterion (unless min_value and max_value agree, and
+   * unless min_value is bigger than 25, in which case it probably comes from
+   * a J or U pattern): 
+   */
+  if (move[pos].min_value < 25)
+    move[pos].min_value += tot_value / 200;
+  if (tot_value < move[pos].min_value
+      && move[pos].min_value > 0) {
+    tot_value = move[pos].min_value;
+    TRACE("  %1m:   %f - minimum accepted value\n", pos, tot_value);
+  }
+  
   if (tot_value > move[pos].max_value) {
     tot_value = move[pos].max_value;
     TRACE("  %1m:   %f - maximum accepted value\n",
-	  pos, tot_value);
-  }
-  
-  if (tot_value < move[pos].min_value && move[pos].min_value > 0) {
-    tot_value = move[pos].min_value;
-    TRACE("  %1m:   %f - minimum accepted value\n", pos, tot_value);
+          pos, tot_value);
   }
 
   if (tot_value > 0

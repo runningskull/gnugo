@@ -171,7 +171,7 @@ write_colon_line(int move_type, char *text)
       p += 2;
   }
 
-  printf(":8,s");
+  printf(":8,sF");
   switch (move_type) {
   case URGENT:
     printf("U");

@@ -242,26 +242,34 @@ The move strategically attacks all X dragons in the pattern.
 @quotation
 Standard joseki move. Unless there is an urgent move on the board these moves
 are made as soon as they can be.  This is equivalent to adding the @samp{d}
-and @samp{a} classifications together with a shape bonus of 5 and a minimum
-accepted value of 25.
+and @samp{a} classifications together with a minimum accepted value of 27.
+@end quotation
+@item @samp{F}
+@quotation
+This indicates a fuseki pattern. This is only effective together with
+either the @samp{j} or @samp{t} classification, and is used to ensure
+indeterministic play during fuseki.
 @end quotation
 @item @samp{j}
 @quotation
 Slightly less urgent joseki move. These moves will be made after those
-with the @samp{J} classification. This is equivalent to adding the
-@samp{e} and @samp{E} classifications together with a minimum accepted
-value of 22.
+with the @samp{J} classification. This adds the
+@samp{e} and @samp{E} classifications. If the move has the @samp{F} 
+classification, it also gets a fixed value of 20.1, otherwise it
+gets a minimum accepted value of 20. (This makes sure that GNU Go chooses
+randomly between different moves that have @samp{jF} as classification.)
 @end quotation
 @item @samp{t}
 @quotation
 Minor joseki move (tenuki OK). This is equivalent to adding the @samp{e} and
-@samp{E} classifications together with a minimum accepted value of 18.
+@samp{E} classifications together with either a fixed value of 15.07 (if
+the move has @samp{F} classification) or a minimum value of 15 (otherwise).
 @end quotation
 @item @samp{U}
 @quotation
 Urgent joseki move (never tenuki). This is equivalent to the @samp{d} and
-@samp{a} classifications together with a shape bonus of 20 and a minimum
-accepted value of 50.  
+@samp{a} classifications together with a shape bonus of 15 and a minimum
+accepted value of 40.  
 @end quotation
 @end itemize
 
