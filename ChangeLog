@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- edge_block_moves() proposes more moves
 - don't try to undo when stackp is not zero (GTP mode)
 - support for multiple engines in view.pike
 - more info about semeais in dragon_data2

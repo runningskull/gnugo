@@ -32,7 +32,7 @@
 #include "patterns.h"
 #include "gg_utils.h"
 
-/* If defined, attack() and find_defense() write all results to
+/* If nonzero, attack() and find_defense() write all results to
  * stderr.  Use this to if you have deviations in results, but cannot
  * find where they come from.
  *
@@ -41,7 +41,8 @@
  * sorted dumps:
  *
  *   join -t= sorted-first-dump sorted-second-dump \
- *   | sed -e "s/^[^=]\+=\([^=]\+\)=\1$//" | tr -s "\n" | tr = "\t"
+ *   | sed -e "s/^[^=]\+=\([^=]\+\)=\1$//" | tr -s "\n" | tr = "\t" \
+ *   | uniq
  *
  * to get a nice list of deviations.  This is only meaningful if you
  * dump results of a single test (or at least tests originating at a
@@ -4196,23 +4197,31 @@ edge_block_moves(int str, int apos, struct reading_moves *moves)
 
 /* In positions like
  *
- * OOX..
- * XXO*.
- * x.X..
- * -----
+ *   OOX..
+ *   XXO*.
+ *   x.X..
+ *   -----
  *
  * where the X stones to the left are being attacked, it is usually
  * important to start by considering the move at *. Thus we propose
  * the move at * with a high initial score.
  *
+ * Also, it is often needed to prevent "crawling" along first line
+ * which can eventually give defender more liberties, like here:
+ *
+ *   O.OO..X
+ *   OXXO..X
+ *   ...X*..
+ *   -------
+ *
  * This function identifies the situation
  *
- * XO.?   bdf?
- * .X.o   aceg
- * ----   ----
+ *   XO.?   bdf?
+ *   .X.o   aceg
+ *   ----   ----
  *
  * where a is a liberty of the attacked string, b is a stone of the
- * attacked string, and f is the considered moves.
+ * attacked string, and e and f are the considered moves.
  */
 
 static void
@@ -4220,17 +4229,13 @@ edge_block_moves(int str, int apos, struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int k, l;
-  int cpos;
-  int dpos;
-  int epos;
-  int fpos;
-  int gpos;
-  int hpos;
+  int k;
 
   /* Search for the right orientation. */
   for (k = 0; k < 4; k++) {
+    int l;
     int up = delta[k];
+
     if (ON_BOARD(apos - up))
       continue;
     if (board[apos + up] != color || !same_string(apos + up, str))
@@ -4238,26 +4243,45 @@ edge_block_moves(int str, int apos, struct reading_moves *moves)
     
     for (l = 0; l < 2; l++) {
       int right = delta[(k+1)%4];
+      int cpos;
+      int dpos;
+      int epos;
+      int fpos;
+
       if (l == 1)
 	right = -right;
 
       cpos = apos + right;
       dpos = apos + right + up;
-
-      if (board[cpos] != color || board[dpos] != other || countlib(dpos) > 1)
-	continue;
-
       epos = cpos + right;
       fpos = dpos + right;
-      gpos = epos + right;
-      hpos = apos - right;
-      
-      if (!ON_BOARD(epos))
-	continue;
-      
-      if (board[epos] == EMPTY && board[fpos] == EMPTY 
-	  && (board[gpos] != color))
-	ADD_CANDIDATE_MOVE(fpos, 30, *moves, "edge_block");
+
+      if (board[cpos] == color && board[dpos] == other
+	  && board[epos] == EMPTY && board[fpos] == EMPTY) {
+	if (countlib(dpos) == 1) {
+	  int gpos = epos + right;
+
+	  /* Check if we have the first situation. */
+	  if (board[gpos] != color)
+	    ADD_CANDIDATE_MOVE(fpos, 30, *moves, "edge_block-A");
+	}
+	else {
+	  int edge_scan;
+
+	  /* Look along board edge to see if the defender's string can
+	   * run away to a friend.
+	   */
+	  for (edge_scan = epos; ; edge_scan += right) {
+	    if (board[edge_scan] == color || board[edge_scan + up] == color) {
+	      ADD_CANDIDATE_MOVE(epos, 10, *moves, "edge_block-B");
+	      break;
+	    }
+
+	    if (board[edge_scan] != EMPTY || board[edge_scan + up] != EMPTY)
+	      break;
+	  }
+	}
+      }
     }
   }
 }
