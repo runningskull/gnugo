@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static function special_rescue4() called from defend2() in reading.c
 - fast_defense() now heuristically looks for neighbors to capture
 - don't restore random state in hash_init() and keyhash_init()
 - major `view.pike' revision, added new "single window" mode
