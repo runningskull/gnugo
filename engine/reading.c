@@ -302,7 +302,8 @@ static void superstring_moves(int str, struct reading_moves *moves,
 static void superstring_break_chain_moves(int str, int liberty_cap,
 					 struct reading_moves *moves);
 static void double_atari_chain2_moves(int str,
-    				      struct reading_moves *moves);
+    				      struct reading_moves *moves,
+				      int generate_more_moves);
 static void order_moves(int str, struct reading_moves *moves,
 			int color, const char *funcname, int killer);
 static int simple_ladder_defend(int str, int *move);
@@ -2112,7 +2113,7 @@ special_rescue5_moves(int str, int libs[3],
 	}
   
 	/* Defend against double atari in the surrounding chain early. */
-	double_atari_chain2_moves(bpos, moves);
+	double_atari_chain2_moves(bpos, moves, 0);
       }
     }
   }
@@ -3432,7 +3433,7 @@ attack3(int str, int *move)
       }
   
       /* Defend against double atari in the surrounding chain early. */
-      double_atari_chain2_moves(str, &moves);
+      double_atari_chain2_moves(str, &moves, stackp <= superstring_depth);
   
       /* Get the three liberties of (str). */
       liberties = findlib(str, 3, libs);
@@ -3564,7 +3565,7 @@ attack4(int str, int *move)
       }
 
       /* Defend against double atari in the surrounding chain early. */
-      double_atari_chain2_moves(str, &moves);
+      double_atari_chain2_moves(str, &moves, stackp <= superstring_depth);
 
       /* Give a score bonus to the chain preserving moves. */
       for (k = 0; k < moves.num; k++)
@@ -4674,27 +4675,29 @@ superstring_break_chain_moves(int str, int liberty_cap,
 }
 
 /*
- * If str points to a group, double_atari_chain2_moves() adds all moves
- * which make a double atari on some strings in the surrounding chain
- * to the (movei[], movej[]) arrays.
+ * If `str' points to a group, double_atari_chain2_moves() adds all
+ * moves which make a double atari on some strings in the surrounding
+ * chain to the moves[] array.  In addition, if `generate_more_moves'
+ * is set, it adds moves that make atari on a string in the
+ * surrounding chain and are adjacent to another string with 3
+ * liberties.
  */
 
 static void
-double_atari_chain2_moves(int str, struct reading_moves *moves)
+double_atari_chain2_moves(int str, struct reading_moves *moves,
+			  int generate_more_moves)
 {
   int r, k;
-  int apos;
   int adj;
   int adjs[MAXCHAIN];
-  int libs[2];
+  int libs[3];
   int mw[BOARDMAX];
 
   memset(mw, 0, sizeof(mw));
 
   adj = chainlinks2(str, adjs, 2);
   for (r = 0; r < adj; r++) {
-    apos = adjs[r];
-    findlib(apos, 2, libs);
+    findlib(adjs[r], 2, libs);
     for (k = 0; k < 2; k++) {
       mw[libs[k]]++;
       if (mw[libs[k]] == 2) {
@@ -4702,7 +4705,24 @@ double_atari_chain2_moves(int str, struct reading_moves *moves)
          * is safe for the defender.
 	 */
 	if (!is_self_atari(libs[k], board[str]))
-	  ADD_CANDIDATE_MOVE(libs[k], 1, *moves, "double_atari_chain2");
+	  ADD_CANDIDATE_MOVE(libs[k], 1, *moves, "double_atari_chain2-A");
+      }
+    }
+  }
+
+  if (generate_more_moves) {
+    int adj3;
+    int adjs3[MAXCHAIN];
+
+    adj3 = chainlinks2(str, adjs3, 3);
+    for (r = 0; r < adj3; r++) {
+      findlib(adjs3[r], 3, libs);
+      for (k = 0; k < 3; k++) {
+	if (mw[libs[k]] == 1) {
+	  mw[libs[k]] = 2;
+	  if (!is_self_atari(libs[k], board[str]))
+	    ADD_CANDIDATE_MOVE(libs[k], -3, *moves, "double_atari_chain2-B");
+	}
       }
     }
   }
