@@ -2209,7 +2209,15 @@ estimate_territorial_value(int pos, int color,
 	int adjustment_up = 0;
 	int adjustment_down = 0;
 	int s;
-	int num_adj = chainlinks(aa, adjs);
+	int num_adj;
+
+	/* In rare cases it may happen that the trymove() above
+         * actually removed the string at aa.
+	 */
+	if (board[aa] == EMPTY)
+	  num_adj = 0;
+	else
+	  num_adj = chainlinks(aa, adjs);
 
 	for (s = 0; s < num_adj; s++) {
 	  int adj = adjs[s];

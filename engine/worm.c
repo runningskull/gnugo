@@ -1030,7 +1030,11 @@ find_worm_threats()
 	      bb = worm[adjs[k]].defense_points[r];
 	      if (trymove(bb, other, "threaten attack", pos,
 			  EMPTY, NO_MOVE)) {
-		int acode = attack(pos, NULL);
+		int acode;
+		if (board[pos] == EMPTY)
+		  acode = WIN;
+		else
+		  acode = attack(pos, NULL);
 		if (acode != 0)
 		  change_attack_threat(pos, bb, acode);
 		popgo();
