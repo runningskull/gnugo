@@ -18,7 +18,7 @@ loadsgf games/strategy14.sgf 33
 
 loadsgf games/strategy14.sgf 53
 53 gg_genmove white
-#? [S15]*
+#? [S15]
 
 loadsgf games/strategy14.sgf 81
 54 gg_genmove white

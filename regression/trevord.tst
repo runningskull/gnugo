@@ -292,7 +292,7 @@ loadsgf games/trevor/auto/d24.sgf 180
 #L14 is ko threat for both.
 loadsgf games/trevor/auto/d24.sgf 212
 600 gg_genmove white
-#? [L14]*
+#? [L14]
 
 
 loadsgf games/trevor/auto/d24.sgf 216

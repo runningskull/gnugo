@@ -19,7 +19,7 @@
 @vskip 0pt plus 1filll
 @image{newlogo}
 @vskip 0pt plus 1filll
-@author By Daniel Bump, David Denholm, Jerome Dumonteil, 
+@author By Arend Bayer, Daniel Bump, David Denholm, Jerome Dumonteil, 
 @author Gunnar Farneb@"ack, Thomas Traber, Tanguy Urvoy, Inge Wallin
 @sp 1
 @page

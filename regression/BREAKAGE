@@ -1,3 +1,50 @@
+========================== 3.1.25 =========================
+
+configure option enabled: experimental connections
+configure option enabled: alternate connections
+
+./regress.sh . connection.tst
+72 unexpected FAIL: Correct '1 F3', got '1 E3'
+./regress.sh . trevora.tst
+140 unexpected PASS!
+220 unexpected FAIL: Correct '!B6', got 'B6'
+430 unexpected PASS!
+470 unexpected PASS!
+./regress.sh . strategy.tst
+34 unexpected PASS!
+./regress.sh . trevorb.tst
+520 unexpected PASS!
+570 unexpected PASS!
+620 unexpected PASS!
+950 unexpected FAIL: Correct 'M6', got 'L8'
+960 unexpected PASS!
+./regress.sh . strategy2.tst
+53 unexpected PASS!
+./regress.sh . nngs.tst
+560 unexpected PASS!
+680 unexpected FAIL: Correct '!H13|R13', got 'H13'
+1270 unexpected FAIL: Correct 'C16|B15', got 'C15'
+1660 unexpected FAIL: Correct '!F18', got 'F18'
+1690 unexpected PASS!
+./regress.sh . trevorc.tst
+340 unexpected PASS!
+1540 unexpected FAIL: Correct 'M10', got 'L10'
+1550 unexpected PASS!
+./regress.sh . global.tst
+4 unexpected FAIL: Correct 'Q6', got 'F5'
+16 unexpected FAIL: Correct 'O10', got 'P12'
+./regress.sh . arend.tst
+30 unexpected PASS!
+./regress.sh . 13x13.tst
+15 unexpected FAIL: Correct 'C7|B7|C6|B6|B5|C5', got 'H6'
+./regress.sh . trevord.tst
+600 unexpected PASS!
+./regress.sh . strategy4.tst
+151 unexpected FAIL: Correct '!(Q1|T5)', got 'T5'
+194 unexpected FAIL: Correct 'A13', got 'D6'
+
+========================== 3.1.24 =========================
+
 When 3.1.24 was released, the test results were updated with the configure 
 options --enable-experimental-connections --enable-alternate-connections.
 If you run the release without these configure options, you will get the

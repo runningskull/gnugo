@@ -41,7 +41,7 @@ loadsgf games/trevor/auto/a004.sgf 10
 #Must connect.
 loadsgf games/trevor/auto/a005.sgf 12
 140 gg_genmove white
-#? [G4]*
+#? [G4]
 
 
 
@@ -99,7 +99,7 @@ loadsgf games/trevor/auto/a009.sgf 66
 #B6 is an overplay.  E7 may be best.
 loadsgf games/trevor/auto/a010.sgf 10
 220 gg_genmove white
-#? [!B6]
+#? [!B6]*
 
 
 
@@ -273,7 +273,7 @@ loadsgf games/trevor/auto/a026.sgf 16
 
 loadsgf games/trevor/auto/a027.sgf 40
 430 gg_genmove white
-#? [G4]*
+#? [G4]
 
 
 
@@ -304,7 +304,7 @@ loadsgf games/trevor/auto/a030.sgf 22
 #For a ko threat, D3 is better.
 loadsgf games/trevor/auto/a031.sgf 28
 470 gg_genmove white
-#? [!E2]*
+#? [!E2]
 
 
 #Sacrificing these two for the rest seems best.

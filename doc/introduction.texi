@@ -93,8 +93,8 @@ Man Li, Daniel Bump, David Denholm, Gunnar Farneb@"ack, Nils
 Lohner, Jerome Dumonteil, Tommy Thorn, Nicklas Ekstrand, Inge
 Wallin, Thomas Traber, Douglas Ridgway, Teun Burgers, Tanguy
 Urvoy, Thien-Thi Nguyen, Heikki Levanto, Mark Vytlacil,
-Adriaan van Kessel, Wolfgang Manner, Jens Yllman and Don
-Dailey.
+Adriaan van Kessel, Wolfgang Manner, Jens Yllman, Don Dailey,
+Mans Ullerstam, Arend Bayer and Trevor Morris.
 
 @node Thanks, TODO, Authors, Introduction
 @comment node-name,    next,        previous,     up

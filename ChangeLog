@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.24 released February 14, 2002
+
+- updated AUTHORS
 - command line option --options reports configure options
 - verbose reduced in readconnect.
 - do_genmove tries harder to restrain thrashing dragons.

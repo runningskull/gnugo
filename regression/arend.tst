@@ -156,7 +156,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 24
 # GNU Go played F8.
 loadsgf games/arend/gnugo-gnugo7.sgf 79
 30 gg_genmove black
-#? [C13]*
+#? [C13]
 
 #CATEGORY=OWL_DEFEND (?)
 # B14 can (and should) be saved here

@@ -12332,12 +12332,13 @@ Pattern EJ79
 
 
 Pattern EJ80
+# db generalized (3.1.25)
 
 |...O.x        even a computer connects after nozoki
-|..X*..
-|...O..
-|......
-|......
+|..X*.x
+|...O.x
+|....??
+|..x.??
 
 :8,J
 

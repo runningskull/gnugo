@@ -12,7 +12,7 @@ loadsgf golois/Aya991113-13.sgf
 
 loadsgf golois/Aya991113-1.sgf
 4 gg_genmove black
-#? [Q6]
+#? [Q6]*
 
 loadsgf golois/Aya991113-2.sgf
 5 gg_genmove black
@@ -62,7 +62,7 @@ loadsgf golois/Goemate990903-10.sgf
 
 loadsgf golois/Goemate990903-6.sgf
 16 gg_genmove black
-#? [O10]
+#? [O10]*
 
 #CATEGORY=CONNECTION
 #DESCRIPTION=

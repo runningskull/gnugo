@@ -229,7 +229,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
 71 connect D3 G3
 #? [1 (F3|H3|E3|G2|F2|H2|E2)]
 72 disconnect D3 G3
-#? [1 F3]
+#? [1 F3]*
 73 connect D3 J2
 #? [1 (F3|H3|E3|G2|F2|H2|E2)]
 74 disconnect D3 J2

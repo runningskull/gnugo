@@ -9,7 +9,7 @@ loadsgf games/gwe.sgf 231
 # tm - Indeed GNU Go has finally figured out that tenuki is best!
 # tm - yes, Q1 is bad.  T5 also wastes a point.
 151 gg_genmove white
-#? [!(Q1|T5)]
+#? [!(Q1|T5)]*
 
 loadsgf games/gwe.sgf 241
 152 gg_genmove white
@@ -230,7 +230,7 @@ loadsgf games/bretz.sgf 26
 
 loadsgf games/bretz.sgf 58
 194 gg_genmove black
-#? [A13]
+#? [A13]*
 
 loadsgf games/bretz.sgf 88
 195 gg_genmove black
