@@ -183,7 +183,7 @@ loadsgf games/gunnar/gunnar7.sgf
 
 # Only topologically false eyes but it still lives!
 # See also gunnar:27.
-loadsgf games/gunnar/rbm-bobk-200303111815.sgf -L 159
+loadsgf games/gunnar/rbm-bobk-200303111815.sgf 159
 306 owl_attack M17
 #? [0]*
 
@@ -245,6 +245,22 @@ loadsgf games/owl48.sgf
 
 loadsgf games/nngs/takeda-gnugo-3.4-200308142205.sgf 60
 320 owl_attack R4
+#? [0]
+
+loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 79
+321 owl_defend F3
+#? [0]
+
+loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 81
+322 owl_defend F3
+#? [0]
+
+loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 85
+323 owl_defend F3
+#? [0]
+
+loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 89
+324 owl_defend E5
 #? [0]
 
 

@@ -337,7 +337,7 @@ loadsgf games/nngs/Temnik-gnugo-3.3.15-200301161937.sgf 232
 101 disconnect O3 L5
 #? [1 (M3|N3)]*
 
-loadsgf games/nngs/gnugo-3.3.17-joshj-200304172202.sgf 226
+loadsgf games/nngs/gnugo-3.3.17-joshj-200304172202.sgf 222
 102 disconnect Q8 Q6
 #? [1 (S7|S6|S8|R6)]*
 

@@ -92,6 +92,10 @@ static void ProgramReader(object f)
       if (number < 10000 || number > 10004) {
 	test_number = (int) number;
 	string correct = correct_results[test_number];
+	if (!correct) {
+	  correct = "correct result missing, check the test suite";
+	  correct_results[test_number] = correct;
+	}
 	int negate = 0;
 	if (correct[0] == '!') {
 	  correct = correct[1..];

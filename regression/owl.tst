@@ -18,11 +18,17 @@ loadsgf games/incident85.sgf 104
 #? [1 C12]
 
 # incident 159
+# Recent analysis has shown that white actually cannot live.
+# After white B5, black can kill with
+# Black C4 - B4 - B2,
+# a) W A2 - B1 - C1 - B3 - A3 - A5
+# b) W B1 - B2 - B6 - A6
+# The attack test has been commented out. (3.5.1)
 loadsgf games/incident156.sgf 246
-5 owl_attack C3
-#? [1 (B4|C4)]
+# 5 owl_attack C3
+# #? [1 (B4|C4)]
 6 owl_defend C3
-#? [1 B5]
+#? [0]
 
 # incident 160
 loadsgf games/incident156.sgf 250

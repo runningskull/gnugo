@@ -239,8 +239,8 @@ loadsgf games/semeai/semeai9.sgf
 #? [1 1 (A17|B17|C16|D16|E15|E14|F13|F12|F11|F10|F9|F8|B9|A9)]
 
 loadsgf games/semeai/semeai12.sgf
-45 analyze_semeai B5 A9
-#? [1 1 C1]*
+45 analyze_semeai C3 A9
+#? [0 0 PASS]*
 
 loadsgf games/semeai/semeai9.sgf
 46 analyze_semeai Q12 S11
@@ -291,13 +291,65 @@ loadsgf games/test4lose.sgf
 
 loadsgf games/test5win.sgf
 59 analyze_semeai B7 E6
-#? [1 1 J4]*
+#? [1 1 H5]*
 
 loadsgf games/test5lose.sgf
 60 analyze_semeai C8 E6
 #? [0 0 PASS]
 
+# A15 is a certain seki. A17 gives a ko for life and death of both.
+# The ko is very indirect for white, but it's still a ko. B17
+# naturally dies right out.
+loadsgf games/nngs/tommmal-gnugo-3.4-200308200805.sgf 122
+61 analyze_semeai D19 B19
+#? [1 0 A15]
 
+# A17 kills cleanly with a bent four in the corner. A15 gives a bad
+# ko. See also tests 63-70.
+62 analyze_semeai B19 D19
+#? [1 1 A17]
+
+# Variations of bent four in the corner positions considered as semeai.
+loadsgf games/semeai/semeai13.sgf
+63 analyze_semeai D13 B13
+#? [0 0 PASS]
+64 analyze_semeai B13 D13
+#? [1 1 (PASS|A13|E13|E12|C11|C10|B9|A9)]
+65 analyze_semeai K13 M13
+#? [0 0 PASS]
+66 analyze_semeai M13 K13
+#? [1 1 (PASS|N13)]
+67 analyze_semeai A4 A2
+#? [0 0 PASS]
+68 analyze_semeai A2 A4
+#? [1 1 (PASS|A5|B5|C3|D3)]
+69 analyze_semeai M4 N3
+#? [0 0 PASS]
+70 analyze_semeai N3 M4
+#? [1 1 (PASS|L3)]
+
+# A basic seki with varying number of outer liberties.
+loadsgf games/semeai/semeai14.sgf
+71 analyze_semeai D13 B13
+#? [1 0 PASS]
+72 analyze_semeai B13 D13
+#? [1 0 PASS]
+73 analyze_semeai M13 N12
+#? [1 0 PASS]
+74 analyze_semeai N12 M13
+#? [1 0 (PASS|L13)]
+75 analyze_semeai J3 L2
+#? [1 0 PASS]
+76 analyze_semeai L2 J3
+#? [1 0 (PASS|N3|K2)]
+77 analyze_semeai A5 A3
+#? [1 0 PASS]
+78 analyze_semeai A3 A5
+#? [1 0 (PASS|A6|C6|C1)]
+79 analyze_semeai F9 F7
+#? [1 0 PASS]
+80 analyze_semeai F7 F9
+#? [1 0 (PASS|E9|E8|J9|H5)]
 
 ########### end of semeai tests #################
 

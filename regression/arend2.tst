@@ -57,13 +57,13 @@ loadsgf games/arend/gnugo-gnugo6.sgf 20
 130 restricted_genmove white P17 G16 F16 E15
 #? [P17]*
 
-loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf C10
+loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf 39
 140 reg_genmove black
 #? [D11|H10|G9|E10]*
 
-loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf B12
+loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf 187
 150 reg_genmove black
-#? [B6|C6]*
+#? [D6|C6]*
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 6
 160 reg_genmove black
