@@ -332,40 +332,33 @@ Pattern 410
 # with false marginals. In that case it is equivalent
 # to .... which yields 2 eyes.
 
-XxXX
+XxxX
 
 :2222
 
 
 Pattern 411
 
-X..X
-
-:2222
-
-
-Pattern 412
-
 x...
 
 :1222
 
 
-Pattern 413
+Pattern 412
 
 x*Xx
 
 :1122
 
 
-Pattern 414
+Pattern 413
 
 XXX.
 
 :1112
 
 
-Pattern 415
+Pattern 414
 
 .XX.
 
