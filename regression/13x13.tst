@@ -72,7 +72,7 @@ loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 20
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 24
 12 gg_genmove white
-#? [G7|F7|G8]*
+#? [G7|F7|G8]
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 22
@@ -90,7 +90,7 @@ loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 28
 # See also owl:262.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 15 gg_genmove white
-#? [C7|B7|C6|B6|B5|C5]*
+#? [C7|B7|C6|B6|B5|C5]
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
@@ -206,7 +206,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 # In fact, there is none at all (3.3.8)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 40 gg_genmove white
-#? [K13]
+#? [K13]*
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 41 gg_genmove white

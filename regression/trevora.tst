@@ -99,7 +99,7 @@ loadsgf games/trevor/auto/a009.sgf 66
 #B6 is an overplay.  E7 may be best.
 loadsgf games/trevor/auto/a010.sgf 10
 220 gg_genmove white
-#? [!B6]*
+#? [!B6]
 
 
 
@@ -161,7 +161,7 @@ loadsgf games/trevor/auto/a016.sgf 18
 
 loadsgf games/trevor/auto/a017.sgf 20
 290 gg_genmove white
-#? [!C8]*
+#? [!C8]
 
 
 #B8 makes better eye space, at least one point better here, in reverse sente.
@@ -264,7 +264,7 @@ loadsgf games/trevor/auto/a025.sgf 12
 #Once you've haned, you've gotta connect.  (Or you shouldn't have haned.)
 loadsgf games/trevor/auto/a026.sgf 16
 420 gg_genmove white
-#? [J5]*
+#? [J5]
 
 
 

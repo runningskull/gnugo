@@ -113,12 +113,12 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 20
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 26
 310 gg_genmove black
-#? [C5|B5]
+#? [C5|B5]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 32
 320 gg_genmove black
-#? [F4]*
+#? [F4]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 42
@@ -158,7 +158,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 90
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 104
 400 gg_genmove black
-#? [N13]
+#? [N13]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 134
@@ -322,7 +322,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 66
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 78
 730 gg_genmove black
-#? [!E8]*
+#? [!E8]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 86
@@ -361,7 +361,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 80
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 86
 800 gg_genmove black
-#? [G4]*
+#? [G4]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 90
@@ -376,7 +376,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 96
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 120
 830 gg_genmove black
-#? [!N13]
+#? [!N13]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 128
@@ -455,7 +455,7 @@ loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 146
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 158
 980 gg_genmove black
-#? [!G10]
+#? [!G10]*
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 160
@@ -540,7 +540,7 @@ loadsgf games/nngs/gnugo-3.3.9-joshj-200210181607.sgf 102
 # G13 is the only move. J13 pointlessly lets black have a ko.
 loadsgf games/nngs/gnugo-3.3.9-Ayoye-200209301535.sgf 76
 1150 gg_genmove white
-#? [G13]*
+#? [G13]
 
 # B1 is the only move. After A4 or B4 black can play B6 and white can
 # no longer capture both A3 and B6
@@ -551,7 +551,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 240
 # B1 minimizes the losses.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
 1170 gg_genmove white
-#? [B1]
+#? [B1]*
 
 # A5 is very odd.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 244

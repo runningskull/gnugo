@@ -35,7 +35,7 @@ loadsgf games/dniwog.sgf 88
 #SEVERITY=10
 loadsgf games/dniwog.sgf 96
 7 gg_genmove white
-#? [B8]*
+#? [B8]
 
 loadsgf games/dniwog.sgf 108
 8 gg_genmove white

@@ -258,7 +258,7 @@ loadsgf games/bretz.sgf 164
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7|S18]*
+#? [P6|P7|Q7|S18]
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black

@@ -1,3 +1,80 @@
+======================= 3.3.12 pre 5  =========================
+
+./regress.sh . reading.tst 
+163 unexpected PASS!
+175 unexpected PASS!
+./regress.sh . connection.tst 
+95 unexpected PASS!
+./regress.sh . trevora.tst 
+220 unexpected PASS!
+290 unexpected PASS!
+420 unexpected PASS!
+./regress.sh . strategy.tst 
+20 unexpected FAIL: Correct 'Q11', got 'C18'
+22 unexpected PASS!
+40 unexpected FAIL: Correct 'E5|M11', got 'R6'
+./regress.sh . neurogo.tst 
+11 unexpected PASS!
+./regress.sh . arb.tst 
+220 unexpected FAIL: Correct '!F6', got 'F6'
+./regress.sh . dniwog.tst 
+7 unexpected PASS!
+./regress.sh . lazarus.tst 
+4 unexpected PASS!
+./regress.sh . trevorb.tst 
+740 unexpected PASS!
+790 unexpected FAIL: Correct 'K6|K5', got 'A6'
+./regress.sh . nicklas2.tst 
+102 unexpected FAIL: Correct 'D4', got 'F5'
+./regress.sh . trevor.tst 
+190 unexpected PASS!
+./regress.sh . nngs.tst 
+420 unexpected PASS!
+490 unexpected PASS!
+1280 unexpected FAIL: Correct 'D13', got 'J12'
+1860 unexpected FAIL: Correct '!L7|D19', got 'D19'
+./regress.sh . trevorc.tst 
+170 unexpected PASS!
+590 unexpected PASS!
+1580 unexpected FAIL: Correct 'C8', got 'A4'
+./regress.sh . strategy3.tst 
+119 unexpected FAIL: Correct 'D9|J3', got 'B13'
+136 unexpected PASS!
+./regress.sh . global.tst 
+5 unexpected FAIL: Correct 'O4', got 'F5'
+7 unexpected PASS!
+26 unexpected PASS!
+./regress.sh . arend.tst 
+23 unexpected PASS!
+./regress.sh . 13x13.tst 
+12 unexpected PASS!
+15 unexpected PASS!
+40 unexpected FAIL: Correct 'K13', got 'L11'
+./regress.sh . strategy4.tst 
+200 unexpected PASS!
+./regress.sh . nngs2.tst 
+140 unexpected FAIL: Correct 'P5', got 'Q6'
+290 unexpected PASS!
+550 unexpected PASS!
+./regress.sh . nngs3.tst 
+310 unexpected FAIL: Correct 'C5|B5', got 'B7'
+320 unexpected PASS!
+400 unexpected FAIL: Correct 'N13', got 'Q15'
+730 unexpected PASS!
+800 unexpected PASS!
+830 unexpected FAIL: Correct '!N13', got 'N13'
+980 unexpected FAIL: Correct '!G10', got 'G10'
+1150 unexpected PASS!
+1170 unexpected FAIL: Correct 'B1', got 'B7'
+./regress.sh . strategy5.tst 
+226 unexpected PASS!
+./regress.sh . century2002.tst 
+160 unexpected PASS!
+./regress.sh . ninestones.tst 
+150 unexpected PASS!
+./regress.sh . tactics1.tst 
+10 unexpected PASS!
+
 ======================= 3.3.12 pre 4  =========================
 
 ./regress.sh . ld_owl.tst 

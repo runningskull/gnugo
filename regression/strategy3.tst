@@ -92,7 +92,7 @@ loadsgf games/incident240.sgf 65
 # incident 241
 loadsgf games/incident240.sgf 69
 119 gg_genmove black
-#? [D9|J3]
+#? [D9|J3]*
 
 # incident 221
 loadsgf games/incident221.sgf 35
@@ -176,7 +176,7 @@ loadsgf games/strategy31.sgf 188
 
 loadsgf games/strategy32.sgf 19
 136 gg_genmove black
-#? [E2]*
+#? [E2]
 
 loadsgf games/mf1.sgf 29
 137 gg_genmove black

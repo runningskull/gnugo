@@ -16,7 +16,7 @@ loadsgf golois/Aya991113-1.sgf
 
 loadsgf golois/Aya991113-2.sgf
 5 gg_genmove black
-#? [O4]
+#? [O4]*
 
 loadsgf golois/Aya991113-3.sgf
 6 gg_genmove black
@@ -24,7 +24,7 @@ loadsgf golois/Aya991113-3.sgf
 
 loadsgf golois/Aya991113-6.sgf
 7 gg_genmove black
-#? [A5]*
+#? [A5]
 
 loadsgf golois/Aya991113-7.sgf
 8 gg_genmove black
@@ -111,7 +111,7 @@ loadsgf golois/Goemate991113-1.sgf
 
 loadsgf golois/Goemate991113-4.sgf
 26 gg_genmove black
-#? [D12]*
+#? [D12]
 
 loadsgf golois/Goemate991113-5.sgf
 27 gg_genmove black

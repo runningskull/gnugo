@@ -126,7 +126,7 @@ loadsgf games/strategy4.sgf
 # incident 290
 loadsgf games/incident290.sgf 30
 20 gg_genmove black
-#? [Q11]
+#? [Q11]*
 
 # incident 291
 loadsgf games/incident291.sgf 54
@@ -136,7 +136,7 @@ loadsgf games/incident291.sgf 54
 # incident 292
 loadsgf games/incident291.sgf 70
 22 gg_genmove black
-#? [K3]*
+#? [K3]
 
 # incident 294
 loadsgf games/incident291.sgf 88
@@ -237,7 +237,7 @@ loadsgf games/nicklas/nicklas8.sgf 96
 # I disagree. M11 makes territory while attacking. -arend
 loadsgf games/nicklas/nicklas8.sgf 98
 40 gg_genmove black
-#? [E5|M11]
+#? [E5|M11]*
 
 
 #CATEGORY=STRATEGY

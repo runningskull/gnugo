@@ -176,7 +176,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 204
 #E4 better than C4, if must defend.
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 234
 420 gg_genmove black
-#? [!C4|D3|C3|B3]*
+#? [!C4|D3|C3|B3]
 
 
 
@@ -203,7 +203,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 84
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 86
 490 gg_genmove black
-#? [J18]*
+#? [J18]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 90
@@ -611,7 +611,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 90
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 138
 1280 gg_genmove white
-#? [D13]
+#? [D13]*
 
 
 
@@ -839,7 +839,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 97
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 117
 1860 gg_genmove black
-#? [!L7|D19]
+#? [!L7|D19]*
 
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 125

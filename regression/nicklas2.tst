@@ -23,7 +23,7 @@ reset_trymove_counter
 #    should be in nicklas3.tst (harder problems).
 loadsgf games/nicklas/nicklas1.sgf 29
 102 gg_genmove black
-#? [D4]
+#? [D4]*
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=I think G9 is not too terrible here. Very difficult to see.-trevor

@@ -70,7 +70,7 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 100
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 130
 140 gg_genmove black
-#? [P5]
+#? [P5]*
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
 150 gg_genmove black
@@ -135,7 +135,7 @@ loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 216
 # C17 is in any case better than the game move C18.
 loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 220
 290 gg_genmove black
-#? [C17|B16]*
+#? [C17|B16]
 
 # Hey, Q19 is dead and Q13 doesn't threaten anything.
 loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 232
@@ -232,7 +232,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 211
 
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 122
 550 gg_genmove white
-#? [!H19]*
+#? [!H19]
 
 # The next two tests pass and perhaps don't need to be in the regressions.
 # loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 146

@@ -8,7 +8,7 @@ reset_trymove_counter
 # counted twice (territorially and strategically)
 loadsgf games/tactics05.sgf
 10 gg_genmove white
-#? [!T9]*
+#? [!T9]
 
 loadsgf games/tactics06.sgf
 20 owl_defend C19

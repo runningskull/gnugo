@@ -640,7 +640,7 @@ loadsgf games/reading34.sgf
 # See also trevorb:840.
 loadsgf games/trevor/auto/b75.sgf 62
 163 attack E12
-#? [0]*
+#? [0]
 
 loadsgf games/reading35.sgf
 164 defend B6
@@ -716,7 +716,7 @@ popgo
 
 loadsgf games/reading39.sgf
 175 defend O3
-#? [1 (N1|N2)]*
+#? [1 (N1|N2)]
 
 # See also nngs3:1170
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242

@@ -90,7 +90,7 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 157
 # avoid shortage of liberties
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 177
 160 gg_genmove black
-#? [B7]*
+#? [B7]
 
 # Does not work because of white J8.
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 235

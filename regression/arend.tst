@@ -126,7 +126,7 @@ loadsgf games/arend/gnugo-gnugo5.sgf 80
 # H10 is quite overvalued here.
 loadsgf games/arend/gnugo-gnugo5.sgf 105
 23 gg_genmove black
-#? [!H10]*
+#? [!H10]
 
 # Low Shimari clearly better here
 loadsgf games/arend/gnugo-gnugo6.sgf 20
