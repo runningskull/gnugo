@@ -1,3 +1,40 @@
+============================= 3.3.17 ===============================
+
+./regress.sh . optics.tst 
+328 unexpected FAIL: Correct '0 1 (N16|N13) N16', got '0 0'
+./regress.sh . atari_atari.tst 
+21 unexpected FAIL: Correct 'Q9|N13|O13', got 'PASS'
+./regress.sh . trevora.tst 
+220 unexpected PASS!
+./regress.sh . endgame.tst 
+803 unexpected PASS!
+804 unexpected PASS!
+./regress.sh . trevorc.tst 
+1060 unexpected FAIL: Correct 'K11', got 'D13'
+1440 unexpected FAIL: Correct 'E12|F11', got 'E3'
+./regress.sh . global.tst 
+4 unexpected FAIL: Correct 'Q6', got 'F15'
+5 unexpected FAIL: Correct 'O4', got 'F15'
+./regress.sh . nngs4.tst 
+310 unexpected FAIL: Correct 'D6|D7', got 'H2'
+330 unexpected FAIL: Correct 'M15|H15', got 'R2'
+350 unexpected FAIL: Correct 'H10', got 'F14'
+360 unexpected FAIL: Correct 'M10', got 'C11'
+370 unexpected FAIL: Correct '0', got '1 M19'
+380 unexpected FAIL: Correct 'J7|K8', got 'P2'
+390 unexpected FAIL: Correct 'A11', got 'B8'
+400 unexpected FAIL: Correct '0', got '1 G2'
+410 unexpected FAIL: Correct 'E1', got 'PASS'
+430 unexpected FAIL: Correct 'H10|G9|G10|G11|M6|L7|K7', got 'E2'
+./regress.sh . tactics1.tst 
+101 unexpected PASS!
+104 unexpected PASS!
+./regress.sh . gunnar.tst 
+20 unexpected FAIL: Correct 'F16|K14', got 'H14'
+21 unexpected FAIL: Correct '!P17', got 'P17'
+22 unexpected FAIL: Correct '!E17', got 'E17'
+23 unexpected FAIL: Correct 'N5', got 'O5'
+
 ========================== 3.3.17 pre 7  ============================
 
 ./regress.sh . owl.tst 

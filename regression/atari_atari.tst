@@ -90,4 +90,4 @@ white P16
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302252226.sgf -L 256
 21 combination_attack black
-#? [Q9|N13|O13]
+#? [Q9|N13|O13]*

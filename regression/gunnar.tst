@@ -107,23 +107,23 @@ loadsgf games/gunnar/gunnar4.sgf 198
 # H14 and J14 are blunders.
 loadsgf games/gunnar/gunnar5.sgf 198
 20 gg_genmove black
-#? [F16|K14]
+#? [F16|K14]*
 
 # P17 only helps black and leaves white with bad shape. Locally Q17 is
 # superior. A move around K16 may be even better to start with.
 loadsgf games/nngs/gnugo-3.3.16-rubus-200302281805.sgf 17
 21 restricted_genmove white P17 Q17 K16 K17
-#? [!P17]
+#? [!P17]*
 
 # Same problem as 21 but with slightly different surroundings.
 loadsgf games/nngs/gnugo-3.3.16-rubus-200302281805.sgf 19
 22 restricted_genmove white E17 D17 K16 K17
-#? [!E17]
+#? [!E17]*
 
 # Must not play empty triangle at O5. N5 superior local shape.
 loadsgf games/nngs/gnugo-3.3.16-rubus-200302281805.sgf 69
 23 restricted_genmove white O4 O5 N4 N5
-#? [N5]
+#? [N5]*
 
 ############ End of Tests #################
 

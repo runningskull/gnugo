@@ -222,9 +222,9 @@ loadsgf games/nngs/gnugo-3.3.11-bconwil-200211202359.sgf 242
 # No point for F5.
 loadsgf games/endgame8.sgf
 803 gg_genmove black
-#? [J7]*
+#? [J7]
 804 gg_genmove white
-#? [J7]*
+#? [J7]
 
 ############ End of Tests #################
 

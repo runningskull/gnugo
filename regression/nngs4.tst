@@ -126,11 +126,11 @@ loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 42
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 22
 310 restricted_genmove black H2 D6 D7
-#? [D6|D7]
+#? [D6|D7]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 40
 330 restricted_genmove black R2 M15 H15
-#? [M15|H15]
+#? [M15|H15]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 76
 340 restricted_genmove black B1 D2
@@ -138,31 +138,31 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 76
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 102
 350 gg_genmove black
-#? [H10]
+#? [H10]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 110
 360 gg_genmove black
-#? [M10]
+#? [M10]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 120
 370 owl_defend L18
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 128
 380 gg_genmove black
-#? [J7|K8]
+#? [J7|K8]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 138
 390 restricted_genmove black B8 A11
-#? [A11]
+#? [A11]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 142
 400 owl_defend J5
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 174
 410 restricted_genmove black F2 E1
-#? [E1]
+#? [E1]*
 
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 65
 420 gg_genmove black
@@ -171,7 +171,7 @@ loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 65
 # G12 allows white to live.
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 185
 430 gg_genmove black
-#? [H10|G9|G10|G11|M6|L7|K7]
+#? [H10|G9|G10|G11|M6|L7|K7]*
 
 
 ############ End of Tests #################

@@ -99,7 +99,7 @@ loadsgf games/trevor/auto/a009.sgf 66
 #B6 is an overplay.  E7 may be best.
 loadsgf games/trevor/auto/a010.sgf 10
 220 restricted_genmove white B6 C3 E7
-#? [C3|E7]*
+#? [C3|E7]
 
 
 

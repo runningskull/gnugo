@@ -29,7 +29,7 @@ trymove white C13
 trymove white C12
 trymove black C11
 101 attack_either C11 D12
-#? [1]*
+#? [1]
 popgo
 popgo
 popgo
@@ -48,7 +48,7 @@ trymove white G3
 103 attack_either E5 G3
 #? [1]
 104 attack_either G3 E5
-#? [1]*
+#? [1]
 popgo
 popgo
 
