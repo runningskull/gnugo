@@ -1196,7 +1196,7 @@ finish_pattern(char *line)
 
       paren = strchr(entry, '(');
       if (paren) {
-	struct attribute_description *description;
+	struct attribute_description *description = NULL;
 
 	if (attribute_map) {
 	  for (description = attribute_map; description->input_name;
