@@ -1226,7 +1226,6 @@ defend2(int str, int *move, int komaster, int kom_pos)
   int savecode = 0;
   int k;
   int r;
-  int s;
 
   SETUP_TRACE_INFO("defend2", str);
   reading_node_counter++;
