@@ -103,6 +103,7 @@ DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
 DECLARE(gtp_loadsgf);
 DECLARE(gtp_name);
+DECLARE(gtp_new_game);
 DECLARE(gtp_estimate_score);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_defend);
@@ -182,6 +183,7 @@ static struct gtp_command commands[] = {
   {"level",        	      gtp_set_level},
   {"loadsgf",          	      gtp_loadsgf},
   {"name",                    gtp_name},
+  {"new_game",                gtp_new_game},
   {"new_score",               gtp_estimate_score},
   {"owl_attack",     	      gtp_owl_attack},
   {"owl_defend",     	      gtp_owl_defend},
@@ -267,6 +269,18 @@ gtp_protocol_version(char *s, int id)
 {
   UNUSED(s);
   return gtp_success(id, "1");
+}
+
+/* Function:  Start a new game
+ * Arguments: none
+ * Fails:     always
+ * Returns:   nothing
+ */
+static int
+gtp_new_game(char *s, int id)
+{
+  UNUSED(s);
+  return gtp_failure(id, "not implemented");
 }
 
 
@@ -1359,16 +1373,19 @@ gtp_set_level(char *s, int id)
 static int
 gtp_undo(char *s, int id)
 {
-  int k;
-  UNUSED(s);
-
-  if (move_stack_pointer == 0)
+  int k, nb_undo;
+  
+  nb_undo = 1;
+  sscanf(s, "%d", &nb_undo);
+  if (move_stack_pointer == 0) 
     return gtp_failure(id, "no moves to take back");
+  if ((move_stack_pointer-nb_undo) < 0)
+    return gtp_failure(id, "can't undo %d moves", nb_undo);
   if (move_stack_pointer > MAX_MOVES)
     return gtp_failure(id, "move stack overflow");
   restore_position(&starting_position);
-
-  move_stack_pointer--;
+  
+  move_stack_pointer=move_stack_pointer-nb_undo;
   for (k = 0; k < move_stack_pointer; k++)
     play_move(POS(game_move[k].i, game_move[k].j), game_move[k].color);
 
