@@ -1582,9 +1582,14 @@ do_find_superstring(int str, int *num_stones, int *stones,
       }
       
       /* Case 3. */
-      if (board[fpos] == color && !mx[epos]
-	  && board[apos] == color && board[epos] == color
-	  && board[bpos] == EMPTY && board[gpos] == EMPTY)
+      /* Notice that the order of these tests is significant. We must
+       * check bpos before fpos and epos to avoid accessing memory
+       * outside the board array. (Notice that fpos is two steps away
+       * from pos, which we know is on the board.)
+       */
+      if (board[apos] == color && board[bpos] == EMPTY
+	  && board[fpos] == color && board[epos] == color && !mx[epos]
+	  && board[gpos] == EMPTY)
 	superstring_add_string(epos, &num_my_stones, my_stones,
 			       num_stones, stones,
 			       num_libs, libs, maxlibs,
