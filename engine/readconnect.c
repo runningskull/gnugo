@@ -2411,6 +2411,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
   for (r = 0; r < num_moves; r++) {
     int move = moves[r];
     int adjacent_to_attacker = 0;
+    int bonus_given = 0;
 
     for (k = 0; k < 4; k++) {
       int pos = move + delta[k];
@@ -2423,12 +2424,14 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	  distances[r] -= 0.2;
 	  if (verbose > 0)
 	    gprintf("%o%1M -0.2, adjacent to attacker string with at most two liberties\n", move);
-	  if ((conn1->distances[move] - conn1->deltas[move] <= 0.5
-	       || conn1->distances[pos] - conn1->deltas[pos] <= 0.5)
+	  if ((connect_move || !bonus_given)
+	      && (conn1->distances[move] - conn1->deltas[move] <= 0.5
+		  || conn1->distances[pos] - conn1->deltas[pos] <= 0.5)
 	      && (conn2->distances[move] - conn2->deltas[move] <= 0.5
 		  || conn2->distances[pos] - conn2->deltas[pos] <= 0.5)
 	      && conn1->distances[pos] < total_distance
 	      && conn2->distances[pos] < total_distance) {
+	    bonus_given = 1;
 	    distances[r] -= 0.7;
 	    if (verbose > 0)
 	      gprintf("%o%1M -0.7, capture or atari of immediately connecting string\n", move);
@@ -2441,10 +2444,29 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	  if (verbose > 0)
 	    gprintf("%o%1M -0.2, adjacent to defender string with at most two liberties\n", move);
 	}
+	/* The code above (in the 'board[pos] == other' branch) makes
+	 * perfect sense for the defender, but has a tendency to
+	 * overestimate solid connection defenses when the attacker's
+	 * stones happen to be in atari, specially when capturing some
+	 * defender stones instead would help just as well, if not better.
+	 * The following code compensates in such kind of situations.
+	 * See connection:111 and gunnar:53 for example.
+	 */
+	if (!connect_move && countlib(pos) == 1
+	    /* let's avoid ko and snapbacks */
+	    && accuratelib(move, other, 2, NULL) > 1) {
+	  int adjs[MAXCHAIN];
+	  float bonus;
+	  bonus = 0.1 * chainlinks2(pos, adjs, 2);
+	  bonus += 0.5 * chainlinks2(pos, adjs, 1);
+	  distances[r] -= bonus;
+	  if (verbose > 0)
+	    gprintf("%o%1M -%f, capture of defender string\n", move, bonus);
+	}
       }
     }
     if (adjacent_to_attacker
-	&& color != color_to_move
+	&& !connect_move
 	&& is_edge_vertex(move)) {
       distances[r] -= 0.1;
       if (verbose > 0)

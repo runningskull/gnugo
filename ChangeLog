@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- find_connection_moves() revised
 - always print copyright string on stdout
 - do not include "Version" in the --version output
 - old cache implementation removed

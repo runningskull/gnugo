@@ -391,6 +391,13 @@ trymove B S17
 popgo
 popgo
 
+# See also nngs1:11
+loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 104
+trymove B S6
+112 connect S3 S6
+#? [0]*
+popgo
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
