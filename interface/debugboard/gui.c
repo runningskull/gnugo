@@ -314,7 +314,7 @@ display_dragon(int pos)
 
   wmove(info_window, 8, 55);
   wmove(info_window, 9, 55);
-  gg_wprintw(info_window, "%s     ", safety_to_string(d2->safety));
+  gg_wprintw(info_window, "%s     ", status_to_string(d2->safety));
   wmove(info_window, 10, 55);
   gg_wprintw(info_window, "%d  ", d2->semeai);
 

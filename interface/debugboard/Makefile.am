@@ -17,7 +17,6 @@ INCLUDES = \
 LDADD = \
 	$(top_builddir)/engine/libengine.a \
 	$(top_builddir)/patterns/libpatterns.a \
-	$(top_builddir)/patterns/libdfa.a \
 	$(top_builddir)/sgf/libsgf.a \
 	$(top_builddir)/utils/libutils.a
 
