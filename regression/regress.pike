@@ -61,7 +61,7 @@ void Send(string|void s)
 
 static void Finish()
 {
-  write("%-37s %6.2f %9d %7d %8d\n", current_testsuite->name,
+  write("%-37s %7.2f %9d %7d %8d\n", current_testsuite->name,
 	current_testsuite->time,
 	current_testsuite->reading_nodes, current_testsuite->owl_nodes,
 	current_testsuite->connection_nodes);
