@@ -511,10 +511,10 @@ X*        2 points reverse sente
 :8,bOX,terri(2),reverse_followup(5)
 
 ba
-C*
+X*
 --
 
-;eye(*) && eye(a) && oplay_defend_both(*,a,*,C)
+;eye(*) && eye(a) && oplay_defend_both(*,a,*,b)
 
 
 Pattern EE303
