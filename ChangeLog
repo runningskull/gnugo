@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- readline support in ASCII mode
 - liberties and neighbors list broken out of string_data array in board.c
   for speedup
 - new functions remove_double_blocks(), check_double_block() to improve

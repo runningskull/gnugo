@@ -33,6 +33,14 @@ dnl See if user has expressed a preference for use of curses and/or color
 dnl These set variables $enable_color and $with_curses to "no" if disabled
 dnl "yes" if enabled, or undefined if not specified
 
+AC_ARG_WITH(readline,
+ [  --with-readline     try to use GNU readline for command reading
+  --without-readline  do not use GNU readline (default)])
+
+AC_ARG_WITH(readline,
+ [  --with-readline     try to use GNU readline for command reading
+  --without-readline  do not use GNU readline (default)])
+
 AC_ARG_WITH(curses,
  [  --with-curses       try to use curses for colored debugging output (default)
   --without-curses    do not use curses for colored debugging output])
@@ -308,7 +316,6 @@ if test "$with_curses" != no -a "$enable_color" != no ; then
   fi
 fi
 
-
 if test "$with_curses" = no -a "$enable_color" != no ; then
   dnl we asked for color, but there is no termcap
   AC_DEFINE(ANSI_COLOR)
@@ -318,6 +325,19 @@ fi
 
 AC_MSG_CHECKING(for color support)
 AC_MSG_RESULT($tmp_color_result)
+
+dnl -------- readline support -------------------
+
+if test "$with_readline" = yes ; then
+
+    dnl check for a working termcap and readline library
+    AC_SEARCH_LIBS(readline,termcap readline)
+
+    if test "$ac_cv_search_readline" != "no" ; then
+	AC_DEFINE(READLINE,1,[Enable GNU Readline support])
+    fi
+	
+fi
 
 dnl ---------- grid optimisation ------------
 

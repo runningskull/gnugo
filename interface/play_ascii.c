@@ -27,6 +27,11 @@
 #include <string.h>
 #include <ctype.h>
 
+#ifdef READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
+
 #include "liberty.h"
 #include "interface.h"
 #include "sgftree.h"
@@ -623,7 +628,8 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
       /* Display game board. */
       if (opt_showboard)
 	ascii_showboard();
-      
+
+#ifndef READLINE
       /* Print the prompt */
       mprintf("%s(%d): ", color_to_string(gameinfo->to_move), movenum + 1);
 
@@ -633,6 +639,15 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	printf("\nThanks! for playing GNU Go.\n\n");
 	return;
       }
+#else
+      snprintf(line,79,"%s(%d): ",
+	       color_to_string(gameinfo->to_move), movenum+1);
+      if (!(line_ptr = readline(line))) {
+	printf("\nThanks! for playing GNU go.\n\n");
+	return;
+      }
+      add_history(line_ptr);
+#endif
 
       while (state == 0
 	     && (command = strtok(line_ptr, ";"), line_ptr = 0, command)) {
@@ -974,6 +989,10 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	if (passes >= 2)
 	  state = ascii_endgame(gameinfo, 0);
       }
+#ifdef READLINE
+	free(line_ptr);
+#endif
+
     }
 
     sgffile_output(&sgftree);
