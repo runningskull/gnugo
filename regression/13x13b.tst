@@ -199,7 +199,7 @@ loadsgf games/mertin13x13/GNGI3.sgf 65
 # Must connect at D3.
 loadsgf games/mertin13x13/GMGN2.sgf 30
 26 gg_genmove white
-#? [D3]*
+#? [D3]
 
 # B2 inefficient way to live.
 loadsgf games/mertin13x13/GMGN2.sgf 92
@@ -271,12 +271,12 @@ loadsgf games/mertin13x13/WLGN2.sgf 74
 
 loadsgf games/mertin13x13/GNWL1.sgf 61
 41 gg_genmove black
-#? [J6]*
+#? [J6]
 
 # L7 way overconcentrated.
 loadsgf games/mertin13x13/GNWL2.sgf 35
 42 restricted_genmove black L7 L13
-#? [L13]*
+#? [L13]
 
 # J3 is of course bigger than J1.
 loadsgf games/mertin13x13/GNWL3.sgf 109

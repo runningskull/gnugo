@@ -169,7 +169,7 @@ black S6
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto021.sgf
 31 connect E18 H19
-#? [0]*
+#? [0]
 
 #--------------------------------------------------------------
 # Cascade of chain breakings
@@ -185,7 +185,7 @@ loadsgf games/nando/meijin27_g1.sgf 105
 #CATEGORY=STRATEGY
 loadsgf games/nando/meijin27_g1.sgf 186
 112 gg_genmove white
-#? [!P7]*
+#? [!P7]
 
 #--------------------------------------------------------------
 # After B:P2 W:Q2, the connection code (as of 3.3.15) overvalues

@@ -82,7 +82,7 @@ loadsgf games/gunnar/gunnar2.sgf 168
 # O6 is clearly locally better than P6.
 loadsgf games/gunnar/gunnar3.sgf 140
 15 restricted_genmove white O6 P6
-#? [O6]*
+#? [O6]
 
 # T5 is huge. See next test case.
 loadsgf games/gunnar/gunnar3.sgf 190

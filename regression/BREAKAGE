@@ -1,3 +1,19 @@
+========================== 3.3.17 pre 2  ============================
+
+./regress.sh . trevorc.tst 
+130 unexpected FAIL: Correct 'H9', got 'H6'
+./regress.sh . nngs3.tst 
+630 unexpected PASS!
+./regress.sh . gunnar.tst 
+15 unexpected PASS!
+./regress.sh . nando.tst 
+31 unexpected PASS!
+112 unexpected PASS!
+./regress.sh . 13x13b.tst 
+26 unexpected PASS!
+41 unexpected PASS!
+42 unexpected PASS!
+
 ========================== 3.3.17 pre 1  ============================
 
 ./regress.sh . nngs3.tst 
