@@ -256,7 +256,6 @@ contain the game result. If @code{overwrite} is zero the result is
 written only if no previous result property exists.
 @end quotation
 
-
 @item @code{SGFNode *sgfCircle(SGFNode *node, int i, int j)}
 @findex sgfCircle
 @quotation

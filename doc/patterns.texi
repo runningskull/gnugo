@@ -72,7 +72,7 @@ Pattern EB112
   :8,ed,NULL
 @end example
 
-Here \samp{O} marks a friendly stone, @samp{X} marks an enemy stone, @samp{.} marks
+Here @samp{O} marks a friendly stone, @samp{X} marks an enemy stone, @samp{.} marks
 an empty vertex, @samp{*} marks O's next move, @samp{o} marks a square either
 containing @samp{O} or empty but not @samp{X}. (The symbol @samp{x}, which does not
 appear in this pattern, means @samp{X} or @samp{.}.) Finally @samp{?} Indicates a

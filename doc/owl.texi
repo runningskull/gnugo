@@ -152,12 +152,13 @@ information in the calls to @code{same_dragon} from the (static)
 function @code{owl_mark_dragon}. This requires the dragon data
 to be current, which it is not when @code{stackp>0}. 
 
-As with the tactical reading code, return codes are WIN, 0,
-or KO_A or KO_B if the position is ko. Thus for example @code{owl_attack()}
+As with the tactical reading code, return codes are @code{WIN}, 0,
+or @code{KO_A} or @code{KO_B} if the position is ko. Thus for example 
+@code{owl_attack()} 
 @itemize @bullet
-Returns KO_A if the attack prevails provided attacker is willing to
+@item Returns @code{KO_A} if the attack prevails provided attacker is willing to
 ignore any ko threat (the attacker makes the first ko capture).
-@item Returns KO_B if attack succeeds provided attacker has a ko threat
+@item Returns @code{KO_B} if attack succeeds provided attacker has a ko threat
 which must be answered (the defender makes the first ko capture).
 @end itemize
 
@@ -168,8 +169,8 @@ The public functions in @file{owl.c} are:
 @findex owl_analyze_semeai
 @quotation
 Called when @code{apos} and @code{bpos} point to adjacent dragons
-of the opposite color, both with @code{matcher_status} DEAD or
-CRITICAL, analyzes the semeai, assuming that the player
+of the opposite color, both with @code{matcher_status} @code{DEAD} or
+@code{CRITICAL}, analyzes the semeai, assuming that the player
 of the @code{apos} dragon moves first.
 @end quotation
 @item @code{int owl_attack(int target, int *attack_point, int *certain)}

@@ -400,6 +400,9 @@ propagated to the intersection.
 @comment  node-name,  next,  previous,  up
 @section The Core of the Influence Function
 
+While most of the engine uses the one dimensional board (@pxref{The Board})
+the two dimensional board is still used in @file{engine/influence.c}.
+
 Let @code{(m, n)} be the coordinates of the influence source and
 @code{(i, j)} the coordinates of a an intersection being visited
 during propagation, using the same notation as in the

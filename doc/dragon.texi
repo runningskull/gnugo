@@ -106,7 +106,7 @@ struct worm_data @{
 @cindex border color
 If the worm is @code{BLACK} or @code{WHITE}, that is its color.
 Cavities (empty worms) have an additional attribute which we call
-@dfn{bordercolor}. This will be one of @code{BLACK_BORDER,}
+@dfn{bordercolor}. This will be one of @code{BLACK_BORDER},
 @code{WHITE_BORDER} or @code{GRAY_BORDER}. Specifically, if all the worms
 adjacent to a given empty worm have the same color (black or white) then we
 define that to be the bordercolor. Otherwise the bordercolor is gray.
@@ -301,11 +301,11 @@ invincible. Stones which can not be turned invincible even if the
 defender is allowed an arbitrary number of consecutive moves are given
 an unconditional status of DEAD. Empty points where the opponent cannot
 form an invincible worm are called unconditional territory. The
-unconditional status is set to WHITE_BORDER or BLACK_BORDER depending on
-who owns the territory. Finally, if a stone can be captured but is
-adjacent to unconditional territory of its own color, it is also given
-the unconditional status ALIVE. In all other cases the unconditional
-status is UNKNOWN.
+unconditional status is set to @code{WHITE_BORDER} or @code{BLACK_BORDER}
+depending on who owns the territory. Finally, if a stone can be captured but
+is adjacent to unconditional territory of its own color, it is also given the
+unconditional status @code{ALIVE}. In all other cases the unconditional status is
+@code{UNKNOWN}.
 
 To make sense of these definitions it is important to notice that any
 stone which is alive in the ordinary sense (even if only in seki) can be
@@ -325,8 +325,8 @@ this is left for a later revision.
 @quotation
 If the tactical reading code (@pxref{Tactical Reading}) finds that the
 worm can be attacked, @code{attack_points[0]} is a point of attack, and
-@code{attack_codes[0]} is the attack code, WIN, KO_A or KO_B. If
-multiple attacks are known, @code{attack_points[k]} and
+@code{attack_codes[0]} is the attack code, @code{WIN}, @code{KO_A} or 
+@code{KO_B}. If multiple attacks are known, @code{attack_points[k]} and
 @code{attack_codes[k]} are used. Similarly with the defense
 codes and defense points.
 @end quotation
@@ -803,7 +803,7 @@ such killing moves are found, they are cached in @code{owl_attacki_point}
 @item @code{owl_defense_code}
 @quotation
 If the owl code finds that the dragon can be defended, this is the
-defense code (WIN, KO_A, KO_B); otherwise it is 0.
+defense code (@code{WIN}, @code{KO_A}, @code{KO_B}); otherwise it is 0.
 @end quotation
 @item @code{owl_defense_point}
 @quotation
@@ -851,9 +851,10 @@ Size of the surrounding influence moyo. Computed by
 @item @code{safety}
 @quotation
 This is a finer measure of dragon safety than @code{matcher_status}.
-In addition to the values ALIVE, DEAD and CRITICAL it can take the
-values INESSENTIAL, TACTICALLY_DEAD, WEAK, WEAKLY_ALIVE, ALIVE_IN_SEKI,
-STRONGLY_ALIVE and INVINCIBLE.
+In addition to the values @code{ALIVE}, @code{DEAD} and @code{CRITICAL} 
+it can take the values @code{INESSENTIAL}, @code{TACTICALLY_DEAD}, 
+@code{WEAK}, @code{WEAKLY_ALIVE}, @code{ALIVE_IN_SEKI}, @code{STRONGLY_ALIVE}
+and @code{INVINCIBLE}.
 @end quotation
 @item @code{escape_route}
 @quotation

@@ -335,10 +335,8 @@ The owl attack and owl defense move reasons are self explanatory.
 The owl attack threat reason is generated if owl attack on an
 opponent's dragon fails but the owl code determines that the
 dragon can be killed with two consecutive moves. The killing
-moves are stored in @code{(dragon[ai][aj].owl_attacki_i,
-dragon[ai][aj].owl_attacki_j)} and
-@code{(dragon[ai][aj].owl_second_attacki_i,
-dragon[ai][aj].owl_second_attacki_j)}.
+moves are stored in @code{dragon[pos].owl_attack_point}
+and @code{dragon[pos].owl_second_attack_point}.
 
 Similarly if a friendly dragon is dead but two moves can revive it,
 an owl defense threat move reason is generated.
@@ -364,9 +362,8 @@ unsure, a move to defend may still be generated.
 
 The function @code{atari_atari} tries to find a sequence of ataris
 culminating in an unexpected change of status of any opponent string,
-from ALIVE to CRITICAL, or from CRITICAL to DEAD. Once such a sequence
-of ataris is found, it tries to shorten it by rejecting irrelevant
-moves.
+from @code{ALIVE} to @code{CRITICAL}. Once such a sequence of ataris
+is found, it tries to shorten it by rejecting irrelevant moves.
 
 @node Valuation, Move Generation Functions, MG Details, Move Generation
 @comment  node-name,  next,  previous,  up

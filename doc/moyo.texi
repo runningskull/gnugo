@@ -64,18 +64,17 @@ the goban, 0 to empty intersections. We may iterate the following
 operations:
 
 @dfn{dilation}: for each intersection of the goban, if the intersection
-is >= 0, and not adjacent to a <0 one, then add to the intersection
+is @code{>= 0}, and not adjacent to a @code{< 0} one, then add to the intersection
 the number of adjacent >0 intersections. The same for other color : if
-the intersection is <=0, and not adjacent to a >0 one, then sub to
-it the number of <0 intersections.
+the intersection is @code{<= 0}, and not adjacent to a @code{> 0} one, then subtract
+the number of @code{< 0} intersections.
 
-@dfn{erosion}: for each intersection >0 (or <0), subtract (or add) the
-number of adjacent <=0 (or >=0) intersection. Stop at zero.
-The algorithm is just : 5 dilations, then 21 erosions. The number of
-erosions should be 1+n(n-1) where n=number of dilation, since this
-permit to have an isolated stone to give no territory. Thus the
-couple 4/13 also works, but it is often not good, for example when
-there is territory on the 6th line.
+@dfn{erosion}: for each intersection @code{> 0} (or @code{< 0}), subtract (or
+add) the number of adjacent @code{<= 0} (or @code{>= 0}) intersection. Stop at zero.  The
+algorithm is just : 5 dilations, then 21 erosions. The number of erosions
+should be 1+n(n-1) where n=number of dilation, since this permit to have an
+isolated stone to give no territory. Thus the couple 4/13 also works, but it
+is often not good, for example when there is territory on the 6th line.
 
 For example, let us start with a tobi. 
 

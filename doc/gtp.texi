@@ -260,7 +260,7 @@ gtp_countlib(char *s, int id)
   if (p[i][j] == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  return gtp_success(id, "%d", countlib(i, j));
+  return gtp_success(id, "%d", countlib(POS(i, j)));
 @}
 @end example
 
@@ -280,7 +280,7 @@ gtp_genmove_white(char *s, int id)
   int i, j;
   UNUSED(s);
   if (genmove(&i, &j, WHITE) >= 0)
-    play_move(i, j, WHITE);
+    play_move(POS(i, j), WHITE);
 
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_vertex(i, j);
