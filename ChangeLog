@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.29 released March 26, 2002
+
 - assymmetry in influence computation reduced
 - case added in strategic_penalty
 - simulation of ko threat + answer in sgf output reinstated in tryko()
@@ -15,6 +17,7 @@
 - tuning
 - influence tuning
 - code consistency cleanup
+- new tests in nngs1.tst
 - THANKS updated
 
 3.1.28 released March 24, 2002

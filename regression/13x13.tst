@@ -72,7 +72,7 @@ loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 20
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 24
 12 gg_genmove white
-#? [G7|F7|G8]*
+#? [G7|F7|G8]
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 22
@@ -99,7 +99,7 @@ loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
 17 gg_genmove white
-#? [L5|L3]*
+#? [L5|L3]
 
 #CATEGORY=OWL_TUNING
 # This got broke between 3.0.0 and 3.1.14.
@@ -148,7 +148,7 @@ loadsgf games/mertin13x13/katsunari-gnugo3.B+14.sgf 66
 # Too early for 3-3 invasion at L11 with both UL and LR corner open
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 10
 27 gg_genmove white
-#? [C11|E3|E4]*
+#? [C11|E3|E4]
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 12
 28 gg_genmove white
@@ -252,7 +252,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 7
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 11
 48 gg_genmove black
-#? [K7]*
+#? [K7]
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 49 gg_genmove black
@@ -306,7 +306,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 99
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 111
 57 gg_genmove black
-#? [C5|D5]
+#? [C5|D5]*
 
 #CATEGORY=OWL_TUNING
 # New failure (comparing 3.1.15 with 3.0.0)

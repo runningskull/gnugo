@@ -1,3 +1,67 @@
+======================= 3.1.29  =========================
+
+./regress.sh . connection.tst
+60 unexpected FAIL: Correct '1 D15|F15|B15|D19|E19', got '1 C13'
+./regress.sh . blunder.tst
+./regress.sh . trevora.tst
+./regress.sh . nngs1.tst
+10 unexpected PASS!
+16 unexpected PASS!
+17 unexpected PASS!
+34 unexpected PASS!
+./regress.sh . strategy.tst
+./regress.sh . endgame.tst
+./regress.sh . heikki.tst
+./regress.sh . neurogo.tst
+8 unexpected FAIL: Correct 'O2', got 'Q5'
+28 unexpected FAIL: Correct 'O2', got 'Q5'
+./regress.sh . arb.tst
+./regress.sh . rosebud.tst
+./regress.sh . golife.tst
+10 unexpected FAIL: Correct 'D7', got 'B5'
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+./regress.sh . ego.tst
+./regress.sh . dniwog.tst
+./regress.sh . lazarus.tst
+./regress.sh . trevorb.tst
+180 unexpected PASS!
+250 unexpected PASS!
+270 unexpected FAIL: Correct 'G11', got 'G4'
+500 unexpected PASS!
+830 unexpected PASS!
+./regress.sh . strategy2.tst
+./regress.sh . nicklas1.tst
+./regress.sh . nicklas2.tst
+./regress.sh . nicklas3.tst
+./regress.sh . nicklas4.tst
+./regress.sh . nicklas5.tst
+./regress.sh . manyfaces.tst
+1 unexpected PASS!
+./regress.sh . niki.tst
+./regress.sh . trevor.tst
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+./regress.sh . nngs.tst
+120 unexpected PASS!
+850 unexpected FAIL: Correct '!Q9|R9', got 'R9'
+1060 unexpected PASS!
+./regress.sh . trevorc.tst
+1040 unexpected PASS!
+./regress.sh . strategy3.tst
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+38 unexpected PASS!
+./regress.sh . 13x13.tst
+12 unexpected PASS!
+17 unexpected PASS!
+27 unexpected PASS!
+48 unexpected PASS!
+57 unexpected FAIL: Correct 'C5|D5', got 'N7'
+
 ======================= 3.1.28 pre 4  =========================
 
 ./regress.sh . reading.tst

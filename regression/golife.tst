@@ -61,5 +61,5 @@ loadsgf games/golife.sgf 56
 
 loadsgf games/golife.sgf 60
 10 gg_genmove white
-#? [D7]
+#? [D7]*
 

@@ -207,7 +207,7 @@ loadsgf games/arend/constructed2.sgf
 # highly enough by GNU Go?
 loadsgf games/arend/constructed3.sgf
 38 gg_genmove white
-#? [O5]*
+#? [O5]
 
 #CATEGORY=STRATEGY
 # This is an example for part 1 of my comment of the previous problem.

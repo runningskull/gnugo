@@ -38,7 +38,7 @@ loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 44
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 46
 10 gg_genmove black
-#? [R13]*
+#? [R13]
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 104
 11 gg_genmove black
@@ -62,11 +62,11 @@ loadsgf games/nngs/gnugo-3.1.26-farrell-200203051803.sgf 84
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 14
 16 gg_genmove white
-#? [M4]*
+#? [M4]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 34
 17 gg_genmove white
-#? [L3|L4|J3]*
+#? [L3|L4|J3]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 38
 18 gg_genmove white
@@ -136,7 +136,7 @@ loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203132324.sgf 90
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 30
 34 gg_genmove white
-#? [!N10|N9|N11|O11|O10]*
+#? [!N10|N9|N11|O11|O10]
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 44
 35 gg_genmove white
@@ -146,3 +146,26 @@ loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 64
 36 gg_genmove white
 #? [N11|L7]*
 
+loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 59
+37 gg_genmove black
+#? [H8|K14|L15|L14]*
+
+loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
+38 gg_genmove black
+#? [R7]*
+
+loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
+39 gg_genmove black
+#? [R7]*
+
+loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 141
+40 gg_genmove black
+#? [R6]*
+
+loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 145
+41 gg_genmove black
+#? [P6]*
+
+loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 153
+42 gg_genmove black
+#? [O9]*

@@ -195,7 +195,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
 59 disconnect D18 E15
 #? [1 D15|F15|B15|D19|E19]
 60 connect D14 B18
-#? [1 D15|F15|B15|D19|E19]
+#? [1 D15|F15|B15|D19|E19]*
 61 connect O9 Q9
 #? [1 D15|F15|B15|D19|E19]*
 

@@ -6,7 +6,7 @@ reset_trymove_counter
 
 loadsgf games/mfgg1.sgf 43
 1 gg_genmove black
-#? [S13]*
+#? [S13]
 
 loadsgf games/mfgg1.sgf 49
 2 gg_genmove black
