@@ -704,7 +704,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	owla->lunch[k] = NO_MOVE;
       }
     }
-#if 0
+#if 1
     for (k = 0; k < MAX_LUNCHES; k++) {
       if (owlb->lunch[k] != NO_MOVE 
 	  && owla->goal[owlb->lunch[k]]) {
