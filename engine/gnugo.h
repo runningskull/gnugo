@@ -35,6 +35,10 @@
 #include <config.h>
 #endif
 
+#ifdef HAVE_VISUAL_C
+# include <crtdbg.h>
+#endif
+
 #include "sgftree.h"
 #include "clock.h"
 

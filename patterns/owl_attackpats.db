@@ -426,8 +426,8 @@ XY*
 Pattern A206
 
 ?O?        block
-XOo
-.Y*
+YOo
+.X*
 ...
 ---
 
@@ -437,8 +437,8 @@ XOo
 Pattern A206b
 
 ?.O        block
-XO.
-.Y*
+YO.
+.X*
 ...
 ---
 
@@ -1046,6 +1046,27 @@ Pattern A235
 :8,-,value(77)
 
 
+Pattern A236
+# tm new pattern (3.3.12)
+
+---
+x..
+Y.*
+X..
+xO.
+
+:8,-,value(66)
+
+---
+x..
+Y.*
+X..
+xO.
+
+; !oplay_attack(*,*)
+
+
+
 #########################################################
 #                                                       #
 #          Limiting moves on the first line             #
@@ -1396,21 +1417,22 @@ Pattern A411a
 ;owl_escape_value(a)>0 && o_somewhere(f,g,h,i,j) && o_somewhere(b,c,d,e)
 
 
-Pattern A412
-
-????
-?*.O        (possibly desperate) center block
-?.Y?
-?O??
-
-:8,-,value(55)
-
-ba??
-?*.O
-?.Y?
-?O??
-
-;owl_escape_value(a) + owl_escape_value(b) > 0
+# tm Too general, removed (3.3.12)
+#Pattern A412
+#
+#????
+#?*.O        (possibly desperate) center block
+#?.Y?
+#?O??
+#
+#:8,-,value(55)
+#
+#ba??
+#?*.O
+#?.Y?
+#?O??
+#
+#;owl_escape_value(a) + owl_escape_value(b) > 0
 
 
 # Pattern A413
@@ -2086,15 +2108,15 @@ X.D?
 Pattern A614
 # gf New pattern. (3.1.15)
 
-XXO?        destroy eyespace when we can't capture
-..YO
+XYO?        destroy eyespace when we can't capture
+..XO
 X.*.
 ----
 
 :8,-,value(65)
 
-XXO?
-.aYO
+XYO?
+.aXO
 X.*.
 ----
 
@@ -2926,7 +2948,7 @@ Pattern A1001b
 YO          cut if safe
 *X
 
-:/,n,value(50)
+:8,n,value(50)
 
 Ya
 *X
@@ -3041,7 +3063,7 @@ Pattern A1008
 X*Y      stop connection
 ?O?
 
-:|,-,value(80)
+:8,-,value(80)
 
 a*b
 ?O?
@@ -3104,7 +3126,7 @@ XOY      stop connection underneath
 x*x
 ---
 
-:|,-,value(80)
+:8,-,value(80)
 
 aOb
 x*x

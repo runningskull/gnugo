@@ -95,6 +95,41 @@ typedef struct dfa
 dfa_t;
 
 
+
+/* The run-time data structures are different from those used
+ * internally to build the DFA */
+
+/* attribute list */
+typedef struct attrib_rt
+{
+  short val;
+  short next;
+}
+attrib_rt_t;
+
+/* dfa state */
+typedef struct state_rt
+{
+  short att;
+  unsigned short next[4];
+}
+state_rt_t;
+
+typedef struct dfa_rt
+{
+  /* file header */
+  const char name[80];
+  const int pre_rotated;
+  
+  /* transition graph */
+  const state_rt_t *states;
+
+  /* attributes sets */
+  const attrib_rt_t *indexes;
+}
+dfa_rt_t;
+
+
 /* scan order */
 
 #if 0

@@ -26,28 +26,6 @@ loadsgf games/tactics04.sgf 206
 5 gg_genmove white
 #? [N16]
 
-# attack_either and defend_both tests could go in a separate test suite,
-# once there is more of them
-
-loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 32
-trymove black D12
-trymove white C13
-trymove white C12
-trymove black C11
-101 attack_either C11 D12
-#? [1 D12]*
-popgo
-popgo
-popgo
-popgo
-
-# This is subtle. White N3 works as defense to L4.
-loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
-trymove black L4
-102 defend_both N7 K4
-#? [0]*
-popgo
-
 
 
 ############ End of Tests #################

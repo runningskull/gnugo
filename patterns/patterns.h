@@ -265,9 +265,9 @@ struct tree_node_list;
 
 struct pattern_db {
   int fixed_for_size;
-  int fixed_anchor;
+  const int fixed_anchor;
   struct pattern *patterns;
-  struct dfa *pdfa;
+  struct dfa_rt *pdfa;
 #if EXPERIMENTAL_READING
   struct tree_node_list *tnl; /* For tree-based pattern matching */
 #endif

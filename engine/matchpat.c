@@ -829,12 +829,12 @@ const int convert[3][4];
 
 /* Forward declarations. */
 static void dfa_prepare_for_match(int color);
-static int scan_for_patterns(dfa_t *pdfa, int l, int m, int n, 
+static int scan_for_patterns(dfa_rt_t *pdfa, int l, int m, int n, 
 			     int *pat_list);
 #if DFA_SORT
 static int compare_int(const void *a, const void *b);
 #endif
-static void do_dfa_matchpat(dfa_t *pdfa,
+static void do_dfa_matchpat(dfa_rt_t *pdfa,
 			    int m, int n, matchpat_callback_fn_ptr callback,
 			    int color, struct pattern *database,
 			    void *callback_data, char goal[BOARDMAX],
@@ -945,7 +945,7 @@ dump_dfa_board(int m, int n)
  * Return the number of patterns found.
  */
 static int
-scan_for_patterns(dfa_t *pdfa, int l, int m, int n, int *pat_list)
+scan_for_patterns(dfa_rt_t *pdfa, int l, int m, int n, int *pat_list)
 {
   int state, att, id, row;
   int dfa_pos;
@@ -962,7 +962,7 @@ scan_for_patterns(dfa_t *pdfa, int l, int m, int n, int *pat_list)
       if (pdfa->pre_rotated) {
         pat_list[id] = pdfa->indexes[att].val;
       } else {
-        pat_list[id] = l + 8 * pdfa->indexes[att].val;
+        pat_list[id] = l + 8 * (int)(pdfa->indexes[att].val);
       }
       id++;
       att = pdfa->indexes[att].next;
@@ -993,7 +993,7 @@ compare_int(const void *a, const void *b)
 
 /* perform pattern matching with dfa filtering */
 static void 
-do_dfa_matchpat(dfa_t *pdfa,
+do_dfa_matchpat(dfa_rt_t *pdfa,
 		int m, int n, matchpat_callback_fn_ptr callback,
 		int color, struct pattern *database,
 		void *callback_data, char goal[BOARDMAX],

@@ -480,9 +480,21 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
 {
   int i;
 
+  if (sizeof(unsigned short) < 2) {
+    fprintf(of, "#error shorts too short");
+    fprintf(stderr, "Error: shorts are expected to be at least 2 bytes long.\n");
+    exit(2);
+  }
+
+  if (pdfa->lastState > 65535) {
+    fprintf(of, "#error too many states");
+    fprintf(stderr, "Error: The dfa has too many states. Can't fit into a short.\n");
+    exit(2);
+  }
+
   fprintf(of, "\n#include \"dfa.h\"\n");
 
-  fprintf(of, "static state_t state_%s[%d] = {\n", name, pdfa->lastState + 1);
+  fprintf(of, "static const state_rt_t state_%s[%d] = {\n", name, pdfa->lastState + 1);
   for (i = 0; i != pdfa->lastState + 1; i++) {
     fprintf(of, "{%d,", pdfa->states[i].att);
     fprintf(of, "{%d,", pdfa->states[i].next[0]);
@@ -493,17 +505,16 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
   fprintf(of, "};\n\n");
 
 
-  fprintf(of, "static attrib_t idx_%s[%d] = {\n", name, pdfa->lastIndex + 1);
+  fprintf(of, "static const attrib_rt_t idx_%s[%d] = {\n", name, pdfa->lastIndex + 1);
   for (i = 0; i != pdfa->lastIndex + 1; i++)
     fprintf(of, "{%d,%d},\n", pdfa->indexes[i].val, pdfa->indexes[i].next);
   fprintf(of, "};\n\n");
 
-  fprintf(of, "static struct dfa dfa_%s = {\n", name);
+  fprintf(of, "static dfa_rt_t dfa_%s = {\n", name);
   fprintf(of, " \"%s\",\n", name);
   fprintf(of, " %d,\n", pdfa->pre_rotated);
-  fprintf(of, "state_%s, %d, %d,\n", name,
-	  pdfa->lastState + 1, pdfa->lastState);
-  fprintf(of, "idx_%s, %d, %d", name, pdfa->lastIndex + 1, pdfa->lastIndex);
+  fprintf(of, "state_%s,\n", name);
+  fprintf(of, "idx_%s", name);
   fprintf(of, "};\n");
 
 }

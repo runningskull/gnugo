@@ -24,7 +24,7 @@ loadsgf games/owl11.sgf 126
 orientation 2
 loadsgf games/incident108b.sgf 178
 125 owl_attack P16
-#? [1 P15]*
+#? [1 P15]
 
 orientation 1
 loadsgf games/incident248.sgf 228

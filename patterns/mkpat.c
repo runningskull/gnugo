@@ -2460,7 +2460,8 @@ main(int argc, char *argv[])
 
     fprintf(stderr, "dfa for %s\n", argv[gg_optind]);
     fprintf(stderr, "size: %d kB for ", dfa_size(&dfa));
-    fprintf(stderr, "%d patterns\n", patno);
+    fprintf(stderr, "%d patterns", patno);
+    fprintf(stderr, "(%d states)\n", dfa.lastState);
 
     if (0 && dfa.pre_rotated)
       dump_dfa(stderr, &dfa);
