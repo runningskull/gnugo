@@ -932,6 +932,20 @@ loadsgf games/handtalk/handtalk11.sgf 157
 258 owl_defend O2
 #? [0]
 
+loadsgf games/handtalk/handtalk12.sgf 29
+259 owl_does_attack L2 M3
+#? [0]
+
+# Far too many escape ways for F10 as it could be killed.
+loadsgf games/handtalk/handtalk12.sgf 41
+260 owl_does_attack G9 F10
+#? [0]
+
+# A good example where connection handling is important in owl.
+loadsgf games/handtalk/handtalk23.sgf 186
+261 owl_attack E5
+#? [1 (O6|Q7|T4|T5|R4)]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

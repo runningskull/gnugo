@@ -86,3 +86,13 @@ loadsgf games/blunder13.sgf
 loadsgf games/blunder14.sgf
 19 gg_genmove white
 #? [P18|P19|R18|R19]
+
+# P11 got incorrectly rejected as a blunder.
+loadsgf games/handtalk/handtalk13.sgf 123
+20 gg_genmove black
+#? [P11]
+
+# L9 got incorrectly rejected as a blunder.
+loadsgf games/handtalk/handtalk13.sgf 131
+21 gg_genmove black
+#? [L9]

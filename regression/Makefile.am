@@ -1,7 +1,7 @@
 TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst blunder.tst \
        buzco.tst capture.tst connect.tst connect_rot.tst connection.tst \
        connection_rot.tst cutstone.tst dniwog.tst ego.tst endgame.tst \
-       endgame_rot.tst filllib.tst global.tst golife.tst heikki.tst \
+       endgame_rot.tst filllib.tst global.tst golife.tst handtalk.tst heikki.tst \
        lazarus.tst ld_owl.tst ld_owl_rot.tst life.tst manyfaces.tst \
        neurogo.tst newscore.tst nicklas1.tst nicklas2.tst nicklas3.tst \
        nicklas4.tst nicklas5.tst niki.tst nngs.tst nngs1.tst optics.tst \
@@ -225,6 +225,9 @@ nngs1: nngs1.tst
 lazarus: lazarus.tst
 	$(srcdir)/eval.sh lazarus.tst
 
+handtalk: handtalk.tst
+	$(srcdir)/eval.sh handtalk.tst
+
 all_batches: first_batch second_batch third_batch fourth_batch
 
 first_batch: 
@@ -253,6 +256,7 @@ second_batch:
 	$(srcdir)/regress.sh $(srcdir) ego.tst
 	$(srcdir)/regress.sh $(srcdir) dniwog.tst
 	$(srcdir)/regress.sh $(srcdir) lazarus.tst
+	$(srcdir)/regress.sh $(srcdir) handtalk.tst
 	$(srcdir)/regress.sh $(srcdir) trevorb.tst
 	$(srcdir)/regress.sh $(srcdir) strategy2.tst
 
