@@ -20,6 +20,9 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#ifndef _CACHE_H_
+#define _CACHE_H_
+
 #include <stdio.h>
 #include "hash.h"
 
@@ -28,9 +31,6 @@
  * using a method known as Zobrist hashing.  See the Texinfo documentation
  * (Reading/Hashing) for more information.  
  */
-
-#ifndef _CACHE_H_
-#define _CACHE_H_
 
 /* Define to 1 if you want the new transposition table. */
 #define USE_HASHTABLE_NG 1

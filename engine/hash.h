@@ -20,9 +20,12 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#ifndef _HASH_H_
+#define _HASH_H_
 
 #include "config.h"
 #include "board.h"
+#include <limits.h>
 
 /*
  * This file, together with engine/hash.c implements hashing of go positions
@@ -32,9 +35,6 @@
 
 /* Dump (almost) all read results. */
 #define TRACE_READ_RESULTS 0
-
-#ifndef _HASH_H_
-#define _HASH_H_
 
 /* Hash values and the compact board representation should use the
  * longest integer type that the platform can handle efficiently.
@@ -55,8 +55,8 @@
  * cost.
  */
 typedef unsigned long Hashvalue;
-typedef unsigned long Compacttype;
-
+#define SIZEOF_HASHVALUE SIZEOF_LONG
+#define HASHVALUE_PRINT_FORMAT "%l0x"
 
 /* for testing: Enables a lot of checks. */
 #define CHECK_HASHING 0
@@ -67,9 +67,9 @@ typedef unsigned long Compacttype;
  * With 64 bits, there should be less than one such mistake in 10^9 games.
  * Set this to 96 if this is not safe enough for you.
  */
-#define MIN_HASHBITS 		64		
+#define MIN_HASHBITS   64		
 
-#define NUM_HASHVALUES 		(MIN_HASHBITS / ( 8 * SIZEOF_LONG))
+#define NUM_HASHVALUES (1 + (MIN_HASHBITS - 1) / (CHAR_BIT * SIZEOF_HASHVALUE))
 
 /*
  * This struct is maintained by the machinery that updates the board

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- computation of NUM_HASHVALUES corrected in hash.h
+- hashdata_to_string reimplemented
 - defend4() and special_rescue_moves() revised
 - avoid ko captures when filling outer liberties in semeai reading
 - adjust breakin_depth in modify_depth_values()
