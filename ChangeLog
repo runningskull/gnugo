@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- gtp.texi (GTP command reference): Add @cindex.
+- gtp-commands.sed: Use @verbatim. Tighten output. 
+- gtp-commands.sed: Move `Function' field into @item line, sans field name.
+- doc/ Makefile.am (gtp-commands.texi): Eliminate redundant use of cat(1).
+- revision of gtp-commands.sed
+- bugfix in main.c: remember to sgfFreeNode(gameinfo.game_record.root)
 - allow PASS_MOVE in trymove() and tryko()
 - do_trymove() and popgo() revised
 - 'printfsgf -' supported from GTP	
