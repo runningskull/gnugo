@@ -130,7 +130,7 @@ loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 195
 #? [O13]
 
 loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 235
-282 reg_genmove white
+283 reg_genmove white
 #? [B9]
 
 
