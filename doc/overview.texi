@@ -43,6 +43,7 @@ slightly different if the code is called from @file{owl.c} or from
 @file{reading.c}.
 
 @node The Board, Move Generation Basics, Definitions, Overview
+@section The Board
 
 GNU Go represents the board in a one-dimensional array called
 @code{board}. For some purposes a two dimensional indexing of the
