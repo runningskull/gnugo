@@ -61,27 +61,29 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
    * previously during find_cuts.
    */
 
-  if (!experimental_connections && (pattern->class & CLASS_C)) {
-    for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-      /* transform pattern real coordinate */
-      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				 ll, m, n);
-      if (board[pos]==EMPTY
-	  && ((color == WHITE
-	       && (white_eye[pos].type & INHIBIT_CONNECTION))
-	      || (color == BLACK
+  if (pattern->class & CLASS_C) {
+    if (!experimental_connections) {
+      for (k = 0; k < pattern->patlen; ++k) { /* match each point */
+	/* transform pattern real coordinate */
+	int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+				   ll, m, n);
+	if (board[pos]==EMPTY
+	    && ((color == WHITE
+		 && (white_eye[pos].type & INHIBIT_CONNECTION))
+		|| (color == BLACK
 		  && (black_eye[pos].type & INHIBIT_CONNECTION)))) {
-	DEBUG(DEBUG_DRAGONS, 
-	      "Connection pattern of type %s inhibited at %1m\n",
-	      pattern->name, pos);
-	return;
+	  DEBUG(DEBUG_DRAGONS, 
+		"Connection pattern of type %s inhibited at %1m\n",
+		pattern->name, pos);
+	  return;
+	}
       }
-    }	
+    }
 
-  /* If C pattern, test if there are more than one dragon in this
-   * pattern so that there is something to connect, before doing any
-   * expensive reading.
-   */
+    /* If C pattern, test if there are more than one dragon in this
+     * pattern so that there is something to connect, before doing any
+     * expensive reading.
+     */
 
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
       /* transform pattern real coordinate */
@@ -193,6 +195,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
      */
     if ((pattern->class & CLASS_C)
 	&& board[pos] == color
+	&& pattern->patn[k].att == ATT_O
 	&& ((pattern->class & CLASS_s) || worm[pos].attack_codes[0] == 0)) {
       if (first_dragon == NO_MOVE)
 	first_dragon = dragon[pos].origin;
