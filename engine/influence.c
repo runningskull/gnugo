@@ -99,32 +99,42 @@ static int debug_influence_j = -1;
 #define EXPLICIT_LOOP_UNROLLING 1
 
 #if EXPLICIT_LOOP_UNROLLING
+/* In addition to the parameters, this macro expects
+ *  m,n = original source of influence
+ *  i,j = point influence is being spread from
+ *  current_strength combines strength and damping factor
+ *  b is 1/(square of distance from m,n to i,j) ; or halved
+ *    for diagonals
+ * 
+ *  arg_i is i + arg_di ; arg_j is j + arg_dj
+ *  arg_d is 1 for diagonal movement
+ *
+ */
 
-#define code1(arg_di, arg_dj, arg_i, arg_j, arg_d) \
+
+#define code1(arg_di, arg_dj, arg_i, arg_j, arg_d) do { \
       if (q->p[arg_i][arg_j] == EMPTY \
 	  && ((arg_di)*(i-m) + (arg_dj)*(j-n) > 0 \
 	      || queue_start == 1)) { \
-	permeability = permeability_array[i][j]; \
-	if (arg_d) \
+	float contribution; \
+	float permeability = permeability_array[i][j]; \
+	if (arg_d) { \
 	  permeability *= gg_max(permeability_array[arg_i][j], \
 			         permeability_array[i][arg_j]); \
-	if (permeability == 0.0) \
-	  continue; \
-	damping = (arg_d) ? diagonal_attenuation : attenuation; \
-	if (i == m && j == n) \
-	  cos2phi = 1.0; \
-	else { \
-	  float a = (arg_di)*(i-m) + (arg_dj)*(j-n); \
-	  float c = (arg_di)*(arg_di) + (arg_dj)*(arg_dj); \
-	  gg_assert(a > 0.0); \
-	  cos2phi = (a*a) / (b*c); \
+	  if (permeability == 0.0) \
+	    continue; \
 	} \
-	contribution = cos2phi * permeability * current_strength / damping; \
+	contribution = current_strength * permeability; \
+	if (queue_start != 1) { \
+	  int a = (arg_di)*(i-m) + (arg_dj)*(j-n); \
+	  contribution *= (a*a) * b; /* contribution *= cos(phi) */ \
+	} \
 	if (contribution <= INFLUENCE_CUTOFF) { \
           if (permeability < 1.0 || q->w[arg_i][arg_j] != 0.0) \
 	    continue; \
-          else \
+          else { \
             contribution = 1.01 * INFLUENCE_CUTOFF; \
+	  } \
 	} \
 	if (q->w[arg_i][arg_j] == 0.0) { \
 	  q->queuei[queue_end] = (arg_i); \
@@ -132,8 +142,9 @@ static int debug_influence_j = -1;
 	  queue_end++; \
 	} \
 	q->w[arg_i][arg_j] += contribution; \
-      }
+      } } while (0) 
 #endif
+
 
 static void
 accumulate_influence(struct influence_data *q, int m, int n, int color)
@@ -143,19 +154,14 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
 #if !EXPLICIT_LOOP_UNROLLING
   int d;
 #endif
-  float damping;
   float b;
-  float current_strength;
-  float cos2phi;
-  float permeability;
-  float contribution;
-  float attenuation;
-  float diagonal_attenuation;
+  float inv_attenuation;
+  float inv_diagonal_damping;
   float (*permeability_array)[MAX_BOARD];
   
-  /* Clear the queue. */
+  /* Clear the queue. Entry 0 is implicitly (m, n). */
   int queue_start = 0;
-  int queue_end = 0;
+  int queue_end = 1;
 
   if (0)
     gprintf("Accumulating influence for %s at %m\n",
@@ -163,40 +169,48 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
 
   /* Attenuation only depends on the influence origin. */
   if (color == WHITE)
-    attenuation = q->white_attenuation[m][n];
+    inv_attenuation = 1.0 / q->white_attenuation[m][n];
   else
-    attenuation = q->black_attenuation[m][n];
+    inv_attenuation = 1.0 / q->black_attenuation[m][n];
+
   if (q->is_territorial_influence)
-    diagonal_attenuation = attenuation * TERR_DIAGONAL_DAMPING;
+    inv_diagonal_damping = 1.0 / TERR_DIAGONAL_DAMPING;
   else
-    diagonal_attenuation = attenuation * DIAGONAL_DAMPING;
+    inv_diagonal_damping = 1.0 / DIAGONAL_DAMPING;
 
   if (color == WHITE)
     permeability_array = q->white_permeability;
   else
     permeability_array = q->black_permeability;
+
+  /* We put the original source into slot 0.  */
+  q->queuei[0] = m;
+  q->queuej[0] = n;
     
-  /* Put the influence origin on the stack. */
   if (color == WHITE)
     q->w[m][n] = q->white_strength[m][n];
   else
     q->w[m][n] = q->black_strength[m][n];
-  q->queuei[queue_end] = m;
-  q->queuej[queue_end] = n;
-  queue_end++;
+
 
   /* Spread influence until the stack is empty. */
   while (queue_start < queue_end) {
+    float current_strength;
 
-    /* Pick first element in queue. */
     i = q->queuei[queue_start];
     j = q->queuej[queue_start];
-    b = (i-m)*(i-m) + (j-n)*(j-n);
+    queue_start++;
+    if (permeability_array[i][j] == 0.0)
+      continue;
     if (0)
       gprintf("Picked %m from queue. w=%f start=%d end=%d\n",
 	      i, j, q->w[i][j], queue_start, queue_end);
-    current_strength = q->w[i][j];
-    queue_start++;
+    if (queue_start == 1)
+      b = 1.0;
+    else
+      b = 1.0 / ((i-m)*(i-m) + (j-n)*(j-n));
+
+    current_strength = q->w[i][j] * inv_attenuation;
 
 #if !EXPLICIT_LOOP_UNROLLING
     /* Try to spread influence in each of the eight directions. */    
@@ -214,52 +228,45 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
 	  && (di*(i-m) + dj*(j-n) > 0
 	      || queue_start == 1)) {
 
+	float contribution;
+	float permeability = permeability_array[i][j];
+	float dfactor;
+	float inv_damping;
+
 	/* Now compute the damping of the influence.
 	 * First we have the permeability at the point we are
 	 * spreading from. For diagonal movement we also take the
 	 * permeability of the vertices we are "passing by" into
 	 * account.
 	 */
-	permeability = permeability_array[i][j];
-	if (d > 3) /* diagonal movement */
+	if (d > 3) { /* diagonal movement */
 	  permeability *= gg_max(permeability_array[i+di][j],
-				 permeability_array[i][j+dj]);
+				         permeability_array[i][j+dj]);
+	  inv_damping = inv_diagonal_damping;
+	  dfactor = 0.5;
+	}
+	else {
+	  inv_damping = 1.0;
+	  dfactor = 1.0;
+	}
 
 	if (permeability == 0.0)
 	  continue;
-	
-	/* Then we have the distance dependent damping. */
-	damping = 1.0;
-	switch (d) {
-	case 0: /* south */
-	case 1: /* west */
-	case 2: /* north */
-	case 3: /* east */
-	  damping = attenuation;
-	  break;
-	case 4: /* southwest */
-	case 5: /* northwest */
-	case 6: /* northeast */
-	case 7: /* southeast */
-	  damping = diagonal_attenuation;
-	  break;
-	}
-	
-	/* Finally direction dependent damping. */
-	if (i == m && j == n)
-	  cos2phi = 1.0;
-	else {
-	  float a = di*(i-m) + dj*(j-n);
-	  float c = di*di + dj*dj;
-	  gg_assert(a > 0.0);
-	  cos2phi = (a*a) / (b*c);
-	}
 
-	contribution = cos2phi * permeability * current_strength / damping;
+	contribution = permeability * current_strength * inv_diagonal_damping;
+
+	/* Finally direction dependent damping. */
+	if (i != m || j != n) {
+	  int a = di*(i-m) + dj*(j-n);
+	  gg_assert(a > 0);
+	  contribution *= (a*a) * b * dfactor;
+	}
 
 	/* Stop spreading influence if the contribution becomes too low. */
 	if (contribution <= INFLUENCE_CUTOFF) {
-          if (permeability < 1.0 || q->w[i+di][j+dj] != 0.0)
+          if (permeability_array[i][j] < 1.0 
+	      || (d > 3 && diagonal_permeability < 1.0)
+	      || q->w[i+di][j+dj] != 0.0)
 	    continue;
           else
             contribution = 1.01 * INFLUENCE_CUTOFF;
@@ -280,23 +287,27 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
       }
     }
 #else
-    if (i > 0)
-      code1(-1, 0, i-1, j, 0);
     if (i < board_size-1)
       code1(1, 0, i+1, j, 0);
     if (j > 0)
       code1(0, -1, i, j-1, 0);
+    if (i > 0)
+      code1(-1, 0, i-1, j, 0);
     if (j < board_size-1)
       code1(0, 1, i, j+1, 0);
-    if (i > 0 && j > 0)
-      code1(-1, -1, i-1, j-1, 1);
+
+    /* Update factors for diagonal movement. */
+    b *= 0.5;
+    current_strength *= inv_diagonal_damping;
+
     if (i < board_size-1 && j > 0)
       code1(1, -1, i+1, j-1, 1);
-    if (i < board_size-1 && j < board_size-1)
-      code1(1, 1, i+1, j+1, 1);
+    if (i > 0 && j > 0)
+      code1(-1, -1, i-1, j-1, 1);
     if (i > 0 && j < board_size-1)
       code1(-1, 1, i-1, j+1, 1);
- 
+    if (i < board_size-1 && j < board_size-1)
+      code1(1, 1, i+1, j+1, 1);
 #endif
   }
   
@@ -1038,7 +1049,7 @@ find_influence_patterns(struct influence_data *q, int color)
  * move for OTHER_COLOR(color) at (m, n). If these coordinates are -1
  * no move is made. In any case it's assumed that color is in turn to
  * move. (This affects the barrier patterns (class A, D) and intrusions
- * (class B).
+ * (class B)).
  */
 static void
 compute_influence(struct influence_data *q, int color, int m, int n,
