@@ -78,8 +78,8 @@ glibconfig = @glibconfig@
 install_sh = @install_sh@
 perl = @perl@
 
-noinst_PROGRAMS = mkpat joseki mkeyes extract_fuseki
-EXTRA_PROGRAMS = transpat
+noinst_PROGRAMS = mkpat joseki mkeyes
+EXTRA_PROGRAMS = extract_fuseki transpat
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
 
@@ -177,9 +177,8 @@ am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
 	fuseki13.$(OBJEXT) fuseki19.$(OBJEXT) josekidb.$(OBJEXT) \
 	read_attack.$(OBJEXT) read_defend.$(OBJEXT) handipat.$(OBJEXT)
 libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
-EXTRA_PROGRAMS = transpat$(EXEEXT)
-noinst_PROGRAMS = mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT) \
-	extract_fuseki$(EXEEXT)
+EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) transpat$(EXEEXT)
+noinst_PROGRAMS = mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 
 am_extract_fuseki_OBJECTS = extract_fuseki.$(OBJEXT)

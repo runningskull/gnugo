@@ -4,6 +4,11 @@ reset_owl_node_counter
 reset_reading_node_counter
 reset_trymove_counter
 
+# This test suite is a collection of blunders. By "blunder" we here
+# mean a move which is worse than passing. Also included are moves
+# which are okay but which GNU Go incorrectly rejects thinking that
+# they would be blunders.
+
 loadsgf games/blunder1.sgf
 1 gg_genmove black
 #? [!E5]
@@ -137,3 +142,4 @@ loadsgf games/blunder22.sgf 1
 loadsgf games/blunder22.sgf 5
 29 gg_genmove white
 #? [!(C1|B3)]
+

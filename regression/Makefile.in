@@ -91,8 +91,8 @@ TST = 13x13.tst arb.tst arend.tst arion.tst atari_atari.tst auto01.tst \
        reading_rot.tst rosebud.tst safety.tst score.tst score2.tst \
        score_rot.tst semeai.tst semeai2.tst strategy.tst strategy2.tst \
        strategy3.tst strategy4.tst strategy5.tst strategy_rot.tst tactics.tst \
-       trevor.tst trevora.tst trevorb.tst trevorc.tst trevord.tst \
-       vie.tst viking.tst
+       tactics1.tst trevor.tst trevora.tst trevorb.tst trevorc.tst \
+       trevord.tst vie.tst viking.tst
 
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
@@ -440,6 +440,9 @@ strategy5: strategy5.tst
 tactics: tactics.tst
 	$(srcdir)/eval.sh tactics.tst $(GG_OPTIONS)
 
+tactics1: tactics1.tst
+	$(srcdir)/eval.sh tactics1.tst $(GG_OPTIONS)
+
 trevor: trevor.tst
 	$(srcdir)/eval.sh trevor.tst $(GG_OPTIONS)
 
@@ -533,6 +536,7 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) auto_handtalk.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) safety.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) ninestones.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) tactics1.tst $(GG_OPTIONS)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

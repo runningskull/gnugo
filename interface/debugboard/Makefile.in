@@ -78,7 +78,7 @@ glibconfig = @glibconfig@
 install_sh = @install_sh@
 perl = @perl@
 
-bin_PROGRAMS = debugboard
+EXTRA_PROGRAMS = debugboard
 
 EXTRA_DIST = 
 
@@ -113,9 +113,7 @@ subdir = interface/debugboard
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
-bin_PROGRAMS = debugboard$(EXEEXT)
-PROGRAMS = $(bin_PROGRAMS)
-
+EXTRA_PROGRAMS = debugboard$(EXEEXT)
 am_debugboard_OBJECTS = main.$(OBJEXT) gui.$(OBJEXT) display.$(OBJEXT)
 debugboard_OBJECTS = $(am_debugboard_OBJECTS)
 debugboard_LDADD = $(LDADD)
@@ -155,29 +153,6 @@ Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.s
 	cd $(top_builddir) && \
 	  CONFIG_HEADERS= CONFIG_LINKS= \
 	  CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
-install-binPROGRAMS: $(bin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(bindir)
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  if test -f $$p \
-	  ; then \
-	    f=`echo $$p1|sed '$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$f"; \
-	   $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$f; \
-	  else :; fi; \
-	done
-
-uninstall-binPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
-	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
-	  rm -f $(DESTDIR)$(bindir)/$$f; \
-	done
-
-clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 debugboard$(EXEEXT): $(debugboard_OBJECTS) $(debugboard_DEPENDENCIES) 
 	@rm -f debugboard$(EXEEXT)
 	$(LINK) $(debugboard_LDFLAGS) $(debugboard_OBJECTS) $(debugboard_LDADD) $(LIBS)
@@ -264,10 +239,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS) $(HEADERS)
+all-am: Makefile $(HEADERS)
 
 installdirs:
-	$(mkinstalldirs) $(DESTDIR)$(bindir)
 
 install: install-am
 install-exec: install-exec-am
@@ -295,7 +269,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-generic mostlyclean-am
 
 distclean: distclean-am
 
@@ -312,7 +286,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am:
 
 install-info: install-info-am
 
@@ -328,18 +302,17 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am
+uninstall-am: uninstall-info-am
 
-.PHONY: GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic distclean distclean-compile distclean-depend \
-	distclean-generic distclean-tags distdir dvi dvi-am info \
-	info-am install install-am install-binPROGRAMS install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-info-am
+.PHONY: GTAGS all all-am check check-am clean clean-generic distclean \
+	distclean-compile distclean-depend distclean-generic \
+	distclean-tags distdir dvi dvi-am info info-am install \
+	install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic tags uninstall \
+	uninstall-am uninstall-info-am
 
 
 # OPTIONS=$(AIXOPTS)
