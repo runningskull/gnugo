@@ -84,7 +84,7 @@ loadsgf games/incident169.sgf 110
 # incident 174 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 132
 66 gg_genmove white
-#? [N11]
+#? [N11]*
 
 # incident 175 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 154
@@ -262,7 +262,7 @@ loadsgf games/strategy26.sgf 251
 # See also owl:254.
 loadsgf games/strategy26.sgf 257
 100 gg_genmove black
-#? [M16]
+#? [M16]*
 
 
 ############ End of Tests #################

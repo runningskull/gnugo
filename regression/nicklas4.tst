@@ -24,7 +24,7 @@ loadsgf games/nicklas/nicklas8.sgf 212
 # point worse than J12. K12 loses the tail.
 loadsgf games/nicklas/nicklas8.sgf 242
 812 gg_genmove black
-#? [J12]*
+#? [J12]
 
 # O9 does leave a ko but is not out of the question. /gf
 loadsgf games/nicklas/nicklas11.sgf 56
@@ -40,7 +40,7 @@ loadsgf games/nicklas/nicklas11.sgf 172
 # doubt it checks whether both will be defended by S7. /ab
 loadsgf games/nicklas/nicklas12.sgf 29
 1201 gg_genmove black
-#? [Q9]*
+#? [Q9]
 
 # I have some doubt about the correct move. I might be advisable for B
 # to defend his center group, although W E16 hurts, of course. However,

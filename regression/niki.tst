@@ -50,12 +50,12 @@ loadsgf games/niki.sgf 110
 # important. Added H15, G15, and F15. /gf
 loadsgf games/niki.sgf 124
 8 gg_genmove white
-#? [G16|H15|G15|F15]
+#? [G16|H15|G15|F15]*
 
 #gg_genmove bug requires reloading game.
 loadsgf games/niki.sgf 124
 9 gg_genmove black
-#? [F15]
+#? [F15]*
 
 loadsgf games/niki.sgf 128
 10 gg_genmove white
@@ -94,7 +94,7 @@ loadsgf games/niki.sgf 226
 #SEVERITY=8
 loadsgf games/niki.sgf 214
 14 gg_genmove white
-#? [F16]*
+#? [F16]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

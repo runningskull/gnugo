@@ -31,4 +31,4 @@ loadsgf games/trevor/trevor_27.sgf 36
 orientation 1
 loadsgf games/nicklas/nicklas18.sgf 17
 228 owl_attack B5
-#? [0]*
+#? [0]

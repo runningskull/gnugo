@@ -138,10 +138,10 @@ loadsgf games/semeai/semeai9.sgf
 loadsgf golois/Goemate990902-1.sgf
 
 23 owl_analyze_semeai G12 G13
-#? [ALIVE ALIVE (F13|G13|H13|PASS)]
+#? [ALIVE ALIVE (F13|G13|H13|PASS)]*
 
 24 owl_analyze_semeai G13 G12
-#? [DEAD DEAD PASS]
+#? [DEAD DEAD PASS]*
 
 25 owl_analyze_semeai S8 R8
 #? [ALIVE DEAD S9]
@@ -150,18 +150,18 @@ loadsgf golois/Goemate990902-1.sgf
 #? [ALIVE DEAD S9]
 
 27 owl_analyze_semeai Q7 R7
-#? [ALIVE DEAD S9]
+#? [ALIVE DEAD S9]*
 
 # If this semeai is treated as a strictly local
 # problem (ignoring the R8 dragon) then R7 can't live.
 # So it's unclear what the correct answer should be.
 # A similar remark holds with problem 27.
 28 owl_analyze_semeai R7 Q7
-#? [ALIVE DEAD S9]
+#? [ALIVE DEAD S9]*
 
 # A6 gives an unfavorable ko while F10 gives seki.
 # Since there are no ko threats, and F10 is enough to win, it is preferred.
 loadsgf games/semeaiko1.sgf
 29 gg_genmove black
-#? F10
+#? [F10]*
 

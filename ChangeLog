@@ -2,11 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.16 released December 9, 2001
+
 - readconnect revised
 - new board.c function breakchain3()
 - dsp and config.vc updates
 - new function influence_get_moyo_segmentation()
-- new function add_influence_source
+- new function add_influence_source()
 - computations of moyo size surrounding a dragon changed
 - confirm_safety() takes two new parameters to tell which stones were saved
 - atari_atari_confirm_safety() revised
@@ -20,6 +22,7 @@
 - examine_move_safety() revised
 - new function decide_combination() in sgfdecide.c
 - new option --decide-combination
+- new experimental-combination configure option, and command line options
 - new gtp command aa_confirm_safety
 - bugfix in trymove()
 - 1D revisions and cleaning up

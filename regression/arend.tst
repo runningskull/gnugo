@@ -8,7 +8,7 @@ loadsgf games/arend/gnugo-gnugo1.sgf 25
 # SEVERITY=3
 loadsgf games/arend/gnugo-gnugo1.sgf 112
 2 gg_genmove white
-#? [H15]*
+#? [H15]
 
 # CATEGORY=CONNECTION
 # SEVERITY=10
@@ -94,7 +94,7 @@ loadsgf games/arend/gnugo-gnugo4.sgf 45
 # GNU Go moves at C9. I do not know what it is afraid of.
 loadsgf games/arend/gnugo-gnugo4.sgf 153
 17 gg_genmove black
-#? [C7]
+#? [C7]*
 
 # Maybe this problem is suboptimal, because there is a ko involved, and
 # GNU Go gets it wrong even without the ko.
@@ -172,7 +172,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 137
  
 loadsgf games/arend/gnugo-gnugo7.sgf 140
 33 gg_genmove white
-#? [F9]*
+#? [F9]
  
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/arend/gnugo-gnugo7.sgf 173

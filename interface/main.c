@@ -87,7 +87,9 @@ enum {OPT_BOARDSIZE=2,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_TACTICAL_SEMEAI,
       OPT_EXPERIMENTAL_SEMEAI,
+      OPT_EXPERIMENTAL_CONNECTIONS,
       OPT_STANDARD_SEMEAI,
+      OPT_STANDARD_CONNECTIONS,
       OPT_DECIDE_POSITION,
       OPT_DECIDE_EYE,
       OPT_DECIDE_COMBINATION,
@@ -193,6 +195,7 @@ static struct gg_option const long_options[] =
   {"chinese-rules",  no_argument,       0, OPT_CHINESE_RULES},
   {"japanese-rules", no_argument,       0, OPT_JAPANESE_RULES},
   {"experimental_semeai",  no_argument, 0, OPT_EXPERIMENTAL_SEMEAI},
+  {"experimental_connections",  no_argument, 0, OPT_EXPERIMENTAL_CONNECTIONS},
   {"standard_semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
@@ -298,6 +301,7 @@ main(int argc, char *argv[])
   else 
     chinese_rules = 0;
   experimental_semeai = EXPERIMENTAL_SEMEAI;
+  experimental_connections = EXPERIMENTAL_CONNECTIONS;
 
   allow_suicide = 0;
   capture_all_dead = 0;
@@ -426,6 +430,14 @@ main(int argc, char *argv[])
 
       case OPT_STANDARD_SEMEAI: 
 	experimental_semeai = 0;
+	break;
+
+      case OPT_EXPERIMENTAL_CONNECTIONS:
+	experimental_connections = 1;
+	break;
+
+      case OPT_STANDARD_CONNECTIONS: 
+	experimental_connections = 0;
 	break;
 
       case OPT_ALLOW_SUICIDE:

@@ -18,7 +18,7 @@ AH_TEMPLATE([VERSION],
 [Define to the version of the distribution.])
 
 dnl this defines VERSION and PACKAGE
-AM_INIT_AUTOMAKE([gnugo], [3.1.15])
+AM_INIT_AUTOMAKE([gnugo], [3.1.16])
 GNU_PACKAGE="GNU $PACKAGE"
 AC_DEFINE_UNQUOTED(GNU_PACKAGE, "$GNU_PACKAGE")
 
@@ -67,6 +67,10 @@ AC_ARG_ENABLE(chinese-rules,
 AC_ARG_ENABLE(experimental-semeai,
  [  --enable-experimental-semeai    use the experimental semeai module
   --disable-experimental-semeai    use standard semeai module (default)])
+
+AC_ARG_ENABLE(experimental-connections,
+ [  --enable-experimental-connections    use experimental connection analysis
+  --disable-experimental-connections    use standard connection analysis (default)])
 
 AC_ARG_ENABLE(profile,
  [  --enable-profile       compile gnugo with gprof option ])
@@ -335,15 +339,26 @@ else
    AC_DEFINE(CHINESE_RULES, 0)
 fi
 
-dnl ------------ Chinese Rules -------------------
+dnl ------------ Semeai -------------------
 
 AH_TEMPLATE([EXPERIMENTAL_SEMEAI],
-[Ruleset. Default Japanese])
+[Semeai module. Default standard.])
 
 if test "$enable_experimental_semeai" = "yes" ; then
    AC_DEFINE(EXPERIMENTAL_SEMEAI, 1)
 else
    AC_DEFINE(EXPERIMENTAL_SEMEAI, 0)
+fi
+
+dnl ------------ Connections -------------------
+
+AH_TEMPLATE([EXPERIMENTAL_CONNECTIONS],
+[Connection module. Default standard.])
+
+if test "$enable_experimental_connections" = "yes" ; then
+   AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 1)
+else
+   AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 0)
 fi
 
 dnl  ----------- special-case use of gcc ---------

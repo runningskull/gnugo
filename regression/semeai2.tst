@@ -60,7 +60,7 @@ loadsgf games/FSF-neurogo.sgf 152
 # Nicklas1 1213
 loadsgf games/nicklas/nicklas12.sgf 203
 1213 gg_genmove black
-#? [N4]*
+#? [N4]
 
 # Nicklas1 1405
 loadsgf games/nicklas/nicklas14.sgf 55
@@ -136,13 +136,13 @@ loadsgf games/nicklas/nicklas8.sgf 84
 # See also reading:158
 loadsgf games/strategy11.sgf 77
 44 gg_genmove black
-#? [G2]*
+#? [G2]
 
 # Strategy2 66
 # incident 174 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 132
 66 gg_genmove white
-#? [N11]
+#? [N11]*
 
 # Strategy2 72
 # Semeai problem.
@@ -185,7 +185,7 @@ loadsgf games/strategy27.sgf 216
 # Important semeai example.
 loadsgf games/strategy27.sgf 220
 110 gg_genmove white
-#? [A8]*
+#? [A8]
 
 # Strategy3 113
 loadsgf games/me.sgf 150
@@ -250,7 +250,7 @@ loadsgf games/strategy39.sgf 158
 # Safety must come first. This is almost a whole-board semeai.
 loadsgf games/strategy40.sgf 30
 168 gg_genmove black
-#? [A3|A4]*
+#? [A3|A4]
 
 # Strategy4 179
 #DESCRIPTION=Tenuki also seems OK here.

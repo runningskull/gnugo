@@ -144,7 +144,7 @@ loadsgf games/trevor/trevor_14.sgf
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
 15 gg_genmove white
-#? [E7]
+#? [E7]*
 
 # C1 looks best here.  A7 very unorthodox, and at least
 # worse for ko threats.
@@ -166,7 +166,7 @@ loadsgf games/trevor/trevor_16.sgf 58
 # If Black B9, White can't connect at C7.
 loadsgf games/trevor/trevor_16.sgf 67
 163 gg_genmove black
-#? [B9]*
+#? [B9]
 
 # Must connect dragons.
 # B6 should be valued much much lower than B5
@@ -192,7 +192,7 @@ loadsgf games/trevor/trevor_19.sgf 12
 # W should connect his two dragons.
 loadsgf games/trevor/trevor_20.sgf 14
 200 gg_genmove white
-#? [D7|D4]*
+#? [D7|D4]
 
 # W can live on the right pretty easily (i.e. G8)
 loadsgf games/trevor/trevor_20.sgf
@@ -390,14 +390,14 @@ loadsgf games/trevor/trevor_39.sgf 38
 #SEVERITY=3
 loadsgf games/trevor/trevor_40.sgf 1
 400 gg_genmove black
-#? [F8]*
+#? [F8]
 
 #CATEGORY=
 #DESCRIPTION=White can live!
 #SEVERITY=4
 loadsgf games/trevor/trevor_40a.sgf 2
 401 gg_genmove white
-#? [F8]
+#? [F8]*
 
 #CATEGORY=
 #DESCRIPTION=White can live!

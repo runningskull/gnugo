@@ -111,7 +111,7 @@ loadsgf games/incident165.sgf 108
 # F3 seems fine to protect the two cuts -arend
 loadsgf games/incident165.sgf 142
 18 gg_genmove black
-#? [E4|F3]*
+#? [E4|F3]
 
 loadsgf games/strategy4.sgf
 19 gg_genmove black
@@ -172,7 +172,7 @@ loadsgf games/strategy5.sgf 12
 #
 loadsgf games/strategy5.sgf 14
 27 gg_genmove black
-#? [C3]
+#? [C3]*
 
 loadsgf games/strategy5.sgf 20
 28 gg_genmove black
@@ -180,7 +180,7 @@ loadsgf games/strategy5.sgf 20
 
 loadsgf games/strategy5.sgf 40
 29 gg_genmove black
-#? [R4]*
+#? [R4]
 
 loadsgf games/strategy5.sgf 44
 30 gg_genmove black
@@ -209,7 +209,7 @@ loadsgf games/nicklas/nicklas8.sgf 80
 
 loadsgf games/nicklas/nicklas8.sgf 82
 36 gg_genmove black
-#? [!D18]
+#? [!D18]*
 
 loadsgf games/nicklas/nicklas8.sgf 84
 37 gg_genmove black
@@ -284,7 +284,7 @@ loadsgf games/strategy10.sgf
 # See also reading:158
 loadsgf games/strategy11.sgf 77
 44 gg_genmove black
-#? [G2]*
+#? [G2]
 
 # G17/G18 and C1 are both huge.
 loadsgf games/strategy11.sgf 127
@@ -309,7 +309,7 @@ loadsgf games/strategy12.sgf 19
 loadsgf games/strategy12.sgf 21
 # D16 is the strongest but these are acceptable
 49 gg_genmove black
-#? [C17|D16|B17]
+#? [C17|D16|B17]*
 
 
 #CATEGORY=OWL_TUNING

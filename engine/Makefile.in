@@ -131,10 +131,10 @@ DEP_FILES =  .deps/aftermath.P .deps/board.P .deps/cache.P .deps/clock.P \
 .deps/combination.P .deps/dragon.P .deps/filllib.P .deps/fuseki.P \
 .deps/genmove.P .deps/globals.P .deps/hash.P .deps/influence.P \
 .deps/interface.P .deps/life.P .deps/matchpat.P .deps/move_reasons.P \
-.deps/movelist.P .deps/optics.P .deps/owl.P .deps/printutils.P .deps/readconnect.P \
-.deps/reading.P .deps/score.P .deps/semeai.P .deps/sgfdecide.P \
-.deps/sgffile.P .deps/shapes.P .deps/showbord.P .deps/utils.P \
-.deps/worm.P
+.deps/movelist.P .deps/optics.P .deps/owl.P .deps/printutils.P \
+.deps/readconnect.P .deps/reading.P .deps/score.P .deps/semeai.P \
+.deps/sgfdecide.P .deps/sgffile.P .deps/shapes.P .deps/showbord.P \
+.deps/utils.P .deps/worm.P
 SOURCES = $(libengine_a_SOURCES) $(libboard_a_SOURCES)
 OBJECTS = $(libengine_a_OBJECTS) $(libboard_a_OBJECTS)
 

@@ -22,7 +22,7 @@ loadsgf games/trevor/auto/a001.sgf 8
 
 loadsgf games/trevor/auto/a003.sgf 30
 121 gg_genmove white
-#? [E8]
+#? [E8]*
 
 
 
@@ -294,7 +294,7 @@ loadsgf games/trevor/auto/a029.sgf 14
 #B4, B6 too passive. H8 prob. best.
 loadsgf games/trevor/auto/a030.sgf 22
 460 gg_genmove white
-#? [H8]*
+#? [H8]
 
 
 
@@ -353,12 +353,12 @@ loadsgf games/trevor/auto/a035.sgf 42
 
 loadsgf games/trevor/auto/a035.sgf 50
 540 gg_genmove white
-#? [!A1]*
+#? [!A1]
 
 
 loadsgf games/trevor/auto/a035.sgf 51
 550 owl_attack D3
-#? [1 F2]*
+#? [1 F2]
 
 
 

@@ -6,9 +6,6 @@
 /* Ruleset. Default Japanese */
 #undef CHINESE_RULES
 
-/* Ruleset. Default Japanese */
-#undef EXPERIMENTAL_SEMEAI
-
 /* Define to use curses for color debugging */
 #undef CURSES
 
@@ -17,6 +14,12 @@
 
 /* Default hash table size in megabytes */
 #undef DEFAULT_MEMORY
+
+/* Connection module. Default standard. */
+#undef EXPERIMENTAL_CONNECTIONS
+
+/* Semeai module. Default standard. */
+#undef EXPERIMENTAL_SEMEAI
 
 /* Give the directory where gnugo was compiled */
 #undef GNUGO_PATH

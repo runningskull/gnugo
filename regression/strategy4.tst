@@ -75,17 +75,17 @@ loadsgf games/strategy39.sgf 178
 
 loadsgf games/incident94.sgf 114
 166 gg_genmove white
-#? [D11]
+#? [D11]*
 
 # Tenuki instead of urgent edge joseki move.
 loadsgf games/strategy40.sgf 10
 167 gg_genmove black
-#? [D4]
+#? [D4]*
 
 # Safety must come first. This is almost a whole-board semeai.
 loadsgf games/strategy40.sgf 30
 168 gg_genmove black
-#? [A3|A4]*
+#? [A3|A4]
 
 # Both J7 and J9 rescue the threatened stones, but J7 is the proper
 # choice since it leaves a smaller ko threat behind. (That there's no
@@ -194,7 +194,7 @@ loadsgf games/owl29.sgf 134
 
 loadsgf games/pooo.sgf 16
 187 gg_genmove black
-#? [!C1]*
+#? [!C1]
 
 loadsgf games/pooo.sgf 24
 188 gg_genmove black
@@ -239,7 +239,7 @@ loadsgf games/bretz.sgf 100
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 130
 197 gg_genmove black
-#? [K3|S18]*
+#? [K3|S18]
 
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 148
@@ -301,7 +301,7 @@ loadsgf games/lordofpi.sgf 46
 
 loadsgf games/lordofpi.sgf 52
 210 gg_genmove black
-#? [H7]*
+#? [H7]
 
 loadsgf games/lordofpi.sgf 56
 211 gg_genmove black
@@ -323,7 +323,7 @@ loadsgf games/strategy46.sgf 174
 # CD103a incorrectly thinks E7 defends against a combination attack.
 loadsgf games/owl33.sgf 200
 215 gg_genmove black
-#? [!E7]*
+#? [!E7]
 
 ############ End of Tests #################
 

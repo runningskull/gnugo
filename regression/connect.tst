@@ -73,7 +73,7 @@ loadsgf golois/connecter990614-1.sgf
 # Added O12 and P11. /gf
 loadsgf golois/connecter990614-2.sgf
 19 connect O11 O13
-#? [1 (P13|O12|P11)]*
+#? [1 (P13|O12|P11)]
 
 loadsgf golois/Connecter990621-1.sgf
 20 connect O11 P12
@@ -86,7 +86,7 @@ loadsgf golois/Connecter990621-1.sgf
 # Q10 also works, although K12 is lost in the process. /gf
 loadsgf golois/Connecter990621-1.sgf
 22 connect Q9 P12
-#? [1 (O12|Q10)]*
+#? [1 (O12|Q10)]
 
 loadsgf golois/Connecter990628-1.sgf
 23 connect L6 N6
@@ -179,7 +179,7 @@ loadsgf golois/Goemate991109-3.sgf
 # Added G17 and G18. /gf
 loadsgf golois/Goemate991218-1.sgf
 44 connect H17 F17
-#? [1 (H18|G17|G18)]*
+#? [1 (H18|G17|G18)]
 
 loadsgf golois/Goemate991218-1.sgf
 45 disconnect H17 F17
@@ -213,7 +213,7 @@ loadsgf golois/Handtalk980820-1.sgf
 # Added B15. /gf
 loadsgf golois/Handtalk980820-2.sgf
 52 disconnect C12 B14
-#? [1 (C13|B15)]*
+#? [1 (C13|B15)]
 
 loadsgf golois/Handtalk980820-6.sgf
 53 disconnect M12 M15
@@ -252,7 +252,7 @@ loadsgf golois/Indigo20000718-3.sgf
 
 loadsgf golois/Indigo991107-1.sgf
 61 disconnect P4 P8
-#? [1 P5]*
+#? [1 P5]
 
 loadsgf golois/Indigo-Golois-991105-1.sgf
 62 connect G9 G7
@@ -296,7 +296,7 @@ loadsgf golois/Indigo-Golois-991106-3.sgf
 # gf Added Q3. /gf
 loadsgf golois/Indigo-Golois-991106-3.sgf
 71 connect R3 P3
-#? [1 (P4|Q3)]*
+#? [1 (P4|Q3)]
 
 loadsgf golois/Jimmy990711-2.sgf
 72 disconnect R12 Q13
