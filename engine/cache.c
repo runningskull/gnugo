@@ -282,15 +282,15 @@ tt_update(Transposition_table *table,
   table->is_clean = 0;
 }
 
-static const char* routine_names[] = {
-    ROUTINE_NAMES
+static const char *routine_names[] = {
+  ROUTINE_NAMES
 };
 
 /* Convert a routine as used in the cache table to a string. */
 const char *
 routine_id_to_string(enum routine_id routine)
 {
-    return routine_names[(int) routine];
+  return routine_names[(int) routine];
 }
 
 

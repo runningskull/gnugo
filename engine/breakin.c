@@ -281,7 +281,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 
     for (k = save_num; k < *num_non_territory; k++) {
       int j;
-      int pos =  non_territory[k];
+      int pos = non_territory[k];
       if (goal[pos]) {
 	affected_size++;
 	goal[pos] = 0;

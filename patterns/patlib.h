@@ -72,16 +72,16 @@ typedef struct textpattern_t {
   char    *comment6;
 } Textpattern;
 
-extern void textpattern_clear(Textpattern *tp);
-extern void textpattern_print(FILE *outfile, Textpattern *tp);
-extern void parse_init(char *filename, FILE *file);
-extern int  parse_whitespace(int to_end_of_line_only);
-extern char *get_whitespace(void);
-extern int  textpattern_parse(FILE *infile,
-			      int parm_pattern_type, int parm_anchor_both, 
-			      int parm_fullboard, int parm_verbose,
-			      Textpattern *tp);
-extern void textpattern_transform(Textpattern *tp, int transform);
+void textpattern_clear(Textpattern *tp);
+void textpattern_print(FILE *outfile, Textpattern *tp);
+void parse_init(char *filename, FILE *file);
+int  parse_whitespace(int to_end_of_line_only);
+char *get_whitespace(void);
+int  textpattern_parse(FILE *infile,
+		       int parm_pattern_type, int parm_anchor_both, 
+		       int parm_fullboard, int parm_verbose,
+		       Textpattern *tp);
+void textpattern_transform(Textpattern *tp, int transform);
 
 
 extern const int transformations[8][2][2];

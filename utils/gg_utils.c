@@ -428,7 +428,7 @@ gg_interpolate(struct interpolation_data *f, float x)
 float
 soft_cap(float a, float b)
 {
-  return ((a * b) / ( a + b));
+  return ((a * b) / (a + b));
 }
 
 

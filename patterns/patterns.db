@@ -10813,12 +10813,12 @@ oo.O?     Significant improvement of eyespace.
 
 :8,dX
 
-oo.b?
-.*abD
-..cDD
+oo.O?
+.*aOB
+..OBB
 -----
 
-;!attack(D) && safe_xmove(a)
+;!attack(B) && safe_xmove(a)
 
 
 Pattern ED95
@@ -14432,7 +14432,7 @@ Pattern RE14
 |..?
 |*.O
 |b.O
-|OcO
+|O.O
 |aO?
 
 ;olib(a)==2 && !oplay_attack(a,b,b)

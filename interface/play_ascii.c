@@ -224,7 +224,7 @@ ascii_showboard(void)
 	pos_is_move = 128;
       else
 	pos_is_move = 0;
-      dead = (dragon_status(POS(i, j))==DEAD) && showdead;
+      dead = (dragon_status(POS(i, j)) == DEAD) && showdead;
       switch (BOARD(i, j) + pos_is_move + last_pos_was_move) {
 	case EMPTY+128:
 	case EMPTY:
@@ -632,11 +632,11 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
       line_ptr = line;
       if (!fgets(line, 80, stdin)) {
 	printf("\nThanks! for playing GNU Go.\n\n");
-	return ;
+	return;
       }
 
-      while (state == 0 &&
-	     (command = strtok(line_ptr, ";"), line_ptr = 0, command)) {
+      while (state == 0
+	     && (command = strtok(line_ptr, ";"), line_ptr = 0, command)) {
 	/* Get the command or move. */
 	switch (get_command(command)) {
 	case RESIGN:
@@ -1270,7 +1270,7 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
 	  break;
       }
       else if (string_to_location(board_size, line, &x, &y)) {
-	pos = POS(x,y);
+	pos = POS(x, y);
 	if (board[pos] != EMPTY)
 	  printf("\nThere's already a stone there.\n");
 	else {

@@ -569,7 +569,7 @@ depending on who moves first. Here is a half eye for @code{O}:
 @end group
 @end example
 
-A FALSE EYE is a cave which cannot become an eye. Here are
+A FALSE EYE is an eye vertex which cannot become a proper eye. Here are
 two examples of false eyes for @code{O}:
 
 @example

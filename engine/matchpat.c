@@ -622,8 +622,8 @@ tree_matchpat_loop(matchpat_callback_fn_ptr callback,
 
   for (i = 0; i != board_size; i++)
     for (j = 0; j != board_size; j++)
-      if (BOARD(i,j) == anchor
-          && (!anchor_in_goal || goal[POS(i,j)] != 0))
+      if (BOARD(i, j) == anchor
+          && (!anchor_in_goal || goal[POS(i, j)] != 0))
 	tree_do_matchpat(i, j, callback, color, 
 			 pdb, callback_data, goal, anchor_in_goal);
 
@@ -656,13 +656,13 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
     struct tree_node *node = &(tnl->node);
     int x = m + node->x;
     int y = n + node->y;
-    if (ON_BOARD2(x,y)) {
+    if (ON_BOARD2(x, y)) {
       int att = node->att;
-      int point_color = BOARD(x,y);
+      int point_color = BOARD(x, y);
       if ((att == EMPTY && point_color == EMPTY)
           || (att == ATT_X && point_color == OTHER_COLOR(color))
           || (att == ATT_O && point_color == color)) {
-        goal_found = goal_found || goal[POS(x,y)];
+        goal_found = goal_found || goal[POS(x, y)];
         if (node->matches) {
           struct match_node *match = node->matches->next;
           while (match) {
@@ -876,7 +876,7 @@ dump_dfa_board(int m, int n)
 {
   int i, j;
 
-  for (i = 0; i < dfa_board_size ; i++) {
+  for (i = 0; i < dfa_board_size; i++) {
     for (j = 0; j < dfa_board_size; j++) {
       if (i != m || j != n)
 	fprintf(stderr, "%1d", dfa_p[DFA_POS(i, j)]);

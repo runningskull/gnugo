@@ -688,8 +688,9 @@ set_depth_values(int level, int report_levels)
   break_chain_depth    = gg_max(2, BREAK_CHAIN_DEPTH + depth_level);
   if (level >= 8)
     owl_distrust_depth = gg_max(1, (2 * OWL_DISTRUST_DEPTH + depth_level) / 2);
-  else owl_distrust_depth = 
-      gg_max(1, (2 * OWL_DISTRUST_DEPTH - 1 + depth_level) / 2);
+  else
+    owl_distrust_depth = gg_max(1, (2 * OWL_DISTRUST_DEPTH - 1
+				    + depth_level) / 2);
   owl_branch_depth     = gg_max(2, (2 * OWL_BRANCH_DEPTH   + depth_level) / 2);
   owl_reading_depth    = gg_max(5, (2 * OWL_READING_DEPTH  + depth_level) / 2);
 

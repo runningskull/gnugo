@@ -48,7 +48,7 @@ decide_string(int pos)
   
   if (board[pos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-string called on an empty vertex\n");
-    return ;
+    return;
   }
 
   if (*outfilename)
@@ -205,7 +205,7 @@ decide_owl(int pos)
 
   if (board[pos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-dragon called on an empty vertex\n");
-    return ;
+    return;
   }
 
   /* Prepare pattern matcher and reading code. */
@@ -295,7 +295,7 @@ decide_dragon_data(int pos)
 {
   if (board[pos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-dragon-data called on an empty vertex\n");
-    return ;
+    return;
   }
   reset_engine();
   silent_examine_position(board[pos], FULL_EXAMINE_DRAGONS);

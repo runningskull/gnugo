@@ -2919,7 +2919,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 	  other_tactic = KO_A;
 	  if (other_tactic < best_other_tactic) {
 	    best_move = moves[k].pos;
-	    best_other_tactic = other_tactic ;
+	    best_other_tactic = other_tactic;
 	  }
 	}
 	else {
@@ -3864,7 +3864,7 @@ find_cap_moves(int str, struct reading_moves *moves)
   int alib, blib;
   int numlibs;
   int libs[4];
-  int i,j;
+  int i, j;
   int ai, aj;
   int bi, bj;
 
@@ -5572,8 +5572,8 @@ safe_move(int move, int color)
 
   /* If we have this position cached, use the previous value. */
   if (stackp == 0
-      && safe_move_cache_when[move][color==BLACK] == position_number)
-    return safe_move_cache[move][color==BLACK];
+      && safe_move_cache_when[move][color == BLACK] == position_number)
+    return safe_move_cache[move][color == BLACK];
 
   /* Otherwise calculate the value... */
   if (trymove(move, color, "safe_move-A", 0, EMPTY, 0)) {
@@ -5600,8 +5600,8 @@ safe_move(int move, int color)
     if (0)
       gprintf("Safe move at %1m for %s cached when depth=%d, position number=%d\n",
 	      move, color_to_string(color), depth, position_number);
-    safe_move_cache_when[move][color==BLACK] = position_number;
-    safe_move_cache[move][color==BLACK] = safe;
+    safe_move_cache_when[move][color == BLACK] = position_number;
+    safe_move_cache[move][color == BLACK] = safe;
   }
 
   return safe;

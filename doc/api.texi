@@ -127,23 +127,9 @@ colors. Each intersection on the board is represented by one of these:
 @end group
 @end example
 
-In addition to these, the following values can be used in special
-places, such as describing the borders of eyes:
-
-@example
-@group
-
-     color                     value
-     GRAY (GRAY_BORDER)          3
-     WHITE_BORDER                4
-     BLACK_BORDER                5
-
-@end group
-@end example
-
 There is a macro, @code{OTHER_COLOR(color)} which can be used to get the
 other color than the parameter. This macro can only be used on @code{WHITE}
-or @code{BLACK}, but not on @code{EMPTY} or one of the border colors.
+or @code{BLACK}, but not on @code{EMPTY}.
 @findex OTHER_COLOR
 
 GNU Go uses two different representations of the board, for
@@ -151,7 +137,7 @@ most purposes a one-dimensional one, but for a few purposes a
 two dimensional one (@pxref{Libboard}). The one-dimensional
 board was introduced before GNU Go 3.2, while the two-dimensional
 board dates back to the ancestral program written by Man Lung Li
-before 1995. The API still uses the one-dimensional board, so
+before 1995. The API still uses the two-dimensional board, so
 the API functions have not changed much since GNU Go 3.0.
 
 @node The Board State

@@ -166,7 +166,7 @@ gtp_mprintf(const char *fmt, ...)
   va_list ap;
   va_start(ap, fmt);
   
-  for (; *fmt ; ++fmt) {
+  for (; *fmt; ++fmt) {
     if (*fmt == '%') {
       switch (*++fmt) {
       case 'c':
@@ -190,7 +190,7 @@ gtp_mprintf(const char *fmt, ...)
       }
       case 's':
       {
-	char *s = va_arg(ap, char*);
+	char *s = va_arg(ap, char *);
 	fputs(s, stdout);
 	break;
       }

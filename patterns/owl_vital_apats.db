@@ -904,7 +904,7 @@ Pattern VA53
 # See ld_owl:68.
 
 |XXX   nakade if X cannot squeeze
-|O.X    
+|O.X
 |XOX
 |*OX
 +---
@@ -912,7 +912,7 @@ Pattern VA53
 :8,s,value(75)
 
 |AAA
-|O.A    
+|O.A
 |XOA
 |*OA
 +---

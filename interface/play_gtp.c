@@ -69,12 +69,17 @@ static void rotate_on_output(int ai, int aj, int *bi, int *bj);
 #define DECLARE(func) static int func(char *s)
 
 DECLARE(gtp_aa_confirm_safety);
+DECLARE(gtp_accurate_approxlib);
+DECLARE(gtp_accuratelib);
 DECLARE(gtp_all_legal);
 DECLARE(gtp_analyze_eyegraph);
+DECLARE(gtp_analyze_semeai);
+DECLARE(gtp_analyze_semeai_after_move);
 DECLARE(gtp_attack);
 DECLARE(gtp_attack_either);
 DECLARE(gtp_block_off);
 DECLARE(gtp_break_in);
+DECLARE(gtp_captures);
 DECLARE(gtp_clear_board);
 DECLARE(gtp_clear_cache);
 DECLARE(gtp_combination_attack);
@@ -86,30 +91,32 @@ DECLARE(gtp_decrease_depths);
 DECLARE(gtp_defend);
 DECLARE(gtp_defend_both);
 DECLARE(gtp_disconnect);
+DECLARE(gtp_does_surround);
 DECLARE(gtp_dragon_data);
 DECLARE(gtp_dragon_status);
 DECLARE(gtp_dragon_stones);
+DECLARE(gtp_draw_search_area);
 DECLARE(gtp_dump_stack);
 DECLARE(gtp_echo);
 DECLARE(gtp_echo_err);
+DECLARE(gtp_estimate_score);
 DECLARE(gtp_eval_eye);
-DECLARE(gtp_accuratelib);
-DECLARE(gtp_accurate_approxlib);
+DECLARE(gtp_experimental_score);
 DECLARE(gtp_final_score);
 DECLARE(gtp_final_status);
 DECLARE(gtp_final_status_list);
 DECLARE(gtp_findlib);
 DECLARE(gtp_finish_sgftrace);
 DECLARE(gtp_fixed_handicap);
-DECLARE(gtp_get_handicap);
-DECLARE(gtp_get_random_seed);
-DECLARE(gtp_set_random_seed);
 DECLARE(gtp_genmove);
 DECLARE(gtp_genmove_black);
 DECLARE(gtp_genmove_white);
 DECLARE(gtp_get_connection_node_counter);
+DECLARE(gtp_get_handicap);
+DECLARE(gtp_get_komi);
 DECLARE(gtp_get_life_node_counter);
 DECLARE(gtp_get_owl_node_counter);
+DECLARE(gtp_get_random_seed);
 DECLARE(gtp_get_reading_node_counter);
 DECLARE(gtp_get_trymove_counter);
 DECLARE(gtp_gg_genmove);
@@ -117,23 +124,15 @@ DECLARE(gtp_gg_undo);
 DECLARE(gtp_increase_depths);
 DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
+DECLARE(gtp_is_surrounded);
 DECLARE(gtp_known_command);
 DECLARE(gtp_ladder_attack);
 DECLARE(gtp_last_move);
-DECLARE(gtp_set_search_diamond);
-DECLARE(gtp_reset_search_mask);
 DECLARE(gtp_limit_search);
-DECLARE(gtp_set_search_limit);
-DECLARE(gtp_draw_search_area);
 DECLARE(gtp_list_commands);
 DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
 DECLARE(gtp_name);
-DECLARE(gtp_estimate_score);
-DECLARE(gtp_experimental_score);
-DECLARE(gtp_analyze_semeai);
-DECLARE(gtp_analyze_semeai_after_move);
-DECLARE(gtp_tactical_analyze_semeai);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_connection_defends);
 DECLARE(gtp_owl_defend);
@@ -148,42 +147,43 @@ DECLARE(gtp_playblack);
 DECLARE(gtp_playwhite);
 DECLARE(gtp_popgo);
 DECLARE(gtp_printsgf);
-DECLARE(gtp_captures);
+DECLARE(gtp_program_version);
 DECLARE(gtp_protocol_version);
 DECLARE(gtp_query_boardsize);
 DECLARE(gtp_query_orientation);
 DECLARE(gtp_quit);
-DECLARE(gtp_restricted_genmove);
 DECLARE(gtp_reg_genmove);
 DECLARE(gtp_report_uncertainty);
 DECLARE(gtp_reset_connection_node_counter);
 DECLARE(gtp_reset_life_node_counter);
 DECLARE(gtp_reset_owl_node_counter);
 DECLARE(gtp_reset_reading_node_counter);
+DECLARE(gtp_reset_search_mask);
 DECLARE(gtp_reset_trymove_counter);
+DECLARE(gtp_restricted_genmove);
 DECLARE(gtp_same_dragon);
-DECLARE(gtp_is_surrounded);
-DECLARE(gtp_does_surround);
-DECLARE(gtp_surround_map);
 DECLARE(gtp_set_boardsize);
 DECLARE(gtp_set_free_handicap);
-DECLARE(gtp_set_orientation);
 DECLARE(gtp_set_komi);
-DECLARE(gtp_get_komi);
 DECLARE(gtp_set_level);
+DECLARE(gtp_set_orientation);
+DECLARE(gtp_set_random_seed);
+DECLARE(gtp_set_search_diamond);
+DECLARE(gtp_set_search_limit);
 DECLARE(gtp_showboard);
 DECLARE(gtp_start_sgftrace);
+DECLARE(gtp_surround_map);
+DECLARE(gtp_tactical_analyze_semeai);
 DECLARE(gtp_test_eyeshape);
 DECLARE(gtp_time_left);
 DECLARE(gtp_time_settings);
 DECLARE(gtp_top_moves);
-DECLARE(gtp_top_moves_white);
 DECLARE(gtp_top_moves_black);
-DECLARE(gtp_trymove);
+DECLARE(gtp_top_moves_white);
 DECLARE(gtp_tryko);
+DECLARE(gtp_trymove);
 DECLARE(gtp_tune_move_ordering);
 DECLARE(gtp_undo);
-DECLARE(gtp_program_version);
 DECLARE(gtp_what_color);
 DECLARE(gtp_worm_cutstone);
 DECLARE(gtp_worm_data);
@@ -192,14 +192,18 @@ DECLARE(gtp_worm_stones);
 /* List of known commands. */
 static struct gtp_command commands[] = {
   {"aa_confirm_safety",       gtp_aa_confirm_safety},
+  {"accurate_approxlib",      gtp_accurate_approxlib},
+  {"accuratelib",             gtp_accuratelib},
   {"all_legal",        	      gtp_all_legal},
   {"analyze_eyegraph", 	      gtp_analyze_eyegraph},
+  {"analyze_semeai",          gtp_analyze_semeai},
+  {"analyze_semeai_after_move", gtp_analyze_semeai_after_move},
   {"attack",           	      gtp_attack},
   {"attack_either",           gtp_attack_either},
   {"black",            	      gtp_playblack},
   {"block_off",		      gtp_block_off},
-  {"break_in",		      gtp_break_in},
   {"boardsize",        	      gtp_set_boardsize},
+  {"break_in",		      gtp_break_in},
   {"captures",        	      gtp_captures},
   {"clear_board",      	      gtp_clear_board},
   {"clear_cache",	      gtp_clear_cache},
@@ -213,60 +217,54 @@ static struct gtp_command commands[] = {
   {"defend",           	      gtp_defend},
   {"defend_both",	      gtp_defend_both},
   {"disconnect",       	      gtp_disconnect},
+  {"does_surround",           gtp_does_surround},
   {"dragon_data",             gtp_dragon_data},
   {"dragon_status",    	      gtp_dragon_status},
   {"dragon_stones",           gtp_dragon_stones},
+  {"draw_search_area",        gtp_draw_search_area},
   {"dump_stack",       	      gtp_dump_stack},
   {"echo" ,                   gtp_echo},
   {"echo_err" ,               gtp_echo_err},
   {"estimate_score",          gtp_estimate_score},
-  {"accuratelib",             gtp_accuratelib},
-  {"accurate_approxlib",      gtp_accurate_approxlib},
-  {"experimental_score",      gtp_experimental_score},
   {"eval_eye",         	      gtp_eval_eye},
+  {"experimental_score",      gtp_experimental_score},
   {"final_score",             gtp_final_score},
   {"final_status",            gtp_final_status},
   {"final_status_list",       gtp_final_status_list},
   {"findlib",          	      gtp_findlib},
   {"finish_sgftrace",  	      gtp_finish_sgftrace},
   {"fixed_handicap",   	      gtp_fixed_handicap},
-  {"get_handicap",   	      gtp_get_handicap},
-  {"get_random_seed",  	      gtp_get_random_seed},
-  {"set_random_seed",  	      gtp_set_random_seed},
   {"genmove",                 gtp_genmove},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
   {"get_connection_node_counter", gtp_get_connection_node_counter},
+  {"get_handicap",   	      gtp_get_handicap},
+  {"get_komi",        	      gtp_get_komi},
   {"get_life_node_counter",   gtp_get_life_node_counter},
   {"get_owl_node_counter",    gtp_get_owl_node_counter},
+  {"get_random_seed",  	      gtp_get_random_seed},
   {"get_reading_node_counter",gtp_get_reading_node_counter},
   {"get_trymove_counter",     gtp_get_trymove_counter},
-  {"gg_genmove",              gtp_gg_genmove},
   {"gg-undo",                 gtp_gg_undo},
+  {"gg_genmove",              gtp_gg_genmove},
   {"help",                    gtp_list_commands},
   {"increase_depths",  	      gtp_increase_depths},
   {"influence",               gtp_influence},
   {"is_legal",         	      gtp_is_legal},
+  {"is_surrounded",           gtp_is_surrounded},
   {"known_command",    	      gtp_known_command},
   {"komi",        	      gtp_set_komi},
-  {"get_komi",        	      gtp_get_komi},
   {"ladder_attack",    	      gtp_ladder_attack},
   {"last_move",    	      gtp_last_move},
   {"level",        	      gtp_set_level},
-  {"set_search_diamond",      gtp_set_search_diamond},
-  {"reset_search_mask",       gtp_reset_search_mask},
-  {"limit_search",            gtp_limit_search},
-  {"set_search_limit",        gtp_set_search_limit},
-  {"draw_search_area",        gtp_draw_search_area},
   {"limit_search",     	      gtp_limit_search},
+  {"limit_search",            gtp_limit_search},
   {"list_commands",    	      gtp_list_commands},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
   {"name",                    gtp_name},
   {"new_score",               gtp_estimate_score},
-  {"analyze_semeai",          gtp_analyze_semeai},
-  {"analyze_semeai_after_move", gtp_analyze_semeai_after_move},
-  {"tactical_analyze_semeai", gtp_tactical_analyze_semeai},
+  {"orientation",     	      gtp_set_orientation},
   {"owl_attack",     	      gtp_owl_attack},
   {"owl_connection_defends",  gtp_owl_connection_defends},
   {"owl_defend",     	      gtp_owl_defend},
@@ -275,38 +273,40 @@ static struct gtp_command commands[] = {
   {"owl_substantial", 	      gtp_owl_substantial},
   {"owl_threaten_attack",     gtp_owl_threaten_attack},
   {"owl_threaten_defense",    gtp_owl_threaten_defense},
+  {"place_free_handicap",     gtp_place_free_handicap},
   {"play",            	      gtp_play},
   {"popgo",            	      gtp_popgo},
   {"printsgf",         	      gtp_printsgf},
-  {"orientation",     	      gtp_set_orientation},
-  {"place_free_handicap",     gtp_place_free_handicap},
   {"protocol_version",        gtp_protocol_version},
   {"query_boardsize",         gtp_query_boardsize},
   {"query_orientation",       gtp_query_orientation},
   {"quit",             	      gtp_quit},
-  {"restricted_genmove",      gtp_restricted_genmove},
   {"reg_genmove",             gtp_reg_genmove},
   {"report_uncertainty",      gtp_report_uncertainty},
   {"reset_connection_node_counter", gtp_reset_connection_node_counter},
   {"reset_life_node_counter", gtp_reset_life_node_counter},
   {"reset_owl_node_counter",  gtp_reset_owl_node_counter},
   {"reset_reading_node_counter", gtp_reset_reading_node_counter},
+  {"reset_search_mask",       gtp_reset_search_mask},
   {"reset_trymove_counter",   gtp_reset_trymove_counter},
+  {"restricted_genmove",      gtp_restricted_genmove},
   {"same_dragon",    	      gtp_same_dragon},
   {"set_free_handicap",       gtp_set_free_handicap},
+  {"set_random_seed",  	      gtp_set_random_seed},
+  {"set_search_diamond",      gtp_set_search_diamond},
+  {"set_search_limit",        gtp_set_search_limit},
   {"showboard",        	      gtp_showboard},
-  {"is_surrounded",           gtp_is_surrounded},
-  {"does_surround",           gtp_does_surround},
-  {"surround_map",            gtp_surround_map},
   {"start_sgftrace",  	      gtp_start_sgftrace},
+  {"surround_map",            gtp_surround_map},
+  {"tactical_analyze_semeai", gtp_tactical_analyze_semeai},
   {"test_eyeshape",           gtp_test_eyeshape},
   {"time_left",               gtp_time_left},
   {"time_settings",           gtp_time_settings},
   {"top_moves",               gtp_top_moves},
   {"top_moves_black",         gtp_top_moves_black},
   {"top_moves_white",         gtp_top_moves_white},
-  {"trymove",          	      gtp_trymove},
   {"tryko",          	      gtp_tryko},
+  {"trymove",          	      gtp_trymove},
   {"tune_move_ordering",      gtp_tune_move_ordering},
   {"undo",                    gtp_undo},
   {"version",                 gtp_program_version},

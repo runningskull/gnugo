@@ -126,7 +126,7 @@ struct vertex_stack_entry {
 
 
 /* Main array of string information. */
-static struct string_data  string[MAX_STRINGS];
+static struct string_data string[MAX_STRINGS];
 
 /* Stacks and stack pointers. */
 static struct change_stack_entry change_stack[STACK_SIZE];
@@ -1475,7 +1475,7 @@ fastlib(int pos, int color, int ignore_captures)
 	return -1;
     }
     else if (board[EAST(pos)] == color
-	&& string_number[EAST(pos)] != ally1)
+	     && string_number[EAST(pos)] != ally1)
       ally2 = string_number[EAST(pos)];
   }
   else if (board[NORTH(pos)] == color) {

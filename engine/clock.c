@@ -149,7 +149,7 @@ clock_init(int time, int byo_time, int byo_stones)
     clk.byoyomi_stones = byo_stones;
 
   clk.moveno = -1;
-  for (color = WHITE ; color <= BLACK ; color++) {
+  for (color = WHITE; color <= BLACK; color++) {
     clk.timer[color] = 0;
     clk.btimer[color] = 0;
     clk.byoyomi[color] = 0;
@@ -492,7 +492,7 @@ estimate_time_by_move(int color, int move)
   gg_assert(COLOR(move) == OTHER_COLOR(color));
 
   res = 0;
-  for (i = 0 ; i < 5 ; i++)
+  for (i = 0; i < 5; i++)
     res += coef[i] * (clk.date[move-9+i*2] - clk.date[move-10+i*2]);
   
   return res;
@@ -608,8 +608,8 @@ clock_adapt_level(int *p_level, int color)
    * Time contract strategy:
    * try to respect the time of a standard game. 
    */
-    if (clk.moveno < CLOCK_MOVE_CONTRACT(board_size))
-      respect_time_contract(color);
+  if (clk.moveno < CLOCK_MOVE_CONTRACT(board_size))
+    respect_time_contract(color);
 
   /* 
    * Keep ahead strategy:
@@ -639,8 +639,3 @@ clock_adapt_level(int *p_level, int color)
  * c-basic-offset: 2
  * End:
  */
-
-
-
-
-

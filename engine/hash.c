@@ -278,7 +278,7 @@ xor_hashvalues(Hash_data *hash1, Hash_data *hash2)
 char *
 hashdata_to_string(Hash_data *hashdata)
 {
-  static char  buffer[17];
+  static char buffer[17];
 
   sprintf(buffer, "%lx", hashdata->hashval[0]);
 #if NUM_HASHVALUES == 2

@@ -25,7 +25,7 @@
 
 
 #define TRYMOVE(pos, color) trymove(pos, color, "helper", NO_MOVE, EMPTY, NO_MOVE)
-#define OFFSET_BY(x, y) AFFINE_TRANSFORM(OFFSET(x,y), trans, move)
+#define OFFSET_BY(x, y) AFFINE_TRANSFORM(OFFSET(x, y), trans, move)
 #define ARGS struct pattern *pattern, int trans, int move, int color
 
 

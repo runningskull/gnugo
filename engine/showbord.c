@@ -69,9 +69,9 @@ static int next_black;
  * avoided.
  */
 static const int colors[3][5] = {
-  {0,0,0,0,0}, /*not used */
-  {6,2,1,3,5}, /* WHITE : dead, alive, critical, unknown, unchecked */
-  {6,2,1,3,5}  /* BLACK : dead, alive, critical, unknown, unchecked */
+  {0, 0, 0, 0, 0}, /*not used */
+  {6, 2, 1, 3, 5}, /* WHITE : dead, alive, critical, unknown, unchecked */
+  {6, 2, 1, 3, 5}  /* BLACK : dead, alive, critical, unknown, unchecked */
 };
 
 static const int domain_colors[4] = {5, 1, 2, 3}; /* gray, black, white, both */
@@ -314,7 +314,7 @@ showboard(int xo)
  * in the engine code than here.
  */
 
-static const char* status_names [] = {
+static const char *status_names[] = {
   DRAGON_STATUS_NAMES
 };
 

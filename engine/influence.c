@@ -681,7 +681,7 @@ add_marked_intrusions(struct influence_data *q, int color)
  * E - Enhance patterns, FIXME: document this one!
  * t - Non-territory patterns, marking vertices as not territory.
  * I - Invasion patterns, adding a low intensity influence source. 
-* e - Escape bonus. Used together with I to increase the value substantially
+ * e - Escape bonus. Used together with I to increase the value substantially
  *     if escape influence is being computed.
  *
  * Classes A, D, and B are matched with color as O, and it is assumed
@@ -919,7 +919,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 	}
       }
 
-     if (cosmic_gnugo)  {
+     if (cosmic_gnugo) {
         float t = 0.15 + (1.0 - cosmic_importance);
         t = gg_min(1.0, t);
         t = gg_max(0.0, t);
@@ -1254,13 +1254,13 @@ whose_moyo(const struct influence_data *q, int pos)
   if (territory_color != EMPTY)
     return territory_color;
     
-  if (bi > moyo_data.influence_balance * wi && 
-      bi > moyo_data.my_influence_minimum && 
-      wi < moyo_data.opp_influence_maximum)
+  if (bi > moyo_data.influence_balance * wi
+      && bi > moyo_data.my_influence_minimum
+      && wi < moyo_data.opp_influence_maximum)
     return BLACK;
-  if (wi > moyo_data.influence_balance * bi && 
-      wi > moyo_data.my_influence_minimum && 
-      bi < moyo_data.opp_influence_maximum)
+  if (wi > moyo_data.influence_balance * bi
+      && wi > moyo_data.my_influence_minimum
+      && bi < moyo_data.opp_influence_maximum)
     return WHITE;
   
   return EMPTY;
@@ -1292,13 +1292,13 @@ whose_moyo_restricted(const struct influence_data *q, int pos)
   /* default */
   if (territory_color != EMPTY)
     color = territory_color;
-  else if (bi > moyo_restricted_data.influence_balance * wi &&
-           bi > moyo_restricted_data.my_influence_minimum   && 
-           wi < moyo_restricted_data.opp_influence_maximum)
+  else if (bi > moyo_restricted_data.influence_balance * wi
+           && bi > moyo_restricted_data.my_influence_minimum
+           && wi < moyo_restricted_data.opp_influence_maximum)
     color = BLACK;
-  else if (wi > moyo_restricted_data.influence_balance * bi && 
-           wi > moyo_restricted_data.my_influence_minimum   && 
-           bi < moyo_restricted_data.opp_influence_maximum)
+  else if (wi > moyo_restricted_data.influence_balance * bi
+           && wi > moyo_restricted_data.my_influence_minimum
+           && bi < moyo_restricted_data.opp_influence_maximum)
     color = WHITE; 
   else
     color = EMPTY;

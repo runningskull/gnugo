@@ -606,17 +606,17 @@ show_surround_map(char mf[BOARDMAX], char mn[BOARDMAX])
     for (n = 0; n < board_size; n++) {
       int col, c;
       
-      if (mf[POS(m,n)]) {
-	if (mn[POS(m,n)] ==1 )
+      if (mf[POS(m, n)]) {
+	if (mn[POS(m, n)] == 1)
 	  col = GG_COLOR_RED;
-	else if (mn[POS(m,n)] == 2)
+	else if (mn[POS(m, n)] == 2)
 	  col = GG_COLOR_YELLOW;
 	else
 	  col = GG_COLOR_GREEN;
       }
-      else if (mn[POS(m,n)] == 1)
+      else if (mn[POS(m, n)] == 1)
 	col = GG_COLOR_BLUE;
-      else if (mn[POS(m,n)] == 2)
+      else if (mn[POS(m, n)] == 2)
 	col = GG_COLOR_CYAN;
       else
 	col = GG_COLOR_BLACK;

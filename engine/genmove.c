@@ -850,7 +850,8 @@ set_search_diamond(int pos)
 	search_mask[POS(m, n)] = 0;      
     }
   limit_search = pos;
-  if (0) draw_search_area();
+  if (0)
+    draw_search_area();
 }
 
 /* unmarks the entire board */
@@ -881,7 +882,7 @@ draw_search_area(void)
     for (n = 0; n < board_size; n++) {
       int col, c;
 	
-      if (search_mask[POS(m,n)])
+      if (search_mask[POS(m, n)])
 	col = GG_COLOR_RED;
       else
 	col = GG_COLOR_BLACK;

@@ -97,7 +97,7 @@ enum colors {
   "gray_black", \
   "weak_ko"
 
-const char* color_to_string(int color);
+const char *color_to_string(int color);
 
 #define OTHER_COLOR(color)      (WHITE+BLACK-(color))
 #define IS_STONE(arg)           ((arg) == WHITE || (arg) == BLACK)

@@ -92,11 +92,11 @@ play_gmp(Gameinfo *gameinfo, int simplified)
     message = gmp_check(ge, 1, NULL, NULL, &error);
   } while (message == gmp_nothing || message == gmp_reset);
   
-  if (message == gmp_err)  {
+  if (message == gmp_err) {
     fprintf(stderr, "gnugo-gmp: Error \"%s\" occurred.\n", error);
     exit(EXIT_FAILURE);
   }
-  else if (message != gmp_newGame)  {
+  else if (message != gmp_newGame) {
     fprintf(stderr, "gnugo-gmp: Expecting a newGame, got %s\n",
 	    gmp_resultString(message));
     exit(EXIT_FAILURE);

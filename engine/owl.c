@@ -1473,7 +1473,7 @@ do_owl_attack(int str, int *move, int *wormid,
 
 
   /* If reading goes to deep or we run out of nodes, we assume life. */
-  if (reading_limit_reached(&live_reason, this_variation_number))  {
+  if (reading_limit_reached(&live_reason, this_variation_number)) {
     SGFTRACE(0, 0, live_reason);
     READ_RETURN(read_result, move, 0, 0);
   }
@@ -1586,9 +1586,9 @@ do_owl_attack(int str, int *move, int *wormid,
 	sgf_dumptree = NULL;
 	count_variations = 0;
 	result = attack(str, &apos);
-	if (result == WIN ||
-	    (result != 0 && (min_eyes(&probable_eyes) >= 2
-			     || pass == 5))) {
+	if (result == WIN
+	    || (result != 0 && (min_eyes(&probable_eyes) >= 2
+				|| pass == 5))) {
 	  set_single_owl_move(shape_moves, apos, "tactical attack");
 	  moves = shape_moves;
 	}
@@ -2131,7 +2131,7 @@ do_owl_defend(int str, int *move, int *wormid,
   }
 
   /* If reading goes to deep or we run out of nodes, we assume life. */
-  if (reading_limit_reached(&live_reason, this_variation_number))  {
+  if (reading_limit_reached(&live_reason, this_variation_number)) {
     SGFTRACE(0, WIN, live_reason);
     READ_RETURN(read_result, move, 0, WIN);
   }
@@ -3239,7 +3239,7 @@ close_pattern_list(int color, struct matched_patterns_list_data *list)
       if (!list->pattern_heap)
 	pattern_list_build_heap(list);
 
-      for (i = 0 ; i < list->heap_num_patterns; i++)
+      for (i = 0; i < list->heap_num_patterns; i++)
 	if (check_pattern_hard(list->pattern_heap[i]->move, color,
 	     		       list->pattern_heap[i]->pattern,
 			       list->pattern_heap[i]->ll)) {
@@ -4054,7 +4054,7 @@ owl_reasons(int color)
 	
 	/* If we've reached this far, the attack is okay. */
 	if (DRAGON2(pos).owl_attack_code == GAIN) {
-	  add_gain_move(move, pos, DRAGON2(pos).owl_attack_kworm );
+	  add_gain_move(move, pos, DRAGON2(pos).owl_attack_kworm);
 	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n",
 		move, pos, movenum+1);
 	}
@@ -4283,9 +4283,9 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
     if (search_persistent_owl_cache(OWL_ATTACK, origin, 0, 0,
 				    &result, defense_point, kworm, NULL)) {
       popgo();
-      if (result==0)
+      if (result == 0)
 	return WIN;
-      else if (result==GAIN)
+      else if (result == GAIN)
 	return LOSS;
       else
 	return 0;
@@ -4296,7 +4296,7 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
 		      kworm, 0);
     acode = do_owl_attack(target, &defense, &wid, owl, EMPTY, NO_MOVE, 0);
     finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
-    if (acode==0)
+    if (acode == 0)
       result = WIN;
     else if (acode == GAIN)
       result = LOSS;
@@ -5669,7 +5669,7 @@ list_goal_worms(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
   /* experimental: let's try to fill up the array with other neighboring
    * opponent worms
    */
-  if (1 && (w > 0) && (w < MAX_GOAL_WORMS) ) {
+  if (1 && (w > 0) && (w < MAX_GOAL_WORMS)) {
     pos = goal_worm[0];
     for (k = 0; k < DRAGON2(pos).neighbors && w < MAX_GOAL_WORMS; k++) {
       int ii;

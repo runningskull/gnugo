@@ -857,7 +857,7 @@ reduced_genmove(int *move, int color)
   else
     TRACE("reduced_genmove() recommends %1m with value %f\n", *move, val);
  
- return val;
+  return val;
 }
 
 /* Preliminary function for playing through the aftermath. */

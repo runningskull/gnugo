@@ -80,8 +80,8 @@ semeai()
       if (dragon[apos].color == dragon[bpos].color
 	  || (dragon[apos].status != DEAD
 	      && dragon[apos].status != CRITICAL)
-	  ||(dragon[bpos].status != DEAD
-	     && dragon[bpos].status != CRITICAL))
+	  || (dragon[bpos].status != DEAD
+	      && dragon[bpos].status != CRITICAL))
 	continue;
       
       /* A dragon consisting of a single worm which is tactically dead or
@@ -359,7 +359,7 @@ update_status(int dr, enum dragon_status new_status,
   int pos;
 
   if (dragon[dr].status != new_status
-      && (dragon[dr].status != CRITICAL || new_status != DEAD))  {
+      && (dragon[dr].status != CRITICAL || new_status != DEAD)) {
     DEBUG(DEBUG_SEMEAI, "Changing status of %1m from %s to %s.\n", dr,
 	  status_to_string(dragon[dr].status),
 	  status_to_string(new_status));

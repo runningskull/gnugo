@@ -171,7 +171,7 @@ char *hashdata_to_string(Hash_data *hashdata);
 
 #endif
 
-extern void hash_ng_init(void);
+void hash_ng_init(void);
 
 
 #endif

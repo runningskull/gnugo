@@ -91,13 +91,13 @@ enum routine_id {
   "connect", \
   "disconnect", \
   "break_in", \
-  "block_off" \
-  "owl_threaten_attack" \
-  "owl_threatend_defense" \
-  "owl_does_defend" \
-  "owl_does_attack" \
-  "owl_connection_defends" \
-  "owl_substantial" \
+  "block_off", \
+  "owl_threaten_attack", \
+  "owl_threatend_defense", \
+  "owl_does_defend", \
+  "owl_does_attack", \
+  "owl_connection_defends", \
+  "owl_substantial", \
   "owl_confirm_safety"
 
 const char *routine_id_to_string(enum routine_id routine);

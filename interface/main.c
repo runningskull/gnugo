@@ -943,16 +943,16 @@ main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 	break;
 
-	/* NOTE: getopt returns '?' if an illegal option is supplied. */
-
       case OPT_PRINT_LEVELS:
 	{
 	  int lev;
-	  for(lev = 10; lev > 0; lev--)
+	  for (lev = 10; lev > 0; lev--)
 	    set_depth_values(lev, 1);
 	}
 	return EXIT_SUCCESS;
 	break;
+
+      /* NOTE: getopt returns '?' if an illegal option is supplied. */
 
       case '?':
       default:

@@ -2079,7 +2079,6 @@ Pattern A517
 :8,-,value(5)
 
 
-
 #########################################################
 #                                                       #
 #          Eye reducing moves on the first line         #
@@ -2426,20 +2425,17 @@ aXO
 Pattern A621
 # spl added 3.3.22
 
-
 ?XOo? threaten to make ko or nakade
 X..*.
 -----
 
 :8,s,value(10)
 
-?AOo? threaten to make ko or nakade
+?AOo?
 X..*.
 -----
 
 ;lib(A)<3
-
-
 
 
 #########################################################
@@ -2774,7 +2770,7 @@ X*Ox
 
 ?c??
 Ya.x
-X*bx
+X*Ox
 ?...
 ?OO?
 
@@ -5406,7 +5402,7 @@ Pattern A1350
 # See ld_owl:68.
 
 |XXX?   try to kill without ko
-|O.X?    
+|O.X?
 |X.YX
 |.*.O
 +----
@@ -5414,7 +5410,7 @@ Pattern A1350
 :8,s,value(75)
 
 |AAA?
-|O.A?    
+|O.A?
 |X.AA
 |.*.O
 +----

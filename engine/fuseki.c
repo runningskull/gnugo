@@ -171,7 +171,7 @@ choose_corner_move(int corner, int *m, int *n)
   else 
     table = large_board;
 
-  for (i = 0; i < 8 ;i++)
+  for (i = 0; i < 8; i++)
     sum_of_weights += table[i];
 
   q = gg_rand() % sum_of_weights;

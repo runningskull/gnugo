@@ -343,7 +343,7 @@ make_dragons(int color, int stop_before_owl)
 			       &DRAGON2(str).owl_defense_certain, &kworm);
 	    if (dcode != 0) {
 	      if (defense_point != NO_MOVE) {
-		DRAGON2(str).owl_status = acode==GAIN ? ALIVE : CRITICAL;
+		DRAGON2(str).owl_status = (acode == GAIN ? ALIVE : CRITICAL);
 		DRAGON2(str).owl_defense_point = defense_point;
 		DRAGON2(str).owl_defense_code = dcode;
 		DRAGON2(str).owl_defense_kworm = kworm;
@@ -357,7 +357,7 @@ make_dragons(int color, int stop_before_owl)
 		 * propose. Having the status right is important e.g.
 		 * for connection moves to be properly valued.
 		 */
-		DRAGON2(str).owl_status = acode==GAIN ? ALIVE : CRITICAL;
+		DRAGON2(str).owl_status = (acode == GAIN ? ALIVE : CRITICAL);
 		DEBUG(DEBUG_OWL_PERFORMANCE,
 		      "Inconsistent owl attack and defense results for %1m.\n", 
 		      str);
@@ -1148,7 +1148,7 @@ set_dragon_strengths(const char safe_stones[BOARDMAX],
   int ii;
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
-      if (safe_stones[ii])  {
+      if (safe_stones[ii]) {
 	ASSERT1(IS_STONE(board[ii]), ii);
 	strength[ii] = DEFAULT_STRENGTH
 	  	       * (1.0 - 0.3 * DRAGON2(ii).weakness_pre_owl);
@@ -1176,7 +1176,7 @@ mark_inessential_stones(int color, char safe_stones[BOARDMAX])
 		     && DRAGON2(ii).safety != TACTICALLY_DEAD
 		     && DRAGON2(ii).safety != CRITICAL)
 		    || (DRAGON2(ii).safety == CRITICAL
-			&& board[ii] == color)))) )
+			&& board[ii] == color)))))
       safe_stones[ii] = INFLUENCE_SAFE_STONE;
 }
 

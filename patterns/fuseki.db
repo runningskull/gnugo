@@ -1788,7 +1788,7 @@ Pattern F812
 
 :8,Fj
 
-|..xxx.........xxx..|             wariuchi
+|..xxx.........xxx..|
 |..xxx.........abc..|
 |..xxx.........def..|
 |..Xxx....*....ghi..|
@@ -1811,7 +1811,7 @@ Pattern F813
 
 :8,Fj
 
-|..xxx.........xxx..|             wariuchi
+|..xxx.........xxx..|
 |..xxx.........abc..|
 |..xxx.........def..|
 |..xXx....*....ghi..|
@@ -1834,7 +1834,7 @@ Pattern F814
 
 :8,Fj
 
-|..xxx.........xxx..|             wariuchi
+|..xxx.........xxx..|
 |..xxx.........abc..|
 |..xxx.........def..|
 |..xxX....*....ghi..|
@@ -1843,7 +1843,6 @@ Pattern F814
 +-------------------+
 
 ; x_somewhere(a,b,c,d,e,f,g,h,i)
-
 
 
 Pattern F815
@@ -1869,7 +1868,6 @@ Pattern F815
 ; x_somewhere(a,b,c,d,e,f,g,h,i)
 
 
-
 Pattern F816
 
 |..xxx.........xxx..|             wariuchi
@@ -1891,7 +1889,6 @@ Pattern F816
 +-------------------+
 
 ; x_somewhere(a,b,c,d,e,f,g,h,i)
-
 
 
 ################

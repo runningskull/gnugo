@@ -95,19 +95,7 @@ struct worm_data @{
 @itemize @bullet
 @item @code{color}
 @quotation
-@cindex border color
-If the worm is @code{BLACK} or @code{WHITE}, that is its color.
-Cavities (empty worms) have an additional attribute which we call
-@dfn{bordercolor}. This will be one of @code{BLACK_BORDER},
-@code{WHITE_BORDER} or @code{GRAY_BORDER}. Specifically, if all the worms
-adjacent to a given empty worm have the same color (black or white) then we
-define that to be the bordercolor. Otherwise the bordercolor is gray.
-
-Rather than define a new field, we keep this data in the
-field color. Thus for every worm, the color field will
-have one of the following values: @code{BLACK}, @code{WHITE},
-@code{GRAY_BORDER}, @code{BLACK_BORDER} or @code{WHITE_BORDER}. 
-The last three categories are empty worms classified by bordercolor.
+The color of the worm. 
 @end quotation
 @item @code{size}
 @quotation
@@ -148,7 +136,7 @@ string. This is supplemented by @code{LIBERTIES2}, @code{LIBERTIES3} and
 fourth order liberties, respectively.
 The definition of liberties of order >1 is adapted to the
 problem of detecting the shape of the surrounding
-cavity. In particular we want to be able to see if a group
+empty space. In particular we want to be able to see if a group
 is loosely surrounded. @dfn{a liberty of order n} is an empty
 vertex which may be connected to the string by placing n
 stones of the same color on the board, but no fewer. The
@@ -281,16 +269,16 @@ moves.
 @item unconditional_status
 @quotation
 Unconditional status is also set by the function
-@code{unconditional_life}. This is set ALIVE for stones which are
+@code{unconditional_life}. This is set @code{ALIVE} for stones which are
 invincible. Stones which can not be turned invincible even if the
 defender is allowed an arbitrary number of consecutive moves are given
-an unconditional status of DEAD. Empty points where the opponent cannot
-form an invincible worm are called unconditional territory. The
-unconditional status is set to @code{WHITE_BORDER} or @code{BLACK_BORDER}
-depending on who owns the territory. Finally, if a stone can be captured but
-is adjacent to unconditional territory of its own color, it is also given the
-unconditional status @code{ALIVE}. In all other cases the unconditional status is
-@code{UNKNOWN}.
+an unconditional status of @code{DEAD}. Empty points where the opponent
+cannot form an invincible worm are called unconditional territory. The
+unconditional status is set to @code{WHITE_TERRITORY} or
+@code{BLACK_TERRITORY} depending on who owns the territory. Finally, if
+a stone can be captured but is adjacent to unconditional territory of
+its own color, it is also given the unconditional status @code{ALIVE}.
+In all other cases the unconditional status is @code{UNKNOWN}.
 
 To make sense of these definitions it is important to notice that any
 stone which is alive in the ordinary sense (even if only in seki) can be
@@ -612,9 +600,7 @@ Here are the definitions of each field in the @code{dragon} arrray.
 @item @code{color} 
 @quotation
 @cindex color (dragon)
-For strings, this is @code{BLACK} or @code{WHITE}. 
-For caves, it is @code{BLACK_BORDER}, @code{WHITE_BORDER} or 
-@code{GRAY_BORDER}. The meaning of these concepts is the same as for worms.
+The color of the dragon.
 @end quotation
 @item @code{id}
 @cindex dragon number

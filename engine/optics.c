@@ -2530,7 +2530,7 @@ white_area(int mx[BOARDMAX], int pos)
   int m, n;
 
   for (m = i - 3; m <= i + 3; m++)
-    for (n = j - 2 ; n <= j + 2; n++)
+    for (n = j - 2; n <= j + 2; n++)
       if (!ON_BOARD(POS(m, n)) || mx[POS(m, n)] != WHITE)
 	return 0;
 
@@ -2940,7 +2940,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	  popgo();
 	}
       }
-      set_eyevalue(result, a, 1,1, d);
+      set_eyevalue(result, a, 1, 1, d);
     }
     else if (defense_code != 0) {
       /* Critical with extra eye.

@@ -3309,7 +3309,7 @@ choose_strategy(int color, float our_score, float game_status)
 
     if (game_status > 0.65 && our_score > 15.0) {
       
-      /* We seem to be winning, so we use conservative settings */
+      /* We seem to be winning, so we use conservative settings. */
       minimum_value_weight  = 0.66;
       maximum_value_weight  = 2.0;
       territorial_weight    = 0.95; 
@@ -3322,7 +3322,7 @@ choose_strategy(int color, float our_score, float game_status)
     }
     else if (game_status > 0.16) {
       
-      /* We're not winning enough yet, try aggressive settings */
+      /* We're not winning enough yet, try aggressive settings. */
       minimum_value_weight  = 0.66;
       maximum_value_weight  = 2.0;
       territorial_weight    = 1.4;
@@ -3336,7 +3336,7 @@ choose_strategy(int color, float our_score, float game_status)
         invasion_malus_weight = 0.2;
             
       TRACE("  %s is not winning enough, using aggressive settings.\n", 
-             color == WHITE ? "White" : "Black");
+	    color == WHITE ? "White" : "Black");
     }
   }
 }

@@ -201,8 +201,8 @@ draw_active_area(char board[BOARDMAX], int apos)
 {
   int i, j, ii;
   int c = ' ';
-  int cw = apos==NO_MOVE ? 'O' : 'o';
-  int cb = apos==NO_MOVE ? 'X' : 'x';
+  int cw = (apos == NO_MOVE) ? 'O' : 'o';
+  int cb = (apos == NO_MOVE) ? 'X' : 'x';
 
   start_draw_board();
   

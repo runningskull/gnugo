@@ -48,7 +48,7 @@ vgprintf(FILE *outputfile, const char *fmt, va_list ap)
   else if (stackp > 0)
     fprintf(outputfile, "%.*s", stackp*2, "                                ");
 
-  for (; *fmt ; ++fmt) {
+  for (; *fmt; ++fmt) {
     if (*fmt == '%') {
       switch (*++fmt) {
       case 'c':
@@ -78,7 +78,7 @@ vgprintf(FILE *outputfile, const char *fmt, va_list ap)
       }
       case 's':
       {
-	char *s = va_arg(ap, char*);
+	char *s = va_arg(ap, char *);
 	fputs(s, outputfile);
 	break;
       }
@@ -252,7 +252,7 @@ If you can, please also include the debug output above this message.\n");
   abort();  /* cause core dump */
 }
 
-static const char* color_names[] = {
+static const char *color_names[] = {
   COLOR_NAMES
 };
 
@@ -396,7 +396,7 @@ is_hoshi_point(int m, int n)
   if (board_size%2 == 0)
     return 0;
 
-  /* Less then 12 in board size only middle point. */
+  /* Less than 12 in board size only middle point. */
   if (board_size < 12) {
     if (m == middle && n == middle)
       return 1;

@@ -89,8 +89,8 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   /* For some classes of patterns we need to find all dragons present
    * in the pattern.
    */
-  if ((class & (CLASS_B | CLASS_C | CLASS_c | CLASS_a | CLASS_d | CLASS_O |
-		CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t)) != 0) {
+  if ((class & (CLASS_B | CLASS_C | CLASS_c | CLASS_a | CLASS_d | CLASS_O
+		| CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t)) != 0) {
     /* Match each point. */
     for (k = 0; k < pattern->patlen; ++k) {
       int pos; /* absolute (board) co-ord of (transformed) pattern element */

@@ -572,7 +572,7 @@ store_pattern_if_winner(struct invariant_hash *pre,
       winning_moves[k].pattern[m][n] = '*';
       /* add ? in areas far away from the move */
       if (half_board_patterns == 1 && move_number > 3 && board_size == 19)
-        region = find_region(m,n);
+        region = find_region(m, n);
       if (region != 8) {
         for (i = 0; i < board_size; i++) {
           for (j = 0; j < board_size; j++) {

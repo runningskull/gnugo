@@ -231,7 +231,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"does_attack",		2, 0, 1.00, "does_attack(%s, %s)"},
   {"attack",			1, 0, 1.00, "ATTACK_MACRO(%s)"},
   {"defend",			1, 0, 1.00, "DEFEND_MACRO(%s)"},
-  {"weak",			1, 0, 0.01, "DRAGON_WEAK(%s)"},
+  {"weak",			1, 0, 0.01, "dragon_weak(%s)"},
   {"safe_xmove", 		1, 0, 1.00, "safe_move(%s, OTHER_COLOR(color))"},
   {"safe_omove", 		1, 0, 1.00, "safe_move(%s, color)"},
   {"legal_xmove",		1, 0, 0.05, "is_legal(%s, OTHER_COLOR(color))"},
@@ -752,7 +752,7 @@ read_pattern_line(char *p)
     }
 
     /* count the number of -'s */
-    for (width = 0; *p == '-' ; ++p, ++width)
+    for (width = 0; *p == '-'; ++p, ++width)
       ;
 
     if (width == 0)
@@ -1646,7 +1646,9 @@ finish_constraint_and_action(void)
 static int
 compare_elements(const void *a, const void *b)
 {
-  static char order[] = {7,2,3,5,6,0,4,1};  /* score for each attribute */
+  /* score for each attribute */
+  static char order[] = {7, 2, 3, 5, 6, 0, 4, 1};
+  
   return  order[((const struct patval_b *)a)->att]
     - order[((const struct patval_b *)b)->att];
 }
@@ -1669,9 +1671,9 @@ compare_elements_closest(const void *a, const void *b)
   int bx = pb->x - ci;
   int ay = pa->y - cj;
   int by = pb->y - cj;
-  int metric = (ax*ax + ay*ay) - (bx*bx + by*by) ;
+  int metric = (ax*ax + ay*ay) - (bx*bx + by*by);
   if (metric == 0)
-    return -compare_elements(a,b);
+    return -compare_elements(a, b);
   else
     return metric;
 }
@@ -2085,10 +2087,10 @@ dump_tree_node(FILE *outfile, struct tree_node *gn, int depth, int pass)
   if (gn->matches) {
     struct match_node *m = gn->matches->next;
     if (pass == PASS_FILL) {
-      tnl_dump[tnl_count].node.matches = (void*)mn_count;
+      tnl_dump[tnl_count].node.matches = (void *) mn_count;
       matches_dump[mn_count].patnum = -1; /*Unused*/
       matches_dump[mn_count].orientation = 0; /*Unused*/
-      matches_dump[mn_count].next = (void*)(mn_count + 1);
+      matches_dump[mn_count].next = (void *) (mn_count + 1);
     }
     
     if (as_text)
@@ -2100,7 +2102,7 @@ dump_tree_node(FILE *outfile, struct tree_node *gn, int depth, int pass)
         matches_dump[mn_count].patnum = m->patnum;
         matches_dump[mn_count].orientation = m->orientation;
         if (m->next)
-          matches_dump[mn_count].next = (void*)(mn_count + 1);
+          matches_dump[mn_count].next = (void *) (mn_count + 1);
 	else
           matches_dump[mn_count].next = 0;
       }
@@ -2125,7 +2127,7 @@ dump_tree_node(FILE *outfile, struct tree_node *gn, int depth, int pass)
   if (gl) {
     int prev_tnl_count = tnl_count;
     if (pass == PASS_FILL) {
-      tnl_dump[tnl_count].node.next_list = (void*)(tnl_count+1);
+      tnl_dump[tnl_count].node.next_list = (void *) (tnl_count + 1);
       /*tnl_dump[tnl_count+1].node data is unused.*/
       tnl_dump[tnl_count+1].node.matches = 0;   /*Unused*/
       tnl_dump[tnl_count+1].node.att = -1;      /*Unused*/
@@ -2138,14 +2140,14 @@ dump_tree_node(FILE *outfile, struct tree_node *gn, int depth, int pass)
     tnl_count++;
     while (gl->next) {
       if (pass == PASS_FILL)
-        tnl_dump[prev_tnl_count+1].next = (void*)(tnl_count+1);
+        tnl_dump[prev_tnl_count+1].next = (void *) (tnl_count + 1);
 
       prev_tnl_count = tnl_count;
-      dump_tree_node(outfile, &gl->next->node, depth+1, pass);
+      dump_tree_node(outfile, &gl->next->node, depth + 1, pass);
       gl = gl->next;
     }
     if (pass == PASS_FILL)
-      tnl_dump[prev_tnl_count+1].next = 0;
+      tnl_dump[prev_tnl_count + 1].next = 0;
   }
   else {
     if (pass == PASS_FILL) {
@@ -2180,13 +2182,13 @@ tree_write_patterns(FILE *outfile)
   tnl_dump = malloc(sizeof(struct tree_node_list) * tnl_count);
   matches_dump = malloc(sizeof(struct match_node) * mn_count);
 
-  tnl_dump[0].next = (void*)1;  /* X anchor node */
+  tnl_dump[0].next = (void *) 1;  /* X anchor node */
   tnl_dump[0].node.att = -1;    /* Not used */
   tnl_dump[0].node.matches = 0; /* Not used */
   tnl_dump[0].node.x = -99;     /* Not used */
   tnl_dump[0].node.y = -99;     /* Not used */
   tnl_dump[0].node.next_list = 0; /* Not used */
-  tnl_dump[1].next = (void*) oanchor_index;
+  tnl_dump[1].next = (void *) oanchor_index;
   tnl_dump[oanchor_index].next = 0;
   
   mn_count = 1;
@@ -2197,7 +2199,7 @@ tree_write_patterns(FILE *outfile)
   fprintf(outfile, "struct tree_node_list tnl_%s[] =\n{\n", prefix);
   for (i = 0; i < tnl_count+1; i++) {
     fprintf(outfile,
-	    "  { {(void*)%d, %d, %d, %d, (void*)%d}, (void*)%d}, /*#%d*/\n",
+	    "  { {(void *)%d, %d, %d, %d, (void *)%d}, (void *)%d}, /*#%d*/\n",
 	    (int)tnl_dump[i].node.matches,
 	    tnl_dump[i].node.att,
 	    tnl_dump[i].node.x,
@@ -2210,7 +2212,7 @@ tree_write_patterns(FILE *outfile)
 
   fprintf(outfile, "struct match_node matches_%s[] = \n{\n", prefix);
   for (i = 0; i < mn_count; i++) {
-    fprintf(outfile, "  {%d, %d, (void*)%d}, /*#%d*/\n",
+    fprintf(outfile, "  {%d, %d, (void *)%d}, /*#%d*/\n",
 	    matches_dump[i].patnum,
 	    matches_dump[i].orientation,
 	    (int) matches_dump[i].next,

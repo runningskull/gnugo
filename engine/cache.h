@@ -95,17 +95,17 @@ typedef struct {
 
 extern Transposition_table  ttable;
 
-extern void  tt_init(Transposition_table *table, int memsize);
-extern void  tt_clear(Transposition_table *table);
-extern void  tt_free(Transposition_table *table);
-extern int   tt_get(Transposition_table *table, 
-		    int komaster, int kom_pos, enum routine_id routine,
-		    int target, int remaining_depth,
-		    int *result, int *move);
-extern void  tt_update(Transposition_table *table,
-		       int komaster, int kom_pos, enum routine_id routine,
-		       int target, int remaining_depth,
-		       int result, int move);
+void tt_init(Transposition_table *table, int memsize);
+void tt_clear(Transposition_table *table);
+void tt_free(Transposition_table *table);
+int  tt_get(Transposition_table *table, 
+	    int komaster, int kom_pos, enum routine_id routine,
+	    int target, int remaining_depth,
+	    int *result, int *move);
+void tt_update(Transposition_table *table,
+	       int komaster, int kom_pos, enum routine_id routine,
+	       int target, int remaining_depth,
+	       int result, int move);
 
 
 /* ================================================================ */
@@ -306,7 +306,7 @@ void sgf_trace(const char *func, int str, int move, int result,
 	       const char *message);
 /* Trace messages in decideconnection sgf file. */
 void sgf_trace2(const char *func, int str1, int str2, int move, 
-	        const char* result, const char *message);
+	        const char *result, const char *message);
 /* Trace messages in decidesemeai sgf file. */
 void sgf_trace_semeai(const char *func, int str1, int str2, int move, 
 		      int result1, int result2, const char *message);
