@@ -274,6 +274,124 @@ find_more_attack_and_defense_moves(int color)
 }
 
 
+/* Do the real job of find_more_attack_and_defense_moves() with given
+ * move reason at given position and for given target (`what').  This
+ * function is used from induce_secondary_move_reasons() for upgrading
+ * one specific move reason only.
+ */
+static void
+do_find_more_owl_attack_and_defense_moves(int color, int pos,
+					  int move_reason_type, int what)
+{
+  int k;
+  int dd1 = NO_MOVE;
+  int dd2 = NO_MOVE;
+  int save_verbose;
+
+  save_verbose = verbose;
+  if (verbose > 0)
+    verbose --;
+
+  if (move_reason_type == STRATEGIC_ATTACK_MOVE
+      || move_reason_type == STRATEGIC_DEFEND_MOVE)
+    dd1 = what;
+  else if (move_reason_type == ATTACK_MOVE
+	   || move_reason_type == ATTACK_MOVE_GOOD_KO
+	   || move_reason_type == ATTACK_MOVE_BAD_KO
+	   || move_reason_type == DEFEND_MOVE
+	   || move_reason_type == DEFEND_MOVE_GOOD_KO
+	   || move_reason_type == DEFEND_MOVE_BAD_KO)
+    dd1 = what;
+  else if (move_reason_type == VITAL_EYE_MOVE) {
+    int ee = eyes[what];
+    int ecolor = eyecolor[what];
+
+    if (ecolor == WHITE)
+      find_eye_dragons(ee, white_eye, WHITE, &dd1, 1);
+    else
+      find_eye_dragons(ee, black_eye, BLACK, &dd1, 1);
+
+    if (dd1 == NO_MOVE) { /* Maybe we should assert this not to happen. */
+      verbose = save_verbose;
+      return;
+    }
+  }
+  else if (move_reason_type == CONNECT_MOVE) {
+    int worm1 = conn_worm1[what];
+    int worm2 = conn_worm2[what];
+
+    dd1 = dragon[worm1].origin;
+    dd2 = dragon[worm2].origin;
+    if (dd1 == dd2)
+      dd2 = NO_MOVE;
+  }
+  else {
+    verbose = save_verbose;
+    return;
+  }
+
+  for (k = 0; k < 2; k++) {
+    int dd = (k == 0 ? dd1 : dd2);
+
+    if (dd == NO_MOVE)
+      continue;
+
+    /* Don't care about inessential dragons. */
+    if (DRAGON2(dd).safety == INESSENTIAL)
+      continue;
+
+    if (DRAGON2(dd).owl_status != CRITICAL)
+      continue;
+
+    if ((move_reason_type == STRATEGIC_ATTACK_MOVE
+	 || move_reason_type == ATTACK_MOVE
+	 || move_reason_type == ATTACK_MOVE_GOOD_KO
+	 || move_reason_type == ATTACK_MOVE_BAD_KO
+	 || (move_reason_type == VITAL_EYE_MOVE
+	     && board[dd] == OTHER_COLOR(color)))
+	&& !owl_attack_move_reason_known(pos, dd)) {
+      int kworm = NO_MOVE;
+      int acode = owl_does_attack(pos, dd, &kworm);
+
+      if (acode >= DRAGON2(dd).owl_attack_code) {
+	if (acode == GAIN)
+	  add_gain_move(pos, dd, kworm);
+	else
+	  add_owl_attack_move(pos, dd, acode);
+	if (save_verbose)
+	  gprintf("Move at %1m upgraded to owl attack on %1m (%s).\n",
+		  pos, dd, result_to_string(acode));
+      }
+    }
+
+    if ((move_reason_type == STRATEGIC_DEFEND_MOVE
+	 || move_reason_type == CONNECT_MOVE
+	 || move_reason_type == DEFEND_MOVE
+	 || move_reason_type == DEFEND_MOVE_GOOD_KO
+	 || move_reason_type == DEFEND_MOVE_BAD_KO
+	 || (move_reason_type == VITAL_EYE_MOVE
+	     && board[dd] == color))
+	&& !owl_defense_move_reason_known(pos, dd)) {
+      int kworm = NO_MOVE;
+      /* FIXME: Better use owl_connection_defend() for CONNECT_MOVE ? */
+      int dcode = owl_does_defend(pos, dd, &kworm);
+
+      if (dcode >= DRAGON2(dd).owl_defense_code) {
+	if (dcode == LOSS)
+	  add_loss_move(pos, dd, kworm);
+	else
+	  add_owl_defense_move(pos, dd, dcode);
+	if (save_verbose)
+	  gprintf("Move at %1m upgraded to owl defense for %1m (%s).\n",
+		  pos, dd, result_to_string(dcode));
+      }
+    }
+  }
+
+  verbose = save_verbose;
+}
+
+
 /* Test certain moves to see whether they (too) can owl attack or
  * defend an owl critical dragon. Tested moves are
  * 1. Strategical attacks or defenses for the dragon.
@@ -282,16 +400,15 @@ find_more_attack_and_defense_moves(int color)
  * 4. Moves connecting the dragon to something else.
  */
 static void
-find_more_owl_attack_and_defense_moves(int color, int save_verbose)
+find_more_owl_attack_and_defense_moves(int color)
 {
   int pos, pos2;
   int k;
-  int s;
-  int dd1, dd2;
   int dd = NO_MOVE;
   int worth_trying;
-  
-  if (save_verbose)
+  int save_verbose;
+
+  if (verbose)
     gprintf("\nTrying to upgrade strategical attack and defense moves.\n");
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -300,106 +417,18 @@ find_more_owl_attack_and_defense_moves(int color, int save_verbose)
       
     for (k = 0; k < MAX_REASONS; k++) {
       int r = move[pos].reason[k];
-      int what;
-      dd1 = NO_MOVE;
-      dd2 = NO_MOVE;
-      
       if (r < 0)
 	break;
-      what = move_reasons[r].what;
-      if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE
-	  || move_reasons[r].type == STRATEGIC_DEFEND_MOVE)
-	dd1 = what;
-      else if (move_reasons[r].type == ATTACK_MOVE
-	       || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
-	       || move_reasons[r].type == ATTACK_MOVE_BAD_KO
-	       || move_reasons[r].type == DEFEND_MOVE
-	       || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
-	       || move_reasons[r].type == DEFEND_MOVE_BAD_KO)
-	dd1 = what;
-      else if (move_reasons[r].type == VITAL_EYE_MOVE) {
-	int ee = eyes[what];
-	int ecolor = eyecolor[what];
-	
-	if (ecolor == WHITE)
-	  find_eye_dragons(ee, white_eye, WHITE, &dd1, 1);
-	else
-	  find_eye_dragons(ee, black_eye, BLACK, &dd1, 1);
-	
-	if (dd1 == NO_MOVE) /* Maybe we should assert this not to happen. */
-	  continue;
-      }      
-      else if (move_reasons[r].type == CONNECT_MOVE) {
-	int worm1 = conn_worm1[what];
-	int worm2 = conn_worm2[what];
-	dd1 = dragon[worm1].origin;
-	dd2 = dragon[worm2].origin;
-	if (dd1 == dd2)
-	  dd2 = NO_MOVE;
-      }
-      else
-	continue;
-      
-      for (s = 0; s < 2; s++) {
-	if (s == 0)
-	  dd = dd1;
-	else
-	  dd = dd2;
-	
-	if (dd == NO_MOVE)
-	  continue;
-	
-	/* Don't care about inessential dragons. */
-	if (DRAGON2(dd).safety == INESSENTIAL)
-	  continue;
 
-	if (DRAGON2(dd).owl_status != CRITICAL)
-	  continue;
-	
-	if ((move_reasons[r].type == STRATEGIC_ATTACK_MOVE 
-	     || move_reasons[r].type == ATTACK_MOVE
-	     || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
-	     || move_reasons[r].type == ATTACK_MOVE_BAD_KO
-	     || (move_reasons[r].type == VITAL_EYE_MOVE
-		 && board[dd] == OTHER_COLOR(color)))
-	    && !owl_attack_move_reason_known(pos, dd)) {
-	  int kworm = NO_MOVE;
-	  int acode = owl_does_attack(pos, dd, &kworm);
-	  if (acode >= DRAGON2(dd).owl_attack_code) {
-	    if (acode == GAIN)
-	      add_gain_move(pos, dd, kworm);
-	    else
-	      add_owl_attack_move(pos, dd, acode);
-	    if (save_verbose)
-	      gprintf("Move at %1m upgraded to owl attack on %1m (%s).\n",
-	      	      pos, dd, result_to_string(acode));
-	  }
-	}
-	
-	if ((move_reasons[r].type == STRATEGIC_DEFEND_MOVE
-	     || move_reasons[r].type == CONNECT_MOVE
-	     || move_reasons[r].type == DEFEND_MOVE
-	     || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
-	     || move_reasons[r].type == DEFEND_MOVE_BAD_KO
-	     || (move_reasons[r].type == VITAL_EYE_MOVE
-		 && board[dd] == color))
-	    && !owl_defense_move_reason_known(pos, dd)) {
-	  int kworm = NO_MOVE;
-	  /* FIXME: Better use owl_connection_defend() for CONNECT_MOVE ? */
-	  int dcode = owl_does_defend(pos, dd, &kworm);
-	  if (dcode >= DRAGON2(dd).owl_defense_code) {
-	    if (dcode == LOSS)
-	      add_loss_move(pos, dd, kworm);
-	    else
-	      add_owl_defense_move(pos, dd, dcode);
-	    if (save_verbose)
-	      gprintf("Move at %1m upgraded to owl defense for %1m (%s).\n",
-	      	      pos, dd, result_to_string(dcode));
-	  }
-	}
-      }
+      do_find_more_owl_attack_and_defense_moves(color, pos,
+						move_reasons[r].type,
+						move_reasons[r].what);
     }
   }
+
+  save_verbose = verbose;
+  if (verbose > 0)
+    verbose--;
 
   /* If two critical dragons are adjacent, test whether a move to owl
    * attack or defend one also is effective on the other.
@@ -468,8 +497,9 @@ find_more_owl_attack_and_defense_moves(int color, int save_verbose)
       }
     }
   }
-}
 
+  verbose = save_verbose;
+}
 
 
 /*
@@ -578,8 +608,10 @@ induce_secondary_move_reasons(int color)
 		      "Connection move at %1m induced for %1m/%1m due to attack of %1m\n",
 		      pos, adj1, adj2, aa);
 		add_connection_move(pos, adj1, adj2);
+		do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
+							  find_connection(adj1, adj2));
 	      }
-		  
+
 	      if (!attack_move
 		  && board[adj1] != board[aa]
 		  && !string_connect(adj1, adj2, NULL)) {
@@ -596,12 +628,68 @@ induce_secondary_move_reasons(int color)
 		      "Connection move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
 		add_connection_move(pos, adj1, adj2);
+		do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
+							  find_connection(adj1, adj2));
 	      }
-		  
+
 	      popgo();
 	    }
 	  }
-	}  
+	}
+
+	/* Strategical attack move reason is induced for moves that
+	 * defend neighbor strings of weak opponent dragons a.  We
+	 * only count strings that are large (more than three stones)
+	 * or adjoin at least two non-dead non-single-stone opponent
+	 * dragons.
+	 */
+	if (!attack_move) {
+	  int strategically_valuable = (worm[aa].size > 3);
+	  char neighbor_dragons[BOARDMAX];
+
+	  memset(neighbor_dragons, 0, sizeof(neighbor_dragons));
+
+	  if (!strategically_valuable) {
+	    int num_dragons = 0;
+
+	    for (i = 0; i < num_adj; i++) {
+	      int origin = dragon[adjs[i]].origin;
+
+	      if (board[origin] != color_to_move
+		  && neighbor_dragons[origin] != 1
+		  && dragon[origin].size > 1
+		  && dragon[origin].status != DEAD) {
+		if (++num_dragons == 2) {
+		  strategically_valuable = 1;
+		  break;
+		}
+
+		neighbor_dragons[origin] = 1;
+	      }
+	    }
+	  }
+
+	  if (strategically_valuable) {
+	    for (i = 0; i < num_adj; i++) {
+	      int origin = dragon[adjs[i]].origin;
+
+	      if (board[origin] != color_to_move
+		  && neighbor_dragons[origin] != 2
+		  && dragon[origin].status != DEAD
+		  && dragon_weak(origin)) {
+		DEBUG(DEBUG_MOVE_REASONS,
+		      "Strategical attack move at %1m induced for %1m due to defense of %1m\n",
+		      pos, origin, aa);
+		add_strategical_attack_move(pos, origin);
+		do_find_more_owl_attack_and_defense_moves(color, pos,
+							  STRATEGIC_ATTACK_MOVE,
+							  origin);
+
+		neighbor_dragons[origin] = 2;
+	      }
+	    }
+	  }
+	}
       }
       else if (move_reasons[r].type == OWL_ATTACK_MOVE) {
 	aa = move_reasons[r].what;
@@ -610,6 +698,9 @@ induce_secondary_move_reasons(int color)
 	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0
 	      && !DRAGON2(bb).semeai) {
 	    add_strategical_defense_move(pos, bb);
+	    do_find_more_owl_attack_and_defense_moves(color, pos,
+						      STRATEGIC_DEFEND_MOVE,
+						      bb);
 	    DEBUG(DEBUG_MOVE_REASONS, "Strategic defense at %1m induced for %1m due to owl attack on %1m\n",
 		  pos, bb, aa);
 	  }
@@ -633,11 +724,15 @@ induce_secondary_move_reasons(int color)
 			    worm1, EMPTY, NO_MOVE)) {
 		  if (!disconnect(pos3, worm1, NULL)) {
 		    add_connection_move(pos, pos3, worm1);
+		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
+							      find_connection(pos3, worm1));
 		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm1);
 		  }
 		  if (!disconnect(pos3, worm2, NULL)) {
 		    add_connection_move(pos, pos3, worm2);
+		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
+							      find_connection(pos3, worm2));
 		    DEBUG(DEBUG_MOVE_REASONS, "Connection at %1m induced for %1m/%1m due to connection at %1m/%1m\n",
 			  pos, worm1, worm2, pos3, worm2);
 		  }
@@ -3285,15 +3380,12 @@ review_move_reasons(int *the_move, float *val, int color,
   find_more_attack_and_defense_moves(color);
   time_report(2, "  find_more_attack_and_defense_moves", NO_MOVE, 1.0);
 
-  save_verbose = verbose;
-  if (verbose > 0)
-    verbose--;
   if (level >= 6) {
-    find_more_owl_attack_and_defense_moves(color, save_verbose);
+    find_more_owl_attack_and_defense_moves(color);
     time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);
   }
-  verbose = save_verbose;
 
+  save_verbose = verbose;
   if (verbose > 0)
     verbose--;
   examine_move_safety(color);

@@ -201,6 +201,8 @@ void mark_changed_string(int affected, char changed_stones[BOARDMAX],
 			 float strength[BOARDMAX], char new_status);
 int adjacent_to_nondead_stone(int pos, int color);
 
+int find_connection(int worm1, int worm2);
+
 /*
  * Local Variables:
  * tab-width: 8

@@ -142,7 +142,7 @@ clear_move_reasons(void)
  * Find the index of a connection in the list of connections.
  * If necessary, add a new entry.
  */
-static int
+int
 find_connection(int worm1, int worm2)
 {
   int k;
