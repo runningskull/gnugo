@@ -263,7 +263,7 @@ not_lunch_helper(int ai, int aj, int bi, int bj)
     return 0;
 
   /* Tell the move generation code about the change in status. */
-  remove_lunch(bi, bj, ai, aj);
+  remove_lunch(POS(bi, bj), POS(ai, aj));
   
   if (DRAGON2(bi, bj).lunch == POS(ai, aj))
     DRAGON2(bi, bj).lunch = NO_MOVE;
@@ -606,7 +606,7 @@ backfill_helper(int ai, int aj, int bi, int bj, int ci, int cj)
   if (TRYMOVE(ai, aj, color)) {
     if (TRYMOVE(bi, bj, other)) {
       if (attack(POS(ci, cj), NULL) && find_defense(POS(ci, cj), &dpos)) {
-	set_minimum_move_value(I(dpos), J(dpos), 0.1);
+	set_minimum_move_value(dpos, 0.1);
 	TRACE("%o...setting min move value of %1m to 0.1\n", dpos);
       }
       popgo();

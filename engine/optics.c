@@ -1694,8 +1694,7 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	      if (graphs[graph].vertex[k].type == '*' ||
 		  graphs[graph].vertex[k].type == '<') {
 		/* add attack vital move */
-		add_vital_eye_move(I(vpos[map[k]]), J(vpos[map[k]]),
-				   i, j, eye_color);
+		add_vital_eye_move(vpos[map[k]], POS(i, j), eye_color);
 	      }
 	      else if (graphs[graph].vertex[k].type == '@' ||
 		       graphs[graph].vertex[k].type == '(') {
@@ -1710,14 +1709,12 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 		  struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
 
 		  for (ix = 0; ix < this_half_eye->num_attacks; ix++) {
-		    add_vital_eye_move(I(this_half_eye->attack_point[ix]),
-				       J(this_half_eye->attack_point[ix]), 
-				       i, j, eye_color);
+		    add_vital_eye_move(this_half_eye->attack_point[ix],
+				       POS(i, j), eye_color);
 		  }
 		}
 		else {
-		  add_vital_eye_move(I(vpos[map[k]]), J(vpos[map[k]]),
-				     i, j, eye_color);
+		  add_vital_eye_move(vpos[map[k]], POS(i, j), eye_color);
 		}
 	      }
 	    }
@@ -1725,8 +1722,7 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	      if (graphs[graph].vertex[k].type == '*' ||
 		  graphs[graph].vertex[k].type == '>')
 		/* add defense vital move */
-		add_vital_eye_move(I(vpos[map[k]]), J(vpos[map[k]]),
-				   i, j, eye_color);
+		add_vital_eye_move(vpos[map[k]], POS(i, j), eye_color);
 	      else if (graphs[graph].vertex[k].type == '@' ||
 		       graphs[graph].vertex[k].type == ')') {
 		/* check for marginal matching half eye diagonal */
@@ -1736,14 +1732,12 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 		  struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
 
 		  for (ix = 0; ix < this_half_eye->num_defends; ix++) {
-		    add_vital_eye_move(I(this_half_eye->defense_point[ix]),
-				       J(this_half_eye->defense_point[ix]), 
-				       i, j, eye_color);
+		    add_vital_eye_move(this_half_eye->defense_point[ix],
+				       POS(i, j), eye_color);
 		  }
 		}
 		else {
-		  add_vital_eye_move(I(vpos[map[k]]), J(vpos[map[k]]),
-				     i, j, eye_color);
+		  add_vital_eye_move(vpos[map[k]], POS(i, j), eye_color);
 		}
 	      }
 	    }

@@ -180,7 +180,7 @@ announce_move(int i, int j, int val)
     return;
 
   TRACE("Fuseki Player suggests %m with value %d\n", i, j, val);
-  set_minimum_move_value(i, j, val);
+  set_minimum_move_value(POS(i, j), val);
 }
 
 
@@ -265,7 +265,7 @@ search_fuseki_database(int color)
    * traces and in the output file.
    */
   for (k = 0; k < fuseki_moves; k++)
-    set_minimum_move_value(fuseki_movei[k], fuseki_movej[k], 74);
+    set_minimum_move_value(POS(fuseki_movei[k], fuseki_movej[k]), 74);
 
   return 1;
 }

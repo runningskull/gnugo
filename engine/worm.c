@@ -342,7 +342,7 @@ make_worms(void)
 		      TRACE("moving point of attack of %1m to %1m\n",
 			    pos2, aa);
 		      worm[pos2].attack_point = aa;
-		      add_attack_move(I(aa), J(aa), i, j);
+		      add_attack_move(aa, pos2);
 		      mi[pos2] = 1;
 		    }
 		  }
@@ -362,7 +362,7 @@ make_worms(void)
 			    pos2, dd);
 		    worm[pos2].defend_code   = WIN;
 		    worm[pos2].defense_point = aa;
-		    add_defense_move(I(aa), J(aa), i, j);
+		    add_defense_move(aa, pos2);
 		    mi[pos2] = 1;
 		  }
 		}
@@ -422,7 +422,7 @@ make_worms(void)
 		      TRACE("moving point of attack of %1m to %1m\n",
 			    pos2, dd);
 		      worm[pos2].attack_point = dd;
-		      add_attack_move(I(dd), J(dd), i, j);
+		      add_attack_move(dd, POS(i, j));
 		      mi[pos2] = 1;
 		    }
 		  }
@@ -442,7 +442,7 @@ make_worms(void)
 			    pos2, dd);
 		    worm[pos2].defend_code   = WIN;
 		    worm[pos2].defense_point = dd;
-		    add_defense_move(I(dd), J(dd), i, j);
+		    add_defense_move(dd, pos2);
 		    mi[pos2] = 1;
 		  }
 		}
@@ -807,7 +807,7 @@ find_worm_attacks_and_defenses()
 	TRACE("worm at %m can be attacked at %1m\n", m, n, tpos);
 	worm[pos].attack_code = acode;
 	worm[pos].attack_point = tpos;
-	add_attack_move(I(tpos), J(tpos), m, n);
+	add_attack_move(tpos, pos);
       }
       propagate_worm(pos);
     }
@@ -836,7 +836,7 @@ find_worm_attacks_and_defenses()
 	  worm[pos].defend_code   = dcode;
 	  worm[pos].defense_point = tpos;
 	  if (tpos != NO_MOVE)
-	    add_defense_move(I(tpos), J(tpos), m, n);
+	    add_defense_move(tpos, pos);
 	}
 	else {
 	  /* If the point of attack is not adjacent to the worm, 
@@ -852,7 +852,7 @@ find_worm_attacks_and_defenses()
 		int change_defense = 0;
 		/* FIXME: Include defense code when move 
 		 *        is registered. */
-		add_defense_move(I(aa), J(aa), m, n);
+		add_defense_move(aa, pos);
 
 		if (acode == 0) {
 		  worm[pos].defend_code = WIN;
@@ -936,7 +936,7 @@ find_worm_attacks_and_defenses()
 		  || (dcode == KO_B && (worm[pos].attack_code == 0
 					|| worm[pos].attack_code == KO_B))
 		  || (dcode == KO_A && worm[pos].attack_code == 0))
-		add_attack_move(I(aa), J(aa), m, n);
+		add_attack_move(aa, pos);
 	    }
 	    popgo();
 	  }
@@ -948,7 +948,7 @@ find_worm_attacks_and_defenses()
 		  || (acode == KO_B && (worm[pos].defend_code == 0
 					|| worm[pos].defend_code == KO_B))
 		  || (acode == KO_A && worm[pos].defend_code == 0))
-		add_defense_move(I(aa), J(aa), m, n);
+		add_defense_move(aa, pos);
 	      popgo();
 	    }
 	}
@@ -1006,7 +1006,7 @@ find_worm_threats()
 	    if (trymove(aa, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
 	      /* FIXME: Support ko also. */
 	      if (attack(pos, NULL) == WIN)
-		add_attack_threat_move(I(aa), J(aa), m, n);
+		add_attack_threat_move(aa, POS(m, n));
 	      popgo();
 	    }
 
@@ -1022,7 +1022,7 @@ find_worm_threats()
 	      if (trymove(bb, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
 		/* FIXME: Support ko also. */
 		if (attack(pos, NULL) == WIN)
-		  add_attack_threat_move(I(bb), J(bb), m, n);
+		  add_attack_threat_move(bb, POS(m, n));
 		popgo();
 	      }
 	    }
@@ -1049,7 +1049,7 @@ find_worm_threats()
 	    /* FIXME: Support ko also. */
 	    if (attack(pos, NULL) == WIN
 		&& find_defense(pos, NULL) == WIN)
-	      add_defense_threat_move(I(aa), J(aa), m, n);
+	      add_defense_threat_move(aa, POS(m, n));
 	    popgo();
 	  }
 
@@ -1066,7 +1066,7 @@ find_worm_threats()
 	      /* FIXME: Support ko also. */
 	      if (attack(pos, NULL) == WIN
 		  && find_defense(pos, NULL) == WIN)
-		add_defense_threat_move(I(bb), J(bb), m, n);
+		add_defense_threat_move(bb, POS(m, n));
 	      popgo();
 	    }
 	  }
@@ -1509,7 +1509,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
       if (countlib(aa) > 4)
 	continue;
 
-      if (attack_move_known(ti, tj, I(aa), J(aa)))
+      if (attack_move_known(move, aa))
 	continue;
 
       /* No defenses are known at this time, so defend_code is always 0. */
@@ -1559,7 +1559,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
 	if (dcode != WIN) {
 	  propagate_worm(aa);
-	  add_attack_move(ti, tj, I(aa), J(aa));
+	  add_attack_move(move, aa);
 	}
       }
     }
@@ -1618,7 +1618,7 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
       aa = worm[POS(x, y)].origin;
 
       if (worm[aa].attack_code == 0
-	  || defense_move_known(ti, tj, I(aa), J(aa)))
+	  || defense_move_known(move, aa))
 	continue;
       
       /* FIXME: Don't try to defend the same string more than once.
@@ -1655,7 +1655,7 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
 	if (acode != WIN) {
 	  propagate_worm(aa);
-	  add_defense_move(ti, tj, I(aa), J(aa));
+	  add_defense_move(move, aa);
 	}
       }
     }

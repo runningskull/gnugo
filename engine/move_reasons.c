@@ -260,13 +260,13 @@ find_eye(int eye, int color)
  * (a worm).
  */
 void
-add_lunch(int ai, int aj, int bi, int bj)
+add_lunch(int eater, int food)
 {
   int k;
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
-  int worm1   = find_worm(worm[POS(bi, bj)].origin);
-  ASSERT_ON_BOARD2(ai, aj);
-  ASSERT_ON_BOARD2(bi, bj);
+  int dragon1 = find_dragon(dragon[eater].origin);
+  int worm1   = find_worm(worm[food].origin);
+  ASSERT_ON_BOARD1(eater);
+  ASSERT_ON_BOARD1(food);
   
   for (k = 0; k < next_lunch; k++)
     if ((lunch_dragon[k] == dragon1) && (lunch_worm[k] == worm1))
@@ -285,13 +285,13 @@ add_lunch(int ai, int aj, int bi, int bj)
  * of eater (a dragon) and food (a worm).  
  */
 void
-remove_lunch(int ai, int aj, int bi, int bj)
+remove_lunch(int eater, int food)
 {
   int k;
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
-  int worm1   = find_worm(worm[POS(bi, bj)].origin);
-  ASSERT_ON_BOARD2(ai, aj);
-  ASSERT_ON_BOARD2(bi, bj);
+  int dragon1 = find_dragon(dragon[eater].origin);
+  int worm1   = find_worm(worm[food].origin);
+  ASSERT_ON_BOARD1(eater);
+  ASSERT_ON_BOARD1(food);
   
   for (k = 0; k < next_lunch; k++)
     if ((lunch_dragon[k] == dragon1) && (lunch_worm[k] == worm1))
@@ -330,7 +330,7 @@ find_reason(int type, int what)
 }
 
 /*
- * Add a move reason for (ti, tj) if it's not already there or the
+ * Add a move reason for (pos) if it's not already there or the
  * table is full.
  */ 
 static void
@@ -357,7 +357,7 @@ add_move_reason(int pos, int type, int what)
 }
 
 /*
- * Remove a move reason for (ti, tj). Ignore silently if the reason
+ * Remove a move reason for (pos). Ignore silently if the reason
  * wasn't there.
  */ 
 static void
@@ -411,31 +411,31 @@ move_reason_known(int pos, int type, int what)
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it attacks the worm
- * at (ai, aj).
+ * Add to the reasons for the move at (pos) that it attacks the worm
+ * at (ww).
  */
 void
-add_attack_move(int ti, int tj, int ai, int aj)
+add_attack_move(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), ATTACK_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  add_move_reason(pos, ATTACK_MOVE, worm_number);
 }
 
 /* Query whether an attack move is already known. */
 int
-attack_move_known(int ti, int tj, int ai, int aj)
+attack_move_known(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  return move_reason_known(POS(ti, tj), ATTACK_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  return move_reason_known(pos, ATTACK_MOVE, worm_number);
 }
 
 /*
- * Remove from the reasons for the move at (ti, tj) that it attacks
- * the worm at (ai, aj). We do this by adding a NON_ATTACK move
+ * Remove from the reasons for the move at (pos) that it attacks
+ * the worm at (ww). We do this by adding a NON_ATTACK move
  * reason and wait until later to actually remove it. Otherwise it may
  * be added again.
  *
@@ -444,41 +444,41 @@ attack_move_known(int ti, int tj, int ai, int aj)
  * to actually remove it.
  */
 void
-remove_attack_move(int ti, int tj, int ai, int aj)
+remove_attack_move(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  if (move_reason_known(POS(ti, tj), ATTACK_MOVE, worm_number))
-    add_move_reason(POS(ti, tj), NON_ATTACK_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  if (move_reason_known(pos, ATTACK_MOVE, worm_number))
+    add_move_reason(pos, NON_ATTACK_MOVE, worm_number);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it defends the worm
- * at (ai, aj).
+ * Add to the reasons for the move at (pos) that it defends the worm
+ * at (ww).
  */
 void
-add_defense_move(int ti, int tj, int ai, int aj)
+add_defense_move(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), DEFEND_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  add_move_reason(pos, DEFEND_MOVE, worm_number);
 }
 
 /* Query whether a defense move is already known. */
 int
-defense_move_known(int ti, int tj, int ai, int aj)
+defense_move_known(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  return move_reason_known(POS(ti, tj), DEFEND_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  return move_reason_known(pos, DEFEND_MOVE, worm_number);
 }
 
 /*
- * Remove from the reasons for the move at (ti, tj) that it defends
- * the worm at (ai, aj). We do this by adding a NON_DEFEND move
+ * Remove from the reasons for the move at (pos) that it defends
+ * the worm at (ww). We do this by adding a NON_DEFEND move
  * reason and wait until later to actually remove it. Otherwise it may
  * be added again.
  *
@@ -487,112 +487,112 @@ defense_move_known(int ti, int tj, int ai, int aj)
  * to actually remove it.
  */
 void
-remove_defense_move(int ti, int tj, int ai, int aj)
+remove_defense_move(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  if (move_reason_known(POS(ti, tj), DEFEND_MOVE, worm_number))
-    add_move_reason(POS(ti, tj), NON_DEFEND_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  if (move_reason_known(pos, DEFEND_MOVE, worm_number))
+    add_move_reason(pos, NON_DEFEND_MOVE, worm_number);
 }
 
 
 /*
- * Add to the reasons for the move at (ti, tj) that it threatens to
- * attack the worm at (ai, aj). 
+ * Add to the reasons for the move at (pos) that it threatens to
+ * attack the worm at (ww). 
  */
 void
-add_attack_threat_move(int ti, int tj, int ai, int aj)
+add_attack_threat_move(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), ATTACK_THREAT_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  add_move_reason(pos, ATTACK_THREAT_MOVE, worm_number);
 }
 
 /* Query whether a threat to attack move is already known. */
 int
-attack_threat_move_known(int ti, int tj, int ai, int aj)
+attack_threat_move_known(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  return move_reason_known(POS(ti, tj), ATTACK_THREAT_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  return move_reason_known(pos, ATTACK_THREAT_MOVE, worm_number);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it defends the worm
- * at (ai, aj).
+ * Add to the reasons for the move at (pos) that it defends the worm
+ * at (ww).
  */
 void
-add_defense_threat_move(int ti, int tj, int ai, int aj)
+add_defense_threat_move(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), DEFEND_THREAT_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  add_move_reason(pos, DEFEND_THREAT_MOVE, worm_number);
 }
 
 /* Query whether a threat to defense move is already known. */
 int
-defense_threat_move_known(int ti, int tj, int ai, int aj)
+defense_threat_move_known(int pos, int ww)
 {
-  int worm_number = find_worm(worm[POS(ai, aj)].origin);
+  int worm_number = find_worm(worm[ww].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  return move_reason_known(POS(ti, tj), DEFEND_THREAT_MOVE, worm_number);
+  ASSERT_ON_BOARD1(ww);
+  return move_reason_known(pos, DEFEND_THREAT_MOVE, worm_number);
 }
 
 
 /*
- * Add to the reasons for the move at (ti, tj) that it connects the
- * dragons at (ai, aj) and (bi, bj). Require that the dragons are
+ * Add to the reasons for the move at (pos) that it connects the
+ * dragons at (dr1) and (dr2). Require that the dragons are
  * distinct.
  */
 void
-add_connection_move(int ti, int tj, int ai, int aj, int bi, int bj)
+add_connection_move(int pos, int dr1, int dr2)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
-  int dragon2 = find_dragon(dragon[POS(bi, bj)].origin);
+  int dragon1 = find_dragon(dragon[dr1].origin);
+  int dragon2 = find_dragon(dragon[dr2].origin);
   int connection;
 
-  ASSERT_ON_BOARD2(ai, aj);
-  ASSERT_ON_BOARD2(bi, bj);
-  gg_assert (dragon[POS(ai, aj)].color == dragon[POS(bi, bj)].color);
+  ASSERT_ON_BOARD1(dr1);
+  ASSERT_ON_BOARD1(dr2);
+  gg_assert (dragon[dr1].color == dragon[dr2].color);
   if (dragon1 == dragon2)
     return;
   connection = find_connection(dragon1, dragon2);
-  add_move_reason(POS(ti, tj), CONNECT_MOVE, connection);
+  add_move_reason(pos, CONNECT_MOVE, connection);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it cuts the
- * dragons at (ai, aj) and (bi, bj). Require that the dragons are
+ * Add to the reasons for the move at (pos) that it cuts the
+ * dragons at (dr1) and (dr2). Require that the dragons are
  * distinct.
  */
 void
-add_cut_move(int ti, int tj, int ai, int aj, int bi, int bj)
+add_cut_move(int pos, int dr1, int dr2)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
-  int dragon2 = find_dragon(dragon[POS(bi, bj)].origin);
+  int dragon1 = find_dragon(dragon[dr1].origin);
+  int dragon2 = find_dragon(dragon[dr2].origin);
   int connection;
 
-  ASSERT_ON_BOARD2(ai, aj);
-  ASSERT_ON_BOARD2(bi, bj);
-  gg_assert (dragon[POS(ai, aj)].color == dragon[POS(bi, bj)].color);
+  ASSERT_ON_BOARD1(dr1);
+  ASSERT_ON_BOARD1(dr2);
+  gg_assert (dragon[dr1].color == dragon[dr2].color);
   if (dragon1 == dragon2)
     return;
   connection = find_connection(dragon1, dragon2);
   
   /*
-   * Ignore the cut or connection if either (ai, aj) or (bi, bj)
+   * Ignore the cut or connection if either (dr1) or (dr2)
    * points to a tactically captured worm.
    */
-  if ((worm[POS(ai, aj)].attack_code != 0 && worm[POS(ai, aj)].defend_code == 0)
-      || (worm[POS(bi, bj)].attack_code != 0 && worm[POS(bi, bj)].defend_code == 0))
+  if ((worm[dr1].attack_code != 0 && worm[dr1].defend_code == 0)
+      || (worm[dr2].attack_code != 0 && worm[dr2].defend_code == 0))
     return;
   
-  add_move_reason(POS(ti, tj), CUT_MOVE, connection);
+  add_move_reason(pos, CUT_MOVE, connection);
 }
 
 /*
@@ -601,112 +601,113 @@ add_cut_move(int ti, int tj, int ai, int aj, int bi, int bj)
  * must *not* be played.
  */
 void
-add_antisuji_move(int ti, int tj)
+add_antisuji_move(int pos)
 {
-  add_move_reason(POS(ti, tj), ANTISUJI_MOVE, 0);
+  add_move_reason(pos, ANTISUJI_MOVE, 0);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it wins the
- * dragon (friendly or not) at (ai, aj) in semeai. Since it is
+ * Add to the reasons for the move at (pos) that it wins the
+ * dragon (friendly or not) at (dr) in semeai. Since it is
  * possible that in some semeai one player can kill but the
  * other can only make seki, it is possible that one dragon
  * is already alive in seki. Therefore separate move reasons
  * must be added for the two dragons.
  */
 void
-add_semeai_move(int ti, int tj, int ai, int aj)
+add_semeai_move(int pos, int dr)
 {
-  int the_dragon = find_dragon(dragon[POS(ai, aj)].origin);
+  int the_dragon = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), SEMEAI_MOVE, the_dragon);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, SEMEAI_MOVE, the_dragon);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that given two
+ * Add to the reasons for the move at (pos) that given two
  * moves in a row a move here can win the dragon (friendly or
- * not) at (ai, aj) in semeai. Such a move can be used as a 
+ * not) at (dr) in semeai. Such a move can be used as a 
  * ko threat, and it is also given some value due to uncertainty
  * in the counting of liberties.
  */
 void
-add_semeai_threat(int ti, int tj, int ai, int aj)
+add_semeai_threat(int pos, int dr)
 {
-  int the_dragon = find_dragon(dragon[POS(ai, aj)].origin);
+  int the_dragon = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), SEMEAI_THREAT, the_dragon);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, SEMEAI_THREAT, the_dragon);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it's the vital
- * point for the eye space at (ai, aj) of color.
+ * Add to the reasons for the move at (pos) that it's the vital
+ * point for the eye space at (eyespace) of color.
  */
 void
-add_vital_eye_move(int ti, int tj, int ai, int aj, int color)
+add_vital_eye_move(int pos, int eyespace, int color)
 {
   int eye;
-  ASSERT_ON_BOARD2(ai, aj);
+
+  ASSERT_ON_BOARD1(eyespace);
   if (color == WHITE)
-    eye = find_eye(white_eye[POS(ai, aj)].origin, color);
+    eye = find_eye(white_eye[eyespace].origin, color);
   else
-    eye = find_eye(black_eye[POS(ai, aj)].origin, color);
-  add_move_reason(POS(ti, tj), VITAL_EYE_MOVE, eye);
+    eye = find_eye(black_eye[eyespace].origin, color);
+  add_move_reason(pos, VITAL_EYE_MOVE, eye);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it attacks
- * either (ai, aj) or (bi, bj) (e.g. a double atari). This move
+ * Add to the reasons for the move at (pos) that it attacks
+ * either (str1) or (str2) (e.g. a double atari). This move
  * reason is only used for double attacks on opponent stones.
  *
  * Before accepting the move reason, check that the worms are
  * distinct and that neither is undefendable.
  */
 void
-add_attack_either_move(int ti, int tj, int ai, int aj, int bi, int bj)
+add_attack_either_move(int pos, int str1, int str2)
 {
-  int worm1 = find_worm(worm[POS(ai, aj)].origin);
-  int worm2 = find_worm(worm[POS(bi, bj)].origin);
+  int worm1 = find_worm(worm[str1].origin);
+  int worm2 = find_worm(worm[str2].origin);
   int worm_pair;
 
-  ASSERT_ON_BOARD2(ai, aj);
-  ASSERT_ON_BOARD2(bi, bj);
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
   if (worm1 == worm2)
     return;
-  if (worm[POS(ai, aj)].attack_code != 0 && worm[POS(ai, aj)].defend_code == 0)
+  if (worm[str1].attack_code != 0 && worm[str2].defend_code == 0)
     return;
-  if (worm[POS(bi, bj)].attack_code != 0 && worm[POS(bi, bj)].defend_code == 0)
+  if (worm[str2].attack_code != 0 && worm[str2].defend_code == 0)
     return;
   worm_pair = find_worm_pair(worm1, worm2);
-  add_move_reason(POS(ti, tj), ATTACK_EITHER_MOVE, worm_pair);
+  add_move_reason(pos, ATTACK_EITHER_MOVE, worm_pair);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it defends
- * both (ai, aj) and (bi, bj) (e.g. from a double atari). This move
+ * Add to the reasons for the move at (pos) that it defends
+ * both (str1) and (str2) (e.g. from a double atari). This move
  * reason is only used for defense of own stones.
  */
 void
-add_defend_both_move(int ti, int tj, int ai, int aj, int bi, int bj)
+add_defend_both_move(int pos, int str1, int str2)
 {
-  int worm1 = find_worm(worm[POS(ai, aj)].origin);
-  int worm2 = find_worm(worm[POS(bi, bj)].origin);
+  int worm1 = find_worm(worm[str1].origin);
+  int worm2 = find_worm(worm[str2].origin);
   int worm_pair = find_worm_pair(worm1, worm2);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  ASSERT_ON_BOARD2(bi, bj);
-  add_move_reason(POS(ti, tj), DEFEND_BOTH_MOVE, worm_pair);
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  add_move_reason(pos, DEFEND_BOTH_MOVE, worm_pair);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it secures
+ * Add to the reasons for the move at (pos) that it secures
  * territory by blocking.
  */
 void
-add_block_territory_move(int ti, int tj)
+add_block_territory_move(int pos)
 {
-  add_move_reason(POS(ti, tj), BLOCK_TERRITORY_MOVE, 0);
+  add_move_reason(pos, BLOCK_TERRITORY_MOVE, 0);
 }
 
 /*
@@ -714,19 +715,19 @@ add_block_territory_move(int ti, int tj)
  * territory.
  */
 void
-add_expand_territory_move(int ti, int tj)
+add_expand_territory_move(int pos)
 {
-  add_move_reason(POS(ti, tj), EXPAND_TERRITORY_MOVE, 0);
+  add_move_reason(pos, EXPAND_TERRITORY_MOVE, 0);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it expands
+ * Add to the reasons for the move at (pos) that it expands
  * moyo.
  */
 void
-add_expand_moyo_move(int ti, int tj)
+add_expand_moyo_move(int pos)
 {
-  add_move_reason(POS(ti, tj), EXPAND_MOYO_MOVE, 0);
+  add_move_reason(pos, EXPAND_MOYO_MOVE, 0);
 }
 
 /*
@@ -739,19 +740,19 @@ add_expand_moyo_move(int ti, int tj)
  * shape contributions.
  */
 void
-add_shape_value(int ti, int tj, float value)
+add_shape_value(int pos, float value)
 {
-  ASSERT_ON_BOARD2(ti, tj);
+  ASSERT_ON_BOARD1(pos);
   if (value > 0.0) {
-    if (value > move[POS(ti, tj)].maxpos_shape)
-      move[POS(ti, tj)].maxpos_shape = value;
-    move[POS(ti, tj)].numpos_shape += 1;
+    if (value > move[pos].maxpos_shape)
+      move[pos].maxpos_shape = value;
+    move[pos].numpos_shape += 1;
   }
   else if (value < 0.0) {
     value = -value;
-    if (value > move[POS(ti, tj)].maxneg_shape)
-      move[POS(ti, tj)].maxneg_shape = value;
-    move[POS(ti, tj)].numneg_shape += 1;
+    if (value > move[pos].maxneg_shape)
+      move[pos].maxneg_shape = value;
+    move[pos].numneg_shape += 1;
   }
 }
 
@@ -759,9 +760,9 @@ add_shape_value(int ti, int tj, float value)
  * Flag that this move is worthwhile to play as a pure threat move.
  */
 void
-add_worthwhile_threat_move(int ti, int tj)
+add_worthwhile_threat_move(int pos)
 {
-  move[POS(ti, tj)].worthwhile_threat = 1;
+  move[pos].worthwhile_threat = 1;
 }
 
 /* 
@@ -795,71 +796,71 @@ compute_shape_factor(int pos)
 
 
 /*
- * Add to the reasons for the move at (ti, tj) that it attacks
- * the dragon (ai, aj) on a strategical level.
+ * Add to the reasons for the move at (pos) that it attacks
+ * the dragon (dr) on a strategical level.
  */
 void
-add_strategical_attack_move(int ti, int tj, int ai, int aj)
+add_strategical_attack_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), STRATEGIC_ATTACK_MOVE, dragon1);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, STRATEGIC_ATTACK_MOVE, dragon1);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it defends
- * the dragon (ai, aj) on a strategical level.
+ * Add to the reasons for the move at (pos) that it defends
+ * the dragon (dr) on a strategical level.
  */
 void
-add_strategical_defense_move(int ti, int tj, int ai, int aj)
+add_strategical_defense_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), STRATEGIC_DEFEND_MOVE, dragon1);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, STRATEGIC_DEFEND_MOVE, dragon1);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that the owl
- * code reports an attack on the dragon (ai, aj).
+ * Add to the reasons for the move at (pos) that the owl
+ * code reports an attack on the dragon (dr).
  */
 void
-add_owl_attack_move(int ti, int tj, int ai, int aj)
+add_owl_attack_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), OWL_ATTACK_MOVE, dragon1);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, OWL_ATTACK_MOVE, dragon1);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that the owl
- * code reports a defense of the dragon (ai, aj).
+ * Add to the reasons for the move at (pos) that the owl
+ * code reports a defense of the dragon (dr).
  */
 void
-add_owl_defense_move(int ti, int tj, int ai, int aj)
+add_owl_defense_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), OWL_DEFEND_MOVE, dragon1);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, OWL_DEFEND_MOVE, dragon1);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that the owl
- * code reports a move threatening to attack the dragon enemy (ai, aj).
- * That is, if the attacker is given two moves in a row, (ti, tj)
+ * Add to the reasons for the move at (pos) that the owl
+ * code reports a move threatening to attack the dragon enemy (dr).
+ * That is, if the attacker is given two moves in a row, (pos)
  * can be the first move.
  */
 void
-add_owl_attack_threat_move(int ti, int tj, int ai, int aj)
+add_owl_attack_threat_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), OWL_ATTACK_THREAT, dragon1);
-  add_worthwhile_threat_move(ti, tj);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, OWL_ATTACK_THREAT, dragon1);
+  add_worthwhile_threat_move(pos);
 }
 
 /* The owl code found the friendly dragon alive, or the unfriendly dragon
@@ -868,12 +869,12 @@ add_owl_attack_threat_move(int ti, int tj, int ai, int aj)
  */
 
 void
-add_owl_uncertain_defense_move(int ti, int tj, int ai, int aj)
+add_owl_uncertain_defense_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), UNCERTAIN_OWL_DEFENSE, dragon1);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, UNCERTAIN_OWL_DEFENSE, dragon1);
 }
 
 /* The owl code found the opponent dragon alive, or the friendly
@@ -882,28 +883,28 @@ add_owl_uncertain_defense_move(int ti, int tj, int ai, int aj)
  */
 
 void
-add_owl_uncertain_attack_move(int ti, int tj, int ai, int aj)
+add_owl_uncertain_attack_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), UNCERTAIN_OWL_ATTACK, dragon1);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, UNCERTAIN_OWL_ATTACK, dragon1);
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that the owl
- * code reports a move threatening to rescue the dragon (ai, aj).
- * That is, if the defender is given two moves in a row, (ti, tj)
+ * Add to the reasons for the move at (pos) that the owl
+ * code reports a move threatening to rescue the dragon (dr).
+ * That is, if the defender is given two moves in a row, (pos)
  * can be the first move.
  */
 void
-add_owl_defense_threat_move(int ti, int tj, int ai, int aj)
+add_owl_defense_threat_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), OWL_DEFENSE_THREAT, dragon1);
-  add_worthwhile_threat_move(ti, tj);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, OWL_DEFENSE_THREAT, dragon1);
+  add_worthwhile_threat_move(pos);
 }
 
 /* Add to the reasons for the move at (ti, tj) that it captures
@@ -912,9 +913,9 @@ add_owl_defense_threat_move(int ti, int tj, int ai, int aj)
  * permitted per move.
  */
 void
-add_my_atari_atari_move(int ti, int tj, int size)
+add_my_atari_atari_move(int pos, int size)
 {
-  add_move_reason(POS(ti, tj), MY_ATARI_ATARI_MOVE, size);
+  add_move_reason(pos, MY_ATARI_ATARI_MOVE, size);
 }
 
 /* Add to the reasons for the move at (ti, tj) that an opponent move there
@@ -923,143 +924,143 @@ add_my_atari_atari_move(int ti, int tj, int size)
  * by the defender is safe---presumably it defends the threat.
  * Only one such move reason is permitted per move.  */
 void
-add_your_atari_atari_move(int ti, int tj, int size)
+add_your_atari_atari_move(int pos, int size)
 {
-  add_move_reason(POS(ti, tj), YOUR_ATARI_ATARI_MOVE, size);
+  add_move_reason(pos, YOUR_ATARI_ATARI_MOVE, size);
 }
 
 
 /*
- * Add to the reasons for the move at (ti, tj) that the owl
- * code reports a move threatening to defend the dragon enemy (ai, aj),
- * and that (ti, tj) is a move which attacks the dragon. 
- * That is, if the defender is given two moves in a row, (ti, tj)
- * can be the first move. Hopefully playing at (ti, tj) makes it harder 
+ * Add to the reasons for the move at (pos) that the owl
+ * code reports a move threatening to defend the dragon enemy (dr),
+ * and that (pos) is a move which attacks the dragon. 
+ * That is, if the defender is given two moves in a row, (pos)
+ * can be the first move. Hopefully playing at (pos) makes it harder 
  * for the dragon to live.
  */
 void
-add_owl_prevent_threat_move(int ti, int tj, int ai, int aj)
+add_owl_prevent_threat_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[POS(ai, aj)].origin);
+  int dragon1 = find_dragon(dragon[dr].origin);
 
-  ASSERT_ON_BOARD2(ai, aj);
-  add_move_reason(POS(ti, tj), OWL_PREVENT_THREAT, dragon1);
+  ASSERT_ON_BOARD1(dr);
+  add_move_reason(pos, OWL_PREVENT_THREAT, dragon1);
 }
 
 /*
  * Add value of followup moves. 
  */
 void
-add_followup_value(int tt, float value)
+add_followup_value(int pos, float value)
 {
-  ASSERT_ON_BOARD1(tt);
-  if (value > move[tt].followup_value)
-    move[tt].followup_value = value;
+  ASSERT_ON_BOARD1(pos);
+  if (value > move[pos].followup_value)
+    move[pos].followup_value = value;
 }
 
 /*
  * Add value of inverse followup moves. 
  */
 void
-add_reverse_followup_value(int tt, float value)
+add_reverse_followup_value(int pos, float value)
 {
-  ASSERT_ON_BOARD1(tt);
-  if (value > move[tt].reverse_followup_value)
-    move[tt].reverse_followup_value = value;
+  ASSERT_ON_BOARD1(pos);
+  if (value > move[pos].reverse_followup_value)
+    move[pos].reverse_followup_value = value;
 }
 
 /*
  * Set a minimum allowed value for the move.
  */
 void
-set_minimum_move_value(int ti, int tj, float value)
+set_minimum_move_value(int pos, float value)
 {
-  ASSERT_ON_BOARD2(ti, tj);
-  if (value > move[POS(ti, tj)].min_value)
-    move[POS(ti, tj)].min_value = value;
+  ASSERT_ON_BOARD1(pos);
+  if (value > move[pos].min_value)
+    move[pos].min_value = value;
 }
 
 /*
  * Set a maximum allowed value for the move.
  */
 void
-set_maximum_move_value(int ti, int tj, float value)
+set_maximum_move_value(int pos, float value)
 {
-  ASSERT_ON_BOARD2(ti, tj);
-  if (value < move[POS(ti, tj)].max_value)
-    move[POS(ti, tj)].max_value = value;
+  ASSERT_ON_BOARD1(pos);
+  if (value < move[pos].max_value)
+    move[pos].max_value = value;
 }
 
 /*
  * Set a minimum allowed territorial value for the move.
  */
 void
-set_minimum_territorial_value(int ti, int tj, float value)
+set_minimum_territorial_value(int pos, float value)
 {
-  ASSERT_ON_BOARD2(ti, tj);
-  if (value > move[POS(ti, tj)].min_territory)
-    move[POS(ti, tj)].min_territory = value;
+  ASSERT_ON_BOARD1(pos);
+  if (value > move[pos].min_territory)
+    move[pos].min_territory = value;
 }
 
 /*
  * Set a maximum allowed territorial value for the move.
  */
 void
-set_maximum_territorial_value(int ti, int tj, float value)
+set_maximum_territorial_value(int pos, float value)
 {
-  ASSERT_ON_BOARD2(ti, tj);
-  if (value < move[POS(ti, tj)].max_territory)
-    move[POS(ti, tj)].max_territory = value;
+  ASSERT_ON_BOARD1(pos);
+  if (value < move[pos].max_territory)
+    move[pos].max_territory = value;
 }
 
 /* 
- * Add a point redistribution rule, sending the points from (ai, aj)
- * to (bi, bj). 
+ * Add a point redistribution rule, sending the points from (from)
+ * to (to). 
  */
 void
-add_replacement_move(int ai, int aj, int bi, int bj)
+add_replacement_move(int from, int to)
 {
-  int ci, cj;
+  int cc;
   int m, n;
+  int ii;
 
-  ASSERT_ON_BOARD2(ai, aj);
-  ASSERT_ON_BOARD2(bi, bj);
-  ci = I(replacement_map[POS(bi, bj)]);
-  cj = J(replacement_map[POS(bi, bj)]);
+  ASSERT_ON_BOARD1(from);
+  ASSERT_ON_BOARD1(to);
+  cc = replacement_map[to];
 
   /* First check for an incompatible redistribution rule. */
-  if (replacement_map[POS(ai, aj)] != NO_MOVE) {
-    int di = I(replacement_map[POS(ai, aj)]);
-    int dj = J(replacement_map[POS(ai, aj)]);
+  if (replacement_map[from] != NO_MOVE) {
+    int dd = replacement_map[from];
+
     /* Crash if the old rule isn't compatible with the new one. */
-    ASSERT2((bi == di && bj == dj)
-	   || (POS(bi, bj) == replacement_map[POS(di, dj)]), ai, aj);
+    ASSERT1(dd == to || to == replacement_map[dd], from);
     /* There already is a compatible redistribution in effect so we
      * have nothing more to do.
      */
     return;
   }
 
-  TRACE("Move at %m is replaced by %m.\n", ai, aj, bi, bj);    
+  TRACE("Move at %1m is replaced by %1m.\n", from, to);    
 
   /* Verify that we don't introduce a cyclic redistribution. */
-  if (ci == ai && cj == aj) {
+  if (cc == from) {
     gprintf("Cyclic point redistribution detected.\n");
-    ASSERT2(0, ai, aj);
+    ASSERT1(0, from);
   }
 
   /* Update the replacement map. Make sure that all replacements
    * always are directed immediately to the final destination.
    */
-  if (ci != -1)
-    replacement_map[POS(ai, aj)] = POS(ci, cj);
+  if (cc != NO_MOVE)
+    replacement_map[from] = cc;
   else
-    replacement_map[POS(ai, aj)] = POS(bi, bj);
+    replacement_map[from] = to;
   
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (replacement_map[POS(m, n)] == POS(ai, aj))
-	replacement_map[POS(m, n)] = replacement_map[POS(ai, aj)];
+      ii = POS(m, n);
+      if (replacement_map[ii] == from)
+	replacement_map[ii] = replacement_map[from];
     }
 }
 
@@ -1143,7 +1144,7 @@ find_more_attack_and_defense_moves(int color)
 		TRACE("%ofound extra point of defense of %1m at %1m\n", 
 		      aa, pos);
 		cursor_at_start_of_line = 1;
-		add_defense_move(I(pos), J(pos), I(aa), J(aa));
+		add_defense_move(pos, aa);
 	      }
 	    
 	    /* string of opponent color, see if there still is a defense,
@@ -1171,7 +1172,7 @@ find_more_attack_and_defense_moves(int color)
 		  TRACE("%ofound extra point of attack of %1m at %1m\n",
 			aa, pos);
 		  cursor_at_start_of_line = 1;
-		  add_attack_move(I(pos), J(pos), I(aa), J(aa));
+		  add_attack_move(pos, aa);
 		}
 	      }
 	  }
@@ -1363,7 +1364,7 @@ find_more_owl_attack_and_defense_moves(int color)
 		 && board[dd] == OTHER_COLOR(color)))
 	    && !move_reason_known(pos, OWL_ATTACK_MOVE, what)
 	    && owl_does_attack(m, n, I(dd), J(dd))) {
-	  add_owl_attack_move(m, n, I(dd), J(dd));
+	  add_owl_attack_move(POS(m, n), dd);
 	  TRACE("Move at %1m owl attacks %1m.\n", pos, dd);
 	}
 	
@@ -1373,7 +1374,7 @@ find_more_owl_attack_and_defense_moves(int color)
 		 && board[dd] == color))
 	    && !move_reason_known(pos, OWL_DEFEND_MOVE, what)
 	    && owl_does_defend(m, n, I(dd), J(dd))) {
-	  add_owl_defense_move(m, n, I(dd), J(dd));
+	  add_owl_defense_move(POS(m, n), dd);
 	  TRACE("Move at %1m owl defends %1m.\n", pos, dd);
 	}
       }
@@ -1513,10 +1514,10 @@ induce_secondary_move_reasons(int color)
 			&& DRAGON2(I(dd), J(dd)).safety != INVINCIBLE)
 		    || (DRAGON2(I(ee), J(ee)).safety != STRONGLY_ALIVE
 			&& DRAGON2(I(ee), J(ee)).safety != INVINCIBLE))
-		  add_connection_move(I(pos), J(pos), I(dd), J(dd), I(ee), J(ee));
+		  add_connection_move(pos, dd, ee);
 	      }
 	      else
-		add_cut_move(I(pos), J(pos), I(dd), J(dd), I(ee), J(ee));
+		add_cut_move(pos, dd, ee);
 	    }
 	  }
 	}
@@ -1565,10 +1566,10 @@ induce_secondary_move_reasons(int color)
 			&& DRAGON2(I(dd), J(dd)).safety != INVINCIBLE)
 		    || (DRAGON2(I(ee), J(ee)).safety != STRONGLY_ALIVE
 			&& DRAGON2(I(ee), J(ee)).safety != INVINCIBLE))
-		  add_connection_move(I(pos), J(pos), I(dd), J(dd), I(ee), J(ee));
+		  add_connection_move(pos, dd, ee);
 	      }
 	      else
-		add_cut_move(I(pos), J(pos), I(dd), J(dd), I(ee), J(ee));
+		add_cut_move(pos, dd, ee);
 	    }
 	  }
 	}

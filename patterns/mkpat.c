@@ -218,12 +218,12 @@ static struct autohelper_func autohelper_functions[] = {
   {"owl_topological_eye", 2, "owl_topological_eye(%ci,%cj,BOARD(%ci,%cj))"},
   {"obvious_false_oeye", 1, "obvious_false_eye(%ci,%cj,color)"},
   {"obvious_false_xeye", 1, "obvious_false_eye(%ci,%cj,OTHER_COLOR(color))"},
-  {"antisuji",        1, "add_antisuji_move(%ci,%cj)"},
-  {"add_connect_move",2, "add_connection_move(ti,tj,%ci,%cj,%ci,%cj)"},
-  {"add_cut_move",    2, "add_cut_move(ti,tj,%ci,%cj,%ci,%cj)"},
-  {"add_attack_either_move",2,"add_attack_either_move(ti,tj,%ci,%cj,%ci,%cj)"},
-  {"add_defend_both_move",2, "add_defend_both_move(ti,tj,%ci,%cj,%ci,%cj)"},
-  {"remove_attack",   2, "remove_attack_move(%ci,%cj,%ci,%cj)"},
+  {"antisuji",        1, "add_antisuji_move(POS(%ci,%cj))"},
+  {"add_connect_move",2, "add_connection_move(POS(ti,tj),POS(%ci,%cj),POS(%ci,%cj))"},
+  {"add_cut_move",    2, "add_cut_move(POS(ti,tj),POS(%ci,%cj),POS(%ci,%cj))"},
+  {"add_attack_either_move",2,"add_attack_either_move(POS(ti,tj),POS(%ci,%cj),POS(%ci,%cj))"},
+  {"add_defend_both_move",2, "add_defend_both_move(POS(ti,tj),POS(%ci,%cj),POS(%ci,%cj))"},
+  {"remove_attack",   2, "remove_attack_move(POS(%ci,%cj),POS(%ci,%cj))"},
   {"same_dragon",     2, "same_dragon(%ci,%cj,%ci,%cj)"},
   {"same_worm",       2, "same_worm(%ci,%cj,%ci,%cj)"},
   {"dragonsize",      1, "dragon[POS(%ci, %cj)].size"},
@@ -248,7 +248,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"owl_threatens",   2, "owl_threatens_attack(%ci,%cj,%ci,%cj)"},
   {"o_aa_attack",     2, "atari_atari_try_combination(color,POS(%ci,%cj),POS(%ci,%cj))"},
   {"x_aa_attack",     2, "atari_atari_try_combination(OTHER_COLOR(color),POS(%ci,%cj),POS(%ci,%cj))"},
-  {"replace",         2, "add_replacement_move(%ci,%cj,%ci,%cj)"}
+  {"replace",         2, "add_replacement_move(POS(%ci,%cj),POS(%ci,%cj))"}
 };
 
 

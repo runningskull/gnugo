@@ -173,7 +173,7 @@ make_dragons(int color, int stop_before_owl)
 
       /* Tell the move generation code about the lunch. */
       if (color != EMPTY)
-	add_lunch(m, n, i, j);
+	add_lunch(POS(m, n), POS(i, j));
 	
       /* If several lunches are found, we pick the juiciest.
        * First maximize cutstone, then minimize liberties.

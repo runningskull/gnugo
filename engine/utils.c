@@ -93,9 +93,9 @@ change_defense(int str, int tpos, int dcode)
   propagate_worm(origin);
 
   if (tpos != 0)
-    add_defense_move(I(tpos), J(tpos), I(origin), J(origin));
+    add_defense_move(tpos, origin);
   else if (dpos != 0)
-    remove_defense_move(I(str), J(str), I(origin), J(origin));
+    remove_defense_move(str, origin);
 }
 
 
@@ -127,9 +127,9 @@ change_attack(int str, int tpos, int acode)
   propagate_worm(origin);
 
   if (tpos != 0)
-    add_attack_move(I(tpos), J(tpos), I(origin), J(origin));
+    add_attack_move(tpos, origin);
   else if (apos != 0)
-    remove_attack_move(I(apos), J(apos), I(origin), J(origin));
+    remove_attack_move(apos, origin);
 }
 
 

@@ -193,9 +193,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
     if (dragon[POS(ai, aj)].owl_defense_point != NO_MOVE
 	&& owl_does_attack(I(dragon[POS(ai, aj)].owl_defense_point),
 			   J(dragon[POS(ai, aj)].owl_defense_point), bi, bj)) {
-      add_owl_attack_move(I(dragon[POS(ai, aj)].owl_defense_point),
-			  J(dragon[POS(ai, aj)].owl_defense_point),
-			  bi, bj);
+      add_owl_attack_move(dragon[POS(ai, aj)].owl_defense_point,
+			  POS(bi, bj));
       DEBUG(DEBUG_SEMEAI, "added owl attack of %m at %1m\n",
 	    bi, bj, dragon[POS(ai, aj)].owl_defense_point);
       owl_code_sufficient = 1;
@@ -215,9 +214,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
     if (dragon[POS(bi, bj)].owl_attack_point != NO_MOVE
 	&& owl_does_defend(I(dragon[POS(bi, bj)].owl_attack_point),
 			   J(dragon[POS(bi, bj)].owl_attack_point), ai, aj)) {
-      add_owl_defense_move(I(dragon[POS(bi, bj)].owl_attack_point),
-			   J(dragon[POS(bi, bj)].owl_attack_point),
-			   ai, aj);
+      add_owl_defense_move(dragon[POS(bi, bj)].owl_attack_point,
+			   POS(ai, aj));
       DEBUG(DEBUG_SEMEAI, "added owl defense of %m at %1m\n",
 	    ai, aj, dragon[POS(bi, bj)].owl_attack_point);
       if (dragon[POS(ai, aj)].owl_status == DEAD) {
@@ -695,13 +693,13 @@ add_appropriate_semeai_moves(int ti, int tj, int ai, int aj, int bi, int bj,
 			     int margin_of_safety)
 {
   if (my_status == CRITICAL)
-    add_semeai_move(ti, tj, ai, aj);
+    add_semeai_move(POS(ti, tj), POS(ai, aj));
   else if (margin_of_safety==1)
-    add_semeai_threat(ti, tj, ai, aj);    
+    add_semeai_threat(POS(ti, tj), POS(ai, aj));
   if (your_status == CRITICAL)
-      add_semeai_move(ti, tj, bi, bj);
+      add_semeai_move(POS(ti, tj), POS(bi, bj));
   else if (margin_of_safety==1)
-    add_semeai_threat(ti, tj, bi, bj);
+    add_semeai_threat(POS(ti, tj), POS(bi, bj));
 }
 
 
