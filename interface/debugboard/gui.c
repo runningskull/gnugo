@@ -70,61 +70,61 @@ display_worm(Position *pos, int i, int j)
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s worm   ",
 	     location_to_string2(i, j),
-	     color_to_string(worm[i][j].color));
+	     color_to_string(worm[POS(i, j)].color));
   gg_wprintw(info_window, "(origin %s) ",
-	     location_to_string(worm[i][j].origin));
+	     location_to_string(worm[POS(i, j)].origin));
 
   wmove(info_window, 3, 16);
   gg_wprintw(info_window, "%3d  %5.3f ",
-	     worm[i][j].size, worm[i][j].effective_size);
+	     worm[POS(i, j)].size, worm[POS(i, j)].effective_size);
 
   wmove(info_window, 6, 16);
   gg_wprintw(info_window, "%3d %3d %3d %3d ", 
-	     worm[i][j].liberties, worm[i][j].liberties2,
-	     worm[i][j].liberties3, worm[i][j].liberties4);
+	     worm[POS(i, j)].liberties, worm[POS(i, j)].liberties2,
+	     worm[POS(i, j)].liberties3, worm[POS(i, j)].liberties4);
 
   wmove(info_window, 8, 18);
-  gg_wprintw(info_window, "%d", worm[i][j].cutstone);
+  gg_wprintw(info_window, "%d", worm[POS(i, j)].cutstone);
   wmove(info_window, 9, 18);
-  gg_wprintw(info_window, "%d", worm[i][j].cutstone2);
+  gg_wprintw(info_window, "%d", worm[POS(i, j)].cutstone2);
   wmove(info_window, 10, 18);
-  gg_wprintw(info_window, "%d", worm[i][j].genus);
+  gg_wprintw(info_window, "%d", worm[POS(i, j)].genus);
 
   wmove(info_window, 3, 55);
-  if (worm[i][j].attack_point == 0)
+  if (worm[POS(i, j)].attack_point == 0)
     gg_wprintw(info_window, "--- [code %d]",
-	       worm[i][j].attack_code);
+	       worm[POS(i, j)].attack_code);
   else
     gg_wprintw(info_window, "%3s [code %d]", 
-	    location_to_string(worm[i][j].attack_point),
-	    worm[i][j].attack_code);
+	    location_to_string(worm[POS(i, j)].attack_point),
+	    worm[POS(i, j)].attack_code);
   
   wmove(info_window, 4, 55);
-  if (worm[i][j].defense_point == 0)
+  if (worm[POS(i, j)].defense_point == 0)
     gg_wprintw(info_window, "--- [code %d]",
-	       worm[i][j].defend_code);
+	       worm[POS(i, j)].defend_code);
   else
     gg_wprintw(info_window, "%3s [code %d]", 
-	    location_to_string(worm[i][j].defense_point),
-	    worm[i][j].defend_code);
+	    location_to_string(worm[POS(i, j)].defense_point),
+	    worm[POS(i, j)].defend_code);
 
   wmove(info_window, 5, 55);
-  if (worm[i][j].lunch == NO_MOVE)
+  if (worm[POS(i, j)].lunch == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
-    gg_wprintw(info_window, "%3s", location_to_string(worm[i][j].lunch));
+    gg_wprintw(info_window, "%3s", location_to_string(worm[POS(i, j)].lunch));
 
   wmove(info_window, 7, 55);
   gg_wprintw(info_window, "%s         ", 
-	     status_to_string(worm[i][j].unconditional_status));
+	     status_to_string(worm[POS(i, j)].unconditional_status));
   /* FIXME: Is status_to_string() correct here? */
 
   wmove(info_window, 8, 49);
   gg_wprintw(info_window, "                          ");
   wmove(info_window, 8, 49);
-  if (worm[i][j].inessential)
+  if (worm[POS(i, j)].inessential)
     gg_wprintw(info_window, "inessential ");
-  if (worm[i][j].invincible)
+  if (worm[POS(i, j)].invincible)
     gg_wprintw(info_window, "invincible ");
 
   wrefresh(info_window);
@@ -179,7 +179,7 @@ prepare_dragons_tab()
 void
 display_dragon(int i, int j)
 {
-  struct dragon_data *d = &dragon[i][j];
+  struct dragon_data *d = &dragon[POS(i, j)];
   struct dragon_data2 *d2 = &(dragon2[d->id]);
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s dragon ",

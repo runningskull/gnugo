@@ -115,11 +115,11 @@ aftermath_genmove(int *i, int *j, int color,
   /* As a preparation we compute a distance map to the invincible strings. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n) == color && worm[m][n].unconditional_status == ALIVE)
+      if (BOARD(m, n) == color && worm[POS(m, n)].unconditional_status == ALIVE)
 	distance[m][n] = 0;
       else if (!do_capture_dead_stones
 	       && BOARD(m, n) == other 
-	       && worm[m][n].unconditional_status == DEAD)
+	       && worm[POS(m, n)].unconditional_status == DEAD)
 	distance[m][n] = 0;
       else
 	distance[m][n] = -1;
@@ -270,7 +270,7 @@ aftermath_genmove(int *i, int *j, int color,
     m = I(pos);
     n = J(pos);
     if (board[pos] == other
-	&& worm[m][n].unconditional_status != DEAD
+	&& worm[POS(m, n)].unconditional_status != DEAD
 	&& countlib(pos) == 1
 	&& ((ON_BOARD(SOUTH(pos))    && distance[m+1][n] == 0)
 	    || (ON_BOARD(WEST(pos))  && distance[m][n-1] == 0)
@@ -422,10 +422,10 @@ aftermath_genmove(int *i, int *j, int color,
 	}
 	
 	if (BOARD(m+dm, n+dn) == other) {
-	  int origin = dragon[m+dm][n+dn].origin;
+	  int origin = dragon[POS(m+dm, n+dn)].origin;
 
 	  if (k < 4) {
-	    if (dragon[m+dm][n+dn].matcher_status == ALIVE) {
+	    if (dragon[POS(m+dm, n+dn)].matcher_status == ALIVE) {
 	      safety = DEAD;
 	      break;
 	    }
@@ -435,7 +435,7 @@ aftermath_genmove(int *i, int *j, int color,
 	    }
 	  }
 
-	  if (!mx[origin] && dragon[m+dm][n+dn].matcher_status == DEAD) {
+	  if (!mx[origin] && dragon[POS(m+dm, n+dn)].matcher_status == DEAD) {
 	    bonus++;
 	    if (k < 4 
 		&& countlib2(m+dm, n+dn) <= 2 
@@ -451,14 +451,14 @@ aftermath_genmove(int *i, int *j, int color,
 	  dragoni[m][n] = m+dm;
 	  dragonj[m][n] = n+dn;
 
-	  if (safety == UNKNOWN && dragon[m+dm][n+dn].matcher_status == ALIVE)
+	  if (safety == UNKNOWN && dragon[POS(m+dm, n+dn)].matcher_status == ALIVE)
 	    safety = ALIVE;
 
 	  if (DRAGON2(m+dm, n+dn).safety == INVINCIBLE)
 	    safety = INVINCIBLE;
 	  
 	  if (k < 4) {
-	    int apos = worm[m+dm][n+dn].origin;
+	    int apos = worm[POS(m+dm, n+dn)].origin;
 	    
 	    if (!mx[apos]) {
 	      own_worms++;
@@ -480,7 +480,7 @@ aftermath_genmove(int *i, int *j, int color,
 		if (!ON_BOARD(apos+d))
 		  continue;
 		if (board[apos+d] == other
-		    && dragon[I(apos+d)][J(apos+d)].matcher_status == DEAD)
+		    && dragon[apos+d].matcher_status == DEAD)
 		  important = 1;
 		else if (board[apos+d] == EMPTY
 		    && !is_self_atari(apos+d, other))
@@ -583,9 +583,9 @@ aftermath_genmove(int *i, int *j, int color,
 	if (!ON_BOARD2(m+dm, n+dn))
 	  continue;
 	if (BOARD(m+dm, n+dn) == other 
-	    && dragon[m+dm][n+dn].matcher_status != ALIVE
+	    && dragon[POS(m+dm, n+dn)].matcher_status != ALIVE
 	    && (do_capture_dead_stones 
-		|| worm[m+dm][n+dn].unconditional_status != DEAD)
+		|| worm[POS(m+dm, n+dn)].unconditional_status != DEAD)
 	    && DRAGON2(m+dm, n+dn).safety != INESSENTIAL) {
 	  ai = m + dm;
 	  aj = n + dn;
@@ -711,13 +711,13 @@ aftermath_genmove(int *i, int *j, int color,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
       if (BOARD(m, n) == other
-	  && (worm[m][n].unconditional_status == UNKNOWN
+	  && (worm[POS(m, n)].unconditional_status == UNKNOWN
 	      || do_capture_dead_stones)
 	  && (DRAGON2(m, n).safety == DEAD
 	      || DRAGON2(m, n).safety == TACTICALLY_DEAD)
-	  && worm[m][n].attack_code != 0) {
-	*i = I(worm[m][n].attack_point);
-	*j = J(worm[m][n].attack_point);
+	  && worm[POS(m, n)].attack_code != 0) {
+	*i = I(worm[POS(m, n)].attack_point);
+	*j = J(worm[POS(m, n)].attack_point);
 	return 1;
       }
       

@@ -815,10 +815,10 @@ atari_atari(int color, int *move, int save_verbose)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (BOARD(m, n) == other) {
-	if (dragon[m][n].matcher_status == DEAD)
+	if (dragon[POS(m, n)].matcher_status == DEAD)
 	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[m][n].attack_code != 0) {
-	  if (worm[m][n].defend_code != 0)
+	else if (worm[POS(m, n)].attack_code != 0) {
+	  if (worm[POS(m, n)].defend_code != 0)
 	    aa_status[POS(m, n)] = CRITICAL;
 	  else
 	    aa_status[POS(m, n)] = DEAD;
@@ -836,8 +836,8 @@ atari_atari(int color, int *move, int save_verbose)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
       if (BOARD(m, n) == other
-	  && worm[m][n].origin == POS(m, n)
-	  && worm[m][n].liberties == 2
+	  && worm[POS(m, n)].origin == POS(m, n)
+	  && worm[POS(m, n)].liberties == 2
 	  && aa_status[POS(m, n)] == ALIVE
 	  && !owl_substantial(m, n)) {
 	int ti, tj;
@@ -1176,10 +1176,10 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (BOARD(m, n) == color) {
-	if (dragon[m][n].matcher_status == DEAD)
+	if (dragon[POS(m, n)].matcher_status == DEAD)
 	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[m][n].attack_code != 0) {
-	  if (worm[m][n].defend_code != 0)
+	else if (worm[POS(m, n)].attack_code != 0) {
+	  if (worm[POS(m, n)].defend_code != 0)
 	    aa_status[POS(m, n)] = CRITICAL;
 	  else
 	    aa_status[POS(m, n)] = DEAD;
@@ -1197,8 +1197,8 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
       if (BOARD(m, n) == color
-	  && worm[m][n].origin == POS(m, n)
-	  && worm[m][n].liberties == 2
+	  && worm[POS(m, n)].origin == POS(m, n)
+	  && worm[POS(m, n)].liberties == 2
 	  && aa_status[POS(m, n)] == ALIVE
 	  && !owl_substantial(m, n)) {
 	int ui, uj;
@@ -1304,10 +1304,10 @@ atari_atari_try_combination(int color, int apos, int bpos)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (BOARD(m, n) == other) {
-	if (dragon[m][n].matcher_status == DEAD)
+	if (dragon[POS(m, n)].matcher_status == DEAD)
 	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[m][n].attack_code != 0) {
-	  if (worm[m][n].defend_code != 0)
+	else if (worm[POS(m, n)].attack_code != 0) {
+	  if (worm[POS(m, n)].defend_code != 0)
 	    aa_status[POS(m, n)] = CRITICAL;
 	  else
 	    aa_status[POS(m, n)] = DEAD;
@@ -1326,8 +1326,8 @@ atari_atari_try_combination(int color, int apos, int bpos)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
       if (BOARD(m, n) == other
-	  && worm[m][n].origin == POS(m, n)
-	  && worm[m][n].liberties == 2
+	  && worm[POS(m, n)].origin == POS(m, n)
+	  && worm[POS(m, n)].liberties == 2
 	  && aa_status[POS(m, n)] == ALIVE
 	  && !owl_substantial(m, n)) {
 	int ti, tj;
@@ -6045,7 +6045,7 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
   for (k = BOARDMIN; k < BOARDMAX; k++) {
     if (!ON_BOARD(k))
       continue;
-    if (board[k] != EMPTY && worm[I(k)][J(k)].invincible)
+    if (board[k] != EMPTY && worm[k].invincible)
       active[k] = 0;
   }
   

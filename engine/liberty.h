@@ -586,7 +586,7 @@ struct worm_data {
   int unconditional_status; /* ALIVE, DEAD, WHITE_BORDER, BLACK_BORDER, UNKNOWN */
 };
 
-extern struct worm_data worm[MAX_BOARD][MAX_BOARD];
+extern struct worm_data worm[BOARDMAX];
 
 
 /*
@@ -612,7 +612,7 @@ struct dragon_data {
   int matcher_status;  /* status used by pattern matching                    */
 };
 
-extern struct dragon_data dragon[MAX_BOARD][MAX_BOARD];
+extern struct dragon_data dragon[BOARDMAX];
 
 /* Supplementary data concerning a dragon. Only one copy is stored per
  * dragon in the dragon2 array.
@@ -643,8 +643,8 @@ extern struct dragon_data2 *dragon2;
 /* Macros for accessing the dragon2 data with board coordinates and
  * the dragon data with a dragon id.
  */
-#define DRAGON2(m, n) dragon2[dragon[m][n].id]
-#define DRAGON(d) dragon[I(dragon2[d].origin)][J(dragon2[d].origin)]
+#define DRAGON2(m, n) dragon2[dragon[POS(m, n)].id]
+#define DRAGON(d) dragon[POS(I(dragon2[d].origin), J(dragon2[d].origin))]
 
 struct aftermath_data {
   int white_captured;

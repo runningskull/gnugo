@@ -932,39 +932,39 @@ gtp_dragon_status(char *s, int id)
   
   /* FIXME: We should also call the semeai module. */
 
-  if (dragon[i][j].owl_status == UNCHECKED) {
-    if (dragon[i][j].status == ALIVE)
+  if (dragon[POS(i, j)].owl_status == UNCHECKED) {
+    if (dragon[POS(i, j)].status == ALIVE)
       return gtp_success(id, "alive");
   
-    if (dragon[i][j].status == DEAD)
+    if (dragon[POS(i, j)].status == DEAD)
       return gtp_success(id, "dead");
   
-    if (dragon[i][j].status == UNKNOWN)
+    if (dragon[POS(i, j)].status == UNKNOWN)
       return gtp_success(id, "unknown");
 
-    assert(dragon[i][j].status == CRITICAL); /* Only remaining possibility. */
+    assert(dragon[POS(i, j)].status == CRITICAL); /* Only remaining possibility. */
     return gtp_success(id, "critical");
   }
 
   /* Owl code active. */
-  if (dragon[i][j].owl_status == ALIVE)
+  if (dragon[POS(i, j)].owl_status == ALIVE)
     return gtp_success(id, "alive");
   
-  if (dragon[i][j].owl_status == DEAD)
+  if (dragon[POS(i, j)].owl_status == DEAD)
     return gtp_success(id, "dead");
   
-  if (dragon[i][j].owl_status == UNKNOWN)
+  if (dragon[POS(i, j)].owl_status == UNKNOWN)
     return gtp_success(id, "unknown");
   
-  assert(dragon[i][j].owl_status == CRITICAL);
+  assert(dragon[POS(i, j)].owl_status == CRITICAL);
   /* Status critical, need to return attack and defense point as well. */
   gtp_printid(id, GTP_SUCCESS);
   gtp_printf("critical ");
-  gtp_print_vertex(I(dragon[i][j].owl_attack_point),
-		   J(dragon[i][j].owl_attack_point));
+  gtp_print_vertex(I(dragon[POS(i, j)].owl_attack_point),
+		   J(dragon[POS(i, j)].owl_attack_point));
   gtp_printf(" ");
-  gtp_print_vertex(I(dragon[i][j].owl_defense_point),
-		   J(dragon[i][j].owl_defense_point));
+  gtp_print_vertex(I(dragon[POS(i, j)].owl_defense_point),
+		   J(dragon[POS(i, j)].owl_defense_point));
   return gtp_finish_response();
 }
 
@@ -997,7 +997,7 @@ gtp_same_dragon(char *s, int id)
   examine_position(BLACK, EXAMINE_DRAGONS);
   verbose = save_verbose;
   
-  return gtp_success(id, "%d", dragon[ai][aj].id == dragon[bi][bj].id);
+  return gtp_success(id, "%d", dragon[POS(ai, aj)].id == dragon[POS(bi, bj)].id);
 }
 
 
@@ -1913,7 +1913,7 @@ gtp_worm_data(char *s, int id)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
       if (i == -1 || (m == i && n == j)) {
-	struct worm_data *w = &worm[m][n];
+	struct worm_data *w = &worm[POS(m, n)];
 	gtp_print_vertex(m, n);
 	gtp_printf(":\n");
 	gtp_mprintf("color           %C\n",  w->color);
@@ -1970,13 +1970,13 @@ gtp_worm_stones(char *s, int id)
     for (v = 0; v < board_size; v++) {
       if (BOARD(u, v) == EMPTY)
 	continue;
-      if (worm[u][v].origin != POS(u, v))
+      if (worm[POS(u, v)].origin != POS(u, v))
 	continue;
-      if (ON_BOARD2(i, j) && worm[i][j].origin != POS(u, v))
+      if (ON_BOARD2(i, j) && worm[POS(i, j)].origin != POS(u, v))
 	continue;
       for (m = 0; m < board_size; m++)
 	for (n = 0; n < board_size; n++)
-	  if (worm[m][n].origin == POS(u, v))
+	  if (worm[POS(m, n)].origin == POS(u, v))
 	    gtp_mprintf("%m ", m, n);
       gtp_printf("\n");
     }
@@ -2005,7 +2005,7 @@ gtp_worm_cutstone(char *s, int id)
 
   examine_position(EMPTY, EXAMINE_WORMS);
 
-  return gtp_success(id, " %d", worm[i][j].cutstone);
+  return gtp_success(id, " %d", worm[POS(i, j)].cutstone);
 }
 
 /* Function:  Return the information in the dragon data structure.
@@ -2035,9 +2035,9 @@ gtp_dragon_data(char *s, int id)
 	if ((m == i && n == j)
 	    || (i == -1
 		&& BOARD(m, n) != EMPTY
-		&& dragon[m][n].origin == POS(m, n))) {
+		&& dragon[POS(m, n)].origin == POS(m, n))) {
 	  int k, ti, tj;
-	  struct dragon_data *d = &dragon[m][n];
+	  struct dragon_data *d = &dragon[POS(m, n)];
 	  struct dragon_data2 *d2 = &(dragon2[d->id]);
 	  gtp_print_vertex(m, n);
 	  gtp_printf(":\n");
@@ -2098,8 +2098,8 @@ gtp_dragon_data(char *s, int id)
 	  gtp_printf("strings: ");
 	  for (ti = 0; ti < board_size; ti++)
 	    for (tj = 0; tj < board_size; tj++)
-	      if (worm[ti][tj].origin == POS(ti, tj)
-		  && dragon[ti][tj].origin == dragon[m][n].origin)
+	      if (worm[POS(ti, tj)].origin == POS(ti, tj)
+		  && dragon[POS(ti, tj)].origin == dragon[POS(m, n)].origin)
 		gtp_mprintf("%m ", ti, tj);
 	  gtp_printf("\n");
 	}
@@ -2137,13 +2137,13 @@ gtp_dragon_stones(char *s, int id)
     for (v = 0; v < board_size; v++) {
       if (BOARD(u, v) == EMPTY)
 	continue;
-      if (dragon[u][v].origin != POS(u, v))
+      if (dragon[POS(u, v)].origin != POS(u, v))
 	continue;
-      if (ON_BOARD2(i, j) && dragon[i][j].origin != POS(u, v))
+      if (ON_BOARD2(i, j) && dragon[POS(i, j)].origin != POS(u, v))
 	continue;
       for (m = 0; m < board_size; m++)
 	for (n = 0; n < board_size; n++)
-	  if (dragon[m][n].origin == POS(u, v))
+	  if (dragon[POS(m, n)].origin == POS(u, v))
 	    gtp_mprintf("%m ", m, n);
       gtp_printf("\n");
     }

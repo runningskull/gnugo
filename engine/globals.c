@@ -123,8 +123,8 @@ int best_movej[10];
 /* Various statistics are collected here. */
 struct stats_data stats;
 
-struct worm_data      worm[MAX_BOARD][MAX_BOARD];
-struct dragon_data    dragon[MAX_BOARD][MAX_BOARD];
+struct worm_data      worm[BOARDMAX];
+struct dragon_data    dragon[BOARDMAX];
 int                   number_of_dragons;
 struct dragon_data2   *dragon2 = NULL;
 struct half_eye_data  half_eye[BOARDMAX];

@@ -88,8 +88,8 @@ do { \
   *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
 } while(0)
 
-#define ATTACK_MACRO(i,j) ((stackp==0) ? (worm[i][j].attack_code) : attack(POS(i,j),NULL))
-#define DEFEND_MACRO(i,j) ((stackp==0) ? (worm[i][j].defend_code) : find_defense(POS(i,j),NULL))
+#define ATTACK_MACRO(i,j) ((stackp==0) ? (worm[POS(i, j)].attack_code) : attack(POS(i,j),NULL))
+#define DEFEND_MACRO(i,j) ((stackp==0) ? (worm[POS(i, j)].defend_code) : find_defense(POS(i,j),NULL))
 #define DRAGON_WEAK(i, j) (DRAGON2(i, j).safety != ALIVE \
 			   && DRAGON2(i, j).safety != STRONGLY_ALIVE \
 			   && DRAGON2(i, j).safety != INVINCIBLE)

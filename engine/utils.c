@@ -41,12 +41,12 @@ void
 change_matcher_status(int m, int n, int status)
 {
   int i, j;
-  int origin = dragon[m][n].origin;
+  int origin = dragon[POS(m, n)].origin;
 
   for (i = 0; i < board_size; i++) 
     for (j = 0; j < board_size; j++) {
-      if (dragon[i][j].origin == origin)
-	dragon[i][j].matcher_status = status;
+      if (dragon[POS(i, j)].origin == origin)
+	dragon[POS(i, j)].matcher_status = status;
     }
 }
 
@@ -62,8 +62,8 @@ change_matcher_status(int m, int n, int status)
 void
 change_defense(int str, int tpos, int dcode)
 {
-  int origin = worm[I(str)][J(str)].origin;
-  int dpos   = worm[I(str)][J(str)].defense_point;  /* Old defense point. */
+  int origin = worm[str].origin;
+  int dpos   = worm[str].defense_point;  /* Old defense point. */
   
   gg_assert (stackp == 0);
 
@@ -77,19 +77,19 @@ change_defense(int str, int tpos, int dcode)
   gg_assert(tpos == 0 || board[tpos] == EMPTY);
   gg_assert(board[str] != EMPTY);
 
-  if (worm[I(str)][J(str)].attack_code != 0
-      && worm[I(str)][J(str)].defend_code != 0
+  if (worm[str].attack_code != 0
+      && worm[str].defend_code != 0
       && tpos == 0)
   {
     int m, n;
 
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
-	if (dragon[m][n].origin == dragon[I(str)][J(str)].origin)
-	  dragon[m][n].status = DEAD;
+	if (dragon[POS(m, n)].origin == dragon[str].origin)
+	  dragon[POS(m, n)].status = DEAD;
   }
-  worm[I(origin)][J(origin)].defend_code = dcode;
-  worm[I(origin)][J(origin)].defense_point = tpos;
+  worm[origin].defend_code = dcode;
+  worm[origin].defense_point = tpos;
   propagate_worm(I(origin), J(origin));
 
   if (tpos != 0)
@@ -107,8 +107,8 @@ change_defense(int str, int tpos, int dcode)
 void
 change_attack(int str, int tpos, int acode)
 {
-  int origin = worm[I(str)][J(str)].origin;
-  int apos   = worm[I(str)][J(str)].attack_point;  /* Old attack point. */
+  int origin = worm[str].origin;
+  int apos   = worm[str].attack_point;  /* Old attack point. */
 
   gg_assert(stackp == 0);
 
@@ -122,8 +122,8 @@ change_attack(int str, int tpos, int acode)
   gg_assert (tpos == 0 || board[tpos] == EMPTY);
   gg_assert (board[str] != EMPTY);
 
-  worm[I(origin)][J(origin)].attack_code  = acode;
-  worm[I(origin)][J(origin)].attack_point = tpos;
+  worm[origin].attack_code  = acode;
+  worm[origin].attack_point = tpos;
   propagate_worm(I(origin), J(origin));
 
   if (tpos != 0)
@@ -184,10 +184,10 @@ does_attack(int ti, int tj, int ai, int aj)
   int spos = NO_MOVE;
   
   if (stackp == 0) {
-    if (worm[ai][aj].attack_code != 0 
-	&& worm[ai][aj].defend_code == 0)
+    if (worm[POS(ai, aj)].attack_code != 0 
+	&& worm[POS(ai, aj)].defend_code == 0)
       return 0;
-    spos = worm[ai][aj].defense_point;
+    spos = worm[POS(ai, aj)].defense_point;
   }
   else {
     attack_and_defend(POS(ai, aj), &acode, NULL, &dcode, &spos);
@@ -230,10 +230,10 @@ does_defend(int ti, int tj, int ai, int aj)
   int spos = NO_MOVE;
 
   if (stackp == 0) {
-    if (worm[ai][aj].attack_code == 0)
+    if (worm[POS(ai, aj)].attack_code == 0)
       return 0;
     else
-      spos = worm[ai][aj].attack_point;
+      spos = worm[POS(ai, aj)].attack_point;
   }
   else if (!attack(POS(ai, aj), &spos))
     return 0;
@@ -281,7 +281,7 @@ somewhere(int color, int last_move, ...)
     aj = va_arg(ap, int);
 
     if (BOARD(ai, aj) == color && 
-	(stackp > 0 || dragon[ai][aj].matcher_status != DEAD))
+	(stackp > 0 || dragon[POS(ai, aj)].matcher_status != DEAD))
       return 1;
   }
 
@@ -573,7 +573,7 @@ find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)
 		&& is_same_worm(i+1, j-1, m, n))
 	    || (i < board_size-1 && j < board_size-1
 		&& is_same_worm(i+1, j+1, m, n)))
-	  if (worm[i][j].attack_code != 0 && !is_ko_point2(i, j)) {
+	  if (worm[POS(i, j)].attack_code != 0 && !is_ko_point2(i, j)) {
 	    /*
 	     * If several adjacent lunches are found, we pick the 
 	     * juiciest. First maximize cutstone, then minimize liberties. 
@@ -581,13 +581,13 @@ find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)
 	     * i.e. if stackp==0.
 	     */
 	    if (vi == -1
-		|| worm[i][j].cutstone > worm[vi][vj].cutstone 
-		|| (worm[i][j].cutstone == worm[vi][vj].cutstone 
-		    && worm[i][j].liberties < worm[vi][vj].liberties)) {
-	      vi = I(worm[i][j].origin);
-	      vj = J(worm[i][j].origin);
-	      if (ai) *ai = I(worm[i][j].attack_point);
-	      if (aj) *aj = J(worm[i][j].attack_point);
+		|| worm[POS(i, j)].cutstone > worm[POS(vi, vj)].cutstone 
+		|| (worm[POS(i, j)].cutstone == worm[POS(vi, vj)].cutstone 
+		    && worm[POS(i, j)].liberties < worm[POS(vi, vj)].liberties)) {
+	      vi = I(worm[POS(i, j)].origin);
+	      vj = J(worm[POS(i, j)].origin);
+	      if (ai) *ai = I(worm[POS(i, j)].attack_point);
+	      if (aj) *aj = J(worm[POS(i, j)].attack_point);
 	    }
 	  }
 
@@ -917,12 +917,12 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
     int bj = j + deltaj[k];
     if (ON_BOARD2(bi, bj)
 	&& BOARD(bi, bj) == color
-	&& liberties <= worm[bi][bj].liberties) {
+	&& liberties <= worm[POS(bi, bj)].liberties) {
       trouble = 1;
-      if (dragon[bi][bj].matcher_status == ALIVE
+      if (dragon[POS(bi, bj)].matcher_status == ALIVE
 	  && DRAGON2(bi, bj).safety != INVINCIBLE
 	  && DRAGON2(bi, bj).safety != STRONGLY_ALIVE
-	  && dragon[bi][bj].size >= size
+	  && dragon[POS(bi, bj)].size >= size
 	  && !owl_confirm_safety(i, j, bi, bj, di, dj)) {
 	verbose = save_verbose;
 	return 0;
@@ -945,11 +945,11 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
       for (n = 0; issafe && n < board_size; n++)
 	if (issafe
 	    && BOARD(m, n)
-	    && worm[m][n].origin == POS(m, n)
+	    && worm[POS(m, n)].origin == POS(m, n)
 	    && (m != i || n != j)) {
 	  if (BOARD(m, n) == color
-	      && worm[m][n].attack_code == 0
-	      && worm[m][n].size >= size
+	      && worm[POS(m, n)].attack_code == 0
+	      && worm[POS(m, n)].size >= size
 	      && attack(POS(m, n), NULL)) {
 	    if (di) {
 	      int  dpos;
@@ -961,9 +961,9 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 	    TRACE("After %m Worm at %m becomes attackable.\n", i, j, m, n);
 	  }
 	  else if (BOARD(m, n) == other
-		   && worm[m][n].attack_code != 0
-		   && worm[m][n].defend_code == 0
-		   && worm[m][n].size >= size
+		   && worm[POS(m, n)].attack_code != 0
+		   && worm[POS(m, n)].defend_code == 0
+		   && worm[POS(m, n)].size >= size
 		   && find_defense(POS(m, n), NULL)) {
 	    /* Also ask the owl code whether the string can live
 	     * strategically. To do this we need to temporarily undo

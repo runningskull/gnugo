@@ -42,7 +42,7 @@ living_neighbor(int m, int n, int color)
     int dm = deltai[k];
     int dn = deltaj[k];
     if (BOARD(m+dm, n+dn) == color
-	&& dragon[m+dm][n+dn].matcher_status != DEAD)
+	&& dragon[POS(m+dm, n+dn)].matcher_status != DEAD)
       return 1;
   }
 
@@ -72,8 +72,8 @@ analyze_neighbor(int m, int n, int *found_black, int *found_white)
       break;
 
     case BLACK:
-      if (!worm[m][n].inessential && DRAGON2(m, n).safety != INESSENTIAL) {
-	if (dragon[m][n].matcher_status == ALIVE)
+      if (!worm[POS(m, n)].inessential && DRAGON2(m, n).safety != INESSENTIAL) {
+	if (dragon[POS(m, n)].matcher_status == ALIVE)
 	  *found_black = 1;
 	else
 	  *found_white = 1;
@@ -81,8 +81,8 @@ analyze_neighbor(int m, int n, int *found_black, int *found_white)
       break;
 
     case WHITE:
-      if (!worm[m][n].inessential && DRAGON2(m, n).safety != INESSENTIAL) {
-	if (dragon[m][n].matcher_status == ALIVE)
+      if (!worm[POS(m, n)].inessential && DRAGON2(m, n).safety != INESSENTIAL) {
+	if (dragon[POS(m, n)].matcher_status == ALIVE)
 	  *found_white = 1;
 	else
 	  *found_black = 1;
@@ -122,10 +122,10 @@ fill_liberty(int *i, int *j, int color)
       if (BOARD(m, n) == EMPTY)
 	continue;
 
-      if (worm[m][n].inessential || DRAGON2(m, n).safety == INESSENTIAL)
+      if (worm[POS(m, n)].inessential || DRAGON2(m, n).safety == INESSENTIAL)
 	continue;
 
-      if (dragon[m][n].matcher_status != ALIVE) {
+      if (dragon[POS(m, n)].matcher_status != ALIVE) {
 	for (k = 0; k < 4; k++) {
 	  int di = deltai[k];
 	  int dj = deltaj[k];
@@ -134,7 +134,7 @@ fill_liberty(int *i, int *j, int color)
 	}
       }
       
-      if (dragon[m][n].matcher_status != DEAD) {
+      if (dragon[POS(m, n)].matcher_status != DEAD) {
 	for (k = 0; k < 12; k++) {
 	  int di = deltai[k%8];
 	  int dj = deltaj[k%8];
@@ -288,9 +288,9 @@ fill_liberty(int *i, int *j, int color)
 	  int dm = deltai[k];
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
-	      && worm[m+dm][n+dn].attack_code == WIN) {
-	    *i = I(worm[m+dm][n+dn].attack_point);
-	    *j = J(worm[m+dm][n+dn].attack_point);
+	      && worm[POS(m+dm, n+dn)].attack_code == WIN) {
+	    *i = I(worm[POS(m+dm, n+dn)].attack_point);
+	    *j = J(worm[POS(m+dm, n+dn)].attack_point);
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
 	    return 1;
 	  }
@@ -302,10 +302,10 @@ fill_liberty(int *i, int *j, int color)
 	  int dm = deltai[k];
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
-	      && worm[m+dm][n+dn].attack_code != 0
-	      && is_legal(worm[m+dm][n+dn].attack_point, color)) {
-	    *i = I(worm[m+dm][n+dn].attack_point);
-	    *j = J(worm[m+dm][n+dn].attack_point);
+	      && worm[POS(m+dm, n+dn)].attack_code != 0
+	      && is_legal(worm[POS(m+dm, n+dn)].attack_point, color)) {
+	    *i = I(worm[POS(m+dm, n+dn)].attack_point);
+	    *j = J(worm[POS(m+dm, n+dn)].attack_point);
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
 	    return 1;
 	  }
@@ -317,7 +317,7 @@ fill_liberty(int *i, int *j, int color)
 	  int dm = deltai[k];
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
-	      && worm[m+dm][n+dn].attack_code != 0) {
+	      && worm[POS(m+dm, n+dn)].attack_code != 0) {
 	    /* Just pick some other liberty. */
 	    int libs[2];
 	    if (findlib(POS(m+dm, n+dn), 2, libs) > 1) {

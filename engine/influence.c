@@ -353,9 +353,9 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       q->p[i][j] = BOARD(i, j);
       
       if (BOARD(i, j) != EMPTY) {
-	if (worm[i][j].attack_code == WIN
+	if (worm[POS(i, j)].attack_code == WIN
 	    && (OTHER_COLOR(q->p[i][j]) == color
-		|| worm[i][j].defend_code == 0)) {
+		|| worm[POS(i, j)].defend_code == 0)) {
 	  if (q->p[i][j] == WHITE)
 	    q->white_permeability[i][j] = 0.0;
 	  else
@@ -363,7 +363,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 	  q->p[i][j] = EMPTY;
 	}
 	else if (!dragons_known
-		 || dragon[i][j].id == -1
+		 || dragon[POS(i, j)].id == -1
 		 || DRAGON2(i, j).safety != DEAD) {
 	  if (q->p[i][j] == WHITE)
 	    q->black_permeability[i][j] = 0.0;
@@ -384,7 +384,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
        * stone will have the invalid dragon id -1.
        */
       if (BOARD(i, j) != EMPTY) {
-	if (!dragons_known || dragon[i][j].id == -1) {
+	if (!dragons_known || dragon[POS(i, j)].id == -1) {
 	  if (q->p[i][j] == WHITE)
 	    q->white_strength[i][j] = DEFAULT_STRENGTH;
 	  else if (q->p[i][j] == BLACK)
@@ -496,7 +496,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	    return; /* Match failed. */
 	}
 	else {
-	  if ((stackp == 0 && worm[x][y].attack_code != 0)
+	  if ((stackp == 0 && worm[POS(x, y)].attack_code != 0)
 	      || attack(POS(x, y), NULL) != 0)
 	    return; /* Match failed */
 	}
@@ -823,7 +823,7 @@ whose_moyo_restricted(struct influence_data *q, int m, int n)
 
   int territory_color = whose_territory(q, m, n);
 
-  if (worm[m][n].attack_code != 0 && worm[m][n].defend_code != 0)
+  if (worm[POS(m, n)].attack_code != 0 && worm[POS(m, n)].defend_code != 0)
     return EMPTY;
   
   /* default */

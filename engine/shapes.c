@@ -96,12 +96,12 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
        */
       if ((class & CLASS_O)
 	  && BOARD(x, y) == color
-	  && worm[x][y].attack_point != 0
+	  && worm[POS(x, y)].attack_point != 0
 	  && !does_defend(ti, tj, x, y))
 	return;
 
-      di = I(dragon[x][y].origin);
-      dj = J(dragon[x][y].origin);
+      di = I(dragon[POS(x, y)].origin);
+      dj = J(dragon[POS(x, y)].origin);
       if (BOARD(x, y) == color && my_ndragons < MAX_DRAGONS_PER_PATTERN) {
 	for (l = 0; l < my_ndragons; l++) {
 	  if (my_dragoni[l] == di && my_dragonj[l] == dj)
@@ -112,7 +112,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
            * rather the underlying worm) cannot be tactically
            * captured before adding it to the list of my_dragons.  
 	   */
-	  if (worm[x][y].attack_code == 0 || does_defend(ti, tj, x, y)) {
+	  if (worm[POS(x, y)].attack_code == 0 || does_defend(ti, tj, x, y)) {
 	    /* Ok, add the dragon to the list. */
 	    my_dragoni[l] = di;
 	    my_dragonj[l] = dj;

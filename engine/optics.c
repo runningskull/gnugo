@@ -585,9 +585,9 @@ is_lively(int owl_call, int i, int j)
   if (owl_call)
     result = owl_lively(i, j);
   else
-    result = (!worm[i][j].inessential
-	      && (worm[i][j].attack_code == 0
-		  || worm[i][j].defend_code != 0));
+    result = (!worm[POS(i, j)].inessential
+	      && (worm[POS(i, j)].attack_code == 0
+		  || worm[POS(i, j)].defend_code != 0));
 
   return result;
 }
@@ -661,13 +661,13 @@ false_margin(int i, int j, int color, int lively[MAX_BOARD][MAX_BOARD])
   
   if ((stackp == 0
        && ((   BOARD(i-1, j) == other && lively[i-1][j]
-	       && worm[i-1][j].attack_code == 0)
+	       && worm[POS(i-1, j)].attack_code == 0)
 	   || (BOARD(i+1, j) == other && lively[i+1][j]
-	       && worm[i+1][j].attack_code == 0)
+	       && worm[POS(i+1, j)].attack_code == 0)
 	   || (BOARD(i, j-1) == other && lively[i][j-1]
-	       && worm[i][j-1].attack_code == 0)
+	       && worm[POS(i, j-1)].attack_code == 0)
 	   || (BOARD(i, j+1) == other && lively[i][j+1]
-	       && worm[i][j+1].attack_code == 0)))
+	       && worm[POS(i, j+1)].attack_code == 0)))
       || (stackp > 0
 	  && ((BOARD(i-1, j) == other && lively[i-1][j] 
 	       && !attack(POS(i-1, j), NULL))
@@ -2159,12 +2159,12 @@ evaluate_diagonal_intersection(int m, int n, int color,
   else {
     if (stackp == 0) {
       if (BOARD(m, n) == other) {
-	if (worm[m][n].attack_code == 0)
+	if (worm[POS(m, n)].attack_code == 0)
 	  value = 2;
-	else if (worm[m][n].defend_code != 0) {
+	else if (worm[POS(m, n)].defend_code != 0) {
 	  value = 1;
-	  apos = worm[m][n].attack_point;
-	  dpos = worm[m][n].defense_point;
+	  apos = worm[POS(m, n)].attack_point;
+	  dpos = worm[POS(m, n)].defense_point;
 	}
       }
     }

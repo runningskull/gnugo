@@ -70,10 +70,10 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
       /* Look for distinct dragons. */
       if (pattern->patn[k].att == ATT_O) {
 	if (first_dragon == NO_MOVE)
-	  first_dragon = dragon[x][y].origin;
+	  first_dragon = dragon[POS(x, y)].origin;
 	else if (second_dragon == NO_MOVE
-		 && dragon[x][y].origin != first_dragon) {
-	  second_dragon = dragon[x][y].origin;
+		 && dragon[POS(x, y)].origin != first_dragon) {
+	  second_dragon = dragon[POS(x, y)].origin;
 	  /* A second dragon found, no need to continue looping. */
 	  break;
 	}
@@ -110,7 +110,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 	x += m;
 	y += n;
 
-	if (worm[x][y].attack_code == WIN
+	if (worm[POS(x, y)].attack_code == WIN
 	  && (pattern->movei == -1
 	      || !does_defend(stari, starj, x, y)))
 	  return; /* Match failed */
@@ -175,12 +175,12 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
      * can be attacked.
      */
     if ((pattern->class & CLASS_C) && (BOARD(x, y) == color)
-	&& (worm[x][y].attack_code == 0)) {
+	&& (worm[POS(x, y)].attack_code == 0)) {
       if (first_dragon == NO_MOVE)
-	first_dragon = dragon[x][y].origin;
+	first_dragon = dragon[POS(x, y)].origin;
       else if (second_dragon == NO_MOVE
-	       && dragon[x][y].origin != first_dragon) {
-	second_dragon = dragon[x][y].origin;
+	       && dragon[POS(x, y)].origin != first_dragon) {
+	second_dragon = dragon[POS(x, y)].origin;
 	/* A second dragon found, we amalgamate them at once. */
 	TRACE("Pattern %s joins dragons %1m, %1m\n",
 	      pattern->name, first_dragon, second_dragon);
@@ -189,7 +189,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 		     I(first_dragon), J(first_dragon));
 	/* Now look for another second dragon. */
 	second_dragon = NO_MOVE;
-	first_dragon = dragon[x][y].origin;
+	first_dragon = dragon[POS(x, y)].origin;
       }
     }
 

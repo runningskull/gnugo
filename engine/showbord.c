@@ -255,7 +255,7 @@ end_draw_board()
 static void 
 showchar(int i, int j, int empty, int xo)
 {
-  struct dragon_data *d = &(dragon[i][j]);  /* dragon data at i,j */
+  struct dragon_data *d = &(dragon[POS(i, j)]);  /* dragon data at i,j */
   int x = BOARD(i, j);
 
   if (x == EMPTY) {

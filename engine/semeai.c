@@ -76,9 +76,9 @@ semeai(int color)
       bj = J(DRAGON(d2).origin);
 
       /* Ignore inessential worms or dragons */
-      if (worm[ai][aj].inessential 
+      if (worm[POS(ai, aj)].inessential 
 	  || DRAGON2(ai, aj).safety == INESSENTIAL
-	  || worm[bi][bj].inessential 
+	  || worm[POS(bi, bj)].inessential 
 	  || DRAGON2(bi, bj).safety == INESSENTIAL)
 	continue;
 
@@ -101,19 +101,19 @@ liberty_of_dragon(int i, int j, int m, int n)
     return 0;
 
   if (i > 0
-      && dragon[i-1][j].origin == POS(m, n))
+      && dragon[POS(i-1, j)].origin == POS(m, n))
     return 1;
 
   if (i < board_size - 1
-      && dragon[i+1][j].origin == POS(m, n))
+      && dragon[POS(i+1, j)].origin == POS(m, n))
     return 1;
 
   if (j > 0
-      && dragon[i][j-1].origin == POS(m, n))
+      && dragon[POS(i, j-1)].origin == POS(m, n))
     return 1;
 
   if (j < board_size - 1
-      && dragon[i][j+1].origin == POS(m, n))
+      && dragon[POS(i, j+1)].origin == POS(m, n))
     return 1;
 
   return 0;
@@ -152,27 +152,27 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    * Correction: We can't add an owl defense move reason here because
    * this would be a defense of an opponent dragon.
    */
-  if (dragon[ai][aj].owl_status == CRITICAL
-      && (dragon[bi][bj].owl_status == CRITICAL
-	  || dragon[bi][bj].owl_status == DEAD)) {
-    if (dragon[bi][bj].owl_defense_point == dragon[ai][aj].owl_attack_point)
+  if (dragon[POS(ai, aj)].owl_status == CRITICAL
+      && (dragon[POS(bi, bj)].owl_status == CRITICAL
+	  || dragon[POS(bi, bj)].owl_status == DEAD)) {
+    if (dragon[POS(bi, bj)].owl_defense_point == dragon[POS(ai, aj)].owl_attack_point)
       return;
-    if (dragon[ai][aj].owl_attack_point != NO_MOVE
-	&& owl_does_defend(I(dragon[ai][aj].owl_attack_point),
-			   J(dragon[ai][aj].owl_attack_point), bi, bj)) {
+    if (dragon[POS(ai, aj)].owl_attack_point != NO_MOVE
+	&& owl_does_defend(I(dragon[POS(ai, aj)].owl_attack_point),
+			   J(dragon[POS(ai, aj)].owl_attack_point), bi, bj)) {
 #if 0
-      add_owl_defense_move(dragon[ai][aj].owl_attacki,
-			   dragon[ai][aj].owl_attackj,
+      add_owl_defense_move(dragon[POS(ai, aj)].owl_attacki,
+			   dragon[POS(ai, aj)].owl_attackj,
 			   bi, bj);
       DEBUG(DEBUG_SEMEAI, "added owl defense of %m at %m\n",
-	    bi, bj, dragon[ai][aj].owl_defendi, dragon[ai][aj].owl_defendj);
+	    bi, bj, dragon[POS(ai, aj)].owl_defendi, dragon[POS(ai, aj)].owl_defendj);
 #endif
-      if (dragon[bi][bj].owl_status == DEAD) {
+      if (dragon[POS(bi, bj)].owl_status == DEAD) {
 	for (m = 0; m < board_size; m++)
 	  for (n = 0; n < board_size; n++)
 	    if (BOARD(m, n) == BOARD(bi, bj) && same_dragon(m, n, bi, bj)) {
-	      dragon[m][n].owl_status = CRITICAL;
-	      dragon[m][n].matcher_status = CRITICAL;
+	      dragon[POS(m, n)].owl_status = CRITICAL;
+	      dragon[POS(m, n)].matcher_status = CRITICAL;
 	    }
 	DEBUG(DEBUG_SEMEAI,
 	      "changed owl_status and matcher_status of %m to CRITICAL\n",
@@ -186,18 +186,18 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    * dragon owl_does_attack your dragon, add another owl attack move
    * reason.
    */
-  if ((dragon[ai][aj].owl_status == CRITICAL)
-      && (dragon[bi][bj].owl_status == CRITICAL)) {
-    if (dragon[bi][bj].owl_attack_point == dragon[ai][aj].owl_defense_point)
+  if ((dragon[POS(ai, aj)].owl_status == CRITICAL)
+      && (dragon[POS(bi, bj)].owl_status == CRITICAL)) {
+    if (dragon[POS(bi, bj)].owl_attack_point == dragon[POS(ai, aj)].owl_defense_point)
       return;
-    if (dragon[ai][aj].owl_defense_point != NO_MOVE
-	&& owl_does_attack(I(dragon[ai][aj].owl_defense_point),
-			   J(dragon[ai][aj].owl_defense_point), bi, bj)) {
-      add_owl_attack_move(I(dragon[ai][aj].owl_defense_point),
-			  J(dragon[ai][aj].owl_defense_point),
+    if (dragon[POS(ai, aj)].owl_defense_point != NO_MOVE
+	&& owl_does_attack(I(dragon[POS(ai, aj)].owl_defense_point),
+			   J(dragon[POS(ai, aj)].owl_defense_point), bi, bj)) {
+      add_owl_attack_move(I(dragon[POS(ai, aj)].owl_defense_point),
+			  J(dragon[POS(ai, aj)].owl_defense_point),
 			  bi, bj);
       DEBUG(DEBUG_SEMEAI, "added owl attack of %m at %1m\n",
-	    bi, bj, dragon[ai][aj].owl_defense_point);
+	    bi, bj, dragon[POS(ai, aj)].owl_defense_point);
       owl_code_sufficient = 1;
     }
   }
@@ -207,25 +207,25 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    * owl_does_defend my dragon, add another owl defense move reason
    * and possibly change the owl status of my dragon to critical.
    */
-  if ((dragon[ai][aj].owl_status == CRITICAL
-       || dragon[ai][aj].owl_status == DEAD)
-      && dragon[bi][bj].owl_status == CRITICAL) {
-    if (dragon[bi][bj].owl_attack_point == dragon[ai][aj].owl_defense_point)
+  if ((dragon[POS(ai, aj)].owl_status == CRITICAL
+       || dragon[POS(ai, aj)].owl_status == DEAD)
+      && dragon[POS(bi, bj)].owl_status == CRITICAL) {
+    if (dragon[POS(bi, bj)].owl_attack_point == dragon[POS(ai, aj)].owl_defense_point)
       return;
-    if (dragon[bi][bj].owl_attack_point != NO_MOVE
-	&& owl_does_defend(I(dragon[bi][bj].owl_attack_point),
-			   J(dragon[bi][bj].owl_attack_point), ai, aj)) {
-      add_owl_defense_move(I(dragon[bi][bj].owl_attack_point),
-			   J(dragon[bi][bj].owl_attack_point),
+    if (dragon[POS(bi, bj)].owl_attack_point != NO_MOVE
+	&& owl_does_defend(I(dragon[POS(bi, bj)].owl_attack_point),
+			   J(dragon[POS(bi, bj)].owl_attack_point), ai, aj)) {
+      add_owl_defense_move(I(dragon[POS(bi, bj)].owl_attack_point),
+			   J(dragon[POS(bi, bj)].owl_attack_point),
 			   ai, aj);
       DEBUG(DEBUG_SEMEAI, "added owl defense of %m at %1m\n",
-	    ai, aj, dragon[bi][bj].owl_attack_point);
-      if (dragon[ai][aj].owl_status == DEAD) {
+	    ai, aj, dragon[POS(bi, bj)].owl_attack_point);
+      if (dragon[POS(ai, aj)].owl_status == DEAD) {
 	for (m = 0; m < board_size; m++)
 	  for (n = 0; n < board_size; n++)
 	    if (BOARD(m, n) == BOARD(ai, aj) && same_dragon(m, n, ai, aj)) {
-	      dragon[m][n].owl_status = CRITICAL;
-	      dragon[m][n].matcher_status = CRITICAL;
+	      dragon[POS(m, n)].owl_status = CRITICAL;
+	      dragon[POS(m, n)].matcher_status = CRITICAL;
 	    }
 	DEBUG(DEBUG_SEMEAI,
 	      "changed owl_status and matcher_status of %m to CRITICAL\n",
@@ -242,19 +242,19 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    * Correction: We can't add an owl attack move reason here because
    * this would be an attack on our own dragon.
    */
-  if ((dragon[ai][aj].owl_status == CRITICAL)
-      && (dragon[bi][bj].owl_status == CRITICAL)) {
-    if (dragon[bi][bj].owl_defense_point == dragon[ai][aj].owl_attack_point)
+  if ((dragon[POS(ai, aj)].owl_status == CRITICAL)
+      && (dragon[POS(bi, bj)].owl_status == CRITICAL)) {
+    if (dragon[POS(bi, bj)].owl_defense_point == dragon[POS(ai, aj)].owl_attack_point)
       return;
-    if (dragon[bi][bj].owl_defense_point != NO_MOVE
-	&& owl_does_attack(I(dragon[bi][bj].owl_defense_point),
-			   J(dragon[bi][bj].owl_defense_point), ai, aj)) {
+    if (dragon[POS(bi, bj)].owl_defense_point != NO_MOVE
+	&& owl_does_attack(I(dragon[POS(bi, bj)].owl_defense_point),
+			   J(dragon[POS(bi, bj)].owl_defense_point), ai, aj)) {
 #if 0
-      add_owl_attack_move(dragon[bi][bj].owl_defendi,
-			  dragon[bi][bj].owl_defendj,
+      add_owl_attack_move(dragon[POS(bi, bj)].owl_defendi,
+			  dragon[POS(bi, bj)].owl_defendj,
 			  ai, aj);
       DEBUG(DEBUG_SEMEAI, "added owl attack of %m at %m\n",
-	    ai, aj, dragon[bi][bj].owl_attacki, dragon[bi][bj].owl_attackj);
+	    ai, aj, dragon[POS(bi, bj)].owl_attacki, dragon[POS(bi, bj)].owl_attackj);
 #endif
       owl_code_sufficient = 1;
     }
@@ -277,10 +277,10 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (worm[m][n].origin == POS(m, n)
-	  && worm[m][n].attack_code == WIN)
-	if (dragon[m][n].origin == POS(ai, aj)
-	    || dragon[m][n].origin == POS(bi, bj)) {
+      if (worm[POS(m, n)].origin == POS(m, n)
+	  && worm[POS(m, n)].attack_code == WIN)
+	if (dragon[POS(m, n)].origin == POS(ai, aj)
+	    || dragon[POS(m, n)].origin == POS(bi, bj)) {
 	  int adj;
 	  int adjs[MAXCHAIN];
 	  int r;
@@ -289,8 +289,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 	  for (r = 0; r < adj; r++) {
 	    int ci = I(adjs[r]);
 	    int cj = J(adjs[r]);
-	    if (dragon[ci][cj].origin == POS(ai, aj)
-		|| dragon[ci][cj].origin == POS(bi, bj))
+	    if (dragon[POS(ci, cj)].origin == POS(ai, aj)
+		|| dragon[POS(ci, cj)].origin == POS(bi, bj))
 	      if (owl_substantial(m, n)) {
 		DEBUG(DEBUG_SEMEAI, "...tactical situation detected, exiting\n");
 		return;
@@ -317,7 +317,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       if (BOARD(i, j)
-	  && worm[i][j].origin == POS(i, j)) {
+	  && worm[POS(i, j)].origin == POS(i, j)) {
 	if (same_dragon(i, j, ai, aj))
 	  mylibs--;
 	if (same_dragon(i, j, bi, bj))
@@ -347,12 +347,12 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    * may have to be invested in attacking it.
    */
 
-  if (dragon[ai][aj].owl_status == CRITICAL
-      && !liberty_of_string(dragon[ai][aj].owl_attack_point, POS(ai, aj)))
+  if (dragon[POS(ai, aj)].owl_status == CRITICAL
+      && !liberty_of_string(dragon[POS(ai, aj)].owl_attack_point, POS(ai, aj)))
     mylibs++;
   
-  if (dragon[bi][bj].owl_status == CRITICAL
-      && !liberty_of_string(dragon[bi][bj].owl_attack_point, POS(bi, bj)))
+  if (dragon[POS(bi, bj)].owl_status == CRITICAL
+      && !liberty_of_string(dragon[POS(bi, bj)].owl_attack_point, POS(bi, bj)))
     yourlibs++;
   
   /* Now we compute the statuses which result from a
@@ -555,7 +555,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    * want to take it. So the matcher status is not changed.
    */
   
-  if (dragon[ai][aj].owl_status != CRITICAL) {
+  if (dragon[POS(ai, aj)].owl_status != CRITICAL) {
     if (my_status == ALIVE) {
       DEBUG(DEBUG_SEMEAI, 
 	    "Changing matcher_status of %m to ALIVE.\n", ai, aj);
@@ -563,7 +563,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
       for (di = 0; di < board_size; di++)
 	for (dj = 0; dj < board_size; dj++)
 	  if (same_dragon(ai, aj, di, dj)) {
-	    dragon[di][dj].matcher_status = ALIVE;
+	    dragon[POS(di, dj)].matcher_status = ALIVE;
 	  }
     }
     else if (my_status == CRITICAL) {
@@ -573,7 +573,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
       for (di = 0; di < board_size; di++)
 	for (dj = 0; dj < board_size; dj++)
 	  if (same_dragon(ai, aj, di, dj))
-	    dragon[di][dj].matcher_status = CRITICAL;
+	    dragon[POS(di, dj)].matcher_status = CRITICAL;
     }
     else if (my_status == DEAD) {
       DEBUG(DEBUG_SEMEAI, 
@@ -582,7 +582,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
       for (di = 0; di < board_size; di++)
 	for (dj = 0; dj < board_size; dj++)
 	  if (same_dragon(ai, aj, di, dj))
-	    dragon[di][dj].matcher_status = DEAD;
+	    dragon[POS(di, dj)].matcher_status = DEAD;
     }
   }
 
@@ -593,7 +593,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
     for (di = 0; di < board_size; di++)
       for (dj = 0; dj < board_size; dj++)
 	if (same_dragon(bi, bj, di, dj))
-	  dragon[di][dj].matcher_status = ALIVE;
+	  dragon[POS(di, dj)].matcher_status = ALIVE;
   }
 
   else if (your_status == CRITICAL) {
@@ -603,7 +603,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
     for (di = 0; di < board_size; di++)
       for (dj = 0; dj < board_size; dj++)
 	if (same_dragon(bi, bj, di, dj)) {
-	  dragon[di][dj].matcher_status = CRITICAL;
+	  dragon[POS(di, dj)].matcher_status = CRITICAL;
 	}
   }
   else if (your_status == DEAD) {
@@ -613,7 +613,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
     for (di = 0; di < board_size; di++)
       for (dj = 0; dj < board_size; dj++)
 	if (same_dragon(bi, bj, di, dj))
-	  dragon[di][dj].matcher_status = DEAD;
+	  dragon[POS(di, dj)].matcher_status = DEAD;
   }
   
   /* Find the recommended semeai moves. In order of priority,
@@ -626,16 +626,16 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 
   if ((my_status == CRITICAL) || (your_status == CRITICAL)) {
     int found_one = 0;
-    if (dragon[ai][aj].owl_status == CRITICAL
-	&& dragon[ai][aj].owl_defense_point != NO_MOVE)
-      add_appropriate_semeai_moves(I(dragon[ai][aj].owl_defense_point),
-				   J(dragon[ai][aj].owl_defense_point),
+    if (dragon[POS(ai, aj)].owl_status == CRITICAL
+	&& dragon[POS(ai, aj)].owl_defense_point != NO_MOVE)
+      add_appropriate_semeai_moves(I(dragon[POS(ai, aj)].owl_defense_point),
+				   J(dragon[POS(ai, aj)].owl_defense_point),
 				   ai, aj, bi, bj, my_status, your_status,
 				   margin_of_safety);
-    else if (dragon[bi][bj].owl_status == CRITICAL
-	     && dragon[bi][bj].owl_attack_point != NO_MOVE)
-      add_appropriate_semeai_moves(I(dragon[bi][bj].owl_attack_point),
-				   J(dragon[bi][bj].owl_attack_point),
+    else if (dragon[POS(bi, bj)].owl_status == CRITICAL
+	     && dragon[POS(bi, bj)].owl_attack_point != NO_MOVE)
+      add_appropriate_semeai_moves(I(dragon[POS(bi, bj)].owl_attack_point),
+				   J(dragon[POS(bi, bj)].owl_attack_point),
 				   ai, aj, bi, bj, my_status, your_status,
 				   margin_of_safety);
     else if (commonlibs > 1) {
@@ -720,12 +720,12 @@ revise_semeai(int color)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (DRAGON2(m, n).semeai
-	  && dragon[m][n].matcher_status == DEAD
-	  && dragon[m][n].color == other)
+	  && dragon[POS(m, n)].matcher_status == DEAD
+	  && dragon[POS(m, n)].color == other)
       {
 	found_one = 1;
-	dragon[m][n].matcher_status = UNKNOWN;
-	if (dragon[m][n].origin == POS(m, n))
+	dragon[POS(m, n)].matcher_status = UNKNOWN;
+	if (dragon[POS(m, n)].origin == POS(m, n))
 	  TRACE("revise_semeai: changed status of dragon %m from DEAD to UNKNOWN\n",
 		m, n);
       }
@@ -742,7 +742,7 @@ revise_semeai(int color)
  * move which consists of attacking an adjoining string.
  *
  * small_semeai(), called by make_worms() searches for a 
- * string A with 3 or 4 liberties such that worm[A].attack_code != 0.
+ * string A with 3 or 4 liberties such that worm[A], attack_code != 0.
  * If there is a string B next to A (of the opposite color)
  * such that worm[B].attack_code != 0, the following action is
  * taken: if worm[A].liberties == worm[B].liberties, then
@@ -758,8 +758,8 @@ small_semeai()
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
       if (BOARD(i, j)
-	  && (worm[i][j].liberties == 3 || worm[i][j].liberties == 4)
-	  && worm[i][j].attack_code != 0) {
+	  && (worm[POS(i, j)].liberties == 3 || worm[POS(i, j)].liberties == 4)
+	  && worm[POS(i, j)].attack_code != 0) {
 	int other = OTHER_COLOR(BOARD(i, j));
 	if (i > 0 && BOARD(i-1, j) == other)
 	  small_semeai_analyzer(i, j, i-1, j);
@@ -784,19 +784,19 @@ small_semeai_analyzer(int i, int j, int m, int n)
   int color = BOARD(i, j);
   int other = BOARD(m, n);
 
-  if (worm[m][n].attack_code == 0 || worm[m][n].liberties < 3)
+  if (worm[POS(m, n)].attack_code == 0 || worm[POS(m, n)].liberties < 3)
     return;
-  if (worm[i][j].attack_code == 0 || worm[i][j].liberties < 3)
+  if (worm[POS(i, j)].attack_code == 0 || worm[POS(i, j)].liberties < 3)
     return;
 
 
   /* FIXME: There are many more possibilities to consider */
-  if (trymove(worm[i][j].attack_point, other,
+  if (trymove(worm[POS(i, j)].attack_point, other,
 	      "small_semeai_analyzer", POS(i, j), EMPTY, 0)) {
     int acode = attack(POS(m, n), &apos);
     if (acode == 0) {
       popgo();
-      change_defense(POS(m, n), worm[i][j].attack_point, 1);
+      change_defense(POS(m, n), worm[POS(i, j)].attack_point, 1);
     }
     else if (trymove(apos, color, "small_semeai_analyzer", POS(i, j),
 		     EMPTY, NO_MOVE)) {
@@ -815,12 +815,12 @@ small_semeai_analyzer(int i, int j, int m, int n)
   }
   gg_assert(stackp == 0);
   
-  if (trymove(worm[m][n].attack_point, color, 
+  if (trymove(worm[POS(m, n)].attack_point, color, 
 	      "small_semeai_analyzer", POS(m, n), EMPTY, 0)) {
     int acode = attack(POS(i, j), &apos);
     if (acode == 0) {
       popgo();
-      change_defense(POS(i, j), worm[m][n].attack_point, 1);
+      change_defense(POS(i, j), worm[POS(m, n)].attack_point, 1);
     }
     else if (trymove(apos, other, "small_semeai_analyzer", POS(m, n),
 		     EMPTY, NO_MOVE)) {

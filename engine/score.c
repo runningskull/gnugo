@@ -55,7 +55,7 @@ dilate_erode(int dilations, int erosions, int gb[MAX_BOARD][MAX_BOARD],
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) && dragon[i][j].matcher_status == CRITICAL)
+      if (BOARD(i, j) && dragon[POS(i, j)].matcher_status == CRITICAL)
 	critical_found = 1;
       if (BOARD(i, j) == WHITE && !captured_territory(i, j, color))
 	gb[i][j] = 128;
@@ -235,7 +235,7 @@ print_regions(int gb[MAX_BOARD][MAX_BOARD])
   start_draw_board();
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) && dragon[i][j].matcher_status != DEAD)
+      if (BOARD(i, j) && dragon[POS(i, j)].matcher_status != DEAD)
 	k = BOARD(i, j);
       else
 	k = EMPTY;
@@ -251,14 +251,14 @@ print_regions(int gb[MAX_BOARD][MAX_BOARD])
 	break;
 
       case BLACK:
-	if (dragon[i][j].matcher_status == CRITICAL)
+	if (dragon[POS(i, j)].matcher_status == CRITICAL)
 	  draw_color_char(i, j, 'X', GG_COLOR_RED);
 	else
 	  draw_color_char(i, j, 'X', GG_COLOR_BLACK);
 	break;
 
       case WHITE:
-	if (dragon[i][j].matcher_status == CRITICAL)
+	if (dragon[POS(i, j)].matcher_status == CRITICAL)
 	  draw_color_char(i, j, 'O', GG_COLOR_RED);
 	else
 	  draw_color_char(i, j, 'O', GG_COLOR_BLACK);
@@ -436,9 +436,9 @@ captured_territory(int i, int j, int color)
   int d;
 
   if (BOARD(i, j) == EMPTY 
-      || dragon[i][j].matcher_status == ALIVE
-      || dragon[i][j].matcher_status == UNKNOWN
-      || (BOARD(i, j) == color && dragon[i][j].matcher_status == CRITICAL))
+      || dragon[POS(i, j)].matcher_status == ALIVE
+      || dragon[POS(i, j)].matcher_status == UNKNOWN
+      || (BOARD(i, j) == color && dragon[POS(i, j)].matcher_status == CRITICAL))
     return 0;
 
   for (d = 0; d < DRAGON2(i, j).neighbors; d++)
