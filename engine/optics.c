@@ -1235,7 +1235,8 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
 
 	      for (ix = 0; ix < this_half_eye->num_defends; ix++)
-		defense_points[num_defenses++] = this_half_eye->defense_point[ix];
+		defense_points[num_defenses++] 
+		  = this_half_eye->defense_point[ix];
 	    }
 	    else
 	      defense_points[num_defenses++] = vpos[map[k]];

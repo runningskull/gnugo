@@ -282,7 +282,8 @@ make_dragons(int color, int stop_before_owl)
       ii = POS(i, j);
 
       if (black_eye[ii].color == BLACK_BORDER
-	  && black_eye[ii].origin == ii)
+	  && black_eye[ii].origin == ii
+	  && black_eye[ii].dragon != NO_MOVE)
       {
 	int max, min, attack_point, defense_point;
 
@@ -298,7 +299,8 @@ make_dragons(int color, int stop_before_owl)
       }
 
       if (white_eye[ii].color == WHITE_BORDER
-	  && white_eye[ii].origin == ii)
+	  && white_eye[ii].origin == ii
+	  && white_eye[ii].dragon != NO_MOVE)
       {
 	int max, min, attack_point, defense_point;
 

@@ -89,7 +89,7 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       capture.tst connect.tst global.tst vie.tst \
       owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst arend.tst \
       trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst \
-      nngs.tst
+      nngs.tst Lazarus.tst
 
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
@@ -402,6 +402,9 @@ semeai2: semeai2.tst
 nngs: nngs.tst
 	$(srcdir)/eval.sh nngs.tst
 
+lazarus: lazarus.tst
+	$(srcdir)/eval.sh lazarus.tst
+
 all_batches: first_batch second_batch third_batch fourth_batch
 
 first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
@@ -427,6 +430,7 @@ second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.t
 	$(srcdir)/regress.sh $(srcdir) viking.tst
 	$(srcdir)/regress.sh $(srcdir) ego.tst
 	$(srcdir)/regress.sh $(srcdir) dniwog.tst
+	$(srcdir)/regress.sh $(srcdir) lazarus.tst
 	$(srcdir)/regress.sh $(srcdir) strategy2.tst
 
 third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst tactics.tst nngs.tst
