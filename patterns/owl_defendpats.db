@@ -7014,6 +7014,21 @@ dCC.
 ;owl_escape_value(a) > 0 && oplay_attack(*,b,C) && !xplay_connect(*,a,d)
 
 
+Pattern D1392
+# evand New pattern. (3.7.1)
+# sometimes forcing is better than the cut -- see gifu03:704
+
+O.X
+*XO
+
+:8,b,value(40)
+
+O.X
+*AO
+
+;lib(A) == 2
+
+
 #########################################################
 #                                                       #
 #                          Ko                           #
