@@ -240,6 +240,7 @@ static int
 do_genmove(int *i, int *j, int color, float pure_threat_value)
 {
   float val;
+  int move;
 
   start_timer(0);
   
@@ -394,9 +395,11 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
    * all missing dame points.
    */
   if (val < 0.0 
-      && fill_liberty(i, j, color)) {
+      && fill_liberty(&move, color)) {
     val = 1.0;
-    TRACE("Filling a liberty at %m\n", *i, *j);
+    TRACE("Filling a liberty at %1m\n", move);
+    *i = I(move);
+    *j = J(move);
     move_considered(*i, *j, val);
     time_report(1, "fill liberty", -1, -1, 1.0);
   }
@@ -407,7 +410,9 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   if (val < 0.0
       && !doing_scoring
       && (play_out_aftermath || capture_all_dead)
-      && aftermath_genmove(i, j, color, NULL, 0) > 0) {
+      && aftermath_genmove(&move, color, NULL, 0) > 0) {
+    *i = I(move);
+    *j = J(move);
     val = 1.0;
     TRACE("Aftermath move at %m\n", *i, *j);
     move_considered(*i, *j, val);
@@ -420,7 +425,9 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   if (val < 0.0
       && !doing_scoring
       && capture_all_dead
-      && aftermath_genmove(i, j, color, NULL, 1) > 0) {
+      && aftermath_genmove(&move, color, NULL, 1) > 0) {
+    *i = I(move);
+    *j = J(move);
     val = 1.0;
     TRACE("Aftermath move at %m\n", *i, *j);
     move_considered(*i, *j, val);
@@ -654,7 +661,7 @@ placehand(int handicap)
 
   /* special cases: 5 and 7 */
   if (handicap == 5 || handicap == 7) {
-    add_stone2(mid, mid, BLACK);
+    add_stone(POS(mid, mid), BLACK);
     handicap--;
   }
 
@@ -675,7 +682,7 @@ placehand(int handicap)
     if ( i < 0) i += board_size-1;
     if ( j < 0) j += board_size-1;
 
-    add_stone2(i, j, BLACK);
+    add_stone(POS(i, j), BLACK);
   }
 
   return retval;

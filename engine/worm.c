@@ -345,7 +345,7 @@ make_worms(void)
 		       */
 		      if (attack_works) {
 			DEBUG(DEBUG_WORMS,
-			      "adding point of attack of %1m at %1m with code\n",
+			      "adding point of attack of %1m at %1m with code %d\n",
 			      pos2, aa, 3 - dcode);
 			change_attack(pos2, aa, 3 - dcode);
 			mi[pos2] = 1;
@@ -363,7 +363,7 @@ make_worms(void)
 		    int acode = attack(pos2, NULL); 
 		    if (acode < worm[pos2].attack_codes[0]) {
 		      DEBUG(DEBUG_WORMS,
-			    "adding point of defense of %1m at %1m with code\n",
+			    "adding point of defense of %1m at %1m with code %d\n",
 			    pos2, aa, 3 - acode);
 		      change_defense(pos2, aa, 3 - acode);
 		      mi[pos2] = 1;
@@ -396,7 +396,7 @@ make_worms(void)
 		/* If a worm has its origin (i, j), and it's not (m, n)...*/
 		if (board[pos2]
 		    && is_worm_origin(pos2, pos2)
-		    && (pos2 != pos)) {
+		    && pos2 != pos) {
 		  
 		  /* Either the worm is of the opposite color as (m, n),
 		   * then we try to attack it.  If there was a previous 
@@ -413,7 +413,8 @@ make_worms(void)
 		      /* Sometimes find_defense() fails to find a
 			 defense which has been found by other means.
 			 Try if the old defense move still works. */
-		      if (trymove(worm[pos2].defense_points[0], other, "make_worms",
+		      if (trymove(worm[pos2].defense_points[0],
+				  other, "make_worms",
 				  NO_MOVE, EMPTY, NO_MOVE)) {
 			if (!attack(pos2, NULL))
 			  attack_works = 0;
@@ -425,7 +426,7 @@ make_worms(void)
 		       */
 		      if (attack_works) {
 			DEBUG(DEBUG_WORMS,
-			      "adding point of attack of %1m at %1m with code\n",
+			      "adding point of attack of %1m at %1m with code %d\n",
 			      pos2, dd, 3 - dcode);
 			change_attack(pos2, dd, 3 - dcode);
 			mi[pos2] = 1;
@@ -442,7 +443,7 @@ make_worms(void)
 		    int acode = attack(pos2, NULL);
 		    if (acode < worm[pos2].attack_codes[0]) {
 		      DEBUG(DEBUG_WORMS,
-			    "adding point of defense of %1m at %1m with code\n",
+			    "adding point of defense of %1m at %1m with code %d\n",
 			    pos2, dd, 3 - acode);
 		      change_defense(pos2, dd, 3 - acode);
 		      mi[pos2] = 1;

@@ -333,12 +333,6 @@ location_to_string(int pos)
   return buf;
 }
 
-const char *
-location_to_string2(int i, int j)
-{
-  return location_to_string(POS(i, j));
-}
-
 /* Convert a status value to a string. */
 const char *
 status_to_string(int status)

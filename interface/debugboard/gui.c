@@ -182,7 +182,7 @@ display_dragon(int i, int j)
   struct dragon_data2 *d2 = &(dragon2[d->id]);
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s dragon ",
-	     location_to_string2(i, j), color_to_string(d->color));
+	     location_to_string(POS(i, j)), color_to_string(d->color));
   gg_wprintw(info_window, "(origin %s)  id %d   ",
 	     location_to_string(d->origin), d->id);
 
@@ -312,7 +312,7 @@ display_eye(int color, struct eye_data eyedata[BOARDMAX],
   wmove(info_window, 1, 24);
   gg_wprintw(info_window, "%s", color == WHITE ? "WHITE" : "BLACK");
   wmove(info_window, 2, 9);
-  gg_wprintw(info_window, "%s ", location_to_string2(i, j));
+  gg_wprintw(info_window, "%s ", location_to_string(POS(i, j)));
 
   wmove(info_window, 2, 24);
   if (eyedata[POS(i, j)].origin == NO_MOVE)

@@ -592,8 +592,7 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[BOARDMAX],
  */
 
 int
-recognize_eye2(int m, int  n, 
-	       int *attacki, int *attackj, int *defendi, int *defendj,
+recognize_eye2(int pos, int *attack_point, int *defense_point,
 	       int *max, int *min, 
 	       struct eye_data eyedata[BOARDMAX],
 	       struct half_eye_data heye[BOARDMAX],
@@ -605,6 +604,8 @@ recognize_eye2(int m, int  n,
   int attack_point1a, attack_point1b;
   int defense_point2a, defense_point2b;
   int save_stackp;
+  int m = I(pos);
+  int n = J(pos);
 
   /* FIXME: Remove the unused parameter entirely if it's not needed. */
   UNUSED(color);
@@ -676,12 +677,12 @@ recognize_eye2(int m, int  n,
     *max = 2;
   
   if (*min != *max) {
-    if (attacki) *attacki = eyei[attack_point1a];
-    if (attackj) *attackj = eyej[attack_point1a];
-    if (defendi) *defendi = eyei[defense_point2b];
-    if (defendj) *defendj = eyej[defense_point2b];
-    DEBUG(DEBUG_EYES, "  vital point (attack):  %m\n", *attacki, *attackj);
-    DEBUG(DEBUG_EYES, "  vital point (defense): %m\n", *defendi, *defendj);
+    if (attack_point)
+      *attack_point = POS(eyei[attack_point1a], eyej[attack_point1a]);
+    if (defense_point)
+      *defense_point = POS(eyei[defense_point2b], eyej[defense_point2b]);
+    DEBUG(DEBUG_EYES, "  vital point (attack):  %1m\n", *attack_point);
+    DEBUG(DEBUG_EYES, "  vital point (defense): %1m\n", *defense_point);
   }
 
   /* FIXME: Currently the rest of the life and death analysis can't

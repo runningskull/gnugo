@@ -28,21 +28,19 @@
 #include <string.h>
 #include "liberty.h"
 
-static int find_backfilling_move(int m, int n, int color, int *i, int *j);
+static int find_backfilling_move(int move, int color, int *backfill_move);
 static int filllib_confirm_safety(int m, int n, int color, int *di, int *dj);
 
 /* Determine whether a point is adjacent to at least one own string which
  * isn't dead.
  */
 static int
-living_neighbor(int m, int n, int color)
+living_neighbor(int pos, int color)
 {
   int k;
   for (k = 0; k < 4; k++) {
-    int dm = deltai[k];
-    int dn = deltaj[k];
-    if (BOARD(m+dm, n+dn) == color
-	&& dragon[POS(m+dm, n+dn)].matcher_status != DEAD)
+    if (board[pos + delta[k]] == color
+	&& dragon[pos + delta[k]].matcher_status != DEAD)
       return 1;
   }
 
@@ -55,25 +53,25 @@ living_neighbor(int m, int n, int color)
  * around a killing nakade string.
  */
 static void
-analyze_neighbor(int m, int n, int *found_black, int *found_white)
+analyze_neighbor(int pos, int *found_black, int *found_white)
 {
-  switch (BOARD(m, n)) {
+  switch (board[pos]) {
     case EMPTY:
       if (!(*found_black)
-	  && living_neighbor(m, n, BLACK)
-	  && safe_move2(m, n, WHITE) != 3)
+	  && living_neighbor(pos, BLACK)
+	  && safe_move(pos, WHITE) != 3)
 	*found_black = 1;
       
       if (!(*found_white)
-	  && living_neighbor(m, n, WHITE)
-	  && safe_move2(m, n, BLACK) != 3)
+	  && living_neighbor(pos, WHITE)
+	  && safe_move(pos, BLACK) != 3)
 	*found_white = 1;
       
       break;
 
     case BLACK:
-      if (!worm[POS(m, n)].inessential && DRAGON2(m, n).safety != INESSENTIAL) {
-	if (dragon[POS(m, n)].matcher_status == ALIVE)
+      if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
+	if (dragon[pos].matcher_status == ALIVE)
 	  *found_black = 1;
 	else
 	  *found_white = 1;
@@ -81,8 +79,8 @@ analyze_neighbor(int m, int n, int *found_black, int *found_white)
       break;
 
     case WHITE:
-      if (!worm[POS(m, n)].inessential && DRAGON2(m, n).safety != INESSENTIAL) {
-	if (dragon[POS(m, n)].matcher_status == ALIVE)
+      if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
+	if (dragon[pos].matcher_status == ALIVE)
 	  *found_white = 1;
 	else
 	  *found_black = 1;
@@ -102,13 +100,13 @@ analyze_neighbor(int m, int n, int *found_black, int *found_white)
  */
 
 int 
-fill_liberty(int *i, int *j, int color)
+fill_liberty(int *move, int color)
 {
   int m, n;
   int k;
   int other = OTHER_COLOR(color);
   int di, dj;
-  int potential_color[MAX_BOARD][MAX_BOARD];
+  int potential_color[BOARDMAX];
 
   /* We first make a fast scan for intersections which are potential
    * candidates for liberty filling. This is not very accurate, but it
@@ -119,22 +117,22 @@ fill_liberty(int *i, int *j, int color)
   memset(potential_color, 0, sizeof(potential_color));
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n) == EMPTY)
+      int pos = POS(m, n);
+      if (board[pos] == EMPTY)
 	continue;
 
-      if (worm[POS(m, n)].inessential || DRAGON2(m, n).safety == INESSENTIAL)
+      if (worm[pos].inessential || DRAGON2(pos).safety == INESSENTIAL)
 	continue;
 
-      if (dragon[POS(m, n)].matcher_status != ALIVE) {
+      if (dragon[pos].matcher_status != ALIVE) {
 	for (k = 0; k < 4; k++) {
-	  int di = deltai[k];
-	  int dj = deltaj[k];
-	  if (BOARD(m+di, n+dj) == EMPTY)
-	    potential_color[m+di][n+dj] |= OTHER_COLOR(BOARD(m, n));
+	  int pos2 = pos + delta[k];
+	  if (board[pos2] == EMPTY)
+	    potential_color[pos2] |= OTHER_COLOR(board[pos]);
 	}
       }
       
-      if (dragon[POS(m, n)].matcher_status != DEAD) {
+      if (dragon[pos].matcher_status != DEAD) {
 	for (k = 0; k < 12; k++) {
 	  int di = deltai[k%8];
 	  int dj = deltaj[k%8];
@@ -145,7 +143,7 @@ fill_liberty(int *i, int *j, int color)
 	    dj *= 2;
 	  }
 	  if (BOARD(m+di, n+dj) == EMPTY)
-	    potential_color[m+di][n+dj] |= BOARD(m, n);
+	    potential_color[POS(m+di, n+dj)] |= board[pos];
 	}
       }
     }
@@ -153,6 +151,7 @@ fill_liberty(int *i, int *j, int color)
   
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
+      int pos = POS(m, n);
       /* It seems we can't trust an empty liberty to be gray-colored
        * either as a cave or as a cavity. Instead we look for empty
        * intersections with at least one neighbor of each color, where
@@ -162,19 +161,19 @@ fill_liberty(int *i, int *j, int color)
       int found_white = 0;
       int found_black = 0;
 
-      if (BOARD(m, n) != EMPTY)
+      if (board[pos] != EMPTY)
 	continue;
 
       /* Quick rejection based on preliminary test above. */
-      if (potential_color[m][n] != GRAY)
+      if (potential_color[POS(m, n)] != GRAY)
 	continue;
 
       /* Loop over the neighbors. */
       for (k = 0; k < 4; k++) {
 	int dm = deltai[k];
 	int dn = deltaj[k];
-	if (ON_BOARD2(m+dm, n+dn))
-	  analyze_neighbor(m+dm, n+dn, &found_black, &found_white);
+	if (ON_BOARD(POS(m+dm, n+dn)))
+	  analyze_neighbor(POS(m+dm, n+dn), &found_black, &found_white);
       }
       
       /* Do we have neighbors of both colors? */
@@ -197,13 +196,12 @@ fill_liberty(int *i, int *j, int color)
        * confirm_safety test, i.e. that it isn't a blunder which
        * causes problems for other strings.
        */
-      if (safe_move2(m, n, color) == WIN) {
+      if (safe_move(pos, color) == WIN) {
 	DEBUG(DEBUG_FILLLIB, "Filllib: Tactically safe.\n");
 	if (filllib_confirm_safety(m, n, color, &di, &dj)) {
 	  /* Safety confirmed. */
 	  DEBUG(DEBUG_FILLLIB, "Filllib: Safety confirmed.\n");
-	  *i = m;
-	  *j = n;
+	  *move = POS(m, n);
 	  return 1;
 	}
 	else if (di != -1) {
@@ -215,8 +213,7 @@ fill_liberty(int *i, int *j, int color)
 	   */
 	  DEBUG(DEBUG_FILLLIB,
 		"Filllib: Safety not confirmed, but %m defends.\n", di, dj);
-	  *i = di;
-	  *j = dj;
+	  *move = POS(di, dj);
 	  return 1;
 	}
 	else {
@@ -231,30 +228,29 @@ fill_liberty(int *i, int *j, int color)
       }
       
       /* Try to play the move. */
-      if (trymove2(m, n, color, "fill_liberty", -1, -1, EMPTY, -1, -1)) {
+      if (trymove(pos, color, "fill_liberty", NO_MOVE, EMPTY, NO_MOVE)) {
 	popgo();
 	/* Legal, but not safe. Look for backfilling move. */
 	DEBUG(DEBUG_FILLLIB,
 	      "Filllib: Legal but not safe, looking for backfilling move.\n");
 
-	if (find_backfilling_move(m, n, color, i, j)) {
-	  DEBUG(DEBUG_FILLLIB, "Filllib: Backfilling move at %m.\n", *i, *j);
+	if (find_backfilling_move(POS(m, n), color, move)) {
+	  DEBUG(DEBUG_FILLLIB, "Filllib: Backfilling move at %1m.\n", *move);
 	  /* In certain positions it may happen that an illegal move
 	   * is found. This probably only can happen if we try to play
 	   * a move inside a lost semeai. Anyway we should discard the
 	   * move.
 	   */
-	  if (!is_legal2(*i, *j, color)) {
+	  if (!is_legal(*move, color)) {
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Was illegal, discarded.\n");
-	    *i = -1;
-	    *j = -1;
+	    *move = NO_MOVE;
 	    continue;
 	  }
 
 	  /* If the move turns out to be strategically unsafe, or
            * setting up a double threat elsewhere, also discard it.
 	   */
-	  if (!filllib_confirm_safety(*i, *j, color, &di, &dj)) {
+	  if (!filllib_confirm_safety(I(*move), J(*move), color, &di, &dj)) {
 	    DEBUG(DEBUG_FILLLIB,
 		  "Filllib: Safety not confirmed, discarded.\n");
 	    continue;
@@ -265,7 +261,7 @@ fill_liberty(int *i, int *j, int color)
 	}
 	else {
 	  /* If we captured some stones, this move should be ok anyway. */
-	  if (does_capture_something2(m, n, color)) {
+	  if (does_capture_something(pos, color)) {
 	    DEBUG(DEBUG_FILLLIB,
 		  "Filllib: Not tactically safe, but captures stones.\n");
 	    if (!filllib_confirm_safety(m, n, color, &di, &dj)) {
@@ -273,8 +269,7 @@ fill_liberty(int *i, int *j, int color)
 		    "Filllib: Safety not confirmed, discarded.\n");
 	      continue;
 	    }
-	    *i = m;
-	    *j = n;
+	    *move = POS(m, n);
 	    return 1;
 	  }
 	}
@@ -289,9 +284,8 @@ fill_liberty(int *i, int *j, int color)
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
 	      && worm[POS(m+dm, n+dn)].attack_codes[0] == WIN) {
-	    *i = I(worm[POS(m+dm, n+dn)].attack_points[0]);
-	    *j = J(worm[POS(m+dm, n+dn)].attack_points[0]);
-	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
+	    *move = worm[POS(m+dm, n+dn)].attack_points[0];
+	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
 	    return 1;
 	  }
 	}
@@ -304,9 +298,8 @@ fill_liberty(int *i, int *j, int color)
 	  if (BOARD(m+dm, n+dn) == other
 	      && worm[POS(m+dm, n+dn)].attack_codes[0] != 0
 	      && is_legal(worm[POS(m+dm, n+dn)].attack_points[0], color)) {
-	    *i = I(worm[POS(m+dm, n+dn)].attack_points[0]);
-	    *j = J(worm[POS(m+dm, n+dn)].attack_points[0]);
-	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
+	    *move = worm[POS(m+dm, n+dn)].attack_points[0];
+	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
 	    return 1;
 	  }
 	}
@@ -321,15 +314,11 @@ fill_liberty(int *i, int *j, int color)
 	    /* Just pick some other liberty. */
 	    int libs[2];
 	    if (findlib(POS(m+dm, n+dn), 2, libs) > 1) {
-	      if (is_legal(libs[0], color)) {
-		*i = I(libs[0]);
-		*j = J(libs[0]);
-	      }
-	      else if (is_legal(libs[1], color)) {
-		*i = I(libs[1]);
-		*j = J(libs[1]);
-	      }
-	      DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
+	      if (is_legal(libs[0], color))
+		*move = libs[0];
+	      else if (is_legal(libs[1], color))
+		*move = libs[1];
+	      DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
 	      return 1;
 	    }
 	  }
@@ -366,7 +355,7 @@ static int adjs[MAXCHAIN];
 static int libs[MAXLIBS];
 
 static int
-find_backfilling_move(int m, int n, int color, int *i, int *j)
+find_backfilling_move(int move, int color, int *backfill_move)
 {
   int k;
   int liberties;
@@ -377,25 +366,23 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
   int extra_pop = 0;
   int success = 0;
   int acode;
-  int savei = -1;
-  int savej = -1;
-  int pos = POS(m, n);
+  int saved_move = NO_MOVE;
   
   /* Play (m,n) and identify all liberties and adjacent strings. */
-  if (!trymove2(m, n, color, "find_backfilling_move", m, n, EMPTY, -1, -1))
+  if (!trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE))
     return 0; /* This shouldn't happen, I believe. */
 
   /* The move wasn't safe, so there must be an attack for the
    * opponent. Save it for later use.
    */
-  acode = attack(POS(m, n), &apos);
+  acode = attack(move, &apos);
   gg_assert(acode != 0 && apos > NO_MOVE);
   
   /* Find liberties. */
-  liberties = findlib(pos, MAXLIBS, libs);
+  liberties = findlib(move, MAXLIBS, libs);
 
   /* Find neighbors. */
-  neighbors = chainlinks(pos, adjs);
+  neighbors = chainlinks(move, adjs);
 
   /* Remove (m,n) again. */
   popgo();
@@ -419,14 +406,11 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
   for (k = 0; k < neighbors; k++) {
     if (attack(adjs[k], &bpos) == WIN) {
       if (liberty_of_string(bpos, adjs[k])) {
-	*i = I(bpos);
-	*j = J(bpos);
+	*backfill_move = bpos;
 	return 1;
       }
-      else {
-	savei = I(bpos);
-	savej = J(bpos);
-      }
+      else
+	saved_move = bpos;
     }
   }
   
@@ -434,8 +418,7 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
   if (!found_one) {
     for (k = 0; k < liberties; k++) {
       if (safe_move(libs[k], color) == WIN) {
-	*i = I(libs[k]);
-	*j = J(libs[k]);
+	*backfill_move = libs[k];
 	found_one = 1;
 	break;
       }
@@ -444,13 +427,12 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
 
   /* If no luck so far, try with superstring liberties. */
   if (!found_one) {
-    trymove2(m, n, color, "find_backfilling_move", m, n, EMPTY, -1, -1);
-    find_proper_superstring_liberties(pos, &liberties, libs, 0);
+    trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE);
+    find_proper_superstring_liberties(move, &liberties, libs, 0);
     popgo();
     for (k = 0; k < liberties; k++) {
       if (safe_move(libs[k], color) == WIN) {
-	*i = I(libs[k]);
-	*j = J(libs[k]);
+	*backfill_move = libs[k];
 	found_one = 1;
 	break;
       }
@@ -460,19 +442,20 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
 
   if (found_one) {
   
-    if (!trymove2(*i, *j, color, "find_backfilling_move", m, n, EMPTY, -1, -1))
+    if (!trymove(*backfill_move, color, "find_backfilling_move", move,
+		 EMPTY, NO_MOVE))
       return 0; /* This really shouldn't happen. */
     
     /* Allow opponent to get a move in here. */
-    if (trymove(apos, OTHER_COLOR(color), "find_backfilling_move", POS(m, n), 
+    if (trymove(apos, OTHER_COLOR(color), "find_backfilling_move", move, 
 		EMPTY, NO_MOVE))
       extra_pop = 1;
     
     /* If still not safe, recurse to find a new backfilling move. */
-    if (safe_move2(m, n, color) == WIN)
+    if (safe_move(move, color) == WIN)
       success = 1;
     else
-      success = find_backfilling_move(m, n, color, i, j);
+      success = find_backfilling_move(move, color, backfill_move);
 
     /* Pop move(s) and return. */
     if (extra_pop)
@@ -480,9 +463,8 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
     popgo();
   }
 
-  if (!success && savei != -1) {
-    *i = savei;
-    *j = savej;
+  if (!success && saved_move != NO_MOVE) {
+    *backfill_move = saved_move;
     success = 1;
   }
 

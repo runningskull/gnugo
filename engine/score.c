@@ -434,18 +434,19 @@ static int
 captured_territory(int i, int j, int color)
 {
   int d;
+  int pos = POS(i, j);
 
-  if (BOARD(i, j) == EMPTY 
-      || dragon[POS(i, j)].matcher_status == ALIVE
-      || dragon[POS(i, j)].matcher_status == UNKNOWN
-      || (BOARD(i, j) == color && dragon[POS(i, j)].matcher_status == CRITICAL))
+  if (board[pos] == EMPTY 
+      || dragon[pos].matcher_status == ALIVE
+      || dragon[pos].matcher_status == UNKNOWN
+      || (board[pos] == color && dragon[pos].matcher_status == CRITICAL))
     return 0;
 
-  for (d = 0; d < DRAGON2(i, j).neighbors; d++)
-    if (DRAGON(DRAGON2(i, j).adjacent[d]).color == OTHER_COLOR(BOARD(i, j))
-	&& (DRAGON(DRAGON2(i, j).adjacent[d]).matcher_status == ALIVE
-	|| (BOARD(i, j) != color
-	    && DRAGON(DRAGON2(i, j).adjacent[d]).matcher_status == CRITICAL)))
+  for (d = 0; d < DRAGON2(pos).neighbors; d++)
+    if (DRAGON(DRAGON2(pos).adjacent[d]).color == OTHER_COLOR(board[pos])
+	&& (DRAGON(DRAGON2(pos).adjacent[d]).matcher_status == ALIVE
+	|| (board[pos] != color
+	    && DRAGON(DRAGON2(pos).adjacent[d]).matcher_status == CRITICAL)))
       return 1;
 
   return 0;

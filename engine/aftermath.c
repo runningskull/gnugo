@@ -83,31 +83,26 @@
  * genmove() call should return pass.
  */
 int
-aftermath_genmove(int *i, int *j, int color,
+aftermath_genmove(int *aftermath_move, int color,
 		  int under_control[BOARDMAX],
 		  int do_capture_dead_stones)
 {
   int m, n;
   int k;
   int other = OTHER_COLOR(color);
-  int distance[MAX_BOARD][MAX_BOARD];
-  int score[MAX_BOARD][MAX_BOARD];
+  int distance[BOARDMAX];
+  int score[BOARDMAX];
   float owl_hotspot[MAX_BOARD][MAX_BOARD];
   float reading_hotspot[MAX_BOARD][MAX_BOARD];
-  int dragoni[MAX_BOARD][MAX_BOARD];
-  int dragonj[MAX_BOARD][MAX_BOARD];
+  int dragons[BOARDMAX];
   int something_found;
-  int closest_opponent_i = -1;
-  int closest_opponent_j = -1;
-  int closest_own_i = -1;
-  int closest_own_j = -1;
+  int closest_opponent = NO_MOVE;
+  int closest_own = NO_MOVE;
   int d;
-  int ai = -1;
-  int aj = -1;
-  int pos = 0;
+  int move = NO_MOVE;
+  int pos = NO_MOVE;
   int best_score;
-  int best_i;
-  int best_j;
+  int best_scoring_move;
   
   owl_hotspots(owl_hotspot);
   reading_hotspots(reading_hotspot);
@@ -115,14 +110,15 @@ aftermath_genmove(int *i, int *j, int color,
   /* As a preparation we compute a distance map to the invincible strings. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n) == color && worm[POS(m, n)].unconditional_status == ALIVE)
-	distance[m][n] = 0;
+      pos = POS(m, n);
+      if (board[pos] == color && worm[pos].unconditional_status == ALIVE)
+	distance[pos] = 0;
       else if (!do_capture_dead_stones
-	       && BOARD(m, n) == other 
-	       && worm[POS(m, n)].unconditional_status == DEAD)
-	distance[m][n] = 0;
+	       && board[pos] == other 
+	       && worm[pos].unconditional_status == DEAD)
+	distance[pos] = 0;
       else
-	distance[m][n] = -1;
+	distance[pos] = -1;
     }
 
   d = 0;
@@ -130,30 +126,26 @@ aftermath_genmove(int *i, int *j, int color,
     something_found = 0;
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (distance[m][n] == -1) {
+	pos = POS(m, n);
+	if (distance[pos] == -1) {
 	  for (k = 0; k < 4; k++) {
-	    int dm = deltai[k];
-	    int dn = deltaj[k];
-	    if (!ON_BOARD2(m+dm, n+dn))
+	    int pos2 = pos + delta[k];
+	    if (!ON_BOARD(pos2))
 	      continue;
-	    if ((d == 0 || BOARD(m+dm, n+dn) == EMPTY)
-		&& distance[m+dm][n+dn] == d) {
-	      if (d > 0 && BOARD(m, n) == other) {
-		distance[m][n] = d + 1;
-		if (closest_opponent_i == -1) {
-		  closest_opponent_i = m;
-		  closest_opponent_j = n;
-		}
+	    if ((d == 0 || board[pos2] == EMPTY)
+		&& distance[pos2] == d) {
+	      if (d > 0 && board[pos] == other) {
+		distance[pos] = d + 1;
+		if (closest_opponent == NO_MOVE)
+		  closest_opponent = pos;
 	      }
-	      else if (d > 0 && BOARD(m, n) == color) {
-		distance[m][n] = d + 1;
-		if (closest_own_i == -1) {
-		  closest_own_i = m;
-		  closest_own_j = n;
-		}
+	      else if (d > 0 && board[pos] == color) {
+		distance[pos] = d + 1;
+		if (closest_own == NO_MOVE)
+		  closest_own = pos;
 	      }
-	      else if (BOARD(m, n) == EMPTY) {
-		distance[m][n] = d + 1;
+	      else if (board[pos] == EMPTY) {
+		distance[pos] = d + 1;
 		something_found = 1;
 	      }
 	      break;
@@ -167,30 +159,32 @@ aftermath_genmove(int *i, int *j, int color,
   if (under_control) {
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (distance[m][n] == -1)
-	  under_control[POS(m, n)] = 0;
+	pos = POS(m, n);
+	if (distance[pos] == -1)
+	  under_control[pos] = 0;
 	else
-	  under_control[POS(m, n)] = 1;
+	  under_control[pos] = 1;
       }
   }
   
   if (debug & DEBUG_AFTERMATH) {
     for (m = 0; m < board_size; m++) {
       for (n = 0; n < board_size; n++) {
-	if (distance[m][n] > 0)
-	  printf("%2d", distance[m][n]);
-	else if (distance[m][n] == 0) {
-	  if (BOARD(m, n) == WHITE)
+	pos = POS(m, n);
+	if (distance[pos] > 0)
+	  printf("%2d", distance[pos]);
+	else if (distance[pos] == 0) {
+	  if (board[pos] == WHITE)
 	    printf(" o");
-	  else if (BOARD(m, n) == BLACK)
+	  else if (board[pos] == BLACK)
 	    printf(" x");
 	  else
 	    printf(" ?");
 	}
 	else {
-	  if (BOARD(m, n) == WHITE)
+	  if (board[pos] == WHITE)
 	    printf(" O");
-	  else if (BOARD(m, n) == BLACK)
+	  else if (board[pos] == BLACK)
 	    printf(" X");
 	  else
 	    printf(" .");
@@ -199,16 +193,16 @@ aftermath_genmove(int *i, int *j, int color,
       printf("\n");
     }
   
-    gprintf("Closest opponent %m", closest_opponent_i, closest_opponent_j);
-    if (closest_opponent_i != -1)
+    gprintf("Closest opponent %1m", closest_opponent);
+    if (closest_opponent != NO_MOVE)
       gprintf(", distance %d\n",
-	      distance[closest_opponent_i][closest_opponent_j]);
+	      distance[closest_opponent]);
     else
       gprintf("\n");
 
-    gprintf("Closest own %m", closest_own_i, closest_own_j);
-    if (closest_own_i != -1)
-      gprintf(", distance %d\n", distance[closest_own_i][closest_own_j]);
+    gprintf("Closest own %1m", closest_own);
+    if (closest_own != NO_MOVE)
+      gprintf(", distance %d\n", distance[closest_own]);
     else
       gprintf("\n");
   }
@@ -225,121 +219,112 @@ aftermath_genmove(int *i, int *j, int color,
    * to stop X from "leaking" out along the edge. Sometimes this can
    * save huge amounts of tactical reading for later moves.
    */
-  best_i = -1;
-  best_j = -1;
+  best_scoring_move = NO_MOVE;
   best_score = 5;
   for (m = 0; m < board_size; m++) {
     for (n = 0; n < board_size; n++) {
       int libs;
-      if (distance[m][n] == 0
-	  || BOARD(m, n) != EMPTY)
+      pos = POS(m, n);
+      if (distance[pos] == 0
+	  || board[pos] != EMPTY)
 	continue;
 
-      libs = approxlib(POS(m, n), color, 3, NULL);
+      libs = approxlib(pos, color, 3, NULL);
       if (libs < 3)
 	continue;
 
       for (k = 0; k < 4; k++) {
-	int dm = deltai[k];
-	int dn = deltaj[k];
-	if (!ON_BOARD2(m-dm, n-dn)
-	    && BOARD(m+dm, n+dn) == color
-	    && libs > countlib2(m+dm, n+dn)
-	    && (DRAGON2(m+dm, n+dn).safety == INVINCIBLE
-		|| DRAGON2(m+dm, n+dn).safety == STRONGLY_ALIVE)) {
-	  int score = 20 * (owl_hotspot[m][n] + reading_hotspot[m][n]);
+	int dir = delta[k];
+	if (!ON_BOARD(pos - dir)
+	    && board[pos + dir] == color
+	    && libs > countlib(pos + dir)
+	    && (DRAGON2(pos + dir).safety == INVINCIBLE
+		|| DRAGON2(pos + dir).safety == STRONGLY_ALIVE)) {
+	  int score = 20 * (owl_hotspot[I(pos)][J(pos)] + reading_hotspot[I(pos)][J(pos)]);
 	  if (score > best_score) {
 	    best_score = score;
-	    best_i = m;
-	    best_j = n;
+	    best_scoring_move = pos;
 	  }
 	}
       }
     }
   }
-  if (best_i != -1 && safe_move2(best_i, best_j, color) == WIN) {
-    *i = best_i;
-    *j = best_j;
-    DEBUG(DEBUG_AFTERMATH, "Closing edge at %m\n", best_i, best_j);
+  
+  if (best_scoring_move != NO_MOVE
+      && safe_move(best_scoring_move, color) == WIN) {
+    *aftermath_move = best_scoring_move;
+    DEBUG(DEBUG_AFTERMATH, "Closing edge at %1m\n", best_scoring_move);
     return 1;
   }
 
   /* Case 1. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     int lib;
-    m = I(pos);
-    n = J(pos);
     if (board[pos] == other
-	&& worm[POS(m, n)].unconditional_status != DEAD
+	&& worm[pos].unconditional_status != DEAD
 	&& countlib(pos) == 1
-	&& ((ON_BOARD(SOUTH(pos))    && distance[m+1][n] == 0)
-	    || (ON_BOARD(WEST(pos))  && distance[m][n-1] == 0)
-	    || (ON_BOARD(NORTH(pos)) && distance[m-1][n] == 0)
-	    || (ON_BOARD(EAST(pos))  && distance[m][n+1] == 0))) {
+	&& ((ON_BOARD(SOUTH(pos))    && distance[SOUTH(pos)] == 0)
+	    || (ON_BOARD(WEST(pos))  && distance[WEST(pos)]  == 0)
+	    || (ON_BOARD(NORTH(pos)) && distance[NORTH(pos)] == 0)
+	    || (ON_BOARD(EAST(pos))  && distance[EAST(pos)]  == 0))) {
       findlib(pos, 1, &lib);
       /* Make sure we don't play into a ko or a (proper) snapback. */
       if (countstones(pos) > 1 || !is_self_atari(lib, color)) {
-	*i = I(lib);
-	*j = J(lib);
+	*aftermath_move = lib;
 	return 1;
       }
     }
   }
 
   /* Cases 2--4. */
-  if (closest_opponent_i != -1 || closest_own_i != -1) {
-    if (closest_own_i == -1) {
-      ai = closest_opponent_i;
-      aj = closest_opponent_j;
-    }
-    else {
-      ai = closest_own_i;
-      aj = closest_own_j;
-    }
+  if (closest_opponent != NO_MOVE || closest_own != NO_MOVE) {
+    if (closest_own == NO_MOVE)
+      move = closest_opponent;
+    else
+      move = closest_own;
 
     /* if we're about to play at distance 1, try to optimize the move. */
-    if (distance[ai][aj] == 2) {
+    if (distance[move] == 2) {
       char mx[BOARDMAX];
       char mark = 0;
       memset(mx, 0, sizeof(mx));
       best_score = 0;
-      best_i = ai;
-      best_j = aj;
+      best_scoring_move = move;
 
       for (m = 0; m < board_size; m++)
 	for (n = 0; n < board_size; n++) {
 	  int score = 0;
 	  int move_ok = 0;
-	  if (distance[m][n] != 1)
+	  pos = POS(m, n);
+	  if (distance[pos] != 1)
 	    continue;
 	  mark++;
 	  for (k = 0; k < 4; k++) {
-	    int dm = deltai[k];
-	    int dn = deltaj[k];
-	    if (!ON_BOARD2(m+dm, n+dn))
+	    int pos2 = pos + delta[k];
+	    if (!ON_BOARD(pos2))
 	      continue;
-	    if (distance[m+dm][n+dn] < 1)
+	    if (distance[pos2] < 1)
 	      score--;
-	    else if (BOARD(m+dm, n+dn) == EMPTY)
+	    else if (board[pos2] == EMPTY)
 	      score++;
-	    else if (mx[POS(m+dm, n+dn)] == mark)
+	    else if (mx[pos2] == mark)
 	      score--;
 	    else {
-	      if (BOARD(m+dm, n+dn) == color) {
+	      if (board[pos2] == color) {
 		move_ok = 1;
 		score += 7;
-		if (countstones2(m+dm, n+dn) > 2)
+		if (countstones(pos2) > 2)
 		  score++;
-		if (countstones2(m+dm, n+dn) > 4)
+		if (countstones(pos2) > 4)
 		  score++;
-		if (countlib2(m+dm, n+dn) < 4)
+		if (countlib(pos2) < 4)
 		  score++;
-		if (countlib2(m+dm, n+dn) < 3)
+		if (countlib(pos2) < 3)
 		  score++;
 	      }
 	      else {
-		int deltalib = (approxlib(POS(m, n), other, MAXLIBS, NULL)
-				- countlib2(m+dm, n+dn));
+		int deltalib = (approxlib(pos, other, MAXLIBS, NULL)
+				- countlib(pos2));
 		move_ok = 1;
 		score++;
 		if (deltalib >= 0)
@@ -347,10 +332,10 @@ aftermath_genmove(int *i, int *j, int color,
 		if (deltalib > 0)
 		  score++;
 	      }
-	      mark_string(POS(m+dm, n+dn), mx, mark);
+	      mark_string(pos2, mx, mark);
 	    }
 	  }
-	  if (is_suicide2(m, n, other))
+	  if (is_suicide(pos, other))
 	    score -= 3;
 	  
 	  if (0)
@@ -358,29 +343,24 @@ aftermath_genmove(int *i, int *j, int color,
 	  
 	  if (move_ok && score > best_score) {
 	    best_score = score;
-	    best_i = m;
-	    best_j = n;
+	    best_scoring_move = pos;
 	  }
 	}
-      ai = best_i;
-      aj = best_j;
+      move = best_scoring_move;
     }
 
-    while (distance[ai][aj] > 1) {
+    while (distance[move] > 1) {
       for (k = 0; k < 4; k++) {
-	int di = deltai[k];
-	int dj = deltaj[k];
-	if (ON_BOARD2(ai+di, aj+dj)
-	    && BOARD(ai+di, aj+dj) == EMPTY
-	    && distance[ai+di][aj+dj] == distance[ai][aj] - 1) {
-	  ai = ai + di;
-	  aj = aj + dj;
+	int pos2 = move + delta[k];
+	if (ON_BOARD(pos2)
+	    && board[pos2] == EMPTY
+	    && distance[pos2] == distance[move] - 1) {
+	  move = pos2;
 	  break;
 	}
       }
     }
-    *i = ai;
-    *j = aj;
+    *aftermath_move = move;
     return 1;
   }
   
@@ -402,30 +382,30 @@ aftermath_genmove(int *i, int *j, int color,
       int safety = UNKNOWN;
       int bonus = 0;
       int mx[BOARDMAX];
-      score[m][n] = 0;
+      pos = POS(m, n);
+      score[pos] = 0;
       
-      if (BOARD(m, n) != EMPTY || distance[m][n] != -1)
+      if (board[pos] != EMPTY || distance[pos] != -1)
 	continue;
 
       memset(mx, 0, sizeof(mx));
 
       for (k = 0; k < 8; k++) {
-	int dm = deltai[k];
-	int dn = deltaj[k];
-	if (!ON_BOARD2(m+dm, n+dn))
+	int pos2 = pos + delta[k];
+	if (!ON_BOARD(pos2))
 	  continue;
 	
-	if (BOARD(m+dm, n+dn) == EMPTY) {
+	if (board[pos2] == EMPTY) {
 	  if (k < 4)
 	    eyespace_neighbors++;
 	  continue;
 	}
 	
-	if (BOARD(m+dm, n+dn) == other) {
-	  int origin = dragon[POS(m+dm, n+dn)].origin;
+	if (board[pos2] == other) {
+	  int origin = dragon[pos2].origin;
 
 	  if (k < 4) {
-	    if (dragon[POS(m+dm, n+dn)].matcher_status == ALIVE) {
+	    if (dragon[pos2].matcher_status == ALIVE) {
 	      safety = DEAD;
 	      break;
 	    }
@@ -435,30 +415,29 @@ aftermath_genmove(int *i, int *j, int color,
 	    }
 	  }
 
-	  if (!mx[origin] && dragon[POS(m+dm, n+dn)].matcher_status == DEAD) {
+	  if (!mx[origin] && dragon[pos2].matcher_status == DEAD) {
 	    bonus++;
 	    if (k < 4 
-		&& countlib2(m+dm, n+dn) <= 2 
-		&& countstones2(m+dm, n+dn) >= 3)
+		&& countlib(pos2) <= 2 
+		&& countstones(pos2) >= 3)
 	      bonus++;
 	    
-	    if (k < 4 && countlib2(m+dm, n+dn) == 1)
+	    if (k < 4 && countlib(pos2) == 1)
 	      bonus += 3;
 	  }
 	  mx[origin] = 1;
 	}
-	else if (BOARD(m+dm, n+dn) == color) {
-	  dragoni[m][n] = m+dm;
-	  dragonj[m][n] = n+dn;
+	else if (board[pos2] == color) {
+	  dragons[pos] = pos2;
 
-	  if (safety == UNKNOWN && dragon[POS(m+dm, n+dn)].matcher_status == ALIVE)
+	  if (safety == UNKNOWN && dragon[pos2].matcher_status == ALIVE)
 	    safety = ALIVE;
 
-	  if (DRAGON2(m+dm, n+dn).safety == INVINCIBLE)
+	  if (DRAGON2(pos2).safety == INVINCIBLE)
 	    safety = INVINCIBLE;
 	  
 	  if (k < 4) {
-	    int apos = worm[POS(m+dm, n+dn)].origin;
+	    int apos = worm[pos2].origin;
 	    
 	    if (!mx[apos]) {
 	      own_worms++;
@@ -473,10 +452,6 @@ aftermath_genmove(int *i, int *j, int color,
 	      int safe_atari = 0;
 	      for (r = 0; r < 4; r++) {
 		int  d = delta[r];
-#if 0
-		int di = deltai[r];
-		int dj = deltaj[r];
-#endif
 		if (!ON_BOARD(apos+d))
 		  continue;
 		if (board[apos+d] == other
@@ -486,7 +461,7 @@ aftermath_genmove(int *i, int *j, int color,
 		    && !is_self_atari(apos+d, other))
 		  safe_atari = 1;
 	      }
-	      if (approxlib(POS(m, n), color, 3, NULL) > 2) {
+	      if (approxlib(pos, color, 3, NULL) > 2) {
 		bonus++;
 		if (important) {
 		  bonus += 2;
@@ -507,60 +482,57 @@ aftermath_genmove(int *i, int *j, int color,
 	  || (own_neighbors + own_diagonals) == 0)
 	continue;
 
-      score[m][n] = 4 * eyespace_neighbors + bonus;
+      score[pos] = 4 * eyespace_neighbors + bonus;
       if (safety == INVINCIBLE) {
-	score[m][n] += own_neighbors;
+	score[pos] += own_neighbors;
 	if (own_neighbors < 2)
-	  score[m][n] += own_diagonals;
+	  score[pos] += own_diagonals;
 	if (own_worms > 1 && eyespace_neighbors >= 1)
-	  score[m][n] += 10 + 5 * (own_worms - 2);
+	  score[pos] += 10 + 5 * (own_worms - 2);
       }
       else if (eyespace_neighbors > 2)
-	score[m][n] += own_diagonals;
+	score[pos] += own_diagonals;
 
       /* Splitting bonus. */
       if (opponent_dragons > 1)
-	score[m][n] += 10 * (opponent_dragons - 1);
+	score[pos] += 10 * (opponent_dragons - 1);
 
-      score[m][n] += (int) (20.0 * owl_hotspot[m][n]);
-      score[m][n] += (int) (20.0 * reading_hotspot[m][n]);
+      score[pos] += (int) (20.0 * owl_hotspot[I(pos)][J(pos)]);
+      score[pos] += (int) (20.0 * reading_hotspot[I(pos)][J(pos)]);
 
       if (1 && (debug & DEBUG_AFTERMATH))
-	gprintf("Score %M = %d (hotspot bonus %d + %d)\n", m, n, score[m][n],
-		(int) (20.0 * owl_hotspot[m][n]),
-		(int) (20.0 * reading_hotspot[m][n]));
+	gprintf("Score %1M = %d (hotspot bonus %d + %d)\n", pos, score[pos],
+		(int) (20.0 * owl_hotspot[I(pos)][J(pos)]),
+		(int) (20.0 * reading_hotspot[I(pos)][J(pos)]));
     }
 
   while (1) {
-    int bi, bj;
+    int bb;
     best_score = 0;
-    ai = -1;
-    aj = -1;
+    move = NO_MOVE;
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (score[m][n] > best_score) {
-	  best_score = score[m][n];
-	  ai = m;
-	  aj = n;
+	pos = POS(m, n);
+	if (score[pos] > best_score) {
+	  best_score = score[pos];
+	  move = pos;
 	}
       }
 
-    if (ai == -1)
+    if (move == NO_MOVE)
       break;
 
-    bi = dragoni[ai][aj];
-    bj = dragonj[ai][aj];
-    if (is_illegal_ko_capture2(ai, aj, color)
-	|| !safe_move2(ai, aj, color)
-	|| (DRAGON2(bi, bj).safety != INVINCIBLE
-	    && DRAGON2(bi, bj).safety != STRONGLY_ALIVE
-	    && !owl_does_defend(ai, aj, bi, bj))
-	|| (!confirm_safety(ai, aj, color, 0, NULL, NULL))) {
-      score[ai][aj] = 0;
+    bb = dragons[move];
+    if (is_illegal_ko_capture(move, color)
+	|| !safe_move(move, color)
+	|| (DRAGON2(bb).safety != INVINCIBLE
+	    && DRAGON2(bb).safety != STRONGLY_ALIVE
+	    && !owl_does_defend(I(move), J(move), I(bb), J(bb)))
+	|| (!confirm_safety(I(move), J(move), color, 0, NULL, NULL))) {
+      score[move] = 0;
     }
     else {
-      *i = ai;
-      *j = aj;
+      *aftermath_move = move;
       return 1;
     }
   }
@@ -571,35 +543,33 @@ aftermath_genmove(int *i, int *j, int color,
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      int bi, bj;
+      int bb;
       int self_atari_ok = 0;
-      if (BOARD(m, n) != EMPTY || distance[m][n] != -1)
+      pos = POS(m, n);
+      if (board[pos] != EMPTY || distance[pos] != -1)
 	continue;
-      ai = -1;
-      aj = -1;
+      move = NO_MOVE;
       for (k = 0; k < 4; k++) {
-	int dm = deltai[k];
-	int dn = deltaj[k];
-	if (!ON_BOARD2(m+dm, n+dn))
+	int pos2 = pos + delta[k];
+	if (!ON_BOARD(pos2))
 	  continue;
-	if (BOARD(m+dm, n+dn) == other 
-	    && dragon[POS(m+dm, n+dn)].matcher_status != ALIVE
+	if (board[pos2] == other 
+	    && dragon[pos2].matcher_status != ALIVE
 	    && (do_capture_dead_stones 
-		|| worm[POS(m+dm, n+dn)].unconditional_status != DEAD)
-	    && DRAGON2(m+dm, n+dn).safety != INESSENTIAL) {
-	  ai = m + dm;
-	  aj = n + dn;
+		|| worm[pos2].unconditional_status != DEAD)
+	    && DRAGON2(pos2).safety != INESSENTIAL) {
+	  move = pos2;
 	  break;
 	}
       }
-      if (ai == -1)
+      if (move == NO_MOVE)
 	continue;
 
       /* At this point, (m, n) is a move that potentially may capture
-       * a dead opponent string at (ai, aj).
+       * a dead opponent string at (move).
        */
       
-      if (!trymove2(m, n, color, "aftermath-A", ai, aj, EMPTY, -1, -1))
+      if (!trymove(pos, color, "aftermath-A", move, EMPTY, NO_MOVE))
 	continue;
       
       /* It is frequently necessary to sacrifice own stones in order
@@ -625,50 +595,42 @@ aftermath_genmove(int *i, int *j, int color,
        * +-----
        */
 
-      if ((m > 0 
-	   && BOARD(m-1, n) == color
-	   && DRAGON2(m-1, n).safety != INESSENTIAL)
-	  || (m < board_size - 1
-	      && BOARD(m+1, n) == color
-	      && DRAGON2(m+1, n).safety != INESSENTIAL)
-	  || (n > 0 
-	      && BOARD(m, n-1) == color
-	      && DRAGON2(m, n-1).safety != INESSENTIAL)
-	  || (n < board_size - 1
-	      && BOARD(m, n+1) == color
-	      && DRAGON2(m, n+1).safety != INESSENTIAL))
+      if ((board[SOUTH(pos)] == color
+	   && DRAGON2(SOUTH(pos)).safety != INESSENTIAL)
+	  || (board[WEST(pos)] == color
+	      && DRAGON2(WEST(pos)).safety != INESSENTIAL)
+	  || (board[NORTH(pos)] == color
+	      && DRAGON2(NORTH(pos)).safety != INESSENTIAL)
+	  || (board[EAST(pos)] == color
+	      && DRAGON2(EAST(pos)).safety != INESSENTIAL))
 	self_atari_ok = 0;
       else
 	self_atari_ok = 1;
 
-      /* Copy the potential move to (bi, bj). */
-      bi = m;
-      bj = n;
+      /* Copy the potential move to (bb). */
+      bb = pos;
 
       /* If the move is a self atari, but that isn't okay, try to
        * recursively find a backfilling move which later makes the
        * potential move possible.
        */
       if (!self_atari_ok) {
-	while (countlib2(m, n) == 1) {
+	while (countlib(pos) == 1) {
 	  int lib;
-	  findlib(POS(m, n), 1, &lib);
-	  bi = I(lib);
-	  bj = J(lib);
-	  if (!trymove2(bi, bj, color, "aftermath-B", ai, aj, EMPTY, -1, -1))
+	  findlib(pos, 1, &lib);
+	  bb = lib;
+	  if (!trymove(bb, color, "aftermath-B", move, EMPTY, NO_MOVE))
 	    break;
 	}
 	
-	if (countlib2(m, n) == 1) {
-	  bi = -1;
-	  bj = -1;
-	}
+	if (countlib(pos) == 1)
+	  bb = NO_MOVE;
       }
 
       while (stackp > 0)
 	popgo();
 
-      if (bi == -1)
+      if (bb == NO_MOVE)
 	continue;
       
       /* Make sure that the potential move really isn't a self
@@ -676,15 +638,14 @@ aftermath_genmove(int *i, int *j, int color,
        * could happen (because the backfilling moves happened to
        * capture some stones).
        */
-      if (!self_atari_ok && is_self_atari2(bi, bj, color))
+      if (!self_atari_ok && is_self_atari(bb, color))
 	continue;
       
       /* Consult the owl code to determine whether the considered move
        * really is effective. Blunders should be detected here.
        */
-      if (owl_does_attack(bi, bj, ai, aj)) {
-	*i = bi;
-	*j = bj;
+      if (owl_does_attack(I(bb), J(bb), I(move), J(move))) {
+	*aftermath_move = bb;
 	return 1;
       }
     }
@@ -710,14 +671,14 @@ aftermath_genmove(int *i, int *j, int color,
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (BOARD(m, n) == other
-	  && (worm[POS(m, n)].unconditional_status == UNKNOWN
+      pos = POS(m, n);
+      if (board[pos] == other
+	  && (worm[pos].unconditional_status == UNKNOWN
 	      || do_capture_dead_stones)
-	  && (DRAGON2(m, n).safety == DEAD
-	      || DRAGON2(m, n).safety == TACTICALLY_DEAD)
-	  && worm[POS(m, n)].attack_codes[0] != 0) {
-	*i = I(worm[POS(m, n)].attack_points[0]);
-	*j = J(worm[POS(m, n)].attack_points[0]);
+	  && (DRAGON2(pos).safety == DEAD
+	      || DRAGON2(pos).safety == TACTICALLY_DEAD)
+	  && worm[pos].attack_codes[0] != 0) {
+	*aftermath_move = worm[pos].attack_points[0];
 	return 1;
       }
       
@@ -731,6 +692,7 @@ static void
 do_play_aftermath(int color, struct aftermath_data *a)
 {
   int i, j;
+  int move;
   int pass = 0;
   int moves = 0;
   int color_to_play = color;
@@ -745,18 +707,19 @@ do_play_aftermath(int color, struct aftermath_data *a)
     int reading_nodes = get_reading_node_counter();
     int owl_nodes = get_owl_node_counter();
     int move_val = genmove_conservative(&i, &j, color_to_play);
+    move = POS(i, j);
     if (move_val < 0)
-      move_val = aftermath_genmove(&i, &j, color_to_play,
+      move_val = aftermath_genmove(&move, color_to_play,
 				   (color_to_play == WHITE ?
 				    a->white_control : a->black_control),
 				   0);
-    play_move(POS(i, j), color_to_play);
+    play_move(move, color_to_play);
     moves++;
-    DEBUG(DEBUG_AFTERMATH, "%d %C move %m (nodes %d, %d  total %d, %d)\n",
-	  movenum, color_to_play, i, j, get_owl_node_counter() - owl_nodes,
+    DEBUG(DEBUG_AFTERMATH, "%d %C move %1m (nodes %d, %d  total %d, %d)\n",
+	  movenum, color_to_play, move, get_owl_node_counter() - owl_nodes,
 	  get_reading_node_counter() - reading_nodes,
 	  get_owl_node_counter(), get_reading_node_counter());
-    if (i != -1)
+    if (move != PASS_MOVE)
       pass = 0;
     else
       pass++;
@@ -788,8 +751,8 @@ play_aftermath(int color)
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (BOARD(m, n) != current_board[m][n]) {
-	current_board[m][n] = BOARD(m, n);
+      if (board[POS(m, n)] != current_board[m][n]) {
+	current_board[m][n] = board[POS(m, n)];
 	cached_board = 0;
       }
 
@@ -816,12 +779,12 @@ play_aftermath(int color)
     for (n = 0; n < board_size; n++) {
       if (a->black_control[POS(m, n)]) {
 	a->black_area++;
-	if (BOARD(m, n) == WHITE) {
+	if (board[POS(m, n)] == WHITE) {
 	  a->black_territory++;
 	  a->white_prisoners++;
 	  a->final_status[POS(m, n)] = DEAD;
 	}
-	else if (BOARD(m, n) == EMPTY) {
+	else if (board[POS(m, n)] == EMPTY) {
 	  a->black_territory++;
 	  a->final_status[POS(m, n)] = BLACK_TERRITORY;
 	}
@@ -830,12 +793,12 @@ play_aftermath(int color)
       }
       else if (a->white_control[POS(m, n)]) {
 	a->white_area++;
-	if (BOARD(m, n) == BLACK) {
+	if (board[POS(m, n)] == BLACK) {
 	  a->white_territory++;
 	  a->black_prisoners++;
 	  a->final_status[POS(m, n)] = DEAD;
 	}
-	else if (BOARD(m, n) == EMPTY) {
+	else if (board[POS(m, n)] == EMPTY) {
 	  a->white_territory++;
 	  a->final_status[POS(m, n)] = WHITE_TERRITORY;
 	}
@@ -843,11 +806,11 @@ play_aftermath(int color)
 	  a->final_status[POS(m, n)] = ALIVE;
       }
       else {
-	if (BOARD(m, n) == EMPTY)
+	if (board[POS(m, n)] == EMPTY)
 	  a->final_status[POS(m, n)] = DAME;
 	else {
 	  a->final_status[POS(m, n)] = ALIVE_IN_SEKI;
-	  if (BOARD(m, n) == WHITE)
+	  if (board[POS(m, n)] == WHITE)
 	    a->white_area++;
 	  else
 	    a->black_area++;
@@ -882,7 +845,7 @@ aftermath_compute_score(int color, float komi)
 int
 aftermath_final_status(int color, int m, int n)
 {
-  ASSERT_ON_BOARD2(m, n);
+  ASSERT_ON_BOARD1(POS(m, n));
   play_aftermath(color);
   return aftermath.final_status[POS(m, n)];
 }

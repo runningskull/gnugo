@@ -88,11 +88,11 @@ do { \
   *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
 } while(0)
 
-#define ATTACK_MACRO(i,j) ((stackp==0) ? (worm[POS(i, j)].attack_codes[0]) : attack(POS(i,j),NULL))
-#define DEFEND_MACRO(i,j) ((stackp==0) ? (worm[POS(i, j)].defend_codes[0]) : find_defense(POS(i,j),NULL))
-#define DRAGON_WEAK(i, j) (DRAGON2(i, j).safety != ALIVE \
-			   && DRAGON2(i, j).safety != STRONGLY_ALIVE \
-			   && DRAGON2(i, j).safety != INVINCIBLE)
+#define ATTACK_MACRO(pos) ((stackp==0) ? (worm[pos].attack_codes[0]) : attack(pos, NULL))
+#define DEFEND_MACRO(pos) ((stackp==0) ? (worm[pos].defend_codes[0]) : find_defense(pos, NULL))
+#define DRAGON_WEAK(pos) (DRAGON2(pos).safety != ALIVE \
+			  && DRAGON2(pos).safety != STRONGLY_ALIVE \
+			  && DRAGON2(pos).safety != INVINCIBLE)
 
 struct pattern; /* forward reference to keep gcc happy */
 

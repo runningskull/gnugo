@@ -281,7 +281,7 @@ loadsgf games/incident278.sgf 160
 
 loadsgf games/strategy5.sgf 44
 61 defend S5
-#? [S3|S4]
+#? [1 S3|S4]
 
 loadsgf games/reading04.sgf 237
 trymove B E1

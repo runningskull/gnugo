@@ -104,26 +104,14 @@ extern Hash_data    hashdata;
 /* 2D workaround macros for 1D functions. */
 #define countlib2(m, n) countlib(POS(m, n))
 #define countstones2(m, n) countstones(POS(m, n))
-#define same_string2(m, n, i, j) same_string(POS(m, n), POS(i, j))
 #define safe_move2(m, n, color) safe_move(POS(m, n), color)
 #define is_legal2(m, n, color) is_legal(POS(m, n), color)
 #define is_suicide2(m, n, color) is_suicide(POS(m, n), color)
-#define is_self_atari2(m, n, color) is_self_atari(POS(m, n), color)
-#define is_illegal_ko_capture2(m, n, color) \
-        is_illegal_ko_capture(POS(m, n), color)
 #define trymove2(m, n, color, message, i, j, komaster, kom_i, kom_j) \
         trymove(POS(m, n), color, message, POS(i, j), \
                 komaster, POS(kom_i, kom_j))
 #define tryko2(m, n, color, message, komaster, kom_i, kom_j) \
         tryko(POS(m, n), color, message, komaster, POS(kom_i, kom_j))
-#define neighbor_of_string2(m, n, i, j) \
-        neighbor_of_string(POS(m, n), POS(i, j))
-#define liberty_of_string2(m, n, i, j) \
-        liberty_of_string(POS(m, n), POS(i, j))
-#define is_ko_point2(m, n) is_ko_point(POS(m, n))
-#define does_capture_something2(m, n, color) \
-        does_capture_something(POS(m, n), color)
-#define add_stone2(m, n, color) add_stone(POS(m, n), color)
 #define is_worm_origin2(wi, wj, i, j) is_worm_origin(POS(wi, wj), POS(i, j))
 
 /* board utility functions */
@@ -277,9 +265,9 @@ void mark_string2(int m, int n, char mx[MAX_BOARD][MAX_BOARD], char mark);
 int move_in_stack(int pos, int cutoff);
 void get_move_from_stack(int k, int *move, int *color);
 int stones_on_board(int color);
-int obvious_false_eye(int i, int j, int color);
+int obvious_false_eye(int pos, int color);
 int owl_topological_eye(int i, int j, int color);
-int vital_chain(int m, int n);
+int vital_chain(int pos);
 int confirm_safety(int m, int n, int color, int size, int *di, int *dj);
 void set_depth_values(int level);
 void modify_depth_values(int n);
@@ -289,8 +277,9 @@ void set_temporary_depth_values(int d, int b, int f, int k,
 				int br, int b2, int ss);
 void restore_depth_values(void);
 int safe_move(int move, int color);
-void join_dragons(int ai, int aj, int bi, int bj);
+void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, int escape_value[BOARDMAX]);
+int same_dragon(int d1, int d2);
 int lively_dragon_exists(int color);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
@@ -348,7 +337,7 @@ void find_stones_saved_by_move(int i, int j, int color,
 
 int owl_lively(int i, int j);
 int owl_escape_value(int i, int j);
-int owl_goal_dragon(int i, int j);
+int owl_goal_dragon(int pos);
 int owl_eyespace(int ai, int aj, int bi, int bj);
 int owl_big_eyespace(int ai, int aj, int bi, int bj);
 void owl_reasons(int color);
@@ -386,8 +375,8 @@ int atari_atari_try_combination(int color, int apos, int bpos);
 
 int review_move_reasons(int *i, int *j, float *val, int color,
 			float pure_threat_value, float lower_bound);
-int fill_liberty(int *i, int *j, int color);
-int aftermath_genmove(int *i, int *j, int color,
+int fill_liberty(int *move, int color);
+int aftermath_genmove(int *aftermath_move, int color,
 		      int under_control[BOARDMAX],
 		      int do_capture_dead_stones);
 int revise_semeai(int color);
@@ -676,7 +665,7 @@ extern struct dragon_data2 *dragon2;
 /* Macros for accessing the dragon2 data with board coordinates and
  * the dragon data with a dragon id.
  */
-#define DRAGON2(m, n) dragon2[dragon[POS(m, n)].id]
+#define DRAGON2(pos) dragon2[dragon[pos].id]
 #define DRAGON(d) dragon[dragon2[d].origin]
 
 struct aftermath_data {
@@ -724,21 +713,20 @@ extern struct eye_data black_eye[BOARDMAX];
  * definition of struct eye_data or struct half_eye_data.
  */
 
-void compute_eyes(int i, int  j, int *max, int *min,
-                  int *attacki, int *attackj, int *defendi, int *defendj,
+void compute_eyes(int pos, int *max, int *min,
+                  int *attack_point, int *defense_point,
                   struct eye_data eye[BOARDMAX],
                   struct half_eye_data heye[BOARDMAX],
                   int add_moves, int color);
-void compute_eyes_pessimistic(int i, int  j, int *max, int *min,
+void compute_eyes_pessimistic(int pos, int *max, int *min,
                               int *pessimistic_min,
-                              int *attacki, int *attackj,
-                              int *defendi, int *defendj,
+                              int *attack_point, int *defense_point,
                               struct eye_data eye[BOARDMAX],
                               struct half_eye_data heye[BOARDMAX]);
-int recognize_eye2(int m, int n, int *attacki, int *attackj,
-                    int *defendi, int *defendj, int *max, int *min,
-                    struct eye_data eye[BOARDMAX],
-                    struct half_eye_data heye[BOARDMAX],
+int recognize_eye2(int pos, int *attack_point,
+		   int *defense_point, int *max, int *min,
+		   struct eye_data eye[BOARDMAX],
+		   struct half_eye_data heye[BOARDMAX],
                     int add_moves, int color);
 void propagate_eye (int pos, struct eye_data eye[BOARDMAX]);
 void originate_eye(int i, int j, int m, int n,

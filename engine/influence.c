@@ -364,7 +364,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 	}
 	else if (!dragons_known
 		 || dragon[POS(i, j)].id == -1
-		 || DRAGON2(i, j).safety != DEAD) {
+		 || DRAGON2(POS(i, j)).safety != DEAD) {
 	  if (q->p[i][j] == WHITE)
 	    q->black_permeability[i][j] = 0.0;
 	  else
@@ -393,10 +393,10 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 	else {
 	  if (q->p[i][j] == WHITE)
 	    q->white_strength[i][j] = (DEFAULT_STRENGTH
-				       * strength_map[DRAGON2(i, j).safety]);
+				       * strength_map[DRAGON2(POS(i, j)).safety]);
 	  else if (q->p[i][j] == BLACK)
 	    q->black_strength[i][j] = (DEFAULT_STRENGTH
-				       * strength_map[DRAGON2(i, j).safety]);
+				       * strength_map[DRAGON2(POS(i, j)).safety]);
 	}
 
 	/* Stop influence radiation from captured stones.

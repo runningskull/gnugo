@@ -321,7 +321,6 @@ void gprintf(const char *fmt, ...);
 void mprintf(const char *fmt, ...);
 const char *color_to_string(int color);
 const char *location_to_string(int pos);
-const char *location_to_string2(int i, int j);
 const char *status_to_string(int status);
 const char *safety_to_string(int status);
 const char *result_to_string(int result);
@@ -432,7 +431,6 @@ void make_dragons(int color, int stop_before_owl);
 void show_dragons(void);
 int dragon_status(int i, int j);
 int matcher_status(int i, int j);
-int same_dragon(int ai, int aj, int bi, int bj);
 
 /* moyo functions */
 void print_moyo(void);

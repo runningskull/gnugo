@@ -342,12 +342,12 @@ decideposition(int color, const char *sgf_output)
     for (n = 0; n < board_size; n++) {
       if ((dragon[POS(m, n)].origin != POS(m, n))
 	  || (BOARD(m, n) == EMPTY)
-	  || (DRAGON2(m, n).escape_route >= 6))
+	  || (DRAGON2(POS(m, n)).escape_route >= 6))
 	continue;
 
       gprintf("\nanalyzing %m\n", m, n);
       gprintf("status=%s, escape=%d\n", 
-	      snames[dragon[POS(m, n)].status], DRAGON2(m, n).escape_route);
+	      snames[dragon[POS(m, n)].status], DRAGON2(POS(m, n)).escape_route);
       acode = owl_attack(m, n, &i, &j, NULL);
       if (acode) {
 	if (acode == WIN) {
@@ -414,9 +414,9 @@ decideeye(int m, int n, const char *sgf_output)
 {
   int  color;
   int  max, min;
-  int  attacki, attackj;
-  int  defendi, defendj;
-  int  i, j;
+  int  attack_point;
+  int  defense_point;
+  int  pos;
   int  save_verbose = verbose;
   int  save_debug = debug;
   SGFTree tree;
@@ -449,25 +449,23 @@ decideeye(int m, int n, const char *sgf_output)
   count_variations = 1;
   
   if (black_eye[POS(m, n)].color == BLACK_BORDER) {
-    i = I(black_eye[POS(m, n)].origin);
-    j = J(black_eye[POS(m, n)].origin);
-    compute_eyes(i, j, &max, &min, &attacki, &attackj, &defendi, &defendj,
+    pos = black_eye[POS(m, n)].origin;
+    compute_eyes(pos, &max, &min, &attack_point, &defense_point,
 		 black_eye, half_eye, 0, EMPTY);
-    gprintf("Black eyespace at %m: min=%d, max=%d\n", i, j, min, max);
+    gprintf("Black eyespace at %1m: min=%d, max=%d\n", pos, min, max);
     if (max != min) {
-      gprintf("  vital points: %m (attack) %m (defense)\n", attacki, attackj,
-	      defendi, defendj);
+      gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
+	      defense_point);
     }
   }
   if (white_eye[POS(m, n)].color == WHITE_BORDER) {
-    i = I(white_eye[POS(m, n)].origin);
-    j = J(white_eye[POS(m, n)].origin);
-    compute_eyes(i, j, &max, &min, &attacki, &attackj, &defendi, &defendj,
+    pos = white_eye[POS(m, n)].origin;
+    compute_eyes(pos, &max, &min, &attack_point, &defense_point,
 		 white_eye, half_eye, 0, EMPTY);
-    gprintf("White eyespace at %m: min=%d, max=%d\n", i, j, min, max);
+    gprintf("White eyespace at %1m: min=%d, max=%d\n", pos, min, max);
     if (max != min) {
-      gprintf("  vital points: %m (attack) %m (defense)\n", attacki, attackj,
-	      defendi, defendj);
+      gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
+	      defense_point);
     }
   }
   

@@ -1155,7 +1155,7 @@ find_more_owl_attack_and_defense_moves(int color)
 	    continue;
 
 	  /* Don't care about inessential dragons. */
-	  if (DRAGON2(I(dd), J(dd)).safety == INESSENTIAL)
+	  if (DRAGON2(dd).safety == INESSENTIAL)
 	    continue;
 	}      
 	else
@@ -1261,7 +1261,7 @@ induce_secondary_move_reasons(int color)
 	  continue; /* No defense. */
 
 	/* Don't care about inessential dragons. */
-	if (DRAGON2(I(aa), J(aa)).safety == INESSENTIAL)
+	if (DRAGON2(aa).safety == INESSENTIAL)
 	  continue;
 	
 	/*
@@ -1287,8 +1287,8 @@ induce_secondary_move_reasons(int color)
          * should become unnecessary.
 	 */
 	if (dragon[aa].size == worm[aa].size) {
-	  for (i = 0; i < DRAGON2(I(aa), J(aa)).neighbors; i++) {
-	    int d = DRAGON2(I(aa), J(aa)).adjacent[i];
+	  for (i = 0; i < DRAGON2(aa).neighbors; i++) {
+	    int d = DRAGON2(aa).adjacent[i];
 	    if (DRAGON(d).color == dragon[aa].color)
 	      continue;
 	    
@@ -1301,8 +1301,8 @@ induce_secondary_move_reasons(int color)
 	  if (biggest == 0)
 	    continue;
 	  
-	  for (i = 0; i < DRAGON2(I(aa), J(aa)).neighbors; i++) {
-	    int d = DRAGON2(I(aa), J(aa)).adjacent[i];
+	  for (i = 0; i < DRAGON2(aa).neighbors; i++) {
+	    int d = DRAGON2(aa).adjacent[i];
 	    int ee = DRAGON(d).origin;
 
 	    if (DRAGON(d).color == dragon[aa].color)
@@ -1316,10 +1316,10 @@ induce_secondary_move_reasons(int color)
                  * points.
 		 */
 		if (dragon[aa].matcher_status != DEAD
-		    || (DRAGON2(I(dd), J(dd)).safety != STRONGLY_ALIVE
-			&& DRAGON2(I(dd), J(dd)).safety != INVINCIBLE)
-		    || (DRAGON2(I(ee), J(ee)).safety != STRONGLY_ALIVE
-			&& DRAGON2(I(ee), J(ee)).safety != INVINCIBLE))
+		    || (DRAGON2(dd).safety != STRONGLY_ALIVE
+			&& DRAGON2(dd).safety != INVINCIBLE)
+		    || (DRAGON2(ee).safety != STRONGLY_ALIVE
+			&& DRAGON2(ee).safety != INVINCIBLE))
 		  add_connection_move(pos, dd, ee);
 	      }
 	      else
@@ -1368,10 +1368,10 @@ induce_secondary_move_reasons(int color)
                  * points.
 		 */
 		if (dragon[aa].matcher_status != DEAD
-		    || (DRAGON2(I(dd), J(dd)).safety != STRONGLY_ALIVE
-			&& DRAGON2(I(dd), J(dd)).safety != INVINCIBLE)
-		    || (DRAGON2(I(ee), J(ee)).safety != STRONGLY_ALIVE
-			&& DRAGON2(I(ee), J(ee)).safety != INVINCIBLE))
+		    || (DRAGON2(dd).safety != STRONGLY_ALIVE
+			&& DRAGON2(dd).safety != INVINCIBLE)
+		    || (DRAGON2(ee).safety != STRONGLY_ALIVE
+			&& DRAGON2(ee).safety != INVINCIBLE))
 		  add_connection_move(pos, dd, ee);
 	      }
 	      else
@@ -1490,10 +1490,10 @@ examine_move_safety(int color)
 	      }
 	    }
 	    else {
-	      for (k = 0; k < DRAGON2(I(aa), J(aa)).neighbors; k++)
-		if (DRAGON(DRAGON2(I(aa), J(aa)).adjacent[k]).color == color) {
+	      for (k = 0; k < DRAGON2(aa).neighbors; k++)
+		if (DRAGON(DRAGON2(aa).adjacent[k]).color == color) {
 		  our_color_neighbors++;
-		  bb = dragon2[DRAGON2(I(aa), J(aa)).adjacent[k]].origin;
+		  bb = dragon2[DRAGON2(aa).adjacent[k]].origin;
 		}
 	    }
 	    
@@ -1858,7 +1858,7 @@ static float safety_values[10] = {
 static float
 dragon_safety(int dr, int ignore_dead_dragons)
 {
-  int dragon_safety = DRAGON2(I(dr), J(dr)).safety;
+  int dragon_safety = DRAGON2(dr).safety;
 
   /* Kludge: If a dragon is dead, we return 1.0 in order not
    * to try to run away.
@@ -1871,8 +1871,8 @@ dragon_safety(int dr, int ignore_dead_dragons)
 
   /* More detailed guesses for WEAK and WEAKLY_ALIVE dragons. */
   if (dragon_safety == WEAK || dragon_safety == WEAKLY_ALIVE) {
-    int escape = DRAGON2(I(dr), J(dr)).escape_route;
-    int moyo = DRAGON2(I(dr), J(dr)).moyo;
+    int escape = DRAGON2(dr).escape_route;
+    int moyo = DRAGON2(dr).moyo;
     /* If escape <= 5 and moyo <= 10, the dragon won't be WEAK, since
      * the owl code has been run.
      */
@@ -1970,14 +1970,10 @@ static float cautious_impact_values[10][10] = {
 static float
 connection_value(int dragona, int dragonb, int tt, float margin)
 {
-  int ai = I(dragona);
-  int aj = J(dragona);
-  int bi = I(dragonb);
-  int bj = J(dragonb);
-  int safety1 = DRAGON2(ai, aj).safety;
-  int safety2 = DRAGON2(bi, bj).safety;
-  int true_genus1 = 2 * DRAGON2(ai, aj).genus + DRAGON2(ai, aj).heyes;
-  int true_genus2 = 2 * DRAGON2(bi, bj).genus + DRAGON2(bi, bj).heyes;
+  int safety1 = DRAGON2(dragona).safety;
+  int safety2 = DRAGON2(dragonb).safety;
+  int true_genus1 = 2 * DRAGON2(dragona).genus + DRAGON2(dragona).heyes;
+  int true_genus2 = 2 * DRAGON2(dragonb).genus + DRAGON2(dragonb).heyes;
   float impact;
 
   /* If the connected dragon gets sufficient eyespace to live on its
@@ -1987,8 +1983,8 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   if (true_genus1 < 4 && true_genus2 < 4) {
     if (true_genus1 + true_genus2 >= 4
 	||  (true_genus1 + true_genus2 >= 3
-	     && (DRAGON2(ai, aj).heye == tt
-		 || DRAGON2(bi, bj).heye == tt)))
+	     && (DRAGON2(dragona).heye == tt
+		 || DRAGON2(dragonb).heye == tt)))
       safety2 = ALIVE;
   }
 
@@ -1996,7 +1992,7 @@ connection_value(int dragona, int dragonb, int tt, float margin)
    * assume it doesn't help dragon a to connect to b.
    */
   if (safety2 == CRITICAL && true_genus2 == 0
-      && DRAGON2(bi, bj).moyo == 0)
+      && DRAGON2(dragonb).moyo == 0)
     return 0.0;
   
 
@@ -2035,7 +2031,7 @@ connection_value(int dragona, int dragonb, int tt, float margin)
       && is_self_atari(tt, board[dragona]))
     impact = 0.0;
   
-  return impact * 2.0 * dragon[POS(ai, aj)].effective_size;
+  return impact * 2.0 * dragon[dragona].effective_size;
 }
 
 /*
@@ -2181,7 +2177,7 @@ estimate_territorial_value(int pos, int color,
 	break;
       }
 
-      if (DRAGON2(I(aa), J(aa)).safety == INESSENTIAL
+      if (DRAGON2(aa).safety == INESSENTIAL
 	  || worm[aa].inessential) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - threatens to capture %1m (inessential)\n",
@@ -2283,7 +2279,7 @@ estimate_territorial_value(int pos, int color,
     case UNCERTAIN_OWL_DEFENSE:
       aa = dragons[move_reasons[r].what];
       
-      if (DRAGON2(I(aa), J(aa)).safety == INESSENTIAL) {
+      if (DRAGON2(aa).safety == INESSENTIAL) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0 - owl attack/defend for inessential dragon %1m\n",
 	      pos, aa);
@@ -2309,8 +2305,8 @@ estimate_territorial_value(int pos, int color,
 	int d;
 	int found_one = 0;
 
-	for (d = 0; d < DRAGON2(I(aa), J(aa)).neighbors; d++)
-	  if (DRAGON(DRAGON2(I(aa), J(aa)).adjacent[d]).matcher_status == CRITICAL)
+	for (d = 0; d < DRAGON2(aa).neighbors; d++)
+	  if (DRAGON(DRAGON2(aa).adjacent[d]).matcher_status == CRITICAL)
 	    found_one = 1;
 	if (found_one)
 	  break;
@@ -2405,7 +2401,7 @@ estimate_territorial_value(int pos, int color,
     case OWL_DEFEND_MOVE:
       aa = dragons[move_reasons[r].what];
       
-      if (DRAGON2(I(aa), J(aa)).safety == INESSENTIAL) {
+      if (DRAGON2(aa).safety == INESSENTIAL) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0 - owl attack/defend for inessential dragon %1m\n",
 	      pos, aa);
@@ -2457,7 +2453,7 @@ estimate_territorial_value(int pos, int color,
        * This does not apply if we are doing scoring.
        */
       if (!doing_scoring
-	  && same_dragon(I(last_moves[0]), J(last_moves[0]), I(aa), J(aa))) {
+	  && same_dragon(last_moves[0], aa)) {
 	this_value = 1.5 * dragon[aa].effective_size;
 	TRACE("  %1m: %f - attack last move played, although it seems dead\n",
 	      pos, this_value);
@@ -2678,7 +2674,7 @@ estimate_strategical_value(int pos, int color, float score)
 	 * No points are awarded if the lunch is an inessential dragon
 	 * or worm.
 	 */
-	if (DRAGON2(I(aa), J(aa)).safety == INESSENTIAL
+	if (DRAGON2(aa).safety == INESSENTIAL
 	    || worm[aa].inessential)
 	  break;
 
@@ -3417,7 +3413,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
 	tval = move[POS(m, n)].value;
 	
 	if (tval > bestval) {
-	  if (is_legal2(m, n, color) || is_illegal_ko_capture2(m, n, color)) {
+	  if (is_legal(POS(m, n), color) || is_illegal_ko_capture(POS(m, n), color)) {
 	    bestval = tval;
 	    best_i = m;
 	    best_j = n;
@@ -3447,7 +3443,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
     /* If the best move is an illegal ko capture, reevaluate ko
      * threats and search again.
      */
-    if (bestval > 0.0 && is_illegal_ko_capture2(best_i, best_j, color)) {
+    if (bestval > 0.0 && is_illegal_ko_capture(POS(best_i, best_j), color)) {
       TRACE("Move at %m would be an illegal ko capture.\n", best_i, best_j);
       reevaluate_ko_threats();
       redistribute_points();

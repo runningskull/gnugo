@@ -1214,6 +1214,22 @@ O.Xx
 
 
 
+# Pattern A419
+# # gf New pattern. (3.1.10)
+# #    (This pattern is probably good, but is disabled awaiting
+# #     investigation of some broken regressions.)
+# 
+# X.O
+# .*X      cut to stop escape
+# 
+# :8,-,value(55)
+# 
+# A.O
+# .*B
+# 
+# ;owl_escape_value(A)>0 || owl_escape_value(B)>0
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the second line        #

@@ -2907,11 +2907,11 @@ do_attack(int str, int *move, int komaster, int kom_pos)
 
 /* If (str) points to a group with exactly one liberty, attack1
  * determines whether it can be captured by playing at this liberty.
- * If yes, (*move) is the killing move. move may be NULL if caller is
- * only interested in whether it can be captured.
+ * If successful, (*move) is the killing move. move may be NULL if
+ * caller is only interested in whether it can be captured.
  *
  * The attack may fail for two different reasons. The first one is
- * that the attack may be an illegal ko capture, in this case 3 is
+ * that the attack may be an illegal ko capture, in this case KO_B is
  * returned (need to play a ko threat before the attack can be
  * fulfilled).
  *
@@ -6154,7 +6154,7 @@ mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
 	int dj = deltaj[k];
 	if (ON_BOARD2(i+di, j+dj)
 	    && BOARD(i+di, j+dj) != EMPTY
-	    && same_string2(i+di, j+dj, m, n)) {
+	    && same_string(POS(i+di, j+dj), POS(m, n))) {
 	  if (k < 4) {
 	    values[i][j] += contribution;
 	    break;

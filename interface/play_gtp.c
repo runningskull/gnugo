@@ -981,9 +981,9 @@ gtp_eval_eye(char *s, int id)
 {
   int m, n;
   int max, min;
-  int attacki, attackj;
-  int defendi, defendj;
-  int i, j;
+  int attack_point;
+  int defense_point;
+  int pos;
   int save_verbose = verbose;
 
   if (!gtp_decode_coord(s, &m, &n))
@@ -994,15 +994,13 @@ gtp_eval_eye(char *s, int id)
   verbose = save_verbose;
   
   if (black_eye[POS(m, n)].color == BLACK_BORDER) {
-    i = I(black_eye[POS(m, n)].origin);
-    j = J(black_eye[POS(m, n)].origin);
-    compute_eyes(i, j, &max, &min, &attacki, &attackj, &defendi, &defendj,
+    pos = black_eye[POS(m, n)].origin;
+    compute_eyes(pos, &max, &min, &attack_point, &defense_point,
 		 black_eye, half_eye, 0, EMPTY);
   }
   else if (white_eye[POS(m, n)].color == WHITE_BORDER) {
-    i = I(white_eye[POS(m, n)].origin);
-    j = J(white_eye[POS(m, n)].origin);
-    compute_eyes(i, j, &max, &min, &attacki, &attackj, &defendi, &defendj,
+    pos = white_eye[POS(m, n)].origin;
+    compute_eyes(pos, &max, &min, &attack_point, &defense_point,
 		 white_eye, half_eye, 0, EMPTY);
   }
   else
@@ -1013,9 +1011,9 @@ gtp_eval_eye(char *s, int id)
   gtp_printf("%d %d", min, max);
   if (max != min) {
     gtp_printf(" ");
-    gtp_print_vertex(attacki, attackj);
+    gtp_print_vertex(I(attack_point), J(attack_point));
     gtp_printf(" ");
-    gtp_print_vertex(defendi, defendj);
+    gtp_print_vertex(I(defense_point), J(defense_point));
   }
   return gtp_finish_response();
 }
@@ -2212,14 +2210,14 @@ gtp_dragon_data(char *s, int id)
 	  gtp_printf("semeai_margin_of_safety %d\n",   
 		     d2->semeai_margin_of_safety);
 	  gtp_printf("neighbors:              ");
-	  for (k = 0; k < DRAGON2(m, n).neighbors; k++)
+	  for (k = 0; k < DRAGON2(POS(m, n)).neighbors; k++)
 	    gtp_mprintf("%m ", 
-			I(DRAGON(DRAGON2(m, n).adjacent[k]).origin),
-			J(DRAGON(DRAGON2(m, n).adjacent[k]).origin));
+			I(DRAGON(DRAGON2(POS(m, n)).adjacent[k]).origin),
+			J(DRAGON(DRAGON2(POS(m, n)).adjacent[k]).origin));
 	  gtp_printf("\n");
-	  gtp_printf("moyo:                   %d\n", DRAGON2(m, n).moyo);
+	  gtp_printf("moyo:                   %d\n", DRAGON2(POS(m, n)).moyo);
 	  gtp_printf("safety:                 %s\n", 
-		     safety_to_string(DRAGON2(m, n).safety));
+		     safety_to_string(DRAGON2(POS(m, n)).safety));
 	  gtp_printf("strings: ");
 	  for (ti = 0; ti < board_size; ti++)
 	    for (tj = 0; tj < board_size; tj++)

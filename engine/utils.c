@@ -775,8 +775,8 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 	&& liberties <= worm[POS(bi, bj)].liberties) {
       trouble = 1;
       if (dragon[POS(bi, bj)].matcher_status == ALIVE
-	  && DRAGON2(bi, bj).safety != INVINCIBLE
-	  && DRAGON2(bi, bj).safety != STRONGLY_ALIVE
+	  && DRAGON2(POS(bi, bj)).safety != INVINCIBLE
+	  && DRAGON2(POS(bi, bj)).safety != STRONGLY_ALIVE
 	  && dragon[POS(bi, bj)].size >= size
 	  && !owl_confirm_safety(i, j, bi, bj, di, dj)) {
 	verbose = save_verbose;

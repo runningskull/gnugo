@@ -78,9 +78,9 @@ basic_cut_helper (ARGS)
   /* If c is a ko stone, assume that we would lose the ko. */
   if (worm[POS(ci, cj)].attack_codes[0] != 0
       && (ccolor == color
-	  || is_ko_point2(ci, cj)))
+	  || is_ko_point(POS(ci, cj))))
     return 0;
-  if (is_ko_point2(ti, tj))
+  if (is_ko_point(POS(ti, tj)))
     return 0;
 
   if (TRYMOVE(ti, tj, ccolor)) {
@@ -94,7 +94,7 @@ basic_cut_helper (ARGS)
   else
     return 0;
 
-  if (safe_move2(ti, tj, acolor) == 0)
+  if (safe_move(POS(ti, tj), acolor) == 0)
     return 0;
 
   /* Cut ok. */
@@ -265,8 +265,8 @@ not_lunch_helper(int ai, int aj, int bi, int bj)
   /* Tell the move generation code about the change in status. */
   remove_lunch(POS(bi, bj), POS(ai, aj));
   
-  if (DRAGON2(bi, bj).lunch == POS(ai, aj))
-    DRAGON2(bi, bj).lunch = NO_MOVE;
+  if (DRAGON2(POS(bi, bj)).lunch == POS(ai, aj))
+    DRAGON2(POS(bi, bj)).lunch = NO_MOVE;
 
   return 0;
 }
@@ -496,11 +496,14 @@ defend_against_atari_helper(int ti, int tj, int ai, int aj)
 void
 amalgamate_most_valuable_helper(int ai, int aj, int bi, int bj, int ci, int cj)
 {
-  if (!same_dragon(ai, aj, bi, bj) && !same_dragon(bi, bj, ci, cj)) {
-    if (dragon[POS(ai, aj)].effective_size >= dragon[POS(ci, cj)].effective_size)
-      join_dragons(ai, aj, bi, bj);
+  int apos = POS(ai, aj);
+  int bpos = POS(bi, bj);
+  int cpos = POS(ci, cj);
+  if (!same_dragon(apos, bpos) && !same_dragon(bpos, cpos)) {
+    if (dragon[apos].effective_size >= dragon[cpos].effective_size)
+      join_dragons(apos, bpos);
     else
-      join_dragons(bi, bj, ci, cj);
+      join_dragons(bpos, cpos);
   }
 }
 

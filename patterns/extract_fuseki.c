@@ -392,7 +392,7 @@ get_move_from_sgf(SGFNode *node, int *m, int *n, int *color)
     case SGFAB:
       get_moveXY(prop, &i, &j, board_size);
       /* Put handicap stones on the board at once. */
-      add_stone2(i, j, BLACK);
+      add_stone(POS(i, j), BLACK);
       break;
       
     case SGFAW:
