@@ -5344,7 +5344,7 @@ estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
     else {
       *min = 0;
       *probable = 1;
-      *max = 2;
+      *max = 1;
     }
   }
   else if (size == 1) {

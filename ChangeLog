@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- estimate_lunch_eye_value() revised	
 - avoid calling owl_substantial() when not needed in aa_compute_status()
 - value_move_reasons() revised
 - special_rescue6_moves() revised
