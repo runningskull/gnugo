@@ -336,7 +336,7 @@ sub play {
 	    push @{$self->moves}, $move;
 	    print "Black plays $move\n" if $verbose;
 	    $pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
-	    $self->white->black($move) unless ($move =~ /PASS/);
+            $self->white->black($move);
 	    if ($verbose == 3) {
 		my $black_seed = $self->black->get_random_seed;
 		printf "Black seed $black_seed\n";
@@ -357,7 +357,7 @@ sub play {
 	    push @{$self->moves}, $move;
 	    print "White plays $move\n" if $verbose;
 	    $pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
-	    $self->black->white($move) unless ($move =~ /PASS/);
+            $self->black->white($move);
 	    if ($verbose == 3) {
 		my $white_seed = $self->white->get_random_seed;
 		printf "White seed $white_seed\n";
