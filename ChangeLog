@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- move initalization of ..._vital_points to initialize_dragon_data()
 - persistent caches reorganized to share common code
 
 3.5.9 released July 18, 2004

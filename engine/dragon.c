@@ -557,8 +557,6 @@ static void
 eye_computations()
 { 
   int str;
-  memset(black_vital_points, 0, BOARDMAX * sizeof(struct vital_eye_points));
-  memset(white_vital_points, 0, BOARDMAX * sizeof(struct vital_eye_points));
 
   for (str = BOARDMIN; str < BOARDMAX; str++) {
     if (!ON_BOARD(str))
@@ -731,6 +729,9 @@ initialize_dragon_data(void)
    * reach initialize_supplementary_dragon_data().
    */
   number_of_dragons = 0;
+
+  memset(black_vital_points, 0, BOARDMAX * sizeof(struct vital_eye_points));
+  memset(white_vital_points, 0, BOARDMAX * sizeof(struct vital_eye_points));
 }
 
 
