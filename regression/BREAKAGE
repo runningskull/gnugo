@@ -1,3 +1,29 @@
+========================== 3.3.16  ============================
+
+./regress.sh . thrash.tst 
+3 unexpected FAIL: Correct 'O5|N5|N4', got 'P8'
+4 unexpected FAIL: Correct 'N4|O4|M4', got 'T6'
+5 unexpected FAIL: Correct 'M3|M2|N3|L4|M5|M4', got 'D1'
+./regress.sh . 13x13b.tst 
+4 unexpected FAIL: Correct 'F4', got 'PASS'
+6 unexpected FAIL: Correct 'C4', got 'B4'
+8 unexpected FAIL: Correct 'F10', got 'F11'
+14 unexpected FAIL: Correct 'J9', got 'G12'
+17 unexpected FAIL: Correct 'F1', got 'H5'
+18 unexpected FAIL: Correct 'F3', got 'G8'
+25 unexpected FAIL: Correct 'M13', got 'M9'
+26 unexpected FAIL: Correct 'D3', got 'F5'
+27 unexpected FAIL: Correct 'C4', got 'B2'
+29 unexpected FAIL: Correct 'F3', got 'L8'
+30 unexpected FAIL: Correct 'N8', got 'H9'
+31 unexpected FAIL: Correct 'M7', got 'N7'
+36 unexpected FAIL: Correct 'J3|H3', got 'J4'
+38 unexpected FAIL: Correct 'E8', got 'E7'
+39 unexpected FAIL: Correct 'F10', got 'N9'
+41 unexpected FAIL: Correct 'J6', got 'F5'
+42 unexpected FAIL: Correct 'L13', got 'L7'
+43 unexpected FAIL: Correct 'J3', got 'J1'
+
 ========================== 3.3.16 pre 5 ============================
 
 ./regress.sh . connect.tst 

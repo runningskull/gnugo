@@ -89,7 +89,7 @@ loadsgf games/mertin13x13/GAGN1.sgf 28
 # Hane at K1 is not appropriate.
 loadsgf games/mertin13x13/GAGN1.sgf 42
 4 restricted_genmove white F4 H2 K1
-#? [F4]
+#? [F4]*
 
 # Unreasonable to block at A5.
 loadsgf games/mertin13x13/GAGN1.sgf 66
@@ -99,7 +99,7 @@ loadsgf games/mertin13x13/GAGN1.sgf 66
 # B4 unreasonable. C4 locally the best move.
 loadsgf games/mertin13x13/GAGN1.sgf 68
 6 restricted_genmove white B4 C4
-#? [C4]
+#? [C4]*
 
 # H11 allows a combination attack starting with K10.
 loadsgf games/mertin13x13/GNGA3.sgf 67
@@ -109,7 +109,7 @@ loadsgf games/mertin13x13/GNGA3.sgf 67
 # F10 blocks and connects in the best way. F11 is clearly inferior.
 loadsgf games/mertin13x13/GNGA3.sgf 81
 8 gg_genmove black
-#? [F10]
+#? [F10]*
 
 # Most other moves are better than the game move at C6.
 loadsgf games/mertin13x13/GHGN1.sgf 26
@@ -139,7 +139,7 @@ loadsgf games/mertin13x13/GHGN3.sgf 38
 # J9 is huge.
 loadsgf games/mertin13x13/GNGH2.sgf 23
 14 gg_genmove black
-#? [J9]
+#? [J9]*
 
 # N11 is meaningless.
 loadsgf games/mertin13x13/GNGH2.sgf 71
@@ -154,12 +154,12 @@ loadsgf games/mertin13x13/GNGH3.sgf 57
 # F1 gives seki.
 loadsgf games/mertin13x13/GNGH3.sgf 111
 17 gg_genmove black
-#? [F1]
+#? [F1]*
 
 # Necessary to defend the bottom.
 loadsgf games/mertin13x13/GIGN2.sgf 18
 18 gg_genmove white
-#? [F3]
+#? [F3]*
 
 # One critical point left at B5. K10 is dame.
 loadsgf games/mertin13x13/GIGN2.sgf 60
@@ -194,17 +194,17 @@ loadsgf games/mertin13x13/GNGI3.sgf 63
 # M13 lives independently. K13 gives a semeai.
 loadsgf games/mertin13x13/GNGI3.sgf 65
 25 gg_genmove black
-#? [M13]
+#? [M13]*
 
 # Must connect at D3.
 loadsgf games/mertin13x13/GMGN2.sgf 30
 26 gg_genmove white
-#? [D3]
+#? [D3]*
 
 # B2 inefficient way to live.
 loadsgf games/mertin13x13/GMGN2.sgf 92
 27 gg_genmove white
-#? [C4]
+#? [C4]*
 
 # H9 can be cut off.
 loadsgf games/mertin13x13/GMGN3.sgf 30
@@ -214,15 +214,15 @@ loadsgf games/mertin13x13/GMGN3.sgf 30
 # Must connect at F3.
 loadsgf games/mertin13x13/GNGM3.sgf 11
 29 gg_genmove black
-#? [F3]
+#? [F3]*
 
 loadsgf games/mertin13x13/GPGN1.sgf 62
 30 gg_genmove white
-#? [N8]
+#? [N8]*
 
 loadsgf games/mertin13x13/GPGN1.sgf 64
 31 gg_genmove white
-#? [M7]
+#? [M7]*
 
 # G5 is dame. H4 is the point needed to win the game.
 loadsgf games/mertin13x13/GNGP3.sgf 55
@@ -247,7 +247,7 @@ loadsgf games/mertin13x13/GXGN2.sgf 52
 # Low enclosure better.
 loadsgf games/mertin13x13/GXGN3.sgf 12
 36 restricted_genmove white J3 J4 H3 H4
-#? [J3|H3]
+#? [J3|H3]*
 
 # Must follow up A6 with A4, which in any case is sente.
 loadsgf games/mertin13x13/GNGX1.sgf 51
@@ -257,12 +257,12 @@ loadsgf games/mertin13x13/GNGX1.sgf 51
 # E8 clearly bigger than E7.
 loadsgf games/mertin13x13/HTGN3.sgf 102
 38 restricted_genmove white E7 E8
-#? [E8]
+#? [E8]*
 
 # F10 needed for seki.
 loadsgf games/mertin13x13/MFGN3.sgf 58
 39 gg_genmove white
-#? [F10]
+#? [F10]*
 
 # Must connect at F8.
 loadsgf games/mertin13x13/WLGN2.sgf 74
@@ -271,14 +271,14 @@ loadsgf games/mertin13x13/WLGN2.sgf 74
 
 loadsgf games/mertin13x13/GNWL1.sgf 61
 41 gg_genmove black
-#? [J6]
+#? [J6]*
 
 # L7 way overconcentrated.
 loadsgf games/mertin13x13/GNWL2.sgf 35
 42 restricted_genmove black L7 L13
-#? [L13]
+#? [L13]*
 
 # J3 is of course bigger than J1.
 loadsgf games/mertin13x13/GNWL3.sgf 109
 43 restricted_genmove black J1 J2 J3
-#? [J3]
+#? [J3]*
