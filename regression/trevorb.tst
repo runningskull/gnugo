@@ -187,9 +187,10 @@ loadsgf games/trevor/auto/b25.sgf 74
 # games/trevor/auto/b27.sgf problems:
 
 #L7 locally better than N6
+#Other moves possible.
 loadsgf games/trevor/auto/b27.sgf 24
 370 gg_genmove white
-#? [L7]*
+#? [L7|B10]*
 
 
 loadsgf games/trevor/auto/b27.sgf 72

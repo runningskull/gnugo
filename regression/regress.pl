@@ -292,7 +292,7 @@ sub regress_chunk {
 
 sub regress_file {
   $testfile = shift;
-  my @problist = @_;
+  my @problist = sort {$a<=>$b} @_;
   if ($verbose) {
     print "$testfile";
     print ": ", join ("  ", @problist), "\n" if @problist;

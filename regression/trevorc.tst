@@ -891,6 +891,7 @@ loadsgf games/trevor/auto/c83.sgf 112
 #? [L5]*
 
 
+#At least win this ko!
 loadsgf games/trevor/auto/c83.sgf 134
 1520 gg_genmove white
 #? [C11]*

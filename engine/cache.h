@@ -354,7 +354,7 @@ int get_read_result2(int routine, int komaster, int kom_pos,
   
 /* Macro to use when saving ko results while continuing to look for an
  * unconditional result. It's assumed that we have tried the move at
- * (i, j) and then called an attack or defense function giving the
+ * (move) and then called an attack or defense function giving the
  * result passed in the code parameter.
  *
  * In general we prefer not to have to do the first ko threat. Thus a

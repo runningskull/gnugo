@@ -534,6 +534,7 @@ sub summaryDiagrams() {
   my $content;
   foreach my $curfile (glob("html/$tstfile.tst/*.xml"))
   {
+    %points = {};
     $curfile =~ s/html.$tstfile.tst.(.*xml)/$1/;
     local $/;
     undef($/);
@@ -543,7 +544,7 @@ sub summaryDiagrams() {
 
     my %attribs = %{game_parse($content, 1)};
 
-    print "<HR>$attribs{num}:";
+    print qq@<HR><A HREF="?$tstfile:$attribs{num}">$tstfile:$attribs{num}</A>\n@;
 
     my $boardsize = $attribs{"boardsize"};  #need to add to export.
     my $colorboard;
@@ -958,7 +959,7 @@ sub printunexpected{
     print qq@<TR><TD>PASSES</TD><TD>@.scalar(@upasses).qq@</TD></TR>\n@;
     print qq@<TR><TD>passes</TD><TD>@.scalar(@passes).qq@</TD></TR>\n@;
     print qq@<TR><TD>pass : fail</TD><TD>@.
-              sprintf("%.2f : 1", ((@upasses + @passes) / (@ufails + @fails))).
+              sprintf("%.2f : 1", ((@upasses + @passes) / (@ufails + @fails + .001))).
               qq@</TD></TR>\n@;
     print "</TABLE><BR>\n";
 

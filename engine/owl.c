@@ -844,10 +844,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 		       ALIVE_IN_SEKI, ALIVE_IN_SEKI);
   }
   /* If no move was found, then pass */
-  /* FIXME: This case should be avoided. Find out if it ever happens,
-   * then disable it.
-   * Indeed, it happens. -ab
-   */
   if (best_resulta == UNKNOWN) {
     do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
 			  resultb, resulta, NULL, 1);

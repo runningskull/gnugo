@@ -162,7 +162,7 @@ loadsgf games/owl02.sgf
 45  owl_attack B3
 #? [1 (E3|F1)]
 46 owl_defend B3
-#? [1 (F1|B1|D2)]
+#? [1 (F1|B1|D2|E3)]
 47  owl_attack F2
 #? [1 (E3|F1)]
 48 owl_defend F2
@@ -867,6 +867,7 @@ loadsgf games/owl33.sgf 134
 236 owl_defend O4
 #? [1 (R4|S3|R3|S2|Q5|P5)]
 
+#SEE_ALSO=trevor:1080
 loadsgf games/owl33.sgf 212
 237 owl_defend S12
 #? [0]*

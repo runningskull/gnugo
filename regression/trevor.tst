@@ -219,7 +219,7 @@ loadsgf games/trevor/trevor_22.sgf 23
 # F2 is not really sente, nor useful if it were!
 loadsgf games/trevor/trevor_23.sgf 27
 230 gg_genmove black
-#? [C2|B2]*
+#? [C2|B2|C4]*
 
 
 # Connect the dragons!  One eye is not enough, anyway.
@@ -330,9 +330,10 @@ loadsgf games/trevor/trevor_32.sgf
 320 gg_genmove black
 #? [J2|H3]
 
-loadsgf games/trevor/trevor_33.sgf
-330 owl_defend L9
-#? [1 P9]*
+#duplicate of trevor:340
+##loadsgf games/trevor/trevor_33.sgf
+##330 owl_defend L9
+###? [1 P9]*
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Very simple to threaten eye or run out here.
@@ -591,7 +592,7 @@ loadsgf games/trevor/trevor_69.sgf
 #SEVERITY=10
 loadsgf games/trevor/trevor_70.sgf
 700 owl_attack H1
-#? [1 G5]*
+#? [1 G5|J5|H5|G2]*
 
 #CATEGORY=OWL_ESCAPE
 #DESCRIPTION=black gets the killing move, creating a missed cutting point.

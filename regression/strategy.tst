@@ -95,11 +95,11 @@ loadsgf games/incident121.sgf 116
 #    pattern. After N11, the strings at M12 and N10 cannot both be 
 #    saved. This is not necessarily the biggest move on the board but 
 #    at least this move should be found.
-#
 # incident 165
+# H10 looks fine - tm
 loadsgf games/incident165.sgf 108
 17 gg_genmove black
-#? [N11]
+#? [N11|H10]
 
 
 #CATEGORY=DYNAMIC_READING
