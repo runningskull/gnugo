@@ -45,9 +45,9 @@ loadsgf games/atari_atari04.sgf 279
 #? [J4|G5]
 
 loadsgf games/viking2.sgf 140
-11 combination_attack_white
+11 combination_attack white
 #? [M14]
 
 loadsgf games/viking2.sgf 146
-12 combination_attack_white
+12 combination_attack white
 #? [N13|Q12]
