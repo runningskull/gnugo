@@ -1,3 +1,118 @@
+CVS version of November 29, 2001
+
+./regress.sh . reading.tst
+122 unexpected PASS!
+155 unexpected PASS!
+./regress.sh . owl.tst
+4 unexpected PASS!
+6 unexpected FAIL: Correct '1 B5', got '3 B5'
+80 unexpected PASS!
+136 unexpected FAIL: Correct '1 F14', got '0'
+149 unexpected PASS!
+157 unexpected FAIL: Correct '3 (P16|Q15)', got '0'
+166 unexpected FAIL: Correct '2 P18', got '1 P18'
+./regress.sh . owl_rot.tst
+4 unexpected PASS!
+150 unexpected FAIL: Correct '0', got '1 G13'
+222 unexpected PASS!
+./regress.sh . ld_owl.tst
+./regress.sh . optics.tst
+./regress.sh . filllib.tst
+./regress.sh . atari_atari.tst
+./regress.sh . connection.tst
+./regress.sh . blunder.tst
+./regress.sh . strategy.tst
+8 unexpected FAIL: Correct 'N1', got 'T17'
+34 unexpected FAIL: Correct 'E17', got 'N14'
+49 unexpected PASS!
+./regress.sh . endgame.tst
+208 unexpected FAIL: Correct 'N1', got 'Q8'
+./regress.sh . heikki.tst
+./regress.sh . neurogo.tst
+12 unexpected PASS!
+16 unexpected PASS!
+./regress.sh . arb.tst
+./regress.sh . rosebud.tst
+./regress.sh . golife.tst
+2 unexpected FAIL: Correct 'H5', got 'F4'
+3 unexpected FAIL: Correct 'E3|E2', got 'F4'
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+./regress.sh . ego.tst
+./regress.sh . dniwog.tst
+./regress.sh . strategy2.tst
+66 unexpected PASS!
+100 unexpected PASS!
+./regress.sh . nicklas1.tst
+1106 unexpected FAIL: Correct '!F6', got 'F6'
+1214 unexpected PASS!
+1408 unexpected FAIL: Correct '!dead', got 'dead'
+./regress.sh . nicklas2.tst
+102 unexpected FAIL: Correct 'D4', got 'G2'
+1407 unexpected FAIL: Correct 'A6', got 'C9'
+./regress.sh . nicklas3.tst
+./regress.sh . nicklas4.tst
+812 unexpected FAIL: Correct 'J12', got 'K14'
+./regress.sh . nicklas5.tst
+./regress.sh . manyfaces.tst
+6 unexpected FAIL: Correct 'R3', got 'M15'
+7 unexpected PASS!
+9 unexpected PASS!
+./regress.sh . niki.tst
+4 unexpected FAIL: Correct 'Q8', got 'O2'
+./regress.sh . trevor.tst
+290 unexpected PASS!
+350 unexpected PASS!
+590 unexpected PASS!
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+8 unexpected PASS!
+./regress.sh . strategy3.tst
+108 unexpected FAIL: Correct 'C15', got 'A10'
+145 unexpected PASS!
+146 unexpected PASS!
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+4 unexpected FAIL: Correct 'Q6', got 'F5'
+9 unexpected PASS!
+36 unexpected FAIL: Correct 'B6', got 'C5'
+41 unexpected FAIL: Correct 'B4', got 'A9'
+./regress.sh . vie.tst
+41 unexpected FAIL: Correct '1 B4', got '1 A9'
+./regress.sh . arend.tst
+15 unexpected FAIL: Correct 'F3', got 'B13'
+17 unexpected PASS!
+39 unexpected PASS!
+./regress.sh . trevora.tst
+100 unexpected PASS!
+120 unexpected PASS!
+170 unexpected PASS!
+180 unexpected PASS!
+210 unexpected PASS!
+220 unexpected PASS!
+230 unexpected PASS!
+280 unexpected PASS!
+290 unexpected PASS!
+320 unexpected PASS!
+330 unexpected PASS!
+350 unexpected PASS!
+400 unexpected PASS!
+420 unexpected PASS!
+470 unexpected PASS!
+560 unexpected PASS!
+580 unexpected PASS!
+620 unexpected PASS!
+630 unexpected PASS!
+660 unexpected PASS!
+./regress.sh . strategy4.tst
+160 unexpected PASS!
+179 unexpected PASS!
+187 unexpected FAIL: Correct '!C1', got 'C1'
+198 unexpected PASS!
+199 unexpected PASS!
+200 unexpected PASS!
+
 CVS version of 11/26/01
 
 meep regression$ make all_batches

@@ -192,6 +192,7 @@ static void do_owl_analyze_semeai(int apos, int bpos,
 		      struct local_owl_data *owlb, int komaster,
 		      int *resulta, int *resultb,
 		      int *move, int pass);
+static int find_backfilling_move(int worm, int liberty);
 static int liberty_of_goal(int pos, struct local_owl_data *owl);
 static int matches_found;
 static char found_matches[BOARDMAX];
@@ -290,52 +291,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 
   wormsa = catalog_goal(owla, goal_wormsa);
   wormsb = catalog_goal(owlb, goal_wormsb);
-
-  /* First look for a tactical resolution */
-  /* FIXME: This needs to be unified with the tactical code
-   * that comes later in the function.
-   */
-
-  /* Look for a tactical win */
-
-  for (k = 0; k < wormsb; k++) {
-    int worm_b = goal_wormsb[k];
-    
-    if (countlib(worm_b) > 2)
-      break;
-    
-    /* If any worm of the b dragon can be captured, declare victory.
-     * FIXME: We should confirm this worm is adjacent to the a dragon.
-     */
-    
-    if (attack(worm_b, NULL)) {
-      int dpos;
-      *resulta = ALIVE;
-      *resultb = DEAD;
-      if (move) {
-	if (find_defense(worm_b, &dpos))
-	  *move = dpos;
-	else
-	  *move = PASS_MOVE;
-      }
-      return;
-    }
-  }
-
-  /* Look for a tactical seki */
-  if (wormsa == 1 && wormsb == 1) {
-    int worm_a = goal_wormsa[0];
-    int worm_b = goal_wormsb[0];
-    if ((countlib(worm_a) == 2) 
-	&& (countlib(worm_b) == 2)
-	&& !attack(worm_a, NULL)
-	&& !attack(worm_b, NULL)) {
-      *resulta = ALIVE_IN_SEKI;
-      *resultb = ALIVE_IN_SEKI;
-      if (move) *move = PASS_MOVE;
-      return;
-    }
-  }
 
   if (count_variations > 100)
     return;
@@ -615,14 +570,14 @@ do_owl_analyze_semeai(int apos, int bpos,
 		outside_liberty.pos = pos;
 	      }
 	      else if (!safe_outside_liberty_found) {
-		int libs[2];
+		if (!backfilling_move_found) {
+		  backfilling_move.pos =
+		    find_backfilling_move(bpos, pos);
+		  if (backfilling_move.pos)
+		    backfilling_move_found = 1;
 		
 		unsafe_outside_liberty_found = 1;
 		outside_liberty.pos = pos;
-		
-		if (accurate_approxlib(pos, color, 2, libs) == 1) {
-		  backfilling_move_found = 1;
-		  backfilling_move.pos = libs[0];
 		}
 	      }
 	    }
@@ -685,10 +640,11 @@ do_owl_analyze_semeai(int apos, int bpos,
     if (unsafe_outside_liberty_found 
 	&& outside_liberty.pos != NO_MOVE
 	&& is_legal(outside_liberty.pos, color)) {
-      owl_add_move(moves, outside_liberty.pos, 30,
-		   "unsafe outside liberty", 0);
       if (backfilling_move_found && backfilling_move.pos != NO_MOVE)
 	owl_add_move(moves, backfilling_move.pos, 30, "backfilling move", 0);
+      else 
+	owl_add_move(moves, outside_liberty.pos, 30,
+		     "unsafe outside liberty", 0);
     }
     else if (safe_common_liberty_found
 	     && common_liberty.pos != NO_MOVE)
@@ -783,6 +739,52 @@ liberty_of_goal(int pos, struct local_owl_data *owl)
   
   return 0;
 }
+
+
+/* 'liberty' is a liberty of 'worm' which we would like to fill.
+ * However it is not safe to play there, so we look for a
+ * backfilling move. For example in this situation:
+ *
+ *   ------+
+ *   O.OaXc|
+ *   OOOOOX|
+ *   XXXXXb|
+ *   ......|
+ *
+ * If 'worm' is the O string and 'liberty' is 'a', the
+ * function returns 'b'. To fill at 'a', X must first
+ * fill 'b' and 'c' and it is better to fill at 'b' first
+ * since that will sometimes leave fewer or smaller ko threats.
+ *
+ * Returns NO_MOVE if no move is found.
+ */
+
+static int
+find_backfilling_move(int worm, int liberty)
+{
+  int color = board[worm];
+  int other = OTHER_COLOR(color);
+  int result = NO_MOVE;
+
+  if (stackp > backfill_depth)
+    return NO_MOVE;
+
+  if (safe_move(liberty, other))
+    return other;
+  if (is_self_atari(liberty, other)) {
+    int fill;
+    if (approxlib(liberty, other, 1, &fill) > 0
+	&& trymove(fill, other, "find_backfilling_move", worm, 
+		   EMPTY, NO_MOVE)) {
+      if (safe_move(liberty, other))
+	result = fill;
+      else result = find_backfilling_move(worm, liberty);
+      popgo();
+    }
+  }
+  return result;
+}
+
 
 
 /* Returns true if a move can be found to attack the dragon

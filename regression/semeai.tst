@@ -57,3 +57,18 @@ loadsgf games/semeai/semeai8.sgf
 
 18 tactical_analyze_semeai A12 A14
 #? [ALIVE DEAD (A15|B15|D15|PASS)]
+
+loadsgf games/semeai/semeai9.sgf
+
+19 tactical_analyze_semeai J1 L1
+#? [ALIVE DEAD (M3|N3|O3|P3|Q1)]
+
+20 tactical_analyze_semeai L1 J1
+#? [ALIVE DEAD (H1|H2|H3|H4|H5|H6|H7|H8)]
+
+21 tactical_analyze_semeai N19 O19
+#? [ALIVE DEAD (T17|T19)]
+
+22 tactical_analyze_semeai O19 N19
+#? [ALIVE DEAD (L15|L17|L18)]
+
