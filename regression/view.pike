@@ -947,8 +947,8 @@ class RegressionViewer
     {
 	if ((parent->connection_reading_button->get_active()
 	     || parent->semeai_reading_button->get_active())
-	    && parent->first_semeai_or_connection_vertex != "")
-	    goban->add_symbol(parent->first_semeai_or_connection_vertex,
+	    && parent->first_vertex != "")
+	    goban->add_symbol(parent->first_vertex,
 	    		      "big_dot", "green");
     }
     
@@ -1133,7 +1133,7 @@ class RegressionViewer
 	string result;
 	send_command("clear_cache");
         if (sizeof(parent->viewers) > 1)
-            sgffilename += "." + name;
+            sgffilename += "." + replace(name, " ", "_");
 	if (sgffilename != "")
 	    send_command("start_sgftrace");
 
@@ -1142,7 +1142,7 @@ class RegressionViewer
 	clist->append(({first_command, result,
 			"(" + send_command(get_counter) + " nodes)"}));
 	
-	if (result[0..0] != "0")
+	if (result[0..0] != "0" && second_command != "")
 	{
 	    send_command(reset_counter);
 	    string result = send_command(second_command);
@@ -1210,10 +1210,9 @@ class Controller
     GTK.RadioButton white_eyes_button;
     GTK.RadioButton black_eyes_button;
     
-    GTK.RadioButton tactical_reading_button;
-    GTK.RadioButton owl_reading_button;
-    GTK.RadioButton connection_reading_button;
-    GTK.RadioButton semeai_reading_button;
+    GTK.RadioButton tactical_reading_button, owl_reading_button,
+	owl_does_attack_button, owl_does_defend_button,
+	connection_reading_button, semeai_reading_button;
     GTK.CheckButton sgf_traces_button, sgf_viewer_button;
     GTK.Entry sgf_filename_entry, sgf_viewer_entry;
     GTK.Table sgf_stuff;
@@ -1223,7 +1222,7 @@ class Controller
     
     string delta_territory_move = "PASS";
     string move_influence_move = "PASS";
-    string first_semeai_or_connection_vertex = "";
+    string first_vertex = "";
 
     string testcase_name;
     string testcase_command;
@@ -1399,6 +1398,10 @@ class Controller
 	tactical_reading_button = GTK.RadioButton("tactical reading");
 	owl_reading_button = GTK.RadioButton("owl reading",
 					     tactical_reading_button);
+        owl_does_attack_button = GTK.RadioButton("owl_does_attack",
+                                                 tactical_reading_button);
+        owl_does_defend_button = GTK.RadioButton("owl_does_defend",
+                                                 tactical_reading_button);
 	connection_reading_button = GTK.RadioButton("connection reading",
 						    tactical_reading_button);
 	semeai_reading_button = GTK.RadioButton("semeai reading",
@@ -1491,6 +1494,8 @@ class Controller
 	    = (GTK.Vbox(0, 0)
 	       ->pack_start(tactical_reading_button, 0, 0, 0)
 	       ->pack_start(owl_reading_button, 0, 0, 0)
+	       ->pack_start(owl_does_attack_button, 0, 0, 0)
+               ->pack_start(owl_does_defend_button, 0, 0, 0)
 	       ->pack_start(connection_reading_button, 0, 0, 0)
 	       ->pack_start(semeai_reading_button, 0, 0, 0)
 	       ->pack_start(GTK.Label(""), 0, 0, 0)
@@ -1682,7 +1687,7 @@ class Controller
                 sgf_viewer_cmd = "";
 	    }
 
-	    if (first_semeai_or_connection_vertex == ""
+	    if (first_vertex == ""
 		|| tactical_reading_button->get_active()
 		|| owl_reading_button->get_active())
 		viewers->goban->clear_markup();
@@ -1710,21 +1715,39 @@ class Controller
 				    prefix + "attack " + vertex,
 				    prefix + "defend " + vertex);
 	    }
-	    else if (connection_reading_button->get_active()
+	    else if (owl_does_attack_button->get_active()
+                     || owl_does_defend_button->get_active()
+		     || connection_reading_button->get_active()
 		     || semeai_reading_button->get_active())
 	    {
-		if (first_semeai_or_connection_vertex == "")
+		if (first_vertex == "")
 		{
-		    first_semeai_or_connection_vertex = vertex;
+		    first_vertex = vertex;
 		}
-		else if (first_semeai_or_connection_vertex != vertex)
+		else if (first_vertex != vertex)
 		{
 		    string c1, c2;
 		    
-		    if (connection_reading_button->get_active())
+                    if (owl_does_attack_button->get_active()) {
+                        c1 = sprintf("owl_does_attack %s %s\n",
+                                     first_vertex, vertex);
+                        viewers->do_reading("reset_owl_node_counter",
+                                            "get_owl_node_counter",
+                                            sgffilename, sgf_viewer_cmd,
+                                            c1, "");
+                    }
+                    else if (owl_does_defend_button->get_active()) {
+                        c1 = sprintf("owl_does_defend %s %s\n",
+                                     first_vertex, vertex);
+                        viewers->do_reading("reset_owl_node_counter",
+                                            "get_owl_node_counter",
+                                            sgffilename, sgf_viewer_cmd,
+                                            c1, "");
+                    }
+		    else if (connection_reading_button->get_active())
 		    {
 			c1 = sprintf("connect %s %s\n",
-				    first_semeai_or_connection_vertex,
+				    first_vertex,
 				    vertex);
 			c2 = "dis" + c1;
 			viewers->do_reading("reset_connection_node_counter",
@@ -1735,10 +1758,10 @@ class Controller
 		    else
 		    {
 			c1 = sprintf("analyze_semeai %s %s",
-				     first_semeai_or_connection_vertex,
+				     first_vertex,
 				     vertex);
 			c2 = sprintf("analyze_semeai %s %s", vertex,
-				     first_semeai_or_connection_vertex);
+				     first_vertex);
 			// FIXME: We should use a semeai node counter rather
 			// than the owl node counter, except that it doesn't
 			// exist yet.
@@ -1747,7 +1770,7 @@ class Controller
 					    sgffilename, sgf_viewer_cmd,
 					    c1, c2);
 		    }
-		    first_semeai_or_connection_vertex = "";
+		    first_vertex = "";
 		}
 	    }
 	    break;

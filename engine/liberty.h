@@ -286,6 +286,7 @@ void store_persistent_semeai_cache(enum routine_id routine,
 /* readconnect.c */
 int string_connect(int str1, int str2, int *move);
 int disconnect(int str1, int str2, int *move);
+int fast_disconnect(int str1, int str2, int *move);
 int non_transitivity(int str1, int str2, int str3, int *move);
 
 int break_in(int str, const char goal[BOARDMAX], int *move);

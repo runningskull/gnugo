@@ -332,7 +332,7 @@ Pattern A113
 |..*O
 |..Y?
 
-:8,-,value(99)
+:8,C,value(99)
 
 
 Pattern A114
@@ -343,7 +343,7 @@ Pattern A114
 |..*O
 |..Y?
 
-:8,-,value(99)
+:8,C,value(99)
 
 
 Pattern A115
@@ -412,7 +412,7 @@ x*Yx
 ...X
 ----
 
-:8,-,value(60)
+:8,C,value(60)
 
 
 Pattern A204
@@ -517,7 +517,7 @@ X.*.xx
 ?...??
 ------
 
-:8,-,value(60)
+:8,C,value(60)
 
 ?O.Yxx
 a.*.xx
@@ -627,7 +627,7 @@ xY*.x       second line block
 x....
 -----
 
-:8,-,value(85)
+:8,C,value(85)
 
 ?OO?x
 xY*.a
@@ -673,7 +673,7 @@ x*..
 ....
 ----
 
-:8,-,value(80)
+:8,C,value(80)
 
 
 Pattern A216
@@ -908,7 +908,7 @@ Pattern A227
 X.Y..
 -----
 
-:8,-,value(35)
+:8,C,value(35)
 
 ?XOxx
 ?XO*a
@@ -926,7 +926,7 @@ X.*.         stop escape
 xY..
 ----
 
-:8,-,value(65)
+:8,C,value(65)
 
 ?O.x
 X.*a
@@ -958,7 +958,7 @@ x.*OX
 ...Y.
 -----
 
-:8,-,value(80)
+:8,C,value(80)
 
 ac.O?
 b.*OX
@@ -975,7 +975,7 @@ xxx?        stop escape
 ...Y
 ----
 
-:8,-,value(79)
+:8,C,value(79)
 
 abx?
 ..*O
@@ -1009,7 +1009,7 @@ X?        stop escape
 .Y
 --
 
-:8,-,value(79)
+:8,C,value(79)
 
 a?
 *O
@@ -1054,7 +1054,7 @@ Y..?
 ....
 ----
 
-:8,-,value(80)
+:8,C,value(80)
 
 ?OO?
 Yab?
@@ -1109,7 +1109,7 @@ YO
 ..
 --
 
-:8,-,value(20)
+:8,C,value(20)
 
 
 Pattern A235
@@ -1193,7 +1193,7 @@ o*XO capture one stone and limiting eye
 o... maybe gote
 ----
 
-:8,-,value(50)
+:8,C,value(50)
 
 
 Pattern A241
@@ -1310,7 +1310,7 @@ x...O
 .*..o
 -----
 
-:8,-,value(45)
+:8,C,value(45)
 
 
 #########################################################
@@ -1552,7 +1552,7 @@ oO*..        try to contain
 O.Y.O
 ?X.Oo
 
-:8,-,value(80)
+:8,C,value(80)
 
 ??abc
 oO*..
@@ -1569,7 +1569,7 @@ xxx          try to block
 OYO
 ?X?
 
-:|,-,value(90)
+:|,B,value(90)
 
 xax
 .*.
@@ -1723,7 +1723,7 @@ o..         cut off escape
 .*Y
 X.O
 
-:8,-,value(80)
+:8,C,value(80)
 
 o..
 .*Y
@@ -1782,7 +1782,7 @@ Pattern A419
 Y.O
 .*X      cut to stop escape
 
-:8,-,value(68)
+:8,C,value(68)
 
 Ycd
 .*A
@@ -1797,7 +1797,7 @@ Pattern A419b
 X.O
 .*Y      cut to stop escape
 
-:8,-,value(68)
+:8,C,value(68)
 
 Acd
 .*Y
@@ -1884,7 +1884,7 @@ X..?         try to cut
 Y.*X
 ??O?
 
-:8,-,value(61)
+:8,C,value(61)
 
 X..?
 Y.*a
@@ -1949,7 +1949,7 @@ x.Y?      jump under
 ....
 ----
 
-:8,-,value(75)
+:8,C,value(75)
 
 
 Pattern A502
@@ -1959,7 +1959,7 @@ O*Y
 X.X
 ---
 
-:8,n,value(45)
+:8,Cn,value(45)
 
 ?Xo
 a*Y
@@ -1976,7 +1976,7 @@ Y*O
 X.X
 ---
 
-:8,s,value(45)
+:8,Cs,value(45)
 
 
 Pattern A503b
@@ -2003,7 +2003,7 @@ Y*           cut off one stone
 OX
 --
 
-:8,-,value(35)
+:8,C,value(35)
 
 
 Pattern A505
@@ -2033,7 +2033,7 @@ Y*X
 ...
 ---
 
-:8,-,value(80)
+:8,C,value(80)
 
 
 Pattern A508
@@ -2043,7 +2043,7 @@ O.*.Y
 ....x
 -----
 
-:8,-,value(65)
+:8,C,value(65)
 
 
 Pattern A509
@@ -2070,7 +2070,7 @@ OXO*.
 .O...
 -----
 
-:8,-,value(55)
+:8,C,value(55)
 
 
 Pattern A511
@@ -2688,7 +2688,7 @@ Pattern A704
 OXOX
 .*.?
 
-:8,-,value(80)
+:8,C,value(80)
 
 
 #Pattern A705
@@ -2714,7 +2714,7 @@ Pattern A705b
 X*Y
 ?.?
 
-:8,-,value(61)
+:8,C,value(61)
 
 ?b?
 X*Y
@@ -2729,7 +2729,7 @@ Pattern A706
 X.X
 ?Y.
 
-:8,-,value(70)
+:8,C,value(70)
 
 ?*?
 XaA
@@ -2744,7 +2744,7 @@ Pattern A707
 X*X
 .Y.
 
-:8,-,value(70)
+:8,C,value(70)
 
 ?O?
 X*A
@@ -2775,7 +2775,7 @@ xX.         half eye sometimes missed
 Y.*
 ?x?
 
-:8,-,value(45)
+:8,C,value(45)
 
 xXb
 Aa*
@@ -2806,7 +2806,7 @@ O*.X        destroy eye
 X..X
 xXY?
 
-:8,-,value(35)
+:8,C,value(35)
 
 
 Pattern A712
@@ -2816,7 +2816,7 @@ Pattern A712
 .*.X
 oo.?
 
-:8,-,value(60)
+:8,C,value(60)
 
 
 Pattern A713
@@ -2843,7 +2843,7 @@ O..X
 X*.x
 OX.x
 
-:8,-,value(82)
+:8,C,value(82)
 
 ?XY?
 O..X
@@ -2877,7 +2877,7 @@ O*x          destroy eye in reverse sente
 X.X
 xYx
 
-:8,-,value(50)
+:8,C,value(50)
 
 a*x
 X.X
@@ -2893,7 +2893,7 @@ Pattern A717
 XO*Y
 ?X.X
 
-:8,s,value(75)
+:8,Cs,value(75)
 
 ?.??
 XO*Y
@@ -2911,7 +2911,7 @@ xYx?   reduce eye space
 x.*O
 xXx?
 
-:8,-,value(50)
+:8,C,value(50)
 
 xYx?
 x.*A
@@ -2962,7 +2962,7 @@ X*Ox
 ?...
 ?OO?
 
-:8,-,value(40)
+:8,C,value(40)
 
 ?c??
 Ya.x
@@ -3075,7 +3075,7 @@ OX*.
 ....
 ----
 
-:8,-,value(75)
+:8,C,value(75)
 
 
 Pattern A807
@@ -3115,6 +3115,7 @@ A.*..
 
 
 Pattern A810
+# This looks a little weird. /ab
 
 ?O?
 X.Y        safe invasion into eye
@@ -3155,7 +3156,7 @@ Pattern A812
 ..o
 ---
 
-:8,-,value(40)
+:8,C,value(40)
 
 .Y?
 ..O
@@ -3175,7 +3176,7 @@ OXO sacrifice to eliminate eye
 .X.
 ---
 
-:8,s,value(85)
+:8,Cs,value(85)
 
 X*.
 aXb
@@ -3522,7 +3523,7 @@ Pattern A1001
 YO          cut if safe
 *X
 
-:8,n,value(80)
+:8,Cn,value(80)
 
 Ba
 *C
@@ -3538,7 +3539,7 @@ Pattern A1001b
 YO          cut if safe
 *X
 
-:8,n,value(50)
+:8,Cn,value(50)
 
 Ya
 *X
@@ -3552,7 +3553,7 @@ Pattern A1002
 ?*.X     threaten to cut
 ??YO
 
-:8,-,value(75)
+:8,C,value(75)
 
 ????
 ?*aX
@@ -3567,7 +3568,7 @@ Pattern A1003
 ?*.X     threaten to cut
 ??YO
 
-:8,-,value(55)
+:8,C,value(55)
 
 ????
 ?*aX
@@ -3583,7 +3584,7 @@ Pattern A1003
 #?*.X     threaten to cut
 #??XO
 #
-#:8,-,value(50)
+#:8,B,value(50)
 #
 #----
 #?*aX
@@ -3598,7 +3599,7 @@ Y?          cut!
 *O
 .X
 
-:8,-,value(90)
+:8,C,value(90)
 
 Y?
 *b
@@ -3614,7 +3615,7 @@ X?          cut!
 *O
 .Y
 
-:8,-,value(90)
+:8,C,value(90)
 
 C?
 *b
@@ -3629,7 +3630,7 @@ XOY        push out
 .*.
 ?.?
 
-:8,-,value(70)
+:8,C,value(70)
 
 
 Pattern A1006b
@@ -3639,7 +3640,7 @@ XOY        push out in reverse sente
 .*.
 ?.?
 
-:8,-,value(75)
+:8,C,value(75)
 
 XaY
 .*.
@@ -3669,7 +3670,7 @@ Pattern A1008
 X*Y      stop connection
 ?O?
 
-:8,-,value(80)
+:8,C,value(80)
 
 a*b
 ?O?
@@ -3684,7 +3685,7 @@ ooo
 X*Y      stop connection
 O.?
 
-:8,-,value(80)
+:8,C,value(80)
 
 ooo
 a*b
@@ -3700,7 +3701,7 @@ XO*Y         stop connection underneath
 ....
 ----
 
-:8,-,value(55)
+:8,C,value(55)
 
 XO*Y
 .a..
@@ -3716,7 +3717,7 @@ Y.O        cut and capture to destroy eyespace
 ...
 ---
 
-:8,-,value(75)
+:8,C,value(75)
 
 YaO
 .*B
@@ -3732,7 +3733,7 @@ XOY      stop connection underneath
 x*x
 ---
 
-:8,-,value(80)
+:8,C,value(80)
 
 aOb
 x*x
@@ -3747,7 +3748,7 @@ X.??          cut
 OY*O
 oOX?
 
-:8,-,value(45)
+:8,C,value(45)
 
 Xa??
 OY*O
@@ -3782,7 +3783,7 @@ xx..Ox        stop connection underneath
 ...*Y.
 ------
 
-:8,-,value(55)
+:8,C,value(55)
 
 AB..Ox
 ...*Y.
@@ -3796,7 +3797,7 @@ Pattern A1015
 X.*Y   cut!
 X..X
 
-:8,-,value(75)
+:8,C,value(75)
 
 Ae*B
 AfgB
@@ -3810,7 +3811,7 @@ Pattern A1015a
 Y.*X   cut!
 X..X
 
-:8,-,value(75)
+:8,C,value(75)
 
 Ae*B
 AfgB
@@ -3827,7 +3828,7 @@ YxO?
 o.*X
 ----
 
-:8,-,value(75)
+:8,C,value(75)
 
 Bde?
 oc*A
@@ -3846,7 +3847,7 @@ XxO?
 o.*Y
 ----
 
-:8,-,value(75)
+:8,C,value(75)
 
 Bde?
 oc*A
@@ -3863,7 +3864,7 @@ Pattern A1017
 X.*o     threaten to cut and mess up opponent's shape
 xY.X
 
-:8,-,value(65)
+:8,C,value(65)
 
 X.*b
 xYaX
@@ -3879,7 +3880,7 @@ O.Y      separate
 .*.
 X.o
 
-:8,-,value(35)
+:8,C,value(35)
 
 
 Pattern A1019
@@ -3889,7 +3890,7 @@ Pattern A1019
 X...
 .*.Y
 
-:8,-,value(65)
+:8,C,value(65)
 
 .fgO
 Xbde
@@ -3948,7 +3949,7 @@ oY.O
 .X.X
 ...o
 
-:8,-,value(55)
+:8,C,value(55)
 
 oA.O
 ..*.
@@ -3966,7 +3967,7 @@ O*.?
 ?..?
 xYxx
 
-:8,-,value(45)
+:8,C,value(45)
 
 ?Bx?
 O*a?
@@ -3984,7 +3985,7 @@ YO.o       connect along edge to strong dragon
 x*.X
 ----
 
-:8,Eb,value(90)
+:8,CEb,value(90)
 
 AO.o
 x*.B
@@ -4093,7 +4094,7 @@ Pattern A1102
 O*O
 ?Y?
 
-:8,-,value(95)
+:8,C,value(95)
 
 baX
 c*O
@@ -4119,7 +4120,7 @@ OYO        connect to prevent double atari
 XO*
 ...
 
-:8,-,value(85)
+:8,C,value(85)
 
 OYB
 AO*
@@ -4137,7 +4138,7 @@ xYO
 x..
 ---
 
-:8,n,value(85)
+:8,Cn,value(85)
 
 Oa.
 XO*
@@ -4156,7 +4157,7 @@ xYO.
 xx..
 ----
 
-:8,-,value(70)
+:8,C,value(70)
 
 OO.?
 XOB*
@@ -4249,7 +4250,7 @@ O.*..
 .....
 -----
 
-:8,-,value(65)
+:8,C,value(65)
 
 ?Xx??
 ?cYab
@@ -4358,7 +4359,7 @@ OYO
 *OX
 xxx
 
-:8,-,value(90)
+:8,C,value(90)
 
 ?X?
 aDO
@@ -4374,7 +4375,7 @@ Pattern A1117
 X*O         don't let defender cut and capture to escape
 ?OY
 
-:8,n,value(80)
+:8,Cn,value(80)
 
 X*b
 ?aY
@@ -4388,7 +4389,7 @@ Pattern A1117a
 Y*O         don't let defender cut and capture to escape
 ?OX
 
-:8,n,value(80)
+:8,Cn,value(80)
 
 Y*b
 ?aX
@@ -4423,7 +4424,7 @@ Pattern A1119
 Y*?	    cut off escape route.
 o.X
 
-:8,n,value(36)
+:8,Cn,value(36)
 
 a*E
 Dcb
@@ -4471,7 +4472,7 @@ O.O         block to protect weakness
 Y*.
 ?O?
 
-:8,-,value(35)
+:8,C,value(35)
 
 a.b
 Y*.
@@ -4488,7 +4489,7 @@ Y.
 *.
 .X
 
-:8,-,value(75)
+:8,C,value(75)
 
 a.
 *.
@@ -4597,7 +4598,7 @@ Pattern A1124b
 x.*
 xx?
 
-:8,-,value(70)
+:8,C,value(70)
 
 ?OA
 be*
@@ -4618,7 +4619,7 @@ O*O?
 XOYo
 ?X.?
 
-:8,-,value(76)
+:8,C,value(76)
 
 
 Pattern A1126
@@ -4676,7 +4677,7 @@ Pattern A1128
 OY*X	cut off from home
 X.X.
 
-:8,-,value(80)
+:8,C,value(80)
 
 Ob*a
 XcXd
@@ -4694,7 +4695,7 @@ XYO.
 XO..
 O..?
 
-:8,-,value(86)
+:8,C,value(86)
 
 xB*x
 XYOa
@@ -4714,7 +4715,7 @@ Pattern A1130
 ..XYO
 ...o?
 
-:8,-,value(65)
+:8,C,value(65)
 
 
 Pattern A1131
@@ -4796,7 +4797,7 @@ XOY	    prevent escaping by capturing
 .*O
 ---
 
-:8,-,value(75)
+:8,C,value(75)
 
 BOY
 .*a
@@ -4812,7 +4813,7 @@ YOX	    prevent escaping by capturing
 .*O
 ---
 
-:8,-,value(75)
+:8,C,value(75)
 
 YOB
 .*a
@@ -4828,7 +4829,7 @@ XOY	    prevent escaping by capturing
 .*O
 ---
 
-:8,-,value(40)
+:8,C,value(40)
 
 XOY
 .*a
@@ -4845,7 +4846,7 @@ YOX	    prevent escaping by capturing
 .*O
 ---
 
-:8,-,value(40)
+:8,C,value(40)
 
 YOX
 .*a
@@ -5002,7 +5003,7 @@ Pattern A1206
 *Y          kill one string, possibly with ko!
 XO
 
-:8,s,value(30)
+:8,Cs,value(30)
 
 *Y
 AO
@@ -5017,7 +5018,7 @@ Pattern A1207
 .*Y
 .XO
 
-:8,-,value(45)
+:8,C,value(45)
 
 ..X
 .*Y
@@ -5034,7 +5035,7 @@ Y..o
 ....
 ----
 
-:8,-,value(40)
+:8,C,value(40)
 
 
 Pattern A1209
@@ -5485,7 +5486,7 @@ Pattern A1327
 |oo???
 |oo???
 
-:8,s,value(85)
+:8,Cs,value(85)
 
 
 Pattern A1328
@@ -5712,7 +5713,7 @@ Pattern A1342
 |.YX
 |.O?
 
-:8,s,value(50)
+:8,Cs,value(50)
 
 
 Pattern A1343
@@ -5968,7 +5969,7 @@ Y*X
 OXO
 ?O?
 
-:8,s,value(75)
+:8,Cs,value(75)
 
 OX?
 A*B
@@ -5986,7 +5987,7 @@ X*Y
 OXO
 ?O?
 
-:8,s,value(75)
+:8,Cs,value(75)
 
 OX?
 A*B
@@ -6046,7 +6047,7 @@ Pattern A1602
 .X.?
 ----
 
-:8,s,value(55)
+:8,Cs,value(55)
 
 aYO?
 *bCO
@@ -6063,7 +6064,7 @@ Pattern A1603
 ..X?
 ----
 
-:8,s,value(55)
+:8,Cs,value(55)
 
 aYO?
 *bCO
@@ -6080,7 +6081,7 @@ O*.XO
 ..X.?
 -----
 
-:8,s,value(55)
+:8,Cs,value(55)
 
 ?XYO?
 O*aBO
@@ -6097,7 +6098,7 @@ O*.XO
 ...X?
 -----
 
-:8,s,value(55)
+:8,Cs,value(55)
 
 ?XYO?
 O*aBO
@@ -6114,7 +6115,7 @@ XYO?      peep to destroy eyeshape
 .X.?
 ----
 
-:8,s,value(35)
+:8,Cs,value(35)
 
 XYO?
 *aBO

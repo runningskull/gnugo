@@ -51,6 +51,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "liberty.h"
+#include "readconnect.h"
 #include "patterns.h"
 #include "cache.h"
 #include "sgftree.h"
@@ -113,6 +114,8 @@ static int goal_worms_computed = 0;
 static int owl_goal_worm[MAX_GOAL_WORMS];
 
 
+#define MAX_CUTS 5
+
 struct owl_move_data {
   int pos;          /* move coordinate */
   int value;        /* value */
@@ -121,6 +124,7 @@ struct owl_move_data {
   int lunch;	    /* Position of a lunch, if applicable.*/
   int escape;       /* true if an escape pattern is matched */
   int defense_pos;  /* defense coordinate for vital owl attack patterns. */
+  int cuts[MAX_CUTS]; /* strings of the goal that might get cut off */
 };
 
 #define USE_BDIST 1
@@ -129,6 +133,7 @@ struct matched_pattern_data {
   int move;
   int value;
   int ll;
+  int anchor;
 #if USE_BDIST
   int bdist;
 #endif
@@ -172,7 +177,7 @@ static void pattern_list_sink_heap_top_element(struct matched_patterns_list_data
 
 static int get_next_move_from_list(struct matched_patterns_list_data *list,
                                    int color, struct owl_move_data *moves,
-				   int cutoff);
+				   int cutoff, struct local_owl_data *owl);
 static void init_pattern_list(struct matched_patterns_list_data *list);
 static void close_pattern_list(int color,
 			       struct matched_patterns_list_data *list);
@@ -208,6 +213,8 @@ static void owl_mark_worm(int apos, int bpos,
 static void owl_mark_boundary(struct local_owl_data *owl);
 static void owl_update_goal(int pos, int same_dragon, int lunch,
 			    struct local_owl_data *owl, int semeai_call);
+static void owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS]);
+static void componentdump(const char goal[BOARDMAX]);
 static void owl_update_boundary_marks(int pos, struct local_owl_data *owl);
 static void owl_find_lunches(struct local_owl_data *owl);
 static int improve_lunch_attack(int lunch, int attack_point);
@@ -312,6 +319,17 @@ static int prefer_ko;
  *        information to owl_lively(), where it's used.
  */
 static int include_semeai_worms_in_eyespace = 0;
+
+
+
+static void
+clear_cut_list(int cuts[MAX_CUTS])
+{
+  int i;
+  for (i = 0; i < MAX_CUTS; i++)
+    cuts[i] = NO_MOVE;
+}
+
 
 
 /* Called when (apos) and (bpos) point to adjacent dragons
@@ -672,6 +690,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     moves[k].name = NULL;
     moves[k].same_dragon = 2;
     moves[k].lunch = NO_MOVE;
+    clear_cut_list(moves[k].cuts);
   }
   ASSERT1(other == board[bpos], bpos);
   memset(mw, 0, sizeof(mw));
@@ -831,14 +850,14 @@ do_owl_analyze_semeai(int apos, int bpos,
 		 owla, &owl_defendpat_db);
       for (k = 0; k < MAX_MOVES-1; k++)
 	if (!get_next_move_from_list(&shape_defensive_patterns, color,
-				     shape_defensive_moves, 1))
+				     shape_defensive_moves, 1, owla))
 	  break;
     }
     owl_shapes(&shape_offensive_patterns, shape_offensive_moves, color, owlb, 
 	       &owl_attackpat_db);
     for (k = 0; k < MAX_MOVES-1; k++)
       if (!get_next_move_from_list(&shape_offensive_patterns, color,
-	                           shape_offensive_moves, 1))
+	                           shape_offensive_moves, 1, owla))
 	break;
     
     /* Now we review the moves already considered, while collecting
@@ -1623,6 +1642,7 @@ clear_owl_move_data(struct owl_move_data moves[MAX_MOVES])
     moves[k].same_dragon = 2;
     moves[k].escape = 0;
     moves[k].lunch = NO_MOVE;
+    clear_cut_list(moves[k].cuts);
   }
 }
 
@@ -1636,6 +1656,7 @@ set_single_owl_move(struct owl_move_data moves[MAX_MOVES],
   moves[0].same_dragon = 1;
   moves[0].escape      = 0;
   moves[0].lunch       = NO_MOVE;
+  clear_cut_list(moves[0].cuts);
   moves[1].value       = 0;
 }
 
@@ -2010,7 +2031,7 @@ do_owl_attack(int str, int *move, int *wormid,
       /* Shape moves are selected on demand. */
       if (pass == 1) {
         if (!get_next_move_from_list(&shape_patterns, other,
-	                             shape_moves, move_cutoff))
+	                             shape_moves, move_cutoff, owl))
           break;
       }
       else
@@ -2056,11 +2077,14 @@ do_owl_attack(int str, int *move, int *wormid,
 	origin = NO_MOVE;
 	for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
 	  if (board[pos] == color && owl->goal[pos] == 1) {
-	      origin = find_origin(pos);
-	      break;
+	    origin = find_origin(pos);
+	    break;
 	  }
 	}
       }
+
+      if (moves[k].cuts[0] != NO_MOVE)
+	owl_test_cuts(owl->goal, owl->color, moves[k].cuts);
 
       if (origin == NO_MOVE)
 	dcode = 0;
@@ -2220,7 +2244,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   owl_shapes(&shape_patterns, moves, other, owl, &owl_attackpat_db);
   for (k = 0; k < MAX_MOVES; k++) {
     current_owl_data = owl;
-    if (!get_next_move_from_list(&shape_patterns, other, moves, 1))
+    if (!get_next_move_from_list(&shape_patterns, other, moves, 1, owl))
       break;
     else {
       int mpos = moves[k].pos;
@@ -2374,7 +2398,7 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
 static int
 do_owl_defend(int str, int *move, int *wormid,
 	      struct local_owl_data *owl,
-	        int escape)
+	      int escape)
 {
   int color = board[str];
   struct owl_move_data shape_moves[MAX_MOVES];
@@ -2597,7 +2621,7 @@ do_owl_defend(int str, int *move, int *wormid,
       
       if (pass == 1) {
         if (!get_next_move_from_list(&shape_patterns, color, shape_moves,
-	                             move_cutoff))
+	                             move_cutoff, owl))
 	  break;
       }
       else
@@ -2741,7 +2765,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   owl_shapes(&shape_patterns, moves, color, owl, &owl_defendpat_db);
   for (k = 0; k < MAX_MOVES; k++) {
     current_owl_data = owl;
-    if (!get_next_move_from_list(&shape_patterns, color, moves, 1))
+    if (!get_next_move_from_list(&shape_patterns, color, moves, 1, owl))
       break;
     else {
       if (moves[k].pos != NO_MOVE && moves[k].value > 0)
@@ -3631,6 +3655,7 @@ collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
   next_pattern->move	= AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   next_pattern->value	= pattern->value;
   next_pattern->ll	= ll;
+  next_pattern->anchor	= anchor;
   next_pattern->pattern	= pattern;
   next_pattern->next_pattern_index = -1;
 
@@ -3944,6 +3969,37 @@ pattern_list_sink_heap_top_element(struct matched_patterns_list_data *list)
 }
 
 
+/* Adds all goal strings in the pattern area to the cuts[] list, if there
+ * is more than one.
+ */
+static void
+generate_cut_list(struct pattern *pattern, int ll, int anchor,
+    		  int cuts[MAX_CUTS], struct local_owl_data *owl)
+{
+  int k;
+  int num = 0;
+  char mark[BOARDMAX];
+
+  memset(mark, 0, BOARDMAX);
+  for (k = 0; k < pattern->patlen; k++) {
+    int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
+    if (!IS_STONE(board[pos]))
+      continue;
+    pos = find_origin(pos);
+    if (!mark[pos] && board[pos] == owl->color && owl->goal[pos]) {
+      cuts[num++] = pos;
+      mark[pos] = 1;
+      if (num == MAX_CUTS)
+	return;
+    }
+  }
+  if (num == 1)
+    cuts[0] = NO_MOVE;
+  else if ((debug & DEBUG_SPLIT_OWL) && num > 1)
+    gprintf("Move provokes %d cuts, among them %1m and %1m.\n", num,
+	    cuts[0], cuts[1]);
+}
+
 /* This function searches in the previously stored list of matched
  * patterns for the highest valued unused patterns that have a valid
  * constraint.  It returns the moves at the next empty positions in
@@ -3965,7 +4021,8 @@ pattern_list_sink_heap_top_element(struct matched_patterns_list_data *list)
 
 static int
 get_next_move_from_list(struct matched_patterns_list_data *list, int color,
-			struct owl_move_data *moves, int cutoff)
+			struct owl_move_data *moves, int cutoff,
+			struct local_owl_data *owl)
 {
   int move_found = 0;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
@@ -3984,6 +4041,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
     int move;
     int value;
     int ll;
+    int anchor;
     int next_pattern_index;
 
     /* Peek top element of heap associated with pattern list. */
@@ -3994,6 +4052,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
     move    = list->pattern_heap[0]->move;
     value   = list->pattern_heap[0]->value;
     ll      = list->pattern_heap[0]->ll;
+    anchor  = list->pattern_heap[0]->anchor;
     next_pattern_index = list->pattern_heap[0]->next_pattern_index;
 
     list->used++;
@@ -4037,12 +4096,23 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 
       moves[k].pos = move;
       moves[k].value = value;
+      clear_cut_list(moves[k].cuts);
       move_found = 1;
 
       if (pattern && !(pattern->class & CLASS_c)) {
 	moves[k].name = pattern->name;
 	TRACE("Pattern %s found at %1m with value %d\n",
 	      pattern->name, move, moves[k].value);
+
+	if (pattern->class & CLASS_C) {
+	  /* Cut possible. (Only used in attack patterns). Try to find
+	   * goal strings in the pattern area and store them in the cut list
+	   * if there is more than one.
+	   */
+	  DEBUG(DEBUG_SPLIT_OWL,
+	      	"Generating cut list for move at %1m.\n", move);
+	  generate_cut_list(pattern, ll, anchor, moves[k].cuts, owl);
+	}
 
 	if (pattern->class & CLASS_B)
 	  moves[k].same_dragon = 0;
@@ -4534,6 +4604,196 @@ owl_update_goal(int pos, int same_dragon, int lunch,
     goaldump(owl->goal);
 }
 
+
+/* Computes the connected components of a the graph that is given by
+ * having graph[i][j] = 1 if i and j are connected, and that has size
+ * graph_size.
+ *
+ * This function is generic, but without having the fixed MAX_CUTS
+ * array size it is ugly to write in ANSI C89 (no variably sized arrays),
+ * so we leave it here for now.
+ */
+static int
+connected_components(char graph[MAX_CUTS][MAX_CUTS], int graph_size,
+		     char component[MAX_CUTS])
+{
+  int num_components = 0;
+  int k, j;
+
+  if (graph_size <= 0)
+    return 0;
+
+  memset(component, -1, MAX_CUTS);
+  for (;;)  {
+    int found_one;
+    /* Find unidentified string. */
+    for (k = 0; k < graph_size; k++)
+      if (component[k] == -1)
+	break;
+    if (k == graph_size)
+      break; /* All are identified. */
+    component[k] = num_components; /* Start new component. */
+    do { /* Spread new component. */
+      found_one = 0;
+      for (j = k+1; j < graph_size; j++)
+	if (graph[k][j] && component[j] == -1) {
+	  component[j] = num_components;
+	  found_one = 1;
+	}
+    } while (found_one);
+    num_components++;
+  }
+  gg_assert(num_components > 0);
+  return num_components;
+}
+
+/* This functions gets called after a move has been made that threatens
+ * to cut the owl goal dragon. It cuts the goal if necessary, and sets it
+ * to the biggest remaining component.
+ */
+static void
+owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
+{
+  int k, j;
+  char connected[MAX_CUTS][MAX_CUTS];
+  /* int connect_move[MAX_CUTS][MAX_CUTS]; */
+  int num_cuts;
+  int found_cut = 0;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+    
+  sgf_dumptree = NULL;
+  count_variations = 0;
+
+  memset(connected, 1, MAX_CUTS*MAX_CUTS);
+  if (debug & DEBUG_SPLIT_OWL) {
+    gprintf("Called for this goal: ");
+    goaldump(goal);
+    gprintf("At this position:\n");
+    showboard(0);
+  }
+
+  /* Delete captured strings from list. */
+  for (k = 0; k < MAX_CUTS; k++) {
+    if (cuts[k] == NO_MOVE)
+      break;
+    if (board[cuts[k]] == EMPTY) {
+      for (j = k + 1; j < MAX_CUTS; j++) {
+	if (cuts[j] == NO_MOVE)
+	  break;
+	cuts[j-1] = cuts[j];
+      }
+      cuts[k] = NO_MOVE;
+      k--;
+    }
+  }
+  num_cuts = k;
+
+  /* Test for each pair of strings in cuts[] whether it can now be
+   * disconnected.
+   */
+  for (k = 0; k < num_cuts; k++) {
+    ASSERT1(board[cuts[k]] == color, cuts[k]);
+    for (j = k + 1; j < num_cuts; j++)
+      if (fast_disconnect(cuts[k], cuts[j], NULL) == WIN) {
+	found_cut = 1;
+	connected[k][j] = 0;
+	connected[j][k] = 0;
+      }
+  }
+
+  if (found_cut) {
+    char component[MAX_CUTS];
+    char component2[BOARDMAX];
+    int component_size[MAX_CUTS];
+    int num_components;
+    int biggest_component = -1;
+    struct connection_data* conn_data;
+    int c_id;
+    int pos;
+
+    /* Start by computing the connected components among the strings
+     * listed in cuts[].
+     */
+    num_components = connected_components(connected, num_cuts, component);
+    if (num_components <= 1) {
+      sgf_dumptree = save_sgf_dumptree;
+      count_variations = save_count_variations;
+      return;
+    }
+
+    /* Now break up the goal by associating each goal stone to one of
+     * the connected components.
+     *
+     * First we compute the connection distances from each of the
+     * partial goals we have found.
+     */
+    memset(component2, -1, BOARDMAX);
+    memset(component_size, 0, sizeof(int) * num_components);
+    conn_data = malloc(sizeof(struct connection_data) * num_components);
+    for (c_id = 0; c_id < num_components; c_id++) {
+      char this_goal[BOARDMAX];
+      memset(this_goal, 0, BOARDMAX);
+
+      for (k = 0; k < num_cuts; k++)
+	if (component[k] == c_id) {
+	  mark_string(cuts[k], this_goal, 1);
+	  mark_string(cuts[k], component2, c_id);
+	}
+      init_connection_data(color, this_goal, NO_MOVE, 3.01,
+	  		   conn_data + c_id, 1);
+      spread_connection_distances(color, conn_data + c_id);
+    }
+
+    /* Now put each goal string to the component to which it has the
+     * smallest distance.
+     */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      float closest_dist = HUGE_CONNECTION_DISTANCE;
+      int closest_component = -1;
+      if (!goal[pos] || board[pos] != color)
+	continue;
+      if (pos != find_origin(pos))
+	continue;
+      for (c_id = 0; c_id < num_components; c_id++) {
+	if (conn_data[c_id].distances[pos] < closest_dist) {
+	  closest_dist = conn_data[c_id].distances[pos];
+	  closest_component = c_id;
+	}
+      }
+      /* FIXME: What to do if no close component found? */
+      if (closest_component != -1) {
+	mark_string(pos, component2, closest_component);
+	component_size[closest_component] += countstones(pos);
+      }
+    }
+
+    /* Now find the biggest_component. */
+    {
+      int biggest_size = 0;
+      for (c_id = 0; c_id < num_components; c_id++)
+	if (component_size[c_id] > biggest_size) {
+	  biggest_size = component_size[c_id];
+	  biggest_component = c_id;
+	}
+      gg_assert(biggest_component != -1);
+    }
+
+    /* Now delete everything except the biggest component from the goal. */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (component2[pos] != biggest_component)
+	goal[pos] = 0;
+    if (debug & DEBUG_SPLIT_OWL) {
+      gprintf("Split dragon. Biggest component is %d (of %d).\n",
+	      biggest_component, num_components);
+      showboard(0);
+      componentdump(component2);
+    }
+  }
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+}
+
 /* We update the boundary marks. The boundary mark must be
  * constant on each string. It is nonzero if the string
  * adjoins the goal dragon, or if the string includes a
@@ -4573,6 +4833,16 @@ goaldump(const char goal[BOARDMAX])
   int pos;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos) && goal[pos])
+      gprintf("%o%1m (%d)  ", pos, (int) goal[pos]);
+  gprintf("\n");
+}
+
+void
+componentdump(const char goal[BOARDMAX])
+{
+  int pos;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos) && goal[pos] != -1)
       gprintf("%o%1m (%d)  ", pos, (int) goal[pos]);
   gprintf("\n");
 }

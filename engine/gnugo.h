@@ -188,6 +188,7 @@ extern int output_flags;       /* amount of output to outfile */
 #define DEBUG_MISCELLANEOUS         0x800000
 #define DEBUG_ORACLE_STREAM         0x1000000
 #define DEBUG_LARGE_SCALE           0x1000000
+#define DEBUG_SPLIT_OWL             0x2000000
 
 /* hash flag bits 
  *

@@ -42,6 +42,8 @@ struct heap_entry {
   connection_helper_fn_ptr helper;
 };
 
+#define HUGE_CONNECTION_DISTANCE 100.0
+
 struct connection_data {
   float distances[BOARDMAX];
   float deltas[BOARDMAX];

@@ -1365,6 +1365,43 @@ disconnect(int str1, int str2, int *move)
   return res;
 }
 
+/* Externally callable frontend to recursive_disconnect().
+ * Returns WIN if str1 and str2 can be disconnected. 
+ *
+ * Uses much lower node and depths limits.
+ */
+int
+fast_disconnect(int str1, int str2, int *move)
+{
+  int result;
+  int save_limit = connection_node_limit;
+  int save_verbose = verbose;
+
+  if (board[str1] == EMPTY || board[str2] == EMPTY)
+    return WIN;
+  str1 = find_origin(str1);
+  str2 = find_origin(str2);
+  if (str1 > str2) {
+    int tmp = str1;
+    str1 = str2;
+    str2 = tmp;
+  }
+
+  modify_depth_values(-3);
+  connection_node_limit /= 4;
+
+  if (verbose > 0)
+    verbose--;
+  result = recursive_disconnect2(str1, str2, move, 0);
+  verbose = save_verbose;
+
+  connection_node_limit = save_limit;
+  modify_depth_values(3);
+
+  return result;
+}
+
+
 
 /* Returns WIN if str1 and str2 can be disconnected. */
 
@@ -1892,8 +1929,6 @@ get_connection_node_counter()
     }\
   } while (0)
 
-
-#define HUGE_CONNECTION_DISTANCE 100.0
 
 static int find_string_connection_moves(int str1, int str2, int color_to_move,
 				        int moves[MAX_MOVES],
