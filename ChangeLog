@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function sgffile_load_and_print()
 - new call convention for sgftree* functions
 - sgftreeCreateHeaderNode() revised
 - sgffile_debuginfo() renamed to sgffile_add_debuginfo()

@@ -959,11 +959,11 @@ main(int argc, char *argv[])
     else {
       if (mandated_color != EMPTY)
         gameinfo.to_move = mandated_color;
+
       sgftree.root->child = NULL;
       sgftreeSetLastNode(&sgftree, sgftree.root);
-      sgffile_printboard(&sgftree);
-      sgfAddProperty(sgftree.lastnode, "PL",
-        (gameinfo.to_move == WHITE ? "W" : "B"));
+      sgffile_loadandprint(&sgftree, gameinfo.to_move);
+
       writesgf(sgftree.root, printsgffile);
     }
     break;

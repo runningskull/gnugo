@@ -143,6 +143,33 @@ sgffile_enddump(const char *filename)
 
 
 /*
+ * sgffile_loadandprint adds the current board position as well as
+ * information about who is to play and illegal moves to the tree.
+ */
+
+void
+sgffile_loadandprint(SGFTree *tree, int next)
+{
+  int m, n;
+  char pos[3];
+  
+  sgffile_printboard(tree);
+  
+  if (next == EMPTY)
+    return;
+
+  sgfAddProperty(tree->lastnode, "PL", (next == WHITE ? "W" : "B"));
+
+  for (m = 0; m < board_size; ++m)
+    for (n = 0; n < board_size; ++n)
+      if (BOARD(m, n) == EMPTY && !is_legal(POS(m, n), next)) {
+       gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
+       sgfAddProperty(tree->lastnode, "IL", pos);
+      }
+}
+
+
+/*
  * sgffile_printboard adds the current board position to the tree.
  */
 
