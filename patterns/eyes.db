@@ -1833,7 +1833,16 @@ Pattern 751
 
   @
   .
-....@
+x...@
+
+:2,1
+
+
+Pattern 752
+
+  !
+  .
+.*X.!
 
 :2,1
 
@@ -1842,14 +1851,14 @@ Pattern 751
 # Topology: ....
 #
 
-Pattern 752
+Pattern 753
 
   xXx
 @..x
 
 :2,1
 
-Pattern 753
+Pattern 754
 
   x.!
 !.xx
