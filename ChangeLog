@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new GTP command unconditional_status
 - estimate_lunch_eye_value() revised	
 - avoid calling owl_substantial() when not needed in aa_compute_status()
 - value_move_reasons() revised
@@ -18,6 +19,7 @@
 - influence tuning
 - owl tuning
 - tuning
+- new test suite unconditional.tst
 - new game records and test cases
 
 3.5.3 released January 7, 2004

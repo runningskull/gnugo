@@ -186,6 +186,7 @@ DECLARE(gtp_top_moves_white);
 DECLARE(gtp_tryko);
 DECLARE(gtp_trymove);
 DECLARE(gtp_tune_move_ordering);
+DECLARE(gtp_unconditional_status);
 DECLARE(gtp_undo);
 DECLARE(gtp_what_color);
 DECLARE(gtp_worm_cutstone);
@@ -318,6 +319,7 @@ static struct gtp_command commands[] = {
   {"tryko",          	      gtp_tryko},
   {"trymove",          	      gtp_trymove},
   {"tune_move_ordering",      gtp_tune_move_ordering},
+  {"unconditional_status",    gtp_unconditional_status},
   {"undo",                    gtp_undo},
   {"version",                 gtp_program_version},
   {"white",            	      gtp_playwhite},
@@ -2179,6 +2181,36 @@ gtp_same_dragon(char *s)
   silent_examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
   
   return gtp_success("%d", dragon[POS(ai, aj)].id == dragon[POS(bi, bj)].id);
+}
+
+
+/************************
+ * Unconditional status *
+ ************************/
+
+/* Function:  Determine the unconditional status of a vertex.
+ * Arguments: vertex
+ * Fails:     invalid vertex
+ * Returns:   unconditional status ("undecided", "alive", "dead",
+ *            "white_territory", "black_territory"). Occupied vertices can
+ *            be undecided, alive, or dead. Empty vertices can be
+ *            undecided, white territory, or black territory.
+ */
+
+static int
+gtp_unconditional_status(char *s)
+{
+  int i, j;
+
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure("invalid coordinate");
+
+  silent_examine_position(BLACK, EXAMINE_WORMS);
+  
+  enum dragon_status status = worm[POS(i, j)].unconditional_status;
+  if (status == UNKNOWN)
+    return gtp_success("undecided");
+  return gtp_success("%s", status_to_string(status));
 }
 
 

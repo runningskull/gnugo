@@ -750,6 +750,22 @@
 @end example
 
 
+@cindex unconditional_status
+@item unconditional_status
+
+@example
+
+ Function:  Determine the unconditional status of a vertex.
+ Arguments: vertex
+ Fails:     invalid vertex
+ Returns:   unconditional status ("undecided", "alive", "dead",
+            "white_territory", "black_territory"). Occupied vertices can
+            be undecided, alive, or dead. Empty vertices can be
+            undecided, white territory, or black territory.
+
+@end example
+
+
 @cindex combination_attack
 @item combination_attack
 
