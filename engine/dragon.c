@@ -536,10 +536,7 @@ make_dragons(int color, int stop_before_owl)
   time_report(2, "  post owl dragon data", NO_MOVE, 1.0);
 
   /* Resolve semeais. This may revise the safety and status fields. */
-  if (experimental_semeai && level >= 8)
-    new_semeai();
-  else 
-    semeai(color);
+  semeai();
 
   time_report(2, "  semeai module", NO_MOVE, 1.0);
 

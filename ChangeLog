@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- support for !experimental_semeai removed
+- old semeai() removed and new_semeai() renamed to semeai()
+- analyze_semeai(), add_appropriate_semeai_moves(), and liberty_of_dragon()
+  removed
 - old amalgamation (!experimental_connections) code and patterns removed
 - dragon_eye() removed
 - basic_cut_helper() and ugly_cutstone_helper() removed

@@ -5362,11 +5362,8 @@ static void
 reduced_init_owl(struct local_owl_data **owl, int at_bottom_of_stack)
 {
   if (owl_stack_size == 0) {
-    if (experimental_semeai)
-      owl_stack_size = gg_max(owl_reading_depth + 2,
-	  		      2 * semeai_branch_depth + 4);
-    else
-      owl_stack_size = owl_reading_depth + 2;
+    owl_stack_size = gg_max(owl_reading_depth + 2,
+			    2 * semeai_branch_depth + 4);
     owl_stack = malloc(owl_stack_size * sizeof(*owl_stack));
     gg_assert(owl_stack != NULL);
   }

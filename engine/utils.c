@@ -656,7 +656,6 @@ set_depth_values(int level, int report_levels)
    * Other policies depending on level:
    * aftermath.c:   >=  8: call estimate_score().
    * dragon.c:      >=  8: compute owl threats (currently disabled)
-   *                >=  8: call owl analysis of semeai (currently disabled)
    * genmove.c:     >=  8: call estimate_score().
    * owl.c:         >=  9: use vital attack pattern database
    *                >=  8: increase depth values in owl_substantial
