@@ -358,7 +358,7 @@ owl: owl.tst
 	$(srcdir)/eval.sh owl.tst $(GG_OPTIONS)
 
 owl1: owl1.tst
-	$(srcdir)/eval.sh owl.tst $(GG_OPTIONS)
+	$(srcdir)/eval.sh owl1.tst $(GG_OPTIONS)
 
 owl_rot: owl_rot.tst
 	$(srcdir)/eval.sh owl_rot.tst $(GG_OPTIONS)

@@ -22,6 +22,15 @@ loadsgf games/mfgg1.sgf 49
 265 owl_attack S15
 #? [1 S16]*
 
+loadsgf games/unfinished.sgf 214
+266 owl_defend C15
+#? [1 B17]
+
+loadsgf games/unfinished.sgf 214
+267 owl_defend Q2
+#? [2 R3]
+
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
