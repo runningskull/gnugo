@@ -69,6 +69,19 @@ openregion(int i1, int i2, int j1, int j2)
   if (j1 > j2)
     return openregion(i1, i2, j2, j1);
 
+  /* Disregard parts of the region off the board. This is convenient
+   * in order not to have to special-case tiny boards. It also secures
+   * against potential reading outside the board[] array boundaries.
+   */
+  if (i1 < 0)
+    i1 = 0;
+  if (j1 < 0)
+    j1 = 0;
+  if (i2 >= board_size)
+    i2 = board_size - 1;
+  if (j2 >= board_size)
+    j2 = board_size - 1;
+    
   for (x = i1; x <= i2; x++)
     for (y = j1; y <= j2; y++)
       if (BOARD(x, y) != EMPTY)
