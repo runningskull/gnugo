@@ -49,7 +49,11 @@ static int initial_influence_examined = -1;
 static int dragons_examined_without_owl = -1;
 static int dragons_examined = -1;
 static int initial_influence2_examined = -1;
+#if 0
 static int opponent_not_passing(int color, int score);
+#endif
+static int revise_semeai(int color);
+static int revise_thrashing_dragon(int color, float advantage);
 
 void sgfShowConsideredMoves(void);
 
@@ -289,6 +293,8 @@ genmove_conservative(int *i, int *j, int color)
 }
 
 
+#if 0
+
 /* If we're way ahead, and opponent has not been passing when we
  * think there are not even dame left, let's start playing aftermath
  * moves, too.  This funtion returns 1 if we should play an aftermath
@@ -312,6 +318,7 @@ opponent_not_passing(int color, int score)
  /*(last_moves[0] != NO_MOVE*/
 }
 
+#endif
 
 /* 
  * Perform the actual move generation. 
@@ -438,6 +445,22 @@ do_genmove(int *move, int color, float pure_threat_value)
   gg_assert(stackp == 0);
   time_report(1, "review move reasons", NO_MOVE, 1.0);
 
+  /* If we are ahead by 15 points or more, consider a thrashing
+   * dragon dangerous and change its status from DEAD to
+   * UNKNOWN. This may generate a move.
+   */
+  if (val < 10.0) {
+    if (revise_thrashing_dragon(color, 15.)) {
+      shapes(color);
+      endgame_shapes(color);
+      if (review_move_reasons(move, &val, color, pure_threat_value, score)) {
+	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
+	      *move, val); 
+      }
+    }
+    time_report(1, "move reasons with revised semeai status", NO_MOVE, 1.0);
+  }
+
   /* If the move value is 6 or lower, we look for endgame patterns too. */
   if (val <= 6.0 && !disable_endgame_patterns) {
     endgame_shapes(color);
@@ -453,7 +476,8 @@ do_genmove(int *move, int color, float pure_threat_value)
    * run shapes and endgame_shapes again. This may turn up a move.
    */
   if (val < 0.0) {
-    if (revise_semeai(color)) {
+    if (revise_thrashing_dragon(color, 0.)
+	|| revise_semeai(color)) {
       shapes(color);
       endgame_shapes(color);
       if (review_move_reasons(move, &val, color, pure_threat_value, score)) {
@@ -476,14 +500,17 @@ do_genmove(int *move, int color, float pure_threat_value)
   }
 
   /* If we're instructed to play out the aftermath or capture all dead
-   * opponent stones, generate an aftermath move.
+   * opponent stones, or if the opponent is trying to live inside
+   * our territory and we are clearly ahead, generate an aftermath move.
    */
 
   if (val < 0.0
       && !doing_scoring
       && (play_out_aftermath 
-          || capture_all_dead
-          || opponent_not_passing(color, score))
+	  || capture_all_dead 
+	  || (thrashing_dragon &&
+	      ((color == BLACK && score < -15.)
+	       || (color == WHITE && score > 15.))))
       && aftermath_genmove(move, color, NULL, 0) > 0) {
     ASSERT1(is_legal(*move, color), *move);
     val = 1.0;
@@ -497,8 +524,7 @@ do_genmove(int *move, int color, float pure_threat_value)
    */
   if (val < 0.0
       && !doing_scoring
-      && (capture_all_dead 
-          || opponent_not_passing(color, score))
+      && capture_all_dead 
       && aftermath_genmove(move, color, NULL, 1) > 0) {
     ASSERT1(is_legal(*move, color), *move);
     val = 1.0;
@@ -547,6 +573,7 @@ do_genmove(int *move, int color, float pure_threat_value)
   gg_assert(test_gray_border() < 0);
   return val;
 }
+
 
 
 /* This is called for each move which has been considered. For
@@ -759,6 +786,73 @@ placehand(int handicap)
 
   return retval;
 }
+
+
+/* revise_semeai(color) changes the status of any DEAD dragon of
+ * OPPOSITE_COLOR(color) which occurs in a semeai to UNKNOWN.
+ * It returns true if such a dragon is found.
+ */
+
+static int
+revise_semeai(int color)
+{
+  int pos;
+  int found_one = 0;
+  int other = OTHER_COLOR(color);
+
+  gg_assert(dragon2 != NULL);
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos)
+	&& DRAGON2(pos).semeai
+	&& dragon[pos].matcher_status == DEAD
+	&& dragon[pos].color == other) {
+      found_one = 1;
+      dragon[pos].matcher_status = UNKNOWN;
+      if (dragon[pos].origin == pos)
+	TRACE("revise_semeai: changed status of dragon %1m from DEAD to UNKNOWN\n",
+	      pos);
+    }
+  }
+  
+  return found_one;
+}
+
+
+/* If the opponent's last move added a stone to a dead dragon,
+ * revise it's status to UNKNOWN. This will cause genmove to
+ * generate moves restraining the dragon. We only do this if
+ * we are ahead by 'advantage', and no owl threat has been found.
+ */
+
+static int
+revise_thrashing_dragon(int color, float advantage)
+{
+  int pos;
+
+  /* Trust the owl code's opinion if we are behind. */
+  if ((color == BLACK && score > -advantage)
+      || (color == WHITE && score < advantage))
+    return 0;
+
+  /* If an owl threat has been found, a move reason has
+   * probably been generated, so we skip this step. */
+  if (dragon[thrashing_dragon].owl_threat_status == CAN_THREATEN_DEFENSE)
+    return 0;
+
+  if (disable_threat_computation
+      || !thrashing_dragon 
+      || dragon[thrashing_dragon].matcher_status != DEAD)
+    return 0;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos)
+	&& is_same_dragon(pos, thrashing_dragon))
+      dragon[pos].matcher_status = UNKNOWN;
+  return 1;
+}
+
+
 
 
 /*

@@ -781,37 +781,6 @@ add_appropriate_semeai_moves(int move, int my_dragon, int your_dragon,
 }
 
 
-/* revise_semeai(color) changes the status of any DEAD dragon of
- * OPPOSITE_COLOR(color) which occurs in a semeai to UNKNOWN.
- * It returns true if such a dragon is found.
- */
-
-int
-revise_semeai(int color)
-{
-  int pos;
-  int found_one = 0;
-  int other = OTHER_COLOR(color);
-
-  gg_assert(dragon2 != NULL);
-
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(pos)
-	&& DRAGON2(pos).semeai
-	&& dragon[pos].matcher_status == DEAD
-	&& dragon[pos].color == other) {
-      found_one = 1;
-      dragon[pos].matcher_status = UNKNOWN;
-      if (dragon[pos].origin == pos)
-	TRACE("revise_semeai: changed status of dragon %1m from DEAD to UNKNOWN\n",
-	      pos);
-    }
-  }
-  
-  return found_one;
-}
-
-
 /* small_semeai() addresses a deficiency in the reading code:
  * for reasons of speed, savestone3 and savestone4 do not
  * sufficiently check whether there may be an adjoining string
