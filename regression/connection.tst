@@ -415,6 +415,11 @@ loadsgf games/gunnar/gunnar9.sgf 4
 115 disconnect D10 J7
 #? [1 H7]*
 
+# See also golife:3 and connection:28
+loadsgf games/golife.sgf 30
+116 disconnect H4 H7
+#? [0]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

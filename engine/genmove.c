@@ -298,6 +298,7 @@ do_genmove(int color, float pure_threat_value,
   int save_depth;
   int move;
   float dummy_value;
+  int use_thrashing_dragon_heuristics = 0;
 
   if (!value)
     value = &dummy_value;
@@ -419,6 +420,15 @@ do_genmove(int color, float pure_threat_value,
 
   /* Look for moves to break mirror play by the opponent. */
   break_mirror_go(color);
+
+  /* If we are ahead by 10 points or more, consider a thrashing
+   * dragon dangerous and change its status from DEAD to
+   * UNKNOWN. This may generate a move. Otherwise, pretend there is no
+   * thrashing dragon.
+   */
+  if (!doing_scoring && !limit_search)
+    use_thrashing_dragon_heuristics
+      = revise_thrashing_dragon(color, our_score, -30.0);
   
   /* The general pattern database. */
   shapes(color);
@@ -432,28 +442,12 @@ do_genmove(int color, float pure_threat_value,
 
   /* Review the move reasons and estimate move values. */
   if (review_move_reasons(&move, value, color, 
-			  pure_threat_value, our_score, allowed_moves))
+			  pure_threat_value, our_score, allowed_moves,
+			  use_thrashing_dragon_heuristics))
     TRACE("Move generation likes %1m with value %f\n", move, *value);
   gg_assert(stackp == 0);
   time_report(1, "review move reasons", NO_MOVE, 1.0);
 
-  /* If we are ahead by 15 points or more, consider a thrashing
-   * dragon dangerous and change its status from DEAD to
-   * UNKNOWN. This may generate a move.
-   */
-  if (*value < 0.4 * our_score && !doing_scoring && !limit_search) {
-    if (revise_thrashing_dragon(color, our_score, 15.0)) {
-      shapes(color);
-      if (!disable_endgame_patterns)
-	endgame_shapes(color);
-      if (review_move_reasons(&move, value, color, pure_threat_value,
-			      our_score, allowed_moves)) {
-	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
-	      move, *value); 
-      }
-    }
-    time_report(1, "move reasons with revised thrashing status", NO_MOVE, 1.0);
-  }
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
   if (*value <= 6.0 && !disable_endgame_patterns && !limit_search) {
@@ -461,7 +455,8 @@ do_genmove(int color, float pure_threat_value,
     endgame(color);
     gg_assert(stackp == 0);
     if (review_move_reasons(&move, value, color, pure_threat_value, our_score,
-			    allowed_moves))
+			    allowed_moves,
+			    use_thrashing_dragon_heuristics))
       TRACE("Move generation likes %1m with value %f\n", move, *value);
     gg_assert(stackp == 0);
     time_report(1, "endgame", NO_MOVE, 1.0);
@@ -472,17 +467,17 @@ do_genmove(int color, float pure_threat_value,
    * run shapes and endgame_shapes again. This may turn up a move.
    */
   if (move == PASS_MOVE) {
-    if (revise_thrashing_dragon(color, our_score, 0.0)
-	|| revise_semeai(color)) {
+    if (revise_semeai(color)) {
       shapes(color);
       endgame_shapes(color);
       if (review_move_reasons(&move, value, color, pure_threat_value,
-			      our_score, allowed_moves)) {
+			      our_score, allowed_moves,
+			      use_thrashing_dragon_heuristics)) {
 	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
 	      move, *value); 
       }
     }
-    time_report(1, "move reasons with revised semeai or thrashing status",
+    time_report(1, "move reasons with revised semeai status",
 		NO_MOVE, 1.0);
   }
 

@@ -2453,7 +2453,8 @@ estimate_territorial_value(int pos, int color, float our_score,
  * Estimate the strategical value of a move at (pos).
  */
 static void
-estimate_strategical_value(int pos, int color, float our_score)
+estimate_strategical_value(int pos, int color, float our_score,
+    			   int use_thrashing_dragon_heuristics)
 {
   int k;
   int l;
@@ -2653,19 +2654,18 @@ estimate_strategical_value(int pos, int color, float our_score)
 	 * stays dead. If we are ahead, add a safety move here, at most
 	 * half the margin of victory.
 	 *
-	 * This does not apply if we are doing scoring.
-	 *
-	 * FIXME: The margin of victory limit is not implemented.
+	 * This does only apply if we decided earlier we want to use
+	 * thrashing dragon heuristics.
 	 */
       
-	if (!doing_scoring) {
+	if (use_thrashing_dragon_heuristics) {
 	  int cc;
 	  aa = dragon[conn_worm1[move_reasons[r].what]].origin;
 	  bb = dragon[conn_worm2[move_reasons[r].what]].origin;
 	  cc = get_last_opponent_move(color);
 
 	  if (cc != NO_MOVE
-	      && dragon[cc].status == DEAD
+	      && thrashing_stone[cc]
 	      && are_neighbor_dragons(aa, cc)
 	      && are_neighbor_dragons(bb, cc)) {
 	    if (aa == bb)
@@ -2761,8 +2761,12 @@ estimate_strategical_value(int pos, int color, float our_score)
 	 * dragon safety alone is not enough. The question is whether
 	 * the dragon is threatened by the move or not.
 	 */
-	this_value = 1.8 * soft_cap(dragon[aa].effective_size, 15.0)
-		     * dragon_weakness(aa, 1);
+	if (use_thrashing_dragon_heuristics
+	    && thrashing_stone[aa])
+	  this_value = 1.7 * dragon[aa].effective_size;
+	else
+	  this_value = 1.8 * soft_cap(dragon[aa].effective_size, 15.0)
+		       * dragon_weakness(aa, 1);
 
 	/* No strategical attack value is awarded if the dragon at (aa)
 	 * has an adjacent (friendly) critical dragon, which is not
@@ -2935,7 +2939,7 @@ compare_move_reasons(const void *p1, const void *p2)
  */
 static float
 value_move_reasons(int pos, int color, float pure_threat_value,
-		   float our_score)
+		   float our_score, int use_thrashing_dragon_heuristics)
 {
   float tot_value;
   float shape_factor;
@@ -2974,7 +2978,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * strategical value. See connection_value().
      */
     estimate_territorial_value(pos, color, our_score, 0);
-    estimate_strategical_value(pos, color, our_score);
+    estimate_strategical_value(pos, color, our_score,
+			       use_thrashing_dragon_heuristics);
   }
 
   /* Introduction of strategical_weight and territorial_weight, 
@@ -3188,7 +3193,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
  * Loop over all possible moves and value the move reasons for each.
  */
 static void
-value_moves(int color, float pure_threat_value, float our_score)
+value_moves(int color, float pure_threat_value, float our_score,
+            int use_thrashing_dragon_heuristics)
 {
   int m, n;
   int pos;
@@ -3201,7 +3207,8 @@ value_moves(int color, float pure_threat_value, float our_score)
       pos = POS(m, n);
 
       move[pos].value = value_move_reasons(pos, color, 
-					   pure_threat_value, our_score);
+					   pure_threat_value, our_score,
+					   use_thrashing_dragon_heuristics);
       if (move[pos].value == 0.0)
 	continue;
       
@@ -3644,7 +3651,8 @@ find_best_move(int *the_move, float *value, int color,
 int
 review_move_reasons(int *the_move, float *value, int color,
 		    float pure_threat_value, float our_score,
-		    int allowed_moves[BOARDMAX])
+		    int allowed_moves[BOARDMAX],
+		    int use_thrashing_dragon_heuristics)
 {
   int save_verbose;
 
@@ -3682,7 +3690,8 @@ review_move_reasons(int *the_move, float *value, int color,
     list_move_reasons(stderr, NO_MOVE);
 
   /* Evaluate all moves with move reasons. */
-  value_moves(color, pure_threat_value, our_score);
+  value_moves(color, pure_threat_value, our_score,
+      	      use_thrashing_dragon_heuristics);
   time_report(2, "  value_moves", NO_MOVE, 1.0);
 
   /* Perform point redistribution */

@@ -863,7 +863,7 @@ reduced_genmove(int color)
   gg_assert(stackp == 0);
 
   /* Review the move reasons and estimate move values. */
-  if (review_move_reasons(&move, &value, color, 0.0, our_score, NULL))
+  if (review_move_reasons(&move, &value, color, 0.0, our_score, NULL, 0))
     TRACE("Move generation likes %1m with value %f\n", move, value);
   gg_assert(stackp == 0);
 

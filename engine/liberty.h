@@ -485,7 +485,8 @@ int atari_atari_blunder_size(int color, int tpos, char defense_moves[BOARDMAX],
 
 int review_move_reasons(int *move, float *value, int color,
 			float pure_threat_value, float our_score,
-			int allowed_moves[BOARDMAX]);
+			int allowed_moves[BOARDMAX],
+			int use_thrashing_dragon_heuristics);
 void prepare_move_influence_debugging(int pos, int color);
 int fill_liberty(int *move, int color);
 int aftermath_genmove(int color, int do_capture_dead_stones,
