@@ -458,7 +458,7 @@ void
 gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)
 {
   gnugo_play_move(i, j, color);
-  sgftreeAddPlay(&ginfo->game_record, 0, color, i, j);
+  sgftreeAddPlay(&ginfo->game_record, color, i, j);
 
   ginfo->to_move = OTHER_COLOR(color);
 }

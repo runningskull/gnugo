@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new call convention for sgftree* functions
+- sgftreeCreateHeaderNode() revised
+- sgffile_debuginfo() renamed to sgffile_add_debuginfo()
+- new call convention for sgffile_output()
+- --color option effective in scoring mode
+- sgftree struct and functions consistently used in play_gmp(),
+  play_solo(), load_and_analyze_sgf_file(), and load_and_score_sgf_file()
 - new arrays close_worms[][], close_white_worms[][],
   close_black_worms[][], number_close_worms[],
   number_close_white_worms[], number_close_black_worms[]

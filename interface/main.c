@@ -940,6 +940,9 @@ main(int argc, char *argv[])
     break;
     
   case MODE_LOAD_AND_SCORE:
+    if (mandated_color != EMPTY)
+      gameinfo.to_move = mandated_color;
+
     if (!infilename) {
       fprintf(stderr, "gnugo: --score must be used with -l\n");
       exit(EXIT_FAILURE);

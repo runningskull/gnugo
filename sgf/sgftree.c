@@ -77,13 +77,11 @@ sgftreeNodeCheck(SGFTree *tree, SGFNode *node)
  * Return the node where the stone was added.
  */
 
-SGFNode *
-sgftreeAddStone(SGFTree *tree, SGFNode *node, int color, int movex, int movey)
+void
+sgftreeAddStone(SGFTree *tree, int color, int movex, int movey)
 {
-  node = sgftreeNodeCheck(tree, node);
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
   sgfAddStone(node, color, movex, movey);
-
-  return node;
 }
 
 
@@ -91,14 +89,11 @@ sgftreeAddStone(SGFTree *tree, SGFNode *node, int color, int movex, int movey)
  * Add a move to the gametree.
  */
 
-SGFNode *
-sgftreeAddPlay(SGFTree *tree, SGFNode *node, int color, int movex, int movey)
+void
+sgftreeAddPlay(SGFTree *tree, int color, int movex, int movey)
 {
-  node = sgftreeNodeCheck(tree, node);
-  node = sgfAddPlay(node, color, movex, movey);
-  tree->lastnode = node;
-
-  return node;
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  tree->lastnode = sgfAddPlay(node, color, movex, movey);
 }
 
 
@@ -107,19 +102,15 @@ sgftreeAddPlay(SGFTree *tree, SGFNode *node, int color, int movex, int movey)
  * ones rather than before.
  */
 
-SGFNode *
-sgftreeAddPlayLast(SGFTree *tree, SGFNode *node, int color,
-		   int movex, int movey)
+void
+sgftreeAddPlayLast(SGFTree *tree, int color, int movex, int movey)
 {
-  node = sgftreeNodeCheck(tree, node);
-  node = sgfAddPlayLast(node, color, movex, movey);
-  tree->lastnode = node;
-
-  return node;
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  tree->lastnode = sgfAddPlayLast(node, color, movex, movey);
 }
 
 
-SGFNode *
+void
 sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi)
 {
   SGFNode *root = sgfNewNode();
@@ -127,8 +118,7 @@ sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi)
   sgfAddPropertyInt(root, "SZ", boardsize);
   sgfAddPropertyFloat(root, "KM", komi);
   tree->root = root;
-
-  return root;
+  tree->lastnode = root;
 }
 
 
@@ -136,15 +126,14 @@ sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi)
  * Add a comment to a gametree.
  */
 
-SGFNode *
-sgftreeAddComment(SGFTree *tree, SGFNode *node, const char *comment)
+void
+sgftreeAddComment(SGFTree *tree, const char *comment)
 {
+  SGFNode *node;
   assert(tree && tree->root);
 
-  node = sgftreeNodeCheck(tree, node);
+  node = sgftreeNodeCheck(tree, NULL);
   sgfAddComment(node, comment);
-
-  return node;
 }
 
 
@@ -152,15 +141,14 @@ sgftreeAddComment(SGFTree *tree, SGFNode *node, const char *comment)
  * Place text on the board at position (i, j).
  */
 
-SGFNode *
-sgftreeBoardText(SGFTree *tree, SGFNode *node, int i, int j, const char *text)
+void
+sgftreeBoardText(SGFTree *tree, int i, int j, const char *text)
 {
+  SGFNode *node;
   assert(tree->root);
 
-  node = sgftreeNodeCheck(tree, node);
+  node = sgftreeNodeCheck(tree, NULL);
   sgfBoardText(node, i, j, text);
-
-  return node;
 }
 
 
@@ -168,15 +156,14 @@ sgftreeBoardText(SGFTree *tree, SGFNode *node, int i, int j, const char *text)
  * Place a character on the board at position (i, j).
  */
 
-SGFNode *
-sgftreeBoardChar(SGFTree *tree, SGFNode *node, int i, int j, char c)
+void
+sgftreeBoardChar(SGFTree *tree, int i, int j, char c)
 {
+  SGFNode *node;
   assert(tree->root);
 
-  node = sgftreeNodeCheck(tree, node);
+  node = sgftreeNodeCheck(tree, NULL);
   sgfBoardChar(node, i, j, c);
-
-  return node;
 }
 
 
@@ -184,13 +171,11 @@ sgftreeBoardChar(SGFTree *tree, SGFNode *node, int i, int j, char c)
  * Place a number on the board at position (i, j).
  */
 
-SGFNode * 
-sgftreeBoardNumber(SGFTree *tree, SGFNode *node, int i, int j, int number)
+void
+sgftreeBoardNumber(SGFTree *tree, int i, int j, int number)
 {
-  node = sgftreeNodeCheck(tree, node);
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
   sgfBoardNumber(node, i, j, number);
-
-  return node;
 }
 
 
@@ -198,13 +183,11 @@ sgftreeBoardNumber(SGFTree *tree, SGFNode *node, int i, int j, int number)
  * Place a circle mark on the board at position (i, j).
  */
 
-SGFNode * 
-sgftreeTriangle(SGFTree *tree, SGFNode *node, int i, int j)
+void
+sgftreeTriangle(SGFTree *tree, int i, int j)
 {
-  node = sgftreeNodeCheck(tree, node);
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
   sgfTriangle(node, i, j);
-
-  return node;
 }
 
 
@@ -212,13 +195,11 @@ sgftreeTriangle(SGFTree *tree, SGFNode *node, int i, int j)
  * Place a circle mark on the board at position (i, j).
  */
 
-SGFNode * 
-sgftreeCircle(SGFTree *tree, SGFNode *node, int i, int j)
+void
+sgftreeCircle(SGFTree *tree, int i, int j)
 {
-  node = sgftreeNodeCheck(tree, node);
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
   sgfCircle(node, i, j);
-
-  return node;
 }
 
 
@@ -226,13 +207,11 @@ sgftreeCircle(SGFTree *tree, SGFNode *node, int i, int j)
  * Place a square mark on the board at position (i, j).
  */
 
-SGFNode * 
-sgftreeSquare(SGFTree *tree, SGFNode *node, int i, int j)
+void
+sgftreeSquare(SGFTree *tree, int i, int j)
 {
-  node = sgftreeNodeCheck(tree, node);
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
   sgfSquare(node, i, j);
-
-  return node;
 }
 
 
@@ -240,13 +219,11 @@ sgftreeSquare(SGFTree *tree, SGFNode *node, int i, int j)
  * Place a (square) mark on the board at position (i, j).
  */
 
-SGFNode *
-sgftreeMark(SGFTree *tree, SGFNode *node, int i, int j)
+void
+sgftreeMark(SGFTree *tree, int i, int j)
 {
-  node = sgftreeNodeCheck(tree, node);
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
   sgfMark(node, i, j);
-
-  return node;
 }
 
 
@@ -254,11 +231,11 @@ sgftreeMark(SGFTree *tree, SGFNode *node, int i, int j)
  * Start a new variant. Returns a pointer to the new node.
  */
 
-SGFNode *
-sgftreeStartVariant(SGFTree *tree, SGFNode *node)
+void
+sgftreeStartVariant(SGFTree *tree)
 {
-  node = sgftreeNodeCheck(tree, node);
-  return sgfStartVariant(node);
+  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  tree->lastnode = sgfStartVariant(node);
 }
 
 
@@ -266,12 +243,11 @@ sgftreeStartVariant(SGFTree *tree, SGFNode *node)
  * Start a new variant as first child. Returns a pointer to the new node.
  */
 
-SGFNode *
-sgftreeStartVariantFirst(SGFTree *tree, SGFNode *node)
+void
+sgftreeStartVariantFirst(SGFTree *tree)
 {
-  node = sgftreeNodeCheck(tree, node);
-  return sgfStartVariantFirst(node);
-
+  SGFNode *node = sgftreeNodeCheck(tree, node);
+  tree->lastnode = sgfStartVariantFirst(node);
 }
 
 

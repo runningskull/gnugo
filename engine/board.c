@@ -516,8 +516,8 @@ trymove(int pos, int color, const char *message, int str,
 		    message, location_to_string(str), count_variations,
 		    hashdata.hashval[0]);
     }
-    sgftreeAddPlayLast(sgf_dumptree, NULL, color, I(pos), J(pos));
-    sgftreeAddComment(sgf_dumptree, NULL, buf);
+    sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
+    sgftreeAddComment(sgf_dumptree, buf);
   }
   
   if (count_variations)
@@ -561,8 +561,8 @@ semeai_trymove(int pos, int color, const char *message, int str1, int str2,
     else
       gg_snprintf(buf, 100, 
 		  message, sbuf1, sbuf2, count_variations, value);
-    sgftreeAddPlayLast(sgf_dumptree, NULL, color, I(pos), J(pos));
-    sgftreeAddComment(sgf_dumptree, NULL, buf);
+    sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
+    sgftreeAddComment(sgf_dumptree, buf);
   }
   
   if (count_variations)
@@ -612,13 +612,13 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
      * captures. SGF FF[4] compliant browsers should have no problem
      * with this, though.
      */
-    sgftreeAddPlayLast(sgf_dumptree, NULL, color, -1, -1);
-    sgftreeAddComment(sgf_dumptree, NULL, "tenuki (ko threat)");
-    sgftreeAddPlayLast(sgf_dumptree, NULL, OTHER_COLOR(color), -1, -1);
-    sgftreeAddComment(sgf_dumptree, NULL, "tenuki (answers ko threat)");
+    sgftreeAddPlayLast(sgf_dumptree, color, -1, -1);
+    sgftreeAddComment(sgf_dumptree, "tenuki (ko threat)");
+    sgftreeAddPlayLast(sgf_dumptree, OTHER_COLOR(color), -1, -1);
+    sgftreeAddComment(sgf_dumptree, "tenuki (answers ko threat)");
 
-    sgftreeAddPlayLast(sgf_dumptree, NULL, color, I(pos), J(pos));
-    sgftreeAddComment(sgf_dumptree, NULL, buf);
+    sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
+    sgftreeAddComment(sgf_dumptree, buf);
   }
   
   if (count_variations)
@@ -755,7 +755,7 @@ popgo()
   if (sgf_dumptree) {
     char buf[100];
     gg_snprintf(buf, 100, "(next variation: %d)", count_variations);
-    sgftreeAddComment(sgf_dumptree, NULL, buf);
+    sgftreeAddComment(sgf_dumptree, buf);
     sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent;
     /* After tryko() we need to undo two pass nodes too. Since we have
      * no other way to identify ko moves, we skip all pass nodes.

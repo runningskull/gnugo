@@ -895,7 +895,7 @@ do_play_aftermath(int color, struct aftermath_data *a)
     }
     play_move(move, color_to_play);
     if (aftermath_sgftree)
-      sgftreeAddPlay(aftermath_sgftree, NULL, color_to_play, I(move), J(move));
+      sgftreeAddPlay(aftermath_sgftree, color_to_play, I(move), J(move));
     moves++;
     DEBUG(DEBUG_AFTERMATH, "%d %C move %1m (nodes %d, %d  total %d, %d)\n",
 	  movenum, color_to_play, move, get_owl_node_counter() - owl_nodes,

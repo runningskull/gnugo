@@ -594,7 +594,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     if (retval != 0) {
       if (sgf_dumptree)
 	/* FIXME: Better message. */
-	sgftreeAddComment(sgf_dumptree, NULL, "attack found");
+	sgftreeAddComment(sgf_dumptree, "attack found");
       return retval;
     }
   }
@@ -687,7 +687,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
       }
       if (sgf_dumptree)
 	/* FIXME: Better message. */
-	sgftreeAddComment(sgf_dumptree, NULL, "attack found");
+	sgftreeAddComment(sgf_dumptree, "attack found");
     }
 
     if (attack_point)

@@ -459,9 +459,9 @@ computer_move(Gameinfo *gameinfo, int *passes)
     *passes = 0;
 
   gnugo_play_move(i, j, gameinfo->to_move);
-  sgffile_debuginfo(curnode, move_val);
+  sgffile_add_debuginfo(curnode, move_val);
   curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
-  sgffile_output(sgftree.root);
+  sgffile_output(&sgftree);
 
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 }
@@ -490,9 +490,9 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
   TRACE("\nyour move: %m\n\n", i, j);
   init_sgf(gameinfo, sgftree.root);
   gnugo_play_move(i, j, gameinfo->to_move);
-  sgffile_debuginfo(curnode, 0);
+  sgffile_add_debuginfo(curnode, 0);
   curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
-  sgffile_output(sgftree.root);
+  sgffile_output(&sgftree);
 
   last_move_i = i;
   last_move_j = j;
@@ -522,9 +522,9 @@ do_pass(Gameinfo *gameinfo, int *passes, int force)
   (*passes)++;
   init_sgf(gameinfo, sgftree.root);
   gnugo_play_move(-1, -1, gameinfo->to_move);
-  sgffile_debuginfo(curnode, 0);
+  sgffile_add_debuginfo(curnode, 0);
   curnode = sgfAddPlay(curnode, gameinfo->to_move, -1, -1);
-  sgffile_output(sgftree.root);
+  sgffile_output(&sgftree);
 
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
   if (force) {
@@ -617,7 +617,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  sgftreeWriteResult(&sgftree,
 			     gameinfo->to_move == WHITE ? -1000.0 : 1000.0,
 			     1);
-         sgffile_output(sgftree.root);
+         sgffile_output(&sgftree);
 	case END:
 	case EXIT:
 	case QUIT:
@@ -872,8 +872,8 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  if (tmpstring) {
 	    /* discard newline */
 	    tmpstring[strlen(tmpstring)-1] = 0;
-           /* make sure we are saving proper handicap */
-           init_sgf(gameinfo, sgftree.root);
+	    /* make sure we are saving proper handicap */
+	    init_sgf(gameinfo, sgftree.root);
 	    writesgf(sgftree.root, tmpstring);
 	    printf("You may resume the game");
 	    printf(" with -l %s --mode ascii\n", tmpstring);
@@ -941,7 +941,7 @@ Type \"save <filename>\" to save,\n\
 	if (tmpstring) {
 	  /* discard newline */
 	  tmpstring[strlen(tmpstring)-1] = 0;
-          init_sgf(gameinfo,sgftree.root);
+          init_sgf(gameinfo, sgftree.root);
 	  writesgf(sgftree.root, tmpstring);
 	}
 	else
@@ -965,7 +965,7 @@ Type \"save <filename>\" to save,\n\
       }
     }
     sgftreeWriteResult(&sgftree, estimate_score(NULL, NULL), 1);
-    sgffile_output(sgftree.root);
+    sgffile_output(&sgftree);
     passes = 0;
     showdead = 0;
     /* Play a different game next time. */

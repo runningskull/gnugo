@@ -809,7 +809,7 @@ sgf_trace(const char *func, int str, int move, int result,
   if (message)
     sprintf(buf + strlen(buf), " (%s)", message);
   
-  sgftreeAddComment(sgf_dumptree, NULL, buf);
+  sgftreeAddComment(sgf_dumptree, buf);
 }
 
 /* Write two group reading (connection or semeai) trace data to an SGF
@@ -840,7 +840,7 @@ sgf_trace2(const char *func, int str1, int str2, int move, int result,
   if (message)
     sprintf(buf + strlen(buf), " (%s)", message);
   
-  sgftreeAddComment(sgf_dumptree, NULL, buf);
+  sgftreeAddComment(sgf_dumptree, buf);
 }
 
 /*

@@ -1705,7 +1705,7 @@ order_connection_moves(int *moves, int str1, int str2, int color_to_move,
 	      board_size - I(moves[i]), scores[i], &chars);
       pos += chars;
     }
-    sgftreeAddComment(sgf_dumptree, NULL, buf);
+    sgftreeAddComment(sgf_dumptree, buf);
   }
 }
 
@@ -2343,7 +2343,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	      board_size - I(moves[i]), distances[i], &chars);
       pos += chars;
     }
-    sgftreeAddComment(sgf_dumptree, NULL, buf);
+    sgftreeAddComment(sgf_dumptree, buf);
   }
 
 

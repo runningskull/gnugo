@@ -46,47 +46,52 @@
  */
 
 void
-sgffile_debuginfo(SGFNode *node, int value)
+sgffile_add_debuginfo(SGFNode *node, int value)
 {
   int m, n;
   char comment[24];
 
-  if (outfilename[0]) {
-    for (m = 0; m < board_size; ++m)
-      for (n = 0; n < board_size; ++n) {
-        if (BOARD(m, n) && (output_flags & OUTPUT_MARKDRAGONS))
-          switch (dragon[POS(m, n)].crude_status) {
-            case DEAD:
-             sgfLabel(node, "X", m, n);
-             break;
-           case CRITICAL:
-             sgfLabel(node, "!", m, n);
-             break;
-          }
-       if (potential_moves[m][n] > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
-         if (potential_moves[m][n] < 1.0)
-           sgfLabel(node, "<1", m, n);
-         else
-           sgfLabelInt(node, (int) potential_moves[m][n], m, n);
-       }
+  if (!outfilename[0])
+    return;
+  
+  for (m = 0; m < board_size; ++m)
+    for (n = 0; n < board_size; ++n) {
+      if (BOARD(m, n) && (output_flags & OUTPUT_MARKDRAGONS)) {
+	switch (dragon[POS(m, n)].crude_status) {
+	case DEAD:
+	  sgfLabel(node, "X", m, n);
+	  break;
+	case CRITICAL:
+	  sgfLabel(node, "!", m, n);
+	  break;
+	}
       }
-    if (value) {
-      sprintf(comment, "Value of move: %d", value);
-      sgfAddComment(node, comment);
+      
+      if (potential_moves[m][n] > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
+	if (potential_moves[m][n] < 1.0)
+	  sgfLabel(node, "<1", m, n);
+	else
+	  sgfLabelInt(node, (int) potential_moves[m][n], m, n);
+      }
     }
+  
+  if (value > 0 && (output_flags & OUTPUT_MOVEVALUES)) {
+    sprintf(comment, "Value of move: %d", value);
+    sgfAddComment(node, comment);
   }
 }
 
 
 /*
- * Write sgf tree to output file specified with -o option
+ * Write sgf tree to output file specified with -o option.
+ * This can safely be done multiple times.
  */
 
 void
-sgffile_output(SGFNode *root)
+sgffile_output(SGFTree *tree)
 {
   if (outfilename[0])
-    writesgf(root, outfilename);
+    writesgf(tree->root, outfilename);
 }
 
 
@@ -118,8 +123,7 @@ sgffile_begindump(SGFTree *tree)
     sgf_dumptree = tree;
   
   sgftree_clear(sgf_dumptree);
-  node = sgftreeCreateHeaderNode(sgf_dumptree, board_size, 0.0);
-  sgftreeSetLastNode(sgf_dumptree, node);
+  sgftreeCreateHeaderNode(sgf_dumptree, board_size, 0.0);
   sgffile_printboard(sgf_dumptree);
 }
 

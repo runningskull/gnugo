@@ -473,8 +473,8 @@ void prepare_pattern_profiling(void);
 void report_pattern_profiling(void);
 
 /* sgffile.c */
-void sgffile_debuginfo(SGFNode *node, int value);
-void sgffile_output(SGFNode *root);
+void sgffile_add_debuginfo(SGFNode *node, int value);
+void sgffile_output(SGFTree *tree);
 
 void sgffile_printboard(SGFTree *tree);
 void sgffile_recordboard(SGFNode *node);

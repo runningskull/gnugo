@@ -86,7 +86,7 @@ play_replay(Gameinfo *gameinfo, int color_to_replay)
    */
   while (node) {
     replay_node(node, color_to_replay);
-    sgffile_output(tree.root);
+    sgffile_output(&tree);
     node = node->child;
   }
 }
@@ -170,7 +170,7 @@ replay_node(SGFNode *node, int color_to_replay)
                  location_to_string(POS(i, j)),
                  gnugo_is_pass(i, j) ? 0 : potential_moves[i][j]);
     sgfAddComment(node, buf);
-    sgffile_debuginfo(node, 0);
+    sgffile_add_debuginfo(node, 0);
   }
 
   /* Finally, do play the move from the file. */

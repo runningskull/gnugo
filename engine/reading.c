@@ -2816,7 +2816,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
               moves.pos[k].name, moves[k].value, &chars);
       pos += chars;
     }
-    sgftreeAddComment(sgf_dumptree, NULL, buf);
+    sgftreeAddComment(sgf_dumptree, buf);
   }
 
   for (k = 0; MAX_READING_MOVES; k++) {
@@ -2828,8 +2828,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
     if (k > 3 + skipped && k > 12 - stackp + skipped) {
       if (sgf_dumptree) {
         if (trymove(moves[k].pos, next_color, namebuf, str, 0, 0)) {
-          sgftreeAddComment(sgf_dumptree, NULL, 
-			    "move trimmed to reduce variations");
+          sgftreeAddComment(sgf_dumptree, "move trimmed to reduce variations");
           popgo();
         }
       }
@@ -2850,7 +2849,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
         sprintf(buf, "tactical_pat komaster: %d %s  new_komaster: %d %s ko_move: %d", 
 		komaster, location_to_string(kom_pos), new_komaster, 
 		location_to_string(new_kom_pos), ko_move);
-        sgftreeAddComment(sgf_dumptree, NULL, buf);
+        sgftreeAddComment(sgf_dumptree, buf);
       }
       
       if (stackp > 100) {
@@ -5574,7 +5573,7 @@ order_moves(int str, struct reading_moves *moves, int color,
 	      board_size - I(moves->pos[i]), moves->score[i], &chars);
       pos += chars;
     }
-    sgftreeAddComment(sgf_dumptree, NULL, buf);
+    sgftreeAddComment(sgf_dumptree, buf);
   }
 }
 

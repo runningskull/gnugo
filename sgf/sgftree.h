@@ -134,29 +134,24 @@ typedef struct SGFTree_t {
 void sgftree_clear(SGFTree *tree);
 int  sgftree_readfile(SGFTree *tree, const char *infilename);
 
-SGFNode *sgftreeAddPlay(SGFTree *tree, SGFNode *node, int color,
-			int movex, int movey);
-SGFNode *sgftreeAddPlayLast(SGFTree *tree, SGFNode *node, int color,
-			    int movex, int movey);
-SGFNode *sgftreeAddStone(SGFTree *tree, SGFNode *node,
-			 int color, int movex, int movey);
-void     sgftreeWriteResult(SGFTree *tree, float score, int overwrite);
+void sgftreeAddPlay(SGFTree *tree, int color, int movex, int movey);
+void sgftreeAddPlayLast(SGFTree *tree, int color, int movex, int movey);
+void sgftreeAddStone(SGFTree *tree, int color, int movex, int movey);
+void sgftreeWriteResult(SGFTree *tree, float score, int overwrite);
 SGFNode *sgftreeNodeCheck(SGFTree *tree, SGFNode *node);
 	 
-SGFNode *sgftreeCircle  (SGFTree *tree, SGFNode *node, int i, int j);
-SGFNode *sgftreeSquare  (SGFTree *tree, SGFNode *node, int i, int j);
-SGFNode *sgftreeTriangle(SGFTree *tree, SGFNode *node, int i, int j);
-SGFNode *sgftreeMark    (SGFTree *tree, SGFNode *node, int i, int j);
-SGFNode *sgftreeAddComment(SGFTree *tree, SGFNode *node, const char *comment);
-SGFNode *sgftreeBoardText(SGFTree *tree, SGFNode *node, int i, int j,
-			  const char *text);
-SGFNode *sgftreeBoardChar(SGFTree *tree, SGFNode *node, int i, int j, char c);
-SGFNode *sgftreeBoardNumber(SGFTree *tree, SGFNode *node,
-			    int i, int j, int number);
-SGFNode *sgftreeStartVariant(SGFTree *tree, SGFNode *node);
-SGFNode *sgftreeStartVariantFirst(SGFTree *tree, SGFNode *node);
-SGFNode *sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi);
-void     sgftreeSetLastNode(SGFTree *tree, SGFNode *lastnode);
+void sgftreeCircle(SGFTree *tree, int i, int j);
+void sgftreeSquare(SGFTree *tree, int i, int j);
+void sgftreeTriangle(SGFTree *tree, int i, int j);
+void sgftreeMark(SGFTree *tree, int i, int j);
+void sgftreeAddComment(SGFTree *tree, const char *comment);
+void sgftreeBoardText(SGFTree *tree, int i, int j, const char *text);
+void sgftreeBoardChar(SGFTree *tree, int i, int j, char c);
+void sgftreeBoardNumber(SGFTree *tree, int i, int j, int number);
+void sgftreeStartVariant(SGFTree *tree);
+void sgftreeStartVariantFirst(SGFTree *tree);
+void sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi);
+void sgftreeSetLastNode(SGFTree *tree, SGFNode *lastnode);
 
 
 /* ---------------------------------------------------------------- */
