@@ -215,6 +215,10 @@ SOURCE=.\globals.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\handicap.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\hash.c
 
 !IF  "$(CFG)" == "engine - Win32 Release"

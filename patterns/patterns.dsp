@@ -134,6 +134,10 @@ SOURCE=.\fusekipat.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\handipat.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\helpers.c
 # End Source File
 # Begin Source File
@@ -582,6 +586,37 @@ InputPath=.\fuseki9.db
 
 "fuseki9.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -b -f fuseki9 -i ..\patterns\fuseki9.db -o fuseki9.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\handicap.db
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__HANDI="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\handicap.db
+
+"handipat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b handipat -i ..\patterns\handicap.db -o handipat.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__HANDI="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\handicap.db
+
+"handipat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b handipat -i ..\patterns\handicap.db -o handipat.c
 
 # End Custom Build
 
