@@ -115,6 +115,8 @@ enum {OPT_BOARDSIZE=127,
       OPT_NOFUSEKI,
       OPT_NOJOSEKIDB,
       OPT_LEVEL,
+      OPT_MIN_LEVEL,
+      OPT_MAX_LEVEL,
       OPT_LIMIT_SEARCH,
       OPT_SHOWTIME,
       OPT_SHOWSCORE,
@@ -214,6 +216,8 @@ static struct gg_option const long_options[] =
   {"owl-reading",    required_argument, 0, OPT_OWL_READING},
   {"owl-node-limit", required_argument, 0, OPT_OWL_NODE_LIMIT},
   {"level",          required_argument, 0, OPT_LEVEL},
+  {"min-level",      required_argument, 0, OPT_MIN_LEVEL},
+  {"max-level",      required_argument, 0, OPT_MAX_LEVEL},
   {"limit-search",   required_argument, 0, OPT_LIMIT_SEARCH},
   {"clock",          required_argument, 0, OPT_CLOCK_TIME},
   {"byo-time",       required_argument, 0, OPT_CLOCK_BYO_TIME},
@@ -316,7 +320,9 @@ main(int argc, char *argv[])
   komi = 0.0;
   
   level = DEFAULT_LEVEL;
-
+  min_level = 0;
+  max_level = 10;
+  
   mandated_depth               = -1;
   mandated_backfill_depth      = -1;
   mandated_backfill2_depth     = -1;
@@ -355,7 +361,6 @@ main(int argc, char *argv[])
 
   /* Default parameters for clock and auto level systems. */
   clock_init(3600, 0, 0);      /* One hour sudden death. */
-  clock_init_autolevel(2, 10); /* 2 < level < 10 */
 
   sgftree_clear(&sgftree);
   gameinfo_clear(&gameinfo, board_size, komi);
@@ -764,6 +769,14 @@ main(int argc, char *argv[])
 	
       case OPT_LEVEL:
 	level = atoi(gg_optarg);
+	break;
+
+      case OPT_MIN_LEVEL:
+	min_level = atoi(gg_optarg);
+	break;
+
+      case OPT_MAX_LEVEL:
+	max_level = atoi(gg_optarg);
 	break;
 
       case OPT_LIMIT_SEARCH:
@@ -1366,6 +1379,8 @@ Options that affect strength (higher = stronger, slower):\n\
    --owl-reading <depth>        owl reading depth (default %d)\n\
    --owl-node-limit <limit>     max nodes for owl reading (default %d)\n\
    --level <amount>             strength (default %d, up to 10 supported)\n\
+   --min-level <amount>         minimum level for adjustment schemes\n\
+   --max-level <amount>         maximum level for adjustment schemes\n\
    --autolevel                  adapt gnugo level during game to respect\n\
                                 the time specified by --clock <sec>.\n\
 "

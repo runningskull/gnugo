@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- TODO revised.
+- clock_init_autolevel() retired
+- new global variables min_level and max_level
+- new options --min-level and --max-level
+- time handling implemented in play_gtp.c
 - speedup: move some functionality of update_liberties() to do_remove_string()
 - bugfix in do_play_move()
 - doc: delete most lists of functions

@@ -900,8 +900,6 @@
 
  Status:    GTP version 2 standard command.
 
- FIXME: This command stores the time settings but no one ever takes notice.
-
 @end example
 
 
@@ -916,8 +914,6 @@
  Returns:   nothing
 
  Status:    GTP version 2 standard command.
-
- FIXME: This command does not take any action.
 
 @end example
 

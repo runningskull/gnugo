@@ -83,11 +83,9 @@ typedef struct {
 
   /* adapative system parameters */
   int    autolevel_on;
-  double min_level;
-  double level;
+  double level;  /* FIXME: Why is this a double and not an int? */
   double levels[CLOCK_MAX_MOVES];
   double expected[CLOCK_MAX_MOVES];
-  double max_level;
   double error; /* time/move estimation error */
 } gnugo_clock;
 
@@ -168,16 +166,6 @@ clock_enable(void)
 {
   gg_assert(clk.ready);
   clk.clock_on = 1;
-}
-
-/* 
- * set the autolevel parameters.
- */
-void 
-clock_init_autolevel(int min_level, int max_level)
-{
-  clk.min_level = min_level;  
-  clk.max_level = max_level;
 }
 
 /*
@@ -632,10 +620,10 @@ clock_adapt_level(int *p_level, int color)
     keep_ahead(color);
 
   /* Update the level. */
-  if (clk.level > clk.max_level)
-    clk.level = clk.max_level;
-  if (clk.level < clk.min_level)
-    clk.level = clk.min_level;
+  if (clk.level > (double) max_level)
+    clk.level = (double) max_level;
+  if (clk.level < (double) min_level)
+    clk.level = (double) min_level;
 
   clk.levels[clk.moveno + 1] = clk.level;
   *p_level = clk.level;

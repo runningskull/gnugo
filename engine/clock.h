@@ -64,7 +64,6 @@
 void clock_init(int time, int byo_time, int byo_stones);
 void clock_enable(void);
  
-void clock_init_autolevel(int min_level, int max_level);
 void clock_enable_autolevel(void);
 
 /* main access */

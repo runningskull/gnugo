@@ -818,6 +818,8 @@ extern int connection_node_limit;
 extern int breakin_depth;
 extern int breakin_node_limit;
 extern int level;               /* controls the strength of play */
+extern int min_level;           /* minimum level for adjustment schemes */
+extern int max_level;           /* minimum level for adjustment schemes */
 extern int semeai_variations;   /* max variations considered reading semeai */
 extern float best_move_values[10];
 extern int best_moves[10];
