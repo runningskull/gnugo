@@ -99,3 +99,15 @@ loadsgf games/nngs/gnugo-3.1.27-wingjk-200203101039.sgf 78
 25 gg_genmove white
 #? [C9]
 
+loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 26
+26 gg_genmove white
+#? [P3]
+
+loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 46
+27 gg_genmove white
+#? [H2]
+
+loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 126
+28 gg_genmove white
+#? [J18]
+
