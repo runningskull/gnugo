@@ -488,6 +488,19 @@ SOURCE=.\surround.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\unconditional.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\utils.c
 
 !IF  "$(CFG)" == "engine - Win32 Release"
