@@ -142,7 +142,7 @@ loadsgf golois/Jimmy990906-1.sgf
 
 loadsgf golois/Lanka991113-1.sgf
 34 reg_genmove black
-#? [N6]
+#? [N6]*
 
 loadsgf golois/MeilleurCoup0001.sgf
 35 reg_genmove black

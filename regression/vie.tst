@@ -31,7 +31,7 @@ loadsgf golois/DeuxYeuxIndigoIng98.sgf
 # GNU Go likes R7 but this leave W with Q8. R8 looks good. /db
 loadsgf golois/DeuxYeuxManyFacesIng98.sgf
 8 owl_defend R10
-#? [1 (R8|S9)]*
+#? [1 (R8|S9)]
 
 loadsgf golois/GoAheadMarseille97.sgf
 9 owl_defend O14

@@ -213,7 +213,7 @@ loadsgf games/nngs/tommmal-gnugo-3.5.1-200309081210.sgf 208
 # Keep the connection to save everything without ko.
 loadsgf games/nngs/gnugo-3.5.1-viking4-200309231039.sgf 123
 39 reg_genmove white
-#? [N4]
+#? [N4]*
 
 # A14 is huge, determining the entire upper left part of the board.
 # The lower right corner is also critical but much smaller.

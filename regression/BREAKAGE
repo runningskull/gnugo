@@ -1,3 +1,108 @@
+========================== 3.7.1-pre1  ==================================
+
+./regress.sh . reading.tst 
+201 unexpected FAIL: Correct '1 G17', got '0'
+./regress.sh . connection.tst 
+114 unexpected FAIL: Correct '1 B15', got '0'
+./regress.sh . blunder.tst 
+21 unexpected PASS!
+./regress.sh . strategy.tst 
+8 unexpected FAIL: Correct 'N2|N1', got 'F1'
+./regress.sh . arb.tst 
+210 unexpected PASS!
+./regress.sh . strategy2.tst 
+73 unexpected PASS!
+./regress.sh . trevor.tst 
+410 unexpected FAIL: Correct 'D5|E5', got 'C4'
+630 unexpected PASS!
+./regress.sh . nngs.tst 
+510 unexpected PASS!
+875 unexpected FAIL: Correct 'C5', got 'E7'
+./regress.sh . global.tst 
+34 unexpected FAIL: Correct 'N6', got 'F3'
+./regress.sh . vie.tst 
+8 unexpected PASS!
+./regress.sh . arend.tst 
+9 unexpected FAIL: Correct 'S17', got 'S2'
+./regress.sh . 13x13.tst 
+36 unexpected PASS!
+./regress.sh . semeai.tst 
+117 unexpected FAIL: Correct '3 3 E16', got '0 0 PASS'
+./regress.sh . strategy4.tst 
+182 unexpected FAIL: Correct 'E7|F8', got 'S11'
+188 unexpected PASS!
+206 unexpected FAIL: Correct 'L8', got 'K6'
+./regress.sh . owl1.tst 
+311 unexpected PASS!
+324 unexpected PASS!
+339 unexpected PASS!
+344 unexpected PASS!
+345 unexpected FAIL: Correct '1 N13', got '0'
+346 unexpected FAIL: Correct '1 N13', got '0'
+./regress.sh . nngs3.tst 
+230 unexpected PASS!
+250 unexpected FAIL: Correct 'G11', got 'G13'
+350 unexpected PASS!
+./regress.sh . nngs4.tst 
+230 unexpected PASS!
+650 unexpected FAIL: Correct 'Q2', got 'G12'
+./regress.sh . ninestones.tst 
+630 unexpected PASS!
+650 unexpected PASS!
+./regress.sh . gunnar.tst 
+39 unexpected FAIL: Correct 'N4', got 'N1'
+./regress.sh . kgs.tst 
+320 unexpected PASS!
+330 unexpected FAIL: Correct 'H1', got 'L2'
+340 unexpected FAIL: Correct 'L4', got 'L2'
+350 unexpected FAIL: Correct 'L7|K7', got 'L8'
+360 unexpected FAIL: Correct 'B18', got 'R7'
+370 unexpected FAIL: Correct 'G12', got 'H11'
+390 unexpected FAIL: Correct 'P8|P7', got 'P14'
+400 unexpected FAIL: Correct 'P8|P7|Q13', got 'N12'
+410 unexpected FAIL: Correct 'O8|O11|P11', got 'S12'
+420 unexpected FAIL: Correct '0', got '1 R16'
+450 unexpected FAIL: Correct 'L15', got 'L13'
+460 unexpected FAIL: Correct 'M19', got 'K2'
+470 unexpected FAIL: Correct 'G13', got 'F18'
+480 unexpected FAIL: Correct 'H9|G9|G8', got 'M10'
+490 unexpected FAIL: Correct 'H13', got 'F9'
+500 unexpected FAIL: Correct 'O15|P13', got 'N14'
+./regress.sh . olympiad2004.tst 
+1 unexpected FAIL: Correct '!Q12', got 'Q12'
+2 unexpected FAIL: Correct 'G14', got 'G12'
+3 unexpected FAIL: Correct '!Q10', got 'Q10'
+4 unexpected FAIL: Correct 'G10|G9|G8|G7|J7|J6|K7|H7', got 'N16'
+6 unexpected FAIL: Correct 'D11|H9|F10', got 'N18'
+7 unexpected FAIL: Correct 'D14|D11', got 'P18'
+9 unexpected FAIL: Correct 'B15', got 'E15'
+10 unexpected FAIL: Correct 'B15', got 'C14'
+11 unexpected FAIL: Correct 'S19|R19|O14|O13|S14', got 'T17'
+12 unexpected FAIL: Correct '!L9', got 'L9'
+13 unexpected FAIL: Correct 'A7', got 'O1'
+14 unexpected FAIL: Correct 'T14', got 'T4'
+15 unexpected FAIL: Correct 'G18', got 'J19'
+16 unexpected FAIL: Correct 'A7|A6|E4|A5', got 'C11'
+17 unexpected FAIL: Correct 'A7|A6|E4|A5', got 'PASS'
+101 unexpected FAIL: Correct 'E2', got 'E5'
+102 unexpected FAIL: Correct 'E2', got 'G4'
+103 unexpected FAIL: Correct 'C18', got 'C15'
+104 unexpected FAIL: Correct 'D14', got 'P16'
+105 unexpected FAIL: Correct 'O17|N17|T17', got 'F2'
+107 unexpected FAIL: Correct 'R6', got 'Q6'
+109 unexpected FAIL: Correct 'C10', got 'C2'
+112 unexpected FAIL: Correct 'T14', got 'T13'
+113 unexpected FAIL: Correct '!Q10', got 'Q10'
+114 unexpected FAIL: Correct 'M18', got 'K19'
+115 unexpected FAIL: Correct 'N19', got 'T18'
+116 unexpected FAIL: Correct 'H8', got 'M3'
+117 unexpected FAIL: Correct 'G10', got 'G9'
+118 unexpected FAIL: Correct 'T16|L17|M17|G5', got 'F11'
+120 unexpected FAIL: Correct 'M12', got 'N13'
+121 unexpected FAIL: Correct 'G5', got 'H6'
+122 unexpected FAIL: Correct 'C6', got 'E7'
+123 unexpected FAIL: Correct 'K3|L3|L1', got 'F6'
+
 ========================== 3.5.10 =====================================
 
 ./regress.sh . reading.tst 

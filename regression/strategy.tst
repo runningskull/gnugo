@@ -39,7 +39,7 @@ loadsgf games/incident104.sgf 215
 # tm - moved the test out to move 228; at 216, T17 is arguable bigger.
 loadsgf games/incident107.sgf 228
 8 reg_genmove black
-#? [N2|N1]
+#? [N2|N1]*
 
 # incident 109
 loadsgf games/incident108b.sgf 172

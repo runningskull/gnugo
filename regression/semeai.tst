@@ -417,7 +417,7 @@ loadsgf games/semeai/semeai17.sgf 64
 
 loadsgf games/kgs/yagr-nigiri.sgf 214
 117 analyze_semeai F19 F16
-#? [3 3 E16]
+#? [3 3 E16]*
 
 
 

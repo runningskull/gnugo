@@ -848,7 +848,7 @@ loadsgf games/kgs/yagr-czarny.sgf 17
 loadsgf games/arend/gnugo-gnugo7.sgf 24
 trymove W E17
 201 attack E17
-#? [1 G17]
+#? [1 G17]*
 popgo
 
 

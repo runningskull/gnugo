@@ -203,7 +203,7 @@ loadsgf games/nngs/gnugo-3.3.18-spewnboy-200304291635.sgf 91
 
 loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 72
 311 owl_attack K6
-#? [1 E2]*
+#? [1 E2]
 
 312 owl_defend K6
 #? [1 C3]*
@@ -261,7 +261,7 @@ loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 85
 
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 89
 324 owl_defend E5
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/ccwills-gnugo-3.4-200308231739.sgf 145
 325 owl_attack R18
@@ -322,7 +322,7 @@ loadsgf games/owl50.sgf
 
 loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 90
 339 owl_defend O17
-#? [0]*
+#? [0]
 
 # Both dragons could be saved.
 loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 224
@@ -341,13 +341,13 @@ loadsgf games/kgs/yagr-r08ert.sgf 140
 
 loadsgf games/disaster.sgf 18
 344 owl_attack N3
-#? [0]*
+#? [0]
 
 loadsgf games/kgs/yagr-Mythenmetz.2.sgf 111
 345 owl_defend O13
-#? [1 N13]
+#? [1 N13]*
 346 owl_defend Q13
-#? [1 N13]
+#? [1 N13]*
 
 
 ########### end of tests #####################

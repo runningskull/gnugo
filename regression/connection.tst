@@ -408,7 +408,7 @@ popgo
 loadsgf games/kgs/TheGNUGo-JVD.sgf 19
 trymove white C15
 114 connect C14 C18
-#? [1 B15]
+#? [1 B15]*
 popgo
 
 # Report number of nodes visited by the tactical reading

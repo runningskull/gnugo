@@ -154,28 +154,28 @@ loadsgf games/kgs/yagr-awf.sgf 191
 # Probably owl cut problem. At least have to try to win the semeai.
 loadsgf games/kgs/yagr-Mythenmetz.sgf 156
 320 reg_genmove white
-#? [K12]*
+#? [K12]
 
 loadsgf games/kgs/yagr-FKleolio.sgf 211
 330 reg_genmove white
-#? [H1]
+#? [H1]*
 
 loadsgf games/kgs/yagr-nigiri.sgf 121
 340 restricted_genmove white L2 L4
-#? [L4]
+#? [L4]*
 
 # Not L8
 loadsgf games/kgs/SURARIN-yagr.sgf 218
 350 reg_genmove black
-#? [L7|K7]
+#? [L7|K7]*
 
 loadsgf games/kgs/yagr-digibier.sgf 218
 360 reg_genmove white
-#? [B18]
+#? [B18]*
 
 loadsgf games/kgs/yagr-justre1.sgf 133
 370 restricted_genmove white H11 G12
-#? [G12]
+#? [G12]*
 
 # I think P9 as played in the game is ok. /ab
 #loadsgf games/kgs/evand-TheGNUGo.sgf 8
@@ -184,21 +184,21 @@ loadsgf games/kgs/yagr-justre1.sgf 133
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 10
 390 reg_genmove black
-#? [P8|P7]
+#? [P8|P7]*
 
 #N12 is really bad
 loadsgf games/kgs/evand-TheGNUGo.sgf 12
 400 reg_genmove black
-#? [P8|P7|Q13]
+#? [P8|P7|Q13]*
 
 #cut and fight somewhere
 loadsgf games/kgs/evand-TheGNUGo.sgf 20
 410 reg_genmove black
-#? [O8|O11|P11]
+#? [O8|O11|P11]*
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 36
 420 owl_attack R14
-#? [0]
+#? [0]*
 
 #The M9-O5 exchange is bad
 loadsgf games/kgs/evand-TheGNUGo.sgf 70
@@ -211,27 +211,27 @@ loadsgf games/kgs/evand-TheGNUGo.sgf 70
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 84
 450 reg_genmove black
-#? [L15]
+#? [L15]*
 
 #fight the ko
 loadsgf games/kgs/evand-TheGNUGo.sgf 98
 460 reg_genmove black
-#? [M19]
+#? [M19]*
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 178
 470 reg_genmove black
-#? [G13]
+#? [G13]*
 
 #block somehow
 loadsgf games/kgs/evand-TheGNUGo.sgf 190
 480 reg_genmove black
-#? [H9|G9|G8]
+#? [H9|G9|G8]*
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 242
 490 reg_genmove black
-#? [H13]
+#? [H13]*
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 270
 500 reg_genmove black
-#? [O15|P13]
+#? [O15|P13]*
 

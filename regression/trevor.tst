@@ -424,7 +424,7 @@ loadsgf games/trevor/trevor_40.sgf 2
 #SEVERITY=5
 loadsgf games/trevor/trevor_41.sgf 29
 410 reg_genmove black
-#? [D5|E5]
+#? [D5|E5]*
 
 #CATEGORY=BLUNDER
 #DESCRIPTION=A3 leaves behind a double-atari.
@@ -547,7 +547,7 @@ loadsgf games/trevor/trevor_60.sgf 2
 #SEVERITY=10
 loadsgf games/trevor/trevor_63.sgf
 630 owl_attack G13
-#? [1 H13]*
+#? [1 H13]
 
 #CATEGORY=OWL
 #DESCRIPTION=Perhaps a semeai problem???

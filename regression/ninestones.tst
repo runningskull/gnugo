@@ -206,7 +206,7 @@ loadsgf games/ninestones/ninestones1.sgf 76
 
 loadsgf games/ninestones/ninestones1.sgf 90
 630 reg_genmove black
-#? [F5|H7]*
+#? [F5|H7]
 
 # J2 is better than H2
 loadsgf games/splee.sgf 62
@@ -215,7 +215,7 @@ loadsgf games/splee.sgf 62
 
 loadsgf games/ninestones/emanuel-1.sgf 182
 650 reg_genmove black
-#? [Q5]*
+#? [Q5]
 
 loadsgf games/ninestones/emanuel-1.sgf 200
 660 reg_genmove black

@@ -126,7 +126,7 @@ loadsgf games/strategy19.sgf 94
 # Note: E7 doesn't work because of B:D9.
 loadsgf games/semeai2.sgf 116
 73 reg_genmove white
-#? [F7|R17|P15]*
+#? [F7|R17|P15]
 
 # I have added R17, as it seems to kill the huge black dragon --arend
 # added P15, because it also seems likely to kill the dragon,
