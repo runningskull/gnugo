@@ -52,10 +52,10 @@ loadsgf games/owl38.sgf
 
 loadsgf games/owl39.sgf 1
 273 owl_attack E7
-#? [0]
+#? [1 G4]*
 
-274 owl_threaten_attack E7
-#? [1 (G7 G4|G4 G7)]*
+274 owl_defend E7
+#? [1 G4|G7|B6]*
 
 loadsgf games/owl39.sgf
 275 owl_attack E7
@@ -66,7 +66,7 @@ loadsgf games/owl39.sgf
 
 loadsgf games/owl39a.sgf 1
 277 owl_defend F7
-#? [1 E7|G4|G7]*
+#? [1 G4]*
 
 loadsgf games/owl39a.sgf
 278 owl_defend F7
