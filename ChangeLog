@@ -2,6 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new eye pattern
+- bugfix in fuseki.c
+- cleanup and further 1D conversion in optics.c
+- sgf_decideeye doesn't require owl computation
+- 1D revisions in worm.c
+- is_worm_origin(), propagate_worms(), does_attack(), and does_defend()
+  converted to 1D 
+- NNGS customization removed from ascii interface
 - gtp_worm_stones can be run with stackp>0 and can take a color argument
 - mkpat can take -i and -o options
 

@@ -124,6 +124,7 @@ extern Hash_data    hashdata;
 #define does_capture_something2(m, n, color) \
         does_capture_something(POS(m, n), color)
 #define add_stone2(m, n, color) add_stone(POS(m, n), color)
+#define is_worm_origin2(wi, wj, i, j) is_worm_origin(POS(wi, wj), POS(i, j))
 
 /* board utility functions */
 
@@ -276,7 +277,8 @@ void join_dragons(int ai, int aj, int bi, int bj);
 int dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
 		  int escape_value[MAX_BOARD][MAX_BOARD]);
 int lively_dragon_exists(int color);
-void propagate_worm(int wormi, int wormj);
+int is_worm_origin(int w, int pos);
+void propagate_worm(int pos);
 void transform(int i, int j, int *ti, int *tj, int trans);
 void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 void find_cuts(void);
@@ -394,8 +396,8 @@ void owl_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 
 void change_attack(int str, int tpos, int acode);
 void change_defense(int str, int tpos, int dcode);
-int does_attack(int, int, int, int);
-int does_defend(int, int, int, int);
+int does_attack(int move, int str);
+int does_defend(int move, int str);
 int double_atari(int m, int n, int color);
 int play_attack_defend_n(int color, int do_attack, int num_moves, ...);
 int play_attack_defend2_n(int color, int do_attack, int num_moves, ...);

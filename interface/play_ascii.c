@@ -61,7 +61,6 @@ static int last_move_j;      /* -""-                          */
 static int current_score_estimate = NO_SCORE;
 
 static void endgame(Gameinfo *gameinfo);
-static void nngs_endgame(Gameinfo *gameinfo);
 static void showcapture(Position *pos, char *line);
 static void showdefense(Position *pos, char *line);
 static void ascii_goto(Gameinfo *gameinfo, char *line);
@@ -348,7 +347,7 @@ enum commands {INVALID=-1, END, EXIT, QUIT, RESIGN,
                CMD_CAPTURE,CMD_DEFEND,
                CMD_HELPDEBUG,CMD_SHOWAREA,CMD_SHOWMOYO,CMD_SHOWTERRI,
                CMD_GOTO,CMD_SAVE,CMD_LOAD, CMD_SHOWDRAGONS,CMD_LISTDRAGONS,
-	       NNGS, SETHURRY, SETLEVEL, NEW, COUNT
+	       SETHURRY, SETLEVEL, NEW, COUNT
 };
 
 
@@ -399,7 +398,6 @@ get_command(char *command)
   if (!strncmp(command, "hurry", 5)) return SETHURRY;
   if (!strncmp(command, "level", 5)) return SETLEVEL;
   if (!strncmp(command, "pass", 4)) return PASS;
-  if (!strncmp(command, "nngs", 4)) return NNGS;
   if (!strncmp(command, "save", 3)) return CMD_SAVE;
   if (!strncmp(command, "load", 3)) return CMD_LOAD;
   if (!strncmp(command, "end", 3)) return END;
@@ -568,11 +566,10 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
   char *line_ptr = line;
   char *command;
   char *tmpstring;
-  int nngs = 0; /* NNGS style customization */
   int state = 1;
   
 #ifdef HAVE_SETLINEBUF
-  setlinebuf(stdout); /* Need at least line buffer NNGS and gnugo-gnugo */
+  setlinebuf(stdout); /* Need at least line buffer gnugo-gnugo */
 #else
   setbuf(stdout, NULL); /* else set it to completely UNBUFFERED */
 #endif
@@ -957,14 +954,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  examine_position(gameinfo->to_move, EXAMINE_DRAGONS);
 	  show_dragons();
 	  break;
-	case NNGS:
-	  /* Setting the nngs flag will customize the ascii interface
-	   * for use by the NNGS connecting program. This mode of
-	   * operation is unlikely to be useful for other purposes.
-	   */
-	  nngs = 1;
-	  break;
-	  /* These commands are only valid at the end of the game */
 	case COUNT:
 	case NEW:
 	case INVALID:
@@ -1013,10 +1002,7 @@ Type \"save <filename>\" to save,\n\
 	break;
 	
       case COUNT:
-	if (nngs)
-	  nngs_endgame(gameinfo);
-	else
-	  endgame(gameinfo);
+	endgame(gameinfo);
 	break;
 
       case QUIT:
@@ -1111,76 +1097,6 @@ to toggle its state or \"done\".\n");
     }
   }
   gnugo_who_wins(&gameinfo->position, gameinfo->computer_player, stdout);
-}
-
-
-/*
- * nngs_endgame() records the strings the opponent says are dead and
- * compares this to our own opinion.
- */
-
-static void
-nngs_endgame(Gameinfo *gameinfo)
-{
-  char line[12];
-  int i, j;
-  int worm_status[MAX_BOARD][MAX_BOARD];
-  int m, n;
-  static const char *snames[] = 
-    {"dead", "alive", "critical", "unknown"};
-  
-  for (m = 0; m < gameinfo->position.boardsize; m++)
-    for (n = 0; n < gameinfo->position.boardsize; n++)
-      worm_status[m][n] = ALIVE;
-  
-  while (1) {
-    printf("Bring out your dead!\n");
-
-    if (!fgets(line, 12, stdin))
-      return; /* EOF or some error */
-    
-    for (i = 0; i < 12; i++)
-      line[i] = (isupper ((int) line[i]) ? tolower ((int) line[i]) : line[i]);
-
-    if (!strncmp(line, "done", 4))
-      break;
-    else if (!strncmp(line, "quit", 4))
-      return;
-    else if (!strncmp(line, "pass", 4))  /* ignore */
-      continue;
-    else if (!strncmp(line, "undo", 4)) {
-      for (m = 0; m < gameinfo->position.boardsize; m++)
-	for (n = 0; n < gameinfo->position.boardsize; n++)
-	  worm_status[m][n] = ALIVE;
-    }
-    else {
-      if (!ascii2pos(&gameinfo->position, line, &i, &j)
-	  || gameinfo->position.board[i][j] == EMPTY)
-	printf("\ninvalid!\n");
-      else {
-	for (m = 0; m < gameinfo->position.boardsize; m++)
-	  for (n = 0; n < gameinfo->position.boardsize; n++)
-	    if (is_same_worm(m, n, i, j))
-	      worm_status[m][n] = DEAD;
-      }
-    }
-  }
-
-  for (m = 0; m < gameinfo->position.boardsize; m++)
-    for (n = 0; n < gameinfo->position.boardsize; n++)
-      if (is_worm_origin(m, n, m, n)
-	  && gameinfo->position.board[m][n] != EMPTY) {
-	if (worm_status[m][n] != dragon_status(m, n)) {
-	  char buf[120];
-	  sprintf(buf,
-		  "Disagreement over %c%d: GNU Go says %s, opponent says %s.\n",
- 		  'A'+n+(n>=8), gameinfo->position.boardsize-m,
-		  snames[dragon_status(m, n)],
-		  snames[worm_status[m][n]]);
-	  mprintf(buf);
-	  sgfAddComment(curnode, buf);
-	}
-      }
 }
 
 

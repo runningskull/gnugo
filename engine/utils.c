@@ -90,7 +90,7 @@ change_defense(int str, int tpos, int dcode)
   }
   worm[origin].defend_code = dcode;
   worm[origin].defense_point = tpos;
-  propagate_worm(I(origin), J(origin));
+  propagate_worm(origin);
 
   if (tpos != 0)
     add_defense_move(I(tpos), J(tpos), I(origin), J(origin));
@@ -124,7 +124,7 @@ change_attack(int str, int tpos, int acode)
 
   worm[origin].attack_code  = acode;
   worm[origin].attack_point = tpos;
-  propagate_worm(I(origin), J(origin));
+  propagate_worm(origin);
 
   if (tpos != 0)
     add_attack_move(I(tpos), J(tpos), I(origin), J(origin));
@@ -174,9 +174,9 @@ cut_possible(int i, int j, int color)
  */
 
 int
-does_attack(int ti, int tj, int ai, int aj)
+does_attack(int move, int str)
 {
-  int color = BOARD(ai, aj);
+  int color = board[str];
   int other = OTHER_COLOR(color);
   int result = 0;
   int acode = 0;
@@ -184,25 +184,24 @@ does_attack(int ti, int tj, int ai, int aj)
   int spos = NO_MOVE;
   
   if (stackp == 0) {
-    if (worm[POS(ai, aj)].attack_code != 0 
-	&& worm[POS(ai, aj)].defend_code == 0)
+    if (worm[str].attack_code != 0 
+	&& worm[str].defend_code == 0)
       return 0;
-    spos = worm[POS(ai, aj)].defense_point;
+    spos = worm[str].defense_point;
   }
   else {
-    attack_and_defend(POS(ai, aj), &acode, NULL, &dcode, &spos);
+    attack_and_defend(str, &acode, NULL, &dcode, &spos);
     if (acode != 0 && dcode == 0)
       return 0;
   }
   
-  if (trymove2(ti, tj, other, "does_attack-A", ai, aj,
-	      EMPTY, -1, -1)) {
-    if (!BOARD(ai, aj) || !find_defense(POS(ai, aj), NULL)) {
+  if (trymove(move, other, "does_attack-A", str, EMPTY, NO_MOVE)) {
+    if (!board[str] || !find_defense(str, NULL)) {
       result = WIN;
       increase_depth_values();
-      if (spos != NO_MOVE && trymove(spos, color, "does_attack-B", POS(ai, aj),
+      if (spos != NO_MOVE && trymove(spos, color, "does_attack-B", str,
 				     EMPTY, NO_MOVE)) {
-	if (BOARD(ai, aj) && !attack(POS(ai, aj), NULL))
+	if (board[str] && !attack(str, NULL))
 	  result = 0;
 	popgo();
       }
@@ -222,31 +221,30 @@ does_attack(int ti, int tj, int ai, int aj)
  */
 
 int
-does_defend(int ti, int tj, int ai, int aj)
+does_defend(int move, int str)
 {
-  int color = BOARD(ai, aj);
+  int color = board[str];
   int other = OTHER_COLOR(color);
   int result = 0;
   int spos = NO_MOVE;
 
   if (stackp == 0) {
-    if (worm[POS(ai, aj)].attack_code == 0)
+    if (worm[str].attack_code == 0)
       return 0;
     else
-      spos = worm[POS(ai, aj)].attack_point;
+      spos = worm[str].attack_point;
   }
-  else if (!attack(POS(ai, aj), &spos))
+  else if (!attack(str, &spos))
     return 0;
 
   gg_assert(spos != NO_MOVE);
   
-  if (trymove2(ti, tj, color, "does_defend-A", ai, aj,
-	      EMPTY, -1, -1)) {
-    if (!attack(POS(ai, aj), NULL)) {
+  if (trymove(move, color, "does_defend-A", str, EMPTY, NO_MOVE)) {
+    if (!attack(str, NULL)) {
       result = 1;
       increase_depth_values();
-      if (trymove(spos, other, "does_defend-B", POS(ai, aj), EMPTY, NO_MOVE)) {
-	if (!BOARD(ai, aj) || !find_defense(POS(ai, aj), NULL))
+      if (trymove(spos, other, "does_defend-B", str, EMPTY, NO_MOVE)) {
+	if (!board[str] || !find_defense(str, NULL))
 	  result = 0;
 	popgo();
       }
@@ -1131,7 +1129,7 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
 	int pos = POS(m, n);
-	if (board[pos] != color || !is_worm_origin(m, n, m, n))
+	if (board[pos] != color || !is_worm_origin(pos, pos))
 	  continue;
 	
 	/* Try to capture the worm at (m, n). */
@@ -1181,7 +1179,7 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       int pos = POS(m, n);
-      if (board[pos] != color || !is_worm_origin(m, n, m, n))
+      if (board[pos] != color || !is_worm_origin(pos, pos))
 	continue;
       
       /* Play as many liberties as we can. */
@@ -1265,7 +1263,7 @@ unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
       int pos = POS(m, n);
       if (board[pos] == color) {
 	unconditional_territory[m][n] = 1;
-	if (is_worm_origin(m, n, m, n)) {
+	if (is_worm_origin(pos, pos)) {
 	  liberties = findlib(pos, MAXLIBS, libs);
 	  for (k = 0; k < liberties; k++)
 	    unconditional_territory[I(libs[k])][J(libs[k])] = 2;

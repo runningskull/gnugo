@@ -112,7 +112,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 
 	if (worm[POS(x, y)].attack_code == WIN
 	  && (pattern->movei == -1
-	      || !does_defend(stari, starj, x, y)))
+	      || !does_defend(POS(stari, starj), POS(x, y))))
 	  return; /* Match failed */
       }
     }

@@ -594,7 +594,7 @@ make_dragons(int color, int stop_before_owl)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (is_worm_origin(m, n, m, n)
+      if (is_worm_origin(POS(m, n), POS(m, n))
 	  && worm[POS(m, n)].attack_code != 0
 	  && worm[POS(m, n)].defend_code != 0
 	  && !worm[POS(m, n)].inessential) {
@@ -612,7 +612,7 @@ make_dragons(int color, int stop_before_owl)
 
 	if (!essential) {
 	  worm[POS(m, n)].inessential = 1;
-	  propagate_worm(m, n);
+	  propagate_worm(POS(m, n));
 	}
       }
   

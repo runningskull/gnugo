@@ -357,7 +357,7 @@ decideeye(int m, int n, const char *sgf_output)
   reset_engine();
   verbose = 0;
   debug &= ~(DEBUG_EYES | DEBUG_LIFE);
-  examine_position(BLACK, EXAMINE_DRAGONS);
+  examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
   debug = save_debug;
   

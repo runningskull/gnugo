@@ -2180,10 +2180,8 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   int bj = J(dragonb);
   int safety1 = DRAGON2(ai, aj).safety;
   int safety2 = DRAGON2(bi, bj).safety;
-  int true_genus1 = 2 * DRAGON2(ai, aj).genus
-    + DRAGON2(ai, aj).heyes;
-  int true_genus2 = 2 * DRAGON2(bi, bj).genus
-    + DRAGON2(bi, bj).heyes;
+  int true_genus1 = 2 * DRAGON2(ai, aj).genus + DRAGON2(ai, aj).heyes;
+  int true_genus2 = 2 * DRAGON2(bi, bj).genus + DRAGON2(bi, bj).heyes;
   float impact;
 
   /* If the connected dragon gets sufficient eyespace to live on its

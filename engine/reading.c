@@ -843,7 +843,7 @@ atari_atari(int color, int *move, int save_verbose)
 	int ti, tj;
 	for (ti = 0; ti < board_size; ti++)
 	  for (tj = 0; tj < board_size; tj++)
-	    if (is_worm_origin(ti, tj, m, n))
+	    if (is_worm_origin2(ti, tj, m, n))
 	      aa_status[POS(ti, tj)] = INSUBSTANTIAL;
       }
 
@@ -852,7 +852,7 @@ atari_atari(int color, int *move, int save_verbose)
     gprintf("aa_status: (ALIVE worms not listed)\n");
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (BOARD(m, n) == other && is_worm_origin(m, n, m, n)) {
+	if (BOARD(m, n) == other && is_worm_origin2(m, n, m, n)) {
 	  const char *status = "UNKNOWN (shouldn't happen)";
 	  if (aa_status[POS(m, n)] == DEAD)
 	    status = "DEAD";
@@ -1204,7 +1204,7 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
 	int ui, uj;
 	for (ui = 0; ui < board_size; ui++)
 	  for (uj = 0; uj < board_size; uj++)
-	    if (is_worm_origin(ui, uj, m, n))
+	    if (is_worm_origin2(ui, uj, m, n))
 	      aa_status[POS(ui, uj)] = INSUBSTANTIAL;
       }
 
@@ -1213,7 +1213,7 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
     gprintf("aa_status: (ALIVE worms not listed)\n");
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (BOARD(m, n) == color && is_worm_origin(m, n, m, n)) {
+	if (BOARD(m, n) == color && is_worm_origin2(m, n, m, n)) {
 	  const char *status = "UNKNOWN (shouldn't happen)";
 	  if (aa_status[POS(m, n)] == DEAD)
 	    status = "DEAD";
@@ -1333,7 +1333,7 @@ atari_atari_try_combination(int color, int apos, int bpos)
 	int ti, tj;
 	for (ti = 0; ti < board_size; ti++)
 	  for (tj = 0; tj < board_size; tj++)
-	    if (is_worm_origin(ti, tj, m, n))
+	    if (is_worm_origin2(ti, tj, m, n))
 	      aa_status[POS(ti, tj)] = INSUBSTANTIAL;
       }
 

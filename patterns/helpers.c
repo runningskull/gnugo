@@ -292,8 +292,9 @@ indirect_helper (ARGS)
   UNUSED(pattern);
   UNUSED(color);
 
-  if ((worm[POS(bi, bj)].attack_point == POS(ti, tj))
-      && (worm[POS(bi, bj)].defend_code == 0) && (does_defend(ai, aj, bi, bj)))
+  if (worm[POS(bi, bj)].attack_point == POS(ti, tj)
+      && worm[POS(bi, bj)].defend_code == 0
+      && does_defend(POS(ai, aj), POS(bi, bj)))
     change_attack(POS(bi, bj), 0, 0);
 
   return 0;
@@ -381,7 +382,7 @@ cutstone2_helper (ARGS)
 	|| safe_move2(ti, tj, BOARD(ai, aj)) != 0) {
       popgo();
       worm[worm[POS(ai, aj)].origin].cutstone2++;
-      propagate_worm(I(worm[POS(ai, aj)].origin), J(worm[POS(ai, aj)].origin));
+      propagate_worm(worm[POS(ai, aj)].origin);
       return 0;
     }
     popgo();
@@ -472,7 +473,7 @@ threaten_to_capture_helper(int ti, int tj, int ai, int aj)
   adj = chainlinks2(POS(ai, aj), adjs, 1);
   for (k = 0; k < adj; k++)
     if (worm[adjs[k]].defend_code != 0
-	&& !does_defend(ti, tj, I(adjs[k]), J(adjs[k])))
+	&& !does_defend(POS(ti, tj), adjs[k]))
       return;
     
   add_followup_value(POS(ti, tj), 2 * worm[POS(ai, aj)].effective_size);
@@ -499,7 +500,7 @@ defend_against_atari_helper(int ti, int tj, int ai, int aj)
   adj = chainlinks2(POS(ai, aj), adjs, 1);
   for (k = 0; k < adj; k++)
     if (worm[adjs[k]].defend_code != 0
-	&& !does_defend(ti, tj, I(adjs[k]), J(adjs[k])))
+	&& !does_defend(POS(ti, tj), adjs[k]))
       return;
 
   /* No value if opponent has no safe atari. */

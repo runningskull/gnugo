@@ -29,22 +29,15 @@
 #include "liberty.h"
 #include "eyes.h"
 
+
 /* This macro is not fully generalized. It works because it is used only where
  * c, d match the first vital attack/defend point of the the half eye or none
  * at all.
  */
-#if 0
-#define hadj(heye, a, b, c, d)     ((heye[a][b].type==HALF_EYE) \
-				    && (((heye[a][b].ai[0]==c) \
-					 && (heye[a][b].aj[0]==d)) \
-					|| ((heye[a][b].di[0]==c) \
-					    && (heye[a][b].dj[0]==d))))
-#else
 #define hadj(heye, apos, bpos) \
-     (   (heye[apos].type==HALF_EYE) \
-      && (   (heye[apos].attack_point[0]==bpos) \
-          || ((heye[apos].defense_point[0]==bpos))))
-#endif
+     (heye[apos].type == HALF_EYE \
+      && (heye[apos].attack_point[0] == (bpos) \
+          || (heye[apos].defense_point[0] == (bpos))))
 
 /*
  * Two eye points are defined to be adjacent if they are either
@@ -52,33 +45,23 @@
  * other one is the point making it a real eye.
  */
 
-#if 0
-#define adjacent(heye, a, b, c, d) (((a==c) && ((b==d+1)||(b==d-1))) \
-				    || ((b==d) && ((a==c+1)||(a==c-1))) \
-				    || hadj(heye, a, b, c, d) \
-				    || hadj(heye, c, d, a, b))
-#else
-#define adjacent(heye, apos, bpos) ( ((apos)==(bpos)-1) \
-				     || ((apos)==(bpos)+1) \
-				     || ((apos)==(bpos)-NS) \
-				     || ((apos)==(bpos)+NS) \
- 				     || hadj(heye, apos, bpos) \
-				     || hadj(heye, bpos, apos))
-#endif
+#define adjacent(heye, apos, bpos) (   (apos) == SOUTH(bpos) \
+				    || (apos) == WEST(bpos) \
+				    || (apos) == NORTH(bpos) \
+				    || (apos) == EAST(bpos) \
+ 				    || hadj(heye, apos, bpos) \
+				    || hadj(heye, bpos, apos))
 
 #define MAXEYE 20
 
 static void
 compute_primary_domains(int color, int domain[BOARDMAX],
-			int lively[MAX_BOARD][MAX_BOARD], 
-			int false_margins[MAX_BOARD][MAX_BOARD],
+			int lively[BOARDMAX],
+			int false_margins[BOARDMAX],
 			int first_time);
 static void count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD]);
 static int is_lively(int owl_call, int i, int j);
-static int has_inf(int color, int pos, int domain[BOARDMAX],
-		   int lively[MAX_BOARD][MAX_BOARD]);
-static int false_margin(int i, int j, int color,
-			int lively[MAX_BOARD][MAX_BOARD]);
+static int false_margin(int pos, int color, int lively[BOARDMAX]);
 
 static int recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 			 int *max, int *min, 
@@ -91,8 +74,7 @@ static int linear_eye_space(int i, int j, int *attacki, int *attackj,
 static void first_map(int q, int map[MAXEYE]);
 static int next_map(int *q, int map[MAXEYE], int esize);
 static void print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
-		      struct half_eye_data heye[BOARDMAX],
-		      int i, int j);
+		      struct half_eye_data heye[BOARDMAX], int i, int j);
 static int 
 evaluate_diagonal_intersection(int m, int n, int color,
 			       int *attacki, int *attackj,
@@ -142,8 +124,10 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 	     int owl_call)
 {
   int i, j;
-  int lively[MAX_BOARD][MAX_BOARD];
-  int false_margins[MAX_BOARD][MAX_BOARD];
+  int k;
+  int pos;
+  int lively[BOARDMAX];
+  int false_margins[BOARDMAX];
   
   memset(black_domain, 0, sizeof(black_domain));
   memset(white_domain, 0, sizeof(white_domain));
@@ -154,7 +138,7 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
     for (j = 0; j < board_size; j++) {
       clear_eye(&(b_eye[i][j]));
       clear_eye(&(w_eye[i][j]));
-      lively[i][j] = is_lively(owl_call, i, j);
+      lively[POS(i, j)] = is_lively(owl_call, i, j);
     }
 
   /* Compute the domains of influence of each color. */
@@ -167,85 +151,57 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == EMPTY || !lively[i][j]) {
-	if ((black_domain[POS(i, j)] == 0) && (white_domain[POS(i, j)] == 0)) {
+      pos = POS(i, j);
+      if (board[pos] == EMPTY || !lively[pos]) {
+	if (black_domain[pos] == 0 && white_domain[pos] == 0) {
 	  w_eye[i][j].color = GRAY;
 	  b_eye[i][j].color = GRAY;
 	}
-	else if ((black_domain[POS(i, j)] == 1)
-		 && (white_domain[POS(i, j)] == 0)) {
+	else if (black_domain[pos] == 1 && white_domain[pos] == 0) {
 	  b_eye[i][j].color = BLACK_BORDER;
-	  b_eye[i][j].origin = NO_MOVE;
-	  if ((   i > 0
-		  && white_domain[POS(i-1, j)]
-		  && !black_domain[POS(i-1, j)])
-	      || (i < board_size-1
-		  && white_domain[POS(i+1, j)]
-		  && !black_domain[POS(i+1, j)])
-	      || (j > 0
-		  && white_domain[POS(i, j-1)]
-		  && !black_domain[POS(i, j-1)])
-	      || (j < board_size-1
-		  && white_domain[POS(i, j+1)]
-		  && !black_domain[POS(i, j+1)]))
-	    b_eye[i][j].marginal = 1;
-	  else 
-	    b_eye[i][j].marginal = 0;
+	  for (k = 0; k < 4; k++) {
+	    int apos = pos + delta[k];
+	    if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
+	      b_eye[i][j].marginal = 1;
+	      break;
+	    }
+	  }
 	}
-	else if ((black_domain[POS(i, j)] == 0)
-		 && (white_domain[POS(i, j)]==1)) {
+	else if (black_domain[pos] == 0 && white_domain[pos] == 1) {
 	  w_eye[i][j].color = WHITE_BORDER;
-	  w_eye[i][j].origin = NO_MOVE;
-	  if ((   i > 0
-		  && black_domain[POS(i-1, j)]
-		  && !white_domain[POS(i-1, j)])
-	      || (i < board_size-1
-		  && black_domain[POS(i+1, j)]
-		  && !white_domain[POS(i+1, j)])
-	      || (j > 0
-		  && black_domain[POS(i, j-1)]
-		  && !white_domain[POS(i, j-1)])
-	      || (j < board_size-1
-		  && black_domain[POS(i, j+1)]
-		  && !white_domain[POS(i, j+1)]))
-	    w_eye[i][j].marginal = 1;
-	  else
-	    w_eye[i][j].marginal = 0;
+	  for (k = 0; k < 4; k++) {
+	    int apos = pos + delta[k];
+	    if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
+	      w_eye[i][j].marginal = 1;
+	      break;
+	    }
+	  }
 	}
-	else if (black_domain[POS(i, j)] == 1 
-		 && white_domain[POS(i, j)] == 1) {
-	  if ((i > 0 && black_domain[POS(i-1, j)]
-	       && !white_domain[POS(i-1, j)]) 
-	      || (i < board_size-1 && black_domain[POS(i+1, j)]
-		  && !white_domain[POS(i+1, j)])
-	      || (j > 0 && black_domain[POS(i, j-1)]
-		  && !white_domain[POS(i, j-1)])
-	      || (j < board_size-1 && black_domain[POS(i, j+1)]
-		  && !white_domain[POS(i, j+1)]))
-	    {
+	else if (black_domain[pos] == 1 && white_domain[pos] == 1) {
+	  for (k = 0; k < 4; k++) {
+	    int apos = pos + delta[k];
+	    if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
 	      b_eye[i][j].marginal = 1;
 	      b_eye[i][j].color = BLACK_BORDER;
+	      break;
 	    }
-	  else
+	  }
+	  if (k == 4)
 	    b_eye[i][j].color = GRAY;
-
-	  if ((i > 0 && white_domain[POS(i-1, j)]
-	       && !black_domain[POS(i-1, j)])
-	      || (i < board_size-1 && white_domain[POS(i+1, j)]
-		  && !black_domain[POS(i+1, j)])
-	      || (j > 0 && white_domain[POS(i, j-1)]
-		  && !black_domain[POS(i, j-1)])
-	      || (j < board_size-1 && white_domain[POS(i, j+1)]
-		  && !black_domain[POS(i, j+1)]))
-	    {
+	  
+	  for (k = 0; k < 4; k++) {
+	    int apos = pos + delta[k];
+	    if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
 	      w_eye[i][j].marginal = 1;
 	      w_eye[i][j].color = WHITE_BORDER;
+	      break;
 	    }
-	  else
+	  }
+	  if (k == 4)
 	    w_eye[i][j].color = GRAY;
 	}
-      }      
-    }      
+      }
+    }
 
   /* 
    * If called from make_dragons, search connection database for cutting
@@ -259,7 +215,7 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
  /* The eye spaces are all found. Now we need to find the origins. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (b_eye[i][j].origin == NO_MOVE
+      if (b_eye[i][j].origin == NO_MOVE 
 	  && b_eye[i][j].color == BLACK_BORDER)
       {
 	int esize = 0;
@@ -338,39 +294,140 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
  *
  */
 
+#define lively_stone(pos, color) (board[pos] == color && lively[pos])
+#define has_inf(color, pos) (domain[pos] || lively_stone(pos, color))
+#define sufficient_influence(pos, apos, bpos) \
+ (ON_BOARD(bpos) \
+  && (domain[apos] + domain[bpos]) \
+      > (inhibit[pos] > 1) + (inhibit[apos] > 0) + (inhibit[bpos] > 0))
+
 static void
 compute_primary_domains(int color, int domain[BOARDMAX],
-			int lively[MAX_BOARD][MAX_BOARD], 
-			int false_margins[MAX_BOARD][MAX_BOARD],
+			int lively[BOARDMAX],
+			int false_margins[BOARDMAX],
 			int first_time)
 {
+#if 0
+  /* This is a new implementation, which has not been enabled yet. */
   int other = OTHER_COLOR(color);
   int found_one;
   int i, j;
+  int pos;
+  int inhibit[BOARDMAX];
+  memset(inhibit, 0, sizeof(inhibit));
+
+  /* In the first pass we
+   * 1. Give influence to lively own stones and their neighbors.
+   *    (Cases (1) and (2) above.)
+   * 2. Set inhibit for lively opponent stones and their neighbors.
+   */
+  for (i = 0; i < board_size; i++)
+    for (j = 0; j < board_size; j++) {
+      pos = POS(i, j);
+      if (lively_stone(pos, color))
+	domain[pos] = 1; /* Case (1) above. */
+      else if (lively_stone(pos, other))
+	inhibit[pos] = 1;
+      else {
+	if (lively_stone(SOUTH(pos), color)
+	    || lively_stone(WEST(pos), color)
+	    || lively_stone(NORTH(pos), color)
+	    || lively_stone(EAST(pos), color)) {
+	  /* Case (2) above.
+	   *
+	   * To explain the asymmetry between the first time around
+	   * this loop and subsequent ones, a false margin is adjacent
+	   * to both B and W lively stones, so it's found on the first
+	   * pass through the loop.
+	   */
+	  if (first_time) {
+	    if (board[pos] == EMPTY && false_margin(pos, color, lively))
+	      false_margins[pos] = 1;
+	    else if (board[pos] == EMPTY
+		     && false_margin(pos, other, lively))
+	      false_margins[pos] = 1;
+	    else
+	      domain[pos] = 1;
+	  }
+	  else {
+	    if (board[pos] != EMPTY || false_margins[pos] != 1)
+	      domain[pos] = 1;
+	  }
+	}
+	
+	if (lively_stone(SOUTH(pos), other)
+	    || lively_stone(WEST(pos), other)
+	    || lively_stone(NORTH(pos), other)
+	    || lively_stone(EAST(pos), other))
+	  inhibit[pos] = 2;
+	else if (!ON_BOARD(SOUTH(pos))
+		 || !ON_BOARD(WEST(pos))
+		 || !ON_BOARD(NORTH(pos))
+		 || !ON_BOARD(EAST(pos)))
+	  inhibit[pos] = 1;
+      }
+    }
+
+  /* Now we loop over the board until no more vertices can be added to
+   * the domain through case (3) above.
+   */
+  do {
+    found_one = 0;
+    for (i = 0; i < board_size; i++)
+      for (j = 0; j < board_size; j++) {
+	pos = POS(i, j);
+	
+	/* First we handle the trivial cases. */
+	if (domain[pos] || lively_stone(pos, other) || false_margins[pos])
+	  continue;
+
+	/* Case (3) above. */
+	if (sufficient_influence(pos, SOUTH(pos), SE(pos))
+	    || sufficient_influence(pos, SOUTH(pos), SW(pos))
+	    || sufficient_influence(pos, WEST(pos), SW(pos))
+	    || sufficient_influence(pos, WEST(pos), NW(pos))
+	    || sufficient_influence(pos, NORTH(pos), NW(pos))
+	    || sufficient_influence(pos, NORTH(pos), NE(pos))
+	    || sufficient_influence(pos, EAST(pos), NE(pos))
+	    || sufficient_influence(pos, EAST(pos), SE(pos))) {
+	  domain[pos] = 1;
+	  found_one = 1;
+	}
+      }
+  } while (found_one);
+#else
+  int other = OTHER_COLOR(color);
+  int found_one;
+  int i, j;
+  int pos;
 
   do {
     found_one = 0;
     for (i = 0; i < board_size; i++)
       for (j = 0; j < board_size; j++) {
+	pos = POS(i, j);
+	
 	/* First we handle the trivial cases. */
-	if (domain[POS(i, j)])
+	if (domain[pos])
 	  continue;
-	if (!(BOARD(i, j) == EMPTY 
-	      || (BOARD(i, j) == other && !lively[i][j])))
+	if (!(board[pos] == EMPTY || (board[pos] == other && !lively[pos])))
 	  continue;
 
 	/* Case (1) above. */
-	if (BOARD(i, j) == color && lively[i][j]) {
-	  domain[POS(i, j)] = 1;
+	if (lively_stone(pos, color)) {
+	  /* Comment: This code is never reached due to the previous
+           * continue statement.
+	   */
+	  domain[pos] = 1;
 	  found_one = 1;
 	  continue;
 	}
 
 	/* Case (2) above. */
-	if ((   BOARD(i-1, j) == color && lively[i-1][j])
-	    || (BOARD(i+1, j) == color && lively[i+1][j])
-	    || (BOARD(i, j-1) == color && lively[i][j-1])
-	    || (BOARD(i, j+1) == color && lively[i][j+1])) 
+	if (lively_stone(NORTH(pos), color)
+	    || lively_stone(SOUTH(pos), color)
+	    || lively_stone(WEST(pos), color)
+	    || lively_stone(EAST(pos), color))
 	{
 	  /* To explain the asymmetry between the first time around
 	   * this loop and subsequent ones, a false margin is adjacent
@@ -378,20 +435,20 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 	   * pass through the loop. 
 	   */
 	  if (first_time) {
-	    if (BOARD(i, j) == EMPTY && false_margin(i, j, color, lively))
-	      false_margins[i][j] = 1;
-	    else if (BOARD(i, j) == EMPTY
-		     && false_margin(i, j, other, lively))
-	      false_margins[i][j] = 1;
+	    if (board[pos] == EMPTY && false_margin(pos, color, lively))
+	      false_margins[pos] = 1;
+	    else if (board[pos] == EMPTY
+		     && false_margin(pos, other, lively))
+	      false_margins[pos] = 1;
 	    else {
-	      domain[POS(i, j)] = 1;
+	      domain[pos] = 1;
 	      found_one = 1;
 	    }
 	  }
 	  else {
-	    if (BOARD(i, j) != EMPTY || false_margins[i][j] != 1) {
+	    if (board[pos] != EMPTY || false_margins[pos] != 1) {
 	      found_one = 1;
-	      domain[POS(i, j)] = 1;
+	      domain[pos] = 1;
 	    }
 	  }
 	  continue;
@@ -399,132 +456,116 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 
 	/* Case (3) above. */
 
+	/* First test the corners. */
 	if ((i == 0 && j == 0
-	     && (has_inf(color, POS(1, 0), domain, lively)
-		 || has_inf(color, POS(0, 1), domain, lively))
-	     && (BOARD(1, 0) != other || !lively[1][0])
-	     && (BOARD(1, 1) != other || !lively[1][1])
-	     && (BOARD(0, 1) != other || !lively[0][1]))
+	     && (has_inf(color, POS(1, 0))
+		 || has_inf(color, POS(0, 1)))
+	     && !lively_stone(POS(1, 0), other)
+	     && !lively_stone(POS(1, 1), other)
+	     && !lively_stone(POS(0, 1), other))
 	    || (i == board_size-1 && j == 0
-		&& (has_inf(color, POS(board_size-2, 0), domain, lively)
-		    || has_inf(color, POS(board_size-1, 1), domain, lively))
-		&& (BOARD(board_size-2, 0) != other
-		    || !lively[board_size-2][0])
-		&& (BOARD(board_size-2, 1) != other 
-		    || !lively[board_size-2][1])
-		&& (BOARD(board_size-1, 1) != other
-		    || !lively[board_size-1][1]))
+		&& (has_inf(color, POS(board_size-2, 0))
+		    || has_inf(color, POS(board_size-1, 1)))
+		&& !lively_stone(POS(board_size-2, 0), other)
+		&& !lively_stone(POS(board_size-2, 1), other)
+		&& !lively_stone(POS(board_size-1, 1), other))
 	    || (i == 0 && j == board_size-1
-		&& (has_inf(color, POS(1, board_size-1), domain, lively)
-		    || has_inf(color, POS(0, board_size-2), domain, lively))
-		&& (BOARD(1, board_size-1) != other
-		    || !lively[1][board_size-1])
-		&& (BOARD(1, board_size-2) != other
-		    || !lively[1][board_size-2])
-		&& (BOARD(0, board_size-2) != other
-		   || !lively[0][board_size-2]))
+		&& (has_inf(color, POS(1, board_size-1))
+		    || has_inf(color, POS(0, board_size-2)))
+		&& !lively_stone(POS(1, board_size-1), other)
+		&& !lively_stone(POS(1, board_size-2), other)
+		&& !lively_stone(POS(0, board_size-2), other))
 	    || (i == board_size-1 && j == board_size-1
-		&& (has_inf(color, POS(board_size-2, board_size-1), 
-			    domain, lively)
-		    || has_inf(color, POS(board_size-1, board_size-2), 
-			       domain, lively))
-		&& (BOARD(board_size-2, board_size-1) != other
-		    || !lively[board_size-2][board_size-1])
-		&& (BOARD(board_size-2, board_size-2) != other
-		    || !lively[board_size-2][board_size-2])
-		&& (BOARD(board_size-1, board_size-2) != other
-		    || !lively[board_size-1][board_size-2])))
+		&& (has_inf(color, POS(board_size-2, board_size-1))
+		    || has_inf(color, POS(board_size-1, board_size-2)))
+		&& !lively_stone(POS(board_size-2, board_size-1), other)
+		&& !lively_stone(POS(board_size-2, board_size-2), other)
+		&& !lively_stone(POS(board_size-1, board_size-2), other)))
 	{
-	  domain[POS(i, j)] = 1;
+	  domain[pos] = 1;
 	  found_one = 1;
 	} 
-	else 
+	else /* Then the rest of the board. */
 	  if (((i > 1 && j > 0 && j < board_size-1
-		&& has_inf(color, POS(i-1, j), domain, lively))
-	       && ((j > 1 && has_inf(color, POS(i-1, j-1), domain, lively)
-		    && (BOARD(i, j-1) != other
-			|| !lively[i][j-1]) /* 1st CAVEAT */
+		&& has_inf(color, NORTH(pos)))
+	       && ((j > 1 && has_inf(color, POS(i-1, j-1))
+		    && !lively_stone(WEST(pos), other) /* 1st CAVEAT */
 		    && (j > board_size-2 
-			|| BOARD(i-1, j+1) != other 
-			|| !lively[i-1][j+1]
+			|| !lively_stone(POS(i-1, j+1), other)
 			|| j < 2
-			|| BOARD(i-1, j-2) != other 
-			|| !lively[i-1][j-2]))   /* 2nd CAVEAT */
+			|| !lively_stone(POS(i-1, j-2), other))) /* 2nd CAVEAT */
 		   || (j < board_size-2
-		       && has_inf(color, POS(i-1, j+1), domain, lively)
-		       && (BOARD(i, j+1) != other || !lively[i][j+1])
+		       && has_inf(color, POS(i-1, j+1))
+		       && !lively_stone(EAST(pos), other)
 		       && (j > board_size-3
-			   || BOARD(i-1, j+2) != other
-			   || !lively[i-1][j+2]
+			   || !lively_stone(POS(i-1, j+2), other)
 			   || j < 1
-			   || BOARD(i-1, j-1) != other
-			   || !lively[i-1][j-1]))))
+			   || !lively_stone(POS(i-1, j-1), other)))))
 	      ||
 	      ((i < board_size-2 && j > 0 && j < board_size-1
-		&& has_inf(color, POS(i+1, j), domain, lively))
-	       && ((j > 1 && has_inf(color, POS(i+1, j-1), domain, lively)
-		    && (BOARD(i, j-1) != other || !lively[i][j-1])
+		&& has_inf(color, SOUTH(pos)))
+	       && ((j > 1 && has_inf(color, POS(i+1, j-1))
+		    && !lively_stone(WEST(pos), other)
 		    && (j > board_size-2 
-			|| BOARD(i+1, j+1) != other 
-			|| !lively[i+1][j+1]
+			|| !lively_stone(POS(i+1, j+1), other)
 			|| j < 2
-			|| BOARD(i+1, j-2) != other 
-			|| !lively[i+1][j-2]))
+			|| !lively_stone(POS(i+1, j-2), other)))
 		   || (j < board_size-2
-		       && has_inf(color, POS(i+1, j+1), domain, lively)
-		       && (BOARD(i, j+1) != other || !lively[i][j+1])
+		       && has_inf(color, POS(i+1, j+1))
+		       && !lively_stone(EAST(pos), other)
 		       && (j > board_size-3
-			   || BOARD(i+1, j+2) != other
-			   || !lively[i+1][j+2]
+			   || !lively_stone(POS(i+1, j+2), other)
 			   || j < 1
-			   || BOARD(i+1, j-1) != other
-			   || !lively[i+1][j-1]))))
+			   || !lively_stone(POS(i+1, j-1), other)))))
 	      ||
 	      ((j > 1 && i > 0 && i < board_size-1
-		&& has_inf(color, POS(i, j-1), domain, lively))
-	       && ((i > 1 && has_inf(color, POS(i-1, j-1), domain, lively)
-		    && (BOARD(i-1, j) != other || !lively[i-1][j])
+		&& has_inf(color, WEST(pos)))
+	       && ((i > 1 && has_inf(color, POS(i-1, j-1))
+		    && !lively_stone(NORTH(pos), other)
 		    && (i > board_size-2 
-			|| BOARD(i+1, j-1) != other 
-			|| !lively[i+1][j-1]
+			|| !lively_stone(POS(i+1, j-1), other)
 			|| i < 2
-			|| BOARD(i-2, j-1) != other 
-			|| !lively[i-2][j-1]))
+			|| !lively_stone(POS(i-2, j-1), other)))
 		   || (i < board_size-2
-		       && has_inf(color, POS(i+1, j-1), domain, lively)
-		       && (BOARD(i+1, j) != other || !lively[i+1][j])
+		       && has_inf(color, POS(i+1, j-1))
+		       && !lively_stone(SOUTH(pos), other)
 		       && (i > board_size-3
-			   || BOARD(i+2, j-1) != other
-			   || !lively[i+2][j-1]
+			   || !lively_stone(POS(i+2, j-1), other)
 			   || i < 1
-			   || BOARD(i-1, j-1) != other
-			   || !lively[i-1][j-1]))))
+			   || !lively_stone(POS(i-1, j-1), other)))))
 	      ||
 	      ((j < board_size-2 && i > 0 && i < board_size-1
-		&& has_inf(color, POS(i, j+1), domain, lively))
-	       && ((i > 1 && has_inf(color, POS(i-1, j+1), domain, lively)
-		    && (BOARD(i-1, j) != other || !lively[i-1][j])
+		&& has_inf(color, EAST(pos)))
+	       && ((i > 1 && has_inf(color, POS(i-1, j+1))
+		    && !lively_stone(NORTH(pos), other)
 		    && (i > board_size-2 
-			|| BOARD(i+1, j+1) != other 
-			|| !lively[i+1][j+1]
+			|| !lively_stone(POS(i+1, j+1), other)
 			|| i < 2
-			|| BOARD(i-2, j+1) != other 
-			|| !lively[i-2][j+1]))
+			|| !lively_stone(POS(i-2, j+1), other)))
 		   || (i < board_size-2
-		       && has_inf(color, POS(i+1, j+1), domain, lively)
-		       && (BOARD(i+1, j) != other || !lively[i+1][j])
+		       && has_inf(color, POS(i+1, j+1))
+		       && !lively_stone(SOUTH(pos), other)
 		       && (j > board_size-3
-			   || BOARD(i+2, j+1) != other
-			   || !lively[i+2][j+1]
+			   || !lively_stone(POS(i+2, j+1), other)
 			   || i < 1
-			   || BOARD(i-1, j+1) != other
-			   || !lively[i-1][j+1])))))
+			   || !lively_stone(POS(i-1, j+1), other))))))
 	  {
-	    domain[POS(i, j)] = 1;
+	    domain[pos] = 1;
 	    found_one = 1;
 	  }
       }
   } while (found_one);
+#endif
+  
+  if (0 && (debug & DEBUG_EYES)) {
+    int i, j;
+    start_draw_board();
+    for (i = 0; i < board_size; i++)
+      for (j = 0; j < board_size; j++) {
+	draw_color_char(i, j, domain[POS(i, j)] ? '1' : '0', GG_COLOR_BLACK);
+      }
+    end_draw_board();
+  }
 }
 
 
@@ -532,7 +573,8 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 static void
 count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD])
 {
-  int  i, j;
+  int i, j;
+  int k;
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
@@ -546,32 +588,15 @@ count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD])
       eyedata[i][j].neighbors = 0;
       eyedata[i][j].marginal_neighbors = 0;
 
-      if (i > 0
-	  && eyedata[i-1][j].origin == eyedata[i][j].origin) {
-	eyedata[i][j].neighbors++;
-	if (eyedata[i-1][j].marginal)
-	  eyedata[i][j].marginal_neighbors++;
-      }
-
-      if (i < board_size-1
-	  && eyedata[i+1][j].origin == eyedata[i][j].origin) {
-	eyedata[i][j].neighbors++;
-	if (eyedata[i+1][j].marginal)
-	  eyedata[i][j].marginal_neighbors++;
-      }
-
-      if (j > 0
-	  && eyedata[i][j-1].origin == eyedata[i][j].origin) {
-	eyedata[i][j].neighbors++;
-	if (eyedata[i][j-1].marginal)
-	  eyedata[i][j].marginal_neighbors++;
-      }
-
-      if (j < board_size-1
-	  && eyedata[i][j+1].origin == eyedata[i][j].origin) {
-	eyedata[i][j].neighbors++;
-	if (eyedata[i][j+1].marginal)
-	  eyedata[i][j].marginal_neighbors++;
+      for (k = 0; k < 4; k++) {
+	int ai = i + deltai[k];
+	int aj = j + deltaj[k];
+	if (ON_BOARD2(ai, aj)
+	    && eyedata[ai][aj].origin == eyedata[i][j].origin) {
+	  eyedata[i][j].neighbors++;
+	  if (eyedata[ai][aj].marginal)
+	    eyedata[i][j].marginal_neighbors++;
+	}
       }
     }
 }
@@ -593,14 +618,6 @@ is_lively(int owl_call, int i, int j)
 }
 
 
-static int
-has_inf(int color, int pos, int domain[BOARDMAX],
-	int lively[MAX_BOARD][MAX_BOARD])
-{
-  return domain[pos] || (board[pos] == color && lively[I(pos)][J(pos)]);
-}
-
-
 /* In the following situation, we do not wish the vertex at 'a'
  * included in the O eye space:
  * 
@@ -612,7 +629,7 @@ has_inf(int color, int pos, int domain[BOARDMAX],
  * should not be included in the eyespace if it is adjacent to
  * an X stone which is alive, yet X cannot play safely at a.
  * The function returns 1 if this situation is found at 
- * (i,j) for color O.
+ * (pos) for color O.
  *
  * The condition above is true, curiously enough, also for the
  * following case:
@@ -620,7 +637,7 @@ has_inf(int color, int pos, int domain[BOARDMAX],
  *   It also has to have less than 4 external liberties, since the
  *   reading has to be able to capture the group tactically. In that 
  *   case, the eye of size one will be treated as a false marginal.
- * Thus we have to exclude this case, which is done by requiring (i,j)
+ * Thus we have to exclude this case, which is done by requiring (pos)
  * to be adjacent to both white and black stones. Since this test is
  * least expensive, we start with it.
  *
@@ -630,59 +647,53 @@ has_inf(int color, int pos, int domain[BOARDMAX],
  */
 
 static int
-false_margin(int i, int j, int color, int lively[MAX_BOARD][MAX_BOARD])
+false_margin(int pos, int color, int lively[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int neighbors = 0;
-
+  int k;
+  int all_lively;
+  int potential_false_margin;
+  
   /* The life code needs the false margins to remain in the eyespace. */
   if (life)
     return 0;
   
   /* Require neighbors of both colors. */
-  if (i > 0)
-    neighbors |= BOARD(i-1, j);
-  if (i < board_size-1)
-    neighbors |= BOARD(i+1, j);
-  if (j > 0)
-    neighbors |= BOARD(i, j-1);
-  if (j < board_size-1)
-    neighbors |= BOARD(i, j+1);
+  for (k = 0; k < 4; k++)
+    if (ON_BOARD(pos + delta[k]))
+	neighbors |= board[pos + delta[k]];	
 
   if (neighbors != (WHITE | BLACK))
     return 0;
 
   /* At least one opponent neighbor should be not lively. */
-  if (!((   BOARD(i-1, j) == other && !lively[i-1][j])
-	|| (BOARD(i+1, j) == other && !lively[i+1][j])
-	|| (BOARD(i, j-1) == other && !lively[i][j-1])
-	|| (BOARD(i, j+1) == other && !lively[i][j+1])))
+  all_lively = 1;
+  for (k = 0; k < 4; k++)
+    if (board[pos + delta[k]] == other && !lively[pos + delta[k]])
+      all_lively = 0;
+
+  if (all_lively)
     return 0;
-  
-  if ((stackp == 0
-       && ((   BOARD(i-1, j) == other && lively[i-1][j]
-	       && worm[POS(i-1, j)].attack_code == 0)
-	   || (BOARD(i+1, j) == other && lively[i+1][j]
-	       && worm[POS(i+1, j)].attack_code == 0)
-	   || (BOARD(i, j-1) == other && lively[i][j-1]
-	       && worm[POS(i, j-1)].attack_code == 0)
-	   || (BOARD(i, j+1) == other && lively[i][j+1]
-	       && worm[POS(i, j+1)].attack_code == 0)))
-      || (stackp > 0
-	  && ((BOARD(i-1, j) == other && lively[i-1][j] 
-	       && !attack(POS(i-1, j), NULL))
-	      || (BOARD(i+1, j) == other && lively[i+1][j]
-		  && !attack(POS(i+1, j), NULL))
-	      || (BOARD(i, j-1) == other && lively[i][j-1]
-		  && !attack(POS(i, j-1), NULL))
-	      || (BOARD(i, j+1) == other && lively[i][j+1]
-		  && !attack(POS(i, j+1), NULL))))) {
-    if (safe_move2(i, j, other) == 0) {
-      DEBUG(DEBUG_EYES, "False margin for %s at %m.\n",
-	    color_to_string(color), i, j);
-      return 1;
-    }
+
+  potential_false_margin = 0;
+  for (k = 0; k < 4; k++) {
+    int apos = pos + delta[k];
+    if (board[apos] != other || !lively[apos])
+      continue;
+    
+    if (stackp == 0 && worm[apos].attack_code == 0)
+      potential_false_margin = 1;
+    
+    if (stackp > 0 && !attack(apos, NULL))
+      potential_false_margin = 1;
   }
+  
+  if (potential_false_margin && safe_move(pos, other) == 0) {
+    DEBUG(DEBUG_EYES, "False margin for %C at %1m.\n", color, pos);
+    return 1;
+  }
+
   return 0;
 }
 
@@ -697,40 +708,28 @@ originate_eye(int i, int j, int m, int n,
 	      int *esize, int *msize, 
 	      struct eye_data eye[MAX_BOARD][MAX_BOARD])
 {
-  gg_assert (m >= 0);
-  gg_assert (m < board_size);
-  gg_assert (n >= 0);
-  gg_assert (n < board_size);
-
+  int k;
+  ASSERT_ON_BOARD2(i, j);
+  ASSERT_ON_BOARD2(m, n);
+  gg_assert(esize != NULL);
+  gg_assert(msize != NULL);
+  
   eye[m][n].origin = POS(i, j);
-  if (esize) (*esize)++;
-  if (msize && eye[m][n].marginal)
+  (*esize)++;
+  if (eye[m][n].marginal)
     (*msize)++;
   if (eye[m][n].type & INHIBIT_CONNECTION)
     return;
-  if ((m > 0) 
-      && (eye[m-1][n].color == eye[m][n].color)
-      && (eye[m-1][n].origin == NO_MOVE) 
-      && (!eye[m-1][n].marginal || !eye[m][n].marginal))
-    originate_eye(i, j, m-1, n, esize, msize, eye);
 
-  if ((m < board_size-1) 
-      && (eye[m+1][n].color == eye[m][n].color)
-      && (eye[m+1][n].origin == NO_MOVE) 
-      && (!eye[m+1][n].marginal || !eye[m][n].marginal))
-    originate_eye(i, j, m+1, n, esize, msize, eye);
-
-  if ((n > 0) 
-      && (eye[m][n-1].color == eye[m][n].color)
-      && (eye[m][n-1].origin == NO_MOVE) 
-      && (!eye[m][n-1].marginal || !eye[m][n].marginal))
-    originate_eye(i, j, m, n-1, esize, msize, eye);
-
-  if ((n < board_size-1) 
-      && (eye[m][n+1].color == eye[m][n].color)
-      && (eye[m][n+1].origin == NO_MOVE) 
-      && (!eye[m][n+1].marginal || !eye[m][n].marginal))
-    originate_eye(i, j, m, n+1, esize, msize, eye);
+  for (k = 0; k < 4; k++) {
+    int ai = m + deltai[k];
+    int aj = n + deltaj[k];
+    if (ON_BOARD2(ai, aj)
+	&& eye[ai][aj].color == eye[m][n].color
+	&& eye[ai][aj].origin == NO_MOVE
+	&& (!eye[ai][aj].marginal || !eye[m][n].marginal))
+      originate_eye(i, j, ai, aj, esize, msize, eye);
+  }
 }
 
 

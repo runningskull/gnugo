@@ -34,8 +34,12 @@
 
 /* Pointless to do fuseki database pattern matching after this number
  * of stones have been placed on the board.
+ *
+ * Notice that we are not talking of the move number here but the
+ * number of stones actually residing on the board. This does in
+ * particular include handicap stones.
  */
-#define MAX_FUSEKI_DATABASE_STONES 10
+#define MAX_FUSEKI_DATABASE_STONES 19
 
 #define UPPER_LEFT  0
 #define UPPER_RIGHT 1
