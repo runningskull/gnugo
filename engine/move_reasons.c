@@ -504,9 +504,13 @@ move_reason_known(int pos, int type, int what)
 int
 attack_move_reason_known(int pos, int what)
 {
-  return (move_reason_known(pos, ATTACK_MOVE, what)
-	  || move_reason_known(pos, ATTACK_MOVE_GOOD_KO, what)
-	  || move_reason_known(pos, ATTACK_MOVE_BAD_KO, what));
+  if (move_reason_known(pos, ATTACK_MOVE, what))
+    return WIN;
+  if (move_reason_known(pos, ATTACK_MOVE_GOOD_KO, what))
+    return KO_A;
+  if (move_reason_known(pos, ATTACK_MOVE_BAD_KO, what))
+    return KO_B;
+  return 0;
 }
 
 /*
@@ -516,9 +520,13 @@ attack_move_reason_known(int pos, int what)
 int
 defense_move_reason_known(int pos, int what)
 {
-  return (move_reason_known(pos, DEFEND_MOVE, what)
-	  || move_reason_known(pos, DEFEND_MOVE_GOOD_KO, what)
-	  || move_reason_known(pos, DEFEND_MOVE_BAD_KO, what));
+  if (move_reason_known(pos, DEFEND_MOVE, what))
+    return WIN;
+  if (move_reason_known(pos, DEFEND_MOVE_GOOD_KO, what))
+    return KO_A;
+  if (move_reason_known(pos, DEFEND_MOVE_BAD_KO, what))
+    return KO_B;
+  return 0;
 }
 
 /* Check whether a dragon consists of only one worm. If so, check
@@ -540,9 +548,13 @@ tactical_move_vs_whole_dragon_known(int pos, int what)
 int
 owl_attack_move_reason_known(int pos, int what)
 {
-  return (move_reason_known(pos, OWL_ATTACK_MOVE, what)
-	  || move_reason_known(pos, OWL_ATTACK_MOVE_GOOD_KO, what)
-	  || move_reason_known(pos, OWL_ATTACK_MOVE_BAD_KO, what));
+  if (move_reason_known(pos, OWL_ATTACK_MOVE, what))
+    return WIN;
+  if (move_reason_known(pos, OWL_ATTACK_MOVE_GOOD_KO, what))
+    return KO_A;
+  if (move_reason_known(pos, OWL_ATTACK_MOVE_BAD_KO, what))
+    return KO_B;
+  return 0;
 }
 
 /*
@@ -552,9 +564,13 @@ owl_attack_move_reason_known(int pos, int what)
 int
 owl_defense_move_reason_known(int pos, int what)
 {
-  return (move_reason_known(pos, OWL_DEFEND_MOVE, what)
-	  || move_reason_known(pos, OWL_DEFEND_MOVE_GOOD_KO, what)
-	  || move_reason_known(pos, OWL_DEFEND_MOVE_BAD_KO, what));
+  if (move_reason_known(pos, OWL_DEFEND_MOVE, what))
+    return WIN;
+  if (move_reason_known(pos, OWL_DEFEND_MOVE_GOOD_KO, what))
+    return KO_A;
+  if (move_reason_known(pos, OWL_DEFEND_MOVE_BAD_KO, what))
+    return KO_B;
+  return 0;
 }
 
 /*

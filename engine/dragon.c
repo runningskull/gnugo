@@ -454,8 +454,12 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	   */
 	  dragon[str].matcher_status = UNKNOWN;
 	}
-	else
-	  dragon[str].matcher_status = dragon[str].status;
+	else {
+	  /* And if the static life and death analysis said UNKNOWN,
+           * we are most likely ALIVE.
+	   */
+	  dragon[str].matcher_status = ALIVE;
+	}
       }
     }
   time_report(2, "  compute matcher status", NO_MOVE, 1.0);
@@ -765,9 +769,9 @@ static void
 find_neighbor_dragons()
 {
   int m, n;
-  int ii;
+  int pos;
+  int pos2;
   int i, j;
-  int jj;
   int d;
   int dragons[BOARDMAX];
   int distances[BOARDMAX];
@@ -778,19 +782,16 @@ find_neighbor_dragons()
   gg_assert(dragon2_initialized);
   
   /* Initialize the arrays. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
-
-      if (IS_STONE(board[ii])) {
-	dragons[ii] = dragon[ii].id;
-	distances[ii] = 0;
-      }
-      else {
-	dragons[ii] = -1;
-	distances[ii] = -1;
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (IS_STONE(board[pos])) {
+      dragons[pos] = dragon[pos].id;
+      distances[pos] = 0;
     }
+    else if (ON_BOARD(pos)) {
+      dragons[pos] = -1;
+      distances[pos] = -1;
+    }
+  }
 
   /* Expand from dist-1 to dist. Break out of the loop at the end if
      * we couldn't expand anything. Never expand more than five steps.
@@ -798,61 +799,61 @@ find_neighbor_dragons()
   for (dist = 1; dist <= 5; dist++) {
     int found_one = 0;
       
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	ii = POS(m, n);
-
-	if (distances[ii] != dist-1 || dragons[ii] < 0)
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos))
+	continue;
+    
+      if (distances[pos] != dist-1 || dragons[pos] < 0)
+	continue;
+      
+      color = DRAGON(dragons[pos]).color;
+      for (k = 0; k < 4; k++) {
+	pos2 = pos + delta[k];
+	
+	if (!ON_BOARD1(pos2))
 	  continue;
+	
+	/* Consider expansion from (pos) to adjacent intersection
+	 * (pos2).
+	 */
+	if (distances[pos2] >= 0 && distances[pos2] < dist)
+	  continue; /* (pos2) already occupied. */
 
-	color = DRAGON(dragons[ii]).color;
-	for (k = 0; k < 4; k++) {
-	  jj = ii + delta[k];
-
-	  if (!ON_BOARD1(jj))
-	    continue;
-
-	  /* Consider expansion from (ii) to adjacent intersection
-	   * (jj).
+	/* We can always expand the first step, regardless of influence. */
+	if (dist == 1
+	    || (influence_area_color(pos) == color
+		&& influence_area_color(pos2) != OTHER_COLOR(color))) {
+	  /* Expansion ok. Now see if someone else has tried to
+	   * expand here. In that case we indicate a collision by
+	   * setting the dragon number to -2.
 	   */
-	  if (distances[jj] >= 0 && distances[jj] < dist)
-	    continue; /* (jj) already occupied. */
-
-	  if (influence_area_color(ii) == color
-	      && influence_area_color(jj) != OTHER_COLOR(color)) {
-	    /* Expansion ok. Now see if someone else has tried to
-	     * expand here. In that case we indicate a collision by
-	     * setting the dragon number to -2.
-	     */
-	    if (distances[jj] == dist) {
-	      if (dragons[jj] != dragons[ii])
-		dragons[jj] = -2;
-	    }
-	    else {
-	      dragons[jj] = dragons[ii];
-	      distances[jj] = dist;
-	      found_one = 1;
-	    }
+	  if (distances[pos2] == dist) {
+	    if (dragons[pos2] != dragons[pos])
+	      dragons[pos2] = -2;
+	  }
+	  else {
+	    dragons[pos2] = dragons[pos];
+	    distances[pos2] = dist;
+	    found_one = 1;
 	  }
 	}
       }
-    if (!found_one)
-      break;
+      if (!found_one)
+	break;
+    }
   }
-
+  
   if (0) {
     for (m = 0; m < board_size; m++) {
-      for (n = 0; n < board_size; n++) {
+      for (n = 0; n < board_size; n++)
 	fprintf(stderr, "%3d", dragons[POS(m, n)]);
-      }
       fprintf(stderr, "\n");
     }
     fprintf(stderr, "\n");
       
     for (m = 0; m < board_size; m++) {
-      for (n = 0; n < board_size; n++) {
+      for (n = 0; n < board_size; n++)
 	fprintf(stderr, "%3d", distances[POS(m, n)]);
-      }
       fprintf(stderr, "\n");
     }
     fprintf(stderr, "\n");
@@ -863,38 +864,37 @@ find_neighbor_dragons()
    * where dragons==-2 we set all the neighbors of this intersection
    * as adjacent to each other.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    if (dragons[pos] == -2) {
+      int neighbors = 0;
+      int adjacent[4];
 
-      if (dragons[ii] == -2) {
-	int neighbors = 0;
-	int adjacent[4];
+      for (k = 0; k < 4; k++) {
+	pos2 = pos + delta[k];
 
-	for (k = 0; k < 4; k++) {
-	  jj = ii + delta[k];
-
-	  if (ON_BOARD1(jj) && dragons[jj] >= 0)
-	    adjacent[neighbors++] = dragons[jj];
-	}
-	for (i = 0; i < neighbors; i++)
-	  for (j = i+1; j < neighbors; j++)
-	    add_adjacent_dragons(adjacent[i], adjacent[j]);
+	if (ON_BOARD1(pos2) && dragons[pos2] >= 0)
+	  adjacent[neighbors++] = dragons[pos2];
       }
-      else if (dragons[ii] >= 0) {
-	if (ON_BOARD(NORTH(ii))) {
-	  if (dragons[NORTH(ii)] >= 0
-	      && dragons[NORTH(ii)] != dragons[ii])
-	    add_adjacent_dragons(dragons[ii], dragons[NORTH(ii)]);
-	}
-	if (ON_BOARD(EAST(ii))) {
-	  if (dragons[EAST(ii)] >= 0
-	      && dragons[EAST(ii)] != dragons[ii])
-	    add_adjacent_dragons(dragons[ii], dragons[EAST(ii)]);
-	}
+      for (i = 0; i < neighbors; i++)
+	for (j = i+1; j < neighbors; j++)
+	  add_adjacent_dragons(adjacent[i], adjacent[j]);
+    }
+    else if (dragons[pos] >= 0) {
+      if (ON_BOARD(NORTH(pos))) {
+	if (dragons[NORTH(pos)] >= 0
+	    && dragons[NORTH(pos)] != dragons[pos])
+	  add_adjacent_dragons(dragons[pos], dragons[NORTH(pos)]);
+      }
+      if (ON_BOARD(EAST(pos))) {
+	if (dragons[EAST(pos)] >= 0
+	    && dragons[EAST(pos)] != dragons[pos])
+	  add_adjacent_dragons(dragons[pos], dragons[EAST(pos)]);
       }
     }
-
+  }
+  
   if (0) {
     for (d = 0; d < number_of_dragons; d++) {
       gprintf("dragon %d at %1m:", d, dragon2[d].origin);

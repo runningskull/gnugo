@@ -14,6 +14,14 @@ loadsgf games/wing-yuhiko-gnugo.sgf 220
 264 owl_attack D18
 #? [2 A18]*
 
+# 3.3.2 comes up with R14, which of course doesn't work. T15 might
+# work, but is so much worse than S16 that there's no reason to allow
+# it.
+# See also manyfaces:2.
+loadsgf games/mfgg1.sgf 49
+265 owl_attack S15
+#? [1 S16]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

@@ -1303,6 +1303,21 @@ estimate_territorial_value(int pos, int color, float score)
       }	
     
       tot_value -= this_value;
+
+      /* If a move tactically defends an owl critical string, but
+       * this move is not listed as an owl defense, it probably is
+       * ineffective. The 0.45 factor is chosen so that even in
+       * combination with bad ko it still has a positive net impact.
+       */
+      if (dragon[aa].owl_status == CRITICAL
+	  && (owl_defense_move_reason_known(pos, find_dragon(aa))
+	      < defense_move_reason_known(pos, find_worm(aa)))) {
+	this_value = 0.45 * (2 * worm[aa].effective_size);
+	TRACE("  %1m: -%f - suspected ineffective defense of worm %1m\n",
+	      pos, this_value, aa);
+	tot_value -= this_value;
+      }
+
       does_block = 1;
       break;
 
@@ -1435,6 +1450,34 @@ estimate_territorial_value(int pos, int color, float score)
       /* Make sure this is a threat to defend our stones. */
       ASSERT1(board[aa] == color, aa);
       
+      /* No followup value if string can be attacked with threat
+       * against our move. An exception to this is when our move
+       * isn't safe anyway and we play this only for the followup
+       * value, typically as a ko threat.
+       *
+       * FIXME: This is somewhat halfhearted since only one attack
+       * move is tested.
+       */
+      if (trymove(pos, color, "estimate_territorial_value-A",
+		  NO_MOVE, EMPTY, NO_MOVE)) {
+	int attack_move;
+	if (move[pos].move_safety == 1
+	    && attack(aa, &attack_move) == WIN
+	    && attack_move != NO_MOVE) {
+	  if (trymove(attack_move, other,
+		      "estimate_territorial_value-b", NO_MOVE,
+		      EMPTY, NO_MOVE)) {
+	    if (board[pos] == EMPTY || attack(pos, NULL) == WIN) {
+	      popgo();
+	      popgo();
+	      break;
+	    }
+	    popgo();
+	  }
+	}
+	popgo();
+      }
+      
       add_followup_value(pos, 2 * worm[aa].effective_size);
 
       TRACE("  %1m: %f (followup) - threatens to defend %1m\n",
@@ -1533,6 +1576,30 @@ estimate_territorial_value(int pos, int color, float score)
       }
       
       tot_value -= this_value;
+
+      /* If the dragon is a single string which can be tactically
+       * attacked, but this owl attack does not attack tactically, it
+       * can be suspected to leave some unnecessary aji or even be an
+       * owl misread. Therefore we give it a small penalty to favor
+       * the moves which do attack tactically as well.
+       *
+       * One example is manyfaces:2 where the single stone S15 can be
+       * tactically attacked at S16 but where 3.3.2 finds additional
+       * owl attacks at R14 (clearly ineffective) and T15 (might work,
+       * but leaves huge amounts of aji).
+       */
+      if ((move_reasons[r].type == OWL_ATTACK_MOVE
+	   || move_reasons[r].type == OWL_ATTACK_MOVE_GOOD_KO
+	   || move_reasons[r].type == OWL_ATTACK_MOVE_BAD_KO)
+	  && dragon[aa].size == worm[aa].size
+	  && worm[aa].attack_codes[0] == WIN
+	  && attack_move_reason_known(pos, find_worm(aa)) != WIN) {
+	this_value = 0.05 * (2 * worm[aa].effective_size);
+	TRACE("  %1m: -%f - suspected ineffective owl attack of worm %1m\n",
+	      pos, this_value, aa);
+	tot_value -= this_value;
+      }
+      
       does_block = 1;
       break;
 
@@ -2089,7 +2156,7 @@ estimate_strategical_value(int pos, int color, float score)
 	    || (color == WHITE && score < 0.0))
 	  this_value = 0.0;
 	else 
-	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(.65*score));
+	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(0.65*score));
 	
 	if (this_value > dragon_value[d1]) {
 	  dragon_value[d1] = this_value;

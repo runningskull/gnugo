@@ -1808,7 +1808,7 @@ dXa
 ;!oplay_attack_either(a,b,c,c,d)
 
 
-Pattern Intrusion 51
+Pattern Intrusion51
 
 ?Q?
 X.X
@@ -1822,6 +1822,30 @@ cad
 
 ;oplay_break_through(a,b,c,b,d)
 >return(!xplay_attack(a,b));
+
+
+Pattern Intrusion52
+# gf New pattern. (3.3.3)
+
+X.x
+Q!.
+.X.
+
+:8,B,value(30)
+
+
+Pattern Intrusion53
+# gf New pattern. (3.3.3)
+
+X!.
+QX!
+
+:8,B,value(50)
+
+Xa.
+QB!
+
+;!oplay_defend(a,B)
 
 
 Pattern Nonterritory1

@@ -8,6 +8,7 @@ loadsgf games/mfgg1.sgf 43
 1 gg_genmove black
 #? [S13]
 
+#See also owl1:265.
 loadsgf games/mfgg1.sgf 49
 2 gg_genmove black
 #? [S16]

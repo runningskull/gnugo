@@ -278,6 +278,12 @@ loadsgf games/connection1.sgf
 87 disconnect R12 R9
 #? [1 S10]*
 
+# See also trevorb:670.
+loadsgf games/trevor/auto/b64.sgf 44
+88 disconnect E6/H5
+#? [0]*
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
