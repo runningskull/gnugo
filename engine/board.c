@@ -39,6 +39,14 @@
 #include "gg_utils.h"
 
 
+/* This can be used for internal checks w/in board.c that should
+ * typically not be necessary (for speed). */
+#if 1
+#define PARANOID1(x, pos) ASSERT1(x, pos)
+#else
+#define PARANOID1(x, pos)
+#endif
+
 /* ================================================================ */
 /*                          data structures                         */
 /* ================================================================ */
@@ -2867,6 +2875,7 @@ assimilate_neighbor_strings(int pos)
   /* Get the next free string number. */
   PUSH_VALUE(next_string);
   s = next_string++;
+  PARANOID1(s < MAX_STRINGS, pos); 
   string_number[pos] = s;
   /* Set up a size one cycle for the string. */
   next_stone[pos] = pos;

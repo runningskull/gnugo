@@ -25,10 +25,16 @@
 #  ? - don't care
 #  . - empty
 #  O - color to move
+#  Q - same as O, plus sets the pattern anchor
 #  X - opposite color of O
 #  o - O or empty
 #  x - X or empty
 #  , - point which influence can't pass through
+# A/D patterns:
+#  ! - point where influence gets weakened when passing through
+#      (permeability multiplied by 0.7) 
+# B patterns:
+#  ! - marks an intrusion for the anchor stone with indicated value
 #
 #
 # Four different classes of patterns are used here.
@@ -38,6 +44,16 @@
 #  B - Intrusions (where O can intrude into X'x territory)
 #  t - Nonterritory patterns indicating points where one color cannot
 #      get territory
+#
+# Constraints are as usual.
+# B patterns are matched for the color to move, and for the color having
+# made a move in followup influence, in order to compute the followup
+# value of this move. (Only patterns including the played move or any
+# stone saved by this move are taken into account.)
+# For the followup influence, a pattern is used if the usual constraint
+# is satisfied, and if the action returns true. See the influence
+# documentation for explanation and influence.c for details.
+
 
 Pattern Barrier1
 
@@ -857,7 +873,7 @@ Pattern Intrusion1
 
 xxxx
 ...X
-!!.O
+!!.Q
 ----
 
 :8,B,value(30)
@@ -874,7 +890,7 @@ Pattern Intrusion1b
 
 xxxx
 X..X
-..!O
+..!Q
 ----
 
 :8,B,value(30)
@@ -890,7 +906,7 @@ Pattern Intrusion1c
 
 xxxx
 X..X
-.!.O
+.!.Q
 ----
 
 :8,B,value(30)
@@ -908,14 +924,14 @@ Pattern Intrusion1d
 
 xxxx
 !!.X
-...O
+...Q
 ----
 
 :8,B,value(30)
 
 xxxx
 a!cX
-..bO
+..bQ
 ----
 
 ;!oplay_defend(a,b,c,b)
@@ -924,7 +940,7 @@ a!cX
 Pattern Intrusion2
 
 xXx?
-...O
+...Q
 !!..
 ----
 
@@ -943,7 +959,7 @@ Pattern Intrusion3
 # ab 3.1.22 Constraint added (see 13x13:52)
 
 xxX?
-...O
+...Q
 !!..
 ----
 
@@ -960,7 +976,7 @@ a!c.
 
 Pattern Intrusion4
 
-XOOX
+XQOX
 !!X.
 !...
 ----
@@ -978,7 +994,7 @@ baC.
 
 Pattern Intrusion5a
 
-X.OX
+X.QX
 .!X.
 .!..
 ----
@@ -995,7 +1011,7 @@ XbdX
 
 Pattern Intrusion5b
 
-.OX
+.QX
 !X.
 
 :8,BY,value(30)
@@ -1009,7 +1025,7 @@ aDc
 
 Pattern Intrusion6
 
-?OX
+?QX
 X!!
 x..
 
@@ -1018,7 +1034,7 @@ x..
 
 Pattern Intrusion7a
 
-OX.
+QX.
 .!!
 X.x
 
@@ -1034,7 +1050,7 @@ X.x
 
 Pattern Intrusion7b
 
-OX
+QX
 !!
 
 :8,BY,value(30)
@@ -1050,7 +1066,7 @@ Pattern Intrusion8
 # ab 3.1.22 revised constraint (see territory valuation in 13x13:2)
 
 X.X
-O!!
+Q!!
 ?X.
 
 :8,B,value(30)
@@ -1066,13 +1082,13 @@ ca!
 Pattern Intrusion9
 
 X.
-OX
+QX
 .!
 
 :8,B,value(30)
 
 X.
-OC
+QC
 ba
 
 ;oplay_attack(a,b,C)
@@ -1082,7 +1098,7 @@ Pattern Intrusion10
 
 xxx?
 ..XO
-!!.O
+!!.Q
 ----
 
 :8,B,value(30)
@@ -1100,7 +1116,7 @@ Pattern Intrusion11
 # O can intrude on either side. The position of the influence source
 # here isn't entirely accurate.
 
-.O.
+.Q.
 .X.
 .!.
 ...
@@ -1108,7 +1124,7 @@ Pattern Intrusion11
 
 :|,B,value(30)
 
-dOb
+dQb
 cXa
 .!.
 ...
@@ -1121,7 +1137,7 @@ Pattern Intrusion12a
 # O can intrude on either side. The position of the influence source
 # here isn't entirely accurate.
 
-!O!
+!Q!
 !X!
 ...
 ...
@@ -1129,7 +1145,7 @@ Pattern Intrusion12a
 
 :|,B,value(30)
 
-dOb
+dQb
 cXa
 ...
 ...
@@ -1137,23 +1153,10 @@ cXa
 
 ;oplay_attack(a,b,b) || oplay_attack(c,d,d)
 
-Pattern Intrusion12a
-
-oOo
-.X!
-...
-
-:8,OBY,value(30)
-
-oOb
-.Ca
-...
-
-;o_somewhere(b) || oplay_attack_either(a,b,b,C)
 
 Pattern Intrusion12b
 
-oOo
+oQo
 .X!
 ...
 
@@ -1182,7 +1185,7 @@ odb
 
 Pattern Intrusion13
 
-?OoO?
+?OoQ?
 X.!X.
 X.!..
 .....
@@ -1201,7 +1204,7 @@ X.!..
 
 Pattern Intrusion14
 
-?OO?
+?QO?
 X!X.
 .!..
 .!..
@@ -1209,7 +1212,7 @@ X!X.
 
 :8,B,value(30)
 
-?OO?
+?QO?
 XaXd
 .bc.
 .!..
@@ -1220,13 +1223,13 @@ XaXd
 
 Pattern Intrusion15
 
-oOo
+oQo
 .XO
 !.X
 
 :8,B,value(30)
 
-oOo
+oQo
 aXO
 cbX
 
@@ -1236,7 +1239,7 @@ cbX
 Pattern Intrusion16
 # ab value decreased (3.1.24)
 
-O!.
+Q!.
 !!.
 .xX
 
@@ -1246,7 +1249,7 @@ O!.
 Pattern Intrusion17
 # ab value decreased (3.1.24)
 
-O!.
+Q!.
 .!.
 XxX
 
@@ -1257,7 +1260,7 @@ Pattern Intrusion18
 
 xXx
 o..
-O!!
+Q!!
 o..
 xXx
 
@@ -1267,7 +1270,7 @@ xXx
 Pattern Intrusion19
 
 X..
-O!.
+Q!.
 o..
 xXx
 
@@ -1283,7 +1286,7 @@ xXx
 
 Pattern Intrusion20
 
-oO!
+oQ!
 OX!
 
 :8,B,value(30)
@@ -1297,7 +1300,7 @@ fAb
 
 Pattern Intrusion21
 
-O.X
+Q.X
 .!.
 x..
 
@@ -1313,7 +1316,7 @@ x..
 Pattern Intrusion21b
 
 ooX
-O!.
+Q!.
 x..
 
 :8,B,value(30)
@@ -1326,7 +1329,7 @@ x..
 
 Pattern Intrusion22
 
-O.X
+Q.X
 ...
 .!.
 
@@ -1341,7 +1344,7 @@ a..
 
 Pattern Intrusion23
 
-O..
+Q..
 .!!
 ---
 
@@ -1358,7 +1361,7 @@ dca
 Pattern Intrusion24
 
 O..
-O!!
+Q!!
 ---
 
 :8,B,value(30)
@@ -1367,7 +1370,7 @@ O!!
 Pattern Intrusion25
 
 !!.O
-!XO.
+!XQ.
 ....
 ....
 ----
@@ -1378,7 +1381,7 @@ Pattern Intrusion25
 Pattern Intrusion26
 
 !!.O
-.XO.
+.XQ.
 ..X!
 ....
 ----
@@ -1388,7 +1391,7 @@ Pattern Intrusion26
 
 Pattern Intrusion27
 
-O..
+Q..
 .!.
 .!.
 ...
@@ -1398,7 +1401,7 @@ O..
 
 Pattern Intrusion28
 
-??O?
+??Q?
 x.!X
 ..!.
 ....
@@ -1406,7 +1409,7 @@ x.!X
 
 :8,B,value(30)
 
-??O?
+??Q?
 xdaX
 .cb.
 ....
@@ -1419,7 +1422,7 @@ Pattern Intrusion29
 
 oooo
 oooo
-.O.o
+.Q.o
 ....
 .!!.
 .!..
@@ -1431,7 +1434,7 @@ Pattern Intrusion30
 
 oooo
 oooo
-XO.o
+XQ.o
 ....
 .!!.
 .!..
@@ -1440,7 +1443,7 @@ XO.o
 
 oooo
 oooo
-XOfo
+XQfo
 dbc.
 .ae.
 .!..
@@ -1451,7 +1454,7 @@ dbc.
 Pattern Intrusion31
 
 ooo
-XO.
+XQ.
 .!!
 .!.
 ?.?
@@ -1470,7 +1473,7 @@ Xb.
 Pattern Intrusion32
 
 ooo
-XO.
+XQ.
 .!.
 ?.?
 
@@ -1487,7 +1490,7 @@ Xb.
 Pattern Intrusion33
 
 oOo
-XOX
+XQX
 .!.
 ?.?
 
@@ -1497,14 +1500,14 @@ XOX
 Pattern Intrusion34
 
 o.o
-XOX
+XQX
 .!.
 ?.?
 
 :8,B,value(30)
 
 obo
-XOX
+XQX
 .a.
 ?.?
 
@@ -1515,7 +1518,7 @@ XOX
 Pattern Intrusion35
 
 |..X??
-|...O?
+|...Q?
 |..X!X
 |...!.
 |...!.
@@ -1524,7 +1527,7 @@ Pattern Intrusion35
 :8,B,value(30)
 
 |..X??
-|.baO?
+|.baQ?
 |.fXcX
 |..ed.
 |...!.
@@ -1536,7 +1539,7 @@ Pattern Intrusion35
 Pattern Intrusion36
 
 ?X
-O!
+Q!
 Xx
 
 :8,B,value(30)
@@ -1568,7 +1571,7 @@ oX
 Pattern Intrusion38
 
 X?
-!O
+!Q
 --
 
 :8,B,value(5)
@@ -1584,13 +1587,13 @@ ab
 Pattern Intrusion39
 
 ?Xx
-O!.
+Q!.
 o!X
 
 :8,B,value(30)
 
 ?Xx
-Oa.
+Qa.
 o!X
 
 ;safe_omove(a)
@@ -1599,12 +1602,12 @@ o!X
 Pattern Intrusion40
 
 X!
-O?
+Q?
 
 :8,B,value(30)
 
 A!
-O?
+Q?
 
 ;lib(A)==1
 
@@ -1612,12 +1615,12 @@ O?
 Pattern Intrusion41
 
 X!
-O!
+Q!
 
 :8,B,value(30)
 
 A!
-O!
+Q!
 
 ;lib(A)==1
 
@@ -1625,7 +1628,7 @@ O!
 Pattern Intrusion42
 
 ?Ooo
-.XOo
+.XQo
 .!X.
 ....
 ----
@@ -1633,7 +1636,7 @@ Pattern Intrusion42
 :8,B,value(30)
 
 ?Oeo
-bXOo
+bXQo
 .aDc
 ....
 ----
@@ -1644,13 +1647,13 @@ bXOo
 Pattern Intrusion43
 
 ??XO
-..XO
+..XQ
 ?!!o
 
 :8,B,value(50)
 
 ??AO
-.cAO
+.cAQ
 ?dbo
 
 ;lib(A)==2 && !attack(A) && !oplay_attack(b,c,d,d)
@@ -1659,7 +1662,7 @@ Pattern Intrusion43
 Pattern Intrusion44
 # gf New pattern. (3.1.20)
 
-.XO
+.XQ
 !!o
 
 :8,B,value(30)
@@ -1676,14 +1679,14 @@ bae
 Pattern Intrusion45
 # gf New pattern. (3.1.20)
 
-X.Oo
+X.Qo
 .!X.
 ....
 ----
 
 :8,B,value(30)
 
-XbOo
+XbQo
 .aC.
 ....
 ----
@@ -1698,7 +1701,7 @@ Pattern Intrusion46
 #        on one of the sides, but we don't know which one he will
 #        choose. This may or may not be a problem in practice.
 
-x.O.x
+x.Q.x
 .!X!.
 x...x
 x...x
@@ -1720,7 +1723,7 @@ Pattern Intrusion47
 
 ??X.?
 o..!.
-O....
+Q....
 -----
 
 :8,B,value(20)
@@ -1738,7 +1741,7 @@ Pattern Intrusion48
 
 ?X.
 ...
-O.!
+Q.!
 ..X
 
 :8,B,value(20)
@@ -1753,7 +1756,7 @@ O.!
 Pattern Intrusion49
 # ab added (3.1.24)
 
-XOX
+XQX
 .!!
 
 :8,B,value(30)
@@ -1768,7 +1771,7 @@ Pattern Intrusion50
 # ab added (3.1.25)
 
 ?..
-OX!
+QX!
 ...
 ---
 

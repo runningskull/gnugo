@@ -614,7 +614,6 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 {
   int pos;
   int k;
-  int saved_pos = NO_MOVE;
   struct influence_data *q = data;
   
   /* Patterns marked FY get ignored in experimental influence,
@@ -706,8 +705,6 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	  if ((color == WHITE && q->white_strength[x][y] == 0.0)
 	      || (color == BLACK && q->black_strength[x][y] == 0.0))
 	    return; /* Match failed. */
-          else
-            saved_pos = POS(x, y);
 	}
 	
 	if ((pattern->class & (CLASS_A | CLASS_t))
@@ -838,7 +835,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
       /* Low intensity influence source for the color in turn to move. */
       if (pattern->class & CLASS_B) {
         if (experimental_influence)
-          enter_intrusion_source(saved_pos, POS(x, y), pattern->value,
+          enter_intrusion_source(POS(m, n), POS(x, y), pattern->value,
 	  		         EXP_DEFAULT_ATTENUATION, q);
         else
           add_influence_source(POS(x, y), color,
@@ -850,16 +847,25 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 }
 
 /* Callback for matched barriers patterns in followup influence.
- * This adds a influence source of color O at !-marked points if any
- * of the O-stones in the pattern is marked INFLUENCE_SAVED_STONES.
+ * This adds an intrusion source for all B patterns in barriers.db for
+ * the color that has made a move if all the following conditions are
+ * fulfilled:
+ * - the anchor ("Q") is adjacent (directly or diagonally) to a "saved stone"
+ *  (this is ensured by matchpat before calling back here)
+ * - at least one of the O stones in the pattern is a saved stone.
+ * - the usual pattern constraint ("; oplay_attack_either(...)") is fulfilled
+ * - the pattern action (typically ">return (!xplay_attack(...))") returns
+ *   true if  called with parameter action = FOLLOWUP_INFLUENCE_CALLBACK.
+ * "Saved stones" are: the move played + tactically rescued stones + stones
+ *                     in a critcal dragon brought to life by this move
  */
 static void
 followup_influence_callback(int m, int n, int color, struct pattern *pattern,
                             int ll, void *data)
 {
   int k;
-  int ti, tj;
-  int saved_stone = NO_MOVE;
+  int t;
+  int saved_stone_involved = 0;
   struct influence_data *q = data;
   UNUSED(color);
  
@@ -867,36 +873,7 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
   if (!(pattern->class & CLASS_B))
     return;
 
-  TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
-  ti += m;
-  tj += n;
-  /* If the pattern has a constraint, call the autohelper to see
-   * if the pattern must be rejected.
-   */
-  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, POS(ti, tj), color, 0))
-      return;
-  }
-
-  /* If the pattern has a helper, call it to see if the pattern must
-   * be rejected.
-   */
-  if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, POS(ti, tj), color)) {
-      DEBUG(DEBUG_INFLUENCE,
-            "Influence pattern %s+%d rejected by helper at %1m\n",
-            pattern->name, ll, POS(ti, tj));
-      return;
-    }
-  }
- 
- /* Actions in B patterns are used as followup specific constraints. */
- if ((pattern->autohelper_flag & HAVE_ACTION)
-     && !pattern->autohelper(pattern, ll, POS(ti, tj), color,
-                             FOLLOWUP_INFLUENCE_CALLBACK))
-    return;
-
-  /* First loop: We check whether a saved stone is involved. */
+  /* We check first whether a saved stone is involved. */
   for (k = 0; k < pattern->patlen; ++k) /* match each point */
     if (pattern->patn[k].att == ATT_O) {
       /* transform pattern real coordinate */
@@ -905,12 +882,40 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
       x += m;
       y += n;
       if (q->w[x][y] == MARKED)
-        saved_stone = POS(x,y);
+        saved_stone_involved = 1;
     }
-
-  if (saved_stone == NO_MOVE)
-    return;
   
+  if (!saved_stone_involved)
+    return;
+
+
+  t = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  /* If the pattern has a constraint, call the autohelper to see
+   * if the pattern must be rejected.
+   */
+  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
+    if (!pattern->autohelper(pattern, ll, t, color, 0))
+      return;
+  }
+
+  /* If the pattern has a helper, call it to see if the pattern must
+   * be rejected.
+   */
+  if (pattern->helper) {
+    if (!pattern->helper(pattern, ll, t, color)) {
+      DEBUG(DEBUG_INFLUENCE,
+            "Influence pattern %s+%d rejected by helper at %1m\n",
+            pattern->name, ll, t);
+      return;
+    }
+  }
+ 
+ /* Actions in B patterns are used as followup specific constraints. */
+ if ((pattern->autohelper_flag & HAVE_ACTION)
+     && !pattern->autohelper(pattern, ll, t, color,
+                             FOLLOWUP_INFLUENCE_CALLBACK))
+    return;
+
   DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
 	pattern->name, ll, POS(m, n));
 
@@ -922,10 +927,10 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
 			     ll, m, n);
 
       /* Low intensity influence source for the color in turn to move. */
-      enter_intrusion_source(saved_stone, pos, pattern->value,
-			     EXP_DEFAULT_ATTENUATION, &followup_influence);
+      enter_intrusion_source(POS(m, n), pos, pattern->value,
+			     EXP_DEFAULT_ATTENUATION, q);
       DEBUG(DEBUG_INFLUENCE, "  followup for %1m: intrusion at %1m\n",
-            saved_stone, pos);
+            POS(m, n), pos);
     }
 }
 
@@ -1635,32 +1640,45 @@ compute_followup_influence(int m, int n, int color,
                            char saved_stones[BOARDMAX])
 {
   int i, j;
+  int ii;
+  int k;
+  char goal[BOARDMAX];
 
   UNUSED(m);
   UNUSED(n);  
   memcpy(&followup_influence, &move_influence, sizeof(move_influence));
  
-  /* We mark the saved stones in the q->w array. */
+  /* We mark the saved stones and their neighbors in the goal array
+   * and in q->w.
+   */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (saved_stones[POS(i,j)]) 
-        followup_influence.w[i][j] = MARKED;
-      else
-        followup_influence.w[i][j] = UNMARKED;
+      goal[POS(i,j)] = 0;
+      followup_influence.w[i][j] = UNMARKED;
     }
+  for (i = 0; i < board_size; i++)
+    for (j = 0; j < board_size; j++)
+      if (saved_stones[POS(i,j)]) {
+	ii = POS(i, j);
+        goal[ii] = 1;
+	followup_influence.w[i][j] = MARKED;
+	for (k = 0; k < 8; k++) 
+	  if (board[ii] == board[ii+delta[k]])
+	    goal[ii+delta[k]] = 1;
+      }
 
   followup_influence.intrusion_counter = 0;
 
   current_influence = &followup_influence;
   /* Match B patterns for saved stones. */
-  matchpat(followup_influence_callback, color, &barrierspat_db, 
-           &followup_influence, NULL);
- 
-  /* Clean the q->w array. */
+  matchpat_goal_anchor(followup_influence_callback, color, &barrierspat_db, 
+           	       &followup_influence, goal, 1);
+
+  /* Reset the working area w. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
       followup_influence.w[i][j] = UNMARKED;
-  
+ 
   /* Now add the intrusions. */
   add_marked_intrusions(&followup_influence, color);
 
