@@ -817,6 +817,13 @@ break_through_helper(int apos, int bpos, int cpos,
 		return CUT;
 	      }
 	    }
+	    else {
+	      /* Lost everything. (Note we ignore ko at the moment.) */
+	      popgo();
+	      popgo();
+	      popgo();
+	      return 0;
+	    }
 	    popgo();
 	  }
 	  popgo();

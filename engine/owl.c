@@ -4663,7 +4663,7 @@ push_owl(struct local_owl_data **owla, struct local_owl_data **owlb)
 static void
 pop_owl(struct local_owl_data **owl)
 {
-  int nodes = (*owl)->local_owl_node_counter;
+  int nodes = owl_stack[owl_stack_pointer].local_owl_node_counter;
 
   *owl = &(owl_stack[owl_stack[owl_stack_pointer].restore_from]);
 

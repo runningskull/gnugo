@@ -131,7 +131,7 @@ ba*x
 ----
 
 ; marginal_eye(*) && proper_eye(a) && proper_eye(b)
-; && xplay_attack(*,a,c)
+; && xplay_attack(*,a,c) && !xplay_attack(*,c)
 
 
 Pattern EE2

@@ -1613,10 +1613,11 @@ o!X
 :8,B,value(30)
 
 ?Xx
-Qa.
+ba.
 o!X
 
 ;safe_omove(a)
+>return (!xplay_attack(a,b));
 
 
 Pattern Intrusion40
@@ -1679,7 +1680,7 @@ Pattern Intrusion43
 ;lib(A)==2 && !attack(A) && !oplay_attack(b,c,d,d)
 
 
-Pattern Intrusion44
+Pattern Intrusion44a
 # gf New pattern. (3.1.20)
 
 .XQ
@@ -1694,6 +1695,26 @@ bae
 ;&& (o_somewhere(e) || oplay_attack(a,e,e))
 ;&& !oplay_defend_both(a,b,c,b,D)
 >return (!xplay_attack(a,f) && (o_somewhere(e) || (!xplay_attack(e,f))));
+
+
+Pattern Intrusion44b
+# ab New pattern. (3.3.5)
+
+..X?
+.XQo
+!!o?
+
+:8,B,value(30)
+
+.dG?
+eFho
+cab?
+
+
+;safe_omove(a)
+;&& (o_somewhere(b) || oplay_attack(a,b,b))
+;&& !oplay_defend_both(a,c,d,e,F,G)
+>return (!xplay_attack(a,h));
 
 
 Pattern Intrusion45
@@ -1808,7 +1829,7 @@ dXa
 ;!oplay_attack_either(a,b,c,c,d)
 
 
-Pattern Intrusion51
+Pattern Intrusion51a
 
 ?Q?
 X.X
@@ -1816,12 +1837,32 @@ X.X
 
 :|,B,value(30)
 
-?Q?
-cad
+?e?
+CaD
 .b.
 
-;oplay_break_through(a,b,c,b,d)
->return(!xplay_attack(a,b));
+;oplay_break_through(a,b,C,b,D)
+>return(!xplay_attack(a,e));
+
+
+Pattern Intrusion51b
+# ab New pattern. (3.3.5)
+# This is a bit incorrect, as usually X can choose on which side the
+# intrusion is allowed to happen.
+# Due to reading depth limitations, oplay_break_through == CUT is not
+# sufficient (see nngs1:40).
+
+?O?
+XQX
+!X!
+
+:|,BX,value(20)
+
+?O?
+aQc
+.b.
+
+;(oplay_break_through(a,b,c)==WIN)
 
 
 Pattern Intrusion52
@@ -1832,6 +1873,12 @@ Q!.
 .X.
 
 :8,B,value(30)
+
+X.x
+ba.
+.X.
+
+>return (!xplay_attack(a,b));
 
 
 Pattern Intrusion53

@@ -2,9 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in break_through_helper()
 - bugfix in combinations()
 - reduced_init_owl() allocates bigger owl stack with --experimental-semeai
-- bugfix in pop_owl(): don't crash if owl stack has moved
+- bugfixes in pop_owl(): don't crash if owl stack has moved
 - reduce reading depth by one in influence pattern matching
 - new struct reading_moves in reading.c
 - owl stack can now handle two local_owl_data structs
@@ -18,6 +19,7 @@
 - bugfix in play_ascii.c: don't crash on unusual boardsizes
 - dead stones with no neighbors are captured territory
 - improved debug traces in score.c
+- influence pattern tuning
 - new tests and regressions
 
 3.3.4 released June 19, 2002
