@@ -460,7 +460,7 @@ Pattern EB24
 Pattern EB25
 # tm New Pattern (3.1.22)
 
-O!.  cutable keima on edge.
+O!.  cutable keima on edge
 .*O
 .!.
 ---
@@ -909,7 +909,7 @@ B.?
 #
 ########################
 
-# Static connections needs almost everything
+# Static connections need almost everything
 callback_data .Oxo,!
 
 
@@ -1021,7 +1021,7 @@ cbdf
 #
 ##############################################
 
-# Static connections needs almost everything
+# Static connections need almost everything
 callback_data .Oxo,!
 
 

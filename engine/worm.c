@@ -1611,7 +1611,7 @@ attack_callback(int anchor, int color, struct pattern *pattern, int ll,
 #endif
       
       /* FIXME: Don't attack the same string more than once.
-       * Play (ti, tj) and see if there is a defense.
+       * Play (move) and see if there is a defense.
        */
       if (trymove(move, color, "attack_callback", str, EMPTY, NO_MOVE)) {
 	int dcode;

@@ -129,7 +129,6 @@ find_more_attack_and_defense_moves(int color)
 {
   int unstable_worms[MAX_WORMS];
   int N = 0;  /* number of unstable worms */
-  int m, n;
   int ii;
   int k;
   int other = OTHER_COLOR(color);
@@ -138,134 +137,129 @@ find_more_attack_and_defense_moves(int color)
   TRACE("\nLooking for additional attack and defense moves. Trying moves ...\n");
   
   /* Identify the unstable worms and store them in a list. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n  <board_size; n++) {
-      ii = POS(m, n);
-
-      if (board[ii]
-	  && worm[ii].origin == ii
-	  && worm[ii].attack_codes[0] != 0
-	  && worm[ii].defense_codes[0] != 0) {
-	unstable_worms[N] = ii;
-	N++;
-      }
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    if (IS_STONE(board[ii])
+	&& worm[ii].origin == ii
+	&& worm[ii].attack_codes[0] != 0
+	&& worm[ii].defense_codes[0] != 0) {
+      unstable_worms[N] = ii;
+      N++;
     }
+  }
   
   /* To avoid horizon effects, we temporarily increase the depth values. */
   increase_depth_values();
   
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
-
-      for (k = 0; k < MAX_REASONS; k++) {
-	int r = move[ii].reason[k];
-	int what;
-
-	if (r < 0)
-	  break;
-	what = move_reasons[r].what;
-	if (move_reasons[r].type == ATTACK_MOVE
-	    || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
-	    || move_reasons[r].type == ATTACK_MOVE_BAD_KO
-	    || move_reasons[r].type == DEFEND_MOVE
-	    || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
-	    || move_reasons[r].type == DEFEND_MOVE_BAD_KO
-	    || move_reasons[r].type == CONNECT_MOVE
-	    || move_reasons[r].type == CUT_MOVE)
-	  break;
-	/* FIXME: Add code for EITHER_MOVE and ALL_MOVE here. */
-      }
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    if (!ON_BOARD(ii))
+      continue;
+    
+    for (k = 0; k < MAX_REASONS; k++) {
+      int r = move[ii].reason[k];
+      int what;
       
-      if (k == MAX_REASONS || move[ii].reason[k] == -1)
-	continue;
-
-      /* Try the move at (ii) and see what happens. */
-      cursor_at_start_of_line = 0;
-      TRACE("%1m ", ii);
-      if (trymove(ii, color, "find_more_attack_and_defense_moves",
-		  NO_MOVE, EMPTY, NO_MOVE)) {
-	for (k = 0; k < N; k++) {
-	  int aa = unstable_worms[k];
-
-	  /* string of our color, see if there still is an attack,
-	   * unless we already know the move works as defense move.
-	   */
-	  if (board[aa] == color
-	      && !defense_move_reason_known(ii, unstable_worms[k])) {
-	    int acode = attack(aa, NULL);
-	    if (acode < worm[aa].attack_codes[0]) {
-	      /* Maybe attack() doesn't find the attack. Try to
-	       * attack with the stored attack move.
-	       */
-	      int defense_works = 1;
-
-	      if (trymove(worm[aa].attack_points[0], other, 
-			  "find_more_attack_and_defense_moves", 0,
-			  EMPTY, 0)) {
-		if (!board[aa])
-		  defense_works = 0;
-		else {
-		  int this_acode = REVERSE_RESULT(find_defense(aa, NULL));
-		  if (this_acode > acode) {
-		    acode = this_acode;
-		    if (acode >= worm[aa].attack_codes[0])
-		      defense_works = 0;
-		  }
+      if (r < 0)
+	break;
+      what = move_reasons[r].what;
+      if (move_reasons[r].type == ATTACK_MOVE
+	  || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
+	  || move_reasons[r].type == ATTACK_MOVE_BAD_KO
+	  || move_reasons[r].type == DEFEND_MOVE
+	  || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
+	  || move_reasons[r].type == DEFEND_MOVE_BAD_KO
+	  || move_reasons[r].type == CONNECT_MOVE
+	  || move_reasons[r].type == CUT_MOVE)
+	break;
+      /* FIXME: Add code for EITHER_MOVE and ALL_MOVE here. */
+    }
+    
+    if (k == MAX_REASONS || move[ii].reason[k] == -1)
+      continue;
+    
+    /* Try the move at (ii) and see what happens. */
+    cursor_at_start_of_line = 0;
+    TRACE("%1m ", ii);
+    if (trymove(ii, color, "find_more_attack_and_defense_moves",
+		NO_MOVE, EMPTY, NO_MOVE)) {
+      for (k = 0; k < N; k++) {
+	int aa = unstable_worms[k];
+	
+	/* string of our color, see if there still is an attack,
+	 * unless we already know the move works as defense move.
+	 */
+	if (board[aa] == color
+	    && !defense_move_reason_known(ii, unstable_worms[k])) {
+	  int acode = attack(aa, NULL);
+	  if (acode < worm[aa].attack_codes[0]) {
+	    /* Maybe attack() doesn't find the attack. Try to
+	     * attack with the stored attack move.
+	     */
+	    int defense_works = 1;
+	    
+	    if (trymove(worm[aa].attack_points[0], other, 
+			"find_more_attack_and_defense_moves", 0, EMPTY, 0)) {
+	      if (!board[aa])
+		defense_works = 0;
+	      else {
+		int this_acode = REVERSE_RESULT(find_defense(aa, NULL));
+		if (this_acode > acode) {
+		  acode = this_acode;
+		  if (acode >= worm[aa].attack_codes[0])
+		    defense_works = 0;
 		}
-		popgo();
 	      }
-		
-	      if (defense_works) {
-		if (!cursor_at_start_of_line)
-		  TRACE("\n");
-		TRACE("%ofound extra point of defense of %1m at %1m code %d\n",
-		      aa, ii, REVERSE_RESULT(acode));
-		cursor_at_start_of_line = 1;
-		add_defense_move(ii, aa, REVERSE_RESULT(acode));
-	      }
+	      popgo();
 	    }
-	  }
 	    
-	  /* string of opponent color, see if there still is a defense,
-	   * unless we already know the move works as attack move.
-	   */
-	  if (board[aa] == other
-	      && !attack_move_reason_known(ii, unstable_worms[k])) {
-	    
-	    int dcode = find_defense(aa, NULL);
-	    if (dcode < worm[aa].defense_codes[0]) {
-	      /* Maybe find_defense() doesn't find the defense. Try to
-	       * defend with the stored defense move.
-	       */
-	      int attack_works = 1;
-
-	      if (trymove(worm[aa].defense_points[0], other, 
-			  "find_more_attack_and_defense_moves", 0,
-			  EMPTY, 0)) {
-		int this_dcode = REVERSE_RESULT(attack(aa, NULL));
-		if (this_dcode > dcode) {
-		  dcode = this_dcode;
-		  if (dcode >= worm[aa].defense_codes[0])
-		    attack_works = 0;
-		}
-		popgo();
-	      }
-		
-	      if (attack_works) {
-		if (!cursor_at_start_of_line)
-		  TRACE("\n");
-		TRACE("%ofound extra point of attack of %1m at %1m code %d\n",
-		      aa, ii, REVERSE_RESULT(dcode));
-		cursor_at_start_of_line = 1;
-		add_attack_move(ii, aa, REVERSE_RESULT(dcode));
-	      }
+	    if (defense_works) {
+	      if (!cursor_at_start_of_line)
+		TRACE("\n");
+	      TRACE("%ofound extra point of defense of %1m at %1m code %d\n",
+		    aa, ii, REVERSE_RESULT(acode));
+	      cursor_at_start_of_line = 1;
+	      add_defense_move(ii, aa, REVERSE_RESULT(acode));
 	    }
 	  }
 	}
-	popgo();
+	
+	/* string of opponent color, see if there still is a defense,
+	 * unless we already know the move works as attack move.
+	 */
+	if (board[aa] == other
+	    && !attack_move_reason_known(ii, unstable_worms[k])) {
+	  
+	  int dcode = find_defense(aa, NULL);
+	  if (dcode < worm[aa].defense_codes[0]) {
+	    /* Maybe find_defense() doesn't find the defense. Try to
+	     * defend with the stored defense move.
+	     */
+	    int attack_works = 1;
+	    
+	    if (trymove(worm[aa].defense_points[0], other, 
+			"find_more_attack_and_defense_moves", 0, EMPTY, 0)) {
+	      int this_dcode = REVERSE_RESULT(attack(aa, NULL));
+	      if (this_dcode > dcode) {
+		dcode = this_dcode;
+		if (dcode >= worm[aa].defense_codes[0])
+		  attack_works = 0;
+	      }
+	      popgo();
+	    }
+	    
+	    if (attack_works) {
+	      if (!cursor_at_start_of_line)
+		TRACE("\n");
+	      TRACE("%ofound extra point of attack of %1m at %1m code %d\n",
+		    aa, ii, REVERSE_RESULT(dcode));
+	      cursor_at_start_of_line = 1;
+	      add_attack_move(ii, aa, REVERSE_RESULT(dcode));
+	    }
+	  }
+	}
       }
+      popgo();
     }
+  }
   
   TRACE("\n");
   decrease_depth_values();
@@ -2859,15 +2853,12 @@ remove_top_move(int move)
 
 /* This function is called if the biggest move on board was an illegal
  * ko capture.
- * FIXME: We need a check here whether the threat still works after
- * the opponent fills in the ko (or resolves it in another way.)
  */
 static void
 reevaluate_ko_threats(int ko_move, int color)
 {
   int ko_stone = NO_MOVE;
   int opp_ko_move;
-  int m, n;
   int pos;
   int k;
   int type, what;
@@ -2886,27 +2877,25 @@ reevaluate_ko_threats(int ko_move, int color)
   ASSERT_ON_BOARD1(ko_stone);
   
   TRACE("Reevaluating ko threats.\n");
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-      if (pos == ko_move)
-        continue;
-      if (move[pos].additional_ko_value <= 0.0) 
-        continue;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos) || pos == ko_move)
+      continue;
+    if (move[pos].additional_ko_value <= 0.0) 
+      continue;
 
-      /* Otherwise we look for the biggest threat, and then check whether
-       * it still works after ko has been resolved.
-       */
-      threat_size = 0.0;
-      type = -1;
-      what = -1;
-      for (k = 0; k < MAX_REASONS; k++) {
-        int r = move[pos].reason[k];
-        if (r < 0)
-          break;
-        if (!(move_reasons[r].type & THREAT_BIT))
-          continue;
-        switch (move_reasons[r].type) {
+    /* Otherwise we look for the biggest threat, and then check whether
+     * it still works after ko has been resolved.
+     */
+    threat_size = 0.0;
+    type = -1;
+    what = -1;
+    for (k = 0; k < MAX_REASONS; k++) {
+      int r = move[pos].reason[k];
+      if (r < 0)
+	break;
+      if (!(move_reasons[r].type & THREAT_BIT))
+	continue;
+      switch (move_reasons[r].type) {
         case ATTACK_THREAT:
         case DEFEND_THREAT:
           if (worm[move_reasons[r].what].effective_size
@@ -2922,7 +2911,7 @@ reevaluate_ko_threats(int ko_move, int color)
           if (dragon[move_reasons[r].what].effective_size
               > threat_size) {
             threat_size = dragon[move_reasons[r].what]\
-                          .effective_size;
+	      .effective_size;
             type = move_reasons[r].type;
             what = move_reasons[r].what;
           }
@@ -2933,24 +2922,24 @@ reevaluate_ko_threats(int ko_move, int color)
            */
           gg_assert(0);
           break;
-        }
-      } 
-      /* If there is no threat recorded, the followup value is probably
-       * contributed by a pattern. We can do nothing but accept this value.
-       * (although this does cause problems).
-       */
-      if (type == -1)
-        threat_does_work = 1;
-      else {
-        if (trymove(pos, color, "reevaluate_ko_threats", ko_move,
-                    EMPTY, ko_move)) {
-	  ASSERT_ON_BOARD1(ko_stone);
-          if (!find_defense(ko_stone, &opp_ko_move))
-            threat_does_work = 1;
-          else {
-            if (trymove(opp_ko_move, OTHER_COLOR(color),
-                        "reevaluate_ko_threats", ko_move, EMPTY, NO_MOVE)) {
-              switch (type) {
+      }
+    } 
+    /* If there is no threat recorded, the followup value is probably
+     * contributed by a pattern. We can do nothing but accept this value.
+     * (although this does cause problems).
+     */
+    if (type == -1)
+      threat_does_work = 1;
+    else {
+      if (trymove(pos, color, "reevaluate_ko_threats", ko_move,
+		  EMPTY, ko_move)) {
+	ASSERT_ON_BOARD1(ko_stone);
+	if (!find_defense(ko_stone, &opp_ko_move))
+	  threat_does_work = 1;
+	else {
+	  if (trymove(opp_ko_move, OTHER_COLOR(color),
+		      "reevaluate_ko_threats", ko_move, EMPTY, NO_MOVE)) {
+	    switch (type) {
               case ATTACK_THREAT:
                 threat_does_work = attack(what, NULL);
                 break;
@@ -2966,34 +2955,34 @@ reevaluate_ko_threats(int ko_move, int color)
                  * same dragon as ko_move. (Can this really happen?)
                  */
                 threat_does_work = (ko_move_target != what);
-              }
-              popgo();
-
-	      /* Is this a losing ko threat? */
-	      if (threat_does_work && type == ATTACK_THREAT) {
-		int apos;
-		if (attack(pos, &apos)
-		    && does_defend(apos, what)
-		    && !is_proper_eye_space(apos)) {
-		  threat_does_work = 0;
-		}
+	    }
+	    popgo();
+	    
+	    /* Is this a losing ko threat? */
+	    if (threat_does_work && type == ATTACK_THREAT) {
+	      int apos;
+	      if (attack(pos, &apos)
+		  && does_defend(apos, what)
+		  && !is_proper_eye_space(apos)) {
+		threat_does_work = 0;
 	      }
-            }
-          }
-          popgo();
-        }
+	    }
+	  }
+	}
+	popgo();
       }
- 
-      if (threat_does_work) {
-	TRACE("%1m: %f + %f = %f\n", pos, move[pos].value,
-	      move[pos].additional_ko_value,
-	      move[pos].value + move[pos].additional_ko_value);
-	move[pos].value += move[pos].additional_ko_value;
-      }
-      else
-        DEBUG(DEBUG_MOVE_REASONS,
-              "%1m: no additional ko value (threat does not work as ko threat)\n", pos);
     }
+    
+    if (threat_does_work) {
+      TRACE("%1m: %f + %f = %f\n", pos, move[pos].value,
+	    move[pos].additional_ko_value,
+	    move[pos].value + move[pos].additional_ko_value);
+      move[pos].value += move[pos].additional_ko_value;
+    }
+    else
+      DEBUG(DEBUG_MOVE_REASONS,
+	    "%1m: no additional ko value (threat does not work as ko threat)\n", pos);
+  }
 }
 
 

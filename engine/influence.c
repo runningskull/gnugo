@@ -1810,7 +1810,8 @@ influence_evaluate_position(int color, float *power, float *game_status)
 /* Export game advancement status (fuseki, chuban, yose)
  * Returned as a value between 0.0 (start) and 1.0 (game over)
  */
-float game_status(int color)
+float
+game_status(int color)
 {
   float status;
   influence_evaluate_position(color, NULL, &status);

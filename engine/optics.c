@@ -3028,7 +3028,7 @@ analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
   vertices[num_vertices++] = POS(0, 0);
 
   /* Add small invincible black groups in contact with the marginal
-   * vertices, without dstroying the connectivity of the white stones.
+   * vertices, without destroying the connectivity of the white stones.
    *
    * FIXME: This algorithm is somewhat crude and may fail to add all
    * black groups if unlucky.

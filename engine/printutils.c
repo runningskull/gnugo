@@ -243,15 +243,15 @@ DEBUG_func(int flag, const char *fmt, ...)
 
 /*
  * A wrapper around abort() which shows the state variables at the time
- * of the problem.  (x, y) are typically a related move, or -1, -1.
+ * of the problem. (pos) is typically a related move, or NO_MOVE.
  */
 
 void 
-abortgo(const char *file, int line, const char *msg, int x, int y)
+abortgo(const char *file, int line, const char *msg, int pos)
 {
   verbose = 4;
-  TRACE("%o\n\n***assertion failure:\n%s:%d - %s near %m***\n\n",
-	file, line, msg, x, y);
+  TRACE("%o\n\n***assertion failure:\n%s:%d - %s near %1m***\n\n",
+	file, line, msg, pos);
   dump_stack();
 
   /* Dump the stack as board images. */

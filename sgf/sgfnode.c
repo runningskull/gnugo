@@ -57,8 +57,6 @@
 /*                     Some utility functions.                      */
 /* ================================================================ */
 
-/* General FIXME:  Move these somewhere? */
-
 /*
  * Utility: a checking, initializing malloc
  */
@@ -362,9 +360,6 @@ sgfRoot(SGFNode *node)
 
 /*
  * Make an SGF property.
- *
- * FIXME: To speed up, we should have MkMoveProperty.
- *      Comment: We *never* have any speed problems with these functions. /iw
  */
 
 SGFProperty *

@@ -405,7 +405,7 @@ float crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
 int is_same_dragon(int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
 void mark_dragon(int pos, char mx[BOARDMAX], char mark);
-int first_worm_in_dragon(int w);
+int first_worm_in_dragon(int d);
 int next_worm_in_dragon(int w);
 int lively_dragon_exists(int color);
 void compute_dragon_influence(void);
@@ -1086,8 +1086,9 @@ int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);
 int is_false_eye(struct half_eye_data heye[BOARDMAX], int pos);
 
 /* Our own abort() which prints board state on the way out.
- * (i, j) is a "relevant" board position for info. */
-void abortgo(const char *file, int line, const char *msg, int i, int j);
+ * (pos) is a "relevant" board position for info.
+ */
+void abortgo(const char *file, int line, const char *msg, int pos);
 
 #if GG_TURN_OFF_ASSERTS
 #define ASSERT2(x, i, j)
@@ -1095,11 +1096,11 @@ void abortgo(const char *file, int line, const char *msg, int i, int j);
 #else
 /* avoid dangling else */
 /* FIXME: Should probably re-write these using do {...} while (0) idiom. */
-#define ASSERT2(x, i, j) if (x) ; else abortgo(__FILE__, __LINE__, #x, i, j)
-#define ASSERT1(x, pos) if (x) ; else abortgo(__FILE__, __LINE__, #x, I(pos), J(pos))
+#define ASSERT2(x, i, j) if (x) ; else abortgo(__FILE__, __LINE__, #x, POS(i, j))
+#define ASSERT1(x, pos) if (x) ; else abortgo(__FILE__, __LINE__, #x, pos)
 #endif
 
-#define gg_assert(x) ASSERT2(x, -1, -1);
+#define gg_assert(x) ASSERT1(x, NO_MOVE);
 
 #endif  /* _LIBERTY_H_ */
 

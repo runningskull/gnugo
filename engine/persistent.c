@@ -627,12 +627,12 @@ mark_string_hotspot_values(float values[BOARDMAX],
 void
 reading_hotspots(float values[BOARDMAX])
 {
-  int m, n, k;
+  int pos;
+  int k;
   int sum_nodes = 0;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      values[POS(m, n)] = 0.0;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    values[pos] = 0.0;
   
   /* Compute the total number of nodes for the cached entries. */
   for (k = 0; k < persistent_reading_cache_size; k++)

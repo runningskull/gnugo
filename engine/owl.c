@@ -791,7 +791,6 @@ do_owl_analyze_semeai(int apos, int bpos,
       break;
 
     /* Do not try too many moves. */
-    /* FIXME: Replace the hardcoded 6 below with a proper DEPTH constant. */
     if (tested_moves > 2
 	|| (stackp > semeai_branch_depth2 && tested_moves > 1)
 	|| (stackp > semeai_branch_depth && tested_moves > 0)) {
@@ -1594,6 +1593,9 @@ do_owl_attack(int str, int *move, int *wormid,
 
       /* Consider only the highest scoring move if we're deeper than
        * owl_branch_depth.
+       *
+       * FIXME: To behave as intended, k should be replaced by
+       *        number_tried_moves.
        */
       if (stackp > owl_branch_depth && k > 0)
 	break;
@@ -1617,7 +1619,7 @@ do_owl_attack(int str, int *move, int *wormid,
       if (mw[mpos])
 	continue;
 
-      captured = (color==WHITE? white_captured : black_captured);
+      captured = (color == WHITE ? white_captured : black_captured);
 
       /* Try to make the move. */
       if (!komaster_trymove(mpos, other, moves[k].name, str,
@@ -1625,7 +1627,7 @@ do_owl_attack(int str, int *move, int *wormid,
 			    &ko_move, savecode == 0))
 	continue;
 
-      captured = (color==WHITE? white_captured : black_captured) - captured;
+      captured = (color == WHITE ? white_captured : black_captured) - captured;
 
       TRACE("Trying %C %1m. Escape = %d. Current stack: ",
 	    other, mpos, escape);
@@ -2163,6 +2165,9 @@ do_owl_defend(int str, int *move, int *wormid,
       
       /* Consider only the highest scoring move if we're deeper than
        * owl_branch_depth.
+       *
+       * FIXME: To behave as intended, k should be replaced by
+       *        number_tried_moves.
        */
       if (stackp > owl_branch_depth && k > 0)
 	break;
@@ -2500,7 +2505,6 @@ owl_determine_life(struct local_owl_data *owl,
   int dummy_eyemin = 0;
   int dummy_eyemax = 0;
   struct eyevalue eyevalue;
-  /* FIXME: use MAX_EYES from move_reasons.h ? */
   struct eyevalue eyevalue_list[BOARDMAX/2];
   int eyes_attack_points[BOARDMAX/2];
   int pessimistic_min;
@@ -2547,8 +2551,10 @@ owl_determine_life(struct local_owl_data *owl,
 
   /* Reset halfeye data. Set topological eye value to something big. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    owl->half_eye[pos].type = 0;
-    owl->half_eye[pos].value = 10.0;
+    if (ON_BOARD(pos)) {
+      owl->half_eye[pos].type = 0;
+      owl->half_eye[pos].value = 10.0;
+    }
   }
   
   /* Find topological half eyes and false eyes. */
@@ -3755,7 +3761,7 @@ owl_reasons(int color)
   int pos;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos) || board[pos] == EMPTY
+    if (!IS_STONE(board[pos])
         || dragon[pos].origin != pos)
       continue;
     if (dragon[pos].status == CRITICAL

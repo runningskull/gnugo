@@ -113,7 +113,6 @@ Pattern Barrier4b
 |,o?
 |.OX
 
-
 :8,OD
 
 |ao?
@@ -2146,11 +2145,11 @@ Pattern Intrusion59
 
 |x!xx
 |.!.x
-|.B.C
+|.X.B
 |AQO?
 |.oo?
 
-;!attack(A) && oplay_disconnect(A,C) && !attack(C)
+;!attack(A) && oplay_disconnect(A,B) && !attack(B)
 
 
 Pattern Nonterritory1

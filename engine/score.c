@@ -396,13 +396,11 @@ estimate_score(float *upper, float *lower)
       }
     }
     if (chinese_rules) {
-      DEBUG(DEBUG_SCORING,
-	    "in row %d, white area=%d, black=%d\n",
-	  board_size - i, white_area_in_row, black_area_in_row);
+      DEBUG(DEBUG_SCORING, "in row %d, white area=%d, black=%d\n",
+	    board_size - i, white_area_in_row, black_area_in_row);
     }
     else {
-      DEBUG(DEBUG_SCORING, 
-	    "in row %d, white territory=%d, black=%d\n",
+      DEBUG(DEBUG_SCORING, "in row %d, white territory=%d, black=%d\n",
 	    board_size - i, white_territory_in_row, black_territory_in_row);
     }
   }
@@ -476,8 +474,7 @@ estimate_score(float *upper, float *lower)
 	      board_size-i, white_area_in_row, black_area_in_row);
       }
       else {
-	DEBUG(DEBUG_SCORING, 
-	      "in row %d, white territory=%d, black=%d\n",
+	DEBUG(DEBUG_SCORING, "in row %d, white territory=%d, black=%d\n",
 	      board_size-i, white_territory_in_row, black_territory_in_row);
       }
     }

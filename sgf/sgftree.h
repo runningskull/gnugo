@@ -53,13 +53,13 @@ void *xalloc(unsigned int);
 
 typedef struct SGFProperty_t {
   struct SGFProperty_t *next;
-  short name;           /* FIXME: should be char with enumed flags */
-  char  *value;         /* FIXME: different types */
+  short name;
+  char *value;
 } SGFProperty;
 
     
 typedef struct SGFNode_t {
-  SGFProperty      *props;
+  SGFProperty *props;
   struct SGFNode_t *parent;
   struct SGFNode_t *child;
   struct SGFNode_t *next;

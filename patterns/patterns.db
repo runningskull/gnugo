@@ -5859,6 +5859,27 @@ O...
 :8,OXed
 
 
+Pattern EB1022
+# db New pattern (3.1.28)
+
+?Xxx??         simply extend to avoid bad aji
+oOX.x?
+o.O*..
+......
+------
+
+:8,O,shape(2)
+
+?Xxd??
+ocX.e?
+obO*a.
+......
+------
+
+; oplay_attack(a,b,*,c) || x_alive_somewhere(d,e)
+> replace(a,*)
+
+
 #################
 # First line push
 #################
@@ -6116,8 +6137,8 @@ Pattern EB1403
 
 :8,Xe
 
-?oD??
-b.Da?
+?oX??
+b.Xa?
 ?.*..
 -----
 
@@ -8117,8 +8138,6 @@ O.*.
 
 
 Pattern CB237
-# FIXME:  Need a connection helper to verify
-#   that * can't be cut off & die in X moyo. (see viking:13)
 # tm Modified (3.1.23)
 # gf Corrected constraint. (3.3.12)
 
@@ -9003,28 +9022,6 @@ Pattern CB334
 O.Xx
 
 :8,OX,shape(2)
-
-
-Pattern CB336
-# db New pattern (3.1.28)
-# gf FIXME: This is an edge pattern. Should be moved to EBxxx. (3.3.4)
-
-?Xxx??         simply extend to avoid bad aji
-oOX.x?
-o.O*..
-......
-------
-
-:8,O,shape(2)
-
-?Xxd??
-ocX.e?
-obO*a.
-......
-------
-
-; oplay_attack(a,b,*,c) || x_alive_somewhere(d,e)
-> replace(a,*)
 
 
 Pattern CB337
@@ -10159,7 +10156,6 @@ Pattern ED66
 # gf This pattern is way too general, see e.g. 13x13b:8.
 #    Furthermore the second half of the constraint doesn't really make
 #    sense. Consider removal. (3.3.17)
-
 
 ?x?         draw back for safety
 O.X
@@ -12745,7 +12741,7 @@ XOO.*.
 Pattern EJ75
 #tm modified (3.1.22) (see trevorc:420)
 #FIXME: Pattern still seems a bit too general
-#   consider adding appriate constraint & C attribute.
+#   consider adding appropriate constraint.
 
 .X.??           connect under
 O*.oo

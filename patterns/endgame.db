@@ -218,11 +218,12 @@ XO?       descend to edge
 :8,OXe,terri(0.1)
 
 ?ab
-XOc       descend to edge
-.*d       may quite possibly be 0 points gote
+XOc
+.*d
 ---
 
 ;o_somewhere(a,b,c,d)
+
 
 Pattern EE6
 
@@ -762,12 +763,13 @@ Pattern EE415
 |*A?
 |OXX
 |.OX
-----
++---
 
 ;alive(A)
 
 
 Pattern EE416
+# pp New pattern (3.3.18)
 
 |.OO?
 |..*X
@@ -775,14 +777,13 @@ Pattern EE416
 
 :8,OXe
 
-|.BB?
-|..aX
+|.aa?
+|..*X
 +----
 
-;xplay_attack(a,B) && !oplay_attack(a,B)
+;xplay_attack(*,a) && !oplay_attack(*,a)
 
->prevent_attack_threat(B)
-
+>prevent_attack_threat(a)
 
 
 # miscellaneous first line moves

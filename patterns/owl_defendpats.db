@@ -1103,7 +1103,7 @@ O..?
 
 
 Pattern D302
-# FIXME: This pattern looks way to general (see owl:23)
+# FIXME: This pattern looks way too general (see owl:23)
 
 XX.?          push along
 O*..
@@ -2535,24 +2535,7 @@ Oa...
 ;!obvious_false_oeye(a) && !oplay_attack(b,*,*)
 
 
-Pattern D640
-# gf New pattern. (3.3.20)
-# Compare D720.
-
-?O*.o       try to make eye on edge
-O....
------
-
-:8,-,value(56)
-
-?O*bo
-Oa...
------
-
-;!obvious_false_oeye(a) && !oplay_attack(b,*,*)
-
-
-Pattern D640
+Pattern D641
 # evand New pattern. (3.3.20)
 
 xXOO.
@@ -2568,6 +2551,23 @@ xXOOa
 -----
 
 ;!obvious_false_oeye(a) || !obvious_false_oeye(b)
+
+
+Pattern D642
+# tm New Pattern (3.1.22) (see trevord:910)
+
+X*O?     Extend side eye-space in sente
+?..o
+----
+
+:8,-,value(80)
+
+C*O?
+?bao
+----
+
+;!obvious_false_oeye(a)
+;&& oplay_attack(*,b,C)
 
 
 #########################################################
@@ -3605,24 +3605,6 @@ Pattern D838
 
 
 Pattern D839
-# tm New Pattern (3.1.22) (see trevord:910)
-# gf FIXME: This is no corner pattern, move. (3.3.18)
-
-X*O?     Extend side eye-space in sente
-?..o
-----
-
-:8,-,value(80)
-
-C*O?
-?bao
-----
-
-;!obvious_false_oeye(a)
-;&& oplay_attack(*,b,C)
-
-
-Pattern D840
 # gf New pattern. (3.3.18)
 
 |.X??     Capture lunch with threat to make second eye
@@ -5942,7 +5924,7 @@ Oxx	    connect to strong friendly dragon to escape
 
 :8,nE,value(90)
 
-a.?
+axx
 .*b
 
 ;(owl_strong_dragon(a) || owl_strong_dragon(b)) && !oplay_disconnect(*,a,b)
@@ -5954,6 +5936,7 @@ Pattern D1348d
 O.?	    connect to strong friendly dragon to escape
 .*.
 ?.O
+
 :8,nE,value(90)
 
 a.?
@@ -6623,7 +6606,7 @@ OX*X
 
 ?cbd
 o...
-OX.X
+OX*X
 ?ao?
 
 ;(owl_escape_value(b)>0 || owl_escape_value(c)>0 || owl_escape_value(d)>0)

@@ -392,7 +392,7 @@ atari_atari_blunder_size(int color, int move, int *defense,
   /* Accept illegal ko capture here. */
   if (!tryko(move, color, NULL, EMPTY, NO_MOVE))
     /* Really shouldn't happen. */
-    abortgo(__FILE__, __LINE__, "trymove", I(move), J(move));
+    abortgo(__FILE__, __LINE__, "trymove", move);
   increase_depth_values();
 
   aa_val = do_atari_atari(other, &apos, &defense_point, NULL,
@@ -789,65 +789,62 @@ static int
 atari_atari_succeeded(int color, int *attack_point, int *defense_point,
 		      int last_friendly, int save_verbose, int minsize)
 {
-  int m, n;
+  int pos;
+  int apos;
   int other = OTHER_COLOR(color);
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int ii = POS(m, n);
-      int aa;
-
-      if (board[ii] != other)
-       continue;
-
-      if (ii != find_origin(ii))
-       continue;
-
-      if (minsize > 0
-	  && get_aa_value(ii) < minsize)
-       continue;
-
-      if (get_aa_status(ii) != ALIVE)
-       continue;
-
-      if (board[last_friendly] != EMPTY
-	  && !adjacent_strings(last_friendly, ii))
-       continue;
-
-      if (board[last_friendly] == EMPTY
-	  && !liberty_of_string(last_friendly, ii))
-       continue;
-
-      if (debug & DEBUG_ATARI_ATARI)
-	gprintf("Considering attack of %1m. depth = %d.\n", ii, depth);
-
-      if (attack(ii, &aa) && !forbidden[aa]) {
-	if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
-	  gprintf("%oThe worm %1m can be attacked at %1m after ", ii, aa);
-	  dump_stack();
-	}
-	if (attack_point)
-	  *attack_point = aa;
-
-	/* We look for a move defending the combination.
-	 * Normally this is found by find_defense but failing
-	 * that, if the attacking move is a safe move for color,
-	 * it probably defends.
-	 */
-	if (defense_point) {
-	  if (!find_defense(ii, defense_point)) {
-	    if (safe_move(aa, other))
-	      *defense_point = aa;
-	    else
-	      *defense_point = NO_MOVE;
-	  }
-	}
-	
-	DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n",
-	      get_aa_value(ii), ii);
-	return get_aa_value(ii);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] != other)
+      continue;
+    
+    if (pos != find_origin(pos))
+      continue;
+    
+    if (minsize > 0
+	&& get_aa_value(pos) < minsize)
+      continue;
+    
+    if (get_aa_status(pos) != ALIVE)
+      continue;
+    
+    if (board[last_friendly] != EMPTY
+	&& !adjacent_strings(last_friendly, pos))
+      continue;
+    
+    if (board[last_friendly] == EMPTY
+	&& !liberty_of_string(last_friendly, pos))
+      continue;
+    
+    if (debug & DEBUG_ATARI_ATARI)
+      gprintf("Considering attack of %1m. depth = %d.\n", pos, depth);
+    
+    if (attack(pos, &apos) && !forbidden[apos]) {
+      if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
+	gprintf("%oThe worm %1m can be attacked at %1m after ", pos, apos);
+	dump_stack();
       }
+      if (attack_point)
+	*attack_point = apos;
+      
+      /* We look for a move defending the combination.
+       * Normally this is found by find_defense but failing
+       * that, if the attacking move is a safe move for color,
+       * it probably defends.
+       */
+      if (defense_point) {
+	if (!find_defense(pos, defense_point)) {
+	  if (safe_move(apos, other))
+	    *defense_point = apos;
+	  else
+	    *defense_point = NO_MOVE;
+	}
+      }
+      
+      DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n",
+	    get_aa_value(pos), pos);
+      return get_aa_value(pos);
     }
+  }
   
   return 0;
 }

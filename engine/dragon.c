@@ -1461,9 +1461,6 @@ show_dragons(void)
       if (w->cutstone2 > 0)
 	gprintf("- cutstone2 = %d\n", w->cutstone2);
       
-      /* FIXME: List all attack and defense points. Also list all
-       * threats.
-       */
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (w->attack_codes[k] == 0)
 	  break;
@@ -1474,9 +1471,8 @@ show_dragons(void)
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (w->defense_codes[k] == 0)
 	  break;
-	if (w->defense_codes[k] != 0)
-	  gprintf("- defendable at %1m, defend code = %d\n",
-		  w->defense_points[k], w->defense_codes[k]);
+	gprintf("- defendable at %1m, defend code = %d\n",
+		w->defense_points[k], w->defense_codes[k]);
       }
       
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
@@ -1489,9 +1485,8 @@ show_dragons(void)
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (w->defense_threat_codes[k] == 0)
 	  break;
-	if (w->defense_threat_codes[k] != 0)
-	  gprintf("- defense threat at %1m, defense threat code = %d\n",
-		  w->defense_threat_points[k], w->defense_threat_codes[k]);
+	gprintf("- defense threat at %1m, defense threat code = %d\n",
+		w->defense_threat_points[k], w->defense_threat_codes[k]);
       }
       
       if (w->lunch != NO_MOVE)
@@ -1573,7 +1568,6 @@ show_dragons(void)
 static void
 dragon_eye(int pos, struct eye_data eye[BOARDMAX])
 {
-  int i, j;
   int ii;
   int dr = NO_MOVE;
   int color;
@@ -1591,27 +1585,27 @@ dragon_eye(int pos, struct eye_data eye[BOARDMAX])
     color = WHITE;
   }
 
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
-
-      if (eye[ii].origin == pos
-	  && !eye[ii].marginal
-	  && !(eye[ii].type & INHIBIT_CONNECTION)) {
-	for (k = 0; k < 4; k++) {
-	  int d = delta[k];
-
-	  if (board[ii+d] == color) {
-	    if (dr == NO_MOVE)
-	      dr = dragon[ii+d].origin;
-	    else if (dragon[ii+d].origin != dr) {
-	      join_dragons(ii+d, dr);
-	      dr = dragon[ii+d].origin;
-	    }
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    if (!ON_BOARD(ii))
+      continue;
+    
+    if (eye[ii].origin == pos
+	&& !eye[ii].marginal
+	&& !(eye[ii].type & INHIBIT_CONNECTION)) {
+      for (k = 0; k < 4; k++) {
+	int d = delta[k];
+	
+	if (board[ii+d] == color) {
+	  if (dr == NO_MOVE)
+	    dr = dragon[ii+d].origin;
+	  else if (dragon[ii+d].origin != dr) {
+	    join_dragons(ii+d, dr);
+	    dr = dragon[ii+d].origin;
 	  }
 	}
       }
     }
+  }
 }
 
 
@@ -2265,13 +2259,13 @@ mark_dragon(int pos, char mx[BOARDMAX], char mark)
  * for (ii = first_worm_in_dragon(pos); ii != NO_MOVE;
  *      ii = next_worm_in_dragon(ii);)
  *   ...
- * At the moment first_worm(pos) will always be the origin of the dragon,
- * but you should not rely on that.
+ * At the moment first_worm_in_dragon(pos) will always be the origin
+ * of the dragon, but you should not rely on that.
  */
 int
-first_worm_in_dragon(int w)
+first_worm_in_dragon(int d)
 {
-  return dragon[w].origin;
+  return dragon[d].origin;
 }
 
 int
