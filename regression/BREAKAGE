@@ -1,3 +1,14 @@
+======================= 3.3.12 pre 2  =========================
+
+./regress.sh . owl_rot.tst 
+125 unexpected PASS!
+./regress.sh . strategy4.tst 
+179 unexpected FAIL: Correct 'P3|O2|P2|O4|E2', got 'O5'
+./regress.sh . nngs3.tst 
+130 unexpected PASS!
+./regress.sh . century2002.tst 
+200 unexpected FAIL: Correct 'F6', got 'G6'
+
 ======================= 3.3.12 pre 1  =========================
 
 ./regress.sh . reading.tst 
