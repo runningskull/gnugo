@@ -162,11 +162,11 @@ static int attack3(int str, int *move, int komaster, int kom_pos);
 static int attack4(int str, int *move, int komaster, int kom_pos);
 static void find_cap_moves(int str, struct reading_moves *moves);
 static void special_attack2_moves(int str, int libs[2],
-				 struct reading_moves *moves);
+				  struct reading_moves *moves);
 static void special_attack3_moves(int str, int libs[2],
-				 struct reading_moves *moves);
+				  struct reading_moves *moves);
 static void special_attack4_moves(int str, int libs[2],
-				 struct reading_moves *moves);
+				  struct reading_moves *moves);
 static void draw_back_moves(int str, struct reading_moves *moves);
 static void edge_closing_backfill_moves(int str, int apos,
 					struct reading_moves *moves);
@@ -3114,8 +3114,8 @@ attack2(int str, int *move, int komaster, int kom_pos)
 
   RTRACE("checking attack on %1m with 2 liberties\n", str);
 
-  for(pass = 0; pass < 4; pass++) {
-  
+  for (pass = 0; pass < 4; pass++) {
+    
     if (pass == 0) {
       /* The attack may fail if a boundary string is in atari and cannot
        * be defended.  First we must try defending such a string.
@@ -3166,7 +3166,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
 	        && board[WEST(apos)] != other
 	        && board[NORTH(apos)] != other
 	        && board[EAST(apos)] != other)
-	     || !is_self_atari(apos, other))
+	    || !is_self_atari(apos, other))
           ADD_CANDIDATE_MOVE(apos, 0, moves);
 
         /* Try backfilling if atari is impossible. */
@@ -3498,56 +3498,58 @@ attack3(int str, int *move, int komaster, int kom_pos)
       saved_num_moves = moves.num;
     }
 
-  if (pass == 3) {
-  /* If nothing else works, we try filling a liberty of the
-   * super_string.
-   */
-  if (level >= 10 && stackp <= backfill2_depth) {
-    int ss_liberties;
-    int ss_libs[MAX_LIBERTIES + 4];
-
-    find_superstring_liberties(str, &ss_liberties, ss_libs, 3);
-    if (ss_liberties <= 5) {
-      for (k = 0; k < ss_liberties; k++) {
-	int apos = ss_libs[k];
+    if (pass == 3) {
+      /* If nothing else works, we try filling a liberty of the
+       * super_string.
+       */
+      if (level >= 10 && stackp <= backfill2_depth) {
+	int ss_liberties;
+	int ss_libs[MAX_LIBERTIES + 4];
 	
-	if (liberty_of_string(apos, str))
-	  continue;
-	if (trymove(apos, other, "attack3-E", str, komaster, kom_pos)) {
-	  if (countlib(apos) == 1) {
-	    /* can't atari, try backfilling */
-	    findlib(apos, 1, &xpos);
-	    if (approxlib(xpos, other, 2, NULL) > 1) {
-	      popgo();
-	      if (trymove(xpos, other, "attack3-F", str, komaster, kom_pos)) {
+	find_superstring_liberties(str, &ss_liberties, ss_libs, 3);
+	if (ss_liberties <= 5) {
+	  for (k = 0; k < ss_liberties; k++) {
+	    int apos = ss_libs[k];
+	    
+	    if (liberty_of_string(apos, str))
+	      continue;
+	    if (trymove(apos, other, "attack3-E", str, komaster, kom_pos)) {
+	      if (countlib(apos) == 1) {
+		/* can't atari, try backfilling */
+		findlib(apos, 1, &xpos);
+		if (approxlib(xpos, other, 2, NULL) > 1) {
+		  popgo();
+		  if (trymove(xpos, other, "attack3-F", str,
+			      komaster, kom_pos)) {
+		    dcode = do_find_defense(str, NULL, komaster, kom_pos);
+		    if (dcode != WIN
+			&& do_attack(str, NULL, komaster, kom_pos)) {
+		      popgo();
+		      CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+				   "attack effective");
+		    }
+		    else
+		      popgo();
+		  }
+		}
+		else
+		  popgo();
+	      }
+	      else {
 		dcode = do_find_defense(str, NULL, komaster, kom_pos);
 		if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 		  popgo();
-		  CHECK_RESULT(savecode, savemove, dcode, xpos, move,
-		    	       "attack effective");
+		  CHECK_RESULT(savecode, savemove, dcode, apos, move,
+			       "attack effective");
 		}
 		else
 		  popgo();
 	      }
 	    }
-	    else
-	      popgo();
-	  }
-	  else {
-	    dcode = do_find_defense(str, NULL, komaster, kom_pos);
-	    if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-	      popgo();
-	      CHECK_RESULT(savecode, savemove, dcode, apos, move,
-			   "attack effective");
-	    }
-	    else
-	      popgo();
 	  }
 	}
       }
     }
-  }
-  }
   }
   RETURN_RESULT(savecode, savemove, move, "saved move");
 }
@@ -3663,8 +3665,8 @@ attack4(int str, int *move, int komaster, int kom_pos)
 			     0 && stackp <= ko_depth && savecode == 0)) {
           if (!ko_move) {
 	    dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
-	    if (dcode != WIN && do_attack(str, NULL, new_komaster,
-				          new_kom_pos)) {
+	    if (dcode != WIN
+		&& do_attack(str, NULL, new_komaster, new_kom_pos)) {
 	      popgo();
 	      CHECK_RESULT(savecode, savemove, dcode, xpos, move,
 	    	           "attack effective");
