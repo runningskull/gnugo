@@ -196,6 +196,12 @@ static int liberty_of_goal(int i, int j, struct local_owl_data *owl);
 static int matches_found;
 static char found_matches[MAX_BOARD][MAX_BOARD];
 
+static struct local_owl_data *owl_stack = NULL;
+static int owl_stack_size = 0;
+static int owl_stack_pointer = 0;
+static void push_owl(struct local_owl_data *owl);
+static void pop_owl(struct local_owl_data *owl);
+
 /* Called when (ai,aj) and (bi,bj) point to adjacent dragons
  * of the opposite color, both with matcher_status DEAD or
  * CRITICAL, analyzes the semeai, assuming that the player
@@ -873,7 +879,6 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
   struct owl_move_data shape_moves[MAX_MOVES];
   struct owl_move_data *moves;
   char mw[MAX_BOARD][MAX_BOARD];
-  struct local_owl_data saved_owl;
   int number_tried_moves = 0;
   int pass;
   int k;
@@ -991,8 +996,6 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
     }
   }
 
-  saved_owl = *owl;   /* struct copy */
-  
   /* We try moves in five passes.
    *                                stackp==0   stackp>0
    * 0. Vital moves in the interval  [70..]      [45..]
@@ -1172,6 +1175,7 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
       TRACE("Trying %C %m\n", other, mi, mj);
       
       /* We have now made a move. Analyze the new position. */
+      push_owl(owl);
       mw[mi][mj] = 1;
       number_tried_moves++;
       owl->lunches_are_current = 0;
@@ -1208,9 +1212,7 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
 			      new_kom_i, new_kom_j);
       if (!ko_move) {
 	if (dcode == 0) {
-	  int nodes = owl->local_owl_node_counter;
-	  *owl = saved_owl;   /* struct copy */
-	  owl->local_owl_node_counter = nodes;
+	  pop_owl(owl);
 	  popgo();
 	  if (om == -1) {
 	    SGFTRACE(mi, mj, WIN, "all original stones captured");
@@ -1244,11 +1246,7 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
 	}
       }
     
-      {
-	int nodes = owl->local_owl_node_counter;
-	*owl = saved_owl;   /* struct copy */
-	owl->local_owl_node_counter = nodes;
-      }
+      pop_owl(owl);
       popgo();
     }
   }
@@ -1454,7 +1452,6 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
   char mw[MAX_BOARD][MAX_BOARD];
   int number_tried_moves = 0;
   int pass;
-  struct local_owl_data saved_owl;
   int k;
   int savei = -1;
   int savej = -1;
@@ -1598,8 +1595,6 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
     }
   }
 
-  saved_owl = *owl;   /* struct copy */
-  
   /* We try moves in four passes.
    *                                stackp==0   stackp>0
    * 0. Vital moves in the interval  [70..]      [45..]
@@ -1724,6 +1719,7 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
       TRACE("Trying %C %m\n", color, mi, mj);
 
       /* We have now made a move. Analyze the new position. */
+      push_owl(owl);
       mw[mi][mj] = 1;
       number_tried_moves++;
       owl->lunches_are_current = 0;
@@ -1737,9 +1733,7 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
 	acode = do_owl_attack(m, n, NULL, NULL, owl,
 			      new_komaster, new_kom_i, new_kom_j);
 	if (!acode) {
-	  int nodes = owl->local_owl_node_counter;
-	  *owl = saved_owl;   /* struct copy */
-	  owl->local_owl_node_counter = nodes;
+	  pop_owl(owl);
 	  popgo();
 	  SGFTRACE(mi, mj, WIN, "defense effective - A");
 	  READ_RETURN(read_result, ui, uj, mi, mj, WIN);
@@ -1756,11 +1750,7 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
       }
       
       /* Undo the tested move. */
-      {
-	int nodes = owl->local_owl_node_counter;
-	*owl = saved_owl;   /* struct copy */
-	owl->local_owl_node_counter = nodes;
-      }
+      pop_owl(owl);
       popgo();
     }
   }
@@ -3713,6 +3703,49 @@ static int
 owl_escape_route(struct local_owl_data *owl)
 {
   return dragon_escape(owl->goal, owl->color, owl->escape_values);
+}
+
+
+/***********************
+ * Storage of owl data
+ ***********************/
+
+/* Push owl data onto a stack. The stack is dynamically reallocated if
+ * it is too small.
+ */
+static void
+push_owl(struct local_owl_data *owl)
+{
+  int new_size = owl_stack_size;
+
+  /* Do we need to enlarge the stack. */
+  if (owl_stack_size == 0)
+    new_size = owl_reading_depth;
+  else if (owl_stack_pointer == owl_stack_size)
+    new_size++;
+
+  /* If so, reallocate space. */
+  if (new_size > owl_stack_size) {
+    owl_stack = realloc(owl_stack, new_size * sizeof(*owl_stack));
+    gg_assert(owl_stack != NULL);
+    owl_stack_size = new_size;
+  }
+
+  /* Store the owl data. */
+  owl_stack[owl_stack_pointer] = *owl;
+  owl_stack_pointer++;
+}
+
+/* Retrieve owl data from the stack. The local_owl_node_counter field
+ * is not reset.
+ */
+static void
+pop_owl(struct local_owl_data *owl)
+{
+  int nodes = owl->local_owl_node_counter;
+  owl_stack_pointer--;
+  *owl = owl_stack[owl_stack_pointer];
+  owl->local_owl_node_counter = nodes;
 }
 
 /***********************

@@ -169,7 +169,7 @@ loadsgf games/nicklas/nicklas12.sgf 123
 
 loadsgf games/nicklas/nicklas12.sgf 203
 1213 gg_genmove black
-#? [N4]
+#? [N4]*
 
 # Added A6 among the correct moves. /gf (2.7.203)
 loadsgf games/nicklas/nicklas12.sgf 215
@@ -262,7 +262,7 @@ loadsgf games/nicklas/nicklas16.sgf 38
 
 loadsgf games/nicklas/nicklas16.sgf 62
 1604 gg_genmove black
-#? [J2]*
+#? [J2]
 
 loadsgf games/nicklas/nicklas16.sgf 64
 1605 gg_genmove black

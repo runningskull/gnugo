@@ -1152,6 +1152,26 @@ OdA
 >backfill_helper(*,c,d);
 
 
+Pattern AS4
+# gf New pattern. (3.1.2)
+
+|*O       Connect without leaving bigger ko threat than necessary.
+|OX
+|.O
++--
+
+:8,sX
+
+|*b
+|OX
+|ac
++--
+
+;alive(b) && attack(c)
+
+>replace(a,*);
+
+
 ###########################
 #
 # Shape moves. 

@@ -2,6 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+3.1.1 released September 4, 2001
+
+- realloc space for owl stack if needed
+- new static functions push_owl and pop_owl
+- bugfix in move_reasons.c to avoid overcounting certain attacks
+- move replacement mechanism implemented in move_reasons.c
+- new autohelper action replace()
+- new game record and regression test
+- new tests and regressions
+
 3.1.1 released August 31, 2001
 
 - halfeyes valued slightly more guessing eye value for shapes not in eyes.db

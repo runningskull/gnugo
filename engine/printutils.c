@@ -91,7 +91,7 @@ vgprintf(FILE* outputfile, const char *fmt, va_list ap)
 	int n = va_arg(ap, int);
 	if (m == -1 && n == -1)
 	  fputs("PASS", outputfile);
-	else if ((m<0) || (n<0) || (m>=board_size) || (n>=board_size))
+	else if (m < 0 || n < 0 || m >= board_size || n >= board_size)
 	  fprintf(outputfile, "[%d,%d]", m, n);
 	else {
 	  /* Generate the move name. */

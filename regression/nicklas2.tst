@@ -35,7 +35,7 @@ loadsgf games/nicklas/nicklas9.sgf 28
 # point.
 loadsgf games/nicklas/nicklas9.sgf 50
 904 gg_genmove black
-#? [B1|E1]
+#? [B1|E1]*
 
 loadsgf games/nicklas/nicklas10.sgf 18
 1001 gg_genmove black

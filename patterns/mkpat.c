@@ -247,7 +247,8 @@ static struct autohelper_func autohelper_functions[] = {
   {"backfill_helper", 3, "backfill_helper(%ci,%cj, %ci, %cj, %ci, %cj)"},
   {"owl_threatens",   2, "owl_threatens_attack(%ci,%cj,%ci,%cj)"},
   {"o_aa_attack",     2, "atari_atari_try_combination(color,%ci,%cj,%ci,%cj)"},
-  {"x_aa_attack",     2, "atari_atari_try_combination(OTHER_COLOR(color),%ci,%cj,%ci,%cj)"}
+  {"x_aa_attack",     2, "atari_atari_try_combination(OTHER_COLOR(color),%ci,%cj,%ci,%cj)"},
+  {"replace",         2, "add_replacement_move(%ci,%cj,%ci,%cj)"}
 };
 
 

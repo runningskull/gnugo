@@ -1146,7 +1146,7 @@ fi
 
 PACKAGE=gnugo
 
-VERSION=3.1.1
+VERSION=3.1.2
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { { echo "$as_me:1152: error: source directory already configured; run \"make distclean\" there first" >&5
