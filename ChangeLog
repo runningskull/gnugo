@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function gg_normalize_float2int to address optics.c-platform dependency 
 - hash_init behaviour made independent of boardsize
 - output cleanup: --statistics, and EITHER_MOVE-trace
 - floats normalized in finish_pattern() in mkpat.c

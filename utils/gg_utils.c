@@ -338,6 +338,12 @@ gg_normalize_float(float x, float a)
   return a * ((int) (0.5 + x / a));
 }
 
+int
+gg_normalize_float2int(float x, float a)
+{
+  return ((int) (0.5 + x / a));
+}
+
 /* A sorting algorithm, call-compatible with the libc qsort() function.
  *
  * The reason to prefer this to standard qsort() is that quicksort is

@@ -26,6 +26,7 @@
 #include <string.h>
 #include "liberty.h"
 #include "eyes.h"
+#include "gg_utils.h"
 
 
 /* This macro is not fully generalized. It works because it is used only where
@@ -934,7 +935,8 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
 	else
 	  continue;
 	
-	if (this_score > score) {
+	if (gg_normalize_float2int(this_score, 0.01)
+	    > gg_normalize_float2int(score, 0.01)) {
 	  best_attack_point = this_attack_point;
 	  best_defense_point = this_defense_point;
 	  score = this_score;
