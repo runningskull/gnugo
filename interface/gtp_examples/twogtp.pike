@@ -85,6 +85,17 @@ nice_time(float _time)
 }
 
 
+int
+is_numeric(string str)
+{
+  str = String.trim_all_whites(str);
+  if (str[0] == '+')
+    str = str[1..];
+
+  return ((string) ((int) str)) == str;
+}
+
+
 class GtpServer {
   int server_is_up;
   int board_size;
@@ -102,10 +113,14 @@ class GtpServer {
   private float time_left;
   private int stones_left;
   float total_used_time;
+  private array(string) statistics;
+  private array(string) reset;
+  private array totals;
 
 
   void
-  create(string _command_line, string _color,
+  create(string _command_line, array(string) _statistics, array(string) _reset,
+	 string _color,
 	 float _main_time, float _byo_yomi_time, int _byo_yomi_stones)
   {
     file_out = Stdio.File();
@@ -141,6 +156,10 @@ class GtpServer {
 	byo_yomi_time = _byo_yomi_time;
 	byo_yomi_stones = _byo_yomi_stones;
 	total_used_time = 0.0;
+
+	statistics = _statistics;
+	reset = _reset;
+	totals = ({ 0 }) * sizeof(statistics);
       }
     }
   }
@@ -303,6 +322,16 @@ class GtpServer {
 					(string) load_up_to));
     board_size = (int) send_command("query_boardsize")[1];
     return answer;
+  }
+
+
+  void
+  reset_engine()
+  {
+    foreach (reset, string reset_command)
+      send_command(reset_command);
+
+    initialize_time_control();
   }
 
 
@@ -487,6 +516,50 @@ class GtpServer {
   }
 
 
+  void
+  print_statistics(int dont_print_numerics)
+  {
+    for (int k = 0; k < sizeof(statistics); k++) {
+      array command_result = send_command(statistics[k]);
+      if (!command_result[0]) {
+	if (is_numeric(command_result[1])) {
+	  if (totals[k] != "")
+	    totals[k] += (int) command_result[1];
+
+	  if (dont_print_numerics)
+	    continue;
+	}
+	else
+	  totals[k] = "";
+
+	write("%s (%s) statistic `%s': %s\n", full_engine_name, color,
+	      statistics[k], command_result[1]);
+      }
+      else {
+	werror("Couldn't acquire statistic `%s': engine failed with message \"%s\"\n",
+	       statistics[k], command_result[1]);
+      }
+    }
+  }
+
+
+  void
+  print_statistic_totals()
+  {
+    int first_total = 1;
+    for (int k = 0; k < sizeof(statistics); k++) {
+      if (totals[k] != "") {
+	if (first_total) {
+	  write("\n%s (%s) statistics totals:\n", full_engine_name, color);
+	  first_total = 0;
+	}
+
+	write("`%s' total: %d\n", statistics[k], totals[k]);
+      }
+    }
+  }
+
+
   string
   final_score()
   {
@@ -529,24 +602,29 @@ class GtpServer {
 
 
 class GtpGame {
-  GtpServer white;
-  GtpServer black;
-  int verbose;
+  private GtpServer white;
+  private GtpServer black;
+  private int verbose;
   private int black_to_play;
   private string sgf_header;
   private array(array(string)) territory;
+  private int totals_only;
 
 
   void
-  create(string command_line_white, string command_line_black, int _verbose,
+  create(string command_line_white, string command_line_black,
+	 array(string) statistics_white, array(string) statistics_black,
+	 array(string) reset_white, array(string) reset_black,
+	 int _totals_only, int _verbose,
 	 float main_time, float byo_yomi_time, int byo_yomi_stones)
   {
     verbose = _verbose;
-    white = GtpServer(command_line_white, "white",
-		      main_time, byo_yomi_time, byo_yomi_stones);
+    totals_only = _totals_only;
+    white = GtpServer(command_line_white, statistics_white, reset_white,
+		      "white", main_time, byo_yomi_time, byo_yomi_stones);
     if (white) {
-      black = GtpServer(command_line_black, "black",
-			main_time, byo_yomi_time, byo_yomi_stones);
+      black = GtpServer(command_line_black, statistics_black, reset_black,
+			"black", main_time, byo_yomi_time, byo_yomi_stones);
     }
 
     if (!white || !black)
@@ -595,8 +673,8 @@ class GtpGame {
     if (verbose)
       werror("\nBeginning a new game.\n");
 
-    white->initialize_time_control();
-    black->initialize_time_control();
+    white->reset_engine();
+    black->reset_engine();
 
     array error = catch {
       for (int passes = 0; passes < 2;) {
@@ -654,6 +732,9 @@ class GtpGame {
       }
     };
 
+    white->finalize_time_control();
+    black->finalize_time_control();
+
     array(string) result;
     territory = UNDEFINED;
     if (error) {
@@ -676,9 +757,6 @@ class GtpGame {
       else
 	result = ({ special_win });
     }
-
-    white->finalize_time_control();
-    black->finalize_time_control();
 
     write_sgf_file(sgf_file_name, sgf_moves, result);
     return result;
@@ -799,6 +877,30 @@ class GtpGame {
     write("  White: %s\n", nice_time(white->total_used_time));
     write("  Black: %s\n", nice_time(black->total_used_time));
   }
+
+
+  void
+  print_statistics()
+  {
+    white->print_statistics(totals_only);
+    black->print_statistics(totals_only);
+  }
+
+
+  void
+  print_statistic_totals()
+  {
+    white->print_statistic_totals();
+    black->print_statistic_totals();
+  }
+
+
+  void
+  finalize()
+  {
+    white->quit();
+    black->quit();
+  }
 }
 
 
@@ -820,7 +922,9 @@ run_twogtp_match(GtpGame game, int num_games, int board_size, int handicap,
     game->start_new_game(board_size, handicap, handicap_mode, komi);
     string sgf_file_name = sprintf("%s%03d.sgf", sgf_base, k + 1);
     array(string) result = game->play(sgf_file_name);
+
     write("Game %d: %s\n", k + 1, result * "  ");
+    game->print_statistics();
     results += ({result});
 
     if (sizeof(result) == 1 || (result[0][0] == result[1][0])) {
@@ -902,8 +1006,8 @@ run_twogtp_match(GtpGame game, int num_games, int board_size, int handicap,
     write("Engines disagreed on results of %d game(s).\n", disagreed_games);
 
   game->print_time_report();
-  game->white->quit();
-  game->black->quit();
+  game->print_statistic_totals();
+  game->finalize();
 }
 
 
@@ -920,8 +1024,11 @@ endgame_contest(GtpGame game, int endgame_moves, array(string) endgame_files,
 	werror("Replaying game `%s'.\n", endgame_files[k]);
 
       array(string) result1 = game->play(sgf_file_base_name + "1.sgf");
+      game->print_statistics();
       game->reinit_endgame_contest(endgame_files[k], load_up_to);
+
       array(string) result2 = game->play(sgf_file_base_name + "2.sgf");
+      game->print_statistics();
       game->swap_engines();
 
       write("%s: ", endgame_files[k]);
@@ -960,52 +1067,71 @@ endgame_contest(GtpGame game, int endgame_moves, array(string) endgame_files,
   write("\nTotal %d game(s) replayed. White won %d. Black won %d.\n",
 	sizeof(differences), white_wins, black_wins);
   game->print_time_report();
-  game->white->quit();
-  game->black->quit();
+  game->print_statistic_totals();
+  game->finalize();
 }
 
 
 string help_message =
-"Usage: %s [OPTION]... [FILE]...\n\n"
-"Runs either a match or endgame contest between two GTP engines.\n"
-"`--white' and `--black' options are mandatory.\n\n"
-"Options:\n"
-"  -w, --white=COMMAND_LINE\n"
-"  -b, --black=COMMAND_LINE      command lines to run the two engines with.\n\n"
-"      --help                    display this help and exit.\n"
-"  -v, --verbose=LEVEL           1 - print moves, 2 and higher - draw boards.\n"
-"      --sgf-base=FILENAME       create SGF files with FILENAME as base (default\n"
-"                                is `twogtp' or `endgame' depending on mode).\n"
-"  -m, --match                   runs a match between the engines (the default).\n"
-"  -e, --endgame=MOVES           runs an endgame contest instead of a match.\n"
-"  -c, --continue                continue a match or endgame contest.\n\n"
-"Options valid only in match mode:\n"
-"  -g, --games=GAMES             number of games in the match (one by default).\n"
-"  -s, --board-size=SIZE         the board size for the match (default is 19).\n"
-"  -h, --handicap=STONES         fixed handicap for the black player.\n"
-"  -f, --free-handicap=STONES    free handicap for the black player.\n"
-"  -a, --adjust-handicap=LENGTH  use simple adjusting scheme: change handicap\n"
-"                                by 1 after LENGTH wins in a row.\n"
-"  -k, --komi=KOMI               the komi to use.\n\n"
-"Time control options:\n"
-"  -t, --main-time=TIME          main time for a game (default is forever with\n"
-"                                no byo-yomi or zero otherwise).\n"
-"  -B, --byo-yomi-time=TIME      byo-yomi time for a game (zero by default).\n"
-"                                TIMEs are in minutes and can be fractional.\n"
-"  -S, --byo-yomi-stones=STONES  stones to be played in a byo-yomi period\n"
-"                                (default is 25).\n\n"
-"Default is no handicap. Komi defaults to 5.5 with no handicap or 0.5 with\n"
-"nonzero handicap. Note that `--adjust-handicap' option not only can change\n"
-"handicap, but can also swap engines' colors if black appears stronger.\n\n"
-"FILEs are only used in endgame contest mode. They must be non-branched SGF\n"
-"game records. In endgame contest mode the FILEs are loaded into the engines\n"
-"excluding last non-pass MOVES specified with `--endgame' option. For each of\n"
-"the FILEs two games are played with alternating colors and the difference in\n"
-"results is determined.\n\n"
-"Option `--continue' allows to have a continuous set of game records for\n"
-"several script runs. It restarts a match or endgame contest skipping all\n"
-"games for which game records already exist. In case of an endgame contest\n"
-"it also skips appropriate number of FILEs.\n";
+  "Usage: %s [OPTION]... [FILE]...\n\n"
+  "Runs either a match or endgame contest between two GTP engines.\n"
+  "`--white' and `--black' options are mandatory.\n\n"
+  "Options:\n"
+  "  -w, --white=COMMAND_LINE\n"
+  "  -b, --black=COMMAND_LINE      command lines to run the two engines with.\n\n"
+  "      --help                    display this help and exit.\n"
+  "      --help-statistics         display help on statistics options and exit.\n"
+  "  -v, --verbose=LEVEL           1 - print moves, 2 and higher - draw boards.\n"
+  "      --sgf-base=FILENAME       create SGF files with FILENAME as base (default\n"
+  "                                is `twogtp' or `endgame' depending on mode).\n"
+  "  -m, --match                   runs a match between the engines (the default).\n"
+  "  -e, --endgame=MOVES           runs an endgame contest instead of a match.\n"
+  "  -c, --continue                continue a match or endgame contest.\n\n"
+  "Options valid only in match mode:\n"
+  "  -g, --games=GAMES             number of games in the match (one by default).\n"
+  "  -s, --board-size=SIZE         the board size for the match (default is 19).\n"
+  "  -h, --handicap=STONES         fixed handicap for the black player.\n"
+  "  -f, --free-handicap=STONES    free handicap for the black player.\n"
+  "  -a, --adjust-handicap=LENGTH  use simple adjusting scheme: change handicap\n"
+  "                                by 1 after LENGTH wins in a row.\n"
+  "  -k, --komi=KOMI               the komi to use.\n\n"
+  "Time control options:\n"
+  "  -t, --main-time=TIME          main time for a game (default is forever with\n"
+  "                                no byo-yomi or zero otherwise).\n"
+  "  -B, --byo-yomi-time=TIME      byo-yomi time for a game (zero by default).\n"
+  "                                TIMEs are in minutes and can be fractional.\n"
+  "  -S, --byo-yomi-stones=STONES  stones to be played in a byo-yomi period\n"
+  "                                (default is 25).\n\n"
+  "Default is no handicap. Komi defaults to 5.5 with no handicap or 0.5 with\n"
+  "nonzero handicap. Note that `--adjust-handicap' option not only can change\n"
+  "handicap, but can also swap engines' colors if black appears stronger.\n\n"
+  "FILEs are only used in endgame contest mode. They must be non-branched SGF\n"
+  "game records. In endgame contest mode the FILEs are loaded into the engines\n"
+  "excluding last non-pass MOVES specified with `--endgame' option. For each of\n"
+  "the FILEs two games are played with alternating colors and the difference in\n"
+  "results is determined.\n\n"
+  "Option `--continue' allows to have a continuous set of game records for\n"
+  "several script runs. It restarts a match or endgame contest skipping all\n"
+  "games for which game records already exist. In case of an endgame contest\n"
+  "it also skips appropriate number of FILEs.\n";
+
+string help_statistics_message =
+  "Engine statistics options:\n"
+  "  --statistics=COMMANDS\n"
+  "  --statistics-white=COMMANDS\n"
+  "  --statistics-black=COMMANDS   COMMANDS is a semicolon separated list of GTP\n"
+  "                                commands to be executed after each game; if\n"
+  "                                engines' responses appear to be numeric, totals\n"
+  "                                are printed after all games are played.\n"
+  "  --reset=COMMANDS\n"
+  "  --reset-white=COMMANDS\n"
+  "  --reset-black=COMMANDS        semicolon separated list of GTP commands needed\n"
+  "                                to reset statistics before each game.\n\n"
+  "  --totals-only                 don't print numeric statistics after each game.\n"
+  "Note that you can use `--statistics' and `--reset' options to acquire similar\n"
+  "statistics from both engines (provided they both understand the commands). If\n"
+  "you use color-specific options together with common options, both command lists\n"
+  "are used as one would expect.\n";
 
 
 int
@@ -1016,6 +1142,11 @@ main(int argc, array(string) argv)
 
   if (Getopt.find_option(argv, UNDEFINED, "help")) {
     werror(help_message, basename(argv[0]));
+    return 0;
+  }
+
+  if (Getopt.find_option(argv, UNDEFINED, "help-statistics")) {
+    werror(help_statistics_message);
     return 0;
   }
 
@@ -1058,6 +1189,54 @@ main(int argc, array(string) argv)
   int byo_yomi_stones = (int) Getopt.find_option(argv, "S", "byo-yomi-stones",
 						 UNDEFINED, "25");
   byo_yomi_stones = max(byo_yomi_stones, 1);
+
+  string|int statistics_value
+    = Getopt.find_option(argv, UNDEFINED, "statistics", UNDEFINED, "");
+  string|int statistics_white_value
+    = Getopt.find_option(argv, UNDEFINED, "statistics-white", UNDEFINED, "");
+  string|int statistics_black_value
+    = Getopt.find_option(argv, UNDEFINED, "statistics-black", UNDEFINED, "");
+
+  array(string) statistics_white = ({});
+  array(string) statistics_black = ({});
+
+  if (statistics_value && statistics_value != "") {
+    statistics_white = map(statistics_value / ";", String.trim_all_whites);
+    statistics_black = map(statistics_value / ";", String.trim_all_whites);
+  }
+
+  if (statistics_white_value && statistics_white_value != "") {
+    statistics_white |= map(statistics_white_value / ";",
+			    String.trim_all_whites);
+  }
+
+  if (statistics_black_value && statistics_black_value != "") {
+    statistics_black |= map(statistics_black_value / ";",
+			    String.trim_all_whites);
+  }
+
+  string|int reset_value
+    = Getopt.find_option(argv, UNDEFINED, "reset", UNDEFINED, "");
+  string|int reset_white_value
+    = Getopt.find_option(argv, UNDEFINED, "reset-white", UNDEFINED, "");
+  string|int reset_black_value
+    = Getopt.find_option(argv, UNDEFINED, "reset-black", UNDEFINED, "");
+
+  array(string) reset_white = ({});
+  array(string) reset_black = ({});
+
+  if (reset_value && reset_value != "") {
+    reset_white = map(reset_value / ";", String.trim_all_whites);
+    reset_black = map(reset_value / ";", String.trim_all_whites);
+  }
+
+  if (reset_white_value && reset_white_value != "")
+    reset_white |= map(reset_white_value / ";", String.trim_all_whites);
+
+  if (reset_black_value && reset_black_value != "")
+    reset_black |= map(reset_black_value / ";", String.trim_all_whites);
+
+  int totals_only = (Getopt.find_option(argv, UNDEFINED, "totals-only") != 0);
 
   if (!mode) {
     string handicap_mode = "fixed";
@@ -1118,8 +1297,9 @@ main(int argc, array(string) argv)
     }
 
 
-    GtpGame game = GtpGame(white, black, verbose,
-			   main_time, byo_yomi_time, byo_yomi_stones);
+    GtpGame game = GtpGame(white, black, statistics_white, statistics_black,
+			   reset_white, reset_black, totals_only,
+			   verbose, main_time, byo_yomi_time, byo_yomi_stones);
     if (game) {
       run_twogtp_match(game, games, board_size, handicap, handicap_mode,
 		       adjust_handicap, komi, verbose, sgf_base, skip_games);
@@ -1128,12 +1308,13 @@ main(int argc, array(string) argv)
   else {
     array(string) endgame_files = Getopt.get_args(argv)[1..];
     if (sizeof(endgame_files) == 0) {
-      werror("No sgf files specified for endgame contest.\n" + hint);
+      werror("No SGF files specified for endgame contest.\n" + hint);
       return 1;
     }
 
-    GtpGame game = GtpGame(white, black, verbose,
-			   main_time, byo_yomi_time, byo_yomi_stones);
+    GtpGame game = GtpGame(white, black, statistics_white, statistics_black,
+			   reset_white, reset_black, totals_only,
+			   verbose, main_time, byo_yomi_time, byo_yomi_stones);
     if (game) {
       endgame_contest(game, endgame_moves, endgame_files,
 		      verbose, sgf_base, skip_games);
