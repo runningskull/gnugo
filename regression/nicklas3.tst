@@ -13,7 +13,7 @@ reset_trymove_counter
 
 loadsgf games/nicklas/nicklas4.sgf 73
 401 reg_genmove black
-#? [A5]
+#? [A5]*
 
 loadsgf games/nicklas/nicklas6.sgf 25
 602 reg_genmove black
