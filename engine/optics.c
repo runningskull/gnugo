@@ -76,15 +76,15 @@ static void originate_eye(int origin, int pos,
 			  int *esize, int *msize,
 			  struct eye_data eye[BOARDMAX]);
 static int read_eye(int pos, int *attack_point, int *defense_point,
-                   struct eyevalue *value,
-                   struct eye_data eye[BOARDMAX],
-                   struct half_eye_data heye[BOARDMAX],
-                   int add_moves, int color);
+		    struct eyevalue *value,
+		    struct eye_data eye[BOARDMAX],
+		    struct half_eye_data heye[BOARDMAX],
+		    int add_moves, int color);
 static int recognize_eye(int pos, int *attack_point, int *defense_point,
 			 struct eyevalue *value,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
-                        int color, struct vital_points *vp);
+			 int color, struct vital_points *vp);
 static void guess_eye_space(int pos, int effective_eyesize, int margins,
 			    struct eye_data eye[BOARDMAX],
 			    struct eyevalue *value, char *pessimistic_min);
@@ -794,7 +794,7 @@ compute_eyes(int pos, struct eyevalue *value,
   
   /* Look up the eye space in the graphs database. */
   if (read_eye(pos, attack_point, defense_point, value,
-              eye, heye, add_moves, color))
+	       eye, heye, add_moves, color))
     return;
 
   /* Ideally any eye space that hasn't been matched yet should be two
@@ -870,7 +870,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   
   /* Look up the eye space in the graphs database. */
   if (read_eye(pos, attack_point, defense_point, value,
-              eye, heye, 0, EMPTY)) {
+	       eye, heye, 0, EMPTY)) {
     *pessimistic_min = min_eyes(value) - margins;
 
     /* A single point eye which is part of a ko can't be trusted. */
@@ -1010,8 +1010,8 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
  * recognize_eye(). Currently, its only purpose is to read positions
  * like this:
  *
- *      .XXXX|        with half eye         with proper eye
- *      XXOOO|
+ *     .XXXX|        with half eye         with proper eye
+ *     XXOOO|
  *     XO.O.|           .   (1 eye)           .   (2 eyes)
  *     XXOa.|         !..                    .*
  *     -----+
@@ -1030,9 +1030,9 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
  */
 static int
 read_eye(int pos, int *attack_point, int *defense_point,
-        struct eyevalue *value, struct eye_data eye[BOARDMAX], 
-        struct half_eye_data heye[BOARDMAX], 
-        int add_moves, int color)
+	 struct eyevalue *value, struct eye_data eye[BOARDMAX], 
+	 struct half_eye_data heye[BOARDMAX], 
+	 int add_moves, int color)
 {
   int eye_color;
   int k;
@@ -1053,8 +1053,8 @@ read_eye(int pos, int *attack_point, int *defense_point,
     if (eye[pos2].origin == pos
         && heye[pos2].type == HALF_EYE && heye[pos2].value < 3.0) {
       if (ko_halfeye != NO_MOVE) {
-       ko_halfeye = NO_MOVE;   /* We can't win two kos at once. */
-       break;            
+	ko_halfeye = NO_MOVE;   /* We can't win two kos at once. */
+	break;            
       }
       
       ko_halfeye = pos2;
@@ -1065,7 +1065,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
 
     heye[ko_halfeye].type = 0;
     result = recognize_eye(pos, &apos, &dpos, &ko_value, eye,
-                          heye, color, &ko_vp);
+			   heye, color, &ko_vp);
     heye[ko_halfeye].type = HALF_EYE;
 
     if (result && max_eyes(value) < max_eyes(&ko_value)) {
@@ -1080,11 +1080,11 @@ read_eye(int pos, int *attack_point, int *defense_point,
   if (add_moves) {
     if (eye_color == color) {
       for (k = 0; k < best_vp->num_defenses; k++)
-       add_vital_eye_move(best_vp->defenses[k], pos, eye_color);
+	add_vital_eye_move(best_vp->defenses[k], pos, eye_color);
     }
     else {
       for (k = 0; k < best_vp->num_attacks; k++)
-       add_vital_eye_move(best_vp->attacks[k], pos, eye_color);
+	add_vital_eye_move(best_vp->attacks[k], pos, eye_color);
     }
   }
   
@@ -1107,7 +1107,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      struct eyevalue *value,
 	      struct eye_data eye[BOARDMAX], 
 	      struct half_eye_data heye[BOARDMAX], 
-             int color, struct vital_points *vp)
+	      int color, struct vital_points *vp)
 {
   int m, n;
   int k;
@@ -1294,7 +1294,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	for (k = 0; k < graphs[graph].esize; k++) {
 	  if (graphs[graph].vertex[k].type == '*'
 	      || graphs[graph].vertex[k].type == '<')
-           vp->attacks[vp->num_attacks++] = vpos[map[k]];
+	    vp->attacks[vp->num_attacks++] = vpos[map[k]];
 	  else if (graphs[graph].vertex[k].type == '@'
 		   || graphs[graph].vertex[k].type == '(') {
 	    /* check for marginal matching half eye diagonal
@@ -1307,16 +1307,16 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
 	      
 	      for (ix = 0; ix < this_half_eye->num_attacks; ix++)
-               vp->attacks[vp->num_attacks++] =
-                 this_half_eye->attack_point[ix];
+		vp->attacks[vp->num_attacks++] =
+		  this_half_eye->attack_point[ix];
 	    }
 	    else
-             vp->attacks[vp->num_attacks++] = vpos[map[k]];
+	      vp->attacks[vp->num_attacks++] = vpos[map[k]];
 	  }
 	  
 	  if (graphs[graph].vertex[k].type == '*'
 	      || graphs[graph].vertex[k].type == '>')
-           vp->defenses[vp->num_defenses++] = vpos[map[k]];
+	    vp->defenses[vp->num_defenses++] = vpos[map[k]];
 	  else if (graphs[graph].vertex[k].type == '@'
 		   || graphs[graph].vertex[k].type == ')') {
 	    /* Check for marginal matching half eye diagonal. */
@@ -1326,24 +1326,24 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
 
 	      for (ix = 0; ix < this_half_eye->num_defends; ix++)
-               vp->defenses[vp->num_defenses++] 
+		vp->defenses[vp->num_defenses++] 
 		  = this_half_eye->defense_point[ix];
 	    }
 	    else
-             vp->defenses[vp->num_defenses++] = vpos[map[k]];
+	      vp->defenses[vp->num_defenses++] = vpos[map[k]];
 	  }
 	}
 	
-       gg_assert(vp->num_attacks > 0 && vp->num_defenses > 0);
+	gg_assert(vp->num_attacks > 0 && vp->num_defenses > 0);
 
-       *attack_point = vp->attacks[0];
+	*attack_point = vp->attacks[0];
 	/* If possible, choose a non-sacrificial defense point.
          * Compare white T8 and T6 in lazarus:21.
 	 */
-       *defense_point = vp->defenses[0];
-       for (k = 0; k < vp->num_defenses; k++) {
-         if (safe_move(vp->defenses[k], eye_color) == WIN) {
-           *defense_point = vp->defenses[k];
+	*defense_point = vp->defenses[0];
+	for (k = 0; k < vp->num_defenses; k++) {
+	  if (safe_move(vp->defenses[k], eye_color) == WIN) {
+	    *defense_point = vp->defenses[k];
 	    break;
 	  }
 	}
@@ -1351,10 +1351,10 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
 	      *attack_point, *defense_point);
 	DEBUG(DEBUG_EYES, "  pattern matched:  %s\n", graphs[graph].patname);
-
+	
       }
       TRACE("eye space at %1m of type %s\n", pos, graphs[graph].patname);
-
+      
       return eye_color;
     }
   }
