@@ -1141,9 +1141,8 @@ compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
    * strings with less than five liberties.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos))
-      active[pos] |= (goal[pos]
-	  	      && board[pos] == goal_color);
+    if (ON_BOARD(pos) && goal[pos])
+      active[pos] = 1;
 
   /* Distance four expansion through empty intersections and own stones. */
   for (k = 1; k < 5; k++) {
@@ -1330,7 +1329,8 @@ mark_dragon_hotspot_values(float values[BOARDMAX], int dr,
 {
   int pos;
   int k;
-  ASSERT1(IS_STONE(board[dr]), dr);
+  if (!IS_STONE(board[dr]))
+    return;
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] != EMPTY)
       continue;
@@ -1430,6 +1430,8 @@ owl_hotspots(float values[BOARDMAX])
       break;
     case OWL_SUBSTANTIAL:
       /* Only consider the liberties of (apos). */
+      if (!IS_STONE(board[entry->apos]))
+	continue;
       liberties = findlib(entry->apos, MAXLIBS, libs);
       for (r = 0; r < liberties; r++)
 	values[libs[r]] += contribution;

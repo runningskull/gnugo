@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- crash in owl_hotspots() fixed
 - view.pike enhancement: directly start sgf viewer
 - remove special case of CLASS_C in matchpat.c
 - tuning
