@@ -4628,6 +4628,7 @@ break_chain2_moves(int str, struct reading_moves *moves,
   int apos;
   int adj;
   int adjs[MAXCHAIN];
+  int dummy_adjs[MAXCHAIN];
   int libs[2];
   int unsafe[2];
 
@@ -4636,6 +4637,18 @@ break_chain2_moves(int str, struct reading_moves *moves,
   for (r = 0; r < adj; r++) {
     apos = adjs[r];
 
+    /* If stackp > backfill_depth, don't bother playing liberties of
+     * 2-liberty strings if those also have at least one neighbor in
+     * atari. This is intended to solve reading:171 and generally reduce
+     * the number of nodes.
+     *
+     * FIXME: We may need to still accept these moves if they happen to
+     * take the ataried string out of atari.
+     */
+    if (stackp > backfill_depth
+	&& chainlinks2(apos, dummy_adjs, 1) > 0)
+      continue;
+      
     findlib(apos, 2, libs);
     for (k = 0; k < 2; k++) {
       unsafe[k] = is_self_atari(libs[k], color);
