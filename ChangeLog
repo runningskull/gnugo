@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl_find_lunches() revised
+- eye tuning
 - new game records and regression tests
 
 3.3.10 released October 20, 2002
