@@ -50,6 +50,8 @@
 #define STRICT_SGF 's'
 #define LAX_SGF    'l'
 
+/* Set this to 1 if you want warnings for missing GM and FF properties. */
+#define VERBOSE_WARNINGS 0
 
 /* ================================================================ */
 /*                     Some utility functions.                      */
@@ -966,24 +968,20 @@ readsgffilefuseki(const char *filename, int moves_per_game)
 
   /* perform some simple checks on the file */
   if (!sgfGetIntProperty(root, "GM", &tmpi)) {
-    fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
+    if (VERBOSE_WARNINGS)
+      fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
   }
-  if (tmpi != 1) {
+  else if (tmpi != 1) {
     fprintf(stderr, "SGF file might be for game other than go: %d\n", tmpi);
     fprintf(stderr, "Trying to load anyway.\n");
   }
 
-
-#if 0
-  if (debug & DEBUG_LOADSGF) {
-    if (!sgfGetIntProperty(root, "FF", &tmpi)) {
+  if (!sgfGetIntProperty(root, "FF", &tmpi)) {
+    if (VERBOSE_WARNINGS)
       fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
-    }
-    if (tmpi < 3 || tmpi > 4) {
-      fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
-    }
   }
-#endif
+  else if (tmpi < 3 || tmpi > 4)
+    fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
 
   return root;
 }
@@ -1024,24 +1022,20 @@ readsgffile(const char *filename)
 
   /* perform some simple checks on the file */
   if (!sgfGetIntProperty(root, "GM", &tmpi)) {
-    fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
+    if (VERBOSE_WARNINGS)
+      fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
   }
-  if (tmpi != 1) {
+  else if (tmpi != 1) {
     fprintf(stderr, "SGF file might be for game other than go: %d\n", tmpi);
     fprintf(stderr, "Trying to load anyway.\n");
   }
 
-
-#if 0
-  if (debug & DEBUG_LOADSGF) {
-    if (!sgfGetIntProperty(root, "FF", &tmpi)) {
+  if (!sgfGetIntProperty(root, "FF", &tmpi)) {
+    if (VERBOSE_WARNINGS)
       fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
-    }
-    if (tmpi < 3 || tmpi > 4) {
-      fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
-    }
   }
-#endif
+  else if (tmpi < 3 || tmpi > 4)
+    fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
 
   return root;
 }
