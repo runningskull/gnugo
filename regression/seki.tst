@@ -239,9 +239,10 @@ play white C1
 loadsgf games/seki08.sgf
 401 reg_genmove white
 #? [B1]
-# Most moves secure territory but C1 and C2 are most natural.
+# Most moves secure territory but C1 and C2 are most natural. We also
+# allow B1.
 402 reg_genmove black
-#? [C1|C2]
+#? [C1|C2|B1]
 
 # C1 and C2 both secure seki, but C1 is one prisoner better.
 # B2 leaves white the option to make ko.
@@ -404,16 +405,18 @@ loadsgf games/seki13.sgf
 902 reg_genmove black
 #? [B2]
 
-# Black probably have more moves to make seki but C2 looks most natural.
+# Black probably have more moves to make seki but C2 looks most
+# natural. C1 is also good enough
 play white B2
 903 reg_genmove black
-#? [C2]
+#? [C2|C1]
 
 play black C2
 904 reg_genmove white
 #? [B3]
 
-# B1 gives ko or seki in gote.
+# B1 gives ko or seki in gote. Tenuki also leaves a seki but compared
+# to C1 the latter is 1 point double sente.
 play white B3
 905 reg_genmove black
 #? [C1]
@@ -432,6 +435,7 @@ play black A3
 908 reg_genmove white
 #? [A2]
 
+# 1 point double sente, just like 907.
 undo
 909 reg_genmove white
 #? [A3]

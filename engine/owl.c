@@ -288,6 +288,21 @@ static int s_worms = 0;
 static int semeai_worms[MAX_SEMEAI_WORMS];
 static int important_semeai_worms[MAX_SEMEAI_WORMS];
 
+/* Whether one color prefers to get a ko over a seki. */
+static int prefer_ko;
+
+/* Usually it's a bad idea to include the opponent worms involved in
+ * the semeai in the eyespace. For some purposes (determining a
+ * definite lack of eyespace, finding certain vital moves), however,
+ * we want to do that anyway. Then set this variable to 1 before
+ * calling owl_estimate_life() and reset it afterwards.
+ *
+ * FIXME: We should implement a nicer mechanism to propagate this
+ *        information to owl_lively(), where it's used.
+ */
+static int include_semeai_worms_in_eyespace = 0;
+
+
 /* Called when (apos) and (bpos) point to adjacent dragons
  * of the opposite color, both with matcher_status DEAD or
  * CRITICAL, analyzes the semeai, assuming that the player
@@ -397,6 +412,25 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
 
   result_certain = 1;
 
+  /* In some semeai situations one or both players have the option to
+   * choose between seki and ko for the life and death of both. In
+   * general this choice depends on the ko threat situation, the
+   * overall score, and the strategical effects on surrounding
+   * dragons, but we don't try to correctly estimate this. Instead we
+   * make the reasonable assumption that if one dragon is
+   * substantially smaller than the other dragon, ko is to be
+   * preferred for the smaller dragon and seki for the larger dragon.
+   *
+   * prefer_ko can be either WHITE, BLACK, or EMPTY and tells which
+   * color, if any, prefers to get ko.
+   */
+  if (dragon[apos].size <= 5 && dragon[bpos].size > 3 * dragon[apos].size)
+    prefer_ko = board[apos];
+  else if (dragon[bpos].size <= 5 && dragon[apos].size > 3 * dragon[bpos].size)
+    prefer_ko = board[bpos];
+  else
+    prefer_ko = EMPTY;
+  
   if (move == PASS_MOVE)
     do_owl_analyze_semeai(apos, bpos, owla, owlb, EMPTY, NO_MOVE,
 			  resulta, resultb, semeai_move, 0, owl);
@@ -537,7 +571,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     int upos;
     int sworm;
 
-    for (sworm = 0; sworm <= s_worms; sworm++) {
+    for (sworm = 0; sworm < s_worms; sworm++) {
       critical_semeai_worms[sworm] = 0;
       if (board[semeai_worms[sworm]] == other) {
 	int acode = attack(semeai_worms[sworm], &upos);
@@ -565,7 +599,7 @@ do_owl_analyze_semeai(int apos, int bpos,
      * threatened, try to save it.
      */
 
-    for (sworm = 0; sworm <= s_worms; sworm++)
+    for (sworm = 0; sworm < s_worms; sworm++)
       if (board[semeai_worms[sworm]] == color
 	  && attack(semeai_worms[sworm], NULL)
 	  && find_defense(semeai_worms[sworm], &upos)) {
@@ -712,6 +746,23 @@ do_owl_analyze_semeai(int apos, int bpos,
 			      critical_semeai_worms);
     }
 
+    /* If no moves were found so far, also check the eyespaces when
+     * opponent semeai worms are allowed to be included for vital
+     * moves.
+     */
+    if (moves[0].pos == NO_MOVE) {
+      include_semeai_worms_in_eyespace = 1;
+      if (!owl_estimate_life(owlb, owla, vital_offensive_moves,
+			     &live_reasonb, komaster, 1, &probable_eyes_b,
+			     &eyemin_b, &eyemax_b))
+	semeai_review_owl_moves(vital_offensive_moves, owla, owlb, color,
+				&safe_outside_liberty_found,
+				&safe_common_liberty_found,
+				mw, moves, 1, 30,
+				critical_semeai_worms);
+      include_semeai_worms_in_eyespace = 0;
+    }
+
     if (level < 8) {
       /* If no owl moves were found on two consecutive moves,
        * turn off the owl phase.
@@ -758,7 +809,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  }
 	  else {
 	    /* common liberty */
-	    if (safe_move(pos, color)) {
+	    if (safe_move(pos, color) == WIN) {
 	      safe_common_liberty_found = 1;
 	      common_liberty.pos = pos;
 	    }
@@ -866,16 +917,19 @@ do_owl_analyze_semeai(int apos, int bpos,
 	close_pattern_list(color, &shape_offensive_patterns);
 	READ_RETURN_SEMEAI(read_result, move, mpos, WIN, WIN);
       }
-      /* We consider our own safety most important and attacking the
-       * opponent as a secondary aim. This means that we prefer seki
-       * over a ko for life and death.
-       *
-       * FIXME: If our dragon is considerably smaller than the
-       * opponent dragon, we should probably prefer ko over seki.
+      /* When there is a choice between ko and seki, the prefer_ko
+       * variable decides policy. Thus if prefer_ko == color we
+       * consider attacking the opponent more important than defending
+       * our dragon, and vise versa otherwise.
        */
-      else if (this_resulta > best_resulta
-	       || (this_resulta == best_resulta
-		   && this_resultb > best_resultb)) {
+      else if ((prefer_ko != color
+		&& (this_resulta > best_resulta
+		    || (this_resulta == best_resulta
+			&& this_resultb > best_resultb)))
+	       || (prefer_ko == color
+		   && (this_resultb > best_resultb
+		       || (this_resultb == best_resultb
+			   && this_resulta > best_resulta)))) {
 	best_resulta = this_resulta;
 	best_resultb = this_resultb;
 	best_move = mpos;
@@ -896,6 +950,38 @@ do_owl_analyze_semeai(int apos, int bpos,
     *move = PASS_MOVE;
     SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You live, I die");
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
+  }
+
+  /* If we can't find a move and we look dead even if including the
+   * opponent stones in our eyespace, we have lost.
+   */
+  if (tested_moves == 0) {
+    const char *live_reasona;
+    struct eyevalue probable_eyes_a;
+    int eyemin_a;
+    int eyemax_a;
+    int sworm;
+    for (sworm = 0; sworm < s_worms; sworm++) {
+      if (board[semeai_worms[sworm]] == other) {
+	if (important_semeai_worms[sworm])
+	  break;
+      }
+    }
+    
+    if (sworm == s_worms) {
+      include_semeai_worms_in_eyespace = 1;
+      if (!owl_estimate_life(owla, owlb, vital_defensive_moves,
+			     &live_reasona, komaster, 0, &probable_eyes_a,
+			     &eyemin_a, &eyemax_a)) {
+	include_semeai_worms_in_eyespace = 0;
+	*resulta = 0;
+	*resultb = 0;
+	*move = PASS_MOVE;
+	SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You live, I die - 2");
+	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
+      }
+      include_semeai_worms_in_eyespace = 0;
+    }
   }
 
   /* If we can't find a move and opponent passed, it's seki */
@@ -1174,7 +1260,7 @@ semeai_move_value(int move, struct local_owl_data *owla,
     }
 
     increase_depth_values();
-    for (k = 0; k <= s_worms; k++) {
+    for (k = 0; k < s_worms; k++) {
       if (!critical_semeai_worms[k])
 	continue;
       if (board[semeai_worms[k]] == color
@@ -2500,6 +2586,7 @@ owl_estimate_life(struct local_owl_data *owl,
   memset(found_matches, 0, sizeof(found_matches));
 
   if (level >= 8) {
+    memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
     if (!does_attack) {
       clear_owl_move_data(dummy_moves);
       matchpat(owl_shapes_callback, other,
@@ -4895,6 +4982,10 @@ owl_lively(int pos)
    * other dragon and can't be saved is not lively.
    */
   if (other_owl_data) {
+
+    if (include_semeai_worms_in_eyespace && other_owl_data->goal[pos])
+      return 0;
+    
     if (other_owl_data->goal[pos] && !semeai_trust_tactical_attack(pos))
       return 1;
     /* FIXME: Shouldn't we check other_owl_data->inessential[origin] here? */

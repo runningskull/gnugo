@@ -1913,6 +1913,24 @@ X.X
 :8,s,value(45)
 
 
+Pattern A503b
+# gf New pattern. (3.5.3)
+
+?XXX        atari to eliminate eye or make ko
+Y.O.
+X.X*
+----
+
+:8,s,value(32)
+
+?XXX
+Y.O.
+X.X*
+----
+
+;olib(*)>1
+
+
 Pattern A504
 
 Y*           cut off one stone
@@ -3127,15 +3145,46 @@ Pattern A905
 :8,s,value(36)
 
 
-# Pattern A906
-# # gf We don't need two copies of this pattern. Removed one. (3.1.14)
-# 
-# |O.X        try to form nakade
-# |XOX
-# |*..
-# +---
-# 
-# :8,s,value(35)
+Pattern A906a
+# gf New pattern. (3.5.3)
+# See seki:303.
+
+|X???
+|.YX?
+|XO.X         try to make ko
+|*.O.
++----
+
+:8,s,value(32)
+
+|Xa??
+|.YX?
+|XO.X
+|*.O.
++----
+
+;!o_somewhere(a) || !defend(a)
+
+
+Pattern A906b
+# gf New pattern. (3.5.3)
+# See seki:303.
+
+|X???
+|.YX?
+|.OXX         try to make ko
+|*.O.
++----
+
+:8,s,value(32)
+
+|Xa??
+|.YX?
+|.OXX
+|*.O.
++----
+
+;!o_somewhere(a) || !defend(a)
 
 
 Pattern A907
@@ -4579,6 +4628,24 @@ A.*.
 ;owl_escape_value(A)>0 && !xplay_disconnect(*,A,B) && !oplay_connect(*,A,B)
 
 
+Pattern A1136
+# gf New pattern. (3.5.3)
+
+?Y?
+O*O
+..?
+?X?
+
+:8,-,value(75)
+
+?B?
+O*O
+..?
+?A?
+
+;owl_escape_value(A)>0 && !xplay_disconnect(*,A,B) && !oplay_connect(*,A,B)
+
+
 #########################################################
 #                                                       #
 #       Kill or threaten a worm of the dragon           #
@@ -4752,6 +4819,24 @@ Pattern A1303b
 +----
 
 :8,s,value(50)
+
+
+Pattern A1303c
+# gf New pattern. (3.5.3)
+
+|..X?         variation
+|XOYo
+|.*.?
++----
+
+:8,s,value(85)
+
+|..X?
+|XaYo
+|.*.?
++----
+
+;defend(a) != WIN
 
 
 Pattern A1304

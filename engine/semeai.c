@@ -29,6 +29,7 @@
 
 #define INFINITY 1000
 
+static void find_moves_to_make_seki(void);
 static void update_status(int dr, enum dragon_status new_status, 
    			  enum dragon_status new_safety);
 
@@ -83,25 +84,8 @@ semeai()
 	  || (dragon[bpos].status != DEAD
 	      && dragon[bpos].status != CRITICAL))
 	continue;
+
       
-      /* A dragon consisting of a single worm which is tactically dead or
-       * critical and having just one neighbor should be ignored, since
-       * the owl code is more reliable than the semeai code in such cases.
-       * We do allow these cases if the worm has 4 liberties and can be
-       * defended.
-       */
-      
-      if (dragon[apos].size == worm[apos].size
-	  && worm[apos].attack_codes[0]
-	  && (worm[apos].liberties < 4
-	      || worm[apos].defense_codes[0] == 0))
-	continue;
-      
-      if (dragon[bpos].size == worm[bpos].size
-	  && worm[bpos].attack_codes[0]
-	  && (worm[bpos].liberties < 4
-	      || worm[bpos].defense_codes[0] == 0))
-	continue;
       /* Ignore inessential worms or dragons */
       
       if (worm[apos].inessential 
@@ -110,10 +94,6 @@ semeai()
 	  || DRAGON2(bpos).safety == INESSENTIAL)
 	continue;
 
-      /* If either dragon is a single stone, this is best left
-       * to the owl code */
-      if (dragon[apos].size == 1 || dragon[bpos].size == 1)
-	continue;
 
       /* The array semeai_results_first[d1][d2] will contain the status
        * of d1 after the d1 d2 semeai, giving d1 the first move.
@@ -225,6 +205,80 @@ semeai()
       }
       else if (best_attack == 0 && attack_certain)
 	update_status(DRAGON(d1).origin, ALIVE, ALIVE);
+    }
+  }
+  find_moves_to_make_seki();
+}
+
+/* Find moves turning supposed territory into seki. This is not
+ * detected above since it either involves an ALIVE dragon adjacent to
+ * a CRITICAL dragon, or an ALIVE dragon whose eyespace can be invaded
+ * and turned into a seki.
+ *
+ * Currently we only search for tactically critical strings with
+ * dragon status dead, which are neighbors of only one opponent
+ * dragon, which is alive. Through semeai analysis we then determine
+ * whether such a string can in fact live in seki. Relevant testcases
+ * include gunnar:42 and gifu03:2.
+ */
+static void
+find_moves_to_make_seki()
+{
+  int str;
+  int defend_move;
+  int resulta, resultb;
+  
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (IS_STONE(board[str]) && is_worm_origin(str, str)
+	&& attack_and_defend(str, NULL, NULL, NULL, &defend_move)
+	&& dragon[str].status == DEAD
+	&& DRAGON2(str).hostile_neighbors == 1) {
+      int k;
+      int color = board[str];
+      int opponent;
+      int certain;
+      
+      for (k = 0; k < DRAGON2(str).neighbors; k++) {
+	opponent = dragon2[DRAGON2(str).adjacent[k]].origin;
+	if (board[opponent] != color)
+	  break;
+      }
+
+      if (dragon[opponent].status != ALIVE)
+	continue;
+      
+      /* FIXME: These heuristics are not very precise. What we really
+       * want to check is whether str is inside the eyespace of the
+       * opponent, for an interpretation of eyespace that includes
+       * lunches, while it doesn't already have more than one eye
+       * elsewhere.
+       */
+      if (DRAGON2(opponent).moyo_size > 10
+	  || min_eyes(&DRAGON2(opponent).genus) > 1)
+	continue;
+
+      owl_analyze_semeai_after_move(defend_move, color, opponent, str,
+				    &resulta, &resultb, NULL, 1, &certain);
+
+      /* Do not trust uncertain results. In fact it should only take a
+       * few nodes to determine the semeai result, if it is a proper
+       * potential seki position.
+       */
+      if (resultb != WIN && certain) {
+	int d = dragon[str].id;
+	DEBUG(DEBUG_SEMEAI, "Move to make seki at %1m (%1m vs %1m)\n",
+	      defend_move, str, opponent);
+	dragon2[d].semeai = 1;
+	update_status(str, CRITICAL, CRITICAL);
+	dragon2[d].semeai_defense_point = defend_move;
+	dragon2[d].semeai_defense_certain = certain;
+	/* FIXME: The assumption that the attack move coincides with
+         * the defense move is somewhat optimistic.
+	 */
+	dragon2[d].semeai_attack_point = defend_move;
+	dragon2[d].semeai_attack_certain = certain;
+	dragon2[d].semeai_target = opponent;
+      }
     }
   }
 }

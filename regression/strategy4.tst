@@ -216,6 +216,9 @@ loadsgf games/pooo.sgf 56
 191 reg_genmove black
 #? [C12]
 
+# A15 captures the white corner stones but does not have much
+# strategical value. The black stones are safe anyway. Thus A15 is
+# worth about 19 points. Other moves may well be larger.
 loadsgf games/pooo.sgf 74
 192 reg_genmove black
 #? [A15]

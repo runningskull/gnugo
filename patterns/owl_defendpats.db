@@ -2607,6 +2607,18 @@ o.*
 :8,-,value(40)
 
 
+Pattern D644
+# gf New pattern. (3.5.3)
+# See seki:111.
+
+oOOo   make one definite eye
+.*.O
+X..O
+----
+
+:8,-,value(30)
+
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #
@@ -3677,6 +3689,19 @@ Pattern D839
 +----
 
 ;does_attack(*,A) && xplay_attack(b,*,c,A)
+
+
+Pattern D840
+# gf New pattern. (3.5.3)
+# See seki:203.
+
+|OO??
+|.*O?
+|XXOO         make seki
+|.O.O
++----
+
+:8,-,value(25)
 
 
 #########################################################

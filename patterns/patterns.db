@@ -13630,8 +13630,8 @@ Pattern S6b
 
 
 Pattern S6c
-# Back out from a potential and horribly complex ko for the
-# life of the entire corner. This moves secures a seki.
+# Eliminate a potential 1000-year ko for the life of the entire
+# corner. This moves secures a seki.
 
 |OO??
 |.OOO
@@ -13668,6 +13668,223 @@ Pattern S7
 +----
 
 ;lib(a)==4 && seki_helper(a)
+
+
+Pattern S8
+# gf New pattern. (3.5.3)
+# 7 points gote seki. See seki:301.
+
+|XX???
+|.XXX?
+|.*.XX
+|....X
++-----
+
+:8,sXe,terri(7)
+
+|AA???
+|.AAA?
+|.*.AA
+|....A
++-----
+
+;lib(A)==4 && seki_helper(A)
+
+
+Pattern S9
+# gf New pattern. (3.5.3)
+# 7 points seki. Compare S8. See seki:302
+
+|OO???
+|.OOO?
+|.*.OO
+|....O
++-----
+
+:8,sXe,terri(7)
+
+|aa???
+|.aaa?
+|.*.aa
+|....a
++-----
+
+;lib(a)==4 && seki_helper(a)
+
+
+Pattern S10
+# gf New pattern. (3.5.3)
+# 8 points (mostly) sente seki. See seki:801.
+
+|XXX??
+|..XX?
+|.*.XX
+|....X
++-----
+
+:8,sXe,terri(8),followup(16)
+
+|AAA??
+|..AA?
+|.*.AA
+|....A
++-----
+
+;lib(A)==4 && seki_helper(A)
+
+
+Pattern S10b
+# gf New pattern. (3.5.3)
+# Best way to secure seki. See seki:803.
+
+|OOO??
+|..OO?
+|.X*OO
+|....O
++-----
+
+:8,sXe,terri(8),reverse_followup(16)
+
+|aaa??
+|..aa?
+|bX*aa
+|....a
++-----
+
+;lib(a)==4 && seki_helper(a)
+
+>replace(b,*);
+
+
+Pattern S10c
+# gf New pattern. (3.5.3)
+# Make seki in sente, not gote. See seki:808.
+
+|XXX??
+|..XX?
+|.O*XX
+|..X.X
++-----
+
+:8,sXe,terri(8),followup(16)
+
+|AAA??
+|..AA?
+|bO*AA
+|.cX.A
++-----
+
+;lib(A)==4 && seki_helper(A)
+
+>replace(b,*);
+>replace(c,*);
+
+
+Pattern S10d
+# gf New pattern. (3.5.3)
+# Make seki in sente, not gote. See seki:810.
+# Only replace pattern here. The seki_helper doesn't apply and the
+# semeai code should find either a or * if there's a chance to make seki.
+
+|XXX??
+|*.XX?
+|.OOXX
+|.XX.X
++-----
+
+:8,sX
+
+|XXX??
+|*.XX?
+|aOOXX
+|.XX.X
++-----
+
+>replace(a,*);
+
+
+Pattern S11
+# gf New pattern. (3.5.3)
+# 8 points (mostly) reverse sente seki. Compare S10. See seki:802.
+
+|OOO??
+|..OO?
+|.*.OO
+|....O
++-----
+
+:8,sXe,terri(8),reverse_followup(16)
+
+|aaa??
+|..aa?
+|.*.aa
+|....a
++-----
+
+;lib(a)==4 && seki_helper(a)
+
+
+Pattern S12
+# gf New pattern. (3.5.3)
+# 9 points gote seki. See seki:901.
+
+|XXXX?
+|...X?
+|.*.XX
+|....X
++-----
+
+:8,sXe,terri(9)
+
+|AAAA?
+|...A?
+|.*.AA
+|....A
++-----
+
+;lib(A)==5 && seki_helper(A)
+
+
+Pattern S13
+# gf New pattern. (3.5.3)
+# 9 points seki. Compare S12. See seki:902.
+
+|OOOO?
+|...O?
+|.*.OO
+|....O
++-----
+
+:8,sXe,terri(9)
+
+|aaaa?
+|...a?
+|.*.aa
+|....a
++-----
+
+;lib(a)==5 && seki_helper(a)
+
+
+Pattern S14b
+# gf New pattern. (3.5.3)
+# Make sente seki. See seki:905.
+
+|OOOO?
+|.X.O?
+|.XOOO
+|..*.O
++-----
+
+:8,sX
+
+|OOOO?
+|.X.O?
+|.XOOO
+|.a*.O
++-----
+
+> replace(a,*);
 
 
 ######################################################################

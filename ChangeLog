@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- if one dragon is considerably smaller than the other in a semeai,
+  prefer to get ko over seki in do_owl_analyze_semeai()
+- in a semeai, consider also the eyespaces including opponent semeai
+  worms in order to detect a definite lack of eyespace and to find
+  certain vital moves
+- off-by-one error in loops over semeai_worms[] corrected
+- don't allow "safe" common liberties to depend on ko in
+  do_owl_analyze_semeai() 
+- new static function find_moves_to_make_seki() in semeai.c
+- do semeai analysis for all pairs of critical/dead dragons except
+  when one is inessential, other exceptional cases removed from semeai()
 - defend4() generates superstring moves
 - semeai_move_reasons() revised
 - induce_secondary_move_reasons() revised; do not allow owl attack moves

@@ -134,6 +134,7 @@ loadsgf games/life_and_death/ld13.sgf
 51 dragon_status R3
 #? [critical S1 (R1|S1|T5|T4|T3|S2|S3|T1)]
 # B1 is a better defense than D1 because the latter only lives by double ko.
+# FIXME: D1 and A5 only attack with ko since black can reply at A2.
 52 dragon_status C4
 #? [critical (D1|A5) (B1|D1|B2)]
 
