@@ -80,6 +80,7 @@ typedef struct dfa
 {
   /* file header */
   char name[80];
+  int pre_rotated;
   
   /* transition graph */
   state_t *states;
@@ -132,7 +133,7 @@ void pattern_2_string(struct pattern *pat, char *str,
 		      int trans, int ci, int cj);
 
 /* add a string with attribute att_val into a dfa */
-float dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index);
+float dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll);
 
 
 /* conversion macros */

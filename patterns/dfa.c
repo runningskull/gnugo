@@ -208,6 +208,13 @@ buildSpiralOrder(int order[8][MAX_ORDER])
     }
   }
 
+  if (0) {
+    for (ll = 0; ll < 8; ll++) {
+      for (i = 0; i < 13; i++) {
+        fprintf(stderr, "i:%d; ll:%d; %d(%c)\n", i, ll, order[ll][i],'A'+i);
+      }
+    }
+  }
 }
 
 /********************************
@@ -493,6 +500,7 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
 
   fprintf(of, "static struct dfa dfa_%s = {\n", name);
   fprintf(of, " \"%s\",\n", name);
+  fprintf(of, " %d,\n", pdfa->pre_rotated);
   fprintf(of, "state_%s, %d, %d,\n", name,
 	  pdfa->lastState + 1, pdfa->lastState);
   fprintf(of, "idx_%s, %d, %d", name, pdfa->lastIndex + 1, pdfa->lastIndex);
@@ -674,7 +682,7 @@ free_test_array(test_array_t *pta)
 {
   int h;
 
-  for (h=0; h!=MAX_HASH_VALUE; h++) {
+  for (h = 0; h != MAX_HASH_VALUE; h++) {
     free_entry_list(pta->hash[h]);
     pta->hash[h] = NULL;
   }
@@ -853,21 +861,57 @@ dfa_finalize(dfa_t *pdfa)
  */
 
 float
-dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index)
+dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
 {
-  float ratio;
   dfa_t *new_dfa = &(aux_dfa[aux_count % DFA_BINS]);
   dfa_t *old_dfa = &(aux_dfa[(aux_count+1) % DFA_BINS]);
+  float ratio;
+  char strrot[MAX_ORDER+1];
+  int len = strlen(str);
+
+  if (ll == 0) {
+    strcpy(strrot, str);
+  } else {
+    int i,j;
+    char strdollar[MAX_ORDER+1];
+    memset(strdollar, '$', sizeof(char) * (MAX_ORDER + 1));
+    strcpy(strdollar, str);
+    strdollar[strlen(str)] = '$';
+    memset(strrot, '$', sizeof(char) * (MAX_ORDER + 1));
+    for (i = 0; i < MAX_ORDER/2; i++) {
+      for (j = 0; j < MAX_ORDER+1; j++) {
+        if (spiral[0][i] == spiral[ll][j]) {
+          if (0 && (spiral[0][i] == 84 || spiral[0][i] == -84
+              || spiral[0][i]== 1   || spiral[0][i] == -1
+              || spiral[ll][j] == 84 || spiral[ll][j] == -84
+              || spiral[ll][j] == 1  || spiral[ll][j] == -1 ) )
+            fprintf(stderr, "i: %d  j: %d\n", i, j);
+          assert(strrot[i] == '$');
+          strrot[i] = strdollar[j];
+          break;
+        }
+      }
+      assert(j < MAX_ORDER+1);
+    }
+    j = MAX_ORDER;
+    while (strrot[j] == '$') {
+      j--;
+    }
+    strrot[j+1] = 0;
+  }
 
   if (dfa_verbose > 1) {
-    fprintf(stderr, "Adding to dfa %s the string: %s\n", pdfa->name, str);
-    fprintf(stderr, "  at bin: %d\n", aux_count);
+    fprintf(stderr, "Adding to dfa %s the string: %s\n", pdfa->name, strrot);
+    fprintf(stderr, "  pat_ind: %d; rotation: %d at bin: %d\n", pattern_index, ll, aux_count);
   }
 
   gg_assert(dfa_was_initialized > 0);
   gg_assert(pdfa != NULL);
 
-  create_dfa(&aux_temp, str, pattern_index);
+  if (pdfa->pre_rotated)
+    pattern_index = pattern_index * 8 + ll;
+
+  create_dfa(&aux_temp, strrot, pattern_index);
 
   /* then we do the synchronization product with dfa */
   sync_product(new_dfa, old_dfa, &aux_temp);
@@ -988,7 +1032,7 @@ pattern_2_string(struct pattern *pat, char *str, int trans, int ci, int cj)
     fprintf(stderr, "\n");
   }
 
-  /* Now we can build the smaller pattern string as possible 
+  /* Now we can build the smallest pattern string possible 
    * from the anchor */
 
   to_test = pat->patlen;	/* How many positions left to test ? */
@@ -1045,7 +1089,7 @@ pattern_2_string(struct pattern *pat, char *str, int trans, int ci, int cj)
   str[k] = '\0';		/* end of string */
 
   if (0 && dfa_verbose > 0)
-    fprintf(stderr, "converted pattern into string: %s\n", str);
+    fprintf(stderr, "converted pattern %s into string: %s\n", pat->name, str);
 
 }
 

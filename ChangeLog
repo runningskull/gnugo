@@ -2,7 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.3.10 released October 29, 2002
+- pre-rotated pattern generation in mkpat. (-p option) implemented.
+- %2m added as valid syntax for gprintf
+- relabel rotation matrices in transform.c
+
+3.3.11 released October 29, 2002
 
 - experimental connection code made default
 - configure --help cleanup

@@ -957,7 +957,11 @@ scan_for_patterns(dfa_t *pdfa, int l, int m, int n, int *pat_list)
     /* collect patterns indexes */
     att = pdfa->states[state].att;
     while (att != 0) {
-      pat_list[id] = l + 8 * pdfa->indexes[att].val;
+      if (pdfa->pre_rotated) {
+        pat_list[id] = pdfa->indexes[att].val;
+      } else {
+        pat_list[id] = l + 8 * pdfa->indexes[att].val;
+      }
       id++;
       att = pdfa->indexes[att].next;
     }
@@ -1009,6 +1013,8 @@ do_dfa_matchpat(dfa_t *pdfa,
   for (ll = 0; ll != 8; ll++) {
     maxr += scan_for_patterns(pdfa, ll, m, n, preorder);
     preorder = reorder + maxr;
+    if (pdfa->pre_rotated)
+      break;
   }
 
   ASSERT2(maxr < DFA_MAX_MATCHED, m, n);
@@ -1058,6 +1064,10 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 #ifdef PROFILE_MATCHER
   ++totals[1];
 #endif
+
+  if (0)
+    gprintf("check_pattern_light @ %2m rot:%d pattern: %s\n", 
+	    m, n, ll, pattern->name);
 
   /* Throw out duplicating orientations of symmetric patterns. */
   if (pattern->trfno == 5) {

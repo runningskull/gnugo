@@ -85,6 +85,13 @@ vgprintf(FILE* outputfile, const char *fmt, va_list ap)
 	fputs(s, outputfile);
 	break;
       }
+      case '2':
+        fmt++;
+        if (*fmt != 'm' && *fmt != 'M') {
+	  fprintf(outputfile, "\n\nUnknown format string '2%c'\n", *fmt);
+	  break;
+        }
+        /* else fall through - 2 modifier on %m is default. */
       case 'm':
       case 'M':
       {

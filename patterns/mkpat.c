@@ -513,6 +513,9 @@ write_to_dfa(int index)
 {
   char str[MAX_ORDER+1];
   float ratio;
+  int ll;
+  int rot_start = 0;
+  int rot_stop = 1;
   
   assert(ci != -1 && cj != -1);
   pattern[index].patn = elements; /* a little modification : keep in touch! */
@@ -524,17 +527,27 @@ write_to_dfa(int index)
   /* First we create the string from the actual pattern */
   pattern_2_string(pattern+index, str, 0, ci, cj);
       
-  /* Then We add this string to the DFA */
-  ratio = (dfa_add_string(&dfa, str, index) - 1)*100;
- 
-  /* Complain when there is more than 10% of increase */ 
-  if (dfa_size(&dfa) > 100 && ratio > 10.0) {
-    fprintf(stderr, "Pattern %s => %3.1f%% increase: ",
-	    pattern[index].name, ratio);
-    fprintf(stderr, "another orientation may save memory.\n");
+  if (pre_rotate) {
+    if (pattern[index].trfno != 5) {
+      rot_stop = pattern[index].trfno;
+    } else {
+      rot_start = 2;
+      rot_stop = 6;
+    }
   }
-  if (dfa_verbose > 2)
-    dump_dfa(stderr, &dfa);
+  for (ll = 0; ll < rot_stop; ll++) {
+    /* Then We add this string to the DFA */
+    ratio = (dfa_add_string(&dfa, str, index, ll) - 1)*100;
+ 
+    /* Complain when there is more than 10% of increase */ 
+    if (dfa_size(&dfa) > 100 && ratio > 10.0) {
+      fprintf(stderr, "Pattern %s => %3.1f%% increase: ",
+	      pattern[index].name, ratio);
+      fprintf(stderr, "another orientation may save memory.\n");
+    }
+    if (dfa_verbose > 2)
+      dump_dfa(stderr, &dfa);
+  }
 }
 
 
@@ -1651,7 +1664,7 @@ tree_push_pattern_DOX(struct element_node *elist, int ll)
   while (elist_next) {
     if (elist_next->e.att == ATT_o 
         || elist_next->e.att == ATT_x) {
-      need_copy =1;
+      need_copy = 1;
       break;
     }
     elist_next = elist_next->next;
@@ -1662,7 +1675,7 @@ tree_push_pattern_DOX(struct element_node *elist, int ll)
     struct element_node *elist_copy2 = malloc(sizeof(struct element_node));
     struct element_node *elist1_next = elist_copy1;
     struct element_node *elist2_next = elist_copy2;
-    int found_copy_element=0;
+    int found_copy_element = 0;
     
     elist_next = elist->next;
     while (elist_next) {
@@ -2138,7 +2151,7 @@ main(int argc, char *argv[])
 
   {
     /* parse command-line args */
-    while ((i = gg_getopt(argc, argv, "i:o:V:vcbXfmtDT")) != EOF) {
+    while ((i = gg_getopt(argc, argv, "i:o:V:vcbpXfmtDT")) != EOF) {
       switch (i) {
       case 'v': verbose = 1; break;
       case 'c': pattern_type = CONNECTIONS; break;
@@ -2146,7 +2159,7 @@ main(int argc, char *argv[])
       case 'X': anchor = ANCHOR_X; break;
       case 'f': fullboard = 1; break;
       case 'm': choose_best_anchor = 1; break;
-      case 'r': pre_rotate = 1; break;
+      case 'p': pre_rotate = 1; break;
       case 'i': 
 	if (ifc == MAX_INPUT_FILE_NAMES) {
 	  fprintf(stderr, "Error : Too many input files; %s", gg_optarg);
@@ -2185,6 +2198,7 @@ main(int argc, char *argv[])
   if (dfa_generate) {
     dfa_init();
     new_dfa(&dfa, "mkpat's dfa");
+    dfa.pre_rotated = pre_rotate;
   }
 
   if (gg_optind >= argc) {
@@ -2430,11 +2444,15 @@ main(int argc, char *argv[])
   if (dfa_generate) {
     fprintf(stderr, "---------------------------\n");
 
+    dfa.pre_rotated = pre_rotate;
     dfa_finalize(&dfa);
 
     fprintf(stderr, "dfa for %s\n", argv[gg_optind]);
     fprintf(stderr, "size: %d kB for ", dfa_size(&dfa));
     fprintf(stderr, "%d patterns\n", patno);
+
+    if (0 && dfa.pre_rotated)
+      dump_dfa(stderr, &dfa);
 
     strcpy(dfa.name, argv[gg_optind]);
     print_c_dfa(output_FILE, argv[gg_optind], &dfa);

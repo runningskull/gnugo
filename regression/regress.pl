@@ -522,7 +522,8 @@ sub tally_result {
   $failures++ if $status eq "failed";
   $unexpected_fail++ if $status eq "FAILED";
   
-  if ($status ne "skipped") {
+  if (($verbose and $status ne "skipped") or
+      (!$verbose and ($status eq "PASSED" or $status eq "FAILED")) ) {
     print "$g_curtestfile:$number: $status: correct: $correct  answer: $incorrect\n";
   }
   
