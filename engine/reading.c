@@ -4065,6 +4065,8 @@ special_attack4(int str, int libs[2], int *move, int komaster, int kom_pos)
   int cpos;
   int dpos;
   int epos;
+  int dlibs;
+  int elibs;
   int k, s, t;
 
   gg_assert(countlib(str) == 2);
@@ -4111,17 +4113,27 @@ special_attack4(int str, int libs[2], int *move, int komaster, int kom_pos)
       /* Try playing at a liberty. Before doing this, verify that
        * (cpos) cannot get more than two liberties by answering on the
        * other liberty and that we are not putting ourselves in atari.
+       * We also shouldn't allow ourselves to get fewer liberties than
+       * the defender.
        */
       for (t = 0; t < 2; t++) {
 	dpos = libs2[t];
 	epos = libs2[1-t];
+
 	if (is_self_atari(dpos, other))
-	  break;
-	if (approxlib(epos, color, 4, NULL) > 3)
-	  break;
+	  continue;
+
+	elibs = approxlib(epos, color, 4, NULL);
+	if (elibs > 3)
+	  continue;
+
+	dlibs = approxlib(dpos, other, 3, NULL);
+	if (elibs > dlibs)
+	  continue;
 
 	if (trymove(dpos, other, "special_attack4", str, komaster, kom_pos)) {
 	  dcode = do_find_defense(str, NULL, komaster, kom_pos);
+
 	  if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 	    if (dcode == 0) {
 	      popgo();

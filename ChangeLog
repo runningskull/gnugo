@@ -22,6 +22,7 @@
 - revision of extract_fuseki
 - revision of fuseki.c
 - bugfix in break_chain3
+- bugfix in special_attack4
 - warning fixed in mkpat
 - formatting errors fixed in decidestring and other places: use %1m
 - twogtp-a writes html
