@@ -32,7 +32,7 @@ loadsgf games/unfinished.sgf 214
 
 loadsgf games/owl36.sgf
 268 owl_defend A3
-#? [2 A1]*
+#? [3 A1]*
 
 loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 192
 269 owl_defend D11
