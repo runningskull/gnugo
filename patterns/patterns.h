@@ -46,15 +46,11 @@
 #define _NO_PROTO
 #endif
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#else
-#define GRID_OPT 0
-#endif
+/* =================================================================== */
+/*  Configure option that has been removed from the stable version.    */
+/* =================================================================== */
 
-#ifndef GRID_OPT
-#error GRID_OPT should be defined as 0, 1 or 2
-#endif
+#define GRID_OPT 1
 
 
 /* Include support for pattern profiling. May be turned off in stable

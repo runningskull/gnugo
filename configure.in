@@ -44,12 +44,6 @@ AC_ARG_ENABLE(color,
 
 dnl and look to see if they want to disable the grid optimisation
 
-AC_ARG_ENABLE(grid-opt,
- [  --enable-grid-opt           enable the grid optimsation within the pattern
-                                matcher (default)
-  --enable-grid-opt=distrust  enable the grid optimsation in non-trusting mode
-  --disable-grid-opt          disable the grid optimisation])
-
 default_cache_size=8
 default_level=10
 default_semeai_node_limit=500
@@ -84,21 +78,13 @@ AC_ARG_ENABLE(resignation-allowed,
  [  --enable-resignation-allowed       resign lost games (default)
   --disable-resignation-allowed      never resign])
 
-AC_ARG_ENABLE(oracle,
- [  --enable-oracle                    enable oracle
-  --disable-oracle                   don't enable oracle (default)])
+AC_ARG_ENABLE(metamachine,
+ [  --enable-metamachine                enable metamachine
+  --disable-metamachine               don't enable metamachine (default)])
 
 AC_ARG_ENABLE(experimental-break-in,
  [  --enable-experimental-break-in     use the breakin module (default)
   --disable-experimental-break-in    don't use the breakin module])
-
-AC_ARG_ENABLE(experimental-owl-ext,
- [  --enable-experimental-owl-ext      use the experimental GAIN/LOSS codes
-  --disable-experimental-owl-ext     use standard owl module (default)])
-
-AC_ARG_ENABLE(experimental-reading,
- [  --enable-experimental-reading      use experimental pattern-based reading
-  --disable-experimental-reading     use standard reading (default)])
 
 AC_ARG_ENABLE(cosmic-gnugo,
  [  --enable-cosmic-gnugo              use center-oriented influence code
@@ -107,17 +93,6 @@ AC_ARG_ENABLE(cosmic-gnugo,
 AC_ARG_ENABLE(large-scale,
  [  --enable-large-scale               look for large scale captures
   --disable-large-scale              don't seek large scale captures (default)])
-
-AC_ARG_ENABLE(experimental-connections,
- [  --enable-experimental-connections  use experimental connection analysis 
-                                         (default)
-  --disable-experimental-connections use standard connection analysis])
-
-AC_ARG_ENABLE(alternate-connections,
- [  --enable-alternate-connections     use alternate experimental connection
-                                         analysis
-  --disable-alternate-connections    use primary experimental connection 
-                                         analysis (default)])
 
 AC_ARG_ENABLE(profile,
  [  --enable-profile                   compile gnugo with gprof option ])
@@ -317,18 +292,6 @@ AC_MSG_RESULT($tmp_color_result)
 
 dnl ---------- grid optimisation ------------
 
-AH_TEMPLATE([GRID_OPT],
-[Define as 1 to use the grid optimisation, or 2 to run it in self-test mode])
-
-if test "$enable_grid_opt" = "distrust" ; then
-  AC_DEFINE(GRID_OPT, 2)
-else
-  if test "$enable_grid_opt" = "no" ; then
-    AC_DEFINE(GRID_OPT, 0)
-  else
-    AC_DEFINE(GRID_OPT, 1)
-  fi
-fi
 
 
 dnl ------------ set cache size ----------
@@ -422,9 +385,9 @@ fi
 dnl ------------ Oracle enabled-------------------
 
 AH_TEMPLATE([ORACLE],
-[Oracle. Default not enabled.])
+[Metamachine. Default not enabled.])
 
-if test "$enable_oracle" = "yes" ; then
+if test "$enable_metamachine" = "yes" ; then
    AC_DEFINE(ORACLE, 1)
 else
    AC_DEFINE(ORACLE, 0)
@@ -439,28 +402,6 @@ if test "$enable_experimental_break_in" = "no" ; then
    AC_DEFINE(USE_BREAK_IN, 0)
 else
    AC_DEFINE(USE_BREAK_IN, 1)
-fi
-
-dnl ------------ Owl extensions ------------
-
-AH_TEMPLATE([EXPERIMENTAL_OWL_EXT],
-[GAIN/LOSS codes. Disabled by default.])
-
-if test "$enable_experimental_owl_ext" = "yes" ; then
-   AC_DEFINE(EXPERIMENTAL_OWL_EXT, 1)
-else
-   AC_DEFINE(EXPERIMENTAL_OWL_EXT, 0)
-fi
-
-dnl ------------ Reading -------------------
-
-AH_TEMPLATE([EXPERIMENTAL_READING],
-[Experimental pattern based reading. Disabled by default.])
-
-if test "$enable_experimental_reading" = "yes" ; then
-   AC_DEFINE(EXPERIMENTAL_READING, 1)
-else
-   AC_DEFINE(EXPERIMENTAL_READING, 0)
 fi
 
 dnl ------------ Cosmic Consciousness -------------------
@@ -483,39 +424,6 @@ if test "$enable_large_scale" = "yes" ; then
    AC_DEFINE(LARGE_SCALE, 1)
 else
    AC_DEFINE(LARGE_SCALE, 0)
-fi
-
-dnl ------------ Connections -------------------
-
-AH_TEMPLATE([EXPERIMENTAL_CONNECTIONS],
-[Connection module. Default experimental.])
-
-if test "$enable_experimental_connections" = "no" ; then
-   AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 0)
-else
-   AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 1)
-fi
-
-dnl ------------ Connections -------------------
-
-AH_TEMPLATE([ALTERNATE_CONNECTIONS],
-[Connection module. Default standard.])
-
-if test "$enable_alternate_connections" = "no" ; then
-   AC_DEFINE(ALTERNATE_CONNECTIONS, 0)
-else
-   AC_DEFINE(ALTERNATE_CONNECTIONS, 1)
-fi
-
-dnl ------------ Owl Threats -------------------
-
-AH_TEMPLATE([OWL_THREATS],
-[Owl Threats. 0 standard.])
-
-if test "$enable_owl_threats" = "yes" ; then
-   AC_DEFINE(OWL_THREATS, 1)
-else
-   AC_DEFINE(OWL_THREATS, 0)
 fi
 
 dnl ------------ additional valgrind macros ------

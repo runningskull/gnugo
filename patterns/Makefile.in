@@ -113,8 +113,7 @@ EXTRA_DIST = $(DSP)\
 	fuseki19.db\
 	handicap.db\
 	read_attack.db\
-	read_defend.db\
-	oracle.db
+	read_defend.db
 
 
 mkpat_SOURCES = mkpat.c transform.c dfa.c
@@ -145,7 +144,7 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
-		 read_attack.c read_defend.c handipat.c oraclepat.c
+		 read_attack.c read_defend.c handipat.c
 
 
 DBBUILT = hoshi_keima.db hoshi_other.db komoku.db sansan.db \
@@ -158,7 +157,7 @@ DBBUILT_INPUT = -i hoshi_keima.db -i hoshi_other.db -i komoku.db \
 
 DB_TO_TAG = aa_attackpats.db attack.db barriers.db conn.db defense.db\
 	    endgame.db eyes.db fuseki.db fuseki9.db fuseki13.db fuseki19.db\
-	    handicap.db influence.db oracle.db owl_attackpats.db\
+	    handicap.db influence.db owl_attackpats.db\
 	    owl_defendpats.db owl_vital_apats.db patterns.db patterns2.db\
 	    read_attack.db read_defend.db $(DBBUILT)
 
@@ -193,7 +192,7 @@ am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
 	owl_vital_apat.$(OBJEXT) owl_defendpat.$(OBJEXT) \
 	fusekipat.$(OBJEXT) fuseki9.$(OBJEXT) fuseki13.$(OBJEXT) \
 	fuseki19.$(OBJEXT) josekidb.$(OBJEXT) read_attack.$(OBJEXT) \
-	read_defend.$(OBJEXT) handipat.$(OBJEXT) oraclepat.$(OBJEXT)
+	read_defend.$(OBJEXT) handipat.$(OBJEXT)
 libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
 EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) transpat$(EXEEXT)
 noinst_PROGRAMS = mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT)
@@ -241,8 +240,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/handipat.Po $(DEPDIR)/helpers.Po \
 @AMDEP_TRUE@	$(DEPDIR)/influence.Po $(DEPDIR)/joseki.Po \
 @AMDEP_TRUE@	$(DEPDIR)/josekidb.Po $(DEPDIR)/mkeyes.Po \
-@AMDEP_TRUE@	$(DEPDIR)/mkpat.Po $(DEPDIR)/oraclepat.Po \
-@AMDEP_TRUE@	$(DEPDIR)/owl_attackpat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/mkpat.Po $(DEPDIR)/owl_attackpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_defendpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po $(DEPDIR)/patlib.Po \
 @AMDEP_TRUE@	$(DEPDIR)/patterns.Po $(DEPDIR)/read_attack.Po \
@@ -327,7 +325,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/josekidb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/mkeyes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/mkpat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/oraclepat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_attackpat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_defendpat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_vital_apat.Po@am__quote@
@@ -547,9 +544,6 @@ aa_attackpat.c : $(srcdir)/aa_attackpats.db $(srcdir)/aa_attackpats.dtr mkpat$(E
 owl_attackpat.c : $(srcdir)/owl_attackpats.db $(srcdir)/owl_attackpats.dtr mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b -t $(srcdir)/owl_attackpats.dtr owl_attackpat \
                -i $(srcdir)/owl_attackpats.db -o owl_attackpat.c
-
-oraclepat.c : $(srcdir)/oracle.db mkpat$(EXEEXT)
-	./mkpat -b oracle -i $(srcdir)/oracle.db -o oraclepat.c
 
 owl_vital_apat.c : $(srcdir)/owl_vital_apats.db $(srcdir)/owl_vital_apats.dtr mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b -t $(srcdir)/owl_vital_apats.dtr owl_vital_apat \

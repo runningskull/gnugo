@@ -638,29 +638,6 @@ decide_surrounded(int pos)
 }  
 
 
-#if ORACLE
-
-void
-decide_oracle(Gameinfo *gameinfo, char *infilename, char *untilstring)
-{
-  SGFTree tree;
-
-  reset_engine();
-  if (*outfilename)
-    sgffile_begindump(&tree);
-
-  count_variations = 1;
-  summon_oracle();
-  oracle_loadsgf(infilename, untilstring);
-  consult_oracle(gameinfo->to_move);
-  sgffile_enddump(outfilename);
-  dismiss_oracle();
-  count_variations = 0;
-}
-
-#endif
-
-
 /*
  * Local Variables:
  * tab-width: 8

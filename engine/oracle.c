@@ -82,15 +82,8 @@ struct oracle_move_data {
   const char *reason; /* why this move */
 };
 
-static void oracle_callback(int anchor, int color, struct pattern *pattern,
-			    int ll, void *data);
-static void oracle_add_move(struct oracle_move_data *moves, 
-			    int this_move, int this_value, 
-			    const char *this_reason);
-void do_consult_oracle(int color);
 void error(const char *msg);
-static int oracle_trymove(int pos, int color, const char *message, int str,
-			  int komaster, int kom_pos);
+static int oracle_trymove(int pos, int color, const char *message, int str);
 static void oracle_popgo(void);
 static void tell_oracle(const char *fmt, ...);
 static void ask_oracle(void);
@@ -169,8 +162,7 @@ error(const char *msg)
  * play the move.
  */
 static int 
-oracle_trymove(int pos, int color, const char *message, int str,
-	       int komaster, int kom_pos)
+oracle_trymove(int pos, int color, const char *message, int str)
 {
   if (!trymove(pos, color, message, str))
     return 0;
@@ -264,74 +256,6 @@ oracle_clear_board(int boardsize)
 }
 
 /*** * *** * *** * *** * *** * *** * *** * *** * *** * *** * *** * ***\
- *              Demonstration: a pattern matcher                     *
-\*** * *** * *** * *** * *** * *** * *** * *** * *** * *** * *** * ***/
-
-/* Call the pattern matcher */
-
-void
-consult_oracle(int color)
-{
-  do_consult_oracle(color);
-}
-
-void
-do_consult_oracle(int color)
-{
-  struct oracle_move_data oracle_moves[MAX_ORACLE_MOVES];
-  int k;
-
-  for (k = 0; k < MAX_ORACLE_MOVES; k++)
-    oracle_moves[k].value = -1;
-  
-  matchpat(oracle_callback, color, &oracle_db, oracle_moves, NULL);
-  for (k = 0; k < MAX_ORACLE_MOVES; k++)
-    if (oracle_moves[k].value > -1) {
-      oracle_trymove(oracle_moves[k].pos, color, oracle_moves[k].reason,
-		     0, 0, NO_MOVE);
-      do_consult_oracle(OTHER_COLOR(color));
-      oracle_popgo();
-    }
-}
-
-static void
-oracle_callback(int anchor, int color, struct pattern *pattern,
-		int ll, void *data)
-{
-  int this_move;
-  struct oracle_move_data *moves = data;
-  UNUSED(color);
-
-  this_move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
-  if (within_search_area(this_move))
-    oracle_add_move(moves, this_move, pattern->value, pattern->name);
-  else
-    gprintf("outside the area\n");
-}
-
-/* Add a move to a list */
-
-static void
-oracle_add_move(struct oracle_move_data moves[MAX_ORACLE_MOVES],
-		int this_move, int this_value, const char *this_reason)
-{
-  int k, l;
-  
-  for (k = 0; k < MAX_ORACLE_MOVES; k++)
-    if (moves[k].value == -1
-	|| this_value >= moves[k].value)
-      break;
-  for (l = MAX_ORACLE_MOVES-1; l > k; l--) {
-    moves[l].pos = moves[l-1].pos;
-    moves[l].value = moves[l-1].value;
-    moves[l].reason = moves[l-1].reason;
-  }
-  moves[k].pos = this_move;
-  moves[k].value = this_value;
-  moves[k].reason = this_reason;
-}
-
-/*** * *** * *** * *** * *** * *** * *** * *** * *** * *** * *** * ***\
  *              Demonstration: metamachine                           *
 \*** * *** * *** * *** * *** * *** * *** * *** * *** * *** * *** * ***/
 
@@ -418,7 +342,7 @@ do_metamachine_genmove(int *i, int *j, int color, int width)
     return 1;
   }
   for (k = 0; k < moves_considered; k++) {
-    if (oracle_trymove(POS(move_i[k], move_j[k]), color, "", 0, 0, NO_MOVE)) {
+    if (oracle_trymove(POS(move_i[k], move_j[k]), color, "", 0)) {
       int new_width = search_width();
 
       if (new_width == 0) {

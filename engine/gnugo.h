@@ -78,6 +78,16 @@ const char *result_to_string(int result);
 #define SURROUNDED 1
 #define WEAKLY_SURROUNDED 2
 
+/* =================================================================== */
+/*  Configure options that have been removed from the stable version.  */
+/* =================================================================== */
+
+#define EXPERIMENTAL_CONNECTIONS 1
+#define ALTERNATE_CONNECTIONS 1
+#define EXPERIMENTAL_OWL_EXT 0
+#define EXPERIMENTAL_READING 0
+#define OWL_THREATS 0
+
 /* ================================================================ */
 /*                        Board manipulation                        */
 /* ================================================================ */

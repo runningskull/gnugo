@@ -86,7 +86,6 @@ enum {OPT_BOARDSIZE = 127,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_SURROUNDED,
       OPT_DECIDE_TACTICAL_SEMEAI,
-      OPT_DECIDE_ORACLE,
       OPT_EXPERIMENTAL_SEMEAI,
       OPT_EXPERIMENTAL_OWL_EXT,
       OPT_SEMEAI_NODE_LIMIT,
@@ -170,8 +169,7 @@ enum mode {
   MODE_DECIDE_POSITION,
   MODE_DECIDE_EYE,
   MODE_DECIDE_COMBINATION,
-  MODE_DECIDE_SURROUNDED,
-  MODE_DECIDE_ORACLE
+  MODE_DECIDE_SURROUNDED
 };
 
 
@@ -272,7 +270,6 @@ static struct gg_option const long_options[] =
   {"decide-surrounded",  required_argument, 0, OPT_DECIDE_SURROUNDED},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
   {"decide-combination", no_argument,   0, OPT_DECIDE_COMBINATION},
-  {"decide-oracle",  no_argument,       0, OPT_DECIDE_ORACLE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
   {"nofuseki",       no_argument,       0, OPT_NOFUSEKI},
   {"nojosekidb",     no_argument,       0, OPT_NOJOSEKIDB},
@@ -492,10 +489,10 @@ main(int argc, char *argv[])
 		  "configure option enabled: owl threats\n");
 	if (RESIGNATION_ALLOWED)
 	  fprintf(stdout,
-		  "configure option enabled: resination allowed\n");
+		  "configure option enabled: resignation allowed\n");
 	if (ORACLE)
 	  fprintf(stdout,
-		  "configure option enabled: oracle\n");
+		  "configure option enabled: metamachine\n");
 	fprintf(stdout,
 		"Owl node limit: %d\n", OWL_NODE_LIMIT);
 	fprintf(stdout,
@@ -755,10 +752,6 @@ main(int argc, char *argv[])
 	}
 	strcpy(decide_this, gg_optarg);
 	playmode = MODE_DECIDE_SURROUNDED;
-	break;
-	
-      case OPT_DECIDE_ORACLE:
-	playmode = MODE_DECIDE_ORACLE;
 	break;
 	
       case OPT_BRANCH_DEPTH:
@@ -1324,22 +1317,6 @@ main(int argc, char *argv[])
       break;
     }
 
-#if ORACLE
-  case MODE_DECIDE_ORACLE:
-    {
-      if (mandated_color != EMPTY)
-	gameinfo.to_move = mandated_color;
-      
-      if (!infilename) {
-	fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
-	exit(EXIT_FAILURE);
-      }
-
-      decide_oracle(&gameinfo, infilename, untilstring);
-      break;
-    }
-#endif
-
   case MODE_GTP:  
     if (gtpfile != NULL) {
       gtp_input_FILE = fopen(gtpfile, "r");
@@ -1383,10 +1360,20 @@ main(int argc, char *argv[])
       show_copyright();
     }
   
+#if ORACLE
+    if (metamachine) {
+      summon_oracle();
+      oracle_loadsgf(infilename, untilstring);
+    }
+#endif
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;
   }
   
+#if ORACLE
+  dismiss_oracle();
+#endif
+
   if (profile_patterns)
     report_pattern_profiling();
 
