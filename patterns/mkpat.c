@@ -70,9 +70,7 @@ If output file is not specified, writes to stdout.\n\
 "
 
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>

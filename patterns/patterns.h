@@ -26,9 +26,7 @@
  * describing the patterns.
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #ifndef __PATTERN_H__
 #define __PATTERN_H__
@@ -44,12 +42,6 @@
  */
 #ifndef _NO_PROTO
 #define _NO_PROTO
-#endif
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#else
-#define GRID_OPT 0
 #endif
 
 #ifndef GRID_OPT

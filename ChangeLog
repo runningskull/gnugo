@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- remove "#ifdef HAVE_CONFIGH_H"-wrappers
 - backport bugfix in do_owl_analyze_semeai() from semeai_3_15.1a
 - fix potential floating point rounding errors in surround.c
 - fixed point integer arithmetic for accumulate_influence()
