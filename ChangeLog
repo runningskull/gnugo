@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- important bugfix in store_persistent_owl_cache()
 - bugfix in semeai_find_backfilling_move()
 - new command line option --debug-flags
 - new DEBUG_OWL_PERSISTENT_CACHE

@@ -4780,10 +4780,10 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
     for (pos = BOARDMIN; pos < BOARDMAX; pos++){
       if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
 	continue;
-      if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)])
-	  || (ON_BOARD(WEST(pos)) && active[WEST(pos)])
-	  || (ON_BOARD(NORTH(pos)) && active[NORTH(pos)])
-	  || (ON_BOARD(EAST(pos)) && active[EAST(pos)])) {
+      if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
+	  || (ON_BOARD(WEST(pos)) && active[WEST(pos)] == k)
+	  || (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == k)
+	  || (ON_BOARD(EAST(pos)) && active[EAST(pos)] == k)) {
 	if (board[pos] == EMPTY)
 	  active[pos] = k + 1;
 	else
@@ -4858,9 +4858,9 @@ print_persistent_owl_cache_entry(int k)
   gprintf("%omovenum         = %d\n",  entry->movenum);
   gprintf("%otactical_nodes  = %d\n",  entry->tactical_nodes);
   gprintf("%oroutine         = %s\n",  routine_to_string(entry->routine));
-  gprintf("%o(apos)  	     = %1m\n", entry->apos);
-  gprintf("%o(bpos)  	     = %1m\n", entry->bpos);
-  gprintf("%o(cpos)  	     = %1m\n", entry->cpos);
+  gprintf("%o(apos)          = %1m\n", entry->apos);
+  gprintf("%o(bpos)          = %1m\n", entry->bpos);
+  gprintf("%o(cpos)          = %1m\n", entry->cpos);
   gprintf("%oresult          = %d\n",  entry->result);
   gprintf("%o(move)          = %1m\n", entry->move);
   gprintf("%o(move2)         = %1m\n", entry->move2);
