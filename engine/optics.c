@@ -1067,52 +1067,47 @@ static int
 linear_eye_space(int pos, int *vital_point, int *max, int *min,
 		 struct eye_data eye[BOARDMAX])
 {
-  int m, n;
-  int end1i = -1, end1j = -1;
-  int end2i = -1, end2j = -1;
+  int posa;
+  int end1 = NO_MOVE;
+  int end2 = NO_MOVE;
   int centers = 0;
-  int centeri = -1, centerj = -1;
-  int middlei = -1, middlej = -1;
+  int center = NO_MOVE;
+  int middle = NO_MOVE;
   int is_line = 1;
   int msize = eye[pos].msize;
   int esize = eye[pos].esize;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos2 = POS(m, n);
-      if (eye[pos2].origin == pos) {
-	if (eye[pos2].neighbors > 2) {
-	  if (centeri == -1) {
-	    centeri = m;
-	    centerj = n;
-	  }
+  for (posa = BOARDMIN; posa < BOARDMAX; posa++) {
+    if (ON_BOARD(posa)) {
+      if (eye[posa].origin == pos) {
+	if (eye[posa].neighbors > 2) {
+	  if (center == NO_MOVE)
+	    center = posa;
 	  centers++;
 	  is_line = 0;
 	}
-	if (eye[pos2].neighbors == 2) {
-	  middlei = m;
-	  middlej = n;
-	  if (eye[pos2].marginal)
+	if (eye[posa].neighbors == 2) {
+	  middle = posa;
+	  if (eye[posa].marginal)
 	    is_line = 0;
 	}
-	if (eye[pos2].neighbors == 1) {
-	  if (end1i == -1) {
-	    end1i = m;
-	    end1j = n;
-	  }
-	  else if (end2i == -1) {
-	    end2i = m;
-	    end2j = n;
+	if (eye[posa].neighbors == 1) {
+	  if (end1 == NO_MOVE)
+	    end1 = posa;
+	  else if (end2 == NO_MOVE) {
+	    end2 = posa;
 	  }
 	}
       }
     }
-  
+  }
   if (!is_line)
     return 0;
 
-  /* Come here --> Indeed a linear eye space. 
-   * Now check how many eyes we can get. 
+  /* If we got this far, we have a linear eye space.
+   * end1 and end2 are the endpoints. middle is a
+   * vertex which is not one of these though its 
+   * location is not specified beyond that.
    */
 
   /* 1. Check eye spaces with no marginal vertices. */
@@ -1123,11 +1118,11 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
       return 1;
     }
     if (esize == 3) {
-      gg_assert (middlei != -1);
-      if (BOARD(middlei, middlej) == EMPTY) {
+      gg_assert (middle != NO_MOVE);
+      if (board[middle] == EMPTY) {
 	*max = 2;
 	*min = 1;
-	*vital_point = POS(middlei, middlej);
+	*vital_point = middle;
 	return 1;
       }
       else {
@@ -1137,44 +1132,31 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
       }
     }
     if (esize == 4) {
-      int farmiddlei;
-      int farmiddlej;
-      if (middlei > 0 
-	  && eye[POS(middlei-1, middlej)].origin == pos
-	  && eye[POS(middlei-1, middlej)].neighbors == 2) 
-      {
-	farmiddlei = middlei-1;
-	farmiddlej = middlej;
-      }
-      else if (middlei < board_size-1
-	       && eye[POS(middlei+1, middlej)].origin == pos
-	       && eye[POS(middlei+1, middlej)].neighbors == 2) 
-      {
-	farmiddlei = middlei+1;
-	farmiddlej = middlej;
-      }
-      else if (middlej > 0
-	       && eye[POS(middlei, middlej-1)].origin == pos
-	       && eye[POS(middlei, middlej-1)].neighbors == 2) 
-      {
-	farmiddlei = middlei;
-	farmiddlej = middlej-1;
-      }
-      else if (middlej < board_size-1
-	       && eye[POS(middlei, middlej+1)].origin == pos
-	       && eye[POS(middlei, middlej+1)].neighbors == 2) 
-      {
-	farmiddlei = middlei;
-	farmiddlej = middlej+1;
-      }
+      int farmiddle;
+      if (ON_BOARD(SOUTH(middle))
+	  && eye[SOUTH(middle)].origin == pos
+	  && eye[SOUTH(middle)].neighbors == 2)
+	farmiddle = SOUTH(middle);
+      else if (ON_BOARD(NORTH(middle))
+	       && eye[NORTH(middle)].origin == pos
+	       && eye[NORTH(middle)].neighbors == 2)
+	farmiddle = NORTH(middle);
+      else if (ON_BOARD(EAST(middle))
+	       && eye[EAST(middle)].origin == pos
+	       && eye[EAST(middle)].neighbors == 2)
+	farmiddle = EAST(middle);
+      else if (ON_BOARD(WEST(middle))
+	       && eye[WEST(middle)].origin == pos
+	       && eye[WEST(middle)].neighbors == 2)
+	farmiddle = WEST(middle);
       else {
-	farmiddlei = -1; /* to prevent compiler warning */
-	farmiddlej = -1;
+	farmiddle = NO_MOVE; /* to prevent compiler warning */
 	abort();
       }
-
-      if (BOARD(middlei, middlej) == EMPTY) {
-	if (BOARD(farmiddlei, farmiddlej) == EMPTY) {
+      
+      if (board[middle] == EMPTY) {
+	
+	if (board[farmiddle] == EMPTY) {
 	  *max = 2;
 	  *min = 2;
 	  return 1;
@@ -1182,15 +1164,15 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
 	else {
 	  *max = 2;
 	  *min = 1;
-	  *vital_point = POS(middlei, middlej);
+	  *vital_point = middle;
 	  return 1;
 	}
       }
       else
-	if (BOARD(farmiddlei, farmiddlej) == EMPTY) {
+	if (board[farmiddle] == EMPTY) {
 	  *max = 2;
 	  *min = 1;
-	  *vital_point = POS(farmiddlei, farmiddlej);
+	  *vital_point = farmiddle;
 	  return 1;
 	}
 	else {
@@ -1215,12 +1197,11 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
     if (esize == 2) {
       *max = 1;
       *min = 0;
-      if (eye[POS(end1i, end1j)].marginal) {
-	*vital_point = POS(end1i, end1j);
+      if (eye[end1].marginal) {
+	*vital_point = end1;
       }
-      else {
-	*vital_point = POS(end2i, end2j);
-      }
+      else
+	*vital_point = end2;
       
       /* We need to make an exception for cases like this:
        * XXOOO
@@ -1235,42 +1216,42 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
     }
 
     if (esize == 3) {
-      if (BOARD(middlei, middlej) == EMPTY) {
+      if (board[middle] == EMPTY) {
 	*max = 1;
 	*min = 1;
-
-	/* Exceptional cases. (eyes.tst:312) */
-	if ((eye[POS(end1i, end1j)].marginal
-	     && IS_STONE(BOARD(end1i, end1j))
-	     && BOARD(end2i, end2j) == EMPTY)
-	    || (eye[POS(end2i, end2j)].marginal
-		&& IS_STONE(BOARD(end2i, end2j))
-		&& BOARD(end1i, end1j) == EMPTY)) {
+	
+	/* Exceptional cases. (optics.tst:312) */
+	if ((eye[end1].marginal
+	     && IS_STONE(board[end1])
+	     && board[end2] == EMPTY)
+	    || (eye[end2].marginal
+		&& IS_STONE(board[end2])
+		&& board[end1] == EMPTY)) {
+	  *max = 1;
 	  *min = 0;
-	  *vital_point = POS(middlei, middlej);
+	  *vital_point = middle;
+	  return 1;
 	}
-	return 1;
       }
       else {
 	*max = 1;
 	*min = 0;
-	if (eye[POS(end1i, end1j)].marginal) {
-	  if (BOARD(end1i, end1j) == EMPTY) {
-	    *vital_point = POS(end1i, end1j);
+	if (eye[end1].marginal) {
+	  if (board[end1] == EMPTY) {
+	    *vital_point = end1;
 	  }
 	  else {
-	    if (IS_STONE(BOARD(end2i, end2j)))
+	    if (IS_STONE(board[end2]))
 	      *min = 1; /* three tactically dead stones in a row. */
 	    else
 	      *max = 0;
 	  }
 	}
 	else {
-	  if (BOARD(end2i, end2j) == EMPTY) {
-	    *vital_point = POS(end2i, end2j);
-	  }
+	  if (board[end2] == EMPTY)
+	    *vital_point = end2;
 	  else {
-	    if (IS_STONE(BOARD(end1i, end1j)))
+	    if (IS_STONE(board[end1]))
 	      *min = 1; /* three tactically dead stones in a row. */
 	    else
 	      *max = 0;
@@ -1281,77 +1262,98 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
     }
 
     if (esize == 4) {
-      if (BOARD(middlei, middlej) == EMPTY) {
+      if (board[middle] == EMPTY) {
 	*max=1;
 	*min=1;
 	return 1;
       }
       else {
-	int farmiddlei;
-	int farmiddlej;
-	if (middlei > 0
-	    && eye[POS(middlei-1, middlej)].origin == pos
-	    && eye[POS(middlei-1, middlej)].neighbors == 2) 
-	{
-	  farmiddlei = middlei-1;
-	  farmiddlej = middlej;
-	}
-	else if (middlei < board_size-1
-		 && eye[POS(middlei+1, middlej)].origin == pos
-		 && eye[POS(middlei+1, middlej)].neighbors == 2)
-	{
-	  farmiddlei = middlei+1;
-	  farmiddlej = middlej;
-	}
-	else if (middlej > 0
-		 && eye[POS(middlei, middlej-1)].origin == pos
-		 && eye[POS(middlei, middlej-1)].neighbors == 2) 
-	{
-	  farmiddlei = middlei;
-	  farmiddlej = middlej-1;
-	}
-	else if (middlej < board_size-1
-		 && eye[POS(middlei, middlej+1)].origin == pos
-		 && eye[POS(middlei, middlej+1)].neighbors == 2)
-	{
-	  farmiddlei = middlei;
-	  farmiddlej = middlej+1;
-	}
+	int farmiddle;
+
+	if (ON_BOARD(SOUTH(middle))
+	    && eye[SOUTH(middle)].origin == pos
+	    && eye[SOUTH(middle)].neighbors == 2)
+	  farmiddle = SOUTH(middle);
+	else if (ON_BOARD(NORTH(middle))
+		 && eye[NORTH(middle)].origin == pos
+		 && eye[NORTH(middle)].neighbors == 2)
+	  farmiddle = NORTH(middle);
+	else if (ON_BOARD(EAST(middle))
+		 && eye[EAST(middle)].origin == pos
+		 && eye[EAST(middle)].neighbors == 2)
+	  farmiddle = EAST(middle);
+	else if (ON_BOARD(WEST(middle))
+		 && eye[WEST(middle)].origin == pos
+		 && eye[WEST(middle)].neighbors == 2)
+	  farmiddle = WEST(middle);
+
+	/* Now farmiddle is the second middle vertex */
+
 	else {
-	  farmiddlei = -1; /* to prevent compiler warning */
-	  farmiddlej = -1;
+	  farmiddle = NO_MOVE; /* to prevent compiler warning */
 	  abort();
 	}
-
-	if (BOARD(farmiddlei, farmiddlej) == EMPTY) {
+	if (board[farmiddle] == EMPTY) {
 	  *max = 1;
 	  *min = 1;
 	  return 1;
 	}
 	else {
-	  *max = 1;
-	  *min = 0;
-	  if (eye[POS(end1i, end1j)].marginal) {
-	    *vital_point = POS(end1i, end1j);
+	  if (eye[end1].marginal) {
+	    if (board[end1] == EMPTY) {
+	      *max = 1;
+	      *min = 0;
+	      *vital_point = end1;
+	      return 1;
+	    }
+	    else {
+	      /* Since end1, middle and farmiddle are occupied,
+	       * if they are captured, an eye results.
+	       */
+	      int apos;
+	      if (attack(end1, &apos)) {
+		if (find_defense(end1, NULL)) {
+		  *max = 1;
+		  *min = 0;
+		  *vital_point = end2;
+		  return 1;
+		}
+		else {
+		  *max = 1;
+		  *min = 1;
+		  return 1;
+		}
+	      }
+	    }
 	  }
-	  else {
-	    *vital_point = POS(end2i, end2j);
-	  }
-	  return 1;
 	}
       }
     }
-
+    
     if (esize == 5) {
-      *max=2;
-      *min=1;
-      if (eye[POS(end1i, end1j)].marginal) {
-	*vital_point = POS(end1i, end1j);
+      *max = 2;
+      *min = 1;
+      if (eye[end1].marginal) {
+	if (board[end1] == EMPTY) {
+	  *vital_point = end1;
+	  return 1;
+	}
+	else {
+	  *max = 1;
+	  *min = 1;
+	  return 1;
+	}
       }
-      else {
-	*vital_point = POS(end2i, end2j);
-      }
-      return 1;
+      else
+	if (board[end2] == EMPTY) {
+	  *vital_point = end2;
+	  return 1;
+	}
+	else {
+	  *max = 1;
+	  *min = 1;
+	  return 1;
+	}
     }
     if (esize == 6) {
       *max = 2;
@@ -1367,21 +1369,36 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
       return 1;
     }
     if (esize == 4) {
-      *max = 1;
-      *min = 0;
-      *vital_point = POS(end1i, end1j);
-      return 1;
+      if (board[end1] == EMPTY
+	  && board[end2] == EMPTY) {
+	*max = 1;
+	*min = 0;
+	*vital_point = end1;
+	return 1;
+      }
+      else {
+	*max = 0;
+	*min = 0;
+	return 1;
+      }
     }
-    if (esize == 5 || esize==6) {
+    if (esize == 5 || esize == 6) {
       *max = 1;
       *min = 1;
       return 1;
     }
     if (esize == 7) {
-      *max = 2;
-      *min = 1;
-      *vital_point = POS(end1i, end1j);
-      return 1;
+      if (board[end1] == EMPTY
+	  && board[end2] == EMPTY) {
+	*max = 2;
+	*min = 1;
+	*vital_point = end1;
+      }
+      else {
+	*max = 2;
+	*min = 1;
+	return 1;
+      }
     }
     if (esize > 7) {
       *max = 2;
