@@ -2494,7 +2494,48 @@ Pattern J46
 ..O...|
 ......|
 
-:8,sFU
+:8,J
+
+
+Pattern J47
+# db added (3.3.14)
+
++-------        general hanetsugi
+|.......
+|...*...
+|..OX.O.
+|..OX.??
+|..ox.??
+|..??...
+
+:8,J
+
+
+Pattern J47
+# db added (3.3.14)
+
++-------        general hanetsugi
+|.......
+|..*OX..
+|..OX.O.
+|..OX.??
+|..ox.??
+|..??...
+
+:8,J
+
+
+Pattern J48
+# db added (3.3.14)
+
++--------        stabilize the corner
+|........
+|..O.*...
+|..XO....
+|..X.....
+|...X....
+
+:8,J
 
 
 # END OF FILE

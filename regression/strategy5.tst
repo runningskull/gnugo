@@ -5,8 +5,8 @@ reset_reading_node_counter
 reset_trymove_counter
 
 loadsgf games/wing-yuhiko-gnugo.sgf 12
-221 gg_genmove black
-#? [S4|C11]*
+221 restricted_genmove black S4 Q7
+#? [S4]*
 
 # This might be worth a J pattern.
 loadsgf games/wing-yuhiko-gnugo.sgf 30

@@ -9017,6 +9017,31 @@ abh
 ;&& !oplay_disconnect(*,b,*,a) && !oplay_disconnect(*,c,*,a)
 
 
+Pattern CB339
+# db added (3.3.14)
+# compare CB242
+
+X...          extend to prevent hane
+..X.
+O.O*
+o...
+
+:8,OXda,shape(3)
+
+
+Pattern CB340
+# db added (3.3.14)
+# compare CB242
+
+..X.        extend to prevent hane and split
+O.O*
+o...
+..X.
+
+:8,OXda,shape(3)
+
+
+
 ######################################################################
 #
 # Edge defend/attack patterns
@@ -10252,6 +10277,7 @@ Pattern ED76
 # gf The negative shape value is a temporary measure to avoid
 #    overvaluation. (3.1.17)
 # tm Added right hand side check (3.1.20) (see strategy4:195)
+# db removed 'a' classification and reduced negative shape.
 
 oOo???     stop expansion and undermine
 o..X??
@@ -10259,7 +10285,7 @@ o.*.x?
 ....??
 ------
 
-:8,OXea,shape(-3)
+:8,OXe,shape(-2)
 
 oOo???
 obaX?g
@@ -12967,6 +12993,30 @@ O..*O.
 ------
 
 :8,j
+
+
+Pattern EJ99
+# db added (3.3.14)
+# see nngs3:330 where GNU thinks e is an owl attack
+
+........        seal the opponent
+oooO*.oo
+ooOXX.oo
+o.......
+........
+--------
+
+:8,j,shape(3)
+
+........
+oooO*.ab
+ooOXX.cd
+o.e.....
+........
+--------
+
+; o_somewhere(a,b,c,d)
+> replace(e,*)
 
 
 
