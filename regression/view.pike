@@ -399,7 +399,7 @@ class Goban
     }
 }
 
-string font_filename = "/home/gunnar/aido/aido/fonts/arial.ttf";
+string font_filename = "";
 
 int main(int argc, array(string) argv)
 {
