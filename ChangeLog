@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- speed up scan_for_patterns()
+- remove DFA_SORT
+
 3.3.16 released January 29, 2003
 
 - redundant patterns removed from hoshi.c
