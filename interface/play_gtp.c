@@ -26,6 +26,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 
 #include "interface.h"
 #include "liberty.h"
@@ -136,6 +137,7 @@ DECLARE(gtp_loadsgf);
 DECLARE(gtp_move_influence);
 DECLARE(gtp_move_probabilities);
 DECLARE(gtp_move_reasons);
+DECLARE(gtp_move_uncertainty);
 DECLARE(gtp_name);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_connection_defends);
@@ -275,6 +277,7 @@ static struct gtp_command commands[] = {
   {"move_influence",          gtp_move_influence},
   {"move_probabilities",      gtp_move_probabilities},
   {"move_reasons",            gtp_move_reasons},
+  {"move_uncertainty",	      gtp_move_uncertainty},
   {"name",                    gtp_name},
   {"new_score",               gtp_estimate_score},
   {"orientation",     	      gtp_set_orientation},
@@ -3763,6 +3766,37 @@ gtp_move_probabilities(char *s)
   if (!any_moves_printed)
     gtp_printf("\n");
   gtp_printf("\n");
+/* Function:  Return the number of bits of uncertainty in the move.
+ * Arguments: none
+ * Fails:     never
+ * Returns:   bits of uncertainty
+ */
+static int
+gtp_move_uncertainty(char *s)
+{
+  float probabilities[BOARDMAX];
+  int pos;
+  double uncertainty = 0.0;
+
+  UNUSED(s);
+
+  compute_move_probabilities(probabilities);
+
+  gtp_start_response(GTP_SUCCESS);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos) && probabilities[pos] > 0.0) {
+      /* Shannon's formula */
+      uncertainty += -1 * ((double)probabilities[pos]) *
+	log((double)probabilities[pos]) / log(2.0);
+    }
+  }
+
+  gtp_printf("%.4f\n\n", uncertainty);
+
+  return GTP_OK;
+}
+
+
 
   return GTP_OK;
 }
