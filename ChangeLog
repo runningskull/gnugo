@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- atari_atari_find_defense_moves() revised
 - ATTACK_EITHER_MOVE taken down
 - new ALL_MOVE reason
 - new static find_all_data(), all_move_redundant() in move_reasons.c

@@ -1005,7 +1005,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
   int neighbors;
   int adjs[MAXCHAIN];
   int mx[BOARDMAX];
-  int r;
+  int r, s;
 
   memset(mx, 0, sizeof(mx));
 
@@ -1054,6 +1054,27 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
 	if (num_moves == AA_MAX_MOVES)
 	  return num_moves;
 	mx[attack_point] = 1;
+      }
+
+      /* If the neighbor has at most three liberties, try all of them
+       * for defense, except self-ataris.
+       */
+      liberties = findlib(adjs[k], 3, libs);
+      if (liberties <= 3) {
+	for (s = 0; s < liberties; s++) {
+	  if (!mx[libs[s]]
+	      && !is_self_atari(libs[s], board[str])
+	      && trymove(libs[s], board[str], "aa_defend-B", str,
+			 EMPTY, NO_MOVE)) {
+	    if (attack(str, NULL) == 0) {
+	      moves[num_moves++] = libs[s];
+	      mx[libs[s]] = 1;
+	    }
+	    popgo();
+	    if (num_moves == AA_MAX_MOVES)
+	      return num_moves;
+	  }
+	}
       }
     }
     
