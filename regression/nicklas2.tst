@@ -166,7 +166,7 @@ loadsgf games/nicklas/nicklas22.sgf 50
 #SEVERITY=10
 loadsgf games/nicklas/nicklas24.sgf 41
 2401 gg_genmove black
-#? [G3|G2]*
+#? [G3|G2]
 
 
 

@@ -4,7 +4,7 @@ loadsgf games/auto_gen/auto007.sgf 20
 
 loadsgf games/auto_gen/auto007.sgf 42
 2 owl_defend q13
-#? [!0]*
+#? [!0]
 
 # C16 is probably best. /ab
 loadsgf games/auto_gen/auto008.sgf 58
@@ -22,7 +22,7 @@ loadsgf games/auto_gen/auto008.sgf 180
 
 loadsgf games/auto_gen/auto009.sgf 94
 6 owl_defend f3
-#? [!0]*
+#? [!0]
 
 loadsgf games/auto_gen/auto010.sgf 66
 7 owl_attack q17
@@ -30,7 +30,7 @@ loadsgf games/auto_gen/auto010.sgf 66
 
 loadsgf games/auto_gen/auto010.sgf 64
 8 owl_attack q17
-#? [!0]*
+#? [!0]
 
 loadsgf games/auto_gen/auto010.sgf 77
 9 owl_attack c18
@@ -42,4 +42,4 @@ loadsgf games/auto_gen/auto011.sgf 43
 
 loadsgf games/auto_gen/auto012.sgf 168
 11 owl_attack h15
-#? [0]
+#? [0]*

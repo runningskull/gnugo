@@ -142,7 +142,7 @@ loadsgf games/trevor/auto/a014.sgf 16
 #as the original hane.
 loadsgf games/trevor/auto/a015.sgf 20
 270 gg_genmove white
-#? [C4]*
+#? [C4]
 
 
 

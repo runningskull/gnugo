@@ -686,7 +686,7 @@ trymove W P4
 trymove B R5
 trymove W R3
 171 attack R3
-#? [1 R2]*
+#? [1 R2]
 popgo
 popgo
 popgo

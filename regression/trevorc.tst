@@ -903,7 +903,7 @@ loadsgf games/trevor/auto/c83.sgf 134
 
 loadsgf games/trevor/auto/c84.sgf 50
 1530 gg_genmove white
-#? [A9]*
+#? [A9]
 
 
 loadsgf games/trevor/auto/c84.sgf 62

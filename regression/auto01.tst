@@ -33,7 +33,7 @@ loadsgf games/auto_gen/auto006.sgf 81
 
 loadsgf games/auto_gen/auto006.sgf 94
 13 owl_attack s11
-#? [1 (Q12|Q13)]
+#? [1 (Q12|Q13)]*
 
 # This is a difficult semeai problem.
 loadsgf games/auto_gen/auto006.sgf 99

@@ -20,11 +20,11 @@ loadsgf games/century21-2002/golois-gnugo.sgf 183
 # B15 and D13 are both locally better. C13 fills a dame.
 loadsgf games/century21-2002/golois-gnugo.sgf 239
 35 gg_genmove black
-#? [!C13]*
+#? [!C13]
 
 loadsgf games/century21-2002/goint-gnugo.sgf 37
 40 gg_genmove black 
-#? [J3]*
+#? [J3]
 
 loadsgf games/century21-2002/goint-gnugo.sgf 47
 50 gg_genmove black 
@@ -85,7 +85,7 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 57
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 157
 150 gg_genmove black
-#? [B18]*
+#? [B18]
 
 # avoid shortage of liberties
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 177

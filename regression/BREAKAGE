@@ -1,3 +1,61 @@
+======================= 3.3.7 pre 1  =========================   
+
+./regress.sh . reading.tst 
+171 unexpected PASS!
+./regress.sh . owl.tst 
+262 unexpected FAIL: Correct '0', got '1 E8'
+./regress.sh . trevora.tst 
+270 unexpected PASS!
+./regress.sh . rosebud.tst 
+1 unexpected PASS!
+./regress.sh . lazarus.tst 
+5 unexpected FAIL: Correct 'R13', got 'N11'
+14 unexpected FAIL: Correct 'Q15|T5|H5', got 'Q14'
+./regress.sh . nicklas2.tst 
+2401 unexpected PASS!
+./regress.sh . nicklas4.tst 
+1201 unexpected PASS!
+./regress.sh . tactics.tst 
+5 unexpected PASS!
+./regress.sh . nngs.tst 
+600 unexpected PASS!
+880 unexpected PASS!
+890 unexpected PASS!
+1480 unexpected PASS!
+1910 unexpected PASS!
+./regress.sh . trevorc.tst 
+1530 unexpected PASS!
+./regress.sh . global.tst 
+34 unexpected FAIL: Correct 'N6', got 'L6'
+./regress.sh . nngs2.tst 
+1 unexpected PASS!
+60 unexpected PASS!
+100 unexpected PASS!
+./regress.sh . century2002.tst 
+35 unexpected PASS!
+40 unexpected PASS!
+150 unexpected PASS!
+./regress.sh . auto01.tst 
+13 unexpected FAIL: Correct '1 (Q12|Q13)', got 'vertex must not be empty'
+./regress.sh . auto02.tst 
+2 unexpected PASS!
+6 unexpected PASS!
+8 unexpected PASS!
+11 unexpected FAIL: Correct '0', got 'vertex must not be empty'
+./regress.sh . auto03.tst 
+1 unexpected PASS!
+2 unexpected PASS!
+9 unexpected PASS!
+12 unexpected PASS!
+14 unexpected PASS!
+./regress.sh . auto04.tst 
+1 unexpected PASS!
+2 unexpected PASS!
+./regress.sh . safety.tst 
+2 unexpected FAIL: Correct 'Q7|P6|R7|S1|S5|R6|O5', got 'O12'
+3 unexpected FAIL: Correct 'H15|H16|G14|F13|C17', got 'G16'
+4 unexpected FAIL: Correct 'G14|E13|C17', got 'G16'
+
 ======================= 3.3.6 =========================
 
 ./regress.sh . owl.tst 

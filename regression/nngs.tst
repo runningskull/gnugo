@@ -253,7 +253,7 @@ loadsgf games/nngs/NE-gnugo-3.1.18-200201030545.sgf 20
 
 loadsgf games/nngs/NE-gnugo-3.1.18-200201030545.sgf 40
 600 gg_genmove black
-#? [H6]*
+#? [H6]
 
 
 loadsgf games/nngs/NE-gnugo-3.1.18-200201030545.sgf 42
@@ -373,12 +373,12 @@ loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051408.sgf 5
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 13
 880 gg_genmove white
-#? [E6]*
+#? [E6]
 
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 19
 890 gg_genmove white
-#? [!J4]*
+#? [!J4]
 
 
 
@@ -662,7 +662,7 @@ loadsgf games/nngs/gnugo-3.1.18-rpwiegand-200201072335.sgf 13
 
 loadsgf games/nngs/gnugo-3.1.18-rpwiegand-200201072335.sgf 71
 1480 gg_genmove white
-#? [B1]*
+#? [B1]
 
 
 
@@ -870,7 +870,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 173
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 177
 1910 gg_genmove black
-#? [E18]*
+#? [E18]
 
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 205
