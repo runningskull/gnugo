@@ -160,7 +160,7 @@ loadsgf games/endgame8.sgf
 
 loadsgf games/nngs/gnugo-3.3.17-Wiedemann-200303251932.sgf 151
 810 genmove white
-#? [F5|F4]*
+#? [F5|F4]
 
 loadsgf games/nngs/gnugo-3.3.17-Wiedemann-200303251932.sgf 203
 820 gg_genmove white

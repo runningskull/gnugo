@@ -184,7 +184,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 102
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 110
 36 gg_genmove white
-#? [C5]
+#? [C5]*
 
 #CATEGORY=STRATEGY
 #SEVERITY=8

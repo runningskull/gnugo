@@ -49,7 +49,7 @@ loadsgf games/nngs/tobyiii-gnugo-3.3.2-200206041432.sgf 162
 #CATEGORY=BLUNDER (incorrectly rejected move)
 loadsgf games/nngs/tobyiii-gnugo-3.3.2-200206041432.sgf 166
 90 gg_genmove black
-#? [N1]*
+#? [N1]
 
 loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 214
 100 gg_genmove black

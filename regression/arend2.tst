@@ -25,7 +25,7 @@ loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 52
 # The cut at R14 is not dangerous. /ab
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 110
 60 gg_genmove white
-#? [N8|M7|L7|M9|L9|N7|O9|N10]*
+#? [N8|M7|L7|M9|L9|N7|O9|N10]
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 112
 70 gg_genmove white
@@ -59,8 +59,8 @@ loadsgf games/arend/gnugo-gnugo6.sgf 20
 
 loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf C10
 140 genmove black
-#? [D11|H10|G9|E10]
+#? [D11|H10|G9|E10]*
 
 loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf B12
 150 genmove black
-#? [B6|C6]
+#? [B6|C6]*

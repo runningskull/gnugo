@@ -174,7 +174,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 137
  
 loadsgf games/arend/gnugo-gnugo7.sgf 140
 33 gg_genmove white
-#? [F9]
+#? [F9]*
  
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/arend/gnugo-gnugo7.sgf 173

@@ -404,7 +404,7 @@ loadsgf games/trevor/auto/a037.sgf 12
 #Enough to win.
 loadsgf games/trevor/auto/a038.sgf 34
 610 gg_genmove white
-#? [D2|F2]*
+#? [D2|F2]
 
 
 

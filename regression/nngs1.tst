@@ -159,7 +159,7 @@ loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 59
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
 39 gg_genmove black
-#? [R7]*
+#? [R7]
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 141
 40 gg_genmove black

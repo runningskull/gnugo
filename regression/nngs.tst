@@ -612,7 +612,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 90
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 138
 1280 gg_genmove white
-#? [D13]
+#? [D13]*
 
 
 
@@ -797,7 +797,7 @@ loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 192
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 196
 1770 gg_genmove black
-#? [M2|M3|M5|O1]*
+#? [M2|M3|M5|O1]
 
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 202

@@ -361,7 +361,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 164
 trymove black R14
 trymove white P16
 106 disconnect O14 O17
-#? [1 O16]
+#? [1 O16]*
 popgo
 popgo
 

@@ -233,7 +233,7 @@ loadsgf games/trevor/auto/b28.sgf 80
 
 loadsgf games/trevor/auto/b29.sgf 52
 440 gg_genmove white
-#? [E6]*
+#? [E6]
 
 
 

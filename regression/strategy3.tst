@@ -97,7 +97,7 @@ loadsgf games/incident240.sgf 69
 # incident 221
 loadsgf games/incident221.sgf 35
 120 gg_genmove black
-#? [C7]
+#? [C7]*
 
 # incident 222
 loadsgf games/incident221.sgf 39
