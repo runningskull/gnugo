@@ -83,9 +83,6 @@ struct local_owl_data {
   
   int lunches_are_current; /* If true, owl lunch data is current */  
 
-  /* Node limitation. */
-  int local_owl_node_counter;
-
   char safe_move_cache[BOARDMAX];
 
  /* This is used to organize the owl stack. */
@@ -97,6 +94,8 @@ struct local_owl_data {
 static int result_certain;
 
 /* Statistics. */
+static int local_owl_node_counter;
+/* Node limitation. */
 static int global_owl_node_counter = 0;
 
 static struct local_owl_data *current_owl_data;
@@ -147,7 +146,7 @@ static void collect_owl_shapes_callbacks(int m, int n, int color,
 static int get_next_move_from_list(struct matched_patterns_list_data *list,
                                    int color, struct owl_move_data *moves,
 				   int cutoff);
-static void  init_pattern_list(struct matched_patterns_list_data *list);
+static void init_pattern_list(struct matched_patterns_list_data *list);
 static void close_pattern_list(int color,
 			       struct matched_patterns_list_data *list);
 static void owl_shapes_callback(int m, int n, int color,
@@ -161,6 +160,12 @@ static void owl_determine_life(struct local_owl_data *owl,
 			       struct owl_move_data *moves,
 			       struct eyevalue *probable_eyes,
 			       int *eyemin, int *eyemax);
+static int owl_estimate_life(struct local_owl_data *owl,
+    		  	     struct owl_move_data vital_moves[MAX_MOVES],
+		  	     const char **live_reason,
+			     int komaster, int does_attack,
+		  	     struct eyevalue *probable_eyes,
+			     int *eyemin, int *eyemax);
 static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
 					 int *vital_point,
 					 int is_attack_point);
@@ -199,6 +204,7 @@ static void reduced_init_owl(struct local_owl_data **owl,
     			     int at_bottom_of_stack);
 static void init_owl(struct local_owl_data **owl, int target1, int target2,
 		     int move, int use_stack);
+
 static struct local_owl_data *owl_stack = NULL;
 static int owl_stack_size = 0;
 static int owl_stack_pointer = 0;
@@ -208,10 +214,12 @@ static void do_push_owl(struct local_owl_data **owl);
 static void pop_owl(struct local_owl_data **owl);
 
 #if 0
-static int catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS]);
+static int catalog_goal(struct local_owl_data *owl,
+    			int goal_worm[MAX_GOAL_WORMS]);
 #endif
 
-static int list_goal_worms(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS]);
+static int list_goal_worms(struct local_owl_data *owl,
+    			   int goal_worm[MAX_GOAL_WORMS]);
 
 /* FIXME: taken from move_reasons.h */
 #define MAX_DRAGONS       2*MAX_BOARD*MAX_BOARD/3
@@ -278,8 +286,7 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
   else {
     reduced_init_owl(&owla, 1);
     reduced_init_owl(&owlb, 0);
-    owla->local_owl_node_counter	= 0;
-    owlb->local_owl_node_counter	= 0;
+    local_owl_node_counter = 0;
     owl_mark_worm(apos, NO_MOVE, owla);
     owl_mark_worm(bpos, NO_MOVE, owlb);
   }
@@ -352,7 +359,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   int this_resulta = UNKNOWN;
   int this_resultb = UNKNOWN;
   int best_move_k = -1;
-  int found_read_result;
   Read_result *read_result;
   int this_variation_number = count_variations - 1;
   int dummy_move;
@@ -369,16 +375,14 @@ do_owl_analyze_semeai(int apos, int bpos,
   shape_defensive_patterns.initialized = 0;
   
   global_owl_node_counter++;
-  owla->local_owl_node_counter++;
+  local_owl_node_counter++;
 
   gg_assert(board[apos] == owla->color);
   gg_assert(board[bpos] == owlb->color);
 
   if (stackp <= owl_branch_depth && (hashflags & HASH_SEMEAI)
       && !pass && owl_phase) {
-    found_read_result = get_read_result2(SEMEAI, EMPTY, 0,
-					 &apos, &bpos, &read_result);
-    if (found_read_result) {
+    if (get_read_result2(SEMEAI, EMPTY, 0, &apos, &bpos, &read_result)) {
       TRACE_CACHED_RESULT2(*read_result);
       if (rr_get_result1(*read_result) != 0)
 	*move = rr_get_move(*read_result);
@@ -1069,6 +1073,57 @@ find_semeai_backfilling_move(int worm, int liberty)
     return NO_MOVE;
 }
 
+/* Some helper function for do_owl_attack/defend. */
+
+static int
+reading_limit_reached(const char **live_reason, int this_variation_number)
+{
+  /* If (stackp > owl_reading_depth), interpret deep reading
+   * conservatively as escape.
+   */
+  if (stackp > owl_reading_depth) {
+    TRACE("%oVariation %d: ALIVE (maximum reading depth reached)\n",
+	  this_variation_number);
+    *live_reason = "max reading depth reached";
+    return 1;
+  }
+  /* If the owl node limit has been reached, assume the dragon has
+   * managed to escape.
+   */
+  if (local_owl_node_counter >= owl_node_limit) {
+    result_certain = 0;
+    TRACE("%oVariation %d: ALIVE (owl node limit reached)\n",
+	  this_variation_number);
+    *live_reason = "owl node limit reached";
+    return 1;
+  }
+  return 0;
+}
+
+static void
+clear_owl_move_data(struct owl_move_data moves[MAX_MOVES])
+{
+  int k;
+  for (k = 0; k < MAX_MOVES; k++) {
+    moves[k].pos = NO_MOVE;
+    moves[k].value = -1;
+    moves[k].name = NULL;
+    moves[k].same_dragon = 2;
+    moves[k].escape = 0;
+  }
+}
+
+static void
+set_single_owl_move(struct owl_move_data moves[MAX_MOVES],
+    		    int pos, const char *name)
+{
+  moves[0].pos         = pos;
+  moves[0].value       = 25;
+  moves[0].name        = name;
+  moves[0].same_dragon = 1;
+  moves[0].escape      = 0;
+  moves[1].value       = 0;
+}
 
 
 /* Returns true if a move can be found to attack the dragon
@@ -1129,7 +1184,7 @@ owl_attack(int target, int *attack_point, int *certain, int *kworm)
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
     "owl_attack %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
-    target, result, move, owl->local_owl_node_counter,
+    target, result, move, local_owl_node_counter,
     tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_ATTACK, target, 0, 0,
@@ -1173,9 +1228,8 @@ do_owl_attack(int str, int *move, int *wormid,
   int eyemin = -1;               /* Lower bound on the number of eyes. */
   int eyemax = -1;               /* Upper bound on the number of eyes. */
   struct eyevalue probable_eyes; /* Best guess of eyevalue. */
+  const char *live_reason;
   int move_cutoff;
-  int dcode;
-  int found_read_result;
   Read_result *read_result = NULL;
   int this_variation_number = count_variations - 1;
   
@@ -1184,9 +1238,7 @@ do_owl_attack(int str, int *move, int *wormid,
   shape_patterns.initialized = 0;
 
   if ((stackp <= owl_branch_depth) && (hashflags & HASH_OWL_ATTACK)) {
-    found_read_result = get_read_result(OWL_ATTACK, komaster, kom_pos,
-					&str, &read_result);
-    if (found_read_result) {
+    if (get_read_result(OWL_ATTACK, komaster, kom_pos, &str, &read_result)) {
       TRACE_CACHED_RESULT(*read_result);
       if (rr_get_result(*read_result) != 0) {
 	if (move)
@@ -1212,111 +1264,57 @@ do_owl_attack(int str, int *move, int *wormid,
     }
   }
 
-  /* If we're deeper than owl_reading_depth, assume the dragon has
-   * managed to escape.
-   */
-  if (stackp > owl_reading_depth) {
-    TRACE("%oVariation %d: ALIVE (maximum reading depth reached)\n",
-	  this_variation_number);
-    SGFTRACE(0, 0, "max reading depth reached");
-    READ_RETURN0(read_result);
-  }
-  
-  /* If the owl node limit has been reached, assume the dragon has
-   * managed to escape.
-   */
-  if (owl->local_owl_node_counter >= owl_node_limit) {
-    result_certain = 0;
-    TRACE("%oVariation %d: ALIVE (owl node limit reached)\n",
-	  this_variation_number);
-    SGFTRACE(0, 0, "owl node limit reached");
-    READ_RETURN0(read_result);
+
+  /* If reading goes to deep or we run out of nodes, we assume life. */
+  if (reading_limit_reached(&live_reason, this_variation_number))  {
+    SGFTRACE(0, 0, live_reason);
+    READ_RETURN(read_result, move, 0, 0);
   }
 
   memset(mw, 0, sizeof(mw));
   global_owl_node_counter++;
-  owl->local_owl_node_counter++;
+  local_owl_node_counter++;
 
-  /* Always start with picking up the vital moves so we can see if
-   * there is any chance to kill.
-   */
-  {
-    SGFTree *save_sgf_dumptree = sgf_dumptree;
-    int save_count_variations = count_variations;
-    
-    sgf_dumptree = NULL;
-    count_variations = 0;
-    owl_determine_life(owl, NULL, komaster, 1, vital_moves,
-		       &probable_eyes, &eyemin, &eyemax);
+  current_owl_data = owl;
+  memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
 
-    current_owl_data = owl;
-    memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
-
-    matches_found = 0;
-    memset(found_matches, 0, sizeof(found_matches));
-    if (level >= 9)
-      matchpat(owl_shapes_callback, other, 
-	       &owl_vital_apat_db, vital_moves, owl->goal);
-    
-    sgf_dumptree = save_sgf_dumptree;
-    count_variations = save_count_variations;
-
-    if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
-      gprintf("owl: eyemin=%d matches_found=%d\n", eyemin, matches_found);
-    eyemin -= matches_found;
-
-    if (eyemin >= 2
-	|| (eyemin == 1 && min_eyes(&probable_eyes) >= 4)
-	|| (stackp > owl_distrust_depth
-	    && min_eyes(&probable_eyes) >= 2
-	    && !matches_found)) {
-      const char *live_reason = "";
-      int acode = 0;
-      int mpos = NO_MOVE;
-      /*
-       * We need to check here if there's a worm under atari. If yes,
-       * locate it and report a (gote) GAIN.
-       */
-      if (experimental_owl_ext && goal_worms_computed) {
-	int size = 0;
-	saveworm = MAX_GOAL_WORMS;
-	for (k = 0; k < MAX_GOAL_WORMS; k++) {
-	  if (owl_goal_worm[k] == NO_MOVE) break;
-	  if (board[owl_goal_worm[k]] == EMPTY) continue;
-	  if (countlib(owl_goal_worm[k]) > 1) continue;
-	  if (size == 0 || worm[owl_goal_worm[k]].size > size) {
-	    saveworm = k;
-	    size = worm[owl_goal_worm[k]].size;
-	  }
-	}
-	if (saveworm != MAX_GOAL_WORMS && size >= 3) {
-	  acode = GAIN;
-	  findlib(worm[owl_goal_worm[saveworm]].origin, 1, &mpos);
-	  /* ASSERT1( ... */
+  /* First see whether there is any chance to kill. */
+  if (owl_estimate_life(owl, vital_moves, &live_reason, komaster, 1,
+			&probable_eyes, &eyemin, &eyemax)) {
+    /*
+     * We need to check here if there's a worm under atari. If yes,
+     * locate it and report a (gote) GAIN.
+     */
+    int acode = 0;
+    int mpos = NO_MOVE;
+    if (experimental_owl_ext && goal_worms_computed) {
+      int size = 0;
+      saveworm = MAX_GOAL_WORMS;
+      for (k = 0; k < MAX_GOAL_WORMS; k++) {
+	if (owl_goal_worm[k] == NO_MOVE)
+	  break;
+	if (board[owl_goal_worm[k]] == EMPTY
+	    || countlib(owl_goal_worm[k]) > 1)
+	  continue;
+	if (worm[owl_goal_worm[k]].size > size) {
+	  saveworm = k;
+	  size = worm[owl_goal_worm[k]].size;
 	}
       }
-
-      if (eyemin >= 2) 
-	live_reason = "2 or more secure eyes";
-      else if (eyemin == 1 && min_eyes(&probable_eyes) >= 4)
-	live_reason = "1 secure eye, likely >= 4";
-      else if (stackp > owl_distrust_depth 
-	       && min_eyes(&probable_eyes) >= 2
-	       && !matches_found)
-	live_reason = "getting deep, looks lively";
-      else
-	gg_assert(0); /* This should never happen */
-
-      SGFTRACE(0, acode, live_reason);
-      TRACE("%oVariation %d: ALIVE (%s)\n",
-	    this_variation_number, live_reason);
-      if (acode == 0)
-	READ_RETURN(read_result, move, 0, 0);
-      else {
-	if (wormid)
-	  *wormid = saveworm;
-        READ_RETURN2(read_result, move, mpos, acode, saveworm);
+      if (saveworm != MAX_GOAL_WORMS && size >= 3) {
+	acode = GAIN;
+	findlib(worm[owl_goal_worm[saveworm]].origin, 1, &mpos);
+	/* ASSERT1( ... */
       }
+    }
+    SGFTRACE(0, acode, live_reason);
+    TRACE("%oVariation %d: ALIVE (%s)\n", this_variation_number, live_reason);
+    if (acode == 0)
+      READ_RETURN(read_result, move, 0, 0);
+    else {
+      if (wormid)
+	*wormid = saveworm;
+      READ_RETURN2(read_result, move, mpos, acode, saveworm);
     }
   }
 
@@ -1335,8 +1333,8 @@ do_owl_attack(int str, int *move, int *wormid,
     
     current_owl_data = owl;
     /* Get the shape moves if we are in the right pass. */
-    if (pass == 1) {
-
+    switch (pass) {
+    case 1:
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
       
@@ -1355,9 +1353,10 @@ do_owl_attack(int str, int *move, int *wormid,
       }
 
       moves = shape_moves;
-    }
-    else if (pass == 0 || pass == 2) {
-      
+      break;
+
+    case 0:
+    case 2:
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
       
@@ -1370,87 +1369,87 @@ do_owl_attack(int str, int *move, int *wormid,
       }
       if (eyemax < 2 && stackp > 2)
 	move_cutoff = 99; /* Effectively disable vital moves. */
-    }
-    else if (pass == 3 || pass == 5) {
-      /* Look for a tactical attack. This is primarily intended for
-       * the case where the whole dragon is a single string, therefore
-       * we only look at the string at the "origin".
-       *
-       * We must be wary with attacks giving ko. Unless the dragon
-       * otherwise looks alive, this may turn a dead dragon into one
-       * which can live by ko. Such moves will be tried anyway in
-       * pass 5. Notice though that we can only reach there if an owl
-       * defense was found in pass 4.
-       */
-      int apos;
-      int result;
-      SGFTree *save_sgf_dumptree = sgf_dumptree;
-      int save_count_variations = count_variations;
-      
-      sgf_dumptree = NULL;
-      count_variations = 0;
-      result = attack(str, &apos);
-      if (result == WIN ||
-	  (result != 0 && (min_eyes(&probable_eyes) >= 2
-			   || pass == 5))) {
-	shape_moves[0].pos         = apos;
-	shape_moves[0].value       = 25;
-	shape_moves[0].name        = "tactical attack";
-	shape_moves[0].same_dragon = 1;
-	shape_moves[0].escape      = 0;
-	shape_moves[1].value       = 0;
-	moves = shape_moves;
+      break;
+
+    case 3:
+    case 5:
+      {
+	/* Look for a tactical attack. This is primarily intended for
+	 * the case where the whole dragon is a single string, therefore
+	 * we only look at the string at the "origin".
+	 *
+	 * We must be wary with attacks giving ko. Unless the dragon
+	 * otherwise looks alive, this may turn a dead dragon into one
+	 * which can live by ko. Such moves will be tried anyway in
+	 * pass 5. Notice though that we can only reach there if an owl
+	 * defense was found in pass 4.
+	 */
+	int apos;
+	int result;
+	SGFTree *save_sgf_dumptree = sgf_dumptree;
+	int save_count_variations = count_variations;
+
+	sgf_dumptree = NULL;
+	count_variations = 0;
+	result = attack(str, &apos);
+	if (result == WIN ||
+	    (result != 0 && (min_eyes(&probable_eyes) >= 2
+			     || pass == 5))) {
+	  set_single_owl_move(shape_moves, apos, "tactical attack");
+	  moves = shape_moves;
+	}
+	sgf_dumptree = save_sgf_dumptree;
+	count_variations = save_count_variations;
       }
-      sgf_dumptree = save_sgf_dumptree;
-      count_variations = save_count_variations;
-    }
+      break;
 
     /* If we found no move in the first four passes we ask the defender
      * for a move suggestion.
      */
-    if (pass == 4 && number_tried_moves == 0) {
-      int dpos;
-      dcode = do_owl_defend(str, &dpos, NULL, owl, komaster, kom_pos, escape);
-      /* No defense, we won. */
-      if (dcode == 0) {
-	TRACE("%oVariation %d: DEAD (no defense)\n",
-	      this_variation_number);
-	SGFTRACE(0, WIN, "no defense");
-	close_pattern_list(other, &shape_patterns);
-	READ_RETURN(read_result, move, 0, WIN);
-      }
-      else if (dpos != NO_MOVE) {
-	/* The dragon could be defended by one more move. Try to
-         * attack with this move.
-	 *
-	 * If the move is suicide for us, try to find a backfilling
-	 * move to play instead.
-	 */
-	shape_moves[0].name = "defense move";
-	
-	if (is_suicide(dpos, other)) {
-	  int dpos2;
-	  for (k = 0; k < 4; k++) {
-	    if (board[dpos + delta[k]] == other
-		&& find_defense(dpos + delta[k], &dpos2)) {
-	      dpos = dpos2;
-	      shape_moves[0].name = "defense move (backfill)";
-	      break;
+    case 4:
+      if (number_tried_moves == 0) {
+	int dpos;
+	int dcode = do_owl_defend(str, &dpos, NULL, owl, komaster,
+				  kom_pos, escape);
+	/* No defense, we won. */
+	if (dcode == 0) {
+	  TRACE("%oVariation %d: DEAD (no defense)\n",
+		this_variation_number);
+	  SGFTRACE(0, WIN, "no defense");
+	  close_pattern_list(other, &shape_patterns);
+	  READ_RETURN(read_result, move, 0, WIN);
+	}
+	else if (dpos != NO_MOVE) {
+	  /* The dragon could be defended by one more move. Try to
+	   * attack with this move.
+	   *
+	   * If the move is suicide for us, try to find a backfilling
+	   * move to play instead.
+	   */
+	  const char *name = "defense move";
+
+	  if (is_suicide(dpos, other)) {
+	    int dpos2;
+	    for (k = 0; k < 4; k++) {
+	      if (board[dpos + delta[k]] == other
+		  && find_defense(dpos + delta[k], &dpos2)) {
+		dpos = dpos2;
+		name = "defense move (backfill)";
+		break;
+	      }
 	    }
 	  }
-	}
 
-	if (dpos != NO_MOVE) {
-	  shape_moves[0].pos         = dpos;
-	  shape_moves[0].value       = 25;
-	  shape_moves[0].same_dragon = 1;
-	  shape_moves[0].escape      = 0;
-	  shape_moves[1].value       = 0;
-	  moves = shape_moves;
+	  if (dpos != NO_MOVE) {
+	    set_single_owl_move(shape_moves, dpos, name);
+	    moves = shape_moves;
+	  }
 	}
       }
-    }
+      break;
+    } /* switch (pass) */
       
+
     /* FIXME: This block probably should reappear somewhere in this
      * function.
      */
@@ -1483,6 +1482,7 @@ do_owl_attack(int str, int *move, int *wormid,
       int origin = NO_MOVE;
       int captured;
       int wid = MAX_GOAL_WORMS;
+      int dcode;
 
       /* Consider only the highest scoring move if we're deeper than
        * owl_branch_depth.
@@ -1519,7 +1519,6 @@ do_owl_attack(int str, int *move, int *wormid,
 
       mpos = moves[k].pos;
       ASSERT_ON_BOARD1(mpos);
-      gg_assert(mpos != NO_MOVE);
     
       /* Have we already tested this move? */
       if (mw[mpos])
@@ -1774,7 +1773,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
     "owl_threaten_attack %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
-    target, move, move2, result, owl->local_owl_node_counter,
+    target, move, move2, result, local_owl_node_counter,
     tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_THREATEN_ATTACK, target, 0, 0,
@@ -1843,7 +1842,7 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
     "owl_defend %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
-	    target, result, move, owl->local_owl_node_counter,
+	    target, result, move, local_owl_node_counter,
 	    tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_DEFEND, target, 0, 0, result, move, wpos,
@@ -1870,7 +1869,6 @@ do_owl_defend(int str, int *move, int *wormid,
 	      int komaster, int kom_pos, int escape)
 {
   int color = board[str];
-  int other = OTHER_COLOR(color);
   struct owl_move_data shape_moves[MAX_MOVES];
   struct owl_move_data vital_moves[MAX_MOVES];
   struct owl_move_data *moves;
@@ -1885,9 +1883,8 @@ do_owl_defend(int str, int *move, int *wormid,
   int eyemin = -1;               /* Lower bound on the number of eyes. */
   int eyemax = -1;               /* Upper bound on the number of eyes. */
   struct eyevalue probable_eyes; /* Best guess of eyevalue. */
+  const char *live_reason;
   int move_cutoff;
-  int acode;
-  int found_read_result;
   Read_result *read_result = NULL;
   int this_variation_number = count_variations - 1;
 
@@ -1896,9 +1893,7 @@ do_owl_defend(int str, int *move, int *wormid,
   shape_patterns.initialized = 0;
   
   if ((stackp <= owl_branch_depth) && (hashflags & HASH_OWL_DEFEND)) {
-    found_read_result = get_read_result(OWL_DEFEND, komaster, kom_pos,
-					&str, &read_result);
-    if (found_read_result) {
+    if (get_read_result(OWL_DEFEND, komaster, kom_pos, &str, &read_result)) {
       TRACE_CACHED_RESULT(*read_result);
       if (rr_get_result(*read_result) != 0) {
 	if (move)
@@ -1942,102 +1937,33 @@ do_owl_defend(int str, int *move, int *wormid,
     READ_RETURN(read_result, move, 0, WIN);
   }
 
-  /* If (stackp > owl_reading_depth), interpret deep reading 
-   * conservatively as escape.
-   */
-  if (stackp > owl_reading_depth) {
-    TRACE("%oVariation %d: ALIVE (maximum reading depth reached)\n",
-	  this_variation_number);
-    SGFTRACE(0, WIN, "max reading depth reached");
-    READ_RETURN(read_result, move, 0, WIN);
-  }
-  
-  /* If the owl node limit has been reached, assume the dragon has
-   * managed to escape.
-   */
-  if (owl->local_owl_node_counter >= owl_node_limit) {
-    result_certain = 0;
-    TRACE("%oVariation %d: ALIVE (owl node limit reached)\n",
-	  this_variation_number);
-    SGFTRACE(0, WIN, "owl node limit reached");
+  /* If reading goes to deep or we run out of nodes, we assume life. */
+  if (reading_limit_reached(&live_reason, this_variation_number))  {
+    SGFTRACE(0, WIN, live_reason);
     READ_RETURN(read_result, move, 0, WIN);
   }
 
   memset(mw, 0, sizeof(mw));
-  owl->local_owl_node_counter++;
+  local_owl_node_counter++;
   global_owl_node_counter++;
 
-  /* Always start with picking up the vital moves so we can see if
-   * we already are safe.
-   */
-  {
-    SGFTree *save_sgf_dumptree = sgf_dumptree;
-    int save_count_variations = count_variations;
-    
-    sgf_dumptree = NULL;
-    count_variations = 0;
+  current_owl_data = owl;
+  memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
 
-    if (escape < MAX_ESCAPE) {
-      owl_determine_life(owl, NULL, komaster, 0, vital_moves,
-			 &probable_eyes, &eyemin, &eyemax);
-    }
-    else {
-      vital_moves[0].pos = 0;
-      vital_moves[0].value = -1;
-      set_eyevalue(&probable_eyes, 0, 0, 0, 0);
-    }
-    
-    current_owl_data = owl;
-    memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
-
-    /* We don't care about the moves, just whether matches are found.
-     * The content of shape_moves[] will be discarded when we call
-     * owl_shapes().
-     */
-    for (k = 0; k < MAX_MOVES; k++) {
-      shape_moves[k].pos = 0;
-      shape_moves[k].value = -1;
-      shape_moves[k].name = NULL;
-      shape_moves[k].same_dragon = 2;
-      shape_moves[k].escape = 0;
-    }
-
-    matches_found = 0;
-    memset(found_matches, 0, sizeof(found_matches));
-    if (level >= 9) 
-      matchpat(owl_shapes_callback, other, 
-	       &owl_vital_apat_db, shape_moves, owl->goal);
-
-    if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
-      gprintf("owl: eyemin=%d matches_found=%d\n",
-	      eyemin, matches_found);
-    eyemin -= matches_found;
-
-    sgf_dumptree = save_sgf_dumptree;
-    count_variations = save_count_variations;
-
-    if (eyemin >= 2
-	|| (eyemin == 1 && min_eyes(&probable_eyes) >= 4)
-	|| (stackp > owl_distrust_depth
-	    && min_eyes(&probable_eyes) >= 2
-	    && !matches_found)) {
-      const char *live_reason = "";
-      if (eyemin >= 2) 
-	live_reason = "2 or more secure eyes";
-      else if (eyemin == 1 && min_eyes(&probable_eyes) >= 4)
-	live_reason = "1 secure eye, likely >= 4";
-      else if (stackp > owl_distrust_depth 
-	       && min_eyes(&probable_eyes) >= 2
-	       && !matches_found)
-	live_reason = "getting deep, looks lively";
-      else
-	gg_assert(0); /* This should never happen */
-
+  /* First see whether we might already be alife. */
+  if (escape < MAX_ESCAPE) {
+    if (owl_estimate_life(owl, vital_moves, &live_reason, komaster, 0,
+	  		  &probable_eyes, &eyemin, &eyemax)) {
       SGFTRACE(0, WIN, live_reason);
       TRACE("%oVariation %d: ALIVE (%s)\n",
 	    this_variation_number, live_reason);
       READ_RETURN(read_result, move, 0, WIN);
     }
+  }
+  else {
+    vital_moves[0].pos = 0;
+    vital_moves[0].value = -1;
+    set_eyevalue(&probable_eyes, 0, 0, 0, 0);
   }
 
   /* We try moves in four passes.
@@ -2052,8 +1978,9 @@ do_owl_defend(int str, int *move, int *wormid,
     move_cutoff = 1;
     
     current_owl_data = owl;
+    switch (pass) {
     /* Get the shape moves if we are in the right pass. */
-    if (pass == 1) {
+    case 1:
       
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
@@ -2072,9 +1999,10 @@ do_owl_defend(int str, int *move, int *wormid,
 	READ_RETURN(read_result, move, shape_moves[0].pos, WIN);
       }
       moves = shape_moves;
-    }
-    else if (pass == 0 || pass == 2) {
+      break;
 
+    case 0:
+    case 2:
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
       
@@ -2091,56 +2019,53 @@ do_owl_defend(int str, int *move, int *wormid,
       }
       if (eyemax < 2 && stackp > 2)
 	move_cutoff = 99; /* Effectively disable vital moves. */
-    }
-    else {
+      break;
+
+    case 3:
 #if 1
-      int goalcount = 0;
+      {
+	int goalcount = 0;
 
-      /* If the goal is small, try a tactical defense. */
+	/* If the goal is small, try a tactical defense. */
 
-      for (k = BOARDMIN; k < BOARDMAX; k++)
-	if (ON_BOARD(k))
-	  goalcount += owl->goal[k];
+	for (k = BOARDMIN; k < BOARDMAX; k++)
+	  if (ON_BOARD(k))
+	    goalcount += owl->goal[k];
 
-      if (goalcount < 5) {
+	if (goalcount < 5) {
 
-	/* Look for a tactical defense. This is primarily intended for
-	 * the case where the whole dragon is a single string, therefore
-	 * we only look at the string at the "origin".
-	 *
-	 * We only accept clearly effective tactical defenses here,
-	 * using a liberty heuristic. The reason for this is problems
-	 * with ineffective self ataris which do defend tactically but
-	 * have no strategical effect other than wasting owl nodes or
-	 * confusing the eye analysis.
-	 */
-	int dpos;
-	SGFTree *save_sgf_dumptree = sgf_dumptree;
-	int save_count_variations = count_variations;
-      
-	sgf_dumptree = NULL;
-	count_variations = 0;
-	if (attack_and_defend(str, NULL, NULL, NULL, &dpos)
-	    && (approxlib(dpos, color, 2, NULL) > 1
-		|| does_capture_something(dpos, color))) {
-	  TRACE("Found tactical defense for %1m at %1m.\n", str, dpos);
-	  shape_moves[0].pos         = dpos;
-	  shape_moves[0].value       = 25;
-	  shape_moves[0].name        = "tactical defense";
-	  shape_moves[0].same_dragon = 1;
-	  shape_moves[0].escape = 0;
-	  shape_moves[1].value       = 0;
-	  moves = shape_moves;
+	  /* Look for a tactical defense. This is primarily intended for
+	   * the case where the whole dragon is a single string, therefore
+	   * we only look at the string at the "origin".
+	   *
+	   * We only accept clearly effective tactical defenses here,
+	   * using a liberty heuristic. The reason for this is problems
+	   * with ineffective self ataris which do defend tactically but
+	   * have no strategical effect other than wasting owl nodes or
+	   * confusing the eye analysis.
+	   */
+	  int dpos;
+	  SGFTree *save_sgf_dumptree = sgf_dumptree;
+	  int save_count_variations = count_variations;
+
+	  sgf_dumptree = NULL;
+	  count_variations = 0;
+	  if (attack_and_defend(str, NULL, NULL, NULL, &dpos)
+	      && (approxlib(dpos, color, 2, NULL) > 1
+		  || does_capture_something(dpos, color))) {
+	    TRACE("Found tactical defense for %1m at %1m.\n", str, dpos);
+	    set_single_owl_move(shape_moves, dpos, "tactical_defense");
+	    moves = shape_moves;
+	  }
+	  sgf_dumptree = save_sgf_dumptree;
+	  count_variations = save_count_variations;
 	}
-	sgf_dumptree = save_sgf_dumptree;
-	count_variations = save_count_variations;
+	if (!moves)
+	  continue;
       }
 #endif
-    }
+    } /* switch (pass) */
 
-    if (!moves)
-      continue;
-    
     /* For the up to MAX_MOVES best moves with value equal to
      * move_cutoff or higher, try to defend the dragon and see if it
      * can then be attacked.
@@ -2171,7 +2096,6 @@ do_owl_defend(int str, int *move, int *wormid,
       
       mpos = moves[k].pos;
       ASSERT_ON_BOARD1(mpos);
-      gg_assert(mpos != NO_MOVE);
       
       /* Have we already tested this move? */
       if (mw[mpos])
@@ -2204,8 +2128,8 @@ do_owl_defend(int str, int *move, int *wormid,
       owl_update_goal(mpos, moves[k].same_dragon, owl, 0);
 
       if (!ko_move) {
-	acode = do_owl_attack(str, NULL, &wid, owl, new_komaster, 
-			      new_kom_pos, new_escape);
+	int acode = do_owl_attack(str, NULL, &wid, owl, new_komaster,
+			          new_kom_pos, new_escape);
 	if (!acode) {
 	  pop_owl(&owl);
 	  popgo();
@@ -2337,7 +2261,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
 
   DEBUG(DEBUG_OWL_PERFORMANCE, 
     "owl_threaten_defense %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
-	    target, move, move2, result, owl->local_owl_node_counter,
+	    target, move, move2, result, local_owl_node_counter,
 	    tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_THREATEN_DEFENSE, target, 0, 0,
@@ -2351,6 +2275,73 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
 
   close_pattern_list(color, &shape_patterns);
   return result;
+}
+
+
+
+/*
+ * This function calls owl_determine_life() to get an eye estimate,
+ * and matchpat() for vital attack moves, and decides according to
+ * various policies (depth-dependant) whether the dragon should thus
+ * be considered alife.
+ */
+static int
+owl_estimate_life(struct local_owl_data *owl,
+    		  struct owl_move_data vital_moves[MAX_MOVES],
+		  const char **live_reason, int komaster, int does_attack,
+		  struct eyevalue *probable_eyes, int *eyemin, int *eyemax)
+{
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+  struct owl_move_data dummy_moves[MAX_MOVES];
+  int other = OTHER_COLOR(owl->color);
+
+  sgf_dumptree = NULL;
+  count_variations = 0;
+
+  owl_determine_life(owl, NULL, komaster, does_attack, vital_moves,
+		     probable_eyes, eyemin, eyemax);
+
+  matches_found = 0;
+  memset(found_matches, 0, sizeof(found_matches));
+
+  if (level >= 9) {
+    if (!does_attack) {
+      clear_owl_move_data(dummy_moves);
+      matchpat(owl_shapes_callback, other,
+	       &owl_vital_apat_db, dummy_moves, owl->goal);
+    }
+    else
+      matchpat(owl_shapes_callback, other,
+	       &owl_vital_apat_db, vital_moves, owl->goal);
+  }
+
+  if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
+    gprintf("owl: eyemin=%d matches_found=%d\n", *eyemin, matches_found);
+  *eyemin -= matches_found;
+
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
+  if (*eyemin >= 2
+      || (*eyemin == 1 && min_eyes(probable_eyes) >= 4)
+      || (stackp > owl_distrust_depth
+	  && min_eyes(probable_eyes) >= 2
+	  && !matches_found)) {
+    if (*eyemin >= 2)
+      *live_reason = "2 or more secure eyes";
+    else if (*eyemin == 1 && min_eyes(probable_eyes) >= 4)
+      *live_reason = "1 secure eye, likely >= 4";
+    else if (stackp > owl_distrust_depth
+	     && min_eyes(probable_eyes) >= 2
+	     && !matches_found)
+      *live_reason = "getting deep, looks lively";
+    else
+      gg_assert(0);
+    return 1;
+  }
+  else
+    return 0;
 }
 
 
@@ -2434,13 +2425,7 @@ owl_determine_life(struct local_owl_data *owl,
   if (!(debug & DEBUG_OWL))
     debug &= ~DEBUG_EYES;
   
-  for (k = 0; k < MAX_MOVES; k++) {
-    moves[k].pos = 0;
-    moves[k].value = -1;
-    moves[k].name = NULL;
-    moves[k].same_dragon = 2;
-    moves[k].escape = 0;
-  }
+  clear_owl_move_data(moves);
   
   if (!owl->lunches_are_current)
     owl_find_lunches(owl);
@@ -2795,7 +2780,6 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
   return 0;
 }
 
-	
 /* 
  * Generates up to max_moves moves, attempting to attack or defend the goal
  * dragon. The found moves are put in moves, an array of owl_move_data
@@ -2815,7 +2799,6 @@ owl_shapes(struct matched_patterns_list_data *pattern_list,
            struct owl_move_data moves[MAX_MOVES],
 	   int color, struct local_owl_data *owl, struct pattern_db *type)
 {
-  int k;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
   sgf_dumptree = NULL;
@@ -2823,13 +2806,7 @@ owl_shapes(struct matched_patterns_list_data *pattern_list,
 
   current_owl_data = owl;
   
-  for (k = 0; k < MAX_MOVES; k++) {
-    moves[k].pos = NO_MOVE;
-    moves[k].value = -1;
-    moves[k].name = NULL;
-    moves[k].same_dragon = 2;
-    moves[k].escape = 0;
-  }
+  clear_owl_move_data(moves);
 
   /* We must reset the owl safe_move_cache before starting the
    * pattern matching. The cache is used by owl_shapes_callback().
@@ -2912,8 +2889,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
 /* This initializes a pattern list, allocating memory for 200 patterns.
  * If more patterns need to be stored, collect_owl_shapes_callbacks will
  * dynamically reallocate additional memory.
- * Only the space for list->pattern_list is allocated here, *list needs to
- * have been allocated by the calling function.
+ * The space for list->pattern_list is allocated here.
  *
  * This function is automatically called from owl_shapes. Every call here
  * has to be matched by a call to close_pattern_list below.
@@ -3799,7 +3775,7 @@ owl_does_defend(int move, int target, int *kworm)
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
 	"owl_does_defend %1m %1m(%1m), result %d (%d, %d nodes, %f seconds)\n",
-	move, target, origin, result, owl->local_owl_node_counter, 
+	move, target, origin, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_DOES_DEFEND, move, target, 0,
@@ -3879,7 +3855,7 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
   DEBUG(DEBUG_OWL_PERFORMANCE,
 	"owl_confirm_safety %1m %1m(%1m), result %d %1m (%d, %d nodes, %f seconds)\n",
 	move, target, origin, result, defense,
-	owl->local_owl_node_counter, tactical_nodes,
+	local_owl_node_counter, tactical_nodes,
 	gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_CONFIRM_SAFETY, move, target, 0,
@@ -3946,7 +3922,7 @@ owl_does_attack(int move, int target, int *kworm)
     }
 
 #if 0
-    owl->local_owl_node_counter = 0;
+    local_owl_node_counter = 0;
     owl->lunches_are_current = 0;
     owl_mark_dragon(target, NO_MOVE, owl);
 #endif
@@ -3976,7 +3952,7 @@ owl_does_attack(int move, int target, int *kworm)
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
 	"owl_does_attack %1m %1m(%1m), result %d (%d, %d nodes, %f seconds)\n",
-	move, target, origin, result, owl->local_owl_node_counter, 
+	move, target, origin, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_DOES_ATTACK, move, target, 0,
@@ -4032,7 +4008,7 @@ owl_connection_defends(int move, int target1, int target2)
   
   DEBUG(DEBUG_OWL_PERFORMANCE,
 	"owl_conn_defends %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
-	move, target1, target2, result, owl->local_owl_node_counter,
+	move, target1, target2, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_CONNECTION_DEFENDS, move, target1, target2,
@@ -4453,7 +4429,7 @@ owl_substantial(int str)
   reduced_init_owl(&owl, 1);
 
   owl->color = OTHER_COLOR(board[str]);
-  owl->local_owl_node_counter = 0;
+  local_owl_node_counter = 0;
   gg_assert(stackp == 0);
 
   /* Big strings are always substantial since the biggest nakade is
@@ -4540,7 +4516,7 @@ owl_substantial(int str)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   DEBUG(DEBUG_OWL_PERFORMANCE,
 	"owl_substantial %1m, result %d (%d, %d nodes, %f seconds)\n",
-	str, result, owl->local_owl_node_counter,
+	str, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_SUBSTANTIAL, str, 0, 0, result, 0, 0, 0,
@@ -4911,7 +4887,7 @@ init_owl(struct local_owl_data **owl, int target1, int target2, int move,
 {
   reduced_init_owl(owl, at_bottom_of_stack);
 
-  (*owl)->local_owl_node_counter = 0;
+  local_owl_node_counter = 0;
   (*owl)->lunches_are_current = 0;
   owl_mark_dragon(target1, target2, *owl);
   if (move != NO_MOVE)
@@ -4993,18 +4969,12 @@ push_owl(struct local_owl_data **owla, struct local_owl_data **owlb)
 }
 
 
-/* Retrieve owl data from the stack. The local_owl_node_counter field
- * is not reset.
- */
+/* Retrieve owl data from the stack. */
 static void
 pop_owl(struct local_owl_data **owl)
 {
-  int nodes = owl_stack[owl_stack_pointer].local_owl_node_counter;
-
   *owl = &(owl_stack[owl_stack[owl_stack_pointer].restore_from]);
-
   owl_stack_pointer--;
-  (*owl)->local_owl_node_counter = nodes;
 }
 
 
