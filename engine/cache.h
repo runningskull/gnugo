@@ -189,7 +189,15 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
       gprintf("%o%s %1m %d %d %1m (cached) ", read_function_name, \
 	      q, stackp, \
 	      rr_get_result(rr), \
-	      rr_get_result_move(rr)); \
+	      rr_get_move(rr)); \
+      dump_stack();
+
+#define TRACE_CACHED_RESULT2(rr) \
+      gprintf("%o%s %1m %1m %d %d %d %1m (cached) ", read_function_name, \
+	      q1, q2, stackp, \
+	      rr_get_result1(rr), \
+	      rr_get_result2(rr), \
+	      rr_get_move(rr)); \
       dump_stack();
 
 #define SETUP_TRACE_INFO(name, str) \
@@ -204,6 +212,7 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 #else
 
 #define TRACE_CACHED_RESULT(rr)
+#define TRACE_CACHED_RESULT2(rr)
 
 #define SETUP_TRACE_INFO(name, str) \
   const char *read_function_name = name; \
@@ -283,6 +292,15 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     return; \
   } while (0)
 
+#define READ_RETURN_CONN(read_result, point, move, value) \
+  do { \
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    if (read_result) { \
+      rr_set_result_move(*(read_result), (value), (move)); \
+    } \
+    return (value); \
+  } while (0)
+
 #else
 
 #define READ_RETURN0(read_result) \
@@ -309,17 +327,29 @@ int get_read_result2(int routine, int komaster, int kom_pos,
   
 #define READ_RETURN_SEMEAI(read_result, point, move, value_a, value_b) \
   do { \
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
     if (read_result) { \
       rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
     } \
-    gprintf("%o%s %1m %d %d %d %d ", read_function_name, q, stackp, \
+    gprintf("%o%s %1m %1m %d %d %d %d ", read_function_name, q1, q2, stackp, \
 	    (value_a), (value_b), (move)); \
+    dump_stack(); \
+    return; \
+  } while (0)
+
+#define READ_RETURN_CONN(read_result, point, move, value) \
+  do { \
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    if (read_result) { \
+      rr_set_result_move(*(read_result), (value), (move)); \
+    } \
+    gprintf("%o%s %1m %1m %d %d %d ", read_function_name, q1, q2, stackp, \
+	    (value), (move)); \
     dump_stack(); \
     return (value); \
   } while (0)
 
- #endif
+#endif
 
 /* ================================================================ */
 /* Routine numbers. */

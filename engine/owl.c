@@ -383,7 +383,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     found_read_result = get_read_result2(SEMEAI, EMPTY, 0,
 					&apos, &bpos, &read_result);
     if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
+      TRACE_CACHED_RESULT2(*read_result);
       if (rr_get_result1(*read_result) != 0) {
 	if (move)
 	  *move = rr_get_move(*read_result);

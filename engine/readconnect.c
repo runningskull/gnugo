@@ -1748,7 +1748,7 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
     found_read_result = get_read_result2(CONNECT, komaster, kom_pos, 
 					 &str1, &str2, &read_result);
     if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
+      TRACE_CACHED_RESULT2(*read_result);
       if (rr_get_result(*read_result) != 0)
 	if (move)
 	  *move = rr_get_move(*read_result);
@@ -1761,7 +1761,7 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
   
   if (trivial_connection(str1, str2, &xpos) == WIN) {
     SGFTRACE2(xpos, WIN, "trivial connection");
-    READ_RETURN(read_result, move, xpos, WIN);
+    READ_RETURN_CONN(read_result, move, xpos, WIN);
   }
   
   num_moves = find_connection_moves(str1, str2, color, moves, &distance);
@@ -1783,7 +1783,7 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
 	popgo();
 	if (acode == 0) {
 	  SGFTRACE2(xpos, WIN, "connection effective");
-	  READ_RETURN(read_result, move, xpos, WIN);
+	  READ_RETURN_CONN(read_result, move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
 	 * better.
@@ -1804,16 +1804,16 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
 
   if (num_moves == 0 && distance < 1.0) {
     SGFTRACE2(NO_MOVE, WIN, "no move, probably connected");
-    READ_RETURN(read_result, move, NO_MOVE, WIN);
+    READ_RETURN_CONN(read_result, move, NO_MOVE, WIN);
   }
   
   if (savecode != 0) {
     SGFTRACE2(savemove, savecode, "saved move");
-    READ_RETURN(read_result, move, savemove, savecode);
+    READ_RETURN_CONN(read_result, move, savemove, savecode);
   }
 
   SGFTRACE2(0, 0, NULL);
-  READ_RETURN0(read_result);
+  READ_RETURN_CONN(read_result, move, NO_MOVE, 0);
 }
 
 
@@ -1882,7 +1882,7 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
     found_read_result = get_read_result2(DISCONNECT, komaster, kom_pos, 
 					 &str1, &str2, &read_result);
     if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
+      TRACE_CACHED_RESULT2(*read_result);
       if (rr_get_result(*read_result) != 0)
 	if (move)
 	  *move = rr_get_move(*read_result);
@@ -1895,11 +1895,11 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
   
   if (ladder_capture(str1, &xpos) == WIN) {
     SGFTRACE2(xpos, WIN, "first string capturable");
-    READ_RETURN(read_result, move, xpos, WIN);
+    READ_RETURN_CONN(read_result, move, xpos, WIN);
   }
   if (ladder_capture(str2, &xpos) == WIN) {
     SGFTRACE2(xpos, WIN, "second string capturable");
-    READ_RETURN(read_result, move, xpos, WIN);
+    READ_RETURN_CONN(read_result, move, xpos, WIN);
   }
 
   num_moves = find_connection_moves(str1, str2, other, moves, &distance);
@@ -1920,7 +1920,7 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
 	popgo();
 	if (dcode == 0) {
 	  SGFTRACE2(xpos, WIN, "disconnection effective");
-	  READ_RETURN(read_result, move, xpos, WIN);
+	  READ_RETURN_CONN(read_result, move, xpos, WIN);
 	}
 	/* if the move works with ko we save it, then look for something
 	 * better.
@@ -1944,16 +1944,16 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
       && (has_passed
 	  || !recursive_connect2(str1, str2, NULL, komaster, kom_pos, 1))) {
     SGFTRACE2(NO_MOVE, WIN, "no move, probably disconnected");
-    READ_RETURN(read_result, move, NO_MOVE, WIN);
+    READ_RETURN_CONN(read_result, move, NO_MOVE, WIN);
   }
   
   if (savecode != 0) {
     SGFTRACE2(savemove, savecode, "saved move");
-    READ_RETURN(read_result, move, savemove, savecode);
+    READ_RETURN_CONN(read_result, move, savemove, savecode);
   }
 
   SGFTRACE2(0, 0, NULL);
-  READ_RETURN0(read_result);
+  READ_RETURN_CONN(read_result, move, NO_MOVE, 0);
 }
 
 
