@@ -94,46 +94,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 
   start_timer(2);
   dragon2_initialized = 0;
-  
-  /* We start with the dragon data copied from the worm data, then
-   * modify it as the worms are amalgamated into larger dragons.
-   */
-
-  for (str = BOARDMIN; str < BOARDMAX; str++)
-    if (ON_BOARD(str)) {
-
-      dragon[str].id                 = -1;
-      dragon[str].size               = worm[str].size;
-      dragon[str].effective_size     = worm[str].effective_size;
-      dragon[str].color              = worm[str].color;
-      dragon[str].origin             = worm[str].origin;
-#if 0
-      for (i = 0; i < MAX_TACTICAL_POINTS; ++i) {
-       dragon[str].owl_attack_points[i]   = NO_MOVE;
-       dragon[str].owl_attack_codes[i]    = 0;
-      }
-#else
-      dragon[str].owl_attack_point   = NO_MOVE;
-      dragon[str].owl_attack_code    = 0;
-#endif
-      dragon[str].owl_attack_certain = 1;
-      dragon[str].owl_defense_point  = NO_MOVE;
-      dragon[str].owl_defense_code   = 0;
-      dragon[str].owl_defense_certain = 1;
-      dragon[str].owl_status         = UNCHECKED;
-      dragon[str].status             = UNKNOWN;
-      dragon[str].matcher_status     = UNKNOWN;
-      dragon[str].owl_threat_status  = UNCHECKED;
-      dragon[str].owl_second_attack_point  = NO_MOVE;
-      dragon[str].owl_second_defense_point = NO_MOVE;
-      half_eye[str].type             =  0;
-      half_eye[str].value            =  10.0; /* Something big. */
-      
-      if (IS_STONE(board[str]) && worm[str].origin == str)
-	DEBUG(DEBUG_DRAGONS, 
-	      "Initializing dragon from worm at %1m, size %d\n", 
-	      str, worm[str].size);
-    }
+  initialize_dragon_data();
   time_report(2, "  time to initialize dragons", NO_MOVE, 1.0);
 
   make_domains(black_eye, white_eye, 0);
@@ -727,30 +688,68 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 }
 
 
+/* Initialize the dragon[] array. */
+
+void
+initialize_dragon_data(void)
+{
+  int str;
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+
+      dragon[str].id                 = -1;
+      dragon[str].size               = worm[str].size;
+      dragon[str].effective_size     = worm[str].effective_size;
+      dragon[str].color              = worm[str].color;
+      dragon[str].origin             = worm[str].origin;
+      dragon[str].owl_attack_point   = NO_MOVE;
+      dragon[str].owl_attack_code    = 0;
+      dragon[str].owl_attack_certain = 1;
+      dragon[str].owl_defense_point  = NO_MOVE;
+      dragon[str].owl_defense_code   = 0;
+      dragon[str].owl_defense_certain = 1;
+      dragon[str].owl_status         = UNCHECKED;
+      dragon[str].status             = UNKNOWN;
+      dragon[str].matcher_status     = UNKNOWN;
+      dragon[str].owl_threat_status  = UNCHECKED;
+      dragon[str].owl_second_attack_point  = NO_MOVE;
+      dragon[str].owl_second_defense_point = NO_MOVE;
+      half_eye[str].type             =  0;
+      half_eye[str].value            =  10.0; /* Something big. */
+      
+      if (IS_STONE(board[str]) && worm[str].origin == str)
+	DEBUG(DEBUG_DRAGONS, 
+	      "Initializing dragon from worm at %1m, size %d\n", 
+	      str, worm[str].size);
+    }
+}
+
+
 /* Initialize the dragon2[] array. */
 static void
-initialize_supplementary_dragon_data()
+initialize_supplementary_dragon_data(void)
 {
-  int m, n;
+  int str;
   int d;
+  int origin;
   
   /* Give each dragon (caves excluded) an id number for indexing into
    * the dragon2 array. After this the DRAGON2 macro can be used.
    */
   number_of_dragons = 0;
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int str = POS(m, n);
-      int origin = dragon[str].origin;
-
-      if (board[str] == EMPTY)
-	continue;
-
-      if (dragon[origin].id == -1)
-	dragon[origin].id = number_of_dragons++;
-      dragon[str].id = dragon[origin].id;
-    }
-
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (!ON_BOARD(str))
+      continue;
+    origin = dragon[str].origin;
+    
+    if (board[str] == EMPTY)
+      continue;
+    
+    if (dragon[origin].id == -1)
+      dragon[origin].id = number_of_dragons++;
+    dragon[str].id = dragon[origin].id;
+  }
+  
   /* Now number_of_dragons contains the number of dragons and we can
    * allocate a dragon2 array of the appropriate size. First throw
    * away the old array.
@@ -760,23 +759,22 @@ initialize_supplementary_dragon_data()
    */
   if (dragon2 != NULL)
     free(dragon2);
-
+  
   dragon2 = malloc(number_of_dragons * sizeof(*dragon2));
   gg_assert(dragon2 != NULL);
-
+  
   /* Find the origins of the dragons to establish the mapping back to
    * the board. After this the DRAGON macro can be used.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int str = POS(m, n);
-
-      if (IS_STONE(board[str])
-	  && dragon[str].origin == str) {
-	DRAGON2(str).origin = str;
-      }
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (!ON_BOARD(str))
+      continue;
+    if (IS_STONE(board[str])
+	&& dragon[str].origin == str) {
+      DRAGON2(str).origin = str;
     }
-
+  }
+  
   /* Initialize the rest of the dragon2 data. */
   for (d = 0; d < number_of_dragons; d++) {
     dragon2[d].neighbors            = 0;
@@ -791,10 +789,10 @@ initialize_supplementary_dragon_data()
     dragon2[d].semeai               = 0;
     dragon2[d].semeai_margin_of_safety = -1;
   }
-
+  
   dragon2_initialized = 1;
 }
-
+ 
 
 /* Examine which dragons are adjacent to each other. This is
  * complicated by the fact that adjacency may involve a certain

@@ -37,6 +37,7 @@
 - seed field removed from Gameinfo struct
 - new global variable random_seed
 - joseki tuning
+- Handtalk games in regression/games
 - doc revision
 
 3.1.30 released March 30, 2002

@@ -74,6 +74,7 @@ DECLARE(gtp_findlib);
 DECLARE(gtp_finish_sgftrace);
 DECLARE(gtp_fixed_handicap);
 DECLARE(gtp_get_handicap);
+DECLARE(gtp_get_random_seed);
 DECLARE(gtp_genmove);
 DECLARE(gtp_genmove_black);
 DECLARE(gtp_genmove_white);
@@ -169,6 +170,7 @@ static struct gtp_command commands[] = {
   {"finish_sgftrace",  	      gtp_finish_sgftrace},
   {"fixed_handicap",   	      gtp_fixed_handicap},
   {"get_handicap",   	      gtp_get_handicap},
+  {"get_random_seed",  	      gtp_get_random_seed},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
   {"get_connection_node_counter", gtp_get_connection_node_counter},
@@ -2913,6 +2915,23 @@ rotate_on_output(int ai, int aj, int *bi, int *bj)
 {
   inv_rotate(ai, aj, bi, bj, board_size, gtp_orientation);
 }
+
+
+/* Function:  Get the random seed
+ * Arguments: none
+ * Fails:     never
+ * Returns:   random seed
+ */
+static int
+gtp_get_random_seed(char *s, int id)
+{
+  UNUSED(s);
+  return gtp_success(id, "%d", random_seed);
+}
+
+
+
+
 
 /*
  * Local Variables:

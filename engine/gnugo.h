@@ -451,6 +451,7 @@ void make_worms(int save_verbose);
 
 /* dragon.c */
 void make_dragons(int color, int stop_before_owl, int save_verbose);
+void initialize_dragon_data(void);
 void show_dragons(void);
 int dragon_status(int pos);
 int matcher_status(int pos);
