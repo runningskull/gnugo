@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- remove global variables score, lower_bound, upper_bound
+- remove (level >= 8) condition for estimate_score() call
+- pass our_score instead of score to the move valuation functions
+
+3.5.1 released September 4, 2003
+
 - semeai() revised to better handle certain cases of multiple simultaneous
   semeais 
 - find additional semeai moves in semeai_reasons()

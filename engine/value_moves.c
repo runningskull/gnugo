@@ -1346,7 +1346,7 @@ adjacent_to_nondead_stone(int pos, int color)
  * Estimate the direct territorial value of a move at (pos).
  */
 static void
-estimate_territorial_value(int pos, int color, float score)
+estimate_territorial_value(int pos, int color, float our_score)
 {
   int other = OTHER_COLOR(color);
   int k;
@@ -1872,25 +1872,16 @@ estimate_territorial_value(int pos, int color, float score)
 	      pos, this_value);
 	tot_value += this_value * attack_dragon_weight;
       }
-      else if (!doing_scoring && ((color == BLACK && score < 0.0)
-				  || (color == WHITE && score > 0.0))) {
+      else if (!doing_scoring && our_score > 0.0) {
 	/* tm - devalued this bonus (3.1.17) */
 	this_value = gg_min(0.9 * dragon[aa].effective_size,
-			    gg_abs(score/2) - board_size/2 - 1);
+			    our_score/2.0 - board_size/2.0 - 1.0);
 	this_value = gg_max(this_value, 0);
 	TRACE("  %1m: %f - attack %1m, although it seems dead, as we are ahead\n",
 	      pos, this_value, aa);
 	tot_value += this_value * attack_dragon_weight;
       }
       else {
-	/* FIXME: Why are we computing a this_value here when it's
-         * never used?
-	 */
-	if ((color == BLACK && score > 0.0)
-	    || (color == WHITE && score < 0.0))
-	  this_value = 0.0;
-	else 
-	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(score/2));
 	
 	add_reverse_followup_value(pos, 2 * dragon[aa].effective_size);
 	if (board[aa] == color)
@@ -2018,7 +2009,7 @@ estimate_territorial_value(int pos, int color, float score)
  * Estimate the strategical value of a move at (pos).
  */
 static void
-estimate_strategical_value(int pos, int color, float score)
+estimate_strategical_value(int pos, int color, float our_score)
 {
   int k;
   int l;
@@ -2273,9 +2264,8 @@ estimate_strategical_value(int pos, int color, float score)
 	  continue;
 
 	/* If we are ahead by more than 20, value connections more strongly */
-	if ((color == WHITE && score > 20.0)
-	    || (color == BLACK && score < -20.0))
-	  this_value = connection_value(aa, bb, pos, gg_abs(score));
+	if (our_score > 20.0)
+	  this_value = connection_value(aa, bb, pos, our_score);
 	else
 	  this_value = connection_value(aa, bb, pos, 0);
 	if (this_value > dragon_value[aa]) {
@@ -2286,9 +2276,8 @@ estimate_strategical_value(int pos, int color, float score)
 	}
 
 	
-	if ((color == WHITE && score > 20.0)
-	    || (color == BLACK && score < -20.0))
-	  this_value = connection_value(bb, aa, pos, gg_abs(score));
+	if (our_score > 20.0)
+	  this_value = connection_value(bb, aa, pos, our_score);
 	else
 	  this_value = connection_value(bb, aa, pos, 0);
 	if (this_value > dragon_value[bb]) {
@@ -2432,11 +2421,10 @@ estimate_strategical_value(int pos, int color, float score)
 	/* If we are behind, we should skip this type of move reason. 
 	 * If we are ahead, we should value it more. 
 	 */
-	if ((color == BLACK && score > 0.0)
-	    || (color == WHITE && score < 0.0))
+	if (our_score < 0.0)
 	  this_value = 0.0;
 	else 
-	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(0.65*score));
+	  this_value = gg_min(2*dragon[aa].effective_size, 0.65*our_score);
 	
 	if (this_value > dragon_value[aa]) {
 	  dragon_value[aa] = this_value;
@@ -2546,7 +2534,7 @@ compare_move_reasons(const void *p1, const void *p2)
  */
 static float
 value_move_reasons(int pos, int color, float pure_threat_value,
-		   float score)
+		   float our_score)
 {
   float tot_value;
   float shape_factor;
@@ -2584,8 +2572,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * is significant. Territorial value must be computed before
      * strategical value. See connection_value().
      */
-    estimate_territorial_value(pos, color, score);
-    estimate_strategical_value(pos, color, score);
+    estimate_territorial_value(pos, color, our_score);
+    estimate_strategical_value(pos, color, our_score);
   }
 
   /* Introduction of strategical_weight and territorial_weight, 
@@ -2798,7 +2786,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
  * Loop over all possible moves and value the move reasons for each.
  */
 static void
-value_moves(int color, float pure_threat_value, float score)
+value_moves(int color, float pure_threat_value, float our_score)
 {
   int m, n;
   int pos;
@@ -2811,7 +2799,7 @@ value_moves(int color, float pure_threat_value, float score)
       pos = POS(m, n);
 
       move[pos].value = value_move_reasons(pos, color, 
-					   pure_threat_value, score);
+					   pure_threat_value, our_score);
       if (move[pos].value == 0.0)
 	continue;
       
@@ -3239,7 +3227,7 @@ find_best_move(int *the_move, float *val, int color,
  */
 int
 review_move_reasons(int *the_move, float *val, int color,
-		    float pure_threat_value, float score,
+		    float pure_threat_value, float our_score,
 		    int allowed_moves[BOARDMAX])
 {
   int save_verbose;
@@ -3271,7 +3259,7 @@ review_move_reasons(int *the_move, float *val, int color,
     list_move_reasons(color);
 
   /* Evaluate all moves with move reasons. */
-  value_moves(color, pure_threat_value, score);
+  value_moves(color, pure_threat_value, our_score);
   time_report(2, "  value_moves", NO_MOVE, 1.0);
 
   /* Perform point redistribution */
@@ -3294,7 +3282,7 @@ review_move_reasons(int *the_move, float *val, int color,
  */
 
 void 
-choose_strategy(int color, float score, float game_status)
+choose_strategy(int color, float our_score, float game_status)
 {
 
   minimum_value_weight  = 1.0;
@@ -3310,9 +3298,7 @@ choose_strategy(int color, float score, float game_status)
   
   if (cosmic_gnugo) {
 
-    if ((game_status > 0.65) &&
-       ((color == BLACK && score < -15.0)
-       || (color == WHITE && score > 15.0))) {
+    if (game_status > 0.65 && our_score > 15.0) {
       
       /* We seem to be winning, so we use conservative settings */
       minimum_value_weight  = 0.66;
@@ -3337,16 +3323,13 @@ choose_strategy(int color, float score, float game_status)
       followup_weight       = 0.62;
        
       /* If we're getting desesperate, try invasions as a last resort */
-      if ((game_status > 0.75)  &&
-          ((color == BLACK && score > 25.0)
-           || (color == WHITE && score < -25.0)))
+      if (game_status > 0.75 && our_score < -25.0)
         invasion_malus_weight = 0.2;
             
       TRACE("  %s is not winning enough, using aggressive settings.\n", 
              color == WHITE ? "White" : "Black");
     }
   }
-
 }
 
 

@@ -3137,6 +3137,8 @@ static int
 gtp_estimate_score(char *s)
 {
   UNUSED(s);
+  float score;
+  float upper_bound, lower_bound;
 
   silent_examine_position(WHITE, EXAMINE_DRAGONS);
   

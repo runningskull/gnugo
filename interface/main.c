@@ -95,6 +95,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_WITH_BREAK_IN,
       OPT_WITHOUT_BREAK_IN,
       OPT_COSMIC_GNUGO,
+      OPT_NO_COSMIC_GNUGO,
       OPT_OPTIONS,
       OPT_STANDARD_SEMEAI,
       OPT_STANDARD_CONNECTIONS,
@@ -241,6 +242,7 @@ static struct gg_option const long_options[] =
   {"with-break-in",  	no_argument, 0, OPT_WITH_BREAK_IN},
   {"without-break-in",  no_argument, 0, OPT_WITHOUT_BREAK_IN},
   {"cosmic-gnugo",   no_argument, 0, OPT_COSMIC_GNUGO},
+  {"no-cosmic-gnugo",   no_argument, 0, OPT_NO_COSMIC_GNUGO},
   {"options",        no_argument, 0, OPT_OPTIONS},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
@@ -585,6 +587,10 @@ main(int argc, char *argv[])
 
       case OPT_COSMIC_GNUGO:
 	cosmic_gnugo = 1;
+	break;
+
+      case OPT_NO_COSMIC_GNUGO:
+	cosmic_gnugo = 0;
 	break;
 
       case OPT_ALLOW_SUICIDE:
@@ -1421,6 +1427,7 @@ Experimental options:\n\
    --with-break-in         use the break-in code (on at level 10 by default)\n\
    --without-break-in      do not use the break-in code\n\
    --cosmic-gnugo          use center oriented influence\n\
+   --no-cosmic-gnugo       don't use center oriented influence\n\
    --nofusekidb            turn off fuseki database\n\
    --nofuseki              turn off fuseki moves entirely\n\
    --nojosekidb            turn off joseki database\n\

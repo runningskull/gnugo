@@ -447,7 +447,7 @@ int atari_atari_blunder_size(int color, int tpos, int *move,
 			     const char safe_stones[BOARDMAX]);
 
 int review_move_reasons(int *move, float *val, int color,
-			float pure_threat_value, float lower_bound,
+			float pure_threat_value, float our_score,
 			int allowed_moves[BOARDMAX]);
 int fill_liberty(int *move, int color);
 int aftermath_genmove(int *aftermath_move, int color,
@@ -617,7 +617,7 @@ void clear_break_in_list(void);
 void break_in_move_reasons(int color);
 
 float estimate_score(float *upper, float *lower);
-void choose_strategy(int color, float score, float game_status);
+void choose_strategy(int color, float our_score, float game_status);
 
 /* Eye space functions. */
 int is_eye_space(int pos);

@@ -1198,7 +1198,7 @@ store_persistent_breakin_cache(enum routine_id routine,
   /* If cache is still full, consider kicking out an old entry. */
   if (persistent_breakin_cache_size == MAX_BREAKIN_CACHE_SIZE) {
     int worst_entry = -1;
-    int worst_score = score;
+    int worst_score = tactical_nodes;
     
     for (k = 1; k < persistent_breakin_cache_size; k++) {
       if (persistent_breakin_cache[k].score < worst_score) {

@@ -446,6 +446,7 @@ computer_move(Gameinfo *gameinfo, int *passes)
   int i, j;
   int move_val;
   int resignation_declined = 0;
+  float upper_bound, lower_bound;
 
   init_sgf(gameinfo);
 

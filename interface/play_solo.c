@@ -114,8 +114,10 @@ play_solo(Gameinfo *gameinfo, int moves)
   /* Two passes and it's over. (EMPTY == BOTH) */
   gnugo_who_wins(EMPTY, stdout);
 
-  score = gnugo_estimate_score(&upper_bound, &lower_bound);
-  sgfWriteResult(sgftree.root, score, 1);
+  {
+    float score = gnugo_estimate_score(NULL, NULL);
+    sgfWriteResult(sgftree.root, score, 1);
+  }
   sgffile_output(&sgftree);
 
 #if 0
@@ -201,6 +203,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   int next;
   int pass = 0;
   int method;
+  float score;
   SGFTree local_tree;
   SGFTree *score_tree = tree;
   

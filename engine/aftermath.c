@@ -790,6 +790,8 @@ reduced_genmove(int *move, int color)
 {
   float val;
   int save_verbose;
+  float upper_bound, lower_bound;
+  float our_score;
 
   /* no move is found yet. */
   *move = NO_MOVE;  
@@ -805,29 +807,25 @@ reduced_genmove(int *move, int color)
    * move generation.  If we are ahead, we can play safely and if
    * we are behind, we have to play more daringly.
    */
-  if (level >= 8) {
-    estimate_score(&upper_bound, &lower_bound);
-    if (verbose || showscore) {
-      if (lower_bound == upper_bound)
-	gprintf("\nScore estimate: %s %f\n",
-		lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound));
-      else
-	gprintf("\nScore estimate: %s %f to %s %f\n",
-		lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound),
-		upper_bound > 0 ? "W " : "B ", gg_abs(upper_bound));
-      fflush(stderr);
-    }
-
-    /* The score will be used to determine when we are safely
-     * ahead. So we want the most conservative score.
-     */
-    if (color == WHITE)
-      score = lower_bound;
+  estimate_score(&upper_bound, &lower_bound);
+  if (verbose || showscore) {
+    if (lower_bound == upper_bound)
+      gprintf("\nScore estimate: %s %f\n",
+	      lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound));
     else
-      score = upper_bound;
+      gprintf("\nScore estimate: %s %f to %s %f\n",
+	      lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound),
+	      upper_bound > 0 ? "W " : "B ", gg_abs(upper_bound));
+    fflush(stderr);
   }
+
+  /* The score will be used to determine when we are safely
+   * ahead. So we want the most conservative score.
+   */
+  if (color == WHITE)
+    our_score = lower_bound;
   else
-    score = 0.0;
+    our_score = -upper_bound;
 
   gg_assert(stackp == 0);
   
@@ -847,7 +845,7 @@ reduced_genmove(int *move, int color)
   gg_assert(stackp == 0);
 
   /* Review the move reasons and estimate move values. */
-  if (review_move_reasons(move, &val, color, 0.0, score, NULL))
+  if (review_move_reasons(move, &val, color, 0.0, our_score, NULL))
     TRACE("Move generation likes %1m with value %f\n", *move, val);
   gg_assert(stackp == 0);
 
