@@ -287,6 +287,10 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
   int dd2 = NO_MOVE;
   int save_verbose;
 
+  /* Never consider moves of the send-two-return-one type here. */
+  if (send_two_return_one(pos, color))
+    return;
+
   save_verbose = verbose;
   if (verbose > 0)
     verbose --;

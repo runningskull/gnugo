@@ -1393,6 +1393,63 @@ double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])
 }
     
 
+/* Returns true if a move by (color) fits a shape like:
+ *
+ *  -----
+ *  O.O*X        (O=color)
+ *  OOXXX
+ *
+ * More specifically the move should have the following properties:
+ * - The move is a self-atari
+ * - The move forms a string of exactly two stones
+ * - When the opponent captures, the capturing stone becomes a single
+ *   stone in atari
+ * - When capturing back the original position is repeated
+ */
+
+int
+send_two_return_one(int move, int color)
+{
+  int other = OTHER_COLOR(color);
+  int lib1;
+  int lib2;
+
+  /* Try to play the move. */
+  if (!trymove(move, color, "send_two_return_one-A", NO_MOVE))
+    return 0;
+
+  /* Does the move leave exactly two stones in atari? */
+  if (findlib(move, 1, &lib1) > 1 || countstones(move) != 2) {
+    popgo();
+    return 0;
+  }
+
+  /* Let the opponent capture. This move is guaranteed to be legal. */
+  trymove(lib1, other, "send_two_return_one-A", NO_MOVE);
+
+  /* Is the capturing string single and in atari? */
+  if (findlib(lib1, 1, &lib2) > 1 || countstones(lib1) > 1) {
+    popgo();
+    popgo();
+    return 0;
+  }
+
+  popgo();
+  popgo();
+
+  /* The move to capture back is in lib2. This must be one of the two
+   * captured stones, either the move or the adjacent stone. If it is
+   * the same as the first move, the previous position is not repeated
+   * by capturing back, so we return false.
+   */
+  if (lib2 == move)
+    return 0;
+
+  /* The move matches the shape. */
+  return 1;
+}
+
+
 /* Score the game and determine the winner */
 
 void
