@@ -637,6 +637,14 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     if (!trymove(apos, color, "do_atari_atari-A", str, EMPTY, NO_MOVE))
       continue;
 	
+    if (!IS_STONE(str)) {
+      /* Error situation. This could be caused by a wrong matcher status. */
+      if (save_verbose || (debug & DEBUG_ATARI_ATARI))
+	gprintf("%oError condition found by atari_atari\n", str, apos);
+      popgo();
+      return 0;
+    }
+
     /* Try to defend the stone (str) which is threatened. */
     aa_val = countstones(str);
 

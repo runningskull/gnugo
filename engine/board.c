@@ -1252,15 +1252,15 @@ findlib(int str, int maxlib, int *libs)
 
 
 /* Find the liberties a stone of the given color would get if played
- * at pos, ignoring possible captures of opponent stones. (m, n)
+ * at pos, ignoring possible captures of opponent stones. (pos)
  * must be empty. If libi!=NULL, the locations of up to maxlib
- * liberties are written into (libi[], libj[]). The counting of
+ * liberties are written into (libs[]). The counting of
  * liberties may or may not be halted when maxlib is reached. The
  * number of liberties found is returned.
  *
  * If you want the number or the locations of all liberties, however
  * many they are, you should pass MAXLIBS as the value for maxlib and
- * allocate space for libi[], libj[] accordingly.
+ * allocate space for libs[] accordingly.
  */
 
 int

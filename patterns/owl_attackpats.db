@@ -1009,23 +1009,26 @@ x*.Xo
 :8,-,value(30)
 
 
-Pattern A303
-# In this position, X often cannot get away by pushing on the first
-# line. Still it may be possible to evade long enough to hit various
-# reading depth limits. This move is only intended to stop such
-# nonsense, thus the low value.
-
-?O..           prevent escape
-X*..
-----
-
-:8,-,value(30)
-
-?O.a
-X*..
-----
-
-;owl_escape_value(a)>0
+# tm Removed (3.1.17)
+#   X won't try such moves, unless they're successful.
+#   if he does, that pattern should be modified.
+#Pattern A303
+## In this position, X often cannot get away by pushing on the first
+## line. Still it may be possible to evade long enough to hit various
+## reading depth limits. This move is only intended to stop such
+## nonsense, thus the low value.
+#
+#?O..           prevent escape
+#X*..
+#----
+#
+#:8,-,value(30)
+#
+#?O.a
+#X*..
+#----
+#
+#;owl_escape_value(a)>0
 
 
 # Pattern A304
@@ -1136,23 +1139,24 @@ X.X
 :|,-,value(75)
 
 
-Pattern A405
-# FIXME: Bad pattern.  Probably can be deleted.
-#   See vie:19 for unnecessary blocking.
-
-???
-?..         center block
-?*O
-?X?
-
-:8,-,value(35)
-
-?a?
-?..
-?*O
-?X?
-
-;owl_escape_value(a)>0
+#tm removed (3.1.15)
+#Pattern A405
+## FIXME: Bad pattern.  Probably can be deleted.
+##   See vie:19 for unnecessary blocking.
+#
+#???
+#?..         center block
+#?*O
+#?X?
+#
+#:8,-,value(35)
+#
+#?a?
+#?..
+#?*O
+#?X?
+#
+#;owl_escape_value(a)>0
 
 
 Pattern A406
@@ -2341,7 +2345,7 @@ A.X
 
 
 
-Pattern D721
+Pattern A811
 #tm New Pattern (3.1.17)
 
 .X?	
@@ -2939,6 +2943,23 @@ b*c
 ; lib(b)<=4 && lib(c)<=4 && xplay_break_through(*,a,b,a,c) == WIN
 
 
+Pattern A1101c
+# New Pattern
+
+O*O   connect against threat
+?X?
+
+:8,-,value(81)
+
+
+A*B
+?X?
+
+; vital_chain(A) && vital_chain(B)
+; && xplay_attack_either(*,A,B)
+
+
+
 Pattern A1102
 
 ..X
@@ -3018,17 +3039,18 @@ xx..
 ;!attack(A) && attack(a) && !oplay_defend(*,B)
 
 
-Pattern A1107
-
-O*          defend the surrounding chain
-XO
-
-:/,-,value(95)
-
-a*
-Xb
-
-; !xplay_defend_both(*,a,b) && vital_chain(a) && vital_chain(b)
+## tm Moved to owl_vital_apats (3.1.17)
+#Pattern A1107
+#
+#O*          defend the surrounding chain
+#XO
+#
+#:/,-,value(95)
+#
+#a*
+#Xb
+#
+#; !xplay_defend_both(*,a,b) && vital_chain(a) && vital_chain(b)
 
 
 Pattern A1107b
@@ -3044,6 +3066,24 @@ XO
 
 ??
 *.
+ba
+Xc
+
+;lib(c)>2 && !xplay_defend_both(a,b,c) && vital_chain(b)
+;&& vital_chain(c) && oplay_attack(*,a,a)
+
+
+Pattern A1107c
+# tm New pattern. (3.1.17)
+
+   
+.*       defend the surrounding chain
+O.
+XO
+
+:8,-,value(96)
+
+.*
 ba
 Xc
 
@@ -3221,6 +3261,24 @@ C*b
 ?aD
 
 ;!xplay_defend_both(*,a,b)
+
+
+Pattern A1118
+# tm New pattern (3.1.17)
+
+XO?           defend
+OX*
+...
+---
+
+:8,-,value(75)
+
+XO?
+AX*
+...
+---
+
+; attack(A) && !oplay_attack(*,A)
 
 
 #########################################################

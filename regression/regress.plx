@@ -545,9 +545,11 @@ sub summarizeTestFile {
   
   my %totals = (cputime=>0, owl_node=>0);
   
+  my ($tstfileshort) = $tstfile =~ /(.*)\.tst$/;
+  
   foreach my $curfile (sort {filesby($sortby)} keys %files) {
     my %h = %{$files{$curfile}};
-    my $numURL = qq@<A HREF="?tstfile=$tstfile&num=$h{num}">$h{num}</A>@;
+    my $numURL = qq@<A HREF="?$tstfileshort:$h{num}">$h{num}</A>@;
     my $r = $h{result};
     $r =~ s@^([A-Z]*)$@<B>$1</B>@;
     print TF "<TR><TD>$h{filepos}</TD><TD>$numURL</TD><TD>$r</TD><TD>$h{expected}</TD>"

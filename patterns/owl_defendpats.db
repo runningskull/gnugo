@@ -967,10 +967,10 @@ OX*o
 Pattern D230
 # tm New Pattern (3.1.16)
 
-OO...	expand along edge.
-....*
-.....
------
+?OO...	expand along edge.
+o....*
+?.....
+------
 
 :8,-,value(80)
 
@@ -1469,13 +1469,15 @@ XO..
 :8,-,value(60)
 
 
-Pattern D501
-
-?OXx        connect
-O*OX
-..Xx
-
-:8,-,value(80)
+# tm Removed (3.1.17)  too generic
+#   possibly add back w/ constraint, or lower value.
+#Pattern D501
+#
+#?OXx        connect
+#O*OX
+#..Xx
+#
+#:8,-,value(80)
 
 
 Pattern D502
@@ -3365,7 +3367,12 @@ XO.
 ; does_attack(*,A)
 
 
+#FIXME:  D903 & D904 often both match, reducing the number
+#  of patterns available for other options.  Perhaps reduce
+#  the value of one or the other?
+
 Pattern D903
+# tm modified (3.1.17)
 
 XOX        descend to prevent connection
 .*.
@@ -4073,13 +4080,14 @@ A*B
 
 
 Pattern D1123
+# tm modified (3.1.17) added b classification
 
 oX*o      break through
 OOX.
 OX..
 X..?
 
-:8,-,value(86)
+:8,b,value(86)
 
 oB*o
 OOXa
@@ -4550,7 +4558,7 @@ oooo
 X.Ox
 ?O.X
 
-:8,-,value(80)
+:8,-,value(75)
 
 ????
 oabc
@@ -4665,7 +4673,7 @@ Pattern D1310
 X*oo
 ?OX?
 
-:8,-b,value(80)
+:8,-,value(80)
 
 dabo
 eooc
@@ -5206,7 +5214,7 @@ o..X
 o.*.
 ?x.O
 
-:8,-,value(60)
+:8,-,value(77)
 
 obo?
 a..X
@@ -5768,12 +5776,14 @@ OA*.o    hane into the open.
 ;defend(A) && !oplay_attack(*,*)
 
 
+
 Pattern D1378
+# tm reduced value (3.1.17)
 
 X*X   breakout & attack
 ?O?
 
-:8,-,value(75)
+:8,-,value(55)
 
 A*B   breakout & attack
 ?O?
@@ -5803,6 +5813,21 @@ O*X
 ; !attack(d) &&
 ; oplay_attack(*,A,d) &&
 ; oplay_attack(*,e,d)
+
+
+Pattern 1380
+
+?..	escape
+.*.
+O.?
+
+:8,-,value(65)
+
+?AB	escape
+.*C
+O.?
+
+; owl_escape_value(A) + owl_escape_value(B) + owl_escape_value(C) > 3
 
 
 #########################################################

@@ -231,7 +231,7 @@ if ($problem_set) {
   while (<F>) {
     next if ($_ =~ /^\s*(#.*)?$/);
     last if ($_ =~ /DONE|STOP/);
-    my ($filename, $probnum) = $_ =~ /^(.*):(\d+)/;
+    my ($filename, $probnum) = $_ =~ /^([^:]*):(\d+)/;
     if (!defined $filename) {
       warn "Unexpected line: $_";
       last;
@@ -319,14 +319,17 @@ sub regress_file {
         last if $t =~ /^ALL DONE/;
         print TRACER $t;
         print "ERR: $t" if $verbose > 2;
-        if ($t =~ /^\s*FINISHED PROBLEM:\s*$/) {
+        if ($t =~ /^\s*FINISHED PROBLEM:\s*$/ or
+            $t =~ /^\s*SKIPPED PROBLEM:\s*$/) {
           my $num = <$goprog_err>;
           print TRACER $num;
           $num += 0;
           close TRACER or die "Couldn't close temp trace file";
           print "closed trace file\n" if $verbose > 2; 
+          if ($t =~ /^\s*FINISHED PROBLEM:\s*$/) {
           rename "tracer.ttt", "$num.trace"
               or die "Couldn't rename tracer: $testfile, $num";
+          }
           open (TRACER, ">tracer.ttt");
         }
       }
@@ -380,13 +383,18 @@ sub regress_file {
           if ($3) { $fail = 1} else { $fail = 0};
           if ($4) {$ignore = 1} else {$ignore = 0};
 
+          $skipping = (@problist &&
+            eval {foreach my $i (@problist) { return 0 if $i == $num} return 1;} );
+
+          if ($skipping) {
+            go_command("echo_err SKIPPED PROBLEM:\n");
+          } else {
           go_command("echo_err FINISHED PROBLEM:\n");
+          }
           eat();  #ignore output!
           go_command("echo_err $num\n");
           eat();  #ignore output!
 
-          $skipping = (@problist &&
-            eval {foreach my $i (@problist) { return 0 if $i == $num} return 1;} );
           if ($skipping) {
             print "$g_curtestfile:$num skipped.\n" if $verbose > 1;
             tally_result ($num, "skipped", "&nbsp;", "&nbsp;");
@@ -439,7 +447,7 @@ sub regress_file {
 	    $top_moves = 1;
 	  }
 	}
-	if (defined($this_number) && $next_cmd =~ /owl_(attack|defend)/) {
+	if (defined($this_number) && $next_cmd =~ /attack|defend/) {
 	  go_command("start_sgftrace");
 	  eat(); #ignore output
 	}
@@ -458,7 +466,7 @@ sub regress_file {
 	  if (!defined($result)) {$result="";}
 	}
 	print "RES: $result\n" if $verbose > 1;
-	if (defined($this_number) && $next_cmd =~ /owl_(attack|defend)/) {
+	if (defined($this_number) && $next_cmd =~ /attack|defend/) {
 	  go_command("finish_sgftrace html$s$testfile$s$this_number.sgf");
 	  eat(); #ignore output
 	}

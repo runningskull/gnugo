@@ -5000,7 +5000,6 @@ X*..
 C*a.
 ----
 
-;!owl_threatens(*,C) &&
 ;!xplay_attack_either(*,a,b,*,b)
 
 

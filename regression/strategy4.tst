@@ -64,10 +64,13 @@ loadsgf games/strategy39.sgf 158
 163 gg_genmove white
 #? [O7|P8]*
 
-# N4 is clearly superior to O5.
-loadsgf games/strategy39.sgf 172
-164 gg_genmove white
-#? [!O5]
+#### N4 is clearly superior to O5.
+#### tm - N4 has it's weaknesses (at O5) too.  Both clearly kill.
+###    removing this problem.
+###loadsgf games/strategy39.sgf 172
+###164 gg_genmove white
+####? [!O5]
+###
 
 # K1 is out of the question. K3 is locally better and L6 might kill with ko.
 loadsgf games/strategy39.sgf 178
@@ -150,7 +153,7 @@ loadsgf games/xxlin.sgf 8
 # should be added. /gf
 loadsgf games/xxlin.sgf 16
 178 gg_genmove black
-#? [P4|P3]*
+#? [P4|P3|E2]*
 
 #DESCRIPTION=Tenuki also seems OK here.
 #Added E2 (3.1.14) -trevor

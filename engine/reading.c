@@ -895,12 +895,10 @@ attack_threats(int pos, int max_points, int moves[], int codes[])
 
 	for (r = -1; r < max_points; r++) {
 	  /* -1 is used only when stackp > 0. */
-	  if (stackp > 0) {
-	    if (r == -1)
-	      bb = dd;
-	    else
-	      break;
-	  }
+	  if (r == -1 && stackp > 0)
+	    break;
+	  if (r == -1)
+	    bb = dd;
 	  else {
 	    if (worm[adjs[k]].defend_codes[r] == 0)
 	      break;

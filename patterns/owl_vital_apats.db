@@ -796,5 +796,19 @@ CbX??
 ; owl_topological_eye(b,C) < 4 && owl_topological_eye(b,C) > 0
 
 
+Pattern VA46
+# tm Moved from owl_attackpats (3.1.17)
+#   was A1107
+
+O*          defend the surrounding chain
+XO
+
+:/,-,value(95)
+
+a*
+Xb
+
+; !xplay_defend_both(*,a,b) && vital_chain(a) && vital_chain(b)
+
 
 # END OF FILE

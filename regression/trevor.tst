@@ -558,7 +558,13 @@ loadsgf games/trevor/trevor_66.sgf
 660 owl_attack G2
 #? [1 L1]*
 
+loadsgf games/trevor/trevor_67.sgf
+670 attack G1
+#? [(2|3) F1]*
 
+loadsgf games/trevor/trevor_67.sgf
+671 defend G1
+#? [1 (D1|C3)]*
 
 
 
@@ -576,6 +582,7 @@ loadsgf games/trevor/owl111a.sgf
 #CATEGORY=OWL
 #DESCRIPTION=Escaping to no where.
 #SEVERITY=7
+#SEE_ALSO=global:16
 loadsgf golois/Goemate990903-6.sgf
 1010 owl_does_defend O13 O11 
 #? [0]*

@@ -2,11 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- new gtp commands reset_connection_node_counter and
-  get_connection_node_counter
+- new gtp commands reset_connection_node_counter, get_connection_node_counter
 - removed small valued lunch attacks and defenses in owl_determine_life()
 - new gtp commands owl_threaten_attack, owl_threaten_defense
 - better error reporting in mkpat.c
+- improved error reporting in owl.c
 - html regression view tweeks
 - new function second_order_liberty_of_string() in board.c
 - readconnect.c revised

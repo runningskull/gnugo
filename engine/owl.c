@@ -992,9 +992,20 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	|| (stackp > owl_distrust_depth
 	    && probable_min >= 2
 	    && !matches_found)) {
-      TRACE("%oVariation %d: ALIVE (2 or more secure eyes)\n",
-	    this_variation_number, true_genus);
-      SGFTRACE(0, 0, "2 or more secure eyes");
+      const char *live_reason = "";
+      if (true_genus >= 2) 
+	live_reason = "2 or more secure eyes";
+      else if (true_genus == 1 && probable_min >= 4)
+	live_reason = "1 secure eye, likely >= 4";
+      else if (stackp > owl_distrust_depth 
+	       && probable_min >= 2 && !matches_found)
+	live_reason = "getting deep, looks lively";
+      else
+	gg_assert(0); /* This should never happen */
+
+      TRACE("%oVariation %d: ALIVE (%s)\n",
+	    this_variation_number, live_reason);
+      SGFTRACE(0, 0, live_reason);
       READ_RETURN(read_result, move, 0, 0);
     }
   }
@@ -1587,9 +1598,21 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	|| (stackp > owl_distrust_depth
 	    && probable_min >= 2
 	    && !matches_found)) {
-      TRACE("%oVariation %d: ALIVE (2 or more secure eyes)\n",
-	    this_variation_number, true_genus);
-	SGFTRACE(0, WIN, "2 or more secure eyes");
+      const char *live_reason = "";
+      if (true_genus >= 2) 
+	live_reason = "2 or more secure eyes";
+      else if (true_genus == 1 && probable_min >= 4)
+	live_reason = "1 secure eye, likely >= 4";
+      else if (stackp > owl_distrust_depth 
+	       && probable_min >= 2
+	       && !matches_found)
+	live_reason = "getting deep, looks lively";
+      else
+	gg_assert(0); /* This should never happen */
+
+      TRACE("%oVariation %d: ALIVE (%s)\n",
+	    this_variation_number, live_reason);
+      SGFTRACE(0, WIN, live_reason);
 	READ_RETURN(read_result, move, 0, WIN);
     }
   }
