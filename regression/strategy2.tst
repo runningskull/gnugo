@@ -208,7 +208,7 @@ loadsgf games/strategy25.sgf 45
 
 loadsgf games/strategy25.sgf 55
 89 gg_genmove black
-#? [(D16|B7|G13)]*
+#? [(D16|B7|G13)]
 
 # Connecting with ko at B14 looks best. Cutting at D17 might be
 # considered. B17 (game move) is inferior.

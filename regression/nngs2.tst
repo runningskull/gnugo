@@ -61,7 +61,7 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 34
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 42
 120 gg_genmove black
-#? [E12|D13]*
+#? [E12|D13]
 
 # See also connection:93
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 100
@@ -157,7 +157,7 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 34
 # stones at C10 are critical, don't tenuki.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 42
 410 gg_genmove white
-#? [D7]*
+#? [D7]
 
 # don't get into the snap back!
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 115

@@ -20,12 +20,12 @@ loadsgf games/wing-yuhiko-gnugo.sgf 46
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf 62
 224 gg_genmove black
-#? [N15]*
+#? [N15]
 
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf 86
 225 gg_genmove black
-#? [O12]*
+#? [O12]
 
 #CATEGORY=CONNECTION
 loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 54
@@ -67,7 +67,7 @@ loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 23
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 29
 234 gg_genmove black
-#? [H14]*
+#? [H14]
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 47
 235 gg_genmove black

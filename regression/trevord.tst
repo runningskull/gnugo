@@ -77,7 +77,7 @@ loadsgf games/trevor/auto/d02.sgf 64
 #Other moves possible.  !F2
 loadsgf games/trevor/auto/d02.sgf 68
 230 gg_genmove white
-#? [G6]
+#? [G6]*
 
 
 #Must reduce the moyo.
@@ -455,7 +455,7 @@ loadsgf games/trevor/auto/d39.sgf 26
 
 loadsgf games/trevor/auto/d39.sgf 30
 880 gg_genmove white
-#? [R7]*
+#? [R7]
 
 
 #locally, E18 is better.

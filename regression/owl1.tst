@@ -88,7 +88,7 @@ loadsgf games/nngs/gnugo-3.3.8-evand-200209170730.sgf 227
 # Not sure whether there is a defense, but J9 certainly can be attacked.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 77
 282 owl_attack J9
-#? [1 .*]*
+#? [1 .*]
 
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 231
 283 owl_defend J9

@@ -180,7 +180,7 @@ loadsgf games/strategy32.sgf 19
 
 loadsgf games/mf1.sgf 29
 137 gg_genmove black
-#? [F5]*
+#? [F5]
 
 loadsgf games/manner.sgf 12
 138 gg_genmove white

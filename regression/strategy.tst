@@ -126,7 +126,7 @@ loadsgf games/strategy4.sgf
 # incident 290
 loadsgf games/incident290.sgf 30
 20 gg_genmove black
-#? [Q11]*
+#? [Q11]
 
 # incident 291
 loadsgf games/incident291.sgf 54
@@ -203,7 +203,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
-#? [E17]*
+#? [E17]
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black

@@ -934,7 +934,7 @@ loadsgf games/handtalk/handtalk11.sgf 157
 
 loadsgf games/handtalk/handtalk12.sgf 29
 259 owl_does_attack L2 M3
-#? [0]*
+#? [0]
 
 # Far too many escape ways for F10 as it could be killed.
 loadsgf games/handtalk/handtalk12.sgf 41

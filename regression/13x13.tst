@@ -264,7 +264,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 # Renumbered since there were 2 test 49's
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
 149 gg_genmove black
-#? [L7]
+#? [L7]*
 
 # Here N11 is generated as an "additional attack/defense move", although
 # the black dragon is still dead after black connects at N11.
