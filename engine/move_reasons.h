@@ -137,8 +137,6 @@ struct move_data {
 #define MAX_ALL           100
 
 
-float compute_shape_factor(int pos);
-
 extern struct move_data move[BOARDMAX];
 extern struct move_reason move_reasons[MAX_MOVE_REASONS];
 extern int next_reason;
@@ -188,19 +186,16 @@ extern int replacement_map[BOARDMAX];
 
 
 
-int  find_worm(int str);
-int  find_dragon(int str);
-
-int  move_reason_known(int pos, int type, int what);
-int  attack_move_reason_known(int pos, int what);
-int  defense_move_reason_known(int pos, int what);
-int  owl_attack_move_reason_known(int pos, int what);
-int  owl_defense_move_reason_known(int pos, int what);
-int  get_biggest_owl_target(int pos);
-int  is_antisuji_move(int pos);
-
-int  move_connects_strings(int pos, int color);
-int  move_reasons_confirm_safety(int move, int color, int minsize);
+int find_worm(int str);
+int find_dragon(int str);
+   
+int move_reason_known(int pos, int type, int what);
+int attack_move_reason_known(int pos, int what);
+int defense_move_reason_known(int pos, int what);
+int owl_attack_move_reason_known(int pos, int what);
+int owl_defense_move_reason_known(int pos, int what);
+int get_biggest_owl_target(int pos);
+int is_antisuji_move(int pos);
 
 void discard_redundant_move_reasons(int pos);
 void list_move_reasons(int color);

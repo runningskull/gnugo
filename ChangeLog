@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- compute_shape_factor() and move_connects_strings() moved from
+  move_reasons.c to value_moves.c
+- move_reasons_confirm_safety() moved likewise and renamed to
+  value_moves_confirm_safety()
+- b patterns in endgame.db, fuseki.db, patterns.db, and patterns2.db
+  changed to e patterns
+- classification letters ordered consistently in pattern databases
 - find_backfilling_move() in filllib.c revised
 - new debug flag DEBUG_TOP_MOVES
 - regression revisions

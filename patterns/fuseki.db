@@ -106,7 +106,7 @@ Pattern F1
 |...........
 +-----------
 
-:8,FEda
+:8,FEad
 
 
 Pattern F2
@@ -119,7 +119,7 @@ Pattern F2
 |.........
 +---------
 
-:8,FEe
+:8,FeE
 
 
 Pattern F3
@@ -131,7 +131,7 @@ Pattern F3
 |..........
 +----------
 
-:8,FtEba,shape(1)
+:8,FeEat,shape(1)
 
 
 Pattern F4
@@ -194,7 +194,7 @@ Pattern F6
 |......
 +------
 
-:/,Feb
+:/,Fe
 
 
 Pattern F7
@@ -207,7 +207,7 @@ Pattern F7
 |.....
 +-----
 
-:/,Feb,shape(-2)
+:/,Fe,shape(-2)
 
 
 Pattern F8
@@ -220,7 +220,7 @@ Pattern F8
 |.......
 +-------
 
-:8,FEbaj
+:8,FeEaj
 
 
 Pattern F9
@@ -233,7 +233,7 @@ Pattern F9
 |.........
 +---------
 
-:8,FEbaj,shape(4)
+:8,FeEaj,shape(4)
 
 
 Pattern F10
@@ -246,7 +246,7 @@ Pattern F10
 |.......
 +-------
 
-:8,FEbaj
+:8,FeEaj
 
 
 Pattern F11
@@ -259,7 +259,7 @@ Pattern F11
 |.........
 +---------
 
-:8,FEbaj,shape(4)
+:8,FeEaj,shape(4)
 
 
 Pattern F12
@@ -272,7 +272,7 @@ Pattern F12
 |......
 +------
 
-:8,Fbej,shape(2)
+:8,Fej,shape(2)
 
 
 Pattern F13
@@ -286,7 +286,7 @@ Pattern F13
 |......
 +------
 
-:8,FbEaj,shape(1)
+:8,FeEaj,shape(1)
 
 
 Pattern F14a
@@ -303,7 +303,7 @@ Pattern F14a
 |......
 +------
 
-:8,FbEaj,shape(1)
+:8,FeEaj,shape(1)
 
 
 Pattern F14b
@@ -316,7 +316,7 @@ Pattern F14b
 |......
 +------
 
-:8,FbEaj,shape(2)
+:8,FeEaj,shape(2)
 
 
 Pattern F15
@@ -330,7 +330,7 @@ Pattern F15
 |......
 +------
 
-:8,Fbej,shape(1)
+:8,Fej,shape(1)
 
 
 Pattern F16a
@@ -375,7 +375,7 @@ Pattern F17
 |..........
 +----------
 
-:8,FjEba,shape(3)
+:8,FeEaj,shape(3)
 
 
 Pattern F18
@@ -392,7 +392,7 @@ Pattern F18
 
 # The shape value is carefully chosen so that the low kakari will be
 # played much more often, but not always.
-:8,FjEba,shape(2.98)
+:8,FeEaj,shape(2.98)
 
 
 ###################
@@ -409,7 +409,7 @@ Pattern F101
 |......
 +------
 
-:8,FjEe,shape(3)
+:8,FeEj,shape(3)
 
 
 Pattern F102
@@ -422,7 +422,7 @@ Pattern F102
 |.........
 +---------
 
-:8,FjEe,shape(3)
+:8,FeEj,shape(3)
 
 |.........
 |.........
@@ -445,7 +445,7 @@ Pattern F103
 |.......
 +-------
 
-:8,FjEe,shape(3)
+:8,FeEj,shape(3)
 
 
 Pattern F104
@@ -471,7 +471,7 @@ Pattern F105
 |.......
 +-------
 
-:8,FjEe,shape(3)
+:8,FeEj,shape(3)
 
 
 Pattern F106
@@ -484,7 +484,7 @@ Pattern F106
 |......
 +------
 
-:8,Fte,shape(-3)
+:8,Fet,shape(-3)
 
 
 Pattern F107a
@@ -499,7 +499,7 @@ Pattern F107a
 |......
 +------
 
-:8,Fte,shape(-1)
+:8,Fet,shape(-1)
 
 
 Pattern F107b
@@ -513,7 +513,7 @@ Pattern F107b
 |......
 +------
 
-:8,Fte,shape(-1)
+:8,Fet,shape(-1)
 
 
 Pattern F108
@@ -526,7 +526,7 @@ Pattern F108
 |......
 +------
 
-:8,Fte
+:8,Fet
 
 
 Pattern F109
@@ -542,7 +542,7 @@ Pattern F109
 |.......
 +-------
 
-:8,FtE,shape(-2)
+:8,FEt,shape(-2)
 
 |...a...
 |..*....
@@ -571,7 +571,7 @@ Pattern F109b
 |.......
 +-------
 
-:8,FtE,shape(-2)
+:8,FEt,shape(-2)
 
 
 Pattern F110
@@ -584,7 +584,7 @@ Pattern F110
 |..........
 +----------
 
-:8,FtE,shape(-1)
+:8,FEt,shape(-1)
 
 
 #######################################
@@ -601,7 +601,7 @@ Pattern F201
 |.............
 +-------------
 
-:8,FjEe,shape(0.5)
+:8,FeEj,shape(0.5)
 
 
 Pattern F202
@@ -614,7 +614,7 @@ Pattern F202
 |.............
 +-------------
 
-:8,FjEe,shape(0.5)
+:8,FeEj,shape(0.5)
 
 
 Pattern F203
@@ -626,7 +626,7 @@ Pattern F203
 ........
 --------
 
-:8,FtEe
+:8,FeEt
 
 
 Pattern F204
@@ -638,7 +638,7 @@ O.......?         4 space extension from knight's move
 ........?
 ---------
 
-:8,FtEe
+:8,FeEt
 
 
 Pattern F205
@@ -650,7 +650,7 @@ O........         4 space extension from knight's move
 .........
 ---------
 
-:8,FtEe,shape(1)
+:8,FeEt,shape(1)
 
 
 Pattern F206
@@ -662,7 +662,7 @@ Pattern F206
 |.............
 +-------------
 
-:8,FtE
+:8,FEt
 
 
 Pattern F207
@@ -674,7 +674,7 @@ Pattern F207
 |.............
 +-------------
 
-:8,FtE,shape(-1)
+:8,FEt,shape(-1)
 
 
 Pattern F208
@@ -686,7 +686,7 @@ Pattern F208
 .........
 ---------
 
-:8,FtEe,shape(-2)
+:8,FeEt,shape(-2)
 
 
 Pattern F209
@@ -699,7 +699,7 @@ Pattern F209
 |...................|
 +-------------------+
 
-:8,FtE,shape(3)
+:8,FEt,shape(3)
 
 
 Pattern F210
@@ -713,7 +713,7 @@ Pattern F210
 |............
 +------------
 
-:8,FtE,shape(1)
+:8,FEt,shape(1)
 
 
 #######################################
@@ -731,7 +731,7 @@ O....O.X
 ........
 --------
 
-:8,FtE
+:8,FEt
 
 
 Pattern F302
@@ -744,7 +744,7 @@ O....O.
 .......
 -------
 
-:8,FtE
+:8,FEt
 
 
 Pattern F303
@@ -758,7 +758,7 @@ O....O
 ......
 ------
 
-:8,FtE,shape(-2)
+:8,FEt,shape(-2)
 
 
 Pattern F304
@@ -772,7 +772,7 @@ X....X
 ......
 ------
 
-:8,FtE
+:8,FEt
 
 
 Pattern F305
@@ -784,7 +784,7 @@ X.*oo         usually bad
 .....
 -----
 
-:8,F-,shape(-5)
+:8,F,shape(-5)
 
 
 Pattern F306
@@ -844,7 +844,7 @@ x.*..O.xx
 .......??
 ---------
 
-:8,jed
+:8,edj
 
 x......ab
 x.*..O.cd
@@ -863,7 +863,7 @@ Pattern F402
 ........
 --------
 
-:8,ted,jump_out_helper
+:8,edt,jump_out_helper
 
 
 Pattern F403
@@ -878,7 +878,7 @@ Pattern F403
 ?.......
 --------
 
-:8,Fjed,shape(1)
+:8,Fedj,shape(1)
 
 
 Pattern F404
@@ -890,7 +890,7 @@ Pattern F404
 ?.......
 --------
 
-:8,FjEd,shape(1)
+:8,FEdj,shape(1)
 
 
 Pattern F405
@@ -904,7 +904,7 @@ O.....O?
 ........
 --------
 
-:8,Fted
+:8,Fedt
 
 ?.....o?
 ...*..O?
@@ -942,7 +942,7 @@ Pattern F407
 ......??
 --------
 
-:8,ted
+:8,edt
 
 
 Pattern F408
@@ -955,7 +955,7 @@ oO..*..
 .......
 -------
 
-:8,ted
+:8,edt
 
 
 Pattern F409
@@ -967,7 +967,7 @@ Pattern F409
 .........
 ---------
 
-:8,FtE,shape(1)
+:8,FEt,shape(1)
 
 
 Pattern F410
@@ -991,7 +991,7 @@ Pattern F410a
 ?xx.......
 ----------
 
-:8,FtEd,shape(3)
+:8,FEdt,shape(3)
 
 ?xx......?
 ?ab.O....?
@@ -1013,7 +1013,7 @@ x.........?
 x.........?
 -----------
 
-:8,FjEd,shape(2)
+:8,FEdj,shape(2)
 
 x........??
 a...O....xx
@@ -1036,7 +1036,7 @@ x...........
 x...........
 ------------
 
-:8,FjEd
+:8,FEdj
 
 x.........cd
 x.........ef
@@ -1059,7 +1059,7 @@ O.....xxx
 .........
 ---------
 
-:8,Fted
+:8,Fedt
 
 ......xxx
 O.....abx
@@ -1080,7 +1080,7 @@ O..*..xxx
 .........
 ---------
 
-:8,ted
+:8,edt
 
 ......xxx
 ......abx
@@ -1114,7 +1114,7 @@ Pattern F412
 ......
 ------
 
-:8,FjEda,shape(-1)
+:8,FEadj,shape(-1)
 
 
 Pattern F413
@@ -1126,7 +1126,7 @@ Pattern F413
 .........
 ---------
 
-:8,F-,shape(-5)
+:8,F,shape(-5)
 
 
 Pattern F420
@@ -1141,7 +1141,7 @@ Pattern F420
 |..........
 +----------
 
-:8,FtE,shape(-2)
+:8,FEt,shape(-2)
 
 
 Pattern F421
@@ -1156,7 +1156,7 @@ Pattern F421
 |..........
 +----------
 
-:8,FtEe,shape(-3)
+:8,FeEt,shape(-3)
 
 
 Pattern F423
@@ -1171,7 +1171,7 @@ Pattern F423
 |.............
 +-------------
 
-:8,FtE,shape(-3)
+:8,FEt,shape(-3)
 
 
 Pattern F424
@@ -1186,7 +1186,7 @@ Pattern F424
 |.............
 +-------------
 
-:8,FtE,shape(-4)
+:8,FEt,shape(-4)
 
 
 Pattern F425
@@ -1224,7 +1224,7 @@ X......  make 2 space extension on third row combined with approach move
 .......
 -------
 
-:8,jeda
+:8,eadj
 
 
 Pattern F502
@@ -1235,7 +1235,7 @@ X.*..O.
 .......
 -------
 
-:8,teda,shape(1)
+:8,eadt,shape(1)
 
 
 Pattern F504
@@ -1246,7 +1246,7 @@ xx.*....O
 .........
 ---------
 
-:8,Fjeda
+:8,Feadj
 
 ac.....O.
 bd.*....O
@@ -1265,7 +1265,7 @@ Pattern F505
 .......
 -------
 
-:8,Fteda,shape(1)
+:8,Feadt,shape(1)
 
 
 Pattern F506
@@ -1276,7 +1276,7 @@ o....x
 ......
 ------
 
-:8,Fteda,shape(1)
+:8,Feadt,shape(1)
 
 
 #########
@@ -1292,7 +1292,7 @@ Pattern F601
 .......
 -------
 
-:8,Fjba
+:8,Feaj
 
 
 Pattern F602
@@ -1303,7 +1303,7 @@ O.X.*...o
 .........
 ---------
 
-:8,Fjba
+:8,Feaj
 
 
 Pattern F603
@@ -1341,7 +1341,7 @@ x....*....xx
 ............
 ------------
 
-:8,FstE,shape(1)
+:8,sFEt,shape(1)
 
 X.........ab
 x....*....cd
@@ -1360,7 +1360,7 @@ X....*....xx
 ............
 ------------
 
-:8,FstE,shape(1)
+:8,sFEt,shape(1)
 
 x.........ab
 X....*....cd
@@ -1379,7 +1379,7 @@ X.......X    invade
 .........
 ---------
 
-:8,FstE
+:8,sFEt
 
 
 Pattern F704
@@ -1394,7 +1394,7 @@ Pattern F704
 .......
 -------
 
-:8,FstE,shape(-1)
+:8,sFEt,shape(-1)
 
 ???c?d?
 ?.....?
@@ -1416,7 +1416,7 @@ Pattern F705
 ........
 --------
 
-:8,FstE
+:8,sFEt
 
 
 Pattern F706
@@ -1427,7 +1427,7 @@ o......
 .......
 -------
 
-:8,FsjE
+:8,sFEj
 
 
 # tm - removed (3.1.20)
@@ -1459,7 +1459,7 @@ X....?
 ......
 ------
 
-:8,FJE
+:8,FEJ
 
 
 ############################################
@@ -1476,7 +1476,7 @@ Pattern F801
 |..............
 +--------------
 
-:8,FjE,shape(2)
+:8,FEj,shape(2)
 
 
 Pattern F802
@@ -1488,7 +1488,7 @@ Pattern F802
 |..............
 +--------------
 
-:8,FjE,shape(2)
+:8,FEj,shape(2)
 
 
 Pattern F803
@@ -1500,7 +1500,7 @@ Pattern F803
 |..............
 +--------------
 
-:8,FjE,shape(2)
+:8,FEj,shape(2)
 
 
 Pattern F804
@@ -1512,7 +1512,7 @@ Pattern F804
 |..............
 +--------------
 
-:8,FjE,shape(2)
+:8,FEj,shape(2)
 
 
 Pattern F805
@@ -1524,7 +1524,7 @@ Pattern F805
 |..............
 +--------------
 
-:8,FtE,shape(4)
+:8,FEt,shape(4)
 
 
 Pattern F806
@@ -1536,7 +1536,7 @@ Pattern F806
 |..............
 +--------------
 
-:8,FtE,shape(3)
+:8,FEt,shape(3)
 
 
 Pattern F807
@@ -1549,7 +1549,7 @@ Pattern F807
 |...................|
 +-------------------+
 
-:8,FjE,shape(1)
+:8,FEj,shape(1)
 
 
 Pattern F808
@@ -1562,7 +1562,7 @@ Pattern F808
 |...................|
 +-------------------+
 
-:8,FjE,shape(1)
+:8,FEj,shape(1)
 
 
 Pattern F809
@@ -1574,7 +1574,7 @@ Pattern F809
 |..............
 +--------------
 
-:8,FjE,shape(4)
+:8,FEj,shape(4)
 
 |...X..........
 |.........g.abc
@@ -1595,7 +1595,7 @@ Pattern F810
 |...............
 +---------------
 
-:8,FjE,shape(4)
+:8,FEj,shape(4)
 
 |...X...........
 |..........g.abc
@@ -1616,7 +1616,7 @@ Pattern F811
 |..............
 +--------------
 
-:8,FjE,shape(4)
+:8,FEj,shape(4)
 
 |..............
 |..X.g......abc
@@ -1642,7 +1642,7 @@ Pattern F901
 .......
 -------
 
-:8,FJEd
+:8,FEdJ
 
 
 Pattern F902
@@ -1655,7 +1655,7 @@ o...OX.
 .......
 -------
 
-:8,FJEd
+:8,FEdJ
 
 ......x
 ......x
@@ -1691,7 +1691,7 @@ Pattern J1
 |.....?
 +------
 
-:8,FsJdb
+:8,sFedJ
 
 
 Pattern J2
@@ -1705,7 +1705,7 @@ Pattern J2
 |.......
 +-------
 
-:8,FsJda
+:8,sFadJ
 
 
 Pattern J3
@@ -1720,7 +1720,7 @@ Pattern J3
 |.......
 +-------
 
-:8,FsJda
+:8,sFadJ
 
 
 Pattern J4
@@ -1735,7 +1735,7 @@ Pattern J4
 |.......
 +-------
 
-:8,FsJda
+:8,sFadJ
 
 
 Pattern J5
@@ -1748,7 +1748,7 @@ Pattern J5
 |......
 +------
 
-:8,FsJdab
+:8,sFeadJ
 
 
 Pattern J6
@@ -1762,7 +1762,7 @@ Pattern J6
 |.......
 +-------
 
-:8,FsJe
+:8,sFeJ
 
 
 Pattern J7
@@ -1775,7 +1775,7 @@ Pattern J7
 |......
 +------
 
-:8,FsJbd
+:8,sFedJ
 
 
 Pattern J8
@@ -1789,7 +1789,7 @@ Pattern J8
 |.....
 +-----
 
-:8,FsJdb
+:8,sFedJ
 
 
 Pattern J9
@@ -1800,7 +1800,7 @@ X..O..*.
 ........
 --------
 
-:8,FsJed
+:8,sFedJ
 
 
 Pattern J10
@@ -1818,7 +1818,7 @@ Pattern J10
 |...........
 +-----------
 
-:8,FsjE
+:8,sFEj
 
 |.abc....???
 |.def....???
@@ -1846,7 +1846,7 @@ Pattern J11
 |.....
 +-----
 
-:8,FsJdb
+:8,sFedJ
 
 
 Pattern J12
@@ -1859,7 +1859,7 @@ Pattern J12
 |.......
 +-------
 
-:8,FsJde
+:8,sFedJ
 
 
 Pattern J13
@@ -1873,7 +1873,7 @@ Pattern J13
 |.......
 +-------
 
-:8,FsJdb
+:8,sFedJ
 
 
 Pattern J14
@@ -1888,7 +1888,7 @@ Pattern J14
 |.......
 +-------
 
-:8,FsjdaE
+:8,sFEadj
 
 
 Pattern J15
@@ -1903,7 +1903,7 @@ Pattern J15
 |.......
 +-------
 
-:8,FsjdE
+:8,sFEdj
 
 
 Pattern J16
@@ -1918,7 +1918,7 @@ Pattern J16
 |.......
 +-------
 
-:8,FsjdE
+:8,sFEdj
 
 
 Pattern J17
@@ -1932,7 +1932,7 @@ Pattern J17
 |..........
 +----------
 
-:8,FjaE
+:8,FEaj
 
 
 Pattern J18
@@ -1944,7 +1944,7 @@ Pattern J18
 |......
 +------
 
-:8,Fjde,shape(-1)
+:8,Fedj,shape(-1)
 
 
 Pattern J19
@@ -1956,7 +1956,7 @@ Pattern J19
 |.........
 +---------
 
-:8,Fjda,shape(5)
+:8,Fadj,shape(5)
 
 
 Pattern J20
@@ -1969,7 +1969,7 @@ Pattern J20
 |........
 +--------
 
-:8,FJdb
+:8,FedJ
 
 
 Pattern J21
@@ -1982,7 +1982,7 @@ Pattern J21
 |......
 +------
 
-:8,FjEd
+:8,FEdj
 
 
 Pattern J22
@@ -1995,7 +1995,7 @@ Pattern J22
 |...X..
 +------
 
-:8,FjEd
+:8,FEdj
 
 
 Pattern J23
@@ -2008,7 +2008,7 @@ Pattern J23
 |....
 +----
 
-:8,Fdba,shape(2)
+:8,Fead,shape(2)
 
 
 Pattern J24
@@ -2106,7 +2106,7 @@ Pattern J29
 |..*...
 +------
 
-:8,F-,value(35)
+:8,F,value(35)
 
 |.xx???
 |.Xx???
@@ -2129,7 +2129,7 @@ Pattern J30
 ......
 ------
 
-:8,FJad
+:8,FadJ
 
 ?.....
 ?..O..
@@ -2227,7 +2227,7 @@ Pattern J36
 |.....
 +-----
 
-:8,Fjad
+:8,Fadj
 
 
 Pattern J37

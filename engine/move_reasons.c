@@ -1067,6 +1067,7 @@ add_all_move(int pos, int reason1, int target1, int reason2, int target2)
 void
 add_block_territory_move(int pos)
 {
+  gg_assert(0 && "block_territory move reason obsolete");
   add_move_reason(pos, BLOCK_TERRITORY_MOVE, 0);
 }
 
@@ -1124,36 +1125,6 @@ add_worthwhile_threat_move(int pos)
 {
   move[pos].worthwhile_threat = 1;
 }
-
-/* 
- * This function computes the shape factor, which multiplies
- * the score of a move. We take the largest positive contribution
- * to shape and add 1 for each additional positive contribution found.
- * Then we take the largest negative contribution to shape, and
- * add 1 for each additional negative contribution. The resulting
- * number is raised to the power 1.05.
- *
- * The rationale behind this complicated scheme is that every
- * shape point is very significant. If two shape contributions
- * with values (say) 5 and 3 are found, the second contribution
- * should be devalued to 1. Otherwise the engine is too difficult to
- * tune since finding multiple contributions to shape can cause
- * significant overvaluing of a move.
- */
-
-float
-compute_shape_factor(int pos)
-{
-  float exponent = move[pos].maxpos_shape - move[pos].maxneg_shape;
-
-  ASSERT_ON_BOARD1(pos);
-  if (move[pos].numpos_shape > 1)
-    exponent += move[pos].numpos_shape - 1;
-  if (move[pos].numneg_shape > 1)
-    exponent -= move[pos].numneg_shape - 1;
-  return pow(1.05, exponent);
-}
-
 
 /*
  * Add to the reasons for the move at (pos) that it attacks
@@ -1814,82 +1785,6 @@ is_antisuji_move(int pos)
   }
 
   return 0;
-}
-
-
-/* Count how many distinct strings are (solidly) connected by the move
- * at (pos). Add a bonus for strings with few liberties. Also add
- * bonus for opponent strings put in atari or removed.
- */
-int
-move_connects_strings(int pos, int color)
-{
-  int ss[4];
-  int strings = 0;
-  int own_strings = 0;
-  int k, l;
-  int fewlibs = 0;
-
-  for (k = 0; k < 4; k++) {
-    int ii = pos + delta[k];
-    int origin;
-
-    if (!ON_BOARD(ii) || board[ii] == EMPTY)
-      continue;
-
-    origin = find_origin(ii);
-
-    for (l = 0; l < strings; l++)
-      if (ss[l] == origin)
-	break;
-
-    if (l == strings) {
-      ss[strings] = origin;
-      strings++;
-    }
-  }
-
-  for (k = 0; k < strings; k++) {
-    if (board[ss[k]] == color) {
-      int newlibs = approxlib(pos, color, MAXLIBS, NULL);
-      own_strings++;
-      if (newlibs >= countlib(ss[k])) {
-	if (countlib(ss[k]) <= 4)
-	  fewlibs++;
-	if (countlib(ss[k]) <= 2)
-	  fewlibs++;
-      }
-    }
-    else {
-      if (countlib(ss[k]) <= 2)
-	fewlibs++;
-      if (countlib(ss[k]) <= 1)
-	fewlibs++;
-    }
-  }
-
-  /* Do some thresholding. */
-  if (fewlibs > 4)
-    fewlibs = 4;
-  if (fewlibs == 0 && own_strings == 1)
-    own_strings = 0;
-
-  return own_strings + fewlibs;
-}
-
-
-/* Find saved dragons and worms, then call confirm_safety(). */
-int
-move_reasons_confirm_safety(int move, int color, int minsize)
-{
-  int saved_dragons[BOARDMAX];
-  int saved_worms[BOARDMAX];
-
-  get_saved_dragons(move, saved_dragons);
-  get_saved_worms(move, saved_worms);
-  
-  return confirm_safety(move, color, minsize, NULL,
-			saved_dragons, saved_worms);
 }
 
 

@@ -972,7 +972,7 @@ Pattern Cut101
 X*X
 OoO
 
-:|,BO
+:|,OB
 
 ...
 A*B
@@ -996,7 +996,7 @@ Pattern Cut201
 X*         cut through diagonal
 OX
 
-:/,BO
+:/,OB
 
 X*
 aX
@@ -1019,7 +1019,7 @@ Pattern Cut302
 X*.         cut through keima
 .OX
 
-:8,BO
+:8,OB
 
 X*a
 .bX
@@ -1032,7 +1032,7 @@ Pattern Cut303
 X*O         cut through keima
 .OX
 
-:8,BO
+:8,OB
 
 X*a
 .bX
@@ -1064,7 +1064,7 @@ X.OX
 ....
 ----
 
-:8,BO
+:8,OB
 
 XaeX
 cb*d
@@ -1092,7 +1092,7 @@ XO..
 ....
 ----
 
-:8,BO
+:8,OB
 
 FOc.
 d*aE
@@ -2541,7 +2541,7 @@ Pattern Shape82
 |.X?
 |.??
 
-:8,Xs,shape(2)
+:8,sX,shape(2)
 
 |AAO
 |.*X
@@ -2901,7 +2901,7 @@ Pattern DD2
 *O        double atari on me
 OX
 
-:\,On
+:\,nO
 
 *a
 bX

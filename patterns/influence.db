@@ -422,7 +422,7 @@ Pattern Invade3
 |.....
 |..O..
 
-:8,Ise,value(0.2)
+:8,sIe,value(0.2)
 
 
 Pattern Invade4
@@ -438,7 +438,7 @@ Pattern Invade4
 |.....
 |..oO.
 
-:8,Ise,value(0.2)
+:8,sIe,value(0.2)
 
 
 Pattern Invade4b
@@ -454,7 +454,7 @@ Pattern Invade4b
 |.....
 |..ooO
 
-:8,Ise,value(0.2)
+:8,sIe,value(0.2)
 
 
 Pattern Invade4c
@@ -470,7 +470,7 @@ Pattern Invade4c
 |.....?
 |..oooO
 
-:8,Ise,value(0.2)
+:8,sIe,value(0.2)
 
 
 Pattern Invade5
@@ -591,7 +591,7 @@ Pattern Invade8
 |.....
 |..Ooo
 
-:8,Is,value(2)
+:8,sI,value(2)
 
 
 Pattern Invade9
@@ -603,7 +603,7 @@ Pattern Invade9
 |.....
 |...Oo
 
-:8,Is,value(2)
+:8,sI,value(2)
 
 
 Pattern Invade10
@@ -615,7 +615,7 @@ Pattern Invade10
 |.....
 |....O
 
-:\,Is,value(2)
+:\,sI,value(2)
 
 
 Pattern Invade11
@@ -628,7 +628,7 @@ Pattern Invade11
 |......
 |.....O
 
-:\,Is,value(2)
+:\,sI,value(2)
 
 
 Pattern Invade12
@@ -642,7 +642,7 @@ Pattern Invade12
 |.......
 |......O
 
-:\,Is,value(2)
+:\,sI,value(2)
 
 
 Pattern Invade13
@@ -695,7 +695,7 @@ Pattern Invade16
 |......
 |..O...
 
-:8,Is,value(2)
+:8,sI,value(2)
 
 
 Pattern Invade17
@@ -713,7 +713,7 @@ Pattern Invade17
 |...O..
 |......
 
-:8,Is,value(0.5)
+:8,sI,value(0.5)
 
 
 # END OF FILE

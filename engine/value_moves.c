@@ -31,6 +31,82 @@
 #include "move_reasons.h"
 
 
+/* Count how many distinct strings are (solidly) connected by the move
+ * at (pos). Add a bonus for strings with few liberties. Also add
+ * bonus for opponent strings put in atari or removed.
+ */
+static int
+move_connects_strings(int pos, int color)
+{
+  int ss[4];
+  int strings = 0;
+  int own_strings = 0;
+  int k, l;
+  int fewlibs = 0;
+
+  for (k = 0; k < 4; k++) {
+    int ii = pos + delta[k];
+    int origin;
+
+    if (!ON_BOARD(ii) || board[ii] == EMPTY)
+      continue;
+
+    origin = find_origin(ii);
+
+    for (l = 0; l < strings; l++)
+      if (ss[l] == origin)
+	break;
+
+    if (l == strings) {
+      ss[strings] = origin;
+      strings++;
+    }
+  }
+
+  for (k = 0; k < strings; k++) {
+    if (board[ss[k]] == color) {
+      int newlibs = approxlib(pos, color, MAXLIBS, NULL);
+      own_strings++;
+      if (newlibs >= countlib(ss[k])) {
+	if (countlib(ss[k]) <= 4)
+	  fewlibs++;
+	if (countlib(ss[k]) <= 2)
+	  fewlibs++;
+      }
+    }
+    else {
+      if (countlib(ss[k]) <= 2)
+	fewlibs++;
+      if (countlib(ss[k]) <= 1)
+	fewlibs++;
+    }
+  }
+
+  /* Do some thresholding. */
+  if (fewlibs > 4)
+    fewlibs = 4;
+  if (fewlibs == 0 && own_strings == 1)
+    own_strings = 0;
+
+  return own_strings + fewlibs;
+}
+
+
+/* Find saved dragons and worms, then call confirm_safety(). */
+static int
+value_moves_confirm_safety(int move, int color, int minsize)
+{
+  int saved_dragons[BOARDMAX];
+  int saved_worms[BOARDMAX];
+
+  get_saved_dragons(move, saved_dragons);
+  get_saved_worms(move, saved_worms);
+  
+  return confirm_safety(move, color, minsize, NULL,
+			saved_dragons, saved_worms);
+}
+
+
 /* Test all moves which defend, attack, connect or cut to see if they
  * also attack or defend some other worm.
  *
@@ -987,6 +1063,36 @@ connection_value(int dragona, int dragonb, int tt, float margin)
     impact = 0.0;
   
   return impact * 2.0 * dragon[dragona].effective_size;
+}
+
+
+/* 
+ * This function computes the shape factor, which multiplies
+ * the score of a move. We take the largest positive contribution
+ * to shape and add 1 for each additional positive contribution found.
+ * Then we take the largest negative contribution to shape, and
+ * add 1 for each additional negative contribution. The resulting
+ * number is raised to the power 1.05.
+ *
+ * The rationale behind this complicated scheme is that every
+ * shape point is very significant. If two shape contributions
+ * with values (say) 5 and 3 are found, the second contribution
+ * should be devalued to 1. Otherwise the engine is too difficult to
+ * tune since finding multiple contributions to shape can cause
+ * significant overvaluing of a move.
+ */
+
+static float
+compute_shape_factor(int pos)
+{
+  float exponent = move[pos].maxpos_shape - move[pos].maxneg_shape;
+
+  ASSERT_ON_BOARD1(pos);
+  if (move[pos].numpos_shape > 1)
+    exponent += move[pos].numpos_shape - 1;
+  if (move[pos].numneg_shape > 1)
+    exponent -= move[pos].numneg_shape - 1;
+  return pow(1.05, exponent);
 }
 
 
@@ -2337,7 +2443,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       && board[pos] == EMPTY
       && move[pos].additional_ko_value > 0.0
       && is_legal(pos, color)
-      && move_reasons_confirm_safety(pos, color, 0)) {
+      && value_moves_confirm_safety(pos, color, 0)) {
     float new_tot_value = gg_min(pure_threat_value,
 				 tot_value
 				 + 0.25 * move[pos].additional_ko_value);
@@ -2757,7 +2863,7 @@ review_move_reasons(int *the_move, float *val, int color,
      * values once more.
      */
     else if (bestval > 0.0
-	     && !move_reasons_confirm_safety(best_move, color,
+	     && !value_moves_confirm_safety(best_move, color,
 					     allowed_blunder_size)) {
       TRACE("Move at %1m would be a blunder.\n", best_move);
       move[best_move].value = 0.0;

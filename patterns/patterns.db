@@ -116,7 +116,7 @@ Pattern CC2
 O*O
 ?X?
 
-:8,CBn
+:8,nBC
 
 ?aX
 b*c
@@ -131,7 +131,7 @@ Pattern CC3
 X*X
 ?O?
 
-:+,BO
+:+,OB
 
 ?a?
 X*X
@@ -163,7 +163,7 @@ Pattern CC5
 X*X
 ?O?
 
-:|,BO
+:|,OB
 
 
 Pattern CC6
@@ -187,7 +187,7 @@ OX?                cut
 X*.
 ?.?
 
-:\,BO
+:\,OB
 
 aX?
 X*.
@@ -203,7 +203,7 @@ Pattern CC8
 O.O*
 ???X
 
-:8,BO
+:8,OB
 
 ??A?
 ?OAx
@@ -219,7 +219,7 @@ Pattern CC9
 XO?
 .*X
 
-:8,BO
+:8,OB
 
 
 Pattern CC10
@@ -228,7 +228,7 @@ O.X         three crows
 .*.
 X..
 
-:\,BO
+:\,OB
 
 
 Pattern CC10b
@@ -237,7 +237,7 @@ O.X         three crows
 .*.
 X..
 
-:\,OXb
+:\,OXe
 
 
 Pattern CC11
@@ -246,7 +246,7 @@ o.X         separate the opponent
 ?*O
 ?X?
 
-:8,BOn
+:8,nOB
 
 o.A
 ?*O
@@ -296,7 +296,7 @@ Pattern CC14
 X*.
 ?OO
 
-:8,CO
+:8,OC
 
 
 Pattern CC15
@@ -352,7 +352,7 @@ X*.
 ...
 OO.
 
-:8,CO
+:8,OC
 
 
 Pattern CC20
@@ -547,7 +547,7 @@ XO.?        hane to break connection
 *..x
 .X??
 
-:8,BO
+:8,OB
 
 BO.?
 *A.x
@@ -572,7 +572,7 @@ O??           break connection
 X*X
 ?O?
 
-:8,BO
+:8,OB
 
 O??
 baX
@@ -589,7 +589,7 @@ o.O.?
 x*X.x
 ?.O??
 
-:8,CX
+:8,XC
 
 ?Oo??
 odO.?
@@ -606,7 +606,7 @@ o.OX
 ?*X.
 ?.O?
 
-:8,CX
+:8,XC
 
 ?Oo?
 odOX
@@ -623,7 +623,7 @@ o.O.
 ?*X.
 ?.OX
 
-:8,CX
+:8,XC
 
 ?Oo?
 odO.
@@ -672,7 +672,7 @@ Pattern CC41
 O.*O
 o.X?
 
-:8,BO
+:8,OB
 
 
 Pattern CC42
@@ -681,7 +681,7 @@ O.X.O         warikomi
 oo*oo
 O.X.O
 
-:|,BO
+:|,OB
 
 
 Pattern CC43
@@ -691,7 +691,7 @@ XO
 *.
 .X
 
-:8,BO
+:8,OB
 
 Xb
 *a
@@ -707,7 +707,7 @@ O.X           boldly cut before connecting
 XO*
 ?X.
 
-:8,BO
+:8,OB
 
 baX
 dO*
@@ -740,7 +740,7 @@ Pattern CC46
 .*.
 OXO
 
-:8,BO
+:8,OB
 
 .XO
 b*a
@@ -755,7 +755,7 @@ Pattern CC47
 X..X
 ?OO?
 
-:8,BO
+:8,OB
 
 .*cX
 XabX
@@ -770,7 +770,7 @@ X*.        Cut
 O..
 O.X
 
-:8,BO
+:8,OB
 
 B*.
 Oa.
@@ -785,7 +785,7 @@ Pattern CC49
 O*..
 ?X..
 
-:8,BO
+:8,OB
 
 ?..X
 O*ac
@@ -801,7 +801,7 @@ o.X.?      Cut
 O.*.?
 oOX.?
 
-:8,BO
+:8,OB
 
 o.Xce
 Ob*af
@@ -817,7 +817,7 @@ Pattern CC51
 O*.O
 ?XO?
 
-:8,Cn
+:8,nC
 
 O*aO
 ?XO?
@@ -881,7 +881,7 @@ XOX             push out
 .*.
 ?.?
 
-:|,BO
+:|,OB
 
 AOB
 .*.
@@ -917,7 +917,7 @@ XO*X
 ....
 ..O.
 
-:8,BO
+:8,OB
 
 
 Pattern CC59
@@ -926,7 +926,7 @@ Pattern CC59
 ..*O
 O.XO
 
-:8,BO
+:8,OB
 
 
 Pattern CC60
@@ -935,7 +935,7 @@ Pattern CC60
 .*OO
 OXXO
 
-:8,BO
+:8,OB
 
 
 Pattern CC61
@@ -944,7 +944,7 @@ X.OO            break connection
 X..X
 .*.?
 
-:8,BO
+:8,OB
 
 
 Pattern CC62
@@ -953,7 +953,7 @@ O.X           block off area
 .*.
 X.O
 
-:X,BO
+:X,OB
 
 
 Pattern CC63
@@ -962,7 +962,7 @@ Pattern CC63
 XO?
 .*X
 
-:8,BO
+:8,OB
 
 
 Pattern CC64
@@ -987,7 +987,7 @@ Pattern CC65
 X.O?
 x???
 
-:\,BO
+:\,OB
 
 
 Pattern CC66
@@ -1015,7 +1015,7 @@ O*X        cut!
 X..
 X.O
 
-:8,BO
+:8,OB
 
 O*X
 Xab
@@ -1031,7 +1031,7 @@ Pattern CC68
 .X..
 ...O
 
-:8,BO
+:8,OB
 
 ?O..
 ..*X
@@ -1048,7 +1048,7 @@ OXO
 .*.
 oXO
 
-:8,BO
+:8,OB
 
 
 Pattern CC70
@@ -1091,7 +1091,7 @@ Pattern CC72
 ..O..
 ?...?
 
-:8,BO
+:8,OB
 
 
 Pattern CC73
@@ -1101,7 +1101,7 @@ o.*O
 O..X
 ?.O?
 
-:8,scda,shape(5)
+:8,scad,shape(5)
 
 
 Pattern CC74
@@ -1190,7 +1190,7 @@ XO.*.
 XXO..
 .....
 
-:8,XCeda,shape(5)
+:8,XeCad,shape(5)
 
 ?a.xx
 Xa.*.
@@ -1237,7 +1237,7 @@ Pattern CC82
 X*O.
 ...?
 
-:8,CdaE,shape(3)
+:8,ECad,shape(3)
 
 ..??
 .AXX
@@ -1255,7 +1255,7 @@ O...
 X.*.
 ?X.O
 
-:8,CX
+:8,XC
 
 Oac.
 Xb*.
@@ -1337,7 +1337,7 @@ X*.X
 ....
 ----
 
-:8,BO
+:8,OB
 
 ?O.?
 D*aC
@@ -1354,7 +1354,7 @@ X.*X
 ....
 ----
 
-:8,BO
+:8,OB
 
 ?OaO
 Xd*X
@@ -1372,7 +1372,7 @@ X*..
 ....
 ----
 
-:8,BO
+:8,OB
 
 ?DbX
 X*ac
@@ -1389,7 +1389,7 @@ O*..
 ....
 ----
 
-:8,CX,shape(2)
+:8,XC,shape(2)
 
 ?DbO
 O*ac
@@ -1428,7 +1428,7 @@ Pattern EC9
 O..?
 ----
 
-:8,BO
+:8,OB
 
 
 Pattern EC10
@@ -1495,7 +1495,7 @@ XO?      separate the opponent
 ...
 ---
 
-:8,BO
+:8,OB
 
 
 Pattern EC16
@@ -1555,7 +1555,7 @@ X.OX?         Prevent connection
 .....
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC19
@@ -1566,7 +1566,7 @@ x.?
 ..X
 ---
 
-:8,BO
+:8,OB
 
 
 Pattern EC20
@@ -1577,7 +1577,7 @@ Pattern EC20
 .XX
 ---
 
-:8,BO
+:8,OB
 
 
 Pattern EC21
@@ -1588,7 +1588,7 @@ XOX
 ...
 ---
 
-:|,BO
+:|,OB
 
 o.o
 aOb
@@ -1607,7 +1607,7 @@ XOX
 ...
 ---
 
-:|,BO
+:|,OB
 
 ?O?
 aOb
@@ -1665,7 +1665,7 @@ XO*
 X..
 ---
 
-:8,BO
+:8,OB
 
 ebX
 cO*
@@ -1686,7 +1686,7 @@ XO.
 X..
 ---
 
-:8,BO
+:8,OB
 
 d*X
 XOa
@@ -1744,7 +1744,7 @@ X..Oo        cut
 .....
 -----
 
-:8,BO
+:8,OB
 
 X.aOo
 ..*B.
@@ -1790,7 +1790,7 @@ XO?           cut!
 ...
 ---
 
-:8,BO
+:8,OB
 
 
 Pattern EC33
@@ -1868,7 +1868,7 @@ O.O?
 ?*.O
 ??OX
 
-:8,Cn
+:8,nC
 
 
 Pattern EC38
@@ -1915,7 +1915,7 @@ Pattern EC41
 X..
 ..O
 
-:8,BO
+:8,OB
 
 
 Pattern EC42
@@ -1926,7 +1926,7 @@ X.*X?
 .....
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC43
@@ -1937,7 +1937,7 @@ X.OX?
 .....
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC44
@@ -1946,7 +1946,7 @@ Oo.X               stop connection on edge
 X*.X
 ----
 
-:8,BO
+:8,OB
 
 
 Pattern EC45
@@ -1958,7 +1958,7 @@ X*..
 ....
 ----
 
-:8,BO
+:8,OB
 
 
 Pattern EC46
@@ -1970,7 +1970,7 @@ O.OX?
 ....?
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC47
@@ -1979,7 +1979,7 @@ X.OX     block edge connection
 X.*.
 ----
 
-:8,BO
+:8,OB
 
 
 Pattern EC48
@@ -1988,7 +1988,7 @@ XOXX            break connection
 X*.?
 ----
 
-:8,BO
+:8,OB
 
 
 Pattern EC49
@@ -1999,7 +1999,7 @@ X*.X
 ....
 ----
 
-:8,BO
+:8,OB
 
 
 Pattern EC50
@@ -2010,7 +2010,7 @@ XO.X
 ....
 ----
 
-:8,BO
+:8,OB
 
 
 Pattern EC51
@@ -2021,7 +2021,7 @@ Pattern EC51
 .....
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC52
@@ -2032,7 +2032,7 @@ Pattern EC52
 .....
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC53
@@ -2043,7 +2043,7 @@ X.OX?
 .....
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC54
@@ -2054,7 +2054,7 @@ XO.X.
 .....
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC55
@@ -2065,7 +2065,7 @@ Pattern EC55
 ....
 ----
 
-:8,BO
+:8,OB
 
 ?ce?
 dOaX
@@ -2084,7 +2084,7 @@ X*O?       Prevent opponent's connection under
 ...X
 ----
 
-:8,BO
+:8,OB
 
 B*O?
 ...A
@@ -2141,7 +2141,7 @@ Pattern EC59
 .*..X
 -----
 
-:8,BO
+:8,OB
 
 .Xa.X
 .*..X
@@ -2160,7 +2160,7 @@ XXO.
 ....
 ----
 
-:8,CO
+:8,OC
 
 ?O..
 XO*X
@@ -2181,7 +2181,7 @@ XXO*
 ....
 ----
 
-:8,CO
+:8,OC
 
 ?b..
 XOaX
@@ -2199,7 +2199,7 @@ X.X*X
 .....
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC62
@@ -2222,7 +2222,7 @@ OXO
 ...
 ---
 
-:|,CX,value(20)
+:|,XC,value(20)
 
 ?X?
 OXO
@@ -2241,7 +2241,7 @@ Pattern EC64
 .....
 -----
 
-:8,OXbda,value(15)
+:8,OXead,value(15)
 
 ..xxx
 .O.Xx
@@ -2260,7 +2260,7 @@ O*X.O
 .....
 -----
 
-:8,CX,shape(6)
+:8,XC,shape(6)
 
 
 Pattern EC66
@@ -2270,7 +2270,7 @@ OXX.O          connect below
 .....
 -----
 
-:8,CXda,shape(6)
+:8,XCad,shape(6)
 
 OXX.O
 b*Oa.
@@ -2287,7 +2287,7 @@ OXX.O          connect below
 .....
 -----
 
-:8,CXda,shape(6)
+:8,XCad,shape(6)
 
 OXX.O
 bO*a.
@@ -2304,7 +2304,7 @@ O.XOo        connect underneath
 .....
 -----
 
-:8,CXda
+:8,XCad
 
 O.Abo
 ..*.o
@@ -2322,7 +2322,7 @@ X*..O
 .....
 -----
 
-:8,CXda
+:8,XCad
 
 ?OXx?
 A*..O
@@ -2340,7 +2340,7 @@ oOX.O        connect with ko
 O.*..
 -----
 
-:8,CXd
+:8,XCd
 
 oOXbO
 Oc*ad
@@ -2435,7 +2435,7 @@ Pattern EC77
 |.X.
 |XOO
 
-:8,OXb
+:8,OXe
 
 |..x
 |.*.
@@ -2457,7 +2457,7 @@ OOO	block or cut into black's territory.
 ...
 ---
 
-:8,sOXb
+:8,sOXe
 
 OOO
 a..
@@ -2479,7 +2479,7 @@ XOX       prevent connection
 .*.
 ---
 
-:|,BO
+:|,OB
 
 XOX
 a*b
@@ -2494,7 +2494,7 @@ XOX       prevent connection
 ..*
 ---
 
-:8,BO
+:8,OB
 
 XcX
 ab*
@@ -2539,7 +2539,7 @@ XO?         don't allow connection underneath
 .*X
 ---
 
-:8,BO
+:8,OB
 
 BO?
 a*X
@@ -2554,7 +2554,7 @@ XO?         don't allow connection underneath
 X*X
 ---
 
-:8,BOn
+:8,nOB
 
 
 Pattern EC107
@@ -2572,7 +2572,7 @@ XOX     block edge connection
 x*x
 ---
 
-:8,OBn
+:8,nOB
 
 AOB
 x*x
@@ -2587,7 +2587,7 @@ Pattern EC109
 O*O
 ---
 
-:|,Cn
+:|,nC
 
 
 Pattern EC110
@@ -2611,7 +2611,7 @@ XO..         don't allow connection underneath
 .*.X
 ----
 
-:8,BO
+:8,OB
 
 BO..
 a*.X
@@ -2626,7 +2626,7 @@ XO*.         don't allow connection underneath
 ...X
 ----
 
-:8,BOn
+:8,nOB
 
 BO*.
 ac.X
@@ -2641,7 +2641,7 @@ XO..         don't allow connection underneath
 X*.X
 ----
 
-:8,BOn
+:8,nOB
 
 
 Pattern EC204
@@ -2650,7 +2650,7 @@ XO*.         don't allow connection underneath
 X..X
 ----
 
-:8,BO
+:8,OB
 
 XO*.
 Xa.X
@@ -2665,7 +2665,7 @@ XO.O         don't allow connection underneath
 x.*X
 ----
 
-:8,BO
+:8,OB
 
 XOaO
 xb*X
@@ -2690,7 +2690,7 @@ O.XO          Connect at edge
 ..*.
 ----
 
-:8,Cn
+:8,nC
 
 ObEO
 da*c
@@ -2707,7 +2707,7 @@ O*XO          Connect at edge
 .XO.
 ----
 
-:8,Cn
+:8,nC
 
 O*BO
 .XOa
@@ -2738,7 +2738,7 @@ X.OX          Cut at edge
 ..*.
 ----
 
-:8,BOn
+:8,nOB
 
 XbeX
 da*c
@@ -2799,7 +2799,7 @@ X..O?
 ..*Xx
 -----
 
-:8,BO
+:8,OB
 
 
 Pattern EC216
@@ -2823,7 +2823,7 @@ Pattern EC217
 X*.X
 ----
 
-:8,BO
+:8,OB
 
 ?O??
 B*aC
@@ -2866,7 +2866,7 @@ O.O.O
 ..*..
 ?????
 
-:|,dX
+:|,Xd
 
 ?A?B?
 O.O.O
@@ -2884,7 +2884,7 @@ X..O
 .*..
 O.??
 
-:8,dabX
+:8,Xead
 
 
 Pattern CS3
@@ -2893,7 +2893,7 @@ Pattern CS3
 .*..
 X.O?
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS4
@@ -2903,7 +2903,7 @@ Pattern CS4
 ...*.??
 .....X.
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS5
@@ -2915,7 +2915,7 @@ Pattern CS5
 .....
 ...X?
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS6
@@ -2927,7 +2927,7 @@ Pattern CS6
 .....
 ...X?
 
-:8,daOX
+:8,OXad
 
 ??Oa?
 .X.O.
@@ -2946,7 +2946,7 @@ Pattern CS7
 ...*..
 .....X
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS8
@@ -2955,7 +2955,7 @@ Pattern CS8
 .X...X
 ...*..
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS9
@@ -2966,7 +2966,7 @@ O.*..O
 ......
 ??????
 
-:8,daOX,jump_out_helper
+:8,OXad,jump_out_helper
 
 
 Pattern CS10
@@ -2977,7 +2977,7 @@ X...X
 ?.*..
 ??.??
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS11
@@ -2987,7 +2987,7 @@ Pattern CS11
 .*O
 .X?
 
-:8,daOX
+:8,OXad
 
 b.X
 ...
@@ -3003,7 +3003,7 @@ Pattern CS12
 ...X
 X*..
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS13
@@ -3013,7 +3013,7 @@ Pattern CS13
 ....
 ..X.
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS14
@@ -3024,7 +3024,7 @@ X.*.X
 ?....
 ?oO??
 
-:8,daOX
+:8,OXad
 
 
 Pattern CS15
@@ -3034,7 +3034,7 @@ X*.X
 ....
 oO??
 
-:8,aOX
+:8,OXa
 
 
 Pattern CS16
@@ -3042,7 +3042,7 @@ Pattern CS16
 ?O.x
 X*.X
 
-:8,aOX
+:8,OXa
 
 ?O.x
 A*.B
@@ -3056,7 +3056,7 @@ xXx      Even a computer answers a peep.
 O*O
 ...
 
-:8,dOX
+:8,OXd
 
 xXx
 b*c
@@ -3072,7 +3072,7 @@ O.*.O
 o...o
 ?XxX?
 
-:|,adOX
+:|,OXad
 
 
 Pattern CS19
@@ -3082,7 +3082,7 @@ X...
 O.*.
 O..X
 
-:8,adOX
+:8,OXad
 
 
 Pattern CS20
@@ -3092,7 +3092,7 @@ X..
 O*.
 ?xX
 
-:8,adOX
+:8,OXad
 
 
 Pattern CS21
@@ -3102,7 +3102,7 @@ OOXX           cutting tesuji
 .*..
 ..O?
 
-:8,aXO
+:8,OXa
 
 aaXX
 .X..
@@ -3119,7 +3119,7 @@ Pattern CS22
 ?XO*.
 ??..?
 
-:8,adOX
+:8,OXad
 
 
 Pattern CS23
@@ -3130,7 +3130,7 @@ Pattern CS23
 X...
 ?.O?
 
-:8,adOX
+:8,OXad
 
 
 Pattern CS24
@@ -3142,7 +3142,7 @@ O.*X.
 .....
 .....
 
-:8,dOX
+:8,OXd
 
 ...O.
 .....
@@ -3161,7 +3161,7 @@ O.OX.
 ..X*.
 .....
 
-:8,sdOX
+:8,sOXd
 
 
 Pattern CS26
@@ -3189,7 +3189,7 @@ O.X..
 .....
 -----
 
-:8,dX
+:8,Xd
 
 
 Pattern ES2
@@ -3200,7 +3200,7 @@ O*X..
 .....
 -----
 
-:8,dX
+:8,Xd
 
 
 ######################################################################
@@ -3282,7 +3282,7 @@ Pattern EB6
 .....
 -----
 
-:8,OXeb
+:8,OXe
 
 
 Pattern EB7
@@ -3427,7 +3427,7 @@ O...
 ....
 ----
 
-:8,OXeda
+:8,OXead
 
 
 Pattern EB108
@@ -3670,7 +3670,7 @@ Pattern EB301
 ......
 ------
 
-:8,OXbd
+:8,OXed
 
 
 Pattern EB302
@@ -3692,7 +3692,7 @@ Pattern EB303
 ......
 ------
 
-:8,OXbe
+:8,OXe
 
 
 Pattern EB304
@@ -3703,7 +3703,7 @@ O....     extend
 .....
 -----
 
-:8,OXbe
+:8,OXe
 
 
 Pattern EB305
@@ -3714,7 +3714,7 @@ X....      extend
 .....
 -----
 
-:8,OXbe
+:8,OXe
 
 
 Pattern EB306
@@ -3745,7 +3745,7 @@ X*.O
 ....
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB308
@@ -3756,7 +3756,7 @@ O...          block on third line
 ....
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB309
@@ -3767,7 +3767,7 @@ Pattern EB309
 ....
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB310
@@ -3778,7 +3778,7 @@ X..O.       expand base
 .....
 -----
 
-:8,OXeb
+:8,OXe
 
 
 Pattern EB311
@@ -3790,7 +3790,7 @@ O....*.X
 ........
 --------
 
-:8,OXeb
+:8,OXe
 
 
 Pattern EB312
@@ -3802,7 +3802,7 @@ O....
 .....
 -----
 
-:8,OXeb
+:8,OXe
 
 
 Pattern EB313
@@ -3812,7 +3812,7 @@ Pattern EB313
 ?...?
 -----
 
-:8,OXeb
+:8,OXe
 
 ?X.O?
 b.*.a
@@ -3831,7 +3831,7 @@ X..O
 ....
 ----
 
-:8,OXeb
+:8,OXe
 
 
 Pattern EB315
@@ -3842,7 +3842,7 @@ O....
 .....
 -----
 
-:8,OXbe
+:8,OXe
 
 
 Pattern EB316
@@ -3853,7 +3853,7 @@ O..*X.
 ......
 ------
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB317
@@ -3865,7 +3865,7 @@ X.*.o
 ....o
 -----
 
-:8,OXba
+:8,OXea
 
 ...oo
 A..oo
@@ -4008,7 +4008,7 @@ XXO..?
 .....?
 ------
 
-:8,daeE
+:8,eEad
 
 
 Pattern EB411
@@ -4021,7 +4021,7 @@ XXO..oo
 .....oo
 -------
 
-:8,daeE,shape(7)
+:8,eEad,shape(7)
 
 ...??oo
 O....oo
@@ -4043,7 +4043,7 @@ OXX.
 ....
 ----
 
-:8,deE,shape(3)
+:8,eEd,shape(3)
 
 
 ##############################
@@ -4060,7 +4060,7 @@ Pattern EB501
 .....
 -----
 
-:8,bd,shape(5)
+:8,ed,shape(5)
 
 
 Pattern EB501a
@@ -4072,7 +4072,7 @@ Pattern EB501a
 ......
 ------
 
-:8,bd,shape(5)
+:8,ed,shape(5)
 
 
 Pattern EB502
@@ -4083,7 +4083,7 @@ Pattern EB502
 ......
 ------
 
-:8,b,followup(5)
+:8,e,followup(5)
 
 
 Pattern EB503
@@ -4094,7 +4094,7 @@ Pattern EB503
 ......
 ------
 
-:8,b
+:8,e
 
 
 Pattern EB504
@@ -4105,7 +4105,7 @@ xX*.o
 .....
 -----
 
-:8,b
+:8,e
 
 
 Pattern EB505
@@ -4117,7 +4117,7 @@ O.OO.
 ?....
 -----
 
-:8,b
+:8,e
 
 
 Pattern EB506
@@ -4129,7 +4129,7 @@ x.OO.
 ?....
 -----
 
-:8,b
+:8,e
 
 ??.??
 .*B..
@@ -4151,7 +4151,7 @@ X*..
 ....
 ----
 
-:8,Eb,shape(3)
+:8,eE,shape(3)
 
 
 Pattern EB507a
@@ -4164,7 +4164,7 @@ O...
 ....
 ----
 
-:8,Eb,shape(4)
+:8,eE,shape(4)
 
 
 Pattern EB508
@@ -4176,7 +4176,7 @@ Pattern EB508
 ....
 ----
 
-:8,b
+:8,e
 
 
 Pattern EB509
@@ -4188,7 +4188,7 @@ X*..
 ....
 ----
 
-:8,b
+:8,e
 
 
 Pattern EB510
@@ -4199,7 +4199,7 @@ X*..
 ....
 ----
 
-:8,b
+:8,e
 
 
 Pattern EB511
@@ -4210,7 +4210,7 @@ O.*X
 ....
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB512
@@ -4220,7 +4220,7 @@ Pattern EB512
 X...
 ----
 
-:8,Ob
+:8,Oe
 
 
 Pattern EB513
@@ -4232,7 +4232,7 @@ X.X*..
 ......
 ------
 
-:8,b
+:8,e
 
 
 Pattern EB514
@@ -4244,7 +4244,7 @@ X*..
 ....
 ----
 
-:8,nb
+:8,ne
 
 
 Pattern EB515
@@ -4256,7 +4256,7 @@ Pattern EB515
 .....
 -----
 
-:8,b
+:8,e
 
 
 Pattern EB516
@@ -4268,7 +4268,7 @@ O.....o
 .......
 -------
 
-:8,b
+:8,e
 
 
 Pattern EB517
@@ -4279,7 +4279,7 @@ Pattern EB517
 .....
 -----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB518
@@ -4290,7 +4290,7 @@ XO.
 X..
 ---
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB519
@@ -4301,7 +4301,7 @@ Pattern EB519
 |....
 +----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB520
@@ -4313,7 +4313,7 @@ XO...
 .....
 -----
 
-:8,b
+:8,e
 
 .....
 XO...
@@ -4359,7 +4359,7 @@ XO.?
 ...?
 ----
 
-:8,OXbda
+:8,OXead
 
 
 Pattern EB602
@@ -4370,7 +4370,7 @@ XO.?
 .X.?
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB603
@@ -4380,7 +4380,7 @@ Pattern EB603
 ?..
 ---
 
-:8,XOba
+:8,OXea
 
 ?aO
 b*D
@@ -4398,7 +4398,7 @@ O*X
 ?..
 ---
 
-:8,XOb
+:8,OXe
 
 ?aO
 O*X
@@ -4415,7 +4415,7 @@ X*X
 ?..
 ---
 
-:8,XOb
+:8,OXe
 
 ?.O
 A*X
@@ -4432,7 +4432,7 @@ X*..
 ....
 ----
 
-:8,OXbd
+:8,OXed
 
 
 Pattern EB608
@@ -4442,7 +4442,7 @@ OO?       block on second row
 ..?
 ---
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB609
@@ -4452,7 +4452,7 @@ X.O.    Block off the edge
 ....
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB610
@@ -4462,7 +4462,7 @@ O..*X
 .....
 -----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB611
@@ -4472,7 +4472,7 @@ OOXX        block on second line
 ....
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB612
@@ -4484,7 +4484,7 @@ XXO.
 ....
 ----
 
-:8,OXb
+:8,OXe
 
 ???b
 .Oa.
@@ -4503,7 +4503,7 @@ Pattern EB615
 ...
 ---
 
-:8,XOb
+:8,OXe
 
 
 Pattern EB616
@@ -4513,7 +4513,7 @@ Pattern EB616
 o...X
 -----
 
-:8,XOb
+:8,OXe
 
 
 Pattern EB617
@@ -4524,7 +4524,7 @@ o.*X
 ....
 ----
 
-:8,XOb
+:8,OXe
 
 
 Pattern EB618
@@ -4534,7 +4534,7 @@ oO.?           Prevent monkey jump or other incursion
 ...X
 ----
 
-:8,XOb
+:8,OXe
 
 
 Pattern EB619
@@ -4544,7 +4544,7 @@ oO.?           Prevent monkey jump or other incursion
 ...X
 ----
 
-:8,XOb
+:8,OXe
 
 oOa?
 ..*X
@@ -4562,7 +4562,7 @@ Pattern EB624
 ....
 ----
 
-:8,b
+:8,e
 
 ?O??
 ..aX
@@ -4581,7 +4581,7 @@ Pattern EB625
 .....
 -----
 
-:8,b
+:8,e
 
 ???O?
 ?Xa.?
@@ -4600,7 +4600,7 @@ X.O.?
 .....
 -----
 
-:8,Ob
+:8,Oe
 
 
 Pattern EB627
@@ -4611,7 +4611,7 @@ X*....
 ......
 ------
 
-:8,b
+:8,e
 
 
 Pattern EB628
@@ -4622,7 +4622,7 @@ Pattern EB628
 ....
 ----
 
-:8,Xb
+:8,Xe
 
 
 Pattern EB629
@@ -4633,7 +4633,7 @@ Pattern EB629
 ....
 ----
 
-:8,Ob
+:8,Oe
 
 
 Pattern EB630
@@ -4643,7 +4643,7 @@ Pattern EB630
 ..X.X.
 ------
 
-:8,b
+:8,e
 
 
 Pattern EB631
@@ -4654,7 +4654,7 @@ o*XOX
 o..X.
 -----
 
-:8,b
+:8,e
 
 oOb??
 o.ac?
@@ -4675,7 +4675,7 @@ XOX*.
 .X...
 -----
 
-:8,b
+:8,e
 
 ?oO??
 ?dbaX
@@ -4694,7 +4694,7 @@ O.O.        seal opponent in
 ?X..
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB634
@@ -4706,7 +4706,7 @@ Pattern EB634
 .....x
 ------
 
-:8,Xb
+:8,Xe
 
 
 Pattern EB635
@@ -4726,7 +4726,7 @@ Pattern EB637
 ..XX
 ----
 
-:8,OXbe
+:8,OXe
 
 ?od?
 e*cO
@@ -4743,7 +4743,7 @@ Pattern EB638
 ......
 ------
 
-:8,OXbd
+:8,OXed
 
 ?Oa.Oo
 .X*..o
@@ -4761,7 +4761,7 @@ X.*.
 ....
 ----
 
-:8,OXbda
+:8,OXead
 
 ?OoO
 Xba.
@@ -4779,7 +4779,7 @@ x*.
 X..
 ---
 
-:8,OXb
+:8,OXe
 
 Ooo
 x*.
@@ -4796,7 +4796,7 @@ x*.
 X..
 ---
 
-:8,OXb
+:8,OXe
 
 .Oo
 x*.
@@ -4813,7 +4813,7 @@ x*.
 X..
 ---
 
-:8,OXb
+:8,OXe
 
 ..O
 x*.
@@ -4830,7 +4830,7 @@ x.*.
 X...
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB641b
@@ -4840,7 +4840,7 @@ x.*.
 X...
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB641c
@@ -4850,7 +4850,7 @@ x.*.
 X...
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB642
@@ -4860,7 +4860,7 @@ Pattern EB642
 |...
 +---
 
-:8,OXb,reverse_followup(6)
+:8,OXe,reverse_followup(6)
 
 
 ###################
@@ -4875,7 +4875,7 @@ Pattern EB701
 |.*.
 +---
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB702a
@@ -4886,7 +4886,7 @@ Pattern EB702a
 ..X*.?
 ------
 
-:8,OXb,reverse_followup(6)
+:8,OXe,reverse_followup(6)
 
 ??o???
 ?Xab??
@@ -4904,7 +4904,7 @@ Pattern EB702b
 ..X*.|
 -----+
 
-:8,OXb,reverse_followup(2.5)
+:8,OXe,reverse_followup(2.5)
 
 ??o??|
 ?Xa.?|
@@ -4922,7 +4922,7 @@ O.O
 X*.
 ---
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB704
@@ -4932,7 +4932,7 @@ XO.
 .X*
 ---
 
-:8,OXbe
+:8,OXe
 
 
 Pattern EB705
@@ -4943,7 +4943,7 @@ Pattern EB705
 X*...
 -----
 
-:8,OXb
+:8,OXe
 
 ?????
 ?b...
@@ -4960,7 +4960,7 @@ Pattern EB706
 ..X*...
 -------
 
-:8,OXb
+:8,OXe
 
 ??Oo???
 ..AO...
@@ -4980,7 +4980,7 @@ Pattern EB707
 |..?
 +---
 
-:8,OXb,followup(8)
+:8,OXe,followup(8)
 
 |..?
 |..?
@@ -5000,7 +5000,7 @@ O?       seal off at edge
 *X
 --
 
-:8,XOb
+:8,OXe
 
 
 Pattern EB709
@@ -5010,7 +5010,7 @@ Pattern EB709
 |...
 +---
 
-:8,OXbFY,followup(1),reverse_followup(3)
+:8,OXeFY,followup(1),reverse_followup(3)
 
 
 Pattern EB709Y
@@ -5020,7 +5020,7 @@ Pattern EB709Y
 |...
 +---
 
-:8,OXbY,reverse_followup(3)
+:8,OXeY,reverse_followup(3)
 
 
 Pattern EB709b
@@ -5031,7 +5031,7 @@ Pattern EB709b
 |...
 +---
 
-:8,OXb,reverse_followup(3)
+:8,OXe,reverse_followup(3)
 
 
 Pattern EB710
@@ -5040,7 +5040,7 @@ o.OOX?              block
 .*XX.X
 ------
 
-:8,OXb,value(5)
+:8,OXe,value(5)
 
 
 Pattern EB711
@@ -5049,7 +5049,7 @@ o.OO              block
 .*XX
 ----
 
-:8,OXb,followup(4)
+:8,OXe,followup(4)
 
 o.bb
 .*AA
@@ -5068,7 +5068,7 @@ XO..
 X*..
 ----
 
-:8,OXb,reverse_followup(6)
+:8,OXe,reverse_followup(6)
 
 ?O..
 XOb.
@@ -5086,7 +5086,7 @@ Pattern EB713
 X*..
 ----
 
-:8,OXb,reverse_followup(3)
+:8,OXe,reverse_followup(3)
 
 ?Ob.
 X*a.
@@ -5117,7 +5117,7 @@ O.*      jump if blocking is impossible
 X..
 ---
 
-:8,OXb
+:8,OXe
 
 ac*
 Xbd
@@ -5133,7 +5133,7 @@ O*.     pull back if blocking is impossible
 X..
 ---
 
-:8,OXb
+:8,OXe
 
 a*c
 Xbd
@@ -5150,7 +5150,7 @@ Pattern EB717
 .XX*.
 -----
 
-:8,sOXb
+:8,sOXe
 
 ?OB..
 .AA*.
@@ -5168,7 +5168,7 @@ O.*    jump back to block
 X..
 ---
 
-:8,OXb
+:8,OXe
 
 ac*
 Xb.
@@ -5437,7 +5437,7 @@ Pattern EB919
 .....
 -----
 
-:8,XOe
+:8,OXe
 
 
 Pattern EB920
@@ -5873,7 +5873,7 @@ O.X*.
 ....?
 -----
 
-:8,OXCEeda,value(25)
+:8,OXeECad,value(25)
 
 
 Pattern EB1203
@@ -5885,7 +5885,7 @@ O.XO*
 .....
 -----
 
-:8,OXCEeda,value(25)
+:8,OXeECad,value(25)
 
 
 ##################
@@ -5974,7 +5974,7 @@ Pattern EB1307
 ....o
 -----
 
-:8,OXeda,shape(7)
+:8,OXead,shape(7)
 
 ?..??
 ..Xao
@@ -6017,7 +6017,7 @@ Pattern EB1310
 ....o
 -----
 
-:8,OXeda,value(20)
+:8,OXead,value(20)
 
 ?.cX?
 .bXOO
@@ -6036,7 +6036,7 @@ Pattern EB1311
 ....o
 -----
 
-:8,OXeda,value(20)
+:8,OXead,value(20)
 
 
 #################
@@ -6103,7 +6103,7 @@ Pattern EB1404a
 ?XO*o
 -----
 
-:8,Xb,followup_value(8)
+:8,Xe,followup_value(8)
 
 ?oX??
 ..Xa?
@@ -6123,7 +6123,7 @@ Pattern EB1404b
 ?XO*o
 -----
 
-:8,Xb,value(12)
+:8,Xe,value(12)
 
 ?oB??
 ecBa?
@@ -6298,7 +6298,7 @@ O.X.o
 ....?
 -----
 
-:8,b
+:8,e
 
 
 Pattern EB1606b
@@ -6353,7 +6353,7 @@ O.X.O
 .....
 -----
 
-:|,OXcda
+:|,OXcad
 
 ..x..
 .....
@@ -6375,7 +6375,7 @@ O*X.O
 .....
 -----
 
-:8,cda,shape(10)
+:8,cad,shape(10)
 
 
 Pattern EB1611
@@ -6387,7 +6387,7 @@ OOX.O
 .....
 -----
 
-:8,cda,shape(10)
+:8,cad,shape(10)
 
 
 ###################
@@ -6436,7 +6436,7 @@ O.*X    Strengthen stone on second line
 ....
 ----
 
-:8,OXbd
+:8,OXed
 
 
 Pattern EB1704
@@ -6446,7 +6446,7 @@ XO.?
 ...?
 ----
 
-:8,OXnbd
+:8,nOXed
 
 
 Pattern EB1705
@@ -6457,7 +6457,7 @@ O.*X
 ....
 ----
 
-:8,OXbd
+:8,OXed
 
 
 Pattern EB1706
@@ -6468,7 +6468,7 @@ O*.X
 ....
 ----
 
-:8,OXbd
+:8,OXed
 
 
 Pattern EB1707
@@ -6491,7 +6491,7 @@ Pattern EB1708
 .OXX
 ----
 
-:8,OXb
+:8,OXe
 
 ?.O?
 *acX
@@ -6521,7 +6521,7 @@ Pattern EB1710
 .....?
 ------
 
-:8,OXde
+:8,OXed
 
 
 Pattern EB1711
@@ -6533,7 +6533,7 @@ Pattern EB1711
 ....
 ----
 
-:8,OXbda,shape(1)
+:8,OXead,shape(1)
 
 
 #############################
@@ -6565,7 +6565,7 @@ O.*.O
 .....
 -----
 
-:8,OXceb
+:8,OXec
 
 
 Pattern EB1803
@@ -6577,7 +6577,7 @@ O.*..
 .....
 -----
 
-:8,OXceb
+:8,OXec
 
 
 Pattern EB1804
@@ -6589,7 +6589,7 @@ O.*..
 .....
 -----
 
-:8,Oceb
+:8,Oec
 
 ??.??
 O.*..
@@ -6610,7 +6610,7 @@ O.*.O
 .....
 -----
 
-:8,Oceb
+:8,Oec
 
 ??.??
 O.*.O
@@ -6631,7 +6631,7 @@ O.*..O
 ......
 ------
 
-:8,OXceb
+:8,OXec
 
 
 Pattern EB1807
@@ -6642,7 +6642,7 @@ O*.
 ...
 ---
 
-:8,OXcb
+:8,OXec
 
 
 Pattern EB1808
@@ -6653,7 +6653,7 @@ O.*.O
 .....
 -----
 
-:8,OXceb
+:8,OXec
 
 ??.??
 O.*.O
@@ -6672,7 +6672,7 @@ O...O
 .....
 -----
 
-:8,OXceb
+:8,OXec
 
 ??.??
 O...O
@@ -6712,7 +6712,7 @@ OXO
 ...
 ---
 
-:|,XOCb
+:|,OXeC
 
 ?X?
 bXa
@@ -6736,7 +6736,7 @@ XO*.
 ?X?.
 ----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB1902
@@ -6746,7 +6746,7 @@ XX..
 ....
 ----
 
-:8,OXb
+:8,OXe
 
 .O*.
 XXa.
@@ -6764,7 +6764,7 @@ Pattern EB1903
 ....
 ----
 
-:8,OXbd
+:8,OXed
 
 
 Pattern EB1904
@@ -6775,7 +6775,7 @@ Pattern EB1904
 .....
 -----
 
-:8,OXb
+:8,OXe
 
 
 Pattern EB1905
@@ -6785,7 +6785,7 @@ o.*OX?
 o..X.X
 ------
 
-:8,OXb
+:8,OXe
 
 oo.c??
 o.*cX?
@@ -6805,7 +6805,7 @@ O...              draw back if clamp is impossible
 ..Xx
 ----
 
-:8,OXb
+:8,OXe
 
 Oab.
 .*O.
@@ -7029,7 +7029,7 @@ Pattern CB12
 .*XO
 X.O.
 
-:8,OXBeEda,shape(2)
+:8,OXeEBad,shape(2)
 
 ..a.
 .*XO
@@ -7046,7 +7046,7 @@ x..O
 x..o
 ????
 
-:8,Oeb,jump_out_helper
+:8,Oe,jump_out_helper
 
 
 Pattern CB14
@@ -7113,7 +7113,7 @@ xx*.
 xXO.
 xxXO
 
-:8,CEd,shape(2)
+:8,ECd,shape(2)
 
 .bO.
 ac*.
@@ -7225,7 +7225,7 @@ Pattern CB202
 ....
 ..X.
 
-:8,OXbE
+:8,OXeE
 
 
 Pattern CB203
@@ -7235,7 +7235,7 @@ Pattern CB203
 .*..
 ..X.
 
-:8,XEae,followup(20)
+:8,XeEa,followup(20)
 
 .ae.
 .fXX
@@ -7322,7 +7322,7 @@ Pattern CB207
 O*.
 .XO
 
-:8,nOXba,shape(2)
+:8,nOXea,shape(2)
 
 ??x
 O*.
@@ -7337,7 +7337,7 @@ Pattern CB209
 O*.
 .XO
 
-:8,nOXb
+:8,nOXe
 
 ??a
 O*.
@@ -7352,7 +7352,7 @@ Pattern CB210
 O*.O
 ?XO?
 
-:8,OXnba
+:8,nOXea
 
 ??.?
 O*.O
@@ -7367,7 +7367,7 @@ Pattern CB212
 .X.O.?    hane to defend
 ...X*.
 
-:8,OXbEd
+:8,OXeEd
 
 .X.Oa?
 ...B*.
@@ -7394,7 +7394,7 @@ O.X..    connect if invaded
 ..*.O
 ?...?
 
-:8,OXcbd
+:8,OXecd
 
 
 Pattern CB215
@@ -7403,7 +7403,7 @@ Pattern CB215
 O.*.O
 o...?
 
-:8,OXcbEd
+:8,OXeEcd
 
 
 Pattern CB216
@@ -7412,7 +7412,7 @@ OX..     connect if invaded
 .*.O
 ...?
 
-:8,OXbcd
+:8,OXecd
 
 aX..
 .*.b
@@ -7427,7 +7427,7 @@ Pattern CB217
 .*X
 ?OX
 
-:8,OXcbd
+:8,OXecd
 
 ?.a
 .*X
@@ -7477,7 +7477,7 @@ Pattern CB219
 .*X.X
 .....
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB220
@@ -7498,7 +7498,7 @@ Pattern CB221
 ..XX*?
 ??..??
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB223
@@ -7507,7 +7507,7 @@ ooo      form eye to protect
 O.O
 .*X
 
-:8,XObd
+:8,OXed
 
 ooo
 O.a
@@ -7586,7 +7586,7 @@ Pattern CB227
 XX*.
 ....
 
-:8,OXbeda,shape(4)
+:8,OXead,shape(4)
 
 
 Pattern CB228
@@ -7595,7 +7595,7 @@ Pattern CB228
 OO*.
 ....
 
-:8,OXbe,shape(3)
+:8,OXe,shape(3)
 
 ?AAb
 OO*.
@@ -7621,7 +7621,7 @@ Pattern CB230
 ...O.
 ??XXO
 
-:8,OXEbd
+:8,OXeEd
 
 
 Pattern CB231
@@ -7631,7 +7631,7 @@ Pattern CB231
 o.OX
 ?o??
 
-:8,OXdb
+:8,OXed
 
 
 Pattern CB232
@@ -7641,7 +7641,7 @@ Pattern CB232
 o.OX
 ?OXX
 
-:8,OXdb,shape(1)
+:8,OXed,shape(1)
 
 
 Pattern CB233
@@ -7651,7 +7651,7 @@ O...
 ..*.
 ?...
 
-:8,OXbed
+:8,OXed
 
 ..X.
 Obc.
@@ -7668,7 +7668,7 @@ O...
 O.*.
 ?...
 
-:8,OXbe
+:8,OXe
 
 
 Pattern CB235
@@ -7678,7 +7678,7 @@ O...
 .*..
 ?...
 
-:8,OXbe
+:8,OXe
 
 
 Pattern CB236
@@ -7687,7 +7687,7 @@ XX*.     block! this can be life or death
 ?O.O
 ??O?
 
-:8,OXbd
+:8,OXed
 
 
 Pattern CB237
@@ -7716,7 +7716,7 @@ Pattern CB238
 O*o
 ?X?
 
-:8,OXbe
+:8,OXe
 
 
 Pattern CB240
@@ -7725,7 +7725,7 @@ Pattern CB240
 .*
 OX
 
-:8,XOb
+:8,OXe
 
 ab
 .*
@@ -7741,7 +7741,7 @@ Pattern CB241a
 OX
 O?
 
-:8,XOb
+:8,OXe
 
 ..
 a*
@@ -7758,7 +7758,7 @@ Pattern CB241b
 OX
 .x
 
-:8,XOb
+:8,OXe
 
 ..
 a*
@@ -7775,7 +7775,7 @@ Pattern CB241c
 OX
 .O
 
-:8,XOb
+:8,OXe
 
 ..
 *.
@@ -7791,7 +7791,7 @@ Pattern CB242
 ?*.?
 ?OX?
 
-:8,XOe
+:8,OXe
 
 
 Pattern CB243
@@ -7800,7 +7800,7 @@ Pattern CB243
 ?*.?
 ?OX?
 
-:8,XOe
+:8,OXe
 
 ?ab?
 ?*.?
@@ -7815,7 +7815,7 @@ Pattern CB244
 OXXX*
 ?OOO.
 
-:8,OXeb
+:8,OXe
 
 
 Pattern CB245
@@ -7826,7 +7826,7 @@ Pattern CB245
 OXX*?
 ?OO.?
 
-:8,OXeb
+:8,OXe
 
 ?..??
 cXe*F
@@ -7845,7 +7845,7 @@ Pattern CB246
 ..X.*.
 .....?
 
-:8,OXbd
+:8,OXed
 
 
 Pattern CB247
@@ -7855,7 +7855,7 @@ XO..
 .X*.
 ....
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB248
@@ -7864,7 +7864,7 @@ Pattern CB248
 .*OOX
 ....X
 
-:8,OXbd
+:8,OXed
 
 
 Pattern CB250
@@ -7874,7 +7874,7 @@ Pattern CB250
 .*X?
 ?..?
 
-:8,OXbd
+:8,OXed
 
 ??.O
 ?O.?
@@ -7912,7 +7912,7 @@ Pattern CB254
 o*X
 ..O
 
-:-,Xbda,shape(3)
+:-,Xead,shape(3)
 
 ..a
 o*X
@@ -7927,7 +7927,7 @@ O.XO         bend around
 ..*O
 ??x?
 
-:8,OXeb
+:8,OXe
 
 
 Pattern CB256
@@ -7945,7 +7945,7 @@ X..O           move out
 ..*.
 ...X
 
-:8,OXae
+:8,OXea
 
 
 Pattern CB258
@@ -7976,7 +7976,7 @@ O...
 X.*.
 X..O
 
-:8,OXba
+:8,OXea
 
 
 Pattern CB261
@@ -7986,7 +7986,7 @@ XO..
 X...
 X.*.
 
-:8,OXba
+:8,OXea
 
 
 Pattern CB262
@@ -7996,7 +7996,7 @@ Pattern CB262
 .XOO
 ..XO
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB263
@@ -8017,7 +8017,7 @@ Pattern CB264
 ...*.
 ???.?
 
-:8,OXba
+:8,OXea
 
 a.O??
 ...X?
@@ -8035,7 +8035,7 @@ O.???       seal the opponent in
 .*..?
 ....O
 
-:8,OXba
+:8,OXea
 
 
 Pattern CB266
@@ -8044,7 +8044,7 @@ Pattern CB266
 ..*.O
 O..XO
 
-:8,OXba
+:8,OXea
 
 
 Pattern CB267
@@ -8063,7 +8063,7 @@ O....      sketch a connection
 ?....
 ??..O
 
-:8,OdcE,jump_out_helper
+:8,OEcd,jump_out_helper
 
 a....
 ...*.
@@ -8091,7 +8091,7 @@ O.X?
 OX??
 X???
 
-:8,OXbd
+:8,OXed
 
 
 Pattern CB271
@@ -8101,7 +8101,7 @@ Pattern CB271
 ?O.*.
 ??...
 
-:8,OXbe
+:8,OXe
 
 
 Pattern CB272
@@ -8157,7 +8157,7 @@ X*.
 ?..
 ?.O
 
-:8,OXcbd
+:8,OXecd
 
 
 Pattern CB276
@@ -8175,7 +8175,7 @@ Pattern CB277
 .*O           connect or threaten to connect
 OX?
 
-:8,nOXbd
+:8,nOXed
 
 .*O
 aX?
@@ -8189,7 +8189,7 @@ OXO             block opponent
 .*.
 ?.?
 
-:|,OXbd
+:|,OXed
 
 aXb
 .*.
@@ -8232,7 +8232,7 @@ X*.?
 ...?
 Ooo?
 
-:8,OXbe
+:8,OXe
 
 
 Pattern CB282
@@ -8257,7 +8257,7 @@ O*..
 OX..
 X..?
 
-:8,OXbe
+:8,OXe
 
 
 Pattern CB284
@@ -8267,7 +8267,7 @@ Pattern CB284
 ..*...
 ......
 
-:8,OXcba
+:8,OXeca
 
 
 Pattern CB285
@@ -8277,7 +8277,7 @@ Pattern CB285
 O...O
 ?X.X?
 
-:|,OXcbeE
+:|,OXeEc
 
 
 Pattern CB286
@@ -8287,7 +8287,7 @@ Pattern CB286
 X...X
 ?O.O?
 
-:|,OXbeE
+:|,OXeE
 
 
 Pattern CB287
@@ -8299,7 +8299,7 @@ Pattern CB287
 ..X
 O.?
 
-:8,OXcEa
+:8,OXEca
 
 
 Pattern CB288
@@ -8309,7 +8309,7 @@ Pattern CB288
 OOX.
 ?X..
 
-:8,OXbe
+:8,OXe
 
 
 Pattern CB289
@@ -8318,7 +8318,7 @@ Pattern CB289
 .*.O
 .X.?
 
-:8,OXbd
+:8,OXed
 
 
 Pattern CB290
@@ -8340,7 +8340,7 @@ Pattern CB291
 ..*.?
 ?..??
 
-:8,OXde
+:8,OXed
 
 .OX??
 .aOX?
@@ -8358,7 +8358,7 @@ Pattern CB292
 .*.X?
 ...??
 
-:8,OXEb
+:8,OXeE
 
 
 Pattern CB293
@@ -8370,7 +8370,7 @@ X...
 ..*.
 ?x.?
 
-:8,OXEeda,shape(3)
+:8,OXeEad,shape(3)
 
 ?O..
 ?Oc.
@@ -8408,7 +8408,7 @@ Oooo         block
 .*.o
 OX??
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB297
@@ -8417,7 +8417,7 @@ Oooo         block in sente
 .*.o
 OX??
 
-:8,OXb,followup(5)
+:8,OXe,followup(5)
 
 Oooo
 .*.o
@@ -8432,7 +8432,7 @@ O.Oo     protect by drawing back
 XO..
 XX*O
 
-:8,OXnbd
+:8,nOXed
 
 
 Pattern CB299
@@ -8441,7 +8441,7 @@ OoO            make good shape
 Ox.
 X*O
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB300
@@ -8471,7 +8471,7 @@ Pattern CB302
 ..X.
 O...
 
-:8,OXcEa
+:8,OXEca
 
 
 Pattern CB303
@@ -8481,7 +8481,7 @@ Pattern CB303
 ?..?
 ?OO?
 
-:8,OXb,followup(3)
+:8,OXe,followup(3)
 
 ?.A?
 .*OX
@@ -8557,7 +8557,7 @@ Pattern CB309
 ..*.O
 ?...?
 
-:8,OXbd
+:8,OXed
 
 
 Pattern CB310
@@ -8567,7 +8567,7 @@ Pattern CB310
 ..O?
 ?Oo?
 
-:8,OXbd
+:8,OXed
 
 
 Pattern CB311
@@ -8577,7 +8577,7 @@ O*..
 X...
 ?.O.
 
-:8,OXcba
+:8,OXeca
 
 
 Pattern CB312
@@ -8596,7 +8596,7 @@ Pattern CB313
 X.X*.
 .....
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB314
@@ -8625,7 +8625,7 @@ Pattern CB315
 O..O?
 ?..??
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB316
@@ -8635,7 +8635,7 @@ X..
 .*O
 O.?
 
-:8,OXb
+:8,OXe
 
 ?aa
 X..
@@ -8754,7 +8754,7 @@ Pattern CB323
 O.?        block
 X*O
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB324
@@ -8763,7 +8763,7 @@ xxX?       block
 O*..
 ...O
 
-:8,OXb
+:8,OXe
 
 
 Pattern CB325
@@ -8772,7 +8772,7 @@ Pattern CB325
 .X
 .X
 
-:8,OXnb
+:8,nOXe
 
 
 Pattern CB326
@@ -8782,7 +8782,7 @@ Pattern CB326
 O.*.
 OXXO
 
-:8,OXbeE,shape(7)
+:8,OXeE,shape(7)
 
 ?.??
 .bc.
@@ -8802,7 +8802,7 @@ Pattern CB327
 .*O
 OX?
 
-:8,OXcbeEd,shape(3)
+:8,OXeEcd,shape(3)
 
 
 Pattern CB328
@@ -8848,7 +8848,7 @@ Pattern CB330
 X*X
 ?O?
 
-:|,OXbeE,shape(3)
+:|,OXeE,shape(3)
 
 
 Pattern CB331
@@ -8858,7 +8858,7 @@ Pattern CB331
 X*X
 o.O
 
-:8,OXbeE
+:8,OXeE
 
 ?.?
 ...
@@ -8875,7 +8875,7 @@ Pattern CB332
 ?.*..O
 ?....o
 
-:8,OXbeE
+:8,OXeE
 
 
 Pattern CB333
@@ -8915,7 +8915,7 @@ x.O           block
 X*.
 O.o
 
-:8,bOX
+:8,OXe
 
 
 Pattern CB336
@@ -9021,7 +9021,7 @@ Pattern ED7
 |.*X.
 +----
 
-:8,OXas
+:8,sOXa
 
 |??a?
 |XXaX
@@ -9037,7 +9037,7 @@ XXXOX      sente throw in to kill eye on the edge
 X.*X.
 -----
 
-:8,OXas
+:8,sOXa
 
 XXXaX
 X.*X.
@@ -9075,7 +9075,7 @@ xxxx????      if attached, cut!
 ........
 --------
 
-:8,OXsBd,shape(3)
+:8,sOXBd,shape(3)
 
 
 Pattern ED12
@@ -9088,7 +9088,7 @@ Pattern ED12
 .......
 -------
 
-:8,OXbd,shape(3)
+:8,OXed,shape(3)
 
 ..O.???
 .......
@@ -9191,7 +9191,7 @@ OX..X
 ..*..
 -----
 
-:8,OXsa
+:8,sOXa
 
 ?XXXO
 cX.bX
@@ -9229,7 +9229,7 @@ Pattern ED22
 ..X?
 ----
 
-:8,XOdb,followup(5)
+:8,OXed,followup(5)
 
 ??*?
 ..AO
@@ -9247,7 +9247,7 @@ Pattern ED23
 ..X?
 ----
 
-:8,XOdb,followup(5)
+:8,OXed,followup(5)
 
 ??*O
 ..A?
@@ -9264,7 +9264,7 @@ Pattern ED24
 ..xx
 ----
 
-:8,XOd,followup(7)
+:8,OXd,followup(7)
 
 ??*O
 ..AA
@@ -9351,7 +9351,7 @@ Pattern ED30
 |....
 +----
 
-:8,XOd
+:8,OXd
 
 
 Pattern ED31
@@ -9362,7 +9362,7 @@ O....
 .....
 -----
 
-:8,XOdae
+:8,OXead
 
 
 Pattern ED31b
@@ -9373,7 +9373,7 @@ O.*O.
 .....
 -----
 
-:8,XOde
+:8,OXed
 
 
 Pattern ED31c
@@ -9384,7 +9384,7 @@ o.....
 ......
 ------
 
-:8,XOdeE
+:8,OXeEd
 
 
 Pattern ED32
@@ -9552,7 +9552,7 @@ OO.*..
 ......
 ------
 
-:8,OXdea
+:8,OXead
 
 ?XX.g.
 HHA*..
@@ -9573,7 +9573,7 @@ XX*X.o
 .....?
 ------
 
-:8,OXda,shape(10)
+:8,OXad,shape(10)
 
 ?OO..o
 AA*B.o
@@ -9593,7 +9593,7 @@ O.X.O
 .....
 -----
 
-:8,OXdace,shape(5)
+:8,OXecad,shape(5)
 
 
 Pattern ED45
@@ -9604,7 +9604,7 @@ OO.O*.
 ?.....
 ------
 
-:8,OXeda,value(30)
+:8,OXead,value(30)
 
 ?XX...
 OOaO*.
@@ -9625,7 +9625,7 @@ O.*..
 .....
 -----
 
-:8,OXeda,value(20)
+:8,OXead,value(20)
 
 
 Pattern ED47
@@ -9648,7 +9648,7 @@ Pattern ED48
 ?...
 ----
 
-:8,OXeda,shape(10)
+:8,OXead,shape(10)
 
 ?...
 ?.*O
@@ -9669,7 +9669,7 @@ Pattern ED49
 .....
 -----
 
-:8,OXeda,shape(5)
+:8,OXead,shape(5)
 
 
 Pattern ED49b
@@ -9703,7 +9703,7 @@ X.O..
 .....
 -----
 
-:8,Beda,value(20)
+:8,eBad,value(20)
 
 
 Pattern ED51
@@ -9716,7 +9716,7 @@ oo......O
 .........
 ---------
 
-:8,OXEda,shape(10)
+:8,OXEad,shape(10)
 
 
 Pattern ED52
@@ -9730,7 +9730,7 @@ Pattern ED52
 ......
 ------
 
-:8,OXda,value(20)
+:8,OXad,value(20)
 
 
 Pattern ED53
@@ -9741,7 +9741,7 @@ XX*X..
 ?.....
 ------
 
-:8,OXeda,value(25)
+:8,OXead,value(25)
 
 ?OO...
 EE*D..
@@ -9760,7 +9760,7 @@ XXOX..
 ?.....
 ------
 
-:8,OXsBda,value(30)
+:8,sOXBad,value(30)
 
 ?OO...
 AAOB..
@@ -9779,7 +9779,7 @@ XOX*..
 ?.....
 ------
 
-:8,da,value(30)
+:8,ad,value(30)
 
 ?OO...
 XXOB..
@@ -9799,7 +9799,7 @@ O..O*.
 ......
 ------
 
-:8,OXCda,shape(3)
+:8,OXCad,shape(3)
 
 
 Pattern ED57
@@ -9829,7 +9829,7 @@ Pattern ED58
 .....
 -----
 
-:8,Xda,value(15)
+:8,Xad,value(15)
 
 ??X??
 ?CXO?
@@ -9853,7 +9853,7 @@ Pattern ED59
 .....
 -----
 
-:8,Xda
+:8,Xad
 
 ??X??
 ?OXA?
@@ -9902,7 +9902,7 @@ XXO*.
 .....
 -----
 
-:8,OXeEda,shape(5)
+:8,OXeEad,shape(5)
 
 ....?
 OOb.?
@@ -9921,7 +9921,7 @@ OXOX
 .*..
 ----
 
-:8,da,shape(2)
+:8,ad,shape(2)
 
 oOXx
 OXOX
@@ -9940,7 +9940,7 @@ XXO..
 .....
 -----
 
-:8,OXdaeEC,shape(2)
+:8,OXeECad,shape(2)
 
 ..a..
 .O*..
@@ -9961,7 +9961,7 @@ XXO*.
 xxx..
 -----
 
-:8,OXda,value(15)
+:8,OXad,value(15)
 
 
 Pattern ED66
@@ -9975,7 +9975,7 @@ O.X
 ...
 ---
 
-:8,JO
+:8,OJ
 
 ?x?
 OaB
@@ -9999,7 +9999,7 @@ O.X
 ...
 ---
 
-:8,jO
+:8,Oj
 
 ?x?
 OaB
@@ -10020,7 +10020,7 @@ o..OO
 .....
 -----
 
-:8,ebdOX
+:8,OXed
 
 ?O*Xx
 o.aOO
@@ -10039,7 +10039,7 @@ O..x         connect under
 ....
 ----
 
-:8,Cda,shape(3)
+:8,Cad,shape(3)
 
 O..x
 .*cA
@@ -10056,7 +10056,7 @@ Pattern ED70
 O*X
 OX.
 
-:8,bOX,followup(6)
+:8,OXe,followup(6)
 
 O*C
 OBa
@@ -10072,7 +10072,7 @@ OXOX
 ....
 ----
 
-:8,Cda,shape(1)
+:8,Cad,shape(1)
 
 O*.X
 OXOX
@@ -10161,7 +10161,7 @@ o.*.x?
 ....??
 ------
 
-:8,OXba,shape(-3)
+:8,OXea,shape(-3)
 
 oOo???
 obaX?g
@@ -10181,7 +10181,7 @@ O*O.
 ....
 ----
 
-:8,OXbda,shape(5)
+:8,OXead,shape(5)
 
 ?XX?
 O*Oc
@@ -10200,7 +10200,7 @@ X*X.
 ....
 ----
 
-:8,OXeda,shape(5)
+:8,OXead,shape(5)
 
 ?OO?
 X*Xc
@@ -10298,7 +10298,7 @@ Pattern ED83
 |.*.x
 |..O?
 
-:8,Ced,shape(2)
+:8,eCd,shape(2)
 
 |xXX?
 |XOOX
@@ -10318,7 +10318,7 @@ Pattern ED84
 |.*.O
 |...o
 
-:8,CXOd,shape(2)
+:8,OXCd,shape(2)
 
 |xXXx
 |XOOX
@@ -10458,7 +10458,7 @@ Pattern ED90
 o......
 -------
 
-:8,jd
+:8,dj
 
 ???..o?
 ???X.oo
@@ -10532,7 +10532,7 @@ Pattern CD1
 XO*.
 XX.O
 
-:8,OXnd
+:8,nOXd
 
 
 Pattern CD3
@@ -10645,7 +10645,7 @@ Pattern CD43
 .*.X
 X.O?
 
-:8,XOa
+:8,OXa
 
 .X.B
 a*.B
@@ -10662,7 +10662,7 @@ O.O*.
 .....
 .....
 
-:8,OXdb
+:8,OXed
 
 
 Pattern CD49
@@ -10673,7 +10673,7 @@ O.O*.
 .....
 .....
 
-:8,OXdb
+:8,OXed
 
 
 Pattern CD55
@@ -10788,7 +10788,7 @@ Pattern CD79
 .....
 ..X..
 
-:8,OXdb
+:8,OXed
 
 
 Pattern CD82
@@ -10818,7 +10818,7 @@ X..X?
 ?*...
 ??..?
 
-:8,OXde
+:8,OXed
 
 ?AOX?
 Xabf?
@@ -10834,7 +10834,7 @@ Pattern CD87
 .*.
 .XO
 
-:-,adOX,shape(5)
+:-,OXad,shape(5)
 
 cXO
 a*b
@@ -10851,7 +10851,7 @@ Pattern CD88
 X*..         attack 1 stone to defend and probably connect
 O..O
 
-:8,OXdac
+:8,OXcad
 
 a*..
 O..O
@@ -10865,7 +10865,7 @@ Pattern CD89
 .XO*o
 ?.Xoo
 
-:8,OXeda,shape(10)
+:8,OXead,shape(10)
 
 ?OAoo
 .XO*o
@@ -10881,7 +10881,7 @@ XOX
 ?*.
 ???
 
-:8,OXeda,shape(5)
+:8,OXead,shape(5)
 
 bXx
 AOX
@@ -10913,7 +10913,7 @@ Pattern CD92
 XO*
 .XO
 
-:8,da,shape(3)
+:8,ad,shape(3)
 
 .X.
 XO*
@@ -10928,7 +10928,7 @@ Pattern CD92a
 OX*
 .Ox
 
-:8,Eda,shape(1)
+:8,Ead,shape(1)
 
 
 Pattern CD92b
@@ -10937,7 +10937,7 @@ Pattern CD92b
 OX*
 .OX
 
-:8,Eda,shape(3),reverse_followup(8)
+:8,Ead,shape(3),reverse_followup(8)
 
 aO.
 OX*
@@ -10953,7 +10953,7 @@ Pattern CD93
 X.X.
 ...O
 
-:8,XBda,shape(10),value(10)
+:8,XBad,shape(10),value(10)
 
 ?OF.
 ?*be
@@ -10972,7 +10972,7 @@ Pattern CD94
 X...????
 ?.O..???
 
-:8,OXdae,shape(4)
+:8,OXead,shape(4)
 
 ????????
 ????????
@@ -10993,7 +10993,7 @@ X.*.
 ....
 oO..
 
-:-,OXdaE,shape(2)
+:-,OXEad,shape(2)
 
 
 Pattern CD96
@@ -11003,7 +11003,7 @@ Pattern CD96
 X*.
 O.X
 
-:8,OXda,shape(3)
+:8,OXad,shape(3)
 
 .O?
 ...
@@ -11020,7 +11020,7 @@ OOXO?       defend everything
 .*..?
 ?????
 
-:8,de,value(15)
+:8,ed,value(15)
 
 BBXD?
 .aOc.
@@ -11037,7 +11037,7 @@ OOXO?        defend as much as we can
 .*..?
 ?????
 
-:8,de,value(12)
+:8,ed,value(12)
 
 BBXD?
 .aOc.
@@ -11075,7 +11075,7 @@ XOX.
 .X*o
 ?.o?
 
-:8,Xads,value(7)
+:8,sXad,value(7)
 
 ?ffX
 EfXa
@@ -11130,7 +11130,7 @@ Pattern CD104a
 OX.
 XO?
 
-:8,deE
+:8,eEd
 
 ...
 .*.
@@ -11166,7 +11166,7 @@ O.*O
 x...
 xxxx
 
-:8,tO
+:8,Ot
 
 ?.A?
 O.*b
@@ -11205,7 +11205,7 @@ xX..?        good shape keima
 ..*.?
 O...?
 
-:8,OXdae
+:8,OXead
 
 xX..?
 .a*.?
@@ -11244,7 +11244,7 @@ o.XO.
 .....
 -----
 
-:8,sJdE
+:8,sEdJ
 
 
 Pattern EJ2
@@ -11256,7 +11256,7 @@ x.O..
 ?....
 -----
 
-:8,Jdb
+:8,edJ
 
 
 Pattern EJ2b
@@ -11268,7 +11268,7 @@ Pattern EJ2b
 .....
 -----
 
-:8,Jdb
+:8,edJ
 
 
 Pattern EJ3
@@ -11280,7 +11280,7 @@ O.XO.
 .....
 -----
 
-:8,JadE
+:8,EadJ
 
 
 Pattern EJ4
@@ -11293,7 +11293,7 @@ Pattern EJ4
 .....?
 ------
 
-:8,jEd
+:8,Edj
 
 ...*.?
 .OOX.o
@@ -11312,7 +11312,7 @@ Pattern EJ6
 ...X.?
 ------
 
-:8,ajE
+:8,Eaj
 
 
 Pattern EJ7
@@ -11324,7 +11324,7 @@ Pattern EJ7
 .........
 ---------
 
-:8,de
+:8,ed
 
 ?????...?
 ........?
@@ -11346,7 +11346,7 @@ Pattern EJ7b
 .........
 ---------
 
-:8,de
+:8,ed
 
 
 Pattern EJ8
@@ -11358,7 +11358,7 @@ XOO...*.
 ........
 --------
 
-:8,de
+:8,ed
 
 
 Pattern EJ9
@@ -11370,7 +11370,7 @@ O.OX?
 ....?
 -----
 
-:8,dE
+:8,Ed
 
 
 Pattern EJ12
@@ -11477,7 +11477,7 @@ Pattern EJ17
 .....
 -----
 
-:8,Jad
+:8,adJ
 
 
 Pattern EJ18
@@ -11489,7 +11489,7 @@ o.*O..o
 o.....o
 -------
 
-:8,db
+:8,ed
 
 ?oXXOOo
 oOXOXao
@@ -11534,7 +11534,7 @@ o.*O..o
 o.....o
 -------
 
-:8,db
+:8,ed
 
 ?x.XOOo
 oOXOXao
@@ -11556,7 +11556,7 @@ O.OX?
 ....?
 -----
 
-:8,db
+:8,ed
 
 
 Pattern EJ22
@@ -11592,7 +11592,7 @@ XX..       extend on fourth line if pushed
 ....
 ----
 
-:8,db
+:8,ed
 
 
 Pattern EJ25
@@ -11604,7 +11604,7 @@ XXX..       extend on fourth line if pushed
 .....
 -----
 
-:8,db
+:8,ed
 
 
 Pattern EJ26
@@ -11616,7 +11616,7 @@ XXXX..       extend on fourth line if pushed
 ......
 ------
 
-:8,db
+:8,ed
 
 
 Pattern EJ27
@@ -11640,7 +11640,7 @@ Pattern EJ28
 ........
 --------
 
-:8,db
+:8,ed
 
 
 Pattern EJ29
@@ -11652,7 +11652,7 @@ Pattern EJ29
 ........
 --------
 
-:8,db
+:8,ed
 
 
 Pattern EJ30
@@ -11687,7 +11687,7 @@ x.......
 ?.......
 --------
 
-:8,de
+:8,ed
 
 ?a..?b??
 xxX.....
@@ -11708,7 +11708,7 @@ x.......
 ?.......
 --------
 
-:8,de
+:8,ed
 
 ?a..?b??
 xxXX....
@@ -11809,7 +11809,7 @@ OOXX?
 .....
 -----
 
-:8,tOX
+:8,OXt
 
 
 Pattern EJ41
@@ -11820,7 +11820,7 @@ xX*OX
 .....
 -----
 
-:8,JO
+:8,OJ
 
 ?..O?
 xX*OX
@@ -11854,7 +11854,7 @@ x.O.
 ?...
 ----
 
-:8,JO
+:8,OJ
 
 
 Pattern EJ44
@@ -11902,7 +11902,7 @@ O*O
 ...
 ---
 
-:8,ebdCX
+:8,XeCd
 
 
 Pattern EJ47
@@ -11957,7 +11957,7 @@ O*X.o
 .....
 -----
 
-:8,sjE
+:8,sEj
 
 .....
 O*X.c
@@ -11982,7 +11982,7 @@ OOX.O
 .....
 -----
 
-:8,sjE
+:8,sEj
 
 ..*..
 OOX.O
@@ -12005,7 +12005,7 @@ OO....*.x
 .........
 ---------
 
-:8,sedE,shape(3)
+:8,seEd,shape(3)
 
 
 Pattern EJ51
@@ -12118,7 +12118,7 @@ OOX*O
 .....
 -----
 
-:8,Jc
+:8,cJ
 
 ??.x?
 OOA*O
@@ -12398,7 +12398,7 @@ O*.oo
 .....
 -----
 
-:8,ebEX
+:8,XeE
 
 .X.??
 O*.ab
@@ -12754,7 +12754,7 @@ Pattern S1
 |.o.X
 +----
 
-:/,Xsb,terri(5)
+:/,sXe,terri(5)
 
 |AA??
 |.AA?
@@ -12794,7 +12794,7 @@ Pattern S3
 |....X
 +-----
 
-:8,Xsb,terri(7),followup(20)
+:8,sXe,terri(7),followup(20)
 
 |AAAAA
 |..*.A
@@ -12850,7 +12850,7 @@ Pattern S6
 |...X
 +----
 
-:8,Xsb,terri(6),followup(14)
+:8,sXe,terri(6),followup(14)
 
 |AA??
 |.AAA
@@ -12870,7 +12870,7 @@ Pattern S6b
 |.*.X
 +----
 
-:8,Xsb,terri(6),followup(14)
+:8,sXe,terri(6),followup(14)
 
 |AA??
 |.AAA
@@ -13268,7 +13268,7 @@ O.Xx      fourth line sente kosumi
 ....
 ----
 
-:8,OXebEFY
+:8,OXeEFY
 
 O.Xx
 .*.a
@@ -13287,7 +13287,7 @@ O.Xx      fourth line sente kosumi
 ....
 ----
 
-:8,OXebEY
+:8,OXeEY
 
 
 Pattern LE2a
@@ -13428,7 +13428,7 @@ Pattern LE6
 ?....X
 ?..O??
 
-:8,OXbeE
+:8,OXeE
 
 ?ocbd?
 ?..*.x
