@@ -305,8 +305,12 @@ dnl ------------ dfa -------------------
 
 AM_CONDITIONAL(DFA_ENABLED, test "$enable_dfa" = "yes")
 
+dnl FIXME: Is there a more elegant approach for this?
 dnl force owl c files rebuild
-touch patterns/owl*.db
+rm -f \
+       patterns/owl_attackpat.c \
+       patterns/owl_defendpat.c \
+       patterns/owl_vital_apat.c
 
 
 dnl ------------ gnugo_path -------------------
