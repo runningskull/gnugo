@@ -3,6 +3,7 @@
 -------------------------------------------------------------------------
 	
 - bugfix in aftermath_genmove()
+- bugfix in hashdata_recalc()
 - assertions added to are_neighbor_strings()
 - analyze_neighbor() in filllib.c revised
 - alternative definition of ASSERT1 macro corrected
@@ -17,6 +18,7 @@
 - prefix all occurences of optarg with gg_
 - tuning
 - owl tuning
+- new strategy4.tst and unsorted.tst
 
 3.1.6 released September 15, 2001
 

@@ -274,12 +274,10 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
     target->hashpos.board[index] = bits;
 #endif /* USE_SHIFTING */
 
-  if (ko_pos >= 0) {
+  if (ko_pos != 0)
     target->hashval ^= ko_hash[I(ko_pos)][J(ko_pos)];
-    target->hashpos.ko_pos = ko_pos;
-  }
-  else
-    target->hashpos.ko_pos = 0;
+
+  target->hashpos.ko_pos = ko_pos;
 }
 
 

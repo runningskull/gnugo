@@ -794,6 +794,15 @@ loadsgf games/owl28.sgf 199
 218 owl_defend C14
 #? [1 A16]
 
+loadsgf games/filllib9.sgf 119
+219 owl_defend K19
+#? [0]
+
+loadsgf games/filllib9.sgf 121
+220 owl_defend K19
+#? [0]
+
+
 ########### end of tests #####################
 
 
