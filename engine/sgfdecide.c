@@ -271,6 +271,70 @@ decide_dragon(int pos, const char *sgf_output)
 }
 
 
+/* 
+ * decide_dragon_data prints the dragon data at (pos).
+ */
+
+void
+decide_dragon_data(int pos)
+{
+  int w, k;
+
+  if (board[pos] == EMPTY) {
+    fprintf(stderr, "gnugo: --decide-dragon-data called on an empty vertex\n");
+    return ;
+  }
+  reset_engine();
+  silent_examine_position(board[pos], EXAMINE_DRAGONS);
+  gprintf("color                   %s\n", color_to_string(dragon[pos].color));
+  gprintf("origin                  %1m\n", dragon[pos].origin);
+  gprintf("size                    %d\n", dragon[pos].size);
+  gprintf("effective_size          %f\n", dragon[pos].effective_size);
+  gprintf("heyes                   %d\n", DRAGON2(pos).heyes);
+  gprintf("heye                    %1m\n", DRAGON2(pos).heye);
+  gprintf("genus                   %d\n", DRAGON2(pos).genus);
+  gprintf("escape_route            %d\n", DRAGON2(pos).escape_route);
+  gprintf("lunch                   %1m\n", DRAGON2(pos).lunch);
+  gprintf("status                  %s\n",
+	     status_to_string(dragon[pos].status));
+  gprintf("owl_status              %s\n",   
+	     status_to_string(dragon[pos].owl_status));
+  gprintf("matcher_status          %s\n",   
+	     status_to_string(dragon[pos].matcher_status));
+  gprintf("owl_threat_status       %s\n",   
+	     status_to_string(dragon[pos].owl_threat_status));
+  gprintf("owl_attack              %1m\n", dragon[pos].owl_attack_point);
+  gprintf("owl_attack_certain:     %s\n",   
+	     (dragon[pos].owl_attack_certain) ? "YES" : "NO");
+  gprintf("owl_2nd_attack          %1m\n", dragon[pos].owl_second_attack_point);
+  gprintf("owl_defend              %1m\n", dragon[pos].owl_defense_point);
+  gprintf("owl_defense_certain:     %s\n",   
+	     (dragon[pos].owl_defense_certain) ? "YES" : "NO");
+  gprintf("owl_2nd_defend          %1m\n", dragon[pos].owl_second_defense_point);
+  gprintf("semeai                  %d\n", DRAGON2(pos).semeai);
+  gprintf("semeai_margin_of_safety %d\n", 
+	  DRAGON2(pos).semeai_margin_of_safety);
+  gprintf("neighbors:              ");
+  for (k = 0; k < DRAGON2(pos).neighbors; k++)
+    gprintf("%1m ", DRAGON(DRAGON2(pos).adjacent[k]).origin);
+  gprintf("\n");
+  gprintf("moyo:                   %d\n", DRAGON2(pos).moyo);
+  gprintf("safety:                 %s\n",
+	  safety_to_string(DRAGON2(pos).safety));
+  gprintf("strings: ");
+  for (w = BOARDMIN; w < BOARDMAX; w++)
+    if (ON_BOARD(w)
+	&& worm[w].origin == w
+	&& is_same_dragon(w, pos))
+	gprintf("%1m ", w);
+  gprintf("\n");
+}
+
+
+/* Print the result of the semeai code on the semeai at apos/bpos,
+ * optionally writing an sgf file.
+ */
+
 void
 decide_semeai(int apos, int bpos, const char *sgf_output)
 {

@@ -82,6 +82,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_DECIDE_STRING,
       OPT_DECIDE_CONNECTION,
       OPT_DECIDE_DRAGON,
+      OPT_DECIDE_DRAGON_DATA,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_TACTICAL_SEMEAI,
       OPT_EXPERIMENTAL_SEMEAI,
@@ -145,6 +146,7 @@ enum mode {
   MODE_DECIDE_STRING,
   MODE_DECIDE_CONNECTION,
   MODE_DECIDE_DRAGON,
+  MODE_DECIDE_DRAGON_DATA,
   MODE_DECIDE_SEMEAI,
   MODE_DECIDE_TACTICAL_SEMEAI,
   MODE_DECIDE_POSITION,
@@ -228,6 +230,7 @@ static struct gg_option const long_options[] =
   {"decide-string",  required_argument, 0, OPT_DECIDE_STRING},
   {"decide-connection", required_argument, 0, OPT_DECIDE_CONNECTION},
   {"decide-dragon",  required_argument, 0, OPT_DECIDE_DRAGON},
+  {"decide-dragon-data",  required_argument, 0, OPT_DECIDE_DRAGON_DATA},
   {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
   {"decide-tactical-semeai", required_argument, 0, OPT_DECIDE_TACTICAL_SEMEAI},
   {"decide-position", no_argument,       0, OPT_DECIDE_POSITION},
@@ -577,6 +580,15 @@ main(int argc, char *argv[])
 	playmode = MODE_DECIDE_DRAGON;
 	break;
 	
+      case OPT_DECIDE_DRAGON_DATA:
+	if (strlen(gg_optarg) > 3) {
+	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
+	  exit(EXIT_FAILURE);
+	}
+	strcpy(decide_this, gg_optarg);
+	playmode = MODE_DECIDE_DRAGON_DATA;
+	break;
+	
       case OPT_DECIDE_SEMEAI:
 	if (strlen(gg_optarg) > 7) {
 	  fprintf(stderr, 
@@ -875,6 +887,7 @@ main(int argc, char *argv[])
     if (playmode != MODE_DECIDE_STRING
 	&& playmode != MODE_DECIDE_CONNECTION
 	&& playmode != MODE_DECIDE_DRAGON
+	&& playmode != MODE_DECIDE_DRAGON_DATA
 	&& playmode != MODE_DECIDE_POSITION
 	&& playmode != MODE_DECIDE_SEMEAI
 	&& playmode != MODE_DECIDE_TACTICAL_SEMEAI
@@ -994,6 +1007,25 @@ main(int argc, char *argv[])
 
       rotate(m, n, &m, &n, board_size, orientation);
       decide_dragon(POS(m, n), outfile);
+    }
+    break;
+  
+  case MODE_DECIDE_DRAGON_DATA:
+    {
+      int m, n;
+      
+      if (!infilename) {
+	fprintf(stderr, "gnugo: --decide-dragon-data must be used with -l\n");
+	return EXIT_FAILURE;
+      }
+      
+      if (!string_to_location(board_size, decide_this, &m, &n)) {
+	fprintf(stderr, "gnugo: --decide-dragon-data: strange coordinate \n");
+	return EXIT_FAILURE;
+      }
+
+      rotate(m, n, &m, &n, board_size, orientation);
+      decide_dragon_data(POS(m, n));
     }
     break;
   

@@ -483,6 +483,7 @@ void sgffile_recordboard(SGFNode *node);
 void decide_string(int pos, const char *sgf_output);
 void decide_connection(int apos, int bpos, const char *sgf_output);
 void decide_dragon(int pos, const char *sgf_output);
+void decide_dragon_data(int pos);
 void decide_semeai(int apos, int bpos, const char *sgf_output);
 void decide_tactical_semeai(int apos, int bpos, const char *sgf_output);
 void decide_position(int color, const char *sgf_output);
