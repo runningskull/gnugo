@@ -4,8 +4,8 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       owl_rot.tst heikki.tst golife.tst dniwog.tst strategy4.tst \
       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst \
-      score.tst manyfaces.tst \
-      cutstone.tst newscore.tst blunder.tst niki.tst trevor.tst tactics.tst
+      score.tst manyfaces.tst cutstone.tst newscore.tst blunder.tst \
+      niki.tst trevor.tst tactics.tst buzco.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
@@ -139,6 +139,9 @@ niki: niki.tst
 trevor: trevor.tst
 	$(srcdir)/eval.sh trevor.tst
 
+buzco: buzco.tst
+	$(srcdir)/eval.sh buzco.tst
+
 all_batches: first_batch second_batch third_batch
 
 first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst life.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
@@ -179,3 +182,4 @@ third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst st
 	$(srcdir)/regress.sh $(srcdir) niki.tst
 	$(srcdir)/regress.sh $(srcdir) trevor.tst
 	$(srcdir)/regress.sh $(srcdir) tactics.tst
+	$(srcdir)/regress.sh $(srcdir) buzco.tst

@@ -1,0 +1,44 @@
+(;GM[1]FF[3]
+VieW[]SZ[19]
+PB[GnuGo]
+PW[buzco]
+KM[0.5]HA[3]USer[bump@match.Stanford.EDU]PC[IGS]
+DT[2001/10/01 22:03:45 UT]
+BR[14k]WR[14k]
+RE[Black resigns. W 133.5 B 81.0]
+;AB[dp][pd][dd]C[..........       Handicap 3];W[pp];B[nq];W[jp];B[qn];
+W[np];B[mp];W[no];B[qq];W[qp];B[pq];W[oq];B[hq]C[P2
+];W[jq];B[or];
+W[op];B[mr];W[mo];B[dj];W[lp];B[jd];W[qj];B[qg];W[rm];B[ho];W[fc];
+B[ec];W[eb];B[gd]C[D19|F16
+];W[dc];B[cc]C[E16
+];W[ed];B[cd];W[cb];
+B[df];W[ef];B[cg]C[E13
+];W[fd];B[eg];W[ff];B[nc];W[cn];B[dn];W[dm];
+B[en];W[co];B[cp];W[do];B[eo];W[dl];B[qe];W[dh];B[ch];W[fg];B[di];
+W[eh];B[fl];W[dg];B[bm];W[cm];B[bl];W[ck];B[bj];W[bk];B[bb];W[ba];
+B[bp];W[bo];B[ao];W[an];B[bn]C[C10|C11|E9|A4
+];W[al];B[am];W[ak];B[an]
+;W[bi];B[cj];W[aj];B[bh];W[ai];B[dk];W[ci]C[
+];B[cf]C[E8|E9
+];W[ek];
+B[ah];W[cl];B[el];W[ap];B[ej];W[fk];B[fj];W[gk];B[gj];W[gl];B[bm];
+W[bq];B[hi];W[fn];B[fo];W[em];B[eq];W[hg];B[ji];W[jg];B[li];W[oi];
+B[gc];W[gb];B[mi]C[!N11
+];W[ng];B[mq];W[ko];B[ld];W[lq];B[hb];W[lr];
+B[ns];W[ls];B[ms];W[lf];B[mk];W[ok];B[mm];W[kl];B[il];W[in];B[hk];
+W[hl];B[ij];W[im];B[hm];W[gm];B[ih];W[ig];B[hn];W[jk];B[ml];W[jj];
+B[ki];W[ik];B[om];W[pn];B[rp];W[ro];B[rq];W[qm];B[ri];W[rj];B[of];
+W[nf];B[cr];W[cq];B[br];W[dq];B[dr];W[ep];B[fp];W[fq];B[dp];W[er];
+B[ep];W[fr];B[gq];W[qi];B[ab];W[qh];B[rh];W[pg];B[qf];W[pf];B[hd];
+W[ie];B[ga];W[fb];B[ir];W[jr];B[oe];W[pe];B[og];W[ph];B[ni];W[nh];
+B[ne];W[me];B[gf];W[hf];B[ge];W[gg];B[md];W[si];B[sg];W[id];B[ic];
+W[ke];B[kd];W[oh];B[gn];W[jl];B[so];W[sn];B[sp];W[iq];B[hs];W[hp];
+B[io];W[jo];B[gp];W[ip];B[fm];W[fn];B[fm];W[fl];B[ar];W[fn];B[go];
+W[cp];B[gr];W[js];B[is];W[sj];B[od];W[sh];B[rg];W[fe];B[fa];W[ea];
+B[ha];W[ca];B[je];W[jf];B[le];W[kf];B[mf];W[mg];B[me];W[de];B[ce];
+W[fm];B[ee];W[he];B[hc];W[de];B[sm];W[rn];B[ee];W[aa];B[bd];W[de];
+B[da];W[db];B[ee];W[ad];B[ae];W[de];B[nj];W[lj];B[ee];W[ac];B[bc];
+W[oj];B[de];W[aq];B[gs];W[tt];B[kj];W[lk];B[tt]W[tt]
+C[..........       W passed133.5 B 81.0]
+)
