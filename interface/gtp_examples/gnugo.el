@@ -1,8 +1,24 @@
-;;; ID: $Id: gnugo.el,v 1.1 2003-01-10 14:07:36 bump Exp $
+;;; ID: $Id: gnugo.el,v 1.2 2003-01-10 14:16:05 bump Exp $
 ;;;
-;;; Copyright (C) 1999, 2000, 2002, 2003 Thien-Thi Nguyen
-;;; This file is part of ttn's personal elisp library, released under GNU
-;;; GPL with ABSOLUTELY NO WARRANTY.  See the file COPYING for details.
+;;; This is GNU GO, a Go program. Contact gnugo@gnu.org, or see
+;;; http://www.gnu.org/software/gnugo/ for more information.   
+;;;                                                            
+;;; Copyright 1999, 2000, 2001 by the Free Software Foundation.            
+;;;                                                            
+;;; This program is free software; you can redistribute it and/
+;;; modify it under the terms of the GNU General Public License
+;;; as published by the Free Software Foundation - version 2.  
+;;;                                                            
+;;; This program is distributed in the hope that it will be    
+;;; useful, but WITHOUT ANY WARRANTY; without even the implied 
+;;; warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR    
+;;; PURPOSE.  See the GNU General Public License in file COPYIN
+;;; for more details.                                          
+;;;                                                            
+;;; You should have received a copy of the GNU General Public  
+;;; License along with this program; if not, write to the Free 
+;;; Software Foundation, Inc., 59 Temple Place - Suite 330,    
+;;; Boston, MA 02111, USA.
 
 ;;; Description: Run GNU Go in a buffer.
 
@@ -643,4 +659,4 @@ See also variable `gnugo-option-history'."
 
 (provide 'gnugo)
 
-;;; $RCSfile: gnugo.el,v $$Revision: 1.1 $ ends here
+;;; $RCSfile: gnugo.el,v $$Revision: 1.2 $ ends here
