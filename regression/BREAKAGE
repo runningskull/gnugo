@@ -1,3 +1,16 @@
+========================== 3.3.16 pre 2 ============================
+
+./regress.sh . reading.tst 
+178 unexpected PASS!
+./regress.sh . optics.tst 
+1201 unexpected PASS!
+./regress.sh . trevora.tst 
+390 unexpected FAIL: Correct 'A2', got 'J4'
+./regress.sh . arb.tst 
+150 unexpected PASS!
+./regress.sh . golife.tst 
+4 unexpected PASS!
+
 ========================== 3.3.16 pre 1 ============================
 
 ./regress.sh . atari_atari.tst 

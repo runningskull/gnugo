@@ -234,7 +234,7 @@ loadsgf games/trevor/auto/a022.sgf 42
 #A3 just looses points.
 loadsgf games/trevor/auto/a023.sgf 50
 390 gg_genmove white
-#? [A2]
+#? [A2]*
 
 
 

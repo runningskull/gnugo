@@ -154,7 +154,7 @@ loadsgf games/incident73.sgf 210
 
 loadsgf games/incident73.sgf 212
 1201 eval_eye T10
-#? [1 2 T8 T8]*
+#? [1 2 T8 T8]
 
 # incident 97
 loadsgf games/incident97.sgf 175

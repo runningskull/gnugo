@@ -28,7 +28,7 @@ loadsgf games/arb/game02.sgf 71
 
 loadsgf games/arb/dumonteil-1.sgf 184
 150 gg_genmove white
-#? [J5]*
+#? [J5]
 
 # Why is this move so urgent? /gf
 # tm - F14 is not necessary - removing this bad problem.

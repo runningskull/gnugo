@@ -737,7 +737,7 @@ popgo
 
 loadsgf games/reading40.sgf
 178 attack C9
-#? [0]*
+#? [0]
 
 
 # Report number of nodes visited by the tactical reading

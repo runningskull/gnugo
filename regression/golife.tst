@@ -18,7 +18,7 @@ loadsgf games/golife.sgf 30
 
 loadsgf games/golife.sgf 32
 4 gg_genmove white
-#? [H5]*
+#? [H5]
 
 # GNU Go did play this connection. The test is to make sure it never forgets it.
 loadsgf games/golife.sgf 34
