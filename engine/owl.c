@@ -185,6 +185,8 @@ static void owl_make_domains(struct local_owl_data *owla,
 static int owl_safe_move(int move, int color);
 static void sniff_lunch(int lunch, int *min, int *probable, int *max,
 			struct local_owl_data *owl);
+static void eat_lunch_escape_bonus(int lunch, int *min, int *probable,
+				   int *max, struct local_owl_data *owl);
 static void compute_owl_escape_values(struct local_owl_data *owl);
 static int owl_escape_route(struct local_owl_data *owl);
 static void do_owl_analyze_semeai(int apos, int bpos, 
@@ -4670,11 +4672,13 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
     *min = 2;
     *probable = 2;
     *max = 2;
+    return;
   }
   else if (size > 4) {
     *min = 1;
     *probable = 2;
     *max = 2;
+    return;
   }
   else if (size > 2) {
     *min = 0;
@@ -4710,9 +4714,68 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
       *max = 0;
     }
   }
+
+  eat_lunch_escape_bonus(lunch, min, probable, max, owl);
 }
 
 
+/* Gives a bonus for a lunch capture which joins a (or some) friendly
+ * string(s) to the goal dragon and improves the escape potential at
+ * the same time. This is indicated in some situations where the owl
+ * code would stop the analysis because of various cutoffs. See
+ * do_owl_defend()
+ * 
+ * The following implementation tries to get a precise idea of the
+ * escape potential improvement by calling dragon_escape() twice.
+ */
+static void
+eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
+		       struct local_owl_data *owl)
+{
+  int adjacent[MAXCHAIN];
+  int neighbors;
+  int adjoins = 0;
+  int n;
+  /* Be very careful before touching this value.
+   * See owl_estimate_life() for details.
+   */
+  UNUSED(min);
+  
+  /* Don't mess up with kos */
+  if (is_ko_point(lunch))
+    return;
+  
+  neighbors = chainlinks(lunch, adjacent);
+  for (n = 0; n < neighbors; n++)
+    adjoins |= !owl->goal[adjacent[n]];
+  
+  if (adjoins) {
+    int before, after;
+    before = dragon_escape(owl->goal, owl->color, owl->escape_values);
+    /* if the escape route is already large enough to be considered
+     * a WIN by the owl code, then no need for more */
+    if (before < 5) {
+      char new_goal[BOARDMAX];
+      memcpy(new_goal, owl->goal, sizeof(new_goal));
+      for (n = 0; n < neighbors; n++)
+	if (!owl->goal[adjacent[n]])
+	  mark_string(adjacent[n], new_goal, 2);
+      after = dragon_escape(new_goal, owl->color, owl->escape_values);
+	
+      /* Following is completely ad hoc. Another set of tests might
+       * very well get better results. */
+      if (after - before >= 3)
+	if (after >= 8 || (before == 0 && after >= 5)) {
+	  *probable = 2;
+	  *max = 2;
+	}
+	else if (*max < 2)
+	  (*max)++;
+    }
+  }
+}
+
+ 
 /* Conservative relative of topological_eye. Essentially the same
  * algorithm is used, but only tactically safe opponent strings on
  * diagonals are considered. This may underestimate the false/half eye
