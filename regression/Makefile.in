@@ -412,6 +412,9 @@ strategy3: strategy3.tst
 strategy4: strategy4.tst
 	$(srcdir)/eval.sh strategy4.tst $(GG_OPTIONS)
 
+strategy5: strategy5.tst
+	$(srcdir)/eval.sh strategy5.tst $(GG_OPTIONS)
+
 tactics: tactics.tst
 	$(srcdir)/eval.sh tactics.tst $(GG_OPTIONS)
 

@@ -44,6 +44,42 @@ loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 90
 228 gg_genmove white
 #? [!N12]*
 
+loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 41
+229 gg_genmove black
+#? [D7]
+
+loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 53
+230 gg_genmove black
+#? [H9]
+
+loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 107
+231 gg_genmove black
+#? [J2|J3]
+
+# If tuning this position be sure GNU Go plays subsequent moves acceptably
+loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 17
+232 gg_genmove black
+#? [D11|E11]
+
+loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 23
+233 gg_genmove black
+#? [E13]
+
+loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 29
+234 gg_genmove black
+#? [H14]
+
+loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 47
+235 gg_genmove black
+#? [G12|J13]
+
+loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 91
+236 gg_genmove black
+#? [R12]
+
+
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
