@@ -51,7 +51,7 @@ default_semeai_node_limit=500
 default_owl_node_limit=1000
 
 AC_ARG_ENABLE(cache-size,
-  [  --enable-cache-size=n       reserve n Mb RAM for caching (16 default)])
+  [  --enable-cache-size=n       reserve n Mb RAM for caching (8 default)])
 
 AC_ARG_ENABLE(level,
   [  --enable-level=n            n = default level (up to 10 supported)])

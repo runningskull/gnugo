@@ -643,7 +643,7 @@ Optional Features:
                                 matcher (default)
   --enable-grid-opt=distrust  enable the grid optimsation in non-trusting mode
   --disable-grid-opt          disable the grid optimisation
-  --enable-cache-size=n       reserve n Mb RAM for caching (16 default)
+  --enable-cache-size=n       reserve n Mb RAM for caching (8 default)
   --enable-level=n            n = default level (up to 10 supported)
   --enable-semeai-node-limit=n        n = semeai variations (500 standard)
   --enable-owl-node-limit=n           n = owl node limit (1000 standard)
