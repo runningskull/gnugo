@@ -441,7 +441,7 @@ with jago after the game has been finished and scored.
 @section Macintosh
 
 If you have Mac OS X you can build GNU Go using Apple's compiler, 
-which is derived from GCC. We recommend adding the flag -no-cpp-precom
-to CFLAGS.
+which is derived from GCC.
+
 
 
