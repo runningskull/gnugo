@@ -865,6 +865,7 @@ xXx?
 
 
 Pattern Intrusion3
+# ab 3.1.22 Constraint added (see 13x13:52)
 
 xxX?
 ...O
@@ -872,6 +873,13 @@ xxX?
 ----
 
 :8,B,value(30)
+
+xxX?
+..bd
+a!c.
+----
+
+;!oplay_attack(a,b,c,d)
 
 
 Pattern Intrusion4
@@ -933,6 +941,7 @@ X.x
 
 
 Pattern Intrusion8
+# ab 3.1.22 revised constraint (see territory valuation in 13x13:2)
 
 X.X
 O!!
@@ -944,7 +953,7 @@ B.X
 Oa!
 ?X.
 
-;oplay_attack(a,B)
+;oplay_attack(a,B) && !attack(B)
 
 
 Pattern Intrusion9

@@ -119,6 +119,10 @@ int experimental_semeai = EXPERIMENTAL_SEMEAI;
 int semeai_variations = DEFAULT_SEMEAI_VARIATIONS;
 /* use experimental connection module */
 int experimental_connections = EXPERIMENTAL_CONNECTIONS;
+int owl_threats = OWL_THREATS;          /* compute owl threats */
+
+/* use experimental influence module */
+int experimental_influence = EXPERIMENTAL_INFLUENCE;
 
 int allow_suicide       = 0;    /* allow opponent to make suicide moves */
 int capture_all_dead    = 0;    /* capture all dead opponent stones */

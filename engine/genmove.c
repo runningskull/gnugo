@@ -314,6 +314,8 @@ do_genmove(int *move, int color, float pure_threat_value)
   val = -1; 
   if (get_level(&level))
     fprintf(stderr, "level = %d\n", level);
+  if (!owl_threats)
+    disable_threat_computation = 1;
   
   /* experimental level adapter */
   clock_adapt_level(&level, color);

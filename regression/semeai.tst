@@ -187,3 +187,8 @@ loadsgf games/bretz.sgf 130
 34 owl_analyze_semeai N18 Q18
 #? [ALIVE DEAD S18]
 
+# ab added (3.1.22)
+loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
+35 owl_analyze_semeai M13 M11
+#? [ALIVE DEAD PASS]*
+

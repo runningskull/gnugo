@@ -537,7 +537,7 @@ OX.O
 fHbg
 e*ad
 
-# FIXME PRE/POST3.0: A number of these could probably be replaced by break_through.
+# FIXME : Some of these could probably be replaced by break_through.
 ;!oplay_attack_either(*,f,g)
 ;&& (oplay_attack(*,a,H)
 ;    || (!oplay_defend(*,a,b,c,d,a)
@@ -1415,6 +1415,9 @@ eOf
 Pattern Shape9b
 # tm modified (3.1.18)
 # tm modified (3.1.20)
+# ab I don't understand this pattern. X has already played at LR of
+# the pattern, so ponnuki is slow. Unless * attacks the eye space of X,
+# I see no point in pulling this stone out.
 
 ooo     don't give opponent ponnuki
 o*o
@@ -2263,10 +2266,13 @@ aO..
 
 Pattern Shape66
 # db increased negative shape (3.1.7)
+# ab added ??? lines added as jump is often good on 3rd line
 
 xX.         often bad to leave a gap
 O.*
 ...
+???
+???
 
 :8,-,shape(-3)
 
@@ -2774,6 +2780,8 @@ fg*
 
 Pattern Sente16
 # gf New pattern. (3.1.14)
+# The constraint is unprecise, but correcting it probably
+# require a handwritten helper.
 
 .O?
 .*X

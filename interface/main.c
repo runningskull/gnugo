@@ -89,8 +89,10 @@ enum {OPT_BOARDSIZE=2,
       OPT_EXPERIMENTAL_SEMEAI,
       OPT_SEMEAI_VARIATIONS,
       OPT_EXPERIMENTAL_CONNECTIONS,
+      OPT_EXPERIMENTAL_INFLUENCE,
       OPT_STANDARD_SEMEAI,
       OPT_STANDARD_CONNECTIONS,
+      OPT_STANDARD_INFLUENCE,
       OPT_DECIDE_POSITION,
       OPT_DECIDE_EYE,
       OPT_DECIDE_COMBINATION,
@@ -115,6 +117,8 @@ enum {OPT_BOARDSIZE=2,
       OPT_PRINTSGF,
       OPT_PROFILE_PATTERNS,
       OPT_CHINESE_RULES,
+      OPT_OWL_THREATS,
+      OPT_NO_OWL_THREATS,
       OPT_JAPANESE_RULES,
       OPT_ALLOW_SUICIDE,
       OPT_CAPTURE_ALL_DEAD,
@@ -198,6 +202,10 @@ static struct gg_option const long_options[] =
   {"experimental-semeai",  no_argument, 0, OPT_EXPERIMENTAL_SEMEAI},
   {"semeai-variations",   required_argument, 0, OPT_SEMEAI_VARIATIONS},
   {"experimental-connections",  no_argument, 0, OPT_EXPERIMENTAL_CONNECTIONS},
+  {"owl-threats",     no_argument,      0, OPT_OWL_THREATS},
+  {"no-owl-threats",  no_argument,      0, OPT_NO_OWL_THREATS},
+  {"experimental-influence",  no_argument, 0, OPT_EXPERIMENTAL_INFLUENCE},
+  {"standard-influence",  no_argument, 0, OPT_STANDARD_INFLUENCE},
   {"standard_semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
@@ -303,8 +311,13 @@ main(int argc, char *argv[])
     chinese_rules = 1;
   else 
     chinese_rules = 0;
+  if (OWL_THREATS)
+    owl_threats = 1;
+  else
+    owl_threats = 0;
   experimental_semeai = EXPERIMENTAL_SEMEAI;
   experimental_connections = EXPERIMENTAL_CONNECTIONS;
+  experimental_influence = EXPERIMENTAL_INFLUENCE;
 
   allow_suicide = 0;
   capture_all_dead = 0;
@@ -423,6 +436,14 @@ main(int argc, char *argv[])
 	chinese_rules = 1;
 	break;
 
+      case OPT_OWL_THREATS: 
+	owl_threats = 1;
+	break;
+
+      case OPT_NO_OWL_THREATS: 
+	owl_threats = 0;
+	break;
+
       case OPT_JAPANESE_RULES: 
 	chinese_rules = 0;
 	break;
@@ -445,6 +466,14 @@ main(int argc, char *argv[])
 
       case OPT_STANDARD_CONNECTIONS: 
 	experimental_connections = 0;
+	break;
+
+      case OPT_EXPERIMENTAL_INFLUENCE:
+	experimental_influence = 1;
+	break;
+
+      case OPT_STANDARD_INFLUENCE: 
+	experimental_influence = 0;
 	break;
 
       case OPT_ALLOW_SUICIDE:

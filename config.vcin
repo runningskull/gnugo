@@ -25,6 +25,9 @@
 /* Ruleset. Default Japanese */
 #define CHINESE_RULES 0
 
+/* Compute owl threats. Default 0 */
+#define OWL_THREATS 0
+
 /* Define to use curses for color debugging */
 /* #undef CURSES */
 
@@ -39,6 +42,9 @@
 
 /* Semeai module. Default standard. */
 #define EXPERIMENTAL_SEMEAI 0
+
+/* Semeai module. Default standard. */
+#define EXPERIMENTAL_INFLUENCE 0
 
 /* Max variations to consider reading semeai. */
 #define DEFAULT_SEMEAI_VARIATIONS 250

@@ -69,6 +69,10 @@ AC_ARG_ENABLE(chinese-rules,
  [  --enable-chinese-rules       tell the Go Modem Protocol to use Chinese Rules
   --disable-chinese-rules       use Japanese rules (default)])
 
+AC_ARG_ENABLE(owl-threats,
+ [  --enable-owl-threats        compute owl threats
+  --disable-owl-threats        don't compute owl threats (default)])
+
 AC_ARG_ENABLE(experimental-semeai,
  [  --enable-experimental-semeai    use the experimental semeai module
   --disable-experimental-semeai    use standard semeai module (default)])
@@ -77,9 +81,12 @@ AC_ARG_ENABLE(experimental-connections,
  [  --enable-experimental-connections    use experimental connection analysis
   --disable-experimental-connections    use standard connection analysis (default)])
 
+AC_ARG_ENABLE(experimental-influence,
+ [  --enable-experimental-influence    use experimental influence module
+  --disable-experimental-influence    use standard influence module (default)])
+
 AC_ARG_ENABLE(profile,
  [  --enable-profile       compile gnugo with gprof option ])
-
 
 dnl expand any instances of @matcher@ in Makefile
 AC_SUBST(dfa_c)
@@ -375,6 +382,28 @@ if test "$enable_experimental_connections" = "yes" ; then
    AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 1)
 else
    AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 0)
+fi
+
+dnl ------------ Owl Threats -------------------
+
+AH_TEMPLATE([OWL_THREATS],
+[Owl Threats. 0 standard.])
+
+if test "$enable_owl_threats" = "yes" ; then
+   AC_DEFINE(OWL_THREATS, 1)
+else
+   AC_DEFINE(OWL_THREATS, 0)
+fi
+
+dnl ------------ Influence -------------------
+
+AH_TEMPLATE([EXPERIMENTAL_INFLUENCE],
+[Influence module. Default standard.])
+
+if test "$enable_experimental_influence" = "yes" ; then
+   AC_DEFINE(EXPERIMENTAL_INFLUENCE, 1)
+else
+   AC_DEFINE(EXPERIMENTAL_INFLUENCE, 0)
 fi
 
 dnl  ----------- special-case use of gcc ---------

@@ -273,6 +273,8 @@ extern float upper_bound;
 extern int chinese_rules;       /* use chinese (area) rules for counting */
 extern int experimental_semeai;      /* use experimental semeai module */
 extern int experimental_connections; /* use experimental connection module */
+extern int owl_threats;              /* compute owl threats */
+extern int experimental_influence;   /* use experimental influence module */
 extern int allow_suicide;            /* allow opponent to make suicide moves */
 extern int capture_all_dead;         /* capture all dead opponent stones */
 extern int play_out_aftermath;  /* make everything unconditionally settled */
