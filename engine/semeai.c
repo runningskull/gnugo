@@ -103,10 +103,10 @@ new_semeai(int color)
   int best_result_b[MAX_NEIGHBOR_DRAGONS];
   int worst_result_a[MAX_NEIGHBOR_DRAGONS];
   int worst_result_b[MAX_NEIGHBOR_DRAGONS];
-  int a_best_status;  /* status if a plays first */
-  int b_worst_status; /* status if a plays first */
-  int a_worst_status; /* status if b plays first */
-  int b_best_status;  /* status if b plays first */
+  int a_best_status = UNKNOWN;  /* status if a plays first */
+  int b_worst_status = UNKNOWN; /* status if a plays first */
+  int a_worst_status = UNKNOWN; /* status if b plays first */
+  int b_best_status = UNKNOWN;  /* status if b plays first */
 
   int move[MAX_NEIGHBOR_DRAGONS];
   int a_status = UNKNOWN;
