@@ -46,9 +46,9 @@ static int is_initialized = 0;
 
 
 /* Random values for the hash function.  For stones and ko position. */
-static Hashvalue white_hash[MAX_BOARD][MAX_BOARD];	
-static Hashvalue black_hash[MAX_BOARD][MAX_BOARD];	
-static Hashvalue ko_hash[MAX_BOARD][MAX_BOARD];
+static Hashvalue white_hash[BOARDMAX];	
+static Hashvalue black_hash[BOARDMAX];	
+static Hashvalue ko_hash[BOARDMAX];
 
 
 static Compacttype white_patterns[4 * sizeof(Compacttype)];
@@ -75,7 +75,7 @@ hash_rand(void)
 void
 hash_init(void)
 {
-  int m, n;
+  int pos;
   int x;
   struct gg_rand_state state;
 
@@ -93,11 +93,11 @@ hash_init(void)
   gg_srand(1);
 #endif
   
-  for (m = 0; m < MAX_BOARD; m++)
-    for (n = 0; n < MAX_BOARD; n++) {
-      black_hash[m][n] = hash_rand();
-      white_hash[m][n] = hash_rand();
-      ko_hash[m][n]    = hash_rand();
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos)) {
+      black_hash[pos] = hash_rand();
+      white_hash[pos] = hash_rand();
+      ko_hash[pos]    = hash_rand();
     }
   
   gg_set_rand_state(&state);
@@ -192,90 +192,91 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 
 #define USE_SHIFTING 1
 #if USE_SHIFTING
-  unsigned int   index;
-  int            i, j;
-  Compacttype    bits;
+  unsigned int index;
+  int pos;
+  Compacttype bits;
 
   target->hashval = 0;
   bits = 1;
   index = 0;
   target->hashpos.board[index] = 0;
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      switch (p[POS(i, j)]) {
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    switch (p[pos]) {
       default:
       case EMPTY: 
 	bits <<= 2;
 	break;
       case WHITE:
-	target->hashval ^= white_hash[i][j];
+	target->hashval ^= white_hash[pos];
 	target->hashpos.board[index] |= bits;
 	bits <<= 2;
 	break;
       case BLACK:
-	target->hashval ^= black_hash[i][j];
+	target->hashval ^= black_hash[pos];
 	bits <<= 1;
 	target->hashpos.board[index] |= bits;
 	bits <<= 1;
 	break;
-      }
+    }
 
-      if (!bits) {
-	/* this means the bit fell off the left side */
-	bits = 1;
-	index += 1;
-	if (index < COMPACT_BOARD_SIZE)
-  	  target->hashpos.board[index] = 0;
-      }
+    if (!bits) {
+      /* this means the bit fell off the left side */
+      bits = 1;
+      index++;
+      if (index < COMPACT_BOARD_SIZE)
+	target->hashpos.board[index] = 0;
     }
   }
 
   /* This cleans up garbage bits at the (unused) end of the array.
    * It probably should not really be necessary.
    */
-  for ( ;++index < COMPACT_BOARD_SIZE; )
+  while (++index < COMPACT_BOARD_SIZE)
     target->hashpos.board[index] = 0;
 
 #else /* USE_SHIFTING */
 
   int            index;
   int            subindex;
-  int            i, j;
+  int            pos;
   Compacttype    bits;
 
   target->hashval = 0;
   index = 0;
   subindex = 0;
   bits = 0;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      switch (p[POS(i, j)]) {
-      default:
-      case EMPTY: 
-	break;
-      case WHITE:
-	target->hashval ^= white_hash[i][j] ;
-	bits |= white_patterns[subindex];
-	break;
-      case BLACK:
-	target->hashval ^= black_hash[i][j] ;
-	bits |= black_patterns[subindex];
-	break;
-      }
-
-      if (++subindex == POINTSPERCOMPACT) {
-	target->hashpos.board[index++] = bits;
-	bits = 0;
-	subindex = 0;
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    switch (p[pos]) {
+    default:
+    case EMPTY: 
+      break;
+    case WHITE:
+      target->hashval ^= white_hash[pos];
+      bits |= white_patterns[subindex];
+      break;
+    case BLACK:
+      target->hashval ^= black_hash[pos];
+      bits |= black_patterns[subindex];
+      break;
     }
+
+    if (++subindex == POINTSPERCOMPACT) {
+      target->hashpos.board[index++] = bits;
+      bits = 0;
+      subindex = 0;
+    }
+  }
   
   if (subindex != 0)
     target->hashpos.board[index] = bits;
 #endif /* USE_SHIFTING */
 
   if (ko_pos != 0)
-    target->hashval ^= ko_hash[I(ko_pos)][J(ko_pos)];
+    target->hashval ^= ko_hash[ko_pos];
 
   target->hashpos.ko_pos = ko_pos;
 }
@@ -288,7 +289,7 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 void
 hashdata_set_ko(Hash_data *hd, int pos)
 {
-  hd->hashval ^= ko_hash[I(pos)][J(pos)];
+  hd->hashval ^= ko_hash[pos];
   hd->hashpos.ko_pos = pos;
 }
 
@@ -301,7 +302,7 @@ void
 hashdata_remove_ko(Hash_data *hd)
 {
   if (hd->hashpos.ko_pos != 0) {
-    hd->hashval ^= ko_hash[I(hd->hashpos.ko_pos)][J(hd->hashpos.ko_pos)];
+    hd->hashval ^= ko_hash[hd->hashpos.ko_pos];
     hd->hashpos.ko_pos = 0;
   }
 }
@@ -320,11 +321,11 @@ hashdata_invert_stone(Hash_data *hd, int pos, int color)
   int subindex = (i * board_size + j) % POINTSPERCOMPACT;
 
   if (color == BLACK) {
-    hd->hashval ^= black_hash[i][j];
+    hd->hashval ^= black_hash[pos];
     hd->hashpos.board[index] ^= black_patterns[subindex];
   }
   else if (color == WHITE) {
-    hd->hashval ^= white_hash[i][j];
+    hd->hashval ^= white_hash[pos];
     hd->hashpos.board[index] ^= white_patterns[subindex];
   }
 }
@@ -365,10 +366,10 @@ hashdata_diff_dump(Hash_data *hd1, Hash_data *hd2)
       unsigned int u1, u2;
       int xx, yy, zz;
 
-      u1 = (hd1->hashpos.board[i] >> (2*pos) ) & 3;
-      u2 = (hd2->hashpos.board[i] >> (2*pos) ) & 3;
-      count1[u1] += 1;
-      count2[u2] += 1;
+      u1 = (hd1->hashpos.board[i] >> (2*pos)) & 3;
+      u2 = (hd2->hashpos.board[i] >> (2*pos)) & 3;
+      count1[u1]++;
+      count2[u2]++;
       if (u1 == u2)
 	continue;
       
