@@ -245,11 +245,17 @@ int attack_and_defend(int str,
 int attack_either(int astr, int bstr);
 int defend_both(int astr, int bstr);
 int break_through(int apos, int bpos, int cpos);
+int naive_ladder(int str, int *move);
 #define MOVE_ORDERING_PARAMETERS 67
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
 void draw_reading_shadow(void);
 void purge_persistent_reading_cache(void);
 void reading_hotspots(float values[MAX_BOARD][MAX_BOARD]);
+
+/* readconnect.c */
+int recursive_connect(int str1, int str2, int connect_depth);
+int recursive_disconnect(int str1, int str2, int connect_depth);
+
 
 int liberty_of_string(int pos, int str);
 int neighbor_of_string(int pos, int str);

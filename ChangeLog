@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- naive_ladder() made global
+- warnings eliminated from readconnect.c
+- most functions in readconnect.c made static
 - add point reorientation functions
 - add some comments to dfa.c
 - bugfix and cleanup in naive_ladder()

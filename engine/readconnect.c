@@ -31,28 +31,31 @@
 /* Size of array where candidate moves are stored. */
 #define MAX_MOVES 362
 
-int add_array(int *array, int elt);
-int intersection_array(int *array1, int *array2);
-int snapback(int str);
-int connection_one_move(int str1, int str2);
-int prevent_connection_one_move(int *moves, int str1, int str2);
-int connected_one_move(int str1, int str2);
-int moves_to_connect_in_two_moves(int *moves, int str1, int str2);
-int connection_two_moves(int str1, int str2);
-int prevent_connection_two_moves(int *moves, int str1, int str2);
-int connected_two_moves(int str1, int str2);
-int moves_to_connect_in_three_moves(int *moves, int str1, int str2);
-int simple_connection_three_moves(int str1, int str2);
-int prevent_simple_connection_three_moves(int *moves, int str1, int str2);
-int quiescence_connect(int str1, int str2);
-int recursive_connect(int str1,int str2, int connect_depth);
-int recursive_disconnect(int str1,int str2, int connect_depth);
-int capture_one_move(int str);
-int prevent_capture_one_move(int *moves, int str1);
+static int add_array(int *array, int elt);
+static int intersection_array(int *array1, int *array2);
+static int snapback(int str);
+static int connection_one_move(int str1, int str2);
+static int prevent_connection_one_move(int *moves, int str1, int str2);
+static int connected_one_move(int str1, int str2);
+static int moves_to_connect_in_two_moves(int *moves, int str1, int str2);
+static int connection_two_moves(int str1, int str2);
+static int prevent_connection_two_moves(int *moves, int str1, int str2);
+#if 0
+static int connected_two_moves(int str1, int str2);
+#endif
+static int moves_to_connect_in_three_moves(int *moves, int str1, int str2);
+#if 0
+static int simple_connection_three_moves(int str1, int str2);
+static int prevent_simple_connection_three_moves(int *moves,
+						 int str1, int str2);
+#endif
+static int quiescence_connect(int str1, int str2);
+static int capture_one_move(int str);
+static int prevent_capture_one_move(int *moves, int str1);
 
 int nodes_connect=0,max_nodes_connect=500,max_connect_depth=64;
 
-int add_array (int *array, int elt) {
+static int add_array (int *array, int elt) {
   int r, add = 1;
   
   for (r = 1; ((r < array[0] + 1) && add); r++)
@@ -65,9 +68,20 @@ int add_array (int *array, int elt) {
   return add;
 }
 
+/* FIXME: Added this function to avoid compiler warning. Obviously it
+ * needs to do something also. /gunnar
+ */
+static int
+intersection_array(int *array1, int *array2)
+{
+  UNUSED(array1);
+  UNUSED(array2);
+  return 0;
+}
+
 /* verifies that capturing the stone at str is not a snapback */
 
-int snapback (int str) {
+static int snapback (int str) {
   int stones, liberties, libs[MAXLIBS];
 
   /* if more than one stone captured, not a snapback */
@@ -91,7 +105,7 @@ int snapback (int str) {
   return 0;
 }
 
-int connection_one_move(int str1, int str2) {
+static int connection_one_move(int str1, int str2) {
   int r;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
@@ -112,7 +126,7 @@ int connection_one_move(int str1, int str2) {
   return 0;
 }
 
-int prevent_connection_one_move (int *moves, int str1, int str2) {
+static int prevent_connection_one_move (int *moves, int str1, int str2) {
   int r, s, res=0;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
@@ -145,12 +159,12 @@ int prevent_connection_one_move (int *moves, int str1, int str2) {
   return 0;
 }
 
-int connected_one_move (int str1, int str2) {
+static int connected_one_move (int str1, int str2) {
   int r, res=0;
   int moves[MAX_MOVES];
   
   moves[0] = 0;
-  if (prevent_connection_in_one_move(moves, str1, str2)) {
+  if (prevent_connection_one_move(moves, str1, str2)) {
     res = 1;
     for (r = 1; ((r < moves[0] + 1) && res); r++) {
       if (trymove(moves[r], OTHER_COLOR(board[str1]), NULL, 0, EMPTY, 0)) {
@@ -163,8 +177,8 @@ int connected_one_move (int str1, int str2) {
   return res;
 }
 
-int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
-  int r, s, res=0, common_adj_liberty;
+static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
+  int r, s, common_adj_liberty;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
   int adjadj, adjadjs[MAXCHAIN];
@@ -229,7 +243,7 @@ int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   return 0;
 }
   
-int connection_two_moves (int str1, int str2) {
+static int connection_two_moves (int str1, int str2) {
   int r, res = 0, moves[MAX_MOVES];
   
   if (moves_to_connect_in_two_moves(moves, str1, str2))
@@ -244,17 +258,18 @@ int connection_two_moves (int str1, int str2) {
   return res;
 }
 
-int moves_to_prevent_connection_in_two_moves (int *moves, int str1, int str2) {
+static int moves_to_prevent_connection_in_two_moves (int *moves,
+						     int str1, int str2) {
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return 1;
   return 0;
 }
 
-int prevent_connection_two_moves (int *moves, int str1, int str2) {
+static int prevent_connection_two_moves (int *moves, int str1, int str2) {
   int r, res=0;
   int possible_moves[MAX_MOVES];
   
-  if (connection_in_two_moves(str1, str2)) {
+  if (connection_two_moves(str1, str2)) {
     res=1;
     moves_to_prevent_connection_in_two_moves(possible_moves, str1, str2);
     for (r = 1; r < possible_moves[0] + 1; r++) {
@@ -270,13 +285,13 @@ int prevent_connection_two_moves (int *moves, int str1, int str2) {
   return res;
 }
 
-int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
+static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return 1;
   return 0;
 }
 
-int quiescence_connect(int str1, int str2) {
+static int quiescence_connect(int str1, int str2) {
   int r;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
@@ -391,13 +406,13 @@ int recursive_disconnect (int str1, int str2, int connect_depth) {
   return res;
 }
  
-int capture_one_move (int str) {
+static int capture_one_move (int str) {
   if (countlib(str) == 1)
     return 1;
   return 0;
 }
 
-int prevent_capture_one_move(int *moves, int str1) {
+static int prevent_capture_one_move(int *moves, int str1) {
   int r, res=0;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];

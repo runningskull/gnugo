@@ -131,7 +131,6 @@ static void double_atari_chain2(int str, int moves[MAX_MOVES],
 				int scores[MAX_MOVES], int *num_moves);
 static void order_moves(int str, int num_moves, int *moves,
 			int *scores, int color, const char *funcname);
-static int naive_ladder(int str, int *move);
 static int naive_ladder_defense(int str, int apos, int bpos,
 				int color, int other);
 static int naive_ladder_break_through(int str, int apos, int color, int other);
@@ -6260,7 +6259,7 @@ reading_hotspots(float values[MAX_BOARD][MAX_BOARD])
  *        return codes.
  */
 
-static int
+int
 naive_ladder(int str, int *move)
 {
   int color = board[str];
