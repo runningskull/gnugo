@@ -24,10 +24,9 @@ We define call stones @dfn{lively} if they cannot be tactically
 attacked, or if they have a tactical defense and belong to the player
 whose turn it is. Similarly, stones that cannot be strategically attacked
 (in the sense of the life-and-death analysis), or that have a strategical
-defense and belong to the player to move, are called @dfn{alive} while all
-other stones are called @dfn{alive}. If we want to use the influence
-function before deciding the strategical status, all lively stones count
-as alive.
+defense and belong to the player to move, are called @dfn{alive}.
+If we want to use the influence function before deciding the strategical
+status, all lively stones count as alive.
 
 Every alive stone on the board works as an influence source, with
 influence of its color radiating outwards in all directions. The
@@ -42,26 +41,17 @@ stones can be captured. Notice that it doesn't matter much if the
 connection between the two stones can be broken, since in that case
 there would come influence from both directions anyway.
 
-We define @dfn{territory} to be the intersections where one color has no
-influence at all and the other player does have. We can introduce moyo
-and area concepts similar to those provided by the Bouzy algorithms in
-terms of the influence values for the two colors. ``Territory'' refers
-to certain or probable territory while ``Moyo'' refers to an area of
-dominant influence which is not necessarily guaranteed territory.
-``Area'' refers to the breathing space around a group in which it
-can manoever if it is attacked.
+From the influence of both colors we compute a territorial value between
+-1.0 and +1.0 for each intersection, which can be seen as the likely hood
+of it becoming territory for either color.
 
 In order to avoid finding bogus territory, we add extra influence
 sources at places where an invasion can be launched, e.g. at 3-3 under
 a handicap stone, in the middle of wide edge extensions and in the
 center of large open spaces anywhere. Similarly we add extra influence
 sources where intrusions can be made into what otherwise looks as
-solid territory, e.g. monkey jumps.
-
-Walls typically radiate an influence that is stronger than the sum of
-the influence from the stones building the wall. To accommodate for this
-phenomenon, we also add extra influence sources in empty space at
-certain distances away from walls.
+solid territory, e.g. monkey jumps. These intrusions depend on whose
+turn we assume it to be.
 
 All these extra influence sources, as well as connections, are controlled
 by a pattern database, which consists of the two files patterns/influence.db
@@ -90,8 +80,8 @@ done by the owl code (see @ref{Pattern Based Reading}). A dragon with a
 moyo size of only 5 will be considered weak, even if the owl code has
 decided that it cannot be killed.
 
-As a tool for the owl code, an "escape" influence gets computed for each
-dragon going through the life-and-death analysis (@ref{Escape}).
+As a tool for both the owl code and the strength estimate of dragons,
+an "escape" influence gets computed for each dragon @xref{Escape}.
 
 Once all dragons have been evaluated, the influence module is called again
 and the variables @code{initial_influence} and
@@ -104,7 +94,7 @@ dragon.
 The result of this run is the most important tool for move evaluation. All
 helper functions of patterns as explained in @ref{Patterns} that
 refer to influence results (e. g. @code{olib(*)} etc.) actually use these
-results. More important, @code{initial_influence} serves as the reference for
+results. Further, @code{initial_influence} serves as the reference for
 computing the territorial value of a move. That is, from the influence
 strengths stored in @code{initial_influence}, a territory value is
 assigned to each intersection. This value is supposed to estimate the

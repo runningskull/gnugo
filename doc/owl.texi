@@ -88,9 +88,9 @@ principally the first two.
 @findex owl_defend
 @findex compute_eyes_pessimistic
 A node of the move tree is considered @code{terminal} if no further moves 
-are found from @file{apats.db} or @file{dpats.db}, or if the function
-@code{compute_eyes_pessimistic()} reports that the group is definitely
-alive or dead. At this point, the status of the group is evaluated.
+are found from @file{owl_attackpats.db} or @file{owl_defendpats.db}, or if
+the function @code{compute_eyes_pessimistic()} reports that the group is
+definitely alive. At this point, the status of the group is evaluated.
 The functions @code{owl_attack()} and @code{owl_defend()}, with
 usage similar to @code{attack()} and @code{find_defense()}, make
 use of the owl pattern databases to generate the move tree and decide
@@ -146,11 +146,11 @@ Only dragons with small escape route are studied when the
 functions are called from @code{make_dragons()}.
 
 The owl code can be conveniently tested using the 
-@option{--decidedragon @var{location}} This should be used with 
+@option{--decide-owl @var{location}} This should be used with 
 @option{-t} to produce a useful trace, @option{-o} to produce
 an SGF file of variations produced when the life and death of
 the dragon at @var{location} is checked, or both. 
-@option{--decideposition} performs the same analysis for all
+@option{--decide-position} performs the same analysis for all
 dragons with small escape route. 
 
 @node Owl Functions, Combinations, The Owl Code, Pattern Based Reading

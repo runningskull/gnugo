@@ -12,8 +12,8 @@ opponent to learn the result of different moves is called
 "reading". GNU Go does three distinct types of reading: @dfn{tactical
 reading} which typically is concerned with the life and death of
 individual strings, @dfn{Owl reading} which is concerned
-with the life and death of dragons, and @dfn{life reading}
-which attempts evaluate eye spaces. In this Chapter, we document
+with the life and death of dragons, and @dfn{connection reading}.
+In this Chapter, we document
 the tactical reading code, which is in @file{engine/reading.c}.
 For a summary of the reading functions see @xref{Reading Functions}.
 
@@ -34,9 +34,23 @@ For a summary of the reading functions see @xref{Reading Functions}.
 @comment  node-name,  next,  previous,  up
 @section Reading Basics
 
-In GNU Go, tactical reading is done by the functions in
-@file{engine/reading.c}. Each of these functions has a separate goal to fill,
-and they call each other recursively to carry out the reading process.
+What we call @emph{Tactical Reading} is the analysis whether there is
+a direct capture of a single string, or whether there is a move to prevent
+such a direct capture.
+
+If the reading module finds out that the string can get captured, this
+answer should (usually) be trusted. However, if it says it can be defended,
+this does not say as much. It is often the case that such a string has
+no chance to make a life, but that it cannot be captured within the
+horizon (and the cutoff heuristics) of the tactical reading.
+
+The tactical reading is done by the functions in @file{engine/reading.c}.
+It is a minimax search that declares win for the attacker once he can
+physically take the string off board, whereas the defense is considered
+successful when the string has sufficiently many liberties. A string with
+five liberties is always considered alive. At higher depth within the
+search tree even fewer liberties cause GNU Go to give up the attack,
+@xref{depthparams}.
 
 The reading code makes use of a stack onto which board positions can
 be pushed. The parameter @code{stackp} is zero if GNU Go is
@@ -50,21 +64,29 @@ The most important public reading functions are @code{attack} and
 functions @code{do_attack} and @code{do_find_defense} call each other
 recursively.
 
+@subsection Organization of the reading code
+
+The function @code{do_attack} and @code{do_find_defense} are wrappers
+themselves and call @code{attack1}, @code{attack2}, @code{attack3} or
+@code{attack4} resp.  @code{defend1}, @code{defend1}, @code{defend1}
+or @code{defend1} depending on the number of liberties.
+
+These are fine-tuned to generate and try out the moves in an efficient
+order. They generate a few moves themselves (mostly direct liberties
+of the string), and then call helper functions called @code{..._moves} 
+which suggest less obvious moves. Which of these functions get called
+depends on the number of liberties and of the current search depth.
+
+@subsection Return codes
+@anchor{retcodes}
 @cindex return codes
 @cindex reading return codes
 
 The return codes of the reading (and owl) functions and owl can
-be 0, 1, 2 or 3. Each reading function determines whether a
-particular player (assumed to have the move) can solve a
-specific problem, typically attacking or defending a string.
-
-The nonzero return codes are called these names in the source:
-
-@example
-   #define WIN  3
-   #define KO_A 2
-   #define KO_B 1
-@end example
+be @code{0}, @code{KO_B}, @code{KO_A} or @code{WIN}. Each reading
+function determines whether a particular player (assumed to have the
+move) can solve a specific problem, typically attacking or defending
+a string.
 
 A return code of @code{WIN} means success, 0 failure, while @code{KO_A} and
 @code{KO_B} are success conditioned on ko. A function returns @code{KO_A}
@@ -73,13 +95,9 @@ will get the first ko capture (so the opponent has to make the
 first ko threat). A return code of @code{KO_B} means that the player
 to move will have to make the first ko threat.
 
-Many of the reading functions make use of @dfn{null pointers}.
-For example, a call to @code{attack(str, &apos)} will return @code{WIN}
-if the string at @code{str} can be captured. The point of attack
-(in case it is vulnerable) is returned in @code{apos}. However
-many times we do not care about the point of attack. In this
-case, we can substitute a null pointer: @code{attack(str,
-NULL)}.
+
+@subsection Reading cutoff and depth parameters
+@anchor{depthparams}
 
 Depth of reading is controlled by the parameters @code{depth}
 and @code{branch_depth}. The @code{depth} has a default value
@@ -99,14 +117,14 @@ Between @code{branch_depth} and @code{depth}, attacks on strings with
 3 liberties are considered, but branching is inhibited, so fewer
 variations are considered.
 
-@findex small_semeai
-Currently the reading code does not try to defend a string by
-attacking a boundary string with more than two liberties. Because
-of this restriction, it can make oversights. A symptom of this is
-two adjacent strings, each having three or four liberties, each
-classified as @code{DEAD}. To resolve such situations, a function
-@code{small_semeai()} (in @file{engine/semeai.c}) looks for such
-pairs of strings and corrects their classification.
+%@findex small_semeai
+%Currently the reading code does not try to defend a string by
+%attacking a boundary string with more than two liberties. Because
+%of this restriction, it can make oversights. A symptom of this is
+%two adjacent strings, each having three or four liberties, each
+%classified as @code{DEAD}. To resolve such situations, a function
+%@code{small_semeai()} (in @file{engine/semeai.c}) looks for such
+%pairs of strings and corrects their classification.
 
 The @code{backfill_depth} is a similar variable with a default 12. Below
 this depth, GNU Go will try "backfilling" to capture stones.
@@ -148,28 +166,23 @@ Functions} for a fuller list).
 @item @code{int attack(int str, int *move)}
 @findex attack
 @quotation
-This basic function determines if the string at @code{str} can
+Determines if the string at @code{str} can
 be attacked, and if so, @code{*move} returns the attacking move,
 unless @code{*movei} is a null pointer. (Use null pointers if
 you are interested in the result of the attack but not the
-attacking move itself.) Returns 1 if the attack succeeds,
-otherwise 0. Returns @code{KO_A} or @code{KO_B} if the result depends on ko:
-returns @code{KO_A} if the attack succeeds provided attacker is willing
-to ignore any ko threat. Returns @code{KO_B} if attack succeeds
-provided attacker has a ko threat which must be answered.  
+attacking move itself.) Returns @code{WIN}, if the attack succeeds,
+0 if it fails, and @code{KO_A} or @code{KO_B} if the result depends on ko
+@ref{retcodes}.
 @end quotation
 @findex find_defense
 @item @code{find_defense(int str, int *move)}
 @quotation 
 Attempts to find a move that will save the string at @code{str}. It
 returns true if such a move is found, with @code{*move} the location
-of the saving move (unless @code{*move} are null pointers). It is not
+of the saving move (unless @code{*move} is a null pointer). It is not
 checked that tenuki defends, so this may give an erroneous answer if
 @code{!attack(str)}.  Returns @code{KO_A} or @code{KO_B} if the
-result depends on ko. Returns @code{KO_A} if the string can be
-defended provided @code{color} is willing to ignore any ko
-threat. Returns @code{KO_B} if @code{color} has a ko threat which must be
-answered.  
+result depends on ko @xref{retcodes}. 
 @end quotation
 @findex safe_move
 @item @code{safe_move(int str, int color)} :

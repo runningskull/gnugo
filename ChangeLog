@@ -2,7 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.3.19 released June 3, 2003
+- documentation revisions
+
+3.3.20 released June 3, 2003
 
 - hoshi.sgf split into hoshi_keima.sgf and hoshi_other.sgf
 - new functions recursive_break(), recursive_block() in readconnect.c:
