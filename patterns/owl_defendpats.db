@@ -2683,7 +2683,7 @@ Pattern D715
 
 O*           defend against atari inside eyespace
 
-:8,-,value(35)
+:-,-,value(35)
 
 a*
 

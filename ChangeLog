@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- pattern symmetry corrections in owl_defendpats.db and patterns2.db
 - bugfix in topological_eye()
 - don't spread any influence below INFLUENCE_CUTOFF
 - mark_safe_stones() distinguishes between SAFE_STONE and OWL_SAVED_STONE
