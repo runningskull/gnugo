@@ -18,7 +18,7 @@
 /* Default hash table size in megabytes */
 #undef DEFAULT_MEMORY
 
-/* Semeai Variations. 250 default */
+/* Semeai Variations. 500 default */
 #undef DEFAULT_SEMEAI_VARIATIONS
 
 /* Connection module. Default experimental. */

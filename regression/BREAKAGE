@@ -1,3 +1,38 @@
+========================== 3.3.15 pre 2 ============================
+
+./regress.sh . reading.tst 
+178 unexpected FAIL: Correct '0', got '1 G9'
+./regress.sh . filllib.tst 
+43 unexpected FAIL: Correct 'C6', got 'B10'
+./regress.sh . atari_atari.tst 
+19 unexpected FAIL: Correct 'P9|Q7', got 'PASS'
+./regress.sh . connection.tst 
+100 unexpected FAIL: Correct '(2|3) J15', got '0'
+./regress.sh . neurogo.tst 
+11 unexpected PASS!
+14 unexpected PASS!
+./regress.sh . lazarus.tst 
+7 unexpected PASS!
+14 unexpected PASS!
+./regress.sh . trevorb.tst 
+220 unexpected PASS!
+./regress.sh . strategy2.tst 
+54 unexpected PASS!
+75 unexpected FAIL: Correct 'Q11', got 'F7'
+76 unexpected FAIL: Correct 'Q11', got 'F7'
+./regress.sh . nngs.tst 
+290 unexpected FAIL: Correct 'D12|D11|E12', got 'H10'
+./regress.sh . global.tst 
+3 unexpected PASS!
+./regress.sh . 13x13.tst 
+39 unexpected FAIL: Correct 'H4|J4', got 'J5'
+./regress.sh . owl1.tst 
+294 unexpected FAIL: Correct '1 M19', got '0'
+./regress.sh . nngs4.tst 
+220 unexpected PASS!
+./regress.sh . auto_handtalk.tst 
+8 unexpected PASS!
+
 ========================== 3.3.15 pre 1 ============================
 
 ./regress.sh . strategy.tst 

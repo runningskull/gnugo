@@ -18,8 +18,8 @@
 /* Default hash table size in megabytes */
 #define DEFAULT_MEMORY 8
 
-/* Semeai Variations. 250 default */
-#define DEFAULT_SEMEAI_VARIATIONS 250
+/* Semeai Variations. 500 default */
+#define DEFAULT_SEMEAI_VARIATIONS 500
 
 /* Connection module. Default standard. */
 #define EXPERIMENTAL_CONNECTIONS 1

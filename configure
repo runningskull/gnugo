@@ -681,7 +681,7 @@ Optional Features:
   --disable-grid-opt          disable the grid optimisation
   --enable-cache-size=n       reserve n Mb RAM for caching (16 default)
   --enable-level=n            n = default level (up to 10 supported)
-  --enable-semeai-variations=n        n = semeai variations (250 standard)
+  --enable-semeai-variations=n        n = semeai variations (500 standard)
   --enable-owl-node-limit=n           n = owl node limit (1000 standard)
   --disable-dfa               use old non-dfa pattern matcher
   --enable-chinese-rules      use Chinese (area) counting
@@ -1368,7 +1368,7 @@ fi;
 
 default_cache_size=8
 default_level=10
-default_semeai_variations=250
+default_semeai_variations=500
 default_owl_node_limit=1000
 
 # Check whether --enable-cache-size or --disable-cache-size was given.
