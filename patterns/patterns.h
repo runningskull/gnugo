@@ -106,10 +106,10 @@ struct pattern; /* forward reference to keep gcc happy */
  */
  
 typedef int (*pattern_helper_fn_ptr)(struct pattern *, int rotation,
-				     int ti, int tj, int color);
+				     int move, int color);
 
 typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
-				 int ti, int tj, int color, int action);
+				 int move, int color, int action);
 
 
 /* each pattern is compiled into a sequence of these elements.
@@ -167,7 +167,7 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 #define CLASS_MOVE_REASONS (CLASS_C | CLASS_B | CLASS_b | \
                             CLASS_e | CLASS_E | CLASS_a | CLASS_d | \
 			    CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t | \
-                            CLASS_W)
+                            CLASS_W | CLASS_c)
 
 /* Values associated with patterns. Stored together with classes. */
 #define VALUE_MINVAL       0x00800000 /* pattern has a minimum value */
@@ -269,7 +269,7 @@ struct fullboard_pattern {
 
 /* helper functions */
 
-#define DECLARE(x) int x(struct pattern *pattern, int transformation, int ti, int tj, int color)
+#define DECLARE(x) int x(struct pattern *pattern, int transformation, int move, int color)
 
 DECLARE(basic_cut_helper);
 DECLARE(jump_out_helper);
@@ -287,8 +287,7 @@ int seki_helper(int str);
 void threaten_to_save_helper(int move, int str);
 void threaten_to_capture_helper(int move, int str);
 void defend_against_atari_helper(int move, int str);
-void amalgamate_most_valuable_helper(int apos, int bpos,
-				     int cpos);
+void amalgamate_most_valuable_helper(int apos, int bpos, int cpos);
 int finish_ko_helper(int apos);
 int squeeze_ko_helper(int apos);
 int backfill_helper(int apos, int bpos, int cpos);

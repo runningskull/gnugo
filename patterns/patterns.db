@@ -287,7 +287,6 @@ BO
 ; oplay_attack_either(*,A,B)
 
 
-
 Pattern CC14
 # This connection is bad shape. Should have a helper to verify
 # that it's necessary.
@@ -2376,6 +2375,26 @@ O.OX.o
 ------
 
 :8,Cd,shape(3)
+
+
+Pattern EC76
+#gf New pattern. (3.1.12)
+
+?..O?          cut!
+...OX
+.XOXX
+..*..
+-----
+
+:8,B
+
+?..b?
+..abX
+.XOXX
+..*..
+-----
+
+;alive(b) && oplay_attack(*,a,a)
 
 
 ##############################################
@@ -6298,6 +6317,7 @@ Pattern EB1710
 
 
 Pattern EB1711
+# gf Shape bonus reduced. (3.1.12)
 
 .O.X    prevent slide
 .*X.
@@ -6305,7 +6325,7 @@ Pattern EB1711
 ....
 ----
 
-:8,OXbda,shape(5)
+:8,OXbda,shape(1)
 
 
 #############################
@@ -10682,12 +10702,13 @@ bOX
 
 Pattern CD107
 # db added (3.1.8)
+# gf Added O classification. (3.1.12)
 
 xX..        good shape keima
 ..*.
 O...
 
-:8,Xade
+:8,OXade
 
 xX..        
 .a*.
@@ -10814,6 +10835,19 @@ Pattern EJ7
 ---------
 
 ;!weak(A)
+
+
+Pattern EJ7b
+#gf New pattern. (3.1.12)
+
+?????...?
+........?
+.O..O.X.o
+.....*OX.
+.........
+---------
+
+:8,de
 
 
 Pattern EJ8
@@ -12946,6 +12980,53 @@ XO.O
 > replace(a,*)
 
 
+Pattern RE2
+# gf New pattern. (3.1.12)
+# See test case niki:1 for an example.
+
+..O...	    connect solidly
+XO....
+XO*X..
+XXO...
+......
+------
+
+:8,-
+
+..O...
+XO....
+XO*X..
+XXOa..
+......
+------
+
+> replace(a,*)
+
+
+Pattern RE3
+# gf New pattern. (3.1.12)
+# Common invasion in handicap games. Attaching on top better than
+# capping. 
+
+.......
+.......
+.O.*.O.
+...X...
+.......
+.......
+-------
+
+:|,-
+
+.......
+...a...
+.O.*.O.
+...X...
+.......
+.......
+-------
+
+> replace(a,*)
 
 
 # END OF FILE

@@ -786,6 +786,7 @@ break_through_helper(int apos, int bpos, int cpos,
 
 static int aa_status[BOARDMAX]; /* ALIVE, DEAD or CRITICAL */
 static int forbidden[BOARDMAX];
+static void compute_aa_status(int color);
 static int get_aa_status(int pos);
 static int do_atari_atari(int color, int *attack_point,
 			  int *defense_point, int cpos,
@@ -796,10 +797,8 @@ static int do_atari_atari(int color, int *attack_point,
 int
 atari_atari(int color, int *move, int save_verbose)
 {
-  int m, n;
   int fpos;
   int aa_val;
-  int other = OTHER_COLOR(color);
 
   /* Collect worm statuses of opponent's worms. We need to
    * know this because we only want to report unexpected
@@ -811,61 +810,9 @@ atari_atari(int color, int *move, int save_verbose)
   if (aa_depth < 2)
     return 0;
   memset(forbidden, 0, sizeof(forbidden));
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n) == other) {
-	if (dragon[POS(m, n)].matcher_status == DEAD)
-	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[POS(m, n)].attack_codes[0] != 0) {
-	  if (worm[POS(m, n)].defend_codes[0] != 0)
-	    aa_status[POS(m, n)] = CRITICAL;
-	  else
-	    aa_status[POS(m, n)] = DEAD;
-	}
-	else
-	  aa_status[POS(m, n)] = ALIVE;
-      }
-      else
-	aa_status[POS(m, n)] = UNKNOWN;
-    }
 
-  /* reclassify a worm with 2 liberties as INSUBSTANTIAL if capturing
-   * it does not result in a live group.
-   */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) 
-      if (BOARD(m, n) == other
-	  && worm[POS(m, n)].origin == POS(m, n)
-	  && worm[POS(m, n)].liberties == 2
-	  && aa_status[POS(m, n)] == ALIVE
-	  && !owl_substantial(POS(m, n))) {
-	int ti, tj;
-	for (ti = 0; ti < board_size; ti++)
-	  for (tj = 0; tj < board_size; tj++)
-	    if (is_worm_origin(POS(ti, tj), POS(m, n)))
-	      aa_status[POS(ti, tj)] = INSUBSTANTIAL;
-      }
-
-  if (debug & DEBUG_ATARI_ATARI) {
-    gprintf("atari_atari for %C\n", color);
-    gprintf("aa_status: (ALIVE worms not listed)\n");
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	if (BOARD(m, n) == other && is_worm_origin(POS(m, n), POS(m, n))) {
-	  const char *status = "UNKNOWN (shouldn't happen)";
-	  if (aa_status[POS(m, n)] == DEAD)
-	    status = "DEAD";
-	  else if (aa_status[POS(m, n)] == CRITICAL)
-	    status = "CRITICAL";
-	  else if (aa_status[POS(m, n)] == INSUBSTANTIAL)
-	    status = "INSUBSTANTIAL";
-
-	  if (aa_status[POS(m, n)] != ALIVE)
-	    gprintf("%M: %s\n", m, n, status);
-	}
-      }
-  }
-
+  compute_aa_status(color);
+  
   aa_val = do_atari_atari(color, &fpos, NULL, NO_MOVE,
 			  save_verbose, 0);
 
@@ -899,6 +846,72 @@ atari_atari(int color, int *move, int save_verbose)
 }
 
 
+/* Helper function for computing the aa_status for a string. */
+static void
+compute_aa_status(int color)
+{
+  int other = OTHER_COLOR(color);
+  int pos;
+  /* Collect worm statuses of opponent's worms. We need to
+   * know this because we only want to report unexpected
+   * results. For example, we do not want to report success
+   * if we find we can kill a worm which is already dead.
+   * The worm status of empty points is set to UNKNOWN to signal
+   * that stones added along the way need special attention.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == other) {
+      if (dragon[pos].matcher_status == DEAD)
+	aa_status[pos] = DEAD;
+      else if (worm[pos].attack_codes[0] != 0) {
+	if (worm[pos].defend_codes[0] != 0)
+	  aa_status[pos] = CRITICAL;
+	else
+	  aa_status[pos] = DEAD;
+      }
+      else
+	aa_status[pos] = ALIVE;
+    }
+    else if(ON_BOARD(pos))
+      aa_status[pos] = UNKNOWN;
+  }
+  
+  /* reclassify a worm with 2 liberties as INSUBSTANTIAL if capturing
+   * it does not result in a live group.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == other
+	&& worm[pos].origin == pos
+	&& worm[pos].liberties == 2
+	&& aa_status[pos] == ALIVE
+	&& !owl_substantial(pos)) {
+      int pos2;
+      for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
+	if (ON_BOARD(pos2) && is_worm_origin(pos2, pos))
+	  aa_status[pos2] = INSUBSTANTIAL;
+    }
+  }
+    
+  if (debug & DEBUG_ATARI_ATARI) {
+    gprintf("compute_aa_status() for %C\n", color);
+    gprintf("aa_status: (ALIVE worms not listed)\n");
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (board[pos] == other && is_worm_origin(pos, pos)) {
+	const char *status = "UNKNOWN (shouldn't happen)";
+	if (aa_status[pos] == DEAD)
+	  status = "DEAD";
+	else if (aa_status[pos] == CRITICAL)
+	  status = "CRITICAL";
+	else if (aa_status[pos] == INSUBSTANTIAL)
+	  status = "INSUBSTANTIAL";
+	
+	if (aa_status[pos] != ALIVE)
+	  gprintf("%1M: %s\n", pos, status);
+      }
+    }
+  }
+}
+
 /* Helper function for retrieving the aa_status for a string. We can't
  * reliably do this simply by looking up aa_status[m][n] since this is
  * only valid at vertices which were non-empty at the start of the
@@ -928,7 +941,7 @@ get_aa_status(int pos)
  * opponent worms involved in the combination, and (last_friendly) is
  * the location of the last friendly move played. Moves marked
  * with the forbidden array are not tried. If no move is found,
- * the values of *i and *j are not changed.
+ * the values of *attack_point and *defense_point are not changed.
  *
  * If not NULL, *attack_point is left pointing to the location of the
  * attacking move, and *defense_point points to a move defending the
@@ -954,7 +967,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
 	if (forbidden[POS(m, n)])
-	  gprintf("%o%m ", m, n);
+	  gprintf("%o%1m ", POS(m, n));
       }
     gprintf("\n");
   }
@@ -969,7 +982,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	int pos = POS(m, n);
 	int apos;
 
-	if (BOARD(m, n) != other)
+	if (board[pos] != other)
 	  continue;
 
 	if (pos != find_origin(pos))
@@ -978,16 +991,22 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	if (minsize > 0 && countstones(pos) < minsize)
 	  continue;
 
-	if (get_aa_status(pos) != ALIVE
-	    || !adjacent_strings(last_friendly, pos))
+	if (get_aa_status(pos) != ALIVE)
+	  continue;
+
+	if (board[last_friendly] != EMPTY
+	    && !adjacent_strings(last_friendly, pos))
+	  continue;
+
+	if (board[last_friendly] == EMPTY
+	    && !liberty_of_string(last_friendly, pos))
 	  continue;
 	
 	if (debug & DEBUG_ATARI_ATARI)
-	  gprintf("Considering attack of %m. depth = %d.\n", m, n, depth);
+	  gprintf("Considering attack of %1m. depth = %d.\n", pos, depth);
 	if (attack(pos, &apos)) {
 	  if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
-	    gprintf("%oThe worm %m can be attacked at %1m after ", m, n,
-		    apos);
+	    gprintf("%oThe worm %1m can be attacked at %1m after ", pos, apos);
 	    dump_stack();
 	  }	  
 	  if (attack_point) *attack_point = apos;
@@ -1009,8 +1028,8 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	    }
 	  }
 
-	  DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
-		countstones(pos), m, n);
+	  DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n",
+		countstones(pos), pos);
 	  return countstones(pos);
 	}
       }
@@ -1024,23 +1043,24 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
+      int pos = POS(m, n);
       int libs[2];
       int status;
 
-      if (BOARD(m, n) != other) 
+      if (board[pos] != other) 
 	continue;
 
-      if (POS(m, n) != find_origin(POS(m, n)))
+      if (pos != find_origin(pos))
 	continue;
       
-      if (minsize > 0 && countstones(POS(m, n)) < minsize)
+      if (minsize > 0 && countstones(pos) < minsize)
 	continue;
 
-      status = get_aa_status(POS(m, n));
+      status = get_aa_status(pos);
       if (status != ALIVE)
 	continue;
 
-      if (findlib(POS(m, n), 2, libs) != 2)
+      if (findlib(pos, 2, libs) != 2)
 	continue;
 
       for (k = 0; k < 2; k++) {
@@ -1048,8 +1068,9 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	int bpos;
 
 	if (!forbidden[apos]
-	    && accurate_approxlib(apos, color, 2, NULL) > 1) {
-	  if (trymove(apos, color, "do_atari_atari-A", POS(m, n),
+	    && (accurate_approxlib(apos, color, 2, NULL) > 1
+		|| safe_move(apos, color))) {
+	  if (trymove(apos, color, "do_atari_atari-A", pos,
 		       EMPTY, NO_MOVE)) {
 	    /* try to defend the stone (m,n) which is in atari */
 	    int aa_val = 0;
@@ -1063,8 +1084,8 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	     * On the other hand, if there is no defense we have
 	     * already been successful.
 	     */
-	    if (find_defense(POS(m, n), &bpos)
-		&& trymove(bpos, other, "do_atari_atari-B", POS(m, n),
+	    if (find_defense(pos, &bpos)
+		&& trymove(bpos, other, "do_atari_atari-B", pos,
 			    EMPTY, NO_MOVE)) {
 	      /* These moves may have been irrelevant for later
                * reading, so in order to avoid horizon problems, we
@@ -1087,12 +1108,12 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 		dump_stack();
 	      }	  
 	      if (attack_point) *attack_point = apos;
-	      if (defense_point && !find_defense(POS(m, n), defense_point))
+	      if (defense_point && !find_defense(pos, defense_point))
 		*defense_point = NO_MOVE;
 	      
 	      DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
-		    countstones(POS(m, n)), m, n);
-	      return countstones(POS(m, n));
+		    countstones(pos), m, n);
+	      return countstones(pos);
 	    }
 
 	    if (aa_val) {
@@ -1100,11 +1121,11 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	       * must check there is not a better defense.
 	       */
 	      int cpos;
-	      int res = restricted_defend1(POS(m, n), &cpos, EMPTY, 0, 
+	      int res = restricted_defend1(pos, &cpos, EMPTY, 0, 
 					   1, &bpos);
 	      if (res) {
 		if (trymove(cpos, other, "do_atari_atari-C", 
-			     POS(m, n), EMPTY, NO_MOVE)) {
+			     pos, EMPTY, NO_MOVE)) {
 		  increase_depth_values();
 		  increase_depth_values();
 		  if (!do_atari_atari(color, NULL, defense_point,
@@ -1120,8 +1141,8 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 		popgo();
 		DEBUG(DEBUG_ATARI_ATARI, 
 		      "%oreturn value:%d (min %d, %d (%m))\n",
-		      gg_min(aa_val, countstones(POS(m, n))), aa_val,
-		      countstones(POS(m, n)), m, n);
+		      gg_min(aa_val, countstones(pos)), aa_val,
+		      countstones(pos), m, n);
 		/* If no defense point is known and (ai,aj) is a safe
 		 * move for other, it probably defends the combination.
 		 */
@@ -1130,7 +1151,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 		    && safe_move(apos, other)) {
 		  *defense_point = apos;
 		}
-		return gg_min(aa_val, countstones(POS(m, n)));
+		return gg_min(aa_val, countstones(pos));
 	      }
 	    }
 	    popgo();
@@ -1152,7 +1173,6 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 int
 atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
 {
-  int m, n;
   int fpos;
   int defense_point, after_defense_point;
   int aa_val, after_aa_val;
@@ -1164,68 +1184,9 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
   if (aa_depth < 2)
     return 1;
 
-  /* Collect worm statuses of opponent's worms. We need to
-   * know this because we only want to report unexpected
-   * results. For example, we do not want to report success
-   * if we find we can kill a worm which is already dead.
-   * The worm status of empty points is set to UNKNOWN to signal
-   * that stones added along the way need special attention.
-   */
   memset(forbidden, 0, sizeof(forbidden));
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n) == color) {
-	if (dragon[POS(m, n)].matcher_status == DEAD)
-	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[POS(m, n)].attack_codes[0] != 0) {
-	  if (worm[POS(m, n)].defend_codes[0] != 0)
-	    aa_status[POS(m, n)] = CRITICAL;
-	  else
-	    aa_status[POS(m, n)] = DEAD;
-	}
-	else
-	  aa_status[POS(m, n)] = ALIVE;
-      }
-      else
-	aa_status[POS(m, n)] = UNKNOWN;
-    }
-  
-  /* reclassify a worm with 2 liberties as INSUBSTANTIAL if capturing
-   * it does not result in a live group.
-   */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) 
-      if (BOARD(m, n) == color
-	  && worm[POS(m, n)].origin == POS(m, n)
-	  && worm[POS(m, n)].liberties == 2
-	  && aa_status[POS(m, n)] == ALIVE
-	  && !owl_substantial(POS(m, n))) {
-	int ui, uj;
-	for (ui = 0; ui < board_size; ui++)
-	  for (uj = 0; uj < board_size; uj++)
-	    if (is_worm_origin(POS(ui, uj), POS(m, n)))
-	      aa_status[POS(ui, uj)] = INSUBSTANTIAL;
-      }
 
-  if (debug & DEBUG_ATARI_ATARI) {
-    gprintf("atari_atari for %C\n", other);
-    gprintf("aa_status: (ALIVE worms not listed)\n");
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	if (BOARD(m, n) == color && is_worm_origin(POS(m, n), POS(m, n))) {
-	  const char *status = "UNKNOWN (shouldn't happen)";
-	  if (aa_status[POS(m, n)] == DEAD)
-	    status = "DEAD";
-	  else if (aa_status[POS(m, n)] == CRITICAL)
-	    status = "CRITICAL";
-	  else if (aa_status[POS(m, n)] == INSUBSTANTIAL)
-	    status = "INSUBSTANTIAL";
-	  
-	  if (aa_status[POS(m, n)] != ALIVE)
-	    gprintf("%M: %s\n", m, n, status);
-	}
-      }
-  }
+  compute_aa_status(other);
   
   /* Accept illegal ko capture here. */
   if (!tryko(tpos, color, NULL, EMPTY, NO_MOVE))
@@ -1291,7 +1252,6 @@ atari_atari_try_combination(int color, int apos, int bpos)
 {
   int other = OTHER_COLOR(color);
   int aa_val = 0;
-  int m, n;
   int save_verbose = verbose;
 
   if (aa_depth < 2)
@@ -1299,42 +1259,8 @@ atari_atari_try_combination(int color, int apos, int bpos)
   if (verbose > 0)
     verbose--;
   memset(forbidden, 0, sizeof(forbidden));
-      
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n) == other) {
-	if (dragon[POS(m, n)].matcher_status == DEAD)
-	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[POS(m, n)].attack_codes[0] != 0) {
-	  if (worm[POS(m, n)].defend_codes[0] != 0)
-	    aa_status[POS(m, n)] = CRITICAL;
-	  else
-	    aa_status[POS(m, n)] = DEAD;
 
-	}
-	else
-	  aa_status[POS(m, n)] = ALIVE;
-      }
-      else
-	aa_status[POS(m, n)] = UNKNOWN;
-    }
-
-  /* reclassify a worm with 2 liberties as INSUBSTANTIAL if capturing
-   * it does not result in a live group.
-   */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) 
-      if (BOARD(m, n) == other
-	  && worm[POS(m, n)].origin == POS(m, n)
-	  && worm[POS(m, n)].liberties == 2
-	  && aa_status[POS(m, n)] == ALIVE
-	  && !owl_substantial(POS(m, n))) {
-	int ti, tj;
-	for (ti = 0; ti < board_size; ti++)
-	  for (tj = 0; tj < board_size; tj++)
-	    if (is_worm_origin(POS(ti, tj), POS(m, n)))
-	      aa_status[POS(ti, tj)] = INSUBSTANTIAL;
-      }
+  compute_aa_status(color);
 
   if (trymove(apos, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
     if (trymove(bpos, other, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
@@ -5377,10 +5303,10 @@ order_moves(int str, int num_moves, int *moves, int *scores, int color,
        *    Only applicable if the move is adjacent to the group.
        */
       
-      int libs = approxlib(move, color, 5, NULL);
+      int libs = approxlib(move, color, 10, NULL);
       if (number_same_string > 0) {
 	if (libs > 5 || (libs == 4 && stackp > fourlib_depth))
-	  scores[r] += defend_lib_score[5];
+	  scores[r] += defend_lib_score[5] + (libs - 4);
 	else
 	  scores[r] += defend_lib_score[libs];
       }

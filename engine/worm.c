@@ -1452,18 +1452,23 @@ void worm_reasons(int color)
     if (board[pos] == OTHER_COLOR(color)) {
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (worm[pos].attack_codes[k] != 0)
-	  add_attack_move(worm[pos].attack_points[k], pos);
+	  add_attack_move(worm[pos].attack_points[k], pos,
+			  worm[pos].attack_codes[k]);
 	if (worm[pos].attack_threat_codes[k] != 0)
-	  add_attack_threat_move(worm[pos].attack_threat_points[k], pos);
+	  add_attack_threat_move(worm[pos].attack_threat_points[k], pos,
+				 worm[pos].attack_threat_codes[k]);
       }
     }
       
     if (board[pos] == color) {
       for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
 	if (worm[pos].defend_codes[k] != 0)
-	  add_defense_move(worm[pos].defense_points[k], pos);
+	  add_defense_move(worm[pos].defense_points[k], pos,
+			   worm[pos].defend_codes[k]);
+
 	if (worm[pos].defense_threat_codes[k] != 0)
-	  add_defense_threat_move(worm[pos].defense_threat_points[k], pos);
+	  add_defense_threat_move(worm[pos].defense_threat_points[k], pos,
+				  worm[pos].defense_threat_codes[k]);
       }
     }
   }
@@ -1772,7 +1777,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, ti, tj, color, 0))
+    if (!pattern->autohelper(pattern, ll, move, color, 0))
       return;
   }
 
@@ -1780,7 +1785,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * be rejected.
    */
   if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, ti, tj, color)) {
+    if (!pattern->helper(pattern, ll, move, color)) {
       DEBUG(DEBUG_WORMS,
 	    "Attack pattern %s+%d rejected by helper at %1m\n",
 	    pattern->name, ll, move);
@@ -1868,7 +1873,7 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, ti, tj, color, 0))
+    if (!pattern->autohelper(pattern, ll, move, color, 0))
       return;
   }
 
@@ -1876,7 +1881,7 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * be rejected.
    */
   if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, ti, tj, color)) {
+    if (!pattern->helper(pattern, ll, move, color)) {
       DEBUG(DEBUG_WORMS,
 	    "Defense pattern %s+%d rejected by helper at %1m\n",
 	    pattern->name, ll, move);

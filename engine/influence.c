@@ -43,6 +43,7 @@ static void print_influence_areas(struct influence_data *q);
  * some move.
  */
 static struct influence_data initial_influence;
+static struct influence_data initial_opposite_influence;
 
 /* Influence computed after some move has been made. */
 static struct influence_data move_influence;
@@ -225,7 +226,7 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
 	}
 	
 	/* Finally direction dependent damping. */
-	if (i==m && j==n)
+	if (i == m && j == n)
 	  cos2phi = 1.0;
 	else {
 	  float a = di*(i-m) + dj*(j-n);
@@ -259,21 +260,21 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
       }
     }
 #else
-    if (i>0)
+    if (i > 0)
       code1(-1, 0, i-1, j, 0);
-    if (i<board_size-1)
+    if (i < board_size-1)
       code1( 1, 0, i+1, j, 0);
-    if (j>0)
+    if (j > 0)
       code1( 0,-1, i, j-1, 0);
-    if (j<board_size-1)
+    if (j < board_size-1)
       code1( 0, 1, i, j+1, 0);
-    if (i>0 && j>0)
+    if (i > 0 && j > 0)
       code1(-1,-1, i-1, j-1, 1);
-    if (i<board_size-1 && j>0)
+    if (i < board_size-1 && j > 0)
       code1( 1,-1, i+1, j-1, 1);
-    if (i<board_size-1 && j<board_size-1)
+    if (i < board_size-1 && j < board_size-1)
       code1( 1, 1, i+1, j+1, 1);
-    if (i>0 && j<board_size-1)
+    if (i > 0 && j < board_size-1)
       code1(-1, 1, i-1, j+1, 1);
  
 #endif
@@ -289,11 +290,13 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
     j = q->queuej[k];
 
     if (color == WHITE) {
-      if (q->w[i][j] > 1.01 * INFLUENCE_CUTOFF || q->white_influence[i][j] == 0.0)
+      if (q->w[i][j] > 1.01 * INFLUENCE_CUTOFF
+	  || q->white_influence[i][j] == 0.0)
 	q->white_influence[i][j] += q->w[i][j];
     }
     else {
-      if (q->w[i][j] > 1.01 * INFLUENCE_CUTOFF || q->black_influence[i][j] == 0.0)
+      if (q->w[i][j] > 1.01 * INFLUENCE_CUTOFF
+	  || q->black_influence[i][j] == 0.0)
 	q->black_influence[i][j] += q->w[i][j];
     }
     
@@ -534,7 +537,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, ti, tj, color, 0))
+    if (!pattern->autohelper(pattern, ll, POS(ti, tj), color, 0))
       return;
   }
 
@@ -542,16 +545,16 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * be rejected.
    */
   if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, ti, tj, color)) {
+    if (!pattern->helper(pattern, ll, POS(ti, tj), color)) {
       DEBUG(DEBUG_INFLUENCE,
-	    "Influence pattern %s+%d rejected by helper at %m\n",
-	    pattern->name, ll, ti, tj);
+	    "Influence pattern %s+%d rejected by helper at %1m\n",
+	    pattern->name, ll, POS(ti, tj));
       return;
     }
   }
 
-  DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %m\n",
-	pattern->name, ll, m, n);
+  DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
+	pattern->name, ll, POS(m, n));
 
   /* For I patterns, add a low intensity, both colored, influence
    * source at *.
@@ -961,25 +964,30 @@ segment_influence(struct influence_data *q)
   segment_region(q, whose_area,      IS_AREA,      q->area_segmentation);
 }
 
-/* Return the size of the moyo around (m, n). If initial is 1, the
- * initial influence is used, otherwise the last computed move
- * influence.
+/* Return the size of the moyo around (m, n).
  */
 int
-influence_get_moyo_size(int pos, int color, int initial)
+influence_get_moyo_size(int pos, int color)
 {
+  int result1 = 0;
+  int result2 = 0;
   struct influence_data *q;
-  if (initial)
-    q = &initial_influence;
-  else
-    q = &move_influence;
+
+  q = &initial_influence;
 
   /* Does the color match. */
   if ((q->region_type[q->moyo_segmentation[I(pos)][J(pos)]] == WHITE_MOYO)
       ^ (color == BLACK))
-    return q->region_size[q->moyo_segmentation[I(pos)][J(pos)]];
+    result1 = q->region_size[q->moyo_segmentation[I(pos)][J(pos)]];
 
-  return 0;
+  q = &initial_opposite_influence;
+
+  /* Does the color match. */
+  if ((q->region_type[q->moyo_segmentation[I(pos)][J(pos)]] == WHITE_MOYO)
+      ^ (color == BLACK))
+    result2 = q->region_size[q->moyo_segmentation[I(pos)][J(pos)]];
+
+  return gg_min(result1, result2);
 }
 
 /* Compute the influence before a move has been made, which can
@@ -991,6 +999,8 @@ compute_initial_influence(int color, int dragons_known)
 {
   int i, j;
   compute_influence(&initial_influence, OTHER_COLOR(color), -1, -1,
+		    dragons_known, NULL, NULL);
+  compute_influence(&initial_opposite_influence, color, -1, -1,
 		    dragons_known, NULL, NULL);
   /* Invalidate information in move_influence. */
   influence_movei = -1;
@@ -1007,6 +1017,7 @@ void
 resegment_initial_influence()
 {
   segment_influence(&initial_influence);
+  segment_influence(&initial_opposite_influence);
 }
 
 /* Let color play at (m, n) and compute the influence after this move,
@@ -1368,29 +1379,29 @@ debug_influence_move(int i, int j)
 /* Copy and encode influence data. */
 static void
 retrieve_influence(struct influence_data *q,
-		   float white_influence[MAX_BOARD][MAX_BOARD],
-		   float black_influence[MAX_BOARD][MAX_BOARD],
-		   int influence_regions[MAX_BOARD][MAX_BOARD])
+		   float white_influence[BOARDMAX],
+		   float black_influence[BOARDMAX],
+		   int influence_regions[BOARDMAX])
 {
   int m, n;
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      white_influence[m][n] = q->white_influence[m][n];
-      black_influence[m][n] = q->black_influence[m][n];
+      white_influence[POS(m, n)] = q->white_influence[m][n];
+      black_influence[POS(m, n)] = q->black_influence[m][n];
       if (whose_territory(q, m, n) == WHITE)
-	influence_regions[m][n] = 3;
+	influence_regions[POS(m, n)] = 3;
       else if (whose_territory(q, m, n) == BLACK)
-	influence_regions[m][n] = -3;
+	influence_regions[POS(m, n)] = -3;
       else if (whose_moyo(q, m, n) == WHITE)
-	influence_regions[m][n] = 2;
+	influence_regions[POS(m, n)] = 2;
       else if (whose_moyo(q, m, n) == BLACK)
-	influence_regions[m][n] = -2;
+	influence_regions[POS(m, n)] = -2;
       else if (whose_area(q, m, n) == WHITE)
-	influence_regions[m][n] = 1;
+	influence_regions[POS(m, n)] = 1;
       else if (whose_area(q, m, n) == BLACK)
-	influence_regions[m][n] = -1;
+	influence_regions[POS(m, n)] = -1;
       else
-	influence_regions[m][n] = 0;
+	influence_regions[POS(m, n)] = 0;
     }
 }
   
@@ -1399,9 +1410,9 @@ retrieve_influence(struct influence_data *q,
  */
 void
 get_initial_influence(int color, int dragons_known,
-		      float white_influence[MAX_BOARD][MAX_BOARD],
-		      float black_influence[MAX_BOARD][MAX_BOARD],
-		      int influence_regions[MAX_BOARD][MAX_BOARD])
+		      float white_influence[BOARDMAX],
+		      float black_influence[BOARDMAX],
+		      int influence_regions[BOARDMAX])
 {
   compute_initial_influence(color, dragons_known);
   retrieve_influence(&initial_influence, white_influence,
@@ -1411,13 +1422,13 @@ get_initial_influence(int color, int dragons_known,
 /* Compute influence after a move and export it.
  */
 void
-get_move_influence(int i, int j, int color,
+get_move_influence(int move, int color,
 		   char saved_stones[BOARDMAX],
-		   float white_influence[MAX_BOARD][MAX_BOARD],
-		   float black_influence[MAX_BOARD][MAX_BOARD],
-		   int influence_regions[MAX_BOARD][MAX_BOARD])
+		   float white_influence[BOARDMAX],
+		   float black_influence[BOARDMAX],
+		   int influence_regions[BOARDMAX])
 {
-  compute_move_influence(i, j, color, saved_stones);
+  compute_move_influence(I(move), J(move), color, saved_stones);
   retrieve_influence(&move_influence, white_influence,
 		     black_influence, influence_regions);
 }

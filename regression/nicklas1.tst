@@ -270,6 +270,7 @@ loadsgf games/nicklas/nicklas16.sgf 28
 1602 gg_genmove black
 #? [!H8]
 
+# Missed connection. See also connection:26,27
 loadsgf games/nicklas/nicklas16.sgf 38
 1603 gg_genmove black
 #? [B4]
@@ -285,6 +286,7 @@ loadsgf games/nicklas/nicklas16.sgf 64
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=No reason to give W a chance for ko here.
 #SEVERITY=6
+#The problem with D5 is the same as in nicklas2:1802
 loadsgf games/nicklas/nicklas18.sgf 15
 1801 gg_genmove black
 #? [D2]*

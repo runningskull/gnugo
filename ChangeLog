@@ -2,6 +2,27 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new fields owl_attack_code and owl_defense_code in struct dragon_data
+- revised definition of WEAK and WEAKLY_ALIVE dragons in make_dragons()
+- revised computation of size of surrounding moyo for a dragon
+- 1D revisions
+- add_attack_move() and related functions also take the result code as
+  parameter 
+- new move reasons ATTACK_MOVE_GOOD_KO, ATTACK_MOVE_BAD_KO, and so on
+- move valuation distinguishes between attacks, defenses, owl attacks
+  and owl defenses with or without ko
+- connection moves tested whether they work as owl defenses when
+  connecting an owl critical dragon to something else
+- revised valuation of threats and strategical attacks
+- compute_eyes_pessimistic() revised
+- owl_determine_life() revised
+- new static function compute_aa_status() broken out of three
+  atari_atari functions
+- tuning
+- connection tuning
+- owl tuning
+- joseki tuning
+- new and revised regression tests
 - new reorientation test suites
 - remove rot* subdirs from EXTRA_DIST
 - bugfix in score.c (typo from 1D conversion)

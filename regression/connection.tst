@@ -77,6 +77,29 @@ loadsgf games/nicklas/nicklas12.sgf 69
 20 connect K17 N17
 #? [1 K18]*
 
+loadsgf games/trevor/trevor_09.sgf
+21 connect D4 G5
+#? [1 (E5|D5|C5|C6|E6|C7|D7|E7)]*
+22 disconnect D4 G5
+#? [1 (E5|D5|E6|F6)]*
+
+loadsgf games/incident169.sgf 110
+23 connect K17 N16
+#? [1 (M17|L16)]*
+24 disconnect L15 L17
+#? [1 (M17|L16)]
+25 disconnect L14 M12
+#? [1 L13]
+
+loadsgf games/nicklas/nicklas16.sgf 38
+26 connect C3 C6
+#? [1 B4]*
+27 connect C3 B7
+#? [1 B4]*
+
+loadsgf games/golife.sgf 38
+28 disconnect H5 H7
+#? [0]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

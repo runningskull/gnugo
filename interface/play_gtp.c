@@ -43,9 +43,9 @@ static int report_uncertainty = 0;
 static int gtp_orientation = 0;
 
 static void
-print_influence(float white_influence[MAX_BOARD][MAX_BOARD],
-		float black_influence[MAX_BOARD][MAX_BOARD],
-		int influence_regions[MAX_BOARD][MAX_BOARD]);
+print_influence(float white_influence[BOARDMAX],
+		float black_influence[BOARDMAX],
+		int influence_regions[BOARDMAX]);
 static void gtp_print_code(int c);
 static void gtp_print_vertices2(int n, int *moves);
 static void rotate_on_input(int ai, int aj, int *bi, int *bj);
@@ -1933,9 +1933,9 @@ gtp_influence(char *s, int id)
   int save_debug     = debug;
   int save_printmoyo = printmoyo;
   int color;
-  float white_influence[MAX_BOARD][MAX_BOARD];
-  float black_influence[MAX_BOARD][MAX_BOARD];
-  int influence_regions[MAX_BOARD][MAX_BOARD];
+  float white_influence[BOARDMAX];
+  float black_influence[BOARDMAX];
+  int influence_regions[BOARDMAX];
 
 
   
@@ -1960,15 +1960,15 @@ gtp_influence(char *s, int id)
 }
 
 static void
-print_influence(float white_influence[MAX_BOARD][MAX_BOARD],
-		float black_influence[MAX_BOARD][MAX_BOARD],
-		int influence_regions[MAX_BOARD][MAX_BOARD])
+print_influence(float white_influence[BOARDMAX],
+		float black_influence[BOARDMAX],
+		int influence_regions[BOARDMAX])
 {
   int m, n;
   gtp_printf("white:\n");
   for (m = 0; m < board_size; m++) {
     for (n = 0; n < board_size; n++) {
-      gtp_printf("%6.2f ", white_influence[m][n]);
+      gtp_printf("%6.2f ", white_influence[POS(m, n)]);
     }
     gtp_printf("\n");
   }
@@ -1976,7 +1976,7 @@ print_influence(float white_influence[MAX_BOARD][MAX_BOARD],
   gtp_printf("black:\n");
   for (m = 0; m < board_size; m++) {
     for (n = 0; n < board_size; n++) {
-      gtp_printf("%6.2f ", black_influence[m][n]);
+      gtp_printf("%6.2f ", black_influence[POS(m, n)]);
     }
     gtp_printf("\n");
   }
@@ -1984,7 +1984,7 @@ print_influence(float white_influence[MAX_BOARD][MAX_BOARD],
   gtp_printf("regions:\n");
   for (m = 0; m < board_size; m++) {
     for (n = 0; n < board_size; n++) {
-      gtp_printf("%2d ", influence_regions[m][n]);
+      gtp_printf("%2d ", influence_regions[POS(m, n)]);
     }
     gtp_printf("\n");
   }
@@ -2005,9 +2005,9 @@ gtp_move_influence(char *s, int id)
   int color;
   int i, j;
   char saved_stones[BOARDMAX];
-  float white_influence[MAX_BOARD][MAX_BOARD];
-  float black_influence[MAX_BOARD][MAX_BOARD];
-  int influence_regions[MAX_BOARD][MAX_BOARD];
+  float white_influence[BOARDMAX];
+  float black_influence[BOARDMAX];
+  int influence_regions[BOARDMAX];
 
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure(id, "invalid color or coordinate");
@@ -2023,7 +2023,7 @@ gtp_move_influence(char *s, int id)
   find_stones_saved_by_move(POS(i, j), color, saved_stones);
   
   gtp_printid(id, GTP_SUCCESS);
-  get_move_influence(i, j, color, saved_stones, white_influence,
+  get_move_influence(POS(i, j), color, saved_stones, white_influence,
 		     black_influence, influence_regions);
   print_influence(white_influence, black_influence, influence_regions);
   /* We already have one newline and thus can't use gtp_finish_response(). */

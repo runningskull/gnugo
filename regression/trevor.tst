@@ -110,7 +110,7 @@ loadsgf games/trevor/trevor_08.sgf 24
 #E5 (or some defence of D4 worm) is necessary.
 #Dan: This should be solved by a reading connection
 #analyzer. Tristan Cazenave is working on such a project.
-#This test should be moved to connections.tst.
+#See also connection:21,22.
 #CATEGORY=DYNAMIC_CONNECTION
 loadsgf games/trevor/trevor_09.sgf
 9 gg_genmove white
@@ -208,7 +208,7 @@ loadsgf games/trevor/trevor_20.sgf
 # Black really does pass here, but eval.sh reports a PASSED result. (?)
 loadsgf games/trevor/trevor_20.sgf
 202 gg_genmove black
-#? [!PASS]* 
+#? [!PASS]
 
 # Huge negative sacrifice at D8.
 loadsgf games/trevor/trevor_21.sgf 22

@@ -73,7 +73,10 @@ loadsgf games/incident169.sgf 60
 #? [B13|C13|C12|E14|D14]
 
 # incident 173 (from the disastrous Indigo game)
-# FIXME: Maybe some capping or fencing in move would be ok as well.
+# M17 connects on the edge. L16 does too but allows black to get
+# somewhat stronger. L13 is not completely out of the question since
+# it successfully cuts black. It might be a little too early though.
+# Also see connection:23-25.
 loadsgf games/incident169.sgf 110
 65 gg_genmove white
 #? [M17]
@@ -110,6 +113,7 @@ loadsgf games/strategy18.sgf
 71 gg_genmove black
 #? [E6]
 
+# Semeai problem.
 loadsgf games/strategy19.sgf 94
 72 gg_genmove white
 #? [A8]
@@ -151,6 +155,8 @@ loadsgf games/strategy22.sgf
 80 gg_genmove white
 #? [P4|Q4|Q3]
 
+# Looks to me like B12 is also effective, although much more
+# complicated. /gf
 loadsgf games/strategy23.sgf
 81 gg_genmove white
 #? [E13|D13]

@@ -79,8 +79,10 @@ make_dragons(int color, int stop_before_owl)
       dragon[ii].color              = worm[ii].color;
       dragon[ii].origin             = worm[ii].origin;
       dragon[ii].owl_attack_point   = NO_MOVE;
+      dragon[ii].owl_attack_code    = 0;
       dragon[ii].owl_attack_certain =  1;
       dragon[ii].owl_defense_point  = NO_MOVE;
+      dragon[ii].owl_defense_code   = 0;
       dragon[ii].owl_defend_certain =  1;
       dragon[ii].owl_status         = UNCHECKED;
       dragon[ii].status             = UNKNOWN;
@@ -363,7 +365,7 @@ make_dragons(int color, int stop_before_owl)
   /* Compute the surrounding moyo sizes. */
   for (d = 0; d < number_of_dragons; d++) {
     dragon2[d].moyo = influence_get_moyo_size(dragon2[d].origin,
-					      DRAGON(d).color, 1);
+					      DRAGON(d).color);
   }
   time_report(2, "  influence_get_moyo_size", -1, -1, 1.0);
 
@@ -427,34 +429,42 @@ make_dragons(int color, int stop_before_owl)
 	dragon[ii].owl_second_defense_point = NO_MOVE;
       }
       else {
+	int acode = 0;
+	int dcode = 0;
 	start_timer(3);
-	if (owl_attack(ii, &attack_point, &dragon[ii].owl_attack_certain)) {
+	acode = owl_attack(ii, &attack_point, &dragon[ii].owl_attack_certain);
+	if (acode != 0) {
 	  dragon[ii].owl_attack_point = attack_point;
-	  if (attack_point != NO_MOVE
-	      && owl_defend(ii, &defense_point, 
-			    &dragon[ii].owl_defend_certain)) {
-	    if (defense_point != NO_MOVE) {
-	      dragon[ii].owl_status = CRITICAL;
-	      dragon[ii].owl_defense_point = defense_point;
-	    }
-	    else {
-	      /* Due to irregularities in the owl code, it may
-	       * occasionally happen that a dragon is found to be
-	       * attackable but also alive as it stands. In this case
-	       * we still choose to say that the owl_status is
-	       * CRITICAL, although we don't have any defense move to
-	       * propose. Having the status right is important e.g.
-	       * for connection moves to be properly valued.
-	       */
-	      dragon[ii].owl_status = CRITICAL;
-	      DEBUG(DEBUG_OWL_PERFORMANCE,
-		    "Inconsistent owl attack and defense results for %1m.\n", 
-		    ii);
+	  dragon[ii].owl_attack_code = acode;
+	  if (attack_point != NO_MOVE) {
+	    dcode = owl_defend(ii, &defense_point,
+			       &dragon[ii].owl_defend_certain);
+	    if (dcode != 0) {
+	      if (defense_point != NO_MOVE) {
+		dragon[ii].owl_status = CRITICAL;
+		dragon[ii].owl_defense_point = defense_point;
+		dragon[ii].owl_defense_code = dcode;
+	      }
+	      else {
+		/* Due to irregularities in the owl code, it may
+		 * occasionally happen that a dragon is found to be
+		 * attackable but also alive as it stands. In this case
+		 * we still choose to say that the owl_status is
+		 * CRITICAL, although we don't have any defense move to
+		 * propose. Having the status right is important e.g.
+		 * for connection moves to be properly valued.
+		 */
+		dragon[ii].owl_status = CRITICAL;
+		DEBUG(DEBUG_OWL_PERFORMANCE,
+		      "Inconsistent owl attack and defense results for %1m.\n", 
+		      ii);
+	      }
 	    }
 	  }
-	  else {
+	  if (dcode == 0) {
 	    dragon[ii].owl_status = DEAD; 
 	    dragon[ii].owl_defense_point = NO_MOVE;
+	    dragon[ii].owl_defense_code = 0;
 	    if (level >= 8
 		&& !disable_threat_computation) {
 	      if (owl_threaten_defense(ii, &defense_point,
@@ -469,15 +479,19 @@ make_dragons(int color, int stop_before_owl)
 	  }
 	}
 	else {
-	  if (!dragon[ii].owl_attack_certain
-	      && owl_defend(ii, &defense_point, 
-			    &dragon[ii].owl_defend_certain)) {
-	    /* If the result of owl_attack was not certain, we may
-	     * still want the result of owl_defend */
-	    dragon[ii].owl_defense_point = defense_point;
+	  if (!dragon[ii].owl_attack_certain) {
+	    dcode = owl_defend(ii, &defense_point, 
+			       &dragon[ii].owl_defend_certain);
+	    if (dcode != 0) {
+	      /* If the result of owl_attack was not certain, we may
+	       * still want the result of owl_defend */
+	      dragon[ii].owl_defense_point = defense_point;
+	      dragon[ii].owl_defense_code = dcode;
+	    }
 	  }
 	  dragon[ii].owl_status = ALIVE;
 	  dragon[ii].owl_attack_point = NO_MOVE;
+	  dragon[ii].owl_attack_code = 0;
 	  if (level >= 8
 	      && !disable_threat_computation) {
 	    if (owl_threaten_attack(ii, &attack_point, &second_attack_point)) {
@@ -564,7 +578,8 @@ make_dragons(int color, int stop_before_owl)
       dragon2[d].safety = INVINCIBLE;
     else if (true_genus >= 6 || dragon2[d].moyo > 20)
       dragon2[d].safety = STRONGLY_ALIVE;
-    else if ((2 * true_genus + dragon2[d].moyo < 8
+    else if ((2 * true_genus + dragon2[d].moyo
+	      + 2 * (dragon2[d].lunch != NO_MOVE) < 8
 	      && dragon2[d].escape_route < 10)
 	     || (dragon[origin].owl_threat_status == CAN_THREATEN_ATTACK)) {
       if (DRAGON(d).owl_attack_certain)
@@ -1064,10 +1079,10 @@ show_dragons(void)
 		  safety_names[d2->safety]);
 	  gprintf(", owl status %s\n", snames[d->owl_status]);
 	  if (d->owl_status == CRITICAL) {
-	    gprintf("... owl attackable at %1m\n",
-		    d->owl_attack_point);
-	    gprintf("... owl defendable at %1m\n",
-		    d->owl_defense_point);
+	    gprintf("... owl attackable at %1m, code %d\n",
+		    d->owl_attack_point, d->owl_attack_code);
+	    gprintf("... owl defendable at %1m, code %d\n",
+		    d->owl_defense_point, d->owl_defense_code);
 	  }
 	  gprintf("... neighbors");
 	  for (k = 0; k < d2->neighbors; k++) {
@@ -1263,8 +1278,8 @@ compute_dragon_status(int pos)
  * stones or the border). Let a DISTANCE N INTERSECTION be an
  * intersection connected to a dragon by a path of length N, but by no
  * shorter path. The connection of the path to the dragon may either
- * be by direct adjacency or diagonally if both adjoining
- * intersections are empty.
+ * be by direct adjacency or, in the first step, diagonally if both
+ * adjoining intersections are empty.
  *
  * It is assumed that each intersection has an escape value, which
  * would typically depend on influence and (preliminary) dragon
@@ -1613,7 +1628,8 @@ report_dragon(int m, int n)
 	  status_to_string(d->owl_threat_status));
 
   if (d->owl_attack_point != NO_MOVE)
-    gprintf("owl attack point %1m, ", d->owl_attack_point);
+    gprintf("owl attack point %1m, code %d, ",
+	    d->owl_attack_point, d->owl_attack_code);
   else
     gprintf("no owl attack point, ");
 
@@ -1623,7 +1639,8 @@ report_dragon(int m, int n)
     gprintf("no second owl attack point\n");
 
   if (d->owl_defense_point != NO_MOVE)
-    gprintf("owl defense point %1m, ", d->owl_defense_point);
+    gprintf("owl defense point %1m, code %d, ",
+	    d->owl_defense_point, d->owl_defense_code);
   else
     gprintf("no owl defense point, ");
 

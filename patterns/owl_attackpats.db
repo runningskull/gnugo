@@ -1246,7 +1246,6 @@ O.Xx
 ; lib(A)>1
 
 
-
 # Pattern A419
 # # gf New pattern. (3.1.10)
 # #    (This pattern is probably good, but is disabled awaiting
@@ -1261,6 +1260,24 @@ O.Xx
 # .*B
 # 
 # ;owl_escape_value(A)>0 || owl_escape_value(B)>0
+
+
+Pattern A420
+# gf New pattern. (3.1.12)
+
+?X.o          stop escape into center
+OX.O
+.O*.
+xxxx
+
+:8,B,value(75)
+
+?X.o
+cXaO
+bd*.
+xexx
+
+;owl_escape_value(e)>0 && !xplay_defend_both(*,a,b,c,d)
 
 
 #########################################################
@@ -1526,6 +1543,7 @@ b*.
 
 
 Pattern A607b
+# gf New pattern. (3.1.12)
 
 xXO        the push is also deadly
 .*O
@@ -1862,6 +1880,22 @@ x.bx
 ?xCa
 
 ;owl_eyespace(b,C) && !owl_proper_eye(*,C) && !attack(a)
+
+
+Pattern A716
+# gf New pattern. (3.1.12)
+
+O*x          destroy eye in reverse sente
+X.X
+xXx
+
+:8,-,value(50)
+
+a*x
+X.X
+xXx
+
+;xplay_attack(*,a)
 
 
 #########################################################
@@ -2357,7 +2391,23 @@ XOX        push out
 .*.
 ?.?
 
-:8,-,value(70)
+:|,-,value(70)
+
+
+Pattern A1006b
+# gf New pattern. (3.1.12)
+
+XOX        push out in reverse sente
+.*.
+?.?
+
+:|,-,value(75)
+
+XaX
+.*.
+?.?
+
+;lib(a) <= 2
 
 
 Pattern A1007
@@ -3705,6 +3755,24 @@ XedfO
 -----
 
 ;lib(A)==3 && !attack(b) && !oplay_attack(*,c,d,e,f,f)
+
+
+Pattern A1611
+# gf New pattern. (3.1.12)
+
+OXXXx?      edge tesuji
+X...XO
+..*...
+------
+
+:8,-,value(35)
+
+OXXXx?      edge tesuji
+X.edXf
+.a*cb.
+------
+
+;oplay_attack(*,a,b,c,d,e,e) && !oplay_attack(*,f)
 
 
 # END OF FILE

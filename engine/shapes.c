@@ -90,8 +90,8 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
        * DEAD or CRITICAL matcher_status. If the stone is tactically
        * CRITICAL it still could have matcher_status ALIVE since it might
        * be amalgamated into a live dragon. In this case we want to reject the
-       * pattern if (ti,tj) does not rescue it. This is most easily tested
-       * here within shapes_callback(), since the value of (ti,tj) is not
+       * pattern if (move) does not rescue it. This is most easily tested
+       * here within shapes_callback(), since the value of (move) is not
        * known by matchpat().
        */
       if ((class & CLASS_O)
@@ -191,7 +191,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, ti, tj, color, 0))
+    if (!pattern->autohelper(pattern, ll, move, color, 0))
       return;
   }
 
@@ -201,7 +201,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     int accepted;
     DEBUG(DEBUG_HELPER, "  asking helper to consider '%s'+%d at %1m\n", 
 	  pattern->name, ll, move);
-    accepted = pattern->helper(pattern, ll, ti, tj, color);
+    accepted = pattern->helper(pattern, ll, move, color);
     
     if (accepted) {
       DEBUG(DEBUG_HELPER, "helper likes pattern '%s' at %1m\n",
@@ -216,7 +216,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
       
   /* does the pattern have an action? */
   if (pattern->autohelper_flag & HAVE_ACTION) {
-    pattern->autohelper(pattern, ll, ti, tj, color, 1);
+    pattern->autohelper(pattern, ll, move, color, 1);
   }
 
   /* If using -a, want to see all matches even if not -v */

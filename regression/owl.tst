@@ -832,6 +832,11 @@ loadsgf games/owl30.sgf 172
 227 owl_attack L19
 #? [1 Q19|P17]
 
+# The cut at D5 fails.
+loadsgf games/nicklas/nicklas18.sgf 17
+228 owl_attack B5
+#? [0]*
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

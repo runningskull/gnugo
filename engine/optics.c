@@ -70,6 +70,9 @@ static int recognize_eye(int pos, int *attack_point, int *defense_point,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
 			 int add_moves, int color);
+static void guess_eye_space(int pos, int effective_eyesize, int margins,
+			    struct eye_data eye[BOARDMAX],
+			    int *max, int *min, int *pessimistic_min);
 static int linear_eye_space(int pos, int *vital_point, int *max, int *min,
 			    struct eye_data eye[BOARDMAX]);
 static void first_map(int q, int map[MAXEYE]);
@@ -810,18 +813,25 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
   int margins_adjacent_to_margin = 0;
   int effective_eyesize;
 
+  /* Stones inside eyespace which do not coincide with a false eye or
+   * a halfeye.
+   */
+  int interior_stones = 0;
+
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       int pos2 = POS(m, n);
-      if (eye[pos2].origin == pos
-	  && (eye[pos2].marginal
-	      || is_halfeye(heye, pos2))) {
+      if (eye[pos2].origin != pos)
+	continue;
+      if (eye[pos2].marginal || is_halfeye(heye, pos2)) {
 	margins++;
 	if (eye[pos2].marginal && eye[pos2].marginal_neighbors > 0)
 	  margins_adjacent_to_margin++;
 	if (is_halfeye(heye, pos2))
 	  halfeyes++;
       }
+      else if (IS_STONE(board[pos2]))
+	interior_stones++;
     }
 
   /* This is a measure based on the simplified assumption that both
@@ -870,6 +880,9 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
       && recognize_eye2(pos, attack_point, defense_point, max, min,
 			eye, heye, 0, EMPTY)) {
     *pessimistic_min = *min - margins;
+
+    DEBUG(DEBUG_EYES, "  life - max=%d, min=%d, pessimistic_min=%d\n",
+	  *max, *min, *pessimistic_min);
   }
   /* Fall back on the graphs database if the eye is too big or the
    * life code is disabled.
@@ -880,9 +893,11 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
 
     /* A single point eye which is part of a ko can't be trusted. */
     if (eye[pos].esize == 1
-	&& is_ko(pos, 
-		 eye[pos].color == WHITE_BORDER ? BLACK : WHITE, NULL))
+	&& is_ko(pos, eye[pos].color == WHITE_BORDER ? BLACK : WHITE, NULL))
       *pessimistic_min = 0;
+
+    DEBUG(DEBUG_EYES, "  graph matching - max=%d, min=%d, pessimistic_min=%d\n",
+	  *max, *min, *pessimistic_min);
   }
   
   /* If not found we examine whether we have a linear eye space. */
@@ -895,6 +910,9 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
     *pessimistic_min = *min - margins;
     if (*pessimistic_min == 2)
       *pessimistic_min = 1;
+
+    DEBUG(DEBUG_EYES, "  linear_eye - max=%d, min=%d, pessimistic_min=%d\n",
+	  *max, *min, *pessimistic_min);
   }
 
   /* Ideally any eye space that hasn't been matched yet should be two
@@ -902,34 +920,26 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
    * some additional heuristics to guess the values of unknown
    * eyespaces.
    */
-  else if (effective_eyesize > 3) {
-    *min = 2;
-    *max = 2;
-    if (margins == 0 || effective_eyesize > 7)
-      *pessimistic_min = 1;
-    else
-      *pessimistic_min = 0;
-  }
-  else if (effective_eyesize > 0) {
-    *min = 1;
-    *max = 1;
-    if (margins > 0)
-      *pessimistic_min = 0;
-    else
-      *pessimistic_min = 1;
-  }
   else {
-    *min = 0;
-    if (eye[pos].esize - margins > 2)
-      *max = 1;
-    else
-      *max = 0;
-    *pessimistic_min = 0;
+    guess_eye_space(pos, effective_eyesize, margins, eye,
+		    max, min, pessimistic_min); 
+    DEBUG(DEBUG_EYES, "  guess_eye - max=%d, min=%d, pessimistic_min=%d\n",
+	  *max, *min, *pessimistic_min);
   }
 
-  if (*pessimistic_min < 0)
+  if (*pessimistic_min < 0) {
     *pessimistic_min = 0;
-
+    DEBUG(DEBUG_EYES, "  pessimistic min revised to 0\n");
+  }
+  
+  /* An eyespace with at least two interior stones is assumed to be
+   * worth at least one eye, regardless of previous considerations.
+   */
+  if (*pessimistic_min < 1 && interior_stones >= 2) {
+    *pessimistic_min = 1;
+    DEBUG(DEBUG_EYES, "  pessimistic min revised to 1 (interior stones)\n");
+  }
+  
   if (*max == *min && *max != *pessimistic_min) {
     /* Find one marginal vertex and set as attack and defense point. */
     for (m = 0; m < board_size; m++)
@@ -966,6 +976,36 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
   }
 }
 
+static void
+guess_eye_space(int pos, int effective_eyesize, int margins,
+		struct eye_data eye[BOARDMAX],
+		int *max, int *min, int *pessimistic_min)
+{
+  if (effective_eyesize > 3) {
+    *min = 2;
+    *max = 2;
+    if (margins == 0 || effective_eyesize > 7)
+      *pessimistic_min = 1;
+    else
+      *pessimistic_min = 0;
+  }
+  else if (effective_eyesize > 0) {
+    *min = 1;
+    *max = 1;
+    if (margins > 0)
+      *pessimistic_min = 0;
+    else
+      *pessimistic_min = 1;
+  }
+  else {
+    *min = 0;
+    if (eye[pos].esize - margins > 2)
+      *max = 1;
+    else
+      *max = 0;
+    *pessimistic_min = 0;
+  }
+}
 
 /*
  * A linear eyespace is one in which each vertex has 2 neighbors, 

@@ -133,7 +133,7 @@ write_diagram(int movei, int movej, int color, int marki, int markj,
   int i, j;
   
   for (i = -1; i <= marki; i++) {
-    for (j=markj; j<board_size; j++) {
+    for (j = markj; j < board_size; j++) {
       if (i == -1)
 	printf("-");
       else if (labels && labels[i][j])

@@ -165,7 +165,8 @@ analyze_semeai(int my_dragon, int your_dragon)
     if (dragon[my_dragon].owl_attack_point != NO_MOVE
 	&& owl_does_defend(dragon[my_dragon].owl_attack_point, your_dragon)) {
 #if 0
-      add_owl_defense_move(dragon[my_dragon].owl_attack_point, your_dragon);
+      add_owl_defense_move(dragon[my_dragon].owl_attack_point, your_dragon,
+			   WIN);
       DEBUG(DEBUG_SEMEAI, "added owl defense of %1m at %1m\n",
 	    your_dragon, dragon[my_dragon].owl_defense_point);
 #endif
@@ -198,8 +199,8 @@ analyze_semeai(int my_dragon, int your_dragon)
       return;
     if (dragon[my_dragon].owl_defense_point != NO_MOVE
 	&& owl_does_attack(dragon[my_dragon].owl_defense_point, your_dragon)) {
-      add_owl_attack_move(dragon[my_dragon].owl_defense_point,
-			  your_dragon);
+      add_owl_attack_move(dragon[my_dragon].owl_defense_point, your_dragon,
+			  WIN);
       DEBUG(DEBUG_SEMEAI, "added owl attack of %1m at %1m\n",
 	    your_dragon, dragon[my_dragon].owl_defense_point);
       owl_code_sufficient = 1;
@@ -219,7 +220,8 @@ analyze_semeai(int my_dragon, int your_dragon)
       return;
     if (dragon[your_dragon].owl_attack_point != NO_MOVE
 	&& owl_does_defend(dragon[your_dragon].owl_attack_point, my_dragon)) {
-      add_owl_defense_move(dragon[your_dragon].owl_attack_point, my_dragon);
+      add_owl_defense_move(dragon[your_dragon].owl_attack_point, my_dragon,
+			   WIN);
       DEBUG(DEBUG_SEMEAI, "added owl defense of %1m at %1m\n",
 	    my_dragon, dragon[your_dragon].owl_attack_point);
       if (dragon[my_dragon].owl_status == DEAD) {
@@ -255,7 +257,8 @@ analyze_semeai(int my_dragon, int your_dragon)
     if (dragon[your_dragon].owl_defense_point != NO_MOVE
 	&& owl_does_attack(dragon[your_dragon].owl_defense_point, my_dragon)) {
 #if 0
-      add_owl_attack_move(dragon[your_dragon].owl_defense_point, my_dragon);
+      add_owl_attack_move(dragon[your_dragon].owl_defense_point, my_dragon,
+			  WIN);
       DEBUG(DEBUG_SEMEAI, "added owl attack of %1m at %1m\n",
 	    my_dragon, dragon[your_dragon].owl_attack_point);
 #endif

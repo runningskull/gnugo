@@ -74,32 +74,35 @@ extern Hash_data    hashdata;
 #define MAXSTACK  MAX_BOARD * MAX_BOARD
 #define MAXCHAIN  160
 
-/* 1D board macros. */
-/* Note that POS(-1, -1) == 0 */
-#define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1) + 1)
-#define BOARDMIN     (MAX_BOARD + 2)
-#define BOARDMAX     (MAX_BOARD + 1) * (MAX_BOARD + 1)
-#define POS(i, j)    ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))
-#define I(pos)       ((pos) / (MAX_BOARD + 1) - 1)
-#define J(pos)       ((pos) % (MAX_BOARD + 1) - 1)
-#define PASS_MOVE    0
-#define NO_MOVE      PASS_MOVE
-#define NS           (MAX_BOARD + 1)
-#define WE           1
-#define SOUTH(pos)   ((pos) + NS)
-#define WEST(pos)    ((pos) - 1)
-#define NORTH(pos)   ((pos) - NS)
-#define EAST(pos)    ((pos) + 1)
-#define SW(pos)      ((pos) + NS - 1)
-#define NW(pos)      ((pos) - NS - 1)
-#define NE(pos)      ((pos) - NS + 1)
-#define SE(pos)      ((pos) + NS + 1)
-#define SS(pos)      ((pos) + 2 * NS)
-#define WW(pos)      ((pos) - 2)
-#define NN(pos)      ((pos) - 2 * NS)
-#define EE(pos)      ((pos) + 2)
-
-#define BOARD(i, j)  board[POS(i, j)]
+/* 1D board macros.
+ * Note that POS(-1, -1) == 0
+ * DELTA() is defined so that POS(i+di, j+dj) = POS(i, j) + DELTA(di, dj).
+ */
+#define BOARDSIZE     ((MAX_BOARD + 2) * (MAX_BOARD + 1) + 1)
+#define BOARDMIN      (MAX_BOARD + 2)
+#define BOARDMAX      (MAX_BOARD + 1) * (MAX_BOARD + 1)
+#define POS(i, j)     ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))
+#define DELTA(di, dj) ((di) * (MAX_BOARD + 1) + (dj))
+#define I(pos)        ((pos) / (MAX_BOARD + 1) - 1)
+#define J(pos)        ((pos) % (MAX_BOARD + 1) - 1)
+#define PASS_MOVE     0
+#define NO_MOVE       PASS_MOVE
+#define NS            (MAX_BOARD + 1)
+#define WE            1
+#define SOUTH(pos)    ((pos) + NS)
+#define WEST(pos)     ((pos) - 1)
+#define NORTH(pos)    ((pos) - NS)
+#define EAST(pos)     ((pos) + 1)
+#define SW(pos)       ((pos) + NS - 1)
+#define NW(pos)       ((pos) - NS - 1)
+#define NE(pos)       ((pos) - NS + 1)
+#define SE(pos)       ((pos) + NS + 1)
+#define SS(pos)       ((pos) + 2 * NS)
+#define WW(pos)       ((pos) - 2)
+#define NN(pos)       ((pos) - 2 * NS)
+#define EE(pos)       ((pos) + 2)
+		      
+#define BOARD(i, j)   board[POS(i, j)]
 
 /* board utility functions */
 
@@ -271,7 +274,7 @@ int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
 void propagate_worm(int pos);
 void transform(int i, int j, int *ti, int *tj, int trans);
-void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
+int offset(int i, int j, int basepos, int trans);
 void find_cuts(void);
 void find_connections(void);
 void modify_eye_spaces(void);
@@ -280,20 +283,20 @@ void modify_eye_spaces(void);
 void clear_move_reasons(void);
 void add_lunch(int eater, int food);
 void remove_lunch(int eater, int food);
-void add_attack_move(int pos, int ww);
-void add_defense_move(int pos, int ww);
-void add_attack_threat_move(int pos, int ww);
-void add_defense_threat_move(int pos, int ww);
+void add_attack_move(int pos, int ww, int code);
+void add_defense_move(int pos, int ww, int code);
+void add_attack_threat_move(int pos, int ww, int code);
+void add_defense_threat_move(int pos, int ww, int code);
 void add_connection_move(int pos, int dr1, int dr2);
 void add_cut_move(int pos, int dr1, int dr2);
 void add_antisuji_move(int pos);
 void add_semeai_move(int pos, int dr);
 void add_semeai_threat(int pos, int dr);
 
-void add_owl_attack_move(int pos, int dr);
-void add_owl_defense_move(int pos, int dr);
-void add_owl_attack_threat_move(int pos, int dr);
-void add_owl_defense_threat_move(int pos, int dr);
+void add_owl_attack_move(int pos, int dr, int code);
+void add_owl_defense_move(int pos, int dr, int code);
+void add_owl_attack_threat_move(int pos, int dr, int code);
+void add_owl_defense_threat_move(int pos, int dr, int code);
 void add_owl_prevent_threat_move(int pos, int dr);
 void add_owl_uncertain_defense_move(int pos, int dr);
 void add_owl_uncertain_attack_move(int pos, int dr);
@@ -376,7 +379,7 @@ int owl_confirm_safety(int move, int target, int *defense_point);
 int owl_does_attack(int move, int target);
 int owl_connection_defends(int move, int target1, int target2);
 int owl_substantial(int str);
-void owl_analyze_semeai(int ai, int aj, int bi, int bj);
+void owl_analyze_semeai(int apos, int bpos);
 void purge_persistent_owl_cache(void);
 void owl_hotspots(float values[BOARDMAX]);
 
@@ -415,40 +418,34 @@ int somewhere(int color, int num_moves, ...);
 /* Influence functions. */
 void compute_initial_influence(int color, int dragons_known);
 void resegment_initial_influence(void);
-int influence_delta_territory(int pos, int color,
-                              char saved_stones[BOARDMAX]);
-int influence_delta_moyo(int pos, int color,
-                         char saved_stones[BOARDMAX]);
+int influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX]);
+int influence_delta_moyo(int pos, int color, char saved_stones[BOARDMAX]);
 int influence_delta_strict_moyo(int pos, int color,
-                                char saved_stones[BOARDMAX]);
-int influence_delta_area(int pos, int color,
-                         char saved_stones[BOARDMAX]);
+				char saved_stones[BOARDMAX]);
+int influence_delta_area(int pos, int color, char saved_stones[BOARDMAX]);
 int influence_delta_strict_area(int pos, int color,
-                                char saved_stones[BOARDMAX]);
+				char saved_stones[BOARDMAX]);
 int influence_territory_color(int pos);
 int influence_moyo_color(int pos);
 int influence_area_color(int pos);
-int influence_get_moyo_size(int pos, int color, int initial);
+int influence_get_moyo_size(int pos, int color);
 float influence_estimate_score(float moyo_coeff, float area_coeff);
 
 void  old_estimate_score(int color, float *lower_bound, float *upper_bound);
 float estimate_score(float *upper, float *lower);
 
 void print_initial_influence(int color, int dragons_known);
-void print_move_influence(int pos, int color,
-                          char saved_stones[BOARDMAX]);
+void print_move_influence(int pos, int color, char saved_stones[BOARDMAX]);
 void get_initial_influence(int color, int dragons_known,
-                           float white_influence[MAX_BOARD][MAX_BOARD],
-                           float black_influence[MAX_BOARD][MAX_BOARD],
-                           int influence_regions[MAX_BOARD][MAX_BOARD]);
-void get_move_influence(int i, int j, int color,
-                        char saved_stones[BOARDMAX],
-                        float white_influence[MAX_BOARD][MAX_BOARD],
-                        float black_influence[MAX_BOARD][MAX_BOARD],
-                        int influence_regions[MAX_BOARD][MAX_BOARD]);
+                           float white_influence[BOARDMAX],
+                           float black_influence[BOARDMAX],
+                           int influence_regions[BOARDMAX]);
+void get_move_influence(int move, int color, char saved_stones[BOARDMAX],
+                        float white_influence[BOARDMAX],
+                        float black_influence[BOARDMAX],
+                        int influence_regions[BOARDMAX]);
 void compute_escape_influence(char goal[BOARDMAX], int color,
-                              int escape_value[BOARDMAX],
-                              int dragons_known);
+                              int escape_value[BOARDMAX], int dragons_known);
 
 /* Eye space functions. */
 int is_eye_space(int pos);
@@ -599,9 +596,11 @@ struct dragon_data {
   int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
   int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
   int owl_attack_point;    /* vital point for attack                         */
+  int owl_attack_code;     /* ko result code                                 */
   int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
   int owl_second_attack_point;/* if attacker gets both attack points, wins   */
   int owl_defense_point;   /* vital point for defense                        */
+  int owl_defense_code;    /* ko result code                                 */
   int owl_defend_certain;  /* 0 if owl reading node limit is reached         */
   int owl_second_defense_point;/* if defender gets both attack points, wins  */
   int matcher_status;  /* status used by pattern matching                    */

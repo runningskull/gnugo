@@ -189,17 +189,15 @@ int
 somewhere(int color, int last_move, ...)
 {
   va_list ap;
+  int pos;
   int k;
   
   va_start(ap, last_move);
   for (k = 0; k <= last_move; k++) {
-    int ai, aj;
+    pos = va_arg(ap, int);
 
-    ai = va_arg(ap, int);
-    aj = va_arg(ap, int);
-
-    if (BOARD(ai, aj) == color && 
-	(stackp > 0 || dragon[POS(ai, aj)].matcher_status != DEAD))
+    if (board[pos] == color
+	&& (stackp > 0 || dragon[pos].matcher_status != DEAD))
       return 1;
   }
 
@@ -233,34 +231,29 @@ play_break_through_n(int color, int num_moves, ...)
   int success = 0;
   int i;
   int played_moves = 0;
-  int xi, xj;
-  int yi, yj;
-  int zi, zj;
+  int apos;
+  int xpos;
+  int ypos;
+  int zpos;
   
   va_start(ap, num_moves);
 
   /* Do all the moves with alternating colors. */
   for (i = 0; i < num_moves; i++) {
-    int ai, aj;
+    apos = va_arg(ap, int);
 
-    ai = va_arg(ap, int);
-    aj = va_arg(ap, int);
-
-    if (ai != -1 && (trymove(POS(ai, aj), mcolor, "play_break_through_n", NO_MOVE,
-			     EMPTY, NO_MOVE)
-		     || tryko(POS(ai, aj), mcolor, "play_break_through_n",
-			      EMPTY, NO_MOVE)))
+    if (apos != NO_MOVE
+	&& (trymove(apos, mcolor, "play_break_through_n", NO_MOVE,
+		    EMPTY, NO_MOVE)
+	    || tryko(apos, mcolor, "play_break_through_n", EMPTY, NO_MOVE)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
 
   /* Now do the real work. */
-  xi = va_arg(ap, int);
-  xj = va_arg(ap, int);
-  yi = va_arg(ap, int);
-  yj = va_arg(ap, int);
-  zi = va_arg(ap, int);
-  zj = va_arg(ap, int);
+  xpos = va_arg(ap, int);
+  ypos = va_arg(ap, int);
+  zpos = va_arg(ap, int);
     
   /* Temporarily increase the depth values with the number of explicitly
    * placed stones.
@@ -269,10 +262,12 @@ play_break_through_n(int color, int num_moves, ...)
   modify_depth_values(played_moves);
 #endif
   
-  if (!BOARD(xi, xj) || !BOARD(yi, yj) || !BOARD(zi, zj))
+  if (board[xpos] == EMPTY
+      || board[ypos] == EMPTY
+      || board[zpos] == EMPTY)
     success = 1;
   else
-    success = break_through(POS(xi, xj), POS(yi, yj), POS(zi, zj));
+    success = break_through(xpos, ypos, zpos);
 
 #if 0
   modify_depth_values(-played_moves);
@@ -309,28 +304,25 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
   int success = 0;
   int i;
   int played_moves = 0;
-  int zi, zj;
+  int apos;
+  int zpos;
   
   va_start(ap, num_moves);
 
   /* Do all the moves with alternating colors. */
   for (i = 0; i < num_moves; i++) {
-    int ai, aj;
+    apos = va_arg(ap, int);
 
-    ai = va_arg(ap, int);
-    aj = va_arg(ap, int);
-
-    if (ai != -1 && (trymove(POS(ai, aj), mcolor, "play_attack_defend_n", NO_MOVE,
-			     EMPTY, NO_MOVE)
-		     || tryko(POS(ai, aj), mcolor, "play_attack_defend_n",
-			      EMPTY, NO_MOVE)))
+    if (apos != NO_MOVE
+	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE,
+		    EMPTY, NO_MOVE)
+	    || tryko(apos, mcolor, "play_attack_defend_n", EMPTY, NO_MOVE)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
 
   /* Now do the real work. */
-  zi = va_arg(ap, int);
-  zj = va_arg(ap, int);
+  zpos = va_arg(ap, int);
 
   /* Temporarily increase the depth values with the number of explicitly
    * placed stones.
@@ -344,18 +336,18 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
 #endif
   
   if (do_attack) {
-    if (!BOARD(zi, zj))
-      success = 1;
+    if (board[zpos] == EMPTY)
+      success = WIN;
     else
-      success = attack(POS(zi, zj), NULL);
+      success = attack(zpos, NULL);
   }
   else {
-    if (!BOARD(zi, zj))
+    if (board[zpos] == EMPTY)
       success = 0;
     else {
-      int dcode = find_defense(POS(zi, zj), NULL);
-      if (dcode == 0 && !attack(POS(zi, zj), NULL))
-	success = 1;
+      int dcode = find_defense(zpos, NULL);
+      if (dcode == 0 && !attack(zpos, NULL))
+	success = WIN;
       else
 	success = dcode;
     }
@@ -397,31 +389,27 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
   int success = 0;
   int i;
   int played_moves = 0;
-  int yi, yj;
-  int zi, zj;
+  int apos;
+  int ypos;
+  int zpos;
   
   va_start(ap, num_moves);
 
   /* Do all the moves with alternating colors. */
   for (i = 0; i < num_moves; i++) {
-    int ai, aj;
+    apos = va_arg(ap, int);
 
-    ai = va_arg(ap, int);
-    aj = va_arg(ap, int);
-
-    if (ai != -1 && (trymove(POS(ai, aj), mcolor, "play_attack_defend_n", NO_MOVE,
-			     EMPTY, NO_MOVE)
-		     || tryko(POS(ai, aj), mcolor, "play_attack_defend_n",
-			      EMPTY, NO_MOVE)))
+    if (apos != NO_MOVE
+	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE,
+		    EMPTY, NO_MOVE)
+	    || tryko(apos, mcolor, "play_attack_defend_n", EMPTY, NO_MOVE)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
 
   /* Now do the real work. */
-  yi = va_arg(ap, int);
-  yj = va_arg(ap, int);
-  zi = va_arg(ap, int);
-  zj = va_arg(ap, int);
+  ypos = va_arg(ap, int);
+  zpos = va_arg(ap, int);
 
   /* Temporarily increase the depth values with the number of explicitly
    * placed stones.
@@ -431,15 +419,15 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 #endif
   
   if (do_attack) {
-    if (!BOARD(yi, yj)
-	|| !BOARD(zi, zj) 
-	|| attack_either(POS(yi, yj), POS(zi, zj)))
+    if (board[ypos] == EMPTY
+	|| board[zpos] == EMPTY
+	|| attack_either(ypos, zpos))
       success = 1;
   }
   else {
-    if (BOARD(yi, yj)
-	&& BOARD(zi, zj)
-	&& defend_both(POS(yi, yj), POS(zi, zj)))
+    if (board[ypos] != EMPTY
+	&& board[zpos] != EMPTY
+	&& defend_both(ypos, zpos))
       success = 1;
   }
 

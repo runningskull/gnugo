@@ -140,6 +140,8 @@ loadsgf games/xxlin.sgf 8
 177 gg_genmove black
 #? [E2]
 
+# E2 looks somewhat smaller but is still a good move. I think it
+# should be added. /gf
 loadsgf games/xxlin.sgf 16
 178 gg_genmove black
 #? [P4|P3]

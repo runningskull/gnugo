@@ -915,6 +915,19 @@ gOdbO
 ;xplay_attack_either(a,b,c,d,e,f,g,a,g)
 
 
+Pattern CC207
+
+XO
+OX
+
+:X,C
+
+AO
+OB
+
+;attack(A) && attack(B) && !oplay_defend_both(A,B)
+
+
 #############################################
 #
 # CC3xx - patterns with expensive constraints

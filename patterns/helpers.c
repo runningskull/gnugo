@@ -31,14 +31,13 @@
 #include "patterns.h"
 
 
-#define TRYMOVE2(x, y, z) trymove(POS(x, y), z, "helper", NO_MOVE, EMPTY, NO_MOVE)
 #define TRYMOVE(pos, color) trymove(pos, color, "helper", NO_MOVE, EMPTY, NO_MOVE)
-#define OFFSET(x, y, z, w) offset(x, y, ti, tj, &z, &w, transformation)
-#define ARGS struct pattern *pattern, int transformation, int ti, int tj, int color
+#define OFFSET(x, y) offset(x, y, move, transformation)
+#define ARGS struct pattern *pattern, int transformation, int move, int color
 
 
 /* This file contains helper functions which assist the pattern matcher.
- * They are invoked with (ti,tj) = the position on the board marked with '*'.
+ * They are invoked with (move) = the position on the board marked with '*'.
  * They are invoked with color = WHITE or BLACK: any pieces on the
  * board marked with 'O' in the pattern will always contain color,
  * and 'X's contain OTHER_COLOR(color)
@@ -59,34 +58,34 @@
  */
 
 int 
-basic_cut_helper (ARGS)
+basic_cut_helper(ARGS)
 {
-  int ai, aj, bi, bj, ci, cj;
+  int apos, bpos, cpos;
   int acolor, ccolor;
   UNUSED(pattern);
   
-  OFFSET(0, -1, ai, aj);  /* O to west */
-  OFFSET(-1, 0, bi, bj);  /* O to north */
-  OFFSET(-1, -1, ci, cj); /* X to northwest */
+  apos = OFFSET(0, -1);  /* O to west */
+  bpos = OFFSET(-1, 0);  /* O to north */
+  cpos = OFFSET(-1, -1); /* X to northwest */
 
-  acolor = BOARD(ai, aj);
+  acolor = board[apos];
   ccolor = OTHER_COLOR(acolor);
 
-  ASSERT2(BOARD(ai, aj) != EMPTY, ai, aj);
-  ASSERT2(BOARD(bi, bj) == acolor, bi, bj);
-  ASSERT2(BOARD(ci, cj) == ccolor, ci, cj);
+  ASSERT1(board[apos] != EMPTY, apos);
+  ASSERT1(board[bpos] == acolor, bpos);
+  ASSERT1(board[cpos] == ccolor, cpos);
 
   /* If c is a ko stone, assume that we would lose the ko. */
-  if (worm[POS(ci, cj)].attack_codes[0] != 0
+  if (worm[cpos].attack_codes[0] != 0
       && (ccolor == color
-	  || is_ko_point(POS(ci, cj))))
+	  || is_ko_point(cpos)))
     return 0;
-  if (is_ko_point(POS(ti, tj)))
+  if (is_ko_point(move))
     return 0;
 
-  if (TRYMOVE2(ti, tj, ccolor)) {
-    if ((attack(POS(ti, tj), NULL) == WIN)
-	|| (attack(POS(ci, cj), NULL) == WIN)) {
+  if (TRYMOVE(move, ccolor)) {
+    if ((attack(move, NULL) == WIN)
+	|| (attack(cpos, NULL) == WIN)) {
       popgo();
       return 0;
     }
@@ -95,7 +94,7 @@ basic_cut_helper (ARGS)
   else
     return 0;
 
-  if (safe_move(POS(ti, tj), acolor) == 0)
+  if (safe_move(move, acolor) == 0)
     return 0;
 
   /* Cut ok. */
@@ -109,18 +108,18 @@ basic_cut_helper (ARGS)
  */
 
 int 
-jump_out_helper (ARGS)
+jump_out_helper(ARGS)
 {
   int own_eyespace;
 
   UNUSED(transformation); UNUSED(pattern);
 
   if (color==WHITE)
-    own_eyespace = (white_eye[POS(ti, tj)].color == WHITE_BORDER);
+    own_eyespace = (white_eye[move].color == WHITE_BORDER);
   else
-    own_eyespace = (black_eye[POS(ti, tj)].color == BLACK_BORDER);
+    own_eyespace = (black_eye[move].color == BLACK_BORDER);
   
-  if (influence_area_color(POS(ti, tj)) != color && !own_eyespace)
+  if (influence_area_color(move) != color && !own_eyespace)
     return 1;
   else
     return 0;
@@ -133,10 +132,10 @@ jump_out_helper (ARGS)
  */
 
 int 
-jump_out_far_helper (ARGS)
+jump_out_far_helper(ARGS)
 {
-  if (influence_area_color(POS(ti, tj)) != OTHER_COLOR(color))
-    return jump_out_helper(pattern, transformation, ti, tj, color);
+  if (influence_area_color(move) != OTHER_COLOR(color))
+    return jump_out_helper(pattern, transformation, move, color);
   else
     return 0;
 }
@@ -146,9 +145,9 @@ jump_out_far_helper (ARGS)
  */
 
 int
-high_handicap_helper (ARGS)
+high_handicap_helper(ARGS)
 {
-  UNUSED(transformation); UNUSED(pattern); UNUSED(ti); UNUSED(tj);
+  UNUSED(transformation); UNUSED(pattern); UNUSED(move);
   
   return stones_on_board(OTHER_COLOR(color)) == 0;
 }
@@ -161,12 +160,12 @@ high_handicap_helper (ARGS)
  */
 
 int
-reinforce_helper (ARGS)
+reinforce_helper(ARGS)
 {
   UNUSED(transformation); UNUSED(pattern);
   
   return (!lively_dragon_exists(OTHER_COLOR(color)) 
-	  && safe_move(POS(ti, tj), color));
+	  && safe_move(move, color));
 }
 
 
@@ -199,38 +198,33 @@ reinforce_helper (ARGS)
 int
 throw_in_atari_helper(ARGS)
 {
-  int ai, aj, bi, bj, ci, cj, di, dj, ei, ej;
+  int apos, bpos, cpos, dpos;
   int success = 0;
   int other = OTHER_COLOR(color);
   int libs[2];
   UNUSED(pattern);
   
-  OFFSET(0, 1, ai, aj);
-  OFFSET(-1, 1, ci, cj);
-  OFFSET(1, 1, di, dj);
-  OFFSET(0, -1, ei, ej);
+  apos = OFFSET(0, 1);
+  cpos = OFFSET(-1, 1);
+  dpos = OFFSET(1, 1);
 
   /* Find second liberty of the stone a. */
-  findlib(POS(ai, aj), 2, libs);
-  if (libs[0] != POS(ti, tj)) {
-    bi = I(libs[0]);
-    bj = J(libs[0]);
-  }
-  else {
-    bi = I(libs[1]);
-    bj = J(libs[1]);
-  }
+  findlib(apos, 2, libs);
+  if (libs[0] != move)
+    bpos = libs[0];
+  else
+    bpos = libs[1];
   
-  if (TRYMOVE2(ti, tj, color)) {
-    if (!attack(POS(ci, cj), NULL) &&
-	!(ON_BOARD2(di, dj) && attack(POS(di, dj), NULL))) {
-      if (TRYMOVE2(bi, bj, other)) {
-	if (attack(POS(ai, aj), NULL))
+  if (TRYMOVE(move, color)) {
+    if (!attack(cpos, NULL) &&
+	!(ON_BOARD(dpos) && attack(dpos, NULL))) {
+      if (TRYMOVE(bpos, other)) {
+	if (attack(apos, NULL))
 	  success = 1;
 	popgo();
       }
       else {
-	success = 1; /* X move at (bi, bj) would have been suicide */
+	success = 1; /* X move at (bpos) would have been suicide */
       }
     }
     popgo();
@@ -238,7 +232,7 @@ throw_in_atari_helper(ARGS)
 
   /* The followup is to capture the "a" string. Estimate the value to
      twice the size. */
-  add_followup_value(POS(ti, tj), 2 * worm[POS(ai, aj)].effective_size);
+  add_followup_value(move, 2 * worm[apos].effective_size);
 
   return success;
 }
@@ -305,15 +299,15 @@ seki_helper(int str)
  */
 
 int 
-ugly_cutstone_helper (ARGS)
+ugly_cutstone_helper(ARGS)
 {
-  int ai, aj;
+  int apos;
   UNUSED(pattern);
   UNUSED(color);
   
-  OFFSET(-1, -1, ai, aj);
-
-  worm[POS(ai, aj)].cutstone++;
+  apos = OFFSET(-1, -1);
+  
+  worm[apos].cutstone++;
   return 0;
 }
 
@@ -328,32 +322,31 @@ ugly_cutstone_helper (ARGS)
  */
 
 int 
-cutstone2_helper (ARGS)
+cutstone2_helper(ARGS)
 {
-  int ai, aj;
-  int bi, bj;
-  int ci, cj;
-  int di, dj;
+  int apos;
+  int bpos;
+  int cpos;
+  int dpos;
   UNUSED(pattern);
   UNUSED(color);
   
-  OFFSET(-1, -1, ai, aj);
-  OFFSET(-1,  0, bi, bj);
-  OFFSET( 0, -1, ci, cj);
+  apos = OFFSET(-1, -1);
+  bpos = OFFSET(-1,  0);
+  cpos = OFFSET( 0, -1);
 
-  if (worm[POS(ai, aj)].defend_codes[0] == 0)
+  if (worm[apos].defend_codes[0] == 0)
     return 0;
   
-  di = I(worm[POS(ai, aj)].defense_points[0]);
-  dj = J(worm[POS(ai, aj)].defense_points[0]);
+  dpos = worm[apos].defense_points[0];
 
-  if (TRYMOVE2(di, dj, BOARD(ai, aj))) {
-    if (!BOARD(bi, bj) || attack(POS(bi, bj), NULL)
-	|| !BOARD(ci, cj) || attack(POS(ci, cj), NULL)
-	|| safe_move(POS(ti, tj), BOARD(ai, aj)) != 0) {
+  if (TRYMOVE(dpos, board[apos])) {
+    if (!board[bpos] || attack(bpos, NULL)
+	|| !board[cpos] || attack(cpos, NULL)
+	|| safe_move(move, board[apos]) != 0) {
       popgo();
-      worm[worm[POS(ai, aj)].origin].cutstone2++;
-      propagate_worm(worm[POS(ai, aj)].origin);
+      worm[worm[apos].origin].cutstone2++;
+      propagate_worm(worm[apos].origin);
       return 0;
     }
     popgo();
@@ -373,25 +366,25 @@ cutstone2_helper (ARGS)
 int 
 edge_double_sente_helper(ARGS)
 {
-  int ai, aj;
-  int bi, bj;
-  int ci, cj;
+  int apos;
+  int bpos;
+  int cpos;
   int dpos;
   int other = OTHER_COLOR(color);
   int success = 0;
   UNUSED(pattern);
   
-  OFFSET( 0, 1, ai, aj);
-  OFFSET(-1, 1, bi, bj);
-  OFFSET(-1, 0, ci, cj);
+  apos = OFFSET( 0, 1);
+  bpos = OFFSET(-1, 1);
+  cpos = OFFSET(-1, 0);
 
-  if (TRYMOVE2(ti, tj, color)) {
-    if (TRYMOVE2(ai, aj, other)) {
-      ASSERT1(countlib(POS(ti, tj)) == 1, POS(ti, tj));
-      findlib(POS(ti, tj), 1, &dpos);
-      if (TRYMOVE2(I(dpos), J(dpos), color)) {
-	if (TRYMOVE2(bi, bj, color)) {
-	  if (BOARD(ci, cj) == EMPTY || !defend_both(POS(ai, aj), POS(ci, cj)))
+  if (TRYMOVE(move, color)) {
+    if (TRYMOVE(apos, other)) {
+      ASSERT1(countlib(move) == 1, move);
+      findlib(move, 1, &dpos);
+      if (TRYMOVE(dpos, color)) {
+	if (TRYMOVE(bpos, color)) {
+	  if (board[cpos] == EMPTY || !defend_both(apos, cpos))
 	    success = 1;
 	  popgo();
 	}
@@ -476,9 +469,15 @@ defend_against_atari_helper(int move, int str)
 
   /* No value if opponent has no safe atari. */
   findlib(str, 2, libs);
+#if 0
   if (is_self_atari(libs[0], OTHER_COLOR(board[str]))
       && is_self_atari(libs[1], OTHER_COLOR(board[str])))
     return;
+#else
+  if (!safe_move(libs[0], OTHER_COLOR(board[str]))
+      && !safe_move(libs[1], OTHER_COLOR(board[str])))
+    return;
+#endif 
   
   add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
 }
@@ -588,7 +587,7 @@ backfill_helper(int apos, int bpos, int cpos)
 }
 
 
-/* Returns true if (ai, aj) kills or threatens to kill (bi, bj). */
+/* Returns true if (apos) kills or threatens to kill (bpos). */
 
 int
 owl_threatens_attack(int apos, int bpos)

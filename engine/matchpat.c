@@ -164,7 +164,6 @@ static void matchpat_loop(matchpat_callback_fn_ptr callback,
 			  struct pattern_db *pdb, void *callback_data,
 			  char goal[BOARDMAX]);
 void transform(int i, int j, int *ti, int *tj, int trans);
-void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 
 /* The pattern matcher still works in 2D and has a private copy of the
  * board here.
@@ -348,17 +347,16 @@ transform(int i, int j, int *ti, int *tj, int trans)
 }
 
 
-/* Compute the point offset by (i,j), relative to a base point (basei,basej), 
+/* Compute the point offset by (di, dj), relative to a base point (basepos), 
  * taking into account a transformation.
  */
 
-void 
-offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans)
+int
+offset(int i, int j, int basepos, int trans)
 {
   int ui, uj;
   TRANSFORM(i, j, &ui, &uj, trans);
-  (*ti) = basei + ui;
-  (*tj) = basej + uj;
+  return basepos + DELTA(ui, uj);
 }
 
 

@@ -370,8 +370,10 @@ C[S];W[sg]MA[mi]C[S];B[nc]MA[mi]C[S])
 (;B[nc]MA[lh]C[j
 ];C[#kogeima]
 (;W[rd]C[S]MA[mh];B[qc]MA[ng]C[S]
-(;W[qi]MA[mk]C[S];B[tt];W[lc]C[S]MA[ij];B[tt];W[rc]C[S];B[rb]C[0];
-W[pb]MA[kg]C[S];B[qb]C[0];W[oc]C[S])
+(;W[qi]MA[mk]C[S];B[tt];W[lc]C[j
+]MA[ij];B[tt];W[rc]C[j
+]MA[jj];B[rb]
+C[0];W[pb]MA[kg]C[S];B[qb]C[0];W[oc]C[S]MA[kg])
 
 (;W[tt]PL[2]
 (;B[pj];W[ph]C[S]MA[mk])

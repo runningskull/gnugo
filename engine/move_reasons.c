@@ -413,16 +413,69 @@ move_reason_known(int pos, int type, int what)
 }
 
 /*
+ * Check whether an attack move reason already is recorded for a move.
+ * A negative value for 'what' means only match 'type'.
+ */
+static int
+attack_move_reason_known(int pos, int what)
+{
+  return (move_reason_known(pos, ATTACK_MOVE, what)
+	  || move_reason_known(pos, ATTACK_MOVE_GOOD_KO, what)
+	  || move_reason_known(pos, ATTACK_MOVE_BAD_KO, what));
+}
+
+/*
+ * Check whether a defense move reason already is recorded for a move.
+ * A negative value for 'what' means only match 'type'.
+ */
+static int
+defense_move_reason_known(int pos, int what)
+{
+  return (move_reason_known(pos, DEFEND_MOVE, what)
+	  || move_reason_known(pos, DEFEND_MOVE_GOOD_KO, what)
+	  || move_reason_known(pos, DEFEND_MOVE_BAD_KO, what));
+}
+
+/*
+ * Check whether an owl attack move reason already is recorded for a move.
+ * A negative value for 'what' means only match 'type'.
+ */
+static int
+owl_attack_move_reason_known(int pos, int what)
+{
+  return (move_reason_known(pos, OWL_ATTACK_MOVE, what)
+	  || move_reason_known(pos, OWL_ATTACK_MOVE_GOOD_KO, what)
+	  || move_reason_known(pos, OWL_ATTACK_MOVE_BAD_KO, what));
+}
+
+/*
+ * Check whether am owl defense move reason already is recorded for a move.
+ * A negative value for 'what' means only match 'type'.
+ */
+static int
+owl_defense_move_reason_known(int pos, int what)
+{
+  return (move_reason_known(pos, OWL_DEFEND_MOVE, what)
+	  || move_reason_known(pos, OWL_DEFEND_MOVE_GOOD_KO, what)
+	  || move_reason_known(pos, OWL_DEFEND_MOVE_BAD_KO, what));
+}
+
+/*
  * Add to the reasons for the move at (pos) that it attacks the worm
  * at (ww).
  */
 void
-add_attack_move(int pos, int ww)
+add_attack_move(int pos, int ww, int code)
 {
   int worm_number = find_worm(worm[ww].origin);
 
   ASSERT_ON_BOARD1(ww);
-  add_move_reason(pos, ATTACK_MOVE, worm_number);
+  if (code == WIN)
+    add_move_reason(pos, ATTACK_MOVE, worm_number);
+  else if (code == KO_A)
+    add_move_reason(pos, ATTACK_MOVE_GOOD_KO, worm_number);
+  else if (code == KO_B)
+    add_move_reason(pos, ATTACK_MOVE_BAD_KO, worm_number);
 }
 
 /*
@@ -430,12 +483,17 @@ add_attack_move(int pos, int ww)
  * at (ww).
  */
 void
-add_defense_move(int pos, int ww)
+add_defense_move(int pos, int ww, int code)
 {
   int worm_number = find_worm(worm[ww].origin);
 
   ASSERT_ON_BOARD1(ww);
-  add_move_reason(pos, DEFEND_MOVE, worm_number);
+  if (code == WIN)
+    add_move_reason(pos, DEFEND_MOVE, worm_number);
+  else if (code == KO_A)
+    add_move_reason(pos, DEFEND_MOVE_GOOD_KO, worm_number);
+  else if (code == KO_B)
+    add_move_reason(pos, DEFEND_MOVE_BAD_KO, worm_number);
 }
 
 /*
@@ -443,10 +501,11 @@ add_defense_move(int pos, int ww)
  * attack the worm at (ww). 
  */
 void
-add_attack_threat_move(int pos, int ww)
+add_attack_threat_move(int pos, int ww, int code)
 {
   int worm_number = find_worm(worm[ww].origin);
-
+  UNUSED(code);
+  
   ASSERT_ON_BOARD1(ww);
   add_move_reason(pos, ATTACK_THREAT_MOVE, worm_number);
 }
@@ -456,9 +515,10 @@ add_attack_threat_move(int pos, int ww)
  * at (ww).
  */
 void
-add_defense_threat_move(int pos, int ww)
+add_defense_threat_move(int pos, int ww, int code)
 {
   int worm_number = find_worm(worm[ww].origin);
+  UNUSED(code);
 
   ASSERT_ON_BOARD1(ww);
   add_move_reason(pos, DEFEND_THREAT_MOVE, worm_number);
@@ -750,12 +810,17 @@ add_strategical_defense_move(int pos, int dr)
  * code reports an attack on the dragon (dr).
  */
 void
-add_owl_attack_move(int pos, int dr)
+add_owl_attack_move(int pos, int dr, int code)
 {
   int dragon1 = find_dragon(dragon[dr].origin);
 
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, OWL_ATTACK_MOVE, dragon1);
+  if (code == WIN)
+    add_move_reason(pos, OWL_ATTACK_MOVE, dragon1);
+  else if (code == KO_A)
+    add_move_reason(pos, OWL_ATTACK_MOVE_GOOD_KO, dragon1);
+  else if (code == KO_B)
+    add_move_reason(pos, OWL_ATTACK_MOVE_BAD_KO, dragon1);
 }
 
 /*
@@ -763,12 +828,17 @@ add_owl_attack_move(int pos, int dr)
  * code reports a defense of the dragon (dr).
  */
 void
-add_owl_defense_move(int pos, int dr)
+add_owl_defense_move(int pos, int dr, int code)
 {
   int dragon1 = find_dragon(dragon[dr].origin);
 
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, OWL_DEFEND_MOVE, dragon1);
+  if (code == WIN)
+    add_move_reason(pos, OWL_DEFEND_MOVE, dragon1);
+  else if (code == KO_A)
+    add_move_reason(pos, OWL_DEFEND_MOVE_GOOD_KO, dragon1);
+  else if (code == KO_B)
+    add_move_reason(pos, OWL_DEFEND_MOVE_BAD_KO, dragon1);
 }
 
 /*
@@ -778,10 +848,11 @@ add_owl_defense_move(int pos, int dr)
  * can be the first move.
  */
 void
-add_owl_attack_threat_move(int pos, int dr)
+add_owl_attack_threat_move(int pos, int dr, int code)
 {
   int dragon1 = find_dragon(dragon[dr].origin);
-
+  UNUSED(code);
+  
   ASSERT_ON_BOARD1(dr);
   add_move_reason(pos, OWL_ATTACK_THREAT, dragon1);
   add_worthwhile_threat_move(pos);
@@ -822,9 +893,10 @@ add_owl_uncertain_attack_move(int pos, int dr)
  * can be the first move.
  */
 void
-add_owl_defense_threat_move(int pos, int dr)
+add_owl_defense_threat_move(int pos, int dr, int code)
 {
   int dragon1 = find_dragon(dragon[dr].origin);
+  UNUSED(code);
 
   ASSERT_ON_BOARD1(dr);
   add_move_reason(pos, OWL_DEFENSE_THREAT, dragon1);
@@ -997,6 +1069,8 @@ add_replacement_move(int from, int to)
  *
  * FIXME: We would like to see whether an arbitrary move works to cut
  *        or connect something else too.
+ *
+ * FIXME: Keep track of ko results.
  */
 
 static void
@@ -1036,10 +1110,12 @@ find_more_attack_and_defense_moves(int color)
 	if (r < 0)
 	  break;
 	what = move_reasons[r].what;
-	if ((   move_reasons[r].type == ATTACK_MOVE
-		&& board[worms[what]] == other)
-	    || (move_reasons[r].type == DEFEND_MOVE
-		&& board[worms[what]] == color)
+	if (move_reasons[r].type == ATTACK_MOVE
+	    || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
+	    || move_reasons[r].type == ATTACK_MOVE_BAD_KO
+	    || move_reasons[r].type == DEFEND_MOVE
+	    || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
+	    || move_reasons[r].type == DEFEND_MOVE_BAD_KO
 	    || move_reasons[r].type == CONNECT_MOVE
 	    || move_reasons[r].type == CUT_MOVE
 	    || move_reasons[r].type == ATTACK_EITHER_MOVE
@@ -1061,21 +1137,21 @@ find_more_attack_and_defense_moves(int color)
 	     * unless we already know the move works as defense move.
 	     */
 	    if (board[aa] == color
-		&& !move_reason_known(pos, DEFEND_MOVE, unstable_worms[k]))
+		&& !defense_move_reason_known(pos, unstable_worms[k]))
 	      if (!attack(aa, NULL)) {
 		if (!cursor_at_start_of_line)
 		  TRACE("\n");
 		TRACE("%ofound extra point of defense of %1m at %1m\n", 
 		      aa, pos);
 		cursor_at_start_of_line = 1;
-		add_defense_move(pos, aa);
+		add_defense_move(pos, aa, WIN);
 	      }
 	    
 	    /* string of opponent color, see if there still is a defense,
 	     * unless we already know the move works as attack move.
 	     */
 	    if (board[aa] == other
-		&& !move_reason_known(pos, ATTACK_MOVE, unstable_worms[k]))
+		&& !attack_move_reason_known(pos, unstable_worms[k]))
 	      if (!find_defense(aa, NULL)) {
 		/* Maybe find_defense() doesn't find the defense. Try to
 		 * defend with the stored defense move.
@@ -1096,7 +1172,7 @@ find_more_attack_and_defense_moves(int color)
 		  TRACE("%ofound extra point of attack of %1m at %1m\n",
 			aa, pos);
 		  cursor_at_start_of_line = 1;
-		  add_attack_move(pos, aa);
+		  add_attack_move(pos, aa, WIN);
 		}
 	      }
 	  }
@@ -1110,17 +1186,22 @@ find_more_attack_and_defense_moves(int color)
 }
 
 
-/* Test all moves which strategically attack or defend some owl
- * critical dragon and see whether the move is an effective owl attack
- * or owl defense for this dragon. We also test whether tactical
- * attacks on a part of a critical dragon do owl attack the entire
- * dragon.
+/* Test certain moves to see whether they (too) can owl attack or
+ * defend an owl critical dragon. Tested moves are
+ * 1. Strategical attacks or defenses for the dragon.
+ * 2. Vital eye points for the dragon.
+ * 3. Tactical attacks or defenses for a part of the dragon.
+ * 4. Moves connecting the dragon to something else.
+ *
+ * FIXME: Keep track of ko results.
  */
 static void
 find_more_owl_attack_and_defense_moves(int color)
 {
   int m, n, pos;
   int k;
+  int s;
+  int dd1, dd2;
   int dd = NO_MOVE;
   
   TRACE("\nTrying to upgrade strategical attack and defense moves.\n");
@@ -1128,6 +1209,8 @@ find_more_owl_attack_and_defense_moves(int color)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       pos = POS(m, n);
+      dd1 = NO_MOVE;
+      dd2 = NO_MOVE;
       
       for (k = 0; k < MAX_REASONS; k++) {
 	int r = move[pos].reason[k];
@@ -1138,50 +1221,77 @@ find_more_owl_attack_and_defense_moves(int color)
 	what = move_reasons[r].what;
 	if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE
 	    || move_reasons[r].type == STRATEGIC_DEFEND_MOVE)
-	  dd = dragons[what];
+	  dd1 = dragons[what];
 	else if (move_reasons[r].type == ATTACK_MOVE
-		 || move_reasons[r].type == DEFEND_MOVE)
-	  dd = worms[what];
+		 || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
+		 || move_reasons[r].type == ATTACK_MOVE_BAD_KO
+		 || move_reasons[r].type == DEFEND_MOVE
+		 || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
+		 || move_reasons[r].type == DEFEND_MOVE_BAD_KO)
+	  dd1 = worms[what];
 	else if (move_reasons[r].type == VITAL_EYE_MOVE) {
 	  int ee = eyes[move_reasons[r].what];
 	  int ecolor = eyecolor[move_reasons[r].what];
       
 	  if (ecolor == WHITE)
-	    dd = white_eye[ee].dragon;
+	    dd1 = white_eye[ee].dragon;
 	  else
-	    dd = black_eye[ee].dragon;
+	    dd1 = black_eye[ee].dragon;
       
-	  if (dd == NO_MOVE) /* Maybe we should assert this not to happen. */
-	    continue;
-
-	  /* Don't care about inessential dragons. */
-	  if (DRAGON2(dd).safety == INESSENTIAL)
+	  if (dd1 == NO_MOVE) /* Maybe we should assert this not to happen. */
 	    continue;
 	}      
+	else if (move_reasons[r].type == CONNECT_MOVE) {
+	    int dragon1 = conn_dragon1[move_reasons[r].what];
+	    int dragon2 = conn_dragon2[move_reasons[r].what];
+	    dd1 = dragons[dragon1];
+	    dd2 = dragons[dragon2];
+	}
 	else
 	  continue;
 
-	if (dragon[dd].owl_status != CRITICAL)
-	  continue;
+	for (s = 0; s < 2; s++) {
+	  if (s == 0)
+	    dd = dd1;
+	  else
+	    dd = dd2;
 
-	if ((move_reasons[r].type == STRATEGIC_ATTACK_MOVE 
-	     || move_reasons[r].type == ATTACK_MOVE
-	     || (move_reasons[r].type == VITAL_EYE_MOVE
-		 && board[dd] == OTHER_COLOR(color)))
-	    && !move_reason_known(pos, OWL_ATTACK_MOVE, what)
-	    && owl_does_attack(pos, dd)) {
-	  add_owl_attack_move(pos, dd);
-	  TRACE("Move at %1m owl attacks %1m.\n", pos, dd);
-	}
-	
-	if ((move_reasons[r].type == STRATEGIC_DEFEND_MOVE
-	     || move_reasons[r].type == DEFEND_MOVE
-	     || (move_reasons[r].type == VITAL_EYE_MOVE
-		 && board[dd] == color))
-	    && !move_reason_known(pos, OWL_DEFEND_MOVE, what)
-	    && owl_does_defend(pos, dd)) {
-	  add_owl_defense_move(pos, dd);
-	  TRACE("Move at %1m owl defends %1m.\n", pos, dd);
+	  if (dd == NO_MOVE)
+	    continue;
+	  
+	  /* Don't care about inessential dragons. */
+	  if (DRAGON2(dd).safety == INESSENTIAL)
+	    continue;
+	  
+	  if (dragon[dd].owl_status != CRITICAL)
+	    continue;
+	  
+	  if ((move_reasons[r].type == STRATEGIC_ATTACK_MOVE 
+	       || move_reasons[r].type == ATTACK_MOVE
+	       || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
+	       || move_reasons[r].type == ATTACK_MOVE_BAD_KO
+	       || (move_reasons[r].type == VITAL_EYE_MOVE
+		   && board[dd] == OTHER_COLOR(color)))
+	      && !owl_attack_move_reason_known(pos, find_dragon(dd))
+	      && owl_does_attack(pos, dd)) {
+	    /* FIXME: Report correct ko result code. */
+	    add_owl_attack_move(pos, dd, WIN);
+	    TRACE("Move at %1m owl attacks %1m.\n", pos, dd);
+	  }
+	  
+	  if ((move_reasons[r].type == STRATEGIC_DEFEND_MOVE
+	       || move_reasons[r].type == CONNECT_MOVE
+	       || move_reasons[r].type == DEFEND_MOVE
+	       || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
+	       || move_reasons[r].type == DEFEND_MOVE_BAD_KO
+	       || (move_reasons[r].type == VITAL_EYE_MOVE
+		   && board[dd] == color))
+	      && !owl_defense_move_reason_known(pos, find_dragon(dd))
+	      && owl_does_defend(pos, dd)) {
+	    /* FIXME: Report correct ko result code. */
+	    add_owl_defense_move(pos, dd, WIN);
+	    TRACE("Move at %1m owl defends %1m.\n", pos, dd);
+	  }
 	}
       }
     }
@@ -1422,6 +1532,8 @@ examine_move_safety(int color)
 	case ATTACK_EITHER_MOVE:
 	case DEFEND_BOTH_MOVE:    /* Maybe need better check for this case. */
 	case OWL_DEFEND_MOVE:
+	case OWL_DEFEND_MOVE_GOOD_KO:
+	case OWL_DEFEND_MOVE_BAD_KO:
 	  tactical_safety = 1;
 	  safety = 1;
 	  break;
@@ -1431,7 +1543,11 @@ examine_move_safety(int color)
 	  safety = 1;
 	  break;
 	case ATTACK_MOVE:
+	case ATTACK_MOVE_GOOD_KO:
+	case ATTACK_MOVE_BAD_KO:
 	case OWL_ATTACK_MOVE:
+	case OWL_ATTACK_MOVE_GOOD_KO:
+	case OWL_ATTACK_MOVE_BAD_KO:
 	  {
 	    int aa = NO_MOVE;
 	    int bb = NO_MOVE;
@@ -1439,7 +1555,9 @@ examine_move_safety(int color)
 	    int our_color_neighbors;
 	    int k;
 	    
-	    if (type == ATTACK_MOVE) {
+	    if (type == ATTACK_MOVE
+		|| type == ATTACK_MOVE_GOOD_KO
+		|| type == ATTACK_MOVE_BAD_KO) {
 	      aa = worms[what];
 	      size = worm[aa].effective_size;
 	    }
@@ -1460,7 +1578,9 @@ examine_move_safety(int color)
              * determine safety.
 	     */
 	    our_color_neighbors = 0;
-	    if (type == ATTACK_MOVE) {
+	    if (type == ATTACK_MOVE
+		|| type == ATTACK_MOVE_GOOD_KO
+		|| type == ATTACK_MOVE_BAD_KO) {
 	      /* We could use the same code as for OWL_ATTACK_MOVE
                * below if we were certain that the capturable string
                * had not been amalgamated with a living dragon.
@@ -1553,6 +1673,8 @@ examine_move_safety(int color)
 	    break;
 	  }
 	case DEFEND_MOVE:
+	case DEFEND_MOVE_GOOD_KO:
+	case DEFEND_MOVE_BAD_KO:
 	  {
 	    int aa = worms[what];
 
@@ -1639,27 +1761,41 @@ list_move_reasons(int color)
 	
 	switch(move_reasons[r].type) {
 	case ATTACK_MOVE:
+	  aa = worms[move_reasons[r].what];
+	  gprintf("Move at %1m attacks %1m%s\n", pos, aa,
+		  (worm[aa].defend_codes[0] == 0) ? " (defenseless)" : "");
+	  break;
+	case ATTACK_MOVE_GOOD_KO:
+	  aa = worms[move_reasons[r].what];
+	  gprintf("Move at %1m attacks %1m%s with good ko\n", pos, aa,
+		  (worm[aa].defend_codes[0] == 0) ? " (defenseless)" : "");
+	  break;
+	case ATTACK_MOVE_BAD_KO:
+	  aa = worms[move_reasons[r].what];
+	  gprintf("Move at %1m attacks %1m%s with bad ko\n", pos, aa,
+		  (worm[aa].defend_codes[0] == 0) ? " (defenseless)" : "");
+	  break;
+	  
 	case DEFEND_MOVE:
 	  aa = worms[move_reasons[r].what];
-	  
-	  if (move_reasons[r].type == ATTACK_MOVE
-	      && board[aa] != color)
-	    gprintf("Move at %1m attacks %1m%s\n", pos, aa,
-		    (worm[aa].defend_codes[0] == 0) ? " (defenseless)" : "");
-	  else if ((move_reasons[r].type == DEFEND_MOVE
-		    && board[aa] == color))
-	    gprintf("Move at %1m defends %1m\n", pos, aa);
+	  gprintf("Move at %1m defends %1m\n", pos, aa);
+	  break;
+	case DEFEND_MOVE_GOOD_KO:
+	  aa = worms[move_reasons[r].what];
+	  gprintf("Move at %1m defends %1m with good ko\n", pos, aa);
+	  break;
+	case DEFEND_MOVE_BAD_KO:
+	  aa = worms[move_reasons[r].what];
+	  gprintf("Move at %1m defends %1m with bad ko\n", pos, aa);
 	  break;
 	  
 	case ATTACK_THREAT_MOVE:
 	case DEFEND_THREAT_MOVE:
 	  aa = worms[move_reasons[r].what];
 	  
-	  if (move_reasons[r].type == ATTACK_THREAT_MOVE
-	      && board[aa] != color)
+	  if (move_reasons[r].type == ATTACK_THREAT_MOVE)
 	    gprintf("Move at %1m threatens to attack %1m\n", pos, aa);
-	  else if ((move_reasons[r].type == DEFEND_THREAT_MOVE
-		    && board[aa] == color))
+	  else if (move_reasons[r].type == DEFEND_THREAT_MOVE)
 	    gprintf("Move at %1m threatens to defend %1m\n", pos, aa);
 	  break;
 
@@ -1727,10 +1863,26 @@ list_move_reasons(int color)
 	  aa = dragons[move_reasons[r].what];
 	  gprintf("Move at %1m owl-attacks %1m\n", pos, aa);
 	  break;
+	case OWL_ATTACK_MOVE_GOOD_KO:
+	  aa = dragons[move_reasons[r].what];
+	  gprintf("Move at %1m owl-attacks %1m with good ko\n", pos, aa);
+	  break;
+	case OWL_ATTACK_MOVE_BAD_KO:
+	  aa = dragons[move_reasons[r].what];
+	  gprintf("Move at %1m owl-attacks %1m with bad ko\n", pos, aa);
+	  break;
 	  
 	case OWL_DEFEND_MOVE:
 	  aa = dragons[move_reasons[r].what];
 	  gprintf("Move at %1m owl-defends %1m\n", pos, aa);
+	  break;
+	case OWL_DEFEND_MOVE_GOOD_KO:
+	  aa = dragons[move_reasons[r].what];
+	  gprintf("Move at %1m owl-defends %1m with good ko\n", pos, aa);
+	  break;
+	case OWL_DEFEND_MOVE_BAD_KO:
+	  aa = dragons[move_reasons[r].what];
+	  gprintf("Move at %1m owl-defends %1m with bad ko\n", pos, aa);
 	  break;
 	  
 	case OWL_ATTACK_THREAT:
@@ -1807,21 +1959,21 @@ find_stones_saved_by_move(int pos, int color,
     if (r < 0)
       break;
 
-    if (move_reasons[r].type == DEFEND_MOVE) {
+    if (move_reasons[r].type == DEFEND_MOVE
+	|| move_reasons[r].type == DEFEND_MOVE_GOOD_KO
+	|| move_reasons[r].type == DEFEND_MOVE_BAD_KO) {
       int str = worms[move_reasons[r].what];
       
-      /* Defense of enemy stones. */
-      if (board[str] != color)
-	continue;
+      gg_assert(board[str] == color);
 
       mark_string(str, saved_stones, 1);
     }
-    else if (move_reasons[r].type == ATTACK_MOVE) {
+    else if (move_reasons[r].type == ATTACK_MOVE
+	     || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
+	     || move_reasons[r].type == ATTACK_MOVE_BAD_KO) {
       int str = worms[move_reasons[r].what];
       
-      /* Attack on our stones. */
-      if (board[str] == color)
-	continue;
+      gg_assert(board[str] != color);
       
       mark_string(str, saved_stones, 1);
     }
@@ -2057,12 +2209,11 @@ estimate_territorial_value(int pos, int color,
     this_value = 0.0;
     switch (move_reasons[r].type) {
     case ATTACK_MOVE:
-      /* FIXME: Need to take ko attacks properly into account. */
+    case ATTACK_MOVE_GOOD_KO:
+    case ATTACK_MOVE_BAD_KO:
       aa = worms[move_reasons[r].what];
       
-      /* Attack on our stones. */
-      if (board[aa] == color)
-	break;
+      gg_assert(board[aa] != color);
       
       /* Defenseless stone. */
       if (worm[aa].defend_codes[0] == 0) {
@@ -2077,6 +2228,12 @@ estimate_territorial_value(int pos, int color,
       if (!move[pos].move_safety) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - attack on %1m (unsafe move)\n", pos, aa);
+	break;
+      }
+
+      if (DRAGON2(aa).safety == INESSENTIAL || worm[aa].inessential) {
+	DEBUG(DEBUG_MOVE_REASONS,
+	      "  %1m: 0 - attack on %1m (inessential)\n", pos, aa);
 	break;
       }
 
@@ -2096,24 +2253,36 @@ estimate_territorial_value(int pos, int color,
       /* If the move also owl attacks the same stones, count points
        * for that move reason instead.
        */
-      if (move_reason_known(pos, OWL_ATTACK_MOVE, find_dragon(aa))) {
+      if (owl_attack_move_reason_known(pos, find_dragon(aa))) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - attack on %1m (owl attacked as well)\n", pos, aa);
 	break;
       }
-      
-      TRACE("  %1m: %f - attack on worm %1m\n", pos, this_value, aa);
+
+      /* FIXME: How much should we reduce the value for ko attacks? */
+      if (move_reasons[r].type == ATTACK_MOVE)
+	TRACE("  %1m: %f - attack on worm %1m\n", pos, this_value, aa);
+      else if (move_reasons[r].type == ATTACK_MOVE_GOOD_KO) {
+	this_value *= 0.7;
+	TRACE("  %1m: %f - attack on worm %1m with good ko\n",
+	      pos, this_value, aa);
+      }	
+      else if (move_reasons[r].type == ATTACK_MOVE_BAD_KO) {
+	this_value *= 0.5;
+	TRACE("  %1m: %f - attack on worm %1m with bad ko\n",
+	      pos, this_value, aa);
+      }	
+
       
       tot_value += this_value;
       break;
       
     case DEFEND_MOVE:
-      /* FIXME: Need to take ko defense properly into account. */
+    case DEFEND_MOVE_GOOD_KO:
+    case DEFEND_MOVE_BAD_KO:
       aa = worms[move_reasons[r].what];
       
-      /* Defense of enemy stones. */
-      if (board[aa] != color)
-	break;
+      gg_assert(board[aa] == color);
       
       /* 
        * Estimate value 
@@ -2141,7 +2310,7 @@ estimate_territorial_value(int pos, int color,
       }
 
       /* If the stones are inessential, there is no value in saving them. */
-      if (worm[aa].inessential) {
+      if (worm[aa].inessential || DRAGON2(aa).safety == INESSENTIAL) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - defense of %1m (inessential)\n", pos, aa);
 	break;
@@ -2150,13 +2319,26 @@ estimate_territorial_value(int pos, int color,
       /* If the move also owl defends the same stones, count points
        * for that move reason instead.
        */
-      if (move_reason_known(pos, OWL_DEFEND_MOVE, find_dragon(aa))) {
+      if (owl_defense_move_reason_known(pos, find_dragon(aa))) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - defense of %1m (owl defended as well)\n", pos, aa);
 	break;
       }
+
       
-      TRACE("  %1m: %f - defense of worm %1m\n", pos, this_value, aa);
+      /* FIXME: How much should we reduce the value for ko defenses? */
+      if (move_reasons[r].type == DEFEND_MOVE)
+	TRACE("  %1m: %f - defense of worm %1m\n", pos, this_value, aa);
+      else if (move_reasons[r].type == DEFEND_MOVE_GOOD_KO) {
+	this_value *= 0.7;
+	TRACE("  %1m: %f - defense of worm %1m with good ko\n",
+	      pos, this_value, aa);
+      }	
+      else if (move_reasons[r].type == DEFEND_MOVE_BAD_KO) {
+	this_value *= 0.5;
+	TRACE("  %1m: %f - defense of worm %1m with bad ko\n",
+	      pos, this_value, aa);
+      }	
     
       tot_value += this_value;
       break;
@@ -2174,8 +2356,7 @@ estimate_territorial_value(int pos, int color,
 	break;
       }
 
-      if (DRAGON2(aa).safety == INESSENTIAL
-	  || worm[aa].inessential) {
+      if (DRAGON2(aa).safety == INESSENTIAL || worm[aa].inessential) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - threatens to capture %1m (inessential)\n",
 	      pos, aa);
@@ -2185,7 +2366,7 @@ estimate_territorial_value(int pos, int color,
       /* If the move also owl attacks the same stones, there is 
        * no use to threaten tactically.
        */
-      if (move_reason_known(pos, OWL_ATTACK_MOVE, find_dragon(aa))) {
+      if (owl_attack_move_reason_known(pos, find_dragon(aa))) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - threaten to capture %1m (owl attacked as well)\n",
 	      pos, aa);
@@ -2205,9 +2386,9 @@ estimate_territorial_value(int pos, int color,
       if (trymove(pos, color, "estimate_territorial_value",
 		   NO_MOVE, EMPTY, NO_MOVE)) {
 	int adjs[MAXCHAIN];
-	int adjusted_value = 2 * worm[aa].effective_size;
-	int adjustment_up = 0;
-	int adjustment_down = 0;
+	float adjusted_value = 2 * worm[aa].effective_size;
+	float adjustment_up = 0.0;
+	float adjustment_down = 0.0;
 	int s;
 	int num_adj;
 
@@ -2235,10 +2416,10 @@ estimate_territorial_value(int pos, int color,
 	}
 	adjusted_value += adjustment_up;
 	adjusted_value -= adjustment_down;
-	if (adjusted_value > 0.) {
-	  add_followup_value(pos, 2 * worm[aa].effective_size);
+	if (adjusted_value > 0.0) {
+	  add_followup_value(pos, adjusted_value);
 	  TRACE("  %1m: %f (followup) - threatens to capture %1m\n",
-		pos, 2 * worm[aa].effective_size, aa);
+		pos, adjusted_value, aa);
 	}
 	popgo();
       }
@@ -2258,7 +2439,7 @@ estimate_territorial_value(int pos, int color,
       }
 
       /* If the stones are inessential, there is no value in saving them. */
-      if (worm[aa].inessential) {
+      if (worm[aa].inessential || DRAGON2(aa).safety == INESSENTIAL) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - threaten to defend %1m (inessential)\n", pos, aa);
 	break;
@@ -2267,7 +2448,7 @@ estimate_territorial_value(int pos, int color,
       /* If the move also owl defends the same stones, there is no
        * use in saving them
        */
-      if (move_reason_known(pos, OWL_DEFEND_MOVE, find_dragon(aa))) {
+      if (owl_defense_move_reason_known(pos, find_dragon(aa))) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - threaten to defend of %1m (owl defended as well)\n",
 	      pos, aa);
@@ -2302,8 +2483,8 @@ estimate_territorial_value(int pos, int color,
       /* If this move also owl attacks or defends the same dragon, we
        * count the points for that move reason instead.
        */
-      if (move_reason_known(pos, OWL_ATTACK_MOVE, move_reasons[r].what)
-	  || move_reason_known(pos, OWL_DEFEND_MOVE, move_reasons[r].what))
+      if (owl_attack_move_reason_known(pos, move_reasons[r].what)
+	  || owl_defense_move_reason_known(pos, move_reasons[r].what))
 	break;
 
       aa = dragons[move_reasons[r].what];
@@ -2313,8 +2494,8 @@ estimate_territorial_value(int pos, int color,
        * that move reason instead.
        */
       if (worm[aa].size == dragon[aa].size
-	  && (move_reason_known(pos, ATTACK_MOVE, find_worm(aa))
-	      || move_reason_known(pos, DEFEND_MOVE, find_worm(aa))))
+	  && (attack_move_reason_known(pos, find_worm(aa))
+	      || defense_move_reason_known(pos, find_worm(aa))))
 	break;
       
       this_value = 2 * dragon[aa].effective_size;
@@ -2326,8 +2507,8 @@ estimate_territorial_value(int pos, int color,
       /* If this move also owl attacks or defends the same dragon, we
        * count the points for that move reason instead.
        */
-      if (move_reason_known(pos, OWL_ATTACK_MOVE, move_reasons[r].what)
-	  || move_reason_known(pos, OWL_DEFEND_MOVE, move_reasons[r].what))
+      if (owl_attack_move_reason_known(pos, move_reasons[r].what)
+	  || owl_defense_move_reason_known(pos, move_reasons[r].what))
 	break;
       
       aa = dragons[move_reasons[r].what];
@@ -2337,8 +2518,8 @@ estimate_territorial_value(int pos, int color,
        * that move reason instead.
        */
       if (worm[aa].size == dragon[aa].size
-	  && (move_reason_known(pos, ATTACK_MOVE, find_worm(aa))
-	      || move_reason_known(pos, DEFEND_MOVE, find_worm(aa))))
+	  && (attack_move_reason_known(pos, find_worm(aa))
+	      || defense_move_reason_known(pos, find_worm(aa))))
 	break;
       
       /* threaten to win the semeai as a ko threat */
@@ -2356,7 +2537,11 @@ estimate_territorial_value(int pos, int color,
       break;
 	
     case OWL_ATTACK_MOVE:
+    case OWL_ATTACK_MOVE_GOOD_KO:
+    case OWL_ATTACK_MOVE_BAD_KO:
     case OWL_DEFEND_MOVE:
+    case OWL_DEFEND_MOVE_GOOD_KO:
+    case OWL_DEFEND_MOVE_BAD_KO:
       aa = dragons[move_reasons[r].what];
       
       if (DRAGON2(aa).safety == INESSENTIAL) {
@@ -2386,11 +2571,52 @@ estimate_territorial_value(int pos, int color,
     case OWL_ATTACK_THREAT:
       aa = dragons[move_reasons[r].what];
 
-      add_followup_value(pos, 2 * dragon[aa].effective_size);
-      TRACE("  %1m: %f (followup) - threatens to owl attack %1m\n",
-	    pos, 2 * dragon[aa].effective_size, aa);
+      if (dragon[aa].matcher_status == DEAD) {
+	DEBUG(DEBUG_MOVE_REASONS,
+	      "  %1m: 0.0 - threatens to owl attack %1m (dead)\n", pos, aa);
+	break;
+      }
+
+      if (DRAGON2(aa).safety == INESSENTIAL) {
+	DEBUG(DEBUG_MOVE_REASONS,
+	      "  %1m: 0.0 - threatens to capture %1m (inessential)\n",
+	      pos, aa);
+	break;
+      }
+
+      /* The followup value of a move threatening to attack (aa) is
+       * twice its effective size, unless it has an adjacent
+       * (friendly) critical dragon. In that case it's probably a
+       * mistake to make the threat since it can defend itself with
+       * profit.
+       *
+       * FIXME: We probably need to verify that the critical dragon is
+       * substantial enough that capturing it saves the threatened
+       * dragon.
+       */	 
+      {
+	float value = 2 * dragon[aa].effective_size;
+	int s;
+
+	for (s = 0; s < DRAGON2(aa).neighbors; s++) {
+	  int d = DRAGON2(aa).adjacent[s];
+	  int adj = dragon2[d].origin;
+
+	  if (dragon[adj].color == color
+	      && dragon[adj].matcher_status == CRITICAL
+	      && dragon2[d].safety != INESSENTIAL
+	      && !owl_defense_move_reason_known(pos, find_dragon(adj)))
+	    value = 0.0;
+	}
+	
+	if (value > 0.0) {
+	  add_followup_value(pos, value);
+	  TRACE("  %1m: %f (followup) - threatens to owl attack %1m\n",
+		pos, value, aa);
+	}
+      }
       break;
-      
+
     case OWL_DEFENSE_THREAT:
       aa = dragons[move_reasons[r].what];
 
@@ -2495,8 +2721,10 @@ estimate_territorial_value(int pos, int color,
     
   tot_value += this_value;
   /* subtract one point for a sacrifice (playing in opponent's territory) */
-  if (tot_value > 1.0 && !safe_move(pos, color))
-    tot_value -= 1;
+  if (tot_value > 1.0 && safe_move(pos, color) != WIN) {
+    TRACE("  %1m:   -1 - unsafe move, assumed sacrifice\n", pos, this_value);
+    tot_value -= 1.0;
+  }
 
   move[pos].territorial_value = tot_value;
   move[pos].secondary_value  += secondary_value;
@@ -2535,7 +2763,11 @@ estimate_influence_value(int pos, int color,
       case STRATEGIC_DEFEND_MOVE:
       case EXPAND_MOYO_MOVE:
       case OWL_ATTACK_MOVE:
+      case OWL_ATTACK_MOVE_GOOD_KO:
+      case OWL_ATTACK_MOVE_BAD_KO:
       case OWL_DEFEND_MOVE:
+      case OWL_DEFEND_MOVE_GOOD_KO:
+      case OWL_DEFEND_MOVE_BAD_KO:
       case SEMEAI_MOVE:
 	does_expand = 1;
 	break;
@@ -2588,31 +2820,30 @@ estimate_strategical_value(int pos, int color, float score)
     this_value = 0.0;
     switch (move_reasons[r].type) {
       case ATTACK_MOVE:
+      case ATTACK_MOVE_GOOD_KO:
+      case ATTACK_MOVE_BAD_KO:
       case DEFEND_MOVE:
+      case DEFEND_MOVE_GOOD_KO:
+      case DEFEND_MOVE_BAD_KO:
 	worm1 = move_reasons[r].what;
 	aa = worms[worm1];
       
-	/* Attack on our stones. */
-	if (move_reasons[r].type == ATTACK_MOVE
-	    && board[aa] == color)
-	  break;
-	
-	/* Defense of enemy stones. */
-	if (move_reasons[r].type == DEFEND_MOVE
-	    && board[aa] != color)
-	  break;
-	
 	/* Defenseless stone */
 	if (worm[aa].defend_codes[0] == 0)
 	  break;
 
 	/* Require the defense to be strategically viable. */
-	if (move_reasons[r].type == DEFEND_MOVE
+	if ((move_reasons[r].type == DEFEND_MOVE
+	     || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
+	     || move_reasons[r].type == DEFEND_MOVE_BAD_KO)
 	    && !strategically_sound_defense(aa, pos))
 	  break;
 
 	/* Do the same for attack moves. */
-	if (move_reasons[r].type == ATTACK_MOVE && !move[pos].move_safety)
+	if ((move_reasons[r].type == ATTACK_MOVE
+	     || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
+	     || move_reasons[r].type == ATTACK_MOVE_BAD_KO)
+	    && !move[pos].move_safety)
 	  break;
 	
 	/* This is totally ad hoc, just guessing the value of
@@ -2657,9 +2888,8 @@ estimate_strategical_value(int pos, int color, float score)
 	     */
 	    if (dragon[bb].matcher_status != DEAD
 		&& dragon[bb].size == worm[bb].size
-		&& (move_reason_known(pos, ATTACK_MOVE, find_worm(bb))
-		    || move_reason_known(pos, DEFEND_MOVE,
-					 find_worm(bb))))
+		&& (attack_move_reason_known(pos, find_worm(bb))
+		    || defense_move_reason_known(pos, find_worm(bb))))
 	      this_value = 0.0;
 
 	    if (this_value > dragon_value[d1])
@@ -2691,12 +2921,12 @@ estimate_strategical_value(int pos, int color, float score)
          * either worm, this move reason has no additional value.
 	 */
 	if (move_reasons[r].type == ATTACK_EITHER_MOVE
-	    && (move_reason_known(pos, ATTACK_MOVE, worm1)
-		|| move_reason_known(pos, ATTACK_MOVE, worm2)))
+	    && (attack_move_reason_known(pos, worm1)
+		|| attack_move_reason_known(pos, worm2)))
 	  break;
 	if (move_reasons[r].type == DEFEND_BOTH_MOVE
-	    && (move_reason_known(pos, DEFEND_MOVE, worm1)
-		|| move_reason_known(pos, DEFEND_MOVE, worm2)))
+	    && (defense_move_reason_known(pos, worm1)
+		|| defense_move_reason_known(pos, worm2)))
 	  break;
 
 	/* Also if there is a combination attack, we assume it covers
@@ -2787,8 +3017,8 @@ estimate_strategical_value(int pos, int color, float score)
 	 * we don't care about it, since otherwise we would count the
 	 * points twice.
 	 */
-	if (move_reason_known(pos, OWL_DEFEND_MOVE, find_dragon(bb))
-	    || move_reason_known(pos, OWL_ATTACK_MOVE, find_dragon(bb))) {
+	if (owl_defense_move_reason_known(pos, find_dragon(bb))
+	    || owl_attack_move_reason_known(pos, find_dragon(bb))) {
 	  DEBUG(DEBUG_MOVE_REASONS,
 		"  %1m: 0.0 - vital for %1m: owl attack/defense as well\n",
 		pos, bb);
@@ -2820,11 +3050,11 @@ estimate_strategical_value(int pos, int color, float score)
 	d1 = move_reasons[r].what;
 	aa = dragons[d1];
 
-	/* FIXME: This value cannot be computed
-	   without some measurement of how the actual move affects
-	   the dragon. The dragon safety alone is not enough. The 
-	   question is whether the dragon is threatened by the move 
-	   or not. */	
+	/* FIXME: This value cannot be computed without some
+	 * measurement of how the actual move affects the dragon. The
+	 * dragon safety alone is not enough. The question is whether
+	 * the dragon is threatened by the move or not.
+	 */
 	this_value = (dragon[aa].effective_size
 		      * (1.0 - dragon_safety(aa, 1)));
 
@@ -2833,6 +3063,32 @@ estimate_strategical_value(int pos, int color, float score)
 	 */
 	this_value *= 0.75;
 
+	/* No strategical attack value is awarded if the dragon at (aa)
+	 * has an adjacent (friendly) critical dragon, which is not
+	 * defended by this move. In that case it's probably a mistake
+	 * to make the strategical attack since the dragon can defend
+	 * itself with profit.
+	 *
+	 * FIXME: We probably need to verify that the critical dragon is
+	 * substantial enough that capturing it saves the strategically
+	 * attacked dragon.
+	 */
+	if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE)
+	{
+	  int s;
+	  
+	  for (s = 0; s < DRAGON2(aa).neighbors; s++) {
+	    int d = DRAGON2(aa).adjacent[s];
+	    int adj = dragon2[d].origin;
+	    
+	    if (dragon[adj].color == color
+		&& dragon[adj].matcher_status == CRITICAL
+		&& dragon2[d].safety != INESSENTIAL
+		&& !owl_defense_move_reason_known(pos, find_dragon(adj)))
+	      this_value = 0.0;
+	  }
+	}
+		
 	if (this_value > dragon_value[d1])
 	  dragon_value[d1] = this_value;
 
@@ -2893,16 +3149,16 @@ estimate_strategical_value(int pos, int color, float score)
      */
     if (dragon[aa].matcher_status != DEAD
 	&& dragon[aa].size == worm[aa].size
-	&& (move_reason_known(pos, ATTACK_MOVE, find_worm(aa))
-	    || move_reason_known(pos, DEFEND_MOVE, find_worm(aa))))
+	&& (attack_move_reason_known(pos, find_worm(aa))
+	    || defense_move_reason_known(pos, find_worm(aa))))
       continue;
     
     /* If the dragon has been owl captured, owl defended, or involved
      * in a semeai, we have likewise already counted the points as
      * territorial value.
      */
-    if (move_reason_known(pos, OWL_ATTACK_MOVE, k)
-	|| move_reason_known(pos, OWL_DEFEND_MOVE, k)
+    if (owl_attack_move_reason_known(pos, k)
+	|| owl_defense_move_reason_known(pos, k)
 	|| move_reason_known(pos, SEMEAI_MOVE, k)) {
       /* But if the strategical value was larger than the territorial
        * value (e.g. because connecting to strong dragon) we award the
@@ -3425,13 +3681,13 @@ review_move_reasons(int *i, int *j, float *val, int color,
      * value of the move must be taken into account here.
      */
     if (!ko_values_have_been_added || !ON_BOARD(best_move))
-      allowed_blunder_size = (int) (bestval / 2);
+      allowed_blunder_size = (int) (bestval / 2 - 1);
     else {
       int base_value;
 
       ASSERT_ON_BOARD1(best_move);
       base_value = bestval - move[best_move].additional_ko_value;
-      allowed_blunder_size = (int) (base_value / 2);
+      allowed_blunder_size = (int) (base_value / 2 - 1);
     }
     
     /* If the best move is an illegal ko capture, reevaluate ko

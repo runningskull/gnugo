@@ -497,7 +497,7 @@ filllib_confirm_safety(int move, int color, int *defense_point)
     for (k = 0; k < 4; k++) {
       int pos2 = move + delta[k];
       if (board[pos2] == OTHER_COLOR(color)
-	  && !play_attack_defend_n(color, 0, 1, I(move), J(move), I(pos2), J(pos2))) {
+	  && !play_attack_defend_n(color, 0, 1, move, pos2)) {
 	int adj;
 	adj = chainlinks(pos2, adjs);
 	/* It seems unlikely that we would ever get adjacent strings

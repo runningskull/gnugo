@@ -116,6 +116,7 @@ loadsgf games/nicklas/nicklas17.sgf 47
 1701 gg_genmove black
 #? [C9|A8]
 
+# Owl reading problem. See also owl:228.
 loadsgf games/nicklas/nicklas18.sgf 17
 1802 gg_genmove black
 #? [E2]

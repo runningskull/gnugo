@@ -298,8 +298,8 @@ decidesemeai(int ai, int aj, int bi, int bj, const char *sgf_output)
   
   if (sgf_output)
     begin_sgftreedump(&tree);
-  owl_analyze_semeai(ai, aj, bi, bj);
-  owl_analyze_semeai(bi, bj, ai, aj);
+  owl_analyze_semeai(POS(ai, aj), POS(bi, bj));
+  owl_analyze_semeai(POS(bi, bj), POS(ai, aj));
 
   if (sgf_output) {
     end_sgftreedump(sgf_output);

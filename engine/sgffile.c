@@ -365,8 +365,8 @@ static void
 sgftree_printboard(SGFTree *tree);
 
 /*
- * begin_sgfdump begins outputting all moves considered by
- * trymove and tryko to an sgf file.
+ * begin_sgftreedump begins storing all moves considered by
+ * trymove and tryko in an sgf tree in memory.
  */
 
 void
@@ -383,7 +383,7 @@ begin_sgftreedump(SGFTree *tree)
 
 
 /*
- * end_sgfdump ends the dump and closes the sgf file.
+ * end_sgftreedump ends the dump and writes the sgf tree to file.
  */
 
 void 

@@ -1413,12 +1413,13 @@ Xa?
 
 
 Pattern D510
+# gf Devalued. (3.1.12)
 
 ?OX      capture to defend
 *XO
 ?O?
 
-:8,-,value(90)
+:8,-,value(75)
 
 ?aX
 *XO
@@ -2148,6 +2149,22 @@ o.bo
 ?oaX
 
 ;owl_eyespace(b,a) && !owl_big_eyespace(b,a)
+
+
+Pattern D717
+# gf New pattern. (3.1.12)
+
+oOXx         eat lunch to make certain eye
+OXOX
+O.*x
+
+:8,-,value(81)
+
+oOXx
+OAOX
+O.*x
+
+;!oplay_defend(*,A)
 
 
 #########################################################
@@ -4149,17 +4166,18 @@ oeoo
 
 
 Pattern D1332
+# gf Revised. (3.1.12)
 
 ?O?x          break out into the center, followup
 XO*X
-.XO.
+xXO.
 oooo
 
 :8,-,value(95)
 
 ?O?x
 XO*X
-.XO.
+xXO.
 oaoo
 
 ;owl_escape_value(a)>0
@@ -4758,6 +4776,24 @@ Pattern D1367
 ?OO?
 
 :8,-,value(60)
+
+
+Pattern D1368
+# gf added (3.1.12)
+
+...?       move out
+.*X?       
+..OX
+XOo?
+
+:8,-,value(70)
+
+b..?       move out
+.*X?       
+..OX
+Xao?
+
+;lib(a)>1 && owl_escape_value(b)>0
 
 
 #########################################################
