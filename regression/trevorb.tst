@@ -479,7 +479,7 @@ loadsgf games/trevor/auto/b72.sgf 52
 
 loadsgf games/trevor/auto/b72.sgf 64
 790 restricted_genmove white K5 K6 H6
-#? [K6|K5]*
+#? [K6|K5]
 
 
 #Actually, L4 is probably best, though J4 leads to

@@ -1,3 +1,32 @@
+========================== 3.3.17 pre 5  ============================
+
+./regress.sh . neurogo.tst 
+14 unexpected FAIL: Correct 'Q4', got 'T4'
+./regress.sh . trevorb.tst 
+790 unexpected PASS!
+./regress.sh . buzco.tst 
+5 unexpected FAIL: Correct 'C10|C11|E9|A4|F10', got 'A9'
+./regress.sh . nngs.tst 
+1520 unexpected FAIL: Correct 'F15|F14', got 'B17'
+./regress.sh . global.tst 
+3 unexpected FAIL: Correct 'H4', got 'J4'
+44 unexpected FAIL: Correct 'D5', got 'G7'
+45 unexpected FAIL: Correct 'D5', got 'G7'
+./regress.sh . 13x13.tst 
+36 unexpected PASS!
+./regress.sh . strategy4.tst 
+191 unexpected FAIL: Correct 'C12', got 'B4'
+./regress.sh . owl1.tst 
+297 unexpected FAIL: Correct '1 A13', got '0'
+./regress.sh . nngs3.tst 
+760 unexpected PASS!
+./regress.sh . nngs4.tst 
+210 unexpected PASS!
+./regress.sh . ninestones.tst 
+540 unexpected PASS!
+./regress.sh . arend2.tst 
+80 unexpected FAIL: Correct 'L2', got 'N2'
+
 ========================== 3.3.17 pre 4  ============================
 
 ./regress.sh . atari_atari.tst 

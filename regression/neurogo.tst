@@ -67,7 +67,7 @@ loadsgf games/FSF-neurogo.sgf 176
 
 loadsgf games/FSF-neurogo.sgf 178
 14 gg_genmove white
-#? [Q4]
+#? [Q4]*
 
 # White A16 is about three points reverse sente. G19 is two points
 # double sente, but black can get in A16 in sente before answering

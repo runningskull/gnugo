@@ -160,7 +160,7 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 214
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 228
 540 gg_genmove black
-#? [B15]*
+#? [B15]
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 254
 550 gg_genmove black

@@ -682,7 +682,7 @@ loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 24
 # Other moves possible, !G6
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 44
 1520 gg_genmove white
-#? [F15|F14]
+#? [F15|F14]*
 
 
 

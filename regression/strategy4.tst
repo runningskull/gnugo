@@ -216,7 +216,7 @@ loadsgf games/pooo.sgf 52
 
 loadsgf games/pooo.sgf 56
 191 gg_genmove black
-#? [C12]
+#? [C12]*
 
 loadsgf games/pooo.sgf 74
 192 gg_genmove black

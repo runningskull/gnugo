@@ -8,7 +8,7 @@ loadsgf golois/Aya991113-12.sgf
 
 loadsgf golois/Aya991113-13.sgf
 3 gg_genmove black
-#? [H4]
+#? [H4]*
 
 loadsgf golois/Aya991113-1.sgf
 4 gg_genmove black
@@ -184,11 +184,11 @@ loadsgf golois/MeilleurCoup0009.sgf
 
 loadsgf golois/MeilleurCoup0010.sgf
 44 gg_genmove black
-#? [D5]
+#? [D5]*
 
 loadsgf golois/MeilleurCoup990428-1.sgf
 45 gg_genmove black
-#? [D5]
+#? [D5]*
 
 #CATEGORY=SEMEAI
 #DESCRIPTION=
