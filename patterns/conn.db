@@ -810,6 +810,23 @@ b??
 ;!xplay_connect(*,a,b)
 
 
+Pattern CB18
+
+?X?
+X.X        workaround for ko contingent connection
+OXO
+?O*
+
+:8,BY
+
+?X?
+XbX
+OAd
+?c*
+
+;xplay_attack(*,A)<WIN && !xplay_connect(*,?,b,c,d)
+
+
 ########################
 #
 # C patterns on the edge

@@ -1967,6 +1967,48 @@ estimate_strategical_value(int pos, int color, float score)
 	break;
 	
       case CONNECT_MOVE:
+
+	/* If the opponent just added a stone to a dead dragon, which is
+	 * adjacent to both dragons being connected, then the connection
+	 * is probably a good way to make sure the thrashing dragon
+	 * stays dead. If we are ahead, add a safety move here, at most
+	 * half the margin of victory.
+	 *
+	 * This does not apply if we are doing scoring.
+	 *
+	 * FIXME: The margin of victory limit is not implemented.
+	 */
+      
+	if (!doing_scoring) {
+	  int cc;
+	  worm1 = conn_worm1[move_reasons[r].what];
+	  worm2 = conn_worm2[move_reasons[r].what];
+	  aa = dragon[worms[worm1]].origin;
+	  bb = dragon[worms[worm2]].origin;
+	  cc = get_last_opponent_move(color);
+	  
+	  if (cc != NO_MOVE
+	      && dragon[cc].matcher_status == DEAD
+	      && are_neighbor_dragons(aa, cc)
+	      && are_neighbor_dragons(bb, cc)) {
+	    if (aa == bb)
+	      this_value = 1.6 * dragon[cc].effective_size;
+	    else if (DRAGON2(aa).safety == INESSENTIAL
+		     || DRAGON2(bb).safety == INESSENTIAL)
+	      this_value = 0.8 * dragon[cc].effective_size;
+	    else
+	      this_value = 1.7 * dragon[cc].effective_size;
+	    
+	    d1 = find_dragon(cc);
+	    if (this_value > dragon_value[d1]) {
+	      dragon_value[d1] = this_value;
+	      DEBUG(DEBUG_MOVE_REASONS,
+		    "  %1m:   %f - connect %1m and %1m to attack thrashing dragon %1m\n",
+		    pos, this_value, aa, bb, cc);
+	    }
+	  }
+	}
+
 	if (!move[pos].move_safety)
 	  break;
 	/* Otherwise fall through. */

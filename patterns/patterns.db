@@ -8906,6 +8906,7 @@ O.o
 
 Pattern CB336
 # db New pattern (3.1.28)
+# gf FIXME: This is an edge pattern. Should be moved to EBxxx. (3.3.4)
 
 ?Xxx??         simply extend to avoid bad aji
 oOX.x?
@@ -8958,6 +8959,22 @@ abh
 
 ;(x_somewhere(d,e,f,g,h) || xarea(f))
 ;&& !oplay_disconnect(*,b,*,a) && !oplay_disconnect(*,c,*,a)
+
+
+Pattern CB339
+# gf New pattern. (3.3.4)
+
+?x?
+x.O
+.*X
+
+:8,OXe
+
+?x?
+xaO
+c*B
+
+;xterri(c) && oplay_attack_either(*,a,a,B)
 
 
 ######################################################################

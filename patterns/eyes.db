@@ -1428,13 +1428,21 @@ Pattern 6204
 Pattern 6205
 
   !
+x..x@
+
+:2,1
+
+
+Pattern 6206
+
+  !
 !x..!
  ---
 
 :0,0
 
 
-Pattern 6206
+Pattern 6207
 # tm New Pattern (3.1.22) (see owl:111)
 
   @
@@ -1443,7 +1451,7 @@ Pattern 6206
 :1,0
 
 
-Pattern 6207
+Pattern 6208
 # tm modified (3.1.22)
 
   !
@@ -2039,6 +2047,15 @@ Pattern 7022
 
 
 Pattern 7023
+# Defending the other marginal vertex is always incorrect.
+
+  !
+@X.xxx
+
+:2,1
+
+
+Pattern 7024
 
   . @|
 !...x|
@@ -2047,7 +2064,7 @@ Pattern 7023
 :2,1
 
 
-Pattern 7024
+Pattern 7025
 
   x
 !x*xx!
@@ -2055,7 +2072,7 @@ Pattern 7024
 :2,1
 
 
-Pattern 7025
+Pattern 7026
 
   )
 ..>..@
@@ -2063,7 +2080,7 @@ Pattern 7025
 :2,1
 
 
-Pattern 7026
+Pattern 7027
 
   !
 !..x.!

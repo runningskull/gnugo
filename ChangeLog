@@ -2,7 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- moves to connect two dragons which are both adjacent to a thrashing
+  dragon are appreciated by the move valuation
 - experimental connections off by default in VC build
+- tuning
+- influence tuning
+- connection tuning
+- eye tuning
+- joseki tuning
 - owl tuning
 - new tests and game records
 

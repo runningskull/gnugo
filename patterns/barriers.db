@@ -2502,4 +2502,22 @@ cXO
 >non_xterritory(c);
 
 
+Pattern Nonterritory35
+# gf New pattern. (3.3.4)
+
+..O
+..X
+
+:/,t
+
+caO
+dbX
+
+;!oplay_attack(a,b,c,a) && !oplay_attack(a,c,b,a)
+
+>non_xterritory(b);
+>non_xterritory(c);
+>non_xterritory(d);
+
+
 # END OF FILE
