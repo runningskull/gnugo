@@ -518,7 +518,8 @@ filllib_confirm_safety(int m, int n, int color, int *di, int *dj)
    * our color.
    */
   for (k = 0; k < 4; k++)
-    if (ON_BOARD(m + deltai[k], n + deltaj[k]) && p[m + deltai[k]][n + deltaj[k]] == color) {
+    if (ON_BOARD(m + deltai[k], n + deltaj[k]) 
+	&& p[m + deltai[k]][n + deltaj[k]] == color) {
       ai = m + deltai[k];
       aj = n + deltaj[k];
       break;

@@ -468,13 +468,12 @@ computer_move(Gameinfo *gameinfo, int *passes)
   last_move_j = j;
   
   mprintf("%s(%d): %m\n", color_to_string(gameinfo->to_move),
-	  gameinfo->move_number, i, j);
+	  gameinfo->move_number+1, i, j);
   if (is_pass(i, j))
     (*passes)++;
   else
     *passes = 0;
 
-#if 1
   gnugo_play_move(&gameinfo->position, i, j, gameinfo->to_move);
   curnode = sgfAddPlay(curnode, gameinfo->to_move, i, j);
 
@@ -482,9 +481,6 @@ computer_move(Gameinfo *gameinfo, int *passes)
   
   gameinfo->move_number++;
   gameinfo->to_move = gameinfo->to_move == BLACK ? WHITE : BLACK;
-#else
-  gameinfo_play_move(gameinfo, i, j, gameinfo->to_move);
-#endif
 }
 
 
@@ -630,16 +626,15 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	ascii_showboard(&gameinfo->position);
       
       /* Print the prompt */
-      if (gameinfo->to_move == WHITE)
-	printf("White(%d): ", gameinfo->move_number+1);
-      if (gameinfo->to_move == BLACK)
-	printf("Black(%d): ", gameinfo->move_number+1);
-      
+      mprintf("%s(%d): ", color_to_string(gameinfo->to_move),
+	      gameinfo->move_number+1);
+
       /* Read a line of input. */
       line_ptr = line;
-      if (!fgets(line, 80, stdin))
-	break; /* EOF or some error */
-      
+      if (!fgets(line, 80, stdin)) {
+	printf("\nThanks! for playing GNU Go.\n\n");
+	return ;
+      }      
       while (command = strtok(line_ptr, ";"), line_ptr = 0, command) {
 	
 	/* Get the command or move. */
@@ -674,7 +669,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    break;
 	  }
 	  if (sgf_initialized) {
-	    printf("Boardsize cannot be modified after game record is started!\n");
+	    printf("Boardsize cannot be changed after record is started!\n");
 	    break;
 	  }
 	  command += 10;
@@ -702,7 +697,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    break;
 	  }
 	  if (sgf_initialized) {
-	    printf("Handicap cannot be modified after game record is started!\n");
+	    printf("Handicap cannot be changed after game is started!\n");
 	    break;
 	  }
 	  command += 9;
@@ -718,7 +713,8 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  gnugo_clear_position(&gameinfo->position,
 			       gameinfo->position.boardsize,
 			       gameinfo->position.komi);
-	  /* place stones on board but don't record sgf in case we change more info */
+	  /* place stones on board but don't record sgf 
+	   * in case we change more info */
 	  gameinfo->handicap = gnugo_placehand(&gameinfo->position, num);
 	  sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	  printf("\nSet handicap to %d\n", gameinfo->handicap);
