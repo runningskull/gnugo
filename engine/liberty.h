@@ -330,6 +330,14 @@ void store_persistent_reading_cache(int routine, int str, int result,
 				    int move, int nodes);
 void delete_persistent_reading_cache_entry(int routine, int str);
 void reading_hotspots(float values[BOARDMAX]);
+void purge_persistent_connection_cache(void);
+void clear_persistent_connection_cache(void);
+int search_persistent_connection_cache(int routine, int str1, int str2,
+				       int *result, int *move);
+void store_persistent_connection_cache(int routine, int str1, int str2,
+				       int result, int move,
+				       int tactical_nodes,
+				       char connection_shadow[BOARDMAX]);
 void purge_persistent_owl_cache(void);
 void clear_persistent_owl_cache(void);
 int search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,

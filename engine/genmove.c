@@ -113,6 +113,7 @@ examine_position(int color, int how_much)
   int save_verbose = verbose;
 
   purge_persistent_reading_cache();
+  purge_persistent_connection_cache();
   
   /* Don't print reading traces during make_worms and make_dragons unless 
    * the user really wants it (verbose == 3). 

@@ -86,6 +86,32 @@ static struct reading_cache persistent_reading_cache[MAX_READING_CACHE_SIZE];
 static int persistent_reading_cache_size = 0;
 
 
+/* Connection reading cache. */
+
+#define MAX_CONNECTION_CACHE_DEPTH 5
+#define MAX_CONNECTION_CACHE_SIZE 100
+
+struct connection_cache {
+  int boardsize;
+  char board[BOARDMAX];
+  int movenum;
+  int nodes;
+  int score;
+  int remaining_depth;
+  int routine;			/* CONNECT or DISCONNECT */
+  int str1;			/* first string to connect (origin) */
+  int str2;			/* second string to connect (origin) */
+  int result;
+  int move;			/* connect/disconnect point */
+  int stack[MAX_CONNECTION_CACHE_DEPTH];
+  int move_color[MAX_CONNECTION_CACHE_DEPTH];
+};
+
+static struct connection_cache
+persistent_connection_cache[MAX_READING_CACHE_SIZE];
+static int persistent_connection_cache_size = 0;
+
+
 /* Owl reading cache. */
 
 #define MAX_OWL_CACHE_SIZE 150
@@ -122,6 +148,11 @@ static int find_persistent_reading_cache_entry(int routine, int str);
 static void print_persistent_reading_cache_entry(int k);
 static void mark_string_hotspot_values(float values[BOARDMAX],
 				       int m, int n, float contribution);
+
+/* Connection reading functions. */
+static int find_persistent_connection_cache_entry(int routine,
+						  int str1, int str2);
+static void print_persistent_connection_cache_entry(int k);
 
 /* Owl functions. */
 static void print_persistent_owl_cache_entry(int k);
@@ -631,6 +662,347 @@ reading_hotspots(float values[BOARDMAX])
       break;
     }
   }
+}
+
+
+/* ================================================================ */
+/*                  Connection reading functions                    */
+/* ================================================================ */
+
+/* Remove persistent cache entries which are no longer current. */
+void
+purge_persistent_connection_cache()
+{
+  int k;
+  int r;
+  static int last_purge_position_number = -1;
+  gg_assert(stackp == 0);
+
+  /* Never do this more than once per move. */
+  if (last_purge_position_number == position_number)
+    return;
+  else
+    last_purge_position_number = position_number;
+
+  for (k = 0; k < persistent_connection_cache_size; k++) {
+    int played_moves = 0;
+    int entry_ok = 1;
+
+    if (persistent_connection_cache[k].boardsize != board_size)
+      entry_ok = 0;
+    else {
+      for (r = 0; r < MAX_CONNECTION_CACHE_DEPTH; r++) {
+	int apos = persistent_connection_cache[k].stack[r];
+	int color = persistent_connection_cache[k].move_color[r];
+	if (apos == 0)
+	  break;
+	if (board[apos] == EMPTY
+	    && trymove(apos, color, "purge_persistent_connection_cache", 0,
+		       EMPTY, 0))
+	  played_moves++;
+	else {
+	  entry_ok = 0;
+	  break;
+	}
+      }
+    }
+
+    if (!entry_ok 
+	|| !verify_stored_board(persistent_connection_cache[k].board)) {
+      /* Move the last entry in the cache here and back up the loop
+       * counter to redo the test at this position in the cache.
+       */
+      if (0)
+	gprintf("Purging entry %d from cache.\n", k);
+      if (k < persistent_connection_cache_size - 1)
+	persistent_connection_cache[k] 
+	  = persistent_connection_cache[persistent_connection_cache_size - 1];
+      k--;
+      persistent_connection_cache_size--;
+    }
+
+    while (played_moves > 0) {
+      popgo();
+      played_moves--;
+    }
+  }
+}
+
+void
+clear_persistent_connection_cache()
+{
+  persistent_connection_cache_size = 0;
+}
+
+
+/* Locate a matching entry in the persistent connection cache. Return the
+ * entry number or -1 if none found.
+ */
+static int
+find_persistent_connection_cache_entry(int routine, int str1, int str2)
+{
+  int k;
+  int r;
+  ASSERT1(str1 == find_origin(str1), str1);
+  ASSERT1(str2 == find_origin(str2), str2);
+  ASSERT1(str1 <= str2, str1);
+
+  for (k = 0; k < persistent_connection_cache_size; k++) {
+    /* Check that everything matches. */
+    struct connection_cache *entry = &(persistent_connection_cache[k]);
+    int apos = 0;
+    if (entry->routine != routine
+	|| entry->str1 != str1
+	|| entry->str2 != str2
+	|| entry->remaining_depth < (depth - stackp)
+	|| entry->boardsize != board_size)
+      continue;
+    
+    for (r = 0; r < MAX_CONNECTION_CACHE_DEPTH; r++) {
+      apos = entry->stack[r];
+      if (apos == 0
+	  || (entry->board[apos] != GRAY
+	      && board[apos] != entry->board[apos]))
+	break;
+    }
+
+    if (r < MAX_CONNECTION_CACHE_DEPTH && apos != 0)
+      continue;
+
+    if (!verify_stored_board(entry->board))
+      continue;
+
+    return k;
+  }
+  
+  return -1;
+}
+
+
+/* Look for a valid read result in the persistent connection cache.
+ * Return 1 if found, 0 otherwise.
+ */
+int
+search_persistent_connection_cache(int routine, int str1, int str2,
+				   int *result, int *move)
+{
+  int k;
+  struct connection_cache *entry;
+
+  k = find_persistent_connection_cache_entry(routine, str1, str2);
+  if (k == -1)
+    return 0;
+
+  /* Match found. Increase score and fill in the answer. */
+  entry = &(persistent_connection_cache[k]);
+  entry->score += entry->nodes;
+  if (result)
+    *result = entry->result;
+  if (move)
+    *move = entry->move;
+  ASSERT1(entry->result == 0
+	  || entry->move == NO_MOVE
+	  || ON_BOARD(entry->move),
+	  entry->move);
+  
+  return 1;
+}
+
+
+/* Store a new connection result in the persistent cache. */
+void
+store_persistent_connection_cache(int routine, int str1, int str2,
+				  int result, int move, int tactical_nodes,
+				  char connection_shadow[BOARDMAX])
+{
+  char active[BOARDMAX];
+  int k;
+  int r;
+  int score = tactical_nodes;
+  struct connection_cache *entry;
+  int other = OTHER_COLOR(board[str1]);
+  int pos;
+
+  ASSERT1(result == 0 || (move == 0) || ON_BOARD(move), move);
+
+  /* Never cache results at too great depth. */
+  if (stackp > MAX_CONNECTION_CACHE_DEPTH)
+    return;
+
+  /* If cache is still full, consider kicking out an old entry. */
+  if (persistent_connection_cache_size == MAX_CONNECTION_CACHE_SIZE) {
+    int worst_entry = -1;
+    int worst_score = score;
+    
+    for (k = 1; k < persistent_connection_cache_size; k++) {
+      if (persistent_connection_cache[k].score < worst_score) {
+	worst_score = persistent_connection_cache[k].score;
+	worst_entry = k;
+      }
+    }
+
+    if (worst_entry != -1) {
+      /* Move the last entry in the cache here to make space.
+       */
+      if (worst_entry < persistent_connection_cache_size - 1)
+	persistent_connection_cache[worst_entry] 
+	  = persistent_connection_cache[persistent_connection_cache_size - 1];
+      persistent_connection_cache_size--;
+    }
+    else
+      return;
+  }
+
+  entry = &(persistent_connection_cache[persistent_connection_cache_size]);
+  entry->boardsize       = board_size;
+  entry->movenum         = movenum;
+  entry->nodes           = tactical_nodes;
+  entry->score           = score;
+  entry->remaining_depth = depth - stackp;
+  entry->routine         = routine;
+  entry->str1	         = str1;
+  entry->str2	         = str2;
+  entry->result          = result;
+  entry->move	         = move;
+
+  for (r = 0; r < MAX_CONNECTION_CACHE_DEPTH; r++) {
+    if (r < stackp)
+      get_move_from_stack(r, &(entry->stack[r]), &(entry->move_color[r]));
+    else {
+      entry->stack[r] = 0;
+      entry->move_color[r] = EMPTY;
+    }
+  }
+  
+  /* Remains to set the board. We let the active area be
+   * the two strings to connect +
+   * the connection shadow +
+   * distance two expansion through empty intersections and own stones +
+   * adjacent opponent strings +
+   * liberties of adjacent opponent strings with less than five liberties +
+   * liberties of low liberty neighbors of adjacent opponent strings
+   * with less than five liberties.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    active[pos] = connection_shadow[pos];
+
+  mark_string(str1, active, 1);
+  mark_string(str2, active, 1);
+
+  /* To be safe, also add the successful move. */
+  if (result != 0 && move != 0)
+    active[move] = 1;
+
+  /* Distance two expansion through empty intersections and own stones. */
+  for (k = 1; k < 3; k++) {
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++){
+      if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
+	continue;
+      if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
+	  || (ON_BOARD(WEST(pos)) && active[WEST(pos)] == k)
+	  || (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == k)
+	  || (ON_BOARD(EAST(pos)) && active[EAST(pos)] == k)) {
+	if (board[pos] == EMPTY)
+	  active[pos] = k + 1;
+	else
+	  mark_string(pos, active, (char) (k + 1));
+      }
+    }
+  }
+  
+  /* Adjacent opponent strings. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] != other || active[pos] != 0) 
+      continue;
+    for (r = 0; r < 4; r++) {
+      int pos2 = pos + delta[r];
+      if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
+	mark_string(pos, active, (char) 1);
+	break;
+      }
+    }
+  }
+  
+  /* Liberties of adjacent opponent strings with less than five liberties +
+   * liberties of low liberty neighbors of adjacent opponent strings
+   * with less than five liberties.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == other && active[pos] != 0 && countlib(pos) < 5) {
+      int libs[4];
+      int liberties = findlib(pos, 4, libs);
+      int adjs[MAXCHAIN];
+      int adj;
+      for (r = 0; r < liberties; r++)
+	active[libs[r]] = 1;
+      
+      /* Also add liberties of neighbor strings if these are three
+       * or less.
+       */
+      adj = chainlinks(pos, adjs);
+      for (r = 0; r < adj; r++) {
+	if (countlib(adjs[r]) <= 3) {
+	  int s;
+	  liberties = findlib(adjs[r], 3, libs);
+	  for (s = 0; s < liberties; s++)
+	    active[libs[s]] = 1;
+	}
+      }
+    }
+  }
+  
+  /* Also add the previously played stones to the active area. */
+  for (r = 0; r < stackp; r++)
+    active[entry->stack[r]] = 1;
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int value = board[pos];
+    if (!ON_BOARD(pos))
+      continue;
+    if (!active[pos])
+      value = GRAY;
+    else if (IS_STONE(board[pos]) && countlib(pos) > 4)
+      value |= HIGH_LIBERTY_BIT;
+    
+    persistent_connection_cache[persistent_connection_cache_size].board[pos] =
+      value;
+  }
+
+  if (0) {
+    gprintf("%o Stored result in cache (entry %d):\n",
+	    persistent_connection_cache_size);
+    print_persistent_connection_cache_entry(persistent_connection_cache_size);
+  }
+  
+  persistent_connection_cache_size++;
+}
+
+
+/* For debugging purposes. */
+static void
+print_persistent_connection_cache_entry(int k)
+{
+  struct connection_cache *entry = &(persistent_connection_cache[k]);
+  int r;
+  gprintf("%oboardsize       = %d\n",  entry->boardsize);
+  gprintf("%omovenum         = %d\n",  entry->movenum);
+  gprintf("%onodes           = %d\n",  entry->nodes);
+  gprintf("%oscore           = %d\n",  entry->score);
+  gprintf("%oremaining_depth = %d\n",  entry->remaining_depth);
+  gprintf("%oroutine         = %d\n",  entry->routine);
+  gprintf("%ostr1            = %1m\n", entry->str1);
+  gprintf("%ostr2            = %1m\n", entry->str2);
+  gprintf("%oresult          = %d\n",  entry->result);
+  gprintf("%omove            = %1m\n", entry->move);
+  
+  for (r = 0; r < MAX_CONNECTION_CACHE_DEPTH; r++) {
+    if (entry->stack[r] == 0)
+      break;
+    gprintf("%ostack[%d]      = %C %1m\n", r, entry->move_color[r],
+	    entry->stack[r]);
+  }
+
+  draw_active_area(entry->board, NO_MOVE);
 }
 
 

@@ -85,6 +85,10 @@ int max_nodes_connect = 2000;
 int max_connect_depth = 64;
 int max_connect_depth2 = 20; /* Used by the alternate algorithm. */
 
+/* Used by alternate connections. */
+static char connection_shadow[BOARDMAX];
+
+
 /* Statistics. */
 static int global_connection_node_counter = 0;
 
@@ -1052,6 +1056,27 @@ quiescence_connect(int str1, int str2, int *move)
 }
 
 
+/* A persistent connection cache has been implemented, but currently
+ * (3.3.15) it does not have much impact on performance. Possible
+ * explanations for this include:
+ * 1. The active area is too often unnecessarily large.
+ * 2. Between the persistent caches of tactical reading and owl
+ *    reading, there is not much to gain from also caching the
+ *    connection results.
+ * 3. There is some bug in the implementation.
+ *
+ * In order to simplify testing of code modifications, the caching
+ * code has been made conditional. Setting
+ * USE_PERSISTENT_CONNECTION_CACHE to 0, 1, or 2 has the following
+ * effects.
+ * 0 - Completely turned off.
+ * 1 - Results are stored in the cache but retrieved results are only
+ *     compared to the non-cached result. Deviations are reported.
+ * 2 - Fully turned on.
+ */
+#define USE_PERSISTENT_CONNECTION_CACHE 0
+
+
 /* Externally callable frontend to recursive_connect(). */
 
 int
@@ -1071,13 +1096,49 @@ string_connect(int str1, int str2, int *move)
     int reading_nodes_when_called = get_reading_node_counter();
     double start = 0;
     int tactical_nodes;
+#if USE_PERSISTENT_CONNECTION_CACHE == 1
+    int result2 = -1;
+    int move2;
+#endif
+    if (board[str1] == EMPTY || board[str2] == EMPTY)
+      return 0;
+    str1 = find_origin(str1);
+    str2 = find_origin(str2);
+    if (str1 > str2) {
+      int tmp = str1;
+      str1 = str2;
+      str2 = tmp;
+    }
+
+#if USE_PERSISTENT_CONNECTION_CACHE == 1
+    if (!search_persistent_connection_cache(CONNECT, str1, str2,
+					    &result2, &move2))
+      result2 = -1;
+    else if (0)
+      gprintf("Persistent cache found connect %1m %1m: %d %1m\n",
+	      str1, str2, result2, move2);
+#endif
+#if USE_PERSISTENT_CONNECTION_CACHE == 2
+    if (search_persistent_connection_cache(CONNECT, str1, str2, &result, move))
+      return result;
+#endif
+
     save_verbose = verbose;
     if (verbose > 0)
       verbose--;
     start = gg_cputime();
+    memset(connection_shadow, 0, sizeof(connection_shadow));
     result = recursive_connect2(str1, str2, move, EMPTY, NO_MOVE, 0);
     verbose = save_verbose;
     tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+
+#if USE_PERSISTENT_CONNECTION_CACHE == 1
+    if (result2 != -1
+	&& result2 != result
+	&& *move != move2)
+      gprintf("Persistent cache failure connect %1m %1m: %d %1m != %d %1m\n",
+	      str1, str2, result, *move, result2, move2);
+#endif
 
     if (0) {
       gprintf("%oconnect    %1M %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
@@ -1090,6 +1151,11 @@ string_connect(int str1, int str2, int *move)
       dump_stack();
     }
 
+#if USE_PERSISTENT_CONNECTION_CACHE > 0
+    store_persistent_connection_cache(CONNECT, str1, str2, result, *move,
+				      tactical_nodes, connection_shadow);
+#endif
+  
     return result;
   }
 
@@ -1210,13 +1276,50 @@ disconnect(int str1, int str2, int *move)
     int reading_nodes_when_called = get_reading_node_counter();
     double start = 0;
     int tactical_nodes;
+#if USE_PERSISTENT_CONNECTION_CACHE == 1
+    int result2 = -1;
+    int move2;
+#endif
+    if (board[str1] == EMPTY || board[str2] == EMPTY)
+      return WIN;
+    str1 = find_origin(str1);
+    str2 = find_origin(str2);
+    if (str1 > str2) {
+      int tmp = str1;
+      str1 = str2;
+      str2 = tmp;
+    }
+
+#if USE_PERSISTENT_CONNECTION_CACHE == 1
+    if (!search_persistent_connection_cache(DISCONNECT, str1, str2,
+					    &result2, &move2))
+      result2 = -1;
+    else if (0)
+      gprintf("Persistent cache found disconnect %1m %1m: %d %1m\n",
+	      str1, str2, result2, move2);
+#endif
+#if USE_PERSISTENT_CONNECTION_CACHE == 2
+    if (search_persistent_connection_cache(DISCONNECT, str1, str2,
+					   &result, move))
+      return result;
+#endif
+
     save_verbose = verbose;
     if (verbose > 0)
       verbose--;
     start = gg_cputime();
+    memset(connection_shadow, 0, sizeof(connection_shadow));
     result = recursive_disconnect2(str1, str2, move, EMPTY, NO_MOVE, 0);
     verbose = save_verbose;
     tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+
+#if USE_PERSISTENT_CONNECTION_CACHE == 1
+    if (result2 != -1
+	&& result2 != result
+	&& *move != move2)
+      gprintf("Persistent cache failure disconnect %1m %1m: %d %1m != %d %1m\n",
+	      str1, str2, result, *move, result2, move2);
+#endif
 
     if (0) {
       gprintf("%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
@@ -1228,6 +1331,11 @@ disconnect(int str1, int str2, int *move)
       gprintf("%odisconnect %1m %1m %d %1m ", str1, str2, result, *move);
       dump_stack();
     }
+
+#if USE_PERSISTENT_CONNECTION_CACHE > 0
+    store_persistent_connection_cache(DISCONNECT, str1, str2, result, *move,
+				      tactical_nodes, connection_shadow);
+#endif
 
     return result;
   }
@@ -1791,7 +1899,6 @@ static int no_escape_from_ladder(int str);
 static int check_self_atari(int pos, int color_to_move);
 static int common_vulnerabilities(int a1, int a2, int b1, int b2, int color);
 static int common_vulnerability(int apos, int bpos, int color);
-
 
 /* Try to connect two strings. This function is called in a mutual
  * recursion with recursive_disconnect2(). Return codes and the
@@ -2408,6 +2515,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
 #define ENQUEUE(conn, from, pos, dist, delta, v1, v2) \
   do { \
     if (dist < conn->distances[pos]) { \
+      connection_shadow[pos] = 1; \
       if (board[pos] == EMPTY) { \
         if (conn->distances[pos] == HUGE_CONNECTION_DISTANCE) \
           conn->queue[conn->queue_end++] = pos; \
