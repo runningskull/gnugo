@@ -1,11 +1,11 @@
 TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       ld_owl.tst ld_owl_life.tst connection.tst  \
       neurogo.tst arb.tst strategy2.tst strategy3.tst rosebud.tst \
-      owl_rot.tst heikki.tst golife.tst dniwog.tst \
+      owl_rot.tst heikki.tst golife.tst dniwog.tst strategy4.tst \
       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst \
       score.tst ld_owl_rot.tst reading_rot.tst endgame_rot.tst manyfaces.tst \
-      cutstone.tst newscore.tst blunder.tst niki.tst
+      cutstone.tst newscore.tst blunder.tst niki.tst unsorted.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
@@ -49,6 +49,9 @@ strategy2: strategy2.tst
 	$(srcdir)/eval.sh strategy2.tst
 
 strategy3: strategy3.tst
+	$(srcdir)/eval.sh strategy3.tst
+
+strategy4: strategy4.tst
 	$(srcdir)/eval.sh strategy3.tst
 
 cutstone: cutstone.tst
@@ -139,6 +142,9 @@ nicklas5: nicklas5.tst
 niki: niki.tst
 	$(srcdir)/eval.sh niki.tst
 
+unsorted: unsorted.tst
+	$(srcdir)/eval.sh unsorted.tst
+
 all_batches: first_batch second_batch third_batch
 
 first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst life.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
@@ -168,12 +174,13 @@ second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.t
 	$(srcdir)/regress.sh $(srcdir) dniwog.tst
 
 third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst
+	$(srcdir)/regress.sh $(srcdir) strategy3.tst
+	$(srcdir)/regress.sh $(srcdir) strategy4.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas1.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas2.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas3.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas4.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas5.tst
-	$(srcdir)/regress.sh $(srcdir) strategy3.tst
 	$(srcdir)/regress.sh $(srcdir) manyfaces.tst
 	$(srcdir)/regress.sh $(srcdir) niki.tst
-
+	$(srcdir)/regress.sh $(srcdir) unsorted.tst
