@@ -173,6 +173,20 @@ loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 166
 303 owl_does_defend A17 A16
 #? [0]
 
+loadsgf games/gunnar/gunnar6.sgf 135
+304 owl_defend Q14
+#? [0]
+
+loadsgf games/gunnar/gunnar7.sgf
+305 owl_defend P8
+#? [0]
+
+# Only topologically false eyes but it still lives!
+# See also gunnar:27.
+loadsgf games/gunnar/rbm-bobk-200303111815.sgf -L 159
+306 owl_attack M17
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

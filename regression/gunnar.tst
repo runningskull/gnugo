@@ -125,6 +125,36 @@ loadsgf games/nngs/gnugo-3.3.16-rubus-200302281805.sgf 69
 23 restricted_genmove white O4 O5 N4 N5
 #? [N5]
 
+# L17 and P9 are both -1 point gote. K3 is just a random dame point.
+# See also owl1:300
+loadsgf games/gunnar/gunnar7.sgf
+24 restricted_genmove black L17 K3
+#? [K3]
+25 restricted_genmove black P9 K3
+#? [K3]
+
+# J2 is not a relevant cutstone and saving it should not be worth a bonus.
+loadsgf games/gunnar/gunnar8.sgf
+26 restricted_genmove black K1 H1 J3 J4 F9
+#? [F9]
+
+# White cannot make two proper eyes but can make life with
+# topologically false eyes. G18 and M19 both live but G18 is
+# slightly bigger. M12 is a well timed double sente move which of
+# course also makes life. F19, G19, K19, and N19 all die.
+# See also owl1:301
+loadsgf games/gunnar/rbm-bobk-200303111815.sgf 159
+27 gg_genmove white
+#? [G18|M12|M19]
+
+# T9 is maybe okay but it seems to end in ko for the life of one of
+# the white dragons. Anything is better than the game move at N1, but
+# it looks like S9 is the correct move. For the time being we allow
+# also T9, though.
+loadsgf games/nngs/gnugo-3.3.17-joshj-200304172202.sgf 226
+28 gg_genmove white
+#? [S9|T9]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

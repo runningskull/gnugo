@@ -96,3 +96,7 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302252226.sgf 256
 loadsgf games/nngs/gnugo-3.3.16-ccwills-200303030550.sgf
 22 combination_attack black
 #? [L10]
+
+loadsgf games/atari_atari07.sgf
+23 combination_attack black
+#? [C8]
