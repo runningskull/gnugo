@@ -1777,8 +1777,96 @@ topological_eye(int pos, int color,
 					 J(pos) + deltaj[k], color,
 					 &attack_point, &defense_point, 
 					 my_eye);
-    if (val < 2.0 && board[diag] == OTHER_COLOR(color) && !is_edge_vertex(pos) 
-	&& neighbor_of_string(pos, diag) && countstones(diag) >= 3) {
+
+    /*
+     * Eyespaces with cutting points are problematic. In this position
+     * 
+     * .....XXXXX
+     * XXXXX.OO.X
+     * X.OOOO.O.X
+     * X.O.XXXO.X
+     * ----------
+     * 
+     * the eyespace will be .XXX. which evaluates to two eyes (seki)
+     * unless countermeasures are taken.
+     *
+     * This can be worked around in the topological analysis by
+     * sometimes setting the diagonal value to 2.0 for vertices inside
+     * the eyespace which are occupied by opponent stones. More
+     * precisely all of the following conditions must hold:
+     *
+     * a) The value is not already 2.0.
+     * a) The (potential) eyepoint is empty.
+     * b) The diagonal is occupied by an opponent string,
+     * c) which is also adjacent to the (potential) eye and 
+     * d) at least three stones long.
+     * e) The (potential) eye is not on the edge (to steer clear of all the
+     *    hairy cases that are handled by eyes.db anyway).
+     * f) At least two own strings are adjacent to the (potential) eye.
+     * g) At least one of the own strings adjacent to the (potential) eye has
+     *    only one liberty which is an eye space and not decided false, yet.
+     *
+     * With this revision the eyespace above becomes .XXXh or
+     * equivalently .XXX.! which is almost evaluated correctly, eye
+     * value 0122 instead of the correct 1122. Compared to the
+     * previous value 2222 it's a major improvement.
+     *
+     * FIXME: This approach has a number of shortcomings.
+     *
+     *        1. d) is kind of arbitrary and there may be exceptional
+     *           cases.
+     *
+     *        2. This diagonal value modification should not apply to
+     *           two diagonals of the same strings inside the eyespace.
+     *           E.g. if we have a partial eyespace looking like
+     *
+     *           .OOO.
+     *           OO.OO
+     *           OXXXO
+     *
+     *           it doesn't make sense to mark the middle vertex as a
+     *           false eye. Possibly this doesn't make any difference
+     *           in practice but it's at the very least confusing.
+     *
+     *        3. Actually it doesn't make sense to mark vertices as
+     *           false otherwise either due to these revisions (half
+     *           eyes make good sense though) as can be seen if a
+     *           stone is added to the initial diagram,
+     * 
+     *           .....XXXXX
+     *           XXXXXXOO.X
+     *           X.OOOO.O.X
+     *           X.O.XXXO.X
+     *           ----------
+     *
+     *           Now the eyespace instead becomes .XXX! which has the
+     *           eye value 0011 but if X tries to attack the eye O
+     *           suddenly gets two solid eyes!
+     *
+     *           The correct analysis would be to remove the vertex
+     *           from the eyespace rather than turning it into a false
+     *           eye. Then we would have the eyespace .XXX which is
+     *           correctly evaluated to one eye (eye value 1112).
+     *
+     *           The problem with this is that removing eye points is
+     *           messy. It can surely be done but currently there is
+     *           no support in the code for doing that. It has existed
+     *           at an earlier time but was removed because the
+     *           implementation was not robust enough and there was no
+     *           longer any apparent need for it. To correct this
+     *           problem is sufficient reason to reimplement that
+     *           functionality.
+     *
+     *        4. The test of condition g) has a result which
+     *           potentially depends on the ordering of the eyespaces
+     *           and thus presumably on the orientation of the board.
+     *           It might make more sense to examine whether the
+     *           string neighbors more than one empty vertex in the
+     *           same eyespace.
+     */
+    if (val < 2.0 && board[pos] == EMPTY && board[diag] == OTHER_COLOR(color)
+	&& !is_edge_vertex(pos) && neighbor_of_string(pos, diag)
+	&& countstones(diag) >= 3) {
       int strings[3];
       int string_count;
       int s;
@@ -1810,7 +1898,8 @@ topological_eye(int pos, int color,
 	    continue;
 
 	  for (r = 0; r < lib_count && adj_eye_count < 2; r++)
-	    if (is_proper_eye_space(libs[r]))
+	    if (my_eye[libs[r]].color == OTHER_COLOR(color)
+		&& !my_eye[libs[r]].marginal)
 	      adj_eye_count++;
 	  if (adj_eye_count < 2) {
 	    val = 2.0;

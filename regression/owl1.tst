@@ -422,6 +422,12 @@ loadsgf games/kgs/GnuGoCVS-john.sgf 166
 363 owl_defend F9
 #? [1 (F5|G5|G6|H6)]*
 
+loadsgf games/owl54.sgf
+364 owl_attack E9
+#? [1 (PASS|A7|D6|F8|F9)]
+365 owl_defend E9
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

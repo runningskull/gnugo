@@ -3,6 +3,7 @@
 -------------------------------------------------------------------------
 
 - Revise diagonal value in topological_eye() to account for damezumari
+- new and revised tests
 
 3.7.2 released January 20, 2005
 
