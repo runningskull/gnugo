@@ -84,12 +84,6 @@ AC_ARG_ENABLE(experimental-connections,
                                          (default)
   --disable-experimental-connections use standard connection analysis])
 
-AC_ARG_ENABLE(alternate-connections,
- [  --enable-alternate-connections     use alternate experimental connection
-                                       analysis
-  --disable-alternate-connections    use primary experimental connection 
-                                     analysis (default)])
-
 dnl expand any instances of @matcher@ in Makefile
 AC_SUBST(dfa_c)
 

@@ -130,7 +130,6 @@ int semeai_variations   = DEFAULT_SEMEAI_VARIATIONS;
 /* use experimental connection module */
 int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 /* use alternate connection reading algorithm */
-int alternate_connections = ALTERNATE_CONNECTIONS;
 int owl_threats = OWL_THREATS;          /* compute owl threats */
 /* use experimental owl extension (GAIN/LOSS) */
 int experimental_owl_ext = EXPERIMENTAL_OWL_EXT;

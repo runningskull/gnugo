@@ -13,6 +13,8 @@
 
 @SET_MAKE@
 
+# Remove these files here... they are created locally
+
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -77,9 +79,6 @@ dfa_c = @dfa_c@
 install_sh = @install_sh@
 perl = @perl@
 
-EXTRA_DIST = engine.dsp board.dsp
-
-# Remove these files here... they are created locally
 DISTCLEANFILES = *~
 
 INCLUDES = \

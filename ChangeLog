@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- removed alternate connection reader
 - removed gnugo.dsw, */*.dsp, patterns/transpat.c,
   patterns/extract_fuseki.c, patterns/patlib.[ch],
   interface/debugboard/*, interface/html/*, interface/GoImage/*

@@ -78,12 +78,8 @@ install_sh = @install_sh@
 perl = @perl@
 
 noinst_PROGRAMS = mkpat joseki mkeyes
-EXTRA_PROGRAMS = extract_fuseki transpat
 
-DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
-
-EXTRA_DIST = $(DSP)\
-	dfa.c\
+EXTRA_DIST = dfa.c\
 	hoshi.sgf\
 	komoku.sgf\
 	mokuhazushi.sgf\
@@ -116,22 +112,12 @@ mkpat_LDADD = libdfa.a ../utils/libutils.a
 @DFA_ENABLED_TRUE@DFAFLAGS = -D -m
 @DFA_ENABLED_FALSE@DFAFLAGS = 
 
-transpat_SOURCES = transpat.c patlib.c transform.c
-transpat_LDADD = 
 joseki_SOURCES = joseki.c 
 joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a 
 joseki_INCLUDES = -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
-extract_fuseki_SOURCES = extract_fuseki.c
-# Yes, we currently need duplicate libengine.a and libpatterns.a.
-extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
-		       ../engine/libengine.a libpatterns.a\
-                       ../sgf/libsgf.a ../utils/libutils.a\
-		       libdfa.a
 
-extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
-
-noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
+noinst_HEADERS = patterns.h eyes.h dfa.h
 
 GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  influence.c barriers.c endgame.c aa_attackpat.c\
@@ -174,16 +160,9 @@ am_libpatterns_a_OBJECTS = connections.$(OBJEXT) helpers.$(OBJEXT) \
 	fuseki13.$(OBJEXT) fuseki19.$(OBJEXT) josekidb.$(OBJEXT) \
 	handipat.$(OBJEXT)
 libpatterns_a_OBJECTS = $(am_libpatterns_a_OBJECTS)
-EXTRA_PROGRAMS = extract_fuseki$(EXEEXT) transpat$(EXEEXT)
 noinst_PROGRAMS = mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 
-am_extract_fuseki_OBJECTS = extract_fuseki.$(OBJEXT)
-extract_fuseki_OBJECTS = $(am_extract_fuseki_OBJECTS)
-extract_fuseki_DEPENDENCIES = ../engine/libengine.a libpatterns.a \
-	../engine/libengine.a libpatterns.a ../sgf/libsgf.a \
-	../utils/libutils.a libdfa.a
-extract_fuseki_LDFLAGS =
 am_joseki_OBJECTS = joseki.$(OBJEXT)
 joseki_OBJECTS = $(am_joseki_OBJECTS)
 joseki_DEPENDENCIES = ../engine/libboard.a ../sgf/libsgf.a \
@@ -198,11 +177,6 @@ am_mkpat_OBJECTS = mkpat.$(OBJEXT) transform.$(OBJEXT)
 mkpat_OBJECTS = $(am_mkpat_OBJECTS)
 mkpat_DEPENDENCIES = libdfa.a ../utils/libutils.a
 mkpat_LDFLAGS =
-am_transpat_OBJECTS = transpat.$(OBJEXT) patlib.$(OBJEXT) \
-	transform.$(OBJEXT)
-transpat_OBJECTS = $(am_transpat_OBJECTS)
-transpat_DEPENDENCIES =
-transpat_LDFLAGS =
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
@@ -214,29 +188,27 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/barriers.Po $(DEPDIR)/conn.Po \
 @AMDEP_TRUE@	$(DEPDIR)/connections.Po $(DEPDIR)/dfa.Po \
 @AMDEP_TRUE@	$(DEPDIR)/dpatterns.Po $(DEPDIR)/endgame.Po \
-@AMDEP_TRUE@	$(DEPDIR)/extract_fuseki.Po $(DEPDIR)/eyes.Po \
-@AMDEP_TRUE@	$(DEPDIR)/fuseki13.Po $(DEPDIR)/fuseki19.Po \
-@AMDEP_TRUE@	$(DEPDIR)/fuseki9.Po $(DEPDIR)/fusekipat.Po \
-@AMDEP_TRUE@	$(DEPDIR)/handipat.Po $(DEPDIR)/helpers.Po \
-@AMDEP_TRUE@	$(DEPDIR)/influence.Po $(DEPDIR)/joseki.Po \
-@AMDEP_TRUE@	$(DEPDIR)/josekidb.Po $(DEPDIR)/mkeyes.Po \
-@AMDEP_TRUE@	$(DEPDIR)/mkpat.Po $(DEPDIR)/owl_attackpat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/eyes.Po $(DEPDIR)/fuseki13.Po \
+@AMDEP_TRUE@	$(DEPDIR)/fuseki19.Po $(DEPDIR)/fuseki9.Po \
+@AMDEP_TRUE@	$(DEPDIR)/fusekipat.Po $(DEPDIR)/handipat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/helpers.Po $(DEPDIR)/influence.Po \
+@AMDEP_TRUE@	$(DEPDIR)/joseki.Po $(DEPDIR)/josekidb.Po \
+@AMDEP_TRUE@	$(DEPDIR)/mkeyes.Po $(DEPDIR)/mkpat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/owl_attackpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/owl_defendpat.Po \
-@AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po $(DEPDIR)/patlib.Po \
-@AMDEP_TRUE@	$(DEPDIR)/patterns.Po $(DEPDIR)/transform.Po \
-@AMDEP_TRUE@	$(DEPDIR)/transpat.Po
+@AMDEP_TRUE@	$(DEPDIR)/owl_vital_apat.Po $(DEPDIR)/patterns.Po \
+@AMDEP_TRUE@	$(DEPDIR)/transform.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 CFLAGS = @CFLAGS@
 DIST_SOURCES = $(libdfa_a_SOURCES) $(libpatterns_a_SOURCES) \
-	$(extract_fuseki_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) \
-	$(mkpat_SOURCES) $(transpat_SOURCES)
+	$(joseki_SOURCES) $(mkeyes_SOURCES) $(mkpat_SOURCES)
 HEADERS = $(noinst_HEADERS)
 
 DIST_COMMON = README $(noinst_HEADERS) Makefile.am Makefile.in
-SOURCES = $(libdfa_a_SOURCES) $(libpatterns_a_SOURCES) $(extract_fuseki_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) $(mkpat_SOURCES) $(transpat_SOURCES)
+SOURCES = $(libdfa_a_SOURCES) $(libpatterns_a_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) $(mkpat_SOURCES)
 
 all: all-am
 
@@ -265,9 +237,6 @@ libpatterns.a: $(libpatterns_a_OBJECTS) $(libpatterns_a_DEPENDENCIES)
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-extract_fuseki$(EXEEXT): $(extract_fuseki_OBJECTS) $(extract_fuseki_DEPENDENCIES) 
-	@rm -f extract_fuseki$(EXEEXT)
-	$(LINK) $(extract_fuseki_LDFLAGS) $(extract_fuseki_OBJECTS) $(extract_fuseki_LDADD) $(LIBS)
 joseki$(EXEEXT): $(joseki_OBJECTS) $(joseki_DEPENDENCIES) 
 	@rm -f joseki$(EXEEXT)
 	$(LINK) $(joseki_LDFLAGS) $(joseki_OBJECTS) $(joseki_LDADD) $(LIBS)
@@ -277,9 +246,6 @@ mkeyes$(EXEEXT): $(mkeyes_OBJECTS) $(mkeyes_DEPENDENCIES)
 mkpat$(EXEEXT): $(mkpat_OBJECTS) $(mkpat_DEPENDENCIES) 
 	@rm -f mkpat$(EXEEXT)
 	$(LINK) $(mkpat_LDFLAGS) $(mkpat_OBJECTS) $(mkpat_LDADD) $(LIBS)
-transpat$(EXEEXT): $(transpat_OBJECTS) $(transpat_DEPENDENCIES) 
-	@rm -f transpat$(EXEEXT)
-	$(LINK) $(transpat_LDFLAGS) $(transpat_OBJECTS) $(transpat_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -295,7 +261,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dfa.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dpatterns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/endgame.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/extract_fuseki.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/eyes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fuseki13.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fuseki19.Po@am__quote@
@@ -311,10 +276,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_attackpat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_defendpat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl_vital_apat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/patlib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/patterns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/transform.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/transpat.Po@am__quote@
 
 distclean-depend:
 	-rm -rf $(DEPDIR)
