@@ -14,13 +14,13 @@
 - new pattern database handicap.db
 - new autohelper functions remaining_handicap_stones and
   total_handicap_stones, useful from handicap.db
-- mkpat.c revised to avoid compiler warnings for constraints using no
-  labels
+- mkpat.c revised to avoid compiler warnings for constraints using no labels
 - new file engine/handicap.c
 - placehand() moved from genmove.c to handicap.c
 - bug fix in adjusted_worm_attack_value()
 - FIXME added regarding several EITHER_MOVE reasons
-- revised tests, many new tests
+- revised tests, many new tests, new game files
+- added Evan Berggren Daniel to AUTHORS
 
 3.3.6 released August 13, 2002
 
