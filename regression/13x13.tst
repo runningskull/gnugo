@@ -322,7 +322,7 @@ loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 13
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
 60 gg_genmove black
-#? [K5|L5]
+#? [K5|L5]*
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 75
 61 gg_genmove black

@@ -1,6 +1,6 @@
 loadsgf games/auto_gen/auto007.sgf 20
 1 owl_defend Q13
-#? [1 (Q11|P12)]*
+#? [1 (Q11|P12)]
 
 loadsgf games/auto_gen/auto007.sgf 42
 2 owl_defend Q13

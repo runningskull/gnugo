@@ -25,7 +25,7 @@ loadsgf games/auto_gen/auto015.sgf 145
 
 loadsgf games/auto_gen/auto016.sgf 37
 9 owl_defend J15
-#? [!0]*
+#? [!0]
 
 loadsgf games/auto_gen/auto016.sgf 48
 10 owl_defend P16

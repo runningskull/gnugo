@@ -776,7 +776,7 @@ loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 60
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 68
 1700 gg_genmove black
-#? [!J18]*
+#? [!J18]
 
 
 

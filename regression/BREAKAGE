@@ -1,3 +1,37 @@
+============================= 3.3.18 pre 3 ===============================
+
+./regress.sh . owl.tst 
+260 unexpected PASS!
+./regress.sh . nngs1.tst 
+32 unexpected FAIL: Correct 'L12|K16|H16', got 'E5'
+./regress.sh . viking.tst 
+3 unexpected PASS!
+./regress.sh . trevorb.tst 
+820 unexpected PASS!
+./regress.sh . nngs.tst 
+1700 unexpected PASS!
+./regress.sh . global.tst 
+34 unexpected PASS!
+./regress.sh . 13x13.tst 
+60 unexpected FAIL: Correct 'K5|L5', got 'H4'
+./regress.sh . semeai.tst 
+23 unexpected PASS!
+41 unexpected FAIL: Correct 'ALIVE DEAD (PASS|B3|A6|B6|C5|D4|E3|E2|E1)', got 'DEAD ALIVE PASS'
+42 unexpected FAIL: Correct 'DEAD ALIVE PASS', got 'ALIVE DEAD C1'
+43 unexpected FAIL: Correct 'ALIVE DEAD (A15|A11|B11|C14|C13|D12|D11|D10|D9|B9|A9)', got 'DEAD ALIVE PASS'
+./regress.sh . strategy4.tst 
+190 unexpected PASS!
+./regress.sh . nngs3.tst 
+310 unexpected PASS!
+./regress.sh . auto02.tst 
+1 unexpected PASS!
+./regress.sh . auto03.tst 
+9 unexpected PASS!
+./regress.sh . auto04.tst 
+3 unexpected PASS!
+./regress.sh . ninestones.tst 
+590 unexpected PASS!
+
 ============================= 3.3.18 pre 2 ===============================
 
 ./regress.sh . reading.tst 

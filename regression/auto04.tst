@@ -8,7 +8,7 @@ loadsgf games/auto_gen/auto019.sgf 76
 
 loadsgf games/auto_gen/auto020.sgf 67
 3 owl_defend N4
-#? [1 (M5|L4|N5|L5)]*
+#? [1 (M5|L4|N5|L5)]
 
 loadsgf games/auto_gen/auto021.sgf 72
 7 owl_defend J15

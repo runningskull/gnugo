@@ -506,7 +506,7 @@ loadsgf games/trevor/auto/b73.sgf 116
 
 loadsgf games/trevor/auto/b75.sgf 14
 820 gg_genmove white
-#? [!F4]*
+#? [!F4]
 
 
 loadsgf games/trevor/auto/b75.sgf 30

@@ -185,7 +185,7 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 300
 # collection of bad tenukis
 loadsgf games/ninestones/ninestones1.sgf 18
 590 gg_genmove black
-#? [P4]*
+#? [P4]
 
 loadsgf games/ninestones/ninestones1.sgf 20
 600 gg_genmove black

@@ -939,7 +939,7 @@ loadsgf games/handtalk/handtalk12.sgf 29
 # Far too many escape ways for F10 as it could be killed.
 loadsgf games/handtalk/handtalk12.sgf 41
 260 owl_does_attack G9 F10
-#? [0]*
+#? [0]
 
 # A good example where connection handling is important in owl.
 loadsgf games/handtalk/handtalk23.sgf 186

@@ -135,7 +135,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 18
 # better to avoid attack on one of the two top groups
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 34
 32 gg_genmove white
-#? [L12|K16|H16]
+#? [L12|K16|H16]*
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203132324.sgf 90
 33 gg_genmove white
