@@ -1741,7 +1741,7 @@ estimate_territorial_value(int pos, int color, float score)
    */
   this_value = 0.0;
 
-  if (move[pos].move_safety == 1 && safe_move(pos, color))
+  if (move[pos].move_safety == 1 && safe_move(pos, color) == WIN)
     saved_stones[pos] = INFLUENCE_SAVED_STONE;
   else
     saved_stones[pos] = INFLUENCE_CAPTURED_STONE;
