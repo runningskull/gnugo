@@ -101,6 +101,7 @@ DECLARE(gtp_help);
 DECLARE(gtp_increase_depths);
 DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
+DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
 DECLARE(gtp_name);
 DECLARE(gtp_new_game);
@@ -186,6 +187,7 @@ static struct gtp_command commands[] = {
   {"is_legal",         	      gtp_is_legal},
   {"komi",        	      gtp_set_komi},
   {"level",        	      gtp_set_level},
+  {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
   {"name",                    gtp_name},
   {"new_game",                gtp_new_game},
@@ -599,6 +601,36 @@ gtp_what_color(char *s, int id)
     return gtp_failure(id, "invalid coordinate");
   
   return gtp_success(id, color_to_string(BOARD(i, j)));
+}
+
+
+/* Function:  List vertices with either black or white stones.
+ * Arguments: color
+ * Fails:     invalid color
+ * Returns:   list of vertices
+ */
+static int
+gtp_list_stones(char *s, int id)
+{
+  int i, j;
+  int color = EMPTY;
+  int vertexi[MAX_BOARD * MAX_BOARD];
+  int vertexj[MAX_BOARD * MAX_BOARD];
+  int vertices = 0;
+  
+  if (!gtp_decode_color(s, &color))
+    return gtp_failure(id, "invalid color");
+
+  for (i = 0; i < board_size; i++)
+    for (j = 0; j < board_size; j++)
+      if (BOARD(i, j) == color) {
+	vertexi[vertices] = i;
+	vertexj[vertices++] = j;
+      }
+
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_print_vertices(vertices, vertexi, vertexj);
+  return gtp_finish_response();
 }
 
 
