@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- readconnect finds connections through ponnuki
+- readconnect sgf improvements
+- bugfix in estimate_strategical_value(): ALL_MOVE worms were overvalued
 - VC build now DFA compliant
 - semeai module sets matcher status to ALIVE instead of ALIVE_IN_SEKI
 - fix arraybound violation in compute_aa_values

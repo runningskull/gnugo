@@ -1737,8 +1737,8 @@ estimate_strategical_value(int pos, int color, float score)
 	if (move_reason_known(pos, YOUR_ATARI_ATARI_MOVE, -1))
 	  break;
 
-	aa_value = 2 * worm[aa].effective_size;
-	bb_value = 2 * worm[bb].effective_size;
+	aa_value = worm[aa].effective_size;
+	bb_value = worm[bb].effective_size;
 	this_value = 2 * gg_min(aa_value, bb_value);
 
 	TRACE("  %1m: %f - both defends %1m (%f) and defends %1m (%f)\n",

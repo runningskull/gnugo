@@ -32,6 +32,14 @@
 /* Size of array where candidate moves are stored. */
 #define MAX_MOVES 362
 
+/* trace of a search */
+
+typedef struct  _zone {
+  int array[BOARDMAX];
+  unsigned int bits[1+BOARDMAX/32];
+  int i;
+} zone;
+
 static int add_array(int *array, int elt);
 static int element_array (int *array,int elt);
 static void intersection_array(int *array1, int *array2);
@@ -71,6 +79,74 @@ int max_connect_depth = 64;
 
 /* Statistics. */
 static int global_connection_node_counter = 0;
+
+static void init_zone (zone *zn) {
+  zn->array[0] = 0;
+  memset(zn->bits, 0, 1 + BOARDMAX / 8);
+}
+
+/* send back 1 if the intersection is in the zone
+ */
+
+/*
+static int elt_zone (zone *zn, int elt) {
+  if ((zn->bits[elt >> 5] >> (elt & 31)) & 1)
+    return 1;
+  return 0;
+}
+*/
+
+/* Adds an intersection to a zone
+ */
+
+static void add_zone (zone *zn, int elt) {
+  if (((zn->bits[elt >> 5] >> (elt & 31)) & 1) == 0) {
+    zn->bits[elt >> 5] |= (1 << (elt & 31));
+    zn->array[0]++;
+    zn->array[zn->array[0]] = elt;
+  }
+}
+
+/* start to loop over a zone
+ */
+
+/*
+static int start_zone (zone *zn) {
+  if (zn->array[0] < 1)
+    return -1;
+  zn->i = 1;
+  return zn->array[1];
+}
+*/
+
+/* continue to loop over a zone
+ */
+
+/*
+static int next_zone (zone *zn) {
+  zn->i++;
+  if (zn->i > zn->array[0])
+    return -1;
+  return zn->array[zn->i];
+}
+*/
+
+/* only keep the elements of zn1 which are also in zn2 */
+
+/*
+static void intersection_zone(zone *zn1, zone *zn2) {
+  int r, s;
+  
+  for (r = start_zone(zn1); r > -1; r = next_zone(zn1))
+    if (!elt_zone(zn2, r)) {
+      for (s = r; s< zn1->array[0]; s++)
+	zn1->array[s]=zn1->array[s+1];
+      zn1->bits[r >> 5] &= ~ (1 << (r & 31));
+      zn1->array[0]--;
+      zn1->i--;
+    }
+}
+*/
 
 /* Adds an integer to an array of integers if it is not already there.
  * The number of elements of the array is in array[0].
@@ -116,6 +192,7 @@ static void intersection_array(int *array1, int *array2) {
 
 static int snapback (int str) {
   int stones, liberties, lib;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
 
   /* if more than one stone captured, not a snapback */
   stones = countstones(str);
@@ -127,27 +204,89 @@ static int snapback (int str) {
   if (liberties > 1)
     return 0;
 
+  /* turn off the sgf traces
+   */
+  sgf_dumptree = NULL;
+  
   /* if only one liberty after capture */
   if (trymove(lib, OTHER_COLOR(board[str]), "snapback", str, EMPTY, 0)) {
     liberties=0;
     if (IS_STONE(board[lib]))
       liberties = countlib(lib);
     popgo();
+    sgf_dumptree = save_sgf_dumptree;
     if (liberties > 1)
       return 0;
     return WIN;
   }
+  
+  /* Turn the sgf traces back on. */
+  sgf_dumptree = save_sgf_dumptree;
+  
   return 0;
 }
 
-/* Verifies that the strings str1 and str2 can be connected
- * directly by playing one move, either by playing a common liberty
- * of the two strings, or by capturing a common adjacent string.
- *
- * This is the gi1 game function.
+/* connection by playing and finding a ponnuki after play */
+
+static int ponnuki_connect (int *moves, int str1, int str2, zone *zn) {
+  int r, s, k, res = 0;
+  int liberties, libs[MAXLIBS];
+  int adj, adjs[MAXCHAIN];
+  int neighb, neighbs[MAXCHAIN];
+
+  /* finds connection through two forbidden liberties for
+   * the opponent
+   * + + + + + + +
+   * + + @ O O @ +
+   * + @ + @ @ x +
+   * + + @ + + + +
+   * - - - - - - -
+   *
+   * + + + + + + +
+   * + + @ O O @ +
+   * + @ + @ @ O @
+   * + + @ + + x +
+   * - - - - - - -
+   */
+  liberties = findlib(str1, MAXLIBS, libs);
+  for (r = 0; r < liberties; r++)
+    if (is_self_atari(libs[r], OTHER_COLOR(board[str1]))) 
+      for (k = 0; k < 4; k++) {
+	int pos = libs[r] + delta[k];
+	if (board[pos] == board[str1]
+	    && !same_string(pos, str1)
+	    && !same_string(pos, str2) ) {
+	  /* try to connect pos to str2 in one move */
+	  /* play a common liberty */
+	  neighb = findlib(pos, MAXLIBS, neighbs);
+	  for (s = 0; s < neighb; s++)
+	    if (liberty_of_string(neighbs[s], str2)) {
+	      res = 1;
+	      add_zone(zn, libs[r]);
+	      add_zone(zn, neighbs[s]);
+	      add_array(moves, neighbs[s]);
+	    }
+	  /* or capture a common adjacent string */
+	  adj = chainlinks2(pos, adjs, 1);
+	  for (s = 0; s < adj; s++)
+	    if (adjacent_strings(adjs[s], str2)
+		&& !snapback(adjs[s])) {
+	      res=1;
+	      neighb = findlib(adjs[s], 1, neighbs);
+	      add_zone(zn, libs[r]);
+	      add_zone(zn, neighbs[0]);
+	      add_array(moves, neighbs[0]);
+	    }
+	}
+      }
+  return res;
+}
+
+/* connection in one move, finds all moves and memorizes intersections
+ * involved in the connection.
  */
 
-static int connection_one_move(int str1, int str2) {
+static int moves_connection_one_move(int *moves, int str1, int str2, zone *zn) {
   int r;
   int adj, adjs[MAXCHAIN];
 
@@ -166,7 +305,28 @@ static int connection_one_move(int str1, int str2) {
         && !snapback(adjs[r]))
       return WIN;
   
+  /* Connections through a ponnuki */
+  if (ponnuki_connect(moves, str1, str2, zn))
+    return WIN;
+  if (ponnuki_connect(moves, str2, str1, zn))
+    return WIN;
+
   return 0;
+}
+
+/* Verifies that the strings str1 and str2 can be connected
+ * directly by playing one move, either by playing a common liberty
+ * of the two strings, or by capturing a common adjacent string.
+ *
+ * This is the gi1 game function.
+ */
+
+static int connection_one_move(int str1, int str2) {
+  int moves[BOARDMAX];
+  zone zn;
+  init_zone(&zn);
+  moves[0] = 0;
+  return moves_connection_one_move(moves, str1, str2, &zn);
 }
 
 /* If the two strings str1 and str2 can be connected sends back WIN fill the
@@ -219,6 +379,11 @@ static int prevent_connection_one_move (int *moves, int str1, int str2) {
 static int connected_one_move (int str1, int str2) {
   int r, res=0;
   int moves[MAX_MOVES];
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+
+  /* turn off the sgf traces
+   */
+  sgf_dumptree = NULL;
   
   moves[0] = 0;
   if (prevent_connection_one_move(moves, str1, str2)) {
@@ -234,6 +399,10 @@ static int connected_one_move (int str1, int str2) {
       }
     }
   }
+
+  /* Turn the sgf traces back on. */
+  sgf_dumptree = save_sgf_dumptree;
+  
   return res;
 }
 
@@ -381,7 +550,8 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
 
 static int connection_two_moves (int str1, int str2) {
   int r, res = 0, moves[MAX_MOVES];
-  
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+ 
   /* If one string is missing we have already failed. */
   if (board[str1] == EMPTY || board[str2] == EMPTY)
     return 0;
@@ -391,6 +561,11 @@ static int connection_two_moves (int str1, int str2) {
     return WIN;
   order_connection_moves(moves, str1, str2, board[str1],
 			 "connection_two_moves");
+  
+  /* turn off the sgf traces
+   */
+  sgf_dumptree = NULL;
+  
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
     if (trymove(moves[r], board[str1],
 		"connection_two_moves", str1, EMPTY, 0)) {
@@ -399,6 +574,9 @@ static int connection_two_moves (int str1, int str2) {
       popgo();
     }
   }
+  
+  sgf_dumptree = save_sgf_dumptree;
+  
   return res;
 }
 
@@ -429,7 +607,12 @@ static int moves_to_prevent_connection_in_two_moves (int *moves,
 static int prevent_connection_two_moves (int *moves, int str1, int str2) {
   int r, res=0;
   int possible_moves[MAX_MOVES];
-  
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+
+  /* turn off the sgf traces
+   */
+  sgf_dumptree = NULL;
+    
   if (connection_two_moves(str1, str2)) {
     res = WIN;
     possible_moves[0]=0;
@@ -447,6 +630,9 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
       }
     }
   }
+
+  sgf_dumptree = save_sgf_dumptree;  
+
   return res;
 }
 
@@ -654,6 +840,12 @@ static int moves_to_prevent_connection_in_three_moves (int *moves,
 static int simply_connected_two_moves (int str1, int str2) {
   int r, res=0;
   int moves[MAX_MOVES];
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+
+  /* turn off the sgf traces
+   */
+  sgf_dumptree = NULL;
+    
   
   /* If one string is missing we have already failed. */
   if (board[str1] == EMPTY || board[str2] == EMPTY)
@@ -674,6 +866,9 @@ static int simply_connected_two_moves (int str1, int str2) {
       }
     }
   }
+  
+  sgf_dumptree = save_sgf_dumptree;
+  
   return res;
 }
 
@@ -684,6 +879,12 @@ static int simply_connected_two_moves (int str1, int str2) {
 
 static int simple_connection_three_moves (int str1, int str2) {
   int r, res = 0, moves[MAX_MOVES];
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+
+  /* turn off the sgf traces
+   */
+  sgf_dumptree = NULL;
+    
   
   moves[0]=0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
@@ -698,6 +899,9 @@ static int simple_connection_three_moves (int str1, int str2) {
       popgo();
     }
   }
+  
+  sgf_dumptree = save_sgf_dumptree;
+  
   return res;
 }
 
@@ -722,6 +926,12 @@ static int simple_connection_three_moves (int str1, int str2) {
 static int prevent_simple_connection_three_moves (int *moves, int str1, int str2) {
   int r, res=0;
   int possible_moves[MAX_MOVES];
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+
+  /* turn off the sgf traces
+   */
+  sgf_dumptree = NULL;
+    
   
   if (simple_connection_three_moves(str1, str2)) {
     res = WIN;
@@ -740,6 +950,9 @@ static int prevent_simple_connection_three_moves (int *moves, int str1, int str2
       }
     }
   }
+  
+  sgf_dumptree = save_sgf_dumptree;
+  
   return res;
 }
 
