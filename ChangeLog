@@ -13,8 +13,7 @@
 - bugfix in topological_eye()
 - don't spread any influence below INFLUENCE_CUTOFF
 - mark_safe_stones() distinguishes between SAFE_STONE and OWL_SAVED_STONE
-- detect_owl_blunder() calls owl_confirm_safety() if move may have
-  reduced own eye space
+- detect_owl_blunder() calls owl_confirm_safety() if move may harm own eyes
 - bugfix and speedups in accumulate_influence()
 - bugfix in value_territory()
 - comment play_connect_n()
@@ -30,10 +29,9 @@
 - set_depth_values() reorganized
 - new function find_half_and_false_eyes() in optics.c
 - blunder_size() code reorganized
-- new static functions detect_owl_blunder() and
-  detect_tactical_blunder() in utils.c
-- infrastructure for loops walking across a dragon: next_wormlist[],
-  first_worm_in_dragon(), next_worm_in_dragon()
+- new static detect_owl_blunder() and detect_tactical_blunder() in utils.c
+- for walking across dragons new first_worm_in_dragon(), next_worm_in_dragon()
+- new next_wormlist[]
 - mark_changed_dragon() revised using dragon loop
 - bugfix in fill_liberty()
 - filllib_confirm_safety() revised
@@ -65,8 +63,7 @@
   close_black_worms[][], number_close_worms[],
   number_close_white_worms[], number_close_black_worms[]
 - compute_surrounding_moyo_sizes() revised
-- alternative implementation of compute_surrounding_moyo_sizes() for
-  experimental-connections option
+- compute_surrounding_moyo_sizes() variant for experimental-connections option
 - new function influence_get_moyo_data()
 - owl tuning
 - new game records and regression tests
