@@ -336,6 +336,8 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   int save_verbose = verbose;
   int dummy_resulta;
   int dummy_resultb;
+  double start = 0.0;
+  int reading_nodes_when_called = get_reading_node_counter();
 
   struct local_owl_data *owla;
   struct local_owl_data *owlb;
@@ -345,6 +347,9 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   if (!resultb)
     resultb = &dummy_resultb;
 
+  if (debug & DEBUG_OWL_PERFORMANCE)
+    start = gg_cputime();
+  
   /* Look for owl substantial worms of either dragon adjoining
    * the other dragon. Capturing such a worm wins the semeai.
    * These are the semeai_worms. This code must come before
@@ -372,10 +377,35 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     verbose--;
   for (str = BOARDMIN; str < BOARDMAX; str++) 
     if (ON_BOARD(str) && ms[str] && worm[str].origin == str) {
-      /* FIXME: Consider also strings neighboring the outside as
-       * critical semeai worms.
+      int adj;
+      int adjs[MAXCHAIN];
+      int k;
+      int adjacent_to_outside = 0;
+
+      /* Is the string adjacent to a living dragon outside the semeai?
+       * In that case it's important to attack/defend it for the life
+       * of the opponent.
+       *
+       * FIXME: Checking crude_status here isn't quite appropriate but
+       * owl_status is not always computed and status itself is unsafe
+       * since it might change before later calls to this code, e.g.
+       * when checking for blunders.
+       *
+       * Not checking for aliveness at all gives problems in e.g.
+       * ld_owl:302 where S19 is a separate dragon and R19 should not
+       * be considered critically important. What we really would like
+       * to determine is whether it's outside the semeai, however.
        */
-      if (countstones(str) > 6 && s_worms < MAX_SEMEAI_WORMS) {
+      adj = chainlinks(str, adjs);
+      for (k = 0; k < adj; k++) {
+	if (!is_same_dragon(adjs[k], apos)
+	    && !is_same_dragon(adjs[k], bpos)
+	    && dragon[adjs[k]].crude_status == ALIVE)
+	  adjacent_to_outside = 1;
+      }
+      
+      if ((adjacent_to_outside || countstones(str) > 6)
+	  && s_worms < MAX_SEMEAI_WORMS) {
 	important_semeai_worms[s_worms] = 1;
 	semeai_worms[s_worms++] = str;
 	DEBUG(DEBUG_SEMEAI, "important semeai worm: %1m\n", str);
@@ -442,6 +472,22 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     *resultb = REVERSE_RESULT(*resultb);
   }
 
+  if (move == PASS_MOVE) {
+    DEBUG(DEBUG_OWL_PERFORMANCE,
+	  "analyze_semeai %1m vs. %1m, result %d %d %1m (%d, %d nodes, %f seconds)\n",
+	  apos, bpos, *resulta, *resultb, semeai_move, local_owl_node_counter,
+	  get_reading_node_counter() - reading_nodes_when_called,
+	  gg_cputime() - start);
+  }
+  else {
+    DEBUG(DEBUG_OWL_PERFORMANCE,
+	  "analyze_semeai_after_move %C %1m: %1m vs. %1m, result %d %d %1m (%d, %d nodes, %f seconds)\n",
+	  color, move, apos, bpos, *resulta, *resultb, semeai_move,
+	  local_owl_node_counter,
+	  get_reading_node_counter() - reading_nodes_when_called,
+	  gg_cputime() - start);
+  }
+  
   if (semeai_result_certain)
     *semeai_result_certain = result_certain;
 }
