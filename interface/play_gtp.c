@@ -56,6 +56,7 @@ static void rotate_on_output(int ai, int aj, int *bi, int *bj);
 DECLARE(gtp_aa_confirm_safety);
 DECLARE(gtp_all_legal);
 DECLARE(gtp_attack);
+DECLARE(gtp_attack_either);
 DECLARE(gtp_clear_board);
 DECLARE(gtp_combination_attack);
 DECLARE(gtp_connect);
@@ -63,6 +64,7 @@ DECLARE(gtp_countlib);
 DECLARE(gtp_cputime);
 DECLARE(gtp_decrease_depths);
 DECLARE(gtp_defend);
+DECLARE(gtp_defend_both);
 DECLARE(gtp_disconnect);
 DECLARE(gtp_dragon_data);
 DECLARE(gtp_dragon_status);
@@ -161,6 +163,7 @@ static struct gtp_command commands[] = {
   {"aa_confirm_safety",       gtp_aa_confirm_safety},
   {"all_legal",        	      gtp_all_legal},
   {"attack",           	      gtp_attack},
+  {"attack_either",           gtp_attack_either},
   {"black",            	      gtp_playblack},
   {"boardsize",        	      gtp_set_boardsize},
   {"captures",        	      gtp_captures},
@@ -172,6 +175,7 @@ static struct gtp_command commands[] = {
   {"cputime",		      gtp_cputime},
   {"decrease_depths",  	      gtp_decrease_depths},
   {"defend",           	      gtp_defend},
+  {"defend_both",	      gtp_defend_both},
   {"disconnect",       	      gtp_disconnect},
   {"dragon_data",             gtp_dragon_data},
   {"dragon_status",    	      gtp_dragon_status},
@@ -1050,6 +1054,43 @@ gtp_attack(char *s)
 }  
 
 
+/* Function:  Try to attack either of two strings
+ * Arguments: two vertices
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   attack code against the strings.  Guarantees there
+ *            exists a move which will attack one of the two
+ *            with attack_code, but does not return the move.
+ */
+static int
+gtp_attack_either(char *s)
+{
+  int ai, aj;
+  int bi, bj;
+  int n;
+  int acode;
+
+  n = gtp_decode_coord(s, &ai, &aj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(ai, aj) == EMPTY)
+    return gtp_failure("string vertex must be empty");
+
+  n = gtp_decode_coord(s + n, &bi, &bj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(bi, bj) == EMPTY)
+    return gtp_failure("string vertex must not be empty");
+
+  acode = attack_either(POS(ai, aj), POS(bi, bj));
+
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_code(acode);
+  return gtp_finish_response();
+}
+
+
 /* Function:  Try to defend a string.
  * Arguments: vertex
  * Fails:     invalid vertex, empty vertex
@@ -1429,6 +1470,44 @@ gtp_owl_connection_defends(char *s)
   gtp_print_code(defense_code);
   return gtp_finish_response();
 }
+
+
+/* Function:  Try to defend both of two strings
+ * Arguments: two vertices
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   defend code for the strings.  Guarantees there
+ *            exists a move which will defend both of the two
+ *            with defend_code, but does not return the move.
+ */
+static int
+gtp_defend_both(char *s)
+{
+  int ai, aj;
+  int bi, bj;
+  int n;
+  int dcode;
+
+  n = gtp_decode_coord(s, &ai, &aj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(ai, aj) == EMPTY)
+    return gtp_failure("string vertex must be empty");
+
+  n = gtp_decode_coord(s + n, &bi, &bj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(bi, bj) == EMPTY)
+    return gtp_failure("string vertex must not be empty");
+
+  dcode = defend_both(POS(ai, aj), POS(bi, bj));
+
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_code(dcode);
+  return gtp_finish_response();
+}
+
 
 
 /* Function:  Determine whether capturing a string gives a living dragon

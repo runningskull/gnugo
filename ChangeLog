@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new GTP commands attack_either and defend_both
 - optimzation in compute_connection_distances()
 - owl code reorganization
 - new clear_owl_move_data() set_single_owl_move(), 
