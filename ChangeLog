@@ -11,11 +11,13 @@
 - new function special_rescue5() in reading.c
 - defend2() and defend3() revised
 - new GTP commands list_stones and tactical_analyze_semeai()
+- new command line option --decide-tactical-semeai
 - support for marginal eye points with opponent stones in eyes.db
 - persistent caching added to owl_does_attack()
 - owl_does_defend() and owl_does_attack() now understand ko
 - owl_determine_life() revised
 - owl_analyze_semeai() revised
+- small_semeai() calls owl_analyze_semeai
 - new function silent_examine_position()
 - find_more_owl_attack_and_defense_moves() revised
 - ko valuation revised

@@ -34,13 +34,13 @@
 
 
 /* 
- * decidestring tries to attack and defend the string at (m, n),
+ * decide_string tries to attack and defend the string at (m, n),
  * and then writes the number of variations considered in the attack
  * and defence to the sgf file.
  */
 
 void
-decidestring(int pos, const char *sgf_output)
+decide_string(int pos, const char *sgf_output)
 {
   int apos, dpos;
   int acode, dcode;
@@ -114,13 +114,13 @@ decidestring(int pos, const char *sgf_output)
 
 
 /* 
- * decideconnection tries to connect and disconnect the strings at
+ * decide_connection tries to connect and disconnect the strings at
  * (ai, aj) and (bi, bj), and then writes the number of variations
  * considered in the attack and defence to the sgf file.
  */
 
 void
-decideconnection(int apos, int bpos, const char *sgf_output)
+decide_connection(int apos, int bpos, const char *sgf_output)
 {
   int move;
   int result;
@@ -181,13 +181,13 @@ decideconnection(int apos, int bpos, const char *sgf_output)
 
 
 /* 
- * decidedragon tries to attack and defend the dragon at (m, n),
+ * decide_dragon tries to attack and defend the dragon at (m, n),
  * and then writes the number of variations considered in the attack
  * and defence to the sgf file.
  */
 
 void
-decidedragon(int pos, const char *sgf_output)
+decide_dragon(int pos, const char *sgf_output)
 {
   int move = NO_MOVE;
   int acode, dcode;
@@ -273,7 +273,52 @@ decidedragon(int pos, const char *sgf_output)
 
 
 void
-decidesemeai(int apos, int bpos, const char *sgf_output)
+decide_semeai(int apos, int bpos, const char *sgf_output)
+{
+  SGFTree tree;
+  int resulta, resultb, move;
+  int color = board[apos];
+
+  if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
+    gprintf("gnugo: --decide-semeai called on invalid data\n");
+    return;
+  }
+
+  /* Prepare pattern matcher and reading code. */
+  reset_engine();
+
+  silent_examine_position(board[apos], EXAMINE_DRAGONS_WITHOUT_OWL);
+  gprintf("finished examine_position\n");
+  count_variations = 1;
+
+  /* We want to see the reading performed, not just a result picked
+   * from the cache. Thus we clear the cache here. */
+  reading_cache_clear();
+  
+  if (sgf_output)
+    begin_sgftreedump(&tree);
+  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 1);
+  gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
+	  color == BLACK ? "black" : "white",
+	  move,
+	  apos, safety_to_string(resulta),
+  	  bpos, safety_to_string(resultb));
+  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 1);
+  gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
+	  color == BLACK ? "white" : "black",
+	  move,
+	  apos, safety_to_string(resulta),
+  	  bpos, safety_to_string(resultb));
+
+  if (sgf_output) {
+    end_sgftreedump(sgf_output);
+    count_variations = 0;
+  }
+}
+
+
+void
+decide_tactical_semeai(int apos, int bpos, const char *sgf_output)
 {
   SGFTree tree;
   int resulta, resultb, move;
@@ -318,12 +363,12 @@ decidesemeai(int apos, int bpos, const char *sgf_output)
 
 
 /* 
- * decideposition tries to attack and defend every dragon with
+ * decide_position tries to attack and defend every dragon with
  * dragon.escape<6 and writes the variations to an sgf file.
  */
 
 void
-decideposition(int color, const char *sgf_output)
+decide_position(int color, const char *sgf_output)
 {
   int pos;
   int move = NO_MOVE;
@@ -418,7 +463,7 @@ decideposition(int color, const char *sgf_output)
  */
 
 void
-decideeye(int pos, const char *sgf_output)
+decide_eye(int pos, const char *sgf_output)
 {
   int color;
   int max, min;

@@ -745,72 +745,40 @@ small_semeai()
 }
 
 /* Helper function for small_semeai. Tries to resolve the
- * semeai between (str1) and (str2), possibly revising points
+ * semeai between (apos) and (bpos), possibly revising points
  * of attack and defense.
+ *
  */
 
 static void
-small_semeai_analyzer(int str1, int str2)
+small_semeai_analyzer(int apos, int bpos)
 {
-  int apos;
-  int color = board[str1];
-  int other = board[str2];
+  int move;
+  int resulta, resultb;
 
-  if (worm[str2].attack_codes[0] == 0 || worm[str2].liberties < 3)
+  if (worm[apos].attack_codes[0] == NO_MOVE)
     return;
-  if (worm[str1].attack_codes[0] == 0 || worm[str1].liberties < 3)
+  if (worm[bpos].attack_codes[0] == NO_MOVE)
     return;
 
+  /* FIXME: Not ko aware yet (since owl_analyze_semeai isn't).
+   * Should be more careful if there is already a defense point.
+   */
 
-  /* FIXME: There are many more possibilities to consider */
-  if (trymove(worm[str1].attack_points[0], other,
-	      "small_semeai_analyzer", str1, EMPTY, 0)) {
-    int acode = attack(str2, &apos);
-    if (acode == 0) {
-      popgo();
-      change_defense(str2, worm[str1].attack_points[0], 1);
+  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0);
+  if (resulta != DEAD)
+    if (worm[apos].defend_codes[0] == NO_MOVE) {
+      worm[apos].defend_codes[0] = WIN;
+      worm[apos].defense_points[0] = move;
     }
-    else if (trymove(apos, color, "small_semeai_analyzer", str1,
-		     EMPTY, NO_MOVE)) {
-      if (attack(str1, NULL) == 0) {
-	popgo();
-	popgo();
-	change_attack(str1, 0, 0);
-      }
-      else {
-	popgo();
-	popgo();
-      }
+  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0);
+  if (resultb != DEAD)
+    if (worm[bpos].defend_codes[0] == NO_MOVE) {
+      worm[bpos].defend_codes[0] = WIN;
+      worm[bpos].defense_points[0] = move;
     }
-    else
-      popgo();
-  }
-  gg_assert(stackp == 0);
-  
-  if (trymove(worm[str2].attack_points[0], color, 
-	      "small_semeai_analyzer", str2, EMPTY, 0)) {
-    int acode = attack(str1, &apos);
-    if (acode == 0) {
-      popgo();
-      change_defense(str1, worm[str2].attack_points[0], 1);
-    }
-    else if (trymove(apos, other, "small_semeai_analyzer", str2,
-		     EMPTY, NO_MOVE)) {
-      if (attack(str2, NULL) == 0) {
-	popgo();
-	popgo();
-	change_attack(str2, 0, 0);
-      }
-      else {
-	popgo();
-	popgo();
-      }
-    }
-    else
-      popgo();
-  }
-  gg_assert(stackp == 0);
-}
+} 
+
 
 
 /*

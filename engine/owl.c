@@ -350,7 +350,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     
     if (other == BLACK)
       owl_determine_life(owlb, owlb->black_eye,
-			 BLACK, komaster, 0, /* FIXME: Why 0? */
+			 BLACK, komaster, 1,
 			 vital_offensive_moves,
 			 &probable_minb, &probable_maxb);
     else

@@ -85,6 +85,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_DECIDE_CONNECTION,
       OPT_DECIDE_DRAGON,
       OPT_DECIDE_SEMEAI,
+      OPT_DECIDE_TACTICAL_SEMEAI,
       OPT_DECIDE_POSITION,
       OPT_DECIDE_EYE,
       OPT_BRANCH_DEPTH,
@@ -132,6 +133,7 @@ enum mode {
   MODE_DECIDE_CONNECTION,
   MODE_DECIDE_DRAGON,
   MODE_DECIDE_SEMEAI,
+  MODE_DECIDE_TACTICAL_SEMEAI,
   MODE_DECIDE_POSITION,
   MODE_DECIDE_EYE
 };
@@ -202,6 +204,7 @@ static struct gg_option const long_options[] =
   {"decide-connection", required_argument, 0, OPT_DECIDE_CONNECTION},
   {"decide-dragon",  required_argument, 0, OPT_DECIDE_DRAGON},
   {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
+  {"decide-tactical-semeai", required_argument, 0, OPT_DECIDE_TACTICAL_SEMEAI},
   {"decide-position", no_argument,       0, OPT_DECIDE_POSITION},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
   {"life",           no_argument,       0, OPT_LIFE},
@@ -491,6 +494,24 @@ main(int argc, char *argv[])
 	playmode = MODE_DECIDE_SEMEAI;
 	break;
 	
+      case OPT_DECIDE_TACTICAL_SEMEAI:
+	if (strlen(gg_optarg) > 7) {
+	  fprintf(stderr, 
+		  "usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
+	  return (EXIT_FAILURE);
+	}
+	strcpy(decide_this, gg_optarg);
+	strtok(decide_this, "/");
+	decide_that = strtok(NULL, "/");
+	if (!decide_that) {
+	  fprintf(stderr, 
+		  "usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
+	  return (EXIT_FAILURE);
+	}
+
+	playmode = MODE_DECIDE_TACTICAL_SEMEAI;
+	break;
+	
       case OPT_DECIDE_POSITION:
 	playmode = MODE_DECIDE_POSITION;
 	break;
@@ -721,6 +742,7 @@ main(int argc, char *argv[])
 	&& playmode != MODE_DECIDE_DRAGON
 	&& playmode != MODE_DECIDE_POSITION
 	&& playmode != MODE_DECIDE_SEMEAI
+	&& playmode != MODE_DECIDE_TACTICAL_SEMEAI
 	&& playmode != MODE_DECIDE_EYE)
       if (!sgffile_open_file(outfile)) {
 	fprintf(stderr, "Error: could not open '%s'\n", gg_optarg);
@@ -808,7 +830,7 @@ main(int argc, char *argv[])
       }
 
       rotate(m, n, &m, &n, boardsize, orientation);
-      decidestring(POS(m, n), outfile);
+      decide_string(POS(m, n), outfile);
     }
   break;
   
@@ -837,7 +859,7 @@ main(int argc, char *argv[])
 
       rotate(ai, aj, &ai, &aj, boardsize, orientation);
       rotate(bi, bj, &bi, &bj, boardsize, orientation);
-      decideconnection(POS(ai, aj), POS(bi, bj), outfile);
+      decide_connection(POS(ai, aj), POS(bi, bj), outfile);
     }
   break;
   
@@ -860,7 +882,7 @@ main(int argc, char *argv[])
       }
 
       rotate(m, n, &m, &n, boardsize, orientation);
-      decidedragon(POS(m, n), outfile);
+      decide_dragon(POS(m, n), outfile);
     }
     break;
   
@@ -891,7 +913,39 @@ main(int argc, char *argv[])
 
       rotate(ai, aj, &ai, &aj, boardsize, orientation);
       rotate(bi, bj, &bi, &bj, boardsize, orientation);
-      decidesemeai(POS(ai, aj), POS(bi, bj), outfile);
+      decide_semeai(POS(ai, aj), POS(bi, bj), outfile);
+    }
+    break;
+    
+
+  case MODE_DECIDE_TACTICAL_SEMEAI:
+    {
+      int ai, aj, bi, bj;
+      
+      if (!infilename) {
+	fprintf(stderr, "gnugo: --decide-tactical-semeai must be used with -l\n");
+	return (EXIT_FAILURE);
+      }
+      
+      gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      				untilstring, orientation);
+      boardsize = gameinfo.position.boardsize;
+      
+      if (!string_to_location(boardsize, decide_this, &ai, &aj)) {
+	fprintf(stderr, 
+		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
+	return (EXIT_FAILURE);
+      }
+      
+      if (!string_to_location(boardsize, decide_that, &bi, &bj)) {
+	fprintf(stderr, 
+		"usage: --decide-tactical-semeai [first dragon]/[second dragon]\n");
+	return (EXIT_FAILURE);
+      }
+
+      rotate(ai, aj, &ai, &aj, boardsize, orientation);
+      rotate(bi, bj, &bi, &bj, boardsize, orientation);
+      decide_tactical_semeai(POS(ai, aj), POS(bi, bj), outfile);
     }
     break;
     
@@ -903,9 +957,9 @@ main(int argc, char *argv[])
 	fprintf(stderr, "gnugo: --decide-position must be used with -l\n");
 	return (EXIT_FAILURE);
       }
-      color=gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
+      color = gameinfo_play_sgftree_rot(&gameinfo, sgftree.root,
       					untilstring, orientation);
-      decideposition(color, outfile);
+      decide_position(color, outfile);
     }
     break;
     
@@ -928,7 +982,7 @@ main(int argc, char *argv[])
       }
       
       rotate(m, n, &m, &n, boardsize, orientation);
-      decideeye(POS(m, n), outfile);
+      decide_eye(POS(m, n), outfile);
     }
     break;
   

@@ -1622,7 +1622,11 @@ report_dragon(int m, int n)
     return;
   }
 
-  ASSERT1(d->id >= 0, POS(m, n));
+  if (d->id < 0) {
+    gprintf("Dragon data not available at %m\n", m, n);
+    return;
+  }
+    
 
   gprintf("*** dragon at %m:\n", m, n);
   gprintf("color: %s; origin: %1m; size: %d; effective size: %f\n",

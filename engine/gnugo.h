@@ -452,12 +452,13 @@ void sgffile_printboard(int next);
 void sgffile_recordboard(SGFNode *node);
 
 /* sgfdecide.c */
-void decidestring(int pos, const char *sgf_output);
-void decideconnection(int apos, int bpos, const char *sgf_output);
-void decidedragon(int pos, const char *sgf_output);
-void decidesemeai(int apos, int bpos, const char *sgf_output);
-void decideposition(int color, const char *sgf_output);
-void decideeye(int pos, const char *sgf_output);
+void decide_string(int pos, const char *sgf_output);
+void decide_connection(int apos, int bpos, const char *sgf_output);
+void decide_dragon(int pos, const char *sgf_output);
+void decide_semeai(int apos, int bpos, const char *sgf_output);
+void decide_tactical_semeai(int apos, int bpos, const char *sgf_output);
+void decide_position(int color, const char *sgf_output);
+void decide_eye(int pos, const char *sgf_output);
 
 
 #endif  /* _GNUGO_H_ */
