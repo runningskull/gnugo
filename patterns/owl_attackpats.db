@@ -3587,31 +3587,6 @@ Pattern A1342
 :8,s,value(50)
 
 
-Pattern A1343
-# tm new pattern (3.1.14)
-# See strategy4:208
-
-|.Xx	 1-2 point often vital in this shape
-|.oX
-|.*.
-+---
-:8,s,value(50)
-
-
-Pattern A1343
-# tm new pattern (3.1.14)
-# See strategy4:208
-
-|XX?	  Try destroying X's eye.
-|.X?
-|*Xx	 
-|OoX
-|...
-+---
-
-:8,s,value(50)
-
-
 #########################################################
 #                                                       #
 #               Invasion patterns                       #

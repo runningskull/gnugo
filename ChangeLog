@@ -10,7 +10,8 @@
 - GTP echo_err added to allow echoing to STDERR.
 - tuning
 - connection tuning
-- owl tuning.
+- eye tuning
+- owl tuning
 - revision of rot tests
 - ld_owl_life.tst removed
 - new and revised regression tests

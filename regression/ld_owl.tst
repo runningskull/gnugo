@@ -331,6 +331,24 @@ loadsgf games/life_and_death/comb1.sgf
 305 dragon_status C3
 #? [critical E2 (E2|E1)]
 
+loadsgf games/life_and_death/ld19.sgf
+306 owl_attack C17
+#? [1 B19]
+307 owl_defend C17
+#? [1 (E19|C19|B19|A18|A16)]
+308 owl_attack R17
+#? [1 T17]
+309 owl_defend R17
+#? [1 (T17|S19|Q19)]
+310 owl_attack R3
+#? [1 T2]
+311 owl_defend R3
+#? [1 (T2|R1|P1)]
+310 owl_attack C3
+#? [1 B1]
+311 owl_defend C3
+#? [1 (B1|A4)]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
