@@ -36,7 +36,7 @@ BUILT_SOURCES = gtp-commands.texi
 cmdsrc = $(srcdir)/../interface/play_gtp.c
 
 gtp-commands.texi: $(cmdsrc)
-	cp $(srcdir)/gtp-commands.sed TMP.sed
+	cat $(srcdir)/gtp-commands.sed > TMP.sed
 	sed -e '/static struct gtp_command commands/,/^}/!d'		\
 	    -e '/^ /!d' -e '/NULL/d'					\
 	    -e 's/ *{"\(.*\)"[^a-z]*\(gtp_[a-z_]*\)}.*/s,\2,\1,g/'	\

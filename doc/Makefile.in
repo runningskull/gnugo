@@ -383,7 +383,7 @@ gnugo.6: $(srcdir)/gnugo.pod
 	pod2man $(srcdir)/gnugo.pod --section 6 --release @VERSION@ > gnugo.6
 
 gtp-commands.texi: $(cmdsrc)
-	cp $(srcdir)/gtp-commands.sed TMP.sed
+	cat $(srcdir)/gtp-commands.sed > TMP.sed
 	sed -e '/static struct gtp_command commands/,/^}/!d'		\
 	    -e '/^ /!d' -e '/NULL/d'					\
 	    -e 's/ *{"\(.*\)"[^a-z]*\(gtp_[a-z_]*\)}.*/s,\2,\1,g/'	\
