@@ -2922,21 +2922,22 @@ Pattern Sente11
 ;oplay_attack(*,A)
 
 
-Pattern Sente12
-# For performance reason this pattern has s classification and an
-# explicit safety test in the constraint. Thus the safety test can be
-# shortcut by the preceding liberty test.
-# tm removed attack in ko from constraint.  (3.1.20) (see trevorc:310)
-
-*X
-
-:-,sX
-
-*A
-
-;lib(A) == 2 && !attack(A) && !oplay_attack(*,*)
-# Action adds a followup value unless the threat is considered ineffective.
->threaten_to_capture(A)
+# pp Removed - this pattern is obsolete (3.5.1)
+# Pattern Sente12
+# # For performance reason this pattern has s classification and an
+# # explicit safety test in the constraint. Thus the safety test can be
+# # shortcut by the preceding liberty test.
+# # tm removed attack in ko from constraint.  (3.1.20) (see trevorc:310)
+#
+# *X
+#
+# :-,sX
+#
+# *A
+#
+# ;lib(A) == 2 && !attack(A) && !oplay_attack(*,*)
+# # Action adds a followup value unless the threat is considered ineffective.
+# >threaten_to_capture(A)
 
 
 Pattern Sente13

@@ -296,6 +296,9 @@ prevent_attack_threat_helper(int move, int str)
 }
 
 
+/* This function is obsolete.  Code in `value_moves.c' is more general. */
+#if 0
+
 /*
  * This is intended for use in autohelpers.
  *
@@ -370,6 +373,8 @@ threaten_to_capture_helper(int move, int str)
   add_followup_value(move, 2.0 * worm[str].effective_size);
   TRACE("...followup value %f\n", 2.0 * worm[str].effective_size);
 }
+
+#endif
 
 
 /*

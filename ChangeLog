@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- threaten_to_capture_helper() and pattern `Sente12' retired
 - no buffering on stdout in ascii mode
 - roadmap to engine files in overview.texi updated
 - move DEBUG_func to showbord.c
