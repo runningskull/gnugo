@@ -1620,8 +1620,8 @@ compute_surrounding_moyo_sizes(int opposite, int dragon_status_known)
     float this_moyo_value = 0.0;
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       int moyo_number = moyos.segmentation[pos];
-      if (moyo_number == 0
-          || board[pos] != DRAGON(d).color
+      if (board[pos] != DRAGON(d).color
+          || moyo_number == 0
           || dragon[pos].id != d
           || moyos.owner[moyo_number] != board[pos])
         continue;

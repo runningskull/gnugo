@@ -4424,7 +4424,7 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
 	&& !is_self_atari(libs[r], other)) {
       int k;
       for (k = 0; k < 8; k++)
-	if (owl->goal[libs[r] + delta[k]])
+	if (ON_BOARD(libs[r] + delta[k]) && owl->goal[libs[r] + delta[k]])
 	  break;
       if (k == 8) {
 	*min = 2;

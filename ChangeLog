@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix (reading uninitialized memory) in sniff_lunch()
 - man page revised
 - new options --mirror and --mirror-limit
 - new global variables play_mirror_go and mirror_stones_limit
