@@ -1417,8 +1417,6 @@ finish_constraint_and_action(char *name)
 /*           stuff to write the elements of a pattern               */
 /* ================================================================ */
 
-#ifdef EXPERIMENTAL_READING
-
 /* callback function used to sort the elements in a pattern. 
  * We want to sort the patterns by attribute.
  *
@@ -1438,6 +1436,8 @@ compare_elements(const void *a, const void *b)
   return  order[((const struct patval *)a)->att]
     - order[((const struct patval *)b)->att];
 }
+
+#if EXPERIMENTAL_READING
 
 /* For the tree-based algorithm, it works best to sort the elements
  * by distance from the anchor, making the search tree smaller.
@@ -1462,15 +1462,14 @@ compare_elements_closest(const void *a, const void *b)
     return metric;
 }
 
-
 static void tree_push_pattern(void);
+
+#endif
 
 struct element_node {
   struct patval e;
   struct element_node *next;
 };
-
-#endif
 
 /* flush out the pattern stored in elements[]. Don't forget
  * that elements[].{x,y} and min/max{i,j} are still relative
@@ -1515,7 +1514,6 @@ write_elements(FILE *outfile, char *name)
     tree_push_pattern();
 #endif
 }
-
 
 #if EXPERIMENTAL_READING
 
