@@ -3867,9 +3867,11 @@ pattern_list_build_heap(struct matched_patterns_list_data *list)
   int k;
   int limit;
 
-  list->pattern_heap = malloc(list->counter
-			      * sizeof(struct matched_pattern_data*));
-  gg_assert(list->pattern_heap != NULL);
+  if (list->counter > 0) {
+    list->pattern_heap = malloc(list->counter
+				* sizeof(struct matched_pattern_data*));
+    gg_assert(list->pattern_heap != NULL);
+  }
 
   for (k = 0; k < list->counter; k++) {
 #if USE_BDIST

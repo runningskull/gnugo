@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- do not malloc() 0 bytes in pattern_list_build_heap()
 - aftermath_final_status() declaration moved from gnugo.h to liberty.h
 - bugfix in find_connection_moves()
 - bugfix in hashdata_init macro
