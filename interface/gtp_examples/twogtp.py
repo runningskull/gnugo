@@ -6,7 +6,8 @@
 # Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/ #
 # for more information.                                         #
 #                                                               #
-# Copyright 1999, 2000, 2001 by the Free Software Foundation.   #
+# Copyright 1999, 2000, 2001, 2002 and 2003                     #
+# by the Free Software Foundation.                              #
 #                                                               #
 # This program is free software; you can redistribute it and/or #
 # modify it under the terms of the GNU General Public License   #
@@ -104,39 +105,71 @@ class GTP_player:
 
     def __init__(self, command):
         self.connection = GTP_connection(command)
+	protocol_version = self.connection.exec_cmd("protocol_version")
+	if protocol_version[:5] != "ERROR":
+	    self.protocol_version = protocol_version
+	else:
+	    self.protocol_version = "1"
+
+    def is_known_command(self, command):
+	return self.connection.exec_cmd("known_command " + command) == "true"
 
     def genmove(self, color):
         if color[0] in ["b", "B"]:
-            command = "genmove_black"
+	    command = "black"
         elif color[0] in ["w", "W"]:
-            command = "genmove_white"
+	    command = "white"
+	if self.protocol_version == "1":
+	    command = "genmove_" + command
+	else:
+	    command = "genmove " + command
+
         return self.connection.exec_cmd(command)
 
     def black(self, move):
-        self.connection.exec_cmd("black " + move)
+	if self.protocol_version == "1":
+	    self.connection.exec_cmd("black " + move)
+	else:
+	    self.connection.exec_cmd("play black " + move)
 
     def white(self, move):
-        self.connection.exec_cmd("white " + move)
+	if self.protocol_version == "1":
+	    self.connection.exec_cmd("white " + move)
+	else:
+	    self.connection.exec_cmd("play white " + move)
 
     def komi(self, komi):
         self.connection.exec_cmd("komi " + komi)
 
     def boardsize(self, size):
         self.connection.exec_cmd("boardsize " + size)
+	if self.protocol_version != "1":
+	    self.connection.exec_cmd("clear_board")
 
-    def handicap(self, handi):
-        result = self.connection.exec_cmd("fixed_handicap " + handi)
+    def handicap(self, handicap, handicap_type):
+	if handicap_type == "fixed":
+	    result = self.connection.exec_cmd("fixed_handicap %d" % (handicap))
+	else:
+	    result = self.connection.exec_cmd("place_free_handicap %d"
+					      % (handicap))
+
         return string.split(result, " ")
 
     def loadsgf(self, endgamefile, move_number):
 	self.connection.exec_cmd(string.join(["loadsgf", endgamefile,
 	                         str(move_number)]))
 
+    def list_stones(self, color):
+	return string.split(self.connection.exec_cmd("list_stones " + color), " ")
+
     def quit(self):
         return self.connection.exec_cmd("quit")
     
     def showboard(self):
-        return self.connection.exec_cmd("showboard")
+        board = self.connection.exec_cmd("showboard")
+	if board[0] == "\n":
+	    board = board[1:]
+	return board
 
     def get_random_seed(self):
         result = self.connection.exec_cmd("get_random_seed")
@@ -145,17 +178,17 @@ class GTP_player:
         return result
 
     def set_random_seed(self, seed):
-	self.connection.exec_cmd("set random_seed " + seed)
+	self.connection.exec_cmd("set_random_seed " + seed)
 
     def get_program_name(self):
         return self.connection.exec_cmd("name") + " " + \
                self.connection.exec_cmd("version")
 
-    def estimate_score(self):
-        return self.connection.exec_cmd("estimate_score")
+    def final_score(self):
+        return self.connection.exec_cmd("final_score")
 
     def score(self):
-        return self.estimate_score(self)
+        return self.final_score(self)
 
 
 class GTP_game:
@@ -166,18 +199,20 @@ class GTP_game:
     #    size		 int
     #    komi		 float
     #    handicap        int
+    #    handicap_type   string
     #    handicap_stones int
     #    moves		 list of string
     #    resultw
     #    resultb
 
     def __init__(self, whitecommand, blackcommand, size, komi, handicap,
-    		 endgamefile):
+		 handicap_type, endgamefile):
         self.whiteplayer = GTP_player(whitecommand)
         self.blackplayer = GTP_player(blackcommand)
         self.size = size
         self.komi = komi
         self.handicap = handicap
+	self.handicap_type = handicap_type
 	self.endgamefile = endgamefile
 	self.sgffilestart = ""
 	if endgamefile != "":
@@ -192,9 +227,13 @@ class GTP_game:
 	    sys.exit(2)
 	sgflines = infile.readlines()
 	infile.close
+	size = re.compile("SZ\[[0-9]+\]")
 	move = re.compile(";[BW]\[[a-z]{0,2}\]")
 	sgf_start = []
 	for line in sgflines:
+	    match = size.search(line)
+	    if match:
+		self.size = match.group()[3:-1]
 	    match = move.search(line)
 	    while match:
 		sgf_start.append("A" + match.group()[1:])
@@ -202,13 +241,26 @@ class GTP_game:
 		match = move.search(line)
 	self.endgame_start = len(sgf_start) - endgame_start_at
 	self.sgffilestart = ";" + string.join(
-					sgf_start[:self.endgame_start-1], "")
+				    sgf_start[:self.endgame_start-1], "") + "\n"
 	if self.endgame_start % 2 == 0:
 	    self.first_to_play = "W"
 	else:
 	    self.first_to_play = "B"
 
-
+    def get_position_from_engine(self, engine):
+	black_stones = engine.list_stones("black")
+	white_stones = engine.list_stones("white")
+	self.sgffilestart = ";"
+	if len(black_stones) > 0:
+	    self.sgffilestart += "AB"
+	    for stone in black_stones:
+		self.sgffilestart += "[%s]" % coords_to_sgf(self.size, stone)
+	    self.sgffilestart += "\n"
+	if len(white_stones) > 0:
+	    self.sgffilestart += "AW"
+	    for stone in white_stones:
+		self.sgffilestart += "[%s]" % coords_to_sgf(self.size, stone)
+	    self.sgffilestart += "\n"
 
     def writesgf(self, sgffilename):
         "Write the game to an SGF file after a game"
@@ -232,10 +284,11 @@ class GTP_game:
                       (white_name, white_seed, black_name, black_seed))
 	outfile.write(self.sgffilestart)
 
-        if handicap > 1:
-            for stone in self.handicap_stones:
-                outfile.write("AB[%s]" %(coords_to_sgf(size, stone)))
-            outfile.write("\n")
+	if handicap > 1:
+	    outfile.write("AB");
+	    for stone in self.handicap_stones:
+		outfile.write("[%s]" %(coords_to_sgf(size, stone)))
+	    outfile.write("PL[W]\n")
 
 	to_play = self.first_to_play
 
@@ -248,6 +301,14 @@ class GTP_game:
                 to_play = "B"
         outfile.write(")\n")
         outfile.close
+
+    def set_handicap(self, handicap):
+	self.handicap = handicap
+
+    def swap_players(self):
+	temp = self.whiteplayer
+	self.whiteplayer = self.blackplayer
+	self.blackplayer = self.whiteplayer
 
     def play(self, sgffile):
         "Play a game"
@@ -266,18 +327,22 @@ class GTP_game:
         self.handicap_stones = []
 
 	if self.endgamefile == "":
-	    if int(self.handicap) < 2:
+	    if self.handicap < 2:
 		self.first_to_play = "B"
 	    else:
-		self.handicap_stones = self.whiteplayer.handicap(self.handicap)
+		self.handicap_stones = self.blackplayer.handicap(self.handicap, self.handicap_type)
 		for stone in self.handicap_stones:
-		    self.blackplayer.black(stone)
+		    self.whiteplayer.black(stone)
 		self.first_to_play = "W"
 	else:
 	    self.blackplayer.loadsgf(self.endgamefile, self.endgame_start)
-	    self.blackplayer.set_random_seed(0);
+	    self.blackplayer.set_random_seed("0")
 	    self.whiteplayer.loadsgf(self.endgamefile, self.endgame_start)
-	    self.whiteplayer.set_random_seed(0);
+	    self.whiteplayer.set_random_seed("0")
+	    if self.blackplayer.is_known_command("list_stones"):
+		self.get_position_from_engine(self.blackplayer)
+	    elif self.whiteplayer.is_known_command("list_stones"):
+		self.get_position_from_engine(self.whiteplayer)
 
 	to_play = self.first_to_play
 
@@ -293,13 +358,15 @@ class GTP_game:
 
 		if move[:6] == "resign":
 		    if verbose >= 1:
-			print "Black resigned"
+			print "Black resigns"
 		    won_by_resignation = "W+Resign"
 		    break
 		else:
 		    self.moves.append(move)
 		    if string.lower(move[:4]) == "pass":
 			passes = passes + 1
+			if verbose >= 1:
+			    print "White passes"
 		    else:
 			passes = 0
 			self.whiteplayer.black(move)
@@ -314,13 +381,15 @@ class GTP_game:
 
 		if move[:6] == "resign":
 		    if verbose >= 1:
-			print "White resigned"
+			print "White resigns"
 		    won_by_resignation = "B+Resign"
 		    break
 		else:
 		    self.moves.append(move)
 		    if string.lower(move[:4]) == "pass":
 			passes = passes + 1
+			if verbose >= 1:
+			    print "Black passes"
 		    else:
 			passes = 0
 			self.blackplayer.white(move)
@@ -329,11 +398,11 @@ class GTP_game:
 		to_play = "B"
 
             if verbose >= 2:
-                print self.whiteplayer.showboard()
+                print self.whiteplayer.showboard() + "\n"
 
 	if won_by_resignation == "":
-	    self.resultw = self.whiteplayer.estimate_score()
-	    self.resultb = self.blackplayer.estimate_score()
+	    self.resultw = self.whiteplayer.final_score()
+	    self.resultb = self.blackplayer.final_score()
 	else:
 	    self.resultw = won_by_resignation;
 	    self.resultb = won_by_resignation;
@@ -362,14 +431,17 @@ class GTP_match:
     #    size
     #    komi
     #    handicap
+    #    handicap_type
 
     def __init__(self, whitecommand, blackcommand, size, komi, handicap,
-                 endgamefilelist):
+		 handicap_type, streak_length, endgamefilelist):
         self.white = whitecommand
         self.black = blackcommand
         self.size = size
         self.komi = komi
         self.handicap = handicap
+	self.handicap_type = handicap_type
+	self.streak_length = streak_length
 	self.endgamefilelist = endgamefilelist
 
     def endgame_contest(self, sgfbase):
@@ -377,9 +449,9 @@ class GTP_match:
 	i = 1
 	for endgamefile in self.endgamefilelist:
 	    game1 = GTP_game(self.white, self.black, self.size, self.komi,
-			     0, endgamefile)
+			     0, "", endgamefile)
 	    game2 = GTP_game(self.black, self.white, self.size, self.komi,
-			     0, endgamefile)
+			     0, "", endgamefile)
 	    if verbose:
 		print "Replaying", endgamefile
 		print "Black:", self.black
@@ -419,14 +491,48 @@ class GTP_match:
 	return results
 
     def play(self, games, sgfbase):
-        game = GTP_game(self.white, self.black,
-                        self.size, self.komi, self.handicap, "")
+	last_color = ""
+	last_streak = 0
+	game = GTP_game(self.white, self.black,
+			self.size, self.komi, self.handicap,
+			self.handicap_type, "")
         results = []
         for i in range(games):
             sgffilename = "%s%03d.sgf" % (sgfbase, i + 1)
-            print "Game ", i + 1
             game.play(sgffilename)
-            results.append(game.result())
+	    result = game.result()
+	    if result[0] == result[1]:
+	        print "Game %d: %s" % (i + 1, result[0])
+	    else:
+	        print "Game %d: %s %s" % (i + 1, result[0], result[1])
+
+	    if result[0][0] == last_color:
+		last_streak += 1
+		if last_streak == self.streak_length:
+		    if last_color == "W":
+			self.handicap += 1
+			if self.handicap == 1:
+			    self.handicap = 2
+			print "White wins too often. Increasing handicap to %d" \
+			      % (self.handicap)
+		    else:   
+			if self.handicap > 0:
+			    self.handicap -= 1
+			    if self.handicap == 1:
+			        self.handicap = 0
+			    print "Black wins too often. Decreasing handicap to %d" \
+				  % (self.handicap)
+			else:
+			    self.handicap = 2
+			    game.swap_players()
+			    print "Black looks stronger than white. Swapping colors and setting handicap to 2"
+		    game.set_handicap(self.handicap)
+		    last_color = ""
+		    last_streak = 0
+	    else:
+		last_color = result[0][0]
+		last_streak = 1
+	    results.append(result)
         game.quit()
         return results
 
@@ -441,13 +547,15 @@ class GTP_match:
 
 white    = ""
 black    = ""
-komi     = "5.5"
+komi     = ""
 size     = "19"
-handicap = "0"
+handicap = 0
+handicap_type = "fixed"
+streak_length = -1
 endgame_start_at = 0
 
 games   = 1
-sgffile = "twogtp"
+sgfbase = "twogtp"
 
 verbose = 0
 
@@ -464,7 +572,10 @@ Possible twogtp options:
   --verbose 1 (to list moves) or --verbose 2 (to draw board)
   --komi <amount>
   --handicap <amount>
-  --size <board size>               (default 10)
+  --free-handicap <amount>
+  --adjust-handicap <length>        (change handicap by 1 after <length> wins
+                                     in a row)
+  --size <board size>               (default 19)
   --games <number of games to play> (default 1)
   --sgfbase <filename>              (create sgf files with sgfbase as basename)
   --endgame <moves before end>      (endgame contest - add filenames of
@@ -484,8 +595,10 @@ try:
 			     "boardsize=",
 			     "size=",
 			     "handicap=",
+			     "free-handicap=",
+			     "adjust-handicap=",
 			     "games=",
-			     "sgffile=",
+			     "sgfbase=",
 			     "endgame=",
 			    ])
 except:
@@ -503,11 +616,17 @@ for opt, value in opts:
     elif opt == "--boardsize" or opt == "--size":
         size = value
     elif opt == "--handicap":
-        handicap = value
+	handicap = int(value)
+	handicap_type = "fixed"
+    elif opt == "--free-handicap":
+	handicap = int(value)
+	handicap_type = "free"
+    elif opt == "--adjust-handicap":
+	streak_length = int(value)
     elif opt == "--games":
         games = int(value)
-    elif opt == "--sgffile":
-        sgffile = value
+    elif opt == "--sgfbase":
+        sgfbase = value
     elif opt == "--endgame":
 	endgame_start_at = int(value)
 
@@ -522,12 +641,16 @@ else:
 if black == "" or white == "":
     usage()
 
-if (int(handicap) > 1):
-    komi = "0.5"
+if komi == "":
+    if handicap > 1 and streak_length == -1:
+	komi = "0.5"
+    else:
+	komi = "5.5"
 
-match = GTP_match(white, black, size, komi, handicap, endgame_filelist)
+match = GTP_match(white, black, size, komi, handicap, handicap_type,
+		  streak_length, endgame_filelist)
 if endgame_filelist != []:
-    results = match.endgame_contest(sgffile)
+    results = match.endgame_contest(sgfbase)
     win_black = 0
     win_white = 0
     for res in results:
@@ -539,9 +662,8 @@ if endgame_filelist != []:
     print "%d games, %d wins for black, %d wins for white." \
          % (len(results), win_black, win_white)
 
-
 else:
-    results = match.play(games, sgffile)
+    results = match.play(games, sgfbase)
 
     i = 0
     for resw, resb in results:
@@ -550,4 +672,3 @@ else:
 	    print "Game %d: %s" % (i, resw)
 	else:
 	    print "Game %d: %s %s" % (i, resb, resw)
-

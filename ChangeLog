@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revisions of twogtp.py
 - bugfix in play_move()
 - improved output files from scoring mode
 - traces added to find_double_threats()
