@@ -8,6 +8,8 @@
 - bugfix in add_attack_either_move
 - new move reason: EITHER_MOVE
 - disabled add_attack_either_move
+- removed redundant EITHER_MOVEs
+- minor cleanup in move_reasons.c
 - some cleanup in move_reasons.c
 - renamed some move reasons for name consistency
 - new function special_rescue6() in reading.c
@@ -18,8 +20,7 @@
 - xplay_attack_either returns WIN not 1
 - improved debugging and trace output
 - checking of sgf GM and FF properties revised
-- removed redundant EITHER_MOVEs
-- minor cleanup in move_reasons.c
+- Makefile.in's converted using Automake 1.5
 - html view enhancements
 - tuning
 - influence tuning
