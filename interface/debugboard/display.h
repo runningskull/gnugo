@@ -29,7 +29,14 @@
  */
 
 #include <stdlib.h>
+
+#if HAVE_CURSES_H
 #include <curses.h>
+#elif HAVE_NCURSES_CURSES_H
+#include <ncurses/curses.h>
+#else
+#endif
+
 #include <stdarg.h>
 
 #include "gnugo.h"

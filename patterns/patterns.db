@@ -10599,13 +10599,30 @@ Pattern CD103
 .*X..
 ?...?
 
-:|,s,value(12)
+:|,sa,value(12)
 
 ?XOX?
 .*Xa.
 ?...?
 
 ; o_aa_attack(*,a) && o_aa_attack(a,*)
+
+
+Pattern CD103a
+# valued slightly more than CD103 because at least potentially this
+# pattern could be devastating. (See blunder14.sgf.)
+
+?OXO?       defend against the attack!
+.*O..
+?...?
+
+:|,d,value(15)
+
+?OXO?
+.*Oa.
+?...?
+
+; x_aa_attack(*,a) && x_aa_attack(a,*)
 
 
 Pattern CD104

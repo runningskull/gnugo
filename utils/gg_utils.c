@@ -54,8 +54,21 @@
 #ifdef _AIX
 #define _TPARM_COMPAT
 #endif
+
+#if HAVE_CURSES_H
 #include <curses.h>
+#elif HAVE_NCURSES_CURSES_H
+#include <ncurses/curses.h>
+#else
+#endif
+
+#if HAVE_TERM_H
 #include <term.h>
+#elif HAVE_NCURSES_TERM_H
+#include <ncurses/term.h>
+#else
+#endif
+
 
 /* terminfo attributes */
 static char *setaf;		/* terminfo string to set color */
@@ -63,6 +76,14 @@ static int   max_color;		/* terminfo max colour */
 
 static int init = 0;
 
+#endif /* TERMINFO */
+
+/* for gg_cputime */
+
+#ifdef HAVE_SYS_TIMES_H
+#include <sys/times.h>
+#elif defined(WIN32)
+#include <windows.h>
 #endif
 
 void
@@ -112,7 +133,7 @@ verifyW32(BOOL b)
 }
 
 #else
-
+/* mingw32 lacks crtdbg.h and _ASSERTE */
 verifyW32(BOOL b)
 {
   if (!b) {
@@ -243,6 +264,31 @@ gg_gettimeofday(void)
 const char *
 gg_version(void) {
   return VERSION;
+}
+
+/* return cputime used in mili secs */
+
+int gg_cputime(void)
+{
+#if HAVE_SYS_TIMES_H && HAVE_TIMES
+    struct tms t;
+    times(&t);
+    return t.tms_utime + t.tms_stime + t.tms_cutime + t.tms_cstime;
+#elif defined(WIN32)
+    FILETIME creationTime, exitTime, kernelTime, userTime;
+    ULARGE_INTEGER uKernelTime,uUserTime,uElapsedTime;
+    unsigned long ulElapsedTime;
+    UNUSED(s);
+    GetProcessTimes(GetCurrentProcess(), &creationTime, &exitTime, &kernelTime, &userTime);
+    uKernelTime.LowPart = kernelTime.dwLowDateTime;
+    uKernelTime.HighPart = kernelTime.dwHighDateTime;
+    uUserTime.LowPart = userTime.dwLowDateTime;
+    uUserTime.HighPart = userTime.dwHighDateTime;
+    uElapsedTime.QuadPart = uKernelTime.QuadPart + uUserTime.QuadPart;
+    ulElapsedTime = (unsigned long)(uElapsedTime.QuadPart / 10000); /* convert to milliseconds: */
+    /*_ASSERTE(0 && "Debug Times");*/
+    return ulElapsedTime;
+#endif
 }
 
 /* Reorientation of point (i,j) into (*ri, *rj) */

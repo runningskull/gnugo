@@ -107,7 +107,10 @@ AC_HEADER_TIME
 
 AC_C_CONST
 
-AC_CHECK_HEADERS(unistd.h sys/time.h curses.h term.h)
+AC_CHECK_HEADERS(unistd.h sys/time.h sys/times.h)
+AC_CHECK_HEADERS(curses.h term.h ncurses/curses.h ncurses/term.h)
+
+AC_PATH_PROG(perl, perl)
 
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
@@ -116,7 +119,7 @@ dnl results of setlinebuf test used in interface/play_ascii.c
 dnl alarm not available in VC
 dnl vsnprintf not universally available
 dnl usleep not available in Unicos and mingw32
-AC_CHECK_FUNCS(setlinebuf alarm vsnprintf gettimeofday usleep)
+AC_CHECK_FUNCS(setlinebuf alarm vsnprintf gettimeofday usleep times)
 
 dnl if snprintf not available try to use g_snprintf from glib
 if test $ac_cv_func_vsnprintf = no; then
