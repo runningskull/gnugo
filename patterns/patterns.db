@@ -13369,6 +13369,7 @@ O......
 
 Pattern EJ91
 # db New pattern (3.1.26)
+# gf Demoted from J to j. See e.g. trevorc:1180 and nngs4:485. (3.7.1)
 
 ?.....         large block affecting stability of both
 ..O.oo
@@ -13377,7 +13378,7 @@ Pattern EJ91
 ......
 ------
 
-:8,J
+:8,j
 
 
 Pattern EJ92
