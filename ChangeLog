@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- eye_vertex and eye_graph structures reorganized
+- mkeyes.c rewritten to conform the changes in eyes.h
+- adjacent() and buggy hadj() macros in optics.c retired
+- recognize_eye(), first_map() and next_map() simplified and sped up
+- new static reset_map() in optics.c
 - new autohelpers omoyo_opposite and xmoyo_opposite
 - CLASS_I added to CLASS_MOVE_REASONS in patterns.h
 - compactify_att() removes duplicates from attribute list in DFA

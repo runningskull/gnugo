@@ -21,25 +21,27 @@
 
 #include "liberty.h"
 
+
+#define CAN_BE_EMPTY		1
+#define CAN_CONTAIN_STONE	2
+#define EYE_DEFENSE_POINT	4
+#define EYE_ATTACK_POINT	8
+
 /*
- * The vertices of each eye is defined by an array of struct eye_vertex.
+ * The vertices of each eye are defined by an array of struct eye_vertex.
  */
 
 struct eye_vertex {
-  int i;                          /* coordinates of the vertex             */
-  int j; 
-  char type;                      /* . x or X                              */
-
-  int neighbors;                  /* number of neighbors                   */
-  int n1;                         /* first neighbor (position in array)    */
-  int n2;                         /* second neighbor                       */
-  int n3;                         /* third neighbor                        */
-  int n4;                         /* fourth neighbor                       */
-  int edge;                       /* 0=center, 1=edge, 2=corner            */
+  char marginal;		  /* 1 if marginal vertex, 0 otherwise    */
+  char edge;			  /* 0 = center, 1 = edge, 2 = corner	   */
   /* A corner vertex may only be matched at the corner.
    * An edge vertex may be matched at the corner or on the edge.
    * A center vertex may be matched anywhere.
    */
+  char flags;			  /* see the #defines above		   */
+
+  char neighbors;		  /* number of neighbors                   */
+  int n[4];			  /* position in array of vertex neighors */
 };
 
 
@@ -50,7 +52,7 @@ struct eye_vertex {
 
 struct eye_graph {
   struct eye_vertex *vertex;
-  const char *patname;            /* Name of pattern                       */
+  int patnum;			  /* Number of pattern			    */
   int esize;                      /* number of vertices                    */
   int msize;                      /* number of marginal vertices           */
   int ends;                       /* number of vertices with one neighbor  */

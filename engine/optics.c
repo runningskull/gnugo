@@ -29,28 +29,6 @@
 #include "gg_utils.h"
 
 
-/* This macro is not fully generalized. It works because it is used only where
- * c, d match the first vital attack/defend point of the the half eye or none
- * at all.
- */
-#define hadj(heye, apos, bpos) \
-     (heye[apos].type == HALF_EYE \
-      && (heye[apos].attack_point[0] == (bpos) \
-          || (heye[apos].defense_point[0] == (bpos))))
-
-/*
- * Two eye points are defined to be adjacent if they are either
- * next to each other or if one vertex is a half eye and the
- * other one is the point making it a real eye.
- */
-
-#define adjacent(heye, apos, bpos) (   (apos) == SOUTH(bpos) \
-				    || (apos) == WEST(bpos) \
-				    || (apos) == NORTH(bpos) \
-				    || (apos) == EAST(bpos) \
- 				    || hadj(heye, apos, bpos) \
-				    || hadj(heye, bpos, apos))
-
 #define MAXEYE 20
 
 
@@ -63,6 +41,7 @@ struct vital_points {
   int num_attacks;
   int num_defenses;
 };
+
 
 static void
 compute_primary_domains(int color, int domain[BOARDMAX],
@@ -84,12 +63,13 @@ static int recognize_eye(int pos, int *attack_point, int *defense_point,
 			 struct eyevalue *value,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
-			 int color, struct vital_points *vp);
+			 struct vital_points *vp);
 static void guess_eye_space(int pos, int effective_eyesize, int margins,
 			    struct eye_data eye[BOARDMAX],
 			    struct eyevalue *value, char *pessimistic_min);
-static void first_map(int q, int map[MAXEYE]);
-static int next_map(int *q, int map[MAXEYE], int esize);
+static void reset_map(int size);
+static void first_map(int* map_value);
+static int next_map(int *q, int map[MAXEYE]);
 static void print_eye(struct eye_data eye[BOARDMAX],
 		      struct half_eye_data heye[BOARDMAX], int pos);
 static float 
@@ -101,6 +81,10 @@ evaluate_diagonal_intersection(int m, int n, int color,
 /* These are used during the calculations of eye spaces. */
 static int black_domain[BOARDMAX];
 static int white_domain[BOARDMAX];
+
+/* Used internally by mapping functions. */
+static int map_size;
+static char used_index[MAXEYE];
 
 
 /*
@@ -1045,7 +1029,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
   struct vital_points *best_vp = &vp;
   
   eye_color = recognize_eye(pos, attack_point, defense_point, value,
-                            eye, heye, color, &vp);
+                            eye, heye, &vp);
   if (!eye_color)
     return 0;
 
@@ -1065,7 +1049,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
 
     heye[ko_halfeye].type = 0;
     result = recognize_eye(pos, &apos, &dpos, &ko_value, eye,
-			   heye, color, &ko_vp);
+			   heye, &ko_vp);
     heye[ko_halfeye].type = HALF_EYE;
 
     if (result && max_eyes(value) < max_eyes(&ko_value)) {
@@ -1107,20 +1091,16 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      struct eyevalue *value,
 	      struct eye_data eye[BOARDMAX], 
 	      struct half_eye_data heye[BOARDMAX], 
-	      int color, struct vital_points *vp)
+	      struct vital_points *vp)
 {
   int m, n;
-  int k;
-  int eye_size = 0;
-  int vpos[MAXEYE], marginal[MAXEYE], neighbors[MAXEYE];
-  int edge[MAXEYE];
-  int graph;
-  int q;
-  int map[MAXEYE];
-  int ok, contin;
   int eye_color;
-  int kpos;
+  int eye_size = 0;
   int num_marginals = 0;
+  int vpos[MAXEYE];
+  char marginal[MAXEYE], edge[MAXEYE], neighbors[MAXEYE];
+  int graph;
+  int map[MAXEYE];
 
   gg_assert(attack_point != NULL);
   gg_assert(defense_point != NULL);
@@ -1131,7 +1111,6 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
     eye_color = BLACK;
   if (eye_color == WHITE_BORDER)
     eye_color = WHITE;
-
 
   if (eye[pos].esize-eye[pos].msize > 7)
     return 0;
@@ -1163,26 +1142,22 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	if (n == 0 || n == board_size-1)
 	  edge[eye_size]++;
 	
-	eye_size++;
 	if (is_halfeye(heye, pos2)) {
-
-	  /* Use one of the diagonals as a marginal for mapping purposes.
-	   * The whole set of diagonals is isomorphic to a marginal.
-	   * Note that the half eye preceedes the diagonal in the list.
-	   */
-	  neighbors[eye_size-1]++;       /* increase neighbors of half eye */
-	  if (eye_color == color)
-	    kpos = heye[pos2].defense_point[0];
-	  else
-	    kpos = heye[pos2].attack_point[0];
-	  ASSERT_ON_BOARD1(kpos);
-	  vpos[eye_size] = kpos;
-	  marginal[eye_size] = 1;
-	  edge[eye_size] = 0;
-	  num_marginals++;
-	  neighbors[eye_size] = 1;
+	  neighbors[eye_size]++;      /* Increase neighbors of half eye. */
 	  eye_size++;
+	  /* Use a virtual marginal vertex for mapping purposes. We set it
+	   * to be at NO_MOVE so it won't accidentally count as a
+	   * neighbor for another vertex. Note that the half eye precedes
+	   * the virtual marginal vertex in the list.
+	   */
+	  vpos[eye_size] = NO_MOVE;
+	  marginal[eye_size] = 1;
+	  num_marginals++;
+	  edge[eye_size] = 0;
+	  neighbors[eye_size] = 1;
 	}
+
+	eye_size++;
       }
     }
 
@@ -1192,86 +1167,70 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
    */
 
   for (graph = 0; graphs[graph].vertex != NULL; graph++) {
+    int q;
+
     if (graphs[graph].esize != eye_size
 	|| graphs[graph].msize != num_marginals)
       continue;
 
-
+    reset_map(eye_size);
     q = 0;
-    first_map(q, map);
+    first_map(&map[0]);
 
-    contin = 1;
-    while (contin && q >= 0 && q < eye_size) {
-      ok = 1;
+    while (1) {
+      struct eye_vertex *gv = &graphs[graph].vertex[q];
+      int mv = map[q];
+      int ok = 1;
 
       if (0)
 	TRACE("q=%d: %d %d %d %d %d %d\n", 
 	      q, map[0], map[1], map[2], map[3], map[4], map[5]);
 
-      if (neighbors[map[q]] != graphs[graph].vertex[q].neighbors)
+      if (neighbors[mv] != gv->neighbors
+	  || marginal[mv] != gv->marginal
+	  || edge[mv] < gv->edge)
 	ok = 0;
 
-      if (ok && marginal[map[q]]
-	  && graphs[graph].vertex[q].type != '!'
-	  && graphs[graph].vertex[q].type != '@'
-	  && graphs[graph].vertex[q].type != '$'
-	  && graphs[graph].vertex[q].type != ')'
-	  && graphs[graph].vertex[q].type != '(')
-	ok = 0;
-      
-      if (ok && !marginal[map[q]]
-	  && (graphs[graph].vertex[q].type == '!'
-	      || graphs[graph].vertex[q].type == '('
-	      || graphs[graph].vertex[q].type == ')'
-	      || graphs[graph].vertex[q].type == '@'
-	      || graphs[graph].vertex[q].type == '$'))
-	ok = 0;
-      
-      if (ok && IS_STONE(board[vpos[map[q]]])
-	  && graphs[graph].vertex[q].type != 'X'
-	  && graphs[graph].vertex[q].type != 'x'
-	  && graphs[graph].vertex[q].type != '$')
-	ok = 0;
-      
-      if (ok && board[vpos[map[q]]] == EMPTY
-	  && (graphs[graph].vertex[q].type == 'X'
-	      || graphs[graph].vertex[q].type == '$'))
-	ok = 0;
+      if (ok) {
+        if (IS_STONE(board[vpos[mv]])) {
+	  if (!(gv->flags & CAN_CONTAIN_STONE))
+	    ok = 0;
+	}
+	/* Virtual half eye marginals also fall here since they are off
+	 * board.
+	 */
+	else if (!(gv->flags & CAN_BE_EMPTY))
+	  ok = 0;
+      }
 
-      if (ok && edge[map[q]] < graphs[graph].vertex[q].edge)
-	ok = 0;
-      
-      if (ok && graphs[graph].vertex[q].n1 < q
-	  && graphs[graph].vertex[q].n1 != -1)
-	{
-	  if (!adjacent(heye, vpos[map[q]], 
-			vpos[map[graphs[graph].vertex[q].n1]]))
-	    ok = 0;
+      if (ok) {
+	int k;
+
+	for (k = 0; k < gv->neighbors; k++) {
+	  if (gv->n[k] < q) {
+	    int mn = map[gv->n[k]];
+
+	    /* Two eye vertices are neighbours if they are adjacent on the
+	     * board or one of them is a half eye and the other is its
+	     * virtual marginal vertex (and follows it in vpos[] array).
+	     */
+	    if (vpos[mv] != SOUTH(vpos[mn])
+		&& vpos[mv] != WEST(vpos[mn])
+		&& vpos[mv] != NORTH(vpos[mn])
+		&& vpos[mv] != EAST(vpos[mn])
+		&& (mv != mn - 1 || heye[vpos[mv]].type != HALF_EYE)
+		&& (mn != mv - 1 || heye[vpos[mn]].type != HALF_EYE)) {
+	      ok = 0;
+	      break;
+	    }
+	  }
 	}
-      if (ok && graphs[graph].vertex[q].n2 < q
-	  && graphs[graph].vertex[q].n2 != -1)
-	{
-	  if (!adjacent(heye, vpos[map[q]], 
-			vpos[map[graphs[graph].vertex[q].n2]]))
-	    ok = 0;
-	}
-      if (ok && graphs[graph].vertex[q].n3 < q
-	  && graphs[graph].vertex[q].n3 != -1)
-	{
-	  if (!adjacent(heye, vpos[map[q]],
-			vpos[map[graphs[graph].vertex[q].n3]]))
-	    ok = 0;
-	}
-      if (ok && graphs[graph].vertex[q].n4 < q
-	  && graphs[graph].vertex[q].n4 != -1)
-	{
-	  if (!adjacent(heye, vpos[map[q]],
-			vpos[map[graphs[graph].vertex[q].n4]]))
-	    ok = 0;
-	}
+      }
 
       if (!ok) {
-	contin = next_map(&q, map, eye_size);
+	if (!next_map(&q, map))
+	  break;
+
 	if (0)
 	  gprintf("  q=%d, esize=%d: %d %d %d %d %d\n",
 		  q, eye_size, 
@@ -1279,55 +1238,54 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
       }
       else {
 	q++;
-	first_map(q, map);
+	if (q == eye_size)
+	  break;			/* A match! */
+	
+	first_map(&map[q]);
       }
     }
 
-    /* We have found a match! Now sort out the vital moves. */
     if (q == eye_size) {
+      /* We have found a match! Now sort out the vital moves. */
       *value = graphs[graph].value;
       vp->num_attacks = 0;
       vp->num_defenses = 0;
       
       if (eye_move_urgency(value) > 0) {
 	/* Collect all attack and defense points in the pattern. */
-	for (k = 0; k < graphs[graph].esize; k++) {
-	  if (graphs[graph].vertex[k].type == '*'
-	      || graphs[graph].vertex[k].type == '<')
-	    vp->attacks[vp->num_attacks++] = vpos[map[k]];
-	  else if (graphs[graph].vertex[k].type == '@'
-		   || graphs[graph].vertex[k].type == '(') {
-	    /* check for marginal matching half eye diagonal
-	     * If it is a half eye diagonal, the half eye preceeds
-	     * the diagonal in the list of vertices
+	int k;
+
+	for (k = 0; k < eye_size; k++) {
+	  struct eye_vertex *ev = &graphs[graph].vertex[k];
+
+	  if (ev->flags & EYE_ATTACK_POINT) {
+	    /* Check for a marginal vertex matching a half eye virtual
+	     * marginal. This is the case if a half eye preceeds the
+	     * current vertex in the list.
 	     */
-	    if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
+	    if (ev->marginal && map[k] > 0
+		&& is_halfeye(heye, vpos[map[k] - 1])) {
 	      /* Add all diagonals as vital. */
 	      int ix;
-	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
+	      struct half_eye_data *he = &heye[vpos[map[k] - 1]];
 	      
-	      for (ix = 0; ix < this_half_eye->num_attacks; ix++)
-		vp->attacks[vp->num_attacks++] =
-		  this_half_eye->attack_point[ix];
+	      for (ix = 0; ix < he->num_attacks; ix++)
+		vp->attacks[vp->num_attacks++] = he->attack_point[ix];
 	    }
 	    else
 	      vp->attacks[vp->num_attacks++] = vpos[map[k]];
 	  }
 	  
-	  if (graphs[graph].vertex[k].type == '*'
-	      || graphs[graph].vertex[k].type == '>')
-	    vp->defenses[vp->num_defenses++] = vpos[map[k]];
-	  else if (graphs[graph].vertex[k].type == '@'
-		   || graphs[graph].vertex[k].type == ')') {
-	    /* Check for marginal matching half eye diagonal. */
-	    if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
+	  if (ev->flags & EYE_DEFENSE_POINT) {
+	    /* Check for a half eye virtual marginal vertex. */
+	    if (ev->marginal && map[k] > 0
+		&& is_halfeye(heye, vpos[map[k] - 1])) {
 	      /* Add all diagonals as vital. */
 	      int ix;
-	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
-
-	      for (ix = 0; ix < this_half_eye->num_defends; ix++)
-		vp->defenses[vp->num_defenses++] 
-		  = this_half_eye->defense_point[ix];
+	      struct half_eye_data *he = &heye[vpos[map[k] - 1]];
+	      
+	      for (ix = 0; ix < he->num_defends; ix++)
+		vp->defenses[vp->num_defenses++] = he->defense_point[ix];
 	    }
 	    else
 	      vp->defenses[vp->num_defenses++] = vpos[map[k]];
@@ -1350,10 +1308,10 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	
 	DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
 	      *attack_point, *defense_point);
-	DEBUG(DEBUG_EYES, "  pattern matched:  %s\n", graphs[graph].patname);
+	DEBUG(DEBUG_EYES, "  pattern matched:  %d\n", graphs[graph].patnum);
 	
       }
-      TRACE("eye space at %1m of type %s\n", pos, graphs[graph].patname);
+      TRACE("eye space at %1m of type %d\n", pos, graphs[graph].patnum);
       
       return eye_color;
     }
@@ -1366,69 +1324,60 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 /* a MAP is a map of the integers 0,1,2, ... ,q into 
  * 0,1, ... , esize-1 where q < esize. This determines a 
  * bijection of the first q+1 elements of the graph into the 
- * eyespace. The function first_map finds the smallest valid
- * value of element q, assuming the previous elements are ok.
+ * eyespace. The following three functions work with maps.
  */
 
+/* Reset internal data structure used by first_map() and
+ * next_map() functions.
+ */
 static void
-first_map(int q, int map[MAXEYE])
+reset_map(int size)
 {
-  int k;
-  int r;
-  
-  for (k = 0; k <= q; k++) {
-    for (r = 0; r < q; r++)
-      if (map[r] == k)
-	break;
+  map_size = size;
+  memset(used_index, 0, size * sizeof(used_index[0]));
+}
 
-    if (r == q) {
-      map[q] = k;
-      break;
-    }
-  }
+
+/* The function first_map finds the smallest valid
+ * value of a map element.
+ */
+static void
+first_map(int *map_value)
+{
+  int k = 0;
+
+  while (used_index[k])
+    k++;
+
+  used_index[k] = 1;
+  *map_value = k;
 }     
 
 
-/* a MAP is a map of the integers 0,1,2, ... ,q into 
- * 0,1, ... , esize-1 where q < esize. This determines a 
- * bijection of the first q+1 elements of the graph into the 
- * eyespace. The function next_map produces the next map when
- * these are ordered lexicographically. If no next map can
- * be found, q is decremented, then we try again. If q==0
- * and no next map can be found, the function returns false.
+/* The function next_map produces the next map in lexicographical
+ * order. If no next map can be found, q is decremented, then we
+ * try again. If the entire map is lexicographically last, the
+ * function returns false.
  */
-
 static int
-next_map(int *q, int map[MAXEYE], int esize)
+next_map(int *q, int map[MAXEYE])
 {
-  int mapok = 0;
-  int r;
+  int k;
 
-  if (0)
-    gprintf("  q=%d, esize=%d: %d %d %d %d %d\n",
-	    *q, esize, map[0], map[1], map[2], map[3], map[4]);
-
-  if (*q == 0 && map[*q] == esize - 1)
-    return 0;
-
-  map[*q]++;
-  while (!mapok) {
-    mapok = 1;
-    for (r = 0; r < *q; r++) {
-      if (map[r] == map[*q]) {
-	map[*q]++;
-	mapok = 0;
+  do {
+    used_index[map[*q]] = 0;
+    for (k = map[*q]; ++k < map_size;) {
+      if (!used_index[k]) {
+	used_index[k] = 1;
+	map[*q] = k;
+	return 1;
       }
     }
-  }
 
-  if (map[*q] >= esize) {
-    map[*q] = 0;
     (*q)--;
-    return next_map(q, map, esize);
-  }
-  else
-    return 1;
+  } while (*q >= 0);
+  
+  return 0;
 }     
 
 
