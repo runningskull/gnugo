@@ -1,8 +1,26 @@
+This is GNU Go, a Go program. Contact gnugo@gnu.org, or see
+http://www.gnu.org/software/gnugo/ for more information.
+
+Copyright 1999, 2000, 2001, 2002, 2003, 2004 by the Free Software Foundation.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation - version 2.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License in file COPYING for more details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA 02111, USA.
+
 (;GM[1]FF[3]
-RU[Japanese]SZ[19]HA[0]KM[5.5]
-GN[Hoshi joseki variations]
-DT[1999-05-10]
-SY[Cgoban 1.9.5]TM[-];B[pd]C[0];W[qf];C[#kogeima kakari]
+SZ[19]HA[0]
+GN[Hoshi+keima joseki database]
+;B[pd]C[0];W[qf];C[#kogeima kakari]
 (;B[qh]C[j
 ]MA[mj];C[#hasami]
 (;W[qc]C[S]MA[mj];C[#w invades]
@@ -55,8 +73,7 @@ MA[lg]C[U
 ])
 )
 
-(;W[of]C[
-];C[#w jumps];B[nd]MA[mj]C[S]
+(;W[of];C[#w jumps];B[nd]MA[mj]C[S]
 (;W[pi]C[0]
 (;B[qi]MA[mk]C[S];W[pj]MA[ml]C[0]
 (;B[ph]MA[mk]C[S];W[oh]MA[mk];B[qj]MA[ml]C[S];W[pk]MA[mm];B[ql]MA[mm]
@@ -175,7 +192,7 @@ MA[mj]
 (;W[pg]C[;!xplay_attack(A,B)
 ]MA[mj]LB[qg:A][pg:B]
 (;B[qg]C[S]MA[mj];W[rf]C[S]MA[mj]
-(;B[og]C[S]MA[mj];W[tt]MA[mj];B[ph]C[S]MA[mj])
+(;B[og]C[S]MA[mj];W[tt];B[ph]C[S]MA[mj])
 
 (;B[of])
 )
@@ -226,8 +243,7 @@ B[qb]C[S]MA[og])
 (;W[qj]MA[nk])
 )
 
-(;W[qd]C[
-];B[qc]MA[mg]C[S];W[rc]MA[mg]C[S]
+(;W[qd];B[qc]MA[mg]C[S];W[rc]MA[mg]C[S]
 (;B[pc]MA[mh]C[S];W[re]MA[ng]C[U
 ];B[rb];W[sb]C[J
 ]MA[lh])
@@ -335,8 +351,8 @@ W[qa]MA[mi]C[0];B[oa]MA[mi]C[U])
 W[pb]MA[mi]C[0];B[oa]MA[li]C[U])
 
 (;W[qc]MA[mi]C[0];B[rc]MA[mi]C[U];W[qa]MA[mi]C[0];B[oa]MA[mi]C[U];
-W[pb]MA[mi]C[0];B[oa]MA[mi]C[S];W[pa]MA[mi]C[0];B[tt]MA[mi]C[S];W[se]
-MA[mi]C[0];B[tt]MA[mi]C[S];W[ma]MA[kb]C[0];B[lb]MA[jb]C[U];W[la]MA[jb]
+W[pb]MA[mi]C[0];B[oa]MA[mi]C[S];W[pa]MA[mi]C[0];B[tt];W[se]
+MA[mi]C[0];B[tt];W[ma]MA[kb]C[0];B[lb]MA[jb]C[U];W[la]MA[jb]
 C[0];B[kb]MA[jb]C[U])
 
 (;W[se]MA[mi]C[0];B[qc]MA[mi]C[U];W[rc]MA[mi]C[0];B[sc]MA[mi]C[U]
@@ -344,7 +360,7 @@ C[0];B[kb]MA[jb]C[U])
 W[na]MA[mi]C[0];B[oa]MA[mi]C[U])
 
 (;W[qa]MA[mi]C[0];B[oa]MA[mi]C[U];W[pb]MA[mi]C[0];B[oa]MA[mi]C[U];
-W[pa]MA[mi]C[0];B[tt]MA[mi]C[S];W[ma]MA[ke]C[0];B[lb]MA[ke]C[U];W[la]
+W[pa]MA[mi]C[0];B[tt];W[ma]MA[ke]C[0];B[lb]MA[ke]C[U];W[la]
 MA[jc]C[0]
 (;B[kb])
 
@@ -402,7 +418,7 @@ C[0];B[nb]MA[mi]C[U];W[qb]MA[mi]C[0];B[nc]MA[mi]C[U];W[pa]MA[mi]C[0];
 B[rb]MA[li]C[U];W[ra]MA[mi]C[0];B[re]MA[mi]C[U]
 (;W[sd]MA[mi]C[0];B[se]MA[li]C[U];W[rf]MA[mi]C[0];B[sc]MA[mi]C[U]
 (;W[qh]MA[mi]C[0];B[na]MA[mi]C[U];W[oa]MA[mi]C[0];B[sa]MA[mi]C[U];
-W[sb]MA[mi]C[0];B[tt]MA[mi]C[0];W[rd]MA[mi]C[0];B[sd]MA[mi]C[U])
+W[sb]MA[mi]C[0];B[tt];W[rd]MA[mi]C[0];B[sd]MA[mi]C[U])
 
 (;W[sf]MA[mi]C[0];C[#trick_SK1_1127];B[na]MA[mi]C[U];W[oa]MA[mi]C[0];
 B[ph]MA[mi]C[U];W[qh]MA[mi]C[0];B[og]MA[mi]C[U];W[qg]MA[mi]C[0];B[pi]

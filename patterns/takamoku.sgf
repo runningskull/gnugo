@@ -1,7 +1,7 @@
 This is GNU Go, a Go program. Contact gnugo@gnu.org, or see
 http://www.gnu.org/software/gnugo/ for more information.
 
-Copyright 1999, 2000, 2001, 2002, 2003 by the Free Software Foundation.
+Copyright 1999, 2000, 2001, 2002, 2003, 2004 by the Free Software Foundation.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -18,12 +18,9 @@ Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111, USA.
 
 (;GM[1]FF[3]
-RU[Japanese]SZ[19]HA[0]KM[5.5]
-PW[White]
-PB[Black]
-GN[White (W) vs. Black (B)]
-DT[1999-05-27]
-SY[Cgoban 1.9.2]TM[5:00:00(5x1:00)];B[od];W[qd]
+SZ[19]HA[0]
+GN[Takamoku joseki database]
+;B[od];W[qd]
 (;B[qc]MA[lf]C[j
 ];W[rc]MA[lf];B[pc]MA[lf];W[re]MA[lf]C[U
 ];B[kc]

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- cleanup of patterns/*.sgf
 - revision of dragon_invincible()
 - default to quiet unless in ASCII playing mode
 - new GTP commands move_probabilities and move_uncertainty

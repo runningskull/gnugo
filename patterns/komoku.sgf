@@ -1,7 +1,7 @@
 This is GNU Go, a Go program. Contact gnugo@gnu.org, or see
 http://www.gnu.org/software/gnugo/ for more information.
 
-Copyright 1999, 2000, 2001, 2002, 2003 by the Free Software Foundation.
+Copyright 1999, 2000, 2001, 2002, 2003, 2004 by the Free Software Foundation.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -17,26 +17,17 @@ License along with this program; if not, write to the Free
 Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111, USA.
 
-
-
 (;GM[1]FF[3]
-SZ[19]AP[SGFC:1.13b]
-GN[White (W) vs. Black (B)]
-PB[Black]
-HA[0]
-PW[White]
-KM[5.5]
-DT[1999-05-27]
-TM[5:00:00(5x1:00)]RU[Japanese]SY[Cgoban 1.9.2];B[qd]
+SZ[19]HA[0]
+GN[Komoku joseki database]
+;B[qd]
 (;W[od]
 (;B[oc]MA[mg]
-(;W[nc]MA[lg]C[
-];B[pc]MA[mf]C[U]
+(;W[nc]MA[lg];B[pc]MA[mf]C[U]
 (;W[nd]MA[lg]C[:-,shape(6)]
 (;B[qf]MA[mh]C[U];W[jc]MA[if]C[U];B[hc]MA[gg]C[t
 ]
-(;W[je]C[
-]MA[gg])
+(;W[je]MA[gg])
 
 (;W[tt];B[lc]MA[hg]
 (;W[ld]C[0
@@ -189,8 +180,7 @@ B[rd])
 (;B[pf]MA[lh]
 (;W[qc]MA[lh]C[:-,shape(3)]
 (;B[rc]MA[lh];W[pc]MA[lh]C[U]
-(;B[re]MA[lh]C[:-,shape(8)];W[kc]MA[jg]C[
-])
+(;B[re]MA[lh]C[:-,shape(8)];W[kc]MA[jg])
 
 (;B[rb]MA[kg];W[kc]MA[jg];B[qj]MA[jk])
 )
