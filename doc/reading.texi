@@ -742,33 +742,79 @@ ko captures are not allowed.
 If the ko at @code{kom_pos} is filled, then the komaster
 reverts to @code{EMPTY}.
 
-The komaster scheme may be summarized as follows. It is assumed
-that @samp{O} is about to move.
+The komaster scheme used in GNU Go 3.0 is known as komaster scheme 1.
+It may be summarized as follows. It is assumed that @samp{O} is about to move.
 
 @itemize @bullet
 @item 1. Komaster is @code{EMPTY}.
 @itemize @minus
-@item Unconditional ko capture is allowed. Komaster remains @code{EMPTY}.
-@item Conditional ko capture is allowed. Komaster is set to @samp{O} and
+@item 1a) Unconditional ko capture is allowed. Komaster remains @code{EMPTY}.
+@item 1b) Conditional ko capture is allowed. Komaster is set to @samp{O} and
 @code{kom_pos} to the location of the ko, where a stone was
 just removed.
 @end itemize
-@item Komaster is @samp{O}:
+@item 2. Komaster is @samp{O}:
 @itemize @minus 
-@item Only nested ko captures are allowed.
-@item If komaster fill the ko at @code{kom_pos} then komaster reverts to
+@item 2a) Only nested ko captures are allowed.
+@item 2b) If komaster fill the ko at @code{kom_pos} then komaster reverts to
 @code{EMPTY}.
 @end itemize
-@item Komaster is @samp{X}:
+@item 3. Komaster is @samp{X}:
 @itemize @minus
 @item
 Play at @code{kom_pos} is not allowed. Any other ko capture
 is allowed. If @samp{O} takes another ko, komaster becomes @code{GRAY}.
 @end itemize
-@item Komaster is @code{GRAY}:
+@item 4. Komaster is @code{GRAY}:
 @itemize @minus
 @item Ko captures are not allowed. If the ko at @code{kom_pos} is
 filled then the komaster reverts to @code{EMPTY}.
+@end itemize
+@end itemize
+
+In GNU Go 3.2 a new komaster scheme 5 is used. It may be described as follows.
+
+@itemize @bullet
+@item 1. Komaster is EMPTY.
+@itemize @minus
+@item 1a. Unconditional ko capture is allowed.
+@quotation
+Komaster remains EMPTY if previous move was not a ko capture.
+Komaster is set to WEAK_KO if previous move was a ko capture
+and kom_pos is set to the old value of board_ko_pos.
+@end quotation
+@item 1b) Conditional ko capture is allowed.
+@quotation
+Komaster is set to O and kom_pos to the location of the ko, where a stone was
+just removed.
+@end quotation
+@end itemize
+@item 2. Komaster is O:
+@itemize @minus
+@item 2a) Only nested ko captures are allowed. Kom_pos is moved to the
+new removed stone.
+@item 2b) If komaster fills the ko at kom_pos then komaster reverts to
+EMPTY.
+@end itemize
+@item 3. Komaster is X:
+@quotation
+Play at kom_pos is not allowed. Any other ko capture
+is allowed. If O takes another ko, komaster becomes GRAY_X.
+@end quotation
+@item  4. Komaster is GRAY_O or GRAY_X:
+@quotation
+Ko captures are not allowed. If the ko at kom_pos is
+filled then the komaster reverts to EMPTY.
+@end quotation
+@item 5. Komaster is WEAK_KO:
+@itemize @minus
+@item 5a) After a non-ko move komaster reverts to EMPTY.
+@item 5b) Unconditional ko capture is only allowed if it is nested ko capture.
+@quotation
+Komaster is changed to WEAK_X and kom_pos to the old value of
+board_ko_pos.
+@end quotation
+@item 5c) Conditional ko capture is allowed according to the rules of 1b.
 @end itemize
 @end itemize
 

@@ -48,7 +48,7 @@
  * The data1 field packs into 32 bits the following
  * fields:
  *
- * komaster:  2 bits (EMPTY, BLACK, WHITE, or GRAY)
+ * komaster:  3 bits (EMPTY, BLACK, WHITE, or GRAY)
  * kom_pos : 10 bits (allows MAX_BOARD up to 31)
  * routine :  4 bits (currently 10 different choices)
  * str1    : 10 bits
@@ -75,7 +75,7 @@ typedef struct read_result_t {
 #define RR_INPUT_DATA2 0x3ff
 
 /* Get parts of a Read_result identifying the input data. */
-#define rr_get_komaster(rr)   (((rr).data1  >> 29) & 0x03)
+#define rr_get_komaster(rr)   (((rr).data1  >> 29) & 0x07)
 #define rr_get_kom_pos(rr)    (((rr).data1  >> 19) & 0x3ff)
 #define rr_get_routine(rr)    (((rr).data1  >> 15) & 0x0f)
 #define rr_get_str1(rr)       (((rr).data1  >>  5) & 0x3ff)
@@ -106,7 +106,7 @@ typedef struct read_result_t {
        } while (0)
 
 /* Get parts of a Read_result constituting the result of a search. */
-#define rr_get_status(rr)      (((rr).data2 >> 28) & 0x03)
+#define rr_get_status(rr)      (((rr).data2 >> 28) & 0x07)
 #define rr_get_result1(rr)     (((rr).data2 >> 24) & 0x0f)
 #define rr_get_result2(rr)     (((rr).data2 >> 20) & 0x0f)
 #define rr_get_move(rr)        (((rr).data2 >> 10) & 0x3ff)

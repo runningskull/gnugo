@@ -39,7 +39,7 @@
 #include "sgftree.h"
 #include "gg_utils.h"
 
-#define KOMASTER_SCHEME 1
+#define KOMASTER_SCHEME 5
 #define KOMASTER_TRACE 0
 
 int tracing_inside_komaster = 0;
@@ -450,11 +450,12 @@ komaster_to_string(int komaster, int kom_pos)
 {
 #if KOMASTER_SCHEME == 4 
   const char *b[4] = {"O-Illegal", "X-Illegal", "O-Legal", "X-Legal"};
-  ASSERT1(komaster >=0 && komaster <=3, 0);
+  ASSERT1(komaster >= 0 && komaster <= 3, 0);
   if (kom_pos == PASS_MOVE) 
     return "EMPTY";
   return b[komaster];
 #else
+  UNUSED(kom_pos);
   return color_to_string(komaster);
 #endif
 }
@@ -1330,6 +1331,158 @@ komaster_trymove(int pos, int color, const char *message, int str,
 
 #endif
 
+#if KOMASTER_SCHEME == 5
+
+#define GRAY_WHITE 4
+#define GRAY_BLACK 5
+#define WEAK_KO    6
+
+/* V. Complex scheme, O to move.
+ * 
+ * 1. Komaster is EMPTY.
+ * 1a) Unconditional ko capture is allowed.
+ *       Komaster remains EMPTY if previous move was not a ko capture.
+ *       Komaster is set to WEAK_KO if previous move was a ko capture
+ *       and kom_pos is set to the old value of board_ko_pos.
+ * 1b) Conditional ko capture is allowed. Komaster is set to O and
+ *     kom_pos to the location of the ko, where a stone was
+ *     just removed.
+ * 
+ * 2. Komaster is O:
+ * 2a) Only nested ko captures are allowed. Kom_pos is moved to the
+ *     new removed stone.
+ * 2b) If komaster fills the ko at kom_pos then komaster reverts to
+ *     EMPTY.
+ * 
+ * 3. Komaster is X:
+ *    Play at kom_pos is not allowed. Any other ko capture
+ *    is allowed. If O takes another ko, komaster becomes GRAY_X.
+ * 
+ * 4. Komaster is GRAY_O or GRAY_X:
+ *    Ko captures are not allowed. If the ko at kom_pos is
+ *    filled then the komaster reverts to EMPTY.
+ *
+ * 5. Komaster is WEAK_KO:
+ * 5a) After a non-ko move komaster reverts to EMPTY.
+ * 5b) Unconditional ko capture is only allowed if it is nested ko capture.
+ *     Komaster is changed to WEAK_X and kom_pos to the old value of
+ *     board_ko_pos.
+ * 5c) Conditional ko capture is allowed according to the rules of 1b.
+ */
+int
+komaster_trymove(int pos, int color, const char *message, int str,
+		 int komaster, int kom_pos,
+		 int *new_komaster, int *new_kom_pos,
+		 int *is_conditional_ko, int consider_conditional_ko)
+{
+  int other = OTHER_COLOR(color);
+  int ko_move;
+  int kpos;
+  int previous_board_ko_pos = board_ko_pos;
+
+  /* First we check whether the ko claimed by komaster has been
+   * resolved. If that is the case, we revert komaster to EMPTY.
+   *
+   * The ko has been resolved in favor of the komaster if it has
+   * been filled, or if it is no longer a ko and an opponent move
+   * there is suicide.
+   */
+  if (((komaster == WHITE || komaster == GRAY_WHITE)
+       && (IS_STONE(board[kom_pos])
+	   || (!is_ko(kom_pos, BLACK, NULL)
+	       && is_suicide(kom_pos, BLACK))))
+      || ((komaster == BLACK || komaster == GRAY_BLACK)
+	  && (IS_STONE(board[kom_pos])
+	      || (!is_ko(kom_pos, WHITE, NULL)
+		  && is_suicide(kom_pos, WHITE))))) {
+    komaster = EMPTY;
+    kom_pos = NO_MOVE;
+  }
+
+  /* Usually the komaster parameters are unchanged. */
+  *new_komaster = komaster;
+  *new_kom_pos = kom_pos;
+
+  *is_conditional_ko = 0;
+  ko_move = is_ko(pos, color, &kpos);
+
+  if (!ko_move) {
+    if (komaster == WEAK_KO) {
+      *new_komaster = EMPTY;
+      *new_kom_pos = NO_MOVE;
+    }
+  }
+  else {
+    /* If opponent is komaster we may not capture his ko. */
+    if (komaster == other && pos == kom_pos)
+      return 0;
+
+    /* If komaster is gray we may not capture ko at all. */
+    if (komaster == GRAY_WHITE || komaster == GRAY_BLACK)
+      return 0;
+
+    /* If we are komaster, we may only do nested captures. */
+    if (komaster == color
+	&& !(kpos == SW(kom_pos) || kpos == NW(kom_pos)
+	     || kpos == NE(kom_pos) || kpos == SE(kom_pos)))
+      return 0;
+
+    /* If komaster is WEAK_KO, we may only do nested ko capture or
+     * conditional ko capture.
+     */
+    if (komaster == WEAK_KO) {
+      if (pos != board_ko_pos
+	  && !(kpos == SW(kom_pos) || kpos == NW(kom_pos)
+	       || kpos == NE(kom_pos) || kpos == SE(kom_pos)))
+	return 0;
+    }
+  }
+
+  if (!trymove(pos, color, message, str, komaster, kom_pos)) {
+    if (!consider_conditional_ko)
+      return 0;
+
+    if (!tryko(pos, color, message, komaster, kom_pos))
+      return 0; /* Suicide. */
+      
+    *is_conditional_ko = 1;
+
+    /* Conditional ko capture, set komaster parameters. */
+    if (komaster == EMPTY || komaster == WEAK_KO) {
+      *new_komaster = color;
+      *new_kom_pos = kpos;
+      return 1;
+    }
+  }
+
+  if (!ko_move)
+    return 1;
+
+  if (komaster == other) {
+    if (color == WHITE)
+      *new_komaster = GRAY_BLACK;
+    else
+      *new_komaster = GRAY_WHITE;
+  }
+  else if (komaster == color) {
+    /* This is where we update kom_pos after a nested capture. */
+    *new_kom_pos = kpos;
+  }
+  else {
+    /* We can reach here when komaster is EMPTY or WEAK_KO. If previous
+     * move was also a ko capture, we now set komaster to WEAK_KO.
+     */
+    if (previous_board_ko_pos != NO_MOVE) {
+      *new_komaster = WEAK_KO;
+      *new_kom_pos = previous_board_ko_pos;
+    }
+  }
+  
+  return 1;
+}
+
+#endif
+
 #if KOMASTER_SCHEME == 2
 
 /* Simple komaster scheme, equivalent to the one implemented in 2.7.232.
@@ -1481,16 +1634,17 @@ komaster_trymove(int pos, int color, const char *message, int str,
 #endif
 
 
+#if KOMASTER_SCHEME == 4
+
 /* Returns true if the (pos1) and (pos2) are directly adjacent */
 static int
-is_next_to(int pos1, int pos2) {
+is_next_to(int pos1, int pos2)
+{
   int diff = pos1 - pos2;
   ASSERT_ON_BOARD1(pos1);
   ASSERT_ON_BOARD1(pos2);
   return diff == WE || diff == -WE || diff == NS || diff == -NS;
 }
-
-#if KOMASTER_SCHEME == 4
 
 #define KOMASTER_X 1
 #define KOMASTER_LEGAL 2
