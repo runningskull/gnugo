@@ -62,6 +62,7 @@ int gg_gettimeofday2(struct timeval *tv, void *p);
 double gg_gettimeofday(void);
 double gg_cputime(void);
 
+float gg_normalize_float(float x, float a);
 void gg_sort(void *base, size_t nel, size_t width,
 	     int (*compar)(const void *, const void *));
 

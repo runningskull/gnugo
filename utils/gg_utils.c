@@ -80,6 +80,9 @@ static int init = 0;
 
 /* for gg_cputime */
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 #ifdef HAVE_SYS_TIMES_H
 #include <sys/times.h>
 #elif defined(WIN32)
@@ -275,11 +278,11 @@ gg_version(void)
 double
 gg_cputime(void)
 {
-#if HAVE_SYS_TIMES_H && HAVE_TIMES
+#if HAVE_SYS_TIMES_H && HAVE_TIMES && HAVE_UNISTD_H
     struct tms t;
     times(&t);
     return (t.tms_utime + t.tms_stime + t.tms_cutime + t.tms_cstime)
-            / ((double) CLOCKS_PER_SEC);
+            / ((double) sysconf(_SC_CLK_TCK));
 #elif defined(WIN32)
     FILETIME creationTime, exitTime, kernelTime, userTime;
     ULARGE_INTEGER uKernelTime, uUserTime, uElapsedTime;
@@ -302,6 +305,37 @@ gg_cputime(void)
     /* return wall clock seconds */
     return gg_gettimeofday();
 #endif
+}
+
+/* Before we sort floating point values (or just compare them) we
+ * may need to normalize them. This may sound cryptic but is
+ * required to avoid an obscure platform dependency.
+ *
+ * The underlying problem is that most fractional decimal numbers
+ * can't be represented exactly in a floating point number with base
+ * two. The error may be small but it is there. When such numbers
+ * are added or subtracted, the errors accumulate and even if the
+ * result (counting exactly) should be a number which can be
+ * represented exactly, this cannot be assumed to be the case.
+ *
+ * To give an example of this, the computation 0.3 + 0.05 - 0.35 may
+ * sum to 0, a small negative value, or a small positive value.
+ * Moreover, which case we encounter depends on the number of
+ * mantissa bits in the floating point type used and the exact
+ * details of the floating point arithmetic on the platform.
+ *
+ * In the context of sorting, assume that two values both should be
+ * 0.35, but one has been computed as 0.3 + 0.05 and the other
+ * directly assigned 0.35. Then it depends on the platform whether
+ * they compare as equal or one of them is larger than the other.
+ *
+ * This code normalizes the values to avoid this problem. It is
+ * assumed that all values encountered are integer multiples of a.
+ */
+float
+gg_normalize_float(float x, float a)
+{
+  return a * ((int) (0.5 + x / a));
 }
 
 /* A sorting algorithm, call-compatible with the libc qsort() function.

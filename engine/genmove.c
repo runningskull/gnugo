@@ -449,10 +449,11 @@ do_genmove(int *move, int color, float pure_threat_value)
    * dragon dangerous and change its status from DEAD to
    * UNKNOWN. This may generate a move.
    */
-  if (val < 10.0) {
+  if (val < 10.0 && !doing_scoring) {
     if (revise_thrashing_dragon(color, 15.0)) {
       shapes(color);
-      endgame_shapes(color);
+      if (!disable_endgame_patterns)
+	endgame_shapes(color);
       if (review_move_reasons(move, &val, color, pure_threat_value, score)) {
 	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
 	      *move, val); 

@@ -1172,12 +1172,13 @@ Pattern EF102
 # tm New Pattern (3.1.16)
 # tm modified (3.1.17)
 # tm modified (3.1.20)
+# gf Removed terri(1) value. (3.1.29)
 # FIXME: see endgame:218, trevord:1030, trevorc:430
 
 O.
 *O
 
-:8,O,terri(1),reverse_followup(3)
+:8,O,reverse_followup(3)
 
 ac
 *b

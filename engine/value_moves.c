@@ -820,6 +820,10 @@ dragon_safety(int dr, int ignore_dead_dragons)
 	  || dragon_safety == TACTICALLY_DEAD))
     return 1.0;
 
+  /* When scoring, we don't want to reinforce ALIVE dragons. */
+  if (doing_scoring && dragon_safety == ALIVE)
+    return 1.0;
+  
   /* More detailed guesses for WEAK and WEAKLY_ALIVE dragons. */
   if (dragon_safety == WEAK || dragon_safety == WEAKLY_ALIVE) {
     int escape = DRAGON2(dr).escape_route;
@@ -948,20 +952,18 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   
 
   /* When scoring, we want to be restrictive with reinforcement moves
-   * inside own territory. Thus if both dragons are strongly alive or
-   * invincible, or if one is and the other is alive, no bonus is
-   * awarded.
+   * inside own territory. Thus if both dragons are alive, strongly
+   * alive, or invincible, no bonus is awarded.
    *
    * Notice that this requires that the territorial value is computed
    * before the strategical value.
    */
   if (doing_scoring && move[tt].territorial_value < 0.0) {
-    if (safety1 == ALIVE
-	&& (safety2 == STRONGLY_ALIVE || safety2 == INVINCIBLE))
-      return 0.0;
-    
-    if ((safety1 == STRONGLY_ALIVE || safety1 == INVINCIBLE)
-	&& (safety2 == ALIVE || safety2 == STRONGLY_ALIVE
+    if ((safety1 == ALIVE
+	 || safety1 == STRONGLY_ALIVE
+	 || safety1 == INVINCIBLE)
+	&& (safety2 == ALIVE
+	    || safety2 == STRONGLY_ALIVE
 	    || safety2 == INVINCIBLE))
       return 0.0;
   }
@@ -1773,7 +1775,7 @@ estimate_strategical_value(int pos, int color, float score)
 		    "  %1m:   %f - %1m attacked/defended\n",
 		    pos, this_value, bb);
 	      dragon_value[d1] = this_value;
-	  }
+	    }
 	  }
 
 	break;

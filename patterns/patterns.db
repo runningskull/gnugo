@@ -13629,6 +13629,7 @@ OoO
 
 Pattern LE15Y
 # tm decreased value (3.1.20) (see nngs:1150 move G4)
+# gf Don't bother with this inside own territory. (3.1.29)
 
 xxx            jump towards moyo
 x.x
@@ -13639,6 +13640,16 @@ OoO
 ?o?
 
 :|,OEY
+
+xxx
+x.x
+.*.
+...
+...
+OoO
+?o?
+
+;!oterri(*)
 
 
 Pattern LE16

@@ -603,13 +603,20 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
     else
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx)", 
 		  message, count_variations, hashdata.hashval[0]);
-    if (0) {
-      /* tm - I don't find these pass moves helpful in the tree. */
-      sgftreeAddPlayLast(sgf_dumptree, NULL, color, -1, -1);
-      sgftreeAddComment(sgf_dumptree, NULL, "tenuki (ko threat)");
-      sgftreeAddPlayLast(sgf_dumptree, NULL, OTHER_COLOR(color), -1, -1);
-      sgftreeAddComment(sgf_dumptree, NULL, "tenuki (answers ko threat)");
-    }
+
+    /* Add two pass moves to the SGF output to simulate the ko threat
+     * and the answer.
+     *
+     * The reason we add these is that certain SGF viewers, including
+     * Cgoban 1, won't properly display variations with illegal ko
+     * captures. SGF FF[4] compliant browsers should have no problem
+     * with this, though.
+     */
+    sgftreeAddPlayLast(sgf_dumptree, NULL, color, -1, -1);
+    sgftreeAddComment(sgf_dumptree, NULL, "tenuki (ko threat)");
+    sgftreeAddPlayLast(sgf_dumptree, NULL, OTHER_COLOR(color), -1, -1);
+    sgftreeAddComment(sgf_dumptree, NULL, "tenuki (answers ko threat)");
+
     sgftreeAddPlayLast(sgf_dumptree, NULL, color, I(pos), J(pos));
     sgftreeAddComment(sgf_dumptree, NULL, buf);
   }

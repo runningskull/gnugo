@@ -28,6 +28,7 @@
 
 #include "liberty.h"
 #include "cache.h"
+#include "gg_utils.h"
 
 /* Size of array where candidate moves are stored. */
 #define MAX_MOVES 362
@@ -2257,6 +2258,13 @@ find_connection_moves(int str1, int str2, int color_to_move,
     }
     
   }
+
+  /* Normalize distance values. See comment to gg_normalize_float() in
+   * utils/gg_utils.c for an explanation of this operation. It is
+   * assumed that all distance values are integral multiples of 0.001.
+   */
+  for (i = 0; i < num_moves; i++)
+    distances[i] = gg_normalize_float(distances[i], 0.001);
   
   /* Now sort the moves.  We use selection sort since this array will
    * probably never be more than 10 moves long.  In this case, the

@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- simulation of ko threat + answer in sgf output reinstated in tryko()
+- new function gg_normalize_float() in gg_utils.c
+- platform dependency fixed in readconnect.c by using gg_normalize_float() 
+- scoring tweaks and optimizations
+- bugfix in gg_cputime()
 - new function influence_initial_territory to export territory valuation
 - negative strategic value added to invasion type moves
 - pattern tuning: keima shape bonus removed

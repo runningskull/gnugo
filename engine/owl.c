@@ -4903,7 +4903,7 @@ owl_hotspots(float values[BOARDMAX])
   for (k = 0; k < persistent_owl_cache_size; k++) {
     struct owl_cache *entry = &(persistent_owl_cache[k]);
     float contribution = entry->tactical_nodes / (float) sum_tactical_nodes;
-    if (DEBUG_OWL_PERSISTENT_CACHE) {
+    if (debug & DEBUG_OWL_PERSISTENT_CACHE) {
       gprintf("Owl hotspots: %d %1m %f\n", entry->routine, entry->apos,
 	      contribution);
     }
