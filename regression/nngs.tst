@@ -148,7 +148,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 82
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 126
 380 gg_genmove black
-#? [!H2]
+#? [!H2|S1]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
@@ -283,7 +283,7 @@ loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 116
 
 loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 146
 680 gg_genmove white
-#? [!H13]
+#? [!H13|R13]*
 
 
 loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 152
@@ -854,9 +854,10 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 161
 #? [H16]*
 
 
+#Hard to tell whether J18 or F19 are better.
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 173
 1900 gg_genmove black
-#? [J18]*
+#? [J18|F19]
 
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 177

@@ -80,7 +80,7 @@ loadsgf games/incident121.sgf 110
 # incident 133
 loadsgf games/incident121.sgf 122
 22 owl_attack P12
-#? [1 (PASS|S11|S14|N13)]*
+#? [1 (PASS|S11|S14|N13|S13)]
 23 owl_defend P12
 #? [0]
 

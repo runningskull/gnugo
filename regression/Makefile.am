@@ -277,3 +277,4 @@ fourth_batch:
 	$(srcdir)/regress.sh $(srcdir) semeai.tst
 	$(srcdir)/regress.sh $(srcdir) trevord.tst
 	$(srcdir)/regress.sh $(srcdir) strategy4.tst
+
