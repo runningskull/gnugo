@@ -4259,11 +4259,25 @@ check_self_atari(int pos, int color_to_move)
    * I leave the code in for a while. /gf
    *
    * Code reactivated, see nando:31. /nn
+   *
+   * Added requirement that no additional stones are sacrificed in the
+   * self atari. /gf
+   *
+   * FIXME: Add a function in board.c to check how big the string
+   *        becomes when playing a move and use for the isolated stone
+   *        test below.
    */
   if (approxlib(pos, color_to_move, 1, &lib) >= 1
       && approxlib(lib, OTHER_COLOR(color_to_move), 3, NULL) <= 2
-      && ladder_capturable(lib, OTHER_COLOR(color_to_move)))
-    return 1;
+      && ladder_capturable(lib, OTHER_COLOR(color_to_move))) {
+    int k;
+    for (k = 0; k < 4; k++) {
+      if (board[pos + delta[k]] == color_to_move)
+	break;
+    }
+    if (k == 4)
+      return 1;
+  }
 #endif
 
   return 0;

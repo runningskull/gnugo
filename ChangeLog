@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- check_self_atari() in readconnect.c revised
 - devalue tactical defenses of owl critical dragons when there are
   better owl defenses elsewhere 
 - find_moves_to_make_seki() extended to examine the case of dead stones
