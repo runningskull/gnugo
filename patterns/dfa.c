@@ -70,11 +70,13 @@ char dfa_val2asc[4] = {
 int dfa_p[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
 
 /* auxiliary dfa's for high level functions */
-static dfa_t aux_dfa1;		/* used to store strings */
-static dfa_t aux_dfa2;		/* used to store the result of dfa's products*/
+#define DFA_BINS 33 /* Number of temporary bins used to store intermediate DFAs */
+static dfa_t aux_dfa[DFA_BINS];	/* used to store intermediate DFAs */
+static dfa_t aux_temp;          /* used to store temporary DFAs */
 
 /* To be sure that everything was well initialized */
 static int dfa_was_initialized = 0;
+static aux_count = 0;
 
 
 /* convert is a table to convert the colors */
@@ -434,7 +436,7 @@ kill_dfa(dfa_t *pdfa)
 
 /*
  * Copy a dfa.
- * and rezise the destination dfa if necessary.
+ * and resize the destination dfa if necessary.
  */
 
 void
@@ -531,7 +533,7 @@ create_dfa(dfa_t *pdfa, const char *str, int att_val)
   int new_state;
 
   if (dfa_verbose > 1)
-    fprintf(stderr, "linear dfa in %s with string\n%s\n", pdfa->name, str);
+    fprintf(stderr, "linear dfa in %s with string: %s\n", pdfa->name, str);
 
   gg_assert(str != NULL);
   gg_assert(pdfa->maxStates > 1);
@@ -786,13 +788,15 @@ void
 dfa_init(void)
 {
   int ii;
+  int j;
 
   if (dfa_verbose > 1)
     fprintf(stderr, "dfa: init\n");
   dfa_was_initialized++;
   buildSpiralOrder(spiral);
-  new_dfa(&aux_dfa1, "stringAux ");
-  new_dfa(&aux_dfa2, "copyAux ");
+  for (j=0; j < DFA_BINS; j++)
+    new_dfa(&(aux_dfa[j]), "binAux ");
+  new_dfa(&aux_temp, "tempAux ");
 
   /* set the private board to OUT_BOARD */
   for (ii = 0; ii < 4 * DFA_MAX_BOARD * 4 * DFA_MAX_BOARD; ii++)
@@ -802,12 +806,43 @@ dfa_init(void)
 void
 dfa_end(void)
 {
+  int j;
+
   if (dfa_verbose > 1)
     fprintf(stderr, "dfa: end\n");
 
-  kill_dfa(&aux_dfa1);
-  kill_dfa(&aux_dfa2);
+  for (j=0; j < DFA_BINS; j++)
+    kill_dfa(&(aux_dfa[j]));
+  kill_dfa(&aux_temp);
   dfa_was_initialized--;
+}
+
+
+/*
+ * Merges cached dfas into the master DFA
+ */
+void 
+dfa_finalize(dfa_t *pdfa) 
+{
+  int j;
+  int next_bin = aux_count;
+  int last_bin = aux_count + DFA_BINS - 1;
+  while (next_bin + 1 != last_bin) {
+    for (j=aux_count+1; j <= last_bin; j+=2) {
+      if (j+1 == next_bin) {
+        copy_dfa(&aux_dfa[next_bin % DFA_BINS], &aux_dfa[j % DFA_BINS]);
+      } else {
+        sync_product(&aux_dfa[next_bin % DFA_BINS], 
+                     &aux_dfa[j % DFA_BINS], 
+                     &aux_dfa[(j+1) % DFA_BINS]);
+      }
+      next_bin++;
+    }
+    last_bin = next_bin-1;
+    aux_count--;
+    next_bin = aux_count;
+  }
+  copy_dfa(pdfa, &aux_dfa[last_bin % DFA_BINS]);
 }
 
 
@@ -822,25 +857,28 @@ float
 dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index)
 {
   float ratio;
+  dfa_t *new_dfa = &(aux_dfa[aux_count % DFA_BINS]);
+  dfa_t *old_dfa = &(aux_dfa[(aux_count+1) % DFA_BINS]);
 
-  if (dfa_verbose > 1)
-    fprintf(stderr, "Adding %s\n to dfa %s\n", str, pdfa->name);
+  if (dfa_verbose > 1) {
+    fprintf(stderr, "Adding to dfa %s the string: %s\n", pdfa->name, str);
+    fprintf(stderr, "  at bin: %d\n", aux_count);
+  }
 
   gg_assert(dfa_was_initialized > 0);
   gg_assert(pdfa != NULL);
 
-  /* We first create a dfa in aux_dfa1 from the string. */
-  create_dfa(&aux_dfa1, str, pattern_index);
+  create_dfa(&aux_temp, str, pattern_index);
 
   /* then we do the synchronization product with dfa */
-  sync_product(&aux_dfa2, &aux_dfa1, pdfa);
+  sync_product(new_dfa,
+               old_dfa,
+               &aux_temp);
+  aux_count++;
 
   ratio = 1;
-  if (dfa_size(pdfa) > 0)
-    ratio = (float) (dfa_size(&aux_dfa2) / dfa_size(pdfa));
-
-  /* the result is copied in dfa */
-  copy_dfa(pdfa, &aux_dfa2);
+  if (dfa_size(old_dfa) > 0)
+    ratio = (float) (dfa_size(new_dfa) / dfa_size(old_dfa));
 
   return ratio;
 }
@@ -1008,6 +1046,10 @@ pattern_2_string(struct pattern *pat, char *str, int trans, int ci, int cj)
   
   gg_assert(k < MAX_ORDER);
   str[k] = '\0';		/* end of string */
+
+  if (0 && dfa_verbose > 0)
+    fprintf(stderr, "converted pattern into string: %s\n", str);
+
 }
 
 

@@ -49,6 +49,7 @@ Usage : mkpat [-cvh] <prefix>\n\
                 (reduce dfa size)\n\
 	   -i = one or more input files (typically *.db).\n\
 	   -o = output file (typically *.c).\n\
+           -p = pre-rotate patterns before storing in database.\n\
 \n\
  If compiled with --enable-dfa the following options also work:\n\n\
            -D = generate a dfa and save it as a C file.\n\
@@ -351,6 +352,8 @@ int anchor = ANCHOR_O; /* Whether both O and/or X may be anchors.
 
 int choose_best_anchor = 0;  /* -m */
 
+int pre_rotate = 0; 
+
 int fullboard = 0;   /* Whether this is a database of fullboard patterns. */
 int dfa_generate = 0; /* if 1 a dfa is created. */
 int dfa_c_output = 0; /* if 1 the dfa is saved as a c file */
@@ -519,7 +522,7 @@ write_to_dfa(int index)
 	    pattern[index].name, ratio);
     fprintf(stderr, "another orientation may save memory.\n");
   }
-  if (dfa_verbose)
+  if (dfa_verbose > 2)
     dump_dfa(stderr, &dfa);
 }
 
@@ -2124,6 +2127,7 @@ main(int argc, char *argv[])
       case 'X': anchor = ANCHOR_X; break;
       case 'f': fullboard = 1; break;
       case 'm': choose_best_anchor = 1; break;
+      case 'r': pre_rotate = 1; break;
       case 'i': 
 	if (ifc == MAX_INPUT_FILE_NAMES) {
 	  fprintf(stderr, "Error : Too many input files; %s", gg_optarg);
@@ -2406,6 +2410,9 @@ main(int argc, char *argv[])
 
   if (dfa_generate) {
     fprintf(stderr, "---------------------------\n");
+
+    dfa_finalize(&dfa);
+
     fprintf(stderr, "dfa for %s\n", argv[gg_optind]);
     fprintf(stderr, "size: %d kB for ", dfa_size(&dfa));
     fprintf(stderr, "%d patterns\n", patno);

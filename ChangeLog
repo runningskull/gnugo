@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- improves DFA compile time by doing fewest possible large syncs 
 - experimental_influence command line and configure option removed
 - new flags dragons_known and is_territorial_influence in influence_data
 - struct local_owl_data for speedup only holds eye space of relevant color

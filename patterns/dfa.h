@@ -38,7 +38,7 @@
 /* maximum pattern matched at one positions */
 #define DFA_MAX_MATCHED 8*500
 #define DFA_RESIZE_STEP 20000
-#define DFA_INIT_SIZE 50000
+#define DFA_INIT_SIZE 250
 #ifndef EMPTY
 #define EMPTY     0		/* . */
 #define WHITE     1		/* O */
@@ -110,7 +110,7 @@ order_t;
  *    functions declaration     *
  ********************************/
 
-void dfa_init(void);	/* Every call to a fda function must be done */
+void dfa_init(void);	/* Every call to a dfa function must be done */
 void dfa_end(void);	/* between calls of those 2 functions. */
 void buildSpiralOrder(int order[8][MAX_ORDER]); /* Needed by matchpat */
 
@@ -122,6 +122,7 @@ void kill_dfa(dfa_t *pdfa);
 int dfa_size(dfa_t *pdfa);	/* in kB */
 void save_dfa(const char *f_name, dfa_t *pdfa);
 dfa_t *load_dfa(const char *f_path, const char *f_name, dfa_t **ppdfa);
+void dfa_finalize(dfa_t *pdfa);
 void dump_dfa(FILE *f, dfa_t *pdfa);
 
 struct pattern;
