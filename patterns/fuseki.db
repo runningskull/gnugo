@@ -1188,6 +1188,27 @@ O..*..cdx
 ; x_alive_somewhere(a,b,c,d)
 
 
+Pattern F410f
+
+??..?x?
+oO...xx
+o..*.xx
+......?
+......?
+-------
+
+:8,ed
+
+??..?x?
+oO...ax
+o..*.bx
+......?
+......?
+-------
+
+; x_alive_somewhere(a,b)
+
+
 Pattern F411
 # gf Revised pattern. (3.3.17)
 

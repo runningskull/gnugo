@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- tuning
 - implement persistent semeai caching
 - don't crash on some .sgf-files from kgs
 - NEWS updated
