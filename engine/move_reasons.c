@@ -3621,6 +3621,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
     verbose--;
   examine_move_safety(color);
   time_report(2, "  examine_move_safety", -1, -1);
+  verbose = save_verbose;
 
   if (printworms || verbose)
     list_move_reasons(color);
