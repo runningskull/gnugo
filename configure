@@ -650,8 +650,8 @@ Optional Features:
   --disable-dfa               use old non-dfa pattern matcher
   --enable-chinese-rules      use Chinese (area) counting
   --disable-chinese-rules     use Japanese counting (default)
-  --enable-resignation-allowed       resign lost games
-  --disable-resignation-allowed      never resign (default)
+  --enable-resignation-allowed       resign lost games (default)
+  --disable-resignation-allowed      never resign
   --enable-oracle                    enable oracle
   --disable-oracle                   don't enable oracle (default)
   --enable-experimental-break-in     use the breakin module (default)
@@ -1248,7 +1248,7 @@ fi
 
 # Define the identity of the package.
 PACKAGE=gnugo
-VERSION=3.5.10
+VERSION=3.6-pre1
 
 cat >>confdefs.h <<EOF
 #define PACKAGE "$PACKAGE"
