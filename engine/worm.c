@@ -301,21 +301,30 @@ make_worms(void)
 	    int dcode = find_defense(str, NULL);
 	    if (dcode < worm[str].defense_codes[0]) {
 	      int attack_works = 1;
+
 	      /* Sometimes find_defense() fails to find a
 	       * defense which has been found by other means.
 	       * Try if the old defense move still works.
+	       *
+	       * However, we first check if the _attack_ still exists,
+	       * because we could, for instance, drive the worm into
+	       * seki with our move.
 	       */
-	      if (worm[str].defense_codes[0] != 0
-		  && trymove(worm[str].defense_points[0],
-			     OTHER_COLOR(color), "make_worms", 0, EMPTY, 0)) {
-		int this_dcode = REVERSE_RESULT(attack(str, NULL));
-		if (this_dcode > dcode) {
-		  dcode = this_dcode;
-		  if (dcode >= worm[str].defense_codes[0])
-		    attack_works = 0;
+	      if (attack(str, NULL) >= worm[str].attack_codes[0]) {
+		if (worm[str].defense_codes[0] != 0
+		    && trymove(worm[str].defense_points[0],
+			       OTHER_COLOR(color), "make_worms", 0, EMPTY, 0)) {
+		  int this_dcode = REVERSE_RESULT(attack(str, NULL));
+		  if (this_dcode > dcode) {
+		    dcode = this_dcode;
+		    if (dcode >= worm[str].defense_codes[0])
+		      attack_works = 0;
+		  }
+		  popgo();
 		}
-		popgo();
 	      }
+	      else
+		attack_works = 0;
 	      
 	      /* ...then add an attack point of that worm at pos. */
 	      if (attack_works) {

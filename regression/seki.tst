@@ -498,3 +498,7 @@ play black C2
 1106 reg_genmove white
 #? [C1]*
 
+
+loadsgf games/FSGCBot-dr.sgf 234
+2010 reg_genmove white
+#? [A19|B17]

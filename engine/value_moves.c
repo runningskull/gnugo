@@ -232,19 +232,27 @@ find_more_attack_and_defense_moves(int color)
 	  if (dcode < worm[aa].defense_codes[0]) {
 	    /* Maybe find_defense() doesn't find the defense. Try to
 	     * defend with the stored defense move.
+	     *
+	     * Another option is maybe there is no attack anymore
+	     * (e.g. we pushed the worm into seki), find_defense()
+	     * could easily fail in that case.
 	     */
 	    int attack_works = 1;
-	    
-	    if (trymove(worm[aa].defense_points[0], other, 
-			"find_more_attack_and_defense_moves", 0, EMPTY, 0)) {
-	      int this_dcode = REVERSE_RESULT(attack(aa, NULL));
-	      if (this_dcode > dcode) {
-		dcode = this_dcode;
-		if (dcode >= worm[aa].defense_codes[0])
-		  attack_works = 0;
+
+	    if (attack(aa, NULL) >= worm[aa].attack_codes[0]) {
+	      if (trymove(worm[aa].defense_points[0], other, 
+			  "find_more_attack_and_defense_moves", 0, EMPTY, 0)) {
+		int this_dcode = REVERSE_RESULT(attack(aa, NULL));
+		if (this_dcode > dcode) {
+		  dcode = this_dcode;
+		  if (dcode >= worm[aa].defense_codes[0])
+		    attack_works = 0;
+		}
+		popgo();
 	      }
-	      popgo();
 	    }
+	    else
+	      attack_works = 0;
 	    
 	    if (attack_works) {
 	      if (!cursor_at_start_of_line)

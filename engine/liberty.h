@@ -290,9 +290,12 @@ int does_secure(int color, int move, int pos);
 void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, char escape_value[BOARDMAX]);
 void compute_refined_dragon_weaknesses(void);
+
 struct eyevalue;
+void compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude);
 float crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
 			    float moyo_value, float escape_route);
+
 int is_same_dragon(int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
 void mark_dragon(int pos, char mx[BOARDMAX], char mark);

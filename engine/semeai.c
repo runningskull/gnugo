@@ -246,7 +246,8 @@ find_moves_to_make_seki()
       int color = board[str];
       int opponent = NO_MOVE;
       int certain;
-      
+      struct eyevalue reduced_genus;
+
       for (k = 0; k < DRAGON2(str).neighbors; k++) {
 	opponent = dragon2[DRAGON2(str).adjacent[k]].origin;
 	if (board[opponent] != color)
@@ -257,15 +258,14 @@ find_moves_to_make_seki()
 
       if (dragon[opponent].status != ALIVE)
 	continue;
-      
-      /* FIXME: These heuristics are not very precise. What we really
-       * want to check is whether str is inside the eyespace of the
-       * opponent, for an interpretation of eyespace that includes
-       * lunches, while it doesn't already have more than one eye
-       * elsewhere.
+
+      /* FIXME: These heuristics are used for optimization.  We don't
+       *        want to call expensive semeai code if the opponent
+       *        dragon has more than one eye elsewhere.  However, the
+       *        heuristics might still need improvement.
        */
-      if (DRAGON2(opponent).moyo_size > 10
-	  || min_eyes(&DRAGON2(opponent).genus) > 1)
+      compute_dragon_genus(opponent, &reduced_genus, str);
+      if (DRAGON2(opponent).moyo_size > 10 || min_eyes(&reduced_genus) > 1)
 	continue;
 
       owl_analyze_semeai_after_move(defend_move, color, opponent, str,
@@ -283,10 +283,39 @@ find_moves_to_make_seki()
 	update_status(str, CRITICAL, CRITICAL);
 	dragon2[d].semeai_defense_point = defend_move;
 	dragon2[d].semeai_defense_certain = certain;
-	/* FIXME: The assumption that the attack move coincides with
-         * the defense move is somewhat optimistic.
+
+	/* We need to determine a proper attack move (the one that
+	 * prevents seki).  Currently we try the defense move first,
+	 * and if it doesn't work -- all liberties of the string.
 	 */
-	dragon2[d].semeai_attack_point = defend_move;
+	owl_analyze_semeai_after_move(defend_move, OTHER_COLOR(color),
+				      str, opponent, &resulta, NULL,
+				      NULL, 1, NULL);
+	if (resulta != WIN)
+	  dragon2[d].semeai_attack_point = defend_move;
+	else {
+	  int k;
+	  int libs[MAXLIBS];
+	  int liberties = findlib(str, MAXLIBS, libs);
+
+	  for (k = 0; k < liberties; k++) {
+	    owl_analyze_semeai_after_move(libs[k], OTHER_COLOR(color),
+					  str, opponent, &resulta, NULL,
+					  NULL, 1, NULL);
+	    if (resulta != WIN) {
+	      dragon2[d].semeai_attack_point = libs[k];
+	      break;
+	    }
+	  }
+
+	  /* FIXME: What should we do if none of the tried attacks worked? */
+	  if (k == liberties)
+	    dragon2[d].semeai_attack_point = defend_move;
+	}
+
+	DEBUG(DEBUG_SEMEAI, "Move to prevent seki at %1m (%1m vs %1m)\n",
+	      dragon2[d].semeai_attack_point, opponent, str);
+
 	dragon2[d].semeai_attack_certain = certain;
 	dragon2[d].semeai_target = opponent;
       }
@@ -435,8 +464,10 @@ semeai_move_reasons(int color)
 }
 
 
-/* Change the status and safety of a dragon */
-
+/* Change the status and safety of a dragon.  In addition, if the new
+ * status is not DEAD, make all worms of the dragon essential, so that
+ * results found by semeai code don't get ignored.
+ */
 static void
 update_status(int dr, enum dragon_status new_status,
     	      enum dragon_status new_safety)
@@ -449,8 +480,11 @@ update_status(int dr, enum dragon_status new_status,
 	  status_to_string(dragon[dr].status),
 	  status_to_string(new_status));
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-      if (IS_STONE(board[pos]) && is_same_dragon(dr, pos))
+      if (IS_STONE(board[pos]) && is_same_dragon(dr, pos)) {
 	dragon[pos].status = new_status;
+	if (new_status != DEAD)
+	  worm[pos].inessential = 0;
+      }
   }
 
   if (DRAGON2(dr).safety != new_safety
