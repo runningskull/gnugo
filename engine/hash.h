@@ -38,7 +38,7 @@
  * Typically this would be a 32 bit integer on a 32 bit platform and a
  * 64 bit integer on a 64 bit platform.
  *
- * Our preliminary assumption is that unsigned long has this
+ * Our current assumption is that unsigned long has this
  * characteristic. Should it turn out to be false for some platform
  * we'll add conditional code to choose some other type.
  *
@@ -67,12 +67,11 @@ typedef unsigned long Hashvalue;
  * With 64 bits, there should be less than one such mistake in 10^9 games.
  * Set this to 96 if this is not safe enough for you.
  */
-#define MIN_HASHBITS   64		
+#define MIN_HASHBITS   64
 
 #define NUM_HASHVALUES (1 + (MIN_HASHBITS - 1) / (CHAR_BIT * SIZEOF_HASHVALUE))
 
-/*
- * This struct is maintained by the machinery that updates the board
+/* This struct is maintained by the machinery that updates the board
  * to provide incremental hashing. Examples: trymove(), play_move(), ...
  */
 
@@ -91,7 +90,6 @@ void hashdata_recalc(Hash_data *hd, Intersection *board, int ko_pos);
 int  hashdata_compare(Hash_data *hd1, Hash_data *hd2);
 void hashdata_invert_ko(Hash_data *hd, int pos);
 void hashdata_invert_stone(Hash_data *hd, int pos, int color);
-void hashdata_set_tomove(Hash_data *hd, int to_move);
 
 int hashdata_diff_dump(Hash_data *key1, Hash_data *key2);
 
@@ -101,12 +99,6 @@ char *hashdata_to_string(Hash_data *hashdata);
 
 /* ---------------------------------------------------------------- */
 
-
-/* Next generation hash implementation.  
- * 
- * FIXME: Once this is the standard, remove all the _ng suffixes
- *        and clean it up.
- */
 
 #if NUM_HASHVALUES == 1
 
@@ -128,17 +120,10 @@ char *hashdata_to_string(Hash_data *hashdata);
     (hd1).hashval[0] ^= (hd2).hashval[0]; \
    } while (0)
 
-/* FIXME: This is only an approximation. 
- *        The real remainder can be calculated by 
- *            (ax+y)%z = (a%z)(x%z)+(y%z)
- *        but this probably is good enough for the cache.
- */
 #define hashdata_remainder(hd, num) \
   ((hd).hashval[0] % (num))
 
-#endif
-
-#if NUM_HASHVALUES == 2
+#elif NUM_HASHVALUES == 2
 
 #define hashdata_NULL  {{0, 0}}
 #define hashdata_clear(hd) \
@@ -161,18 +146,19 @@ char *hashdata_to_string(Hash_data *hashdata);
     (hd1).hashval[1] ^= (hd2).hashval[1]; \
    } while (0)
 
-/* FIXME: This is only an approximation. 
- *        The real remainder can be calculated by 
- *            (ax+y)%z = (a%z)(x%z)+(y%z)
- *        but this probably is good enough for the cache.
+/* This is only an approximation. 
+ * The real remainder can be calculated by 
+ *     (ax+y)%z = (a%z)(x%z)+(y%z)
+ * but this is good enough for use in the cache.
  */
 #define hashdata_remainder(hd, num) \
   (((hd).hashval[0] + (hd).hashval[1]) % (num))
 
+#else
+
+#error NUM_HASHVALUES > 2 not implemented yet
+
 #endif
-
-void hash_ng_init(void);
-
 
 #endif
 

@@ -587,7 +587,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       && tt_get(&ttable, SEMEAI, apos, bpos,
 		depth - stackp, NULL,
 		&value1, &value2, &xpos)) {
-    /* TRACE_CACHED_RESULT2(*read_result);*/
+    TRACE_CACHED_RESULT2_NG(value1, value2, xpos);
     if (value1 != 0)
       *move = xpos;
       
@@ -1790,28 +1790,28 @@ do_owl_attack(int str, int *move, int *wormid,
 		depth - stackp, NULL, 
 		&value1, &value2, &xpos) == 2) {
 
-    /*      TRACE_CACHED_RESULT(*read_result);*/
-      if (value1 != 0) {
-	if (move)
-	  *move = xpos;
+    TRACE_CACHED_RESULT_NG(value1, xpos);
+    if (value1 != 0) {
+      if (move)
+	*move = xpos;
+    }
+    if (value1 == GAIN) {
+      if (wormid) {
+	if (goal_worms_computed)
+	  *wormid = value2;
+	else
+	  *wormid = MAX_GOAL_WORMS;
       }
-      if (value1 == GAIN) {
-	if (wormid) {
-	  if (goal_worms_computed)
-	    *wormid = value2;
-	  else
-	    *wormid = MAX_GOAL_WORMS;
-	}
-      }
-
-      if (value1 == WIN)
-	TRACE("%oVariation %d: DEAD (cached)\n", this_variation_number);
-      else
-	TRACE("%oVariation %d: ALIVE (cached)\n", this_variation_number);
-
-      SGFTRACE(xpos, value1, "cached");
-
-      return value1;
+    }
+    
+    if (value1 == WIN)
+      TRACE("%oVariation %d: DEAD (cached)\n", this_variation_number);
+    else
+      TRACE("%oVariation %d: ALIVE (cached)\n", this_variation_number);
+    
+    SGFTRACE(xpos, value1, "cached");
+    
+    return value1;
   }
 
 
@@ -2512,9 +2512,8 @@ do_owl_defend(int str, int *move, int *wormid,
       && tt_get(&ttable, OWL_DEFEND, str, NO_MOVE,
 		depth - stackp, NULL, 
 		&value1, &value2, &xpos) == 2) {
-
-    /* TRACE_CACHED_RESULT(*read_result);*/
-
+    
+    TRACE_CACHED_RESULT_NG(value1, xpos);
     if (value1 != 0) {
       if (move)
 	*move = xpos;
@@ -2842,8 +2841,8 @@ do_owl_defend(int str, int *move, int *wormid,
     else {
       SGFTRACE(savemove, savecode, "defense effective (ko) - B");
 #if USE_HASHTABLE_NG
-    READ_RETURN_NG(OWL_DEFEND, str, depth - stackp,
-		   move, savemove, savecode);
+      READ_RETURN_NG(OWL_DEFEND, str, depth - stackp,
+		     move, savemove, savecode);
 #else
       READ_RETURN(read_result, move, savemove, savecode);
 #endif

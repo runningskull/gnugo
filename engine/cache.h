@@ -111,6 +111,7 @@ void tt_update(Transposition_table *table, enum routine_id routine,
 	       int value1, int value2, int move);
 
 
+#if !USE_HASHTABLE_NG
 /* ================================================================ */
 /*                    The old transposition table                   */
 
@@ -250,7 +251,7 @@ typedef struct hashtable {
 void read_result_dump(Read_result *result, FILE *outfile);
 void hashtable_dump(Hashtable *table, FILE *outfile);
 void hashnode_dump(Hashnode *node, FILE *outfile);
-
+#endif
 
 /* ================================================================ */
 
@@ -261,6 +262,19 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 
 #if TRACE_READ_RESULTS
 
+#if USE_HASHTABLE_NG
+
+#define TRACE_CACHED_RESULT_NG(result, move) \
+      gprintf("%o%s %1m %d %d %1m (cached) ", read_function_name, \
+	      q, stackp, result, move); \
+      dump_stack();
+
+#define TRACE_CACHED_RESULT2_NG(result1, result2, move) \
+      gprintf("%o%s %1m %1m %d %d %d %1m (cached) ", read_function_name, \
+	      q1, q2, stackp, result1, result2, move); \
+      dump_stack();
+
+#else
 #define TRACE_CACHED_RESULT(rr) \
       gprintf("%o%s %1m %d %d %1m (cached) ", read_function_name, \
 	      q, stackp, \
@@ -275,6 +289,7 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 	      rr_get_result2(rr), \
 	      rr_get_move(rr)); \
       dump_stack();
+#endif
 
 #define SETUP_TRACE_INFO(name, str) \
   const char *read_function_name = name; \
@@ -287,8 +302,13 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 
 #else
 
+#if USE_HASHTABLE_NG
+#define TRACE_CACHED_RESULT_NG(result, move)
+#define TRACE_CACHED_RESULT2_NG(result1, result2, move)
+#else
 #define TRACE_CACHED_RESULT(rr)
 #define TRACE_CACHED_RESULT2(rr)
+#endif
 
 #define SETUP_TRACE_INFO(name, str) \
   const char *read_function_name = name; \
@@ -335,6 +355,7 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
 	             result1, result2, message)
 
 
+#if !USE_HASHTABLE_NG
 int get_read_result(enum routine_id routine,
 		    int *str, Read_result **read_result);
 int get_read_result_hash_modified(enum routine_id routine,
@@ -342,7 +363,7 @@ int get_read_result_hash_modified(enum routine_id routine,
 				  Read_result **read_result);
 int get_read_result2(enum routine_id routine,
 		     int *str1, int *str2, Read_result **read_result);
-
+#endif
 
 /* ================================================================ */
 
@@ -352,12 +373,15 @@ int get_read_result2(enum routine_id routine,
  * store the result in the hash table at the same time.
  */
 
+#if !TRACE_READ_RESULTS
+
+#if USE_HASHTABLE_NG
 #define READ_RETURN0_NG(routine, str, remaining_depth) \
   do { \
     tt_update(&ttable, routine, str, NO_MOVE, \
               remaining_depth, NULL,\
 	      0, 0, NO_MOVE);\
-   return 0; \
+    return 0; \
   } while (0)
 
 #define READ_RETURN_NG(routine, str, remaining_depth, point, move, value) \
@@ -405,7 +429,7 @@ int get_read_result2(enum routine_id routine,
     return (value1); \
   } while (0)
 
-#if !TRACE_READ_RESULTS
+#else
 
 #define READ_RETURN0(read_result) \
   do { \
@@ -451,7 +475,83 @@ int get_read_result2(enum routine_id routine,
     return (value_a); \
   } while (0)
 
+#endif
+
 #else /* !TRACE_READ_RESULTS */
+
+#if USE_HASHTABLE_NG
+
+#define READ_RETURN0_NG(routine, str, remaining_depth) \
+  do { \
+    tt_update(&ttable, routine, str, NO_MOVE, \
+              remaining_depth, NULL,\
+	      0, 0, NO_MOVE);\
+    gprintf("%o%s %1m %d 0 0 ", read_function_name, q, stackp); \
+    dump_stack(); \
+    return 0; \
+  } while (0)
+
+#define READ_RETURN_NG(routine, str, remaining_depth, point, move, value) \
+  do { \
+    tt_update(&ttable, routine, str, NO_MOVE, \
+              remaining_depth, NULL,\
+              value, 0, move);\
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
+	    (value), (move)); \
+    dump_stack(); \
+    return (value); \
+  } while (0)
+
+#define READ_RETURN_SEMEAI_NG(routine, str1, str2, remaining_depth, point, move, value1, value2) \
+  do { \
+    tt_update(&ttable, routine, str1, str2, \
+              remaining_depth, NULL, \
+              value1, value2, move); \
+    if ((value1) != 0 && (point) != 0) *(point) = (move); \
+    gprintf("%o%s %1m %1m %d %d %d %1m ", read_function_name, q1, q2, stackp, \
+	    (value1), (value2), (move)); \
+    dump_stack(); \
+    return; \
+  } while (0)
+
+#define READ_RETURN_CONN_NG(routine, str1, str2, remaining_depth, point, move, value) \
+  do { \
+    tt_update(&ttable, routine, str1, str2, \
+              remaining_depth, NULL,\
+              value, 0, move);\
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    gprintf("%o%s %1m %1m %d %d %1m ", read_function_name, q1, q2, stackp, \
+	    (value), (move)); \
+    dump_stack(); \
+    return (value); \
+  } while (0)
+
+#define READ_RETURN_HASH_NG(routine, str, remaining_depth, hash, point, move, value) \
+  do { \
+    tt_update(&ttable, routine, str, NO_MOVE, \
+              remaining_depth, hash,\
+              value, 0, move);\
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
+	    (value), (move)); \
+    dump_stack(); \
+    return (value); \
+  } while (0)
+
+#define READ_RETURN2_NG(routine, str, remaining_depth, point, move, value1, value2) \
+  do { \
+    tt_update(&ttable, routine, str, NO_MOVE, \
+              remaining_depth, NULL,\
+              value1, value2, move);\
+    if ((value1) != 0 && (point) != 0) *(point) = (move); \
+    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
+	    (value1), (move)); \
+    dump_stack(); \
+    return (value1); \
+  } while (0)
+
+#else
 
 #define READ_RETURN0(read_result) \
   do { \
@@ -505,12 +605,13 @@ int get_read_result2(enum routine_id routine,
     if (read_result) { \
       rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
     } \
-    gprintf("%o%s %1m %d %d %d ", read_function_name, q, stackp, \
+    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
 	    (value_a), (move)); \
     dump_stack(); \
     return (value_a); \
   } while (0)
 
+#endif
 
 #endif
 

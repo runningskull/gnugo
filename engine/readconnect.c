@@ -1980,7 +1980,7 @@ recursive_connect2(int str1, int str2, int *move, int has_passed)
       && tt_get(&ttable, CONNECT, str1, str2,
 		depth - stackp, NULL,
 		&value, NULL, &xpos) == 2) {
-    /*TRACE_CACHED_RESULT2(*read_result);*/
+    TRACE_CACHED_RESULT2_NG(value, value, xpos);
     if (value != 0)
       if (move)
 	*move = xpos;
@@ -2204,7 +2204,7 @@ recursive_disconnect2(int str1, int str2, int *move, int has_passed)
       && tt_get(&ttable, DISCONNECT, str1, str2,
 		depth - stackp, NULL,
 		&value, NULL, &xpos) == 2) {
-    /*TRACE_CACHED_RESULT2(*read_result);*/
+    TRACE_CACHED_RESULT2_NG(value, value, xpos);
     if (value != 0)
       if (move)
 	*move = xpos;
@@ -2927,6 +2927,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 		depth - stackp, goal_hash,
 		&retval, NULL, &xpos) == 2) {
     /* FIXME: Use move for move ordering if tt_get() returned 1 */
+    TRACE_CACHED_RESULT_NG(retval, xpos);
     SGFTRACE(xpos, retval, "cached");
     if (move)
       *move = xpos;
@@ -3090,6 +3091,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
       && (hashflags & HASH_BLOCK_OFF)
       && (tt_get(&ttable, BLOCK_OFF, str, NO_MOVE, 
                  depth - stackp, goal_hash, &retval, NULL, &xpos) == 2)) {
+    TRACE_CACHED_RESULT_NG(retval, xpos);
     SGFTRACE(xpos, retval, "cached");
     if (move)
       *move = xpos;

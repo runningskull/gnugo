@@ -302,6 +302,7 @@ tt_update(Transposition_table *table,
   table->is_clean = 0;
 }
 
+
 static const char *routine_names[] = {
   ROUTINE_NAMES
 };
@@ -318,6 +319,8 @@ routine_id_to_string(enum routine_id routine)
 /* ================================================================ */
 /*                    The old transposition table                   */
 
+
+#if !USE_HASHTABLE_NG
 
 static Hashtable *movehash;
 
@@ -897,7 +900,7 @@ hashnode_new_result(Hashtable *table, Hashnode *node,
   stats.read_result_entered++;
   return result;
 }
-
+#endif
 
 /* Initialize the cache for read results, using at most the given
  * number of bytes of memory. If the memory isn't sufficient to
@@ -944,9 +947,14 @@ reading_cache_init(int bytes)
 void
 reading_cache_clear()
 {
-  hashtable_clear(movehash);
+#if USE_HASHTABLE_NG
   tt_clear(&ttable);
+#else
+  hashtable_clear(movehash);
+#endif
 }
+
+#if !USE_HASHTABLE_NG
 
 int
 get_read_result_hash_modified(enum routine_id routine,
@@ -1099,6 +1107,7 @@ do_get_read_result(enum routine_id routine,
   return 0;
 }
 
+#endif
 
 /* Write reading trace data to an SGF file. Normally called through the
  * macro SGFTRACE in cache.h.

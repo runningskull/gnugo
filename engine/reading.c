@@ -1208,6 +1208,7 @@ do_find_defense(int str, int *move)
     /* Note that if return value is 1 (too small depth), the move will
      * still be used for move ordering.
      */
+    TRACE_CACHED_RESULT_NG(retval, xpos);
     SGFTRACE(xpos, retval, "cached");
     if (move)
       *move = xpos;
@@ -3000,6 +3001,7 @@ do_attack(int str, int *move)
       && tt_get(&ttable, ATTACK, str, NO_MOVE, 
 		depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
+    TRACE_CACHED_RESULT_NG(retval, xpos);
     SGFTRACE(xpos, retval, "cached");
     if (move)
       *move = xpos;
