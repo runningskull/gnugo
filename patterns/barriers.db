@@ -687,7 +687,6 @@ O,,O
 
 Pattern Barrier52
 
-
 o.O.?
 o,X..
 .,...
@@ -704,7 +703,6 @@ o*X..
 
 
 Pattern Barrier53
-
 
 ?O?
 OXO
@@ -731,6 +729,19 @@ x,a,x
 -----
 
 ;oplay_attack(a,a)
+
+
+Pattern Barrier55
+
+OX.O
+.,,.
+
+:8,Ds
+
+bA.c
+.,,.
+
+;lib(A)<=3 && lib(b)>=3 && lib(c)>=3
 
 
 Pattern Intrusion1

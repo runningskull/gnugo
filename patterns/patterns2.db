@@ -1560,6 +1560,23 @@ O.b
 ;lib(b)==2 && lib(C)>3 && !oplay_attack(*,a,a)
 
 
+Pattern Shape18c
+# Negate shape bonus if X can connect "beneath".
+# gf New pattern. (3.1.4)
+
+?O.O     tiger
+X.*X
+....
+
+:8,-,shape(-3)
+
+?OdO
+Xc*E
+.ba.
+
+;oplay_attack(*,a,b,c,d,b) && lib(E)>3
+
+
 Pattern Shape19
 
 X.X     stop enemy tiger
