@@ -331,12 +331,12 @@ but the formats are slightly modified. One can use %c, %d, %f,
 The indentation referred to in the last item displays the stack depth.
 
 @itemize @bullet
-@item @code{int  gprintf(const char *fmt, ...)}
+@item @code{int gprintf(const char *fmt, ...)}
 @findex gprintf
 @quotation
 The most common formatted print function, writes to stderr.
 @end quotation
-@item @code{void  gfprintf(FILE *outfile, const char *fmt, ...)}
+@item @code{void gfprintf(FILE *outfile, const char *fmt, ...)}
 @findex gfprintf
 @quotation
 Wrapper around @code{vgprintf}, writes to outfile.
@@ -348,7 +348,7 @@ writes to stdout.
 TRACE(const char *fmt, ...)
 Like @code{gprintf}, but silent if the global variable @code{verbose} is
 zero.
-@item @code{void  abortgo(const char *file, int line, const char *msg, int x, int y)}
+@item @code{void abortgo(const char *file, int line, const char *msg, int x, int y)}
 @findex abortgo
 @quotation
 A wrapper around @code{abort()} which shows the state variables at the time

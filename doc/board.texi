@@ -10,7 +10,7 @@ The foundation of the GNU Go engine is a library of very efficient
 routines for handling go boards.  This board library, called
 @file{libboard}, can be used for those programs that only need a
 basic go board but no AI capability. One such program is
-@code{patterns/joseki} subdirectory, which compiles joseki pattern
+@file{patterns/joseki.c}, which compiles joseki pattern
 databases from SGF files.
 
 The library consists of the following files:

@@ -284,7 +284,7 @@ Write sgf output to file
 @end quotation
 @item @option{--mode @var{mode}} 
 @quotation
-Force the playing mode ('ascii', 'test,' 'gmp' or 'gtp'). The default is
+Force the playing mode ('ascii', 'emacs,' 'gmp' or 'gtp'). The default is
 ASCII, but if no terminal is detected GMP (Go Modem Protocol) will be
 assumed. In practice this is usually what you want, so you may never
 need this option.
@@ -297,17 +297,18 @@ need this option.
 @quotation
 @cindex cache-size
 @cindex cache
-Memory in megabytes used for hashing. The default size is 16 unless you
-configure gnugo with the command @command{configure
+Memory in megabytes used for caching of read results. The default size
+is 16 unless you configure gnugo with the command @command{configure
 --enable-cache-size=@var{size}} before compiling to make @var{size} the
-default (@pxref{Installation}).  GNU Go stores results of its reading
-calculations in a Hash table (@pxref{Hashing}). If the Hash table is filled,
-it is emptied and the reading continues, but some reading may have to be
-repeated that was done earlier, so a larger cache size will make GNU Go run
-faster, provided the cache is not so large that swapping occurs. Swapping may
-be detected on GNU/Linux machines using the program @command{top}. However if
-you have ample memory or if performance seems to be a problem may want to
-increase the size of the Hash cache using this option.
+default (@pxref{Installation}). GNU Go stores results of its reading
+calculations in a Hash table (@pxref{Hashing}). If the Hash table is
+filled, it is emptied and the reading continues, but some reading may
+have to be repeated that was done earlier, so a larger cache size will
+make GNU Go run faster, provided the cache is not so large that swapping
+occurs. Swapping may be detected on GNU/Linux machines using the program
+@command{top}. However, if you have ample memory or if performance seems
+to be a problem you may want to increase the size of the cache using
+this option.
 @end quotation
 @item @option{--chinese-rules} 
 @quotation

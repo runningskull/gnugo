@@ -98,7 +98,7 @@ Lohner, Jerome Dumonteil, Tommy Thorn, Nicklas Ekstrand, Inge
 Wallin, Thomas Traber, Douglas Ridgway, Teun Burgers, Tanguy
 Urvoy, Thien-Thi Nguyen, Heikki Levanto, Mark Vytlacil,
 Adriaan van Kessel, Wolfgang Manner, Jens Yllman, Don Dailey,
-Mans Ullerstam, Arend Bayer and Trevor Morris.
+M@aa{}ns Ullerstam, Arend Bayer and Trevor Morris.
 
 @node Thanks, TODO, Authors, Introduction
 @comment node-name,    next,        previous,     up
@@ -110,7 +110,7 @@ correspondence. Thanks to everyone who stepped on a bug (and sent us a
 report)!
 
 Thanks to Gary Boos, Peter Gucwa, Martijn van der Kooij, Michael
-Margolis, Trevor Morris, Mans Ullerstam, Don Wagner and Yin Zheng for help
+Margolis, Trevor Morris, M@aa{}ns Ullerstam, Don Wagner and Yin Zheng for help
 with Visual C++.
 
 And thanks to Alan Crossman, Stephan Somogyi, Pierce Wetter and Mathias Wagner

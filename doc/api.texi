@@ -14,10 +14,7 @@ user modes:
 SGF file.
 @item GMP - Go Modem Protocol, a protocol for automatic play between two
 computers.
-@item GTP - Go Text Protocol, a more general go protocol currently used
-only for testing of the engine. However, GTP is currently being
-standardized and it is expected that GTP will become the main choice for
-tasks where currently GMP is used.
+@item GTP - Go Text Protocol, a more general go protocol, @pxref{GTP}.
 @end itemize
 @cindex API
 
@@ -73,7 +70,7 @@ stones, do tactical and strategic reading and to query the engine for
 legal moves. These functions are collected into @code{libengine.a}.
 
 The game handling code helps the application programmer keep tracks
-of the moves in a game, and to undo or redo moves. Games can be saved to
+of the moves in a game. Games can be saved to
 SGF files and then later be read back again. These are also within
 @code{libengine.a}. 
 
@@ -145,7 +142,7 @@ or @code{BLACK}, but not on @code{EMPTY} or one of the border colors.
 
 GNU Go uses two different representations of the board, for
 most purposes a one-dimensional one, but for a few purposes a
-two dimensional one (@pxref{The Board}). The one-dimensional
+two dimensional one (@pxref{Libboard}). The one-dimensional
 board was introduced before GNU Go 3.2, while the two-dimensional
 board dates back to the ancestral program written by Man Lung Li
 before 1995. The API still uses the one-dimensional board, so
@@ -338,6 +335,69 @@ Report the board size.
 @quotation
 Report the move number.
 @end quotation
+@end itemize
+
+@section Game handling
+
+The functions (in @pxref{Positional Functions}) are all that are needed to
+create a fully functional go program.  But to make the life easier for the
+programmer, there is a small set of functions specially designed for handling
+ongoing games.
+
+The data structure describing an ongoing game is the @code{Gameinfo}. It
+is defined as follows:
+
+@example
+@group
+
+typedef struct @{
+  int       handicap;
+
+  int       to_move;            /* whose move it currently is */
+  SGFTree   game_record;        /* Game record in sgf format. */
+
+  int       seed;               /* random seed */
+  int       computer_player;    /* BLACK, WHITE, or EMPTY (used as BOTH) */
+
+  char      outfilename[128];   /* Trickle file */
+  FILE      *outfile;
+@} Gameinfo;
+
+@end group
+@end example
+
+The meaning of @code{handicap} should be obvious. @code{to_move} is the
+color of the side whose turn it is to move.
+
+The SGF tree @code{game_record} is used to store all the moves in the entire
+game, including a header node which contains, among other things, komi
+and handicap.
+
+If one or both of the opponents is the computer, the fields @code{seed}
+and @code{computer_player} are used. Otherwise they can be
+ignored. @code{seed} is used to store the number used to seed the random
+number generator. Given the same moves from the opponent, GNU Go will
+try to vary its game somewhat using a random function. But if the random
+generator is given the same seed, GNU Go will always play the same
+move. This is good, e.g. when we debug the engine but could also be used
+for other purposes.
+
+GNU Go can use a trickle file to continuously save all the moves of an
+ongoing game. This file can also contain information about internal
+state of the engine such as move reasons for various locations or move
+valuations. The name of this file should
+be stored in @code{outfilename} and the file pointer to the open file is
+stored in @code{outfile}. If no trickle file is used,
+@code{outfilename[0]} will contain a null character and @code{outfile}
+will be set to @code{NULL}.
+
+@subsection Functions which manipulate a Gameinfo
+
+All the functions in the engine that manipulate Gameinfos have names
+prefixed by @code{gameinfo_}.  Here is a complete list, as prototyped in
+@file{gnugo.h}:
+
+@itemize
 @item @code{void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)}
 @findex gameinfo_clear
 @quotation
@@ -364,7 +424,7 @@ case the move is actually done. Otherwise return 0.
 @quotation
 Play the moves in an SGF tree. Walk the main variation, actioning the
 properties into the playing board. Returns the color of the next move to be
-made. Head is a sgf tree. Untilstr is an optional string of the form either
+made. Head is an sgf tree. Untilstr is an optional string of the form either
 'L12' or '120' which tells it to stop playing at that move or move
 number. When debugging, this is the location of the move being examined.
 @end quotation
@@ -373,126 +433,6 @@ number. When debugging, this is the location of the move being examined.
 @quotation
 Same as previous function, using standard orientation.
 @end quotation
-@end itemize
-
-@section Game handling
-
-The functions (in @pxref{Positional Functions}) are all that are needed to
-create a fully functional go program.  But to make the life easier for the
-programmer, there is a small set of functions specially designed for handling
-ongoing games.
-
-The data structure describing an ongoing game is the @code{Gameinfo}. It
-is defined as follows:
-
-@example
-@group
-
-typedef struct @{
-  int       handicap;
-
-  Position  position;
-  int       move_number;
-  int       to_move;		/* whose move it currently is */
-  SGFTree   moves;		/* The moves in the game. */
-
-  int       seed;		/* random seed */
-  int       computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
-
-  char      outfilename[128];	/* Trickle file */
-  FILE      *outfile;
-@} Gameinfo;
-
-@end group
-@end example
-
-The meaning of @code{handicap} should be obvious. The @code{position}
-field is of course the current position, @code{move_number} is the
-number of the current move and @code{to_move} is the color of the side
-whose turn it is to move.
-
-The SGF tree @code{moves} is used to store all the moves in the entire
-game, including a header node which contains, among other things, komi
-and handicap. If a player wants to undo a move, this can most easily be
-done by replaying all the moves in the tree except for the last
-one. This is the way it is implemented in @code{gameinfo_undo_move()}.
-
-If one or both of the opponents is the computer, the fields @code{seed}
-and @code{computer_player} are used. Otherwise they can be
-ignored. @code{seed} is used to store the number used to seed the random
-number generator. Given the same moves from the opponent, GNU Go will
-try to vary its game somewhat using a random function. But if the random
-generator is given the same seed, GNU Go will always play the same
-move. This is good, e.g. when we debug the engine but could also be used
-for other purposes.
-
-GNU Go can use a trickle file to continuously save all the moves of an
-ongoing game. This file can also contain information about internal
-state of the engine such as move reasons for various locations or move
-valuations for the 10 highest valued moves. The name of this file should
-be stored in @code{outfilename} and the file pointer to the open file is
-stored in @code{outfile}. If no trickle file is used,
-@code{outfilename[0]} will contain a null character and @code{outfile}
-will be set to @code{NULL}.
-
-@subsection Functions which manipulate a Gameinfo
-
-All the functions in the engine that manipulate Gameinfos have names
-prefixed by @code{gameinfo_}.  Here is a complete list, as prototyped in
-@file{gnugo.h}:
-
-@itemize
-@item @code{void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)}
-@findex gameinfo_clear
-@quotation
-Clear the Gameinfo to an empty state. The board size of the
-@code{Position} is set to @code{boardsize}.
-@end quotation
-
-@item @code{void gameinfo_print(Gameinfo *ginfo)}
-@findex gameinfo_print
-@quotation
-Print the Gameinfo on stdout. This is mostly a debug tool.
-@end quotation
-
-@item @code{void gameinfo_load_sgfheader(Gameinfo *ginfo, SGFNode *head)}
-@findex gameinfo_load_sgfheader
-@quotation
-Load header information from the SGF node @code{head} and set the
-appropriate variables in @code{ginfo}.
-@end quotation
-
-@item @code{void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)}
-@findex gameinfo_play_move
-@quotation
-Play a move at (@code{i}, @code{j}), record it in @code{moves}, print it
-to the trickle file if any and update @code{move_number} and
-@code{to_move}.
-@end quotation
-
-@item @code{void gameinfo_undo_move(Gameinfo *ginfo)}
-@findex gameinfo_undo_move
-@quotation
-Replays all the moves of the game except the last one. It also updates
-@code{move_number}, @code{to_move} and @code{moves}. If there is a
-trickle file, it is truncated to the second to last move.
-
-@strong{FIXME: Not yet implemented.}
-@end quotation
-
-@item @code{int gameinfo_play_sgftree(Gameinfo *ginfo, SGFNode *head,
-const char *untilstr)}
-@findex gameinfo_play_sgftree
-@quotation
-Read header information and play the main variation in the SGF tree
-starting with @code{head}.  Return whose turn it is to move after this
-is done. 
-
-The parameter @code{untilstr} is an optional string of the form 'L12' (a
-board position) or '120' (a move number) which tells the function to
-stop playing at that move or move number.
-@end quotation
-
 @end itemize
 
 
