@@ -43,7 +43,7 @@ loadsgf games/nngs/ccwills-gnugo-3.5.2-200312112026.sgf 95
 # Don't let the dragon get out. It's in fact probably critical.
 loadsgf games/nngs/ccwills-gnugo-3.5.2-200312112026.sgf 125
 10 reg_genmove black
-#? [J15]*
+#? [J15]
 
 # White can't be allowed to thrash in the corner. (Clearly critical dragon.)
 loadsgf games/nngs/ccwills-gnugo-3.5.2-200312112026.sgf 173

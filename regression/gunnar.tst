@@ -56,7 +56,7 @@ loadsgf games/gunnar/gunnar1.sgf 34
 # R12 is probably better than R14 but both get the point.
 loadsgf games/gunnar/gunnar1.sgf 96
 10 reg_genmove white
-#? [R12|R14]*
+#? [R12|R14]
 
 # L8 doesn't suffice for local life.
 loadsgf games/gunnar/gunnar1.sgf 126
@@ -256,7 +256,7 @@ loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 254
 # Don't leave aji around, capture the white stones solidly.
 loadsgf games/nngs/joshj-gnugo-3.5.2gf1-200312171536.sgf 140
 46 restricted_genmove black O11 O9 N10 N9 M9
-#? [O11]*
+#? [O11]
 
 # F15 is about 6 points plus some reverse followup. A4 is three points
 # reverse sente.

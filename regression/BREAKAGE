@@ -1,3 +1,53 @@
+========================== 3.7.2-pre2  ==================================
+
+./regress.sh . nngs1.tst 
+27 unexpected PASS!
+./regress.sh . strategy.tst 
+13 unexpected PASS!
+./regress.sh . endgame.tst 
+840 unexpected PASS!
+./regress.sh . golife.tst 
+3 unexpected FAIL: Correct 'E3|E2', got 'H5'
+./regress.sh . trevorb.tst 
+230 unexpected FAIL: Correct 'L5', got 'M7'
+900 unexpected FAIL: Correct 'F11', got 'E12'
+./regress.sh . nngs.tst 
+930 unexpected PASS!
+./regress.sh . trevorc.tst 
+1480 unexpected FAIL: Correct 'A8', got 'F6'
+./regress.sh . strategy3.tst 
+141 unexpected PASS!
+./regress.sh . 13x13.tst 
+43 unexpected FAIL: Correct 'D6', got 'B6'
+74 unexpected PASS!
+./regress.sh . nngs2.tst 
+440 unexpected PASS!
+550 unexpected PASS!
+./regress.sh . nngs3.tst 
+580 unexpected FAIL: Correct 'H3|J5|K3|J3', got 'A4'
+1000 unexpected FAIL: Correct 'L17', got 'H18'
+./regress.sh . nngs4.tst 
+960 unexpected PASS!
+./regress.sh . gunnar.tst 
+10 unexpected PASS!
+46 unexpected PASS!
+./regress.sh . thrash.tst 
+10 unexpected PASS!
+./regress.sh . 9x9.tst 
+250 unexpected PASS!
+./regress.sh . kgs.tst 
+110 unexpected PASS!
+230 unexpected PASS!
+./regress.sh . olympiad2004.tst 
+123 unexpected PASS!
+./regress.sh . tiny.tst 
+1 unexpected FAIL: Correct 'A1|A2|B1|B2', got 'PASS'
+101 unexpected FAIL: Correct 'B2', got 'PASS'
+104 unexpected FAIL: Correct 'B2', got 'PASS'
+201 unexpected FAIL: Correct 'B2|C2|B3|C3', got 'PASS'
+202 unexpected FAIL: Correct 'B2', got 'B3'
+207 unexpected FAIL: Correct 'A3', got 'D2'
+
 ========================== 3.7.2-pre1  ==================================
 
 ./regress.sh . reading.tst 

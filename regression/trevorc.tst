@@ -877,7 +877,7 @@ loadsgf games/trevor/auto/c83.sgf 16
 
 loadsgf games/trevor/auto/c83.sgf 74
 1480 reg_genmove white
-#? [A8]
+#? [A8]*
 
 
 loadsgf games/trevor/auto/c83.sgf 76

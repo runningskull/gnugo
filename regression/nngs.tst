@@ -410,7 +410,7 @@ loadsgf games/nngs/gnugo-3.1.18-bnh-200201061916.sgf 30
 
 loadsgf games/nngs/gnugo-3.1.18-bnh-200201061916.sgf 34
 930 reg_genmove white
-#? [S8]*
+#? [S8]
 
 
 loadsgf games/nngs/gnugo-3.1.18-bnh-200201061916.sgf 36

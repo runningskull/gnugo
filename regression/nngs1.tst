@@ -113,7 +113,7 @@ loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 26
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 46
 27 reg_genmove white
-#? [H2]*
+#? [H2]
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 126
 28 reg_genmove white

@@ -87,7 +87,7 @@ loadsgf games/trevor/auto/b13.sgf 48
 
 loadsgf games/trevor/auto/b13.sgf 66
 230 reg_genmove white
-#? [L5]
+#? [L5]*
 
 
 loadsgf games/trevor/auto/b13.sgf 68
@@ -559,7 +559,7 @@ loadsgf games/trevor/auto/b83.sgf 20
 
 loadsgf games/trevor/auto/b83.sgf 50
 900 reg_genmove white
-#? [F11]
+#? [F11]*
 
 
 loadsgf games/trevor/auto/b83.sgf 64

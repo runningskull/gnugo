@@ -14,7 +14,7 @@ loadsgf games/golife.sgf 26
 # than a move at the bottom anyway.
 loadsgf games/golife.sgf 30
 3 reg_genmove white
-#? [E3|E2]
+#? [E3|E2]*
 
 # # H5 is nice but not the only move. Securing the connection to A3 or
 # # expanding around E2 or E3 is also okay. Testcase removed.

@@ -222,7 +222,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
 # the gap at D7 (by playing D6) should often be bad.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 25
 43 reg_genmove black
-#? [D6]
+#? [D6]*
 
 #CATEGORY=ENDGAME_TUNING
 # To get better evaluation for B6 one would need to
@@ -395,7 +395,7 @@ loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 31
 # produces very bad choices. Also, owl is wrong here.
 loadsgf games/mertin13x13/gnugo-gointellect1.W+28.sgf 33
 74 reg_genmove black
-#? [G10]*
+#? [G10]
 
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 13

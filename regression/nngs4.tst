@@ -418,7 +418,7 @@ loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 50
 
 loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 52
 960 reg_genmove white
-#? [D7|E10|C8]*
+#? [D7|E10|C8]
 
 #game move at L13 is awful
 loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 60

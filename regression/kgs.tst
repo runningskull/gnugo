@@ -50,7 +50,7 @@ loadsgf games/kgs/20040516-GoBucks-GnuGoCVS.sgf 242
 
 loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 152
 110 reg_genmove black
-#? [G13]*
+#? [G13]
 
 # P18 is in danger now.
 loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 192
@@ -112,7 +112,7 @@ loadsgf games/kgs/yagr-Sapojnik.sgf 80
 # Win the semeai!
 loadsgf games/kgs/yagr-Kazik.sgf 149
 230 reg_genmove white
-#? [J12|J11|L10|L9|J19]*
+#? [J12|J11|L10|L9|J19]
 
 loadsgf games/kgs/yagr-yudeta.sgf 257
 240 reg_genmove white

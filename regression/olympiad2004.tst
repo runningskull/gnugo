@@ -217,7 +217,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 202
 # suppression should generate a move at L3 or K3.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
 123 reg_genmove white
-#? [K3|L3|L1]*
+#? [K3|L3|L1]
 
 # More important to build towards center than closing off edge.
 loadsgf games/olympiad2004/19x19/gnu-int.sgf 67

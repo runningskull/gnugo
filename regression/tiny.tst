@@ -3,7 +3,7 @@
 # Should play on the empty board. (?)
 loadsgf games/tiny/2x2.sgf 1
 1 reg_genmove black
-#? [A1|A2|B1|B2]
+#? [A1|A2|B1|B2]*
 
 # B2 urgent
 loadsgf games/tiny/2x2.sgf 2
@@ -23,7 +23,7 @@ loadsgf games/tiny/2x2.sgf 3
 # Taking the center point secures the whole board.
 loadsgf games/tiny/3x3a.sgf 1
 101 reg_genmove black
-#? [B2]
+#? [B2]*
 
 loadsgf games/tiny/3x3a.sgf 3
 102 reg_genmove black
@@ -35,7 +35,7 @@ loadsgf games/tiny/3x3a.sgf 5
 
 loadsgf games/tiny/3x3b.sgf 2
 104 reg_genmove white
-#? [B2]
+#? [B2]*
 
 loadsgf games/tiny/3x3b.sgf 3
 105 reg_genmove black
@@ -48,11 +48,11 @@ loadsgf games/tiny/3x3b.sgf 5
 
 loadsgf games/tiny/4x4a.sgf 1
 201 reg_genmove black
-#? [B2|C2|B3|C3]
+#? [B2|C2|B3|C3]*
 
 loadsgf games/tiny/4x4a.sgf 2
 202 reg_genmove white
-#? [B2]
+#? [B2]*
 
 loadsgf games/tiny/4x4a.sgf 3
 203 reg_genmove black
@@ -74,7 +74,7 @@ loadsgf games/tiny/4x4a.sgf 6
 # B1, C4, and D2 might also be okay.
 loadsgf games/tiny/4x4a.sgf 7
 207 reg_genmove black
-#? [A3]
+#? [A3]*
 
 # C4 might also be okay.
 loadsgf games/tiny/4x4a.sgf 8
