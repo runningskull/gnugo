@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- don't add child to root node in sgffile_printboard()
 - remove color parameter from examine_position(), compute_eyes_pessimistic()
 - new arrays white_vital_points and black_vital_points
 - read_eye() stores vital point in new arrays when add_moves == 1

@@ -203,7 +203,7 @@ sgffile_printboard(SGFTree *tree)
   SGFNode *node;
   
   gg_assert(tree);
-  node = sgfAddChild(tree->lastnode);
+  node = tree->lastnode;
   
   /* Write the white stones to the file. */
   for (i = 0; i < board_size; i++) {
