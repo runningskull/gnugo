@@ -160,7 +160,7 @@ static int attack3(int str, int *move, int komaster, int kom_pos);
 static int attack4(int str, int *move, int komaster, int kom_pos);
 static int find_cap2(int str, int alib, int blib, int *move,
 		     int komaster, int kom_pos);
-static int find_cap3(int str, int *move, int komaster, int kom_pos);
+static int find_cap(int str, int *move, int komaster, int kom_pos);
 static int special_attack2(int str, int libs[2], int *move,
 			   int komaster, int kom_pos);
 static int special_attack3(int str, int libs[2], int *move,
@@ -3439,7 +3439,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
     
   /* The simple ataris didn't work. Try something more fancy. */
   if (stackp <= backfill_depth) {
-    int acode = find_cap3(str, &xpos, komaster, kom_pos);
+    int acode = find_cap(str, &xpos, komaster, kom_pos);
     CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
       			    "find cap3");
   }
@@ -3668,12 +3668,17 @@ attack4(int str, int *move, int komaster, int kom_pos)
     }
   }
 
+  if (stackp <= backfill_depth) {
+    int acode = find_cap(str, &xpos, komaster, kom_pos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
+      			    "find cap");
+  }
+
   RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 
-/* If (str) points to a string with 2 or 3 liberties,
- * find_cap2(str, alib, blib, &i, &j, komaster)
+/* find_cap2(str, alib, blib, &i, &j, komaster)
  * looks for a configuration of the following type:
  *
  *  X.
@@ -3742,51 +3747,62 @@ find_cap2(int str, int alib, int blib, int *move, int komaster, int kom_pos)
 }    
 
 
-/* If (str) points to a string with 3 liberties, find_cap3(str, &move)
+/* If (str) points to a string with 2 - 4 liberties, find_cap(str, &move)
  * looks for a configuration of the following type:
  *
- *  XXa
- *  cb*
+ *  Xa
+ *  b*
  *
- * where X are elements of the string in question and a, b and c are
- * its liberties. It tries the move at * and returns true this move
- * captures the string, leaving (*move) pointing to *.
+ * where X are elements of the string in question and a and b are
+ * two of its liberties. It tries the move at * and returns true
+ * this move captures the string, leaving (*move) pointing to *.
+ *
+ * For larger strings, this can find moves like
+ *
+ * XXXXX
+ * XX.XX
+ * X.*.X
+ * XX.XX
+ * XXXXX
+ *
+ * even though they are not capping moves.
  */
 
 static int
-find_cap3(int str, int *move, int komaster, int kom_pos)
+find_cap(int str, int *move, int komaster, int kom_pos)
 {
   int alib, blib;
-  int libs[3];
+  int numlibs;
+  int libs[4];
   int xpos = 0;
-  int k;
+  int i,j;
   int savemove = 0;
   int savecode = 0;
   int acode;
 
-  if (findlib(str, 3, libs) != 3)
+  numlibs = findlib(str, 4, libs);
+  if (numlibs > 4 || numlibs < 2)
     return 0;
 
-  for (k = 0; k < 3; k++) {
-    /* k and k+1 mod 3 will be (0,1), (1,2) and (2,0); These are the 
-     * three combinations of indices that we have to send to find_cap2.
-     */
-    alib = libs[k];
-    blib = libs[(k+1)%3];
+  for (i = 0; i < numlibs - 1; i++)
+    for (j = i + 1; j < numlibs; j++) {
+      alib = libs[i];
+      blib = libs[j];
 
-    acode = find_cap2(str, alib, blib, &xpos, komaster, kom_pos);
-    if (acode == WIN) {
-      *move = xpos;
-      return WIN;
+      acode = find_cap2(str, alib, blib, &xpos, komaster, kom_pos);
+      if (acode == WIN) {
+        *move = xpos;
+        return WIN;
+      }
+      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
     }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
-  }
 
   if (savecode != 0)
     *move = savemove;
 
   return savecode;
 }
+
 
 
 /* In a situation like this:
