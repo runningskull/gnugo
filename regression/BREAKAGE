@@ -1,3 +1,37 @@
+./regress.sh . endgame.tst 
+219 unexpected PASS!
+./regress.sh . golife.tst 
+4 unexpected PASS!
+7 unexpected FAIL: Correct 'F3', got 'G1'
+./regress.sh . trevorb.tst 
+600 unexpected PASS!
+./regress.sh . nngs.tst 
+220 unexpected PASS!
+240 unexpected PASS!
+./regress.sh . trevorc.tst 
+450 unexpected PASS!
+970 unexpected PASS!
+1480 unexpected PASS!
+1520 unexpected PASS!
+./regress.sh . 13x13.tst 
+39 unexpected PASS!
+57 unexpected PASS!
+60 unexpected PASS!
+./regress.sh . nngs3.tst 
+800 unexpected PASS!
+870 unexpected PASS!
+1010 unexpected FAIL: Correct 'H16|H17', got 'O10'
+./regress.sh . century2002.tst 
+60 unexpected PASS!
+./regress.sh . ninestones.tst 
+290 unexpected PASS!
+./regress.sh . tactics1.tst 
+Possible crash!: expected 11 results, got 13. Last successful test was 10003.
+105 unexpected FAIL: Correct '', got 'F7'
+106 unexpected FAIL: Correct '', got 'F8'
+./regress.sh . arend2.tst 
+70 unexpected PASS!
+
 ========================== 3.3.15 pre 3 ============================
 
 ./regress.sh . trevora.tst 
