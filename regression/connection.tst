@@ -5,9 +5,9 @@ reset_connection_node_counter
 # See also test 87.
 loadsgf games/connection1.sgf
 1 same_dragon G17 K17
-#? [0]*
-2 same_dragon R12 R9
 #? [0]
+2 same_dragon R12 R9
+#? [0]*
 
 loadsgf games/strategy11.sgf 87
 3 same_dragon A6 B4
@@ -19,12 +19,12 @@ loadsgf games/incident104.sgf 63
 
 loadsgf games/strategy13.sgf
 5 same_dragon S11 R12
-#? [0]*
+#? [0]
 
 # incident 213
 loadsgf games/incident211.sgf 40
 6 same_dragon G8 J6
-#? [0]*
+#? [0]
 
 loadsgf games/strategy21.sgf 86
 7 same_dragon F4 J3
@@ -57,7 +57,7 @@ loadsgf games/strategy29.sgf 204
 
 loadsgf games/strategy33.sgf 159
 15 same_dragon G7 F9
-#? [0]*
+#? [0]
 
 loadsgf games/doublecut.sgf
 16 same_dragon E16 G14
@@ -65,7 +65,7 @@ loadsgf games/doublecut.sgf
 
 loadsgf games/doublecut2.sgf 151
 17 same_dragon D13 F12
-#? [0]*
+#? [0]
 
 loadsgf games/arion.sgf 63
 18 same_dragon N17 P17
@@ -74,7 +74,7 @@ loadsgf games/arion.sgf 63
 # FIXME: Strange test. Wrong move number?
 loadsgf games/dublin1.sgf 71
 19 same_dragon B15 E16
-#? [0]
+#? [0]*
 
 loadsgf games/nicklas/nicklas12.sgf 69
 20 connect K17 N17
@@ -214,7 +214,7 @@ loadsgf games/trevor/auto/b72.sgf 30
 64 disconnect G11 K11
 #? [1 H11]
 65 same_dragon G11 K11
-#? [0]*
+#? [0]
 
 loadsgf games/trevor/auto/b67.sgf 58
 66 disconnect M6 L3
@@ -226,7 +226,7 @@ loadsgf games/trevor/auto/b67.sgf 58
 69 connect M6 L1
 #? [1 M2|M3]*
 70 same_dragon M6 L3
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
 71 connect D3 G3
@@ -238,7 +238,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
 74 disconnect D3 J2
 #? [1 F3]
 75 same_dragon D3 G3
-#? [0]*
+#? [0]
 
 loadsgf games/trevor/auto/b20.sgf 38
 76 connect D2 G2
@@ -246,7 +246,7 @@ loadsgf games/trevor/auto/b20.sgf 38
 77 disconnect D2 G2
 #? [1 (F2|F1)]
 78 same_dragon D2 G2
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/gnugo-3.1.34-viking4-200204240801.sgf 134
 79 connect S4 R7
@@ -264,15 +264,15 @@ loadsgf games/handtalk/handtalk13.sgf 116
 
 loadsgf games/handtalk/handtalk23.sgf 80
 83 same_dragon K3 L5
-#? [0]*
+#? [0]
 84 same_dragon H6 L5
-#? [0]*
+#? [0]
 
 loadsgf games/handtalk/handtalk23.sgf 82
 85 same_dragon K3 G3
-#? [0]*
+#? [0]
 86 same_dragon K3 M3
-#? [0]*
+#? [0]
 
 # See also test 2. Possibly some more move works.
 loadsgf games/connection1.sgf
@@ -290,7 +290,7 @@ loadsgf games/ego.sgf 191
 
 loadsgf games/trevor/auto/b13.sgf 48
 90 same_dragon D4 F4
-#? [0]*
+#? [0]
 
 loadsgf games/trevor/auto/c18.sgf 82
 91 same_dragon J8 J10

@@ -112,7 +112,7 @@ loadsgf games/incident165.sgf 108
 # F3 seems fine to protect the two cuts -arend
 loadsgf games/incident165.sgf 142
 18 gg_genmove black
-#? [E4|F3]
+#? [E4|F3]*
 
 loadsgf games/strategy4.sgf
 19 gg_genmove black
@@ -181,7 +181,7 @@ loadsgf games/strategy5.sgf 20
 
 loadsgf games/strategy5.sgf 40
 29 gg_genmove black
-#? [R4]
+#? [R4]*
 
 loadsgf games/strategy5.sgf 44
 30 gg_genmove black
@@ -237,7 +237,7 @@ loadsgf games/nicklas/nicklas8.sgf 96
 # I disagree. M11 makes territory while attacking. -arend
 loadsgf games/nicklas/nicklas8.sgf 98
 40 gg_genmove black
-#? [E5|M11]*
+#? [E5|M11]
 
 
 #CATEGORY=STRATEGY
@@ -322,7 +322,7 @@ loadsgf games/strategy12.sgf 21
 # So much better, that I removed Q11 option -trevor
 loadsgf games/strategy13.sgf
 50 gg_genmove white
-#? [Q9]*
+#? [Q9]
 
 
 

@@ -66,7 +66,7 @@ loadsgf games/incident234.sgf 164
 # The attack at B2 only gives ko. A2 looks more effective.
 loadsgf games/owl01.sgf
 18 owl_attack C3
-#? [1 A2]*
+#? [1 A2]
 19 owl_defend C3
 #? [1 A2]
 
@@ -164,7 +164,7 @@ loadsgf games/owl02.sgf
 46 owl_defend B3
 #? [1 (F1|B1|D2|E3)]
 47  owl_attack F2
-#? [1 (E3|F1)]*
+#? [1 (E3|F1)]
 48 owl_defend F2
 #? [1 (F1|B1|D2|E1)]
 

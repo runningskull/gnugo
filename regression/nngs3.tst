@@ -158,7 +158,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 90
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 104
 400 gg_genmove black
-#? [N13]*
+#? [N13]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 134
@@ -207,7 +207,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 32
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 42
 490 gg_genmove black
-#? [P15]*
+#? [P15]
 
 
 #This seems like a bogus problem.
@@ -218,7 +218,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 42
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 190
 510 gg_genmove black
-#? [P4]*
+#? [P4]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.32-200204150316.sgf 208
@@ -307,7 +307,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 44
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 54
 700 gg_genmove black
-#? [Q2]*
+#? [Q2]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 56
@@ -356,7 +356,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 16
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 80
 790 gg_genmove black
-#? [D5]*
+#? [D5]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 86
@@ -376,7 +376,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 96
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 120
 830 gg_genmove black
-#? [!N13]*
+#? [!N13]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 128
@@ -386,7 +386,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 128
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 136
 850 gg_genmove black
-#? [F9]*
+#? [F9]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 180
@@ -522,7 +522,7 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 224
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209122040.sgf 38
 1110 gg_genmove white
-#? [B7]
+#? [B7]*
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209130704.sgf 160
 1120 gg_genmove white
@@ -560,6 +560,6 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 244
 
 loadsgf games/nngs/gnugo-3.3.10-tsuku-200210241808.sgf 136
 1190 gg_genmove white
-#? [D17]*
+#? [D17]
 
 

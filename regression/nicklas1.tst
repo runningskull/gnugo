@@ -86,7 +86,7 @@ loadsgf games/nicklas/nicklas8.sgf 224
 #DESCRIPTION=Is GnuGo misreading the cut?
 loadsgf games/nicklas/nicklas8.sgf 240
 811 gg_genmove black
-#? [K14|K15]
+#? [K14|K15]*
 
 loadsgf games/nicklas/nicklas9.sgf 28
 901 gg_genmove black
@@ -191,7 +191,7 @@ loadsgf games/nicklas/nicklas12.sgf 123
 #SEVERITY=
 loadsgf games/nicklas/nicklas12.sgf 203
 1213 gg_genmove black
-#? [N4]*
+#? [N4]
 
 # Added A6 among the correct moves. /gf (2.7.203)
 loadsgf games/nicklas/nicklas12.sgf 215

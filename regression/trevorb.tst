@@ -87,7 +87,7 @@ loadsgf games/trevor/auto/b13.sgf 48
 
 loadsgf games/trevor/auto/b13.sgf 66
 230 gg_genmove white
-#? [L5]*
+#? [L5]
 
 
 loadsgf games/trevor/auto/b13.sgf 68
@@ -179,7 +179,7 @@ loadsgf games/trevor/auto/b25.sgf 70
 
 loadsgf games/trevor/auto/b25.sgf 74
 360 gg_genmove white
-#? [K3]*
+#? [K3]
 
 
 
@@ -233,7 +233,7 @@ loadsgf games/trevor/auto/b28.sgf 80
 
 loadsgf games/trevor/auto/b29.sgf 52
 440 gg_genmove white
-#? [E6]
+#? [E6]*
 
 
 
@@ -387,7 +387,7 @@ loadsgf games/trevor/auto/b60.sgf 46
 
 loadsgf games/trevor/auto/b60.sgf 66
 650 gg_genmove white
-#? [J7]*
+#? [J7]
 
 
 
@@ -407,7 +407,7 @@ loadsgf games/trevor/auto/b62.sgf 18
 # See also connection:88
 loadsgf games/trevor/auto/b64.sgf 44
 670 gg_genmove white
-#? [L5]
+#? [L5]*
 
 
 
@@ -416,7 +416,7 @@ loadsgf games/trevor/auto/b64.sgf 44
 
 loadsgf games/trevor/auto/b67.sgf 54
 680 gg_genmove white
-#? [M5]*
+#? [M5]
 
 
 loadsgf games/trevor/auto/b67.sgf 58
@@ -479,7 +479,7 @@ loadsgf games/trevor/auto/b72.sgf 52
 
 loadsgf games/trevor/auto/b72.sgf 64
 790 gg_genmove white
-#? [K6|K5]*
+#? [K6|K5]
 
 
 #Actually, L4 is probably best, though J4 leads to
@@ -559,7 +559,7 @@ loadsgf games/trevor/auto/b83.sgf 20
 
 loadsgf games/trevor/auto/b83.sgf 50
 900 gg_genmove white
-#? [F11]*
+#? [F11]
 
 
 loadsgf games/trevor/auto/b83.sgf 64

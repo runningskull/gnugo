@@ -21,7 +21,7 @@
 /* Semeai Variations. 250 default */
 #undef DEFAULT_SEMEAI_VARIATIONS
 
-/* Connection module. Default standard. */
+/* Connection module. Default experimental. */
 #undef EXPERIMENTAL_CONNECTIONS
 
 /* GAIN/LOSS codes. Disabled by default. */

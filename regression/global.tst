@@ -32,11 +32,11 @@ loadsgf golois/Aya991113-7.sgf
 
 loadsgf golois/Aya991113-8.sgf
 9 gg_genmove black
-#? [F4]
+#? [F4]*
 
 loadsgf golois/Aya991113-9.sgf
 10 gg_genmove black
-#? [A5]*
+#? [A5]
 
 # Changed D8 to E8 as correct answer. /gf
 loadsgf golois/bug96.sgf

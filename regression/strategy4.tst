@@ -230,7 +230,7 @@ loadsgf games/bretz.sgf 26
 
 loadsgf games/bretz.sgf 58
 194 gg_genmove black
-#? [A13]
+#? [A13]*
 
 loadsgf games/bretz.sgf 88
 195 gg_genmove black

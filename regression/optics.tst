@@ -193,7 +193,7 @@ loadsgf games/eyes_edge.sgf
 # Either min or max in these depends on ko.
 loadsgf games/marginal_ko.sgf
 1801 eval_eye A19
-#? [0 1 (A19|B17) B17]
+#? [0 1 (A19|B17) B17]*
 1802 eval_eye B17
 #? [0 1 (A19|B17) A19]
 1803 eval_eye N17

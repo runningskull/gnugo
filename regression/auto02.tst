@@ -22,7 +22,7 @@ loadsgf games/auto_gen/auto008.sgf 180
 
 loadsgf games/auto_gen/auto009.sgf 94
 6 owl_defend f3
-#? [!0]*
+#? [!0]
 
 loadsgf games/auto_gen/auto010.sgf 66
 7 owl_attack q17

@@ -12,7 +12,7 @@ loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 22
 10 gg_genmove black
-#? [!H6]*
+#? [!H6]
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 96
 20 gg_genmove black
@@ -70,7 +70,7 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 100
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 130
 140 gg_genmove black
-#? [P5]*
+#? [P5]
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
 150 gg_genmove black
@@ -211,7 +211,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 141
 # Double sente at E8. Clearly biggest move at this time.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 189
 510 gg_genmove white
-#? [E8]
+#? [E8]*
 
 # Necessary to connect. See also connection:94
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 193
@@ -245,7 +245,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 122
 
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 580 gg_genmove white
-#? [K19]
+#? [K19]*
 
 # We still can live.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 224

@@ -139,10 +139,10 @@ loadsgf games/semeai/semeai9.sgf
 #? [ALIVE DEAD (H1|H2|H3|H4|H5|H6|H7|H8)]
 
 21 owl_analyze_semeai N19 O19
-#? [ALIVE DEAD (T17|T19)]*
+#? [ALIVE DEAD (T17|T19)]
 
 22 owl_analyze_semeai O19 N19
-#? [ALIVE DEAD (L15|L17|L18)]*
+#? [ALIVE DEAD (L15|L17|L18)]
 
 loadsgf golois/Goemate990902-1.sgf
 

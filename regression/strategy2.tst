@@ -10,7 +10,7 @@ loadsgf games/strategy14a.sgf
 # modification of move 17 in strategy14.sgf: Ladder works for W, urgent
 # move in lower left removed.
 51 gg_genmove white
-#? [P3]*
+#? [P3]
 
 loadsgf games/strategy14.sgf 33
 52 gg_genmove white
@@ -108,7 +108,7 @@ loadsgf games/strategy17.sgf
 # however it may be difficult to save both K16 and M18 so if the 
 # moves listed are not too undervalued we may accept this result
 70 gg_genmove white
-#? [M15|J15|N16|J16]
+#? [M15|J15|N16|J16]*
 
 # E6 is the only move.
 loadsgf games/strategy18.sgf
@@ -162,7 +162,7 @@ loadsgf games/strategy14a.sgf
 # This is essentially a semeai problem
 loadsgf games/strategy22.sgf
 80 gg_genmove white
-#? [P4|Q4|Q3]*
+#? [P4|Q4|Q3]
 
 # Looks to me like B12 is also effective, although much more
 # complicated. /gf

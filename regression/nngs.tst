@@ -155,7 +155,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 82
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 126
 380 gg_genmove black
-#? [!H2|S1]*
+#? [!H2|S1]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
@@ -176,7 +176,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 204
 #E4 better than C4, if must defend.
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 234
 420 gg_genmove black
-#? [!C4|D3|C3|B3]
+#? [!C4|D3|C3|B3]*
 
 
 
@@ -203,7 +203,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 84
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 86
 490 gg_genmove black
-#? [J18]*
+#? [J18]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 90
@@ -308,7 +308,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 47
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 57
 710 gg_genmove white
-#? [!B12]
+#? [!B12]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 59
@@ -386,7 +386,7 @@ loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 19
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051823.sgf 21
 900 gg_genmove white
-#? [Q15]*
+#? [Q15]
 
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051823.sgf 43
@@ -466,7 +466,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 180
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 20
 1020 gg_genmove white
-#? [Q2]
+#? [Q2]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 26
@@ -491,7 +491,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 56
 1070 gg_genmove white
-#? [K17]
+#? [K17]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 58
@@ -601,7 +601,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 44
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 68
 1260 gg_genmove white
-#? [G18|F18]
+#? [G18|F18]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 90
@@ -611,7 +611,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 90
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 138
 1280 gg_genmove white
-#? [D13]*
+#? [D13]
 
 
 
@@ -636,7 +636,7 @@ loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 20
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 161
 1420 gg_genmove white
-#? [D12]*
+#? [D12]
 
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 163

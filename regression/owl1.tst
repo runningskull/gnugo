@@ -96,7 +96,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 231
 
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 241
 284 owl_defend J9
-#? [1 (M7|H7)]*
+#? [1 (M7|H7)]
 
 # Looks like a tough problem for GNU Go.
 loadsgf games/owl41.sgf 1

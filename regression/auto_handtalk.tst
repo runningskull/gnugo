@@ -20,7 +20,7 @@ loadsgf games/handtalk/handtalk2.sgf 78
 #? [ALIVE DEAD (O18|O17|P17)]*
 
 8 owl_analyze_semeai P19 Q17
-#? [ALIVE DEAD (N18|O17|S15)]*
+#? [ALIVE DEAD (N18|O17|S15)]
 
 loadsgf games/handtalk/handtalk2.sgf 134
 9 owl_attack r8

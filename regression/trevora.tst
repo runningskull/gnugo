@@ -264,7 +264,7 @@ loadsgf games/trevor/auto/a025.sgf 12
 #Once you've haned, you've gotta connect.  (Or you shouldn't have haned.)
 loadsgf games/trevor/auto/a026.sgf 16
 420 gg_genmove white
-#? [J5]
+#? [J5]*
 
 
 
@@ -310,7 +310,7 @@ loadsgf games/trevor/auto/a031.sgf 28
 #Sacrificing these two for the rest seems best.
 loadsgf games/trevor/auto/a031.sgf 40
 480 gg_genmove white
-#? [E4]*
+#? [E4]
 
 
 

@@ -2,9 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.10 released October 29, 2002
+
+- experimental connection code made default
+- configure --help cleanup
+- minor changes to twogtp*
 - revision of CB20 in conn.db
 - calls to accurate_approxlib() replaced by accuratelib()
 - owl_find_lunches() revised
+- owl tuning
 - eye tuning
 - new game records and regression tests
 

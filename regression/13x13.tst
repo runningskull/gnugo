@@ -47,7 +47,7 @@ loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 44
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 48
 7 gg_genmove white
-#? [L7|M7|M6]
+#? [L7|M7|M6]*
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 54
@@ -72,12 +72,12 @@ loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 20
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gointellect-gnugo1.B+14.sgf 24
 12 gg_genmove white
-#? [G7|F7|G8]
+#? [G7|F7|G8]*
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 22
 13 gg_genmove white
-#? [!G7]*
+#? [!G7]
 
 #CATEGORY=STRATEGY
 # New failure (comparing 3.1.15 with 3.0.0)
@@ -206,7 +206,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 # In fact, there is none at all (3.3.8)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 40 gg_genmove white
-#? [K13]*
+#? [K13]
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 41 gg_genmove white
@@ -259,7 +259,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 11
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 49 gg_genmove black
-#? [K7]*
+#? [K7]
 
 # Renumbered since there were 2 test 49's
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
@@ -347,7 +347,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 33
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 35
 65 gg_genmove black
-#? [H4]*
+#? [H4]
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 47
 66 gg_genmove black
@@ -358,7 +358,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 47
 # EB1404b produces nonsense here. 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 77
 67 gg_genmove black
-#? [B9]
+#? [B9]*
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 79
 68 gg_genmove black

@@ -321,7 +321,7 @@ loadsgf games/life_and_death/mixed1.sgf
 301 owl_defend  C17
 #? [3 B18]
 302 dragon_status R17
-#? [critical T19 (Q19|R18)]
+#? [critical T19 (Q19|R18)]*
 303 dragon_status R3
 #? [critical (S3|Q3|Q1|T2|T3) S3]
 304 dragon_status C3

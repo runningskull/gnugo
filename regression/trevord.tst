@@ -45,7 +45,7 @@ loadsgf games/trevor/auto/d01.sgf 148
 
 loadsgf games/trevor/auto/d01.sgf 154
 180 gg_genmove white
-#? [S9]*
+#? [S9]
 
 
 loadsgf games/trevor/auto/d01.sgf 184
@@ -160,7 +160,7 @@ loadsgf games/trevor/auto/d03.sgf 210
 
 loadsgf games/trevor/auto/d08.sgf 48
 360 gg_genmove white
-#? [K3|K4]*
+#? [K3|K4]
 
 
 #K10 better than J9
@@ -237,7 +237,7 @@ loadsgf games/trevor/auto/d12.sgf 40
 
 loadsgf games/trevor/auto/d12.sgf 52
 500 gg_genmove white
-#? [E3]
+#? [E3]*
 
 
 loadsgf games/trevor/auto/d12.sgf 66
@@ -276,7 +276,7 @@ loadsgf games/trevor/auto/d24.sgf 98
 
 loadsgf games/trevor/auto/d24.sgf 174
 570 gg_genmove white
-#? [K9]*
+#? [K9]
 
 
 loadsgf games/trevor/auto/d24.sgf 178
@@ -332,7 +332,7 @@ loadsgf games/trevor/auto/d25.sgf 176
 
 loadsgf games/trevor/auto/d25.sgf 178
 670 gg_genmove white
-#? [O11]*
+#? [O11]
 
 
 
@@ -455,7 +455,7 @@ loadsgf games/trevor/auto/d39.sgf 26
 
 loadsgf games/trevor/auto/d39.sgf 30
 880 gg_genmove white
-#? [R7]
+#? [R7]*
 
 
 #locally, E18 is better.
