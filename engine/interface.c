@@ -571,8 +571,10 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	  sgfOverwritePropertyInt(head, "HA", handicap);
 	}
 
-	if (movenum == until - 1)
+	if (movenum == until - 1) {
+	  gameinfo->to_move = next;
 	  return next;
+	}
 	      
 	if (get_moveXY(prop, &i, &j, board_size))
 	  if (i == untilm && j == untiln) {
