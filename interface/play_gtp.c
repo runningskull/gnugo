@@ -1737,7 +1737,7 @@ gtp_genmove(char *s, int id)
    */
   seed = 0;
   sscanf(s+n, "%u", &seed);
-  gg_srand(seed);
+  random_seed = seed;
   
   genmove_conservative(&i, &j, color);
   gtp_printid(id, GTP_SUCCESS);
@@ -1981,7 +1981,7 @@ gtp_final_score(char *s, int id)
    */
   seed = 0;
   sscanf(s, "%u", &seed);
-  gg_srand(seed);
+  random_seed = seed;
 
   finish_and_score_game(seed);
 
@@ -2023,7 +2023,7 @@ gtp_final_status(char *s, int id)
    */
   seed = 0;
   sscanf(s + n, "%u", &seed);
-  gg_srand(seed);
+  random_seed = seed;
 
   finish_and_score_game(seed);
 
@@ -2077,7 +2077,7 @@ gtp_final_status_list(char *s, int id)
    */
   seed = 0;
   sscanf(s + n, "%u", &seed);
-  gg_srand(seed);
+  random_seed = seed;
 
   finish_and_score_game(seed);
 

@@ -29,7 +29,7 @@
 
 #include "liberty.h"
 #include "sgftree.h"
-
+#include "random.h"
 #include "gg_utils.h"
 
 

@@ -212,3 +212,7 @@ loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 28
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 30
 53 gg_genmove white
 #? [L4]*
+
+loadsgf games/nngs/gnugo-3.1.31-niki-200204131518.sgf 14
+54 gg_genmove white
+#? [Q14]*

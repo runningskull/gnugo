@@ -117,7 +117,7 @@ void
 gg_srand(unsigned int seed)
 {
   int i;
-  for (i=0; i<N; i++) {
+  for (i = 0; i < N; i++) {
 #if BIG_UINT
     seed &= 0xffffffffU;
 #endif
@@ -172,7 +172,7 @@ void
 gg_get_rand_state(struct gg_rand_state *state)
 {
   int i;
-  for (i=0; i<N; i++)
+  for (i = 0; i < N; i++)
     state->x[i] = x[i];
   state->k = k;
 }
@@ -185,7 +185,7 @@ void
 gg_set_rand_state(struct gg_rand_state *state)
 {
   int i;
-  for (i=0; i<N; i++)
+  for (i = 0; i < N; i++)
     x[i] = state->x[i];
   k = state->k;
 }

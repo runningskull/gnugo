@@ -27,7 +27,7 @@
 
 #include "liberty.h"
 #include "sgftree.h"
-
+#include "random.h"
 
 /* Return one if x doesn't equal position_number and 0 otherwise.
  * After using this macro x will always have the value
