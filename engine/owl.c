@@ -2740,10 +2740,19 @@ owl_determine_life(struct local_owl_data *owl,
   /* now, totalize the eye potential */
   {
     int ne;
-    for (ne = 0; ne < num_eyes - num_lunch; ne++) {
+    for (ne = 0; ne < num_eyes - num_lunch; ne++)
       add_eyevalues(probable_eyes, &eyevalue_list[ne], probable_eyes);
-      *eyemax += max_eyes(probable_eyes);
-    }
+
+    *eyemax += max_eyes(probable_eyes);
+    /* If we have at least two different eyespaces and can create one eye
+     * in sente, we assume there's a chance to create another one. This is
+     * needed because optics code don't know about eyespaces influenting
+     * each other and combination moves (i.e. double threats to create an
+     * eye).
+     */
+    if (num_eyes - num_lunch > 1 && max_eye_threat(probable_eyes) > 1)
+      *eyemax += 1;
+
     for (; ne < num_eyes; ne++)
       add_eyevalues(probable_eyes, &eyevalue_list[ne], probable_eyes);
   }
@@ -2866,7 +2875,7 @@ owl_shapes(struct matched_patterns_list_data *pattern_list,
 
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
-}  
+}
 
 
 /* This function contains all the expensive checks for a matched pattern. */

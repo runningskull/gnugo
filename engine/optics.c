@@ -1822,6 +1822,15 @@ set_eyevalue(struct eyevalue *e, int a, int b, int c, int d)
   e->d = d;
 }
 
+/* Number of eyes if attacker plays first twice (the threat of the first
+ * move by attacker).
+ */
+int
+min_eye_threat(struct eyevalue *e)
+{
+  return e->a;
+}
+
 /* Number of eyes if attacker plays first followed by alternating play. */
 int
 min_eyes(struct eyevalue *e)
@@ -1834,6 +1843,15 @@ int
 max_eyes(struct eyevalue *e)
 {
   return e->c;
+}
+
+/* Number of eyes if defender plays first twice (the threat of the first
+ * move by defender).
+ */
+int
+max_eye_threat(struct eyevalue *e)
+{
+  return e->d;
 }
 
 /* Add the eyevalues *e1 and *e2, leaving the result in *sum. It is

@@ -960,8 +960,10 @@ void find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
 			      char find_mask[BOARDMAX]);
 
 void set_eyevalue(struct eyevalue *e, int a, int b, int c, int d);
+int min_eye_threat(struct eyevalue *e);
 int min_eyes(struct eyevalue *e);
 int max_eyes(struct eyevalue *e);
+int max_eye_threat(struct eyevalue *e);
 void add_eyevalues(struct eyevalue *e1, struct eyevalue *e2,
 		   struct eyevalue *sum);
 int eye_move_urgency(struct eyevalue *e);
