@@ -675,9 +675,11 @@ class GtpGame {
 
     white->reset_engine();
     black->reset_engine();
+    territory = UNDEFINED;
 
     array error = catch {
-      for (int passes = 0; passes < 2;) {
+      int passes = 0;
+      while (1) {
 	player = black_to_play ? black : white;
 	opponent = black_to_play ? white : black;
 
@@ -707,7 +709,9 @@ class GtpGame {
 	if (move_lower_case == "pass") {
 	  if (verbose)
 	    werror(player->capitalized_color + " passes\n");
-	  passes++;
+
+	  if (++passes == 2)
+	    break;
 	}
 	else {
 	  if (verbose) {
@@ -729,6 +733,8 @@ class GtpGame {
 	  werror(board + "\n");
 	}
 	black_to_play = !black_to_play;
+
+	write_sgf_file(sgf_file_name, sgf_moves, ({ "Void" }));
       }
     };
 
@@ -736,7 +742,6 @@ class GtpGame {
     black->finalize_time_control();
 
     array(string) result;
-    territory = UNDEFINED;
     if (error) {
       result = ({ "Void", error[0] });
       werror("The game will be saved in file `%s'.\n", sgf_file_name);
