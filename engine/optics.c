@@ -69,13 +69,13 @@
 #define MAXEYE 20
 
 static void
-compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
+compute_primary_domains(int color, int domain[MAX_BOARD],
 			int lively[MAX_BOARD][MAX_BOARD], 
 			int false_margins[MAX_BOARD][MAX_BOARD],
 			int first_time);
 static void count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD]);
 static int is_lively(int owl_call, int i, int j);
-static int has_inf(int color, int i, int j, int domain[MAX_BOARD][MAX_BOARD],
+static int has_inf(int color, int pos, int domain[MAX_BOARD],
 		   int lively[MAX_BOARD][MAX_BOARD]);
 static int false_margin(int i, int j, int color,
 			int lively[MAX_BOARD][MAX_BOARD]);
@@ -102,8 +102,8 @@ evaluate_diagonal_intersection(int m, int n, int color,
 
 
 /* These are used during the calculations of eye spaces. */
-static int  black_domain[MAX_BOARD][MAX_BOARD];
-static int  white_domain[MAX_BOARD][MAX_BOARD];
+static int  black_domain[BOARDMAX];
+static int  white_domain[BOARDMAX];
 
 
 /*
@@ -168,56 +168,60 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       if (BOARD(i, j) == EMPTY || !lively[i][j]) {
-	if ((black_domain[i][j] == 0) && (white_domain[i][j] == 0)) {
+	if ((black_domain[POS(i, j)] == 0) && (white_domain[POS(i, j)] == 0)) {
 	  w_eye[i][j].color = GRAY;
 	  b_eye[i][j].color = GRAY;
 	}
-	else if ((black_domain[i][j] == 1) && (white_domain[i][j] == 0)) {
+	else if ((black_domain[POS(i, j)] == 1)
+		 && (white_domain[POS(i, j)] == 0)) {
 	  b_eye[i][j].color = BLACK_BORDER;
 	  b_eye[i][j].origin = NO_MOVE;
 	  if ((   i > 0
-		  && white_domain[i-1][j]
-		  && !black_domain[i-1][j])
+		  && white_domain[POS(i-1, j)]
+		  && !black_domain[POS(i-1, j)])
 	      || (i < board_size-1
-		  && white_domain[i+1][j]
-		  && !black_domain[i+1][j])
+		  && white_domain[POS(i+1, j)]
+		  && !black_domain[POS(i+1, j)])
 	      || (j > 0
-		  && white_domain[i][j-1]
-		  && !black_domain[i][j-1])
+		  && white_domain[POS(i, j-1)]
+		  && !black_domain[POS(i, j-1)])
 	      || (j < board_size-1
-		  && white_domain[i][j+1]
-		  && !black_domain[i][j+1]))
+		  && white_domain[POS(i, j+1)]
+		  && !black_domain[POS(i, j+1)]))
 	    b_eye[i][j].marginal = 1;
 	  else 
 	    b_eye[i][j].marginal = 0;
 	}
-	else if ((black_domain[i][j] == 0) && (white_domain[i][j]==1)) {
+	else if ((black_domain[POS(i, j)] == 0)
+		 && (white_domain[POS(i, j)]==1)) {
 	  w_eye[i][j].color = WHITE_BORDER;
 	  w_eye[i][j].origin = NO_MOVE;
 	  if ((   i > 0
-		  && black_domain[i-1][j]
-		  && !white_domain[i-1][j])
+		  && black_domain[POS(i-1, j)]
+		  && !white_domain[POS(i-1, j)])
 	      || (i < board_size-1
-		  && black_domain[i+1][j]
-		  && !white_domain[i+1][j])
+		  && black_domain[POS(i+1, j)]
+		  && !white_domain[POS(i+1, j)])
 	      || (j > 0
-		  && black_domain[i][j-1]
-		  && !white_domain[i][j-1])
+		  && black_domain[POS(i, j-1)]
+		  && !white_domain[POS(i, j-1)])
 	      || (j < board_size-1
-		  && black_domain[i][j+1]
-		  && !white_domain[i][j+1]))
+		  && black_domain[POS(i, j+1)]
+		  && !white_domain[POS(i, j+1)]))
 	    w_eye[i][j].marginal = 1;
 	  else
 	    w_eye[i][j].marginal = 0;
 	}
-	else if (black_domain[i][j] == 1 && white_domain[i][j] == 1) {
-	  if ((i > 0 && black_domain[i-1][j] && !white_domain[i-1][j]) 
-	      || (i < board_size-1 && black_domain[i+1][j]
-		  && !white_domain[i+1][j])
-	      || (j > 0 && black_domain[i][j-1]
-		  && !white_domain[i][j-1])
-	      || (j < board_size-1 && black_domain[i][j+1]
-		  && !white_domain[i][j+1]))
+	else if (black_domain[POS(i, j)] == 1 
+		 && white_domain[POS(i, j)] == 1) {
+	  if ((i > 0 && black_domain[POS(i-1, j)]
+	       && !white_domain[POS(i-1, j)]) 
+	      || (i < board_size-1 && black_domain[POS(i+1, j)]
+		  && !white_domain[POS(i+1, j)])
+	      || (j > 0 && black_domain[POS(i, j-1)]
+		  && !white_domain[POS(i, j-1)])
+	      || (j < board_size-1 && black_domain[POS(i, j+1)]
+		  && !white_domain[POS(i, j+1)]))
 	    {
 	      b_eye[i][j].marginal = 1;
 	      b_eye[i][j].color = BLACK_BORDER;
@@ -225,13 +229,14 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 	  else
 	    b_eye[i][j].color = GRAY;
 
-	  if ((i > 0 && white_domain[i-1][j] && !black_domain[i-1][j])
-	      || (i < board_size-1 && white_domain[i+1][j]
-		  && !black_domain[i+1][j])
-	      || (j > 0 && white_domain[i][j-1]
-		  && !black_domain[i][j-1])
-	      || (j < board_size-1 && white_domain[i][j+1]
-		  && !black_domain[i][j+1]))
+	  if ((i > 0 && white_domain[POS(i-1, j)]
+	       && !black_domain[POS(i-1, j)])
+	      || (i < board_size-1 && white_domain[POS(i+1, j)]
+		  && !black_domain[POS(i+1, j)])
+	      || (j > 0 && white_domain[POS(i, j-1)]
+		  && !black_domain[POS(i, j-1)])
+	      || (j < board_size-1 && white_domain[POS(i, j+1)]
+		  && !black_domain[POS(i, j+1)]))
 	    {
 	      w_eye[i][j].marginal = 1;
 	      w_eye[i][j].color = WHITE_BORDER;
@@ -334,7 +339,7 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
  */
 
 static void
-compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
+compute_primary_domains(int color, int domain[MAX_BOARD],
 			int lively[MAX_BOARD][MAX_BOARD],
 			int false_margins[MAX_BOARD][MAX_BOARD],
 			int first_time)
@@ -348,7 +353,7 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
     for (i = 0; i < board_size; i++)
       for (j = 0; j < board_size; j++) {
 	/* First we handle the trivial cases. */
-	if (domain[i][j])
+	if (domain[POS(i, j)])
 	  continue;
 	if (!(BOARD(i, j) == EMPTY 
 	      || (BOARD(i, j) == other && !lively[i][j])))
@@ -356,7 +361,7 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 
 	/* Case (1) above. */
 	if (BOARD(i, j) == color && lively[i][j]) {
-	  domain[i][j] = 1;
+	  domain[POS(i, j)] = 1;
 	  found_one = 1;
 	  continue;
 	}
@@ -379,14 +384,14 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 		     && false_margin(i, j, other, lively))
 	      false_margins[i][j] = 1;
 	    else {
-	      domain[i][j] = 1;
+	      domain[POS(i, j)] = 1;
 	      found_one = 1;
 	    }
 	  }
 	  else {
 	    if (BOARD(i, j) != EMPTY || false_margins[i][j] != 1) {
 	      found_one = 1;
-	      domain[i][j] = 1;
+	      domain[POS(i, j)] = 1;
 	    }
 	  }
 	  continue;
@@ -395,14 +400,14 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 	/* Case (3) above. */
 
 	if ((i == 0 && j == 0
-	     && (has_inf(color, 1, 0, domain, lively)
-		 || has_inf(color, 0, 1, domain, lively))
+	     && (has_inf(color, POS(1, 0), domain, lively)
+		 || has_inf(color, POS(0, 1), domain, lively))
 	     && (BOARD(1, 0) != other || !lively[1][0])
 	     && (BOARD(1, 1) != other || !lively[1][1])
 	     && (BOARD(0, 1) != other || !lively[0][1]))
 	    || (i == board_size-1 && j == 0
-		&& (has_inf(color, board_size-2, 0, domain, lively)
-		    || has_inf(color, board_size-1, 1, domain, lively))
+		&& (has_inf(color, POS(board_size-2, 0), domain, lively)
+		    || has_inf(color, POS(board_size-1, 1), domain, lively))
 		&& (BOARD(board_size-2, 0) != other
 		    || !lively[board_size-2][0])
 		&& (BOARD(board_size-2, 1) != other 
@@ -410,8 +415,8 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 		&& (BOARD(board_size-1, 1) != other
 		    || !lively[board_size-1][1]))
 	    || (i == 0 && j == board_size-1
-		&& (has_inf(color, 1, board_size-1, domain, lively)
-		    || has_inf(color, 0, board_size-2, domain, lively))
+		&& (has_inf(color, POS(1, board_size-1), domain, lively)
+		    || has_inf(color, POS(0, board_size-2), domain, lively))
 		&& (BOARD(1, board_size-1) != other
 		    || !lively[1][board_size-1])
 		&& (BOARD(1, board_size-2) != other
@@ -419,8 +424,10 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 		&& (BOARD(0, board_size-2) != other
 		   || !lively[0][board_size-2]))
 	    || (i == board_size-1 && j == board_size-1
-		&& (has_inf(color, board_size-2, board_size-1, domain, lively)
-		    || has_inf(color, board_size-1, board_size-2, domain, lively))
+		&& (has_inf(color, POS(board_size-2, board_size-1), 
+			    domain, lively)
+		    || has_inf(color, POS(board_size-1, board_size-2), 
+			       domain, lively))
 		&& (BOARD(board_size-2, board_size-1) != other
 		    || !lively[board_size-2][board_size-1])
 		&& (BOARD(board_size-2, board_size-2) != other
@@ -428,13 +435,13 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 		&& (BOARD(board_size-1, board_size-2) != other
 		    || !lively[board_size-1][board_size-2])))
 	{
-	  domain[i][j] = 1;
+	  domain[POS(i, j)] = 1;
 	  found_one = 1;
 	} 
 	else 
 	  if (((i > 1 && j > 0 && j < board_size-1
-		&& has_inf(color, i-1, j, domain, lively))
-	       && ((j > 1 && has_inf(color, i-1, j-1, domain, lively)
+		&& has_inf(color, POS(i-1, j), domain, lively))
+	       && ((j > 1 && has_inf(color, POS(i-1, j-1), domain, lively)
 		    && (BOARD(i, j-1) != other
 			|| !lively[i][j-1]) /* 1st CAVEAT */
 		    && (j > board_size-2 
@@ -444,7 +451,7 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 			|| BOARD(i-1, j-2) != other 
 			|| !lively[i-1][j-2]))   /* 2nd CAVEAT */
 		   || (j < board_size-2
-		       && has_inf(color, i-1, j+1, domain, lively)
+		       && has_inf(color, POS(i-1, j+1), domain, lively)
 		       && (BOARD(i, j+1) != other || !lively[i][j+1])
 		       && (j > board_size-3
 			   || BOARD(i-1, j+2) != other
@@ -454,8 +461,8 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 			   || !lively[i-1][j-1]))))
 	      ||
 	      ((i < board_size-2 && j > 0 && j < board_size-1
-		&& has_inf(color, i+1, j, domain, lively))
-	       && ((j > 1 && has_inf(color, i+1, j-1, domain, lively)
+		&& has_inf(color, POS(i+1, j), domain, lively))
+	       && ((j > 1 && has_inf(color, POS(i+1, j-1), domain, lively)
 		    && (BOARD(i, j-1) != other || !lively[i][j-1])
 		    && (j > board_size-2 
 			|| BOARD(i+1, j+1) != other 
@@ -464,7 +471,7 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 			|| BOARD(i+1, j-2) != other 
 			|| !lively[i+1][j-2]))
 		   || (j < board_size-2
-		       && has_inf(color, i+1, j+1, domain, lively)
+		       && has_inf(color, POS(i+1, j+1), domain, lively)
 		       && (BOARD(i, j+1) != other || !lively[i][j+1])
 		       && (j > board_size-3
 			   || BOARD(i+1, j+2) != other
@@ -474,8 +481,8 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 			   || !lively[i+1][j-1]))))
 	      ||
 	      ((j > 1 && i > 0 && i < board_size-1
-		&& has_inf(color, i, j-1, domain, lively))
-	       && ((i > 1 && has_inf(color, i-1, j-1, domain, lively)
+		&& has_inf(color, POS(i, j-1), domain, lively))
+	       && ((i > 1 && has_inf(color, POS(i-1, j-1), domain, lively)
 		    && (BOARD(i-1, j) != other || !lively[i-1][j])
 		    && (i > board_size-2 
 			|| BOARD(i+1, j-1) != other 
@@ -484,7 +491,7 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 			|| BOARD(i-2, j-1) != other 
 			|| !lively[i-2][j-1]))
 		   || (i < board_size-2
-		       && has_inf(color, i+1, j-1, domain, lively)
+		       && has_inf(color, POS(i+1, j-1), domain, lively)
 		       && (BOARD(i+1, j) != other || !lively[i+1][j])
 		       && (i > board_size-3
 			   || BOARD(i+2, j-1) != other
@@ -494,8 +501,8 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 			   || !lively[i-1][j-1]))))
 	      ||
 	      ((j < board_size-2 && i > 0 && i < board_size-1
-		&& has_inf(color, i, j+1, domain, lively))
-	       && ((i > 1 && has_inf(color, i-1, j+1, domain, lively)
+		&& has_inf(color, POS(i, j+1), domain, lively))
+	       && ((i > 1 && has_inf(color, POS(i-1, j+1), domain, lively)
 		    && (BOARD(i-1, j) != other || !lively[i-1][j])
 		    && (i > board_size-2 
 			|| BOARD(i+1, j+1) != other 
@@ -504,7 +511,7 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 			|| BOARD(i-2, j+1) != other 
 			|| !lively[i-2][j+1]))
 		   || (i < board_size-2
-		       && has_inf(color, i+1, j+1, domain, lively)
+		       && has_inf(color, POS(i+1, j+1), domain, lively)
 		       && (BOARD(i+1, j) != other || !lively[i+1][j])
 		       && (j > board_size-3
 			   || BOARD(i+2, j+1) != other
@@ -513,7 +520,7 @@ compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
 			   || BOARD(i-1, j+1) != other
 			   || !lively[i-1][j+1])))))
 	  {
-	    domain[i][j] = 1;
+	    domain[POS(i, j)] = 1;
 	    found_one = 1;
 	  }
       }
@@ -587,10 +594,10 @@ is_lively(int owl_call, int i, int j)
 
 
 static int
-has_inf(int color, int i, int j, int domain[MAX_BOARD][MAX_BOARD],
+has_inf(int color, int pos, int domain[BOARDMAX],
 	int lively[MAX_BOARD][MAX_BOARD])
 {
-  return domain[i][j] || (BOARD(i, j) == color && lively[i][j]);
+  return domain[pos] || (board[pos] == color && lively[I(pos)][J(pos)]);
 }
 
 

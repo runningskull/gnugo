@@ -515,15 +515,15 @@ store_pattern_if_winner(struct invariant_hash *pre,
     if (compare_situations(&situation_table[winning_moves[k].index],
 			   &s) == 0) {
       /* This is a winner. Record the pattern. */
-      int i,j;
+      int i, j;
       for (i = 0; i < board_size; i++)
 	for (j = 0; j < board_size; j++) {
 	  if (BOARD(i, j) == EMPTY)
 	    winning_moves[k].pattern[i][j] = '.';
 	  else if (BOARD(i, j) == color)
 	    winning_moves[k].pattern[i][j] = 'O';
-	  else if ((color == WHITE && p[i][j] == BLACK)
-		   || (color == BLACK && p[i][j] == WHITE))
+	  else if ((color == WHITE && BOARD(i, j) == BLACK)
+		   || (color == BLACK && BOARD(i, j) == WHITE))
 	    winning_moves[k].pattern[i][j] = 'X';
 	  else { /* something is wrong */
 	    fprintf(stderr, "Error in store_pattern_if_winner: %d\n",k);
