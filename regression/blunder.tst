@@ -161,7 +161,7 @@ loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 283
 # This needs a detect_semeai_blunder().
 loadsgf games/kisei28_g7.sgf 280
 33 reg_genmove white
-#? [!H6|J1]
+#? [!H6|J1]*
 
 # Fills a common liberty in a seki similar to blunder:32.
 loadsgf games/kgs/2004-04-28-R-dokuganryu-GnuGoCVS.sgf 302

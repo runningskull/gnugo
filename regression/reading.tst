@@ -861,17 +861,17 @@ popgo
 
 loadsgf games/reading46.sgf
 203 attack H9
-#? [1 E9]
+#? [1 E9]*
 204 defend H9
 #? [1 (C6|E9|G9)]
 
 loadsgf games/reading47.sgf
 205 attack G2
-#? [0]
+#? [0]*
 
 loadsgf games/reading47.sgf
 206 attack B3
-#? [0]
+#? [0]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

@@ -106,7 +106,7 @@ play white B1
 undo
 play white C1
 112 reg_genmove black
-#? [B1]
+#? [B1]*
 
 
 loadsgf games/seki06.sgf

@@ -170,10 +170,10 @@ loadsgf games/kisei28_g7.sgf 189
 
 loadsgf games/semeai/semeai19.tst 42
 292 restricted_genmove black A15 F16 F17 S4 Q3
-#? [F16|F17]
+#? [F16|F17]*
 
 293 reg_genmove white
-#? [F17]
+#? [F17]*
 
 
 ############ End of Tests #################

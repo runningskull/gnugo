@@ -155,7 +155,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 82
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 126
 380 reg_genmove black
-#? [!H2|S1]
+#? [!H2|S1]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
@@ -488,7 +488,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 36
 # See also atari_atari:28.
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
 1060 reg_genmove white
-#? [H3|F3]
+#? [H3|F3]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 56

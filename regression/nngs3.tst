@@ -521,7 +521,7 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 194
 # We may want to add more moves as acceptable.
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 224
 1090 reg_genmove white
-#? [R7|N9|M8]*
+#? [R7|N9|M8]
 
 
 # Moved to filllib:41.

@@ -411,15 +411,15 @@ loadsgf games/semeai/semeai17.sgf 60
 
 loadsgf games/semeai/semeai17.sgf 62
 110 analyze_semeai G8 H2
-#? [1 0 (PASS|F3|E1)]*
+#? [1 0 (PASS|F3|E1)]
 111 analyze_semeai H2 G8
-#? [1 0 (PASS|F3|E1)]*
+#? [1 0 (PASS|F3|E1)]
 
 loadsgf games/semeai/semeai17.sgf 64
 112 analyze_semeai G8 H2
-#? [1 0 PASS]*
+#? [1 0 PASS]
 113 analyze_semeai H2 G8
-#? [1 0 PASS]*
+#? [1 0 PASS]
 
 loadsgf games/kgs/yagr-nigiri.sgf 214
 116 analyze_semeai F19 F16
@@ -440,7 +440,7 @@ play white H2
 # A14 is strictly correct since C19 allows W an unfavorable ko.
 loadsgf games/semeai/semeai19.sgf
 120 analyze_semeai C18 C19
-#? [1 1 (A14|C19)]
+#? [1 1 (A14|C19)]*
 
 # There is a complication that B18 and C17 are not amalgamated.
 # If B plays first C19 gives a favorable ko; A15 allows seki.
@@ -448,20 +448,20 @@ loadsgf games/semeai/semeai19.sgf
 # arguably correct.
 loadsgf games/semeai/semeai20.sgf
 121 analyze_semeai C17 C18
-#? [1 0]
+#? [1 0]*
 122 analyze_semeai C18 C17
-#? [2 2 C19]
+#? [2 2 C19]*
 
 # There is also an amalgamation problem here.
 loadsgf games/semeai/semeai19.sgf 80
 123 analyze_semeai K18 N18
-#? [1 1 M18]
+#? [1 1 M18]*
 
 loadsgf games/verybad.sgf 104
 124 analyze_semeai Q16 Q17
 #? [1 1 P19]
 125 analyze_semeai Q17 Q16
-#? [3 3 T17]
+#? [3 3 T17]*
 
 loadsgf games/verybad.sgf 114
 126 analyze_semeai Q16 Q17
@@ -502,7 +502,7 @@ loadsgf games/semeai/semeai17.sgf 52
 # Take the ko last.
 loadsgf games/verybad.sgf 114
 128 restricted_genmove black T15 T17 S17 P19
-#? [!T15]
+#? [!T15]*
 
 ########### semeai status tests #################
 

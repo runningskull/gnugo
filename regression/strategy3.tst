@@ -78,7 +78,7 @@ loadsgf games/poka.sgf 52
 # M4 and N5 are okay. O5 is a bad mistake.
 loadsgf games/incident278.sgf 212
 116 reg_genmove black
-#? [M4|N5]
+#? [M4|N5]*
 
 # incident 282
 loadsgf games/incident278.sgf 252

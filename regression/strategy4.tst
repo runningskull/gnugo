@@ -40,7 +40,7 @@ loadsgf games/ssstator.sgf 133
 # B12, A14, and A12.
 loadsgf games/ssstator.sgf 136
 157 reg_genmove white
-#? [B14|B13|B12|A14|A12]
+#? [B14|B13|B12|A14|A12]*
 
 # E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51

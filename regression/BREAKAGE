@@ -1,3 +1,49 @@
+========================== 3.7.2-pre1  ==================================
+
+./regress.sh . reading.tst 
+203 unexpected FAIL: Correct '1 E9', got '0'
+205 unexpected FAIL: Correct '0', got '1 J2'
+206 unexpected FAIL: Correct '0', got '2 A3'
+./regress.sh . ld_owl.tst 
+322 unexpected FAIL: Correct '1 (N11|N13|PASS)', got '2 N12'
+324 unexpected FAIL: Correct '1 N2', got '2 M4'
+./regress.sh . atari_atari.tst 
+28 unexpected FAIL: Correct '0', got 'R3'
+./regress.sh . connection.tst 
+115 unexpected FAIL: Correct '1 H7', got '0'
+./regress.sh . blunder.tst 
+33 unexpected FAIL: Correct '!H6|J1', got 'J1'
+./regress.sh . buzco.tst 
+4 unexpected PASS!
+./regress.sh . nngs.tst 
+380 unexpected FAIL: Correct '!H2|S1', got 'H2'
+1060 unexpected FAIL: Correct 'H3|F3', got 'T3'
+./regress.sh . strategy3.tst 
+116 unexpected FAIL: Correct 'M4|N5', got 'O7'
+./regress.sh . semeai.tst 
+110 unexpected PASS!
+111 unexpected PASS!
+112 unexpected PASS!
+113 unexpected PASS!
+120 unexpected FAIL: Correct '1 1 (A14|C19)', got '0 0 PASS'
+121 unexpected FAIL: Correct '1 0', got '0 0 PASS'
+122 unexpected FAIL: Correct '2 2 C19', got '1 1 A14'
+123 unexpected FAIL: Correct '1 1 M18', got '0 0 PASS'
+125 unexpected FAIL: Correct '3 3 T17', got '0 0 PASS'
+128 unexpected FAIL: Correct '!T15', got 'T15'
+./regress.sh . strategy4.tst 
+157 unexpected FAIL: Correct 'B14|B13|B12|A14|A12', got 'C18'
+./regress.sh . nngs3.tst 
+1090 unexpected PASS!
+./regress.sh . strategy5.tst 
+292 unexpected FAIL: Correct 'F16|F17', got 'S4'
+293 unexpected FAIL: Correct 'F17', got 'L9'
+./regress.sh . gunnar.tst 
+55 unexpected PASS!
+56 unexpected PASS!
+./regress.sh . seki.tst 
+112 unexpected FAIL: Correct 'B1', got 'C9'
+
 ========================== 3.7.1-pre2  ==================================
 
 ./regress.sh . reading.tst 
