@@ -12,7 +12,7 @@
   territorial evaluation at places where an intrusion is possible
 - stop using worm data at stackp==0 in does_attack() and does_defend()
 - concerns_noncritical_dragon() revised
-- BOARD_MIN reduced to 2
+- MIN_BOARD reduced to 1
 - free memory allocated in a failed read of an sgf file
 - extract_fuseki revisions: statistics on outcomes,
   popularity cutoffs based on unique players added to command line

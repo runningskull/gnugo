@@ -746,7 +746,7 @@ should_resign(int color, float our_score, int move)
    * it looks like all our dragons are dead and the generated move
    * is a pass.
    */
-  if (move == PASS_MOVE && !lively_dragon_exists(color))
+  if (board_size > 2 && move == PASS_MOVE && !lively_dragon_exists(color))
     return 1;
   
   if (move == PASS_MOVE
