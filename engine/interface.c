@@ -59,6 +59,10 @@ gnugo_clear_board(int boardsize)
   gg_assert(MIN_BOARD <= boardsize && boardsize <= MAX_BOARD);
   board_size = boardsize;
   clear_board();
+#if 0
+  if (metamachine && oracle_exists)
+    oracle_clear_board(boardsize);
+#endif
 }
 
 /* Set the komi */
@@ -98,7 +102,14 @@ gnugo_is_pass(int i, int j)
 void
 gnugo_play_move(int i, int j, int color)
 {
+#if ORACLE
+  if (oracle_exists)
+    oracle_play_move(POS(i, j), color);
+  else
+    play_move(POS(i, j), color);
+#else
   play_move(POS(i, j), color);
+#endif
   clock_push_button(color);
 }
 
@@ -338,7 +349,7 @@ gnugo_examine_position(int color, int how_much)
 
 /* Report the komi. */
 
-int 
+float
 gnugo_get_komi()
 {
   return komi;

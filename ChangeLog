@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new oracle.c and oracle.db
+- oracle is a second gnugo process communicating with the gtp by unix pipes
+- experimental alternative move generation --metamachine using oracle
+- demonstration pattern database using oracle
+- bugfix: gnugo_get_komi() returns float as it should
 - ..goal_list macros converted to functions in owl.c
 - bugfix in owl_determine_life()
 - new functions min_eye_threat() and max_eye_threat() in optics.c

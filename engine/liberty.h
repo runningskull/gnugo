@@ -513,6 +513,8 @@ void owl_analyze_semeai(int apos, int bpos,
 void set_search_diamond(int pos);
 void reset_search_mask(void);
 void set_search_limit(int pos, int value);
+int oracle_play_move(int pos, int color);
+void oracle_clear_board(int boardsize);
 void consult_oracle(int color);
 void summon_oracle(void);
 void oracle_loadsgf(char *infilename, char *untilstring);

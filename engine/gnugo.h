@@ -161,10 +161,10 @@ void  gnugo_who_wins(int color, FILE *outfile);
 float gnugo_estimate_score(float *upper, float *lower);
 void  gnugo_examine_position(int color, int how_much);
 
-int  gnugo_get_komi(void);
-void gnugo_get_board(int b[MAX_BOARD][MAX_BOARD]);
-int  gnugo_get_boardsize(void);
-int  gnugo_get_move_number(void);
+float gnugo_get_komi(void);
+void  gnugo_get_board(int b[MAX_BOARD][MAX_BOARD]);
+int   gnugo_get_boardsize(void);
+int   gnugo_get_move_number(void);
 
 /* ================================================================ */
 /*                           Game handling                          */
@@ -317,8 +317,9 @@ extern float potential_moves[MAX_BOARD][MAX_BOARD];
 
 extern volatile int time_to_die;   /* set by signal handlers */
 
-extern int limit_search; /* limit move search to a portion of the board */
-extern int metamachine;  /* use metamachine_genmove                     */
+extern int limit_search;  /* limit move search to a portion of the board */
+extern int oracle_exists; /* oracle is available for consultation        */
+extern int metamachine;   /* use metamachine_genmove                     */
 
 /* ================================================================ */
 /*                 tracing and debugging functions                  */
