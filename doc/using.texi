@@ -235,6 +235,13 @@ position with a grid by entering @command{: showboard RET}.
 This will enter the GTP @command{showboard} command to
 draw an ascii map of the board, which includes a grid.
 
+The file @file{gnugo.el} is under active development.
+A more recent version may work better or have more
+features. The version distributed with GNU Go 3.6
+corresponds to @file{gnugo.el-2.2.8} at
+@url{http://www.glug.org/people/ttn/software/ttn-pers-elisp/standalone/}.
+You can look there or in the GNU Go CVS for a more current version.
+
 @itemize @bullet
 @item
 @quotation
@@ -255,8 +262,7 @@ Resign.
 @end quotation
 @samp{u}             
 @quotation
-Undo one move. If you undo an odd number of moves, you
-switch colors with your computer opponent.
+Undo one two moves. (Yours and your opponents.)
 @end quotation
 @samp{U}          
 @quotation
