@@ -675,9 +675,9 @@ find_influence_patterns(struct influence_data *q, int color)
 {
   int m, n;
 
-  global_matchpat(influence_callback, ANCHOR_COLOR, &influencepat_db, q, NULL);
+  matchpat(influence_callback, ANCHOR_COLOR, &influencepat_db, q, NULL);
   if (color != EMPTY)
-    global_matchpat(influence_callback, color, &barrierspat_db, q, NULL);
+    matchpat(influence_callback, color, &barrierspat_db, q, NULL);
 
   /* When color == EMPTY, we introduce a weaker kind of barriers
    * manually instead of searching for patterns.

@@ -254,20 +254,20 @@ modify_eye_callback(int m, int n, int color, struct pattern *pattern,
 void
 find_cuts(void)
 {
-  global_matchpat(cut_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
+  matchpat(cut_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
 }
 
 /* Find explicit connection patterns and amalgamate the involved dragons. */
 void
 find_connections(void)
 {
-  global_matchpat(conn_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
+  matchpat(conn_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
 }
 
 void
 modify_eye_spaces(void)
 {
-  global_matchpat(modify_eye_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
+  matchpat(modify_eye_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
 }
 
 

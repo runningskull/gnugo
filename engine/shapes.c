@@ -445,13 +445,13 @@ shapes(int color)
   TRACE("\nPattern matcher is looking for move reasons for %s!\n",
 	color_to_string(color));
 
-  global_matchpat(shapes_callback, color, &pat_db, NULL, NULL);
+  matchpat(shapes_callback, color, &pat_db, NULL, NULL);
 
   if (josekidb)
-    global_matchpat(shapes_callback, color, &joseki_db, NULL, NULL);
+    matchpat(shapes_callback, color, &joseki_db, NULL, NULL);
 
   if (!disable_fuseki)
-    global_matchpat(shapes_callback, color, &fusekipat_db, NULL, NULL);
+    matchpat(shapes_callback, color, &fusekipat_db, NULL, NULL);
 }
 
 
@@ -464,7 +464,7 @@ endgame_shapes(int color)
   TRACE("\nEndgame pattern matcher is looking for move reasons for %s!\n",
 	color_to_string(color));
 
-  global_matchpat(shapes_callback, color, &endpat_db, NULL, NULL);
+  matchpat(shapes_callback, color, &endpat_db, NULL, NULL);
 }
 
 

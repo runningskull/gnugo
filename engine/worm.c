@@ -1751,7 +1751,7 @@ cavity_recurse(int pos, int mx[BOARDMAX],
 static void
 find_attack_patterns(void)
 {
-  global_matchpat(attack_callback, ANCHOR_OTHER, &attpat_db, NULL, NULL);
+  matchpat(attack_callback, ANCHOR_OTHER, &attpat_db, NULL, NULL);
 }
 
 /* Try to attack every X string in the pattern, whether there is an attack
@@ -1850,7 +1850,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
 static void
 find_defense_patterns(void)
 {
-  global_matchpat(defense_callback, ANCHOR_COLOR, &defpat_db, NULL, NULL);
+  matchpat(defense_callback, ANCHOR_COLOR, &defpat_db, NULL, NULL);
 }
 
 static void

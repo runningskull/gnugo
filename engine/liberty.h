@@ -208,9 +208,9 @@ typedef void (*matchpat_callback_fn_ptr)(int m, int n, int color,
 typedef void (*fullboard_matchpat_callback_fn_ptr)(int ti, int tj,
                                                    struct fullboard_pattern *,
                                                    int rotation);
-void global_matchpat(matchpat_callback_fn_ptr callback, int color,
-		     struct pattern_db *pdb, void *callback_data,
-		     char goal[BOARDMAX]);
+void matchpat(matchpat_callback_fn_ptr callback, int color,
+	      struct pattern_db *pdb, void *callback_data,
+	      char goal[BOARDMAX]);
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
 

@@ -931,8 +931,8 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
     matches_found = 0;
     memset(found_matches, 0, sizeof(found_matches));
     if (level >= 9)
-      global_matchpat(owl_shapes_callback, other, 
-		      &owl_vital_apat_db, vital_moves, owl->goal);
+      matchpat(owl_shapes_callback, other, 
+	       &owl_vital_apat_db, vital_moves, owl->goal);
     
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
@@ -1523,7 +1523,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     matches_found = 0;
     memset(found_matches, 0, sizeof(found_matches));
     if (level >= 9) 
-      global_matchpat(owl_shapes_callback, other, 
+      matchpat(owl_shapes_callback, other, 
 		      &owl_vital_apat_db, shape_moves, owl->goal);
 
     DEBUG(DEBUG_EYES, "owl: true_genus=%d matches_found=%d\n",
@@ -2146,7 +2146,7 @@ owl_shapes(struct owl_move_data moves[MAX_MOVES], int color,
    * pattern matching. The cache is used by owl_shapes_callback().
    */
   memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
-  global_matchpat(owl_shapes_callback, color, type, moves, owl->goal);
+  matchpat(owl_shapes_callback, color, type, moves, owl->goal);
 
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;

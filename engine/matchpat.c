@@ -1020,7 +1020,7 @@ typedef void (*prepare_fn_ptr_t)(int color);
  */
 
 void
-global_matchpat(matchpat_callback_fn_ptr callback, int color,
+matchpat(matchpat_callback_fn_ptr callback, int color,
 	 struct pattern_db *pdb, void *callback_data,
 	 char goal[BOARDMAX]) 
 {
