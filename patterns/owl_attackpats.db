@@ -1114,10 +1114,11 @@ YO
 
 Pattern A235
 # db new pattern (3.3.6)
+# gf Revised pattern. (3.5.7)
 
 ?XXO?         prevent the hane
 ?Y.*.
-.....
+..x..
 -----
 
 :8,-,value(77)
@@ -4917,6 +4918,25 @@ xx.O?
 -----
 
 :8,-,value(30)
+
+
+Pattern A1138
+# gf New pattern. (3.5.7)
+
+.OXx        
+*XOX
+o..O
+??O?
+
+:8,-,value(60)
+
+.dXx
+*XOX
+oabc
+??O?
+
+;oplay_attack(b,d) && oplay_attack(*,a,a)
+;&& oplay_attack(*,b,?,a,a) && !oplay_attack(*,b,c)
 
 
 #########################################################
