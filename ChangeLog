@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- temporary workaround for a bug in do_corner_matchpat()
 - spread_connection_distances() now delays expensive constraint evaluation,
   storing pending evaluation on a heap
 - new function signed_mark_string()

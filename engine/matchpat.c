@@ -1262,6 +1262,10 @@ static int num_stones[2*BOARDMAX];
  */
 static int pattern_stones[BOARDMAX];
 
+#define TEMPORARY_WORKAROUND 1
+#if TEMPORARY_WORKAROUND
+static int reorder[8] = {7, 4, 5, 6, 1, 2, 3, 0};
+#endif
 
 /* Recursively performs corner matching. This function checks whether
  * `num_variation' variations pointed by `variation' parameter match.
@@ -1288,7 +1292,12 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
 	/* We have found a matching pattern. */
 	ASSERT1(board[move] == EMPTY, move);
 
+#if TEMPORARY_WORKAROUND
+	callback(move, callback_color, pattern, reorder[trans],
+		 pattern_stones, stones);
+#else
 	callback(move, callback_color, pattern, trans, pattern_stones, stones);
+#endif
 	continue;
       }
     }
