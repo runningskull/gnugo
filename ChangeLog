@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function init_owl() in owl.c
 - re-order conditions in revise_semeai to insure valid DRAGON2 data
 - organize include file order to facilitate pre-compiled headers.
 - use location_to_string in replay_node()
