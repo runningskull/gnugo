@@ -99,4 +99,4 @@ loadsgf games/nngs/gnugo-3.3.16-ccwills-200303030550.sgf
 
 loadsgf games/atari_atari07.sgf
 23 combination_attack black
-#? [C8]
+#? [C8]*

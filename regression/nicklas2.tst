@@ -62,7 +62,7 @@ loadsgf games/nicklas/nicklas9.sgf 28
 #? [critical]*
 
 903 dragon_status G7
-#? [critical (H8|F9) H8]*
+#? [critical (H8|F9) H8]
 
 # E1 loses some endgame points since black must capture later anyhow, 
 # but it saves the group. It could be regarded as acceptable at this 

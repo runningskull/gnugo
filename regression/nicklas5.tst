@@ -45,14 +45,14 @@ loadsgf games/nicklas/nicklas12.sgf 89
 # W L8 is alive in semeai. /ab
 loadsgf games/nicklas/nicklas12.sgf 182
 1211 dragon_status L8
-#? [alive]
+#? [alive]*
 
 # This is presumably a semeai problem.
 # As W L8 is alive in semeai with sufficiently many liberties ahead of
 # B G13, I do not think the black P13 dragon can make eyes. /ab
 loadsgf games/nicklas/nicklas12.sgf 199
 1212 dragon_status P13
-#? [dead]
+#? [dead]*
 
 loadsgf games/nicklas/nicklas12.sgf 263
 1217 gg_genmove black

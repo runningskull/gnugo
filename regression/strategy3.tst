@@ -197,7 +197,7 @@ loadsgf games/owl26.sgf 138
 
 loadsgf games/strategy34.sgf 51
 141 gg_genmove black
-#? [C7]
+#? [C7]*
 
 loadsgf games/strategy34.sgf 57
 142 gg_genmove black

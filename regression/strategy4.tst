@@ -26,7 +26,7 @@ loadsgf games/strategy37.sgf
 # Incident 190.
 loadsgf games/incident189.sgf 186
 155 gg_genmove black
-#? [D18]
+#? [D18]*
 
 loadsgf games/ssstator.sgf 133
 156 gg_genmove black
@@ -216,7 +216,7 @@ loadsgf games/pooo.sgf 52
 
 loadsgf games/pooo.sgf 56
 191 gg_genmove black
-#? [C12]*
+#? [C12]
 
 loadsgf games/pooo.sgf 74
 192 gg_genmove black
@@ -258,7 +258,7 @@ loadsgf games/bretz.sgf 164
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7|S18]
+#? [P6|P7|Q7|S18]*
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black

@@ -179,33 +179,33 @@ loadsgf golois/Goemate990902-1.sgf
 #? [ALIVE DEAD S9]
 
 28 owl_analyze_semeai R7 Q7
-#? [ALIVE DEAD S9]*
+#? [ALIVE DEAD S9]
 
 loadsgf games/strategy11.sgf 127
 30 owl_analyze_semeai B3 G4
-#? [ALIVE DEAD C1]*
+#? [ALIVE DEAD C1]
 
 loadsgf games/strategy11.sgf 127
 31 owl_analyze_semeai G4 B3
-#? [ALIVE DEAD C1]*
+#? [ALIVE DEAD C1]
 
 loadsgf games/nicklas/nicklas14.sgf 55
 32 owl_analyze_semeai B8 D9
-#? [ALIVE ALIVE B6]
+#? [ALIVE ALIVE B6]*
 
 loadsgf games/nicklas/nicklas14.sgf 55
 33 owl_analyze_semeai D9 B8
-#? [ALIVE DEAD B7]*
+#? [ALIVE DEAD B7]
 
 # S18 produces a favorable ko. T18 makes seki.
 loadsgf games/bretz.sgf 130
 34 owl_analyze_semeai N18 Q18
-#? [ALIVE DEAD S18]*
+#? [ALIVE DEAD S18]
 
 # ab added (3.1.22)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 35 owl_analyze_semeai M13 M11
-#? [ALIVE DEAD (PASS|N13|N10|H11)]*
+#? [ALIVE DEAD (PASS|N13|N10|H11)]
 
 # See also reading:166
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
@@ -218,31 +218,31 @@ loadsgf games/semeai/semeai10.sgf
 
 loadsgf games/semeai/semeai11.sgf
 38 owl_analyze_semeai B9 B8
-#? [ALIVE DEAD (PASS|B1|A9)]*
+#? [ALIVE DEAD (PASS|B1|A9)]
 
 # See also global:3.
 loadsgf golois/Aya991113-13.sgf
 # Correct answer is ko dependent (2 2 H4).
 39 owl_analyze_semeai R12 H9
-#? [!ALIVE DEAD J4]*
+#? [!ALIVE DEAD J4]
 
 40 owl_analyze_semeai H9 R12
-#? [ALIVE DEAD (J4|H4)]*
+#? [ALIVE DEAD (J4|H4)]
 
 loadsgf games/semeai/semeai9.sgf
 41 owl_analyze_semeai A3 A5
-#? [ALIVE DEAD (PASS|B3|A6|B6|C5|D4|E3|E2|E1)]*
+#? [ALIVE DEAD (PASS|B3|A6|B6|C5|D4|E3|E2|E1)]
 42 owl_analyze_semeai A5 A3
-#? [DEAD ALIVE PASS]*
+#? [DEAD ALIVE PASS]
 43 owl_analyze_semeai A16 A12
-#? [ALIVE DEAD (A15|A11|B11|C14|C13|D12|D11|D10|D9|B9|A9)]*
+#? [ALIVE DEAD (A15|A11|B11|C14|C13|D12|D11|D10|D9|B9|A9)]
 44 owl_analyze_semeai A12 A16
 #? [ALIVE DEAD (A17|B17|C16|D16|E15|E14|F13|F12|F11|F10|F9|F8|B9|A9)]
 
 # The opposite semeai is not very interesting (black clearly can kill white).
 loadsgf games/nngs/jypower-gnugo-3.3.17-200304150031.sgf 166
 50 owl_analyze_semeai O7 L7
-#? [ALIVE DEAD (J5|J6|K7|J4|G5|G6|H7)]
+#? [ALIVE DEAD (J5|J6|K7|J4|G5|G6|H7)]*
 
 
 ########### end of semeai tests #################

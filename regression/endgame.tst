@@ -172,11 +172,11 @@ loadsgf games/paul.sgf 205
 
 loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 110
 840 gg_genmove white
-#? [L15]
+#? [L15]*
 
 loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 140
 850 restricted_genmove white K4 J4 L4 P5
-#? [K4|J4|L4]
+#? [K4|J4|L4]*
 
 ############ End of Tests #################
 

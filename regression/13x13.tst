@@ -139,7 +139,7 @@ loadsgf games/mertin13x13/katsunari-gnugo3.B+14.sgf 34
 
 loadsgf games/mertin13x13/katsunari-gnugo3.B+14.sgf 64
 25 gg_genmove white
-#? [J5]*
+#? [J5]
 
 loadsgf games/mertin13x13/katsunari-gnugo3.B+14.sgf 66
 26 gg_genmove white
@@ -284,7 +284,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 53 gg_genmove black
-#? [C6]
+#? [C6]*
 
 #CATEGORY=SEMEAI
 # This is very difficult. There are some variations in the .sgf-file,

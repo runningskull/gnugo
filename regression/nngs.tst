@@ -155,7 +155,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 82
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 126
 380 gg_genmove black
-#? [!H2|S1]
+#? [!H2|S1]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
@@ -339,7 +339,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 241
 #J11 is terrible.
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 257
 820 gg_genmove white
-#? [J13|L9]
+#? [J13|L9]*
 
 
 

@@ -743,7 +743,7 @@ loadsgf games/nngs/halti-gnugo-3.3.17-200303162357.sgf 228
 179 attack P1
 #? [1 Q1]
 180 defend P1
-#? [2 Q3]*
+#? [2 Q3]
 
 # See also trevora:480. F5 doesn't work.
 loadsgf games/trevor/auto/a031.sgf 40

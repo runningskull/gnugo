@@ -12,7 +12,7 @@ loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 42
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 48
 40 gg_genmove black
-#? [!D2]
+#? [!D2]*
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 62
 50 gg_genmove black
@@ -128,7 +128,7 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 76
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 78
 370 gg_genmove black
-#? [R5]*
+#? [R5]
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200302072106.sgf 4
 380 gg_genmove black
@@ -144,7 +144,7 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 164
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 200
 500 gg_genmove black
-#? [A8|A6|A9]*
+#? [A8|A6|A9]
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 208
 510 gg_genmove black
