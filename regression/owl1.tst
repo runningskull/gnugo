@@ -221,6 +221,10 @@ loadsgf games/splee2.sgf 128
 314 owl_does_attack Q9 M10
 #? [0]
 
+loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 136
+316 owl_defend L7
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
