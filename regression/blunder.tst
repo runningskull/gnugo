@@ -143,3 +143,7 @@ loadsgf games/blunder22.sgf 5
 29 gg_genmove white
 #? [!(C1|B3)]
 
+loadsgf games/blunder23.sgf
+30 gg_genmove black
+#? [!O7]
+
