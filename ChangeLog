@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in do_owl_defend()
+
 3.3.3 released June 19, 2002
 
 - segment_regions also computes territorial value of regions if available

@@ -1972,6 +1972,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       int mpos;
       int new_komaster, new_kom_pos;
       int ko_move = -1;
+      int new_escape;
       
       /* Consider only the highest scoring move if we're deeper than
        * owl_branch_depth.
@@ -2004,8 +2005,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 			    &ko_move, savecode == 0))
 	continue;
 
+      new_escape = escape;
       if (moves[k].escape)
-	escape++;
+	new_escape++;
 
       TRACE("Trying %C %1m.  Current stack: ", color, mpos);
       if (verbose)
@@ -2024,7 +2026,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 
       if (!ko_move) {
 	acode = do_owl_attack(str, NULL, owl, new_komaster, 
-			      new_kom_pos, escape);
+			      new_kom_pos, new_escape);
 	if (!acode) {
 	  pop_owl(&owl);
 	  popgo();
@@ -2041,7 +2043,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       }
       else {
 	if (do_owl_attack(str, NULL, owl, 
-			  new_komaster, new_kom_pos, escape) != WIN) {
+			  new_komaster, new_kom_pos, new_escape) != WIN) {
 	  savemove = mpos;
 	  savecode = KO_B;
 	}
