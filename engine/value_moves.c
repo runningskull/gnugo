@@ -2424,6 +2424,10 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 
   shape_factor = compute_shape_factor(pos);
 
+  /* Avoid rounding anomalies from the territorial valuation. */
+  if (tot_value < 0.001 && tot_value > -0.001)
+    tot_value = 0.0;
+  
   if (tot_value > 0.0) {
     int c;
     float followup_value;

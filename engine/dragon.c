@@ -1981,10 +1981,10 @@ compute_surrounding_moyo_sizes(const struct influence_data *q)
 	for (k = 0; k < number_close_white_worms[pos]; k++) {
 	  int w = close_white_worms[pos][k];
 	  int dr = dragon[w].origin;
+	  int n = gg_min(number_close_white_worms[pos], 5);
 	  
-	  moyo_sizes[dr] += 1.0 / number_close_white_worms[pos];
-	  moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
-			      / number_close_white_worms[pos]);
+	  moyo_sizes[dr] += 1.0 / n;
+	  moyo_values[dr] += gg_min(territory_value[pos], 1.0) / n;
 	}
       }
       
@@ -1992,16 +1992,22 @@ compute_surrounding_moyo_sizes(const struct influence_data *q)
 	for (k = 0; k < number_close_black_worms[pos]; k++) {
 	  int w = close_black_worms[pos][k];
 	  int dr = dragon[w].origin;
+	  int n = gg_min(number_close_black_worms[pos], 5);
 	  
-	  moyo_sizes[dr] += 1.0 / number_close_black_worms[pos];
-	  moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
-			      / number_close_black_worms[pos]);
+	  moyo_sizes[dr] += 1.0 / n;
+	  moyo_values[dr] += gg_min(territory_value[pos], 1.0) / n;
 	}
       }
     }
 
     for (d = 0; d < number_of_dragons; d++) {
-      int this_moyo_size = (int) moyo_sizes[dragon2[d].origin];
+      /* Limiting the number of close worms to at most 5 above (more
+       * is in practice probably very rare) causes the moyo sizes to
+       * become multiples of 1/60. In order to avoid problems with
+       * varying (between platforms) floating point rounding
+       * characteristics, we add 0.01 before converting to int.
+       */
+      int this_moyo_size = (int) (0.01 + moyo_sizes[dragon2[d].origin]);
       float this_moyo_value = moyo_values[dragon2[d].origin];
       
       if (this_moyo_size < dragon2[d].moyo_size) {
