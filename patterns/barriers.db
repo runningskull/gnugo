@@ -3371,4 +3371,22 @@ eab
 >non_oterritory(e);
 
 
+Pattern Nonterritory55
+# gf New pattern. (3.5.4)
+
+?.X.
+O...
+----
+
+:8,t
+
+?dX.
+Ocab
+----
+
+;!oplay_attack(a,b,c,a) && !oplay_attack(a,d,c,a)
+
+>non_xterritory(b);
+
+
 # END OF FILE

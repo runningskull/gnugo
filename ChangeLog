@@ -8,6 +8,8 @@
 - defend4() and special_rescue_moves() revised
 - avoid ko captures when filling outer liberties in semeai reading
 - adjust breakin_depth in modify_depth_values()
+- atari_atari tuning
+- influence tuning
 - owl tuning
 - new game records and test cases
 

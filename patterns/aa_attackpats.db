@@ -409,4 +409,20 @@ BAC
 ; lib(A) == 1 && lib(B) + lib(C) <= 6 && !oplay_defend_both(*,B,C)
 
 
+Pattern A25
+# gf New pattern. (3.5.4)
+
+..X
+*OX
+.XO
+
+:8,-
+
+..A
+*OA
+.BO
+
+;lib(A)<=3 && lib(B)<=3 && (oplay_attack(*,A) || oplay_attack(*,B))
+
+
 # END OF FILE
