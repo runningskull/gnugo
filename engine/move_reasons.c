@@ -646,9 +646,9 @@ one_of_both_attackable(int pos, int what)
 void
 add_attack_move(int pos, int ww, int code)
 {
+  ASSERT_ON_BOARD1(ww);
   ww = worm[ww].origin;
 
-  ASSERT_ON_BOARD1(ww);
   if (code == WIN)
     add_move_reason(pos, ATTACK_MOVE, ww);
   else if (code == KO_A)
@@ -664,9 +664,9 @@ add_attack_move(int pos, int ww, int code)
 void
 add_defense_move(int pos, int ww, int code)
 {
+  ASSERT_ON_BOARD1(ww);
   ww = worm[ww].origin;
 
-  ASSERT_ON_BOARD1(ww);
   if (code == WIN)
     add_move_reason(pos, DEFEND_MOVE, ww);
   else if (code == KO_A)

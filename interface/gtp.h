@@ -38,6 +38,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <stdarg.h>
+#include <stdio.h>
 
 /* Maximum allowed line length in GTP. */
 #define GTP_BUFSIZE 1000

@@ -1926,8 +1926,6 @@ estimate_strategical_value(int pos, int color, float score)
   int l;
   int aa = NO_MOVE;
   int bb = NO_MOVE;
-  int a_id;
-  int b_id;
   float aa_value = 0.0;
   float bb_value = 0.0;
   
@@ -1935,11 +1933,10 @@ estimate_strategical_value(int pos, int color, float score)
   float tot_value = 0.0;
 
   /* Strategical value of connecting or cutting dragons. */
-  float *dragon_value = malloc(sizeof(float) * number_of_dragons);
-  gg_assert(dragon_value);
+  float dragon_value[BOARDMAX];
 
-  for (k = 0; k < number_of_dragons; k++)
-    dragon_value[k] = 0.0;
+  for (aa = BOARDMIN; aa < BOARDMAX; aa++)
+    dragon_value[aa] = 0.0;
   
   for (k = 0; k < MAX_REASONS; k++) {
     int r = move[pos].reason[k];
@@ -1998,7 +1995,6 @@ estimate_strategical_value(int pos, int color, float score)
 	for (l = 0; l < next_lunch; l++)
 	  if (lunch_worm[l] == aa) {
 	    bb = lunch_dragon[l];
-	    b_id = dragon[bb].id;
 
 	    /* FIXME: This value cannot be computed without some measurement
 	     * of how the actual move affects the dragon.  The dragon safety
@@ -2038,11 +2034,11 @@ estimate_strategical_value(int pos, int color, float score)
 		    || DRAGON2(bb).safety == INVINCIBLE))
 	      this_value = 0.0;
 	    
-	    if (this_value > dragon_value[b_id]) {
+	    if (this_value > dragon_value[bb]) {
 	      DEBUG(DEBUG_MOVE_REASONS,
 		    "  %1m:   %f - %1m attacked/defended\n",
 		    pos, this_value, bb);
-	      dragon_value[b_id] = this_value;
+	      dragon_value[bb] = this_value;
 	    }
 	  }
 
@@ -2140,8 +2136,8 @@ estimate_strategical_value(int pos, int color, float score)
 	    else
 	      this_value = 1.7 * dragon[cc].effective_size;
 	    
-	    if (this_value > dragon_value[dragon[cc].id]) {
-	      dragon_value[dragon[cc].id] = this_value;
+	    if (this_value > dragon_value[dragon[cc].origin]) {
+	      dragon_value[dragon[cc].origin] = this_value;
 	      DEBUG(DEBUG_MOVE_REASONS,
 		    "  %1m:   %f - connect %1m and %1m to attack thrashing dragon %1m\n",
 		    pos, this_value, aa, bb, cc);
@@ -2162,17 +2158,14 @@ estimate_strategical_value(int pos, int color, float score)
 	if (aa == bb)
 	  continue;
 
-	a_id = dragon[aa].id;
-	b_id = dragon[bb].id;
-	
 	/* If we are ahead by more than 20, value connections more strongly */
 	if ((color == WHITE && score > 20.0)
 	    || (color == BLACK && score < -20.0))
 	  this_value = connection_value(aa, bb, pos, gg_abs(score));
 	else
 	  this_value = connection_value(aa, bb, pos, 0);
-	if (this_value > dragon_value[a_id]) {
-	  dragon_value[a_id] = this_value;
+	if (this_value > dragon_value[aa]) {
+	  dragon_value[aa] = this_value;
           DEBUG(DEBUG_MOVE_REASONS,
 		"  %1m:   %f - %1m cut/connect strategic value\n",
 		pos, this_value, aa);
@@ -2184,8 +2177,8 @@ estimate_strategical_value(int pos, int color, float score)
 	  this_value = connection_value(bb, aa, pos, gg_abs(score));
 	else
 	  this_value = connection_value(bb, aa, pos, 0);
-	if (this_value > dragon_value[b_id]) {
-	  dragon_value[b_id] = this_value;
+	if (this_value > dragon_value[bb]) {
+	  dragon_value[bb] = this_value;
           DEBUG(DEBUG_MOVE_REASONS,
 		"  %1m:   %f - %1m cut/connect strategic value\n",
 		pos, this_value, bb);
@@ -2258,7 +2251,6 @@ estimate_strategical_value(int pos, int color, float score)
 	 * FIXME: Improve the implementation.
 	 */
 	aa = move_reasons[r].what;
-	a_id = dragon[aa].id;
 
 	/* FIXME: This value cannot be computed without some
 	 * measurement of how the actual move affects the dragon. The
@@ -2293,8 +2285,8 @@ estimate_strategical_value(int pos, int color, float score)
 	  }
 	}
 		
-	if (this_value > dragon_value[a_id]) {
-	  dragon_value[a_id] = this_value;
+	if (this_value > dragon_value[aa]) {
+	  dragon_value[aa] = this_value;
           DEBUG(DEBUG_MOVE_REASONS,
 		"  %1m:   %f - %1m strategic attack/defend\n",
 		pos, this_value, aa);
@@ -2304,7 +2296,6 @@ estimate_strategical_value(int pos, int color, float score)
 
       case UNCERTAIN_OWL_DEFENSE:
 	aa = move_reasons[r].what;
-	a_id = dragon[aa].id;
 	
 	/* If there is an adjacent dragon which is critical we should
 	 * skip this type of move reason, since attacking or defending
@@ -2330,8 +2321,8 @@ estimate_strategical_value(int pos, int color, float score)
 	else 
 	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(0.65*score));
 	
-	if (this_value > dragon_value[a_id]) {
-	  dragon_value[a_id] = this_value;
+	if (this_value > dragon_value[aa]) {
+	  dragon_value[aa] = this_value;
 	  DEBUG(DEBUG_MOVE_REASONS,
 		"  %1m:   %f - %1m uncertain owl defense bonus\n",
 		pos, this_value, aa);
@@ -2341,11 +2332,11 @@ estimate_strategical_value(int pos, int color, float score)
     }
   }
   
-  for (k = 0; k < number_of_dragons; k++) {
-    if (dragon_value[k] == 0.0)
+  for (aa = BOARDMIN; aa < BOARDMAX; aa++) {
+    if (dragon_value[aa] == 0.0)
       continue;
 
-    aa = dragon2[k].origin;
+    ASSERT1(dragon[aa].origin == aa, aa);
 
     /* If this dragon is critical but not attacked/defended by this
      * move, we ignore the strategic effect.
@@ -2367,7 +2358,7 @@ estimate_strategical_value(int pos, int color, float score)
 	&& (attack_move_reason_known(pos, aa)
 	    || defense_move_reason_known(pos, aa))) {
       TRACE("  %1m:   %f - %1m strategic value already counted - A.\n",
-	    pos, dragon_value[k], aa);
+	    pos, dragon_value[aa], aa);
       continue;
     }
     /* If the dragon has been owl captured, owl defended, or involved
@@ -2381,7 +2372,7 @@ estimate_strategical_value(int pos, int color, float score)
        * value (e.g. because connecting to strong dragon) we award the
        * excess value as a bonus.
        */
-      float excess_value = (dragon_value[k] - 
+      float excess_value = (dragon_value[aa] - 
 			    2 * dragon[aa].effective_size);
       if (excess_value > 0.0) {
 	TRACE("  %1m: %f - strategic bonus for %1m\n", pos, excess_value, aa);
@@ -2389,19 +2380,17 @@ estimate_strategical_value(int pos, int color, float score)
       }
       else {
 	TRACE("  %1m:   %f - %1m strategic value already counted - B.\n",
-	      pos, dragon_value[k], aa);
+	      pos, dragon_value[aa], aa);
       }
       
       continue;
     }
 
     TRACE("  %1m: %f - strategic effect on %1m\n",
-	  pos, dragon_value[k], aa);
-    tot_value += dragon_value[k];
+	  pos, dragon_value[aa], aa);
+    tot_value += dragon_value[aa];
   }
 
-  free(dragon_value);
-  
   /* Finally, subtract penalty for invasion type moves. */
   this_value = strategic_penalty(pos, color);
   if (this_value > 0.0) {

@@ -20,6 +20,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <stdio.h>
+#include "hash.h"
 
 /*
  * This file, together with engine/hash.c implements hashing of go positions

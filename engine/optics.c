@@ -424,7 +424,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
     }
   }
   
-  if (1 && (debug & DEBUG_EYES)) {
+  if (0 && (debug & DEBUG_EYES)) {
     start_draw_board();
     for (i = 0; i < board_size; i++)
       for (j = 0; j < board_size; j++) {
@@ -1034,7 +1034,8 @@ read_eye(int pos, int *attack_point, int *defense_point,
     return 0;
 
   for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
-    if (eye[pos2].origin == pos
+    if (ON_BOARD(pos2)
+	&& eye[pos2].origin == pos
         && heye[pos2].type == HALF_EYE && heye[pos2].value < 3.0) {
       if (ko_halfeye != NO_MOVE) {
 	ko_halfeye = NO_MOVE;   /* We can't win two kos at once. */
@@ -1218,8 +1219,12 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 		&& vpos[mv] != WEST(vpos[mn])
 		&& vpos[mv] != NORTH(vpos[mn])
 		&& vpos[mv] != EAST(vpos[mn])
-		&& (mv != mn - 1 || heye[vpos[mv]].type != HALF_EYE)
-		&& (mn != mv - 1 || heye[vpos[mn]].type != HALF_EYE)) {
+		&& (mv != mn - 1
+		    || vpos[mv] == NO_MOVE
+		    || heye[vpos[mv]].type != HALF_EYE)
+		&& (mn != mv - 1
+		    || vpos[mn] == NO_MOVE
+		    || heye[vpos[mn]].type != HALF_EYE)) {
 	      ok = 0;
 	      break;
 	    }
@@ -1263,7 +1268,9 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	     * marginal. This is the case if a half eye preceeds the
 	     * current vertex in the list.
 	     */
-	    if (ev->marginal && map[k] > 0
+	    if (ev->marginal
+		&& map[k] > 0
+		&& vpos[map[k] - 1] != NO_MOVE
 		&& is_halfeye(heye, vpos[map[k] - 1])) {
 	      /* Add all diagonals as vital. */
 	      int ix;
@@ -1278,7 +1285,9 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  
 	  if (ev->flags & EYE_DEFENSE_POINT) {
 	    /* Check for a half eye virtual marginal vertex. */
-	    if (ev->marginal && map[k] > 0
+	    if (ev->marginal
+		&& map[k] > 0
+		&& vpos[map[k] - 1] != NO_MOVE
 		&& is_halfeye(heye, vpos[map[k] - 1])) {
 	      /* Add all diagonals as vital. */
 	      int ix;
