@@ -200,3 +200,15 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 54
 loadsgf games/nngs/gnugo-3.1.29-merlin-200203281708.sgf 33
 50 gg_genmove white
 #? [O10]*
+
+loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 26
+51 gg_genmove white
+#? [!K18]*
+
+loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 28
+52 gg_genmove white
+#? [L5]*
+
+loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 30
+53 gg_genmove white
+#? [L4]*
