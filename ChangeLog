@@ -2,9 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- doc revision
+- bugfix in find_connection_moves()
+- begin_sgftreedump() can take a NULL pointer parameter
+- new gtp command ladder_attack
+- unneeded include directories removed from sgf/Makefile.*
 - seed field removed from Gameinfo struct
 - new global variable random_seed
-- doc revision
+- joseki tuning
 
 3.1.30 released March 30, 2002
 

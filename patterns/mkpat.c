@@ -1507,7 +1507,6 @@ write_elements(FILE *outfile, char *name)
 }
 
 
-/* FIXED: This only needs to be size 2, not 1000 */
 struct tree_node graph[2];
 int tree_next = 0;
 

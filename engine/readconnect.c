@@ -2084,8 +2084,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
   }
 
   if (findlib(str2, 1, &lib) == 1) {
-    conn1.distances[lib] = 0;
-    conn2.distances[lib] = conn2.distances[str2];
+    conn2.distances[lib] = 0;
+    conn1.distances[lib] = conn1.distances[str2];
   }
 
 

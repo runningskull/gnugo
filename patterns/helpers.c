@@ -664,13 +664,13 @@ connect_and_cut_helper(int Apos, int bpos, int cpos)
 
 
 /*
- * This is identical to connect_and_cut_helper(), except that d is
- * found as a general defense point for A. A is no longer restricted
- * to two liberties.
+ * This is similar to connect_and_cut_helper(), except it starts with
+ * a move at A and that d is found as a general defense point for A. A
+ * is no longer restricted to two liberties.
  *
  * |.X   |dX
- * |XO	 |AO
- * |XO	 |Ae
+ * |XO	 |XO
+ * |.O	 |Ae
  * |..	 |bc
  */
    

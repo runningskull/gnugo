@@ -367,20 +367,29 @@ sgffile_printboard(int next)
  * ================================================================ */
 
 
-static void
-sgftree_printboard(SGFTree *tree);
+static void sgftree_printboard(SGFTree *tree);
 
 /*
  * begin_sgftreedump begins storing all moves considered by
  * trymove and tryko in an sgf tree in memory.
+ *
+ * The caller only has to provide an own SGFTree pointer if he wants
+ * to do something more with the tree than writing it to file as done
+ * by end_sgftreedump().
  */
 
 void
 begin_sgftreedump(SGFTree *tree)
 {
   SGFNode *node;
+  static SGFTree local_tree;
   gg_assert(sgf_dumptree == NULL);
-  sgf_dumptree = tree;
+
+  if (tree == NULL)
+    sgf_dumptree = &local_tree;
+  else 
+    sgf_dumptree = tree;
+  
   sgftree_clear(sgf_dumptree);
   node = sgftreeCreateHeaderNode(sgf_dumptree, board_size, 0.0);
   sgftreeSetLastNode(sgf_dumptree, node);

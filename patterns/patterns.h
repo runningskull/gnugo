@@ -358,7 +358,6 @@ extern struct pattern_db read_defend_db;
 
 
 /* Tree-based pattern matching structures*/
-/* FIXED: graph_* should be renamed to tree_* */
 
 struct match_node;
 struct tree_node_list;

@@ -467,7 +467,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
  * already exists an influence source of the respective color at pos
  * that is stronger than the new one, we do nothing.
  */
-void
+static void
 add_influence_source(int pos, int color, float strength, float attenuation,
                      struct influence_data *q)
 {

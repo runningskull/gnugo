@@ -86,6 +86,7 @@ DECLARE(gtp_help);
 DECLARE(gtp_increase_depths);
 DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
+DECLARE(gtp_ladder_attack);
 DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
 DECLARE(gtp_name);
@@ -182,6 +183,7 @@ static struct gtp_command commands[] = {
   {"is_legal",         	      gtp_is_legal},
   {"komi",        	      gtp_set_komi},
   {"get_komi",        	      gtp_get_komi},
+  {"ladder_attack",    	      gtp_ladder_attack},
   {"level",        	      gtp_set_level},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
@@ -875,6 +877,38 @@ gtp_defend(char *s, int id)
   if (defend_code > 0) {
     gtp_printf(" ");
     gtp_print_vertex(I(dpos), J(dpos));
+  }
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Try to attack a string strictly in a ladder.
+ * Arguments: vertex
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   attack code followed by attack point if attack code nonzero.
+ */
+static int
+gtp_ladder_attack(char *s, int id)
+{
+  int i, j;
+  int apos;
+  int attack_code;
+  
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  if (countlib(POS(i, j)) != 2)
+    return gtp_failure(id, "string must have exactly 2 liberties");
+
+  attack_code = simple_ladder(POS(i, j), &apos);
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_print_code(attack_code);
+  if (attack_code > 0) {
+    gtp_printf(" ");
+    gtp_print_vertex(I(apos), J(apos));
   }
   return gtp_finish_response();
 }  
@@ -2732,6 +2766,10 @@ gtp_start_sgftrace(char *s, int id)
  *
  * Warning: You had better know what you're doing if you try to use this
  *          command.
+ *
+ * FIXME: We should free the memory from the sgf tree, now that we are
+ *        done. This would be simpler if there were an sgftree
+ *        function for this. (sgfFreeNode works on an sgfnode.)
  */
 static int
 gtp_finish_sgftrace(char *s, int id)

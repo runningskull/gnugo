@@ -606,8 +606,8 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
  */
 static void
 matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
-	 struct pattern_db *pdb, void *callback_data,
-	 char goal[BOARDMAX], int anchor_in_goal) 
+	      struct pattern_db *pdb, void *callback_data,
+	      char goal[BOARDMAX], int anchor_in_goal) 
 {
   int i, j;
 
@@ -743,9 +743,9 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
 /* Stub for matchpat function.  Work done in recursive helper. */
 static void 
 tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
-			int color, struct pattern_db *database,
-			void *callback_data, char goal[BOARDMAX],
-                        int anchor_in_goal)
+		 int color, struct pattern_db *database,
+		 void *callback_data, char goal[BOARDMAX],
+		 int anchor_in_goal)
 {
   struct tree_node_list *tree = database->tnl;
   struct rec_data data;

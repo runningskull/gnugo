@@ -7209,7 +7209,6 @@ Pattern CB107
 > replace(a,*)
 
 
-
 ###############
 # Miscellaneous
 ###############
@@ -8926,7 +8925,7 @@ o.O*..
 
 :8,O,shape(2)
 
-?Xxd??         
+?Xxd??
 ocX.e?
 obO*a.
 ......
@@ -10503,7 +10502,7 @@ oOXx??       don't do this!
 
 :8,-,shape(-3)
 
-oOXx??       don't do this!
+oOXx??
 ..OAx?
 ...*.x
 .....?

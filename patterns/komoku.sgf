@@ -31,9 +31,16 @@ SY[Cgoban 1.9.2]TM[5:00:00(5x1:00)];B[qd]
 ];B[pc]MA[mf]C[U
 ]
 (;W[nd]MA[lg]C[:-,shape(6)
-];B[qf]MA[mh]C[U
+]PL[B]
+(;B[qf]MA[mh]C[U
 ];W[jc]C[U
-])
+]MA[if])
+
+(;B[tt]C[
+];W[qe]C[s
+]MA[li];B[re]MA[li];W[pd]MA[li];B[rc]MA[li];W[qf]
+MA[li];B[rf]MA[li];W[qg]MA[li])
+)
 
 (;W[md]MA[jg]C[:-, shape(6)
 ];B[qf]MA[mh];W[ic]MA[hf])
@@ -96,8 +103,52 @@ C[:-,shape(8)
 )
 )
 
-(;B[ld]MA[ki]C[S];W[of]MA[ki]C[U];B[qf]MA[ki]C[S];W[oh]MA[ki]C[S];
-B[qh]MA[ki]C[S];W[id]MA[ii]C[S])
+(;B[ld]MA[ki]C[S]
+(;W[of]MA[ki]C[U];B[qf]MA[ki]C[S];W[oh]MA[ki]C[S];B[qh]MA[ki]C[S];
+W[id]MA[ii]C[S])
+
+(;W[pg]MA[ki]C[U
+];B[oe]MA[ki]C[U
+];W[ne]MA[ki]C[U
+];B[of]MA[ki]C[U
+];
+W[pd]MA[ki]C[U
+]
+(;B[pe]MA[ki]C[U
+];W[qc]MA[ki];B[qe]MA[ki];W[nc]MA[ki];B[rc]MA[ki];
+W[qb]MA[ki])
+
+(;B[qf]MA[ki]C[U
+]
+(;W[qc]MA[ki];B[qe]MA[ki];W[nc]MA[ki];B[rc]MA[ki];W[qb]MA[ki]
+(;B[qj]MA[kk])
+
+(;B[qk]MA[kl])
+
+(;B[ql]MA[km])
+)
+
+(;W[nf]MA[ki];B[og]MA[ki]C[U
+];W[qc]MA[ki];B[qe]MA[ki]C[U
+]
+(;W[pb]MA[ki]
+(;B[ql]MA[km])
+
+(;B[qk]MA[kl])
+)
+
+(;W[rc]MA[ki]C[0
+# Requires a ladder.
+];B[pi]MA[kj];W[nc]MA[kj])
+)
+
+(;W[pe]MA[ki]C[0
+# Bad
+];B[pf]MA[ki];W[qe]MA[ki];B[nd]MA[ki];W[rf]
+MA[ki];B[rg]MA[ki];W[re]MA[ki];B[qg]MA[ki];W[nc]MA[ki];B[md]MA[ki])
+)
+)
+)
 )
 
 (;W[oc]
