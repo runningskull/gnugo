@@ -380,8 +380,8 @@ dnl Please add -Wp,-lang-c89 to SOME_WARNINGS soon
 NO_WARNINGS="CFLAGS=$CFLAGS"
 if test $ac_cv_c_compiler_gnu = yes; then
   GCC_ONLY=''
-  GGO_SOME_WARNINGS='-Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wp,-lang-c89'
-  GGO_ALL_WARNINGS='-Wall -W -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wp,-lang-c89'
+  GGO_SOME_WARNINGS='-Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wp,-lang-c89 -pedantic'
+  GGO_ALL_WARNINGS='-Wall -W -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wp,-lang-c89 -pedantic'
   GNUGO_SOME_WARNINGS="CFLAGS=$CFLAGS $GGO_SOME_WARNINGS"
   GNUGO_ALL_WARNINGS="CFLAGS=$CFLAGS $GGO_ALL_WARNINGS"
   CFLAGS="$CFLAGS $GGO_SOME_WARNINGS"
