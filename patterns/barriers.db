@@ -3457,4 +3457,61 @@ Pattern Nonterritory57
 >non_xterritory(e);
 
 
+Pattern Nonterritory58
+# gf New pattern. (3.7.2)
+# See gunnar:56.
+
+XOOOX
+x...x
+-----
+
+:|,t
+
+DOOOE
+xabcx
+-----
+
+;!oplay_attack_either(a,c,D,c) && !oplay_attack_either(c,a,E,a)
+
+>non_oterritory(b);
+
+
+Pattern Nonterritory59
+# gf New pattern. (3.7.2)
+# See gunnar:58.
+
+?OOX
+X...
+?OO?
+
+:8,t
+
+?OOE
+Dabc
+?OO?
+
+;!oplay_attack_either(a,c,D,c) && !oplay_attack_either(c,a,E,a)
+
+>non_oterritory(b);
+
+
+Pattern Nonterritory60
+# gf New pattern. (3.7.2)
+# See gunnar:57.
+
+??OO
+X...
+??OX
+
+:8,t
+
+??OO
+Ecba
+??OD
+
+;!oplay_attack_either(a,c,D,c) && !oplay_attack_either(c,a,E,a)
+
+>non_oterritory(b);
+
+
 # END OF FILE
