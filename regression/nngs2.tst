@@ -145,6 +145,52 @@ loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 240
 310 gg_genmove black
 #? [M11]
 
+
+# problems from gnugo-3.3.8-nailer-200209190045
+
+# C10 is important enough to be saved, D10 only move.
+loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 34
+400 gg_genmove white
+#? [D10]
+
+# stones at C10 are critical, don't tenuki.
+loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 42
+410 gg_genmove white
+#? [D7]
+
+# don't get into the snap back!
+loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 115
+420 gg_genmove black
+#? [M15|M13]
+
+# missed vital snap back after black's mistake.
+loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 116
+430 gg_genmove white
+#? [M11]
+
+# all these moves should kill at least some of black stones
+loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 144
+440 gg_genmove white
+#? [B18|C18|E16|E18|F16|F17]
+
+# prevent loss of four stones a couple of moves later. E16 doesn't
+# look very good, but it works.
+450 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 170
+gg_genmove white
+#? [E14|D15|E16]
+
+# black is getting to deep, time to defend.
+460 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 196
+gg_genmove white
+#? [J4|K2|K3|K4|K5|L2]
+
+#CATEGORY=SEMEAI
+# If we move first, black can only get a ko in the semeai.
+470 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 212
+gg_genmove white
+#? [H6|H5|H3]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
