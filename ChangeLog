@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- semeai_trymove_and_recurse() propagetes back changes to &owla, &owlb
 - copy over old eye_data in do_owl_defend() if escape > MAX_ESCAPE
 - new configure option --experimental-break-in
 - load_and_score_sgf_file() revised

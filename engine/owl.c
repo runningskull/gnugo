@@ -205,8 +205,8 @@ static void do_owl_analyze_semeai(int apos, int bpos,
 				  int *resulta, int *resultb,
 				  int *move, int pass, int owl_phase);
 static int semeai_trymove_and_recurse(int apos, int bpos,
-				      struct local_owl_data *owla,
-				      struct local_owl_data *owlb,
+				      struct local_owl_data **owla,
+				      struct local_owl_data **owlb,
 				      int komaster, int kom_pos, int owl_phase,
 				      int move, int color, int ko_allowed,
 				      int move_value, const char *move_name,
@@ -386,7 +386,7 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     do_owl_analyze_semeai(apos, bpos, owla, owlb, EMPTY, NO_MOVE,
 			  resulta, resultb, semeai_move, 0, owl);
   else {
-    semeai_trymove_and_recurse(bpos, apos, owlb, owla, EMPTY, NO_MOVE, owl,
+    semeai_trymove_and_recurse(bpos, apos, &owlb, &owla, EMPTY, NO_MOVE, owl,
 			       move, color, 1, 0, "mandatory move", 1,
 			       semeai_move, resultb, resulta);
     *resulta = REVERSE_RESULT(*resulta);
@@ -831,7 +831,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     /* Try playing the move at mpos and call ourselves recursively to
      * determine the result obtained by this move.
      */
-    if (semeai_trymove_and_recurse(apos, bpos, owla, owlb, komaster,
+    if (semeai_trymove_and_recurse(apos, bpos, &owla, &owlb, komaster,
 				   kom_pos, owl_phase, mpos, color,
 				   best_resulta == 0 || best_resultb == 0,
 				   moves[k].value, moves[k].name,
@@ -917,8 +917,8 @@ do_owl_analyze_semeai(int apos, int bpos,
  * move.
  */
 static int
-semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
-			   struct local_owl_data *owlb,
+semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data **owla,
+			   struct local_owl_data **owlb,
 			   int komaster, int kom_pos, int owl_phase,
 			   int move, int color, int ko_allowed,
 			   int move_value, const char *move_name,
@@ -940,22 +940,22 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
   TRACE("Trying %C %1m. Current stack: ", color, move);
   if (verbose) {
     dump_stack();
-    goaldump(owla->goal);
+    goaldump((*owla)->goal);
     gprintf("\n");
-    goaldump(owlb->goal);
+    goaldump((*owlb)->goal);
     gprintf("\n");
   }
   TRACE("%s, value %d, same_dragon %d\n", move_name, move_value, same_dragon);
     
-  push_owl(&owla, &owlb);
+  push_owl(owla, owlb);
 
-  if (owla->color == color) {
-    owl_update_goal(move, same_dragon, owla, 1);
-    owl_update_boundary_marks(move, owlb);
+  if ((*owla)->color == color) {
+    owl_update_goal(move, same_dragon, *owla, 1);
+    owl_update_boundary_marks(move, *owlb);
   }
   else {
-    owl_update_goal(move, same_dragon, owlb, 1);
-    owl_update_boundary_marks(move, owla);
+    owl_update_goal(move, same_dragon, *owlb, 1);
+    owl_update_boundary_marks(move, *owla);
   }
     
   /* Do a recursive call to read the semeai after the move we just
@@ -966,21 +966,21 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
     /* FIXME: Are all owl_data fields and relevant static
      * variables properly set up for a call to do_owl_attack()?
      */
-    *this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, owla,
+    *this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, *owla,
 						new_komaster, new_kom_pos,
 						0));
     *this_resultb = *this_resulta;
   }
   else {
-    do_owl_analyze_semeai(bpos, apos, owlb, owla, new_komaster, new_kom_pos,
+    do_owl_analyze_semeai(bpos, apos, *owlb, *owla, new_komaster, new_kom_pos,
 			  this_resultb, this_resulta, semeai_move, 0,
 			  owl_phase);
     *this_resulta = REVERSE_RESULT(*this_resulta);
     *this_resultb = REVERSE_RESULT(*this_resultb);
   }
     
-  pop_owl(&owlb);
-  pop_owl(&owla);
+  pop_owl(owlb);
+  pop_owl(owla);
     
   popgo();
     
