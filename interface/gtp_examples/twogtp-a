@@ -81,7 +81,7 @@ my $white;
 my $black;
 my $size = 19;
 my $verbose = 0;
-my $komi = 5.5;
+my $komi;
 my $handicap = 0;
 my $games = 1;
 my $wanthelp;
@@ -155,6 +155,15 @@ while ($games > 0) {
 	undef($sgffilename);
     }
     
+    if (!defined $komi) {
+        if ($handicap eq 0) {
+	    $komi = 5.5;
+	}
+	else {
+	    $komi = 0.5;
+	}
+    }
+
     print $black_in  "boardsize $size\n";
     eat_no_response($black_out);
     print $black_in  "komi $komi\n";

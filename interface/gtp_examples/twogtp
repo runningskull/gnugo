@@ -434,7 +434,7 @@ my $white;
 my $black;
 my $size = 19;
 my $games = 1;
-my $komi = 5.5;
+my $komi;
 my $handicap = 0;
 my $sgffile = "twogtp.sgf";
 
@@ -470,8 +470,13 @@ Possible twogtp options:
 ";
 
 die $helpstring unless defined $white and defined $black;
-if ($handicap > 1) {
-    $komi = 0.5;
+
+if (!defined $komi) {
+    if ($handicap > 0) {
+        $komi = 0.5;
+    } else {
+        $komi = 5.5;
+    }
 }
 
 # create GTP players

@@ -229,6 +229,15 @@ while ($games > 0) {
     #set autoflushing for sgf file
     SGFFILEHANDLE->autoflush(1);
 
+    if (!defined $komi) {
+        if ($handicap > 0) {
+	    $komi = 0.5;
+	}
+	else {
+	    $komi = 5.5;
+	}
+    }
+
     print $prog_in  "boardsize $size\n";
     eat_no_response($prog_out);
     print $prog_in  "komi $komi\n";
