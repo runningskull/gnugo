@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.21 released January 12, 2002
+
+- revision of compute_surrounding_moyo_sizes()
+- bugfix in pattern EE302
+- value_moves.c split from move_reasons.c
+
 3.1.20 released January 11, 2002
 
 - ko return codes from owl_does_attack() and owl_does_defend() handled

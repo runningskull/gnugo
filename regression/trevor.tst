@@ -571,7 +571,7 @@ loadsgf games/trevor/trevor_66.sgf
 
 loadsgf games/trevor/trevor_67.sgf
 670 attack G1
-#? [(2|3) F1]*
+#? [(2|3) F1]
 
 loadsgf games/trevor/trevor_67.sgf
 671 defend G1

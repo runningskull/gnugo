@@ -127,6 +127,7 @@ libengine_a_SOURCES = \
       shapes.c \
       showbord.c \
       utils.c \
+      value_moves.c \
       worm.c
 
 
@@ -163,7 +164,7 @@ am_libengine_a_OBJECTS = aftermath.$(OBJEXT) board.$(OBJEXT) \
 	readconnect.$(OBJEXT) reading.$(OBJEXT) score.$(OBJEXT) \
 	semeai.$(OBJEXT) sgfdecide.$(OBJEXT) sgffile.$(OBJEXT) \
 	shapes.$(OBJEXT) showbord.$(OBJEXT) utils.$(OBJEXT) \
-	worm.$(OBJEXT)
+	value_moves.$(OBJEXT) worm.$(OBJEXT)
 libengine_a_OBJECTS = $(am_libengine_a_OBJECTS)
 
 DEFS = @DEFS@
@@ -186,7 +187,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/score.Po $(DEPDIR)/semeai.Po \
 @AMDEP_TRUE@	$(DEPDIR)/sgfdecide.Po $(DEPDIR)/sgffile.Po \
 @AMDEP_TRUE@	$(DEPDIR)/shapes.Po $(DEPDIR)/showbord.Po \
-@AMDEP_TRUE@	$(DEPDIR)/utils.Po $(DEPDIR)/worm.Po
+@AMDEP_TRUE@	$(DEPDIR)/utils.Po $(DEPDIR)/value_moves.Po \
+@AMDEP_TRUE@	$(DEPDIR)/worm.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -258,6 +260,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/shapes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/showbord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/utils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/value_moves.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/worm.Po@am__quote@
 
 distclean-depend:

@@ -45,6 +45,7 @@ libengine_a_SOURCES = \
       shapes.c \
       showbord.c \
       utils.c \
+      value_moves.c \
       worm.c
 
 libboard_a_SOURCES = \

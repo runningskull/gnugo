@@ -1576,35 +1576,32 @@ compute_escape(int pos, int dragon_status_known)
 static void
 compute_surrounding_moyo_sizes(int opposite)
 {
-  int i, j;
   int pos;
-  int m, n;
-  int result[MAX_BOARD * MAX_BOARD];
-  static int moyo_is_adjacent[MAX_BOARD * MAX_BOARD][MAX_MOYOS + 1];
+  int d;
+  int mx[MAX_MOYOS + 1];
   struct moyo_data moyos;
 
   influence_get_moyo_segmentation(opposite, &moyos);
-  for (i = 0; i < number_of_dragons; i++) {
-    result[i] = 0;
-    for (j = 1; j <= moyos.number; j++)
-      moyo_is_adjacent[i][j] = 0;
-  }
-  
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-      if (moyos.segmentation[pos] != 0
-          && board[pos] == moyos.owner[moyos.segmentation[pos]])
-        moyo_is_adjacent[dragon[pos].id][moyos.segmentation[pos]] = 1; 
+
+  memset(mx, 0, sizeof(mx));
+  for (d = 0; d < number_of_dragons; d++) {
+    int this_moyo_size = 0;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      int moyo_number = moyos.segmentation[pos];
+      if (moyo_number == 0
+         || board[pos] != DRAGON(d).color
+         || dragon[pos].id != d
+         || moyos.owner[moyo_number] != board[pos])
+       continue;
+
+      if (mx[moyo_number] != d + 1) {
+       mx[moyo_number] = d + 1;
+       this_moyo_size += moyos.size[moyo_number];
+      }
     }
-  
-  for (i = 0; i < number_of_dragons; i++) {
-    for (j = 1; j <= moyos.number; j++) {
-      if (moyo_is_adjacent[i][j])
-         result[i] += moyos.size[j];
-    }
-    if (result[i] < dragon2[i].moyo)
-       dragon2[i].moyo = result[i];
+
+    if (this_moyo_size < dragon2[d].moyo)
+      dragon2[d].moyo = this_moyo_size;
   }
 }
 

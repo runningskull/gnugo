@@ -121,6 +121,88 @@ struct move_data {
 
 
 /*
+ * Some sizes.  
+ *
+ * FIXME: Many of these could be optimized more for size (e.g. MAX_EYES)
+ */
+
+#define MAX_MOVE_REASONS  1000
+#define MAX_WORMS         2*MAX_BOARD*MAX_BOARD/3
+#define MAX_DRAGONS       MAX_WORMS
+#define MAX_CONNECTIONS   4*MAX_WORMS
+#define MAX_WORM_PAIRS    MAX_WORMS
+#define MAX_EYES          MAX_BOARD*MAX_BOARD/2
+#define MAX_LUNCHES       MAX_WORMS
+#define MAX_EITHER        100
+
+
+float compute_shape_factor(int pos);
+
+extern struct move_data move[BOARDMAX];
+extern struct move_reason move_reasons[MAX_MOVE_REASONS];
+extern int next_reason;
+
+/* Worms */
+extern int worms[MAX_WORMS];
+extern int next_worm;
+
+/* Dragons */
+extern int dragons[MAX_DRAGONS];
+extern int next_dragon;
+
+/* Connections */
+extern int conn_dragon1[MAX_CONNECTIONS];
+extern int conn_dragon2[MAX_CONNECTIONS];
+extern int next_connection;
+
+/* Unordered worm pairs */
+extern int worm_pair1[MAX_WORM_PAIRS];
+extern int worm_pair2[MAX_WORM_PAIRS];
+extern int next_worm_pair;
+
+/* Unordered pairs of threats */
+typedef struct {
+  int reason1;
+  int what1;
+  int reason2;
+  int what2;
+} Either_data;
+extern Either_data either_data[MAX_EITHER];
+extern int         next_either;
+
+/* Eye shapes */
+extern int eyes[MAX_EYES];
+extern int eyecolor[MAX_EYES];
+extern int next_eye;
+
+/* Lunches */
+extern int lunch_dragon[MAX_LUNCHES]; /* eater */
+extern int lunch_worm[MAX_LUNCHES];   /* food */
+extern int next_lunch;
+
+/* Point redistribution */
+extern int replacement_map[BOARDMAX];
+
+
+
+int  find_worm(int str);
+int  find_dragon(int str);
+
+int  move_reason_known(int pos, int type, int what);
+int  attack_move_reason_known(int pos, int what);
+int  defense_move_reason_known(int pos, int what);
+int  owl_attack_move_reason_known(int pos, int what);
+int  owl_defense_move_reason_known(int pos, int what);
+int  is_antisuji_move(int pos);
+
+int  move_connects_strings(int pos, int color);
+int  move_reasons_confirm_safety(int move, int color, int minsize);
+
+void discard_redundant_move_reasons(int pos);
+void list_move_reasons(int color);
+
+
+/*
  * Local Variables:
  * tab-width: 8
  * c-basic-offset: 2

@@ -626,16 +626,16 @@ loadsgf games/trevor/auto/d12.sgf 66
 loadsgf games/ssstator.sgf 133
 trymove black C1
 160 attack D1
-#? [0]*
+#? [0]
 popgo
 
 loadsgf games/reading34.sgf
 161 attack C9
-#? [0]*
+#? [0]
 
 loadsgf games/reading34.sgf
 162 attack D7
-#? [0]*
+#? [0]
 
 # See also trevorb:840.
 loadsgf games/trevor/auto/b75.sgf 62

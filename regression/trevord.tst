@@ -379,7 +379,7 @@ loadsgf games/trevor/auto/d32.sgf 166
 
 loadsgf games/trevor/auto/d32.sgf 176
 760 gg_genmove white
-#? [H6]*
+#? [H6]
 
 
 ##Not a good problem.
@@ -491,7 +491,7 @@ loadsgf games/trevor/auto/d39.sgf 204
 
 loadsgf games/trevor/auto/d39.sgf 208
 960 gg_genmove white
-#? [J6]*
+#? [J6]
 
 
 loadsgf games/trevor/auto/d39.sgf 210
@@ -581,12 +581,12 @@ loadsgf games/trevor/auto/d47.sgf 100
 
 loadsgf games/trevor/auto/d48.sgf 80
 1100 gg_genmove white
-#? [N5]
+#? [N5]*
 
 
 loadsgf games/trevor/auto/d48.sgf 150
 1110 gg_genmove white
-#? [O17]
+#? [O17]*
 
 
 #Mostly, !Q7
