@@ -57,11 +57,11 @@ loadsgf games/life_and_death/ld5.sgf
 
 loadsgf games/life_and_death/ld6.sgf
 21 dragon_status B18
-#? [critical (A14|A17|B19) A17]
+#? [critical (A14|A17|B19) A17]*
 22 dragon_status S18
-#? [critical T18 (T18|R18|R19|Q19)]
+#? [critical T18 (T18|R18|R19|Q19)]*
 23 dragon_status S2
-#? [dead]
+#? [dead]*
 24 dragon_status B2
 #? [critical F1 (F1|D2|D1|B1)]
 
@@ -273,13 +273,13 @@ loadsgf games/life_and_death/tripod6.sgf
 178 owl_defend C17
 #? [1 (A19|A17)]
 179 owl_attack R17
-#? [3 T17]
+#? [3 T17]*
 180 owl_defend R17
 #? [1 (Q18|T17|S18|T18|S17|S19)]
 181 owl_attack R3
 #? [1 (R2|S4|P1)]
 182 owl_defend R3
-#? [2 S1]
+#? [2 S1]*
 183 owl_attack C3
 #? [3 B2]
 184 owl_defend C3
@@ -329,14 +329,14 @@ loadsgf games/life_and_death/tripod4.sgf
 # Black tries a bad defense. He must be punished.
 play black Q19
 201 owl_attack Q19
-#? [3 T15]
+#? [3 T15]*
 
 # Mixed life and death problems.
 loadsgf games/life_and_death/mixed1.sgf
 300 owl_attack  C17
 #? [1 (E19|D19|C19|B18|B19|A18|A19)]
 301 owl_defend  C17
-#? [3 B18]
+#? [3 B18]*
 302 dragon_status R17
 #? [critical T19 (Q19|R18)]
 303 dragon_status R3

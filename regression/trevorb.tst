@@ -18,7 +18,7 @@ loadsgf games/trevor/auto/b01.sgf 56
 
 loadsgf games/trevor/auto/b02.sgf 42
 120 reg_genmove white
-#? [N2]*
+#? [N2]
 
 
 loadsgf games/trevor/auto/b02.sgf 46

@@ -1,3 +1,51 @@
+========================== 3.5.1 pre 1 =====================================
+
+./regress.sh . ld_owl.tst 
+21 unexpected FAIL: Correct 'critical (A14|A17|B19) A17', got 'critical B19 A14'
+22 unexpected FAIL: Correct 'critical T18 (T18|R18|R19|Q19)', got 'alive'
+23 unexpected FAIL: Correct 'dead', got 'critical T1 R2'
+179 unexpected FAIL: Correct '3 T17', got '0'
+182 unexpected FAIL: Correct '2 S1', got '1 S1'
+201 unexpected FAIL: Correct '3 T15', got '0'
+301 unexpected FAIL: Correct '3 B18', got '0'
+./regress.sh . optics.tst 
+1201 unexpected FAIL: Correct '1 2 T8 T8', got '0 0'
+./regress.sh . atari_atari.tst 
+24 unexpected FAIL: Correct '!.*(K16|A12|R12|S12|T12|A11|B11|C11|R11|S11|T11|A10|C10|Q10|S10|D9).*', got 'K16 J13 A12 H12 J12 R12 S12 T12 A11 B11 C11 G11 H11 Q11 R11 S11 T11 A10 B10 C10 F10 G10 Q10 S10 B9 C9 D9 E9 F9 D8 E8'
+./regress.sh . trevorb.tst 
+120 unexpected PASS!
+./regress.sh . nicklas1.tst 
+1406 unexpected PASS!
+./regress.sh . global.tst 
+44 unexpected FAIL: Correct 'D5', got 'G7'
+./regress.sh . 13x13.tst 
+31 unexpected PASS!
+53 unexpected PASS!
+./regress.sh . semeai.tst 
+58 unexpected FAIL: Correct '0 0 PASS', got '1 1 J4'
+59 unexpected FAIL: Correct '1 1 J4', got '0 0 PASS'
+./regress.sh . nngs2.tst 
+1 unexpected FAIL: Correct 'B1|A2', got 'A4'
+./regress.sh . nngs3.tst 
+390 unexpected PASS!
+./regress.sh . nngs4.tst 
+210 unexpected FAIL: Correct '!S5', got 'S5'
+660 unexpected FAIL: Correct 'O16', got 'R6'
+670 unexpected FAIL: Correct 'O14', got 'S18'
+680 unexpected FAIL: Correct 'P9', got 'P6'
+690 unexpected FAIL: Correct 'N6', got 'Q3'
+700 unexpected FAIL: Correct 'K7', got 'L3'
+710 unexpected FAIL: Correct 'J3|H7|G5|H3|G6', got 'C5'
+720 unexpected FAIL: Correct 'B15|B16|B17', got 'H11'
+730 unexpected FAIL: Correct 'C17', got 'D17'
+740 unexpected FAIL: Correct 'D2', got 'T1'
+./regress.sh . century2002.tst 
+60 unexpected PASS!
+./regress.sh . safety.tst 
+5 unexpected FAIL: Correct 'K8|L9|L7', got 'H16'
+./regress.sh . nando.tst 
+12 unexpected PASS!
+
 ========================== 3.3.23 pre 2 =====================================
 
 ./regress.sh . ld_owl.tst 

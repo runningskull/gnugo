@@ -165,7 +165,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 32
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 64
 31 reg_genmove white
-#? [M4|N4]*
+#? [M4|N4]
 
 # A nice tesuji by GNU Go worth remembering!
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 74
@@ -284,7 +284,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 53 reg_genmove black
-#? [C6]*
+#? [C6]
 
 #CATEGORY=SEMEAI
 # This is very difficult. There are some variations in the .sgf-file,

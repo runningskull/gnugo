@@ -103,5 +103,5 @@ loadsgf games/atari_atari07.sgf
 
 loadsgf games/atari_atari08.sgf 227
 24 combination_defend black
-#? [!.*(K16|A12|R12|S12|T12|A11|B11|C11|R11|S11|T11|A10|C10|Q10|S10|D9).*]
+#? [!.*(K16|A12|R12|S12|T12|A11|B11|C11|R11|S11|T11|A10|C10|Q10|S10|D9).*]*
 

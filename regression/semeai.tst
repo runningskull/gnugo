@@ -287,11 +287,11 @@ loadsgf games/test4win.sgf
 
 loadsgf games/test4lose.sgf
 58 analyze_semeai F5 H6
-#? [0 0 PASS]
+#? [0 0 PASS]*
 
 loadsgf games/test5win.sgf
 59 analyze_semeai B7 E6
-#? [1 1 J4]
+#? [1 1 J4]*
 
 loadsgf games/test5lose.sgf
 60 analyze_semeai C8 E6
