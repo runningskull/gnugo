@@ -177,65 +177,135 @@ use CGoban to save a file, then reload it in ascii mode.
 @cindex emacs mode
 
 You can run GNU Go from Emacs. This has the advantage 
-that you place the stones using the cursor arrow keys.
-This may require Emacs 20.4 or later---it has been 
-tested with Emacs 20.4 but does not work with Emacs 19
-or Emacs 20.2.
+that you place the stones using the cursor arrow keys
+or with the mouse, and (provided you have Emacs version 21
+or later) you can have a nice graphical display of the
+board within emacs.
 
-Load @file{interface/gnugo.el}, either by @command{M-x load-file},
-or by copying the file into your @file{site-lisp} directory and
-adding a line
+Load the file @file{interface/gnugo.el} and (if you want
+the graphical board) @file{interface/gnugo-xpms.el}. You
+may do this using the Emacs @command{M-x load-file} command.
+
+@strong{In detail:} Emacs uses Control and Meta keys. The
+``Meta'' key is the Alt key on the PC keyboard. The Control
+and Meta keys are denoted @command{C-} and
+@command{M-}. Thus the @command{M-x} is obtained by holding
+the Alt key and typing @samp{x}. In Emacs, this prompts you
+for another command. You can then type @command{load-file},
+hit the Enter key, then type the path to @file{gnugo.el} and
+hit Enter again. Then repeat the process for
+@file{gnugo-xpms.el}.
+
+To have the files @file{gnugo.el} and @file{gnugo-xpms.el}
+loaded automatically each time you run emacs, copy the files
+into your @file{site-lisp} directory (often
+@file{/usr/share/emacs/site-lisp}) and add lines
 
 @example
 (autoload 'gnugo "gnugo" "GNU Go" t)
+(autoload 'gnugo-xpms "gnugo-xpms" "GNU Go" t)
 @end example
 
 @noindent
 in your @file{.emacs} file. 
 
-@paragraphindent 3
-Now you may start GNU Go by @command{M-x gnugo}. You will be prompted for
-command line options @pxref{Invoking GNU Go}. Using these, you may set the
-handicap, board size, color and komi.
+You may start GNU Go by @command{M-x gnugo}. You will be
+prompted for command line options (@pxref{Invoking GNU
+Go}). Using these, you may set the handicap, board size,
+color and komi. For example if you want to play white and
+give a nine-stone handicap, use the options
+@option{--handicap 9 --color white}.
 
-You can enter commands from the GNU Go ASCII interface after
-typing @samp{:}. For example, to take a move back, type
-@samp{:back}, or to list all commands, type @samp{:help}.
+You will immediately see an ascii board. However (unless you
+are using the alternate version @file{gnugo.el-ascii}, or
+if you are not running Emacs 21.x or later) you can get
+switch to a graphical Go board by typing `i'. You can also
+get help at any time by typing `?'.
 
 Here are the default keybindings:
 
 @itemize @bullet
-@item @samp{Return} or @samp{Space}
+@item @samp{?}
 @quotation
-Select point as the next move.  An error is signalled
-for invalid locations.  Illegal locations, on the other
-hand, show up in the GNUGO Console buffer.
+View this help.
+@end quotation
+@item @code{RET} or @code{SPC}
+@quotation
+Select point as the next move. An error is signalled for
+invalid locations. You may also use the mouse to play the
+move.
 @end quotation
 @item @samp{q} or @samp{Q}
 @quotation
-Quit. Both Board and Console buffers are deleted.
+Quit (the latter without confirmation).
 @end quotation
 @item @samp{R}
 @quotation
-Resign.
+Resign
 @end quotation
-@item @samp{C-l}
+@item @code{C-l}
 @quotation
-Refresh.  Includes restoring default window configuration.
+Refresh board. Actually, while the subprocess is thinking,
+this only refreshes the mode line.  
 @end quotation
-@item @samp{M-_}
+@item @samp{_} or @code{M-_}
 @quotation
-Bury both Board and Console buffers (when the boss is near).
+Bury the Board buffer (when the boss is near).
 @end quotation
-@item @samp{p}
+@item @samp{P}
 @quotation
 Pass; i.e., select no location for your move.
 @end quotation
-@item @samp{:}
+@item @samp{i}
 @quotation
-Extended command. After typing the @samp{:} you can type a
-command for GNU Go. The possible commands are as in @xref{Ascii}.
+Toggle display using XPM images (if supported).
 @end quotation
+@item @samp{W}
+@quotation
+Display current position's worm data in another buffer.
+@end quotation
+@item @samp{D}
+@quotation
+Display current position's dragon data in another buffer.
+@end quotation
+@item @samp{t}
+@quotation
+Toggle dead groups (when the game is over).
+@end quotation
+@item @samp{!}
+@quotation
+Estimate score (at any time).
+@end quotation
+@item @samp{:} or @samp{;}
+@quotation
+This can be any Gtp command (@pxref{GTP}). Type in a string
+to be passed (quite indirectly) to the GNU Go subprocess.
+Output and emacs behavior depend on which command is given.
+Try @code{help} to get a list of all commands.  Note that
+some commands may confuse @code{gnugo.el.}  
+@end quotation
+@item @samp{=}
+@quotation
+Display board position under point (if valid).
+@end quotation
+@item @samp{h}
+@quotation
+Display in the echo area "(N moves)" followed by the
+move history, most recent move first. This line is
+subsequently available in the *Messages* buffer.
+@end quotation
+@item @samp{F}
+@quotation
+Switch to *GNUGO Final Score* buffer and display the
+final score there. If the game is still in play, Emacs
+confirms that you wish to stop play.
+@end quotation
+@item @samp{s} or @command{C-x C-w} or @command{C-x C-s}
+@quotation
+Save the game history to a file (even if the game is not
+finished). If the file already exists, Emacs confirms
+that you wish to overwrite it.
+@end quotation 
 @end itemize
 
 @node GMP and GTP

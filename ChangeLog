@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revision of interface/emacs.el
+- new interface/xpms/*xpm, make-gnugo-xpms.el and gnugo-xpms.el
 - break_chain2_moves() revised
 - special_attack4_moves() revised
 - defend_secondary_chain_moves() revised and split into two functions
