@@ -4999,12 +4999,13 @@ a*.
 
 Pattern D1142
 # pp New pattern (3.5.3).  See nngs4:420.
+# gf Fixed symmetry. (3.7.1)
 
 ?X?	    split boundary in hope that it will help;
 *OX	    low value because it's not guaranteed it will
 ?XO
 
-:-,b,value(30)
+:8,b,value(30)
 
 ?C?
 *AX
