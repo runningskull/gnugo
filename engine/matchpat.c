@@ -158,11 +158,11 @@ static void fixup_patterns_for_board_size(struct pattern *pattern);
 static void prepare_for_match (int color);
 static void do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 			int color, struct pattern *database,
-			void *callback_data, char goal[MAX_BOARD][MAX_BOARD]);
+			void *callback_data, char goal[BOARDMAX]);
 static void matchpat_loop(matchpat_callback_fn_ptr callback, 
 			  int color, int anchor,
 			  struct pattern_db *pdb, void *callback_data,
-			  char goal[MAX_BOARD][MAX_BOARD]);
+			  char goal[BOARDMAX]);
 void transform(int i, int j, int *ti, int *tj, int trans);
 void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 
@@ -376,7 +376,7 @@ offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans)
 static void
 do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	    struct pattern *pattern, void *callback_data,
-	    char goal[MAX_BOARD][MAX_BOARD]) 
+	    char goal[BOARDMAX]) 
 {
   const int anchor_test = p[m][n] ^ color;  /* see below */
   int merged_val;
@@ -538,7 +538,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	    goto match_failed;
 
 	  if (goal != NULL && p[x][y] != EMPTY) {
-	    if (goal[x][y])
+	    if (goal[POS(x, y)])
 	      found_goal = 1;
 	    else if (p[x][y] == color)
 	      found_nongoal = 1;
@@ -621,7 +621,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 static void
 matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 	 struct pattern_db *pdb, void *callback_data,
-	 char goal[MAX_BOARD][MAX_BOARD]) 
+	 char goal[BOARDMAX]) 
 {
   int i,j;
 
@@ -629,7 +629,7 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
     for (j = 0; j != board_size; j++)
       if (p[i][j] == anchor)
 	do_matchpat(i, j, callback, color, 
-			pdb->patterns, callback_data, goal);
+		    pdb->patterns, callback_data, goal);
 }
 
 
@@ -1007,7 +1007,7 @@ dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 typedef void (*loop_fn_ptr_t)(matchpat_callback_fn_ptr callback, 
 			 int color, int anchor,
 			 struct pattern_db *pdb, void *callback_data,
-			 char goal[MAX_BOARD][MAX_BOARD]);
+			 char goal[BOARDMAX]);
 
 typedef void (*prepare_fn_ptr_t)(int color);
 
@@ -1024,7 +1024,7 @@ typedef void (*prepare_fn_ptr_t)(int color);
 void
 global_matchpat(matchpat_callback_fn_ptr callback, int color,
 	 struct pattern_db *pdb, void *callback_data,
-	 char goal[MAX_BOARD][MAX_BOARD]) 
+	 char goal[BOARDMAX]) 
 {
   loop_fn_ptr_t loop = matchpat_loop;
   prepare_fn_ptr_t prepare = prepare_for_match;

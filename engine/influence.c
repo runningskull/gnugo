@@ -707,7 +707,7 @@ find_influence_patterns(struct influence_data *q, int color)
  */
 static void
 compute_influence(struct influence_data *q, int color, int m, int n,
-		  int dragons_known, char no_influence[MAX_BOARD][MAX_BOARD],
+		  int dragons_known, char no_influence[BOARDMAX],
 		  char saved_stones[MAX_BOARD][MAX_BOARD])
 {
   int i, j;
@@ -1047,8 +1047,8 @@ compute_move_influence(int m, int n, int color,
  */
 
 void
-compute_escape_influence(char goal[MAX_BOARD][MAX_BOARD], int color,
-			 int escape_value[MAX_BOARD][MAX_BOARD],
+compute_escape_influence(char goal[BOARDMAX], int color,
+			 int escape_value[BOARDMAX],
 			 int dragons_known)
 {
   int i, j;
@@ -1057,13 +1057,13 @@ compute_escape_influence(char goal[MAX_BOARD][MAX_BOARD], int color,
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       if (whose_moyo(&escape_influence, i, j) == color)
-	escape_value[i][j] = 4;
+	escape_value[POS(i, j)] = 4;
       else if (whose_area(&escape_influence, i, j) == color)
-	escape_value[i][j] = 2;
+	escape_value[POS(i, j)] = 2;
       else if (whose_area(&escape_influence, i, j) == EMPTY)
-	escape_value[i][j] = 1;
+	escape_value[POS(i, j)] = 1;
       else
-	escape_value[i][j] = 0;
+	escape_value[POS(i, j)] = 0;
     }
 
   if (0 && (debug & DEBUG_ESCAPE) && verbose > 0) {

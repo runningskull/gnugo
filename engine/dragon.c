@@ -1279,8 +1279,8 @@ compute_dragon_status(int i, int j)
  * in the goal array.
  */
 int
-dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
-	      int escape_value[MAX_BOARD][MAX_BOARD])
+dragon_escape(char goal[BOARDMAX], int color,
+	      int escape_value[BOARDMAX])
 {
   int i, j;
   int k;
@@ -1304,7 +1304,7 @@ dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
   /* Enter the stones of the dragon in the queue. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (goal[i][j])
+      if (goal[POS(i, j)])
 	ENQUEUE(i, j);
   
   /* Find points at increasing distances from the dragon. At distance
@@ -1328,7 +1328,7 @@ dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
 	continue;
       
       if (distance == 4)
-	escape_potential += escape_value[i][j];
+	escape_potential += escape_value[POS(i, j)];
       else {
 	if (i > 0
 	    && !mx[i-1][j]
@@ -1425,14 +1425,14 @@ static int
 compute_escape(int m, int n, int dragon_status_known)
 {
   int i, j;
-  char goal[MAX_BOARD][MAX_BOARD];
-  int escape_value[MAX_BOARD][MAX_BOARD];
+  char goal[BOARDMAX];
+  int escape_value[BOARDMAX];
 
   ASSERT2(BOARD(m, n) != EMPTY, m, n);
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      goal[i][j] = same_dragon(i, j, m, n);
+      goal[POS(i, j)] = same_dragon(i, j, m, n);
     }
 
   compute_escape_influence(goal, BOARD(m, n), escape_value,
@@ -1442,16 +1442,16 @@ compute_escape(int m, int n, int dragon_status_known)
     for (j = 0; j < board_size; j++) {
       if (dragon_status_known) {
 	if (dragon[POS(i, j)].status == ALIVE)
-	  escape_value[i][j] = 6;
+	  escape_value[POS(i, j)] = 6;
 	else if (dragon[POS(i, j)].status == UNKNOWN
 		 && (DRAGON2(i, j).escape_route > 5 || DRAGON2(i, j).moyo > 5))
-	  escape_value[i][j] = 4;
+	  escape_value[POS(i, j)] = 4;
       }
       else {
 	if (BOARD(i, j) == BOARD(m, n)
-	    && !goal[i][j]
+	    && !goal[POS(i, j)]
 	    && worm[POS(i, j)].attack_codes[0] == 0)
-	  escape_value[i][j] = 2;
+	  escape_value[POS(i, j)] = 2;
       }
     }
 

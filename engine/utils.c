@@ -88,9 +88,9 @@ cut_possible(int i, int j, int color)
 
 
 /*
- * does_attack(ti, tj, ai, aj) returns true if the move at (ti, tj)
- * attacks (ai, aj). This means that it captures the string, and that
- * (ai, aj) is not already dead.
+ * does_attack(move, str) returns true if the move at (move)
+ * attacks (str). This means that it captures the string, and that
+ * (str) is not already dead.
  */
 
 int
@@ -135,9 +135,9 @@ does_attack(int move, int str)
 
 
 /*
- * does_defend(ti, tj, ai, aj) returns true if the move at (ti, tj)
- * defends (ai, aj). This means that it defends the string, and that
- * (ai, aj) can be captured if no defense is made.
+ * does_defend(move, str) returns true if the move at (move)
+ * defends (str). This means that it defends the string, and that
+ * (str) can be captured if no defense is made.
  */
 
 int

@@ -84,7 +84,7 @@
  */
 int
 aftermath_genmove(int *i, int *j, int color,
-		  int under_control[MAX_BOARD][MAX_BOARD],
+		  int under_control[BOARDMAX],
 		  int do_capture_dead_stones)
 {
   int m, n;
@@ -168,9 +168,9 @@ aftermath_genmove(int *i, int *j, int color,
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
 	if (distance[m][n] == -1)
-	  under_control[m][n] = 0;
+	  under_control[POS(m, n)] = 0;
 	else
-	  under_control[m][n] = 1;
+	  under_control[POS(m, n)] = 1;
       }
   }
   
@@ -814,39 +814,39 @@ play_aftermath(int color)
   
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (a->black_control[m][n]) {
+      if (a->black_control[POS(m, n)]) {
 	a->black_area++;
 	if (BOARD(m, n) == WHITE) {
 	  a->black_territory++;
 	  a->white_prisoners++;
-	  a->final_status[m][n] = DEAD;
+	  a->final_status[POS(m, n)] = DEAD;
 	}
 	else if (BOARD(m, n) == EMPTY) {
 	  a->black_territory++;
-	  a->final_status[m][n] = BLACK_TERRITORY;
+	  a->final_status[POS(m, n)] = BLACK_TERRITORY;
 	}
 	else
-	  a->final_status[m][n] = ALIVE;
+	  a->final_status[POS(m, n)] = ALIVE;
       }
-      else if (a->white_control[m][n]) {
+      else if (a->white_control[POS(m, n)]) {
 	a->white_area++;
 	if (BOARD(m, n) == BLACK) {
 	  a->white_territory++;
 	  a->black_prisoners++;
-	  a->final_status[m][n] = DEAD;
+	  a->final_status[POS(m, n)] = DEAD;
 	}
 	else if (BOARD(m, n) == EMPTY) {
 	  a->white_territory++;
-	  a->final_status[m][n] = WHITE_TERRITORY;
+	  a->final_status[POS(m, n)] = WHITE_TERRITORY;
 	}
 	else
-	  a->final_status[m][n] = ALIVE;
+	  a->final_status[POS(m, n)] = ALIVE;
       }
       else {
 	if (BOARD(m, n) == EMPTY)
-	  a->final_status[m][n] = DAME;
+	  a->final_status[POS(m, n)] = DAME;
 	else {
-	  a->final_status[m][n] = ALIVE_IN_SEKI;
+	  a->final_status[POS(m, n)] = ALIVE_IN_SEKI;
 	  if (BOARD(m, n) == WHITE)
 	    a->white_area++;
 	  else
@@ -884,7 +884,7 @@ aftermath_final_status(int color, int m, int n)
 {
   ASSERT_ON_BOARD2(m, n);
   play_aftermath(color);
-  return aftermath.final_status[m][n];
+  return aftermath.final_status[POS(m, n)];
 }
 
 /*

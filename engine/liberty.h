@@ -230,7 +230,7 @@ typedef void (*fullboard_matchpat_callback_fn_ptr)(int ti, int tj,
                                                    int rotation);
 void global_matchpat(matchpat_callback_fn_ptr callback, int color,
 		     struct pattern_db *pdb, void *callback_data,
-		     char goal[MAX_BOARD][MAX_BOARD]);
+		     char goal[BOARDMAX]);
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
 
@@ -288,8 +288,7 @@ void set_temporary_depth_values(int d, int b, int f, int k,
 void restore_depth_values(void);
 int safe_move(int move, int color);
 void join_dragons(int ai, int aj, int bi, int bj);
-int dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
-		  int escape_value[MAX_BOARD][MAX_BOARD]);
+int dragon_escape(char goal[BOARDMAX], int color, int escape_value[BOARDMAX]);
 int lively_dragon_exists(int color);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
@@ -387,7 +386,7 @@ int review_move_reasons(int *i, int *j, float *val, int color,
 			float pure_threat_value, float lower_bound);
 int fill_liberty(int *i, int *j, int color);
 int aftermath_genmove(int *i, int *j, int color,
-		      int under_control[MAX_BOARD][MAX_BOARD],
+		      int under_control[BOARDMAX],
 		      int do_capture_dead_stones);
 int revise_semeai(int color);
 
@@ -482,8 +481,8 @@ void get_move_influence(int i, int j, int color,
                         float white_influence[MAX_BOARD][MAX_BOARD],
                         float black_influence[MAX_BOARD][MAX_BOARD],
                         int influence_regions[MAX_BOARD][MAX_BOARD]);
-void compute_escape_influence(char goal[MAX_BOARD][MAX_BOARD], int color,
-                              int escape_value[MAX_BOARD][MAX_BOARD],
+void compute_escape_influence(char goal[BOARDMAX], int color,
+                              int escape_value[BOARDMAX],
                               int dragons_known);
 
 /* Eye space functions. */
@@ -502,7 +501,7 @@ void move_considered(int i, int j, float value);
 /* SGF routines for debugging purposes in sgffile.c */
 int  sgffile_write_line(const char *, ...);
 void sgffile_dragon_status(int, int, int );
-void goaldump(char goal[MAX_BOARD][MAX_BOARD]);
+void goaldump(char goal[BOARDMAX]);
 void begin_sgftreedump(struct SGFTree_t *tree);
 void end_sgftreedump(const char *filename);
 
@@ -687,9 +686,9 @@ struct aftermath_data {
   int black_territory;
   int white_area;
   int black_area;
-  int white_control[MAX_BOARD][MAX_BOARD];
-  int black_control[MAX_BOARD][MAX_BOARD];
-  int final_status[MAX_BOARD][MAX_BOARD];
+  int white_control[BOARDMAX];
+  int black_control[BOARDMAX];
+  int final_status[BOARDMAX];
 };
 
 struct eye_data {
