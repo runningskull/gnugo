@@ -252,82 +252,64 @@ First comes the sequence of events when
 is for reference only.
 
 @format
-purge persistent reading cache (@pxref{Persistent Cache})
-@code{make_worms()} (@pxref{Worms}):
-  @code{build_worms()} finds and identifies the worms
-  compute effective size of each worm
-  @code{unconditional_life()}
-  @code{find_worm_attacks_and_defenses()}:
+@code{purge_persistent_caches()}
+@code{make_worms()}:
+  @code{compute_effective_sizes()}
+  @code{compute_unconditional_status()}
+  @code{find_worm_attacks_and_defenses()}:      
     for each attackable worm:
       set @code{worm.attack}
-      @code{add_attack_move()}
+      @code{change_attack()} to add the attack point
     @code{find_attack_patterns()} to find a few more attacks
-    for each defensible worm
-      set @code{worm.defend}
-      @code{add_defense_move}
-      if point of attack is not adjacent to worm see if it defends
-    @code{find_defense_patterns()} to find a few more defenses
-    for each attackable worm try each liberty
-      if it attacks @code{add_attack_move}
-      if it defends @code{add_defense_move}
-  find kos.
-  for each worm
-    find higher order liberties
-  find cutting points (worm.cutstone)
-  for each worm compute the genus (@pxref{Worms})
-  try to improve values of worm.attack and worm.defend
-  try to repair situations where adjacent worms can be
-    both attacked and defended
+    for each defensible worm:
+      set @code{worm.attack}
+      @code{change_defense()} to add the defense point
+    @code{find_defense_patterns()} to find a few more defense moves
+    find additional attacks and defenses by testing all
+      immediate liberties
+  find higher order liberties (for each worm)
+  find cutting stones (for each worm)
+  improve attacks and defenses: if capturing a string defends
+    another friendly string, or kills an unfriendly one, we
+    add points of defense or attack. Make repairs if adjacent 
+    strings can both be attacked but not defended.
   find worm lunches
   find worm threats
-@code{compute_initial_influence()} (@pxref{Influence})
-  @code{compute_influence()}
-    @code{find_influence_patterns()}
-  at each intersection @code{accumulate_influence()}
+  identify inessential worms (such as nakade stones)
+@code{compute_worm_influence()}:
+  @code{find_influence_patterns()}
+  @code{value_influence()}
   @code{segment_influence()}
-@code{make_dragons()} (@pxref{Dragons})
-  initialize dragon data
-  find the inessential worms
-  @code{make_domains()}
-    initialize eye data
-    @code{compute_primary_domains()}
-    fill out arrays black_eye and white_eye 
-      describing eyeshapes
-    find_cuts()
-    for every eyespace
-      @code{originate_eye()}
-    count_neighbors()
+@code{make_dragons()}:
+  @code{find_cuts()}
   @code{find_connections()}
-  amalgamate dragons sharing an eyespace
-  @code{initialize_supplementary_dragon_data()}
-  find adjacent worms which can be captured (dragon lunches)
-  find topological half eyes and false eyes
-  @code{modify_eye_spaces()}
-  for each eye space
-    @code{compute_eyes()}
-    store the results in black_eye, white_eye arrays
-  compute the genus of each dragon
-  for each dragon
-    @code{compute_escape()}
+  @code{make_domains()} (determine eyeshapes)
+  @code{find_lunches()} (adjacent strings that can be captured)
+  @code{find_half_and_false_eyes()}
+  @code{eye_computations()}: Compute the value of each eye space. 
+    Store its attack and defense point.
+  @code{analyze_false_eye_territory()}
+  for each dragon @code{compute_dragon_genus()}
+  for each dragon @code{compute_escape()} and set escape route data
   @code{resegment_initial_influence()}
-  for each dragon
-    @code{influence_get_moyo_size()}
-  for each dragon
-     @code{compute_dragon_status()}
+  @code{compute_refined_dragon_weaknesses()} (called again after owl)
+  for each dragon @code{compute_crude_status()}
   @code{find_neighbor_dragons()}
-  @code{purge_persistent_owl_cache()}
-  for each dragon which seems surrounded
-     try @code{owl_attack()} and @code{owl_defend()}
-     if appropriate find owl threats
-  for each dragon
-     set dragon.matcher_status
-  for each dragon
-     set dragon2.safety
-  @code{semeai()}
-  revise opinion of which worms are inessential
-  count non-dead dragons of each color
-@code{owl_reasons()} (@pxref{The Owl Code})
-@code{compute_initial_influence()} again (@pxref{Influence})
+  for each dragon compute surround status
+  for each weak dragon run @code{owl_attack()} and @code{owl_defend()} 
+    to determine points of attack and defense
+  for each dragon compute dragon.status
+  for each thrashing dragon compute owl threats
+  for each dragon compute dragon.safety
+  @code{revise_inessentiality()}
+  @code{semeai()}:
+    for every semeai, run @code{owl_analyze_semeai()}
+    @code{find_moves_to_make_seki()}
+  @code{identify_thrashing_dragons()}
+  @code{compute_dragon_influence()}:
+    @code{compute_influence()}
+    @code{break_territories()} (@pxref{Break Ins})
+  @code{compute_refined_dragon_weaknesses()}
 @end format
 
 Now a summary of the sequence of events during the
@@ -335,27 +317,27 @@ move generation and selection phases of @code{genmove()}, which
 take place after the information gathering phase has been completed:
 
 @format
+@code{estimate_score()}
+@code{choose_strategy()}
+@code{collect_move_reasons()}:
+  @code{worm_reasons()}: for each attack and defense point add a move reason
+  @code{semeai_reasons()}: for each dragon2.semeai point add a move reason
+  @code{owl_reasons()}: for each owl attack and defense point add a move reason
+  @code{break_in_reasons()}: for each breakin found add a move reason
 @code{fuseki()}
-@code{shapes()}
+@code{break_mirror_go()}
+@code{shapes()}: match patterns around the board (@pxref{Patterns Overview})
+@code{combinations()}: look for moves with a double meaning and other tricks
+  @code{find_double_threats()}
+  @code{atari_atari()}
 @code{review_move_reasons()}
-  @code{find_more_attack_and_defense_moves()}
-  @code{remove_opponent_attack_and_defense_moves()}
-  @code{do_remove_false_attack_and_defense_moves()}
-  @code{examine_move_safety()}
-  @code{induce_secondary_move_reasons()}
-  @code{value_moves()}
-  find the ten best moves
-if the value of the best move is < 6.0
-  @code{endgame_shapes()}
-@findex endgame_shapes
-if no move found yet
-  @code{revise_semeai()}
-  @code{shapes()}
-  @code{endgame_shapes()}
-if still no move found
-  @code{fill_liberty()}
-if still no move found
-    pass
+if ahead and there is a thrashing dragon, consider it 
+  alive and reconsider the position
+@code{endgame_shapes()}
+@code{endgame()}
+if no move found yet, revisit any semeai, change status of dead opponent
+  to alive, then run @code{shapes()} and @code{endgame_shapes()} again
+if no move found yet, run @code{fill_liberty()}
 @end format
 
 @node Roadmap

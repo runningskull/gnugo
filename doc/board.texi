@@ -484,13 +484,12 @@ Thus the correct way of using this function is:
 @end example
 
 @noindent
-Here the @code{komaster} is only set if a conditional ko capture has been made
-at an earlier move. This feature of the tactical and owl reading code in GNU
-Go is used to prevent redundant reading when there is a ko on the board
-(@pxref{Ko}).
+
+In case the move is a ko capture, the legality of the capture is subject to
+the komaster scheme (@pxref{Ko}).
 
 @itemize @bullet
-@item @code{int trymove(int pos, int color, const char *message, int str, int komaster, int kom_pos)}
+@item @code{int trymove(int pos, int color, const char *message)}
 @findex trymove
 @quotation
 Returns true if @code{(pos)} is a legal move for @code{color}. In that
@@ -499,10 +498,10 @@ case, it pushes the board on the stack and makes the move, incrementing
 with @option{--decide-string} or with @option{-o}), the string
 @code{*message} will be inserted in the SGF file as a comment. The
 comment will also refer to the string at @code{str} if this is not
-@code{0}. The komaster and ko position variables are described 
-elsewhere (@pxref{Ko})
+@code{0}. The value of @code{str} can be NO_MOVE if it is not needed but
+otherwise the location of @code{str} is included in the comment.
 @end quotation
-@item @code{int tryko(int pos, int color, const char *message, int komaster, int kom_pos)}
+@item @code{int tryko(int pos, int color, const char *message)}
 @findex tryko
 @quotation
 @code{tryko()} pushes the position onto the stack, and makes a move
@@ -526,7 +525,7 @@ before the call.
 move was not legal, you must @strong{not} call @code{popgo}.
 @end quotation
 
-@item @code{int komaster_trymove(int pos, int color, const char *message, int str, int komaster, int kom_pos, int *new_komaster, int *new_kom_pos, int *is_conditional_ko, int consider_conditional_ko)}
+@item @code{int komaster_trymove(int pos, int color, const char *message, int str, int *is_conditional_ko, int consider_conditional_ko)}
 @findex komaster_trymove
 @quotation
 Variation of @code{trymove}/@code{tryko} where ko captures (both

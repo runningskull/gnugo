@@ -57,17 +57,18 @@ command line by just typing:
 @end example
 
 @noindent
-but it is nicer to run it using CGoban 1 (under X-Windows) or Jago
-(on any platform with a Java runtime environment).
+but it is nicer to run it using CGoban 1 (under X-Windows), Jago
+(on any platform with a Java runtime environment) or other
+client programs offering a GUI.
 
-   You can get the most recent version of CGoban 1 from 
+You can get the most recent version of CGoban 1 from 
 @url{http://sourceforge.net/projects/cgoban1/}. The earlier version
 1.12 is available from @url{http://www.igoweb.org/~wms/comp/cgoban/index.html}.
 The CGoban version number MUST be 1.9.1 at least or it won't work. CGoban 2
 will not work.
 
 @xref{CGoban}, for instructions on how to run GNU Go from Cgoban, or
-@xref{Jago}, for Jago.
+@xref{Other Clients}, for Jago or other clients.
 
 @node Configure Options
 @section Configure Options
@@ -79,7 +80,7 @@ particularly if you are dissatisfied with GNU Go's performance.
 * Ram Cache::                 Ram Cache
 * Default Level::             Default Level
 * DFA Option::                DFA Option
-* Experimental Options::      Experimental Options
+* Other Options::             Other Options
 @end menu
 
 @node Ram Cache
@@ -156,8 +157,8 @@ with the configure option @command{./configure --disable-dfa}.  The
 option is harder to debug than the old matcher but significantly
 faster (@pxref{DFA}).
 
-@node Experimental Options
-@subsection Experimental Options
+@node Other Options
+@subsection Other Options
 
 Anything new in the engine is generally tested as an experimental
 option which can be turned on or off at compile time or run time.
@@ -167,6 +168,11 @@ semeai code are no longer experimental but are enabled by default.
 This section can be skipped unless you are interested in the
 experimental options.
 
+Moreover, some configure options were removed from the stable
+release. For example it is known that the owl extension code
+can cause crashes, so the configure option --enable-experimental-owl-ext
+was disabled for 3.6.
+
 The term ``default'' must be clarified, since there
 are really two sets of defaults at hand, runtime defaults
 specified in @file{config.h} and compile time default
@@ -175,27 +181,28 @@ values for the runtime defaults, contained in @file{configure}
 @command{autoconf}. For example we find in @file{config.h}
 
 @example
-/* GAIN/LOSS codes. Disabled by default. */
-#define EXPERIMENTAL_OWL_EXT 0
+/* Center oriented influence. Disabled by default. */
+#define COSMIC_GNUGO 0
 
 /* Break-in module. Enabled by default. */
 #define USE_BREAK_IN 1
-
 @end example
 
-This means that the experimental owl extension (@pxref{Experimental Owl
-Extension}) is disabled by default, but the break-in module (@pxref{Break
-Ins}) is turned on. At run time you can override the default by running GNU Go
-with the command line options
+This means that the experimental cosmic option, which causes
+GNU Go to play a center-oriented game (and makes the engine
+weaker) is disabled by default, but that the break-in module
+is used. These are defaults which are used when GNU Go is
+run without command line options. They can be overridden
+with the run time options:
 
 @example
-gnugo --experimental-owl-ext --without-break-in
+gnugo --cosmic-gnugo --without-break-in
 @end example
 
 Alternatively you can configure GNU Go as follows:
 
 @example
-./configure --enable-experimental-owl-ext --disable-experimental-break-in
+./configure --enable-cosmic-gnugo --disable-experimental-break-in
 @end example
 
 then recompile GNU Go. This changes the defaults in @file{config.h},
@@ -213,20 +220,26 @@ of experimental options in GNU Go.
 the break in code is enabled by default in level 10, and is turned
 off at level 9. If you don't want the breakin code just play at
 level 9.
-@item @code{experimental-owl-ext}. Experimental Owl extension 
-(@pxref{Experimental Owl Extension}).
 @item @code{cosmic-gnugo}. An experimental style which plays a center
 oriented game and has a good winning rate against standard GNU Go,
-though it may not be stronger than standard GNU Go against other
-opponents.
-@item @code{owl-threats}. Compute owl threats. Potentially this could
-makes GNU Go stronger but it also makes the program slower. Moreover the
-owl threat code has not been tested recently and may need some work.
-@item @code{experimental-connections}. Use the experimental connection
-analysis. @strong{Enabled by default.} Turning it off currently makes
-no difference.
-@item @code{alternate-connections}. Uses an alternative implementation of
-the experimental connection analysis. @strong{Enabled by default.}
+though it makes GNU Go weaker against other opponents.
+@item @code{large-scale}. Attempt to make large-scale captures.
+See @url{http://lists.gnu.org/archive/html/gnugo-devel/2003-07/msg00209.html}
+for the philosophy of this option. This option makes the engine slower.
+@item @code{metamachine}. Enables the metamachine, which allows
+you to run the engine in an experimental mode whereby it forks
+a new @code{gnugo} process which acts as an ``oracle.'' Has no
+effect unless combined with the @option{--metamachine} run-time
+option.
+@end itemize
+
+Other options are not experimental, and can be changed as
+configure or runtime options.
+
+@itemize @bullet
+@item @code{chinese-rules} Use Chinese (area) counting.
+@item @code{resignation-allowed} Allow GNU Go to resign games.
+This is on by default.
 @end itemize
 
 @node Windows and MS-DOS, Macintosh, Configure Options, Installation

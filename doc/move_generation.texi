@@ -54,12 +54,13 @@ of safe moves in a winning position.
 
 @node Move Reasons
 @section Generation of move reasons
+@cindex move reasons
 
 Each move generator suggests a number of moves.  It justifies each move
 suggestion with one or move @dfn{move reasons}.  These move reasons
 are collected at each intersection where the moves are suggested for
-later valuation.  A partial list of of move reasons considered by GNU
-Go are:
+later valuation. Here is a partial list of of move reasons considered by GNU
+Go. (The complete list may be found in @file{move_reasons.h}.)
 
 @table @code
 @item ATTACK_MOVE
@@ -251,6 +252,7 @@ moyo'' move reason.
 
 @node Owl attack and defense
 @subsection Attacking and Defending Dragons
+@findex owl_reasons
 
 Just as the tactical reading code tries to determine when a worm
 can be attacked or defended, the owl code tries to determine
@@ -293,6 +295,7 @@ is found, it tries to shorten it by rejecting irrelevant moves.
 
 @node Valuation
 @section Valuation of suggested moves
+@findex value_move_reasons()
 
 At the end of the move generation process, the function
 @code{value_move_reasons()} tries to assign values to the

@@ -1,9 +1,9 @@
 @menu
 * Documentation::            Getting Documentation
 * CGoban::                   Running GNU Go with CGoban
+* Other Clients::            Other Clients
 * Ascii::                    The Ascii Interface
 * Emacs::                    GNU Go mode in Emacs
-* Jago::                     Jago
 * GMP and GTP::              The Go Modem Protocol and Go Text Protocol
 * Tournaments::              Computer Tournaments
 * SGF Support::              The Smart Game Format
@@ -54,7 +54,12 @@ interested in helping to develop this program.
 @section Running GNU Go via CGoban
 @cindex CGoban
 
-This is an extremely nice way to run GNU Go. CGoban provides a
+There are two different programs called CGoban, both written by
+William Shubert. In this documentation, CGoban means CGoban 1.x,
+the older program. You should get a copy with version number 1.12 
+or higher.
+
+CGoban is an extremely nice way to run GNU Go. CGoban provides a
 beautiful graphic user interface under X-Windows.
 
 Start CGoban. When the CGoban Control panel comes up, select ``Go
@@ -82,6 +87,71 @@ suppress most messages. Since the Go Modem Protocol preempts standard
 I/O other messages are sent to stderr, even if they are not error
 messages. These will appear in the terminal from which you started
 CGoban.
+
+@node Other Clients
+@section Other Clients
+@cindex jago
+@cindex quarry
+@cindex glGo
+@cindex gGo
+@cindex qGo
+
+In addition to CGoban (@pxref{CGoban}) there are a number of
+other good clients that are capable of running GNU Go. Here
+are the ones that we are aware of that are Free Software. This
+list is part of a larger list of free Go programs that is maintained
+at @url{http://www.gnu.org/software/gnugo/free_go_software.html}.
+
+@itemize @bullet
+@item qGo (@url{http://sourceforge.net/projects/qgo/}) is a
+full featured Client for playing on the servers, SGF viewing/editing,
+and GNU Go client written in C++ for GNU/Linux, Windows and Mac OS X.
+Can play One Color Go. Licensed GPL and QPL.
+@item glGo (@url{http://ggo.sourceforge.net/}) is a C++ client
+by Peter Strempel, capable of playing against GNU Go or
+on IGS. Source code is available under the GPL.
+@item ccGo (@url{http://ccdw.org/~cjj/prog/ccgo/}) is a GPL'd client
+written in C++ capable of playing with GNU Go, or on IGS.
+@item RubyGo (@url{http://rubygo.rubyforge.org/}) is a GPL'd
+client by J.-F. Menon for IGS written in the scripting language Ruby.
+RubyGo is capable of playing with GNU Go using the GTP.
+@item Dingoui (@url{http://dingoui.sourceforge.net/}) is a free
+GMP client written in GTK which can run GNU Go.
+@item Jago (@url{http://www.rene-grothmann.de/jago/})
+is a GPL'd Java client which works for both Microsoft Windows
+and X-Window System.
+@item Sente Software's FreeGoban 
+(@url{http://www.sente.ch/software/goban/freegoban.html}) is a
+well-liked user interface for GNU Go (and potentially other
+programs) distributed under the GPL.
+@item  Mac GNU Go (@url{http://www1.u-netsurf.ne.jp/~future/HTML/macgnugo.html}) is a front end for GNU Go 3.2 with both
+English and Japanese versions. License is GPL.
+@item Quickiego (@url{http://www.geocities.com/secretmojo/QuickieGo/}) 
+is a Mac interface to GNU Go 2.6.
+@item Gogui (@url{http://sourceforge.net/projects/gogui/}) from
+Markus Enzenberger is a Java workbench that allows you to play
+with a gtp (@url{http://www.lysator.liu.se/~gunnar/gtp})
+engine such as GNU Go. Source code is in the
+CVS (@url{http://sourceforge.net/cvs/?group_id=59117}).
+Licence is GPL. Gogui does not yet support gmp or play on
+servers but is potentially very useful for programmers
+working on GNU Go or other engines.
+@item gGo is a Java program which was originally known as qGo for Java.
+Although the public source of the program is no longer maintained, it is
+still useful may be found at sourceforge
+here (@url{http://prdownloads.sourceforge.net/ggo/}) or here
+(@url{ftp://download.sourceforge.net/pub/sourceforge/g/gg/ggo/}).
+GGo can function as a client or sgf editor and supports the GTP,
+so you can play on the servers or with GNU Go. Licence is GPL.
+@item Quarry (@url{http://home.gna.org/quarry/}) is a GPL'd
+client that supports GTP.  Works under GNU/Linux and requires
+GTK+ 2.x and librsvg 2.5.  Supports GNU Go as well as other
+engines.  Can play not only Go, but also a few other board
+games.
+@item Goben (@url{http://www.waz.easynet.co.uk/software.html}),
+a GTP capable front end for GNU Go using GTK libraries from
+Wayne Myers. Licensed GPL.
+@end itemize
 
 @node Ascii
 @section Ascii Interface
@@ -168,19 +238,6 @@ command for GNU Go. The possible commands are as in @xref{Ascii}.
 @end quotation
 @end itemize
 
-@node Jago
-@section Running GNU Go via Jago
-@cindex jago
-
-Jago, like CGoban is a client capable of providing GNU Go with a
-graphical user interface. Unlike CGoban, it does not require 
-X-Windows, so it is an attractive alternative under Windows.
-You will need a Java runtime environment. Obtain Jago at
-
-@url{http://www.rene-grothmann.de/jago/}
-@noindent
-and follow the links there for the Java runtime environment.
-
 @node GMP and GTP
 @section The Go Modem Protocol and Go Text Protocol
 @cindex GMP
@@ -200,7 +257,10 @@ resizing the board and other distracting issues.
 
 GNU Go 3.0 introduced a new protocol, the Go Text Protocol
 (@pxref{GTP}) which we hope can serve the functions currently 
-used by the GMP.
+used by the GMP. The GTP is becoming increasingly adopted by
+other programs as a method of interprocess communication,
+both by computer programs and by clients. Still the GMP is 
+widely used in tournaments.
 
 @node Tournaments
 
@@ -352,7 +412,7 @@ in the CGI interface in @file{interface/html/gg.cgi}.
 @item @option{--options}
 @quotation 
 Print which experimental configure options were compiled into the program
-(@pxref{Experimental Options}).
+(@pxref{Other Options}).
 @end quotation
 @item @option{--orientation @var{n}}
 @quotation
@@ -733,7 +793,7 @@ code to finish capturing all dead stones.
 @subsection Experimental options
 
 Most of these are available as configure options and are
-described in @ref{Experimental Options}.
+described in @ref{Other Options}.
 
 @itemize @bullet
 @item @option{--options}

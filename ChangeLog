@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- doc revision
 - find_moves_to_make_seki() extended to examine the case of dead stones
   inside the eye of single-eyed dragons
 - added support for GTP communication over TCP/IP socket;  GNU Go can
