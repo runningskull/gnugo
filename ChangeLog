@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- regress.pike revised so that previous output can be used as input
+  with -f to rerun tests with unexpected results
 - connection_value() revised
 - use influence-based score estimate instead of Bouzy's algorithm
 - new global variable white_score, black_score

@@ -351,10 +351,13 @@ string parse_tests(mapping(string:array(int)) partial_testsuites,
 		   string tests)
 {
   string suite, numbers;
-  if (sscanf(tests, "%s:%s", suite, numbers) != 2) {
+  if (sscanf(tests, "%[^ :]:%s", suite, numbers) != 2) {
     suite = tests;
     numbers = "";
   }
+
+  if (has_value(suite, " "))
+    return "";
   
   if (!has_suffix(suite, ".tst"))
     suite += ".tst";
@@ -458,6 +461,8 @@ int main(int argc, array(string) argv)
   foreach (argv, string tests)
     testsuites |= ({parse_tests(partial_testsuites, tests)});
 
+  testsuites -= ({""});
+  
   if (sizeof(testsuites) == 0) {
     string makefile = Stdio.read_file("Makefile.am");
     foreach (makefile / "\n", string s) {
