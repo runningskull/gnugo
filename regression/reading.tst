@@ -286,7 +286,7 @@ loadsgf games/strategy5.sgf 44
 loadsgf games/reading04.sgf 237
 trymove B E1
 62 defend D6
-#? [2 F2]
+#? [2 (F2|G3)]
 popgo
 
 # Position from Tim's game
@@ -369,7 +369,7 @@ loadsgf games/strategy5.sgf 45
 # Necessary to start by reinforcing surrounding chain.
 loadsgf games/reading11.sgf
 88 attack G6
-#? [1 D5]
+#? [1 (D5|E4)]
 
 # Simplification of test 24, double snapback.
 loadsgf games/reading12.sgf
@@ -441,7 +441,7 @@ loadsgf games/reading16.sgf
 108 attack L3
 #? [1 K2]
 109 defend L3
-#? [1 (K2|M2)]
+#? [1 (K2|M2|N3)]
 
 # Simplification of test 21.
 loadsgf games/reading12.sgf

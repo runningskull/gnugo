@@ -310,7 +310,7 @@ int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
 int dragon_weak(int pos);
 
 
-/* FIXME: My appologies for the set_value macro - needed for 
+/* FIXME: tm: My appologies for the set_value macro - needed for 
  * EXPERIMENTAL_READING code.  I will repair shortly - tm.
  */
 #define set_value(x) patt->value = (x)
@@ -357,8 +357,9 @@ extern struct pattern_db read_attack_db;
 extern struct pattern_db read_defend_db;
 
 
+
 /* Tree-based pattern matching structures*/
-/* FIXME: graph_* should be renamed to tree_* */
+/* FIXME: tm: graph_* should be renamed to tree_* */
 
 struct match_node;
 struct graph_node_list;
@@ -384,6 +385,7 @@ struct graph_node_list {
 };
 
 
+/* FIXME: tm: This needn't be defined in the header file. */
 struct element_node {
   struct patval e;
   struct element_node *next;

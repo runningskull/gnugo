@@ -696,7 +696,7 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
       if ((att == EMPTY && point_color == EMPTY)
           || (att == ATT_X && point_color == OTHER_COLOR(color) )
           || (att == ATT_O && point_color == color)) {
-        /* FIXME: Don't need this check if anchor_in_goal */
+        /* FIXME: tm: Don't need this check if anchor_in_goal */
         goal_found = goal_found || goal[POS(x,y)];
         if (node->matches) {
           struct match_node *match = node->matches->next;

@@ -205,7 +205,19 @@ SOURCE=.\read_defend.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\dfa.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\eyes.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\patlib.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\patterns.h
 # End Source File
 # End Group
 # Begin Group "db files"

@@ -1470,7 +1470,7 @@ write_elements(FILE *outfile, char *name)
 }
 
 
-/* FIXME: This only needs to be size 2, not 1000 */
+/* FIXME: tm: This only needs to be size 2, not 1000 */
 struct graph_node graph[1000];
 int graph_next = 0;
 
@@ -1586,12 +1586,8 @@ tree_push_pattern_DOX(struct element_node *elist, int ll) {
   if (need_copy) {
     struct element_node *elist_copy1 = malloc(sizeof(struct element_node));
     struct element_node *elist_copy2 = malloc(sizeof(struct element_node));
-    struct element_node *elist1_next = 
-      (elist_copy1);
-     /*->next = malloc(sizeof(struct element_node)));*/
-    struct element_node *elist2_next =
-      (elist_copy2);
-    /*->next = malloc(sizeof(struct element_node)));*/
+    struct element_node *elist1_next = elist_copy1;
+    struct element_node *elist2_next = elist_copy2;
     int found_copy_element=0;
     
     elist_next = elist->next;
@@ -1641,7 +1637,7 @@ tree_push_pattern_DOX(struct element_node *elist, int ll) {
       }
     }
   }
-  assert(0); /* Anchor not matched. */
+  assert(0 && "Anchor not matched.");
 }
 
 /* Rotate the pattern and push it onto the tree once for each
@@ -1833,7 +1829,7 @@ dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
       assert(0 && "Strange bug here");
       /* This may be where we crash if we're missing an anchor color
        * in the database */
-      if (0) fprintf(outfile, "  gnl[%d].node.next_list = 0;\n");
+      if (0) fprintf(outfile, "  gnl[%d].node.next_list = 0;\n", gnl_count);
     }
   }
 
@@ -1877,12 +1873,12 @@ tree_write_patterns(FILE *outfile, char *name)
   fprintf(outfile, "struct graph_node_list gnl_%s[] =\n{\n", name);
   for (i = 0; i < gnl_count+1; i++) {
     fprintf(outfile, "  { {(void*)%d, %d, %d, %d, (void*)%d}, (void*)%d}, /*#%d*/\n",
-                     gnl_dump[i].node.matches,
+                     (int)gnl_dump[i].node.matches,
                      gnl_dump[i].node.att,
                      gnl_dump[i].node.x,
                      gnl_dump[i].node.y,
-                     gnl_dump[i].node.next_list,
-                     gnl_dump[i].next,
+                     (int)gnl_dump[i].node.next_list,
+                     (int)gnl_dump[i].next,
                      i);
   }
   fprintf(outfile, "};\n\n");
@@ -1892,7 +1888,7 @@ tree_write_patterns(FILE *outfile, char *name)
     fprintf(outfile, "  {%d, %d, (void*)%d}, /*#%d*/\n",
                      matches_dump[i].patnum,
                      matches_dump[i].orientation,
-                     matches_dump[i].next,
+                     (int)matches_dump[i].next,
                      i);
   }
   fprintf(outfile, "};\n\n");
@@ -1906,6 +1902,7 @@ tree_write_patterns(FILE *outfile, char *name)
     name, name, gnl_count+1, mn_count+1);
   fprintf(outfile, "}\n\n");
 }
+
 
 /* sort and write out the patterns */
 static void

@@ -40,6 +40,10 @@
 #include "gg_utils.h"
 
 #define KOMASTER_SCHEME 1
+#define KOMASTER_TRACE 0
+
+int tracing_inside_komaster = 0;
+
 
 /* This can be used for internal checks w/in board.c that should
  * typically not be necessary (for speed). */
@@ -382,7 +386,6 @@ static int move_color[MAXSTACK];
 static Hash_data hashdata_stack[MAXSTACK];
 
 
-
 /* KOMASTER_SCHEME 4 handles empty case differently from other schemes */
 int
 komaster_is_empty(int komaster, int kom_pos) {
@@ -396,18 +399,17 @@ komaster_is_empty(int komaster, int kom_pos) {
 /* KOMASTER_SCHEME 4 handles komaster interpretation differently from 
  * other schemes */
 const char *
-komaster_to_string(int komaster) {
+komaster_to_string(int komaster, int kom_pos) {
 #if KOMASTER_SCHEME == 4 
   const char *b[4] = {"O-Illegal", "X-Illegal", "O-Legal", "X-Legal"};
   ASSERT1(komaster >=0 && komaster <=3, 0);
+  if (kom_pos == PASS_MOVE) 
+    return "EMPTY";
   return b[komaster];
 #else
   return color_to_string(komaster);
 #endif
 }
-
-
-
 
 
 /*
@@ -446,7 +448,7 @@ trymove(int pos, int color, const char *message, int str,
       if (!komaster_is_empty(komaster, kom_pos))
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, count_variations, hashdata.hashval,
-		    komaster_to_string(komaster),
+		    komaster_to_string(komaster, kom_pos),
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx)", 
@@ -458,7 +460,7 @@ trymove(int pos, int color, const char *message, int str,
 		    "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
 		    hashdata.hashval, 
-                    komaster_to_string(komaster),
+                    komaster_to_string(komaster, kom_pos),
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx)", 
@@ -547,7 +549,7 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
     if (!komaster_is_empty(komaster, kom_pos))
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
 		  message, count_variations, hashdata.hashval,
-		  komaster_to_string(komaster), 
+		  komaster_to_string(komaster, kom_pos), 
                   location_to_string(kom_pos));
     else
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx)", 
@@ -580,15 +582,17 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
 static int 
 do_trymove(int pos, int color, int ignore_ko)
 {
-  if (0) {
+  if (0 || KOMASTER_TRACE) {
+    if (tracing_inside_komaster) {
+      gprintf("%o  ");
+    }
     if (ignore_ko) {
-      gprintf("tryko");
+      gprintf("%otryko");
     } else {
-      gprintf("trymove");
+      gprintf("%otrymove");
     }
     gprintf("%o %C %1m\n", color, pos);
   }
-
 
   /* 1. The move must be inside the board and the color must be BLACK
    * or WHITE.
@@ -730,8 +734,12 @@ silent_popgo(void)
 static void
 undo_move()
 {
-  if (0) 
-    gprintf("popgo\n");
+  if (0 || KOMASTER_TRACE) {
+    if (tracing_inside_komaster) {
+      gprintf("%o  ");
+    }
+    gprintf("%opopgo\n");
+  }
 
   gg_assert(strings_initialized);
   gg_assert(change_stack_pointer - change_stack <= STACK_SIZE);
@@ -1010,6 +1018,64 @@ is_illegal_ko_capture(int pos, int color)
  * trymove()/tryko() code.
  */
 
+#if KOMASTER_TRACE
+
+/* This version of komaster_trymove is for tracing the calls to 
+ * and return values from komaster_trymove.
+ */
+int komaster_trymove_ORIGINAL(int pos, int color, const char *message, int str,
+		 int komaster, int kom_pos,
+		 int *new_komaster, int *new_kom_pos,
+		 int *is_conditional_ko, int consider_conditional_ko);
+
+int komaster_trymove(int pos, int color, const char *message, int str,
+		 int komaster, int kom_pos,
+		 int *new_komaster, int *new_kom_pos,
+		 int *is_conditional_ko, int consider_conditional_ko)
+{
+  int ret;
+  int traceon = 1;
+  tracing_inside_komaster = 1;
+  if (traceon) {
+    gprintf("%okomaster_trymove %1m %C %s %1m %d\n",
+                pos,
+                color,
+    	        komaster_to_string(komaster, kom_pos),
+	        kom_pos,
+                consider_conditional_ko);
+  }
+  ret = komaster_trymove_ORIGINAL(
+                pos, color, message, str,
+	  	komaster, kom_pos,
+		new_komaster, new_kom_pos,
+		is_conditional_ko, consider_conditional_ko);
+  if (traceon) {
+    if (*is_conditional_ko 
+        || komaster != *new_komaster 
+        || kom_pos  != *new_kom_pos) {
+      char buff[255];
+      gg_snprintf(buff, 255, "komaster:%s@%s->%s@%s is_conditional_ko:%d\n",
+              komaster_to_string(komaster, kom_pos), 
+              location_to_string(kom_pos),
+              komaster_to_string(*new_komaster, *new_kom_pos),
+              location_to_string(*new_kom_pos),
+              *is_conditional_ko);
+      gprintf("%o%s", buff);
+      if (sgf_dumptree) {
+        sgftreeAddComment(sgf_dumptree, NULL, buff);
+      }
+    }
+  }
+  tracing_inside_komaster = 0;
+  return ret;
+}
+
+
+/* Replace komaster_trymove implementation with komaster_trymove_trace */
+#define komaster_trymove komaster_trymove_ORIGINAL
+
+#endif KOMASTER_TRACE
+
 
 #if KOMASTER_SCHEME == 1
 
@@ -1269,6 +1335,7 @@ komaster_trymove(int pos, int color, const char *message, int str,
 
 #endif
 
+
 /* Returns true if the (pos1) and (pos2) are directly adjacent */
 static int
 is_next_to(int pos1, int pos2) {
@@ -1482,11 +1549,13 @@ komaster_trymove(int pos, int color, const char *message, int str,
   }
 
   /* Should have taken care of all cases by here. */
-  gg_assert(0 & "Getting here should not be possible.");
+  gg_assert(0 && "Getting here should not be possible.");
 }
 
 #endif
 
+
+#undef komaster_trymove  /* In case KOMASTER_TRACE munged it */
 
 
 /* Determine whether vertex is on the edge. */

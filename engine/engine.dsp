@@ -490,6 +490,34 @@ SOURCE=.\worm.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\cache.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\clock.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\gnugo.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\hash.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\influence.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\liberty.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\move_reasons.h
+# End Source File
 # End Group
 # End Target
 # End Project

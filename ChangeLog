@@ -2,8 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- Added several .h files to appropriate .dsp files
+- corrected gcc warnings & other cleanup in mkpat.c
+- komaster_to_string now takes 2 arguments
+- new define KOMASTER_TRACE; set to log all komaster_trymove calls
 - copyright notices updated
 - doc revision
+- additional correct answers added to reading.tst
 
 3.1.27 released March 1, 2002
 

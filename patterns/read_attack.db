@@ -29,7 +29,7 @@
 #  Need some better backfill & superstring helpers.
 
 
-## This pattern can break ko-masters, but is not good for much else
+#### This pattern can break ko-masters, but is not good for much else
 ##Pattern RA000ko
 ##
 ##?XO?	take the ko!
