@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- don't forget to switch exchange sgf_messages in order_moves()
+
 3.3.19 released April 28, 2003
 
 - change USE_BDIST to 1 in owl.c

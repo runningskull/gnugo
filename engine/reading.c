@@ -3324,6 +3324,11 @@ attack2(int str, int *move, int komaster, int kom_pos)
 	      /* FIXME: If there is more than one neighbor in atari, we
                * currently just take one randomly. This is maybe not good
                * enough. We might also want to check against snapback.
+	       *
+	       * FIXME: What is the purpose of this? It produces some
+	       * completely irrelevant moves (e.g. if bpos is a huge string
+	       * with many liberties and adjs[0] is somewhere else on the
+	       * board).
 	       */
 	      findlib(adjs[0], 1, &xpos);
 	      ADD_CANDIDATE_MOVE(xpos, 0, moves, "back-capture");
@@ -5006,8 +5011,6 @@ order_moves(int str, struct reading_moves *moves, int color,
   int string_libs = countlib(str);
   int r;
   int i, j;
-  int maxscore;
-  int max_at;
 
   /* don't bother sorting if only one move, or none at all */
   if (moves->num - first_move < 2)
@@ -5173,10 +5176,10 @@ order_moves(int str, struct reading_moves *moves, int color,
    * selection sort.
    */
   for (i = first_move; i < moves->num-1; i++) {
+    int maxscore = moves->score[i];
+    int max_at = 0; /* This is slightly faster than max_at = i. */
 
     /* Find the move with the biggest score. */
-    maxscore = moves->score[i];
-    max_at = 0; /* This is slightly faster than max_at = i. */
     for (j = i + 1; j < moves->num; j++) {
       if (moves->score[j] > maxscore) {
 	maxscore = moves->score[j];
@@ -5190,12 +5193,15 @@ order_moves(int str, struct reading_moves *moves, int color,
     if (max_at != 0) {
 
       int temp = moves->pos[max_at];
+      const char *temp_message = moves->message[max_at];
 
       moves->pos[max_at] = moves->pos[i];
       moves->score[max_at] = moves->score[i];
+      moves->message[max_at] = moves->message[i];
 
       moves->pos[i] = temp;
       moves->score[i] = maxscore;
+      moves->message[i] = temp_message;
     }
   }
 
