@@ -478,6 +478,9 @@ void record_top_move(int move, float val);
 void remove_top_move(int move);
 void scale_randomness(int pos, float scaling);
 
+void register_good_attack_threat(int move, int target);
+int is_known_good_attack_threat(int move, int target);
+
 /* Parameters to add_either_move and add_all_move */
 #define ATTACK_STRING  1
 #define DEFEND_STRING  2

@@ -2592,7 +2592,6 @@ owl_determine_life(struct local_owl_data *owl,
     if (ON_BOARD(pos) && mw[pos] > 1) {
       int value = 0;
       const char *reason = "";
-      int pos2;
       compute_eyes_pessimistic(pos, &eyevalue, &pessimistic_min,
 			       &attack_point, &defense_point,
 			       eye, owl->half_eye);

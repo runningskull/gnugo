@@ -200,9 +200,6 @@ void mark_changed_dragon(int pos, int color, int affected, int affected2,
 void mark_changed_string(int affected, char changed_stones[BOARDMAX],
 			 float strength[BOARDMAX], char new_status);
 
-void register_good_attack_threat(int move, int target);
-int is_known_good_attack_threat(int move, int target);
-
 /*
  * Local Variables:
  * tab-width: 8
