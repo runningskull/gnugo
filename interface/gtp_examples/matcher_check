@@ -256,6 +256,8 @@ while ($games > 0) {
         eat_no_response($stable_out);
     }
 
+    undef $randseed;   #if more than one game, get a new seed next time.
+
     print SGFFILEHANDLE "(;GM[1]FF[4]RU[Japanese]SZ[$size]HA[$handicap]KM[$komi]"
 	if defined $sgffilename;
 
