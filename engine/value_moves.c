@@ -761,8 +761,8 @@ examine_move_safety(int color)
 	     * dragon adjacent to the considered move.
 	     */
 
-	    for (k = 0; k < 4; k++) {
-	      int d = delta[k];
+	    for (m = 0; m < 4; m++) {
+	      int d = delta[m];
 	      if (board[pos+d] == color) {
 		bb = pos + d;
 		break;
