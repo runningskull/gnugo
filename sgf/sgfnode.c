@@ -1049,7 +1049,7 @@ gametree(SGFNode **p, SGFNode *parent, int mode)
     last = sequence(head);
     p = &last->child;
     while (lookahead == '(') {
-      gametree(p, last->parent, STRICT_SGF);
+      gametree(p, last, STRICT_SGF);
       p = &((*p)->next);
     }
     if (mode == STRICT_SGF)
@@ -1105,7 +1105,7 @@ gametreefuseki(SGFNode **p, SGFNode *parent, int mode,
 	break;
       }
       else {
-	gametreefuseki(p, last->parent, mode, moves_per_game, i);
+	gametreefuseki(p, last, mode, moves_per_game, i);
 	p = &((*p)->next);
       }
     }
