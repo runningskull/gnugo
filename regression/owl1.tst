@@ -117,6 +117,9 @@ loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 234
 288 owl_attack D4
 #? [0]
 
+loadsgf games/nngs/gnugo-3.3.9-pogonyshev-200210142137.sgf 62
+289 owl_defend H8
+#? [1 H6]
 
 ########### end of tests #####################
 
