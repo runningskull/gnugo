@@ -1123,48 +1123,49 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
   if (eye[pos].msize > MAXEYE)
     return 0;
 
-  /* Create list of eye vertices */
+  /* Create list of eye vertices. Ignore inessential marginals. */
   for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
-    if (!ON_BOARD(pos2))
+    if (!ON_BOARD(pos2)
+	|| eye[pos2].origin != pos
+	|| (heye[pos2].type & INESSENTIAL_MARGINAL))
       continue;
-    if (eye[pos2].origin == pos) {
-      vpos[eye_size] = pos2;
-      marginal[eye_size] = eye[pos2].marginal;
+
+    vpos[eye_size] = pos2;
+    marginal[eye_size] = eye[pos2].marginal;
+    if (marginal[eye_size])
+      num_marginals++;
+    neighbors[eye_size] = eye[pos2].neighbors;
+    if (0) {
       if (marginal[eye_size])
-	num_marginals++;
-      neighbors[eye_size] = eye[pos2].neighbors;
-      if (0) {
-	if (marginal[eye_size])
-	  TRACE("(%1m)", vpos[eye_size]);
-	else
-	  TRACE(" %1m ", vpos[eye_size]);
-	TRACE("\n");
-      }
-      
-      if (is_corner_vertex(pos2))
-	edge[eye_size] = 2;
-      else if (is_edge_vertex(pos2))
-	edge[eye_size] = 1;
-      else 
-	edge[eye_size] = 0;
-      
-      if (is_halfeye(heye, pos2)) {
-	neighbors[eye_size]++;      /* Increase neighbors of half eye. */
-	eye_size++;
-	/* Use a virtual marginal vertex for mapping purposes. We set it
-	 * to be at NO_MOVE so it won't accidentally count as a
-	 * neighbor for another vertex. Note that the half eye precedes
-	 * the virtual marginal vertex in the list.
-	 */
-	vpos[eye_size] = NO_MOVE;
-	marginal[eye_size] = 1;
-	num_marginals++;
-	edge[eye_size] = 0;
-	neighbors[eye_size] = 1;
-      }
-      
-      eye_size++;
+	TRACE("(%1m)", vpos[eye_size]);
+      else
+	TRACE(" %1m ", vpos[eye_size]);
+      TRACE("\n");
     }
+
+    if (is_corner_vertex(pos2))
+      edge[eye_size] = 2;
+    else if (is_edge_vertex(pos2))
+      edge[eye_size] = 1;
+    else 
+      edge[eye_size] = 0;
+
+    if (is_halfeye(heye, pos2)) {
+      neighbors[eye_size]++;      /* Increase neighbors of half eye. */
+      eye_size++;
+      /* Use a virtual marginal vertex for mapping purposes. We set it
+       * to be at NO_MOVE so it won't accidentally count as a
+       * neighbor for another vertex. Note that the half eye precedes
+       * the virtual marginal vertex in the list.
+       */
+      vpos[eye_size] = NO_MOVE;
+      marginal[eye_size] = 1;
+      num_marginals++;
+      edge[eye_size] = 0;
+      neighbors[eye_size] = 1;
+    }
+
+    eye_size++;
   }
   
   /* We attempt to construct a map from the graph to the eyespace
@@ -1488,25 +1489,50 @@ next_map(int *q, int map[MAXEYE])
 }     
 
 
-/* add_false_eye() turns a proper eyespace into a margin. */
-
+/* add_false_eye() turns a proper eyespace into a margin. It also turns
+ * neighbor marginals into inessential when some conditions are met.
+ * Consider this example:
+ *
+ *   ...O.
+ *   XXXOX
+ *   X....
+ *
+ * When the topological algorithm does its job, the eye is turned from
+ * '..!' to '.!!'. Since we prohibit such eyespaces, the easiest way to
+ * work it around is to ignore the right marginal vertex at graph matching
+ * stage. We mark it as "inessential" here and recognize_eye() ignores
+ * such marginals.
+ */
 void
 add_false_eye(int pos, struct eye_data eye[BOARDMAX],
 	      struct half_eye_data heye[BOARDMAX])
 {
   int k;
+  int detach_neighbor_marginals;
   ASSERT1(heye[pos].type == FALSE_EYE, pos);
   DEBUG(DEBUG_EYES, "false eye found at %1m\n", pos);
 
   if (eye[pos].color == GRAY || eye[pos].marginal != 0)
     return;
-  
+
   eye[pos].marginal = 1;
   eye[eye[pos].origin].msize++;
-  for (k = 0; k < 4; k++)
-    if (ON_BOARD(pos + delta[k])
-	&& eye[pos + delta[k]].origin == eye[pos].origin)
-      eye[pos + delta[k]].marginal_neighbors++;
+  detach_neighbor_marginals = (eye[pos].neighbors > 1 && is_edge_vertex(pos));
+
+  for (k = 0; k < 4; k++) {
+    int neighbor = pos + delta[k];
+    if (ON_BOARD(neighbor) && eye[neighbor].origin == eye[pos].origin) {
+      eye[neighbor].marginal_neighbors++;
+      if (detach_neighbor_marginals
+	  && eye[neighbor].marginal
+	  && eye[neighbor].neighbors == 1) {
+	heye[neighbor].type |= INESSENTIAL_MARGINAL;
+	eye[pos].neighbors--;
+	eye[pos].marginal_neighbors--;
+      }
+    }
+  }
+
   propagate_eye(eye[pos].origin, eye);
 }
 
@@ -1589,8 +1615,12 @@ find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
     
     /* skip every vertex which can't be a false or half eye */
     if (eye[pos].color != eye_color
-        || eye[pos].marginal
-        || eye[pos].neighbors > 1)
+	|| eye[pos].marginal
+#if 0
+	|| (eye[pos].neighbors > 1 && !is_edge_vertex(pos)))
+#else
+	|| eye[pos].neighbors > 1)
+#endif
       continue;
     
     sum = topological_eye(pos, color, eye, heye);

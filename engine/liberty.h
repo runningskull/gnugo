@@ -51,9 +51,10 @@ extern Hash_data    hashdata;
 /* ================================================================ */
 
 
-#define FALSE_EYE          1
-#define HALF_EYE           2
-#define INHIBIT_CONNECTION 4
+#define FALSE_EYE		1
+#define HALF_EYE		2
+#define INHIBIT_CONNECTION	4
+#define INESSENTIAL_MARGINAL	8
 
 
 /* A string with n stones can have at most 2(n+1) liberties. From this

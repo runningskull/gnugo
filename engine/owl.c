@@ -4479,18 +4479,19 @@ owl_find_lunches(struct local_owl_data *owl)
 }
 
 
-/* Try to improve the move to attack a lunch. Essentially we try to
- * avoid unsafe moves when there are less risky ways to attack.
+/* Try to improve the move to attack a lunch. Essentially we try to avoid
+ * unsafe moves when there are less risky ways to attack.
  *
- * This function also improves lunch attack point in this special case:
+ * This function also improves lunch attack point in a special case when
+ * we capture a one- or two-stone lunch on the first line. If we eat it
+ * with a first line move, there is a huge risk we'll end up with a false
+ * eye. Therefore, we move the attack to the second line when it works.
  *
- * |.XXX	In this case it is better to play A2 rather than A1 since
- * |XXOO	it saves an eye in the corner. We replace attack point if
- * |XO..	three conditions are satisfied:
- * |.O.O	  a) lunch is a single stone
- * |.XO.	  b) it's attack point is a corner point
- * +----	  c) it has no neighbors in atari
+ *   .*OO	.*OOO	    .*OOOO
+ *   .,XO	.,X.O	    .,XX.O
+ *   ----	-----	    ------
  *
+ * In all these position the attack point is moved from ',' to '*'.
  */
 static int
 improve_lunch_attack(int lunch, int attack_point)
@@ -4501,19 +4502,28 @@ improve_lunch_attack(int lunch, int attack_point)
   int adj[MAXCHAIN];
 
   if (safe_move(attack_point, color)) {
-    if (countstones(lunch) == 1 && is_corner_vertex(attack_point)
-	&& chainlinks2(lunch, adj, 1) == 0) {
-      for (k = 0; k < 4; k++) {
-	int apos = attack_point + delta[k];
+    if (is_edge_vertex(lunch)
+	&& is_edge_vertex(attack_point)
+	&& neighbor_of_string(attack_point, lunch)) {
+      int stones = countstones(lunch);
+      int libs[2];
 
-	if (board[apos] == EMPTY) {
-	  if (safe_move(apos, color))
-	    return apos;
-	  break;
+      if (stones == 1
+	  || (stones == 2
+	      && findlib(lunch, 2, libs) == 2
+	      && is_edge_vertex(libs[0])
+	      && is_edge_vertex(libs[1]))) {
+	for (k = 0; k < 4; k++) {
+	  int apos = attack_point + delta[k];
+	  if (!ON_BOARD(attack_point - delta[k]) && board[apos] == EMPTY) {
+	    if (does_attack(apos, lunch) && safe_move(apos, color))
+	      return apos;
+	    break;
+	  }
 	}
       }
     }
-  
+
     return attack_point;
   }
 

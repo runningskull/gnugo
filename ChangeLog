@@ -2,8 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- new pattern action good_attack_threat overrides heuristics in
-  value_moves.c
+
+- find_half_and_false_eyes() bugfixed
+- improve_lunch_attack() revised
+- new type of marginal vertices INESSENTIAL_MARGINAL 
+- D219 pattern retired
+- new pattern action good_attack_threat overrides heuristics in value_moves.c
 - new global known_good_attack_threats[][]
 - new functions register_good_attack_threat(), is_known_good_attack_threat()
 - make delta territory cache aware of base influence recomputation

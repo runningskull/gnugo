@@ -824,20 +824,21 @@ xx...X.        slide (usually inferior to play on third line)
 :8,-,value(70)
 
 
-Pattern D219
-# tm Modified (3.1.17)
-
-OO*        capture edge stone to maybe make eye
-.X.
----
-
-:8,-,value(50)
-
-OO*
-aA.
----
-
-;does_attack(*,A) && !obvious_false_oeye(a)
+# pp Removed (3.3.20). This job is now done by improve_lunch_attack().
+#Pattern D219
+## tm Modified (3.1.17)
+#
+#OO*        capture edge stone to maybe make eye
+#.X.
+#---
+#
+#:8,-,value(50)
+#
+#OO*
+#aA.
+#---
+#
+#;does_attack(*,A) && !obvious_false_oeye(a)
 
 
 Pattern D220
