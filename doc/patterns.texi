@@ -1217,9 +1217,9 @@ If you want to experiment with modifying the pattern database, invoke
 with the @option{-a} option. This will cause every pattern to be evaluated,
 even when some of them may be skipped due to various optimizations.
 
-You can obtain a Smart Go Format (SGF) record of your game in at least
+You can obtain a Smart Game Format (SGF) record of your game in at least
 two different ways. One is to use CGoban to record the game. You can
-also have GNU Go record the game in Smart Go Format, using the @option{-o}
+also have GNU Go record the game in Smart Game Format, using the @option{-o}
 option. It is best to combine this with @option{-a}. Do not try to read the SGF
 file until the game is finished and you have closed the game
 window. This does not mean that you have to play the game out to its

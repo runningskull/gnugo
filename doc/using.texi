@@ -6,7 +6,7 @@
 * Jago::                     Jago
 * GMP and GTP::              The Go Modem Protocol and Go Text Protocol
 * Tournaments::              Computer Tournaments
-* SGF Support::              The Smart Go Format
+* SGF Support::              The Smart Game Format
 * Invoking GNU Go::          Command line options
 @end menu
 
@@ -216,11 +216,11 @@ the device to @file{/dev/cua0} if your serial port is COM1
 and @file{/dev/cua1} if the port is COM2.
 
 @node SGF Support
-@section Smart Go Format
-@cindex SGF (Smart Go Format)
-@cindex Smart Go Format
+@section Smart Game Format
+@cindex SGF (Smart Game Format)
+@cindex Smart Game Format
 
-The Smart Go Format (SGF), is the standard format for storing Go games. 
+The Smart Game Format (SGF), is the standard format for storing Go games. 
 GNU Go supports both reading and writing SGF files. The SGF specification
 (FF[4]) is at:
 @url{http://www.red-bean.com/sgf/}

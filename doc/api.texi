@@ -62,7 +62,7 @@ incremental handling of connected strings of stones and with methods to
 efficiently hash go positions.
 
 On top of this, there is a library which helps the application use
-smart go files, SGF files, with complete handling of game trees in
+Smart Game Format (SGF) files, with complete handling of game trees in
 memory and in files. This library is called @code{libsgf.a}
 
 The main part of the code within GNU Go is the move generation

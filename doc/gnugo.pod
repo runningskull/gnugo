@@ -38,7 +38,7 @@ B<gnugo>
 GNU Go plays a game of Go against the user. It has many other features: it 
 can play against itself or another program, analyse and score a recorded 
 game. GNU Go is compliant with Go modem protocol, load and save game in
-the Smart Go format. 
+the Smart Game format. 
 
 GNU Go default is a simple alpha-numeric board display, but you can use
 a client such as B<CGoban>.
@@ -125,17 +125,17 @@ different operating system) using a modem, a serial cable or over
 the internet if the other program also supports the protocol. You
 can also communicate with the Go servers using CGoban.
 
-=head2 Smart Go Format
+=head2 Smart Game Format
 
 Games (with comments, variations and other features) can be
-stored in the Smart Go Format (SGF). This format originated in
+stored in the Smart Game Format (SGF). This format originated in
 Anders Kierulf's program Smart Go. Martin Muller and Arno
 Hollosi developed the current standard, which may be found
 at 
 
 http://www.red-bean.com/sgf/
 
-GNU Go supports the Smart Go Format.
+GNU Go supports the Smart Game Format.
 
 =head1 OPTIONS
 
