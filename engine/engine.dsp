@@ -336,7 +336,7 @@ SOURCE=.\owl.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\printutils.c
+SOURCE=.\persistent.c
 
 !IF  "$(CFG)" == "engine - Win32 Release"
 
@@ -349,7 +349,7 @@ SOURCE=.\printutils.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\persistent.c
+SOURCE=.\printutils.c
 
 !IF  "$(CFG)" == "engine - Win32 Release"
 
@@ -462,6 +462,11 @@ SOURCE=.\showbord.c
 # ADD CPP /YX"gnugo.h"
 
 !ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\surround.c
 
 # End Source File
 # Begin Source File

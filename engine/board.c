@@ -202,6 +202,17 @@ static int next_stone[BOARDMAX];
   (board[pos] == string[s].color\
    && string[string_number[pos]].mark != string_mark)
 
+/* Note that these two macros are not complementary. Both return
+ * false if board[pos] != color.
+ */
+#define UNMARKED_COLOR_STRING(pos, color)\
+  (board[pos] == color\
+   && string[string_number[pos]].mark != string_mark)
+
+#define MARKED_COLOR_STRING(pos, color)\
+  (board[pos] == color\
+   && string[string_number[pos]].mark == string_mark)
+
 #define MARK_STRING(pos) string[string_number[pos]].mark = string_mark
 
 #define STRING_AT_VERTEX(pos, s)\
@@ -275,7 +286,6 @@ static void find_liberties_and_neighbors(int s);
 static int do_remove_string(int s);
 static void do_play_move(int pos, int color);
 static int slow_approxlib(int pos, int color, int maxlib, int *libs);
-static int incremental_sloppy_self_atari(int pos, int color);
 
 
 /* Statistics. */
@@ -766,6 +776,8 @@ popgo()
 }
 
 
+#if 0
+
 /* Silent version of popgo(), suitable for use if you have called
  * do_trymove() without passing through trymove() or tryko().
  */
@@ -778,6 +790,7 @@ silent_popgo(void)
   memcpy(&hashdata, &(hashdata_stack[stackp]), sizeof(hashdata));
 }
 
+#endif
 
 /* Restore board state to the position before the last move. This is
  * accomplished by popping everything that was stored on the stacks
@@ -2009,16 +2022,17 @@ findlib(int str, int maxlib, int *libs)
 
 /* Count the liberties a stone of the given color would get if played
  * at (pos).  Captures are ignored based on the ignore_capture flag.
- * (pos) must be empty.  It will fail if there is more than one
+ * (pos) must be empty.  It will fail if there is more than two
  * string neighbor of the same color.  In this case, the return value
- * is -1.  Captures are not handled, so if ignore_capture is 0, and
- * a capture is required, -1 is returned.
+ * is -1.  Captures are handled in a very limited way, so if 
+ * ignore_capture is 0, and a capture is required, it will often
+ * return -1.
  *
  * The intent of this function is to be as fast as possible, not
- * necessarily complete.
+ * necessarily complete. But if it returns a positive value (meaning
+ * it has succeeded), the value is guaranteed to be correct.
  *
- * Note well, that it relies on incremental data (?), and the number
- * of liberties (if over MAX_LIBERTIES) may be inaccurate (?).
+ * Note well, that it relies on incremental data.
  */
 
 int
@@ -2055,6 +2069,7 @@ fastlib(int pos, int color, int ignore_capture)
         ally1 = neighbor;
     }
   }
+  
   for (k = 0; k < 4; k++) {
     int neighbor = pos + delta[k];
     int neighbor_color = board[neighbor];
@@ -2062,11 +2077,16 @@ fastlib(int pos, int color, int ignore_capture)
         && neighbor_color == other
 	&& LIBERTIES(neighbor) == 1) {
       int neighbor_size = COUNTSTONES(neighbor);
+#if 0
       if ((neighbor_size <= 2 && !ally1)
-          || (neighbor_size == 1
+       || (neighbor_size == 1
               && ally1 
               && !ally2
               && COUNTSTONES(ally1) == 1)) {
+#else
+      if (neighbor_size == 1
+         || (neighbor_size == 2 && !ally1)) {
+#endif
         /* Here, we can gain only the adjacent new liberty. */
         fast_liberties++;
       }
@@ -2085,6 +2105,7 @@ fastlib(int pos, int color, int ignore_capture)
     fast_liberties += LIBERTIES(ally1) - 1;
   if (ally2)
     fast_liberties += LIBERTIES(ally2) - count_common_libs(ally1, ally2);
+  
   return fast_liberties;
 }
 
@@ -2105,16 +2126,14 @@ approxlib(int pos, int color, int maxlib, int *libs)
 {
   int k;
   int liberties = 0;
-  int fast_liberties = 0;
 
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
 
   if (!libs) {
-    fast_liberties = fastlib(pos, color, 1);
-    if (fast_liberties >= 0) {
+    int fast_liberties = fastlib(pos, color, 1);
+    if (fast_liberties >= 0)
       return fast_liberties;
-    }
   }
 
   if (!strings_initialized)
@@ -2136,7 +2155,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
   MARK_LIBERTY(pos);
     
   if (UNMARKED_LIBERTY(SOUTH(pos))) {
-    if (libs != NULL && liberties < maxlib)
+    if (libs != NULL)
       libs[liberties] = SOUTH(pos);
     liberties++;
     /* Stop counting if we reach maxlib. */
@@ -2160,7 +2179,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
   }
   
   if (UNMARKED_LIBERTY(WEST(pos))) {
-    if (libs != NULL && liberties < maxlib)
+    if (libs != NULL)
       libs[liberties] = WEST(pos);
     liberties++;
     /* Stop counting if we reach maxlib. */
@@ -2184,7 +2203,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
   }
   
   if (UNMARKED_LIBERTY(NORTH(pos))) {
-    if (libs != NULL && liberties < maxlib)
+    if (libs != NULL)
       libs[liberties] = NORTH(pos);
     liberties++;
     /* Stop counting if we reach maxlib. */
@@ -2233,6 +2252,242 @@ approxlib(int pos, int color, int maxlib, int *libs)
       }
     }
   }  
+
+  return liberties;
+}
+
+
+/* Find the liberties a stone of the given color would get if played
+ * at (pos). This function takes into consideration all captures. Its
+ * return value is exact in that sense it counts all the liberties,
+ * unless (maxlib) allows it to stop earlier. (pos) must be empty. If
+ * libs != NULL, the locations of up to maxlib liberties are written
+ * into libs[]. The counting of liberties may or may not be halted
+ * when maxlib is reached. The number of liberties is returned.
+ *
+ * This function guarantees that liberties which are not results of
+ * captures come first in libs[] array. To find whether all the 
+ * liberties starting from a given one are results of captures, one
+ * may use  if (board[libs[k]] != EMPTY)  construction.
+ *
+ * If you want the number or the locations of all liberties, however
+ * many they are, you should pass MAXLIBS as the value for maxlib and
+ * allocate space for libs[] accordingly.
+ */
+
+int
+accuratelib(int pos, int color, int maxlib, int *libs)
+{
+  int k, l;
+  int liberties = 0;
+  int lib;
+  int captured[4];
+  int captures = 0;
+
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (!libs) {
+    int fast_liberties = fastlib(pos, color, 0);
+    if (fast_liberties >= 0)
+      return fast_liberties;
+  }
+  
+  if (!strings_initialized)
+    init_board();
+
+  string_mark++;
+  liberty_mark++;
+  MARK_LIBERTY(pos);
+
+  for (k = 0; k < 4; k++) {
+    int pos2 = pos + delta[k];
+    if (UNMARKED_LIBERTY(pos2)) {
+      /* A trivial liberty */
+      if (libs)
+       libs[liberties] = pos2;
+      liberties++;
+      if (liberties >= maxlib)
+       return liberties;
+
+      MARK_LIBERTY(pos2);
+    }
+    else if (board[pos2] == color) {
+      /* An own neighbor string */
+      struct string_data *s = &string[string_number[pos2]];
+      
+      if (s->liberties <= MAX_LIBERTIES || maxlib <= MAX_LIBERTIES - 1) {
+       /* The easy case - we already have all (necessary) liberties of
+        * the string listed
+        */
+       for (l = 0; l < s->liberties; l++) {
+         lib = s->libs[l];
+         if (UNMARKED_LIBERTY(lib)) {
+           if(libs)
+             libs[liberties] = lib;
+           liberties++;
+           if(liberties >= maxlib)
+             return liberties;
+
+           MARK_LIBERTY(lib);
+         }
+       }
+      }
+      else {
+       /* The harder case - we need to find all the liberties of the
+        * string by traversing its stones. We stop as soon as we have
+        * traversed all the stones or have reached maxlib. Unfortunately,
+        * we cannot use the trick from findlib() since some of the
+        * liberties may already have been marked.
+        */
+       int stone = pos2;
+       do {
+         if (UNMARKED_LIBERTY(SOUTH(stone))) {
+           if (libs)
+             libs[liberties] = SOUTH(stone);
+           liberties++;
+           if (liberties >= maxlib)
+             return liberties;
+
+           MARK_LIBERTY(SOUTH(stone));
+         }
+         
+         if (UNMARKED_LIBERTY(WEST(stone))) {
+           if (libs)
+             libs[liberties] = WEST(stone);
+           liberties++;
+           if (liberties >= maxlib)
+             return liberties;
+
+           MARK_LIBERTY(WEST(stone));
+         }
+
+         if (UNMARKED_LIBERTY(NORTH(stone))) {
+           if (libs)
+             libs[liberties] = NORTH(stone);
+           liberties++;
+           if (liberties >= maxlib)
+             return liberties;
+
+           MARK_LIBERTY(NORTH(stone));
+         }
+
+         if (UNMARKED_LIBERTY(EAST(stone))) {
+           if (libs)
+             libs[liberties] = EAST(stone);
+           liberties++;
+           if (liberties >= maxlib)
+             return liberties;
+
+           MARK_LIBERTY(EAST(stone));
+         }
+
+         stone = NEXT_STONE(stone);
+       } while (stone != pos2);
+      }
+
+      MARK_STRING(pos2);
+    }
+    else if (board[pos2] == OTHER_COLOR(color)
+        && string[string_number[pos2]].liberties == 1) {
+      /* A capture. */
+      captured[captures++] = pos2;
+    }
+  }
+
+  /* Now we look at all the captures found in the previous step */
+  for (k = 0; k < captures; k++) {
+    lib = captured[k];
+
+    /* Add the stone adjacent to (pos) to the list of liberties if
+     * it is not also adjacent to an own marked string (otherwise,
+     * it will be added later).
+     */
+    if (!MARKED_COLOR_STRING(SOUTH(lib), color)
+       && !MARKED_COLOR_STRING(WEST(lib), color)
+       && !MARKED_COLOR_STRING(NORTH(lib), color)
+       && !MARKED_COLOR_STRING(EAST(lib), color)) {
+      if (libs)
+       libs[liberties] = lib;
+      liberties++;
+      if (liberties >= maxlib)
+       return liberties;
+    }
+
+    /* Check if we already know of this capture. */
+    for (l = 0; l < k; l++)
+      if (string_number[captured[l]] == string_number[lib])
+       break;
+
+    if (l == k) {
+      /* Traverse all the stones of the capture and add to the list
+       * of liberties those, which are adjacent to at least one own
+       * marked string.
+       */
+      do {
+       if (MARKED_COLOR_STRING(SOUTH(lib), color)
+           || MARKED_COLOR_STRING(WEST(lib), color)
+           || MARKED_COLOR_STRING(NORTH(lib), color)
+           || MARKED_COLOR_STRING(EAST(lib), color)) {
+         if (libs)
+           libs[liberties] = lib;
+         liberties++;
+         if (liberties >= maxlib)
+           return liberties;
+       }
+
+       lib = NEXT_STONE(lib);
+      } while (lib != captured[k]);
+    }
+  }
+  
+  return liberties;
+}
+
+
+/* Play a stone at (pos) and count the number of liberties for the
+ * resulting string. This requires (pos) to be empty.
+ *
+ * This function differs from approxlib() by the fact that it removes
+ * captured stones before counting the liberties.
+ */
+
+int
+accurate_approxlib(int pos, int color, int maxlib, int *libs)
+{
+  int fast_liberties = -1;
+  int liberties = 0;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (!libs) {
+    fast_liberties = fastlib(pos, color, 0);
+    if (fast_liberties >= 0) {
+      return fast_liberties;
+    } 
+  }
+
+  sgf_dumptree = 0;
+  /* Use tryko() since we don't care whether the move would violate
+   * the ko rule.
+   */
+  if (tryko(pos, color, "accurate approxlib", EMPTY, 0)) {
+    if (libs != NULL)
+      liberties = findlib(pos, maxlib, libs);
+    else
+      liberties = countlib(pos);
+    popgo();
+  }
+
+  if (fast_liberties >= 0 && liberties > 0) {
+    ASSERT1(fast_liberties == liberties, pos);
+  }
+
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
 
   return liberties;
 }
@@ -2649,6 +2904,112 @@ find_origin(int str)
 int
 is_self_atari(int pos, int color)
 {
+  int other = OTHER_COLOR(color);
+  /* number of empty neighbors */
+  int trivial_liberties = 0;
+  /* number of captured opponent strings */
+  int captures = 0;
+  /* Whether there is a friendly neighbor with a spare liberty. If it
+   * has more than one spare liberty we immediately return 0.
+   */
+  int far_liberties = 0;
+  
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (!strings_initialized)
+    init_board();
+
+  /* 1. Try first to solve the problem without much work. */
+  string_mark++;
+  
+  if (LIBERTY(SOUTH(pos)))
+    trivial_liberties++;
+  else if (board[SOUTH(pos)] == color) {
+    if (LIBERTIES(SOUTH(pos)) > 2)
+      return 0;
+    if (LIBERTIES(SOUTH(pos)) == 2)
+      far_liberties++;
+  }
+  else if (board[SOUTH(pos)] == other
+          && LIBERTIES(SOUTH(pos)) == 1 && UNMARKED_STRING(SOUTH(pos))) {
+    captures++;
+    MARK_STRING(SOUTH(pos));
+  }
+
+  if (LIBERTY(WEST(pos)))
+    trivial_liberties++;
+  else if (board[WEST(pos)] == color) {
+    if (LIBERTIES(WEST(pos)) > 2)
+      return 0;
+    if (LIBERTIES(WEST(pos)) == 2)
+      far_liberties++;
+  }
+  else if (board[WEST(pos)] == other
+          && LIBERTIES(WEST(pos)) == 1 && UNMARKED_STRING(WEST(pos))) {
+    captures++;
+    MARK_STRING(WEST(pos));
+  }
+
+  if (LIBERTY(NORTH(pos)))
+    trivial_liberties++;
+  else if (board[NORTH(pos)] == color) {
+    if (LIBERTIES(NORTH(pos)) > 2)
+      return 0;
+    if (LIBERTIES(NORTH(pos)) == 2)
+      far_liberties++;
+  }
+  else if (board[NORTH(pos)] == other
+          && LIBERTIES(NORTH(pos)) == 1 && UNMARKED_STRING(NORTH(pos))) {
+    captures++;
+    MARK_STRING(NORTH(pos));
+  }
+
+  if (LIBERTY(EAST(pos)))
+    trivial_liberties++;
+  else if (board[EAST(pos)] == color) {
+    if (LIBERTIES(EAST(pos)) > 2)
+      return 0;
+    if (LIBERTIES(EAST(pos)) == 2)
+      far_liberties++;
+  }
+  else if (board[EAST(pos)] == other
+          && LIBERTIES(EAST(pos)) == 1 && UNMARKED_STRING(EAST(pos))) {
+    captures++;
+#if 0
+    MARK_STRING(EAST(pos));
+#endif
+  }
+
+  /* Each captured string is guaranteed to produce at least one
+   * liberty. These are disjoint from both trivial liberties and far
+   * liberties. The two latter may however coincide.
+   */
+  if (trivial_liberties + captures >= 2)
+    return 0;
+
+  if ((far_liberties > 0) + captures >= 2)
+    return 0;
+
+  if (captures == 0 && far_liberties + trivial_liberties <= 1)
+    return 1;
+
+  /* 2. It was not so easy.  We use accuratelib() in this case. */
+  return accurate_approxlib(pos, color, 2, NULL) <= 1;
+}
+
+
+#if 0
+
+/* Determine whether a move by color at (pos) would be a self atari,
+ * i.e. whether it would get more than one liberty. This function
+ * returns true also for the case of a suicide move.
+ */
+
+int
+is_self_atari(int pos, int color)
+{
   int liberties;
   int result;
   
@@ -2676,6 +3037,7 @@ is_self_atari(int pos, int color)
   return liberties <= 1;
 }
 
+#endif
 
 /*
  * Returns true if pos is a liberty of the string at str.
@@ -3867,44 +4229,44 @@ do_play_move(int pos, int color)
    */
   string_mark++;
 
-  if (board[south] == color && UNMARKED_STRING(south)) {
+  if (UNMARKED_COLOR_STRING(south, color)) {
     neighbor_allies++;
     s = string_number[south];
     MARK_STRING(south);
   }
-  else if (board[south] == other && UNMARKED_STRING(south)) {
+  else if (UNMARKED_COLOR_STRING(south, other)) {
     remove_liberty(string_number[south], pos);
     MARK_STRING(south);
   }    
   
-  if (board[west] == color && UNMARKED_STRING(west)) {
+  if (UNMARKED_COLOR_STRING(west, color)) {
     neighbor_allies++;
     s = string_number[west];
     MARK_STRING(west);
   }
-  else if (board[west] == other && UNMARKED_STRING(west)) {
+  else if (UNMARKED_COLOR_STRING(west, other)) {
     remove_liberty(string_number[west], pos);
     MARK_STRING(west);
   }    
   
-  if (board[north] == color && UNMARKED_STRING(north)) {
+  if (UNMARKED_COLOR_STRING(north, color)) {
     neighbor_allies++;
     s = string_number[north];
     MARK_STRING(north);
   }
-  else if (board[north] == other && UNMARKED_STRING(north)) {
+  else if (UNMARKED_COLOR_STRING(north, other)) {
     remove_liberty(string_number[north], pos);
     MARK_STRING(north);
   }    
   
-  if (board[east] == color && UNMARKED_STRING(east)) {
+  if (UNMARKED_COLOR_STRING(east, color)) {
     neighbor_allies++;
     s = string_number[east];
 #if 0
     MARK_STRING(east);
 #endif
   }
-  else if (board[east] == other && UNMARKED_STRING(east)) {
+  else if (UNMARKED_COLOR_STRING(east, other)) {
     remove_liberty(string_number[east], pos);
 #if 0
     MARK_STRING(east);
@@ -3993,103 +4355,6 @@ slow_approxlib(int pos, int color, int maxlib, int *libs)
   return liberties;
 }
 
-
-/* Determine whether a move by color at pos might be a self atari.
- * This function is sloppy in that it only does a quick check for two
- * liberties and might miss certain cases.
- * Return value 0 means it cannot be a self atari.
- * Return value 1 means it definitely is a self atari.
- * Return value -1 means uncertain.
- */
-
-static int
-incremental_sloppy_self_atari(int pos, int color)
-{
-  int other = OTHER_COLOR(color);
-  /* number of empty neighbors */
-  int trivial_liberties = 0;
-  /* number of captured opponent strings */
-  int captures = 0;
-  /* Whether there is a friendly neighbor with a spare liberty. If it
-   * has more than one spare liberty we immediately return 0.
-   */
-  int far_liberties = 0;
-
-  /* Clear string mark. */
-  string_mark++;
-  
-  if (board[SOUTH(pos)] == EMPTY)
-    trivial_liberties++;
-  else if (board[SOUTH(pos)] == color) {
-    if (LIBERTIES(SOUTH(pos)) > 2)
-      return 0;
-    if (LIBERTIES(SOUTH(pos)) == 2)
-      far_liberties++;
-  }
-  else if (board[SOUTH(pos)] == other
-	   && LIBERTIES(SOUTH(pos)) == 1 && UNMARKED_STRING(SOUTH(pos))) {
-    captures++;
-    MARK_STRING(SOUTH(pos));
-  }
-
-  if (board[WEST(pos)] == EMPTY)
-    trivial_liberties++;
-  else if (board[WEST(pos)] == color) {
-    if (LIBERTIES(WEST(pos)) > 2)
-      return 0;
-    if (LIBERTIES(WEST(pos)) == 2)
-      far_liberties++;
-  }
-  else if (board[WEST(pos)] == other
-	   && LIBERTIES(WEST(pos)) == 1 && UNMARKED_STRING(WEST(pos))) {
-    captures++;
-    MARK_STRING(WEST(pos));
-  }
-
-  if (board[NORTH(pos)] == EMPTY)
-    trivial_liberties++;
-  else if (board[NORTH(pos)] == color) {
-    if (LIBERTIES(NORTH(pos)) > 2)
-      return 0;
-    if (LIBERTIES(NORTH(pos)) == 2)
-      far_liberties++;
-  }
-  else if (board[NORTH(pos)] == other
-	   && LIBERTIES(NORTH(pos)) == 1 && UNMARKED_STRING(NORTH(pos))) {
-    captures++;
-    MARK_STRING(NORTH(pos));
-  }
-
-  if (board[EAST(pos)] == EMPTY)
-    trivial_liberties++;
-  else if (board[EAST(pos)] == color) {
-    if (LIBERTIES(EAST(pos)) > 2)
-      return 0;
-    if (LIBERTIES(EAST(pos)) == 2)
-      far_liberties++;
-  }
-  else if (board[EAST(pos)] == other
-	   && LIBERTIES(EAST(pos)) == 1 && UNMARKED_STRING(EAST(pos))) {
-    captures++;
-    MARK_STRING(EAST(pos));
-  }
-
-  /* Each captured string is guaranteed to produce at least one
-   * liberty. These are disjoint from both trivial liberties and far
-   * liberties. The two latter may however coincide.
-   */
-  
-  if (trivial_liberties + captures >= 2)
-    return 0;
-
-  if ((far_liberties > 0) + captures >= 2)
-    return 0;
-
-  if (captures == 0 && far_liberties + trivial_liberties <= 1)
-    return 1;
-
-  return -1;
-}
 
 
 /* ================================================================ *

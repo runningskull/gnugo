@@ -19,12 +19,12 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "gnugo.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
-#include "gnugo.h"
 #include "liberty.h"
 
 /* Returns true if a dragon is enclosed within the convex hull of

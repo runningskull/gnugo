@@ -159,6 +159,8 @@ int countlib(int str);
 int findlib(int str, int maxlib, int *libs);
 int fastlib(int pos, int color, int ignore_capture);
 int approxlib(int pos, int color, int maxlib, int *libs);
+int accuratelib(int pos, int color, int maxlib, int *libs);
+int accurate_approxlib(int pos, int color, int maxlib, int *libs);
 int count_common_libs(int str1, int str2);
 int find_common_libs(int str1, int str2, int maxlib, int *libs);
 int have_common_lib(int str1, int str2, int *lib);
@@ -169,9 +171,6 @@ double time_report(int n, const char *occupation, int move, double mintime);
 
 void update_random_seed(void);
 
-
-/* Play at (pos) and then count the liberties. */
-int accurate_approxlib(int pos, int color, int maxlib, int *libs);
 
 /* Check for self atari. */
 int is_self_atari(int pos, int color);

@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.10 released October 20, 2002
+
+- fastlib revised
+- new accuratelib intended to replace accurate_approxlib
+- incremental_self_atari merged into revised is_self_atari
+- accurate_approxlib moved to board.c
 - old sgftree is now freed on successful sgf loading
 - sgftrees are freed when sgf tracing is finished
 - sgffile_printsgf() revised

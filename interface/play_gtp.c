@@ -73,6 +73,8 @@ DECLARE(gtp_dump_stack);
 DECLARE(gtp_echo);
 DECLARE(gtp_echo_err);
 DECLARE(gtp_eval_eye);
+DECLARE(gtp_accuratelib);
+DECLARE(gtp_accurate_approxlib);
 DECLARE(gtp_final_score);
 DECLARE(gtp_final_status);
 DECLARE(gtp_final_status_list);
@@ -184,6 +186,8 @@ static struct gtp_command commands[] = {
   {"echo" ,                   gtp_echo},
   {"echo_err" ,               gtp_echo_err},
   {"estimate_score",          gtp_estimate_score},
+  {"accuratelib",             gtp_accuratelib},
+  {"accurate_approxlib",      gtp_accurate_approxlib},
   {"experimental_score",      gtp_experimental_score},
   {"eval_eye",         	      gtp_eval_eye},
   {"final_score",             gtp_final_score},
@@ -888,6 +892,65 @@ gtp_findlib(char *s)
     return gtp_failure("vertex must not be empty");
 
   liberties = findlib(POS(i, j), MAXLIBS, libs);
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_vertices2(liberties, libs);
+  return gtp_finish_response();
+}
+
+
+/* Function:  Determine which liberties a stone of given color
+ *            will get if played at given vertex.
+ * Arguments: move (color + vertex)
+ * Fails:     invalid color, invalid vertex, occupied vertex
+ * Returns:   Sorted space separated list of liberties
+ */
+static int
+gtp_accuratelib(char *s)
+{
+  int i, j;
+  int color;
+  int libs[MAXLIBS];
+  int liberties;
+
+  if (!gtp_decode_move(s, &color, &i, &j))
+    return gtp_failure("invalid color or coordinate");
+
+  if (BOARD(i, j) != EMPTY)
+    return gtp_failure("vertex must be empty");
+
+  liberties = accuratelib(POS(i, j), color, MAXLIBS, libs);
+
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_vertices2(liberties, libs);
+  return gtp_finish_response();
+}
+
+
+/* Function:  Determine which liberties a stone of given color
+ *            will get if played at given vertex.
+ * Arguments: move (color + vertex)
+ * Fails:     invalid color, invalid vertex, occupied vertex
+ * Returns:   Sorted space separated list of liberties
+ *
+ * Supposedly identical in behavior to the above function and
+ * can be retired when this is confirmed.
+ */
+static int
+gtp_accurate_approxlib(char *s)
+{
+  int i, j;
+  int color;
+  int libs[MAXLIBS];
+  int liberties;
+
+  if (!gtp_decode_move(s, &color, &i, &j))
+    return gtp_failure("invalid color or coordinate");
+
+  if (BOARD(i, j) != EMPTY)
+    return gtp_failure("vertex must be empty");
+
+  liberties = accuratelib(POS(i, j), color, MAXLIBS, libs);
+
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertices2(liberties, libs);
   return gtp_finish_response();

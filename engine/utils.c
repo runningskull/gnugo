@@ -762,53 +762,6 @@ restore_depth_values()
   ko_depth          = save_ko_depth;
 }
 
-/* Play a stone at (pos) and count the number of liberties for the
- * resulting string. This requires (pos) to be empty.
- *
- * This function differs from approxlib() by the fact that it removes
- * captured stones before counting the liberties.
- */
-
-int
-accurate_approxlib(int pos, int color, int maxlib, int *libs)
-{
-  int fast_liberties = -1;
-  int liberties = 0;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
-
-  ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(color), pos);
-
-  if (!libs) {
-    fast_liberties = fastlib(pos, color, 0);
-    if (fast_liberties >= 0) {
-      return fast_liberties;
-    } 
-  }
-
-  sgf_dumptree = 0;
-  /* Use tryko() since we don't care whether the move would violate
-   * the ko rule.
-   */
-  if (tryko(pos, color, "accurate approxlib", EMPTY, 0)) {
-    if (libs != NULL)
-      liberties = findlib(pos, maxlib, libs);
-    else
-      liberties = countlib(pos);
-    popgo();
-  }
-
-  if (fast_liberties >= 0 && liberties > 0) {
-    ASSERT1(fast_liberties == liberties, pos);
-  }
-
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
-
-  return liberties;
-}
-
 /*******************
  * Detect blunders *
  *******************/
