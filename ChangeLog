@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- connection_value() revised
 - use influence-based score estimate instead of Bouzy's algorithm
 - new global variable white_score, black_score
 - should_resign() now depends on optimistic_score instead of average_score

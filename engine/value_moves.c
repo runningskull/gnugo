@@ -1465,7 +1465,11 @@ connection_value(int dragona, int dragonb, int tt, float margin)
    * owl defend a dragon to other owl defense move.
    */
   if (dragon[dragona].status == CRITICAL) {
-    float bonus = (0.2 - 0.3 * crude_weakness_sum) * sizea;
+    float bonus = (0.4 - 0.3 * crude_weakness_sum) * sizea;
+
+    if (bonus < 0.0)
+      bonus = 0.0;
+
     /* If ahead, give extra bonus to connections. */
     if (margin > 0.0 && bonus > 0.0)
       bonus *= 1.0 + 0.05 * margin;
