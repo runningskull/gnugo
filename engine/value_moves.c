@@ -398,7 +398,7 @@ find_more_owl_attack_and_defense_moves(int color)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (IS_STONE(board[pos])
 	&& dragon[pos].origin == pos
-	&& dragon[pos].owl_status == CRITICAL) {
+	&& dragon[pos].status == CRITICAL) {
       for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
 	if (board[pos2] != EMPTY)
 	  continue;

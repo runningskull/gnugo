@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new alternate gnugo.el in interface/gtp_examples
+- owla life accepted on escape in do_owl_analyze_semeai only if stackp>2
+- use status instead of owl_status in find_more_owl_attack_and_defense_moves
 - speed optimizations in board.c, particularly fastlib()
 - now possible to reduce MAX_BOARD and still get working GNU go
 - mkpat now has amechanism for dropping patterns

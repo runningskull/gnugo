@@ -635,7 +635,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
       }
     }
-    if (min_eyes(&probable_eyes_b) >= 2 || owl_escape_route(owlb) >= 5) {
+    if (min_eyes(&probable_eyes_b) >= 2
+	|| (stackp > 2 && owl_escape_route(owlb) >= 5)) {
       /* you are alive */
       if (max_eyes(&probable_eyes_a) < 2) {
 	/* I am dead */

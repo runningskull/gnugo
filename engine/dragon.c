@@ -2288,11 +2288,8 @@ report_dragon(FILE *outfile, int pos)
 {
   int ii;
   int k;
-  struct dragon_data *d;
-  struct dragon_data2 *d2;
-  
-  d = &(dragon[pos]);
-  d2 = &(dragon2[d->id]);
+  struct dragon_data *d = &(dragon[pos]);
+  struct dragon_data2 *d2 = &(dragon2[d->id]);
 
   if (board[pos] == EMPTY) {
     gprintf("There is no dragon at %1m\n", pos);
