@@ -5544,8 +5544,15 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
   /* Get the two liberties of (str). */
   findlib(str, 2, libs);
 
-  for (k = 0; k < 2; k++)
-    ADD_CANDIDATE_MOVE(libs[k], 0, moves, "simple_ladder_attack");
+  /* If the defender can get enough liberties by playing one of these 
+   * two,    then we have no choice but to block there and consequently, 
+   * it is    unnecesary to try the other liberty.
+   */
+
+  if (approxlib(libs[0], color, 4, NULL) <= 3)
+    ADD_CANDIDATE_MOVE(libs[1], 0, moves, "simple_ladder_attack");
+  if (approxlib(libs[1], color, 4, NULL) <= 3)
+    ADD_CANDIDATE_MOVE(libs[0], 0, moves, "simple_ladder_attack");
 
   order_moves(str, &moves, other, read_function_name, 0, NO_MOVE);
 
