@@ -226,22 +226,28 @@ new_semeai(int color)
 	}
       } /* loop over neighbor dragons */
       if (pass == 0 && semeai_found) {
+	int a_matcher_status;
+	int b_matcher_status;
+
 	if (a_best_status != DEAD && a_worst_status == DEAD)
 	  a_status = CRITICAL;
-	else a_status = a_worst_status;
+	else
+	  a_status = a_worst_status;
+	
 	if (b_best_status != DEAD && b_worst_status == DEAD)
 	  b_status = CRITICAL;
-	else b_status = b_worst_status;
-	{
-	  int a_matcher_status = a_status;
-	  int b_matcher_status = b_status;
-	  if (a_matcher_status == ALIVE_IN_SEKI)
-	    a_matcher_status = ALIVE;
-	  if (b_matcher_status == ALIVE_IN_SEKI)
-	    b_matcher_status = ALIVE;
-	  update_status(apos, a_matcher_status, a_status);
-	  update_status(bpos, b_matcher_status, b_status);
-	}
+	else
+	  b_status = b_worst_status;
+	
+	a_matcher_status = a_status;
+	b_matcher_status = b_status;
+	if (a_matcher_status == ALIVE_IN_SEKI)
+	  a_matcher_status = ALIVE;
+	if (b_matcher_status == ALIVE_IN_SEKI)
+	  b_matcher_status = ALIVE;
+	
+	update_status(apos, a_matcher_status, a_status);
+	update_status(bpos, b_matcher_status, b_status);
       }
     }
   }

@@ -338,9 +338,8 @@ location_to_string(int pos)
   static char buf[BOARDSIZE][5];
   if (!init) {
     int pos;
-    for (pos =0; pos < BOARDSIZE; pos++) {
+    for (pos = 0; pos < BOARDSIZE; pos++)
       location_to_buffer(pos, buf[pos]);
-    }
     init = 1;
   }
   ASSERT1(pos >= 0 && pos < BOARDSIZE, pos);
@@ -441,7 +440,7 @@ result_to_string(int result)
 {
   if (result == 0)
     return "0";
-  else if (result== KO_A)
+  else if (result == KO_A)
     return "KO_A";
   else if (result == KO_B)
     return "KO_B";

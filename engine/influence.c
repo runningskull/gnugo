@@ -720,7 +720,6 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	      || (color == BLACK && q->black_strength[x][y] == 0.0))
 	    return; /* Match failed. */
 	}
-	
       }
     }
   }
@@ -1888,10 +1887,10 @@ influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX],
           followup_value = -followup_value;
       }
       
-      if (( new_value - old_value > 0.02)
-          || ( old_value - new_value > 0.02)) 
+      if (new_value - old_value > 0.02
+          || old_value - new_value > 0.02)
 	DEBUG(DEBUG_TERRITORY, "  %1m:   - %m territory change %f (%f -> %f)\n",
-		pos, i, j, new_value - old_value, old_value, new_value);
+	      pos, i, j, new_value - old_value, old_value, new_value);
       delta += new_value - old_value;
       if (experimental_influence)
         followup_delta += followup_value - new_value;

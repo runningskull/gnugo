@@ -1595,7 +1595,8 @@ main(int argc, char *argv[])
 	if (ifc == MAX_INPUT_FILE_NAMES) {
 	  fprintf(stderr, "Error : Too many input files; %s", gg_optarg);
 	  exit(1);
-        } else {
+        }
+	else {
 	  input_file_names[ifc++] = gg_optarg;
 	  input_file_names[ifc] = 0;
 	}
@@ -1668,9 +1669,9 @@ main(int argc, char *argv[])
       current_file = "<stdin>";
     }
     else {
-      if (input_file_names[ifc] == 0) {
+      if (input_file_names[ifc] == 0)
 	break;
-      } else {
+      else {
 	if ((input_FILE = fopen(input_file_names[ifc], "r")) == NULL) {
 	  fprintf(stderr, "Error: Cannot open file %s\n", 
 		  input_file_names[ifc]);

@@ -421,18 +421,16 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 
   /* FIXED: tm - returns ko results correctly (3.1.22) */
   if (do_attack) {
-    if (board[ypos] == EMPTY || board[zpos] == EMPTY) {
+    if (board[ypos] == EMPTY || board[zpos] == EMPTY)
       success = WIN;
-    } else {
+    else
       success = attack_either(ypos, zpos);
-    }
   }
   else {
-    if (board[ypos] == EMPTY || board[zpos] == EMPTY) {
+    if (board[ypos] == EMPTY || board[zpos] == EMPTY)
       success = 0;
-    } else {
+    else
       success = defend_both(ypos, zpos);
-    }
   }
 
 #if 0
@@ -500,20 +498,16 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 #endif
   
   if (do_connect) {
-    if (board[ypos] == EMPTY || board[zpos] == EMPTY) {
+    if (board[ypos] == EMPTY || board[zpos] == EMPTY)
       success = 0;
-    } else {
-      int move;
-      success = string_connect(ypos, zpos, &move);
-    }
+    else
+      success = string_connect(ypos, zpos, NULL);
   }
   else {
-    if (board[ypos] == EMPTY || board[zpos] == EMPTY) {
+    if (board[ypos] == EMPTY || board[zpos] == EMPTY)
       success = WIN;
-    } else {
-      int move;
-      success = disconnect(ypos, zpos, &move);
-    }
+    else
+      success = disconnect(ypos, zpos, NULL);
   }
 
 #if 0

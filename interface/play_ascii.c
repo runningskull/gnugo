@@ -1160,7 +1160,10 @@ ascii_goto(Gameinfo *gameinfo, char *line)
 }
 
 
-/* Convert a coordinate pair from ascii text to two integers. */
+/* Convert a coordinate pair from ascii text to two integers.
+ * FIXME: Check that this function is indeed equivalent to
+ * string_to_location() and then replace it.
+ */
 static int
 ascii2pos(Position *pos, char *line, int *i, int *j)
 {

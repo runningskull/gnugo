@@ -49,7 +49,7 @@
       scores[num_moves] = score;\
       (num_moves)++;\
     }\
-  } while (0) \
+  } while (0)
 
 #define REMOVE_CANDIDATE_MOVE(move, moves, scores, num_moves)\
   do {\
@@ -64,7 +64,7 @@
 	break;\
       }\
     }\
-  } while (0) \
+  } while (0)
 
 
 /*
@@ -1332,9 +1332,9 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	  if (moves[s] == 0)
 	    break;
 	}
-	if (already_tried || s == MAX_MOVES) {
+	if (already_tried || s == MAX_MOVES)
 	  continue;
-	}
+
 	if (!is_self_atari(xpos, color)
 	    && trymove(xpos, color, "defend2-D", str, komaster, kom_pos)) {
 	  int acode = do_attack(str, NULL, komaster, kom_pos);
@@ -2010,7 +2010,7 @@ special_rescue(int str, int lib, int *move, int komaster, int kom_pos, int tried
 	  break;
       }
       if (already_tried) 
-      continue;
+	continue;
 
       /* Use approxlib() to test for trivial capture. */
       if (approxlib(lib, other, 3, NULL) > 2)
@@ -2691,7 +2691,7 @@ int readpat_tried[BOARDMAX];
 
 static void
 reading_attack_callback(int m, int n, int color,
-			    struct pattern *pattern, int ll, void *data)
+			struct pattern *pattern, int ll, void *data)
 {
   int k;
   int move;
@@ -2706,16 +2706,13 @@ reading_attack_callback(int m, int n, int color,
             pattern->name, move, count_variations);
 
   for (k = 0; k < MAX_READING_MOVES; k++) {
-    if (moves[k].pos) {
-      if (moves[k].pos == move) {
-	if (value <= moves[k].value) {
-	  return;
-	} else {
-	  break;
-	}
-      }
-    } else {
+    if (moves[k].pos == NO_MOVE)
       break;
+    if (moves[k].pos == move) {
+      if (value <= moves[k].value)
+	return;
+      else
+	break;
     }
   }
 
@@ -2742,17 +2739,16 @@ reading_attack_callback(int m, int n, int color,
     return;
 
   for (k = 0; k < MAX_READING_MOVES; k++) {
-    if (moves[k].pos) {
+    if (moves[k].pos != NO_MOVE) {
       if (moves[k].pos == move) {
-	if (value <= moves[k].value) {
+	if (value <= moves[k].value)
 	  return;
-	} else {
+	else
 	  break;
-	}
       }
-    } else {
-      break;
     }
+    else
+      break;
   }
 
   for (k = 0; k < MAX_READING_MOVES; k++) {
@@ -2760,14 +2756,16 @@ reading_attack_callback(int m, int n, int color,
       moves[k].pos = move;
       moves[k].value = value;
       moves[k].name = pattern->name;
-      moves[++k].pos = 0;
+      moves[++k].pos = NO_MOVE;
       break;
     }
+    
     if (moves[k].value < value) {
       int j = k;
-      while (moves[j].pos && moves[j].pos != move) 
+      while (moves[j].pos != NO_MOVE && moves[j].pos != move) 
 	j++;
-      if (moves[j].pos) {j--;}
+      if (moves[j].pos != NO_MOVE)
+	j--;
       for (; j >= k; j--) {
 	moves[j+1].pos = moves[j].pos;
 	moves[j+1].value = moves[j].value;
@@ -2783,13 +2781,16 @@ reading_attack_callback(int m, int n, int color,
 
 
 static void
-set_goal_worm(int str, int value, char goal[BOARDMAX]) {
+set_goal_worm(int str, int value, char goal[BOARDMAX])
+{
   int k;
   int color = board[str];
-  if (goal[str]) { return; }
+  if (goal[str])
+    return;
+  
   goal[str] = value;
   for (k = 0; k < 4; k++) {
-    int pos = str+delta[k];
+    int pos = str + delta[k];
     if (board[pos] == color) {
       set_goal_worm(pos, value, goal);
     }
@@ -2797,25 +2798,27 @@ set_goal_worm(int str, int value, char goal[BOARDMAX]) {
 }
 
 static void
-set_larger_goal_worm(int str, char goal[BOARDMAX]) {
+set_larger_goal_worm(int str, char goal[BOARDMAX])
+{
   int k;
   int color = board[str];
   /*Note: over-ride possible 3 values here.*/
-  if (goal[str]==1) { return; }
+  if (goal[str] == 1)
+    return;
+  
   goal[str] = 1;
   for (k = 0; k < 4; k++) {
-    int pos = str+delta[k];
-    if (board[pos] == color) {
+    int pos = str + delta[k];
+    if (board[pos] == color)
       set_larger_goal_worm(pos, goal);
-    } else if (stackp < (depth+4) && board[pos] == OTHER_COLOR(color)) {
+    else if (stackp < (depth+4) && board[pos] == OTHER_COLOR(color))
       set_goal_worm(pos, 2, goal);
-    } else if (stackp < (12+2) && board[pos] == EMPTY) {
+    else if (stackp < (12+2) && board[pos] == EMPTY) {
       int j;
       for (j = 0; j < 4; j++) {
 	int jpos = pos + delta[j];
-	if (board[jpos] == color) {
-	  set_goal_worm(jpos,3,goal);
-	}
+	if (board[jpos] == color)
+	  set_goal_worm(jpos, 3, goal);
       }
     }
   }
@@ -2824,22 +2827,21 @@ set_larger_goal_worm(int str, char goal[BOARDMAX]) {
 static int
 do_attack_pat(int str, int *move, int komaster, int kom_pos)
 {
-
   char goal[BOARDMAX];
   struct reading_move_data moves[MAX_READING_MOVES];
   int k;
   int color = board[str];
   int other = OTHER_COLOR(color);
   int best_defense = WIN;
-  int best_move = 0;
-  int new_komaster = 0;
-  int new_kom_pos = 0;
+  int best_move = NO_MOVE;
+  int new_komaster = EMPTY;
+  int new_kom_pos = NO_MOVE;
   int ko_move = 0;
   int libs;
 
   SETUP_TRACE_INFO("attack_pat", str);
 
-  ASSERT1(move != 0, str);
+  ASSERT1(move != NULL, str);
 
   if (count_variations > 15000) {
     SGFTRACE(0,0, "Way too many variations");
@@ -2853,27 +2855,30 @@ do_attack_pat(int str, int *move, int komaster, int kom_pos)
     return 0;
   }
 
-  if (libs == 1) {
+  if (libs == 1)
     return attack1(str, move, komaster, kom_pos);
-  }
 
-  if (libs == 4) {
+  if (libs == 4)
     return attack4(str, move, komaster, kom_pos);
-  }
   
   memset(goal, 0, BOARDMAX);
 
   reading_node_counter++;
   set_larger_goal_worm(str, goal);
   moves[0].pos = 0;
-  if (verbose > 1) {TRACE("Stack: "); dump_stack();}
+  if (verbose > 1) {
+    TRACE("Stack: ");
+    dump_stack();
+  }
   rgoal = goal;
   goallib = libs;
-  matchpat_goal_anchor(reading_attack_callback, other, &read_attack_db, moves, goal, 1);
+  matchpat_goal_anchor(reading_attack_callback, other, &read_attack_db,
+		       moves, goal, 1);
   if (verbose > 1) {
     TRACE("Moves (variation %d): ", count_variations);
     for (k = 0; k < MAX_READING_MOVES; k++) {
-      if (!moves[k].pos) { break; }
+      if (!moves[k].pos)
+	break;
       TRACE("%o%s@%1m ", moves[k].name, moves[k].pos);
     }
     TRACE("\n");
@@ -2886,9 +2891,12 @@ do_attack_pat(int str, int *move, int komaster, int kom_pos)
     gg_snprintf(buf, 500, "Move order for %s: %n", read_function_name, &chars);
     pos = buf + chars;
     for (k = 0; k < MAX_READING_MOVES; k++) {
-      if (!moves[k].pos) { break; }
-      sprintf(pos, "%c%d (%s-%d) %n", J(moves[k].pos) + 'A' + (J(moves[k].pos) >= 8),
-	      board_size - I(moves[k].pos), moves[k].name, moves[k].value, &chars);
+      if (!moves[k].pos)
+	break;
+      sprintf(pos, "%c%d (%s-%d) %n",
+	      J(moves[k].pos) + 'A' + (J(moves[k].pos) >= 8),
+	      board_size - I(moves[k].pos), moves[k].name, moves[k].value,
+	      &chars);
       pos += chars;
     }
     sgftreeAddComment(sgf_dumptree, NULL, buf);
@@ -2908,7 +2916,7 @@ do_attack_pat(int str, int *move, int komaster, int kom_pos)
 	TRACE("Attacking %1m at %1m (Pattern %s)\n", str, 
 	      moves[k].pos, moves[k].name);
         if (stackp > board_size * 2 && ko_move) {
-          /* trying to avoid komaster problems - this shouldn't be necessary*/
+          /* trying to avoid komaster problems - this shouldn't be necessary */
           continue;
         }
 	defense = do_find_defense(str, 0, new_komaster, new_kom_pos);
@@ -2923,7 +2931,8 @@ do_attack_pat(int str, int *move, int komaster, int kom_pos)
 		       "Attack successful - no defense, ko sub-attack");
 	      return WIN;
 	    }
-          } else {
+          }
+	  else {
             attack = 0;
             SGFTRACE(moves[k].pos, 0, "Too deep, aborting attack");
           }
@@ -2938,22 +2947,24 @@ do_attack_pat(int str, int *move, int komaster, int kom_pos)
 	      best_move = moves[k].pos;
 	      best_defense = defense;
 	    }
-	  } else {
+	  }
+	  else {
 	    popgo();
 	    SGFTRACE(moves[k].pos, WIN, "Attack successful - no defense.");
 	    *move = moves[k].pos;
 	    return WIN;
 	  }
-	} else if (defense < best_defense) {
+	}
+	else if (defense < best_defense) {
 	  /* May need to check ko_move in this case, too */
 	  best_move = moves[k].pos;
 	  best_defense = defense;
 	}
 	popgo();
       }
-    } else {
-      break;
     }
+    else
+      break;
   }
 
   SGFTRACE(best_move, WIN - best_defense, "No good attack.");
@@ -5205,7 +5216,7 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
   for (k = 0; k < num_moves; k++) {
     int ko_capture;
 
-    xpos= moves[k];
+    xpos = moves[k];
     if (in_list(xpos, num_forbidden_moves, forbidden_moves))
       continue;
     /* To avoid loops with double ko, we do not allow any ko captures,

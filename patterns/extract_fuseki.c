@@ -130,11 +130,11 @@ struct invariant_hash {
 /* This is defined in engine/matchpat.c */
 extern const int transformations[8][2][2];
 
-#define TRANSFORM(i,j,ti,tj,trans) \
-do { \
-  *ti = transformations[trans][0][0] * (i) + transformations[trans][0][1] * (j); \
-  *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
-} while (0)
+#define TRANSFORM(i, j, ti, tj, trans) \
+  do { \
+    *ti = transformations[trans][0][0] * (i) + transformations[trans][0][1] * (j); \
+    *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
+  } while (0)
 
 
 /* A situation is the combination of a board position and the move to

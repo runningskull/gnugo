@@ -557,13 +557,13 @@ do_genmove(int *move, int color, float pure_threat_value)
     if (spent > slowest_time) {
       slowest_time = spent;
       slowest_move = *move;
-      slowest_movenum = movenum+1;
+      slowest_movenum = movenum + 1;
     }
     if (*move == NO_MOVE) {
       gprintf("\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
       fprintf(stderr, "(%.2f seconds)\n", slowest_time);
       fprintf(stderr, "\nAVERAGE TIME: %.2f seconds per move\n",
-	      total_time/movenum);
+	      total_time / movenum);
       fprintf(stderr, "\nTOTAL TIME: %.2f seconds\n",
 	      total_time);
 

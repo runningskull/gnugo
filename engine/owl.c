@@ -650,7 +650,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     owla, owlb,
 				     vital_defensive_moves[k].value);
       owl_add_move(moves, vital_defensive_moves[k].pos,
-		   move_value,"vital defensive move", 
+		   move_value, "vital defensive move", 
 		   vital_defensive_moves[k].same_dragon);
     }
     for (k = 0; 
@@ -1062,7 +1062,8 @@ find_semeai_backfilling_move(int worm, int liberty)
 		   EMPTY, NO_MOVE)) {
       if (safe_move(liberty, other))
 	result = fill;
-      else result = find_semeai_backfilling_move(worm, liberty);
+      else
+	result = find_semeai_backfilling_move(worm, liberty);
       popgo();
     }
   }

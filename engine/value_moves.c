@@ -970,8 +970,9 @@ connection_value(int dragona, int dragonb, int tt, float margin)
     impact = impact_values[safety1][safety2];
   else if (margin > 20.0)
     impact = cautious_impact_values[safety1][safety2];
-  else impact = 0.05*margin*cautious_impact_values[safety1][safety2]
-	 + (1-0.05*margin)*impact_values[safety1][safety2];
+  else
+    impact = (0.05 * margin * cautious_impact_values[safety1][safety2]
+	      + (1 - 0.05 * margin) * impact_values[safety1][safety2]);
 
 
   /* Trying to connect an inessential string to something else with a
@@ -1620,8 +1621,9 @@ estimate_strategical_value(int pos, int color, float score)
 	  if (move_reasons[r].type == ATTACK_MOVE_GOOD_KO
 	      || move_reasons[r].type == DEFEND_MOVE_GOOD_KO) {
 	    ko_factor = 0.6;
-	  } else if (move_reasons[r].type == ATTACK_MOVE_BAD_KO
-	      || move_reasons[r].type == DEFEND_MOVE_BAD_KO) {
+	  }
+	  else if (move_reasons[r].type == ATTACK_MOVE_BAD_KO
+		   || move_reasons[r].type == DEFEND_MOVE_BAD_KO) {
 	    ko_factor = 0.4;
 	  }
 	  this_value = 10.0 * (worm[aa].cutstone2 - 1) * ko_factor;
@@ -2315,7 +2317,7 @@ print_top_moves(void)
 static void
 reevaluate_ko_threats(int ko_move, int color)
 {
-  int ko_stone = 0;
+  int ko_stone = NO_MOVE;
   int opp_ko_move;
   int m, n;
   int pos;
@@ -2354,7 +2356,7 @@ reevaluate_ko_threats(int ko_move, int color)
         int r = move[pos].reason[k];
         if (r < 0)
           break;
-        if (! (move_reasons[r].type & THREAT_BIT))
+        if (!(move_reasons[r].type & THREAT_BIT))
           continue;
         switch (move_reasons[r].type) {
         case ATTACK_THREAT:
