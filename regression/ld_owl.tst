@@ -1,7 +1,7 @@
 # Reset node counters
 reset_reading_node_counter
 reset_owl_node_counter
-reset_life_node_counter
+reset_connection_node_counter
 
 # Life and death test problems.
 loadsgf games/life_and_death/ld1.sgf
@@ -358,5 +358,5 @@ loadsgf games/life_and_death/ld19.sgf
 #? [0]&
 
 # Report number of nodes visited by the life code
-10002 get_life_node_counter
+10002 get_connection_node_counter
 #? [0]&

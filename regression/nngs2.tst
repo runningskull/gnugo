@@ -1,5 +1,5 @@
 # Reset applicable counters
-reset_life_node_counter
+reset_connection_node_counter
 reset_owl_node_counter
 reset_reading_node_counter
 reset_trymove_counter
@@ -156,7 +156,7 @@ loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 240
 #? [0]&
 
 # Report number of nodes visited by the life code
-10002 get_life_node_counter
+10002 get_connection_node_counter
 #? [0]&
 
 # Report number of trymoves/trykos visited by the test

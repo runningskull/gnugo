@@ -1,5 +1,5 @@
 # Reset applicable counters
-reset_life_node_counter
+reset_connection_node_counter
 reset_owl_node_counter
 reset_reading_node_counter
 reset_trymove_counter
@@ -173,6 +173,11 @@ loadsgf games/endgame4.sgf
 401 gg_genmove black
 #? [C4]
 
+# The basic 2/3 pt ko capture is undervalued.
+loadsgf games/endgame5.sgf
+501 gg_genmove black
+#? [E5]
+
 
 ############ End of Tests #################
 
@@ -185,7 +190,7 @@ loadsgf games/endgame4.sgf
 #? [0]&
 
 # Report number of nodes visited by the life code
-10002 get_life_node_counter
+10002 get_connection_node_counter
 #? [0]&
 
 # Report number of trymoves/trykos visited by the test

@@ -64,6 +64,11 @@ loadsgf games/owl39.sgf
 276 owl_defend E7
 #? [1 G4]*
 
+# GNU Go tries to "eat lunch" at B1 instead of recognizing this as seki.
+loadsgf games/owl40.sgf
+277 owl_defend A3
+#? [1 PASS]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

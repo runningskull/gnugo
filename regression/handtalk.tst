@@ -114,7 +114,7 @@ loadsgf games/handtalk/handtalk2.sgf 137
 #? [0]&
 
 # Report number of nodes visited by the life code
-10002 get_life_node_counter
+10002 get_connection_node_counter
 #? [0]&
 
 # Report number of trymoves/trykos visited by the test

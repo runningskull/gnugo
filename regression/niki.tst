@@ -1,5 +1,5 @@
 # Reset life node counter
-reset_life_node_counter
+reset_connection_node_counter
 # Reset owl node counter
 reset_owl_node_counter
 # Reset reading node counter
@@ -105,5 +105,5 @@ loadsgf games/niki.sgf 214
 #? [0]&
 
 # Report number of nodes visited by the life code
-10002 get_life_node_counter
+10002 get_connection_node_counter
 #? [0]&

@@ -1,5 +1,5 @@
 # Reset applicable counters
-reset_life_node_counter
+reset_connection_node_counter
 reset_owl_node_counter
 reset_reading_node_counter
 reset_trymove_counter

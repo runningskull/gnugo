@@ -1,5 +1,6 @@
 # Reset applicable counters
 reset_reading_node_counter
+reset_connection_node_counter
 
 # See also test 87.
 loadsgf games/connection1.sgf
@@ -307,4 +308,6 @@ loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 124
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
+#? [0]&
+10001 get_connection_node_counter
 #? [0]&
