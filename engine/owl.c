@@ -1854,7 +1854,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
        */
       /* Let's say, if the goal is small, try a tactical defense 
        * tm added (3.1.22) */
-      for (k=0; k<BOARDMAX; k++) {
+      for (k = 0; k < BOARDMAX; k++) {
 	goalcount += owl->goal[k];
       }
 

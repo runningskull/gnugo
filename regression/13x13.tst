@@ -20,7 +20,7 @@ loadsgf games/mertin13x13/goliath-gnugo1.B+11.sgf 22
 # for now. 
 loadsgf games/mertin13x13/goliath-gnugo1.B+11.sgf 36
 2 gg_genmove white
-#? [E9|E10]*
+#? [E9|E10]
 
 loadsgf games/mertin13x13/goliath-gnugo1.B+11.sgf 58
 3 gg_genmove white
@@ -99,7 +99,7 @@ loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
 17 gg_genmove white
-#? [L5|L3]*
+#? [L5|L3]
 
 #CATEGORY=OWL_TUNING
 # This got broke between 3.0.0 and 3.1.14.
@@ -169,7 +169,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 64
 # A nice tesuji by GNU Go worth remembering!
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 74
 33 gg_genmove white
-#? [E7]
+#? [E7]*
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 82
@@ -193,7 +193,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 12
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 38 gg_genmove white
-#? [G11]
+#? [G11]*
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
@@ -212,7 +212,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
 42 gg_genmove white
-#? [N3|N2|L4|L3|L2|L1|M1|N1|M3]
+#? [N3|N2|L4|L3|L2|L1|M1|N1|M3]*
 
 #CATEGORY=ENDGAME_TUNING
 # A correction in this shape would need subtle tuning, as leaving
@@ -278,12 +278,12 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
 # GNU Go 3.1.15 wants to play F10 here (although 3.0.0 got H10)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
 52 gg_genmove black
-#? [H10]
+#? [H10]*
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 53 gg_genmove black
-#? [C6]*
+#? [C6]
 
 #CATEGORY=SEMEAI
 # This is very difficult. There are some variations in the .sgf-file,
@@ -334,7 +334,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 13
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 25
 63 gg_genmove black
-#? [K4]
+#? [K4]*
 
 #CATEGORY=OWL_TUNING
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 33
@@ -409,7 +409,7 @@ loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 17
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 19
 77 gg_genmove black
-#? [L6|K5]
+#? [L6|K5]*
 
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 21
 78 gg_genmove black
@@ -423,7 +423,7 @@ loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 23
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 41
 80 gg_genmove black
-#? [M2]*
+#? [M2]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 55

@@ -26,7 +26,7 @@ loadsgf games/nicklas/nicklas2.sgf 9
 #SEVERITY=4
 loadsgf games/nicklas/nicklas2.sgf 23
 203 gg_genmove black
-#? [J5]
+#? [J5]*
 
 ##tm - if B J8, W J5 kills bigger B corner.  
 ##So, there's no really effective move here.
@@ -49,7 +49,7 @@ loadsgf games/nicklas/nicklas5.sgf 23
 
 loadsgf games/nicklas/nicklas5.sgf 27
 502 gg_genmove black
-#? [G5]*
+#? [G5]
 
 loadsgf games/nicklas/nicklas6.sgf 31
 # semeai problem
@@ -164,7 +164,7 @@ loadsgf games/nicklas/nicklas11.sgf 274
 
 loadsgf games/nicklas/nicklas12.sgf 103
 1206 gg_genmove black
-#? [C15]
+#? [C15]*
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=Needless 2 point loss for B.
@@ -190,12 +190,12 @@ loadsgf games/nicklas/nicklas12.sgf 123
 #SEVERITY=
 loadsgf games/nicklas/nicklas12.sgf 203
 1213 gg_genmove black
-#? [N4]*
+#? [N4]
 
 # Added A6 among the correct moves. /gf (2.7.203)
 loadsgf games/nicklas/nicklas12.sgf 215
 1214 gg_genmove black
-#? [A1|A6]*
+#? [A1|A6]
 
 # H3 doesn't seem critical. /gf
 loadsgf games/nicklas/nicklas12.sgf 259
@@ -220,7 +220,7 @@ loadsgf games/nicklas/nicklas14.sgf 51
 
 loadsgf games/nicklas/nicklas14.sgf 55
 1405 gg_genmove black
-#? [B7]*
+#? [B7]
 
 # Semeai problem
 loadsgf games/nicklas/nicklas14.sgf 57
@@ -229,7 +229,7 @@ loadsgf games/nicklas/nicklas14.sgf 57
 
 loadsgf games/nicklas/nicklas14.sgf 61
 1408 dragon_status A8
-#? [!dead]*
+#? [!dead]
 
 loadsgf games/nicklas/nicklas15.sgf 196
 1502 gg_genmove black
@@ -298,7 +298,7 @@ loadsgf games/nicklas/nicklas16.sgf 64
 #The problem with D5 is the same as in nicklas2:1802
 loadsgf games/nicklas/nicklas18.sgf 15
 1801 gg_genmove black
-#? [D2]
+#? [D2]*
 
 loadsgf games/nicklas/nicklas19.sgf 34
 1901 gg_genmove black

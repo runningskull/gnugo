@@ -20,6 +20,26 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/* A "dragon" is a union of strings of the same color which will be
+ * treated as a unit. The dragons are generated anew at each
+ * move. If two strings are in the dragon, it is GNU Go's working
+ * hypothesis that they will live or die together and are
+ * effectively connected.
+ *
+ *                    _____/|        (! !)
+ *                   / ____/|        /@ @)
+ *                  / /   __        //  +--oo
+ *                 | /   |   >>    /<  _v---} 
+ *                 | |   UUU\\\     / / \\
+ *                 | |   __ _\\\    \ \  U
+ *                 | |  /  V  \\-->  \ \ 
+ *                 | <_/           \ /  }
+ *                 |      __     ___   /
+ *                  \    /  \___/   / /\
+ *                  <   <          < <\ \
+ *                   ( )))         ( ))))) 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +47,6 @@
 
 #include "liberty.h"
 #include "patterns.h"
-
 
 static void initialize_supplementary_dragon_data(void);
 static void find_neighbor_dragons(void);

@@ -80,9 +80,9 @@ loadsgf games/incident121.sgf 110
 # incident 133
 loadsgf games/incident121.sgf 122
 22 owl_attack P12
-#? [1 (PASS|S11|S14|N13)]
+#? [1 (PASS|S11|S14|N13)]*
 23 owl_defend P12
-#? [0]*
+#? [0]
 
 # incident 154
 loadsgf games/incident153.sgf 205
@@ -263,7 +263,7 @@ loadsgf games/incident263.sgf 32
 # incident 264
 loadsgf games/incident263.sgf 116
 72 owl_defend D13
-#? [1 C14]*
+#? [1 C14]
 
 # incident 265
 # see also test 134
@@ -657,13 +657,13 @@ loadsgf games/incident104.sgf 169
 # see also strategy3:122
 loadsgf games/incident223.sgf 228
 178 owl_attack R13
-#? [1 (R19|T18)]
+#? [1 (R19|T18)]*
 179 owl_defend R13
 #? [3 R19]
 
 loadsgf games/incident269.sgf 200
 180 owl_attack R19
-#? [1 (T16|T17|T18|S18)]
+#? [1 (T16|T17|T18|S18)]*
 
 # tm (3.1.17)  T18 lives.  Note the W sente at R16.
 181 owl_defend R19
@@ -913,7 +913,7 @@ loadsgf games/strategy26.sgf 257
 
 loadsgf games/owl34.sgf 211
 255 owl_defend D13
-#? [1 (D14|E13|G16)]*
+#? [1 (D14|E13|G16)]
 
 #CATEGORY=CONNECTION_IN_OWL
 # Simple mistake. See also 13x13:60 or 13x13:23.

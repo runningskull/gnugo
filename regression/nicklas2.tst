@@ -104,7 +104,7 @@ loadsgf games/nicklas/nicklas14.sgf 43
 #  group kill another group???
 loadsgf games/nicklas/nicklas14.sgf 61
 1407 gg_genmove black
-#? [A6]*
+#? [A6]
 
 
 #CATEGORY=PATTERN_TUNING
@@ -166,7 +166,7 @@ loadsgf games/nicklas/nicklas22.sgf 50
 #SEVERITY=10
 loadsgf games/nicklas/nicklas24.sgf 41
 2401 gg_genmove black
-#? [G3]
+#? [G3]*
 
 
 

@@ -32,6 +32,7 @@
 #include "patterns.h"
 
 static void value_territory(struct influence_data *q);
+static void new_value_territory(struct influence_data *q);
 static void add_influence_source(int pos, int color, float strength,
                                  float attenuation,
                                  struct influence_data *q);
@@ -928,6 +929,50 @@ whose_area(struct influence_data *q, int m, int n)
   return EMPTY;
 }
 
+static void
+new_value_territory(struct influence_data *q)
+{
+  int i, j;
+  for (i = 0; i < board_size; i++)
+    for (j = 0; j < board_size; j++) {
+      q->territory_value[i][j] = 0.0;
+
+      if (q->p[i][j] == EMPTY
+	  || (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0)) {
+        float diff = ( q->white_influence[i][j] - q->black_influence[i][j] )
+                    /( q->white_influence[i][j] + q->black_influence[i][j] );
+        q->territory_value[i][j] = diff * diff * diff;
+	/* Dead stone, upgrade to territory. Notice that this is not
+         * the point for a prisoner, which is added later. Instead
+         * this is to make sure that the vertex is not regarded as
+         * moyo or area. Also notice that the non-territory
+         * degradation below may over-rule this decision.
+	 */
+	if (BOARD(i, j) == BLACK)
+	  q->territory_value[i][j] = 1.0;
+	else if (BOARD(i, j) == WHITE)
+	  q->territory_value[i][j] = -1.0;
+
+	/* If marked as non-territory for the color currently owning
+         * it, reset the territory value.
+	 */
+	if (q->territory_value[i][j] > 0.0
+	    && (q->non_territory[i][j] & WHITE))
+	  q->territory_value[i][j] = 0.0;
+
+	if (q->territory_value[i][j] < 0.0
+	    && (q->non_territory[i][j] & BLACK))
+	  q->territory_value[i][j] = 0.0;
+	
+	/* Dead stone, add one to the territory value. */
+	if (BOARD(i, j) == BLACK)
+	  q->territory_value[i][j] += 1.0;
+	else if (BOARD(i, j) == WHITE)
+	  q->territory_value[i][j] -= 1.0;
+      }
+    }
+}
+
 /* Give territorial value to each vertex.
  *
  * A vertex with a lively stone has territorial value of 0.
@@ -1181,7 +1226,10 @@ compute_initial_influence(int color, int dragons_known)
   int i, j;
   compute_influence(&initial_influence, OTHER_COLOR(color), -1, -1,
 		    dragons_known, NULL, NULL);
-  value_territory(&initial_influence);
+  if (experimental_influence)
+    new_value_territory(&initial_influence);
+  else
+    value_territory(&initial_influence);
   compute_influence(&initial_opposite_influence, color, -1, -1,
 		    dragons_known, NULL, NULL);
   /* Invalidate information in move_influence. */
@@ -1221,7 +1269,10 @@ compute_move_influence(int m, int n, int color,
 		      NULL, saved_stones);
     decrease_depth_values();
     popgo();
-    value_territory(&move_influence);
+    if (experimental_influence)
+      new_value_territory(&move_influence);
+    else
+      value_territory(&move_influence);
   }
   else {
     gprintf("Computing influence for illegal move %m (move number %d)\n",
@@ -1330,7 +1381,8 @@ influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX])
 	old_value = -old_value;
       }
       
-      if (new_value != old_value) {
+      if (( new_value - old_value > 0.01)
+          || ( old_value - new_value > 0.01)) {
 	DEBUG(DEBUG_TERRITORY, "  %1m:   - %m territory change %f (%f -> %f)\n",
 		pos, i, j, new_value - old_value, old_value, new_value);
 	delta += new_value - old_value;
@@ -1500,6 +1552,14 @@ print_initial_influence(int color, int dragons_known)
   compute_initial_influence(color, dragons_known);
   print_influence(&initial_influence, (dragons_known ? "dragons_known"
 				       : "dragons_unknown"));
+  if ((printmoyo & PRINTMOYO_VALUE_TERRITORY)
+       && dragons_known) {
+    fprintf(stderr, "territory valuation (initial influence):\n");
+    print_numeric_influence(&initial_influence,
+                            initial_influence.territory_value,
+                            "%1.2f", 4, 0);
+  }
+
   print_influence(&initial_opposite_influence,
 		  dragons_known ? "dragons_known, opposite color"
 		  : "dragons_unknown, opposite color");
@@ -1514,6 +1574,13 @@ print_move_influence(int pos, int color,
 {
   compute_move_influence(I(pos), J(pos), color, saved_stones);
   print_influence(&move_influence, "after move, dragons known");
+
+  if (printmoyo & PRINTMOYO_VALUE_TERRITORY) {
+    fprintf(stderr, "territory valuation (after move):\n");
+    print_numeric_influence(&initial_influence,
+                            initial_influence.territory_value,
+                            "%1.2f", 4, 0);
+  }
 }
 
 /* Print influence for debugging purposes. */
@@ -1549,20 +1616,29 @@ print_influence(struct influence_data *q, const char *info_string)
   if (printmoyo & PRINTMOYO_NUMERIC_INFLUENCE) {
     /* Print the white influence values. */
     fprintf(stderr, "white influence (%s):\n", info_string);
-    print_numeric_influence(q, q->white_influence, "%3.0f", 1, 1);
-    
+    if (experimental_influence)
+      print_numeric_influence(q, q->white_influence, "%3.2f", 6, 0);
+    else
+      print_numeric_influence(q, q->white_influence, "%3.0f", 3, 1);
     /* Print the black influence values. */
     fprintf(stderr, "black influence (%s):\n", info_string);
-    print_numeric_influence(q, q->black_influence, "%3.0f", 1, 1);
+    if (experimental_influence)
+      print_numeric_influence(q, q->black_influence, "%3.2f", 6, 1);
+    else
+      print_numeric_influence(q, q->black_influence, "%3.0f", 3, 1);
   }
 
   if (printmoyo & PRINTMOYO_PRINT_INFLUENCE) {
     fprintf(stderr, "influence regions (%s):\n", info_string);
     print_influence_areas(q);
   }
+
 }
 
-/* Print numeric influence values. */
+/* Print numeric influence values.
+ * If draw_stones is not zero, then it denotes the lenght (in characters)
+ * of the numeric output fields.
+ */ 
 static void
 print_numeric_influence(struct influence_data *q,
 			float values[MAX_BOARD][MAX_BOARD],
@@ -1571,6 +1647,11 @@ print_numeric_influence(struct influence_data *q,
 			int mark_epsilon)
 {
   int i, j;
+  char spaces[10] = "";
+  if (draw_stones) {
+    for (i = 0; i < draw_stones; i++)
+      strcat(spaces, " ");
+  }
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
       if (draw_stones && q->p[i][j] == WHITE)

@@ -144,13 +144,13 @@ loadsgf games/trevor/trevor_14.sgf
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
 15 gg_genmove white
-#? [E7]
+#? [E7]*
 
 # C1 looks best here.  A7 very unorthodox, and at least
 # worse for ko threats.
 loadsgf games/trevor/trevor_16.sgf 53
 160 gg_genmove black
-#? [!A7]*
+#? [!A7]
 
 
 # Protecting lower left group better.
@@ -238,7 +238,7 @@ loadsgf games/trevor/trevor_25.sgf 31
 # G1 is another gift to white.
 loadsgf games/trevor/trevor_25.sgf 33
 251 gg_genmove black
-#? [!G1]
+#? [!G1]*
 
 
 # Should connect further back, at least, but of course
@@ -332,7 +332,7 @@ loadsgf games/trevor/trevor_32.sgf
 
 loadsgf games/trevor/trevor_33.sgf
 330 owl_defend L9
-#? [1 P9]
+#? [1 P9]*
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Very simple to threaten eye or run out here.
@@ -340,7 +340,7 @@ loadsgf games/trevor/trevor_33.sgf
 #SEE_ALSO=owl.tst@226
 loadsgf games/trevor/trevor_34.sgf
 340 owl_defend J10
-#? [1 P9]
+#? [1 P9]*
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Very simple Ko missed here.
@@ -430,7 +430,7 @@ loadsgf games/trevor/trevor_41.sgf 29
 #SEVERITY=10
 loadsgf games/trevor/trevor_41.sgf 35
 411 gg_genmove black
-#? [!A3]*
+#? [!A3]
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=D4 worm is more important to save than B2.
@@ -608,7 +608,7 @@ loadsgf games/trevor/trevor_73.sgf
 
 loadsgf games/trevor/trevor_74.sgf
 740 owl_attack B4
-#? [1 A1]*
+#? [1 A1]
 
 #FIXME: Uncomment this problem when the crash (3.1.21) is repaired.
 ###loadsgf games/trevor/trevor_75.sgf
@@ -664,5 +664,5 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 
 loadsgf games/trevor/trevor_20.sgf  14  
 1070 owl_attack G5
-#? [0]*
+#? [0]
 

@@ -161,13 +161,13 @@ loadsgf games/trevor/auto/a016.sgf 18
 
 loadsgf games/trevor/auto/a017.sgf 20
 290 gg_genmove white
-#? [!C8]
+#? [!C8]*
 
 
 #B8 makes better eye space, at least one point better here, in reverse sente.
 loadsgf games/trevor/auto/a017.sgf 30
 300 gg_genmove white
-#? [B8]*
+#? [B8]
 
 
 #E1 is not big enough sente.  D7 threatens whole white group.
@@ -234,7 +234,7 @@ loadsgf games/trevor/auto/a022.sgf 42
 #A3 just looses points.
 loadsgf games/trevor/auto/a023.sgf 50
 390 gg_genmove white
-#? [A2]*
+#? [A2]
 
 
 
@@ -294,7 +294,7 @@ loadsgf games/trevor/auto/a029.sgf 14
 #B4, B6 too passive. H8 prob. best.
 loadsgf games/trevor/auto/a030.sgf 22
 460 gg_genmove white
-#? [H8]*
+#? [H8]
 
 
 
@@ -304,7 +304,7 @@ loadsgf games/trevor/auto/a030.sgf 22
 #For a ko threat, D3 is better.
 loadsgf games/trevor/auto/a031.sgf 28
 470 gg_genmove white
-#? [!E2]
+#? [!E2]*
 
 
 #Sacrificing these two for the rest seems best.

@@ -27,7 +27,7 @@ loadsgf games/strategy27.sgf 12
 
 loadsgf games/strategy27.sgf 62
 105 gg_genmove white
-#? [J2]
+#? [J2]*
 
 loadsgf games/strategy27.sgf 152
 106 gg_genmove white
@@ -92,7 +92,7 @@ loadsgf games/incident240.sgf 65
 # incident 241
 loadsgf games/incident240.sgf 69
 119 gg_genmove black
-#? [D9|J3]
+#? [D9|J3]*
 
 # incident 221
 loadsgf games/incident221.sgf 35
@@ -108,7 +108,7 @@ loadsgf games/incident221.sgf 39
 # see also owl:178
 loadsgf games/incident223.sgf 228
 122 gg_genmove black
-#? [(R19|T18)]
+#? [(R19|T18)]*
 
 # incident 275
 loadsgf games/incident272.sgf 250
@@ -176,7 +176,7 @@ loadsgf games/strategy31.sgf 188
 
 loadsgf games/strategy32.sgf 19
 136 gg_genmove black
-#? [E2]
+#? [E2]*
 
 loadsgf games/mf1.sgf 29
 137 gg_genmove black

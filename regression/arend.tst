@@ -14,7 +14,7 @@ loadsgf games/arend/gnugo-gnugo1.sgf 112
 # SEVERITY=10
 loadsgf games/arend/gnugo-gnugo1.sgf 139
 3 gg_genmove black
-#? [P6|Q5]
+#? [P6|Q5]*
 
 # These kind of fights might be very difficult to do well
 # with current GNU Go methods (How should it choose between the different
@@ -28,7 +28,7 @@ loadsgf games/arend/exper1.sgf 7
 #DESCRIPTION=GNU Go should escape with its cutting stone.
 loadsgf games/arend/exper1.sgf 25
 5 gg_genmove black
-#? [D7|E7|E6]
+#? [D7|E7|E6]*
 
 #CATEGORY=STRATEGY
 #DESCRIPTION=In this position, GNU Go plays L10 because of an enormous assumed strategic effect on the M16 dragon, which is quite safe.
@@ -150,7 +150,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 17
 # Black C15 is sente here, so W C14 is mandatory.
 loadsgf games/arend/gnugo-gnugo7.sgf 24
 29 gg_genmove white
-#? [B14|C14]
+#? [B14|C14]*
 
 #CATEGORY=BLUNDER
 # GNU Go played F8.

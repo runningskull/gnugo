@@ -30,11 +30,11 @@ loadsgf games/incident189.sgf 186
 
 loadsgf games/ssstator.sgf 133
 156 gg_genmove black
-#? [B14|B16]*
+#? [B14|B16]
 
 loadsgf games/ssstator.sgf 136
 157 gg_genmove white
-#? [B14|B16]
+#? [B14|B16]*
 
 # E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51
@@ -62,7 +62,7 @@ loadsgf games/strategy39.sgf 156
 # tm - P8, though not as clean, also kills all the B stones.
 loadsgf games/strategy39.sgf 158
 163 gg_genmove white
-#? [O7|P8]*
+#? [O7|P8]
 
 #### N4 is clearly superior to O5.
 #### tm - N4 has it's weaknesses (at O5) too.  Both clearly kill.
@@ -79,7 +79,7 @@ loadsgf games/strategy39.sgf 178
 
 loadsgf games/incident94.sgf 114
 166 gg_genmove white
-#? [D11]*
+#? [D11]
 
 # Tenuki instead of urgent edge joseki move.
 loadsgf games/strategy40.sgf 10
@@ -173,7 +173,7 @@ loadsgf games/xxlin.sgf 38
 
 loadsgf games/xxlin.sgf 48
 182 gg_genmove black
-#? [E7|F8]
+#? [E7|F8]*
 
 loadsgf games/xxlin.sgf 76
 183 gg_genmove black
@@ -230,7 +230,7 @@ loadsgf games/bretz.sgf 26
 
 loadsgf games/bretz.sgf 58
 194 gg_genmove black
-#? [A13]*
+#? [A13]
 
 loadsgf games/bretz.sgf 88
 195 gg_genmove black
@@ -266,7 +266,7 @@ loadsgf games/juka1.sgf 8
 
 loadsgf games/juka1.sgf 14
 202 gg_genmove black
-#? [B6]
+#? [B6]*
 
 loadsgf games/juka1.sgf 18
 203 gg_genmove black

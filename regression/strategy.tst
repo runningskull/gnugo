@@ -203,7 +203,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
-#? [E17]
+#? [E17]*
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black
@@ -286,7 +286,7 @@ loadsgf games/strategy10.sgf
 # See also reading:158
 loadsgf games/strategy11.sgf 77
 44 gg_genmove black
-#? [G2]
+#? [G2]*
 
 # G17/G18 and C1 are both huge.
 loadsgf games/strategy11.sgf 127

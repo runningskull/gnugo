@@ -456,6 +456,7 @@ int somewhere(int color, int num_moves, ...);
 #define PRINTMOYO_PERMEABILITY      0x40
 #define PRINTMOYO_STRENGTH          0x80
 #define PRINTMOYO_ATTENUATION       0x100
+#define PRINTMOYO_VALUE_TERRITORY   0x200
 
 /* These values are used to communicate whether stones have been
  * saved, captured, or neither, when computing the influence effects

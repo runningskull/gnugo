@@ -224,7 +224,7 @@ lazarus: lazarus.tst
 
 all_batches: first_batch second_batch third_batch fourth_batch
 
-first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
+first_batch: 
 	$(srcdir)/regress.sh $(srcdir) reading.tst
 	$(srcdir)/regress.sh $(srcdir) owl.tst
 	$(srcdir)/regress.sh $(srcdir) owl_rot.tst
@@ -234,9 +234,10 @@ first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst filllib.tst a
 	$(srcdir)/regress.sh $(srcdir) atari_atari.tst
 	$(srcdir)/regress.sh $(srcdir) connection.tst
 	$(srcdir)/regress.sh $(srcdir) blunder.tst
+	$(srcdir)/regress.sh $(srcdir) trevora.tst
 	$(srcdir)/regress.sh $(srcdir) strategy.tst
 
-second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.tst golife.tst arion.tst viking.tst ego.tst dniwog.tst
+second_batch: 
 	$(srcdir)/regress.sh $(srcdir) endgame.tst
 	$(srcdir)/regress.sh $(srcdir) heikki.tst
 	$(srcdir)/regress.sh $(srcdir) neurogo.tst
@@ -248,9 +249,10 @@ second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.t
 	$(srcdir)/regress.sh $(srcdir) ego.tst
 	$(srcdir)/regress.sh $(srcdir) dniwog.tst
 	$(srcdir)/regress.sh $(srcdir) lazarus.tst
+	$(srcdir)/regress.sh $(srcdir) trevorb.tst
 	$(srcdir)/regress.sh $(srcdir) strategy2.tst
 
-third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst tactics.tst nngs.tst
+third_batch: 
 	$(srcdir)/regress.sh $(srcdir) nicklas1.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas2.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas3.tst
@@ -262,18 +264,16 @@ third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst st
 	$(srcdir)/regress.sh $(srcdir) tactics.tst
 	$(srcdir)/regress.sh $(srcdir) buzco.tst
 	$(srcdir)/regress.sh $(srcdir) nngs.tst
+	$(srcdir)/regress.sh $(srcdir) trevorc.tst
 	$(srcdir)/regress.sh $(srcdir) strategy3.tst
 
-fourth_batch: strategy4.tst capture.tst connect.tst global.tst vie.tst
+fourth_batch: 
 	$(srcdir)/regress.sh $(srcdir) capture.tst
 	$(srcdir)/regress.sh $(srcdir) connect.tst
 	$(srcdir)/regress.sh $(srcdir) global.tst
 	$(srcdir)/regress.sh $(srcdir) vie.tst
 	$(srcdir)/regress.sh $(srcdir) arend.tst
 	$(srcdir)/regress.sh $(srcdir) 13x13.tst
-	$(srcdir)/regress.sh $(srcdir) trevora.tst
-	$(srcdir)/regress.sh $(srcdir) trevorb.tst
-	$(srcdir)/regress.sh $(srcdir) trevorc.tst
-	$(srcdir)/regress.sh $(srcdir) trevord.tst
 	$(srcdir)/regress.sh $(srcdir) semeai.tst
+	$(srcdir)/regress.sh $(srcdir) trevord.tst
 	$(srcdir)/regress.sh $(srcdir) strategy4.tst

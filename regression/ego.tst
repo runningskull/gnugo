@@ -68,7 +68,7 @@ loadsgf games/ego.sgf 190
 #SEVERITY=3
 loadsgf games/ego.sgf 198
 11 gg_genmove white
-#? [T18]
+#? [T18]*
 
 # The correct move is the double sente at R10, but for the time being
 # we also accept C12.

@@ -12,7 +12,7 @@ loadsgf golois/Aya991113-13.sgf
 
 loadsgf golois/Aya991113-1.sgf
 4 gg_genmove black
-#? [Q6]*
+#? [Q6]
 
 loadsgf golois/Aya991113-2.sgf
 5 gg_genmove black
@@ -24,7 +24,7 @@ loadsgf golois/Aya991113-3.sgf
 
 loadsgf golois/Aya991113-6.sgf
 7 gg_genmove black
-#? [A5]*
+#? [A5]
 
 loadsgf golois/Aya991113-7.sgf
 8 gg_genmove black
@@ -36,7 +36,7 @@ loadsgf golois/Aya991113-8.sgf
 
 loadsgf golois/Aya991113-9.sgf
 10 gg_genmove black
-#? [A5]*
+#? [A5]
 
 # Changed D8 to E8 as correct answer. /gf
 loadsgf golois/bug96.sgf
@@ -54,7 +54,7 @@ loadsgf golois/Goemate990902-15.sgf
 # Semeai problem.
 loadsgf golois/Goemate990902-1.sgf
 14 gg_genmove black
-#? [S9]*
+#? [S9]
 
 loadsgf golois/Goemate990903-10.sgf
 15 gg_genmove black
@@ -62,7 +62,7 @@ loadsgf golois/Goemate990903-10.sgf
 
 loadsgf golois/Goemate990903-6.sgf
 16 gg_genmove black
-#? [O10]*
+#? [O10]
 
 #CATEGORY=CONNECTION
 #DESCRIPTION=
@@ -131,7 +131,7 @@ loadsgf golois/GoMaster991113-5.sgf
 
 loadsgf golois/GoStar991114-1.sgf
 31 gg_genmove black
-#? [M8]
+#? [M8]*
 
 loadsgf golois/Indigo-Golois-991105-1.sgf
 32 gg_genmove black
@@ -139,7 +139,7 @@ loadsgf golois/Indigo-Golois-991105-1.sgf
 
 loadsgf golois/Jimmy990906-1.sgf
 33 gg_genmove black
-#? [Q9]
+#? [Q9]*
 
 loadsgf golois/Lanka991113-1.sgf
 34 gg_genmove black
@@ -155,7 +155,7 @@ loadsgf golois/MeilleurCoup0002.sgf
 
 loadsgf golois/MeilleurCoup0003.sgf
 37 gg_genmove black
-#? [B6]*
+#? [B6]
 
 loadsgf golois/MeilleurCoup0004.sgf
 38 gg_genmove black

@@ -27,7 +27,7 @@ loadsgf games/nicklas/nicklas8.sgf 140
 # Locally K18 is superior to L17.
 loadsgf games/nicklas/nicklas12.sgf 69
 1202 gg_genmove black
-#? [!L17]*
+#? [!L17]
 
 # I guess K18, giving up the O17 stones and attacking H17 in exchange,
 # is playable. /ab
@@ -45,7 +45,7 @@ loadsgf games/nicklas/nicklas12.sgf 89
 # W L8 is alive in semeai. /ab
 loadsgf games/nicklas/nicklas12.sgf 182
 1211 dragon_status L8
-#? [alive]
+#? [alive]*
 
 # This is presumably a semeai problem.
 # As W L8 is alive in semeai with sufficiently many liberties ahead of

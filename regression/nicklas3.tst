@@ -25,7 +25,7 @@ loadsgf games/nicklas/nicklas6.sgf 25
 # also okay.
 loadsgf games/nicklas/nicklas14.sgf 48
 1403 gg_genmove white
-#? [J6|H9]
+#? [J6|H9]*
 
 ############ End of Tests #################
 

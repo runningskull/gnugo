@@ -108,7 +108,7 @@ loadsgf games/strategy17.sgf
 # however it may be difficult to save both K16 and M18 so if the 
 # moves listed are not too undervalued we may accept this result
 70 gg_genmove white
-#? [M15|J15|N16|J16]
+#? [M15|J15|N16|J16]*
 
 # E6 is the only move.
 loadsgf games/strategy18.sgf
@@ -148,7 +148,7 @@ loadsgf games/strategy21.sgf 86
 # Compare reading test 131.
 loadsgf games/strategy21.sgf 96
 78 gg_genmove black
-#? [H2]
+#? [H2]*
 
 loadsgf games/strategy14a.sgf
 # see test 51
@@ -183,7 +183,7 @@ loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
 # But Q13 seems larger -arend
 84 gg_genmove black
-#? [Q13]
+#? [Q13]*
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white

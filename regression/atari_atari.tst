@@ -56,7 +56,7 @@ loadsgf games/viking2.sgf 146
 
 loadsgf games/trevor/auto/c24.sgf 62
 13 combination_attack black
-#? [D8]*
+#? [D8]
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 104
 14 combination_attack black
