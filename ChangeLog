@@ -5,6 +5,7 @@
 - regression view includes node counts, SGF link, and -t output.
 - GTP echo_err added to allow echoing to STDERR.
 - owl tuning.
+- revision of rot tests
 
 3.1.13 released November 6, 2001
 
