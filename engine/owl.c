@@ -748,8 +748,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 	&& count_variations < semeai_variations
 	&& semeai_trymove(mpos, color, moves[k].name, apos, bpos,
 			  owl_phase, moves[k].value)) {
-      if (debug & DEBUG_SEMEAI)
-	dump_stack();
+      if (0)
+	if (debug & DEBUG_SEMEAI)
+	  dump_stack();
       if (board[bpos] == EMPTY) {
 	this_resultb = DEAD;
 	this_resulta = ALIVE;
@@ -4457,7 +4458,9 @@ catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS])
 	&& (owl->goal)[pos]) {
       int origin = find_origin(pos);
       if (pos == origin) {
-	DEBUG(DEBUG_SEMEAI, "goal worm: %1m\n", pos);
+	if (0) {
+	  DEBUG(DEBUG_SEMEAI, "goal worm: %1m\n", pos);
+	}
 	goal_worm[worms++] = pos;
       }
     }
