@@ -38,14 +38,6 @@ struct move_data move[BOARDMAX];
 struct move_reason move_reasons[MAX_MOVE_REASONS];
 int next_reason;
 
-/* Worms */
-int worms[MAX_WORMS];
-int next_worm;
-
-/* Dragons */
-int dragons[MAX_DRAGONS];
-int next_dragon;
-
 /* Connections */
 int conn_worm1[MAX_CONNECTIONS];
 int conn_worm2[MAX_CONNECTIONS];
@@ -90,8 +82,6 @@ clear_move_reasons(void)
   int ii;
   int k;
   next_reason = 0;
-  next_worm = 0;
-  next_dragon = 0;
   next_connection = 0;
   next_either = 0;
   next_all = 0;
@@ -137,46 +127,6 @@ clear_move_reasons(void)
     }
 }
 
-/*
- * Find the index of a worm in the list of worms. If necessary,
- * add a new entry. (str) must point to the origin of the worm.
- */
-int
-find_worm(int str)
-{
-  int k;
-
-  ASSERT_ON_BOARD1(str);
-  for (k = 0; k < next_worm; k++)
-    if (worms[k] == str)
-      return k;
-  
-  /* Add a new entry. */
-  gg_assert(next_worm < MAX_WORMS);
-  worms[next_worm] = str;
-  next_worm++;
-  return next_worm - 1;
-}
-
-/*
- * Find the index of a dragon in the list of dragons. If necessary,
- * add a new entry. (str) must point to the origin of the dragon.
- */
-int
-find_dragon(int str)
-{
-  int k;
-  ASSERT_ON_BOARD1(str);
-  for (k = 0; k < next_dragon; k++)
-    if (dragons[k] == str)
-      return k;
-  
-  /* Add a new entry. */
-  gg_assert(next_dragon < MAX_DRAGONS);
-  dragons[next_dragon] = str;
-  next_dragon++;
-  return next_dragon - 1;
-}
 
 /*
  * Find the index of a connection in the list of connections.
@@ -324,7 +274,8 @@ get_pos(int reason, int what)
   case ATTACK_MOVE_BAD_KO:
   case DEFEND_MOVE_GOOD_KO:
   case DEFEND_MOVE_BAD_KO:
-    return worms[what];
+    return what;
+
   case SEMEAI_MOVE:
   case SEMEAI_THREAT:
   case VITAL_EYE_MOVE:
@@ -341,16 +292,20 @@ get_pos(int reason, int what)
   case OWL_ATTACK_MOVE_BAD_KO:
   case OWL_DEFEND_MOVE_GOOD_KO:
   case OWL_DEFEND_MOVE_BAD_KO:
-    return dragons[what];
+    return what;
+
   case EITHER_MOVE:
     /* FIXME: What should we return here? */
-    return worms[either_data[what].what1];
+    return either_data[what].what1;
+
   case ALL_MOVE:
     /* FIXME: What should we return here? */
-    return worms[all_data[what].what1];
+    return all_data[what].what1;
+
   case CONNECT_MOVE:
   case CUT_MOVE:
-    return dragons[conn_worm1[what]];
+    return conn_worm1[what];
+
   case ANTISUJI_MOVE:
   case EXPAND_TERRITORY_MOVE:
   case EXPAND_MOYO_MOVE:
@@ -358,14 +313,17 @@ get_pos(int reason, int what)
   case MY_ATARI_ATARI_MOVE:
   case YOUR_ATARI_ATARI_MOVE:
     return NO_MOVE;
+
   case OWL_ATTACK_MOVE_GAIN:
   case OWL_DEFEND_MOVE_LOSS:
     /* FIXME: What should we return here? */
-    return dragons[either_data[what].what1];
+    return either_data[what].what1;
+
+  default:
+    /* We should never get here: */
+    gg_assert(0);
+    return 0; /* To keep gcc happy. */
   }
-  /* We should never get here: */
-  gg_assert(1>2);
-  return 0; /* To keep gcc happy. */
 }
 
 /*
@@ -377,8 +335,8 @@ void
 add_lunch(int eater, int food)
 {
   int k;
-  int dragon1 = find_dragon(dragon[eater].origin);
-  int worm1   = find_worm(worm[food].origin);
+  int dragon1 = dragon[eater].origin;
+  int worm1   = worm[food].origin;
   ASSERT_ON_BOARD1(eater);
   ASSERT_ON_BOARD1(food);
   
@@ -402,8 +360,8 @@ void
 remove_lunch(int eater, int food)
 {
   int k;
-  int dragon1 = find_dragon(dragon[eater].origin);
-  int worm1   = find_worm(worm[food].origin);
+  int dragon1 = dragon[eater].origin;
+  int worm1   = worm[food].origin;
   ASSERT_ON_BOARD1(eater);
   ASSERT_ON_BOARD1(food);
   
@@ -531,6 +489,8 @@ move_reason_known(int pos, int type, int what)
 int
 attack_move_reason_known(int pos, int what)
 {
+  ASSERT1(IS_STONE(board[what]), what);
+  what = worm[what].origin;
   if (move_reason_known(pos, ATTACK_MOVE, what))
     return WIN;
   if (move_reason_known(pos, ATTACK_MOVE_GOOD_KO, what))
@@ -547,6 +507,8 @@ attack_move_reason_known(int pos, int what)
 int
 defense_move_reason_known(int pos, int what)
 {
+  ASSERT1(IS_STONE(board[what]), what);
+  what = worm[what].origin;
   if (move_reason_known(pos, DEFEND_MOVE, what))
     return WIN;
   if (move_reason_known(pos, DEFEND_MOVE_GOOD_KO, what))
@@ -562,10 +524,9 @@ defense_move_reason_known(int pos, int what)
 static int
 tactical_move_vs_whole_dragon_known(int pos, int what)
 {
-  int aa = dragons[what];
-  return ((worm[aa].size == dragon[aa].size)
-	  && (attack_move_reason_known(pos, find_worm(aa))
-	      || defense_move_reason_known(pos, find_worm(aa))));
+  return ((worm[what].size == dragon[what].size)
+	  && (attack_move_reason_known(pos, what)
+	      || defense_move_reason_known(pos, what)));
 }
 
 /*
@@ -618,24 +579,24 @@ owl_move_reason_known(int pos, int what)
 static int
 owl_move_vs_worm_known(int pos, int what)
 {
-  return owl_move_reason_known(pos, find_dragon(dragon[worms[what]].origin));
+  return owl_move_reason_known(pos, dragon[what].origin);
 }
 
-/* Check whether a worm listed in worms[] is inessential */
+/* Check whether a worm is inessential */
 static int
 concerns_inessential_worm(int pos, int what)
 {
   UNUSED(pos);
-  return DRAGON2(worms[what]).safety == INESSENTIAL
-        || worm[worms[what]].inessential;
+  return DRAGON2(what).safety == INESSENTIAL
+        || worm[what].inessential;
 }
 
-/* Check whether a dragon listed in dragons[] is inessential */
+/* Check whether a dragon is inessential */
 static int
 concerns_inessential_dragon(int pos, int what)
 {
   UNUSED(pos);
-  return DRAGON2(dragons[what]).safety == INESSENTIAL; 
+  return DRAGON2(what).safety == INESSENTIAL; 
 }
 
 static int
@@ -645,27 +606,35 @@ move_is_marked_unsafe(int pos, int what)
   return !move[pos].move_safety;
 }
 
+
+/* (what) points to two worms listed in either_data. Returns true if
+ * this is a "attack either" move reason, and one of the worms attackable.
+ * FIXME: Ko?
+ */
 static int
-either_move_redundant(int pos, int what)
+either_worm_attackable(int pos, int what)
 {
-  return ((either_data[what].reason1 == ATTACK_STRING
-	   && attack_move_reason_known(pos, either_data[what].what1))
-	  || (either_data[what].reason2 == ATTACK_STRING
-	      && attack_move_reason_known(pos, either_data[what].what2)));
+  UNUSED(pos);
+  return (either_data[what].reason1 == ATTACK_STRING
+      	  && either_data[what].reason2 == ATTACK_STRING
+          && (worm[either_data[what].what1].attack_codes[0] != 0
+              || worm[either_data[what].what2].attack_codes[0] != 0));
 }
 
-#if 0
-
+/* (what) points to two worms via all_data. Returns true if this is
+ * a "defend both" move reason, and one of the worms is attackable.
+ * FIXME: Ko?
+ */
 static int
-all_move_redundant(int pos, int what)
+one_of_both_attackable(int pos, int what)
 {
-  return ((all_data[what].reason1 == DEFEND_STRING
-	   && defense_move_reason_known(pos, all_data[what].what1))
-	  || (all_data[what].reason2 == DEFEND_STRING
-	      && defense_move_reason_known(pos, all_data[what].what2)));
+  UNUSED(pos);
+  return (all_data[what].reason1 == DEFEND_STRING
+      	  && all_data[what].reason2 == DEFEND_STRING
+   	  && (worm[all_data[what].what1].attack_codes[0] != 0
+              || worm[all_data[what].what2].attack_codes[0] != 0));
 }
 
-#endif
 
 /* ---------------------------------------------------------------- */
 
@@ -677,15 +646,15 @@ all_move_redundant(int pos, int what)
 void
 add_attack_move(int pos, int ww, int code)
 {
-  int worm_number = find_worm(worm[ww].origin);
+  ww = worm[ww].origin;
 
   ASSERT_ON_BOARD1(ww);
   if (code == WIN)
-    add_move_reason(pos, ATTACK_MOVE, worm_number);
+    add_move_reason(pos, ATTACK_MOVE, ww);
   else if (code == KO_A)
-    add_move_reason(pos, ATTACK_MOVE_GOOD_KO, worm_number);
+    add_move_reason(pos, ATTACK_MOVE_GOOD_KO, ww);
   else if (code == KO_B)
-    add_move_reason(pos, ATTACK_MOVE_BAD_KO, worm_number);
+    add_move_reason(pos, ATTACK_MOVE_BAD_KO, ww);
 }
 
 /*
@@ -695,15 +664,15 @@ add_attack_move(int pos, int ww, int code)
 void
 add_defense_move(int pos, int ww, int code)
 {
-  int worm_number = find_worm(worm[ww].origin);
+  ww = worm[ww].origin;
 
   ASSERT_ON_BOARD1(ww);
   if (code == WIN)
-    add_move_reason(pos, DEFEND_MOVE, worm_number);
+    add_move_reason(pos, DEFEND_MOVE, ww);
   else if (code == KO_A)
-    add_move_reason(pos, DEFEND_MOVE_GOOD_KO, worm_number);
+    add_move_reason(pos, DEFEND_MOVE_GOOD_KO, ww);
   else if (code == KO_B)
-    add_move_reason(pos, DEFEND_MOVE_BAD_KO, worm_number);
+    add_move_reason(pos, DEFEND_MOVE_BAD_KO, ww);
 }
 
 /*
@@ -713,11 +682,10 @@ add_defense_move(int pos, int ww, int code)
 void
 add_attack_threat_move(int pos, int ww, int code)
 {
-  int worm_number = find_worm(worm[ww].origin);
   UNUSED(code);
   
   ASSERT_ON_BOARD1(ww);
-  add_move_reason(pos, ATTACK_THREAT, worm_number);
+  add_move_reason(pos, ATTACK_THREAT, worm[ww].origin);
 }
 
 /* Remove an attack threat move reason. */
@@ -725,10 +693,8 @@ add_attack_threat_move(int pos, int ww, int code)
 void
 remove_attack_threat_move(int pos, int ww)
 {
-  int worm_number = find_worm(worm[ww].origin);
-
   ASSERT_ON_BOARD1(ww);
-  remove_move_reason(pos, ATTACK_THREAT, worm_number);
+  remove_move_reason(pos, ATTACK_THREAT, worm[ww].origin);
 }
 
 /*
@@ -738,11 +704,10 @@ remove_attack_threat_move(int pos, int ww)
 void
 add_defense_threat_move(int pos, int ww, int code)
 {
-  int worm_number = find_worm(worm[ww].origin);
   UNUSED(code);
 
   ASSERT_ON_BOARD1(ww);
-  add_move_reason(pos, DEFEND_THREAT, worm_number);
+  add_move_reason(pos, DEFEND_THREAT, worm[ww].origin);
 }
 
 
@@ -762,7 +727,7 @@ get_attack_threats(int pos, int max_strings, int strings[])
       break;
 
     if (move_reasons[r].type == ATTACK_THREAT)
-      strings[num_strings++] = worms[move_reasons[r].what];
+      strings[num_strings++] = move_reasons[r].what;
 
     if (num_strings == max_strings)
       break;
@@ -787,7 +752,7 @@ get_defense_threats(int pos, int max_strings, int strings[])
       break;
 
     if (move_reasons[r].type == DEFEND_THREAT)
-      strings[num_strings++] = worms[move_reasons[r].what];
+      strings[num_strings++] = move_reasons[r].what;
 
     if (num_strings == max_strings)
       break;
@@ -820,10 +785,9 @@ get_biggest_owl_target(int pos)
     case OWL_DEFEND_MOVE_BAD_KO:
     case OWL_DEFEND_THREAT:
     case OWL_PREVENT_THREAT:
-      if (dragon[dragons[move_reasons[r].what]].effective_size
-          > target_size) {
+      if (dragon[move_reasons[r].what].effective_size > target_size) {
         biggest_target = move_reasons[r].what;
-        target_size = dragon[dragons[move_reasons[r].what]].effective_size;
+        target_size = dragon[move_reasons[r].what].effective_size;
       }
       break;
     }
@@ -839,24 +803,16 @@ get_biggest_owl_target(int pos)
 void
 add_connection_move(int pos, int w1, int w2)
 {
-  int worm1 = find_worm(worm[w1].origin);
-  int worm2 = find_worm(worm[w2].origin);
   int connection;
 
   ASSERT_ON_BOARD1(w1);
   ASSERT_ON_BOARD1(w2);
   gg_assert(worm[w1].color == worm[w2].color);
-  if (worm1 == worm2)
+  if (worm[w1].origin == worm[w2].origin)
     return;
   
-  connection = find_connection(worm1, worm2);
+  connection = find_connection(worm[w1].origin, worm[w2].origin);
   add_move_reason(pos, CONNECT_MOVE, connection);
-
-  /* We do this only for the side effect of being sure that the
-   * corresponding dragon gets into the list of dragons.
-   */
-  (void) find_dragon(dragon[w1].origin);
-  (void) find_dragon(dragon[w2].origin);
 }
 
 /*
@@ -867,16 +823,14 @@ add_connection_move(int pos, int w1, int w2)
 void
 add_cut_move(int pos, int w1, int w2)
 {
-  int worm1 = find_worm(worm[w1].origin);
-  int worm2 = find_worm(worm[w2].origin);
   int connection;
 
   ASSERT_ON_BOARD1(w1);
   ASSERT_ON_BOARD1(w2);
   gg_assert(worm[w1].color == worm[w2].color);
-  if (worm1 == worm2)
+  if (worm[w1].origin == worm[w2].origin)
     return;
-  connection = find_connection(worm1, worm2);
+  connection = find_connection(worm[w1].origin, worm[w2].origin);
   
   /*
    * Ignore the cut or connection if either (w1) or (w2)
@@ -888,11 +842,6 @@ add_cut_move(int pos, int w1, int w2)
   
   add_move_reason(pos, CUT_MOVE, connection);
 
-  /* We do this only for the side effect of being sure that the
-   * corresponding dragon gets into the list of dragons.
-   */
-  (void) find_dragon(dragon[w1].origin);
-  (void) find_dragon(dragon[w2].origin);
 }
 
 /*
@@ -917,10 +866,9 @@ add_antisuji_move(int pos)
 void
 add_semeai_move(int pos, int dr)
 {
-  int the_dragon = find_dragon(dragon[dr].origin);
-
+  
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, SEMEAI_MOVE, the_dragon);
+  add_move_reason(pos, SEMEAI_MOVE, dragon[dr].origin);
 }
 
 /*
@@ -933,10 +881,8 @@ add_semeai_move(int pos, int dr)
 void
 add_semeai_threat(int pos, int dr)
 {
-  int the_dragon = find_dragon(dragon[dr].origin);
-
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, SEMEAI_THREAT, the_dragon);
+  add_move_reason(pos, SEMEAI_THREAT, dragon[dr].origin);
 }
 
 /*
@@ -991,7 +937,7 @@ add_either_move(int pos, int reason1, int target1, int reason2, int target2)
   switch (reason1) {
   case ATTACK_STRING:
     {
-      what1 = find_worm(worm[target1].origin);
+      what1 = worm[target1].origin;
 
       /* If this string is already attacked, and with no defense, then
        * there is no additional value of this move reason. */
@@ -1008,7 +954,7 @@ add_either_move(int pos, int reason1, int target1, int reason2, int target2)
   switch (reason2) {
   case ATTACK_STRING:
     {
-      what2 = find_worm(worm[target2].origin);
+      what2 = worm[target2].origin;
 
       /* If this string is already attacked, and with no defense, then
        * there is no additional value of this move reason. */
@@ -1061,7 +1007,7 @@ add_all_move(int pos, int reason1, int target1, int reason2, int target2)
 
   switch (reason1) {
   case DEFEND_STRING:
-    what1 = find_worm(worm[target1].origin);
+    what1 = worm[target1].origin;
     break;
 
   default:
@@ -1070,7 +1016,7 @@ add_all_move(int pos, int reason1, int target1, int reason2, int target2)
 
   switch (reason2) {
   case DEFEND_STRING:
-    what2 = find_worm(worm[target2].origin);
+    what2 = worm[target2].origin;
     break;
 
   default:
@@ -1085,8 +1031,8 @@ add_all_move(int pos, int reason1, int target1, int reason2, int target2)
 void
 add_gain_move(int pos, int target1, int target2)
 {
-  int what1 = find_dragon(dragon[target1].origin);
-  int what2 = find_worm(worm[target2].origin);
+  int what1 = dragon[target1].origin;
+  int what2 = worm[target2].origin;
   int index = find_pair_data(what1, what2);
   ASSERT1(target2 != NO_MOVE, pos);
   add_move_reason(pos, OWL_ATTACK_MOVE_GAIN, index);
@@ -1095,8 +1041,8 @@ add_gain_move(int pos, int target1, int target2)
 void
 add_loss_move(int pos, int target1, int target2)
 {
-  int what1 = find_dragon(dragon[target1].origin);
-  int what2 = find_worm(worm[target2].origin);
+  int what1 = dragon[target1].origin;
+  int what2 = worm[target2].origin;
   int index = find_pair_data(what1, what2);
   ASSERT1(target2 != NO_MOVE, pos);
   add_move_reason(pos, OWL_DEFEND_MOVE_LOSS, index);
@@ -1173,10 +1119,9 @@ add_worthwhile_threat_move(int pos)
 void
 add_strategical_attack_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
-
+  dr = dragon[dr].origin;
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, STRATEGIC_ATTACK_MOVE, dragon1);
+  add_move_reason(pos, STRATEGIC_ATTACK_MOVE, dr);
 }
 
 /*
@@ -1186,10 +1131,9 @@ add_strategical_attack_move(int pos, int dr)
 void
 add_strategical_defense_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
-
+  dr = dragon[dr].origin;
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, STRATEGIC_DEFEND_MOVE, dragon1);
+  add_move_reason(pos, STRATEGIC_DEFEND_MOVE, dr);
 }
 
 /*
@@ -1199,15 +1143,15 @@ add_strategical_defense_move(int pos, int dr)
 void
 add_owl_attack_move(int pos, int dr, int code)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
+  dr = dragon[dr].origin;
 
   ASSERT_ON_BOARD1(dr);
   if (code == WIN)
-    add_move_reason(pos, OWL_ATTACK_MOVE, dragon1);
+    add_move_reason(pos, OWL_ATTACK_MOVE, dr);
   else if (code == KO_A)
-    add_move_reason(pos, OWL_ATTACK_MOVE_GOOD_KO, dragon1);
+    add_move_reason(pos, OWL_ATTACK_MOVE_GOOD_KO, dr);
   else if (code == KO_B)
-    add_move_reason(pos, OWL_ATTACK_MOVE_BAD_KO, dragon1);
+    add_move_reason(pos, OWL_ATTACK_MOVE_BAD_KO, dr);
 }
 
 /*
@@ -1217,15 +1161,15 @@ add_owl_attack_move(int pos, int dr, int code)
 void
 add_owl_defense_move(int pos, int dr, int code)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
+  dr = dragon[dr].origin;
 
   ASSERT_ON_BOARD1(dr);
   if (code == WIN)
-    add_move_reason(pos, OWL_DEFEND_MOVE, dragon1);
+    add_move_reason(pos, OWL_DEFEND_MOVE, dr);
   else if (code == KO_A)
-    add_move_reason(pos, OWL_DEFEND_MOVE_GOOD_KO, dragon1);
+    add_move_reason(pos, OWL_DEFEND_MOVE_GOOD_KO, dr);
   else if (code == KO_B)
-    add_move_reason(pos, OWL_DEFEND_MOVE_BAD_KO, dragon1);
+    add_move_reason(pos, OWL_DEFEND_MOVE_BAD_KO, dr);
 }
 
 /*
@@ -1237,11 +1181,11 @@ add_owl_defense_move(int pos, int dr, int code)
 void
 add_owl_attack_threat_move(int pos, int dr, int code)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
   UNUSED(code);
+  dr = dragon[dr].origin;
   
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, OWL_ATTACK_THREAT, dragon1);
+  add_move_reason(pos, OWL_ATTACK_THREAT, dragon[dr].origin);
   add_worthwhile_threat_move(pos);
 }
 
@@ -1252,10 +1196,9 @@ add_owl_attack_threat_move(int pos, int dr, int code)
 void
 add_owl_uncertain_defense_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
-
+  dr = dragon[dr].origin;
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, UNCERTAIN_OWL_DEFENSE, dragon1);
+  add_move_reason(pos, UNCERTAIN_OWL_DEFENSE, dragon[dr].origin);
 }
 
 /* The owl code found the opponent dragon alive, or the friendly
@@ -1265,10 +1208,9 @@ add_owl_uncertain_defense_move(int pos, int dr)
 void
 add_owl_uncertain_attack_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
-
+  dr = dragon[dr].origin;
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, UNCERTAIN_OWL_ATTACK, dragon1);
+  add_move_reason(pos, UNCERTAIN_OWL_ATTACK, dragon[dr].origin);
 }
 
 /*
@@ -1280,11 +1222,11 @@ add_owl_uncertain_attack_move(int pos, int dr)
 void
 add_owl_defense_threat_move(int pos, int dr, int code)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
   UNUSED(code);
+  dr = dragon[dr].origin;
 
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, OWL_DEFEND_THREAT, dragon1);
+  add_move_reason(pos, OWL_DEFEND_THREAT, dragon[dr].origin);
   add_worthwhile_threat_move(pos);
 }
 
@@ -1320,10 +1262,8 @@ add_your_atari_atari_move(int pos, int size)
 void
 add_owl_prevent_threat_move(int pos, int dr)
 {
-  int dragon1 = find_dragon(dragon[dr].origin);
-
   ASSERT_ON_BOARD1(dr);
-  add_move_reason(pos, OWL_PREVENT_THREAT, dragon1);
+  add_move_reason(pos, OWL_PREVENT_THREAT, dragon[dr].origin);
 }
 
 /*
@@ -1472,10 +1412,10 @@ get_saved_worms(int pos, char saved[BOARDMAX])
      * move is unsafe.
      */
     if (move_reasons[r].type == DEFEND_MOVE)
-      mark_string(worm[worms[what]].origin, saved, 1);
+      mark_string(worm[what].origin, saved, 1);
     else if (move_reasons[r].type == OWL_DEFEND_MOVE_LOSS) {
-      int origin = dragon[worms[what]].origin;
-      int kworm = worm[worms[what]].origin;
+      int origin = dragon[what].origin;
+      int kworm = worm[what].origin;
       int ii;
       for (ii = BOARDMIN; ii < BOARDMAX; ii++)
 	if (IS_STONE(board[ii]) && dragon[ii].origin == origin
@@ -1560,7 +1500,7 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
       else {
 	int worm_is_safe = 0;
 	if (worm[ii].attack_codes[0] == NO_MOVE
-	    || defense_move_reason_known(pos, find_worm(ii)))
+	    || defense_move_reason_known(pos, ii))
 	  worm_is_safe = 1;
 	else if (trymove(pos, color, "mark-changed-dragon", ii,
 			 EMPTY, NO_MOVE)) {
@@ -1605,11 +1545,10 @@ get_saved_dragons(int pos, char saved[BOARDMAX])
      * move is unsafe.
      */
     if (move_reasons[r].type == OWL_DEFEND_MOVE) {
-      int origin = dragon[dragons[what]].origin;
       int ii;
-      for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-	if (IS_STONE(board[ii]) && dragon[ii].origin == origin)
-	  saved[ii] = 1;
+      for (ii = first_worm_in_dragon(what); ii != NO_MOVE;
+	   ii = next_worm_in_dragon(ii))
+	mark_string(ii, saved, 1);
     }
   }    
 }
@@ -1686,37 +1625,37 @@ list_move_reasons(int color)
 	
 	switch (move_reasons[r].type) {
 	case ATTACK_MOVE:
-	  aa = worms[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m attacks %1m%s\n", pos, aa,
 		  (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	case ATTACK_MOVE_GOOD_KO:
-	  aa = worms[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m attacks %1m%s with good ko\n", pos, aa,
 		  (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	case ATTACK_MOVE_BAD_KO:
-	  aa = worms[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m attacks %1m%s with bad ko\n", pos, aa,
 		  (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	  
 	case DEFEND_MOVE:
-	  aa = worms[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m defends %1m\n", pos, aa);
 	  break;
 	case DEFEND_MOVE_GOOD_KO:
-	  aa = worms[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m defends %1m with good ko\n", pos, aa);
 	  break;
 	case DEFEND_MOVE_BAD_KO:
-	  aa = worms[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m defends %1m with bad ko\n", pos, aa);
 	  break;
 	  
 	case ATTACK_THREAT:
 	case DEFEND_THREAT:
-	  aa = worms[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  
 	  if (move_reasons[r].type == ATTACK_THREAT)
 	    gprintf("Move at %1m threatens to attack %1m\n", pos, aa);
@@ -1725,7 +1664,7 @@ list_move_reasons(int color)
 	  break;
 
 	case UNCERTAIN_OWL_DEFENSE:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  if (board[aa] == color)
 	    gprintf("%1m found alive but not certainly, %1m defends it again\n",
 		    aa, pos);
@@ -1738,12 +1677,10 @@ list_move_reasons(int color)
 	case CUT_MOVE:
 	  worm1 = conn_worm1[move_reasons[r].what];
 	  worm2 = conn_worm2[move_reasons[r].what];
-	  aa = worms[worm1];
-	  bb = worms[worm2];
 	  if (move_reasons[r].type == CONNECT_MOVE)
-	    gprintf("Move at %1m connects %1m and %1m\n", pos, aa, bb);
+	    gprintf("Move at %1m connects %1m and %1m\n", pos, worm1, worm2);
 	  else
-	    gprintf("Move at %1m cuts %1m and %1m\n", pos, aa, bb);
+	    gprintf("Move at %1m cuts %1m and %1m\n", pos, worm1, worm2);
 	  break;
 	  
 	case ANTISUJI_MOVE:
@@ -1751,12 +1688,12 @@ list_move_reasons(int color)
 	  break;
 	  
 	case SEMEAI_MOVE:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m wins semeai for %1m\n", pos, aa);
 	  break;
 	  
 	case SEMEAI_THREAT:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m threatens to win semeai for %1m\n", pos, aa);
 	  break;
 	  
@@ -1774,11 +1711,9 @@ list_move_reasons(int color)
 	  reason2 = either_data[move_reasons[r].what].reason2;
 	  worm1 = either_data[move_reasons[r].what].what1;
 	  worm2 = either_data[move_reasons[r].what].what2;
-	  aa = worms[worm1];
-	  bb = worms[worm2];
 	  gprintf("Move at %1m either %s %1m or %s %1m\n", pos, 
-		  reason1 == ATTACK_STRING ? "attacks" : "defends", aa, 
-		  reason2 == ATTACK_STRING ? "attacks" : "defends", bb);
+		  reason1 == ATTACK_STRING ? "attacks" : "defends", worm1, 
+		  reason2 == ATTACK_STRING ? "attacks" : "defends", worm2);
 	  break;
 
 	case ALL_MOVE:
@@ -1786,61 +1721,59 @@ list_move_reasons(int color)
 	  reason2 = all_data[move_reasons[r].what].reason2;
 	  worm1 = all_data[move_reasons[r].what].what1;
 	  worm2 = all_data[move_reasons[r].what].what2;
-	  aa = worms[worm1];
-	  bb = worms[worm2];
 	  gprintf("Move at %1m both %s %1m and %s %1m\n", pos, 
-		  reason1 == ATTACK_STRING ? "attacks" : "defends", aa, 
-		  reason2 == ATTACK_STRING ? "attacks" : "defends", bb);
+		  reason1 == ATTACK_STRING ? "attacks" : "defends", worm1, 
+		  reason2 == ATTACK_STRING ? "attacks" : "defends", worm2);
 	  break;
 
 	case OWL_ATTACK_MOVE:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-attacks %1m\n", pos, aa);
 	  break;
 	case OWL_ATTACK_MOVE_GOOD_KO:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-attacks %1m with good ko\n", pos, aa);
 	  break;
 	case OWL_ATTACK_MOVE_BAD_KO:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-attacks %1m with bad ko\n", pos, aa);
 	  break;
 	case OWL_ATTACK_MOVE_GAIN:
-	  aa = dragons[either_data[move_reasons[r].what].what1];
-	  bb = worms[either_data[move_reasons[r].what].what2];
+	  aa = either_data[move_reasons[r].what].what1;
+	  bb = either_data[move_reasons[r].what].what2;
 	  gprintf("Move at %1m owl-attacks %1m (captures %1m)\n", pos, aa, bb);
 	  break;
 	  
 	case OWL_DEFEND_MOVE:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-defends %1m\n", pos, aa);
 	  break;
 	case OWL_DEFEND_MOVE_GOOD_KO:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-defends %1m with good ko\n", pos, aa);
 	  break;
 	case OWL_DEFEND_MOVE_BAD_KO:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-defends %1m with bad ko\n", pos, aa);
 	  break;
 	case OWL_DEFEND_MOVE_LOSS:
-	  aa = dragons[either_data[move_reasons[r].what].what1];
-	  bb = worms[either_data[move_reasons[r].what].what2];
+	  aa = either_data[move_reasons[r].what].what1;
+	  bb = either_data[move_reasons[r].what].what2;
 	  gprintf("Move at %1m owl-defends %1m (loses %1m)\n", pos, aa, bb);
 	  break;
 	  
 	case OWL_ATTACK_THREAT:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-threatens to attack %1m\n", pos, aa);
 	  break;
 	  
 	case OWL_DEFEND_THREAT:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-threatens to defend %1m\n", pos, aa);
 	  break;
 	  
 	case OWL_PREVENT_THREAT:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  gprintf("Move at %1m owl-prevents a threat to attack or defend %1m\n", 
 		  pos, aa);
 	  break;
@@ -1859,7 +1792,7 @@ list_move_reasons(int color)
 	  
 	case STRATEGIC_ATTACK_MOVE:
 	case STRATEGIC_DEFEND_MOVE:
-	  aa = dragons[move_reasons[r].what];
+	  aa = move_reasons[r].what;
 	  
 	  if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE)
 	    gprintf("Move at %1m strategically attacks %1m\n", pos, aa);
@@ -1889,6 +1822,8 @@ list_move_reasons(int color)
  * flags to be set, trace message }
  * The condition must be of type discard_condition_fn_ptr, that is a pointer
  * to a function with parameters (pos, what).
+ *
+ * FIXME: Add handling of ALL and EITHER moves for inessential worms.
  */
 
 static struct discard_rule discard_rules[] =
@@ -1906,12 +1841,11 @@ static struct discard_rule discard_rules[] =
     tactical_move_vs_whole_dragon_known, REDUNDANT,
     "  %1m: 0.0 - (threat to) win semai involving %1m (tactical move as well)\n"},
   { { EITHER_MOVE, -1 },
-    either_move_redundant, REDUNDANT,
-    "  %1m: 0.0 - either move is redundant at %1m (direct att./def. as well)\n"},
-  /* FIXME: Add handling of ALL_MOVE: All single attacks/defenses should
-   *        be removed when there is also a corresponding ALL_MOVE.
-   */
-  /* FIXME: Add handling of ALL and EITHER moves for inessential worms. */
+    either_worm_attackable, REDUNDANT,
+    "  %1m: 0.0 - 'attack either' is redundant at %1m (direct att./def. as well)\n"},
+  { { ALL_MOVE, -1 },
+    one_of_both_attackable, REDUNDANT,
+    "  %1m: 0.0 - 'defend both' is redundant at %1m (direct att./def. as well)\n"},
   { { ATTACK_MOVE, ATTACK_MOVE_GOOD_KO,
       ATTACK_MOVE_BAD_KO, ATTACK_THREAT,
       DEFEND_MOVE, DEFEND_MOVE_GOOD_KO,

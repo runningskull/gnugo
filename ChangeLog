@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- arrays worms[], dragons[] removed in worms.c and value_moves.c
+- new discard rule to enforce definiton of attack either/defend both reasons
 - cleanups and improvements in board.c
 - new function set_up_snapback_moves() in reading.c
 - defend1() and restricted_defend1() revised

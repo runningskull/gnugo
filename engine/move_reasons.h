@@ -145,14 +145,6 @@ extern struct move_data move[BOARDMAX];
 extern struct move_reason move_reasons[MAX_MOVE_REASONS];
 extern int next_reason;
 
-/* Worms */
-extern int worms[MAX_WORMS];
-extern int next_worm;
-
-/* Dragons */
-extern int dragons[MAX_DRAGONS];
-extern int next_dragon;
-
 /* Connections */
 extern int conn_worm1[MAX_CONNECTIONS];
 extern int conn_worm2[MAX_CONNECTIONS];
