@@ -649,9 +649,18 @@ do_owl_analyze_semeai(int apos, int bpos,
 	SGFTRACE2(PASS_MOVE, DEAD, "You live, I die");
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, DEAD, ALIVE);
       }
-      else if (min_eyes(&probable_eyes_a) < 2) {
+      else if (min_eyes(&probable_eyes_a) >= 2) {
+	/* I am already alive */
+	*resulta = ALIVE;
+	*resultb = ALIVE;
+	if (move) *move = PASS_MOVE;
+	sgf_dumptree = save_sgf_dumptree;
+	count_variations = save_count_variations;
+	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
+	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
+      }
+      else if (vital_defensive_moves[0].pos != NO_MOVE) {
 	/* I can live */
-	gg_assert(vital_defensive_moves[0].pos != NO_MOVE);
 	*resulta = ALIVE;
 	*resultb = ALIVE;
 	if (move) *move = vital_defensive_moves[0].pos;
@@ -662,16 +671,10 @@ do_owl_analyze_semeai(int apos, int bpos,
 	READ_RETURN_SEMEAI(read_result, move, vital_defensive_moves[0].pos,
 			   ALIVE, ALIVE);
       }
-      else {
-	/* I am already alive */
-	*resulta = ALIVE;
-	*resultb = ALIVE;
-	if (move) *move = PASS_MOVE;
-	sgf_dumptree = save_sgf_dumptree;
-	count_variations = save_count_variations;
-	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
-	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
-      }
+      /* If here, compute_eyes_pessimistic has returned min_eyes<2 
+       * and max_eyes>=2 yet produced no defensive move.
+       */
+      else DEBUG(DEBUG_SEMEAI, "inconsistent eyevalue\n");
     }
     
     /* Next the shape moves. */
