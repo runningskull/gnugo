@@ -160,7 +160,7 @@ class Goban
 		int width = text_image->xsize();
 		int height = text_image->ysize();
 		image->paste(text_image * 0 + ({220, 150, 50}), x - width / 2,
-					 y - height / 2);
+			     y - height / 2);
 		image->paste_alpha_color(text_image, x - width / 2,
 					 y - height / 2);
 	    }
@@ -1219,21 +1219,27 @@ class Controller
     string testcase_command;
     string result;
     string expected_result;
+
+    // All lines from the test file shown at the top of the control window.
     array(string) full_testcase;
+
+    // All lines from the test file which may be needed to load the
+    // testcase correctly.
+    array(string) complete_testcase;
 
     static void create(SimpleGtp engine_, string testcase)
     {
-	if (!excerpt_testcase(testcase))
+	if (!excerpt_testcase(testcase, engine_))
 	{
 	    werror("Failed to load testcase.\n");
 	    exit(1);
 	}
 	testcase_name = testcase;
 
-        viewers += ({RegressionViewer(engine_, testcase, full_testcase,
-					 testcase_command,
-					 button_pressed_on_a_board,
-					 this_object())});
+        viewers += ({RegressionViewer(engine_, testcase, complete_testcase,
+				      testcase_command,
+				      button_pressed_on_a_board,
+				      this_object())});
 
 	notebook_window = GTK.Window(GTK.WindowToplevel);
 	notebook = GTK.Notebook();
@@ -1306,8 +1312,7 @@ class Controller
 	    GTK.Label("after move influence for PASS");
 	after_move_influence_button_text->set_justify(GTK.JUSTIFY_LEFT);
 	after_move_influence_button =
-	    GTK.RadioButton(0,
-			    initial_w_influence_dragons_known_button);
+	    GTK.RadioButton(0, initial_w_influence_dragons_known_button);
 	after_move_influence_button->add(after_move_influence_button_text);
 	followup_influence_button_text =
 	    GTK.Label("followup influence for PASS");
@@ -1578,7 +1583,12 @@ class Controller
 	}
     }
 
-    static int excerpt_testcase(string testcase)
+    // The engine parameter is only needed to find out the color to
+    // move when an sgf file is given. Since there can be multiple
+    // viewers we shouldn't use this engine object for anything else
+    // though. Notice also that no viewer has been set up yet at the
+    // time of this call.
+    static int excerpt_testcase(string testcase, SimpleGtp engine)
     {
 	string filename;
 	int number;
@@ -1597,21 +1607,25 @@ class Controller
 	{
 	    // Only sgf file provided. Fake a testcase.
 	    string s = "loadsgf " + filename + " " + number;
-	    string color = viewers[0]->send_command(s);
+	    string color = engine->send_command(s)->text;
 	    testcase_command = "reg_genmove " + color;
 	    full_testcase = ({s, testcase_command});
+	    complete_testcase = ({s, testcase_command});
 	    expected_result = "";
 	    return 1;
 	}
 	
 	full_testcase = ({});
+	complete_testcase = ({});
 	array(string) testlines = testfile / "\n";
 	for (int k = 0; k < sizeof(testlines); k++)
 	{
 	    int this_number;
 	    string testline = testlines[k];
-	    if (sscanf(testline, "%d %s", this_number, testline) == 2
-		     && this_number == number)
+	    if (testline[0..0] >= "a" && testline[0..0] <= "z")
+		complete_testcase += ({testline});
+	    else if (sscanf(testline, "%d %s", this_number, testline) == 2
+		&& this_number == number)
 	    {
 		testcase_command = testline;
 		sscanf(testlines[k + 1], "#? [%s]", expected_result);
