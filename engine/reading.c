@@ -4387,6 +4387,7 @@ do_find_break_chain2_efficient_moves(int str, int adj,
   adj2 = chainlinks2(adj, adjs2, 1);
   if (adj2 == 1 && countlib(str) > 2) {
     int apos;
+    break_chain_moves(adjs2[0], moves);
     findlib(adjs2[0], 1, &apos);
     if (!is_self_atari(apos, color))
       ADD_CANDIDATE_MOVE(apos, 0, *moves);
