@@ -2056,7 +2056,7 @@ gtp_worm_data(char *s, int id)
   int j = -1;
   int m, n;
 
-  if (sscanf(s, " %*c") >= 1 && !gtp_decode_coord(s, &i, &j))
+  if (sscanf(s, "%*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid color or coordinate");
 
   examine_position(EMPTY, EXAMINE_WORMS);
@@ -2110,7 +2110,7 @@ gtp_worm_stones(char *s, int id)
   int m, n;
   int u, v;
 
-  if (sscanf(s, " %*c") >= 1) {
+  if (sscanf(s, "%*c") >= 0) {
     if (!gtp_decode_coord(s, &i, &j)
 	&& !gtp_decode_color(s, &color))
       return gtp_failure(id, "invalid coordinate");
@@ -2178,7 +2178,7 @@ gtp_dragon_data(char *s, int id)
   int j = -1;
   int m, n;
 
-  if (sscanf(s, " %*c") >= 1 && !gtp_decode_coord(s, &i, &j))
+  if (sscanf(s, "%*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
   if (stackp > 0)
@@ -2280,11 +2280,15 @@ gtp_dragon_stones(char *s, int id)
 {
   int i = -1;
   int j = -1;
+  int color = EMPTY;
   int m, n;
   int u, v;
 
-  if (sscanf(s, " %*c") >= 1 && !gtp_decode_coord(s, &i, &j))
+  if (sscanf(s, "%*c") >= 0) {
+    if (!gtp_decode_coord(s, &i, &j)
+	&& !gtp_decode_color(s, &color))
     return gtp_failure(id, "invalid coordinate");
+  }
 
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "dragon_stones called on an empty vertex");
@@ -2296,7 +2300,8 @@ gtp_dragon_stones(char *s, int id)
   
   for (u = 0; u < board_size; u++)
     for (v = 0; v < board_size; v++) {
-      if (BOARD(u, v) == EMPTY)
+      if (BOARD(u, v) == EMPTY
+	  || (color != EMPTY && BOARD(u, v) != color))
 	continue;
       if (dragon[POS(u, v)].origin != POS(u, v))
 	continue;
