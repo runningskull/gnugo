@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- ..goal_list macros converted to functions in owl.c
 - bugfix in owl_determine_life()
 - new functions min_eye_threat() and max_eye_threat() in optics.c
 - somewhere() revised

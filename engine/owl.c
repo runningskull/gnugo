@@ -228,31 +228,12 @@ static int list_goal_worms(struct local_owl_data *owl,
 
 static int dragon_goal_worms[MAX_DRAGONS][MAX_GOAL_WORMS];
 
-#define PREPARE_GOAL_LIST(target, owl, list, flag, kworm) \
-  if (kworm) { \
-    list_goal_worms((owl), (list)); \
-    memcpy(dragon_goal_worms[dragon[(target)].id], (list), \
-	    sizeof (list)); \
-    (flag) = 1; \
-  } \
-  else \
-    (flag) = 0;
-
-#define PREPARE_GOAL_LIST2(target, owl, list, flag, kworm) \
-  if (kworm) { \
-    memcpy((list), dragon_goal_worms[dragon[(target)].id], \
-	    sizeof (list)); \
-    (flag) = 1; \
-  } \
-  else \
-    (flag) = 0;
-
-#define FINISH_GOAL_LIST(flag, wpos, list, index) \
-  (flag) = 0; \
-  if ((index) == MAX_GOAL_WORMS) \
-    (wpos) = NO_MOVE; \
-  else \
-    (wpos) = (list)[(index)];
+static void
+prepare_goal_list(int str, struct local_owl_data *owl,
+		  int list[MAX_GOAL_WORMS], int *flag, int *kworm,
+		  int do_list);
+static void
+finish_goal_list(int *flag, int *wpos, int list[MAX_GOAL_WORMS], int index);
 
 
 /* Called when (apos) and (bpos) point to adjacent dragons
@@ -1179,9 +1160,10 @@ owl_attack(int target, int *attack_point, int *certain, int *kworm)
   TRACE("owl_attack %1m\n", target);
   init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
   owl_make_domains(owl, NULL);
-  PREPARE_GOAL_LIST(target, owl, owl_goal_worm, goal_worms_computed, kworm);
+  prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+		    kworm, 1);
   result = do_owl_attack(target, &move, &wid, owl, EMPTY, 0, 0);
-  FINISH_GOAL_LIST(goal_worms_computed, wpos, owl_goal_worm, wid);
+  finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
@@ -1837,9 +1819,10 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
   TRACE("owl_defend %1m\n", target);
   init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
   owl_make_domains(owl, NULL);
-  PREPARE_GOAL_LIST(target, owl, owl_goal_worm, goal_worms_computed, kworm);
+  prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+		    kworm, 1);
   result = do_owl_defend(target, &move, &wid, owl, EMPTY, 0, 0);
-  FINISH_GOAL_LIST(goal_worms_computed, wpos, owl_goal_worm, wid);
+  finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
@@ -3872,9 +3855,10 @@ owl_does_defend(int move, int target, int *kworm)
     }
     
     init_owl(&owl, target, NO_MOVE, move, 1);
-    PREPARE_GOAL_LIST2(target, owl, owl_goal_worm, goal_worms_computed, kworm);
+    prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+		      kworm, 0);
     acode = do_owl_attack(target, NULL, &wid, owl, EMPTY, 0, 0);
-    FINISH_GOAL_LIST(goal_worms_computed, wpos, owl_goal_worm, wid);
+    finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
     result = REVERSE_RESULT(acode);
     popgo();
   }
@@ -3948,9 +3932,10 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
     }
     
     init_owl(&owl, target, NO_MOVE, move, 1);
-    PREPARE_GOAL_LIST2(target, owl, owl_goal_worm, goal_worms_computed, kworm);
+    prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+		      kworm, 0);
     acode = do_owl_attack(target, &defense, &wid, owl, EMPTY, NO_MOVE, 0);
-    FINISH_GOAL_LIST(goal_worms_computed, wpos, owl_goal_worm, wid);
+    finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
     if (acode==0)
       result = WIN;
     else if (acode == GAIN)
@@ -4046,10 +4031,10 @@ owl_does_attack(int move, int target, int *kworm)
     if (board[target] == EMPTY)
       dcode = 0;
     else {
-      PREPARE_GOAL_LIST2(target, owl, owl_goal_worm, goal_worms_computed,
-	                 kworm);
+      prepare_goal_list(target, owl, owl_goal_worm, &goal_worms_computed,
+	                 kworm, 0);
       dcode = do_owl_defend(target, NULL, &wid, owl, EMPTY, 0, 0);
-      FINISH_GOAL_LIST(goal_worms_computed, wpos, owl_goal_worm, wid);
+      finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
     }
     result = REVERSE_RESULT(dcode);
     owl->lunches_are_current = 0;
@@ -5228,6 +5213,36 @@ list_goal_worms(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
   return w;
 }
 
+static void
+prepare_goal_list(int str, struct local_owl_data *owl,
+		  int list[MAX_GOAL_WORMS], int *flag,
+		  int *kworm, int do_list)
+{
+  gg_assert(flag != NULL);
+
+  if (kworm) {
+    if (do_list)
+      list_goal_worms(owl, list);
+    memcpy(dragon_goal_worms[dragon[str].id], list, sizeof (list));
+    *flag = 1;
+  }
+  else
+    *flag = 0;
+}
+
+static void
+finish_goal_list(int *flag, int *wpos, int list[MAX_GOAL_WORMS], int index)
+{
+  gg_assert(flag != NULL);
+  gg_assert(wpos != NULL);
+
+  *flag = 0;
+  if (index == MAX_GOAL_WORMS)
+    *wpos = NO_MOVE;
+  else
+    *wpos = list[index];
+}
+		  
 
 /* Returns the number of worms in the goal dragon, and a pointer to each */
 
