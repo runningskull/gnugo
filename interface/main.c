@@ -799,6 +799,10 @@ main(int argc, char *argv[])
 	
       case OPT_LEVEL:
 	level = atoi(gg_optarg);
+	if (level > max_level)
+	  max_level = level;
+	if (level < min_level)
+	  min_level = level;
 	break;
 
       case OPT_MIN_LEVEL:
