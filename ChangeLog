@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+
 - new debug flag DEBUG_TERRITORY
 - computation of change in territory, moyo, and area in influence.c
   restructured 
@@ -18,6 +19,14 @@
 - global_matchpat() renamed matchpat()
 - regression view includes node counts, SGF link, and -t output.
 - GTP echo_err added to allow echoing to STDERR.
+- atari_atari moved to combination.c
+- restricted_defend1 and restricted attack2 now public functions
+- in find_double_threats, remove threat reasons after remaking 
+  them into an attack_either reason
+- old disabled function remove_move_reason() now enabled
+- some simple cleaning
+- genmove now 1D
+- Some tests in endgame.tst corrected.
 - tuning
 - connection tuning
 - eye tuning

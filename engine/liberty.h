@@ -229,6 +229,12 @@ int attack_and_defend(int str,
 int attack_either(int astr, int bstr);
 int defend_both(int astr, int bstr);
 int break_through(int apos, int bpos, int cpos);
+
+int restricted_defend1(int str, int *move, int komaster, int kom_pos,
+		       int num_forbidden_moves, int *forbidden_moves);
+int restricted_attack2(int str, int *move, int komaster, int kom_pos,
+		       int num_forbidden_moves, int *forbidden_moves);
+
 int naive_ladder(int str, int *move);
 #define MOVE_ORDERING_PARAMETERS 67
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
@@ -290,6 +296,7 @@ void remove_lunch(int eater, int food);
 void add_attack_move(int pos, int ww, int code);
 void add_defense_move(int pos, int ww, int code);
 void add_attack_threat_move(int pos, int ww, int code);
+void remove_attack_threat_move(int pos, int ww);
 void add_defense_threat_move(int pos, int ww, int code);
 int  get_attack_threats(int pos, int max_strings, int strings[]);
 int  get_defense_threats(int pos, int max_strings, int strings[]);
@@ -366,7 +373,7 @@ int atari_atari_confirm_safety(int color, int tpos, int *move,
 			       int minsize);
 int atari_atari_try_combination(int color, int apos, int bpos);
 
-int review_move_reasons(int *i, int *j, float *val, int color,
+int review_move_reasons(int *move, float *val, int color,
 			float pure_threat_value, float lower_bound);
 int fill_liberty(int *move, int color);
 int aftermath_genmove(int *aftermath_move, int color,

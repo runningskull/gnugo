@@ -355,7 +355,6 @@ add_move_reason(int pos, int type, int what)
     move[pos].reason[k] = find_reason(type, what);
 }
 
-#if 0
 /*
  * Remove a move reason for (pos). Ignore silently if the reason
  * wasn't there.
@@ -386,7 +385,7 @@ remove_move_reason(int pos, int type, int what)
   move[pos].reason[n] = move[pos].reason[k];
   move[pos].reason[k] = -1;
 }
-#endif
+
 
 /*
  * Check whether a move reason already is recorded for a move.
@@ -507,6 +506,15 @@ add_attack_threat_move(int pos, int ww, int code)
   
   ASSERT_ON_BOARD1(ww);
   add_move_reason(pos, ATTACK_THREAT_MOVE, worm_number);
+}
+
+void
+remove_attack_threat_move(int pos, int ww)
+{
+  int worm_number = find_worm(worm[ww].origin);
+
+  ASSERT_ON_BOARD1(ww);
+  remove_move_reason(pos, ATTACK_THREAT_MOVE, worm_number);
 }
 
 /*
@@ -1127,7 +1135,7 @@ find_more_attack_and_defense_moves(int color)
   int unstable_worms[MAX_WORMS];
   int N = 0;  /* number of unstable worms */
   int m, n;
-  int pos;
+  int ii;
   int k;
   int other = OTHER_COLOR(color);
   
@@ -1135,24 +1143,27 @@ find_more_attack_and_defense_moves(int color)
   
   /* Identify the unstable worms and store them in a list. */
   for (m = 0; m < board_size; m++)
-    for (n = 0; n  <board_size; n++)
-      if (BOARD(m, n)
-	  && worm[POS(m, n)].origin == POS(m, n)
-	  && worm[POS(m, n)].attack_codes[0] != 0
-	  && worm[POS(m, n)].defend_codes[0] != 0) {
-	unstable_worms[N] = find_worm(POS(m, n));
+    for (n = 0; n  <board_size; n++) {
+      ii = POS(m, n);
+
+      if (board[ii]
+	  && worm[ii].origin == ii
+	  && worm[ii].attack_codes[0] != 0
+	  && worm[ii].defend_codes[0] != 0) {
+	unstable_worms[N] = find_worm(ii);
 	N++;
       }
+    }
   
   /* To avoid horizon effects, we temporarily increase the depth values. */
   increase_depth_values();
   
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
+      ii = POS(m, n);
 
       for (k = 0; k < MAX_REASONS; k++) {
-	int r = move[pos].reason[k];
+	int r = move[ii].reason[k];
 	int what;
 
 	if (r < 0)
@@ -1171,12 +1182,12 @@ find_more_attack_and_defense_moves(int color)
 	  break;
       }
       
-      if (k<MAX_REASONS && move[pos].reason[k] != -1) {
-	/* Try the move at (pos) and see what happens. */
+      if (k<MAX_REASONS && move[ii].reason[k] != -1) {
+	/* Try the move at (ii) and see what happens. */
 	int cursor_at_start_of_line = 0;
 
-	TRACE("%1m ", pos);
-	if (trymove(pos, color, "find_more_attack_and_defense_moves",
+	TRACE("%1m ", ii);
+	if (trymove(ii, color, "find_more_attack_and_defense_moves",
 		     NO_MOVE, EMPTY, NO_MOVE)) {
 	  for (k = 0; k < N; k++) {
 	    int aa = worms[unstable_worms[k]];
@@ -1185,21 +1196,21 @@ find_more_attack_and_defense_moves(int color)
 	     * unless we already know the move works as defense move.
 	     */
 	    if (board[aa] == color
-		&& !defense_move_reason_known(pos, unstable_worms[k]))
+		&& !defense_move_reason_known(ii, unstable_worms[k]))
 	      if (!attack(aa, NULL)) {
 		if (!cursor_at_start_of_line)
 		  TRACE("\n");
 		TRACE("%ofound extra point of defense of %1m at %1m\n", 
-		      aa, pos);
+		      aa, ii);
 		cursor_at_start_of_line = 1;
-		add_defense_move(pos, aa, WIN);
+		add_defense_move(ii, aa, WIN);
 	      }
 	    
 	    /* string of opponent color, see if there still is a defense,
 	     * unless we already know the move works as attack move.
 	     */
 	    if (board[aa] == other
-		&& !attack_move_reason_known(pos, unstable_worms[k]))
+		&& !attack_move_reason_known(ii, unstable_worms[k]))
 	      if (!find_defense(aa, NULL)) {
 		/* Maybe find_defense() doesn't find the defense. Try to
 		 * defend with the stored defense move.
@@ -1218,9 +1229,9 @@ find_more_attack_and_defense_moves(int color)
 		  if (!cursor_at_start_of_line)
 		    TRACE("\n");
 		  TRACE("%ofound extra point of attack of %1m at %1m\n",
-			aa, pos);
+			aa, ii);
 		  cursor_at_start_of_line = 1;
-		  add_attack_move(pos, aa, WIN);
+		  add_attack_move(ii, aa, WIN);
 		}
 	      }
 	  }
@@ -2181,12 +2192,12 @@ static float impact_values[10][10] = {
 static float cautious_impact_values[10][10] = {
 /*        (bi, bj) DEAD ALIV CRIT INES TACT WEAK WE_A SEKI STRO INVI */
 /* DEAD        */ {0.3, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
-/* ALIVE       */ {0.0, 0.2, 0.05,0.0, 0.0, 0.1,0.15,0.10, 0.2 ,0.2 },
+/* ALIVE       */ {0.0, 0.2, 0.05,0.0, 0.0, 0.1,0.15, 0.10,0.2 ,0.2 },
 /* CRITICAL    */ {0.0, 1.04,0.85,0.0, 0.0, 0.75,0.9, 0.85,1.08,1.1 },
 /* INESSENTIAL */ {0.1, 0.6, 0.0, 0.0, 0.0, 0.3, 0.5, 0.5, 0.6, 0.6 },
 /* TACT. DEAD  */ {0.2, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
 /* WEAK        */ {0.1, 0.6, 0.25,0.0, 0.0, 0.2, 0.25,0.25,0.65,0.65},
-/* WEAK ALIVE  */ {0.0, 0.4, 0.3, 0.0, 0.0, 0.2,0.2, 0.2 ,0.45,0.45},
+/* WEAK ALIVE  */ {0.0, 0.4, 0.3, 0.0, 0.0, 0.2, 0.2, 0.2 ,0.45,0.45},
 /* SEKI        */ {0.0, 0.2, 0.15,0.0, 0.0, 0.1, 0.15,0.2, 0.25,0.3 },
 /* STR. ALIVE  */ {0.0, 0.02,0.01,0.0, 0.0, 0.01,0.01,0.01,0.02,0.02},
 /* INVINCIBLE  */ {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
@@ -2369,7 +2380,7 @@ estimate_territorial_value(int pos, int color, float score)
 
       if (DRAGON2(aa).safety == INESSENTIAL || worm[aa].inessential) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: 0 - attack on %1m (inessential)\n", pos, aa);
+	      "  %1m: 0.0 - attack on %1m (inessential)\n", pos, aa);
 	break;
       }
 
@@ -3222,8 +3233,7 @@ estimate_strategical_value(int pos, int color, float score)
 	 * substantial enough that capturing it saves the strategically
 	 * attacked dragon.
 	 */
-	if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE)
-	{
+	if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE) {
 	  int s;
 	  
 	  for (s = 0; s < DRAGON2(aa).neighbors; s++) {
@@ -3360,7 +3370,6 @@ move_connects_strings(int pos, int color)
   int strings = 0;
   int own_strings = 0;
   int k, l;
-  int oo;
   int fewlibs = 0;
 
   for (k = 0; k < 4; k++) {
@@ -3371,14 +3380,13 @@ move_connects_strings(int pos, int color)
       continue;
 
     origin = find_origin(ii);
-    oo = origin;
 
     for (l = 0; l < strings; l++)
-      if (ss[l] == oo)
+      if (ss[l] == origin)
 	break;
 
     if (l == strings) {
-      ss[strings] = oo;
+      ss[strings] = origin;
       strings++;
     }
   }
@@ -3632,13 +3640,13 @@ value_moves(int color, float pure_threat_value, float score)
        * captures here though, because if that is the best move, we
        * should reevaluate ko threats.
        */
-      if (!(is_illegal_ko_capture(pos, color) || is_legal(pos, color))) {
-	move[pos].value = 0.0;
-	TRACE("Move at %1m wasn't legal.\n", pos);
-      }
-      else {
+      if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
 	/* Add a random number between 0 and 0.01 to use in comparisons. */
 	move[pos].value += 0.01 * move[pos].random_number;
+      }
+      else {
+	move[pos].value = 0.0;
+	TRACE("Move at %1m wasn't legal.\n", pos);
       }
     }
 }
@@ -3720,10 +3728,11 @@ redistribute_points(void)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       pos = POS(m, n);
-      ii = replacement_map[pos];
       
+      ii = replacement_map[pos];
       if (ii == NO_MOVE)
 	continue;
+
       TRACE("Redistributing points from %1m to %1m.\n", pos, ii);
       if (move[ii].final_value < move[pos].final_value) {
 	TRACE("%1m is now valued %f.\n", ii, move[pos].final_value);
@@ -3743,10 +3752,11 @@ redistribute_points(void)
  * misevaluated the dangers or because the opponent misplays.
  */
 int
-review_move_reasons(int *i, int *j, float *val, int color,
+review_move_reasons(int *the_move, float *val, int color,
 		    float pure_threat_value, float score)
 {
   int m, n;
+  int ii;
   float tval;
   float bestval = 0.0;
   int best_move = NO_MOVE;
@@ -3794,7 +3804,6 @@ review_move_reasons(int *i, int *j, float *val, int color,
    * moves and print them.
    */
   print_top_moves();
-  
   while (!good_move_found) {
     bestval = 0.0;
     best_move = NO_MOVE;
@@ -3802,20 +3811,22 @@ review_move_reasons(int *i, int *j, float *val, int color,
     /* Search through all board positions for the highest valued move. */
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (move[POS(m, n)].final_value == 0.0)
+	ii = POS(m, n);
+
+	if (move[ii].final_value == 0.0)
 	  continue;
 	
-	tval = move[POS(m, n)].value;
+	tval = move[ii].value;
 	
 	if (tval > bestval) {
-	  if (is_legal(POS(m, n), color) || is_illegal_ko_capture(POS(m, n), color)) {
+	  if (is_legal(ii, color) || is_illegal_ko_capture(ii, color)) {
 	    bestval = tval;
-	    best_move = POS(m, n);
+	    best_move = ii;
 	  }
 	  else {
-	    TRACE("Move at %m would be suicide.\n", m, n);
-	    move[POS(m, n)].value = 0.0;
-	    move[POS(m, n)].final_value = 0.0;
+	    TRACE("Move at %1m would be suicide.\n", ii);
+	    move[ii].value = 0.0;
+	    move[ii].final_value = 0.0;
 	  }
 	}
       }
@@ -3866,9 +3877,8 @@ review_move_reasons(int *i, int *j, float *val, int color,
   
   if (bestval > 0.0 
       && best_move != NO_MOVE) {
+    *the_move = best_move;
     *val = bestval;
-    *i = I(best_move);
-    *j = J(best_move);
     return 1;
   }
   else

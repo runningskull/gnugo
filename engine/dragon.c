@@ -97,8 +97,8 @@ make_dragons(int color, int stop_before_owl)
 	      "Initialising dragon from worm at %1m, size %d\n", 
 	      ii, worm[ii].size);
     }
-
   time_report(2, "  time to initialize dragons", -1, -1, 1.0);
+
   make_domains(black_eye, white_eye, 0);
   time_report(2, "  time to make domains", -1, -1, 1.0);
 
@@ -196,7 +196,6 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
     }
-
   time_report(2, "  time to find lunches", -1, -1, 1.0);
 
   /* In case origins of dragons got moved, put the dragons of eyes aright. */
@@ -338,7 +337,6 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
     }
-
   time_report(2, "  time to compute genus", -1, -1, 1.0);
 
   /* Compute the escape route measure. */
@@ -351,7 +349,6 @@ make_dragons(int color, int stop_before_owl)
 	DRAGON2(ii).escape_route = compute_escape(ii, 0);
       }
     }
-
   time_report(2, "  time to compute escape", -1, -1, 1.0);
 
   /* Update the segmentation of the initial influence before we
@@ -506,7 +503,6 @@ make_dragons(int color, int stop_before_owl)
 	time_report(3, "    owl reading for dragon at ", m, n, 1.0);
       }
     }
-
   time_report(2, "  owl reading", -1, -1, 1.0);
 
   /* The dragon data is now correct at the origin of each dragon but
@@ -543,7 +539,6 @@ make_dragons(int color, int stop_before_owl)
 	  dragon[ii].matcher_status = dragon[ii].status;
       }
     }
-
   time_report(2, "  compute matcher status", -1, -1, 1.0);
 
   /* Compute the safety value. */
@@ -590,7 +585,6 @@ make_dragons(int color, int stop_before_owl)
     else
       dragon2[d].safety = ALIVE;
   }
-
   time_report(2, "  compute dragon safety", -1, -1, 1.0);
 
   /* Resolve semeais. This may revise the safety and status fields. */
@@ -637,7 +631,6 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
     }
-  
   time_report(2, "  revise inessentiality", -1, -1, 1.0);
 
   /* Count the non-dead dragons. */

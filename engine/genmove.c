@@ -35,7 +35,7 @@
 #define NEEDS_UPDATE(x) (x != position_number ? (x = position_number, 1) : 0)
 
 static int get_level(int *level);
-static int do_genmove(int *i, int *j, int color, float pure_threat_value);
+static int do_genmove(int *move, int color, float pure_threat_value);
 
 static double slowest_time = 0.;
 static int slowest_i = -1;
@@ -219,7 +219,15 @@ old_estimate_score(int color, float *lower_bound, float *upper_bound)
 int
 genmove(int *i, int *j, int color)
 {
-  return do_genmove(i, j, color, 0.4);
+  int move;
+  int retval;
+
+  retval = do_genmove(&move, color, 0.4);
+
+  if (i) *i = I(move);
+  if (j) *j = J(move);
+
+  return retval;
 }
 
 
@@ -231,9 +239,16 @@ genmove(int *i, int *j, int color)
 int
 genmove_conservative(int *i, int *j, int color)
 {
-  return do_genmove(i, j, color, 0.0);
-}
+  int move;
+  int retval;
 
+  retval = do_genmove(&move, color, 0.4);
+
+  if (i) *i = I(move);
+  if (j) *j = J(move);
+
+  return retval;
+}
 
 
 /* 
@@ -241,10 +256,9 @@ genmove_conservative(int *i, int *j, int color)
  */
   
 static int
-do_genmove(int *i, int *j, int color, float pure_threat_value)
+do_genmove(int *move, int color, float pure_threat_value)
 {
   float val;
-  int move;
   int save_verbose;
 
   start_timer(0);
@@ -261,8 +275,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   stats.hash_collisions     = 0;
   
   /* no move is found yet. */
-  *i = -1;  
-  *j = -1;  
+  *move = NO_MOVE;  
   val = -1; 
   if (get_level(&level))
     fprintf(stderr, "level = %d\n", level);
@@ -356,9 +369,9 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   gg_assert(stackp == 0);
 
   /* Review the move reasons and estimate move values. */
-  if (review_move_reasons(i, j, &val, color, 
+  if (review_move_reasons(move, &val, color, 
 			  pure_threat_value, lower_bound))
-    TRACE("Move generation likes %m with value %f\n", *i, *j, val);
+    TRACE("Move generation likes %1m with value %f\n", *move, val);
   gg_assert(stackp == 0);
   time_report(1, "review move reasons", -1, -1, 1.0);
 
@@ -366,8 +379,8 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   if (val <= 6.0 && !disable_endgame_patterns) {
     endgame_shapes(color);
     gg_assert(stackp == 0);
-    if (review_move_reasons(i, j, &val, color, pure_threat_value, score))
-      TRACE("Move generation likes %m with value %f\n", *i, *j, val);
+    if (review_move_reasons(move, &val, color, pure_threat_value, score))
+      TRACE("Move generation likes %1m with value %f\n", *move, val);
     gg_assert(stackp == 0);
     time_report(1, "endgame", -1, -1, 1.0);
   }
@@ -380,9 +393,9 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     if (revise_semeai(color)) {
       shapes(color);
       endgame_shapes(color);
-      if (review_move_reasons(i, j, &val, color, pure_threat_value, score)) {
-	TRACE("Upon reconsideration move generation likes %m with value %f\n",
-	      *i, *j, val); 
+      if (review_move_reasons(move, &val, color, pure_threat_value, score)) {
+	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
+	      *move, val); 
       }
     }
     time_report(1, "move reasons with revised semeai status", -1, -1, 1.0);
@@ -392,12 +405,10 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
    * all missing dame points.
    */
   if (val < 0.0 
-      && fill_liberty(&move, color)) {
+      && fill_liberty(move, color)) {
     val = 1.0;
     TRACE("Filling a liberty at %1m\n", move);
-    *i = I(move);
-    *j = J(move);
-    move_considered(*i, *j, val);
+    move_considered(I(*move), J(*move), val);
     time_report(1, "fill liberty", -1, -1, 1.0);
   }
 
@@ -407,12 +418,10 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   if (val < 0.0
       && !doing_scoring
       && (play_out_aftermath || capture_all_dead)
-      && aftermath_genmove(&move, color, NULL, 0) > 0) {
-    *i = I(move);
-    *j = J(move);
+      && aftermath_genmove(move, color, NULL, 0) > 0) {
     val = 1.0;
-    TRACE("Aftermath move at %m\n", *i, *j);
-    move_considered(*i, *j, val);
+    TRACE("Aftermath move at %1m\n", *move);
+    move_considered(I(*move), J(*move), val);
     time_report(1, "aftermath_genmove", -1, -1, 1.0);
   }
 
@@ -422,23 +431,20 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   if (val < 0.0
       && !doing_scoring
       && capture_all_dead
-      && aftermath_genmove(&move, color, NULL, 1) > 0) {
-    *i = I(move);
-    *j = J(move);
+      && aftermath_genmove(move, color, NULL, 1) > 0) {
     val = 1.0;
-    TRACE("Aftermath move at %m\n", *i, *j);
-    move_considered(*i, *j, val);
+    TRACE("Aftermath move at %1m\n", *move);
+    move_considered(I(*move), J(*move), val);
     time_report(1, "aftermath_genmove", -1, -1, 1.0);
   }
 
   /* If no move is found then pass. */
   if (val < 0.0) {
     TRACE("I pass.\n");
-    *i = -1;
-    *j = -1;
+    *move = NO_MOVE;
   }
   else
-    TRACE("genmove() recommends %m with value %f\n", *i, *j, val);
+    TRACE("genmove() recommends %1m with value %f\n", *move, val);
   
   /* If statistics is turned on, this is the place to show it. */
   if (showstatistics) {
@@ -451,15 +457,16 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   }
  
  if (showtime) {
-    double spent = time_report(0, "TIME to generate move at ", *i, *j, 1.0);
+    double spent = time_report(0, "TIME to generate move at ",
+			       I(*move), J(*move), 1.0);
     total_time += spent;
     if (spent > slowest_time) {
       slowest_time = spent;
-      slowest_i = *i;
-      slowest_j = *j;
+      slowest_i = I(*move);
+      slowest_j = J(*move);
       slowest_movenum = movenum+1;
     }
-    if (*i == -1) {
+    if (*move == NO_MOVE) {
       gprintf("\nSLOWEST MOVE: %d at %m ", slowest_movenum,
 	      slowest_i, slowest_j);
       fprintf(stderr, "(%.2f seconds)\n", slowest_time);
@@ -472,8 +479,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   }
   
   return val;
-  
-}  /* end genmove */
+}
 
 
 /* This is called for each move which has been considered. For
