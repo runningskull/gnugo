@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
+#include "liberty.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -211,6 +212,15 @@ play_gmp(Gameinfo *gameinfo)
   if (!quiet)
     fprintf(stderr, "Game over - waiting for client to shut us down\n");
   who_wins(mycolor, stderr);
+
+  if (showtime) {
+      gprintf("\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
+      fprintf(stderr, "(%.2f seconds)\n", slowest_time);
+      fprintf(stderr, "\nAVERAGE TIME: %.2f seconds per move\n",
+	      total_time / movenum);
+      fprintf(stderr, "\nTOTAL TIME: %.2f seconds\n",
+	      total_time);
+  }
   
   
   /* play_gmp() does not return to main(), therefore the score

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- time summaries reported with --showtime in gmp mode
 - TODO revised.
 - clock_init_autolevel() retired
 - new global variables min_level and max_level
