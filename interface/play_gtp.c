@@ -89,6 +89,8 @@ DECLARE(gtp_decrease_depths);
 DECLARE(gtp_defend);
 DECLARE(gtp_defend_both);
 DECLARE(gtp_disconnect);
+DECLARE(gtp_does_attack);
+DECLARE(gtp_does_defend);
 DECLARE(gtp_does_surround);
 DECLARE(gtp_dragon_data);
 DECLARE(gtp_dragon_status);
@@ -226,6 +228,8 @@ static struct gtp_command commands[] = {
   {"defend",           	      gtp_defend},
   {"defend_both",	      gtp_defend_both},
   {"disconnect",       	      gtp_disconnect},
+  {"does_attack",             gtp_does_attack},
+  {"does_defend",             gtp_does_defend},
   {"does_surround",           gtp_does_surround},
   {"dragon_data",             gtp_dragon_data},
   {"dragon_status",    	      gtp_dragon_status},
@@ -1321,6 +1325,88 @@ gtp_defend(char *s)
     gtp_printf(" ");
     gtp_print_vertex(I(dpos), J(dpos));
   }
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Examine whether a specific move attacks a string tactically.
+ * Arguments: vertex (move), vertex (dragon)
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   attack code
+ */
+static int
+gtp_does_attack(char *s)
+{
+  int i, j;
+  int ti, tj;
+  int attack_code;
+  int n;
+
+  n = gtp_decode_coord(s, &ti, &tj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(ti, tj) != EMPTY)
+    return gtp_failure("move vertex must be empty");
+
+  n = gtp_decode_coord(s + n, &i, &j);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure("string vertex must not be empty");
+
+  if (stackp == 0)
+    silent_examine_position(EXAMINE_WORMS);
+  
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+  
+  attack_code = does_attack(POS(ti, tj), POS(i, j));
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_code(attack_code);
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Examine whether a specific move defends a string tactically.
+ * Arguments: vertex (move), vertex (dragon)
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   attack code
+ */
+static int
+gtp_does_defend(char *s)
+{
+  int i, j;
+  int ti, tj;
+  int defense_code;
+  int n;
+
+  n = gtp_decode_coord(s, &ti, &tj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(ti, tj) != EMPTY)
+    return gtp_failure("move vertex must be empty");
+
+  n = gtp_decode_coord(s + n, &i, &j);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure("string vertex must not be empty");
+
+  if (stackp == 0)
+    silent_examine_position(EXAMINE_WORMS);
+  
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+  
+  defense_code = does_defend(POS(ti, tj), POS(i, j));
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_code(defense_code);
   return gtp_finish_response();
 }  
 

@@ -84,9 +84,11 @@ cut_possible(int pos, int color)
 
 
 /*
- * does_attack(move, str) returns true if the move at (move)
- * attacks (str). This means that it captures the string, and that
- * (str) is not already dead.
+ * does_attack(move, str) returns the result code for an attack on the
+ * string 'str' by the move 'move'. However, if the move does not
+ * improve the attack result compared to tenuki, 0 is returned. In
+ * particular if the string is already captured, does_attack() always
+ * returns 0.
  */
 
 int
@@ -112,12 +114,18 @@ does_attack(int move, int str)
   }
   
   if (trymove(move, other, "does_attack-A", str)) {
-    if (!board[str] || !find_defense(str, NULL)) {
+    if (!board[str])
       result = WIN;
+    else
+      result = REVERSE_RESULT(find_defense(str, NULL));
+    if (result != 0) {
       increase_depth_values();
       if (spos != NO_MOVE && trymove(spos, color, "does_attack-B", str)) {
-	if (board[str] && !attack(str, NULL))
-	  result = 0;
+	if (board[str]) {
+	  int new_result = attack(str, NULL);
+	  if (new_result < result)
+	    result = new_result;
+	}
 	popgo();
       }
       decrease_depth_values();
@@ -125,6 +133,9 @@ does_attack(int move, int str)
     popgo();
   }
 
+  if (result < acode)
+    result = 0;
+  
   return result;
 }
 
@@ -133,6 +144,8 @@ does_attack(int move, int str)
  * does_defend(move, str) returns true if the move at (move)
  * defends (str). This means that it defends the string, and that
  * (str) can be captured if no defense is made.
+ *
+ * FIXME: Make does_defend() ko aware like does_attack().
  */
 
 int

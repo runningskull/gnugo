@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- does_attack() made ko aware
+- new GTP commands does_attack and does_defend
 - sgfnode.c (readsgffile): Do not fclose stdin.
 - gtp.texi (GTP command reference): Add @cindex.
 - gtp-commands.sed: Use @verbatim. Tighten output. 

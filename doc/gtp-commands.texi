@@ -292,6 +292,20 @@ Arguments: vertex
 Fails:     invalid vertex, empty vertex
 Returns:   defense code followed by defense point if defense code nonzero.
 @end verbatim
+@cindex does_attack
+@item does_attack: Examine whether a specific move attacks a string tactically.
+@verbatim
+Arguments: vertex (move), vertex (dragon)
+Fails:     invalid vertex, empty vertex
+Returns:   attack code
+@end verbatim
+@cindex does_defend
+@item does_defend: Examine whether a specific move defends a string tactically.
+@verbatim
+Arguments: vertex (move), vertex (dragon)
+Fails:     invalid vertex, empty vertex
+Returns:   attack code
+@end verbatim
 @cindex ladder_attack
 @item ladder_attack: Try to attack a string strictly in a ladder.
 @verbatim
