@@ -199,6 +199,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   next = gameinfo->to_move;
   sgffile_printboard(next);
   doing_scoring = 1;
+  reset_engine();
   
   if (!strcmp(scoringmode, "finish") || !strcmp(scoringmode, "aftermath")) {
     until = 9999;
@@ -271,7 +272,8 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
 
 
   if (!strcmp(scoringmode, "aftermath")) {
-    writesgf(score_tree.root, gameinfo->outfilename);
+    if (gameinfo->outfile)
+      writesgf(score_tree.root, gameinfo->outfilename);
     return;
   }
 

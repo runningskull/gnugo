@@ -41,14 +41,14 @@ int attack_by_pattern = 1;
 
 #define ADD_CANDIDATE_MOVE(move, score, moves, scores, num_moves)\
   do {\
-    int l;\
-    for (l = 0; l < num_moves; l++)\
-      if (moves[l] == (move)) {\
-        if (scores[l] < score)\
-          scores[l] = score;\
+    int la;\
+    for (la = 0; la < num_moves; la++)\
+      if (moves[la] == (move)) {\
+        if (scores[la] < score)\
+          scores[la] = score;\
 	break;\
       }\
-    if ((l == num_moves) && (num_moves < MAX_MOVES)) {\
+    if ((la == num_moves) && (num_moves < MAX_MOVES)) {\
       moves[num_moves] = move;\
       scores[num_moves] = score;\
       (num_moves)++;\
@@ -57,12 +57,12 @@ int attack_by_pattern = 1;
 
 #define REMOVE_CANDIDATE_MOVE(move, moves, scores, num_moves)\
   do {\
-    int k, l;\
-    for (k = 0; k < num_moves; k++) {\
-      if (moves[k] == (move)) {\
-        for (l = k; l < num_moves-1; l++) {\
-	  moves[l] = moves[l+1];\
-	  scores[l] = scores[l+1];\
+    int kr, lr;\
+    for (kr = 0; kr < num_moves; kr++) {\
+      if (moves[kr] == (move)) {\
+        for (lr = kr; lr < num_moves-1; lr++) {\
+	  moves[lr] = moves[lr+1];\
+	  scores[lr] = scores[lr+1];\
 	}\
         (num_moves)--;\
 	break;\
@@ -1389,12 +1389,12 @@ defend2(int str, int *move, int komaster, int kom_pos)
    * super_string.
    */
   if (level >= 10 && stackp <= superstring_depth) {
-    int liberties;
-    int libs[MAX_LIBERTIES + 4];
+    int ss_liberties;
+    int ss_libs[MAX_LIBERTIES + 4];
 
-    find_superstring_liberties(str, &liberties, libs, 3);
-    for (k = 0; k < liberties; k++) {
-      int apos = libs[k];
+    find_superstring_liberties(str, &ss_liberties, ss_libs, 3);
+    for (k = 0; k < ss_liberties; k++) {
+      int apos = ss_libs[k];
       
       /* Skip if already tried */
       for (s = 0; s < num_moves; s++)
@@ -1426,8 +1426,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
     /* Now we are truly desperate. Try playing second order liberties of
      * the superstring.
      */
-    for (k = 0; k < liberties; k++) {
-      int apos = libs[k];
+    for (k = 0; k < ss_liberties; k++) {
+      int apos = ss_libs[k];
       int dcode;
 	
       if (liberty_of_string(apos, str))
@@ -1733,12 +1733,12 @@ defend3(int str, int *move, int komaster, int kom_pos)
    * super_string.
    */
   if (level >= 10 && stackp <= backfill2_depth) {
-    int liberties;
-    int libs[MAX_LIBERTIES + 4];
+    int ss_liberties;
+    int ss_libs[MAX_LIBERTIES + 4];
 
-    find_superstring_liberties(str, &liberties, libs, 3);
-    for (k = 0; k < liberties; k++) {
-      int apos = libs[k];
+    find_superstring_liberties(str, &ss_liberties, ss_libs, 3);
+    for (k = 0; k < ss_liberties; k++) {
+      int apos = ss_libs[k];
 	
       if (liberty_of_string(apos, str))
 	continue;
@@ -1762,8 +1762,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
     /* Now we are truly desperate. Try playing second order liberties of
      * the superstring.
      */
-    for (k = 0; k < liberties; k++) {
-      int apos = libs[k];
+    for (k = 0; k < ss_liberties; k++) {
+      int apos = ss_libs[k];
       int dcode;
 	
       if (liberty_of_string(apos, str))
@@ -3335,7 +3335,6 @@ attack2(int str, int *move, int komaster, int kom_pos)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int apos;
   int hpos;
   int xpos;
   int liberties, r;
@@ -3415,7 +3414,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
     adjacent_liberties = 1;
   
   for (k = 0; k < 2; k++) {
-    apos = libs[k];
+    int apos = libs[k];
     if (!is_self_atari(apos, other))
       atari_possible = 1;
     /* we only want to consider the move at (apos) if:
@@ -3463,7 +3462,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
   
   adj = chainlinks2(str, adjs, 2);
   for (r = 0; r < adj; r++) {
-    apos = adjs[r];
+    int apos = adjs[r];
     if (liberty_of_string(libs[0], apos)
 	&& liberty_of_string(libs[1], apos))
       break_chain_moves(apos, moves, scores, &num_moves);
@@ -3477,7 +3476,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
     int new_kom_pos;
     int ko_move;
 
-    apos = moves[k];
+    int apos = moves[k];
     if (komaster_trymove(apos, other, "attack2-A", str,
 			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
@@ -3545,17 +3544,17 @@ attack2(int str, int *move, int komaster, int kom_pos)
   if (level >= 10
       && stackp <= backfill_depth
       && (stackp <= superstring_depth || !atari_possible)) {
-    int liberties;
-    int libs[MAX_LIBERTIES + 4];
+    int ss_liberties;
+    int ss_libs[MAX_LIBERTIES + 4];
     int liberty_cap = 2;
 
     if (stackp <= backfill2_depth)
       liberty_cap = 3;
     
-    find_superstring_liberties(str, &liberties, libs, liberty_cap);
-    if (liberties <= 5) {
-      for (k = 0; k < liberties; k++) {
-	int apos = libs[k];
+    find_superstring_liberties(str, &ss_liberties, ss_libs, liberty_cap);
+    if (ss_liberties <= 5) {
+      for (k = 0; k < ss_liberties; k++) {
+	int apos = ss_libs[k];
 	
 	if (liberty_of_string(apos, str))
 	  continue;
