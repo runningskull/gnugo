@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- eyes.db revised
 - bugfixes in cut_connect_callback() in connections.c
 
 3.3.12 released November 20, 2002
