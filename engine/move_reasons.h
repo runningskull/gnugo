@@ -75,7 +75,6 @@ struct move_data {
   float territorial_value; /* Value in terms of actual profit. */
   float strategical_value; /* Value with respect to strength, weakness, and
 			      safety of all groups on the board. */
-  float influence_value;   /* Value from thickness and moyo. */
 
   float maxpos_shape;      /* Maximal positive contribution to shape */
   float maxneg_shape;      /* Maximal negative contribution to shape */

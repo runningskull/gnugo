@@ -105,7 +105,6 @@ clear_move_reasons(void)
       move[ii].additional_ko_value    = 0.0;
       move[ii].territorial_value      = 0.0;
       move[ii].strategical_value      = 0.0;
-      move[ii].influence_value        = 0.0;
       move[ii].maxpos_shape           = 0.0;
       move[ii].numpos_shape           = 0;
       move[ii].maxneg_shape           = 0.0;
@@ -2324,9 +2323,7 @@ adjusted_worm_value(int pos, int ww)
  * Estimate the direct territorial value of a move at (pos).
  */
 static void
-estimate_territorial_value(int pos, int color,
-			   char saved_stones[BOARDMAX],
-			   float score)
+estimate_territorial_value(int pos, int color, float score)
 {
   int k;
   int aa = NO_MOVE;
@@ -2336,6 +2333,7 @@ estimate_territorial_value(int pos, int color,
   float secondary_value = 0.0;
 
   int does_block = 0;
+  char saved_stones[BOARDMAX];
 
   memset(saved_stones, 0, BOARDMAX);
   
@@ -2922,62 +2920,6 @@ estimate_territorial_value(int pos, int color,
 
 
 /*
- * Estimate the influence value of a move at (pos).
- *
- * FIXME: This is much too simplified.
- */
-static void
-estimate_influence_value(int pos, int color,
-			 char saved_stones[BOARDMAX])
-{
-  int k;
-  int does_expand = 0;
-
-  /* If the influence_value is non-zero, we have already computed it
-   * once and don't have to redo it. This may happen when move values
-   * are reevaluated after looking for endgame moves or after
-   * revise_semeai().
-   */
-  if (move[pos].influence_value == 0.0) {
-    for (k = 0; k < MAX_REASONS; k++) {
-      int r = move[pos].reason[k];
-      if (r < 0)
-	break;
-      
-      switch (move_reasons[r].type) {
-      case CONNECT_MOVE:
-      case CUT_MOVE:
-      case BLOCK_TERRITORY_MOVE:
-      case EXPAND_TERRITORY_MOVE:
-      case STRATEGIC_ATTACK_MOVE:
-      case STRATEGIC_DEFEND_MOVE:
-      case EXPAND_MOYO_MOVE:
-      case OWL_ATTACK_MOVE:
-      case OWL_ATTACK_MOVE_GOOD_KO:
-      case OWL_ATTACK_MOVE_BAD_KO:
-      case OWL_DEFEND_MOVE:
-      case OWL_DEFEND_MOVE_GOOD_KO:
-      case OWL_DEFEND_MOVE_BAD_KO:
-      case SEMEAI_MOVE:
-	does_expand = 1;
-	break;
-      }
-    }
-    
-    if (!does_expand || move[pos].move_safety == 0)
-      return;
-    
-    move[pos].influence_value =
-      0.35 * influence_delta_strict_moyo(pos, color, saved_stones);
-    move[pos].influence_value +=
-      0.13 * influence_delta_strict_area(pos, color, saved_stones);
-  }
-  
-  if (move[pos].influence_value != 0.0)
-    TRACE("  %1m: %f - influence\n", pos, move[pos].influence_value);
-}
-
-/*
  * Estimate the strategical value of a move at (pos).
  */
 static void
@@ -3494,7 +3436,6 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 {
   float tot_value;
   float shape_factor;
-  char saved_stones[BOARDMAX];
 
   gg_assert(stackp == 0);
   
@@ -3521,19 +3462,12 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     /* Estimate the value of various aspects of the move. The order
      * is significant. Territorial value must be computed before
      * strategical value. See connection_value().
-     *
-     * The saved_stones[] array is initialized by
-     * estimate_territorial_value() and reused in
-     * estimate_influence_value().
      */
-    estimate_territorial_value(pos, color, saved_stones, score);
+    estimate_territorial_value(pos, color, score);
     estimate_strategical_value(pos, color, score);
-    estimate_influence_value(pos, color, saved_stones);
   }
 
-  tot_value = (move[pos].territorial_value
-	       + move[pos].strategical_value
-	       + move[pos].influence_value);
+  tot_value = move[pos].territorial_value + move[pos].strategical_value;
 
   shape_factor = compute_shape_factor(pos);
 

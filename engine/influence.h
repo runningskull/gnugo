@@ -48,7 +48,7 @@
 /* Value in delta_territory_cache indicating that the value has not
  * been computed. Arbitrary but unattainable.
  */
-#define NOT_COMPUTED (-2 * MAX_BOARD * MAX_BOARD)
+#define NOT_COMPUTED (-2.0 * MAX_BOARD * MAX_BOARD)
 
 /* Values for the float working area w when used only for marking. */
 #define UNMARKED 0.0
@@ -94,6 +94,8 @@ struct influence_data
   int region_type[MAX_REGIONS];
   int region_size[MAX_REGIONS];
   int number_of_regions;
+
+  float territory_value[MAX_BOARD][MAX_BOARD];
 
   int color_to_move; /* Which color is in turn to move. */
   

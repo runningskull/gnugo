@@ -31,6 +31,7 @@
 #include "influence.h"
 #include "patterns.h"
 
+static void value_territory(struct influence_data *q);
 static void segment_influence(struct influence_data *q);
 static void print_influence(struct influence_data *q, int dragons_known);
 static void print_numeric_influence(struct influence_data *q,
@@ -57,7 +58,7 @@ static int influence_color = EMPTY;
 static struct influence_data escape_influence;
 
 /* Cache of delta_territory_values. */
-static int delta_territory_cache[BOARDMAX];
+static float delta_territory_cache[BOARDMAX];
 
 /* If set, print influence map when computing this move. Purely for
  * debugging.
@@ -769,6 +770,7 @@ compute_influence(struct influence_data *q, int color, int m, int n,
       if (q->black_strength[i][j] > 0.0)
 	accumulate_influence(q, i, j, BLACK);
     }
+  value_territory(q);
   segment_influence(q);
   /* FIXME: The "board_size - 19" stuff below is an ugly workaround for a bug
    *        in main.c
@@ -889,6 +891,59 @@ whose_area(struct influence_data *q, int m, int n)
   
   return EMPTY;
 }
+
+/* Give territorial value to each vertex.
+ *
+ * A vertex with a lively stone has territorial value of 0.
+ * For other vertices the value is
+ * 1 if the vertex is classified as territory.
+ * 0.35 if it is classified as moyo
+ * 0.13 if it is classified as area
+ * 0.0 if it is classified as neutral
+ * One point is added for a vertex with a dead stone.
+ * Furthermore black points have a negative sign.
+ *
+ * The results are written to the territory_value[][] array of the
+ * influence data.
+ */
+static void
+value_territory(struct influence_data *q)
+{
+  int i, j;
+  for (i = 0; i < board_size; i++)
+    for (j = 0; j < board_size; j++) {
+      q->territory_value[i][j] = 0.0;
+
+      if (q->p[i][j] == EMPTY
+	  || (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0)) {
+	int owner = whose_territory(q, i, j);
+	if (owner == BLACK)
+	  q->territory_value[i][j] = -1.0;
+	else if (owner == WHITE)
+	  q->territory_value[i][j] = 1.0;
+	else {
+	  owner = whose_moyo(q, i, j);
+	  if (owner == BLACK)
+	    q->territory_value[i][j] = -0.35;
+	  else if (owner == WHITE)
+	    q->territory_value[i][j] = 0.35;
+	  else {
+	    owner = whose_moyo(q, i, j);
+	    if (owner == BLACK)
+	      q->territory_value[i][j] = -0.13;
+	    else if (owner == WHITE)
+	      q->territory_value[i][j] = 0.13;
+	  }
+	}
+	/* Dead stone, add one to the territory value. */
+	if (BOARD(i, j) == BLACK)
+	  q->territory_value[i][j] += 1.0;
+	else if (BOARD(i, j) == WHITE)
+	  q->territory_value[i][j] -= 1.0;
+      }
+    }
+}
+
 
 /* Segment the influence map into connected regions of territory,
  * moyo, or area. What to segment on is determined by the the function
@@ -1104,86 +1159,6 @@ compute_escape_influence(char goal[BOARDMAX], int color,
 }
 
 
-/* Count the amount of territory for color. */
-static int
-sum_territory(struct influence_data *q, int color)
-{
-  int i, j;
-  int territory = 0;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      if ((q->p[i][j] == EMPTY ||
-	   (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0))
-	  && whose_territory(q, i, j) == color) {
-	territory++;
-	if (board[POS(i, j)] != EMPTY)
-	  territory++;
-      }
-  return territory;
-}
-
-/* Count the amount of moyo for color. */
-static int
-sum_moyo(struct influence_data *q, int color)
-{
-  int i, j;
-  int moyo = 0;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      if ((q->p[i][j] == EMPTY ||
-	   (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0))
-	  && whose_moyo(q, i, j) == color)
-	moyo++;
-  return moyo;
-}
-
-/* Count the amount of moyo, that is not also territory, for color. */
-static int
-sum_strict_moyo(struct influence_data *q, int color)
-{
-  int i, j;
-  int moyo = 0;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      if ((q->p[i][j] == EMPTY ||
-	   (q->black_strength[i][j] == 0 && q->white_strength == 0))
-	  && whose_moyo(q, i, j) == color
-	  && whose_territory(q, i, j) != color)
-	moyo++;
-  return moyo;
-}
-
-/* Count the amount of area for color. */
-static int
-sum_area(struct influence_data *q, int color)
-{
-  int i, j;
-  int area = 0;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      if ((q->p[i][j] == EMPTY
-	   || (q->black_strength[i][j] == 0 && q->white_strength == 0))
-	  && whose_area(q, i, j) == color)
-	area++;
-  return area;
-}
-
-/* Count the amount of area, that is not also moyo, for color. */
-static int
-sum_strict_area(struct influence_data *q, int color)
-{
-  int i, j;
-  int area = 0;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      if ((q->p[i][j] == EMPTY ||
-	   (q->black_strength[i][j] == 0 && q->white_strength == 0))
-	  && whose_area(q, i, j) == color
-	  && whose_moyo(q, i, j) != color)
-	area++;
-  return area;
-}
-
 /* Return the color who has territory at pos, or EMPTY. */
 int
 influence_territory_color(int pos)
@@ -1205,107 +1180,45 @@ influence_area_color(int pos)
   return whose_area(&initial_influence, I(pos), J(pos));
 }
 
-/* Compute the difference in territory made by a move by color at (pos). */
-int
-influence_delta_territory(int pos, int color,
-			  char saved_stones[BOARDMAX])
+/* Compute the difference in territory made by a move by color at (pos).
+ * This also includes the changes in moyo and area.
+ */
+float
+influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX])
 {
-  int delta;
+  int i, j;
+  float delta = 0.0;
   if (delta_territory_cache[pos] != NOT_COMPUTED)
     return delta_territory_cache[pos];
   if (0)
     gprintf("influence_delta_territory for %1m %s = ", pos,
 	    color_to_string(color));
   compute_move_influence(I(pos), J(pos), color, saved_stones);
-  delta = (sum_territory(&move_influence, color) -
-	   sum_territory(&initial_influence, color) -
-	   sum_territory(&move_influence, OTHER_COLOR(color)) +
-	   sum_territory(&initial_influence, OTHER_COLOR(color)));
+
+  for (i = 0; i < board_size; i++)
+    for (j = 0; j < board_size; j++) {
+      float new_value = move_influence.territory_value[i][j];
+      float old_value = initial_influence.territory_value[i][j];
+      /* Negate values if we are black. */
+      if (color == BLACK) {
+	new_value = -new_value;
+	old_value = -old_value;
+      }
+      
+      if (new_value != old_value) {
+	DEBUG(DEBUG_TERRITORY, "  - %m territory change %f (%f -> %f)\n",
+		i, j, new_value - old_value, old_value, new_value);
+	delta += new_value - old_value;
+      }
+    }
+  
   if (0)
-    gprintf("%d\n", delta);
+    gprintf("%f\n", delta);
   delta_territory_cache[pos] = delta;
+  
   return delta;
 }
 
-/* Compute the difference in moyo made by a move by color at pos. */
-int
-influence_delta_moyo(int pos, int color,
-		     char saved_stones[BOARDMAX])
-{
-  int delta;
-  if (0)
-    gprintf("influence_delta_moyo for %1m %s = ", pos,
-	    color_to_string(color));
-  compute_move_influence(I(pos), J(pos), color, saved_stones);
-  delta = (sum_moyo(&move_influence, color) -
-	   sum_moyo(&initial_influence, color) -
-	   sum_moyo(&move_influence, OTHER_COLOR(color)) +
-	   sum_moyo(&initial_influence, OTHER_COLOR(color)));
-  if (0)
-    gprintf("%d\n", delta);
-  return delta;
-}
-
-/* Compute the difference in strict moyo made by a move by color at pos. */
-int
-influence_delta_strict_moyo(int pos, int color,
-			    char saved_stones[BOARDMAX])
-{
-  int delta;
-  if (0)
-    gprintf("influence_delta_strict_moyo for %1m %s = ", pos,
-	    color_to_string(color));
-  compute_move_influence(I(pos), J(pos), color, saved_stones);
-  /* friendly influence is valued greater than unfriendly 
-   * to compensate for an observed failure to take fuseki big points */
-  delta = (1.5*sum_strict_moyo(&move_influence, color) -
-	   1.5*sum_strict_moyo(&initial_influence, color) -
-	   sum_strict_moyo(&move_influence, OTHER_COLOR(color)) +
-	   sum_strict_moyo(&initial_influence, OTHER_COLOR(color)));
-  if (0)
-    gprintf("%d\n", delta);
-  return delta;
-}
-
-/* Compute the difference in area made by a move by color at pos. */
-int
-influence_delta_area(int pos, int color,
-		     char saved_stones[BOARDMAX])
-{
-  int delta;
-  if (0)
-    gprintf("influence_delta_area for %1m %s = ", pos,
-	    color_to_string(color));
-  compute_move_influence(I(pos), J(pos), color, saved_stones);
-  /* friendly influence is valued greater than unfriendly 
-   * to compensate for an observed failure to take fuseki big points */
-  delta = (1.5*sum_area(&move_influence, color) -
-	   1.5*sum_area(&initial_influence, color) -
-	   sum_area(&move_influence, OTHER_COLOR(color)) +
-	   sum_area(&initial_influence, OTHER_COLOR(color)));
-  if (0)
-    gprintf("%d\n", delta);
-  return delta;
-}
-
-/* Compute the difference in strict area made by a move by color at pos. */
-int
-influence_delta_strict_area(int pos, int color,
-			    char saved_stones[BOARDMAX])
-{
-  int delta;
-  if (0)
-    gprintf("influence_delta_strict_area for %1m %s = ", pos,
-	    color_to_string(color));
-  compute_move_influence(I(pos), J(pos), color, saved_stones);
-  delta = (sum_strict_area(&move_influence, color) -
-	   sum_strict_area(&initial_influence, color) -
-	   sum_strict_area(&move_influence, OTHER_COLOR(color)) +
-	   sum_strict_area(&initial_influence, OTHER_COLOR(color)));
-  if (0)
-    gprintf("%d\n", delta);
-  return delta;
-}
 
 /* Estimate the score. A positive value means white is ahead. The
  * score is estimated from the initial_influence, which must have been

@@ -212,26 +212,27 @@ extern int last_moves[2];
 
 /* debug flag bits */
 /* NOTE : can specify -d0x... */
-#define DEBUG_INFLUENCE           0x00001
-#define DEBUG_EYES                0x00002
-#define DEBUG_OWL                 0x00004
-#define DEBUG_ESCAPE              0x00008
-#define DEBUG_MATCHER             0x00010
-#define DEBUG_DRAGONS             0x00020
-#define DEBUG_SEMEAI              0x00040
-#define DEBUG_LOADSGF             0x00080
-#define DEBUG_HELPER              0x00100
-#define DEBUG_READING             0x00200
-#define DEBUG_WORMS               0x00400
-#define DEBUG_MOVE_REASONS        0x00800
-#define DEBUG_OWL_PERFORMANCE     0x01000
-#define DEBUG_LIFE                0x02000
-#define DEBUG_FILLLIB             0x04000
-#define DEBUG_READING_PERFORMANCE 0x08000
-#define DEBUG_SCORING             0x10000
-#define DEBUG_AFTERMATH           0x20000
-#define DEBUG_ATARI_ATARI         0x40000
-#define DEBUG_READING_CACHE       0x80000
+#define DEBUG_INFLUENCE           0x0001
+#define DEBUG_EYES                0x0002
+#define DEBUG_OWL                 0x0004
+#define DEBUG_ESCAPE              0x0008
+#define DEBUG_MATCHER             0x0010
+#define DEBUG_DRAGONS             0x0020
+#define DEBUG_SEMEAI              0x0040
+#define DEBUG_LOADSGF             0x0080
+#define DEBUG_HELPER              0x0100
+#define DEBUG_READING             0x0200
+#define DEBUG_WORMS               0x0400
+#define DEBUG_MOVE_REASONS        0x0800
+#define DEBUG_OWL_PERFORMANCE     0x1000
+#define DEBUG_LIFE                0x2000
+#define DEBUG_FILLLIB             0x4000
+#define DEBUG_READING_PERFORMANCE 0x8000
+#define DEBUG_SCORING             0x010000
+#define DEBUG_AFTERMATH           0x020000
+#define DEBUG_ATARI_ATARI         0x040000
+#define DEBUG_READING_CACHE       0x080000
+#define DEBUG_TERRITORY           0x100000
 /* hash flag bits 
  *
  * Regarding HASH_DEFAULT:

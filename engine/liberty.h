@@ -431,12 +431,7 @@ int somewhere(int color, int num_moves, ...);
 /* Influence functions. */
 void compute_initial_influence(int color, int dragons_known);
 void resegment_initial_influence(void);
-int influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX]);
-int influence_delta_moyo(int pos, int color, char saved_stones[BOARDMAX]);
-int influence_delta_strict_moyo(int pos, int color,
-				char saved_stones[BOARDMAX]);
-int influence_delta_area(int pos, int color, char saved_stones[BOARDMAX]);
-int influence_delta_strict_area(int pos, int color,
+float influence_delta_territory(int pos, int color,
 				char saved_stones[BOARDMAX]);
 int influence_territory_color(int pos);
 int influence_moyo_color(int pos);

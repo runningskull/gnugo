@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new debug flag DEBUG_TERRITORY
+- computation of change in territory, moyo, and area in influence.c
+  restructured 
+- influence_value part of move valuation removed
 - new function is_edge_vertex() in board.c
 - guess_eye_space() revised
 - compute_eyes_pessimistic revised
