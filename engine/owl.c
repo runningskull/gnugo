@@ -662,15 +662,21 @@ do_owl_analyze_semeai(int apos, int bpos,
 	&& trymove(mpos, color, moves[k].name, apos, EMPTY, 0)) {
       if (debug & DEBUG_SEMEAI)
 	dump_stack();
-      if (moves[k].same_dragon)
-	mark_string(mpos, owla->goal, 1);
-      owla->lunches_are_current = 0;
-      owl_update_boundary_marks(mpos, owla);
-      if (liberty_of_goal(mpos, owla))
-	owla->goal[mpos] = 1;
-
-      do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
-			    &this_resultb, &this_resulta, NULL, 0);
+      if (board[bpos] == EMPTY) {
+	this_resultb = DEAD;
+	this_resulta = ALIVE;
+      }
+      else {
+	if (moves[k].same_dragon)
+	  mark_string(mpos, owla->goal, 1);
+	owla->lunches_are_current = 0;
+	owl_update_boundary_marks(mpos, owla);
+	if (liberty_of_goal(mpos, owla))
+	  owla->goal[mpos] = 1;
+	do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
+			      &this_resultb, &this_resulta, NULL, 0);
+      }
+      
       if (this_resultb == DEAD && this_resulta == ALIVE) {
 	memcpy(owla->goal, saved_goal, sizeof(saved_goal));
 	popgo();
