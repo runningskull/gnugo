@@ -15,6 +15,49 @@ static int total_pass = 0;
 static int total_fail = 0;
 static int verbose = 0;
 
+/* General class to manage a high-score list (e.g. of slow tests, tests
+ * with many nodes, ..)
+ */
+class Highscorelist
+{
+  array(float) scores;
+  array(string) names;
+  int max;
+  
+  void create(int m)
+  {
+    max = m;
+    scores = ({});
+    names = ({});
+  }
+
+  void add_score(float score, string name)
+  {
+    int num = sizeof(scores);
+    if (num != sizeof(names)) {
+      write("This should not happen!!");
+      return;
+    }
+    if (num < max) {
+      scores += ({score});
+      names += ({name});
+      sort(scores, names);
+    }
+    else if (scores[0] < score) {
+      scores[0] = score;
+      names[0] = name;
+      sort(scores, names);
+    }
+    return;
+  }
+
+  void report(string s)
+  {
+    for (int i = 0; i < sizeof(scores); i++)
+      write(s, names[i], scores[i]);
+  }
+}
+
 class Testsuite
 {
   string name;
@@ -45,6 +88,9 @@ class Testsuite
 
 array(Testsuite) testsuites = ({});
 Testsuite current_testsuite;
+
+Highscorelist slow_moves;
+int report_slow = 0;
 
 void send(string|void s)
 {
@@ -113,6 +159,9 @@ static void program_reader(object f)
 	}
 	current_testsuite[result] += ({test_number});
 	current_testsuite->time += (current_time - last_time);
+ 	if (report_slow)
+	  slow_moves->add_score(current_time - last_time,
+			        current_testsuite->name + ":" + test_number);
 	
 	if (result == "PASS" || result == "FAIL" || verbose)
 	  write("%-15s %s %s [%s]\n",
@@ -283,6 +332,10 @@ void final_report()
     write("%d PASS\n", number_unexpected_pass);
   if (number_unexpected_fail > 0)
     write("%d FAIL\n", number_unexpected_fail);
+  if (report_slow) {
+    write("Slowest moves:\n");
+    slow_moves->report("%s: %f seconds\n");  
+  }
 }
 
 string parse_tests(mapping(string:array(int)) partial_testsuites,
@@ -333,6 +386,7 @@ int main(int argc, array(string) argv)
 		   ({"valgrind", Getopt.NO_ARG, "--valgrind"}),
 		   ({"check-unoccupied-answers", Getopt.NO_ARG,
 		     "--check-unoccupied"}),
+		   ({"slow_moves", Getopt.HAS_ARG, ({"-s", "--slow-moves"})}),
 		   ({"engine", Getopt.HAS_ARG, ({"-e", "--engine"})}),
 		   ({"options", Getopt.HAS_ARG, ({"-o", "--options"})}),
 		   ({"file", Getopt.HAS_ARG, ({"-f", "--file"})})});
@@ -368,6 +422,11 @@ int main(int argc, array(string) argv)
       case "options":
 	engine_options += value / " ";
 	break;
+
+      case "slow_moves":
+        report_slow = 1;
+        slow_moves = Highscorelist((int) value);
+        break;
 	
       case "file":
 	string testlist = Stdio.read_file(value);

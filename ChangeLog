@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- slowest move statistics from regress.pike
 - update usages of time_report()
 - breakin and readconnect fixes
 - first implementation of owl threat combinator--intended for improving
