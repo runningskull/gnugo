@@ -198,7 +198,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 39 gg_genmove white
-#? [H4]*
+#? [H4|J4]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
@@ -294,7 +294,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 83
 55 gg_genmove black
 #? [F5]*
 
-#CATEGORY=BLUNDER
+#CATEGORY=CONNECTION
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 99
 56 gg_genmove black
 #? [H3]*
