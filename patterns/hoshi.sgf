@@ -476,6 +476,16 @@ MA[mf]C[S];W[pb]MA[mf]C[S])
 (;B[rd]MA[mg];W[qe]MA[mg]C[S];B[rb]MA[mg];W[pc]MA[mg]C[S];B[qb]MA[mg];
 W[od]MA[mg]C[S])
 )
+
+(;W[qc];B[qd]MA[mg];W[rd];B[re]MA[mg]
+(;W[rc];B[qe]MA[mg])
+
+(;W[rb];B[sd]MA[mg]
+(;W[sc];B[rc]MA[mg])
+
+(;W[rc];B[qe]MA[mg])
+)
+)
 )
 
 (;B[of]C[0];W[ph]MA[nj]C[S])
@@ -506,7 +516,40 @@ MA[mg]C[S])
 )
 )
 
-(;B[jd]C[0];W[tt];B[qh]MA[ij]C[S];W[qc]C[S]MA[hj];B[pc]MA[ij]C[S])
+(;B[jd]C[0];W[tt]
+(;B[qh]MA[ij]C[S];W[qc]C[S]MA[hj];B[pc]MA[ij]C[S])
+
+(;B[pi]MA[ij];W[of]MA[ij]
+(;B[nd]MA[ij];W[rd]MA[ij];B[qc]MA[ij]
+(;W[ri]MA[ij]
+(;B[mf]C[j
+]MA[ij])
+
+(;B[tt];W[mf]C[j
+]MA[ij])
+)
+
+(;W[tt]C[#this is why w must play S11
+];B[pg]MA[ij];W[pf]MA[ij];B[qg]
+MA[ij];W[rg]MA[ij];B[rh]MA[ij];W[rf]MA[ij])
+)
+
+(;B[ne]C[0
+#gg has trouble here; I assume this is reasonable  /evan
+];
+W[rd]MA[ij];B[qc]MA[ij];W[ri]MA[ij])
+)
+)
+
+(;B[pi]MA[ij]
+(;W[qc]MA[ij];B[qd]MA[ij];W[pc]MA[ij];B[od]MA[ij];W[rd]MA[ij];B[re]
+MA[ij];W[rc]MA[ij];B[qe]MA[ij];W[nc]MA[ij];B[pf]C[j
+])
+
+(;W[of]MA[ij];B[nd]MA[ij];W[rd]MA[ij];B[qc]MA[ij];W[ri]MA[ij];B[jc]
+MA[ij];W[qi]MA[ij]C[j
+])
+)
 )
 
 (;W[pf];B[nd]MA[lh]C[S]
