@@ -42,6 +42,15 @@ trymove black L4
 #? [0]*
 popgo
 
+loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 86
+trymove black G4
+trymove white G3
+103 attack_either E5 G3
+#? [1]
+104 attack_either G3 E5
+#? [1]*
+popgo
+popgo
 
 ############ End of Tests #################
 
