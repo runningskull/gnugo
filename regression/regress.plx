@@ -54,6 +54,11 @@ use GoImage::Stone;
 use HTML::Entities ;#qw/encode_entity/;
   
 
+#set $name to whatever this script is called in the URL.
+#eg, if you access it from http://example.com/regress/
+#then set $name = ""
+
+my $name = "regress.plx";
 
 my $debug=2;
 
@@ -87,7 +92,7 @@ if (!$tstfile) {
 sub sgfFile(%);
 
 
-print "HTTP/1.0 200 OK\r\n";
+#print "HTTP/1.0 200 OK\r\n";
 print "Content-type: " .
         do {
           my $plain = $trace;
@@ -225,7 +230,7 @@ sub createIndex {
 
   open I, ">html/index.html";
 
-  print I '<HTML>
+  print I qq@<HTML>
  <HEAD>
   <TITLE>Regression test summary - </TITLE>
   <META NAME="ROBOTS" CONTENT="NOFOLLOW">
@@ -233,11 +238,11 @@ sub createIndex {
  <BODY>
  <H3> Regression test summary - </H3>
  Program: _CMDLINE_TBD_ <BR>
- <A href="?bycat=1">View by category</A><BR>
- <A href="?unexpected=1">View unexpected results</A><BR>
+ <A href="$name?bycat=1">View by category</A><BR>
+ <A href="$name?unexpected=1">View unexpected results</A><BR>
  <TABLE border=1>
  <TR><TD>file</TD><TD>passed</TD><TD>PASSED</TD><TD>failed</TD><TD>FAILED</TD>
- </TR>';
+ </TR>@;
   
   my @pflist = ("passed", "PASSED", "failed", "FAILED");
   my %totHash;
@@ -255,14 +260,14 @@ sub createIndex {
     if ($k1 !~ /^$curfile:/) {
       if ($curfile ne "") {
         #New file = print old totals
-        print I qq@<TR>\n <TD><A href="?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
+        print I qq@<TR>\n <TD><A href="$name?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
         foreach my $k2 (@pflist) {
           my $c = @{$subTotHash{$k2}};  #i.e. length of array.
           $totHash{$k2} += $c;
           if ($k2 !~ /passed/ and $c) {
             print I " <TD>$c:<BR>\n";
             foreach (sort {$a<=>$b} @{$subTotHash{$k2}}) {
-              print I qq@  <A HREF="?$curfile:$_">$_</A>\n@;
+              print I qq@  <A href="$name?$curfile:$_">$_</A>\n@;
             }
             print I " </TD>\n";
           } else {
@@ -281,14 +286,14 @@ sub createIndex {
       #direct copy from above - don't miss last time through - HACK!  
         if ($curfile ne "") {
         #New file = print old totals
-        print I qq@<TR>\n <TD><A href="?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
+        print I qq@<TR>\n <TD><A href="$name?tstfile=$curfile&sortby=result">$curfile</A></TD>\n@;
         foreach my $k2 (@pflist) {
           my $c = @{$subTotHash{$k2}};  #i.e. length of array.
           $totHash{$k2} += $c;
           if ($k2 !~ /passed/ and $c) {
             print I " <TD>$c:<BR>\n";
             foreach (sort {$a<=>$b} @{$subTotHash{$k2}}) {
-              print I qq@  <A HREF="?$curfile:$_">$_</A>\n@;
+              print I qq@  <A href="$name?$curfile:$_">$_</A>\n@;
             }
             print I " </TD>\n";
           } else {
@@ -421,8 +426,8 @@ if ($num) {
   print qq@<HR>\n\n@;
   print qq@
 <TABLE border=0>
-<TR><TD><A HREF="?tstfile=$tstfile&num=$num&sgf=1">SGF File</A>
-</TD><TD>&nbsp;&nbsp;&nbsp;<A HREF="?tstfile=$tstfile&num=$num&trace=1" target=tracefile>Trace File</A>
+<TR><TD><A href="$name?tstfile=$tstfile&num=$num&sgf=1">SGF File</A>
+</TD><TD>&nbsp;&nbsp;&nbsp;<A href="$name?tstfile=$tstfile&num=$num&trace=1" target=tracefile>Trace File</A>
 </TD></TR></TABLE>
 @;
 
@@ -476,7 +481,7 @@ if ($num) {
       }
 
       my $colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", $dragonletter, $dragoncolor, $owlletter, $owlcolor, $markcolor);
-      $colorboard .= qq@  <TD><A href="?tstfile=$tstfile&num=$num&move=$coord" target=movewin>@ .
+      $colorboard .= qq@  <TD><A href="$name?tstfile=$tstfile&num=$num&move=$coord" target=movewin>@ .
                      qq@<IMG border=0 HEIGHT=$img_pix_size WIDTH=$img_pix_size @ . 
                      qq@SRC="html/images/$colorboard_imgsrc"></A></TD>\n@;
     }
@@ -555,7 +560,7 @@ sub summaryDiagrams {
 
     my %attribs = %{game_parse($content, 1)};
 
-    print qq@<HR><A HREF="?$tstfile:$attribs{num}">$tstfile:$attribs{num}</A>\n@;
+    print qq@<HR><A href="$name?$tstfile:$attribs{num}">$tstfile:$attribs{num}</A>\n@;
 
     my $boardsize = $attribs{"boardsize"};  #need to add to export.
     my $colorboard;
@@ -611,16 +616,16 @@ sub summarizeTestFile {
   print TF "<H3>$tstfile regression results - _VERSION_</H3>\n";
   print TF qq@<TABLE border=1>
 <tr>
-  <TH><A HREF="?tstfile=$tstfile&sortby=filepos">line</A></TH>
-  <TH><A href="?tstfile=$tstfile&sortby=num">number</A></TH>
-  <TH><A href="?tstfile=$tstfile&sortby=result">result</A></TH>
+  <TH><A href="$name?tstfile=$tstfile&sortby=filepos">line</A></TH>
+  <TH><A href="$name?tstfile=$tstfile&sortby=num">number</A></TH>
+  <TH><A href="$name?tstfile=$tstfile&sortby=result">result</A></TH>
   <TH>expected </TH>
   <TH>got</TH>
   <TH>gtp</TH>
-  <TH><A href="?tstfile=$tstfile&sortby=cputime">cputime</A></TH>
-  <TH><A href="?tstfile=$tstfile&sortby=owl_node">owl_node</A></TH>
-  <TH><A href="?tstfile=$tstfile&sortby=reading_node">reading_node</A></TH>
-  <TH><A href="?tstfile=$tstfile&sortby=msperowl">1000*time/owl_node</A></TH>
+  <TH><A href="$name?tstfile=$tstfile&sortby=cputime">cputime</A></TH>
+  <TH><A href="$name?tstfile=$tstfile&sortby=owl_node">owl_node</A></TH>
+  <TH><A href="$name?tstfile=$tstfile&sortby=reading_node">reading_node</A></TH>
+  <TH><A href="$name?tstfile=$tstfile&sortby=msperowl">1000*time/owl_node</A></TH>
 </TR>\n@;
 
   my @files = glob("html/$tstfile.tst/*.xml");
@@ -707,7 +712,7 @@ sub summarizeTestFile {
   
   foreach my $curfile (sort {filesby($sortby)} keys %files) {
     my %h = %{$files{$curfile}};
-    my $numURL = qq@<A HREF="?$tstfile:$h{num}">$h{num}</A>@;
+    my $numURL = qq@<A href="$name?$tstfile:$h{num}">$h{num}</A>@;
     my $r = $h{result};
     $r =~ s@^([A-Z]*)$@<B>$1</B>@;
     print TF "<TR><TD>$h{filepos}</TD><TD>$numURL</TD><TD>$r</TD><TD>$h{expected}</TD>"
@@ -880,7 +885,7 @@ sub printslow {
   foreach my $k (sort $by_cputime keys %h) {
     $i++;
     last if $i > 50;
-    print qq@<TR><TD><A HREF="?$k">$k</TD><TD>$h{$k}->{status}</TD>@;
+    print qq@<TR><TD><A href="$name?$k">$k</TD><TD>$h{$k}->{status}</TD>@;
     print qq@    <TD>$h{$k}->{cputime}</TD></TR>@;
     my ($p, $n) = $k =~ /(\w+):(\d+)/;
     open (F, "html/$p.tst/$n.trace") or do {print "Missing trace file for $k<BR>"; next;};
@@ -919,7 +924,7 @@ sub printspecial {
     open (BF, $sfile);
     while (<BF>) {
       if (/^((\w+):(\d+))/) {
-        print qq@<TR><TD><A HREF="?$1">$1</A></TD><TD>$h{$1}->{status}</TD>@ .
+        print qq@<TR><TD><A href="$name?$1">$1</A></TD><TD>$h{$1}->{status}</TD>@ .
               qq@<TD>$h{$1}->{cputime}</TD></TR>\n@;
       }
     }
@@ -999,16 +1004,16 @@ sub printunexpected{
     print "<TABLE border=1>";
     print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD></TR>\n";
     foreach (@ufails) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>FAILED</TD></TR>\n@;
+      print qq@<TR><TD><A href="$name?$_">$_</A></TD><TD>FAILED</TD></TR>\n@;
     }
     foreach (@fails) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>failed</TD></TR>\n@;
+      print qq@<TR><TD><A href="$name?$_">$_</A></TD><TD>failed</TD></TR>\n@;
     }
     foreach (@upasses) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>PASSED</TD></TR>\n@;
+      print qq@<TR><TD><A href="$name?$_">$_</A></TD><TD>PASSED</TD></TR>\n@;
     }
     foreach (@passes) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>passed</TD></TR>\n@;
+      print qq@<TR><TD><A href="$name?$_">$_</A></TD><TD>passed</TD></TR>\n@;
     }
     print "</TABLE>\n";
     print "</body></html>\n";
@@ -1095,7 +1100,7 @@ sub printbycategory {
        <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
       </HEAD>\n@;
     print "<BODY><H4>Failures by category</H4>";
-    print qq@<A href="?">main index</A>@;
+    print qq@<A href="$name?">main index</A>@;
     
     
     print "<TABLE border=1>";
@@ -1114,7 +1119,7 @@ sub printbycategory {
         $sev = getsev($fails{$k});
         print "<TD>$sev</TD><TD>\n";
       }
-      print qq@<A href="?$k">$k</A>&nbsp&nbsp</A>\n@;
+      print qq@<A href="$name?$k">$k</A>&nbsp&nbsp</A>\n@;
     }
     print "</TABLE>\n";
     print "</body></html>\n";
