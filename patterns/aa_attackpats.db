@@ -50,6 +50,13 @@
 #  are possible. Friendly stones are 'O', opponent stones are 'X'.
 # 
 # s  :  "Sacrifice" pattern. Allow sacrifice through self atari.
+#       Notice that this is different from the usual meaning of the
+#       s classification since all but a few moves in an atari_atari
+#       sequence are expected to be sacrifices.
+#
+# c  :  "Conditional" pattern. Don't accept the move unless it is also
+#       found by a non-conditional pattern or by one more conditional
+#       pattern that threatens some other string.
 # 
 #########################################################
 #                                                       #
@@ -111,17 +118,17 @@ X*X
 :|,-
 
 
-# Pattern A6
-# 
-# *.X
-# oXO
-# 
-# :8,-
-# 
-# *.X
-# oXO
-# 
-# ;olib(*)>3
+Pattern A6
+
+*.X
+oXO
+
+:8,c
+
+*.X
+oXO
+
+;olib(*)>3
 
 
 Pattern A7
@@ -133,13 +140,13 @@ OXO
 :|,s
 
 
-# Pattern A8
-# 
-# O..
-# ?X*
-# ??O
-# 
-# :8,-
+Pattern A8
+
+O..
+?X*
+??O
+
+:8,c
 
 
 Pattern A9
@@ -162,6 +169,37 @@ XOX
 .*.
 
 :|,-
+
+
+Pattern A11
+
+*.X
+?.X
+?XO
+
+:8,c
+
+*.X
+oXO
+
+;olib(*)>3
+
+
+Pattern A12
+
+.X?
+*.X
+.X?
+---
+
+:8,-
+
+.X?
+*.X
+.A?
+---
+
+;lib(A)==2 && olib(*)>3
 
 
 # END OF FILE

@@ -3024,7 +3024,8 @@ estimate_territorial_value(int pos, int color, float score)
       
     case YOUR_ATARI_ATARI_MOVE:
       this_value = 2 * move_reasons[r].what + 3.0;
-      if (influence_territory_color(pos) == color)
+      if (influence_territory_color(pos) == color
+	  && !is_self_atari(pos, OTHER_COLOR(color)))
 	this_value += 7.0;
       tot_value += this_value;
       TRACE("  %1m: %f - defends against combination attack on several worms\n",

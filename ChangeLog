@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new local struct aa_move in combinations.c
+- new pattern class 'c' for conditional moves in aa_attackspats.db
+- atari_atari() tries to attack smallest targets first
+- combinations() reports multiple defense moves when the opponent
+  has an atari_atari attack sequence
 - new gtp commands owl_connection_defends and owl_substantial
 - mkpat stricter in parsing of classification field
 - new function gg_sort() in gg_utils.c
@@ -18,6 +23,7 @@
 - tuning
 - owl tuning
 - influence tuning
+- atari_atari tuning
 - test revisions
 
 3.1.17 released December 16, 2001

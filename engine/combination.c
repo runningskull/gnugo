@@ -32,19 +32,34 @@
 #include "gg_utils.h"
 #include "patterns.h"
 
+/* Local struct to keep track of atari_atari attack moves and what
+ * they threat.
+ */
+#define AA_MAX_TARGETS_PER_MOVE 4
+
+struct aa_move {
+  int move;
+  int target[AA_MAX_TARGETS_PER_MOVE];
+};
+
+#define AA_MAX_MOVES MAX_BOARD * MAX_BOARD  
 
 static void find_double_threats(int color);
-static int atari_atari_find_attack_moves(int color, int minsize,
-					 int moves[MAX_BOARD * MAX_BOARD],
-					 int targets[MAX_BOARD * MAX_BOARD]);
-static int atari_atari_attack_patterns(int color, int minsize,
-				       int moves[MAX_BOARD * MAX_BOARD],
-				       int targets[MAX_BOARD * MAX_BOARD]);
+static void atari_atari_find_attack_moves(int color, int minsize,
+					  struct aa_move attacks[AA_MAX_MOVES]);
+static void atari_atari_attack_patterns(int color, int minsize,
+					struct aa_move attacks[AA_MAX_MOVES]);
 static void atari_atari_attack_callback(int m, int n, int color,
 					struct pattern *pattern,
 					int ll, void *data);
-static int atari_atari_find_defense_moves(int str,
-					  int moves[MAX_BOARD * MAX_BOARD]);
+static int atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
+					  int moves[AA_MAX_MOVES]);
+static void aa_init_moves(struct aa_move attacks[AA_MAX_MOVES]);
+static void aa_add_move(struct aa_move attacks[AA_MAX_MOVES],
+			int move, int target);
+static int aa_move_known(struct aa_move attacks[AA_MAX_MOVES],
+			 int move, int target);
+static void aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES]);
 static int is_atari(int pos, int color);
 
 
@@ -74,7 +89,7 @@ combinations(int color)
     gprintf("\nlooking for combination attacks ...\n");
   
   aa_val = atari_atari(color, &attack_point, NULL, save_verbose);
-  if (aa_val) {
+  if (aa_val > 0) {
     if (save_verbose)
       gprintf("Combination attack for %C with size %d found at %1m\n",
 	      color, aa_val, attack_point);
@@ -82,13 +97,26 @@ combinations(int color)
   }
   
   aa_val = atari_atari(other, &attack_point, &defense_point, save_verbose);
-  if (aa_val && safe_move(defense_point, color)) {
+  if (aa_val > 0) {
+    int libs[2];
     if (save_verbose)
       gprintf("Combination attack for %C with size %d found at %1m, defense at %1m\n",
 	      other, aa_val, attack_point, defense_point);
-    add_your_atari_atari_move(defense_point, aa_val);
+    if (safe_move(defense_point, color))
+      add_your_atari_atari_move(defense_point, aa_val);
+    /* Playing at the attack point is probably also a defense. */
+    if (safe_move(attack_point, color))
+      add_your_atari_atari_move(attack_point, aa_val);
+    /* If the attacking move gets two liberties, playing first on one
+     * of them is probably a defense.
+     */
+    if (approxlib(attack_point, other, 2, libs) == 2) {
+      if (safe_move(libs[0], color))
+	add_your_atari_atari_move(libs[0], aa_val);
+      if (safe_move(libs[1], color))
+	add_your_atari_atari_move(libs[1], aa_val);
+    }
   }
-  
   verbose = save_verbose;
 }
 
@@ -559,19 +587,15 @@ is_vital_string(int str)
  * equivalent to a return value of 0.
  */
 
-#define MAX_THREAT_MOVES  MAX_TACTICAL_POINTS
-
 static int
 do_atari_atari(int color, int *attack_point, int *defense_point,
 	       int last_friendly, int save_verbose, int minsize)
 {
   int other = OTHER_COLOR(color);
   int k;
-  int num_attack_moves;
-  int attack_moves[MAX_BOARD * MAX_BOARD];
-  int targets[MAX_BOARD * MAX_BOARD];
+  struct aa_move attacks[AA_MAX_MOVES];
   int num_defense_moves;
-  int defense_moves[MAX_BOARD * MAX_BOARD];
+  int defense_moves[AA_MAX_MOVES];
   int pos;
   SGFTree *save_sgf_dumptree;
   int save_count_variations;
@@ -619,18 +643,17 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
   save_count_variations = count_variations;
   sgf_dumptree = NULL;
   count_variations = 0;
-  num_attack_moves = atari_atari_find_attack_moves(color, minsize,
-						   attack_moves, targets);
+  atari_atari_find_attack_moves(color, minsize, attacks);
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
 
   /* Try the attacking moves and let the opponent defend. Then call
    * ourselves recursively.
    */
-  for (k = 0; k < num_attack_moves; k++) {
+  for (k = 0; attacks[k].move != NO_MOVE; k++) {
     int aa_val;
-    int str = targets[k];
-    int apos = attack_moves[k];
+    int str = attacks[k].target[0];
+    int apos = attacks[k].move;
     int bpos;
     int r;
     
@@ -653,7 +676,8 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     save_count_variations = count_variations;
     sgf_dumptree = NULL;
     count_variations = 0;
-    num_defense_moves = atari_atari_find_defense_moves(str, defense_moves);
+    num_defense_moves = atari_atari_find_defense_moves(attacks[k].target,
+						       defense_moves);
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
     
@@ -779,13 +803,10 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
 	 */
 	if (defense_point) {
 	  if (!find_defense(ii, defense_point)) {
-	    if (safe_move(aa, other)) {
+	    if (safe_move(aa, other))
 	      *defense_point = aa;
-	    }
-	    /* No defense is found */
-	    else {
+	    else
 	      *defense_point = NO_MOVE;
-	    }
 	  }
 	}
 	
@@ -798,27 +819,25 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
   return 0;
 }
 
+#define MAX_THREAT_MOVES  MAX_TACTICAL_POINTS
 
-static int
+static void
 atari_atari_find_attack_moves(int color, int minsize,
-			      int moves[MAX_BOARD * MAX_BOARD],
-			      int targets[MAX_BOARD * MAX_BOARD])
+			      struct aa_move attacks[AA_MAX_MOVES])
 {
   int other = OTHER_COLOR(color);
   int pos;
   int k;
-  int num_moves = 0;
   int num_threat_moves;
   int threat_moves[MAX_THREAT_MOVES];
   int threat_codes[MAX_THREAT_MOVES];
-  int mx[BOARDMAX];
+  int r;
+  
+  aa_init_moves(attacks);
 
   if (USE_ATARI_ATARI_PATTERNS)
-    num_moves = atari_atari_attack_patterns(color, minsize, moves, targets);
+    atari_atari_attack_patterns(color, minsize, attacks);
   else {
-    /* We set mx to 0 for every move added to the moves[] array. */
-    memset(mx, 0, sizeof(mx));
-    
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (board[pos] != other) 
 	continue;
@@ -859,54 +878,53 @@ atari_atari_find_attack_moves(int color, int minsize,
       for (k = 0; k < num_threat_moves; k++) {
 	int move = threat_moves[k];
 	
-	if (mx[move] != 0 || forbidden[move])
+	if (aa_move_known(attacks, move, pos) || forbidden[move])
 	  continue;
 	
 	if ((is_self_atari(move, color)
 	     || !is_atari(move, color))
 	    && !safe_move(move, color))
 	  continue;
-	
-	moves[num_moves] = move;
-	targets[num_moves] = pos;
-	num_moves++;
-	mx[move] = 1;
+
+	aa_add_move(attacks, move, pos);
       }
     }
   }
 
+  /* Sort the attack moves. */
+  aa_sort_moves(attacks);
+  
   if (debug & DEBUG_ATARI_ATARI) {
     gprintf("Attack moves:");
-    for (k = 0; k < num_moves; k++)
-      gprintf("%o %1m(%1m)", moves[k], targets[k]);
+    for (k = 0; k < AA_MAX_MOVES && attacks[k].move != NO_MOVE; k++) {
+      gprintf("%o %1m(", attacks[k].move);
+      for (r = 0; r < AA_MAX_TARGETS_PER_MOVE; r++) {
+	if (attacks[k].target[r] == NO_MOVE)
+	  break;
+	gprintf("%o%s%1m", r == 0 ? "" : ",", attacks[k].target[r]);
+      }
+      gprintf("%o)");
+    }
     gprintf("%o\n");
   }
-
-  return num_moves;
 }
 
 /* FIXME: Move these to a struct and pass to callback through the
  * *data parameter.
  */
 static int current_minsize;
-static int *current_moves;
-static int *current_targets;
-static int current_num_moves;
-static int mx[BOARDMAX];
+static struct aa_move *current_attacks;
+static int conditional_attack_point[BOARDMAX];
 
-static int atari_atari_attack_patterns(int color, int minsize,
-				       int moves[MAX_BOARD * MAX_BOARD],
-				       int targets[MAX_BOARD * MAX_BOARD])
+static void
+atari_atari_attack_patterns(int color, int minsize,
+			    struct aa_move attacks[AA_MAX_MOVES])
 {
   current_minsize = minsize;
-  current_moves = moves;
-  current_targets = targets;
-  current_num_moves = 0;
-  memset(mx, 0, sizeof(mx));
+  current_attacks = attacks;
+  memset(conditional_attack_point, 0, sizeof(conditional_attack_point));
   
   matchpat(atari_atari_attack_callback, color, &aa_attackpat_db, NULL, NULL);
-  
-  return current_num_moves;
 }
 
 /* Try to attack every X string in the pattern, whether there is an attack
@@ -919,7 +937,6 @@ atari_atari_attack_callback(int m, int n, int color,
   int ti, tj;
   int move;
   int k;
-  int str1 = NO_MOVE;
   UNUSED(data);
 
   TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
@@ -927,7 +944,7 @@ atari_atari_attack_callback(int m, int n, int color,
   tj += n;
   move = POS(ti, tj);
 
-  if (mx[move] || forbidden[move])
+  if (forbidden[move])
     return;
   
   /* If the pattern has a constraint, call the autohelper to see
@@ -958,22 +975,20 @@ atari_atari_attack_callback(int m, int n, int color,
 
       str = worm[POS(x, y)].origin;
 
-      if (str == str1)
-	continue;
-
-      if (str1 == NO_MOVE)
-	str1 = str;
-
       if (current_minsize > 0
 	  && countstones(str) < current_minsize
 	  && !is_vital_string(str))
+	continue;
+
+      if (aa_move_known(current_attacks, move, str))
 	continue;
 
       if (get_aa_status(str) != ALIVE)
 	continue;
 
       /* Usually we don't want to play self atari. However, if we
-       * capture in snapback it's okay.
+       * capture in snapback it's okay. For s class patterns we don't
+       * have this requirement.
        */
       if (!(pattern->class & CLASS_s) && is_self_atari(move, color)) {
 	if (countlib(str) > 2)
@@ -988,21 +1003,36 @@ atari_atari_attack_callback(int m, int n, int color,
        */
       if (trymove(move, color, "attack_callback", str, EMPTY, NO_MOVE)) {
 	int acode;
+	int attack_point = NO_MOVE;
+
 	if (!board[str])
 	  acode = WIN;
 	else
-	  acode = attack(str, NULL);
+	  acode = attack(str, &attack_point);
 
 	popgo();
 
 	if (acode != 0) {
-	  current_moves[current_num_moves] = move;
-	  current_targets[current_num_moves] = str;
-	  current_num_moves++;
-	  mx[move] = 1;
-	  DEBUG(DEBUG_ATARI_ATARI,
-		"aa_attack pattern %s+%d found threat on %1m at %1m with code %d\n",
-		pattern->name, ll, str, move, acode);
+	  if ((pattern->class & CLASS_c)
+	      && !aa_move_known(current_attacks, move, NO_MOVE)) {
+	    /* Conditional pattern. */
+	    DEBUG(DEBUG_ATARI_ATARI,
+		  "aa_attack pattern %s+%d (conditional) found threat on %1m at %1m with code %d\n",
+		  pattern->name, ll, str, move, acode);
+	    if (conditional_attack_point[move] == NO_MOVE)
+	      conditional_attack_point[move] = str;
+	    else if (conditional_attack_point[move] != str) {
+	      aa_add_move(current_attacks, move,
+			  conditional_attack_point[move]);
+	      aa_add_move(current_attacks, move, str);
+	    }
+	  }
+	  else {
+	    aa_add_move(current_attacks, move, str);
+	    DEBUG(DEBUG_ATARI_ATARI,
+		  "aa_attack pattern %s+%d found threat on %1m at %1m with code %d\n",
+		  pattern->name, ll, str, move, acode);
+	  }
 	}
       }
     }
@@ -1011,7 +1041,8 @@ atari_atari_attack_callback(int m, int n, int color,
 
 
 static int
-atari_atari_find_defense_moves(int str, int moves[MAX_BOARD * MAX_BOARD])
+atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
+			       int moves[AA_MAX_MOVES])
 {
   int num_moves = 0;
   int move;
@@ -1021,62 +1052,204 @@ atari_atari_find_defense_moves(int str, int moves[MAX_BOARD * MAX_BOARD])
   int neighbors;
   int adjs[MAXCHAIN];
   int mx[BOARDMAX];
+  int r;
 
   memset(mx, 0, sizeof(mx));
 
-  /* Because we know (str) is threatened there is an
-   * attack and we can be sure find_defense() will give a
-   * useful defense point if it returns non-zero. Usually we
-   * would need to call attack_and_defend() to be certain of
-   * this.
-   */
-  if (!find_defense(str, &move))
-    return 0;
-  moves[num_moves++] = move;
-  mx[move] = 1;
-  
-  /* Consider all moves to attack a neighbor or to play on a liberty. */
-  liberties = findlib(str, 4, libs);
-  for (k = 0; k < liberties; k++) {
-    if (!mx[libs[k]]
-	&& trymove(libs[k], board[str], "aa_defend-A", str, EMPTY, NO_MOVE)) {
-      if (attack(str, NULL) == 0) {
-	moves[num_moves++] = libs[k];
-	mx[libs[k]] = 1;
+  for (r = 0; r < AA_MAX_TARGETS_PER_MOVE && targets[r] != NO_MOVE; r++) {
+    int str = targets[r];
+
+    /* Because we know (str) is threatened there is an
+     * attack and we can be sure find_defense() will give a
+     * useful defense point if it returns non-zero. Usually we
+     * would need to call attack_and_defend() to be certain of
+     * this.
+     */
+    if (!find_defense(str, &move))
+      continue;
+    moves[num_moves++] = move;
+    if (num_moves == AA_MAX_MOVES)
+      return num_moves;
+    mx[move] = 1;
+    
+    /* Consider all moves to attack a neighbor or to play on a liberty. */
+    liberties = findlib(str, 4, libs);
+    for (k = 0; k < liberties; k++) {
+      if (!mx[libs[k]]
+	  && trymove(libs[k], board[str], "aa_defend-A", str,
+		     EMPTY, NO_MOVE)) {
+	if (attack(str, NULL) == 0) {
+	  moves[num_moves++] = libs[k];
+	  mx[libs[k]] = 1;
+	}
+	popgo();
+	if (num_moves == AA_MAX_MOVES)
+	  return num_moves;
       }
-      popgo();
     }
-  }
-
-  neighbors = chainlinks(str, adjs);
-  for (k = 0; k < neighbors; k++) {
-    int attack_point;
-    if (attack(adjs[k], &attack_point) == WIN
-	&& !mx[attack_point]) {
-      moves[num_moves++] = attack_point;
-      mx[attack_point] = 1;
+    
+    neighbors = chainlinks(str, adjs);
+    for (k = 0; k < neighbors; k++) {
+      int attack_point;
+      if (attack(adjs[k], &attack_point) == WIN
+	  && !mx[attack_point]) {
+	moves[num_moves++] = attack_point;
+	if (num_moves == AA_MAX_MOVES)
+	  return num_moves;
+	mx[attack_point] = 1;
+      }
     }
-  }
-
-#if 0
-  {
-    int move2;
-    /* Look for additional defense moves. */
-    if (countlib(str) == 1
-	&& restricted_defend1(str, &move2, EMPTY, 0, 1, &move))
-      moves[num_moves++] = move2;
-  }
-#endif
-
-  if (debug & DEBUG_ATARI_ATARI) {
-    gprintf("Defense moves for %1m:", str);
-    for (k = 0; k < num_moves; k++)
-      gprintf("%o %1m", moves[k]);
-    gprintf("%o\n");
+    
+    if (debug & DEBUG_ATARI_ATARI) {
+      gprintf("Defense moves for %1m:", str);
+      for (k = 0; k < num_moves; k++)
+	gprintf("%o %1m", moves[k]);
+      gprintf("%o\n");
+    }
   }
   
   return num_moves;
 }
+
+static void
+aa_init_moves(struct aa_move attacks[AA_MAX_MOVES])
+{
+  attacks[0].move = NO_MOVE;
+}
+
+static void
+aa_add_move(struct aa_move attacks[AA_MAX_MOVES], int move, int target)
+{
+  int k;
+  int r;
+
+  for (k = 0; k < AA_MAX_MOVES; k++)
+    if (attacks[k].move == move || attacks[k].move == NO_MOVE)
+      break;
+
+  /* If the array is full, give up. */
+  if (k == AA_MAX_MOVES)
+    return;
+
+  target = find_origin(target);
+
+  /* New move. */
+  if (attacks[k].move == NO_MOVE) {
+    attacks[k].move = move;
+    attacks[k].target[0] = target;
+    if (AA_MAX_TARGETS_PER_MOVE > 0)
+      attacks[k].target[1] = NO_MOVE;
+
+    if (k < AA_MAX_MOVES - 1)
+      attacks[k+1].move = NO_MOVE;
+
+    return;
+  }
+
+  /* Known move, maybe new target. */
+  for (r = 0; r < AA_MAX_TARGETS_PER_MOVE; r++)
+    if (attacks[k].target[r] == target || attacks[k].target[r] == NO_MOVE)
+      break;
+
+  /* No place for more targets. */
+  if (r == AA_MAX_TARGETS_PER_MOVE)
+    return;
+
+  /* Target known. */
+  if (attacks[k].target[r] == target)
+    return;
+
+  /* Add target. */
+  attacks[k].target[r] = target;
+  if (r < AA_MAX_TARGETS_PER_MOVE - 1)
+    attacks[k].target[r + 1] = NO_MOVE;
+}
+
+static int
+aa_move_known(struct aa_move attacks[AA_MAX_MOVES], int move, int target)
+{
+  int k;
+  int r;
+
+  for (k = 0; k < AA_MAX_MOVES; k++)
+    if (attacks[k].move == move || attacks[k].move == NO_MOVE)
+      break;
+
+  /* If the array is full, give up and claim the move to be known. */
+  if (k == AA_MAX_MOVES)
+    return 1;
+
+  /* Unknown move. */
+  if (attacks[k].move == NO_MOVE)
+    return 0;
+
+  /* Move known, but how about the target?
+   * If no target specified, just return 1.
+   */
+  if (target == NO_MOVE)
+    return 1;
+
+  target = find_origin(target);
+  for (r = 0; r < AA_MAX_TARGETS_PER_MOVE; r++)
+    if (attacks[k].target[r] == target || attacks[k].target[r] == NO_MOVE)
+      break;
+
+  /* No place for more targets. Give up and claim the target to be known. */
+  if (r == AA_MAX_TARGETS_PER_MOVE)
+    return 1;
+
+  /* Target known. */
+  if (attacks[k].target[r] == target)
+    return 1;
+
+  /* Unknown target. */
+  return 0;
+}
+
+/* Auxiliary function for aa_sort_moves(). */
+static int
+target_comp_func(const void *a, const void *b)
+{
+  int asize = countstones(*((const int *) a));
+  int bsize = countstones(*((const int *) b));
+  return asize - bsize;
+}
+
+/* Auxiliary function for aa_sort_moves(). */
+static int
+move_comp_func(const void *a, const void *b)
+{
+  const struct aa_move *aa = a;
+  const struct aa_move *bb = b;
+  int asize = countstones(aa->target[0]);
+  int bsize = countstones(bb->target[0]);
+  return asize - bsize;
+}
+
+/* Sort the attack moves. For each move the targets are sorted in
+ * decreasing size. Then the moves are sorted with increasing size
+ * of their first target.
+ */
+static void
+aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES])
+{
+  int k;
+  int r;
+  int number_of_attacks;
+  int number_of_targets;
+
+  for (k = 0; k < AA_MAX_MOVES && attacks[k].move != NO_MOVE; k++) {
+    for (r = 0; r < AA_MAX_TARGETS_PER_MOVE; r++)
+      if (attacks[k].target[r] == NO_MOVE)
+	break;
+    number_of_targets = r;
+    gg_sort(attacks[k].target, number_of_targets,
+	    sizeof(attacks[k].target[0]), target_comp_func);
+  }
+  number_of_attacks = k;
+  gg_sort(attacks, number_of_attacks, sizeof(attacks[0]), move_comp_func);
+}
+
 
 /* Returns true if a move by (color) at (pos) is atari on something.
  * FIXME: Move this to an appropriate location.
