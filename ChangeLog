@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static function do_find_break_chain2_efficient_moves() split off
+  from break_chain2_efficient_moves() and revised
+- superstring_breakchain() revised
 - speed optimization of compute_primary_domains()
 - countlib() calls eliminated in count_common_libs(), find_common_libs(),
   and have_common_lib()
