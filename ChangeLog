@@ -4,6 +4,7 @@
 
 - bugfix (reading uninitialized memory) in sniff_lunch()
 - bugfix (EXPERIMENTAL_CONNECTIONS) in cut_connect_callback()
+- bugfix (gameinfo_load_sgfheader) in play_ascii()
 - man page revised
 - new options --mirror and --mirror-limit
 - new global variables play_mirror_go and mirror_stones_limit

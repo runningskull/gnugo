@@ -916,6 +916,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	      break;
 	    }
 	    sgf_initialized = 0;
+	    gameinfo_load_sgfheader(gameinfo, sgftree.root);
 	    gameinfo_play_sgftree(gameinfo, sgftree.root, NULL);
 	    sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	    curnode = sgftreeNodeCheck(&sgftree, 0);
