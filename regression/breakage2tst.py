@@ -1,4 +1,4 @@
-#! /usr/bin/env python1.5
+#! /usr/bin/env python
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # This program is distributed with GNU GO, a Go program.        #
