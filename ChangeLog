@@ -2,14 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.5.8 released July 18, 2004
+
 - bugfix in read_eye()	
 - bugfix in fast_defense()
 - improved printing of hashvalues
 - bugfix in atari_atari_blunder_size()	
 - new static function dump_board_sgf() in printutils.c
-- abortgo() revised to no longer unwind the stack and to print an sgf
-  of the move history
+- abortgo() no longer unwinds the stack but prints an sgf file
 - new and revised tests
+- doc revision
 
 3.5.8 released June 8, 2004
 
