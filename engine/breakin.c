@@ -90,7 +90,6 @@ static void
 compute_smaller_goal(int owner, int color_to_move,
     		     const struct connection_data *conn,
     		     const char goal[BOARDMAX], char smaller_goal[BOARDMAX])
-		     
 {
   int k, j;
   int own_stones_visited[BOARDMAX];

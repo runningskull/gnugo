@@ -2976,7 +2976,7 @@ break_in(int str, const char goal[BOARDMAX], int *move)
   verbose = save_verbose;
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   if (debug & DEBUG_BREAKIN) {
-    gprintf("%obreak_in    %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
+    gprintf("%obreak_in    %1M, result %r %1M (%d, %d nodes, %f seconds)\n",
 	    str, result, *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
     goaldump(goal);
@@ -3037,7 +3037,7 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   if (debug & DEBUG_BREAKIN) {
-    gprintf("%oblock_off %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+    gprintf("%oblock_off %1m, result %r %1m (%d, %d nodes, %f seconds)\n",
 	    str, result, *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
     goaldump(goal);

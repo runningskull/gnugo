@@ -4,37 +4,27 @@ coded in C, for efficiency. There is much to be said for
 another type of reading, in which the moves to be tried are
 generated from a pattern database.
 
-GNU Go does three very different types of pattern based
-reading. First, there is the OWL code (Optics with Limit
-Negotiation) which attempts to read out to a point where the code
-in @file{engine/optics.c} (@pxref{Eyes}) can be used to evaluate it.
-Like the tactical reading code, a persistent cache is
+GNU Go does three main types of pattern based reading. First,
+there is the OWL code (Optics with Limit Negotiation) which
+attempts to read out to a point where the code in
+@file{engine/optics.c} (@pxref{Eyes}) can be used to evaluate
+it.  Like the tactical reading code, a persistent cache is
 employed to maintain some of the owl data from move to
-move. This is an essential speedup without which GNU Go
-would play too slowly.
+move. This is an essential speedup without which GNU Go would
+play too slowly.
 
 Secondly, there is the @file{engine/combination.c} which
 attempts to find combinations---situations where a series
 of threats eventually culminates in one that cannot be
 parried.
 
-Finally, there is the connection code. GNU Go has three
-distinct implementations of code to determine whether
-two strings are connected. There are controlled by
-the parameters @code{experimental_connections} and
-@code{alternate_connections}. If @code{experimental_connections}
-is true, GNU Go uses reading to try to determine whether
-worms and dragons are (or can be) connected. Otherwise,
-less reliable heuristics based on static analysis (no
-reading) are employed. Two different reading algorithms are
-contained in this file. Default values of 
-@code{experimental_connections} and @code{alternate_connections}
-are both 1 in GNU Go 3.4. (So the ``experimental connections''
-are no longer considered experimental.) The default values,
-defined as EXPERIMENTAL_CONNECTIONS and ALTERNATE_CONNECTIONS
-in @file{config.h} can be changed with the configure options
-@option{--disable-experimental-connections} and 
-@option{--disable-alternate-connections}.
+Finally there is the semeai module. A @strong{semeai} is
+a capturing race between two adjacent DEAD or CRITICAL
+dragons of opposite colors. The principal function,
+@code{owl_analyze_semeai()} is contained in @file{owl.c}.
+Due to the complex nature of semeais, the results of
+this function are more frequently wrong than the usual
+owl code.
 
 @menu
 * The Owl Code::                Life and death reading

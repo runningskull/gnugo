@@ -623,6 +623,27 @@ deeper tactical reading and are thus impossible to detect for the
 influence module. It gets run after the influence module and revises
 its territory valuations.
 
+The break-in code makes use of two public functions in @file{readconnect.c},
+
+@itemize @bullet
+@item int break_in(int str, const char goal[BOARDMAX], int *move)
+@findex break_in
+@quotation
+Returns WIN if @code{str} can connect to the area @code{goal[]} (which may or
+may not contain stones), if the string's owner gets the first move.
+@end quotation
+@item int block_off(int str, const char goal[BOARDMAX], int *move)
+@findex block_off
+@quotation
+Returns WIN if @code{str} cannot connect to the area @code{goal[]} (which may
+or may not contain stones), if the other color moves first.
+@end quotation
+@end itemize
+
+These functions are public front ends to their counterparts
+@code{recursive_break_in} and @code{recursive_block_off}, which
+call each other recursively.
+
 The procedure is as follows: We look at all big (>= 10) territory regions
 as detected by the influence code. Using the computation of
 connection distances from readconnect.c, we compute all nearby vertices
@@ -642,9 +663,84 @@ We repeat this until the territory is shrunk so much that the opponent
 can no longer reach it.
 
 To see the break in code in action run GNU Go on the file
-@file{regression/games/break_in.sgf} with the option @code{-d0x102000}. The
-break in code is able to find the move at G7 to break into White's territory,
-a move which is otherwise overlooked by the engine.
+@file{regression/games/break_in.sgf} with the option @code{-d0x102000}. Among
+the traces you will find:
+
+@example
+  Trying to break in from D7 to:
+E9 (1)  F9 (1)  G9 (1)  E8 (1)  F8 (1)  G8 (1)  
+H8 (1)  G7 (1)  H7 (1)  J7 (1)  H6 (1)  J6 (1)
+H5 (1)  J5 (1)  H4 (1)  J4 (1)  H3 (1)  J3 (1)
+H2 (1)  J2 (1)    
+block_off D7, result 0 PASS (355, 41952 nodes, 0.73 seconds)
+E9 (1)  F9 (1)  G9 (1)  E8 (1)  F8 (1)  G8 (1)
+H8 (1)  G7 (1)  H7 (1)  J7 (1)  H6 (1)  J6 (1)
+H5 (1)  J5 (1)  H4 (1)  J4 (1)  H3 (1)  J3 (1)
+H2 (1)  J2 (1)    
+B:F4 
+  Erasing territory at E8 -b.
+  Erasing territory at G3 -b.
+  Now trying to break to smaller goal:
+F9 (1)  G9 (1)  F8 (1)  G8 (1)  H8 (1)  G7 (1)
+H7 (1)  J7 (1)  H6 (1)  J6 (1)  H5 (1)  J5 (1)
+H4 (1)  J4 (1)  H3 (1)  J3 (1)  H2 (1)  J2 (1)    
+@end example
+
+This means that the function @code{break_in} is called with the goal
+marked 'a' in the following diagram. The code attempts to find out
+whether it is possible to connect into this area from the string
+at @code{D7}.
+
+@example
+   A B C D E F G H J
+ 9 . . . . a a a . . 9
+ 8 . . . . a a a a . 8
+ 7 . . . X O O a a a 7
+ 6 . . . X X X O a a 6
+ 5 . . . . + . . a a 5
+ 4 . . . X . . O a a 4
+ 3 . . . . X . . a a 3
+ 2 . . . . . . O a a 2
+ 1 . . . . . . . . . 1
+   A B C D E F G H J
+@end example
+
+A breakin is found, so the goal is shrunk by removing
+@code{E9} and @code{J2}, then break_in is called again.
+
+In order to see what reading is actually done in order to
+do this break in, you may load GNU Go in gtp mode, then
+issue the commands:
+
+@example
+loadsgf break_in.sgf 
+= black
+
+start_sgftrace
+= 
+
+break_in D7 E9 F9 G9 E8 F8 G8 H8 G7 H7 J7 H6 J6 H5 J5 H4 J4 H3 J3 H2 J2
+= 1 E8
+
+finish_sgftrace vars.sgf
+= 
+
+start_sgftrace
+= 
+
+break_in D7 F9 G9 F8 G8 H8 G7 H7 J7 H6 J6 H5 J5 H4 J4 H3 J3 H2 J2
+= 1 G7
+
+finish_sgftrace vars1.sgf
+@end example
+
+This will produce two sgf files containing the variations caused
+by these calls to the breakin code. The second file, @file{vars1.sgf}
+will contain quite a few variations.
+
+The break in code makes a list of break ins which are found.
+When it is finished, the function @code{add_expand_territory_move}
+is called for each break in, adding a move reason.
 
 The break in code is slow, and only changes a few moves by the engine
 per game. Nevertheless we believe that it contributes substantially
