@@ -126,7 +126,9 @@ enum {OPT_BOARDSIZE=127,
       OPT_CAPTURE_ALL_DEAD,
       OPT_PLAY_OUT_AFTERMATH,
       OPT_ATTACK_BY_PATTERN,
-      OPT_DEFEND_BY_PATTERN
+      OPT_DEFEND_BY_PATTERN,
+      OPT_MIRROR,
+      OPT_MIRROR_LIMIT
 };
 
 /* names of playing modes */
@@ -231,13 +233,13 @@ static struct gg_option const long_options[] =
   {"decide-dragon-data",  required_argument, 0, OPT_DECIDE_DRAGON_DATA},
   {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
   {"decide-tactical-semeai", required_argument, 0, OPT_DECIDE_TACTICAL_SEMEAI},
-  {"decide-position", no_argument,       0, OPT_DECIDE_POSITION},
+  {"decide-position", no_argument,      0, OPT_DECIDE_POSITION},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
   {"decide-combination", no_argument,   0, OPT_DECIDE_COMBINATION},
   {"life",           no_argument,       0, OPT_LIFE},
   {"life-eyesize",   required_argument, 0, OPT_LIFE_EYESIZE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
-  {"nofuseki",       no_argument,         0, OPT_NOFUSEKI},
+  {"nofuseki",       no_argument,       0, OPT_NOFUSEKI},
   {"nojosekidb",     no_argument,       0, OPT_NOJOSEKIDB},
   {"debug-influence", required_argument, 0, OPT_DEBUG_INFLUENCE},
   {"showtime",       no_argument,       0, OPT_SHOWTIME},
@@ -247,6 +249,8 @@ static struct gg_option const long_options[] =
   {"profile-patterns", no_argument,     0, OPT_PROFILE_PATTERNS},
   {"attack-by-pattern", no_argument,    0, OPT_ATTACK_BY_PATTERN},
   {"defend-by-pattern", no_argument,    0, OPT_DEFEND_BY_PATTERN},
+  {"mirror",         no_argument,       0, OPT_MIRROR},
+  {"mirror-limit",   required_argument, 0, OPT_MIRROR_LIMIT},
   {NULL, 0, NULL, 0}
 };
 
@@ -777,6 +781,14 @@ main(int argc, char *argv[])
 
 #endif
 
+      case OPT_MIRROR:
+        play_mirror_go = 1;
+        break;
+
+      case OPT_MIRROR_LIMIT:
+        mirror_stones_limit = atoi(gg_optarg);
+        break;
+
       case 'v':
 	show_version();
 	return EXIT_SUCCESS;
@@ -1258,6 +1270,8 @@ Experimental options:\n\
    --nofusekidb            turn off fuseki database\n\
    --nofuseki              turn off fuseki moves entirely\n\
    --nojosekidb            turn off joseki database\n\
+   --mirror                try to play mirror go\n\
+   --mirror-limit <n>      stop mirroring when n stones on board\n\
 Scoring:\n\
    --score estimate        estimate score at loaded position\n\
    --score finish          generate moves to finish game, then score\n\

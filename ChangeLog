@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new options --mirror and --mirror-limit
+- new global variables play_mirror_go and mirror_stones_limit
+- new static functions find_mirror_move() and
+  test_symmetry_after_move() in genmove.c
 - Apply "B" cutting pattern from shapes.db only when connection code
   confirms it is working
 - new function test_attack_either_move; gets invoked by patterns

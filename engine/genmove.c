@@ -54,6 +54,9 @@ static int dragons_refinedly_examined = -1;
 static int revise_semeai(int color);
 static int revise_thrashing_dragon(int color, float advantage);
 
+static int find_mirror_move(int *move, int color);
+static int test_symmetry_after_move(int move, int color);
+
 void sgfShowConsideredMoves(void);
 
 
@@ -345,6 +348,15 @@ do_genmove(int *move, int color, float pure_threat_value)
 
   /* Prepare pattern matcher and reading code. */
   reset_engine();
+
+  /* If in mirror mode, try to find a mirror move. */
+  if (play_mirror_go
+      && (mirror_stones_limit < 0
+	  || stones_on_board(WHITE | BLACK) <= mirror_stones_limit)
+      && find_mirror_move(move, color)) {
+    TRACE("genmove() recommends mirror move at %1m\n", *move);
+    return 1.0;
+  }
 
   /* Find out information about the worms and dragons. */
   start_timer(1);
@@ -683,6 +695,63 @@ revise_thrashing_dragon(int color, float advantage)
   return 1;
 }
 
+
+/* Look for a mirror move. First try the mirror of the last move. If
+ * none is available, test all moves to see if one makes the board
+ * symmetric.
+ *
+ * To be able to deal with handicap stones we use a somewhat weak
+ * definition of symmetry.
+ */
+#define MIRROR_MOVE(pos) POS(board_size - 1 - I(pos), board_size - 1 - J(pos))
+
+static int
+find_mirror_move(int *move, int color)
+{
+  int last_move = get_last_move();
+  int mirror_move;
+  if (last_move != NO_MOVE) {
+    mirror_move = MIRROR_MOVE(last_move);
+    if (test_symmetry_after_move(mirror_move, color)) {
+      *move = mirror_move;
+      return 1;
+    }
+  }
+  else {
+    for (mirror_move = BOARDMIN; mirror_move < BOARDMAX; mirror_move++) {
+      if (ON_BOARD(mirror_move)
+	  && test_symmetry_after_move(mirror_move, color)) {
+	*move = mirror_move;
+	return 1;
+      }
+    }
+  }
+  
+  return 0;
+}
+
+static int
+test_symmetry_after_move(int move, int color)
+{
+  int pos;
+  int result = 1;
+
+  if (board[move] != EMPTY)
+    return 0;
+  if (!trymove(move, color, "find_mirror_move", NO_MOVE, EMPTY, NO_MOVE))
+    return 0;
+  
+  for (pos = BOARDMIN; pos <= MIRROR_MOVE(pos); pos++) {
+    if (!(board[pos] == EMPTY ^ board[MIRROR_MOVE(pos)])) {
+      result = 0;
+      break;
+    }
+  }
+  
+  popgo();
+
+  return result;
+}
 
 /*
  * Local Variables:
