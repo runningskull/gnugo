@@ -66,10 +66,10 @@ loadsgf games/niki.sgf 128
 #DESCRIPTION=Very tough position
 #SEVERITY=3
 #Note: G16 is still very very big.  See niki.tst#8 & nikit.tst#9
-# FIXME: Same move listed twice.
+#tm (3.1.16) added P6 - looks locally best, and GNU Go agrees.
 loadsgf games/niki.sgf 158
 11 gg_genmove white
-#? [M6|M6|P7]*
+#? [P6|M6|P7]*
 
 
 #CATEGORY=OWL_TUNING

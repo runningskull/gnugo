@@ -151,6 +151,10 @@ SOURCE=.\move_reasons.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\movelist.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\optics.c
 # End Source File
 # Begin Source File

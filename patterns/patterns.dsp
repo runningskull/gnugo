@@ -87,6 +87,10 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\aa_attackpat.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\apatterns.c
 # End Source File
 # Begin Source File
@@ -195,6 +199,37 @@ SOURCE=.\takamoku.db
 # End Group
 # Begin Source File
 
+SOURCE=.\aa_attackpats.db
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__AA_AT="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\aa_attackpats.db
+
+"aa_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b aa_attackpat -i ..\patterns\aa_attackpats.db -o aa_attackpat.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__AA_AT="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\aa_attackpats.db
+
+"aa_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b aa_attackpat -i ..\patterns\aa_attackpats.db -o aa_attackpat.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\attack.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
@@ -205,7 +240,7 @@ IntDir=.\Release
 InputPath=.\attack.db
 
 "apatterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -X  attpat < attack.db > apatterns.c
+	$(IntDir)\mkpat -X  attpat -i attack.db -o apatterns.c
 
 # End Custom Build
 
@@ -217,7 +252,7 @@ IntDir=.\Debug
 InputPath=.\attack.db
 
 "apatterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -X  attpat < attack.db > apatterns.c
+	$(IntDir)\mkpat -X  attpat -i attack.db -o apatterns.c
 
 # End Custom Build
 
@@ -236,7 +271,7 @@ IntDir=.\Release
 InputPath=.\barriers.db
 
 "barriers.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c -b barrierspat -i barriers.db -o barriers.c
+	$(IntDir)\mkpat -c -b barrierspat -i ..\patterns\barriers.db -o barriers.c
 
 # End Custom Build
 
@@ -248,7 +283,7 @@ IntDir=.\Debug
 InputPath=.\barriers.db
 
 "barriers.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c -b barrierspat <barriers.db >barriers.c
+	$(IntDir)\mkpat -c -b barrierspat -i ..\patterns\barriers.db -o barriers.c
 
 # End Custom Build
 
@@ -267,7 +302,7 @@ IntDir=.\Release
 InputPath=.\conn.db
 
 "conn.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c conn <conn.db >conn.c
+	$(IntDir)\mkpat -c conn -i conn.db -o conn.c
 
 # End Custom Build
 
@@ -279,7 +314,7 @@ IntDir=.\Debug
 InputPath=.\conn.db
 
 "conn.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c conn <conn.db >conn.c
+	$(IntDir)\mkpat -c conn -i conn.db -o conn.c
 
 # End Custom Build
 
@@ -329,7 +364,7 @@ IntDir=.\Release
 InputPath=.\endgame.db
 
 "endgame.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b endpat <endgame.db >endgame.c
+	$(IntDir)\mkpat -b endpat -i endgame.db -o endgame.c
 
 # End Custom Build
 
@@ -341,7 +376,7 @@ IntDir=.\Debug
 InputPath=.\endgame.db
 
 "endgame.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b endpat <endgame.db >endgame.c
+	$(IntDir)\mkpat -b endpat -i endgame.db -o endgame.c
 
 # End Custom Build
 
@@ -668,7 +703,7 @@ SOURCE=.\patterns.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__PATTE="$(IntDir)\mkpat.exe"	
+USERDEP__PATTE="$(IntDir)\mkpat.exe"	"patterns.db"	"patterns2.db"	
 # Begin Custom Build
 IntDir=.\Release
 InputPath=.\patterns.db

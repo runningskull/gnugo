@@ -501,9 +501,10 @@ loadsgf games/owl16.sgf
 135 owl_attack O18
 #? [0]
 
+# Actually, white is alive.  If black F14, white B12 lives.
 loadsgf games/owl17.sgf
 136 owl_attack D15
-#? [1 F14]*
+#? [0]
 
 loadsgf games/incident96.sgf 71
 137 owl_attack B4

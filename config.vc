@@ -25,6 +25,9 @@
 /* Ruleset. Default Japanese */
 #define CHINESE_RULES 0
 
+/* Use Experimental semeai code */
+#define EXPERIMENTAL_SEMEAI 0
+
 /* Define to use curses for color debugging */
 /* #undef CURSES */
 

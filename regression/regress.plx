@@ -59,7 +59,8 @@ my %colors = ("ALIVE", "green",
 	"UNCHECKED", "magenta");
 
 my $query = new CGI;
-my ($tstfile, $num, $sortby, $sgf, $reset, $trace, $bycat, $unexpected);
+my ($tstfile, $num, $sortby, $sgf, $reset, $trace, $bycat,
+     $unexpected, $slow, $special);
 
 ($tstfile, $num) = ($query->query_string() =~ /keywords=(.*)%3A(.*)/);
 
@@ -72,6 +73,8 @@ if (!$tstfile) {
   $trace = $query->param("trace");
   $bycat = $query->param("bycat");
   $unexpected = $query->param("unexpected");
+  $slow = $query->param("slow");
+  $special = $query->param("special");
 }
 
 sub sgfFile(%);
@@ -131,6 +134,16 @@ unless ($tstfile) {
   
   if ($unexpected) {
     printunexpected();
+    exit;
+  }
+  
+  if ($slow) {
+    printslow();
+    exit;
+  }
+  
+  if ($special) {
+    printspecial();
     exit;
   }
   
@@ -667,6 +680,69 @@ sub GTPtoSGF {
 }
 
 
+sub printslow {
+  our $VAR1;
+  do "html/one.perldata.new" or confess "can't do perldata";
+  my %h = %{$VAR1->[0]};
+  sub by_cputime {
+    $h{$b}->{cputime} <=> $h{$a}->{cputime}
+    or $a cmp $b;
+  }
+  
+
+  print "<HTML><HEAD><TITLE>Slow results - GNU Go</TITLE></HEAD>\n";
+  print "<BODY><H4>Slow results</H4>";
+  print "<TABLE border=1>";
+  print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD><TD>CPU Time</TD></TR>\n";
+
+  my $i = 0;
+  foreach my $k (sort by_cputime keys %h) {
+    $i++;
+    last if $i > 50;
+    print qq@<TR><TD><A HREF="?$k">$k</TD><TD>$h{$k}->{status}</TD>@;
+    print qq@    <TD>$h{$k}->{cputime}</TD></TR>@;
+    my ($p, $n) = $k =~ /(\w+):(\d+)/;
+    open (F, "html/$p.tst/$n.trace") or do {print "Missing trace file for $k<BR>"; next;};
+    my $first=1;
+    while (<F>) {
+      my $line = $_;
+      if ($line =~ /^owl_.*\d{6} nodes/) {
+        print qq@<TR><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>@ if $first-- > 0;
+        print qq@$line<BR>@;
+      }
+    }
+    print qq@</TD></TR>@ if $first < 1;
+    close F;
+  }
+}
+
+sub printspecial {
+  our $VAR1;
+  do "html/one.perldata.new" or confess "can't do perldata";
+  my %h = %{$VAR1->[0]};
+
+  my (%special);
+  my $sfile = "special";
+
+    print "<HTML><HEAD><TITLE>Special results - GNU Go</TITLE></HEAD>\n";
+    print "<BODY><H4>Special results</H4>";
+
+    print "<TABLE border=1>";
+    print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD><TD>cputime</TD></TR>\n";
+
+  if (-e $sfile) {
+    open (BF, $sfile);
+    while (<BF>) {
+      if (/^((\w+):(\d+))/) {
+        print qq@<TR><TD><A HREF="?$1">$1</A></TD><TD>$h{$1}->{status}</TD>@ .
+              qq@<TD>$h{$1}->{cputime}</TD></TR>\n@;
+      }
+    }
+    close(BF);
+  }
+  print qq@</TABLE></BODY></HTML>@;
+}
+
 
 sub printunexpected{
     my (%breakage);
@@ -692,7 +768,7 @@ sub printunexpected{
     print "<BODY><H4>Unexpected results</H4>";
 
     print "<TABLE border=1>";
-    print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD>\n";
+    print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD></TR>\n";
     foreach my $k (sort keys %h) {
       my $status = %{$h{$k}}->{status};
       defined $status or do { warn "missing status for $k"; next;};
@@ -715,19 +791,20 @@ sub printunexpected{
     }
     }
     
+    
     foreach (@ufails) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>FAILED</TD>\n@;
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>FAILED</TD></TR>\n@;
     }
 
     foreach (@upasses) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>PASSED</TD>\n@;
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>PASSED</TD></TR>\n@;
     }
     foreach (@fails) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>failed</TD>\n@;
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>failed</TD></TR>\n@;
     }
 
     foreach (@passes) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>passed</TD>\n@;
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>passed</TD></TR>\n@;
     }
 
     

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- dsp and config.vc updates
 - new function influence_get_moyo_segmentation
 - computations of moyo size surrounding a dragon changed
 - confirm_safety() takes two new parameters to tell which stones were saved
@@ -30,6 +31,8 @@
 - experimental-semeai configure option
 - experimental_semeai command line option
 - owl_analyze_semeai improvements
+- regress.plx improvements
+- test revisions
 
 3.1.15 released November 30, 2001
 
