@@ -121,6 +121,7 @@ AC_CACHE_CHECK(
 
 if test $ac_cv_mingw32 = yes;then
     LIBS="$LIBS -lwsock32"
+    AC_SEARCH_LIBS(vsnprintf, mingwex)
 fi
 
 AC_PROG_CPP
