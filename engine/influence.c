@@ -77,6 +77,14 @@ static int territory_cache_color = -1;
  */
 static int debug_influence = NO_MOVE;
 
+/* We use fixed point arithmetics in accumulate_influence(). Everything
+ * is stored as (int) value * GG_ONE.
+ */
+#define GG_ONE (1 << 12)
+#define FLOAT2FIXED(f) ((int) ((f) * GG_ONE) + 0.5)
+#define FIXED2FLOAT(i) (((float) (i)) / GG_ONE)
+#define FIXED_MULT(i, j) ((i) * (j) / GG_ONE)
+
 /* This is the core of the influence function. Given the coordinates
  * and color of an influence source, it radiates the influence
  * outwards until it hits a barrier or the strength of the influence
@@ -103,117 +111,99 @@ static int debug_influence = NO_MOVE;
  *  b is 1/(square of distance from m,n to i,j) ; or halved
  *    for diagonals
  * 
- *  arg is i + arg_di ; arg_j is j + arg_dj
+ *  arg is POS(i + arg_di, j + arg_dj)
  *  arg_d is 1 for diagonal movement
  *
  */
 
 
 #define code1(arg_di, arg_dj, arg, arg_d) do { \
-      if (!q->safe[arg] \
+      if (!safe[arg] \
 	  && ((arg_di)*(delta_i) + (arg_dj)*(delta_j) > 0 \
 	      || queue_start == 1)) { \
-	float contribution; \
-	float permeability = permeability_array[ii]; \
+	int contribution; \
+	int permeability = permeability_array[ii]; \
 	if (arg_d) { \
-	  permeability *= gg_max(permeability_array[ii + DELTA(arg_di, 0)], \
-			         permeability_array[ii + DELTA(0, arg_dj)]); \
-	  if (permeability == 0.0) \
+	  permeability = FIXED_MULT(permeability, \
+		                    gg_max(permeability_array \
+				               [ii + DELTA(arg_di, 0)], \
+			                   permeability_array \
+					       [ii + DELTA(0, arg_dj)])); \
+	  if (permeability == 0) \
 	    continue; \
 	} \
-	contribution = current_strength * permeability; \
+	contribution = FIXED_MULT(current_strength, permeability); \
 	if (queue_start != 1) { \
 	  int a = (arg_di)*(delta_i) + (arg_dj)*(delta_j); \
-	  contribution *= (a*a) * b; /* contribution *= cos(phi) */ \
+	  contribution *= (a*a); /* contribution *= cos(phi) */ \
+	  contribution = FIXED_MULT(b, contribution); \
 	} \
-	if (contribution <= INFLUENCE_CUTOFF) \
+	if (contribution <= FLOAT2FIXED(INFLUENCE_CUTOFF)) \
 	  continue; \
-	if (working[arg] == 0.0) { \
-	  q->queue[queue_end] = (arg); \
+	if (working[arg] == 0) { \
+	  queue[queue_end] = (arg); \
 	  queue_end++; \
 	} \
 	working[arg] += contribution; \
       } } while (0) 
 #endif
 
+/* Propagates the influence from (pos) with given strength and attenuation
+ * across the board.
+ */
 
 static void
-accumulate_influence(struct influence_data *q, int pos, int color)
+accumulate_influence(int pos, int strength, int inv_attenuation,
+    		     int inv_diagonal_damping,
+                     const int permeability_array[BOARDMAX],
+		     const char safe[BOARDMAX],
+		     int influence[BOARDMAX])
 {
   int ii;
   int m = I(pos);
   int n = J(pos);
   int k;
-#if !EXPLICIT_LOOP_UNROLLING
+  static int queue[BOARDMAX];
   int d;
-#endif
-  float b;
-  float inv_attenuation;
-  float inv_diagonal_damping;
-  float (*permeability_array);
+  int b;
 
   /* Clear the queue. Entry 0 is implicitly (m, n). */
   int queue_start = 0;
   int queue_end = 1;
 
-  static float working[BOARDMAX];
+  static int working[BOARDMAX];
   static int working_area_initialized = 0;
 
   if (!working_area_initialized) {
     for (ii = 0; ii < BOARDMAX; ii++)
-      working[ii] = 0.0;
+      working[ii] = 0;
     working_area_initialized = 1;
   }
 
-  if (0)
-    gprintf("Accumulating influence for %s at %m\n",
-	    color_to_string(color), m, n);
-
-  /* Attenuation only depends on the influence origin. */
-  if (color == WHITE)
-    inv_attenuation = 1.0 / q->white_attenuation[pos];
-  else
-    inv_attenuation = 1.0 / q->black_attenuation[pos];
-
-  if (q->is_territorial_influence)
-    inv_diagonal_damping = 1.0 / TERR_DIAGONAL_DAMPING;
-  else
-    inv_diagonal_damping = 1.0 / DIAGONAL_DAMPING;
-
-  if (color == WHITE)
-    permeability_array = q->white_permeability;
-  else
-    permeability_array = q->black_permeability;
-
   /* We put the original source into slot 0.  */
-  q->queue[0] = pos;
-    
-  if (color == WHITE)
-    working[pos] = q->white_strength[pos];
-  else
-    working[pos] = q->black_strength[pos];
-
+  queue[0] = pos;
+  working[pos] = strength;
 
   /* Spread influence until the stack is empty. */
   while (queue_start < queue_end) {
-    float current_strength;
+    int current_strength;
     int delta_i, delta_j;
 
-    ii = q->queue[queue_start];
+    ii = queue[queue_start];
     delta_i = I(ii) - m;
     delta_j = J(ii) - n;
     queue_start++;
-    if (permeability_array[ii] == 0.0)
+    if (permeability_array[ii] == 0)
       continue;
     if (0)
       gprintf("Picked %1m from queue. w=%f start=%d end=%d\n",
 	      ii, working[ii], queue_start, queue_end);
     if (queue_start == 1)
-      b = 1.0;
+      b = GG_ONE;
     else
-      b = 1.0 / ((delta_i)*(delta_i) + (delta_j)*(delta_j));
+      b = GG_ONE / ((delta_i)*(delta_i) + (delta_j)*(delta_j));
 
-    current_strength = working[ii] * inv_attenuation;
+    current_strength = FIXED_MULT(working[ii], inv_attenuation);
 
 #if !EXPLICIT_LOOP_UNROLLING
     /* Try to spread influence in each of the eight directions. */    
@@ -277,34 +267,24 @@ accumulate_influence(struct influence_data *q, int pos, int color)
 	  gprintf("  Spreading %s influence from %1m to %1m, d=%d\n",
 		  color_to_string(color), ii, ii + d_ii, d);
 	if (working[ii + d_ii] == 0.0) {
-	  q->queue[queue_end] = ii + d_ii;
+	  queue[queue_end] = ii + d_ii;
 	  queue_end++;
 	}
 	working[ii + d_ii] += contribution;
       }
     }
 #else
-    if (ON_BOARD(ii + delta[0]))
-      code1(deltai[0], deltaj[0], ii + delta[0], 0);
-    if (ON_BOARD(ii + delta[1]))
-      code1(deltai[1], deltaj[1], ii + delta[1], 0);
-    if (ON_BOARD(ii + delta[2]))
-      code1(deltai[2], deltaj[2], ii + delta[2], 0);
-    if (ON_BOARD(ii + delta[3]))
-      code1(deltai[3], deltaj[3], ii + delta[3], 0);
+    for (d = 0; d < 4; d++)
+      if (ON_BOARD(ii + delta[d]))
+	code1(deltai[d], deltaj[d], ii + delta[d], 0);
 
     /* Update factors for diagonal movement. */
-    b *= 0.5;
-    current_strength *= inv_diagonal_damping;
+    b /= 2;
+    current_strength = FIXED_MULT(current_strength, inv_diagonal_damping);
 
-    if (ON_BOARD(ii + delta[4]))
-      code1(deltai[4], deltaj[4], ii + delta[4], 1);
-    if (ON_BOARD(ii + delta[5]))
-      code1(deltai[5], deltaj[5], ii + delta[5], 1);
-    if (ON_BOARD(ii + delta[6]))
-      code1(deltai[6], deltaj[6], ii + delta[6], 1);
-    if (ON_BOARD(ii + delta[7]))
-      code1(deltai[7], deltaj[7], ii + delta[7], 1);
+    for (; d < 8; d++)
+      if (ON_BOARD(ii + delta[d]))
+	code1(deltai[d], deltaj[d], ii + delta[d], 1);
 #endif
   }
   
@@ -314,20 +294,11 @@ accumulate_influence(struct influence_data *q, int pos, int color)
    * it.
    */
   for (k = 0; k < queue_end; k++) {
-    ii = q->queue[k];
-
-    if (color == WHITE) {
-      if (working[ii] > 1.01 * INFLUENCE_CUTOFF
-	  || q->white_influence[ii] == 0.0)
-	q->white_influence[ii] += working[ii];
-    }
-    else {
-      if (working[ii] > 1.01 * INFLUENCE_CUTOFF
-	  || q->black_influence[ii] == 0.0)
-	q->black_influence[ii] += working[ii];
-    }
-    
-    working[ii] = 0.0;
+    ii = queue[k];
+    if (working[ii] > (FLOAT2FIXED(INFLUENCE_CUTOFF))
+	|| influence[ii] == 0)
+      influence[ii] += working[ii];
+    working[ii] = 0;
   }
 }
 
@@ -946,6 +917,12 @@ do_compute_influence(int color, const char safe_stones[BOARDMAX],
 		     int move, const char *trace_message)
 {
   int ii;
+  int int_white_permeabilities[BOARDMAX];
+  int int_black_permeabilities[BOARDMAX];
+  int int_white_influence[BOARDMAX];
+  int int_black_influence[BOARDMAX];
+  int inv_diagonal_damping;
+
   init_influence(q, color, safe_stones, strength);
 
   modify_depth_values(stackp - 1);
@@ -954,14 +931,39 @@ do_compute_influence(int color, const char safe_stones[BOARDMAX],
   else
     find_influence_patterns(q, EMPTY);
   modify_depth_values(1 - stackp);
+
+  if (q->is_territorial_influence)
+    inv_diagonal_damping = GG_ONE / TERR_DIAGONAL_DAMPING;
+  else
+    inv_diagonal_damping = GG_ONE / DIAGONAL_DAMPING;
+  memset(int_white_influence, 0, sizeof(int_white_influence));
+  memset(int_black_influence, 0, sizeof(int_black_influence));
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    int_white_permeabilities[ii] = FLOAT2FIXED(q->white_permeability[ii]);
+    int_black_permeabilities[ii] = FLOAT2FIXED(q->black_permeability[ii]);
+  }
+
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
       if (q->white_strength[ii] > 0.0)
-	accumulate_influence(q, ii, WHITE);
+	accumulate_influence(ii, FLOAT2FIXED(q->white_strength[ii]),
+	                     GG_ONE / q->white_attenuation[ii],
+			     inv_diagonal_damping,
+			     int_white_permeabilities, q->safe,
+			     int_white_influence);
       if (q->black_strength[ii] > 0.0)
-	accumulate_influence(q, ii, BLACK);
+	accumulate_influence(ii, FLOAT2FIXED(q->black_strength[ii]),
+	                     GG_ONE / q->black_attenuation[ii],
+			     inv_diagonal_damping,
+			     int_black_permeabilities, q->safe,
+			     int_black_influence);
     }
+
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    q->white_influence[ii] = FIXED2FLOAT(int_white_influence[ii]);
+    q->black_influence[ii] = FIXED2FLOAT(int_black_influence[ii]);
+  }
 
   value_territory(q);
   segment_influence(q);
@@ -1471,13 +1473,49 @@ compute_followup_influence(const struct influence_data *base,
   reset_unblocked_blocks(q);
   
   /* Spread influence for new influence sources. */
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii))
-      if ((color == BLACK
-            && q->black_strength[ii] > base->black_strength[ii])
-          || (color == WHITE
-              && q->white_strength[ii] > base->white_strength[ii]))
-        accumulate_influence(q, ii, color);
+  {
+    int inv_diagonal_damping = GG_ONE / TERR_DIAGONAL_DAMPING;
+    int int_permeabilities[BOARDMAX];
+    int int_influence[BOARDMAX];
+
+    /* Initialize integer copies of arrays. */
+    memset(int_influence, 0, BOARDMAX * sizeof(int));
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+      if (ON_BOARD(ii)) {
+	if (color == WHITE)
+	  int_permeabilities[ii] = FLOAT2FIXED(q->white_permeability[ii]);
+	else
+	  int_permeabilities[ii] = FLOAT2FIXED(q->black_permeability[ii]);
+      }
+
+    /* Spread new influence. */
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+      if (ON_BOARD(ii)) {
+	if (color == BLACK
+	    && q->black_strength[ii] > base->black_strength[ii])
+	  accumulate_influence(ii, FLOAT2FIXED(q->black_strength[ii]),
+			       GG_ONE / q->black_attenuation[ii],
+			       inv_diagonal_damping,
+			       int_permeabilities, q->safe,
+			       int_influence);
+	else if (color == WHITE
+		 && q->white_strength[ii] > base->white_strength[ii])
+	  accumulate_influence(ii, FLOAT2FIXED(q->white_strength[ii]),
+			       GG_ONE / q->white_attenuation[ii],
+			       inv_diagonal_damping,
+			       int_permeabilities, q->safe,
+			       int_influence);
+      }
+
+    /* Add new influence. */
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+      if (ON_BOARD(ii)) {
+	if (color == WHITE)
+	  q->white_influence[ii] += FIXED2FLOAT(int_influence[ii]);
+	else
+	  q->black_influence[ii] += FIXED2FLOAT(int_influence[ii]);
+      }
+  }
 
   value_territory(q);
 
