@@ -347,7 +347,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 33
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 35
 65 gg_genmove black
-#? [H4]*
+#? [H4]
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 47
 66 gg_genmove black

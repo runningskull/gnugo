@@ -1,3 +1,27 @@
+========================== 3.3.15 pre 3 ============================
+
+./regress.sh . trevora.tst 
+130 unexpected PASS!
+./regress.sh . nngs1.tst 
+20 unexpected PASS!
+46 unexpected PASS!
+48 unexpected FAIL: Correct 'R16', got 'F15'
+./regress.sh . trevor.tst 
+412 unexpected PASS!
+1060 unexpected FAIL: Correct '1', got '0'
+./regress.sh . global.tst 
+26 unexpected PASS!
+./regress.sh . 13x13.tst 
+65 unexpected PASS!
+./regress.sh . nngs3.tst 
+130 unexpected FAIL: Correct 'C7|C9', got 'N14'
+1190 unexpected PASS!
+./regress.sh . safety.tst 
+5 unexpected PASS!
+7 unexpected PASS!
+./regress.sh . ninestones.tst 
+150 unexpected FAIL: Correct 'C5|D5', got 'G14'
+
 ========================== 3.3.15 pre 2 ============================
 
 ./regress.sh . reading.tst 

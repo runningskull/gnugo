@@ -438,7 +438,7 @@ loadsgf games/trevor/trevor_41.sgf 35
 #SEVERITY=3
 loadsgf games/trevor/trevor_41.sgf 37
 412 gg_genmove black
-#? [C4]*
+#? [C4]
 
 #CATEGORY=KO
 #DESCRIPTION=Terrible confusion on GNU Go's part here.
@@ -659,7 +659,7 @@ loadsgf games/trevor/auto/c30.sgf 62
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 1060 owl_does_defend J4 E4
-#? [1]
+#? [1]*
 
 
 loadsgf games/trevor/trevor_20.sgf  14  
