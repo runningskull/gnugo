@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new GTP command kgs-genmove_cleanup
 - compute_crude_status() revised to consider dragons with big
   territorial moyo value as alive
 - semeai moves considered safe in mark_changed_dragon

@@ -125,6 +125,7 @@ DECLARE(gtp_increase_depths);
 DECLARE(gtp_initial_influence);
 DECLARE(gtp_is_legal);
 DECLARE(gtp_is_surrounded);
+DECLARE(gtp_kgs_genmove_cleanup);
 DECLARE(gtp_known_command);
 DECLARE(gtp_ladder_attack);
 DECLARE(gtp_last_move);
@@ -258,6 +259,7 @@ static struct gtp_command commands[] = {
   {"initial_influence",       gtp_initial_influence},
   {"is_legal",         	      gtp_is_legal},
   {"is_surrounded",           gtp_is_surrounded},
+  {"kgs-genmove_cleanup",     gtp_kgs_genmove_cleanup},
   {"known_command",    	      gtp_known_command},
   {"komi",        	      gtp_set_komi},
   {"ladder_attack",    	      gtp_ladder_attack},
@@ -2530,6 +2532,53 @@ gtp_restricted_genmove(char *s)
 }
 
 
+/* Function:  Generate and play the supposedly best move for either color,
+ *            not passing until all dead opponent stones have been removed.
+ * Arguments: color to move
+ * Fails:     invalid color
+ * Returns:   a move coordinate (or "PASS")
+ *
+ * Status:    KGS specific command.
+ *
+ * A similar command, but possibly somewhat different, will likely be added
+ * to GTP version 3 at a later time.
+ */
+static int
+gtp_kgs_genmove_cleanup(char *s)
+{
+  int i, j;
+  int color;
+  int n;
+  float val;
+  int save_capture_all_dead = capture_all_dead;
+
+  n = gtp_decode_color(s, &color);
+  if (!n)
+    return gtp_failure("invalid color");
+
+  if (stackp > 0)
+    return gtp_failure("kgs-genmove_cleanup cannot be called when stackp > 0");
+
+  /* Turn on the capture_all_dead option to force removal of dead
+   * opponent stones.
+   */
+  capture_all_dead = 1;
+  
+  adjust_level_offset(color);
+  level += level_offset;
+  val = genmove(&i, &j, color);
+  level -= level_offset;
+
+  capture_all_dead = save_capture_all_dead;
+  
+  play_move(POS(i, j), color);
+
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_vertex(i, j);
+  return gtp_finish_response();
+}
+
+
 /* Function : List the move reasons for a move.
  * Arguments: vertex
  * Fails:   : invalid vertex, occupied vertex
@@ -2826,7 +2875,7 @@ adjust_level_offset(int color)
   if (level + level_offset > max_level)
     level_offset = max_level - level;
 
-  if (0)
+  if (1)
     gprintf("New level %d (%d %C %d %d %d)\n", level + level_offset,
 	    movenum / 2, color, time_for_last_move, time_left, stones_left);
 }

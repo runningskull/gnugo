@@ -874,6 +874,24 @@
 
 @end example
 
+@cindex kgs-genmove_cleanup
+@item kgs-genmove_cleanup
+
+@example
+
+ Function:  Generate and play the supposedly best move for either color,
+            not passing until all dead opponent stones have been removed.
+ Arguments: color to move
+ Fails:     invalid color
+ Returns:   a move coordinate (or "PASS")
+
+ Status:    KGS specific command.
+
+ A similar command, but possibly somewhat different, will likely be added
+ to GTP version 3 at a later time.
+
+@end example
+
 @cindex level
 @item level
 
