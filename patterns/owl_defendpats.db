@@ -6660,6 +6660,26 @@ aX.b
 ;(owl_strong_dragon(a) || owl_strong_dragon(b)) && !oplay_disconnect(*,a,b)
 
 
+Pattern D1390
+# pp New pattern (3.5.2)
+
+???.O	    either capture or escape
+o*...
+OX..?
+?x.??
+-----
+
+:8,b,value(80)
+
+???dC
+o*bc.
+ABa.?
+?x.??
+
+; owl_escape_value(d) > 0
+; && oplay_attack_either(*,a,b,c,d,B,c) && oplay_connect(*,a,b,c,d,?,A,C)
+
+
 #########################################################
 #                                                       #
 #                          Ko                           #
