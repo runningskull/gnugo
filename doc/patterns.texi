@@ -351,8 +351,8 @@ The actual helper functions are in @file{helpers.c}. They are declared
 in @file{patterns.h}.
 
 As an example to show how to write a helper function, we consider
-@code{wedge_helper}. (This helper does not exist anymore but has been
-replaced by a constraint, discussed in the following section. Due to
+a hypothetical helper called @code{wedge_helper}. Such a helper
+used to exist, but has been replaced by a constraint. Due to
 its simplicity it's still a good example.) The helper begins with a
 comment:
 
@@ -376,20 +376,20 @@ Go will move if the pattern is adopted.
 int 
 wedge_helper (ARGS)
 @{
-  int ai, aj, bi, bj, ci, cj;
+  int apos, bpos, cpos;
   int other = OTHER_COLOR(color);
   int success = 0;
   
-  OFFSET(0, -2, ai, aj);
-  OFFSET(-1, 0, bi, bj);
-  OFFSET(1, 0, ci, cj);
+  apos = OFFSET(0, -2);
+  bpos = OFFSET(-1, 0);
+  cpos = OFFSET(1, 0);
 
-  if (TRYMOVE(ti, tj, color)) @{
-    if (TRYMOVE(ai, aj, other)) @{
-      if (!p[ai][aj] || attack(ai, aj, NULL, NULL))
+  if (TRYMOVE(move, color)) @{
+    if (TRYMOVE(apos, other)) @{
+      if (board[apos] == EMPTY || attack(apos, NULL))
         success = 1;
-      else if (TRYMOVE(bi, bj, color)) @{
-        if (!safe_move(ci, cj, other))
+      else if (TRYMOVE(bpos, color)) @{
+        if (!safe_move(cpos, other))
           success = 1;
         popgo();
       @}
@@ -404,20 +404,21 @@ wedge_helper (ARGS)
 @end example
 
 The @code{OFFSET} lines tell GNU Go the positions of the three stones at
-@code{a=(ai,aj)}, @code{b=(bi,bj)}, and @code{c=(ci,cj)}. To decide
-whether the pattern guarantees a connection, we do some reading. First
-we use the @code{TRYMOVE} macro to place an O at t and let X draw back
-to a. Then we try whether O can capture these stones by calling
-@code{attack()}. The test if there is a stone at a before calling
-@code{attack()} is in this position not really necessary but it's good
-practice to do so, because if the attacked stone should happen to
-already have been captured while placing stones, GNU Go would crash with
-an assertion failure.
+@samp{a}, @samp{b}, and @samp{c}. To decide whether the pattern
+guarantees a connection, we do some reading. First we use the
+@code{TRYMOVE} macro to place an @samp{O} at @samp{move} and let
+@samp{X} draw back to @samp{a}. Then we ask whether @samp{O} can capture
+these stones by calling @code{attack()}. The test if there is a stone at
+a before calling @code{attack()} is in this position not really
+necessary but it's good practice to do so, because if the attacked stone
+should happen to already have been captured while placing stones, GNU Go
+would crash with an assertion failure.
 
-If this attack fails we let O connect at b and use the @code{safe_move()}
-function to examine whether a cut by X at c could be immediately
-captured. Before we return the result we need to remove the stones we
-placed from the reading stack. This is done with the function @code{popgo()}.
+If this attack fails we let @samp{O} connect at @samp{b} and use the
+@code{safe_move()} function to examine whether a cut by @samp{X} at
+@samp{c} could be immediately captured. Before we return the result we
+need to remove the stones we placed from the reading stack. This is done
+with the function @code{popgo()}.
 
 @node  Autohelpers and Constraints, Autohelper Actions, Helper Functions, Patterns
 @comment  node-name,  next,  previous,  up
@@ -429,16 +430,16 @@ placed from the reading stack. This is done with the function @code{popgo()}.
 In addition to the hand-written helper functions in @file{helpers.c}, GNU Go
 can automatically generate helper functions from a diagram with labels
 and an expression describing a constraint. The constraint diagram,
-specifying the labels, is placed below the ":" line and the constraint
-expression is placed below the diagram on line starting with a ";".
+specifying the labels, is placed below the @samp{:} line and the constraint
+expression is placed below the diagram on line starting with a @samp{;}.
 Constraints can only be used to accept or reject a pattern. If the
 constraint evaluates to zero (false) the pattern is rejected,
 otherwise it's accepted (still conditioned on passing all other tests
 of course). To give a simple example we consider a connection pattern.
 
-Pattern Conn311
-
 @example
+
+Pattern Conn311
 
 O*.
 ?XO
@@ -463,10 +464,11 @@ with the label. (These conventions are not enforced by the pattern
 compiler, but to make the database consistent and easy to read they
 should be followed.)
 
-The labels can now be used in the constraint expression. In this
-example we have a reading constraint which should be interpreted as
-"Play an O stone at * followed by an X stone at a. Accept the pattern
-if O now can capture either at a or at B (or both strings)."
+The labels can now be used in the constraint expression. In this example
+we have a reading constraint which should be interpreted as "Play an
+@samp{O} stone at @samp{*} followed by an @samp{X} stone at
+@samp{a}. Accept the pattern if @samp{O} now can capture either at
+@samp{a} or at @samp{B} (or both strings)."
 
 The functions that are available for use in the constraints are listed
 in the section `Autohelpers Functions' below. Technically the
@@ -699,23 +701,23 @@ color.
 
 These functions make it possible to do more complex reading
 experiments in the constraints. All of them work so that first the
-sequence of moves a,b,c,... is played through with alternating colors,
-starting with X or O as indicated by the name. Then it is tested
-whether the worm at z can be attacked or defended, respectively. It
-doesn't matter who would be in turn to move, a worm of either color
-may be attacked or defended. For attacks the opposite color of the
-string being attacked starts moving and for defense the same color
-starts. The defend functions return true if the worm cannot be
-attacked in the position or if it can be attacked but also defended.
-The attack functions return true if there is a way to capture the
-worm, whether or not it can also be defended. If there is no stone
-present at z after the moves have been played, it is assumed that an
-attack has already been successful or a defense has already failed.
+sequence of moves @samp{a},@samp{b},@samp{c},... is played through with
+alternating colors, starting with @samp{X} or @samp{O} as indicated by
+the name. Then it is tested whether the worm at z can be attacked or
+defended, respectively. It doesn't matter who would be in turn to move,
+a worm of either color may be attacked or defended. For attacks the
+opposite color of the string being attacked starts moving and for
+defense the same color starts. The defend functions return true if the
+worm cannot be attacked in the position or if it can be attacked but
+also defended.  The attack functions return true if there is a way to
+capture the worm, whether or not it can also be defended. If there is no
+stone present at z after the moves have been played, it is assumed that
+an attack has already been successful or a defense has already failed.
 If some of the moves should happen to be illegal, typically because it
 would have been suicide, the following moves are played as if nothing
-has happened and the attack or defense is tested as usual. It is
-assumed that this convention will give the relevant result without
-requiring a lot of special cases.
+has happened and the attack or defense is tested as usual. It is assumed
+that this convention will give the relevant result without requiring a
+lot of special cases.
 
 The special label @samp{?} can be used to represent a tenuki.
 Thus @code{oplay_defend(a,?,b,c)} tries moves by @samp{O} at @samp{a} and
@@ -773,13 +775,15 @@ OXO    xXz
 @end example
 
 @noindent
-and X aims at capturing at least one of x, y, and z. If this succeeds
-1 is returned. If it doesn't, X tries instead to cut through on either
-side and if this succeeds, 2 is returned. Of course the same shape
-with opposite colors can also be used.
+and @samp{X} aims at capturing at least one of @samp{x}, @samp{y}, and
+@samp{z}. If this succeeds @samp{1} is returned. If it doesn't, @samp{X}
+tries instead to cut through on either side and if this succeeds,
+@samp{2} is returned. Of course the same shape with opposite colors can
+also be used.
 
-Important notice: x, y, and z must be given in the order they have in
-the diagram above, or any reflection and/or rotation of it.
+Important notice: @samp{x}, @samp{y}, and @samp{z} must be given in the
+order they have in the diagram above, or any reflection and/or rotation
+of it.
 
 @example
 seki_helper(x)
@@ -981,23 +985,26 @@ matching is performed during @code{make_worms()}, at the time when the
 tactical status of all worms is decided. None of the classes described
 above are useful in these databases, instead we have two other
 classes.
-@format
 
-D  :  For each O worm in the pattern that can be tactically captured
-      (worm[m][n].attack_code != 0), the move at @samp{*} is tried. If it
-      is found to defend the stone, this is registered as a reason
-      for the move * and the defense point of the worm is set to @samp{*}.
+@table @samp
+@item D
+For each @samp{O} worm in the pattern that can be tactically captured
+(@code{worm[m][n].attack_code != 0}), the move at @samp{*} is
+tried. If it is found to defend the stone, this is registered as a
+reason for the move @samp{*} and the defense point of the worm is set to
+@samp{*}.
+@item A
+For each @samp{X} worm in the pattern, it's tested whether the move
+at @samp{*} captures the worm. If that is the case, this is
+registered as a reason for the move at @samp{*}. The attack point of
+the worm is set to * and if it wasn't attacked before, a
+defense is searched for.
+@end table
 
-A  :  For each X worm in the pattern, it's tested whether the move
-      at * captures the worm. If that is the case, this is
-      registered as a reason for the move at @samp{*}. The attack point of
-      the worm is set to * and if it wasn't attacked before, a
-      defense is searched for.
-@end format
-
-Furthermore, A patterns can only be used in @file{attack.db} and D patterns
-only in @file{defense.db}. Unclassified patterns may appear in these
-databases, but then they must work through actions to be effective.
+Furthermore, @samp{A} patterns can only be used in @file{attack.db} and
+@samp{D} patterns only in @file{defense.db}. Unclassified patterns may
+appear in these databases, but then they must work through actions to be
+effective.
 
 @node  Connections Database, Connection Functions, Attack and Defense DB, Patterns
 @comment  node-name,  next,  previous,  up

@@ -1,24 +1,23 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   *
- * http://www.gnu.org/software/gnugo/ for more information.      *
- *                                                               *
- * Copyright 1999, 2000, 2001 by the Free Software Foundation.   *
- *                                                               *
- * This program is free software; you can redistribute it and/or *
- * modify it under the terms of the GNU General Public License   *
- * as published by the Free Software Foundation - version 2.     *
- *                                                               *
- * This program is distributed in the hope that it will be       *
- * useful, but WITHOUT ANY WARRANTY; without even the implied    *
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       *
- * PURPOSE.  See the GNU General Public License in file COPYING  *
- * for more details.                                             *
- *                                                               *
- * You should have received a copy of the GNU General Public     *
- * License along with this program; if not, write to the Free    *
- * Software Foundation, Inc., 59 Temple Place - Suite 330,       *
- * Boston, MA 02111, USA.                                        *
-\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       *
+ * http://www.gnu.org/software/gnugo/ for more information.          *
+ *                                                                   *
+ * Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation. *
+ *                                                                   *
+ * This program is free software; you can redistribute it and/or     *
+ * modify it under the terms of the GNU General Public License as    *
+ * published by the Free Software Foundation - version 2             *
+ *                                                                   *
+ * This program is distributed in the hope that it will be useful,   *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of    *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the     *
+ * GNU General Public License in file COPYING for more details.      *
+ *                                                                   *
+ * You should have received a copy of the GNU General Public         *
+ * License along with this program; if not, write to the Free        *
+ * Software Foundation, Inc., 59 Temple Place - Suite 330,           *
+ * Boston, MA 02111, USA.                                            *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
 
@@ -35,19 +34,19 @@
 
 
 /*
- * Change the status of all the stones in the dragon at (x,y).
+ * Change the status of all the stones in the dragon at (dr).
  */
 
 void
-change_matcher_status(int m, int n, int status)
+change_matcher_status(int dr, int status)
 {
-  int i, j;
-  int origin = dragon[POS(m, n)].origin;
+  int pos;
+  int origin = dragon[dr].origin;
 
-  for (i = 0; i < board_size; i++) 
-    for (j = 0; j < board_size; j++) {
-      if (dragon[POS(i, j)].origin == origin)
-	dragon[POS(i, j)].matcher_status = status;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos)) {
+      if (dragon[pos].origin == origin)
+	dragon[pos].matcher_status = status;
     }
 }
 
@@ -179,10 +178,10 @@ does_defend(int move, int str)
 
 
 /* 
- * Example: somewhere(WHITE, 2, ai, aj, bi, bj, ci, cj).
+ * Example: somewhere(WHITE, 2, apos, bpos, cpos).
  * 
  * Returns true if one of the vertices listed
- * satisfies p[i][j]==color. Here last_move is the
+ * satisfies board[pos]==color. Here last_move is the
  * number of moves minus one.
  */
 
@@ -768,8 +767,8 @@ restore_depth_values()
   ko_depth          = save_ko_depth;
 }
 
-/* Play a stone at (m, n) and count the number of liberties for the
- * resulting string. This requires (m, n) to be empty.
+/* Play a stone at (pos) and count the number of liberties for the
+ * resulting string. This requires (pos) to be empty.
  *
  * This function differs from approxlib() by the fact that it removes
  * captured stones before counting the liberties.
@@ -830,10 +829,10 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
  *
  * For use when called from fill_liberty, this function may optionally
  * return a point of defense, which, if taken, will presumably make
- * the move at (i, j) safe on a subsequent turn.
+ * the move at (move) safe on a subsequent turn.
  *
  * FIXME: Most TRACE calls below are ineffective because we have
- * decreased the verbose value to avoid traces in the owl code. Oops.
+ * decreased the verbose value to avoid traces in the owl code.
  */
 
 int
@@ -1021,7 +1020,7 @@ double_atari(int move, int color)
 /* Find those worms of the given color that can never be captured,
  * even if the opponent is allowed an arbitrary number of consecutive
  * moves. The coordinates of the origins of these worms are written to
- * the wormi, wormj arrays and the number of non-capturable worms is
+ * the worm arrays and the number of non-capturable worms is
  * returned.
  *
  * The algorithm is to cycle through the worms until none remains or
@@ -1398,8 +1397,8 @@ find_superstring_stones_and_liberties(int str,
 }
 
 /* analogous to chainlinks, this function finds boundary chains of the
- * superstring at (m, n), including those which are boundary chains of
- * (m, n) itself. If liberty_cap != 0, only those boundary chains with
+ * superstring at (str), including those which are boundary chains of
+ * (str) itself. If liberty_cap != 0, only those boundary chains with
  * <= liberty_cap liberties are reported.
  */
 
@@ -1416,8 +1415,8 @@ superstring_chainlinks(int str,
 
 
 /* analogous to chainlinks, this function finds boundary chains of the
- * superstring at (m, n), omitting those which are boundary chains of
- * (m, n) itself. If liberty_cap != 0, only those boundary chains with
+ * superstring at (str), omitting those which are boundary chains of
+ * (str) itself. If liberty_cap != 0, only those boundary chains with
  * <= liberty_cap liberties are reported.
  */
 

@@ -1,25 +1,23 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   *
- * http://www.gnu.org/software/gnugo/ for more information.      *
- *                                                               *
- * Copyright 1999, 2000, 2001 by the Free Software Foundation.   *
- *                                                               *
- * This program is free software; you can redistribute it and/or *
- * modify it under the terms of the GNU General Public License   *
- * as published by the Free Software Foundation - version 2.     *
- *                                                               *
- * This program is distributed in the hope that it will be       *
- * useful, but WITHOUT ANY WARRANTY; without even the implied    *
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       *
- * PURPOSE.  See the GNU General Public License in file COPYING  *
- * for more details.                                             *
- *                                                               *
- * You should have received a copy of the GNU General Public     *
- * License along with this program; if not, write to the Free    *
- * Software Foundation, Inc., 59 Temple Place - Suite 330,       *
- * Boston, MA 02111, USA.                                        *
-\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       *
+ * http://www.gnu.org/software/gnugo/ for more information.          *
+ *                                                                   *
+ * Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation. *
+ *                                                                   *
+ * This program is free software; you can redistribute it and/or     *
+ * modify it under the terms of the GNU General Public License as    *
+ * published by the Free Software Foundation - version 2             *
+ *                                                                   *
+ * This program is distributed in the hope that it will be useful,   *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of    *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the     *
+ * GNU General Public License in file COPYING for more details.      *
+ *                                                                   *
+ * You should have received a copy of the GNU General Public         *
+ * License along with this program; if not, write to the Free        *
+ * Software Foundation, Inc., 59 Temple Place - Suite 330,           *
+ * Boston, MA 02111, USA.                                            *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
  * The code in this file implements "Optics With Limit-negotiation (OWL)."
@@ -1735,12 +1733,12 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
  * stackp==0; otherwise you can call do_owl_attack but you must
  * set up the goal and boundary arrays by hand first.
  *
- * Returns 2 or 3 if the position is ko:
+ * Returns KO_A or KO_B if the position is ko:
  *
- * - Returns 2 if the attack prevails provided attacker is willing to
- *   ignore any ko threat (the attacker makes the first ko capture).
- * - Returns 3 if attack succeeds provided attacker has a ko threat
- *   which must be answered (the defender makes the first ko capture).
+ * - Returns KO_A if the defendse succeeds provided the defender is willing to
+ *   ignore any ko threat (the defender makes the first ko capture).
+ * - Returns KO_B if the defense succeeds provided the defender has a ko threat
+ *   which must be answered (the attacker makes the first ko capture).
  *
  * The array goal marks the extent of the dragon. This must
  * be maintained during reading.  */
@@ -3545,8 +3543,8 @@ owl_reasons(int color)
     }
 }
 
-/* Use the owl code to determine whether the move at (ti, tj) makes
- * the dragon at (m, n) owl safe. This is used to test whether
+/* Use the owl code to determine whether the move at (move) makes
+ * the dragon at (target) owl safe. This is used to test whether
  * tactical defenses are strategically viable and whether a vital eye
  * point does kill an owl critical dragon. 
  *
@@ -4038,7 +4036,7 @@ owl_make_domains(struct local_owl_data *owla, struct local_owl_data *owlb)
   }
 }
 
-/* True unless (i, j) is EMPTY or occupied by a lunch for the goal dragon.  
+/* True unless (pos) is EMPTY or occupied by a lunch for the goal dragon.  
  * Used during make_domains (see optics.c: lively macro). A ``lively''
  * worm is one that might be alive, hence cannot be ignored in 
  * determining eye spaces.

@@ -15,7 +15,7 @@
 @titlepage
 @subtitle Documentation for the GNU Go Project
 @subtitle Edition @value{EDITION}
-@subtitle August, 2001
+@subtitle April, 2002
 @vskip 0pt plus 1filll
 @image{newlogo}
 @vskip 0pt plus 1filll
@@ -57,7 +57,7 @@ are respected.
 This file documents @code{GNU Go}, a Go program and its sources.
 This is Edition @value{EDITION} of the @cite{GNU Go Program Documentation}
 
-Copyright 1999, 2000 and 2001, The Free Software Foundation, Inc.
+Copyright 1999, 2000, 2001 and 2002, The Free Software Foundation, Inc.
      
 Permission is granted to make and distribute verbatim
 or modified copies of this manual is given provided

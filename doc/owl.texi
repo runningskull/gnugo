@@ -112,7 +112,7 @@ The functions @code{owl_attack()} and @code{owl_defend()} may, like
 defending move through their pointer arguments. If the position is
 already won, @code{owl_attack()} may or may not return an attacking
 move. If it finds no move of interest, it will return @code{PASS}, that
-is, @code{(-1,-1)}. The same goes for @code{owl_defend()}.
+is, @code{0}. The same goes for @code{owl_defend()}.
 
 When @code{owl_attack()} or @code{owl_defend()} is called,
 the dragon under attack is marked in the array @code{goal}.
@@ -152,106 +152,122 @@ information in the calls to @code{same_dragon} from the (static)
 function @code{owl_mark_dragon}. This requires the dragon data
 to be current, which it is not when @code{stackp>0}. 
 
+As with the tactical reading code, return codes are WIN, 0,
+or KO_A or KO_B if the position is ko. Thus for example @code{owl_attack()}
 @itemize @bullet
-@item @code{int owl_attack(int m, int n, int *ui, int *uj)}
-@findex owl_attack
-@quotation
-Returns 1 if a move can be found to attack the dragon
-at @code{(m, n)}, in which case @code{(*ui, *uj)} is the recommended move.
-@code{(*ui, *uj)} can be null pointers if the result is not needed.
-@itemize @minus
-@item Returns 2 if the attack prevails provided attacker is willing to
+Returns KO_A if the attack prevails provided attacker is willing to
 ignore any ko threat (the attacker makes the first ko capture).
-@item Returns 3 if attack succeeds provided attacker has a ko threat
+@item Returns KO_B if attack succeeds provided attacker has a ko threat
 which must be answered (the defender makes the first ko capture).
 @end itemize
+
+The public functions in @file{owl.c} are:
+
+@itemize @bullet
+@item @code{void owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move, int owl)}
+@findex owl_analyze_semeai
+@quotation
+Called when (apos) and (bpos) point to adjacent dragons
+of the opposite color, both with matcher_status DEAD or
+CRITICAL, analyzes the semeai, assuming that the player
+of the (apos) dragon moves first.
 @end quotation
-@item @code{int owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)}
+@item @code{int owl_attack(int target, int *attack_point, int *certain)}
+@findex owl_attack
+@quotation
+Returns true if a move can be found to attack the dragon
+at @code{target}, in which case @code{*attack_point} is the recommended move.
+@code{attack_point} can be a null pointer if only the result is needed.
+The array goal marks the extent of the dragon. This must
+be maintained during reading. Call this function only when
+@code{stackp==0}; otherwise you can call do_owl_attack but you must
+set up the goal and boundary arrays by hand first.
+@end quotation
+@item @code{int owl_threaten_attack(int target, int *attack1, int *attack2)}
 @findex owl_threaten_attack
 @quotation
-Returns 1 if the dragon at @code{(m, n)} can be captured given
+Returns true if the dragon at @code{target} can be captured given
 two moves in a row. The first two moves to capture the
-dragon are given as @code{(*ui, *uj)} and @code{(*vi, *vj)}.
+dragon are given as @code{*attack1} and @code{*attack2}.
 @end quotation
-@item @code{int owl_defend(int m, int n, int *ui, int *uj)}
+@item @code{int owl_defend(int target, int *defense_point, int *certain)}
 @findex owl_defend
 @quotation
-Returns 1 if a move can be found to defend the dragon
-at @code{(m, n)}, in which case @code{(*ui, *uj)} is the recommended move.
-@code{(*ui, *uj)} can be null pointers if the result is not needed.
-@itemize @minus
-@item Returns 2 if the defense prevails provided defender is willing to
-ignore any ko threat (the defender makes the first ko capture).
-@item Returns 3 if defense succeeds provided defender has a ko threat
-which must be answered (the attacker makes the first ko capture).
-@end itemize
+Returns true if a move can be found to defend the dragon
+at @code{target}, in which case @code{*defense_point} is the recommended move.
 @end quotation
-@item @code{int owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj)}
+@code{defense_point} can be a null pointer if the result is not needed.
+@item @code{int owl_threaten_defense(int target, int *defend1, int *defend2)}
 @findex owl_threaten_defense
 @quotation
-Returns true if the dragon at @code{(m, n)} can be defended given
+Returns true if the dragon at @code{target} can be defended given
 two moves in a row. The first two moves to defend the
-dragon are given as @code{(*ui, *uj)} and @code{(*vi, *vj)}.
+dragon are given as @code{*defend1} and @code{*defend2}.
 @end quotation
-@item @code{void goaldump(char goal[MAX_BOARD][MAX_BOARD])}
-@findex goaldump
-quotation
-Lists the goal array. For use in GDB:
-@example
-(gdb) set goaldump(goal)
-@end example
 @item @code{void owl_reasons(int color)}
 @findex owl_reasons
 @quotation
-Add owl reasons. This function should be called once during genmove.
+Add owl reasons. This function should be called once during
+genmove.
 @end quotation
-@item @code{owl_does_defend(int ti, int tj, int m, int n)}
+@item @code{int owl_does_defend(int move, int target)}
 @findex owl_does_defend
 @quotation
-Use the owl code to determine whether the move at @code{(ti, tj)} makes
-the dragon at @code{(m, n)} owl safe. This is used to test whether
-tactical defenses are strategically viable, whether a strategical
-defense move is effective, and whether a vital eye point does save an
-owl critical dragon.
+Use the owl code to determine whether the move at @code{move} makes
+the dragon at @code{target} owl safe. This is used to test whether
+tactical defenses are strategically viable and whether a vital eye
+point does kill an owl critical dragon. Should be called only when 
+@code{stackp==0}.
 @end quotation
-@end itemize
-@itemize @bullet
-@item @code{owl_does_attack(int ti, int tj, int m, int n)}
+@item @code{int owl_confirm_safety(int move, int target, int *defense_point)}
+@findex owl_confirm_safety
+@quotation
+Use the owl code to determine whether the dragon at @code{move} is owl safe
+after an own move at @code{target}. This is used to detect blunders. In case
+the dragon is not safe, it also tries to find a defense point making
+@code{target} safe in a later move.  Should be called only when 
+@code{stackp==0}.
+@end quotation
+@item @code{int owl_does_attack(int move, int target)}
 @findex owl_does_attack
 @quotation
-Use the owl code to determine whether the move at @code{(ti, tj)} owl
-kills the dragon at @code{(m, n)}. This is used to test whether
-strategical attack moves are dangerous enough to kill and whether a
-vital eye point does kill an owl critical dragon.
+Use the owl code to determine whether the attack move at @code{move} of
+the dragon @code{target} is effective, i.e. whether it kills the stones.
 @end quotation
-@end itemize
-@itemize @bullet
-@item @code{int owl_connection_defends(int ti, int tj, int ai, int aj, int bi, int bj)}
+Should be called only when @code{stackp==0}.
+@item @code{int owl_connection_defends(int move, int target1, int target2)}
 @findex owl_connection_defends
 @quotation
 Use the owl code to determine whether connecting the two dragons
-@code{(ai, aj)} and @code{(bi, bj)} by playing at @code{(ti, tj)}
-results in a living dragon. Should be called only when @code{stackp==0}.
+@code{target1} and @code{target2} by playing at @code{move} results in a living
+dragon. Should be called only when @code{stackp==0}.
 @end quotation
-@item @code{int owl_lively(int i, int j)}
+@item @code{int  owl_lively(int pos)}
 @findex owl_lively
 @quotation
-True unless @code{(i, j)} is @code{EMPTY} or occupied by a lunch for the goal
-dragon. Used during @code{make_domains()} (see @file{optics.c}: lively macro).
+True unless @code{pos} is @code{EMPTY} or occupied by a lunch for the goal
+dragon.  Used during make_domains (see the function @code{is_lively}
+in @file{optics.c}). A ``lively'' worm is one that might be alive, hence
+cannot be ignored in determining eye spaces.
 @end quotation
-@end itemize
-
-@itemize @bullet
-@item @code{int owl_substantial(int i, int j)}
+@item @code{int owl_substantial(int str)}
 @findex owl_substantial
 @quotation
 This function, called when @code{stackp==0}, returns true if capturing
-the string at @code{(i,j)} results in a live group.
+the string at @code{str} results in a live group.
 @end quotation
-@item @code{int vital_chain(int m, int n)}
-@findex vital_chain
+@item @code{int obvious_false_eye(int pos, int color)}
+@findex obvious_false_eye
 @quotation
-This function returns true if it is judged that the capture of the
-string at @code{(m,n)} is sufficient to create one eye or to escape.
+Conservative relative of topological_eye. Essentially the same
+algorithm is used, but only tactically safe opponent strings on
+diagonals are considered. This may underestimate the false/half eye
+status, but it should never be overestimated.
+@end quotation
+@item @code{int owl_topological_eye(int pos, int color)}
+@findex owl_topological_eye
+@quotation
+Retrieve topological eye values stored in the half_eye[] array of
+the current owl data.
 @end quotation
 @end itemize

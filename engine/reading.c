@@ -1,24 +1,23 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   *
- * http://www.gnu.org/software/gnugo/ for more information.      *
- *                                                               *
- * Copyright 1999, 2000, 2001 by the Free Software Foundation.   *
- *                                                               *
- * This program is free software; you can redistribute it and/or *
- * modify it under the terms of the GNU General Public License   *
- * as published by the Free Software Foundation - version 2.     *
- *                                                               *
- * This program is distributed in the hope that it will be       *
- * useful, but WITHOUT ANY WARRANTY; without even the implied    *
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       *
- * PURPOSE.  See the GNU General Public License in file COPYING  *
- * for more details.                                             *
- *                                                               *
- * You should have received a copy of the GNU General Public     *
- * License along with this program; if not, write to the Free    *
- * Software Foundation, Inc., 59 Temple Place - Suite 330,       *
- * Boston, MA 02111, USA.                                        *
-\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       *
+ * http://www.gnu.org/software/gnugo/ for more information.          *
+ *                                                                   *
+ * Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation. *
+ *                                                                   *
+ * This program is free software; you can redistribute it and/or     *
+ * modify it under the terms of the GNU General Public License as    *
+ * published by the Free Software Foundation - version 2             *
+ *                                                                   *
+ * This program is distributed in the hope that it will be useful,   *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of    *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the     *
+ * GNU General Public License in file COPYING for more details.      *
+ *                                                                   *
+ * You should have received a copy of the GNU General Public         *
+ * License along with this program; if not, write to the Free        *
+ * Software Foundation, Inc., 59 Temple Place - Suite 330,           *
+ * Boston, MA 02111, USA.                                            *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "gnugo.h"
 
@@ -5911,7 +5910,7 @@ clear_safe_move_cache(void)
  * For performance reasons, the result of this function is cached.
  */
 
-int 
+int
 safe_move(int move, int color)
 {
   int safe = 0;
@@ -5988,6 +5987,7 @@ get_reading_node_counter()
 
 /* ============ Reading shadow and persistent cache =============== */
 
+/* Draw the reading shadow, for debugging purposes */
 
 void
 draw_reading_shadow()
@@ -6023,6 +6023,8 @@ draw_reading_shadow()
 
   end_draw_board();
 }
+
+/* Draw the active area, for debugging purposes */
 
 static void
 draw_active_area(char p[BOARDMAX])
@@ -6071,9 +6073,7 @@ verify_stored_board(char p[BOARDMAX])
 }
 
 
-/* Remove persistent cache entries which have (m, n) within their
- * active areas.
- */
+/* Remove persistent cache entries which are no longer current. */
 void
 purge_persistent_reading_cache()
 {

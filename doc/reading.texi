@@ -74,24 +74,25 @@ first ko threat). A return code of KO_B means that the player
 to move will have to make the first ko threat.
 
 Many of the reading functions make use of @dfn{null pointers}.
-For example, a call to @code{attack(i, j, &ai, &aj)} will return
-WIN if the string at @code{(i, j)} can be captured. The point of
-attack (in case it is vulnerable) is returned in 
-@code{(ai, aj)}. However many times we do not care about the
-point of attack. In this case, we can substitute a null pointer:
-@code{attack(i, j, NULL, NULL)}.
+For example, a call to @code{attack(str, &apos)} will return WIN
+if the string at @code{str} can be captured. The point of attack
+(in case it is vulnerable) is returned in @code{apos}. However
+many times we do not care about the point of attack. In this
+case, we can substitute a null pointer: @code{attack(str,
+NULL)}.
 
-Depth of reading is controlled by the parameters @code{depth} and
-@code{branch_depth}. The @code{depth} has a default value @code{DEPTH} (in
-@file{liberty.h}), which is set to 14 in the distribution, but it may also be
-set at the command line using the @option{-D} or @option{--depth} option. 
-If @code{depth} is increased, GNU Go will be stronger and slower. GNU Go will
-read moves past depth, but in doing so it makes simplifying assumptions that
-can cause it to miss moves.
+Depth of reading is controlled by the parameters @code{depth}
+and @code{branch_depth}. The @code{depth} has a default value
+@code{DEPTH} (in @file{liberty.h}), which is set to 14 in the
+distribution, but it may also be set at the command line using
+the @option{-D} or @option{--depth} option.  If @code{depth} is
+increased, GNU Go will be stronger and slower. GNU Go will read
+moves past depth, but in doing so it makes simplifying
+assumptions that can cause it to miss moves.
 
-Specifically, when @code{stackp > depth}, GNU Go assumes that as soon
-as the string can get 3 liberties it is alive. This assumption is
-sufficient for reading ladders.
+Specifically, when @code{stackp > depth}, GNU Go assumes that as
+soon as the string can get 3 liberties it is alive. This
+assumption is sufficient for reading ladders.
 
 The @code{branch_depth} is typically set a little below @code{depth}.
 Between @code{branch_depth} and @code{depth}, attacks on strings with
@@ -107,7 +108,7 @@ classified as @code{DEAD}. To resolve such situations, a function
 @code{small_semeai()} (in @file{engine/semeai.c}) looks for such
 pairs of strings and corrects their classification.
 
-The backfill_depth is a similar variable with a default 10. Below
+The @code{backfill_depth} is a similar variable with a default 10. Below
 this depth, GNU Go will try "backfilling" to capture stones.
 For example in this situation:
 
@@ -140,173 +141,43 @@ before continuation).  This parameter may be set using the
 
 @cindex reading.c
 
-A partial list of the functions in @file{reading.c}:
+A partial list of the functions in @file{reading.c} (@pxref{Reading
+Functions} for a fuller list).
 
 @itemize @bullet
+@item @code{int attack(int str, int *move)}
 @findex attack
-@item @code{int attack(int m, int n, int *i, int *j)}:
 @quotation
-The basic function @code{attack(m, n, *i, *j)} determines if the
-string at @code{(m, n)} can be attacked, and if so, @code{(*i, *j)}
-returns the attacking move, unless @code{*i} and @code{*j} are null
-pointers. (Use null pointers if you are interested in the result
-of the attack but not the attacking move itself.) Returns 1 if the
-attack succeeds, otherwise 0. Returns KO_A or KO_B if the result depends on
-ko: returns KO_A if the attack succeeds provided attacker is willing to
-ignore any ko threat. Returns KO_B if attack succeeds provided attacker
-has a ko threat which must be answered.  
+This basic function determines if the string at @code{str} can
+be attacked, and if so, @code{*move} returns the attacking move,
+unless @code{*movei} is a null pointer. (Use null pointers if
+you are interested in the result of the attack but not the
+attacking move itself.) Returns 1 if the attack succeeds,
+otherwise 0. Returns @code{KO_A} or @code{KO_B} if the result depends on ko:
+returns @code{KO_A} if the attack succeeds provided attacker is willing
+to ignore any ko threat. Returns @code{KO_B} if attack succeeds
+provided attacker has a ko threat which must be answered.  
 @end quotation
-
 @findex find_defense
-@item @code{find_defense(int m, int n, int *i, int *j)}:
+@item @code{find_defense(int str, int *move)}
 @quotation 
-The function @code{find_defense(m, n, *i, *j)} attempts to find a move
-that will save the string at @code{(m,n)}. It returns true if such a
-move is found, with @code{(*i, *j)} the location of the saving move (unless
-@code{(*i, *j)} are null pointers). It is not checked that tenuki
-defends, so this may give an erroneous answer if
-@code{!attack(m,n)}.  Returns KO_A or KO_B if the result depends on
-ko. Returns KO_A if the string can be defended provided (color) is
-willing to ignore any ko threat. Returns KO_B if (color) has a ko
-threat which must be answered.  
+Attempts to find a move that will save the string at @code{str}. It
+returns true if such a move is found, with @code{*move} the location
+of the saving move (unless @code{*move} are null pointers). It is not
+checked that tenuki defends, so this may give an erroneous answer if
+@code{!attack(str)}.  Returns @code{KO_A} or @code{KO_B} if the
+result depends on ko. Returns @code{KO_A} if the string can be
+defended provided @code{color} is willing to ignore any ko
+threat. Returns @code{KO_B} if @code{color} has a ko threat which must be
+answered.  
 @end quotation
-
 @findex safe_move
-@item @code{safe_move(int i, int j, int color)} :
+@item @code{safe_move(int str, int color)} :
 @quotation
-The function @code{safe_move(i, j, color)} checks whether a move at
-@code{(i, j)} is illegal or can immediately be captured. If @code{stackp==0}
+The function @code{safe_move(str, color)} checks whether a move at
+@code{str} is illegal or can immediately be captured. If @code{stackp==0}
 the result is cached. If the move only can be captured by a ko, it's
 considered safe. This may or may not be a good convention.
-@end quotation
-@end itemize
-
-The next few functions are essentially special cases of @code{attack}
-and @code{find_defense}. They are coded individually, and are
-static in @file{engine/reading.c}.
-
-@itemize @bullet
-@findex attack2
-@item @code{attack2(int m, int n, int *i, int *j)} :
-@quotation
-Determine whether a string with 2 liberties can
-be captured. Usage is similar to @code{attack}.
-@end quotation
-
-@findex attack3
-@item @code{attack3(int m, int n, int *i, int *j)} :
-@quotation 
-Determine whether a string with 3 liberties can
-be captured. Usage is similar to @code{attack}.
-@end quotation
-
-@findex attack4
-@item @code{attack4(int m, int n, int *i, int *j)} :
-@quotation 
-Determine whether a string with 4 liberties can
-be captured. Usage is similar to @code{attack}.
-@end quotation
-
-@findex defend1
-@item @code{defend1(int m, int n, int *i, int *j)} : 
-@quotation
-Determine whether a string with 1 liberty can be
-rescued. Usage is similar to @code{find_defense}.
-@end quotation
-
-@findex defend2
-@item @code{defend2()} : 
-@quotation
-Determine whether a string with 2 liberties can be
-rescued. Usage is similar to @code{find_defense}.
-@end quotation
-
-@findex defend3
-@item @code{defend3()} : 
-@quotation
-Determine whether a string with 3 liberties can be
-rescued. Usage is similar to @code{find_defense}.
-@end quotation
-
-@findex find_cap2
-@item @code{find_cap2()} : 
-@quotation
-If @code{(m,n)} points to a string with 2 liberties,
-@code{find_cap2(m,n,&i,&j)} looks for a configuration:
-@example
-@group
-
-  O.
-  .*
-
-@end group
-@end example
-
-@noindent
-where @samp{O} is an element of the string in question. It tries the
-move at @samp{*} and returns true this move captures the string, leaving
-@code{(i,j)} pointing to *. 
-@end quotation
-
-@findex break_chain
-@item @code{break_chain(int si, int sj, int *i, int *j, int *k, int *l)}: 
-@quotation
-The function @code{break_chain(si, sj, *i, *j, *k, *l)} returns 1 if
-part of some surrounding string is in atari, and if capturing
-this string results in a live string at @code{(si, sj)}.
-Returns 2 if the capturing string can be taken (as in a snapback),
-or the the saving move depends on ignoring a ko threat;
-Returns 3 if the saving move requires making a ko threat and winning
-the ko. The pointers @code{(i,j)}, if not NULL, are left pointing to
-the appropriate defensive move. The pointers @code{(k,l)}, if not
-NULL, are left pointing to the boundary string which is in atari.
-@end quotation
-
-@findex break_chain2
-@item @code{break_chain2(int si, int sj, int *i, int *j)}: 
-@quotation
-The function @code{break_chain2(si, sj, *i, *j)} returns 1 if there is a
-string in the surrounding chain having exactly two liberties whose
-attack leads to the rescue of @code{(si, sj)}. Then @code{*i, *j} points
-to the location of the attacking move. Returns 2 if the attacking stone
-can be captured, 1 if it cannot.
-@end quotation
-
-@findex snapback
-@item @code{snapback(snapback(int si, int sj, int i, int j, int color)}: 
-@quotation
-The function @code{snapback(si, sj, i, j, color)} considers a move by
-color at @code{(i, j)} and returns true if the move is a snapback.
-Algorithm: It removes dead pieces of the other color, then returns 1 
-if the stone at @code{(si, sj)} has <2 liberties. The purpose of this test 
-is to avoid snapbacks.  The locations @code{(i, j)} and @code{(si,sj)} 
-may be either same or different. Also returns 1 if the move at
-@code{(i, j)} is illegal, with the trace message "ko violation"
-which is the only way I think this could happen. It is not a
-snapback if the capturing stone can be recaptured on its own, e.g.
-@example 
-@group
-
-  XXOOOOO
-  X*XXXXO
-  -------
-
-@end group 
-@end example
-
-Here @samp{O} capturing at @samp{*} is in atari, but this is not a
-snapback. Use with caution: you may want to condition the test on
-the string being captured not being a singleton. For example
-@example
-@group
-
-  XXXOOOOOOOO
-  XO*XXXXXXXO
-  -----------
-
-@end group 
-@end example
-is rejected as a snapback, yet @samp{O} captures more than it gives up.
 @end quotation
 @end itemize
 
@@ -606,26 +477,27 @@ human readable summary of any differences to stderr.
 The return value is the same as for hashdata_compare. This function is
 primarily intended to be used in assert statements.
 @end quotation
-@item @code{void hashdata_recalc(Hash_data *target, Intersection board[MAX_BOARD][MAX_BOARD], int koi, int koj)}
+@item @code{void hashdata_recalc(Hash_data *target, Intersection *p, int kopos)}
 @findex hashdata_recalc
 @quotation
 Calculate the compactboard and the hashvalue in one function.
-They are always used together and it saves us a loop and a function call.
+They are always used together and it saves us a loop and a
+function call.
 @end quotation
-@item @code{void hashdata_set_ko(Hash_data *hd, int i, int j)}
+@item @code{void hashdata_set_ko(Hash_data *hd, int pos)}
 @findex hashdata_set_ko
 @quotation
-Set or remove a ko at (i, j). 
+Set or remove a ko at @code{pos}. 
 @end quotation
 @item @code{void hashdata_remove_ko(Hash_data *hd)}
 @findex hashdata_remove_ko
 @quotation
 Remove any ko from the hash value and hash position.
 @end quotation
-@item @code{void hashdata_invert_stone(Hash_data *hd, int i, int j, int color)}
+@item @code{void hashdata_invert_stone(Hash_data *hd, int pos, int color)}
 @findex hashdata_invert_stone
 @quotation
-Set or remove a stone of COLOR at (I, J) in a Hash_data.
+Set or remove a stone of @code{color} at @code{pos} in a Hash_data.
 @end quotation
 @item @code{void read_result_dump(Read_result *result, FILE *outfile)}
 @findex read_result_dump
@@ -681,20 +553,6 @@ this position with the given hash value.
 @quotation
 Dump an ASCII representation of the contents of a Hashtable onto
 the FILE outfile. 
-@end quotation
-@item @code{Read_result * hashnode_search(Hashnode *node, int routine, int i, int j)}
-@findex hashnode_search
-@quotation
-Search the result list in a hash node for a particular result. This
-result is from @code{routine} (the calling function) at @code{(i, j)} and
-reading depth stackp. All these numbers must be unsigned, and 0<= x <= 255).
-@end quotation
-@item @code{Read_result * hashnode_new_result(Hashtable *table, Hashnode *node, int routine, int i, int j)}
-@findex hashnode_new_result
-@quotation
-Enter a new Read_result into a Hashnode. We already have the node, now we
-just want to enter the result itself. We will fill in the result itself
-later, so we only need the routine number for now.
 @end quotation
 @end itemize
 
@@ -834,20 +692,21 @@ This function is like @code{trymove()} except that
 it does not require legality of the move in question.
 
 The static reading functions, and the global functions @code{do_attack}
-and @code{do_find_defense} have arguments @code{komaster}, @code{kom_i} 
-and @code{kom_j}. These mediate ko captures to prevent the occurrence of
-infinite loops.
+and @code{do_find_defense} have arguments @code{komaster},
+@code{kom_pos}. These mediate ko captures to prevent the
+occurrence of infinite loops.
 
-Normally @code{komaster} is EMPTY but it can also be BLACK, WHITE or
-GRAY. The komaster is set to COLOR when COLOR makes a conditional ko
-capture. In this case @code{kom_i, kom_j} is set to the location of the
-captured ko stone.
+Normally @code{komaster} is @code{EMPTY} but it can also be
+@code{BLACK}, @code{WHITE} or @code{GRAY}. The komaster is set to @code{color}
+when @code{color} makes a conditional ko capture. In this case
+@code{kom_pos} is set to the location of the captured ko
+stone.
 
 If the opponent is komaster, the reading functions will not try to
-take the ko at @code{kom_i, kom_j}. Also, the komaster is normally not
+take the ko at @code{kom_pos}. Also, the komaster is normally not
 allowed to take another ko. The exception is a nested ko, characterized
 by the condition that the captured ko stone is at distance 1 both
-vertically and horizontally from @code{(kom_i, kom_j)}, which is the location
+vertically and horizontally from @code{kom_pos}, which is the location
 of the last stone taken by the komaster. Thus in this situation:
 
 @example
@@ -859,7 +718,7 @@ of the last stone taken by the komaster. Thus in this situation:
 
 @end example
 
-Here if @samp{m} is the location of @code{(kom_i,kom_j)}, then the move at 
+Here if @samp{m} is the location of @code{kom_pos}, then the move at 
 @samp{*} is allowed.
 
 The rationale behind this rule is that in the case where there are
@@ -872,7 +731,7 @@ If the komaster's opponent takes a ko, then both players have taken
 one ko. In this case `komaster' is set to GRAY and after this further
 ko captures are not allowed.
 
-If the ko at @code{(kom_i, kom_j)} is filled, then the komaster
+If the ko at @code{kom_pos} is filled, then the komaster
 reverts to EMPTY.
 
 The komaster scheme may be summarized as follows. It is assumed
@@ -883,24 +742,24 @@ that @samp{O} is about to move.
 @itemize @minus
 @item Unconditional ko capture is allowed. Komaster remains EMPTY.
 @item Conditional ko capture is allowed. Komaster is set to @samp{O} and
-@code{(kom_i, kom_j)} to the location of the ko, where a stone was
+@code{kom_pos} to the location of the ko, where a stone was
 just removed.
 @end itemize
 @item Komaster is O:
 @itemize @minus 
 @item Only nested ko captures are allowed.
-@item If komaster fill the ko at @code{(kom_i,kom_j)} then komaster reverts to
+@item If komaster fill the ko at @code{kom_pos} then komaster reverts to
 EMPTY.
 @end itemize
 @item Komaster is X:
 @itemize @minus
 @item
-Play at @code{(kom_i,kom_j)} is not allowed. Any other ko capture
+Play at @code{kom_pos} is not allowed. Any other ko capture
 is allowed. If @samp{O} takes another ko, komaster becomes GRAY.
 @end itemize
 @item Komaster is GRAY:
 @itemize @minus
-@item Ko captures are not allowed. If the ko at @code{(kom_i,kom_j)} is
+@item Ko captures are not allowed. If the ko at @code{kom_pos} is
 filled then the komaster reverts to EMPTY.
 @end itemize
 @end itemize
@@ -965,7 +824,7 @@ The board looks like this:
 @group
 
  8 . . . . . . . .         komaster: BLACK
- 7 . . O . . . . .         (kom_i, kom_j): A2
+ 7 . . O . . . . .         kom_pos: A2
  6 . . O . . . . .
  5 O O O . . . . .
  4 O X O O . . . .
@@ -984,7 +843,7 @@ ko recaptures are not allowed.
 @group
 
  8 . . . . . . . .         komaster: GRAY
- 7 . . O . . . . .         (kom_i, kom_j): B4
+ 7 . . O . . . . .         kom_pos: B4
  6 . . O . . . . .
  5 O O O . . . . .
  4 O . O O . . . .
@@ -1076,7 +935,7 @@ that @samp{O} is the player about to move.
 @itemize @minus
 @item Unconditional ko capture is allowed. Komaster remains EMPTY.
 @item Conditional ko capture is allowed. Komaster is set to O and
-@code{(kom_i, kom_j)} to the location of the ko, where a stone was
+@code{kom_pos} to the location of the ko, where a stone was
 just removed.
 @end itemize
 @item Komaster is O:
@@ -1088,7 +947,7 @@ just removed.
 @itemize @minus
 @item Conditional ko capture is not allowed.
 @item Unconditional ko capture is allowed except for a move at 
-@code{(kom_i, kom_j)}. Komaster parameters unchanged.
+@code{kom_pos}. Komaster parameters unchanged.
 @end itemize
 @end itemize
 
@@ -1099,21 +958,21 @@ just removed.
 @itemize @minus
 @item Unconditional ko capture is allowed. Komaster remains EMPTY.
 @item Conditional ko capture is allowed. Komaster is set to @samp{O} and
-@code{(kom_i, kom_j)} to the location of the ko, where a stone was
+@code{kom_pos} to the location of the ko, where a stone was
 just removed.
 @end itemize
 @item Komaster is @samp{O}:
 @itemize @minus
 @item Ko capture (both kinds) is allowed only if after playing the move,
-@code{is_ko(kom_i, kom_j, X)} returns false. In that case, 
-@code{(kom_i, kom_j)} is updated to the new ko position, i.e. the stone
+@code{is_ko(kom_pos, X)} returns false. In that case, 
+@code{kom_pos} is updated to the new ko position, i.e. the stone
 captured by this move.
 @end itemize
-@item Komaster is X:
+@item Komaster is @samp{X}:
 @itemize @minus
 @item Conditional ko capture is not allowed.
 @item Unconditional ko capture is allowed except for a move at 
-@code{(kom_i, kom_j)}. Komaster parameters unchanged.
+@code{kom_pos}. Komaster parameters unchanged.
 @end itemize
 @end itemize
 
@@ -1173,115 +1032,117 @@ in contrast with dragons, which are ignored during tactical reading.
 
 Here we list the publically callable functions in @file{reading.c}.
 The return codes of these functions are explained elsewhere
-(@pxref{Reading Basics}).
-
+(@pxref{Reading Basics}). To briefly repeat this, a reading
+function return WIN if the attack succeeds unconditionally, 0 if it doesn't.
+It returns KO_A or KO_B if the result depends on ko: 
 @itemize @bullet
-@item @code{attack(si, sj, *i, *j)}
-@findex attack
-@quotation
-Determines if the string at (m, n) can be captured, and if so, (*i, *j)
-returns the attacking move, unless (*i, *j) are null pointers. Use null
-pointers if you are interested in the result of the attack but not the
-attacking move itself. The string is assumed to be alive if it can
-get five liberties---fewer if @code{stackp} is large.
-@itemize @minus
-@item Returns 1 if the attack succeeds unconditionally
-@item Returns 0 if the attack fails unconditionally
-@item Returns 2 if the attack succeeds provided attacker is willing to
+@item Returns KO_A if the attack succeeds provided attacker is willing to
 ignore any ko threat (the attacker makes the first ko capture).
-@item Returns 3 if attack succeeds provided attacker has a ko threat
+@item Returns KO_B if attack succeeds provided attacker has a ko threat
 which must be answered (the defender makes the first ko capture).
 @end itemize
+@itemize @bullet
+@item @code{int attack(int str, int *move)}
+@findex attack
+@quotation
+Determines if the string at (str) can be captured, and if so, (*move) returns
+the attacking move, unless (move) is a null pointer. Use a null pointer if you
+are interested in the result of the attack but not the attacking move itself.
 @end quotation
-@item @code{find_defense(m, n, *i, *j)}
+@item @code{int find_defense(int str, int *move)}
 @findex find_defense
 @quotation
-Attempts to find a move that will save the string at @code{(m, n)}. 
-It returns 1 if such a move is found, with @code{(*i, *j)} the location of the
-saving move, unless @code{(*i, *j)} are null pointers. It is not checked that
-tenuki defends, so this may give an erroneous answer if @code{!attack(m,n)}.
-Returns 2 or 3 if the result depends on ko. Returns 2 if the string can be
-defended provided the defender is willing to ignore any ko threat. Returns 3
-if the defender wins by having a ko threat which must be answered.
+Attempts to find a move that will save the string at (str). It returns WIN if
+such a move is found, with (*move) the location of the saving move, unless
+(move) is a null pointer. It is not checked that tenuki defends, so this may
+give an erroneous answer if !attack(str).
 @end quotation
+@item @code{int attack_and_defend(int str, int *attack_code, int *attack_point, int *defend_code, int *defense_point)}
 @findex attack_and_defend
-@item @code{int attack_and_defend(int si, int sj, int *attack_code, int *attacki, int *attackj,int *defend_code, int *defendi, int *defendj)}
 @quotation
-This is a frontend to the @code{attack()} and @code{find_defense()} which
-guarantees a consistent result. If a string cannot be attacked, 0 is returned
-and acode is 0. If a string can be attacked and defended, WIN is returned,
-acode and dcode are both non-zero, and @code{(ai, aj)}, @code{(di, dj)} both
-point to vertices on the board. If a string can be attacked but not defended,
-0 is again returned, acode is non-zero, dcode is 0, and (ai, aj) point to a
-vertex on the board.  This function in particular guarantees that if there is
-an attack, it will never return @code{(di, dj) = (-1, -1)}, which means the
-string is safe without defense. Separate calls to @code{attack()} and
-@code{find_defense()} may occasionally give this result, due to irregularities
-introduced by the persistent reading cache.
+This is a frontend to the @code{attack()} and @code{find_defense()} functions,
+which guarantees a consistent result. If a string cannot be attacked, 0 is
+returned and acode is 0. If a string can be attacked and defended, @code{WIN}
+is returned, acode and dcode are both non-zero, and (attack_point),
+(defense_point) both point to vertices on the board. If a string can be
+attacked but not defended, 0 is again returned, acode is non-zero, dcode is 0,
+and (attack_point) points to a vertex on the board. This function in
+particular guarantees that if there is an attack, it will never return
+@code{defense_point}=@code{NO_MOVE}, which means the string is safe without
+defense. Separate calls to @code{attack()} and @code{find_defense()} may
+occasionally give this result, due to irregularities introduced by the
+persistent reading cache.
 @end quotation
-@item @code{attack_either(ai, aj, bi, bj)}
+@item @code{int attack_either(int astr, int bstr)}
 @findex attack_either
 @quotation
-returns true if there is a move which guarantees that at least one of the
-strings @code{(ai, aj)} and @code{(bi, bj)} can be captured. A typical
-application for this is in connection patterns, where after a cut it suffices
-to capture one of the cutting stones. The current implementation looks
-only for uncoordinated attacks and is not even sufficient to find a
-double atari.
+Returns true if there is a move which guarantees that at least one of the
+strings (astr) and (bstr) can be captured. A typical application for this is
+in connection patterns, where after a cut it suffices to capture one of the
+cutting stones. The current implementation only looks for uncoordinated
+attacks. This is insufficient to find double ataris or 
+moves such as @samp{a} in positions like
+@example
+       XOOOOOOOX
+       XOXXOXXOX
+       XX..a..XX
+       ---------
+@end example
+where neither of the threatened X stones can be captured outright.
+Still either can be captured by a move down to @samp{a}.
 @end quotation
-@item @code{defend_both(ai, aj, bi, bj)}
+@item @code{int defend_both(int astr, int bstr)}
+@findex defend_both
 @quotation
-Returns true if both the strings @code{(ai, aj)} and @code{(bi, bj)} can be
-defended simultaneously or if there is no attack.  A typical application for
-this is in connection patterns, where after a cut it's necessary to defend
-both cutting stones.
+Returns true if both the strings @code{astr} and @code{bstr} can be defended
+simultaneously or if there is no attack. A typical application for this is in
+connection patterns, where after a cut it's necessary to defend both cutting
+stones. The current implementation only makes halfhearted attempts to find
+coordinated defense moves. A proper implementation would require some serious
+reading.
 @end quotation
-@item @code{int break_through(int ai, int aj, int bi, int bj, int ci, int cj)}
+@item @code{int break_through(int apos, int bpos, int cpos)}
 @findex break_through
 @quotation
-Returns 1 if a position can succesfully be broken through and 2 if it can be
-cut. The position is assumed to have the shape (the colors may be reversed)
+returns WIN if a position can succesfully be broken through and CUT if it can
+be cut. The position is assumed to have the shape (the colors may be reversed)
 @example
-
- .O.       dbe
- OXO       aFc
-
+.O.       dbe
+OXO       aFc
 @end example
-It is @samp{X} to move and try to capture at least one of @samp{a},
-@samp{b}, and @samp{c}. If this succeeds, @samp{X} is said to have broken
-through the position.  Otherwise @samp{X} may try to cut through the position,
-which means keeping @samp{F} safe and getting a tactically safe string at
-either @samp{d} or @samp{e}. @strong{Important}: @samp{a}, @samp{b}, and
-@samp{c} must be given in the correct order.
+It is X to move and try to capture at least one of a, b, and c. If
+this succeeds, X is said to have broken through the position.
+Otherwise X may try to cut through the position, which means
+keeping F safe and getting a tactically safe string at either d or
+e. @strong{Important}: a, b, and c must be given in the correct order.
 @end quotation
-@findex atari_atari
-@item @code{int atari_atari(int color, int *i, int *j, int save_verbose)}
+@item @code{int attack_threats(int str, int max_points, int moves[], int codes[])}
+@findex attack_threats
 @quotation
-Looks for a series of ataris on strings of the other color culminating in the
-capture of a string which is thought to be invulnerable by the reading
-code. Such a move can be missed since it may be that each string involved
-individually can be rescued, but nevertheless one of them can be caught. The
-simplest example is a double atari. The return value is the size of the
-smallest opponent worm. A danger with this scheme is that the first atari
-tried might be irrelevant to the actual combination. To avoid this, once we've
-found a combination, we mark the first move as forbidden, then try again. If
-no combination of the same size or larger turns up, then the first move was
-indeed essential. Returns the size of the smallest of the worms under attack.
+Return up to max_threats threats to capture the string at str. If the string
+is directly attackable the number of threats is reported to be 0. NOTE: You
+can call attack_threats with moves[] and codes[] already partly filled in. So
+if you want to get the threats from scratch, you have to set them to 0
+yourself.
 @end quotation
-@findex atari_atari_confirm_safety
-@item @code{int atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j, int minsize)}
+@item @code{int safe_move(int move, int color)}
+@findex safe_move
 @quotation
-Uses the @code{atari_atari} code to detect blunders.  Ask whether there
-appears any combination attack which would capture at least minsize stones
-after playing at @code{(ti, tj)}. If this happens, @code{(*i, *j)} points to a
-defensive move which prevents this blunder.
+Checks whether a move at (move) is illegal or can immediately be captured. If
+@code{stackp==0} the result is cached. If the move only can be captured by a
+ko, it's considered safe.
 @end quotation
-@findex atari_atari_try_combination
-@item @code{int atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)}
+@item @code{void purge_persistent_reading_cache()}
+@findex purge_persistent_reading_cache
 @quotation
-Ask the atari_atari code if after color plays at (ai,aj)
-and other plays at (bi,bj) there appears any combination
-attack. Returns the size of the combination.
+Remove persistent cache entries which are no longer current.
+@end quotation
+@item @code{void reading_hotspots(float values[BOARDMAX])}
+@findex reading_hotspots
+@quotation
+Based on the entries in the reading cache and their nodes field,
+compute where the relatively most expensive tactical reading is
+going on.
 @end quotation
 @end itemize
 

@@ -1,43 +1,41 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   *
- * http://www.gnu.org/software/gnugo/ for more information.      *
- *                                                               *
- * Copyright 1999, 2000, 2001 by the Free Software Foundation.   *
- *                                                               *
- * This program is free software; you can redistribute it and/or *
- * modify it under the terms of the GNU General Public License   *
- * as published by the Free Software Foundation - version 2.     *
- *                                                               *
- * This program is distributed in the hope that it will be       *
- * useful, but WITHOUT ANY WARRANTY; without even the implied    *
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       *
- * PURPOSE.  See the GNU General Public License in file COPYING  *
- * for more details.                                             *
- *                                                               *
- * You should have received a copy of the GNU General Public     *
- * License along with this program; if not, write to the Free    *
- * Software Foundation, Inc., 59 Temple Place - Suite 330,       *
- * Boston, MA 02111, USA.                                        *
-\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       *
+ * http://www.gnu.org/software/gnugo/ for more information.          *
+ *                                                                   *
+ * Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation. *
+ *                                                                   *
+ * This program is free software; you can redistribute it and/or     *
+ * modify it under the terms of the GNU General Public License as    *
+ * published by the Free Software Foundation - version 2             *
+ *                                                                   *
+ * This program is distributed in the hope that it will be useful,   *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of    *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the     *
+ * GNU General Public License in file COPYING for more details.      *
+ *                                                                   *
+ * You should have received a copy of the GNU General Public         *
+ * License along with this program; if not, write to the Free        *
+ * Software Foundation, Inc., 59 Temple Place - Suite 330,           *
+ * Boston, MA 02111, USA.                                            *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifndef _CLOCK_H_
 #define _CLOCK_H_
 
-
-/* ============================================================= */
-/*                        Time handling                          */
-/*                          for GNU Go                           */
-/*                         __       __                           */
-/*                        <  >     <  >                          */
-/*                      +--++-------++--+                        */
-/*                      |  .'11 12 1'.  |                        */
-/*                      |  :10 \    2:  |                        */
-/*                      |  :9   @-> 3:  |                        */
-/*                      |  :8       4;  |                        */
-/*                      |  '..7 6 5..'  |                        */
-/*                      |_______________|                        */
-/*                                                               */
-/* ============================================================= */
+/* ============================================================= *\
+ *                        Time handling                          *
+ *                          for GNU Go                           *
+ *                         __       __                           *
+ *                        <  >     <  >                          *
+ *                      +--++-------++--+                        *
+ *                      |  .'11 12 1'.  |                        *
+ *                      |  :10 \    2:  |                        *
+ *                      |  :9   @-> 3:  |                        *
+ *                      |  :8       4;  |                        *
+ *                      |  '..7 6 5..'  |                        *
+ *                      |_______________|                        *
+ *                                                               *
+\* ============================================================= */
 
 #include <stdio.h>
 #ifdef HAVE_CONFIG_H

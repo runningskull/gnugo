@@ -61,7 +61,7 @@ different aspects of GNU Go's internals.
 @comment node-name,    next,     previous,     up
 @section Copyrights
 
-Copyright 1999, 2000, 2001 by the Free Software Foundation except for
+Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation except for
 the files @file{gmp.c} and @file{gmp.h}, which are copyrighted by
 Bill Shubert (@email{wms@@igoweb.org}).
 
