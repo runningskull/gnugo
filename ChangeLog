@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- make `mkpat' detect duplicate pattern names
+- duplicate pattern names renamed
+- reduce DFA_MAX_MATCHED 20 times 
+- calculate actual maximum dfa with new dfa_calculate_max_matched_patterns()
 - remove unused configure option --experimental-semeai
 - add missing output to --options
 - new static function special_rescue4() called from defend2() in reading.c

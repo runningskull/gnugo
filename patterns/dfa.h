@@ -40,7 +40,7 @@
 
 
 /* Maximum pattern matched at one positions. */
-#define DFA_MAX_MATCHED		(8 * 500)
+#define DFA_MAX_MATCHED		(8 * 24)
 
 /* Conversion macro. */
 #define EXPECTED_COLOR(player_c, position_c)	(convert[player_c][position_c])

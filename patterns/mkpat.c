@@ -3205,6 +3205,8 @@ main(int argc, char *argv[])
 	}
 
 	if (command == 1) { /* Pattern `name' */
+	  int k;
+
 	  if (!discard_pattern) {
 	    convert_attribute_labels_to_offsets();
 	    patno++;
@@ -3218,6 +3220,18 @@ main(int argc, char *argv[])
 		    current_file, current_line_number);
 	    command_data[MAXNAME - 1] = 0;
 	  }
+ 
+          /* Somewhat inefficient, but doesn't take any real time
+           * given current database sizes.
+           */
+          for (k = 0; k < patno; k++) {
+            if (strcmp(pattern_names[k], command_data) == 0) {
+              fprintf(stderr, "%s(%d) : Warning : duplicate pattern name `%s'\n",
+                      current_file, current_line_number, command_data);
+              break;
+            }
+          }
+ 
 	  strcpy(pattern_names[patno], command_data);
 
 	  transformation_hint = find_transformation_hint(pattern_names[patno]);
@@ -3484,7 +3498,7 @@ main(int argc, char *argv[])
       print_c_dfa(output_FILE, prefix, &dfa);
       fprintf(stderr, "---------------------------\n");
 
-      if (DFA_MAX_MATCHED/8 < patno)
+      if (DFA_MAX_MATCHED/8 < dfa_calculate_max_matched_patterns(&dfa))
         fprintf(stderr, "Warning: Increase DFA_MAX_MATCHED in 'dfa.h'.\n");
 
       kill_dfa(&dfa);

@@ -884,6 +884,46 @@ dfa_shuffle(dfa_t *pdfa)
 }
 
 
+/* Calculate the maximal number of patterns matched at one point for
+ * one transformation.  Multiplying this number by 8 gives an upper
+ * bound for the total number of matched patterns for all
+ * transformation.  The DFA must be shuffled before calling this
+ * function (to ensure that all jumps go forward).
+ */
+int
+dfa_calculate_max_matched_patterns(dfa_t *pdfa)
+{
+  int total_max = 0;
+  int *state_max = calloc(pdfa->last_state + 1, sizeof(int));
+  int k;
+
+  for (k = 1; k <= pdfa->last_state; k++) {
+    int i;
+
+    /* Increment maximal number of matched patterns for each pattern
+     * matched at state `k'.
+     */
+    for (i = pdfa->states[k].att; i; i = pdfa->indexes[i].next)
+      state_max[k]++;
+
+    if (total_max < state_max[k])
+      total_max = state_max[k];
+
+    for (i = 0; i < 4; i++) {
+      int next = pdfa->states[k].next[i];
+      if (next != 0) {
+       assert(next > k);
+
+       if (state_max[next] < state_max[k])
+         state_max[next] = state_max[k];
+      }
+    }
+  }
+
+  return total_max;
+}
+
+
 /*
  * Merges cached dfas into the master DFA
  */

@@ -95,6 +95,7 @@ void save_dfa(const char *f_name, dfa_t *pdfa);
 dfa_t *load_dfa(const char *f_path, const char *f_name, dfa_t **ppdfa);
 void dfa_finalize(dfa_t *pdfa);
 void dfa_shuffle(dfa_t *pdfa);
+int dfa_calculate_max_matched_patterns(dfa_t *pdfa);
 int dfa_minmax_delta(dfa_t *pdfa, int next_index, int isMin);
 void dump_dfa(FILE *f, dfa_t *pdfa);
 
