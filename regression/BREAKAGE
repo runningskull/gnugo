@@ -1,3 +1,56 @@
+============================= 3.3.18 pre 2 ===============================
+
+./regress.sh . reading.tst 
+180 unexpected FAIL: Correct '2 Q3', got '0'
+./regress.sh . owl.tst 
+208 unexpected PASS!
+./regress.sh . atari_atari.tst 
+22 unexpected PASS!
+./regress.sh . endgame.tst 
+810 unexpected FAIL: Correct 'F5|F4', got 'L9'
+820 unexpected FAIL: Correct 'H4|M10|K19', got 'P6'
+./regress.sh . neurogo.tst 
+14 unexpected PASS!
+./regress.sh . trevorb.tst 
+170 unexpected PASS!
+./regress.sh . nicklas4.tst 
+1103 unexpected FAIL: Correct 'C2|C3', got 'D2'
+./regress.sh . trevor.tst 
+310 unexpected PASS!
+./regress.sh . trevorc.tst 
+1120 unexpected PASS!
+1121 unexpected PASS!
+1130 unexpected PASS!
+./regress.sh . global.tst 
+3 unexpected PASS!
+./regress.sh . semeai.tst 
+39 unexpected FAIL: Correct '!ALIVE DEAD J4', got 'ALIVE DEAD J4'
+40 unexpected FAIL: Correct 'ALIVE DEAD (J4|H4)', got 'ALIVE ALIVE J4'
+./regress.sh . owl1.tst 
+298 unexpected FAIL: Correct '2 Q3', got '1 Q3'
+299 unexpected FAIL: Correct '1 Q1', got '0'
+./regress.sh . nngs3.tst 
+400 unexpected FAIL: Correct 'N13', got 'Q15'
+980 unexpected PASS!
+./regress.sh . nngs4.tst 
+370 unexpected PASS!
+480 unexpected FAIL: Correct 'R16', got 'Q17'
+485 unexpected FAIL: Correct 'D17', got 'C16'
+487 unexpected FAIL: Correct 'P12', got 'C7'
+490 unexpected FAIL: Correct 'M14|N17|M16', got 'J15'
+510 unexpected FAIL: Correct '0', got '1 S9'
+530 unexpected FAIL: Correct 'Q2', got 'D6'
+540 unexpected FAIL: Correct 'Q2', got 'S4'
+./regress.sh . ninestones.tst 
+590 unexpected FAIL: Correct 'P4', got 'E6'
+600 unexpected FAIL: Correct 'P5', got 'B5'
+610 unexpected FAIL: Correct 'P11|O9|O7|O4', got 'B7'
+615 unexpected FAIL: Correct 'K16', got 'E18'
+620 unexpected FAIL: Correct 'G7|C8|F8', got 'N12'
+630 unexpected FAIL: Correct 'F5|H7', got 'H6'
+./regress.sh . gunnar.tst 
+19 unexpected PASS!
+
 ============================= 3.3.18 pre 1 ===============================
 
 ./regress.sh . atari_atari.tst 

@@ -47,7 +47,7 @@ loadsgf games/trevor/auto/b08.sgf 32
 
 loadsgf games/trevor/auto/b08.sgf 94
 170 gg_genmove white
-#? [N11]*
+#? [N11]
 
 
 

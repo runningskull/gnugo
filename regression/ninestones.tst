@@ -185,25 +185,25 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 300
 # collection of bad tenukis
 loadsgf games/ninestones/ninestones1.sgf 18
 590 gg_genmove black
-#? [P4]
+#? [P4]*
 
 loadsgf games/ninestones/ninestones1.sgf 20
 600 gg_genmove black
-#? [P5]
+#? [P5]*
 
 loadsgf games/ninestones/ninestones1.sgf 34
 610 gg_genmove black
-#? [P11|O9|O7|O4]
+#? [P11|O9|O7|O4]*
 
 loadsgf games/ninestones/ninestones1.sgf 44
 615 gg_genmove black
-#? [K16]
+#? [K16]*
 
 loadsgf games/ninestones/ninestones1.sgf 76
 620 gg_genmove black
-#? [G7|C8|F8]
+#? [G7|C8|F8]*
 
 loadsgf games/ninestones/ninestones1.sgf 90
 630 gg_genmove black
-#? [F5|H7]
+#? [F5|H7]*
 

@@ -636,16 +636,16 @@ loadsgf games/trevor/auto/c62.sgf 110
 
 loadsgf games/trevor/auto/c62.sgf 118
 1120 gg_genmove white
-#? [A3]*
+#? [A3]
 
 loadsgf games/trevor/auto/c62.sgf 118
 1121 gg_genmove black
-#? [A3]*
+#? [A3]
 
 
 loadsgf games/trevor/auto/c62.sgf 120
 1130 gg_genmove white
-#? [A3]*
+#? [A3]
 
 
 loadsgf games/trevor/auto/c62.sgf 130

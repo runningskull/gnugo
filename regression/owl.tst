@@ -765,7 +765,7 @@ loadsgf games/owl26.sgf 138
 
 loadsgf games/incident248.sgf 228
 208 owl_attack J2
-#? [3 A2]*
+#? [3 A2]
 209 owl_defend J2
 #? [1 (A2|F1|J1|A1|B1)]
 

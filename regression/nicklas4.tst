@@ -33,7 +33,7 @@ loadsgf games/nicklas/nicklas11.sgf 56
 
 loadsgf games/nicklas/nicklas11.sgf 172
 1103 gg_genmove black
-#? [C2|C3]
+#? [C2|C3]*
 
 # It seems that GNU Go makes a logical mistake here: After seeing that
 # R9 can be defended with S7, and that Q8 can be defended with S7, I

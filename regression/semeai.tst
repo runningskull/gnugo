@@ -212,10 +212,10 @@ loadsgf games/semeai/semeai11.sgf
 # See also global:3.
 loadsgf golois/Aya991113-13.sgf
 39 owl_analyze_semeai R12 H9
-#? [!ALIVE DEAD J4]
+#? [!ALIVE DEAD J4]*
 
 40 owl_analyze_semeai H9 R12
-#? [ALIVE DEAD (J4|H4)]
+#? [ALIVE DEAD (J4|H4)]*
 
 ########### end of semeai tests #################
 

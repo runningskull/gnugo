@@ -146,7 +146,7 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 110
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 120
 370 owl_defend L18
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 128
 380 gg_genmove black
@@ -191,23 +191,23 @@ loadsgf games/nngs/looknglass-ggl-200302271041.sgf 99
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 6
 480 gg_genmove black 2
-#? [R16]
+#? [R16]*
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 12
 485 gg_genmove black 3
-#? [D17]
+#? [D17]*
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 28
 487 gg_genmove black
-#? [P12]
+#? [P12]*
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 38
 490 gg_genmove black
-#? [M14|N17|M16]
+#? [M14|N17|M16]*
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 52
 510 owl_attack R8
-#? [0]
+#? [0]*
 
 #do something to help the C16 group
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 54
@@ -216,11 +216,11 @@ loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 54
 
 loadsgf games/nngs/gnugo-3.3.17-ylamaki-200303262305.sgf 9
 530 gg_genmove white
-#? [Q2]
+#? [Q2]*
 
 loadsgf games/nngs/gnugo-3.3.17-ylamaki-200303262305.sgf 11
 540 gg_genmove white
-#? [Q2]
+#? [Q2]*
 
 
 ############ End of Tests #################

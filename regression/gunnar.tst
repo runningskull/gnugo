@@ -102,7 +102,7 @@ loadsgf games/gunnar/gunnar4.sgf 180
 # No reason to play ko with L3.
 loadsgf games/gunnar/gunnar4.sgf 198
 19 gg_genmove white
-#? [L4]*
+#? [L4]
 
 # H14 and J14 are blunders.
 loadsgf games/gunnar/gunnar5.sgf 198

@@ -323,7 +323,7 @@ black G3
 #SEVERITY=10
 loadsgf games/trevor/trevor_31.sgf
 310 gg_genmove black
-#? [A8]*
+#? [A8]
 
 
 loadsgf games/trevor/trevor_32.sgf
