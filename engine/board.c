@@ -596,30 +596,32 @@ tryko(int pos, int color, const char *message)
 static int 
 do_trymove(int pos, int color, int ignore_ko)
 {
-  /* 1. The move must be inside the board and the color must be BLACK
-   * or WHITE.
-   */
-  ASSERT_ON_BOARD1(pos);
+  /* 1. The color must be BLACK or WHITE. */
   gg_assert(color == BLACK || color == WHITE);
  
-  /* Update the reading tree shadow. */
-  shadow[pos] = 1;
+  if (pos != PASS_MOVE) {
+    /* 2. Unless pass, the move must be inside the board. */
+    ASSERT_ON_BOARD1(pos);
+    
+    /* Update the reading tree shadow. */
+    shadow[pos] = 1;
 
-  /* 2. The location must be empty. */
-  if (board[pos] != EMPTY)
-    return 0;
-
-  /* 3. The location must not be the ko point, unless ignore_ko == 1. */
-  if (!ignore_ko && pos == board_ko_pos) {
-    if (board[WEST(pos)] == OTHER_COLOR(color)
-	|| board[EAST(pos)] == OTHER_COLOR(color)) {
+    /* 3. The location must be empty. */
+    if (board[pos] != EMPTY)
       return 0;
+    
+    /* 4. The location must not be the ko point, unless ignore_ko == 1. */
+    if (!ignore_ko && pos == board_ko_pos) {
+      if (board[WEST(pos)] == OTHER_COLOR(color)
+	  || board[EAST(pos)] == OTHER_COLOR(color)) {
+	return 0;
+      }
     }
-  }
 
-  /* 4. Test for suicide. */
-  if (is_suicide(pos, color))
-    return 0;
+    /* 5. Test for suicide. */
+    if (is_suicide(pos, color))
+      return 0;
+  }
   
   /* Check for stack overflow. */
   if (stackp >= MAXSTACK-2) {
@@ -666,17 +668,18 @@ do_trymove(int pos, int color, int ignore_ko)
   PUSH_VALUE(board_ko_pos);
   memcpy(&board_hash_stack[stackp], &board_hash, sizeof(board_hash));
 
-  if (board_ko_pos != NO_MOVE) {
+  if (board_ko_pos != NO_MOVE)
     hashdata_invert_ko(&board_hash, board_ko_pos);
-  }
+
   board_ko_pos = NO_MOVE;
   
-  PUSH_VALUE(black_captured);
-  PUSH_VALUE(white_captured);
+  stackp++;
 
-  ++stackp;
-
-  do_play_move(pos, color);
+  if (pos != PASS_MOVE) {
+    PUSH_VALUE(black_captured);
+    PUSH_VALUE(white_captured);
+    do_play_move(pos, color);
+  }
 
   return 1;
 }
@@ -697,14 +700,20 @@ popgo()
 
   if (sgf_dumptree) {
     char buf[100];
+    int is_tryko = 0;
+    char *sgf_comment;
+    
+    if (sgfGetCharProperty(sgf_dumptree->lastnode, "C", &sgf_comment)
+	&& strncmp(sgf_comment, "tryko:", 6) == 0)
+      is_tryko = 1;
+    
     gg_snprintf(buf, 100, "(next variation: %d)", count_variations);
     sgftreeAddComment(sgf_dumptree, buf);
     sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent;
-    /* After tryko() we need to undo two pass nodes too. Since we have
-     * no other way to identify ko moves, we skip all pass nodes.
-     */
-    while (is_pass_node(sgf_dumptree->lastnode, board_size))
-      sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent;
+
+    /* After tryko() we need to undo two pass nodes too. */
+    if (is_tryko)
+      sgf_dumptree->lastnode = sgf_dumptree->lastnode->parent->parent;
   }
 }
 

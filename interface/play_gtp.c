@@ -1160,7 +1160,7 @@ gtp_trymove(char *s)
 {
   int i, j;
   int color;
-  if (!gtp_decode_move(s, &color, &i, &j) || POS(i, j) == PASS_MOVE)
+  if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure("invalid color or coordinate");
 
   if (!trymove(POS(i, j), color, "gtp_trymove", NO_MOVE))
