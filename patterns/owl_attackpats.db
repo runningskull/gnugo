@@ -833,7 +833,7 @@ O.*.
 Pattern A232
 # db added (3.1.7)
 
-?OO?
+?OO?            Jump down to block
 X..?
 .*..
 ....
@@ -848,6 +848,19 @@ Xab?
 ----
 
 ; oplay_attack(*,a,b,c,c)
+
+
+Pattern A333
+# db added (3.1.10)
+
+OO.?            Jump and block
+....
+X*.?
+...?
+----
+
+:8,-,value(75)
+
 
 
 #########################################################

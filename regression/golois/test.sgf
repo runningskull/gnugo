@@ -1,0 +1,4 @@
+(;N[test.gob]ID[test.gob]BS[0]WS[0]GM[1]FF[3]SZ[13]
+AB[gb][ic][hd][fe][gf][fg][hg]
+AW[lb][lc][dd][jd][ld][le][hf][if][lf][gg][lg][eh][lh][dj][jj][lj][kk][ll]
+;C[move(gh):capture(gg) move(gh):connect(hg,gf) move(gh,black):best move(gh,black):bestThan(ff) move(gh,black):best move(gh,black):good move(gh,black):bestThan(ff) ])

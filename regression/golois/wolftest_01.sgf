@@ -1,0 +1,4 @@
+(;N[wolftest_01.gob]ID[wolftest_01.gob]BS[0]WS[0]GM[1]FF[3]SZ[13]
+AB[ba][da][db][dc][bd][dd][de][af][bf][cf][df]
+AW[aa][ca][cb][bc][cd][ae][be][ce]
+;C[move(cc):kill(bc) ])

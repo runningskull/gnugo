@@ -5,12 +5,13 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst \
       score.tst manyfaces.tst cutstone.tst newscore.tst blunder.tst \
-      niki.tst trevor.tst tactics.tst buzco.tst
+      niki.tst trevor.tst tactics.tst buzco.tst \
+      capture.tst connect.tst global.tst vie.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
-EXTRA_DIST = games $(TST) $(noinst_SCRIPTS) regress.awk STRATEGY NICKLAS \
-	     READING rot0 rot1 rot5 BREAKAGE
+EXTRA_DIST = golois games $(TST) $(noinst_SCRIPTS) regress.awk \
+             STRATEGY NICKLAS READING rot0 rot1 rot5 BREAKAGE
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *.orig *~
@@ -142,7 +143,19 @@ trevor: trevor.tst
 buzco: buzco.tst
 	$(srcdir)/eval.sh buzco.tst
 
-all_batches: first_batch second_batch third_batch
+capture: capture.tst
+	$(srcdir)/eval.sh capture.tst 
+
+connect: connect.tst
+	$(srcdir)/eval.sh connect.tst
+
+global: global.tst
+	$(srcdir)/eval.sh global.tst
+
+vie: vie.tst
+	$(srcdir)/eval.sh vie.tst
+
+all_batches: first_batch second_batch third_batch fourth_batch
 
 first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst life.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
 	$(srcdir)/regress.sh $(srcdir) reading.tst
@@ -183,3 +196,10 @@ third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst st
 	$(srcdir)/regress.sh $(srcdir) trevor.tst
 	$(srcdir)/regress.sh $(srcdir) tactics.tst
 	$(srcdir)/regress.sh $(srcdir) buzco.tst
+
+fourth_batch: strategy4.tst capture.tst connect.tst global.tst vie.tst
+	$(srcdir)/regress.sh $(srcdir) strategy4.tst
+	$(srcdir)/regress.sh $(srcdir) capture.tst
+	$(srcdir)/regress.sh $(srcdir) connect.tst
+	$(srcdir)/regress.sh $(srcdir) global.tst
+	$(srcdir)/regress.sh $(srcdir) vie.tst

@@ -220,13 +220,19 @@ the files gmp.c and gmp.h, which are copyrighted by Bill Shubert
 (@email{wms@@hevanet.com}).
 
 All files are under the GNU General Public License, which may be
-found in the file COPYING, except gmp.c and gmp.h, the files
-interface/html/* and win/makefile.win. The two files gmp.c and
-gmp.h are in the public domain and are free for unrestricted
-use. The files interface/html/* are not part of GNU Go but are a
-separate program and are included in the distribution for the
-convenience of anyone looking for a CGI interface to GNU Go. Were
-placed in the public domain by their author, Douglas Ridgway,
-and are free for unrestricted use. The file win/makefile.win is
-also in the public domain and is free for unrestricted use.
+found in the file COPYING, with the following exceptions.
+
+* The files interface/gtp.c and gtp.h are copyright 2001 by
+  the Free Software Foundation. They are licensed for unrestricted
+  use.
+
+* The files gmp.c and gmp.h are copyright Bill Shubert. These
+  are free for unrestricted use.
+
+* The files interface/html/* were placed in the public domain
+  by their author, Douglas Ridgway. They are free for unrestricted use.
+
+* The files regression/golois/* and the tests vie.tst, connect.tst,
+  capture.tst and global.tst are currently copyright Tristan Cazenave.
+
 

@@ -28,6 +28,9 @@
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
+#ifndef HAVE_VISUAL_C
+#include <sys/times.h>
+#endif
 
 #include "gnugo.h"
 #include "interface.h"
@@ -70,6 +73,7 @@ DECLARE(gtp_attack);
 DECLARE(gtp_combination_attack);
 DECLARE(gtp_connect);
 DECLARE(gtp_countlib);
+DECLARE(gtp_cputime);
 DECLARE(gtp_debug_influence);
 DECLARE(gtp_debug_move_influence);
 DECLARE(gtp_decrease_depths);
@@ -144,6 +148,7 @@ static struct gtp_command commands[] = {
   {"combination_attack",      gtp_combination_attack},
   {"connect",         	      gtp_connect},
   {"countlib",         	      gtp_countlib},
+  {"cputime",				  gtp_cputime},
   {"debug_influence",         gtp_debug_influence},
   {"debug_move_influence",    gtp_debug_move_influence},
   {"decrease_depths",  	      gtp_decrease_depths},
@@ -1735,6 +1740,39 @@ gtp_get_trymove_counter(char *s, int id)
 /*********
  * debug *
  *********/
+
+
+/* Function:  Returns elapsed CPU time.
+ * Arguments: none
+ * Fails:     never
+ * Returns:   Total elapsed (user + system) CPU time in milliseconds
+ */
+static int
+gtp_cputime(char *s, int id)
+{
+#ifdef WIN32
+    FILETIME creationTime, exitTime, kernelTime, userTime;
+    ULARGE_INTEGER uKernelTime,uUserTime,uElapsedTime;
+    unsigned long ulElapsedTime;
+    UNUSED(s);
+    GetProcessTimes(GetCurrentProcess(), &creationTime, &exitTime, &kernelTime, &userTime);
+    uKernelTime.LowPart = kernelTime.dwLowDateTime;
+    uKernelTime.HighPart = kernelTime.dwHighDateTime;
+    uUserTime.LowPart = userTime.dwLowDateTime;
+    uUserTime.HighPart = userTime.dwHighDateTime;
+    uElapsedTime.QuadPart = uKernelTime.QuadPart + uUserTime.QuadPart;
+    ulElapsedTime = (unsigned long)(uElapsedTime.QuadPart / 10000); /* convert to milliseconds: */
+    /*_ASSERTE(0 && "Debug Times");*/
+    return gtp_success(id, "%ld", ulElapsedTime);
+#else
+    struct tms t;
+    UNUSED(s);
+    times(&t);
+	return gtp_success(id, "%ld", t.tms_utime + t.tms_stime + t.tms_cutime + t.tms_cstime);
+#endif
+}
+
+
 
 /* Function:  Write the position to stderr.
  * Arguments: none

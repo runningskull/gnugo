@@ -167,7 +167,7 @@ loadsgf games/heikki/heikki01.sgf 17
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
 84 gg_genmove black
-#? [J18]
+#? [J18]*
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white

@@ -28,7 +28,7 @@ loadsgf games/blunder5.sgf
 
 loadsgf games/blunder6.sgf 1
 6 gg_genmove white
-#? [D4]*
+#? [D4]
 
 # A9 is a losing ko threat
 loadsgf games/blunder6.sgf 3

@@ -271,18 +271,21 @@ a*B
 
 
 Pattern CC13
+# tm modified (3.1.10)
+# (compare Conn315)
 
 O?        cut!
 *X
 XO
 
-:8,BC
+:8,B,shape(2)
 
 O?
 *A
 BO
 
-;oplay_attack_either(*,A,B)
+; oplay_attack_either(*,A,B)
+
 
 
 Pattern CC14

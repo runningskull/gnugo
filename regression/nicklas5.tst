@@ -22,7 +22,7 @@ loadsgf games/nicklas/nicklas8.sgf 134
 
 loadsgf games/nicklas/nicklas8.sgf 140
 804 gg_genmove black
-#? [D6]
+#? [D6]*
 
 # Locally K18 is superior to L17.
 loadsgf games/nicklas/nicklas12.sgf 69

@@ -100,7 +100,7 @@ loadsgf games/trevor/trevor_06.sgf 22
 #DIFFICULTY=6
 loadsgf games/trevor/trevor_07.sgf 32
 7 gg_genmove white
-#? [!C5]*
+#? [!C5]
 
 #Pattern missing here?  B8 is almost always better than B9.
 loadsgf games/trevor/trevor_08.sgf 24

@@ -129,7 +129,7 @@ loadsgf games/strategy42.sgf 248
 # the J14 move also does this, without sacrificing K13.
 loadsgf games/strategy43.sgf 271
 175 gg_genmove white
-#? [J14]*
+#? [J14]
 
 # Best to capture with snapback.
 loadsgf games/strategy44.sgf
@@ -183,79 +183,83 @@ loadsgf games/owl29.sgf 134
 
 loadsgf games/pooo.sgf 16
 187 gg_genmove black
-#? [!C1]
+#? [!C1]*
 
 loadsgf games/pooo.sgf 24
 188 gg_genmove black
-#? [B6|C4]
+#? [B6|C4]*
 
 # The dragon at A2 is misclassified as inessential.
 
-loadsgf games/pooo.sgf 52
+loadsgf games/pooo.sgf 50
 189 gg_genmove black
-#? [D13]
+#? [E14]*
+
+loadsgf games/pooo.sgf 52
+190 gg_genmove black
+#? [D13]*
 
 loadsgf games/pooo.sgf 56
-190 gg_genmove black
-#? [C12]
+191 gg_genmove black
+#? [C12]*
 
 loadsgf games/pooo.sgf 74
-191 gg_genmove black
-#? [A15]
+192 gg_genmove black
+#? [A15]*
 
 # (3.1.9) owl status of A11 is unchecked.
 
 loadsgf games/bretz.sgf 26
-192 gg_genmove black
+193 gg_genmove black
 #? [F16]
 
 loadsgf games/bretz.sgf 58
-193 gg_genmove black
+194 gg_genmove black
 #? [A13]
 
 loadsgf games/bretz.sgf 88
-194 gg_genmove black
-#? [!S14]
+195 gg_genmove black
+#? [!S14]*
 
 loadsgf games/bretz.sgf 100
-195 gg_genmove black
-#? [M17]
+196 gg_genmove black
+#? [M17]*
 
 loadsgf games/bretz.sgf 130
-196 gg_genmove black
-#? [K3]
+197 gg_genmove black
+#? [K3]*
 
 loadsgf games/bretz.sgf 148
-197 gg_genmove black
+198 gg_genmove black
 #? [C10]
 
 loadsgf games/bretz 164
-198 gg_genmove black
-#? [N5]
+199 gg_genmove black
+#? [N5]*
 
 loadsgf games/bretz.sgf 149
-199 gg_genmove black
-#? [P6|P7|Q7]
+200 gg_genmove black
+#? [P6|P7|Q7]*
 
 loadsgf games/juka1.sgf 8
-200 gg_genmove black
-#? [D5]
+201 gg_genmove black
+#? [D5]*
 
 loadsgf games/juka1.sgf 14
-201 gg_genmove black
-#? [B6]
+202 gg_genmove black
+#? [B6]*
 
 loadsgf games/juka1.sgf 18
-202 gg_genmove black
-#? [D5]
+203 gg_genmove black
+#? [D5]*
 
 loadsgf games/juka1.sgf 28
-203 gg_genmove black
-#? [B2]
+204 gg_genmove black
+#? [B2]*
 
 loadsgf games/juka1.sgf 48
-204 gg_genmove black
-#? [!O11]
+205 gg_genmove black
+#? [!O11]*
 
 
 ############ End of Tests #################

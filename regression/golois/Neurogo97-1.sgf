@@ -1,0 +1,4 @@
+(;N[Neurogo97-1.gob]ID[Neurogo97-1.gob]BS[0]WS[0]GM[1]FF[3]SZ[9]
+AB[cc][ec][gc][bd][be][ge][bf][hf][dh][eh][fh][gh][hh]
+AW[ad][ae][af][ef][ff][bg][cg][dg][eg][gg][hg][ch]
+;C[move(ih):live(hh) move(ih):kill(hh) move(ig):connect(hh,hf) move(ih):cut(hh,hf) move(ih,white):best ])
