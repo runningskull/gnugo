@@ -1302,8 +1302,10 @@ adjacent_to_nondead_stone(int pos, int color)
       int pos2;
       if (k < 8)
 	pos2 = pos + delta[k];
-      else
+      else if (ON_BOARD(pos + delta[k - 8]))
 	pos2 = pos + 2 * delta[k - 8];
+      else
+	continue;
       
       if (ON_BOARD(pos2)
 	  && worm[pos2].color == color
