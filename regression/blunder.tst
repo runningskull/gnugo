@@ -147,3 +147,6 @@ loadsgf games/blunder23.sgf
 30 reg_genmove black
 #? [!O7]*
 
+loadsgf games/atari_atari09.sgf
+31 reg_genmove black
+#? [!T14]

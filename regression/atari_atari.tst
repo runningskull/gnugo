@@ -105,3 +105,8 @@ loadsgf games/atari_atari08.sgf 227
 24 combination_defend black
 #? [!.*(K16|A12|R12|S12|T12|A11|B11|C11|R11|S11|T11|A10|C10|Q10|S10|D9).*]*
 
+# T14 is a blunder.  GNU Go should know how to punish it.
+loadsgf games/atari_atari09.sgf
+play black T14
+25 combination_attack white
+#? [R16]

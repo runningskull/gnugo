@@ -178,6 +178,25 @@ loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 140
 850 restricted_genmove white K4 J4 L4 P5
 #? [K4|J4|L4]*
 
+# Defending T12 is large and R15 is clearly the best way.
+loadsgf games/endgame9.sgf
+860 reg_genmove black
+#? [R15]
+
+# H1 is one point and N7 is about 0.5.
+loadsgf games/endgame10.sgf
+870 restricted_genmove black H1 N7
+#? [H1]
+
+# K5 is best, althought in absence of other worthy moves it doesn't matter.
+loadsgf games/endgame11.sgf
+880 reg_genmove white
+#? [K5]
+# T4 is one point in ko, while T5 and S6 are filling dame only.
+890 restricted_genmove white T4 T5 S6
+$? [T4]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
