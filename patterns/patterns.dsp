@@ -821,7 +821,7 @@ IntDir=.\Release
 InputPath=.\read_attack.db
 
 "read_attack.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -T read_attack -i ..\patterns\read_attack.db -o read_attack.c
+	$(IntDir)\mkpat -b read_attack -i ..\patterns\read_attack.db -o read_attack.c
 
 # End Custom Build
 
@@ -833,7 +833,7 @@ IntDir=.\Debug
 InputPath=.\read_attack.db
 
 "read_attack.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -T read_attack -i ..\patterns\read_attack.db -o read_attack.c
+	$(IntDir)\mkpat -b read_attack -i ..\patterns\read_attack.db -o read_attack.c
 
 # End Custom Build
 
@@ -852,7 +852,7 @@ IntDir=.\Release
 InputPath=.\read_defend.db
 
 "read_defend.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -T read_defend -i ..\patterns\read_defend.db -o read_defend.c
+	$(IntDir)\mkpat -b read_defend -i ..\patterns\read_defend.db -o read_defend.c
 
 # End Custom Build
 
@@ -864,7 +864,7 @@ IntDir=.\Debug
 InputPath=.\read_defend.db
 
 "read_defend.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -T read_defend -i ..\patterns\read_defend.db -o read_defend.c
+	$(IntDir)\mkpat -b read_defend -i ..\patterns\read_defend.db -o read_defend.c
 
 # End Custom Build
 

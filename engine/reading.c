@@ -2930,6 +2930,8 @@ attack1(int str, int *move, int komaster, int kom_pos)
   int other = OTHER_COLOR(color);
   int xpos;
   int result = -1;
+  int k;
+  int dcode;
   
   SETUP_TRACE_INFO("attack1", str);
   reading_node_counter++;
@@ -2996,14 +2998,13 @@ attack1(int str, int *move, int komaster, int kom_pos)
   if (result != WIN) {
     int liberties;
     int libs[6];
-    int k;
     liberties = approxlib(xpos, color, 6, libs);
     if (liberties <= 5)
       for (k = 0; k < liberties; k++) {
 	int apos = libs[k];
 	if (!is_self_atari(apos, other)
 	    && trymove(apos, other, "attack1-C", str, komaster, kom_pos)) {
-	  int dcode = do_find_defense(str, NULL, komaster, kom_pos);
+         dcode = do_find_defense(str, NULL, komaster, kom_pos);
 	  if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
 	    if (dcode == 0) {
 	      popgo();
@@ -3016,6 +3017,33 @@ attack1(int str, int *move, int komaster, int kom_pos)
 	  popgo();
 	}
       }
+  }
+
+  /* If we can attack in ko, but defender cannot defend except in ko,
+   * then that means that all the defender is doing is delaying things,
+   * and in actuality we have a win.  We give defender lots of chances
+   * in case defender needs to win the ko several times.
+   */
+  if (result < WIN && result > 0) {
+    int nmoves = 0;
+    int d_move = 0;
+    do {
+      dcode = find_defense(str, &d_move);
+      if (dcode == 0 || dcode == WIN)
+        break;
+      if (trymove(d_move, color, "attack2-E", str, komaster, kom_pos)) {
+        nmoves++;
+      } else
+       break;
+    } while (1);
+
+    if (dcode == 0)
+      result = WIN;
+
+    while (nmoves > 0) {
+      nmoves--;
+      popgo();
+    }
   }
   
   if (result > 0) {
