@@ -19,7 +19,8 @@ if a change breaks something.
 @menu
 * Regression Testing::          Regression Testing in GNU Go
 * Test Suites::                 Test Suites
-* Performance Testing::         Performance Testing
+* Running the Regressions::     Running the Regression Tests
+* Running regress.pike::        Running regress.pike
 * HTML Views::                  HTML Views
 @end menu
 
@@ -31,8 +32,10 @@ directory. The tests are specified as GTP commands in files with the
 suffix @file{.tst}, with corresponding correct results and expected
 pass/fail status encoded in GTP comments following the test. To run a
 test suite the shell scripts @file{test.sh}, @file{eval.sh}, and
-@code{regress.sh} can be used. There are also Makefile targets to do
-this. If you @command{make all_batches} most of the tests are run.
+@file{regress.sh} can be used. There are also Makefile targets to do
+this. If you @command{make all_batches} most of the tests are run. The
+Pike script @file{regress.pike} can also be used to run all tests or a
+subset of the tests.
 
 Game records used by the regression tests are stored in the
 directory @file{regression/games/} and its subdirectories.
@@ -85,8 +88,8 @@ followed by a @samp{&}, meaning that the result is ignored. This is
 primarily used to report statistics, e.g. how many tactical reading
 nodes were spent while running the test suite.
 
-@node Performance Testing
-@section Performing tests
+@node Running the Regressions
+@section Running the Regression Tests
 
 @code{./test.sh blunder.tst} runs the tests in @file{blunder.tst} and
 prints the results of the commands on numbered lines, which may look
@@ -172,8 +175,49 @@ results. The example above is compressed to
 
 For convenience the tests are also available as makefile targets. For
 example, @code{make blunder} runs the tests in the blunder test suite by
-executing @code{eval.sh blunder.tst}. @code{make test} runs all test
-suites in a sequence using the @code{regress.sh} script.
+executing @code{eval.sh blunder.tst}. @code{make all_batches} runs all
+test suites in a sequence using the @code{regress.sh} script.
+
+@node Running regress.pike
+@section Running regress.pike
+
+A more powerful way to run regressions is with the script
+@file{regress.pike}. This requires that you have Pike
+(@url{http://pike.ida.liu.se}) installed.
+
+Executing @code{./regress.pike} without arguments will run all
+testsuites that @code{make all_batches} would run. The difference is
+that unexpected results are reported immediately when they have been
+found (instead of after the whole file has been run) and that statistics
+of time consumption and node usage is presented for each test file and
+in total.
+
+To run a single test suite do e.g. @code{./regress.pike nicklas3.tst} or
+@code{./regress.pike nicklas3}. The result may look like:
+@example
+nicklas3                                 2.96    614772    3322      469
+Total nodes: 614772 3322 469
+Total time: 2.96 (3.22)
+Total uncertainty: 0.00
+@end example
+The numbers here mean that the test suite took 2.96 seconds of processor
+time and 3.22 seconds of real time. The consumption of reading nodes was
+614772 for tactical reading, 3322 for owl reading, and 469 for
+connection reading. The last line relates to the variability of the
+generated moves in the test suite, and 0 means that none was decided by
+the randomness contribution to the move valuation. Multiple testsuites
+can be run by e.g. @code{./regress.pike owl ld_owl owl1}.
+
+It is also possible to run a single testcase, e.g. @code{./regress.pike
+strategy:6}, a number of testcases, e.g. @code{./regress.pike
+strategy:6,23,45}, a range of testcases, e.g. @code{./regress.pike
+strategy:13-15} or more complex combinations e.g. @code{./regress.pike
+strategy:6,13-15,23,45 nicklas3:602,1403}.
+
+There are also command line options to choose what engine to run, what
+options to send to the engine, to turn on verbose output, and to use a
+file to specify which testcases to run. Run @code{./regress.pike --help}
+for a complete and up to date list of options.
 
 @node HTML Views
 @section HTML Regression Views
