@@ -248,7 +248,7 @@ attack(int str, int *move)
     return 0;
 
   origin = find_origin(str);
-  if (search_persistent_reading_cache(ATTACK, origin, &result, &the_move)) {
+  if (search_persistent_reading_cache(ATTACK, origin, &result, &the_move) != -1) {
     if (move)
       *move = the_move;
     return result;
@@ -311,7 +311,7 @@ find_defense(int str, int *move)
 
   origin = find_origin(str);
   if (search_persistent_reading_cache(FIND_DEFENSE, origin, 
-				      &result, &the_move)) {
+				      &result, &the_move) != -1) {
     if (move)
       *move = the_move;
     return result;
@@ -379,10 +379,20 @@ attack_and_defend(int str,
      * incorrect, but we can't easily find a defense point to return.
      */
     if (dcode == WIN && dpos == NO_MOVE) {
-      acode = 0;
-      apos = NO_MOVE;
+      int ai, di;
+      ai = search_persistent_reading_cache(ATTACK, str, NULL, NULL);
+      di = search_persistent_reading_cache(FIND_DEFENSE, str, NULL, NULL);
+      if (ai != -1)
+        delete_persistent_reading_entry(ai);
+      if (di != -1)
+        delete_persistent_reading_entry(di);
+      acode = attack(str, &apos);
+      if (acode != 0)
+        dcode = find_defense(str, &dpos);
     }
   }
+
+  gg_assert(!((acode != 0) && (dcode == WIN && dpos == NO_MOVE)));
 
   if (attack_code)
     *attack_code = acode;

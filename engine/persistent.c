@@ -265,7 +265,9 @@ purge_persistent_reading_cache()
 }
 
 
-/* Look for a valid read result in the persistent cache. */
+/* Look for a valid read result in the persistent cache.
+ * Return index of the entry found if there is a match, -1 if no match
+ */
 int
 search_persistent_reading_cache(int routine, int str, int *result, int *move)
 {
@@ -298,7 +300,8 @@ search_persistent_reading_cache(int routine, int str, int *result, int *move)
 
     /* Matched alright. Increase score, fill in the answer, and return. */
     entry->score += entry->nodes;
-    *result = entry->result;
+    if (result)
+      *result = entry->result;
     if (move)
       *move = entry->move;
     ASSERT1(entry->result == 0
@@ -319,10 +322,10 @@ search_persistent_reading_cache(int routine, int str, int *result, int *move)
       dump_stack();
     }
 
-    return 1;
+    return k;
   }
 
-  return 0;
+  return -1;
 }
 
 
@@ -472,6 +475,15 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
   }
   
   persistent_reading_cache_size++;
+}
+
+/*delete an entry from the cache, given its index*/
+void
+delete_persistent_reading_entry(int index)
+{
+  gg_assert(index >= 0 && index < persistent_reading_cache_size);
+  persistent_reading_cache[index]
+	  = persistent_reading_cache[--persistent_reading_cache_size];
 }
 
 

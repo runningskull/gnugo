@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function delete_persistent_reading_entry()
+- inconsistent results in attack_and_defend() resolved
 - compilation errors for EXPERIMENTAL_READING fixed
 - new experimental owl code is aware of tails getting captured
 - new move reasons OWL_ATTACK_MOVE_GAIN and OWL_DEFEND_MOVE_LOSS

@@ -301,6 +301,7 @@ int search_persistent_reading_cache(int routine, int str, int *result,
 				    int *move);
 void store_persistent_reading_cache(int routine, int str, int result,
 				    int move, int nodes);
+void delete_persistent_reading_entry(int index);
 void reading_hotspots(float values[BOARDMAX]);
 void purge_persistent_owl_cache(void);
 int search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
