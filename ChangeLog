@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl stack management reimplemented
 - consider semeai worms adjacent to the outside as important in
   owl_analyze_semeai_after_move()
 - additional semeai debug output

@@ -93,8 +93,7 @@ struct local_owl_data {
   char safe_move_cache[BOARDMAX];
 
   /* This is used to organize the owl stack. */
-  int restore_from;
-  int number_in_stack;
+  struct local_owl_data *restore_from;
 };
 
 
@@ -220,8 +219,8 @@ static void do_owl_analyze_semeai(int apos, int bpos,
 				  int *resulta, int *resultb,
 				  int *move, int pass, int owl_phase);
 static int semeai_trymove_and_recurse(int apos, int bpos,
-				      struct local_owl_data **owla,
-				      struct local_owl_data **owlb,
+				      struct local_owl_data *owla,
+				      struct local_owl_data *owlb,
 				      int komaster, int kom_pos, int owl_phase,
 				      int move, int color, int ko_allowed,
 				      int move_value, const char *move_name,
@@ -252,11 +251,11 @@ static void reduced_init_owl(struct local_owl_data **owl,
 static void init_owl(struct local_owl_data **owl, int target1, int target2,
 		     int move, int use_stack);
 
-static struct local_owl_data *owl_stack = NULL;
+static struct local_owl_data *owl_stack[2 * MAXSTACK];
 static int owl_stack_size = 0;
 static int owl_stack_pointer = 0;
-static void push_owl(struct local_owl_data **owla,
-    		     struct local_owl_data **owlb);
+static void check_owl_stack_size(void);
+static void push_owl(struct local_owl_data **owl);
 static void do_push_owl(struct local_owl_data **owl);
 static void pop_owl(struct local_owl_data **owl);
 
@@ -465,7 +464,7 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     do_owl_analyze_semeai(apos, bpos, owla, owlb, EMPTY, NO_MOVE,
 			  resulta, resultb, semeai_move, 0, owl);
   else {
-    semeai_trymove_and_recurse(bpos, apos, &owlb, &owla, EMPTY, NO_MOVE, owl,
+    semeai_trymove_and_recurse(bpos, apos, owlb, owla, EMPTY, NO_MOVE, owl,
 			       move, color, 1, 0, "mandatory move", 1,
 			       semeai_move, resultb, resulta);
     *resulta = REVERSE_RESULT(*resulta);
@@ -945,7 +944,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     /* Try playing the move at mpos and call ourselves recursively to
      * determine the result obtained by this move.
      */
-    if (semeai_trymove_and_recurse(apos, bpos, &owla, &owlb, komaster,
+    if (semeai_trymove_and_recurse(apos, bpos, owla, owlb, komaster,
 				   kom_pos, owl_phase, mpos, color,
 				   best_resulta == 0 || best_resultb == 0,
 				   moves[k].value, moves[k].name,
@@ -1066,8 +1065,8 @@ do_owl_analyze_semeai(int apos, int bpos,
  * move.
  */
 static int
-semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data **owla,
-			   struct local_owl_data **owlb,
+semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data *owla,
+			   struct local_owl_data *owlb,
 			   int komaster, int kom_pos, int owl_phase,
 			   int move, int color, int ko_allowed,
 			   int move_value, const char *move_name,
@@ -1089,22 +1088,23 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data **owla,
   TRACE("Trying %C %1m. Current stack: ", color, move);
   if (verbose) {
     dump_stack();
-    goaldump((*owla)->goal);
+    goaldump(owla->goal);
     gprintf("\n");
-    goaldump((*owlb)->goal);
+    goaldump(owlb->goal);
     gprintf("\n");
   }
   TRACE("%s, value %d, same_dragon %d\n", move_name, move_value, same_dragon);
     
-  push_owl(owla, owlb);
+  push_owl(&owla);
+  push_owl(&owlb);
 
-  if ((*owla)->color == color) {
-    owl_update_goal(move, same_dragon, *owla, 1);
-    owl_update_boundary_marks(move, *owlb);
+  if (owla->color == color) {
+    owl_update_goal(move, same_dragon, owla, 1);
+    owl_update_boundary_marks(move, owlb);
   }
   else {
-    owl_update_goal(move, same_dragon, *owlb, 1);
-    owl_update_boundary_marks(move, *owla);
+    owl_update_goal(move, same_dragon, owlb, 1);
+    owl_update_boundary_marks(move, owla);
   }
     
   /* Do a recursive call to read the semeai after the move we just
@@ -1115,21 +1115,21 @@ semeai_trymove_and_recurse(int apos, int bpos, struct local_owl_data **owla,
     /* FIXME: Are all owl_data fields and relevant static
      * variables properly set up for a call to do_owl_attack()?
      */
-    *this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, *owla,
+    *this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, owla,
 						new_komaster, new_kom_pos,
 						0));
     *this_resultb = *this_resulta;
   }
   else {
-    do_owl_analyze_semeai(bpos, apos, *owlb, *owla, new_komaster, new_kom_pos,
+    do_owl_analyze_semeai(bpos, apos, owlb, owla, new_komaster, new_kom_pos,
 			  this_resultb, this_resulta, semeai_move, 0,
 			  owl_phase);
     *this_resulta = REVERSE_RESULT(*this_resulta);
     *this_resultb = REVERSE_RESULT(*this_resultb);
   }
     
-  pop_owl(owlb);
-  pop_owl(owla);
+  pop_owl(&owlb);
+  pop_owl(&owla);
     
   popgo();
     
@@ -1854,7 +1854,7 @@ do_owl_attack(int str, int *move, int *wormid,
 	dump_stack();
 
       /* We have now made a move. Analyze the new position. */
-      push_owl(&owl, NULL);
+      push_owl(&owl);
       mw[mpos] = 1;
       number_tried_moves++;
       owl_update_boundary_marks(mpos, owl);
@@ -2288,13 +2288,11 @@ do_owl_defend(int str, int *move, int *wormid,
   else {
     /* In this case we don't recompute eyes. However, to avoid accessing
      * partially-random data left on stack, we copy eye data from the
-     * previous depth level. It must be reasonably close to the actual
+     * previous depth level. It should be reasonably close to the actual
      * state of eyes.
      */
-    memcpy(owl->my_eye, owl_stack[owl->restore_from].my_eye,
-	   sizeof(owl->my_eye));
-    memcpy(owl->half_eye, owl_stack[owl->restore_from].half_eye,
-	   sizeof(owl->half_eye));
+    memcpy(owl->my_eye, owl->restore_from->my_eye, sizeof(owl->my_eye));
+    memcpy(owl->half_eye, owl->restore_from->half_eye, sizeof(owl->half_eye));
 
     vital_moves[0].pos = 0;
     vital_moves[0].value = -1;
@@ -2443,7 +2441,7 @@ do_owl_defend(int str, int *move, int *wormid,
 	dump_stack();
 
       /* We have now made a move. Analyze the new position. */
-      push_owl(&owl, NULL);
+      push_owl(&owl);
       mw[mpos] = 1;
       number_tried_moves++;
 
@@ -5644,32 +5642,19 @@ owl_escape_route(struct local_owl_data *owl)
 static void
 reduced_init_owl(struct local_owl_data **owl, int at_bottom_of_stack)
 {
-  if (owl_stack_size == 0) {
-    owl_stack_size = gg_max(owl_reading_depth + 2,
-			    2 * semeai_branch_depth + 4);
-    owl_stack = malloc(owl_stack_size * sizeof(*owl_stack));
-    gg_assert(owl_stack != NULL);
-  }
-
-  if (at_bottom_of_stack) {
+  if (at_bottom_of_stack)
     owl_stack_pointer = 0;
-    *owl = &owl_stack[0];
-  }
-  else {
+  else
     owl_stack_pointer++;
-    *owl = &owl_stack[owl_stack_pointer];
-  }
-  owl_stack[owl_stack_pointer].number_in_stack = owl_stack_pointer;
+
+  check_owl_stack_size();
+  *owl = owl_stack[owl_stack_pointer];
 }
 
 
-/*
- * If use_stack is set, the stack is initialized, and the return value
- * of *owl is a pointer to the bottom of the stack.
- *
- * at_bottom_of_stack = 1 means **owl will be initialized at the bottom
- * 	of the stack
- * (otherwise, it will be set at the lowest available spot in the stack)
+/* Initialize owl data. Set at_bottom_of_stack to 1 the first time you
+ * call init_owl() and to 0 any following time (only relevant if you
+ * need more than one set of owl data).
  */
 static void
 init_owl(struct local_owl_data **owl, int target1, int target2, int move,
@@ -5690,15 +5675,24 @@ init_owl(struct local_owl_data **owl, int target1, int target2, int move,
  * Storage of owl data
  ***********************/
 
+/* Check the size of the owl stack and extend it if too small. */
+static void
+check_owl_stack_size(void)
+{
+  while (owl_stack_size <= owl_stack_pointer) {
+    owl_stack[owl_stack_size] = malloc(sizeof(*owl_stack[0]));
+    gg_assert(owl_stack[owl_stack_size] != NULL);
+    owl_stack_size++;
+  }
+}
+
 /* Push owl data one step upwards in the stack. Gets called from
  * push_owl.
  */
 static void
 do_push_owl(struct local_owl_data **owl)
 {
-  struct local_owl_data *new_owl = &owl_stack[++owl_stack_pointer];
-
-  gg_assert(&owl_stack[(*owl)->number_in_stack] == *owl);
+  struct local_owl_data *new_owl = owl_stack[owl_stack_pointer];
 
   /* Copy the owl data. */
   memcpy(new_owl->goal, (*owl)->goal, sizeof(new_owl->goal));
@@ -5710,61 +5704,29 @@ do_push_owl(struct local_owl_data **owl)
 
   new_owl->lunches_are_current = 0;
 
-  /* Needed for stack organization: */
-  new_owl->number_in_stack = owl_stack_pointer;
-  new_owl->restore_from = (*owl)->number_in_stack;
+  /* Needed for stack organization. Since there may be one or two sets
+   * of owl data active at we don't know whether to restore from the
+   * previos stack entry or two steps back.
+   */
+  new_owl->restore_from = *owl;
 
   /* Finally move the *owl pointer. */
   *owl = new_owl;
 }
 
 
-/* Push owl data one step upwards in the stack. The stack is dynamically
- * reallocated if it is too small. Second argument is used from the
- * semeai code; use NULL otherwise.
+/* Push owl data one step upwards in the stack. The stack is extended
+ * with dynamically allocated memory if it is too small.
  *
- * If you use push_owl with two arguments, later call
- * pop_owl(&owlb); pop_owl(&owla);
- * in this order!
- *
- * Note that the owl stack might get moved in this function. This means
- * that all pointers to the owl stack will get invalid. Only the pointers
- * owla (and owlb) at the current recursion depth get corrected immediately.
- * All other pointers will get corrected when pop_owl() is called. 
+ * This function no longer may move existing owl data around, so
+ * existing pointers do not risk becoming invalid.
  */
 static void
-push_owl(struct local_owl_data **owla, struct local_owl_data **owlb)
+push_owl(struct local_owl_data **owl)
 {
-  /* Do we need to enlarge the stack? */
-  if (owl_stack_pointer == owl_stack_size - 1
-      || (owl_stack_pointer == owl_stack_size - 2 && owlb)) {
-    int num_a = (*owla)->number_in_stack;
-    int num_b = 0;
-    struct local_owl_data *old_stack_loc = owl_stack;
-    gg_assert(*owla == &(owl_stack[num_a]));
-    if (owlb) {
-      num_b = (*owlb)->number_in_stack;
-      gg_assert(*owlb == &(owl_stack[num_b]));
-    }  
-    if (0) {
-      gprintf("Have to enlarge owl stack! (size %d, owl_stack %d, stackp %d)\n",
-	      owl_stack_size, owl_stack_pointer, stackp);
-      dump_stack();
-    }
-    /* Better reallocate too much, than to have reallocate more often: */
-    owl_stack_size += 2;
-    owl_stack = realloc(owl_stack, owl_stack_size * sizeof(*owl_stack));
-    gg_assert(owl_stack != NULL);
-    if (0 && (owl_stack != old_stack_loc))
-      gprintf("Stack has moved! New stack size %d.\n", owl_stack_size);
-    *owla = &(owl_stack[num_a]);
-    if (owlb)
-      *owlb = &(owl_stack[num_b]);
-  }
-
-  do_push_owl(owla);
-  if (owlb)
-    do_push_owl(owlb);
+  owl_stack_pointer++;
+  check_owl_stack_size();
+  do_push_owl(owl);
 }
 
 
@@ -5772,7 +5734,7 @@ push_owl(struct local_owl_data **owla, struct local_owl_data **owlb)
 static void
 pop_owl(struct local_owl_data **owl)
 {
-  *owl = &(owl_stack[owl_stack[owl_stack_pointer].restore_from]);
+  *owl = (*owl)->restore_from;
   owl_stack_pointer--;
 }
 
