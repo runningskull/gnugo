@@ -799,7 +799,8 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
 	fast_liberties = 0;
 	break;
       }
-      fast_liberties += board[pos + delta[k]] == EMPTY;
+      if (board[pos + delta[k]] == EMPTY)
+	fast_liberties++;
     }
   }
 
