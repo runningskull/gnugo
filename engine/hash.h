@@ -56,7 +56,7 @@
  */
 typedef unsigned long Hashvalue;
 #define SIZEOF_HASHVALUE SIZEOF_LONG
-#define HASHVALUE_PRINT_FORMAT "%l0x"
+#define HASHVALUE_PRINT_FORMAT "%0lx"
 
 /* for testing: Enables a lot of checks. */
 #define CHECK_HASHING 0
