@@ -73,6 +73,12 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
 DBBUILT = hoshi_keima.db hoshi_other.db komoku.db sansan.db \
 	  mokuhazushi.db takamoku.db
 
+DB_TO_TAG = aa_attackpats.db attack.db barriers.db conn.db defense.db\
+	    endgame.db eyes.db fuseki.db fuseki9.db fuseki13.db fuseki19.db\
+	    handicap.db influence.db oracle.db owl_attackpats.db\
+	    owl_defendpats.db owl_vital_apats.db patterns.db patterns2.db\
+	    read_attack.db read_defend.db $(DBBUILT)
+
 # Remove these files here... they are created locally
 DISTCLEANFILES = $(GGBUILTSOURCES) $(DBBUILT) *~
 
@@ -172,3 +178,7 @@ read_attack.c : $(srcdir)/read_attack.db mkpat$(EXEEXT)
 read_defend.c : $(srcdir)/read_defend.db mkpat$(EXEEXT)
 	./mkpat -b read_defend < $(srcdir)/read_defend.db >read_defend.c
 
+
+ETAGS_ARGS = --language none --regex '/^Pattern[ \t]+[a-zA-Z0-9]+/' $(DB_TO_TAG)\
+	     --language auto --no-regex
+TAGS_DEPENDENCIES = $(DB_TO_TAG)

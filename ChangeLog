@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- pattern tagging
 - regress.sh revised
 - regress.pike revised
 - attack2() revised
