@@ -380,6 +380,37 @@ Pattern EB21
 ; lib(D)==3
 
 
+Pattern EB22
+
+??X?
+?XOX
+.O*O
+.!!!
+..!.
+----
+
+:8,B
+
+??X?
+?XOX
+.D*O
+.!!!
+..!.
+----
+
+; lib(D)==3
+
+
+Pattern EB23
+
+O.X
+!*.
+.!O
+---
+
+:8,B
+
+
 ##########################
 #
 # B patterns in the center

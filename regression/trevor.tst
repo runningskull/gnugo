@@ -304,7 +304,3 @@ loadsgf games/trevor/trevor_30.sgf
 loadsgf games/trevor/trevor_30.sgf
 301 gg_genmove black
 #? [!PASS]*
-
-
-
-

@@ -277,6 +277,7 @@ fuseki(int color)
   int i = -1;
   int j = -1;
   int width;  /* Side of the open region required in the corner. */
+  int empty_corner_value = EMPTY_CORNER_VALUE;
 
   /* Return immediately if --disable_fuseki option used. */
   if (disable_fuseki)
@@ -285,9 +286,12 @@ fuseki(int color)
   /* Search in fuseki database unless disabled by --nofusekidb option. */
   if (fusekidb && search_fuseki_database(color))
     return;
-  
+
+  /* On 9x9, only play open corners after the first move if nothing
+   * else useful is found.
+   */
   if (board_size == 9 && stones_on_board(color) > 0)
-    return;
+    empty_corner_value = 5;
   
   if (board_size <= 11) {
     /* For boards of size 11x11 or smaller we first go for the center point. */
@@ -302,27 +306,29 @@ fuseki(int color)
 
   if (board_size >= 18)
     width = 8;
+  else if (board_size == 9)
+    width = 5;
   else
     width = board_size/2;
   
   if (openregion(0, width-1, board_size-width, board_size-1)) {
     choose_corner_move(UPPER_RIGHT, &i, &j);
-    announce_move(i, j, EMPTY_CORNER_VALUE);
+    announce_move(i, j, empty_corner_value);
   }
   
   if (openregion(board_size-width, board_size-1, 0, width-1)) {
     choose_corner_move(LOWER_LEFT, &i, &j);
-    announce_move(i, j, EMPTY_CORNER_VALUE);
+    announce_move(i, j, empty_corner_value);
   }
   if (openregion(board_size-width, board_size-1,
 		 board_size-width, board_size-1)) {
     choose_corner_move(LOWER_RIGHT, &i, &j);
-    announce_move(i, j, EMPTY_CORNER_VALUE);
+    announce_move(i, j, empty_corner_value);
   }
   
   if (openregion(0, width-1, 0, width-1)) {
     choose_corner_move(UPPER_LEFT, &i, &j);
-    announce_move(i, j, EMPTY_CORNER_VALUE);
+    announce_move(i, j, empty_corner_value);
   }
 }
 

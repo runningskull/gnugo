@@ -111,44 +111,44 @@ X.X
 :8,A,indirect_helper
 
 
-Pattern Attack8
-# The tactical reading may fail to find the defense move at 'a'. This
-# pattern corrects the mistake.
-
-?XX?
-X.*.
-?X..
-----
-
-:8,-
-
-?BB?
-C.*a
-?D..
-----
-
->if (attack(B) && !oplay_attack(*,a,B)) remove_attack(*,B);
->if (attack(C) && !oplay_attack(*,a,C)) remove_attack(*,C);
->if (attack(D) && !oplay_attack(*,a,D)) remove_attack(*,D);
-
-
-Pattern Attack9
-# The tactical reading may fail to find the defense move at 'a'. This
-# pattern corrects the mistake.
-
-?O??
-XOX*
-?...
-----
-
-:8,-
-
-?O??
-XOB*
-?a..
-----
-
->if (attack(B) && !oplay_attack(*,a,B)) remove_attack(*,B);
+# Pattern Attack8
+# # The tactical reading may fail to find the defense move at 'a'. This
+# # pattern corrects the mistake.
+# 
+# ?XX?
+# X.*.
+# ?X..
+# ----
+# 
+# :8,-
+# 
+# ?BB?
+# C.*a
+# ?D..
+# ----
+# 
+# >if (attack(B) && !oplay_attack(*,a,B)) remove_attack(*,B);
+# >if (attack(C) && !oplay_attack(*,a,C)) remove_attack(*,C);
+# >if (attack(D) && !oplay_attack(*,a,D)) remove_attack(*,D);
+# 
+# 
+# Pattern Attack9
+# # The tactical reading may fail to find the defense move at 'a'. This
+# # pattern corrects the mistake.
+# 
+# ?O??
+# XOX*
+# ?...
+# ----
+# 
+# :8,-
+# 
+# ?O??
+# XOB*
+# ?a..
+# ----
+# 
+# >if (attack(B) && !oplay_attack(*,a,B)) remove_attack(*,B);
 
 
 Pattern Attack10
@@ -220,6 +220,19 @@ b.OX
 ?AA?
 
 ;lib(A)==1 && olib(*)>1 && lib(b)>1
+
+
+Pattern Attack17
+# This is only intended for finding an alternative attack. It should
+# have a constraint to first check whether the move above * was
+# successful. 
+# FIXME: Add necessary machinary for this.
+
+?X?
+O.O
+?*o
+
+:8,A
 
 
 # END OF FILE

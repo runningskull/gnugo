@@ -537,7 +537,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	  if ((p[x][y] & and_mask[color-1][att]) != val_mask[color-1][att])
 	    goto match_failed;
 
-	  if (goal != NULL) {
+	  if (goal != NULL && p[x][y] != EMPTY) {
 	    if (goal[x][y])
 	      found_goal = 1;
 	    else if (p[x][y] == color)

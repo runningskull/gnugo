@@ -757,3 +757,16 @@ OX*O
 ----
 
 :8,D
+
+
+Pattern Def69
+
+OX*       atari on opponent to defend
+?O.
+
+:8,D
+
+aC*
+?b.
+
+;lib(a)>1 && lib(b)>1 && lib(C)<=2 && olib(*)>1

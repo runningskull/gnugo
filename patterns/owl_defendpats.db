@@ -1673,6 +1673,17 @@ AOX
 ;oplay_defend(*,A) != WIN
 
 
+Pattern D614b
+# gf New pattern. (3.1.9)
+
+ooOOo           attempt to live without ko
+o...O
+.*XOX
+-----
+
+:8,-,value(31)
+
+
 Pattern D615
 
 XOo?          secure eye shape against snapback threat
@@ -3397,6 +3408,23 @@ OOB.
 
 ; oplay_attack_either(*,A,B)
 
+
+Pattern D1133
+# gf New pattern. (3.1.9)
+
+?X.o
+Ox*.         escape
+oO..
+----
+
+:8,-,value(65)
+
+?X.o
+Ox*a
+oO..
+----
+
+;owl_escape_value(a)>0
 
 
 ########################################################

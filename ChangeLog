@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- 9x9 case revised in fuseki()
+- bugfix in goal detection in matchpat, don't accept empty goal vertices
+- bugfix in gtp_genmove()
+- tuning, owl tuning
+- new test cases in owl.tst
 - further 1D revisions in worm.c
 - find_lunch() moved from utils.c to worm.c
 - is_same_worm() converted to 1D

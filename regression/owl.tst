@@ -802,6 +802,16 @@ loadsgf games/filllib9.sgf 121
 220 owl_defend K19
 #? [0]
 
+# Additionally D7, C8 and some other odd moves work. H9 does not.
+loadsgf games/trevor/trevor_24.sgf 33
+221 owl_defend H8
+#? [D8|E8]*
+
+# E6 almost kills tactically.
+loadsgf games/trevor/trevor_27.sgf 36
+222 owl_attack E5
+#? [E6]*
+
 
 ########### end of tests #####################
 

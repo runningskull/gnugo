@@ -1118,12 +1118,6 @@ gtp_genmove(char *s, int id)
   gg_srand(seed);
   
   genmove_conservative(&i, &j, color);
-  game_move[move_stack_pointer].i = i;
-  game_move[move_stack_pointer].j = j;
-  game_move[move_stack_pointer].color = color;
-  if (move_stack_pointer < MAX_MOVES)
-    move_stack_pointer++;
-
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_vertex(i, j);
   return gtp_finish_response();

@@ -8048,13 +8048,14 @@ Pattern CB290
 
 
 Pattern CB291
+# gf Shape value removed. (3.1.9)
 
 .OX??          extend
 ..OX?
 ..*.?
 ?..??
 
-:8,OXde,shape(7)
+:8,OXde
 
 .OX??
 .aOX?
@@ -11961,6 +11962,7 @@ Pattern EJ83
 
 
 Pattern EJ84
+# gf Made pattern more powerful. (3.1.9)
 
 ......       Atari before connecting
 ..*...
@@ -11970,7 +11972,21 @@ X.XO..
 ......
 ------
 
-:8,J
+:8,J,reverse_followup(10)
+
+......
+..*c..
+X.XO..
+.XObe.
+..ad..
+......
+------
+
+>replace(a,*);
+>replace(b,*);
+>replace(c,*);
+>replace(d,*);
+>replace(e,*);
 
 
 Pattern EJ85
@@ -12603,9 +12619,9 @@ OX?
 
 .a.
 b*o
-OX?
+OC?
 
-;omoyo(a) && oplay_attack(*,b,b)
+;omoyo(a) && oplay_attack(*,b,b) && !(attack(C) && oplay_defend(*,C))
 
 
 Pattern LE5
