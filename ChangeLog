@@ -22,6 +22,7 @@
 - alternative implementation of compute_surrounding_moyo_sizes() for
   experimental-connections option
 - new function influence_get_moyo_data()
+- new game records and regression tests
 
 3.3.8 released September 5, 2002
 

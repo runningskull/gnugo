@@ -38,12 +38,17 @@ loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 192
 269 owl_defend D11
 #? [1 E9]*
 
+# tests 270 - 272 refer to badly connected dragon eyespaces
 loadsgf games/owl37.sgf
 270 owl_attack A4
 #? [1 A5]*
 
 271 owl_defend A4
 #? [1 A5]*
+
+loadsgf games/owl38.sgf
+272 owl_defend H12
+#? [1 F13]*
 
 
 ########### end of tests #####################
