@@ -19,7 +19,7 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 36
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 46
 40 reg_genmove white
-#? [H3|F4]*
+#? [H3|F4]
 
 # upper left needs attention
 loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 12
@@ -265,7 +265,7 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 152
 
 loadsgf games/nngs/evand-gnugo-3.3.21-200306130638.sgf 156
 630 reg_genmove black
-#? [B6]*
+#? [B6]
 
 #unneeded.  Take a big point somewhere.
 loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 16
@@ -320,7 +320,7 @@ loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 220
 
 loadsgf games/nngs/gnugo-3.4-nailer-200308230714.sgf 32
 750 reg_genmove white
-#? [C7]
+#? [C7]*
 
 
 ############ End of Tests #################

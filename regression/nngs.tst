@@ -69,7 +69,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 172
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 194
 220 reg_genmove black
-#? [L1|E7|G13|K9]
+#? [L1|E7|G13|K9]*
 
 
 
@@ -127,7 +127,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 8
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 12
 320 reg_genmove black
-#? [B15|B16]*
+#? [B15|B16]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 14
@@ -155,7 +155,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 82
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 126
 380 reg_genmove black
-#? [!H2|S1]*
+#? [!H2|S1]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
@@ -502,7 +502,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 58
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 92
 1090 reg_genmove white
-#? [B17|B16]*
+#? [B17|B16]
 
 
 #Yikes!

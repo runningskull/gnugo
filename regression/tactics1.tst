@@ -62,7 +62,7 @@ loadsgf games/tactics07.sgf
 
 loadsgf games/tactics08.sgf
 106 reg_genmove white
-#? [F8|F6]*
+#? [F8|F6]
 
 loadsgf games/edge_defense1.sgf
 107 reg_genmove white

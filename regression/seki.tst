@@ -471,7 +471,7 @@ play white C1
 # Black should play B2. A2 and B1 leave an unnecessary ko threat.
 loadsgf games/seki14.sgf
 1001 reg_genmove white
-#? [B2]
+#? [B2]*
 1002 reg_genmove black
 #? [B2]*
 

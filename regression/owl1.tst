@@ -283,9 +283,9 @@ loadsgf games/nngs/juka-gnugo-3.5.1-200309161948.sgf
 
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 78
 330 owl_attack Q5
-#? [1 R1]*
+#? [1 R1]
 331 owl_defend Q5
-#? [1 (R1|S1|T2)]*
+#? [1 (R1|S1|T2)]
 
 # This is more of a semeai, but at least owl should not say that
 # B19 is unattackable.
@@ -308,7 +308,7 @@ loadsgf games/nngs/joshj-gnugo-3.5.2gf1-200312171536.sgf 180
 
 loadsgf games/nngs/gnugo-3.5.2gf1-G28-200312282240.sgf 203
 336 owl_attack M5
-#? [1 (N2|O1)]
+#? [1 (N2|O1)]*
 
 ########### end of tests #####################
 

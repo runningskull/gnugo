@@ -166,7 +166,7 @@ loadsgf games/strategy14a.sgf
 # This is essentially a semeai problem
 loadsgf games/strategy22.sgf
 80 reg_genmove white
-#? [P4|Q4|Q3|S8]*
+#? [P4|Q4|Q3|S8]
 
 # Looks to me like B12 is also effective, although much more
 # complicated. /gf

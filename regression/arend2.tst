@@ -63,7 +63,7 @@ loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf 39
 
 loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf 187
 150 reg_genmove black
-#? [D6|C6]
+#? [D6|C6]*
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 6
 160 reg_genmove black
@@ -99,7 +99,7 @@ loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 152
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 158
 230 restricted_genmove black G14 H14 K11 L11
-#? [!H14]*
+#? [!H14]
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 208
 240 reg_genmove black

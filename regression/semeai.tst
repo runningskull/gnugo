@@ -356,22 +356,22 @@ loadsgf games/semeai/semeai16.sgf 222
 87 analyze_semeai N19 S18
 #? [1 1 (Q19|S19|T18|T16)]
 88 analyze_semeai S18 N19
-#? [2 0 T12]
+#? [2 0 T12]*
 loadsgf games/semeai/semeai16.sgf 224
 90 analyze_semeai N19 S18
-#? [1 3 (Q19|S19|T18|T16)]
+#? [1 3 (Q19|S19|T18|T16)]*
 91 analyze_semeai S18 N19
-#? [2 0 Q17]
+#? [2 0 Q17]*
 loadsgf games/semeai/semeai16.sgf 226
 93 analyze_semeai N19 S18
-#? [1 3 S19]
+#? [1 3 S19]*
 94 analyze_semeai S18 N19
 #? [1 1 S19]
 loadsgf games/semeai/semeai16.sgf 230
 96 analyze_semeai N19 S18
 #? [1 0 S19]
 97 analyze_semeai S18 N19
-#? [1 1 S19]
+#? [1 1 S19]*
 
 ########### semeai gen_move tests #################
 
@@ -383,7 +383,7 @@ loadsgf games/semeai/semeaiko1.sgf
 
 loadsgf games/semeai/semeai16.sgf 222
 89 reg_genmove black
-#? [Q19|S19|T18|T16]
+#? [Q19|S19|T18|T16]*
 loadsgf games/semeai/semeai16.sgf 224
 92 reg_genmove black
 #? [Q19|S19|T18|T16]

@@ -67,7 +67,7 @@ loadsgf games/cgf2003/GnuGo-Go4.sgf 141
 # P5 clearly better than N6.
 loadsgf games/cgf2003/GnuGo-Go4.sgf 155
 205 restricted_genmove black N6 P5
-#? [P5]*
+#? [P5]
 
 # C13 only move. D13 unthinkable.
 loadsgf games/cgf2003/GnuGo-Go4.sgf 175
@@ -82,7 +82,7 @@ loadsgf games/cgf2003/GnuGo-GoInt.sgf 41
 # C1 suffices to live, as does B6.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 59
 302 reg_genmove black
-#? [C1|B6]*
+#? [C1|B6]
 
 # P18 is clearly superior to Q18.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 69

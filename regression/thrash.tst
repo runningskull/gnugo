@@ -8,7 +8,7 @@ loadsgf games/nngs/Temnik-gnugo-3.3.15-200301161937.sgf 222
 
 loadsgf games/nngs/Temnik-gnugo-3.3.15-200301161937.sgf 228
 3 reg_genmove black
-#? [O5|N5|N4]*
+#? [O5|N5|N4]
 
 loadsgf games/nngs/Temnik-gnugo-3.3.15-200301161937.sgf 230
 4 reg_genmove black
@@ -48,5 +48,5 @@ loadsgf games/nngs/ccwills-gnugo-3.5.2-200312112026.sgf 125
 # White can't be allowed to thrash in the corner. (Clearly critical dragon.)
 loadsgf games/nngs/ccwills-gnugo-3.5.2-200312112026.sgf 173
 11 reg_genmove black
-#? [S3]*
+#? [S3]
 

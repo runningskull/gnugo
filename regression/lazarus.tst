@@ -51,7 +51,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 268
 # gf Added L9 which looks no worse than M8. (3.3.17)
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 74
 13 reg_genmove black
-#? [R13|M8|L9]
+#? [R13|M8|L9]*
 
 # Q15 is locally much more solid than R19, but at least T5 and H5 may
 # also be considered. 

@@ -248,7 +248,7 @@ loadsgf games/bretz.sgf 130
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 148
 198 reg_genmove black
-#? [C10|S18]
+#? [C10|S18]*
 
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 164

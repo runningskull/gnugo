@@ -526,7 +526,7 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 224
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209122040.sgf 38
 1110 reg_genmove white
-#? [B7]*
+#? [B7]
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209130704.sgf 160
 1120 reg_genmove white

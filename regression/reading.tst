@@ -808,7 +808,7 @@ loadsgf games/reading44.sgf
 # See also strategy:13.
 loadsgf games/incident108b.sgf 292
 194 attack L16
-#? [0]
+#? [0]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

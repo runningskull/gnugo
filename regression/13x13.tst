@@ -190,11 +190,11 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 110
 #SEVERITY=8
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 12
 37 reg_genmove white
-#? [E10]
+#? [E10]*
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 38 reg_genmove white
-#? [G11]*
+#? [G11]
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
@@ -322,7 +322,7 @@ loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 13
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
 60 reg_genmove black
-#? [K5|L5]*
+#? [K5|L5]
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 75
 61 reg_genmove black
@@ -345,7 +345,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 33
 # New failure (comparing 3.0.0 and 3.1.15)
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 35
 65 reg_genmove black
-#? [H4]*
+#? [H4]
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 47
 66 reg_genmove black

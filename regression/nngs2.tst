@@ -129,7 +129,7 @@ loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 204
 
 loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 206
 270 reg_genmove black
-#? [S19]*
+#? [S19]
 
 loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 216
 280 reg_genmove black
@@ -144,7 +144,7 @@ loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 220
 # Hey, Q19 is dead and Q13 doesn't threaten anything.
 loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 232
 300 reg_genmove black
-#? [!Q13]*
+#? [!Q13]
 
 loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 240
 310 reg_genmove black
@@ -187,7 +187,7 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 170
 # black is getting to deep, time to defend.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 196
 460 reg_genmove white
-#? [J4|K2|K3|K4|K5|L2]*
+#? [J4|K2|K3|K4|K5|L2]
 
 #CATEGORY=SEMEAI
 # K1 wins the semeai. Other moves let black get ko.
@@ -249,7 +249,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 122
 
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 580 reg_genmove white
-#? [N19]*
+#? [N19]
 
 # We still can live.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 224

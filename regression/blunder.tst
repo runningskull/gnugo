@@ -81,7 +81,7 @@ loadsgf games/blunder12.sgf 252
 
 loadsgf games/blunder12.sgf 258
 17 reg_genmove white
-#? [R7]*
+#? [R7]
 
 # A simplification of incident 136. Black E6 is a bad blunder.
 loadsgf games/blunder13.sgf
@@ -100,7 +100,7 @@ loadsgf games/handtalk/handtalk13.sgf 123
 # L9 got incorrectly rejected as a blunder.
 loadsgf games/handtalk/handtalk13.sgf 131
 21 reg_genmove black
-#? [L9]
+#? [L9]*
 
 # R18 is suicidal
 loadsgf games/blunder15.sgf
@@ -125,7 +125,7 @@ loadsgf games/blunder18.sgf
 # Don't play an outer liberty and let black make seki or better.
 loadsgf games/blunder19.sgf
 26 reg_genmove white
-#? [!D19|F17]*
+#? [!D19|F17]
 
 # R3 lets black play T2 and get seki.
 loadsgf games/blunder20.sgf
