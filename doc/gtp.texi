@@ -365,6 +365,7 @@ vertex, from the command arguments.
 
 @node GTP command reference
 @section GTP command reference
+@cindex GTP command reference
 
 This section lists the GTP commands implemented in GNU Go along with
 some information about each command. Each entry in the list has the

@@ -1,1713 +1,1069 @@
 @cindex quit
-@item quit
+@item quit: Quit
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
 
-@example
-
- Function:  Quit
- Arguments: none
- Fails:     never
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex protocol_version
-@item protocol_version
+@item protocol_version: Report protocol version.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   protocol version number
 
-@example
-
- Function:  Report protocol version.
- Arguments: none
- Fails:     never
- Returns:   protocol version number
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex name
-@item name
+@item name: Report the name of the program.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   program name
 
-@example
-
- Function:  Report the name of the program.
- Arguments: none
- Fails:     never
- Returns:   program name
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex version
-@item version
+@item version: Report the version number of the program.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   version number
 
-@example
-
- Function:  Report the version number of the program.
- Arguments: none
- Fails:     never
- Returns:   version number
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex boardsize
-@item boardsize
+@item boardsize: Set the board size to NxN and clear the board.
+@verbatim
+Arguments: integer
+Fails:     board size outside engine's limits
+Returns:   nothing
 
-@example
-
- Function:  Set the board size to NxN and clear the board.
- Arguments: integer
- Fails:     board size outside engine's limits
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex query_boardsize
-@item query_boardsize
-
-@example
-
- Function:  Find the current boardsize
- Arguments: none
- Fails:     never
- Returns:   board_size
-
-@end example
-
+@item query_boardsize: Find the current boardsize
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   board_size
+@end verbatim
 @cindex clear_board
-@item clear_board
+@item clear_board: Clear the board.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
 
-@example
-
- Function:  Clear the board.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex orientation
-@item orientation
-
-@example
-
- Function:  Set the orienation to N and clear the board
- Arguments: integer
- Fails:     illegal orientation
- Returns:   nothing
-
-@end example
-
+@item orientation: Set the orienation to N and clear the board
+@verbatim
+Arguments: integer
+Fails:     illegal orientation
+Returns:   nothing
+@end verbatim
 @cindex query_orientation
-@item query_orientation
-
-@example
-
- Function:  Find the current orientation
- Arguments: none
- Fails:     never
- Returns:   orientation
-
-@end example
-
+@item query_orientation: Find the current orientation
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   orientation
+@end verbatim
 @cindex komi
-@item komi
+@item komi: Set the komi.
+@verbatim
+Arguments: float
+Fails:     incorrect argument
+Returns:   nothing
 
-@example
-
- Function:  Set the komi.
- Arguments: float
- Fails:     incorrect argument
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex get_komi
-@item get_komi
-
-@example
-
- Function:  Get the komi
- Arguments: none
- Fails:     never
- Returns:   Komi 
-
-@end example
-
+@item get_komi: Get the komi
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   Komi 
+@end verbatim
 @cindex black
-@item black
+@item black: Play a black stone at the given vertex.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, illegal move
+Returns:   nothing
 
-@example
-
- Function:  Play a black stone at the given vertex.
- Arguments: vertex
- Fails:     invalid vertex, illegal move
- Returns:   nothing
-
- Status:    Obsolete GTP version 1 command.
-
-@end example
-
+Status:    Obsolete GTP version 1 command.
+@end verbatim
 @cindex playwhite
-@item playwhite
+@item playwhite: Play a white stone at the given vertex.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, illegal move
+Returns:   nothing
 
-@example
-
- Function:  Play a white stone at the given vertex.
- Arguments: vertex
- Fails:     invalid vertex, illegal move
- Returns:   nothing
-
- Status:    Obsolete GTP version 1 command.
-
-@end example
-
+Status:    Obsolete GTP version 1 command.
+@end verbatim
 @cindex play
-@item play
+@item play: Play a stone of the given color at the given vertex.
+@verbatim
+Arguments: color, vertex
+Fails:     invalid vertex, illegal move
+Returns:   nothing
 
-@example
-
- Function:  Play a stone of the given color at the given vertex.
- Arguments: color, vertex
- Fails:     invalid vertex, illegal move
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex fixed_handicap
-@item fixed_handicap
+@item fixed_handicap: Set up fixed placement handicap stones.
+@verbatim
+Arguments: number of handicap stones
+Fails:     invalid number of stones for the current boardsize
+Returns:   list of vertices with handicap stones
 
-@example
-
- Function:  Set up fixed placement handicap stones.
- Arguments: number of handicap stones
- Fails:     invalid number of stones for the current boardsize
- Returns:   list of vertices with handicap stones
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex place_free_handicap
-@item place_free_handicap
+@item place_free_handicap: Choose free placement handicap stones and put them on the board.
+@verbatim
+Arguments: number of handicap stones
+Fails:     invalid number of stones
+Returns:   list of vertices with handicap stones
 
-@example
-
- Function:  Choose free placement handicap stones and put them on the board.
- Arguments: number of handicap stones
- Fails:     invalid number of stones
- Returns:   list of vertices with handicap stones
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex set_free_handicap
-@item set_free_handicap
+@item set_free_handicap: Put free placement handicap stones on the board.
+@verbatim
+Arguments: list of vertices with handicap stones
+Fails:     board not empty, bad list of vertices
+Returns:   nothing
 
-@example
-
- Function:  Put free placement handicap stones on the board.
- Arguments: list of vertices with handicap stones
- Fails:     board not empty, bad list of vertices
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex get_handicap
-@item get_handicap
-
-@example
-
- Function:  Get the handicap
- Arguments: none
- Fails:     never
- Returns:   handicap
-
-@end example
-
+@item get_handicap: Get the handicap
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   handicap
+@end verbatim
 @cindex loadsgf
-@item loadsgf
+@item loadsgf: Load an sgf file, possibly up to a move number or the first occurence of a move.           
+@verbatim
+Arguments: filename + move number, vertex, or nothing
+Fails:     missing filename or failure to open or parse file
+Returns:   color to play
 
-@example
-
- Function:  Load an sgf file, possibly up to a move number or the first
-            occurence of a move.           
- Arguments: filename + move number, vertex, or nothing
- Fails:     missing filename or failure to open or parse file
- Returns:   color to play
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex color
-@item color
-
-@example
-
- Function:  Return the color at a vertex.
- Arguments: vertex
- Fails:     invalid vertex
- Returns:   "black", "white", or "empty"
-
-@end example
-
+@item color: Return the color at a vertex.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex
+Returns:   "black", "white", or "empty"
+@end verbatim
 @cindex list_stones
-@item list_stones
-
-@example
-
- Function:  List vertices with either black or white stones.
- Arguments: color
- Fails:     invalid color
- Returns:   list of vertices
-
-@end example
-
+@item list_stones: List vertices with either black or white stones.
+@verbatim
+Arguments: color
+Fails:     invalid color
+Returns:   list of vertices
+@end verbatim
 @cindex countlib
-@item countlib
-
-@example
-
- Function:  Count number of liberties for the string at a vertex.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   Number of liberties.
-
-@end example
-
+@item countlib: Count number of liberties for the string at a vertex.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   Number of liberties.
+@end verbatim
 @cindex findlib
-@item findlib
-
-@example
-
- Function:  Return the positions of the liberties for the string at a vertex.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   Sorted space separated list of vertices.
-
-@end example
-
+@item findlib: Return the positions of the liberties for the string at a vertex.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   Sorted space separated list of vertices.
+@end verbatim
 @cindex accuratelib
-@item accuratelib
-
-@example
-
- Function:  Determine which liberties a stone of given color
-            will get if played at given vertex.
- Arguments: move (color + vertex)
- Fails:     invalid color, invalid vertex, occupied vertex
- Returns:   Sorted space separated list of liberties
-
-@end example
-
+@item accuratelib: Determine which liberties a stone of given color will get if played at given vertex.
+@verbatim
+Arguments: move (color + vertex)
+Fails:     invalid color, invalid vertex, occupied vertex
+Returns:   Sorted space separated list of liberties
+@end verbatim
 @cindex accurate_approxlib
-@item accurate_approxlib
+@item accurate_approxlib: Determine which liberties a stone of given color will get if played at given vertex.
+@verbatim
+Arguments: move (color + vertex)
+Fails:     invalid color, invalid vertex, occupied vertex
+Returns:   Sorted space separated list of liberties
 
-@example
-
- Function:  Determine which liberties a stone of given color
-            will get if played at given vertex.
- Arguments: move (color + vertex)
- Fails:     invalid color, invalid vertex, occupied vertex
- Returns:   Sorted space separated list of liberties
-
- Supposedly identical in behavior to the above function and
- can be retired when this is confirmed.
-
-@end example
-
+Supposedly identical in behavior to the above function and
+can be retired when this is confirmed.
+@end verbatim
 @cindex is_legal
-@item is_legal
-
-@example
-
- Function:  Tell whether a move is legal.
- Arguments: move
- Fails:     invalid move
- Returns:   1 if the move is legal, 0 if it is not.
-
-@end example
-
+@item is_legal: Tell whether a move is legal.
+@verbatim
+Arguments: move
+Fails:     invalid move
+Returns:   1 if the move is legal, 0 if it is not.
+@end verbatim
 @cindex all_legal
-@item all_legal
-
-@example
-
- Function:  List all legal moves for either color.
- Arguments: color
- Fails:     invalid color
- Returns:   Sorted space separated list of vertices.
-
-@end example
-
+@item all_legal: List all legal moves for either color.
+@verbatim
+Arguments: color
+Fails:     invalid color
+Returns:   Sorted space separated list of vertices.
+@end verbatim
 @cindex captures
-@item captures
-
-@example
-
- Function:  List the number of captures taken by either color.
- Arguments: color
- Fails:     invalid color
- Returns:   Number of captures.
-
-@end example
-
+@item captures: List the number of captures taken by either color.
+@verbatim
+Arguments: color
+Fails:     invalid color
+Returns:   Number of captures.
+@end verbatim
 @cindex last_move
-@item last_move
-
-@example
-
- Function:  Return the last move.
- Arguments: none
- Fails:     no previous move known
- Returns:   Color and vertex of last move.
-
-@end example
-
+@item last_move: Return the last move.
+@verbatim
+Arguments: none
+Fails:     no previous move known
+Returns:   Color and vertex of last move.
+@end verbatim
 @cindex move_history
-@item move_history
-
-@example
-
- Function:  Print the move history in reverse order
- Arguments: none
- Fails:     never
- Returns:   List of moves played in reverse order in format: 
-            color move (one move per line)
-
-@end example
-
+@item move_history: Print the move history in reverse order
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   List of moves played in reverse order in format: 
+           color move (one move per line)
+@end verbatim
 @cindex trymove
-@item trymove
-
-@example
-
- Function:  Play a stone of the given color at the given vertex.
- Arguments: move (color + vertex)
- Fails:     invalid color, invalid vertex, illegal move
- Returns:   nothing
-
-@end example
-
+@item trymove: Play a stone of the given color at the given vertex.
+@verbatim
+Arguments: move (color + vertex)
+Fails:     invalid color, invalid vertex, illegal move
+Returns:   nothing
+@end verbatim
 @cindex tryko
-@item tryko
-
-@example
-
- Function:  Play a stone of the given color at the given vertex, 
-            allowing illegal ko capture.
- Arguments: move (color + vertex)
- Fails:     invalid color, invalid vertex, illegal move
- Returns:   nothing
-
-@end example
-
+@item tryko: Play a stone of the given color at the given vertex,  allowing illegal ko capture.
+@verbatim
+Arguments: move (color + vertex)
+Fails:     invalid color, invalid vertex, illegal move
+Returns:   nothing
+@end verbatim
 @cindex popgo
-@item popgo
-
-@example
-
- Function:  Undo a trymove or tryko.
- Arguments: none
- Fails:     stack empty
- Returns:   nothing
-
-@end example
-
+@item popgo: Undo a trymove or tryko.
+@verbatim
+Arguments: none
+Fails:     stack empty
+Returns:   nothing
+@end verbatim
 
 @cindex clear_cache
-@item clear_cache
-
-@example
-
- Function:  clear the caches.
- Arguments: none.
- Fails:     never.
- Returns:   nothing.
-
-@end example
-
+@item clear_cache: clear the caches.
+@verbatim
+Arguments: none.
+Fails:     never.
+Returns:   nothing.
+@end verbatim
 @cindex attack
-@item attack
-
-@example
-
- Function:  Try to attack a string.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   attack code followed by attack point if attack code nonzero.
-
-@end example
-
+@item attack: Try to attack a string.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   attack code followed by attack point if attack code nonzero.
+@end verbatim
 @cindex attack_either
-@item attack_either
-
-@example
-
- Function:  Try to attack either of two strings
- Arguments: two vertices
- Fails:     invalid vertex, empty vertex
- Returns:   attack code against the strings.  Guarantees there
-            exists a move which will attack one of the two
-            with attack_code, but does not return the move.
-
-@end example
-
+@item attack_either: Try to attack either of two strings
+@verbatim
+Arguments: two vertices
+Fails:     invalid vertex, empty vertex
+Returns:   attack code against the strings.  Guarantees there
+           exists a move which will attack one of the two
+           with attack_code, but does not return the move.
+@end verbatim
 @cindex defend
-@item defend
-
-@example
-
- Function:  Try to defend a string.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   defense code followed by defense point if defense code nonzero.
-
-@end example
-
+@item defend: Try to defend a string.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   defense code followed by defense point if defense code nonzero.
+@end verbatim
 @cindex ladder_attack
-@item ladder_attack
-
-@example
-
- Function:  Try to attack a string strictly in a ladder.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   attack code followed by attack point if attack code nonzero.
-
-@end example
-
+@item ladder_attack: Try to attack a string strictly in a ladder.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   attack code followed by attack point if attack code nonzero.
+@end verbatim
 @cindex increase_depths
-@item increase_depths
-
-@example
-
- Function:  Increase depth values by one.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item increase_depths: Increase depth values by one.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex decrease_depths
-@item decrease_depths
-
-@example
-
- Function:  Decrease depth values by one.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item decrease_depths: Decrease depth values by one.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex owl_attack
-@item owl_attack
-
-@example
-
- Function:  Try to attack a dragon.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   attack code followed by attack point if attack code nonzero.
-
-@end example
-
+@item owl_attack: Try to attack a dragon.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   attack code followed by attack point if attack code nonzero.
+@end verbatim
 @cindex owl_defend
-@item owl_defend
-
-@example
-
- Function:  Try to defend a dragon.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   defense code followed by defense point if defense code nonzero.
-
-@end example
-
+@item owl_defend: Try to defend a dragon.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   defense code followed by defense point if defense code nonzero.
+@end verbatim
 @cindex owl_threaten_attack
-@item owl_threaten_attack
-
-@example
-
- Function:  Try to attack a dragon in 2 moves.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   attack code followed by the two attack points if
-            attack code nonzero.
-
-@end example
-
+@item owl_threaten_attack: Try to attack a dragon in 2 moves.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   attack code followed by the two attack points if
+           attack code nonzero.
+@end verbatim
 @cindex owl_threaten_defense
-@item owl_threaten_defense
-
-@example
-
- Function:  Try to defend a dragon with 2 moves.
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   defense code followed by the 2 defense points if
-            defense code nonzero.
-
-@end example
-
+@item owl_threaten_defense: Try to defend a dragon with 2 moves.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   defense code followed by the 2 defense points if
+           defense code nonzero.
+@end verbatim
 @cindex owl_does_attack
-@item owl_does_attack
-
-@example
-
- Function:  Examine whether a specific move attacks a dragon.
- Arguments: vertex (move), vertex (dragon)
- Fails:     invalid vertex, empty vertex
- Returns:   attack code
-
-@end example
-
+@item owl_does_attack: Examine whether a specific move attacks a dragon.
+@verbatim
+Arguments: vertex (move), vertex (dragon)
+Fails:     invalid vertex, empty vertex
+Returns:   attack code
+@end verbatim
 @cindex owl_does_defend
-@item owl_does_defend
-
-@example
-
- Function:  Examine whether a specific move defends a dragon.
- Arguments: vertex (move), vertex (dragon)
- Fails:     invalid vertex, empty vertex
- Returns:   defense code
-
-@end example
-
+@item owl_does_defend: Examine whether a specific move defends a dragon.
+@verbatim
+Arguments: vertex (move), vertex (dragon)
+Fails:     invalid vertex, empty vertex
+Returns:   defense code
+@end verbatim
 @cindex owl_connection_defends
-@item owl_connection_defends
-
-@example
-
- Function:  Examine whether a connection defends involved dragons.
- Arguments: vertex (move), vertex (dragon1), vertex (dragon2)
- Fails:     invalid vertex, empty vertex
- Returns:   defense code
-
-@end example
-
+@item owl_connection_defends: Examine whether a connection defends involved dragons.
+@verbatim
+Arguments: vertex (move), vertex (dragon1), vertex (dragon2)
+Fails:     invalid vertex, empty vertex
+Returns:   defense code
+@end verbatim
 @cindex defend_both
-@item defend_both
-
-@example
-
- Function:  Try to defend both of two strings
- Arguments: two vertices
- Fails:     invalid vertex, empty vertex
- Returns:   defend code for the strings.  Guarantees there
-            exists a move which will defend both of the two
-            with defend_code, but does not return the move.
-
-@end example
-
+@item defend_both: Try to defend both of two strings
+@verbatim
+Arguments: two vertices
+Fails:     invalid vertex, empty vertex
+Returns:   defend code for the strings.  Guarantees there
+           exists a move which will defend both of the two
+           with defend_code, but does not return the move.
+@end verbatim
 @cindex owl_substantial
-@item owl_substantial
-
-@example
-
- Function:  Determine whether capturing a string gives a living dragon
- Arguments: vertex
- Fails:     invalid vertex, empty vertex
- Returns:   1 if dragon can live, 0 otherwise
-
-@end example
-
+@item owl_substantial: Determine whether capturing a string gives a living dragon
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex, empty vertex
+Returns:   1 if dragon can live, 0 otherwise
+@end verbatim
 @cindex analyze_semeai
-@item analyze_semeai
-
-@example
-
- Function:  Analyze a semeai
- Arguments: dragona, dragonb
- Fails:     invalid vertices, empty vertices
- Returns:   semeai defense result, semeai attack result, semeai move
-
-@end example
-
+@item analyze_semeai: Analyze a semeai
+@verbatim
+Arguments: dragona, dragonb
+Fails:     invalid vertices, empty vertices
+Returns:   semeai defense result, semeai attack result, semeai move
+@end verbatim
 @cindex analyze_semeai_after_move
-@item analyze_semeai_after_move
-
-@example
-
- Function:  Analyze a semeai after a move have been made.
- Arguments: color, vertex, dragona, dragonb
- Fails:     invalid vertices
- Returns:   semeai defense result, semeai attack result, semeai move
-
-@end example
-
+@item analyze_semeai_after_move: Analyze a semeai after a move have been made.
+@verbatim
+Arguments: color, vertex, dragona, dragonb
+Fails:     invalid vertices
+Returns:   semeai defense result, semeai attack result, semeai move
+@end verbatim
 @cindex tactical_analyze_semeai
-@item tactical_analyze_semeai
-
-@example
-
- Function:  Analyze a semeai, not using owl
- Arguments: dragona, dragonb
- Fails:     invalid vertices, empty vertices
- Returns:   status of dragona, dragonb assuming dragona moves first
-
-@end example
-
+@item tactical_analyze_semeai: Analyze a semeai, not using owl
+@verbatim
+Arguments: dragona, dragonb
+Fails:     invalid vertices, empty vertices
+Returns:   status of dragona, dragonb assuming dragona moves first
+@end verbatim
 @cindex connect
-@item connect
-
-@example
-
- Function:  Try to connect two strings.
- Arguments: vertex, vertex
- Fails:     invalid vertex, empty vertex, vertices of different colors
- Returns:   connect result followed by connect point if successful.
-
-@end example
-
+@item connect: Try to connect two strings.
+@verbatim
+Arguments: vertex, vertex
+Fails:     invalid vertex, empty vertex, vertices of different colors
+Returns:   connect result followed by connect point if successful.
+@end verbatim
 @cindex disconnect
-@item disconnect
-
-@example
-
- Function:  Try to disconnect two strings.
- Arguments: vertex, vertex
- Fails:     invalid vertex, empty vertex, vertices of different colors
- Returns:   disconnect result followed by disconnect point if successful.
-
-@end example
-
+@item disconnect: Try to disconnect two strings.
+@verbatim
+Arguments: vertex, vertex
+Fails:     invalid vertex, empty vertex, vertices of different colors
+Returns:   disconnect result followed by disconnect point if successful.
+@end verbatim
 @cindex break_in
-@item break_in
-
-@example
-
- Function:  Try to break from string into area.
- Arguments: vertex, vertices
- Fails:     invalid vertex, empty vertex.
- Returns:   result followed by break in point if successful.
-
-@end example
-
+@item break_in: Try to break from string into area.
+@verbatim
+Arguments: vertex, vertices
+Fails:     invalid vertex, empty vertex.
+Returns:   result followed by break in point if successful.
+@end verbatim
 @cindex block_off
-@item block_off
-
-@example
-
- Function:  Try to block string from area.
- Arguments: vertex, vertices
- Fails:     invalid vertex, empty vertex.
- Returns:   result followed by block point if successful.
-
-@end example
-
+@item block_off: Try to block string from area.
+@verbatim
+Arguments: vertex, vertices
+Fails:     invalid vertex, empty vertex.
+Returns:   result followed by block point if successful.
+@end verbatim
 
 @cindex eval_eye
-@item eval_eye
-
-@example
-
- Function:  Evaluate an eye space
- Arguments: vertex
- Fails:     invalid vertex
- Returns:   Minimum and maximum number of eyes. If these differ an
-            attack and a defense point are additionally returned.
-            If the vertex is not an eye space or not of unique color,
-            a single -1 is returned.
-
-@end example
-
+@item eval_eye: Evaluate an eye space
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex
+Returns:   Minimum and maximum number of eyes. If these differ an
+           attack and a defense point are additionally returned.
+           If the vertex is not an eye space or not of unique color,
+           a single -1 is returned.
+@end verbatim
 
 @cindex dragon_status
-@item dragon_status
+@item dragon_status: Determine status of a dragon.
+@verbatim
+Arguments: optional vertex
+Fails:     invalid vertex, empty vertex
+Returns:   status ("alive", "critical", "dead", or "unknown"),
+           attack point, defense point. Points of attack and
+           defense are only given if the status is critical.
+           If no vertex is given, the status is listed for all
+           dragons, one per row in the format "A4: alive".
 
-@example
-
- Function:  Determine status of a dragon.
- Arguments: optional vertex
- Fails:     invalid vertex, empty vertex
- Returns:   status ("alive", "critical", "dead", or "unknown"),
-            attack point, defense point. Points of attack and
-            defense are only given if the status is critical.
-            If no vertex is given, the status is listed for all
-            dragons, one per row in the format "A4: alive".
-
- FIXME: Should be able to distinguish between life in seki
-        and independent life. Should also be able to identify ko.
-
-@end example
-
+FIXME: Should be able to distinguish between life in seki
+       and independent life. Should also be able to identify ko.
+@end verbatim
 
 @cindex same_dragon
-@item same_dragon
-
-@example
-
- Function:  Determine whether two stones belong to the same dragon.
- Arguments: vertex, vertex
- Fails:     invalid vertex, empty vertex
- Returns:   1 if the vertices belong to the same dragon, 0 otherwise
-
-@end example
-
+@item same_dragon: Determine whether two stones belong to the same dragon.
+@verbatim
+Arguments: vertex, vertex
+Fails:     invalid vertex, empty vertex
+Returns:   1 if the vertices belong to the same dragon, 0 otherwise
+@end verbatim
 
 @cindex unconditional_status
-@item unconditional_status
-
-@example
-
- Function:  Determine the unconditional status of a vertex.
- Arguments: vertex
- Fails:     invalid vertex
- Returns:   unconditional status ("undecided", "alive", "dead",
-            "white_territory", "black_territory"). Occupied vertices can
-            be undecided, alive, or dead. Empty vertices can be
-            undecided, white territory, or black territory.
-
-@end example
-
+@item unconditional_status: Determine the unconditional status of a vertex.
+@verbatim
+Arguments: vertex
+Fails:     invalid vertex
+Returns:   unconditional status ("undecided", "alive", "dead",
+           "white_territory", "black_territory"). Occupied vertices can
+           be undecided, alive, or dead. Empty vertices can be
+           undecided, white territory, or black territory.
+@end verbatim
 
 @cindex combination_attack
-@item combination_attack
-
-@example
-
- Function:  Find a move by color capturing something through a
-            combination attack.
- Arguments: color
- Fails:     invalid color
- Returns:   Recommended move, PASS if no move found
-
-@end example
-
+@item combination_attack: Find a move by color capturing something through a combination attack.
+@verbatim
+Arguments: color
+Fails:     invalid color
+Returns:   Recommended move, PASS if no move found
+@end verbatim
 
 @cindex combination_defend
-@item combination_defend
-
-@example
-
- Function:  If color can capture something through a
-            combination attack, list moves by the opponent of color
-            to defend against this attack.
- Arguments: color
- Fails:     invalid color
- Returns:   Recommended moves, PASS if no combination attack found.
-
-@end example
-
+@item combination_defend: If color can capture something through a combination attack, list moves by the opponent of color
+           to defend against this attack.
+@verbatim
+Arguments: color
+Fails:     invalid color
+Returns:   Recommended moves, PASS if no combination attack found.
+@end verbatim
 
 @cindex aa_confirm_safety
-@item aa_confirm_safety
-
-@example
-
- Function:  Run atari_atari_confirm_safety().
- Arguments: move, optional int
- Fails:     invalid move
- Returns:   success code, if failure also defending move
-
-@end example
-
+@item aa_confirm_safety: Run atari_atari_confirm_safety().
+@verbatim
+Arguments: move, optional int
+Fails:     invalid move
+Returns:   success code, if failure also defending move
+@end verbatim
 @cindex genmove_black
-@item genmove_black
+@item genmove_black: Generate and play the supposedly best black move.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   a move coordinate or "PASS"
 
-@example
-
- Function:  Generate and play the supposedly best black move.
- Arguments: none
- Fails:     never
- Returns:   a move coordinate or "PASS"
-
- Status:    Obsolete GTP version 1 command.
-
-@end example
-
+Status:    Obsolete GTP version 1 command.
+@end verbatim
 @cindex genmove_white
-@item genmove_white
+@item genmove_white: Generate and play the supposedly best white move.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   a move coordinate or "PASS"
 
-@example
-
- Function:  Generate and play the supposedly best white move.
- Arguments: none
- Fails:     never
- Returns:   a move coordinate or "PASS"
-
- Status:    Obsolete GTP version 1 command.
-
-@end example
-
+Status:    Obsolete GTP version 1 command.
+@end verbatim
 @cindex genmove
-@item genmove
+@item genmove: Generate and play the supposedly best move for either color.
+@verbatim
+Arguments: color to move
+Fails:     invalid color
+Returns:   a move coordinate or "PASS" (or "resign" if resignation_allowed)
 
-@example
-
- Function:  Generate and play the supposedly best move for either color.
- Arguments: color to move
- Fails:     invalid color
- Returns:   a move coordinate or "PASS" (or "resign" if resignation_allowed)
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex reg_genmove
-@item reg_genmove
+@item reg_genmove: Generate the supposedly best move for either color.
+@verbatim
+Arguments: color to move
+Fails:     invalid color
+Returns:   a move coordinate (or "PASS")
 
-@example
-
- Function:  Generate the supposedly best move for either color.
- Arguments: color to move
- Fails:     invalid color
- Returns:   a move coordinate (or "PASS")
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex gg_genmove
-@item gg_genmove
+@item gg_genmove: Generate the supposedly best move for either color.
+@verbatim
+Arguments: color to move, optionally a random seed
+Fails:     invalid color
+Returns:   a move coordinate (or "PASS")
 
-@example
-
- Function:  Generate the supposedly best move for either color.
- Arguments: color to move, optionally a random seed
- Fails:     invalid color
- Returns:   a move coordinate (or "PASS")
-
- This differs from reg_genmove in the optional random seed.
-
-@end example
-
+This differs from reg_genmove in the optional random seed.
+@end verbatim
 @cindex restricted_genmove
-@item restricted_genmove
-
-@example
-
- Function:  Generate the supposedly best move for either color from a
-            choice of allowed vertices.
- Arguments: color to move, allowed vertices
- Fails:     invalid color, invalid vertex, no vertex listed
- Returns:   a move coordinate (or "PASS")
-
-@end example
-
+@item restricted_genmove: Generate the supposedly best move for either color from a choice of allowed vertices.
+@verbatim
+Arguments: color to move, allowed vertices
+Fails:     invalid color, invalid vertex, no vertex listed
+Returns:   a move coordinate (or "PASS")
+@end verbatim
 @cindex kgs-genmove_cleanup
-@item kgs-genmove_cleanup
+@item kgs-genmove_cleanup: Generate and play the supposedly best move for either color, not passing until all dead opponent stones have been removed.
+@verbatim
+Arguments: color to move
+Fails:     invalid color
+Returns:   a move coordinate (or "PASS")
 
-@example
+Status:    KGS specific command.
 
- Function:  Generate and play the supposedly best move for either color,
-            not passing until all dead opponent stones have been removed.
- Arguments: color to move
- Fails:     invalid color
- Returns:   a move coordinate (or "PASS")
-
- Status:    KGS specific command.
-
- A similar command, but possibly somewhat different, will likely be added
- to GTP version 3 at a later time.
-
-@end example
-
+A similar command, but possibly somewhat different, will likely be added
+to GTP version 3 at a later time.
+@end verbatim
 @cindex level
-@item level
-
-@example
-
- Function:  Set the playing level.
- Arguments: int
- Fails:     incorrect argument
- Returns:   nothing
-
-@end example
-
+@item level: Set the playing level.
+@verbatim
+Arguments: int
+Fails:     incorrect argument
+Returns:   nothing
+@end verbatim
 
 @cindex undo
-@item undo
+@item undo: Undo one move
+@verbatim
+Arguments: none
+Fails:     If move history is too short.
+Returns:   nothing
 
-@example
-
- Function:  Undo one move
- Arguments: none
- Fails:     If move history is too short.
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 
 @cindex gg-undo
-@item gg-undo
-
-@example
-
- Function:  Undo a number of moves
- Arguments: optional int
- Fails:     If move history is too short.
- Returns:   nothing
-
-@end example
-
+@item gg-undo: Undo a number of moves
+@verbatim
+Arguments: optional int
+Fails:     If move history is too short.
+Returns:   nothing
+@end verbatim
 
 @cindex time_settings
-@item time_settings
+@item time_settings: Set time allowance
+@verbatim
+Arguments: int main_time, int byo_yomi_time, int byo_yomi_stones
+Fails:     syntax error
+Returns:   nothing
 
-@example
-
- Function:  Set time allowance
- Arguments: int main_time, int byo_yomi_time, int byo_yomi_stones
- Fails:     syntax error
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 
 @cindex time_left
-@item time_left
+@item time_left: Report remaining time
+@verbatim
+Arguments: color color, int time, int stones
+Fails:     syntax error
+Returns:   nothing
 
-@example
-
- Function:  Report remaining time
- Arguments: color color, int time, int stones
- Fails:     syntax error
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex final_score
-@item final_score
+@item final_score: Compute the score of a finished game.
+@verbatim
+Arguments: Optional random seed
+Fails:     never
+Returns:   Score in SGF format (RE property).
 
-@example
-
- Function:  Compute the score of a finished game.
- Arguments: Optional random seed
- Fails:     never
- Returns:   Score in SGF format (RE property).
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex final_status
-@item final_status
-
-@example
-
- Function:  Report the final status of a vertex in a finished game.
- Arguments: Vertex, optional random seed
- Fails:     invalid vertex
- Returns:   Status in the form of one of the strings "alive", "dead",
-            "seki", "white_territory", "black_territory", or "dame".
-
-@end example
-
+@item final_status: Report the final status of a vertex in a finished game.
+@verbatim
+Arguments: Vertex, optional random seed
+Fails:     invalid vertex
+Returns:   Status in the form of one of the strings "alive", "dead",
+           "seki", "white_territory", "black_territory", or "dame".
+@end verbatim
 @cindex final_status_list
-@item final_status_list
+@item final_status_list: Report vertices with a specific final status in a finished game.
+@verbatim
+Arguments: Status in the form of one of the strings "alive", "dead",
+           "seki", "white_territory", "black_territory", or "dame".
+           An optional random seed can be added.
+Fails:     missing or invalid status string
+Returns:   Vertices having the specified status. These are split with
+           one string on each line if the vertices are nonempty (i.e.
+           for "alive", "dead", and "seki").
 
-@example
-
- Function:  Report vertices with a specific final status in a finished game.
- Arguments: Status in the form of one of the strings "alive", "dead",
-            "seki", "white_territory", "black_territory", or "dame".
-            An optional random seed can be added.
- Fails:     missing or invalid status string
- Returns:   Vertices having the specified status. These are split with
-            one string on each line if the vertices are nonempty (i.e.
-            for "alive", "dead", and "seki").
-
- Status:    GTP version 2 standard command.
-            However, "dame", "white_territory", and "black_territory"
-            are private extensions.
-
-@end example
-
+Status:    GTP version 2 standard command.
+           However, "dame", "white_territory", and "black_territory"
+           are private extensions.
+@end verbatim
 
 @cindex estimate_score
-@item estimate_score
-
-@example
-
- Function:  Estimate the score
- Arguments: None
- Fails:     never
- Returns:   upper and lower bounds for the score
-
-@end example
-
+@item estimate_score: Estimate the score
+@verbatim
+Arguments: None
+Fails:     never
+Returns:   upper and lower bounds for the score
+@end verbatim
 
 @cindex experimental_score
-@item experimental_score
+@item experimental_score: Estimate the score, taking into account which player moves next
+@verbatim
+Arguments: Color to play
+Fails:     Invalid color
+Returns:   Score.
 
-@example
-
- Function:  Estimate the score, taking into account which player moves next
- Arguments: Color to play
- Fails:     Invalid color
- Returns:   Score.
-
- This function generates a move for color, then adds the
- value of the move generated to the value of the position.
- Critical dragons are awarded to the opponent since the
- value of rescuing a critical dragon is taken into account
- in the value of the move generated.
-
-@end example
-
+This function generates a move for color, then adds the
+value of the move generated to the value of the position.
+Critical dragons are awarded to the opponent since the
+value of rescuing a critical dragon is taken into account
+in the value of the move generated.
+@end verbatim
 @cindex reset_life_node_counter
-@item reset_life_node_counter
+@item reset_life_node_counter: Reset the count of life nodes.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
 
-@example
-
- Function:  Reset the count of life nodes.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
- Note: This function is obsolete and only remains for backwards
- compatibility.
-
-@end example
-
+Note: This function is obsolete and only remains for backwards
+compatibility.
+@end verbatim
 @cindex get_life_node_counter
-@item get_life_node_counter
+@item get_life_node_counter: Retrieve the count of life nodes.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   number of life nodes
 
-@example
-
- Function:  Retrieve the count of life nodes.
- Arguments: none
- Fails:     never
- Returns:   number of life nodes
-
- Note: This function is obsolete and only remains for backwards
- compatibility.
-
-@end example
-
+Note: This function is obsolete and only remains for backwards
+compatibility.
+@end verbatim
 @cindex reset_owl_node_counter
-@item reset_owl_node_counter
-
-@example
-
- Function:  Reset the count of owl nodes.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item reset_owl_node_counter: Reset the count of owl nodes.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex get_owl_node_counter
-@item get_owl_node_counter
-
-@example
-
- Function:  Retrieve the count of owl nodes.
- Arguments: none
- Fails:     never
- Returns:   number of owl nodes
-
-@end example
-
+@item get_owl_node_counter: Retrieve the count of owl nodes.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   number of owl nodes
+@end verbatim
 @cindex reset_reading_node_counter
-@item reset_reading_node_counter
-
-@example
-
- Function:  Reset the count of reading nodes.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item reset_reading_node_counter: Reset the count of reading nodes.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex get_reading_node_counter
-@item get_reading_node_counter
-
-@example
-
- Function:  Retrieve the count of reading nodes.
- Arguments: none
- Fails:     never
- Returns:   number of reading nodes
-
-@end example
-
+@item get_reading_node_counter: Retrieve the count of reading nodes.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   number of reading nodes
+@end verbatim
 @cindex reset_trymove_counter
-@item reset_trymove_counter
-
-@example
-
- Function:  Reset the count of trymoves/trykos.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item reset_trymove_counter: Reset the count of trymoves/trykos.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex get_trymove_counter
-@item get_trymove_counter
-
-@example
-
- Function:  Retrieve the count of trymoves/trykos.
- Arguments: none
- Fails:     never
- Returns:   number of trymoves/trykos
-
-@end example
-
+@item get_trymove_counter: Retrieve the count of trymoves/trykos.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   number of trymoves/trykos
+@end verbatim
 @cindex reset_connection_node_counter
-@item reset_connection_node_counter
-
-@example
-
- Function:  Reset the count of connection nodes.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item reset_connection_node_counter: Reset the count of connection nodes.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex get_connection_node_counter
-@item get_connection_node_counter
-
-@example
-
- Function:  Retrieve the count of connection nodes.
- Arguments: none
- Fails:     never
- Returns:   number of connection nodes
-
-@end example
-
+@item get_connection_node_counter: Retrieve the count of connection nodes.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   number of connection nodes
+@end verbatim
 @cindex test_eyeshape
-@item test_eyeshape
-
-@example
-
- Function:  Test an eyeshape for inconsistent evaluations
- Arguments: Eyeshape vertices
- Fails:     Bad vertices
- Returns:   Failure reports on stderr.
-
-@end example
-
+@item test_eyeshape: Test an eyeshape for inconsistent evaluations
+@verbatim
+Arguments: Eyeshape vertices
+Fails:     Bad vertices
+Returns:   Failure reports on stderr.
+@end verbatim
 @cindex analyze_eyegraph
-@item analyze_eyegraph
-
-@example
-
- Function:  Compute an eyevalue and vital points for an eye graph
- Arguments: Eyeshape encoded in string
- Fails:     Bad eyeshape, analysis failed
- Returns:   Eyevalue, vital points
-
-@end example
-
+@item analyze_eyegraph: Compute an eyevalue and vital points for an eye graph
+@verbatim
+Arguments: Eyeshape encoded in string
+Fails:     Bad eyeshape, analysis failed
+Returns:   Eyevalue, vital points
+@end verbatim
 @cindex cputime
-@item cputime
-
-@example
-
- Function:  Returns elapsed CPU time in seconds.
- Arguments: none
- Fails:     never
- Returns:   Total elapsed (user + system) CPU time in seconds.
-
-@end example
-
+@item cputime: Returns elapsed CPU time in seconds.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   Total elapsed (user + system) CPU time in seconds.
+@end verbatim
 @cindex showboard
-@item showboard
+@item showboard: Write the position to stdout.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
 
-@example
-
- Function:  Write the position to stdout.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex dump_stack
-@item dump_stack
-
-@example
-
- Function:  Dump stack to stderr.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item dump_stack: Dump stack to stderr.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex initial_influence
-@item initial_influence
+@item initial_influence: Return information about the initial influence function.
+@verbatim
+Arguments: color to move, what information
+Fails:     never
+Returns:   Influence data formatted like:
 
-@example
+  0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
+  0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
+                  .
+                  .
+                  .
+  0.00   0.00   0.00   0.00   0.00 100.00  75.53  41.47  23.41
 
- Function:  Return information about the initial influence function.
- Arguments: color to move, what information
- Fails:     never
- Returns:   Influence data formatted like:
+The available choices of information are:
 
-   0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
-   0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
-                   .
-                   .
-                   .
-   0.00   0.00   0.00   0.00   0.00 100.00  75.53  41.47  23.41
+white_influence (float)
+black_influence (float)
+white_strength (float)
+black_strength (float)
+white_attenuation (float)
+black_attenuation (float)
+white_permeability (float)
+black_permeability (float)
+territory_value (float)
+influence_regions (int)
+non_territory (int)
 
- The available choices of information are:
- 
- white_influence (float)
- black_influence (float)
- white_strength (float)
- black_strength (float)
- white_attenuation (float)
- black_attenuation (float)
- white_permeability (float)
- black_permeability (float)
- territory_value (float)
- influence_regions (int)
- non_territory (int)
-
- The encoding of influence_regions is as follows:
-  4 white stone
-  3 white territory
-  2 white moyo
-  1 white area
-  0 neutral
- -1 black area
- -2 black moyo
- -3 black territory
- -4 black stone
-
-@end example
-
+The encoding of influence_regions is as follows:
+ 4 white stone
+ 3 white territory
+ 2 white moyo
+ 1 white area
+ 0 neutral
+-1 black area
+-2 black moyo
+-3 black territory
+-4 black stone
+@end verbatim
 @cindex move_influence
-@item move_influence
-
-@example
-
- Function:  Return information about the influence function after a move.
- Arguments: move, what information
- Fails:     never
- Returns:   Influence data formatted like for initial_influence.
-
-@end example
-
+@item move_influence: Return information about the influence function after a move.
+@verbatim
+Arguments: move, what information
+Fails:     never
+Returns:   Influence data formatted like for initial_influence.
+@end verbatim
 @cindex move_probabilities
-@item move_probabilities
-
-@example
-
- Function:  List probabilities of each move being played (when non-zero).
-            If no previous genmove command has been issued, the result
-            of this command will be meaningless.
- Arguments: none
- Fails:     never
- Returns:   Move, probabilty pairs, one per row.
-
-@end example
-
+@item move_probabilities: List probabilities of each move being played (when non-zero). If no previous genmove command has been issued, the result
+           of this command will be meaningless.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   Move, probabilty pairs, one per row.
+@end verbatim
 @cindex move_uncertainty
-@item move_uncertainty
-
-@example
-
- Function:  Return the number of bits of uncertainty in the move.
-            If no previous genmove command has been issued, the result
-            of this command will be meaningless.
- Arguments: none
- Fails:     never
- Returns:   bits of uncertainty
-
-@end example
-
+@item move_uncertainty: Return the number of bits of uncertainty in the move. If no previous genmove command has been issued, the result
+           of this command will be meaningless.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   bits of uncertainty
+@end verbatim
 @cindex followup_influence
-@item followup_influence
-
-@example
-
- Function:  Return information about the followup influence after a move.
- Arguments: move, what information
- Fails:     never
- Returns:   Influence data formatted like for initial_influence.
-
-@end example
-
+@item followup_influence: Return information about the followup influence after a move.
+@verbatim
+Arguments: move, what information
+Fails:     never
+Returns:   Influence data formatted like for initial_influence.
+@end verbatim
 @cindex worm_data
-@item worm_data
+@item worm_data: Return the information in the worm data structure.
+@verbatim
+Arguments: optional vertex
+Fails:     never
+Returns:   Worm data formatted like:
 
-@example
+A19:
+color           black
+size            10
+effective_size  17.83
+origin          A19
+liberties       8
+liberties2      15
+liberties3      10
+liberties4      8
+attack          PASS
+attack_code     0
+lunch           B19
+defend          PASS
+defend_code     0
+cutstone        2
+cutstone2       0
+genus           0
+inessential     0
+B19:
+color           white
+.
+.
+.
+inessential     0
+C19:
+...
 
- Function:  Return the information in the worm data structure.
- Arguments: optional vertex
- Fails:     never
- Returns:   Worm data formatted like:
-
- A19:
- color           black
- size            10
- effective_size  17.83
- origin          A19
- liberties       8
- liberties2      15
- liberties3      10
- liberties4      8
- attack          PASS
- attack_code     0
- lunch           B19
- defend          PASS
- defend_code     0
- cutstone        2
- cutstone2       0
- genus           0
- inessential     0
- B19:
- color           white
- .
- .
- .
- inessential     0
- C19:
- ...
-
- If an intersection is specified, only data for this one will be returned.
-
-@end example
-
+If an intersection is specified, only data for this one will be returned.
+@end verbatim
 @cindex worm_stones
-@item worm_stones
-
-@example
-
- Function:  List the stones of a worm
- Arguments: the location, "BLACK" or "WHITE"
- Fails:     if called on an empty or off-board location
- Returns:   list of stones
-
-@end example
-
+@item worm_stones: List the stones of a worm
+@verbatim
+Arguments: the location, "BLACK" or "WHITE"
+Fails:     if called on an empty or off-board location
+Returns:   list of stones
+@end verbatim
 @cindex worm_cutstone
-@item worm_cutstone
-
-@example
-
- Function:  Return the cutstone field in the worm data structure.
- Arguments: non-empty vertex
- Fails:     never
- Returns:   cutstone
-
-@end example
-
+@item worm_cutstone: Return the cutstone field in the worm data structure.
+@verbatim
+Arguments: non-empty vertex
+Fails:     never
+Returns:   cutstone
+@end verbatim
 @cindex dragon_data
-@item dragon_data
-
-@example
-
- Function:  Return the information in the dragon data structure.
- Arguments: optional intersection
- Fails:     never
- Returns:   Dragon data formatted in the corresponding way to worm_data.
-
-@end example
-
+@item dragon_data: Return the information in the dragon data structure.
+@verbatim
+Arguments: optional intersection
+Fails:     never
+Returns:   Dragon data formatted in the corresponding way to worm_data.
+@end verbatim
 @cindex dragon_stones
-@item dragon_stones
-
-@example
-
- Function:  List the stones of a dragon
- Arguments: the location
- Fails:     if called on an empty or off-board location
- Returns:   list of stones
-
-@end example
-
+@item dragon_stones: List the stones of a dragon
+@verbatim
+Arguments: the location
+Fails:     if called on an empty or off-board location
+Returns:   list of stones
+@end verbatim
 @cindex eye_data
-@item eye_data
-
-@example
-
- Function:  Return the information in the eye data structure.
- Arguments: color, vertex
- Fails:     never
- Returns:   eye data fields and values, one pair per row
-
-@end example
-
+@item eye_data: Return the information in the eye data structure.
+@verbatim
+Arguments: color, vertex
+Fails:     never
+Returns:   eye data fields and values, one pair per row
+@end verbatim
 @cindex half_eye_data
-@item half_eye_data
-
-@example
-
- Function:  Return the information in the half eye data structure.
- Arguments: vertex
- Fails:     never
- Returns:   half eye data fields and values, one pair per row
-
-@end example
-
+@item half_eye_data: Return the information in the half eye data structure.
+@verbatim
+Arguments: vertex
+Fails:     never
+Returns:   half eye data fields and values, one pair per row
+@end verbatim
 @cindex start_sgftrace
-@item start_sgftrace
+@item start_sgftrace: Start storing moves executed during reading in an sgf tree in memory. 
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
 
-@example
-
- Function:  Start storing moves executed during reading in an sgf
-            tree in memory. 
- Arguments: none
- Fails:     never
- Returns:   nothing
-
- Warning: You had better know what you're doing if you try to use this
-          command.
-
-@end example
-
+Warning: You had better know what you're doing if you try to use this
+         command.
+@end verbatim
 @cindex finish_sgftrace
-@item finish_sgftrace
+@item finish_sgftrace: Finish storing moves in an sgf tree and write it to file. 
+@verbatim
+Arguments: filename
+Fails:     never
+Returns:   nothing
 
-@example
-
- Function:  Finish storing moves in an sgf tree and write it to file. 
- Arguments: filename
- Fails:     never
- Returns:   nothing
-
- Warning: You had better know what you're doing if you try to use this
-          command.
-
-@end example
-
+Warning: You had better know what you're doing if you try to use this
+         command.
+@end verbatim
 @cindex printsgf
-@item printsgf
-
-@example
-
- Function:  Dump the current position as a static sgf file to filename,
-            or as output if filename is missing or "-" 
- Arguments: optional filename
- Fails:     never
- Returns:   nothing if filename, otherwise the sgf
-
-@end example
-
+@item printsgf: Dump the current position as a static sgf file to filename, or as output if filename is missing or "-" 
+@verbatim
+Arguments: optional filename
+Fails:     never
+Returns:   nothing if filename, otherwise the sgf
+@end verbatim
 @cindex tune_move_ordering
-@item tune_move_ordering
-
-@example
-
- Function:  Tune the parameters for the move ordering in the tactical
-            reading.
- Arguments: MOVE_ORDERING_PARAMETERS integers
- Fails:     incorrect arguments
- Returns:   nothing
-
-@end example
-
+@item tune_move_ordering: Tune the parameters for the move ordering in the tactical reading.
+@verbatim
+Arguments: MOVE_ORDERING_PARAMETERS integers
+Fails:     incorrect arguments
+Returns:   nothing
+@end verbatim
 @cindex echo
-@item echo
-
-@example
-
- Function:  Echo the parameter
- Arguments: string
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item echo: Echo the parameter
+@verbatim
+Arguments: string
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex echo_err
-@item echo_err
-
-@example
-
- Function:  Echo the parameter to stdout AND stderr
- Arguments: string
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item echo_err: Echo the parameter to stdout AND stderr
+@verbatim
+Arguments: string
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex help
-@item help
+@item help: List all known commands
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   list of known commands, one per line
 
-@example
-
- Function:  List all known commands
- Arguments: none
- Fails:     never
- Returns:   list of known commands, one per line
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex known_command
-@item known_command
+@item known_command: Tell whether a command is known.
+@verbatim
+Arguments: command name
+Fails:     never
+Returns:   "true" if command exists, "false" if not
 
-@example
-
- Function:  Tell whether a command is known.
- Arguments: command name
- Fails:     never
- Returns:   "true" if command exists, "false" if not
-
- Status:    GTP version 2 standard command.
-
-@end example
-
+Status:    GTP version 2 standard command.
+@end verbatim
 @cindex report_uncertainty
-@item report_uncertainty
-
-@example
-
- Function:  Turn uncertainty reports from owl_attack
-            and owl_defend on or off.
- Arguments: "on" or "off"
- Fails:     invalid argument
- Returns:   nothing
-
-@end example
-
+@item report_uncertainty: Turn uncertainty reports from owl_attack and owl_defend on or off.
+@verbatim
+Arguments: "on" or "off"
+Fails:     invalid argument
+Returns:   nothing
+@end verbatim
 @cindex get_random_seed
-@item get_random_seed
-
-@example
-
- Function:  Get the random seed
- Arguments: none
- Fails:     never
- Returns:   random seed
-
-@end example
-
+@item get_random_seed: Get the random seed
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   random seed
+@end verbatim
 @cindex set_random_seed
-@item set_random_seed
-
-@example
-
- Function:  Set the random seed
- Arguments: integer
- Fails:     invalid data
- Returns:   nothing
-
-@end example
-
+@item set_random_seed: Set the random seed
+@verbatim
+Arguments: integer
+Fails:     invalid data
+Returns:   nothing
+@end verbatim
 @cindex is_surrounded
-@item is_surrounded
-
-@example
-
- Function:  Determine if a dragon is surrounded
- Arguments: vertex (dragon)
- Fails:     invalid vertex, empty vertex
- Returns:   1 if surrounded, 2 if weakly surrounded, 0 if not
-
-@end example
-
+@item is_surrounded: Determine if a dragon is surrounded
+@verbatim
+Arguments: vertex (dragon)
+Fails:     invalid vertex, empty vertex
+Returns:   1 if surrounded, 2 if weakly surrounded, 0 if not
+@end verbatim
 @cindex does_surround
-@item does_surround
-
-@example
-
- Function:  Determine if a move surrounds a dragon
- Arguments: vertex (move), vertex (dragon)
- Fails:     invalid vertex, empty (dragon, nonempty (move)
- Returns:   1 if (move) surrounds (dragon)
-
-@end example
-
+@item does_surround: Determine if a move surrounds a dragon
+@verbatim
+Arguments: vertex (move), vertex (dragon)
+Fails:     invalid vertex, empty (dragon, nonempty (move)
+Returns:   1 if (move) surrounds (dragon)
+@end verbatim
 
 @cindex surround_map
-@item surround_map
-
-@example
-
- Function:  Report the surround map for dragon at a vertex
- Arguments: vertex (dragon), vertex (mapped location)
- Fails:     invalid vertex, empty dragon
- Returns:   value of surround map at (mapped location), or -1 if
-            dragon not surrounded.
-
-@end example
-
+@item surround_map: Report the surround map for dragon at a vertex
+@verbatim
+Arguments: vertex (dragon), vertex (mapped location)
+Fails:     invalid vertex, empty dragon
+Returns:   value of surround map at (mapped location), or -1 if
+           dragon not surrounded.
+@end verbatim
 @cindex set_search_diamond
-@item set_search_diamond
-
-@example
-
- Function:  limit search, and establish a search diamond
- Arguments: pos
- Fails:     invalid value
- Returns:   nothing
-
-@end example
-
+@item set_search_diamond: limit search, and establish a search diamond
+@verbatim
+Arguments: pos
+Fails:     invalid value
+Returns:   nothing
+@end verbatim
 @cindex reset_search_mask
-@item reset_search_mask
-
-@example
-
- Function:  unmark the entire board for limited search
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item reset_search_mask: unmark the entire board for limited search
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim
 @cindex limit_search
-@item limit_search
-
-@example
-
- Function:  sets the global variable limit_search
- Arguments: value
- Fails:     invalid arguments
- Returns:   nothing
-
-@end example
-
+@item limit_search: sets the global variable limit_search
+@verbatim
+Arguments: value
+Fails:     invalid arguments
+Returns:   nothing
+@end verbatim
 @cindex set_search_limit
-@item set_search_limit
-
-@example
-
- Function:  mark a vertex for limited search
- Arguments: position
- Fails:     invalid arguments
- Returns:   nothing
-
-@end example
-
+@item set_search_limit: mark a vertex for limited search
+@verbatim
+Arguments: position
+Fails:     invalid arguments
+Returns:   nothing
+@end verbatim
 @cindex draw_search_area
-@item draw_search_area
-
-@example
-
- Function:  Draw search area. Writes to stderr.
- Arguments: none
- Fails:     never
- Returns:   nothing
-
-@end example
-
+@item draw_search_area: Draw search area. Writes to stderr.
+@verbatim
+Arguments: none
+Fails:     never
+Returns:   nothing
+@end verbatim

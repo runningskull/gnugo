@@ -49,12 +49,14 @@ gnugo.html: gnugo.texi $(gnugo_TEXINFOS)
 	$(TEXI2HTML) -split=chapter -nosec_nav -expand=tex $<
 
 gtp-commands.texi: $(cmdsrc)
-	cat $(srcdir)/gtp-commands.sed > TMP.sed
-	sed -e '/static struct gtp_command commands/,/^}/!d'		\
+	sed -e '1r '$(srcdir)/gtp-commands.sed				\
+	    -e '/static struct gtp_command commands/,/^}/!d'		\
 	    -e '/^ /!d' -e '/NULL/d'					\
 	    -e 's/ *{"\(.*\)"[^a-z]*\(gtp_[a-z_]*\)}.*/s,\2,\1,g/'	\
-	    $(cmdsrc) >> TMP.sed
+	    $(cmdsrc) > TMP.sed
 	sed -f TMP.sed $(cmdsrc) > $(srcdir)/gtp-commands.texi
 	rm -f TMP.sed
+
+
 
 
