@@ -243,7 +243,7 @@ loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 16
 # R9 makes life.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 34
 520 reg_genmove black
-#? [R9]*
+#? [R9]
 
 # Black has at least the Q6 threat and should fight the ko.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 52

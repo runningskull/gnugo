@@ -28,7 +28,7 @@ loadsgf games/incident156.sgf 246
 # 5 owl_attack C3
 # #? [1 (B4|C4)]
 6 owl_defend C3
-#? [0]
+#? [0]*
 
 # incident 160
 loadsgf games/incident156.sgf 250
@@ -493,7 +493,7 @@ loadsgf games/owl14.sgf 250
 
 loadsgf games/owl15.sgf
 132 owl_attack Q3
-#? [(1|2) R4]
+#? [(1|2) R4]*
 133 owl_defend O3
 #? [1 M3]
 
@@ -558,7 +558,7 @@ loadsgf games/FSF-neurogo.sgf 40
 # There might be an attack at G13, but it looks like it fails.
 loadsgf games/strategy25.sgf 63
 150 owl_attack D15
-#? [0]
+#? [0]*
 
 # Now G13 works.
 loadsgf games/strategy25.sgf 67

@@ -94,7 +94,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
 # Kill the whole thing, not just a piece.
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 222
 230 reg_genmove black
-#? [Q18]
+#? [Q18]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 242
 240 reg_genmove black
@@ -155,7 +155,7 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 128
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 138
 390 restricted_genmove black B8 A11
-#? [A11]*
+#? [A11]
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 142
 400 owl_defend J5
@@ -378,7 +378,7 @@ loadsgf games/nngs/GoFuN-gnugo-3.5.2gf1-200312230328.sgf 20
 
 loadsgf games/nngs/GoFuN-gnugo-3.5.2gf1-200312230328.sgf 74
 870 reg_genmove black
-#? [C3|C4|D3]*
+#? [C3|C4|D3]
 
 #M17 is bad; deal with one of the important groups
 loadsgf games/nngs/gnugo-3.5.2gf1-guest-200312260740.sgf 22

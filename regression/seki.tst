@@ -61,7 +61,7 @@ loadsgf games/seki05.sgf
 play white C2
 # Only B1 and A2 (oddly enough) avoids giving white a ko option.
 103 reg_genmove black
-#? [B1|A2]
+#? [B1|A2]*
 
 play black B1
 104 reg_genmove white

@@ -30,7 +30,7 @@ loadsgf games/wing-yuhiko-gnugo.sgf 86
 #CATEGORY=CONNECTION
 loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 54
 226 reg_genmove white
-#? [F5]*
+#? [F5]
 
 #CATEGORY=OWL
 # F1 was played in the game as an owl defense of E4.
@@ -170,7 +170,7 @@ loadsgf games/kisei28_g7.sgf 189
 
 loadsgf games/semeai/semeai19.sgf 42
 292 restricted_genmove black A15 F16 F17 S4 Q3
-#? [F16|F17]*
+#? [F16|F17]
 
 293 reg_genmove white
 #? [F17]*

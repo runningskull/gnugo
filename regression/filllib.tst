@@ -152,7 +152,7 @@ loadsgf games/filllib13.sgf
 #Moved from 9x9:240
 loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312150903.sgf
 45 reg_genmove black
-#? [G9]*
+#? [G9]
 
 loadsgf games/filllib14.sgf
 46 reg_genmove white

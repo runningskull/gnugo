@@ -1,3 +1,94 @@
+========================== 3.7.2  ==================================
+
+./regress.sh . reading.tst 
+207 unexpected FAIL: Correct '3 (B4|C4|C1)', got '0'
+209 unexpected FAIL: Correct '3 (B4|C4)', got '0'
+211 unexpected FAIL: Correct '3 (C4|C5|C1)', got '0'
+213 unexpected FAIL: Correct '3 (C4|C5)', got '0'
+215 unexpected FAIL: Correct '3 (C4|C5)', got '0'
+./regress.sh . owl.tst 
+6 unexpected FAIL: Correct '0', got '1 B5'
+132 unexpected FAIL: Correct '(1|2) R4', got '0'
+150 unexpected FAIL: Correct '0', got '1 G13'
+./regress.sh . ld_owl.tst 
+69 unexpected FAIL: Correct '1 (T16|T18)', got '3 T16'
+./regress.sh . filllib.tst 
+45 unexpected PASS!
+./regress.sh . atari_atari.tst 
+29 unexpected FAIL: Correct 'K5', got 'PASS'
+./regress.sh . arb.tst 
+210 unexpected FAIL: Correct 'D8', got 'C8'
+./regress.sh . viking.tst 
+2 unexpected PASS!
+6 unexpected PASS!
+./regress.sh . nngs.tst 
+1750 unexpected PASS!
+./regress.sh . trevorc.tst 
+1020 unexpected PASS!
+1030 unexpected PASS!
+1440 unexpected FAIL: Correct 'E12|F11', got 'F1'
+./regress.sh . arend.tst 
+30 unexpected FAIL: Correct 'C13', got 'J13'
+./regress.sh . 13x13.tst 
+17 unexpected FAIL: Correct 'L5|L3', got 'G8'
+52 unexpected PASS!
+61 unexpected FAIL: Correct 'K8', got 'L13'
+87 unexpected PASS!
+./regress.sh . semeai.tst 
+130 unexpected FAIL: Correct '0 0 PASS', got '3 3 F2'
+./regress.sh . strategy4.tst 
+187 unexpected FAIL: Correct 'C4|E4', got 'C1'
+./regress.sh . owl1.tst 
+293 unexpected FAIL: Correct '0', got '1 S6'
+354 unexpected FAIL: Correct '0', got '1 S15'
+356 unexpected FAIL: Correct '1 L3', got '0'
+358 unexpected FAIL: Correct '0', got '1 Q17'
+359 unexpected FAIL: Correct '0', got '1 S6'
+360 unexpected FAIL: Correct '0', got '1 L14'
+361 unexpected FAIL: Correct '1 K16', got '0'
+362 unexpected FAIL: Correct '1 M16', got '0'
+363 unexpected FAIL: Correct '1 (F5|G5|G6|H6)', got '0'
+./regress.sh . nngs2.tst 
+440 unexpected FAIL: Correct 'B18|C18|E16|E18|F16|F17', got 'J7'
+./regress.sh . nngs3.tst 
+400 unexpected PASS!
+700 unexpected PASS!
+./regress.sh . nngs4.tst 
+230 unexpected FAIL: Correct 'Q18', got 'L18'
+390 unexpected PASS!
+870 unexpected PASS!
+./regress.sh . strategy5.tst 
+226 unexpected PASS!
+292 unexpected PASS!
+./regress.sh . ninestones.tst 
+150 unexpected FAIL: Correct 'C5|D5', got 'G14'
+./regress.sh . manyfaces1.tst 
+70 unexpected PASS!
+./regress.sh . gunnar.tst 
+46 unexpected FAIL: Correct 'O11', got 'O9'
+51 unexpected PASS!
+60 unexpected FAIL: Correct 'R10', got 'R11'
+61 unexpected FAIL: Correct 'D8', got 'J2'
+62 unexpected FAIL: Correct 'O19', got 'G14'
+63 unexpected FAIL: Correct 'Q2', got 'P1'
+64 unexpected FAIL: Correct '!(M1|Q2)', got 'Q2'
+65 unexpected FAIL: Correct '!P19', got 'P19'
+67 unexpected FAIL: Correct 'D9', got 'O16'
+68 unexpected FAIL: Correct 'D8', got 'F6'
+69 unexpected FAIL: Correct 'D7', got 'A9'
+70 unexpected FAIL: Correct 'A18|A13', got 'D14'
+71 unexpected FAIL: Correct 'D5', got 'C8'
+./regress.sh . arend2.tst 
+150 unexpected PASS!
+./regress.sh . seki.tst 
+103 unexpected FAIL: Correct 'B1|A2', got 'B2'
+./regress.sh . 9x9.tst 
+160 unexpected FAIL: Correct 'E7', got 'G6'
+250 unexpected FAIL: Correct 'A2|C1|C2', got 'PASS'
+260 unexpected PASS!
+./regress.sh . kgs.tst 
+520 unexpected PASS!
+
 ========================== 3.7.2-pre2  ==================================
 
 ./regress.sh . nngs1.tst 

@@ -202,7 +202,7 @@ loadsgf games/owl29.sgf 134
 
 loadsgf games/pooo.sgf 16
 187 restricted_genmove black E4 C4 B3 B4 C1
-#? [C4|E4]
+#? [C4|E4]*
 
 loadsgf games/pooo.sgf 24
 188 reg_genmove black

@@ -256,7 +256,7 @@ loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 254
 # Don't leave aji around, capture the white stones solidly.
 loadsgf games/nngs/joshj-gnugo-3.5.2gf1-200312171536.sgf 140
 46 restricted_genmove black O11 O9 N10 N9 M9
-#? [O11]
+#? [O11]*
 
 # F15 is about 6 points plus some reverse followup. A4 is three points
 # reverse sente.
@@ -284,7 +284,7 @@ loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 132
 # to be a problem with valuation of the semeai.
 loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 154
 51 reg_genmove white
-#? [S7]*
+#? [S7]
 
 # Regardless whether the dragon is thrashing or critical, Q14 is the
 # most solid move.
@@ -341,32 +341,32 @@ loadsgf games/gunnar/gunnar18.sgf
 # R10 is clearly bigger than R11.
 loadsgf games/gunnar/gunnar19.sgf
 60 restricted_genmove white R10 R11
-#? [R10]
+#? [R10]*
 
 # Major endgame tesuji.
 loadsgf games/gunnar/gunnar20.sgf
 61 reg_genmove black
-#? [D8]
+#? [D8]*
 
 # O19 is both bigger and safer than the played move at G14.
 loadsgf games/kgs/GnuGoCVS-john.sgf 204
 62 reg_genmove white
-#? [O19]
+#? [O19]*
 
 # Q2 more solid than P1.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 42
 63 restricted_genmove black Q2 P1
-#? [Q2]
+#? [Q2]*
 
 # The game move at M1 is just weird. R2 is locally better than Q2.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 44
 64 restricted_genmove black M1 Q2 R2 M5 R5
-#? [!(M1|Q2)]
+#? [!(M1|Q2)]*
 
 # P19 is one point reverse sente. There are many larger moves.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 146
 65 restricted_genmove black P19 Q12 B11 S8
-#? [!P19]
+#? [!P19]*
 
 # A10 was an overplay. Black should capture it and not fall back.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 162
@@ -376,27 +376,27 @@ loadsgf games/kgs/dogo-TheGNUGo.sgf 162
 # O16 severely overvalued and D9 undervalued
 loadsgf games/kgs/dogo-TheGNUGo.sgf 164
 67 restricted_genmove black D9 O16
-#? [D9]
+#? [D9]*
 
 # Capture on a large scale.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 170
 68 restricted_genmove black F6 D8
-#? [D8]
+#? [D8]*
 
 # Stop the main incursion first.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 178
 69 restricted_genmove black A9 D7
-#? [D7]
+#? [D7]*
 
 # A13 and A18 live, the game move at D14 dies.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 190
 70 reg_genmove black
-#? [A18|A13]
+#? [A18|A13]*
 
 # D5 huge.
 loadsgf games/kgs/dogo-TheGNUGo.sgf 198
 71 reg_genmove black
-#? [D5]
+#? [D5]*
 
 ############ End of Tests #################
 

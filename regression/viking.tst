@@ -7,7 +7,7 @@ loadsgf games/viking1.sgf 15
 
 loadsgf games/viking1.sgf 23
 2 reg_genmove white 
-#? [E2]*
+#? [E2]
 
 loadsgf games/viking1.sgf 65
 3 reg_genmove white 
@@ -23,7 +23,7 @@ loadsgf games/viking1.sgf 187
 
 loadsgf games/viking1.sgf 189
 6 reg_genmove white 
-#? [B17|B18]*
+#? [B17|B18]
 
 # Locally S5 is the only move.
 loadsgf games/viking3.sgf 79

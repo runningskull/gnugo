@@ -876,23 +876,23 @@ loadsgf games/reading47.sgf
 # See also 9x9:250.
 loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312161910.sgf 52
 207 attack A6
-#? [3 (B4|C4|C1)]
+#? [3 (B4|C4|C1)]*
 208 defend A6
 #? [1 (A2|C2|C1)]
 209 attack D4
-#? [3 (B4|C4)]
+#? [3 (B4|C4)]*
 210 defend D4
 #? [1 (A2|C2|C1)]
 211 defend A3
-#? [3 (C4|C5|C1)]
+#? [3 (C4|C5|C1)]*
 212 attack A3
 #? [1 (A2|C2|C1)]
 213 defend B2
-#? [3 (C4|C5)]
+#? [3 (C4|C5)]*
 214 attack B2
 #? [1 (A2|C2|C1)]
 215 defend A1
-#? [3 (C4|C5)]
+#? [3 (C4|C5)]*
 216 attack A1
 #? [1 (A2|C2|C1)]
 

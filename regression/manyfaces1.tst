@@ -39,7 +39,7 @@ loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 79
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 83
 70 reg_genmove black
-#? [M10|L9|L8|K7]*
+#? [M10|L9|L8|K7]
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 97
 80 reg_genmove black

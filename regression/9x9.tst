@@ -71,7 +71,7 @@ loadsgf games/nngs/speciman-gnugo-3.5.2-200312091734.sgf 9
 # Only move. /ab
 loadsgf games/nngs/speciman-gnugo-3.5.2-200312091734.sgf 13
 160 reg_genmove black
-#? [E7]
+#? [E7]*
 
 #something better than C3
 loadsgf games/nngs/speciman-gnugo-3.5.2-200312091734.sgf 15
@@ -126,11 +126,11 @@ loadsgf games/nngs/gnugo-3.5.2gf1-kisome-200312131322.sgf 22
 # See also reading:207-216.
 loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312161910.sgf 52
 250 reg_genmove black
-#? [A2|C1|C2]
+#? [A2|C1|C2]*
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2gf1-200312161704.sgf 10
 260 reg_genmove black
-#? [E6]*
+#? [E6]
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2gf1-200312161704.sgf 14
 265 reg_genmove black

@@ -100,7 +100,7 @@ loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
 17 reg_genmove white
-#? [L5|L3]
+#? [L5|L3]*
 
 #CATEGORY=OWL_TUNING
 # This got broke between 3.0.0 and 3.1.14.
@@ -279,7 +279,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
 # GNU Go 3.1.15 wants to play F10 here (although 3.0.0 got H10)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
 52 reg_genmove black
-#? [H10]*
+#? [H10]
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
@@ -326,7 +326,7 @@ loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
 
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 75
 61 reg_genmove black
-#? [K8]
+#? [K8]*
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 13
 62 reg_genmove black
@@ -458,7 +458,7 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 45
 # GNU Go claims that D6 defends the worms D9 and F9
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 65
 87 reg_genmove black
-#? [E6]*
+#? [E6]
 
 #CATEGORY=BLUNDER
 # New failure (comparing 3.1.15 with 3.0.0)

@@ -788,7 +788,7 @@ loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 164
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 178
 1750 reg_genmove black
-#? [L8|J9]*
+#? [L8|J9]
 
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 192

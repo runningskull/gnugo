@@ -57,7 +57,7 @@ loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 64
 
 loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 66
 150 reg_genmove black
-#? [C5|D5]
+#? [C5|D5]*
 
 # Black is actually trapped.
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64

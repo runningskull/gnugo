@@ -475,7 +475,7 @@ loadsgf games/verybad.sgf 118
 
 loadsgf games/owl54.sgf
 130 analyze_semeai D3 G2
-#? [0 0 PASS]
+#? [0 0 PASS]*
 
 ########### semeai gen_move tests #################
 

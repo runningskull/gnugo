@@ -176,7 +176,7 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 116
 # all these moves should kill at least some of black stones
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 144
 440 reg_genmove white
-#? [B18|C18|E16|E18|F16|F17]
+#? [B18|C18|E16|E18|F16|F17]*
 
 # prevent loss of four stones a couple of moves later. E16 doesn't
 # look very good, but it works.
