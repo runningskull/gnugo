@@ -59,6 +59,8 @@ static int quiescence_connect(int str1, int str2, int *move);
 static int quiescence_capture(int str, int *move);
 /* static int capture_one_move(int str); */
 static int prevent_capture_one_move(int *moves, int str1);
+static int recursive_transitivity (int str1, int str2, int str3, int *move);
+static int recursive_non_transitivity (int str1, int str2, int str3, int *move);
 
 int nodes_connect=0,max_nodes_connect=2000,max_connect_depth=64;
 
@@ -131,11 +133,11 @@ static int snapback (int str) {
   return 0;
 }
 
-/* Verifies that the strings str1 and str2 can be connected
+/* verifies that the strings str1 and str2 can be connected
  * directly by playing one move, either by playing a common liberty
- * of the two strings, either by capturing a common adjacent string.
+ * of the two strings, either by capturing a common adjacent string
  *
- * This is the gi1 game function.
+ * this is the gi1 game function
  */
 
 static int connection_one_move(int str1, int str2) {
@@ -156,11 +158,12 @@ static int connection_one_move(int str1, int str2) {
   return 0;
 }
 
-/* If the two strings str1 and str2 can be connected sends back WIN fill the
- * array moves with the only move that can prevent a connection in one move
- * (common liberties, liberties of common adjacent strings in atari).
+/* if the two strings str1 and str2 can be connected sends back WIN
+ * fill the array moves with the only move that can prevent a connection
+ * in one move (common liberties, liberties of common adjacent strings in atari)
  *
- * This is the ip1 game function. */
+ * this is the ip1 game function
+ */
 
 static int prevent_connection_one_move (int *moves, int str1, int str2) {
   int r, s;
@@ -193,14 +196,14 @@ static int prevent_connection_one_move (int *moves, int str1, int str2) {
   return 0;
 }
 
-/* Returns WIN if str1 and str2 are connected in at most
+/* returns WIN if str1 and str2 are connected in at most
  * one move even if the opponent plays first.
  * Verify that the strings are connectable in one move
  * and find the only possible moves that can prevent
  * using prevent_connection_one_move. If none of these
  * moves works, the two strings are connected.
  *
- * This is the g1 game function.
+ * this is the g1 game function
  */
 
 static int connected_one_move (int str1, int str2) {
@@ -222,18 +225,17 @@ static int connected_one_move (int str1, int str2) {
   return res;
 }
 
-/* Find the moves that might be able to connect in less than three plies
+/* find the moves that might be able to connect in less than three plies
  * that is moves that can connect the strings if another move of the same
  * color is played jut after :
- * - common liberties of the two strings;
+ * - common liberties of the two strings
  * - moves on the liberties of an opponent string with less than two liberties
  *   adjacent to both strings, or adjacent to one string and that has a common
- *   liberty with the second string;
- * - liberties of one string that are second order liberties of the other
- *   string.
- *
- * returns WIN if a direct connection has been found returns 0
- * elsewhere */
+ *   liberty with the second string
+ * - liberties of one string that are second order liberties of the other string
+ * returns WIN if a direct connection has been found
+ * returns 0 elsewhere
+ */
 
 static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   int r, s, common_adj_liberty;
@@ -243,8 +245,6 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   int k;
   int color = board[str1];
   
-  moves[0] = 0;
-
   /* Common liberties. */
   if (have_common_lib(str1, str2, libs)) {
     add_array(moves, libs[0]);
@@ -254,7 +254,7 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   /* Capture a common adjacent string or an adjacent liberty of str1
    * that has a common liberty with str2...
    */
-  adj = chainlinks2(str1, adjs, 2);
+  adj = chainlinks3(str1, adjs, 2);
   for (r = 0; r < adj; r++) {
     liberties = findlib(adjs[r], MAXLIBS, libs);
     common_adj_liberty=0;
@@ -273,7 +273,7 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   }
 
   /* ...and vice versa. */
-  adj = chainlinks2(str2, adjs, 2);
+  adj = chainlinks3(str2, adjs, 2);
   for (r = 0; r < adj; r++) {
     liberties = findlib(adjs[r], MAXLIBS, libs);
     common_adj_liberty=0;
@@ -347,17 +347,20 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   return 0;
 }
   
-/* Tests if the strings can be connected in three plies starts
- * with finding the possible moves that can connect.  If two
- * moves in a row are played, then try them and stops at the
- * first working move.  The strings are connected in two moves
- * if the function connected_one_move is verified after a move.
+/* tests if the strings can be connected in three plies
+ * starts with finding the possible moves that can connect
+ * if two moves in a row are played, then try them
+ * and stops at the first working move
+ * the strings are connected in two moves if the
+ * function connected_one_move is verified after a move
  *
- * This is the gi2 game function. */
+ * this is the gi2 game function
+ */
 
 static int connection_two_moves (int str1, int str2) {
   int r, res = 0, moves[MAX_MOVES];
   
+  moves[0]=0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return WIN;
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
@@ -371,11 +374,10 @@ static int connection_two_moves (int str1, int str2) {
   return res;
 }
 
-/* Find the complete set of possible moves that can prevent
- * a connection in three plies.
- *
- * The function is not yet written, but moves_to_connect_in_two_moves does
- * a similar job, so it is called temporarly.
+/* find the complete set of possible moves that can prevent
+ * a connection in three plies
+ * the function is not yet written, but moves_to_connect_in_two_moves does
+ * a similar job, so it is called temporarly
  */
 
 static int moves_to_prevent_connection_in_two_moves (int *moves,
@@ -385,15 +387,15 @@ static int moves_to_prevent_connection_in_two_moves (int *moves,
   return 0;
 }
 
-/* Find all the moves that prevent to connect in a three plies
- * deep search and put them in the moves array.  Returns 0 if
- * there is no three plies connection, or else it tries all the
- * possible preventing moves.  If after a possible preventing
- * moves, there no connection in one move and no connection in
- * two moves, then the moves prevents a three plies deep
- * connection, and it is added to the moves array.
- *
- * this is the ip2 game function */
+/* find all the move that prevent to connect in a three plies deep search
+ * and put them in the moves array 
+ * returns 0 if there is no three plies connection
+ * else it tries all the possible preventing moves
+ * if after a possible preventing moves, there no connection in
+ * one move and no connection in two moves, then the moves
+ * prevents a three plies deep connection, and it is added to the moves array
+ * this is the ip2 game function
+ */
 
 static int prevent_connection_two_moves (int *moves, int str1, int str2) {
   int r, res=0;
@@ -401,6 +403,7 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
   
   if (connection_two_moves(str1, str2)) {
     res = WIN;
+    possible_moves[0]=0;
     moves_to_prevent_connection_in_two_moves(possible_moves, str1, str2);
     for (r = 1; r < possible_moves[0] + 1; r++) {
       if (trymove(possible_moves[r], OTHER_COLOR(board[str1]), 
@@ -415,18 +418,20 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
   return res;
 }
 
-/* Not yet written.
- *
- * Find all the moves than can connect if two subsequent moves
- * of the same color are played after
- * - common liberties;
- * - liberties of common adjacent strings with 3 liberties or less;
+/* not yet written
+ * find all the moves than can connect if two subsequent
+ * moves of the same color are played after
+ * - common liberties
+ * - liberties of common adjacent strings with 3 liberties or less
  * - liberties of adjacent strings with 2 liberties or less that have
- *   liberties that are second order liberties of the other string;
- * - liberties of one string that are second order liberties of
- *   the other string;
+ *   liberties that are second order liberties of the other string
+ * - liberties of one string that are second order liberties of the other string
  * - second order liberties of the first string that are second order 
- *   liberties of the other string.
+ *   liberties of the other string 
+ *
+ * a function that compute the second order liberties of string is needed
+ * as well as a function that check efficiently if an intersection is a second
+ * order liberty of a given string
  */
 
 static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
@@ -435,10 +440,9 @@ static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
   return 0;
 }
 
-/* Not yet written.
- *
- * Find the complete set of possible moves that can prevent
- * a connection in 5 plies.
+/* not yet written
+ * find the complete set of possible moves that can prevent
+ * a connection in 5 plies
  */
 
 static int moves_to_prevent_connection_in_three_moves (int *moves,
@@ -449,13 +453,13 @@ static int moves_to_prevent_connection_in_three_moves (int *moves,
 }
 
 /* 
- * The simplest depth 4 connection:
- *
- * If there are forced moves to prevent connection in one move,
- * try them, and verify that they all lead to a depth 1 or
- * depth 3 connection.
+ * the most simple depth 4 connection
+ * if there are forced moves to prevent connection in
+ * one move, try them, and verify that they all 
+ * lead to a depth 1 or depth 3 connection
  * 
- * This is the g211 game function */
+ * this is the g211 game function
+ */
 
 static int simply_connected_two_moves (int str1, int str2) {
   int r, res=0;
@@ -477,14 +481,15 @@ static int simply_connected_two_moves (int str1, int str2) {
   return res;
 }
 
-/* Test if a move is a simple depth 5 connection.
+/* test if a move is a simple depth 5 connection
  *
- * This is the gi311 game function.
+ * this is the gi311 game function
  */
 
 static int simple_connection_three_moves (int str1, int str2) {
   int r, res = 0, moves[MAX_MOVES];
   
+  moves[0]=0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return WIN;
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
@@ -498,31 +503,28 @@ static int simple_connection_three_moves (int str1, int str2) {
   return res;
 }
 
-/* Find the forced moves that prevent a simple depth 5 connection.
- * Fills the array moves with the forced moves.
+/* find the forced moves that prevent a simple depth 5 connection
+ * fills the array moves with the forced moves
  *
- * This is the ip311 game function.
- *
- * It finds moves in very important situations such as :
- *
+ * this is the ip311 game function
+ * it finds moves in very important situations such as :
  * + + + O + +
  * + @ @ O + +
  * + @ O @ @ +
  * + @ O + + +
  * + + + + + +
  * - - - - - -
- *
  * and enables recursive_disconnect to prove the two black
- * strings are connected in these situations.
+ * strings are connected in these situations
  */
 
-static int prevent_simple_connection_three_moves (int *moves, 
-						  int str1, int str2) {
+static int prevent_simple_connection_three_moves (int *moves, int str1, int str2) {
   int r, res=0;
   int possible_moves[MAX_MOVES];
   
   if (simple_connection_three_moves(str1, str2)) {
     res = WIN;
+    possible_moves[0]=0;
     moves_to_prevent_connection_in_three_moves(possible_moves, str1, str2);
     for (r = 1; r < possible_moves[0] + 1; r++) {
       if (trymove(possible_moves[r], OTHER_COLOR(board[str1]), 
@@ -538,9 +540,9 @@ static int prevent_simple_connection_three_moves (int *moves,
   return res;
 }
 
-/* Find simple connections by looking at common liberties
+/* find simple connections by looking at common liberties
  * or directly capturing a common adjacent string without a snapback
- * or looking at a ladder for a common adjacent string.
+ * or looking at a ladder for a common adjacent string
  */
 
 static int quiescence_connect(int str1, int str2, int *move) {
@@ -585,7 +587,7 @@ string_connect(int str1, int str2, int *move)
 }
 
 
-/* returns WIN if str1 and str2 can be connected. */
+/* returns WIN if str1 and str2 can be connected */
 
 static int recursive_connect (int str1, int str2, int *move) {
   int i, res = 0, Moves[MAX_MOVES], ForcedMoves[MAX_MOVES];
@@ -628,17 +630,15 @@ static int recursive_connect (int str1, int str2, int *move) {
    */
   if (!prevent_capture_one_move(ForcedMoves, str1))
     prevent_capture_one_move(ForcedMoves, str2);
-#if 0
-  else if (prevent_capture_two_moves(ForcedMoves, str1))
-     ; 
-  else if (prevent_capture_two_moves(ForcedMoves, str2))
-     ; 
-#endif
+/*   else if (prevent_capture_two_moves(ForcedMoves, str1)) */
+/*     ;  */
+/*   else if (prevent_capture_two_moves(ForcedMoves, str2)) */
+/*     ;  */
   
-  /* We are at a max node, so any move we can find
+  /* we are at a max node, so any move we can find
    * is ok. Try moves that can connect in three moves
    * because the function that prevent connection in one
-   * and two moves are called at AND nodes.
+   * and two moves are called at and nodes
    */
   moves_to_connect_in_three_moves (Moves, str1, str2);
 
@@ -673,16 +673,29 @@ static int recursive_connect (int str1, int str2, int *move) {
 
 /* Externally callable frontend to recursive_disconnect(). */
 
-int
-disconnect(int str1, int str2, int *move)
-{
+int disconnect(int str1, int str2, int *move) {
+  int i, res = WIN, Moves[MAX_MOVES];
+  
   nodes_connect = 0;
   *move = PASS_MOVE;
-  return recursive_disconnect(str1, str2, move);
+  Moves[0]=0;
+  moves_to_prevent_connection_in_three_moves (Moves, str1, str2);
+  if (Moves[0] > 0)
+    res = 0;
+  for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
+    if (trymove(Moves[i], OTHER_COLOR(board[str1]),
+		"disconnect", str1, EMPTY, 0)) {
+      if (!recursive_connect(str1, str2, move)) {
+	*move = Moves[i];
+	res = WIN;
+      }
+      popgo();
+    }
+  return res;
 }
 
 
-/* Returns WIN if str1 and str2 can be disconnected. */
+/* returns WIN if str1 and str2 can be disconnected */
 
 static int recursive_disconnect (int str1, int str2, int *move) {
   int i, res = WIN, Moves[MAX_MOVES];
@@ -754,7 +767,7 @@ static int recursive_disconnect (int str1, int str2, int *move) {
   return res;
 }
  
-/* Reads simple ladders.
+/* reads simple ladders
  */
 
 static int quiescence_capture (int str, int *move) {
@@ -782,19 +795,16 @@ static int quiescence_capture (int str, int *move) {
   return result;
 }
 
-#if 0
-static int capture_one_move (int str) 
-{
-  if (countlib(str) == 1)
-    return 1;
-  return 0;
-}
-#endif
+/* static int capture_one_move (int str) { */
+/*   if (countlib(str) == 1) */
+/*     return 1; */
+/*   return 0; */
+/* } */
 
-/* Find all the possible moves that can prevent the capture
- * of a string in atari.
+/* find all the possible moves that can prevent the capture
+ * of a string in atari
  *
- * The ip1 game function.
+ * the ip1 game function
  */
 
 static int prevent_capture_one_move(int *moves, int str1) {
@@ -814,7 +824,193 @@ static int prevent_capture_one_move(int *moves, int str1) {
 }
 
 
+/* returns WIN if str1, str2 and str3 can be connected */
 
+static int recursive_transitivity (int str1, int str2, int str3, int *move) {
+  int i, res = 0, Moves[MAX_MOVES], ForcedMoves[MAX_MOVES];
+
+  SETUP_TRACE_INFO2("recursive_transitivity", str1, str3);
+  
+  if ( (board[str1] == EMPTY) || (board[str2] == EMPTY) || (board[str3] == EMPTY) ) {
+    SGFTRACE2(PASS_MOVE, 0, "one string already captured");
+    return 0;
+  }
+  
+  if (same_string(str1, str2) && same_string(str1, str3)) {
+    SGFTRACE2(PASS_MOVE, WIN, "already connected");
+    return WIN;
+  }
+
+  if (nodes_connect > max_nodes_connect) {
+    SGFTRACE2(PASS_MOVE, 0, "connection node limit reached");
+    return 0;
+  }
+  
+  if (stackp == max_connect_depth) {
+    SGFTRACE2(PASS_MOVE, 0, "connection depth limit reached");
+    return 0;
+  }
+
+  nodes_connect++;
+
+  if (same_string(str1, str2))
+    if (quiescence_connect (str1, str3, move)) {
+      SGFTRACE2(*move, WIN, "quiescence_connect");
+      return WIN;
+    }
+
+  if (same_string(str2, str3))
+    if (quiescence_connect (str1, str2, move)) {
+      SGFTRACE2(*move, WIN, "quiescence_connect");
+      return WIN;
+    }
+
+  ForcedMoves[0] = 0;
+  Moves[0] = 0;
+  /* if one of the strings to connect can be captured
+   * and there are forced moves to prevent the capture
+   * then the only moves to try are the moves that
+   * defend the string: all the other moves will
+   * lead to the capture of the string
+   */
+  if (!prevent_capture_one_move(ForcedMoves, str1))
+    if (!prevent_capture_one_move(ForcedMoves, str2))
+      prevent_capture_one_move(ForcedMoves, str3);
+  
+  /* we are at a max node, so any move we can find
+   * is ok. Try moves that can connect in two moves
+   * because the function that prevent connection in one
+   * move is called at and nodes
+   */
+  moves_to_connect_in_two_moves (Moves, str1, str2);
+  moves_to_connect_in_two_moves (Moves, str2, str3);
+
+  /* if there are some forced moves to prevent the capture
+   * of one of the two strings, then we only look at
+   * the moves that prevent capture and that might also
+   * connect
+   */
+  if ( (ForcedMoves[0] != 0) && (Moves[0] != 0) )
+    intersection_array(Moves, ForcedMoves);
+
+  for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
+    if (trymove(Moves[i], board[str1], "recursive_transitivity", 
+		str1, EMPTY, 0)) {
+      if (!recursive_non_transitivity(str1, str2, str3, move)) {
+	*move = Moves[i];
+	res = WIN;
+      }
+      popgo();
+    }
+  }
+
+  if (res == WIN) {
+    SGFTRACE2(*move, WIN, "success");
+  }
+  else {
+    SGFTRACE2(PASS_MOVE, 0, "failure");
+  }
+  
+  return res;
+}
+  
+/* Externally callable frontend to recursive_non_transitivity(). */
+
+int non_transitivity(int str1, int str2, int str3, int *move) {
+  int i, res = WIN, Moves[MAX_MOVES];
+  
+  nodes_connect = 0;
+  *move = PASS_MOVE;
+  moves_to_prevent_connection_in_three_moves (Moves, str1, str3);
+  if (Moves[0] > 0)
+    res = 0;
+  for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
+    if (trymove(Moves[i], OTHER_COLOR(board[str1]),
+		"non_transitivity", str1, EMPTY, 0)) {
+      if (!recursive_transitivity(str1, str2, str3, move)) {
+	*move = Moves[i];
+	res = WIN;
+      }
+      popgo();
+    }
+  return res;
+}
+
+/* returns WIN if str1, str2 and str3 can be disconnected */
+
+static int recursive_non_transitivity (int str1, int str2, int str3, 
+				       int *move) {
+  int i, res = WIN, Moves[MAX_MOVES];
+  
+  SETUP_TRACE_INFO2("recursive_non_transitivity", str1, str3);
+  
+  if ((board[str1] == EMPTY) || (board[str2] == EMPTY) 
+      || (board[str3] == EMPTY)) {
+    SGFTRACE2(PASS_MOVE, WIN, "one string already captured");
+    return WIN;
+  }
+
+  if (quiescence_capture(str1, move)) {
+    SGFTRACE2(*move, WIN, "first string capturable");
+    return WIN;
+  }
+  if (quiescence_capture(str2, move)) {
+    SGFTRACE2(*move, WIN, "second string capturable");
+    return WIN;
+  }
+  if (quiescence_capture(str3, move)) {
+    SGFTRACE2(*move, WIN, "third string capturable");
+    return WIN;
+  }
+
+  if (same_string(str1, str2) && same_string(str1, str3)) {
+    SGFTRACE2(PASS_MOVE, 0, "already connected");
+    return 0;
+  }
+  
+  if (nodes_connect > max_nodes_connect) {
+    SGFTRACE2(PASS_MOVE, WIN, "connection node limit reached");
+    return WIN;
+  }
+  
+  if (stackp == max_connect_depth) {
+    SGFTRACE2(PASS_MOVE, WIN, "connection depth limit reached");
+    return WIN;
+  }
+  
+  nodes_connect++;
+
+  /* we are at an and node
+   * only look at forced moves
+   */
+  Moves[0] = 0;
+  if (prevent_connection_one_move(Moves, str1, str3))
+    res = 0;
+  else if (prevent_connection_two_moves(Moves, str1, str3))
+    res = 0;
+  else if (prevent_simple_connection_three_moves(Moves, str1, str3))
+    res = 0;
+  
+  if (res == 0)
+    for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
+      if (trymove(Moves[i], OTHER_COLOR(board[str1]),
+		  "recursive_non_transitivity", str1, EMPTY, 0)) {
+	if (!recursive_transitivity(str1, str2, str3, move)) {
+	  *move = Moves[i];
+	  res = WIN;
+	}
+	popgo();
+      }
+
+  if (res == WIN) {
+    SGFTRACE2(*move, WIN, "success");
+  }
+  else {
+    SGFTRACE2(PASS_MOVE, 0, "failure");
+  }
+  
+  return res;
+}
 
 /*
  * Local Variables:
@@ -822,4 +1018,3 @@ static int prevent_capture_one_move(int *moves, int str1) {
  * c-basic-offset: 2
  * End:
  */
-

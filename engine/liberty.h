@@ -109,6 +109,7 @@ extern Hash_data    hashdata;
 int find_origin(int str);
 int chainlinks(int str, int adj[MAXCHAIN]);
 int chainlinks2(int str, int adj[MAXCHAIN], int lib);
+int chainlinks3(int str, int adj[MAXCHAIN], int lib);
 
 
 /* This is increased by one anytime a move is (permanently) played or
@@ -251,7 +252,7 @@ void reading_hotspots(float values[BOARDMAX]);
 /* readconnect.c */
 int string_connect(int str1, int str2, int *move);
 int disconnect(int str1, int str2, int *move);
-
+int non_transitivity(int str1, int str2, int str3, int *move);
 
 int liberty_of_string(int pos, int str);
 int neighbor_of_string(int pos, int str);

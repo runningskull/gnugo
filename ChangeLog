@@ -2,8 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- readconnect revised
+- new board.c function breakchain3()
 - dsp and config.vc updates
-- new function influence_get_moyo_segmentation
+- new function influence_get_moyo_segmentation()
+- new function add_influence_source
 - computations of moyo size surrounding a dragon changed
 - confirm_safety() takes two new parameters to tell which stones were saved
 - atari_atari_confirm_safety() revised

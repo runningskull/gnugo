@@ -32,6 +32,9 @@
 #include "patterns.h"
 
 static void value_territory(struct influence_data *q);
+static void add_influence_source(int pos, int color, float strength,
+                                 float attenuation,
+                                 struct influence_data *q);
 static void segment_influence(struct influence_data *q);
 static void print_influence(struct influence_data *q, int dragons_known);
 static void print_numeric_influence(struct influence_data *q,
@@ -436,6 +439,25 @@ init_influence(struct influence_data *q, int color, int dragons_known,
     }
 }
 
+/* Adds an influence source at position pos with prescribed strength
+ * and attenuation. color can be BLACK, WHITE or both. If there
+ * already exists an influence source of the respective color at pos
+ * that is stronger than the new one, we do nothing.
+ */
+void
+add_influence_source(int pos, int color, float strength, float attenuation,
+                     struct influence_data *q)
+{
+  if ((color & WHITE) && (q->white_strength[I(pos)][J(pos)] < strength)) {
+    q->white_strength[I(pos)][J(pos)] = strength;
+    q->white_attenuation[I(pos)][J(pos)] = attenuation;
+  }
+  if ((color & BLACK) && (q->black_strength[I(pos)][J(pos)] < strength)) {
+    q->black_strength[I(pos)][J(pos)] = strength;
+    q->black_attenuation[I(pos)][J(pos)] = attenuation;
+  }
+}
+
 /* Callback for the matched patterns in influence.db and barriers.db.
  * The pattern classes used here are:
  * A - Barrier pattern, where O plays first and X tries to block influence.
@@ -596,24 +618,13 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
       this_color = q->color_to_move;
 
     /* Increase strength if we're computing escape influence. */
-    if (q == &escape_influence && (pattern->class & CLASS_e)) {
-      if (this_color & WHITE)
-	q->white_strength[ti][tj] = 20 * pattern->value;
-      if (this_color & BLACK)
-	q->black_strength[ti][tj] = 20 * pattern->value;
-    }
-    else {
-      if (this_color & WHITE)
-	q->white_strength[ti][tj] = pattern->value;
-      if (this_color & BLACK)
-	q->black_strength[ti][tj] = pattern->value;
-    }
+    if (q == &escape_influence && (pattern->class & CLASS_e))
+      add_influence_source(POS(ti, tj), this_color,
+          20 * pattern->value, 1.5, q);
+    else
+      add_influence_source(POS(ti, tj), this_color,
+          pattern->value, 1.5, q);
 
-    if (this_color & WHITE)
-      q->white_attenuation[ti][tj] = 1.5;
-    if (this_color & BLACK)
-      q->black_attenuation[ti][tj] = 1.5;
-    
     DEBUG(DEBUG_INFLUENCE,
 	  "  low intensity influence source at %m, strength %f, color %C\n",
 	  ti, tj, pattern->value, this_color);
@@ -624,14 +635,8 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * pattern defined strength at *.
    */
   if (pattern->class & CLASS_E) {
-    if (color == WHITE) {
-      q->white_strength[ti][tj] = pattern->value;
-      q->white_attenuation[ti][tj] = DEFAULT_ATTENUATION;
-    }
-    else {
-      q->black_strength[ti][tj] = pattern->value;
-      q->black_attenuation[ti][tj] = DEFAULT_ATTENUATION;
-    }
+    add_influence_source(POS(ti, tj), color,
+        pattern->value, DEFAULT_ATTENUATION, q);
     DEBUG(DEBUG_INFLUENCE,
 	  "  extra %C source at %m, strength %f\n", color,
 	  ti, tj, pattern->value);
@@ -669,11 +674,9 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
       
       /* Low intensity influence source for the color in turn to move. */
       if (pattern->class & CLASS_B) {
+        add_influence_source(POS(x, y), color,
+            pattern->value, DEFAULT_ATTENUATION, q);
 	DEBUG(DEBUG_INFLUENCE, "  intrusion at %m\n", x, y);
-	if (color == WHITE)
-	  q->white_strength[x][y] = pattern->value;
-	else
-	  q->black_strength[x][y] = pattern->value;
       }
     }
   }

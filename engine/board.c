@@ -1620,6 +1620,37 @@ chainlinks2(int str, int adj[MAXCHAIN], int lib)
 }
 
 
+/* chainlinks3 returns (in adj array) the chains surrounding
+ * the string at str, which have less or equal lib liberties.
+ * The number of such chains is returned.
+ */
+
+int
+chainlinks3(int str, int adj[MAXCHAIN], int lib)
+{
+  struct string_data *s, *t;
+  int k;
+  int neighbors;
+
+  ASSERT1(IS_STONE(board[str]), str);
+
+  if (!strings_initialized)
+    init_board();
+
+  /* We already have the list ready, just copy the strings with the
+   * right number of liberties.
+   */
+  neighbors = 0;
+  s = &string[string_number[str]];
+  for (k = 0; k < s->neighbors; k++) {
+    t = &string[s->neighborlist[k]];
+    if (t->liberties <= lib)
+      adj[neighbors++] = t->origin;
+  }
+  return neighbors;
+}
+
+
 /*
  * Find the origin of a worm or a cavity, i.e. the point with smallest
  * i coordinate and in the case of a tie with smallest j coordinate.
