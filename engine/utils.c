@@ -1418,6 +1418,8 @@ who_wins(int color, FILE *outfile)
 {
   float result;
 
+  silent_examine_position(WHITE, EXAMINE_DRAGONS);
+
 #if 0
   float white_score;
   float black_score;
