@@ -1,0 +1,352 @@
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
+
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+DESTDIR =
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+CC = @CC@
+CPP = @CPP@
+EXEEXT = @EXEEXT@
+GCC_ONLY = @GCC_ONLY@
+GNUGO_ALL_WARNINGS = @GNUGO_ALL_WARNINGS@
+GNUGO_SOME_WARNINGS = @GNUGO_SOME_WARNINGS@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+NO_WARNINGS = @NO_WARNINGS@
+PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
+U = @U@
+VERSION = @VERSION@
+dfa_c = @dfa_c@
+glibconfig = @glibconfig@
+
+TST = life.tst owl.tst optics.tst reading.tst strategy.tst       ld_owl.tst ld_owl_life.tst connection.tst        neurogo.tst arb.tst strategy2.tst strategy3.tst rosebud.tst       owl_rot.tst heikki.tst golife.tst dniwog.tst       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst       score.tst ld_owl_rot.tst reading_rot.tst endgame_rot.tst manyfaces.tst       cutstone.tst newscore.tst blunder.tst niki.tst
+
+
+noinst_SCRIPTS = eval.sh regress.sh test.sh
+
+EXTRA_DIST = games $(TST) $(noinst_SCRIPTS) regress.awk STRATEGY NICKLAS 	     READING rot1 rot2 rot3 BREAKAGE
+
+
+# Remove these files here... they are created locally
+DISTCLEANFILES = *.orig *~
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../config.h
+CONFIG_CLEAN_FILES = 
+SCRIPTS =  $(noinst_SCRIPTS)
+
+DIST_COMMON =  README Makefile.am Makefile.in
+
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+TAR = tar
+GZIP_ENV = --best
+all: all-redirect
+.SUFFIXES:
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps regression/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+tags: TAGS
+TAGS:
+
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = regression
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am: all-am
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-exec-am:
+install-exec: install-exec-am
+
+install-data-am:
+install-data: install-data-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am:
+uninstall: uninstall-am
+all-am: Makefile $(SCRIPTS)
+all-redirect: all-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs:
+
+
+mostlyclean-generic:
+
+clean-generic:
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
+
+maintainer-clean-generic:
+mostlyclean-am:  mostlyclean-generic
+
+mostlyclean: mostlyclean-am
+
+clean-am:  clean-generic mostlyclean-am
+
+clean: clean-am
+
+distclean-am:  distclean-generic clean-am
+
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-generic distclean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
+
+.PHONY: tags distdir info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
+
+
+check: first_batch
+
+regression: first_batch
+
+test: all_batches
+
+reading: reading.tst
+	$(srcdir)/eval.sh reading.tst
+
+reading_rot: reading_rot.tst
+	$(srcdir)/eval.sh reading_rot.tst
+
+owl: owl.tst
+	$(srcdir)/eval.sh owl.tst
+
+owl_rot: owl_rot.tst
+	$(srcdir)/eval.sh owl_rot.tst
+
+optics: optics.tst
+	$(srcdir)/eval.sh optics.tst
+
+life: life.tst
+	$(srcdir)/eval.sh life.tst --life
+
+filllib: filllib.tst
+	$(srcdir)/eval.sh filllib.tst
+
+strategy: strategy.tst
+	$(srcdir)/eval.sh strategy.tst
+
+strategy2: strategy2.tst
+	$(srcdir)/eval.sh strategy2.tst
+
+strategy3: strategy3.tst
+	$(srcdir)/eval.sh strategy3.tst
+
+cutstone: cutstone.tst
+	$(srcdir)/eval.sh cutstone.tst
+
+ld_owl: ld_owl.tst
+	$(srcdir)/eval.sh ld_owl.tst
+
+ld_owl_rot: ld_owl_rot.tst
+	$(srcdir)/eval.sh ld_owl_rot.tst
+
+ld_owl_life: ld_owl_life.tst
+	$(srcdir)/eval.sh ld_owl_life.tst --life
+
+connection: connection.tst
+	$(srcdir)/eval.sh connection.tst
+
+endgame: endgame.tst
+	$(srcdir)/eval.sh endgame.tst
+
+endgame_rot: endgame_rot.tst
+	$(srcdir)/eval.sh endgame_rot.tst
+
+blunder: blunder.tst
+	$(srcdir)/eval.sh blunder.tst
+
+heikki: heikki.tst
+	$(srcdir)/eval.sh heikki.tst
+
+neurogo: neurogo.tst
+	$(srcdir)/eval.sh neurogo.tst
+
+arb: arb.tst
+	$(srcdir)/eval.sh arb.tst
+
+dniwog: dniwog.tst
+	$(srcdir)/eval.sh dniwog.tst
+
+rosebud: rosebud.tst
+	$(srcdir)/eval.sh rosebud.tst
+
+golife: golife.tst
+	$(srcdir)/eval.sh golife.tst
+
+arion: arion.tst
+	$(srcdir)/eval.sh arion.tst
+
+viking: viking.tst
+	$(srcdir)/eval.sh viking.tst
+
+ego: ego.tst
+	$(srcdir)/eval.sh ego.tst
+
+atari_atari: atari_atari.tst
+	$(srcdir)/eval.sh atari_atari.tst
+
+manyfaces: manyfaces.tst
+	$(srcdir)/eval.sh manyfaces.tst
+
+score: score.tst
+	$(srcdir)/eval.sh score.tst
+
+newscore: newscore.tst
+	$(srcdir)/eval.sh newscore.tst
+
+nicklas: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst
+	$(srcdir)/eval.sh nicklas1.tst
+	$(srcdir)/eval.sh nicklas2.tst
+	$(srcdir)/eval.sh nicklas3.tst
+	$(srcdir)/eval.sh nicklas4.tst
+	$(srcdir)/eval.sh nicklas5.tst
+
+nicklas1: nicklas1.tst
+	$(srcdir)/eval.sh nicklas1.tst
+
+nicklas2: nicklas2.tst
+	$(srcdir)/eval.sh nicklas2.tst
+
+nicklas3: nicklas3.tst
+	$(srcdir)/eval.sh nicklas3.tst
+
+nicklas4: nicklas4.tst
+	$(srcdir)/eval.sh nicklas4.tst
+
+nicklas5: nicklas5.tst
+	$(srcdir)/eval.sh nicklas5.tst
+
+niki: niki.tst
+	$(srcdir)/eval.sh niki.tst
+
+all_batches: first_batch second_batch third_batch
+
+first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst life.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
+	$(srcdir)/regress.sh $(srcdir) reading.tst
+	$(srcdir)/regress.sh $(srcdir) owl.tst
+	$(srcdir)/regress.sh $(srcdir) owl_rot.tst
+	$(srcdir)/regress.sh $(srcdir) ld_owl.tst
+	$(srcdir)/regress.sh $(srcdir) optics.tst
+	$(srcdir)/regress.sh $(srcdir) life.tst --life
+	$(srcdir)/regress.sh $(srcdir) filllib.tst
+	$(srcdir)/regress.sh $(srcdir) atari_atari.tst
+	$(srcdir)/regress.sh $(srcdir) connection.tst
+	$(srcdir)/regress.sh $(srcdir) blunder.tst
+	$(srcdir)/regress.sh $(srcdir) strategy.tst
+
+second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.tst golife.tst arion.tst viking.tst ego.tst dniwog.tst
+	$(srcdir)/regress.sh $(srcdir) strategy2.tst
+	$(srcdir)/regress.sh $(srcdir) endgame.tst
+	$(srcdir)/regress.sh $(srcdir) heikki.tst
+	$(srcdir)/regress.sh $(srcdir) neurogo.tst
+	$(srcdir)/regress.sh $(srcdir) arb.tst
+	$(srcdir)/regress.sh $(srcdir) rosebud.tst
+	$(srcdir)/regress.sh $(srcdir) golife.tst
+	$(srcdir)/regress.sh $(srcdir) arion.tst
+	$(srcdir)/regress.sh $(srcdir) viking.tst
+	$(srcdir)/regress.sh $(srcdir) ego.tst
+	$(srcdir)/regress.sh $(srcdir) dniwog.tst
+
+third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst
+	$(srcdir)/regress.sh $(srcdir) nicklas1.tst
+	$(srcdir)/regress.sh $(srcdir) nicklas2.tst
+	$(srcdir)/regress.sh $(srcdir) nicklas3.tst
+	$(srcdir)/regress.sh $(srcdir) nicklas4.tst
+	$(srcdir)/regress.sh $(srcdir) nicklas5.tst
+	$(srcdir)/regress.sh $(srcdir) strategy3.tst
+	$(srcdir)/regress.sh $(srcdir) manyfaces.tst
+	$(srcdir)/regress.sh $(srcdir) niki.tst
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:

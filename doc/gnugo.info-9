@@ -1,0 +1,986 @@
+This is gnugo.info, produced by makeinfo version 4.0 from gnugo.texi.
+
+INFO-DIR-SECTION GNU games
+START-INFO-DIR-ENTRY
+* GNU go: (gnugo).          The GNU Go program
+END-INFO-DIR-ENTRY
+
+
+File: gnugo.info,  Node: General Utilities,  Next: Print Utilities,  Up: Utility Functions
+
+General Utilities
+=================
+
+   Utility functions from `engine/utils.c'. Many of these functions
+underlie autohelper functions (*note Autohelper Functions::).
+
+   * `void change_dragon_status(int x, int y, int status)'
+          Change the status of the dragon at `(x,y)'.
+
+   * `void count_territory( int *white, int *black)'
+          Measure territory.
+
+   * `void evaluate_territory( int *white, int *black)'
+          Evaluate territory for both sides. Removes dead dragons
+          before counting. The position cannot be reused after this
+          operation.
+
+   * `void change_defense(int ai, int aj, int ti, int tj, int dcode)'
+          Moves the point of defense of `(ai, aj)' to `(ti, tj)', and
+          sets `worm[a].defend_code' to `dcode'.
+
+   * `void change_attack(int ai, int aj, int ti, int tj, int acode)'
+          Moves the point of attack of the worm at `(ai, aj)' to `(ti,
+          tj)', and sets `worm[a].attack_code' to `acode'.
+
+   * `int defend_against(int ti, int tj, int color, int ai, int aj)'
+          Returns true if a move at `(ti,tj)' prevents the enemy from
+          playing at `(ai,aj)'. It is checked whether after the moves
+          `t', `a', the string at `a' can be captured.
+
+   * `int cut_possible(int i, int j, int color)'
+          Returns true if `color' can cut at `(i,j)'. This information
+          is collected by `find_cuts()', using the `B' patterns in the
+          connections database.
+
+   * `int does_attack(int ti, int tj, int ai, int aj)'
+          Returns true if the move at `(ti, tj)' attacks `(ai, aj)'.
+          This means that it captures the string, and that `(ai, aj)'
+          is not already dead.
+
+   * `int does_defend(int ti, int tj, int ai, int aj)'
+          Returns true if the move at `(ti, tj)' defends `(ai, aj)'.
+          This means that it defends the string, and that `(ai, aj)'
+          can be captured if no defense is made.
+
+   * `int somewhere(int color, int last_move, ...)'
+          Example:
+                  somehere(WHITE, 2, ai, aj, bi, bj, ci, cj).
+
+          returns true if one of the vertices listed satisfies
+          `p[i][j]==color'. Here last_move is the number of moves minus
+          one.
+
+   * `int play_break_through_n(int color, int num_moves, ...)'
+          This function plays a sequence of moves, alternating between
+          the players and starting with color. After having played
+          through the sequence, the three last coordinate pairs gives a
+          position to be analyzed by `break_through()', to see whether
+          either color has managed to enclose some stones and/or
+          connected his own stones. If any of the three last positions
+          is empty, it's assumed that the enclosure has failed, as well
+          as the attempt to connect.  If one or more of the moves to
+          play turns out to be illegal for some reason, the rest of the
+          sequence is played anyway, and `break_through()' is called as
+          if nothing special happened.  Like `break_through()', this
+          function returns 1 if the attempt to break through was
+          succesful and 2 if it only managed to cut through. The
+          function `break_through' is documented elsewhere (*note
+          Reading Functions::).
+
+   * `int play_break_through_n(int color, int num_moves, ...)'
+          plays a sequence of moves, alternating between the players
+          and starting with color. After having played through the
+          sequence, the three last coordinate pairs gives a position to
+          be analyzed by break_through(), to see whether either color
+          has managed to enclose some stones and/or connected his own
+          stones. If any of the three last positions is empty, it's
+          assumed that the enclosure has failed, as well as the attempt
+          to connect. If one or more of the moves to play turns out to
+          be illegal for some reason, the rest of the sequence is
+          played anyway, and break_through() is called as if nothing
+          special happened.  Like break_through(), this function
+          returns 1 if the attempt to break through was succesful and 2
+          if it only managed to cut through.
+
+   * `int play_attack_defend_n(int color, int do_attack, int num_moves,
+     ...)'
+          Plays a sequence of moves, alternating between the players
+          and starting with color. After having played through the
+          sequence, the last coordinate pair gives a target to attack
+          or defend, depending on the value of do_attack.  If there is
+          no stone present to attack or defend, it is assumed that it
+          has already been captured. If one or more of the moves to
+          play turns out to be illegal for some reason, the rest of the
+          sequence is played anyway, and attack/defense is tested as if
+          nothing special happened.  A typical use for these functions
+          is to set up a ladder in an autohelper and see whether it
+          works or not.
+
+   * `int play_attack_defend2_n(int color, int do_attack, int
+     num_moves, ...)'
+          The function play_attack_defend2_n() plays a sequence of
+          moves, alternating between the players and starting with
+          color. After having played through the sequence, the two last
+          coordinate pairs give two targets to simultaneously attack or
+          defend, depending on the value of do_attack. If there is no
+          stone present to attack or defend, it is assumed that it has
+          already been captured. If one or more of the moves to play
+          turns out to be illegal for some reason, the rest of the
+          sequence is played anyway, and attack/defense is tested as if
+          nothing special happened. A typical use for these functions
+          is to set up a crosscut in an autohelper and see whether at
+          least one cutting stone can be captured.
+
+   * `int find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)'
+          Looks for a worm adjoining the string at `(m,n)' which can be
+          easily captured. Whether or not it can be defended doesn't
+          matter (*note Worms and Dragons::). Returns the location of
+          the string in `(*wi, *wj)', and the location of the attacking
+          move in `(*ai, *aj)'.
+
+   * `void modify_depth_values(int n)'
+          The parameters `depth', `backfill_depth', `fourlib_depth' and
+          `ko_depth' are incremented by `n'. This is typically used to
+          avoid horizon effects. By temporarily increasing the depth
+          values when trying some move, one can avoid that an
+          irrelevant move seems effective just because the reading hits
+          a depth limit earlier than it did when reading only on
+          relevant moves.
+
+   * `void increase_depth_values(void)'
+          Same as `modify_depth_values(1)'.
+
+   * `void decrease_depth_values(void)'
+          Same as `modify_depth_values(-1)'.
+
+   * `void set_temporary_depth_values(int d, int b, int f, int k)'
+
+   * `void restore_depth_values()'
+          These functions allow more drastic temporary modifications of
+          the depth values. Typical use is to turn certain depth values
+          way down for reading where speed is more important than
+          accuracy, e.g. for the influence function. Temporarily set or
+          restore the values of `depth', `backfill_depth',
+          `fourlib_depth'
+     `ko_depth'.
+
+   * `int same_dragon(int ai, int aj, int bi, int bj)'
+          Test whether two dragons are the same. Used by autohelpers.
+
+   * `int same_worm(int ai, int aj, int bi, int bj)'
+          Test whether two worms are the same. Used by autohelpers.
+
+   * `int is_worm_origin(int wi, int wj, int i, int j)'
+          Determine whether two worms have the same origin.
+
+   * `int accurate_approxlib(int m, int n, int color, int maxlib, int
+     *libi, int *libj)'
+          Play a stone at `(m, n)' and count the number of liberties
+          for the resulting string. This requires `(m, n)' to be empty.
+          This function differs from `approxlib()' by the fact that it
+          removes captured stones before counting the liberties. If
+          `libi != NULL' the found liberties are written into the
+          `libi[], libj[]' arrays, but no more than `maxlib' of them.
+          Liberties exceeding `maxlib' may or may not be reported in
+          the return value. If you want to know the exact number of
+          liberties, regardless how large, you should set `maxlib' to
+          `MAXLIBS'.
+
+   * `int confirm_safety(int i, int j, int color, int value, int *di,
+     int *dj)'
+          This function will detect some blunders.  Returns 1 if a move
+          by `color' at `(i,j)' does not diminish the safety of any
+          worm, nor tend to rescue inadvertantly an opponent stone.
+
+   * `int double_atari(int m, int n, int color)'
+          Returns true if a move by (color) fits the following shape:
+                    .
+                   X*.       (O=color)
+                   OX
+
+          capturing one of the two X strings. The name is a slight
+          misnomer since this includes attacks which are not necessarily
+          double ataris, though the common double atari is the most
+          important special case.
+
+   * `int unconditional_life(int wormi[MAX_STRINGS], int
+     wormj[MAX_STRINGS], int color)'
+          Find those worms of the given color that can never be
+          captured, even if the opponent is allowed an arbitrary number
+          of consecutive moves. The coordinates of the origins of these
+          worms are written to the wormi, wormj arrays and the number
+          of non-capturable worms is returned. The algorithm is to
+          cycle through the worms until none remains or no more can be
+          captured. A worm is removed when it is found to be
+          capturable, by letting the opponent try to play on all its
+          liberties. If the attack fails, the moves are undone.
+
+   * `int vital_chain(int m, int n)'
+          This function returns true if it is judged that the capture
+          of the string at (m,n) is sufficient to create one eye. The
+          current just checks that (m,n) is not a singleton on the
+          first line.  For use when called from fill_liberty, this
+          function may optionally return a point `(*di, *dj)' of
+          defense, which, if taken, will presumably make the move at
+          `(i, j)' safe on a subsequent turn.
+
+   * `double gg_gettimeofday(void)'
+          Get the time of day, calling `gettimeofday' from `sys/time.h'
+          if available, otherwise substituting a workaround for
+          portability.
+
+   * `void sniff_lunch(int i, int j, int *max, int *min)'
+          Computes the number of eyes yielded by capturing a lunch.
+          The surrounding liberties are filled and the stones are
+          removed from the board. Then compute_eyes is called to
+          evaluate the resulting eyespace. The maximum and minimum
+          number of resulting eyes is returned in the variables *max
+          and *min.
+
+   * `int unconditional_life(int wormi[MAX_STRINGS], int
+     wormj[MAX_STRINGS], int color)'
+          Find those worms of the given color that can never be
+          captured, even if the opponent is allowed an arbitrary number
+          of consecutive moves. The coordinates of the origins of these
+          worms are written to the `wormi', `wormj' arrays and the
+          number of non-capturable worms is returned.
+
+
+File: gnugo.info,  Node: Print Utilities,  Prev: General Utilities,  Up: Utility Functions
+
+Print utilities
+===============
+
+   Utility functions from `engine/printutils.c'.
+
+   * `static void vgprintf(FILE* outputfile, const char *fmt, va_list
+     ap)'
+          This function underpins all the `TRACE' and `DEBUG' stuff.
+          It is static to `printutils.c' but documented here for
+          completeness.  Accepts `%c', `%d', `%f', `%s', and `%x' as
+          usual. But it also accepts `%m', which takes TWO integers and
+          writes a move. Other nonstandard format strings are `%H' for
+          writing a hash value and `%C' to convert a color value into a
+          string. `%o' at start means outdent (ie cancel indent). The
+          scope of this function is limited to `engine/utils.c' but the
+          format codes `%m' and `%c'$ work for all its relatives such as
+          `TRACE'.
+
+   * `void gprintf(const char *fmt, ...)'
+          Required wrapper to `vgprintf'. Writes to `stderr'.
+
+   * `void mprintf(const char *fmt, ...)'
+          Identical to `gprintf' except that it prints to `stdout'.
+          Useful when `%m' is needed for non-error messages, e.g. in the
+          ascii interface.
+
+   * `void TRACE(const char *fmt, ...)'
+          Basic tracing function. Like `gprintf' but prints only if
+          `verbose>0'.  Set the `verbose' level with the `-t' option
+          (*note Invoking GNU Go::).  Variants `RTRACE', etc. are
+          documented in the source.
+
+   * `void DEBUG(int flag, const char *fmt, ...)'
+          Like `TRACE' but conditioned on a debug flag being set,
+          usually at the command line with `-d' option (*note Invoking
+          GNU Go::).
+
+   * `void abortgo(const char *file, int line, const char *msg, int x,
+     int y)'
+          A wrapper around `abort()' which shows the state variables at
+          the time of the problem. `(i, j)' are typically a related
+          move, or `-1, -1'.
+
+   * `ASSERT'
+          This is the usual way of calling `abortgo'. This macro
+          (defined in `liberty.h') terminates the program if
+          `condition' fails.
+
+   * `const char *color_to_string(int color)'
+          Convert a color value to a string.
+
+   * `const char * location_to_string(int i, int j)'
+          Converts a board location to a string
+
+   * `const char * status_to_string(int i, int j)'
+          Converts a status to a string.
+
+
+File: gnugo.info,  Node: Incremental Board,  Next: GTP,  Prev: Utility Functions,  Up: Top
+
+Incremental Algorithms in Reading
+*********************************
+
+   The algorithms in `board.c' implement a method of incremental board
+updates that keeps track of the following information for each string:
+
+   * The color of the string.
+
+   * Number of stones in the string.
+
+   * Origin of the string, i.e. a canonical reference point, defined to
+     be the stone with smallest `i' coordinate and if there is a tie
+     with smallest `j' coordinate.
+
+   * A list of the stones in the string.
+
+   * Number of liberties.
+
+   * A list of the liberties. If there are too many liberties the list
+     is truncated.
+
+   * The number of neighbor strings.
+
+   * A list of the neighbor strings.
+
+   The basic data structure is
+
+     struct string_data {
+       int color;                  /* Color of string, BLACK or WHITE */
+       int size;                   /* Number of stones in string. */
+       int origini;                /* Coordinates of "origin", i.e. */
+       int originj;                /* "upper left" stone. */
+       int liberties;              /* Number of liberties. */
+       int libi[MAX_LIBERTIES];    /* Coordinates of liberties. */
+       int libj[MAX_LIBERTIES];
+       int neighbors;              /* Number of neighbor strings */
+       int neighborlist[MAXCHAIN]; /* List of neighbor string numbers. */
+       int mark;                   /* General purpose mark. */
+     };
+     
+     struct string_data string[MAX_STRINGS];
+
+   It should be clear that almost all information is stored in the
+`string' array. To get a mapping from the board coordinates to the
+`string' array we have
+
+     int string_number[MAX_BOARD][MAX_BOARD];
+
+which contains indices into the `string' array. This information is only
+valid at nonempty vertices, however, so it is necessary to first verify
+that `p[i][j] != EMPTY'.
+
+   The `string_data' structure does not include an array of the stone
+coordinates. This information is stored in a separate array (or rather
+two):
+
+     int next_stonei[MAX_BOARD][MAX_BOARD];
+     int next_stonej[MAX_BOARD][MAX_BOARD];
+
+   These arrays implement cyclic linked lists of stones. Each vertex
+contains a pointer to another (possibly the same) vertex. Starting at
+an arbitrary stone on the board, following these pointers should
+traverse the entire string in an arbitrary order before coming back to
+the starting point. As for the 'string_number' array, this information
+is invalid at empty points on the board. This data structure has the
+good properties of requiring fixed space (regardless of the number of
+strings) and making it easy to add a new stone or join two strings.
+
+   Additionally the code makes use of some work variables:
+
+     static int ml[MAX_BOARD][MAX_BOARD];
+     static int liberty_mark;
+     static int string_mark;
+     static int next_string;
+     static int strings_initialized = 0;
+
+   The `ml' array and `liberty_mark' are used to "mark" liberties on
+the board, e.g. to avoid counting the same liberty twice. The
+convention is that if `ml[i][j]' has the same value as `liberty_mark',
+then `(i, j)' is marked. To clear all marks it suffices to increase the
+value of `liberty_mark', since it is never allowed to decrease.
+
+   The same relation holds between the `mark' field of the `string_data'
+structure and `string_mark'. Of course these are used for marking
+individual strings.
+
+   `next_string' gives the number of the next available entry in the
+`string' array. Then `strings_initialized' is set to one when all data
+structures are known to be up to date. Given an arbitrary board
+position in the `p' array, this is done by calling
+`incremental_board_init()'. It is not necessary to call this function
+explicitly since any other function that needs the information does
+this if it has not been done.
+
+   The interesting part of the code is the incremental update of the
+data structures when a stone is played and subsequently removed. To
+understand the strategies involved in adding a stone it is necessary to
+first know how undoing a move works. The idea is that as soon as some
+piece of information is about to be changed, the old value is pushed
+onto a stack which stores the value and its address. The stack is built
+from the following structures:
+
+     struct change_stack_entry {
+       int *address;
+       int value;
+     };
+     
+     struct change_stack_entry change_stack[STACK_SIZE];
+     int change_stack_index;
+
+and manipulated with the macros
+
+     BEGIN_CHANGE_RECORD()
+     PUSH_VALUE(v)
+     POP_MOVE()
+
+   Calling `BEGIN_CHANGE_RECORD()' stores a null pointer in the address
+field to indicate the start of changes for a new move. As mentioned
+earlier `PUSH_VALUE()' stores a value and its corresponding address.
+Assuming that all changed information has been duly pushed onto the
+stack, undoing the move is only a matter of calling `POP_MOVE()', which
+simply assigns the values to the addresses in the reverse order until
+the null pointer is reached. This description is slightly simplified
+because this stack can only store 'int' values and we need to also
+store changes to the board. Thus we have two parallel stacks where one
+stores `int' values and the other one stores `Intersection' values.
+
+   When a new stone is played on the board, first captured opponent
+strings, if any, are removed. In this step we have to push the board
+values and the `next_stone' pointers for the removed stones, and update
+the liberties and neighbor lists for the neighbors of the removed
+strings. We do not have to push all information in the 'string' entries
+of the removed strings however. As we do not reuse the entries they
+will remain intact until the move is pushed and they are back in use.
+
+   After this we put down the new stone and get three distinct cases:
+
+  1. The new stone is isolated, i.e. it has no friendly neighbor.
+
+  2. The new stone has exactly one friendly neighbor.
+
+  3. The new stone has at least two friendly neighbors.
+
+   The first case is easiest. Then we create a new string by using the
+number given by `next_string' and increasing this variable. The string
+will have size one, `next_stone' points directly back on itself, the
+liberties can be found by looking for empty points in the four
+directions, possible neighbor strings are found in the same way, and
+those need also to remove one liberty and add one neighbor.
+
+   In the second case we do not create a new string but extend the
+neighbor with the new stone. This involves linking the new stone into
+the cyclic chain, if needed moving the origin, and updating liberties
+and neighbors. Liberty and neighbor information also needs updating for
+the neighbors of the new stone.
+
+   In the third case finally, we need to join already existing strings.
+In order not to have to store excessive amounts of information, we
+create a new string for the new stone and let it assimilate the
+neighbor strings. Thus all information about those can simply be left
+around in the 'string' array, exactly as for removed strings. Here it
+becomes a little more complex to keep track of liberties and neighbors
+since those may have been shared by more than one of the joined
+strings. Making good use of marks it all becomes rather straightforward
+anyway.
+
+   The often used construction
+
+         FIRST_STONE(s, i, j);
+         do {
+             ...
+             NEXT_STONE(i, j);
+         } while (!BACK_TO_FIRST_STONE(s, i, j));
+
+traverses the stones of the string with number `s' exactly once, with
+`(i, j)' holding the coordinates. In general `(i, j)' are used as board
+coordinates and `s' as an index into the `string' array or sometimes a
+pointer to an entry in the `string' array.
+
+
+File: gnugo.info,  Node: GTP,  Next: Regression,  Prev: Incremental Board,  Up: Top
+
+The Go Text Protocol
+********************
+
+* Menu:
+
+* The Go Text Protocol::          The Go Text Protocol
+* Protocol applications::         Protocol applications
+* Protocol conventions::	  Protocol conventions
+* Regression with GTP::           Regression testing with GTP
+
+
+File: gnugo.info,  Node: The Go Text Protocol,  Next: Protocol applications,  Prev: GTP,  Up: GTP
+
+The GNU Go Text Protocol
+========================
+
+   GNU Go 3.0 introduces a new interface, the Go Text Protocol (GTP).
+The intention is to make an interface that is better suited for
+machine-machine communication than the ascii interface and simpler,
+more powerful, and more flexible than the Go Modem Protocol.
+
+   The GTP has two principal current applications: it is used in the
+test suite (*note Regression::) and it is used to communicate with
+`gnugoclient', which is not part of the GNU Go distribution, but has
+been used to run GNU Go on NNGS. Other potential uses might be any of
+the current uses of the GMP, for which the GTP might serve as a
+replacement.  This would likely entail extension and standardization of
+the protocol.
+
+   A sample GTP session may look as follows:
+
+       hannah 2289% ./interface/gnugo --quiet --mode gtp
+       1 loadsgf regression/games/incident156.sgf 249
+       =1
+     
+       2 countlib C3
+       =2 4
+     
+       3 findlib C3
+       =3 C4 B3 D3 B2
+     
+       5 attack C3
+       =5 0
+     
+       owl_attack C3
+       = 1 B4
+     
+       3 owl_defend C3
+       =3 1 B5
+     
+       owl_attack A2
+       ? vertex must not be empty
+     
+       quit
+       =
+
+   By specifying `--mode gtp' GNU Go starts in the GTP interface. No
+prompt is used, just start giving commands. The commands have the
+common syntax
+
+     [id] command_name [arguments]
+
+   The command is exactly one line long, i.e. it ends as soon as a
+newline appears. It's not possible to give multiple commands on the
+same line. Before the command name an optional identity number can be
+specified. If present it must be an integer between 0 and 2^31-1. The
+id numbers may come in any order or be reused. The rest of the line
+after the command name is assumed to be arguments for the command.
+Empty lines are ignored, as is everything following a hash sign up to
+the end of the line.
+
+   If the command is successful, the response is of the form
+
+     =[id] result
+
+   Here `=' indicates success and `id' is the identity number given in
+the command or the empty string if the id was omitted. This is followed
+by the result, which is a text string ending with two consecutive
+newlines.
+
+   If the command fails for some reason, the response takes the form
+
+     ?[id] error_message
+
+   Here `?' indicates failure, `id' is as before, and `error_message'
+gives an explanation for the failure. This string also ends with two
+consecutive newlines.
+
+   The available commands may always be listed using the single command
+`help'. Currently this gives the list below.
+
+     attack
+     black
+     boardsize
+     color
+     combination_attack
+     countlib
+     debug_influence
+     debug_move_influence
+     decrease_depths
+     defend
+     dragon_data
+     dragon_status
+     dump_stack
+     echo
+     eval_eye
+     final_score
+     findlib
+     fixed_handicap
+     genmove_black
+     genmove_white
+     get_life_node_counter
+     get_owl_node_counter
+     get_reading_node_counter
+     get_trymove_counter
+     gg_genmove
+     help
+     increase_depths
+     influence
+     is_legal
+     komi
+     level
+     loadsgf
+     move_influence
+     name
+     new_score
+     owl_attack
+     owl_defend
+     popgo
+     prisoners
+     quit
+     report_uncertainty
+     reset_life_node_counter
+     reset_owl_node_counter
+     reset_reading_node_counter
+     reset_trymove_counter
+     same_dragon
+     showboard
+     trymove
+     tune_move_ordering
+     version
+     white
+     worm_cutstone
+     worm_data
+
+   For exact specification of their arguments and results we refer to
+the comments of the functions in `interface/play_gtp.c'.
+
+
+File: gnugo.info,  Node: Protocol applications,  Next: Protocol conventions,  Prev: The Go Text Protocol,  Up: GTP
+
+   The protocol is asymmetric and involves two parties, which we may
+call `A' and `B'. `A' is typically some kind of arbiter or relay and
+`B' is a go engine. All communication is initiated by `A' in form of
+commands, to which `B' responds.
+
+   Potential setups include:
+
+  1. Regression testing.
+          A (regression script) -- B (engine).
+
+          A sets up a board position and asks B to e.g. generate a move
+          or find an attack on a specific string.
+
+  2. Human vs program.
+          A (GUI) -- B (engine)
+
+          The GUI relays moves between the human and the engine and
+          asks the engine to generate moves. Optionally the GUI may
+          also use GTP to ask the engine which moves are legal or give
+          a score when the game is finished.
+
+  3. Program vs program with arbiter.
+          B1 (engine 1) -- A (arbiter) -- B2 (engine 2)
+
+          A relays moves between the two engines and alternately asks
+          the engines to generate moves. This involves two different GTP
+          channels, the first between A and B1, and the second between
+          A and B2. There is no direct communication between B1 and B2.
+          The arbiter dictates board size, komi, rules, etc.
+
+  4. Program vs program without arbiter.
+          The same as above except that B1 includes the arbiter
+          functionality and the first GTP link is shortcut.
+
+  5. Connection between go server and program.
+          Go server -- A (relay) -- B (engine)
+
+          A talks with a go server using whatever protocol is needed and
+          listens for match requests. When one arrives it accepts it,
+          starts the go engine and issues GTP commands to set up board
+          size, komi, etc. and if a game is restarted it also sets up
+          the position. Then it relays moves between the server and the
+          engine and asks the engine to generate new moves when it is
+          in turn.
+
+   Setups 1 and 5 are in active and regular use with GNU Go. Programs
+implementing setup 3 are also distributed with GNU Go (the files
+`interface/gtp_examples/twogtp' and `interface/gtp_examples/2ptkgo.pl').
+
+
+File: gnugo.info,  Node: Protocol conventions,  Next: Regression with GTP,  Prev: Protocol applications,  Up: GTP
+
+   The GTP is currently unfinished and unstandardized. It is hoped that
+it will grow to fill the needs currently served by the GMP and perhaps
+other functions. As it is yet unstandardized, this section gives some
+general remarks which we hope will constrain its development. We also
+discuss how the GTP is implemented in GNU Go, for the benefit of anyone
+wishing to add new commands. Notice that the current set of GTP commands
+is a mix of generally useful ones and highly GNU Go specific ones. Only
+the former should be part of a standardized protocol while the latter
+should be private extensions.
+
+   The purpose of the protocol is machine-machine communication. It may
+be tempting to modify the protocol so that it becomes more comfortable
+for the human user, for example with an automatic showboard after every
+move. *This is absolutely not the purpose of the protocol!* Use the
+ascii interface instead if you're inclined to make such a change.
+
+   Newlines are implemented differently on different operating systems.
+On Unix, a newline is just a line feed LF (ascii \012).  On DOS/Windows
+it is CRLF (\013\012). Thus whether GNU Go sends a carriage return with
+the line feed depends on which platform it is compiled for. The arbiter
+should silently discard carriage returns.
+
+   Applications using GTP should never have to guess about the basic
+structure of the responses, defined above. The basic construction for
+coding a GTP command can be found in `gtp_countlib()':
+
+     static int
+     gtp_countlib(char *s, int id)
+     {
+       int i, j;
+       if (!gtp_decode_coord(s, &i, &j))
+         return gtp_failure(id, "invalid coordinate");
+     
+       if (p[i][j] == EMPTY)
+         return gtp_failure(id, "vertex must not be empty");
+     
+       return gtp_success(id, "%d", countlib(i, j));
+     }
+
+   The functions `gtp_failure()' and `gtp_success()' automatically
+ensures the specified response format, assuming the strings they are
+printing do not end with a newline.
+
+   Sometimes the output is too complex for use with gtp_success, e.g. if
+we want to print vertices, which gtp_success() doesn't support. Then we
+have to fall back to the construction in e.g.  `gtp_genmove_white()':
+
+     static int
+     gtp_genmove_white(char *s, int id)
+     {
+       int i, j;
+       UNUSED(s);
+       if (genmove(&i, &j, WHITE) >= 0)
+         play_move(i, j, WHITE);
+     
+       gtp_printid(id, GTP_SUCCESS);
+       gtp_print_vertex(i, j);
+       return gtp_finish_response();
+     }
+
+   Here `gtp_printid()' writes the equal sign and the request id while
+`gtp_finish_response()' adds the final two newlines. The next example
+is from `gtp_influence()':
+
+       gtp_printid(id, GTP_SUCCESS);
+       get_initial_influence(color, 1, white_influence,
+     			black_influence, influence_regions);
+       print_influence(white_influence, black_influence, influence_regions);
+       /* We already have one newline, thus can't use gtp_finish_response(). */
+       gtp_printf("\n");
+       return GTP_OK;
+
+   As we have said, the response should be finished with two newlines.
+Here we have to finish up the response ourselves since we already have
+one newline in place.
+
+   One problem that can be expected to be common is that an engine
+happens to finish its response with three (or more) rather than two
+consecutive newlines. This is an error by the engine that the
+controller can easily detect and ignore. Thus a well behaved engine
+should not send stray newlines, but should they appear the controller
+should ignore them. The opposite problem of an engine failing to
+properly finish its response with two newlines will result in deadlock.
+Don't do this mistake!
+
+   Although it doesn't suffice in more complex cases, gtp_success() is
+by far the most convenient construction when it does. For example, the
+function `gtp_report_uncertainty' takes a single argument which is
+expected to be "on" or "off", after which it sets the value of
+`report_uncertainty', a variable which affects the form of future GTP
+responses, reports success, and exits. The function is coded thus:
+
+     static int
+     gtp_report_uncertainty(char *s, int id)
+     {
+       if (!strncmp(s, "on", 2)) {
+         report_uncertainty = 1;
+         return gtp_success(id, "");
+       }
+       if (!strncmp(s, "off", 3)) {
+         report_uncertainty = 0;
+         return gtp_success(id, "");
+       }
+       return gtp_failure(id, "invalid argument");
+     }
+
+
+File: gnugo.info,  Node: Regression with GTP,  Prev: Protocol conventions,  Up: GTP
+
+Regression testing with GTP
+===========================
+
+   GNU Go uses GTP for regression testing. These tests are implemented
+as files with GTP commands, which are fed to GNU Go simply by
+redirecting stdin to read from a file. The output is filtered so that
+equal signs and responses from commands without id numbers are removed.
+These results are then compared with expected results encoded in GTP
+comments in the file, using matching with regular expressions. More
+information can be found in the regression chapter (*note Regression::).
+
+
+File: gnugo.info,  Node: Regression,  Next: Copying,  Prev: GTP,  Up: Top
+
+Regression testing
+******************
+
+   The standard purpose of regression testing is to avoid getting the
+same bug twice. When a bug is found, the programmer fixes the bug and
+adds a test to the test suite. The test should fail before the fix and
+pass after the fix. When a new version is about to be released, all the
+tests in the regression test suite are run and if an old bug reappears,
+this will be seen quickly since the appropriate test will fail.
+
+   The regression testing in GNU Go is slightly different. A typical
+test case involves specifying a position and asking the engine what
+move it would make. This is compared to one or more correct moves to
+decide whether the test case passes or fails. It is also stored whether
+a test case is expected to pass or fail, and deviations in this status
+signify whether a change has solved some problem and/or broken something
+else. Thus the regression tests both include positions highlighting some
+mistake being done by the engine, which are waiting to be fixed, and
+positions where the engine does the right thing, where we want to detect
+if a change breaks something.
+
+Regression testing in GNU Go
+============================
+
+   Regression testing is performed by the files in the `regression/'
+directory. The tests are specified as GTP commands in files with the
+suffix `.tst', with corresponding correct results and expected
+pass/fail status encoded in GTP comments following the test. To run a
+test suite the shell scripts `test.sh', `eval.sh', and `regress.sh' can
+be used. There are also Makefile targets to do this. If you `make
+all_batches' most of the tests are run.
+
+   Game records used by the regression tests are stored in the
+directory `regression/games/' and its subdirectories.
+
+Test suites
+===========
+
+   The regression tests are grouped into suites and stored in files as
+GTP commands. A part of a test suite can look as follows:
+     # Connecting with ko at B14 looks best. Cutting at D17 might be
+     # considered. B17 (game move) is inferior.
+     loadsgf games/strategy25.sgf 61
+     90 gg_genmove black
+     #? [B14|D17]
+     
+     # The game move at P13 is a suicidal blunder.
+     loadsgf games/strategy25.sgf 249
+     95 gg_genmove black
+     #? [!P13]
+     
+     loadsgf games/strategy26.sgf 257
+     100 gg_genmove black
+     #? [M16]*
+
+   Lines starting with a hash sign, or in general anything following a
+hash sign, are interpreted as comments by the GTP mode and thus ignored
+by the engine. GTP commands are executed in the order they appear, but
+only those on numbered lines are used for testing. The comment lines
+starting with `#?' are magical to the regression testing scripts and
+indicate correct results and expected pass/fail status. The string
+within brackets is matched as a regular expression against the response
+from the previous numbered GTP command. A particular useful feature of
+regular expressions is that by using `|' it is possible to specify
+alternatives. Thus `B14|D17' above means that if either `B14' or `D17'
+is the move generated in test case 90, it passes. There is one
+important special case to be aware of. If the correct result string
+starts with an exclamation mark, this is excluded from the regular
+expression but afterwards the result of the matching is negated. Thus
+`!P13' in test case 95 means that any move except `P13' is accepted as
+a correct result.
+
+   In test case 100, the brackets on the `#?' line is followed by an
+asterisk. This means that the test is expected to fail. If there is no
+asterisk, the test is expected to pass. The brackets may also be
+followed by a `&', meaning that the result is ignored. This is
+primarily used to report statistics, e.g. how many tactical reading
+nodes were spent while running the test suite.
+
+Performing tests
+================
+
+   `./test.sh blunder.tst' runs the tests in `blunder.tst' and prints
+the results of the commands on numbered lines, which may look like:
+
+     1 E5
+     2 F9
+     3 O18
+     4 B7
+     5 A4
+     6 E4
+     7 E3
+     8 A3
+     9 D9
+     10 J9
+     11 B3
+     12 C6
+     13 C6
+
+   This is usually not very informative, however. More interesting is
+`./eval.sh blunder.tst' which also compares the results above against
+the correct ones in the test file and prints a report for each test on
+the form:
+
+     1 failed: Correct '!E5', got 'E5'
+     2 failed: Correct 'C9|H9', got 'F9'
+     3 PASSED
+     4 failed: Correct 'B5|C5|C4|D4|E4|E3|F3', got 'B7'
+     5 PASSED
+     6 failed: Correct 'D4', got 'E4'
+     7 PASSED
+     8 failed: Correct 'B4', got 'A3'
+     9 failed: Correct 'G8|G9|H8', got 'D9'
+     10 failed: Correct 'G9|F9|C7', got 'J9'
+     11 failed: Correct 'D4|E4|E5|F4|C6', got 'B3'
+     12 failed: Correct 'D4', got 'C6'
+     13 failed: Correct 'D4|E4|E5|F4', got 'C6'
+
+   The result of a test can be one of four different cases:
+
+   * `passed': An expected pass
+
+     This is the ideal result.
+
+   * `PASSED': An unexpected pass
+
+     This is a result that we are hoping for when we fix a bug. An old
+     test case that used to fail is now passing.
+
+   * `failed': An expected failure
+
+     The test failed but this was also what we expected, unless we were
+     trying to fix the particular mistake highlighted by the test case.
+     These tests show weaknesses of the GNU Go engine and are good
+     places to search if you want to detect an area which needs
+     improvement.
+
+   * `FAILED': An unexpected failure
+
+     This should nominally only happen if something is broken by a
+     change. However, sometimes GNU Go passes a test, but for the wrong
+     reason or for a combination of wrong reasons.  When one of these
+     reasons is fixed, the other one may shine through so that the test
+     suddenly fails. When a test case unexpectedly fails, it is
+     necessary to make a closer examination in order to determine
+     whether a change has broken something.
+
+
+   If you want a less verbose report, `./regress.sh . blunder.tst' does
+the same thing as the previous command, but only reports unexpected
+results. The example above is compressed to
+
+     3 unexpected PASS!
+     5 unexpected PASS!
+     7 unexpected PASS!
+
+   For convenience the tests are also available as makefile targets. For
+example, `make blunder' runs the tests in the blunder test suite by
+executing `eval.sh blunder.tst'. `make test' runs all test suites in a
+sequence using the `regress.sh' script.
+
+
+File: gnugo.info,  Node: Copying,  Next: Concept Index,  Prev: Regression,  Up: Top
+
+Copying
+*******
+
+   The program GNU Go is distributed under the terms of the GNU General
+Public License (GPL). Its documentation is distributed under the terms
+of the GNU Free Documentation License (GFDL).
+
+* Menu:
+
+* GPL::            The GNU General Public License
+* GFDL::           The GNU Free Documentation License
+* GTP License::    The Go Text Protocol License
+

@@ -1,0 +1,1178 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999, 2000, 2001 by the Free Software Foundation.   #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA.                                        #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Database of connection patterns.
+#
+#  ? - don't care
+#  . - empty
+#  X - opposite color of O
+#  O - color of dragon looking for connection
+#  x - X or empty
+#  o - O or empty
+#  * - cutting point in the O formation, an X move here must be
+#      tactically safe
+#  ! - inhibit connection, eye space points for O are turned marginal
+#
+###################################
+#
+# Classification
+#
+# The connection database contains patterns of four different classes,
+# which also are matched separately.
+#
+#  B - Indicate cutting points and inhibit connections.
+#  C - Amalgamate worms into dragons
+#  e - Modify eye space, late matching
+#
+###################################
+#
+# Organisation
+#
+# The connection database is organized into a number of different
+# categories and ordered so that more specific patterns are matched
+# before more general ones, since evaluating the constraints of the
+# latter usually is expensive.
+#
+#  EB    - Edge B patterns
+#  CB    - Center B patterns
+#  EC    - Edge C patterns
+#  CC    - Center C patterns
+#  Eye   - eye modification patterns of e classification
+#  Lunch - patterns that invalidate lunches, matched with e patterns
+#
+###################################
+
+########################
+#
+# B patterns on the edge
+#
+########################
+
+Pattern EB1
+
+?XO
+O*!
+---
+
+:8,B
+
+
+Pattern EB2
+
+?XO
+O*!
+.!.
+---
+
+:8,B
+
+
+Pattern EB3
+# second line clamp
+
+x.!?
+XO*!
+x.!?
+----
+
+:8,B
+
+
+Pattern EB4
+
+X.O?
+.*!?
+..!!
+----
+
+:8,B
+
+
+Pattern EB5
+
+OXO
+!*!
+.!.
+---
+
+:|,B
+
+
+Pattern EB6
+
+?XO
+O*!
+.!.
+.!.
+---
+
+:8,B
+
+?XO
+O*.
+cab
+...
+---
+
+;!xplay_attack(*,a,b,b) || !xplay_attack(*,a,c,c)
+
+
+Pattern EB7
+
+Xx?
+O*O
+.!.
+.!.
+---
+
+:8,B
+
+Xx?
+c*O
+ba.
+.!.
+---
+
+;xplay_attack(*,a,c) && !xplay_attack(*,b,a,a)
+
+
+Pattern EB8
+
+?O?
+X*!
+O!.
+---
+
+:8,B
+
+
+Pattern EB9
+
+?X?
+XOX
+O*O
+.!.
+---
+
+:8,B
+
+?X?
+XOX
+a*b
+.!.
+---
+
+;xplay_attack(*,a) || xplay_attack(*,b)
+
+
+Pattern EB10
+
+O.X
+!*O
+.!.
+---
+
+:8,B
+
+OaX
+!*b
+.!.
+---
+
+;xplay_attack(*,a,b)
+
+
+Pattern EB11
+
+?XX?
+O*O.
+!!!.
+.!..
+----
+
+:8,B
+
+?XX?
+O*Oc
+.ab.
+.!..
+----
+
+;xplay_attack_either(*,a,b,c,a,c)
+
+
+Pattern EB12
+
+??X?
+O.*O
+.!!.
+..!.
+----
+
+:8,B
+
+??X?
+Oc*O
+.ba.
+..!.
+----
+
+;xplay_attack(*,a,b,c,a)
+
+
+Pattern EB13
+
+?X?
+O*O
+o!o
+---
+
+:|,B
+
+?X?
+b*c
+oao
+---
+
+;xplay_attack_either(*,a,b,c)
+
+
+Pattern EB14
+
+??X?
+O.*O
+.!!.
+.!!.
+..!.
+----
+
+:8,B
+
+??X?
+Oc*O
+.bad
+..ef
+..!.
+----
+
+;!xplay_attack_either(*,a,b,c,d,e,f,*,f)
+
+
+Pattern EB15
+
+?OX?
+.!*O
+..!O
+----
+
+:8,B
+
+
+Pattern EB16
+
+??X?
+O.*O
+..!o
+----
+
+:8,B
+
+??X?
+Oc*O
+.bao
+----
+
+;xplay_attack_either(*,a,b,c,a,c)
+
+
+Pattern EB17
+
+?X?
+OXO
+!*!
+!!!
+.!.
+---
+
+:8,B
+
+
+Pattern EB18
+
+X.O
+O*!
+.!.
+---
+
+:8,B
+
+XaO
+d*b
+.c.
+---
+
+;xplay_attack_either(*,a,a,d)
+;&& (xplay_attack(*,b,d) || xplay_attack_either(*,b,c,a,a,d))
+
+
+Pattern EB19
+
+X!O
+O*.
+---
+
+:8,B
+
+XaO
+b*.
+---
+
+;xplay_attack_either(*,a,a,b)
+
+
+Pattern EB20
+
+?X??
+OX.?
+!*!O
+!!!?
+.!.?
+----
+
+:8,B
+
+
+##########################
+#
+# B patterns in the center
+#
+##########################
+
+Pattern CB1
+
+?O.          fragile double connection 
+X*O
+?O.
+
+:8,B
+
+?Oa
+X*O
+?Ob
+
+;!xplay_attack_either(*,a,b,*,b) && !xplay_attack_either(*,b,a,*,a)
+
+
+Pattern CB2
+
+?O.
+?..          fragile double connection 
+X*O
+?O.
+
+:8,B
+
+?O.
+?ca
+X*O
+?Ob
+
+;!xplay_attack_either(*,a,b,*,b) && xplay_defend_both(*,b,a,c,*,a)
+
+
+Pattern CB3
+
+O!O
+!*X
+.O?
+
+:8,B
+
+O!a
+!*X
+.b?
+
+;lib(a)==2 || lib(b) == 2
+
+
+Pattern CB4
+
+XO?
+O*!
+?!?
+
+:\,B,basic_cut_helper
+
+
+Pattern CB5
+# This pattern is needed to inhibit connection in a position like
+#
+# .XO..
+# .XOXX
+# OO.OX
+# .XOOX
+# .XXXX
+#
+
+XO
+O*
+
+:\,B,basic_cut_helper
+
+
+Pattern CB6
+# This pattern is an ugly way to ensure that the X stone is at least
+# regarded as a potential cutting stone. The helper returns 0 so the
+# pattern does not fire as a B pattern. With an improved connectivity
+# analysis, this pattern should no longer be needed.
+
+XO
+O*
+
+:\,B,ugly_cutstone_helper
+
+AO
+OB
+
+;attack(A) && safe_xmove(B)
+
+
+Pattern CB7
+# This pattern is used to find potential cutting stones as defined by
+# the field cutstone2 in the worm data. The helper returns 0 so the
+# pattern doesn't fire as a B pattern.
+
+XO
+O*
+
+:\,B,cutstone2_helper
+
+AO
+O*
+
+;attack(A)
+
+
+Pattern CB8
+
+?O?
+.*X
+.!O
+xOo
+
+:8,B
+
+
+Pattern CB9
+
+X.O
+O*.
+O!.
+?XX
+
+:8,B
+
+BaO
+O*.
+O!.
+?XX
+
+;xplay_defend_both(*,a,*,B)
+
+
+Pattern CB10
+
+o!X
+O*O
+X!o
+
+:8,B
+
+.aB
+O*O
+Cd.
+
+;xplay_defend_both(*,a,*,B) && xplay_defend_both(*,d,*,C)
+
+
+Pattern CB11
+
+?OX?
+O!OX
+?*!O
+??O?
+
+:8,B
+
+?OA?
+OaOB
+?*bO
+??O?
+
+; !attack(A) && !attack(B) && !xplay_attack(*,a,b,*) && !xplay_attack(*,b,a,*)
+
+
+########################
+#
+# C patterns on the edge
+#
+########################
+
+Pattern EC1
+
+??oo??
+?....?
+oO..Oo
+o....o
+o....o
+------
+
+:|,C
+
+
+Pattern EC1b
+
+??....??
+o.O..O.o
+o......o
+o......o
+--------
+
+:|,C
+
+
+Pattern EC2
+
+O.O
+...
+...
+---
+
+:|,C
+
+OaO
+dbc
+...
+---
+
+;!xplay_defend(a,b,c,d,c) && !xplay_defend(a,b,d,c,d)
+
+
+Pattern EC3a
+
+o...o
+oO.Oo
+o...o
+o...o
+o...o
+-----
+
+:8,C
+
+o...o
+oO.Oo
+o...o
+oa..o
+o...o
+-----
+
+;omoyo(a)
+
+
+Pattern EC3b
+
+o...?
+.O.O?
+.....
+....o
+....o
+-----
+
+:8,C
+
+ojc.?
+iOaO?
+febd.
+hg..o
+....o
+-----
+
+;!xplay_attack(a,b,c,d,e,f,g,h,i,j,j)
+
+
+Pattern EC4
+
+O..?     monkey jump connection
+...O
+----
+
+:8,C
+
+Oae?
+cbdf
+----
+
+;xplay_attack_either(a,b,c,c,a) && !xplay_attack(d,e,f)
+;&& !xplay_attack(b,a,e,d,d)
+
+
+##########################
+#
+# C patterns in the center
+#
+##############################################
+#
+# CC1xx - patterns without reading constraints
+#
+##############################################
+
+Pattern CC101
+
+.O
+O.
+
+:X,C
+
+aO
+Ob
+
+;!xcut(a) && !xcut(b)
+
+
+Pattern CC102
+
+OO
+..
+OO
+
+:+,C
+
+
+Pattern CC103
+
+?oooo?
+o....o
+oO..Oo
+o....o
+?oooo?
+
+:+,C
+
+
+Pattern CC104
+
+?ooo??
+o...oo
+oO...o
+o...Oo
+oo...o
+??ooo?
+
+:8,C
+
+
+Pattern CC105
+
+?ooo?
+.....
+.O.O.
+.....
+?ooo?
+
+:+,C
+
+
+Pattern CC106
+
+.O.O.
+o...o
+o...o
+o.O.o
+
+:8,C
+
+
+Pattern CC107
+
+.O.O.
+o...o
+o...o
+.O.O.
+
+:8,C
+
+
+Pattern CC108
+
+O.O
+...
+...
+.O.
+
+:|,C
+
+OaO
+bcd
+efg
+hOi
+
+;omoyo(a) && oarea(c) && oarea(f)
+;&& ((omoyo(b) + omoyo(c) + omoyo(d) + omoyo(e) + omoyo(f) +omoyo(g)) >= 3)
+
+
+Pattern CC109
+
+O.oo
+..oo
+..oo
+.Ooo
+
+:8,C
+
+O.oo
+.aoo
+.boo
+.Ooo
+
+;omoyo(a) && omoyo(b)
+
+
+##########################################################
+#
+# CC2xx - patterns with reasonably inexpensive constraints
+#
+##########################################################
+
+Pattern CC201
+
+OO
+..
+O.
+
+:8,C
+
+OO
+ab
+Oc
+
+;xplay_attack_either(a,b,c,a,c)
+
+
+Pattern CC202
+
+OO
+..
+OX
+
+:8,C
+
+OO
+ab
+OC
+
+;!xplay_defend_both(a,b,a,C)
+
+
+Pattern CC203
+
+XO
+..
+OX
+
+:8,C
+
+DO
+ab
+OC
+
+;!xplay_defend_both(a,b,C,D) && !xplay_defend_both(b,a,C,D)
+
+
+Pattern CC204
+
+O
+.
+O
+
+:+,C
+
+O
+A
+O
+
+;!safe_xmove(A) && !ko(A) && !xcut(A)
+
+
+Pattern CC205
+
+XO
+O.
+
+:\,C
+
+AO
+OB
+
+;attack(A) || (!safe_xmove(B) && !ko(B) && !xcut(B))
+
+
+Pattern CC206
+
+O..
+..O
+ooo
+
+:8,C
+
+Obc
+daf
+ooo
+
+;xplay_attack_either(a,b,c,a,c) && xplay_attack_either(b,a,d,b,d)
+
+
+Pattern CC206
+
+oOO..
+.....
+.O..O
+
+:8,C
+
+oOO..
+feca.
+gOdbO
+
+;xplay_attack_either(a,b,c,d,e,f,g,a,g)
+
+
+#############################################
+#
+# CC3xx - patterns with expensive constraints
+#
+#############################################
+#
+# CC30x - one space jump connections
+#
+####################################
+
+Pattern CC301
+
+O.O
+...
+
+:8,C
+
+OaO
+dbc
+
+;xplay_attack(a,b,c,c) && xplay_attack(a,b,d,d)
+
+
+Pattern CC302
+
+?O.
+...
+?O.
+
+:-,C
+
+?gd
+cab
+?fe
+
+;olib(c)>1 && (xplay_attack(a,b,c,d,e,e) || xplay_attack(a,b,c,e,d,d))
+;&& !xplay_attack(a,b,f) && !xplay_attack(a,b,g)
+
+
+###########################
+#
+# CC31x - keima connections
+#
+###########################
+
+Pattern CC311
+
+O..
+..O
+
+:8,C
+
+Ebc
+daF
+
+;lib(E)>2 && lib(F)>2
+;&& xplay_attack_either(a,b,c,a,c) && xplay_attack_either(b,a,d,b,d)
+
+
+
+Pattern CC312
+
+.O
+..
+O.
+oO
+
+:8,C
+
+dO
+ab
+Oc
+oO
+
+;(xplay_attack(a,b,c,a) || xplay_attack(a,b,c,c)) &&
+;(xplay_attack(b,a,d,b) || xplay_attack(b,a,d,d)) &&
+;!xcut(c)
+
+
+Pattern CC313
+
+O..
+..O
+...
+
+:8,C
+
+Obc
+daf
+.e.
+
+;xplay_attack_either(a,b,c,a,c)
+;&& (xplay_attack_either(b,a,d,b,d) || !xplay_break_through(b,d,a,e,d,e,f))
+
+
+####################################
+#
+# CC32x - two space jump connections
+#
+####################################
+
+Pattern CC321
+
+O..O
+O..O
+
+:+,C
+
+OadO
+ObcO
+
+;!xplay_defend_both(a,b,c,d,a,c) && !xplay_defend_both(b,a,d,c,b,d)
+
+
+Pattern CC322
+
+O..O
+O...
+
+:8,C
+
+OacO
+Obde
+
+;xplay_attack_either(a,b,c,d,e,c,e) && !xplay_defend_both(a,b,d,c,a,d)
+;&& xplay_attack(b,a,c,c)
+
+
+Pattern CC323
+
+O..O
+O...
+
+:8,C
+
+Oadf
+Obce
+
+;!xplay_defend_both(a,b,c,d,a,c) && xplay_attack_either(a,b,d,c,e,d,e)
+;&& (!xplay_defend(d,c,b,a,d)
+;    || (xplay_attack(d,c,b,a,e,d) && xplay_attack(d,c,b,a,e,b)
+;        && xplay_attack(a,c,b,a,e,e)))
+;&& xplay_defend_both(d,c,e,c,f)
+
+
+############################
+#
+# CC33x - ogeima connections
+#
+############################
+
+####################################################################
+#
+# CC4xx -  fragile double connections
+#
+# FIXME POST3.0: These shouldn't be matched until all other amalgamation has
+# been completed.
+#
+####################################################################
+
+Pattern CC401
+# Do amalgamate one of the two possible connections. We guess that
+# the larger of the two dragons is the one we most want to keep in
+# case of a cut.
+
+?O.          fragile double connection 
+X.O
+?O.
+
+:8,-
+
+?d.
+Xac
+?b.
+
+;xcut(a)
+
+>amalgamate_most_valuable_helper(b,c,d);
+
+
+Pattern CC402
+# Do amalgamate one of the two possible connections. We guess that
+# the larger of the two dragons is the one we most want to keep in
+# case of a cut.
+
+?O.
+?..          fragile double connection 
+X.O
+?O.
+
+:8,-
+
+?gd
+?bc
+Xaf
+?e
+
+;xcut(a)
+
+>if (!xplay_attack_either(b,c,d,b,d) || !xplay_attack_either(c,b,a,c,a))
+>  amalgamate(e,f);
+>else
+>  amalgamate_most_valuable_helper(e,f,g);
+
+
+##############################
+#
+# eye space modifying patterns
+#
+##############################
+
+# Pattern Eye1
+# Taken out because it caused a crash. 
+# Experiment with patterns that modify the eye space computed
+# by make_domains.
+# 
+# XXOO?
+# XO.OX
+# .....
+# -----
+# 
+# :8,e
+# 
+# ?XOO?
+# XOaOX
+# .....
+# -----
+# 
+# ;marginal_eye(a)
+# 
+# >make_proper_eye(a)
+
+
+# Pattern Eye2
+# Taken out awaiting a fix to a bug in remove_halfeye().
+#
+# XOO
+# O..
+# OO.
+# 
+# :8,e
+# 
+# XOO
+# Oab
+# OOc
+# 
+# ;halfeye(a) && odefend_against(b,c)
+# 
+# >remove_halfeye(a)
+
+
+#############################
+#
+# lunch invalidating patterns
+#
+#############################
+
+Pattern Lunch1
+# O stone on edge is not lunch!
+
+XO|            not lunch!
+O.|
+oo|
+?o|
+
+:8,es
+
+ba|
+O.|
+oo|
+?o|
+
+>not_lunch(a,b);
+
+
+Pattern Lunch2
+# O stone on edge is not lunch!
+
+XO|            not lunch!
+OX|
+o.|
+
+:8,es
+
+ba|
+cX|
+Od|
+
+;!attack(c) && !safe_xmove(d)
+>not_lunch(a,b);
+
+
+Pattern Lunch3
+# O stone on edge is not lunch!
+
+XO|            not lunch!
+O.|
+oo|
+--+
+
+:8,es
+
+ba|
+O.|
+oo|
+--+
+
+>not_lunch(a,b);
+
+
+# END OF FILE

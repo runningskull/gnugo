@@ -1,0 +1,104 @@
+(;GM[1]FF[3]
+SZ[19]
+PB[jahy]
+PW[GnuGo]
+KM[0.5]US[bump@localhost.localdomain]PC[NNGS]
+DT[2000-08-28]
+BR[NR]WR[17k]
+RE[B+R]
+;B[dd];W[od];B[eq];W[qq];B[dj];W[fc];B[ec];W[fd];B[df];W[cc]
+C[To early
+];B[fb];W[gb];B[eb];W[qd]C[Should be H17
+];B[id];W[if]
+C[Should be H17
+];B[gc];W[lc];B[ke];W[kg];B[pj];W[hb];B[hc];W[ib];
+B[fe];W[ih];B[qg];W[cq];B[cn];W[nq]C[Bad tenuki
+];B[po];W[gq]
+C[Should be in corner
+];B[dp];W[dr];B[er];W[jq]C[Should be B5
+];B[qp];
+W[pq];B[lq];W[lr];B[mr];W[mq];B[lp];W[kr];B[no];W[pl];B[ql];W[qm];
+B[rl];W[qk]C[should be Q7
+];B[pk];W[pm];B[nl];W[rk];B[rm];W[rn];B[rp]
+;W[nf]C[Should be R11
+];B[ld];W[md]C[Should be N17
+];B[lf];W[fg];B[dh]
+;W[rq];B[lg];W[dl]C[Bad. Invasion point is C8 (for later)
+];B[cl];
+W[mo];B[ko];W[io];B[mn];W[ln];B[kn];W[mm];B[nm];W[nn];B[on];W[mp];
+B[om]C[Should be R11.
+];W[qj];B[qi];W[sk];B[ri];W[fi];B[gf];W[ok];
+B[nk];W[sm]C[Should be P10
+];B[oi];W[qo];B[pp];W[ro];B[pn];W[sp];B[qn]
+;W[sl];B[kl];W[ol];B[nj];W[ml]C[
+];B[mk];W[km];B[jm];W[lm];B[jn];W[jl]
+;B[il];W[jk];B[kk];W[in];B[im];W[jj];B[kj];W[hm];B[hl];W[gl];B[gk];
+W[gm];B[hj];W[ij];B[fj];W[ck]C[Doomed.
+];B[dk];W[cj];B[ci];W[gi];B[hi]
+;W[hh];B[gg];W[kh];B[lh];W[ki];B[ii];W[ji];B[li];W[gh];B[jf];W[gj]
+C[White's swindle comes to fruition
+];B[hk];W[fk];B[ej];W[el]
+C[Now W should win.
+];B[jp];W[ip];B[iq];W[bo]C[
+];B[bk];W[do]
+C[Should be C5
+];B[eo];W[co];B[dn];W[en];B[kp];W[hq];B[ir];W[jr];B[em]
+C[
+];W[lo]C[Not necessary. Reading code kicks in.
+];B[fn];W[jg];B[fm];
+W[fl];B[gn];W[hn];B[gp];W[bn];B[bm];W[rf];B[nc];W[mb]C[Should be N17
+]
+;B[mc];W[jc]C[Should be L17.
+];B[oc];W[nd];B[lb];W[jd];B[kc];W[ie];
+B[gd];W[je];B[kb];W[pc];B[pb];W[qb];B[ob];W[he];B[rg]BL[94]WL[630];
+W[qf]BL[94]WL[614];B[pf]BL[88]WL[614];W[pe]BL[88]WL[600];B[qa]BL[68]
+WL[600];W[pg]BL[68]WL[580]C[Should be S19.
+];B[rb]BL[58]WL[580];W[qc]
+BL[58]WL[555];B[sd]BL[30]WL[555];W[ph]BL[30]WL[516];B[pi]BL[21]WL[516]
+;W[kf]BL[21]WL[477];B[og]BL[900]WL[477];W[of]BL[900]WL[457];B[re]
+BL[874]WL[457];W[ng]BL[874]WL[441];B[oh]BL[868]WL[441];W[sf]BL[868]
+WL[426];B[qe]BL[862]WL[426];W[se]BL[862]WL[393];B[rc]BL[788]WL[393];
+W[rd]BL[788]WL[378];B[sc]BL[786]WL[378];W[cd]BL[786]WL[353]
+C[Many owl code errors in the upper left. W  should have
+played before now. In this position B15 may be better than C17
+]
+;B[ce]BL[778]WL[353];W[be]BL[778]WL[326];B[bf]BL[776]WL[326];W[ad]
+BL[776]WL[900];B[bb]BL[657]WL[900];W[fq]BL[657]WL[868];B[fp]BL[645]
+WL[868];W[hg]BL[645]WL[846];B[me]BL[619]WL[846];W[ne]BL[619]WL[818];
+B[cp]BL[565]WL[818];W[bp]BL[565]WL[798];B[cs]BL[531]WL[798];W[ds]
+BL[531]WL[779];B[bq]BL[508]WL[779];W[br]BL[508]WL[755];B[hp]BL[455]
+WL[755];W[hr]BL[455]WL[735];B[es]BL[443]WL[735];W[op]BL[443]WL[714];
+B[oo]BL[348]WL[714];W[ef]BL[348]WL[694];B[eh]BL[327]WL[694];W[fh]
+BL[327]WL[680];B[eg]BL[317]WL[680];W[ff]BL[317]WL[669];B[ge]BL[312]
+WL[669];W[qh]BL[312]WL[650];B[ee]BL[264]WL[650];W[rh]BL[264]WL[636];
+B[ll]BL[225]WL[636];W[jb]BL[225]WL[615];B[ho]BL[198]WL[615];W[mn]
+BL[198]WL[594];B[np]BL[180]WL[594];W[oq]BL[180]WL[580];B[dm]BL[125]
+WL[580];W[is]BL[125]WL[560];B[an]BL[900]WL[560];W[nh]BL[900]WL[539];
+B[ni]BL[859]WL[539];W[mh]BL[859]WL[519];B[mi]BL[855]WL[519];W[fa]
+BL[855]WL[499];B[ea]BL[847]WL[499];W[ga]BL[847]WL[473];B[am]BL[795]
+WL[473];W[ka]BL[795]WL[456]C[Should be A3
+];B[la]BL[790]WL[456];W[ja]
+BL[790]WL[439];B[ao]BL[775]WL[439];W[aq]BL[775]WL[425];B[ap]BL[773]
+WL[425];W[bq]BL[773]WL[900];B[bs]BL[736]WL[900]C[A1 makes ko
+];W[cr]
+BL[736]WL[887];B[as]BL[718]WL[887];W[ei]BL[718]WL[870];B[di]BL[714]
+WL[870];W[rj]BL[714]WL[855];B[dq]BL[676]WL[855];W[ar]BL[676]WL[843]
+C[W should not play this move
+];B[bs]BL[674]WL[843];W[si]BL[674]
+WL[828];B[cs]BL[656]WL[828];W[as]BL[656]WL[817];B[cs]BL[640]WL[817];
+W[fr]BL[640]WL[803];B[bs]BL[613]WL[803];W[fs]BL[613]WL[790];B[kd]
+BL[603]WL[790];W[oj]BL[603]WL[778];B[mf]BL[595]WL[778];W[hd]BL[595]
+WL[766];B[ic]BL[587]WL[766];W[mg]BL[587]WL[760];B[cb]BL[513]WL[760];
+W[ek]BL[513]WL[752];B[bj]BL[490]WL[752];W[hf]BL[490]WL[745];B[bc]
+BL[479]WL[745];W[tt]BL[479]WL[742]
+C[..........      :291: White passed];B[bd]BL[474]WL[742];W[tt]BL[474]
+WL[740]C[..........      :293: White passed];B[dc]BL[471]WL[740];W[tt]
+BL[471]WL[738]C[..........      :295: White passed];B[ae]BL[454]
+WL[738];W[tt]BL[454]WL[736]C[..........      :297: White passed];B[ac]
+BL[900]WL[736];W[tt]BL[900]WL[734]
+C[..........      :299: White passed];B[jo]BL[895]WL[734];W[iq]BL[895]
+WL[732];B[ma]BL[886]WL[732];W[tt]BL[886]WL[730]
+C[..........      :303: White passed];B[tt]BL[886]WL[730]
+C[..........      :304: Black passed
+----------       White resigns. W 36.5 B 77.0]
+)

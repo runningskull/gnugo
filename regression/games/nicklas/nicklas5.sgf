@@ -1,0 +1,21 @@
+(;GM[1]FF[3]
+RU[Japanese]SZ[9]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2000-07-26]
+SY[Cgoban 1.9.10]TM[-]
+RE[W+21.5]
+;B[gd];W[ee];B[fg];W[ce];B[ff];W[dg];B[ec];W[dc];B[db];W[cc];B[cb];
+W[bb];B[ba];W[ab];B[eh];W[dh];B[ca];W[eb];B[fb];W[fc];B[ea];W[ed];
+B[eb];W[gc];B[gb];W[fd];B[hc];W[hd];B[hb];W[ge];B[gh];W[hg];B[hh];
+W[ih];B[hf];W[if];B[gg];W[he];B[fi];W[gf];B[hi];W[di];B[id];W[eg];
+B[ei];W[ef];B[fe];W[ie];B[ic];W[bc];B[aa];W[ig];B[ii];W[tt];B[tt];
+TW[ac][ad][bd][cd][dd][gd][ae][be][de][af][bf][cf][df][hf][ag][bg][cg][ah][bh][ch][ai][bi][ci]
+TB[da][fa][ga][ha][ia][ib][fh][gi]
+C[The game is over.  Final score:
+   White = 23 territory + 2 captures + 5.5 komi = 30.5
+   Black = 8 territory + 1 captures = 9
+White wins by 21.5.
+]
+)

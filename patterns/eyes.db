@@ -1,0 +1,2229 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999, 2000, 2001 by the Free Software Foundation.   #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                                               #
+#                  Eye Shape Database                           #
+#                                                               #
+#     . - ordinary eye space                                    #
+#     * - ordinary eye space and key point, attack/defense      #
+#     < - ordinary eye space and attack key point (shrinks)     #
+#     > - ordinary eye space and defense key point (expands)    #
+#     ! - marginal eye space                                    #
+#     @ - marginal eye space and key point, attack/defense      #
+#     ( - marginal eye space and attack key point               #
+#     ) - marginal eye space and defense key point              #
+#     X - dead opponent stone                                   #
+#     x - . or X                                                #
+#                                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+#
+# The patterns are sorted as follows within each size, with the primary
+# criterium first: 
+#
+# 1. Number of rows, lowest first.
+# 2. Number of marginal vertices.
+# 3. Number of possible eyes
+#
+# In addition to 1, there is also the requirement that all patterns
+# with the same topology come together. E.g. among the four vertices,
+# two rows patterns, those with topology
+#
+#  .
+# ...
+#
+# come together and those with topology
+#
+# ..
+# ..
+#
+# follows later.
+
+###############################
+#          1 element          #
+###############################
+
+Pattern 101
+
+x
+
+:1,1
+
+
+Pattern 102
+
+!
+
+:0,0
+
+
+###############################
+#          2 elements         #
+###############################
+
+Pattern 201
+
+xx
+
+:1,1
+
+
+Pattern 202
+
+@x
+
+:1,0
+
+
+Pattern 203
+
+!!
+
+:0,0
+
+
+###############################
+#          3 elements         #
+###############################
+
+Pattern 301
+# Must be matched before 302.
+
+X.X
+
+:2,2
+
+
+Pattern 302
+
+x*x
+
+:2,1
+
+
+Pattern 303
+
+xXx
+
+:1,1
+
+
+Pattern 304
+
+!.x
+
+:1,1
+
+
+Pattern 305
+
+@Xx
+
+:1,0
+
+
+Pattern 306
+# a chimera
+
+x@x
+
+:2,0
+
+
+Pattern 391
+
+!x!
+
+:0,0
+
+
+Pattern 392
+# This actually came up once.
+
+!@.
+
+:1,0
+
+
+Pattern 393
+
+!!!
+
+:0,0
+
+
+###############################
+#          4 elements         #
+###############################
+
+# Special cases in corners and on edges. These must be matched before
+# the same shape is matched in the center.
+
+Pattern 401
+# Bent four in the corner. The attack depends on a ko and sufficiently
+# few outer liberties.
+
+|.
+|.*.
++---
+
+:2,1
+
+
+#
+# Topology: ....
+#
+
+
+Pattern 410
+# This pattern is a special case. It can only come up when dealing
+# with false marginals. In that case it is equivalent
+# to .... which yields 2 eyes.
+
+XXXX
+
+:2,2
+
+
+Pattern 411
+
+x..x
+
+:2,2
+
+
+Pattern 412
+
+x*Xx
+
+:2,1
+
+
+Pattern 413
+
+xXXx
+
+:1,1
+
+
+Pattern 414
+
+!.xx
+
+:1,1
+
+
+Pattern 415
+
+!X.x
+
+:1,1
+
+
+Pattern 416
+
+@XXx
+
+:1,0
+
+
+Pattern 417
+
+(.x@
+
+:1,0
+
+
+Pattern 418
+
+!x@x
+
+:1,0
+ 
+
+Pattern 419
+
+!XX!
+
+:0,0
+
+#
+# Do we ever get more than 2 marginal eye points with a linear 4 pattern?
+#
+
+#            .
+# Topology: ...
+#
+
+Pattern 420
+# Match before 421
+
+ X
+X*X
+
+:2,2
+
+
+Pattern 421
+
+ x
+x*x
+
+:2,1
+
+
+Pattern 422
+
+ x
+xXx
+
+:1,1
+
+
+Pattern 423
+
+ !
+x*x
+
+:2,1
+
+
+Pattern 424
+
+ x
+x@x
+
+:2,0
+
+
+Pattern 425
+
+ !
+!*x
+
+:1,0
+
+
+Pattern 426
+
+ x
+@Xx
+
+:1,0
+
+
+#           ..
+# Topology: ..
+#
+
+Pattern 431
+
+xx
+xx
+
+:1,1
+
+
+Pattern 432
+
+@x
+xx
+
+:1,0
+
+
+Pattern 433
+
+!@
+.x
+
+:1,0
+
+#
+# Completely dead patterns.
+#
+
+Pattern 491
+
+ .
+!X!
+
+:0,0
+
+Pattern 492
+
+!!
+XX
+
+:0,0
+
+Pattern 493
+
+!x
+x!
+
+:0,0
+
+
+Pattern 494
+
+ !
+!x!
+
+:0,0
+
+
+###############################
+#          5 elements         #
+###############################
+
+
+#
+# 5 vertices.  Now it is getting tricky...  
+# At least we will get all the linear patterns correct.
+#
+
+# Special cases in corners and on edges. These must be matched before
+# the same shape is matched in the center.
+#
+# Special care must be taken to get these patterns in the right order.
+# In particular the bent four in the corner patterns must be matched
+# before the patterns of topology
+#
+# |...
+# |. .
+# +---
+
+Pattern 501
+# Bent four in the corner.
+
+|.
+|X
+|xX.
++---
+
+:1,1
+
+
+Pattern 502
+# Bent four in the corner.
+
+|.
+|XXX.
++---
+
+:1,1
+
+
+Pattern 503
+# Bent four in the corner.
+#
+# This one is tricky. Black has two certain eyes if there are at least
+# two outside liberties, but at most one if they are fewer.
+# It seems likely that calling this only one eye leads to the fewest
+# errors in the surrounding code. (Unfortunately we have no provisions
+# to check the number of liberties at this point.)
+
+|.
+|X
+|.XX
++---
+
+:1,1
+
+
+Pattern 504
+# Bent four in the corner. The attack depends on ko and sufficiently
+# few outer liberties if the corner vertex is empty.
+
+|.
+|xX*.
++---
+
+:2,1
+
+
+Pattern 505
+# Bent four in the corner. The attack depends on ko and sufficiently
+# few outer liberties.
+
+|.
+|.*X.
++---
+
+:2,1
+
+
+Pattern 506
+# Bent four in the corner. An O move in the corner may or may not give
+# another eye (depending on ko and/or outer liberties). An X move in
+# the corner definitely settles the number of eyes to 1.
+
+|.
+|.XX.
++---
+
+:1,1
+
+
+Pattern 507
+# Bent four in the corner.
+
+|.
+|*
+|.X.
++---
+
+:2,1
+
+
+Pattern 508
+
+xxxxx
+-----
+
+:2,2
+
+
+Pattern 509
+
+|XX*
+|. .
++---
+
+:2,1
+
+
+Pattern 510
+
+|X*X
+|. .
++---
+
+:2,1
+
+
+Pattern 511
+
+|*XX
+|. .
++---
+
+:2,1
+
+
+Pattern 512
+# FIXME: The correct form of this pattern is
+# 
+# |.X>
+# |< X
+# +---
+# 
+# but the code towards the end of recognize_eye() can't handle the
+# pattern because there is no '*' or '@'.
+
+|.X>
+|* X
++---
+
+:2,1
+
+
+Pattern 513
+
+|XXX
+|. .
++---
+
+:1,1
+
+
+#
+# Topology: .....
+#
+
+#
+# Linear, no marginal vertices.
+#
+
+Pattern 521
+# Usually at least seki.
+#
+# There are rare exceptions where this is only
+# one eye. See strategy test 38 for an example
+# where .XXX. gives only one eye since one of
+# the . is not a liberty of the dragon.
+
+xxxxx
+
+:2,2
+
+#
+# Linear, one marginal vertex.
+#
+
+
+Pattern 522
+
+@X.<.
+
+:2,1
+
+# If there is a live attacking stone left of @:
+# @X<<.
+
+# :2,1
+
+  
+Pattern 523
+
+@..<x
+
+:2,1
+
+  
+Pattern 524
+
+@x..x
+
+:2,1
+
+  
+Pattern 525
+
+!.X*x
+
+:2,1
+
+
+Pattern 526
+
+@XXXx
+
+:1,0
+
+
+Pattern 527
+# NOTE: This overlaps pattern 504 which are the cases where we actually
+#       have to defend.
+
+!xxxx
+
+:1,1
+
+
+# FIXME PRE3.0:
+# Continue here.  I believe everything above this line is correct.
+
+
+#
+# Linear, two marginal vertices.
+#
+
+#Pattern 529
+# This actually turned up once, but it was bent...
+#!!...
+#:1,1
+
+
+Pattern 528
+
+!.x.!
+
+:1,1
+
+
+Pattern 529
+
+!.>X@
+
+:1,0
+
+
+Pattern 530
+
+!x!.x
+
+:1,1
+
+
+Pattern 531
+# Must be matched before 509.
+
+!.x@x
+
+:2,0
+
+
+Pattern 532
+
+@x.@x
+
+:1,0
+
+
+Pattern 533
+
+!.@.!
+
+:1,0
+
+
+#            .
+# Topology: ....
+#
+
+Pattern 541
+
+ x
+xX*.
+
+:2,1
+
+
+Pattern 542
+
+ x
+x*X.
+
+:2,1
+
+
+Pattern 543
+
+ x
+xXXX
+
+:2,2
+
+
+Pattern 544
+
+ x
+xXXx
+
+:1,1
+
+
+Pattern 545
+
+ x
+x.!x
+
+:2,2
+
+
+Pattern 546
+# Must be matched before 547.
+
+ x
+)*.x
+
+:2,1
+
+
+Pattern 547
+
+ x
+!*xx
+
+:2,1
+
+
+Pattern 548
+
+ x
+x*x!
+
+:2,1
+
+
+Pattern 549
+
+ x
+xX.!
+
+:1,1
+
+
+Pattern 550
+
+ ! 
+!..x
+
+:1,1
+
+
+Pattern 551
+
+ !
+!*Xx
+
+:1,0
+
+
+Pattern 552
+
+ !
+x..!
+
+:1,1
+
+
+Pattern 553
+
+ @
+xX.(
+
+:1,0
+
+
+Pattern 554
+
+ @
+x<X!
+
+:1,0
+
+
+# FIXME PRE3.0: Pattern 
+#
+#  X
+# .X.!
+
+
+Pattern 555
+
+ !  
+!xx!
+
+:0,0
+
+
+Pattern 556
+
+ !
+!.@x
+
+:1,0
+
+
+#           ..
+# Topology: ...
+#
+
+Pattern 561
+
+xx
+x*x
+
+:2,1
+
+
+Pattern 562
+
+XX
+.XX
+
+:2,2
+
+
+Pattern 563
+
+xx
+xXx
+
+:1,1
+
+
+Pattern 564
+
+x.
+@.x
+
+:2,1
+
+
+Pattern 565
+
+xx
+@Xx
+
+:1,0
+
+
+Pattern 566
+
+xX
+!.x
+
+:1,1
+
+
+Pattern 567
+
+xx 
+x.!
+ 
+:1,1
+
+
+# FIXME PRE3.0: Pattern 
+#
+# !X
+# !XX
+
+
+Pattern 568
+
+!@
+.>x
+
+:1,0
+
+
+Pattern 569
+
+!.
+!..
+
+:1,1
+
+
+Pattern 570
+
+..
+!@.
+
+:1,0
+
+
+Pattern 571
+
+xx
+@.!
+
+:1,0
+
+
+Pattern 572
+
+xx
+@X!
+
+:0,0
+
+
+#            .
+# Topology: ...
+#            .
+
+Pattern 581
+# This pattern must be matched before 582. The vital point would be
+# suicide for X.
+
+ X
+X.X
+ X
+
+:2,2
+
+
+Pattern 582
+
+ x
+x*x
+ x
+
+:2,1
+
+
+Pattern 583
+
+ x
+xXx
+ x
+
+:1,1
+
+
+#
+# Completely dead patterns
+#
+
+Pattern 591
+
+!.
+..!
+
+:0,0
+
+
+Pattern 592
+
+!!
+xx!
+
+:0,0
+
+
+Pattern 593
+
+x!
+!x!
+
+:0,0
+
+
+Pattern 594
+
+ ! 
+!x!
+ ! 
+
+:0,0
+
+
+Pattern 595
+
+ x 
+xX!
+ ! 
+
+:0,0
+
+
+###############################
+#          6 elements         #
+###############################
+
+#
+# Topology: ......
+#
+
+Pattern 600
+# Bent four in the corner.
+
+|.
+|*
+|...!
++---
+
+:2,1
+
+
+Pattern 601
+# Bent four in the corner.
+
+|.
+|*X..!
++---
+
+:2,1
+
+
+Pattern 602
+# Special corner shape
+
+|*X.
+|. .)
++----
+
+:2,1
+
+
+Pattern 603
+
+xxxxxx
+
+:2,2
+
+
+Pattern 604
+
+!....x
+
+:2,2
+
+
+Pattern 605
+
+@..xXx
+
+:2,1
+
+
+Pattern 606
+
+@.XX>.
+
+:2,1
+
+
+Pattern 607
+
+!..X.X
+
+:2,2
+
+
+Pattern 608
+
+!.X...
+
+:2,2
+
+
+Pattern 609
+
+!.XxxX
+
+:2,2
+
+
+Pattern 610
+
+@.XxX.
+
+:2,1
+
+
+Pattern 611
+
+@X.xxx
+
+:2,1
+
+
+Pattern 612
+
+@Xx.xx
+
+:2,1
+
+
+Pattern 613
+
+@Xxx.x
+
+:2,1
+
+
+Pattern 614
+
+@XXXXx
+
+:2,0
+
+
+Pattern 615
+
+!.xx.!
+
+:1,1
+
+
+Pattern 616
+
+(.@x.x
+
+:2,1
+
+
+# FIXME POST3.0: Do all size 6 linear patterns with 2 or more marginal eye
+#                points.
+
+
+Pattern 617
+
+@XX>X!
+
+:1,0
+
+
+Pattern 618
+
+@XXX.!
+
+:1,0
+
+
+Pattern 619
+
+.@.).!
+
+:1,0
+
+
+#            .
+# Topology: .....
+#
+
+Pattern 621
+
+ x
+x*xx)
+
+:2,1
+
+
+Pattern 622
+# must be matched before 623
+
+ X
+XX*X@
+
+:2,1
+
+
+Pattern 623
+
+ x
+x*>x@
+
+:2,1
+
+
+Pattern 624
+
+ x
+xXx.!
+
+:1,1
+
+
+Pattern 625
+
+ !
+x*x.!
+
+:2,1
+
+
+#             .
+# Topology: .....
+#
+
+Pattern 631
+
+  x
+x*X.!
+
+:2,1
+
+
+Pattern 632
+
+  x
+xX*.!
+
+:2,1
+
+
+Pattern 633
+
+  x
+.XX.!
+
+:1,1
+
+
+Pattern 634
+
+  x
+!x*x!
+
+:2,1
+
+
+Pattern 635
+
+  !
+!x..!
+ ---
+
+:0,0
+
+
+Pattern 636
+
+  !
+@x*.!
+
+:1,0
+
+
+#            ..
+# Topology: ....
+#
+
+Pattern 641
+
+ xx
+xXXx
+
+:1,1
+
+
+Pattern 642
+
+ xx
+x*Xx
+
+:2,1
+
+
+Pattern 643
+
+ xx
+!.*x
+
+:2,1
+
+
+Pattern 644
+
+ XX
+!*XX
+
+:2,1
+
+
+Pattern 645
+
+ !!
+!.*.
+
+:1,0
+
+
+Pattern 646
+
+ .@
+!..!
+
+:1,0
+
+
+Pattern 647
+
+ !! 
+!xx!
+
+:0,0
+
+#           ..
+# Topology: ....
+#
+
+Pattern 651
+
+xX
+X*X.
+
+:2,1
+
+
+Pattern 652
+
+xX
+XXX.
+
+:1,1
+
+
+Pattern 653
+# Certain instances of this pattern are 1,1 on the edge.
+
+.x
+x*x!
+
+:2,1
+
+
+Pattern 654
+# This pattern must be matched before 653.
+
+XX
+X*x!
+
+:2,1
+
+
+Pattern 655
+
+Xx
+x.x!
+
+:1,1
+
+
+Pattern 656
+
+xx
+xX.!
+
+:1,1
+
+
+Pattern 657
+
+.x
+xXX@
+
+:1,0
+
+
+#           ...
+# Topology: ...
+#
+
+Pattern 658
+
+xXx
+x*x
+
+:2,1
+
+
+Pattern 659
+
+XX*
+.XX
+
+:2,1
+
+
+Pattern 660
+
+xXx
+xXx
+
+:1,1
+
+
+#            ...
+# Topology: ...
+#
+
+Pattern 671
+# FIXME PRE/POST3.0: Do all patterns of this type.
+
+ ...
+...
+
+:2,2
+
+
+Pattern 672
+
+ *Xx
+.XX
+
+:2,1
+
+
+Pattern 673
+
+ X*X
+.XX
+
+:2,1
+
+
+Pattern 674
+
+ XXx
+.XX
+
+:1,1
+
+
+Pattern 675
+
+ x*x
+!.x
+ 
+:2,1
+
+
+Pattern 676
+
+ xXx
+!.x
+
+:1,1
+
+#            .
+# Topology: ....
+#            .
+
+Pattern 681
+
+ x
+x*x)
+ x
+
+:2,1
+
+
+#            .
+# Topology: ....
+#             .
+
+Pattern 682
+
+ x
+xX*!
+  x
+
+:2,1
+
+
+#           ..
+# Topology: ...
+#            .
+
+
+Pattern 683
+# This pattern must be matched before 684.
+
+XX
+X.X
+ X
+
+:2,2
+
+
+Pattern 684
+
+xx
+x*x
+ x
+
+:2,1
+
+
+Pattern 685
+# This pattern must be matched before 686.
+
+XX
+*Xx
+ x
+
+:2,1
+
+
+Pattern 686
+
+xx
+xXx
+ x
+
+:1,1
+
+
+#
+# Trivially dead patterns
+#
+
+Pattern 691
+
+ !
+!.!
+.!
+
+:0,0
+
+
+###############################
+#          7 elements         #
+###############################
+
+#            
+# Topology: .......
+#
+
+Pattern 700
+# There is some ko potential here.
+
+ .
+|X
+|X
+|...@
++--
+
+:2,1
+
+
+Pattern 701
+
+@..>..@
+
+:2,1
+
+
+#            .
+# Topology: ......
+#
+
+Pattern 702
+
+ x
+!*xxx!
+
+:2,1
+
+
+Pattern 703
+
+ )
+)*x..x
+
+:2,1
+
+
+#             .
+# Topology: ......
+#
+
+Pattern 710
+
+  !
+@.>XxX
+
+:2,1
+
+
+Pattern 711
+# Defending the other marginal vertex is sometimes incorrect,
+# see regression/games/owl27.sgf.
+
+  @
+!..x.x
+
+:2,1
+
+
+Pattern 712
+# Defending the other marginal vertex is always incorrect.
+
+  !
+@x.xXx
+
+:2,1
+
+
+Pattern 713
+
+  . @|
+!...x|
+-----+
+
+:2,1
+
+
+Pattern 714
+
+  x
+!x*xx!
+
+:2,1
+
+
+Pattern 715
+
+  )
+..>..@
+
+:2,1
+
+
+Pattern 716
+
+  !
+!..x.!
+
+:1,1
+
+
+#           ...
+# Topology: ....
+#
+
+Pattern 720
+
+---
+X.X
+.XX.
+
+:1,1
+
+
+Pattern 721
+
+---
+X.X
+.X*.
+
+:2,1
+
+
+Pattern 722
+
+----
+X.X.
+.Xx
+
+:1,1
+
+
+Pattern 723
+
+----
+X.X.
+xX.
+
+:1,1
+
+
+Pattern 724
+
+----
+X.*.
+.Xx
+
+:2,1
+
+
+Pattern 725
+
+----
+X.*.
+xX.
+
+:2,1
+
+
+Pattern 726
+
+----
+*.X.
+.Xx
+
+:2,1
+
+
+Pattern 727
+
+----
+*.X.
+xX.
+
+:2,1
+
+
+Pattern 728
+
+----
+X.X.
+.*x
+
+:2,1
+
+
+Pattern 729
+
+----
+X.X.
+x*.
+
+:2,1
+
+
+Pattern 730
+
+x.x
+x..@
+
+:2,1
+
+
+Pattern 731
+
+.xx
+x*.!
+
+:2,1
+
+
+#            ..
+# Topology: .....
+#
+
+Pattern 740
+
+ ..
+.X*.!
+
+:2,1
+
+
+Pattern 741
+
+ xx
+.*x.!
+
+:2,1
+
+
+Pattern 742
+
+ Xx
+.Xx.!
+
+:1,1
+
+
+Pattern 743
+
+ xx
+!.x.!
+
+:1,1
+
+
+#            . .
+# Topology: .....
+#
+
+
+Pattern 750
+
+ . !
+!*..!
+
+:2,1
+
+
+#             .
+# Topology:   .
+#           .....
+
+Pattern 751
+
+  @
+  .
+....@
+
+:2,1
+
+
+#             ...
+# Topology: ....
+#
+
+Pattern 752
+
+  xXx
+@..x
+
+:2,1
+
+Pattern 753
+
+  x.!
+!.xx
+
+:1,1
+
+
+#            .
+# Topology:  ..
+#           ....
+
+Pattern 760
+
+ !
+ .x
+!.*x
+
+:2,1
+
+
+#            .
+# Topology: .....
+#            .
+
+Pattern 761
+
+ x
+x*X.!
+ x 
+
+:2,1
+
+
+Pattern 762
+
+ x
+x*.x@
+ x 
+
+:2,1
+
+
+# ..!
+# !.!
+#  ! 
+
+
+#           ..
+# Topology: .....
+#
+
+Pattern 763
+# Bent four in the corner
+
+|..
+|.*..!
++----
+
+:2,1
+
+
+Pattern 764
+# This pattern must be matched before 765.
+
+XX
+X.x.!
+
+:2,2
+
+
+Pattern 765
+
+Xx
+x*x.@
+
+:2,1
+
+
+#            .
+# Topology: ...
+#           ...
+
+Pattern 770
+# Big nakade.
+ .
+.X.
+.*.
+
+:2,1
+
+
+Pattern 771
+# Big nakade.
+
+ x
+x*x
+.X.
+
+:2,1
+
+
+Pattern 772
+# Big nakade.
+
+ x
+XXx
+.*.
+
+:2,1
+
+
+Pattern 773
+# Big nakade.
+
+ x
+xXx
+.X.
+
+:1,1
+
+
+###############################
+#          8 elements         #
+###############################
+
+#           
+# Topology: ........
+#
+
+Pattern 800
+# Bent four in the corner, some ko potential
+
+ !
+ .
+|X
+|X
+|...!
++---
+
+:1,1
+
+#           ....
+# Topology:  ....
+#
+
+Pattern 801
+
+!...
+ ...!
+
+:1,1
+
+
+#             .
+# Topology:   .
+#           ......
+
+Pattern 802
+
+  ! 
+  . 
+!.*..@
+
+:2,1
+
+
+Pattern 803
+
+  !
+  .
+!.*Xxx
+
+:2,1
+
+
+Pattern 804
+
+  !
+  .
+!.X*Xx
+
+:2,1
+
+
+Pattern 805
+
+  !
+  .
+!.x..x
+
+:2,2
+
+
+#             ..
+# Topology: ......
+#
+
+Pattern 806
+
+  ..
+@.>>.@
+
+:2,1
+
+
+Pattern 807
+
+  ..
+!.X*.!
+
+:2,1
+
+
+
+#            ..
+# Topology: ......
+#
+
+
+Pattern 808
+
+ xx
+!.*x.!
+
+:2,1
+
+
+#           ...
+# Topology:  .....
+#
+
+Pattern 809
+
+!.x
+ x.x.@
+
+:2,1
+
+
+Pattern 810
+# in some cases this could become seki
+
+!.x
+ xXx.!
+
+:1,1
+
+
+#              .
+# Topology: .......
+#
+
+Pattern 821
+
+   !
+(..*..(
+
+:2,1
+
+
+###############################
+#          9 elements         #
+###############################
+
+
+Pattern 901
+
+@.>..
+  ...!
+
+:2,1
+
+
+Pattern 902
+
+  ! .
+!...*.!
+
+:2,1
+
+
+Pattern 903
+
+  !
+  .
+ .*
+!.*.!
+
+:2,1
+
+
+Pattern 904
+
+ !
+ ..
+!.*..!
+
+:2,1
+
+
+Pattern 905
+
+ .....!
+!..
+
+:2,2
+
+ 
+# Above seems right to me, but this is what it was:  mv
+
+#  .....@
+# !..
+
+# :2,1
+
+ 
+
+###############################
+#         10 elements         #
+###############################
+
+
+Pattern 1001
+
+ !
+ .
+ *.
+xX.
+ x.
+  !
+
+:2,1
+
+
+Pattern 1002
+
+   !
+ ! .
+ ..*
+!...
+
+:2,1
+
+
+Pattern 1003
+
+
+  !
+  ..
+  .*
+!...!
+
+:2,1
+
+
+Pattern 1004
+
+   !
+  ..
+  *.
+!.x.!
+
+:2,1
+
+
+Pattern 1005
+
+  !
+@..
+  .
+ .*
+!..
+
+:2,1
+
+
+

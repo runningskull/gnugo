@@ -1,0 +1,547 @@
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
+
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+DESTDIR =
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+CC = @CC@
+CPP = @CPP@
+EXEEXT = @EXEEXT@
+GCC_ONLY = @GCC_ONLY@
+GNUGO_ALL_WARNINGS = @GNUGO_ALL_WARNINGS@
+GNUGO_SOME_WARNINGS = @GNUGO_SOME_WARNINGS@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+NO_WARNINGS = @NO_WARNINGS@
+PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
+U = @U@
+VERSION = @VERSION@
+dfa_c = @dfa_c@
+glibconfig = @glibconfig@
+
+noinst_PROGRAMS = mkpat joseki mkeyes extract_fuseki
+EXTRA_PROGRAMS = transpat
+
+DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
+
+EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	takamoku.sgf 	patterns.db 	patterns2.db 	attack.db 	defense.db 	endgame.db 	owl_attackpats.db 	owl_vital_apats.db 	owl_defendpats.db 	eyes.db 	conn.db 	influence.db 	barriers.db 	fuseki9.db 	fuseki19.db
+
+
+mkpat_SOURCES = mkpat.c transform.c
+
+# uncomment dependencies when these dfas are built
+
+# pat.dfa: patterns.c
+# joseki.dfa : joseki.c
+# attpat.dfa: apatterns.c
+# defpat.dfa: dpatterns.c
+# conn.dfa: conn.c
+# endpat.dfa: endgame.c
+# influencepat.dfa: influence.c
+# barrierspat.dfa: barriers.c
+
+@DFA_ENABLED_TRUE@mkpat_LDADD = ./libdfa.a ../utils/libutils.a
+@DFA_ENABLED_FALSE@mkpat_LDADD = ../utils/libutils.a
+
+# dfas in DFA_INST are made and installed in $prefix/share/gnugo
+
+@DFA_ENABLED_TRUE@DFA_INST = 	owl_attackpat.dfa owl_defendpat.dfa owl_vital_apat.dfa 
+
+# dfas in DFA_NOINST are neither built nor installed
+
+@DFA_ENABLED_TRUE@DFA_NOINST = 	pat.dfa joseki.dfa conn.dfa attpat.dfa defpat.dfa endpat.dfa 	influencepat.dfa barrierspat.dfa
+
+@DFA_ENABLED_TRUE@pkgdata_DATA = $(DFA_INST)
+@DFA_ENABLED_TRUE@DFAFLAGS = -D -m
+@DFA_ENABLED_FALSE@DFAFLAGS = 
+transpat_SOURCES = transpat.c patlib.c transform.c
+transpat_LDADD = 
+joseki_SOURCES = joseki.c 
+joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a 
+joseki_INCLUDES = -I$(top_srcdir)/sgf
+mkeyes_SOURCES = mkeyes.c
+extract_fuseki_SOURCES = extract_fuseki.c
+# Yes, we currently need duplicate libengine.a and libpatterns.a.
+extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a 		       ../engine/libengine.a libpatterns.a                        ../sgf/libsgf.a ../utils/libutils.a 		       libdfa.a
+
+extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
+
+noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
+
+GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c                  influence.c barriers.c endgame.c owl_attackpat.c 		 owl_vital_apat.c owl_defendpat.c                  fuseki9.c fuseki19.c josekidb.c
+
+
+DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
+
+# Remove these files here... they are created locally
+DISTCLEANFILES = $(GGBUILTSOURCES) $(DBBUILT) *~
+
+# source files in this directory get access to private prototypes
+INCLUDES = -I$(top_srcdir)/engine -I$(top_srcdir)/utils -I$(top_srcdir)/sgf
+
+noinst_LIBRARIES = libpatterns.a libdfa.a
+
+libpatterns_a_SOURCES = connections.c helpers.c $(GGBUILTSOURCES)
+libdfa_a_SOURCES = dfa.c transform.c
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../config.h
+CONFIG_CLEAN_FILES = 
+LIBRARIES =  $(noinst_LIBRARIES)
+
+
+DEFS = @DEFS@ -I. -I$(srcdir) -I..
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+libpatterns_a_LIBADD = 
+libpatterns_a_OBJECTS =  connections.o helpers.o conn.o patterns.o \
+apatterns.o dpatterns.o eyes.o influence.o barriers.o endgame.o \
+owl_attackpat.o owl_vital_apat.o owl_defendpat.o fuseki9.o fuseki19.o \
+josekidb.o
+libdfa_a_LIBADD = 
+libdfa_a_OBJECTS =  dfa.o transform.o
+AR = ar
+noinst_PROGRAMS =  mkpat$(EXEEXT) joseki$(EXEEXT) mkeyes$(EXEEXT) \
+extract_fuseki$(EXEEXT)
+PROGRAMS =  $(noinst_PROGRAMS)
+
+transpat_OBJECTS =  transpat.o patlib.o transform.o
+transpat_DEPENDENCIES = 
+transpat_LDFLAGS = 
+mkpat_OBJECTS =  mkpat.o transform.o
+@DFA_ENABLED_FALSE@mkpat_DEPENDENCIES =  ../utils/libutils.a
+@DFA_ENABLED_TRUE@mkpat_DEPENDENCIES =  ./libdfa.a ../utils/libutils.a
+mkpat_LDFLAGS = 
+joseki_OBJECTS =  joseki.o
+joseki_DEPENDENCIES =  ../engine/libboard.a ../sgf/libsgf.a \
+../utils/libutils.a
+joseki_LDFLAGS = 
+mkeyes_OBJECTS =  mkeyes.o
+mkeyes_LDADD = $(LDADD)
+mkeyes_DEPENDENCIES = 
+mkeyes_LDFLAGS = 
+extract_fuseki_OBJECTS =  extract_fuseki.o
+extract_fuseki_DEPENDENCIES =  ../engine/libengine.a libpatterns.a \
+../engine/libengine.a libpatterns.a ../sgf/libsgf.a ../utils/libutils.a \
+libdfa.a
+extract_fuseki_LDFLAGS = 
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+DATA =  $(pkgdata_DATA)
+
+HEADERS =  $(noinst_HEADERS)
+
+DIST_COMMON =  README Makefile.am Makefile.in
+
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+TAR = tar
+GZIP_ENV = --best
+SOURCES = $(libpatterns_a_SOURCES) $(libdfa_a_SOURCES) $(transpat_SOURCES) $(mkpat_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) $(extract_fuseki_SOURCES)
+OBJECTS = $(libpatterns_a_OBJECTS) $(libdfa_a_OBJECTS) $(transpat_OBJECTS) $(mkpat_OBJECTS) $(joseki_OBJECTS) $(mkeyes_OBJECTS) $(extract_fuseki_OBJECTS)
+
+all: all-redirect
+.SUFFIXES:
+.SUFFIXES: .S .c .o .s
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps patterns/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+
+mostlyclean-noinstLIBRARIES:
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+
+distclean-noinstLIBRARIES:
+
+maintainer-clean-noinstLIBRARIES:
+
+.c.o:
+	$(COMPILE) -c $<
+
+.s.o:
+	$(COMPILE) -c $<
+
+.S.o:
+	$(COMPILE) -c $<
+
+mostlyclean-compile:
+	-rm -f *.o core *.core
+
+clean-compile:
+
+distclean-compile:
+	-rm -f *.tab.c
+
+maintainer-clean-compile:
+
+libpatterns.a: $(libpatterns_a_OBJECTS) $(libpatterns_a_DEPENDENCIES)
+	-rm -f libpatterns.a
+	$(AR) cru libpatterns.a $(libpatterns_a_OBJECTS) $(libpatterns_a_LIBADD)
+	$(RANLIB) libpatterns.a
+
+libdfa.a: $(libdfa_a_OBJECTS) $(libdfa_a_DEPENDENCIES)
+	-rm -f libdfa.a
+	$(AR) cru libdfa.a $(libdfa_a_OBJECTS) $(libdfa_a_LIBADD)
+	$(RANLIB) libdfa.a
+
+mostlyclean-noinstPROGRAMS:
+
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+
+distclean-noinstPROGRAMS:
+
+maintainer-clean-noinstPROGRAMS:
+
+transpat$(EXEEXT): $(transpat_OBJECTS) $(transpat_DEPENDENCIES)
+	@rm -f transpat$(EXEEXT)
+	$(LINK) $(transpat_LDFLAGS) $(transpat_OBJECTS) $(transpat_LDADD) $(LIBS)
+
+mkpat$(EXEEXT): $(mkpat_OBJECTS) $(mkpat_DEPENDENCIES)
+	@rm -f mkpat$(EXEEXT)
+	$(LINK) $(mkpat_LDFLAGS) $(mkpat_OBJECTS) $(mkpat_LDADD) $(LIBS)
+
+joseki$(EXEEXT): $(joseki_OBJECTS) $(joseki_DEPENDENCIES)
+	@rm -f joseki$(EXEEXT)
+	$(LINK) $(joseki_LDFLAGS) $(joseki_OBJECTS) $(joseki_LDADD) $(LIBS)
+
+mkeyes$(EXEEXT): $(mkeyes_OBJECTS) $(mkeyes_DEPENDENCIES)
+	@rm -f mkeyes$(EXEEXT)
+	$(LINK) $(mkeyes_LDFLAGS) $(mkeyes_OBJECTS) $(mkeyes_LDADD) $(LIBS)
+
+extract_fuseki$(EXEEXT): $(extract_fuseki_OBJECTS) $(extract_fuseki_DEPENDENCIES)
+	@rm -f extract_fuseki$(EXEEXT)
+	$(LINK) $(extract_fuseki_LDFLAGS) $(extract_fuseki_OBJECTS) $(extract_fuseki_LDADD) $(LIBS)
+
+install-pkgdataDATA: $(pkgdata_DATA)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(pkgdatadir)
+	@list='$(pkgdata_DATA)'; for p in $$list; do \
+	  if test -f $(srcdir)/$$p; then \
+	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(pkgdatadir)/$$p"; \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(pkgdatadir)/$$p; \
+	  else if test -f $$p; then \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(pkgdatadir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(pkgdatadir)/$$p; \
+	  fi; fi; \
+	done
+
+uninstall-pkgdataDATA:
+	@$(NORMAL_UNINSTALL)
+	list='$(pkgdata_DATA)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(pkgdatadir)/$$p; \
+	done
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = patterns
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+	$(MAKE) $(AM_MAKEFLAGS) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-hook
+apatterns.o: apatterns.c ../engine/liberty.h ../engine/gnugo.h \
+	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
+	../engine/clock.h ../engine/hash.h patterns.h
+barriers.o: barriers.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
+	../engine/hash.h patterns.h
+conn.o: conn.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
+	../engine/hash.h patterns.h
+connections.o: connections.c ../engine/liberty.h ../engine/gnugo.h \
+	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
+	../engine/clock.h ../engine/hash.h patterns.h
+dfa.o: dfa.c patterns.h ../config.h dfa.h
+dpatterns.o: dpatterns.c ../engine/liberty.h ../engine/gnugo.h \
+	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
+	../engine/clock.h ../engine/hash.h patterns.h
+endgame.o: endgame.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
+	../engine/hash.h patterns.h
+extract_fuseki.o: extract_fuseki.c ../sgf/sgftree.h \
+	../sgf/sgf_properties.h ../engine/liberty.h ../engine/gnugo.h \
+	../config.h ../engine/clock.h ../engine/hash.h \
+	../utils/random.h
+eyes.o: eyes.c eyes.h
+fuseki19.o: fuseki19.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
+	../engine/hash.h patterns.h
+fuseki9.o: fuseki9.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
+	../engine/hash.h patterns.h
+helpers.o: helpers.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
+	../engine/hash.h patterns.h
+influence.o: influence.c ../engine/liberty.h ../engine/gnugo.h \
+	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
+	../engine/clock.h ../engine/hash.h patterns.h
+joseki.o: joseki.c ../sgf/sgftree.h ../sgf/sgf_properties.h \
+	../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../engine/clock.h ../engine/hash.h
+josekidb.o: josekidb.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
+	../engine/hash.h patterns.h
+mkeyes.o: mkeyes.c
+mkpat.o: mkpat.c ../config.h patterns.h ../utils/gg-getopt.h
+owl_attackpat.o: owl_attackpat.c ../engine/liberty.h ../engine/gnugo.h \
+	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
+	../engine/clock.h ../engine/hash.h patterns.h
+owl_defendpat.o: owl_defendpat.c ../engine/liberty.h ../engine/gnugo.h \
+	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
+	../engine/clock.h ../engine/hash.h patterns.h
+owl_vital_apat.o: owl_vital_apat.c ../engine/liberty.h ../engine/gnugo.h \
+	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
+	../engine/clock.h ../engine/hash.h patterns.h
+patterns.o: patterns.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
+	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
+	../engine/hash.h patterns.h
+transform.o: transform.c
+
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am: all-am
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-exec-am:
+install-exec: install-exec-am
+
+install-data-am: install-pkgdataDATA
+install-data: install-data-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am: uninstall-pkgdataDATA
+uninstall: uninstall-am
+all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS)
+all-redirect: all-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs:
+	$(mkinstalldirs)  $(DESTDIR)$(pkgdatadir)
+
+
+mostlyclean-generic:
+
+clean-generic:
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
+
+maintainer-clean-generic:
+mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+		mostlyclean-noinstPROGRAMS mostlyclean-tags \
+		mostlyclean-generic
+
+mostlyclean: mostlyclean-am
+
+clean-am:  clean-noinstLIBRARIES clean-compile clean-noinstPROGRAMS \
+		clean-tags clean-generic mostlyclean-am
+
+clean: clean-am
+
+distclean-am:  distclean-noinstLIBRARIES distclean-compile \
+		distclean-noinstPROGRAMS distclean-tags \
+		distclean-generic clean-am
+
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
+		maintainer-clean-compile \
+		maintainer-clean-noinstPROGRAMS maintainer-clean-tags \
+		maintainer-clean-generic distclean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
+
+.PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
+clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
+mostlyclean-compile distclean-compile clean-compile \
+maintainer-clean-compile mostlyclean-noinstPROGRAMS \
+distclean-noinstPROGRAMS clean-noinstPROGRAMS \
+maintainer-clean-noinstPROGRAMS uninstall-pkgdataDATA \
+install-pkgdataDATA tags mostlyclean-tags distclean-tags clean-tags \
+maintainer-clean-tags distdir info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
+
+
+# dependencies for the dfas from DFA_INST
+
+@DFA_ENABLED_TRUE@owl_attackpat.dfa: owl_attackpat.c
+@DFA_ENABLED_TRUE@owl_vital_apat.dfa: owl_vital_apat.c
+@DFA_ENABLED_TRUE@owl_defendpat.dfa: owl_defendpat.c
+
+dist-hook:
+	cd $(distdir) && rm $(GGBUILTSOURCES)
+
+hoshi.db : $(srcdir)/hoshi.sgf joseki$(EXEEXT)
+	./joseki JH $(srcdir)/hoshi.sgf >hoshi.db
+
+komoku.db : $(srcdir)/komoku.sgf joseki$(EXEEXT)
+	./joseki JK $(srcdir)/komoku.sgf >komoku.db
+
+sansan.db : $(srcdir)/sansan.sgf joseki$(EXEEXT)
+	./joseki JS $(srcdir)/sansan.sgf >sansan.db
+
+mokuhazushi.db : $(srcdir)/mokuhazushi.sgf joseki$(EXEEXT)
+	./joseki JM $(srcdir)/mokuhazushi.sgf >mokuhazushi.db
+
+takamoku.db : $(srcdir)/takamoku.sgf joseki$(EXEEXT)
+	./joseki JT $(srcdir)/takamoku.sgf >takamoku.db
+
+patterns.c : $(srcdir)/patterns.db $(srcdir)/patterns2.db mkpat$(EXEEXT)
+	cat  $(srcdir)/patterns.db $(srcdir)/patterns2.db \
+		| ./mkpat -b pat >patterns.c
+
+josekidb.c : $(DBBUILT) mkpat$(EXEEXT)
+	cat  $(DBBUILT) | ./mkpat -b joseki >josekidb.c
+
+apatterns.c : $(srcdir)/attack.db mkpat$(EXEEXT)
+	cat $(srcdir)/attack.db | ./mkpat -X attpat >apatterns.c
+
+dpatterns.c : $(srcdir)/defense.db mkpat$(EXEEXT)
+	cat $(srcdir)/defense.db | ./mkpat defpat >dpatterns.c
+
+conn.c : $(srcdir)/conn.db mkpat$(EXEEXT)
+	./mkpat -c conn < $(srcdir)/conn.db >conn.c
+
+endgame.c : $(srcdir)/endgame.db mkpat$(EXEEXT)
+	cat $(srcdir)/endgame.db | ./mkpat -b endpat >endgame.c
+
+eyes.c: $(srcdir)/eyes.db mkeyes$(EXEEXT)
+	./mkeyes < $(srcdir)/eyes.db >eyes.c
+
+influence.c : $(srcdir)/influence.db mkpat$(EXEEXT)
+	./mkpat -c influencepat < $(srcdir)/influence.db >influence.c
+
+barriers.c : $(srcdir)/barriers.db mkpat$(EXEEXT)
+	./mkpat -c -b barrierspat < $(srcdir)/barriers.db >barriers.c
+
+owl_attackpat.c : $(srcdir)/owl_attackpats.db mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b owl_attackpat < $(srcdir)/owl_attackpats.db >owl_attackpat.c
+
+owl_vital_apat.c : $(srcdir)/owl_vital_apats.db mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b owl_vital_apat < $(srcdir)/owl_vital_apats.db >owl_vital_apat.c
+
+owl_defendpat.c : $(srcdir)/owl_defendpats.db mkpat$(EXEEXT)
+	./mkpat $(DFAFLAGS) -b owl_defendpat < $(srcdir)/owl_defendpats.db >owl_defendpat.c
+
+fuseki9.c : $(srcdir)/fuseki9.db mkpat$(EXEEXT)
+	./mkpat -b -f fuseki9 < $(srcdir)/fuseki9.db >fuseki9.c
+
+fuseki19.c : $(srcdir)/fuseki19.db mkpat$(EXEEXT)
+	./mkpat -b -f fuseki19 < $(srcdir)/fuseki19.db >fuseki19.c
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:

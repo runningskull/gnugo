@@ -1,0 +1,257 @@
+GNU Go does two very different types of life and death reading. First,
+there is the OWL code (Optics with Limit Negotiation) which
+attempts to read out to a point where the code in
+@file{engine/optics.c} (@pxref{Eyes}) can be used to evaluate it.
+
+Secondly, there is the code in @file{engine/life.c} which
+is a potential replacement for the code in @file{optics.c}.
+It attempts to evaluate eyespaces more accurately than the
+code in @file{optics.c}, but since it is fairly slow,
+it is partially disabled unless you run GNU Go with the
+option @option{--life}. The default use of the life code
+is that it can be called from @file{optics.c} when the graph
+based life and death code concludes that it needs an expert
+opinion.
+
+Like the tactical reading code, a persistent cache is
+employed to maintain some of the owl data from move to
+move. This is an essential speedup without which GNU Go
+would play too slowly.
+
+@menu
+* The Owl Code::                Life and death reading
+* Owl Functions::               Functions in @file{owl.c}
+@end menu
+
+@node The Owl Code, Owl Functions, , Life and Death Reading
+@comment  node-name,  next,  previous,  up
+@section The Owl Code
+
+The life and death code in @file{optics.c}, described elsewhere
+(@pxref{Eyes}), works reasonably well as long as the position is in a
+@dfn{terminal position}, which we define to be one where there are no
+moves left which can expand the eye space, or limit it. In situations
+where the dragon is surrounded, yet has room to thrash around a bit
+making eyes, a simple application of the graph-based analysis will not
+work. Instead, a bit of reading is needed to reach a terminal position.
+
+The defender tries to expand his eyespace, the attacker to limit
+it, and when neither finds an effective move, the position is
+evaluated. We call this type of life and death reading
+@dfn{Optics With Limit-negotiation} (OWL). The module which
+implements it is in @file{engine/owl.c}.
+
+There are two reasonably small databases
+@file{patterns/owl_defendpats.db} and @file{patterns/owl_attackpats.db}
+of expanding and limiting moves. The code in @file{owl.c} generates a
+small move tree, allowing the attacker only moves from
+@file{owl_attackpats.db}, and the defender only moves from
+@file{owl_defendpats.db}. In addition to the moves suggested by
+patterns, vital moves from the eye space analysis are also tested.
+
+A third database, @file{owl_vital_apats.db} includes patterns which
+override the eyespace analysis done by the optics code. Since the
+eyeshape graphs ignore the complications of shortage of liberties and
+cutting points in the surrounding chains, the static analysis of
+eyespace is sometimes wrong. The problem is when the optics code says
+that a dragon definitely has 2 eyes, but it isn't true due to 
+shortage of liberties, so the ordinary owl patterns never get into play.
+In such situations @code{owl_vital_apats.db} is the only available measure
+to correct mistakes by the optics. Currently the patterns in
+@file{owl_vital_apats.db} are only matched when the level is 9 or
+greater.
+
+The owl code is tuned by editing these three pattern databases,
+principally the first two.
+
+@findex owl_attack
+@findex owl_defend
+@findex compute_eyes_pessimistic
+A node of the move tree is considered @code{terminal} if no further moves 
+are found from @file{apats.db} or @file{dpats.db}, or if the function
+@code{compute_eyes_pessimistic()} reports that the group is definitely
+alive or dead. At this point, the status of the group is evaluated.
+The functions @code{owl_attack()} and @code{owl_defend()}, with
+usage similar to @code{attack()} and @code{find_defense()}, make
+use of the owl pattern databases to generate the move tree and decide
+the status of the group.
+
+The function @code{compute_eyes_pessimistic()} used by the owl
+code is very conservative and only feels certain about eyes if the
+eyespace is completely closed (i.e. no marginal vertices). 
+
+The maximum number of moves tried at each node is limited by
+the parameter @code{MAX_MOVES} defined at the beginning of
+@file{engine/owl.c}. The most most valuable moves are
+tried first, with the following restrictions:
+
+@itemize @bullet
+@item
+If @code{stackp > owl_branch_depth} then only one move is tried per
+variation. 
+@item
+If @code{stackp > owl_reading_depth} then the reading terminates,
+and the situation is declared a win for the defender (since
+deep reading may be a sign of escape).
+@item
+If the node count exceeds @code{owl_node_limit}, the reading also
+terminates with a win for the defender.
+@item
+Any pattern with value 99 is considered a forced move: no
+other move is tried, and if two such moves are found, the function
+returns false. This is only relevant for the attacker.
+@item
+Any pattern in @file{patterns/owl_attackpats.db} and 
+@file{patterns/owl_defendpats.db} with value 100 is considered a win: if
+such a pattern is found by @code{owl_attack} or @code{owl_defend}, the
+function returns true. This feature must be used most carefully.
+@end itemize
+
+The functions @code{owl_attack()} and @code{owl_defend()} may, like
+@code{attack()} and @code{find_defense()}, return an attacking or
+defending move through their pointer arguments. If the position is
+already won, @code{owl_attack()} may or may not return an attacking
+move. If it finds no move of interest, it will return @code{PASS}, that
+is, @code{(-1,-1)}. The same goes for @code{owl_defend()}.
+
+When @code{owl_attack()} or @code{owl_defend()} is called,
+the dragon under attack is marked in the array @code{goal}.
+The stones of the dragon originally on the board are marked
+with goal=1; those added by @code{owl_defend()} are marked
+with goal=2. If all the original strings of the original dragon 
+are captured, @code{owl_attack()} considers the dragon to be defeated,
+even if some stones added later can make a live group.
+
+Only dragons with small escape route are studied when the
+functions are called from @code{make_dragons()}.
+
+The owl code can be conveniently tested using the 
+@option{--decidedragon @var{location}} This should be used with 
+@option{-t} to produce a useful trace, @option{-o} to produce
+an SGF file of variations produced when the life and death of
+the dragon at @var{location} is checked, or both. 
+@option{--decideposition} performs the same analysis for all
+dragons with small escape route. 
+
+@node Owl Functions, , The Owl Code, Life and Death Reading
+@comment  node-name,  next,  previous,  up
+@section Functions in @file{owl.c}
+@cindex owl functions, how to write
+
+In this section we list the non-static functions in @file{owl.c}.
+Note that calls to @code{owl_attack} and @code{owl_defend} should
+be made only when @code{stackp==0}. If you want to set up a 
+position, then use the owl code to analyze it, you may call
+@code{do_owl_attack} and @code{do_owl_defend} with @code{stackp>0}
+but first you must set up the goal and boundary arrays. See
+@code{owl_does_defend} and @code{owl_substantial} for examples.
+
+The reason that we do not try to write a general @code{owl_attack}
+which works when @code{stackp>0} is that we make use of cached
+information in the calls to @code{same_dragon} from the (static)
+function @code{owl_mark_dragon}. This requires the dragon data
+to be current, which it is not when @code{stackp>0}. 
+
+@itemize @bullet
+@item @code{int owl_attack(int m, int n, int *ui, int *uj)}
+@findex owl_attack
+@quotation
+Returns 1 if a move can be found to attack the dragon
+at @code{(m, n)}, in which case @code{(*ui, *uj)} is the recommended move.
+@code{(*ui, *uj)} can be null pointers if the result is not needed.
+@itemize @minus
+@item Returns 2 if the attack prevails provided attacker is willing to
+ignore any ko threat (the attacker makes the first ko capture).
+@item Returns 3 if attack succeeds provided attacker has a ko threat
+which must be answered (the defender makes the first ko capture).
+@end itemize
+@end quotation
+@item @code{int owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)}
+@findex owl_threaten_attack
+@quotation
+Returns 1 if the dragon at @code{(m, n)} can be captured given
+two moves in a row. The first two moves to capture the
+dragon are given as @code{(*ui, *uj)} and @code{(*vi, *vj)}.
+@end quotation
+@item @code{int owl_defend(int m, int n, int *ui, int *uj)}
+@findex owl_defend
+@quotation
+Returns 1 if a move can be found to defend the dragon
+at @code{(m, n)}, in which case @code{(*ui, *uj)} is the recommended move.
+@code{(*ui, *uj)} can be null pointers if the result is not needed.
+@itemize @minus
+@item Returns 2 if the defense prevails provided defender is willing to
+ignore any ko threat (the defender makes the first ko capture).
+@item Returns 3 if defense succeeds provided defender has a ko threat
+which must be answered (the attacker makes the first ko capture).
+@end itemize
+@end quotation
+@item @code{int owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj)}
+@findex owl_threaten_defense
+@quotation
+Returns true if the dragon at @code{(m, n)} can be defended given
+two moves in a row. The first two moves to defend the
+dragon are given as @code{(*ui, *uj)} and @code{(*vi, *vj)}.
+@end quotation
+@item @code{void goaldump(char goal[MAX_BOARD][MAX_BOARD])}
+@findex goaldump
+quotation
+Lists the goal array. For use in GDB:
+@example
+(gdb) set goaldump(goal)
+@end example
+@item @code{void owl_reasons(int color)}
+@findex owl_reasons
+@quotation
+Add owl reasons. This function should be called once during genmove.
+@end quotation
+@item @code{owl_does_defend(int ti, int tj, int m, int n)}
+@findex owl_does_defend
+@quotation
+Use the owl code to determine whether the move at @code{(ti, tj)} makes
+the dragon at @code{(m, n)} owl safe. This is used to test whether
+tactical defenses are strategically viable, whether a strategical
+defense move is effective, and whether a vital eye point does save an
+owl critical dragon.
+@end quotation
+@end itemize
+@itemize @bullet
+@item @code{owl_does_attack(int ti, int tj, int m, int n)}
+@findex owl_does_attack
+@quotation
+Use the owl code to determine whether the move at @code{(ti, tj)} owl
+kills the dragon at @code{(m, n)}. This is used to test whether
+strategical attack moves are dangerous enough to kill and whether a
+vital eye point does kill an owl critical dragon.
+@end quotation
+@end itemize
+@itemize @bullet
+@item @code{int owl_connection_defends(int ti, int tj, int ai, int aj, int bi, int bj)}
+@findex owl_connection_defends
+@quotation
+Use the owl code to determine whether connecting the two dragons
+@code{(ai, aj)} and @code{(bi, bj)} by playing at @code{(ti, tj)}
+results in a living dragon. Should be called only when @code{stackp==0}.
+@end quotation
+@item @code{int owl_lively(int i, int j)}
+@findex owl_lively
+@quotation
+True unless @code{(i, j)} is @code{EMPTY} or occupied by a lunch for the goal
+dragon. Used during @code{make_domains()} (see @code{optics.c}: lively macro).
+@end quotation
+@end itemize
+
+@itemize @bullet
+@item @code{int owl_substantial(int i, int j)}
+@findex owl_substantial
+@quotation
+This function, called when @code{stackp==0}, returns true if capturing
+the string at @code{(i,j)} results in a live group.
+@end quotation
+@item @code{int vital_chain(int m, int n)}
+@findex vital_chain
+@quotation
+This function returns true if it is judged that the capture of the
+string at @code{(m,n)} is sufficient to create one eye or to escape.
+@end quotation
+@end itemize

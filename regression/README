@@ -1,0 +1,5 @@
+The files with suffix .gtp and .res are automatically generated from
+the .tst files. Only edit the latter files.
+
+Please see the Texinfo documentation (Regression) for further
+information.

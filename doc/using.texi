@@ -1,0 +1,597 @@
+@menu
+* Documentation::            Getting Documentation
+* CGoban::                   Running GNU Go with CGoban
+* Ascii::                    The Ascii Interface
+* Emacs::                    GNU Go mode in Emacs
+* Jago::                     Jago
+* GMP and GTP::              The Go Modem Protocol and Go Text Protocol
+* Tournaments::              Computer Tournaments
+* SGF Support::              The Smart Go Format
+* Invoking GNU Go::          Command line options
+@end menu
+
+@node Documentation, CGoban, , User Guide
+@comment  node-name,  next,  previous,  up
+
+@section Getting Documentation
+
+You can obtain a printed copy of the manual by running
+@command{make gnugo.ps} in the @file{doc/}directory, then printing the
+resulting postscript file. The manual contains a great deal of information
+about the algorithms of GNU Go.
+
+On platforms supporting info documentation, you can usually
+install the manual by executing `make install' (running as
+root) from the @file{doc/} directory. The info documentation can
+be read conveniently from within Emacs by executing the
+command @command{Control-h i}.
+
+Documentation in @file{doc/} consists of a man page @file{gnugo.6}, the 
+info files @file{gnugo.info}, @file{gnugo.info-1}, ... and the 
+Texinfo files from which the info files are built. The Texinfo
+documentation contains this User's Guide and extensive information
+about the algorithms of GNU Go, for developers.
+
+If you want a typeset copy of the Texinfo documentation, you can
+@command{make gnugo.dvi} or @command{make gnugo.ps} in the @file{doc/}
+directory. 
+
+You can make an HTML version with the command @command{makeinfo
+--html gnugo.texi}. Better HTML documentation may be obtained
+using @command{texi2html -split_chapter gnugo.texi}. You can
+obtain the @command{texi2html} utility (version 1.61 or later) from
+@url{http://www.mathematik.uni-kl.de/~obachman/Texi2html/}. (See also
+@url{http://texinfo.org/texi2html/}.)
+
+User documentation can be obtained by running @command{gnugo --help} 
+or @command{man gnugo} from any terminal, or from the Texinfo
+documentation.
+
+Documentation for developers is in the Texinfo documentation, and in comments
+throughout the source. Contact us at @email{gnugo@@gnu.org} if you are
+interested in helping to develop this program.
+
+@node CGoban, Ascii, Documentation, User Guide
+@comment  node-name,  next,  previous,  up
+@section Running GNU Go via CGoban
+@cindex CGoban
+
+This is an extremely nice way to run GNU Go. CGoban provides a
+beautiful graphic user interface under X-Windows.
+
+Start CGoban. When the CGoban Control panel comes up, select ``Go
+Modem''. You will get the Go Modem Protocol Setup. Choose one (or
+both) of the players to be ``Program,'' and fill out the box with the
+path to gnugo. After clicking OK, you get the Game Setup window.
+Choose ``Rules Set'' to be Japanese (otherwise handicaps won't work).
+Set the board size and handicap if you want.
+
+If you want to play with a komi, you should bear in mind that
+the GMP does not have any provision for communicating the komi.
+Because of this misfeature, unless you set the komi at the command
+line GNU Go will have to guess it. It assumes the komi is 5.5 for
+even games, 0.5 for handicap games. If this is not what you want,
+you can specify the komi at the command line with the
+@option{--komi} option, in the Go Modem Protocol Setup window.
+You have to set the komi again in the Game Setup window, which
+comes up next.
+
+Click OK and you are ready to go.
+
+In the Go Modem Protocol Setup window, when you specify the path to
+GNU Go, you can give it command line options, such as @option{--quiet} to
+suppress most messages. Since the Go Modem Protocol preempts standard
+I/O other messages are sent to stderr, even if they are not error
+messages. These will appear in the terminal from which you started
+CGoban.
+
+@node Ascii, Emacs, CGoban, User Guide
+@comment  node-name,  next,  previous,  up
+@section Ascii Interface
+@cindex ascii interface
+
+Even if you do not have CGoban installed you can play with GNU Go
+using its default Ascii interface. Simply type @command{gnugo}
+at the command line, and GNU Go will draw a board. Typing
+@command{help} will give a list of options. At the end of the
+game, pass twice, and GNU Go will prompt you through the
+counting. You and GNU Go must agree on the dead groups---you
+can toggle the status of groups to be removed, and when you
+are done, GNU Go will report the score.
+
+You can save the game at any point using the @command{save @var{filename}}
+command. You can reload the game from the resulting SGF file with
+the command @command{gnugo -l @var{filename} --mode ascii}. Reloading
+games is not supported when playing with CGoban. However you can
+use CGoban to save a file, then reload it in ascii mode.
+
+@node Emacs, Jago, Ascii, User Guide
+@comment  node-name,  next,  previous,  up
+@section GNU Go mode in Emacs
+@cindex emacs mode
+
+You can run GNU Go from Emacs. This has the advantage 
+that you place the stones using the cursor arrow keys.
+This may require Emacs 20.4 or later---it has been 
+tested with Emacs 20.4 but does not work with Emacs 19
+or Emacs 20.2.
+
+Load @file{interface/gnugo.el}, either by @command{M-x load-file},
+or by copying the file into your @file{site-lisp} directory and
+adding a line
+
+@example
+(autoload 'gnugo "gnugo" "GNU Go" t)
+@end example
+
+@noindent
+in your @file{.emacs} file. 
+
+@paragraphindent 3
+Now you may start GNU Go by @command{M-x gnugo}. You will be prompted for
+command line options @pxref{Invoking GNU Go}. Using these, you may set the
+handicap, board size, color and komi.
+
+You can enter commands from the GNU Go ASCII interface after
+typing @samp{:}. For example, to take a move back, type
+@samp{:back}, or to list all commands, type @samp{:help}.
+
+Here are the default keybindings:
+
+@itemize @bullet
+@item @samp{Return} or @samp{Space}
+@quotation
+Select point as the next move.  An error is signalled
+for invalid locations.  Illegal locations, on the other
+hand, show up in the GNUGO Console buffer.
+@end quotation
+@item @samp{q} or @samp{Q}
+@quotation
+Quit. Both Board and Console buffers are deleted.
+@end quotation
+@item @samp{R}
+@quotation
+Resign.
+@end quotation
+@item @samp{C-l}
+@quotation
+Refresh.  Includes restoring default window configuration.
+@end quotation
+@item @samp{M-_}
+@quotation
+Bury both Board and Console buffers (when the boss is near).
+@end quotation
+@item @samp{p}
+@quotation
+Pass; i.e., select no location for your move.
+@end quotation
+@item @samp{:}
+@quotation
+Extended command. After typing the @samp{:} you can type a
+command for GNU Go. The possible commands are as in @xref{Ascii}.
+@end quotation
+@end itemize
+
+@node Jago, GMP and GTP, Emacs, User Guide
+@comment  node-name,  next,  previous,  up
+@section Running GNU Go via Jago
+@cindex jago
+
+Jago, like CGoban is a client capable of providing GNU Go with a
+graphical user interface. Unlike CGoban, it does not require 
+X-Windows, so it is an attractive alternative under Windows.
+You will need a Java runtime environment. Obtain Jago at
+
+@url{http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html}
+@noindent
+and follow the links there for the Java runtime environment.
+
+@node GMP and GTP, Tournaments, Jago, User Guide
+@comment  node-name,  next,  previous,  up
+@section The Go Modem Protocol and Go Text Protocol
+@cindex GMP
+@cindex GTP
+@cindex The Go Modem Protocol and Go Text Protocol
+
+@paragraphindent 3
+The Go Modem Protocol (GMP) was developed by Bruce Wilcox with input from
+David Fotland, Anders Kierulf and others, according to the history in
+@url{http://www.britgo.org/tech/gmp.html}.
+
+Any Go program @emph{should} support this protocol since it is a
+standard. Since CGoban supports this protocol, the user interface for
+any Go program can be done entirely through CGoban. The programmer can
+concentrate on the real issues without worrying about drawing stones,
+resizing the board and other distracting issues.
+
+GNU Go 3.0 introduces a new protocol, the Go Text Protocol
+(@pxref{GTP}) which we hope can serve the functions currently 
+used by the GMP.
+
+@node Tournaments, SGF Support, GMP and GTP, User Guide
+
+@section Computer Go Tournaments
+
+Computer Tournaments currently use the Go Modem Protocol.
+The current method followed in such tournaments is to connect
+the serial ports of the two computers by a ``null modem'' cable.
+If you are running GNU/Linux it is convenient to use CGoban.
+If your program is black, set it up in the Go Modem Protocol
+Setup window as usual. For White, select ``Device'' and set
+the device to @file{/dev/cua0} if your serial port is COM1
+and @file{/dev/cua1} if the port is COM2.
+
+@node SGF Support, Invoking GNU Go, Tournaments, User Guide
+@comment  node-name,  next,  previous,  up
+@section Smart Go Format
+@cindex SGF (Smart Go Format)
+@cindex Smart Go Format
+
+The Smart Go Format (SGF), is the standard format for storing Go games. 
+GNU Go supports both reading and writing SGF files. The SGF specification
+(FF[4]) is at:
+@url{http://www.red-bean.com/sgf/}
+
+@node Invoking GNU Go, , SGF Support, User Guide
+@comment  node-name,  next,  previous,  up
+@section Invoking GNU Go: Command line options
+@cindex command line options
+@cindex invoking GNU Go
+
+@subsection Some basic options
+@itemize
+@item @option{--help}, @option{-h}
+@quotation
+Print a help message describing the options. This will also
+tell you the defaults of various parameters, most importantly
+the level and cache size. The default values of these
+parameters can be set before compiling by @command{configure}.
+If you forget the defaults you can find out using @option{--help}.
+@end quotation
+@item @option{--boardsize @var{size}}
+@quotation
+Set the board size
+@end quotation
+@item @option{--komi @var{num}}
+@quotation
+Set the komi
+@end quotation
+@item @option{--level @var{level}}
+@cindex level of play
+@quotation
+GNU Go can play with different strengths and speeds. Level 10
+is the default. Decreasing the level will make GNU Go faster
+but less accurate in its reading.
+@end quotation
+@item @option{--quiet}, @option{--silent}
+@quotation
+Don't print copyright and other messages. Messages specifically
+requested by other command line options, such as @option{--trace},
+are not supressed.
+@end quotation
+@item @option{-l}, @option{--infile @var{filename}}
+@quotation
+Load the named SGF file
+@end quotation
+@item @option{-L}, @option{--until @var{move}}
+@quotation
+Stop loading just before the indicated move is played. @var{move} can
+be either the move number or location.
+@end quotation
+@item @option{-o}, @option{--outfile @var{filename}}
+@quotation
+Write sgf output to file
+@end quotation
+@item @option{--mode @var{mode}} 
+@quotation
+Force the playing mode ('ascii', 'test,' 'gmp' or 'gtp'). The default is
+ASCII, but if no terminal is detected GMP (Go Modem Protocol) will be
+assumed. In practice this is usually what you want, so you may never
+need this option.
+@end quotation
+@end itemize
+
+@subsection Other general options:
+@itemize
+@item @option{-M}, @option{--cache-size @var{megs}} 
+@quotation
+@cindex cache-size
+@cindex cache
+Memory in megabytes used for hashing. The default size is 16 unless you
+configure gnugo with the command @command{configure
+--enable-cache-size=@var{size}} before compiling to make @var{size} the
+default (@pxref{Installation}).  GNU Go stores results of its reading
+calculations in a Hash table (@pxref{Hashing}). If the Hash table is filled,
+it is emptied and the reading continues, but some reading may have to be
+repeated that was done earlier, so a larger cache size will make GNU Go run
+faster, provided the cache is not so large that swapping occurs. Swapping may
+be detected on GNU/Linux machines using the program @command{top}. However if
+you have ample memory or if performance seems to be a problem may want to
+increase the size of the Hash cache using this option.
+@end quotation
+@item @option{--chinese-rules} 
+@quotation
+Use Chinese rules. This means that the Chinese or Area Counting is
+followed. It may affect the score of the game by one point in even
+games, more if there is a handicap (since in Chinese Counting the
+handicap stones count for Black).
+@end quotation
+@item @option{--japanese-rules} 
+@quotation
+Use Japanese Rules. This is the default unless you specify
+@option{--enable-chinese-rules} as a configure option.
+@end quotation
+@item @option{--copyright}: Display the copyright notice
+@item @option{--version} or @option{-v}: Print the version number
+@item @option{--printsgf @var{filename}}: Create an SGF file
+containing a diagram of the board. Useful with @option{-L} to
+create diagrams from games.
+@end itemize
+
+@subsection Other options affecting strength and speed
+
+The single parameter @option{--level} is a convenient way of
+choosing whether to play stronger or faster. This single
+parameter controls a host of other parameters which may
+optionally be set individually at the command line.  The
+default values of these parameters may be found by running
+@command{gnugo --help}. Unless you are working on the program
+you probably don't need these options. Instead, just adjust the
+single variable @option{--level}.
+
+These options are of use to developers tuning the program
+for performance and accuracy.
+
+@itemize @bullet
+@item @option{-D}, @option{--depth @var{depth}}
+@cindex depth
+@quotation
+Deep reading cutoff. When reading beyond this depth (default 14) GNU
+Go assumes that any string which can obtain 3 liberties is alive. Thus
+GNU Go can read ladders to an arbitrary depth, but will miss other
+types of capturing moves.
+@end quotation
+@item @option{--branch-depth}
+@quotation
+This sets the @code{branch_depth}, typically a little below the
+@code{depth}. Between @code{branch_depth} and @code{depth}, 
+attacks on strings with 3 liberties are considered but branching
+is inhibited, so fewer variations are considered.	
+@end quotation
+@item @option{-B}, @option{--backfill-depth @var{depth}}
+@quotation
+Deep reading cutoff. Beyond this depth (default 9) GNU Go will no 
+longer try backfilling moves in its reading.
+@end quotation
+@item @option{--backfill2-depth @var{depth}}
+@quotation
+Another depth controlling how deeply GNU Go looks for backfilling
+moves. The moves tried below @code{backfill2_depth} are generally more obscure
+and time intensive than those controlled by @code{backfill_depth}, so this
+parameter has a lower default.
+@end quotation
+@item @option{-F}, @option{--fourlib-depth @var{depth}}
+@quotation
+Deep reading cutoff. When reading beyond this depth (default 5) GNU
+Go assumes that any string which can obtain 4 liberties is alive.
+@end quotation
+@item @option{-K}, @option{--ko-depth @var{depth}}
+@quotation
+Deep reading cutoff. Beyond this depth (default 8) GNU Go no longer
+tries very hard to analyze kos.
+@end quotation
+@item @option{--branch-depth @var{depth}} 
+@quotation
+Deep reading cutoff. Below
+this depth (default 8), GNU Go still tries to attack strings with only 3
+liberties, but only tries one move at each node.
+@end quotation
+@item @option{--aa_depth @var{depth}}
+@quotation
+The reading function @code{atari_atari} looks for combinations beginning
+with a series of ataris, and culminating with some string having an
+unexpected change in status (e.g. alive to dead or critical). This
+command line optio sets the parameter @code{aa_depth} which determines
+how deeply this function looks for combinations.
+@end quotation
+@item @option{--superstring-depth}
+@quotation
+A superstring (@pxref{Superstrings}) is an amalgamation of
+tightly strings. Sometimes the best way to attack or defend a
+string is by attacking or defending an element of the superstring.
+Such tactics are tried below @code{superstring_depth} and this
+command line option allows this parameter to be set.
+@end quotation
+@end itemize
+
+The preceeding options are documented with the reading code
+(@pxref{Reading Basics}).
+
+@itemize @bullet
+@item @option{owl-branch} Below this depth Owl only considers one move. Default 8.
+@item @option{owl-reading} Below this depth Owl assumes the dragon has escaped.
+Default 20.
+@item @option{owl-node-limit} If the number of variations exceeds this limit,
+Owl assumes the dragon can make life. Default 10000.  We caution the user that
+increasing @code{owl_node_limit} does not necessarily increase the strength of
+the program.
+@item @option{--level @var{amount}}
+@cindex level
+@quotation
+The higher the level, the deeper GNU Go reads. Level 10 is the default.
+If GNU Go plays too slowly on your machine, you may want to decrease it.
+@end quotation
+@end itemize
+
+@subsection Ascii Mode Options
+@cindex ascii mode
+@itemize
+@item @option{--color @var{color}}
+@quotation
+Choose your color ('black' or 'white')
+@end quotation
+@item @option{--handicap @var{number}}
+@quotation
+Choose the number of handicap stones (0--9)
+@end quotation
+@end itemize
+
+@subsection Development options:
+
+@itemize
+@item @option{--replay @var{color}} 
+@quotation
+Replay all moves in a game for either or both colors. If used with the
+@option{-o} option the game record is annotated with move values. This
+option requires @option{-l @var{filename}}. The color can be:
+@itemize
+@item white: replay white moves only
+@item black: replay black moves only
+@item both: replay all moves
+@end itemize
+When the move found by genmove differs from the move in the sgf
+file the values of both moves are reported thus:
+@example
+Move 13 (white): GNU Go plays C6 (20.60) - Game move F4 (20.60) 
+@end example
+
+This option is useful if one wants to confirm that a change such as an
+speedup or other optimization has not affected the behavior of the
+engine. Note that when the several moves have the same top value (or
+nearly equal) the move generated is not deterministic (though it can be
+made deterministic by starting with the same random seed). Thus a few
+deviations from the move in the sgf file are to be expected. Only if the
+two reported values differ should we conclude that the engine plays
+differently from the engine which generated the sgf file.
+@xref{Regression}.
+@end quotation
+@item @option{-a}, @option{--allpats}
+@quotation
+Test all patterns, even those smaller in value than the largest move
+found so far. This should never affect GNU Go's final move, and it
+will make it run slower. However this can be very useful when "tuning"
+GNU Go. It causes both the traces and the output file (@option{-o}) to
+be more informative.
+@end quotation
+@item @option{-T}, @option{--printboard}: colored display of dragons.
+@quotation
+Use rxvt, xterm or Linux Console. (@pxref{Colored Display})
+@end quotation
+@item @option{-E}: colored display of eye spaces
+@quotation
+Use rxvt, xterm or Linux Console. (@pxref{Colored Display})
+@end quotation
+@item @option{-d}, @option{--debug @var{level}}
+@quotation
+Produce debugging output. The debug level is given in hexadecimal, using the
+bits defined in the following table from @file{engine/gnugo.h}.
+@cindex debugging options
+@itemize
+@item DEBUG_INFLUENCE    0x0001
+@item DEBUG_EYES         0x0002
+@item DEBUG_OWL          0x0004
+@item DEBUG_ESCAPE       0x0008
+@item DEBUG_MATCHER      0x0010
+@item DEBUG_DRAGONS      0x0020
+@item DEBUG_SEMEAI       0x0040
+@item DEBUG_LOADSGF      0x0080
+@item DEBUG_HELPER       0x0100
+@item DEBUG_READING      0x0200
+@item DEBUG_WORMS        0x0400
+@item DEBUG_MOVE_REASONS 0x0800
+@end itemize
+@end quotation
+@item @option{-H}, @option{--hash @var{level}} 
+@quotation
+hash (see @file{engine/gnugo.h} for bits).
+@end quotation
+@item @option{-w}, @option{--worms}
+@quotation
+Print more information about worm data.
+@end quotation
+@item @option{-m}, @option{--moyo @var{level}} 
+@quotation
+moyo debugging, show moyo board. The @var{level} is fully
+documented elsewhere (@pxref{Colored Display}).
+@end quotation
+@item @option{-b}, @option{--benchmark @var{number}} 
+@quotation
+benchmarking mode - can be used with @option{-l}.
+@end quotation
+@item @option{-s}, @option{--stack}
+@quotation
+stack trace (for debugging purposes).
+@end quotation
+@item @option{-S}, @option{--statistics}
+@quotation
+Print statistics (for debugging purposes).
+@end quotation
+@item @option{-t}, @option{--trace}
+@quotation
+Print debugging information. Use twice for more detail.
+@end quotation
+@item @option{-r}, @option{--seed @var{seed}}
+@quotation
+Set random number seed. This can be used to guarantee that GNU Go will make
+the same decisions on multiple runs through the same game. If @code{seed} is
+zero, GNU Go will play a different game each time.
+@end quotation
+@item @option{--decide-string @var{location}}
+@quotation
+Invoke the tactical reading code (@pxref{Tactical Reading} to decide
+whether the string at @var{location} can be captured, and if so, whether it
+can be defended. If used with @option{-o}, this will produce a variation tree
+in SGF.
+@end quotation
+@item @option{--decide-dragon @var{location}}
+@quotation
+Invoke the owl code (@pxref{The Owl Code}) to decide whether the dragon at
+@var{location} can be captured, and whether it can be defended. If used with
+@option{-o}, this will produce a variation tree in SGF.  
+@end quotation
+@item @option{--score @var{method}}
+@quotation
+Requires @option{-l}. @var{method} can be "end", "last", "aftermath" or a move.
+"end" and "aftermath" are appropriate when the game is complete, or nearly
+so, and both try to supply an accurate final score. The other options may
+be used to get an estimate during the middle of the game. Any of these
+options may be combined with @option{--chinese-rule} if you want to
+use Chinese (Area) counting.
+@itemize
+@item last
+@quotation
+load the sgf file up to the last move, then estimate territory
+using the Bouzy 5/21 algorithm (@pxref{Moyo}).
+@end quotation
+@item end
+@quotation
+finish the game by selfplaying from the end of the file until two passes,
+then estimate territory using the Bouzy 5/21 algorithm (@pxref{Moyo}).
+@end quotation
+@item aftermath
+@quotation
+finish the game by selfplaying from the end of the file until two passes,
+then estimate territory using the most accurate scoring algorithm available.
+Slower than @option{--score last}, and while these algorithms usually agree,
+if they differ, @option{--score aftermath} is most likely to be correct.
+@end quotation
+@item move, e.g. @option{--score J17}
+@quotation
+load file until move is reached and estimate territorial balance using
+the Bouzy 5/21 algorithm. The @option{--score end} and 
+@option{--score aftermath} options are only useful at or near the
+end of the game, so if you want an estimate of the score in the
+middle, use this method.
+@end quotation
+@end itemize
+@end quotation
+@item @option{--printsgf @var{output file}} 
+@quotation
+load SGF file, output final position (requires @option{-l}) as another
+SGF file. Illegal moves are indicated with the private @code{IL} property.
+This property is not used in the FF4 SGF specification, so we are
+free to preempt it. This feature is used in the CGI interface in
+@file{interface/html/gg.cgi}.
+@end quotation
+@end itemize
+

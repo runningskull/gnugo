@@ -1,0 +1,122 @@
+(;
+GM[1]FF[3]US[Brought to you by No Name Go Server]
+CP[
+  This game was played on the No Name Go Server
+  Permission to reproduce this game is given.]
+GN[ingwa-golife(B) NNGS]
+EV[None]
+RE[W+Resign]
+PW[ingwa]WR[6k*]
+PB[golife]BR[NR ]
+PC[NNGS Worldwide: nngs.cosmic.org 9696]
+DT[2000-11-02]
+SZ[9]TM[1800]KM[0.5]
+
+;B[fd];W[gc]C[
+golife NR : Golife normally plays rather fast now. Haven't worked on it for a couple of years...
+]
+;B[cg];W[fc]C[
+golife NR : It also has a lousy interface, so I better not screw up...
+]
+;B[ed];W[db];B[ge];W[cd]C[
+NE NR : this looks good for B (8)
+]
+;B[hd];W[gg];B[bc]C[
+golife NR : wow...
+ingwa 6k*: A daring invasion (11)
+golife NR : wow...
+ingwa 6k*: And yours also (11)
+golife NR : Indeed :-)
+NE NR : B7 must be a mistake (11)
+]
+;W[hf];B[cf]C[
+bump started observation.
+jpyllman started observation.
+]
+;W[bd];B[dd]C[
+golife NR : with this speed it will be over in no time.
+ingwa 6k*: Perhaps, but computers can complicate things very much (15)
+]
+;W[ac]C[
+golife NR : The lookahead is rather shallow as set. How much lookahead does gnugo do?
+gunnar 3k : C7 is of course much better than A7. (16)
+]
+;B[ab]C[
+golife NR : A8 not much better...
+gunnar 3k : A8 looks unreasonable. (17)
+]
+;W[cc];B[gb]C[
+golife NR : hmm... getting complicated.
+]
+;W[hc];B[hb]C[
+ingwa 6k*: Lookahead: 16 plys (21)
+gunnar 3k : Black is helping white to get stronger. White has H5 for connection now. (21)
+golife NR : 16 plys is a lot. Only on a restricted set of moves, I take it.
+]
+;W[ib];B[ia]C[
+golife NR : It's getting worse and worse.
+Micke started observation.
+turvoy 5k : neverknow (23)
+ingwa 6k*: Yes, only on tactical reading (23)
+ingwa 6k*: Capturing and such (23)
+ingwa 6k*: No full width search (23)
+]
+;W[fb]C[
+NE NR : If W doesn't win this game I will be most surprised (24)
+]
+;B[bb]C[
+golife NR : both programs like suspense :-)
+gunnar 3k : Many odd moves now. (25)
+]
+;W[ha]C[
+NE NR : gnugo doesn't like to capture stones? (26)
+]
+;B[ic]C[
+strandhag started observation.
+golife NR : what is this? I played several games today, and it did not do such moves then...
+gunnar 3k : I'm still waiting for H5 to connect. (27)
+]
+;W[id]C[
+mik started observation.
+]
+;B[ga]C[
+golife NR : I predict an easy win for gnugo at this stage :-)
+teun NR : gnugo takes plenty of time here (29)
+teun started observation.
+ planar started observation.
+ NE started observation.
+ gunnar started observation.
+ teun started observation.
+]
+;W[ag];B[ie]C[
+ turvoy started observation.
+ bump started observation.
+]
+;W[ad];B[eh]C[
+ golife NR : I'm not getting it.
+]
+;W[he];B[gh]C[
+ golife NR : tie for plan B
+]
+;W[hh];B[fh]C[
+ jpyllman started observation.
+]
+;W[gd];B[ce]C[
+ teun started observation.
+]
+;W[fe];B[ee];W[gf];B[ff];W[bh];B[dh];W[fa];B[fg];W[ge];B[df];W[ch];B[bg]
+;W[af];B[di];W[hi];B[fi];W[ec]C[
+ golife NR : those moves are so thick...
+]
+;B[bi];W[ah];B[ci];W[be]C[
+ scribbler started observation.
+]
+;B[bf];W[dc];B[ai];W[ae];B[gi];W[tt];B[cb];W[tt];B[ba]C[
+ limestone started observation.
+]
+;W[tt]C[
+ pappa started observation.
+]
+;B[da];W[tt];B[if];W[tt];B[hg];W[tt];B[ig];W[tt];B[eb];W[tt];B[ea];W[tt]
+;B[ca];W[tt];B[ga];W[tt];B[gb];W[tt];B[ih];W[ii]
+;)

@@ -1,0 +1,545 @@
+If you want to write your own interface to GNU Go, or if you want to
+create a go application using the GNU Go engine, this chapter is of
+interest to you.
+
+First an overview: GNU Go consists of two parts: the GNU Go @i{engine}
+and a program (user interface) which uses this engine. These are linked
+together into one binary. The current program implements the following
+user modes:
+
+@itemize @bullet
+@item An interactive board playable on ASCII terminals
+@item solo play - GNU Go plays against itself
+@item replay - a mode which lets the user investigate moves in an existing
+SGF file.
+@item GMP - Go Modem Protocol, a protocol for automatic play between two
+computers.
+@item GTP - Go Text Protocol, a more general go protocol currently used
+only for testing of the engine. However, GTP is currently being
+standardized and it is expected that GTP will become the main choice for
+tasks where currently GMP is used.
+@end itemize
+@cindex API
+
+The GNU Go engine can be used in other applications. For example, supplied
+with GNU Go is another program using the engine, called @file{debugboard},
+in the directory @file{interface/debugboard/}. The program debugboard lets the
+user load SGF files and can then interactively look at different properties of
+the position such as group status and eye status.
+
+The purpose of this Chapter is to show how to interface your own
+program such as @code{debugboard} with the GNU Go engine.
+
+Figure 1 describes the structure of a program using the GNU Go
+engine.
+
+@example
+                 +-----------------------------------+
+                 |                                   |
+                 |          Go application           |
+                 |                                   |
+                 +-----+----------+------+           |
+                 |     |          |      |           |
+                 |     |   Game   |      |           |
+                 |     | handling |      |           |
+                 |     |          |      |           |
+                 |     +----+-----+      |           |
+                 |   SGF    |    Move    |           |
+                 | handling | generation |           |
+                 |          |            |           |
+                 +----------+------------+-----------+
+                 |                                   |
+                 |           Board handling          |
+                 |                                   |
+                 +-----------------------------------+
+     
+        Figure 1: The structure of a program using the GNU Go engine
+
+@end example
+
+The foundation is a library called @code{libboard.a} which provides 
+efficient handling of a go board with rule checks for moves, with
+incremental handling of connected strings of stones and with methods to
+efficiently hash go positions.
+
+On top of this, there is a library which helps the application use
+smart go files, SGF files, with complete handling of game trees in
+memory and in files. This library is called @code{libsgf.a}
+
+The main part of the code within GNU Go is the move generation
+library which given a position generates a move. This part of the
+engine can also be used to manipulate a go position, add or remove
+stones, do tactical and strategic reading and to query the engine for
+legal moves. These functions are collected into @code{libengine.a}.
+
+The game handling code helps the application programmer keep tracks
+of the moves in a game, and to undo or redo moves. Games can be saved to
+SGF files and then later be read back again. These are also within
+@code{libengine.a}. 
+
+The resposibility of the application is to provide the user with a
+user interface, graphical or not, and let the user interact with the
+engine.
+
+@menu
+* Getting Started::          How to use the engine in your program
+* Basic Data Structures::    Basic Data Structures in the Engine
+* The Position Struct::      The Position `struct'
+* Positional Functions::     Functions which manipulate a Position
+@end menu
+
+@node Getting Started, Basic Data Structures, API, API
+
+@section How to use the engine in your own program: getting started
+
+To use the GNU Go engine in your own program you must include
+the file @file{gnugo.h}. This file describes the whole public API. There is
+another file, @file{liberty.h}, which describes the internal interface within
+the engine. If you want to make a new module within the engine, e.g.  for
+suggesting moves you will have to include this file also. In this section we
+will only describe the public interface.
+
+@findex init_gnugo
+   Before you do anything else, you have to call the function
+@code{init_gnugo()}. This function initializes everything within the engine.
+It takes one parameter: the number of megabytes the engine can use for
+the internal hash table. In addition to this the engine will use a few
+megabytes for other purposes such as data describing groups (liberties,
+life status, etc), eyes and so on.
+
+@node Basic Data Structures, The Position Struct, Getting Started, API
+@cindex data structures
+@cindex position struct
+
+@section Basic Data Structures in the Engine
+
+   There are some basic definitions in gnugo.h which are used
+everywhere. The most important of these are the numeric declarations of
+colors. Each intersection on the board is represented by one of these:
+
+@example
+
+     color              value
+     EMPTY                0
+     WHITE                1
+     BLACK                2
+
+@end example
+
+In addition to these, the following values can be used in special
+places, such as describing the borders of eyes:
+
+@example
+
+     color                     value
+     GRAY (GRAY_BORDER)          3
+     WHITE_BORDER                4
+     BLACK_BORDER                5
+
+@end example
+
+There is a macro, @code{OTHER_COLOR(color)} which can be used to get the
+other color than the parameter. This macro can only be used on @code{WHITE}
+or @code{BLACK}, but not on @code{EMPTY} or one of the border colors.
+@findex OTHER_COLOR
+
+@node The Position Struct, Positional Functions, Basic Data Structures, API
+
+@section The Position Struct
+@cindex position struct
+
+The basic data structure in the interface to the engine is the
+@code{Position}. A @code{Position} is used to store the current position
+of a game including the location of all black and white stones, a
+possible ko, and the number of captured stones on each side.  Here is
+the definition of @code{Position}:
+
+@example 
+
+     typedef unsigned char Intersection;
+     
+     typedef struct @{
+       int          boardsize;
+       Intersection board[MAX_BOARD][MAX_BOARD];
+       int          ko_i;
+       int          ko_j;
+       int          last_i[2];
+       int          last_j[2];
+
+       float        komi;
+       int          white_captured;
+       int          black_captured;
+     @} Position;
+
+@end example
+
+Here @code{Intersection} stores @code{EMPTY}, @code{WHITE} or
+@code{BLACK}. It is currently defined as an @code{unsigned char} to make
+it reasonably efficient in both storage and access time. The position
+stores a two-dimensional array of Intersections with the size
+@code{MAX_BOARD}. @code{MAX_BOARD} is the value of the biggest board
+size that the engine supports; it is currently set to 21. There is also
+a @code{MIN_BOARD} which is set to 3.
+
+To indicate what board size is actually used, there is a member,
+@code{boardsize}, which should be in the range between @code{MIN_BOARD}
+and @code{MAX_BOARD}.
+
+A location on the board is represented by a pair of integers in the range
+@code{[0 ... boardsize-1]}. The convention used within GNU Go is that the
+first integer indicates the row number from the top and the second integer
+indicates the column number from the left. Thus the coordinate (2,5) is F5 (A)
+in the small diagram below.
+
+@example
+@group
+
+           A B C D E F G
+         7 . . . . . . . 7
+         6 . . . . . . . 6
+         5 . . . . . A . 5
+         4 . . . . . . . 4
+         3 . . . . . . . 3
+         2 . . . . . . . 2
+         1 . . . . . . . 1
+           A B C D E F G
+
+@end group
+@end example
+
+A pass move is represented by the pair @code{(-1,-1)}.  A convention
+within the code is to use the suffix @samp{i} and @samp{j} for the first and
+the last coordinate.
+
+   If there is a ko present on the board, that is if one stone was
+captured the last move and the capturing stone can be recaptured, the
+pair @code{(ko_i, ko_j)} points at the empty intersection where the stone was
+just captured (@samp{a} in the diagram below).
+
+@example 
+@group
+
+           A B C D E F G
+         7 . . . . . . . 7
+         6 . . . . . . . 6
+         5 . . . O X . . 5
+         4 . . O a O X . 4
+         3 . . . O X . . 3
+         2 . . . . . . . 2
+         1 . . . . . . . 1
+           A B C D E F G
+
+@end group
+@end example
+
+If no ko is present, @code{ko_i} should be set to @code{-1}.
+
+The last two moves played are stored in @code{(last_i[], last_j[])}.
+
+As the game progresses the number of prisoners on each side are
+maintained in the members @code{white_captured} and @code{black_captured}.
+
+The komi used in the ongoing game is also stored in the @code{Position}.
+The reason for this is that in some instances, GNU Go plays differently
+whether it is ahead, behind or the position is even.  So the komi is an
+important input to the move generation.
+
+@node Positional Functions, , The Position Struct, API
+
+@section Functions which manipulate a Position
+
+All the functions in the engine that manipulate Positions have names
+prefixed by @code{gnugo_}.  Here is a complete list, as defined in 
+@file{gnugo.h}:
+
+@subsection Functions which manipulate the go position
+
+@itemize
+@item @code{void gnugo_clear_position(Position *pos, int boardsize, float komi)}
+@findex gnugo_clear_position
+@quotation
+Clear the position setting the board size to @code{boardsize} and the
+komi to @code{komi}.
+@end quotation
+
+@item @code{void gnugo_copy_position(Position *dest, Position *src)}
+@findex gnugo_copy_position
+@quotation
+Copy position @code{src} to position @code{dest}. This is the same
+convention that is used in @code{memcpy(3)}.
+@end quotation
+
+@item @code{void gnugo_add_stone(Position *pos, int i, int j, int color)}
+@findex gnugo_add_stone
+@quotation
+Add a stone of @code{color} at @code{(i,j)} to the position.
+@end quotation
+
+@item @code{void gnugo_remove_stone(Position *pos, int i, int j)}
+@findex gnugo_remove_stone
+@quotation
+Remove the stone at @code{(i,j)} from the position. No check is
+done that there actually is a stone there.
+@end quotation
+
+@item @code{void gnugo_play_move(Position *pos, int i, int j, int color)}
+@findex gnugo_play_move
+@quotation
+Play a stone of color color at @code{(i, j)} in the position removing
+captured stones if any. No check is done if the move is legal; to do
+that, call @code{gnugo_is_legal()}. Suicide is legal.
+@end quotation
+
+@item @code{int gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)}
+@findex gnugo_play_sgfnode
+@quotation
+Place all the stones in and play all the moves in the SGF node
+@code{node} (@pxref{SGF}.) Return whose turn it is to move after this is
+done.
+@end quotation
+
+@item @code{int gnugo_play_sgftree(Position *pos, SGFNode *root, int *until, SGFNode **curnode)}
+@findex gnugo_play_sgftree
+@quotation
+Clear the position and play through the moves in SGF tree @code{root}
+until the move number @code{until} has been reached.  Return whose turn
+it is to move after this is done. The parameter @code{curnode} will be
+set to the current node in the tree, i.e. the one which was played
+last. 
+@end quotation
+
+@item @code{int gnugo_is_legal(Position *pos, int i, int j, int color)}
+@findex gnugo_is_legal
+@quotation
+Return 1 if the move at @code{(i,j)} would be legal; otherwise return
+0. The rule set used is standard japanese rules where suicide is
+illegal. If there is a ko point set (@code{ko_i != -1}), then the ko
+point is also illegal to play on.
+@end quotation
+
+@item @code{int gnugo_is_suicide(Position *pos, int i, int j, int color)}
+@findex gnugo_is_suicide
+@quotation
+Return 1 if the move at @code{(i,j)} would be suicide; otherwise return 0.
+@end quotation
+
+@item @code{int gnugo_placehand(Position *pos, int handicap)}
+@findex gnugo_placehand
+@quotation
+Sets up handicap stones, returning the number of placed handicap stones.
+Maximum handicap supported is 0 for board sizes below 7, 4 for board
+sizes 7 or 8 and 9 for board sizes from 9 and up.
+@end quotation
+
+@item @code{int gnugo_sethand(Position *pos, int handicap, struct SGFNode_t *root)}
+@findex gnugo_sethand
+@quotation
+Sets up handicap pieces and returns the number of placed
+handicap stones, updating the SGF file.
+@end quotation
+
+@item @code{void gnugo_recordboard(Position *pos, struct SGFNode_t *node)}
+@findex gnugo_recordboard
+@quotation
+Records the position in the SGF node (@pxref{SGF}).
+@end quotation
+
+@item @code{int gnugo_genmove(Position *pos, int *i, int *j, int color, int move_number)}
+@findex gnugo_genmove
+@quotation
+Generate a move for color @code{color} and return it in
+@code{(*i,*j)}. The parameter @code{move_number} is the number of the
+current move. This is mostly used for debugging reasons, as the game
+handling functions all work on top of the move generation part of the
+engine. (@pxref{Move Generation Basics}.).
+@end quotation
+
+@item @code{float gnugo_estimate_score(Position *pos, float *upper, float *lower)}
+
+@findex gnugo_estimate_score
+@quotation
+Evaluate the approximate score. The score is given as an interval with a
+lower and upper bound.  A positive score means that white is leading,
+while a negative score is good for black.  When the lower bound is
+estimated, CRITICAL dragons are awarded to white; when estimating the
+lower bound, they are awarded to black.
+
+The estimation is returned through the pointers @code{*upper} and
+@code{*lower}, and the mean between them is returned as the functions
+value.
+@end quotation
+
+@item @code{void gnugo_who_wins(Position *pos, int color, FILE *outfile)}
+@findex gnugo_who_wins
+@quotation
+Score the game and determine the winner.
+@end quotation
+@end itemize
+
+@subsection Status functions
+
+These functions examines the position in different ways and tells the
+status of groups and other items.  
+
+@itemize
+@item @code{int gnugo_attack(Position *pos, int m, int n, int *i, int *j)}
+@findex gnugo_attack
+@quotation
+Calls the tactical reading function @code{attack} to determine whether
+the string at @code{(m, n)} can be captured (@pxref{Tactical Reading}).
+@end quotation
+
+@item @code{int gnugo_find_defense(Position *pos, int m, int n, int *i, int *j)}
+@findex gnugo_find_defense
+@quotation
+Calls the tactical reading function @code{find_defense} to determine
+whether the string at @code{(m, n)} can be rescued (@pxref{Tactical
+Reading}).
+@end quotation
+@end itemize
+
+@subsection Special functions
+
+These functions are only used in special situations, such as when the
+program wants to access internal data structures within the engine. They
+should only be used when the programmer has a good knowledge of the
+internals of GNU Go.
+
+@itemize
+
+@item @code{void gnugo_force_to_globals(Position *pos)}
+@findex gnugo_force_to_globals
+@quotation
+Put the values in @code{pos} into the global variables which is the
+equivalent of the @code{Position}.
+@end quotation
+
+@item @code{void gnugo_examine_position(Position *pos, int color, int how_much)}
+@findex gnugo_examine_position
+@quotation
+Calls @code{examine_position()}, doing much prelimary analysis of
+the board position (@pxref{Move Generation Basics}).
+@end quotation
+@end itemize
+
+@section Game handling
+
+The functions (in @pxref{Positional Functions}) are all that are needed to
+create a fully functional go program.  But to make the life easier for the
+programmer, there is a small set of functions specially designed for handling
+ongoing games.
+
+The data structure describing an ongoing game is the @code{Gameinfo}. It
+is defined as follows:
+
+@example
+@group
+
+typedef struct @{
+  int       handicap;
+
+  Position  position;
+  int       move_number;
+  int       to_move;		/* whose move it currently is */
+  SGFTree   moves;		/* The moves in the game. */
+
+  int       seed;		/* random seed */
+  int       computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
+
+  char      outfilename[128];	/* Trickle file */
+  FILE      *outfile;
+@} Gameinfo;
+
+@end group
+@end example
+
+The meaning of @code{handicap} should be obvious. The @code{position}
+field is of course the current position, @code{move_number} is the
+number of the current move and @code{to_move} is the color of the side
+whose turn it is to move.
+
+The SGF tree @code{moves} is used to store all the moves in the entire
+game, including a header node which contains, among other things, komi
+and handicap. If a player wants to undo a move, this can most easily be
+done by replaying all the moves in the tree except for the last
+one. This is the way it is implemented in @code{gameinfo_undo_move()}.
+
+If one or both of the opponents is the computer, the fields @code{seed}
+and @code{computer_player} are used. Otherwise they can be
+ignored. @code{seed} is used to store the number used to seed the random
+number generator. Given the same moves from the opponent, GNU Go will
+try to vary its game somewhat using a random function. But if the random
+generator is given the same seed, GNU Go will always play the same
+move. This is good, e.g. when we debug the engine but could also be used
+for other purposes.
+
+GNU Go can use a trickle file to continuously save all the moves of an
+ongoing game. This file can also contain information about internal
+state of the engine such as move reasons for various locations or move
+valuations for the 10 highest valued moves. The name of this file should
+be stored in @code{outfilename} and the file pointer to the open file is
+stored in @code{outfile}. If no trickle file is used,
+@code{outfilename[0]} will contain a null character and @code{outfile}
+will be set to @code{NULL}.
+
+@subsection Functions which manipulate a Gameinfo
+
+All the functions in the engine that manipulate Gameinfos have names
+prefixed by @code{gameinfo_}.  Here is a complete list, as defined in 
+@file{gnugo.h}:
+
+@itemize
+@item @code{void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)}
+@findex gameinfo_clear
+@quotation
+Clear the Gameinfo to an empty state. The board size of the
+@code{Position} is set to @code{boardsize}.
+@end quotation
+
+@item @code{void gameinfo_print(Gameinfo *ginfo)}
+@findex gameinfo_print
+@quotation
+Print the Gameinfo on stdout. This is mostly a debug tool.
+@end quotation
+
+@item @code{void gameinfo_load_sgfheader(Gameinfo *ginfo, SGFNode *head)}
+@findex gameinfo_load_sgfheader
+@quotation
+Load header information from the SGF node @code{head} and set the
+appropriate variables in @code{ginfo}.
+@end quotation
+
+@item @code{void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)}
+@findex gameinfo_play_move
+@quotation
+Play a move at (@code{i}, @code{j}), record it in @code{moves}, print it
+to the trickle file if any and update @code{move_number} and
+@code{to_move}.
+@end quotation
+
+@item @code{void gameinfo_undo_move(Gameinfo *ginfo)}
+@findex gameinfo_undo_move
+@quotation
+Replays all the moves of the game except the last one. It also updates
+@code{move_number}, @code{to_move} and @code{moves}. If there is a
+trickle file, it is truncated to the second to last move.
+
+@strong{FIXME: Not yet implemented.}
+@end quotation
+
+@item @code{int gameinfo_play_sgftree(Gameinfo *ginfo, SGFNode *head,
+const char *untilstr)}
+@findex gameinfo_play_sgftree
+@quotation
+Read header information and play the main variation in the SGF tree
+starting with @code{head}.  Return whose turn it is to move after this
+is done. 
+
+The parameter @code{untilstr} is an optional string of the form 'L12' (a
+board position) or '120' (a move number) which tells the function to
+stop playing at that move or move number.
+@end quotation
+
+@end itemize
+
+

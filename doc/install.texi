@@ -1,0 +1,388 @@
+
+You can get the most recent version of GNU Go ftp.gnu.org or a mirror
+(see @url{http://www.gnu.org/order/ftp.html} for a list).  You can read
+about newer versions and get other information at
+@url{http://www.gnu.org/software/gnugo/}. 
+
+@menu
+* GNU/Linux and Unix::          GNU Linux and Unix Installation
+* Configure Options::           Configure Options
+* Windows and MS-DOS::          Windows Installation
+* Macintosh::                   Macintosh Installation
+@end menu
+
+@node GNU/Linux and Unix, Configure Options, ,Installation
+@comment  node-name,  next,  previous,  up
+@section GNU/Linux and Unix
+@cindex installation
+
+Untar the sources, change to the directory gnugo-3.0.0. Now do:
+
+@example
+   ./configure [OPTIONS]
+   make
+@end example
+
+The most important configure options, cache size, default level
+and dfa will be explained in detail in the next section (@pxref{Configure
+Options}). Probably you do not need to set these unless you are
+dissatisfied with GNU Go's performance for any reason.
+
+As an example,
+
+@example
+   ./configure --enable-cache-size=32 --enable-level=8
+@end example
+
+@noindent
+creates a 48 Mb cache in RAM and sets the level to 8. Both these
+defaults can be overridden at run time.
+
+If you do not specify any options, the default level is 10 (highest
+supported), and the default cache size is 16, and the DFA is not
+enabled.
+
+If you have a slow machine or find GNU Go too slow you may want
+to decrease the default level. At level 8 the engine is playing about
+1.6 times faster than at level 10.
+
+Increasing the cache size will improve performance up to a point ---
+once the cache is so large that it cannot be kept in RAM, GNU Go will
+start swapping (characterized by frequent hard drive accesses) and
+performance will degrade.
+
+You have now made a binary called @file{interface/gnugo}. Now 
+(running as root) type
+
+@example
+   make install
+@end example
+
+@noindent
+to install gnugo in @file{/usr/local/bin}.
+
+There are different methods of using GNU Go. You may run it from the
+command line by just typing:
+
+@example
+   gnugo
+@end example
+
+@noindent
+but it is nicer to run it using CGoban 1 (under X-Windows) or Jago
+(on any platform with a Java runtime environment).
+
+You can get the most recent version of CGoban 1 from Bill Shubert's web site:
+@url{http://www.igoweb.org/~wms/comp/cgoban/index.html} The CGoban version
+number MUST be 1.9.1 at least or it won't work. CGoban 2 will not work.
+
+@xref{CGoban}, for instructions on how to run GNU Go from Cgoban, or
+@xref{Jago}, for Jago.
+
+@node Configure Options, Windows and MS-DOS, GNU/Linux and Unix, Installation
+
+There are three options which you should consider configuring,
+particularly if you are dissatisfied with GNU Go's performance.
+
+@menu
+* Ram Cache::                 Ram Cache
+* Default Level::             Default Level
+* DFA Option::                DFA Option
+@end menu
+
+@node Ram Cache, Default Level, , Configure Options
+@subsection Ram Cache
+
+By default, GNU Go makes a cache of 16 Megabytes in RAM for its
+internal use. The cache is used to store intermediate results during
+its analysis of the position.
+
+Increasing the cache size will often give a modest speed improvement.
+If your system has lots of RAM, consider increasing the cache
+size. But if the cache is too large, swapping will occur,
+causing hard drive accesses and degrading performance. If
+your hard drive seems to be running excessively your cache
+may be too large. On GNU/Linux systems, you may detect swapping
+using the program 'top'. Use the 'f' command to toggle SWAP
+display.
+
+You may override the size of the default cache at compile time 
+by running one of:
+
+@example
+   ./configure --enable-cache-size=n
+@end example
+
+@noindent
+to set the cache size to @code{n} megabytes. For example
+
+@example
+   ./configure --enable-cache-size=48
+@end example
+
+@noindent
+creates a cache of size 48 megabytes. If you omit this, your default
+cache size will be 16 MB. You must recompile and reinstall
+GNU Go after reconfiguring it by running @command{make} and
+@command{make install}.
+
+You may override the compile-time defaults by running gnugo with the
+option @option{--cache-size n}, where @code{n} is the size in
+megabytes of the cache you want, and @option{--level} where n is the
+level desired.  We will discuss setting these parameters next in detail.
+
+@node Default Level, DFA Option, Ram Cache, Configure Options
+@subsection Default Level
+
+GNU Go can play at different levels. Up to level 10 is
+supported. At level 10 GNU Go is much more accurate but takes
+an average of about 1.6 times longer to play than at level 8.
+
+The level can be set at run time using the @option{--level} option.
+If you don't set this, the default level will be used. You
+can set the default level with the configure option
+@option{--enable-level=n}. For example
+
+@example
+./configure --enable-level=9
+@end example
+
+@noindent
+sets the default level to 9. If you omit this parameter,
+the compiler sets the default level to 10. We recommend
+using level 10 unless you find it too slow. If you decide
+you want to change the default you may rerun configure
+and recompile the program.
+
+@node DFA Option, , Default Level, Configure Options
+@subsection DFA Configure Option
+
+If you @command{./configure --enable-dfa} you get the experimental DFA
+(Discrete Finite-State Automata) pattern matcher. This will result in a
+larger but somewhat faster engine. The option is considered experimental
+because it is new and harder to debug but sufficiently tested that it is
+probably safe.
+
+@node Windows and MS-DOS, Macintosh, Configure Options, Installation
+@comment  node-name,  next,  previous,  up
+@section Compiling GNU Go on Microsoft platforms
+
+GNU Go is being developed on Unix variants. GNU Go is easy to build
+and install on those platforms. GNU Go 3.0 has support for building
+on MS-DOS, Windows 3.x, Windows NT/2000 and Windows 95/98.
+
+There are two approaches to building GNU Go on Microsoft platforms.
+
+@enumerate
+@item 
+The first approach is to install a Unix-like environment based
+on ports of GCC to Microsoft platforms. This approach is fully
+supported by the GNU Go developers and works well. Several
+high quality free Unix-environments for Microsoft platforms
+are available.
+
+One benefit of this approach is that it is easier to
+participate in Gnu Go's development. These unix environments
+come for instance with the `diff' and `patch' programs
+necessary to generate and apply patches.
+
+Another benefit of the unix environments is that development
+versions (which may be stronger than the latest stable
+version) can be built too.  The supporting files for VC are
+not always actively worked on and consequently are often out
+of sync for development versions, so that VC will not build
+cleanly.
+
+@item
+The second approach is to use compilers such as Visual C
+developed specially for the Microsoft platform. GNU Go 2.6
+and later support Visual C. Presently we support Visual C
+through the project files which are supplied with the 
+distribution.
+@end enumerate
+
+The rest of this section gives more details on the various ways
+to compile GNU go for Microsoft platforms.
+
+@menu Using free Unix-environments and GCC
+* DJGPP::      Windows 95/98, MS-DOS and Windows 3.x using DJGPP
+* Cygwin::     Windows NT, 95/98 using Cygwin
+* MinGW32::    Windows NT, 95/98 using MINGW32
+* VC::         Visual C++ using Project Files
+@end menu
+
+@node DJGPP, Cygwin, , Windows and MS-DOS
+@subsection Windows 95/98, MS-DOS and Windows 3.x using DJGPP
+
+On these platforms DJGPP can be used. GNU Go installation has been
+tested in a DOS-Box with long filenames on Windows 95/98. GNU Go
+compiles out-of-the box with the DJGPP port of GCC using the
+standard Unix build and install procedure.
+
+Some URLs for DJGPP:
+
+DJGPP home page: @url{http://www.delorie.com/djgpp/}
+
+DJGPP ftp archive on simtel:
+
+@url{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/}
+
+@url{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/}
+
+Once you have a working DJGPP environment and you have downloaded
+the gnugo source available as gnugo-3.0.0.tar.gz you can build the
+executable as follows:
+
+@example
+       tar zxvf gnugo-3.0.0.tar.gz
+       cd gnugo-3.0.0
+       ./configure
+       make
+@end example
+
+Optionally you can download glib for DJGPP to get a working version
+of snprintf.
+
+@node Cygwin, MinGW32, DJGPP, Windows and MS-DOS
+@subsection Windows NT, Windows 95/98 using Cygwin
+
+On these platforms the Cygwin environment can be installed. Recent
+versions of Cygwin install very easily with the setup program available
+from the cygwin homepage.  @url{<http://sourceware.cygnus.com/cygwin/}.
+GNU Go compiles out-of-the box using the standard Unix build procedure
+on the Cygwin environment. After installation of cygwin and fetching
+@file{gnugo-3.0.0.tar.gz} you can type:
+
+@example
+  tar zxvf gnugo-3.0.0.tar.gz
+  cd gnugo-3.0.0
+  ./configure
+  make
+@end example
+
+The generated executable is not a stand-alone executable: it needs
+cygwin1.dll that comes with the Cygwin environment. cygwin1.dll
+contains the emulation layer for Unix.
+
+Cygwin Home page: @url{http://sourceware.cygnus.com/cygwin/}
+
+Optionally you can use glib to get a working version of snprintf.
+Glib builds out of the box on cygwin.
+
+@node MinGW32, VC, Cygwin, Windows and MS-DOS
+@subsection Windows NT, Windows 95/98 using MinGW32
+
+The Cygwin environment also comes with MinGW32. This generates an
+executable that relies only on Microsoft DLLs. This executable is thus
+completely comparable to a Visual C executable and easier to distribute
+than the Cygwin executable. To build on cygwin an executable suitable
+for the win32 platform type the following at your cygwin prompt:
+
+@example
+  tar zxvf gnugo-3.0.0.tar.gz
+  cd gnugo-3.0.0
+  env CC='gcc -mno-cygwin' ./configure
+  make
+@end example
+
+@node VC, , MinGW32, Windows and MS-DOS
+@subsection Windows NT, Windows 95/98 using Visual C and project files
+
+We assume that you do not want to change any configure options.
+If you do, you should edit the file @file{config.vc}. Note that
+when @command{configure} is run, this file is overwritten with
+the contents of @file{config.vcin}, so you may also want to edit
+@file{config.vcin}, though the instructions below do not have
+you running @command{configure}.
+
+@enumerate
+@item Open the VC++ 6 workspace file gnugo.dsw
+@item Set the gnugo project as the active project (right-click on it,
+and select "Set as Active Project".  Select 'Build' from the main 
+menu, then select 'Build gnugo.exe', this will make all of the 
+runtime subprojects.
+@end enumerate
+
+Notes:
+
+@itemize @bullet
+@item 
+a) The build can also be done from the command line:
+@example   
+    msdev gnugo.dsw /make "gnugo - Win32 Release"
+@end example
+@item 
+b) The default configuration is 'Debug', build the optimized
+version by selecting 'Build' from the main menu , then select
+'Set active Configuration' and click on 'gnugo - Win32 Release'.
+See the Visual Studio help for more on project configurations.
+@item 
+c) A custom build step in the first dependent subproject (utils)
+copys config.vc to config.h in the root directory. If you want
+to modify config.h, copy any changes to config.vc. In
+particular if you want to change the default level
+or default cache size, whose significance is discussed in
+@xref{GNU/Linux and Unix}, you must edit this file.
+@item
+d) This project was built and tested using VC version 6.0.
+It has not been tested, and will most likely not work with
+earlier versions of VC.
+@item
+e) If for any reason some or all of the automatically built
+files in the patterns directory do not build you can run 
+mkpat on the command line to make these files. For reference 
+here are the recommended mkpat options:
+
+@example
+  FILE             MKPAT OPTIONS      INPUT FILES
+
+ conn.c           mkpat -c conn            conn.db
+ patterns.c       mkpat -b pat             patterns.db, patterns2.db
+ apatterns.c      mkpat -X attpat          attack.db
+ dpatterns.c      mkpat defpat             defense.db
+ influence.c      mkpat -c influencepat    influence.db
+ endgame.c        mkpat -b endpat          endgame.db
+ owl_attackpat.c  mkpat -b owl_attackpat   owl_attackpats.db
+ owl_vital_apat.c mkpat -b owl_vital_apat  owl_vital_apats.db
+ owl_defendpat.c  mkpat -b owl_defendpat   owl_defendpats.db
+ fuseki9.c        mkpat -b -f fuseki9      fuseki9.db
+ fuseki19.c       mkpat -b -f fuseki19     fuseki19.db
+ josekidb.c       mkpat -b joseki          hoshi.db, komoku.db, 
+                                           sansan.db, takamoku.db
+                                           mokuhazushi.db
+@end example
+@end itemize
+
+@subsection Running GNU Go on Windows NT and Windows 95/98
+
+GNU Go does not come with its own graphical user interface. The Java
+client jago can be used.
+
+To run Jago you need a Java Runtime Environment (JRE). This can
+be obtained from @url{http://www.javasoft.com/}.  This is the runtime
+part of the Java Development Kit (JDK) and consists of the Java
+virtual machine, Java platform core classes, and supporting files.
+The Java virtual machine that comes with I.E. 5.0 works also.
+
+Jago: @url{http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html}
+
+@enumerate
+@item Invoke GNU Go with @command{gnugo --quiet --mode gmp}
+@item Run @command{gnugo --help} from a cygwin or DOS window for a list of
+options
+@item optionally specify @command{--level <level>} to make the game faster
+@end enumerate
+
+Jago works well with both the Cygwin and MinGW32 executables. The
+DJGPP executable also works, but has some problems in the interaction
+with jago after the game has been finished and scored.
+
+@node Macintosh, , Windows and MS-DOS, Installation
+@comment  node-name,  next,  previous,  up
+@section Macintosh
+
+If you have Mac OS X you can build GNU Go using Apple's compiler, 
+which is derived from GCC. We recommend adding the flag -no-cpp-precom
+to CFLAGS.
+
+

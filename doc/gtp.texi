@@ -1,0 +1,350 @@
+             
+@menu
+* The Go Text Protocol::          The Go Text Protocol
+* Protocol applications::         Protocol applications
+* Protocol conventions::	  Protocol conventions
+* Regression with GTP::           Regression testing with GTP
+@end menu
+
+@node The Go Text Protocol, Protocol applications, GTP, GTP
+@comment  node-name,  next,  previous,  up
+@section The GNU Go Text Protocol
+
+GNU Go 3.0 introduces a new interface, the Go Text Protocol
+(GTP). The intention is to make an interface that is better suited
+for machine-machine communication than the ascii interface and
+simpler, more powerful, and more flexible than the Go Modem
+Protocol. 
+
+The GTP has two principal current applications: it is used
+in the test suite (@pxref{Regression}) and it is used to
+communicate with @command{gnugoclient}, which is not part
+of the GNU Go distribution, but has been used to run GNU
+Go on NNGS. Other potential uses might be any of the current
+uses of the GMP, for which the GTP might serve as a replacement.
+This would likely entail extension and standardization of
+the protocol.
+
+A sample GTP session may look as follows:
+
+@example
+  hannah 2289% ./interface/gnugo --quiet --mode gtp
+  1 loadsgf regression/games/incident156.sgf 249
+  =1 
+  
+  2 countlib C3
+  =2 4
+  
+  3 findlib C3
+  =3 C4 B3 D3 B2
+  
+  5 attack C3
+  =5 0 
+  
+  owl_attack C3  
+  = 1 B4
+  
+  3 owl_defend C3
+  =3 1 B5
+  
+  owl_attack A2
+  ? vertex must not be empty
+  
+  quit
+  = 
+@end example
+
+By specifying @option{--mode gtp} GNU Go starts in the GTP
+interface. No prompt is used, just start giving commands. The
+commands have the common syntax
+
+@example
+[id] command_name [arguments]
+@end example
+
+The command is exactly one line long, i.e. it ends as soon as a
+newline appears. It's not possible to give multiple commands on the
+same line. Before the command name an optional identity number can be
+specified. If present it must be an integer between 0 and 2^31-1. The
+id numbers may come in any order or be reused. The rest of the line
+after the command name is assumed to be arguments for the command.
+Empty lines are ignored, as is everything following a hash sign up to
+the end of the line.
+
+If the command is successful, the response is of the form
+
+@example
+=[id] result
+@end example
+
+Here @samp{=} indicates success and @code{id} is the identity
+number given in the command or the empty string if the id was
+omitted. This is followed by the result, which is a text string
+ending with two consecutive newlines.
+
+If the command fails for some reason, the response takes the form
+
+@example
+?[id] error_message
+@end example
+
+Here @samp{?} indicates failure, @code{id} is as before, and
+@code{error_message} gives an explanation for the failure. This
+string also ends with two consecutive newlines.
+
+The available commands may always be listed using the single command
+@command{help}. Currently this gives the list below.
+
+@example
+attack
+black
+boardsize
+color
+combination_attack
+countlib
+debug_influence
+debug_move_influence
+decrease_depths
+defend
+dragon_data
+dragon_status
+dump_stack
+echo
+eval_eye
+final_score
+findlib
+fixed_handicap
+genmove_black
+genmove_white
+get_life_node_counter
+get_owl_node_counter
+get_reading_node_counter
+get_trymove_counter
+gg_genmove
+help
+increase_depths
+influence
+is_legal
+komi
+level
+loadsgf
+move_influence
+name
+new_score
+owl_attack
+owl_defend
+popgo
+prisoners
+quit
+report_uncertainty
+reset_life_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+same_dragon
+showboard
+trymove
+tune_move_ordering
+version
+white
+worm_cutstone
+worm_data
+@end example
+
+For exact specification of their arguments and results we refer to the
+comments of the functions in @file{interface/play_gtp.c}.
+
+@node Protocol applications, Protocol conventions, The Go Text Protocol, GTP
+
+The protocol is asymmetric and involves two parties, which we may
+call @samp{A} and @samp{B}. @samp{A} is typically some kind of arbiter or
+relay and @samp{B} is a go engine. All communication is initiated by @samp{A}
+in form of commands, to which @samp{B} responds.
+
+Potential setups include:
+
+@enumerate
+@item Regression testing. 
+@display
+A (regression script) -- B (engine).
+@end display
+@quotation
+A sets up a board position and asks B to e.g. generate a move or
+find an attack on a specific string.
+@end quotation    
+@item Human vs program. 
+@display
+A (GUI) -- B (engine)
+@end display
+@quotation
+The GUI relays moves between the human and the engine and asks the
+engine to generate moves. Optionally the GUI may also use GTP to
+ask the engine which moves are legal or give a score when the game
+is finished.
+@end quotation
+@item Program vs program with arbiter.
+@display
+B1 (engine 1) -- A (arbiter) -- B2 (engine 2)
+@end display
+@quotation
+A relays moves between the two engines and alternately asks the
+engines to generate moves. This involves two different GTP
+channels, the first between A and B1, and the second between A and
+B2. There is no direct communication between B1 and B2. The
+arbiter dictates board size, komi, rules, etc.
+@end quotation    
+@item Program vs program without arbiter.
+@quotation
+The same as above except that B1 includes the arbiter
+functionality and the first GTP link is shortcut.
+@end quotation
+@item Connection between go server and program.
+@display
+Go server -- A (relay) -- B (engine)
+@end display
+@quotation
+A talks with a go server using whatever protocol is needed and
+listens for match requests. When one arrives it accepts it, starts
+the go engine and issues GTP commands to set up board size, komi,
+etc. and if a game is restarted it also sets up the position. Then
+it relays moves between the server and the engine and asks the
+engine to generate new moves when it is in turn.
+@end quotation
+@end enumerate
+
+Setups 1 and 5 are in active and regular use with GNU Go. Programs
+implementing setup 3 are also distributed with GNU Go (the files
+@file{interface/gtp_examples/twogtp} and 
+@file{interface/gtp_examples/2ptkgo.pl}).
+
+@node Protocol conventions, Regression with GTP, Protocol applications, GTP
+
+The GTP is currently unfinished and unstandardized. It is hoped that it
+will grow to fill the needs currently served by the GMP and perhaps
+other functions. As it is yet unstandardized, this section gives some
+general remarks which we hope will constrain its development. We also
+discuss how the GTP is implemented in GNU Go, for the benefit of anyone
+wishing to add new commands. Notice that the current set of GTP commands
+is a mix of generally useful ones and highly GNU Go specific ones. Only
+the former should be part of a standardized protocol while the latter
+should be private extensions.
+
+The purpose of the protocol is machine-machine communication. It may be
+tempting to modify the protocol so that it becomes more comfortable for
+the human user, for example with an automatic showboard after every
+move. @strong{This is absolutely not the purpose of the protocol!}
+Use the ascii interface instead if you're inclined to make such a
+change.
+
+Newlines are implemented differently on different operating
+systems. On Unix, a newline is just a line feed LF (ascii \012).
+On DOS/Windows it is CRLF (\013\012). Thus whether GNU Go
+sends a carriage return with the line feed depends on which
+platform it is compiled for. The arbiter should silently
+discard carriage returns.
+
+Applications using GTP should never have to guess about the basic
+structure of the responses, defined above. The basic construction for
+coding a GTP command can be found in @code{gtp_countlib()}:
+
+@example
+static int
+gtp_countlib(char *s, int id)
+@{
+  int i, j;
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (p[i][j] == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  return gtp_success(id, "%d", countlib(i, j));
+@}
+@end example
+
+The functions @code{gtp_failure()} and @code{gtp_success()}
+automatically ensures the specified response format, assuming the
+strings they are printing do not end with a newline.
+
+Sometimes the output is too complex for use with gtp_success, e.g. if
+we want to print vertices, which gtp_success() doesn't
+support. Then we have to fall back to the construction in e.g.
+@code{gtp_genmove_white()}:
+
+@example
+static int
+gtp_genmove_white(char *s, int id)
+@{
+  int i, j;
+  UNUSED(s);
+  if (genmove(&i, &j, WHITE) >= 0)
+    play_move(i, j, WHITE);
+
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_print_vertex(i, j);
+  return gtp_finish_response();
+@}
+@end example
+
+Here @code{gtp_printid()} writes the equal sign and the request id while
+@code{gtp_finish_response()} adds the final two newlines. The next example
+is from @code{gtp_influence()}:
+
+@example
+  gtp_printid(id, GTP_SUCCESS);
+  get_initial_influence(color, 1, white_influence,
+			black_influence, influence_regions);
+  print_influence(white_influence, black_influence, influence_regions);
+  /* We already have one newline, thus can't use gtp_finish_response(). */
+  gtp_printf("\n");
+  return GTP_OK;
+@end example
+
+As we have said, the response should be finished with two newlines.
+Here we have to finish up the response ourselves since we already have
+one newline in place.
+
+One problem that can be expected to be common is that an engine
+happens to finish its response with three (or more) rather than
+two consecutive newlines. This is an error by the engine that
+the controller can easily detect and ignore. Thus a well
+behaved engine should not send stray newlines, but should they
+appear the controller should ignore them. The opposite problem
+of an engine failing to properly finish its response with two
+newlines will result in deadlock. Don't do this mistake!
+
+Although it doesn't suffice in more complex cases, gtp_success() is by
+far the most convenient construction when it does. For example,
+the function @code{gtp_report_uncertainty} takes a single argument
+which is expected to be "on" or "off", after which it sets the
+value of @code{report_uncertainty}, a variable which affects
+the form of future GTP responses, reports success, and exits. The
+function is coded thus:
+
+@example
+static int
+gtp_report_uncertainty(char *s, int id)
+@{
+  if (!strncmp(s, "on", 2)) @{
+    report_uncertainty = 1;
+    return gtp_success(id, "");
+  @}
+  if (!strncmp(s, "off", 3)) @{
+    report_uncertainty = 0;
+    return gtp_success(id, "");
+  @}
+  return gtp_failure(id, "invalid argument");
+@}
+@end example
+
+@node Regression with GTP, , Protocol conventions, GTP
+@comment  node-name,  next,  previous,  up
+@section Regression testing with GTP
+
+GNU Go uses GTP for regression testing. These tests are implemented as
+files with GTP commands, which are fed to GNU Go simply by redirecting
+stdin to read from a file. The output is filtered so that equal signs
+and responses from commands without id numbers are removed. These
+results are then compared with expected results encoded in GTP comments
+in the file, using matching with regular expressions. More information
+can be found in the regression chapter (@pxref{Regression}).

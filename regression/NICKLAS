@@ -1,0 +1,41 @@
+nicklas1.tst: all these tests should pass
+nicklas2.tst: 9x9 games where gnugo should do better.
+nicklas3.tst: 9x9 games with harder problems
+nicklas4.tst: 19x19 games (simple)
+nicklas5.tst: 19x19 games (harder)
+
+
+			     NICKLAS2.TST
+
+#102: LOW PRIORITY; DIFFICULTY HARD; DEFER
+gnugo --quiet -l niclas1.sgf -L29 -t
+
+    This is not as clear cut as it may seem. 2.7.228 values the endgame 
+    move at A7 to 6.66 points which seems about correct. The fact that 
+    white D4 threatens both to cut off E5-F6 and to capture D3 through 
+    a chain of threats (which is what happens in the game) is not that
+    easy to understand.  A more general atari_atari module could 
+    perhaps see it, but we are still far from that.  I think this test
+    should be in nicklas3.tst (harder problems).
+
+
+#601: ??? PRIORITY; DIFFICULTY EASY/HARD; TUNING
+
+    This test illustrates a general weakness of GNU Go: It's poor 
+    ability to defend its borders.  White can enter blacks domains or
+    capture the E8 group. In the latter case, whites first move is
+    a sacrifice and the capture happens through a chain of threats.
+
+
+#701 ??? PRIORITY; DIFFICULTY UNKNOWN; SEMEAI
+
+    This is a very good test case for a semeai module. Black F1 threatens
+    to live and creates all the necessary liberties to win the semai.
+
+
+#902 
+
+    The only way to live is to attack a neighbour dragon, e.g. the one
+    at F8. But does the owl code really do this by default?
+
+

@@ -1,0 +1,671 @@
+The purpose of this Chapter is to describe the algorithm used in
+GNU Go 3.0 to determine eyes. There are actually two alternative
+algorithms: the graph-based algorithm in @code{optics.c}, and
+the algorithm based on reading in @code{life.c}. The life
+code is slower than the graph based algorithm, but more 
+accurate. You can make it the default by using the option
+@code{--life}. Otherwise, GNU Go will only call the life
+code if the graph based algorithm decides that it needs
+an expert opinion.
+
+@menu
+* Local Games::                 Local games
+* Eye Space::                   Eye space
+* Eye Space as Local Game::     Eye space as local game
+* Eye Example::                 An example
+* Graphs::                      Underlying graphs
+* Eye Shape::                   Pattern matching
+* Eye Topology::                False eyes and half eyes
+* False Margins::               False margins
+* Eye Functions::               Functions in @file{optics.c}
+@end menu
+
+@node Local Games, Eye Space, Eyes, Eyes
+@comment  node-name,  next,  previous,  up
+@section Local games
+
+Each connected eyespace of a dragon affords a local game which yields
+a local game tree. The score of this local game is the number of eyes
+it yields. Usually if the players take turns and make optimal moves,
+the end scores will differ by 0 or 1. In this case, the local game may
+be represented by a single number, which is an integer or half
+integer. Thus if @samp{n(O)} is the score if @samp{O} moves first,
+both players alternate (no passes) and make alternate moves, and
+similarly @samp{n(X)}, the game can be represented by
+@samp{@{n(O)|n(X)@}}. Thus @{1|1@} is an eye, @{2|1@} is an eye plus a
+half eye, etc.
+
+The exceptional game @{2|0@} can occur, though rarely. We call
+an eyespace yielding this local game a CHIMERA.  The dragon
+is alive if any of the local games ends up with a score of 2
+or more, so @{2|1@} is not different from @{3|1@}. Thus @{3|1@} is
+NOT a chimera. 
+
+Here is an example of a chimera:
+
+@example
+@group
+XXXXX
+XOOOX
+XO.OOX
+XX..OX
+XXOOXX
+XXXXX
+@end group
+@end example
+
+@node Eye Space, Eye Space as Local Game, Local Games, Eyes
+@comment  node-name,  next,  previous,  up
+@section Eye spaces
+
+In order that each eyespace be assignable to a dragon,
+it is necessary that all the dragons surrounding it
+be amalgamated (@pxref{Amalgamation}). This is the
+function of @code{dragon_eye()}.
+
+An EYE SPACE for a black dragon is a collection of vertices
+adjacent to a dragon which may not yet be completely closed off,
+but which can potentially become eyespace. If an open eye space is
+sufficiently large, it will yield two eyes. Vertices at the edge
+of the eye space (adjacent to empty vertices outside the eye space)
+are called MARGINAL.
+
+Here is an example from a game:
+
+@example
+@group
+
+ |. X . X X . . X O X O 
+ |X . . . . . X X O O O
+ |O X X X X . . X O O O
+ |O O O O X . O X O O O
+ |. . . . O O O O X X O
+ |X O . X X X . . X O O
+ |X O O O O O O O X X O
+ |. X X O . O X O . . X
+ |X . . X . X X X X X X
+ |O X X O X . X O O X O
+
+@end group
+@end example
+
+Here the @samp{O} dragon which is surrounded in the center has open
+eye space. In the middle of this open eye space are three
+dead @samp{X} stones. This space is large enough that O cannot be
+killed. We can abstract the properties of this eye shape as follows.
+Marking certain vertices as follows:
+
+@example
+@group
+
+ |- X - X X - - X O X O 
+ |X - - - - - X X O O O
+ |O X X X X - - X O O O
+ |O O O O X - O X O O O
+ |! . . . O O O O X X O
+ |X O . X X X . ! X O O
+ |X O O O O O O O X X O
+ |- X X O - O X O - - X
+ |X - - X - X X X X X X
+ |O X X O X - X O O X O
+
+@end group
+@end example
+
+@noindent
+the shape in question has the form:
+
+@example
+@group
+
+!...
+  .XXX.!
+
+@end group
+@end example
+
+The marginal vertices are marked with an exclamation point (@samp{!}).
+The captured @samp{X} stones inside the eyespace are naturally marked @samp{X}.
+
+The precise algorithm by which the eye spaces are determined is
+somewhat complex. Documentation of this algorithm is in the
+comments in the source to the function @code{make_domains()} in
+@file{src/optics.c}.
+
+The eyespaces can be conveniently displayed using a colored 
+ascii diagram by running @command{gnugo -E}.
+
+@node Eye Space as Local Game, Eye Example, Eye Space, Eyes
+@comment  node-name,  next,  previous,  up
+@section The eyespace as local game
+
+In the abstraction, an eyespace consists of a set of vertices
+labelled:
+
+@example
+
+!  .  X
+
+@end example
+
+Tables of many eyespaces are found in the database @file{patterns/eyes.db}.
+Each of these may be thought of as a local game. The result of this
+game is listed after the eyespace in the form :max,min, where max is
+the number of eyes the pattern yields if @samp{O} moves first, while
+min is the number of eyes the pattern yields if @samp{X} moves
+first. The player who owns the eye space is denoted @samp{O}
+throughout this discussion.  Since three eyes are no better than two,
+there is no attempt to decide whether the space yields two eyes or
+three, so max never exceeds 2. Patterns with min>1 are omitted from
+the table.
+
+For example, we have:
+
+@example
+@group
+Pattern 1
+
+  x
+!x*x
+
+:2,1
+
+@end group
+@end example
+
+Here notation is as above, except that @samp{x} means @samp{X} or 
+@code{EMPTY}.  The result of the pattern is not different if @samp{X} has
+stones at these vertices or not.
+
+We may abstract the local game as follows. The two players @samp{O}
+and @samp{X} take turns moving, or either may pass.
+
+RULE 1: @samp{O} for his move may remove any vertex marked @samp{!}
+or marked @samp{.} .
+
+RULE 2: @samp{X} for his move may replace a @samp{.} by an @samp{X}. 
+
+RULE 3: @samp{X} may remove a @samp{!}. In this case, each @samp{.}
+adjacent to the "!" which is removed becomes a "!" . If an
+"@samp{X}" adjoins the "!" which is removed, then that "@samp{X}" and any
+which are connected to it are also removed. Any @samp{.} which
+are adjacent to the removed @samp{X}'s then become @samp{.}
+
+Thus if @samp{O} moves first he can transform the eyeshape in
+the above example to:
+
+@example
+@group
+ ...            or      !...
+  .XXX.!                  .XXX.
+@end group
+@end example
+
+However if @samp{X} moves he may remove the @samp{!} and the @samp{.}s
+adjacent to the @samp{!} become @samp{!} themselves. Thus if @samp{X}
+moves first he may transform the eyeshape to:
+
+@example
+@group
+ !..           or    !..
+  .XXX.!              .XXX!
+@end group
+@end example
+
+NOTE: A nuance which is that after the @samp{X:1}, @samp{O:2}
+exchange below, @samp{O} is threatening to capture three X stones,
+hence has a half eye to the left of 2.  This is subtle, and there are
+other such subtleties which our abstraction will not capture. Some of
+these at least can be dealt with by a refinements of the scheme, but
+we will content ourselves for the time being with a simplified
+
+@example
+@group
+
+ |- X - X X - - X O X O 
+ |X - - - - - X X O O O
+ |O X X X X - - X O O O
+ |O O O O X - O X O O O
+ |1 2 . . O O O O X X O
+ |X O . X X X . 3 X O O
+ |X O O O O O O O X X O
+ |- X X O - O X O - - X
+ |X - - X - X X X X X X
+ |O X X O X - X O O X O
+
+@end group
+@end example
+
+We will not attempt to characterize the terminal states
+of the local game (some of which could be seki) or
+the scoring. 
+
+@node Eye Example, Graphs, Eye Space as Local Game, Eyes
+@comment  node-name,  next,  previous,  up
+@section An example
+
+Here is a local game which yields exactly one
+eye, no matter who moves first:
+
+@example
+@group
+
+!
+...
+...!
+
+@end group
+@end example
+
+Here are some variations, assuming @samp{O} moves first.
+
+@example
+@group
+!        (start position)
+...
+...!
+@end group
+
+
+@group
+...      (after @samp{O}'s move)
+...!
+@end group
+
+
+@group
+... 
+..!
+@end group
+
+
+@group
+... 
+..
+@end group
+
+
+@group
+.X.       (nakade)
+..
+@end group
+@end example
+
+Here is another variation:
+
+@example
+
+@group
+!         (start)
+...
+...!
+@end group
+
+
+@group
+!         (after @samp{O}'s move)
+. .
+...!
+@end group
+
+
+@group
+!         (after @samp{X}'s move)
+. .
+..X!
+@end group
+
+
+@group
+. .
+..X!
+@end group
+
+
+@group
+. !
+.!
+@end group
+@end example
+
+
+@node Graphs, Eye Shape, Eye Example, Eyes
+@comment  node-name,  next,  previous,  up
+@section Graphs
+
+It is a useful observation that the local game associated
+with an eyespace depends only on the underlying graph, which
+as a set consists of the set of vertices, in which two elements
+are connected by an edge if and only if they are adjacent on
+the Go board. For example the two eye shapes:
+
+@example
+
+..
+ ..
+
+and
+
+....
+
+@end example
+
+@noindent
+though distinct in shape have isomorphic graphs, and consequently
+they are isomorphic as local games. This reduces the number of
+eyeshapes in the database @file{patterns/eyes.db}.
+
+A further simplification is obtained through our treatment of
+half eyes and false eyes. Such patterns are tabulated in the
+database hey.h. During make_worms, which runs before the
+eye space analysis, the half eye and false eye patterns are
+tabulated in the array @code{half_eye}.
+
+A half eye is isomorphic to the pattern @code{(!.)} . To see this,
+consider the following two eye shapes:
+
+
+@example
+@group 
+XOOOOOO
+X.....O
+XOOOOOO
+
+@end group
+and:
+@group
+
+XXOOOOO
+XOa...O
+XbOOOOO
+XXXXXX
+
+@end group
+@end example
+
+These are equivalent eyeshapes, with isomorphic local games @{2|1@}.
+The first has shape:
+
+@example
+
+!....
+
+@end example
+
+The second eyeshape has a half eye at a which is taken when @samp{O} 
+or @samp{X} plays at @samp{b}. This is found by the topological
+criterion (@pxref{Eye Topology}).
+
+@example
+@group
+ooo      half eye
+OhO
+*OX
+@end group
+@end example
+
+@noindent
+and it is recorded in the half_eye array as follows. If @code{(i,j)}
+are the coordinates of the point @samp{a}, @code{half_eye[i][j].type==HALF_EYE}
+and @code{(half_eye[i][j].ki, half_eye[i][j].kj)} are the coordinates
+of @samp{b}.
+
+The graph of the eye_shape, ostensibly @samp{....} is modified by replacing
+the left @samp{.} by @samp{!}.
+
+@node Eye Shape, Eye Topology, Graphs, Eyes
+@comment  node-name,  next,  previous,  up
+@section Eye shape analysis
+
+The patterns in @file{patterns/eyes.db} are compiled into graphs
+represented essentially by linked lists in @file{patterns/eyes.c}.
+
+Each actual eye space as it occurs on the board is also
+compiled into a graph. Half eyes are handled as follows.
+Referring to the example 
+
+@example
+@group
+XXOOOOO
+XOa...O
+XbOOOOO
+XXXXXX
+@end group
+@end example
+
+@noindent
+repeated from the preceding discussion, the vertex at @samp{b} is
+added to the eyespace as a marginal vertex. The adjacency
+condition in the graph is a macro (in @file{optics.c}): two
+vertices are adjacent if they are physically adjacent, 
+or if one is a half eye and the other is its key point.
+
+In recognize_eyes, each such graph arising from an actual eyespace is
+matched against the graphs in @file{eyes.c}.  If a match is found, the
+result of the local game is known. If a graph cannot be matched, its
+local game is assumed to be @{2|2@}.
+
+@node Eye Topology, False Margins, Eye Shape, Eyes
+@comment  node-name,  next,  previous,  up
+@section Topology of Half Eyes and False Eyes
+
+A HALF EYE is a pattern where an eye may or may not materialize,
+depending on who moves first. Here is a half eye for @code{O}:
+
+@example
+@group
+
+   OOOX
+   O..X
+   OOOX
+
+@end group
+@end example
+
+A FALSE EYE is a cave which cannot become an eye. Here is are
+two examples of false eyes for @code{O}:
+
+@example
+@group
+
+   OOX         OOX
+   O.O         O.OO
+   XOO         OOX
+
+@end group
+@end example
+
+We describe now the topological algorithm used to find half eyes
+and false eyes.
+
+False eyes and half eyes can locally be characterized by the status of
+the diagonal intersections from an eye space. For each diagonal
+intersection, which is not within the eye space, there are three
+distinct possibilities:
+
+@itemize @bullet
+@item occupied by an enemy (@code{X}) stone, which cannot be captured.
+@item either empty and @code{X} can safely play there, or occupied
+   by an @code{X} stone that can both be attacked and defended.
+@item occupied by an @code{O} stone, an @code{X} stone that can be attacked
+   but not defended, or it's empty and @code{X} cannot safely play there.
+@end itemize
+
+We give the first possibility a value of two, the second a value of
+one, and the last a value of zero. Summing the values for the diagonal
+intersections, we have the following criteria:
+
+@itemize @bullet
+@item sum >= 4: false eye
+@item sum == 3: half eye
+@item sum <= 2: proper eye
+@end itemize
+
+If the eye space is on the edge, the numbers above should be decreased
+by 2. An alternative approach is to award diagonal points which are
+outside the board a value of 1. To obtain an exact equivalence we must
+however give value 0 to the points diagonally off the corners, i.e.
+the points with both coordinates out of bounds.
+
+The algorithm to find all topologically false eyes and half eyes is:
+
+For all eye space points with at most one neighbor in the eye space,
+evaluate the status of the diagonal intersections according to the
+criteria above and classify the point from the sum of the values.
+
+@node False Margins, Eye Functions, Eye Topology, Eyes
+@comment  node-name,  next,  previous,  up
+@section False Margins
+
+The following situation is rare but special enough to warrant
+separate attention:
+
+@example
+   OOOOXX
+   OXaX..
+   ------
+@end example
+
+Here @samp{a} may be characterized by the fact that it is adjacent
+to O's eyespace, and it is also adjacent to an X group which cannot
+be attacked, but that an X move at 'a' results in a string with only
+one liberty. We call this a @dfn{false margin}. 
+
+For the purpose of the eye code, O's eyespace should be parsed
+as @code{(X)}, not @code{(X!)}.
+
+@node Eye Functions, , False Margins, Eyes
+@comment  node-name,  next,  previous,  up
+@section Functions in @file{optics.c}
+
+Here are the public functions in @file{optics.c}. The statically
+declared functions are documented in the source code.
+
+@itemize @bullet 
+@item @code{void make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD], struct eye_data w_eye[MAX_BOARD][MAX_BOARD])}
+@findex make_domains
+@quotation
+This function is called from make_dragons(). It marks the black
+and white domains (eyeshape regions) and collects some statistics
+about each one.
+@end quotation
+@item @code{void originate_eye(int i, int j, int m, int n, int *esize, int *msize, struct eye_data eye[MAX_BOARD][MAX_BOARD])}
+@findex originate_eye
+@quotation
+originate_eye(i, j, i, j, *size) creates an eyeshape with origin (i, j).
+the last variable returns the size. The repeated variables (i, j) are due
+to the recursive definition of the function.
+@end quotation
+@item @code{static void print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD], int i, int j)}
+@findex print_eye
+@quotation
+Print debugging data for the eyeshape at (i,j). Useful with GDB.
+@end quotation
+@item @code{void compute_eyes(int i, int  j, int *max, int *min, 
+	int *attacki, int *attackj, struct eye_data eye[MAX_BOARD][MAX_BOARD],
+	int add_moves, int color)}
+@findex compute_eyes
+@quotation
+Given an eyespace with origin (i,j), this function computes the
+minimum and maximum numbers of eyes the space can yield.
+If @code{add_moves==1}, this function may add a move_reason for @code{color} at
+a vital point which is found by the function. If @code{add_moves==0},
+set @code{color==EMPTY}.
+@end quotation
+@item @code{void compute_eyes_pessimistic(int i, int  j, int *max, int *min, int *pessimistic_min, int *attacki, int *attackj, int *defendi, int *defendj, struct eye_data eye[MAX_BOARD][MAX_BOARD], struct half_eye_data heye[MAX_BOARD][MAX_BOARD])}
+@findex compute_eyes_pessimistic
+@quotation
+This function works like compute_eyes(), except that it also gives
+a pessimistic view of the chances to make eyes. Since it is intended
+to be used from the owl code, the option to add move reasons has
+been removed.
+@end quotation
+@item @code{void propagate_eye (int i, int j, struct eye_data eye[MAX_BOARD][MAX_BOARD])}
+@findex propogate_eye
+@quotation
+Copies the data at the origin (i, j) to the rest of the eye (certain fields only).
+@end quotation
+@item @code{static int recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj, int *max, int *min, struct eye_data eye[MAX_BOARD][MAX_BOARD], struct half_eye_data heye[MAX_BOARD][MAX_BOARD], int add_moves, int color)}
+@quotation
+Declared static but documented here because of its importance. The life
+code supplies an alternative version of this function called
+@code{recognize_eye2()}.  Here @code{(i,j)} is the origin of an
+eyespace. Returns 1 if there is a pattern in @file{eyes.c} matching the
+eyespace, or 0 if no match is found. If there is a key point for attack,
+@code{(*ai, *aj)} are set to its location, or @code{(-1, -1)} if there is
+none.  Similarly @code{(*di, *dj)} is the location of a vital defense
+point. @code{*min} and @code{*max} are the minimum and maximum number of eyes
+that can be made in this eyespace respectively. Vital attack/defense points
+exist if and only if @code{*min != *max}. If @code{add_moves==1}, this
+function may add a move_reason for (color) at a vital point which is found by
+the function. If @code{add_moves==0}, set @code{color==EMPTY}.
+@end quotation
+@item @code{ void add_half_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD], struct half_eye_data hey[MAX_BOARD][MAX_BOARD])}
+@findex add_half_eye
+@quotation
+This function adds a half eye or false eye to an eye shape.
+@end quotation
+@item @code{int eye_space(int i, int j)}
+@findex eye_space
+@quotation
+Used from constraints to identify eye spaces, primarily for late endgame moves.
+This returns true if the location is an eye space of either color.
+@end quotation
+@item @code{int proper_eye_space(int i, int j)}
+@findex proper_eye_space
+@quotation
+Used from constraints to identify proper eye spaces, primarily for late
+endgame moves. Returns true if the location is an eye space of either
+color and is not marginal.
+@end quotation
+@item @code{int marginal_eye_space(int i, int j)}
+@findex marginal_eye_space
+@quotation
+Used from constraints to identify marginal eye spaces, primarily for late
+endgame moves. Returns true if the location is a marginal eye space of either
+color.
+@end quotation
+@item @code{void make_proper_eye_space(int i, int j, int color)}
+@quotation
+Turn a marginal eye space into a proper eye space.
+@end quotation
+@item @code{void remove_half_eye(int m, int n, int color)}
+@findex remove_half_eye
+@quotation
+Remove a halfeye from an eye shape.
+@end quotation
+@item @code{void remove_eyepoint(int m, int n, int color)}
+@findex remove_eyepoint
+@quotation
+Remove an eye point. This function can only be used before the
+segmentation into eyespaces.
+@end quotation
+@item @code{int topological_eye(int m, int n, int color, int *ai, int *aj, int *di, int *dj, struct eye_data b_eye[MAX_BOARD][MAX_BOARD], struct eye_data w_eye[MAX_BOARD][MAX_BOARD], struct half_eye_data heye[MAX_BOARD][MAX_BOARD])}
+@findex topological_eye
+@quotation 
+See @xref{Eye Topology}. Evaluate the eye space at @code{(m, n)} topologically
+(@pxref{Eye Topology}). Returns 2 or less if @code{(m, n)} is a proper eye for
+(color); 3 if @code{(m, n)} is a half eye; 4 if @code{(m, n)} is a false eye.
+@code{(*ai, *aj)} and @code{(*di, *dj)} return the coordinates of an unsettled
+diagonal intersection, or an attack or defense point of defense of an opponent
+stone occupying a diagonal intersection.
+@end quotation
+@item @code{int evaluate_diagonal_intersection(int m, int n, int color, int *vitali, int *vitalj)}
+@findex evaluate_diagonal_intersection
+@quotation
+Evaluate an intersection which is diagonal to an eye space
+(@pxref{Eye Topology}).  Returns 0 if the opponent cannot safely
+play at the vertex; Returns 1 if empty and the opponent can
+safely play on it, or if the vertex is occupied by an opponent
+stone which can be either attacked or defended. Returns 2 if
+safely occupied by the opponent.  Exception: if one coordinate is
+off the board, returns 1; if both are off the board, returns
+0. This guarantees correct behavior for diagonal intersections of
+points on the edge or in the corner. If the return value is 1,
+@code{(*vitali, *vitalj)} returns @code{(m, n)} if the vertex is
+empty, or the vital point of defense if it is occupied by an
+opponent stone.
+
+@end quotation
+@end itemize
+

@@ -1,0 +1,1254 @@
+This is gnugo.info, produced by makeinfo version 4.0 from gnugo.texi.
+
+INFO-DIR-SECTION GNU games
+START-INFO-DIR-ENTRY
+* GNU go: (gnugo).          The GNU Go program
+END-INFO-DIR-ENTRY
+
+
+File: gnugo.info,  Node: Positional Functions,  Prev: The Position Struct,  Up: API
+
+Functions which manipulate a Position
+=====================================
+
+   All the functions in the engine that manipulate Positions have names
+prefixed by `gnugo_'.  Here is a complete list, as defined in `gnugo.h':
+
+Functions which manipulate the go position
+------------------------------------------
+
+   * `void gnugo_clear_position(Position *pos, int boardsize, float
+     komi)'
+          Clear the position setting the board size to `boardsize' and
+          the komi to `komi'.
+
+   * `void gnugo_copy_position(Position *dest, Position *src)'
+          Copy position `src' to position `dest'. This is the same
+          convention that is used in `memcpy(3)'.
+
+   * `void gnugo_add_stone(Position *pos, int i, int j, int color)'
+          Add a stone of `color' at `(i,j)' to the position.
+
+   * `void gnugo_remove_stone(Position *pos, int i, int j)'
+          Remove the stone at `(i,j)' from the position. No check is
+          done that there actually is a stone there.
+
+   * `void gnugo_play_move(Position *pos, int i, int j, int color)'
+          Play a stone of color color at `(i, j)' in the position
+          removing captured stones if any. No check is done if the move
+          is legal; to do that, call `gnugo_is_legal()'. Suicide is
+          legal.
+
+   * `int gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)'
+          Place all the stones in and play all the moves in the SGF node
+          `node' (*note SGF::.) Return whose turn it is to move after
+          this is done.
+
+   * `int gnugo_play_sgftree(Position *pos, SGFNode *root, int *until,
+     SGFNode **curnode)'
+          Clear the position and play through the moves in SGF tree
+          `root' until the move number `until' has been reached.
+          Return whose turn it is to move after this is done. The
+          parameter `curnode' will be set to the current node in the
+          tree, i.e. the one which was played last.
+
+   * `int gnugo_is_legal(Position *pos, int i, int j, int color)'
+          Return 1 if the move at `(i,j)' would be legal; otherwise
+          return 0. The rule set used is standard japanese rules where
+          suicide is illegal. If there is a ko point set (`ko_i !=
+          -1'), then the ko point is also illegal to play on.
+
+   * `int gnugo_is_suicide(Position *pos, int i, int j, int color)'
+          Return 1 if the move at `(i,j)' would be suicide; otherwise
+          return 0.
+
+   * `int gnugo_placehand(Position *pos, int handicap)'
+          Sets up handicap stones, returning the number of placed
+          handicap stones.  Maximum handicap supported is 0 for board
+          sizes below 7, 4 for board sizes 7 or 8 and 9 for board sizes
+          from 9 and up.
+
+   * `int gnugo_sethand(Position *pos, int handicap, struct SGFNode_t
+     *root)'
+          Sets up handicap pieces and returns the number of placed
+          handicap stones, updating the SGF file.
+
+   * `void gnugo_recordboard(Position *pos, struct SGFNode_t *node)'
+          Records the position in the SGF node (*note SGF::).
+
+   * `int gnugo_genmove(Position *pos, int *i, int *j, int color, int
+     move_number)'
+          Generate a move for color `color' and return it in `(*i,*j)'.
+          The parameter `move_number' is the number of the current
+          move. This is mostly used for debugging reasons, as the game
+          handling functions all work on top of the move generation
+          part of the engine. (*note Move Generation Basics::.).
+
+   * `float gnugo_estimate_score(Position *pos, float *upper, float
+     *lower)'
+
+          Evaluate the approximate score. The score is given as an
+          interval with a lower and upper bound.  A positive score
+          means that white is leading, while a negative score is good
+          for black.  When the lower bound is estimated, CRITICAL
+          dragons are awarded to white; when estimating the lower
+          bound, they are awarded to black.
+
+          The estimation is returned through the pointers `*upper' and
+          `*lower', and the mean between them is returned as the
+          functions value.
+
+   * `void gnugo_who_wins(Position *pos, int color, FILE *outfile)'
+          Score the game and determine the winner.
+
+Status functions
+----------------
+
+   These functions examines the position in different ways and tells the
+status of groups and other items.
+
+   * `int gnugo_attack(Position *pos, int m, int n, int *i, int *j)'
+          Calls the tactical reading function `attack' to determine
+          whether the string at `(m, n)' can be captured (*note
+          Tactical Reading::).
+
+   * `int gnugo_find_defense(Position *pos, int m, int n, int *i, int
+     *j)'
+          Calls the tactical reading function `find_defense' to
+          determine whether the string at `(m, n)' can be rescued
+          (*note Tactical Reading::).
+
+Special functions
+-----------------
+
+   These functions are only used in special situations, such as when the
+program wants to access internal data structures within the engine. They
+should only be used when the programmer has a good knowledge of the
+internals of GNU Go.
+
+   * `void gnugo_force_to_globals(Position *pos)'
+          Put the values in `pos' into the global variables which is the
+          equivalent of the `Position'.
+
+   * `void gnugo_examine_position(Position *pos, int color, int
+     how_much)'
+          Calls `examine_position()', doing much prelimary analysis of
+          the board position (*note Move Generation Basics::).
+
+Game handling
+=============
+
+   The functions (in *note Positional Functions::) are all that are
+needed to create a fully functional go program.  But to make the life
+easier for the programmer, there is a small set of functions specially
+designed for handling ongoing games.
+
+   The data structure describing an ongoing game is the `Gameinfo'. It
+is defined as follows:
+
+
+     typedef struct {
+       int       handicap;
+     
+       Position  position;
+       int       move_number;
+       int       to_move;		/* whose move it currently is */
+       SGFTree   moves;		/* The moves in the game. */
+     
+       int       seed;		/* random seed */
+       int       computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
+     
+       char      outfilename[128];	/* Trickle file */
+       FILE      *outfile;
+     } Gameinfo;
+
+   The meaning of `handicap' should be obvious. The `position' field is
+of course the current position, `move_number' is the number of the
+current move and `to_move' is the color of the side whose turn it is to
+move.
+
+   The SGF tree `moves' is used to store all the moves in the entire
+game, including a header node which contains, among other things, komi
+and handicap. If a player wants to undo a move, this can most easily be
+done by replaying all the moves in the tree except for the last one.
+This is the way it is implemented in `gameinfo_undo_move()'.
+
+   If one or both of the opponents is the computer, the fields `seed'
+and `computer_player' are used. Otherwise they can be ignored. `seed'
+is used to store the number used to seed the random number generator.
+Given the same moves from the opponent, GNU Go will try to vary its
+game somewhat using a random function. But if the random generator is
+given the same seed, GNU Go will always play the same move. This is
+good, e.g. when we debug the engine but could also be used for other
+purposes.
+
+   GNU Go can use a trickle file to continuously save all the moves of
+an ongoing game. This file can also contain information about internal
+state of the engine such as move reasons for various locations or move
+valuations for the 10 highest valued moves. The name of this file should
+be stored in `outfilename' and the file pointer to the open file is
+stored in `outfile'. If no trickle file is used, `outfilename[0]' will
+contain a null character and `outfile' will be set to `NULL'.
+
+Functions which manipulate a Gameinfo
+-------------------------------------
+
+   All the functions in the engine that manipulate Gameinfos have names
+prefixed by `gameinfo_'.  Here is a complete list, as defined in
+`gnugo.h':
+
+   * `void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)'
+          Clear the Gameinfo to an empty state. The board size of the
+          `Position' is set to `boardsize'.
+
+   * `void gameinfo_print(Gameinfo *ginfo)'
+          Print the Gameinfo on stdout. This is mostly a debug tool.
+
+   * `void gameinfo_load_sgfheader(Gameinfo *ginfo, SGFNode *head)'
+          Load header information from the SGF node `head' and set the
+          appropriate variables in `ginfo'.
+
+   * `void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)'
+          Play a move at (`i', `j'), record it in `moves', print it to
+          the trickle file if any and update `move_number' and
+          `to_move'.
+
+   * `void gameinfo_undo_move(Gameinfo *ginfo)'
+          Replays all the moves of the game except the last one. It
+          also updates `move_number', `to_move' and `moves'. If there
+          is a trickle file, it is truncated to the second to last move.
+
+          *FIXME: Not yet implemented.*
+
+   * `int gameinfo_play_sgftree(Gameinfo *ginfo, SGFNode *head, const
+     char *untilstr)'
+          Read header information and play the main variation in the
+          SGF tree starting with `head'.  Return whose turn it is to
+          move after this is done.
+
+          The parameter `untilstr' is an optional string of the form
+          'L12' (a board position) or '120' (a move number) which tells
+          the function to stop playing at that move or move number.
+
+
+
+File: gnugo.info,  Node: SGF,  Next: Libboard,  Prev: API,  Up: Top
+
+Handling SGF trees in memory
+****************************
+
+   "SGF" - Smart Game Format - is a file format which is used for
+storing game records for a number of different games, among them chess
+and go. The format is a framework with special adaptions to each game.
+This is not a description of the file format standard. Too see the exact
+definition of the file format, see <http://www.red-bean.com/sgf/>.
+
+   GNU Go contains a library to handle go game records in the SGF
+format in memory and to read and write SGF files. This library -
+`libsgf.a' - is in the `sgf' subdirectory. To use the SGF routines,
+include the file `sgftree.h'.
+
+   Each game record is stored as a tree of "nodes", where each node
+represents a state of the game, often after some move is made. Each node
+contains zero or more "properties", which gives meaning to the node.
+There can also be a number of "child nodes" which are different
+variations of the game tree. The first child node is the main variation.
+
+   Here is the definition of `SGFNode', and `SGFProperty', the data
+structures which are used to encode the game tree.
+
+
+     typedef struct SGFProperty_t {
+       struct SGFProperty_t *next;
+       short  name;
+       char   value[1];
+     } SGFProperty;
+     
+     typedef struct SGFNode_t {
+       SGFProperty      *props;
+       struct SGFNode_t *parent;
+       struct SGFNode_t *child;
+       struct SGFNode_t *next;
+     } SGFNode;
+
+   Each node of the SGF tree is stored in an `SGFNode' struct. It has a
+pointer to a linked list of properties (see below) called `props'. It
+also has a pointer to a linked list of children, where each child is a
+variation which starts at this node. The variations are linked through
+the `next' pointer and each variation continues through the `child'
+pointer. Each and every node also has a pointer to its parent node (the
+`parent' field), except the top node whose parent pointer is `NULL'.
+
+   An SGF property is encoded in the `SGFPoperty' struct. It is linked
+in a list through the `next' field.  A property has a `name' which is
+encoded in a short int.  Symbolic names of properties can be found in
+`sgf_properties.h'.
+
+   Some properties also have a value, which could be an integer, a
+floating point value, a character or a string. These values can be
+accessed or set through special functions (see below).
+
+Functions which manipulate SGF nodes and properties
+===================================================
+
+   All the functions which create and manipulate SGF trees are prefixed
+by `sgf'.  The SGF code was donated to us by Thomas Traber, so they
+don't follow the naming conventions of GNU Go perfectly.
+
+Low level functions
+-------------------
+
+   These functions let the caller create nodes or access nodes easier.
+
+   * `SGFNode *sgfNewNode(void)'
+          Allocate and return a new instance of `SGFNode'. The node is
+          cleared.
+
+   * `SGFProperty *sgfMkProperty(const char *name, const  char *value,
+      SGFNode *node, SGFProperty *last)'
+          Allocate and return a new instance of `SGFProperty'. The
+          `name' should be 1 or 2 characters long.  This function should
+          probably not be used directly. Instead, use the
+          `sgfAddProperty' functions.
+
+   * `SGFNode *sgfPrev(SGFNode *node)'
+          Return the previous node in a chain. This is done by going to
+          the parent node and then search through the children until
+          the same node is found.  If there is no previous node, `NULL'
+          is returned.
+
+   * `SGFNode *sgfRoot(SGFNode *node)'
+          Return the root of the tree.  If `node' already is the root,
+          `node' itself is returned.
+
+
+Functions which manipulate SGF properties
+-----------------------------------------
+
+   * `int sgfGetIntProperty(SGFNode *node, const char *name, int
+     *value)'
+          Get the property `name' in `node' as an integer. The value is
+          returned in `value'. Returns 1 if successful, otherwise
+          returns 0.
+
+   * `int sgfGetFloatProperty(SGFNode *node, const char *name, float
+     *value)'
+          Get the property `name' in `node' as a floating point value.
+          The value is returned in `value'. Returns 1 if successful,
+          otherwise returns 0.
+
+   * `int sgfGetCharProperty(SGFNode *node, const char *name, char
+     **value)'
+          Get the property `name' in `node' as a string of characters.
+          The value is returned in `value'. Returns 1 if successful,
+          otherwise returns 0.
+
+   * `void sgfAddProperty(SGFNode *node, const char *name, const char
+     *value)'
+          Add a new property to `node'. There is no check to see if
+          there already is a property with the same name. The property
+          value has to be a character string.
+
+   * `void sgfAddPropertyInt(SGFNode *node, const char *name, long val)'
+          Add an integer property to `node'. This function converts the
+          value to a string and calls `sgfAddProperty'.
+
+   * `void sgfAddPropertyFloat(SGFNode *node, const char *name, float
+     val)'
+          Add a floating point property to `node'. This function
+          converts the value to a string and calls `sgfAddProperty'.
+
+   * `void sgfOverwriteProperty(SGFNode *node, const char *name, const
+     char *text)'
+          Overwrite the property `name' in `node' with the string
+          `text'.  If the property does not yet exist in `node', it is
+          added using `sgfAddProperty'.
+
+   * `void sgfOverwritePropertyInt(SGFNode *node, const char *name, int
+     value)'
+          Overwrite the property `name' in `node' with the integer
+          `value'.  If the property does not yet exist in `node', it is
+          added using `sgfAddPropertyInt'.
+
+   * `void sgfOverwritePropertyFloat(SGFNode *node, const char *name,
+     float value)'
+          Overwrite the property `name' in `node' with the floating
+          point number `value'.  If the property does not yet exist in
+          `node', it is added using `sgfAddPropertyFloat'.
+
+
+Functions which manipulate SGF nodes
+------------------------------------
+
+   * `SGFNode *sgfAddStone(SGFNode *node, int color, int movex, int
+     movey)'
+          Add a stone to `node'. Properties added is either `AB' (black
+          stone) or `AW' (white stone).
+
+   * `SGFNode *sgfAddPlay(SGFNode *node, int who, int movex, int movey)'
+
+          Add a child node with a move to `node'. Properties added is
+          either `B' (black move) or `W' (white move).  A pass is coded
+          by `(-1, -1)'.
+
+          This function does not add a property to the node itself, but
+          adds a child node instead. If there are previous child nodes,
+          the new node is placed before the other ones, so this
+          function should be used if you want to add a main branch to
+          the tree. To add a variation, use `sgfAddPlayLast' instead.
+
+   * `SGFNode *sgfAddPlayLast(SGFNode *node, int who, int movex, int
+     movey)'
+
+          Add a child node with a move to `node'. Properties added is
+          either `B' (black move) or `W' (white move).  A pass is coded
+          by `(-1, -1)'.
+
+          If there are previous child nodes in `node', the move is
+          added by adding the child node last, so this function should
+          be used when you want to add a variation to the game tree.
+
+   * `int sgfPrintCharProperty(FILE *file, SGFNode *node, const char
+     *name)'
+          Print the properties of type `name' in `node' on `file'.
+
+   * `int sgfPrintCommentProperty(FILE *file, SGFNode *node, const char
+     *name)'
+          Print the comment properties of type `name' in `node' on
+          `file'.
+
+   * `void sgfWriteResult(SGFNode *node, float score, int overwrite)'
+          Add a `RE' (result) property to `node'. This property will
+          contain the game result. If `overwrite' is zero the result is
+          written only if no previous result property exists.
+
+   * `SGFNode *sgfCircle(SGFNode *node, int i, int j)'
+          Add a `CR' (circle) property at `(i, j)' to `node'.
+
+   * `SGFNode *sgfSquare(SGFNode *node, int i, int j)'
+          Calls `sgfMark' to add a `MA' (mark) property at `(i, j)' to
+          `node'.
+
+   * `SGFNode *sgfTriangle(SGFNode *node, int i, int j)'
+          Add a `TR' (triangle) property at `(i, j)' to `node'.
+
+   * `SGFNode *sgfMark(SGFNode *node, int i, int j)'
+          Add a `MA' (mark) property at `(i, j)' to `node'.
+
+   * `SGFNode *sgfAddComment(SGFNode *node, const char *comment)'
+          Add a `C' (comment) property to `node'.
+
+   * `SGFNode *sgfBoardText(SGFNode *node, int i, int j, const char
+     *text)'
+          Add a `LB' (label) property at `(i, j)' to `node'.
+
+   * `SGFNode *sgfBoardChar(SGFNode *node, int i, int j, char c)'
+          Add a `LB' (label) property at `(i, j)' to `node'. This
+          functions is a utility function that converts the character
+          to a string and calls `sgfBoardText'.
+
+   * `SGFNode *sgfBoardNumber(SGFNode *node, int i, int j, int number)'
+          Add a numeric label at `(i, j)' by calling `sgfBoardText'.
+
+   * `SGFNode *sgfStartVariant(SGFNode *node)'
+
+          Start a new variation in the game tree. This means that the
+          `next' pointer of `node' is followed to the end of the list
+          and a new node is inserted there. A pointer to the new node
+          is returned.
+
+   * `SGFNode *sgfStartVariantFirst(SGFNode *node)'
+
+          Same as `sgfStartVariant', except that the node is placed
+          first in the list. This means that the new variation will be
+          the main variation of the game tree. Returns a pointer to the
+          new node.
+
+   * `SGFNode *sgfAddChild(SGFNode *node)'
+          Adds a child node to `node'. If there already are children,
+          the new node is placed last in the list. Returns a pointer to
+          the new node.
+
+
+High level functions
+--------------------
+
+   * `SGFNode *sgfCreateHeaderNode(int boardsize, float komi)'
+          Create a new SGF node with the two properties `SZ' (size) and
+          `KM' (komi).  More properties, like `HA' (handicap), can later
+          be added to it.
+
+          The idea with this node is to store the game info and to use
+          as a root node for the game.
+
+   * `SGFNode *readsgffile(const char *filename)'
+          Read an SGF file and return the resulting tree.
+
+   * `void sgf_write_header(SGFNode *root, int overwrite, int seed,
+     float komi)'
+          Write random seed, date, ruleset, komi and SGF file version
+          to the header node `root'. If `overwrite' is non-zero, it
+          overwrites the values in the node, otherwise it just writes
+          those that are missing.
+
+          Ruleset is always set to "Japanese", date is set to the
+          current date.
+
+   * `int writesgf(SGFNode *root, const char *filename)'
+          Write the tree starting in `root' to the file `filename'.  If
+          `filename' is `-', the tree is written to `stdout'. Returns 1
+          if successful, otherwise returns 0.
+
+
+The SGFTree datatype
+====================
+
+   Sometimes we just want to record an ongoing game or something
+similarly simple and not do any sofisticated tree manipulation.  In
+that case we can use the simplified interface provided by `SGFTree'
+below.
+
+
+     typedef struct SGFTree_t {
+       SGFNode *root;
+       SGFNode *lastnode;
+     } SGFTree;
+
+   An `SGFTree' contains a pointer to the root node of an SGF tree and
+a pointer to the node that we last accessed. Most of the time this will
+be the last move of an ongoing game.
+
+   Most of the functions which manipulate an `SGFTree' work exactly
+like their `SGFNode' counterparts, except that they work on the current
+node of the tree.
+
+   All the functions below that take arguments `tree' and `node' will
+work on:
+
+  1. `node' if non-`NULL'
+
+  2. `tree->lastnode' if non-`NULL'
+
+  3. The current end of the game tree.
+        in that order.
+
+Functions that manipulate sgftrees
+----------------------------------
+
+   * `void sgftree_clear(SGFTree *tree)'
+          Clear the `root' and `lastnode' pointers of `tree'. `NOTE:'
+          This function does not free any memory. That has to be done
+          separately.
+
+   * `int sgftree_readfile(SGFTree *tree, const char *infilename)'
+          Read an SGF file with the name `infilename' and store it in
+          `tree'. Return 1 if successful, otherwise return 0. `lastnode'
+          will be set to `NULL'.
+
+   * `SGFNode *sgftreeNodeCheck(SGFTree *tree, SGFNode *node)'
+          Return the node to work on as described above. This is:
+            1. `node' if non-`NULL'
+
+            2. `tree->lastnode' if non-`NULL'
+
+            3. The current end of the tree.
+               in that order.
+
+
+   * `SGFNode *sgftreeAddPlay(SGFTree *tree, SGFNode *node, int color
+     int movex, int movey)'
+          Add a move of `color' at `(movex,movey)' to the tree. *Note
+          sgfAddPlay: sgfAddPlay.
+
+   * `SGFNode *sgftreeAddPlayLast(SGFTree *tree, SGFNode *node, int
+     color, int movex, int movey)'
+          Add a variation of `color' at `(movex,movey)' to the tree.
+          *Note sgfAddPlayLast: sgfAddPlayLast.
+
+   * `SGFNode *sgftreeAddStone(SGFTree *tree, SGFNode *node, int color,
+     int movex, int movey)'
+          Add a stone of `color' at `(movex,movey)' to the tree.
+
+   * `void sgftreeWriteResult(SGFTree *tree, float score, int
+     overwrite)'
+          Add the result to the tree. If there already is a result,
+          only overwrite it if `overwrite' is non-zero.
+
+   * `SGFNode *sgftreeCircle  (SGFTree *tree, SGFNode *node, int i, int
+     j)'
+          Add a circle property at `(i, j)' to the tree.
+
+   * `SGFNode *sgftreeSquare  (SGFTree *tree, SGFNode *node, int i, int
+     j)'
+          Add a square property at `(i, j)' to the tree.
+
+   * `SGFNode *sgftreeTriangle(SGFTree *tree, SGFNode *node, int i, int
+     j)'
+          Add a triangle property at `(i, j)' to the tree.
+
+   * `SGFNode *sgftreeMark(SGFTree *tree, SGFNode *node, int i, int j)'
+          Add a mark property at `(i, j)' to the tree.
+
+   * `SGFNode *sgftreeAddComment(SGFTree *tree, SGFNode *node, const
+     char *comment)'
+          Add a comment property to the tree. This is a property of the
+          node itself, and has no position on the board.
+
+   * `SGFNode *sgftreeBoardText(SGFTree *tree, SGFNode *node, int i,
+     int j, const char *text)'
+          Add a text property at `(i, j)' to the tree.
+
+   * `SGFNode *sgftreeBoardChar(SGFTree *tree, SGFNode *node, int i,
+     int j, char c)'
+          Add a character at `(i, j)' to the tree.
+
+   * `SGFNode *sgftreeBoardNumber(SGFTree *tree, SGFNode *node, int i,
+     int j, int number)'
+          Add a number at `(i, j)' to the tree.
+
+   * `SGFNode *sgftreeStartVariant(SGFTree *tree, SGFNode *node)'
+          Start a new variation in the tree. *Note sgfStartVariant:
+          sgfStartVariant.
+
+   * `SGFNode *sgftreeStartVariantFirst(SGFTree *tree, SGFNode *node)'
+          Start a new main variation in the tree. *Note
+          sgfStartVariantFirst: sgfStartVariantFirst.
+
+   * `SGFNode *sgftreeCreateHeaderNode(SGFTree *tree, int boardsize,
+     float komi)'
+          Add a header node first in `tree'.
+
+   * `void sgftreeSetLastNode(SGFTree *tree, SGFNode *last_node)'
+          Explicitly set the last accessed node in `tree' to
+          `last_node'.
+
+
+
+File: gnugo.info,  Node: Libboard,  Next: Move Generation,  Prev: SGF,  Up: Top
+
+The Board Library
+*****************
+
+* Menu:
+
+* Board Data Structures::      Board Data Structures
+* Board Setup Functions::      Board Setup Functions
+* Move Functions::             Move Functions
+* Status Functions::           Status Functions
+* String Functions::           String and Miscellaneous Functions
+
+   The foundation of the GNU Go engine is a library of very efficient
+routines for handling go boards.  This board library, called
+`libboard', can be used for those programs that only need a basic go
+board but no AI capability. One such program is `patterns/joseki'
+subdirectory, which compiles joseki pattern databases from SGF files.
+
+   The library consists of the following files:
+
+   * `board.c'
+          The basic board code.  It uses incremental algorithms for
+          keeping track of strings and liberties on the go board.
+
+   * `hash.c'
+          Code for hashing go positions.
+
+   * `cache.c'
+          Code for caching go positions
+
+   * `globals.c'
+          Global variables needed in the rest of the files.  This file
+          also contains global variables needed in the rest of the
+          engine.
+
+   * `sgffile.c'
+          Implementation of output file in SGF format.
+
+   * `showbord.c'
+          Print go boards.
+
+   * `printutils.c'
+          Utilities for printing go boards and other things.
+
+
+   To use the board library, you must include `liberty.h' just like
+when you use the whole engine, but of course you cannot use all the
+functions declared in it, i.e. the functions that are part of the
+engine, but not part of the board library.  You must link your
+application with `libboard.a'.
+
+
+File: gnugo.info,  Node: Board Data Structures,  Next: Board Setup Functions,  Up: Libboard
+
+Board Data structures
+=====================
+
+   The basic data structures of the board correspond tightly to the
+`Position' struct described in *Note The Position Struct::. They are all
+stored in global variables for efficiency reasons, the most important
+of which are:
+
+
+     int           board_size;
+     Intersection  p[MAX_BOARD][MAX_BOARD];
+     int           board_ko_i;
+     int           board_ko_j;
+     int           last_moves_i[2];
+     int           last_moves_j[2];
+     
+     float         komi;
+     int           white_captured;
+     int           black_captured;
+     
+     Hash_data     hashdata;
+
+   The description of the `Position' struct is applicable to these
+variables also, so we won't duplicate it here.  All these variables are
+globals for performance reasons.  Behind these variables, there are a
+number of other private data structures.  These implement incremental
+handling of strings, liberties and other properties (*note Incremental
+Board::). The variable `hashdata' contains information about the hash
+value for the current position (*note Hashing::).
+
+   These variables should never be manipulated directly, since they are
+only the front end for the incremental machinery. They can be read, but
+should only be written by using the functions described in the next
+section. If you write directly to them, the incremental data structures
+will become out of sync with each other, and a crash is the likely
+result.
+
+
+File: gnugo.info,  Node: Board Setup Functions,  Next: Move Functions,  Prev: Board Data Structures,  Up: Libboard
+
+Board Functions
+===============
+
+   These functions are all the public functions in `engine/board.c'.
+
+Setup Functions
+---------------
+
+   These functions are used when you want to set up a new position
+without actually playing out moves.
+
+   * `void clear_board()'
+          Clears the internal board (`p[][]'), resets the ko position,
+          captured stones and recalculates the hash value.
+
+   * `void setup_board(Intersection new_p[MAX_BOARD][MAX_BOARD], int
+     koi, int koj, int *last_i, int *last_j, float new_komi, int
+     w_captured, int b_captured)'
+          Set up a new board position using the parameters.
+
+   * `void add_stone(int i, int j, int color)'
+          Place a stone on the board and update the hashdata.  No
+          captures are done.
+
+   * `void remove_stone(int i, int j)'
+          Remove a stone from the board and update the hashdata.
+
+
+File: gnugo.info,  Node: Move Functions,  Next: Status Functions,  Prev: Board Setup Functions,  Up: Libboard
+
+Move Functions
+--------------
+
+   *Reading*, often called *search* in computer game theory, is a
+fundamental process in GNU Go. This is the process of generating
+hypothetical future boards in order to determine the answer to some
+question, for example "can these stones live."  Since these are
+hypothetical future positions, it is important to be able to undo them,
+ultimately returning to the present board. Thus a move stack is
+maintained during reading. When a move is tried, by the function
+`trymove', or its variant `tryko'. This function pushes the current
+board on the stack and plays a move. The stack pointer `stackp', which
+keeps track of the position, is incremented. The function `popgo()'
+pops the move stack, decrementing `stackp' and undoing the last move
+made.
+
+   Every successful `trymove()' must be matched with a `popgo()'.  Thus
+the correct way of using this function is:
+
+
+       if (trymove(i, j, color, [message], k, l, komaster, kom_i, kom_j)) {
+            ...    [potentially lots of code here]
+            popgo();
+       }
+
+Here the `komaster' is only set if a conditional ko capture has been
+made at an earlier move. This feature of the tactical and owl reading
+code in GNU Go is used to prevent redundant reading when there is a ko
+on the board (*note Ko::). If komaster is not defined then take the
+last three parameters to be `EMPTY', and `-1, -1'.
+
+   * `void play_move(int i, int j, int color)'
+          Play a move at `(i, j)'. If you want to test for legality you
+          should first call `is_legal()'. This function strictly
+          follows the algorithm:
+          1. Place a stone of given color on the board.
+          2. If there are any adjacent opponent strings without
+          liberties, remove them and increase the prisoner count.
+          3. If the newly placed stone is part of a string without
+          liberties, remove it and increase the prisoner count.
+
+   * `int trymove(int i, int j, int color, const char *message, int k,
+     int l, int komaster, int kom_i, int kom_j)'
+          Returns true if `(i,j)' is a legal move for `color'. In that
+          case, it pushes the board on the stack and makes the move,
+          incrementing `stackp'. If the reading code is recording
+          reading variations (as with `--decide-string' or with `-o'),
+          the string `*message' will be inserted in the SGF file as a
+          comment. The comment will also refer to the string at `(k,l)'
+          if these are not `(-1,-1)'.
+
+   * `int TRY_MOVE()'
+          Wrapper around trymove which suppresses `*message' and
+          `(k,l)'.  Used in `helpers.c'
+
+   * `int tryko(int i, int j, int color, const char *message, int
+     komaster, kom_i, kom_j)'
+          `tryko()' pushes the position onto the stack, and makes a move
+          `(i, j)' of `color'. The move is allowed even if it is an
+          illegal ko capture. It is to be imagined that `color' has
+          made an intervening ko threat which was answered and now the
+          continuation is to be explored. Return 1 if the move is legal
+          with the above caveat. Returns zero if it is not legal
+          because of suicide.
+
+   * `void popgo()'
+          Pops the move stack. This function must (eventually) be
+          called after a succesful `trymove' or `tryko' to restore the
+          board position. It undoes all the changes done by the call to
+          `trymove/tryko' and leaves the board in the same state as it
+          was before the call.
+
+          *NOTE*: If `trymove/tryko' returns `0', i.e. the tried move
+          was not legal, you must *not* call `popgo'.
+
+   * `int komaster_trymove(int i, int j, int color,  const char
+     *message, int si, int sj,  int komaster, int kom_i, int kom_j,
+     int *new_komaster, int *new_kom_i, int *new_kom_j,  int
+     *is_conditional_ko, int consider_conditional_ko)'
+          Variation of `trymove'/`tryko' where ko captures (both
+          conditional and unconditional) must follow a komaster scheme
+          (*note Ko::).
+
+   * `int move_in_stack(int m, int n, int cutoff)'
+          Returns true if at least one move been played at `(m, n)' at
+          deeper than level 'cutoff' in the reading tree.
+
+   * `void get_move_from_stack(int k, int *i, int *j, int *color)'
+          Retrieve the move number `k' from the move stack.  The move
+          location is returned in `(*i, *j)', and the color that made
+          the move is returned in `*color'.
+
+   * `void dump_stack(void)'
+          Handy for debugging the reading code under GDB. Prints the
+          move stack.  Usage: `(gdb) set dump_stack()'.
+
+   * `void reset_trymove_counter()'
+          Reset the trymove counter.  This counter is incremented every
+          time that a variant of `trymove' or `tryko' is called.
+
+   * `int get_trymove_counter()'
+          Retrieve the trymove counter.
+
+
+File: gnugo.info,  Node: Status Functions,  Next: String Functions,  Prev: Move Functions,  Up: Libboard
+
+Status Functions
+----------------
+
+   These functions are used for inquiring about properties of the
+current position or of potential moves.
+
+   * `int is_pass(int i, int j)'
+          Returns true if the move `(i,j)' is a pass move, i.e. `(-1,
+          -1)'.
+
+   * `int is_legal(int i, int j, int color)'
+          Returns true if a move at `(i,j)' is legal for `color'.
+
+   * `int is_ko(int m, int n, int color, int *ko_i, int *ko_j)'
+          Return true if the move `(i,j)' by `color' is a ko capture
+          whether capture is a legal ko capture on this move or not. If
+          `(*ko_i,*ko_j)' are non-`NULL', then the location of the
+          captured ko stone are returned through `(*ko_i,*ko_j)'. If
+          the move is not a ko capture, `(*ko_i,*ko_j)' is set to `(-1,
+          -1)'.
+
+   * `int is_illegal_ko_capture(int i, int j, int color)'
+          Return true if the move `(i,j)' by `color' would be an illegal
+          ko capture.  There is no need to call both `is_ko' and
+          `is_illegal_ko_capture'.
+
+   * `int is_self_atari(int i, int j, int color)'
+          Return true if a move by `color' at `(i, j)' would be a self
+          atari, i.e. whether it would get only one liberty. This
+          function returns true also for the case of a suicide move.
+
+   * `int is_suicide(int i, int j, int color)'
+          Returns true if a move at `(i,j)' is suicide for `color'.
+
+   * `int does_capture_something(int i, int j, int color)'
+          Returns true if a move at `(i,j)' does capture any stone for
+          the other side.
+
+   * `int stones_on_board(int color)'
+          Return the number of stones of the indicated color(s) on the
+          board. This only count stones in the permanent position, not
+          stones placed by `trymove()' or `tryko()'. Use
+          `stones_on_board(BLACK | WHITE)' to get the total number of
+          stones on the board.
+
+
+File: gnugo.info,  Node: String Functions,  Prev: Status Functions,  Up: Libboard
+
+String and Miscellaneous Functions
+----------------------------------
+
+   These functions are used for getting information like liberties,
+member stones and similar about strings. Most of these are here because
+they have a particularly efficient implementation through access to the
+incremental data structures behind the scene.
+
+   * `void find_origin(int i, int j, int *origini, int *originj)'
+          Find the origin of a worm or a cavity, i.e. the point with
+          smallest `i' coordinate and in the case of a tie with
+          smallest `j' coordinate.  The idea is to have a canonical
+          reference point for a string.
+
+   * `int findstones(int m, int n, int maxstones, int *stonei, int
+     *stonej)'
+          Find the stones of the string at `(m, n)'. `(m, n)' must not
+          be empty. The locations of up to `maxstones' stones are
+          written into `(stonei[], stonej[])'. The full number of
+          stones is returned.
+
+   * `int countstones(int m, int n)'
+          Count the number of stones in a string.
+
+   * `void mark_string(int i, int j, char mx[MAX_BOARD][MAX_BOARD],
+     char mark)'
+          For each stone in the string at `(i, j)', set `mx' to value
+          `mark'. If some of the stones in the string are marked prior
+          to calling this function, only the connected unmarked stones
+          starting from `(i, j)' are guaranteed to become marked. The
+          rest of the string may or may not become marked.
+
+   * `int liberty_of_string(int ai, int aj, int si, int sj)'
+          Returns true if `(ai, aj)' is a liberty of the string at
+          `(si, sj)'.
+
+   * `int neighbor_of_string(int ai, int aj, int si, int sj)'
+          Returns true if `(ai, aj)' is adjacent to the string at `(si,
+          sj)'.
+
+   * `int same_string(int ai, int aj, int bi, int bj)'
+          Returns true if `(ai, aj)' is a stone in the same string as
+          `(bi, bj)'.
+
+   * `int findlib(int m, int n, int maxlib, int *libi, int *libj)'
+          Find the liberties of the string at `(m, n)', which must not
+          be empty. The locations of up to maxlib liberties are written
+          into `(libi[], libj[])'. The full number of liberties is
+          returned.  If you want the locations of all liberties,
+          whatever their number, you should pass `MAXLIBS' as the value
+          for maxlib and allocate space for `libi[], libj[]'
+          accordingly.
+
+   * `int countlib(int m, int n)'
+          Count the number of liberties of the string at `(m,n)', which
+          must not be empty.
+
+   * `int approxlib(int m, int n, int maxlib, int *libi, int *libj)'
+          Find the liberties a stone of the given color would get if
+          played at `(m, n)', ignoring possible captures of opponent
+          stones.  `(m, n)' must be empty. If `libi!=NULL', the
+          locations of up to maxlib liberties are written into
+          `(libi[], libj[])'. The counting of liberties may or may not
+          be halted when maxlib is reached. The number of liberties
+          found is returned. If you want the number or the locations of
+          all liberties, however many they are, you should pass
+          `MAXLIBS' as the value for maxlib and allocate space for
+          `libi[], libj[]' accordingly.
+
+   * `int chainlinks(int m, int n, int adji[MAXCHAIN], int
+     adjj[MAXCHAIN])':
+          Returns (in `adji[]', `adjj[]' arrays) the chain (strings)
+          surrounding the string at `(m, n)'.  The chain is defined as
+          the set of strings in immediate connection to the `(m, n)'
+          string.  Return value is the number of strings in the chain.
+
+   * `void chainlinks2(int m, int n, int adji[MAXCHAIN], int
+     adjj[MAXCHAIN], int lib)'
+          Returns (in `adji[]', `adjj[]' arrays) the strings surrounding
+          the string at `(m, n)', which have exactly `lib' liberties.
+
+Miscellaneous Functions
+-----------------------
+
+   * `void incremental_order_moves(int mi, int mj, int color,
+                      int si, int sj,                             int
+     *number_edges, int *number_same_string,
+     int *number_own, int *number_opponent,
+     int *captured_stones, int *threatened_stones,
+            int *saved_stones, int *number_open)'
+          Help collect the data needed by `order_moves()' in
+          `reading.c'.  It's the caller's responsibility to initialize
+          the result parameters.
+
+Hashing of Board Positions
+==========================
+
+   Hashing of go positions in a hash table (sometimes also called a
+transposition table) is implemented in `libboard', in `hash.c' and
+`cache.c' to be exact.
+
+   To use the hash function, you must include `hash.h' and to use the
+entire hash table, you must include `cache.h' in your program.  The
+details are described in *Note Hashing::.
+
+
+File: gnugo.info,  Node: Move Generation,  Next: Worms and Dragons,  Prev: Libboard,  Up: Top
+
+Move generation
+***************
+
+* Menu:
+
+* MG Intro::                    Introduction.
+* MG Overview ::                Overview.
+* MG Info::                     Information gathering.
+* MG Reasons::                  Generation of move reasons.
+* MG Details::                  Detailed Descriptions of Move Reasons
+* Valuation:: 			Valuating the moves
+* Move Generation Functions::   Move Generation Functions
+* Local MG Functions::		Static Functions
+* End Game::			Endgame move generation
+
+
+File: gnugo.info,  Node: MG Intro,  Next: MG Overview,  Prev: Move Generation,  Up: Move Generation
+
+Introduction
+============
+
+   GNU Go 3.0 has a move generation scheme that is substantially
+different from earlier versions. In particular, it is different from
+the method of move generation in GNU Go 2.6.
+
+   In the old scheme, various move generators suggested different moves
+with attached values. The highest such value then decided the move.
+There were two important drawbacks with this scheme:
+
+   * Efficient multipurpose moves could only be found by patterns which
+     explicitly looked for certain combinations, such as a simultaneous
+     connection and cut. There was also no good way to e.g. choose among
+     several attacking moves.
+
+   * The absolute move values were increasingly becoming harder to tune
+     with the increasing number of patterns. They were also fairly
+     subjective and the tuning could easily break in unexpected ways
+     when something changed, e.g. the worm valuation.
+
+   The basic idea of the new move generation scheme is that the various
+move generators suggest reasons for moves, e.g. that a move captures
+something or connects two strings, and so on. When all reasons for the
+different moves have been found, the valuation starts. The primary
+advantages are
+
+   * The move reasons are objective, in contrast to the move values in
+     the old scheme. Anyone can verify whether a suggested move reason
+     is correct.
+
+   * The centralized move valuation makes tuning easier. It also allows
+     for style dependent tuning, e.g. how much to value influence
+     compared to territory. Another possibility is to increase the value
+     of safe moves in a winning position.
+
+
+File: gnugo.info,  Node: MG Overview,  Next: MG Info,  Prev: MG Intro,  Up: Move Generation
+
+Overview
+========
+
+   The engine of GNU Go takes a position and a color to move and
+generates the (supposedly) optimal move. This is done by the function
+genmove() in engine/genmove.c.
+
+   The move generation is done in three steps:
+
+  1. information gathering
+
+  2. generation of moves and move reasons
+
+  3. valuation of the suggested moves
+
+   This is somewhat simplified. In reality there is some overlap between
+the steps.
+
+
+File: gnugo.info,  Node: MG Info,  Next: MG Reasons,  Prev: MG Overview,  Up: Move Generation
+
+Information gathering
+=====================
+
+   First we have to collect as much information as possible about the
+current position. Such information could be life and death of the
+groups, moyo status, connection of groups and so on. Information
+gathering are performed by the following functions, called in this
+order:
+
+   * `make_worms'
+          Collect information about all connected sets of stones
+          (strings) and cavities.  This information is stored in the
+          `worm[][]' array.
+
+   * `make_dragons'
+          Collect information about connected strings, which are called
+          dragons.  Important information here is number of eyes, life
+          status, and connectedness between strings. The information is
+          stored mainly in the array `dragon[][]' but also in
+          `dragon2[][]'.
+
+   *Note Examining the Position::, for a more exact itinerary of the
+information-gathering portion of the move-generation proces.
+
+   *Note Worms and Dragons::, for more detailed documentation about
+`make_worms' and `make_dragons'.
+
+
+File: gnugo.info,  Node: MG Reasons,  Next: MG Details,  Prev: MG Info,  Up: Move Generation
+
+Generation of move reasons
+==========================
+
+   Each move generator suggests a number of moves.  It justifies each
+move suggestion with one or move "move reasons".  These move reasons
+are collected at each intersection where the moves are suggested for
+later valuation.  The different kinds of move reasons considered by GNU
+Go are:
+
+`ATTACK_MOVE'
+`DEFEND_MOVE'
+     Attack or defend a worm.
+
+`ATTACK_THREAT_MOVE'
+`DEFEND_THREAT_MOVE'
+     Threaten to attack or defend a worm.
+
+`NON_ATTACK_MOVE'
+`NON_DEFEND_MOVE'
+     a non-attacking or non-defending move.
+
+`ATTACK_EITHER_MOVE'
+     a move that attacks either on of two worms.
+
+`DEFEND_BOTH_MOVE'
+     a move that simultaneously defends two worms.
+
+`CONNECT_MOVE'
+`CUT_MOVE'
+     Connect or cut two worms.
+
+`ANTISUJI_MOVE'
+     Declare an antisuji or forbidden move.
+
+`SEMEAI_MOVE'
+`SEMEAI_THREAT'
+     Win or threaten to win a semeai.
+
+`EXPAND_TERRITORY_MOVE'
+`BLOCK_TERRITORY_MOVE'
+     a move that expands our territory or blocks opponents expansion.
+
+`EXPAND_MOYO_MOVE'
+     a move expanding a moyo.
+
+`VITAL_EYE_MOVE'
+     a vital point for life and death.
+
+`STRATEGIC_ATTACK_MOVE'
+`STRATEGIC_DEFEND_MOVE'
+     Moves added by 'a' and 'd' class patterns (*note Pattern
+     Classification::) which (perhaps intangibly) attack or defend a
+     dragon.
+
+`OWL_ATTACK_MOVE'
+`OWL_DEFEND_MOVE'
+     an owl attack or defense move.
+
+`OWL_ATTACK_THREAT'
+`OWL_DEFEND_THREAT'
+     a threat to owl attack or defend a group.
+
+`OWL_PREVENT_THREAT'
+     a move to remove an owl threat.
+
+`UNCERTAIN_OWL_ATTACK'
+`UNCERTAIN_OWL_DEFENSE'
+     an uncertain owl attack or defense.
+
+`MY_ATARI_ATARI_MOVE'
+     a move that starts a chain of ataris, eventually leading to a
+     capture.
+
+`YOUR_ATARI_ATARI_MOVE'
+     a move that if played by the opponent starts a chain of ataris for
+     the opponent, leading to capture, which is also a safe move for
+     us. Preemptively playing such a move almost always defends the
+     threat.
+
+   *NOTE:* Some of these are reasons for *not* playing a move.
+
+   More detailed discussion of these move reasons will be found in the
+next section.
+
+
+File: gnugo.info,  Node: MG Details,  Next: Valuation,  Prev: MG Reasons,  Up: Move Generation
+
+Detailed Descriptions of various Move Reasons
+=============================================
+
+* Menu:
+
+* Attack and Defense::             Worm Attack and Defense
+* Threats to Attack or Defend::    Worm Threats
+* Non-Working Moves::              Marking attacks and defenses as failing
+* Multi Attack or Defense::        Combined Attacks and Defenses
+* Cutting and Connecting::         Cutting and Connecting moves
+* Semeai::                         Semeai winning moves
+* Making eyes::                    Vital eye moves
+* Antisuji moves::                 Never play these!
+* Territorial moves::              Block or expand territory
+* Owl attack and defense::         Owl Attack and Defense
+* Combination Attacks::            Coordinated threats such as double ataris
+
+
+File: gnugo.info,  Node: Attack and Defense,  Next: Threats to Attack or Defend,  Up: MG Details
+
+Attacking and defending moves
+-----------------------------
+
+   A move which tactically captures a worm is called an "attack move"
+and a move which saves a worm from being tactically captured is called a
+"defense move". It is understood that a defense move can only exist if
+the worm can be captured, and that a worm without defense only is
+attacked by moves that decrease the liberty count or perform necessary
+backfilling.
+
+   It is important that all moves which attack or defend a certain
+string are found, so that the move generation can make an informed
+choice about how to perform a capture, or find moves which capture
+and/or defend several worms.
+
+   Attacking and defending moves are first found in `make_worms' while
+it evaluates the tactical status of all worms, although this step only
+gives one attack and defense (if any) move per worm. Immediately after,
+still in `make_worms', all liberties of the attacked worms are tested
+for additional attack and defense moves. More indirect moves are found
+by `find_attack_patterns' and `find_defense_patterns', which match the
+A (attack) and D (defense) class patterns in `patterns/attack.db' and
+`patterns/defense.db' As a final step, all moves which fill some
+purpose at all are tested whether they additionally attacks or defends
+some worm. (Only unstable worms are analyzed.)
+

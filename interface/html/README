@@ -1,0 +1,25 @@
+A CGI for playing against GNU Go with a browser.
+
+Written in 1999 by Doug Ridgway
+
+The contents of this directory are not part of GNU Go but constitute
+a separate program. They are in the public domain and are available
+for unrestricted use. There is no warranty.
+
+INSTALLATION
+
+o Install Tcl 8.0 or later (see http://www.scriptics.com/).
+o Install cgi.tcl 0.8.0 (from http://expect.nist.gov/)
+   apply patch cgi.patch
+o Put script in a place accessible to your webserver, and set it up
+  to be executed as a CGI.
+o Put patched cgi.tcl in same directory.
+o Set the GNUGO_PATH, DOMAIN, and PATH variables below.
+o Pick directory of desired images.
+  The naming convention is consistent with Andrew Grant's GIFs,
+  and his GIFs can be obtained at
+  http://www.britgo.org/gopcres/gopcres1.html#ag-gifs
+  Create a new directory, called "images", and unpack the gifs there.
+o Edit mumble file as desired.
+o Uncomment the cgi_debug -on command during debugging.
+

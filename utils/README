@@ -1,0 +1,11 @@
+The files getopt.h, getopt.c, getopt1.c are from glibc-2.1.2,
+
+The getopt functions are included because a lot of platforms do not have
+getopt functions for processing long options.  Some platforms (VC,MINGW32)
+don't have the getopt function that processes single letter options.
+
+getopt.h was renamed to gg-getopt.h to avoid conflicts with system provided
+getopt.h files.
+
+Function getopt was renamed gg_getopt to avoid conflicts with the system
+provided getopt function.

@@ -1,0 +1,26 @@
+--- /home/httpd/Winehq/cgi.tcl	Fri Sep 25 11:06:28 1998
++++ cgi.tcl	Sat Jul 17 08:48:59 1999
+@@ -1764,13 +1764,21 @@
+     cgi_puts ">"
+ }
+ 
+-proc cgi_image_button {nameval} {
++proc cgi_image_button {nameval args} {
+     regexp "(\[^=]*)=(.*)" $nameval dummy name value
+     cgi_put "<input type=image"
+     if {0!=[string compare "" $name]} {
+ 	cgi_put " name=\"$name\""
+     }
+-    cgi_puts " src=\"$value\">"
++    cgi_put " src=\"$value\""
++    foreach a $args {
++	if {[regexp "^onClick=(.*)" $a dummy str]} {
++	    cgi_put " onClick=\"$str\""
++	} else {
++	    cgi_put " $a"
++	}
++    }
++    cgi_put ">"
+ }
+ 
+ # map/area implement client-side image maps

@@ -1,0 +1,27 @@
+Copyright 2000 and 2001 by the Free Software Foundation
+
+(;GM[1]FF[3]
+RU[Japanese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[1999-05-27]
+SY[Cgoban 1.9.2]TM[5:00:00(5x1:00)];B[qc]
+(;W[pd]MA[ki]C[j
+];B[qd]MA[of];W[pe]MA[mg]C[
+];B[ob]MA[mg]C[
+];W[md]
+MA[lg]C[:-,shape(10)
+];B[rf];W[pg]MA[ki])
+
+(;W[pf];B[nc]MA[lf]C[
+])
+
+(;W[pc];B[pd]MA[mg]C[U
+];W[qd];B[qe]MA[mg]C[U
+];W[rd];B[oc]MA[mg]C[U
+]
+;W[pb];B[oe]MA[mg]C[U
+])
+
+)

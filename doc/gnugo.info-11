@@ -1,0 +1,350 @@
+This is gnugo.info, produced by makeinfo version 4.0 from gnugo.texi.
+
+INFO-DIR-SECTION GNU games
+START-INFO-DIR-ENTRY
+* GNU go: (gnugo).          The GNU Go program
+END-INFO-DIR-ENTRY
+
+
+File: gnugo.info,  Node: Functions Index,  Prev: Concept Index,  Up: Top
+
+Functions Index
+***************
+
+* Menu:
+
+* accumulate_influence:                  Influential Functions.
+* accurate_approxlib:                    General Utilities.
+* add_antisuji_move:                     Move Generation Functions.
+* add_attack_either_move:                Move Generation Functions.
+* add_block_territory_move:              Move Generation Functions.
+* add_connection_move:                   Move Generation Functions.
+* add_cut_move:                          Move Generation Functions.
+* add_defend_both_move:                  Move Generation Functions.
+* add_defense_move:                      Move Generation Functions.
+* add_expand_moyo_move:                  Move Generation Functions.
+* add_expand_territory_move:             Move Generation Functions.
+* add_followup_value:                    Move Generation Functions.
+* add_half_eye:                          Eye Functions.
+* add_lunch:                             Move Generation Functions.
+* add_move_reason:                       Local MG Functions.
+* add_semeai_move:                       Move Generation Functions.
+* add_shape_value:                       Move Generation Functions.
+* add_stone:                             Board Setup Functions.
+* add_strategical_attack_move:           Move Generation Functions.
+* add_strategical_defense_move:          Move Generation Functions.
+* add_vital_eye_move:                    Move Generation Functions.
+* amalgamate_most_valuable_helper:       Connection.
+* approxlib:                             String Functions.
+* ASSERT:                                Print Utilities.
+* atari_atari <1>:                       Reading Functions.
+* atari_atari <2>:                       Combination Attacks.
+* atari_atari:                           Move Generation Basics.
+* atari_atari_confirm_safety:            Reading Functions.
+* atari_atari_try_combination:           Reading Functions.
+* attack <1>:                            Reading Functions.
+* attack:                                Reading Basics.
+* attack2:                               Reading Basics.
+* attack3:                               Reading Basics.
+* attack4:                               Reading Basics.
+* attack_and_defend:                     Reading Functions.
+* attack_either:                         Reading Functions.
+* attack_move_known:                     Move Generation Functions.
+* break_chain:                           Reading Basics.
+* break_chain2:                          Reading Basics.
+* break_through:                         Reading Functions.
+* chainlinks:                            String Functions.
+* chainlinks2:                           String Functions.
+* change_attack:                         General Utilities.
+* change_defense:                        General Utilities.
+* change_dragon_status:                  General Utilities.
+* clear_board:                           Board Setup Functions.
+* clear_move_reasons:                    Move Generation Functions.
+* compute_dragon_status:                 Worm and Dragon Functions.
+* compute_escape_potential:              Worm and Dragon Functions.
+* compute_eyes:                          Eye Functions.
+* compute_eyes_pessimistic <1>:          The Owl Code.
+* compute_eyes_pessimistic:              Eye Functions.
+* compute_initial_influence <1>:         Influential Functions.
+* compute_initial_influence:             Move Generation Basics.
+* compute_move_influence:                Influential Functions.
+* confirm_safety:                        General Utilities.
+* connection_value2:                     Local MG Functions.
+* countlib:                              String Functions.
+* countstones:                           String Functions.
+* cut_connect_callback:                  Connection Functions.
+* cut_possible:                          General Utilities.
+* debug_influence_move:                  Influential Functions.
+* decrease_depth_values:                 General Utilities.
+* defend1:                               Reading Basics.
+* defend2:                               Reading Basics.
+* defend3:                               Reading Basics.
+* defend_against:                        General Utilities.
+* defense_move_known:                    Move Generation Functions.
+* do_remove_false_attack_and_defense_moves: Local MG Functions.
+* does_attack:                           General Utilities.
+* does_capture_something:                Status Functions.
+* does_defend:                           General Utilities.
+* double_atari:                          General Utilities.
+* dragon_eye:                            Amalgamation.
+* dragon_safety:                         Local MG Functions.
+* dump_stack:                            Move Functions.
+* effective_dragon_size:                 Local MG Functions.
+* endgame_shapes <1>:                    Sequence of Events.
+* endgame_shapes:                        Move Generation Basics.
+* estimate_influence_value <1>:          Local MG Functions.
+* estimate_influence_value:              Influence value.
+* estimate_strategical_value:            Local MG Functions.
+* estimate_territorial_value <1>:        Local MG Functions.
+* estimate_territorial_value:            Territorial value.
+* evaluate_diagonal_intersection:        Eye Functions.
+* examine_cavity:                        Worm and Dragon Functions.
+* examine_position:                      Move Generation Basics.
+* eye_space:                             Eye Functions.
+* fill_liberty:                          Move Generation Basics.
+* find_cap2:                             Reading Basics.
+* find_connection:                       Local MG Functions.
+* find_connections:                      Connection Functions.
+* find_cuts:                             Connection Functions.
+* find_defense <1>:                      Reading Functions.
+* find_defense:                          Reading Basics.
+* find_dragon:                           Local MG Functions.
+* find_eye:                              Local MG Functions.
+* find_lunch:                            General Utilities.
+* find_more_attack_and_defense_moves:    Local MG Functions.
+* find_origin:                           String Functions.
+* find_reason:                           Local MG Functions.
+* find_semeai:                           Local MG Functions.
+* find_worm:                             Local MG Functions.
+* find_worm_pair:                        Local MG Functions.
+* findlib:                               String Functions.
+* findstones:                            String Functions.
+* followup:                              Pattern Values.
+* fuseki:                                Move Generation Basics.
+* gameinfo_clear:                        Positional Functions.
+* gameinfo_load_sgfheader:               Positional Functions.
+* gameinfo_play_move:                    Positional Functions.
+* gameinfo_play_sgftree:                 Positional Functions.
+* gameinfo_print:                        Positional Functions.
+* gameinfo_undo_move:                    Positional Functions.
+* genmove:                               Move Generation Basics.
+* get_move_from_stack:                   Move Functions.
+* get_read_result:                       Hash Functions.
+* get_trymove_counter:                   Move Functions.
+* gg_gettimeofday:                       General Utilities.
+* gnugo_add_stone:                       Positional Functions.
+* gnugo_attack:                          Positional Functions.
+* gnugo_clear_position:                  Positional Functions.
+* gnugo_copy_position:                   Positional Functions.
+* gnugo_estimate_score:                  Positional Functions.
+* gnugo_examine_position:                Positional Functions.
+* gnugo_find_defense:                    Positional Functions.
+* gnugo_force_to_globals:                Positional Functions.
+* gnugo_genmove:                         Positional Functions.
+* gnugo_is_legal:                        Positional Functions.
+* gnugo_is_suicide:                      Positional Functions.
+* gnugo_placehand:                       Positional Functions.
+* gnugo_play_move:                       Positional Functions.
+* gnugo_play_sgfnode:                    Positional Functions.
+* gnugo_play_sgftree:                    Positional Functions.
+* gnugo_recordboard:                     Positional Functions.
+* gnugo_remove_stone:                    Positional Functions.
+* gnugo_sethand:                         Positional Functions.
+* gnugo_who_wins:                        Positional Functions.
+* goaldump:                              Owl Functions.
+* hashdata_compare:                      Hash Functions.
+* hashdata_diff_dump:                    Hash Functions.
+* hashdata_invert_stone:                 Hash Functions.
+* hashdata_recalc:                       Hash Functions.
+* hashdata_remove_ko:                    Hash Functions.
+* hashdata_set_ko:                       Hash Functions.
+* hashnode_dump:                         Hash Functions.
+* hashnode_new_result <1>:               Hash Functions.
+* hashnode_new_result:                   Hash Organization.
+* hashnode_search:                       Hash Functions.
+* hashposition_dump:                     Hash Functions.
+* hashtable_clear:                       Hash Functions.
+* hashtable_clear_if_full:               Hash Functions.
+* hashtable_dump:                        Hash Functions.
+* hashtable_enter_position <1>:          Hash Functions.
+* hashtable_enter_position:              Hash Organization.
+* hashtable_init:                        Hash Functions.
+* hashtable_new:                         Hash Functions.
+* hashtable_search <1>:                  Hash Functions.
+* hashtable_search:                      Hash Organization.
+* increase_depth_values:                 General Utilities.
+* incremental_order_moves:               String Functions.
+* induce_secondary_move_reasons:         Local MG Functions.
+* influence_area_color:                  Influential Functions.
+* influence_delta_area:                  Influential Functions.
+* influence_delta_moyo:                  Influential Functions.
+* influence_delta_strict_area:           Influential Functions.
+* influence_delta_strict_moyo:           Influential Functions.
+* influence_delta_territory:             Influential Functions.
+* influence_moyo_color:                  Influential Functions.
+* influence_territory_color:             Influential Functions.
+* init_gnugo:                            Getting Started.
+* is_antisuji_move:                      Local MG Functions.
+* is_illegal_ko_capture:                 Status Functions.
+* is_ko:                                 Status Functions.
+* is_legal <1>:                          Status Functions.
+* is_legal:                              Roadmap.
+* is_pass:                               Status Functions.
+* is_self_atari:                         Status Functions.
+* is_suicide:                            Status Functions.
+* is_worm_origin:                        General Utilities.
+* join_dragons:                          Worm and Dragon Functions.
+* komaster_trymove:                      Move Functions.
+* liberty_of_string:                     String Functions.
+* location_to_string:                    Print Utilities.
+* make_domains:                          Eye Functions.
+* make_dragons <1>:                      Worm and Dragon Functions.
+* make_dragons:                          Move Generation Basics.
+* make_worms <1>:                        Worm and Dragon Functions.
+* make_worms:                            Move Generation Basics.
+* marginal_eye_space:                    Eye Functions.
+* mark_string:                           String Functions.
+* maxterri:                              Pattern Values.
+* minterri:                              Pattern Values.
+* minvalue:                              Pattern Values.
+* modify_depth_values:                   General Utilities.
+* modify_eye_spaces1:                    Connection Functions.
+* move_in_stack:                         Move Functions.
+* move_reason_known:                     Local MG Functions.
+* neighbor_of_string:                    String Functions.
+* originate_eye:                         Eye Functions.
+* OTHER_COLOR:                           Basic Data Structures.
+* owl_attack <1>:                        Owl Functions.
+* owl_attack:                            The Owl Code.
+* owl_connection_defends:                Owl Functions.
+* owl_defend <1>:                        Owl Functions.
+* owl_defend:                            The Owl Code.
+* owl_does_attack:                       Owl Functions.
+* owl_does_defend:                       Owl Functions.
+* owl_lively:                            Owl Functions.
+* owl_reasons <1>:                       Owl Functions.
+* owl_reasons:                           Move Generation Basics.
+* owl_substantial:                       Owl Functions.
+* owl_threaten_attack:                   Owl Functions.
+* owl_threaten_defense:                  Owl Functions.
+* play_attack_defend2_n:                 General Utilities.
+* play_attack_defend_n:                  General Utilities.
+* play_break_through_n:                  General Utilities.
+* play_move:                             Move Functions.
+* popgo <1>:                             Move Functions.
+* popgo:                                 Roadmap.
+* print_eye:                             Eye Functions.
+* propagate_worm:                        Worm and Dragon Functions.
+* proper_eye_space:                      Eye Functions.
+* propogate_eye:                         Eye Functions.
+* purge_persistent_reading_cache:        Persistent Cache.
+* read_result_dump:                      Hash Functions.
+* READ_RETURN:                           Hash Functions.
+* READ_RETURN0:                          Hash Functions.
+* readsgffile:                           SGF.
+* remove_attack_move:                    Move Generation Functions.
+* remove_defense_move:                   Move Generation Functions.
+* remove_eyepoint:                       Eye Functions.
+* remove_half_eye:                       Eye Functions.
+* remove_lunch:                          Move Generation Functions.
+* remove_move_reason:                    Local MG Functions.
+* remove_opponent_attack_and_defense_moves: Local MG Functions.
+* remove_stone:                          Board Setup Functions.
+* reset_trymove_counter:                 Move Functions.
+* restore_depth_values:                  General Utilities.
+* review_move_reasons:                   Move Generation Functions.
+* revise_semeai:                         Move Generation Basics.
+* rr_get_pos_i:                          Hash Functions.
+* rr_get_pos_j:                          Hash Functions.
+* rr_get_routine:                        Hash Functions.
+* rr_get_stackp:                         Hash Functions.
+* safe_move:                             Reading Basics.
+* same_dragon:                           General Utilities.
+* same_string:                           String Functions.
+* same_worm:                             General Utilities.
+* search_persistent_reading_cache:       Persistent Cache.
+* semeai:                                Move Generation Basics.
+* set_maximum_move_value:                Move Generation Functions.
+* set_maximum_territorial_value:         Move Generation Functions.
+* set_minimum_move_value:                Move Generation Functions.
+* set_minimum_territorial_value:         Move Generation Functions.
+* set_temporary_depth_values:            General Utilities.
+* setup_board:                           Board Setup Functions.
+* sgf_write_header:                      SGF.
+* sgfAddChild:                           SGF.
+* sgfAddComment:                         SGF.
+* sgfAddPlay:                            SGF.
+* sgfAddPlayLast:                        SGF.
+* sgfAddProperty:                        SGF.
+* sgfAddPropertyFloat:                   SGF.
+* sgfAddPropertyInt:                     SGF.
+* sgfAddStone:                           SGF.
+* sgfBoardChar:                          SGF.
+* sgfBoardNumber:                        SGF.
+* sgfBoardText:                          SGF.
+* sgfCircle:                             SGF.
+* sgfCreateHeaderNode:                   SGF.
+* sgfGetCharProperty:                    SGF.
+* sgfGetFloatProperty:                   SGF.
+* sgfGetIntProperty:                     SGF.
+* sgfMark:                               SGF.
+* sgfMkProperty:                         SGF.
+* sgfNewNode:                            SGF.
+* sgfOverwriteProperty:                  SGF.
+* sgfOverwritePropertyFloat:             SGF.
+* sgfOverwritePropertyInt:               SGF.
+* sgfPrev:                               SGF.
+* sgfPrintCharProperty:                  SGF.
+* sgfPrintCommentProperty:               SGF.
+* sgfRoot:                               SGF.
+* sgfSquare:                             SGF.
+* sgfStartVariant:                       SGF.
+* sgfStartVariantFirst:                  SGF.
+* sgftree_clear:                         SGF.
+* sgftree_readfile:                      SGF.
+* sgftreeAddComment:                     SGF.
+* sgftreeAddPlay:                        SGF.
+* sgftreeAddPlayLast:                    SGF.
+* sgftreeAddStone:                       SGF.
+* sgftreeBoardChar:                      SGF.
+* sgftreeBoardNumber:                    SGF.
+* sgftreeBoardText:                      SGF.
+* sgftreeCircle:                         SGF.
+* sgftreeCreateHeaderNode:               SGF.
+* sgftreeMark:                           SGF.
+* sgftreeNodeCheck:                      SGF.
+* sgftreeSetLastNode:                    SGF.
+* sgftreeSquare:                         SGF.
+* sgftreeStartVariant:                   SGF.
+* sgftreeStartVariantFirst:              SGF.
+* sgftreeTriangle:                       SGF.
+* sgftreeWriteResult:                    SGF.
+* sgfTriangle:                           SGF.
+* sgfWriteResult:                        SGF.
+* shape:                                 Pattern Values.
+* shapes:                                Move Generation Basics.
+* shapes_callback:                       Patterns Overview.
+* show_dragons:                          Worm and Dragon Functions.
+* small_semeai:                          Reading Basics.
+* snapback:                              Reading Basics.
+* status_to_string:                      Print Utilities.
+* stones_on_board:                       Status Functions.
+* store_persistent_reading_cache:        Persistent Cache.
+* strategically_sound_defense:           Local MG Functions.
+* terri:                                 Pattern Values.
+* topological_eye:                       Eye Functions.
+* TRACE:                                 Print Utilities.
+* TRY_MOVE:                              Move Functions.
+* tryko:                                 Move Functions.
+* trymove <1>:                           Move Functions.
+* trymove:                               Roadmap.
+* unconditional_life:                    Worms.
+* value:                                 Pattern Values.
+* value_move_reasons:                    Local MG Functions.
+* value_moves:                           Local MG Functions.
+* vgprintf:                              Print Utilities.
+* vital_chain <1>:                       General Utilities.
+* vital_chain:                           Owl Functions.
+* writesgf:                              SGF.
+
+
