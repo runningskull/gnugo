@@ -286,6 +286,7 @@ genmove(int *i, int *j, int color)
   int retval;
 
   retval = do_genmove(&move, color, 0.4);
+  gg_assert(retval < 0 || ON_BOARD1(move));
 
   if (i) *i = I(move);
   if (j) *j = J(move);

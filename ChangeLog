@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- add assert on inconsistent do_genmove result() in genmove()
 - life code completely disabled
 - global variables life and life_eyesize removed
 - options --life and --life-eyesize removed
