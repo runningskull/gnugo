@@ -3506,6 +3506,7 @@ Pattern D838
 
 Pattern D839
 # tm New Pattern (3.1.22) (see trevord:910)
+# gf FIXME: This is no corner pattern, move. (3.3.18)
 
 X*O?     Extend side eye-space in sente
 ?..o
@@ -3519,6 +3520,28 @@ C*O?
 
 ;!obvious_false_oeye(a)
 ;&& oplay_attack(*,b,C)
+
+
+Pattern D840
+# gf New pattern. (3.3.18)
+
+|.X??     Capture lunch with threat to make second eye
+|.OO?
+|.XO?
+|*XOo
+|...o
++----
+
+:8,-,value(88)
+
+|.X??
+|cOO?
+|.AO?
+|*AOo
+|.b.o
++----
+
+;does_attack(*,A) && xplay_attack(b,*,c,A)
 
 
 #########################################################

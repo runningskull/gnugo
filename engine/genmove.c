@@ -686,7 +686,8 @@ revise_thrashing_dragon(int color, float advantage)
     return 0;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos) && thrashing_stone[pos]) {
+    if (ON_BOARD(pos) && thrashing_stone[pos]
+	&& worm[pos].unconditional_status != DEAD) {
       dragon[pos].status = UNKNOWN;
       DRAGON2(pos).safety = ALIVE;
     }

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- don't attack unconditionally dead stones, even if thrashing
+- never play on vertices which are unconditional territory for either player
 - bugfix in attack_either()
 - back-capturing added in attack1() and code restructured
 - new regression script regress.pike
@@ -35,6 +37,7 @@
 - joseki tuning
 - owl tuning
 - atari_atari tuning
+- eye tuning
 - new and revised test cases
 
 3.3.17 released March 2, 2003

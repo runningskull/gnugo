@@ -3556,9 +3556,11 @@ x*x
 
 
 Pattern 6514
+# Need to mark both empty vertices. In the corner one of them may not
+# be a valid defense (suicide move).
 
 XX*
-.XX
+*XX
 
 :1122
 

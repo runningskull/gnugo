@@ -1557,6 +1557,16 @@ X.X
 :|,OXe,terri(0.1)
 
 
+Pattern CE32
+# gf New pattern. (3.3.17)
+
+X*X
+O.o
+?O?
+
+:8,OXe
+
+
 ######################################################################
 #
 # Center followup patterns

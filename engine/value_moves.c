@@ -2509,6 +2509,12 @@ value_move_reasons(int pos, int color, float pure_threat_value,
   if (is_antisuji_move(pos))
     return 0.0; /* This move must not be played. End of story. */
 
+  /* Never play on a vertex which is unconditional territory for
+   * either player. There is absolutely nothing to gain.
+   */
+  if (worm[pos].unconditional_status != UNKNOWN)
+    return 0.0;
+  
   /* If this move has no reason at all, we can skip some steps. */
   if ((!urgent || allpats)
       && (move[pos].reason[0] >= 0
