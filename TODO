@@ -98,6 +98,8 @@ order of perceived difficulty.
     tournament play. If all dragons are settled and GNU Go is
     behind by a lot, it should be able to resign.
 
+12. Implement hashing and persistent caching in the semeai code. 
+
 //--------------------------------------------------------------
 // long term issues
 //--------------------------------------------------------------
@@ -114,7 +116,8 @@ playing strength of the program and/or enhance certain aspects of it.
    square, and so on. Other areas where test suites would be most
    welcome are fuseki, tesuji, and endgame.
 
-2. Tuning the pattern databases. This is a sort of art. It is not
+2. Tuning the pattern databases. These are under constant revision 
+   This is a sort of art. It is not
    necessary to do any programming to do this since most of the
    patterns do not require helpers. We would like it if a few more Dan
    level players would learn this skill.
@@ -145,7 +148,8 @@ playing strength of the program and/or enhance certain aspects of it.
    also be strong enough to find combinations of strategic moves and
    more indirect threats (a threat to a threat).  Possibly it could
    combine threats in AND-OR trees (DAGs?) that could be searched
-   using ordinary tree search algorithms.
+   using ordinary tree search algorithms. (Revision of combination.c
+   is underway.)
 
 8. Speed up the tactical reading. GNU Go is reasonably accurate when
    it comes to tactical reading, but not always very fast. The main
@@ -233,4 +237,8 @@ are presented here for inspiration.
 10.Generalize representation and handling of threats so that we have a
    graph representation of threats that can be searched to see how
    different threats interact.
+
+
+
+
 

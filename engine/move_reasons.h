@@ -57,6 +57,13 @@
 #define OWL_DEFEND_MOVE_GOOD_KO 35
 #define OWL_DEFEND_MOVE_BAD_KO  36
 
+/* Bitmap values for move_reason.status */
+#define ACTIVE 0
+#define TERRITORY_REDUNDANT 1
+#define STRATEGICALLY_REDUNDANT 2
+#define REDUNDANT 3
+#define SECONDARY 4
+
 #define MAX_REASONS 40
 
 #define HUGE_MOVE_VALUE 10.0*MAX_BOARD*MAX_BOARD
@@ -65,6 +72,8 @@ struct move_reason {
   int type;   /* e.g. attack, defend, or connect */
   int what;   /* pointer into list of strings, list of pair of dragons,
 		 or similar */
+  int status; /* This is a bitmap to mark redundant or secondary
+                 move reasons. */
 };
 
 struct move_data {
