@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- comments added explaining heap in readconnect.c
 - provide links to html regression views from regress.sh
 - semeai analysis in make_dragons() postponed until after revision of
   inessentiality 

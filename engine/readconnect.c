@@ -3151,6 +3151,16 @@ block_off(int str, const char goal[BOARDMAX], int *move)
 }
 
 
+/* Store a possibly expensive decision for later evaluation. The
+ * data getting stored should be self-explanatory.
+ * The job of the helper function is to
+ * - decide whether the spreading step will be allowed (typically
+ *   depending on a latter)
+ * - add the relevant positions to the connection queue in case the test
+ *   was successful.
+ *
+ * Elements in the heap are kept sorted according to smallest distance.
+ */
 static void
 push_connection_heap_entry(struct connection_data *conn, float distance,
 			   int coming_from, int target,
@@ -3184,6 +3194,7 @@ push_connection_heap_entry(struct connection_data *conn, float distance,
 }
 
 
+/* Delete the first entry from the heap. */
 static void
 pop_connection_heap_entry(struct connection_data *conn)
 {
@@ -3373,6 +3384,12 @@ case_16_17_18_helper(struct connection_data *conn, int color)
  * (cutoff_distance) is the highest distance before we give up,
  * (speculative) controls some special cases in the propagation rules
  * below.
+ *
+ * As an optimization, new points are either added directly via the ENQUEUE
+ * macro if the necessary test is an immediate (usually purely geometric)
+ * check, or if the decision is more expensive (usually depending on a
+ * ladder), it gets postponed and stored via push_connection_heap_entry()
+ * for later evaluation.
  */
 
 void
@@ -3389,6 +3406,9 @@ spread_connection_distances(int color, struct connection_data *conn)
     int pos;
     float distance;
 
+    /* Delete heap entries for positions that have already been reached
+     * with smaller distance.
+     */
     while (conn->heap_size > 0
 	   && conn->heap[0]->distance >= conn->distances[conn->heap[0]->target])
       pop_connection_heap_entry(conn);
@@ -3423,6 +3443,10 @@ spread_connection_distances(int color, struct connection_data *conn)
 	conn->queue[best_index] = temp;
       }
 
+      /* If the first element in heap has smaller distance than the
+       * smallest we have found so far, call the relevant helper function
+       * now, and delete the heap entry.
+       */
       if (conn->heap_size > 0 && conn->heap[0]->distance < smallest_dist) {
 	conn->heap[0]->helper(conn, color);
 	pop_connection_heap_entry(conn);

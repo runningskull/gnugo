@@ -24,9 +24,17 @@
 struct heap_entry;
 struct connection_data;
 
+/* Expensive functions that we try to evaluate as late as possible
+ * when spreading connection distances.
+ */
 typedef void (*connection_helper_fn_ptr) (struct connection_data *conn,
 					  int color);
 
+/* This heap contains a list of positions where we have delayed a
+ * decision whether to "spread a connection distance". The function
+ * helper() will be called when we finally need the decision. See
+ * push_connection_heap_entry() for organization of the heap.
+ */
 struct heap_entry {
   float distance;
   int coming_from;
