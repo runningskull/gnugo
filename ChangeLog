@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in list_move_reasons()
+- revised test case in niki.tst
 - tuning, owl tuning
 - new implementation of compute_primary_domains()
 - new eye pattern

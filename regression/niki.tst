@@ -43,13 +43,16 @@ loadsgf games/niki.sgf 128
 10 gg_genmove white
 #? [S5]*
 
+# FIXME: Same move listed twice.
 loadsgf games/niki.sgf 158
 11 gg_genmove white
 #? [M6|M6|P7]*
 
+# Originally H12 was listed as correct here, but that vertex is
+# occupied. F14 and G15 seem sufficient for life.
 loadsgf games/niki.sgf 212
 12 gg_genmove white
-#? [H12]*
+#? [F14|G15]*
 
 loadsgf games/niki.sgf 226
 13 gg_genmove white

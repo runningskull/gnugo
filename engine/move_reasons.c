@@ -1857,7 +1857,7 @@ list_move_reasons(int color)
 	  break;
 
 	case UNCERTAIN_OWL_DEFENSE:
-	  aa = worms[move_reasons[r].what];
+	  aa = dragons[move_reasons[r].what];
 	  if (board[aa] == color)
 	    gprintf("%1m found alive but not certainly, %1m defends it again\n",
 		    aa, pos);
