@@ -49,7 +49,7 @@ loadsgf games/nicklas/nicklas7.sgf 29
 #? [F1]*
 
 
-#CATEGORY=SEMEAI_MODULE
+#CATEGORY=SEMEAI
 #DESCRIPTION=Tough for white to see attacking B, and linking w/ attack stone.
 #SEVERITY=3
 #    The only way to live is to attack a neighbour dragon, e.g. the one

@@ -82,7 +82,7 @@ loadsgf games/nicklas/nicklas8.sgf 224
 
 # Moved K15 to K14. /gf ; Added back K14 - both work.
 #SEVERITY=7
-#CATEGORY=CONNECTION_TUNING
+#CATEGORY=CONNECTION
 #DESCRIPTION=Is GnuGo misreading the cut?
 loadsgf games/nicklas/nicklas8.sgf 240
 811 reg_genmove black

@@ -148,7 +148,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 17
 28 reg_genmove black
 #? [C16]
 
-#CATEGORY=FUSKEI_STRATEGY
+#CATEGORY=FUSEKI_STRATEGY
 # Black C15 is sente here, so W C14 is mandatory.
 loadsgf games/arend/gnugo-gnugo7.sgf 24
 29 reg_genmove white

@@ -111,7 +111,7 @@ loadsgf games/trevor/trevor_08.sgf 24
 #Dan: This should be solved by a reading connection
 #analyzer. Tristan Cazenave is working on such a project.
 #See also connection:21,22.
-#CATEGORY=DYNAMIC_CONNECTION
+#CATEGORY=CONNECTION
 loadsgf games/trevor/trevor_09.sgf
 9 reg_genmove white
 #? [E5]*
