@@ -82,3 +82,7 @@ loadsgf games/blunder12.sgf 258
 loadsgf games/blunder13.sgf
 18 gg_genmove black
 #? [F5]
+
+loadsgf games/blunder14.sgf
+19 gg_genmove white
+#? [P18|P19|R18|R19]
