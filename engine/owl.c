@@ -3042,7 +3042,7 @@ owl_does_attack(int move, int target)
 
   /* FIXME: We want to do this after the trymove(), but currently
    * owl_mark_dragon() may crash if the trymove() happens to remove
-   * some stones from the goal dragon from the board.
+   * some stones of the goal dragon from the board.
    */
 #if 1
     owl.lunches_are_current = 0;

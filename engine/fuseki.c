@@ -175,37 +175,35 @@ choose_corner_move(int corner, int *m, int *n)
 
 
 static void
-announce_move(int i, int j, int val)
+announce_move(int move, int val)
 {
   /* This shouldn't happen. */
-  if (BOARD(i, j))
+  if (board[move] != EMPTY)
     return;
 
-  TRACE("Fuseki Player suggests %m with value %d\n", i, j, val);
-  set_minimum_move_value(POS(i, j), val);
+  TRACE("Fuseki Player suggests %1m with value %d\n", move, val);
+  set_minimum_move_value(move, val);
 }
 
 
 /* Storage for values collected during pattern matching. */
-static int fuseki_movei[MAX_BOARD * MAX_BOARD];
-static int fuseki_movej[MAX_BOARD * MAX_BOARD];
+static int fuseki_moves[MAX_BOARD * MAX_BOARD];
 static int fuseki_value[MAX_BOARD * MAX_BOARD];
-static int fuseki_moves;
+static int num_fuseki_moves;
 static int fuseki_total_value;
 
 /* Callback for fuseki database pattern matching. */
 static void
 fuseki_callback(int ti, int tj, struct fullboard_pattern *pattern, int ll)
 {
-  TRACE("Fuseki database move at %m with relative weight %d, pattern %s+%d\n",
-	ti, tj, (int) pattern->value, pattern->name, ll);
+  TRACE("Fuseki database move at %1m with relative weight %d, pattern %s+%d\n",
+	POS(ti, tj), (int) pattern->value, pattern->name, ll);
 
   /* Store coordinates and relative weight for the found move. */
-  fuseki_movei[fuseki_moves] = ti;
-  fuseki_movej[fuseki_moves] = tj;
-  fuseki_value[fuseki_moves] = pattern->value;
+  fuseki_moves[num_fuseki_moves] = POS(ti, tj);
+  fuseki_value[num_fuseki_moves] = pattern->value;
   fuseki_total_value += pattern->value;
-  fuseki_moves++;
+  num_fuseki_moves++;
 }
 
 /* Full board matching in database for fuseki moves. Return 1 if any
@@ -236,19 +234,19 @@ search_fuseki_database(int color)
     return 0;
 
   /* Do the matching. */
-  fuseki_moves = 0;
+  num_fuseki_moves = 0;
   fuseki_total_value = 0;
   fullboard_matchpat(fuseki_callback, color, database);
 
   /* No match. */
-  if (fuseki_moves == 0)
+  if (num_fuseki_moves == 0)
     return 0;
 
   /* Choose randomly with respect to relative weights for matched moves. */
   /* do not choose moves with less value than 20% of the best move */
   best_fuseki_value = fuseki_value[0];
   q = gg_rand() % fuseki_total_value;
-  for (k = 0; k < fuseki_moves; k++) {
+  for (k = 0; k < num_fuseki_moves; k++) {
     if (fuseki_value[k] < (best_fuseki_value / 5))
       break;
     q -= fuseki_value[k];
@@ -256,18 +254,18 @@ search_fuseki_database(int color)
       break;
   }
 
-  gg_assert(k < fuseki_moves);
+  gg_assert(k < num_fuseki_moves);
   /* Give this move an arbitrary value of 75. The actual value doesn't
    * matter much since the intention is that we should play this move
    * whatever the rest of the analysis thinks.
    */
-  announce_move(fuseki_movei[k], fuseki_movej[k], 75);
+  announce_move(fuseki_moves[k], 75);
 
   /* Also make sure the other considered moves can be seen in the
    * traces and in the output file.
    */
-  for (k = 0; k < fuseki_moves; k++)
-    set_minimum_move_value(POS(fuseki_movei[k], fuseki_movej[k]), 74);
+  for (k = 0; k < num_fuseki_moves; k++)
+    set_minimum_move_value(fuseki_moves[k], 74);
 
   return 1;
 }
@@ -299,7 +297,7 @@ fuseki(int color)
     /* For boards of size 11x11 or smaller we first go for the center point. */
     int middle = board_size/2;
     if (openregion(middle-2, middle+2, middle-2, middle+2)) {
-      announce_move(middle, middle, 45);
+      announce_move(POS(middle, middle), 45);
     }
   }
 
@@ -315,22 +313,22 @@ fuseki(int color)
   
   if (openregion(0, width-1, board_size-width, board_size-1)) {
     choose_corner_move(UPPER_RIGHT, &i, &j);
-    announce_move(i, j, empty_corner_value);
+    announce_move(POS(i, j), empty_corner_value);
   }
   
   if (openregion(board_size-width, board_size-1, 0, width-1)) {
     choose_corner_move(LOWER_LEFT, &i, &j);
-    announce_move(i, j, empty_corner_value);
+    announce_move(POS(i, j), empty_corner_value);
   }
   if (openregion(board_size-width, board_size-1,
 		 board_size-width, board_size-1)) {
     choose_corner_move(LOWER_RIGHT, &i, &j);
-    announce_move(i, j, empty_corner_value);
+    announce_move(POS(i, j), empty_corner_value);
   }
   
   if (openregion(0, width-1, 0, width-1)) {
     choose_corner_move(UPPER_LEFT, &i, &j);
-    announce_move(i, j, empty_corner_value);
+    announce_move(POS(i, j), empty_corner_value);
   }
 }
 

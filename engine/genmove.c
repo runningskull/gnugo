@@ -38,8 +38,7 @@ static int get_level(int *level);
 static int do_genmove(int *move, int color, float pure_threat_value);
 
 static double slowest_time = 0.;
-static int slowest_i = -1;
-static int slowest_j = -1;
+static int slowest_move = NO_MOVE;
 static int slowest_movenum = 0;
 static double total_time = 0.;
 
@@ -107,7 +106,7 @@ examine_position(int color, int how_much)
   if (NEEDS_UPDATE(worms_examined)) {
     start_timer(0);
     make_worms();
-    time_report(0, "  make worms", -1, -1, 1.0);
+    time_report(0, "  make worms", NO_MOVE, 1.0);
   }
   if (how_much == EXAMINE_WORMS) {
     verbose = save_verbose;
@@ -317,7 +316,7 @@ do_genmove(int *move, int color, float pure_threat_value)
   /* Find out information about the worms and dragons. */
   start_timer(1);
   examine_position(color, EXAMINE_ALL);
-  time_report(1, "examine position", -1, -1, 1.0);
+  time_report(1, "examine position", NO_MOVE, 1.0);
 
   /* Make a score estimate. This can be used in later stages of the 
    * move generation.  If we are ahead, we can play safely and if
@@ -334,7 +333,7 @@ do_genmove(int *move, int color, float pure_threat_value)
 		lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound),
 		upper_bound > 0 ? "W " : "B ", gg_abs(upper_bound));
     }
-    time_report(1, "estimate score", -1, -1, 1.0);
+    time_report(1, "estimate score", NO_MOVE, 1.0);
 
     /* The score will be used to determine when we are safely
      * ahead. So we want the most conservative score.
@@ -388,12 +387,12 @@ do_genmove(int *move, int color, float pure_threat_value)
   /* The general pattern database. */
   start_timer(1);
   shapes(color);
-  time_report(1, "shapes", -1, -1, 1.0);
+  time_report(1, "shapes", NO_MOVE, 1.0);
   gg_assert(stackp == 0);
 
   /* Look for combination attacks and defenses against them. */
   combinations(color);
-  time_report(1, "combinations", -1, -1, 1.0);
+  time_report(1, "combinations", NO_MOVE, 1.0);
   gg_assert(stackp == 0);
 
   /* Review the move reasons and estimate move values. */
@@ -401,7 +400,7 @@ do_genmove(int *move, int color, float pure_threat_value)
 			  pure_threat_value, lower_bound))
     TRACE("Move generation likes %1m with value %f\n", *move, val);
   gg_assert(stackp == 0);
-  time_report(1, "review move reasons", -1, -1, 1.0);
+  time_report(1, "review move reasons", NO_MOVE, 1.0);
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
   if (val <= 6.0 && !disable_endgame_patterns) {
@@ -410,7 +409,7 @@ do_genmove(int *move, int color, float pure_threat_value)
     if (review_move_reasons(move, &val, color, pure_threat_value, score))
       TRACE("Move generation likes %1m with value %f\n", *move, val);
     gg_assert(stackp == 0);
-    time_report(1, "endgame", -1, -1, 1.0);
+    time_report(1, "endgame", NO_MOVE, 1.0);
   }
   
   /* If no move found yet, revisit any semeai and change the
@@ -426,7 +425,7 @@ do_genmove(int *move, int color, float pure_threat_value)
 	      *move, val); 
       }
     }
-    time_report(1, "move reasons with revised semeai status", -1, -1, 1.0);
+    time_report(1, "move reasons with revised semeai status", NO_MOVE, 1.0);
   }
 
   /* If still no move, fill a remaining liberty. This should pick up
@@ -436,8 +435,8 @@ do_genmove(int *move, int color, float pure_threat_value)
       && fill_liberty(move, color)) {
     val = 1.0;
     TRACE("Filling a liberty at %1m\n", *move);
-    move_considered(I(*move), J(*move), val);
-    time_report(1, "fill liberty", -1, -1, 1.0);
+    move_considered(*move, val);
+    time_report(1, "fill liberty", NO_MOVE, 1.0);
   }
 
   /* If we're instructed to play out the aftermath or capture all dead
@@ -449,8 +448,8 @@ do_genmove(int *move, int color, float pure_threat_value)
       && aftermath_genmove(move, color, NULL, 0) > 0) {
     val = 1.0;
     TRACE("Aftermath move at %1m\n", *move);
-    move_considered(I(*move), J(*move), val);
-    time_report(1, "aftermath_genmove", -1, -1, 1.0);
+    move_considered(*move, val);
+    time_report(1, "aftermath_genmove", NO_MOVE, 1.0);
   }
 
   /* If we're instructed to capture all dead opponent stones, generate
@@ -462,8 +461,8 @@ do_genmove(int *move, int color, float pure_threat_value)
       && aftermath_genmove(move, color, NULL, 1) > 0) {
     val = 1.0;
     TRACE("Aftermath move at %1m\n", *move);
-    move_considered(I(*move), J(*move), val);
-    time_report(1, "aftermath_genmove", -1, -1, 1.0);
+    move_considered(*move, val);
+    time_report(1, "aftermath_genmove", NO_MOVE, 1.0);
   }
 
   /* If no move is found then pass. */
@@ -485,18 +484,15 @@ do_genmove(int *move, int color, float pure_threat_value)
   }
  
  if (showtime) {
-    double spent = time_report(0, "TIME to generate move at ",
-			       I(*move), J(*move), 1.0);
+    double spent = time_report(0, "TIME to generate move at ", *move, 1.0);
     total_time += spent;
     if (spent > slowest_time) {
       slowest_time = spent;
-      slowest_i = I(*move);
-      slowest_j = J(*move);
+      slowest_move = *move;
       slowest_movenum = movenum+1;
     }
     if (*move == NO_MOVE) {
-      gprintf("\nSLOWEST MOVE: %d at %m ", slowest_movenum,
-	      slowest_i, slowest_j);
+      gprintf("\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
       fprintf(stderr, "(%.2f seconds)\n", slowest_time);
       fprintf(stderr, "\nAVERAGE TIME: %.2f seconds per move\n",
 	      total_time/movenum);
@@ -516,8 +512,10 @@ do_genmove(int *move, int color, float pure_threat_value)
  */
 
 void 
-move_considered(int i, int j, float val)
+move_considered(int move, float val)
 {
+  int i = I(move);
+  int j = J(move);
   if (val > potential_moves[i][j]) {
     potential_moves[i][j] = val;
   }

@@ -1864,7 +1864,7 @@ examine_move_safety(int color)
       else
 	move[pos].move_safety = 0;
 
-      time_report(3, "    examine_move_safety: ", i, j, 1.0);
+      time_report(3, "    examine_move_safety: ", pos, 1.0);
     }
 }
 
@@ -3658,7 +3658,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       || move[pos].territorial_value > 0
       || move[pos].strategical_value > 0) {
     TRACE("Move generation values %1m to %f\n", pos, tot_value);
-    move_considered(I(pos), J(pos), tot_value);
+    move_considered(pos, tot_value);
   }
 
   return tot_value;
@@ -3819,7 +3819,7 @@ review_move_reasons(int *the_move, float *val, int color,
   start_timer(2);
   if (!urgent || allpats) {
     find_more_attack_and_defense_moves(color);
-    time_report(2, "  find_more_attack_and_defense_moves", -1, -1, 1.0);
+    time_report(2, "  find_more_attack_and_defense_moves", NO_MOVE, 1.0);
   }
 
   save_verbose = verbose;
@@ -3827,17 +3827,17 @@ review_move_reasons(int *the_move, float *val, int color,
     verbose--;
   if (level > 5) {
     find_more_owl_attack_and_defense_moves(color);
-    time_report(2, "  find_more_owl_attack_and_defense_moves", -1, -1, 1.0);
+    time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);
   }
   verbose = save_verbose;
 
   induce_secondary_move_reasons(color);
-  time_report(2, "  induce_secondary_move_reasons", -1, -1, 1.0);
+  time_report(2, "  induce_secondary_move_reasons", NO_MOVE, 1.0);
   
   if (verbose > 0)
     verbose--;
   examine_move_safety(color);
-  time_report(2, "  examine_move_safety", -1, -1, 1.0);
+  time_report(2, "  examine_move_safety", NO_MOVE, 1.0);
   verbose = save_verbose;
 
   if (printworms || verbose)
@@ -3845,7 +3845,7 @@ review_move_reasons(int *the_move, float *val, int color,
 
   /* Evaluate all moves with move reasons. */
   value_moves(color, pure_threat_value, score);
-  time_report(2, "  value_moves", -1, -1, 1.0);
+  time_report(2, "  value_moves", NO_MOVE, 1.0);
 
   /* Perform point redistribution */
   redistribute_points();
@@ -3902,7 +3902,7 @@ review_move_reasons(int *the_move, float *val, int color,
       TRACE("Move at %1m would be an illegal ko capture.\n", best_move);
       reevaluate_ko_threats();
       redistribute_points();
-      time_report(2, "  reevaluate_ko_threats", -1, -1, 1.0);
+      time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
       ko_values_have_been_added = 1;
       move[best_move].value = 0.0;
       move[best_move].final_value = 0.0;

@@ -339,7 +339,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	    score -= 3;
 	  
 	  if (0)
-	    gprintf("Score %m = %d\n", m, n, score);
+	    gprintf("Score %1m = %d\n", pos, score);
 	  
 	  if (move_ok && score > best_score) {
 	    best_score = score;

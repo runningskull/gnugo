@@ -1599,7 +1599,7 @@ start_timer(int n)
  * time is less than mintime.
  */
 double
-time_report(int n, const char *occupation, int i, int j, double mintime)
+time_report(int n, const char *occupation, int move, double mintime)
 {
   double t;
   double dt;
@@ -1612,8 +1612,8 @@ time_report(int n, const char *occupation, int i, int j, double mintime)
   dt = t - timers[n];
   if (dt > mintime) {
     gprintf("%s", occupation);
-    if (!is_pass(POS(i, j)))
-      gprintf("%m", i, j);
+    if (move != NO_MOVE)
+      gprintf("%1m", move);
     fprintf(stderr, ": %.2f sec\n", dt);
   }
   timers[n] = t;

@@ -177,7 +177,7 @@ make_worms(void)
       int pos = POS(m, n);
       int w1 = NO_MOVE;
       int w2 = NO_MOVE;
-      int i, j, k, di, dj;
+      int i, j, k;
 
       /* Only work on each worm once. This is easiest done if we only 
        * work with the origin of each worm.
@@ -190,26 +190,25 @@ make_worms(void)
        */
       for (i = 0; i < board_size; i++)
 	for (j = 0; j < board_size; j++) {
-
+	  int pos2 = POS(i, j);
 	  /* Work only with the opposite color from (pos). */
-	  if (BOARD(i, j) != OTHER_COLOR(board[pos])) 
+	  if (board[pos2] != OTHER_COLOR(board[pos])) 
 	    continue;
 	      
 	  for (k = 0; k < 4; k++) {
-	    di = i + deltai[k];
-	    dj = j + deltaj[k];
-	    if (ON_BOARD2(di, dj) && is_worm_origin(POS(di, dj), pos)) {
+	    if (!ON_BOARD(pos2 + delta[k])
+		|| worm[pos2 + delta[k]].origin != pos)
+	      continue;
 
-	      ASSERT1(BOARD(di, dj) == board[pos], pos);
+	    ASSERT1(board[pos2 + delta[k]] == board[pos], pos);
 
-	      /* If we have not already found a worm which meets the criteria,
-	       * store it into (ti, tj), otherwise store it into (ui, uj).
-	       */
-	      if (w1 == NO_MOVE)
-	        w1 = worm[POS(i, j)].origin;
-	      else if (!is_same_worm(POS(i, j), w1))
-	        w2 = worm[POS(i, j)].origin;
-	    }
+	    /* If we have not already found a worm which meets the criteria,
+	     * store it into (w1), otherwise store it into (w2).
+	     */
+	    if (w1 == NO_MOVE)
+	      w1 = worm[pos2].origin;
+	    else if (!is_same_worm(pos2, w1))
+	      w2 = worm[pos2].origin;
 	  } /* loop over k */
 	} /* loop over i,j */
 
@@ -239,7 +238,7 @@ make_worms(void)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       int pos = POS(m, n);
-      if (board[pos] && is_worm_origin(pos, pos)) {
+      if (IS_STONE(board[pos]) && is_worm_origin(pos, pos)) {
  	worm[pos].genus = genus(pos);
 	propagate_worm(pos);
       }
@@ -831,10 +830,10 @@ find_worm_attacks_and_defenses()
       if (worm[pos].attack_codes[0] != 0) {
 	int tpos = NO_MOVE;
 
-	TRACE ("considering defense of %m\n", m, n);
+	TRACE ("considering defense of %1m\n", pos);
 	dcode = find_defense(pos, &tpos);
 	if (dcode) {
-	  TRACE ("worm at %m can be defended at %1m\n", m, n, tpos);
+	  TRACE ("worm at %1m can be defended at %1m\n", pos, tpos);
 	  if (tpos != NO_MOVE)
 	    change_defense(pos, tpos, dcode);
 	}
@@ -1778,7 +1777,8 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
       /* FIXME: Don't try to defend the same string more than once.
        * FIXME: For all attacks on this string, we should test whether
        *        the proposed move happens to refute the attack.
-       * Play (move) and see if there is an attack. */
+       * Play (move) and see if there is an attack.
+       */
       if (trymove(move, color, "defense_callback", str, EMPTY, NO_MOVE)) {
 	int acode = attack(str, NULL);
 

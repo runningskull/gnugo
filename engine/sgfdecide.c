@@ -85,7 +85,7 @@ decide_string(int pos, const char *sgf_output)
 	gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n", 
 		pos, dpos, count_variations);
       else if (dcode == KO_B)
-	gprintf("%m can be defended with ko (bad) at %1m (%d variations)\n", 
+	gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n", 
 		pos, dpos, count_variations);
     }
     else

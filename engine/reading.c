@@ -876,7 +876,6 @@ attack_threats(int pos, int max_points, int moves[], int codes[])
 	}
     }
   }
-  movelist_sort_points(max_points, moves, codes);
 
 
   /* FIXME: Threaten to attack by saving weak neighbors.

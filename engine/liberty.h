@@ -131,8 +131,7 @@ int have_common_lib(int str1, int str2, int *lib);
 
 
 void start_timer(int n);
-double time_report(int n, const char *occupation, int i, int j, 
-		   double mintime);
+double time_report(int n, const char *occupation, int move, double mintime);
 
 
 /* Play at (pos) and then count the liberties. */
@@ -300,7 +299,6 @@ void modify_eye_spaces(void);
 int  movelist_move_known(int move, int max_points, int points[], int codes[]);
 void movelist_change_point(int move, int code, int max_points, 
 			   int points[], int codes[]);
-void movelist_sort_points(int max_points, int points[], int codes[]);
 
 
 /* functions to add (or remove) move reasons */
@@ -488,7 +486,7 @@ void test_eyeshape(int eyesize, int *eye_vertices);
 
 
 /* debugging support */
-void move_considered(int i, int j, float value);
+void move_considered(int move, float value);
 
 
 /* SGF routines for debugging purposes in sgffile.c */

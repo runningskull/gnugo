@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in trymove()
+- 1D revisions and cleaning up
 - new file: engine/movelist.c
 - generalized handling of move lists and moved from worm.c
 - attack_threats() enhanced

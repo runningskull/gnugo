@@ -375,6 +375,9 @@ trymove(int pos, int color, const char *message, int str,
   /* Do the real work elsewhere. */
   if (!do_trymove(pos, color, 0))
     return 0;
+
+  if (message == NULL)
+    message = "UNKNOWN";
   
   /* Store the move in an sgf tree if one is available. */
   if (sgf_dumptree) {
@@ -433,8 +436,8 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
 
   if (sgf_dumptree) {
     char buf[100];
-    if (!message)
-      message = "???";
+    if (message == NULL)
+      message = "UNKNOWN";
     if (komaster != EMPTY)
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
 		  message, count_variations, hashdata.hashval,
