@@ -4,7 +4,7 @@
 
 - avoid overflow in reading_cache_init()
 - converted owl to use new cache implementation
-- new tests
+- new game records and test cases
 
 3.5.4 released January 23, 2004
 

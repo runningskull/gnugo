@@ -414,6 +414,50 @@ loadsgf games/owl47.sgf 15
 414 owl_attack Q4
 #? [1 S2]
 
+# Problems arising from a 3-3 invasion.
+loadsgf games/life_and_death/invasion1.sgf
+501 owl_defend C17
+#? [1 C15]
+502 owl_defend R17
+#? [1 (R14|S14|R16)]
+503 owl_defend R3
+#? [1 S2]
+504 owl_attack C3
+#? [1 B1]
+
+loadsgf games/life_and_death/invasion2.sgf
+505 owl_attack C17
+#? [1 (C19|B19)]
+506 owl_defend R17
+#? [1 S16]
+507 owl_defend R3
+#? [1 S2]
+508 owl_defend R5
+#? [1 (S2|S7)]
+509 owl_defend C5
+#? [1 A5]
+
+loadsgf games/life_and_death/invasion3.sgf
+510 owl_defend C15
+#? [1 B15]
+511 owl_defend R15
+#? [1 (R12|R11)]
+512 owl_defend R3
+#? [1 S5]
+513 owl_defend C3
+#? [1 C2]
+
+loadsgf games/life_and_death/invasion4.sgf
+514 owl_defend C17
+#? [1 B16]
+515 owl_defend R15
+#? [1 S15]
+516 owl_defend R3
+#? [1 S2]
+517 owl_defend C3
+#? [1 C8]
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
