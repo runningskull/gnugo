@@ -168,8 +168,6 @@ experimental_analyze_semeai(int my_dragon, int your_dragon)
 }
 
 
-
-
 /* analyzes a pair of adjacent dragons which are 
  * DEAD or CRITICAL.
  */

@@ -956,7 +956,9 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
     DEBUG(DEBUG_EYES, "  pessimistic min revised to 1 (interior stones)\n");
   }
   
-  if (*max == *min && *max != *pessimistic_min) {
+  if (attack_point
+      && *attack_point == NO_MOVE
+      && *max != *pessimistic_min) {
     /* Find one marginal vertex and set as attack and defense point.
      *
      * We make some effort to find the best marginal vertex by giving
