@@ -110,7 +110,7 @@ loadsgf games/kgs/yagr-Sapojnik.sgf 80
 #? [T10]*
 
 # Win the semeai!
-loadsgf games/kgs/yagr-Sapojnik.sgf 149
+loadsgf games/kgs/yagr-Kazik.sgf 149
 230 reg_genmove white
 #? [J12|J11|L10|L9|J19]*
 
