@@ -1366,7 +1366,9 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
       for (j = 1; j < database->max_width; j++) {
 	pos += dx;
 	num_stones[pos] = num_stones[pos - dx] + num_stones[pos - dy]
-			- num_stones[pos - dx - dy] + IS_STONE(board[pos]);
+			- num_stones[pos - dx - dy];
+	if (ON_BOARD1(pos) && IS_STONE(board[pos]))
+	  num_stones[pos]++;
       }
     }
 

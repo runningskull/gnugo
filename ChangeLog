@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- fix arraybound violation in corner_matchpat()
+
 3.3.17 released March 2, 2003
 
 - most superstring related move generation broken into new superstring_moves()
