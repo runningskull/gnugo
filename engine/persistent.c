@@ -266,13 +266,14 @@ purge_persistent_reading_cache()
 
 
 /* Look for a valid read result in the persistent cache.
- * Return index of the entry found if there is a match, -1 if no match
+ * Return index of the entry found if there is a match, -1 if no match.
  */
 int
 search_persistent_reading_cache(int routine, int str, int *result, int *move)
 {
   int k;
   int r;
+  ASSERT1(str == find_origin(str), str);
 
   for (k = 0; k < persistent_reading_cache_size; k++) {
     /* Check that everything matches. */

@@ -380,8 +380,10 @@ attack_and_defend(int str,
      */
     if (dcode == WIN && dpos == NO_MOVE) {
       int ai, di;
-      ai = search_persistent_reading_cache(ATTACK, str, NULL, NULL);
-      di = search_persistent_reading_cache(FIND_DEFENSE, str, NULL, NULL);
+      ai = search_persistent_reading_cache(ATTACK, find_origin(str),
+					   NULL, NULL);
+      di = search_persistent_reading_cache(FIND_DEFENSE, find_origin(str),
+					   NULL, NULL);
       if (ai != -1)
         delete_persistent_reading_entry(ai);
       if (di != -1)
