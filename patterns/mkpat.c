@@ -335,6 +335,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"owl_maxeye",		1, 0, 0.01, "owl_maxeye(%s)"},
   {"owl_proper_eye",		1, 0, 0.01, "owl_proper_eye(%s)"},
   {"owl_eye_size",		1, 0, 0.01, "owl_eye_size(%s)"},
+  {"owl_lunch",                 1, 0, 0.01, "owl_lunch(%s)"},
   {"owl_strong_dragon",		1, 0, 0.01, "owl_strong_dragon(%s)"},
   {"has_aji",			1, 0, 0.01,
 		"(dragon[%s].owl_threat_status == CAN_THREATEN_DEFENSE)"},

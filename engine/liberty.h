@@ -409,6 +409,7 @@ int owl_mineye(int pos);
 int owl_maxeye(int pos);
 int owl_proper_eye(int pos);
 int owl_eye_size(int pos);
+int owl_lunch(int str);
 int owl_strong_dragon(int pos);
 void owl_reasons(int color);
 

@@ -2297,6 +2297,9 @@ xc*b.
 
 Pattern A607a
 # gf Split pattern. (3.5.3)
+# gf Revised constraint. (3.5.4)
+# gf Comment: A607a and A607b could now be merged again but I think
+#    it may be handy for later revisions to keep them apart.
 
 XYO        there is death in the hane
 .*.
@@ -2308,11 +2311,12 @@ XYa
 b*.
 ---
 
-;!oplay_attack(*,a) && !obvious_false_xeye(b)
+;owl_maxeye(b) > 0 && !oplay_attack(*,a) && !obvious_false_xeye(b)
 
 
 Pattern A607b
 # gf Split pattern and revised constraint. (3.5.3)
+# gf Reordered constraint for better performance. (3.5.4)
 
 .YO        there is death in the hane
 .*.
@@ -2324,11 +2328,12 @@ Pattern A607b
 b*.
 ---
 
-;!oplay_attack(*,a) && !obvious_false_xeye(b) && owl_maxeye(b)>0
+;owl_maxeye(b)>0 && !oplay_attack(*,a) && !obvious_false_xeye(b)
 
 
-Pattern A607b
+Pattern A607c
 # gf New pattern. (3.1.12)
+# gf Reordered constraint for better performance. (3.5.4)
 
 xYO        the push is also deadly
 .*O
@@ -2340,7 +2345,28 @@ xYa
 b*a
 ---
 
-;!oplay_attack(*,b,a) && owl_eyespace(b)
+;owl_eyespace(b) && !oplay_attack(*,b,a)
+
+
+Pattern A607d
+# gf New pattern. (3.5.4)
+# gf Comment: A607a and A607b could now be merged again but I think
+#    it may be handy for later revisions to keep them apart.
+
+?XYO        there is death in the hane
+o.*.
+----
+
+:8,s,value(36)
+
+dXYa
+cb*.
+----
+
+;owl_maxeye(b)==0
+;&& ((o_somewhere(c) && owl_lunch(c))
+;    || (o_somewhere(d) && owl_lunch(d)))
+;&& !oplay_attack(*,a) && !obvious_false_xeye(b)
 
 
 Pattern A608
@@ -3931,6 +3957,40 @@ O*a?
 xCxx
 
 ;oplay_disconnect(*,a,B,C)
+
+
+Pattern A1024a
+# gf New pattern. (3.5.4)
+# Converse to D1386a
+
+YO.o       connect along edge to strong dragon
+x*.X
+----
+
+:8,Eb,value(90)
+
+AO.o
+x*.B
+----
+
+;owl_strong_dragon(B) && !xplay_disconnect(*,A,B)
+
+
+Pattern A1024b
+# gf New pattern. (3.5.4)
+# Converse to D1386a
+
+XO.o       connect along edge to strong dragon
+x*.Y
+----
+
+:8,Eb,value(90)
+
+BO.o
+x*.A
+----
+
+;owl_strong_dragon(B) && !xplay_disconnect(*,A,B)
 
 
 #########################################################

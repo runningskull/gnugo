@@ -701,13 +701,24 @@ Pattern 5001
 
 |.
 |X
-|xX.
+|.X.
++---
+
+:1112
+
+
+Pattern 5002
+# Bent four in the corner.
+
+|.
+|X
+|XX.
 +---
 
 :1111
 
 
-Pattern 5002
+Pattern 5003
 # Bent four in the corner.
 
 |.
@@ -717,7 +728,7 @@ Pattern 5002
 :1111
 
 
-Pattern 5003
+Pattern 5004
 # Bent four in the corner.
 #
 # This one is tricky. Black has two certain eyes if there are at least
@@ -734,7 +745,7 @@ Pattern 5003
 :1111
 
 
-Pattern 5004
+Pattern 5005
 # Bent four in the corner.
 #
 # This pattern is similar to the previous one. Black has two certain eyes
@@ -749,7 +760,7 @@ Pattern 5004
 :1111
 
 
-Pattern 5005
+Pattern 5006
 # Bent four in the corner.
 #
 # This pattern behaves identically to the previous one.
@@ -761,7 +772,7 @@ Pattern 5005
 :1111
 
 
-Pattern 5006
+Pattern 5007
 # Bent four in the corner. The attack depends on ko and sufficiently
 # few outer liberties if the corner vertex is empty.
 
@@ -772,7 +783,7 @@ Pattern 5006
 :1122
 
 
-Pattern 5007
+Pattern 5008
 # Bent four in the corner. The attack depends on ko and sufficiently
 # few outer liberties if the corner vertex is empty.
 
@@ -783,7 +794,7 @@ Pattern 5007
 :1122
 
 
-Pattern 5008
+Pattern 5009
 # Bent four in the corner. An O move in the corner may or may not give
 # another eye (depending on ko and/or outer liberties). An X move in
 # the corner definitely settles the number of eyes to 1.
@@ -795,7 +806,7 @@ Pattern 5008
 :1111
 
 
-Pattern 5009
+Pattern 5010
 # Bent four in the corner.
 
 |.
@@ -806,7 +817,7 @@ Pattern 5009
 :1122
 
 
-Pattern 5010
+Pattern 5011
 # Bent four shape that X must fight. Ko if at most one outer liberty.
 
 |X
@@ -816,7 +827,7 @@ Pattern 5010
 :1122
 
 
-Pattern 5011
+Pattern 5012
 
 xxxxx
 -----
@@ -5132,13 +5143,24 @@ Pattern 75003
 
 Pattern 75004
 
+|.
+|*
+|X.
+|..!
++---
+
+:1122
+
+
+Pattern 75010
+
   XX.
 !..X
 
 :1112
 
 
-Pattern 75005
+Pattern 75011
 
   XXX
 (.*X
@@ -5146,7 +5168,7 @@ Pattern 75005
 :1122
 
 
-Pattern 75006
+Pattern 75012
 
   xXx
 @..x
@@ -5154,7 +5176,7 @@ Pattern 75006
 :1122
 
 
-Pattern 75007
+Pattern 75020
 
   X.(
 (.*X
@@ -5162,7 +5184,7 @@ Pattern 75007
 :1122
 
 
-Pattern 75008
+Pattern 75021
 
   x.!
 !..x
@@ -5170,7 +5192,7 @@ Pattern 75008
 :0112
 
 
-Pattern 75009
+Pattern 75022
 
   x.!
 !.Xx
@@ -5586,6 +5608,15 @@ Pattern 78510
 ----
 X.X.
 x*.
+
+:1122
+
+
+Pattern 78511
+
+----
+..*.
+.XX
 
 :1122
 
@@ -6308,6 +6339,18 @@ Pattern 90700
 
    !
 @..>...!
+
+:1122
+
+
+Pattern 90800
+
+|!
+|.
+|X.
+|X
+|...@
++---
 
 :1122
 

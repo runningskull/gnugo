@@ -593,13 +593,14 @@ OXO
 #########################
 
 Pattern EE401
+# gf Added n classification. (3.5.2)
 
 |.O?        big endgame move
 |.OX        at least 2 points gote
 |.*x
 +---
 
-:8,OXed,terri(2)
+:8,nOXed,terri(2)
 
 
 Pattern EE402

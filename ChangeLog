@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function and autohelper owl_lunch()
+- lunches_are_current field no longer reset in owl_safe_move()
 - don't claim levels higher than 10 are unsupported
 - new GTP command unconditional_status
 - estimate_lunch_eye_value() revised	
@@ -15,6 +17,7 @@
 - avoid ko captures when filling outer liberties in semeai reading
 - adjust breakin_depth in modify_depth_values()
 - atari_atari tuning
+- endgame tuning
 - eye tuning
 - fuseki tuning
 - influence tuning

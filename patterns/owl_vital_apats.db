@@ -667,6 +667,7 @@ x..
 
 Pattern VA39
 # tm New Pattern (3.1.16)
+# gf Revised constraint. (3.5.4)
 
 XO*|	  atari to kill eye
 !XX|
@@ -675,10 +676,10 @@ XOO|
 :8,s,value(95)
 
 XO*|
-AXX|
-XOO|
+aXX|
+Xbb|
 
-; owl_eyespace(A)
+;owl_eyespace(a) && olib(*)>1 && lib(b)>1
 
 
 Pattern VA40

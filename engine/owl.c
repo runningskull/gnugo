@@ -5191,7 +5191,6 @@ owl_safe_move(int move, int color)
       safe = 1;
     else
       safe = 0;
-    current_owl_data->lunches_are_current = 0;
     popgo();
   }
   current_owl_data->safe_move_cache[move] = safe+1;
@@ -5717,6 +5716,29 @@ owl_eye_size(int pos)
   origin = current_owl_data->my_eye[pos].origin;
   return current_owl_data->my_eye[origin].esize
 	 - current_owl_data->my_eye[origin].msize;
+}
+  
+
+/* Used by autohelpers.
+ * Returns whether str is a lunch.
+ */
+int
+owl_lunch(int str)
+{
+  int k;
+  int origin;
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(current_owl_data->lunches_are_current, str);
+  origin = find_origin(str);
+
+  for (k = 0; k < MAX_LUNCHES; k++) {
+    if (current_owl_data->lunch[k] == NO_MOVE)
+      break;
+    if (current_owl_data->lunch[k] == origin)
+      return 1;
+  }
+
+  return 0;
 }
   
 
