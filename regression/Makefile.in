@@ -78,8 +78,8 @@ glibconfig = @glibconfig@
 install_sh = @install_sh@
 perl = @perl@
 
-TST = 13x13.tst arb.tst arend.tst arend2.tst arion.tst atari_atari.tst \
-       auto01.tst auto02.tst auto03.tst auto04.tst \
+TST = 13x13.tst 13x13b.tst arb.tst arend.tst arend2.tst arion.tst \
+       atari_atari.tst auto01.tst auto02.tst auto03.tst auto04.tst \
        auto_handtalk.tst blunder.tst buzco.tst capture.tst \
        century2002.tst connect.tst connect_rot.tst \
        connection.tst connection_rot.tst cutstone.tst \
@@ -95,7 +95,7 @@ TST = 13x13.tst arb.tst arend.tst arend2.tst arion.tst atari_atari.tst \
        score.tst score2.tst score_rot.tst semeai.tst \
        semeai2.tst strategy.tst strategy2.tst strategy3.tst \
        strategy4.tst strategy5.tst strategy_rot.tst \
-       tactics.tst tactics1.tst trevor.tst trevora.tst \
+       tactics.tst tactics1.tst thrash.tst trevor.tst trevora.tst \
        trevorb.tst trevorc.tst trevord.tst vie.tst viking.tst \
        semeai_rot.tst
 
@@ -235,6 +235,9 @@ test: all_batches
 
 13x13: 13x13.tst
 	$(srcdir)/eval.sh 13x13.tst $(GG_OPTIONS)
+
+13x13b: 13x13b.tst
+	$(srcdir)/eval.sh 13x13b.tst $(GG_OPTIONS)
 
 arb: arb.tst
 	$(srcdir)/eval.sh arb.tst $(GG_OPTIONS)
@@ -463,6 +466,9 @@ tactics: tactics.tst
 tactics1: tactics1.tst
 	$(srcdir)/eval.sh tactics1.tst $(GG_OPTIONS)
 
+thrash: thrash.tst
+	$(srcdir)/eval.sh thrash.tst $(GG_OPTIONS)
+
 trevor: trevor.tst
 	$(srcdir)/eval.sh trevor.tst $(GG_OPTIONS)
 
@@ -561,6 +567,8 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) gunnar.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) arend2.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) nando.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) thrash.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) 13x13b.tst $(GG_OPTIONS)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
