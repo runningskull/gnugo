@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- shadowed variables fixed in dragon.c
 - major aftermath code revisions
 - doing_scoring contingent revisions in influence_callback(), shapes(),
   shapes_callback(), connection_value(), estimate_strategical_value(),

@@ -144,7 +144,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       }
     }
   time_report(2, "  time to amalgamate dragons", NO_MOVE, 1.0);
-
+  
   /* At this time, all dragons have been finalized and we can
    * initialize the dragon2[] array. After that we can no longer allow
    * amalgamation of dragons.
@@ -196,22 +196,22 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   time_report(2, "  time to find lunches", NO_MOVE, 1.0);
 
   /* In case origins of dragons got moved, put the dragons of eyes aright. */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      str = POS(i, j);
-
-      if (black_eye[str].dragon != NO_MOVE) {
-	int dr = dragon[black_eye[str].dragon].origin;
-	black_eye[str].dragon = dr;
-      }
-
-      if (white_eye[str].dragon != NO_MOVE) {
-	int dr = dragon[white_eye[str].dragon].origin;
-	  white_eye[str].dragon = dr;
-      }
+  for (str = BOARDMIN; str < BOARDMAX; str++) {
+    if (!ON_BOARD(str))
+      continue;
+    
+    if (black_eye[str].dragon != NO_MOVE) {
+      dr = dragon[black_eye[str].dragon].origin;
+      black_eye[str].dragon = dr;
     }
+    
+    if (white_eye[str].dragon != NO_MOVE) {
+      dr = dragon[white_eye[str].dragon].origin;
+      white_eye[str].dragon = dr;
+    }
+  }
   time_report(2, "  time to fix origins", NO_MOVE, 1.0);
-
+  
   /* Find topological half eyes and false eyes by analyzing the
    * diagonal intersections, as described in the Texinfo
    * documentation (Eyes/Eye Topology).
@@ -306,7 +306,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   /* Now we compute the genus. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      int str = POS(i, j);
+      str = POS(i, j);
 
       if (black_eye[str].color == BLACK_BORDER
 	  && black_eye[str].dragon != NO_MOVE
@@ -384,9 +384,9 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
-      struct dragon_data *d = &(dragon[str]);
+      struct dragon_data *dd = &(dragon[str]);
       
-      dragon[str] = dragon[d->origin];
+      dragon[str] = dragon[dd->origin];
     }
   
   find_neighbor_dragons();
@@ -507,8 +507,8 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
-      struct dragon_data *d = &(dragon[str]);
-      dragon[str] = dragon[d->origin];
+      struct dragon_data *dd = &(dragon[str]);
+      dragon[str] = dragon[dd->origin];
     }
 
   /* If the opponent's last move is a dead dragon, this is
@@ -583,8 +583,8 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
-      struct dragon_data *d = &(dragon[str]);
-      dragon[str] = dragon[d->origin];
+      struct dragon_data *dd = &(dragon[str]);
+      dragon[str] = dragon[dd->origin];
     }
 
   time_report(2, "  owl threats ", NO_MOVE, 1.0);
@@ -1170,34 +1170,33 @@ show_dragons(void)
     
   gprintf("%o\n");
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    struct dragon_data *d = &(dragon[pos]);
+    struct dragon_data *dd = &(dragon[pos]);
     struct dragon_data2 *d2;
-    int k;
     
     if (!IS_STONE(board[pos]))
       continue;
     
-    d2 = &(dragon2[d->id]);
+    d2 = &(dragon2[dd->id]);
     
-    if (d->origin == pos) {
+    if (dd->origin == pos) {
       gprintf("%1m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, status %s, matcher status %s, moyo size %d safety %s",
 	      pos,
 	      board[pos] == BLACK ? "B" : "W",
-	      d->size,
-	      d->effective_size,
+	      dd->size,
+	      dd->effective_size,
 	      d2->genus,
 	      d2->heyes,
 	      d2->escape_route,
-	      snames[d->status],
-	      snames[d->matcher_status],
+	      snames[dd->status],
+	      snames[dd->matcher_status],
 	      d2->moyo,
 	      safety_names[d2->safety]);
-      gprintf(", owl status %s\n", snames[d->owl_status]);
-      if (d->owl_status == CRITICAL) {
+      gprintf(", owl status %s\n", snames[dd->owl_status]);
+      if (dd->owl_status == CRITICAL) {
 	gprintf("... owl attackable at %1m, code %d\n",
-		d->owl_attack_point, d->owl_attack_code);
+		dd->owl_attack_point, dd->owl_attack_code);
 	gprintf("... owl defendable at %1m, code %d\n",
-		d->owl_defense_point, d->owl_defense_code);
+		dd->owl_defense_point, dd->owl_defense_code);
       }
       gprintf("... neighbors");
       for (k = 0; k < d2->neighbors; k++) {
