@@ -1,34 +1,3 @@
-<html><head>
-<!-- ViewCVS       -- http://viewcvs.sourceforge.net/
-     by Greg Stein -- mailto:gstein@lyra.org
-  -->
-
-<title>gnugo/gnugo/regression/trevord.tst - view - 1.1</title></head>
-<body bgcolor="#eeeeee">
-<table width="100&#37;" border=0 cellspacing=0 cellpadding=1 bgcolor="#9999ee">
-<tr valign=bottom><td>
-<a href="trevord.tst#rev1.1"><img src="/icons/back.gif" alt="[BACK_ICON]" border=0 width=20 height=22></a>
-<b>Return to <a href="trevord.tst#rev1.1">trevord.tst</a> CVS log</b> <img src="/icons/text.gif" alt="[FILE_ICON]" border=0 width=20 height=22></td>
-<td align=right><img src="/icons/dir.gif" alt="[DIR_ICON]" border=0 width=20 height=22> <b>Up to <a href="/cgi-bin/viewcvs/#dirlist">[Sources]</a> / <a href="/cgi-bin/viewcvs/gnugo/#dirlist">gnugo</a> / <a href="/cgi-bin/viewcvs/gnugo/gnugo/#dirlist">gnugo</a> / <a href="/cgi-bin/viewcvs/gnugo/gnugo/regression/#dirlist">regression</a></b></td>
-</tr></table>
-<hr noshade>
-<table width="100&#37;"><tr><td bgcolor="#ffffff">
-File: <a href="/cgi-bin/viewcvs/#dirlist">[Sources]</a> / <a href="/cgi-bin/viewcvs/gnugo/#dirlist">gnugo</a> / <a href="/cgi-bin/viewcvs/gnugo/gnugo/#dirlist">gnugo</a> / <a href="/cgi-bin/viewcvs/gnugo/gnugo/regression/#dirlist">regression</a> / <a href="/cgi-bin/viewcvs/gnugo/gnugo/regression/trevord.tst#dirlist">trevord.tst</a> </b>
-(<a href="/cgi-bin/viewcvs/~checkout~/gnugo/gnugo/regression/trevord.tst?rev=1.1"
- target="cvs_checkout"
- onClick="window.open('/cgi-bin/viewcvs/~checkout~/gnugo/gnugo/regression/trevord.tst?rev=1.1','cvs_checkout','resizeable=1,scrollbars=1 ');"
-><b>download</b></a>)
-<br>
-Revision <b>1.1</b>
-, <i>Sun Dec 30 16:40:45 2001 UTC</i> (3 days, 6 hours ago) by <i>bump</i>
-<br>Branch: <b>MAIN</b>
-<pre>added trevor_1_19.[1234]
-</pre>
-</td></tr></table>
-<hr noshade>
-<pre>
-
-
 # games/trevor/auto/d01.sgf problems:
 
 #Extend along side bigger.  Probably C7
@@ -413,10 +382,11 @@ loadsgf games/trevor/auto/d32.sgf 176
 #? [H6]*
 
 
-loadsgf games/trevor/auto/d32.sgf 184
-770 gg_genmove white
-#? [A12]*
-
+##Not a good problem.
+##loadsgf games/trevor/auto/d32.sgf 184
+##770 gg_genmove white
+###? [A12]*
+##
 
 loadsgf games/trevor/auto/d32.sgf 198
 780 gg_genmove white
@@ -625,9 +595,3 @@ loadsgf games/trevor/auto/d48.sgf 226
 #? [Q8]*
 
 
-</pre>
-<hr noshade><table width="100&#37;" border=0 cellpadding=0 cellspacing=0><tr>
-<td align=left><address>Send suggestions and report problems to the GNU CVS Hackers <a href="mailto:cvs-hackers@gnu.org">&lt;cvs-hackers@gnu.org&gt;</a>;</address></td>
-<td align=right>Powered by<br><a href="http://viewcvs.sourceforge.net/">ViewCVS 0.7</a>
-</td></tr></table>
-</body></html>
