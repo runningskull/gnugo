@@ -166,6 +166,8 @@ static void owl_determine_life(struct local_owl_data *owl,
 			       struct owl_move_data *moves,
 			       struct eyevalue *probable_eyes,
 			       int *eyemin, int *eyemax);
+static void owl_find_relevant_eyespaces(struct local_owl_data *owl,
+					char mw[BOARDMAX], char mz[BOARDMAX]);
 static int owl_estimate_life(struct local_owl_data *owl,
 			     struct local_owl_data *second_owl,
     		  	     struct owl_move_data vital_moves[MAX_MOVES],
@@ -2507,12 +2509,9 @@ owl_determine_life(struct local_owl_data *owl,
   int pos;
   int k;
   int lunch;
-  int eye_color;
   int num_eyes = 0;
   int num_lunches = 0;
   int save_debug = debug;
-  memset(mw, 0, sizeof(mw));
-  memset(mz, 0, sizeof(mz));
   memset(vital_values, 0, sizeof(vital_values));
   UNUSED(komaster);
 
@@ -2544,38 +2543,7 @@ owl_determine_life(struct local_owl_data *owl,
 
   owl_make_domains(owl, second_owl);
 
-  /* The eyespaces we want to evaluate are the ones which
-   * are adjacent to the dragon (whose stones comprise the
-   * support of goal) which are not GRAY_BORDERED. These
-   * are the eyespaces of the dragon. Now we find their
-   * origins.
-   *
-   * It is required that there are at least two distinct connections,
-   * adjacent or diagonal, between non-marginal eyespace vertices and
-   * stones of the goal dragon. Otherwise there is a risk that we
-   * include irrelevant eye spaces.
-   */
-
-  if (color == WHITE)
-    eye_color = WHITE_BORDER;
-  else
-    eye_color = BLACK_BORDER;
-
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == color) {
-      for (k = 0; k < 8; k++) {
-	int pos2 = pos + delta[k];
-	if (ON_BOARD(pos2)
-	    && eye[pos2].color == eye_color
-	    && !eye[pos2].marginal) {
-	  if (owl->goal[pos])
-	    mw[eye[pos2].origin]++;
-	  else
-	    mz[eye[pos2].origin]++;
-	}
-      }
-    }
-  }
+  owl_find_relevant_eyespaces(owl, mw, mz);
 
   /* Reset halfeye data. Set topological eye value to something big. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -2586,6 +2554,13 @@ owl_determine_life(struct local_owl_data *owl,
   /* Find topological half eyes and false eyes. */
   find_half_and_false_eyes(color, eye, owl->half_eye, mw);
 
+  /* The eyespaces may have been split or changed in other ways by the
+   * topological analysis, so we need to regenerate them and once more
+   * determine which ones are relevant.
+   */
+  partition_eyespaces(owl->my_eye, owl->color);
+  owl_find_relevant_eyespaces(owl, mw, mz);
+  
   set_eyevalue(probable_eyes, 0, 0, 0, 0);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -2831,7 +2806,7 @@ owl_determine_life(struct local_owl_data *owl,
     *eyemax += max_eyes(probable_eyes);
     /* If we have at least two different eyespaces and can create one eye
      * in sente, we assume there's a chance to create another one. This is
-     * needed because optics code don't know about eyespaces influenting
+     * needed because optics code don't know about eyespaces influencing
      * each other and combination moves (i.e. double threats to create an
      * eye).
      */
@@ -2845,6 +2820,51 @@ owl_determine_life(struct local_owl_data *owl,
   debug = save_debug;
 }
 
+
+/* The eyespaces we want to evaluate are the ones which
+ * are adjacent to the dragon (whose stones comprise the
+ * support of goal) which are not GRAY_BORDERED. These
+ * are the eyespaces of the dragon. Now we find their
+ * origins.
+ *
+ * It is required that there are at least two distinct connections,
+ * adjacent or diagonal, between non-marginal eyespace vertices and
+ * stones of the goal dragon. Otherwise there is a risk that we
+ * include irrelevant eye spaces.
+ */
+
+static void
+owl_find_relevant_eyespaces(struct local_owl_data *owl,
+			    char mw[BOARDMAX], char mz[BOARDMAX])
+{
+  int pos;
+  int eye_color;
+  int k;
+  struct eye_data *eye = owl->my_eye;
+  
+  if (owl->color == WHITE)
+    eye_color = WHITE_BORDER;
+  else
+    eye_color = BLACK_BORDER;
+
+  memset(mw, 0, BOARDMAX * sizeof(mw[0]));
+  memset(mz, 0, BOARDMAX * sizeof(mz[0]));
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == owl->color) {
+      for (k = 0; k < 8; k++) {
+	int pos2 = pos + delta[k];
+	if (ON_BOARD(pos2)
+	    && eye[pos2].color == eye_color
+	    && !eye[pos2].marginal) {
+	  if (owl->goal[pos])
+	    mw[eye[pos2].origin]++;
+	  else
+	    mz[eye[pos2].origin]++;
+	}
+      }
+    }
+  }
+}
 
 /* Case 1.
  *

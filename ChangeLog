@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function partition_eyespaces()
+- new function owl_find_relevant_eyespaces()
 - cpu time support for regress.pike
 - new function spread_connection_distances() broken out of
   compute_connection_distances() and tuned
@@ -23,7 +25,6 @@
 - bugfix in revise_semeai()
 - find_half_and_false_eyes() bugfixed
 - improve_lunch_attack() revised
-- new type of marginal vertices INESSENTIAL_MARGINAL 
 - D219 pattern retired
 - new pattern action good_attack_threat overrides heuristics in value_moves.c
 - new global known_good_attack_threats[][]

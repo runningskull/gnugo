@@ -51,10 +51,9 @@ extern Hash_data    hashdata;
 /* ================================================================ */
 
 
-#define FALSE_EYE		1
-#define HALF_EYE		2
-#define INHIBIT_CONNECTION	4
-#define INESSENTIAL_MARGINAL	8
+#define FALSE_EYE          1
+#define HALF_EYE           2
+#define INHIBIT_CONNECTION 4
 
 
 /* A string with n stones can have at most 2(n+1) liberties. From this
@@ -1068,6 +1067,7 @@ void add_false_eye(int pos, struct eye_data eye[BOARDMAX],
 void make_domains(struct eye_data b_eye[BOARDMAX],
                   struct eye_data w_eye[BOARDMAX],
 		  int owl_call);
+void partition_eyespaces(struct eye_data eye[BOARDMAX], int color);
 void find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
 			      struct half_eye_data heye[BOARDMAX],
 			      char find_mask[BOARDMAX]);
