@@ -1455,19 +1455,6 @@ do_owl_attack(int str, int *move, int *wormid,
 	continue;
       
       owl_shapes(&shape_patterns, shape_moves, other, owl, &owl_attackpat_db);
-      /* A move of value 100 is considered a win */
-      if (get_next_move_from_list(&shape_patterns, other, shape_moves, 100)) {
-	/* to make sure this move is recorded in the sgf file */
-	if (trymove(shape_moves[0].pos, other,
-		    shape_moves[0].name, str, komaster, kom_pos))
-	  popgo();
-	TRACE("%oVariation %d: DEAD (Winning owl_attackpat)\n",
-	      this_variation_number);
-	SGFTRACE(shape_moves[0].pos, WIN, "winning attack pattern");
-	close_pattern_list(other, &shape_patterns);
-	READ_RETURN(read_result, move, shape_moves[0].pos, WIN);
-      }
-
       moves = shape_moves;
       break;
 
@@ -1613,21 +1600,6 @@ do_owl_attack(int str, int *move, int *wormid,
         if (!get_next_move_from_list(&shape_patterns, other,
 	                             shape_moves, move_cutoff))
           break;
-	/* A move of value 99 is considered a forced move. No other move
-	 * needs to be considered. If there are two of them, we loose.
-	 */
-	if (moves[k].value == 99) {
-	  gg_assert(k == 0);
-          if (get_next_move_from_list(&shape_patterns, other,
-	                              shape_moves, 99)) {
-	    TRACE("%oVariation %d: ALIVE (multiple forced moves)\n",
-		  this_variation_number);
-	    SGFTRACE(0, 0, "multiple forced moves");
-	    close_pattern_list(other, &shape_patterns);
-	    READ_RETURN0(read_result);
-	  }
-	  move_cutoff = 99;
-	}
       }
       else
 	if (moves[k].value < move_cutoff)
@@ -2106,18 +2078,6 @@ do_owl_defend(int str, int *move, int *wormid,
 	continue;
       
       owl_shapes(&shape_patterns, shape_moves, color, owl, &owl_defendpat_db);
-      /* A move of value 100 is considered a win */
-      if (get_next_move_from_list(&shape_patterns, color, shape_moves, 100)) {
-	/* to make sure this move is recorded in the sgf file */
-	if (trymove(shape_moves[0].pos, color, shape_moves[0].name, str,
-		    komaster, kom_pos))
-	  popgo();
-	TRACE("%oVariation %d: ALIVE (Winning owl_defendpat)\n", 
-	      this_variation_number);
-	SGFTRACE(shape_moves[0].pos, WIN, "winning defense pattern");
-	close_pattern_list(color, &shape_patterns);
-	READ_RETURN(read_result, move, shape_moves[0].pos, WIN);
-      }
       moves = shape_moves;
       break;
 

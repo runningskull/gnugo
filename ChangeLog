@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- retire special meaning of owl pattern values 99 and 100
 - bugfix in revise_semeai()
 - find_half_and_false_eyes() bugfixed
 - improve_lunch_attack() revised
