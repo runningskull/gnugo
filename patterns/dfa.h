@@ -147,7 +147,7 @@ order_t;
 
 void dfa_init(void);	/* Every call to a dfa function must be done */
 void dfa_end(void);	/* between calls of those 2 functions. */
-void buildSpiralOrder(int order[8][MAX_ORDER]); /* Needed by matchpat */
+void buildSpiralOrder(int order[MAX_ORDER][8]); /* Needed by matchpat */
 
 /* basic dfa manipulation */
 void print_c_dfa(FILE* of, const char *name, dfa_t *pdfa);

@@ -2460,7 +2460,7 @@ r_push_move(int move, int value, const char * name,
 
 /* Callback function for pattern-based tactical reading */
 static void
-reading_callback(int m, int n, int color,
+reading_callback(int anchor, int color,
                  struct pattern *pattern, int ll, void *data)
 {
   int k;
@@ -2470,7 +2470,7 @@ reading_callback(int m, int n, int color,
   UNUSED(data);
   UNUSED(k);
 
-  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
 
   if (0)
     gprintf("  Pattern %s called back at %1m (variation %d) orientation %d.\n", 

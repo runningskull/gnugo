@@ -121,7 +121,7 @@ static void sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright);
  *                                6        dfa.
  */
 
-int spiral[8][MAX_ORDER];
+int spiral[MAX_ORDER][8];
 
 /*
  * Build the spiral order for each
@@ -146,7 +146,7 @@ static const int generator[4] =
   { 4 * DFA_MAX_BOARD, 1, -4 * DFA_MAX_BOARD, -1 };
 
 void
-buildSpiralOrder(int order[8][MAX_ORDER])
+buildSpiralOrder(int order[MAX_ORDER][8])
 {
   int Mark[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
   int fifo[8 * MAX_ORDER];
@@ -180,7 +180,7 @@ buildSpiralOrder(int order[8][MAX_ORDER])
   /* generation */
   while (end < MAX_ORDER) {
     ii = fifo[end];
-    order[0][end] = ii - 2 * DFA_OFFSET;
+    order[end][0] = ii - 2 * DFA_OFFSET;
     end++;
     
     for (k = 0; k != 4; k++) {
@@ -197,22 +197,22 @@ buildSpiralOrder(int order[8][MAX_ORDER])
   /* Then we compute all the geometric transformations
      on this order */
   for (k = 0; k < MAX_ORDER; k++) {
-    j0 = order[0][k] % (4 * DFA_MAX_BOARD);
+    j0 = order[k][0] % (4 * DFA_MAX_BOARD);
     if (j0 >= 2 * DFA_MAX_BOARD)
       j0 -= 4 * DFA_MAX_BOARD;
     if (j0 < - 2 * DFA_MAX_BOARD)
       j0 += 4 * DFA_MAX_BOARD;
-    i0 = (order[0][k] - j0) / (4 * DFA_MAX_BOARD);
+    i0 = (order[k][0] - j0) / (4 * DFA_MAX_BOARD);
     for (ll = 1; ll != 8; ll++) {
       TRANSFORM2(i0, j0, &i, &j, ll);
-      order[ll][k] = DFA_POS(i, j);
+      order[k][ll] = DFA_POS(i, j);
     }
   }
 
   if (0) {
     for (ll = 0; ll < 8; ll++) {
       for (i = 0; i < 13; i++) {
-        fprintf(stderr, "i:%d; ll:%d; %d(%c)\n", i, ll, order[ll][i],'A'+i);
+        fprintf(stderr, "i:%d; ll:%d; %d(%c)\n", i, ll, order[i][ll],'A'+i);
       }
     }
   }
@@ -1084,11 +1084,11 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
     memset(strrot, '$', sizeof(char) * (MAX_ORDER + 1));
     for (i = 0; i < MAX_ORDER/2; i++) {
       for (j = 0; j < MAX_ORDER+1; j++) {
-        if (spiral[0][i] == spiral[ll][j]) {
-          if (0 && (spiral[0][i] == 84 || spiral[0][i] == -84
-              || spiral[0][i]== 1   || spiral[0][i] == -1
-              || spiral[ll][j] == 84 || spiral[ll][j] == -84
-              || spiral[ll][j] == 1  || spiral[ll][j] == -1 ) )
+        if (spiral[i][0] == spiral[j][ll]) {
+          if (0 && (spiral[i][0] == 84 || spiral[i][0] == -84
+              || spiral[i][0]== 1   || spiral[i][0] == -1
+              || spiral[j][ll] == 84 || spiral[j][ll] == -84
+              || spiral[j][ll] == 1  || spiral[j][ll] == -1 ) )
             fprintf(stderr, "i: %d  j: %d\n", i, j);
           assert(strrot[i] == '$');
           strrot[i] = strdollar[j];
@@ -1256,12 +1256,12 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
   for (k = 0;
        (k != MAX_ORDER - 1) && ((borders > 0) || edges || to_test > 0);
        k++) {
-    j = spiral[trans][k] % (4 * DFA_MAX_BOARD);
+    j = spiral[k][trans] % (4 * DFA_MAX_BOARD);
     if (j >= 2 * DFA_MAX_BOARD)
       j -= 4 * DFA_MAX_BOARD;
     if (j <  - 2 * DFA_MAX_BOARD)
       j += 4 * DFA_MAX_BOARD;
-    i = (spiral[trans][k] - j) / (4 * DFA_MAX_BOARD);
+    i = (spiral[k][trans] - j) / (4 * DFA_MAX_BOARD);
 
     if (i == pat->maxi)
       borders &= ~SOUTH_EDGE;

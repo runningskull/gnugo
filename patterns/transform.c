@@ -22,7 +22,7 @@
 #include "liberty.h"
 
 /* Array for use by TRANSFORM() macro. */
-int transformation[8][MAX_OFFSET];
+int transformation[MAX_OFFSET][8];
 
 /* Matrix array for use by TRANSFORM2() macro. */
 const int transformation2[8][2][2] = {
@@ -66,7 +66,7 @@ void transformation_init(void)
 	int ty;
 
 	TRANSFORM2(dx, dy, &tx, &ty, k);
-	transformation[k][OFFSET(dx, dy)] = DELTA(tx, ty);
+	transformation[OFFSET(dx, dy)][k] = DELTA(tx, ty);
       }
     }
   }

@@ -119,9 +119,9 @@ extern Hash_data    hashdata;
   ((dy + MAX_BOARD - 1) * (2*MAX_BOARD - 1) + (dx + MAX_BOARD - 1))
 #define OFFSET_DELTA(dx, dy)		(OFFSET(dx, dy) - OFFSET(0, 0))
 #define CENTER_OFFSET(offset)		(offset - OFFSET(0, 0))
-#define TRANSFORM(offset, trans)	(transformation[trans][offset])
+#define TRANSFORM(offset, trans)	(transformation[offset][trans])
 #define AFFINE_TRANSFORM(offset, trans, delta)\
-  (transformation[trans][offset] + delta)
+  (transformation[offset][trans] + delta)
 #define TRANSFORM2(x, y, tx, ty, trans)\
   do {\
     *tx = transformation2[trans][0][0] * (x) + transformation2[trans][0][1] * (y);\
@@ -696,7 +696,7 @@ extern int          disable_endgame_patterns;
 extern int          doing_scoring;
 
 /* Transformation arrays */
-extern int	    transformation[8][MAX_OFFSET];
+extern int	    transformation[MAX_OFFSET][8];
 extern const int    transformation2[8][2][2];
 
 /* Reading parameters */

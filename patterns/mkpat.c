@@ -1761,8 +1761,8 @@ tree_push_pattern_rot(int ll)
     elist_next = elist_next->next;
     elist_next->e.att = elements[i].att;
     /* or continue if we don't need this transformation */
-    TRANSFORM(elements[i].x - ci, elements[i].y - cj, 
-              &(elist_next->e.x), &(elist_next->e.y), ll);
+    TRANSFORM2(elements[i].x - ci, elements[i].y - cj, 
+               &(elist_next->e.x), &(elist_next->e.y), ll);
     elist_next->next = 0;
   }
   tree_push_pattern_DOX(elist, ll);

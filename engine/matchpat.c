@@ -154,27 +154,17 @@ static void matchpat_loop(matchpat_callback_fn_ptr callback,
 			  char goal[BOARDMAX], int anchor_in_goal);
 void transform2(int i, int j, int *ti, int *tj, int trans);
 
-/* FIXME: While translating pattern matching to 1D i try to avoid
- *	  non-trivial changes, so i keep the `p' arrays. Check if
- *	  they are still needed.
- *	    - Paul
- */
-static Intersection p[BOARDMAX];
-static Intersection saved_p[BOARDMAX];
-static int matchpat_call_level = 0;
-
-static void board_to_p(void);
-
 /* Precomputed tables to allow rapid checks on the piece at
  * the board. This table relies on the fact that color is
  * 1 or 2.
  *
- * For pattern element i,  require  (p[m][n] & andmask[i]) == valmask[i]
+ * For pattern element i,  require  (board[pos] & andmask[i]) == valmask[i]
  *
- * .XO) For i=0,1,2,  p[m][n] & 3 is a no-op, so we check p[][] == valmask
- * x)   For i=3, we are checking that p[][] is not color, so AND color and
- *      we get 0 for either empty or OTHER_COLOR, but color if it contains
- *      color
+ * .XO) For i=0,1,2, board[pos] & 3 is a no-op, so we check board[pos]
+ *	== valmask
+ * x)   For i=3, we are checking that board[pos] is not color, so AND
+ *	color and we get 0 for either empty or OTHER_COLOR, but color
+ *	if it contains color
  * o)   Works the other way round for checking it is not X.
  *
  *
@@ -195,7 +185,7 @@ static const int val_mask[2][8] = {
 
 /* and a table for checking classes quickly
  * class_mask[status][color] contains the mask to look for in class.
- * ie. if  pat[r].class & class_mask[dragon[x][y].status][p[x][y]]
+ * ie. if  pat[r].class & class_mask[dragon[pos].status][board[pos]]
  * is not zero then we reject it
  * Most elements if class_mask[] are zero - it is a sparse
  * matrix containing
@@ -319,14 +309,14 @@ transform2(int i, int j, int *ti, int *tj, int trans)
 
 
 /*
- * Try all the patterns in the given array at (m, n). Invoke the
+ * Try all the patterns in the given array at (anchor). Invoke the
  * callback for any that matches. Classes X,O,x,o are checked here. It
  * is up to the callback to process the other classes, and any helper
  * or autohelper functions.
  *
- * If the support of goal[MAX_BOARD][MAX_BOARD] is a subset of the board,
- * patterns are rejected which do not involve this dragon. If goal is a 
- * null pointer, this parameter is ignored.
+ * If the support of goal[BOARDMAX] is a subset of the board, patterns
+ * are rejected which do not involve this dragon. If goal is a null
+ * pointer, this parameter is ignored.
  */
 
 static void
@@ -334,7 +324,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	    struct pattern *pattern, void *callback_data,
 	    char goal[BOARDMAX]) 
 {
-  const int anchor_test = p[anchor] ^ color;  /* see below */
+  const int anchor_test = board[anchor] ^ color;  /* see below */
   int m = I(anchor), n = J(anchor);
   int merged_val;
 
@@ -355,7 +345,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	unsigned int this;
 	if (!ON_BOARD2(i, j))
 	  this = 3;
-	else if ((this = p[POS(i, j)]) == 0)
+	else if ((this = BOARD(i, j)) == 0)
 	  continue;
 	else if (color == 2)
 	  this = OTHER_COLOR(this);
@@ -383,13 +373,13 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
        * pattern in one go.
        *
        * Patterns are always drawn from O perspective in .db,
-       * so p[m][n] is 'color' if the pattern is anchored
+       * so board[pos] is 'color' if the pattern is anchored
        * at O, or 'other' for X.
        * Since we require that this flag contains 3 for
        * anchored_at_X, we can check that
-       *   p[m][n] == (color ^ anchored_at_X)
+       *   board[pos] == (color ^ anchored_at_X)
        * which is equivalent to
-       *   (p[m][n] ^ color) == anchored_at_X)
+       *   (board[pos] ^ color) == anchored_at_X)
        * and the LHS is something we precomputed.
        */
 
@@ -490,14 +480,14 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 
 	  ASSERT_ON_BOARD1(pos);
 
-	  /* ...and check that p[x][y] matches (see above). */
-	  if ((p[pos] & and_mask[color-1][att]) != val_mask[color-1][att])
+	  /* ...and check that board[pos] matches (see above). */
+	  if ((board[pos] & and_mask[color-1][att]) != val_mask[color-1][att])
 	    goto match_failed;
 
-	  if (goal != NULL && p[pos] != EMPTY) {
+	  if (goal != NULL && board[pos] != EMPTY) {
 	    if (goal[pos])
 	      found_goal = 1;
-	    else if (p[pos] == color)
+	    else if (board[pos] == color)
 	      found_nongoal = 1;
 	  }
 	  
@@ -505,7 +495,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	   * attributes - see patterns.db and above.
 	   */
 	  if ((pattern->class
-	       & class_mask[dragon[pos].status][p[pos]]) != 0)
+	       & class_mask[dragon[pos].status][board[pos]]) != 0)
 	    goto match_failed; 
 	  
 	} /* loop over elements */
@@ -583,7 +573,7 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
   int pos;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (p[pos] == anchor && (!anchor_in_goal || goal[pos] != 0))
+    if (board[pos] == anchor && (!anchor_in_goal || goal[pos] != 0))
       do_matchpat(pos, callback, color, pdb->patterns,
 		  callback_data, goal);
   }
@@ -599,7 +589,7 @@ static void tree_matchpat_loop(matchpat_callback_fn_ptr callback,
 			       int color, int anchor,
 			       struct pattern_db *pdb, void *callback_data,
 			       char goal[BOARDMAX], int anchor_in_goal);
-static void tree_do_matchpat(int anchor, matchpat_callback_fn_ptr callback,
+static void tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 			     int color, struct pattern_db *database,
 			     void *callback_data, char goal[BOARDMAX],
                              int anchor_in_goal);
@@ -633,7 +623,7 @@ tree_matchpat_loop(matchpat_callback_fn_ptr callback,
 
   for (i = 0; i != board_size; i++)
     for (j = 0; j != board_size; j++)
-      if (board[POS(i,j)] == anchor
+      if (BOARD(i,j) == anchor
           && (!anchor_in_goal || goal[POS(i,j)] != 0))
 	tree_do_matchpat(i, j, callback, color, 
 			 pdb, callback_data, goal, anchor_in_goal);
@@ -654,7 +644,7 @@ struct rec_data {
  * for all patterns matched at location (m,n).
  */
 static void 
-do_tree_matchpat_rec(int color, int anchor, int goal_found,
+do_tree_matchpat_rec(int color, int m, int n, int goal_found,
                      char goal[BOARDMAX], 
                      struct tree_node_list *tnl, 
                      struct rec_data *pdata)
@@ -696,7 +686,7 @@ do_tree_matchpat_rec(int color, int anchor, int goal_found,
 			match->orientation, x, y);
               }
               /* A match! */
-              pdata->callback(m, n, color, pattern, ll, pdata->callback_data);
+              pdata->callback(POS(m, n), color, pattern, ll, pdata->callback_data);
             }
 
             match = match->next;
@@ -714,7 +704,7 @@ do_tree_matchpat_rec(int color, int anchor, int goal_found,
 
 /* Stub for matchpat function.  Work done in recursive helper. */
 static void 
-tree_do_matchpat(int anchor, matchpat_callback_fn_ptr callback,
+tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 		 int color, struct pattern_db *database,
 		 void *callback_data, char goal[BOARDMAX],
 		 int anchor_in_goal)
@@ -795,12 +785,14 @@ tree_initialize_pointers(struct tree_node_list *tnl,
 extern int board_size;
 static int dfa_board_size = -1;
 extern int dfa_p[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
-extern int spiral[8][MAX_ORDER];
+extern int spiral[MAX_ORDER][8];
+
+/* FIXME: what is this for? */
 const int convert[3][4];
 
 /* Forward declarations. */
 static void dfa_prepare_for_match(int color);
-static int scan_for_patterns(dfa_rt_t *pdfa, int l, int anchor, 
+static int scan_for_patterns(dfa_rt_t *pdfa, int l, int dfa_pos,
 			     int *pat_list);
 #if DFA_SORT
 static int compare_int(const void *a, const void *b);
@@ -830,11 +822,6 @@ static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback,
 void
 dfa_match_init(void)
 {
-  /* Copy the board to the p array.
-   * FIXME: Check whether this is needed here.
-   */
-  board_to_p();
-
   buildSpiralOrder(spiral);
 
   if (owl_vital_apat_db.pdfa != NULL)
@@ -885,7 +872,7 @@ dfa_prepare_for_match(int color)
   for (i = 0; i < dfa_board_size; i++)
     for (j = 0; j < dfa_board_size; j++)
       dfa_p[DFA_POS(i, j) + DFA_OFFSET] = 
-	EXPECTED_COLOR(color, p[POS(i, j)]);
+	EXPECTED_COLOR(color, BOARD(i, j));
 
   prepare_for_match(color);
 }
@@ -900,7 +887,7 @@ dump_dfa_board(int m, int n)
   for (i = DFA_MAX_BOARD / 2; i < DFA_MAX_BOARD*1.5 ; i++) {
     for (j = DFA_MAX_BOARD / 2 ; j < DFA_MAX_BOARD*1.5 ; j++)
       if (i != (m+DFA_MAX_BOARD) || j != (n+DFA_MAX_BOARD))
-	fprintf(stderr, "%1d", dfa_p[DFA_PSO(i, j)]);
+	fprintf(stderr, "%1d", dfa_p[DFA_POS(i, j)]);
       else
 	fprintf(stderr, "*");
     fprintf(stderr, "\n");
@@ -916,19 +903,16 @@ dump_dfa_board(int m, int n)
  * Return the number of patterns found.
  */
 static int
-scan_for_patterns(dfa_rt_t *pdfa, int l, int anchor, int *pat_list)
+scan_for_patterns(dfa_rt_t *pdfa, int l, int dfa_pos, int *pat_list)
 {
-  int state, att, id, row, delta;
-  int dfa_pos;
-
-  dfa_pos = DFA_POS(I(anchor), J(anchor)) + DFA_OFFSET;
-  state = 1; /* initial state */
-  row = 0; /* initial row */
-  id = 0; /* position in id_list */ 
+  int delta;
+  int state = 1; /* initial state */
+  int row = 0; /* initial row */
+  int id = 0; /* position in id_list */ 
   
   do {
     /* collect patterns indexes */
-    att = pdfa->states[state].att;
+    int att = pdfa->states[state].att;
     while (att != 0) {
       if (pdfa->pre_rotated) {
         pat_list[id] = pdfa->indexes[att].val;
@@ -940,12 +924,12 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int anchor, int *pat_list)
     }
       
     /* go to next state */
-    delta = pdfa->states[state].next[dfa_p[dfa_pos + spiral[l][row]]];
+    delta = pdfa->states[state].next[dfa_p[dfa_pos + spiral[row][l]]];
     state += delta;
     row++;
   } while (delta != 0); /* while not on error state */
 
-  ASSERT1(row < MAX_ORDER, anchor);
+  ASSERT1(row < MAX_ORDER, dfa_pos);
   return id;
 }
 
@@ -977,6 +961,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
   int reorder[DFA_MAX_MATCHED];
   int *preorder = reorder;
   int maxr = 0, k;
+  int dfa_pos = DFA_POS(I(anchor), J(anchor)) + DFA_OFFSET;
 
   /* Basic sanity checks. */
   ASSERT_ON_BOARD1(anchor);
@@ -986,7 +971,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
 
   /* one scan by transformation */
   for (ll = 0; ll != 8; ll++) {
-    maxr += scan_for_patterns(pdfa, ll, anchor, preorder);
+    maxr += scan_for_patterns(pdfa, ll, dfa_pos, preorder);
     preorder = reorder + maxr;
     if (pdfa->pre_rotated)
       break;
@@ -1070,7 +1055,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
       if (goal != NULL) {
         if (goal[pos])
 	  found_goal = 1;
-        else if (p[pos] == color)
+        else if (board[pos] == color)
 	  found_nongoal = 1;
       }
     }
@@ -1078,7 +1063,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
     /* class check */
     ASSERT1(dragon[pos].status < 4, anchor);
     if ((pattern->class
-	 & class_mask[dragon[pos].status][p[pos]]) != 0)
+	 & class_mask[dragon[pos].status][board[pos]]) != 0)
       goto match_failed;
     
   } /* loop over elements */
@@ -1128,7 +1113,7 @@ dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
   int pos;
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (p[pos] == anchor && (!anchor_in_goal || goal[pos] != 0))
+    if (board[pos] == anchor && (!anchor_in_goal || goal[pos] != 0))
       do_dfa_matchpat(pdb->pdfa, pos, callback, color, pdb->patterns,
 		      callback_data, goal, anchor_in_goal);
   }
@@ -1175,33 +1160,6 @@ matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
   loop_fn_ptr_t loop = matchpat_loop;
   prepare_fn_ptr_t prepare = prepare_for_match;
 
-  /*
-   * Caution, dangerous workaround ahead.
-   *
-   * It's almost certainly not safe to make recursive calls to this
-   * function, but if we just make sure that we don't corrupt the
-   * contents of the p[][] array because of this, it seems to work
-   * anyway.
-   *
-   * Therefore we backup p[][] to saved_p[][] when we are called
-   * recursively and restore it when we are ready.
-   *
-   * FIXME: This is not a proper solution. In any case this
-   * implementation can only handle one level of recursion, which on
-   * the other hand is all we need.
-   */
-
-  /* Don't accept a second recursive call. */
-  gg_assert(matchpat_call_level <= 1);
-
-  if (matchpat_call_level == 1)
-    memcpy(saved_p, p, sizeof(p));
-
-  matchpat_call_level++;
-
-  /* Copy the board to the p array. */
-  board_to_p();
-
   /* check board size */
   if (pdb->fixed_for_size != board_size) {
     fixup_patterns_for_board_size(pdb->patterns);
@@ -1246,10 +1204,6 @@ matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
 	loop(callback, color, BLACK, pdb, callback_data, goal, anchor_in_goal);
       }
   }
-
-  matchpat_call_level--;
-  if (matchpat_call_level == 1)
-    memcpy(p, saved_p, sizeof(p));
 }
 
 
@@ -1271,13 +1225,10 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
   /* Basic sanity check. */
   gg_assert(color != EMPTY);
   gg_assert(board_size%2 == 1);
-  
-  /* Copy the board to the p array. */
-  board_to_p();
 
   /* Count the number of stones on the board. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (IS_STONE(p[pos]))
+    if (IS_STONE(board[pos]))
       number_of_stones_on_board++;
   }
   
@@ -1302,8 +1253,8 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
 
         ASSERT_ON_BOARD1(pos);
 
-	if ((att == ATT_O && p[pos] != color)
-	    || (att == ATT_X && p[pos] != other))
+	if ((att == ATT_O && board[pos] != color)
+	    || (att == ATT_X && board[pos] != other))
 	  break;
 	
       } /* loop over elements */
@@ -1317,15 +1268,6 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
   }
 }
 
-/* Copy the 1D board array to the 2D p array. */
-static void
-board_to_p(void)
-{
-  int pos;
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    p[pos] = board[pos];
-}
 
 /*
  * Local Variables:
