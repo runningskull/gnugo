@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- value_territory() revised to disable certain reductions of the territory
+  value when scoring
 - regress.pike revised so that previous output can be used as input
   with -f to rerun tests with unexpected results
 - connection_value() revised

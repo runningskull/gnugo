@@ -1456,6 +1456,20 @@ value_territory(struct influence_data *q)
 	/* If both side have small influence, we have to reduce this value.
 	 * What we consider "small influence" depends on how central this
 	 * intersection lies.
+	 *
+	 * The values of central on an 11x11 board become:
+	 *
+	 *  4  5  6  7  7  7  7  7  6  5  4
+	 *  5  8  9 10 10 10 10 10  9  8  5
+	 *  6  9 12 13 13 13 13 13 12  9  6
+	 *  7 10 13 16 16 16 16 16 13 10  7
+	 *  7 10 13 16 17 17 17 16 13 10  7
+	 *  7 10 13 16 17 18 17 16 13 10  7
+	 *  7 10 13 16 17 17 17 16 13 10  7
+	 *  7 10 13 16 16 16 16 16 13 10  7
+	 *  6  9 12 13 13 13 13 13 12  9  6
+	 *  5  8  9 10 10 10 10 10  9  8  5
+	 *  4  5  6  7  7  7  7  7  6  5  4
 	 */
         dist_i = gg_min(I(ii), board_size - I(ii) - 1);
         dist_j = gg_min(J(ii), board_size - J(ii) - 1);
@@ -1466,6 +1480,14 @@ value_territory(struct influence_data *q)
 	central = (float) 2 * gg_min(dist_i, dist_j) + dist_i + dist_j;
         ratio = gg_max(q->black_influence[ii], q->white_influence[ii])
                 / gg_interpolate(&min_infl_for_territory, central);
+
+	/* Do not make this adjustment when scoring unless both
+	 * players have non-zero influence.
+	 */
+	if (doing_scoring && (q->black_influence[ii] == 0.0
+			      || q->white_influence[ii] == 0.0))
+	  ratio = 1.0;
+	
         first_guess[ii] *= gg_interpolate(&territory_correction, ratio);
 
 	/* Dead stone, upgrade to territory. Notice that this is not
