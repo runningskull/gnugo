@@ -696,6 +696,15 @@ initialize_dragon_data(void)
 	      str, worm[str].size);
     }
   memset(next_worm_list, 0, sizeof(next_worm_list));
+
+  /* We need to reset this to avoid trouble on an empty board when
+   * moves have previously been generated for a non-empty board.
+   *
+   * Comment: The cause of this is that make_dragons() is not called
+   * for an empty board, only initialize_dragon_data(), so we never
+   * reach initialize_supplementary_dragon_data().
+   */
+  number_of_dragons = 0;
 }
 
 
