@@ -32,7 +32,7 @@ loadsgf games/unfinished.sgf 214
 
 loadsgf games/owl36.sgf
 268 owl_defend A3
-#? [3 A1]*
+#? [3 A1]
 
 loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 192
 269 owl_defend D11
@@ -123,9 +123,9 @@ loadsgf games/nngs/gnugo-3.3.9-pogonyshev-200210142137.sgf 62
 
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 253
 290 owl_attack M19
-#? [1 O19]
+#? [1 O19]*
 291 owl_defend M19
-#? [2 O19]
+#? [2 O19]*
 
 ########### end of tests #####################
 

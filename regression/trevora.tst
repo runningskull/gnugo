@@ -83,7 +83,7 @@ loadsgf games/trevor/auto/a008.sgf 10
 #Can't give up ponuki.
 loadsgf games/trevor/auto/a009.sgf 8
 200 gg_genmove white
-#? [E5]*
+#? [E5]
 
 
 #Full point before ko!
@@ -376,7 +376,7 @@ loadsgf games/trevor/auto/a036.sgf 6
 #Breaking into black's area is required.
 loadsgf games/trevor/auto/a036.sgf 10
 570 gg_genmove white
-#? [!B5]*
+#? [!B5]
 
 
 #E6 is bigger, and enough to win.

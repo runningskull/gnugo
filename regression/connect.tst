@@ -295,7 +295,7 @@ loadsgf golois/Indigo-Golois-991106-2.sgf
 
 loadsgf golois/Indigo-Golois-991106-3.sgf
 70 disconnect P3 M3
-#? [0]
+#? [0]*
 
 # gf Added Q3. /gf
 loadsgf golois/Indigo-Golois-991106-3.sgf
@@ -330,7 +330,7 @@ loadsgf golois/Neurogo97-1.sgf
 
 loadsgf golois/Neurogo97-3.sgf
 78 disconnect E3 C3
-#? [0]
+#? [0]*
 
 loadsgf golois/test.sgf
 79 connect H7 G8

@@ -7,7 +7,7 @@ loadsgf games/connection1.sgf
 1 same_dragon G17 K17
 #? [0]
 2 same_dragon R12 R9
-#? [0]*
+#? [0]
 
 loadsgf games/strategy11.sgf 87
 3 same_dragon A6 B4
@@ -88,7 +88,7 @@ loadsgf games/trevor/trevor_09.sgf
 
 loadsgf games/incident169.sgf 110
 23 connect K17 N16
-#? [1 (M17|L16)]*
+#? [1 (M17|L16)]
 24 disconnect L15 L17
 #? [1 (M17|L16)]
 25 disconnect L14 M12
@@ -198,7 +198,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
 59 disconnect D18 E15
 #? [1 D15|F15|B15|D19|E19]
 60 connect D14 B18
-#? [1 D15|F15|B15|D19|E19]*
+#? [1 D15|F15|B15|D19|E19]
 61 connect O9 Q9
 #? [1 D15|F15|B15|D19|E19]*
 
@@ -250,9 +250,9 @@ loadsgf games/trevor/auto/b20.sgf 38
 
 loadsgf games/nngs/gnugo-3.1.34-viking4-200204240801.sgf 134
 79 connect S4 R7
-#? [1 S6]*
+#? [1 S6]
 80 connect R2 R7
-#? [1 S6]*
+#? [1 S6]
 
 loadsgf games/handtalk/handtalk13.sgf 106
 81 connect L5 R5
@@ -282,7 +282,7 @@ loadsgf games/connection1.sgf
 # See also trevorb:670.
 loadsgf games/trevor/auto/b64.sgf 44
 88 disconnect E6 H5
-#? [0]*
+#? [0]
 
 loadsgf games/ego.sgf 191
 89 same_dragon M12 Q11

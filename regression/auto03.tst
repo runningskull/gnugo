@@ -29,11 +29,11 @@ loadsgf games/auto_gen/auto016.sgf 37
 
 loadsgf games/auto_gen/auto016.sgf 48
 10 owl_defend P16
-#? [1 (O16|P15)]*
+#? [1 (O16|P15)]
 
 loadsgf games/auto_gen/auto016.sgf 53
 11 owl_defend Q4
-#? [1 (P4|P3|Q3|R4)]*
+#? [1 (P4|P3|Q3|R4)]
 
 loadsgf games/auto_gen/auto016.sgf 55
 12 owl_defend N5

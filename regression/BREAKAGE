@@ -1,3 +1,63 @@
+======================= 3.3.12 pre 3  =========================
+
+./regress.sh . owl_rot.tst 
+23 unexpected PASS!
+./regress.sh . filllib.tst 
+42 unexpected FAIL: Correct 'N19', got 'PASS'
+./regress.sh . connection.tst 
+2 unexpected PASS!
+23 unexpected PASS!
+60 unexpected PASS!
+79 unexpected PASS!
+80 unexpected PASS!
+88 unexpected PASS!
+./regress.sh . trevora.tst 
+200 unexpected PASS!
+570 unexpected PASS!
+./regress.sh . trevorb.tst 
+670 unexpected PASS!
+./regress.sh . strategy2.tst 
+75 unexpected FAIL: Correct 'Q11', got 'Q13'
+./regress.sh . nicklas1.tst 
+1213 unexpected FAIL: Correct 'N4', got 'F12'
+./regress.sh . manyfaces.tst 
+9 unexpected FAIL: Correct '!P12', got 'P12'
+./regress.sh . trevor.tst 
+1100 unexpected FAIL: Correct 'D15', got 'C7'
+1110 unexpected FAIL: Correct 'O12', got 'C7'
+./regress.sh . nngs.tst 
+490 unexpected FAIL: Correct 'J18', got 'G18'
+1955 unexpected PASS!
+./regress.sh . trevorc.tst 
+230 unexpected PASS!
+940 unexpected PASS!
+./regress.sh . connect.tst 
+70 unexpected FAIL: Correct '0', got '1 O3'
+78 unexpected FAIL: Correct '0', got '1 E2'
+./regress.sh . global.tst 
+4 unexpected FAIL: Correct 'Q6', got 'F5'
+./regress.sh . owl1.tst 
+268 unexpected PASS!
+290 unexpected FAIL: Correct '1 O19', got '1 PASS'
+291 unexpected FAIL: Correct '2 O19', got '0'
+./regress.sh . nngs2.tst 
+600 unexpected PASS!
+./regress.sh . nngs3.tst 
+800 unexpected FAIL: Correct 'G4', got 'H5'
+./regress.sh . strategy5.tst 
+225 unexpected FAIL: Correct 'O12', got 'B9'
+./regress.sh . auto03.tst 
+10 unexpected PASS!
+11 unexpected PASS!
+./regress.sh . ninestones.tst 
+130 unexpected PASS!
+./regress.sh . gunnar.tst 
+1 unexpected FAIL: Correct 'M17', got 'M19'
+2 unexpected FAIL: Correct '!D19', got 'D19'
+3 unexpected FAIL: Correct 'K17', got 'L18'
+4 unexpected FAIL: Correct '!L17', got 'L17'
+5 unexpected FAIL: Correct 'F12', got 'G1'
+
 ======================= 3.3.12 pre 2  =========================
 
 ./regress.sh . owl_rot.tst 

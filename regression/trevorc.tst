@@ -90,7 +90,7 @@ loadsgf games/trevor/auto/c13.sgf 32
 
 loadsgf games/trevor/auto/c14.sgf 18
 230 gg_genmove white
-#? [K3|K2|J2|L4|M4|M5]*
+#? [K3|K2|J2|L4|M4|M5]
 
 
 loadsgf games/trevor/auto/c14.sgf 20
@@ -530,7 +530,7 @@ loadsgf games/trevor/auto/c54.sgf 78
 
 loadsgf games/trevor/auto/c55.sgf 58
 940 gg_genmove white
-#? [G1]*
+#? [G1]
 
 
 loadsgf games/trevor/auto/c55.sgf 92

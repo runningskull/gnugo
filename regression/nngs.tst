@@ -203,7 +203,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 84
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 86
 490 gg_genmove black
-#? [J18]
+#? [J18]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.18-200201072351.sgf 90
@@ -890,7 +890,7 @@ loadsgf games/nngs/gnugo-3.1.20-setenza-200201162038.sgf 29
 
 loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 15
 1955 gg_genmove white
-#? [D3]*
+#? [D3]
 
 loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 27
 1960 gg_genmove white

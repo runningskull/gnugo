@@ -49,7 +49,7 @@ loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 58
 
 loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 60
 130 gg_genmove black
-#? [!N8]*
+#? [!N8]
 
 loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 64
 140 gg_genmove black

@@ -250,7 +250,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 # We still can live.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 224
 600 gg_genmove white
-#? [B5]*
+#? [B5]
 
 ############ End of Tests #################
 

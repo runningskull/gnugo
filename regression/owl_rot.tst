@@ -4,7 +4,7 @@
 orientation 1
 loadsgf games/incident121.sgf 122
 23 owl_defend P12
-#? [0]*
+#? [0]
 
 orientation 1
 loadsgf games/incident258.sgf 147

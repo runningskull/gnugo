@@ -407,7 +407,7 @@ loadsgf games/trevor/auto/b62.sgf 18
 # See also connection:88
 loadsgf games/trevor/auto/b64.sgf 44
 670 gg_genmove white
-#? [L5]*
+#? [L5]
 
 
 

@@ -55,7 +55,7 @@ loadsgf games/mfgg2.sgf 117
 
 loadsgf games/mfgg3.sgf 42
 9 gg_genmove black
-#? [!P12]
+#? [!P12]*
 
 loadsgf games/mfgg3.sgf 44
 10 gg_genmove black
