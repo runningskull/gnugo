@@ -1,3 +1,20 @@
+======================= 3.3.12 pre 4  =========================
+
+./regress.sh . ld_owl.tst 
+168 unexpected PASS!
+./regress.sh . nicklas2.tst 
+102 unexpected PASS!
+./regress.sh . trevor.tst 
+412 unexpected PASS!
+./regress.sh . trevorc.tst 
+940 unexpected FAIL: Correct 'G1', got 'F3'
+./regress.sh . 13x13.tst 
+41 unexpected PASS!
+./regress.sh . nngs3.tst 
+1080 unexpected FAIL: Correct '!H7', got 'H7'
+./regress.sh . gunnar.tst 
+2 unexpected PASS!
+
 ======================= 3.3.12 pre 3  =========================
 
 ./regress.sh . owl_rot.tst 
