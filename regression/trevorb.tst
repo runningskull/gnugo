@@ -23,7 +23,7 @@ loadsgf games/trevor/auto/b02.sgf 42
 
 loadsgf games/trevor/auto/b02.sgf 46
 130 gg_genmove white
-#? [!J4]*
+#? [!J4]
 
 
 loadsgf games/trevor/auto/b02.sgf 48

@@ -16,7 +16,7 @@ loadsgf games/nando/auto002.sgf
 #CATEGORY=OPTICS
 loadsgf games/nando/auto003.sgf
 3 owl_defend B11
-#? [1 A12]*
+#? [1 A12]
 
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto004.sgf

@@ -13,4 +13,4 @@ loadsgf games/incident248.sgf 228
 orientation 1
 loadsgf games/marginal_ko.sgf
 244 owl_attack D11
-#? [(2|3) F11]*
+#? [(2|3) F11]

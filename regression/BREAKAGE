@@ -1,3 +1,24 @@
+========================== 3.3.17 pre 3  ============================
+
+./regress.sh . owl_rot.tst 
+244 unexpected PASS!
+./regress.sh . viking.tst 
+2 unexpected PASS!
+./regress.sh . trevorb.tst 
+130 unexpected PASS!
+./regress.sh . strategy2.tst 
+90 unexpected PASS!
+./regress.sh . nngs.tst 
+1700 unexpected FAIL: Correct '!J18', got 'J18'
+./regress.sh . trevorc.tst 
+1440 unexpected PASS!
+./regress.sh . global.tst 
+34 unexpected FAIL: Correct 'N6', got 'S7'
+./regress.sh . vie.tst 
+4 unexpected FAIL: Correct '1 G2', got '1 L3'
+./regress.sh . nando.tst 
+3 unexpected PASS!
+
 ========================== 3.3.17 pre 2  ============================
 
 ./regress.sh . trevorc.tst 

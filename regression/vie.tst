@@ -13,7 +13,7 @@ loadsgf golois/BiwakoFost97-1.sgf
 
 loadsgf golois/BiwakoFost97-1.sgf
 4 owl_defend G3
-#? [1 G2]
+#? [1 G2]*
 
 loadsgf golois/BiwakoFost97-2.sgf
 5 owl_attack G3
