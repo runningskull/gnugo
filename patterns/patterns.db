@@ -3665,6 +3665,7 @@ X....      extend
 
 
 Pattern EB306
+# gf Don't attach a weak stone. (3.1.18)
 
 ??.?          extend and attach
 X*.O
@@ -3673,6 +3674,14 @@ X*.O
 ----
 
 :8,OXe
+
+??.?
+B*.a
+....
+....
+----
+
+;!weak(B)
 
 
 Pattern EB307
@@ -8763,6 +8772,15 @@ O.Xx
 :8,OX,shape(2)
 
 
+Pattern CB335
+# gf New pattern. (3.1.18)
+
+x.O
+X*.
+O.o
+
+:8,bOX
+
 
 ######################################################################
 #
@@ -9047,13 +9065,14 @@ XOX*
 
 
 Pattern ED22
+# gf Added b classification. (3.1.18)
 
 ??*?          sente endgame (maybe rather middle game) move
 ..XO
 ..X?
 ----
 
-:8,XOd,followup(5)
+:8,XOdb,followup(5)
 
 ??*?
 ..AO
@@ -9064,13 +9083,14 @@ Pattern ED22
 
 
 Pattern ED23
+# gf Added b classification. (3.1.18)
 
 ??*O          sente endgame (maybe rather middle game) move
 ..X?
 ..X?
 ----
 
-:8,XOd,followup(5)
+:8,XOdb,followup(5)
 
 ??*O
 ..A?

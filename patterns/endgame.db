@@ -1330,9 +1330,8 @@ X*.A
 ; omoyo(b) && lib(A)==2
 
 
-
 Pattern CE25
-# tm  New pattenrn (3.1.15)  (see trevora:320)
+# tm New pattern (3.1.15)  (see trevora:320)
 
 O*X
 XX.
@@ -1344,6 +1343,14 @@ Xa.
 
 ;lib(a)==2
 
+
+Pattern CE26
+# gf New pattern. (3.1.18)  (see trevorb:870)
+
+O*O
+X.X
+
+:|,b
 
 
 ######################################################################

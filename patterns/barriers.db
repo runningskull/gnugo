@@ -1765,4 +1765,39 @@ dcaeO
 >non_xterritory(f);
 
 
+Pattern Nonterritory19
+# gf New pattern. (3.1.18)
+
+.?
+*X
+.O
+
+:8,t
+
+b?
+*X
+aO
+
+;oplay_attack(*,a,a) && safe_omove(*)
+
+>non_xterritory(*);
+>non_xterritory(b);
+
+
+Pattern Nonterritory20
+# gf New pattern. (3.1.18)
+
+*X
+.O
+
+:8,t
+
+*X
+ab
+
+;attack(b) && oplay_attack(*,b)
+
+>non_oterritory(a);
+
+
 # END OF FILE
