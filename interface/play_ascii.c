@@ -194,8 +194,8 @@ ascii_showboard(void)
   set_handicap_spots(board_size);
 
   printf("\n");
-  printf("    White has captured %d pieces\n", black_captured);
-  printf("    Black has captured %d pieces\n", white_captured);
+  printf("    White (O) has captured %d pieces\n", black_captured);
+  printf("    Black (X) has captured %d pieces\n", white_captured);
   if (showscore) {
     if (current_score_estimate == NO_SCORE)
       printf("    No score estimate is available yet.\n");

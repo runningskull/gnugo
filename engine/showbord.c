@@ -373,11 +373,11 @@ showboard(int xo)
     
     if (xo == 0 && ((board_size < 10 && i == board_size-2)
 		    || (board_size >= 10 && i == 8)))
-      fprintf(stderr, "     WHITE has captured %d stones", black_captured);
+      fprintf(stderr, "     WHITE (O) has captured %d stones", black_captured);
     
     if (xo == 0 && ((board_size < 10 && i == board_size-1)
 		    || (board_size >= 10 && i == 9)))
-      fprintf(stderr, "     BLACK has captured %d stones", white_captured);
+      fprintf(stderr, "     BLACK (X) has captured %d stones", white_captured);
     
     if (xo == 3) {
       if (i == board_size-5)
@@ -421,11 +421,11 @@ simple_showboard(FILE *outfile)
     
     if ((board_size < 10 && i == board_size-2)
 	|| (board_size >= 10 && i == 8))
-      fprintf(outfile, "     WHITE has captured %d stones", black_captured);
+      fprintf(outfile, "     WHITE (O) has captured %d stones", black_captured);
     
     if ((board_size < 10 && i == board_size-1)
 	|| (board_size >= 10 && i == 9))
-      fprintf(outfile, "     BLACK has captured %d stones", white_captured);
+      fprintf(outfile, "     BLACK (X) has captured %d stones", white_captured);
   }
   
   fprintf(outfile, "\n");
