@@ -1439,8 +1439,8 @@ show_dragons(void)
   {"dead", "alive", "critical", "unknown", "unchecked"};
 
   static const char *safety_names[] =
-  {"dead", "alive", "critical", "inessential", "tactically dead", "weak",
-   "weakly_alive", "alive_in_seki", "strongly_alive", "invincible"};
+  {"dead", "alive", "critical", "[3]", "[4]", "inessential",
+   "tactically dead", "alive_in_seki", "strongly_alive", "invincible"};
   
   int pos;
   int k;

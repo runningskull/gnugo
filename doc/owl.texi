@@ -143,7 +143,7 @@ Only dragons with small escape route are studied when the
 functions are called from @code{make_dragons()}.
 
 The owl code can be conveniently tested using the 
-@option{--decide-owl @var{location}} This should be used with 
+@option{--decide-owl @var{location}} option. This should be used with 
 @option{-t} to produce a useful trace, @option{-o} to produce
 an SGF file of variations produced when the life and death of
 the dragon at @var{location} is checked, or both. 

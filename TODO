@@ -45,12 +45,6 @@ member.  Some of them are bigger and demand a deeper knowledge of the
 engine internals.  The issues are presented here in an approximate
 order of perceived difficulty.
 
- * GNU Go passes on the first move as white on small boards with high
-   handicap (e.g. 2 stones on 7x7 or 7 stones on 9x9). While it's hard
-   to argue that there's no way for white to live, it should be forced
-   to thrash around for a while. Presumably the opponent is taking the
-   handicap for a reason.
-
  * Add more checks in patterns/mkpat.c testing whether the main diagram and
    the constraint diagram are consistent.
 
@@ -146,14 +140,12 @@ playing strength of the program and/or enhance certain aspects of it.
    Also, one should implement some more of the standard tree search
    optimizations used in alpha-beta readers.
 
- * Create a way to quickly assess the safety of a group.  This might
-   take into account number of eyes / half eyes, moyo in corners, moyo
-   along the edge, moyo in the center, proximity to living friendly
-   groups, weak opponent groups etc.  The point is that it should
-   involve no reading and that it is quick.  This could be used to
-   make a strategic estimation of how a move strengthens a friendly
-   group and/or weakens an opponent group and how strong/weak groups
-   influence each other.
+ * Improve the heuristics for assessment of the safety of a
+   group. This might take into account number of eyes / half eyes,
+   moyo in corners, moyo along the edge, moyo in the center, proximity
+   to living friendly groups, weak opponent groups etc. It is of
+   particular interest to be able to accurately determine how a move
+   affects the safety of all groups on the board.
 
 
 //--------------------------------------------------------------

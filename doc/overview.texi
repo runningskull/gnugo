@@ -116,7 +116,7 @@ the previous phase, examining the position:
 @item @code{worm_reasons()}
 @findex worm_reasons
 @quotation
-Moves that have been found to capture or defend a worm are propsed as
+Moves that have been found to capture or defend a worm are proposed as
 candidates.
 @end quotation
 

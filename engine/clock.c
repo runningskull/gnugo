@@ -513,7 +513,7 @@ respect_time_contract(int color)
   predicted_tm = estimate_time_by_move(color, clk.moveno);
 
   /* Compute the expected mean time/move 
-   * to recpect the contract.
+   * to respect the contract.
    */
   moves_left = (CLOCK_MOVE_CONTRACT(board_size) - clk.moveno) / 2.0;
   time_left = (clock_get_time_left(color)

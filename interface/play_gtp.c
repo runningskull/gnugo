@@ -2540,7 +2540,7 @@ gtp_set_level(char *s)
   return gtp_success("");
 }
 
-/* Function:  Undo a number of moves
+/* Function:  Undo one move
  * Arguments: none
  * Fails:     If move history is too short.
  * Returns:   nothing
