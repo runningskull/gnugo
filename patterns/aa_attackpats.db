@@ -378,4 +378,20 @@ X*A
 
 ;lib(A) <= 4 && oplay_attack(*,b,A) && oplay_defend(*,?,*)
 
+
+Pattern A23
+# evand New pattern. (3.3.19)
+
+XXO
+.X.
+.*.
+
+:8,-
+
+AAB
+.A.
+.*.
+
+;lib(A) == 3 && lib(B) > 1 && oplay_attack(*,A)
+
 # END OF FILE

@@ -9,6 +9,7 @@
 - don't forget to switch exchange sgf_messages in order_moves()
 - owl tuning
 - eye tuning
+- atari_atari tuning
 - new tests and test revisions
 
 3.3.19 released April 28, 2003
