@@ -1396,6 +1396,9 @@ add_replacement_move(int from, int to)
 
   ASSERT_ON_BOARD1(from);
   ASSERT_ON_BOARD1(to);
+  ASSERT1(board[from] == EMPTY, from);
+  ASSERT1(board[to] == EMPTY, to);
+
   cc = replacement_map[to];
 
   /* First check for an incompatible redistribution rule. */
