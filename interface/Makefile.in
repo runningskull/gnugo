@@ -79,7 +79,7 @@ bin_PROGRAMS = gnugo
 
 EXTRA_DIST = gtp_examples gnugo.el
 
-noinst_HEADERS = interface.h gmp.h gtp.h
+noinst_HEADERS = interface.h gtp.h
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *~
