@@ -47,14 +47,9 @@ int dragons[MAX_DRAGONS];
 int next_dragon;
 
 /* Connections */
-int conn_dragon1[MAX_CONNECTIONS];
-int conn_dragon2[MAX_CONNECTIONS];
+int conn_worm1[MAX_CONNECTIONS];
+int conn_worm2[MAX_CONNECTIONS];
 int next_connection;
-
-/* Unordered worm pairs */
-int worm_pair1[MAX_WORM_PAIRS];
-int worm_pair2[MAX_WORM_PAIRS];
-int next_worm_pair;
 
 /* Unordered sets (currently pairs) of move reasons / targets */
 Reason_set either_data[MAX_EITHER];
@@ -98,7 +93,6 @@ clear_move_reasons(void)
   next_worm = 0;
   next_dragon = 0;
   next_connection = 0;
-  next_worm_pair = 0;
   next_either = 0;
   next_all = 0;
   next_eye = 0;
@@ -188,61 +182,29 @@ find_dragon(int str)
  * If necessary, add a new entry.
  */
 static int
-find_connection(int dragon1, int dragon2)
+find_connection(int worm1, int worm2)
 {
   int k;
   
-  if (dragon1 > dragon2) {
-    /* Swap to canonical order. */
-    int tmp = dragon1;
-    dragon1 = dragon2;
-    dragon2 = tmp;
-  }
-  
-  for (k = 0; k < next_connection; k++)
-    if ((conn_dragon1[k] == dragon1) && (conn_dragon2[k] == dragon2))
-      return k;
-  
-  /* Add a new entry. */
-  gg_assert(next_connection < MAX_CONNECTIONS);
-  conn_dragon1[next_connection] = dragon1;
-  conn_dragon2[next_connection] = dragon2;
-  next_connection++;
-  return next_connection - 1;
-}
-
-
-#if 0
-
-/*
- * Find the index of an unordered pair of worms in the list of worm pairs.
- * If necessary, add a new entry.
- */
-static int
-find_worm_pair(int worm1, int worm2)
-{
-  int k;
-  
-  /* Make sure the worms are ordered canonically. */
   if (worm1 > worm2) {
+    /* Swap to canonical order. */
     int tmp = worm1;
     worm1 = worm2;
     worm2 = tmp;
   }
   
-  for (k = 0; k < next_worm_pair; k++)
-    if ((worm_pair1[k] == worm1) && (worm_pair2[k] == worm2))
+  for (k = 0; k < next_connection; k++)
+    if (conn_worm1[k] == worm1 && conn_worm2[k] == worm2)
       return k;
   
   /* Add a new entry. */
-  gg_assert(next_worm_pair < MAX_WORM_PAIRS);
-  worm_pair1[next_worm_pair] = worm1;
-  worm_pair2[next_worm_pair] = worm2;
-  next_worm_pair++;
-  return next_worm_pair - 1;
+  gg_assert(next_connection < MAX_CONNECTIONS);
+  conn_worm1[next_connection] = worm1;
+  conn_worm2[next_connection] = worm2;
+  next_connection++;
+  return next_connection - 1;
 }
 
-#endif
 
 static int
 find_either_data(int reason1, int what1, int reason2, int what2)
@@ -369,7 +331,7 @@ get_pos(int reason, int what)
     return worms[all_data[what].what1];
   case CONNECT_MOVE:
   case CUT_MOVE:
-    return dragons[conn_dragon1[what]];
+    return dragons[conn_worm1[what]];
   case ANTISUJI_MOVE:
   case EXPAND_TERRITORY_MOVE:
   case EXPAND_MOYO_MOVE:
@@ -461,8 +423,12 @@ add_move_reason(int pos, int type, int what)
       return;  /* Reason already listed. */
   }
 
-  /* Reason not found, add it if there is place left in both lists. */
-  gg_assert(k<MAX_REASONS);
+  /* Reason not found, add it if there is place left in both lists.
+   *
+   * FIXME: We should just drop the move reason silently in stable
+   *        releases if some list is full.
+   */
+  gg_assert(k < MAX_REASONS);
   gg_assert(next_reason < MAX_MOVE_REASONS);
   /* Add a new entry. */
   move[pos].reason[k] = next_reason;
@@ -827,19 +793,26 @@ get_biggest_owl_target(int pos)
  * distinct.
  */
 void
-add_connection_move(int pos, int dr1, int dr2)
+add_connection_move(int pos, int w1, int w2)
 {
-  int dragon1 = find_dragon(dragon[dr1].origin);
-  int dragon2 = find_dragon(dragon[dr2].origin);
+  int worm1 = find_worm(worm[w1].origin);
+  int worm2 = find_worm(worm[w2].origin);
   int connection;
 
-  ASSERT_ON_BOARD1(dr1);
-  ASSERT_ON_BOARD1(dr2);
-  gg_assert(dragon[dr1].color == dragon[dr2].color);
-  if (dragon1 == dragon2)
+  ASSERT_ON_BOARD1(w1);
+  ASSERT_ON_BOARD1(w2);
+  gg_assert(worm[w1].color == worm[w2].color);
+  if (worm1 == worm2)
     return;
-  connection = find_connection(dragon1, dragon2);
+  
+  connection = find_connection(worm1, worm2);
   add_move_reason(pos, CONNECT_MOVE, connection);
+
+  /* We do this only for the side effect of being sure that the
+   * corresponding dragon gets into the list of dragons.
+   */
+  (void) find_dragon(dragon[w1].origin);
+  (void) find_dragon(dragon[w2].origin);
 }
 
 /*
@@ -848,28 +821,34 @@ add_connection_move(int pos, int dr1, int dr2)
  * distinct.
  */
 void
-add_cut_move(int pos, int dr1, int dr2)
+add_cut_move(int pos, int w1, int w2)
 {
-  int dragon1 = find_dragon(dragon[dr1].origin);
-  int dragon2 = find_dragon(dragon[dr2].origin);
+  int worm1 = find_worm(worm[w1].origin);
+  int worm2 = find_worm(worm[w2].origin);
   int connection;
 
-  ASSERT_ON_BOARD1(dr1);
-  ASSERT_ON_BOARD1(dr2);
-  gg_assert(dragon[dr1].color == dragon[dr2].color);
-  if (dragon1 == dragon2)
+  ASSERT_ON_BOARD1(w1);
+  ASSERT_ON_BOARD1(w2);
+  gg_assert(worm[w1].color == worm[w2].color);
+  if (worm1 == worm2)
     return;
-  connection = find_connection(dragon1, dragon2);
+  connection = find_connection(worm1, worm2);
   
   /*
-   * Ignore the cut or connection if either (dr1) or (dr2)
+   * Ignore the cut or connection if either (w1) or (w2)
    * points to a tactically captured worm.
    */
-  if ((worm[dr1].attack_codes[0] != 0 && worm[dr1].defend_codes[0] == 0)
-      || (worm[dr2].attack_codes[0] != 0 && worm[dr2].defend_codes[0] == 0))
+  if ((worm[w1].attack_codes[0] != 0 && worm[w1].defend_codes[0] == 0)
+      || (worm[w2].attack_codes[0] != 0 && worm[w2].defend_codes[0] == 0))
     return;
   
   add_move_reason(pos, CUT_MOVE, connection);
+
+  /* We do this only for the side effect of being sure that the
+   * corresponding dragon gets into the list of dragons.
+   */
+  (void) find_dragon(dragon[w1].origin);
+  (void) find_dragon(dragon[w2].origin);
 }
 
 /*
@@ -1475,8 +1454,6 @@ list_move_reasons(int color)
   int reason2;
   int aa = NO_MOVE;
   int bb = NO_MOVE;
-  int dragon1 = -1;
-  int dragon2 = -1;
   int worm1 = -1;
   int worm2 = -1;
   int ecolor = 0;
@@ -1545,10 +1522,10 @@ list_move_reasons(int color)
 
 	case CONNECT_MOVE:
 	case CUT_MOVE:
-	  dragon1 = conn_dragon1[move_reasons[r].what];
-	  dragon2 = conn_dragon2[move_reasons[r].what];
-	  aa = dragons[dragon1];
-	  bb = dragons[dragon2];
+	  worm1 = conn_worm1[move_reasons[r].what];
+	  worm2 = conn_worm2[move_reasons[r].what];
+	  aa = worms[worm1];
+	  bb = worms[worm2];
 	  if (move_reasons[r].type == CONNECT_MOVE)
 	    gprintf("Move at %1m connects %1m and %1m\n", pos, aa, bb);
 	  else

@@ -2483,6 +2483,57 @@ chainlinks3(int str, int adj[MAXCHAIN], int lib)
 }
 
 
+/* extended_chainlinks() returns (in the (adj) array) the opponent
+ * strings being directly adjacent to (str) or having a common liberty
+ * with (str). The number of such strings is returned.
+ */
+
+int 
+extended_chainlinks(int str, int adj[MAXCHAIN])
+{
+  struct string_data *s;
+  int n;
+  int k;
+  int r;
+  int libs[MAXLIBS];
+  int liberties;
+
+  ASSERT1(IS_STONE(board[str]), str);
+
+  if (!strings_initialized)
+    init_board();
+
+  /* We already have the list of directly adjacent strings ready, just
+   * copy it and mark the strings.
+   */
+  s = &string[string_number[str]];
+  string_mark++;
+  for (n = 0; n < s->neighbors; n++) {
+    adj[n] = string[s->neighborlist[n]].origin;
+    MARK_STRING(adj[n]);
+  }
+
+  /* Get the liberties. */
+  liberties = findlib(str, MAXLIBS, libs);
+
+  /* Look for unmarked opponent strings next to a liberty and add the
+   * ones which are found to the output.
+   */
+  for (r = 0; r < liberties; r++) {
+    for (k = 0; k < 4; k++) {
+      if (board[libs[r] + delta[k]] == OTHER_COLOR(board[str])
+	  && UNMARKED_STRING(libs[r] + delta[k])) {
+	adj[n] = string[string_number[libs[r] + delta[k]]].origin;
+	MARK_STRING(adj[n]);
+	n++;
+      }
+    }
+  }
+  
+  return n;
+}
+
+
 /*
  * Find the origin of a worm or a cavity, i.e. the point with the
  * smallest 1D board coordinate. The idea is to have a canonical

@@ -87,6 +87,7 @@ loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 28
 
 #CATEGORY=STRATEGY
 # New failure (comparing 3.1.15 and 3.0.0)
+# See also owl:262.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 15 gg_genmove white
 #? [C7|B7|C6|B6|B5|C5]

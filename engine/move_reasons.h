@@ -72,7 +72,7 @@
 #define REDUNDANT               (TERRITORY_REDUNDANT | STRATEGICALLY_REDUNDANT)
 #define SECONDARY               4
 
-#define MAX_REASONS 40
+#define MAX_REASONS 80
 
 #define MAX_TRACE_LENGTH  160
 
@@ -130,7 +130,6 @@ struct move_data {
 #define MAX_WORMS         2*MAX_BOARD*MAX_BOARD/3
 #define MAX_DRAGONS       MAX_WORMS
 #define MAX_CONNECTIONS   4*MAX_WORMS
-#define MAX_WORM_PAIRS    MAX_WORMS
 #define MAX_EYES          MAX_BOARD*MAX_BOARD/2
 #define MAX_LUNCHES       MAX_WORMS
 #define MAX_EITHER        100
@@ -150,14 +149,9 @@ extern int dragons[MAX_DRAGONS];
 extern int next_dragon;
 
 /* Connections */
-extern int conn_dragon1[MAX_CONNECTIONS];
-extern int conn_dragon2[MAX_CONNECTIONS];
+extern int conn_worm1[MAX_CONNECTIONS];
+extern int conn_worm2[MAX_CONNECTIONS];
 extern int next_connection;
-
-/* Unordered worm pairs */
-extern int worm_pair1[MAX_WORM_PAIRS];
-extern int worm_pair2[MAX_WORM_PAIRS];
-extern int next_worm_pair;
 
 /* Unordered sets (currently pairs) of move reasons / targets */
 typedef struct {

@@ -287,10 +287,12 @@ find_more_owl_attack_and_defense_moves(int color)
 	  continue;
       }      
       else if (move_reasons[r].type == CONNECT_MOVE) {
-	int dragon1 = conn_dragon1[move_reasons[r].what];
-	int dragon2 = conn_dragon2[move_reasons[r].what];
-	dd1 = dragons[dragon1];
-	dd2 = dragons[dragon2];
+	int worm1 = conn_worm1[move_reasons[r].what];
+	int worm2 = conn_worm2[move_reasons[r].what];
+	dd1 = dragon[worms[worm1]].origin;
+	dd2 = dragon[worms[worm2]].origin;
+	if (dd1 == dd2)
+	  dd2 = NO_MOVE;
       }
       else
 	continue;
@@ -411,202 +413,111 @@ strategically_sound_defense(int aa, int tt)
 
 
 /*
- * Any move that captures or defends a worm also connects or cuts
- * the surrounding dragons. Find these secondary move reasons.
+ * Any move that captures or defends a worm also potentially connects
+ * or cuts the surrounding strings. Find these secondary move reasons
+ * and verify them by connection reading.
  *
  * We also let an owl attack count as a strategical defense of our
  * neighbors of the owl attacked dragon. We only do this for
  * tactically safe dragons, however, because otherwise the effects of
- * capturing has already been taken into account elsewhere.
- *
- * FIXME: There is a certain amount of optimizations that could be
- *        done here.
- *
- * FIXME: Even when we defend a worm, it's possible that the opponent
- *        still can secure a connection, e.g. underneath a string with
- *        few liberties. Thus a defense move isn't necessarily a cut
- *        move. This problem can be solved when we have a working
- *        connection reader.
- *
+ * capturing have already been taken into account elsewhere.
  */
 
 static void
 induce_secondary_move_reasons(int color)
 {
-  int m;
-  int n;
   int pos;
   int k;
-  int i;
+  int i, j;
   int aa;
-  int dd = NO_MOVE;
-  int biggest;
   
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-
-      for (k = 0; k < MAX_REASONS; k++) {
-	int r = move[pos].reason[k];
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    
+    for (k = 0; k < MAX_REASONS; k++) {
+      int r = move[pos].reason[k];
+      
+      if (r < 0)
+	break;
+      
+      if (move_reasons[r].type == ATTACK_MOVE
+	  || move_reasons[r].type == DEFEND_MOVE) {
+	int attack_move;
+	int color_to_move;
+	int num_adj, adjs[MAXCHAIN];
 	
-	if (r < 0)
-	  break;
+	aa = worms[move_reasons[r].what];
 	
-	if (move_reasons[r].type == ATTACK_MOVE
-	    || move_reasons[r].type == DEFEND_MOVE) {
-	  aa = worms[move_reasons[r].what];
-
-	  if (worm[aa].defend_codes[0] == 0)
-	    continue; /* No defense. */
-
-	  /* Don't care about inessential dragons. */
-	  if (DRAGON2(aa).safety == INESSENTIAL)
-	    continue;
-	  
-	  /*
-	   * If this is a defense move and the defense is futile for
-	   * strategical reasons, we shouldn't induce a cutting move
-	   * reason.
-	   */
-	  if (move_reasons[r].type == DEFEND_MOVE
-	      && !strategically_sound_defense(aa, pos))
-	    continue;
-	  
-	  /*
-	   * Find the biggest of the surrounding dragons and say that
-	   * all other dragons are connected or cut with respect to that
-	   * one. We might want to use some other property than size, or
-	   * still better induce cuts/connections for all combinations.
-	   */
-	  biggest = 0;
-	  
-	  /* A tactically unstable worm should never be amalgamated into
-	   * a larger dragon. Occasionally this does still happen and in
-	   * that case we need a workaround. Eventually this workaround
-	   * should become unnecessary.
-	   */
-	  if (dragon[aa].size == worm[aa].size) {
-	    for (i = 0; i < DRAGON2(aa).neighbors; i++) {
-	      int d = DRAGON2(aa).adjacent[i];
-	      if (DRAGON(d).color == dragon[aa].color)
-		continue;
-	      
-	      if (DRAGON(d).size > biggest) {
-		dd = DRAGON(d).origin;
-		biggest = DRAGON(d).size;
-	      }
-	    }
-	    
-	    if (biggest == 0)
-	      continue;
-	    
-	    for (i = 0; i < DRAGON2(aa).neighbors; i++) {
-	      int d = DRAGON2(aa).adjacent[i];
-	      int ee = DRAGON(d).origin;
-	      
-	      if (DRAGON(d).color == dragon[aa].color)
-		continue;
-	      
-	      if (dd != ee) {
-		if (move_reasons[r].type == ATTACK_MOVE) {
-		  /* Exclude the case when (aa) is dead and both
-		   * (dd) and (ee) are strongly alive or
-		   * better. Then the move would only be losing
-		   * points.
-		   */
-		  if (dragon[aa].matcher_status != DEAD
-		      || (DRAGON2(dd).safety != STRONGLY_ALIVE
-			  && DRAGON2(dd).safety != INVINCIBLE)
-		      || (DRAGON2(ee).safety != STRONGLY_ALIVE
-			  && DRAGON2(ee).safety != INVINCIBLE)) {
-		    /* If one of the strings can be attacked and the
-                     * move at (pos) does not defend, do not induce a
-                     * connection move.
-		     */
-		    if ((worm[dd].attack_codes[0] == 0
-			 || does_defend(pos, dd))
-			&& (worm[ee].attack_codes[0] == 0
-			    || does_defend(pos, ee)))
-		      add_connection_move(pos, dd, ee);
-		  }
-		}
-		else
-		  add_cut_move(pos, dd, ee);
-	      }
-	    }
-	  }
-	  else {
-	    /* Workaround. If the unstable worm has been amalgamated
-	     * with stable worms, it would be incorrect to add
-	     * cut/connect move reasons for all neighbors of this
-	     * dragon. Instead we fall back to using chainlinks() to
-	     * find the neighbors of the worm. The shortcoming of this
-	     * is that it only counts neighbors in direct contact with
-	     * the worm, which is not always sufficient.
-	     */
-	    int num_adj, adjs[MAXCHAIN];
-	    
-	    num_adj = chainlinks(aa, adjs);
-	    for (i = 0; i < num_adj; i++) {
-	      int adj = adjs[i];
-	      
-	      if (dragon[adj].color == dragon[aa].color)
-		continue;
-	      if (dragon[adj].size > biggest) {
-		dd = dragon[adj].origin;
-		biggest = dragon[adj].size;
-	      }
-	    }
-	    
-	    if (biggest == 0)
-	      continue;
-	    
-	    for (i = 0; i < num_adj; i++) {
-	      int adj = adjs[i];
-	      int ee  = dragon[adj].origin;
-	      
-	      if (dragon[adj].color == dragon[aa].color)
-		continue;
-	      
-	      if (dd != ee) {
-		if (move_reasons[r].type == ATTACK_MOVE) {
-		  /* Exclude the case when (aa) is dead and both
-		   * (dd) and (ee) are strongly alive or
-		   * better. Then the move would only be losing
-		   * points.
-		   */
-		  if (dragon[aa].matcher_status != DEAD
-		      || (DRAGON2(dd).safety != STRONGLY_ALIVE
-			  && DRAGON2(dd).safety != INVINCIBLE)
-		      || (DRAGON2(ee).safety != STRONGLY_ALIVE
-			  && DRAGON2(ee).safety != INVINCIBLE)) {
-		    /* If one of the strings can be attacked and the
-                     * move at (pos) does not defend, do not induce a
-                     * connection move.
-		     */
-		    if ((worm[dd].attack_codes[0] == 0
-			 || does_defend(pos, dd))
-			&& (worm[ee].attack_codes[0] == 0
-			    || does_defend(pos, ee)))
-		      add_connection_move(pos, dd, ee);
-		  }
-		}
-		else
-		  add_cut_move(pos, dd, ee);
-	      }
-	    }
-	  }
+	if (move_reasons[r].type == ATTACK_MOVE) {
+	  attack_move = 1;
+	  color_to_move = OTHER_COLOR(board[aa]);
 	}
-	else if (move_reasons[r].type == OWL_ATTACK_MOVE) {
-	  aa = dragons[move_reasons[r].what];
-	  for (i = 0; i < DRAGON2(aa).neighbors; i++) {
-	    int bb = dragon2[DRAGON2(aa).adjacent[i]].origin;
-	    if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0)
-	      add_strategical_defense_move(pos, bb);
+	else {
+	  attack_move = 0;
+	  color_to_move = board[aa];
+	}
+		
+	if (worm[aa].defend_codes[0] == 0)
+	  continue; /* No defense. */
+	
+	/* Don't care about inessential dragons. */
+	if (DRAGON2(aa).safety == INESSENTIAL)
+	  continue;
+	
+	/*
+	 * If this is a defense move and the defense is futile for
+	 * strategical reasons, we shouldn't induce a cutting move
+	 * reason.
+	 *
+	 * FIXME: We may want to revise this policy.
+	 */
+	if (!attack_move && !strategically_sound_defense(aa, pos))
+	  continue;
+	
+	num_adj = extended_chainlinks(aa, adjs);
+	
+	for (i = 0; i < num_adj; i++) {
+	  for (j = i+1; j < num_adj; j++) {
+	    int adj1 = adjs[i];
+	    int adj2 = adjs[j];
+
+	    if (attack_move && !disconnect(adj1, adj2, NULL))
+	      continue;
+	    if (!attack_move && !string_connect(adj1, adj2, NULL))
+	      continue;
+
+	    if (trymove(pos, color_to_move, "induce_secondary_move_reasons",
+			aa, EMPTY, NO_MOVE)) {
+	      if (attack_move && !disconnect(adj1, adj2, NULL)) {
+		DEBUG(DEBUG_MOVE_REASONS,
+		      "Connection move at %1m induced for %1m/%1m due to attack of %1m\n",
+		      pos, adj1, adj2, aa);
+		add_connection_move(pos, adj1, adj2);
+	      }
+		  
+	      if (!attack_move && !string_connect(adj1, adj2, NULL)) {
+		DEBUG(DEBUG_MOVE_REASONS,
+		      "Cut move at %1m induced for %1m/%1m due to defense of %1m\n",
+		      pos, adj1, adj2, aa);
+		add_cut_move(pos, adj1, adj2);
+	      }
+
+	      popgo();
+	    }
 	  }
+	}  
+      }
+      else if (move_reasons[r].type == OWL_ATTACK_MOVE) {
+	aa = dragons[move_reasons[r].what];
+	for (i = 0; i < DRAGON2(aa).neighbors; i++) {
+	  int bb = dragon2[DRAGON2(aa).adjacent[i]].origin;
+	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0)
+	    add_strategical_defense_move(pos, bb);
 	}
       }
     }
+  }
 }
 
 
@@ -818,10 +729,13 @@ examine_move_safety(int color)
 
       case CONNECT_MOVE:
         {
-	  int dragon1 = conn_dragon1[move_reasons[r].what];
-	  int dragon2 = conn_dragon2[move_reasons[r].what];
-	  int aa = dragons[dragon1];
-	  int bb = dragons[dragon2];
+	  int worm1 = conn_worm1[move_reasons[r].what];
+	  int worm2 = conn_worm2[move_reasons[r].what];
+	  int aa = dragon[worms[worm1]].origin;
+	  int bb = dragon[worms[worm2]].origin;
+
+	  if (aa == bb)
+	    continue;
 	  
 	  if (dragon[aa].owl_status == ALIVE
 	      || dragon[bb].owl_status == ALIVE) {
@@ -1997,11 +1911,17 @@ estimate_strategical_value(int pos, int color, float score)
 	if (doing_scoring && !move[pos].move_safety)
 	  break;
 
-	d1 = conn_dragon1[move_reasons[r].what];
-	d2 = conn_dragon2[move_reasons[r].what];
-	aa = dragons[d1];
-	bb = dragons[d2];
+	worm1 = conn_worm1[move_reasons[r].what];
+	worm2 = conn_worm2[move_reasons[r].what];
+	aa = dragon[worms[worm1]].origin;
+	bb = dragon[worms[worm2]].origin;
 
+	if (aa == bb)
+	  continue;
+
+	d1 = find_dragon(aa);
+	d2 = find_dragon(bb);
+	
 	/* If we are ahead by more than 20, value connections more strongly */
 	if ((color == WHITE && score > 20.0)
 	    || (color == BLACK && score < -20.0))
@@ -2198,7 +2118,7 @@ estimate_strategical_value(int pos, int color, float score)
 	&& dragon[aa].size == worm[aa].size
 	&& (attack_move_reason_known(pos, find_worm(aa))
 	    || defense_move_reason_known(pos, find_worm(aa)))) {
-      TRACE("  %1m:   %f - %1m strategic value already counted.\n",
+      TRACE("  %1m:   %f - %1m strategic value already counted - A.\n",
 	    pos, dragon_value[k], aa);
       continue;
     }
@@ -2221,7 +2141,7 @@ estimate_strategical_value(int pos, int color, float score)
 	tot_value += excess_value;
       }
       else {
-	TRACE("  %1m:   %f - %1m strategic value already counted.\n",
+	TRACE("  %1m:   %f - %1m strategic value already counted - B.\n",
 	      pos, dragon_value[k], aa);
       }
       
@@ -2760,15 +2680,16 @@ review_move_reasons(int *the_move, float *val, int color,
   }
   verbose = save_verbose;
 
-  induce_secondary_move_reasons(color);
-  time_report(2, "  induce_secondary_move_reasons", NO_MOVE, 1.0);
-  
   if (verbose > 0)
     verbose--;
   examine_move_safety(color);
   time_report(2, "  examine_move_safety", NO_MOVE, 1.0);
   verbose = save_verbose;
 
+  /* We can't do this until move_safety is known. */
+  induce_secondary_move_reasons(color);
+  time_report(2, "  induce_secondary_move_reasons", NO_MOVE, 1.0);
+    
   if (printworms || verbose)
     list_move_reasons(color);
 

@@ -946,6 +946,11 @@ loadsgf games/handtalk/handtalk23.sgf 186
 261 owl_attack E5
 #? [1 (O6|Q7|T4|T5|R4)]
 
+# See also 13x13:15.
+loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
+262 owl_defend E7
+#? [0]*
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

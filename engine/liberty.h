@@ -140,6 +140,7 @@ int find_origin(int str);
 int chainlinks(int str, int adj[MAXCHAIN]);
 int chainlinks2(int str, int adj[MAXCHAIN], int lib);
 int chainlinks3(int str, int adj[MAXCHAIN], int lib);
+int extended_chainlinks(int str, int adj[MAXCHAIN]);
 
 
 /* This is increased by one anytime a move is (permanently) played or

@@ -1656,16 +1656,17 @@ Xc*E
 
 
 Pattern Shape19
+# gf Revised constraint. (3.3.2)
 
 X.X     stop enemy tiger
 .*O
 
 :8,-,shape(2)
 
-XaX
+XaB
 .*O
 
-;xdefend_against(*,a)
+;lib(B)>1 && xdefend_against(*,a)
 
 
 Pattern Shape20
