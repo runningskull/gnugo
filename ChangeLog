@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revised heuristics to find a font file in view.pike
+- avoid crashing on bad engine paths when starting a new engine in
+  view.pike
 - move_connects_strings() revised
 - outcommented patterns removed
 - ignore off board vertices in openregion() in fuseki.c

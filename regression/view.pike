@@ -488,15 +488,21 @@ int find_font()
 	werror("and point to it from the environment variable GNUGO_FONT.\n");
 	return 0;
     }
+
+    // Compute the length of the filename proper, i.e. without the
+    // path to the file.
+    int fontlength(string s) {
+	return sizeof((s / "/")[-1]);
+    };
     
     // Choose the one with shortest name (arbitrary but may avoid e.g.
     // italic fonts).
     font_filename = font_files[0];
     foreach (font_files[1..], string font_file)
     {
-	if (sizeof(font_filename) > sizeof(font_file))
+	if (fontlength(font_filename) > fontlength(font_file))
 	    font_filename = font_file;
-	else if (sizeof(font_filename) == sizeof(font_file)
+	else if (fontlength(font_filename) == fontlength(font_file)
 		 && has_value(lower_case(font_filename), "mono"))
 	    font_filename = font_file;
     }
@@ -1588,6 +1594,12 @@ class Controller
     static void select_new_engine()
     {
 	string new_engine_path = engine_path_entry->get_text();
+	if (!Stdio.is_file(new_engine_path)) {
+	    viewers->clist->clear();
+	    viewers->clist->append(({"The engine path does not point to a file.\n", "", ""}));
+	    return;
+	}
+	
 	SimpleGtp new_engine = SimpleGtp((new_engine_path + " --quiet --mode gtp -w -t -d0x101840") / " ");
     	if (!new_engine)
 	    werror("Failed to start new engine.\n");
