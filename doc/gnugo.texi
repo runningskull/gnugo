@@ -36,10 +36,11 @@ This is Edition @value{EDITION} of @cite{The GNU Go Project documentation}, @*
 for the @value{VERSION} version of the GNU Go program.
 
 @sp 2
-Published by the Free Software Foundation @*
-675 Massachusetts Avenue @*
-Cambridge, MA 02139-3309 USA @*
-Phone: +1-617-876-3296 @*
+Published by the Free Software Foundation Inc @*
+59 Temple Place, Suite 330 @* 
+Boston, MA  02111-1307 @*
+USA @*
+Tel: 617-542-5942 @*
 
 Permission is granted to make and distribute verbatim
 or modified copies of this manual is given provided
