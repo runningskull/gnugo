@@ -421,6 +421,7 @@ void owl_reasons(int color);
 
 void unconditional_life(int unconditional_territory[BOARDMAX], int color);
 void find_superstring(int str, int *num_stones, int *stones);
+void find_superstring_conservative(int str, int *num_stones, int *stones);
 void find_superstring_liberties(int str, int *liberties, int *libs,
                                 int liberty_cap);
 void find_proper_superstring_liberties(int str, int *liberties, int *libs, 

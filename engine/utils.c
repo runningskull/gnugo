@@ -1320,6 +1320,18 @@ find_superstring(int str, int *num_stones, int *stones)
 		      0, 1);
 }
 
+/* This is the same as find_superstring, except that connections of
+ * type 5 are omitted. This is used in semeai analysis.
+ */
+void
+find_superstring_conservative(int str, int *num_stones, int *stones)
+{
+  do_find_superstring(str, num_stones, stones,
+		      NULL, NULL, 0,
+		      NULL, NULL, 0,
+		      0, 0);
+}
+
 
 /* This function computes the superstring at (str) as described above,
  * but omitting connections of type 5. Then it constructs a list of

@@ -48,6 +48,7 @@
 
 #define MAX_MOVES 3           /* maximum number of branches at each node */
 #define MAX_SEMEAI_MOVES 2    /* semeai branch factor--must be <= MAX_MOVES */
+#define SEMEAI_BRANCH_DEPTH 12 /* Only one move considered below this depths.*/
 #define MAX_SEMEAI_DEPTH 100  /* Don't read below this depth */
 #define MAX_LUNCHES 10
 #define MAX_WORMS 10  /* maximum number of worms in a dragon to be cataloged */
@@ -88,7 +89,12 @@ struct local_owl_data {
   int local_owl_node_counter;
 
   char safe_move_cache[BOARDMAX];
+
+ /* This is used to organize the owl stack. */
+  int restore_from;
+  int number_in_stack;
 };
+
 
 static int result_certain;
 
@@ -209,7 +215,7 @@ static void owl_mark_worm(int apos, int bpos,
 			  struct local_owl_data *owl);
 static void owl_mark_boundary(struct local_owl_data *owl);
 static void owl_update_goal(int pos, int same_dragon,
-			    struct local_owl_data *owl);
+			    struct local_owl_data *owl, int semeai_call);
 static void owl_update_boundary_marks(int pos, struct local_owl_data *owl);
 static void owl_find_lunches(struct local_owl_data *owl);
 static void owl_make_domains(struct local_owl_data *owla,
@@ -223,7 +229,7 @@ static void do_owl_analyze_semeai(int apos, int bpos,
 		      struct local_owl_data *owla,
 		      struct local_owl_data *owlb, int komaster,
 		      int *resulta, int *resultb,
-		      int *move, int pass);
+		      int *move, int pass, int owl_phase);
 static int semeai_move_value(int move, struct local_owl_data *owla,
 			     struct local_owl_data *owlb,
 			     int raw_value);
@@ -232,16 +238,21 @@ static int liberty_of_goal(int pos, struct local_owl_data *owl);
 static int matches_found;
 static char found_matches[BOARDMAX];
 
-static void reduced_init_owl(struct local_owl_data **owl);
+static void reduced_init_owl(struct local_owl_data **owl,
+    			     int at_bottom_of_stack);
 static void init_owl(struct local_owl_data **owl, int target1, int target2,
 		     int move, int use_stack);
-
 static struct local_owl_data *owl_stack = NULL;
 static int owl_stack_size = 0;
 static int owl_stack_pointer = 0;
-static void push_owl(struct local_owl_data **owl);
+static void push_owl(struct local_owl_data **owla,
+    		     struct local_owl_data **owlb);
+static void do_push_owl(struct local_owl_data **owl);
 static void pop_owl(struct local_owl_data **owl);
+
+#if 0
 static int catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS]);
+#endif
 
 
 /* Called when (apos) and (bpos) point to adjacent dragons
@@ -249,14 +260,13 @@ static int catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS]);
  * CRITICAL, analyzes the semeai, assuming that the player
  * of the (apos) dragon moves first.
  *
- * owl_phase determines whether owl moves are being generated
+ * owl determines whether owl moves are being generated
  * or simple liberty filling is taking place.
  *
  * semeai_focus can be either owla, owlb or EMPTY. If it is an owl,
  * then owl attack and defense moves for that owl are given
  * priority.
  */
-static int owl_phase;
 
 void
 owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
@@ -264,25 +274,24 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
 {
   int semeai_focus;
 
-  static struct local_owl_data owla;
-  static struct local_owl_data owlb;
+  struct local_owl_data *owla;
+  struct local_owl_data *owlb;
   
   gg_assert(board[apos] == OTHER_COLOR(board[bpos]));
-  owl_phase = owl;
   count_variations = 1;
   TRACE("owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
   if (owl) {
-    struct local_owl_data *owla_ptr = &owla;
-    struct local_owl_data *owlb_ptr = &owlb;
-    init_owl(&owla_ptr, apos, NO_MOVE, NO_MOVE, 0);
-    init_owl(&owlb_ptr, bpos, NO_MOVE, NO_MOVE, 0);
-    owl_make_domains(&owla, &owlb);
+    init_owl(&owla, apos, NO_MOVE, NO_MOVE, 1);
+    init_owl(&owlb, bpos, NO_MOVE, NO_MOVE, 0);
+    owl_make_domains(owla, owlb);
   }
   else {
-    owla.local_owl_node_counter	= 0;
-    owlb.local_owl_node_counter	= 0;
-    owl_mark_worm(apos, NO_MOVE, &owla);
-    owl_mark_worm(bpos, NO_MOVE, &owlb);
+    reduced_init_owl(&owla, 1);
+    reduced_init_owl(&owlb, 0);
+    owla->local_owl_node_counter	= 0;
+    owlb->local_owl_node_counter	= 0;
+    owl_mark_worm(apos, NO_MOVE, owla);
+    owl_mark_worm(bpos, NO_MOVE, owlb);
   }
   if (stackp > 0)
     semeai_focus = NO_MOVE;
@@ -293,8 +302,8 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
   else
     semeai_focus = NO_MOVE;
   
-  do_owl_analyze_semeai(apos, bpos, &owla, &owlb, EMPTY,
-			resulta, resultb, move, 0);
+  do_owl_analyze_semeai(apos, bpos, owla, owlb, EMPTY,
+			resulta, resultb, move, 0, owl);
 }
 
 /* It is assumed that the 'a' player moves first, and
@@ -316,12 +325,14 @@ do_owl_analyze_semeai(int apos, int bpos,
 		      struct local_owl_data *owla,
 		      struct local_owl_data *owlb, int komaster,
 		      int *resulta, int *resultb,
-		      int *move, int pass)
+		      int *move, int pass, int owl_phase)
 {
   int color = board[apos];
   int other = OTHER_COLOR(color);
+#if 0
   int wormsa, wormsb;
   int goal_wormsa[MAX_WORMS], goal_wormsb[MAX_WORMS];
+#endif
   struct owl_move_data vital_defensive_moves[MAX_MOVES];
   struct owl_move_data vital_offensive_moves[MAX_MOVES];
   struct owl_move_data shape_defensive_moves[MAX_MOVES];
@@ -342,7 +353,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   int k;
   int m, n;
   int same_dragon;
-  int save_owl_phase = owl_phase;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
   int move_value;
@@ -363,6 +373,9 @@ do_owl_analyze_semeai(int apos, int bpos,
   
   global_owl_node_counter++;
   owla->local_owl_node_counter++;
+
+  gg_assert(board[apos] == owla->color);
+  gg_assert(board[bpos] == owlb->color);
 
   if ((stackp <= owl_branch_depth) && (hashflags & HASH_SEMEAI)
       && (!pass) && owl_phase) {
@@ -408,8 +421,10 @@ do_owl_analyze_semeai(int apos, int bpos,
   else
     read_result = NULL;
 
+#if 0
   wormsa = catalog_goal(owla, goal_wormsa);
   wormsb = catalog_goal(owlb, goal_wormsb);
+#endif
   
   outside_liberty.pos = 0;
   common_liberty.pos = 0;
@@ -462,14 +477,32 @@ do_owl_analyze_semeai(int apos, int bpos,
       }
     }
 #endif
+
     owl_determine_life(owla, owlb, owla->my_eye,
 		       color, komaster, 1, 
 		       vital_defensive_moves,
 		       &probable_mina, &probable_maxa);
+    if (level >= 9) {
+      current_owl_data = owla;
+      matches_found = 0;
+      memset(found_matches, 0, sizeof(found_matches));
+      matchpat(owl_shapes_callback, other,
+	       &owl_vital_apat_db, vital_defensive_moves, owla->goal);
+      probable_mina -= matches_found;
+    }
+
     owl_determine_life(owlb, owla, owlb->my_eye,
 		       other, komaster, 1,
 		       vital_offensive_moves,
 		       &probable_minb, &probable_maxb);
+    if (level >= 9) {
+      current_owl_data = owlb;
+      matches_found = 0;
+      memset(found_matches, 0, sizeof(found_matches));
+      matchpat(owl_shapes_callback, other,
+	       &owl_vital_apat_db, vital_offensive_moves, owla->goal);
+      probable_minb -= matches_found;
+    }
 
     /* Certain cases can be handled immediately. */
     /* I live, you die, no move needed. */
@@ -644,7 +677,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 				     owla, owlb,
 				     vital_offensive_moves[k].value);
       owl_add_move(moves, vital_offensive_moves[k].pos,
-		      move_value, vital_offensive_moves[k].name, 
+		   move_value, vital_offensive_moves[k].name,
 		   same_dragon,
 		   vital_offensive_moves[k].escape);
     }
@@ -813,13 +846,12 @@ do_owl_analyze_semeai(int apos, int bpos,
   /* Now we are ready to try moves. Turn on the sgf output ... */
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
-  memcpy(saved_goal, owla->goal, sizeof(saved_goal));
   for (k = 0; k < 2*MAX_SEMEAI_MOVES+2; k++) {
     int mpos = moves[k].pos;
 
     if (k > 2
 	|| (stackp > 6 && k > 1)
-	|| (stackp > 12 && k > 0))
+	|| (stackp > SEMEAI_BRANCH_DEPTH && k > 0))
       continue;
 
     if (mpos != NO_MOVE 
@@ -827,31 +859,36 @@ do_owl_analyze_semeai(int apos, int bpos,
 	&& stackp < MAX_SEMEAI_DEPTH
 	&& semeai_trymove(mpos, color, moves[k].name, apos, bpos,
 			  owl_phase, moves[k].value)) {
-      if (1)
-	if (debug & DEBUG_SEMEAI)
-	  dump_stack();
+      if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1)
+	push_owl(&owla, &owlb);
+      else
+	memcpy(saved_goal, owla->goal, sizeof(saved_goal));
+      if ((debug & DEBUG_SEMEAI) && verbose)
+	dump_stack();
       if (board[bpos] == EMPTY) {
 	this_resultb = DEAD;
 	this_resulta = ALIVE;
       }
       else {
-	if (moves[k].same_dragon)
-	  mark_string(mpos, owla->goal, 1);
+	owl_update_goal(mpos, moves[k].same_dragon, owla, 1);
 	owla->lunches_are_current = 0;
 	owl_update_boundary_marks(mpos, owla);
-	if (liberty_of_goal(mpos, owla))
-	  owla->goal[mpos] = 1;
 	do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
-			      &this_resultb, &this_resulta, NULL, 0);
+			      &this_resultb, &this_resulta, NULL, 0, owl_phase);
       }
       
       if (this_resultb == DEAD && this_resulta == ALIVE) {
-	memcpy(owla->goal, saved_goal, sizeof(saved_goal));
+	if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1) {
+	  pop_owl(&owlb);
+	  pop_owl(&owla);
+	}
+	else
+	  memcpy(owla->goal, saved_goal, sizeof(saved_goal));
 	popgo();
-	owl_phase = save_owl_phase;
 	*resulta = ALIVE;
 	*resultb = DEAD;
-	if (move) *move = mpos;
+	if (move)
+	  *move = mpos;
 	SGFTRACE2(mpos, ALIVE, moves[k].name);
 	close_pattern_list(color, &shape_defensive_patterns);
 	close_pattern_list(color, &shape_offensive_patterns);
@@ -873,9 +910,13 @@ do_owl_analyze_semeai(int apos, int bpos,
 	best_move = mpos;
 	best_move_k = k;
       }
-      memcpy(owla->goal, saved_goal, sizeof(saved_goal));
+      if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1) {
+	pop_owl(&owlb);
+	pop_owl(&owla);
+      }
+      else
+	memcpy(owla->goal, saved_goal, sizeof(saved_goal));
       popgo();
-      owl_phase = save_owl_phase;
     }
   }
 
@@ -893,7 +934,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   /* If no move was found, then pass */
   if (best_resulta == UNKNOWN) {
     do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
-			  resultb, resulta, NULL, 1);
+			  resultb, resulta, NULL, 1, owl_phase);
     SGFTRACE2(PASS_MOVE, UNKNOWN, "No move found");
     if (move) *move = PASS_MOVE;
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, *resulta, *resultb);
@@ -1432,7 +1473,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	dump_stack();
 
       /* We have now made a move. Analyze the new position. */
-      push_owl(&owl);
+      push_owl(&owl, NULL);
       mw[mpos] = 1;
       number_tried_moves++;
       owl->lunches_are_current = 0;
@@ -2014,7 +2055,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	dump_stack();
 
       /* We have now made a move. Analyze the new position. */
-      push_owl(&owl);
+      push_owl(&owl, NULL);
       mw[mpos] = 1;
       number_tried_moves++;
       owl->lunches_are_current = 0;
@@ -2022,7 +2063,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       /* Add the stone just played to the goal dragon, unless the
        * pattern explicitly asked for not doing this.
        */
-      owl_update_goal(mpos, moves[k].same_dragon, owl);
+      owl_update_goal(mpos, moves[k].same_dragon, owl, 0);
 
       if (!ko_move) {
 	acode = do_owl_attack(str, NULL, owl, new_komaster, 
@@ -2127,7 +2168,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
       if (moves[k].pos != NO_MOVE && moves[k].value > 0)
 	if (trymove(moves[k].pos, color, moves[k].name, target, EMPTY, 0)) {
 	  owl->lunches_are_current = 0;
-	  owl_update_goal(moves[k].pos, moves[k].same_dragon, owl);
+	  owl_update_goal(moves[k].pos, moves[k].same_dragon, owl, 0);
 	  if (do_owl_defend(target, &move2, owl, EMPTY, 0, 0) == WIN) {
 	    move = moves[k].pos;
 	    popgo();
@@ -3237,7 +3278,8 @@ owl_mark_boundary(struct local_owl_data *owl)
  * goal. If same_dragon is 0, we don't add any stones at all.
  */
 static void
-owl_update_goal(int pos, int same_dragon, struct local_owl_data *owl)
+owl_update_goal(int pos, int same_dragon, struct local_owl_data *owl,
+    		int semeai_call)
 {
   int stones[MAX_BOARD * MAX_BOARD];
   int num_stones;
@@ -3253,7 +3295,10 @@ owl_update_goal(int pos, int same_dragon, struct local_owl_data *owl)
   sgf_dumptree = NULL;
   count_variations = 0;
   
-  find_superstring(pos, &num_stones, stones);
+  if (semeai_call)
+    find_superstring_conservative(pos, &num_stones, stones);
+  else
+    find_superstring(pos, &num_stones, stones);
 
   /* Turn sgf output back on. */
   sgf_dumptree = save_sgf_dumptree;
@@ -3743,7 +3788,7 @@ owl_connection_defends(int move, int target1, int target2)
   init_owl(&owl, target1, target2, NO_MOVE, 1);
 
   if (trymove(move, color, "owl_connection_defends", target1, EMPTY, 0)) {
-    owl_update_goal(move, 1, owl);
+    owl_update_goal(move, 1, owl, 0);
     if (!do_owl_attack(move, NULL, owl, EMPTY, 0, 0))
       result = WIN;
     owl->lunches_are_current = 0;
@@ -4095,7 +4140,7 @@ owl_substantial(int str)
   /* FIXME: We want to use the full init_owl here too (cf. similar
    * remark below).
    */
-  reduced_init_owl(&owl);
+  reduced_init_owl(&owl, 1);
 
   owl->color = OTHER_COLOR(board[str]);
   owl->local_owl_node_counter = 0;
@@ -4495,33 +4540,45 @@ owl_escape_route(struct local_owl_data *owl)
  * init_owl() also in owl_substantial.
  */
 static void
-reduced_init_owl(struct local_owl_data **owl)
+reduced_init_owl(struct local_owl_data **owl, int at_bottom_of_stack)
 {
   if (owl_stack_size == 0) {
     owl_stack_size = owl_reading_depth + 2;
     owl_stack = malloc(owl_stack_size * sizeof(*owl_stack));
     gg_assert(owl_stack != NULL);
   }
-  *owl = &owl_stack[0];
+
+  if (at_bottom_of_stack) {
+    owl_stack_pointer = 0;
+    *owl = &owl_stack[0];
+  }
+  else {
+    owl_stack_pointer++;
+    *owl = &owl_stack[owl_stack_pointer];
+  }
+  owl_stack[owl_stack_pointer].number_in_stack = owl_stack_pointer;
 }
 
 
 /*
  * If use_stack is set, the stack is initialized, and the return value
  * of *owl is a pointer to the bottom of the stack.
+ *
+ * at_bottom_of_stack = 1 means **owl will be initialized at the bottom
+ * 	of the stack
+ * (otherwise, it will be set at the lowest available spot in the stack)
  */
 static void
 init_owl(struct local_owl_data **owl, int target1, int target2, int move,
-         int use_stack)
+         int at_bottom_of_stack)
 {
-  if (use_stack)
-    reduced_init_owl(owl);
+  reduced_init_owl(owl, at_bottom_of_stack);
 
   (*owl)->local_owl_node_counter = 0;
   (*owl)->lunches_are_current = 0;
   owl_mark_dragon(target1, target2, *owl);
   if (move != NO_MOVE)
-    owl_update_goal(move, 1, *owl);
+    owl_update_goal(move, 1, *owl, 0);
   compute_owl_escape_values(*owl);
 }
 
@@ -4530,28 +4587,62 @@ init_owl(struct local_owl_data **owl, int target1, int target2, int move,
  * Storage of owl data
  ***********************/
 
-/* Push owl data one step upwards in the stack. The stack is dynamically
- * reallocated if it is too small.
+/* Push owl data one step upwards in the stack. Gets called from
+ * push_owl.
  */
 static void
-push_owl(struct local_owl_data **owl)
+do_push_owl(struct local_owl_data **owl)
 {
-  gg_assert(*owl == &owl_stack[owl_stack_pointer]);
-  /* Do we need to enlarge the stack? */
-  if (owl_stack_pointer == owl_stack_size - 1) {
-    if (0)
-      gprintf("Have to enlarge owl stack!");
-    owl_stack_size++;
-    owl_stack = realloc(owl_stack, owl_stack_size * sizeof(*owl_stack));
-    gg_assert(owl_stack != NULL);
-    *owl = &owl_stack[owl_stack_pointer];
-  }
+  gg_assert(&owl_stack[(*owl)->number_in_stack] == *owl);
 
   /* Copy the owl data. */
   owl_stack_pointer++;
   owl_stack[owl_stack_pointer] = **owl;
+
+  /* Needed for stack organization: */
+  owl_stack[owl_stack_pointer].number_in_stack = owl_stack_pointer;
+  owl_stack[owl_stack_pointer].restore_from = (*owl)->number_in_stack;
+
+  /* Finally move the *owl pointer. */
   *owl = &owl_stack[owl_stack_pointer];
 }
+
+/* Push owl data one step upwards in the stack. The stack is dynamically
+ * reallocated if it is too small. Second argument is used from the
+ * semeai code; use NULL otherwise.
+ *
+ * If you use push_owl with two arguments, later call
+ * pop_owl(owlb); pop_owl(owla);
+ * in this order!
+ */
+static void
+push_owl(struct local_owl_data **owla, struct local_owl_data **owlb)
+{
+  /* Do we need to enlarge the stack? */
+  if (owl_stack_pointer == owl_stack_size - 1) {
+    int num_a = (*owla)->number_in_stack;
+    int num_b = 0;
+    if (owlb)
+      num_b = (*owlb)->number_in_stack;
+    if (0)
+      gprintf("Have to enlarge owl stack! (size %d, owl_stack %d, stackp %d)\n",
+	      owl_stack_size, owl_stack_pointer, stackp);
+    if (owlb)
+      owl_stack_size += 2;
+    else
+      owl_stack_size++;
+    owl_stack = realloc(owl_stack, owl_stack_size * sizeof(*owl_stack));
+    gg_assert(owl_stack != NULL);
+    *owla = &owl_stack[num_a];
+    if (owlb)
+      *owlb = &owl_stack[num_b];
+  }
+
+  do_push_owl(owla);
+  if (owlb)
+    do_push_owl(owlb);
+}
+
 
 /* Retrieve owl data from the stack. The local_owl_node_counter field
  * is not reset.
@@ -4561,8 +4652,10 @@ pop_owl(struct local_owl_data **owl)
 {
   int nodes = (*owl)->local_owl_node_counter;
   gg_assert(*owl == &owl_stack[owl_stack_pointer]);
+
+  *owl = &owl_stack[(*owl)->restore_from];
+
   owl_stack_pointer--;
-  *owl = &owl_stack[owl_stack_pointer];
   (*owl)->local_owl_node_counter = nodes;
 }
 
@@ -4971,6 +5064,7 @@ owl_hotspots(float values[BOARDMAX])
 
 /* Returns the number of worms in the goal dragon, and a pointer to each */
 
+#if 0
 static int
 catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS])
 {
@@ -4995,6 +5089,7 @@ catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS])
     }
   return worms;
 }
+#endif
 
 
 
