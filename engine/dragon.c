@@ -1520,6 +1520,27 @@ is_same_dragon(int d1, int d2)
   return (dragon[d1].origin == dragon[d2].origin);
 }
 
+/* Test whether two dragons are neighbors. */
+int
+are_neighbor_dragons(int d1, int d2)
+{
+  int k;
+  d1 = dragon[d1].origin;
+  d2 = dragon[d2].origin;
+  
+  for (k = 0; k < DRAGON2(d1).neighbors; k++)
+    if (dragon2[DRAGON2(d1).adjacent[k]].origin == d2)
+      return 1;
+
+  /* Just to be make sure that this function is always symmetric, we
+   * do it the other way round too.
+   */
+  for (k = 0; k < DRAGON2(d2).neighbors; k++)
+    if (dragon2[DRAGON2(d2).adjacent[k]].origin == d1)
+      return 1;
+
+  return 0;
+}
 
 /* ================================================================ */
 /*                       A few status functions                     */

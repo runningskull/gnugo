@@ -269,6 +269,7 @@ int safe_move(int move, int color);
 void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, int escape_value[BOARDMAX]);
 int is_same_dragon(int d1, int d2);
+int are_neighbor_dragons(int d1, int d2);
 int lively_dragon_exists(int color);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
@@ -322,9 +323,6 @@ void set_maximum_territorial_value(int pos, float value);
 void add_shape_value(int pos, float value);
 void add_followup_value(int pos, float value);
 void add_reverse_followup_value(int pos, float value);
-
-void find_stones_saved_by_move(int pos, int color,
-			       char saved_stones[BOARDMAX]);
 
 int owl_lively(int pos);
 int owl_escape_value(int pos);
@@ -417,6 +415,15 @@ int somewhere(int color, int num_moves, ...);
 #define PRINTMOYO_PERMEABILITY      0x40
 #define PRINTMOYO_STRENGTH          0x80
 #define PRINTMOYO_ATTENUATION       0x100
+
+/* These values are used to communicate whether stones have been
+ * saved, captured, or neither, when computing the influence effects
+ * of a move.
+ */
+#define INFLUENCE_UNCHANGED_STONE 0
+#define INFLUENCE_SAVED_STONE     1
+#define INFLUENCE_CAPTURED_STONE  2
+
 
 /* Influence functions. */
 void compute_initial_influence(int color, int dragons_known);

@@ -1293,6 +1293,24 @@ xexx
 ;owl_escape_value(e)>0 && !xplay_defend_both(*,a,b,c,d)
 
 
+Pattern A421
+# gf New pattern. (3.1.13)
+
+xx?
+..O         center block
+.*.
+OX?
+
+:8,-,value(80)
+
+ax?
+b.O
+.*.
+OX?
+
+;owl_escape_value(a)>0 || owl_escape_value(b)>0
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the second line        #

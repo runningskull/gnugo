@@ -94,15 +94,14 @@ reset_engine()
 void
 examine_position(int color, int how_much)
 {
-  int save_verbose;
+  int save_verbose = verbose;
 
   purge_persistent_reading_cache();
   
   /* Don't print reading traces during make_worms and make_dragons unless 
    * the user really wants it (verbose == 3). 
    */
-  save_verbose = verbose;
-  if ((verbose == 1) || (verbose == 2))
+  if (verbose == 1 || verbose == 2)
     --verbose;
 
   if (NEEDS_UPDATE(worms_examined)) {
@@ -246,6 +245,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
 {
   float val;
   int move;
+  int save_verbose;
 
   start_timer(0);
   
@@ -309,7 +309,6 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   /*
    * Print some of the information if the user wants to.
    */
-  /* compute_influence(); */
   if (printmoyo)
     print_moyo();
   
@@ -335,7 +334,11 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   worm_reasons(color);
   
   /* Pick up owl moves. */
+  save_verbose = verbose;
+  if (verbose > 0)
+    verbose--;
   owl_reasons(color);
+  verbose = save_verbose;
   
   /* Try to find empty corner moves. */
   fuseki(color);

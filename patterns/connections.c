@@ -114,7 +114,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 	int x, y;
 	int pos;
 	
-	TRANSFORM(pattern->patn[k].x,pattern->patn[k].y,&x,&y,ll);
+	TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
 	x += m;
 	y += n;
 	pos = POS(x, y);
@@ -181,7 +181,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
     int pos;
     
     /* transform pattern real coordinate */
-    TRANSFORM(pattern->patn[k].x,pattern->patn[k].y,&x,&y,ll);
+    TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
     x += m;
     y += n;
     pos = POS(x, y);

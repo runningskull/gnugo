@@ -74,8 +74,6 @@ DECLARE(gtp_combination_attack);
 DECLARE(gtp_connect);
 DECLARE(gtp_countlib);
 DECLARE(gtp_cputime);
-DECLARE(gtp_debug_influence);
-DECLARE(gtp_debug_move_influence);
 DECLARE(gtp_decrease_depths);
 DECLARE(gtp_defend);
 DECLARE(gtp_disconnect);
@@ -103,7 +101,6 @@ DECLARE(gtp_increase_depths);
 DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
 DECLARE(gtp_loadsgf);
-DECLARE(gtp_move_influence);
 DECLARE(gtp_name);
 DECLARE(gtp_estimate_score);
 DECLARE(gtp_owl_attack);
@@ -152,8 +149,6 @@ static struct gtp_command commands[] = {
   {"connect",         	      gtp_connect},
   {"countlib",         	      gtp_countlib},
   {"cputime",		      gtp_cputime},
-  {"debug_influence",         gtp_debug_influence},
-  {"debug_move_influence",    gtp_debug_move_influence},
   {"decrease_depths",  	      gtp_decrease_depths},
   {"defend",           	      gtp_defend},
   {"disconnect",       	      gtp_disconnect},
@@ -184,7 +179,6 @@ static struct gtp_command commands[] = {
   {"komi",        	      gtp_set_komi},
   {"level",        	      gtp_set_level},
   {"loadsgf",          	      gtp_loadsgf},
-  {"move_influence",          gtp_move_influence},
   {"name",                    gtp_name},
   {"new_score",               gtp_estimate_score},
   {"owl_attack",     	      gtp_owl_attack},
@@ -1818,79 +1812,6 @@ gtp_dump_stack(char *s, int id)
 }
 
 
-/* Function:  Write information about the influence function to stderr.
- * Arguments: color to move, optionally a list of what to show
- * Fails:     invalid color
- * Returns:   nothing
- */
-static int
-gtp_debug_influence(char *s, int id)
-{
-  int save_verbose   = verbose;
-  int save_debug     = debug;
-  int save_printmoyo = printmoyo;
-  int color;
-
-  if (!gtp_decode_color(s, &color))
-    return gtp_failure(id, "invalid color");
-
-  verbose   = 0;
-  debug     = 0;
-  printmoyo = 0;
-  examine_position(color, EXAMINE_ALL);
-  verbose   = save_verbose;
-  debug     = save_debug;
-  printmoyo = save_printmoyo;
-
-  /* FIXME: Decide the choice of information from the command. */
-  printmoyo |= (PRINTMOYO_NUMERIC_INFLUENCE | PRINTMOYO_PRINT_INFLUENCE
-		| PRINTMOYO_PERMEABILITY | PRINTMOYO_STRENGTH
-		| PRINTMOYO_ATTENUATION);
-  print_initial_influence(color, 1);
-  printmoyo = save_printmoyo;
-  
-  return gtp_success(id, "");
-}
-
-
-/* Function:  Write information about the influence function after making
- *            a move to stderr.
- * Arguments: move, optionally a list of what to show
- * Fails:     never
- * Returns:   nothing
- */
-static int
-gtp_debug_move_influence(char *s, int id)
-{
-  int save_verbose   = verbose;
-  int save_debug     = debug;
-  int save_printmoyo = printmoyo;
-  int color;
-  int i, j;
-  char saved_stones[BOARDMAX];
-  
-  if (!gtp_decode_move(s, &color, &i, &j))
-    return gtp_failure(id, "invalid color or coordinate");
-
-  verbose   = 0;
-  debug     = 0;
-  printmoyo = 0;
-  examine_position(color, EXAMINE_ALL);
-  verbose   = save_verbose;
-  debug     = save_debug;
-  printmoyo = save_printmoyo;
-
-  find_stones_saved_by_move(POS(i, j), color, saved_stones);
-  
-  /* FIXME: Decide the choice of information from the command. */
-  printmoyo |= (PRINTMOYO_NUMERIC_INFLUENCE | PRINTMOYO_PRINT_INFLUENCE
-		| PRINTMOYO_PERMEABILITY | PRINTMOYO_STRENGTH);
-  print_move_influence(POS(i, j), color, saved_stones);
-  printmoyo = save_printmoyo;
-
-  return gtp_success(id, "");
-}
-
 /* Function:  Return information about the influence function.
  * Arguments: color to move
  * Fails:     never
@@ -1990,46 +1911,6 @@ print_influence(float white_influence[BOARDMAX],
   }
 }
 
-
-/* Function:  Return information about the influence function after a move
- * Arguments: move
- * Fails:     never
- * Returns:   Influence data formatted in the same way as for gtp_influence.
- */
-static int
-gtp_move_influence(char *s, int id)
-{
-  int save_verbose   = verbose;
-  int save_debug     = debug;
-  int save_printmoyo = printmoyo;
-  int color;
-  int i, j;
-  char saved_stones[BOARDMAX];
-  float white_influence[BOARDMAX];
-  float black_influence[BOARDMAX];
-  int influence_regions[BOARDMAX];
-
-  if (!gtp_decode_move(s, &color, &i, &j))
-    return gtp_failure(id, "invalid color or coordinate");
-
-  verbose   = 0;
-  debug     = 0;
-  printmoyo = 0;
-  examine_position(color, EXAMINE_ALL);
-  verbose   = save_verbose;
-  debug     = save_debug;
-  printmoyo = save_printmoyo;
-
-  find_stones_saved_by_move(POS(i, j), color, saved_stones);
-  
-  gtp_printid(id, GTP_SUCCESS);
-  get_move_influence(POS(i, j), color, saved_stones, white_influence,
-		     black_influence, influence_regions);
-  print_influence(white_influence, black_influence, influence_regions);
-  /* We already have one newline and thus can't use gtp_finish_response(). */
-  gtp_printf("\n");
-  return GTP_OK;
-}
 
 /* Function:  Return the information in the worm data structure.
  * Arguments: optional vertex

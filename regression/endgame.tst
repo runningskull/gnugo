@@ -19,7 +19,7 @@ loadsgf games/endgame1.sgf 3
 
 loadsgf games/endgame1.sgf 4
 104 gg_genmove white
-#? [E8|D8]
+#? [E8|D8|E7]
 
 loadsgf games/endgame1.sgf 5
 105 gg_genmove black

@@ -2714,7 +2714,7 @@ owl_does_defend(int move, int target)
     
     owl.lunches_are_current = 0;
     owl_mark_dragon(target, NO_MOVE, &owl);
-    owl_update_goal(move, 2, &owl);
+    owl_update_goal(move, 1, &owl);
     compute_owl_escape_values(&owl);
     if (!do_owl_attack(target, NULL, &owl, EMPTY, 0))
       result = WIN;
@@ -2782,7 +2782,7 @@ owl_confirm_safety(int move, int target, int *defense_point)
     
     owl.lunches_are_current = 0;
     owl_mark_dragon(target, NO_MOVE, &owl);
-    owl_update_goal(move, 2, &owl);
+    owl_update_goal(move, 1, &owl);
     compute_owl_escape_values(&owl);
     if (!do_owl_attack(target, &defense, &owl, EMPTY, 0))
       result = WIN;
@@ -2883,7 +2883,7 @@ owl_connection_defends(int move, int target1, int target2)
   compute_owl_escape_values(&owl);
 
   if (trymove(move, color, "owl_connection_defends", target1, EMPTY, 0)) {
-    owl_update_goal(move, 2, &owl);
+    owl_update_goal(move, 1, &owl);
     if (!do_owl_attack(move, NULL, &owl, EMPTY, 0))
       result = WIN;
     owl.lunches_are_current = 0;

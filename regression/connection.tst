@@ -105,6 +105,12 @@ loadsgf games/incident240.sgf 69
 29 disconnect B12 F7
 #? [1 D9]*
 
+loadsgf games/strategy13.sgf
+30 connect R13 S8
+#? [1 (Q11|T10|T9)]*
+31 disconnect R13 S8
+#? [1 Q9]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

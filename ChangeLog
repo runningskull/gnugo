@@ -2,6 +2,22 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function are_neighbor_dragons()
+- verbose value reduced while running owl_reasons
+- influence code revised
+- function find_stones_saved_by_move() in move_reasons.c removed
+- find_more_owl_attack_and_defense_moves() revised
+- owl attacks induce strategical defenses of friendly neighbors
+- connection values revised
+- territorial value of attacks, defenses, owl attacks, and owl
+  defenses computed through influence function instead of using
+  effective_size heuristic
+- bugfix in computing effects of min and max territory values
+- played stone not automatically included in goal array in
+  owl_does_defend(), owl_confirm_safety(), and owl_connection_defends()
+- gtp commands debug_influence, debug_move_influence, and move_influence
+  removed
+- cleanup in mkpat.c
 - malformed line warning turned into error in mkpat
 - 1D documentation revisions.
 - twogtp-a now give a (halfhearted) default to missing goprog.
@@ -16,7 +32,8 @@
 - important bugfix in semeai.c, could cause a crash
 - tuning
 - owl tuning
-- one revised regression test
+- influence tuning
+- new and revised regression tests
 - new command-line option --orientation
 - -l and decide-* options can be combined with --orientation
 - tuning and regression revisions

@@ -744,6 +744,23 @@ bA.c
 ;lib(A)<=3 && lib(b)>=3 && lib(c)>=3
 
 
+Pattern Barrier56
+
+XXOo
+XOX,
+...,
+----
+
+:8,Ds
+
+xXbo
+XOXa
+...,
+----
+
+;!oplay_attack(a,b)
+
+
 Pattern Intrusion1
 
 xxxx
@@ -1299,6 +1316,21 @@ X?
 XX
 aO
 --
+
+;safe_omove(a)
+
+
+Pattern Intrusion39
+
+?Xx
+O!.
+o!X
+
+:8,B,value(30)
+
+?Xx
+Oa.
+o!X
 
 ;safe_omove(a)
 

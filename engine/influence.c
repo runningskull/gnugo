@@ -57,7 +57,7 @@ static int influence_color = EMPTY;
 static struct influence_data escape_influence;
 
 /* Cache of delta_territory_values. */
-static int delta_territory_cache[MAX_BOARD][MAX_BOARD];
+static int delta_territory_cache[BOARDMAX];
 
 /* If set, print influence map when computing this move. Purely for
  * debugging.
@@ -308,9 +308,13 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
  * computed, we weight the strength of the influence with the dragon
  * status.
  *
- * The saved_stones parameter tells which strings have been tactically
- * defended by the current move. If no move has been done, it should
- * be passed as NULL.
+ * The saved_stones parameter tells which critical stones have been
+ * defended (value INFLUENCE_SAVED_STONE) or attacked (value
+ * INFLUENCE_CAPTURED_STONE) by the current move. If no move has been
+ * done, it should only contain zeros (INFLUENCE_UNCHANGED_STONE).
+ *
+ * The name saved_stones is historic and should probably be changed
+ * since it also includes captured stones.
  */
 
 static float strength_map[10] = {
@@ -333,6 +337,8 @@ init_influence(struct influence_data *q, int color, int dragons_known,
   int i, j;
   float attenuation;
 
+  gg_assert(saved_stones != NULL);
+  
   if (q != &escape_influence) {
     q->color_to_move = color;
     attenuation = DEFAULT_ATTENUATION;
@@ -344,6 +350,8 @@ init_influence(struct influence_data *q, int color, int dragons_known,
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
+      int pos = POS(i, j);
+      /* Initialize. */
       q->white_influence[i][j] = 0.0;
       q->black_influence[i][j] = 0.0;
       q->w[i][j] = 0.0;
@@ -353,30 +361,39 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       q->black_permeability[i][j] = 1.0;
       q->white_strength[i][j] = 0.0;
       q->black_strength[i][j] = 0.0;
-      q->p[i][j] = BOARD(i, j);
+      q->p[i][j] = board[pos];
+
+      /* FIXME: Simplify the code below! */
       
-      if (IS_STONE(BOARD(i, j))) {
-	if (worm[POS(i, j)].attack_codes[0] == WIN
-	    && (OTHER_COLOR(q->p[i][j]) == color
-		|| worm[POS(i, j)].defend_codes[0] == 0)) {
+      /* Dead stones (or critical ones for the color which will not
+       * make the next move) count as empty space. However, influence
+       * cannot flow through these for the owner of the stones.
+       */
+      if (IS_STONE(board[pos])) {
+	if (saved_stones[pos] == INFLUENCE_CAPTURED_STONE
+	    || (saved_stones[pos] == INFLUENCE_UNCHANGED_STONE
+		&& ((worm[pos].attack_codes[0] != 0
+		    && (OTHER_COLOR(q->p[i][j]) == color
+			|| worm[pos].defend_codes[0] == 0))
+		    || (dragons_known
+			&& dragon[pos].id != -1
+			&& (DRAGON2(pos).safety == DEAD
+			    || (DRAGON2(pos).safety == CRITICAL
+				&& board[pos] == OTHER_COLOR(color))))))) {
 	  if (q->p[i][j] == WHITE)
 	    q->white_permeability[i][j] = 0.0;
 	  else
 	    q->black_permeability[i][j] = 0.0;
 	  q->p[i][j] = EMPTY;
 	}
-	else if (!dragons_known
-		 || dragon[POS(i, j)].id == -1
-		 || DRAGON2(POS(i, j)).safety != DEAD) {
+	else if (saved_stones[pos] == INFLUENCE_SAVED_STONE
+		 || !dragons_known
+		 || dragon[pos].id == -1
+		 || (DRAGON2(pos).safety != DEAD
+		     && DRAGON2(pos).safety != CRITICAL)
+		 || (DRAGON2(pos).safety == CRITICAL
+		     && board[pos] == color)) {
 	  if (q->p[i][j] == WHITE)
-	    q->black_permeability[i][j] = 0.0;
-	  else
-	    q->white_permeability[i][j] = 0.0;
-	}
-	
-	/* Stop influence radiation through saved stones. */
-	if (saved_stones && saved_stones[POS(i, j)] && BOARD(i, j) != color) {
-	  if (BOARD(i, j) == WHITE)
 	    q->black_permeability[i][j] = 0.0;
 	  else
 	    q->white_permeability[i][j] = 0.0;
@@ -386,32 +403,30 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       /* When evaluating influence after a move, the newly placed
        * stone will have the invalid dragon id -1.
        */
-      if (IS_STONE(BOARD(i, j))) {
-	if (!dragons_known || dragon[POS(i, j)].id == -1) {
+      if (IS_STONE(board[pos])) {
+	if (!dragons_known || saved_stones[pos] == INFLUENCE_SAVED_STONE) {
 	  if (q->p[i][j] == WHITE)
 	    q->white_strength[i][j] = DEFAULT_STRENGTH;
 	  else if (q->p[i][j] == BLACK)
 	    q->black_strength[i][j] = DEFAULT_STRENGTH;
 	}
-	else {
-	  if (q->p[i][j] == WHITE)
-	    q->white_strength[i][j] = (DEFAULT_STRENGTH
-				       * strength_map[DRAGON2(POS(i, j)).safety]);
-	  else if (q->p[i][j] == BLACK)
-	    q->black_strength[i][j] = (DEFAULT_STRENGTH
-				       * strength_map[DRAGON2(POS(i, j)).safety]);
+	else if (saved_stones[pos] != INFLUENCE_CAPTURED_STONE) {
+	  ASSERT1(dragon[pos].id != -1, pos);
+	  if (q->p[i][j] == WHITE) {
+	    if (color == BLACK && DRAGON2(pos).safety == CRITICAL)
+	      q->white_strength[i][j] = 0.0;
+	    else
+	      q->white_strength[i][j] = (DEFAULT_STRENGTH
+					 * strength_map[DRAGON2(pos).safety]);
+	  }
+	  else if (q->p[i][j] == BLACK) {
+	    if (color == WHITE && DRAGON2(pos).safety == CRITICAL)
+	      q->black_strength[i][j] = 0.0;
+	    else
+	      q->black_strength[i][j] = (DEFAULT_STRENGTH
+					 * strength_map[DRAGON2(pos).safety]);
+	  }
 	}
-
-	/* Stop influence radiation from captured stones.
-	 * (Yes, saved_stones now also includes captured stones.)
-	 */
-	if (saved_stones && saved_stones[POS(i, j)] && BOARD(i, j) == color) {
-	  if (BOARD(i, j) == WHITE)
-	    q->white_strength[i][j] = 0.0;
-	  else
-	    q->black_strength[i][j] = 0.0;
-	}
-	
       }
     }
 }
@@ -490,7 +505,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	      && (pattern->class & (CLASS_A | CLASS_B)))) {
 	/* transform pattern real coordinate */
 	int x, y;
-	TRANSFORM(pattern->patn[k].x,pattern->patn[k].y,&x,&y,ll);
+	TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
 	x += m;
 	y += n;
 	if (pattern->class & CLASS_E) {
@@ -498,7 +513,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	      || (color == BLACK && q->black_strength[x][y] == 0.0))
 	    return; /* Match failed. */
 	}
-	else {
+	else if (!(pattern->class & CLASS_D)) {
 	  if ((stackp == 0 && worm[POS(x, y)].attack_codes[0] != 0)
 	      || attack(POS(x, y), NULL) != 0)
 	    return; /* Match failed */
@@ -610,7 +625,8 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
   
   /* Loop through pattern elements and perform necessary actions
-   * for A, D, and B patterns. */
+   * for A, D, and B patterns.
+   */
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     if ((   (pattern->class & (CLASS_D | CLASS_A))
 	    && pattern->patn[k].att == ATT_comma)
@@ -657,7 +673,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 static void
 find_influence_patterns(struct influence_data *q, int color)
 {
-  int m,n;
+  int m, n;
 
   global_matchpat(influence_callback, ANCHOR_COLOR, &influencepat_db, q, NULL);
   if (color != EMPTY)
@@ -668,7 +684,7 @@ find_influence_patterns(struct influence_data *q, int color)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (IS_STONE(BOARD(m, n))) {
+      if (IS_STONE(q->p[m][n])) {
 	int k;
 	for (k = 0; k < 8; k++) {
 	  int dm = deltai[k];
@@ -676,7 +692,7 @@ find_influence_patterns(struct influence_data *q, int color)
 	  if (ON_BOARD2(m+dm, n+dn) && q->p[m+dm][n+dn] == EMPTY) {
 	    /* Reduce less diagonally. */
 	    float reduction = (k < 4) ? 0.25 : 0.5;
-	    if (BOARD(m, n) == BLACK)
+	    if (q->p[m][n] == BLACK)
 	      q->white_permeability[m+dm][n+dn] *= reduction;
 	    else
 	      q->black_permeability[m+dm][n+dn] *= reduction;
@@ -714,14 +730,14 @@ compute_influence(struct influence_data *q, int color, int m, int n,
 		  char saved_stones[BOARDMAX])
 {
   int i, j;
-  init_influence(q, color, dragons_known, saved_stones);
-  if (m != -1) {
-    if (color == WHITE)
-      q->black_strength[m][n] = DEFAULT_STRENGTH;
-    else
-      q->white_strength[m][n] = DEFAULT_STRENGTH;
+  char dummy_saved_stones[BOARDMAX];
+  if (saved_stones != NULL)
+    init_influence(q, color, dragons_known, saved_stones);
+  else {
+    memset(dummy_saved_stones, 0, sizeof(dummy_saved_stones));
+    init_influence(q, color, dragons_known, dummy_saved_stones);
   }
-  
+
 #if 0
   /* This is used when computing escape influence to remove the
    * influence from the escaping dragon.
@@ -1009,7 +1025,7 @@ compute_initial_influence(int color, int dragons_known)
   /* Clear delta_territory cache. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      delta_territory_cache[i][j] = NOT_COMPUTED;
+      delta_territory_cache[POS(i, j)] = NOT_COMPUTED;
 }
 
 /* Redo the segmentation of the initial influence. */
@@ -1097,9 +1113,12 @@ sum_territory(struct influence_data *q, int color)
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
       if ((q->p[i][j] == EMPTY ||
-	   (q->black_strength[i][j] == 0 && q->white_strength == 0))
-	  && whose_territory(q, i, j) == color)
+	   (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0))
+	  && whose_territory(q, i, j) == color) {
 	territory++;
+	if (board[POS(i, j)] != EMPTY)
+	  territory++;
+      }
   return territory;
 }
 
@@ -1112,7 +1131,7 @@ sum_moyo(struct influence_data *q, int color)
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
       if ((q->p[i][j] == EMPTY ||
-	   (q->black_strength[i][j] == 0 && q->white_strength == 0))
+	   (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0))
 	  && whose_moyo(q, i, j) == color)
 	moyo++;
   return moyo;
@@ -1165,35 +1184,35 @@ sum_strict_area(struct influence_data *q, int color)
   return area;
 }
 
-/* Return the color who has territory at (m, n), or EMPTY. */
+/* Return the color who has territory at pos, or EMPTY. */
 int
 influence_territory_color(int pos)
 {
   return whose_territory(&initial_influence, I(pos), J(pos));
 }
 
-/* Return the color who has moyo at (m, n), or EMPTY. */
+/* Return the color who has moyo at pos, or EMPTY. */
 int
 influence_moyo_color(int pos)
 {
   return whose_moyo(&initial_influence, I(pos), J(pos));
 }
 
-/* Return the color who has area at (m, n), or EMPTY. */
+/* Return the color who has area at pos, or EMPTY. */
 int
 influence_area_color(int pos)
 {
   return whose_area(&initial_influence, I(pos), J(pos));
 }
 
-/* Compute the difference in territory made by a move by color at (m, n). */
+/* Compute the difference in territory made by a move by color at (pos). */
 int
 influence_delta_territory(int pos, int color,
 			  char saved_stones[BOARDMAX])
 {
   int delta;
-  if (delta_territory_cache[I(pos)][J(pos)] != NOT_COMPUTED)
-    return delta_territory_cache[I(pos)][J(pos)];
+  if (delta_territory_cache[pos] != NOT_COMPUTED)
+    return delta_territory_cache[pos];
   if (0)
     gprintf("influence_delta_territory for %1m %s = ", pos,
 	    color_to_string(color));
@@ -1204,11 +1223,11 @@ influence_delta_territory(int pos, int color,
 	   sum_territory(&initial_influence, OTHER_COLOR(color)));
   if (0)
     gprintf("%d\n", delta);
-  delta_territory_cache[I(pos)][J(pos)] = delta;
+  delta_territory_cache[pos] = delta;
   return delta;
 }
 
-/* Compute the difference in moyo made by a move by color at (m, n). */
+/* Compute the difference in moyo made by a move by color at pos. */
 int
 influence_delta_moyo(int pos, int color,
 		     char saved_stones[BOARDMAX])
@@ -1227,7 +1246,7 @@ influence_delta_moyo(int pos, int color,
   return delta;
 }
 
-/* Compute the difference in strict moyo made by a move by color at (m, n). */
+/* Compute the difference in strict moyo made by a move by color at pos. */
 int
 influence_delta_strict_moyo(int pos, int color,
 			    char saved_stones[BOARDMAX])
@@ -1248,7 +1267,7 @@ influence_delta_strict_moyo(int pos, int color,
   return delta;
 }
 
-/* Compute the difference in area made by a move by color at (m, n). */
+/* Compute the difference in area made by a move by color at pos. */
 int
 influence_delta_area(int pos, int color,
 		     char saved_stones[BOARDMAX])
@@ -1269,7 +1288,7 @@ influence_delta_area(int pos, int color,
   return delta;
 }
 
-/* Compute the difference in strict area made by a move by color at (m, n). */
+/* Compute the difference in strict area made by a move by color at pos. */
 int
 influence_delta_strict_area(int pos, int color,
 			    char saved_stones[BOARDMAX])

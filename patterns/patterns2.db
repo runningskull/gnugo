@@ -2235,6 +2235,18 @@ AA..
 ;lib(A)==2
 
 
+Pattern Shape69
+# gf New pattern. (3.1.13)
+
+?XXX??      usually the right way to strengthen the position
+XO.O*.
+XO....
+......
+------
+
+:8,-,shape(1)
+
+
 ###########################
 #
 # Followup moves. 

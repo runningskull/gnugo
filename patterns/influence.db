@@ -590,7 +590,7 @@ Pattern Invade8
 |.....
 |..Ooo
 
-:8,I,value(2)
+:8,Is,value(2)
 
 
 Pattern Invade9
@@ -602,7 +602,7 @@ Pattern Invade9
 |.....
 |...Oo
 
-:8,I,value(2)
+:8,Is,value(2)
 
 
 Pattern Invade10
@@ -614,7 +614,7 @@ Pattern Invade10
 |.....
 |....O
 
-:\,I,value(2)
+:\,Is,value(2)
 
 
 Pattern Invade11

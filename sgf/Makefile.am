@@ -11,7 +11,7 @@ noinst_HEADERS = \
 GGBUILTSOURCES = sgf_properties.h
 
 # Remove these files here... they are created locally
-# don'e clean up sgfproperties.h
+# don't clean up sgfproperties.h
 DISTCLEANFILES = *~
 
 INCLUDES =\

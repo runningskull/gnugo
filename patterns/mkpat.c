@@ -121,7 +121,7 @@ int el;                         /* next element number in current pattern */
 struct patval elements[MAX_BOARD*MAX_BOARD]; /* elements of current pattern */
 int num_stars;
 
-int ci=-1, cj=-1;               /* position of origin (first piece element)
+int ci = -1, cj = -1;           /* position of origin (first piece element)
 				   relative to top-left */
 int patno;		        /* current pattern */
 int pats_with_constraints = 0;  /* just out of interest */
@@ -148,8 +148,8 @@ struct autohelper_func {
 /*
  * current_* are useful for debugging broken patterns.
  */
-char *current_file=0;
-int current_line_number=0;
+const char *current_file = 0;
+int current_line_number = 0;
 
 /* ================================================================ */
 /*                                                                  */
@@ -631,12 +631,12 @@ read_pattern_line(char *p)
 
 fatal:
  fprintf(stderr, "Illegal pattern %s\n", pattern_names[patno]);
- fatal_errors=1;
+ fatal_errors = 1;
  return;
 
 notrectangle:
  fprintf(stderr, "%s(%d) : error : Pattern %s not rectangular\n", 
-	    current_file, current_line_number, pattern_names[patno]);
+	 current_file, current_line_number, pattern_names[patno]);
  fatal_errors++;
  return;
 }
@@ -1027,14 +1027,14 @@ parse_constraint_or_action(char *line)
   int labels[MAXLABELS];
   int N = sizeof(autohelper_functions)/sizeof(struct autohelper_func);
   int number_of_params = 0;
-  for (p=line; *p; p++)
+  for (p = line; *p; p++)
   {
     switch (state) {
       case 0: /* Looking for a token, echoing other characters. */
 	for (n = 0; n < N; n++) {
 	  if (strncmp(p, autohelper_functions[n].name,
 		      strlen(autohelper_functions[n].name)) == 0) {
-	    state=1;
+	    state = 1;
 	    p += strlen(autohelper_functions[n].name)-1;
 	    break;
 	  }
@@ -1088,7 +1088,8 @@ parse_constraint_or_action(char *line)
 	    if (label_coords[label][0] == -1) {
 	      fprintf(stderr,
 		      "%s(%d) : error : The constraint or action uses a label (%c) that wasn't specified in the diagram (pattern %s).\n", 
-		      current_file, current_line_number, label, pattern_names[patno]);
+		      current_file, current_line_number, label,
+		      pattern_names[patno]);
 	      fatal_errors++;
 	      return;
 	    }
@@ -1261,7 +1262,7 @@ write_elements(FILE *outfile, char *name)
   /* sort the elements so that least-likely elements are tested first. */
   qsort(elements, el, sizeof(struct patval), compare_elements);
 
-  fprintf(outfile, "static struct patval %s%d[]={\n", name, patno);
+  fprintf(outfile, "static struct patval %s%d[] = {\n", name, patno);
 
   /* This may happen for fullboard patterns. */
   if (el == 0) {
@@ -1273,7 +1274,7 @@ write_elements(FILE *outfile, char *name)
     assert(elements[node].x >= mini && elements[node].y >= minj);
     if (!(elements[node].x <= maxi && elements[node].y <= maxj)) {
       fprintf(stderr, "%s(%d) : error : Maximum number of elements exceeded in %s.\n",
-	    current_file, current_line_number, name);
+	      current_file, current_line_number, name);
       fatal_errors++;
     };
 
@@ -1300,9 +1301,9 @@ write_patterns(FILE *outfile, char *name)
 
   /* Write out the patterns. */
   if (fullboard)
-    fprintf(outfile, "struct fullboard_pattern %s[]={\n", name);
+    fprintf(outfile, "struct fullboard_pattern %s[] = {\n", name);
   else
-    fprintf(outfile, "struct pattern %s[]={\n", name);
+    fprintf(outfile, "struct pattern %s[] = {\n", name);
 
   for (j = 0; j < patno; ++j) {
     struct pattern *p = pattern + j;
@@ -1430,9 +1431,9 @@ main(int argc, char *argv[])
   {
     /* parse command-line args */
 #if DFA_ENABLED
-    while ( (i=gg_getopt(argc, argv, "i:o:V:vcbXfmtD")) != EOF) {
+    while ((i = gg_getopt(argc, argv, "i:o:V:vcbXfmtD")) != EOF) {
 #else
-    while ( (i=gg_getopt(argc, argv, "i:o:vcbXfm")) != EOF) {
+    while ((i = gg_getopt(argc, argv, "i:o:vcbXfm")) != EOF) {
 #endif
       switch(i) {
       case 'v': verbose = 1; break;
@@ -1619,7 +1620,8 @@ main(int argc, char *argv[])
 	state = 4;
       }
       else {
-	fprintf(stderr, "%s(%d) : warning : Unexpected entry line in pattern %s\n",
+	fprintf(stderr,
+		"%s(%d) : warning : Unexpected entry line in pattern %s\n",
 		current_file, current_line_number, pattern_names[patno]);
       }
     } 
@@ -1646,10 +1648,10 @@ main(int argc, char *argv[])
     else {
       int i = strlen(line);
       char c = line[i-1];
-      line[i-1] = 0;  /*Chop of \n*/
+      line[i-1] = 0;  /* Chop off \n */
       fprintf(stderr, "%s(%d) : error : Malformed line \"%s\" in pattern %s\n",
 	      current_file, current_line_number, line, pattern_names[patno]);
-      line[i-1]=c; /*Put it back - maybe not necessary at this point.*/
+      line[i-1] = c;  /* Put it back - maybe not necessary at this point. */
       fatal_errors++;
     }
   }
@@ -1714,11 +1716,13 @@ main(int argc, char *argv[])
   write_pattern_db(output_FILE, argv[gg_optind]);
 
   if (fatal_errors) {
-    fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n", current_file);
+    fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n",
+	    current_file);
   }
 
   if (fatal_errors) {
-    fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n", current_file);
+    fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n",
+	    current_file);
   }
 
   return fatal_errors ? 1 : 0;
