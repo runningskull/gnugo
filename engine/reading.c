@@ -1816,6 +1816,8 @@ defend4(int str, int *move, int komaster, int kom_pos)
 
   if (stackp <= backfill_depth) {
     break_chain2_defense_moves(str, &moves, 0);
+    break_chain3_moves(str, &moves, 0);
+    break_chain4_moves(str, &moves, 0);
 #if 0 
     hane_rescue_moves(str, libs, &moves);
 #endif
@@ -3336,11 +3338,16 @@ attack2(int str, int *move, int komaster, int kom_pos)
        */
       adj = chainlinks2(str, adjs, 1);
       for (r = 0; r < adj; r++) {
-        /* if stackp > depth and any boundary chain is in atari, assume safe.
+        /* If stackp > depth and any boundary chain is in atari, assume safe.
          * However, if the captured chain is only of size 1, there can still
          * be a working ladder, so continue if that is the case.
+	 * Also if the string in atari shares its liberty with the
+	 * attacked string, drawing it out may enable the ladder to
+	 * continue.
          */
-        if (stackp > depth && countstones(adjs[r]) > 1) {
+        if (stackp > depth
+	    && countstones(adjs[r]) > 1
+	    && !have_common_lib(str, adjs[r], NULL)) {
           RETURN_RESULT(0, 0, move, "boundary in atari");
         }
 

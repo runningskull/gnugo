@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- attack2() revised
+- defend4() revised
 - slow sorting in get_next_move_from_list() is replaced with heap sorting
 - new static functions pattern_list_build_heap() and
   pattern_list_get_next_pattern() in `engine/owl.c'

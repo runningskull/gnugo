@@ -69,7 +69,7 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 100
 #? [S13]*
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 130
-140 reg_genmove black
+140 restricted_genmove black O5 P5 Q5 Q6
 #? [P5]
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
