@@ -342,12 +342,36 @@ make_worms(void)
 	   */
 	  else if (worm[str].color == color
 		   && worm[str].attack_codes[0] != 0) {
-	    int acode = attack(str, NULL); 
+	    int acode = attack(str, NULL);
 	    if (acode < worm[str].attack_codes[0]) {
-	      DEBUG(DEBUG_WORMS,
-		    "adding point of defense of %1m at %1m with code %d\n",
-		    str, pos, REVERSE_RESULT(acode));
-	      change_defense(str, pos, REVERSE_RESULT(acode));
+	      int defense_works = 1;
+	      /* Sometimes attack() fails to find an
+	       * attack which has been found by other means.
+	       * Try if the old attack move still works.
+	       */
+	      if (worm[str].attack_codes[0] != 0
+		  && trymove(worm[str].attack_points[0],
+			     OTHER_COLOR(color), "make_worms", 0, EMPTY, 0)) {
+		int this_acode;
+		if (board[str] == EMPTY)
+		  this_acode = WIN;
+		else
+		  this_acode = REVERSE_RESULT(find_defense(str, NULL));
+		if (this_acode > acode) {
+		  acode = this_acode;
+		  if (acode >= worm[str].attack_codes[0])
+		    defense_works = 0;
+		}
+		popgo();
+	      }
+	      
+	      /* ...then add an attack point of that worm at pos. */
+	      if (defense_works) {
+		DEBUG(DEBUG_WORMS,
+		      "adding point of defense of %1m at %1m with code %d\n",
+		      str, pos, REVERSE_RESULT(acode));
+		change_defense(str, pos, REVERSE_RESULT(acode));
+	      }
 	    }
 	  }
 	}
