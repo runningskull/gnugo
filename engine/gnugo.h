@@ -221,7 +221,7 @@ extern int last_moves[2];
 #define DEBUG_LOADSGF             0x00080
 #define DEBUG_HELPER              0x00100
 #define DEBUG_READING             0x00200
-#define DEBUG_WORMS               0x00400 /* unused */
+#define DEBUG_WORMS               0x00400
 #define DEBUG_MOVE_REASONS        0x00800
 #define DEBUG_OWL_PERFORMANCE     0x01000
 #define DEBUG_LIFE                0x02000

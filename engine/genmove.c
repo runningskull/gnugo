@@ -89,7 +89,6 @@ examine_position(int color, int how_much)
   static int initial_influence_examined = -1;
   static int dragons_examined_without_owl = -1;
   static int dragons_examined = -1;
-  static int owl_reasons_examined = -1;
   static int initial_influence2_examined = -1;
 
   purge_persistent_reading_cache();
@@ -136,16 +135,9 @@ examine_position(int color, int how_much)
       return;
     }
 
-    if (NEEDS_UPDATE(owl_reasons_examined))
-      owl_reasons(color);
-    if (how_much == EXAMINE_OWL_REASONS) {
-      verbose = save_verbose;
-      return;
-    }
   }
   else if (how_much == EXAMINE_INITIAL_INFLUENCE
-	   || how_much == EXAMINE_DRAGONS
-	   || how_much == EXAMINE_OWL_REASONS) {
+	   || how_much == EXAMINE_DRAGONS) {
     verbose = save_verbose;
     return;
   }
@@ -326,6 +318,12 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   /*
    * Ok, information gathering is complete. Now start to find some moves!
    */
+
+  /* Pick up tactical moves. */
+  worm_reasons(color);
+  
+  /* Pick up owl moves. */
+  owl_reasons(color);
   
   /* Try to find empty corner moves. */
   fuseki(color);

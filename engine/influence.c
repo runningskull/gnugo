@@ -353,9 +353,9 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       q->p[i][j] = BOARD(i, j);
       
       if (BOARD(i, j) != EMPTY) {
-	if (worm[POS(i, j)].attack_code == WIN
+	if (worm[POS(i, j)].attack_codes[0] == WIN
 	    && (OTHER_COLOR(q->p[i][j]) == color
-		|| worm[POS(i, j)].defend_code == 0)) {
+		|| worm[POS(i, j)].defend_codes[0] == 0)) {
 	  if (q->p[i][j] == WHITE)
 	    q->white_permeability[i][j] = 0.0;
 	  else
@@ -496,7 +496,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	    return; /* Match failed. */
 	}
 	else {
-	  if ((stackp == 0 && worm[POS(x, y)].attack_code != 0)
+	  if ((stackp == 0 && worm[POS(x, y)].attack_codes[0] != 0)
 	      || attack(POS(x, y), NULL) != 0)
 	    return; /* Match failed */
 	}
@@ -823,7 +823,8 @@ whose_moyo_restricted(struct influence_data *q, int m, int n)
 
   int territory_color = whose_territory(q, m, n);
 
-  if (worm[POS(m, n)].attack_code != 0 && worm[POS(m, n)].defend_code != 0)
+  if (worm[POS(m, n)].attack_codes[0] != 0
+      && worm[POS(m, n)].defend_codes[0] != 0)
     return EMPTY;
   
   /* default */

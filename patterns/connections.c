@@ -110,7 +110,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 	x += m;
 	y += n;
 
-	if (worm[POS(x, y)].attack_code == WIN
+	if (worm[POS(x, y)].attack_codes[0] == WIN
 	  && (pattern->movei == -1
 	      || !does_defend(POS(stari, starj), POS(x, y))))
 	  return; /* Match failed */
@@ -175,7 +175,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
      * can be attacked.
      */
     if ((pattern->class & CLASS_C) && (BOARD(x, y) == color)
-	&& (worm[POS(x, y)].attack_code == 0)) {
+	&& (worm[POS(x, y)].attack_codes[0] == 0)) {
       if (first_dragon == NO_MOVE)
 	first_dragon = dragon[POS(x, y)].origin;
       else if (second_dragon == NO_MOVE

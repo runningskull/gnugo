@@ -168,7 +168,7 @@ make_dragons(int color, int stop_before_owl)
       /* In contrast to worm lunches, a dragon lunch must also be
        * able to defend itself. 
        */
-      if (worm[POS(i, j)].defend_code == 0)
+      if (worm[POS(i, j)].defend_codes[0] == 0)
 	continue;
 
       /* Tell the move generation code about the lunch. */
@@ -544,8 +544,8 @@ make_dragons(int color, int stop_before_owl)
 	&& !owl_substantial(m, n))
       dragon2[d].safety = INESSENTIAL;
     else if (dragon[POS(m, n)].size == worm[POS(m, n)].size
-	     && worm[POS(m, n)].attack_code != 0
-	     && worm[POS(m, n)].defend_code == 0)
+	     && worm[POS(m, n)].attack_codes[0] != 0
+	     && worm[POS(m, n)].defend_codes[0] == 0)
       dragon2[d].safety = TACTICALLY_DEAD;
     else if (0) /* Seki is detected by the call to semeai() below. */
       dragon2[d].safety = ALIVE_IN_SEKI;
@@ -593,17 +593,18 @@ make_dragons(int color, int stop_before_owl)
    * better than DEAD, is considered INESSENTIAL.
    */
   for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (is_worm_origin(POS(m, n), POS(m, n))
-	  && worm[POS(m, n)].attack_code != 0
-	  && worm[POS(m, n)].defend_code != 0
-	  && !worm[POS(m, n)].inessential) {
+    for (n = 0; n < board_size; n++) {
+      int pos = POS(m, n);
+      if (is_worm_origin(pos, pos)
+	  && worm[pos].attack_codes[0] != 0
+	  && worm[pos].defend_codes[0] != 0
+	  && !worm[pos].inessential) {
 	int adjs[MAXCHAIN];
 	int neighbors;
 	int r;
 	int essential = 0;
 	
-	neighbors = chainlinks(POS(m, n), adjs);
+	neighbors = chainlinks(pos, adjs);
 	for (r = 0; r < neighbors; r++)
 	  if (dragon[adjs[r]].matcher_status != DEAD) {
 	    essential = 1;
@@ -611,10 +612,12 @@ make_dragons(int color, int stop_before_owl)
 	  }
 
 	if (!essential) {
-	  worm[POS(m, n)].inessential = 1;
-	  propagate_worm(POS(m, n));
+	  DEBUG(DEBUG_WORMS, "Worm %1m revised to be inessential.\n", pos);
+	  worm[pos].inessential = 1;
+	  propagate_worm(pos);
 	}
       }
+    }
   
   time_report(2, "  revise inessentiality", -1, -1);
 
@@ -931,6 +934,7 @@ show_dragons(void)
    "weakly_alive", "alive_in_seki", "strongly_alive", "invincible"};
   
   int m, n;
+  int k;
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
@@ -957,13 +961,39 @@ show_dragons(void)
 
 	  if (w->cutstone2 > 0)
 	    gprintf("- cutstone2 = %d\n", w->cutstone2);
-	  
-	  if (w->attack_code != 0)
+
+	  /* FIXME: List all attack and defense points. Also list all
+           * threats.
+	   */
+	  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	    if (w->attack_codes[k] == 0)
+	      break;
 	    gprintf("- attackable at %1m, attack code = %d\n",
-		    w->attack_point, w->attack_code);
-	  if (w->defend_code != 0)
-	    gprintf("- defendable at %1m, defend code = %d\n",
-		    w->defense_point, w->defend_code);
+		    w->attack_points[k], w->attack_codes[k]);
+	  }
+	  
+	  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	    if (w->defend_codes[k] == 0)
+	      break;
+	    if (w->defend_codes[k] != 0)
+	      gprintf("- defendable at %1m, defend code = %d\n",
+		      w->defense_points[k], w->defend_codes[k]);
+	  }
+
+	  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	    if (w->attack_threat_codes[k] == 0)
+	      break;
+	    gprintf("- attack threat at %1m, attack threat code = %d\n",
+		    w->attack_threat_points[k], w->attack_threat_codes[k]);
+	  }
+	  
+	  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	    if (w->defense_threat_codes[k] == 0)
+	      break;
+	    if (w->defense_threat_codes[k] != 0)
+	      gprintf("- defense threat at %1m, defense threat code = %d\n",
+		      w->defense_threat_points[k], w->defense_threat_codes[k]);
+	  }
 
 	  if (w->lunch != NO_MOVE)
 	    gprintf("... adjacent worm %1m is lunch\n", w->lunch);
@@ -1176,14 +1206,14 @@ compute_dragon_status(int i, int j)
    * the situation is hopeless.
    */
   if (dragon[POS(i, j)].size == worm[POS(i, j)].size
-      && worm[POS(i, j)].attack_code != 0 
-      && worm[POS(i, j)].defend_code == 0
+      && worm[POS(i, j)].attack_codes[0] != 0 
+      && worm[POS(i, j)].defend_codes[0] == 0
       && true_genus < 3)
     return DEAD;
   
   if (lunch != NO_MOVE
       && true_genus < 3
-      && worm[lunch].defend_code != 0
+      && worm[lunch].defend_codes[0] != 0
       && DRAGON2(i, j).escape_route < 5)
     if (true_genus == 2 || worm[lunch].size > 2)
       return CRITICAL;
@@ -1420,7 +1450,7 @@ compute_escape(int m, int n, int dragon_status_known)
       else {
 	if (BOARD(i, j) == BOARD(m, n)
 	    && !goal[i][j]
-	    && worm[POS(i, j)].attack_code == 0)
+	    && worm[POS(i, j)].attack_codes[0] == 0)
 	  escape_value[i][j] = 2;
       }
     }

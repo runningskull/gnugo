@@ -39,19 +39,19 @@
 #  as a defense for each attackable O string in the pattern.
 #  The patterns are matched with either player as O.
 #
-#  FIXME PRE/POST3.0: A fairly large number of these patterns are redundant.
+#  FIXME: There are still some redundant patterns.
 #
 ##################################################################
 
 Pattern Def1
 
 X*
-OX
+Ox
 
-:/,D
+:8,D
 
 X*
-OX
+Ox
 
 ;olib(*)>1
 
@@ -68,16 +68,6 @@ a.*
 a.b
 
 ;attack(a) && oplay_defend(*,b,a)
-
-
-Pattern Def3
-
-X.*o       defend by capturing
-XOXO      
-....
-----
-
-:8,D
 
 
 Pattern Def4
@@ -99,12 +89,6 @@ O*..
 
 :8,D
 
-OXoO
-Oa..
-....
-----
-
-;safe_xmove(a)
 
 Pattern Def6
 
@@ -112,28 +96,6 @@ OXXO    connect under (the connection may or may not be broken)
 O.*.
 ....
 ----
-
-:8,D
-
-
-Pattern Def7
-
-|.OX?        large value to override defender
-|..O.
-|.*XX
-|..OO
-|..??
-
-:8,D
-
-
-Pattern Def8
-
-.....       high value to override defender
-.O*XO
-..XO.
-.....
------
 
 :8,D
 
@@ -148,17 +110,9 @@ OX*O    cut!
 
 Pattern Def10
 
-?XO?        connection pattern
-O*.O
-??.?
-
-:8,D
-
-
-Pattern Def11
-
-OX?
-.*O
+XO?        connection pattern
+*.O
+?.?
 
 :8,D
 
@@ -168,38 +122,6 @@ Pattern Def12
 ?O*X           
 o.XO           
 ?O.X
-
-:8,D
-
-
-Pattern Def13
-
-??O.|
-?X*.|
-XO..|
-X.O.|
-?XX.|
-
-:8,D
-
-
-Pattern Def14
-
-------
-......
-XOOX*.
-?XOOX?
-??XX??
-
-:8,D
-
-
-Pattern Def15
-
-----
-....          If the OO string can be attacked, save it.
-..OO
-O*??
 
 :8,D
 
@@ -226,38 +148,6 @@ Pattern Def17
 :8,D
 
 
-Pattern Def18
-
-oOo?
-O.*?          Defend with good shape
-XO.?
-...?
-----
-
-:8,D
-
-
-Pattern Def19
-
-OOo          Defend with good shape
-O.*
-XO.
----
-
-:8,D
-
-
-Pattern Def20
-
-|..O.           Defend
-|..*X
-|...X
-|.OOX
-|.XX?
-
-:8,D
-
-
 Pattern Def21
 
 |oOO
@@ -277,35 +167,6 @@ Pattern Def21
 ;lib(a)>2
 
 
-Pattern Def22
-
-|?XX?      move defense point
-|.OOX
-|...X
-|..*?
-
-:8,D
-
-
-Pattern Def23
-# Probably redundant.
-
-?xx?     protect by drawing back
-XO*.
-XX.O
-
-:8,D
-
-
-Pattern Def24
-
-.X?         extend, don't capture
-*OX
-OXO
-
-:8,D
-
-
 Pattern Def25
 
 ?XO           threaten to capture          
@@ -317,30 +178,11 @@ Pattern Def25
 
 
 Pattern Def26
-# The point is the D classification
 
 O.O?           Bamboo joint for defense
 O.*?
 
 :8,D
-
-
-Pattern Def27
-# constraint tries the common tesuji at B.
-
-X???        leap out to defend
-O...
-O.*.
-XX.?
-
-:8,D
-
-X???
-c.B.
-c.a.
-XX.?
-
-;attack(c) && oplay_defend(a,B,c)
 
 
 Pattern Def28
@@ -354,102 +196,13 @@ Ox*	    defend with eye shape
 
 Pattern Def29
 
-?X??        make shape
-.O.?
-...?
-.*..
-?..?
+?X?        make shape
+.O.
+...
+.*.
+?.?
 
-:8,D
-
-
-Pattern Def30
-
-.....          cut!
-.X*O.
-.OX..
-.....
-.....
------
-
-:8,D
-
-
-Pattern Def31
-# Override capturing single X stone.
-
-???.???
-?o*XOOo       Punish overplay.
-oOXOX.o
-o.XO..o
-o.....o
--------
-
-:8,D
-
-
-Pattern Def32
-
-??XoO        Defend monkey jump
-?O*oo
------
-
-:8,D
-
-
-Pattern Def33
-
-?..XO        Defend monkey jump
-.O.*o
------
-
-:8,D
-
-
-Pattern Def34
-
-?xx..        Defend inverse monkey jump
-o.XO.
-O.*..
------
-
-:8,D
-
-
-Pattern Def35
-
-?X..O        Monkey jump edge connection
-O*..o
------
-
-:8,D
-
-
-Pattern Def36
-
-?XO|          Get up from first line.
-O*O|
-O..|
-
-:8,D
-
-
-Pattern Def37
-
-|.OX?        Connect at edge.
-|..*O
-|..??
-
-:8,D
-
-
-Pattern Def38
-
-??.?           connection helper
-O*.O
-?XO?
-
-:8,D
+:|,D
 
 
 Pattern Def39
@@ -459,47 +212,6 @@ O..*.?
 O....?
 o....?
 ------
-
-:8,D
-
-
-Pattern Def40
-
-?X?.?       jump under
-O.*oo
-O....
-o....
------
-
-:8,D
-
-
-Pattern Def41
-
-?X?.?|       jump under
-O.*..|
-O....|
-o....|
------+
-
-:8,D
-
-
-Pattern Def42
-
-|.OOX        jump out to defend
-|...X
-|..*.
-|..o.
-
-:8,D
-
-
-Pattern Def43
-
-o.OO              block
-.*XX
-----
 
 :8,D
 
@@ -525,37 +237,6 @@ OOXX         push to capture X
 :8,D
 
 
-Pattern Def46
-
-XO..|              hane underneath
-XO..|
-.X*.|
-....|
-
-:8,D
-
-
-Pattern Def47
-
-XOX              hane on second line
-O.*
-...
----
-
-:8,D
-
-
-Pattern Def48
-
-......|
-......|
-......|
-..XX*.|
-??OO..|
-
-:8,D
-
-
 Pattern Def49
 
 ??X?
@@ -577,16 +258,6 @@ XXO.
 :8,D
 
 
-Pattern Def51
-
-?.O?
-*.OX          Defend after hanetsugi
-.OXX
-----
-
-:8,D
-
-
 Pattern Def52
 
 ??????
@@ -594,27 +265,6 @@ Pattern Def52
 ?.*.OO
 ?....x
 ??????
-
-:8,D
-
-
-Pattern Def53
-
-.O.?    large value to override defender
-.*XX
-OXO.
-...X
-..O?
-
-:8,D
-
-
-Pattern Def54
-
-????O?
-.XOO..            hane
-..XX*?
-??..??
 
 :8,D
 
@@ -704,47 +354,6 @@ Pattern Def63
 O.Oo
 XO..     protect by drawing back
 XX*O
-
-:8,D
-
-
-Pattern Def64
-
-?X           block to attack and defend
-?O
-X*
-O.
-
-:8,D
-
-
-Pattern Def65
-
-??O.|       Large value to override defender
-?X*.|
-XO..|
-X.O.|
-?XX.|
-
-:8,D
-
-
-Pattern Def66
-
-O*XX?
-..OOX
-.....
------
-
-:8,D
-
-
-Pattern Def67
-
-?OXOO     prevent a killing attack
-.*O.O
-....O
------
 
 :8,D
 

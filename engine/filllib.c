@@ -288,9 +288,9 @@ fill_liberty(int *i, int *j, int color)
 	  int dm = deltai[k];
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
-	      && worm[POS(m+dm, n+dn)].attack_code == WIN) {
-	    *i = I(worm[POS(m+dm, n+dn)].attack_point);
-	    *j = J(worm[POS(m+dm, n+dn)].attack_point);
+	      && worm[POS(m+dm, n+dn)].attack_codes[0] == WIN) {
+	    *i = I(worm[POS(m+dm, n+dn)].attack_points[0]);
+	    *j = J(worm[POS(m+dm, n+dn)].attack_points[0]);
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
 	    return 1;
 	  }
@@ -302,10 +302,10 @@ fill_liberty(int *i, int *j, int color)
 	  int dm = deltai[k];
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
-	      && worm[POS(m+dm, n+dn)].attack_code != 0
-	      && is_legal(worm[POS(m+dm, n+dn)].attack_point, color)) {
-	    *i = I(worm[POS(m+dm, n+dn)].attack_point);
-	    *j = J(worm[POS(m+dm, n+dn)].attack_point);
+	      && worm[POS(m+dm, n+dn)].attack_codes[0] != 0
+	      && is_legal(worm[POS(m+dm, n+dn)].attack_points[0], color)) {
+	    *i = I(worm[POS(m+dm, n+dn)].attack_points[0]);
+	    *j = J(worm[POS(m+dm, n+dn)].attack_points[0]);
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
 	    return 1;
 	  }
@@ -317,7 +317,7 @@ fill_liberty(int *i, int *j, int color)
 	  int dm = deltai[k];
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
-	      && worm[POS(m+dm, n+dn)].attack_code != 0) {
+	      && worm[POS(m+dm, n+dn)].attack_codes[0] != 0) {
 	    /* Just pick some other liberty. */
 	    int libs[2];
 	    if (findlib(POS(m+dm, n+dn), 2, libs) > 1) {

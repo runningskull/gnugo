@@ -273,7 +273,7 @@ choose_worms_tab()
 {
   tab_window_choose(tabs, 0);
   prepare_worms_tab();
-  display_worm(&gameinfo.position, display_cur_row(), display_cur_col());
+  display_worm(POS(display_cur_row(), display_cur_col()));
 
   display_board_cursor();
 }
@@ -314,7 +314,7 @@ show_current_info()
 {
   switch (display_cur_tabchoice()) {
   case 0: 
-    display_worm(&gameinfo.position, display_cur_row(), display_cur_col());
+    display_worm(POS(display_cur_row(), display_cur_col()));
     break;
   case 1: 
     display_dragon(display_cur_row(), display_cur_col());

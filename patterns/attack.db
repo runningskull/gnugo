@@ -43,7 +43,8 @@
 ##################################################################
 
 Pattern Attack1
-# Probably redundant. The tactical reading should find this net.
+# Even if a ladder works (and is found by the tactical reading) we
+# also want to consider the geta capture.
 
 XOO?    capture one stone
 OX..
@@ -59,16 +60,6 @@ OOXX         push to capture X
 .XO*
 ....
 ----
-
-:8,A
-
-
-Pattern Attack3
-
-|X??         vital point in corner
-|.X?
-|*.X
-+---
 
 :8,A
 
@@ -99,56 +90,6 @@ X*
 O.
 
 :8,A
-
-
-Pattern Attack7
-
-?XX
-X.X
-.*.
----
-
-:8,A,indirect_helper
-
-
-# Pattern Attack8
-# # The tactical reading may fail to find the defense move at 'a'. This
-# # pattern corrects the mistake.
-# 
-# ?XX?
-# X.*.
-# ?X..
-# ----
-# 
-# :8,-
-# 
-# ?BB?
-# C.*a
-# ?D..
-# ----
-# 
-# >if (attack(B) && !oplay_attack(*,a,B)) remove_attack(*,B);
-# >if (attack(C) && !oplay_attack(*,a,C)) remove_attack(*,C);
-# >if (attack(D) && !oplay_attack(*,a,D)) remove_attack(*,D);
-# 
-# 
-# Pattern Attack9
-# # The tactical reading may fail to find the defense move at 'a'. This
-# # pattern corrects the mistake.
-# 
-# ?O??
-# XOX*
-# ?...
-# ----
-# 
-# :8,-
-# 
-# ?O??
-# XOB*
-# ?a..
-# ----
-# 
-# >if (attack(B) && !oplay_attack(*,a,B)) remove_attack(*,B);
 
 
 Pattern Attack10
@@ -226,7 +167,7 @@ Pattern Attack17
 # This is only intended for finding an alternative attack. It should
 # have a constraint to first check whether the move above * was
 # successful. 
-# FIXME: Add necessary machinary for this.
+# FIXME: Add necessary machinery for this.
 
 ?X?
 O.O

@@ -141,6 +141,7 @@ extern int position_number;
 int countlib(int str);
 int findlib(int str, int maxlib, int *libs);
 int approxlib(int pos, int color, int maxlib, int *libs);
+int count_common_libs(int str1, int str2);
 int find_common_libs(int str1, int str2, int maxlib, int *libs);
 
 void start_timer(int n);
@@ -304,15 +305,9 @@ void clear_move_reasons(void);
 void add_lunch(int eater, int food);
 void remove_lunch(int eater, int food);
 void add_attack_move(int pos, int ww);
-void remove_attack_move(int pos, int ww);
-int  attack_move_known(int pos, int ww);
 void add_defense_move(int pos, int ww);
-void remove_defense_move(int pos, int ww);
-int  defense_move_known(int pos, int ww);
 void add_attack_threat_move(int pos, int ww);
-int  attack_threat_move_known(int pos, int ww);
 void add_defense_threat_move(int pos, int ww);
-int  defense_threat_move_known(int pos, int ww);
 void add_connection_move(int pos, int dr1, int dr2);
 void add_cut_move(int pos, int dr1, int dr2);
 void add_antisuji_move(int pos);
@@ -409,8 +404,16 @@ void owl_analyze_semeai(int ai, int aj, int bi, int bj);
 void purge_persistent_owl_cache(void);
 void owl_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 
-void change_attack(int str, int tpos, int acode);
-void change_defense(int str, int tpos, int dcode);
+void change_attack(int str, int move, int acode);
+void change_defense(int str, int move, int dcode);
+void change_attack_threat(int str, int move, int acode);
+void change_defense_threat(int str, int move, int dcode);
+int attack_move_known(int move, int str);
+int defense_move_known(int move, int str);
+int attack_threat_move_known(int move, int str);
+int defense_threat_move_known(int move, int str);
+void worm_reasons(int color);
+
 int does_attack(int move, int str);
 int does_defend(int move, int str);
 int double_atari(int m, int n, int color);
@@ -577,6 +580,8 @@ extern struct half_eye_data half_eye[BOARDMAX];
  * data concerning a worm. A copy is kept at each vertex of the worm.
  */
 
+#define MAX_TACTICAL_POINTS 10
+
 struct worm_data {
   int color;         /* its color */
   int size;          /* its cardinality */
@@ -587,12 +592,6 @@ struct worm_data {
   int liberties2;    /* number of second order liberties */
   int liberties3;    /* third order liberties (empty vertices at distance 3) */
   int liberties4;    /* fourth order liberties */
-  int attack_code;   /* 3=unconditional win, 1 or 2=win with ko */
-  int attack_point;  /* if attack_code != 0, points to a move which */
-		     /* captures the string. */
-  int defend_code;   /* 3=unconditional win, 1 or 2=win with ko */
-  int defense_point; /* if defend_code != 0 points to a defensive move */
-                     /* protecting the string */
   int lunch;         /* if lunch != 0 then lunch points to a boundary */
                      /* worm which can be captured easily. */
   int cutstone;      /* 1=potential cutting stone; 2=cutting stone */
@@ -601,6 +600,22 @@ struct worm_data {
   int inessential;   /* 1=inessential worm */
   int invincible;    /* 1=strongly unconditionally non-capturable */
   int unconditional_status; /* ALIVE, DEAD, WHITE_BORDER, BLACK_BORDER, UNKNOWN */
+
+  /* The following arrays keeps track of up to MAX_TACTICAL_POINTS
+   * different attack, defense, attack threat, and defense threat
+   * points with corresponding result codes. (0 = loss, 1 = bad ko, 2
+   * = good ko, 3 = win). The arrays are guaranteed to be sorted with
+   * respect to the codes so that the first element contains the best
+   * result.
+   */
+  int attack_codes[MAX_TACTICAL_POINTS];
+  int attack_points[MAX_TACTICAL_POINTS];
+  int defend_codes[MAX_TACTICAL_POINTS];
+  int defense_points[MAX_TACTICAL_POINTS];
+  int attack_threat_codes[MAX_TACTICAL_POINTS];
+  int attack_threat_points[MAX_TACTICAL_POINTS];
+  int defense_threat_codes[MAX_TACTICAL_POINTS];
+  int defense_threat_points[MAX_TACTICAL_POINTS];
 };
 
 extern struct worm_data worm[BOARDMAX];
@@ -661,7 +676,7 @@ extern struct dragon_data2 *dragon2;
  * the dragon data with a dragon id.
  */
 #define DRAGON2(m, n) dragon2[dragon[POS(m, n)].id]
-#define DRAGON(d) dragon[POS(I(dragon2[d].origin), J(dragon2[d].origin))]
+#define DRAGON(d) dragon[dragon2[d].origin]
 
 struct aftermath_data {
   int white_captured;

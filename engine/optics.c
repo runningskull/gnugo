@@ -608,8 +608,8 @@ is_lively(int owl_call, int i, int j)
     result = owl_lively(i, j);
   else
     result = (!worm[POS(i, j)].inessential
-	      && (worm[POS(i, j)].attack_code == 0
-		  || worm[POS(i, j)].defend_code != 0));
+	      && (worm[POS(i, j)].attack_codes[0] == 0
+		  || worm[POS(i, j)].defend_codes[0] != 0));
 
   return result;
 }
@@ -679,7 +679,7 @@ false_margin(int pos, int color, int lively[BOARDMAX])
     if (board[apos] != other || !lively[apos])
       continue;
     
-    if (stackp == 0 && worm[apos].attack_code == 0)
+    if (stackp == 0 && worm[apos].attack_codes[0] == 0)
       potential_false_margin = 1;
     
     if (stackp > 0 && !attack(apos, NULL))
@@ -2156,12 +2156,12 @@ evaluate_diagonal_intersection(int m, int n, int color,
   else {
     if (stackp == 0) {
       if (BOARD(m, n) == other) {
-	if (worm[POS(m, n)].attack_code == 0)
+	if (worm[POS(m, n)].attack_codes[0] == 0)
 	  value = 2;
-	else if (worm[POS(m, n)].defend_code != 0) {
+	else if (worm[POS(m, n)].defend_codes[0] != 0) {
 	  value = 1;
-	  apos = worm[POS(m, n)].attack_point;
-	  dpos = worm[POS(m, n)].defense_point;
+	  apos = worm[POS(m, n)].attack_points[0];
+	  dpos = worm[POS(m, n)].defense_points[0];
 	}
       }
     }

@@ -51,88 +51,6 @@ change_matcher_status(int m, int n, int status)
 }
 
 
-/* 
- * Change_defense(str, tpos, dcode) moves the point of defense of the
- * worm at (str) to (tpos), and sets worm[a].defend_code to dcode.
- *
- * This function is less important with the 3.0 move generation
- * scheme, but not entirely ineffective.
- */
-
-void
-change_defense(int str, int tpos, int dcode)
-{
-  int origin = worm[str].origin;
-  int dpos   = worm[str].defense_point;  /* Old defense point. */
-  
-  gg_assert (stackp == 0);
-
-  if (tpos == 0)
-    TRACE("Removed defense of %1m (was %1m).\n", origin, dpos);
-  else if (dpos == 0)
-    TRACE("Setting defense of %1m to %1m.\n", origin, tpos);
-  else
-    TRACE("Moved defense of %1m from %1m to %1m.\n", origin, dpos, tpos);
-  
-  gg_assert(tpos == 0 || board[tpos] == EMPTY);
-  gg_assert(board[str] != EMPTY);
-
-  if (worm[str].attack_code != 0
-      && worm[str].defend_code != 0
-      && tpos == 0)
-  {
-    int m, n;
-
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++)
-	if (dragon[POS(m, n)].origin == dragon[str].origin)
-	  dragon[POS(m, n)].status = DEAD;
-  }
-  worm[origin].defend_code = dcode;
-  worm[origin].defense_point = tpos;
-  propagate_worm(origin);
-
-  if (tpos != 0)
-    add_defense_move(tpos, origin);
-  else if (dpos != 0)
-    remove_defense_move(str, origin);
-}
-
-
-/*
- * change_attack(str, tpos, acode) moves the point of attack of the
- * worm at (str) to (tpos), and sets worm[str].attack_code to acode.
- */
-
-void
-change_attack(int str, int tpos, int acode)
-{
-  int origin = worm[str].origin;
-  int apos   = worm[str].attack_point;  /* Old attack point. */
-
-  gg_assert(stackp == 0);
-
-  if (tpos == 0) 
-    TRACE("Removed attack of %1m (was %1m).\n", origin, apos);
-  else if (apos == 0)
-    TRACE("Setting attack of %1m to %1m.\n", origin, tpos);
-  else
-    TRACE("Moved attack of %1m from %1m to %1m.\n", origin, apos, tpos);
-
-  gg_assert (tpos == 0 || board[tpos] == EMPTY);
-  gg_assert (board[str] != EMPTY);
-
-  worm[origin].attack_code  = acode;
-  worm[origin].attack_point = tpos;
-  propagate_worm(origin);
-
-  if (tpos != 0)
-    add_attack_move(tpos, origin);
-  else if (apos != 0)
-    remove_attack_move(apos, origin);
-}
-
-
 /*
  * Check whether a move at (ti,tj) stops the enemy from playing at (ai,aj).
  */
@@ -186,10 +104,10 @@ does_attack(int move, int str)
   int spos = NO_MOVE;
   
   if (stackp == 0) {
-    if (worm[str].attack_code != 0 
-	&& worm[str].defend_code == 0)
+    if (worm[str].attack_codes[0] != 0 
+	&& worm[str].defend_codes[0] == 0)
       return 0;
-    spos = worm[str].defense_point;
+    spos = worm[str].defense_points[0];
   }
   else {
     attack_and_defend(str, &acode, NULL, &dcode, &spos);
@@ -231,10 +149,10 @@ does_defend(int move, int str)
   int spos = NO_MOVE;
 
   if (stackp == 0) {
-    if (worm[str].attack_code == 0)
+    if (worm[str].attack_codes[0] == 0)
       return 0;
     else
-      spos = worm[str].attack_point;
+      spos = worm[str].attack_points[0];
   }
   else if (!attack(str, &spos))
     return 0;
@@ -885,7 +803,7 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 	    && worm[POS(m, n)].origin == POS(m, n)
 	    && (m != i || n != j)) {
 	  if (BOARD(m, n) == color
-	      && worm[POS(m, n)].attack_code == 0
+	      && worm[POS(m, n)].attack_codes[0] == 0
 	      && worm[POS(m, n)].size >= size
 	      && attack(POS(m, n), NULL)) {
 	    if (di) {
@@ -898,8 +816,8 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 	    TRACE("After %m Worm at %m becomes attackable.\n", i, j, m, n);
 	  }
 	  else if (BOARD(m, n) == other
-		   && worm[POS(m, n)].attack_code != 0
-		   && worm[POS(m, n)].defend_code == 0
+		   && worm[POS(m, n)].attack_codes[0] != 0
+		   && worm[POS(m, n)].defend_codes[0] == 0
 		   && worm[POS(m, n)].size >= size
 		   && find_defense(POS(m, n), NULL)) {
 	    /* Also ask the owl code whether the string can live

@@ -816,8 +816,8 @@ atari_atari(int color, int *move, int save_verbose)
       if (BOARD(m, n) == other) {
 	if (dragon[POS(m, n)].matcher_status == DEAD)
 	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[POS(m, n)].attack_code != 0) {
-	  if (worm[POS(m, n)].defend_code != 0)
+	else if (worm[POS(m, n)].attack_codes[0] != 0) {
+	  if (worm[POS(m, n)].defend_codes[0] != 0)
 	    aa_status[POS(m, n)] = CRITICAL;
 	  else
 	    aa_status[POS(m, n)] = DEAD;
@@ -1177,8 +1177,8 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
       if (BOARD(m, n) == color) {
 	if (dragon[POS(m, n)].matcher_status == DEAD)
 	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[POS(m, n)].attack_code != 0) {
-	  if (worm[POS(m, n)].defend_code != 0)
+	else if (worm[POS(m, n)].attack_codes[0] != 0) {
+	  if (worm[POS(m, n)].defend_codes[0] != 0)
 	    aa_status[POS(m, n)] = CRITICAL;
 	  else
 	    aa_status[POS(m, n)] = DEAD;
@@ -1305,8 +1305,8 @@ atari_atari_try_combination(int color, int apos, int bpos)
       if (BOARD(m, n) == other) {
 	if (dragon[POS(m, n)].matcher_status == DEAD)
 	  aa_status[POS(m, n)] = DEAD;
-	else if (worm[POS(m, n)].attack_code != 0) {
-	  if (worm[POS(m, n)].defend_code != 0)
+	else if (worm[POS(m, n)].attack_codes[0] != 0) {
+	  if (worm[POS(m, n)].defend_codes[0] != 0)
 	    aa_status[POS(m, n)] = CRITICAL;
 	  else
 	    aa_status[POS(m, n)] = DEAD;

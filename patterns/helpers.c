@@ -76,7 +76,7 @@ basic_cut_helper (ARGS)
   ASSERT2(BOARD(ci, cj) == ccolor, ci, cj);
 
   /* If c is a ko stone, assume that we would lose the ko. */
-  if (worm[POS(ci, cj)].attack_code != 0
+  if (worm[POS(ci, cj)].attack_codes[0] != 0
       && (ccolor == color
 	  || is_ko_point2(ci, cj)))
     return 0;
@@ -272,36 +272,6 @@ not_lunch_helper(int ai, int aj, int bi, int bj)
 }
   
 
-/*
- *  ?OO                 ?OO
- *  O.O                 O.b
- *  .*.                 at.
- *  ---                 ---
- *
- * overturn spurious attack found by find_cap2
- *
- */
-
-int
-indirect_helper (ARGS)
-{
-  int ai, aj, bi, bj;
-
-  OFFSET(0, -1, ai, aj);
-  OFFSET(-1, 1, bi, bj);
-  UNUSED(pattern);
-  UNUSED(color);
-
-  if (worm[POS(bi, bj)].attack_point == POS(ti, tj)
-      && worm[POS(bi, bj)].defend_code == 0
-      && does_defend(POS(ai, aj), POS(bi, bj)))
-    change_attack(POS(bi, bj), 0, 0);
-
-  return 0;
-}
-
-
-  
 /* This is intended for use in autohelpers. */
 
 /* Check whether the string at (ai, aj) can attack any surrounding
@@ -318,7 +288,7 @@ seki_helper(int ai, int aj)
   
   adj = chainlinks(POS(ai, aj), adjs);
   for (r = 0; r < adj; r++)
-    if (worm[adjs[r]].attack_code != 0)
+    if (worm[adjs[r]].attack_codes[0] != 0)
       return 0;
 
   return 1;
@@ -370,11 +340,11 @@ cutstone2_helper (ARGS)
   OFFSET(-1,  0, bi, bj);
   OFFSET( 0, -1, ci, cj);
 
-  if (worm[POS(ai, aj)].defend_code == 0)
+  if (worm[POS(ai, aj)].defend_codes[0] == 0)
     return 0;
   
-  di = I(worm[POS(ai, aj)].defense_point);
-  dj = J(worm[POS(ai, aj)].defense_point);
+  di = I(worm[POS(ai, aj)].defense_points[0]);
+  dj = J(worm[POS(ai, aj)].defense_points[0]);
 
   if (TRYMOVE(di, dj, BOARD(ai, aj))) {
     if (!BOARD(bi, bj) || attack(POS(bi, bj), NULL)
@@ -472,7 +442,7 @@ threaten_to_capture_helper(int ti, int tj, int ai, int aj)
   
   adj = chainlinks2(POS(ai, aj), adjs, 1);
   for (k = 0; k < adj; k++)
-    if (worm[adjs[k]].defend_code != 0
+    if (worm[adjs[k]].defend_codes[0] != 0
 	&& !does_defend(POS(ti, tj), adjs[k]))
       return;
     
@@ -499,7 +469,7 @@ defend_against_atari_helper(int ti, int tj, int ai, int aj)
   /* No value if the string can capture out of atari. */
   adj = chainlinks2(POS(ai, aj), adjs, 1);
   for (k = 0; k < adj; k++)
-    if (worm[adjs[k]].defend_code != 0
+    if (worm[adjs[k]].defend_codes[0] != 0
 	&& !does_defend(POS(ti, tj), adjs[k]))
       return;
 

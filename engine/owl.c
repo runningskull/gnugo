@@ -2248,7 +2248,7 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
   if (pattern->helper) {
     /* ask helper function to consider the move */
     DEBUG(DEBUG_HELPER, "  asking helper to consider '%s'+%d at %m\n", 
-	  pattern->name, ll, ti,tj);
+	  pattern->name, ll, ti, tj);
     tval = pattern->helper(pattern, ll, ti, tj, color);
     
     if (tval > 0) {
@@ -2433,7 +2433,7 @@ owl_mark_boundary(struct local_owl_data *owl)
 	 * function is called. Thus we can (mostly) trust the worm data for
 	 * stones of this color.
 	 */
-	if (worm[POS(i, j)].attack_code != 0
+	if (worm[POS(i, j)].attack_codes[0] != 0
 	    && worm[POS(i, j)].size != dragon[POS(i, j)].size)
 	  continue;
 

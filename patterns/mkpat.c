@@ -121,7 +121,7 @@ int el;                         /* next element number in current pattern */
 struct patval elements[MAX_BOARD*MAX_BOARD]; /* elements of current pattern */
 int num_stars;
 
-int ci=-1,cj=-1;                /* position of origin (first piece element)
+int ci=-1, cj=-1;               /* position of origin (first piece element)
 				   relative to top-left */
 int patno;		        /* current pattern */
 int pats_with_constraints = 0;  /* just out of interest */
@@ -223,7 +223,6 @@ static struct autohelper_func autohelper_functions[] = {
   {"add_cut_move",    2, "add_cut_move(POS(ti,tj),POS(%ci,%cj),POS(%ci,%cj))"},
   {"add_attack_either_move",2,"add_attack_either_move(POS(ti,tj),POS(%ci,%cj),POS(%ci,%cj))"},
   {"add_defend_both_move",2, "add_defend_both_move(POS(ti,tj),POS(%ci,%cj),POS(%ci,%cj))"},
-  {"remove_attack",   2, "remove_attack_move(POS(%ci,%cj),POS(%ci,%cj))"},
   {"same_dragon",     2, "same_dragon(%ci,%cj,%ci,%cj)"},
   {"same_worm",       2, "same_worm(%ci,%cj,%ci,%cj)"},
   {"dragonsize",      1, "dragon[POS(%ci, %cj)].size"},
@@ -412,7 +411,7 @@ write_to_dfa(int index)
   /* Complain when there is more than 10% of increase */ 
   if (dfa_size(&dfa) > 100 && ratio > 10.0) {
     fprintf(stderr, "Pattern %s => %3.1f%% increase: ",
-	    pattern[index].name,ratio);
+	    pattern[index].name, ratio);
     fprintf(stderr, "another orientation may save memory.\n");
   }
   if (dfa_verbose)
@@ -656,8 +655,7 @@ read_constraint_diagram_line(char *p)
     p++;
   
   for (j = 0; 
-       strchr(VALID_PATTERN_CHARS, *p) 
-	 || strchr(VALID_CONSTRAINT_LABELS, *p);
+       strchr(VALID_PATTERN_CHARS, *p) || strchr(VALID_CONSTRAINT_LABELS, *p);
        ++j, ++p) {
     if (strchr(VALID_CONSTRAINT_LABELS, *p) 
 	&& label_coords[(int)*p][0] == -1) {
@@ -818,29 +816,29 @@ finish_pattern(char *line)
     }
       
     {
-      if (strchr(class,'s')) pattern[patno].class |= CLASS_s;
-      if (strchr(class,'O')) pattern[patno].class |= CLASS_O;
-      if (strchr(class,'o')) pattern[patno].class |= CLASS_o;
-      if (strchr(class,'X')) pattern[patno].class |= CLASS_X;
-      if (strchr(class,'x')) pattern[patno].class |= CLASS_x;
-      if (strchr(class,'D')) pattern[patno].class |= CLASS_D;
-      if (strchr(class,'C')) pattern[patno].class |= CLASS_C;
-      if (strchr(class,'c')) pattern[patno].class |= CLASS_c;
-      if (strchr(class,'n')) pattern[patno].class |= CLASS_n;
-      if (strchr(class,'B')) pattern[patno].class |= CLASS_B;
-      if (strchr(class,'A')) pattern[patno].class |= CLASS_A;
-      if (strchr(class,'b')) pattern[patno].class |= CLASS_b;
-      if (strchr(class,'e')) pattern[patno].class |= CLASS_e;
-      if (strchr(class,'E')) pattern[patno].class |= CLASS_E;
-      if (strchr(class,'a')) pattern[patno].class |= CLASS_a;
-      if (strchr(class,'d')) pattern[patno].class |= CLASS_d;
-      if (strchr(class,'I')) pattern[patno].class |= CLASS_I;
-      if (strchr(class,'J')) pattern[patno].class |= CLASS_J;
-      if (strchr(class,'j')) pattern[patno].class |= CLASS_j;
-      if (strchr(class,'t')) pattern[patno].class |= CLASS_t;
-      if (strchr(class,'T')) pattern[patno].class |= CLASS_T;
-      if (strchr(class,'U')) pattern[patno].class |= CLASS_U;
-      if (strchr(class,'W')) pattern[patno].class |= CLASS_W;
+      if (strchr(class, 's')) pattern[patno].class |= CLASS_s;
+      if (strchr(class, 'O')) pattern[patno].class |= CLASS_O;
+      if (strchr(class, 'o')) pattern[patno].class |= CLASS_o;
+      if (strchr(class, 'X')) pattern[patno].class |= CLASS_X;
+      if (strchr(class, 'x')) pattern[patno].class |= CLASS_x;
+      if (strchr(class, 'D')) pattern[patno].class |= CLASS_D;
+      if (strchr(class, 'C')) pattern[patno].class |= CLASS_C;
+      if (strchr(class, 'c')) pattern[patno].class |= CLASS_c;
+      if (strchr(class, 'n')) pattern[patno].class |= CLASS_n;
+      if (strchr(class, 'B')) pattern[patno].class |= CLASS_B;
+      if (strchr(class, 'A')) pattern[patno].class |= CLASS_A;
+      if (strchr(class, 'b')) pattern[patno].class |= CLASS_b;
+      if (strchr(class, 'e')) pattern[patno].class |= CLASS_e;
+      if (strchr(class, 'E')) pattern[patno].class |= CLASS_E;
+      if (strchr(class, 'a')) pattern[patno].class |= CLASS_a;
+      if (strchr(class, 'd')) pattern[patno].class |= CLASS_d;
+      if (strchr(class, 'I')) pattern[patno].class |= CLASS_I;
+      if (strchr(class, 'J')) pattern[patno].class |= CLASS_J;
+      if (strchr(class, 'j')) pattern[patno].class |= CLASS_j;
+      if (strchr(class, 't')) pattern[patno].class |= CLASS_t;
+      if (strchr(class, 'T')) pattern[patno].class |= CLASS_T;
+      if (strchr(class, 'U')) pattern[patno].class |= CLASS_U;
+      if (strchr(class, 'W')) pattern[patno].class |= CLASS_W;
     }
 
   }
@@ -1249,7 +1247,7 @@ write_elements(FILE *outfile, char *name)
   /* sort the elements so that least-likely elements are tested first. */
   qsort(elements, el, sizeof(struct patval), compare_elements);
 
-  fprintf(outfile, "static struct patval %s%d[]={\n",name,patno);
+  fprintf(outfile, "static struct patval %s%d[]={\n", name, patno);
 
   /* This may happen for fullboard patterns. */
   if (el == 0) {
@@ -1667,16 +1665,16 @@ main(int argc, char *argv[])
 #if DFA_ENABLED
   if (dfa_generate) {
     fprintf(stderr, "---------------------------\n");
-    fprintf(stderr, "dfa for %s\n",argv[gg_optind]);
+    fprintf(stderr, "dfa for %s\n", argv[gg_optind]);
     fprintf(stderr, "size: %dKb for ", dfa_size(&dfa));
     fprintf(stderr, "%d patterns\n", patno);
 
-    strcpy(dfa.name,argv[gg_optind]);
+    strcpy(dfa.name, argv[gg_optind]);
     print_c_dfa(output_FILE, argv[gg_optind], &dfa);
     fprintf(stderr, "---------------------------\n");
 
     if (DFA_MAX_MATCHED/8 < patno)
-      fprintf(stderr,"Warning: Increase DFA_MAX_MATCHED in 'dfa.h'.\n");
+      fprintf(stderr, "Warning: Increase DFA_MAX_MATCHED in 'dfa.h'.\n");
 
     kill_dfa(&dfa);
     dfa_end();

@@ -33,6 +33,17 @@ static void compute_unconditional_status(void);
 static void find_worm_attacks_and_defenses(void);
 static void find_worm_threats(void);
 static int find_lunch(int str, int *lunch);
+static int tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
+			       int codes[MAX_TACTICAL_POINTS]);
+static void change_tactical_point(int str, int move, int code,
+				  int points[MAX_TACTICAL_POINTS],
+				  int codes[MAX_TACTICAL_POINTS]);
+static void sort_tactical_points(int points[MAX_TACTICAL_POINTS],
+				 int codes[MAX_TACTICAL_POINTS]);
+static void swap_points_and_codes(int points[MAX_TACTICAL_POINTS],
+				  int codes[MAX_TACTICAL_POINTS],
+				  int m, int n);
+static void propagate_worm2(int str);
 static int genus(int str);
 static void markcomponent(int str, int pos, int mg[BOARDMAX]);
 static int examine_cavity(int pos, int *edge);
@@ -79,7 +90,7 @@ static void defense_callback(int m, int n, int color,
 void
 make_worms(void)
 {
-  int m,n; /* iterate over board */
+  int m, n; /* iterate over board */
 
   /* Build the basic worm data:  color, origin, size, liberties. */
   build_worms();
@@ -183,13 +194,13 @@ make_worms(void)
       if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
 	continue;
 
-      /* Try to find two adjacent worms (ui,uj) and (ti,tj) 
-       * of opposite colour from (m, n).
+      /* Try to find two adjacent worms (w1) and (w2) 
+       * of opposite colour from (pos).
        */
       for (i = 0; i < board_size; i++)
 	for (j = 0; j < board_size; j++) {
 
-	  /* Work only with the opposite color from (m, n). */
+	  /* Work only with the opposite color from (pos). */
 	  if (BOARD(i, j) != OTHER_COLOR(board[pos])) 
 	    continue;
 	      
@@ -198,11 +209,11 @@ make_worms(void)
 	    dj = j + deltaj[k];
 	    if (ON_BOARD2(di, dj) && is_worm_origin(POS(di, dj), pos)) {
 
-	      ASSERT2(BOARD(di, dj) == board[pos], m, n);
+	      ASSERT1(BOARD(di, dj) == board[pos], pos);
 
-	    /* If we have not already found a worm which meets the criteria,
-	     * store it into (ti, tj), otherwise store it into (ui, uj).
-	     */
+	      /* If we have not already found a worm which meets the criteria,
+	       * store it into (ti, tj), otherwise store it into (ui, uj).
+	       */
 	      if (w1 == NO_MOVE)
 	        w1 = worm[POS(i, j)].origin;
 	      else if (!is_same_worm(POS(i, j), w1))
@@ -213,26 +224,20 @@ make_worms(void)
 
       /* 
        *  We now verify the definition of cutting stones. We have
-       *  verified that the string at (m,n) is adjacent to two enemy
-       *  strings at (ti,tj) and (ui,uj). We need to know if these
+       *  verified that the string at (pos) is adjacent to two enemy
+       *  strings at (w1) and (w2). We need to know if these
        *  strings share a liberty.
        */
 
-      /* Only do this if we really found anything. */
+      /* Only do this if we really found something. */
       if (w2 != NO_MOVE) {
-	int lib;  /* look for a common liberty vi,vj */
-	TRACE("Worm at %1m has w1 %1m and w2 %1m\n", pos, w1, w2);
         worm[pos].cutstone = 2;
-	for (lib = BOARDMIN; lib < BOARDMAX; lib++) {
-	  if (board[lib] != EMPTY) 
-	    continue;
-	  if (liberty_of_string(lib, w1) && liberty_of_string(lib, w2))
-	    worm[pos].cutstone = 1;
+	if (count_common_libs(w1, w2) > 0)
+	  worm[pos].cutstone = 1;
 	  
-	  DEBUG(DEBUG_WORMS,
-		"Worm at %1m has w1 %1m and w2 %1m, cutstone %d\n",
-		pos, w1, w2, worm[pos].cutstone);
-	}
+	DEBUG(DEBUG_WORMS, 
+	      "Worm at %1m has w1 %1m and w2 %1m, cutstone %d\n",
+	      pos, w1, w2, worm[pos].cutstone);
       }
 
     } /* loop over m,n */
@@ -256,8 +261,8 @@ make_worms(void)
 
   /* Now we try to improve the values of worm.attack and worm.defend. If we
    * find that capturing the string at (m,n) also defends the string at (i,j),
-   * or attacks it, then we move the point of attack and defense.
-   * We don't move the attacking point of strings that can't be defended.
+   * or attacks it, then we add points of attack and defense.
+   * We don't add attacking point for strings that can't be defended.
    */
   {
     int mi[BOARDMAX]; /* mark changed information */
@@ -276,8 +281,8 @@ make_worms(void)
 	int color = board[pos];
 	int other = OTHER_COLOR(color);
 	
-	int aa = worm[pos].attack_point;
-	int dd = worm[pos].defense_point;
+	int aa = worm[pos].attack_points[0];
+	int dd = worm[pos].defense_points[0];
 	
 	/* For each worm, only work with the origin. */
 	if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
@@ -301,7 +306,7 @@ make_worms(void)
 	    
 	    /* Now we try to find a group which is saved or attacked as well
 	       by this move. */
-	    TRACE("trying %1m\n", aa);
+	    DEBUG(DEBUG_WORMS, "trying %1m\n", aa);
 	    increase_depth_values();
 	    
 	    for (i = 0; i < board_size; i++)
@@ -310,60 +315,59 @@ make_worms(void)
 		/* If a worm has its origin (i, j), and it's not (m, n)...*/
 		if (board[pos2]
 		    && is_worm_origin(pos2, pos2)
-		    && (pos2 != pos)) {
+		    && pos2 != pos) {
 		  
 		  /* Either the worm is of the same color as (m, n),
 		   * then we try to attack it.  If there was a previous 
-		   * attack and defense of it, and there is no defence
+		   * attack and defense of it, and there is no defense
 		   * for the attack now...
 		   */
 		  if (worm[pos2].color == color
-		      && worm[pos2].attack_code != 0
-		      && worm[pos2].defend_code != 0
-		      && !find_defense(pos2, NULL)) {
+		      && worm[pos2].attack_codes[0] != 0
+		      && worm[pos2].defend_codes[0] != 0) {
+		    int dcode = find_defense(pos2, NULL);
+		    if (dcode != WIN) {
+		      int attack_works = 1;
+		      /* Sometimes find_defense() fails to find a
+		       * defense which has been found by other means.
+		       * Try if the old defense move still works.
+		       */
+		      if (worm[pos2].defend_codes[0] != 0
+			  && trymove(worm[pos2].defense_points[0],
+				     color, "make_worms", 0, EMPTY, 0)) {
+			if (!attack(pos2, NULL))
+			  attack_works = 0;
+			popgo();
+		      }
 		    
-		    int attack_works = 1;
-		    /* Sometimes find_defense() fails to find a
-		     * defense which has been found by other means.
-		     * Try if the old defense move still works.
-		     */
-		    if (worm[pos2].defense_point != 0
-			&& trymove(worm[pos2].defense_point,
-				   color, "make_worms", 0, EMPTY, 0)) {
-		      if (!attack(pos2, NULL))
-			attack_works = 0;
-		      popgo();
-		    }
-		    
-		    /* ...then move the attack point of that worm to
-		     * the attack point of (m, n).
-		     */
-		    if (attack_works) {
-		      TRACE("moving point of attack of %1m to %1m\n",
-			    pos2, aa);
-		      worm[pos2].attack_point = aa;
-		      add_attack_move(aa, pos2);
-		      mi[pos2] = 1;
+		      /* ...then move the attack point of that worm to
+		       * the attack point of (m, n).
+		       */
+		      if (attack_works) {
+			DEBUG(DEBUG_WORMS,
+			      "adding point of attack of %1m at %1m with code\n",
+			      pos2, aa, 3 - dcode);
+			change_attack(pos2, aa, 3 - dcode);
+			mi[pos2] = 1;
+		      }
 		    }
 		  }
+		  
 		  /* Or the worm is of the opposite color as (m, n).
 		   * If there previously was an attack on it, but there
-		   * is none now, then move the defence point of (i, j)
-		   * to the defence point of (m, n).
+		   * is none now, then move the defense point of (i, j)
+		   * to the defense point of (m, n).
 		   */
 		  else if (worm[pos2].color == other
-			   && worm[pos2].attack_code != 0
-			   && !attack(pos2, NULL)) {
-		    if (worm[pos2].defend_code != 0)
-		      TRACE("moving point of defense of %1m to %1m\n",
-			    pos2, dd);
-		    else
-		      TRACE("setting point of defense of %1m to %1m\n",
-			    pos2, dd);
-		    worm[pos2].defend_code   = WIN;
-		    worm[pos2].defense_point = aa;
-		    add_defense_move(aa, pos2);
-		    mi[pos2] = 1;
+			   && worm[pos2].attack_codes[0] != 0) {
+		    int acode = attack(pos2, NULL); 
+		    if (acode < worm[pos2].attack_codes[0]) {
+		      DEBUG(DEBUG_WORMS,
+			    "adding point of defense of %1m at %1m with code\n",
+			    pos2, aa, 3 - acode);
+		      change_defense(pos2, aa, 3 - acode);
+		      mi[pos2] = 1;
+		    }
 		  }
 		}
 	      }
@@ -382,7 +386,7 @@ make_worms(void)
 	  /* First carry out the defending move. */
 	  if (trymove(dd, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
 	    
-	    TRACE("trying %1m\n", dd);
+	    DEBUG(DEBUG_WORMS, "trying %1m\n", dd);
 	    increase_depth_values();
 	    
 	    for (i = 0; i < board_size; i++)
@@ -396,54 +400,53 @@ make_worms(void)
 		  
 		  /* Either the worm is of the opposite color as (m, n),
 		   * then we try to attack it.  If there was a previous 
-		   * attack and defense of it, and there is no defence
+		   * attack and defense of it, and there is no defense
 		   * for the attack now...
 		   */
 		  if (worm[pos2].color == other
-		      && worm[pos2].attack_code != 0 
-		      && worm[pos2].defend_code != 0
-		      && !find_defense(pos2, NULL)) {
+		      && worm[pos2].attack_codes[0] != 0 
+		      && worm[pos2].defend_codes[0] != 0) {
+		    int dcode = find_defense(pos2, NULL);
+		    if (dcode != WIN) {
 		    
-		    int attack_works = 1;
-		    /* Sometimes find_defense() fails to find a
-		       defense which has been found by other means.
-		       Try if the old defense move still works. */
-		    if (trymove(worm[pos2].defense_point, other, "make_worms",
-				NO_MOVE, EMPTY, NO_MOVE)) {
-		      if (!attack(pos2, NULL))
-			attack_works = 0;
-		      popgo();
-		    }
+		      int attack_works = 1;
+		      /* Sometimes find_defense() fails to find a
+			 defense which has been found by other means.
+			 Try if the old defense move still works. */
+		      if (trymove(worm[pos2].defense_points[0], other, "make_worms",
+				  NO_MOVE, EMPTY, NO_MOVE)) {
+			if (!attack(pos2, NULL))
+			  attack_works = 0;
+			popgo();
+		      }
 		      
-		    /* ...then move the attack point of that worm to
-		     * the defense point of (m, n).
-		     */
-		    if (attack_works) {
-		      TRACE("moving point of attack of %1m to %1m\n",
-			    pos2, dd);
-		      worm[pos2].attack_point = dd;
-		      add_attack_move(dd, POS(i, j));
-		      mi[pos2] = 1;
+		      /* ...then move the attack point of that worm to
+		       * the defense point of (m, n).
+		       */
+		      if (attack_works) {
+			DEBUG(DEBUG_WORMS,
+			      "adding point of attack of %1m at %1m with code\n",
+			      pos2, dd, 3 - dcode);
+			change_attack(pos2, dd, 3 - dcode);
+			mi[pos2] = 1;
+		      }
 		    }
 		  }
 		  /* Or the worm is of the same color as (m, n).
 		   * If there previously was an attack on it, but there
-		   * is none now, then move the defence point of (i, j)
-		   * to the defence point of (m, n).
+		   * is none now, then move the defense point of (i, j)
+		   * to the defense point of (m, n).
 		   */
 		  else if (worm[pos2].color == color
-			   && worm[pos2].attack_code != 0
-			   && !attack(pos2, NULL)) {
-		    if (worm[pos2].defend_code != 0)
-		      TRACE("moving point of defense of %1m to %1m\n",
-			    pos2, dd);
-		    else
-		      TRACE("setting point of defense of %1m to %1m\n",
-			    pos2, dd);
-		    worm[pos2].defend_code   = WIN;
-		    worm[pos2].defense_point = dd;
-		    add_defense_move(dd, pos2);
-		    mi[pos2] = 1;
+			   && worm[pos2].attack_codes[0] != 0) {
+		    int acode = attack(pos2, NULL);
+		    if (acode < worm[pos2].attack_codes[0]) {
+		      DEBUG(DEBUG_WORMS,
+			    "adding point of defense of %1m at %1m with code\n",
+			    pos2, dd, 3 - acode);
+		      change_defense(pos2, dd, 3 - acode);
+		      mi[pos2] = 1;
+		    }
 		  }
 		}
 	      }
@@ -452,7 +455,8 @@ make_worms(void)
 	  }
 	}
       }
-    
+
+    /* FIXME: Should be redundant now. */
     /* Propagate the newly generated info to all other stones of each worm. */
     for (i = 0; i < board_size; i++)
       for (j = 0; j < board_size; j++)
@@ -486,16 +490,17 @@ make_worms(void)
       if (!is_same_worm(pos, SOUTH(pos))
 	  && board[pos] != EMPTY
 	  && board[SOUTH(pos)] != EMPTY) {
-        if (worm[pos].attack_code != 0 && worm[SOUTH(pos)].attack_code != 0) {
-	  if (worm[pos].defend_code == 0
-	      && does_defend(worm[SOUTH(pos)].attack_point, pos)) {
+        if (worm[pos].attack_codes[0] != 0
+	    && worm[SOUTH(pos)].attack_codes[0] != 0) {
+	  if (worm[pos].defend_codes[0] == 0
+	      && does_defend(worm[SOUTH(pos)].attack_points[0], pos)) {
 	    /* FIXME: need to check ko relationship here */
-	    change_defense(pos, worm[SOUTH(pos)].attack_point, WIN);
+	    change_defense(pos, worm[SOUTH(pos)].attack_points[0], WIN);
 	  }
-	  if (worm[SOUTH(pos)].defend_code == 0
-              && does_defend(worm[pos].attack_point, SOUTH(pos))) {
+	  if (worm[SOUTH(pos)].defend_codes[0] == 0
+              && does_defend(worm[pos].attack_points[0], SOUTH(pos))) {
 	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(SOUTH(pos), worm[pos].attack_point, WIN);
+	    change_defense(SOUTH(pos), worm[pos].attack_points[0], WIN);
 	  }
         }
       }
@@ -508,16 +513,17 @@ make_worms(void)
       if (!is_same_worm(pos, EAST(pos))
 	  && board[pos] != EMPTY
 	  && board[EAST(pos)] != EMPTY) {
-        if (worm[pos].attack_code != 0 && worm[EAST(pos)].attack_code != 0) {
-	  if (worm[pos].defend_code == 0
-              && does_defend(worm[EAST(pos)].attack_point, pos)) {
+        if (worm[pos].attack_codes[0] != 0
+	    && worm[EAST(pos)].attack_codes[0] != 0) {
+	  if (worm[pos].defend_codes[0] == 0
+              && does_defend(worm[EAST(pos)].attack_points[0], pos)) {
 	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(pos, worm[EAST(pos)].attack_point, WIN);
+	    change_defense(pos, worm[EAST(pos)].attack_points[0], WIN);
 	  }
-	  if (worm[EAST(pos)].defend_code == 0
-              && does_defend(worm[pos].attack_point, EAST(pos))) {
+	  if (worm[EAST(pos)].defend_codes[0] == 0
+              && does_defend(worm[pos].attack_points[0], EAST(pos))) {
 	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(EAST(pos), worm[pos].attack_point, WIN);
+	    change_defense(EAST(pos), worm[pos].attack_points[0], WIN);
 	  }
 	}
       }
@@ -536,9 +542,9 @@ make_worms(void)
 	continue;
 
       if (find_lunch(pos, &lunch)
-	  && (worm[lunch].attack_code == WIN
-	      || worm[lunch].attack_code == KO_A)) {
-	TRACE("lunch found for %1m at %1m\n", pos, lunch);
+	  && (worm[lunch].attack_codes[0] == WIN
+	      || worm[lunch].attack_codes[0] == KO_A)) {
+	DEBUG(DEBUG_WORMS, "lunch found for %1m at %1m\n", pos, lunch);
 	worm[pos].lunch = lunch;
       }
       else
@@ -586,6 +592,7 @@ make_worms(void)
 
 	int border_color = examine_cavity(pos, &edge);
 	if (border_color != GRAY_BORDER && edge < 3) {
+	  DEBUG(DEBUG_WORMS, "Worm %1m identified as inessential.\n", pos);
 	  worm[pos].inessential = 1;
 	  propagate_worm(pos);
 	}
@@ -785,6 +792,7 @@ static void
 find_worm_attacks_and_defenses()
 {
   int m, n;
+  int k;
 
    /* 1. Start with finding attack points. */
   for (m = 0; m < board_size; m++)
@@ -798,18 +806,19 @@ find_worm_attacks_and_defenses()
 
       TRACE ("considering attack of %m\n", m, n);
       /* Initialize all relevant fields at once. */
-      worm[pos].attack_code   = 0;
-      worm[pos].attack_point  = 0;
-      worm[pos].defend_code   = 0;
-      worm[pos].defense_point = 0;
-      acode = attack(pos, &tpos);
-      if (acode) {
-	TRACE("worm at %m can be attacked at %1m\n", m, n, tpos);
-	worm[pos].attack_code = acode;
-	worm[pos].attack_point = tpos;
-	add_attack_move(tpos, pos);
+      for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	worm[pos].attack_codes[k]   = 0;
+	worm[pos].attack_points[k]  = 0;
+	worm[pos].defend_codes[k]   = 0;
+	worm[pos].defense_points[k] = 0;
       }
       propagate_worm(pos);
+      
+      acode = attack(pos, &tpos);
+      if (acode) {
+	DEBUG(DEBUG_WORMS, "worm at %m can be attacked at %1m\n", m, n, tpos);
+	change_attack(pos, tpos, acode);
+      }
     }
   gg_assert(stackp == 0);
   
@@ -826,58 +835,35 @@ find_worm_attacks_and_defenses()
       if (board[pos] == EMPTY || !is_worm_origin(pos, pos))
 	continue;
 
-      if (worm[pos].attack_code != 0) {
+      if (worm[pos].attack_codes[0] != 0) {
 	int tpos = NO_MOVE;
 
 	TRACE ("considering defense of %m\n", m, n);
 	dcode = find_defense(pos, &tpos);
 	if (dcode) {
 	  TRACE ("worm at %m can be defended at %1m\n", m, n, tpos);
-	  worm[pos].defend_code   = dcode;
-	  worm[pos].defense_point = tpos;
 	  if (tpos != NO_MOVE)
-	    add_defense_move(tpos, pos);
+	    change_defense(pos, tpos, dcode);
 	}
 	else {
 	  /* If the point of attack is not adjacent to the worm, 
 	   * it is possible that this is an overlooked point of
 	   * defense, so we try and see if it defends.
 	   */
-	  int aa = worm[pos].attack_point;
+	  int aa = worm[pos].attack_points[0];
 	  if (!liberty_of_string(aa, pos))
 	    if (trymove(aa, worm[pos].color, "make_worms", NO_MOVE,
 			EMPTY, NO_MOVE)) {
 	      int acode = attack(pos, NULL);
 	      if (acode != WIN) {
-		int change_defense = 0;
-		/* FIXME: Include defense code when move 
-		 *        is registered. */
-		add_defense_move(aa, pos);
-
-		if (acode == 0) {
-		  worm[pos].defend_code = WIN;
-		  change_defense = 1;
-		}
-		else if (acode == KO_B && worm[pos].defend_code != WIN) {
-		  worm[pos].defend_code = KO_A;
-		  change_defense = 1;
-		}
-		else if (acode == KO_A && worm[pos].defend_code == 0) {
-		  worm[pos].defend_code = KO_B;
-		  change_defense = 1;
-		}
-		
-		if (change_defense) {
-		  worm[pos].defense_point = aa;
-		  TRACE ("worm at %1m can be defended at %1m with code %d\n",
-			 pos, aa, worm[pos].defend_code);
-		}
+		change_defense(pos, aa, 3 - acode);
+		TRACE ("worm at %1m can be defended at %1m with code %d\n",
+		       pos, aa, 3 - acode);
 	      }	 
 	      popgo();
 	    }
 	}
       }
-      propagate_worm(pos);
     }
   gg_assert(stackp == 0);
 
@@ -912,7 +898,7 @@ find_worm_attacks_and_defenses()
 
 	other = OTHER_COLOR(color);
 	
-	if (worm[pos].attack_code == 0)
+	if (worm[pos].attack_codes[0] == 0)
 	  continue;
 	
 	/* There is at least one attack on this group. Try the
@@ -922,35 +908,34 @@ find_worm_attacks_and_defenses()
 	
 	for (k = 0; k < liberties; k++) {
 	  int aa = libs[k];
-	  /* Try to attack on the liberty. */
-	  if (trymove(aa, other, "make_worms", NO_MOVE,
-		       EMPTY, NO_MOVE)) {
-	    if (!board[pos] || attack(pos, NULL)) {
-	      int dcode;
-	      if (!board[pos])
-		dcode = 0;
-	      else
-		dcode = find_defense(pos, NULL);
-
-	      if (dcode == 0
-		  || (dcode == KO_B && (worm[pos].attack_code == 0
-					|| worm[pos].attack_code == KO_B))
-		  || (dcode == KO_A && worm[pos].attack_code == 0))
-		add_attack_move(aa, pos);
-	    }
-	    popgo();
-	  }
-	  /* Try to defend at the liberty. */
-	  if (worm[pos].defend_code != 0)
-	    if (trymove(aa, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
-	      int acode = attack(pos, NULL);
-	      if (acode == 0
-		  || (acode == KO_B && (worm[pos].defend_code == 0
-					|| worm[pos].defend_code == KO_B))
-		  || (acode == KO_A && worm[pos].defend_code == 0))
-		add_defense_move(aa, pos);
+	  if (!attack_move_known(aa, pos)) {
+	    /* Try to attack on the liberty. */
+	    if (trymove(aa, other, "make_worms", pos, EMPTY, NO_MOVE)) {
+	      if (!board[pos] || attack(pos, NULL)) {
+		int dcode;
+		if (!board[pos])
+		  dcode = 0;
+		else
+		  dcode = find_defense(pos, NULL);
+		
+		if (dcode != WIN) {
+		  change_attack(pos, aa, 3 - dcode);
+		}
+	      }
 	      popgo();
 	    }
+	  }
+	  /* Try to defend at the liberty. */
+	  if (!defense_move_known(aa, pos)) {
+	    if (worm[pos].defend_codes[0] != 0)
+	      if (trymove(aa, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
+		int acode = attack(pos, NULL);
+		if (acode != WIN) {
+		  change_defense(pos, aa, 3 - acode);
+		}
+		popgo();
+	      }
+	  }
 	}
       }
   }
@@ -972,9 +957,12 @@ find_worm_threats()
       int pos = POS(m, n);
       int liberties;
       static int libs[MAXLIBS];
+      int adj;
+      int adjs[MAXCHAIN];
 
       int k;
       int l;
+      int r;
       int color;
       int other;
 
@@ -987,7 +975,7 @@ find_worm_threats()
 
       /* 1. Start with finding attack threats. */
       /* Only try those worms that have no attack. */
-      if (worm[pos].attack_code == 0) {
+      if (worm[pos].attack_codes[0] == 0) {
 
 	liberties = findlib(pos, MAXLIBS, libs);
 
@@ -1004,9 +992,9 @@ find_worm_threats()
 
 	    /* Try to threaten on the liberty. */
 	    if (trymove(aa, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
-	      /* FIXME: Support ko also. */
-	      if (attack(pos, NULL) == WIN)
-		add_attack_threat_move(aa, POS(m, n));
+	      int acode = attack(pos, NULL);
+	      if (acode != 0)
+		change_attack_threat(pos, aa, acode);
 	      popgo();
 	    }
 
@@ -1020,23 +1008,41 @@ find_worm_threats()
 		continue;
 
 	      if (trymove(bb, other, "threaten attack", pos, EMPTY, NO_MOVE)) {
-		/* FIXME: Support ko also. */
-		if (attack(pos, NULL) == WIN)
-		  add_attack_threat_move(bb, POS(m, n));
+		int acode = attack(pos, NULL);
+		if (acode != 0)
+		  change_attack_threat(pos, bb, acode);
 		popgo();
 	      }
 	    }
 	  }
 	}
 
+	/* Threaten to attack by saving weak neighbors. */
+	adj = chainlinks(pos, adjs);
+	for (k = 0; k < adj; k++)
+	  if (worm[adjs[k]].attack_codes[0] != 0
+	      && worm[adjs[k]].defend_codes[0] != 0)
+	    for (r = 0; r < MAX_TACTICAL_POINTS; r++) {
+	      int bb;
+	      if (worm[adjs[k]].defend_codes[r] == 0)
+		break;
+	      bb = worm[adjs[k]].defense_points[r];
+	      if (trymove(bb, other, "threaten attack", pos,
+			  EMPTY, NO_MOVE)) {
+		int acode = attack(pos, NULL);
+		if (acode != 0)
+		  change_attack_threat(pos, bb, acode);
+		popgo();
+	      }
+	    }
+	
 	/* FIXME: Try other moves also (patterns?). */
       }
 
       /* 2. Continue with finding defense threats. */
       /* Only try those worms that have an attack. */
-      /* FIXME: Support ko also */
-      if (worm[pos].attack_code == WIN
-	  && worm[pos].defend_code == 0) {
+      if (worm[pos].attack_codes[0] != 0
+	  && worm[pos].defend_codes[0] == 0) {
 
 	liberties = findlib(pos, MAXLIBS, libs);
 
@@ -1046,10 +1052,11 @@ find_worm_threats()
 	  /* Try to threaten on the liberty. */
 	  if (trymove(aa, color, "threaten defense", NO_MOVE,
 		      EMPTY, NO_MOVE)) {
-	    /* FIXME: Support ko also. */
-	    if (attack(pos, NULL) == WIN
-		&& find_defense(pos, NULL) == WIN)
-	      add_defense_threat_move(aa, POS(m, n));
+	    if (attack(pos, NULL) == WIN) {
+	      int dcode = find_defense(pos, NULL);
+	      if (dcode != 0)
+		change_defense_threat(pos, aa, dcode);
+	    }
 	    popgo();
 	  }
 
@@ -1063,15 +1070,23 @@ find_worm_threats()
 	      continue;
 
 	    if (trymove(bb, other, "threaten defense", pos, EMPTY, NO_MOVE)) {
-	      /* FIXME: Support ko also. */
-	      if (attack(pos, NULL) == WIN
-		  && find_defense(pos, NULL) == WIN)
-		add_defense_threat_move(bb, POS(m, n));
+	      if (attack(pos, NULL) == WIN) {
+		int dcode = find_defense(pos, NULL);
+		if (dcode != 0)
+		  change_defense_threat(pos, bb, dcode);
+	      }
 	      popgo();
 	    }
 	  }
 	}
 
+	/* It might be interesting to look for defense threats by
+         * attacking weak neighbors, similar to threatening attack by
+         * defending a weak neighbor. However, in this case it seems
+         * probable that if there is such an attack, it's a real
+         * defense, not only a threat. 
+	 */
+	
 	/* FIXME: Try other moves also (patterns?). */
       }
     }
@@ -1103,7 +1118,7 @@ find_lunch(int str, int *lunch)
       for (k = 0; k < 8; k++) {
 	int apos = pos + delta[k];
 	if (ON_BOARD(apos) && is_same_worm(apos, str)) {
-	  if (worm[pos].attack_code != 0 && !is_ko_point(pos)) {
+	  if (worm[pos].attack_codes[0] != 0 && !is_ko_point(pos)) {
 	    /*
 	     * If several adjacent lunches are found, we pick the 
 	     * juiciest. First maximize cutstone, then minimize liberties. 
@@ -1153,6 +1168,225 @@ is_worm_origin(int w, int pos)
 
 
 /* 
+ * change_defense(str, move, dcode) is used to add and remove defense
+ * points. It can also be used to change the defense code. The meaning
+ * of the call is that the string (str) can be defended by (move) with
+ * defense code (dcode). If (dcode) is zero, the move is removed from
+ * the list of defense moves if it was previously listed.
+ */
+
+void
+change_defense(int str, int move, int dcode)
+{
+  str = worm[str].origin;
+  change_tactical_point(str, move, dcode,
+			worm[str].defense_points, worm[str].defend_codes);
+}
+
+
+/* 
+ * change_attack(str, move, acode) is used to add and remove attack
+ * points. It can also be used to change the attack code. The meaning
+ * of the call is that the string (str) can be attacked by (move) with
+ * attack code (acode). If (acode) is zero, the move is removed from
+ * the list of attack moves if it was previously listed.
+ */
+
+void
+change_attack(int str, int move, int acode)
+{
+  str = worm[str].origin;
+  DEBUG(DEBUG_WORMS, "change_attack: %1m %1m %d\n", str, move, acode);
+  change_tactical_point(str, move, acode,
+			worm[str].attack_points, worm[str].attack_codes);
+}
+
+
+/* 
+ * change_defense_threat(str, move, dcode) is used to add and remove
+ * defense threat points. It can also be used to change the defense
+ * threat code. The meaning of the call is that the string (str) can
+ * threaten to be defended by (move) with defense threat code (dcode).
+ * If (dcode) is zero, the move is removed from the list of defense
+ * threat moves if it was previously listed.
+ */
+
+void
+change_defense_threat(int str, int move, int dcode)
+{
+  str = worm[str].origin;
+  change_tactical_point(str, move, dcode,
+			worm[str].defense_threat_points,
+			worm[str].defense_threat_codes);
+}
+
+
+/* 
+ * change_attack_threat(str, move, acode) is used to add and remove
+ * attack threat points. It can also be used to change the attack
+ * threat code. The meaning of the call is that the string (str) can
+ * threaten to be attacked by (move) with attack threat code (acode).
+ * If (acode) is zero, the move is removed from the list of attack
+ * threat moves if it was previously listed.
+ */
+
+void
+change_attack_threat(int str, int move, int acode)
+{
+  str = worm[str].origin;
+  change_tactical_point(str, move, acode,
+			worm[str].attack_threat_points,
+			worm[str].attack_threat_codes);
+}
+
+
+/* Check whether (move) is listed as an attack point for (str) and
+ * return the attack code. If (move) is not listed, return 0.
+ */
+int attack_move_known(int move, int str)
+{
+  return tactical_move_known(move, worm[str].attack_points,
+			     worm[str].attack_codes);
+}
+
+/* Check whether (move) is listed as a defense point for (str) and
+ * return the defense code. If (move) is not listed, return 0.
+ */
+int defense_move_known(int move, int str)
+{
+  return tactical_move_known(move, worm[str].defense_points,
+			     worm[str].defend_codes);
+}
+
+/* Check whether (move) is listed as an attack threat point for (str)
+ * and return the attack threat code. If (move) is not listed, return
+ * 0.
+ */
+int attack_threat_move_known(int move, int str)
+{
+  return tactical_move_known(move, worm[str].attack_threat_points,
+			     worm[str].attack_threat_codes);
+}
+
+/* Check whether (move) is listed as a defense threat point for (str)
+ * and return the defense threat code. If (move) is not listed, return
+ * 0.
+ */
+int defense_threat_move_known(int move, int str)
+{
+  return tactical_move_known(move, worm[str].defense_threat_points,
+			     worm[str].defense_threat_codes);
+}
+
+/* Do the real work for the functions above. */
+static int
+tactical_move_known(int move, int points[MAX_TACTICAL_POINTS],
+		    int codes[MAX_TACTICAL_POINTS])
+{
+  int k;
+  for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+    if (codes[k] == 0)
+      return 0;
+    if (points[k] == move)
+      return codes[k];
+  }
+  return 0;
+}
+
+
+/*
+ * This function does the real work for change_attack(),
+ * change_defense(), change_attack_threat(), and
+ * change_defense_threat().
+ */
+
+static void
+change_tactical_point(int str, int move, int code,
+		      int points[MAX_TACTICAL_POINTS],
+		      int codes[MAX_TACTICAL_POINTS])
+{
+  int k;
+
+  gg_assert(ON_BOARD(str));
+  gg_assert(str == worm[str].origin);
+  
+  /* First see if we already knew about this defense point. */
+  for (k = 0; k < MAX_TACTICAL_POINTS; k++)
+    if (points[k] == move)
+      break;
+
+  /* Yes, we did. */
+  if (k < MAX_TACTICAL_POINTS) {
+    if (codes[k] == code)
+      return; /* Old news. */
+
+    codes[k] = code;
+    sort_tactical_points(points, codes);
+    propagate_worm2(str);
+    return;
+  }
+
+  /* This defense point is news to us. */
+  if (code > codes[MAX_TACTICAL_POINTS-1]) {
+    points[MAX_TACTICAL_POINTS - 1] = move;
+    codes[MAX_TACTICAL_POINTS - 1] = code;
+    sort_tactical_points(points, codes);
+    propagate_worm2(str);
+  }
+}
+
+
+/* Sort the tactical points so we have it sorted in falling order on
+ * the code values.
+ *
+ * We use shaker sort because we prefer a stable sort and in all use
+ * cases we can expect it to suffice with one turn through the outer
+ * loop.
+ */
+
+static void
+sort_tactical_points(int points[MAX_TACTICAL_POINTS],
+		     int codes[MAX_TACTICAL_POINTS])
+{
+  int start = 0;
+  int end = MAX_TACTICAL_POINTS - 1;
+  int new_start;
+  int new_end;
+  int k;
+  
+  while (start < end) {
+    new_start = end;
+    for (k = end; k > start; k--)
+      if (codes[k] > codes[k-1]) {
+	swap_points_and_codes(points, codes, k, k-1);
+	new_start = k;
+      }
+    start = new_start;
+    new_end = start;
+    for (k = start; k < end - 1; k++)
+      if (codes[k] < codes[k+1]) {
+	swap_points_and_codes(points, codes, k, k+1);
+	new_end = k;
+      }
+    end = new_end;
+  }
+}
+
+static void
+swap_points_and_codes(int points[MAX_TACTICAL_POINTS],
+		      int codes[MAX_TACTICAL_POINTS],
+		      int m, int n)
+{
+  int tmp = points[m];
+  points[m] = points[n];
+  points[n] = tmp;
+  tmp = codes[m];
+  codes[m] = codes[n];
+  codes[n] = tmp;
+}
+
+
+/* 
  * propagate_worm() takes the worm data at one stone and copies it to 
  * the remaining members of the worm.
  *
@@ -1173,6 +1407,61 @@ propagate_worm(int pos)
   for (k = 0; k < num_stones; k++)
     if (stones[k] != pos)
       worm[stones[k]] = worm[pos];
+}
+
+
+/* 
+ * propagate_worm2() is a relative to propagate_worm() which can be
+ * used when stack>0 but not for the initial construction of the
+ * worms.
+ */
+
+static void 
+propagate_worm2(int str)
+{
+  int pos;
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(worm[str].color != EMPTY, str);
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (board[pos] == board[str] && is_same_worm(pos, str))
+      worm[pos] = worm[str];
+}
+
+
+/* Report all known attack, defense, attack threat, and defense threat
+ * moves. But limit this to the moves which can be made by (color).
+ */
+void worm_reasons(int color)
+{
+  int pos;
+  int k;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos) || board[pos] == EMPTY)
+      continue;
+
+    if (!is_worm_origin(pos, pos))
+      continue;
+
+    if (board[pos] == OTHER_COLOR(color)) {
+      for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	if (worm[pos].attack_codes[k] != 0)
+	  add_attack_move(worm[pos].attack_points[k], pos);
+	if (worm[pos].attack_threat_codes[k] != 0)
+	  add_attack_threat_move(worm[pos].attack_threat_points[k], pos);
+      }
+    }
+      
+    if (board[pos] == color) {
+      for (k = 0; k < MAX_TACTICAL_POINTS; k++) {
+	if (worm[pos].defend_codes[k] != 0)
+	  add_defense_move(worm[pos].defense_points[k], pos);
+	if (worm[pos].defense_threat_codes[k] != 0)
+	  add_defense_threat_move(worm[pos].defense_threat_points[k], pos);
+      }
+    }
+  }
 }
 
 
@@ -1487,8 +1776,9 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (pattern->helper) {
     if (!pattern->helper(pattern, ll, ti, tj, color)) {
-      TRACE("Attack pattern %s+%d rejected by helper at %1m\n", pattern->name,
-	    ll, move);
+      DEBUG(DEBUG_WORMS,
+	    "Attack pattern %s+%d rejected by helper at %1m\n",
+	    pattern->name, ll, move);
       return;
     }
   }
@@ -1498,68 +1788,46 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
     if (pattern->patn[k].att == ATT_X) {
       /* transform pattern real coordinate */
       int x, y;
-      int aa;
-      TRANSFORM(pattern->patn[k].x,pattern->patn[k].y,&x,&y,ll);
+      int str;
+      TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
       x += m;
       y += n;
 
-      aa = worm[POS(x, y)].origin;
+      str = worm[POS(x, y)].origin;
 
       /* A string with 5 liberties or more is considered tactically alive. */
-      if (countlib(aa) > 4)
+      if (countlib(str) > 4)
 	continue;
 
-      if (attack_move_known(move, aa))
+      if (attack_move_known(move, str))
 	continue;
 
       /* No defenses are known at this time, so defend_code is always 0. */
 #if 0
       /* If the string can be attacked but not defended, ignore it. */
-      if (worm[aa].attack_code == WIN && worm[aa].defend_code == 0)
+      if (worm[str].attack_codes[0] == WIN && worm[str].defend_codes[0] == 0)
 	continue;
 #endif
       
       /* FIXME: Don't attack the same string more than once.
        * Play (ti, tj) and see if there is a defense.
        */
-      if (trymove(move, color, "attack_callback", aa, EMPTY, NO_MOVE)) {
+      if (trymove(move, color, "attack_callback", str, EMPTY, NO_MOVE)) {
 	int dcode;
-	if (!board[aa])
+	if (!board[str])
 	  dcode = 0;
-	else if (!attack(aa, NULL))
+	else if (!attack(str, NULL))
 	  dcode = WIN;
 	else
-	  dcode = find_defense(aa, NULL);
+	  dcode = find_defense(str, NULL);
 
 	popgo();
 
-	if (dcode == 0) {
-	  TRACE("Attack pattern %s+%d found attack on %1m at %1m\n",
-		pattern->name, ll, aa, move);
-	  worm[aa].attack_code = WIN;
-	  worm[aa].attack_point = move;
-	}
-	else if (dcode == KO_A) {
-	  TRACE("Attack pattern %s+%d found attack on %1m at %m1 with ko (acode=%d)\n",
-		pattern->name, ll, aa, move, KO_A);
-	  if (worm[aa].attack_code == KO_B 
-	      || worm[aa].attack_code == 0) {
-	    worm[aa].attack_code = KO_B;
-	    worm[aa].attack_point = move;
-	  }
-	}
-	else if (dcode == KO_B) {
-	  TRACE("Attack pattern %s+%d found attack on %1m at %1m with ko (acode=%d)\n",
-		pattern->name, ll, aa, move, KO_B);
-	  if (worm[aa].attack_code != WIN) {
-	    worm[aa].attack_code = KO_A;
-	    worm[aa].attack_point = move;
-	  }
-	}
-
 	if (dcode != WIN) {
-	  propagate_worm(aa);
-	  add_attack_move(move, aa);
+	  change_attack(str, move, 3-dcode);
+	  DEBUG(DEBUG_WORMS,
+		"Attack pattern %s+%d found attack on %1m at %1m with code %d\n",
+		pattern->name, ll, str, move, 3 - dcode);
 	}
       }
     }
@@ -1599,8 +1867,9 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (pattern->helper) {
     if (!pattern->helper(pattern, ll, ti, tj, color)) {
-      TRACE("Defense pattern %s+%d rejected by helper at %1m\n", pattern->name,
-	    ll, move);
+      DEBUG(DEBUG_WORMS,
+	    "Defense pattern %s+%d rejected by helper at %1m\n",
+	    pattern->name, ll, move);
       return;
     }
   }
@@ -1610,52 +1879,31 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
     if (pattern->patn[k].att == ATT_O) {
       /* transform pattern real coordinate */
       int x, y;
-      int aa;
+      int str;
       TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
       x += m;
       y += n;
 
-      aa = worm[POS(x, y)].origin;
+      str = worm[POS(x, y)].origin;
 
-      if (worm[aa].attack_code == 0
-	  || defense_move_known(move, aa))
+      if (worm[str].attack_codes[0] == 0
+	  || defense_move_known(move, str))
 	continue;
       
       /* FIXME: Don't try to defend the same string more than once.
        * FIXME: For all attacks on this string, we should test whether
        *        the proposed move happens to refute the attack.
-       * Play (ti, tj) and see if there is an attack. */
-      if (trymove(move, color, "defense_callback", aa, EMPTY, NO_MOVE)) {
-	int acode = attack(aa, NULL);
+       * Play (move) and see if there is an attack. */
+      if (trymove(move, color, "defense_callback", str, EMPTY, NO_MOVE)) {
+	int acode = attack(str, NULL);
 
 	popgo();
 	
-	if (acode == 0) {
-	  TRACE("Defense pattern %s+%d found defense of %1m at %1m\n",
-		pattern->name, ll, aa, move);
-	  worm[aa].defend_code   = WIN;
-	  worm[aa].defense_point = move;
-	}
-	else if (acode == KO_A) {
-	  TRACE("Defense pattern %s+%d found defense of %1m at %1m with ko (acode=%d)\n",
-		pattern->name, ll, aa, move, 3);
-	  if (worm[aa].defend_code != WIN) {
-	    worm[aa].defend_code   = KO_B;
-	    worm[aa].defense_point = move;
-	  }
-	}
-	else if (acode == KO_B) {
-	  TRACE("Defense pattern %s+%d found defense of %1m at %1m with ko (acode=%d)\n",
-		pattern->name, ll, aa, move, 3);
-	  if (worm[aa].defend_code != WIN) {
-	    worm[aa].defend_code   = KO_A;
-	    worm[aa].defense_point = move;
-	  }
-	}
-
 	if (acode != WIN) {
-	  propagate_worm(aa);
-	  add_defense_move(move, aa);
+	  change_defense(str, move, 3 - acode);
+	  DEBUG(DEBUG_WORMS,
+		"Defense pattern %s+%d found defense of %1m at %1m with code %d\n",
+		pattern->name, ll, str, move, 3 - acode);
 	}
       }
     }
@@ -1706,29 +1954,34 @@ report_worm(int m, int n)
 	  worm[pos].liberties3, 
 	  worm[pos].liberties4);
 
-  if (worm[pos].attack_point != NO_MOVE)
-    gprintf("attack point %1m, ", worm[pos].attack_point);
+  /* FIXME: List all attack points. */
+  if (worm[pos].attack_points[0] != NO_MOVE)
+    gprintf("attack point %1m, ", worm[pos].attack_points[0]);
   else
     gprintf("no attack point, ");
 
-  if (worm[pos].attack_code == 1)
+  if (worm[pos].attack_codes[0] == WIN)
     gprintf("attack code WIN\n");
-  else if (worm[pos].attack_code == KO_A)
+  else if (worm[pos].attack_codes[0] == KO_A)
     gprintf("attack code KO_A\n");
-  else if (worm[pos].attack_code == KO_B)
+  else if (worm[pos].attack_codes[0] == KO_B)
     gprintf("attack code KO_B\n");
 
-  if (worm[pos].defense_point != NO_MOVE)
-    gprintf("defense point %1m, ", worm[pos].defense_point);
+  /* FIXME: List all defense points. */
+  if (worm[pos].defense_points[0] != NO_MOVE)
+    gprintf("defense point %1m, ", worm[pos].defense_points[0]);
   else
     gprintf("no defense point, ");
 
-  if (worm[pos].defend_code == 1)
+  if (worm[pos].defend_codes[0] == WIN)
     gprintf("defend code WIN\n");
-  else if (worm[pos].defend_code == KO_A)
+  else if (worm[pos].defend_codes[0] == KO_A)
     gprintf("defend code KO_A\n");
-  else if (worm[pos].defend_code == KO_B)
+  else if (worm[pos].defend_codes[0] == KO_B)
     gprintf("defend code KO_B\n");
+
+  /* FIXME: List all attack and defense threat points. */
+
 
   if (worm[pos].lunch != NO_MOVE)
     gprintf("lunch at %1m\n", worm[pos].lunch);

@@ -31,8 +31,6 @@
 #define ANTISUJI_MOVE          7
 #define SEMEAI_MOVE            8
 #define SEMEAI_THREAT          9
-#define NON_ATTACK_MOVE       10
-#define NON_DEFEND_MOVE       11
 #define VITAL_EYE_MOVE        12
 #define ATTACK_EITHER_MOVE    13
 #define DEFEND_BOTH_MOVE      14

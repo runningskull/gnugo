@@ -356,6 +356,7 @@ add_move_reason(int pos, int type, int what)
     move[pos].reason[k] = find_reason(type, what);
 }
 
+#if 0
 /*
  * Remove a move reason for (pos). Ignore silently if the reason
  * wasn't there.
@@ -386,6 +387,7 @@ remove_move_reason(int pos, int type, int what)
   move[pos].reason[n] = move[pos].reason[k];
   move[pos].reason[k] = -1;
 }
+#endif
 
 /*
  * Check whether a move reason already is recorded for a move.
@@ -423,36 +425,6 @@ add_attack_move(int pos, int ww)
   add_move_reason(pos, ATTACK_MOVE, worm_number);
 }
 
-/* Query whether an attack move is already known. */
-int
-attack_move_known(int pos, int ww)
-{
-  int worm_number = find_worm(worm[ww].origin);
-
-  ASSERT_ON_BOARD1(ww);
-  return move_reason_known(pos, ATTACK_MOVE, worm_number);
-}
-
-/*
- * Remove from the reasons for the move at (pos) that it attacks
- * the worm at (ww). We do this by adding a NON_ATTACK move
- * reason and wait until later to actually remove it. Otherwise it may
- * be added again.
- *
- * We must also check that there does exist an attack move reason for
- * this worm. Otherwise we may end up in an infinite loop when trying
- * to actually remove it.
- */
-void
-remove_attack_move(int pos, int ww)
-{
-  int worm_number = find_worm(worm[ww].origin);
-
-  ASSERT_ON_BOARD1(ww);
-  if (move_reason_known(pos, ATTACK_MOVE, worm_number))
-    add_move_reason(pos, NON_ATTACK_MOVE, worm_number);
-}
-
 /*
  * Add to the reasons for the move at (pos) that it defends the worm
  * at (ww).
@@ -465,37 +437,6 @@ add_defense_move(int pos, int ww)
   ASSERT_ON_BOARD1(ww);
   add_move_reason(pos, DEFEND_MOVE, worm_number);
 }
-
-/* Query whether a defense move is already known. */
-int
-defense_move_known(int pos, int ww)
-{
-  int worm_number = find_worm(worm[ww].origin);
-
-  ASSERT_ON_BOARD1(ww);
-  return move_reason_known(pos, DEFEND_MOVE, worm_number);
-}
-
-/*
- * Remove from the reasons for the move at (pos) that it defends
- * the worm at (ww). We do this by adding a NON_DEFEND move
- * reason and wait until later to actually remove it. Otherwise it may
- * be added again.
- *
- * We must also check that there does exist a defense move reason for
- * this worm. Otherwise we may end up in an infinite loop when trying
- * to actually remove it.
- */
-void
-remove_defense_move(int pos, int ww)
-{
-  int worm_number = find_worm(worm[ww].origin);
-
-  ASSERT_ON_BOARD1(ww);
-  if (move_reason_known(pos, DEFEND_MOVE, worm_number))
-    add_move_reason(pos, NON_DEFEND_MOVE, worm_number);
-}
-
 
 /*
  * Add to the reasons for the move at (pos) that it threatens to
@@ -510,16 +451,6 @@ add_attack_threat_move(int pos, int ww)
   add_move_reason(pos, ATTACK_THREAT_MOVE, worm_number);
 }
 
-/* Query whether a threat to attack move is already known. */
-int
-attack_threat_move_known(int pos, int ww)
-{
-  int worm_number = find_worm(worm[ww].origin);
-
-  ASSERT_ON_BOARD1(ww);
-  return move_reason_known(pos, ATTACK_THREAT_MOVE, worm_number);
-}
-
 /*
  * Add to the reasons for the move at (pos) that it defends the worm
  * at (ww).
@@ -531,16 +462,6 @@ add_defense_threat_move(int pos, int ww)
 
   ASSERT_ON_BOARD1(ww);
   add_move_reason(pos, DEFEND_THREAT_MOVE, worm_number);
-}
-
-/* Query whether a threat to defense move is already known. */
-int
-defense_threat_move_known(int pos, int ww)
-{
-  int worm_number = find_worm(worm[ww].origin);
-
-  ASSERT_ON_BOARD1(ww);
-  return move_reason_known(pos, DEFEND_THREAT_MOVE, worm_number);
 }
 
 
@@ -588,8 +509,8 @@ add_cut_move(int pos, int dr1, int dr2)
    * Ignore the cut or connection if either (dr1) or (dr2)
    * points to a tactically captured worm.
    */
-  if ((worm[dr1].attack_code != 0 && worm[dr1].defend_code == 0)
-      || (worm[dr2].attack_code != 0 && worm[dr2].defend_code == 0))
+  if ((worm[dr1].attack_codes[0] != 0 && worm[dr1].defend_codes[0] == 0)
+      || (worm[dr2].attack_codes[0] != 0 && worm[dr2].defend_codes[0] == 0))
     return;
   
   add_move_reason(pos, CUT_MOVE, connection);
@@ -675,10 +596,13 @@ add_attack_either_move(int pos, int str1, int str2)
   ASSERT_ON_BOARD1(str2);
   if (worm1 == worm2)
     return;
-  if (worm[str1].attack_code != 0 && worm[str2].defend_code == 0)
+  
+  if (worm[str1].attack_codes[0] != 0 && worm[str2].defend_codes[0] == 0)
     return;
-  if (worm[str2].attack_code != 0 && worm[str2].defend_code == 0)
+  
+  if (worm[str2].attack_codes[0] != 0 && worm[str2].defend_codes[0] == 0)
     return;
+  
   worm_pair = find_worm_pair(worm1, worm2);
   add_move_reason(pos, ATTACK_EITHER_MOVE, worm_pair);
 }
@@ -1092,8 +1016,8 @@ find_more_attack_and_defense_moves(int color)
     for (n = 0; n  <board_size; n++)
       if (BOARD(m, n)
 	  && worm[POS(m, n)].origin == POS(m, n)
-	  && worm[POS(m, n)].attack_code != 0
-	  && worm[POS(m, n)].defend_code != 0) {
+	  && worm[POS(m, n)].attack_codes[0] != 0
+	  && worm[POS(m, n)].defend_codes[0] != 0) {
 	unstable_worms[N] = find_worm(POS(m, n));
 	N++;
       }
@@ -1158,7 +1082,7 @@ find_more_attack_and_defense_moves(int color)
 		 */
 		int attack_works = 1;
 
-		if (trymove(worm[aa].defense_point, other, 
+		if (trymove(worm[aa].defense_points[0], other, 
 			     "find_more_attack_and_defense_moves", 0,
 			     EMPTY, 0)) {
 		  if (!attack(aa, NULL))
@@ -1183,124 +1107,6 @@ find_more_attack_and_defense_moves(int color)
   
   TRACE("\n");
   decrease_depth_values();
-}
-
-/*
- * Remove attacks on own stones and defense of opponent stones, i.e.
- * moves which are only relevant for the opponent.
- *
- * Comment: I once thought it would be useful to take these into
- * account (cf. the proverb "opponent's key points are your key
- * points") but now it seems they only lead to trouble. It's easiest
- * just to remove them altogether.
- *
- * FIXME: There is a certain amount of superfluous code that tests
- * against this case which now can be removed.
- */
-static void
-remove_opponent_attack_and_defense_moves(int color)
-{
-  int m, n, pos, k;
-  int aa;
-  int found_one;
-
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-
-      do {
-	/* If we do remove something, we must restart the loop to be
-         * sure that we look through all move_reasons.
-	 */
-	found_one = 0;
-	for (k = 0; k < MAX_REASONS; k++) {
-	  int r = move[pos].reason[k];
-	  if (r < 0)
-	    break;
-	  aa = worms[move_reasons[r].what];
-	  if (move_reasons[r].type == ATTACK_MOVE
-	      && board[aa] == color) {
-	    remove_move_reason(pos, ATTACK_MOVE, move_reasons[r].what);
-	    found_one = 1;
-	    break;
-	  }
-	  else if (move_reasons[r].type == DEFEND_MOVE
-		   && board[aa] == OTHER_COLOR(color)) {
-	    remove_move_reason(pos, DEFEND_MOVE, move_reasons[r].what);
-	    found_one = 1;
-	    break;
-	  }
-	}
-      } while (found_one);
-    }
-}
-
-/*
- * Remove attacks and defenses that have earlier been marked as
- * NON_ATTACK or NON_DEFEND respectively, because they actually don't
- * work.
- */
-static void
-do_remove_false_attack_and_defense_moves(void)
-{
-  int m, n, pos, k;
-  int found_one;
-
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-      do {
-	/* If we do remove something, we must restart the loop to be
-         * sure that we look through all move_reasons.
-	 */
-	found_one = 0;
-	for (k = 0; k < MAX_REASONS; k++) {
-	  int r = move[pos].reason[k];
-	  if (r < 0)
-	    break;
-	  if (move_reasons[r].type == NON_ATTACK_MOVE) {
-	    int aa = worms[move_reasons[r].what];
-
-	    remove_move_reason(pos, ATTACK_MOVE, move_reasons[r].what);
-	    /* Remove ourselves too. */
-	    remove_move_reason(pos, NON_ATTACK_MOVE, move_reasons[r].what);
-	    /* If (pos) was the attack point of the worm (aa), we
-	     * call change_attack to remove it.
-	     *
-	     * FIXME: We should look through the move reasons to see
-	     * whether we could come up with an alternate attack point.
-	     */
-	    change_attack(aa, 0, 0);
-	    /* If there was no attack, there is nothing to defend against. */
-	    if (worm[aa].defend_code != 0) {
-	      remove_move_reason(pos, DEFEND_MOVE, move_reasons[r].what);
-	      change_defense(aa, 0, 0);
-	    }
-	    /* FIXME: We should also remove all defense reasons for
-             * this worm.
-	     */
-	    found_one = 1;
-	    break;
-	  }
-	  else if (move_reasons[r].type == NON_DEFEND_MOVE) {
-	    int aa = worms[move_reasons[r].what];
-
-	    remove_move_reason(pos, DEFEND_MOVE, move_reasons[r].what);
-	    /* Remove ourselves too. */
-	    remove_move_reason(pos, NON_DEFEND_MOVE, move_reasons[r].what);
-	    /* If (pos) was the defense point of the worm (aa), we
-	     * call change_defense to remove it.
-	     *
-	     * FIXME: We should look through the move reasons to see
-	     * whether we could come up with an alternate defense point.
-	     */
-	    change_defense(aa, 0, 0);
-	    found_one = 1;
-	    break;
-	  }
-	}
-      } while (found_one);
-    }
 }
 
 
@@ -1451,7 +1257,7 @@ induce_secondary_move_reasons(int color)
 		&& (board[aa] != color)))
 	  continue; /* Only a move for the opponent. */
 	
-	if (worm[aa].defend_code == 0)
+	if (worm[aa].defend_codes[0] == 0)
 	  continue; /* No defense. */
 
 	/* Don't care about inessential dragons. */
@@ -1840,7 +1646,7 @@ list_move_reasons(int color)
 	  if (move_reasons[r].type == ATTACK_MOVE
 	      && board[aa] != color)
 	    gprintf("Move at %1m attacks %1m%s\n", pos, aa,
-		    (worm[aa].defend_code == 0) ? " (defenseless)" : "");
+		    (worm[aa].defend_codes[0] == 0) ? " (defenseless)" : "");
 	  else if ((move_reasons[r].type == DEFEND_MOVE
 		    && board[aa] == color))
 	    gprintf("Move at %1m defends %1m\n", pos, aa);
@@ -1903,18 +1709,6 @@ list_move_reasons(int color)
 	  else
 	    gprintf("Move at %1m vital eye point for dragon %1m (eye %1m)\n",
 		    pos, black_eye[aa].dragon, aa);
-	  break;
-	  
-	case NON_ATTACK_MOVE:
-	case NON_DEFEND_MOVE:
-	  aa = worms[move_reasons[r].what];
-	  
-	  if (move_reasons[r].type == NON_ATTACK_MOVE
-	      && board[aa] != color)
-	    gprintf("Move at %1m does in fact not attack %1m\n", pos, aa);
-	  else if ((move_reasons[r].type == NON_DEFEND_MOVE
-		    && board[aa] == color))
-	    gprintf("Move at %1m does in fact not defend %1m\n", pos, aa);
 	  break;
 	  
 	case ATTACK_EITHER_MOVE:
@@ -2278,7 +2072,7 @@ estimate_territorial_value(int pos, int color,
 	break;
       
       /* Defenseless stone. */
-      if (worm[aa].defend_code == 0) {
+      if (worm[aa].defend_codes[0] == 0) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: %f (secondary) - attack on %1m (defenseless)\n",
 	      pos, worm[aa].size, aa);
@@ -2384,6 +2178,14 @@ estimate_territorial_value(int pos, int color,
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: 0.0 - threatens to capture %1m (dead)\n", pos, aa);
+	break;
+      }
+
+      if (DRAGON2(I(aa), J(aa)).safety == INESSENTIAL
+	  || worm[aa].inessential) {
+	DEBUG(DEBUG_MOVE_REASONS,
+	      "  %1m: 0.0 - threatens to capture %1m (inessential)\n",
+	      pos, aa);
 	break;
       }
 
@@ -2847,7 +2649,7 @@ estimate_strategical_value(int pos, int color, float score)
 	  break;
 	
 	/* Defenseless stone */
-	if (worm[aa].defend_code == 0)
+	if (worm[aa].defend_codes[0] == 0)
 	  break;
 
 	/* Require the defense to be strategically viable. */
@@ -3567,12 +3369,6 @@ review_move_reasons(int *i, int *j, float *val, int color,
     find_more_attack_and_defense_moves(color);
     time_report(2, "  find_more_attack_and_defense_moves", -1, -1);
   }
-
-  remove_opponent_attack_and_defense_moves(color);
-  time_report(2, "  remove_opponent_attack_and_defense_moves", -1, -1);
-
-  do_remove_false_attack_and_defense_moves();
-  time_report(2, "  do_remove_false_attack_and_defense_moves", -1, -1);
 
   save_verbose = verbose;
   if (verbose > 0)

@@ -11,6 +11,24 @@
 - revision of engine/engine.dsp: remember readconnect.c
 - make gtp_loadsgf reorient gamerecords
 - make gtp_printvertices orient output points back
+- new function count_common_libs() in board.c
+- struct worm_data now keeps track of all attack, defense, attack threat,
+  and defense threat points
+- remove_attack_move() and remove_defense_move() removed
+- attack_move_known(), defense_move_known(), attack_threat_move_known(),
+  and defense_threat_move_known() moved from move_reasons.c to worm.c
+- change_attack() and change_defense() moved from utils.c to worm.c
+- new function change_attack_threat() and change_defense_threat() in
+  worm.c
+- new function worm_reasons() in worm.c
+- trace messages in worm.c changed to DEBUG_WORMS messages
+- remove_opponent_attack_and_defense_moves() and
+  do_remove_false_attack_and_defense_moves() removed from move_reasons.c
+- NON_ATTACK_MOVE and NON_DEFEND_MOVE move reasons removed
+- try a little harder to find attack threats
+- attack.db and defense.db revised
+- indirect_helper() removed from helpers.c
+- tuning
 
 3.1.9 released October 7, 2001
 

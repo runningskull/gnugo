@@ -2471,6 +2471,7 @@ Pattern Sente13
 
 
 Pattern Sente13b
+# gf Revised constraint. (3.1.10)
 
 .O
 *?
@@ -2481,7 +2482,7 @@ ba
 *?
 
 ;lib(a) == 2 && !attack(a) && olib(b) > 2 && safe_omove(*)
-;&& oplay_attack(*,b,b)
+;&& oplay_attack(*,b,b)==WIN
 # Action adds a reverse followup value.
 >defend_against_atari(a)
 

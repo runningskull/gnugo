@@ -88,8 +88,8 @@ do { \
   *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
 } while(0)
 
-#define ATTACK_MACRO(i,j) ((stackp==0) ? (worm[POS(i, j)].attack_code) : attack(POS(i,j),NULL))
-#define DEFEND_MACRO(i,j) ((stackp==0) ? (worm[POS(i, j)].defend_code) : find_defense(POS(i,j),NULL))
+#define ATTACK_MACRO(i,j) ((stackp==0) ? (worm[POS(i, j)].attack_codes[0]) : attack(POS(i,j),NULL))
+#define DEFEND_MACRO(i,j) ((stackp==0) ? (worm[POS(i, j)].defend_codes[0]) : find_defense(POS(i,j),NULL))
 #define DRAGON_WEAK(i, j) (DRAGON2(i, j).safety != ALIVE \
 			   && DRAGON2(i, j).safety != STRONGLY_ALIVE \
 			   && DRAGON2(i, j).safety != INVINCIBLE)
@@ -135,18 +135,21 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 #define ATT_a     6
 #define ATT_not   7
 
-/* and pattern classes */
+/* Pattern classes. The semantics of these varies between different
+ * databases. The descriptions here mostly relate to patterns in
+ * patterns.db and other databases which are handled by shapes.c.
+ */
 #define CLASS_O 0x0001   /* O stones must be alive or unknown */
 #define CLASS_o 0x0002   /* O stones must be dead or unknown */
 #define CLASS_X 0x0004   /* X stones must be alive or unknown */
 #define CLASS_x 0x0008   /* X stones must be dead or unknown */
 #define CLASS_s 0x0010   /* move is a sacrifice */
 #define CLASS_n 0x0020   /* X could also make this move if we do not */
-#define CLASS_D 0x0040   /* move is defensive: update worm data */
+#define CLASS_D 0x0040   /* defense pattern */
 #define CLASS_C 0x0080   /* move connects two worms */ 
 #define CLASS_c 0x0100   /* move weakly connects two worms */ 
 #define CLASS_B 0x0200   /* move breaks connection between enemy worms */
-#define CLASS_A 0x0400   /* change attack point of a worm */
+#define CLASS_A 0x0400   /* attack pattern */
 #define CLASS_b 0x0800   /* move is intended to block opponent */
 #define CLASS_e 0x1000   /* move is intended to expand territory */
 #define CLASS_E 0x2000   /* move is intended to expand moyo */
@@ -161,10 +164,7 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 #define CLASS_W 0x400000 /* worthwhile threat move */
 
 /* Collection of the classes inducing move reasons. */
-/* FIXME: CLASS_A doesn't seem to do this.
- * This is harmless but should be fixed in some cleaning operation. /gf
- */
-#define CLASS_MOVE_REASONS (CLASS_D | CLASS_C | CLASS_B | CLASS_A | CLASS_b | \
+#define CLASS_MOVE_REASONS (CLASS_C | CLASS_B | CLASS_b | \
                             CLASS_e | CLASS_E | CLASS_a | CLASS_d | \
 			    CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t | \
                             CLASS_W)
@@ -277,7 +277,6 @@ DECLARE(jump_out_far_helper);
 DECLARE(high_handicap_helper);
 DECLARE(reinforce_helper);
 DECLARE(throw_in_atari_helper);
-DECLARE(indirect_helper);
 DECLARE(ugly_cutstone_helper);
 DECLARE(cutstone2_helper);
 DECLARE(edge_double_sente_helper);

@@ -1387,6 +1387,44 @@ approxlib(int pos, int color, int maxlib, int *libs)
  */
 
 int
+count_common_libs(int str1, int str2)
+{
+  int libs1[MAXLIBS];
+  int liberties1;
+  int commonlibs;
+  int k;
+  
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(board[str1] != EMPTY, str1);
+  ASSERT1(board[str2] != EMPTY, str2);
+  
+  if (countlib(str1) > countlib(str2)) {
+    int tmp = str1;
+    str1 = str2;
+    str2 = tmp;
+  }
+
+  liberties1 = findlib(str1, MAXLIBS, libs1);
+  commonlibs = 0;
+  for (k = 0; k < liberties1; k++)
+    if (neighbor_of_string(libs1[k], str2))
+      commonlibs++;
+  
+  return commonlibs;
+}
+
+
+/* Find the common liberties of the two strings at str1 and str2. The
+ * locations of up to maxlib common liberties are written into libs[].
+ * The full number of common liberties is returned.
+ *
+ * If you want the locations of all common liberties, whatever their
+ * number, you should pass MAXLIBS as the value for maxlib and
+ * allocate space for libs[] accordingly.
+ */
+
+int
 find_common_libs(int str1, int str2, int maxlib, int *libs)
 {
   int libs1[MAXLIBS];

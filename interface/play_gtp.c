@@ -2004,13 +2004,13 @@ gtp_worm_data(char *s, int id)
 	gtp_printf("liberties3      %d\n",   w->liberties3);
 	gtp_printf("liberties4      %d\n",   w->liberties4);
 	gtp_mprintf("attack_point    %m\n",  
-		    I(w->attack_point), J(w->attack_point));
-	gtp_printf("attack_code     %d\n",   w->attack_code);
+		    I(w->attack_points[0]), J(w->attack_points[0]));
+	gtp_printf("attack_code     %d\n",   w->attack_codes[0]);
 	gtp_mprintf("lunch           %m\n",  
 		    I(w->lunch), J(w->lunch));
 	gtp_mprintf("defense_point   %m\n",  
-		    I(w->defense_point), J(w->defense_point));
-	gtp_printf("defend_code     %d\n",   w->defend_code);
+		    I(w->defense_points[0]), J(w->defense_points[0]));
+	gtp_printf("defend_code     %d\n",   w->defend_codes[0]);
 	gtp_printf("cutstone        %d\n",   w->cutstone);
 	gtp_printf("cutstone2       %d\n",   w->cutstone2);
 	gtp_printf("genus           %d\n",   w->genus);

@@ -35,7 +35,7 @@
 
 
 void prepare_worms_tab(void);
-void display_worm(Position *pos, int i, int j);
+void display_worm(int w);
 void prepare_dragons_tab(void);
 void display_dragon(int i, int j);
 void prepare_eyes_tab(void);

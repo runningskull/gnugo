@@ -715,9 +715,9 @@ aftermath_genmove(int *i, int *j, int color,
 	      || do_capture_dead_stones)
 	  && (DRAGON2(m, n).safety == DEAD
 	      || DRAGON2(m, n).safety == TACTICALLY_DEAD)
-	  && worm[POS(m, n)].attack_code != 0) {
-	*i = I(worm[POS(m, n)].attack_point);
-	*j = J(worm[POS(m, n)].attack_point);
+	  && worm[POS(m, n)].attack_codes[0] != 0) {
+	*i = I(worm[POS(m, n)].attack_points[0]);
+	*j = J(worm[POS(m, n)].attack_points[0]);
 	return 1;
       }
       
