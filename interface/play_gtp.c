@@ -2660,8 +2660,8 @@ gtp_dragon_data(char *s, int id)
 		      J(d->owl_second_attack_point));
 	  gtp_mprintf("owl_defend              %m\n", 
 		      I(d->owl_defense_point), J(d->owl_defense_point));
-	  gtp_printf("owl_defend_certain:     %s\n",   
-		     (d->owl_defend_certain) ? "YES" : "NO");
+	  gtp_printf("owl_defense_certain:     %s\n",   
+		     (d->owl_defense_certain) ? "YES" : "NO");
 	  gtp_mprintf("owl_2nd_defend          %m\n", 
 		      I(d->owl_second_defense_point), 
 		      J(d->owl_second_defense_point));

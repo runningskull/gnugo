@@ -127,14 +127,14 @@ examine_position(int color, int how_much)
 
     if (how_much == EXAMINE_DRAGONS_WITHOUT_OWL) {
       if (NEEDS_UPDATE(dragons_examined_without_owl))
-	make_dragons(color, 1);
+	make_dragons(color, 1, save_verbose);
       verbose = save_verbose;
       gg_assert(test_gray_border() < 0);
       return;
     }
     
     if (NEEDS_UPDATE(dragons_examined)) {
-      make_dragons(color, 0);
+      make_dragons(color, 0, save_verbose);
       /* We have automatically done a partial dragon analysis as well. */
       dragons_examined_without_owl = position_number;
     }
@@ -341,8 +341,6 @@ do_genmove(int *move, int color, float pure_threat_value)
   val = -1; 
   if (get_level(&level))
     fprintf(stderr, "level = %d\n", level);
-  if (!owl_threats)
-    disable_threat_computation = 1;
   
   /* experimental level adapter */
   clock_adapt_level(&level, color);

@@ -73,10 +73,9 @@ static int lively_black_dragons;
  */
 
 void 
-make_dragons(int color, int stop_before_owl)
+make_dragons(int color, int stop_before_owl, int save_verbose)
 {
-  int m, n;
-  int ii;
+  int str;
   int i, j;
   int dr;
   int d;
@@ -89,41 +88,40 @@ make_dragons(int color, int stop_before_owl)
    * modify it as the worms are amalgamated into larger dragons.
    */
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
 
-      dragon[ii].id                 = -1;
-      dragon[ii].size               = worm[ii].size;
-      dragon[ii].effective_size     = worm[ii].effective_size;
-      dragon[ii].color              = worm[ii].color;
-      dragon[ii].origin             = worm[ii].origin;
+      dragon[str].id                 = -1;
+      dragon[str].size               = worm[str].size;
+      dragon[str].effective_size     = worm[str].effective_size;
+      dragon[str].color              = worm[str].color;
+      dragon[str].origin             = worm[str].origin;
 #if 0
       for (i = 0; i < MAX_TACTICAL_POINTS; ++i) {
-       dragon[ii].owl_attack_points[i]   = NO_MOVE;
-       dragon[ii].owl_attack_codes[i]    = 0;
+       dragon[str].owl_attack_points[i]   = NO_MOVE;
+       dragon[str].owl_attack_codes[i]    = 0;
       }
 #else
-      dragon[ii].owl_attack_point   = NO_MOVE;
-      dragon[ii].owl_attack_code    = 0;
+      dragon[str].owl_attack_point   = NO_MOVE;
+      dragon[str].owl_attack_code    = 0;
 #endif
-      dragon[ii].owl_attack_certain = 1;
-      dragon[ii].owl_defense_point  = NO_MOVE;
-      dragon[ii].owl_defense_code   = 0;
-      dragon[ii].owl_defend_certain = 1;
-      dragon[ii].owl_status         = UNCHECKED;
-      dragon[ii].status             = UNKNOWN;
-      dragon[ii].matcher_status     = UNKNOWN;
-      dragon[ii].owl_threat_status  = UNCHECKED;
-      dragon[ii].owl_second_attack_point  = NO_MOVE;
-      dragon[ii].owl_second_defense_point = NO_MOVE;
-      half_eye[ii].type             =  0;
-      half_eye[ii].value            =  10.0; /* Something big. */
+      dragon[str].owl_attack_certain = 1;
+      dragon[str].owl_defense_point  = NO_MOVE;
+      dragon[str].owl_defense_code   = 0;
+      dragon[str].owl_defense_certain = 1;
+      dragon[str].owl_status         = UNCHECKED;
+      dragon[str].status             = UNKNOWN;
+      dragon[str].matcher_status     = UNKNOWN;
+      dragon[str].owl_threat_status  = UNCHECKED;
+      dragon[str].owl_second_attack_point  = NO_MOVE;
+      dragon[str].owl_second_defense_point = NO_MOVE;
+      half_eye[str].type             =  0;
+      half_eye[str].value            =  10.0; /* Something big. */
       
-      if (IS_STONE(board[ii]) && worm[ii].origin == ii)
+      if (IS_STONE(board[str]) && worm[str].origin == str)
 	DEBUG(DEBUG_DRAGONS, 
 	      "Initializing dragon from worm at %1m, size %d\n", 
-	      ii, worm[ii].size);
+	      str, worm[str].size);
     }
   time_report(2, "  time to initialize dragons", NO_MOVE, 1.0);
 
@@ -141,33 +139,33 @@ make_dragons(int color, int stop_before_owl)
    * (typically false eyes but sometimes halfeyes) get assigned to an
    * arbitrary neighbor that is not the ko stone.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
 
-      if (black_eye[ii].color == BLACK_BORDER
-	  && black_eye[ii].origin == ii) {
-	if (!is_ko_point(ii)
-	    || black_eye[ii].esize > 1) /* Only exclude living kos. */
-	  dragon_eye(ii, black_eye);
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+
+      if (black_eye[str].color == BLACK_BORDER
+	  && black_eye[str].origin == str) {
+	if (!is_ko_point(str)
+	    || black_eye[str].esize > 1) /* Only exclude living kos. */
+	  dragon_eye(str, black_eye);
 	else {
 	  for (k = 0; k < 4; k++)
-	    if (ON_BOARD(ii + delta[k]) && !is_ko_point(ii + delta[k])) {
-	      black_eye[ii].dragon = dragon[ii + delta[k]].origin;
+	    if (ON_BOARD(str + delta[k]) && !is_ko_point(str + delta[k])) {
+	      black_eye[str].dragon = dragon[str + delta[k]].origin;
 	      break;
 	    }
 	}
       }
 	  
-      if (white_eye[ii].color == WHITE_BORDER
-	  && white_eye[ii].origin == ii) {
-	if (!is_ko_point(ii)
-	    || white_eye[ii].esize > 1) /* Only exclude living kos. */
-	  dragon_eye(ii, white_eye);
+      if (white_eye[str].color == WHITE_BORDER
+	  && white_eye[str].origin == str) {
+	if (!is_ko_point(str)
+	    || white_eye[str].esize > 1) /* Only exclude living kos. */
+	  dragon_eye(str, white_eye);
 	else {
 	  for (k = 0; k < 4; k++)
-	    if (ON_BOARD(ii + delta[k]) && !is_ko_point(ii + delta[k])) {
-	      white_eye[ii].dragon = dragon[ii + delta[k]].origin;
+	    if (ON_BOARD(str + delta[k]) && !is_ko_point(str + delta[k])) {
+	      white_eye[str].dragon = dragon[str + delta[k]].origin;
 	      break;
 	    }
 	}
@@ -183,18 +181,17 @@ make_dragons(int color, int stop_before_owl)
   time_report(2, "  time to initialize dragon2", NO_MOVE, 1.0);
   
   /* Find adjacent worms which can be easily captured: */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
+  
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
       int food;
 
-      ii = POS(m, n);
-
-      if (worm[ii].origin != ii
-	  || board[ii] == EMPTY
-	  || worm[ii].lunch == NO_MOVE)
+      if (worm[str].origin != str
+	  || board[str] == EMPTY
+	  || worm[str].lunch == NO_MOVE)
 	continue;
 
-      food = worm[ii].lunch;
+      food = worm[str].lunch;
 
       /* In contrast to worm lunches, a dragon lunch must also be
        * able to defend itself. 
@@ -204,13 +201,13 @@ make_dragons(int color, int stop_before_owl)
 
       /* Tell the move generation code about the lunch. */
       if (IS_STONE(color))
-	add_lunch(ii, food);
+	add_lunch(str, food);
 	
       /* If several lunches are found, we pick the juiciest.
        * First maximize cutstone, then minimize liberties.
        */
       {
-	int origin = dragon[ii].origin;
+	int origin = dragon[str].origin;
 	int lunch = DRAGON2(origin).lunch;
 
 	if (lunch == NO_MOVE
@@ -219,7 +216,7 @@ make_dragons(int color, int stop_before_owl)
 		&& (worm[food].liberties < worm[lunch].liberties))) {
 	  DRAGON2(origin).lunch = worm[food].origin;
 	  TRACE("at %1m setting %1m.lunch to %1m (cutstone=%d)\n",
-		ii, origin,
+		str, origin,
 		worm[food].origin, worm[food].cutstone);
 	}
       }
@@ -229,16 +226,16 @@ make_dragons(int color, int stop_before_owl)
   /* In case origins of dragons got moved, put the dragons of eyes aright. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
+      str = POS(i, j);
 
-      if (black_eye[ii].dragon != NO_MOVE) {
-	int dr = dragon[black_eye[ii].dragon].origin;
-	black_eye[ii].dragon = dr;
+      if (black_eye[str].dragon != NO_MOVE) {
+	int dr = dragon[black_eye[str].dragon].origin;
+	black_eye[str].dragon = dr;
       }
 
-      if (white_eye[ii].dragon != NO_MOVE) {
-	int dr = dragon[white_eye[ii].dragon].origin;
-	  white_eye[ii].dragon = dr;
+      if (white_eye[str].dragon != NO_MOVE) {
+	int dr = dragon[white_eye[str].dragon].origin;
+	  white_eye[str].dragon = dr;
       }
     }
   time_report(2, "  time to fix origins", NO_MOVE, 1.0);
@@ -251,41 +248,40 @@ make_dragons(int color, int stop_before_owl)
    * in owl_determine_life().
    */
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
       float sum;
-      ii = POS(m, n);
 
-      if (black_eye[ii].color == BLACK_BORDER
-	  && (!black_eye[ii].marginal || life)
-	  && black_eye[ii].neighbors <= 1
-	  && black_eye[ii].dragon != NO_MOVE) {
-	sum = topological_eye(ii, BLACK, black_eye, white_eye, half_eye);
+      if (black_eye[str].color == BLACK_BORDER
+	  && (!black_eye[str].marginal || life)
+	  && black_eye[str].neighbors <= 1
+	  && black_eye[str].dragon != NO_MOVE) {
+	sum = topological_eye(str, BLACK, black_eye, white_eye, half_eye);
 	if (sum >= 4.0) {
-	  half_eye[ii].type = FALSE_EYE;
-	  if (black_eye[ii].esize == 1
-	      || is_legal(ii, WHITE)
-	      || board[ii] == WHITE)
-	    add_false_eye(ii, black_eye, half_eye);
+	  half_eye[str].type = FALSE_EYE;
+	  if (black_eye[str].esize == 1
+	      || is_legal(str, WHITE)
+	      || board[str] == WHITE)
+	    add_false_eye(str, black_eye, half_eye);
 	}
 	else if (sum > 2.0)
-	  half_eye[ii].type = HALF_EYE;
+	  half_eye[str].type = HALF_EYE;
       }
       
-      if (white_eye[ii].color == WHITE_BORDER
-	  && (!white_eye[ii].marginal || life)
-	  && white_eye[ii].neighbors <= 1
-	  && white_eye[ii].dragon != NO_MOVE) {
-	sum = topological_eye(ii, WHITE, black_eye, white_eye, half_eye);
+      if (white_eye[str].color == WHITE_BORDER
+	  && (!white_eye[str].marginal || life)
+	  && white_eye[str].neighbors <= 1
+	  && white_eye[str].dragon != NO_MOVE) {
+	sum = topological_eye(str, WHITE, black_eye, white_eye, half_eye);
 	if (sum >= 4.0) {
-	  half_eye[ii].type = FALSE_EYE;
-	  if (white_eye[ii].esize == 1
-	      || is_legal(ii, BLACK)
-	      || board[ii] == BLACK)
-	    add_false_eye(ii, white_eye, half_eye);
+	  half_eye[str].type = FALSE_EYE;
+	  if (white_eye[str].esize == 1
+	      || is_legal(str, BLACK)
+	      || board[str] == BLACK)
+	    add_false_eye(str, white_eye, half_eye);
 	}
 	else if (sum > 2.0)
-	  half_eye[ii].type = HALF_EYE;
+	  half_eye[str].type = HALF_EYE;
       }
     }
 
@@ -297,40 +293,40 @@ make_dragons(int color, int stop_before_owl)
   /* Compute the number of eyes, half eyes, etc. in an eye space. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
+      str = POS(i, j);
 
-      if (black_eye[ii].color == BLACK_BORDER
-	  && black_eye[ii].origin == ii
-	  && black_eye[ii].dragon != NO_MOVE)
+      if (black_eye[str].color == BLACK_BORDER
+	  && black_eye[str].origin == str
+	  && black_eye[str].dragon != NO_MOVE)
       {
 	int max, min, attack_point, defense_point;
 
-	compute_eyes(ii, &max, &min, &attack_point, &defense_point, 
+	compute_eyes(str, &max, &min, &attack_point, &defense_point, 
 		     black_eye, half_eye, 1, color);
 	DEBUG(DEBUG_EYES, "Black eyespace at %1m: min=%d, max=%d\n",
-	      ii, min, max);
-	black_eye[ii].maxeye = max;
-	black_eye[ii].mineye = min;
-	black_eye[ii].attack_point = attack_point;
-	black_eye[ii].defense_point = defense_point;
-	propagate_eye(ii, black_eye);
+	      str, min, max);
+	black_eye[str].maxeye = max;
+	black_eye[str].mineye = min;
+	black_eye[str].attack_point = attack_point;
+	black_eye[str].defense_point = defense_point;
+	propagate_eye(str, black_eye);
       }
 
-      if (white_eye[ii].color == WHITE_BORDER
-	  && white_eye[ii].origin == ii
-	  && white_eye[ii].dragon != NO_MOVE)
+      if (white_eye[str].color == WHITE_BORDER
+	  && white_eye[str].origin == str
+	  && white_eye[str].dragon != NO_MOVE)
       {
 	int max, min, attack_point, defense_point;
 
-	compute_eyes(ii, &max, &min, &attack_point, &defense_point,
+	compute_eyes(str, &max, &min, &attack_point, &defense_point,
 		     white_eye, half_eye, 1, color);
 	DEBUG(DEBUG_EYES, "White eyespace at %1m: min=%d, max=%d\n",
-	      ii, min, max);
-	white_eye[ii].maxeye = max;
-	white_eye[ii].mineye = min;
-	white_eye[ii].attack_point = attack_point;
-	white_eye[ii].defense_point = defense_point;
-	propagate_eye(ii, white_eye);
+	      str, min, max);
+	white_eye[str].maxeye = max;
+	white_eye[str].mineye = min;
+	white_eye[str].attack_point = attack_point;
+	white_eye[str].defense_point = defense_point;
+	propagate_eye(str, white_eye);
       }
     }
   time_report(2, "  time to find eyes", NO_MOVE, 1.0);
@@ -338,48 +334,46 @@ make_dragons(int color, int stop_before_owl)
   /* Now we compute the genus. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      int ii = POS(i, j);
+      int str = POS(i, j);
 
-      if (black_eye[ii].color == BLACK_BORDER
-	  && black_eye[ii].dragon != NO_MOVE
-	  && black_eye[ii].origin == ii)
+      if (black_eye[str].color == BLACK_BORDER
+	  && black_eye[str].dragon != NO_MOVE
+	  && black_eye[str].origin == str)
       {
-	dr = black_eye[ii].dragon;
+	dr = black_eye[str].dragon;
 
 	gg_assert(board[dr] == BLACK);
 	TRACE("eye at %1m found for dragon at %1m--augmenting genus\n",
-	      ii, dr);
-	DRAGON2(dr).genus += (black_eye[ii].mineye);
-	DRAGON2(dr).heyes += (black_eye[ii].maxeye - black_eye[ii].mineye);
-	if (black_eye[ii].maxeye - black_eye[ii].mineye > 0)
-	  DRAGON2(dr).heye = black_eye[ii].attack_point;
+	      str, dr);
+	DRAGON2(dr).genus += (black_eye[str].mineye);
+	DRAGON2(dr).heyes += (black_eye[str].maxeye - black_eye[str].mineye);
+	if (black_eye[str].maxeye - black_eye[str].mineye > 0)
+	  DRAGON2(dr).heye = black_eye[str].attack_point;
       }
-      if ((white_eye[ii].color == WHITE_BORDER) 
-	  && (white_eye[ii].dragon != NO_MOVE)
-	  && (white_eye[ii].origin == ii)) 
+      if ((white_eye[str].color == WHITE_BORDER) 
+	  && (white_eye[str].dragon != NO_MOVE)
+	  && (white_eye[str].origin == str)) 
       {
-	dr = white_eye[ii].dragon;
+	dr = white_eye[str].dragon;
 
 	gg_assert(board[dr] == WHITE);
 	TRACE("eye at %1m found for dragon at %1m--augmenting genus\n", 
-	      ii, dr);
-	DRAGON2(dr).genus += (white_eye[ii].mineye);
-	DRAGON2(dr).heyes += (white_eye[ii].maxeye - white_eye[ii].mineye);
-	if (white_eye[ii].maxeye - white_eye[ii].mineye > 0) {
-	  DRAGON2(dr).heye = white_eye[ii].attack_point;
+	      str, dr);
+	DRAGON2(dr).genus += (white_eye[str].mineye);
+	DRAGON2(dr).heyes += (white_eye[str].maxeye - white_eye[str].mineye);
+	if (white_eye[str].maxeye - white_eye[str].mineye > 0) {
+	  DRAGON2(dr).heye = white_eye[str].attack_point;
 	}
       }
     }
   time_report(2, "  time to compute genus", NO_MOVE, 1.0);
 
   /* Compute the escape route measure. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
-
-      if (dragon[ii].origin == ii
-	  && IS_STONE(board[ii])) {
-	DRAGON2(ii).escape_route = compute_escape(ii, 0);
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      if (dragon[str].origin == str
+	  && IS_STONE(board[str])) {
+	DRAGON2(str).escape_route = compute_escape(str, 0);
       }
     }
   time_report(2, "  time to compute escape", NO_MOVE, 1.0);
@@ -402,33 +396,30 @@ make_dragons(int color, int stop_before_owl)
    */
   compute_surrounding_moyo_sizes(1);
   time_report(2, "  time to compute moyo sizes", NO_MOVE, 1.0);
-
+  
   /* Determine status: ALIVE, DEAD, CRITICAL or UNKNOWN */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
-
-      if (dragon[ii].origin == ii && board[ii]) {
-	dragon[ii].status = compute_dragon_status(ii);
-	sgffile_dragon_status(I(ii), J(ii), dragon[ii].status);
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      if (dragon[str].origin == str && board[str]) {
+	dragon[str].status = compute_dragon_status(str);
+	sgffile_dragon_status(I(str), J(str), dragon[str].status);
       }
     }
   time_report(2, "  compute_dragon_status", NO_MOVE, 1.0);
-
+  
   /* We must update the dragon status at every intersection before we
    * call the owl code. This updates all fields.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int ii = POS(m, n);
-      struct dragon_data *d = &(dragon[ii]);
-
-      dragon[ii] = dragon[d->origin];
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      struct dragon_data *d = &(dragon[str]);
+      
+      dragon[str] = dragon[d->origin];
     }
-
+  
   find_neighbor_dragons();
   time_report(2, "  find_neighbor_dragons", NO_MOVE, 1.0);
-
+  
   if (stop_before_owl)
     return;
   
@@ -436,48 +427,41 @@ make_dragons(int color, int stop_before_owl)
    * if necessary.
    */
   purge_persistent_owl_cache();
-
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
       int attack_point = NO_MOVE;
-      int second_attack_point = NO_MOVE;
       int defense_point = NO_MOVE;
-      int second_defense_point = NO_MOVE;
       
-      ii = POS(m, n);
-
-      if (board[ii] == EMPTY
-	  || dragon[ii].origin != ii)
+      if (board[str] == EMPTY
+	  || dragon[str].origin != str)
 	continue;
-
+      
       /* Some dragons can be ignored but be extra careful with big dragons. */
-      if (DRAGON2(ii).escape_route > 25
-	  || DRAGON2(ii).moyo > 20
-	  || (DRAGON2(ii).moyo > 10
-	      && DRAGON2(ii).moyo > dragon[ii].size)) {
-	dragon[ii].owl_status = UNCHECKED;
-	dragon[ii].owl_threat_status = UNCHECKED;
-	dragon[ii].owl_attack_point  = NO_MOVE;
-	dragon[ii].owl_defense_point = NO_MOVE;
-	dragon[ii].owl_second_attack_point  = NO_MOVE;
-	dragon[ii].owl_second_defense_point = NO_MOVE;
+      if (DRAGON2(str).escape_route > 25
+	  || DRAGON2(str).moyo > 20
+	  || (DRAGON2(str).moyo > 10
+	      && DRAGON2(str).moyo > dragon[str].size)) {
+	dragon[str].owl_status = UNCHECKED;
+	dragon[str].owl_attack_point  = NO_MOVE;
+	dragon[str].owl_defense_point = NO_MOVE;
       }
       else {
 	int acode = 0;
 	int dcode = 0;
 	start_timer(3);
-	acode = owl_attack(ii, &attack_point, &dragon[ii].owl_attack_certain);
+	acode = owl_attack(str, &attack_point, 
+			   &dragon[str].owl_attack_certain);
 	if (acode != 0) {
-	  dragon[ii].owl_attack_point = attack_point;
-	  dragon[ii].owl_attack_code = acode;
+	  dragon[str].owl_attack_point = attack_point;
+	  dragon[str].owl_attack_code = acode;
 	  if (attack_point != NO_MOVE) {
-	    dcode = owl_defend(ii, &defense_point,
-			       &dragon[ii].owl_defend_certain);
+	    dcode = owl_defend(str, &defense_point,
+			       &dragon[str].owl_defense_certain);
 	    if (dcode != 0) {
 	      if (defense_point != NO_MOVE) {
-		dragon[ii].owl_status = CRITICAL;
-		dragon[ii].owl_defense_point = defense_point;
-		dragon[ii].owl_defense_code = dcode;
+		dragon[str].owl_status = CRITICAL;
+		dragon[str].owl_defense_point = defense_point;
+		dragon[str].owl_defense_code = dcode;
 	      }
 	      else {
 		/* Due to irregularities in the owl code, it may
@@ -488,96 +472,147 @@ make_dragons(int color, int stop_before_owl)
 		 * propose. Having the status right is important e.g.
 		 * for connection moves to be properly valued.
 		 */
-		dragon[ii].owl_status = CRITICAL;
+		dragon[str].owl_status = CRITICAL;
 		DEBUG(DEBUG_OWL_PERFORMANCE,
 		      "Inconsistent owl attack and defense results for %1m.\n", 
-		      ii);
+		      str);
 	      }
 	    }
 	  }
 	  if (dcode == 0) {
-	    dragon[ii].owl_status = DEAD; 
-	    dragon[ii].owl_defense_point = NO_MOVE;
-	    dragon[ii].owl_defense_code = 0;
-	    if (level >= 8
-		&& !disable_threat_computation) {
-	      if (owl_threaten_defense(ii, &defense_point,
-				       &second_defense_point)) {
-		dragon[ii].owl_threat_status = CAN_THREATEN_DEFENSE;
-		dragon[ii].owl_defense_point = defense_point;
-		dragon[ii].owl_second_defense_point = second_defense_point;
-	      }
-	      else
-		dragon[ii].owl_threat_status = DEAD;;
-	    }
+	    dragon[str].owl_status = DEAD; 
+	    dragon[str].owl_defense_point = NO_MOVE;
+	    dragon[str].owl_defense_code = 0;
 	  }
 	}
 	else {
-	  if (!dragon[ii].owl_attack_certain) {
-	    dcode = owl_defend(ii, &defense_point, 
-			       &dragon[ii].owl_defend_certain);
+	  if (!dragon[str].owl_attack_certain) {
+	    dcode = owl_defend(str, &defense_point, 
+			       &dragon[str].owl_defense_certain);
 	    if (dcode != 0) {
 	      /* If the result of owl_attack was not certain, we may
 	       * still want the result of owl_defend */
-	      dragon[ii].owl_defense_point = defense_point;
-	      dragon[ii].owl_defense_code = dcode;
+	      dragon[str].owl_defense_point = defense_point;
+	      dragon[str].owl_defense_code = dcode;
 	    }
 	  }
-	  dragon[ii].owl_status = ALIVE;
-	  dragon[ii].owl_attack_point = NO_MOVE;
-	  dragon[ii].owl_attack_code = 0;
-	  if (level >= 8
-	      && !disable_threat_computation) {
-	    if (owl_threaten_attack(ii, &attack_point, &second_attack_point)) {
-	      dragon[ii].owl_threat_status = CAN_THREATEN_ATTACK;
-	      dragon[ii].owl_attack_point = attack_point;
-	      dragon[ii].owl_second_attack_point = second_attack_point;
-	    }
-	    else
-	      dragon[ii].owl_threat_status = ALIVE;
-	  }
+	  dragon[str].owl_status = ALIVE;
+	  dragon[str].owl_attack_point = NO_MOVE;
+	  dragon[str].owl_attack_code = 0;
+	  
+	  time_report(3, "    owl reading for dragon at ", str, 1.0);
 	}
-	time_report(3, "    owl reading for dragon at ", ii, 1.0);
       }
     }
   time_report(2, "  owl reading", NO_MOVE, 1.0);
-
-  /* The dragon data is now correct at the origin of each dragon but
-   * we need to copy it to every vertex.  
-   */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int ii = POS(m, n);
-      struct dragon_data *d = &(dragon[ii]);
-      dragon[ii] = dragon[d->origin];
-    }
-
+  
   /* Compute the status to be used by the matcher. We most trust the
    * owl status, if it is available.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
-
-      if (IS_STONE(board[ii])) {
-	if (dragon[ii].owl_status != UNCHECKED)
-	  dragon[ii].matcher_status = dragon[ii].owl_status;
-	else if (dragon[ii].status == DEAD 
-		 || dragon[ii].status == CRITICAL) {
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      if (IS_STONE(board[str])) {
+	if (dragon[str].owl_status != UNCHECKED)
+	  dragon[str].matcher_status = dragon[str].owl_status;
+	else if (dragon[str].status == DEAD 
+		 || dragon[str].status == CRITICAL) {
 	  /* If a dragon has sufficient escape potential or
 	   * surrounding moyo to stop the owl code from being run, the
 	   * matcher_status should be no worse than UNKNOWN,
 	   * regardless what the static life and death analysis
 	   * guesses.
 	   */
-	  dragon[ii].matcher_status = UNKNOWN;
+	  dragon[str].matcher_status = UNKNOWN;
 	}
 	else
-	  dragon[ii].matcher_status = dragon[ii].status;
+	  dragon[str].matcher_status = dragon[str].status;
       }
     }
   time_report(2, "  compute matcher status", NO_MOVE, 1.0);
 
+  /* The dragon data is now correct at the origin of each dragon but
+   * we need to copy it to every vertex.  
+   */
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      struct dragon_data *d = &(dragon[str]);
+      dragon[str] = dragon[d->origin];
+    }
+
+  /* If the opponent's last move is a dead dragon, this is
+   * called a *thrashing dragon*. We must be careful because
+   * the opponent may be trying to trick us, so even though
+   * GNU Go thinks the stone is dead, we should consider
+   * attacking it, particularly if we are ahead.
+   */
+
+  if (last_moves[0] && dragon[last_moves[0]].matcher_status == DEAD) {
+    thrashing_dragon = dragon[last_moves[0]].origin;
+    if (save_verbose)
+      gprintf("thrashing dragon found at %1m\n", thrashing_dragon);
+  }
+
+  /* Owl threats. */
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str) 
+	&& board[str] != EMPTY 
+	&& dragon[str].origin == str) {
+      /* Some dragons can be ignored but be extra careful with big dragons. */
+      if (DRAGON2(str).escape_route > 25
+	  || DRAGON2(str).moyo > 20
+	  || (DRAGON2(str).moyo > 10
+	      && DRAGON2(str).moyo > dragon[str].size)) {
+	dragon[str].owl_threat_status = UNCHECKED;
+	dragon[str].owl_second_attack_point  = NO_MOVE;
+	dragon[str].owl_second_defense_point = NO_MOVE;
+      }
+      else {
+	int acode = dragon[str].owl_attack_code;
+	int dcode = dragon[str].owl_defense_code;
+	int defense_point, second_defense_point;
+	
+	if (level >= 8
+	    && !disable_threat_computation
+	    && (owl_threats 
+		|| (thrashing_dragon &&
+		    is_same_dragon(str, thrashing_dragon)))) {
+	  if (acode && !dcode && dragon[str].owl_attack_point != NO_MOVE) {
+	    if (owl_threaten_defense(str, &defense_point,
+				     &second_defense_point)) {
+	      dragon[str].owl_threat_status = CAN_THREATEN_DEFENSE;
+	      dragon[str].owl_defense_point = defense_point;
+	      dragon[str].owl_second_defense_point = second_defense_point;
+	    }
+	    else
+	      dragon[str].owl_threat_status = DEAD;;
+	  }
+	  else if (!acode) {
+	    int attack_point, second_attack_point;
+	    if (owl_threaten_attack(str, 
+				    &attack_point, &second_attack_point)) {
+	      dragon[str].owl_threat_status = CAN_THREATEN_ATTACK;
+	      dragon[str].owl_attack_point = attack_point;
+	      dragon[str].owl_second_attack_point = second_attack_point;
+	    }
+	    else
+	      dragon[str].owl_threat_status = ALIVE;
+	  }
+	}
+	time_report(3, "    owl threats for dragon at ", str, 1.0);
+      }
+    }
+  
+  /* Once again, the dragon data is now correct at the origin of each dragon
+   * but we need to copy it to every vertex.  
+   */
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      struct dragon_data *d = &(dragon[str]);
+      dragon[str] = dragon[d->origin];
+    }
+
+  time_report(2, "  owl threats ", NO_MOVE, 1.0);
+  
   /* Compute the safety value. */
   for (d = 0; d < number_of_dragons; d++) {
     int true_genus;
@@ -623,35 +658,32 @@ make_dragons(int color, int stop_before_owl)
     new_semeai(color);
   else 
     semeai(color);
+
   time_report(2, "  semeai module", NO_MOVE, 1.0);
-  
+
   /* The matcher_status is now correct at the origin of each dragon
    * but we need to copy it to every vertex.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
-
-      dragon[ii].matcher_status = dragon[dragon[ii].origin].matcher_status;
-    }
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str))
+      dragon[str].matcher_status = dragon[dragon[str].origin].matcher_status;
 
   /* Revise essentiality of critical worms. Specifically, a critical
    * worm which is adjacent to no enemy dragon with matcher_status
    * better than DEAD, is considered INESSENTIAL.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      ii = POS(m, n);
-      if (is_worm_origin(ii, ii)
-	  && worm[ii].attack_codes[0] != 0
-	  && worm[ii].defend_codes[0] != 0
-	  && !worm[ii].inessential) {
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      if (is_worm_origin(str, str)
+	  && worm[str].attack_codes[0] != 0
+	  && worm[str].defend_codes[0] != 0
+	  && !worm[str].inessential) {
 	int adjs[MAXCHAIN];
 	int neighbors;
 	int r;
 	int essential = 0;
 	
-	neighbors = chainlinks(ii, adjs);
+	neighbors = chainlinks(str, adjs);
 	for (r = 0; r < neighbors; r++)
 	  if (dragon[adjs[r]].matcher_status != DEAD) {
 	    essential = 1;
@@ -659,9 +691,9 @@ make_dragons(int color, int stop_before_owl)
 	  }
 
 	if (!essential) {
-	  DEBUG(DEBUG_WORMS, "Worm %1m revised to be inessential.\n", ii);
-	  worm[ii].inessential = 1;
-	  propagate_worm(ii);
+	  DEBUG(DEBUG_WORMS, "Worm %1m revised to be inessential.\n", str);
+	  worm[str].inessential = 1;
+	  propagate_worm(str);
 	}
       }
     }
@@ -693,15 +725,15 @@ initialize_supplementary_dragon_data()
   number_of_dragons = 0;
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      int ii = POS(m, n);
-      int origin = dragon[ii].origin;
+      int str = POS(m, n);
+      int origin = dragon[str].origin;
 
-      if (board[ii] == EMPTY)
+      if (board[str] == EMPTY)
 	continue;
 
       if (dragon[origin].id == -1)
 	dragon[origin].id = number_of_dragons++;
-      dragon[ii].id = dragon[origin].id;
+      dragon[str].id = dragon[origin].id;
     }
 
   /* Now number_of_dragons contains the number of dragons and we can
@@ -722,11 +754,11 @@ initialize_supplementary_dragon_data()
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      int ii = POS(m, n);
+      int str = POS(m, n);
 
-      if (IS_STONE(board[ii])
-	  && dragon[ii].origin == ii) {
-	DRAGON2(ii).origin = ii;
+      if (IS_STONE(board[str])
+	  && dragon[str].origin == str) {
+	DRAGON2(str).origin = str;
       }
     }
 

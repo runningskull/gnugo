@@ -445,7 +445,7 @@ void build_worms(void);
 void make_worms(int save_verbose);
 
 /* dragon.c */
-void make_dragons(int color, int stop_before_owl);
+void make_dragons(int color, int stop_before_owl, int save_verbose);
 void show_dragons(void);
 int dragon_status(int pos);
 int matcher_status(int pos);

@@ -727,8 +727,7 @@ do_play_aftermath(int color, struct aftermath_data *a)
   }
   
   /* Reenable worm and dragon threats and endgame patterns. */
-  if (owl_threats)
-    disable_threat_computation = 0;
+  disable_threat_computation = 0;
   disable_endgame_patterns   = 0;
 }
 

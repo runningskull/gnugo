@@ -38,6 +38,8 @@ Intersection shadow[BOARDMAX];
 int          board_ko_pos;
 int          last_moves[2];
 
+int thrashing_dragon = 0; /* Dead opponent's dragon trying to live */
+
 float        komi;
 int          white_captured;    /* number of black and white stones captured */
 int          black_captured;

@@ -575,6 +575,8 @@ extern int alternate_connections;    /* use alternate connection module */
 extern int owl_threats;              /* compute owl threats */
 extern int experimental_influence;   /* use experimental influence module */
 
+extern int thrashing_dragon; /* Dead opponent's dragon trying to live */
+
 /* Experimental reading */
 extern char *rgoal;
 extern int goallib;
@@ -678,7 +680,7 @@ struct dragon_data {
   int owl_second_attack_point;/* if attacker gets both attack points, wins   */
   int owl_defense_point;   /* vital point for defense                        */
   int owl_defense_code;    /* ko result code                                 */
-  int owl_defend_certain;  /* 0 if owl reading node limit is reached         */
+  int owl_defense_certain; /* 0 if owl reading node limit is reached         */
   int owl_second_defense_point;/* if defender gets both attack points, wins  */
   int matcher_status;  /* status used by pattern matching                    */
 };

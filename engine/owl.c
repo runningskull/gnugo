@@ -3080,7 +3080,7 @@ owl_reasons(int color)
 	       && dragon[pos].owl_status == ALIVE
 	       && board[pos] == color
 	       && !dragon[pos].owl_attack_certain
-	       && dragon[pos].owl_defend_certain
+	       && dragon[pos].owl_defense_certain
 	       && ON_BOARD(dragon[pos].owl_defense_point))
 	add_owl_uncertain_defense_move(dragon[pos].owl_defense_point, pos);
       /* The owl code found the dragon dead, but was uncertain,
