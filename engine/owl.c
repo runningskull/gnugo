@@ -3716,20 +3716,20 @@ owl_reasons(int color)
         || dragon[pos].origin != pos)
       continue;
     if (dragon[pos].status == CRITICAL
-	&& dragon[pos].owl_attack_point != NO_MOVE) {
+	&& DRAGON2(pos).owl_attack_point != NO_MOVE) {
       if (board[pos] == color) {
-	if (dragon[pos].owl_defense_point != NO_MOVE) {
-	  if (dragon[pos].owl_defense_code == LOSS) {
-	    add_loss_move(dragon[pos].owl_defense_point, pos,
-			  dragon[pos].owl_defense_kworm);
+	if (DRAGON2(pos).owl_defense_point != NO_MOVE) {
+	  if (DRAGON2(pos).owl_defense_code == LOSS) {
+	    add_loss_move(DRAGON2(pos).owl_defense_point, pos,
+			  DRAGON2(pos).owl_defense_kworm);
 	    DEBUG(DEBUG_OWL, "owl: %1m defends %1m with loss at move %d\n",
-		  dragon[pos].owl_defense_point, pos, movenum+1);
+		  DRAGON2(pos).owl_defense_point, pos, movenum+1);
 	  }
 	  else {
-	    add_owl_defense_move(dragon[pos].owl_defense_point, pos,
-				 dragon[pos].owl_defense_code);
+	    add_owl_defense_move(DRAGON2(pos).owl_defense_point, pos,
+				 DRAGON2(pos).owl_defense_code);
 	    DEBUG(DEBUG_OWL, "owl: %1m defends %1m at move %d\n",
-		  dragon[pos].owl_defense_point, pos, movenum+1);
+		  DRAGON2(pos).owl_defense_point, pos, movenum+1);
 	  }
 	}
       }
@@ -3742,7 +3742,7 @@ owl_reasons(int color)
 	   * scheme should minimize the performance hit, but of course
 	   * it's unfortunate to have the code duplication.
 	   */
-	int move = dragon[pos].owl_attack_point;
+	int move = DRAGON2(pos).owl_attack_point;
 	
 	/* No worries if we catch something big. */
 	if (dragon[pos].effective_size < 8) {
@@ -3789,87 +3789,87 @@ owl_reasons(int color)
 	}
 	
 	/* If we've reached this far, the attack is okay. */
-	if (dragon[pos].owl_attack_code == GAIN) {
-	  add_gain_move(move, pos, dragon[pos].owl_attack_kworm );
+	if (DRAGON2(pos).owl_attack_code == GAIN) {
+	  add_gain_move(move, pos, DRAGON2(pos).owl_attack_kworm );
 	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n", move, pos,
 		movenum+1);
 	}
 	else {
-	  add_owl_attack_move(move, pos, dragon[pos].owl_attack_code);
+	  add_owl_attack_move(move, pos, DRAGON2(pos).owl_attack_code);
 	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m at move %d\n", move, pos,
 		movenum+1);
 	}
       }
     }
-    else if (dragon[pos].owl_status == DEAD
-	     && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE) {
+    else if (DRAGON2(pos).owl_status == DEAD
+	     && DRAGON2(pos).owl_threat_status == CAN_THREATEN_DEFENSE) {
       if (board[pos] == color 
-	  && dragon[pos].owl_defense_point != NO_MOVE) {
-	add_owl_defense_threat_move(dragon[pos].owl_defense_point, pos, WIN);
+	  && DRAGON2(pos).owl_defense_point != NO_MOVE) {
+	add_owl_defense_threat_move(DRAGON2(pos).owl_defense_point, pos, WIN);
 	DEBUG(DEBUG_OWL, "owl: %1m threatens to defend %1m at move %d\n", 
-	      dragon[pos].owl_defense_point, pos, movenum+1);
+	      DRAGON2(pos).owl_defense_point, pos, movenum+1);
       }
       if (board[pos] == color
-	    && dragon[pos].owl_second_defense_point != NO_MOVE
-	  && is_legal(dragon[pos].owl_second_defense_point, color)) {
-	add_owl_defense_threat_move(dragon[pos].owl_second_defense_point,
+	    && DRAGON2(pos).owl_second_defense_point != NO_MOVE
+	  && is_legal(DRAGON2(pos).owl_second_defense_point, color)) {
+	add_owl_defense_threat_move(DRAGON2(pos).owl_second_defense_point,
 				    pos, WIN);
 	DEBUG(DEBUG_OWL, "owl: %1m threatens to defend %1m at move %d\n", 
-	      dragon[pos].owl_second_defense_point, pos, movenum+1);
+	      DRAGON2(pos).owl_second_defense_point, pos, movenum+1);
       }
 
       /* If the opponent can threaten to live, an attacking
        * move gets a small value to make sure it's really dead.
        */
       if (board[pos] == OTHER_COLOR(color)
-	  && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE
-	  && dragon[pos].owl_attack_point != NO_MOVE) {
-	add_owl_prevent_threat_move(dragon[pos].owl_attack_point, pos);
+	  && DRAGON2(pos).owl_threat_status == CAN_THREATEN_DEFENSE
+	  && DRAGON2(pos).owl_attack_point != NO_MOVE) {
+	add_owl_prevent_threat_move(DRAGON2(pos).owl_attack_point, pos);
 	DEBUG(DEBUG_OWL, "owl: %1m prevents a threat against %1m at move %d\n",
-	      dragon[pos].owl_attack_point, pos, movenum+1);
+	      DRAGON2(pos).owl_attack_point, pos, movenum+1);
       }
     }
-    else if (dragon[pos].owl_status == ALIVE) {
+    else if (DRAGON2(pos).owl_status == ALIVE) {
       if (board[pos] == OTHER_COLOR(color)
-	  && dragon[pos].owl_threat_status == CAN_THREATEN_ATTACK) {
-	if (dragon[pos].owl_attack_point != NO_MOVE) {
-	  add_owl_attack_threat_move(dragon[pos].owl_attack_point, pos, WIN);
+	  && DRAGON2(pos).owl_threat_status == CAN_THREATEN_ATTACK) {
+	if (DRAGON2(pos).owl_attack_point != NO_MOVE) {
+	  add_owl_attack_threat_move(DRAGON2(pos).owl_attack_point, pos, WIN);
 	  DEBUG(DEBUG_OWL, "owl: %1m threatens %1m at move %d\n",
-		dragon[pos].owl_attack_point, pos, movenum+1);
+		DRAGON2(pos).owl_attack_point, pos, movenum+1);
 	}
-	if (dragon[pos].owl_second_attack_point != NO_MOVE
-	    && is_legal(dragon[pos].owl_second_attack_point, color)) {
-	  add_owl_attack_threat_move(dragon[pos].owl_second_attack_point, pos,
+	if (DRAGON2(pos).owl_second_attack_point != NO_MOVE
+	    && is_legal(DRAGON2(pos).owl_second_attack_point, color)) {
+	  add_owl_attack_threat_move(DRAGON2(pos).owl_second_attack_point, pos,
 				     WIN);
 	  DEBUG(DEBUG_OWL, "owl: %1m threatens %1m at move %d\n",
-		dragon[pos].owl_second_attack_point, pos, movenum+1);
+		DRAGON2(pos).owl_second_attack_point, pos, movenum+1);
 	}
       }
       else if (board[pos] == OTHER_COLOR(color)
-	       && dragon[pos].owl_attack_point != NO_MOVE
-	       && dragon[pos].owl_attack_code == GAIN) {
-	add_gain_move(dragon[pos].owl_attack_point, pos,
-		      dragon[pos].owl_attack_kworm);
+	       && DRAGON2(pos).owl_attack_point != NO_MOVE
+	       && DRAGON2(pos).owl_attack_code == GAIN) {
+	add_gain_move(DRAGON2(pos).owl_attack_point, pos,
+		      DRAGON2(pos).owl_attack_kworm);
 	DEBUG(DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n", 
-	      dragon[pos].owl_attack_point, pos, movenum+1);
+	      DRAGON2(pos).owl_attack_point, pos, movenum+1);
       }
       else if (board[pos] == color
-	       && dragon[pos].owl_defense_point != NO_MOVE
-	       && dragon[pos].owl_defense_code == LOSS) {
-	add_loss_move(dragon[pos].owl_defense_point, pos,
-		      dragon[pos].owl_defense_kworm);
+	       && DRAGON2(pos).owl_defense_point != NO_MOVE
+	       && DRAGON2(pos).owl_defense_code == LOSS) {
+	add_loss_move(DRAGON2(pos).owl_defense_point, pos,
+		      DRAGON2(pos).owl_defense_kworm);
 	DEBUG(DEBUG_OWL, "owl: %1m defends %1m with loss at move %d\n",
-	      dragon[pos].owl_defense_point, pos, movenum+1);
+	      DRAGON2(pos).owl_defense_point, pos, movenum+1);
       }
       else if (board[pos] == color
-	       && dragon[pos].owl_attack_point != NO_MOVE
-	       && dragon[pos].owl_attack_code == GAIN
-	       && dragon[pos].owl_defense_code == WIN
-	       && dragon[pos].owl_defense_point != NO_MOVE) {
-	add_owl_defense_move(dragon[pos].owl_defense_point, pos,
-			     dragon[pos].owl_defense_code);
+	       && DRAGON2(pos).owl_attack_point != NO_MOVE
+	       && DRAGON2(pos).owl_attack_code == GAIN
+	       && DRAGON2(pos).owl_defense_code == WIN
+	       && DRAGON2(pos).owl_defense_point != NO_MOVE) {
+	add_owl_defense_move(DRAGON2(pos).owl_defense_point, pos,
+			     DRAGON2(pos).owl_defense_code);
 	DEBUG(DEBUG_OWL, "owl: %1m defends %1m against possible loss at move %d\n",
-	      dragon[pos].owl_defense_point, pos, movenum+1);
+	      DRAGON2(pos).owl_defense_point, pos, movenum+1);
 
       }
       /* The owl code found the friendly dragon alive, but was uncertain,
@@ -3877,13 +3877,13 @@ owl_reasons(int color)
        * be a good place to play.
        */
       else if (board[pos] == color
-	       && !dragon[pos].owl_attack_certain
-	       && dragon[pos].owl_defense_certain
-	       && ON_BOARD(dragon[pos].owl_defense_point)) {
-	add_owl_uncertain_defense_move(dragon[pos].owl_defense_point, pos);
+	       && !DRAGON2(pos).owl_attack_certain
+	       && DRAGON2(pos).owl_defense_certain
+	       && ON_BOARD(DRAGON2(pos).owl_defense_point)) {
+	add_owl_uncertain_defense_move(DRAGON2(pos).owl_defense_point, pos);
 	DEBUG(DEBUG_OWL, 
 	      "owl: %1m defends the uncertain dragon at %1m at move %d\n",
-	      dragon[pos].owl_defense_point, pos, movenum+1);
+	      DRAGON2(pos).owl_defense_point, pos, movenum+1);
       }
     }
 
@@ -3891,14 +3891,14 @@ owl_reasons(int color)
      * and an extra point of attack was found, so this might
      * be a good place to play.
      */
-    else if (dragon[pos].owl_status == DEAD
+    else if (DRAGON2(pos).owl_status == DEAD
 	     && board[pos] == OTHER_COLOR(color)
-	     && !dragon[pos].owl_attack_certain
-	     && ON_BOARD(dragon[pos].owl_attack_point)) {
-      add_owl_uncertain_defense_move(dragon[pos].owl_attack_point, pos);
+	     && !DRAGON2(pos).owl_attack_certain
+	     && ON_BOARD(DRAGON2(pos).owl_attack_point)) {
+      add_owl_uncertain_defense_move(DRAGON2(pos).owl_attack_point, pos);
       DEBUG(DEBUG_OWL,
 	    "owl: %1m might defend the uncertain dragon at %1m at move %d\n",
-	    dragon[pos].owl_attack_point, pos, movenum+1);
+	    DRAGON2(pos).owl_attack_point, pos, movenum+1);
     }
   }
 }

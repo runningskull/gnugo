@@ -211,7 +211,7 @@ void report_worm(int m, int n);
 void ascii_report_worm(char *string);
 void report_dragon(FILE *outfile, int pos);
 void ascii_report_dragon(char *string);
-struct dragon_data2 * dragon2_func(int pos);
+struct dragon_data2 *dragon2_func(int pos);
 
 /* prototypes for reorientation functions */
 
@@ -911,24 +911,8 @@ struct dragon_data {
                 /* dragon iff they have same origin.                         */
   int size;     /* size of the dragon                                        */
   float effective_size; /* stones and surrounding spaces                     */
-  int crude_status;   /* (ALIVE, DEAD, UNKNOWN, CRITICAL)                    */
-  int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
-  int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
-  int owl_attack_point;    /* vital point for attack                         */
-  int owl_attack_code;     /* ko result code                                 */
-#if 0
-  int owl_attack_points[MAX_TACTICAL_POINTS];
-  int owl_attack_codes[MAX_TACTICAL_POINTS];
-#endif
-  int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
-  int owl_second_attack_point;/* if attacker gets both attack points, wins   */
-  int owl_defense_point;   /* vital point for defense                        */
-  int owl_defense_code;    /* ko result code                                 */
-  int owl_defense_certain; /* 0 if owl reading node limit is reached         */
-  int owl_second_defense_point;/* if defender gets both attack points, wins  */
-  int status;              /* best trusted status                            */
-  int owl_attack_kworm;    /* only valid when owl_attack_code is GAIN        */
-  int owl_defense_kworm;   /* only valid when owl_defense_code is LOSS       */
+  int crude_status;     /* (ALIVE, DEAD, UNKNOWN, CRITICAL)                  */
+  int status;           /* best trusted status                               */
 };
 
 extern struct dragon_data dragon[BOARDMAX];
@@ -958,6 +942,18 @@ struct dragon_data2 {
   int semeai_margin_of_safety; /* if small, the semeai is close              */
   int surround_status;         /* Is it surrounded?                          */
   int surround_size;           /* Size of the surrounding area               */
+  int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
+  int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
+  int owl_attack_point;    /* vital point for attack                         */
+  int owl_attack_code;     /* ko result code                                 */
+  int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
+  int owl_second_attack_point;/* if attacker gets both attack points, wins   */
+  int owl_defense_point;   /* vital point for defense                        */
+  int owl_defense_code;    /* ko result code                                 */
+  int owl_defense_certain; /* 0 if owl reading node limit is reached         */
+  int owl_second_defense_point;/* if defender gets both attack points, wins  */
+  int owl_attack_kworm;    /* only valid when owl_attack_code is GAIN        */
+  int owl_defense_kworm;   /* only valid when owl_defense_code is LOSS       */
 };
 
 /* dragon2 is dynamically allocated */

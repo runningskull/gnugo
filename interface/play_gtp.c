@@ -1910,10 +1910,10 @@ gtp_dragon_status(char *s)
 	assert(dragon[pos].status == CRITICAL); 
 	/* Status critical, need to return attack and defense point as well. */
 	gtp_mprintf("critical %m %m\n", 
-		    I(dragon[pos].owl_attack_point),
-		    J(dragon[pos].owl_attack_point),
-		    I(dragon[pos].owl_defense_point),
-		    J(dragon[pos].owl_defense_point));
+		    I(DRAGON2(pos).owl_attack_point),
+		    J(DRAGON2(pos).owl_attack_point),
+		    I(DRAGON2(pos).owl_defense_point),
+		    J(DRAGON2(pos).owl_defense_point));
       }
     }
   }

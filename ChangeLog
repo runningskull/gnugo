@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl_* fields moved from struct dragon_data to struct dragon_data2
 - more trace output in do_atari_atari()
 - update_aa_goal() revised
 - new dfa builder implemented in dfa.c

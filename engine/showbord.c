@@ -255,10 +255,12 @@ static void
 showchar(int i, int j, int empty, int xo)
 {
   struct dragon_data *d;  /* dragon data at (i, j) */
+  struct dragon_data2 *d2;
   int x;
   ASSERT_ON_BOARD2(i, j);
   x = BOARD(i, j);
   d = &(dragon[POS(i, j)]);
+  d2 = &(dragon2[d->id]);
 
   if (x == EMPTY) {
     if (xo != 2)
@@ -326,7 +328,7 @@ showchar(int i, int j, int empty, int xo)
 	write_color_char(domain_colors[2], 'O');
     }
     else if (xo == 3)
-      write_color_char(colors[BOARD(i, j)][d->owl_status], w);
+      write_color_char(colors[BOARD(i, j)][d2->owl_status], w);
     else if (xo == 4)
       write_color_char(colors[BOARD(i, j)][d->status], w);
   }

@@ -347,8 +347,8 @@ find_more_owl_attack_and_defense_moves(int color)
 	/* Don't care about inessential dragons. */
 	if (DRAGON2(dd).safety == INESSENTIAL)
 	  continue;
-	
-	if (dragon[dd].owl_status != CRITICAL)
+
+	if (DRAGON2(dd).owl_status != CRITICAL)
 	  continue;
 	
 	if ((move_reasons[r].type == STRATEGIC_ATTACK_MOVE 
@@ -360,7 +360,7 @@ find_more_owl_attack_and_defense_moves(int color)
 	    && !owl_attack_move_reason_known(pos, dd)) {
 	  int kworm = NO_MOVE;
 	  int acode = owl_does_attack(pos, dd, &kworm);
-	  if (acode >= dragon[dd].owl_attack_code) {
+	  if (acode >= DRAGON2(dd).owl_attack_code) {
 	    if (acode == GAIN)
 	      add_gain_move(pos, dd, kworm);
 	    else
@@ -380,7 +380,7 @@ find_more_owl_attack_and_defense_moves(int color)
 	  int kworm = NO_MOVE;
 	  /* FIXME: Better use owl_connection_defend() for CONNECT_MOVE ? */
 	  int dcode = owl_does_defend(pos, dd, &kworm);
-	  if (dcode >= dragon[dd].owl_defense_code) {
+	  if (dcode >= DRAGON2(dd).owl_defense_code) {
 	    if (dcode == LOSS)
 	      add_loss_move(pos, dd, kworm);
 	    else
@@ -430,7 +430,7 @@ find_more_owl_attack_and_defense_moves(int color)
 	      && !owl_defense_move_reason_known(pos2, pos)) {
 	    int kworm = NO_MOVE;
 	    int dcode = owl_does_defend(pos2, pos, &kworm);
-	    if (dcode >= dragon[pos].owl_defense_code) {
+	    if (dcode >= DRAGON2(pos).owl_defense_code) {
 	      if (dcode == LOSS)
 		add_loss_move(pos2, pos, kworm);
 	      else
@@ -442,7 +442,7 @@ find_more_owl_attack_and_defense_moves(int color)
 		   && !owl_attack_move_reason_known(pos2, pos)) {
 	    int kworm = NO_MOVE;
 	    int acode = owl_does_attack(pos2, pos, &kworm);
-	    if (acode >= dragon[pos].owl_attack_code) {
+	    if (acode >= DRAGON2(pos).owl_attack_code) {
 	      if (acode == GAIN)
 		add_gain_move(pos2, pos, kworm);
 	      else
@@ -854,14 +854,14 @@ examine_move_safety(int color)
 	  if (aa == bb)
 	    continue;
 	  
-	  if (dragon[aa].owl_status == ALIVE
-	      || dragon[bb].owl_status == ALIVE) {
+	  if (DRAGON2(aa).owl_status == ALIVE
+	      || DRAGON2(bb).owl_status == ALIVE) {
 	    tactical_safety = 1;
 	    safety = 1;
 	  }
-	  else if ((dragon[aa].owl_status == UNCHECKED
+	  else if ((DRAGON2(aa).owl_status == UNCHECKED
 		    && dragon[aa].crude_status == ALIVE)
-		   || (dragon[bb].owl_status == UNCHECKED
+		   || (DRAGON2(bb).owl_status == UNCHECKED
 		       && dragon[bb].crude_status == ALIVE)) {
 	    tactical_safety = 1;
 	    safety = 1;
@@ -1458,7 +1458,7 @@ estimate_territorial_value(int pos, int color, float score)
        * ineffective. The 0.45 factor is chosen so that even in
        * combination with bad ko it still has a positive net impact.
        */
-      if (dragon[aa].owl_status == CRITICAL
+      if (DRAGON2(aa).owl_status == CRITICAL
 	  && (owl_defense_move_reason_known(pos, aa)
 	      < defense_move_reason_known(pos, aa))) {
 	this_value = 0.45 * (2 * worm[aa].effective_size);

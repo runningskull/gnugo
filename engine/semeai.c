@@ -230,11 +230,17 @@ new_semeai(int color)
 	}
 	else { /* pass == 1 */
 	  if (a_status == CRITICAL
-	      && best_result_a[k] != DEAD)
+	      && best_result_a[k] != DEAD) {
 	    add_owl_defense_move(move[k], apos, WIN);
+	    DEBUG(DEBUG_SEMEAI, "Adding owl defense move for %1m at %1m\n",
+		  apos, move[k]);
+	  }
 	  if (b_status == CRITICAL
-	      && worst_result_b[k] == DEAD)
+	      && worst_result_b[k] == DEAD) {
 	    add_owl_attack_move(move[k], bpos, WIN);
+	    DEBUG(DEBUG_SEMEAI, "Adding owl attack move for %1m at %1m\n",
+		  bpos, move[k]);
+	  }
 	}
       } /* loop over neighbor dragons */
       if (pass == 0 && semeai_found) {
@@ -339,19 +345,19 @@ analyze_semeai(int my_dragon, int your_dragon)
    * dragon owl_does_attack your dragon, add another owl attack move
    * reason.
    */
-  if (dragon[my_dragon].owl_status == CRITICAL
-      && dragon[your_dragon].owl_status == CRITICAL) {
-    if (dragon[your_dragon].owl_attack_point
-	== dragon[my_dragon].owl_defense_point)
+  if (DRAGON2(my_dragon).owl_status == CRITICAL
+      && DRAGON2(your_dragon).owl_status == CRITICAL) {
+    if (DRAGON2(your_dragon).owl_attack_point
+	== DRAGON2(my_dragon).owl_defense_point)
       return;
-    if (dragon[my_dragon].owl_defense_point != NO_MOVE) {
-      int acode = owl_does_attack(dragon[my_dragon].owl_defense_point,
+    if (DRAGON2(my_dragon).owl_defense_point != NO_MOVE) {
+      int acode = owl_does_attack(DRAGON2(my_dragon).owl_defense_point,
 				  your_dragon, NULL);
       if (acode != 0) {
-	add_owl_attack_move(dragon[my_dragon].owl_defense_point, your_dragon,
+	add_owl_attack_move(DRAGON2(my_dragon).owl_defense_point, your_dragon,
 			    acode);
 	DEBUG(DEBUG_SEMEAI, "added owl attack of %1m at %1m with code %d\n",
-	      your_dragon, dragon[my_dragon].owl_defense_point, acode);
+	      your_dragon, DRAGON2(my_dragon).owl_defense_point, acode);
 	owl_code_sufficient = 1;
       }
     }
@@ -362,21 +368,21 @@ analyze_semeai(int my_dragon, int your_dragon)
    * owl_does_defend my dragon, add another owl defense move reason
    * and possibly change the owl status of my dragon to critical.
    */
-  if ((dragon[my_dragon].owl_status == CRITICAL
-       || dragon[my_dragon].owl_status == DEAD)
-      && dragon[your_dragon].owl_status == CRITICAL) {
-    if (dragon[your_dragon].owl_attack_point
-	== dragon[my_dragon].owl_defense_point)
+  if ((DRAGON2(my_dragon).owl_status == CRITICAL
+       || DRAGON2(my_dragon).owl_status == DEAD)
+      && DRAGON2(your_dragon).owl_status == CRITICAL) {
+    if (DRAGON2(your_dragon).owl_attack_point
+	== DRAGON2(my_dragon).owl_defense_point)
       return;
-    if (dragon[your_dragon].owl_attack_point != NO_MOVE) {
-      int dcode = owl_does_defend(dragon[your_dragon].owl_attack_point,
+    if (DRAGON2(your_dragon).owl_attack_point != NO_MOVE) {
+      int dcode = owl_does_defend(DRAGON2(your_dragon).owl_attack_point,
 				  my_dragon, NULL);
       if (dcode != 0) {
-	add_owl_defense_move(dragon[your_dragon].owl_attack_point, my_dragon,
+	add_owl_defense_move(DRAGON2(your_dragon).owl_attack_point, my_dragon,
 			     dcode);
 	DEBUG(DEBUG_SEMEAI, "added owl defense of %1m at %1m with code %d\n",
-	      my_dragon, dragon[your_dragon].owl_attack_point, dcode);
-	if (dragon[my_dragon].owl_status == DEAD) {
+	      my_dragon, DRAGON2(your_dragon).owl_attack_point, dcode);
+	if (DRAGON2(my_dragon).owl_status == DEAD) {
 	  int pos;
 
 	  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -384,7 +390,7 @@ analyze_semeai(int my_dragon, int your_dragon)
 	      continue;
 	    if (board[pos] == board[my_dragon]
 		&& is_same_dragon(pos, my_dragon)) {
-	      dragon[pos].owl_status = CRITICAL;
+	      DRAGON2(pos).owl_status = CRITICAL;
 	      dragon[pos].status = CRITICAL;
 	    }
 	  }
@@ -489,14 +495,14 @@ analyze_semeai(int my_dragon, int your_dragon)
    * may have to be invested in attacking it.
    */
 
-  if (dragon[my_dragon].owl_status == CRITICAL
-      && dragon[my_dragon].owl_attack_point != NO_MOVE
-      && !liberty_of_string(dragon[my_dragon].owl_attack_point, my_dragon))
+  if (DRAGON2(my_dragon).owl_status == CRITICAL
+      && DRAGON2(my_dragon).owl_attack_point != NO_MOVE
+      && !liberty_of_string(DRAGON2(my_dragon).owl_attack_point, my_dragon))
     mylibs++;
   
-  if (dragon[your_dragon].owl_status == CRITICAL
-      && dragon[your_dragon].owl_attack_point != NO_MOVE
-      && !liberty_of_string(dragon[your_dragon].owl_attack_point, your_dragon))
+  if (DRAGON2(your_dragon).owl_status == CRITICAL
+      && DRAGON2(your_dragon).owl_attack_point != NO_MOVE
+      && !liberty_of_string(DRAGON2(your_dragon).owl_attack_point, your_dragon))
     yourlibs++;
   
   /* Now we compute the statuses which result from a
@@ -699,7 +705,7 @@ analyze_semeai(int my_dragon, int your_dragon)
    * want to take it. So the matcher status is not changed.
    */
   
-  if (dragon[my_dragon].owl_status != CRITICAL) {
+  if (DRAGON2(my_dragon).owl_status != CRITICAL) {
     if (my_status == ALIVE)
       update_status(my_dragon, ALIVE, ALIVE_IN_SEKI);
     else if (my_status == CRITICAL)
@@ -725,14 +731,14 @@ analyze_semeai(int my_dragon, int your_dragon)
 
   if (my_status == CRITICAL || your_status == CRITICAL) {
     int found_one = 0;
-    if (dragon[my_dragon].owl_status == CRITICAL
-	&& dragon[my_dragon].owl_defense_point != NO_MOVE)
-      add_appropriate_semeai_moves(dragon[my_dragon].owl_defense_point,
+    if (DRAGON2(my_dragon).owl_status == CRITICAL
+	&& DRAGON2(my_dragon).owl_defense_point != NO_MOVE)
+      add_appropriate_semeai_moves(DRAGON2(my_dragon).owl_defense_point,
 				   my_dragon, your_dragon,
 				   my_status, your_status, margin_of_safety);
-    else if (dragon[your_dragon].owl_status == CRITICAL
-	     && dragon[your_dragon].owl_attack_point != NO_MOVE)
-      add_appropriate_semeai_moves(dragon[your_dragon].owl_attack_point,
+    else if (DRAGON2(your_dragon).owl_status == CRITICAL
+	     && DRAGON2(your_dragon).owl_attack_point != NO_MOVE)
+      add_appropriate_semeai_moves(DRAGON2(your_dragon).owl_attack_point,
 				   my_dragon, your_dragon,
 				   my_status, your_status, margin_of_safety);
     else if (commonlibs > 1) {

@@ -610,13 +610,13 @@ backfill_helper(int apos, int bpos, int cpos)
 int
 owl_threatens_attack(int apos, int bpos)
 {
-  if (dragon[bpos].owl_status == CRITICAL
-      && dragon[bpos].owl_attack_point == apos)
+  if (DRAGON2(bpos).owl_status == CRITICAL
+      && DRAGON2(bpos).owl_attack_point == apos)
     return 1;
   
-  if (dragon[bpos].owl_threat_status == CAN_THREATEN_ATTACK)
-    if (dragon[bpos].owl_attack_point == apos
-	|| dragon[bpos].owl_second_attack_point == apos)
+  if (DRAGON2(bpos).owl_threat_status == CAN_THREATEN_ATTACK)
+    if (DRAGON2(bpos).owl_attack_point == apos
+	|| DRAGON2(bpos).owl_second_attack_point == apos)
       return 1;
   
   return 0;

@@ -352,9 +352,9 @@ make_dragons(int color, int stop_before_owl)
 	    			DRAGON2(str).moyo_territorial_value,
 				DRAGON2(str).escape_route - 10)
 	  < 0.00001 + gg_max(0.12, 0.32 - 0.01*dragon[str].effective_size)) {
-	dragon[str].owl_status = UNCHECKED;
-	dragon[str].owl_attack_point  = NO_MOVE;
-	dragon[str].owl_defense_point = NO_MOVE;
+	DRAGON2(str).owl_status = UNCHECKED;
+	DRAGON2(str).owl_attack_point  = NO_MOVE;
+	DRAGON2(str).owl_defense_point = NO_MOVE;
       }
       else {
 	int acode = 0;
@@ -362,21 +362,21 @@ make_dragons(int color, int stop_before_owl)
 	int kworm = NO_MOVE;
 	start_timer(3);
 	acode = owl_attack(str, &attack_point, 
-			   &dragon[str].owl_attack_certain, &kworm);
+			   &DRAGON2(str).owl_attack_certain, &kworm);
 	if (acode != 0) {
-	  dragon[str].owl_attack_point = attack_point;
-	  dragon[str].owl_attack_code = acode;
-	  dragon[str].owl_attack_kworm = kworm;
+	  DRAGON2(str).owl_attack_point = attack_point;
+	  DRAGON2(str).owl_attack_code = acode;
+	  DRAGON2(str).owl_attack_kworm = kworm;
 	  if (attack_point != NO_MOVE) {
 	    kworm = NO_MOVE;
 	    dcode = owl_defend(str, &defense_point,
-			       &dragon[str].owl_defense_certain, &kworm);
+			       &DRAGON2(str).owl_defense_certain, &kworm);
 	    if (dcode != 0) {
 	      if (defense_point != NO_MOVE) {
-		dragon[str].owl_status = acode==GAIN ? ALIVE : CRITICAL;
-		dragon[str].owl_defense_point = defense_point;
-		dragon[str].owl_defense_code = dcode;
-		dragon[str].owl_defense_kworm = kworm;
+		DRAGON2(str).owl_status = acode==GAIN ? ALIVE : CRITICAL;
+		DRAGON2(str).owl_defense_point = defense_point;
+		DRAGON2(str).owl_defense_code = dcode;
+		DRAGON2(str).owl_defense_kworm = kworm;
 	      }
 	      else {
 		/* Due to irregularities in the owl code, it may
@@ -387,45 +387,45 @@ make_dragons(int color, int stop_before_owl)
 		 * propose. Having the status right is important e.g.
 		 * for connection moves to be properly valued.
 		 */
-		dragon[str].owl_status = acode==GAIN ? ALIVE : CRITICAL;
+		DRAGON2(str).owl_status = acode==GAIN ? ALIVE : CRITICAL;
 		DEBUG(DEBUG_OWL_PERFORMANCE,
 		      "Inconsistent owl attack and defense results for %1m.\n", 
 		      str);
 		/* Let's see whether the attacking move might be the right
 		 * defense:
 		 */
-		dcode = owl_does_defend(dragon[str].owl_attack_point,
+		dcode = owl_does_defend(DRAGON2(str).owl_attack_point,
 					str, NULL);
 		if (dcode != 0) {
-		  dragon[str].owl_defense_point
-		    = dragon[str].owl_attack_point;
-		  dragon[str].owl_defense_code = dcode;
+		  DRAGON2(str).owl_defense_point
+		    = DRAGON2(str).owl_attack_point;
+		  DRAGON2(str).owl_defense_code = dcode;
 		}
 	      }
 	    }
 	  }
 	  if (dcode == 0) {
-	    dragon[str].owl_status = DEAD; 
-	    dragon[str].owl_defense_point = NO_MOVE;
-	    dragon[str].owl_defense_code = 0;
+	    DRAGON2(str).owl_status = DEAD; 
+	    DRAGON2(str).owl_defense_point = NO_MOVE;
+	    DRAGON2(str).owl_defense_code = 0;
 	  }
 	}
 	else {
-	  if (!dragon[str].owl_attack_certain) {
+	  if (!DRAGON2(str).owl_attack_certain) {
 	    kworm = NO_MOVE;
 	    dcode = owl_defend(str, &defense_point, 
-			       &dragon[str].owl_defense_certain, &kworm);
+			       &DRAGON2(str).owl_defense_certain, &kworm);
 	    if (dcode != 0) {
 	      /* If the result of owl_attack was not certain, we may
 	       * still want the result of owl_defend */
-	      dragon[str].owl_defense_point = defense_point;
-	      dragon[str].owl_defense_code = dcode;
-	      dragon[str].owl_defense_kworm = kworm;
+	      DRAGON2(str).owl_defense_point = defense_point;
+	      DRAGON2(str).owl_defense_code = dcode;
+	      DRAGON2(str).owl_defense_kworm = kworm;
 	    }
 	  }
-	  dragon[str].owl_status = ALIVE;
-	  dragon[str].owl_attack_point = NO_MOVE;
-	  dragon[str].owl_attack_code = 0;
+	  DRAGON2(str).owl_status = ALIVE;
+	  DRAGON2(str).owl_attack_point = NO_MOVE;
+	  DRAGON2(str).owl_attack_code = 0;
 	  
 	  time_report(3, "    owl reading for dragon at ", str, 1.0);
 	}
@@ -439,8 +439,8 @@ make_dragons(int color, int stop_before_owl)
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
       if (IS_STONE(board[str])) {
-	if (dragon[str].owl_status != UNCHECKED)
-	  dragon[str].status = dragon[str].owl_status;
+	if (DRAGON2(str).owl_status != UNCHECKED)
+	  dragon[str].status = DRAGON2(str).owl_status;
 	else if (dragon[str].crude_status == DEAD 
 		 || dragon[str].crude_status == CRITICAL) {
 	  /* If a dragon has sufficient escape potential or
@@ -483,39 +483,39 @@ make_dragons(int color, int stop_before_owl)
 	    			DRAGON2(str).moyo_territorial_value,
 				DRAGON2(str).escape_route - 10)
 	  < 0.00001 + gg_max(0.12, 0.32 - 0.01*dragon[str].effective_size)) {
-	dragon[str].owl_threat_status = UNCHECKED;
-	dragon[str].owl_second_attack_point  = NO_MOVE;
-	dragon[str].owl_second_defense_point = NO_MOVE;
+	DRAGON2(str).owl_threat_status = UNCHECKED;
+	DRAGON2(str).owl_second_attack_point  = NO_MOVE;
+	DRAGON2(str).owl_second_defense_point = NO_MOVE;
       }
       else {
-	int acode = dragon[str].owl_attack_code;
-	int dcode = dragon[str].owl_defense_code;
+	int acode = DRAGON2(str).owl_attack_code;
+	int dcode = DRAGON2(str).owl_defense_code;
 	int defense_point, second_defense_point;
 	
 	if (level >= 8
 	    && !disable_threat_computation
 	    && (owl_threats 
 		|| thrashing_stone[str])) {
-	  if (acode && !dcode && dragon[str].owl_attack_point != NO_MOVE) {
+	  if (acode && !dcode && DRAGON2(str).owl_attack_point != NO_MOVE) {
 	    if (owl_threaten_defense(str, &defense_point,
 				     &second_defense_point)) {
-	      dragon[str].owl_threat_status = CAN_THREATEN_DEFENSE;
-	      dragon[str].owl_defense_point = defense_point;
-	      dragon[str].owl_second_defense_point = second_defense_point;
+	      DRAGON2(str).owl_threat_status = CAN_THREATEN_DEFENSE;
+	      DRAGON2(str).owl_defense_point = defense_point;
+	      DRAGON2(str).owl_second_defense_point = second_defense_point;
 	    }
 	    else
-	      dragon[str].owl_threat_status = DEAD;
+	      DRAGON2(str).owl_threat_status = DEAD;
 	  }
 	  else if (!acode) {
 	    int attack_point, second_attack_point;
 	    if (owl_threaten_attack(str, 
 				    &attack_point, &second_attack_point)) {
-	      dragon[str].owl_threat_status = CAN_THREATEN_ATTACK;
-	      dragon[str].owl_attack_point = attack_point;
-	      dragon[str].owl_second_attack_point = second_attack_point;
+	      DRAGON2(str).owl_threat_status = CAN_THREATEN_ATTACK;
+	      DRAGON2(str).owl_attack_point = attack_point;
+	      DRAGON2(str).owl_second_attack_point = second_attack_point;
 	    }
 	    else
-	      dragon[str].owl_threat_status = ALIVE;
+	      DRAGON2(str).owl_threat_status = ALIVE;
 	  }
 	}
 	time_report(3, "    owl threats for dragon at ", str, 1.0);
@@ -552,9 +552,9 @@ make_dragons(int color, int stop_before_owl)
       dragon2[d].safety = TACTICALLY_DEAD;
     else if (0) /* Seki is detected by the call to semeai() below. */
       dragon2[d].safety = ALIVE_IN_SEKI;
-    else if (dragon[origin].owl_status == DEAD)
+    else if (dragon2[d].owl_status == DEAD)
       dragon2[d].safety = DEAD;
-    else if (dragon[origin].owl_status == CRITICAL)
+    else if (dragon2[d].owl_status == CRITICAL)
       dragon2[d].safety = CRITICAL;
     else if (dragon_invincible(origin))
       dragon2[d].safety = INVINCIBLE;
@@ -700,18 +700,8 @@ initialize_dragon_data(void)
       dragon[str].effective_size     = worm[str].effective_size;
       dragon[str].color              = worm[str].color;
       dragon[str].origin             = worm[str].origin;
-      dragon[str].owl_attack_point   = NO_MOVE;
-      dragon[str].owl_attack_code    = 0;
-      dragon[str].owl_attack_certain = 1;
-      dragon[str].owl_defense_point  = NO_MOVE;
-      dragon[str].owl_defense_code   = 0;
-      dragon[str].owl_defense_certain = 1;
-      dragon[str].owl_status         = UNCHECKED;
       dragon[str].crude_status       = UNKNOWN;
       dragon[str].status     = UNKNOWN;
-      dragon[str].owl_threat_status  = UNCHECKED;
-      dragon[str].owl_second_attack_point  = NO_MOVE;
-      dragon[str].owl_second_defense_point = NO_MOVE;
       half_eye[str].type             =  0;
       half_eye[str].value            =  10.0; /* Something big. */
       
@@ -776,17 +766,27 @@ initialize_supplementary_dragon_data(void)
   
   /* Initialize the rest of the dragon2 data. */
   for (d = 0; d < number_of_dragons; d++) {
-    dragon2[d].neighbors               = 0;
-    dragon2[d].hostile_neighbors       = 0;
-    dragon2[d].moyo_size	       = -1;
-    dragon2[d].moyo_territorial_value  = 0.0;
-    dragon2[d].safety                  = -1;
-    dragon2[d].escape_route            = 0;
-    dragon2[d].heye                    = NO_MOVE;
-    dragon2[d].lunch                   = NO_MOVE;
-    dragon2[d].semeai                  = 0;
-    dragon2[d].semeai_margin_of_safety = -1;
-    dragon2[d].surround_status         = 0;
+    dragon2[d].neighbors                = 0;
+    dragon2[d].hostile_neighbors        = 0;
+    dragon2[d].moyo_size	        = -1;
+    dragon2[d].moyo_territorial_value   = 0.0;
+    dragon2[d].safety                   = -1;
+    dragon2[d].escape_route             = 0;
+    dragon2[d].heye                     = NO_MOVE;
+    dragon2[d].lunch                    = NO_MOVE;
+    dragon2[d].semeai                   = 0;
+    dragon2[d].semeai_margin_of_safety  = -1;
+    dragon2[d].surround_status          = 0;
+    dragon2[d].owl_attack_point         = NO_MOVE;
+    dragon2[d].owl_attack_code          = 0;
+    dragon2[d].owl_attack_certain       = 1;
+    dragon2[d].owl_defense_point        = NO_MOVE;
+    dragon2[d].owl_defense_code         = 0;
+    dragon2[d].owl_defense_certain      = 1;
+    dragon2[d].owl_status               = UNCHECKED;
+    dragon2[d].owl_threat_status        = UNCHECKED;
+    dragon2[d].owl_second_attack_point  = NO_MOVE;
+    dragon2[d].owl_second_defense_point = NO_MOVE;
     set_eyevalue(&dragon2[d].genus, 0, 0, 0, 0);
   }
   
@@ -1546,12 +1546,12 @@ show_dragons(void)
 	      safety_names[d2->safety],
 	      d2->weakness_pre_owl,
 	      d2->weakness);
-      gprintf(", owl status %s\n", snames[dd->owl_status]);
-      if (dd->owl_status == CRITICAL) {
+      gprintf(", owl status %s\n", snames[d2->owl_status]);
+      if (d2->owl_status == CRITICAL) {
 	gprintf("... owl attackable at %1m, code %d\n",
-		dd->owl_attack_point, dd->owl_attack_code);
+		d2->owl_attack_point, d2->owl_attack_code);
 	gprintf("... owl defendable at %1m, code %d\n",
-		dd->owl_defense_point, dd->owl_defense_code);
+		d2->owl_defense_point, d2->owl_defense_code);
       }
       gprintf("... neighbors");
       for (k = 0; k < d2->neighbors; k++) {
@@ -2181,11 +2181,11 @@ compute_dragon_weakness_value(int d)
 				   (float) dragon2[d].escape_route);
 
   /* Now corrections due to (uncertain) owl results resp. owl threats. */
-  if (!dragon[origin].owl_attack_certain)
+  if (!dragon2[d].owl_attack_certain)
     weakness += gg_min(0.25 * (1.0 - weakness), 0.25 * weakness);
-  if (!dragon[origin].owl_defense_certain)
+  if (!dragon2[d].owl_defense_certain)
     weakness += gg_min(0.25 * (1.0 - weakness), 0.25 * weakness);
-  if (dragon[origin].owl_threat_status == CAN_THREATEN_ATTACK)
+  if (dragon2[d].owl_threat_status == CAN_THREATEN_ATTACK)
     weakness += 0.15 * (1.0 - weakness);
 
   if (weakness < 0.0)
@@ -2370,21 +2370,21 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile, "crude status            %s\n",
 	   status_to_string(d->crude_status));
   gfprintf(outfile, "owl_status              %s\n",
-	   status_to_string(d->owl_status));
+	   status_to_string(d2->owl_status));
   gfprintf(outfile, "status                  %s\n",
 	   status_to_string(d->status));
   gfprintf(outfile, "owl_threat_status       %s\n",
-	   status_to_string(d->owl_threat_status));
-  gfprintf(outfile, "owl_attack              %1m\n", d->owl_attack_point);
+	   status_to_string(d2->owl_threat_status));
+  gfprintf(outfile, "owl_attack              %1m\n", d2->owl_attack_point);
   gfprintf(outfile, "owl_attack_certain      %s\n",
-	   (d->owl_attack_certain) ? "YES" : "NO");
+	   (d2->owl_attack_certain) ? "YES" : "NO");
   gfprintf(outfile, "owl_2nd_attack          %1m\n",
-	   d->owl_second_attack_point);
-  gfprintf(outfile, "owl_defend              %1m\n", d->owl_defense_point);
+	   d2->owl_second_attack_point);
+  gfprintf(outfile, "owl_defend              %1m\n", d2->owl_defense_point);
   gfprintf(outfile, "owl_defense_certain     %s\n",
-	   (d->owl_defense_certain) ? "YES" : "NO");
+	   (d2->owl_defense_certain) ? "YES" : "NO");
   gfprintf(outfile, "owl_2nd_defend          %1m\n",
-           d->owl_second_defense_point);
+           d2->owl_second_defense_point);
   gfprintf(outfile, "semeai                  %d\n", d2->semeai);
   gfprintf(outfile, "semeai_margin_of_safety %d\n",
 	   d2->semeai_margin_of_safety);
