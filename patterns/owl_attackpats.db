@@ -3207,6 +3207,25 @@ cXd
 ;|| (!attack(b) && olib(c)>=3)
 
 
+Pattern A814
+# gf New pattern. (3.7.2)
+# See ld_owl:321.
+
+X..        try to squeeze eyespace
+OX*
+?X.
+---
+
+:8,s,value(35)
+
+X..
+OB*
+?Ba
+---
+
+;lib(B) == 3 && owl_big_eyespace(*) && olib(*)>2 && olib(a)>1
+
+
 #########################################################
 #                                                       #
 #                Nakade patterns                        #
