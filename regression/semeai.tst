@@ -197,7 +197,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 # See also reading:166
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 36 owl_analyze_semeai S9 R11
-#? [ALIVE DEAD R12]
+#? [ALIVE DEAD R12]*
 
 ########### end of semeai tests #################
 

@@ -4,7 +4,7 @@ loadsgf golois/Aya991113-1.sgf
 
 loadsgf golois/Basique990715-1.sgf
 2 disconnect K17 G17
-#? [0]*
+#? [0]
 
 loadsgf golois/Basique990715-1.sgf
 3 disconnect D3 C5
@@ -62,7 +62,7 @@ loadsgf golois/Connecter990501-1.sgf
 
 loadsgf golois/Connecter990502-1.sgf
 16 connect G7 D6
-#? [1 D5]*
+#? [1 D5]
 
 loadsgf golois/connecter990614-1.sgf
 17 disconnect N10 N12
@@ -100,7 +100,7 @@ loadsgf golois/Connecter990628-2.sgf
 
 loadsgf golois/Connecter990628-2.sgf
 25 connect E2 J3
-#? [1 G1]*
+#? [1 G1]
 
 # Added D3. /gf
 loadsgf golois/Connecter990630-1.sgf
@@ -118,7 +118,7 @@ loadsgf golois/Goemate990902-3.sgf
 
 loadsgf golois/Goemate990902-7.sgf
 29 disconnect P8 Q11
-#? [0]*
+#? [0]
 
 loadsgf golois/Goemate990903-1.sgf
 30 disconnect J9 H12
@@ -145,11 +145,11 @@ loadsgf golois/Goemate990906-1.sgf
 
 loadsgf golois/Goemate990906-2.sgf
 35 disconnect N14 M15
-#? [0]*
+#? [0]
 
 loadsgf golois/Goemate990908-2.sgf
 36 disconnect C14 C17
-#? [0]*
+#? [0]
 
 loadsgf golois/Goemate990908-2.sgf
 37 disconnect F3 C3
@@ -239,7 +239,7 @@ loadsgf golois/Handtalk980822-3.sgf
 # if it does, then C6 is also okay. Added C6. /gf
 loadsgf golois/Handtalk980828-2.sgf
 57 disconnect C4 D7
-#? [1 (D5|C6)]
+#? [1 (D5|C6)]*
 
 # Added B13, C13, and C11. /gf
 loadsgf golois/Handtalk980828-3.sgf
@@ -295,7 +295,7 @@ loadsgf golois/Indigo-Golois-991106-2.sgf
 
 loadsgf golois/Indigo-Golois-991106-3.sgf
 70 disconnect P3 M3
-#? [0]*
+#? [0]
 
 # gf Added Q3. /gf
 loadsgf golois/Indigo-Golois-991106-3.sgf
@@ -330,7 +330,7 @@ loadsgf golois/Neurogo97-1.sgf
 
 loadsgf golois/Neurogo97-3.sgf
 78 disconnect E3 C3
-#? [0]*
+#? [0]
 
 loadsgf golois/test.sgf
 79 connect H7 G8
@@ -342,4 +342,4 @@ loadsgf golois/test_prendre.sgf
 
 loadsgf golois/Vivre990710-1.sgf
 81 disconnect S12 R11
-#? [0]*
+#? [0]

@@ -50,6 +50,7 @@
 
 #define MAX_MOVES 3           /* maximum number of branches at each node */
 #define MAX_SEMEAI_MOVES 2    /* semeai branch factor--must be <= MAX_MOVES */
+#define MAX_SEMEAI_DEPTH 100  /* Don't read below this depth */
 #define MAX_LUNCHES 10
 #define MAX_WORMS 10          /* maximum number of worms in a dragon to be cataloged */
 
@@ -784,6 +785,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 
     if (mpos != NO_MOVE 
 	&& count_variations < semeai_variations
+	&& stackp < MAX_SEMEAI_DEPTH
 	&& semeai_trymove(mpos, color, moves[k].name, apos, bpos,
 			  owl_phase, moves[k].value)) {
       if (0)

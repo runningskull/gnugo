@@ -219,7 +219,7 @@ loadsgf games/trevor/trevor_22.sgf 23
 # F2 is not really sente, nor useful if it were!
 loadsgf games/trevor/trevor_23.sgf 27
 230 gg_genmove black
-#? [C2|B2|C4]*
+#? [C2|B2|C4]
 
 
 # Connect the dragons!  One eye is not enough, anyway.
@@ -238,7 +238,7 @@ loadsgf games/trevor/trevor_25.sgf 31
 # G1 is another gift to white.
 loadsgf games/trevor/trevor_25.sgf 33
 251 gg_genmove black
-#? [!G1]*
+#? [!G1]
 
 
 # Should connect further back, at least, but of course
@@ -341,7 +341,7 @@ loadsgf games/trevor/trevor_32.sgf
 #SEE_ALSO=owl.tst@226
 loadsgf games/trevor/trevor_34.sgf
 340 owl_defend J10
-#? [1 P9]*
+#? [1 P9]
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Very simple Ko missed here.
@@ -386,7 +386,7 @@ loadsgf games/trevor/trevor_38.sgf 39
 #SEVERITY=1
 loadsgf games/trevor/trevor_38.sgf 41
 382 gg_genmove black
-#? [E8]
+#? [E8]*
 
 
 #CATEGORY=PATTERN_TUNING
@@ -592,7 +592,7 @@ loadsgf games/trevor/trevor_69.sgf
 #SEVERITY=10
 loadsgf games/trevor/trevor_70.sgf
 700 owl_attack H1
-#? [1 G5|J5|H5|G2]*
+#? [1 G5|J5|H5|G2]
 
 #CATEGORY=OWL_ESCAPE
 #DESCRIPTION=black gets the killing move, creating a missed cutting point.
@@ -609,7 +609,7 @@ loadsgf games/trevor/trevor_73.sgf
 
 loadsgf games/trevor/trevor_74.sgf
 740 owl_attack B4
-#? [1 A1]
+#? [1 A1]*
 
 loadsgf games/trevor/trevor_75.sgf
 750 disconnect O9 O7
@@ -659,7 +659,7 @@ loadsgf games/trevor/auto/c30.sgf 62
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 1060 owl_does_defend J4 E4
-#? [1]*
+#? [1]
 
 
 loadsgf games/trevor/trevor_20.sgf  14  

@@ -234,7 +234,7 @@ loadsgf games/strategy25.sgf 67
 #SEVERITY=
 loadsgf games/strategy25.sgf 75
 93 gg_genmove black
-#? [D11]*
+#? [D11]
 
 # A2 is the best move to live in the corner. B3 and A4 also live but
 # the two B6 stones must then be sacrificed. C5 only lives with ko. B5

@@ -95,7 +95,7 @@ loadsgf games/trevor/auto/d02.sgf 78
 
 loadsgf games/trevor/auto/d02.sgf 142
 260 gg_genmove white
-#? [Q2]*
+#? [Q2]
 
 
 loadsgf games/trevor/auto/d02.sgf 142
@@ -251,7 +251,7 @@ loadsgf games/trevor/auto/d12.sgf 66
 
 loadsgf games/trevor/auto/d24.sgf 24
 520 gg_genmove white
-#? [D15]
+#? [D15]*
 
 
 loadsgf games/trevor/auto/d24.sgf 52
@@ -271,7 +271,7 @@ loadsgf games/trevor/auto/d24.sgf 80
 
 loadsgf games/trevor/auto/d24.sgf 98
 560 gg_genmove white
-#? [E18]
+#? [E18]*
 
 
 loadsgf games/trevor/auto/d24.sgf 174
@@ -406,7 +406,7 @@ loadsgf games/trevor/auto/d32.sgf 240
 
 loadsgf games/trevor/auto/d32.sgf 244
 800 gg_genmove white
-#? [Q9]*
+#? [Q9]
 
 
 
@@ -445,7 +445,7 @@ loadsgf games/trevor/auto/d33.sgf 210
 
 loadsgf games/trevor/auto/d39.sgf 24
 860 gg_genmove white
-#? [Q5]
+#? [Q5]*
 
 
 loadsgf games/trevor/auto/d39.sgf 26
@@ -487,12 +487,12 @@ loadsgf games/trevor/auto/d39.sgf 196
 
 loadsgf games/trevor/auto/d39.sgf 198
 940 gg_genmove white
-#? [!R19]*
+#? [!R19]
 
 
 loadsgf games/trevor/auto/d39.sgf 204
 950 gg_genmove white
-#? [R9]
+#? [R9]*
 
 
 loadsgf games/trevor/auto/d39.sgf 208

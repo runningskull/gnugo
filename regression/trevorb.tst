@@ -190,7 +190,7 @@ loadsgf games/trevor/auto/b25.sgf 74
 #Other moves possible.
 loadsgf games/trevor/auto/b27.sgf 24
 370 gg_genmove white
-#? [L7|B10]*
+#? [L7|B10]
 
 
 loadsgf games/trevor/auto/b27.sgf 72
@@ -373,7 +373,7 @@ loadsgf games/trevor/auto/b56.sgf 78
 
 loadsgf games/trevor/auto/b58.sgf 16
 630 gg_genmove white
-#? [!C5]*
+#? [!C5]
 
 
 

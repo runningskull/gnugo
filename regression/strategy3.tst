@@ -39,7 +39,7 @@ loadsgf games/strategy27.sgf 190
 
 loadsgf games/strategy27.sgf 208
 108 gg_genmove white
-#? [C15]
+#? [C15]*
 
 #CATEGORY=SEMEAI
 #DESCRIPTION=
@@ -68,7 +68,7 @@ loadsgf games/me.sgf 150
 
 loadsgf games/poka.sgf 42
 114 gg_genmove white
-#? [D7]*
+#? [D7]
 
 loadsgf games/poka.sgf 52
 115 gg_genmove white

@@ -225,7 +225,7 @@ loadsgf games/nicklas/nicklas14.sgf 55
 # Semeai problem
 loadsgf games/nicklas/nicklas14.sgf 57
 1406 gg_genmove black
-#? [B6]*
+#? [B6]
 
 loadsgf games/nicklas/nicklas14.sgf 61
 1408 dragon_status A8
@@ -298,7 +298,7 @@ loadsgf games/nicklas/nicklas16.sgf 64
 #The problem with D5 is the same as in nicklas2:1802
 loadsgf games/nicklas/nicklas18.sgf 15
 1801 gg_genmove black
-#? [D2]*
+#? [D2]
 
 loadsgf games/nicklas/nicklas19.sgf 34
 1901 gg_genmove black

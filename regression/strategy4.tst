@@ -169,7 +169,7 @@ loadsgf games/xxlin.sgf 20
 
 loadsgf games/xxlin.sgf 38
 181 gg_genmove black
-#? [F3]*
+#? [F3]
 
 loadsgf games/xxlin.sgf 48
 182 gg_genmove black

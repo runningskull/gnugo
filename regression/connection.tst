@@ -93,9 +93,9 @@ loadsgf games/incident169.sgf 110
 
 loadsgf games/nicklas/nicklas16.sgf 38
 26 connect C3 C6
-#? [1 B4]*
+#? [1 B4]
 27 connect C3 B7
-#? [1 B4]*
+#? [1 B4]
 
 loadsgf games/golife.sgf 38
 28 disconnect H5 H7
@@ -107,13 +107,13 @@ loadsgf games/incident240.sgf 69
 
 loadsgf games/strategy13.sgf
 30 connect R13 S8
-#? [1 (Q11|T10|T9)]*
+#? [1 (Q11|T10|T9)]
 31 disconnect R13 S8
-#? [1 Q9]*
+#? [1 Q9]
 
 loadsgf games/incident240.sgf 69
 32 disconnect B12 E9
-#? [1 D9]*
+#? [1 D9]
 
 # White can't cut unconditionally but black has to make the first ko threat.
 loadsgf games/trevor/auto/a035.sgf 28
@@ -125,15 +125,15 @@ loadsgf games/connection3.sgf
 34 disconnect B11 A9
 #? [0]
 35 disconnect L12 H13
-#? [0]*
+#? [0]
 36 connect M3 N7
-#? [1 (N4|M4|N5|N6)]*
+#? [1 (N4|M4|N5|N6)]
 37 disconnect M3 N7
-#? [1 (N4|M4|N5|M5|M6|N6)]*
+#? [1 (N4|M4|N5|M5|M6|N6)]
 38 connect B2 G1
-#? [1 E1]*
+#? [1 E1]
 39 disconnect B2 G1
-#? [1 (F2|F1|E2|E1|D2|D1|C2|C1|G2|H1|B1)]*
+#? [1 (F2|F1|E2|E1|D2|D1|C2|C1|G2|H1|B1)]
 
 # More monkey jumps and relatives.
 loadsgf games/connection4.sgf
@@ -142,21 +142,21 @@ loadsgf games/connection4.sgf
 41 disconnect B11 A8
 #? [1 (B9|A10|B10|B8|A7)]
 42 connect L12 H13
-#? [1 K12]*
+#? [1 K12]
 43 disconnect L12 H13
 #? [1 (K12|J12|J13|H12|G13)]
 44 connect M3 N7
 #? [0]
 45 disconnect M3 N7
-#? [1 (N4|M4|N5|M5|M6|M7|N8|M8)]*
+#? [1 (N4|M4|N5|M5|M6|M7|N8|M8)]
 46 connect B2 G1
-#? [1 (B1|C1|C2|D2|E1|F1)]*
+#? [1 (B1|C1|C2|D2|E1|F1)]
 47 disconnect B2 G1
-#? [1 (C1|E1)]*
+#? [1 (C1|E1)]
 
 loadsgf games/trevor/auto/a038.sgf 34
 48 disconnect C3 G3
-#? [1 D2|F2]*
+#? [1 D2|F2]
 
 loadsgf games/trevor/trevor_15.sgf 
 49 disconnect D7 G6
@@ -168,11 +168,11 @@ loadsgf games/trevor/auto/a014.sgf 16
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 108
 51 connect R14 Q16
-#? [1 Q15]*
+#? [1 Q15]
 52 connect R14 O15
 #? [1 Q15]*
 53 connect S7 S4
-#? [1 T5]*
+#? [1 T5]
 
 # D8 might also disconnect.
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 164
@@ -195,7 +195,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
 59 disconnect D18 E15
 #? [1 D15|F15|B15|D19|E19]
 60 connect D14 B18
-#? [1 D15|F15|B15|D19|E19]*
+#? [1 D15|F15|B15|D19|E19]
 61 connect O9 Q9
 #? [1 D15|F15|B15|D19|E19]*
 
@@ -205,7 +205,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 238
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
 63 connect N13 N17
-#? [1 N16|O17|P16]*
+#? [1 N16|O17|P16]
 
 loadsgf games/trevor/auto/b72.sgf 30
 64 disconnect G11 K11
@@ -229,11 +229,11 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
 71 connect D3 G3
 #? [1 (F3|H3|E3|G2|F2|H2|E2)]
 72 disconnect D3 G3
-#? [1 F3]*
+#? [1 F3]
 73 connect D3 J2
-#? [1 (F3|H3|E3|G2|F2|H2|E2)]*
+#? [1 (F3|H3|E3|G2|F2|H2|E2)]
 74 disconnect D3 J2
-#? [1 F3]*
+#? [1 F3]
 75 same_dragon D3 G3
 #? [0]*
 

@@ -654,13 +654,13 @@ loadsgf games/reading36.sgf 23
 # See also semeai:36
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 166 attack R11
-#? [1 R12]
+#? [1 R12]*
 
 # Gets it right if F5 is filled, so the issue is finding the
 # backfilling move.
 loadsgf games/doubleko.sgf
 167 attack J1
-#? [1 F5]
+#? [1 F5]*
 
 
 # Report number of nodes visited by the tactical reading

@@ -68,7 +68,7 @@ loadsgf games/blunder11.sgf 42
 
 loadsgf games/blunder11.sgf 44
 15 gg_genmove black
-#? [H3]*
+#? [H3]
 
 loadsgf games/blunder12.sgf 252
 16 gg_genmove white
