@@ -559,7 +559,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	|| !safe_move(move, color)
 	|| (DRAGON2(bb).safety != INVINCIBLE
 	    && DRAGON2(bb).safety != STRONGLY_ALIVE
-	    && owl_does_defend(move, bb) != WIN)
+	    && owl_does_defend(move, bb, NULL) != WIN)
 	|| (!confirm_safety(move, color, NULL, NULL))) {
       score[move] = 0;
     }
@@ -596,7 +596,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	    popgo();
 	    for (r = 0; r < neighbors && move_ok; r++) {
 	      if (dragon[adjs[r]].status == DEAD
-		  && !owl_does_attack(move, adjs[r])) {
+		  && !owl_does_attack(move, adjs[r], NULL)) {
 		DEBUG(DEBUG_AFTERMATH,
 		      "Blunder: %1m becomes more alive after %1m\n",
 		      adjs[r], move);
@@ -721,11 +721,11 @@ aftermath_genmove(int *aftermath_move, int color,
     /* Consult the owl code to determine whether the considered move
      * really is effective. Blunders should be detected here.
      */
-    if (owl_does_attack(move, target) == WIN) {
+    if (owl_does_attack(move, target, NULL) == WIN) {
       /* If we have an adjacent own dragon, which is not inessential,
        * verify that it remains safe.
        */
-      if (cc != NO_MOVE && !owl_does_defend(move, cc))
+      if (cc != NO_MOVE && !owl_does_defend(move, cc, NULL))
 	continue;
 
       /* If we don't allow self atari, also call confirm safety to

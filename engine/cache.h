@@ -297,7 +297,16 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     return (value); \
   } while (0)
 
-#else
+#define READ_RETURN2(read_result, point, move, value_a, value_b) \
+  do { \
+    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
+    if (read_result) { \
+      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
+    } \
+    return (value_a); \
+  } while (0)
+
+#else /* !TRACE_READ_RESULTS */
 
 #define READ_RETURN0(read_result) \
   do { \
@@ -344,6 +353,19 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     dump_stack(); \
     return (value); \
   } while (0)
+
+#define READ_RETURN2(read_result, point, move, value_a, value_b) \
+  do { \
+    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
+    if (read_result) { \
+      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
+    } \
+    gprintf("%o%s %1m %d %d %d ", read_function_name, q, stackp, \
+	    (value_a), (move)); \
+    dump_stack(); \
+    return (value_a); \
+  } while (0)
+
 
 #endif
 

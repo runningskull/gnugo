@@ -61,6 +61,9 @@
 #define YOUR_ATARI_ATARI_MOVE   52
 #define VITAL_EYE_MOVE          54
 
+#define OWL_ATTACK_MOVE_GAIN    60
+#define OWL_DEFEND_MOVE_LOSS    62
+
 #define ANTISUJI_MOVE           70
 
 #define EITHER_MOVE             100
@@ -196,7 +199,7 @@ int is_antisuji_move(int pos);
 void discard_redundant_move_reasons(int pos);
 void list_move_reasons(int color);
 
-void mark_changed_dragon(int pos, int color, int affected_dragon,
+void mark_changed_dragon(int pos, int color, int affected, int affected2,
 			 int move_reason_type, char changed_stones[BOARDMAX],
 			 float *effective_size);
 

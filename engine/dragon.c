@@ -354,20 +354,24 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       else {
 	int acode = 0;
 	int dcode = 0;
+	int kworm = NO_MOVE;
 	start_timer(3);
 	acode = owl_attack(str, &attack_point, 
-			   &dragon[str].owl_attack_certain);
+			   &dragon[str].owl_attack_certain, &kworm);
 	if (acode != 0) {
 	  dragon[str].owl_attack_point = attack_point;
 	  dragon[str].owl_attack_code = acode;
+	  dragon[str].owl_attack_kworm = kworm;
 	  if (attack_point != NO_MOVE) {
+	    kworm = NO_MOVE;
 	    dcode = owl_defend(str, &defense_point,
-			       &dragon[str].owl_defense_certain);
+			       &dragon[str].owl_defense_certain, &kworm);
 	    if (dcode != 0) {
 	      if (defense_point != NO_MOVE) {
-		dragon[str].owl_status = CRITICAL;
+		dragon[str].owl_status = acode==GAIN ? ALIVE : CRITICAL;
 		dragon[str].owl_defense_point = defense_point;
 		dragon[str].owl_defense_code = dcode;
+		dragon[str].owl_defense_kworm = kworm;
 	      }
 	      else {
 		/* Due to irregularities in the owl code, it may
@@ -378,14 +382,15 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 		 * propose. Having the status right is important e.g.
 		 * for connection moves to be properly valued.
 		 */
-		dragon[str].owl_status = CRITICAL;
+		dragon[str].owl_status = acode==GAIN ? ALIVE : CRITICAL;
 		DEBUG(DEBUG_OWL_PERFORMANCE,
 		      "Inconsistent owl attack and defense results for %1m.\n", 
 		      str);
 		/* Let's see whether the attacking move might be the right
 		 * defense:
 		 */
-		dcode = owl_does_defend(dragon[str].owl_attack_point, str);
+		dcode = owl_does_defend(dragon[str].owl_attack_point,
+					str, NULL);
 		if (dcode != 0) {
 		  dragon[str].owl_defense_point
 		    = dragon[str].owl_attack_point;
@@ -402,13 +407,15 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	}
 	else {
 	  if (!dragon[str].owl_attack_certain) {
+	    kworm = NO_MOVE;
 	    dcode = owl_defend(str, &defense_point, 
-			       &dragon[str].owl_defense_certain);
+			       &dragon[str].owl_defense_certain, &kworm);
 	    if (dcode != 0) {
 	      /* If the result of owl_attack was not certain, we may
 	       * still want the result of owl_defend */
 	      dragon[str].owl_defense_point = defense_point;
 	      dragon[str].owl_defense_code = dcode;
+	      dragon[str].owl_defense_kworm = kworm;
 	    }
 	  }
 	  dragon[str].owl_status = ALIVE;

@@ -1014,6 +1014,7 @@ gtp_owl_attack(char *s)
   int attack_point;
   int attack_code;
   int result_certain;
+  int kworm;
 
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
@@ -1027,7 +1028,7 @@ gtp_owl_attack(char *s)
   if (sgf_dumptree)
     reading_cache_clear();
   
-  attack_code = owl_attack(POS(i, j), &attack_point, &result_certain);
+  attack_code = owl_attack(POS(i, j), &attack_point, &result_certain, &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(attack_code);
   if (attack_code > 0) {
@@ -1052,6 +1053,7 @@ gtp_owl_defend(char *s)
   int defense_point;
   int defend_code;
   int result_certain;
+  int kworm;
   
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
@@ -1065,7 +1067,7 @@ gtp_owl_defend(char *s)
   if (sgf_dumptree)
     reading_cache_clear();
 
-  defend_code = owl_defend(POS(i, j), &defense_point, &result_certain);
+  defend_code = owl_defend(POS(i, j), &defense_point, &result_certain, &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(defend_code);
   if (defend_code > 0) {
@@ -1167,6 +1169,7 @@ gtp_owl_does_attack(char *s)
   int i, j;
   int ti, tj;
   int attack_code;
+  int kworm;
   int n;
 
   n = gtp_decode_coord(s, &ti, &tj);
@@ -1189,7 +1192,7 @@ gtp_owl_does_attack(char *s)
   if (sgf_dumptree)
     reading_cache_clear();
   
-  attack_code = owl_does_attack(POS(ti, tj), POS(i, j));
+  attack_code = owl_does_attack(POS(ti, tj), POS(i, j), &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(attack_code);
   return gtp_finish_response();
@@ -1207,6 +1210,7 @@ gtp_owl_does_defend(char *s)
   int i, j;
   int ti, tj;
   int defense_code;
+  int kworm;
   int n;
 
   n = gtp_decode_coord(s, &ti, &tj);
@@ -1229,7 +1233,7 @@ gtp_owl_does_defend(char *s)
   if (sgf_dumptree)
     reading_cache_clear();
   
-  defense_code = owl_does_defend(POS(ti, tj), POS(i, j));
+  defense_code = owl_does_defend(POS(ti, tj), POS(i, j), &kworm);
   gtp_start_response(GTP_SUCCESS);
   gtp_print_code(defense_code);
   return gtp_finish_response();

@@ -200,6 +200,7 @@ decide_dragon(int pos)
   int acode, dcode;
   SGFTree tree;
   int result_certain;
+  int kworm;
 
   if (board[pos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-dragon called on an empty vertex\n");
@@ -221,7 +222,7 @@ decide_dragon(int pos)
     sgffile_begindump(&tree);
 
   count_variations = 1;
-  acode = owl_attack(pos, &move, &result_certain);
+  acode = owl_attack(pos, &move, &result_certain, &kworm);
   if (acode) {
     if (acode == WIN) {
       if (move == NO_MOVE)
@@ -236,6 +237,9 @@ decide_dragon(int pos)
     else if (acode == KO_B)
       gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)", 
 	      pos, move, count_variations);
+    else if (acode == GAIN)
+      gprintf("%1m can be attacked with gain (captures %1m) at %1m (%d variations)", 
+	      pos, kworm, move, count_variations);
   }
   else 
     gprintf("%1m cannot be attacked (%d variations)", pos, count_variations);
@@ -247,7 +251,7 @@ decide_dragon(int pos)
 
   reading_cache_clear();
   count_variations = 1;
-  dcode = owl_defend(pos, &move, &result_certain);
+  dcode = owl_defend(pos, &move, &result_certain, &kworm);
 
   if (dcode) {
     if (dcode == WIN) {
@@ -263,6 +267,9 @@ decide_dragon(int pos)
     else if (dcode == KO_B)
       gprintf("%1m can be defended with ko (bad) at %1m (%d variations)", 
 	      pos, move, count_variations);
+    else if (dcode == LOSS)
+      gprintf("%1m can be defended with loss (loses %1m) at %1m (%d variations)", 
+	      pos, kworm, move, count_variations);
   }
   else
     gprintf("%1m cannot be defended (%d variations)",
@@ -404,6 +411,7 @@ decide_position(int color)
   int pos;
   int move = NO_MOVE;
   int acode = 0, dcode = 0;
+  int kworm;
   static const char *snames[] = {"dead", "alive", "critical", "unknown"};
   SGFTree tree;
 
@@ -431,7 +439,7 @@ decide_position(int color)
     gprintf("\nanalyzing %1m\n", pos);
     gprintf("status=%s, escape=%d\n", 
 	    snames[dragon[pos].crude_status], DRAGON2(pos).escape_route);
-    acode = owl_attack(pos, &move, NULL);
+    acode = owl_attack(pos, &move, NULL, &kworm);
     if (acode) {
       if (acode == WIN) {
 	if (move == NO_MOVE)
@@ -446,9 +454,12 @@ decide_position(int color)
       else if (acode == KO_B)
 	gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
 		pos, move, count_variations);
+      else if (acode == GAIN)
+	gprintf("%1m can be attacked with gain (captures %1m) at %1m (%d variations)", 
+		pos, kworm, move, count_variations);
       
       count_variations = 1;
-      dcode = owl_defend(pos, &move, NULL);
+      dcode = owl_defend(pos, &move, NULL, &kworm);
       if (dcode) {
 	if (dcode == WIN) {
 	  if (move == NO_MOVE)
@@ -463,6 +474,9 @@ decide_position(int color)
 	else if (dcode == KO_B)
 	  gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n",
 		  pos, move, count_variations);
+	else if (dcode == LOSS)
+	  gprintf("%1m can be defended with loss (loses %1m) at %1m (%d variations)", 
+		  pos, kworm, move, count_variations);
       }
       else
 	gprintf("%1m cannot be defended (%d variations)\n", 

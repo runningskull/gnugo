@@ -265,6 +265,24 @@ find_all_data(int reason1, int what1, int reason2, int what2)
   return next_all - 1;
 }
 
+static int
+find_pair_data(int what1, int what2)
+{
+  int k;
+  
+  for (k = 0; k < next_either; k++)
+    if (either_data[k].what1 == what1
+	&& either_data[k].what2 == what2)
+      return k;
+  
+  /* Add a new entry. */
+  gg_assert(next_either < MAX_EITHER);
+  either_data[next_either].what1   = what1;
+  either_data[next_either].what2   = what2;
+  next_either++;
+  return next_either - 1;
+}
+
 /*
  * Find the index of an eye space in the list of eye spaces.
  * If necessary, add a new entry.
@@ -340,6 +358,10 @@ get_pos(int reason, int what)
   case MY_ATARI_ATARI_MOVE:
   case YOUR_ATARI_ATARI_MOVE:
     return NO_MOVE;
+  case OWL_ATTACK_MOVE_GAIN:
+  case OWL_DEFEND_MOVE_LOSS:
+    /* FIXME: What should we return here? */
+    return dragons[either_data[what].what1];
   }
   /* We should never get here: */
   gg_assert(1>2);
@@ -801,6 +823,7 @@ get_biggest_owl_target(int pos)
         biggest_target = move_reasons[r].what;
         target_size = dragon[dragons[move_reasons[r].what]].effective_size;
       }
+      break;
     }
   }
   return biggest_target;
@@ -1056,6 +1079,26 @@ add_all_move(int pos, int reason1, int target1, int reason2, int target2)
   add_move_reason(pos, ALL_MOVE, index);
 }
 
+
+void
+add_gain_move(int pos, int target1, int target2)
+{
+  int what1 = find_dragon(dragon[target1].origin);
+  int what2 = find_worm(worm[target2].origin);
+  int index = find_pair_data(what1, what2);
+  ASSERT1(target2 != NO_MOVE, pos);
+  add_move_reason(pos, OWL_ATTACK_MOVE_GAIN, index);
+}
+
+void
+add_loss_move(int pos, int target1, int target2)
+{
+  int what1 = find_dragon(dragon[target1].origin);
+  int what2 = find_worm(worm[target2].origin);
+  int index = find_pair_data(what1, what2);
+  ASSERT1(target2 != NO_MOVE, pos);
+  add_move_reason(pos, OWL_DEFEND_MOVE_LOSS, index);
+}
 
 /*
  * Add to the reasons for the move at (pos) that it expands
@@ -1428,6 +1471,15 @@ get_saved_worms(int pos, char saved[BOARDMAX])
      */
     if (move_reasons[r].type == DEFEND_MOVE)
       mark_string(worm[worms[what]].origin, saved, 1);
+    else if (move_reasons[r].type == OWL_DEFEND_MOVE_LOSS) {
+      int origin = dragon[worms[what]].origin;
+      int kworm = worm[worms[what]].origin;
+      int ii;
+      for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+	if (IS_STONE(board[ii]) && dragon[ii].origin == origin
+	    && worm[ii].origin != kworm)
+	  mark_string(worm[ii].origin, saved, 1);
+    }
   }    
 }
 
@@ -1443,7 +1495,7 @@ get_saved_worms(int pos, char saved[BOARDMAX])
  * is returned (unless it is a NULL pointer).
  */
 void
-mark_changed_dragon(int pos, int color, int affected_dragon,
+mark_changed_dragon(int pos, int color, int affected, int affected2,
     		    int move_reason_type, char changed_stones[BOARDMAX],
 		    float *effective_size)
 {
@@ -1452,7 +1504,7 @@ mark_changed_dragon(int pos, int color, int affected_dragon,
   int result_to_beat = 0;
 
   ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(board[affected_dragon]), pos);
+  ASSERT1(IS_STONE(board[affected]), pos);
 
   if (effective_size != NULL)
     *effective_size = 0.0;
@@ -1461,51 +1513,71 @@ mark_changed_dragon(int pos, int color, int affected_dragon,
     case OWL_ATTACK_MOVE:
     case OWL_ATTACK_MOVE_GOOD_KO:
     case OWL_ATTACK_MOVE_BAD_KO:
-      ASSERT1(board[affected_dragon] == OTHER_COLOR(color), pos);
+      ASSERT1(board[affected] == OTHER_COLOR(color), pos);
       new_status = INFLUENCE_CAPTURED_STONE;
       if (effective_size != NULL)
-	*effective_size = dragon[affected_dragon].effective_size;
+	*effective_size = dragon[affected].effective_size;
       break;
     case OWL_DEFEND_MOVE:
-      ASSERT1(board[affected_dragon] == color, pos);
+      ASSERT1(board[affected] == color, pos);
       result_to_beat = WIN;
       break;
     case OWL_DEFEND_MOVE_GOOD_KO:
-      ASSERT1(board[affected_dragon] == color, pos);
+      ASSERT1(board[affected] == color, pos);
       result_to_beat = KO_A;
       break;
     case OWL_DEFEND_MOVE_BAD_KO:
-      ASSERT1(board[affected_dragon] == color, pos);
+      ASSERT1(board[affected] == color, pos);
       result_to_beat = KO_B;
+      break;
+    case OWL_ATTACK_MOVE_GAIN:
+      ASSERT1(board[affected] == OTHER_COLOR(color), pos);
+      new_status = INFLUENCE_CAPTURED_STONE;
+      if (effective_size != NULL)
+	*effective_size = worm[affected2].effective_size;
+      break;
+    case OWL_DEFEND_MOVE_LOSS:
+      ASSERT1(board[affected] == color, pos);
+      if (effective_size != NULL)
+	*effective_size = dragon[affected].effective_size
+			  - worm[affected2].effective_size;
+      result_to_beat = WIN;
       break;
     default:
       /* mark_changed_dragon() called with invalid move reason. */
       ASSERT1(0, pos);
   }
 
-  for (ii = first_worm_in_dragon(affected_dragon); ii != NO_MOVE; 
-       ii = next_worm_in_dragon(ii)) {
-    if (new_status == INFLUENCE_CAPTURED_STONE)
-      mark_string(ii, changed_stones, new_status);
-    else {
-      int worm_is_safe = 0;
-      if (worm[ii].attack_codes[0] == NO_MOVE
-	  || defense_move_reason_known(pos, find_worm(ii)))
-	worm_is_safe = 1;
-      else if (trymove(pos, color, "mark-changed-dragon", ii,
-		       EMPTY, NO_MOVE)) {
-	  if (REVERSE_RESULT(attack(ii, NULL)) >= result_to_beat)
-	    worm_is_safe = 1;
-	  popgo();
-	}
-      if (worm_is_safe) {
-	/* This string can now be considered safe. Hence we mark the
-	 * whole string as such:
-	 */
+  if (move_reason_type == OWL_ATTACK_MOVE_GAIN)
+    mark_string(affected2, changed_stones, new_status);
+  else {
+    for (ii = first_worm_in_dragon(affected); ii != NO_MOVE; 
+	 ii = next_worm_in_dragon(ii))
+      if (new_status == INFLUENCE_CAPTURED_STONE)
 	mark_string(ii, changed_stones, new_status);
-	if (effective_size != NULL)
-	  *effective_size += worm[ii].effective_size;
+      else {
+	int worm_is_safe = 0;
+	if (worm[ii].attack_codes[0] == NO_MOVE
+	    || defense_move_reason_known(pos, find_worm(ii)))
+	  worm_is_safe = 1;
+	else if (trymove(pos, color, "mark-changed-dragon", ii,
+			 EMPTY, NO_MOVE)) {
+	    if (REVERSE_RESULT(attack(ii, NULL)) >= result_to_beat)
+	      worm_is_safe = 1;
+	    popgo();
+	}
+	if (worm_is_safe) {
+	  /* This string can now be considered safe. Hence we mark the
+	   * whole string as such:
+	   */
+	  mark_string(ii, changed_stones, new_status);
+	  if (effective_size != NULL)
+	    *effective_size += worm[ii].effective_size;
+	}
       }
+    if (move_reason_type == OWL_DEFEND_MOVE_LOSS) {
+      new_status = INFLUENCE_CAPTURED_STONE;
+      mark_string(affected2, changed_stones, new_status);
     }
   }
 }
@@ -1731,6 +1803,11 @@ list_move_reasons(int color)
 	  aa = dragons[move_reasons[r].what];
 	  gprintf("Move at %1m owl-attacks %1m with bad ko\n", pos, aa);
 	  break;
+	case OWL_ATTACK_MOVE_GAIN:
+	  aa = dragons[either_data[move_reasons[r].what].what1];
+	  bb = worms[either_data[move_reasons[r].what].what2];
+	  gprintf("Move at %1m owl-attacks %1m (captures %1m)\n", pos, aa, bb);
+	  break;
 	  
 	case OWL_DEFEND_MOVE:
 	  aa = dragons[move_reasons[r].what];
@@ -1743,6 +1820,11 @@ list_move_reasons(int color)
 	case OWL_DEFEND_MOVE_BAD_KO:
 	  aa = dragons[move_reasons[r].what];
 	  gprintf("Move at %1m owl-defends %1m with bad ko\n", pos, aa);
+	  break;
+	case OWL_DEFEND_MOVE_LOSS:
+	  aa = dragons[either_data[move_reasons[r].what].what1];
+	  bb = worms[either_data[move_reasons[r].what].what2];
+	  gprintf("Move at %1m owl-defends %1m (loses %1m)\n", pos, aa, bb);
 	  break;
 	  
 	case OWL_ATTACK_THREAT:

@@ -959,16 +959,47 @@ detect_owl_blunder(int move, int color, int *defense_point,
 	 || (safe_stones 
 	     && safe_stones[bpos]))
 	&& DRAGON2(bpos).safety != INVINCIBLE
-	&& DRAGON2(bpos).safety != STRONGLY_ALIVE
-	&& !owl_confirm_safety(move, bpos, defense_point)) {
-      verbose = save_verbose;
-      TRACE("Dragon at %1m becomes attackable.\n", bpos);
-      verbose = current_verbose;
-      *return_value += 2.0 * dragon[bpos].effective_size;
-      if (safe_stones)
-	for (ii = first_worm_in_dragon(bpos); ii != NO_MOVE; 
-	     ii = next_worm_in_dragon(ii))
-	  mark_string(ii, safe_stones, 0);
+	&& DRAGON2(bpos).safety != STRONGLY_ALIVE) {
+      int kworm = NO_MOVE;
+      int acode = owl_confirm_safety(move, bpos, defense_point, &kworm);
+      if (acode == 0) {
+	verbose = save_verbose;
+	TRACE("Dragon at %1m becomes attackable.\n", bpos);
+	if (verbose > 0)
+	  verbose--;
+	*return_value += 2.0 * dragon[bpos].effective_size;
+	if (safe_stones)
+	  for (ii = first_worm_in_dragon(bpos); ii != NO_MOVE; 
+	       ii = next_worm_in_dragon(ii))
+	    mark_string(ii, safe_stones, 0);
+      }
+      else if (acode == LOSS) {
+	verbose = save_verbose;
+	TRACE("Dragon at %1m becomes attackable.\n", bpos);
+	if (verbose > 0)
+	  verbose--;
+	if (kworm == move) {
+	  int l;
+	  /* the worm origin was messed by our own move */
+	  for (l = 0; l < 4; l++) {
+	    int kworm = move + delta[l];
+	    if (board[kworm] == color) {
+	      *return_value += 2.0 * worm[kworm].effective_size;
+	      if (safe_stones)
+		for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+		  if (ON_BOARD(ii) && worm[ii].origin == worm[kworm].origin)
+		    safe_stones[ii] = 0;
+	    }
+	  }
+	}
+	else {
+	  *return_value += 2.0 * worm[kworm].effective_size;
+	  if (safe_stones)
+	    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+	      if (ON_BOARD(ii) && worm[ii].origin == worm[kworm].origin)
+		safe_stones[ii] = 0;
+	}
+      }
     }
   }
 
@@ -1034,7 +1065,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
       
       popgo();
       decrease_depth_values();
-      owl_attacks = owl_does_attack(move, pos);
+      owl_attacks = owl_does_attack(move, pos, NULL);
       if (owl_attacks != WIN) {
 	*return_value += worm[pos].effective_size;
 	verbose = save_verbose;

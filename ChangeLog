@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new experimental owl code is aware of tails getting captured
+- new move reasons OWL_ATTACK_MOVE_GAIN and OWL_DEFEND_MOVE_LOSS
+  with corresponding supporting code in value_moves.c and move_reasons.c
 - new move reason INVASION_MOVE
 - pattern class I (invasions) can now be used in patterns.db et al
   and not only in influence patterns

@@ -340,7 +340,7 @@ analyze_semeai(int my_dragon, int your_dragon)
       return;
     if (dragon[my_dragon].owl_defense_point != NO_MOVE) {
       int acode = owl_does_attack(dragon[my_dragon].owl_defense_point,
-				  your_dragon);
+				  your_dragon, NULL);
       if (acode != 0) {
 	add_owl_attack_move(dragon[my_dragon].owl_defense_point, your_dragon,
 			    acode);
@@ -364,7 +364,7 @@ analyze_semeai(int my_dragon, int your_dragon)
       return;
     if (dragon[your_dragon].owl_attack_point != NO_MOVE) {
       int dcode = owl_does_defend(dragon[your_dragon].owl_attack_point,
-				  my_dragon);
+				  my_dragon, NULL);
       if (dcode != 0) {
 	add_owl_defense_move(dragon[your_dragon].owl_attack_point, my_dragon,
 			     dcode);

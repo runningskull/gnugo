@@ -426,6 +426,9 @@ void add_either_move(int pos, int reason1, int target1,
 void add_all_move(int pos, int reason1, int target1,
 		  int reason2, int target2);
 
+void add_gain_move(int pos, int target1, int target2);
+void add_loss_move(int pos, int target1, int target2);
+
 
 int get_attack_threats(int pos, int max_strings, int strings[]);
 int get_defense_threats(int pos, int max_strings, int strings[]);
@@ -492,13 +495,13 @@ int aftermath_genmove(int *aftermath_move, int color,
 		      int under_control[BOARDMAX],
 		      int do_capture_dead_stones);
 
-int owl_attack(int target, int *attack_point, int *certain);
-int owl_defend(int target, int *defense_point, int *certain);
+int owl_attack(int target, int *attack_point, int *certain, int *kworm);
+int owl_defend(int target, int *defense_point, int *certain, int *kworm);
 int owl_threaten_attack(int target, int *attack1, int *attack2);
 int owl_threaten_defense(int target, int *defend1, int *defend2);
-int owl_does_defend(int move, int target);
-int owl_confirm_safety(int move, int target, int *defense_point);
-int owl_does_attack(int move, int target);
+int owl_does_defend(int move, int target, int *kworm);
+int owl_confirm_safety(int move, int target, int *defense_point, int *kworm);
+int owl_does_attack(int move, int target, int *kworm);
 int owl_connection_defends(int move, int target1, int target2);
 int owl_substantial(int str);
 void owl_analyze_semeai(int apos, int bpos, 
@@ -670,6 +673,7 @@ extern float best_move_values[10];
 extern int best_moves[10];
 
 extern int chinese_rules;
+extern int experimental_owl_ext;     /* use experimental owl (GAIN/LOSS) */
 extern int experimental_semeai;      /* use experimental semeai module */
 extern int experimental_connections; /* use experimental connection module */
 extern int alternate_connections;    /* use alternate connection module */
@@ -816,6 +820,8 @@ struct dragon_data {
   int owl_defense_certain; /* 0 if owl reading node limit is reached         */
   int owl_second_defense_point;/* if defender gets both attack points, wins  */
   int status;              /* best trusted status                            */
+  int owl_attack_kworm;    /* only valid when owl_attack_code is GAIN        */
+  int owl_defense_kworm;   /* only valid when owl_defense_code is LOSS       */
 };
 
 extern struct dragon_data dragon[BOARDMAX];

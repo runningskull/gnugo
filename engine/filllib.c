@@ -562,7 +562,7 @@ filllib_confirm_safety(int move, int color, int *defense_point)
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  if (!owl_does_defend(move, apos))
+  if (!owl_does_defend(move, apos, NULL))
     return 0;
   verbose = save_verbose;
   

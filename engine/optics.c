@@ -1918,7 +1918,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
      */
     examine_position(WHITE, EXAMINE_DRAGONS_WITHOUT_OWL);
 
-    attack_code = owl_attack(str, &attack_point, NULL);
+    attack_code = owl_attack(str, &attack_point, NULL, NULL);
 
     if (attack_code == 0) {
       /* The owl code claims there is no attack. We test this by
@@ -1927,7 +1927,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
       for (k = 0; k < eyesize; k++) {
 	if (board[eye_vertices[k]] == EMPTY
 	    && is_legal(eye_vertices[k], BLACK)
-	    && owl_does_attack(eye_vertices[k], str)) {
+	    && owl_does_attack(eye_vertices[k], str, NULL)) {
 	  gprintf("%1m alive, but %1m attacks:\n", str, eye_vertices[k]);
 	  showboard(0);
 	  gprintf("\n");
@@ -1941,7 +1941,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
       if (internal_stones == eyesize - 1) {
 	for (k = 0; k < eyesize; k++) {
 	  if (board[eye_vertices[k]] == EMPTY
-	      && !owl_does_defend(eye_vertices[k], str)) {
+	      && !owl_does_defend(eye_vertices[k], str, NULL)) {
 	    gprintf("%1m alive, but almost filled with nakade:\n", str);
 	    showboard(0);
 	  }
@@ -1949,8 +1949,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
       }
     }
     else {
-      defense_code = owl_defend(str, &defense_point, NULL);
-
+      defense_code = owl_defend(str, &defense_point, NULL, NULL);
       if (defense_code == 0) {
 	/* The owl code claims there is no defense. We test this by
 	 * trying to defend on all empty spaces in the eyeshape.
@@ -1958,7 +1957,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	for (k = 0; k < eyesize; k++) {
 	  if (board[eye_vertices[k]] == EMPTY
 	      && is_legal(eye_vertices[k], WHITE)
-	      && owl_does_defend(eye_vertices[k], str)) {
+	      && owl_does_defend(eye_vertices[k], str, NULL)) {
 	    gprintf("%1m dead, but %1m defends:\n", str, eye_vertices[k]);
 	    showboard(0);
 	    gprintf("\n");
@@ -1974,7 +1973,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	  gprintf("Bad attack point %1m:\n", attack_point);
 	  showboard(0);
 	}
-	else if (!owl_does_attack(attack_point, str)) {
+	else if (!owl_does_attack(attack_point, str, NULL)) {
 	  gprintf("Attack point %1m failed:\n", attack_point);
 	  showboard(0);
 	}
@@ -1984,7 +1983,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
 	  gprintf("Bad defense point %1m:\n", defense_point);
 	  showboard(0);
 	}
-	else if (!owl_does_defend(defense_point, str)) {
+	else if (!owl_does_defend(defense_point, str, NULL)) {
 	  gprintf("Defense point %1m failed:\n", defense_point);
 	  showboard(0);
 	}
