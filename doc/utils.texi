@@ -97,6 +97,19 @@ tested as if nothing special happened. A typical use for these functions is to
 set up a crosscut in an autohelper and see whether at least one cutting stone
 can be captured.
 @end quotation
+@item @code{int play_connect_n(int color, int do_connect, int num_moves, ...)}
+@findex play_connect_n
+@quotation
+Plays a sequence of moves, alternating between the players and starting
+with color. After having played through the sequence, the two last
+coordinates give two targets that should be connected or disconnected,
+depending on the value of do_connect. If there is no stone present to
+connect or disconnect, it is assumed that the connection has failed. If
+one or more of the moves to play turns out to be illegal for some
+reason, the rest of the sequence is played anyway, and
+connection/disconnection is tested as if nothing special happened.
+@end quotation
+
 @item @code{void set_depth_values(int level)}
 @findex set_depth_values
 @quotation

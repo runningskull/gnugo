@@ -446,8 +446,15 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 }
 
 
-/* FIXME: documentation needs expanding - identical in concept 
- * to play_attack_defend2_n
+/* The function play_connect_n() plays a sequence of moves,
+ * alternating between the players and starting with color. After
+ * having played through the sequence, the two last coordinates
+ * give two targets that should be connected or disconnected, depending on
+ * the value of do_connect. If there is no stone present to connect or
+ * disconnect, it is assumed that the connection has failed. If one or
+ * more of the moves to play turns out to be illegal for some reason,
+ * the rest of the sequence is played anyway, and connection/disconnection
+ * is tested as if nothing special happened.
  */
 
 int 
@@ -469,9 +476,9 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE,
+	&& (trymove(apos, mcolor, "play_connect_n", NO_MOVE,
 		    EMPTY, NO_MOVE)
-	    || tryko(apos, mcolor, "play_attack_defend_n", EMPTY, NO_MOVE)))
+	    || tryko(apos, mcolor, "play_connect_n", EMPTY, NO_MOVE)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -491,6 +498,7 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
   modify_depth_values(played_moves);
 #endif
   
+  /* See if ypos and zpos can be connected (or disconnected). */
   if (do_connect) {
     if (board[ypos] == EMPTY || board[zpos] == EMPTY)
       success = 0;

@@ -113,15 +113,15 @@ find_double_threats(int color)
     if (!ON_BOARD(ii))
       continue;
 
-    /* Generate ATTACK_EITHER_MOVE move reasons for each pair of the 
+    /* Generate an EITHER_MOVE move reasons for each pair of the 
      * threatened strings.  We must also remove the threats, because
-     * otherwise we would get followup points for them also.     
+     * otherwise we would get followup points for them as well.
      *
      * FIXME: 
      *   - This is perhaps not the best way to do it, but realistically
      *     it will be seldom that more than two strings are threatened
      *     at the same point.  Still, we should find a better way.
-     *   - ATTACK_EITHER_MOVE should be generalized to more than two strings.
+     *   - EITHER_MOVE should be generalized to more than two strings.
      */
     num_a_threatened_groups = get_attack_threats(ii, MAX_THREATENED_STRINGS,
 						 a_threatened_groups);

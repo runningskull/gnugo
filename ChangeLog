@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- comment play_connect_n()
+- document play_connect_n() in the texinfo docs
+- bugfix in play_connect_n (trace output)
+- fix comment in find_double_threats()
 - break_chain2_moves() revised	
 - do_play_move() revised to improve performance
 - corrects quoting of special characters in regress.plx
