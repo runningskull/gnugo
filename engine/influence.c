@@ -668,10 +668,10 @@ add_marked_intrusions(struct influence_data *q, int color)
  * color as O.
  */
 static void
-influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
+influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 		   void *data)
 {
-  int pos = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  int pos = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   int k;
   struct influence_data *q = data;
   
@@ -704,7 +704,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	break;  /* All commas are guaranteed to come first. */
 
       /* transform pattern real coordinate */
-      ii = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, ll, m, n);
+      ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
       /* Territorial connection, making a barrier for opponent influence. */
       if (pattern->class & CLASS_D)
@@ -742,8 +742,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	  || (pattern->patn[k].att == ATT_X
 	      && (pattern->class & (CLASS_A | CLASS_B | CLASS_t)))) {
 	/* transform pattern real coordinate */
-	int ii = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				  ll, m , n);
+	int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 	if (pattern->class & CLASS_E) {
 	  if ((color == WHITE && q->white_strength[ii] == 0.0)
 	      || (color == BLACK && q->black_strength[ii] == 0.0))
@@ -802,7 +801,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
 
   DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
-	pattern->name, ll, POS(m, n));
+	pattern->name, ll, anchor);
 
   /* For t patterns, everything happens in the action. */
   if ((pattern->class & CLASS_t)
@@ -857,8 +856,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	|| ((pattern->class & CLASS_B)
 	    && pattern->patn[k].att == ATT_not)) {
       /* transform pattern real coordinate */
-      int ii = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-      	   			ll, m, n);
+      int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
       /* Territorial connection, making a barrier for opponent influence. */
       if (pattern->class & (CLASS_A | CLASS_D)) {
@@ -888,7 +886,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
       /* Low intensity influence source for the color in turn to move. */
       if (pattern->class & CLASS_B) {
         if (q->is_territorial_influence)
-          enter_intrusion_source(POS(m, n), ii, pattern->value,
+          enter_intrusion_source(anchor, ii, pattern->value,
 	  		         TERR_DEFAULT_ATTENUATION, q);
         else
           add_influence_source(ii, color,
@@ -913,7 +911,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
  *                     in a critcal dragon brought to life by this move
  */
 static void
-followup_influence_callback(int m, int n, int color, struct pattern *pattern,
+followup_influence_callback(int anchor, int color, struct pattern *pattern,
                             int ll, void *data)
 {
   int k;
@@ -925,7 +923,7 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
   if (!(pattern->class & CLASS_B))
     return;
 
-  t = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  t = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
    */
@@ -953,19 +951,18 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
     return;
 
   DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
-	pattern->name, ll, POS(m, n));
+	pattern->name, ll, anchor);
 
   for (k = 0; k < pattern->patlen; ++k)  /* match each point */
     if (pattern->patn[k].att == ATT_not) {
       /* transform pattern real coordinate */
-      int ii = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				ll, m, n);
+      int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
       /* Low intensity influence source for the color in turn to move. */
-      enter_intrusion_source(POS(m, n), ii, pattern->value,
+      enter_intrusion_source(anchor, ii, pattern->value,
 			     TERR_DEFAULT_ATTENUATION, q);
       DEBUG(DEBUG_INFLUENCE, "  followup for %1m: intrusion at %1m\n",
-            POS(m, n), ii);
+            anchor, ii);
     }
 }
 

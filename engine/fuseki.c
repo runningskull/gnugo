@@ -250,13 +250,13 @@ static int fuseki_total_value;
 
 /* Callback for fuseki database pattern matching. */
 static void
-fuseki_callback(int ti, int tj, struct fullboard_pattern *pattern, int ll)
+fuseki_callback(int move, struct fullboard_pattern *pattern, int ll)
 {
   TRACE("Fuseki database move at %1m with relative weight %d, pattern %s+%d\n",
-	POS(ti, tj), (int) pattern->value, pattern->name, ll);
+	move, (int) pattern->value, pattern->name, ll);
 
   /* Store coordinates and relative weight for the found move. */
-  fuseki_moves[num_fuseki_moves] = POS(ti, tj);
+  fuseki_moves[num_fuseki_moves] = move;
   fuseki_value[num_fuseki_moves] = pattern->value;
   fuseki_total_value += pattern->value;
   num_fuseki_moves++;

@@ -141,7 +141,7 @@ static int do_owl_defend(int str, int *move, int *wormid,
 static void owl_shapes(struct matched_patterns_list_data *list,
                        struct owl_move_data moves[MAX_MOVES], int color,
 		       struct local_owl_data *owl, struct pattern_db *type);
-static void collect_owl_shapes_callbacks(int m, int n, int color,
+static void collect_owl_shapes_callbacks(int anchor, int color,
 	  			         struct pattern *pattern_db,
 				         int ll, void *data);
 static int get_next_move_from_list(struct matched_patterns_list_data *list,
@@ -150,7 +150,7 @@ static int get_next_move_from_list(struct matched_patterns_list_data *list,
 static void init_pattern_list(struct matched_patterns_list_data *list);
 static void close_pattern_list(int color,
 			       struct matched_patterns_list_data *list);
-static void owl_shapes_callback(int m, int n, int color,
+static void owl_shapes_callback(int anchor, int color,
 				struct pattern *pattern_db,
 				int ll, void *data);
 static void owl_add_move(struct owl_move_data *moves, int move, int value,
@@ -3042,7 +3042,7 @@ dump_pattern_list(struct matched_patterns_list_data *list)
  * forgetting the color.
  */
 static void
-collect_owl_shapes_callbacks(int m, int n, int color, struct pattern *pattern,
+collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
                              int ll, void *data)
 {
   struct matched_patterns_list_data *matched_patterns = data;
@@ -3058,8 +3058,7 @@ collect_owl_shapes_callbacks(int m, int n, int color, struct pattern *pattern,
 	          * sizeof(matched_patterns->pattern_list[0]));
   }
   next_pattern = &matched_patterns->pattern_list[matched_patterns->counter];
-  next_pattern->move = AFFINE_TRANSFORM(pattern->movei, pattern->movej,
-			                ll, m, n);
+  next_pattern->move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   next_pattern->pattern = pattern;
   next_pattern->ll = ll;
   matched_patterns->counter++;
@@ -3255,7 +3254,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
  * the goal dragon are considered.
  */
 static void
-owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
+owl_shapes_callback(int anchor, int color, struct pattern *pattern,
 		    int ll, void *data)
 {
   int tval;  /* trial move and its value */
@@ -3266,7 +3265,7 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
   int defense_pos;
 
   /* Pick up the location of the move */
-  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
 
   /* Before we do any expensive reading, check whether this move
    * already is known with a higher value or if there are too many
@@ -3335,8 +3334,7 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
     defense_pos = move;
     for (k = 0; k < pattern->patlen; k++)
       if (pattern->patn[k].att == ATT_not)
-	defense_pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				       ll, m, n);
+	defense_pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
   }
   
   owl_add_move(moves, move, tval, pattern->name, same_dragon, escape,

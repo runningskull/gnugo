@@ -25,8 +25,8 @@
 
 
 #define TRYMOVE(pos, color) trymove(pos, color, "helper", NO_MOVE, EMPTY, NO_MOVE)
-#define OFFSET(x, y) offset(x, y, move, transformation)
-#define ARGS struct pattern *pattern, int transformation, int move, int color
+#define OFFSET_BY(x, y) AFFINE_TRANSFORM(OFFSET(x,y), trans, move)
+#define ARGS struct pattern *pattern, int trans, int move, int color
 
 
 /* This file contains helper functions which assist the pattern matcher.
@@ -57,9 +57,9 @@ basic_cut_helper(ARGS)
   int acolor, ccolor;
   UNUSED(pattern);
   
-  apos = OFFSET(0, -1);  /* O to west */
-  bpos = OFFSET(-1, 0);  /* O to north */
-  cpos = OFFSET(-1, -1); /* X to northwest */
+  apos = OFFSET_BY(0, -1);  /* O to west */
+  bpos = OFFSET_BY(-1, 0);  /* O to north */
+  cpos = OFFSET_BY(-1, -1); /* X to northwest */
 
   acolor = board[apos];
   ccolor = OTHER_COLOR(acolor);
@@ -105,7 +105,7 @@ jump_out_helper(ARGS)
 {
   int own_eyespace;
 
-  UNUSED(transformation); UNUSED(pattern);
+  UNUSED(trans); UNUSED(pattern);
 
   if (color == WHITE)
     own_eyespace = (white_eye[move].color == WHITE_BORDER);
@@ -128,7 +128,7 @@ int
 jump_out_far_helper(ARGS)
 {
   if (influence_area_color(move) != OTHER_COLOR(color))
-    return jump_out_helper(pattern, transformation, move, color);
+    return jump_out_helper(pattern, trans, move, color);
   else
     return 0;
 }
@@ -140,7 +140,7 @@ jump_out_far_helper(ARGS)
 int
 high_handicap_helper(ARGS)
 {
-  UNUSED(transformation); UNUSED(pattern); UNUSED(move);
+  UNUSED(trans); UNUSED(pattern); UNUSED(move);
   
   return !doing_scoring && stones_on_board(OTHER_COLOR(color)) == 0;
 }
@@ -155,7 +155,7 @@ high_handicap_helper(ARGS)
 int
 reinforce_helper(ARGS)
 {
-  UNUSED(transformation); UNUSED(pattern);
+  UNUSED(trans); UNUSED(pattern);
   
   return (!doing_scoring
 	  && !lively_dragon_exists(OTHER_COLOR(color)) 
@@ -198,9 +198,9 @@ throw_in_atari_helper(ARGS)
   int libs[2];
   UNUSED(pattern);
   
-  apos = OFFSET(0, 1);
-  cpos = OFFSET(-1, 1);
-  dpos = OFFSET(1, 1);
+  apos = OFFSET_BY(0, 1);
+  cpos = OFFSET_BY(-1, 1);
+  dpos = OFFSET_BY(1, 1);
 
   /* Find second liberty of the stone a. */
   findlib(apos, 2, libs);
@@ -299,7 +299,7 @@ ugly_cutstone_helper(ARGS)
   UNUSED(pattern);
   UNUSED(color);
   
-  apos = OFFSET(-1, -1);
+  apos = OFFSET_BY(-1, -1);
   
   worm[apos].cutstone++;
   return 0;
@@ -325,9 +325,9 @@ cutstone2_helper(ARGS)
   UNUSED(pattern);
   UNUSED(color);
   
-  apos = OFFSET(-1, -1);
-  bpos = OFFSET(-1,  0);
-  cpos = OFFSET( 0, -1);
+  apos = OFFSET_BY(-1, -1);
+  bpos = OFFSET_BY(-1,  0);
+  cpos = OFFSET_BY( 0, -1);
 
   if (worm[apos].defense_codes[0] == 0)
     return 0;

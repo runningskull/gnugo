@@ -129,12 +129,6 @@ struct invariant_hash {
 /* This is defined in engine/matchpat.c */
 extern const int transformations[8][2][2];
 
-#define TRANSFORM(i, j, ti, tj, trans) \
-  do { \
-    *ti = transformations[trans][0][0] * (i) + transformations[trans][0][1] * (j); \
-    *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
-  } while (0)
-
 
 /* A situation is the combination of a board position and the move to
  * be made. We use the invariant hashes excluding and including the move
@@ -263,7 +257,7 @@ init_zobrist_table(unsigned int hash[8][MAX_BOARD][MAX_BOARD])
   for (k = 1; k < 8; k++)
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	TRANSFORM(m-mid, n-mid, &i, &j, k);
+	TRANSFORM2(m-mid, n-mid, &i, &j, k);
 	hash[k][m][n] = hash[0][i+mid][j+mid];
       }
   

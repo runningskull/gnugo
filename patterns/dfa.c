@@ -23,6 +23,7 @@
  * * * * * * * * fast pattern matching with DFA  version 2.9 * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "liberty.h"
 #include "patterns.h"
 #include "dfa.h"
 #include <assert.h>
@@ -203,7 +204,7 @@ buildSpiralOrder(int order[8][MAX_ORDER])
       j0 += 4 * DFA_MAX_BOARD;
     i0 = (order[0][k] - j0) / (4 * DFA_MAX_BOARD);
     for (ll = 1; ll != 8; ll++) {
-      TRANSFORM(i0, j0, &i, &j, ll);
+      TRANSFORM2(i0, j0, &i, &j, ll);
       order[ll][k] = DFA_POS(i, j);
     }
   }
@@ -1133,7 +1134,8 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
  * str must refer a buffer of size greater than MAX_ORDER.
  */
 void
-pattern_2_string(struct pattern *pat, char *str, int trans, int ci, int cj)
+pattern_2_string(struct pattern *pat, struct patval_b *elements,
+		 char *str, int trans, int ci, int cj)
 {
   char work_space[DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
   int m, n;			/* anchor position */
@@ -1215,10 +1217,10 @@ pattern_2_string(struct pattern *pat, char *str, int trans, int ci, int cj)
 
   /* pattern representation on the work space */
   for (k = 0; k != pat->patlen; k++) {
-    c = EXPECTED_VAL(pat->patn[k].att);
-    gg_assert(work_space[m + pat->patn[k].x - ci]
-	      [n + pat->patn[k].y - cj] == '?');
-    work_space[m + pat->patn[k].x - ci][n + pat->patn[k].y - cj] = c;
+    c = EXPECTED_VAL(elements[k].att);
+    gg_assert(work_space[m + elements[k].x - ci]
+	      [n + elements[k].y - cj] == '?');
+    work_space[m + elements[k].x - ci][n + elements[k].y - cj] = c;
   }
 
   /* dump */

@@ -19,9 +19,13 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* table for use by TRANSFORM() (patterns.h) */
+#include "liberty.h"
 
-const int transformations[8][2][2] = {
+/* Array for use by TRANSFORM() macro. */
+int transformation[8][MAX_OFFSET];
+
+/* Matrix array for use by TRANSFORM2() macro. */
+const int transformation2[8][2][2] = {
   { { 1,  0}, 
     { 0,  1}}, /* a - identity transformation matrix */
 
@@ -47,3 +51,23 @@ const int transformations[8][2][2] = {
     { 0, -1}}  /* c - flip on y axis */
 };
 
+
+/* Initialize transformation[][] array. */
+void transformation_init(void)
+{
+  int k;
+  int dx;
+  int dy;
+
+  for (k = 0; k < 8; k++) {
+    for (dy = -MAX_BOARD+1; dy <= MAX_BOARD-1; dy++) {
+      for (dx = -MAX_BOARD+1; dx <= MAX_BOARD-1; dx++) {
+	int tx;
+	int ty;
+
+	TRANSFORM2(dx, dy, &tx, &ty, k);
+	transformation[k][OFFSET(dx, dy)] = DELTA(tx, ty);
+      }
+    }
+  }
+}

@@ -52,10 +52,10 @@ static void ping_recurse(int pos, int *counter,
 			 int mr[BOARDMAX], int color);
 static int touching(int pos, int color);
 static void find_attack_patterns(void);
-static void attack_callback(int m, int n, int color,
+static void attack_callback(int anchor, int color,
 			    struct pattern *pattern, int ll, void *data);
 static void find_defense_patterns(void);
-static void defense_callback(int m, int n, int color,
+static void defense_callback(int anchor, int color,
 			     struct pattern *pattern, int ll, void *data);
 static void build_worms(void);
 
@@ -1534,14 +1534,14 @@ find_attack_patterns(void)
  * before or not. Only exclude already known attacking moves.
  */
 static void
-attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
+attack_callback(int anchor, int color, struct pattern *pattern, int ll,
 		void *data)
 {
   int move;
   int k;
   UNUSED(data);
 
-  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
 
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
@@ -1567,8 +1567,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     if (pattern->patn[k].att == ATT_X) {
       /* transform pattern real coordinate */
-      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				 ll, m, n);
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
       int str = worm[pos].origin;
 
@@ -1623,14 +1622,14 @@ find_defense_patterns(void)
 }
 
 static void
-defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
+defense_callback(int anchor, int color, struct pattern *pattern, int ll,
 		 void *data)
 {
   int move;
   int k;
   UNUSED(data);
 
-  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
@@ -1656,8 +1655,7 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     if (pattern->patn[k].att == ATT_O) {
       /* transform pattern real coordinate */
-      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				 ll, m, n);
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
       int str = worm[pos].origin;
 
       if (worm[str].attack_codes[0] == 0

@@ -81,7 +81,7 @@ struct oracle_move_data {
   const char *reason; /* why this move */
 };
 
-static void oracle_callback(int m, int n, int color, struct pattern *pattern,
+static void oracle_callback(int anchor, int color, struct pattern *pattern,
 			    int ll, void *data);
 static void oracle_add_move(struct oracle_move_data *moves, 
 			    int this_move, int this_value, 
@@ -294,14 +294,14 @@ do_consult_oracle(int color)
 }
 
 static void
-oracle_callback(int m, int n, int color, struct pattern *pattern,
+oracle_callback(int anchor, int color, struct pattern *pattern,
 		int ll, void *data)
 {
   int this_move;
   struct oracle_move_data *moves = data;
   UNUSED(color);
 
-  this_move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  this_move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   if (within_search_area(this_move))
     oracle_add_move(moves, this_move, pattern->value, pattern->name);
   else

@@ -108,10 +108,26 @@ extern Hash_data    hashdata;
 #define WW(pos)       ((pos) - 2)
 #define NN(pos)       ((pos) - 2 * NS)
 #define EE(pos)       ((pos) + 2)
-		      
+
 #define BOARD(i, j)   board[POS(i, j)]
 
 #define REVERSE_RESULT(result)		(WIN - result)
+
+/* Transformation stuff. */
+#define MAX_OFFSET			(2*MAX_BOARD - 1) * (2*MAX_BOARD - 1)
+#define OFFSET(dx, dy)\
+  ((dy + MAX_BOARD - 1) * (2*MAX_BOARD - 1) + (dx + MAX_BOARD - 1))
+#define OFFSET_DELTA(dx, dy)		(OFFSET(dx, dy) - OFFSET(0, 0))
+#define CENTER_OFFSET(offset)		(offset - OFFSET(0, 0))
+#define TRANSFORM(offset, trans)	(transformation[trans][offset])
+#define AFFINE_TRANSFORM(offset, trans, delta)\
+  (transformation[trans][offset] + delta)
+#define TRANSFORM2(x, y, tx, ty, trans)\
+  do {\
+    *tx = transformation2[trans][0][0] * (x) + transformation2[trans][0][1] * (y);\
+    *ty = transformation2[trans][1][0] * (x) + transformation2[trans][1][1] * (y);\
+  } while (0)
+
 
 /* This struct holds the internal board state.
  */
@@ -185,6 +201,9 @@ void incremental_order_moves(int move, int color, int string,
 			     int *captured_stones, int *threatened_stones,
 			     int *saved_stones, int *number_open);
 
+
+void transformation_init(void);
+
   
 void dump_stack(void);
 void report_worm(int m, int n);
@@ -247,10 +266,10 @@ struct match_node;
  * Try to match a pattern in the database to the board. Callback for
  * each match
  */
-typedef void (*matchpat_callback_fn_ptr)(int m, int n, int color,
+typedef void (*matchpat_callback_fn_ptr)(int anchor, int color,
                                          struct pattern *, int rotation,
                                          void *data);
-typedef void (*fullboard_matchpat_callback_fn_ptr)(int ti, int tj,
+typedef void (*fullboard_matchpat_callback_fn_ptr)(int move,
                                                    struct fullboard_pattern *,
                                                    int rotation);
 void matchpat(matchpat_callback_fn_ptr callback, int color,
@@ -364,8 +383,7 @@ int lively_dragon_exists(int color);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
 void propagate_worm(int pos);
-void transform(int i, int j, int *ti, int *tj, int trans);
-int offset(int i, int j, int basepos, int trans);
+void transform2(int i, int j, int *ti, int *tj, int trans);
 void find_cuts(void);
 void find_connections(void);
 void modify_eye_spaces(void);
@@ -676,6 +694,10 @@ extern Intersection shadow[BOARDMAX];      /* reading tree shadow */
 extern int          disable_threat_computation;
 extern int          disable_endgame_patterns;
 extern int          doing_scoring;
+
+/* Transformation arrays */
+extern int	    transformation[8][MAX_OFFSET];
+extern const int    transformation2[8][2][2];
 
 /* Reading parameters */
 extern int depth;               /* deep reading cutoff */

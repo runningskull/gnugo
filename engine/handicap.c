@@ -210,7 +210,7 @@ static int remaining_handicap_stones = -1;
 static int total_handicap_stones = -1;
 
 static int find_free_handicap_pattern(void);
-static void free_handicap_callback(int m, int n, int color,
+static void free_handicap_callback(int anchor, int color,
 				   struct pattern *pattern,
 				   int ll, void *data);
 
@@ -276,8 +276,7 @@ place_free_handicap(int handicap)
 
 struct handicap_match {
   int value;
-  int m;
-  int n;
+  int anchor;
   struct pattern *pattern;
   int ll;
 };
@@ -294,8 +293,7 @@ find_free_handicap_pattern()
   int highest_value = -1;
   int sum_values = 0;
   int r;
-  int m;
-  int n;
+  int anchor;
   struct pattern *pattern;
   int ll;
   int move;
@@ -337,21 +335,19 @@ find_free_handicap_pattern()
   }
 
   /* Place handicap stones according to pattern k. */
-  m = handicap_matches[k].m;
-  n = handicap_matches[k].n;
+  anchor = handicap_matches[k].anchor;
   pattern = handicap_matches[k].pattern;
   ll = handicap_matches[k].ll;
   
   /* Pick up the location of the move */
-  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   add_stone(move, BLACK);
   remaining_handicap_stones--;
 
   /* Add stones at all '!' in the pattern. */
   for (k = 0; k < pattern->patlen; k++) { 
     if (pattern->patn[k].att == ATT_not) {
-      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				 ll, m, n);
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
       add_stone(pos, BLACK);
       remaining_handicap_stones--;
     }
@@ -361,7 +357,7 @@ find_free_handicap_pattern()
 }
 
 static void
-free_handicap_callback(int m, int n, int color, struct pattern *pattern,
+free_handicap_callback(int anchor, int color, struct pattern *pattern,
 		       int ll, void *data)
 {
   int r = -1;
@@ -369,7 +365,7 @@ free_handicap_callback(int m, int n, int color, struct pattern *pattern,
   int number_of_stones = 1;
 
   /* Pick up the location of the move */
-  int move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  int move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
 
   UNUSED(data);
 
@@ -406,8 +402,7 @@ free_handicap_callback(int m, int n, int color, struct pattern *pattern,
   }
   gg_assert(r >= 0 && r < MAX_HANDICAP_MATCHES);
   handicap_matches[r].value   = pattern->value;
-  handicap_matches[r].m       = m;
-  handicap_matches[r].n       = n;
+  handicap_matches[r].anchor  = anchor;
   handicap_matches[r].pattern = pattern;
   handicap_matches[r].ll      = ll;
 }

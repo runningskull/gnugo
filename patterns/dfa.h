@@ -165,8 +165,8 @@ void dump_dfa(FILE *f, dfa_t *pdfa);
 struct pattern;
 
 /* conversion between a gnugo pattern struct into a dfa string. */
-void pattern_2_string(struct pattern *pat, char *str,
-		      int trans, int ci, int cj);
+void pattern_2_string(struct pattern *pat, struct patval_b *elements,
+		      char *str, int trans, int ci, int cj);
 
 /* add a string with attribute att_val into a dfa */
 float dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll);

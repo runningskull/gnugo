@@ -145,23 +145,25 @@ report_pattern_profiling()
 
 static void fixup_patterns_for_board_size(struct pattern *pattern);
 static void prepare_for_match(int color);
-static void do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
+static void do_matchpat(int anchor, matchpat_callback_fn_ptr callback,
 			int color, struct pattern *database,
 			void *callback_data, char goal[BOARDMAX]);
 static void matchpat_loop(matchpat_callback_fn_ptr callback, 
 			  int color, int anchor,
 			  struct pattern_db *pdb, void *callback_data,
 			  char goal[BOARDMAX], int anchor_in_goal);
-void transform(int i, int j, int *ti, int *tj, int trans);
+void transform2(int i, int j, int *ti, int *tj, int trans);
 
-/* The pattern matcher still works in 2D and has a private copy of the
- * board here.
+/* FIXME: While translating pattern matching to 1D i try to avoid
+ *	  non-trivial changes, so i keep the `p' arrays. Check if
+ *	  they are still needed.
+ *	    - Paul
  */
-static Intersection p[MAX_BOARD][MAX_BOARD];
-static void board_to_p(void);
-
+static Intersection p[BOARDMAX];
+static Intersection saved_p[BOARDMAX];
 static int matchpat_call_level = 0;
-static Intersection saved_p[MAX_BOARD][MAX_BOARD];
+
+static void board_to_p(void);
 
 /* Precomputed tables to allow rapid checks on the piece at
  * the board. This table relies on the fact that color is
@@ -305,47 +307,14 @@ prepare_for_match(int color)
 }
 
 
-
-/* Compute the transform of (i, j) under transformation number trans.
- * *ti and *tj point to the transformed coordinates.
- * ORDER MATTERS : see texinfo documentation for details
- *
- * There is a copy of this table in mkpat.c
- */
-
-const int transformations[8][2][2] = {
-  {{ 1,  0}, { 0,  1}}, /* a - identity transformation matrix */
-  {{ 0,  1}, {-1,  0}}, /* g - rotate 270 counter-clockwise */
-  {{-1,  0}, { 0, -1}}, /* d - rotate 180 */
-  {{ 0, -1}, { 1,  0}}, /* f - rotate 90 counter-clockwise */
-  {{ 0, -1}, {-1,  0}}, /* h - rotate 90 and invert */
-  {{-1,  0}, { 0,  1}}, /* b - flip left */
-  {{ 0,  1}, { 1,  0}}, /* e - rotate 90 and flip left */
-  {{ 1,  0}, { 0, -1}}  /* c - invert */
-};
-
-
-/* Functional version for completeness. Prefer the TRANSFORM macro
- * in patterns.h.
+/* Functional version for completeness. Prefer the TRANSFORM2 macro
+ * in liberty.h.
  */
 
 void 
-transform(int i, int j, int *ti, int *tj, int trans)
+transform2(int i, int j, int *ti, int *tj, int trans)
 {
-  TRANSFORM(i, j, ti, tj, trans);
-}
-
-
-/* Compute the point offset by (di, dj), relative to a base point (basepos), 
- * taking into account a transformation.
- */
-
-int
-offset(int i, int j, int basepos, int trans)
-{
-  int ui, uj;
-  TRANSFORM(i, j, &ui, &uj, trans);
-  return basepos + DELTA(ui, uj);
+  TRANSFORM2(i, j, ti, tj, trans);
 }
 
 
@@ -361,18 +330,22 @@ offset(int i, int j, int basepos, int trans)
  */
 
 static void
-do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
+do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	    struct pattern *pattern, void *callback_data,
 	    char goal[BOARDMAX]) 
 {
-  const int anchor_test = p[m][n] ^ color;  /* see below */
+  const int anchor_test = p[anchor] ^ color;  /* see below */
+  int m = I(anchor), n = J(anchor);
   int merged_val;
 
   /* Basic sanity checks. */
-  ASSERT_ON_BOARD2(m, n);
+  ASSERT_ON_BOARD1(anchor);
 
   /* calculate the merged value around [m][n] for the grid opt */
   {
+    /* FIXME: Convert this to 2D (using delta[]) but be aware that you'll
+     *	      also need to make corresponding changes in mkpat.c!
+     */
     int i, j;
     int shift = 30;
 
@@ -382,7 +355,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	unsigned int this;
 	if (!ON_BOARD2(i, j))
 	  this = 3;
-	else if ((this = p[i][j]) == 0)
+	else if ((this = p[POS(i, j)]) == 0)
 	  continue;
 	else if (color == 2)
 	  this = OTHER_COLOR(this);
@@ -480,8 +453,8 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	{
 	  int mi, mj, xi, xj;
 	  
-	  TRANSFORM(pattern->mini, pattern->minj, &mi, &mj, ll);
-	  TRANSFORM(pattern->maxi, pattern->maxj, &xi, &xj, ll);
+	  TRANSFORM2(pattern->mini, pattern->minj, &mi, &mj, ll);
+	  TRANSFORM2(pattern->maxi, pattern->maxj, &xi, &xj, ll);
 
 	  /* {min,max}{i,j} are the appropriate corners of the original
 	   * pattern, Once we transform, {m,x}{i,j} are still corners,
@@ -490,11 +463,12 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	   * to just test enough cases to be safe.
 	   */
 
-	  DEBUG(DEBUG_MATCHER, "---\nconsidering pattern '%s', rotation %d at %m. Range %d,%d -> %d,%d\n",
-		pattern->name, ll, m, n, mi, mj, xi, xj);
+	  DEBUG(DEBUG_MATCHER, 
+		"---\nconsidering pattern '%s', rotation %d at %1m. Range %d,%d -> %d,%d\n",
+		pattern->name, ll, anchor, mi, mj, xi, xj);
 
 	  /* now do the range-check */
-	  if (!ON_BOARD2(m+mi, n+mj) || !ON_BOARD2(m+xi, n+xj))
+	  if (!ON_BOARD2(m + mi, n + mj) || !ON_BOARD2(m + xi, n + xj))
 	    continue;  /* out of range */
 	}
 
@@ -506,28 +480,24 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	found_goal = 0;
 	found_nongoal = 0;
 	for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-	  int x, y; /* absolute coords of (transformed) pattern element */
-
+	  int pos; /* absolute coords of (transformed) pattern element */
 	  int att = pattern->patn[k].att;  /* what we are looking for */
-
 
 	  /* Work out the position on the board of this pattern element. */
 
 	  /* transform pattern real coordinate... */
-	  TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-	  x += m;
-	  y += n;
+	  pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
-	  ASSERT_ON_BOARD2(x, y);
+	  ASSERT_ON_BOARD1(pos);
 
 	  /* ...and check that p[x][y] matches (see above). */
-	  if ((p[x][y] & and_mask[color-1][att]) != val_mask[color-1][att])
+	  if ((p[pos] & and_mask[color-1][att]) != val_mask[color-1][att])
 	    goto match_failed;
 
-	  if (goal != NULL && p[x][y] != EMPTY) {
-	    if (goal[POS(x, y)])
+	  if (goal != NULL && p[pos] != EMPTY) {
+	    if (goal[pos])
 	      found_goal = 1;
-	    else if (p[x][y] == color)
+	    else if (p[pos] == color)
 	      found_nongoal = 1;
 	  }
 	  
@@ -535,7 +505,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	   * attributes - see patterns.db and above.
 	   */
 	  if ((pattern->class
-	       & class_mask[dragon[POS(x, y)].status][p[x][y]]) != 0)
+	       & class_mask[dragon[pos].status][p[pos]]) != 0)
 	    goto match_failed; 
 	  
 	} /* loop over elements */
@@ -574,7 +544,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 #endif
 	
 	/* A match!  - Call back to the invoker to let it know. */
-	callback(m, n, color, pattern, ll, callback_data);
+	callback(anchor, color, pattern, ll, callback_data);
 
 #if PROFILE_PATTERNS
 	pattern->reading_nodes += stats.nodes - nodes_before;
@@ -583,8 +553,8 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	/* We jump to here as soon as we discover a pattern has failed. */
       match_failed:
 	DEBUG(DEBUG_MATCHER, 
-	      "end of pattern '%s', rotation %d at %m\n---\n", 
-	      pattern->name, ll, m, n);
+	      "end of pattern '%s', rotation %d at %1m\n---\n", 
+	      pattern->name, ll, anchor);
 	 
       } while (++ll < end_transformation); /* ll loop over symmetries */
     } /* if not rejected by maxwt */
@@ -610,14 +580,13 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 	      struct pattern_db *pdb, void *callback_data,
 	      char goal[BOARDMAX], int anchor_in_goal) 
 {
-  int i, j;
-
-  for (i = 0; i != board_size; i++)
-    for (j = 0; j != board_size; j++)
-      if (p[i][j] == anchor
-          && (!anchor_in_goal || goal[POS(i,j)] != 0))
-	do_matchpat(i, j, callback, color, 
-		    pdb->patterns, callback_data, goal);
+  int pos;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (p[pos] == anchor && (!anchor_in_goal || goal[pos] != 0))
+      do_matchpat(pos, callback, color, pdb->patterns,
+		  callback_data, goal);
+  }
 }
 
 #if EXPERIMENTAL_READING
@@ -630,7 +599,7 @@ static void tree_matchpat_loop(matchpat_callback_fn_ptr callback,
 			       int color, int anchor,
 			       struct pattern_db *pdb, void *callback_data,
 			       char goal[BOARDMAX], int anchor_in_goal);
-static void tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
+static void tree_do_matchpat(int anchor, matchpat_callback_fn_ptr callback,
 			     int color, struct pattern_db *database,
 			     void *callback_data, char goal[BOARDMAX],
                              int anchor_in_goal);
@@ -685,7 +654,7 @@ struct rec_data {
  * for all patterns matched at location (m,n).
  */
 static void 
-do_tree_matchpat_rec(int color, int m, int n, int goal_found,
+do_tree_matchpat_rec(int color, int anchor, int goal_found,
                      char goal[BOARDMAX], 
                      struct tree_node_list *tnl, 
                      struct rec_data *pdata)
@@ -712,8 +681,8 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
 	      &(pdata->database->patterns[match->patnum]);
             int ll = match->orientation;
 	    int mi, mj, xi, xj;
-	    TRANSFORM(pattern->mini, pattern->minj, &mi, &mj, ll);
-	    TRANSFORM(pattern->maxi, pattern->maxj, &xi, &xj, ll);
+	    TRANSFORM2(pattern->mini, pattern->minj, &mi, &mj, ll);
+	    TRANSFORM2(pattern->maxi, pattern->maxj, &xi, &xj, ll);
 	    /* now do the range-check */
             if (!goal_found
                 || !ON_BOARD2(m+mi, n+mj) 
@@ -745,7 +714,7 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
 
 /* Stub for matchpat function.  Work done in recursive helper. */
 static void 
-tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
+tree_do_matchpat(int anchor, matchpat_callback_fn_ptr callback,
 		 int color, struct pattern_db *database,
 		 void *callback_data, char goal[BOARDMAX],
 		 int anchor_in_goal)
@@ -831,17 +800,17 @@ const int convert[3][4];
 
 /* Forward declarations. */
 static void dfa_prepare_for_match(int color);
-static int scan_for_patterns(dfa_rt_t *pdfa, int l, int m, int n, 
+static int scan_for_patterns(dfa_rt_t *pdfa, int l, int anchor, 
 			     int *pat_list);
 #if DFA_SORT
 static int compare_int(const void *a, const void *b);
 #endif
 static void do_dfa_matchpat(dfa_rt_t *pdfa,
-			    int m, int n, matchpat_callback_fn_ptr callback,
+			    int anchor, matchpat_callback_fn_ptr callback,
 			    int color, struct pattern *database,
 			    void *callback_data, char goal[BOARDMAX],
                             int anchor_in_goal);
-static void check_pattern_light(int m, int n, 
+static void check_pattern_light(int anchor, 
 				matchpat_callback_fn_ptr callback,
 				int color, struct pattern *pattern, int ll,
 				void *callback_data,
@@ -916,7 +885,7 @@ dfa_prepare_for_match(int color)
   for (i = 0; i < dfa_board_size; i++)
     for (j = 0; j < dfa_board_size; j++)
       dfa_p[DFA_POS(i, j) + DFA_OFFSET] = 
-	EXPECTED_COLOR(color, p[i][j]);
+	EXPECTED_COLOR(color, p[POS(i, j)]);
 
   prepare_for_match(color);
 }
@@ -947,12 +916,12 @@ dump_dfa_board(int m, int n)
  * Return the number of patterns found.
  */
 static int
-scan_for_patterns(dfa_rt_t *pdfa, int l, int m, int n, int *pat_list)
+scan_for_patterns(dfa_rt_t *pdfa, int l, int anchor, int *pat_list)
 {
   int state, att, id, row, delta;
   int dfa_pos;
 
-  dfa_pos = DFA_POS(m, n) + DFA_OFFSET;
+  dfa_pos = DFA_POS(I(anchor), J(anchor)) + DFA_OFFSET;
   state = 1; /* initial state */
   row = 0; /* initial row */
   id = 0; /* position in id_list */ 
@@ -976,7 +945,7 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int m, int n, int *pat_list)
     row++;
   } while (delta != 0); /* while not on error state */
 
-  ASSERT2(row < MAX_ORDER, m, n);
+  ASSERT1(row < MAX_ORDER, anchor);
   return id;
 }
 
@@ -997,7 +966,7 @@ compare_int(const void *a, const void *b)
 /* perform pattern matching with dfa filtering */
 static void 
 do_dfa_matchpat(dfa_rt_t *pdfa,
-		int m, int n, matchpat_callback_fn_ptr callback,
+		int anchor, matchpat_callback_fn_ptr callback,
 		int color, struct pattern *database,
 		void *callback_data, char goal[BOARDMAX],
                 int anchor_in_goal)
@@ -1010,20 +979,20 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
   int maxr = 0, k;
 
   /* Basic sanity checks. */
-  ASSERT_ON_BOARD2(m, n);
+  ASSERT_ON_BOARD1(anchor);
 
   /* Geometrical pattern matching */
   maxr = 0;
 
   /* one scan by transformation */
   for (ll = 0; ll != 8; ll++) {
-    maxr += scan_for_patterns(pdfa, ll, m, n, preorder);
+    maxr += scan_for_patterns(pdfa, ll, anchor, preorder);
     preorder = reorder + maxr;
     if (pdfa->pre_rotated)
       break;
   }
 
-  ASSERT2(maxr < DFA_MAX_MATCHED, m, n);
+  ASSERT1(maxr < DFA_MAX_MATCHED, anchor);
 
   /* Sorting patterns keep the same order as 
    * standard pattern matching algorithm */
@@ -1042,7 +1011,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
     database[matched].dfa_hits++;
 #endif
     
-    check_pattern_light(m, n, callback, color, database+matched, 
+    check_pattern_light(anchor, callback, color, database+matched, 
 			ll, callback_data, goal, anchor_in_goal);
   }
 }
@@ -1055,7 +1024,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
  */
 
 static void
-check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
+check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 	      struct pattern *pattern, int ll, void *callback_data,
 	      char goal[BOARDMAX], int anchor_in_goal)
 {
@@ -1072,8 +1041,8 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 #endif
 
   if (0)
-    gprintf("check_pattern_light @ %2m rot:%d pattern: %s\n", 
-	    m, n, ll, pattern->name);
+    gprintf("check_pattern_light @ %1m rot:%d pattern: %s\n", 
+	    anchor, ll, pattern->name);
 
   /* Throw out duplicating orientations of symmetric patterns. */
   if (pattern->trfno == 5) {
@@ -1089,29 +1058,27 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
   /* Now iterate over the elements of the pattern. */
   for (k = 0; k < pattern->patlen; k++) {
   				/* match each point */
-    int x, y;			/* absolute (board) co-ords of 
+    int pos;			/* absolute (board) co-ords of 
   				   (transformed) pattern element */
 
     /* transform pattern real coordinate... */
-    TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-    x += m;
-    y += n;
-    ASSERT_ON_BOARD2(x, y);
+    pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
+    ASSERT_ON_BOARD1(pos);
 
     if (!anchor_in_goal) { 
       /* goal check */
       if (goal != NULL) {
-        if (goal[POS(x, y)])
+        if (goal[pos])
 	  found_goal = 1;
-        else if (p[x][y] == color)
+        else if (p[pos] == color)
 	  found_nongoal = 1;
       }
     }
 
     /* class check */
-    ASSERT2(dragon[POS(x,y)].status < 4, x, y);
+    ASSERT1(dragon[pos].status < 4, anchor);
     if ((pattern->class
-	 & class_mask[dragon[POS(x, y)].status][p[x][y]]) != 0)
+	 & class_mask[dragon[pos].status][p[pos]]) != 0)
       goto match_failed;
     
   } /* loop over elements */
@@ -1134,7 +1101,7 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 #endif
   
   /* A match!  - Call back to the invoker to let it know. */
-  callback(m, n, color, pattern, ll, callback_data);
+  callback(anchor, color, pattern, ll, callback_data);
   
 #if PROFILE_PATTERNS
   pattern->reading_nodes += stats.nodes - nodes_before;
@@ -1142,8 +1109,8 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
   
   /* We jump to here as soon as we discover a pattern has failed. */
  match_failed:
-  DEBUG(DEBUG_MATCHER, "end of pattern '%s', rotation %d at %m\n---\n",
-	pattern->name, ll, m, n);
+  DEBUG(DEBUG_MATCHER, "end of pattern '%s', rotation %d at %1m\n---\n",
+	pattern->name, ll, anchor);
   
 } /* check_pattern_light */
 
@@ -1158,14 +1125,13 @@ dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 		  struct pattern_db *pdb, void *callback_data,
 		  char goal[BOARDMAX], int anchor_in_goal) 
 {
-  int i, j;
+  int pos;
 
-  for (i = 0; i != board_size; i++)
-    for (j = 0; j != board_size; j++)
-      if (p[i][j] == anchor
-          && (!anchor_in_goal || goal[POS(i,j)] != 0))
-	do_dfa_matchpat(pdb->pdfa, i, j, callback, color, pdb->patterns, 
-			callback_data, goal, anchor_in_goal);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (p[pos] == anchor && (!anchor_in_goal || goal[pos] != 0))
+      do_dfa_matchpat(pdb->pdfa, pos, callback, color, pdb->patterns,
+		      callback_data, goal, anchor_in_goal);
+  }
 }
 
 
@@ -1297,8 +1263,9 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
   int other = OTHER_COLOR(color);
   int ll;   /* Iterate over transformations (rotations or reflections)  */
   int k;    /* Iterate over elements of pattern */
-  int mid = (board_size-1)/2; /* We transform around the center point. */
-  int m, n;
+  /* We transform around the center point. */
+  int mid = POS((board_size-1)/2, (board_size-1)/2);
+  int pos;
   int number_of_stones_on_board = 0;
   
   /* Basic sanity check. */
@@ -1309,10 +1276,10 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
   board_to_p();
 
   /* Count the number of stones on the board. */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (p[m][n] != EMPTY)
-	number_of_stones_on_board++;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (IS_STONE(p[pos]))
+      number_of_stones_on_board++;
+  }
   
   /* Try each pattern - NULL pattern marks end of list. */
   for (; pattern->patn; pattern++) { 
@@ -1327,29 +1294,24 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
     for (ll = 0; ll < 8; ll++) {
       /* Now iterate over the elements of the pattern. */
       for (k = 0; k < pattern->patlen; k++) { /* match each point */
-	int x, y; /* board co-ords of transformed pattern element */
+	int pos; /* board co-ords of transformed pattern element */
 	int att = pattern->patn[k].att;  /* what we are looking for */
 
 	/* Work out the position on the board of this pattern element. */
-	TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-	x += mid;
-	y += mid;
+	pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, mid);
 
-        ASSERT_ON_BOARD2(x, y);
+        ASSERT_ON_BOARD1(pos);
 
-	if ((att == ATT_O && p[x][y] != color)
-	    || (att == ATT_X && p[x][y] != other))
+	if ((att == ATT_O && p[pos] != color)
+	    || (att == ATT_X && p[pos] != other))
 	  break;
 	
       } /* loop over elements */
 	
       if (k == pattern->patlen) {
 	/* A match!  - Call back to the invoker to let it know. */
-	int x, y;
-	TRANSFORM(pattern->movei, pattern->movej, &x, &y, ll);
-	x += mid;
-	y += mid;
-	callback(x, y, pattern, ll);
+	int pos = AFFINE_TRANSFORM(pattern->move_offset, ll, mid);
+	callback(pos, pattern, ll);
       }
     }
   }
@@ -1359,10 +1321,10 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
 static void
 board_to_p(void)
 {
-  int m, n;
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      p[m][n] = BOARD(m, n);
+  int pos;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    p[pos] = board[pos];
 }
 
 /*

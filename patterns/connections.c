@@ -32,10 +32,9 @@
  */
 
 static void
-cut_connect_callback(int m, int n, int color, struct pattern *pattern,
+cut_connect_callback(int anchor, int color, struct pattern *pattern,
 		     int ll, void *data)
 {
-  int anchor = POS(m, n);
   int move;
   int k;
   int first_dragon  = NO_MOVE;
@@ -52,7 +51,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
   if ((pattern->class & CLASS_Y) && !experimental_connections)
     return;
   
-  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   
   if ((pattern->class & CLASS_B) && !safe_move(move, other))
     return;
@@ -65,8 +64,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
     if (!experimental_connections) {
       for (k = 0; k < pattern->patlen; ++k) { /* match each point */
 	/* transform pattern real coordinate */
-	int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				   ll, m, n);
+	int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 	if (board[pos]==EMPTY
 	    && ((color == WHITE
 		 && (white_eye[pos].type & INHIBIT_CONNECTION))
@@ -87,8 +85,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
       /* transform pattern real coordinate */
-      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				 ll, m, n);
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
       
       /* Look for distinct dragons. */
       if (pattern->patn[k].att == ATT_O) {
@@ -128,8 +125,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
       if (pattern->patn[k].att == ATT_X) {
 	/* transform pattern real coordinate */
-	int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-				   ll, m, n);
+	int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
 	if (worm[pos].attack_codes[0] == WIN
 	  && (move == NO_MOVE
@@ -187,8 +183,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
   second_dragon = NO_MOVE;
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     /* transform pattern real coordinate */
-    int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
-			       ll, m, n);
+    int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
     /* Look for dragons to amalgamate. Never amalgamate stones which
      * can be attacked.
@@ -234,30 +229,30 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 
 /* Only consider B patterns. */
 static void
-cut_callback(int m, int n, int color, struct pattern *pattern, int ll,
+cut_callback(int anchor, int color, struct pattern *pattern, int ll,
 	     void *data)
 {
   if (pattern->class & CLASS_B)
-    cut_connect_callback(m, n, color, pattern, ll, data);
+    cut_connect_callback(anchor, color, pattern, ll, data);
 }
   
 
 /* Consider C patterns and those without classification. */
 static void
-conn_callback(int m, int n, int color, struct pattern *pattern, int ll,
+conn_callback(int anchor, int color, struct pattern *pattern, int ll,
 	      void *data)
 {
   if (!(pattern->class & (CLASS_B | CLASS_I)))
-    cut_connect_callback(m, n, color, pattern, ll, data);
+    cut_connect_callback(anchor, color, pattern, ll, data);
 }
   
 /* Only consider e patterns. */
 static void
-modify_eye_callback(int m, int n, int color, struct pattern *pattern,
+modify_eye_callback(int anchor, int color, struct pattern *pattern,
 		     int ll, void *data)
 {
   if (pattern->class & CLASS_I)
-    cut_connect_callback(m, n, color, pattern, ll, data);
+    cut_connect_callback(anchor, color, pattern, ll, data);
 }
   
 /* Find cutting points which should inhibit amalgamations and sever

@@ -222,7 +222,7 @@ static void atari_atari_find_attack_moves(int color, int minsize,
 static void atari_atari_attack_patterns(int color, int minsize,
 					struct aa_move attacks[AA_MAX_MOVES],
 					char goal[BOARDMAX]);
-static void atari_atari_attack_callback(int m, int n, int color,
+static void atari_atari_attack_callback(int anchor, int color,
 					struct pattern *pattern,
 					int ll, void *data);
 static int atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
@@ -911,14 +911,14 @@ atari_atari_attack_patterns(int color, int minsize,
  * before or not. Only exclude already known attacking moves.
  */
 static void
-atari_atari_attack_callback(int m, int n, int color,
+atari_atari_attack_callback(int anchor, int color,
 			    struct pattern *pattern, int ll, void *data)
 {
   int move;
   int k;
   UNUSED(data);
 
-  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
 
   if (forbidden[move])
     return;
@@ -943,8 +943,8 @@ atari_atari_attack_callback(int m, int n, int color,
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     if (pattern->patn[k].att == ATT_X) {
       /* transform pattern real coordinate */
-      int str = find_origin(AFFINE_TRANSFORM(pattern->patn[k].x,
-					     pattern->patn[k].y, ll, m, n));
+      int str = find_origin(AFFINE_TRANSFORM(pattern->patn[k].offset,
+					     ll, anchor));
 
       if (current_minsize > 0
 	  && get_aa_value(str) < current_minsize)

@@ -33,6 +33,11 @@
  *  '!' will always be written as the first elements
 */
 
+/* FIXME: This file is a horrible mess, especially after pattern
+ *	  matching went 1D. Cleaning it will make future work
+ *	  with pattern mathing easier.
+ */
+
 /* As in the rest of GNU Go, co-ordinate convention (i,j) is 'i' down from
  * the top, then 'j' across from the left
  */
@@ -71,6 +76,7 @@ Usage : mkpat [-cvh] <prefix>\n\
 #include <ctype.h>
 #include <assert.h>
 
+#include "liberty.h"
 #include "patterns.h"
 #include "gg-getopt.h"
 #include "gg_utils.h"
@@ -123,7 +129,7 @@ int mini, minj;                 /* offset of top-left element
 				   (0,0) unless there are edge constraints */
 int where;                      /* NORTH_EDGE | WEST_EDGE, etc */
 int el;                         /* next element number in current pattern */
-struct patval elements[MAX_BOARD*MAX_BOARD]; /* elements of current pattern */
+struct patval_b elements[MAX_BOARD*MAX_BOARD]; /* elements of current pattern */
 int num_stars;
 
 int ci = -1, cj = -1;           /* position of origin (first piece element)
@@ -528,14 +534,16 @@ write_to_dfa(int index)
   int rot_stop = 1;
   
   assert(ci != -1 && cj != -1);
+#if 0
   pattern[index].patn = elements; /* a little modification : keep in touch! */
+#endif
   pattern[index].name = &(pattern_names[index][0]); 
 
   if (verbose)
     fprintf(stderr, "Add   :%s\n", pattern[index].name);
 
   /* First we create the string from the actual pattern */
-  pattern_2_string(pattern+index, str, 0, ci, cj);
+  pattern_2_string(pattern+index, elements, str, 0, ci, cj);
       
   if (pre_rotate) {
     if (pattern[index].trfno != 5) {
@@ -590,7 +598,7 @@ compute_grids(void)
     for (k = 0; k < el; ++k) {
       int di, dj;
 
-      TRANSFORM(elements[k].x - ci, elements[k].y - cj, &di, &dj, ll);
+      TRANSFORM2(elements[k].x - ci, elements[k].y - cj, &di, &dj, ll);
       ++di;
       ++dj;
       if (di >= 0 && di < 4 && dj >= 0 && dj < 4) {
@@ -702,8 +710,7 @@ read_pattern_line(char *p)
 
     if (off == ATT_star) {
       /* '*' */
-      pattern[patno].movei = maxi;
-      pattern[patno].movej = j;
+      pattern[patno].move_offset = OFFSET(maxi, j);
       ++num_stars;
       off = ATT_dot;  /* add a '.' to the pattern instead */
     }
@@ -927,12 +934,10 @@ finish_pattern(char *line)
    */
 
   if (num_stars == 1) {
-    pattern[patno].movei -= ci;
-    pattern[patno].movej -= cj;
+    pattern[patno].move_offset -= OFFSET_DELTA(ci, cj);
   }
   else if (num_stars == 0) {
-    pattern[patno].movei = -1;
-    pattern[patno].movej = -1;
+    pattern[patno].move_offset = OFFSET(ci, cj);
   }
 
   find_extents();
@@ -1389,7 +1394,7 @@ finish_constraint_and_action(char *name)
   
   /* Generate autohelper function declaration. */
   code_pos += sprintf(code_pos, 
-		      "static int\nautohelper%s%d(struct pattern *patt, int transformation, int move, int color, int action)\n{\n  int",
+		      "static int\nautohelper%s%d(struct pattern *patt, int trans, int move, int color, int action)\n{\n  int",
 		      name, patno);
 
   /* Generate variable declarations. */
@@ -1405,7 +1410,7 @@ finish_constraint_and_action(char *name)
     *(code_pos-1) = ';';
   else {
     code_pos -= 3; /* no variable, erase "int" */
-    code_pos += sprintf(code_pos, "UNUSED(transformation);");
+    code_pos += sprintf(code_pos, "UNUSED(trans);");
   }
 
   /* Include UNUSED statements for two parameters */
@@ -1419,10 +1424,11 @@ finish_constraint_and_action(char *name)
 
     if (label_coords[c][0] != -1) {
       code_pos += sprintf(code_pos,
-			  "\n  %c = offset(%d, %d, move, transformation);",
+			  "\n  %c = AFFINE_TRANSFORM(%d, trans, move);",
 			  c,
-			  label_coords[c][0] - ci - pattern[patno].movei,
-			  label_coords[c][1] - cj - pattern[patno].movej);
+			  OFFSET(label_coords[c][0], label_coords[c][1])
+			  - OFFSET_DELTA(ci, cj)
+			  - CENTER_OFFSET(pattern[patno].move_offset));
       no_labels = 0;
     }
   }
@@ -1474,8 +1480,8 @@ static int
 compare_elements(const void *a, const void *b)
 {
   static char order[] = {7,2,3,5,6,0,4,1};  /* score for each attribute */
-  return  order[((const struct patval *)a)->att]
-    - order[((const struct patval *)b)->att];
+  return  order[((const struct patval_b *)a)->att]
+    - order[((const struct patval_b *)b)->att];
 }
 
 #if EXPERIMENTAL_READING
@@ -1489,8 +1495,8 @@ compare_elements(const void *a, const void *b)
 static int
 compare_elements_closest(const void *a, const void *b)
 {
-  const struct patval *pa = (const struct patval *)a;
-  const struct patval *pb = (const struct patval *)b;
+  const struct patval_b *pa = (const struct patval_b *)a;
+  const struct patval_b *pb = (const struct patval_b *)b;
 
   int ax = pa->x - ci;
   int bx = pb->x - ci;
@@ -1508,7 +1514,7 @@ static void tree_push_pattern(void);
 #endif
 
 struct element_node {
-  struct patval e;
+  struct patval_b e;
   struct element_node *next;
 };
 
@@ -1526,13 +1532,13 @@ write_elements(FILE *outfile, char *name)
   assert(ci != -1 && cj != -1);
 
   /* sort the elements so that least-likely elements are tested first. */
-  gg_sort(elements, el, sizeof(struct patval), compare_elements);
+  gg_sort(elements, el, sizeof(struct patval_b), compare_elements);
 
   fprintf(outfile, "static struct patval %s%d[] = {\n", name, patno);
 
   /* This may happen for fullboard patterns. */
   if (el == 0) {
-    fprintf(outfile, "    {0,0,-1}}; /* Dummy element, not used. */\n\n");
+    fprintf(outfile, "  {0,-1}}; /* Dummy element, not used. */\n\n");
     return;
   }
   
@@ -1545,8 +1551,9 @@ write_elements(FILE *outfile, char *name)
       fatal_errors++;
     }
 
-    fprintf(outfile, "   {%d,%d,%d}%s",
-	    elements[node].x - ci, elements[node].y - cj, elements[node].att,
+    fprintf(outfile, "  {%d,%d}%s",
+	    OFFSET(elements[node].x - ci, elements[node].y - cj),
+	    elements[node].att,
             node < el-1 ?  ((node + 1) % 4 ? ",\t" : ",\n")  : "};\n\n");
   }
 
@@ -1800,7 +1807,7 @@ tree_push_pattern(void)
   end_transformation = pattern[patno].trfno;
 
   /* sort the elements so that MOST likely elements are tested first. */
-  gg_sort(elements, el, sizeof(struct patval), compare_elements_closest);
+  gg_sort(elements, el, sizeof(struct patval_b), compare_elements_closest);
 
   if (0) {
   int i;
@@ -2034,8 +2041,8 @@ write_patterns(FILE *outfile, char *name)
     struct pattern *p = pattern + j;
 
     if (fullboard) {
-      fprintf(outfile, "  {%s%d,%d,\"%s\",%2d,%2d,%f},\n", name, j, p->patlen,
-	      pattern_names[j], p->movei, p->movej, p->value);
+      fprintf(outfile, "  {%s%d,%d,\"%s\",%d,%f},\n", name, j, p->patlen,
+	      pattern_names[j], p->move_offset, p->value);
       continue;
     }
     
@@ -2046,7 +2053,7 @@ write_patterns(FILE *outfile, char *name)
      * as the elements.
      */
     
-    fprintf(outfile, "  {%s%d,%d,%d, \"%s\",%d,%d,%d,%d,%d,%d,0x%x,%d,%d",
+    fprintf(outfile, "  {%s%d,%d,%d, \"%s\",%d,%d,%d,%d,%d,%d,0x%x,%d",
 	    name, j,
 	    p->patlen,
 	    p->trfno,
@@ -2056,7 +2063,7 @@ write_patterns(FILE *outfile, char *name)
 	    p->maxi - p->mini,   /* height */
 	    p->maxj - p->minj,   /* width  */
 	    p->edge_constraints,
-	    p->movei, p->movej);
+	    p->move_offset);
 
 
 #if GRID_OPT
@@ -2099,12 +2106,12 @@ write_patterns(FILE *outfile, char *name)
   }
 
   if (fullboard) {
-    fprintf(outfile, "  {NULL,0,NULL,0,0,0.0}\n};\n");
+    fprintf(outfile, "  {NULL,0,NULL,0,0.0}\n};\n");
     return;
   }
   
   /* Add a final empty entry. */
-  fprintf(outfile, "  {NULL, 0,0,NULL,0,0,0,0,0,0,0,0,0");
+  fprintf(outfile, "  {NULL, 0,0,NULL,0,0,0,0,0,0,0,0");
 #if GRID_OPT
   fprintf(outfile, ",{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}");
 #endif
@@ -2156,7 +2163,9 @@ main(int argc, char *argv[])
   int state = 0;
   int ifc = 0;
   int i;
-  
+
+  transformation_init();
+
   input_file_names[0] = 0;
   input_file_names[1] = 0;
 
@@ -2203,7 +2212,7 @@ main(int argc, char *argv[])
       }
     }
   }
-  
+
   if (output_file_name == NULL) {
     output_FILE = stdout;
   }

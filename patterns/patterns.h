@@ -68,29 +68,6 @@ struct _unused_patterns_h {
   int unused[sizeof(unsigned int) >= 4 ? 1 : -1];
 };
 
-/* transformation stuff */
-extern const int transformations[8][2][2];
-
-/*
- * a macro (inline) version of the transform function
- */
-
-#define TRANSFORM(i, j, ti, tj, trans) \
-do { \
-  *ti = transformations[trans][0][0] * (i) + transformations[trans][0][1] * (j); \
-  *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
-} while (0)
-
-
-/* The ordinary TRANSFORM plus translation with (m, n), returned as a
- * 1D coordinate.
- */
-#define AFFINE_TRANSFORM(i, j, trans, m, n) \
-  POS((m) + transformations[trans][0][0] * (i) \
-          + transformations[trans][0][1] * (j), \
-      (n) + transformations[trans][1][0] * (i) \
-          + transformations[trans][1][1] * (j))
-
 
 #define ATTACK_MACRO(pos) ((stackp==0) ? (worm[pos].attack_codes[0]) : attack(pos, NULL))
 #define DEFEND_MACRO(pos) ((stackp==0) ? (worm[pos].defense_codes[0]) : find_defense(pos, NULL))
@@ -205,10 +182,16 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 
 
 typedef struct patval {
+  int offset;
+  int att;
+} Patval;
+
+/* Build-time version of patval structure. */
+typedef struct patval_b {
   int x;
   int y;
   int att;
-} Patval;
+} Patval_b;
 
 
 /*
@@ -226,7 +209,7 @@ struct pattern {
   int height, width;    /* differences between max and min extents */
   int edge_constraints; /* and combinations of NORTH, EAST etc. for edges */
 
-  int movei, movej;     /* position of the suggested move (relative to anchor) */
+  int move_offset;      /* offset of the suggested move (relative to anchor) */
 
 #if GRID_OPT
   unsigned int and_mask[8]; /* for each rotation, masks for a */
@@ -278,7 +261,7 @@ struct fullboard_pattern {
   struct patval *patn;  /* array of elements */
   int patlen;           /* number of elements */
   const char *name;     /* short description of pattern (optional) */
-  int movei, movej;     /* position of the suggested move */
+  int move_offset;      /* offset of the suggested move (to intersection (0,0)) */
   float value;          /* value for pattern, if matched */
 };
 

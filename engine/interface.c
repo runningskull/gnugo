@@ -41,6 +41,7 @@ init_gnugo(float memory)
   reading_cache_init(memory * 1024 * 1024);
   clear_board();
 
+  transformation_init();
   dfa_match_init();
 #if EXPERIMENTAL_READING
   tree_match_init();

@@ -43,7 +43,7 @@
  */
 
 static void
-shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
+shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
 		void *data)
 {
   int other = OTHER_COLOR(color);
@@ -79,7 +79,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   UNUSED(data);
   
   /* Pick up the location of the move */
-  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   
   if (limit_search && !within_search_area(move))
     return;
@@ -99,7 +99,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	continue;
       
       /* transform pattern real coordinate */
-      pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, ll, m, n);
+      pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
       
       /* Already, matchpat rejects O patterns containing a friendly stone with
        * DEAD or CRITICAL matcher_status. If the stone is tactically

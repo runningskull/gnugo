@@ -34,6 +34,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "liberty.h"
 #include "gg_utils.h"
 #include "patterns.h"
 #include "patlib.h"
@@ -876,7 +877,7 @@ textpattern_transform(Textpattern *tp, int transform)
     }
     
     if (i != 0 || j != 0) {
-      TRANSFORM(i, j, &i1, &j1, transform);
+      TRANSFORM2(i, j, &i1, &j1, transform);
       if (i1 == 0) {
 	if (j1 < 0)
 	  newedge |= WEST_EDGE;
@@ -900,7 +901,7 @@ textpattern_transform(Textpattern *tp, int transform)
   for (r = 0; r < tp->num_elements; ++r) {
     i = r / tp->width;
     j = r % tp->width;
-    TRANSFORM(i, j, &i1, &j1, transform);
+    TRANSFORM2(i, j, &i1, &j1, transform);
 
     array1[(i1+size)*size2 + j1+size] = tp->elements[r];
     if (tp->num_constraint_elements > 0)
