@@ -412,28 +412,50 @@ on the board, and @code{popgo()} which removes it by popping the move
 stack. At the same time vital information such as the number of
 liberties for each string and their location is updated incrementally. 
 @end quotation
-@item @file{clock.c}
+@item @file{breakin.c}
+@quotation
+Code to detect moves which can break into supposed territory and moves
+to prevent this.
+@end quotation
+@item @file{cache.c} and @file{cache.h}
+@quotation
+As a means of speeding up reading, computed results are cached so that
+they can be quickly reused if the same position is encountered through
+e.g. another move ordering. This is implemented using a hash table.
+@end quotation
+@item @file{clock.c} and @file{clock.h}
 @quotation
 Clock code, including code allowing GNU Go to automatically
 adjust its level in order to avoid losing on time in tournaments.
+@end quotation
+@item @file{combination.c}
+@quotation
+When something can (only) be captured through a series of ataris or
+other threats we call this a combination attack. This file contains code
+to find such attacks and moves to prevent them.
 @end quotation
 @item @file{dragon.c}
 @quotation
 This contains @code{make_dragons()}. This function is executed before
 the move-generating modules @code{shapes()} @code{semeai()} and the
-other move generators but after @code{make_worms}. It tries to connect
+other move generators but after @code{make_worms()}. It tries to connect
 worms into dragons and collect important information about them, such as
 how many liberties each has, whether (in GNU Go's opinion) the dragon
 can be captured, if it lives, etc.
 @end quotation
-@item @file{fuseki.c}
+@item @file{endgame.c}
 @quotation
-Generates fuseki (opening) moves from a database.
+Code to find certain types of endgame moves.
 @end quotation
 @item @file{filllib.c}
 @quotation 
 Code to force filling of dame (backfilling if necessary)
 at the end of the game.
+@end quotation
+@item @file{fuseki.c}
+@quotation
+Generates fuseki (opening) moves from a database. Also generates moves
+in empty corners.
 @end quotation
 @item @file{genmove.c}
 @quotation
@@ -449,21 +471,12 @@ This contains the principal global variables used by GNU Go.
 This file contains declarations forming the public interface to
 the engine.
 @end quotation
-@item @file{hash.c} and @file{cache.c}
+@item @file{hash.c} and @file{hash.h}
 @quotation
 Hashing code implementing Zobrist hashing. (@pxref{Hashing}) The code in
 @file{hash.c} provides a way to hash board positions into compact descriptions
-which can be efficiently compared. The code in @file{cache.c} implements a
-kind of database for storing reading results, so they can be quickly
-retrieved. The caching code uses the board hashes as keys to the database.
-They are split since these functionalities are sufficiently demarked that
-either file could be reimplemented without affecting the other one.  Note also
-that @code{matchpat()} uses the hashing code without also using the caching
-code.
-@end quotation
-@item @file{hash.h} and @file{cache.h}
-@quotation
-Header files for @file{hash.c} and @file{cache.c}.
+which can be efficiently compared. The caching code in @file{cache.c}
+makes use of the board hashes when storing and retrieving read results.
 @end quotation
 @item @file{influence.c} and @file{influence.h}.
 @quotation
@@ -483,26 +496,46 @@ patterns at a particular board location. The actual patterns are in
 the @file{patterns/} directory. The function @code{matchpat()} is
 called by every module which does pattern matching, notably @code{shapes}.
 @end quotation
-@item @file{move_reasons.c}
+@item @file{move_reasons.c} and @file{move_reasons.h}
 @quotation
-This file contains the code which assigns values to every move
-after all the move reasons are gen
+Code for keeping track of move reasons.
+@end quotation
+@item @file{movelist.c}
+@quotation 
+Supporting code for lists of moves.
 @end quotation
 @item @file{optics.c}
 @quotation 
 This file contains the code to recognize eye shapes,
 documented in @xref{Eyes}.
 @end quotation
+@item @file{oracle.c}
+@quotation 
+Code to fork off a second GNU Go process which can be used to simulate
+reading with top level information (e.g. dragon partitioning) available.
+@end quotation
 @item @file{owl.c}
 @quotation
-This file does life and death reading. The paradigm is that moves
-are played by both players trying to expand and shrink the eyespace
-until a static configuration is reached where it can be analyzed
-by the code in @file{optics.c}.
+This file does life and death reading. Move generation is pattern based
+and the code in @file{optics.c} is used to evaluate the eyespaces for
+vital moves and independent life. A dragon can also live by successfully
+escaping. Semeai reading along the same principles is also implemented
+in this file.
+@end quotation
+@item @file{persistent.c}
+@quotation
+Persistent cache which allows reuse of read results at a later move or
+with additional stones outside an active area, which are those
+intersections thought to affect the read result.
 @end quotation
 @item @file{printutils.c}
 @quotation
-Print utilities
+Print utilities.
+@end quotation
+@item @file{readconnect.c} and @file{readconnect.h}
+@quotation 
+This file contains code to determine whether two strings can be
+connected or disconnected.
 @end quotation
 @item @file{reading.c}
 @quotation 
@@ -517,9 +550,13 @@ code for scoring the game.
 @end quotation
 @item @file{semeai.c}
 @quotation 
-This file contains @code{semeai()}, the module which tries to
-win capturing races. This module does not work particularly
-well and will eventually be replaced.
+This file contains @code{semeai()}, the module which detects dragons
+in semeai. To determine the semeai results the semeai reading in
+@file{owl.c} is used.
+@end quotation
+@item @file{sgfdecide.c}
+@quotation 
+Code to generate sgf traces for various types of reading.
 @end quotation
 @item @file{shapes.c}
 @quotation 
@@ -534,16 +571,27 @@ with same letter) and status (color). This was the
 primary interface in GNU Go 1.2, but is now a debugging 
 aid.
 @end quotation
+@item @file{surround.c}
+@quotation 
+Code to determine whether a dragon is surrounded and to find moves to
+surround with or break out with.
+@end quotation
+@item @file{utils.c}
+@quotation
+An assortment of utilities, described in greater detail below.
+@end quotation
+@item @file{value_moves.c}
+@quotation 
+This file contains the code which assigns values to every move
+after all the move reasons are generated. It also tries to generate
+certain kinds of additional move reasons.
+@end quotation
 @item @file{worm.c}
 @quotation 
 This file contains @code{make_worms()}, code which is run at the
 beginning of each move cycle, before the code in @file{dragon.c}, to
 determine the attributes of every string. These attributes are things
 like liberties, wether the string can be captured (and how), etc
-@end quotation
-@item @file{utils.c}
-@quotation
-An assortment of utilities, described in greater detail below.
 @end quotation
 @end itemize
 
