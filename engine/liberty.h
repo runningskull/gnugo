@@ -707,10 +707,12 @@ float influence_delta_territory(const struct influence_data *base,
 				int move);
 int retrieve_delta_territory_cache(int pos, int color, float *move_value,
 			           float *followup_value,
-				   const struct influence_data *base);
+				   const struct influence_data *base,
+				   Hash_data safety_hash);
 void store_delta_territory_cache(int pos, int color, float move_value,
 				 float followup_value,
-				 const struct influence_data *base);
+				 const struct influence_data *base,
+			         Hash_data safety_hash);
 
 int whose_territory(const struct influence_data *q, int pos);
 int whose_moyo(const struct influence_data *q, int pos);

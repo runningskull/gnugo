@@ -1943,9 +1943,11 @@ estimate_territorial_value(int pos, int color, float score)
    */
   if (does_block
       && tryko(pos, color, "estimate_territorial_value", EMPTY, NO_MOVE)) {
+    Hash_data safety_hash = goal_to_hashvalue(safe_stones);
     if (!retrieve_delta_territory_cache(pos, color, &this_value, 
 	  				&move[pos].influence_followup_value,
-					OPPOSITE_INFLUENCE(color))) {
+					OPPOSITE_INFLUENCE(color),
+					safety_hash)) {
       compute_influence(OTHER_COLOR(color), safe_stones, strength, 
 	  		&move_influence, pos, "after move");
       increase_depth_values();
@@ -1964,7 +1966,7 @@ estimate_territorial_value(int pos, int color, float score)
 	    			    color, pos);
       store_delta_territory_cache(pos, color, this_value,
 	 			  move[pos].influence_followup_value,
-				  OPPOSITE_INFLUENCE(color));	
+				  OPPOSITE_INFLUENCE(color), safety_hash);	
     }
     else {
       if (this_value != 0.0)

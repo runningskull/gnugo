@@ -1824,6 +1824,7 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
 /* Cache of delta_territory_values. */
 static float delta_territory_cache[BOARDMAX];
 static float followup_territory_cache[BOARDMAX];
+Hash_data delta_territory_cache_hash[BOARDMAX];
 static int territory_cache_position_number = -1;
 static int territory_cache_influence_id = -1;
 static int territory_cache_color = -1;
@@ -1837,14 +1838,12 @@ static int territory_cache_color = -1;
 int 
 retrieve_delta_territory_cache(int pos, int color, float *move_value,
     			       float *followup_value,
-			       const struct influence_data *base)
+			       const struct influence_data *base,
+			       Hash_data safety_hash)
 {
   ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), pos);
 
-#if 1
-  return 0;
-#endif
   /* We check whether the color, the board position, or the base influence
    * data has changed since the cache entry got entered.
    */
@@ -1852,6 +1851,11 @@ retrieve_delta_territory_cache(int pos, int color, float *move_value,
       && territory_cache_color == color
       && territory_cache_influence_id == base->id
       && delta_territory_cache[pos] != NOT_COMPUTED) {
+    int i;
+    for (i = 0; i < NUM_HASHVALUES; i++)
+      if (delta_territory_cache_hash[pos].hashval[i]
+	  != safety_hash.hashval[i])
+	return 0;
     *move_value = delta_territory_cache[pos];
     *followup_value = followup_territory_cache[pos];
     if (0) 
@@ -1865,10 +1869,12 @@ retrieve_delta_territory_cache(int pos, int color, float *move_value,
 void 
 store_delta_territory_cache(int pos, int color,
 			    float move_value, float followup_value,
-			    const struct influence_data *base)
+			    const struct influence_data *base,
+			    Hash_data safety_hash)
 {
   ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), pos);
+  int i;
 
   if (territory_cache_position_number != position_number
       || territory_cache_color != color
@@ -1884,6 +1890,8 @@ store_delta_territory_cache(int pos, int color,
   }
   delta_territory_cache[pos] = move_value;
   followup_territory_cache[pos] = followup_value;
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    delta_territory_cache_hash[pos].hashval[i] = safety_hash.hashval[i];
   if (0)
     gprintf("%1m: Stored delta territory cache: %f, %f\n", pos, move_value,
 	    followup_value);

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- add safety_hash field to delta territory cache, reenable this cache
 - cgi interface in interface/html directory removed
 
 3.4 released July 31, 2003
