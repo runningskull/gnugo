@@ -431,6 +431,26 @@ Pattern EB24
 ;!xplay_defend(*,a)
 
 
+Pattern EB25
+# tm New Pattern (3.1.22)
+
+O!.  cutable keima on edge.
+.*O
+.!.
+---
+
+:8,B
+
+Gb.
+caF
+.!.
+---
+
+; xplay_attack_either(a,b,G,F) &&
+; xplay_attack_either(a,c,G,F)
+
+
+ 
 ##########################
 #
 # B patterns in the center

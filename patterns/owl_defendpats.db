@@ -381,18 +381,19 @@ O*X
 
 
 Pattern D117
+# tm modified (3.1.22)
 
-*O.X           extend on third line
-...O
-....
-----
+?*O.X           extend on third line
+o...O
+?....
+-----
 
 :8,-,value(70)
 
-*O.X
-...a
-....
-----
+?*O.X
+?...a
+?....
+-----
 
 ;lib(a) >= 4
 
@@ -597,17 +598,19 @@ oO*?x
 
 
 Pattern D207
+# tm reduced value (3.1.22) (see nngs:710)
 
 O.X          second line kosumi
 .*x
 ...
 ---
 
-:8,-,value(76)
+:8,-,value(66)
 
 
 Pattern D208
 # db reduced slightly (3.1.8)
+# tm reduced some more (3.1.22) (see nngs:710)
 
 ???o      second line keima
 X..O
@@ -615,7 +618,7 @@ X..O
 ....
 ----
 
-:8,-,value(78)
+:8,-,value(65)
 
 
 Pattern D209
@@ -1184,6 +1187,7 @@ ooo
 
 Pattern D309a
 # tm modified (3.1.16)
+# tm modified (3.1.22)
 
 ?O?        block off area
 X*.
@@ -1196,6 +1200,7 @@ X*a
 ooo
 
 ; oplay_attack(*,a,a)
+; && !obvious_false_oeye(a)
 
 
 Pattern D309b
@@ -1234,13 +1239,14 @@ oo?
 
 Pattern D310b
 # More worth if safe from atari.
+# tm Reduced value (3.1.22) (see owl:153)
 
 ?o?
 *.O        hanging connection to make eye
 .OX
 oo?
 
-:8,-,value(75)
+:8,-,value(65)
 
 ?o?
 *ba
@@ -1542,6 +1548,7 @@ Pattern D503
 # The first constraint is necessary because the lower O stone 
 # may be short on liberties. It might work to replace it with 
 # a liberty constraint.
+# tm modified (3.1.22)
 
 |..O
 |*.O       hanging connection to protect eyespace
@@ -1549,11 +1556,13 @@ Pattern D503
 
 :8,-,value(70)
 
-|..O
+|.bO
 |*aO
 |?Oc
 
-; oplay_attack(*,a,a) && !xplay_attack_either(*,?,a,a,c)
+; oplay_attack(*,a,a) && 
+; !xplay_attack_either(a,a,c) &&
+; oplay_attack(*,b,a,b)
 
 
 Pattern D504
@@ -1571,6 +1580,7 @@ Pattern D504
 
 
 Pattern D505
+#tm modified (3.1.22)
 
 OOX         hanging connection to defend and make eye
 ..O
@@ -1580,11 +1590,11 @@ OOX         hanging connection to defend and make eye
 :8,-,value(85)
 
 OaX
-.bc
+dbc
 .*.
 ---
 
-; lib(a)>1 && safe_xmove(b) && oplay_attack(*,b,b) && does_attack(b,c)
+; lib(a)>1 && safe_xmove(b) && oplay_attack(*,d,b,d) && does_attack(b,c)
 
 
 Pattern D506
@@ -2737,7 +2747,7 @@ OO.
 
 Pattern D720
 # tm New pattern (3.1.16)
-
+  
 ?O.o
 O.*o
 
@@ -3387,6 +3397,24 @@ Pattern D838
 ;oplay_attack(*,A)
 
 
+Pattern D839
+# tm New Pattern (3.1.22) (see trevord:910)
+
+X*O?     Extend side eye-space in sente
+?..o
+----
+
+:8,-,value(80)
+
+C*O?     Extend side eye-space in sente
+?bao
+----
+
+;!obvious_false_oeye(a)
+;&& oplay_attack(*,b,C)
+
+
+
 #########################################################
 #                                                       #
 #                  Prevent intrusion                    #
@@ -3576,16 +3604,18 @@ obO.X
 
 
 Pattern D1000
+# tm modified (3.1.22)
 
 O*          prevent opponent's safe cut
 XO
 
 :/,-,value(60)
 
-O*
-aO
+B*
+aC
 
-; safe_xmove(*) && !xplay_attack(*,a)
+; (wormsize(B) > 1 && wormsize(C) > 1)
+;  && safe_xmove(*) && !xplay_attack(*,a)
 
 
 Pattern D1000a
@@ -3639,13 +3669,14 @@ X*O
 
 Pattern D1003
 # Notice similarity with D310a, D310b.
+# tm reduced value (3.1.22)  (see trevorc:1440)
 
 ????
 ?*.O       hanging connection to protect eyespace
 ?.OX
 ?oo?
 
-:8,-,value(70)
+:8,-,value(55)
 
 ????
 ?*ab
@@ -3750,7 +3781,6 @@ bAc
 
 
 Pattern D1100
-# The B classification inhibits the addition of * to the dragon.
 
 X*          attack the surrounding chain
 OX
@@ -4442,6 +4472,26 @@ cd?
 ;&& oplay_attack(*,a)
 
 
+Pattern D1141
+# tm New Pattern (3.1.22)
+#  (see nngs:1810  owl_attack M17, result 3 L16)
+
+...	atari for tempo
+O.X
+OX.
+X*.
+
+:8,-,value(45)
+
+...
+O.X
+OX.
+a*.
+
+; lib(a) == 2 || oplay_attack(*,a)
+
+
+
 ########################################################
 #                                                       #
 #                       Kikashi                         #
@@ -4480,6 +4530,7 @@ AOo
 
 
 Pattern D1202
+# tm modified (3.1.22) (see owl:152)
 
 o*X?         move up with atari
 o.OO
@@ -4489,11 +4540,11 @@ o.OO
 :8,-,value(75)
 
 o*A?
-o.OO
+B.OO
 ....
 ----
 
-;lib(A) <= 2
+;lib(A) <= 2 && (o_somewhere(B) || !attack(A) || defend(A))
 
 
 Pattern D1203
@@ -5751,13 +5802,14 @@ o...
 
 Pattern D1367
 # db added (3.1.11)
+# tm added b attribute.
 
 ...?
 .*.?       jump out
 ...X
 ?OO?
 
-:8,-,value(60)
+:8,b,value(60)
 
 
 Pattern D1368
@@ -6007,13 +6059,32 @@ Pattern D1383
 
 :8,s,value(71)
 
-?OD
-fbc
-?*e
+?Bo
+...
+?*.
 ?a?
 
 ;(owl_escape_value(a) > 0)
-; && (xplay_attack(b,c,f,D,e,e) || xplay_attack(b,c,f,e,D,D))
+; && !oplay_disconnect(*,*,B)
+
+
+Pattern D1384
+# tm New Pattern (3.1.22)  (see strategy2:73)
+#   may not be necessary, but probably doesn't hurt.
+#   (doesn't work for strategy2:73; no matching stones are in dragon)
+
+O..   escape or capture to escape
+.*?
+?.O
+
+:8,-,value(65)
+
+A..
+.*c
+?dB
+
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
+; && (!x_somewhere(c) || oplay_attack_either(*,d,c,d))
 
 
 #########################################################

@@ -1276,7 +1276,7 @@ O*      empty triangle. Ok if the empty point of the triangle is an eye.
 O*
 aO
 
-;!eye(a)
+;!eye(a) 
 
 
 Pattern Shape3
@@ -2493,6 +2493,30 @@ A..
 ;lib(A)==2
 
 
+Pattern Shape80
+# tm New Pattern (3.1.22) (see trevora:390)
+
+|O.O
+|..O
+|*.O
+|..o
++---
+
+:8,-,shape(1)
+
+
+Pattern Shape81
+# tm New Pattern (3.1.22) (see trevora:300)
+# FIXME: potentially bad for ko threats.
+
+.*o
+O..
+XOO
+
+:8,X,shape(1)
+
+
+
 ###########################
 #
 # Followup moves. 
@@ -2623,6 +2647,7 @@ A.A
 
 
 Pattern Sente7
+# tm modified (3.1.22) (added oplay_defend)
 
 ?O?
 .X*
@@ -2636,7 +2661,7 @@ Pattern Sente7
 ...
 ---
 
-;oplay_attack(*,A)
+;oplay_attack(*,A) && oplay_defend(*,A)
 
 
 Pattern Sente8

@@ -4914,18 +4914,21 @@ XO.
 
 
 Pattern EB705
+# FIXME: (see trevorc:1040)
 
+?????
 ?O...        prevent incursion
 X*...
 -----
 
 :8,OXb
 
+?????
 ?b...
 X*a..
 -----
 
-;xplay_attack(*,a,a) || weak(b)
+;(xplay_attack(*,a,a) || weak(b))
 
 
 Pattern EB706
@@ -5045,6 +5048,7 @@ C*a.
 
 Pattern EB713
 # tm modified (3.1.17)
+# FIXME: (see trevorc:1040)
 
 ?O..          block
 X*..
@@ -7742,7 +7746,7 @@ a*
 OX
 .x
 
-;odefend_against(*,a)
+; odefend_against(*,a)
 
 
 Pattern CB241c
@@ -8100,16 +8104,26 @@ Pattern CB272
 
 
 Pattern CB273
-# FIXME: See global:8 for unexpected difficulty.
+# See global:8, global:9
+# tm modified (3.1.22)
 
 ??O?        jump out
-?XO?
+?XOo
 X...
-..*?
+..*o
 ????
 
 :8,OXe
 
+??O?        jump out
+?XOa
+Xecd
+..*b
+????
+
+; o_somewhere(a,b) 
+; || oplay_attack(*,c,d,e,b,a)
+; || oplay_attack(*,c,d,e,a,b)
 
 Pattern CB274
 
@@ -10630,14 +10644,15 @@ dXO
 
 
 Pattern CD88
+#tm removed shape bonus (3.1.22)  (see nngs:700)
 
 X*..         attack 1 stone to defend and probably connect
 O..O
 
-:8,OXdac,shape(3)
+:8,OXdac
 
 a*..
-O..O
+Ob.O
 
 ; does_attack(*,a)
 
@@ -11758,6 +11773,7 @@ bXOX.
 
 
 Pattern EJ50
+# tm Modified (3.1.22) (see nngs:1740)
 
 ??.....??     good extension
 ?.O.....x
@@ -11766,7 +11782,7 @@ OO....*.x
 .........
 ---------
 
-:8,sjdE,shape(3)
+:8,sedE,shape(3)
 
 
 Pattern EJ51
@@ -12149,7 +12165,9 @@ XOO.*.
 
 
 Pattern EJ75
-#FIXME:  see trevorc:420
+#tm modified (3.1.22) (see trevorc:420)
+#FIXME: Pattern still seems a bit too general
+#   consider adding appriate constraint & C attribute.
 
 .X.??           connect under
 O*.oo
@@ -12157,7 +12175,7 @@ O*.oo
 .....
 -----
 
-:8,jCX
+:8,ebEX
 
 .X.??
 O*.ab

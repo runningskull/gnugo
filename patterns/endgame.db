@@ -118,6 +118,24 @@ ba*x
 ;marginal_eye(*) && proper_eye(a) && proper_eye(b) && !xplay_attack(*,c)
 
 
+Pattern EE1a
+
+?OOx      block on edge
+..*x      2 point gote
+----
+
+:8,bOX,terri(2)
+
+?ccx
+ba*x
+----
+
+; marginal_eye(*) && proper_eye(a) && proper_eye(b) 
+; && xplay_attack(*,a,c)
+
+
+
+
 Pattern EE2
 
 OXXx
@@ -1467,6 +1485,24 @@ X*X	Wedge
 O.X
 
 :8,OXb
+
+
+Pattern CE30
+# tm New Pattern (3.1.20)  (see trevorc:650, trevorc:470)
+
+???    threaten to capture
+?*X
+??.
+
+:8,nOXb,terri(1),followup(3)
+
+?c?
+d*A
+??b
+
+; o_somewhere(c,d) && (!weak(c) || !weak(d))
+; && proper_eye(b) && oplay_attack(*,A)
+
 
 
 ######################################################################
