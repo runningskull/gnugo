@@ -165,3 +165,8 @@ loadsgf games/kisei28_g7.sgf 280
 loadsgf games/kgs/2004-04-28-R-dokuganryu-GnuGoCVS.sgf 302
 34 gg_genmove black
 #? [!A19|C19]
+
+# An example of transforming a won semeai into a seki
+loadsgf games/blunder24.sgf
+35 gg_genmove white
+#? [!G1]
