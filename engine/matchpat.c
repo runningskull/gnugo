@@ -773,6 +773,8 @@ static const int convert[3][4] = {
   {EMPTY, WHITE, BLACK, OUT_BOARD},	/* WHITE */
   {EMPTY, BLACK, WHITE, OUT_BOARD}	/* BLACK */
 };
+#define EXPECTED_COLOR(player_c, position_c)  		\
+		(convert[player_c][position_c])
 
 /* Forward declarations. */
 static void dfa_prepare_for_match(int color);
@@ -906,7 +908,6 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos, int *pat_list)
     row++;
   } while (delta != 0); /* while not on error state */
 
-  gg_assert(row < DFA_MAX_ORDER);
   return id;
 }
 

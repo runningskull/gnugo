@@ -113,20 +113,24 @@ member_att(dfa_t *pdfa, int att, int val)
 static int
 union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
 {
-  int att;
-  int att_aux;
+  int att_aux = 0;
+  int att = 0;
+  int save1 = att1;
+  int save2 = att2;
 
+  if (att1 == 0 && att2 == 0)
+    return 0;
   /* copy att1 in att */
-  att = 0;
   while (att1 != 0) {
     pdfa->last_index++;
     if (pdfa->last_index >= pdfa->max_indexes)
       resize_dfa(pdfa, pdfa->max_states, pdfa->max_indexes + DFA_RESIZE_STEP);
     att_aux = pdfa->last_index;
+    if (!att)
+      att = att_aux;
     
     pdfa->indexes[att_aux].val = pdfa1->indexes[att1].val;
-    pdfa->indexes[att_aux].next = att;
-    att = att_aux;
+    pdfa->indexes[att_aux].next = att_aux + 1;
     att1 = pdfa1->indexes[att1].next;
   }
 
@@ -137,12 +141,20 @@ union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
       if (pdfa->last_index >= pdfa->max_indexes)
 	resize_dfa(pdfa, pdfa->max_states, pdfa->max_indexes + DFA_RESIZE_STEP);
       att_aux = pdfa->last_index;
+      if (!att)
+	att = att_aux;
 
       pdfa->indexes[att_aux].val = pdfa2->indexes[att2].val;
-      pdfa->indexes[att_aux].next = att;
-      att = att_aux;
+      pdfa->indexes[att_aux].next = att_aux + 1;
     }
     att2 = pdfa2->indexes[att2].next;
+  }
+  pdfa->indexes[att_aux].next = 0;
+  if (0 && save1 != 0 && save2 != 0) {
+    fprintf(stderr, "Made union of %d and %d at %d.\n", save1, save2, att);
+    dump_dfa(stderr, pdfa);
+    dump_dfa(stderr, pdfa1);
+    dump_dfa(stderr, pdfa2);
   }
 
   return att;
@@ -416,8 +428,8 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
     exit(EXIT_FAILURE);
   }
 
-  assert(dfa_minmax_delta(pdfa, -1, 1) > 0);
-  if (dfa_minmax_delta(pdfa, -1, 0)  > 65535) {
+  assert(dfa_minmax_delta(pdfa, -1, 1) > -32768);
+  if (dfa_minmax_delta(pdfa, -1, 0)  > 32768) {
     fprintf(of, "#error too many states");
     fprintf(stderr, "Error: The dfa states are too disperse. Can't fit delta into a short.\n");
     exit(EXIT_FAILURE);
@@ -436,16 +448,15 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
 	  name, pdfa->last_state + 1);
   for (i = 0; i != pdfa->last_state + 1; i++) {
     int j;
-    fprintf(of, "{%d,", pdfa->states[i].att);
-    fprintf(of, "{");
+    fprintf(of, "{{");
     for (j = 0; j < 4; j++) {
       int n = pdfa->states[i].next[j];
-      assert((n == 0) || ((n - i > 0) && (n - i < 65535)));
+      assert((n == 0) || (abs(n - i) < 32768));
       fprintf(of, "%d", n ? n - i : 0);
       if (j != 3)
         fprintf(of, ",");
     }
-    fprintf(of, "}},%s", ((i+1)%3 ? "\t" : "\n"));
+    fprintf(of, "}, %d},%s", pdfa->states[i].att, ((i+1)%3 ? "\t" : "\n"));
   }
   fprintf(of, "};\n\n");
 
@@ -816,11 +827,11 @@ dfa_minmax_delta(dfa_t *pdfa, int next_index, int isMin) {
   return ret;
 }
 
+#define DFA_ALIGN 	2
 
 /*
  * Re-orders DFA into a canonical form, which does a half-hearted 
- * attempt to reduce the size of jumps for all states entries, and
- * guarantees the jumps are all forward-only.
+ * attempt to reduce the size of jumps for all states entries.
  */
 void
 dfa_shuffle(dfa_t *pdfa)
@@ -852,11 +863,13 @@ dfa_shuffle(dfa_t *pdfa)
     for (i = 0; i < q1p; i++) {
       for (j = 0; j < 4; j++) {
         int n = pdfa->states[queue1[i]].next[j];
-        if (n && !state_to[n]) {
+	/* next_new_state = DFA_ALIGN * ((next_new_state-1) / DFA_ALIGN) + 1;*/
+        while (n && !state_to[n]) {
           state_to[n] = next_new_state;
           state_from[next_new_state] = n;
           next_new_state++;
           queue2[q2p++] = n;
+	  n = pdfa->states[n].next[0];
         }
       }
     }
@@ -887,38 +900,52 @@ dfa_shuffle(dfa_t *pdfa)
 /* Calculate the maximal number of patterns matched at one point for
  * one transformation.  Multiplying this number by 8 gives an upper
  * bound for the total number of matched patterns for all
- * transformation.  The DFA must be shuffled before calling this
- * function (to ensure that all jumps go forward).
+ * transformation.
  */
 int
 dfa_calculate_max_matched_patterns(dfa_t *pdfa)
 {
   int total_max = 0;
   int *state_max = calloc(pdfa->last_state + 1, sizeof(int));
-  int k;
+  char *queued = calloc(pdfa->last_state + 1, sizeof(char));
+  int *queue = malloc(pdfa->last_state * sizeof(int));
+  int queue_start = 0;
+  int queue_end = 1;
 
-  for (k = 1; k <= pdfa->last_state; k++) {
-    int i;
+  queue[0] = 1;
+  while (queue_start < queue_end) {
+    int state = queue[queue_start++];
+    int k;
 
     /* Increment maximal number of matched patterns for each pattern
-     * matched at state `k'.
+     * matched at current `state'.
      */
-    for (i = pdfa->states[k].att; i; i = pdfa->indexes[i].next)
-      state_max[k]++;
+    for (k = pdfa->states[state].att; k; k = pdfa->indexes[k].next)
+      state_max[state]++;
 
-    if (total_max < state_max[k])
-      total_max = state_max[k];
+    if (total_max < state_max[state])
+      total_max = state_max[state];
 
-    for (i = 0; i < 4; i++) {
-      int next = pdfa->states[k].next[i];
+    for (k = 0; k < 4; k++) {
+      int next = pdfa->states[state].next[k];
+
       if (next != 0) {
-       assert(next > k);
+	if (!queued[next]) {
+	  queue[queue_end++] = next;
+	  queued[next] = 1;
+	}
 
-       if (state_max[next] < state_max[k])
-         state_max[next] = state_max[k];
+	if (state_max[next] < state_max[state])
+	  state_max[next] = state_max[state];
       }
     }
   }
+
+  assert(queue_end == pdfa->last_state);
+
+  free(state_max);
+  free(queued);
+  free(queue);
 
   return total_max;
 }
@@ -951,7 +978,6 @@ dfa_finalize(dfa_t *pdfa)
   
   compactify_att(pdfa);
 }
-
 
 /*
  * Add a new string with attribute att_val into the dfa.

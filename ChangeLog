@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- DFA micro optimizations
 - use int arrays instead of char arrays to mark eyes in
   owl_determine_life() and dependent functions
 - added .eps-version of new logo

@@ -24,7 +24,7 @@
 #define _DFA_H_
 
 
-#define DFA_MAX_BOARD		21
+#define DFA_MAX_BOARD		MAX_BOARD
 #define DFA_MAX_ORDER		((2 * DFA_MAX_BOARD - 1)	\
 				 * (2 * DFA_MAX_BOARD - 1))
 #define DFA_BASE		(3 * DFA_MAX_BOARD)
@@ -41,9 +41,6 @@
 
 /* Maximum pattern matched at one positions. */
 #define DFA_MAX_MATCHED		(8 * 24)
-
-/* Conversion macro. */
-#define EXPECTED_COLOR(player_c, position_c)	(convert[player_c][position_c])
 
 
 /* DFA spiral order. */
@@ -65,8 +62,8 @@ typedef struct attrib_rt
 /* DFA state. */
 typedef struct state_rt
 {
+  short next[4];
   short att;
-  unsigned short next[4];
 } state_rt_t;
 
 typedef struct dfa_rt
@@ -81,15 +78,6 @@ typedef struct dfa_rt
   const attrib_rt_t *indexes;
 } dfa_rt_t;
 
-
-#if 0
-/* Scan order. */
-typedef struct
-{
-  int i;
-  int j;
-} order_t;
-#endif
 
 
 #endif /* _DFA_H_ */
