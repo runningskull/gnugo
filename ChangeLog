@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.13 released December 22, 2002
+
 - new aa_ pattern A16
 - tactical move ordering tuned
 - complete rewrite of interface to influence.c
