@@ -605,9 +605,17 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	  }
 
 	rotate(i, j, &i, &j, board_size, orientation);
-	gnugo_play_move(i, j, next);
-	sgffile_move_made(i, j, next, 0);
-	next = OTHER_COLOR(next);
+	if ((ON_BOARD2(i,j) && board[POS(i, j)] == EMPTY)
+	    || (i == -1 && j == -1)) {
+	  gnugo_play_move(i, j, next);
+	  sgffile_move_made(i, j, next, 0);
+	  next = OTHER_COLOR(next);
+	}
+	else {
+	  gprintf("WARNING: Move off board or on occupied position found in sgf-file.\n");
+	  gprintf("Move at %m ignored, trying to proceed.\n", i, j);
+	  return next;
+	}
 
 	break;
 

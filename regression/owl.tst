@@ -889,7 +889,7 @@ loadsgf games/marginal_ko.sgf
 244 owl_attack D11
 #? [(2|3) F11]
 245 owl_defend D11
-#? [1 (F11|H8|F8)]
+#? [1 (F11|H8|F8|H5)]
 246 owl_attack O9
 #? [3 (M6|Q8)]
 247 owl_defend O9
