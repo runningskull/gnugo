@@ -1172,13 +1172,14 @@ Pattern AS1
 #  --------
 #
 # descending is the *only* move to live. So this should not be an antisuji.
+# gf Reduced shape value. (3.5.2)
 
 ?XO     don't defend by moving straight down if it gives X a free forcing move
 XO.
 .*.
 ---
 
-:8,-,shape(-5)
+:8,-,shape(-3)
 
 ?XO
 Xb.
@@ -1381,12 +1382,13 @@ xXX
 
 
 Pattern Shape5
+# gf Reduced shape value. (3.5.2)
 
 ?O.O     protect against atari or threat to atari
 ?.OX
 ?*XX
 
-:8,-,shape(4)
+:8,-,shape(3)
 
 
 Pattern Shape6
@@ -1579,12 +1581,13 @@ x.*X
 
 
 Pattern Shape12b
+# gf Reduced shape value. (3.5.2)
 
 ..x     Don't push from behind with few liberties if we have to bend after hane
 .*X
 .OX
 
-:8,-,shape(-5)
+:8,-,shape(-3)
 
 bax
 .*C
@@ -1596,12 +1599,13 @@ bax
 Pattern Shape13
 # Such huge shape values can cause problems. See handtalk12.sgf, move 37
 # (where * is actually an owl defense). -Arend
+# gf Reduced shape value. (3.5.2)
 
 ?X?     don't set up double cut
 *.O
 .O.
 
-:8,-,shape(-10)
+:8,-,shape(-3)
 
 ?X?
 *aB
@@ -1738,6 +1742,7 @@ XaB
 
 Pattern Shape20
 # delta_moyo currently overvalues this move, so we compensate here
+# gf Reduced shape value. (3.5.2)
 
 XO.     bad aji
 O..
@@ -1745,7 +1750,7 @@ O..
 ...
 ---
 
-:8,-,shape(-5)
+:8,-,shape(-3)
 
 
 Pattern Shape21
@@ -1798,13 +1803,14 @@ O*.O
 
 
 Pattern Shape25
+# gf Reduced shape value. (3.5.2)
 
 ...x
 .*.X     Don't cap with weak stone that can be cut off.
 ....
 xx.O
 
-:8,-,shape(-5)
+:8,-,shape(-3)
 
 ...x
 .*.X
@@ -2087,13 +2093,14 @@ a..b
 
 
 Pattern Shape46
+# gf Reduced shape value. (3.5.2)
 
 ?XXO    blocking one step to the left usually much superior
 .O.*
 ....
 ----
 
-:8,-,shape(-5)
+:8,-,shape(-3)
 
 ?XXb
 .Oa*
@@ -2209,12 +2216,13 @@ O.O
 
 
 Pattern Shape55
+# gf Reduced shape value. (3.5.2)
 
 O.      don't force opponent to cut
 X.
 .*
 
-:8,-,shape(-5)
+:8,-,shape(-3)
 
 a.
 X.
@@ -2258,13 +2266,14 @@ O.AO
 
 
 Pattern Shape59
+# gf Reduced shape value. (3.5.2)
 
 ?X.O         usually stupid, other atari or descent generally better
 XOXO
 ..*.
 ----
 
-:8,-,shape(-5)
+:8,-,shape(-3)
 
 
 Pattern Shape60
@@ -2447,13 +2456,14 @@ XO...
 
 Pattern Shape72
 # gf New pattern. (3.1.14)
+# gf Reduced shape value. (3.5.2)
 
 ?XO.     don't leave double threat behind
 XO..      
 *...
 ----
 
-:8,-,shape(-4)
+:8,-,shape(-3)
 
 ?Xc.
 Xba.
@@ -2530,13 +2540,14 @@ bOXx
 
 Pattern Shape76
 # tm New Pattern. (3.1.16) (see trevor:220)
+# gf Reduced shape value. (3.5.2)
 
 ----
 ....
 ....
 O.*.
 
-:8,-,shape(-4)
+:8,-,shape(-3)
 
 ----
 ....

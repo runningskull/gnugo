@@ -364,7 +364,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 80
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 86
-800 reg_genmove black
+800 restricted_genmove black J5 H5 G4 H4 J4 G6 G3 H3 J3 K3
 #? [G4]
 
 

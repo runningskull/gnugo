@@ -11,7 +11,8 @@
 - remove global variables score, lower_bound, upper_bound
 - remove (level >= 8) condition for estimate_score() call
 - pass our_score instead of score to the move valuation functions
-- tuning	
+- tuning
+- influence tuning
 - owl tuning
 - joseki tuning
 - new game records and test cases

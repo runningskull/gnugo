@@ -1111,13 +1111,14 @@ Pattern CC72
 
 
 Pattern CC73
+# gf Reduced shape value. (3.5.2)
 
 ?X??          connect!
 o.*O
 O..X
 ?.O?
 
-:8,scad,shape(5)
+:8,scad,shape(3)
 
 
 Pattern CC74
@@ -1201,13 +1202,14 @@ O*ba
 
 Pattern CC79
 # ab modified (3.3.10)
+# gf Reduced shape value. (3.5.2)
 
 ?O.xx
 XO.*.
 XXO..
 .....
 
-:8,XCad,shape(5)
+:8,XCad,shape(3)
 
 ?a.xx
 Xa.*.
@@ -1585,6 +1587,7 @@ o.OXX
 
 
 Pattern EC16a
+# gf Reduced shape value. (3.5.2)
 
 ?..O?         hanging connection is best
 .*.OX
@@ -1592,7 +1595,7 @@ o.OXX
 .....
 -----
 
-:8,C,shape(5)
+:8,C,shape(3)
 
 ?..O?
 .*bOX
@@ -1774,6 +1777,7 @@ Xbc
 
 Pattern EC27
 # gf Removed obsolete add_connect_move action. (3.3.16)
+# gf Reduced shape value. (3.5.2)
 
 ?X*O          Use edge to stay connected.
 ?XOX
@@ -1781,7 +1785,7 @@ Pattern EC27
 ....
 ----
 
-:8,-,shape(5)
+:8,-,shape(3)
 
 ?X*O
 ?XOB
@@ -2231,6 +2235,7 @@ O*...
 
 
 Pattern EC63
+# gf Fixed value removed and constraint revised. (3.5.2)
 
 ?X?           connect underneath if X can't cut
 OXO
@@ -2238,18 +2243,19 @@ OXO
 ...
 ---
 
-:|,XC,value(20)
+:|,XC
 
 ?X?
-OXO
-a*b
+aXb
+.*.
 ...
 ---
 
-; (oplay_attack(*,a,a)&&!oplay_defend(*,b,a,b))||(oplay_attack(*,b,b)&&!oplay_defend(*,a,b,a))
+;!oplay_disconnect(*,a,b)
 
 
 Pattern EC64
+# gf Removed fixed value. (3.5.2)
 
 ..xxx           threaten connection
 .O.Xx
@@ -2257,7 +2263,7 @@ Pattern EC64
 .....
 -----
 
-:8,OXead,value(15)
+:8,OXead
 
 ..xxx
 .O.Xx
@@ -2269,6 +2275,7 @@ Pattern EC64
 
 
 Pattern EC65
+# gf Reduced shape value. (3.5.2)
 
 ox..o         Connect underneath
 O*X.O
@@ -2276,17 +2283,18 @@ O*X.O
 .....
 -----
 
-:8,XC,shape(6)
+:8,XC,shape(3)
 
 
 Pattern EC66
+# gf Reduced shape value. (3.5.2)
 
 OXX.O          connect below
 .*O..
 .....
 -----
 
-:8,XCad,shape(6)
+:8,XCad,shape(3)
 
 OXX.O
 b*Oa.
@@ -2297,13 +2305,14 @@ b*Oa.
 
 
 Pattern EC67
+# gf Reduced shape value. (3.5.2)
 
 OXX.O          connect below
 .O*..
 .....
 -----
 
-:8,XCad,shape(6)
+:8,XCad,shape(3)
 
 OXX.O
 bO*a.
@@ -4066,6 +4075,7 @@ XXO..?
 
 
 Pattern EB411
+# gf Reduced shape value. (3.5.2)
 
 ...??oo
 O....oo
@@ -4075,7 +4085,7 @@ XXO..oo
 .....oo
 -------
 
-:8,ead,shape(7)
+:8,ead,shape(3)
 
 ...??oo
 O....oo
@@ -4107,6 +4117,7 @@ OXX.
 
 
 Pattern EB501
+# gf Reduced shape value. (3.5.2)
 
 ....?         hane if attached
 .*X.X
@@ -4115,10 +4126,11 @@ Pattern EB501
 .....
 -----
 
-:8,ed,shape(5)
+:8,ed,shape(3)
 
 
 Pattern EB501a
+# gf Reduced shape value. (3.5.2)
 
 ?..X.?         push in to stabilize
 ..OX.X
@@ -4127,7 +4139,7 @@ Pattern EB501a
 ......
 ------
 
-:8,ed,shape(5)
+:8,ed,shape(3)
 
 
 Pattern EB502
@@ -4212,6 +4224,7 @@ X*..
 
 Pattern EB507a
 # tm New Pattern (3.1.20) (see strategy:26)
+# gf Reduced shape value. (3.5.2)
 
 ?o??
 ?O..           block
@@ -4220,7 +4233,7 @@ O...
 ....
 ----
 
-:8,Oe,shape(4)
+:8,Oe,shape(3)
 
 
 Pattern EB508
@@ -4384,6 +4397,7 @@ XO...
 
 Pattern EB521
 # gf FIXME: This fixed value looks dangerous. (3.3.12)
+# gf Removed fixed value and E classification. (3.5.2)
 
 ..O?        urgent atari
 ..OX
@@ -4392,7 +4406,7 @@ Pattern EB521
 ....
 ----
 
-:8,XEd,value(30)
+:8,Xd
 
 ..O?
 ..OX
@@ -5103,12 +5117,13 @@ Pattern EB709b
 
 
 Pattern EB710
+# gf Removed fixed value. (3.5.2)
 
 o.OOX?              block
 .*XX.X
 ------
 
-:8,OXe,value(5)
+:8,OXe
 
 
 Pattern EB711
@@ -5413,6 +5428,7 @@ Pattern EB913b
 
 
 Pattern EB914
+# gf Removed fixed value. (3.5.2)
 
 ?O??X.           an exception to the preceeding pattern
 *XOO..
@@ -5420,7 +5436,7 @@ Pattern EB914
 ......
 ------
 
-:8,d,value(10)
+:8,d
 
 ?O??X.
 *AOOa.
@@ -5434,6 +5450,7 @@ Pattern EB914
 
 
 Pattern EB915
+# gf Removed fixed value. (3.5.2)
 
 ?O??X.           exception, continued
 OXOO..
@@ -5441,7 +5458,7 @@ OXOO..
 ......
 ------
 
-:8,d,value(10)
+:8,d
 
 ?O??X.
 OAOOa.
@@ -5593,6 +5610,7 @@ O.O...
 
 
 Pattern EB925
+# gf Removed fixed value and E classification, revised constraint. (3.5.2)
 
 XX...x         extend on third line
 O.O*.x
@@ -5600,15 +5618,15 @@ O.O*.x
 ......
 ------
 
-:8,Ed,shape(3),value(12)
+:8,d,shape(3)
 
 XX...x
-A.O*.x
+a.O*.x
 ......
 ......
 ------
 
-; !dead(A)
+; !dead(a) && !oplay_disconnect(*,a,*)
 
 
 ############################
@@ -5919,7 +5937,7 @@ Pattern EB1201
 
 
 Pattern EB1202
-# gf FIXME: Too high value? (3.3.12)
+# gf Removed fixed value. (3.5.2)
 
 ?...?       hane
 O.X*.
@@ -5927,11 +5945,12 @@ O.X*.
 ....?
 -----
 
-:8,OXeCad,value(25)
+:8,OXeCad
 
 
 Pattern EB1203
 # gf Added constraint. (3.3.12)
+# gf Removed fixed value. (3.5.2)
 
 ?..X.       extend to defend and connect
 O.XO*
@@ -5939,7 +5958,7 @@ O.XO*
 .....
 -----
 
-:8,OXeCad,value(25)
+:8,OXeCad
 
 ?..X.
 a.XO*
@@ -6060,6 +6079,7 @@ OX...
 
 
 Pattern EB1309
+# gf Reduced shape value. (3.5.2)
 
 ??.o???        urgent hane
 ?.XO..O
@@ -6067,10 +6087,11 @@ Pattern EB1309
 .......
 -------
 
-:8,-,shape(5)
+:8,-,shape(3)
 
 
 Pattern EB1310
+# gf Removed fixed value. (3.5.2)
 
 ?..X?         after hane opponent must fall back
 ..XOO
@@ -6078,7 +6099,7 @@ Pattern EB1310
 ....o
 -----
 
-:8,OXead,value(20)
+:8,OXead
 
 ?.cX?
 .bXOO
@@ -6090,6 +6111,7 @@ da*eo
 
 
 Pattern EB1311
+# gf Removed fixed value. (3.5.2)
 
 ?..X?         double sente
 .XXOO
@@ -6097,7 +6119,7 @@ Pattern EB1311
 ....o
 -----
 
-:8,OXead,value(20)
+:8,OXead
 
 
 #################
@@ -6106,13 +6128,14 @@ Pattern EB1311
 
 
 Pattern EB1401
+# gf Removed fixed value. (3.5.2)
 
 |.XO?          large endgame move
 |.XO?
 |.*.o
 +----
 
-:8,OXe,value(5)
+:8,OXe
 
 
 Pattern EB1402
@@ -6176,40 +6199,42 @@ Pattern EB1404a
 ;!dead(a) && !attack(B)
 
 
-Pattern EB1404b
-# Second followup to EB1403.
-# and guarantees that the move is followed up.
-# gf Revised pattern. (3.1.3)
-# eb revised constraint (3.3.13)
-# see nngs3:1110
-# ab FIMXE: Still needed? Also maybe reuse code from connect_and_cut_helper
-# here?
-
-?oX??          Connect after hane.
-..XO?
-?XO*o
------
-
-:8,Xe,value(12)
-
-?oB??
-ecBa?
-?AO*o
------
-
-;!dead(a) && xmoyo(e) && !oplay_defend_both(*,?,c,A,B) && !oplay_attack(*,c,*) && !attack(A)
+# Pattern EB1404b
+# # Second followup to EB1403.
+# # and guarantees that the move is followed up.
+# # gf Revised pattern. (3.1.3)
+# # eb revised constraint (3.3.13)
+# # see nngs3:1110
+# # ab FIXME: Still needed? Also maybe reuse code from connect_and_cut_helper
+# #           here?
+# # gf Removed. (3.5.2)
+# 
+# ?oX??          Connect after hane.
+# ..XO?
+# ?XO*o
+# -----
+# 
+# :8,Xe,value(12)
+# 
+# ?oB??
+# ecBa?
+# ?AO*o
+# -----
+# 
+# ;!dead(a) && xmoyo(e) && !oplay_defend_both(*,?,c,A,B) && !oplay_attack(*,c,*) && !attack(A)
 
 
 Pattern EB1404c
 #cut followup to sente hane
 #evand new pattern (3.3.13)
+# gf Fixed value removed. (3.5.2)
 
 ?oX??
 .*XO?
 ?XO.o
 -----
 
-:8,Xe,value(12)
+:8,Xe
 
 ?oX??
 c*Xa?
@@ -6453,6 +6478,7 @@ O.X.O
 
 
 Pattern EB1610
+# gf Reduced shape value. (3.5.2)
 
 ..x..          followup
 .....
@@ -6461,10 +6487,11 @@ O*X.O
 .....
 -----
 
-:8,cad,shape(10)
+:8,cad,shape(3)
 
 
 Pattern EB1611
+# gf Reduced shape value. (3.5.2)
 
 ..x..          followup
 ..*..
@@ -6473,7 +6500,7 @@ OOX.O
 .....
 -----
 
-:8,cad,shape(10)
+:8,cad,shape(3)
 
 
 ###################
@@ -6919,6 +6946,7 @@ o...
 
 
 Pattern EB2002
+# gf Reduced shape value. (3.5.2)
 
 ?.....         don't jump if the edge is open
 .*....
@@ -6929,12 +6957,13 @@ O.....
 ......
 ------
 
-:8,-,shape(-7)
+:8,-,shape(-3)
 
 
 Pattern EB2003
 # With a sufficiently strong position directly to the right of the
 #    diagram, this may be a good move to build a moyo.
+# gf Reduced shape value. (3.5.2)
 
 ?......         don't jump if the edge is open
 .*.....
@@ -6945,7 +6974,7 @@ Pattern EB2003
 ?......
 -------
 
-:8,-,shape(-7)
+:8,-,shape(-3)
 
 
 ######################################################################
@@ -7392,13 +7421,14 @@ OA?
 
 Pattern CB328
 #ab Revised constraint (3.3.3)
+# gf Reduced shape value. (3.5.2)
 
 ?.?         seal opponent in and connect
 ...      
 .*O
 OX?
 
-:8,OXC,shape(10)
+:8,OXC,shape(3)
 
 ?.?
 ...
@@ -8066,12 +8096,13 @@ a*...
 
 
 Pattern CB227
+# gf Reduced shape value. (3.5.2)
 
 ?OO.             bend around
 XX*.
 ....
 
-:8,OXead,shape(4)
+:8,OXead,shape(3)
 
 
 Pattern CB228
@@ -8940,13 +8971,14 @@ Pattern CB325
 
 
 Pattern CB326
+# gf Reduced shape value. (3.5.2)
 
 ?.??       seal opponent in 
 ....
 O.*.
 OXXO
 
-:8,OXe,shape(7)
+:8,OXe,shape(3)
 
 ?.??
 .bc.
@@ -9750,6 +9782,7 @@ HHA*..
 
 
 Pattern ED43
+# gf Reduced shape value. (3.5.2)
 
 ?OO..o      push through and cut!
 XX*X.o
@@ -9757,7 +9790,7 @@ XX*X.o
 .....?
 ------
 
-:8,OXad,shape(10)
+:8,OXad,shape(3)
 
 ?OO..o
 AA*B.o
@@ -9769,6 +9802,7 @@ AA*B.o
 
 
 Pattern ED44
+# gf Reduced shape value. (3.5.2)
 
 O....      capture one stone
 O..*.
@@ -9777,10 +9811,11 @@ O.X.O
 .....
 -----
 
-:8,OXecad,shape(5)
+:8,OXecad,shape(3)
 
 
 Pattern ED45
+# gf Fixed value removed. (3.5.2)
 
 ?XX...        defense is urgent
 OO.O*.
@@ -9788,7 +9823,7 @@ OO.O*.
 ?.....
 ------
 
-:8,OXead,value(30)
+:8,OXead
 
 ?XX...
 OOaO*.
@@ -9800,6 +9835,7 @@ OOaO*.
 
 
 Pattern ED46
+# gf Removed fixed value. (3.5.2)
 
 ?X...        jump to take territory on 4-th line
 .....
@@ -9809,10 +9845,11 @@ O.*..
 .....
 -----
 
-:8,OXead,value(20)
+:8,OXead
 
 
 Pattern ED47
+# gf Reduced shape value. (3.5.2)
 
 X.O...x
 xXO.*.x
@@ -9820,10 +9857,11 @@ xXO.*.x
 .......
 -------
 
-:8,OXed,shape(5)
+:8,OXed,shape(3)
 
 
 Pattern ED48
+# gf Reduced shape value. (3.5.2)
 
 ?...       break ponnuki, threaten to cut
 ?.*O
@@ -9832,7 +9870,7 @@ Pattern ED48
 ?...
 ----
 
-:8,OXead,shape(10)
+:8,OXead,shape(3)
 
 ?...
 ?.*O
@@ -9845,6 +9883,7 @@ Pattern ED48
 
 
 Pattern ED49
+# gf Reduced shape value. (3.5.2)
 
 ??..?       push to stabilize O
 ?.X..
@@ -9853,7 +9892,7 @@ Pattern ED49
 .....
 -----
 
-:8,OXead,shape(5)
+:8,OXead,shape(3)
 
 
 Pattern ED49b
@@ -9878,6 +9917,7 @@ de..*a.
 
 
 Pattern ED50
+# gf Removed fixed value. (3.5.2)
 
 .....        don't get sealed in!
 ..*Xx
@@ -9887,10 +9927,11 @@ X.O..
 .....
 -----
 
-:8,OeBad,value(20)
+:8,OeBad
 
 
 Pattern ED51
+# gf Reduced shape value. (3.5.2)
 
 .........        block to build influence
 o.....*Xx
@@ -9900,10 +9941,11 @@ oo......O
 .........
 ---------
 
-:8,OXead,shape(10)
+:8,OXead,shape(3)
 
 
 Pattern ED52
+# gf Removed fixed value. (3.5.2)
 
 ?.....        attach in sente
 ......
@@ -9914,10 +9956,11 @@ Pattern ED52
 ......
 ------
 
-:8,OXad,value(20)
+:8,OXad
 
 
 Pattern ED53
+# gf Removed fixed value, added B classification. (3.5.2)
 
 ?OO...        push through and cut
 XX*X..
@@ -9925,7 +9968,7 @@ XX*X..
 ?.....
 ------
 
-:8,OXead,value(25)
+:8,OXBead
 
 ?OO...
 EE*D..
@@ -9933,10 +9976,11 @@ EE*D..
 ?.....
 ------
 
-; oplay_attack(*,a,b,c,E)&&oplay_attack(*,a,c,D)
+; oplay_attack(*,a,b,c,E) && oplay_attack(*,a,c,D)
 
 
 Pattern ED54
+# gf Removed fixed value. (3.5.2)
 
 ?OO...        cut
 XXOX..
@@ -9944,7 +9988,7 @@ XXOX..
 ?.....
 ------
 
-:8,sOXBad,value(30)
+:8,sOXBad
 
 ?OO...
 AAOB..
@@ -9952,10 +9996,11 @@ AAOB..
 ?.....
 ------
 
-; oplay_attack(*,d,A)&&oplay_attack(d,B)
+; oplay_attack(*,d,A) && oplay_attack(d,B)
 
 
 Pattern ED55
+# gf Removed fixed value. (3.5.2)
 
 ?OO...        cut
 XXOX..
@@ -9963,7 +10008,7 @@ XOX*..
 ?.....
 ------
 
-:8,ad,value(30)
+:8,Bad
 
 ?OO...
 XXOB..
@@ -9987,6 +10032,7 @@ O..O*.
 
 
 Pattern ED57
+# gf Reduced shape value. (3.5.2)
 
 OOXX??      push to defend
 .XOX..
@@ -9994,7 +10040,7 @@ OOXX??      push to defend
 ......
 ------
 
-:8,-,shape(8)
+:8,-,shape(3)
 
 OOXX??
 .AOX..
@@ -10006,6 +10052,7 @@ OOXX??
 
 
 Pattern ED58
+# gf Removed fixed value and revised constraint. (3.5.2)
 
 ??X??        connect to defend everything
 ?OXO?
@@ -10013,15 +10060,15 @@ Pattern ED58
 .....
 -----
 
-:8,Xad,value(15)
+:8,BCad
 
-??X??
-?CXO?
+??G??
+?cGO?
 .*OAd
 ..bef
 -----
 
-; !oplay_defend(*,A) && xplay_attack(*,b,C)
+; alive(G) && !oplay_defend(*,A) && xplay_attack(*,b,c)
 
 > antisuji(b);
 > antisuji(d);
@@ -10080,6 +10127,7 @@ Pattern ED61
 
 
 Pattern ED62
+# gf Reduced shape value. (3.5.2)
 
 ....?        if double hane is not reasonable, extend
 OO..?
@@ -10088,7 +10136,7 @@ XXO*.
 .....
 -----
 
-:8,OXead,shape(5)
+:8,OXead,shape(3)
 
 ....?
 OOb.?
@@ -10139,6 +10187,7 @@ XXO..
 
 
 Pattern ED65
+# gf Removed fixed value. (3.5.2)
 
 ?o..?        pull back to stabilize
 ?O..?
@@ -10147,58 +10196,60 @@ XXO*.
 xxx..
 -----
 
-:8,OXad,value(15)
+:8,OXad
 
 
-Pattern ED66
-# tm Modified (3.1.18) (see trevorb:610)
-# FIXME: Is this just too generic?
-# gf This pattern is way too general, see e.g. 13x13b:8.
-#    Furthermore the second half of the constraint doesn't really make
-#    sense. Consider removal. (3.3.17)
+# Pattern ED66
+# # tm Modified (3.1.18) (see trevorb:610)
+# # FIXME: Is this just too generic?
+# # gf This pattern is way too general, see e.g. 13x13b:8.
+# #    Furthermore the second half of the constraint doesn't really make
+# #    sense. Consider removal. (3.3.17)
+# # gf Removed. (3.5.2)
+# 
+# ?x?         draw back for safety
+# O.X
+# .*O
+# ...
+# ...
+# ---
+# 
+# :8,OJ
+# 
+# ?x?
+# OaB
+# .*O
+# ...
+# ...
+# ---
+# 
+# ; xplay_defend(*,a,*) && !xplay_attack(*,a,B)
 
-?x?         draw back for safety
-O.X
-.*O
-...
-...
----
 
-:8,OJ
-
-?x?
-OaB
-.*O
-...
-...
----
-
-; xplay_defend(*,a,*) && !xplay_attack(*,a,B)
-
-
-Pattern ED67
-# tm Modified (3.1.18) (see trevorb:610)
-# FIXME: Is this just too generic?
-#   Identical to ED66, but with j attribute instead of J
-# gf See comments for ED66. This pattern is redundant anyway. (3.3.17)
-
-?x?         draw back for safety
-O.X
-.*O
-...
-...
----
-
-:8,Oj
-
-?x?
-OaB
-.*O
-...
-...
----
-
-; xplay_defend(*,a,*) && !xplay_attack(*,a,B)
+# Pattern ED67
+# # tm Modified (3.1.18) (see trevorb:610)
+# # FIXME: Is this just too generic?
+# #   Identical to ED66, but with j attribute instead of J
+# # gf See comments for ED66. This pattern is redundant anyway. (3.3.17)
+# # gf Removed. (3.5.2)
+# 
+# ?x?         draw back for safety
+# O.X
+# .*O
+# ...
+# ...
+# ---
+# 
+# :8,Oj
+# 
+# ?x?
+# OaB
+# .*O
+# ...
+# ...
+# ---
+# 
+# ; xplay_defend(*,a,*) && !xplay_attack(*,a,B)
 
 
 Pattern ED68
@@ -10365,6 +10416,7 @@ oc*.xf
 
 
 Pattern ED77
+# gf Reduced shape value. (3.5.2)
 
 ?XX?            defend cut
 O*O.
@@ -10372,7 +10424,7 @@ O*O.
 ....
 ----
 
-:8,OXead,shape(5)
+:8,OXead,shape(3)
 
 ?XX?
 O*Oc
@@ -10384,6 +10436,7 @@ O*Oc
 
 
 Pattern ED78
+# gf Reduced shape value. (3.5.2)
 
 ?OO?          push through and cut
 X*X.
@@ -10391,7 +10444,7 @@ X*X.
 ....
 ----
 
-:8,OXead,shape(5)
+:8,OXead,shape(3)
 
 ?OO?
 X*Xc
@@ -10464,6 +10517,7 @@ Pattern ED81
 
 
 Pattern ED82
+# gf Reduced shape value. (3.5.2)
 
 |.....       atari is usually a better way to use the dead stone
 |..*..
@@ -10471,7 +10525,7 @@ Pattern ED82
 |..XOO
 |..OX?
 
-:8,-,shape(-4)
+:8,-,shape(-3)
 
 |.....
 |..*..
@@ -11107,12 +11161,13 @@ Xabf?
 
 
 Pattern CD87
+# gf Reduced shape value. (3.5.2)
 
 .XO        create cutting points
 .*.
 .XO
 
-:-,OXad,shape(5)
+:-,OXad,shape(3)
 
 cXO
 a*b
@@ -11138,12 +11193,13 @@ O..O
 
 
 Pattern CD89
+# gf Reduced shape value. (3.5.2)
 
 ?OXoo         prevent ponnuki
 .XO*o
 ?.Xoo
 
-:8,OXead,shape(10)
+:8,OXead,shape(3)
 
 ?OAoo
 .XO*o
@@ -11153,13 +11209,14 @@ Pattern CD89
 
 
 Pattern CD90
+# gf Reduced shape value. (3.5.2)
 
 OXx        extending usually better than capturing, but not at edge
 XOX
 ?*.
 ???
 
-:8,OXead,shape(5)
+:8,OXead,shape(3)
 
 bXx
 AOX
@@ -11171,12 +11228,13 @@ AOX
 
 Pattern CD91
 # gf Revised constraint. (3.3.18)
+# gf Reduced shape value. (3.5.2)
 
 ?XO.        atari to prevent opponent's expansion
 OOX.
 ..*.
 
-:8,XEd,shape(10)
+:8,XEd,shape(3)
 
 ?Xa.
 bbX.
@@ -11227,13 +11285,14 @@ OX*
 
 
 Pattern CD93
+# gf Removed fixed value and reduced shape. (3.5.2)
 
 ?OX.       break through one way or the other
 ?*..
 X.X.
 ...O
 
-:8,XBad,shape(10),value(10)
+:8,XBad,shape(3)
 
 ?OF.
 ?*be
@@ -11245,6 +11304,7 @@ DcE.
 
 Pattern CD94
 # gf Split and revised. (3.3.14)
+# gf Reduced shape value. (3.5.2)
 
 ????????       jump out
 ????????
@@ -11253,7 +11313,7 @@ Pattern CD94
 X...????
 x.O..???
 
-:8,OXEad,shape(4)
+:8,OXEad,shape(3)
 
 ????????
 ????????
@@ -11267,6 +11327,7 @@ x.O..???
 
 Pattern CD94b
 # gf Split and revised. (3.3.14)
+# gf Reduced shape value. (3.5.2)
 
 ????????       jump out
 ????????
@@ -11275,7 +11336,7 @@ Pattern CD94b
 X...????
 O.O..???
 
-:8,OXEad,shape(4)
+:8,OXEad,shape(3)
 
 ????????
 ????????
@@ -11371,46 +11432,48 @@ B*
 # FIXME: The two following patterns may be superfluous due to the
 #        atari_atari code.
 
-Pattern CD100
-# This should strictly give an "attack one out of three" move reason,
-# but since there is no support for these, we do something ad hoc
-# instead.
-# gf Revised constraint. (3.1.13)
+# Pattern CD100
+# # This should strictly give an "attack one out of three" move reason,
+# # but since there is no support for these, we do something ad hoc
+# # instead.
+# # gf Revised constraint. (3.1.13)
+# # gf Removed. We leave this to the atari_atari code. (3.5.2)
+# 
+# ?OOX         atari twice to capture something
+# XOX.
+# .X*o
+# ?.o?
+# 
+# :8,sXad,value(7)
+# 
+# ?ffX
+# EfXa
+# bD*o
+# ?co?
+# 
+# ;olib(b)>=2 && !attack(E) && !attack(D) && oplay_attack_either(*,a,b,c,D,E)
+# ;&& !oplay_attack(*,f)
 
-?OOX         atari twice to capture something
-XOX.
-.X*o
-?.o?
 
-:8,sXad,value(7)
-
-?ffX
-EfXa
-bD*o
-?co?
-
-;olib(b)>=2 && !attack(E) && !attack(D) && oplay_attack_either(*,a,b,c,D,E)
-;&& !oplay_attack(*,f)
-
-
-Pattern CD101
-# Converse of previous pattern. Same comment applies.
-# gf Revised constraint. (3.1.13)
-
-?XXO         defend against atari sequence
-OXO.
-.O*x
-?.x?
-
-:8,Xad,value(7)
-
-?FFO
-eFOa
-bd*x
-?cx?
-
-;xlib(b)>=2 && !attack(e) && !attack(d) && !attack(F)
-;&& xplay_attack_either(*,a,b,c,d,e)
+# Pattern CD101
+# # Converse of previous pattern. Same comment applies.
+# # gf Revised constraint. (3.1.13)
+# # gf Removed. We leave this to the atari_atari code. (3.5.2)
+# 
+# ?XXO         defend against atari sequence
+# OXO.
+# .O*x
+# ?.x?
+# 
+# :8,Xad,value(7)
+# 
+# ?FFO
+# eFOa
+# bd*x
+# ?cx?
+# 
+# ;xlib(b)>=2 && !attack(e) && !attack(d) && !attack(F)
+# ;&& xplay_attack_either(*,a,b,c,d,e)
 
 
 Pattern CD102
@@ -11874,7 +11937,7 @@ o..c..o
 
 
 Pattern EJ20
-
+				   
 ?x.XOOo       Connect underneath.
 oOXOX.o
 o.*O..o
@@ -12070,6 +12133,7 @@ x.......
 Pattern EJ33
 # gf Sometimes it's better to play one step to the left. See
 # nngs:1180. (3.3.7)
+# gf Revised classification. (3.5.2)
 
 ...XX          common important follow up 
 .O.*O
@@ -12077,7 +12141,7 @@ Pattern EJ33
 .....
 -----
 
-:8,sJ
+:8,XCd
 
 
 Pattern EJ34
@@ -12104,16 +12168,17 @@ Pattern EJ35
 :8,J
 
 
-Pattern EJ36
-
-?....ooo     seal the opponent!
-OO...ooo
-X*...ooo
-........
-........
---------
-
-:8,-,value(22)
+# Pattern EJ36
+# # gf Removed. (3.5.2)
+# 
+# ?....ooo     seal the opponent!
+# OO...ooo
+# X*...ooo
+# ........
+# ........
+# --------
+# 
+# :8,-,value(22)
 
 
 Pattern EJ37
@@ -12130,6 +12195,7 @@ Pattern EJ37
 
 Pattern EJ39
 # sometimes the solid connection would be better
+# gf Removed fixed value, added d classification. (3.5.2)
 
 ?.XX.O       draw back to defend
 .O.O*.
@@ -12137,7 +12203,7 @@ Pattern EJ39
 ......
 ------
 
-:8,-,value(30)
+:8,d
 
 ?.XX.O
 .O.O*.
@@ -12208,6 +12274,7 @@ x.O.x
 
 
 Pattern EJ44
+# gf Reduced shape value. (3.5.2)
 
 ......        almost an antisuji
 oO.X..
@@ -12216,7 +12283,7 @@ oO.X..
 ......
 ------
 
-:8,-,shape(-5)
+:8,-,shape(-3)
 
 
 Pattern EJ45
@@ -12552,7 +12619,8 @@ O.XA.
 ; !critical(A)
 
 
-Pattern EJ62
+Pattern EJ62a
+# gf Split and revised. (3.5.2)
 
 XX...       push to expand threatened dragon
 OOX..
@@ -12560,18 +12628,39 @@ OOX..
 .....
 -----
 
-:8,J
+:8,OJ
 
 XX...
-AAX..
+aaX..
 ..*..
 .....
 -----
 
-; owl_threatens(*,A)||critical(A)
+;owl_threatens(*,a)
 
 
-Pattern EJ63
+Pattern EJ62b
+# gf Split and revised. (3.5.2)
+
+XX...       push to expand threatened dragon
+OOX..
+..*..
+.....
+-----
+
+:8,d,followup(8)
+
+XX...
+aaX..
+..*..
+.....
+-----
+
+;critical(a)
+
+
+Pattern EJ63a
+# gf Split and revised. (3.5.2)
 
 XX....      push again to expand threatened dragon
 OOXX..
@@ -12582,12 +12671,32 @@ OOXX..
 :8,J
 
 XX....
-AAXX..
+aaXX..
 ..O*..
 ......
 ------
 
-; owl_threatens(*,A)||critical(A)
+;owl_threatens(*,a)
+
+
+Pattern EJ63
+# gf Split and revised. (3.5.2)
+
+XX....      push again to expand threatened dragon
+OOXX..
+..O*..
+......
+------
+
+:8,d,followup(8)
+
+XX....
+aaXX..
+..O*..
+......
+------
+
+;critical(a)
 
 
 Pattern EJ64
@@ -13736,7 +13845,7 @@ X..
 ######################################################################
 
 Pattern Reinforce102
-# This pattern should be contingent on being clearly ahead.
+# FIXME: This pattern should be contingent on being clearly ahead.
 
 .......
 O..O..O     Eliminate invasion point
@@ -13771,6 +13880,7 @@ O.Xx      fourth line sente kosumi
 
 
 Pattern LE2
+# gf Added e classification. (3.5.2)
 
 ?????     third line sente kosumi
 O.Xxx
@@ -13778,10 +13888,11 @@ O.Xxx
 .....
 -----
 
-:8,OX
+:8,OXe
 
 
 Pattern LE3
+# gf Added e classification. (3.5.2)
 
 xXx       expand territory
 ...
@@ -13789,26 +13900,28 @@ xXx       expand territory
 O..
 o..
 
-:8,OX
+:8,OXe
 
 
-Pattern LE4
-# gf Revised constraint. (3.1.9)
-
-...      hane to prevent incursion
-.*o
-OX?
-
-:8,OX,value(12)
-
-.a.
-b*o
-OC?
-
-;omoyo(a) && oplay_attack(*,b,b) && !(attack(C) && oplay_defend(*,C))
+# Pattern LE4
+# # gf Revised constraint. (3.1.9)
+# # gf Removed. (3.5.2)
+# 
+# ...      hane to prevent incursion
+# .*o
+# OX?
+# 
+# :8,OX,value(12)
+# 
+# .a.
+# b*o
+# OC?
+# 
+# ;omoyo(a) && oplay_attack(*,b,b) && !(attack(C) && oplay_defend(*,C))
 
 
 Pattern LE5
+# gf Added e classification and constraint. (3.5.2)
 
 ?Xxx
 O...
@@ -13816,7 +13929,15 @@ O...
 ....
 ----
 
-:8,OX
+:8,OXe
+
+?Xxx
+ca..
+.b*.
+....
+----
+
+;!oplay_disconnect(*,a,b,*,c)
 
 
 Pattern LE6
@@ -13843,23 +13964,18 @@ Pattern LE6
 
 
 Pattern LE8
+# gf Changed fixed value to e classification, removed constraint. (3.5.2)
 
 ?OOo        prevent monkey jump
 X*..
 ....
 ----
 
-:8,OX,value(8)
-
-?OOo
-X*.a
-....
-----
-
-; omoyo(a)
+:8,OXe
 
 
 Pattern LE9
+# gf Added e classification. (3.5.2)
 
 oo..?       good local sente
 ..O.x
@@ -13868,7 +13984,7 @@ O*X..
 .....
 -----
 
-:8,OX
+:8,OXe
 
 
 Pattern LE10
@@ -13886,34 +14002,30 @@ A*
 ;&& safe_omove(*) && oplay_attack_either(*,A,B)
 
 
-Pattern LE11
-
-...       jump towards the opponent's territory
-.*.
-...
-.O?
-
-:8,O
+# Pattern LE11
+# gf Removed ineffective pattern. (3.5.2)
+# 
+# ...       jump towards the opponent's territory
+# .*.
+# ...
+# .O?
+# 
+# :8,O
 
 
 Pattern LE12
+# gf Changed fixed value to e classification, removed constraint. (3.5.2)
 
 ?O..    seal the edge
 X*..
 ....
 ----
 
-:8,OX,value(10)
-
-?O.a
-X*..
-....
-----
-
-; omoyo(a)
+:8,OX
 
 
 Pattern LE13
+# gf Changed fixed value to e classification, added reverse followup. (3.5.2)
 
 |??o?        take the corner
 |...O
@@ -13922,7 +14034,7 @@ Pattern LE13
 |....
 +----
 
-:8,OX,value(15)
+:8,OXe,reverse_followup(5)
 
 |??o?
 |..aO

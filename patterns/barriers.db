@@ -1003,6 +1003,13 @@ Pattern Barrier66
 :8,D
 
 
+#########################################################
+#                                                       #
+#   Intrusion patterns (secondary influence sources)    #
+#                                                       #
+#########################################################
+
+
 Pattern Intrusion1
 
 ???x
@@ -1036,13 +1043,6 @@ Pattern Intrusion1a
 
 ;safe_omove(c)
 >return (lib(a)>2 || (lib(a) == 2 && connect_and_cut_helper(a,b,c)));
-
-
-#########################################################
-#                                                       #
-#   Intrusion patterns (secondary influence sources)    #
-#                                                       #
-#########################################################
 
 
 Pattern Intrusion1b
@@ -2196,6 +2196,26 @@ X.!
 OO?
 
 :-,B,value(20)
+
+
+Pattern Intrusion61
+# gf New pattern. (3.5.2)
+# This pattern is somewhat questionable. See arend:30 and 13x13:16 for
+# positions where it helps.
+
+|..!?
+|.X..
+|.QXX
+|.OO?
+
+:8,B,value(20)
+
+|.a!?
+|bEc.
+|.QDD
+|.OO?
+
+;!oplay_connect(a,b,c,D,E)
 
 
 #########################################################
