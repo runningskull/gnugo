@@ -136,7 +136,9 @@ find_double_threats(int color)
 	    if (board[a_threatened_groups[k]] == EMPTY
 		|| board[a_threatened_groups[l]] == EMPTY) {
 	      if (!attack(ii, NULL)) {
-		add_either_move(ii, ATTACK_STRING, a_threatened_groups[k], 
+		TRACE("Double threat at %1m, either %1m or %1m attacked.\n",
+		      ii, a_threatened_groups[k], a_threatened_groups[l]);
+		add_either_move(ii, ATTACK_STRING, a_threatened_groups[k],
 				ATTACK_STRING, a_threatened_groups[l]);
 		remove_attack_threat_move(ii, a_threatened_groups[k]);
 		remove_attack_threat_move(ii, a_threatened_groups[l]);
@@ -144,7 +146,9 @@ find_double_threats(int color)
 	    }
 	    else if (!defend_both(a_threatened_groups[k],
 				  a_threatened_groups[l])) {
-	      add_either_move(ii, ATTACK_STRING, a_threatened_groups[k], 
+	      TRACE("Double threat at %1m, either %1m or %1m attacked.\n",
+		    ii, a_threatened_groups[k], a_threatened_groups[l]);
+	      add_either_move(ii, ATTACK_STRING, a_threatened_groups[k],
 			      ATTACK_STRING, a_threatened_groups[l]);
 	      remove_attack_threat_move(ii, a_threatened_groups[k]);
 	      remove_attack_threat_move(ii, a_threatened_groups[l]);

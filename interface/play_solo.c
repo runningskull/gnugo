@@ -200,8 +200,16 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
   SGFTree score_tree;
   
   sgftree_clear(&score_tree);
-  sgftreeCreateHeaderNode(&score_tree, board_size, komi);
+  /* Modify komi to compensate for captured stones. We start at a
+   * setup position and since there is no standard sgf property to
+   * tell the number of captured stones, a modified komi is the best
+   * available solution.
+   */
+  sgftreeCreateHeaderNode(&score_tree, board_size,
+			  komi + black_captured - white_captured);
   sgffile_printboard(&score_tree);
+  sgfAddProperty(score_tree.lastnode, "PL",
+		 gameinfo->to_move == WHITE ? "W" : "B");  
   
   next = gameinfo->to_move;
   doing_scoring = 1;
