@@ -455,6 +455,16 @@ int somewhere(int color, int num_moves, ...);
 #define INFLUENCE_SAVED_STONE     1
 #define INFLUENCE_CAPTURED_STONE  2
 
+/* This format is used when exporting the moyo segmentation. */
+#define MAX_MOYOS MAX_BOARD*MAX_BOARD
+
+struct moyo_data
+{
+  int number; /* Number of moyos. */
+  int segmentation[BOARDMAX]; /* Numbers the moyos. */
+  int size[MAX_MOYOS];
+  int owner[MAX_MOYOS];
+};
 
 /* Influence functions. */
 void compute_initial_influence(int color, int dragons_known);
@@ -465,6 +475,8 @@ int influence_territory_color(int pos);
 int influence_moyo_color(int pos);
 int influence_area_color(int pos);
 int influence_get_moyo_size(int pos, int color);
+void influence_get_moyo_segmentation(int opposite, 
+                                     struct moyo_data *moyo);
 float influence_estimate_score(float moyo_coeff, float area_coeff);
 void influence_mark_non_territory(int pos, int color);
 

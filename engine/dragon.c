@@ -37,6 +37,7 @@ static int dragon_invincible(int pos);
 static int compute_dragon_status(int pos);
 static void dragon_eye(int pos, struct eye_data[BOARDMAX]);
 static int compute_escape(int pos, int dragon_status_known);
+static void compute_surrounding_moyo_sizes(int opposite);
 
 static int dragon2_initialized;
 static int lively_white_dragons;
@@ -371,11 +372,15 @@ make_dragons(int color, int stop_before_owl)
   time_report(2, "  resegment_initial_influence", NO_MOVE, 1.0);
 
   /* Compute the surrounding moyo sizes. */
-  for (d = 0; d < number_of_dragons; d++) {
-    dragon2[d].moyo = influence_get_moyo_size(dragon2[d].origin,
-					      DRAGON(d).color);
-  }
-  time_report(2, "  influence_get_moyo_size", NO_MOVE, 1.0);
+  for (d = 0; d < number_of_dragons; d++) 
+    dragon2[d].moyo = 2 * BOARDMAX;
+  /* Set moyo sizes according to initial_influence. */
+  compute_surrounding_moyo_sizes(0);
+  /* Set moyo sizes according to initial_opposite_influence if
+   * this yields smaller results.
+   */
+  compute_surrounding_moyo_sizes(1);
+  time_report(2, "  time to compute moyo sizes", NO_MOVE, 1.0);
 
   /* Determine status: ALIVE, DEAD, CRITICAL or UNKNOWN */
   for (m = 0; m < board_size; m++)
@@ -1510,6 +1515,46 @@ compute_escape(int pos, int dragon_status_known)
     }
 
   return dragon_escape(goal, board[pos], escape_value);
+};
+
+/*
+ * Sum up the surrounding moyo sizes for each dragon. Write this into
+ * dragon2[].moyo if it is smaller than the current entry. If (opposite)
+ * is true, we use initial_opposite_influence, otherwise initial_influence.
+ */
+static void
+compute_surrounding_moyo_sizes(int opposite)
+{
+  int i, j;
+  int pos;
+  int m, n;
+  int result[MAX_BOARD * MAX_BOARD];
+  int moyo_is_adjacent[MAX_BOARD * MAX_BOARD][MAX_MOYOS + 1];
+  struct moyo_data moyos;
+
+  influence_get_moyo_segmentation(opposite, &moyos);
+  for (i = 0; i < number_of_dragons; i++) {
+    result[i] = 0;
+    for (j = 1; j <= moyos.number; j++)
+      moyo_is_adjacent[i][j] = 0;
+  };
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      pos = POS(m, n);
+      if ((moyos.segmentation[pos] != 0)
+          && (board[pos] == moyos.owner[moyos.segmentation[pos]]))
+        moyo_is_adjacent
+          [dragon[pos].id][moyos.segmentation[pos]] = 1; 
+    };
+  for (i = 0; i < number_of_dragons; i++) {
+    for (j = 1; j <= moyos.number; j++)
+      if (moyo_is_adjacent[i][j]) {
+         result[i] += moyos.size[j];
+      }
+    if (result[i] < dragon2[i].moyo) {
+       dragon2[i].moyo = result[i];
+    }
+  }
 }
 
 

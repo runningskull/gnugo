@@ -1096,6 +1096,66 @@ influence_get_moyo_size(int pos, int color)
   return gg_min(result1, result2);
 }
 
+/* Export the moyo segmentation. If (opposite) is true, then
+ * initial_opposite_influence is used, otherwise initial_influence.
+ */
+void
+influence_get_moyo_segmentation(int opposite, 
+                                struct moyo_data *moyos)
+{
+  int m, n;
+  int pos;
+  int min_moyo_id;
+  int max_moyo_id;
+  int i;
+  struct influence_data *q;
+
+  min_moyo_id = MAX_REGIONS;
+  max_moyo_id = 0;
+
+  if (opposite) {
+    q = &initial_opposite_influence;
+  }
+  else {
+    q = &initial_influence;
+  };
+  /* Find out range of region ids used by moyos. */
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      pos = POS(m, n);
+      if (q->moyo_segmentation[I(pos)][J(pos)] != 0) {
+        min_moyo_id = gg_min(min_moyo_id,
+                    q->moyo_segmentation[I(pos)][J(pos)]);
+        max_moyo_id = gg_max(max_moyo_id,
+                    q->moyo_segmentation[I(pos)][J(pos)]);
+      }
+    }
+  moyos->number = max_moyo_id - min_moyo_id + 1;
+
+  /* Export segmentation. */
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      pos = POS(m, n);
+      if (q->moyo_segmentation[I(pos)][J(pos)] != 0) {
+        moyos->segmentation[pos]
+             = q->moyo_segmentation[I(pos)][J(pos)] - min_moyo_id + 1;
+      }
+      else {
+        moyos->segmentation[pos] = 0;
+      }
+    }
+  /* Export size and owner info. */
+  for (i = min_moyo_id; i <= max_moyo_id; i++) {
+    moyos->size[i - min_moyo_id + 1] = q->region_size[i];
+    if (q->region_type[i] & BLACK_REGION) {
+      moyos->owner[i - min_moyo_id  +1] = BLACK;
+    }
+    else {
+      moyos->owner[i - min_moyo_id  +1] = WHITE;
+    }
+  }
+}
+
 /* Compute the influence before a move has been made, which can
  * later be compared to the influence after a move. Assume that
  * the other color is in turn to move.
