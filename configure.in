@@ -83,10 +83,7 @@ AC_PROG_MAKE_SET
 
 AC_HEADER_TIME
 
-AC_CHECK_HEADERS(unistd.h)
-
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long,,[#include <stdio.h>])
 
 dnl ---------- grid optimisation ------------
 

@@ -4,6 +4,9 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- remove GMP playing mode
+- remove unistd.h include in main.c and dfa.c
+- remove more unneeded configure tests (standard headers, SIZEOF_INT)
 - remove a lot of unneeded configure tests
 - remove all colored debugging support from curses.c; remove corresponding
   configure tests (HAVE_CURSES, HAVE_TERMINFO, ...)

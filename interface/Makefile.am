@@ -22,11 +22,9 @@ LDADD = \
 gnugo_SOURCES = \
 	main.c \
 	play_ascii.c \
-	play_gmp.c \
 	play_gtp.c \
 	play_solo.c \
 	play_test.c \
-	gmp.c \
 	gtp.c
 
 AIXOPTS=-O -qmaxmem=16384 -qro -qroconst -qinfo

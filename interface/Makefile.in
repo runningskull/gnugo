@@ -58,7 +58,6 @@ POST_UNINSTALL = :
 AMTAR = @AMTAR@
 AWK = @AWK@
 CC = @CC@
-CPP = @CPP@
 DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
 GCC_ONLY = @GCC_ONLY@
@@ -75,7 +74,6 @@ am__include = @am__include@
 am__quote = @am__quote@
 dfa_c = @dfa_c@
 install_sh = @install_sh@
-perl = @perl@
 
 bin_PROGRAMS = gnugo
 
@@ -103,11 +101,9 @@ LDADD = \
 gnugo_SOURCES = \
 	main.c \
 	play_ascii.c \
-	play_gmp.c \
 	play_gtp.c \
 	play_solo.c \
 	play_test.c \
-	gmp.c \
 	gtp.c
 
 
@@ -120,8 +116,8 @@ bin_PROGRAMS = gnugo$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
 am_gnugo_OBJECTS = main.$(OBJEXT) play_ascii.$(OBJEXT) \
-	play_gmp.$(OBJEXT) play_gtp.$(OBJEXT) play_solo.$(OBJEXT) \
-	play_test.$(OBJEXT) gmp.$(OBJEXT) gtp.$(OBJEXT)
+	play_gtp.$(OBJEXT) play_solo.$(OBJEXT) play_test.$(OBJEXT) \
+	gtp.$(OBJEXT)
 gnugo_OBJECTS = $(am_gnugo_OBJECTS)
 gnugo_LDADD = $(LDADD)
 gnugo_DEPENDENCIES = ../engine/libengine.a ../patterns/libpatterns.a \
@@ -134,9 +130,8 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
-@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/gmp.Po $(DEPDIR)/gtp.Po \
-@AMDEP_TRUE@	$(DEPDIR)/main.Po $(DEPDIR)/play_ascii.Po \
-@AMDEP_TRUE@	$(DEPDIR)/play_gmp.Po $(DEPDIR)/play_gtp.Po \
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/gtp.Po $(DEPDIR)/main.Po \
+@AMDEP_TRUE@	$(DEPDIR)/play_ascii.Po $(DEPDIR)/play_gtp.Po \
 @AMDEP_TRUE@	$(DEPDIR)/play_solo.Po $(DEPDIR)/play_test.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -193,11 +188,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gtp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/play_ascii.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/play_gmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/play_gtp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/play_solo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/play_test.Po@am__quote@

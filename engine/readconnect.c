@@ -591,7 +591,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
       gprintf("%o  %f, primary distance\n", distance);
     
     /* Bonus if d1 and d2 are well balanced. */
-    if (1.5 * d1 > d2 && 1.5 * d2 > d1) {
+    if (1.50001 * d1 > d2 && 1.50001 * d2 > d1) {
       distance -= 0.1;
       if (verbose > 0)
 	gprintf("%o  -0.1, well balanced\n");
@@ -805,7 +805,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
    * move.
    */
   for (r = 0; r < num_moves; r++)
-    if (distances[r] > distances[0] + 1.5)
+    if (distances[r] > distances[0] + 1.50001)
       break;
   num_moves = r;
 

@@ -217,11 +217,6 @@ static void push_owl(struct local_owl_data **owla,
 static void do_push_owl(struct local_owl_data **owl);
 static void pop_owl(struct local_owl_data **owl);
 
-#if 0
-static int catalog_goal(struct local_owl_data *owl,
-    			int goal_worm[MAX_GOAL_WORMS]);
-#endif
-
 static int list_goal_worms(struct local_owl_data *owl,
     			   int goal_worm[MAX_GOAL_WORMS]);
 
@@ -311,10 +306,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 {
   int color = board[apos];
   int other = OTHER_COLOR(color);
-#if 0
-  int wormsa, wormsb;
-  int goal_wormsa[MAX_GOAL_WORMS], goal_wormsb[MAX_GOAL_WORMS];
-#endif
   struct owl_move_data vital_defensive_moves[MAX_MOVES];
   struct owl_move_data vital_offensive_moves[MAX_MOVES];
   struct owl_move_data shape_defensive_moves[MAX_MOVES];
@@ -406,11 +397,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   else
     read_result = NULL;
 
-#if 0
-  wormsa = catalog_goal(owla, goal_wormsa);
-  wormsb = catalog_goal(owlb, goal_wormsb);
-#endif
-  
   outside_liberty.pos = 0;
   common_liberty.pos = 0;
   backfilling_move.pos = 0;
@@ -455,14 +441,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 	owla->lunch[k] = NO_MOVE;
       }
     }
-#if 0
-    for (k = 0; k < MAX_LUNCHES; k++) {
-      if (owlb->lunch[k] != NO_MOVE 
-	  && owla->goal[owlb->lunch[k]]) {
-	owlb->lunch[k] = NO_MOVE;
-      }
-    }
-#endif
 
     owl_determine_life(owla, owlb, komaster, 1, vital_defensive_moves,
 		       &probable_eyes_a, NULL, NULL);
@@ -983,11 +961,6 @@ semeai_move_value(int move, struct local_owl_data *owla,
   }
   if (net < 0)
     net = 0;
-#if 0
-  if (semeai_focus != EMPTY 
-      && move_focus == semeai_focus)
-    return raw_value + net + 50;
-#endif
   return raw_value + net;
 }
 
@@ -1435,23 +1408,6 @@ do_owl_attack(int str, int *move, int *wormid,
       break;
     } /* switch (pass) */
       
-
-    /* FIXME: This block probably should reappear somewhere in this
-     * function.
-     */
-#if 0
-    /* First test whether the dragon has escaped. */
-    if (owl_escape_route(owl) >= 5) {
-      /* FIXME: We probably should make distinction in the returned
-       * result whether the dragon lives by making two eyes or by
-       * escaping.
-       */
-      TRACE("%oVariation %d: ALIVE (escaped)\n", this_variation_number);
-      SGFTRACE(0, 0, "escaped");
-      close_pattern_list(other, &shape_patterns);
-      READ_RETURN0(read_result);
-    }
-#endif
 
     if (!moves)
       continue;
@@ -3996,9 +3952,7 @@ owl_does_attack(int move, int target, int *kworm)
    * owl_mark_dragon() may crash if the trymove() happens to remove
    * some stones of the goal dragon from the board.
    */
-#if 1
     init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
-#endif
 
     if (trymove(move, other, "owl_does_attack", target, EMPTY, 0)) {
     /* Check if a compatible owl_defend() is cached. */
@@ -4008,15 +3962,7 @@ owl_does_attack(int move, int target, int *kworm)
       return REVERSE_RESULT(result);
     }
 
-#if 0
-    local_owl_node_counter = 0;
-    owl->lunches_are_current = 0;
-    owl_mark_dragon(target, NO_MOVE, owl);
-#endif
     owl_update_boundary_marks(move, owl);
-#if 0
-    compute_owl_escape_values(owl);
-#endif
     /* FIXME: Should also check if part of the dragon was captured,
      *        like do_owl_attack() does.
      */
@@ -5258,34 +5204,6 @@ finish_goal_list(int *flag, int *wpos, int list[MAX_GOAL_WORMS], int index)
 }
 		  
 
-/* Returns the number of worms in the goal dragon, and a pointer to each */
-
-#if 0
-static int
-catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
-{
-  int pos;
-  int worms = 0;
-  int k;
-
-  for (k = 0; k < MAX_WORMS; k++)
-    goal_worm[k] = NO_MOVE;
-
-  for (pos = BOARDMIN; pos < BOARDMAX && worms < MAX_WORMS; pos++)
-    if (ON_BOARD(pos)
-	&& board[pos]
-	&& (owl->goal)[pos]) {
-      int origin = find_origin(pos);
-      if (pos == origin) {
-	if (0) {
-	  TRACE_SEMEAI("goal worm: %1m\n", pos);
-	}
-	goal_worm[worms++] = pos;
-      }
-    }
-  return worms;
-}
-#endif
 
 /***********************/
 

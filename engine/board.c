@@ -756,21 +756,6 @@ popgo()
 }
 
 
-#if 0
-
-/* Silent version of popgo(), suitable for use if you have called
- * do_trymove() without passing through trymove() or tryko().
- */
-
-static void
-silent_popgo(void)
-{
-  stackp--;
-  undo_trymove();
-  memcpy(&hashdata, &(hashdata_stack[stackp]), sizeof(hashdata));
-}
-
-#endif
 
 /* Restore board state to the position before the last move. This is
  * accomplished by popping everything that was stored on the stacks
@@ -1593,94 +1578,6 @@ fastlib(int pos, int color, int ignore_captures)
 }
 
 
-/* Enable this to check that the newer implementation above gives
- * correct answers (using the older implementation). Don't forget to
- * rename the newer implementation to `fastlib_new'.
- */
-#if 0
-static int
-fastlib_old(int pos, int color, int ignore_capture)
-{
-  int k;
-  int ally1 = NO_MOVE;
-  int ally2 = NO_MOVE;
-  int fast_liberties = 0;
-  int other = OTHER_COLOR(color);
-
-  ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(color), pos);
-
-  for (k = 0; k < 4; k++) {
-    int neighbor = pos + delta[k];
-    if (board[neighbor] == color) {
-      if (ally1 != NO_MOVE) {
-        if (string_number[ally1] != string_number[neighbor]) { 
-          if (ally2 != NO_MOVE) {
-            if (string_number[ally2] != string_number[neighbor]) {
-	      /* More than 2 allies not implemented (yet).*/
-              return -1;
-            }
-          }
-	  else
-            ally2 = neighbor;
-        }
-      }
-      else
-        ally1 = neighbor;
-    }
-  }
-  
-  for (k = 0; k < 4; k++) {
-    int neighbor = pos + delta[k];
-    int neighbor_color = board[neighbor];
-    if (!ignore_capture
-        && neighbor_color == other
-	&& LIBERTIES(neighbor) == 1) {
-      int neighbor_size = COUNTSTONES(neighbor);
-#if 0
-      if ((neighbor_size <= 2 && !ally1)
-       || (neighbor_size == 1
-              && ally1 
-              && !ally2
-              && COUNTSTONES(ally1) == 1)) {
-#else
-      if (neighbor_size == 1
-         || (neighbor_size == 2 && !ally1)) {
-#endif
-        /* Here, we can gain only the adjacent new liberty. */
-        fast_liberties++;
-      }
-      else
-        return -1;
-    }
-    if (neighbor_color == EMPTY) {
-      if ((!ally1 || !neighbor_of_string(neighbor, ally1))
-          && (!ally2 || !neighbor_of_string(neighbor, ally2))) {
-	fast_liberties++;
-      }
-    }
-  }
-
-  if (ally1)
-    fast_liberties += LIBERTIES(ally1) - 1;
-  if (ally2)
-    fast_liberties += LIBERTIES(ally2) - count_common_libs(ally1, ally2);
-  
-  return fast_liberties;
-}
-
-
-int fastlib(int pos, int color, int ignore_captures)
-{
-  int liberties1 = fastlib_old(pos, color, ignore_captures);
-  int liberties2 = fastlib_new(pos, color, ignore_captures);
-
-  ASSERT1(liberties1 == liberties2, pos);
-
-  return liberties1;
-}
-#endif
-
 /* Find the liberties a stone of the given color would get if played
  * at (pos), ignoring possible captures of opponent stones. (pos)
  * must be empty. If libs != NULL, the locations of up to maxlib
@@ -1802,10 +1699,6 @@ approxlib(int pos, int color, int maxlib, int *libs)
     /* Stop counting if we reach maxlib. */
     if (liberties >= maxlib)
       return liberties;
-    /* Unneeded since we're about to leave. */
-#if 0
-    MARK_LIBERTY(EAST(pos));
-#endif
   }
   else if (board[EAST(pos)] == color) {
     int s = string_number[EAST(pos)];
@@ -2010,76 +1903,6 @@ accuratelib(int pos, int color, int maxlib, int *libs)
   return liberties;
 }
 
-
-#if 0
-
-/* Functionally identical to accuratelib(), within the flexibility
- * allowed by maxlib. Older implementation.
- *
- * Play a stone at (pos) and count the number of liberties for the
- * resulting string. This requires (pos) to be empty.
- *
- * This function differs from approxlib() by the fact that it removes
- * captured stones before counting the liberties.
- */
-
-int
-accurate_approxlib(int pos, int color, int maxlib, int *libs)
-{
-  int fast_liberties = -1;
-  int liberties = 0;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
-  int save_count_variations = count_variations;
-
-  ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(color), pos);
-
-  if (!libs) {
-    fast_liberties = fastlib(pos, color, 0);
-    if (fast_liberties >= 0) {
-      /* uncomment to confirm equivalence with accuratelib */
-      if (0) {
-	int dlibs[MAXLIBS];
-	int accuratelib_result = accuratelib(pos, color, maxlib, dlibs);
-
-	ASSERT1(gg_min(maxlib, fast_liberties)
-		== gg_min(maxlib, accuratelib_result), pos);
-      }
-      return fast_liberties;
-    } 
-  }
-
-  sgf_dumptree = 0;
-  /* Use tryko() since we don't care whether the move would violate
-   * the ko rule.
-   */
-  if (tryko(pos, color, "accurate approxlib", EMPTY, 0)) {
-    if (libs != NULL)
-      liberties = findlib(pos, maxlib, libs);
-    else
-      liberties = countlib(pos);
-    popgo();
-  }
-
-  if (fast_liberties >= 0 && liberties > 0) {
-    ASSERT1(fast_liberties == liberties, pos);
-  }
-
-  sgf_dumptree = save_sgf_dumptree;
-  count_variations = save_count_variations;
-
-  /* uncomment to confirm equivalence with accuratelib */
-  if (0) {
-    int dlibs[MAXLIBS];
-    int accuratelib_result = accuratelib(pos, color, maxlib, dlibs);
-
-    ASSERT1(gg_min(maxlib, liberties)
-	    == gg_min(maxlib, accuratelib_result), pos);
-  }
-  return liberties;
-}
-
-#endif
 
 /* Find the number of common liberties of the two strings at str1 and str2.
  */
@@ -2532,9 +2355,6 @@ is_self_atari(int pos, int color)
   else if (board[EAST(pos)] == other
           && LIBERTIES(EAST(pos)) == 1 && UNMARKED_STRING(EAST(pos))) {
     captures++;
-#if 0
-    MARK_STRING(EAST(pos));
-#endif
   }
 
   /* Each captured string is guaranteed to produce at least one
@@ -2554,42 +2374,6 @@ is_self_atari(int pos, int color)
   return accuratelib(pos, color, 2, NULL) <= 1;
 }
 
-
-/* Alternative implementation.
- * Note that incremental_sloppy_self_atari() is already integrated
- * into the newer implementation above.
- */
-
-#if 0
-
-int
-is_self_atari(int pos, int color)
-{
-  int liberties;
-  int result;
-  
-  ASSERT_ON_BOARD1(pos);
-  ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(IS_STONE(color), pos);
-
-  /* 1. Try first without really putting the stone on the board. */
-  /* FIXME: Integrate incremental_sloppy_self_atari() here. */
-  result = incremental_sloppy_self_atari(pos, color);
-  if (result != -1)
-    return result;
-
-  /* 2. It was not so easy.  Now see if we can put the stone on the board.
-   *    If we can't, this is a self atari.
-   */
-  if (!do_trymove(pos, color, 1))
-    return 1;
-  liberties = string[string_number[pos]].liberties;
-  silent_popgo();
-  
-  return liberties <= 1;
-}
-
-#endif
 
 /*
  * Returns true if pos is a liberty of the string at str.
@@ -2983,59 +2767,6 @@ new_position(void)
 }
 
 
-#if 0
-
-/*
- * Debug function. Dump all string information.
- */
-
-static void
-dump_incremental_board(void)
-{
-  int pos;
-  int s;
-  int i;
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
-      continue;
-    if (board[pos] == EMPTY)
-      fprintf(stderr, " . ");
-    else
-      fprintf(stderr, "%2d ", string_number[pos]);
-    fprintf(stderr, "\n");
-  }
-
-  for (s = 0; s < next_string; s++) {
-    if (board[string[s].origin] == EMPTY)
-      continue;
-    
-    gprintf("%o%d %s %1m size %d, %d liberties, %d neighbors\n", s,
-	    color_to_string(string[s].color),
-	    string[s].origin, string[s].size,
-	    string[s].liberties, string[s].neighbors);
-    gprintf("%ostones:");
-
-    pos = FIRST_STONE(s);
-    do {
-      gprintf("%o %1m", pos);
-      pos = NEXT_STONE(pos);
-    } while (!BACK_TO_FIRST_STONE(s, pos));
-    
-    gprintf("%o\nliberties:");
-    for (i = 0; i < string[s].liberties; i++)
-      gprintf("%o %1m", string[s].libs[i]);
-    
-    gprintf("%o\nneighbors:");
-    for (i = 0; i < string[s].neighbors; i++)
-      gprintf("%o %d(%1m)", string[s].neighborlist[i],
-	      string[string[s].neighborlist[i]].origin);
-    gprintf("%o\n\n");
-  }
-}
-#endif
-
-
 /* Build a string and its cyclic list representation from scratch.
  * propagate_string(stone, str) adds the stone (stone) to the string
  * (str) and recursively continues with not already included friendly
@@ -3355,9 +3086,6 @@ create_new_string(int pos)
     PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
     /* No need to mark since no visits left. */
-#if 0
-    MARK_STRING(EAST(pos));
-#endif
   }
 }
 
@@ -3470,9 +3198,6 @@ extend_neighbor_string(int pos, int s)
     ADD_NEIGHBOR(s, EAST(pos));
     PUSH_VALUE(string[s2].neighbors);
     ADD_NEIGHBOR(s2, pos);
-#if 0
-    MARK_STRING(EAST(pos));
-#endif
   }
   
 }
@@ -3638,19 +3363,12 @@ assimilate_neighbor_strings(int pos)
   }
   
   if (UNMARKED_LIBERTY(EAST(pos))) {
-#if 0
-    ADD_AND_MARK_LIBERTY(s, EAST(pos));
-#else
     ADD_LIBERTY(s, EAST(pos));
-#endif
   }
   else if (UNMARKED_COLOR_STRING(EAST(pos), other)) {
     ADD_NEIGHBOR(s, EAST(pos));
     PUSH_VALUE(string[string_number[EAST(pos)]].neighbors);
     ADD_NEIGHBOR(string_number[EAST(pos)], pos);
-#if 0
-    MARK_STRING(EAST(pos));
-#endif
   }
   else if (UNMARKED_COLOR_STRING(EAST(pos), color)) {
     assimilate_string(s, EAST(pos));
@@ -3773,16 +3491,9 @@ do_play_move(int pos, int color)
   if (UNMARKED_COLOR_STRING(east, color)) {
     neighbor_allies++;
     s = string_number[east];
-#if 0
-    MARK_STRING(east);
-#endif
   }
-  else if (UNMARKED_COLOR_STRING(east, other)) {
+  else if (UNMARKED_COLOR_STRING(east, other))
     remove_liberty(string_number[east], pos);
-#if 0
-    MARK_STRING(east);
-#endif
-  }    
   
   /* Choose strategy depending on the number of friendly neighbors. */
   if (neighbor_allies == 0)

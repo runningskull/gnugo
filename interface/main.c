@@ -27,12 +27,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#else
-#include <io.h>
-#endif
-
 #include "liberty.h"
 
 #include "gg-getopt.h"
@@ -121,7 +115,6 @@ enum mode {
   MODE_ASCII,
   MODE_ASCII_EMACS,
   MODE_GTP,
-  MODE_GMP,
   MODE_SGF,
   MODE_LOAD_AND_ANALYZE,
   MODE_LOAD_AND_SCORE,
@@ -513,8 +506,6 @@ main(int argc, char *argv[])
 	  playmode = MODE_ASCII_EMACS;
 	else if (strcmp(gg_optarg, "gtp") == 0)
 	  playmode = MODE_GTP;
-	else if (strcmp(gg_optarg, "gmp") == 0)
-	  playmode = MODE_GMP;
 	else {
 	  fprintf(stderr, "Invalid mode selection: %s\n", gg_optarg);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
@@ -848,7 +839,7 @@ main(int argc, char *argv[])
     if (infilename)
       playmode = MODE_LOAD_AND_ANALYZE;
     else
-      playmode = (isatty(0)) ? MODE_ASCII : MODE_GMP;
+      playmode = MODE_ASCII;
   }
 
   if (outfile && playmode != MODE_LOAD_AND_PRINT) {
@@ -861,10 +852,6 @@ main(int argc, char *argv[])
   }
   
   switch (playmode) {
-  case MODE_GMP:     
-    play_gmp(&gameinfo);
-    break;
-    
   case MODE_SOLO:
     play_solo(&gameinfo, benchmark);
     break;
@@ -1174,10 +1161,8 @@ show_version(void)
 Usage: gnugo [-opts]\n\
 \n\
 Main Options:\n\
-       --mode <mode>     Force the playing mode ('ascii', 'gmp', or 'gtp').\n\
+       --mode <mode>     Force the playing mode ('ascii' or 'gtp').\n\
                          Default is ASCII.\n\
-                         If no terminal is detected GMP (Go Modem Protocol)\n\
-                         will be assumed.\n\
        --quiet           Don't print copyright and informational messages\n\
        --gtp-input <file>Read gtp commands from file instead of stdin\n\
    -l, --infile <file>   Load name sgf file\n\
