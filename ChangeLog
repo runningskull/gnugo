@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- spread_connection_distances() now delays expensive constraint evaluation,
+  storing pending evaluation on a heap
 - new function signed_mark_string()
 - computation of active area revised in store_persistent_connection_cache(), 
   store_persistent_breakin_cache(), and store_persistent_owl_cache()
