@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- check for snapback/oiotoshi reactivated in check_self_atari()
 - joseki patterns are matched using corner matcher
 - symmetrical joseki patterns no longer match twice
 - antisuji joseki patterns are handled by callback now

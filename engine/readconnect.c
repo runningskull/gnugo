@@ -3326,7 +3326,7 @@ no_escape_from_ladder(int str)
 static int
 check_self_atari(int pos, int color_to_move)
 {
-#if 0
+#if 1
   int lib;
 #endif
   
@@ -3336,10 +3336,12 @@ check_self_atari(int pos, int color_to_move)
   if (is_ko(pos, color_to_move, NULL))
     return 1;
 
-#if 0
+#if 1
   /* FIXME: At some time I added this exceptional case but I can no
    * longer see how it would be useful. It might still be, however, so
    * I leave the code in for a while. /gf
+   *
+   * Code reactivated, see nando:31. /nn
    */
   if (approxlib(pos, color_to_move, 1, &lib) >= 1
       && approxlib(lib, OTHER_COLOR(color_to_move), 3, NULL) <= 2
