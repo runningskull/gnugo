@@ -35,7 +35,7 @@ static void add_adjacent_dragons(int a, int b);
 static void add_adjacent_dragon(int a, int b);
 static int dragon_invincible(int m, int n);
 static int compute_dragon_status(int i, int j);
-static void dragon_eye(int m, int n, struct eye_data[MAX_BOARD][MAX_BOARD]);
+static void dragon_eye(int m, int n, struct eye_data[BOARDMAX]);
 static int compute_escape(int m, int n, int dragon_status_known);
 
 static int dragon2_initialized;
@@ -111,37 +111,37 @@ make_dragons(int color, int stop_before_owl)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
 
-      if (black_eye[m][n].color == BLACK_BORDER
-	  && black_eye[m][n].origin == POS(m, n)) {
+      if (black_eye[POS(m, n)].color == BLACK_BORDER
+	  && black_eye[POS(m, n)].origin == POS(m, n)) {
 	if (!is_ko_point2(m, n)
-	   || black_eye[m][n].esize > 1) /* Only exclude living kos. */
+	   || black_eye[POS(m, n)].esize > 1) /* Only exclude living kos. */
 	  dragon_eye(m, n, black_eye);
 	else {
 	  if (m > 0 && !is_ko_point2(m-1, n))
-	    black_eye[m][n].dragon = dragon[POS(m-1, n)].origin;
+	    black_eye[POS(m, n)].dragon = dragon[POS(m-1, n)].origin;
 	  else if (m < board_size-1 && !is_ko_point2(m+1, n))
-	    black_eye[m][n].dragon = dragon[POS(m+1, n)].origin;
+	    black_eye[POS(m, n)].dragon = dragon[POS(m+1, n)].origin;
 	  else if (n > 0 && !is_ko_point2(m, n-1))
-	    black_eye[m][n].dragon = dragon[POS(m, n-1)].origin;
+	    black_eye[POS(m, n)].dragon = dragon[POS(m, n-1)].origin;
 	  else if (n < board_size-1 && !is_ko_point2(m, n+1))
-	    black_eye[m][n].dragon = dragon[POS(m, n+1)].origin;
+	    black_eye[POS(m, n)].dragon = dragon[POS(m, n+1)].origin;
 	}
       }
 	  
-      if (white_eye[m][n].color == WHITE_BORDER
-	  && white_eye[m][n].origin == POS(m, n)) {
+      if (white_eye[POS(m, n)].color == WHITE_BORDER
+	  && white_eye[POS(m, n)].origin == POS(m, n)) {
 	if (!is_ko_point2(m, n)
-	    || white_eye[m][n].esize > 1) /* Only exclude living kos. */
+	    || white_eye[POS(m, n)].esize > 1) /* Only exclude living kos. */
 	  dragon_eye(m, n, white_eye);
 	else {
 	  if (m > 0 && !is_ko_point2(m-1, n))
-	    white_eye[m][n].dragon = dragon[POS(m-1, n)].origin;
+	    white_eye[POS(m, n)].dragon = dragon[POS(m-1, n)].origin;
 	  else if (m < board_size-1 && !is_ko_point2(m+1, n))
-	    white_eye[m][n].dragon = dragon[POS(m+1, n)].origin;
+	    white_eye[POS(m, n)].dragon = dragon[POS(m+1, n)].origin;
 	  else if (n > 0 && !is_ko_point2(m, n-1))
-	    white_eye[m][n].dragon = dragon[POS(m, n-1)].origin;
+	    white_eye[POS(m, n)].dragon = dragon[POS(m, n-1)].origin;
 	  else if (n < board_size-1 && !is_ko_point2(m, n+1))
-	    white_eye[m][n].dragon = dragon[POS(m, n+1)].origin;
+	    white_eye[POS(m, n)].dragon = dragon[POS(m, n+1)].origin;
 	}
       }
     }
@@ -200,14 +200,14 @@ make_dragons(int color, int stop_before_owl)
   /* In case origins of dragons got moved, put the dragons of eyes aright. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (black_eye[i][j].dragon != NO_MOVE) {
-	int dr=dragon[black_eye[i][j].dragon].origin;
-	black_eye[i][j].dragon = dr;
+      if (black_eye[POS(i, j)].dragon != NO_MOVE) {
+	int dr=dragon[black_eye[POS(i, j)].dragon].origin;
+	black_eye[POS(i, j)].dragon = dr;
       }
 
-      if (white_eye[i][j].dragon != NO_MOVE) {
-	int dr=dragon[white_eye[i][j].dragon].origin;
-	  white_eye[i][j].dragon = dr;
+      if (white_eye[POS(i, j)].dragon != NO_MOVE) {
+	int dr=dragon[white_eye[POS(i, j)].dragon].origin;
+	  white_eye[POS(i, j)].dragon = dr;
       }
     }
   time_report(2, "  time to fix origins", -1, -1);
@@ -225,15 +225,15 @@ make_dragons(int color, int stop_before_owl)
       int di = -1;
       int dj = -1;
 
-      if (black_eye[m][n].color == BLACK_BORDER
-	  && (!black_eye[m][n].marginal || life)
-	  && (black_eye[m][n].neighbors <= 1)
-	  && (black_eye[m][n].dragon != NO_MOVE)) {
+      if (black_eye[POS(m, n)].color == BLACK_BORDER
+	  && (!black_eye[POS(m, n)].marginal || life)
+	  && (black_eye[POS(m, n)].neighbors <= 1)
+	  && (black_eye[POS(m, n)].dragon != NO_MOVE)) {
 	sum = topological_eye(m, n, BLACK, &ai, &aj, &di, &dj,
 			      black_eye, white_eye, half_eye);
 	if (sum >= 4) {
 	  half_eye[POS(m, n)].type = FALSE_EYE;
-	  if ((black_eye[m][n].esize == 1)
+	  if ((black_eye[POS(m, n)].esize == 1)
 	      || is_legal2(m, n, WHITE)
 	      || BOARD(m, n) == WHITE)
 	    add_half_eye(m, n, black_eye, half_eye);
@@ -242,15 +242,15 @@ make_dragons(int color, int stop_before_owl)
 	  half_eye[POS(m, n)].type = HALF_EYE;
       }
       
-      if (white_eye[m][n].color == WHITE_BORDER
-	  && (!white_eye[m][n].marginal || life)
-	  && (white_eye[m][n].neighbors <= 1)
-	  && (white_eye[m][n].dragon != NO_MOVE)) {
+      if (white_eye[POS(m, n)].color == WHITE_BORDER
+	  && (!white_eye[POS(m, n)].marginal || life)
+	  && (white_eye[POS(m, n)].neighbors <= 1)
+	  && (white_eye[POS(m, n)].dragon != NO_MOVE)) {
 	sum = topological_eye(m, n, WHITE, &ai, &aj, &di, &dj,
 			      black_eye, white_eye, half_eye);
 	if (sum >= 4) {
 	  half_eye[POS(m, n)].type = FALSE_EYE;
-	  if ((white_eye[m][n].esize == 1)
+	  if ((white_eye[POS(m, n)].esize == 1)
 	      || is_legal2(m, n, BLACK)
 	      || BOARD(m, n) == BLACK)
 	    add_half_eye(m, n, white_eye, half_eye);
@@ -268,8 +268,8 @@ make_dragons(int color, int stop_before_owl)
   /* Compute the number of eyes, half eyes, etc. in an eye space. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if ((black_eye[i][j].color == BLACK_BORDER) 
-	  && (black_eye[i][j].origin == POS(i, j))) 
+      if ((black_eye[POS(i, j)].color == BLACK_BORDER) 
+	  && (black_eye[POS(i, j)].origin == POS(i, j))) 
       {
 	int max, min, attacki, attackj, defendi, defendj;
 
@@ -277,15 +277,15 @@ make_dragons(int color, int stop_before_owl)
 		     &defendi, &defendj, black_eye, half_eye, 1, color);
 	DEBUG(DEBUG_EYES, "Black eyespace at %m: min=%d, max=%d\n",
 	      i, j, min, max);
-	black_eye[i][j].maxeye = max;
-	black_eye[i][j].mineye = min;
-	black_eye[i][j].attack_point  = POS(attacki, attackj);
-	black_eye[i][j].defense_point = POS(defendi, defendj);
-	propagate_eye(i, j, black_eye);
+	black_eye[POS(i, j)].maxeye = max;
+	black_eye[POS(i, j)].mineye = min;
+	black_eye[POS(i, j)].attack_point  = POS(attacki, attackj);
+	black_eye[POS(i, j)].defense_point = POS(defendi, defendj);
+	propagate_eye(POS(i, j), black_eye);
       }
 
-      if ((white_eye[i][j].color == WHITE_BORDER) 
-	  && (white_eye[i][j].origin == POS(i, j))) 
+      if ((white_eye[POS(i, j)].color == WHITE_BORDER) 
+	  && (white_eye[POS(i, j)].origin == POS(i, j))) 
       {
 	int max, min, attacki, attackj, defendi, defendj;
 
@@ -293,11 +293,11 @@ make_dragons(int color, int stop_before_owl)
 		     &defendi, &defendj, white_eye, half_eye, 1, color);
 	DEBUG(DEBUG_EYES, "White eyespace at %m: min=%d, max=%d\n",
 	      i, j, min, max);
-	white_eye[i][j].maxeye = max;
-	white_eye[i][j].mineye = min;
-	white_eye[i][j].attack_point = POS(attacki, attackj);
-	white_eye[i][j].defense_point = POS(defendi, defendj);
-	propagate_eye(i, j, white_eye);
+	white_eye[POS(i, j)].maxeye = max;
+	white_eye[POS(i, j)].mineye = min;
+	white_eye[POS(i, j)].attack_point = POS(attacki, attackj);
+	white_eye[POS(i, j)].defense_point = POS(defendi, defendj);
+	propagate_eye(POS(i, j), white_eye);
       }
     }
   time_report(2, "  time to find eyes", -1, -1);
@@ -305,35 +305,35 @@ make_dragons(int color, int stop_before_owl)
   /* Now we compute the genus. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (black_eye[i][j].color == BLACK_BORDER
-	  && black_eye[i][j].dragon != NO_MOVE
-	  && black_eye[i][j].origin == POS(i, j))
+      if (black_eye[POS(i, j)].color == BLACK_BORDER
+	  && black_eye[POS(i, j)].dragon != NO_MOVE
+	  && black_eye[POS(i, j)].origin == POS(i, j))
       {
-	m = I(black_eye[i][j].dragon);
-	n = J(black_eye[i][j].dragon);
+	m = I(black_eye[POS(i, j)].dragon);
+	n = J(black_eye[POS(i, j)].dragon);
 	gg_assert (BOARD(m, n) == BLACK);
 	TRACE("eye at %m found for dragon at %m--augmenting genus\n",
 	      i, j, m, n);
-	DRAGON2(m, n).genus += (black_eye[i][j].mineye);
-	DRAGON2(m, n).heyes += (black_eye[i][j].maxeye
-				- black_eye[i][j].mineye);
-	if (black_eye[i][j].maxeye - black_eye[i][j].mineye > 0)
-	  DRAGON2(m, n).heye = black_eye[i][j].attack_point;
+	DRAGON2(m, n).genus += (black_eye[POS(i, j)].mineye);
+	DRAGON2(m, n).heyes += (black_eye[POS(i, j)].maxeye
+				- black_eye[POS(i, j)].mineye);
+	if (black_eye[POS(i, j)].maxeye - black_eye[POS(i, j)].mineye > 0)
+	  DRAGON2(m, n).heye = black_eye[POS(i, j)].attack_point;
       }
-      if ((white_eye[i][j].color == WHITE_BORDER) 
-	  && (white_eye[i][j].dragon != NO_MOVE)
-	  && (white_eye[i][j].origin == POS(i, j))) 
+      if ((white_eye[POS(i, j)].color == WHITE_BORDER) 
+	  && (white_eye[POS(i, j)].dragon != NO_MOVE)
+	  && (white_eye[POS(i, j)].origin == POS(i, j))) 
       {
-	m = I(white_eye[i][j].dragon);
-	n = J(white_eye[i][j].dragon);
+	m = I(white_eye[POS(i, j)].dragon);
+	n = J(white_eye[POS(i, j)].dragon);
 	gg_assert (BOARD(m, n) == WHITE);
 	TRACE("eye at %m found for dragon at %m--augmenting genus\n",
 	      i, j, m, n);
-	DRAGON2(m, n).genus += (white_eye[i][j].mineye);
-	DRAGON2(m, n).heyes += (white_eye[i][j].maxeye
-				- white_eye[i][j].mineye);
-	if (white_eye[i][j].maxeye - white_eye[i][j].mineye > 0) {
-	  DRAGON2(m, n).heye = white_eye[i][j].attack_point;
+	DRAGON2(m, n).genus += (white_eye[POS(i, j)].mineye);
+	DRAGON2(m, n).heyes += (white_eye[POS(i, j)].maxeye
+				- white_eye[POS(i, j)].mineye);
+	if (white_eye[POS(i, j)].maxeye - white_eye[POS(i, j)].mineye > 0) {
+	  DRAGON2(m, n).heye = white_eye[POS(i, j)].attack_point;
 	}
       }
     }
@@ -880,8 +880,7 @@ static int
 dragon_invincible(int m, int n)
 {
 
-  typedef struct eye_data row_of_eye_data[MAX_BOARD];
-  row_of_eye_data *eye;
+  struct eye_data *eye;
 
   int i, j;
 
@@ -905,9 +904,9 @@ dragon_invincible(int m, int n)
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (eye[i][j].origin == POS(i, j)
-          && same_dragon(I(eye[i][j].dragon), J(eye[i][j].dragon), m, n)) {
-        if (eye[i][j].msize == 0 && eye[i][j].mineye > 0)
+      if (eye[POS(i, j)].origin == POS(i, j)
+          && same_dragon(I(eye[POS(i, j)].dragon), J(eye[POS(i, j)].dragon), m, n)) {
+        if (eye[POS(i, j)].msize == 0 && eye[POS(i, j)].mineye > 0)
           strong_eyes++;
       }
 
@@ -1035,7 +1034,7 @@ show_dragons(void)
  */
 
 static void
-dragon_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD])
+dragon_eye(int m, int n, struct eye_data eye[BOARDMAX])
 {
   int i, j;
   int dragoni = -1, dragonj = -1;
@@ -1043,22 +1042,22 @@ dragon_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD])
   int k;
 
   /* don't amalgamate across ikken tobi */
-  if (eye[m][n].esize == 3 && eye[m][n].msize > 1)
+  if (eye[POS(m, n)].esize == 3 && eye[POS(m, n)].msize > 1)
     return;
 
   DEBUG(DEBUG_DRAGONS, "amalgamate dragons around %m\n", m, n);
-  if (eye[m][n].color == BLACK_BORDER)
+  if (eye[POS(m, n)].color == BLACK_BORDER)
     color = BLACK;
   else {
-    gg_assert(eye[m][n].color == WHITE_BORDER);
+    gg_assert(eye[POS(m, n)].color == WHITE_BORDER);
     color = WHITE;
   }
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (eye[i][j].origin == POS(m, n)
-	  && !eye[i][j].marginal
-	  && !(eye[i][j].type & INHIBIT_CONNECTION)) {
+      if (eye[POS(i, j)].origin == POS(m, n)
+	  && !eye[POS(i, j)].marginal
+	  && !(eye[POS(i, j)].type & INHIBIT_CONNECTION)) {
 	for (k = 0; k < 4; k++) {
 	  int di = deltai[k];
 	  int dj = deltaj[k];
@@ -1079,11 +1078,11 @@ dragon_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD])
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if ((eye[i][j].color == BLACK_BORDER 
-	   || eye[i][j].color == WHITE_BORDER) 
-	  && eye[i][j].origin == POS(m, n))
+      if ((eye[POS(i, j)].color == BLACK_BORDER 
+	   || eye[POS(i, j)].color == WHITE_BORDER) 
+	  && eye[POS(i, j)].origin == POS(m, n))
       {
-	eye[i][j].dragon = POS(dragoni, dragonj);
+	eye[POS(i, j)].dragon = POS(dragoni, dragonj);
       }
     }
 }
@@ -1291,11 +1290,11 @@ dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
 
       /* Do not pass connection inhibited intersections. */
       if ((color == WHITE
-	   && ((white_eye[i][j].type & INHIBIT_CONNECTION)
-	       || white_eye[i][j].cut == 1))
+	   && ((white_eye[POS(i, j)].type & INHIBIT_CONNECTION)
+	       || white_eye[POS(i, j)].cut == 1))
 	  || (color == BLACK
-	      && ((black_eye[i][j].type & INHIBIT_CONNECTION)
-		  || black_eye[i][j].cut == 1)))
+	      && ((black_eye[POS(i, j)].type & INHIBIT_CONNECTION)
+		  || black_eye[POS(i, j)].cut == 1)))
 	continue;
       
       if (distance == 4)

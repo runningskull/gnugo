@@ -145,13 +145,13 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
   
   if (pattern->class & CLASS_B) {
     if (color == WHITE)
-      white_eye[stari][starj].cut = 1;
+      white_eye[POS(stari, starj)].cut = 1;
     else
-      black_eye[stari][starj].cut = 1;
-    if (color == WHITE && white_eye[stari][starj].color == WHITE_BORDER)
-      white_eye[stari][starj].marginal = 1;
-    else if (color == BLACK && black_eye[stari][starj].color == BLACK_BORDER)
-      black_eye[stari][starj].marginal = 1;
+      black_eye[POS(stari, starj)].cut = 1;
+    if (color == WHITE && white_eye[POS(stari, starj)].color == WHITE_BORDER)
+      white_eye[POS(stari, starj)].marginal = 1;
+    else if (color == BLACK && black_eye[POS(stari, starj)].color == BLACK_BORDER)
+      black_eye[POS(stari, starj)].marginal = 1;
   }
   else if (!(pattern->class & CLASS_C))
     return; /* Nothing more to do, up to the helper or autohelper
@@ -197,10 +197,10 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
     if (pattern->class & CLASS_B) {
       if (pattern->patn[k].att != ATT_not)
 	break; /* The inhibition points are guaranteed to come first. */
-      if (color == WHITE && white_eye[x][y].color == WHITE_BORDER)
-	white_eye[x][y].type |= INHIBIT_CONNECTION;
-      else if (color == BLACK && black_eye[x][y].color == BLACK_BORDER)
-	black_eye[x][y].type |= INHIBIT_CONNECTION;
+      if (color == WHITE && white_eye[POS(x, y)].color == WHITE_BORDER)
+	white_eye[POS(x, y)].type |= INHIBIT_CONNECTION;
+      else if (color == BLACK && black_eye[POS(x, y)].color == BLACK_BORDER)
+	black_eye[POS(x, y)].type |= INHIBIT_CONNECTION;
     }
   } /* loop over elements */
 }

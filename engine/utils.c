@@ -161,9 +161,11 @@ int
 cut_possible(int i, int j, int color)
 {
   if (color == WHITE)
-    return (black_eye[i][j].cut || (black_eye[i][j].type & INHIBIT_CONNECTION));
+    return (black_eye[POS(i, j)].cut
+	    || (black_eye[POS(i, j)].type & INHIBIT_CONNECTION));
   else
-    return (white_eye[i][j].cut || (white_eye[i][j].type & INHIBIT_CONNECTION));
+    return (white_eye[POS(i, j)].cut
+	    || (white_eye[POS(i, j)].type & INHIBIT_CONNECTION));
 }
 
 

@@ -649,9 +649,9 @@ add_vital_eye_move(int ti, int tj, int ai, int aj, int color)
   int eye;
   ASSERT_ON_BOARD2(ai, aj);
   if (color == WHITE)
-    eye = find_eye(white_eye[ai][aj].origin, color);
+    eye = find_eye(white_eye[POS(ai, aj)].origin, color);
   else
-    eye = find_eye(black_eye[ai][aj].origin, color);
+    eye = find_eye(black_eye[POS(ai, aj)].origin, color);
   add_move_reason(POS(ti, tj), VITAL_EYE_MOVE, eye);
 }
 
@@ -1340,9 +1340,9 @@ find_more_owl_attack_and_defense_moves(int color)
 	  int ecolor = eyecolor[move_reasons[r].what];
       
 	  if (ecolor == WHITE)
-	    dd = white_eye[I(ee)][J(ee)].dragon;
+	    dd = white_eye[ee].dragon;
 	  else
-	    dd = black_eye[I(ee)][J(ee)].dragon;
+	    dd = black_eye[ee].dragon;
       
 	  if (dd == NO_MOVE) /* Maybe we should assert this not to happen. */
 	    continue;
@@ -1897,10 +1897,10 @@ list_move_reasons(int color)
 	  ecolor = eyecolor[move_reasons[r].what];
 	  if (ecolor == WHITE)
 	    gprintf("Move at %1m vital eye point for dragon %1m (eye %1m)\n",
-		    pos, white_eye[I(aa)][J(aa)].dragon, aa);
+		    pos, white_eye[aa].dragon, aa);
 	  else
 	    gprintf("Move at %1m vital eye point for dragon %1m (eye %1m)\n",
-		    pos, black_eye[I(aa)][J(aa)].dragon, aa);
+		    pos, black_eye[aa].dragon, aa);
 	  break;
 	  
 	case NON_ATTACK_MOVE:
@@ -3018,9 +3018,9 @@ estimate_strategical_value(int pos, int color, float score)
 	ecolor = eyecolor[move_reasons[r].what];
 
 	if (ecolor == WHITE) 
-	  bb = white_eye[I(aa)][J(aa)].dragon;
+	  bb = white_eye[aa].dragon;
 	else
-	  bb = black_eye[I(aa)][J(aa)].dragon;
+	  bb = black_eye[aa].dragon;
 
 	if (bb == NO_MOVE) /* Maybe we should assert this not to happen. */
 	  break; 

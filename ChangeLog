@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- struct eye_data arrays changed from 2D to 1D
 - 9x9 case revised in fuseki()
 - bugfix in goal detection in matchpat, don't accept empty goal vertices
 - bugfix in gtp_genmove()

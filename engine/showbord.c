@@ -265,20 +265,20 @@ showchar(int i, int j, int empty, int xo)
       int  empty_color;
       char empty_char;
       
-      if (black_eye[i][j].color == BLACK_BORDER) {
-	if (white_eye[i][j].color == WHITE_BORDER)
+      if (black_eye[POS(i, j)].color == BLACK_BORDER) {
+	if (white_eye[POS(i, j)].color == WHITE_BORDER)
 	  empty_color = domain_colors[3];
 	else
 	  empty_color = domain_colors[1];
 
-	if (black_eye[i][j].marginal)
+	if (black_eye[POS(i, j)].marginal)
 	  empty_char = '!';
 	else
 	  empty_char = 'x';
       }
-      else if (white_eye[i][j].color == WHITE_BORDER) {
+      else if (white_eye[POS(i, j)].color == WHITE_BORDER) {
 	empty_color = domain_colors[2];
-	if (white_eye[i][j].marginal)
+	if (white_eye[POS(i, j)].marginal)
 	  empty_char = '!';
 	else
 	  empty_char = 'o';

@@ -115,9 +115,9 @@ jump_out_helper (ARGS)
   UNUSED(transformation); UNUSED(pattern);
 
   if (color==WHITE)
-    own_eyespace = (white_eye[ti][tj].color == WHITE_BORDER);
+    own_eyespace = (white_eye[POS(ti, tj)].color == WHITE_BORDER);
   else
-    own_eyespace = (black_eye[ti][tj].color == BLACK_BORDER);
+    own_eyespace = (black_eye[POS(ti, tj)].color == BLACK_BORDER);
   
   if (influence_area_color(ti, tj) != color && !own_eyespace)
     return 1;

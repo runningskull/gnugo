@@ -469,12 +469,12 @@ void compute_escape_influence(char goal[MAX_BOARD][MAX_BOARD], int color,
                               int dragons_known);
 
 /* Eye space functions. */
-int eye_space(int i, int j);
-int proper_eye_space(int i, int j);
-int max_eye_value(int i, int j);
-int marginal_eye_space(int i, int j);
-void make_proper_eye_space(int i, int j, int color);
-void remove_eyepoint(int i, int j, int color);
+int is_eye_space(int pos);
+int is_proper_eye_space(int pos);
+int is_marginal_eye_space(int pos);
+int max_eye_value(int pos);
+void make_proper_eye_space(int pos, int color);
+void remove_eyepoint(int pos, int color);
 
 
 /* debugging support */
@@ -684,10 +684,10 @@ struct eye_data {
   int cut;                  /* Opponent can cut at vertex.                */
 };
 
-typedef struct eye_data row_of_eye_data[MAX_BOARD];
+typedef struct eye_data row_of_eye_data[BOARDMAX];
 
-extern struct eye_data white_eye[MAX_BOARD][MAX_BOARD];
-extern struct eye_data black_eye[MAX_BOARD][MAX_BOARD];
+extern struct eye_data white_eye[BOARDMAX];
+extern struct eye_data black_eye[BOARDMAX];
 
 /* The following declarations have to be postponed until after the
  * definition of struct eye_data or struct half_eye_data.
@@ -695,33 +695,33 @@ extern struct eye_data black_eye[MAX_BOARD][MAX_BOARD];
 
 void compute_eyes(int i, int  j, int *max, int *min,
                   int *attacki, int *attackj, int *defendi, int *defendj,
-                  struct eye_data eye[MAX_BOARD][MAX_BOARD],
+                  struct eye_data eye[BOARDMAX],
                   struct half_eye_data heye[BOARDMAX],
                   int add_moves, int color);
 void compute_eyes_pessimistic(int i, int  j, int *max, int *min,
                               int *pessimistic_min,
                               int *attacki, int *attackj,
                               int *defendi, int *defendj,
-                              struct eye_data eye[MAX_BOARD][MAX_BOARD],
+                              struct eye_data eye[BOARDMAX],
                               struct half_eye_data heye[BOARDMAX]);
 int recognize_eye2(int m, int n, int *attacki, int *attackj,
                     int *defendi, int *defendj, int *max, int *min,
-                    struct eye_data eye[MAX_BOARD][MAX_BOARD],
+                    struct eye_data eye[BOARDMAX],
                     struct half_eye_data heye[BOARDMAX],
                     int add_moves, int color);
-void propagate_eye (int, int, struct eye_data eye[MAX_BOARD][MAX_BOARD]);
+void propagate_eye (int pos, struct eye_data eye[BOARDMAX]);
 void originate_eye(int i, int j, int m, int n,
-                          int *esize, int *msize,
-                          struct eye_data eye[MAX_BOARD][MAX_BOARD]);
+		   int *esize, int *msize,
+		   struct eye_data eye[BOARDMAX]);
 int topological_eye(int m, int n, int color, int *ai, int *aj,
                     int *di, int *dj, 
-                    struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
-                    struct eye_data w_eye[MAX_BOARD][MAX_BOARD],
+                    struct eye_data b_eye[BOARDMAX],
+                    struct eye_data w_eye[BOARDMAX],
                     struct half_eye_data heye[BOARDMAX]);
-void add_half_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD], 
+void add_half_eye(int m, int n, struct eye_data eye[BOARDMAX], 
                   struct half_eye_data heye[BOARDMAX]);
-void make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
-                  struct eye_data w_eye[MAX_BOARD][MAX_BOARD],
+void make_domains(struct eye_data b_eye[BOARDMAX],
+                  struct eye_data w_eye[BOARDMAX],
 		  int owl_call);
 
 int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);

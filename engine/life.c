@@ -106,11 +106,11 @@ static int eye_color;
 static int boundary_size;
 
 
-static int minimize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
+static int minimize_eyes(struct eye_data eyedata[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
 			 int *min, int *ko_out, int ko_in, int ko_master,
 			 int *attack_point, int cutoff_eyes, int cutoff_ko);
-static int maximize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
+static int maximize_eyes(struct eye_data eyedata[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
 			 int *max, int *ko_out, int ko_in, int ko_master,
 			 int *defense_point, int cutoff_eyes, int cutoff_ko);
@@ -384,7 +384,7 @@ check_vulnerability(int i, int j, int m, int n)
 
 
 static void
-print_eyespace(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
+print_eyespace(struct eye_data eyedata[BOARDMAX],
 	       struct half_eye_data heye[BOARDMAX])
 {
   int m, n;
@@ -417,7 +417,7 @@ print_eyespace(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
     for (n = minj; n <= maxj; n++) {
       if (eyeindex[m][n] >= 0) {
 	if (BOARD(m, n) == EMPTY) {
-	  if (eyedata[m][n].marginal)
+	  if (eyedata[POS(m, n)].marginal)
 	    gprintf("%o!");
 	  else if (is_halfeye(heye, POS(m, n)))
 	    gprintf("%oh");
@@ -438,14 +438,14 @@ print_eyespace(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
 
 
 static int
-prepare_eyespace(int m, int n, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
+prepare_eyespace(int m, int n, struct eye_data eyedata[BOARDMAX],
 		 struct half_eye_data heye[BOARDMAX])
 {
   int i, j;
   int k;
   
   /* Set `eye_color' to the owner of the eye. */
-  eye_color = eyedata[m][n].color;
+  eye_color = eyedata[POS(m, n)].color;
   if (eye_color == BLACK_BORDER)
     eye_color = BLACK;
   if (eye_color == WHITE_BORDER)
@@ -459,8 +459,8 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
    */
   for (i = 0; i < board_size; ++i)
     for (j = 0; j < board_size; ++j) {
-      if (eyedata[i][j].origin == POS(m, n)) {
-	include_eyepoint(i, j, eyedata[i][j].marginal == 0, 0);
+      if (eyedata[POS(i, j)].origin == POS(m, n)) {
+	include_eyepoint(i, j, eyedata[POS(i, j)].marginal == 0, 0);
 	if (is_halfeye(heye, POS(i, j))) {
 	  for (k=0; k<heye[POS(i, j)].num_attacks; k++)
 	    include_eyepoint(I(heye[POS(i, j)].attack_point[k]),
@@ -543,7 +543,7 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
   for (k=0; k<eyesize; k++) {
     i = eyei[k];
     j = eyej[k];
-    if (!eyedata[i][j].marginal)
+    if (!eyedata[POS(i, j)].marginal)
       continue;
     /* Found a margin. Now look for a vulnerable stone outside the
      * eyespace.
@@ -595,7 +595,7 @@ int
 recognize_eye2(int m, int  n, 
 	       int *attacki, int *attackj, int *defendi, int *defendj,
 	       int *max, int *min, 
-	       struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
+	       struct eye_data eyedata[BOARDMAX],
 	       struct half_eye_data heye[BOARDMAX],
  	       int add_moves, int color)
 {
@@ -881,7 +881,7 @@ compare_max_eyes(int eyes1, int ko1, int eyes2, int ko2)
  */
 
 static int
-minimize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
+minimize_eyes(struct eye_data eyedata[BOARDMAX],
 	      struct half_eye_data heye[BOARDMAX],
 	      int *min, int *ko_out, int ko_in, int ko_master,
 	      int *attack_point, int cutoff_eyes, int cutoff_ko)
@@ -1012,7 +1012,7 @@ minimize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
 	score++;
       if (j < board_size-1 && BOARD(i, j+1) != eye_color)
 	score++;
-      if (eyedata[i][j].marginal)
+      if (eyedata[POS(i, j)].marginal)
 	score += 2;
       if (score == 0)
 	score = 5;
@@ -1175,7 +1175,7 @@ minimize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
  */
 
 static int
-maximize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
+maximize_eyes(struct eye_data eyedata[BOARDMAX],
 	      struct half_eye_data heye[BOARDMAX],
 	      int *max, int *ko_out, int ko_in, int ko_master,
 	      int *defense_point, int cutoff_eyes, int cutoff_ko)
@@ -1324,7 +1324,7 @@ maximize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
 	score++;
     }
     
-    if (eyedata[i][j].marginal)
+    if (eyedata[POS(i, j)].marginal)
       score += 2;
     
     if (score == 0)

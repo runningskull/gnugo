@@ -307,7 +307,7 @@ prepare_eyes_tab()
 
 
 void
-display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD], 
+display_eye(int color, struct eye_data eyedata[BOARDMAX], 
 	    int i, int j)
 {
   wmove(info_window, 1, 24);
@@ -316,55 +316,55 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
   gg_wprintw(info_window, "%s ", location_to_string2(i, j));
 
   wmove(info_window, 2, 24);
-  if (eyedata[i][j].origin == NO_MOVE)
+  if (eyedata[POS(i, j)].origin == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ", 
-	       location_to_string(eyedata[i][j].origin));
+	       location_to_string(eyedata[POS(i, j)].origin));
 
   wmove(info_window, 4, 18);
-  gg_wprintw(info_window, "%-12s", color_to_string(eyedata[i][j].color));
+  gg_wprintw(info_window, "%-12s", color_to_string(eyedata[POS(i, j)].color));
   wmove(info_window, 5, 18);
-  gg_wprintw(info_window, "%d   ", eyedata[i][j].esize);
+  gg_wprintw(info_window, "%d   ", eyedata[POS(i, j)].esize);
   wmove(info_window, 6, 18);
-  gg_wprintw(info_window, "%d   ", eyedata[i][j].msize);
+  gg_wprintw(info_window, "%d   ", eyedata[POS(i, j)].msize);
   wmove(info_window, 7, 18);
-  if (eyedata[i][j].dragon == NO_MOVE)
+  if (eyedata[POS(i, j)].dragon == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ",
-	       location_to_string(eyedata[i][j].dragon));
+	       location_to_string(eyedata[POS(i, j)].dragon));
 
   wmove(info_window, 11, 18);
-  gg_wprintw(info_window, "%d  ", eyedata[i][j].type);
+  gg_wprintw(info_window, "%d  ", eyedata[POS(i, j)].type);
   wmove(info_window, 12, 18);
-  gg_wprintw(info_window, "%d  ", eyedata[i][j].marginal);
+  gg_wprintw(info_window, "%d  ", eyedata[POS(i, j)].marginal);
 
   wmove(info_window, 4, 55);
-  gg_wprintw(info_window, "%d ", eyedata[i][j].maxeye);
+  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].maxeye);
   wmove(info_window, 5, 55);
-  gg_wprintw(info_window, "%d ", eyedata[i][j].mineye);
+  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].mineye);
 
   wmove(info_window, 6, 55);
-  if (eyedata[i][j].attack_point == NO_MOVE)
+  if (eyedata[POS(i, j)].attack_point == NO_MOVE)
     gg_wprintw(info_window, "---          ");
   else
     gg_wprintw(info_window, "%3s", 
-	       location_to_string(eyedata[i][j].attack_point));
+	       location_to_string(eyedata[POS(i, j)].attack_point));
 
   wmove(info_window, 7, 55);
-  if (eyedata[i][j].defense_point == NO_MOVE)
+  if (eyedata[POS(i, j)].defense_point == NO_MOVE)
     gg_wprintw(info_window, "---          ");
   else
     gg_wprintw(info_window, "%3s", 
-	       location_to_string(eyedata[i][j].defense_point));
+	       location_to_string(eyedata[POS(i, j)].defense_point));
   
   wmove(info_window, 11, 55);
-  gg_wprintw(info_window, "%d ", eyedata[i][j].neighbors);
+  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].neighbors);
   wmove(info_window, 12, 55);
-  gg_wprintw(info_window, "%d ", eyedata[i][j].marginal_neighbors);
+  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].marginal_neighbors);
   wmove(info_window, 13, 55);
-  gg_wprintw(info_window, "%d ", eyedata[i][j].cut);
+  gg_wprintw(info_window, "%d ", eyedata[POS(i, j)].cut);
 
   wrefresh(info_window);
 }

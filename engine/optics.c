@@ -59,28 +59,28 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 			int lively[BOARDMAX],
 			int false_margins[BOARDMAX],
 			int first_time);
-static void count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD]);
+static void count_neighbours(struct eye_data eyedata[BOARDMAX]);
 static int is_lively(int owl_call, int i, int j);
 static int false_margin(int pos, int color, int lively[BOARDMAX]);
 
 static int recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 			 int *max, int *min, 
-			 struct eye_data eye[MAX_BOARD][MAX_BOARD],
+			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
 			 int add_moves, int color);
 static int linear_eye_space(int i, int j, int *attacki, int *attackj,
 			    int *max, int *min,
-			    struct eye_data eye[MAX_BOARD][MAX_BOARD]);
+			    struct eye_data eye[BOARDMAX]);
 static void first_map(int q, int map[MAXEYE]);
 static int next_map(int *q, int map[MAXEYE], int esize);
-static void print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
+static void print_eye(struct eye_data eye[BOARDMAX],
 		      struct half_eye_data heye[BOARDMAX], int i, int j);
 static int 
 evaluate_diagonal_intersection(int m, int n, int color,
 			       int *attacki, int *attackj,
 			       int *defendi, int *defendj,
-			       struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
-			       struct eye_data w_eye[MAX_BOARD][MAX_BOARD]);
+			       struct eye_data b_eye[BOARDMAX],
+			       struct eye_data w_eye[BOARDMAX]);
 
 
 /* These are used during the calculations of eye spaces. */
@@ -119,8 +119,8 @@ clear_eye(struct eye_data *eye)
  */
 
 void
-make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
-	     struct eye_data w_eye[MAX_BOARD][MAX_BOARD],
+make_domains(struct eye_data b_eye[BOARDMAX],
+	     struct eye_data w_eye[BOARDMAX],
 	     int owl_call)
 {
   int i, j;
@@ -136,8 +136,8 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
   /* Initialize eye data and compute the lively array. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      clear_eye(&(b_eye[i][j]));
-      clear_eye(&(w_eye[i][j]));
+      clear_eye(&(b_eye[POS(i, j)]));
+      clear_eye(&(w_eye[POS(i, j)]));
       lively[POS(i, j)] = is_lively(owl_call, i, j);
     }
 
@@ -154,25 +154,25 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
       pos = POS(i, j);
       if (board[pos] == EMPTY || !lively[pos]) {
 	if (black_domain[pos] == 0 && white_domain[pos] == 0) {
-	  w_eye[i][j].color = GRAY;
-	  b_eye[i][j].color = GRAY;
+	  w_eye[POS(i, j)].color = GRAY;
+	  b_eye[POS(i, j)].color = GRAY;
 	}
 	else if (black_domain[pos] == 1 && white_domain[pos] == 0) {
-	  b_eye[i][j].color = BLACK_BORDER;
+	  b_eye[POS(i, j)].color = BLACK_BORDER;
 	  for (k = 0; k < 4; k++) {
 	    int apos = pos + delta[k];
 	    if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
-	      b_eye[i][j].marginal = 1;
+	      b_eye[POS(i, j)].marginal = 1;
 	      break;
 	    }
 	  }
 	}
 	else if (black_domain[pos] == 0 && white_domain[pos] == 1) {
-	  w_eye[i][j].color = WHITE_BORDER;
+	  w_eye[POS(i, j)].color = WHITE_BORDER;
 	  for (k = 0; k < 4; k++) {
 	    int apos = pos + delta[k];
 	    if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
-	      w_eye[i][j].marginal = 1;
+	      w_eye[POS(i, j)].marginal = 1;
 	      break;
 	    }
 	  }
@@ -181,24 +181,24 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 	  for (k = 0; k < 4; k++) {
 	    int apos = pos + delta[k];
 	    if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
-	      b_eye[i][j].marginal = 1;
-	      b_eye[i][j].color = BLACK_BORDER;
+	      b_eye[POS(i, j)].marginal = 1;
+	      b_eye[POS(i, j)].color = BLACK_BORDER;
 	      break;
 	    }
 	  }
 	  if (k == 4)
-	    b_eye[i][j].color = GRAY;
+	    b_eye[POS(i, j)].color = GRAY;
 	  
 	  for (k = 0; k < 4; k++) {
 	    int apos = pos + delta[k];
 	    if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
-	      w_eye[i][j].marginal = 1;
-	      w_eye[i][j].color = WHITE_BORDER;
+	      w_eye[POS(i, j)].marginal = 1;
+	      w_eye[POS(i, j)].color = WHITE_BORDER;
 	      break;
 	    }
 	  }
 	  if (k == 4)
-	    w_eye[i][j].color = GRAY;
+	    w_eye[POS(i, j)].color = GRAY;
 	}
       }
     }
@@ -215,29 +215,29 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
  /* The eye spaces are all found. Now we need to find the origins. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (b_eye[i][j].origin == NO_MOVE 
-	  && b_eye[i][j].color == BLACK_BORDER)
+      if (b_eye[POS(i, j)].origin == NO_MOVE 
+	  && b_eye[POS(i, j)].color == BLACK_BORDER)
       {
 	int esize = 0;
 	int msize = 0;
 
 	originate_eye(i, j, i, j, &esize, &msize, b_eye);
-	b_eye[i][j].esize = esize;
-	b_eye[i][j].msize = msize;
+	b_eye[POS(i, j)].esize = esize;
+	b_eye[POS(i, j)].msize = msize;
       }
     }
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (w_eye[i][j].origin == NO_MOVE
-	  && w_eye[i][j].color == WHITE_BORDER)
+      if (w_eye[POS(i, j)].origin == NO_MOVE
+	  && w_eye[POS(i, j)].color == WHITE_BORDER)
       {
 	int esize = 0;
 	int msize = 0;
 
 	originate_eye(i, j, i, j, &esize, &msize, w_eye);
-	w_eye[i][j].esize = esize;
-	w_eye[i][j].msize = msize;
+	w_eye[POS(i, j)].esize = esize;
+	w_eye[POS(i, j)].msize = msize;
       }
     }
 
@@ -570,31 +570,29 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 
 
 static void
-count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD])
+count_neighbours(struct eye_data eyedata[BOARDMAX])
 {
   int i, j;
   int k;
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (eyedata[i][j].origin == NO_MOVE) 
+      if (eyedata[POS(i, j)].origin == NO_MOVE) 
 	continue;
 
-      eyedata[i][j].esize = eyedata[I(eyedata[i][j].origin)]
-			           [J(eyedata[i][j].origin)].esize;
-      eyedata[i][j].msize = eyedata[I(eyedata[i][j].origin)]
-				   [J(eyedata[i][j].origin)].msize;
-      eyedata[i][j].neighbors = 0;
-      eyedata[i][j].marginal_neighbors = 0;
+      eyedata[POS(i, j)].esize = eyedata[eyedata[POS(i, j)].origin].esize;
+      eyedata[POS(i, j)].msize = eyedata[eyedata[POS(i, j)].origin].msize;
+      eyedata[POS(i, j)].neighbors = 0;
+      eyedata[POS(i, j)].marginal_neighbors = 0;
 
       for (k = 0; k < 4; k++) {
 	int ai = i + deltai[k];
 	int aj = j + deltaj[k];
 	if (ON_BOARD2(ai, aj)
-	    && eyedata[ai][aj].origin == eyedata[i][j].origin) {
-	  eyedata[i][j].neighbors++;
-	  if (eyedata[ai][aj].marginal)
-	    eyedata[i][j].marginal_neighbors++;
+	    && eyedata[POS(ai, aj)].origin == eyedata[POS(i, j)].origin) {
+	  eyedata[POS(i, j)].neighbors++;
+	  if (eyedata[POS(ai, aj)].marginal)
+	    eyedata[POS(i, j)].marginal_neighbors++;
 	}
       }
     }
@@ -705,7 +703,7 @@ false_margin(int pos, int color, int lively[BOARDMAX])
 void
 originate_eye(int i, int j, int m, int n,
 	      int *esize, int *msize, 
-	      struct eye_data eye[MAX_BOARD][MAX_BOARD])
+	      struct eye_data eye[BOARDMAX])
 {
   int k;
   ASSERT_ON_BOARD2(i, j);
@@ -713,20 +711,20 @@ originate_eye(int i, int j, int m, int n,
   gg_assert(esize != NULL);
   gg_assert(msize != NULL);
   
-  eye[m][n].origin = POS(i, j);
+  eye[POS(m, n)].origin = POS(i, j);
   (*esize)++;
-  if (eye[m][n].marginal)
+  if (eye[POS(m, n)].marginal)
     (*msize)++;
-  if (eye[m][n].type & INHIBIT_CONNECTION)
+  if (eye[POS(m, n)].type & INHIBIT_CONNECTION)
     return;
 
   for (k = 0; k < 4; k++) {
     int ai = m + deltai[k];
     int aj = n + deltaj[k];
     if (ON_BOARD2(ai, aj)
-	&& eye[ai][aj].color == eye[m][n].color
-	&& eye[ai][aj].origin == NO_MOVE
-	&& (!eye[ai][aj].marginal || !eye[m][n].marginal))
+	&& eye[POS(ai, aj)].color == eye[POS(m, n)].color
+	&& eye[POS(ai, aj)].origin == NO_MOVE
+	&& (!eye[POS(ai, aj)].marginal || !eye[POS(m, n)].marginal))
       originate_eye(i, j, ai, aj, esize, msize, eye);
   }
 }
@@ -736,14 +734,14 @@ originate_eye(int i, int j, int m, int n,
  */
 
 static void
-print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
+print_eye(struct eye_data eye[BOARDMAX],
 	  struct half_eye_data heye[BOARDMAX],
 	  int i, int j)
 {
   int m,n;
   int mini, maxi;
   int minj, maxj;
-  int origin = eye[i][j].origin;
+  int origin = eye[POS(i, j)].origin;
   
   /* Determine the size of the eye. */
   mini = board_size;
@@ -752,7 +750,7 @@ print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
   maxj = -1;
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (eye[m][n].origin != origin)
+      if (eye[POS(m, n)].origin != origin)
 	continue;
 
       if (m < mini) mini = m;
@@ -770,9 +768,9 @@ print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
   for (m = mini; m <= maxi; m++) {
     gprintf(""); /* Get the indentation right. */
     for (n = minj; n <= maxj; n++) {
-      if (eye[m][n].origin == origin) {
+      if (eye[POS(m, n)].origin == origin) {
 	if (BOARD(m, n) == EMPTY) {
-	  if (eye[m][n].marginal)
+	  if (eye[POS(m, n)].marginal)
 	    gprintf("%o!");
 	  else if (is_halfeye(heye, POS(m, n)))
 	    gprintf("%oh");
@@ -806,7 +804,7 @@ print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
 void
 compute_eyes(int i, int  j, int *max, int *min, int *attacki, int *attackj,
 	     int *defendi, int *defendj,
-	     struct eye_data eye[MAX_BOARD][MAX_BOARD],
+	     struct eye_data eye[BOARDMAX],
 	     struct half_eye_data heye[BOARDMAX],
 	     int add_moves, int color)
 {
@@ -819,18 +817,19 @@ compute_eyes(int i, int  j, int *max, int *min, int *attacki, int *attackj,
 
   if (debug & DEBUG_EYES) {
     DEBUG(DEBUG_EYES, "Eyespace at %m: color=%C, esize=%d, msize=%d\n",
-	  i, j, eye[i][j].color, eye[i][j].esize, eye[i][j].msize);
+	  i, j, eye[POS(i, j)].color, eye[POS(i, j)].esize, 
+	  eye[POS(i, j)].msize);
 
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (eye[m][n].origin != POS(i, j)) 
+	if (eye[POS(m, n)].origin != POS(i, j)) 
 	  continue;
 
-	if (eye[m][n].marginal && BOARD(m, n) != EMPTY)
+	if (eye[POS(m, n)].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X!)\n", m, n);
-	else if (eye[m][n].marginal && BOARD(m, n) == EMPTY)
+	else if (eye[POS(m, n)].marginal && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (!)\n", m, n);
-	else if (!eye[m][n].marginal && BOARD(m, n) != EMPTY)
+	else if (!eye[POS(m, n)].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X)\n", m, n);
 	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (H)\n", m, n);
@@ -845,7 +844,7 @@ compute_eyes(int i, int  j, int *max, int *min, int *attacki, int *attackj,
   }
   
   /* First we try to let the life code evaluate the eye space. */
-  if (life && eye[i][j].esize <= life_eyesize) {
+  if (life && eye[POS(i, j)].esize <= life_eyesize) {
     int  max1, min1;
     int  attacki1, attackj1;
     int  defendi1, defendj1;
@@ -892,12 +891,12 @@ compute_eyes(int i, int  j, int *max, int *min, int *attacki, int *attackj,
 		    eye, heye, add_moves, color))
     return;
 
-  if (eye[i][j].esize < 6) {
+  if (eye[POS(i, j)].esize < 6) {
     /* made these printouts contingent on DEBUG_EYES /gf */
     if (debug & DEBUG_EYES) {
       gprintf("===========================================================\n");
       gprintf("Unrecognized eye of size %d shape at %m\n", 
-	      eye[i][j].esize, i, j);
+	      eye[POS(i, j)].esize, i, j);
       print_eye(eye, heye, i, j);
     }
   }
@@ -916,11 +915,11 @@ compute_eyes(int i, int  j, int *max, int *min, int *attacki, int *attackj,
    * some additional heuristics to guess the values of unknown
    * eyespaces.
    */
-  if (eye[i][j].esize-2*eye[i][j].msize > 3) {
+  if (eye[POS(i, j)].esize-2*eye[POS(i, j)].msize > 3) {
     *min = 2;
     *max = 2;
   }
-  else if (eye[i][j].esize-2*eye[i][j].msize > 0) {
+  else if (eye[POS(i, j)].esize-2*eye[POS(i, j)].msize > 0) {
     *min = 1;
     *max = 1;
   }
@@ -942,7 +941,7 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 			 int *pessimistic_min,
 			 int *attacki, int *attackj,
 			 int *defendi, int *defendj,
-			 struct eye_data eye[MAX_BOARD][MAX_BOARD],
+			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX])
 {
   int m, n;
@@ -953,11 +952,11 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (eye[m][n].origin == POS(i, j)
-	  && (eye[m][n].marginal
+      if (eye[POS(m, n)].origin == POS(i, j)
+	  && (eye[POS(m, n)].marginal
 	      || is_halfeye(heye, POS(m, n)))) {
 	margins++;
-	if (eye[m][n].marginal && eye[m][n].marginal_neighbors > 0)
+	if (eye[POS(m, n)].marginal && eye[POS(m, n)].marginal_neighbors > 0)
 	  margins_adjacent_to_margin++;
 	if (is_halfeye(heye, POS(m, n)))
 	  halfeyes++;
@@ -968,7 +967,7 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
    * players only cares about playing the marginal eye spaces. It is
    * used later to guess the eye value for unidentified eye shapes.
    */
-  effective_eyesize = (eye[i][j].esize + halfeyes - 2*margins
+  effective_eyesize = (eye[POS(i, j)].esize + halfeyes - 2*margins
 		       - margins_adjacent_to_margin);
 
   if (attacki) *attacki = -1;
@@ -978,18 +977,19 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 
   if (debug & DEBUG_EYES) {
     DEBUG(DEBUG_EYES, "Eyespace at %m: color=%C, esize=%d, msize=%d\n",
-	  i, j, eye[i][j].color, eye[i][j].esize, eye[i][j].msize);
+	  i, j, eye[POS(i, j)].color, eye[POS(i, j)].esize, 
+	  eye[POS(i, j)].msize);
 
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (eye[m][n].origin != POS(i, j)) 
+	if (eye[POS(m, n)].origin != POS(i, j)) 
 	  continue;
 
-	if (eye[m][n].marginal && BOARD(m, n) != EMPTY)
+	if (eye[POS(m, n)].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X!)\n", m, n);
-	else if (eye[m][n].marginal && BOARD(m, n) == EMPTY)
+	else if (eye[POS(m, n)].marginal && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (!)\n", m, n);
-	else if (!eye[m][n].marginal && BOARD(m, n) != EMPTY)
+	else if (!eye[POS(m, n)].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X)\n", m, n);
 	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (H)\n", m, n);
@@ -1005,7 +1005,7 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
   
   /* First we try to let the life code evaluate the eye space. */
   if (life
-      && eye[i][j].esize <= life_eyesize
+      && eye[POS(i, j)].esize <= life_eyesize
       && recognize_eye2(i, j, attacki, attackj, defendi, defendj, max, min,
 			eye, heye, 0, EMPTY)) {
     *pessimistic_min = *min - margins;
@@ -1018,9 +1018,9 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
     *pessimistic_min = *min - margins;
 
     /* A single point eye which is part of a ko can't be trusted. */
-    if (eye[i][j].esize == 1
+    if (eye[POS(i, j)].esize == 1
 	&& is_ko(POS(i, j), 
-		 eye[i][j].color == WHITE_BORDER ? BLACK : WHITE, NULL))
+		 eye[POS(i, j)].color == WHITE_BORDER ? BLACK : WHITE, NULL))
       *pessimistic_min = 0;
   }
   
@@ -1059,7 +1059,7 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
   }
   else {
     *min = 0;
-    if (eye[i][j].esize - margins > 2)
+    if (eye[POS(i, j)].esize - margins > 2)
       *max = 1;
     else
       *max = 0;
@@ -1073,8 +1073,8 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
     /* Find one marginal vertex and set as attack and defense point. */
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (eye[m][n].origin == POS(i, j)) {
-	  if (eye[m][n].marginal
+	if (eye[POS(m, n)].origin == POS(i, j)) {
+	  if (eye[POS(m, n)].marginal
 	      && BOARD(m, n) == EMPTY) {
 	    if (defendi) *defendi = m;
 	    if (defendj) *defendj = n;
@@ -1111,22 +1111,22 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
  */
 
 void
-propagate_eye (int i, int j, struct eye_data eye[MAX_BOARD][MAX_BOARD])
+propagate_eye (int pos, struct eye_data eye[BOARDMAX])
 {
   int m, n;
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (eye[m][n].origin == POS(i, j)) {
-	eye[m][n].color    = eye[i][j].color;
-	eye[m][n].esize    = eye[i][j].esize;
-	eye[m][n].msize    = eye[i][j].msize;
-	eye[m][n].origin   = eye[i][j].origin;
-	eye[m][n].maxeye   = eye[i][j].maxeye;
-	eye[m][n].mineye   = eye[i][j].mineye;
-	eye[m][n].attack_point   = eye[i][j].attack_point;
-	eye[m][n].defense_point  = eye[i][j].defense_point;
-	eye[m][n].dragon   = eye[i][j].dragon;
+      if (eye[POS(m, n)].origin == pos) {
+	eye[POS(m, n)].color         = eye[pos].color;
+	eye[POS(m, n)].esize         = eye[pos].esize;
+	eye[POS(m, n)].msize         = eye[pos].msize;
+	eye[POS(m, n)].origin        = eye[pos].origin;
+	eye[POS(m, n)].maxeye        = eye[pos].maxeye;
+	eye[POS(m, n)].mineye        = eye[pos].mineye;
+	eye[POS(m, n)].attack_point  = eye[pos].attack_point;
+	eye[POS(m, n)].defense_point = eye[pos].defense_point;
+	eye[POS(m, n)].dragon        = eye[pos].dragon;
       }
     }
 }
@@ -1145,7 +1145,7 @@ propagate_eye (int i, int j, struct eye_data eye[MAX_BOARD][MAX_BOARD])
  */
 static int
 linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
-		  struct eye_data eye[MAX_BOARD][MAX_BOARD])
+		  struct eye_data eye[BOARDMAX])
 {
   int m, n;
   int end1i = -1, end1j = -1;
@@ -1154,13 +1154,13 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
   int centeri = -1, centerj = -1;
   int middlei = -1, middlej = -1;
   int is_line = 1;
-  int msize = eye[i][j].msize;
-  int esize = eye[i][j].esize;
+  int msize = eye[POS(i, j)].msize;
+  int esize = eye[POS(i, j)].esize;
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (eye[m][n].origin == POS(i, j)) {
-	if (eye[m][n].neighbors > 2) {
+      if (eye[POS(m, n)].origin == POS(i, j)) {
+	if (eye[POS(m, n)].neighbors > 2) {
 	  if (centeri == -1) {
 	    centeri = m;
 	    centerj = n;
@@ -1168,13 +1168,13 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 	  centers++;
 	  is_line = 0;
 	}
-	if (eye[m][n].neighbors == 2) {
+	if (eye[POS(m, n)].neighbors == 2) {
 	  middlei = m;
 	  middlej = n;
-	  if (eye[m][n].marginal)
+	  if (eye[POS(m, n)].marginal)
 	    is_line = 0;
 	}
-	if (eye[m][n].neighbors == 1) {
+	if (eye[POS(m, n)].neighbors == 1) {
 	  if (end1i == -1) {
 	    end1i = m;
 	    end1j = n;
@@ -1220,29 +1220,29 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
       int farmiddlei;
       int farmiddlej;
       if (middlei > 0 
-	  && eye[middlei-1][middlej].origin == POS(i, j)
-	  && eye[middlei-1][middlej].neighbors == 2) 
+	  && eye[POS(middlei-1, middlej)].origin == POS(i, j)
+	  && eye[POS(middlei-1, middlej)].neighbors == 2) 
       {
 	farmiddlei = middlei-1;
 	farmiddlej = middlej;
       }
       else if (middlei < board_size-1
-	       && eye[middlei+1][middlej].origin == POS(i, j)
-	       && eye[middlei+1][middlej].neighbors == 2) 
+	       && eye[POS(middlei+1, middlej)].origin == POS(i, j)
+	       && eye[POS(middlei+1, middlej)].neighbors == 2) 
       {
 	farmiddlei = middlei+1;
 	farmiddlej = middlej;
       }
       else if (middlej > 0
-	       && eye[middlei][middlej-1].origin == POS(i, j)
-	       && eye[middlei][middlej-1].neighbors == 2) 
+	       && eye[POS(middlei, middlej-1)].origin == POS(i, j)
+	       && eye[POS(middlei, middlej-1)].neighbors == 2) 
       {
 	farmiddlei = middlei;
 	farmiddlej = middlej-1;
       }
       else if (middlej < board_size-1
-	       && eye[middlei][middlej+1].origin == POS(i, j)
-	       && eye[middlei][middlej+1].neighbors == 2) 
+	       && eye[POS(middlei, middlej+1)].origin == POS(i, j)
+	       && eye[POS(middlei, middlej+1)].neighbors == 2) 
       {
 	farmiddlei = middlei;
 	farmiddlej = middlej+1;
@@ -1297,7 +1297,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
     if (esize == 2) {
       *max = 1;
       *min = 0;
-      if (eye[end1i][end1j].marginal) {
+      if (eye[POS(end1i, end1j)].marginal) {
 	*attacki = end1i;
 	*attackj = end1j;
       }
@@ -1325,10 +1325,10 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 	*min = 1;
 
 	/* Exceptional cases. (eyes.tst:312) */
-	if ((eye[end1i][end1j].marginal
+	if ((eye[POS(end1i, end1j)].marginal
 	     && BOARD(end1i, end1j) != EMPTY
 	     && BOARD(end2i, end2j) == EMPTY)
-	    || (eye[end2i][end2j].marginal
+	    || (eye[POS(end2i, end2j)].marginal
 		&& BOARD(end2i, end2j) != EMPTY
 		&& BOARD(end1i, end1j) == EMPTY)) {
 	  *min = 0;
@@ -1340,7 +1340,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
       else {
 	*max = 1;
 	*min = 0;
-	if (eye[end1i][end1j].marginal) {
+	if (eye[POS(end1i, end1j)].marginal) {
 	  if (BOARD(end1i, end1j) == EMPTY) {
 	    *attacki = end1i;
 	    *attackj = end1j;
@@ -1378,29 +1378,29 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 	int farmiddlei;
 	int farmiddlej;
 	if (middlei > 0
-	    && eye[middlei-1][middlej].origin == POS(i, j)
-	    && eye[middlei-1][middlej].neighbors == 2) 
+	    && eye[POS(middlei-1, middlej)].origin == POS(i, j)
+	    && eye[POS(middlei-1, middlej)].neighbors == 2) 
 	{
 	  farmiddlei = middlei-1;
 	  farmiddlej = middlej;
 	}
 	else if (middlei < board_size-1
-		 && eye[middlei+1][middlej].origin == POS(i, j)
-		 && eye[middlei+1][middlej].neighbors == 2)
+		 && eye[POS(middlei+1, middlej)].origin == POS(i, j)
+		 && eye[POS(middlei+1, middlej)].neighbors == 2)
 	{
 	  farmiddlei = middlei+1;
 	  farmiddlej = middlej;
 	}
 	else if (middlej > 0
-		 && eye[middlei][middlej-1].origin == POS(i, j)
-		 && eye[middlei][middlej-1].neighbors == 2) 
+		 && eye[POS(middlei, middlej-1)].origin == POS(i, j)
+		 && eye[POS(middlei, middlej-1)].neighbors == 2) 
 	{
 	  farmiddlei = middlei;
 	  farmiddlej = middlej-1;
 	}
 	else if (middlej < board_size-1
-		 && eye[middlei][middlej+1].origin == POS(i, j)
-		 && eye[middlei][middlej+1].neighbors == 2)
+		 && eye[POS(middlei, middlej+1)].origin == POS(i, j)
+		 && eye[POS(middlei, middlej+1)].neighbors == 2)
 	{
 	  farmiddlei = middlei;
 	  farmiddlej = middlej+1;
@@ -1419,7 +1419,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 	else {
 	  *max = 1;
 	  *min = 0;
-	  if (eye[end1i][end1j].marginal) {
+	  if (eye[POS(end1i, end1j)].marginal) {
 	    *attacki = end1i;
 	    *attackj = end1j;
 	  }
@@ -1435,7 +1435,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
     if (esize == 5) {
       *max=2;
       *min=1;
-      if (eye[end1i][end1j].marginal) {
+      if (eye[POS(end1i, end1j)].marginal) {
 	*attacki = end1i;
 	*attackj = end1j;
       }
@@ -1505,7 +1505,7 @@ linear_eye_space (int i, int j, int *attacki, int *attackj, int *max, int *min,
 static int
 recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	      int *max, int *min, 
-	      struct eye_data eye[MAX_BOARD][MAX_BOARD], 
+	      struct eye_data eye[BOARDMAX], 
 	      struct half_eye_data heye[BOARDMAX], 
 	      int add_moves, int color)
 {
@@ -1523,28 +1523,28 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
   int num_marginals = 0;
 
   /* Set `eye_color' to the owner of the eye. */
-  eye_color = eye[i][j].color;
+  eye_color = eye[POS(i, j)].color;
   if (eye_color == BLACK_BORDER)
     eye_color = BLACK;
   if (eye_color == WHITE_BORDER)
     eye_color = WHITE;
 
 
-  if (eye[i][j].esize-eye[i][j].msize > 7)
+  if (eye[POS(i, j)].esize-eye[POS(i, j)].msize > 7)
     return 0;
 
-  if (eye[i][j].msize > MAXEYE)
+  if (eye[POS(i, j)].msize > MAXEYE)
     return 0;
 
   /* Create list of eye vertices */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (eye[m][n].origin == POS(i, j)) {
+      if (eye[POS(m, n)].origin == POS(i, j)) {
 	vpos[eye_size] = POS(m, n);
-	marginal[eye_size] = eye[m][n].marginal;
+	marginal[eye_size] = eye[POS(m, n)].marginal;
 	if (marginal[eye_size])
 	  num_marginals++;
-	neighbors[eye_size] = eye[m][n].neighbors;
+	neighbors[eye_size] = eye[POS(m, n)].neighbors;
 	if (0) {
 	  if (marginal[eye_size])
 	    TRACE("(%1m)", vpos[eye_size]);
@@ -1832,7 +1832,7 @@ next_map(int *q, int map[MAXEYE], int esize)
 /* add_half_eye adds a half eye or false eye to an eye shape. */
 
 void
-add_half_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD],
+add_half_eye(int m, int n, struct eye_data eye[BOARDMAX],
 	     struct half_eye_data heye[BOARDMAX])
 {
   if (heye[POS(m, n)].type)
@@ -1840,24 +1840,24 @@ add_half_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD],
 
   if (heye[POS(m, n)].type == FALSE_EYE) {
     DEBUG(DEBUG_EYES, "false eye at %m for dragon at %1m\n",
-	  m, n, eye[m][n].dragon);
-    if (eye[m][n].color != GRAY) {
-      if (eye[m][n].marginal == 0) {
-	eye[m][n].marginal=1;
-	(eye[I(eye[m][n].origin)][J(eye[m][n].origin)].msize)++;
+	  m, n, eye[POS(m, n)].dragon);
+    if (eye[POS(m, n)].color != GRAY) {
+      if (eye[POS(m, n)].marginal == 0) {
+	eye[POS(m, n)].marginal=1;
+	(eye[eye[POS(m, n)].origin].msize)++;
 	if ((m > 0) 
-	    && (eye[m-1][n].origin == eye[m][n].origin))
-	  eye[m-1][n].marginal_neighbors++;
+	    && (eye[POS(m-1, n)].origin == eye[POS(m, n)].origin))
+	  eye[POS(m-1, n)].marginal_neighbors++;
 	if ((m < board_size-1) 
-	    && (eye[m+1][n].origin == eye[m][n].origin))
-	  eye[m+1][n].marginal_neighbors++;
+	    && (eye[POS(m+1, n)].origin == eye[POS(m, n)].origin))
+	  eye[POS(m+1, n)].marginal_neighbors++;
 	if ((n > 0)
-	    && (eye[m][n-1].origin == eye[m][n].origin))
-	  eye[m][n-1].marginal_neighbors++;
+	    && (eye[POS(m, n-1)].origin == eye[POS(m, n)].origin))
+	  eye[POS(m, n-1)].marginal_neighbors++;
 	if ((n < board_size-1)
-	    && (eye[m][n+1].origin == eye[m][n].origin))
-	  eye[m][n+1].marginal_neighbors++;
-	propagate_eye(I(eye[m][n].origin), J(eye[m][n].origin), eye);
+	    && (eye[POS(m, n+1)].origin == eye[POS(m, n)].origin))
+	  eye[POS(m, n+1)].marginal_neighbors++;
+	propagate_eye(eye[POS(m, n)].origin, eye);
       }
     }
   }
@@ -1868,19 +1868,19 @@ add_half_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD],
  * primarily for late endgame moves.
  */
 int
-eye_space(int i, int j)
+is_eye_space(int pos)
 {
-  return ((white_eye[i][j].color == WHITE_BORDER)
-	  || (black_eye[i][j].color == BLACK_BORDER));
+  return ((white_eye[pos].color == WHITE_BORDER)
+	  || (black_eye[pos].color == BLACK_BORDER));
 }
 
 int
-proper_eye_space(int i, int j)
+is_proper_eye_space(int pos)
 {
-  return ((   (white_eye[i][j].color == WHITE_BORDER)
-	   && !white_eye[i][j].marginal)
-	  || ((black_eye[i][j].color == BLACK_BORDER)
-	      && !black_eye[i][j].marginal));
+  return ((   (white_eye[pos].color == WHITE_BORDER)
+	   && !white_eye[pos].marginal)
+	  || ((black_eye[pos].color == BLACK_BORDER)
+	      && !black_eye[pos].marginal));
 }
 
 /* Return the maximum number of eyes that can be obtained from the
@@ -1889,24 +1889,24 @@ proper_eye_space(int i, int j)
  * all.
  */
 int
-max_eye_value(int i, int j)
+max_eye_value(int pos)
 {
   int max_white = 0;
   int max_black = 0;
   
-  if (white_eye[i][j].color == WHITE_BORDER)
-    max_white = white_eye[i][j].maxeye;
+  if (white_eye[pos].color == WHITE_BORDER)
+    max_white = white_eye[pos].maxeye;
 
-  if (black_eye[i][j].color == BLACK_BORDER)
-    max_black = black_eye[i][j].maxeye;
+  if (black_eye[pos].color == BLACK_BORDER)
+    max_black = black_eye[pos].maxeye;
 
   return gg_max(max_white, max_black);
 }
 
 int
-marginal_eye_space(int i, int j)
+is_marginal_eye_space(int pos)
 {
-  return (white_eye[i][j].marginal || black_eye[i][j].marginal);
+  return (white_eye[pos].marginal || black_eye[pos].marginal);
 }
 
 int
@@ -1917,33 +1917,37 @@ is_halfeye(struct half_eye_data heye[BOARDMAX], int pos)
 
 /* Turn a marginal eye space into a proper eye space. */
 void
-make_proper_eye_space(int i, int j, int color)
+make_proper_eye_space(int pos, int color)
 {
-  row_of_eye_data *eye;
+  struct eye_data  *eye;
+  int i = I(pos);
+  int j = J(pos);
+
   if (color == WHITE)
     eye = white_eye;
   else
     eye = black_eye;
 
-  gg_assert(eye[i][j].color != GRAY_BORDER);
-  gg_assert(eye[i][j].marginal == 1);
+  gg_assert(eye[pos].color != GRAY_BORDER);
+  gg_assert(eye[pos].marginal == 1);
   
-  eye[i][j].marginal = 0;
+  eye[pos].marginal = 0;
   
-  (eye[I(eye[i][j].origin)][J(eye[i][j].origin)].msize)--;
+  (eye[eye[pos].origin].msize)--;
   if ((i > 0) 
-      && (eye[i-1][j].origin == eye[i][j].origin))
-    eye[i-1][j].marginal_neighbors--;
+      && (eye[pos-NS].origin == eye[pos].origin))
+    eye[pos-NS].marginal_neighbors--;
   if ((i < board_size-1) 
-      && (eye[i+1][j].origin == eye[i][j].origin))
-    eye[i+1][j].marginal_neighbors--;
+      && (eye[pos+NS].origin == eye[pos].origin))
+    eye[pos+NS].marginal_neighbors--;
   if ((j > 0)
-      && (eye[i][j-1].origin == eye[i][j].origin))
-    eye[i][j-1].marginal_neighbors--;
+      && (eye[pos-1].origin == eye[pos].origin))
+    eye[pos-1].marginal_neighbors--;
   if ((j < board_size-1)
-      && (eye[i][j+1].origin == eye[i][j].origin))
-    eye[i][j+1].marginal_neighbors--;
-  propagate_eye(I(eye[i][j].origin), J(eye[i][j].origin), eye);
+      && (eye[pos+1].origin == eye[pos].origin))
+    eye[pos+1].marginal_neighbors--;
+
+  propagate_eye(eye[pos].origin, eye);
 }
 
 /* remove a halfeye from an eye shape. */
@@ -1992,14 +1996,15 @@ remove_half_eye(struct half_eye_data heye[BOARDMAX],
 }
 
 /* Remove an eye point. This function can only be used before the
- * segmentation into eyespaces. */
+ * segmentation into eyespaces.
+ */
 void
-remove_eyepoint(int m, int n, int color)
+remove_eyepoint(int pos, int color)
 {
   if (color == WHITE)
-    white_eye[m][n].color = GRAY_BORDER;
+    white_eye[pos].color = GRAY_BORDER;
   else
-    black_eye[m][n].color = GRAY_BORDER;
+    black_eye[pos].color = GRAY_BORDER;
 }
 
 
@@ -2016,8 +2021,8 @@ remove_eyepoint(int m, int n, int color)
 int
 topological_eye(int m, int n, int color, 
 		int *ai, int *aj, int *di, int *dj, 
-		struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
-		struct eye_data w_eye[MAX_BOARD][MAX_BOARD],
+		struct eye_data b_eye[BOARDMAX],
+		struct eye_data w_eye[BOARDMAX],
 		struct half_eye_data heye[BOARDMAX])
 {
   int sum = 0;
@@ -2104,8 +2109,8 @@ static int
 evaluate_diagonal_intersection(int m, int n, int color,
 			       int *attacki, int *attackj,
 			       int *defendi, int *defendj,
-			       struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
-			       struct eye_data w_eye[MAX_BOARD][MAX_BOARD])
+			       struct eye_data b_eye[BOARDMAX],
+			       struct eye_data w_eye[BOARDMAX])
 {
   int value = 0;
   int other = OTHER_COLOR(color);
@@ -2142,13 +2147,13 @@ evaluate_diagonal_intersection(int m, int n, int color,
    * whole group as dead (instead of living in seki).
    */
   if (color == BLACK
-      && b_eye[m][n].color == BLACK_BORDER
-      && !b_eye[m][n].marginal
+      && b_eye[POS(m, n)].color == BLACK_BORDER
+      && !b_eye[POS(m, n)].marginal
       && !(BOARD(m, n) == EMPTY && does_capture_something2(m, n, WHITE)))
     return 0;
   if (color == WHITE
-      && w_eye[m][n].color == WHITE_BORDER
-      && !w_eye[m][n].marginal
+      && w_eye[POS(m, n)].color == WHITE_BORDER
+      && !w_eye[POS(m, n)].marginal
       && !(BOARD(m, n) == EMPTY && does_capture_something2(m, n, BLACK)))
     return 0;
 

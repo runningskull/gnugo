@@ -870,15 +870,15 @@ gtp_eval_eye(char *s, int id)
   examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
   
-  if (black_eye[m][n].color == BLACK_BORDER) {
-    i = I(black_eye[m][n].origin);
-    j = J(black_eye[m][n].origin);
+  if (black_eye[POS(m, n)].color == BLACK_BORDER) {
+    i = I(black_eye[POS(m, n)].origin);
+    j = J(black_eye[POS(m, n)].origin);
     compute_eyes(i, j, &max, &min, &attacki, &attackj, &defendi, &defendj,
 		 black_eye, half_eye, 0, EMPTY);
   }
-  else if (white_eye[m][n].color == WHITE_BORDER) {
-    i = I(white_eye[m][n].origin);
-    j = J(white_eye[m][n].origin);
+  else if (white_eye[POS(m, n)].color == WHITE_BORDER) {
+    i = I(white_eye[POS(m, n)].origin);
+    j = J(white_eye[POS(m, n)].origin);
     compute_eyes(i, j, &max, &min, &attacki, &attackj, &defendi, &defendj,
 		 white_eye, half_eye, 0, EMPTY);
   }

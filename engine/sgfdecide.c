@@ -361,9 +361,9 @@ decideeye(int m, int n, const char *sgf_output)
   verbose = save_verbose;
   debug = save_debug;
   
-  if (black_eye[m][n].color == BLACK_BORDER) 
+  if (black_eye[POS(m, n)].color == BLACK_BORDER) 
     color = BLACK;
-  else if (white_eye[m][n].color == WHITE_BORDER) 
+  else if (white_eye[POS(m, n)].color == WHITE_BORDER) 
     color = WHITE;
   else {
     gprintf("The eye at %m is not of a single color.\n", m, n);
@@ -381,9 +381,9 @@ decideeye(int m, int n, const char *sgf_output)
     begin_sgftreedump(&tree);
   count_variations = 1;
   
-  if (black_eye[m][n].color == BLACK_BORDER) {
-    i = I(black_eye[m][n].origin);
-    j = J(black_eye[m][n].origin);
+  if (black_eye[POS(m, n)].color == BLACK_BORDER) {
+    i = I(black_eye[POS(m, n)].origin);
+    j = J(black_eye[POS(m, n)].origin);
     compute_eyes(i, j, &max, &min, &attacki, &attackj, &defendi, &defendj,
 		 black_eye, half_eye, 0, EMPTY);
     gprintf("Black eyespace at %m: min=%d, max=%d\n", i, j, min, max);
@@ -392,9 +392,9 @@ decideeye(int m, int n, const char *sgf_output)
 	      defendi, defendj);
     }
   }
-  if (white_eye[m][n].color == WHITE_BORDER) {
-    i = I(white_eye[m][n].origin);
-    j = J(white_eye[m][n].origin);
+  if (white_eye[POS(m, n)].color == WHITE_BORDER) {
+    i = I(white_eye[POS(m, n)].origin);
+    j = J(white_eye[POS(m, n)].origin);
     compute_eyes(i, j, &max, &min, &attacki, &attackj, &defendi, &defendj,
 		 white_eye, half_eye, 0, EMPTY);
     gprintf("White eyespace at %m: min=%d, max=%d\n", i, j, min, max);

@@ -39,7 +39,7 @@ void display_worm(Position *pos, int i, int j);
 void prepare_dragons_tab(void);
 void display_dragon(int i, int j);
 void prepare_eyes_tab(void);
-void display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD], 
+void display_eye(int color, struct eye_data eyedata[BOARDMAX], 
 		 int i, int j);
 void prepare_help_tab(void);
 

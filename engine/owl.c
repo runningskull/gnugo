@@ -67,8 +67,8 @@ struct local_owl_data {
   int escape_values[MAX_BOARD][MAX_BOARD];
   int color;
 
-  struct eye_data black_eye[MAX_BOARD][MAX_BOARD];
-  struct eye_data white_eye[MAX_BOARD][MAX_BOARD];
+  struct eye_data black_eye[BOARDMAX];
+  struct eye_data white_eye[BOARDMAX];
   /* array of half-eye data for use during owl reading */
   struct half_eye_data half_eye[BOARDMAX];
   
@@ -165,7 +165,7 @@ static void owl_shapes_callback(int m, int n, int color,
 static void owl_add_move(struct owl_move_data *moves, int move, int value,
 			 const char *reason, int same_dragon);
 static int owl_determine_life(struct local_owl_data *owl,
-			      struct eye_data eye[MAX_BOARD][MAX_BOARD],
+			      struct eye_data eye[BOARDMAX],
 			      int color, int komaster, int does_attack,
 			      struct owl_move_data *moves, int *probable_min,
 			      int *probable_max);
@@ -1819,7 +1819,7 @@ owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj)
 
 static int
 owl_determine_life(struct local_owl_data *owl,
-		   struct eye_data eye[MAX_BOARD][MAX_BOARD],
+		   struct eye_data eye[BOARDMAX],
 		   int color, int komaster, int does_attack,
 		   struct owl_move_data *moves, int *probable_min,
 		   int *probable_max)
@@ -1883,25 +1883,25 @@ owl_determine_life(struct local_owl_data *owl,
     for (n = 0; n < board_size; n++)
       if (BOARD(m, n) && owl->goal[m][n]) {
 	if (m > 0
-	    && eye[m-1][n].color == eye_color
-	    && eye[m-1][n].origin != NO_MOVE
-	    && !eye[m-1][n].marginal)
-	  mw[I(eye[m-1][n].origin)][J(eye[m-1][n].origin)] = 1;
+	    && eye[POS(m-1, n)].color == eye_color
+	    && eye[POS(m-1, n)].origin != NO_MOVE
+	    && !eye[POS(m-1, n)].marginal)
+	  mw[I(eye[POS(m-1, n)].origin)][J(eye[POS(m-1, n)].origin)] = 1;
 	if (m < board_size-1
-	    && eye[m+1][n].color == eye_color
-	    && eye[m+1][n].origin != NO_MOVE
-	    && !eye[m+1][n].marginal)
-	  mw[I(eye[m+1][n].origin)][J(eye[m+1][n].origin)] = 1;
+	    && eye[POS(m+1, n)].color == eye_color
+	    && eye[POS(m+1, n)].origin != NO_MOVE
+	    && !eye[POS(m+1, n)].marginal)
+	  mw[I(eye[POS(m+1, n)].origin)][J(eye[POS(m+1, n)].origin)] = 1;
 	if (n > 0
-	    && eye[m][n-1].color == eye_color
-	    && eye[m][n-1].origin != NO_MOVE
-	    && !eye[m][n-1].marginal)
-	  mw[I(eye[m][n-1].origin)][J(eye[m][n-1].origin)] = 1;
+	    && eye[POS(m, n-1)].color == eye_color
+	    && eye[POS(m, n-1)].origin != NO_MOVE
+	    && !eye[POS(m, n-1)].marginal)
+	  mw[I(eye[POS(m, n-1)].origin)][J(eye[POS(m, n-1)].origin)] = 1;
 	if (n < board_size-1
-	    && eye[m][n+1].color == eye_color
-	    && eye[m][n+1].origin != NO_MOVE
-	    && !eye[m][n+1].marginal)
-	  mw[I(eye[m][n+1].origin)][J(eye[m][n+1].origin)] = 1;
+	    && eye[POS(m, n+1)].color == eye_color
+	    && eye[POS(m, n+1)].origin != NO_MOVE
+	    && !eye[POS(m, n+1)].marginal)
+	  mw[I(eye[POS(m, n+1)].origin)][J(eye[POS(m, n+1)].origin)] = 1;
       }
 
   for (m = 0; m < board_size; m++)
@@ -1917,11 +1917,11 @@ owl_determine_life(struct local_owl_data *owl,
   topological_intersections = 0;
   for (m = 0; m<board_size; m++)
     for (n = 0; n<board_size; n++) {
-      if ((eye[m][n].color == eye_color)
-	  && (eye[m][n].origin != NO_MOVE)
-	  && (mw[I(eye[m][n].origin)][J(eye[m][n].origin)])
-	  && (!eye[m][n].marginal || life)
-	  && (eye[m][n].neighbors <= 1)) {
+      if ((eye[POS(m, n)].color == eye_color)
+	  && (eye[POS(m, n)].origin != NO_MOVE)
+	  && (mw[I(eye[POS(m, n)].origin)][J(eye[POS(m, n)].origin)])
+	  && (!eye[POS(m, n)].marginal || life)
+	  && (eye[POS(m, n)].neighbors <= 1)) {
 	mx[m][n] = 1;
 	topological_intersections++;
       }
@@ -1948,9 +1948,9 @@ owl_determine_life(struct local_owl_data *owl,
 			      owl->half_eye);
 
 	if (sum >= 4) {
-	  int previously_marginal = eye[m][n].marginal;
+	  int previously_marginal = eye[POS(m, n)].marginal;
 	  owl->half_eye[POS(m, n)].type = FALSE_EYE;
-	  if (eye[m][n].esize == 1
+	  if (eye[POS(m, n)].esize == 1
 	      || is_legal2(m, n, OTHER_COLOR(color))
 	      || BOARD(m, n) == OTHER_COLOR(color)) {
 	    add_half_eye(m, n, eye, owl->half_eye);
@@ -1995,7 +1995,7 @@ owl_determine_life(struct local_owl_data *owl,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
       if (mw[m][n]
-	  && (eye[m][n].origin == POS(m, n)))
+	  && (eye[POS(m, n)].origin == POS(m, n)))
       {
 	int value = 0;
 	const char *reason = "";
@@ -2009,7 +2009,7 @@ owl_determine_life(struct local_owl_data *owl,
 	for (i = 0; i < board_size; i++)
 	  for (j = 0; j < board_size; j++)
 	    if (mw[i][j]
-		&& eye[i][j].origin == POS(m, n)
+		&& eye[POS(i, j)].origin == POS(m, n)
 		&& owl->inessential[i][j])
 	      pessimistic_min = 0;
 	
@@ -2018,7 +2018,7 @@ owl_determine_life(struct local_owl_data *owl,
 	*probable_max += max;
 
 	/* Fill in the maxeye field for use by the owl_eyespace() function. */
-	eye[m][n].maxeye = max;
+	eye[POS(m, n)].maxeye = max;
 	
 	/* This shortcut has been disabled for two reasons:
 	 * 1. Due to the vital attack moves being able to later reduce
@@ -3579,16 +3579,16 @@ owl_eyespace(int ai, int aj, int bi, int bj)
   ASSERT2(BOARD(bi, bj) != EMPTY, bi, bj);
   
   if (BOARD(bi, bj) == WHITE) {
-    opos = current_owl_data->white_eye[ai][aj].origin;
+    opos = current_owl_data->white_eye[POS(ai, aj)].origin;
     return (!is_pass(opos)
-        && current_owl_data->white_eye[I(opos)][J(opos)].color == WHITE_BORDER
-	&& current_owl_data->white_eye[I(opos)][J(opos)].maxeye > 0);
+        && current_owl_data->white_eye[opos].color == WHITE_BORDER
+	&& current_owl_data->white_eye[opos].maxeye > 0);
   }
   else {
-    opos = current_owl_data->black_eye[ai][aj].origin;
+    opos = current_owl_data->black_eye[POS(ai, aj)].origin;
     return (!is_pass(opos)
-	&& current_owl_data->black_eye[I(opos)][J(opos)].color == BLACK_BORDER
-	&& current_owl_data->black_eye[I(opos)][J(opos)].maxeye > 0);
+	&& current_owl_data->black_eye[opos].color == BLACK_BORDER
+	&& current_owl_data->black_eye[opos].maxeye > 0);
   }
 }
   
@@ -3606,16 +3606,16 @@ owl_big_eyespace(int ai, int aj, int bi, int bj)
   ASSERT_ON_BOARD2(ai, aj);
 
   if (BOARD(bi, bj) == WHITE) {
-    opos = current_owl_data->white_eye[ai][aj].origin;
+    opos = current_owl_data->white_eye[POS(ai, aj)].origin;
     return (ON_BOARD(opos) 
-	&& current_owl_data->white_eye[I(opos)][J(opos)].color == WHITE_BORDER
-	&& current_owl_data->white_eye[I(opos)][J(opos)].maxeye == 2);
+	&& current_owl_data->white_eye[opos].color == WHITE_BORDER
+	&& current_owl_data->white_eye[opos].maxeye == 2);
   }
   else {
-    opos = current_owl_data->black_eye[ai][aj].origin;
+    opos = current_owl_data->black_eye[POS(ai, aj)].origin;
     return (ON_BOARD(opos)
-	&& current_owl_data->black_eye[I(opos)][J(opos)].color == BLACK_BORDER
-	&& current_owl_data->black_eye[I(opos)][J(opos)].maxeye == 2);
+	&& current_owl_data->black_eye[opos].color == BLACK_BORDER
+	&& current_owl_data->black_eye[opos].maxeye == 2);
   }
 }
   
