@@ -21,6 +21,18 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 46
 40 gg_genmove white
 #? [H3|F4]*
 
+# upper left needs attention
+loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 12
+50 gg_genmove black
+#? [J17|E14|F15|C18|B18]*
+
+loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 16
+60 gg_genmove black
+#? [E14|B18|C18|G18]*
+
+loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 142
+70 owl_defend J11
+#? [1 S12]
 
 ############ End of Tests #################
 

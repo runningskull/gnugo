@@ -2434,6 +2434,16 @@ bO?
 ; ko(b) && owl_topological_eye(*,A) > 2 && !obvious_false_oeye(d)
 
 
+Pattern D638
+#evand new pattern 3.3.12
+
+?o.x	attempt to escape or make eyeshape by forcing.
+oOX*
+O.O.
+----
+
+:8,-,value(45)
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #
