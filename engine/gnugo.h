@@ -255,6 +255,7 @@ extern int hashflags;		/* hash flags */
 extern int life;                /* use "life" reading code */
 extern int life_eyesize;        /* max eye size for life code */
 extern int fusekidb;            /* use fuseki database */
+extern int disable_fuseki;      /* do not generate fuseki moves */
 extern int josekidb;            /* use joseki database */
 extern int level;		/* controls depth of reading */
 extern int urgent;              /* urgent move on board */

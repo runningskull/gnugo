@@ -455,11 +455,14 @@ shapes(int color)
 
   if (josekidb)
     global_matchpat(shapes_callback, color, &joseki_db, NULL, NULL);
+
+  if (!disable_fuseki)
+    global_matchpat(shapes_callback, color, &fusekipat_db, NULL, NULL);
 }
 
 
 /*
- * Match all patterns in endgame.db on all positions.  
+ * Match all patterns in endgame.db on all positions.
  */
 void
 endgame_shapes(int color)

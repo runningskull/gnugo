@@ -22,6 +22,7 @@ EXTRA_DIST = $(DSP)\
 	conn.db\
 	influence.db\
 	barriers.db\
+	fuseki.db\
 	fuseki9.db\
 	fuseki13.db\
 	fuseki19.db
@@ -41,7 +42,7 @@ DFA_INST = \
 
 DFA_NOINST = \
 	pat.dfa joseki.dfa conn.dfa attpat.dfa defpat.dfa endpat.dfa \
-	influencepat.dfa barrierspat.dfa
+	influencepat.dfa barrierspat.dfa fusekipat.dfa
 
 pkgdata_DATA = $(DFA_INST)
 
@@ -66,6 +67,7 @@ owl_defendpat.dfa: owl_defendpat.c
 # endpat.dfa: endgame.c
 # influencepat.dfa: influence.c
 # barrierspat.dfa: barriers.c
+# fusekipat.dfa: fuseki.c
 
 else
 mkpat_LDADD = ../utils/libutils.a
@@ -90,7 +92,7 @@ noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
 
 GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  influence.c barriers.c endgame.c owl_attackpat.c\
-		 owl_vital_apat.c owl_defendpat.c \
+		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
@@ -160,6 +162,9 @@ owl_vital_apat.c : $(srcdir)/owl_vital_apats.db mkpat$(EXEEXT)
 
 owl_defendpat.c : $(srcdir)/owl_defendpats.db mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b owl_defendpat < $(srcdir)/owl_defendpats.db >owl_defendpat.c
+
+fusekipat.c : $(srcdir)/fuseki.db mkpat$(EXEEXT)
+	./mkpat -b fusekipat < $(srcdir)/fuseki.db >fusekipat.c
 
 fuseki9.c : $(srcdir)/fuseki9.db mkpat$(EXEEXT)
 	./mkpat -b -f fuseki9 < $(srcdir)/fuseki9.db >fuseki9.c

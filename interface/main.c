@@ -95,6 +95,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_LIFE,
       OPT_LIFE_EYESIZE,
       OPT_NOFUSEKIDB,
+      OPT_NOFUSEKI,
       OPT_NOJOSEKIDB,
       OPT_LEVEL,
       OPT_SHOWTIME,
@@ -198,6 +199,7 @@ static struct gg_option const long_options[] =
   {"life",           no_argument,       0, OPT_LIFE},
   {"life-eyesize",   required_argument, 0, OPT_LIFE_EYESIZE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
+  {"nofuseki",     no_argument,         0, OPT_NOFUSEKI},
   {"nojosekidb",     no_argument,       0, OPT_NOJOSEKIDB},
   {"debug-influence", required_argument, 0, OPT_DEBUG_INFLUENCE},
   {"showtime",       no_argument,       0, OPT_SHOWTIME},
@@ -268,6 +270,7 @@ main(int argc, char *argv[])
   life  = 0;
   life_eyesize = LIFE_EYESIZE;
   fusekidb = 1;
+  disable_fuseki = 0;
   josekidb = 1;
   if (CHINESE_RULES)
     chinese_rules = 1;
@@ -505,6 +508,10 @@ main(int argc, char *argv[])
 	
       case OPT_NOFUSEKIDB:
 	fusekidb = 0;
+	break;
+	
+      case OPT_NOFUSEKI:
+	disable_fuseki = 1;
 	break;
 	
       case OPT_NOJOSEKIDB:
@@ -970,6 +977,7 @@ Experimental options:\n\
    --life                  use life code\n\
    --life-eyesize <n>      use life code, life_eyesize=n (default %d)\n\
    --nofusekidb            turn off fuseki database\n\
+   --nofuseki              turn off fuseki moves entirely\n\
    --nojosekidb            turn off joseki database\n\
 Scoring:\n\
    --score last            estimate score at last move in SGF file\n\
@@ -1044,6 +1052,7 @@ Debugging Options:\n\
        --decide-eye <string>     evaluate the eye\n\
        --life <eyesize>          use eye reading code\n\
        --nofusekidb              turn off fuseki database\n\
+       --nofuseki                turn off fuseki moves entirely\n\
        --nojosekidb              turn off joseki database\n\
        --debuginfluence <move>   print influence map after making a move\n\
        --score <end|last|move>   count or estimate territory\n\

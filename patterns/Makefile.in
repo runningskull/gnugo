@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4a from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -46,10 +46,9 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -79,7 +78,7 @@ EXTRA_PROGRAMS = transpat
 
 DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
 
-EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	takamoku.sgf 	patterns.db 	patterns2.db 	attack.db 	defense.db 	endgame.db 	owl_attackpats.db 	owl_vital_apats.db 	owl_defendpats.db 	eyes.db 	conn.db 	influence.db 	barriers.db 	fuseki9.db 	fuseki13.db 	fuseki19.db
+EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	takamoku.sgf 	patterns.db 	patterns2.db 	attack.db 	defense.db 	endgame.db 	owl_attackpats.db 	owl_vital_apats.db 	owl_defendpats.db 	eyes.db 	conn.db 	influence.db 	barriers.db 	fuseki.db 	fuseki9.db 	fuseki13.db 	fuseki19.db
 
 
 mkpat_SOURCES = mkpat.c transform.c
@@ -94,6 +93,7 @@ mkpat_SOURCES = mkpat.c transform.c
 # endpat.dfa: endgame.c
 # influencepat.dfa: influence.c
 # barrierspat.dfa: barriers.c
+# fusekipat.dfa: fuseki.c
 
 @DFA_ENABLED_TRUE@mkpat_LDADD = ./libdfa.a ../utils/libutils.a
 @DFA_ENABLED_FALSE@mkpat_LDADD = ../utils/libutils.a
@@ -104,7 +104,7 @@ mkpat_SOURCES = mkpat.c transform.c
 
 # dfas in DFA_NOINST are neither built nor installed
 
-@DFA_ENABLED_TRUE@DFA_NOINST = 	pat.dfa joseki.dfa conn.dfa attpat.dfa defpat.dfa endpat.dfa 	influencepat.dfa barrierspat.dfa
+@DFA_ENABLED_TRUE@DFA_NOINST = 	pat.dfa joseki.dfa conn.dfa attpat.dfa defpat.dfa endpat.dfa 	influencepat.dfa barrierspat.dfa fusekipat.dfa
 
 @DFA_ENABLED_TRUE@pkgdata_DATA = $(DFA_INST)
 @DFA_ENABLED_TRUE@DFAFLAGS = -D -m
@@ -123,7 +123,7 @@ extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
 
 noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
 
-GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c                  influence.c barriers.c endgame.c owl_attackpat.c 		 owl_vital_apat.c owl_defendpat.c                  fuseki9.c fuseki13.c fuseki19.c josekidb.c
+GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c                  influence.c barriers.c endgame.c owl_attackpat.c 		 owl_vital_apat.c owl_defendpat.c fusekipat.c                  fuseki9.c fuseki13.c fuseki19.c josekidb.c
 
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
@@ -151,8 +151,8 @@ LIBS = @LIBS@
 libpatterns_a_LIBADD = 
 libpatterns_a_OBJECTS =  connections.o helpers.o conn.o patterns.o \
 apatterns.o dpatterns.o eyes.o influence.o barriers.o endgame.o \
-owl_attackpat.o owl_vital_apat.o owl_defendpat.o fuseki9.o fuseki13.o \
-fuseki19.o josekidb.o
+owl_attackpat.o owl_vital_apat.o owl_defendpat.o fusekipat.o fuseki9.o \
+fuseki13.o fuseki19.o josekidb.o
 libdfa_a_LIBADD = 
 libdfa_a_OBJECTS =  dfa.o transform.o
 AR = ar
@@ -164,8 +164,8 @@ transpat_OBJECTS =  transpat.o patlib.o transform.o
 transpat_DEPENDENCIES = 
 transpat_LDFLAGS = 
 mkpat_OBJECTS =  mkpat.o transform.o
-@DFA_ENABLED_TRUE@mkpat_DEPENDENCIES =  ./libdfa.a ../utils/libutils.a
 @DFA_ENABLED_FALSE@mkpat_DEPENDENCIES =  ../utils/libutils.a
+@DFA_ENABLED_TRUE@mkpat_DEPENDENCIES =  ./libdfa.a ../utils/libutils.a
 mkpat_LDFLAGS = 
 joseki_OBJECTS =  joseki.o
 joseki_DEPENDENCIES =  ../engine/libboard.a ../sgf/libsgf.a \
@@ -198,10 +198,10 @@ GZIP_ENV = --best
 DEP_FILES =  .deps/apatterns.P .deps/barriers.P .deps/conn.P \
 .deps/connections.P .deps/dfa.P .deps/dpatterns.P .deps/endgame.P \
 .deps/extract_fuseki.P .deps/eyes.P .deps/fuseki13.P .deps/fuseki19.P \
-.deps/fuseki9.P .deps/helpers.P .deps/influence.P .deps/joseki.P \
-.deps/josekidb.P .deps/mkeyes.P .deps/mkpat.P .deps/owl_attackpat.P \
-.deps/owl_defendpat.P .deps/owl_vital_apat.P .deps/patlib.P \
-.deps/patterns.P .deps/transform.P .deps/transpat.P
+.deps/fuseki9.P .deps/fusekipat.P .deps/helpers.P .deps/influence.P \
+.deps/joseki.P .deps/josekidb.P .deps/mkeyes.P .deps/mkpat.P \
+.deps/owl_attackpat.P .deps/owl_defendpat.P .deps/owl_vital_apat.P \
+.deps/patlib.P .deps/patterns.P .deps/transform.P .deps/transpat.P
 SOURCES = $(libpatterns_a_SOURCES) $(libdfa_a_SOURCES) $(transpat_SOURCES) $(mkpat_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) $(extract_fuseki_SOURCES)
 OBJECTS = $(libpatterns_a_OBJECTS) $(libdfa_a_OBJECTS) $(transpat_OBJECTS) $(mkpat_OBJECTS) $(joseki_OBJECTS) $(mkeyes_OBJECTS) $(extract_fuseki_OBJECTS)
 
@@ -403,7 +403,7 @@ uninstall: uninstall-am
 all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS)
 all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(pkgdatadir)
 
@@ -521,6 +521,9 @@ owl_vital_apat.c : $(srcdir)/owl_vital_apats.db mkpat$(EXEEXT)
 
 owl_defendpat.c : $(srcdir)/owl_defendpats.db mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b owl_defendpat < $(srcdir)/owl_defendpats.db >owl_defendpat.c
+
+fusekipat.c : $(srcdir)/fuseki.db mkpat$(EXEEXT)
+	./mkpat -b fusekipat < $(srcdir)/fuseki.db >fusekipat.c
 
 fuseki9.c : $(srcdir)/fuseki9.db mkpat$(EXEEXT)
 	./mkpat -b -f fuseki9 < $(srcdir)/fuseki9.db >fuseki9.c

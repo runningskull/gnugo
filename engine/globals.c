@@ -95,6 +95,7 @@ int loading          = 0;  /* TRUE if last loaded move comes from file */
 int life             = 0;  /* use eye reading code */
 int life_eyesize     = 0;  /* max eyesize for life code */
 int fusekidb         = 1;  /* use fuseki database */
+int disable_fuseki   = 0;  /* do not generate fuseki moves */
 int josekidb         = 1;  /* use fuseki database */
 int showtime         = 0;  /* print time to find move */
 int showscore        = 0;  /* print estimated score */

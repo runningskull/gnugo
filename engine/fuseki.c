@@ -274,6 +274,10 @@ fuseki(int color)
   int j = -1;
   int width;  /* Side of the open region required in the corner. */
 
+  /* Return immediately if --disable_fuseki option used. */
+  if (disable_fuseki)
+    return;
+
   /* Search in fuseki database unless disabled by --nofusekidb option. */
   if (fusekidb && search_fuseki_database(color))
     return;
