@@ -1207,8 +1207,8 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
 {
   int m, n;
   int fi, fj;
-  int defendi, defendj;
-  int aa_val;
+  int defendi, defendj, after_defendi, after_defendj;
+  int aa_val, after_aa_val;
   int other = OTHER_COLOR(color);
 
   /* If aa_depth is too small, we can't see any combination attacks,
@@ -1285,9 +1285,11 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   if (!tryko(ti, tj, color, NULL, EMPTY, -1, -1))
     /* Really shouldn't happen. */
     abortgo(__FILE__, __LINE__, "trymove", ti, tj); 
+  increase_depth_values();
 
   aa_val = do_atari_atari(other, &fi, &fj, &defendi, &defendj,
 			  -1, -1, 0, minsize);
+  after_aa_val = aa_val;
 
   if (aa_val == 0 || defendi == -1) {
 
@@ -1300,34 +1302,36 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
    */
 
     popgo();
+    decrease_depth_values();
     return 1;
   }
 
-  while (aa_val > 0) {
+  while (aa_val >= after_aa_val) {
     /* Try dropping moves from the combination and see if it still
      * works. What we really want is to get the proper defense move
-     * into (defendi, defendj).
+     * into (*i, *j).
      */
+    after_defendi = defendi;
+    after_defendj = defendj;
     forbidden[fi][fj] = 1;
-    aa_val = do_atari_atari(other, &fi, &fj, &defendi, &defendj,
+    aa_val = do_atari_atari(other, &fi, &fj, &defendi, &defendj, 
 			    -1, -1, 0, aa_val);
   }
 
   popgo();
-
-  if (i) *i = defendi;
-  if (j) *j = defendj;
-  
-  
+  decrease_depth_values();
   /* We know that a combination exists, but we don't know if
    * the original move at (ai, aj) was really relevant. So we
    * try omitting it and see if a combination is still found.
    */
   if (do_atari_atari(other, NULL, NULL, NULL, NULL,
-		     -1, -1, 0, minsize) >= aa_val)
-    return 0;
-  else
+			  -1, -1, 0, minsize) >= after_aa_val)
     return 1;
+  else {
+    if (i) *i = after_defendi;
+    if (j) *j = after_defendj;
+    return 0;
+  }
 }
 
 
