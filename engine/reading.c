@@ -452,23 +452,48 @@ attack_either(int astr, int bstr)
 
   /* Try (a little) harder */
   {
-    int libs[2];
-    int alibs = findlib(astr, 2, libs);
+    int alibs[2];
+    int blibs[2];
+    int alib = findlib(astr, 2, alibs);
     int defended0 = WIN;
     int defended1 = WIN;
     int other = OTHER_COLOR(color);
     /* Let's just try the case where the group with the fewest liberties
      * has only 2, and try each atari in turn.
      */
-    if (alibs == 2) {
-      if (trymove(libs[0], other, "attack_either-A", astr, EMPTY, NO_MOVE)) {
+    if (alib == 2) {
+      if (trymove(alibs[0], other, "attack_either-A", astr,
+		  EMPTY, NO_MOVE)) {
 	defended0 = defend_both(astr, bstr);
 	popgo();
       }
       if (defended0 
-	  && trymove(libs[1], other, "attack_either-B", astr,
+	  && trymove(alibs[1], other, "attack_either-B", astr,
 		     EMPTY, NO_MOVE)) {
 	defended1 = defend_both(astr, bstr);
+	popgo();
+      }
+    }
+    /* The second string is possibly also short in liberties.
+     * Let's try to improve the result.
+     */
+    if (defended0 > 0 && defended1 > 0
+	&& findlib(bstr, 2, blibs) == 2) {
+      defended0 = gg_min(defended0, defended1);
+      defended1 = defended0;
+      if (blibs[0] != alibs[0] && blibs[0] != alibs[1]
+	  && trymove(blibs[0], other, "attack_either-C", bstr,
+		     EMPTY, NO_MOVE)) {
+	int defended = defend_both(astr, bstr);
+	defended0 = gg_min(defended0, defended);
+	popgo();
+      }
+      if (defended0 
+	  && blibs[1] != alibs[0] && blibs[1] != alibs[1]
+	  && trymove(blibs[1], other, "attack_either-D", bstr,
+		     EMPTY, NO_MOVE)) {
+	int defended = defend_both(astr, bstr);
+	defended1 = gg_min(defended1, defended);
 	popgo();
       }
     }

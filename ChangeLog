@@ -2,12 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- try (a bit) harder in attack_either()
 - semeai worms do not have to be adjacent but may instead share a liberty
 - only claim win for attacking a semeai worm if the attack is unconditional
-- moves to defend a semeai worm are marked as possibly connected to
-  the dragon
-- do no allow liberty_of_goal() to consider goal vertices where the
-  stones have been captured
+- moves to defend a semeai worm are marked as possibly connected to the dragon
+- liberty_of_goal() shall consider goal vertices where stones were captured
 - allow conditional ko capture in attack4()
 - new function is_corner_vertex() in board.c
 - mark_dragon() changed from static to global
