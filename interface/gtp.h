@@ -62,6 +62,8 @@ struct gtp_command {
 
 void gtp_main_loop(struct gtp_command commands[], FILE *gtp_input);
 void gtp_internal_set_boardsize(int size);
+void gtp_internal_set_orientation(int orient);
+int gtp_internal_get_orientation(void);
 void gtp_mprintf(const char *format, ...);
 void gtp_printf(const char *format, ...);
 void gtp_printid(int id, int status);

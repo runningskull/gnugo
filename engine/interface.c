@@ -32,6 +32,7 @@
 #include "liberty.h"
 #include "clock.h"
 
+#include <gg_utils.h>
 
 /*
  * Initialize the gnugo engine. This needs to be called 
@@ -537,7 +538,8 @@ gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)
  */
 
 int
-gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
+gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
+			  const char *untilstr, int orientation)
 {
   int    bs, handicap;
   float  komi;
@@ -605,6 +607,7 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	 */
 	last_moves[0] = 0;
 	last_moves[1] = 0;
+	rotate(i, j, &i, &j, gameinfo->position.boardsize, orientation);
 	gnugo_add_stone(&gameinfo->position, i, j, BLACK);
 	sgffile_put_stone(i, j, BLACK);
 	addstone = 1;
@@ -614,6 +617,7 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
 	last_moves[0] = 0;
 	last_moves[1] = 0;
+	rotate(i, j, &i, &j, gameinfo->position.boardsize, orientation);
 	gnugo_add_stone(&gameinfo->position, i, j, WHITE);
 	sgffile_put_stone(i, j, WHITE);
 	addstone = 1;
@@ -656,6 +660,7 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	  if (i == untilm && j == untiln)
 	    return next;
 
+	rotate(i, j, &i, &j, gameinfo->position.boardsize, orientation);
 	gnugo_play_move(&gameinfo->position, i, j, next);
 	sgffile_move_made(i, j, next, 0);
 	next = OTHER_COLOR(next);
@@ -671,6 +676,7 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 	 * the ko.
 	 */
 	get_moveXY(prop, &i, &j, gameinfo->position.boardsize);
+	rotate(i, j, &i, &j, gameinfo->position.boardsize, orientation);
 	{
 	  int move_color;
 
@@ -690,6 +696,12 @@ gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
 
   gameinfo->to_move = next;
   return next;
+}
+
+int
+gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
+{
+  return gameinfo_play_sgftree_rot(gameinfo, head, untilstr, 0);
 }
 
 

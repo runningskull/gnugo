@@ -41,6 +41,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include <gg_utils.h>
 
 #include "gtp.h"
 
@@ -57,6 +58,7 @@
  * unnecessarily inconvenient.
  */
 static int gtp_boardsize = -1;
+static int gtp_orientation = 0;
 
 /* Read filehandle gtp_input linewise and interpret as GTP commands. */
 void
@@ -109,12 +111,25 @@ gtp_main_loop(struct gtp_command commands[], FILE *gtp_input)
   }
 }
 
-
 /* Set the board size used in coordinate conversions. */
 void
 gtp_internal_set_boardsize(int size)
 {
   gtp_boardsize = size;
+}
+
+/* Set the orientation used in coordinate conversions. */
+void
+gtp_internal_set_orientation(int orient)
+{
+  gtp_orientation = orient;
+}
+
+/* Set the orientation used in coordinate conversions. */
+int
+gtp_internal_get_orientation(void)
+{
+  return gtp_orientation;
 }
 
 /*
@@ -325,6 +340,7 @@ gtp_decode_coord(char *s, int *i, int *j)
   if (*i < 0 || *i >= gtp_boardsize || *j < 0 || *j >= gtp_boardsize)
     return 0;
 
+  rotate(*i, *j, i, j, gtp_boardsize, gtp_orientation);
   return n;
 }
 
@@ -381,6 +397,7 @@ void
 gtp_print_vertices(int n, int movei[], int movej[])
 {
   int k;
+  int ri, rj;
   
   assert(gtp_boardsize > 0);
   
@@ -393,9 +410,10 @@ gtp_print_vertices(int n, int movei[], int movej[])
     else if (movei[k] < 0 || movei[k] >= gtp_boardsize
 	     || movej[k] < 0 || movej[k] >= gtp_boardsize)
       gtp_printf("??");
-    else
-      gtp_printf("%c%d", 'A' + movej[k] + (movej[k] >= 8),
-		 gtp_boardsize - movei[k]);
+    else {
+      inv_rotate(movei[k], movej[k], &ri, &rj, gtp_boardsize, gtp_orientation);
+      gtp_printf("%c%d", 'A' + rj + (rj >= 8), gtp_boardsize - ri);
+    }
   }
 }
 

@@ -468,10 +468,10 @@ gtp_loadsgf(char *s, int id)
   char untilstring[GTP_BUFSIZE];
   SGFNode *sgf;
   Gameinfo gameinfo;
-  int nread;
+  int nread, orient;
   
   nread = sscanf(s, "%s %s", filename, untilstring);
-  if (nread == 0)
+  if (nread < 1)
     return gtp_failure(id, "missing filename");
   
   if ((sgf = readsgffile(filename)) == NULL)
@@ -480,10 +480,12 @@ gtp_loadsgf(char *s, int id)
   gameinfo_clear(&gameinfo, 19, 5.5); /* Probably unnecessary. */
   gameinfo_load_sgfheader(&gameinfo, sgf);
 
+  orient = gtp_internal_get_orientation();
   if (nread == 1)
-    color_to_move = gameinfo_play_sgftree(&gameinfo, sgf, NULL);
+    color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, NULL, orient);
   else
-    color_to_move = gameinfo_play_sgftree(&gameinfo, sgf, untilstring);
+    color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, untilstring,
+                                              orient);
 
   gnugo_force_to_globals(&gameinfo.position);
   movenum = gameinfo.move_number;
@@ -1979,7 +1981,7 @@ gtp_worm_data(char *s, int id)
   int j = -1;
   int m, n;
 
-  if (sscanf(s, " %*c") >= 0 && !gtp_decode_coord(s, &i, &j))
+  if (sscanf(s, " %*c") >= 1 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid color or coordinate");
 
   examine_position(EMPTY, EXAMINE_WORMS);
@@ -2033,7 +2035,7 @@ gtp_worm_stones(char *s, int id)
   int m, n;
   int u, v;
 
-  if (sscanf(s, " %*c") >= 0) {
+  if (sscanf(s, " %*c") >= 1) {
     if (!gtp_decode_coord(s, &i, &j)
 	&& !gtp_decode_color(s, &color))
       return gtp_failure(id, "invalid coordinate");
@@ -2101,7 +2103,7 @@ gtp_dragon_data(char *s, int id)
   int j = -1;
   int m, n;
 
-  if (sscanf(s, " %*c") >= 0 && !gtp_decode_coord(s, &i, &j))
+  if (sscanf(s, " %*c") >= 1 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
   if (stackp > 0)
@@ -2206,7 +2208,7 @@ gtp_dragon_stones(char *s, int id)
   int m, n;
   int u, v;
 
-  if (sscanf(s, " %*c") >= 0 && !gtp_decode_coord(s, &i, &j))
+  if (sscanf(s, " %*c") >= 1 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
   if (BOARD(i, j) == EMPTY)

@@ -6,6 +6,11 @@
 - new and revised test cases
 - bugfix in random.c
 - revision of readconnect.c
+- bugfix for Cygwin: gtp_dragon_data misreports invalid coordinate
+- revision of trevor.tst
+- revision of engine/engine.dsp: remember readconnect.c
+- make gtp_loadsgf reorient gamerecords
+- make gtp_printvertices orient output points back
 
 3.1.9 released October 7, 2001
 

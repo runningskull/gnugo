@@ -236,10 +236,16 @@ gg_version(void) {
 /* Reorientation of point (i,j) into (*ri, *rj) */
 void rotate(int i, int j, int *ri, int *rj, int bs, int rot) {
   assert (bs > 0);
-  assert (i >= 0 && i < bs);
-  assert (j >= 0 && j < bs);
   assert (ri != NULL && rj != NULL);
   assert (rot >= 0 && rot < 8);
+  /* PASS case */
+  if (i == -1 && j == -1) {
+    *ri = i;
+    *rj = j;
+    return;
+  }
+  assert (i >= 0 && i < bs);
+  assert (j >= 0 && j < bs);
 
   if (rot == 0) {
     /* identity map */

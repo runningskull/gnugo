@@ -159,6 +159,10 @@ SOURCE=.\printutils.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\readconnect.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\reading.c
 # End Source File
 # Begin Source File

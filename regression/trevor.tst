@@ -285,14 +285,12 @@ loadsgf games/trevor/trevor_28.sgf 36
 #? [F6]
 
 
-#CATEGORY=OWL_TUNING
-#DESCRIPTION=Black still dead after D1!
-#SEVERITY=10
-loadsgf games/trevor/trevor_31.sgf
-310 gg_genmove black
-#? [A8]*
+
+# Yikes, short of liberties!
+loadsgf games/trevor/trevor_29.sgf 54
 290 gg_genmove white
-#? [!A9]
+#? [!A9]*
+
 
 # Black A7 is a serious threat.  Also, white should at least 
 # try to invade.
@@ -305,6 +303,21 @@ loadsgf games/trevor/trevor_30.sgf
 loadsgf games/trevor/trevor_30.sgf
 301 gg_genmove black
 #? [!PASS]
+
+#CATEGORY=TACTICAL_READING
+#DESCRIPTION=A7 remains a 7 point threat.
+#SEVERITY=6
+loadsgf games/trevor/trevor_30.sgf
+black G3
+302 gg_genmove white
+
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=Black still dead after D1!
+#SEVERITY=10
+loadsgf games/trevor/trevor_31.sgf
+310 gg_genmove black
+#? [A8]*
+
 
 loadsgf games/trevor/trevor_32.sgf
 320 gg_genmove black
