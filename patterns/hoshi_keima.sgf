@@ -66,6 +66,8 @@ MA[lg]C[U
 ];B[nc];W[pe]MA[lg]C[U
 ];B[of];W[md]MA[kg]C[U
 ])
+
+(;B[ob];W[pe]MA[li])
 )
 )
 
@@ -75,8 +77,43 @@ MA[lg]C[U
 
 (;W[of]C[
 ];C[#w jumps];B[nd]MA[mj]C[S]
-(;W[pi]C[0];B[qi]MA[mk]C[S];W[pj]MA[ml]C[0];B[ph]MA[mk]C[S];W[oh]
-MA[mk];B[qj]MA[ml]C[S];W[pk]MA[mm];B[ql]MA[mm]C[S])
+(;W[pi]C[0]
+(;B[qi]MA[mk]C[S];W[pj]MA[ml]C[0]
+(;B[ph]MA[mk]C[S];W[oh]MA[mk];B[qj]MA[ml]C[S];W[pk]MA[mm];B[ql]MA[mm]
+C[S];W[pg]MA[mm])
+
+(;B[qj];W[pk]MA[ml];B[ph]MA[ml];W[oh]MA[ml])
+)
+
+(;B[ph];W[oh]MA[mk]
+(;B[qi]MA[mk];W[pj]MA[mk])
+
+(;B[oi];W[qi]MA[lk];B[og]MA[lk];W[nh]MA[lk];B[pg]MA[lk];W[ng]MA[lk];
+B[pf]MA[lk];W[rh]MA[lk];B[nf]MA[lk])
+)
+
+(;B[qe]
+(;W[rf]C[#considered outdated
+]
+(;B[qi]MA[lk];W[pj]MA[lk]
+(;B[ph]MA[lk];W[oh]MA[lk];B[qj]MA[ll];W[pk]MA[ll]
+(;B[ql]MA[km];W[pg]MA[km])
+
+(;B[pg];W[pf]MA[ll];B[og]MA[ll];W[ng]MA[ll];B[nh]MA[ll];W[oi]MA[ll];
+B[nf]MA[ll];W[mg]MA[ll];B[ql]MA[ln];W[qc]MA[ll];B[pc]MA[lk];W[qd]
+MA[lk];B[qb]MA[lk];W[pe]MA[lk];B[mf]MA[kk];W[rb]MA[lj];B[lg]MA[jk];
+W[mh]MA[jk];B[li]MA[jk];W[mi]MA[jk];B[mj]MA[jl])
+)
+
+(;B[qj];W[pk]MA[ll];B[ph]MA[ll];W[oh]MA[ll])
+)
+
+(;B[ph];W[oh]MA[lk];B[qi]MA[ll];W[pj]MA[lk])
+)
+
+(;W[qi]MA[lk];B[rf]MA[lk];W[qg]MA[lk])
+)
+)
 
 (;W[qc]C[0
 ];B[qd]MA[mi];W[rd];B[re]MA[mi];W[rc];B[qe]MA[mi];W[ob];
@@ -84,6 +121,55 @@ B[mf]C[t
 ]MA[ki])
 
 (;W[oh];B[qe]MA[kj];W[rf]MA[kj];B[qj]MA[kj];W[mf]MA[kj])
+
+(;W[mf]C[#bad for white
+];B[ld]MA[ki])
+
+(;W[rd]MA[mj]C[0
+#bad for white
+])
+)
+
+(;W[nc]MA[ki];B[pf]MA[li]
+(;W[pg]MA[li];B[qg]MA[li]
+(;W[qc];B[qe]MA[li];W[pc]MA[li])
+
+(;W[pc]MA[li]
+(;B[qe]MA[li];W[qc]MA[li]
+(;B[tt];W[rf]MA[li];B[re]MA[li];W[of]MA[li];B[pe]MA[li];W[ne]MA[li])
+
+(;B[og]MA[li]C[0
+])
+)
+
+(;B[qc]MA[li]C[0
+];W[pe]MA[li];B[of];W[qd]MA[li];B[od]
+(;W[oe]MA[li];B[ne];W[qe]MA[ki];B[nd]
+(;W[nf]MA[li])
+
+(;W[ph]MA[li]C[0
+])
+)
+
+(;W[ph]C[0
+]MA[li])
+)
+)
+)
+
+(;W[qc]MA[li]
+(;B[qd]MA[li];W[pc]MA[li]
+(;B[od]MA[li];W[rc]MA[li];B[rd]MA[li]C[j
+])
+
+(;B[tt];W[od]MA[li];B[oe];W[ne]MA[li])
+)
+
+(;B[pc]MA[li];W[qd]MA[li];B[pe]MA[li];W[rf]MA[li];B[pb]MA[li];W[qb]
+MA[li];B[md]MA[li])
+
+(;B[qe]MA[li];W[pc]MA[li])
+)
 )
 )
 
