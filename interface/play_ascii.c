@@ -49,13 +49,15 @@ static int emacs = 0;
 static SGFTree sgftree;
 static int last_move_i;      /* The position of the last move */
 static int last_move_j;      /* -""-                          */
+static int resignation_allowed;
 
 /* Unreasonable score used to detect missing information. */
 #define NO_SCORE 4711
 /* Keep track of the score estimated before the last computer move. */
 static int current_score_estimate = NO_SCORE;
 
-static void ascii_endgame(Gameinfo *gameinfo);
+static int ascii_endgame(Gameinfo *gameinfo, int reason);
+static void ascii_count(Gameinfo *gameinfo);
 static void showcapture(char *line);
 static void showdefense(char *line);
 static void ascii_goto(Gameinfo *gameinfo, char *line);
@@ -329,14 +331,14 @@ show_commands(void)
 enum commands {INVALID=-1, END, EXIT, QUIT, RESIGN, 
 	       PASS, MOVE, FORCE, SWITCH,
 	       PLAY, PLAYBLACK, PLAYWHITE,
-	       SETHANDICAP, SETBOARDSIZE, SETKOMI,
+	       SETHANDICAP, FREEHANDICAP, SETBOARDSIZE, SETKOMI,
 	       SETDEPTH,
                INFO, DISPLAY, SHOWBOARD, HELP, UNDO, COMMENT, SCORE,
                CMD_DEAD, CMD_BACK, CMD_FORWARD, CMD_LAST,
                CMD_CAPTURE, CMD_DEFEND,
                CMD_HELPDEBUG, CMD_SHOWAREA, CMD_SHOWMOYO, CMD_SHOWTERRI,
                CMD_GOTO, CMD_SAVE, CMD_LOAD, CMD_SHOWDRAGONS, CMD_LISTDRAGONS,
-	       SETHURRY, SETLEVEL, NEW, COUNT, FREEHANDICAP
+	       SETHURRY, SETLEVEL, NEW, COUNT, CONTINUE
 };
 
 
@@ -406,7 +408,8 @@ get_command(char *command)
   if (!strncmp(command, "last", 2)) return CMD_LAST;
   if (!strncmp(command, "goto", 2)) return CMD_GOTO;
   if (!strncmp(command, "game", 2)) return NEW;
-  if (!strncmp(command, "count", 2)) return COUNT;
+  if (!strncmp(command, "count", 3)) return COUNT;
+  if (!strncmp(command, "continue", 4)) return CONTINUE;
 
   /* No valid command was found. */
   return INVALID;
@@ -435,16 +438,28 @@ init_sgf(Gameinfo *ginfo)
  * Generate the computer move. 
  */
 
-static void
+static int
 computer_move(Gameinfo *gameinfo, int *passes)
 {
   int i, j;
   int move_val;
+  int resignation_declined = 0;
 
   init_sgf(gameinfo);
-  
+
   /* Generate computer move. */
   move_val = gnugo_genmove(&i, &j, gameinfo->to_move);
+  if (resignation_allowed && move_val < 0.0 && ON_BOARD2(i, j)) {
+    int state = ascii_endgame(gameinfo, 2);
+    if (state != -1)
+      return state;
+
+    /* The opponent declined resignation. Remember not to resign again. */
+    resignation_allowed = 0;
+    resignation_declined = 1;
+    move_val = -move_val;
+  }
+
   if (showscore) {
     gnugo_estimate_score(&upper_bound, &lower_bound);
     current_score_estimate = (int) ((lower_bound + upper_bound) / 2.0);
@@ -463,9 +478,12 @@ computer_move(Gameinfo *gameinfo, int *passes)
   gnugo_play_move(i, j, gameinfo->to_move);
   sgffile_add_debuginfo(sgftree.lastnode, move_val);
   sgftreeAddPlay(&sgftree, gameinfo->to_move, i, j);
+  if (resignation_declined)
+    sgftreeAddComment(&sgftree, "GNU Go resignation was declined");
   sgffile_output(&sgftree);
 
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
+  return 0;
 }
 
 
@@ -473,19 +491,19 @@ computer_move(Gameinfo *gameinfo, int *passes)
  * Make a move.
  */
 
-static void
+static int
 do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
 {
   int i, j;
 
   if (!string_to_location(board_size, command, &i, &j)) {
     printf("\nInvalid move: %s\n", command);
-    return;
+    return 0;
   }
   
   if (!gnugo_is_legal(i, j, gameinfo->to_move)) {
     printf("\nIllegal move: %s", command);
-    return;
+    return 0;
   }
 
   *passes = 0;
@@ -503,14 +521,16 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
     ascii_showboard();
     printf("GNU Go is thinking...\n");
   }
+
   if (force) {
     gameinfo->computer_player = OTHER_COLOR(gameinfo->computer_player);
     gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
     sgftreeAddComment(&sgftree, "forced");
-    return;
+    return 0;
   }
+
   gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
-  computer_move(gameinfo, passes);
+  return computer_move(gameinfo, passes);
 }
 
 
@@ -518,7 +538,7 @@ do_move(Gameinfo *gameinfo, char *command, int *passes, int force)
  * Make a pass.
  */
 
-static void
+static int
 do_pass(Gameinfo *gameinfo, int *passes, int force)
 {
   (*passes)++;
@@ -532,9 +552,10 @@ do_pass(Gameinfo *gameinfo, int *passes, int force)
   if (force) {
     gameinfo->computer_player = OTHER_COLOR(gameinfo->computer_player);
     sgftreeAddComment(&sgftree, "forced");
-    return;
+    return 0;
   }
-  computer_move(gameinfo, passes);
+
+  return computer_move(gameinfo, passes);
 }
 
 
@@ -582,18 +603,25 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
   }
 
   while (state == 1) {
+    state = 0;
+
     /* No score is estimated yet. */
     current_score_estimate = NO_SCORE;
-    
+
+    /* Allow resignation at interface level (the engine may still be not
+     * allowed to resign.
+     */
+    resignation_allowed = 1;
+
     printf("\nBeginning ASCII mode game.\n\n");
     gameinfo_print(gameinfo);
-    
+
     /* Does the computer play first?  If so, make a move. */
     if (gameinfo->computer_player == gameinfo->to_move)
-      computer_move(gameinfo, &passes);
-    
+      state = computer_move(gameinfo, &passes);
+
     /* main ASCII Play loop */
-    while (passes < 2) {
+    while (state == 0) {
       /* Display game board. */
       if (opt_showboard)
 	ascii_showboard();
@@ -606,36 +634,39 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
       if (!fgets(line, 80, stdin)) {
 	printf("\nThanks! for playing GNU Go.\n\n");
 	return ;
-      }      
-      while (command = strtok(line_ptr, ";"), line_ptr = 0, command) {
-	
+      }
+
+      while (state == 0 &&
+	     (command = strtok(line_ptr, ";"), line_ptr = 0, command)) {
 	/* Get the command or move. */
 	switch (get_command(command)) {
 	case RESIGN:
-	  printf("\nGNU Go wins by resignation.");
-	  sgftreeWriteResult(&sgftree,
-			     gameinfo->to_move == WHITE ? -1000.0 : 1000.0,
-			     1);
-          sgffile_output(&sgftree);
+	  state = ascii_endgame(gameinfo, 1);
+	  break;
+
 	case END:
 	case EXIT:
 	case QUIT:
 	  printf("\nThanks! for playing GNU Go.\n\n");
-	  return ;
-	  break;
+	  return;
+
 	case HELP:
 	  show_commands();
 	  break;
+
 	case CMD_HELPDEBUG:
 	  printf(DEBUG_COMMANDS);
 	  break;
+
 	case SHOWBOARD:
 	  opt_showboard = !opt_showboard;
 	  break;
+
 	case INFO:
 	  printf("\n");
 	  gameinfo_print(gameinfo);
 	  break;
+
 	case SETBOARDSIZE:
 	  if (sgf_initialized) {
 	    printf("Boardsize cannot be changed after record is started!\n");
@@ -658,6 +689,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  sgfOverwritePropertyInt(sgftree.root, "SZ", sz);
 	  sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 	  break;
+
 	case SETHANDICAP:
 	  if (sgf_initialized) {
 	    printf("Handicap cannot be changed after game is started!\n");
@@ -680,6 +712,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  printf("\nSet handicap to %d\n", gameinfo->handicap);
           gameinfo->to_move = (gameinfo->handicap ? WHITE : BLACK);
 	  break;
+
 	case FREEHANDICAP:
 	  if (sgf_initialized) {
 	    printf("Handicap cannot be changed after game is started!\n");
@@ -689,6 +722,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    command++;
 	  ascii_free_handicap(gameinfo, command);
 	  break;
+
 	case SETKOMI:
 	  if (sgf_initialized) {
 	    printf("Komi cannot be modified after game record is started!\n");
@@ -702,54 +736,53 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  komi = fnum;
 	  printf("\nSet Komi to %.1f\n", komi);
 	  break;
+
 	case SETDEPTH:
-	  {
-	    command += 6;
-	    if (sscanf(command, "%d", &num) != 1) {
-	      printf("\nInvalid command syntax!\n");
-	      break;
-	    }
-	    mandated_depth = num;
-	    printf("\nSet depth to %d\n", mandated_depth);
+	  command += 6;
+	  if (sscanf(command, "%d", &num) != 1) {
+	    printf("\nInvalid command syntax!\n");
 	    break;
 	  }
+	  mandated_depth = num;
+	  printf("\nSet depth to %d\n", mandated_depth);
+	  break;
+
 	case SETLEVEL:
-	  {
-	    command += 6;
-	    if (sscanf(command, "%d", &num) != 1) {
-	      printf("\nInvalid command syntax!\n");
-	      break;
-	    }
-	    level = num;
-	    printf("\nSet level to %d\n", level);
+	  command += 6;
+	  if (sscanf(command, "%d", &num) != 1) {
+	    printf("\nInvalid command syntax!\n");
 	    break;
 	  }
+	  level = num;
+	  printf("\nSet level to %d\n", level);
+	  break;
+
 	  /* Level replaces hurry as of 2.7.204. This option is retained
 	   * for compatibility with gnugoclient. 
 	   */
 	case SETHURRY:
-	  {
-	    command += 6;
-	    if (sscanf(command, "%d", &num) != 1) {
-	      printf("\nInvalid command syntax!\n");
-	      break;
-	    }
-	    level = 10 - num;
-	    printf("\nSet hurry to %d\n", 10 - level);
+	  command += 6;
+	  if (sscanf(command, "%d", &num) != 1) {
+	    printf("\nInvalid command syntax!\n");
 	    break;
 	  }
+	  level = 10 - num;
+	  printf("\nSet hurry to %d\n", 10 - level);
+	  break;
+
 	case DISPLAY:
 	  if (!opt_showboard)
 	    ascii_showboard();
 	  break;
+
 	case FORCE:
 	  command += 6; /* skip the force part... */
 	  switch (get_command(command)) {
 	  case MOVE:
-	    do_move(gameinfo, command, &passes, 1);
+	    state = do_move(gameinfo, command, &passes, 1);
 	    break;
 	  case PASS:
-	    do_pass(gameinfo, &passes, 1);
+	    state = do_pass(gameinfo, &passes, 1);
 	    break;
 	  default:
 	    printf("Illegal forced move: %s %d\n", command,
@@ -757,12 +790,15 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    break;
 	  }
 	  break;
+
 	case MOVE:
-	  do_move(gameinfo, command, &passes, 0);
+	  state = do_move(gameinfo, command, &passes, 0);
 	  break;
+
 	case PASS:
-	  do_pass(gameinfo, &passes, 0);
+	  state = do_pass(gameinfo, &passes, 0);
 	  break;
+
 	case PLAY:
 	  command += 5;
 	  if (sscanf(command, "%d", &num) != 1) {
@@ -773,7 +809,9 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    for (m = 0; m < num; m++) {
 	      gameinfo->computer_player 
 		= OTHER_COLOR(gameinfo->computer_player);
-	      computer_move(gameinfo, &passes);
+	      state = computer_move(gameinfo, &passes);
+	      if (state)
+		break;
 	      if (passes >= 2)
 		break;
 	    }
@@ -782,22 +820,26 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    break;
 	  }
 	  break;
+
 	case PLAYBLACK:
 	  if (gameinfo->computer_player == WHITE)
 	    gameinfo->computer_player = BLACK;
 	  if (gameinfo->computer_player == gameinfo->to_move)
-	    computer_move(gameinfo, &passes);
+	    state = computer_move(gameinfo, &passes);
 	  break;
+
 	case PLAYWHITE:
 	  if (gameinfo->computer_player == BLACK)
 	    gameinfo->computer_player = WHITE;
 	  if (gameinfo->computer_player == gameinfo->to_move)
-	    computer_move(gameinfo, &passes);
+	    state = computer_move(gameinfo, &passes);
 	  break;
+
 	case SWITCH:
 	  gameinfo->computer_player = OTHER_COLOR(gameinfo->computer_player);
-	  computer_move(gameinfo, &passes);
+	  state = computer_move(gameinfo, &passes);
 	  break;
+
 	case UNDO:
 	case CMD_BACK:
 	  if (gnugo_undo_move(1)) {
@@ -808,6 +850,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  else
 	    printf("\nCan't undo.\n");
 	  break;
+
 	case CMD_FORWARD:
          if (sgftreeForward(&sgftree))
            gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
@@ -815,32 +858,40 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  else
 	    printf("\nEnd of game tree.\n");
 	  break;
+
 	case CMD_LAST:
          while (sgftreeForward(&sgftree))
            gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
 						  gameinfo->to_move);
 	  break;
+
 	case COMMENT:
 	  printf("\nEnter comment. Press ENTER when ready.\n");
 	  fgets(line, 80, stdin);
 	  sgftreeAddComment(&sgftree, line);
 	  break;
+
 	case SCORE:
 	  showscore = !showscore;
 	  if (!showscore)
 	    current_score_estimate = NO_SCORE;
 	  break;
+
 	case CMD_DEAD:
+	  examine_position(gameinfo->to_move, FULL_EXAMINE_DRAGONS);
 	  showdead = !showdead;
 	  break;
+
 	case CMD_CAPTURE:
 	  strtok(command, " ");
 	  showcapture(strtok(NULL, " "));
 	  break;
+
 	case CMD_DEFEND:
 	  strtok(command, " ");
 	  showdefense(strtok(NULL, " "));
 	  break;
+
 	case CMD_SHOWMOYO:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_MOYO;
@@ -848,6 +899,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  print_moyo();
 	  printmoyo = tmp;
 	  break;
+
 	case CMD_SHOWTERRI:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_TERRITORY;
@@ -855,6 +907,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  print_moyo();
 	  printmoyo = tmp;
 	  break;
+
 	case CMD_SHOWAREA:
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_AREA;
@@ -862,14 +915,17 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  print_moyo();
 	  printmoyo = tmp;
 	  break;
+
 	case CMD_SHOWDRAGONS:
 	  examine_position(gameinfo->to_move, EXAMINE_DRAGONS);
 	  showboard(1);
 	  break;
+
 	case CMD_GOTO:
 	  strtok(command, " ");
 	  ascii_goto(gameinfo, strtok(NULL, " "));
 	  break;
+
 	case CMD_SAVE:
 	  strtok(command, " ");
 	  tmpstring = strtok(NULL, " ");
@@ -886,6 +942,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  else
 	    printf("Please specify filename\n");
 	  break;
+
 	case CMD_LOAD:
 	  strtok(command, " ");
 	  tmpstring = strtok(NULL, " ");
@@ -910,66 +967,17 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  examine_position(gameinfo->to_move, EXAMINE_DRAGONS);
 	  show_dragons();
 	  break;
-	case COUNT:
-	case NEW:
-	case INVALID:
+
 	default:
 	  printf("\nInvalid command: %s", command);
 	  break;
 	}
+
+	if (passes >= 2)
+	  state = ascii_endgame(gameinfo, 0);
       }
     }
-    
-    /* two passes : game over */
-    
-    if (passes >= 2)
-      gnugo_who_wins(gameinfo->computer_player, stdout);
-    printf("\nIf you disagree, we may count the game together.\n");
-    printf("You may optionally save the game as an SGF file.\n");
 
-    sgftreeWriteResult(&sgftree, estimate_score(NULL, NULL), 1);
-
-    state = 0;
-    while (state == 0) {
-      printf("\n");
-      printf("Type \"save <filename>\" to save,\n");
-      printf("     \"count\" to recount,\n");
-      printf("     \"quit\" to quit\n");
-      printf(" or  \"game\" to play again\n");
-      line_ptr = line;
-      if (!fgets(line, 80, stdin))
-	break;
-      command = strtok(line_ptr, "");
-      switch (get_command(command)) {
-      case CMD_SAVE:
-	strtok(command, " ");
-	tmpstring = strtok(NULL, " ");
-	if (tmpstring) {
-	  /* discard newline */
-	  tmpstring[strlen(tmpstring)-1] = 0;
-          init_sgf(gameinfo);
-	  writesgf(sgftree.root, tmpstring);
-	}
-	else
-	  printf("Please specify filename\n");
-	break;
-	
-      case NEW:
-	state = 1;
-	break;
-	
-      case COUNT:
-	ascii_endgame(gameinfo);
-	break;
-
-      case QUIT:
-	state = 2;
-	break;
-	
-      default:
-	state = 0;
-      }
-    }
     sgffile_output(&sgftree);
     passes = 0;
     
@@ -984,7 +992,8 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 
     gameinfo_clear(gameinfo, board_size, komi);
   }
-  printf("\nThanks for playing GNU Go.\n\n");
+
+  printf("\nThanks! for playing GNU Go.\n\n");
 }
 
 void
@@ -996,12 +1005,93 @@ play_ascii_emacs(SGFTree *tree, Gameinfo *gameinfo,
 }
 
 
-/*
- * ascii_endgame() scores the game.
- */
+/* Communicates with user after a game has ended. */
+static int
+ascii_endgame(Gameinfo *gameinfo, int reason)
+{
+  char line[80];
+  char *line_ptr;
+  char *command;
+  char *tmpstring;
+  int state = 0;
 
+  if (reason == 0) {		/* Two passes, game is over. */
+    gnugo_who_wins(gameinfo->computer_player, stdout);
+    printf("\nIf you disagree, we may count the game together.\n");
+
+    sgftreeWriteResult(&sgftree, estimate_score(NULL, NULL), 1);
+  }
+  else {
+    int color = OTHER_COLOR(gameinfo->to_move);
+
+    if (reason == 1)		/* Our opponent has resigned. */
+      printf("GNU Go wins by resignation.\n");
+    else			/* We have resigned. */
+      printf("You win by resignation.\n");
+
+    printf("Result: %c+Resign\n\n", color == WHITE ? 'W' : 'B');
+    sgftreeWriteResult(&sgftree, color == WHITE ? 1000.0 : -1000.0, 1);
+  }
+
+  while (state == 0) {
+    printf("You may optionally save the game as an SGF file.\n\n");
+    printf("Type \"save <filename>\" to save,\n");
+    if (reason == 0)
+      printf("     \"count\" to recount,\n");
+    else if (reason == 2)
+      printf("     \"continue\" to decline resignation and continue the game,\n");
+    printf("     \"quit\" to quit\n");
+    printf(" or  \"game\" to play again\n");
+
+    line_ptr = line;
+    if (!fgets(line, 80, stdin))
+      break;
+
+    command = strtok(line_ptr, "");
+    switch (get_command(command)) {
+    case CMD_SAVE:
+      strtok(command, " ");
+      tmpstring = strtok(NULL, " ");
+      if (tmpstring) {
+	/* discard newline */
+	tmpstring[strlen(tmpstring)-1] = 0;
+	init_sgf(gameinfo);
+	writesgf(sgftree.root, tmpstring);
+      }
+      else
+	printf("Please specify filename\n");
+      break;
+
+    case COUNT:
+      if (reason == 0)
+	ascii_count(gameinfo);
+      break;
+
+    case CONTINUE:
+      state = -1;
+      break;
+
+    case NEW:
+      state = 1;
+      break;
+
+    case QUIT:
+      state = 2;
+      break;
+
+    default:
+      state = 0;
+    }
+  }
+
+  return state;
+}
+
+
+/* ascii_count() scores the game.
+ */
 static void
-ascii_endgame(Gameinfo *gameinfo)
+ascii_count(Gameinfo *gameinfo)
 {
   char line[12];
   int done = 0;

@@ -1268,10 +1268,7 @@ main(int argc, char *argv[])
   case MODE_ASCII_EMACS:  
     if (mandated_color != EMPTY)
       gameinfo.computer_player = OTHER_COLOR(mandated_color);
-    
-    /* not yet implemented */
-    resign_allowed = 0;
-    
+
     play_ascii_emacs(&sgftree, &gameinfo, infilename, untilstring);
     break;
 
@@ -1280,9 +1277,6 @@ main(int argc, char *argv[])
     if (mandated_color != EMPTY)
       gameinfo.computer_player = OTHER_COLOR(mandated_color);
 
-    /* not yet implemented */
-    resign_allowed = 0;
-    
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;
   }
