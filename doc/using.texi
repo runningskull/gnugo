@@ -538,6 +538,7 @@ hexadecimal:
   DEBUG_READING_CACHE         0x080000
   DEBUG_TERRITORY             0x100000
   DEBUG_OWL_PERSISTENT_CACHE  0X200000
+  DEBUG_TOP_MOVES             0x400000
 @end example
 
 These debug flags are additive. If you want to turn on both
