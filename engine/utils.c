@@ -655,23 +655,22 @@ set_depth_values(int level)
   /*
    * Other policies depending on level:
    * aftermath.c:   >=  8: call estimate_score().
-   * dragon.c:      >=  8: compute owl threats (currently disabled)
+   * dragon.c:      >=  8: compute owl threats (currently disabled) (*)
    *                >=  8: call owl analysis of semeai (currently disabled)
    * genmove.c:     >=  8: call estimate_score().
    * owl.c:         >=  9: use vital attack pattern database
-   *                >=  8: increase depth values in owl_substantial
-   *                >=  8: don't turn off owl_phase in semeai reading
-   * reading.c:     >=  8: Use superstrings and do more backfilling.
+   *                >= 10: increase depth values in owl_substantial
+   *                >= 10: don't turn off owl_phase in semeai reading
+   * reading.c:     >= 10: Use superstrings and do more backfilling. (*)
    * value_moves.c: >=  6: try to find more owl attacks/defenses
-   * breakin.c:     >= 10: try to find break-ins. (*)
    *
-   * The break-in code (*) is particularly expensive. 
+   * Those two marked (*) are particular expensive. Hence we don't change
+   * most depth values between levels 7 and 8 resp. 9 and 10.
+   * FIXME: This isn't correct. Owl threats are turned off anyway, and
+   * superstring doesn't cause a big time difference.
    *
-   * Speedups between levels 9 and 10 and between levels 7 and 8
-   * are obtained by turning off services, and between these
-   * levels no changes are made in the depths. The parameter
-   * depth_level is the correction compared to the default settings at level
-   * 10 for most reading depths.
+   * depth_level indicates the correction compared to the default settings
+   * at level 10 for most reading depths.
    */
   if (level >= 10)
     depth_level = level - 10;

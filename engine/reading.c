@@ -1651,7 +1651,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
       special_rescue_moves(str, libs[k], &moves);
   }
 
-  if (level >= 8 && stackp <= backfill2_depth)
+  if (level >= 10 && stackp <= backfill2_depth)
     superstring_break_chain_moves(str, 4, &moves);
 
   if (stackp <= break_chain_depth)
@@ -1695,7 +1695,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
   /* If nothing else works, we try playing a liberty of the
    * super_string.
    */
-  if (level >= 8 && stackp <= backfill2_depth)
+  if (level >= 10 && stackp <= backfill2_depth)
     superstring_moves(str, &moves, 3, 0);
 
   if (stackp <= break_chain_depth)
@@ -3381,7 +3381,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
       /* If it is not possible to make a direct atari, we try filling
        * a liberty of the superstring.
        */
-      if (level >= 8
+      if (level >= 10
           && stackp <= backfill_depth
           && (stackp <= superstring_depth || !atari_possible)) {
 	int liberty_cap = 2;
@@ -3573,7 +3573,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
       /* If nothing else works, we try filling a liberty of the
        * super_string.
        */
-      if (level >= 8 && stackp <= backfill2_depth)
+      if (level >= 10 && stackp <= backfill2_depth)
 	superstring_moves(str, &moves, 3, 1);
       break;
 

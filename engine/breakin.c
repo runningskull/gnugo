@@ -42,9 +42,9 @@
  * - break_in(str, territory) if the opponent is assumed to be next to move,
  *   or
  * - block_off(str, territory) if the territory owner is next.
- * If the break in is successful resp. the blocking unsuccessful, we
+ * If the break in is successful resp. the blocking insuccessful, we
  * shrink the territory, and see whether the opponent can still break in.
- * We repeat this until the territory is shrunk so much that the opponent
+ * We repeat this until the territory is shrinked so much that the opponent
  * can no longer reach it.
  */
 
@@ -381,7 +381,7 @@ break_territories(int color_to_move, struct influence_data *q, int store)
   struct moyo_data territories;
   int k;
 
-  if (!experimental_break_in || level < 10)
+  if (!experimental_break_in || level < 9)
     return;
 
   influence_get_territory_segmentation(q, &territories);

@@ -697,7 +697,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 			      critical_semeai_worms);
     }
 
-    if (level < 8) {
+    if (level < 10) {
       /* If no owl moves were found on two consecutive moves,
        * turn off the owl phase.
        */
@@ -2468,7 +2468,7 @@ owl_estimate_life(struct local_owl_data *owl,
   matches_found = 0;
   memset(found_matches, 0, sizeof(found_matches));
 
-  if (level >= 8) {
+  if (level >= 9) {
     if (!does_attack) {
       clear_owl_move_data(dummy_moves);
       matchpat(owl_shapes_callback, other,
@@ -4870,7 +4870,7 @@ owl_substantial(int str)
   /* fill all the liberties */
   for (k = 0; k < liberties; k++) {
     if (trymove(libs[k], owl->color, NULL, 0, EMPTY, 0)) {
-      if (level >= 8)
+      if (level >= 10)
 	increase_depth_values();
       owl->goal[libs[k]] = 1;
     }
@@ -4878,7 +4878,7 @@ owl_substantial(int str)
       /* if we can't fill, try swapping with the next liberty */
       if (k < liberties-1
 	  && trymove(libs[k+1], owl->color, NULL, 0, EMPTY, 0)) {
-	if (level >= 8)
+	if (level >= 10)
 	  increase_depth_values();
 	owl->goal[libs[k+1]] = 1;
 	libs[k+1] = libs[k];
@@ -4886,7 +4886,7 @@ owl_substantial(int str)
       else {
 	/* Can't fill the liberties. Give up! */
 	while (stackp > 0) {
-	  if (level >= 8)
+	  if (level >= 10)
 	    decrease_depth_values();
 	  popgo();
 	}
@@ -4906,7 +4906,7 @@ owl_substantial(int str)
   else
     result = 1;
   while (stackp > 0) {
-    if (level >= 8)
+    if (level >= 10)
       decrease_depth_values();
     popgo();
   }
