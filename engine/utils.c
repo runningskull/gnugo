@@ -815,9 +815,9 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
     popgo();
   }
 
-  if (fast_liberties)
+  if (fast_liberties) {
     ASSERT1(fast_liberties == liberties, pos);
-  
+  }
 
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
