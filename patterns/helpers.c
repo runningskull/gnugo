@@ -47,7 +47,7 @@
 /*
  *
  *  XO     cb
- *  O*     at
+ *  O*     a*
  *
  * Check whether a cut is feasible and effective.
  *
@@ -168,25 +168,25 @@ reinforce_helper(ARGS)
 /*
  *  
  *  XXO      XXc            decrease eye space in sente (unless it kills)
- *  .*X      eta
+ *  .*X      e*a
  *  ---      ---
  *
  * or
  *
  *  XXO      XXc            decrease eye space in sente (unless it kills)
- *  .*X      eta
+ *  .*X      e*a
  *  XXO      XXd
  *
  * or
  *
  *  |XXO     |XXc           decrease eye space in sente (unless it kills)
- *  |.*X     |eta
+ *  |.*X     |e*a
  *  |XXO     |XXd
  *
  * or
  *
  *  |XXO     |XXc           decrease eye space in sente (unless it kills)
- *  |.*X     |eta
+ *  |.*X     |e*a
  *  +---     +---
  *
  */
@@ -212,8 +212,7 @@ throw_in_atari_helper(ARGS)
     bpos = libs[1];
   
   if (TRYMOVE(move, color)) {
-    if (!attack(cpos, NULL) &&
-	!(ON_BOARD(dpos) && attack(dpos, NULL))) {
+    if (!attack(cpos, NULL) && !(ON_BOARD(dpos) && attack(dpos, NULL))) {
       if (TRYMOVE(bpos, other)) {
 	if (attack(apos, NULL))
 	  success = 1;

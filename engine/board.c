@@ -435,12 +435,12 @@ static Hash_data hashdata_stack[MAXSTACK];
 
 /* KOMASTER_SCHEME 4 handles empty case differently from other schemes */
 int
-komaster_is_empty(int komaster, int kom_pos) {
-  if (KOMASTER_SCHEME == 4) {
+komaster_is_empty(int komaster, int kom_pos)
+{
+  if (KOMASTER_SCHEME == 4)
     return kom_pos == PASS_MOVE;
-  } else {
+  else
     return komaster == EMPTY;
-  }
 }
 
 /* KOMASTER_SCHEME 4 handles komaster interpretation differently from 
@@ -632,14 +632,14 @@ static int
 do_trymove(int pos, int color, int ignore_ko)
 {
   if (0 || KOMASTER_TRACE) {
-    if (tracing_inside_komaster) {
+    if (tracing_inside_komaster)
       gprintf("%o  ");
-    }
-    if (ignore_ko) {
+
+    if (ignore_ko)
       gprintf("%otryko");
-    } else {
+    else
       gprintf("%otrymove");
-    }
+
     gprintf("%o %C %1m\n", color, pos);
   }
 
@@ -1175,12 +1175,15 @@ is_illegal_ko_capture(int pos, int color)
 /* This version of komaster_trymove is for tracing the calls to 
  * and return values from komaster_trymove.
  */
-int komaster_trymove_ORIGINAL(int pos, int color, const char *message, int str,
-		 int komaster, int kom_pos,
-		 int *new_komaster, int *new_kom_pos,
-		 int *is_conditional_ko, int consider_conditional_ko);
+int komaster_trymove_ORIGINAL(int pos, int color,
+			      const char *message, int str,
+			      int komaster, int kom_pos,
+			      int *new_komaster, int *new_kom_pos,
+			      int *is_conditional_ko,
+			      int consider_conditional_ko);
 
-int komaster_trymove(int pos, int color, const char *message, int str,
+int
+komaster_trymove(int pos, int color, const char *message, int str,
 		 int komaster, int kom_pos,
 		 int *new_komaster, int *new_kom_pos,
 		 int *is_conditional_ko, int consider_conditional_ko)
@@ -1728,8 +1731,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
       || board[kom_pos] != kom_color
       || !is_ko_point(kom_pos)
       || !board_ko_pos) {
-      /* Try clearing komaster is the prev. move is not a ko.
-       * i.e. it could have been an internal ko threat.*/
+    /* Try clearing komaster is the prev. move is not a ko.
+     * i.e. it could have been an internal ko threat.*/
     /* ko's been resolved clear komaster */
     komaster = 0;
     kom_pos = PASS_MOVE;
@@ -1748,7 +1751,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
         *new_komaster = KOMASTER_LEGAL + new_kom_color_flag;
       } /* else: legal non-ko move (usual case), no komaster change. */
       return 1;
-    } else {
+    }
+    else {
       if (consider_conditional_ko) {
         if (tryko(pos, color, message, komaster, kom_pos)) {
           /* Must be an illegal ko capture*/
@@ -1756,11 +1760,13 @@ komaster_trymove(int pos, int color, const char *message, int str,
           *new_komaster = new_kom_color_flag; /*don't set KOMASTER_LEGAL bit*/
           *is_conditional_ko = 1;
           return 1;
-        } else {
+        }
+	else {
           /* completely illegal move */
           return 0;
         }
-      } else {
+      }
+      else {
         /* don't even try to fake a ko threat. */
         if (log_illegal_moves) {
           if (tryko(pos, color, message, komaster, kom_pos)) {
@@ -1797,7 +1803,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
       if (!is_next_to(pos, kom_pos)) {
         /* An unrelated legal move (possibly another ko) */
         return 1;
-      } else {
+      }
+      else {
         /* legal ko re-capture */
         *new_kom_pos = pos;
         /* Might be worth trying to set the legal bit to see what happens. */
@@ -1806,7 +1813,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
         *is_conditional_ko = 0;  /* Should this be set to 1? */
         return 1;
       }
-    } else {
+    }
+    else {
       if (consider_conditional_ko) {
         if (tryko(pos, color, message, komaster, kom_pos)) {
           /* illegal ko re-capture */
@@ -1814,11 +1822,13 @@ komaster_trymove(int pos, int color, const char *message, int str,
           *new_komaster = new_kom_color_flag;  /*don't set KOMASTER_LEGAL bit */
           *is_conditional_ko = 1;
           return 1;
-        } else {
+        }
+	else {
           /* completely illegal move */
           return 0;
         }
-      } else {
+      }
+      else {
         /* don't even try to fake a ko threat. */
         if (log_illegal_moves) {
           if (tryko(pos, color, message, komaster, kom_pos)) {
@@ -1849,9 +1859,9 @@ komaster_trymove(int pos, int color, const char *message, int str,
       }
     }
     return 0;
-  } else {
-    return trymove(pos, color, message, str, komaster, kom_pos);
   }
+  else
+    return trymove(pos, color, message, str, komaster, kom_pos);
 
   /* Should have taken care of all cases by here. */
   gg_assert(0 && "Getting here should not be possible.");
@@ -2042,9 +2052,9 @@ fastlib(int pos, int color, int ignore_capture)
               && countstones(ally1) == 1)) {
         /* Here, we can gain only the adjacent new liberty. */
         fast_liberties++;
-      } else {
-        return -1;
       }
+      else
+        return -1;
     }
     if (neighbor_color == EMPTY) {
       if ((!ally1 || !liberty_of_string(neighbor, ally1))

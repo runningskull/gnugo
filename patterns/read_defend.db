@@ -55,12 +55,6 @@ a*
 >}
 
 
-
-
-
-
-
-
 ####
 #Attack o
 ####
@@ -114,6 +108,7 @@ a.b*
 
 ; lib(a) < 4 && lib(b) == 2 && xlib(*) > 1
 
+
 Pattern RD105
 
 ?OX   ko
@@ -121,7 +116,7 @@ Q*O
 
 :8,D,value(31)
 
-?OX   ko
+?OX
 Q*a
 
 ; lib(a) == 1 && xlib(*) == 1
@@ -166,7 +161,7 @@ Y.O
 
 :8,D,value(66)
 
-?X*   protect atari
+?X*
 abO
 
 ; rgoal[a] == 1
@@ -197,8 +192,7 @@ YO*   defend super-string
 
 :8,D,minvalue(40),maxvalue(65)
 
-ab*   defend super-string
-
+ab*
 
 ; lib(b) < 4  && xlib(*) > 1
 
@@ -214,8 +208,7 @@ Y.O*   defend super-string
 
 :8,D,value(40)
 
-a.b*   defend super-string
-
+a.b*
 
 ; lib(b) < 4  && xlib(*) > 1
 
@@ -229,8 +222,6 @@ Y*    superstring liberty
 a*
 
 ; rgoal[a] == 3 && lib(a) <= xlib(*)
-
-
 
 
 ########

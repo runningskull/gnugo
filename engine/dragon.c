@@ -589,8 +589,8 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	if (level >= 8
 	    && !disable_threat_computation
 	    && (owl_threats 
-		|| (thrashing_dragon &&
-		    is_same_dragon(str, thrashing_dragon)))) {
+		|| (thrashing_dragon
+		    && is_same_dragon(str, thrashing_dragon)))) {
 	  if (acode && !dcode && dragon[str].owl_attack_point != NO_MOVE) {
 	    if (owl_threaten_defense(str, &defense_point,
 				     &second_defense_point)) {

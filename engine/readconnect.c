@@ -34,7 +34,7 @@
 
 /* trace of a search */
 
-typedef struct  _zone {
+typedef struct _zone {
   int array[BOARDMAX];
   unsigned int bits[1+BOARDMAX/32];
   int i;
@@ -46,7 +46,7 @@ static int recursive_disconnect2(int str1, int str2, int *move,
 				 int komaster, int kom_pos, int has_passed);
 
 static int add_array(int *array, int elt);
-static int element_array (int *array,int elt);
+static int element_array(int *array,int elt);
 static void intersection_array(int *array1, int *array2);
 static int snapback(int str);
 static int connection_one_move(int str1, int str2);
@@ -86,7 +86,9 @@ int max_connect_depth2 = 20; /* Used by the alternate algorithm. */
 /* Statistics. */
 static int global_connection_node_counter = 0;
 
-static void init_zone (zone *zn) {
+static void
+init_zone(zone *zn)
+{
   zn->array[0] = 0;
   memset(zn->bits, 0, 1 + BOARDMAX / 8);
 }
@@ -95,7 +97,9 @@ static void init_zone (zone *zn) {
  */
 
 #if 0
-static int elt_zone (zone *zn, int elt) {
+static int
+elt_zone(zone *zn, int elt)
+{
   if ((zn->bits[elt >> 5] >> (elt & 31)) & 1)
     return 1;
   return 0;
@@ -105,7 +109,9 @@ static int elt_zone (zone *zn, int elt) {
 /* Adds an intersection to a zone
  */
 
-static void add_zone (zone *zn, int elt) {
+static void
+add_zone(zone *zn, int elt)
+{
   if (((zn->bits[elt >> 5] >> (elt & 31)) & 1) == 0) {
     zn->bits[elt >> 5] |= (1 << (elt & 31));
     zn->array[0]++;
@@ -117,7 +123,9 @@ static void add_zone (zone *zn, int elt) {
  */
 
 #if 0
-static int start_zone (zone *zn) {
+static int
+start_zone(zone *zn)
+{
   if (zn->array[0] < 1)
     return -1;
   zn->i = 1;
@@ -129,7 +137,9 @@ static int start_zone (zone *zn) {
  */
 
 #if 0
-static int next_zone (zone *zn) {
+static int
+next_zone(zone *zn)
+{
   zn->i++;
   if (zn->i > zn->array[0])
     return -1;
@@ -140,13 +150,15 @@ static int next_zone (zone *zn) {
 /* only keep the elements of zn1 which are also in zn2 */
 
 #if 0
-static void intersection_zone(zone *zn1, zone *zn2) {
+static void
+intersection_zone(zone *zn1, zone *zn2)
+{
   int r, s;
   
   for (r = start_zone(zn1); r > -1; r = next_zone(zn1))
     if (!elt_zone(zn2, r)) {
-      for (s = r; s< zn1->array[0]; s++)
-	zn1->array[s]=zn1->array[s+1];
+      for (s = r; s < zn1->array[0]; s++)
+	zn1->array[s] = zn1->array[s+1];
       zn1->bits[r >> 5] &= ~ (1 << (r & 31));
       zn1->array[0]--;
       zn1->i--;
@@ -158,7 +170,9 @@ static void intersection_zone(zone *zn1, zone *zn2) {
  * The number of elements of the array is in array[0].
  */
 
-static int add_array (int *array, int elt) {
+static int
+add_array(int *array, int elt)
+{
   int r;
   
   for (r = 1; r < array[0] + 1; r++)
@@ -172,7 +186,9 @@ static int add_array (int *array, int elt) {
 
 /* test if an element is part of an array */
 
-static int element_array (int *array,int elt) {
+static int
+element_array(int *array,int elt)
+{
   int r;
   for (r = 1; r < array[0] + 1; r++)
     if (array[r] == elt)
@@ -182,7 +198,9 @@ static int element_array (int *array,int elt) {
 
 /* only keep the elements of array1 which are also in array2 */
 
-static void intersection_array(int *array1, int *array2) {
+static void
+intersection_array(int *array1, int *array2)
+{
   int r, s;
   
   for (r = 1; r < array1[0] + 1; r++)
@@ -196,7 +214,9 @@ static void intersection_array(int *array1, int *array2) {
 
 /* verifies that capturing the stone at str is not a snapback */
 
-static int snapback (int str) {
+static int
+snapback(int str)
+{
   int stones, liberties, lib;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
 
@@ -216,7 +236,7 @@ static int snapback (int str) {
   
   /* if only one liberty after capture */
   if (trymove(lib, OTHER_COLOR(board[str]), "snapback", str, EMPTY, 0)) {
-    liberties=0;
+    liberties = 0;
     if (IS_STONE(board[lib]))
       liberties = countlib(lib);
     popgo();
@@ -234,7 +254,9 @@ static int snapback (int str) {
 
 /* connection by playing and finding a ponnuki after play */
 
-static int ponnuki_connect (int *moves, int str1, int str2, zone *zn) {
+static int
+ponnuki_connect(int *moves, int str1, int str2, zone *zn)
+{
   int r, s, k, res = 0;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
@@ -277,7 +299,7 @@ static int ponnuki_connect (int *moves, int str1, int str2, zone *zn) {
 	  for (s = 0; s < adj; s++)
 	    if (adjacent_strings(adjs[s], str2)
 		&& !snapback(adjs[s])) {
-	      res=1;
+	      res = 1;
 	      neighb = findlib(adjs[s], 1, neighbs);
 	      add_zone(zn, libs[r]);
 	      add_zone(zn, neighbs[0]);
@@ -285,6 +307,7 @@ static int ponnuki_connect (int *moves, int str1, int str2, zone *zn) {
 	    }
 	}
       }
+  
   return res;
 }
 
@@ -292,7 +315,9 @@ static int ponnuki_connect (int *moves, int str1, int str2, zone *zn) {
  * involved in the connection.
  */
 
-static int moves_connection_one_move(int *moves, int str1, int str2, zone *zn) {
+static int
+moves_connection_one_move(int *moves, int str1, int str2, zone *zn)
+{
   int r;
   int adj, adjs[MAXCHAIN];
 
@@ -327,7 +352,9 @@ static int moves_connection_one_move(int *moves, int str1, int str2, zone *zn) {
  * This is the gi1 game function.
  */
 
-static int connection_one_move(int str1, int str2) {
+static int
+connection_one_move(int str1, int str2)
+{
   int moves[BOARDMAX];
   zone zn;
   init_zone(&zn);
@@ -341,7 +368,9 @@ static int connection_one_move(int str1, int str2) {
  *
  * This is the ip1 game function. */
 
-static int prevent_connection_one_move (int *moves, int str1, int str2) {
+static int
+prevent_connection_one_move(int *moves, int str1, int str2)
+{
   int r, s;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
@@ -382,8 +411,10 @@ static int prevent_connection_one_move (int *moves, int str1, int str2) {
  * This is the g1 game function.
  */
 
-static int connected_one_move (int str1, int str2) {
-  int r, res=0;
+static int
+connected_one_move(int str1, int str2)
+{
+  int r, res = 0;
   int moves[MAX_MOVES];
   SGFTree *save_sgf_dumptree = sgf_dumptree;
 
@@ -426,7 +457,9 @@ static int connected_one_move (int str1, int str2) {
  * otherwise.
  */
 
-static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
+static int
+moves_to_connect_in_two_moves(int *moves, int str1, int str2)
+{
   int r, s, common_adj_liberty;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
@@ -447,10 +480,10 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   adj = chainlinks3(str1, adjs, 2);
   for (r = 0; r < adj; r++) {
     liberties = findlib(adjs[r], MAXLIBS, libs);
-    common_adj_liberty=0;
+    common_adj_liberty = 0;
     for (s = 0; s < liberties; s++)
       if (liberty_of_string(libs[s], str2))
-	common_adj_liberty=1;
+	common_adj_liberty = 1;
     if (common_adj_liberty || adjacent_strings(adjs[r], str2)) {
       for (s = 0; s < liberties; s++)
 	add_array(moves, libs[s]);
@@ -466,10 +499,10 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   adj = chainlinks3(str2, adjs, 2);
   for (r = 0; r < adj; r++) {
     liberties = findlib(adjs[r], MAXLIBS, libs);
-    common_adj_liberty=0;
+    common_adj_liberty = 0;
     for (s = 0; s < liberties; s++)
       if (liberty_of_string(libs[s], str1))
-	common_adj_liberty=1;
+	common_adj_liberty = 1;
     if (common_adj_liberty || adjacent_strings(adjs[r], str1)) {
       for (s = 0; s < liberties; s++)
 	add_array(moves, libs[s]);
@@ -486,30 +519,33 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
    */
   liberties = findlib(str1, MAXLIBS, libs);
   for (r = 0; r < liberties; r++) {
-    if (board[WEST(libs[r])] == EMPTY) {
-      if (liberty_of_string(WEST(libs[r]), str2)) {
-	add_array(moves, libs[r]);
-	add_array(moves, WEST(libs[r]));
-      }
-    }
-    if (board[EAST(libs[r])] == EMPTY) {
-      if (liberty_of_string(EAST(libs[r]), str2)) {
-	add_array(moves, libs[r]);
-	add_array(moves, EAST(libs[r]));
-      }
-    }
     if (board[SOUTH(libs[r])] == EMPTY) {
       if (liberty_of_string(SOUTH(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, SOUTH(libs[r]));
       }
     }
+    
+    if (board[WEST(libs[r])] == EMPTY) {
+      if (liberty_of_string(WEST(libs[r]), str2)) {
+	add_array(moves, libs[r]);
+	add_array(moves, WEST(libs[r]));
+      }
+    }
+
     if (board[NORTH(libs[r])] == EMPTY) {
       if (liberty_of_string(NORTH(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, NORTH(libs[r]));
       }
     }
+
+    if (board[EAST(libs[r])] == EMPTY) {
+      if (liberty_of_string(EAST(libs[r]), str2)) {
+	add_array(moves, libs[r]);
+	add_array(moves, EAST(libs[r]));
+      }
+    }    
   }
 
   /* Liberties of str1 which are adjacent to a friendly string with
@@ -554,7 +590,9 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
  * This is the gi2 game function.
  */
 
-static int connection_two_moves (int str1, int str2) {
+static int
+connection_two_moves(int str1, int str2)
+{
   int r, res = 0, moves[MAX_MOVES];
   SGFTree *save_sgf_dumptree = sgf_dumptree;
  
@@ -562,7 +600,7 @@ static int connection_two_moves (int str1, int str2) {
   if (board[str1] == EMPTY || board[str2] == EMPTY)
     return 0;
   
-  moves[0]=0;
+  moves[0] = 0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return WIN;
   order_connection_moves(moves, str1, str2, board[str1],
@@ -593,8 +631,9 @@ static int connection_two_moves (int str1, int str2) {
  * a similar job, so it is called temporarly.
  */
 
-static int moves_to_prevent_connection_in_two_moves (int *moves,
-						     int str1, int str2) {
+static int
+moves_to_prevent_connection_in_two_moves(int *moves, int str1, int str2)
+{
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return 1;
   return 0;
@@ -610,8 +649,10 @@ static int moves_to_prevent_connection_in_two_moves (int *moves,
  *
  * this is the ip2 game function */
 
-static int prevent_connection_two_moves (int *moves, int str1, int str2) {
-  int r, res=0;
+static int
+prevent_connection_two_moves(int *moves, int str1, int str2)
+{
+  int r, res = 0;
   int possible_moves[MAX_MOVES];
   SGFTree *save_sgf_dumptree = sgf_dumptree;
 
@@ -621,7 +662,7 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
     
   if (connection_two_moves(str1, str2)) {
     res = WIN;
-    possible_moves[0]=0;
+    possible_moves[0] = 0;
     moves_to_prevent_connection_in_two_moves(possible_moves, str1, str2);
     order_connection_moves(possible_moves, str1, str2,
 			   OTHER_COLOR(board[str1]),
@@ -663,8 +704,10 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
  * moves to disconnect.
  */
 
-static int moves_to_connect_in_three_moves(int *moves, int str1, int str2,
-					   int does_connect) {
+static int
+moves_to_connect_in_three_moves(int *moves, int str1, int str2,
+				int does_connect)
+{
   int r, s;
   int liberties, libs[MAXLIBS];
   int liberties2, libs2[MAXLIBS];
@@ -826,8 +869,9 @@ static int moves_to_connect_in_three_moves(int *moves, int str1, int str2,
  * a connection in 5 plies.
  */
 
-static int moves_to_prevent_connection_in_three_moves (int *moves,
-						       int str1, int str2) {
+static int
+moves_to_prevent_connection_in_three_moves(int *moves, int str1, int str2)
+{
   if (moves_to_connect_in_three_moves(moves, str1, str2, 0))
     return 1;
   return 0;
@@ -843,15 +887,17 @@ static int moves_to_prevent_connection_in_three_moves (int *moves,
  * This is the g211 game function.
  */
 
-static int simply_connected_two_moves (int str1, int str2) {
-  int r, res=0;
+static int
+simply_connected_two_moves(int str1, int str2)
+{
+  int r, res = 0;
   int moves[MAX_MOVES];
   SGFTree *save_sgf_dumptree = sgf_dumptree;
 
   /* turn off the sgf traces
    */
   sgf_dumptree = NULL;
-    
+  
   
   /* If one string is missing we have already failed. */
   if (board[str1] == EMPTY || board[str2] == EMPTY)
@@ -883,7 +929,9 @@ static int simply_connected_two_moves (int str1, int str2) {
  * This is the gi311 game function.
  */
 
-static int simple_connection_three_moves (int str1, int str2) {
+static int
+simple_connection_three_moves(int str1, int str2)
+{
   int r, res = 0, moves[MAX_MOVES];
   SGFTree *save_sgf_dumptree = sgf_dumptree;
 
@@ -892,7 +940,7 @@ static int simple_connection_three_moves (int str1, int str2) {
   sgf_dumptree = NULL;
     
   
-  moves[0]=0;
+  moves[0] = 0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return WIN;
   order_connection_moves(moves, str1, str2, board[str1],
@@ -929,8 +977,10 @@ static int simple_connection_three_moves (int str1, int str2) {
  * strings are connected in these situations.
  */
 
-static int prevent_simple_connection_three_moves (int *moves, int str1, int str2) {
-  int r, res=0;
+static int
+prevent_simple_connection_three_moves(int *moves, int str1, int str2)
+{
+  int r, res = 0;
   int possible_moves[MAX_MOVES];
   SGFTree *save_sgf_dumptree = sgf_dumptree;
 
@@ -941,7 +991,7 @@ static int prevent_simple_connection_three_moves (int *moves, int str1, int str2
   
   if (simple_connection_three_moves(str1, str2)) {
     res = WIN;
-    possible_moves[0]=0;
+    possible_moves[0] = 0;
     moves_to_prevent_connection_in_three_moves(possible_moves, str1, str2);
     order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]),
 			   "prevent_simple_connection_three_moves");
@@ -967,7 +1017,9 @@ static int prevent_simple_connection_three_moves (int *moves, int str1, int str2
  * or looking at a ladder for a common adjacent string.
  */
 
-static int quiescence_connect(int str1, int str2, int *move) {
+static int
+quiescence_connect(int str1, int str2, int *move)
+{
   int r;
   int lib;
   int adj, adjs[MAXCHAIN];
@@ -1028,11 +1080,13 @@ string_connect(int str1, int str2, int *move)
 
 /* returns WIN if str1 and str2 can be connected. */
 
-static int recursive_connect (int str1, int str2, int *move) {
+static int
+recursive_connect(int str1, int str2, int *move)
+{
   int i, res = 0, Moves[MAX_MOVES], ForcedMoves[MAX_MOVES];
   SETUP_TRACE_INFO2("recursive_connect", str1, str2);
   
-  if ( (board[str1] == EMPTY) || (board[str2] == EMPTY) ) {
+  if (board[str1] == EMPTY || board[str2] == EMPTY) {
     SGFTRACE2(PASS_MOVE, 0, "one string already captured");
     return 0;
   }
@@ -1089,7 +1143,7 @@ static int recursive_connect (int str1, int str2, int *move) {
    * the moves that prevent capture and that might also
    * connect
    */
-  if ( (ForcedMoves[0] != 0) && (Moves[0] != 0) )
+  if (ForcedMoves[0] != 0 && Moves[0] != 0)
     intersection_array(Moves, ForcedMoves);
 
   order_connection_moves(Moves, str1, str2, board[str1],
@@ -1117,7 +1171,9 @@ static int recursive_connect (int str1, int str2, int *move) {
 
 /* Externally callable frontend to recursive_disconnect(). */
 
-int disconnect(int str1, int str2, int *move) {
+int
+disconnect(int str1, int str2, int *move)
+{
   int i;
   int res = WIN;
   int Moves[MAX_MOVES];
@@ -1140,7 +1196,7 @@ int disconnect(int str1, int str2, int *move) {
     return result;
   }
 
-  Moves[0]=0;
+  Moves[0] = 0;
   moves_to_prevent_connection_in_three_moves (Moves, str1, str2);
   if (Moves[0] > 0)
     res = 0;
@@ -1161,12 +1217,14 @@ int disconnect(int str1, int str2, int *move) {
 
 /* Returns WIN if str1 and str2 can be disconnected. */
 
-static int recursive_disconnect (int str1, int str2, int *move) {
+static int
+recursive_disconnect(int str1, int str2, int *move)
+{
   int i, res = WIN, Moves[MAX_MOVES];
   
   SETUP_TRACE_INFO2("recursive_disconnect", str1, str2);
   
-  if ((board[str1] == EMPTY) || (board[str2] == EMPTY)) {
+  if (board[str1] == EMPTY || board[str2] == EMPTY) {
     SGFTRACE2(PASS_MOVE, WIN, "one string already captured");
     return WIN;
   }
@@ -1238,7 +1296,9 @@ static int recursive_disconnect (int str1, int str2, int *move) {
 /* Reads simple ladders.
  */
 
-static int quiescence_capture (int str, int *move) {
+static int
+quiescence_capture(int str, int *move)
+{
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
   int result = 0;
@@ -1264,7 +1324,8 @@ static int quiescence_capture (int str, int *move) {
 }
 
 #if 0
-static int capture_one_move (int str) 
+static int
+capture_one_move(int str) 
 {
   if (countlib(str) == 1)
     return 1;
@@ -1278,13 +1339,15 @@ static int capture_one_move (int str)
  * The ip1 game function.
  */
 
-static int prevent_capture_one_move(int *moves, int str1) {
-  int r, res=0;
+static int
+prevent_capture_one_move(int *moves, int str1)
+{
+  int r, res = 0;
   int liberties, libs[MAXLIBS];
   int adj, adjs[MAXCHAIN];
   
   liberties = findlib(str1, MAXLIBS, libs);
-  if (liberties==1) {
+  if (liberties == 1) {
     add_array(moves, libs[0]);
     res = WIN;
     adj = chainlinks2(str1, adjs, 1);
@@ -1299,12 +1362,14 @@ static int prevent_capture_one_move(int *moves, int str1) {
 
 /* Returns WIN if str1, str2 and str3 can be connected. */
 
-static int recursive_transitivity (int str1, int str2, int str3, int *move) {
+static int
+recursive_transitivity(int str1, int str2, int str3, int *move)
+{
   int i, res = 0, Moves[MAX_MOVES], ForcedMoves[MAX_MOVES];
 
   SETUP_TRACE_INFO2("recursive_transitivity", str1, str3);
   
-  if ( (board[str1] == EMPTY) || (board[str2] == EMPTY) || (board[str3] == EMPTY) ) {
+  if (board[str1] == EMPTY || board[str2] == EMPTY || board[str3] == EMPTY) {
     SGFTRACE2(PASS_MOVE, 0, "one string already captured");
     return 0;
   }
@@ -1392,7 +1457,9 @@ static int recursive_transitivity (int str1, int str2, int str3, int *move) {
   
 /* Externally callable frontend to recursive_non_transitivity(). */
 
-int non_transitivity(int str1, int str2, int str3, int *move) {
+int
+non_transitivity(int str1, int str2, int str3, int *move)
+{
   int i, res = WIN, Moves[MAX_MOVES];
   
   nodes_connect = 0;
@@ -1416,14 +1483,15 @@ int non_transitivity(int str1, int str2, int str3, int *move) {
 
 /* Returns WIN if str1, str2 and str3 can be disconnected. */
 
-static int recursive_non_transitivity (int str1, int str2, int str3, 
-				       int *move) {
+static int
+recursive_non_transitivity(int str1, int str2, int str3, int *move)
+{
   int i, res = WIN, Moves[MAX_MOVES];
   
   SETUP_TRACE_INFO2("recursive_non_transitivity", str1, str3);
   
-  if ((board[str1] == EMPTY) || (board[str2] == EMPTY) 
-      || (board[str3] == EMPTY)) {
+  if (board[str1] == EMPTY || board[str2] == EMPTY
+      || board[str3] == EMPTY) {
     SGFTRACE2(PASS_MOVE, WIN, "one string already captured");
     return WIN;
   }
@@ -1532,8 +1600,8 @@ order_connection_moves(int *moves, int str1, int str2, int color_to_move,
 
     if (0)
       gprintf("%o %1m values: %d %d %d %d %d %d %d %d\n", move, number_edges,
-	      number_same_string, number_own, number_opponent, captured_stones,
-	      threatened_stones, saved_stones, number_open);
+	      number_same_string, number_own, number_opponent,
+	      captured_stones, threatened_stones, saved_stones, number_open);
 
     scores[r] = 0;
     libs = approxlib(move, color_to_move, 10, NULL);
@@ -2417,8 +2485,7 @@ compute_connection_distances(int str, struct connection_data *conn)
 	if (board[bpos] == color
 	    && board[apos] == EMPTY
 	    && board[gpos] == EMPTY
-	    && conn->distances[bpos] > distance + 0.2
-	    ) {
+	    && conn->distances[bpos] > distance + 0.2) {
 	  ENQUEUE(conn, apos, distance + 0.2, 0.2);
 	  ENQUEUE(conn, gpos, distance + 0.2, 0.2);
 	}
@@ -2426,7 +2493,7 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 5. Almost bamboo joint.
 	 * 
 	 */
-	if (   board[gpos] == EMPTY
+	if (board[gpos] == EMPTY
 	    && board[epos] == color
             && conn->distances[gpos] > distance + 0.2
 	    && approxlib(gpos, other, 3, NULL) <= 2
@@ -2460,10 +2527,8 @@ compute_connection_distances(int str, struct connection_data *conn)
 
 	/* Case 7. "a" is empty or occupied by opponent.
 	 */
-	if ((board[apos] == EMPTY
-		|| board[apos] == other)
-	    && conn->distances[apos] > distance + 1.0
-	    ) {
+	if ((board[apos] == EMPTY || board[apos] == other)
+	    && conn->distances[apos] > distance + 1.0) {
 	  ENQUEUE(conn, apos, distance + 1.0, 1.0);
 	}
 
@@ -2471,16 +2536,16 @@ compute_connection_distances(int str, struct connection_data *conn)
 	 * empty vertex "a" or "g", which makes "a" or "g" self_atari
 	 * for opponent.
 	 */
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.1
 	    && does_secure(color, bpos, apos)) {
 	  ENQUEUE(conn, bpos, distance + 1.1, 1.0);
 	}
 
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
-	    &&conn->distances[bpos] > distance + 1.1
+	    && conn->distances[bpos] > distance + 1.1
 	    && does_secure(color, bpos, gpos)) {
 	  ENQUEUE(conn, bpos, distance + 1.1, 1.0);
 	}
@@ -2488,7 +2553,7 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 9. One-space jump to empty vertex "e" through empty
 	 * vertex "g", which makes "g" self_atari for opponent.
 	 */
-	if (   board[gpos] == EMPTY
+	if (board[gpos] == EMPTY
 	    && board[epos] == EMPTY
 	    && conn->distances[epos] > distance + 1.1
 	    && does_secure(color, epos, gpos)) {
@@ -2498,23 +2563,22 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 10. Diagonal connection to empty vertex "b" through
 	 * empty vertices "a" and "g".
 	 */
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY && board[gpos] == EMPTY
-            && conn->distances[bpos] > distance + 1.3
-	    ) {
+            && conn->distances[bpos] > distance + 1.3) {
 	  ENQUEUE(conn, bpos, distance + 1.3, 1.0);
 	}
 
 	/* Case 11. Keima to f or j on edge and one space jump on
 	 * first or second line.
 	 */
-	if (   board[apos] == EMPTY
+	if (board[apos] == EMPTY
 	    && board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && board[epos] == EMPTY
 	    && board[fpos] == EMPTY
 	    && (conn->distances[fpos] > distance + 1.3
-	     || conn->distances[epos] > distance + 1.5)
+		|| conn->distances[epos] > distance + 1.5)
 	    && countlib(pos) >= 3
 	    && (!ON_BOARD(cpos) || !ON_BOARD(hpos))) {
 	  ENQUEUE(conn, fpos, distance + 1.3, 1.0);
@@ -2528,7 +2592,7 @@ compute_connection_distances(int str, struct connection_data *conn)
 	    && board[epos] == EMPTY
 	    && board[jpos] == EMPTY
 	    && (conn->distances[jpos] > distance + 1.3
-	     || conn->distances[epos] > distance + 1.5)
+		|| conn->distances[epos] > distance + 1.5)
 	    && (!ON_BOARD(apos) || !ON_BOARD(kpos))) {
 	  ENQUEUE(conn, jpos, distance + 1.3, 1.0);
 	  ENQUEUE(conn, epos, distance + 1.3, 1.0);
@@ -2538,14 +2602,14 @@ compute_connection_distances(int str, struct connection_data *conn)
 	 * empty vertex "a" or "g", which allows opponent move at "a"
 	 * or "g" to be captured in a ladder.
 	 */
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.2
 	    && does_secure_through_ladder(color, bpos, apos)) {
 	  ENQUEUE(conn, bpos, distance + 1.2, 1.0);
 	}
 
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.2
 	    && does_secure_through_ladder(color, bpos, gpos)) {
@@ -2555,14 +2619,13 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 13. Diagonal connection to empty vertex "b" through
 	 * empty vertex "a" or "g", with no particular properties.
 	 */
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
-	    && conn->distances[bpos] > distance + 1.8
-	    ) {
+	    && conn->distances[bpos] > distance + 1.8) {
 	  ENQUEUE(conn, bpos, distance + 1.8, 0.9);
 	}
 
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.8
 	    && does_secure_through_ladder(color, bpos, gpos)) {
@@ -2572,7 +2635,7 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 14. Diagonal connection to empty vertex "b" through
 	 * opponent stones "a" or "g" with few liberties.
 	 */
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[apos] == other
 	    && board[gpos] == other
 	    && conn->distances[bpos] > distance + 2.0
@@ -2583,7 +2646,7 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 15. Diagonal connection to own stone "b" through
 	 * opponent stones "a" or "g" with few liberties.
 	 */
-	if (   board[bpos] == color
+	if (board[bpos] == color
 	    && board[apos] == other
 	    && board[gpos] == other
 	    && conn->distances[bpos] > distance + 2.0
@@ -2651,7 +2714,7 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 1. Diagonal connection to empty vertex "b" through
 	 * empty vertices "a" and "g".
 	 */
-	if (   board[bpos] == EMPTY
+	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
 	    && board[gpos] == EMPTY
             && conn->distances[bpos] > distance + 1.5) {
@@ -2661,7 +2724,7 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 2. Diagonal connection to friendly stone at "b" through
 	 * empty vertices "a" and "g".
 	 */
-	if (   board[bpos] == color
+	if (board[bpos] == color
 	    && board[apos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.3) {

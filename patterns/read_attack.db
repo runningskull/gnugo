@@ -96,7 +96,7 @@ a*
 >   set_value(61);
 > else if (xstar > lib(a) && ostar > 1)
 >   set_value(60);
-> else if (xstar == lib(a) 
+> else if (xstar == lib(a)
 >	   && ostar > 1
 >          && (ostar == xstar || ostar >= lib(a)))
 >   set_value(60);
@@ -128,7 +128,6 @@ a*x
 ; rgoal[a] == 1 && olib(*) == 1
 
 
-
 Pattern RA002
 
 .*X  throw-in for better shape
@@ -139,10 +138,10 @@ XY?
 b*X
 Xa?
 
-; rgoal[a] == 1 
-; && olib(*) == 1 
+; rgoal[a] == 1
+; && olib(*) == 1
 ; && olib(b) == 2
-; && xlib(b) <= lib(a) 
+; && xlib(b) <= lib(a)
 ; && lib(a) == 2
 
 
@@ -234,19 +233,19 @@ A*
 
 ; olib(*) > 1
 
-
 > {
 > int ostar = olib(*);
 > if (lib(A) == 1 && ostar >= 3)
 >   set_value(78);
 > else if (lib(A) == 1)
 >   set_value(72);
-> else if (lib(A) == 2 && ostar > 2)  
+> else if (lib(A) == 2 && ostar > 2)
 >   /* FIXME: i.e. backfill hack; causes explosion; see reading:35*/
 >   set_value(10);
 > else
 >   set_value(0);
 >}
+
 
 ###########
 #backfill #
@@ -492,7 +491,7 @@ X.    diagonal liberty
 
 :8,A,minvalue(9),maxvalue(49)
 
-ab    diagonal liberty
+ab
 ?*
 
 # Too many variations.
@@ -502,6 +501,7 @@ ab    diagonal liberty
 >   set_value(49);
 > else
 >   set_value(0);
+
 
 Pattern RA999
 

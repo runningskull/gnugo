@@ -310,7 +310,7 @@ int komaster_trymove(int pos, int color,
 		     int *new_komaster, int *new_kom_pos,
 		     int *is_conditional_ko, int consider_conditional_ko);
 int komaster_is_empty(int komaster, int kom_pos);
-const char * komaster_to_string(int komaster, int kom_pos);
+const char *komaster_to_string(int komaster, int kom_pos);
 int does_capture_something(int pos, int color);
 void mark_string(int str, char mx[BOARDMAX], char mark);
 int move_in_stack(int pos, int cutoff);

@@ -1439,8 +1439,6 @@ compare_elements(const void *a, const void *b)
 static int
 compare_elements_closest(const void *a, const void *b)
 {
-  static char order[] = {7,2,3,5,6,0,4,1};  /* score for each attribute */
-
   const struct patval *pa = (const struct patval *)a;
   const struct patval *pb = (const struct patval *)b;
 
@@ -1450,7 +1448,7 @@ compare_elements_closest(const void *a, const void *b)
   int by = pb->y - cj;
   int metric = (ax*ax + ay*ay) - (bx*bx + by*by) ;
   if (metric == 0)
-    return - compare_elements(a,b);
+    return -compare_elements(a,b);
   else
     return metric;
 }
@@ -1490,17 +1488,15 @@ write_elements(FILE *outfile, char *name)
 	      "%s(%d) : error : Maximum number of elements exceeded in %s.\n",
 	      current_file, current_line_number, name);
       fatal_errors++;
-    };
+    }
 
     fprintf(outfile, "   {%d,%d,%d}%s",
-	   elements[node].x - ci, elements[node].y - cj, elements[node].att,
-	   node < el-1 ? ",\n" : "};\n\n");
+	    elements[node].x - ci, elements[node].y - cj, elements[node].att,
+	    node < el-1 ? ",\n" : "};\n\n");
   }
 
-  if (tree_output) {
+  if (tree_output)
     tree_push_pattern();
-  }
-
 }
 
 
@@ -1521,12 +1517,12 @@ int graph_next = 0;
  * This function adds only one of the 16 copies.
  */
 static void
-tree_push_elements(struct element_node *elist, struct graph_node *graph_start, int ll)
+tree_push_elements(struct element_node *elist,
+		   struct graph_node *graph_start, int ll)
 {
-  struct graph_node_list * grptr;
+  struct graph_node_list *grptr;
   struct element_node *elist_next;
   struct element_node *elist_prev;
-  int found = 0;
 
    if (!graph_start->next_list) {
      graph_start->next_list = malloc(sizeof(struct graph_node_list));
@@ -1538,9 +1534,9 @@ tree_push_elements(struct element_node *elist, struct graph_node *graph_start, i
       elist_prev = elist_next;
       elist_next = elist_next->next;
       for (grptr = graph_start->next_list; grptr != 0; grptr = grptr->next) {
-        if (elist_next->e.x == grptr->node.x &&
-            elist_next->e.y == grptr->node.y &&
-            elist_next->e.att == grptr->node.att)
+        if (elist_next->e.x == grptr->node.x
+	    && elist_next->e.y == grptr->node.y
+	    && elist_next->e.att == grptr->node.att)
         {
           if (verbose) 
             fprintf(stderr, "  element matched.\n");
@@ -1553,15 +1549,20 @@ tree_push_elements(struct element_node *elist, struct graph_node *graph_start, i
 
     if (elist->next) {
       /* Still elements to add to tree */
-      for (grptr = graph_start->next_list; grptr->next != 0; grptr = grptr->next) ;
+      for (grptr = graph_start->next_list;
+	   grptr->next != NULL;
+	   grptr = grptr->next)
+	;
+      
       grptr->next = malloc(sizeof(struct graph_node_list));
       grptr = grptr->next;
       grptr->node.matches = 0;
       grptr->node.att = elist->next->e.att;
       if (!(grptr->node.att == ATT_dot
-             || grptr->node.att == ATT_X
-             || grptr->node.att == ATT_O)) {
-        fprintf(stderr, "%s(%d) : error : Internal error; unexpected att = %d\n",
+	    || grptr->node.att == ATT_X
+	    || grptr->node.att == ATT_O)) {
+        fprintf(stderr,
+		"%s(%d) : error : Internal error; unexpected att = %d\n",
                 current_file, current_line_number, grptr->node.att);
         fatal_errors++;
       }
@@ -1572,23 +1573,27 @@ tree_push_elements(struct element_node *elist, struct graph_node *graph_start, i
       elist->next = elist->next->next;
       if (verbose) {
         fprintf(stderr, "  Added node %c, x=%2d, y=%2d\n", 
-          *(VALID_PATTERN_CHARS + grptr->node.att), grptr->node.x, grptr->node.y);
+		*(VALID_PATTERN_CHARS + grptr->node.att),
+		grptr->node.x, grptr->node.y);
       }
       tree_push_elements(elist, &grptr->node, ll);
-    } else {
+    }
+    else {
       /* patten matches here! */
       struct match_node *matches;
       if (verbose)
         fprintf(stderr, "  pattern complete.\n");
       matches = graph_start->matches;
+      
       if (!matches) {
         matches = malloc(sizeof(struct match_node));
         matches->next = 0;
         graph_start->matches = matches;
       }
-      while (matches->next != 0) {
+      
+      while (matches->next != NULL)
         matches = matches->next;
-      }
+
       matches->next = malloc(sizeof(struct match_node));
       matches = matches->next;
       matches->patnum = patno;
@@ -1602,7 +1607,8 @@ tree_push_elements(struct element_node *elist, struct graph_node *graph_start, i
  * copy the entries as necessary, expanding o & x to ., O, & X
  */
 static void
-tree_push_pattern_DOX(struct element_node *elist, int ll) {
+tree_push_pattern_DOX(struct element_node *elist, int ll)
+{
   struct element_node *elist_next = 0;
   struct element_node *elist_prev = 0;
   int need_copy = 0;
@@ -1633,8 +1639,8 @@ tree_push_pattern_DOX(struct element_node *elist, int ll) {
       elist2_next = elist2_next->next;
       elist2_next->e = elist_next->e;
       if (!found_copy_element) {
-        if (elist_next->e.att == ATT_o ||
-            elist_next->e.att == ATT_x) {
+        if (elist_next->e.att == ATT_o
+            || elist_next->e.att == ATT_x) {
           found_copy_element = 1;
           elist1_next->e.att = ATT_dot;
           elist2_next->e.att = (elist_next->e.att == ATT_o ? ATT_O : ATT_X);
@@ -1658,10 +1664,10 @@ tree_push_pattern_DOX(struct element_node *elist, int ll) {
       int i;
       elist_prev = elist_next;
       elist_next = elist_next->next;
-      for (i=0;i<=1;i++) {
-        if (elist_next->e.x == graph[i].x &&
-            elist_next->e.y == graph[i].y &&
-            elist_next->e.att == graph[i].att)
+      for (i = 0; i <= 1; i++) {
+        if (elist_next->e.x == graph[i].x
+            && elist_next->e.y == graph[i].y
+            && elist_next->e.att == graph[i].att)
         {
           elist_prev->next = elist_next->next;
           tree_push_elements(elist, &graph[i], ll);
@@ -1678,14 +1684,15 @@ tree_push_pattern_DOX(struct element_node *elist, int ll) {
  * appropriate rotation.
  */
 static void 
-tree_push_pattern_rot(int ll) {
+tree_push_pattern_rot(int ll)
+{
   struct element_node *elist = 0;
   struct element_node *elist_next = 0;
-  struct element_node *elist_prev = 0;
   int i;
+  
   elist = malloc(sizeof(struct element_node));
-  elist_next= elist;
-  for (i=0;i<el;i++) {
+  elist_next = elist;
+  for (i = 0; i < el; i++) {
     elist_next->next = malloc(sizeof(struct element_node)); /*or die*/
     elist_next = elist_next->next;
     elist_next->e.att = elements[i].att;
@@ -1711,7 +1718,8 @@ tree_push_pattern_rot(int ll) {
  * then a pattern has matched (with a given orientation).
  */
 static void
-tree_push_pattern(void) {
+tree_push_pattern(void)
+{
   static int init = 0;
   int ll;
   int start_transformation = 0;
@@ -1724,7 +1732,7 @@ tree_push_pattern(void) {
     graph[0].next_list = 0;
     graph[1].next_list = 0;
     graph_next = 2;
-    init=1;
+    init = 1;
   }
 
   if (pattern->trfno == 5) {
@@ -1739,17 +1747,16 @@ tree_push_pattern(void) {
 
   if (0) {
   int i;
-    for (i=0;i<el;i++) {
-      fprintf(stderr, "E[%d, %d, %c]\n", elements[i].x - ci, elements[i].y -cj, 
-        *(VALID_PATTERN_CHARS + elements[i].att));
+    for (i = 0; i < el; i++) {
+      fprintf(stderr, "E[%d, %d, %c]\n",
+	      elements[i].x - ci, elements[i].y -cj, 
+	      *(VALID_PATTERN_CHARS + elements[i].att));
     }
     fprintf(stderr, "\n");
   }
 
-  for (ll = start_transformation; ll < end_transformation; ++ll) {
+  for (ll = start_transformation; ll < end_transformation; ++ll)
     tree_push_pattern_rot(ll);
-  }
-
 }
 
 
@@ -1786,8 +1793,10 @@ dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
   if (as_text) {
     if (depth > 0)
       fprintf(stderr, "%.*s", depth*2, "                                             ");
-    fprintf(stderr, "GN[att=%c, x=%d, y=%d", *(VALID_PATTERN_CHARS + gn->att), gn->x, gn->y);
+    fprintf(stderr, "GN[att=%c, x=%d, y=%d",
+	    *(VALID_PATTERN_CHARS + gn->att), gn->x, gn->y);
   }
+  
   if (pass == PASS_FILL) {
     gnl_dump[gnl_count].node.att = gn->att;
     gnl_dump[gnl_count].node.x = gn->x;
@@ -1802,36 +1811,37 @@ dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
       matches_dump[mn_count].orientation = 0; /*Unused*/
       matches_dump[mn_count].next = (void*)(mn_count + 1);
     }
-    if (as_text) {
+    
+    if (as_text)
       fprintf(stderr, ", matches[%d]: ", mn_count);
-    }
+
     mn_count++;
     while (m) {
       if (pass == PASS_FILL) {
         matches_dump[mn_count].patnum = m->patnum;
         matches_dump[mn_count].orientation = m->orientation;
-        if (m->next) {
+        if (m->next)
           matches_dump[mn_count].next = (void*)(mn_count + 1);
-        } else {
+	else
           matches_dump[mn_count].next = 0;
-        }
+      }
+      
+      if (as_text)
+        fprintf(stderr, "P[%s, %d]", pattern_names[m->patnum],
+		m->orientation);
 
-      }
-      if (as_text) {
-        fprintf(stderr, "P[%s, %d]", pattern_names[m->patnum], m->orientation);
-      }
       mn_count++;
-      m=m->next;
+      m = m->next;
     }
-  } else {
-    if (pass == PASS_FILL) {
+  }
+  else {
+    if (pass == PASS_FILL)
       gnl_dump[gnl_count].node.matches = 0;
-    }
   }
 
-  if (as_text) {
+  if (as_text)
     fprintf(stderr, "]\n");
-  }
+
   gl = gn->next_list;
   if (gl) {
     int prev_gnl_count = gnl_count;
@@ -1848,22 +1858,23 @@ dump_graph_node(FILE *outfile, struct graph_node *gn, int depth, int pass)
     prev_gnl_count = gnl_count;
     gnl_count++;
     while (gl->next) {
-      if (pass == PASS_FILL) {
+      if (pass == PASS_FILL)
         gnl_dump[prev_gnl_count+1].next = (void*)(gnl_count+1);
-      }
+
       prev_gnl_count = gnl_count;
       dump_graph_node(outfile, &gl->next->node, depth+1, pass);
       gl = gl->next;
     }
-    if (pass == PASS_FILL) {
+    if (pass == PASS_FILL)
       gnl_dump[prev_gnl_count+1].next = 0;
-    }
-  } else {
+  }
+  else {
     if (pass == PASS_FILL) {
       assert(0 && "Strange bug here");
       /* This may be where we crash if we're missing an anchor color
        * in the database */
-      if (0) fprintf(outfile, "  gnl[%d].node.next_list = 0;\n", gnl_count);
+      if (0)
+	fprintf(outfile, "  gnl[%d].node.next_list = 0;\n", gnl_count);
     }
   }
 
@@ -1906,34 +1917,36 @@ tree_write_patterns(FILE *outfile, char *name)
 
   fprintf(outfile, "struct graph_node_list gnl_%s[] =\n{\n", name);
   for (i = 0; i < gnl_count+1; i++) {
-    fprintf(outfile, "  { {(void*)%d, %d, %d, %d, (void*)%d}, (void*)%d}, /*#%d*/\n",
-                     (int)gnl_dump[i].node.matches,
-                     gnl_dump[i].node.att,
-                     gnl_dump[i].node.x,
-                     gnl_dump[i].node.y,
-                     (int)gnl_dump[i].node.next_list,
-                     (int)gnl_dump[i].next,
-                     i);
+    fprintf(outfile,
+	    "  { {(void*)%d, %d, %d, %d, (void*)%d}, (void*)%d}, /*#%d*/\n",
+	    (int)gnl_dump[i].node.matches,
+	    gnl_dump[i].node.att,
+	    gnl_dump[i].node.x,
+	    gnl_dump[i].node.y,
+	    (int)gnl_dump[i].node.next_list,
+	    (int)gnl_dump[i].next,
+	    i);
   }
   fprintf(outfile, "};\n\n");
 
   fprintf(outfile, "struct match_node matches_%s[] = \n{\n", name);
   for (i = 0; i < mn_count; i++) {
     fprintf(outfile, "  {%d, %d, (void*)%d}, /*#%d*/\n",
-                     matches_dump[i].patnum,
-                     matches_dump[i].orientation,
-                     (int)matches_dump[i].next,
-                     i);
+	    matches_dump[i].patnum,
+	    matches_dump[i].orientation,
+	    (int) matches_dump[i].next,
+	    i);
   }
   fprintf(outfile, "};\n\n");
 
-  fprintf(outfile, "void\ninit_graph_%s(void) {\n", name);
+  fprintf(outfile, "void\ninit_graph_%s(void)\n{\n", name);
   fprintf(outfile, "  gg_assert(sizeof(gnl_%s) / sizeof(struct graph_node_list) == %d);\n", 
-                   name, gnl_count+1);
+	  name, gnl_count+1);
   fprintf(outfile, "  gg_assert(sizeof(matches_%s) / sizeof(struct match_node) == %d);\n",
-                   name, mn_count);
-  fprintf(outfile, "  tree_initialize_pointers(gnl_%s, matches_%s, %d, %d);\n",
-    name, name, gnl_count+1, mn_count+1);
+	  name, mn_count);
+  fprintf(outfile,
+	  "  tree_initialize_pointers(gnl_%s, matches_%s, %d, %d);\n",
+	  name, name, gnl_count+1, mn_count+1);
   fprintf(outfile, "}\n\n");
 }
 
@@ -1944,14 +1957,13 @@ write_patterns(FILE *outfile, char *name)
 {
   int j;
 
-  if (tree_output) {
+  if (tree_output)
     tree_write_patterns(outfile, name);
-  } else {
-    fprintf(outfile, "\nvoid\ninit_graph_%s(void) { \n"
-                     "  /* nothing to do - tree option not compiled */\n"
-                     "}\n\n", name);
-  }
-
+  else
+    fprintf(outfile, "\nvoid\ninit_graph_%s(void)\n{\n"
+	    "  /* nothing to do - tree option not compiled */\n"
+	    "}\n\n", name);
+  
 
   /* Write out the patterns. */
   if (fullboard)
@@ -1964,7 +1976,7 @@ write_patterns(FILE *outfile, char *name)
 
     if (fullboard) {
       fprintf(outfile, "  {%s%d,%d,\"%s\",%2d,%2d,%f},\n", name, j, p->patlen,
-	     pattern_names[j], p->movei, p->movej, p->value);
+	      pattern_names[j], p->movei, p->movej, p->value);
       continue;
     }
     
@@ -1976,16 +1988,16 @@ write_patterns(FILE *outfile, char *name)
      */
     
     fprintf(outfile, "  {%s%d,%d,%d, \"%s\",%d,%d,%d,%d,%d,%d,0x%x,%d,%d",
-	     name, j,
-	     p->patlen,
-	     p->trfno,
-	     pattern_names[j],
-	     p->mini, p->minj,
-	     p->maxi, p->maxj,
-	     p->maxi - p->mini,   /* height */
-	     p->maxj - p->minj,   /* width  */
-	     p->edge_constraints,
-	     p->movei, p->movej);
+	    name, j,
+	    p->patlen,
+	    p->trfno,
+	    pattern_names[j],
+	    p->mini, p->minj,
+	    p->maxi, p->maxj,
+	    p->maxi - p->mini,   /* height */
+	    p->maxj - p->minj,   /* width  */
+	    p->edge_constraints,
+	    p->movei, p->movej);
 
 
 #if GRID_OPT
@@ -2003,16 +2015,16 @@ write_patterns(FILE *outfile, char *name)
 #endif
 
     fprintf(outfile, ", 0x%x,%f,%f,%f,%f,%f,%f,%f,%d,%s,",
-	   p->class,
-	   p->value,
-	   p->maxvalue,
-	   p->minterritory,
-	   p->maxterritory,
-	   p->shape,
-	   p->followup,
-	   p->reverse_followup,
-	   p->autohelper_flag,
-	   helper_fn_names[j]);
+	    p->class,
+	    p->value,
+	    p->maxvalue,
+	    p->minterritory,
+	    p->maxterritory,
+	    p->shape,
+	    p->followup,
+	    p->reverse_followup,
+	    p->autohelper_flag,
+	    helper_fn_names[j]);
     if (p->autohelper)
       fprintf(outfile, "autohelper%s%d", name, j);
     else
@@ -2040,7 +2052,7 @@ write_patterns(FILE *outfile, char *name)
   fprintf(outfile, ",0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,NULL,NULL,0,0.0");
 #if PROFILE_PATTERNS
   fprintf(outfile, ",0,0");
-    fprintf(outfile, ",0");
+  fprintf(outfile, ",0");
 #endif
   fprintf(outfile, "}\n};\n");
 }

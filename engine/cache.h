@@ -106,7 +106,7 @@ typedef struct read_result_t {
        } while (0)
 
 /* Get parts of a Read_result constituting the result of a search. */
-#define rr_get_status(rr)      (((rr).data2 >> 28) & 0x07)
+#define rr_get_status(rr)      (((rr).data2 >> 28) & 0x03)
 #define rr_get_result1(rr)     (((rr).data2 >> 24) & 0x0f)
 #define rr_get_result2(rr)     (((rr).data2 >> 20) & 0x0f)
 #define rr_get_move(rr)        (((rr).data2 >> 10) & 0x3ff)

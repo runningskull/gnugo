@@ -508,8 +508,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, DEAD);
     }
     /* I am alive */
-    if (probable_mina >= 2 ||
-	(stackp > 2 && owl_escape_route(owla) >= 5)) {
+    if (probable_mina >= 2
+	|| (stackp > 2 && owl_escape_route(owla) >= 5)) {
       if (probable_maxb < 2) {
 	/* you are already dead */
 	*resulta = ALIVE;
@@ -788,11 +788,11 @@ do_owl_analyze_semeai(int apos, int bpos,
 	int pos = POS(m, n);
 	if (owlb->goal[pos] && board[pos] == other) {
 	  origin = find_origin(pos);
-	  if (!ma[origin] &&
-	      ((ON_BOARD(SOUTH(pos)) && owla->goal[SOUTH(pos)])
-	       || (ON_BOARD(WEST(pos)) && owla->goal[WEST(pos)])
-	       || (ON_BOARD(NORTH(pos)) && owla->goal[NORTH(pos)])
-	       || (ON_BOARD(EAST(pos)) && owla->goal[EAST(pos)]))) {
+	  if (!ma[origin]
+	      && ((ON_BOARD(SOUTH(pos)) && owla->goal[SOUTH(pos)])
+		  || (ON_BOARD(WEST(pos)) && owla->goal[WEST(pos)])
+		  || (ON_BOARD(NORTH(pos)) && owla->goal[NORTH(pos)])
+		  || (ON_BOARD(EAST(pos)) && owla->goal[EAST(pos)]))) {
 	    if (countlib(origin) < 3 && attack(origin, &upos)) {
 	      *resulta = ALIVE;
 	      *resultb = DEAD;
@@ -1920,8 +1920,8 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
     
-    if (true_genus >= 2 ||
-	(true_genus == 1 && probable_min >= 4)
+    if (true_genus >= 2
+	|| (true_genus == 1 && probable_min >= 4)
 	|| (stackp > owl_distrust_depth
 	    && probable_min >= 2
 	    && !matches_found)) {
@@ -2597,8 +2597,8 @@ owl_determine_life(struct local_owl_data *owl,
    */
   {
     for (lunch = 0; (lunch < MAX_LUNCHES); lunch++)
-      if (owl->lunch[lunch] != NO_MOVE &&
-	  owl->lunch_defense_point[lunch] != NO_MOVE) {
+      if (owl->lunch[lunch] != NO_MOVE
+	  && owl->lunch_defense_point[lunch] != NO_MOVE) {
 	int value = 0;
 	int lunch_min;
 	int lunch_probable;
@@ -3610,7 +3610,7 @@ owl_confirm_safety(int move, int target, int *defense_point)
   int tactical_nodes;
   int origin;
   int defense = 0;
-  double start = 0.;
+  double start = 0.0;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
@@ -3680,7 +3680,7 @@ owl_does_attack(int move, int target)
   int tactical_nodes;
   int origin;
   int dcode;
-  double start = 0.;
+  double start = 0.0;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
@@ -3761,7 +3761,7 @@ owl_connection_defends(int move, int target1, int target2)
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
-  double start = 0.;
+  double start = 0.0;
   static struct local_owl_data owl;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
@@ -4113,7 +4113,7 @@ owl_substantial(int str)
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
   int result;
-  double start = 0.;
+  double start = 0.0;
   static struct local_owl_data owl;
 
   if (debug & DEBUG_OWL_PERFORMANCE)

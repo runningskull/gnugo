@@ -1012,22 +1012,19 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 #if EXPERIMENTAL_READING
   if (defend_by_pattern) {
     dcode = do_defend_pat(str, &xpos, komaster, kom_pos);
-  } else {
-#else
-  if (0) {
-    ;
-  } else {
-#endif /*EXPERIMENTAL_READING*/
-
-    if (liberties == 1)
-      dcode = defend1(str, &xpos, komaster, kom_pos);
-    else if (liberties == 2)
-      dcode = defend2(str, &xpos, komaster, kom_pos);
-    else if (liberties == 3)
-      dcode = defend3(str, &xpos, komaster, kom_pos);
-    else if (liberties == 4)
-      dcode = defend4(str, &xpos, komaster, kom_pos);
+    /* We set liberties to 0 to pass over the non-pattern code below. */
+    liberties = 0;
   }
+#endif
+
+  if (liberties == 1)
+    dcode = defend1(str, &xpos, komaster, kom_pos);
+  else if (liberties == 2)
+    dcode = defend2(str, &xpos, komaster, kom_pos);
+  else if (liberties == 3)
+    dcode = defend3(str, &xpos, komaster, kom_pos);
+  else if (liberties == 4)
+    dcode = defend4(str, &xpos, komaster, kom_pos);
 
   if (dcode) {
     RTRACE("saving move for %1m found at %1m!\n", str, xpos);
@@ -2708,18 +2705,17 @@ r_scan_moves(int move, int value, struct reading_move_data *moves)
 {
   int k;
   for (k = 0; k < MAX_READING_MOVES; k++) {
-    if (moves[k].pos) {
-      if (moves[k].pos == move) {
-	if (value <= moves[k].value) {
-	  return 1;
-	} else {
-	  break;
-        }
-      }
-    } else {
+    if (moves[k].pos == NO_MOVE)
       break;
+    
+    if (moves[k].pos == move) {
+      if (value <= moves[k].value)
+	return 1;
+      else
+	break;
     }
   }
+  
   return 0;
 }
 
@@ -2743,13 +2739,16 @@ r_push_move(int move, int value, const char * name,
       int j = k;
       while (moves[j].pos != NO_MOVE && moves[j].pos != move) 
 	j++;
+      
       if (moves[j].pos != NO_MOVE)
 	j--;
+      
       for (; j >= k; j--) {
 	moves[j+1].pos = moves[j].pos;
 	moves[j+1].value = moves[j].value;
 	moves[j+1].name = moves[j].name;
       }
+      
       moves[k].pos = move;
       moves[k].value = value;
       moves[k].name = name;
@@ -2776,9 +2775,8 @@ reading_callback(int m, int n, int color,
     gprintf("  Pattern %s called back at %1m (variation %d) orientation %d.\n", 
             pattern->name, move, count_variations, ll);
 
-  if (r_scan_moves(move, value, moves)) {
+  if (r_scan_moves(move, value, moves))
     return;
-  }
 
   if (0 && !strcmp("none3", pattern->name))
     gprintf("Pattern %s contraint to be checked at %1m (variation %d) orientation %d.\n", 
@@ -2795,7 +2793,7 @@ reading_callback(int m, int n, int color,
    * pattern-> value.
    */
   if (pattern->autohelper_flag & HAVE_ACTION)
-    pattern->autohelper(pattern, ll, move, color,1);
+    pattern->autohelper(pattern, ll, move, color, 1);
 
   /* Note: The reading code allows helper to change pattern->value */
   value = pattern->value;
@@ -2806,9 +2804,8 @@ reading_callback(int m, int n, int color,
     gprintf("  Pattern %s MATCHED  at %1m (variation %d) orientation %d.\n", 
             pattern->name, move, count_variations, ll);
 
-  if (r_scan_moves(move, value, moves)) {
+  if (r_scan_moves(move, value, moves))
     return;
-  }
 
   r_push_move(move, value, pattern->name, moves);
 
@@ -2826,9 +2823,8 @@ set_goal_worm(int str, int value, char goal[BOARDMAX])
   goal[str] = value;
   for (k = 0; k < 4; k++) {
     int pos = str + delta[k];
-    if (board[pos] == color) {
+    if (board[pos] == color)
       set_goal_worm(pos, value, goal);
-    }
   }
 }
 
@@ -2846,18 +2842,21 @@ set_larger_goal_worm(int str, char goal[BOARDMAX])
     int pos = str + delta[k];
     if (board[pos] == color) {
       set_larger_goal_worm(pos, goal);
-    } else if (board[pos] == OTHER_COLOR(color) 
-               && (stackp < (depth+4) || countlib(pos) <= 2)) {
+    }
+    else if (board[pos] == OTHER_COLOR(color) 
+	     && (stackp < (depth+4) || countlib(pos) <= 2)) {
       set_goal_worm(pos, 2, goal);
-    } else if (stackp < (12+2) && board[pos] == EMPTY) {
+    }
+    else if (stackp < (12+2) && board[pos] == EMPTY) {
       int j;
       for (j = 0; j < 4; j++) {
 	int jpos = pos + delta[j];
 	if (board[jpos] == color) {
-	  set_goal_worm(jpos,3,goal);
-        } else if (board[jpos] == OTHER_COLOR(color)) {
+	  set_goal_worm(jpos, 3, goal);
+        }
+	else if (board[jpos] == OTHER_COLOR(color)) {
           /* Added for defense - not needed for attack (?) */
-	  set_goal_worm(jpos,2,goal);
+	  set_goal_worm(jpos, 2, goal);
         }
       }
     }
@@ -2901,31 +2900,29 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
   ASSERT1(move != NULL, str);
 
   if (reading_node_counter - nodes_when_called > 15000) {
-    SGFTRACE(0,0, "Way too many variations");
+    SGFTRACE(0, 0, "Way too many variations");
     return 0;
   }
 
   libs = countlib(str);
 
   if (stackp > depth && libs>2) {
-    SGFTRACE(0,0,"Too deep");
+    SGFTRACE(0, 0, "Too deep");
     return 0;
   }
 
   if (libs == 1) {
-    if (is_attack) {
+    if (is_attack)
       return attack1(str, move, komaster, kom_pos);
-    } else {
+    else
       return defend1(str, move, komaster, kom_pos);
-    }
   }
 
   if (libs == 4) {
-    if (is_attack) {
+    if (is_attack)
       return attack4(str, move, komaster, kom_pos);
-    } else {
+    else
       return defend4(str, move, komaster, kom_pos);
-    }
   }
 
   memset(goal, 0, BOARDMAX);
@@ -2939,11 +2936,13 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
   }
   rgoal = goal;
   goallib = libs;
-  if (is_attack) {
-    matchpat_goal_anchor(reading_callback, OTHER_COLOR(color), &read_attack_db, moves, goal, 1);
-  } else {
-    matchpat_goal_anchor(reading_callback, OTHER_COLOR(color), &read_defend_db, moves, goal, 1);
-  }
+  if (is_attack)
+    matchpat_goal_anchor(reading_callback, OTHER_COLOR(color),
+			 &read_attack_db, moves, goal, 1);
+  else
+    matchpat_goal_anchor(reading_callback, OTHER_COLOR(color),
+			 &read_defend_db, moves, goal, 1);
+
   if (verbose > 1) {
     TRACE("Moves (variation %d): ", count_variations);
     for (k = 0; k < MAX_READING_MOVES; k++) {
@@ -2958,10 +2957,13 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
     char buf[500];
     char *pos;
     int chars;
-    gg_snprintf(buf, 500, "Move order for %s: %n", read_function_name, &chars);
+    gg_snprintf(buf, 500, "Move order for %s: %n",
+		read_function_name, &chars);
+    
     pos = buf + chars;
     for (k = 0; k < MAX_READING_MOVES; k++) {
-      if (!moves[k].pos) { break; }
+      if (moves[k].pos == NO_MOVE)
+	break;
       sprintf(pos, "%s (%s-%d) %n", location_to_string(moves[k].pos),
               moves[k].name, moves[k].value, &chars);
       pos += chars;
@@ -2971,15 +2973,15 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 
   for (k = 0; MAX_READING_MOVES; k++) {
     char namebuf[128];
-    if (!moves[k].pos) {
+    if (moves[k].pos == NO_MOVE)
       break;
-    }
+
     gg_snprintf(namebuf, 128, "%s(%d)", moves[k].name, moves[k].value);
     if (k > 3 + skipped && k > 12 - stackp + skipped) {
       if (sgf_dumptree) {
         if (trymove(moves[k].pos, next_color, namebuf, str, 0, 0)) {
           sgftreeAddComment(sgf_dumptree, NULL, 
-                  "move trimmed to reduce variations");
+			    "move trimmed to reduce variations");
           popgo();
         }
       }
@@ -2994,35 +2996,37 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
       int other_tactic;
       ASSERT1(countlib(str) >= 1, str);
       RTRACE("%sing %1m at %1m (Pattern %s)\n", attack_defend_str, str, 
-	    moves[k].pos, moves[k].name);
+	     moves[k].pos, moves[k].name);
       if (sgf_dumptree) {
         char buf[500];
         sprintf(buf, "tactical_pat komaster: %d %s  new_komaster: %d %s ko_move: %d", 
-          komaster, location_to_string(kom_pos), new_komaster, 
-          location_to_string(new_kom_pos), ko_move);
+		komaster, location_to_string(kom_pos), new_komaster, 
+		location_to_string(new_kom_pos), ko_move);
         sgftreeAddComment(sgf_dumptree, NULL, buf);
       }
+      
       if (stackp > 100) {
         popgo();
         gprintf("komaster: %d %1m  new_komaster: %d %1m ko_move: %d\n", 
-          komaster, kom_pos, new_komaster, new_kom_pos, ko_move);
+		komaster, kom_pos, new_komaster, new_kom_pos, ko_move);
         continue;  /* Short circuit */
       }
-      if (is_attack) {
+      
+      if (is_attack)
         other_tactic = do_find_defense(str, 0, new_komaster, new_kom_pos);
-      } else {
+      else
         other_tactic = do_attack(str, 0, new_komaster, new_kom_pos);
-      }
+
       if (is_attack && other_tactic != WIN) {
         int same_tactic;
         /* HINT: add 1 || here to generate stack errors in reading:60 
          *    (not positive of problem number) */
         if (stackp < depth + 6 || countlib(str) <= 2) {
-          if (is_attack) {
+          if (is_attack)
      	    same_tactic = do_attack(str, 0, new_komaster, new_kom_pos);
-          } else {
+	  else
      	    same_tactic = do_find_defense(str, 0, new_komaster, new_kom_pos);
-          }
+
 	  if (!ko_move && other_tactic == 0 && same_tactic != 0) {
 	    *move = moves[k].pos;
 	    popgo();
@@ -3030,11 +3034,12 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 		     "tactic successful - no defense, ko sub-attack");
 	    return WIN;
 	  }
-        } else {
+        }
+	else {
           same_tactic = 0;
           SGFTRACE(moves[k].pos, 0, "Too deep, aborting attack");
         }
-	/*This defense assignment may be incorrect.*/
+	/* This defense assignment may be incorrect. */
 	other_tactic = gg_max(other_tactic, WIN - same_tactic);
       }
       if (!other_tactic) {
@@ -3045,28 +3050,32 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 	    best_move = moves[k].pos;
 	    best_other_tactic = other_tactic ;
 	  }
-	} else {
+	}
+	else {
 	  popgo();
           /* FIXME: add explicit attack/defense verbage here */
 	  SGFTRACE(moves[k].pos, WIN, "tactic successful - no counter.");
 	  *move = moves[k].pos;
 	  return WIN;
 	}
-      } else if (other_tactic < best_other_tactic) {
+      }
+      else if (other_tactic < best_other_tactic) {
 	/* May need to check ko_move in this case, too */
 	best_move = moves[k].pos;
 	best_other_tactic = other_tactic;
       }
       popgo();
-    } else {
-      /*FIXME: Add this back to allow up to 3 legal moves when deep*/
-      /*Current implementation counts illegal moves.*/
-      if (0) skipped++;
+    }
+    else {
+      /* FIXME: Add this back to allow up to 3 legal moves when deep. */
+      /* Current implementation counts illegal moves. */
+      if (0)
+	skipped++;
     }
   }
 
   if (!is_attack) {
-    /* force attacker to capture - i.e. might be seki. */
+    /* Force attacker to capture - i.e. might be seki. */
     int attack;
     attack = do_attack(str, 0, new_komaster, new_kom_pos);
     if (attack < best_other_tactic) {
@@ -3138,24 +3147,21 @@ do_attack(int str, int *move, int komaster, int kom_pos)
 #if EXPERIMENTAL_READING
   if (attack_by_pattern) {
     result = do_attack_pat(str, &xpos, komaster, kom_pos);
-  } else {
-#else
-  if (0) {
-    ;
-  } else {
-#endif /*EXPERIMENTAL_READING*/
-
-    /* Treat the attack differently depending on how many liberties the 
-       string at (str) has. */
-    if (libs == 1)
-      result = attack1(str, &xpos, komaster, kom_pos);
-    else if (libs == 2)
-      result = attack2(str, &xpos, komaster, kom_pos);
-    else if (libs == 3)
-      result = attack3(str, &xpos, komaster, kom_pos);
-    else if (libs == 4)
-      result = attack4(str, &xpos, komaster, kom_pos);
+    /* Set libs to 0 to pass over the non-pattern code below. */
+    libs = 0;
   }
+#endif
+
+  /* Treat the attack differently depending on how many liberties the 
+     string at (str) has. */
+  if (libs == 1)
+    result = attack1(str, &xpos, komaster, kom_pos);
+  else if (libs == 2)
+    result = attack2(str, &xpos, komaster, kom_pos);
+  else if (libs == 3)
+    result = attack3(str, &xpos, komaster, kom_pos);
+  else if (libs == 4)
+    result = attack4(str, &xpos, komaster, kom_pos);
 
 
   ASSERT1(result >= 0 && result <= WIN, str);
@@ -6190,8 +6196,8 @@ search_persistent_reading_cache(int routine, int str, int *result, int *move)
       else
 	result2 = do_find_defense(str, &move2, EMPTY, 0);
       
-      if (result2 != entry->result ||
-	  (result2 != 0 && (move2 != entry->move))) {
+      if (result2 != entry->result
+	  || (result2 != 0 && (move2 != entry->move))) {
 	gprintf("%oIncorrect cached result %d %1m, should be %d %1m\n",
 		entry->result, entry->move, result2, move2);
 	print_persistent_reading_cache_entry(k);

@@ -426,7 +426,8 @@ routine_to_string(int routine)
     return "CONNECT";
   else if (routine == DISCONNECT)
     return "DISCONNECT";
-  else return "ERROR";
+  else
+    return "ERROR";
 }
 
 /* Convert a read result to a string */

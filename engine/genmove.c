@@ -38,10 +38,10 @@
 static int get_level(int *level);
 static int do_genmove(int *move, int color, float pure_threat_value);
 
-static double slowest_time = 0.;
+static double slowest_time = 0.0;
 static int    slowest_move = NO_MOVE;
 static int    slowest_movenum = 0;
-static double total_time = 0.;
+static double total_time = 0.0;
 
 /* Position numbers for which various examinations were last made. */
 static int worms_examined = -1;
@@ -387,7 +387,7 @@ do_genmove(int *move, int color, float pure_threat_value)
       score = upper_bound;
   }
   else
-    score = 0.;
+    score = 0.0;
 
   /*
    * Print some of the information if the user wants to.
@@ -450,7 +450,7 @@ do_genmove(int *move, int color, float pure_threat_value)
    * UNKNOWN. This may generate a move.
    */
   if (val < 10.0) {
-    if (revise_thrashing_dragon(color, 15.)) {
+    if (revise_thrashing_dragon(color, 15.0)) {
       shapes(color);
       endgame_shapes(color);
       if (review_move_reasons(move, &val, color, pure_threat_value, score)) {
@@ -476,7 +476,7 @@ do_genmove(int *move, int color, float pure_threat_value)
    * run shapes and endgame_shapes again. This may turn up a move.
    */
   if (val < 0.0) {
-    if (revise_thrashing_dragon(color, 0.)
+    if (revise_thrashing_dragon(color, 0.0)
 	|| revise_semeai(color)) {
       shapes(color);
       endgame_shapes(color);
@@ -508,9 +508,9 @@ do_genmove(int *move, int color, float pure_threat_value)
       && !doing_scoring
       && (play_out_aftermath 
 	  || capture_all_dead 
-	  || (thrashing_dragon &&
-	      ((color == BLACK && score < -15.)
-	       || (color == WHITE && score > 15.))))
+	  || (thrashing_dragon
+	      && ((color == BLACK && score < -15.0)
+		  || (color == WHITE && score > 15.0))))
       && aftermath_genmove(move, color, NULL, 0) > 0) {
     ASSERT1(is_legal(*move, color), *move);
     val = 1.0;
