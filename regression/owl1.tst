@@ -38,6 +38,13 @@ loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 192
 269 owl_defend D11
 #? [1 E9]*
 
+loadsgf games/owl37.sgf
+270 owl_attack A4
+#? [1 A5]*
+
+271 owl_defend A4
+#? [1 A5]*
+
 
 ########### end of tests #####################
 

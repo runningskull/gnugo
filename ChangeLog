@@ -20,7 +20,7 @@
 - placehand() moved from genmove.c to handicap.c
 - bug fix in adjusted_worm_attack_value()
 - FIXME added regarding several EITHER_MOVE reasons
-- revised tests
+- revised tests, many new tests
 
 3.3.6 released August 13, 2002
 

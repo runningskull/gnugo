@@ -87,6 +87,22 @@ loadsgf games/handtalk/handtalk23.sgf 186
 18 gg_genmove white
 #? [S5]
 
+# GNU Go played J8. Make sure it never forgets to do so!
+loadsgf games/handtalk/handtalk1.sgf 69
+19 gg_genmove black 
+#? [J8]
+
+loadsgf games/handtalk/handtalk2.sgf 79
+20 gg_genmove black 
+#? [N18]*
+
+#CATEGORY=BLUNDER
+# (Incorrectly rejected move)
+loadsgf games/handtalk/handtalk2.sgf 137
+21 gg_genmove black 
+#? [R6]*
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
