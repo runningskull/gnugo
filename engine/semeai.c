@@ -780,7 +780,7 @@ small_semeai()
 void
 small_semeai_analyzer(int i, int j, int m, int n)
 {
-  int ai, aj;
+  int apos;
   int color = BOARD(i, j);
   int other = BOARD(m, n);
 
@@ -793,14 +793,14 @@ small_semeai_analyzer(int i, int j, int m, int n)
   /* FIXME: There are many more possibilities to consider */
   if (trymove(worm[i][j].attack_point, other,
 	      "small_semeai_analyzer", POS(i, j), EMPTY, 0)) {
-    int acode = attack(m, n, &ai, &aj);
+    int acode = attack(POS(m, n), &apos);
     if (acode == 0) {
       popgo();
       change_defense(POS(m, n), worm[i][j].attack_point, 1);
     }
-    else if (trymove2(ai, aj, color, "small_semeai_analyzer", i, j,
-		     EMPTY, -1, -1)) {
-      if (attack(i, j, NULL, NULL) == 0) {
+    else if (trymove(apos, color, "small_semeai_analyzer", POS(i, j),
+		     EMPTY, NO_MOVE)) {
+      if (attack(POS(i, j), NULL) == 0) {
 	popgo();
 	popgo();
 	change_attack(POS(i, j), 0, 0);
@@ -817,14 +817,14 @@ small_semeai_analyzer(int i, int j, int m, int n)
   
   if (trymove(worm[m][n].attack_point, color, 
 	      "small_semeai_analyzer", POS(m, n), EMPTY, 0)) {
-    int acode = attack(i, j, &ai, &aj);
+    int acode = attack(POS(i, j), &apos);
     if (acode == 0) {
       popgo();
       change_defense(POS(i, j), worm[m][n].attack_point, 1);
     }
-    else if (trymove2(ai, aj, other, "small_semeai_analyzer", m, n,
-		     EMPTY, -1, -1)) {
-      if (attack(m, n, NULL, NULL) == 0) {
+    else if (trymove(apos, other, "small_semeai_analyzer", POS(m, n),
+		     EMPTY, NO_MOVE)) {
+      if (attack(POS(m, n), NULL) == 0) {
 	popgo();
 	popgo();
 	change_attack(POS(m, n), 0, 0);

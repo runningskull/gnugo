@@ -1,14 +1,14 @@
 #terrible connection mistake.
 loadsgf games/unsorted_01.sgf 28
 1 gg_genmove white
-#? [G5]*
+#? [G5]
 
 #probably a screwed up fuseki library!
 loadsgf games/unsorted_02.sgf
 2 gg_genmove white
 #? [!PASS]*
 
-#very simple liberty counting blunder.
+# underlying reading problem
 loadsgf games/unsorted_03.sgf 28
 3 gg_genmove white
 #? [!E3]*
@@ -26,7 +26,7 @@ loadsgf games/unsorted_05.sgf 6
 #locally B9 is terrible.  There are other big moves on the board.
 loadsgf games/unsorted_06.sgf 22
 6 gg_genmove white
-#? [B7|C6|F5]*
+#? [B7|C6|F5]
 
 #B5 is certainly better than C5 here.  This is a terrible
 #game for white, but it's hard to narrow down the obvious
@@ -38,7 +38,7 @@ loadsgf games/unsorted_07.sgf 32
 #Pattern missing here?  B8 is almost always better than B9.
 loadsgf games/unsorted_08.sgf 24
 8 gg_genmove white
-#? [!B9]*
+#? [!B9]
 
 #E5 (or some defence of D4 worm) is necessary.
 loadsgf games/unsorted_09.sgf
@@ -48,7 +48,7 @@ loadsgf games/unsorted_09.sgf
 #This is nearly trivial, it would seem!
 loadsgf games/unsorted_10.sgf
 10 gg_genmove white
-#? [E6]*
+#? [E6]
 
 #Yikes, gnugo can't play into here.  See also the next problem.
 loadsgf games/unsorted_11.sgf

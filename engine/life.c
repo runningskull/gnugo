@@ -107,11 +107,11 @@ static int boundary_size;
 
 
 static int minimize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
-			 struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+			 struct half_eye_data heye[BOARDMAX],
 			 int *min, int *ko_out, int ko_in, int ko_master,
 			 int *attack_point, int cutoff_eyes, int cutoff_ko);
 static int maximize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
-			 struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+			 struct half_eye_data heye[BOARDMAX],
 			 int *max, int *ko_out, int ko_in, int ko_master,
 			 int *defense_point, int cutoff_eyes, int cutoff_ko);
 static void life_showboard(void);
@@ -349,7 +349,7 @@ check_vulnerability(int i, int j, int m, int n)
 	       EMPTY, -1, -1))
     return;
 
-  if (BOARD(m, n) && attack(m, n, NULL, NULL)) {
+  if (BOARD(m, n) && attack(POS(m, n), NULL)) {
     int liberties;
     int libs[2];
     /* Vulnerability found. First pick up its liberties. */
@@ -385,7 +385,7 @@ check_vulnerability(int i, int j, int m, int n)
 
 static void
 print_eyespace(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
-	       struct half_eye_data heye[MAX_BOARD][MAX_BOARD])
+	       struct half_eye_data heye[BOARDMAX])
 {
   int m, n;
   int k;
@@ -419,12 +419,12 @@ print_eyespace(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
 	if (BOARD(m, n) == EMPTY) {
 	  if (eyedata[m][n].marginal)
 	    gprintf("%o!");
-	  else if (halfeye(heye, m, n))
+	  else if (is_halfeye(heye, POS(m, n)))
 	    gprintf("%oh");
 	  else
 	    gprintf("%o.");
 	}
-	else if (halfeye(heye, m, n))
+	else if (is_halfeye(heye, POS(m, n)))
 	  gprintf("%oH");
 	else
 	  gprintf("%oX");
@@ -439,7 +439,7 @@ print_eyespace(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
 
 static int
 prepare_eyespace(int m, int n, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
-		 struct half_eye_data heye[MAX_BOARD][MAX_BOARD])
+		 struct half_eye_data heye[BOARDMAX])
 {
   int i, j;
   int k;
@@ -461,11 +461,13 @@ prepare_eyespace(int m, int n, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
     for (j = 0; j < board_size; ++j) {
       if (eyedata[i][j].origin == POS(m, n)) {
 	include_eyepoint(i, j, eyedata[i][j].marginal == 0, 0);
-	if (halfeye(heye, i, j)) {
-	  for (k=0; k<heye[i][j].num_attacks; k++)
-	    include_eyepoint(heye[i][j].ai[k], heye[i][j].aj[k], 0, 0);
-	  for (k=0; k<heye[i][j].num_defends; k++)
-	    include_eyepoint(heye[i][j].di[k], heye[i][j].dj[k], 0, 0);
+	if (is_halfeye(heye, POS(i, j))) {
+	  for (k=0; k<heye[POS(i, j)].num_attacks; k++)
+	    include_eyepoint(I(heye[POS(i, j)].attack_point[k]),
+			     J(heye[POS(i, j)].attack_point[k]), 0, 0);
+	  for (k=0; k<heye[POS(i, j)].num_defends; k++)
+	    include_eyepoint(I(heye[POS(i, j)].defense_point[k]),
+			     J(heye[POS(i, j)].defense_point[k]), 0, 0);
 	}
       }
     }
@@ -594,7 +596,7 @@ recognize_eye2(int m, int  n,
 	       int *attacki, int *attackj, int *defendi, int *defendj,
 	       int *max, int *min, 
 	       struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
-	       struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+	       struct half_eye_data heye[BOARDMAX],
  	       int add_moves, int color)
 {
   int result1a, result1b, result2a, result2b;
@@ -713,28 +715,28 @@ is_small_eye(int i, int j)
  * topologically false and not a marginal eye point.
  */
 static int
-is_true_eye(struct half_eye_data heye[MAX_BOARD][MAX_BOARD], int i, int j)
+is_true_eye(struct half_eye_data heye[BOARDMAX], int i, int j)
 {
   int other = OTHER_COLOR(eye_color);
   
   /* False eyes and other marginal eye points do not yield eyes. */
-  if (heye[i][j].type == FALSE_EYE)
+  if (heye[POS(i, j)].type == FALSE_EYE)
     return 0;
   
   /* If this is a halfeye, check the vital diagonals. */
-  if (halfeye(heye, i, j)) {
+  if (is_halfeye(heye, POS(i, j))) {
     int good = 0;
     int bad = 0;
     int k;
     /* This requires attack points and defense points to be identical. */
-    for (k=0; k<heye[i][j].num_attacks; k++) {
-      int ai = heye[i][j].ai[k];
-      int aj = heye[i][j].aj[k];
-      if (BOARD(ai, aj) == eye_color)
+    for (k=0; k<heye[POS(i, j)].num_attacks; k++) {
+      int apos = heye[POS(i, j)].attack_point[k];
+
+      if (board[apos] == eye_color)
 	good++;
-      else if (BOARD(ai, aj) == other)
+      else if (board[apos] == other)
 	bad++;
-      else if (is_suicide2(ai, aj, eye_color))
+      else if (is_suicide(apos, eye_color))
 	bad++;
       else
 	good++;
@@ -880,7 +882,7 @@ compare_max_eyes(int eyes1, int ko1, int eyes2, int ko2)
 
 static int
 minimize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
-	      struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+	      struct half_eye_data heye[BOARDMAX],
 	      int *min, int *ko_out, int ko_in, int ko_master,
 	      int *attack_point, int cutoff_eyes, int cutoff_ko)
 {
@@ -1089,7 +1091,7 @@ minimize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
 	/* But first we must check a restriction. */
 	if (index != MAX_EYE_SIZE
 	    && (eye_restrictions[i][j] & ATTACKER_PLAY_SAFE)
-	    && attack(i, j, NULL, NULL))
+	    && attack(POS(i, j), NULL))
 	  result = 0;
 	else
 	  result = maximize_eyes(eyedata, heye, &max1, &ko1, ko_in + is_ko,
@@ -1174,7 +1176,7 @@ minimize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
 
 static int
 maximize_eyes(struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
-	      struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+	      struct half_eye_data heye[BOARDMAX],
 	      int *max, int *ko_out, int ko_in, int ko_master,
 	      int *defense_point, int cutoff_eyes, int cutoff_ko)
 {

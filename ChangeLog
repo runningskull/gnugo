@@ -2,6 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+3.1.7 released September 24, 2001
+
+- heye[] is now stored as a 1-dimensional array
+- halfeye() is now called is_halfeye()
+- new macro for traversing all points: for_all_board()
+- atari_atari and helper functions now 1D
+- all goal functions in reading.c now 1D
+- calls to the goal functions in reading.c converted to 1D calling standards.
 - bufix in do_find_superstring()
 - bugfix in aftermath_genmove()
 - bugfix in hashdata_recalc()
@@ -23,6 +31,7 @@
 - brighter colors under VC++
 - increase BOARDSIZE by one
 - set MAX_BOARD to 19 for development versions
+- new functions readsgffilefuseki, gametreefuseki in sgfnode()
 - tuning
 - owl tuning
 - new strategy4.tst and unsorted.tst

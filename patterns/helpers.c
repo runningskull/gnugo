@@ -84,8 +84,8 @@ basic_cut_helper (ARGS)
     return 0;
 
   if (TRYMOVE(ti, tj, ccolor)) {
-    if ((attack(ti, tj, NULL, NULL) == WIN)
-	|| (attack(ci, cj, NULL, NULL) == WIN)) {
+    if ((attack(POS(ti, tj), NULL) == WIN)
+	|| (attack(POS(ci, cj), NULL) == WIN)) {
       popgo();
       return 0;
     }
@@ -221,10 +221,10 @@ throw_in_atari_helper(ARGS)
   }
   
   if (TRYMOVE(ti, tj, color)) {
-    if (!attack(ci, cj, NULL, NULL) &&
-	!(ON_BOARD2(di, dj) && attack(di, dj, NULL, NULL))) {
+    if (!attack(POS(ci, cj), NULL) &&
+	!(ON_BOARD2(di, dj) && attack(POS(di, dj), NULL))) {
       if (TRYMOVE(bi, bj, other)) {
-	if (attack(ai, aj, NULL, NULL))
+	if (attack(POS(ai, aj), NULL))
 	  success = 1;
 	popgo();
       }
@@ -381,8 +381,8 @@ cutstone2_helper (ARGS)
   dj = J(worm[ai][aj].defense_point);
 
   if (TRYMOVE(di, dj, BOARD(ai, aj))) {
-    if (!BOARD(bi, bj) || attack(bi, bj, NULL, NULL)
-	|| !BOARD(ci, cj) || attack(ci, cj, NULL, NULL)
+    if (!BOARD(bi, bj) || attack(POS(bi, bj), NULL)
+	|| !BOARD(ci, cj) || attack(POS(ci, cj), NULL)
 	|| safe_move2(ti, tj, BOARD(ai, aj)) != 0) {
       popgo();
       worm[I(worm[ai][aj].origin)][J(worm[ai][aj].origin)].cutstone2++;
@@ -424,7 +424,7 @@ edge_double_sente_helper(ARGS)
       findlib(POS(ti, tj), 1, &dpos);
       if (TRYMOVE(I(dpos), J(dpos), color)) {
 	if (TRYMOVE(bi, bj, color)) {
-	  if (BOARD(ci, cj) == EMPTY || !defend_both(ai, aj, ci, cj))
+	  if (BOARD(ci, cj) == EMPTY || !defend_both(POS(ai, aj), POS(ci, cj)))
 	    success = 1;
 	  popgo();
 	}
@@ -604,14 +604,14 @@ backfill_helper(int ai, int aj, int bi, int bj, int ci, int cj)
 {
   int color = BOARD(ci, cj);
   int other = OTHER_COLOR(color);
-  int di = -1;
-  int dj = -1;
+  int dpos  = NO_MOVE;
+
 
   if (TRYMOVE(ai, aj, color)) {
     if (TRYMOVE(bi, bj, other)) {
-      if (attack(ci, cj, NULL, NULL) && find_defense(ci, cj, &di, &dj)) {
-	set_minimum_move_value(di, dj, 0.1);
-	TRACE("%o...setting min move value of %m to 0.1\n", di, dj);
+      if (attack(POS(ci, cj), NULL) && find_defense(POS(ci, cj), &dpos)) {
+	set_minimum_move_value(I(dpos), J(dpos), 0.1);
+	TRACE("%o...setting min move value of %1m to 0.1\n", dpos);
       }
       popgo();
     }

@@ -199,9 +199,9 @@ static int reading_node_counter = 0;
  */
 
 
-/* attack(si, sj, *i, *j) determines if the string at (m, n) can be 
- * captured, and if so, (*i, *j) returns the attacking move, unless
- * (*i, *j) are null pointers. Use null pointers if you are interested
+/* attack(str, *move) determines if the string at (str) can be 
+ * captured, and if so, (*move) returns the attacking move, unless
+ * (move) is a null pointer. Use a null pointer if you are interested
  * in the result of the attack but not the attacking move itself.
  *
  * Return WIN if the attack succeeds unconditionally, 0 if it doesn't.
@@ -215,14 +215,13 @@ static int reading_node_counter = 0;
 #define MIN_NODES_TO_REPORT 1000
 
 int
-attack(int si, int sj, int *i, int *j)
+attack(int str, int *move)
 {
   int nodes_when_called = reading_node_counter;
   int result;
   int nodes;
   int origin;
-  int str = POS(si, sj);
-  int move;
+  int the_move;
 
   /* Don't even spend time looking in the cache if there are more than
    * four liberties.
@@ -231,21 +230,20 @@ attack(int si, int sj, int *i, int *j)
     return 0;
 
   origin = find_origin(str);
-  if (search_persistent_reading_cache(ATTACK, origin, &result, &move)) {
-    if (i) *i = I(move);
-    if (j) *j = J(move);
+  if (search_persistent_reading_cache(ATTACK, origin, &result, &the_move)) {
+    if (move) *move = the_move;
     return result;
   }
 
   memset(shadow, 0, sizeof(shadow));
-  result = do_attack(str, &move, EMPTY, 0);
+  result = do_attack(str, &the_move, EMPTY, 0);
   nodes = reading_node_counter - nodes_when_called;
 
   if (debug & DEBUG_READING_PERFORMANCE) {
     if (reading_node_counter - nodes_when_called >= MIN_NODES_TO_REPORT) {
       if (result != 0)
 	gprintf("%oattack %1m(%1m) = %d %1M, %d nodes ", str, origin, result,
-		move, nodes);
+		the_move, nodes);
       else
 	gprintf("%oattack %1m(%1m) = %d, %d nodes ", str, origin, result,
 		nodes);
@@ -253,19 +251,18 @@ attack(int si, int sj, int *i, int *j)
     }
   }
 
-  store_persistent_reading_cache(ATTACK, origin, result, move, nodes);
+  store_persistent_reading_cache(ATTACK, origin, result, the_move, nodes);
   
-  if (i) *i = I(move);
-  if (j) *j = J(move);
+  if (move) *move = the_move;
   return result;
 }
 
 
-/* find_defense(si, sj, *i, *j) attempts to find a move that will save
- * the string at (si, sj). It returns WIN if such a move is found, with
- * (*i, *j) the location of the saving move, unless (*i, *j) are
- * null pointers. It is not checked that tenuki defends, so this may 
- * give an erroneous answer if !attack(m,n).
+/* find_defense(str, *move) attempts to find a move that will save
+ * the string at (str). It returns WIN if such a move is found, with
+ * (*move) the location of the saving move, unless (move) is a
+ * null pointer. It is not checked that tenuki defends, so this may 
+ * give an erroneous answer if !attack(str).
  * 
  * Returns KO_A or KO_B if the result depends on ko. Returns KO_A if the
  * string can be defended provided the defender is willing to ignore
@@ -274,40 +271,38 @@ attack(int si, int sj, int *i, int *j)
  */
 
 int 
-find_defense(int si, int sj, int *i, int *j)
+find_defense(int str, int *move)
 {
   int nodes_when_called = reading_node_counter;
   int result;
   int nodes;
   int origin;
-  int move;
-  int str = POS(si, sj);
+  int the_move;
 
   /* Don't even spend time looking in the cache if there are more than
    * four liberties.
    */
   if (countlib(str) > 4) {
-    if (i) *i = -1;
-    if (j) *j = -1;
+    if (move) *move = NO_MOVE;
     return WIN;
   }
 
   origin = find_origin(str);
-  if (search_persistent_reading_cache(FIND_DEFENSE, origin, &result, &move)) {
-    if (i) *i = I(move);
-    if (j) *j = J(move);
+  if (search_persistent_reading_cache(FIND_DEFENSE, origin, 
+				      &result, &the_move)) {
+    if (move) *move = the_move;
     return result;
   }
 
   memset(shadow, 0, sizeof(shadow));
-  result = do_find_defense(str, &move, EMPTY, 0);
+  result = do_find_defense(str, &the_move, EMPTY, 0);
   nodes = reading_node_counter - nodes_when_called;
 
   if (debug & DEBUG_READING_PERFORMANCE) {
     if (reading_node_counter - nodes_when_called >= MIN_NODES_TO_REPORT) {
       if (result != 0)
 	gprintf("%odefend %1m(%1m) = %d %1M, %d nodes ", str, origin, result,
-		move, nodes);
+		the_move, nodes);
       else
 	gprintf("%odefend %1m(%1m) = %d, %d nodes ", str, origin, result,
 		nodes);
@@ -315,67 +310,67 @@ find_defense(int si, int sj, int *i, int *j)
     }
   }
 
-  store_persistent_reading_cache(FIND_DEFENSE, origin, result, move, nodes);
+  store_persistent_reading_cache(FIND_DEFENSE, origin, result, 
+				 the_move, nodes);
   
-  if (i) *i = I(move);
-  if (j) *j = J(move);
+  if (move) *move = the_move;
   return result;
 }
 
-/* attack_and_defend(si, sj, &acode, &ai, &aj, &dcode, &di, &dj) is a
- * frontend to the attack() and find_defense() functions, which
+
+/* attack_and_defend(str, &acode, &attack_point,
+ *                        &dcode, &defense_point)
+ * is a frontend to the attack() and find_defense() functions, which
  * guarantees a consistent result. If a string cannot be attacked, 0
  * is returned and acode is 0. If a string can be attacked and
  * defended, WIN is returned, acode and dcode are both non-zero, and
- * (ai, aj), (di, dj) both point to vertices on the board. If a string
- * can be attacked but not defended, 0 is again returned, acode is
- * non-zero, dcode is 0, and (ai, aj) point to a vertex on the board.
+ * (attack_point), (defense_point) both point to vertices on the board. 
+ * If a stringcan be attacked but not defended, 0 is again returned, 
+ * acode is non-zero, dcode is 0, and (ai, aj) point to a vertex 
+ * on the board.
  *
  * This function in particular guarantees that if there is an attack,
- * it will never return (di, dj) = (-1, -1), which means the string is
+ * it will never return (defense_point) = NO_MOVE, which means the string is
  * safe without defense. Separate calls to attack() and find_defense()
  * may occasionally give this result, due to irregularities introduced
  * by the persistent reading cache.
  */
 int
-attack_and_defend(int si, int sj,
-		  int *attack_code, int *attacki, int *attackj,
-		  int *defend_code, int *defendi, int *defendj)
+attack_and_defend(int str,
+		  int *attack_code, int *attack_point,
+		  int *defend_code, int *defense_point)
 {
   int acode = 0;
-  int ai = -1, aj = -1;
+  int apos = NO_MOVE;
   int dcode = 0;
-  int di = -1, dj = -1;
+  int dpos = NO_MOVE;
 
-  acode = attack(si, sj, &ai, &aj);
+  acode = attack(str, &apos);
   if (acode != 0) {
-    dcode = find_defense(si, sj, &di, &dj);
+    dcode = find_defense(str, &dpos);
     
     /* If find_defense() says the string is safe as is, we believe
      * this in favor of attack()'s opinion. Actually this is probably
      * incorrect, but we can't easily find a defense point to return.
      */
-    if (dcode == WIN && di == -1) {
+    if (dcode == WIN && dpos == NO_MOVE) {
       acode = 0;
-      ai = -1;
-      aj = -1;
+      apos = NO_MOVE;
     }
   }
 
-  if (attack_code) *attack_code = acode;
-  if (attacki) *attacki = ai;
-  if (attackj) *attackj = aj;
-  if (defend_code) *defend_code = dcode;
-  if (defendi) *defendi = di;
-  if (defendj) *defendj = dj;
+  if (attack_code)   *attack_code   = acode;
+  if (attack_point)  *attack_point  = apos;
+  if (defend_code)   *defend_code   = dcode;
+  if (defense_point) *defense_point = dpos;
 
   return acode != 0 && dcode != 0;
 }
 
 
 /*
- * attack_either(ai, aj, bi, bj) returns true if there is a move which
- * guarantees that at least one of the strings (ai, aj) and (bi, bj)
+ * attack_either(astr, bstr) returns true if there is a move which
+ * guarantees that at least one of the strings (astr) and (bstr)
  * can be captured. A typical application for this is in connection
  * patterns, where after a cut it suffices to capture one of the cutting
  * stones.
@@ -394,25 +389,25 @@ attack_and_defend(int si, int sj,
  */
 
 int
-attack_either(int ai, int aj, int bi, int bj)
+attack_either(int astr, int bstr)
 {
-  int color = BOARD(ai, aj);
-  ASSERT2(color != EMPTY , ai, aj);
-  ASSERT2(color == BOARD(bi, bj), bi, bj);
+  int color = board[astr];
+  ASSERT1(color != EMPTY , astr);
+  ASSERT1(color == board[bstr], bstr);
 
   /* Start by attacking the string with the fewest liberties. On
    * average this seems to be slightly more efficient.
    */
-  if (countlib2(ai, aj) <= countlib2(bi, bj))
-    return attack(ai, aj, NULL, NULL) || attack(bi, bj, NULL, NULL);
+  if (countlib(astr) <= countlib(bstr))
+    return attack(astr, NULL) || attack(bstr, NULL);
   else
-    return attack(bi, bj, NULL, NULL) || attack(ai, aj, NULL, NULL);
+    return attack(bstr, NULL) || attack(astr, NULL);
 }
 
 
 /*
- * defend_both(ai, aj, bi, bj) returns true if both the strings (ai, aj)
- * and (bi, bj) can be defended simultaneously or if there is no attack.
+ * defend_both(astr, bstr) returns true if both the strings (astr)
+ * and (bstr) can be defended simultaneously or if there is no attack.
  * A typical application for this is in connection patterns, where
  * after a cut it's necessary to defend both cutting stones.
  *
@@ -422,30 +417,30 @@ attack_either(int ai, int aj, int bi, int bj)
  */
 
 int
-defend_both(int ai, int aj, int bi, int bj)
+defend_both(int astr, int bstr)
 {
   int a_threatened = 0;
   int b_threatened = 0;
-  int ci, cj, di, dj;
+  int cpos, dpos;
   int acode = 0;
   int dcode = 0;
   
-  int color = BOARD(ai, aj);
-  ASSERT2(color != EMPTY , ai, aj);
-  ASSERT2(color == BOARD(bi, bj), bi, bj);
+  int color = board[astr];
+  ASSERT1(color != EMPTY , astr);
+  ASSERT1(color == board[bstr], bstr);
 
-  attack_and_defend(ai, aj, &acode, NULL, NULL, &dcode, &ci, &cj);
+  attack_and_defend(astr, &acode, NULL, &dcode, &cpos);
   if (acode != 0) {
     a_threatened = 1;
     if (dcode == 0)
-      return 0; /* (ai, aj) already lost */
+      return 0; /* (astr) already lost */
   }
   
-  attack_and_defend(bi, bj, &acode, NULL, NULL, &dcode, &di, &dj);
+  attack_and_defend(bstr, &acode, NULL, &dcode, &dpos);
   if (acode != 0) {
     b_threatened = 1;
     if (dcode == 0)
-      return 0; /* (bi, bj) already lost */
+      return 0; /* (bstr) already lost */
   }
 
   /* Neither string can be attacked or only one of them, in which case
@@ -462,7 +457,7 @@ defend_both(int ai, int aj, int bi, int bj)
    * defends either string and see if it also defends the other string.
    */
 
-  if (ci == di && cj == dj)
+  if (cpos == dpos)
     return WIN; /* Both strings can be attacked but also defended 
                  * by one move. */
 
@@ -471,16 +466,16 @@ defend_both(int ai, int aj, int bi, int bj)
    * somewhat pessimistic estimation.
    */
 
-  if (trymove2(ci, cj, color, "defend_both-A", ai, aj, EMPTY, -1, -1)) {
-    if (BOARD(bi, bj) && !attack(bi, bj, NULL, NULL)) {
+  if (trymove(cpos, color, "defend_both-A", astr, EMPTY, NO_MOVE)) {
+    if (board[bstr] && !attack(bstr, NULL)) {
       popgo();
       return WIN;
     }
     popgo();
   }
   
-  if (trymove2(di, dj, color, "defend_both-B", bi, bj, EMPTY, -1, -1)) {
-    if (BOARD(ai, aj) && !attack(ai, aj, NULL, NULL)) {
+  if (trymove(dpos, color, "defend_both-B", bstr, EMPTY, NO_MOVE)) {
+    if (board[astr] && !attack(astr, NULL)) {
       popgo();
       return WIN;
     }
@@ -495,19 +490,18 @@ defend_both(int ai, int aj, int bi, int bj)
     int neighbors2;
     int r;
     int s;
-    int ei, ej;
-    int fi, fj;
+    int epos;
+    int fpos;
     
-    neighbors1 = chainlinks(POS(ai, aj), adjs1);
-    neighbors2 = chainlinks(POS(bi, bj), adjs2);
+    neighbors1 = chainlinks(astr, adjs1);
+    neighbors2 = chainlinks(bstr, adjs2);
     
     for (r = 0; r < neighbors1; r++) {
-      ei = I(adjs1[r]);
-      ej = J(adjs1[r]);
-      if (countlib2(ei, ej) <= 4
-	  && (ei != ci || ej != cj)
-	  && (ei != di || ej != dj)) {
-	/* Is (ei, ej) also adjacent to (bi, bj)? */
+      epos = adjs1[r];
+      if (countlib(epos) <= 4
+	  && (epos != cpos)
+	  && (epos != dpos)) {
+	/* Is (epos) also adjacent to (bstr)? */
 	for (s = 0; s < neighbors2; s++) {
 	  if (adjs2[s] == adjs1[r])
 	    break;
@@ -515,11 +509,11 @@ defend_both(int ai, int aj, int bi, int bj)
 	if (s == neighbors2)
 	  continue;   /* No, it wasn't. */
 
-	if (attack(ei, ej, &fi, &fj)) {
-	  if (trymove2(fi, fj, color, "defend_both-C", ai, aj, EMPTY, -1, -1)) {
-	    if (BOARD(ai, aj) && BOARD(bi, bj)
-		&& !attack(ai, aj, NULL, NULL) 
-		&& !attack(bi, bj, NULL, NULL)) {
+	if (attack(epos, &fpos)) {
+	  if (trymove(fpos, color, "defend_both-C", astr, EMPTY, NO_MOVE)) {
+	    if (board[astr] && board[bstr]
+		&& !attack(astr, NULL) 
+		&& !attack(bstr, NULL)) {
 	      popgo();
 	      return WIN;
 	    }
@@ -536,7 +530,7 @@ defend_both(int ai, int aj, int bi, int bj)
 
 
 /*
- * break_through(ai, aj, bi, bj, ci, cj) returns WIN if a position can
+ * break_through(apos, bpos, cpos) returns WIN if a position can
  * succesfully be broken through and CUT if it can be cut. The position
  * is assumed to have the shape (the colors may be reversed)
  *
@@ -557,57 +551,54 @@ defend_both(int ai, int aj, int bi, int bj)
  */
 
 static int
-break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
-		     int di, int dj, int ei, int ej, int Fi, int Fj,
+break_through_helper(int apos, int bpos, int cpos,
+		     int dpos, int epos, int Fpos,
 		     int color, int other);
 
 int
-break_through(int ai, int aj, int bi, int bj, int ci, int cj)
+break_through(int apos, int bpos, int cpos)
 {
-  int color = BOARD(ai, aj);
+  int color = board[apos];
   int other = OTHER_COLOR(color);
 
-  int di, dj;
-  int ei, ej;
-  int Fi, Fj;
-  int gi, gj;
+  int dpos;
+  int epos;
+  int Fpos;
+  int gpos;
   
   int success = 0;
   int success2 = 0;
   
   /* Basic sanity checking. */
-  ASSERT2(color != EMPTY , ai, aj);
-  ASSERT2(color == BOARD(bi, bj), bi, bj);
-  ASSERT2(color == BOARD(ci, cj), ci, cj);
+  ASSERT1(color != EMPTY , apos);
+  ASSERT1(color == board[bpos], bpos);
+  ASSERT1(color == board[cpos], cpos);
 
   /* Construct the rest of the points in the pattern. */
-  Fi = (ai + ci) / 2;    /* F midpoint between a and c. */
-  Fj = (aj + cj) / 2;
-  di = ai + bi - Fi;     /* Use diagonal relation a+b = d+F. */
-  dj = aj + bj - Fj;
-  ei = bi + ci - Fi;     /* Use diagonal relation b+c = e+F. */
-  ej = bj + cj - Fj;
+  Fpos = (apos + cpos) / 2;      /* F midpoint between a and c. */
+  dpos = apos + bpos - Fpos;     /* Use diagonal relation a+b = d+F. */
+  epos = bpos + cpos - Fpos;     /* Use diagonal relation b+c = e+F. */
 
   /* More sanity checking. */
-  ASSERT2(BOARD(di, dj) == EMPTY , di, dj);
-  ASSERT2(BOARD(ei, ej) == EMPTY , ei, ej);
+  ASSERT1(board[dpos] == EMPTY , dpos);
+  ASSERT1(board[epos] == EMPTY , epos);
 
   /* F might already have been captured. (play_break_through_n() can't
    * detect this.
    */
-  if (BOARD(Fi, Fj) == EMPTY)
+  if (board[Fpos] == EMPTY)
     return 0;
   
-  ASSERT2(BOARD(Fi, Fj) == other , Fi, Fj);
+  ASSERT1(board[Fpos] == other, Fpos);
 
   /* First X tries to play at d. */
-  success = break_through_helper(ai, aj, bi, bj, ci, cj,
-				 di, dj, ei, ej, Fi, Fj, color, other);
+  success = break_through_helper(apos, bpos, cpos, dpos, epos, Fpos,
+				 color, other);
   if (success == WIN)
     return WIN;
   
-  success2 = break_through_helper(ci, cj, bi, bj, ai, aj,
-				  ei, ej, di, dj, Fi, Fj, color, other);
+  success2 = break_through_helper(cpos, bpos, apos, epos, dpos, Fpos,
+				  color, other);
 
   if (success2 == WIN)
     return WIN;
@@ -623,27 +614,27 @@ break_through(int ai, int aj, int bi, int bj, int ci, int cj)
    * though.
    */
   success2 = 0;
-  if (attack_and_defend(Fi, Fj, NULL, NULL, NULL, NULL, &gi, &gj)) {
-    if (trymove2(gi, gj, other, "break_through-A", Fi, Fj, EMPTY, -1, -1)) {
+  if (attack_and_defend(Fpos, NULL, NULL, NULL, &gpos)) {
+    if (trymove(gpos, other, "break_through-A", Fpos, EMPTY, NO_MOVE)) {
       /* Now we let O defend his position by playing either d or e.
        * FIXME: There may be other plausible moves too.
        */
-      if (trymove2(di, dj, color, "break_through-B", Fi, Fj, EMPTY, -1, -1)) {
+      if (trymove(dpos, color, "break_through-B", Fpos, EMPTY, NO_MOVE)) {
 	/* O connects at d, so X cuts at e. */
-	if (safe_move2(ei, ej, other)) {
+	if (safe_move(epos, other)) {
 	  success2 = CUT;
-	  if (!BOARD(ci, cj) || attack(ci, cj, NULL, NULL))
+	  if (!board[cpos] || attack(cpos, NULL))
 	    success2 = WIN;
 	}
 	popgo();
       }
 
-      if (success2 > 0 && trymove2(ei, ej, color, "break_through-C", Fi, Fj,
-				  EMPTY, -1, -1)) {
+      if (success2 > 0 && trymove(epos, color, "break_through-C", Fpos,
+				  EMPTY, NO_MOVE)) {
 	/* O connects at e, so X cuts at d. */
-	if (safe_move2(di, dj, other)) {
+	if (safe_move(dpos, other)) {
 	  /* success2 is already WIN or CUT. */
-	  if (BOARD(ai, aj) && !attack(ai, aj, NULL, NULL))
+	  if (board[apos] && !attack(apos, NULL))
 	    success2 = CUT;
 	}
 	else
@@ -665,22 +656,21 @@ break_through(int ai, int aj, int bi, int bj, int ci, int cj)
  * simply switching positions between the two calls.
  */
 static int
-break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
-		     int di, int dj, int ei, int ej, int Fi, int Fj,
+break_through_helper(int apos, int bpos, int cpos,
+		     int dpos, int epos, int Fpos,
 		     int color, int other)
 {
   int success = 0;
-  int gi, gj;
+  int gpos;
 
-  if (trymove2(di, dj, other, "break_through_helper-A", Fi, Fj, 
-	      EMPTY, -1, -1)) {
+  if (trymove(dpos, other, "break_through_helper-A", Fpos, EMPTY, NO_MOVE)) {
     /* If F can be attacked we can't start in this way. */
-    if (!attack(Fi, Fj, NULL, NULL)) {
+    if (!attack(Fpos, NULL)) {
       /* If d is safe too, we have at least managed to break through. */
-      if (!attack(di, dj, &gi, &gj)) {
+      if (!attack(dpos, &gpos)) {
 	success = CUT;
 	/* So now we can try to capture something. */
-	if (!BOARD(ai, aj) || !BOARD(bi, bj) || !defend_both(ai, aj, bi, bj))
+	if (!board[apos] || !board[bpos] || !defend_both(apos, bpos))
 	  success = WIN;
 	else {
 	  /* Both a and b could be defended, or didn't need to be.
@@ -689,32 +679,32 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
 	  int attack_on_b = 0;
 	  int attack_on_a = 0;
 
-	  if (trymove2(ei, ej, color, "break_through_helper-B", Fi, Fj,
-		      EMPTY, -1, -1)) {
-	    if (attack(bi, bj, NULL, NULL))
+	  if (trymove(epos, color, "break_through_helper-B", Fpos, 
+		      EMPTY, NO_MOVE)) {
+	    if (attack(bpos, NULL))
 	      attack_on_b = 1;
-	    else if (attack(ai, aj, NULL, NULL))
+	    else if (attack(apos, NULL))
 	      attack_on_a = 1;
 	    popgo();
 	  }
 
 	  /* Let O find a defense and play it. */
 	  if (attack_on_a || attack_on_b) {
-	    int hi = -1;
-	    int hj = -1;
-	    if (((attack_on_a && find_defense(ai, aj, &hi, &hj))
-		|| (attack_on_b && find_defense(bi, bj, &hi, &hj)))
-		&& hi != -1
-		&& trymove2(hi, hj, color, "break_through_helper-C", Fi, Fj,
-			   EMPTY, -1, -1)) {
+	    int hpos = NO_MOVE;
+
+	    if (((attack_on_a && find_defense(apos, &hpos))
+		|| (attack_on_b && find_defense(bpos, &hpos)))
+		&& hpos != NO_MOVE
+		&& trymove(hpos, color, "break_through_helper-C", Fpos,
+			   EMPTY, NO_MOVE)) {
 	      /* Now we make a second cut at e, trying to capture
 	       * either b or c.
 	       */
-	      if (trymove2(ei, ej, other, "break_through_helper-D", Fi, Fj,
-			  EMPTY, -1, -1)) {
-		if (!BOARD(bi, bj) 
-		    || !BOARD(ci, cj) 
-		    || !defend_both(bi, bj, ci, cj))
+	      if (trymove(epos, other, "break_through_helper-D", Fpos,
+			  EMPTY, NO_MOVE)) {
+		if (!board[bpos]
+		    || !board[cpos] 
+		    || !defend_both(bpos, cpos))
 		  success = WIN;
 		popgo();
 	      }
@@ -732,9 +722,9 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
        * O at e is sufficient to capture d.
        */
       else {
-	if (trymove2(ei, ej, color, "break_through_helper-E", Fi, Fj,
-		    EMPTY, -1, -1)) {
-	  if (!BOARD(di, dj) || !find_defense(di, dj, NULL, NULL)) {
+	if (trymove(epos, color, "break_through_helper-E", Fpos,
+		    EMPTY, NO_MOVE)) {
+	  if (!board[dpos] || !find_defense(dpos, NULL)) {
 	    popgo();
 	    popgo();
 	    return 0;
@@ -742,20 +732,20 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
 	  popgo();
 	}
 	
-	if (gi == ei && gj == ej) {
+	if (gpos == epos) {
 	  popgo();
 	  return 0;
 	}
 
-	if (trymove2(gi, gj, color, "break_through_helper-F", Fi, Fj,
-		    EMPTY, -1, -1)) {
-	  if (trymove2(ei, ej, other, "break_through_helper-G", Fi, Fj,
-		      EMPTY, -1, -1)) {
-	    if (!attack(ei, ej, NULL, NULL)) {
+	if (trymove(gpos, color, "break_through_helper-F", Fpos,
+		    EMPTY, NO_MOVE)) {
+	  if (trymove(epos, other, "break_through_helper-G", Fpos,
+		      EMPTY, NO_MOVE)) {
+	    if (!attack(epos, NULL)) {
 	      success = CUT;
-	      if (!BOARD(bi, bj) 
-		  || !BOARD(ci, cj) 
-		  || !defend_both(bi, bj, ci, cj))
+	      if (!board[bpos] 
+		  || !board[cpos] 
+		  || !defend_both(bpos, cpos))
 		success = WIN;
 	    }
 	    popgo();
@@ -763,13 +753,13 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
 	  popgo();
 	}
       }
-	
     }
     popgo();
   }
 
   return success;
 }
+
 
 /* ================================================================ */
 /*                     Global reading functions                     */
@@ -795,20 +785,20 @@ break_through_helper(int ai, int aj, int bi, int bj, int ci, int cj,
  * size of the smallest of the worms under attack.
  */
 
-static int aa_status[MAX_BOARD][MAX_BOARD]; /* ALIVE, DEAD or CRITICAL */
-static int forbidden[MAX_BOARD][MAX_BOARD];
-static int get_aa_status(int m, int n);
-static int do_atari_atari(int color, int *attacki, int *attackj,
-			  int *defendi, int *defendj, int ci, int cj,
+static int aa_status[BOARDMAX]; /* ALIVE, DEAD or CRITICAL */
+static int forbidden[BOARDMAX];
+static int get_aa_status(int pos);
+static int do_atari_atari(int color, int *attack_point,
+			  int *defense_point, int cpos,
 			  int save_verbose, int minsize);
 
 /* Set to 1 if you want verbose traces from this function. */
 
 int
-atari_atari(int color, int *i, int *j, int save_verbose)
+atari_atari(int color, int *move, int save_verbose)
 {
   int m, n;
-  int fi, fj;
+  int fpos;
   int aa_val;
   int other = OTHER_COLOR(color);
 
@@ -826,19 +816,18 @@ atari_atari(int color, int *i, int *j, int save_verbose)
     for (n = 0; n < board_size; n++) {
       if (BOARD(m, n) == other) {
 	if (dragon[m][n].matcher_status == DEAD)
-	  aa_status[m][n] = DEAD;
+	  aa_status[POS(m, n)] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)
-	    aa_status[m][n] = CRITICAL;
+	    aa_status[POS(m, n)] = CRITICAL;
 	  else
-	    aa_status[m][n] = DEAD;
-
+	    aa_status[POS(m, n)] = DEAD;
 	}
 	else
-	  aa_status[m][n] = ALIVE;
+	  aa_status[POS(m, n)] = ALIVE;
       }
       else
-	aa_status[m][n] = UNKNOWN;
+	aa_status[POS(m, n)] = UNKNOWN;
     }
 
   /* reclassify a worm with 2 liberties as INSUBSTANTIAL if capturing
@@ -849,13 +838,13 @@ atari_atari(int color, int *i, int *j, int save_verbose)
       if (BOARD(m, n) == other
 	  && worm[m][n].origin == POS(m, n)
 	  && worm[m][n].liberties == 2
-	  && aa_status[m][n] == ALIVE
+	  && aa_status[POS(m, n)] == ALIVE
 	  && !owl_substantial(m, n)) {
 	int ti, tj;
 	for (ti = 0; ti < board_size; ti++)
 	  for (tj = 0; tj < board_size; tj++)
 	    if (is_worm_origin(ti, tj, m, n))
-	      aa_status[ti][tj] = INSUBSTANTIAL;
+	      aa_status[POS(ti, tj)] = INSUBSTANTIAL;
       }
 
   if (debug & DEBUG_ATARI_ATARI) {
@@ -865,20 +854,20 @@ atari_atari(int color, int *i, int *j, int save_verbose)
       for (n = 0; n < board_size; n++) {
 	if (BOARD(m, n) == other && is_worm_origin(m, n, m, n)) {
 	  const char *status = "UNKNOWN (shouldn't happen)";
-	  if (aa_status[m][n] == DEAD)
+	  if (aa_status[POS(m, n)] == DEAD)
 	    status = "DEAD";
-	  else if (aa_status[m][n] == CRITICAL)
+	  else if (aa_status[POS(m, n)] == CRITICAL)
 	    status = "CRITICAL";
-	  else if (aa_status[m][n] == INSUBSTANTIAL)
+	  else if (aa_status[POS(m, n)] == INSUBSTANTIAL)
 	    status = "INSUBSTANTIAL";
 
-	  if (aa_status[m][n] != ALIVE)
+	  if (aa_status[POS(m, n)] != ALIVE)
 	    gprintf("%M: %s\n", m, n, status);
 	}
       }
   }
 
-  aa_val = do_atari_atari(color, &fi, &fj, NULL, NULL, -1, -1,
+  aa_val = do_atari_atari(color, &fpos, NULL, NO_MOVE,
 			  save_verbose, 0);
 
   if (aa_val == 0)
@@ -889,17 +878,16 @@ atari_atari(int color, int *i, int *j, int save_verbose)
    */
   while (1) {
     int new_aa_val;
-    forbidden[fi][fj] = 1;
-    new_aa_val = do_atari_atari(color, &fi, &fj, NULL, NULL, -1, -1,
+    forbidden[fpos] = 1;
+    new_aa_val = do_atari_atari(color, &fpos, NULL, NO_MOVE,
 				save_verbose, aa_val);
 
     /* The last do_atari_atari call fails. When do_atari_atari fails,
-     * it does not change the value of (fi, fj), so these correspond
+     * it does not change the value of (fpos), so these correspond
      * to a move that works and is necessary.
      */
     if (new_aa_val == 0) {
-      if (i) *i = fi;
-      if (j) *j = fj;
+      if (move) *move = fpos;
       return aa_val;
     }
     aa_val = new_aa_val;
@@ -920,19 +908,19 @@ atari_atari(int color, int *i, int *j, int save_verbose)
  * the reading.
  */
 static int
-get_aa_status(int m, int n)
+get_aa_status(int pos)
 {
   int stones[MAX_BOARD * MAX_BOARD];
   int num_stones;
   int k;
 
-  if (aa_status[m][n] != UNKNOWN)
-    return aa_status[m][n];
+  if (aa_status[pos] != UNKNOWN)
+    return aa_status[pos];
 
-  num_stones = findstones(POS(m, n), MAX_BOARD * MAX_BOARD, stones);
+  num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones);
   for (k = 0; k < num_stones; k++)
-    if (aa_status[I(stones[k])][J(stones[k])] != UNKNOWN)
-      return aa_status[I(stones[k])][J(stones[k])];
+    if (aa_status[stones[k]] != UNKNOWN)
+      return aa_status[stones[k]];
 
   return UNKNOWN;
 }
@@ -953,8 +941,8 @@ get_aa_status(int m, int n)
  */
 
 static int
-do_atari_atari(int color, int *attacki, int *attackj,
-	       int *defendi, int *defendj, int ci, int cj,
+do_atari_atari(int color, 
+	       int *attack_point, int *defense_point, int cpos,
 	       int save_verbose, int minsize)
 {
   int m, n;
@@ -968,7 +956,7 @@ do_atari_atari(int color, int *attacki, int *attackj,
     gprintf("%oforbidden moves: ");
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (forbidden[m][n])
+	if (forbidden[POS(m, n)])
 	  gprintf("%o%m ", m, n);
       }
     gprintf("\n");
@@ -977,10 +965,10 @@ do_atari_atari(int color, int *attacki, int *attackj,
   /* First look for strings adjacent to the last friendly move played
    * which can be unexpectedly attacked.
    */
-  if (ci != -1)
+  if (cpos != NO_MOVE)
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	int ai, aj;
+	int apos;
 
 	if (BOARD(m, n) != other)
 	  continue;
@@ -991,36 +979,33 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	if (minsize > 0 && countstones2(m, n) < minsize)
 	  continue;
 
-	if (get_aa_status(m, n) != ALIVE
-	    || !neighbor_of_string2(ci, cj, m, n))
+	if (get_aa_status(POS(m, n)) != ALIVE
+	    || !neighbor_of_string(cpos, POS(m, n)))
 	  continue;
 	
 	if (debug & DEBUG_ATARI_ATARI)
 	  gprintf("Considering attack of %m. depth = %d.\n", m, n, depth);
-	if (attack(m, n, &ai, &aj)) {
+	if (attack(POS(m, n), &apos)) {
 	  if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
-	    gprintf("%oThe worm %m can be attacked at %m after ", m, n,
-		    ai, aj);
+	    gprintf("%oThe worm %m can be attacked at %1m after ", m, n,
+		    apos);
 	    dump_stack();
 	  }	  
-	  if (attacki) *attacki = ai;
-	  if (attackj) *attackj = aj;
+	  if (attack_point) *attack_point = apos;
 	  
 	  /* We look for a move defending the combination.
 	   * Normally this is found by find_defense but failing
 	   * that, if the attacking move is a safe move for color, 
 	   * it probably defends.
 	   */
-	  if (defendi) {
-	    if (!find_defense(m, n, defendi, defendj)) {
-	      if (safe_move2(ai, aj, other)) {
-		*defendi = ai;
-		*defendj = aj;
+	  if (defense_point) {
+	    if (!find_defense(POS(m, n), defense_point)) {
+	      if (safe_move(apos, other)) {
+		*defense_point = apos;
 	      }
 	      /* No defense is found */
 	      else {
-		*defendi = -1;
-		*defendj = -1;
+		*defense_point = NO_MOVE;
 	      }
 	    }
 	  }
@@ -1052,7 +1037,7 @@ do_atari_atari(int color, int *attacki, int *attackj,
       if (minsize > 0 && countstones2(m, n) < minsize)
 	continue;
 
-      status = get_aa_status(m, n);
+      status = get_aa_status(POS(m, n));
       if (status != ALIVE)
 	continue;
 
@@ -1060,13 +1045,13 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	continue;
 
       for (k = 0; k < 2; k++) {
-	int ai = I(libs[k]);
-	int aj = J(libs[k]);
-	int bi, bj;
-	if (!forbidden[ai][aj]
-	    && accurate_approxlib(POS(ai, aj), color, 2, NULL) > 1) {
-	  if (trymove2(ai, aj, color, "do_atari_atari-A", m, n,
-		       EMPTY, -1, -1)) {
+	int apos = libs[k];
+	int bpos;
+
+	if (!forbidden[apos]
+	    && accurate_approxlib(apos, color, 2, NULL) > 1) {
+	  if (trymove(apos, color, "do_atari_atari-A", POS(m, n),
+		       EMPTY, NO_MOVE)) {
 	    /* try to defend the stone (m,n) which is in atari */
 	    int aa_val = 0;
 
@@ -1079,17 +1064,17 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	     * On the other hand, if there is no defense we have
 	     * already been successful.
 	     */
-	    if (find_defense(m, n, &bi, &bj)
-		&& trymove2(bi, bj, other, "do_atari_atari-B", m, n,
-			    EMPTY, -1, -1)) {
+	    if (find_defense(POS(m, n), &bpos)
+		&& trymove(bpos, other, "do_atari_atari-B", POS(m, n),
+			    EMPTY, NO_MOVE)) {
 	      /* These moves may have been irrelevant for later
                * reading, so in order to avoid horizon problems, we
                * need to temporarily increase the depth values.
 	       */
 	      increase_depth_values();
 	      increase_depth_values();
-	      aa_val = do_atari_atari(color, NULL, NULL, defendi, defendj,
-				      ai, aj, save_verbose, minsize);
+	      aa_val = do_atari_atari(color, NULL, defense_point,
+				      apos, save_verbose, minsize);
 	      decrease_depth_values();
 	      decrease_depth_values();
 	      popgo();
@@ -1098,16 +1083,13 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	      /* No way to save the ataried stone. We have been successful. */
 	      popgo();
 	      if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
-		gprintf("%oThe worm %m can be attacked at %m after ", m, n,
-			ai, aj);
+		gprintf("%oThe worm %m can be attacked at %1m after ", m, n,
+			apos);
 		dump_stack();
 	      }	  
-	      if (attacki) *attacki = ai;
-	      if (attackj) *attackj = aj;
-	      if (defendi && !find_defense(m, n, defendi, defendj)) {
-		*defendi = -1;
-		*defendj = -1;
-	      }
+	      if (attack_point) *attack_point = apos;
+	      if (defense_point && !find_defense(POS(m, n), defense_point))
+		*defense_point = NO_MOVE;
 	      
 	      DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
 		    countstones2(m, n), m, n);
@@ -1118,19 +1100,16 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	      /* The atari at (ai,aj) seems to work but we still
 	       * must check there is not a better defense.
 	       */
-	      int bpos = POS(bi, bj);
 	      int cpos;
 	      int res = restricted_defend1(POS(m, n), &cpos, EMPTY, 0, 
 					   1, &bpos);
-	      ci = I(cpos);
-	      cj = J(cpos);
 	      if (res) {
-		if (trymove2(ci, cj, other, "do_atari_atari-C", 
-			     m, n, EMPTY, -1, -1)) {
+		if (trymove(cpos, other, "do_atari_atari-C", 
+			     POS(m, n), EMPTY, NO_MOVE)) {
 		  increase_depth_values();
 		  increase_depth_values();
-		  if (!do_atari_atari(color, NULL, NULL, defendi, defendj,
-				      ai, aj, save_verbose, minsize)) 
+		  if (!do_atari_atari(color, NULL, defense_point,
+				      apos, save_verbose, minsize)) 
 		    aa_val = 0;
 		  decrease_depth_values();
 		  decrease_depth_values();
@@ -1138,8 +1117,7 @@ do_atari_atari(int color, int *attacki, int *attackj,
 		}
 	      }
 	      if (aa_val) {
-		if (attacki) *attacki = ai;
-		if (attackj) *attackj = aj;
+		if (attack_point) *attack_point = apos;
 		popgo();
 		DEBUG(DEBUG_ATARI_ATARI, 
 		      "%oreturn value:%d (min %d, %d (%m))\n",
@@ -1148,11 +1126,10 @@ do_atari_atari(int color, int *attacki, int *attackj,
 		/* If no defense point is known and (ai,aj) is a safe
 		 * move for other, it probably defends the combination.
 		 */
-		if (defendi 
-		    && *defendi == -1
-		    && safe_move2(ai, aj, other)) {
-		  *defendi = ai;
-		  *defendj = aj;
+		if (defense_point 
+		    && *defense_point == NO_MOVE
+		    && safe_move(apos, other)) {
+		  *defense_point = apos;
 		}
 		return gg_min(aa_val, countstones2(m, n));
 	      }
@@ -1167,19 +1144,18 @@ do_atari_atari(int color, int *attacki, int *attackj,
 
 /* Ask the atari_atari code whether there appears any combination
  * attack which would capture at least minsize stones after playing at
- * (ti, tj). If this happens, (*i, *j) points to a move which prevents
+ * (tpos). If this happens, (*move) points to a move which prevents
  * this blunder.
  *
  * FIXME: Most of the code below is common with atari_atari() and
  *        should be broken out of both functions.
  */
 int
-atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
-			   int minsize)
+atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
 {
   int m, n;
-  int fi, fj;
-  int defendi, defendj, after_defendi, after_defendj;
+  int fpos;
+  int defense_point, after_defense_point;
   int aa_val, after_aa_val;
   int other = OTHER_COLOR(color);
 
@@ -1201,18 +1177,18 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
     for (n = 0; n < board_size; n++) {
       if (BOARD(m, n) == color) {
 	if (dragon[m][n].matcher_status == DEAD)
-	  aa_status[m][n] = DEAD;
+	  aa_status[POS(m, n)] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)
-	    aa_status[m][n] = CRITICAL;
+	    aa_status[POS(m, n)] = CRITICAL;
 	  else
-	    aa_status[m][n] = DEAD;
+	    aa_status[POS(m, n)] = DEAD;
 	}
 	else
-	  aa_status[m][n] = ALIVE;
+	  aa_status[POS(m, n)] = ALIVE;
       }
       else
-	aa_status[m][n] = UNKNOWN;
+	aa_status[POS(m, n)] = UNKNOWN;
     }
   
   /* reclassify a worm with 2 liberties as INSUBSTANTIAL if capturing
@@ -1223,13 +1199,13 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
       if (BOARD(m, n) == color
 	  && worm[m][n].origin == POS(m, n)
 	  && worm[m][n].liberties == 2
-	  && aa_status[m][n] == ALIVE
+	  && aa_status[POS(m, n)] == ALIVE
 	  && !owl_substantial(m, n)) {
 	int ui, uj;
 	for (ui = 0; ui < board_size; ui++)
 	  for (uj = 0; uj < board_size; uj++)
 	    if (is_worm_origin(ui, uj, m, n))
-	      aa_status[ui][uj] = INSUBSTANTIAL;
+	      aa_status[POS(ui, uj)] = INSUBSTANTIAL;
       }
 
   if (debug & DEBUG_ATARI_ATARI) {
@@ -1239,30 +1215,30 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
       for (n = 0; n < board_size; n++) {
 	if (BOARD(m, n) == color && is_worm_origin(m, n, m, n)) {
 	  const char *status = "UNKNOWN (shouldn't happen)";
-	  if (aa_status[m][n] == DEAD)
+	  if (aa_status[POS(m, n)] == DEAD)
 	    status = "DEAD";
-	  else if (aa_status[m][n] == CRITICAL)
+	  else if (aa_status[POS(m, n)] == CRITICAL)
 	    status = "CRITICAL";
-	  else if (aa_status[m][n] == INSUBSTANTIAL)
+	  else if (aa_status[POS(m, n)] == INSUBSTANTIAL)
 	    status = "INSUBSTANTIAL";
 	  
-	  if (aa_status[m][n] != ALIVE)
+	  if (aa_status[POS(m, n)] != ALIVE)
 	    gprintf("%M: %s\n", m, n, status);
 	}
       }
   }
   
   /* Accept illegal ko capture here. */
-  if (!tryko2(ti, tj, color, NULL, EMPTY, -1, -1))
+  if (!tryko(tpos, color, NULL, EMPTY, NO_MOVE))
     /* Really shouldn't happen. */
-    abortgo(__FILE__, __LINE__, "trymove", ti, tj); 
+    abortgo(__FILE__, __LINE__, "trymove", I(tpos), J(tpos)); 
   increase_depth_values();
 
-  aa_val = do_atari_atari(other, &fi, &fj, &defendi, &defendj,
-			  -1, -1, 0, minsize);
+  aa_val = do_atari_atari(other, &fpos, &defense_point,
+			  NO_MOVE, 0, minsize);
   after_aa_val = aa_val;
 
-  if (aa_val == 0 || defendi == -1) {
+  if (aa_val == 0 || defense_point == NO_MOVE) {
 
   /* No sufficiently large combination attack, so the move is safe from
    * this danger.
@@ -1280,13 +1256,12 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   while (aa_val >= after_aa_val) {
     /* Try dropping moves from the combination and see if it still
      * works. What we really want is to get the proper defense move
-     * into (*i, *j).
+     * into (*move).
      */
-    after_defendi = defendi;
-    after_defendj = defendj;
-    forbidden[fi][fj] = 1;
-    aa_val = do_atari_atari(other, &fi, &fj, &defendi, &defendj, 
-			    -1, -1, 0, aa_val);
+    after_defense_point = defense_point;
+    forbidden[fpos] = 1;
+    aa_val = do_atari_atari(other, &fpos, &defense_point, 
+			    NO_MOVE, 0, aa_val);
   }
 
   popgo();
@@ -1295,19 +1270,17 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
    * the original move at (ai, aj) was really relevant. So we
    * try omitting it and see if a combination is still found.
    */
-  if (do_atari_atari(other, NULL, NULL, NULL, NULL,
-			  -1, -1, 0, minsize) >= after_aa_val)
+  if (do_atari_atari(other, NULL, NULL, NO_MOVE, 0, minsize) >= after_aa_val)
     return 1;
   else {
-    if (i) *i = after_defendi;
-    if (j) *j = after_defendj;
+    if (move) *move = after_defense_point;
     return 0;
   }
 }
 
 
-/* Ask the atari_atari code if after color plays at (ai,aj)
- * and other plays at (bi,bj) there appears any combination
+/* Ask the atari_atari code if after color plays at (apos)
+ * and other plays at (bpos) there appears any combination
  * attack. Returns the size of the combination.
  *
  * FIXME: Most of the code below is common with atari_atari() and
@@ -1315,7 +1288,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
  */
 
 int
-atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
+atari_atari_try_combination(int color, int apos, int bpos)
 {
   int other = OTHER_COLOR(color);
   int aa_val = 0;
@@ -1332,19 +1305,19 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
     for (n = 0; n < board_size; n++) {
       if (BOARD(m, n) == other) {
 	if (dragon[m][n].matcher_status == DEAD)
-	  aa_status[m][n] = DEAD;
+	  aa_status[POS(m, n)] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)
-	    aa_status[m][n] = CRITICAL;
+	    aa_status[POS(m, n)] = CRITICAL;
 	  else
-	    aa_status[m][n] = DEAD;
+	    aa_status[POS(m, n)] = DEAD;
 
 	}
 	else
-	  aa_status[m][n] = ALIVE;
+	  aa_status[POS(m, n)] = ALIVE;
       }
       else
-	aa_status[m][n] = UNKNOWN;
+	aa_status[POS(m, n)] = UNKNOWN;
     }
 
   /* reclassify a worm with 2 liberties as INSUBSTANTIAL if capturing
@@ -1355,19 +1328,18 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
       if (BOARD(m, n) == other
 	  && worm[m][n].origin == POS(m, n)
 	  && worm[m][n].liberties == 2
-	  && aa_status[m][n] == ALIVE
+	  && aa_status[POS(m, n)] == ALIVE
 	  && !owl_substantial(m, n)) {
 	int ti, tj;
 	for (ti = 0; ti < board_size; ti++)
 	  for (tj = 0; tj < board_size; tj++)
 	    if (is_worm_origin(ti, tj, m, n))
-	      aa_status[ti][tj] = INSUBSTANTIAL;
+	      aa_status[POS(ti, tj)] = INSUBSTANTIAL;
       }
 
-  if (trymove2(ai, aj, color, NULL, -1, -1, EMPTY, -1, -1)) {
-    if (trymove2(bi, bj, other, NULL, -1, -1, EMPTY, -1, -1)) {
-      aa_val = do_atari_atari(color, NULL, NULL, NULL, NULL,
-			      ai, aj, 0, 0);
+  if (trymove(apos, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
+    if (trymove(bpos, other, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
+      aa_val = do_atari_atari(color, NULL, NULL, apos, 0, 0);
       popgo();
     }
     popgo();
@@ -5661,7 +5633,7 @@ safe_move(int move, int color)
 
   /* Otherwise calculate the value... */
   if (trymove(move, color, "safe_move-A", 0, EMPTY, 0)) {
-    int acode = attack(I(move), J(move), NULL, NULL);
+    int acode = attack(move, NULL);
     if (acode == 0)
       safe = WIN;
     else if (acode == WIN)

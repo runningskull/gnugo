@@ -45,7 +45,7 @@ loadsgf games/strategy38.sgf 117
 
 loadsgf games/strategy38.sgf 133
 160 gg_genmove black
-#? [K2|L2|L3]*
+#? [K2|L2|L3]
 
 loadsgf games/strategy38.sgf 197
 161 gg_genmove black

@@ -1,3 +1,23 @@
+./regress.sh . owl.tst
+150 unexpected PASS!
+219 unexpected FAIL: Correct '0', got '1 M19'
+./regress.sh . filllib.tst
+25 unexpected PASS!
+29 unexpected FAIL: Correct 'B1|A1', got 'F19'
+./regress.sh . strategy3.tst
+117 unexpected PASS!
+./regress.sh . strategy4.tst
+160 unexpected PASS!
+./regress.sh . nicklas2.tst
+2202 unexpected PASS!
+./regress.sh . unsorted.tst
+1 unexpected PASS!
+6 unexpected PASS!
+8 unexpected PASS!
+10 unexpected PASS!
+
+Test results updated. The two broken tests are both new.
+
 ========================== 3.1.5 =========================
 
 ./regress.sh . strategy.tst

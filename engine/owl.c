@@ -70,16 +70,13 @@ struct local_owl_data {
   struct eye_data black_eye[MAX_BOARD][MAX_BOARD];
   struct eye_data white_eye[MAX_BOARD][MAX_BOARD];
   /* array of half-eye data for use during owl reading */
-  struct half_eye_data half_eye[MAX_BOARD][MAX_BOARD];
+  struct half_eye_data half_eye[BOARDMAX];
   
-  int lunchi[MAX_LUNCHES];
-  int lunchj[MAX_LUNCHES];
+  int lunch[MAX_LUNCHES];
   int lunch_attack_code[MAX_LUNCHES];
-  int lunch_attacki[MAX_LUNCHES];
-  int lunch_attackj[MAX_LUNCHES];
+  int lunch_attack_point[MAX_LUNCHES];
   int lunch_defend_code[MAX_LUNCHES];
-  int lunch_defendi[MAX_LUNCHES];
-  int lunch_defendj[MAX_LUNCHES];
+  int lunch_defense_point[MAX_LUNCHES];
   int inessential[MAX_BOARD][MAX_BOARD];
   
   int lunches_are_current; /* If true, owl lunch data is current */  
@@ -323,10 +320,9 @@ do_owl_analyze_semeai(int apos, int bpos,
     owl_find_lunches(owla);
     owl_find_lunches(owlb);
     for (k = 0; k < MAX_LUNCHES; k++) {
-      if (owla->lunchi[k] != -1 
-	  && (owlb->goal)[owla->lunchi[k]][owla->lunchj[k]]) {
-	owla->lunchi[k] = -1;
-	owla->lunchj[k] = -1;
+      if (owla->lunch[k] != NO_MOVE 
+	  && (owlb->goal)[I(owla->lunch[k])][J(owla->lunch[k])]) {
+	owla->lunch[k] = NO_MOVE;
       }
     }
     if (color == BLACK)
@@ -588,26 +584,24 @@ do_owl_analyze_semeai(int apos, int bpos,
    * fewer liberties to avoid having to increase the depth parameters.
    */
   {
-    int ma[MAX_BOARD][MAX_BOARD];
+    int ma[BOARDMAX];
     int origin;
-    int oi, oj;
-    int ui, uj;
+    int upos;
+
     memset(ma, 0, sizeof(ma));
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
 	if ((owlb->goal)[m][n]) {
 	  origin = find_origin(POS(m, n));
-	  oi = I(origin);
-	  oj = J(origin);
-	  if (!ma[oi][oj] &&
+	  if (!ma[origin] &&
 	      ((m > 0 && (owla->goal)[m-1][n])
 	       || (m < board_size-1 && (owla->goal)[m+1][n])
 	       || (n > 0 && (owla->goal)[m][n-1])
 	       || (n <board_size-1 && (owla->goal)[m][n+1]))) {
-	    if (countlib(origin) < 3 && attack(oi, oj, &ui, &uj)) {
+	    if (countlib(origin) < 3 && attack(origin, &upos)) {
 	      *resulta = ALIVE;
 	      *resultb = DEAD;
-	      if (move) *move = POS(ui, uj);
+	      if (move) *move = upos;
 	      sgf_dumptree = save_sgf_dumptree;
 	      count_variations = save_count_variations;
 	      return;
@@ -616,7 +610,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	     * duplicate reading.
 	     */
 	    else
-	      ma[oi][oj] = 1;
+	      ma[origin] = 1;
 	  }
 	}
   }
@@ -1029,16 +1023,16 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
        * otherwise looks alive, this may turn a dead dragon into one
        * which can live by ko.
        */
-      int ai, aj;
+      int apos;
       int result;
       SGFTree *save_sgf_dumptree = sgf_dumptree;
       int save_count_variations = count_variations;
       
       sgf_dumptree = NULL;
       count_variations = 0;
-      result = attack(m, n, &ai, &aj);
+      result = attack(POS(m, n), &apos);
       if (result == WIN || (result != 0 && probable_min >= 2)) {
-	shape_moves[0].pos         = POS(ai, aj);
+	shape_moves[0].pos         = apos;
 	shape_moves[0].value       = 25;
 	shape_moves[0].name        = "tactical attack";
 	shape_moves[0].same_dragon = 2;
@@ -1613,16 +1607,16 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
        * have no strategical effect other than wasting owl nodes or
        * confusing the eye analysis.
        */
-      int di, dj;
+      int dpos;
       SGFTree *save_sgf_dumptree = sgf_dumptree;
       int save_count_variations = count_variations;
       
       sgf_dumptree = NULL;
       count_variations = 0;
-      if (attack_and_defend(m, n, NULL, NULL, NULL, NULL, &di, &dj)
-	  && (approxlib(POS(di, dj), color, 2, NULL) > 1
-	      || does_capture_something(POS(di, dj), color))) {
-	shape_moves[0].pos         = POS(di, dj);
+      if (attack_and_defend(POS(m, n), NULL, NULL, NULL, &dpos)
+	  && (approxlib(dpos, color, 2, NULL) > 1
+	      || does_capture_something(dpos, color))) {
+	shape_moves[0].pos         = dpos;
 	shape_moves[0].value       = 25;
 	shape_moves[0].name        = "tactical defense";
 	shape_moves[0].same_dragon = 2;
@@ -1860,11 +1854,11 @@ owl_determine_life(struct local_owl_data *owl,
   if (0) {
     int k;
     for (k = 0; k < MAX_LUNCHES; k++)
-      if (owl->lunchi[k] != -1)
-	gprintf("owl lunch %m, attack %m, defend %m\n",
-		owl->lunchi[k], owl->lunchj[k],
-		owl->lunch_attacki[k], owl->lunch_attackj[k],
-		owl->lunch_defendi[k], owl->lunch_defendj[k]);
+      if (owl->lunch[k] != NO_MOVE)
+	gprintf("owl lunch %1m, attack %1m, defend %1m\n",
+		owl->lunch[k],
+		owl->lunch_attack_point[k],
+		owl->lunch_defense_point[k]);
   }
 
   owl_make_domains(owl, NULL);
@@ -1912,7 +1906,7 @@ owl_determine_life(struct local_owl_data *owl,
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      owl->half_eye[m][n].type = 0;
+      owl->half_eye[POS(m, n)].type = 0;
 
   /* Find topological half eyes and false eyes by analyzing the
    * diagonal intersections, as described in the Texinfo
@@ -1955,7 +1949,7 @@ owl_determine_life(struct local_owl_data *owl,
 
 	if (sum >= 4) {
 	  int previously_marginal = eye[m][n].marginal;
-	  owl->half_eye[m][n].type = FALSE_EYE;
+	  owl->half_eye[POS(m, n)].type = FALSE_EYE;
 	  if (eye[m][n].esize == 1
 	      || is_legal2(m, n, OTHER_COLOR(color))
 	      || BOARD(m, n) == OTHER_COLOR(color)) {
@@ -1980,13 +1974,11 @@ owl_determine_life(struct local_owl_data *owl,
 	  }
 	}
 	else if (sum == 3) {
-	  owl->half_eye[m][n].type = HALF_EYE;
-	  ASSERT2(owl->half_eye[m][n].num_attacks > 0, m, n);
-	  ASSERT_ON_BOARD2(owl->half_eye[m][n].ai[0],
-			  owl->half_eye[m][n].aj[0]);
-	  ASSERT2(owl->half_eye[m][n].num_defends > 0, m, n);
-	  ASSERT_ON_BOARD2(owl->half_eye[m][n].di[0],
-			  owl->half_eye[m][n].dj[0]);
+	  owl->half_eye[POS(m, n)].type = HALF_EYE;
+	  ASSERT2(owl->half_eye[POS(m,n)].num_attacks > 0, m, n);
+	  ASSERT_ON_BOARD1(owl->half_eye[POS(m, n)].attack_point[0]);
+	  ASSERT2(owl->half_eye[POS(m, n)].num_defends > 0, m, n);
+	  ASSERT_ON_BOARD1(owl->half_eye[POS(m, n)].defense_point[0]);
 	}
       }
   }
@@ -2096,13 +2088,13 @@ owl_determine_life(struct local_owl_data *owl,
    */
   {
     for (lunch = 0; (lunch < MAX_LUNCHES); lunch++)
-      if ((owl->lunchi[lunch] != -1) &&
-	  (owl->lunch_defendi[lunch] != -1)) {
+      if ((owl->lunch[lunch] != NO_MOVE) &&
+	  (owl->lunch_defense_point[lunch] != NO_MOVE)) {
 	int value = 0;
 	int lunch_min;
 	int lunch_probable;
 	int lunch_max;
-	sniff_lunch(owl->lunchi[lunch], owl->lunchj[lunch],
+	sniff_lunch(I(owl->lunch[lunch]), J(owl->lunch[lunch]),
 		    &lunch_min, &lunch_probable, &lunch_max, owl);
 
 	*probable_max += lunch_max;
@@ -2110,30 +2102,28 @@ owl_determine_life(struct local_owl_data *owl,
 	if (lunch_probable == 0)
 	  value = 20;
 	else if (lunch_probable == 1 && lunch_max == 1) {
-	  value = 60 + countstones2(owl->lunchi[lunch], owl->lunchj[lunch]);
+	  value = 60 + countstones(owl->lunch[lunch]);
 	}
 	else if (lunch_probable == 1 && lunch_max == 2)
-	  value = 70 + countstones2(owl->lunchi[lunch], owl->lunchj[lunch]);
+	  value = 70 + countstones(owl->lunch[lunch]);
 	else
-	  value = 75 + countstones2(owl->lunchi[lunch], owl->lunchj[lunch]);
+	  value = 75 + countstones(owl->lunch[lunch]);
 	
 	if (owl->lunch_attack_code[lunch] != WIN)
 	  value -= 10;
 
 	if (does_attack) {
-	  TRACE("save lunch at %m with %m, score %d\n",
-		owl->lunchi[lunch], owl->lunchj[lunch],
-		owl->lunch_defendi[lunch], owl->lunch_defendj[lunch], value);
-	  owl_add_move(moves, POS(owl->lunch_defendi[lunch],
-				  owl->lunch_defendj[lunch]),
+	  TRACE("save lunch at %1m with %1m, score %d\n",
+		owl->lunch[lunch],
+		owl->lunch_defense_point[lunch], value);
+	  owl_add_move(moves, owl->lunch_defense_point[lunch],
 		       value, "save lunch", 1);
 	}
 	else {
-	  TRACE("eat lunch at %m with %m, score %d\n",
-		owl->lunchi[lunch], owl->lunchj[lunch],
-		owl->lunch_attacki[lunch], owl->lunch_attackj[lunch], value);
-	  owl_add_move(moves, POS(owl->lunch_attacki[lunch],
-				  owl->lunch_attackj[lunch]),
+	  TRACE("eat lunch at %1m with %1m, score %d\n",
+		owl->lunch[lunch],
+		owl->lunch_attack_point[lunch], value);
+	  owl_add_move(moves, owl->lunch_attack_point[lunch],
 		       value, "eat lunch", 1);
 	}
       }
@@ -3034,24 +3024,21 @@ owl_find_lunches(struct local_owl_data *owl)
   int lunches = 0;
   int prevlunch;
   int lunch;
-  int li, lj;
-  int ai, aj;
   int acode;
+  int apos;
   int dcode;
-  int di, dj;
+  int dpos;
   int color = owl->color;
   int other = OTHER_COLOR(color);
-  char already_checked[MAX_BOARD][MAX_BOARD];
+  char already_checked[BOARDMAX];
 
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
     
   sgf_dumptree = NULL;
   count_variations = 0;
-  for (prevlunch = 0; prevlunch < MAX_LUNCHES; prevlunch++) {
-    owl->lunchi[prevlunch] = -1;
-    owl->lunchj[prevlunch] = -1;
-  }
+  for (prevlunch = 0; prevlunch < MAX_LUNCHES; prevlunch++)
+    owl->lunch[prevlunch] = NO_MOVE;
   memset(owl->inessential, 0, sizeof(owl->inessential));
   
   memset(already_checked, 0, sizeof(already_checked));
@@ -3073,28 +3060,20 @@ owl_find_lunches(struct local_owl_data *owl)
 	    continue;
 	    
 	  lunch = find_origin(POS(m+dm, n+dn));
-	  li = I(lunch);
-	  lj = J(lunch);
-	  if (already_checked[li][lj])
+	  if (already_checked[lunch])
 	    continue;
-	  already_checked[li][lj] = 1;
+	  already_checked[lunch] = 1;
 	  
-	  attack_and_defend(li, lj, &acode, &ai, &aj, &dcode, &di, &dj);
+	  attack_and_defend(lunch, &acode, &apos, &dcode, &dpos);
 	  if (acode != 0) {
-	    owl->lunchi[lunches] = li;
-	    owl->lunchj[lunches] = lj;
-	    owl->lunch_attack_code[lunches] = acode;
-	    owl->lunch_attacki[lunches] = ai;
-	    owl->lunch_attackj[lunches] = aj;
-	    owl->lunch_defend_code[lunches] = dcode;
-	    if (dcode != 0) {
-	      owl->lunch_defendi[lunches] = di;
-	      owl->lunch_defendj[lunches] = dj;
-	    }
-	    else {
-	      owl->lunch_defendi[lunches] = -1;
-	      owl->lunch_defendj[lunches] = -1;
-	    }
+	    owl->lunch[lunches] = lunch;
+	    owl->lunch_attack_code[lunches]  = acode;
+	    owl->lunch_attack_point[lunches] = apos;
+	    owl->lunch_defend_code[lunches]  = dcode;
+	    if (dcode != 0)
+	      owl->lunch_defense_point[lunches] = dpos;
+	    else
+	      owl->lunch_defense_point[lunches] = NO_MOVE;
 	    lunches++;
 	    if (lunches == MAX_LUNCHES) {
 	      sgf_dumptree = save_sgf_dumptree;
@@ -3103,7 +3082,7 @@ owl_find_lunches(struct local_owl_data *owl)
 	      return;
 	    }
 	  }
-	  else if (!owl->inessential[li][lj]) {
+	  else if (!owl->inessential[I(lunch)][J(lunch)]) {
 	    /* Test for inessentiality. */
 	    int adj;
 	    int adjs[MAXCHAIN];
@@ -3118,9 +3097,9 @@ owl_find_lunches(struct local_owl_data *owl)
 	    /* First check the neighbors of the string. */
 	    adj = chainlinks(lunch, adjs);
 	    for (r = 0; r < adj; r++) {
-	      int bi = I(adjs[r]);
-	      int bj = J(adjs[r]);
-	      if (!owl->goal[bi][bj] || attack(bi, bj, NULL, NULL) != 0) {
+	      if (!owl->goal[I(adjs[r])][J(adjs[r])]
+		  || attack(adjs[r], NULL) != 0) 
+	      {
 		essential = 1;
 		break;
 	      }
@@ -3137,28 +3116,29 @@ owl_find_lunches(struct local_owl_data *owl)
 	      superstring[I(stones[r])][J(stones[r])] = 1;
 	    
 	    for (r = 0; r < liberties; r++) {
-	      int bi = I(libs[r]);
-	      int bj = J(libs[r]);
+	      int bpos = libs[r];
 	      int goal_found = 0;
 	      int s;
+
 	      for (s = 0; s < 4; s++) {
-		int ci = bi + deltai[s];
-		int cj = bj + deltaj[s];
-		if (!ON_BOARD2(ci, cj))
+		int cpos = bpos + delta[s];
+
+		if (!ON_BOARD(cpos))
 		  continue;
-		if (BOARD(ci, cj) == color) {
-		  if (attack(ci, cj, NULL, NULL) != 0) {
+		if (board[cpos] == color) {
+		  if (attack(cpos, NULL) != 0) {
 		    essential = 1;
 		    break;
 		  }
-		  else if (owl->goal[ci][cj])
+		  else if (owl->goal[I(cpos)][J(cpos)])
 		    goal_found = 1;
 		  else {
 		    essential = 1;
 		    break;
 		  }
 		}
-		else if (BOARD(ci, cj) == other && !superstring[ci][cj]) {
+		else if (board[cpos] == other
+			 && !superstring[I(cpos)][J(cpos)]) {
 		  essential = 1;
 		  break;
 		}
@@ -3171,7 +3151,7 @@ owl_find_lunches(struct local_owl_data *owl)
 	    }
 	    
 	    if (!essential) {
-	      TRACE("Inessential string found at %m.\n", li, lj);
+	      TRACE("Inessential string found at %1m.\n", lunch);
 	      for (r = 0; r < num_stones; r++)
 		owl->inessential[I(stones[r])][J(stones[r])] = 1;
 	    }
@@ -3220,34 +3200,32 @@ int
 owl_lively(int i, int j)
 {
   int origin;
-  int oi, oj, lunch;
+  int lunch;
   ASSERT_ON_BOARD2(i, j);
 
   if (BOARD(i, j) == EMPTY)
     return 0;
   origin = find_origin(POS(i, j));
-  oi = I(origin);
-  oj = J(origin);
+
   /* Lunches that can't be saved are dead, so don't report them as lively */
   for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
-    if ((current_owl_data->lunchi[lunch] == oi) 
-	&& (current_owl_data->lunchj[lunch] == oj)
-	&& (current_owl_data->lunch_defendi[lunch] == -1))
+    if ((current_owl_data->lunch[lunch] == origin) 
+	&& (current_owl_data->lunch_defense_point[lunch] == NO_MOVE))
       return 0;
 
   /* Inessential stones are not lively. */
-  if (current_owl_data->inessential[oi][oj])
+  if (current_owl_data->inessential[I(origin)][J(origin)])
     return 0;
   
   /* When reading a semeai there is a second set of owl data to consider */
   if (other_owl_data)
     for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
-      if ((other_owl_data->lunchi[lunch] == oi) 
-	  && (other_owl_data->lunchj[lunch] == oj)
-	  && (other_owl_data->lunch_defendi[lunch] == -1))
+      if ((other_owl_data->lunch[lunch] == origin) 
+	  && (other_owl_data->lunch_defense_point[lunch] == NO_MOVE))
 	return 0;
   return 1;
 }
+
 
 /* Caching version of safe_move for the callback. This function has
  * its own cache, separate from the global safe move cache. Note that
@@ -3267,7 +3245,7 @@ owl_safe_move(int i, int j, int color)
     return owl_safe_move_cache[i][j]-1;
 
   if (trymove(POS(i, j), color, "owl_safe_move", 0, EMPTY, 0)) {
-    acode = attack(i, j, NULL, NULL);
+    acode = attack(POS(i, j), NULL);
     if (acode != WIN)
       safe = 1;
     else
@@ -3498,7 +3476,7 @@ obvious_false_eye(int i, int j, int color)
     if (!ON_BOARD2(i+di, j+dj))
       diagonal_sum++;
     else if (BOARD(i+di, j+dj) == OTHER_COLOR(color)
-	     && !attack(i+di, j+dj, NULL, NULL))
+	     && !attack(POS(i+di, j+dj), NULL))
       diagonal_sum += 2;
   }
   

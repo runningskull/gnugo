@@ -42,8 +42,9 @@
 void
 decidestring(int m, int n, const char *sgf_output)
 {
-  int i, j, acode, dcode;
-  SGFTree tree;
+  int      pos;
+  int      acode, dcode;
+  SGFTree  tree;
   
   if (BOARD(m, n) == EMPTY) {
     fprintf(stderr, "gnugo: --decidestring called on an empty vertex\n");
@@ -57,17 +58,17 @@ decidestring(int m, int n, const char *sgf_output)
   reset_engine();
 
   count_variations = 1;
-  acode = attack(m, n, &i, &j);
+  acode = attack(POS(m, n), &pos);
   if (acode) {
     if (acode == WIN)
-      gprintf("%m can be attacked at %m (%d variations)\n", 
-	      m, n, i, j, count_variations);
+      gprintf("%m can be attacked at %1m (%d variations)\n", 
+	      m, n, pos, count_variations);
     else if (acode == KO_A)
-	gprintf("%m can be attacked with ko (good) at %m (%d variations)\n", 
-	      m, n, i, j, count_variations);
+	gprintf("%m can be attacked with ko (good) at %1m (%d variations)\n", 
+	      m, n, pos, count_variations);
     else if (acode == KO_B)
-	gprintf("%m can be attacked with ko (bad) at %m (%d variations)\n", 
-	      m, n, i, j, count_variations);
+	gprintf("%m can be attacked with ko (bad) at %1m (%d variations)\n", 
+	      m, n, pos, count_variations);
 
     if (debug & DEBUG_READING_PERFORMANCE) {
       gprintf("Reading shadow: \n");
@@ -75,17 +76,17 @@ decidestring(int m, int n, const char *sgf_output)
     }
 
     count_variations = 1;
-    dcode = find_defense(m, n, &i, &j);
+    dcode = find_defense(POS(m, n), &pos);
     if (dcode) {
       if (dcode == WIN)
-	gprintf("%m can be defended at %m (%d variations)\n", 
-		m, n, i, j, count_variations);
+	gprintf("%m can be defended at 1m (%d variations)\n", 
+		m, n, pos, count_variations);
       else if (dcode == KO_A)
-	gprintf("%m can be defended with ko (good) at %m (%d variations)\n", 
-		m, n, i, j, count_variations);
+	gprintf("%m can be defended with ko (good) at %1m (%d variations)\n", 
+		m, n, pos, count_variations);
       else if (dcode == KO_B)
-	gprintf("%m can be defended with ko (bad) at %m (%d variations)\n", 
-		m, n, i, j, count_variations);
+	gprintf("%m can be defended with ko (bad) at %1m (%d variations)\n", 
+		m, n, pos, count_variations);
     }
     else
       gprintf("%m cannot be defended (%d variations)\n", 

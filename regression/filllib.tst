@@ -84,7 +84,7 @@ loadsgf games/filllib6.sgf 261
 # played with the same result.
 loadsgf games/filllib7.sgf 72
 25 gg_genmove white
-#? [J3|H1|J5]*
+#? [J3|H1|J5]
 26 gg_genmove black
 #? [J5|H7|J7]
 
@@ -98,7 +98,7 @@ loadsgf games/filllib8.sgf 303
 # it anyway.
 loadsgf games/filllib9.sgf 235
 29 gg_genmove white
-#? [B1|A1]
+#? [B1|A1]*
 30 gg_genmove black
 #? [A3|A1|B1]
 

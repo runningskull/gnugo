@@ -351,7 +351,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
 
   /* Look for combination attacks. */
   {
-    int ai, aj;
+    int apos;
     int other = OTHER_COLOR(color);
     int aa_val;
 
@@ -361,12 +361,12 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
 
     if (save_verbose)
       gprintf("\nlooking for combination attacks ...\n");
-    aa_val = atari_atari(color, &ai, &aj, save_verbose);
+    aa_val = atari_atari(color, &apos, save_verbose);
     if (aa_val)
-      add_my_atari_atari_move(ai, aj, aa_val);
-    aa_val = atari_atari(other, &ai, &aj, save_verbose);
-    if (aa_val && safe_move2(ai, aj, color))
-      add_your_atari_atari_move(ai, aj, aa_val);
+      add_my_atari_atari_move(I(apos), J(apos), aa_val);
+    aa_val = atari_atari(other, &apos, save_verbose);
+    if (aa_val && safe_move(apos, color))
+      add_your_atari_atari_move(I(apos), J(apos), aa_val);
     verbose = save_verbose;
   }
   time_report(1, "atari atari", -1, -1);

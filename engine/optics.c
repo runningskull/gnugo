@@ -33,21 +33,38 @@
  * c, d match the first vital attack/defend point of the the half eye or none
  * at all.
  */
+#if 0
 #define hadj(heye, a, b, c, d)     ((heye[a][b].type==HALF_EYE) \
 				    && (((heye[a][b].ai[0]==c) \
 					 && (heye[a][b].aj[0]==d)) \
 					|| ((heye[a][b].di[0]==c) \
 					    && (heye[a][b].dj[0]==d))))
+#else
+#define hadj(heye, apos, bpos) \
+     (   (heye[apos].type==HALF_EYE) \
+      && (   (heye[apos].attack_point[0]==bpos) \
+          || ((heye[apos].defense_point[0]==bpos))))
+#endif
+
 /*
  * Two eye points are defined to be adjacent if they are either
  * next to each other or if one vertex is a half eye and the
  * other one is the point making it a real eye.
  */
 
+#if 0
 #define adjacent(heye, a, b, c, d) (((a==c) && ((b==d+1)||(b==d-1))) \
 				    || ((b==d) && ((a==c+1)||(a==c-1))) \
 				    || hadj(heye, a, b, c, d) \
 				    || hadj(heye, c, d, a, b))
+#else
+#define adjacent(heye, apos, bpos) ( ((apos)==(bpos)-1) \
+				     || ((apos)==(bpos)+1) \
+				     || ((apos)==(bpos)-NS) \
+				     || ((apos)==(bpos)+NS) \
+ 				     || hadj(heye, apos, bpos) \
+				     || hadj(heye, bpos, apos))
+#endif
 
 #define MAXEYE 20
 
@@ -67,7 +84,7 @@ static int false_margin(int i, int j, int color,
 static int recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 			 int *max, int *min, 
 			 struct eye_data eye[MAX_BOARD][MAX_BOARD],
-			 struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+			 struct half_eye_data heye[BOARDMAX],
 			 int add_moves, int color);
 static int linear_eye_space(int i, int j, int *attacki, int *attackj,
 			    int *max, int *min,
@@ -75,7 +92,7 @@ static int linear_eye_space(int i, int j, int *attacki, int *attackj,
 static void first_map(int q, int map[MAXEYE]);
 static int next_map(int *q, int map[MAXEYE], int esize);
 static void print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
-		      struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+		      struct half_eye_data heye[BOARDMAX],
 		      int i, int j);
 static int 
 evaluate_diagonal_intersection(int m, int n, int color,
@@ -649,13 +666,13 @@ false_margin(int i, int j, int color, int lively[MAX_BOARD][MAX_BOARD])
 	       && worm[i][j+1].attack_code == 0)))
       || (stackp > 0
 	  && ((BOARD(i-1, j) == other && lively[i-1][j] 
-	       && !attack(i-1, j, NULL, NULL))
+	       && !attack(POS(i-1, j), NULL))
 	      || (BOARD(i+1, j) == other && lively[i+1][j]
-		  && !attack(i+1, j, NULL, NULL))
+		  && !attack(POS(i+1, j), NULL))
 	      || (BOARD(i, j-1) == other && lively[i][j-1]
-		  && !attack(i, j-1, NULL, NULL))
+		  && !attack(POS(i, j-1), NULL))
 	      || (BOARD(i, j+1) == other && lively[i][j+1]
-		  && !attack(i, j+1, NULL, NULL))))) {
+		  && !attack(POS(i, j+1), NULL))))) {
     if (safe_move2(i, j, other) == 0) {
       DEBUG(DEBUG_EYES, "False margin for %s at %m.\n",
 	    color_to_string(color), i, j);
@@ -718,7 +735,7 @@ originate_eye(int i, int j, int m, int n,
 
 static void
 print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
-	  struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+	  struct half_eye_data heye[BOARDMAX],
 	  int i, int j)
 {
   int m,n;
@@ -755,12 +772,12 @@ print_eye(struct eye_data eye[MAX_BOARD][MAX_BOARD],
 	if (BOARD(m, n) == EMPTY) {
 	  if (eye[m][n].marginal)
 	    gprintf("%o!");
-	  else if (halfeye(heye, m, n))
+	  else if (is_halfeye(heye, POS(m, n)))
 	    gprintf("%oh");
 	  else
 	    gprintf("%o.");
 	}
-	else if (halfeye(heye, m, n))
+	else if (is_halfeye(heye, POS(m, n)))
 	  gprintf("%oH");
 	else
 	  gprintf("%oX");
@@ -788,7 +805,7 @@ void
 compute_eyes(int i, int  j, int *max, int *min, int *attacki, int *attackj,
 	     int *defendi, int *defendj,
 	     struct eye_data eye[MAX_BOARD][MAX_BOARD],
-	     struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+	     struct half_eye_data heye[BOARDMAX],
 	     int add_moves, int color)
 {
   int m, n;
@@ -813,9 +830,9 @@ compute_eyes(int i, int  j, int *max, int *min, int *attacki, int *attackj,
 	  DEBUG(DEBUG_EYES, "%m (!)\n", m, n);
 	else if (!eye[m][n].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X)\n", m, n);
-	else if (halfeye(heye, m, n) && BOARD(m, n) == EMPTY)
+	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (H)\n", m, n);
-	else if (halfeye(heye, m, n) && BOARD(m, n) != EMPTY)
+	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (XH)\n", m, n);
 	else
 	  DEBUG(DEBUG_EYES, "%m\n", m, n);
@@ -924,7 +941,7 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 			 int *attacki, int *attackj,
 			 int *defendi, int *defendj,
 			 struct eye_data eye[MAX_BOARD][MAX_BOARD],
-			 struct half_eye_data heye[MAX_BOARD][MAX_BOARD])
+			 struct half_eye_data heye[BOARDMAX])
 {
   int m, n;
   int margins = 0;
@@ -936,11 +953,11 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
     for (n = 0; n < board_size; n++) {
       if (eye[m][n].origin == POS(i, j)
 	  && (eye[m][n].marginal
-	      || halfeye(heye, m, n))) {
+	      || is_halfeye(heye, POS(m, n)))) {
 	margins++;
 	if (eye[m][n].marginal && eye[m][n].marginal_neighbors > 0)
 	  margins_adjacent_to_margin++;
-	if (halfeye(heye, m, n))
+	if (is_halfeye(heye, POS(m, n)))
 	  halfeyes++;
       }
     }
@@ -972,9 +989,9 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 	  DEBUG(DEBUG_EYES, "%m (!)\n", m, n);
 	else if (!eye[m][n].marginal && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (X)\n", m, n);
-	else if (halfeye(heye, m, n) && BOARD(m, n) == EMPTY)
+	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (H)\n", m, n);
-	else if (halfeye(heye, m, n) && BOARD(m, n) != EMPTY)
+	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) != EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (XH)\n", m, n);
 	else
 	  DEBUG(DEBUG_EYES, "%m\n", m, n);
@@ -1064,13 +1081,13 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 	    ASSERT_ON_BOARD2(m, n);
 	    return;
 	  }
-	  else if (halfeye(heye, m, n)) {
-	    if (defendi) *defendi = heye[m][n].di[0];
-	    if (defendj) *defendj = heye[m][n].dj[0];
-	    if (attacki) *attacki = heye[m][n].ai[0];
-	    if (attackj) *attackj = heye[m][n].aj[0];
-	    ASSERT_ON_BOARD2(heye[m][n].di[0], heye[m][n].dj[0]);
-	    ASSERT_ON_BOARD2(heye[m][n].ai[0], heye[m][n].aj[0]);
+	  else if (is_halfeye(heye, POS(m, n))) {
+	    ASSERT_ON_BOARD1(heye[POS(m, n)].defense_point[0]);
+	    ASSERT_ON_BOARD1(heye[POS(m, n)].attack_point[0]);
+	    if (defendi) *defendi = I(heye[POS(m, n)].defense_point[0]);
+	    if (defendj) *defendj = J(heye[POS(m, n)].defense_point[0]);
+	    if (attacki) *attacki = I(heye[POS(m, n)].attack_point[0]);
+	    if (attackj) *attackj = J(heye[POS(m, n)].attack_point[0]);
 	    return;
 	  }
 	}
@@ -1487,20 +1504,20 @@ static int
 recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	      int *max, int *min, 
 	      struct eye_data eye[MAX_BOARD][MAX_BOARD], 
-	      struct half_eye_data heye[MAX_BOARD][MAX_BOARD], 
+	      struct half_eye_data heye[BOARDMAX], 
 	      int add_moves, int color)
 {
   int m, n;
   int k;
   int eye_size = 0;
-  int vi[MAXEYE], vj[MAXEYE], marginal[MAXEYE], neighbors[MAXEYE];
+  int vpos[MAXEYE], marginal[MAXEYE], neighbors[MAXEYE];
   int edge[MAXEYE];
   int graph;
   int q;
   int map[MAXEYE];
   int ok, contin;
   int eye_color;
-  int ki, kj;
+  int kpos;
   int num_marginals = 0;
 
   /* Set `eye_color' to the owner of the eye. */
@@ -1521,17 +1538,16 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (eye[m][n].origin == POS(i, j)) {
-	vi[eye_size] = m;
-	vj[eye_size] = n;
+	vpos[eye_size] = POS(m, n);
 	marginal[eye_size] = eye[m][n].marginal;
 	if (marginal[eye_size])
 	  num_marginals++;
 	neighbors[eye_size] = eye[m][n].neighbors;
 	if (0) {
 	  if (marginal[eye_size])
-	    TRACE("(%m)", vi[eye_size], vj[eye_size]);
+	    TRACE("(%1m)", vpos[eye_size]);
 	  else
-	    TRACE(" %m ", vi[eye_size], vj[eye_size]);
+	    TRACE(" %1m ", vpos[eye_size]);
 	  TRACE("\n");
 	}
 
@@ -1542,24 +1558,19 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	  edge[eye_size]++;
 	
 	eye_size++;
-	if (halfeye(heye, m, n)) {
+	if (is_halfeye(heye, POS(m, n))) {
 
 	  /* Use one of the diagonals as a marginal for mapping purposes.
 	   * The whole set of diagonals is isomorphic to a marginal.
 	   * Note that the half eye preceedes the diagonal in the list.
 	   */
 	  neighbors[eye_size-1]++;       /* increase neighbors of half eye */
-	  if (eye_color == color) {
-	    ki = heye[m][n].di[0];
-	    kj = heye[m][n].dj[0];
-	  }
-	  else {
-	    ki = heye[m][n].ai[0];
-	    kj = heye[m][n].aj[0];
-	  }
-	  ASSERT_ON_BOARD2(ki, kj);
-	  vi[eye_size] = ki;
-	  vj[eye_size] = kj;
+	  if (eye_color == color)
+	    kpos = heye[POS(m, n)].defense_point[0];
+	  else
+	    kpos = heye[POS(m, n)].attack_point[0];
+	  ASSERT_ON_BOARD1(kpos);
+	  vpos[eye_size] = kpos;
 	  marginal[eye_size] = 1;
 	  edge[eye_size] = 0;
 	  num_marginals++;
@@ -1608,12 +1619,12 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	      (graphs[graph].vertex[q].type == '@')))
 	ok = 0;
       
-      if (ok && (BOARD(vi[map[q]], vj[map[q]]) != EMPTY) 
+      if (ok && (board[vpos[map[q]]] != EMPTY) 
 	  && (graphs[graph].vertex[q].type != 'X')
 	  && (graphs[graph].vertex[q].type != 'x'))
 	ok = 0;
       
-      if (ok && (BOARD(vi[map[q]], vj[map[q]]) == EMPTY) 
+      if (ok && (board[vpos[map[q]]] == EMPTY) 
 	  && (graphs[graph].vertex[q].type == 'X'))
 	ok = 0;
 
@@ -1623,33 +1634,29 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
       if (ok && graphs[graph].vertex[q].n1 < q
 	  && (graphs[graph].vertex[q].n1 != -1)) 
 	{
-	  if (!adjacent(heye, vi[map[q]], vj[map[q]], 
-			vi[map[graphs[graph].vertex[q].n1]],
-			vj[map[graphs[graph].vertex[q].n1]]))
+	  if (!adjacent(heye, vpos[map[q]], 
+			vpos[map[graphs[graph].vertex[q].n1]]))
 	    ok = 0;
 	}
       if (ok && graphs[graph].vertex[q].n2 < q
 	  && (graphs[graph].vertex[q].n2 != -1)) 
 	{
-	  if (!adjacent(heye, vi[map[q]], vj[map[q]], 
-			vi[map[graphs[graph].vertex[q].n2]],
-			vj[map[graphs[graph].vertex[q].n2]]))
+	  if (!adjacent(heye, vpos[map[q]], 
+			vpos[map[graphs[graph].vertex[q].n2]]))
 	    ok = 0;
 	}
       if (ok && graphs[graph].vertex[q].n3 < q
 	  && (graphs[graph].vertex[q].n3 != -1)) 
 	{
-	  if (!adjacent(heye, vi[map[q]], vj[map[q]], 
-			vi[map[graphs[graph].vertex[q].n3]],
-			vj[map[graphs[graph].vertex[q].n3]]))
+	  if (!adjacent(heye, vpos[map[q]],
+			vpos[map[graphs[graph].vertex[q].n3]]))
 	    ok = 0;
 	}
       if (ok && graphs[graph].vertex[q].n4 < q
 	  && (graphs[graph].vertex[q].n4 != -1)) 
 	{
-	  if (!adjacent(heye, vi[map[q]], vj[map[q]], 
-			vi[map[graphs[graph].vertex[q].n4]],
-			vj[map[graphs[graph].vertex[q].n4]]))
+	  if (!adjacent(heye, vpos[map[q]],
+			vpos[map[graphs[graph].vertex[q].n4]]))
 	    ok = 0;
 	}
 
@@ -1671,10 +1678,10 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
       *min = graphs[graph].min;
       if (*max != *min) {
 	gg_assert(graphs[graph].vital >= 0);
-	if (ai) *ai = vi[map[graphs[graph].vital]];
-	if (aj) *aj = vj[map[graphs[graph].vital]];
-	if (di) *di = vi[map[graphs[graph].vital]];
-	if (dj) *dj = vj[map[graphs[graph].vital]];
+	if (ai) *ai = I(vpos[map[graphs[graph].vital]]);
+	if (aj) *aj = J(vpos[map[graphs[graph].vital]]);
+	if (di) *di = I(vpos[map[graphs[graph].vital]]);
+	if (dj) *dj = J(vpos[map[graphs[graph].vital]]);
 	DEBUG(DEBUG_EYES, "  vital points: %m (attack) %m (defense)\n",
 	      *ai, *aj, *di, *dj);
 	DEBUG(DEBUG_EYES, "  pattern matched:  %d\n", graphs[graph].id);
@@ -1685,7 +1692,8 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	      if (graphs[graph].vertex[k].type == '*' ||
 		  graphs[graph].vertex[k].type == '<') {
 		/* add attack vital move */
-		add_vital_eye_move(vi[map[k]], vj[map[k]], i, j, eye_color);
+		add_vital_eye_move(I(vpos[map[k]]), J(vpos[map[k]]),
+				   i, j, eye_color);
 	      }
 	      else if (graphs[graph].vertex[k].type == '@' ||
 		       graphs[graph].vertex[k].type == '(') {
@@ -1694,19 +1702,20 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
  		 * If it is a half eye diagonal, the half eye preceeds
  		 * the diagonal in the list of vertices
  		 */
-		if (map[k] > 0 && halfeye(heye, vi[map[k]-1], vj[map[k]-1])) {
+		if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
 		  /* add all diagonals as vital */
 		  int ix;
-		  struct half_eye_data *this_half_eye = 
-		    &heye[vi[map[k]-1]][vj[map[k]-1]];
+		  struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
+
 		  for (ix = 0; ix < this_half_eye->num_attacks; ix++) {
-		    add_vital_eye_move(this_half_eye->ai[ix],
-				       this_half_eye->aj[ix], 
+		    add_vital_eye_move(I(this_half_eye->attack_point[ix]),
+				       J(this_half_eye->attack_point[ix]), 
 				       i, j, eye_color);
 		  }
 		}
 		else {
-		  add_vital_eye_move(vi[map[k]], vj[map[k]], i, j, eye_color);
+		  add_vital_eye_move(I(vpos[map[k]]), J(vpos[map[k]]),
+				     i, j, eye_color);
 		}
 	      }
 	    }
@@ -1714,23 +1723,25 @@ recognize_eye(int i, int j, int *ai, int *aj, int *di, int *dj,
 	      if (graphs[graph].vertex[k].type == '*' ||
 		  graphs[graph].vertex[k].type == '>')
 		/* add defense vital move */
-		add_vital_eye_move(vi[map[k]], vj[map[k]], i, j, eye_color);
+		add_vital_eye_move(I(vpos[map[k]]), J(vpos[map[k]]),
+				   i, j, eye_color);
 	      else if (graphs[graph].vertex[k].type == '@' ||
 		       graphs[graph].vertex[k].type == ')') {
 		/* check for marginal matching half eye diagonal */
-		if (map[k] > 0 && halfeye(heye, vi[map[k]-1], vj[map[k]-1])) {
+		if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
 		  /* add all diagonals as vital */
 		  int ix;
-		  struct half_eye_data *this_half_eye = 
-		    &heye[vi[map[k]-1]][vj[map[k]-1]];
+		  struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
+
 		  for (ix = 0; ix < this_half_eye->num_defends; ix++) {
-		    add_vital_eye_move(this_half_eye->di[ix],
-				       this_half_eye->dj[ix], 
+		    add_vital_eye_move(I(this_half_eye->defense_point[ix]),
+				       J(this_half_eye->defense_point[ix]), 
 				       i, j, eye_color);
 		  }
 		}
 		else {
-		  add_vital_eye_move(vi[map[k]], vj[map[k]], i, j, eye_color);
+		  add_vital_eye_move(I(vpos[map[k]]), J(vpos[map[k]]),
+				     i, j, eye_color);
 		}
 	      }
 	    }
@@ -1820,12 +1831,12 @@ next_map(int *q, int map[MAXEYE], int esize)
 
 void
 add_half_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD],
-	     struct half_eye_data heye[MAX_BOARD][MAX_BOARD])
+	     struct half_eye_data heye[BOARDMAX])
 {
-  if (heye[m][n].type)
+  if (heye[POS(m, n)].type)
     DEBUG(DEBUG_EYES, "half or false eye found at %m\n", m, n);
 
-  if (heye[m][n].type == FALSE_EYE) {
+  if (heye[POS(m, n)].type == FALSE_EYE) {
     DEBUG(DEBUG_EYES, "false eye at %m for dragon at %1m\n",
 	  m, n, eye[m][n].dragon);
     if (eye[m][n].color != GRAY) {
@@ -1897,9 +1908,9 @@ marginal_eye_space(int i, int j)
 }
 
 int
-halfeye(struct half_eye_data heye[MAX_BOARD][MAX_BOARD], int i, int j)
+is_halfeye(struct half_eye_data heye[BOARDMAX], int pos)
 {
-  return heye[i][j].type == HALF_EYE;
+  return heye[pos].type == HALF_EYE;
 }
 
 /* Turn a marginal eye space into a proper eye space. */
@@ -1935,7 +1946,7 @@ make_proper_eye_space(int i, int j, int color)
 
 /* remove a halfeye from an eye shape. */
 void
-remove_half_eye(struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+remove_half_eye(struct half_eye_data heye[BOARDMAX],
 		int m, int n, int color)
 {
   /* This function is unreliable, not up to date with eye_data and
@@ -2005,7 +2016,7 @@ topological_eye(int m, int n, int color,
 		int *ai, int *aj, int *di, int *dj, 
 		struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 		struct eye_data w_eye[MAX_BOARD][MAX_BOARD],
-		struct half_eye_data heye[MAX_BOARD][MAX_BOARD])
+		struct half_eye_data heye[BOARDMAX])
 {
   int sum = 0;
   int val;
@@ -2017,13 +2028,11 @@ topological_eye(int m, int n, int color,
   sum += val;
   if (val == 1) {
     if (ai != NULL && *ai >= 0) {
-      heye[m][n].ai[ax] = *ai;
-      heye[m][n].aj[ax] = *aj;
+      heye[POS(m, n)].attack_point[ax] = POS(*ai, *aj);
       ax++;
     }
     if (di != NULL && *di >= 0) {
-      heye[m][n].di[dx] = *di;
-      heye[m][n].dj[dx] = *dj;
+      heye[POS(m, n)].defense_point[dx] = POS(*di, *dj);
       dx++;
     }
   }
@@ -2033,13 +2042,11 @@ topological_eye(int m, int n, int color,
   sum += val;
   if (val == 1) {
     if (ai != NULL && *ai >= 0) {
-      heye[m][n].ai[ax] = *ai;
-      heye[m][n].aj[ax] = *aj;
+      heye[POS(m, n)].attack_point[ax] = POS(*ai, *aj);
       ax++;
     }
     if (di != NULL && *di >= 0) {
-      heye[m][n].di[dx] = *di;
-      heye[m][n].dj[dx] = *dj;
+      heye[POS(m, n)].defense_point[dx] = POS(*di, *dj);
       dx++;
     }
   }
@@ -2049,13 +2056,11 @@ topological_eye(int m, int n, int color,
   sum += val;
   if (val == 1) {
     if (ai != NULL && *ai >= 0) {
-      heye[m][n].ai[ax] = *ai;
-      heye[m][n].aj[ax] = *aj;
+      heye[POS(m, n)].attack_point[ax] = POS(*ai, *aj);
       ax++;
     }
     if (di != NULL && *di >= 0) {
-      heye[m][n].di[dx] = *di;
-      heye[m][n].dj[dx] = *dj;
+      heye[POS(m, n)].defense_point[dx] = POS(*di, *dj);
       dx++;
     }
   }
@@ -2065,19 +2070,17 @@ topological_eye(int m, int n, int color,
   sum += val;
   if (val == 1) {
     if (ai != NULL && *ai >= 0) {
-      heye[m][n].ai[ax] = *ai;
-      heye[m][n].aj[ax] = *aj;
+      heye[POS(m, n)].attack_point[ax] = POS(*ai, *aj);
       ax++;
     }
     if (di != NULL && *di >= 0) {
-      heye[m][n].di[dx] = *di;
-      heye[m][n].dj[dx] = *dj;
+      heye[POS(m, n)].defense_point[dx] = POS(*di, *dj);
       dx++;
     }
   }
 
-  heye[m][n].num_attacks = ax;
-  heye[m][n].num_defends = dx;
+  heye[POS(m, n)].num_attacks = ax;
+  heye[POS(m, n)].num_defends = dx;
   return sum;
 }
 
@@ -2105,11 +2108,9 @@ evaluate_diagonal_intersection(int m, int n, int color,
   int value = 0;
   int other = OTHER_COLOR(color);
   int acode = 0;
-  int ai = -1;
-  int aj = -1;
+  int apos = NO_MOVE;
   int dcode = 0;
-  int di = -1;
-  int dj = -1;
+  int dpos = NO_MOVE;
 
   /* Check whether intersection is off the board.*/
   if (m < 0 || m >= board_size)
@@ -2158,16 +2159,14 @@ evaluate_diagonal_intersection(int m, int n, int color,
 	  value = 2;
 	else if (worm[m][n].defend_code != 0) {
 	  value = 1;
-	  ai = I(worm[m][n].attack_point);
-	  aj = J(worm[m][n].attack_point);
-	  di = I(worm[m][n].defense_point);
-	  dj = J(worm[m][n].defense_point);
+	  apos = worm[m][n].attack_point;
+	  dpos = worm[m][n].defense_point;
 	}
       }
     }
     else {
       if (BOARD(m, n) == other) {
-	attack_and_defend(m, n, &acode, &ai, &aj, &dcode, &di, &dj);
+	attack_and_defend(POS(m, n), &acode, &apos, &dcode, &dpos);
 	if (acode == 0)
 	  value = 2;
 	else if (dcode != 0)
@@ -2189,12 +2188,12 @@ evaluate_diagonal_intersection(int m, int n, int color,
        * be equally valid. It's not good that we make an arbitrary
        * choice at this point.
        */
-      if (attacki) *attacki = ai;
-      if (attackj) *attackj = aj;
-      if (defendi) *defendi = di;
-      if (defendj) *defendj = dj;
-      ASSERT_ON_BOARD2(ai, aj);
-      ASSERT_ON_BOARD2(di, dj);
+      if (attacki) *attacki = I(apos);
+      if (attackj) *attackj = J(apos);
+      if (defendi) *defendi = I(dpos);
+      if (defendj) *defendj = J(dpos);
+      ASSERT_ON_BOARD1(apos);
+      ASSERT_ON_BOARD1(dpos);
     }
   }
 

@@ -362,8 +362,15 @@ gnugo_genmove(Position *pos, int *i, int *j, int color, int move_number)
 int
 gnugo_attack(Position *pos, int m, int n, int *i, int *j)
 {
+  int  retval;
+  int  move;
+
   position_to_globals(pos);
-  return attack(m, n, i, j);
+  retval = attack(POS(m, n), &move);
+
+  if (i) *i = I(move);
+  if (j) *j = J(move);
+  return retval;
 }
 
 
@@ -371,8 +378,15 @@ gnugo_attack(Position *pos, int m, int n, int *i, int *j)
 int
 gnugo_find_defense(Position *pos, int m, int n, int *i, int *j)
 {
+  int  retval;
+  int  move;
+
   position_to_globals(pos);
-  return find_defense(m, n, i, j);
+  retval = find_defense(POS(m, n), &move);
+
+  if (i) *i = I(move);
+  if (j) *j = J(move);
+  return retval;
 }
 
 

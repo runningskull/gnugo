@@ -228,14 +228,14 @@ void reading_cache_init(int bytes);
 void reading_cache_clear(void);
 
 /* reading.c */
-int attack(int si, int sj, int *i, int *j);
-int find_defense(int si, int sj, int *i, int *j);
-int attack_and_defend(int si, int sj,
-		      int *attack_code, int *attacki, int *attackj,
-		      int *defend_code, int *defendi, int *defendj);
-int attack_either(int ai, int aj, int bi, int bj);
-int defend_both(int ai, int aj, int bi, int bj);
-int break_through(int ai, int aj, int bi, int bj, int ci, int cj);
+int attack(int str, int *move);
+int find_defense(int str, int *move);
+int attack_and_defend(int str,
+		      int *attack_code, int *attack_point,
+		      int *defend_code, int *defense_point);
+int attack_either(int astr, int bstr);
+int defend_both(int astr, int bstr);
+int break_through(int apos, int bpos, int cpos);
 #define MOVE_ORDERING_PARAMETERS 67
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
 void draw_reading_shadow(void);
@@ -364,10 +364,12 @@ void small_semeai(void);
 void small_semeai_analyzer(int, int, int, int);
 void shapes(int color);
 void endgame_shapes(int color);
-int atari_atari(int color, int *i, int *j, int save_verbose);
-int atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
+
+int atari_atari(int color, int *move, int save_verbose);
+int atari_atari_confirm_safety(int color, int tpos, int *move,
 			       int minsize);
-int atari_atari_try_combination(int color, int ai, int aj, int bi, int bj);
+int atari_atari_try_combination(int color, int apos, int bpos);
+
 int review_move_reasons(int *i, int *j, float *val, int color,
 			float pure_threat_value, float lower_bound);
 int fill_liberty(int *i, int *j, int color);
@@ -546,15 +548,13 @@ extern struct stats_data stats;
 struct half_eye_data {
   int type;         /* HALF_EYE or FALSE_EYE; */
   int num_attacks;  /* number of attacking points */
-  int num_defends;  /* number of defending points */
-  int ai[4];        /* (ai, aj) is the move to attack a topological halfeye */
-  int aj[4];
-  int di[4];        /* (di, dj) is the move to defend a topological halfeye */
-  int dj[4];
+  int attack_point[4];  /* the move to attack a topological halfeye */
+  int num_defends;      /* number of defending points */
+  int defense_point[4]; /* the move to defend a topological halfeye */
 };
 
 /* array of half-eye data */
-extern struct half_eye_data half_eye[MAX_BOARD][MAX_BOARD];
+extern struct half_eye_data half_eye[BOARDMAX];
 
 /*
  * data concerning a worm. A copy is kept at each vertex of the worm.
@@ -701,18 +701,18 @@ extern struct eye_data black_eye[MAX_BOARD][MAX_BOARD];
 void compute_eyes(int i, int  j, int *max, int *min,
                   int *attacki, int *attackj, int *defendi, int *defendj,
                   struct eye_data eye[MAX_BOARD][MAX_BOARD],
-                  struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+                  struct half_eye_data heye[BOARDMAX],
                   int add_moves, int color);
 void compute_eyes_pessimistic(int i, int  j, int *max, int *min,
                               int *pessimistic_min,
                               int *attacki, int *attackj,
                               int *defendi, int *defendj,
                               struct eye_data eye[MAX_BOARD][MAX_BOARD],
-                              struct half_eye_data heye[MAX_BOARD][MAX_BOARD]);
+                              struct half_eye_data heye[BOARDMAX]);
 int recognize_eye2(int m, int n, int *attacki, int *attackj,
                     int *defendi, int *defendj, int *max, int *min,
                     struct eye_data eye[MAX_BOARD][MAX_BOARD],
-                    struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+                    struct half_eye_data heye[BOARDMAX],
                     int add_moves, int color);
 void propagate_eye (int, int, struct eye_data eye[MAX_BOARD][MAX_BOARD]);
 void originate_eye(int i, int j, int m, int n,
@@ -722,15 +722,15 @@ int topological_eye(int m, int n, int color, int *ai, int *aj,
                     int *di, int *dj, 
                     struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
                     struct eye_data w_eye[MAX_BOARD][MAX_BOARD],
-                    struct half_eye_data heye[MAX_BOARD][MAX_BOARD]);
+                    struct half_eye_data heye[BOARDMAX]);
 void add_half_eye(int m, int n, struct eye_data eye[MAX_BOARD][MAX_BOARD], 
-                  struct half_eye_data heye[MAX_BOARD][MAX_BOARD]);
+                  struct half_eye_data heye[BOARDMAX]);
 void make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
                   struct eye_data w_eye[MAX_BOARD][MAX_BOARD],
 		  int owl_call);
 
-int halfeye(struct half_eye_data heye[MAX_BOARD][MAX_BOARD], int i, int j);
-void remove_half_eye(struct half_eye_data heye[MAX_BOARD][MAX_BOARD],
+int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);
+void remove_half_eye(struct half_eye_data heye[BOARDMAX],
                      int i, int j, int color);
 
 /* our own abort() which prints board state on the way out.

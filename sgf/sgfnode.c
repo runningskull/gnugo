@@ -48,6 +48,8 @@
 #include "sgftree.h"
 #include "gg_utils.h"
 
+#define STRICT_SGF 's'
+#define LAX_SGF    'l'
 
 
 /* ================================================================ */
@@ -113,12 +115,11 @@ sgfNewNode()
  */
 
 void sgfFreeNode(SGFNode *node) {
-  if (node->next)
-    sgfFreeNode(node->next);
-  if (node->child)
-    sgfFreeNode(node->child);
-  if (node->props)
-    sgfFreeProperty(node->props);
+  if (node == NULL)
+    return;
+  sgfFreeNode(node->next);
+  sgfFreeNode(node->child);
+  sgfFreeProperty(node->props);
   free(node);
 }
 
@@ -374,8 +375,9 @@ sgfMkProperty(const char *name, const  char *value,
  */
 
 void sgfFreeProperty(SGFProperty *prop) {
-  if (prop->next)
-    sgfFreeProperty(prop->next);
+  if (prop == NULL)
+    return;
+  sgfFreeProperty(prop->next);
   free(prop->value);
   free(prop);
 }
@@ -691,10 +693,6 @@ sgfAddChild(SGFNode *node)
  */
 
 
-#define STRICT_SGF 's'
-#define LAX_SGF    'l'
-
-
 static void parse_error(const char *msg, int arg);
 static void nexttoken(void);
 static void match(int expected);
@@ -882,6 +880,115 @@ gametree(SGFNode **p, SGFNode *parent, int mode)
       match(')');
   }
 }
+
+
+/*
+ * Fuseki readers
+ * Reads an SGF file for extract_fuseki in a compact way
+ */
+
+static void
+gametreefuseki(SGFNode **p, SGFNode *parent, int mode, 
+	       int moves_per_game, int i)
+{
+  if (mode == STRICT_SGF)
+    match('(');
+  else
+    for (;;) {
+      if (lookahead == -1) {
+	parse_error("Empty file?", 0);
+	break;
+      }
+      if (lookahead == '(') {
+	while (lookahead == '(')
+	  nexttoken();
+	if (lookahead == ';')
+	  break;
+      }
+      nexttoken();
+    }
+
+  /* The head is parsed */
+  {
+
+    SGFNode *head = sgfNewNode();
+    SGFNode *last;
+    head->parent = parent;
+    *p = head;
+
+    last = sequence(head);
+    p = &last->child;
+    while (lookahead == '(') {
+    	if (last->props 
+	    && (last->props->name == SGFB || last->props->name == SGFW))
+    		i++;
+	  /* break after number_of_moves moves in SGF file */
+    	if (i >= moves_per_game) { 
+    		last->child = NULL;
+    		last->next = NULL;
+       		break;
+    	}
+    	else {
+		gametreefuseki(p, last->parent, mode, moves_per_game, i);
+      		p = &((*p)->next);
+      	}
+    }
+    if (mode == STRICT_SGF)
+      match(')');
+  }
+}
+
+SGFNode *
+readsgffilefuseki(const char *filename, int moves_per_game)
+{
+  SGFNode *root;
+  int tmpi = 0;
+
+  if (strcmp(filename, "-") == 0)
+    sgffile = stdin;
+  else
+    sgffile = fopen(filename, "r");
+
+  if (!sgffile)
+    return NULL;
+
+
+  nexttoken();
+  gametreefuseki(&root, NULL, LAX_SGF, moves_per_game, 0);
+
+  fclose(sgffile);
+
+  if (sgferr) {
+    fprintf(stderr, "Parse error: %s at position %d\n", sgferr, sgferrpos);
+    return NULL;
+  }
+
+  /* perform some simple checks on the file */
+  if (!sgfGetIntProperty(root, "GM", &tmpi)) {
+    fprintf(stderr, "Couldn't find the game type (GM) attribute!\n");
+  }
+  if (tmpi != 1) {
+    fprintf(stderr, "SGF file might be for game other than go: %d\n", tmpi);
+    fprintf(stderr, "Trying to load anyway.\n");
+  }
+
+
+#if 0
+  if (debug & DEBUG_LOADSGF) {
+    if (!sgfGetIntProperty(root, "FF", &tmpi)) {
+      fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
+    }
+    if (tmpi < 3 || tmpi > 4) {
+      fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
+    }
+  }
+#endif
+
+  return root;
+}
+
+
+
 
 
 /*

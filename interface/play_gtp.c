@@ -489,6 +489,7 @@ gtp_loadsgf(char *s, int id)
 
   gtp_printid(id, GTP_SUCCESS);
   gtp_mprintf("%C", color_to_move);
+  sgfFreeNode(sgf);
   return gtp_finish_response();
 }
 
@@ -680,7 +681,7 @@ static int
 gtp_attack(char *s, int id)
 {
   int i, j;
-  int ai, aj;
+  int apos;
   int attack_code;
   
   if (!gtp_decode_coord(s, &i, &j))
@@ -689,12 +690,12 @@ gtp_attack(char *s, int id)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  attack_code = attack(i, j, &ai, &aj);
+  attack_code = attack(POS(i, j), &apos);
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_code(attack_code);
   if (attack_code > 0) {
     gtp_printf(" ");
-    gtp_print_vertex(ai, aj);
+    gtp_print_vertex(I(apos), J(apos));
   }
   return gtp_finish_response();
 }  
@@ -709,7 +710,7 @@ static int
 gtp_defend(char *s, int id)
 {
   int i, j;
-  int di, dj;
+  int dpos;
   int defend_code;
   
   if (!gtp_decode_coord(s, &i, &j))
@@ -718,12 +719,12 @@ gtp_defend(char *s, int id)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  defend_code = find_defense(i, j, &di, &dj);
+  defend_code = find_defense(POS(i, j), &dpos);
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_code(defend_code);
   if (defend_code > 0) {
     gtp_printf(" ");
-    gtp_print_vertex(di, dj);
+    gtp_print_vertex(I(dpos), J(dpos));
   }
   return gtp_finish_response();
 }  
@@ -1011,7 +1012,7 @@ static int
 gtp_combination_attack(char *s, int id)
 {
   int color;
-  int i, j;
+  int pos;
   int save_verbose = verbose;
   int n;
 
@@ -1023,13 +1024,11 @@ gtp_combination_attack(char *s, int id)
   examine_position(BLACK, EXAMINE_ALL);
   verbose = save_verbose;
 
-  if (!atari_atari(color, &i, &j, verbose)) {
-    i = -1;
-    j = -1;
-  }
+  if (!atari_atari(color, &pos, verbose))
+    pos = NO_MOVE;
   
   gtp_printid(id, GTP_SUCCESS);
-  gtp_print_vertex(i, j);
+  gtp_print_vertex(I(pos), J(pos));
   return gtp_finish_response();
 }
 

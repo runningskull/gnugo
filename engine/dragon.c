@@ -92,7 +92,7 @@ make_dragons(int color, int stop_before_owl)
       dragon[m][n].heye               = NO_MOVE;
       dragon[m][n].genus              =  0;
       dragon[m][n].semeai             =  0;
-      half_eye[m][n].type             =  0;
+      half_eye[POS(m, n)].type        =  0;
       
       if (worm[m][n].origin == POS(m, n))
 	DEBUG(DEBUG_DRAGONS, 
@@ -309,14 +309,14 @@ make_dragons(int color, int stop_before_owl)
 	sum = topological_eye(m, n, BLACK, &ai, &aj, &di, &dj,
 			      black_eye, white_eye, half_eye);
 	if (sum >= 4) {
-	  half_eye[m][n].type = FALSE_EYE;
+	  half_eye[POS(m, n)].type = FALSE_EYE;
 	  if ((black_eye[m][n].esize == 1)
 	      || is_legal2(m, n, WHITE)
 	      || BOARD(m, n) == WHITE)
 	    add_half_eye(m, n, black_eye, half_eye);
 	}
 	else if (sum == 3)
-	  half_eye[m][n].type = HALF_EYE;
+	  half_eye[POS(m, n)].type = HALF_EYE;
       }
       
       if (white_eye[m][n].color == WHITE_BORDER
@@ -326,14 +326,14 @@ make_dragons(int color, int stop_before_owl)
 	sum = topological_eye(m, n, WHITE, &ai, &aj, &di, &dj,
 			      black_eye, white_eye, half_eye);
 	if (sum >= 4) {
-	  half_eye[m][n].type = FALSE_EYE;
+	  half_eye[POS(m, n)].type = FALSE_EYE;
 	  if ((white_eye[m][n].esize == 1)
 	      || is_legal2(m, n, BLACK)
 	      || BOARD(m, n) == BLACK)
 	    add_half_eye(m, n, white_eye, half_eye);
 	}
 	else if (sum == 3)
-	  half_eye[m][n].type = HALF_EYE;
+	  half_eye[POS(m, n)].type = HALF_EYE;
       }
     }
 

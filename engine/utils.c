@@ -181,29 +181,28 @@ does_attack(int ti, int tj, int ai, int aj)
   int result = 0;
   int acode = 0;
   int dcode = 0;
-  int si = -1;
-  int sj = -1;
+  int spos = NO_MOVE;
   
   if (stackp == 0) {
-    if (worm[ai][aj].attack_code != 0 && worm[ai][aj].defend_code == 0)
+    if (worm[ai][aj].attack_code != 0 
+	&& worm[ai][aj].defend_code == 0)
       return 0;
-    si = I(worm[ai][aj].defense_point);
-    sj = J(worm[ai][aj].defense_point);
+    spos = worm[ai][aj].defense_point;
   }
   else {
-    attack_and_defend(ai, aj, &acode, NULL, NULL, &dcode, &si, &sj);
+    attack_and_defend(POS(ai, aj), &acode, NULL, &dcode, &spos);
     if (acode != 0 && dcode == 0)
       return 0;
   }
   
   if (trymove2(ti, tj, other, "does_attack-A", ai, aj,
 	      EMPTY, -1, -1)) {
-    if (!BOARD(ai, aj) || !find_defense(ai, aj, NULL, NULL)) {
+    if (!BOARD(ai, aj) || !find_defense(POS(ai, aj), NULL)) {
       result = WIN;
       increase_depth_values();
-      if (si != -1 && trymove2(si, sj, color, "does_attack-B", ai, aj,
-			      EMPTY, -1, -1)) {
-	if (BOARD(ai, aj) && !attack(ai, aj, NULL, NULL))
+      if (spos != NO_MOVE && trymove(spos, color, "does_attack-B", POS(ai, aj),
+				     EMPTY, NO_MOVE)) {
+	if (BOARD(ai, aj) && !attack(POS(ai, aj), NULL))
 	  result = 0;
 	popgo();
       }
@@ -228,30 +227,26 @@ does_defend(int ti, int tj, int ai, int aj)
   int color = BOARD(ai, aj);
   int other = OTHER_COLOR(color);
   int result = 0;
-  int si = -1;
-  int sj = -1;
+  int spos = NO_MOVE;
 
   if (stackp == 0) {
     if (worm[ai][aj].attack_code == 0)
       return 0;
-    else {
-      si = I(worm[ai][aj].attack_point);
-      sj = J(worm[ai][aj].attack_point);
-    }
+    else
+      spos = worm[ai][aj].attack_point;
   }
-  else if (!attack(ai, aj, &si, &sj))
+  else if (!attack(POS(ai, aj), &spos))
     return 0;
 
-  gg_assert(si != -1 && sj != -1);
+  gg_assert(spos != NO_MOVE);
   
   if (trymove2(ti, tj, color, "does_defend-A", ai, aj,
 	      EMPTY, -1, -1)) {
-    if (!attack(ai, aj, NULL, NULL)) {
+    if (!attack(POS(ai, aj), NULL)) {
       result = 1;
       increase_depth_values();
-      if (trymove2(si, sj, other, "does_defend-B", ai, aj,
-		  EMPTY, -1, -1)) {
-	if (!BOARD(ai, aj) || !find_defense(ai, aj, NULL, NULL))
+      if (trymove(spos, other, "does_defend-B", POS(ai, aj), EMPTY, NO_MOVE)) {
+	if (!BOARD(ai, aj) || !find_defense(POS(ai, aj), NULL))
 	  result = 0;
 	popgo();
       }
@@ -359,7 +354,7 @@ play_break_through_n(int color, int num_moves, ...)
   if (!BOARD(xi, xj) || !BOARD(yi, yj) || !BOARD(zi, zj))
     success = 1;
   else
-    success = break_through(xi, xj, yi, yj, zi, zj);
+    success = break_through(POS(xi, xj), POS(yi, yj), POS(zi, zj));
 
 #if 0
   modify_depth_values(-played_moves);
@@ -434,14 +429,14 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
     if (!BOARD(zi, zj))
       success = 1;
     else
-      success = attack(zi, zj, NULL, NULL);
+      success = attack(POS(zi, zj), NULL);
   }
   else {
     if (!BOARD(zi, zj))
       success = 0;
     else {
-      int dcode = find_defense(zi, zj, NULL, NULL);
-      if (dcode == 0 && !attack(zi, zj, NULL, NULL))
+      int dcode = find_defense(POS(zi, zj), NULL);
+      if (dcode == 0 && !attack(POS(zi, zj), NULL))
 	success = 1;
       else
 	success = dcode;
@@ -518,11 +513,15 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 #endif
   
   if (do_attack) {
-    if (!BOARD(yi, yj) || !BOARD(zi, zj) || attack_either(yi, yj, zi, zj))
+    if (!BOARD(yi, yj)
+	|| !BOARD(zi, zj) 
+	|| attack_either(POS(yi, yj), POS(zi, zj)))
       success = 1;
   }
   else {
-    if (BOARD(yi, yj) && BOARD(zi, zj) && defend_both(yi, yj, zi, zj))
+    if (BOARD(yi, yj)
+	&& BOARD(zi, zj)
+	&& defend_both(POS(yi, yj), POS(zi, zj)))
       success = 1;
   }
 
@@ -885,7 +884,7 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
   int other = OTHER_COLOR(color);
   int issafe = 1;
   int m, n;
-  int ai, aj;
+  int apos;
   int trouble = 0;
   int k;
   int save_verbose = verbose;
@@ -899,11 +898,11 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
   if (verbose > 0)
     verbose--;
   
-  if (!atari_atari_confirm_safety(color, i, j, &ai, &aj, size)) {
-    ASSERT_ON_BOARD2(ai, aj);
-    if (di) *di = ai;
-    if (dj) *dj = aj;
-    TRACE("Combination attack appears at %m.\n", ai, aj);
+  if (!atari_atari_confirm_safety(color, POS(i, j), &apos, size)) {
+    ASSERT_ON_BOARD1(apos);
+    if (di) *di = I(apos);
+    if (dj) *dj = J(apos);
+    TRACE("Combination attack appears at %1m.\n", apos);
     verbose = save_verbose;
     return 0;
   }
@@ -951,9 +950,13 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 	  if (BOARD(m, n) == color
 	      && worm[m][n].attack_code == 0
 	      && worm[m][n].size >= size
-	      && attack(m, n, NULL, NULL)) {
-	    if (di)
-	      find_defense(m, n, di, dj);
+	      && attack(POS(m, n), NULL)) {
+	    if (di) {
+	      int  dpos;
+	      find_defense(POS(m, n), &dpos);
+	      if (di) *di = I(dpos);
+	      if (dj) *dj = J(dpos);
+	    }
 	    issafe = 0;
 	    TRACE("After %m Worm at %m becomes attackable.\n", i, j, m, n);
 	  }
@@ -961,7 +964,7 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 		   && worm[m][n].attack_code != 0
 		   && worm[m][n].defend_code == 0
 		   && worm[m][n].size >= size
-		   && find_defense(m, n, NULL, NULL)) {
+		   && find_defense(POS(m, n), NULL)) {
 	    /* Also ask the owl code whether the string can live
 	     * strategically. To do this we need to temporarily undo
 	     * the trymove2().
@@ -974,8 +977,12 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 	    increase_depth_values();
 	    
 	    if (!issafe) {
-	      if (di)
-		attack(m, n, di, dj);
+	      if (di) {
+		int  dpos;
+		attack(POS(m, n), &dpos);
+	      if (di) *di = I(dpos);
+	      if (dj) *dj = J(dpos);
+	      }
 	      
 	      TRACE("After %m worm at %m becomes defendable.\n",
 		    i, j, m, n);
@@ -1048,7 +1055,7 @@ double_atari(int m, int n, int color)
 	&& trymove2(m, n, color, "double_atari", -1, -1, EMPTY, -1, -1)) {
       if (countlib2(m, n) > 1
 	  && (BOARD(m, n+dn) == EMPTY || BOARD(m+dm, n) == EMPTY 
-	      || !defend_both(m, n+dn, m+dm, n))) {
+	      || !defend_both(POS(m, n+dn), POS(m+dm, n)))) {
 	popgo();
 	return 1;
       }
@@ -1631,8 +1638,8 @@ do_find_superstring(int str, int *num_stones, int *stones,
 	  
 	  mx[upos] = 1;
 	  
-	  if (attack(I(upos), J(upos), NULL, NULL)
-	      && !find_defense(I(upos), J(upos), NULL, NULL)) {
+	  if (attack(upos, NULL)
+	      && !find_defense(upos, NULL)) {
 	    int lunch_stones[MAX_BOARD*MAX_BOARD];
 	    int num_lunch_stones = findstones(upos, MAX_BOARD*MAX_BOARD,
 					      lunch_stones);

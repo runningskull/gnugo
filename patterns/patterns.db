@@ -10591,6 +10591,26 @@ xxxx
 ; dead(A) && effective_size(A)>8 && lib(b)<=4
 
 
+Pattern CD106
+# db added (3.1.7)
+
+?x?
+O*O
+O.O
+oOX
+
+:8,d
+
+?x?
+O*A
+OaA
+bOX
+
+; does_defend(*,A)
+
+> replace(a,*);
+> if (!o_somewhere(b)) replace(b,*)
+
 
 ######################################################################
 #
@@ -14007,6 +14027,20 @@ Pattern EJ83
 ; xplay_attack(a,b,C)
 
 
+Pattern EJ84
+
+......       Atari before connecting
+..*...
+X.XO..
+.XO...
+......
+......
+------
+
+:8,J
+
+
+
 ######################################################################
 #
 # Seki patterns.
@@ -14820,6 +14854,24 @@ OoO
 ?o?
 
 ; xmoyo(a)||xmoyo(b)||xmoyo(c)||xmoyo(d)||xmoyo(e)||xmoyo(f)
+
+
+Pattern LE16
+
++----          it's better to bend around
+|..O.
+|.*XO
+|?.X?
+
+:8,OX,terri(3),followup(2)
+
++----
+|.aO.
+|.*XO
+|?.X?
+
+> replace(a,*)
+
 
 
 # END OF FILE

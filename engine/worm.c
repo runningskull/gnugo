@@ -355,7 +355,7 @@ make_worms(void)
 		  if (worm[i][j].color == color
 		      && worm[i][j].attack_code != 0
 		      && worm[i][j].defend_code != 0
-		      && !find_defense(i, j, NULL, NULL)) {
+		      && !find_defense(POS(i, j), NULL)) {
 
 		    int attack_works = 1;
 		    /* Sometimes find_defense() fails to find a
@@ -365,7 +365,7 @@ make_worms(void)
 		    if (worm[i][j].defense_point != 0
 			&& trymove(worm[i][j].defense_point,
 				   color, "make_worms", 0, EMPTY, 0)) {
-		      if (!attack(i, j, NULL, NULL))
+		      if (!attack(POS(i, j), NULL))
 			attack_works = 0;
 		      popgo();
 		    }
@@ -388,7 +388,7 @@ make_worms(void)
 		   */
 		  else if (worm[i][j].color == other
 			   && worm[i][j].attack_code != 0
-			   && !attack(i, j, NULL, NULL)) {
+			   && !attack(POS(i, j), NULL)) {
 		    if (worm[i][j].defend_code != 0)
 		      TRACE("moving point of defense of %m to %m\n",
 			    i, j, di, dj);
@@ -436,7 +436,7 @@ make_worms(void)
 		  if (worm[i][j].color == other
 		      && worm[i][j].attack_code != 0 
 		      && worm[i][j].defend_code != 0
-		      && !find_defense(i, j, NULL, NULL)) {
+		      && !find_defense(POS(i, j), NULL)) {
 
 		    int attack_works = 1;
 		    /* Sometimes find_defense() fails to find a
@@ -444,7 +444,7 @@ make_worms(void)
 		       Try if the old defense move still works. */
 		    if (trymove(worm[i][j].defense_point,
 				other, "make_worms", 0, EMPTY, 0)) {
-		      if (!attack(i, j, NULL, NULL))
+		      if (!attack(POS(i, j), NULL))
 			attack_works = 0;
 		      popgo();
 		    }
@@ -467,7 +467,7 @@ make_worms(void)
 		   */
 		  else if (worm[i][j].color == color
 			   && worm[i][j].attack_code != 0
-			   && !attack(i, j, NULL, NULL)) {
+			   && !attack(POS(i, j), NULL)) {
 		    if (worm[i][j].defend_code != 0)
 		      TRACE("moving point of defense of %m to %m\n",
 			    i, j, di, dj);
@@ -852,7 +852,7 @@ find_worm_attacks_and_defenses()
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       int acode;
-      int ti, tj;
+      int tpos;
 
       if (BOARD(m, n) == EMPTY || !is_worm_origin(m, n, m, n))
 	continue;
@@ -863,12 +863,12 @@ find_worm_attacks_and_defenses()
       worm[m][n].attack_point  = 0;
       worm[m][n].defend_code   = 0;
       worm[m][n].defense_point = 0;
-      acode = attack(m, n, &ti, &tj);
+      acode = attack(POS(m, n), &tpos);
       if (acode) {
-	TRACE("worm at %m can be attacked at %m\n", m, n, ti, tj);
+	TRACE("worm at %m can be attacked at %1m\n", m, n, tpos);
 	worm[m][n].attack_code = acode;
-	worm[m][n].attack_point = POS(ti, tj);
-	add_attack_move(ti, tj, m, n);
+	worm[m][n].attack_point = tpos;
+	add_attack_move(I(tpos), J(tpos), m, n);
       }
       propagate_worm(m, n);
     }
@@ -887,15 +887,16 @@ find_worm_attacks_and_defenses()
 	continue;
 
       if (worm[m][n].attack_code != 0) {
-	int ti, tj;
+	int tpos = NO_MOVE;
+
 	TRACE ("considering defense of %m\n", m, n);
-	dcode = find_defense(m, n, &ti, &tj);
+	dcode = find_defense(POS(m, n), &tpos);
 	if (dcode) {
-	  TRACE ("worm at %m can be defended at %m\n", m, n, ti, tj);
+	  TRACE ("worm at %m can be defended at %1m\n", m, n, tpos);
 	  worm[m][n].defend_code   = dcode;
-	  worm[m][n].defense_point = POS(ti, tj);
-	  if (ti != -1)
-	    add_defense_move(ti, tj, m, n);
+	  worm[m][n].defense_point = tpos;
+	  if (tpos != NO_MOVE)
+	    add_defense_move(I(tpos), J(tpos), m, n);
 	}
 	else {
 	  /* If the point of attack is not adjacent to the worm, 
@@ -907,7 +908,7 @@ find_worm_attacks_and_defenses()
 	  if (!liberty_of_string2(ai, aj, m, n))
 	    if (trymove2(ai, aj, worm[m][n].color, "make_worms", -1, -1,
 			EMPTY, -1, -1)) {
-	      int acode = attack(m, n, NULL, NULL);
+	      int acode = attack(POS(m, n), NULL);
 	      if (acode != WIN) {
 		int change_defense = 0;
 		/* FIXME: Include defense code when move 
@@ -985,12 +986,12 @@ find_worm_attacks_and_defenses()
 	  /* Try to attack on the liberty. */
 	  if (trymove2(ai, aj, other, "make_worms", -1, -1,
 		       EMPTY, -1, -1)) {
-	    if (!BOARD(m, n) || attack(m, n, NULL, NULL)) {
+	    if (!BOARD(m, n) || attack(POS(m, n), NULL)) {
 	      int dcode;
 	      if (!BOARD(m, n))
 		dcode = 0;
 	      else
-		dcode = find_defense(m, n, NULL, NULL);
+		dcode = find_defense(POS(m, n), NULL);
 
 	      if (dcode == 0
 		  || (dcode == KO_B && (worm[m][n].attack_code == 0
@@ -1004,7 +1005,7 @@ find_worm_attacks_and_defenses()
 	  if (worm[m][n].defend_code != 0)
 	    if (trymove2(ai, aj, color, "make_worms", -1, -1,
 			EMPTY, -1, -1)) {
-	      int acode = attack(m, n, NULL, NULL);
+	      int acode = attack(POS(m, n), NULL);
 	      if (acode == 0
 		  || (acode == KO_B && (worm[m][n].defend_code == 0
 					|| worm[m][n].defend_code == KO_B))
@@ -1067,7 +1068,7 @@ find_worm_threats()
 	    if (trymove2(ai, aj, other, "threaten attack", m, n,
 			EMPTY, -1, -1)) {
 	      /* FIXME: Support ko also. */
-	      if (attack(m, n, NULL, NULL) == WIN)
+	      if (attack(POS(m, n), NULL) == WIN)
 		add_attack_threat_move(ai, aj, m, n);
 	      popgo();
 	    }
@@ -1085,7 +1086,7 @@ find_worm_threats()
 	      if (trymove2(bi, bj, other, "threaten attack", m, n,
 			  EMPTY, -1, -1)) {
 		/* FIXME: Support ko also. */
-		if (attack(m, n, NULL, NULL) == WIN)
+		if (attack(POS(m, n), NULL) == WIN)
 		  add_attack_threat_move(bi, bj, m, n);
 		popgo();
 	      }
@@ -1112,8 +1113,8 @@ find_worm_threats()
 	  if (trymove2(ai, aj, color, "threaten defense", -1, -1,
 		      EMPTY, -1, -1)) {
 	    /* FIXME: Support ko also. */
-	    if (attack(m, n, NULL, NULL) == WIN
-		&& find_defense(m, n, NULL, NULL) == WIN)
+	    if (attack(POS(m, n), NULL) == WIN
+		&& find_defense(POS(m, n), NULL) == WIN)
 	      add_defense_threat_move(ai, aj, m, n);
 	    popgo();
 	  }
@@ -1131,8 +1132,8 @@ find_worm_threats()
 	    if (trymove2(bi, bj, other, "threaten defense", m, n,
 			EMPTY, -1, -1)) {
 	      /* FIXME: Support ko also. */
-	      if (attack(m, n, NULL, NULL) == WIN
-		  && find_defense(m, n, NULL, NULL) == WIN)
+	      if (attack(POS(m, n), NULL) == WIN
+		  && find_defense(POS(m, n), NULL) == WIN)
 		add_defense_threat_move(bi, bj, m, n);
 	      popgo();
 	    }
@@ -1575,10 +1576,10 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	int dcode;
 	if (!BOARD(ai, aj))
 	  dcode = 0;
-	else if (!attack(ai, aj, NULL, NULL))
+	else if (!attack(POS(ai, aj), NULL))
 	  dcode = WIN;
 	else
-	  dcode = find_defense(ai, aj, NULL, NULL);
+	  dcode = find_defense(POS(ai, aj), NULL);
 
 	popgo();
 
@@ -1675,7 +1676,7 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
        * Play (ti, tj) and see if there is an attack. */
       if (trymove2(ti, tj, color, "defense_callback", ai, aj,
 		  EMPTY, -1, -1)) {
-	int acode = attack(ai, aj, NULL, NULL);
+	int acode = attack(POS(ai, aj), NULL);
 
 	popgo();
 	

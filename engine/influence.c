@@ -497,7 +497,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	}
 	else {
 	  if ((stackp == 0 && worm[x][y].attack_code != 0)
-	      || attack(x, y, NULL, NULL) != 0)
+	      || attack(POS(x, y), NULL) != 0)
 	    return; /* Match failed */
 	}
 	/* One test left for class B. */

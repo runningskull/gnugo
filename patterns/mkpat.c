@@ -213,7 +213,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"eye",             1, "eye_space(%ci,%cj)"},
   {"proper_eye",      1, "proper_eye_space(%ci,%cj)"},
   {"marginal_eye",    1, "marginal_eye_space(%ci,%cj)"},
-  {"halfeye",         1, "halfeye(half_eye,%ci,%cj)"},
+  {"halfeye",         1, "is_halfeye(half_eye,POS(%ci,%cj))"},
   {"max_eye_value",   1, "max_eye_value(%ci,%cj)"},
   {"owl_topological_eye", 2, "owl_topological_eye(%ci,%cj,BOARD(%ci,%cj))"},
   {"obvious_false_oeye", 1, "obvious_false_eye(%ci,%cj,color)"},
@@ -246,8 +246,8 @@ static struct autohelper_func autohelper_functions[] = {
   {"squeeze_ko_helper",1,"squeeze_ko_helper(%ci,%cj)"},
   {"backfill_helper", 3, "backfill_helper(%ci,%cj, %ci, %cj, %ci, %cj)"},
   {"owl_threatens",   2, "owl_threatens_attack(%ci,%cj,%ci,%cj)"},
-  {"o_aa_attack",     2, "atari_atari_try_combination(color,%ci,%cj,%ci,%cj)"},
-  {"x_aa_attack",     2, "atari_atari_try_combination(OTHER_COLOR(color),%ci,%cj,%ci,%cj)"},
+  {"o_aa_attack",     2, "atari_atari_try_combination(color,POS(%ci,%cj),POS(%ci,%cj))"},
+  {"x_aa_attack",     2, "atari_atari_try_combination(OTHER_COLOR(color),POS(%ci,%cj),POS(%ci,%cj))"},
   {"replace",         2, "add_replacement_move(%ci,%cj,%ci,%cj)"}
 };
 

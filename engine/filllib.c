@@ -372,13 +372,11 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
   int liberties;
   int neighbors;
   int found_one = 0;
-  int ai = -1;
-  int aj = -1;
+  int apos = NO_MOVE;
+  int bpos = NO_MOVE;
   int extra_pop = 0;
   int success = 0;
   int acode;
-  int bi = -1;
-  int bj = -1;
   int savei = -1;
   int savej = -1;
   int pos = POS(m, n);
@@ -390,8 +388,8 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
   /* The move wasn't safe, so there must be an attack for the
    * opponent. Save it for later use.
    */
-  acode = attack(m, n, &ai, &aj);
-  gg_assert(acode != 0 && ai >= 0 && aj >= 0);
+  acode = attack(POS(m, n), &apos);
+  gg_assert(acode != 0 && apos > NO_MOVE);
   
   /* Find liberties. */
   liberties = findlib(pos, MAXLIBS, libs);
@@ -419,15 +417,15 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
    * good enough.
    */
   for (k = 0; k < neighbors; k++) {
-    if (attack(I(adjs[k]), J(adjs[k]), &bi, &bj) == WIN) {
-      if (liberty_of_string(POS(bi, bj), adjs[k])) {
-	*i = bi;
-	*j = bj;
+    if (attack(adjs[k], &bpos) == WIN) {
+      if (liberty_of_string(bpos, adjs[k])) {
+	*i = I(bpos);
+	*j = J(bpos);
 	return 1;
       }
       else {
-	savei = bi;
-	savej = bj;
+	savei = I(bpos);
+	savej = J(bpos);
       }
     }
   }
@@ -466,8 +464,8 @@ find_backfilling_move(int m, int n, int color, int *i, int *j)
       return 0; /* This really shouldn't happen. */
     
     /* Allow opponent to get a move in here. */
-    if (trymove2(ai, aj, OTHER_COLOR(color), "find_backfilling_move", m, n, 
-		EMPTY, -1, -1))
+    if (trymove(apos, OTHER_COLOR(color), "find_backfilling_move", POS(m, n), 
+		EMPTY, NO_MOVE))
       extra_pop = 1;
     
     /* If still not safe, recurse to find a new backfilling move. */

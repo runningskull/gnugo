@@ -109,6 +109,8 @@ SGFNode *sgfCreateHeaderNode(int boardsize, float komi);
 
 /* Read SGF tree from file. */
 SGFNode *readsgffile(const char *filename);
+/* Specific solution for fuseki */
+SGFNode *readsgffilefuseki(const char *filename, int moves_per_game);
 
 /* Write SGF tree to a file. */
 void sgf_write_header(SGFNode *root, int overwrite, int seed, float komi);

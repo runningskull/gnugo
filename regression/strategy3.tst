@@ -77,7 +77,7 @@ loadsgf games/incident278.sgf 212
 # incident 282
 loadsgf games/incident278.sgf 252
 117 gg_genmove black
-#? [M2]*
+#? [M2]
 
 loadsgf games/incident240.sgf 65
 118 gg_genmove black

@@ -684,6 +684,25 @@ Pattern EE504
 # second line descents
 ######################
 
+Pattern EE601
+
+??O?         It's better to push down before blocking
+.X*X
+....
+----
+
+:8,OX,terri(3),followup(5)
+
+??O?
+aA*X
+....
+----
+
+; oplay_attack(*,a,A)
+
+> replace(a,*)
+
+
 # second line hanes
 ###################
 

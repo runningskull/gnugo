@@ -1154,7 +1154,7 @@ find_more_attack_and_defense_moves(int color)
 	     */
 	    if (BOARD(ai, aj) == color
 		&& !move_reason_known(m, n, DEFEND_MOVE, unstable_worms[k]))
-	      if (!attack(ai, aj, NULL, NULL)) {
+	      if (!attack(POS(ai, aj), NULL)) {
 		if (!cursor_at_start_of_line)
 		  TRACE("\n");
 		TRACE("%ofound extra point of defense of %m at %m\n",
@@ -1168,7 +1168,7 @@ find_more_attack_and_defense_moves(int color)
 	     */
 	    if (BOARD(ai, aj) == other
 		&& !move_reason_known(m, n, ATTACK_MOVE, unstable_worms[k]))
-	      if (!find_defense(ai, aj, NULL, NULL)) {
+	      if (!find_defense(POS(ai, aj), NULL)) {
 		/* Maybe find_defense() doesn't find the defense. Try to
 		 * defend with the stored defense move.
 		 */
@@ -1176,7 +1176,7 @@ find_more_attack_and_defense_moves(int color)
 		if (trymove(worm[ai][aj].defense_point, other, 
 			     "find_more_attack_and_defense_moves", 0,
 			     EMPTY, 0)) {
-		  if (!attack(ai, aj, NULL, NULL))
+		  if (!attack(POS(ai, aj), NULL))
 		    attack_works = 0;
 		  popgo();
 		}
@@ -2467,7 +2467,7 @@ estimate_territorial_value(int m, int n, int color,
 	      && 2*dragon[adji][adjj].effective_size > adjustment_up)
 	    adjustment_up = 2*dragon[adji][adjj].effective_size;
 	  if (dragon[adji][adjj].color == color
-	      && attack(adji, adjj, NULL, NULL)
+	      && attack(POS(adji, adjj), NULL)
 	      && 2*worm[adji][adjj].effective_size > adjustment_down)
 	    adjustment_down = 2*worm[adji][adjj].effective_size;
 	}

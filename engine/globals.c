@@ -126,7 +126,7 @@ struct worm_data      worm[MAX_BOARD][MAX_BOARD];
 struct dragon_data    dragon[MAX_BOARD][MAX_BOARD];
 int                   number_of_dragons;
 struct dragon_data2   *dragon2 = NULL;
-struct half_eye_data  half_eye[MAX_BOARD][MAX_BOARD];
+struct half_eye_data  half_eye[BOARDMAX];
 struct half_eye_data  owl_half_eye[MAX_BOARD][MAX_BOARD];
 struct eye_data       black_eye[MAX_BOARD][MAX_BOARD];
 struct eye_data       white_eye[MAX_BOARD][MAX_BOARD];
