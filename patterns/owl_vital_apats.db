@@ -842,4 +842,17 @@ Pattern VA50
 :8,s,value(45)
 
 
+Pattern VA51
+# pp New pattern (3.3.12)
+
+|*Oo         start an unfavourable ko
+|.XO
+|X.X
+|.Xx
+|.O.
++---
+
+:8,-,value(35)
+
+
 # END OF FILE

@@ -314,6 +314,14 @@ loadsgf games/life_and_death/tripod9.sgf
 200 dragon_status C3
 #? [dead]
 
+# More life and death problems around tripod group.
+
+loadsgf games/life_and_death/tripod4.sgf
+# Black tries a bad defense. He must be punished.
+play black Q19
+201 owl_attack Q19
+#? [3 T15]
+
 # Mixed life and death problems.
 loadsgf games/life_and_death/mixed1.sgf
 300 owl_attack  C17
