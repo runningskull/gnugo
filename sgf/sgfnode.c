@@ -706,11 +706,12 @@ SGFNode *
 sgfStartVariant(SGFNode *node)
 {
   assert(node);
+  assert(node->parent);
 
   while (node->next)
     node = node->next;
   node->next = sgfNewNode();
-  node->next->parent = node;
+  node->next->parent = node->parent;
 
   return node->next;
 }
@@ -726,12 +727,13 @@ sgfStartVariantFirst(SGFNode *node)
   SGFNode *old_first_child = node;
   SGFNode *new_first_child = sgfNewNode();
 
+  assert(node);
+  assert(node->parent);
+
   new_first_child->next = old_first_child;
-  if (old_first_child->parent)
-    new_first_child->parent = old_first_child->parent;
-  old_first_child->parent = new_first_child;
-  if (new_first_child->parent)
-    new_first_child->parent->child = new_first_child;
+  new_first_child->parent = old_first_child->parent;
+
+  new_first_child->parent->child = new_first_child;
 
   return new_first_child;
 }

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in sgfStartVariant
 - constrain thrashing dragons more often
 - hashing cleanups
 - missing files added to EXTRADIST in Makefile.* in doc/ and regression/
