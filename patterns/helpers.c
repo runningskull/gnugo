@@ -358,41 +358,24 @@ cutstone2_helper(ARGS)
 
 /*
  *  ?x??   ?x??
- *  ?X..   ?cb.
- *  O*..   O*a.
- *  ----   ----
+ *  ?X..   ?Xb.
+ *  O*..   c*a.
  *
+ * Is the push at * sente? c must have exactly two liberties. This is
+ * called edge_double_sente_helper because it mainly called for edge
+ * hanes, but it can be used anywhere on the board.
  */
 
 int 
-edge_double_sente_helper(ARGS)
+edge_double_sente_helper(int move, int apos, int bpos, int cpos)
 {
-  int apos;
-  int bpos;
-  int cpos;
-  int dpos;
-  int other = OTHER_COLOR(color);
+  int color = board[cpos];
   int success = 0;
-  UNUSED(pattern);
+  ASSERT1((color == BLACK || color == WHITE), move);
   
-  apos = OFFSET( 0, 1);
-  bpos = OFFSET(-1, 1);
-  cpos = OFFSET(-1, 0);
-
   if (TRYMOVE(move, color)) {
-    if (TRYMOVE(apos, other)) {
-      ASSERT1(countlib(move) == 1, move);
-      findlib(move, 1, &dpos);
-      if (TRYMOVE(dpos, color)) {
-	if (TRYMOVE(bpos, color)) {
-	  if (board[cpos] == EMPTY || !defend_both(apos, cpos))
-	    success = 1;
-	  popgo();
-	}
-	popgo();
-      }
-      popgo();
-    }
+    ASSERT1(countlib(move) == 2, move);
+    success = connect_and_cut_helper(move, apos, bpos);
     popgo();
   }
 

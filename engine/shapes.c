@@ -32,6 +32,23 @@
 /* Maximum number of dragons considered by a, B, C, and d class patterns. */
 #define MAX_DRAGONS_PER_PATTERN 5
 
+/* Values of joseki patterns. */
+#define U_VALUE 40
+#define J_VALUE 27
+#define j_VALUE 20
+#define t_VALUE 15
+
+/* Values of joseki patterns if using experimental influence. */
+#define EXP_J_VALUE 30
+#define EXP_j_VALUE 22
+#define EXP_t_VALUE 17
+
+/* Global variables set to joseki values acc. to experimental_influence. */
+float J_value = J_VALUE;
+float j_value = j_VALUE;
+float t_value = t_VALUE;
+
+
 /* 
  * This callback is invoked for each matched pattern.
  */
@@ -287,7 +304,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
 
   /* Pattern class J, joseki standard move. Add expand territory and
-   * moyo, and require the value at least 27.
+   * moyo, and require the value at least J_value.
    */
   if (class & CLASS_J) {
     TRACE("...joseki standard move\n");
@@ -295,16 +312,16 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     TRACE("...expands territory\n");
     add_expand_moyo_move(move);
     TRACE("...expands moyo\n");
-    set_minimum_move_value(move, 27);
-    TRACE("... minimum move value %f\n", 27.0);
+    set_minimum_move_value(move, J_value);
+    TRACE("... minimum move value %f\n", J_value);
   }
 
   /* Pattern class j, less urgent joseki move. Add expand territory and
-   * moyo, set a minimum value of 20. If it is a fuseki pattern, set also
-   * the maximum value to 20.
+   * moyo, set a minimum value of j_value. If it is a fuseki pattern, set also
+   * the maximum value to j_value.
    */
   if (class & CLASS_j) {
-    float min_value = 20;
+    float min_value = j_value;
     TRACE("...less urgent joseki move\n");
     add_expand_territory_move(move);
     TRACE("...expands territory\n");
@@ -332,10 +349,10 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
 
   /* Pattern class t, minor joseki move (tenuki OK).
-   * Set the (min-)value at 15.
+   * Set the (min-)value at t_value
    */
   if (class & CLASS_t) {
-    float min_value = 15;
+    float min_value = t_value;
     TRACE("...minor joseki move\n");
     
     /* Board size modification. */
@@ -374,8 +391,8 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     }
     add_shape_value(move, 15);
     TRACE("...shape value 15\n");
-    set_minimum_move_value(move, 40);
-    TRACE("...(min) move value %f\n", 40);
+    set_minimum_move_value(move, U_VALUE);
+    TRACE("...(min) move value %f\n", U_VALUE);
   }
 
   /* Pattern class T, joseki trick move. For the moment we never play
@@ -448,6 +465,13 @@ shapes(int color)
 {
   TRACE("\nPattern matcher is looking for move reasons for %s!\n",
 	color_to_string(color));
+
+  /* Modify joseki values if using experimental influence. */
+  if (experimental_influence) {
+    J_value = EXP_J_VALUE;
+    j_value = EXP_j_VALUE;
+    t_value = EXP_t_VALUE;
+  }
 
   matchpat(shapes_callback, color, &pat_db, NULL, NULL);
 

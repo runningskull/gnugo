@@ -170,7 +170,7 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
     attenuation = q->white_attenuation[m][n];
   else
     attenuation = q->black_attenuation[m][n];
-  if (experimental_influence)
+  if (experimental_influence && ! (q == &escape_influence))
     diagonal_attenuation = attenuation * EXP_DIAGONAL_DAMPING;
   else
     diagonal_attenuation = attenuation * DIAGONAL_DAMPING;
@@ -365,14 +365,14 @@ init_influence(struct influence_data *q, int color, int dragons_known,
   
   if (q != &escape_influence) {
     q->color_to_move = color;
-    if (experimental_influence)
+    if (experimental_influence && ! (q == &escape_influence))
       attenuation = EXP_DEFAULT_ATTENUATION;
     else
       attenuation = DEFAULT_ATTENUATION;
   }
   else {
     q->color_to_move = EMPTY;
-    if (experimental_influence)
+    if (experimental_influence && ! (q == &escape_influence))
       attenuation = 2 * EXP_DEFAULT_ATTENUATION;
     else
       attenuation = 2 * DEFAULT_ATTENUATION;
@@ -530,7 +530,8 @@ compare_intrusions(const void *p1, const void *p2)
 static void
 add_marked_intrusions(struct influence_data *q, int color)
 {
-  int i, j;
+  int i;
+  int j = 0;
   int source_pos;
   float strength_sum;
   float correction;
@@ -542,6 +543,14 @@ add_marked_intrusions(struct influence_data *q, int color)
   for (i = 0; i < q->intrusion_counter; i = j) {
     strength_sum = 0.0;
     source_pos = q->intrusions[i].source_pos;
+    /* "Anonymous" intrusios go in uncorrected. */
+    if (source_pos == NO_MOVE) {
+      add_influence_source(q->intrusions[i].strength_pos, color,
+                           q->intrusions[j].strength,
+                           q->intrusions[j].attenuation, q);
+      j = i+1;
+      continue;
+    }
     if (color == BLACK) {
       source_strength = q->black_strength[I(source_pos)][J(source_pos)];
     }
@@ -572,8 +581,9 @@ add_marked_intrusions(struct influence_data *q, int color)
                              correction * q->intrusions[j].strength,
                              q->intrusions[j].attenuation, q);
         DEBUG(DEBUG_INFLUENCE,
-              "Adding intrusion for %1m at %1m, value %f (correction %f)\n",
-              source_pos, q->intrusions[j].strength_pos,
+              "Adding %s intrusion for %1m at %1m, value %f (correction %f)\n",
+              (color == BLACK) ? "black" : "white", source_pos,
+              q->intrusions[j].strength_pos,
               correction * q->intrusions[j].strength, correction);
       }
     }
@@ -608,11 +618,14 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * those marked Y in standard influence.
    */
   if (pattern->class & CLASS_Y) 
-    if (((pattern->class & CLASS_F) && (experimental_influence))
-        || (!(pattern->class & CLASS_F) && !(experimental_influence)))
+    if (((pattern->class & CLASS_F)
+         && (experimental_influence && !(q == &escape_influence)))
+        || (!(pattern->class & CLASS_F) 
+         && !(experimental_influence && !(q == &escape_influence))))
     return;
   /* We currently ignore enhancement patterns in experimental influence. */
-  if ((pattern->class & CLASS_E) && (experimental_influence))
+  if ((pattern->class & CLASS_E)
+      && (experimental_influence && !(q == &escape_influence)))
     return;
 
   /* Loop through pattern elements to see if an A or D pattern
@@ -738,7 +751,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
   /* For t patterns, everything happens in the action. */
   if ((pattern->class & CLASS_t)
       && (pattern->autohelper_flag & HAVE_ACTION)) {
-    pattern->autohelper(pattern, ll, pos, color, 1);
+    pattern->autohelper(pattern, ll, pos, color, INFLUENCE_CALLBACK);
   }
   
   
@@ -808,7 +821,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
       
       /* Low intensity influence source for the color in turn to move. */
       if (pattern->class & CLASS_B) {
-        if (experimental_influence)
+        if (experimental_influence && !(q == &escape_influence))
           enter_intrusion_source(saved_pos, POS(x, y), pattern->value,
 	  		         EXP_DEFAULT_ATTENUATION, q);
         else
@@ -829,11 +842,42 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
                             int ll, void *data)
 {
   int k;
+  int ti, tj;
   int saved_stone = NO_MOVE;
   struct influence_data *q = data;
   UNUSED(color);
  
-  if (!pattern->class & CLASS_B)
+  /* We use only B  patterns in followup influence. */
+  if (!(pattern->class & CLASS_B))
+    return;
+
+  TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
+  ti += m;
+  tj += n;
+  /* If the pattern has a constraint, call the autohelper to see
+   * if the pattern must be rejected.
+   */
+  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
+    if (!pattern->autohelper(pattern, ll, POS(ti, tj), color, 0))
+      return;
+  }
+
+  /* If the pattern has a helper, call it to see if the pattern must
+   * be rejected.
+   */
+  if (pattern->helper) {
+    if (!pattern->helper(pattern, ll, POS(ti, tj), color)) {
+      DEBUG(DEBUG_INFLUENCE,
+            "Influence pattern %s+%d rejected by helper at %1m\n",
+            pattern->name, ll, POS(ti, tj));
+      return;
+    }
+  }
+ 
+ /* Actions in B patterns are used as followup specific constraints. */
+ if ((pattern->autohelper_flag & HAVE_ACTION)
+     && !pattern->autohelper(pattern, ll, POS(ti, tj), color,
+                             FOLLOWUP_INFLUENCE_CALLBACK))
     return;
 
   /* First loop: We check whether a saved stone is involved. */
@@ -850,6 +894,9 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
 
   if (saved_stone == NO_MOVE)
     return;
+  
+  DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
+	pattern->name, ll, POS(m, n));
 
   for (k = 0; k < pattern->patlen; ++k)  /* match each point */
     if (pattern->patn[k].att == ATT_not) {
@@ -861,8 +908,8 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
       /* Low intensity influence source for the color in turn to move. */
       enter_intrusion_source(saved_stone, pos, pattern->value,
 			     EXP_DEFAULT_ATTENUATION, &followup_influence);
-      DEBUG(DEBUG_INFLUENCE, "  followup for %m: intrusion at %1m\n",
-            m, n, pos);
+      DEBUG(DEBUG_INFLUENCE, "  followup for %1m: intrusion at %m\n",
+            saved_stone, pos);
     }
 }
 
@@ -876,10 +923,12 @@ influence_mark_non_territory(int pos, int color)
   current_influence->non_territory[I(pos)][J(pos)] |= color;
 }
 
-/* Match the patterns in influence.db and barriers.db in order to add
- * influence barriers, add extra influence sources at possible
- * invasion and intrusion points, and add extra influence induced by
- * strong positions.
+/* Match the patterns in influence.db and barriers.db in order to add:
+ * - influence barriers,
+ * - extra influence sources at possible invasion and intrusion points, and
+ * - extra influence induced by strong positions.
+ * Reduce permeability around each living stone.
+ * Reset permeability to 1.0 at intrusion points.
  */
 static void
 find_influence_patterns(struct influence_data *q, int color)
@@ -891,7 +940,7 @@ find_influence_patterns(struct influence_data *q, int color)
   if (color != EMPTY)
     matchpat(influence_callback, color, &barrierspat_db, q, NULL);
 
-  if (experimental_influence)
+  if (experimental_influence && !(q == &escape_influence))
     add_marked_intrusions(q, color);
 
   /* When color == EMPTY, we introduce a weaker kind of barriers
@@ -937,7 +986,8 @@ find_influence_patterns(struct influence_data *q, int color)
 /* Compute the influence values for both colors, after having made a
  * move for OTHER_COLOR(color) at (m, n). If these coordinates are -1
  * no move is made. In any case it's assumed that color is in turn to
- * move.
+ * move. (This affects the barrier patterns (class A, D) and intrusions
+ * (class B).
  */
 static void
 compute_influence(struct influence_data *q, int color, int m, int n,
@@ -1125,28 +1175,43 @@ interpolate(struct interpolation_data *f, float x)
   int i;
   float ratio;
   float diff;
-  if (x <= f->range_lowerbound)
+  if (x < f->range_lowerbound)
     return f->values[0];
-  else if (x >= f->range_upperbound)
+  else if (x > f->range_upperbound)
     return f->values[f->sections];
   else {
-    ratio = f->sections * ((x - f->range_lowerbound)
-                       /(f->range_upperbound - f->range_lowerbound));
+    ratio = ((float) f->sections) * (x - f->range_lowerbound)
+              /(f->range_upperbound - f->range_lowerbound);
     i = ratio;
     diff = ratio - ((float)i);
-    return (diff*f->values[i] + (1-diff)* f->values[i+1]);
+    return ((1-diff)*f->values[i] + diff* f->values[i+1]);
   }
 }
 
+/* Determines how much influence is needed at least to claim an
+ * intersection as territory, in dependence of the "center value".
+ * (In the center, more effort is needed to get territory!)
+ */
+struct interpolation_data min_infl_for_territory =
+  { 6,  0.0, 24.0, { 10.0, 26.0, 37.0, 46.0, 54.0, 60.0, 65.0 }};
+
+/* Determines the territory correction factor in dependence of the ratio
+ * ( influence of stronger color / min_infl_for_territory(intersection))
+ */
 struct interpolation_data territory_correction = 
-  { 5, (float) 0.0, 15.0, {0.0, 0.3, 0.55, 0.75, 0.9, 1.0}};
+  { 5, (float) 0.0, 1.0, {0.0, 0.3, 0.55, 0.75, 0.9, 1.0}};
 
 static void
 new_value_territory(struct influence_data *q)
 {
   int i, j;
+  int dist_i, dist_j;
+  float centralness;
   float first_guess[MAX_BOARD][MAX_BOARD];
+  float ratio;
+#if 0
   int k;
+#endif
 
   /* First loop: guess territory directly from influence. */
   for (i = 0; i < board_size; i++)
@@ -1160,9 +1225,12 @@ new_value_territory(struct influence_data *q)
           diff = (q->white_influence[i][j] - q->black_influence[i][j])
                 /(q->white_influence[i][j] + q->black_influence[i][j]);
         first_guess[i][j] = diff * diff * diff;
-        first_guess[i][j] *= interpolate(&territory_correction,
-                                         gg_max(q->black_influence[i][j],
-                                                q->white_influence[i][j]));
+        dist_i = gg_min(i, board_size - i -1);
+        dist_j = gg_min(j, board_size - j -1);
+	centralness = (float) 2 * gg_min(dist_i, dist_j) + dist_i + dist_j;
+        ratio = gg_max(q->black_influence[i][j], q->white_influence[i][j])
+                / interpolate(&min_infl_for_territory, centralness);
+        first_guess[i][j] *= interpolate(&territory_correction, ratio);
 
 	/* Dead stone, upgrade to territory. Notice that this is not
          * the point for a prisoner, which is added later. Instead
@@ -1178,9 +1246,8 @@ new_value_territory(struct influence_data *q)
       q->territory_value[i][j] = first_guess[i][j];
     }
 
-  /* Second loop: Correct according to neighbour vertices, then look for
-   * non-territory patterns and add prisoners.
-   */
+#if 0
+  /* Second loop: Correct according to neighbour vertices. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       if (q->p[i][j] == EMPTY) {
@@ -1204,6 +1271,7 @@ new_value_territory(struct influence_data *q)
         }
       }
     }
+#endif
 
   /* Third loop: Nonterritory patterns, points for prisoners. */
   for (i = 0; i < board_size; i++)
@@ -1536,6 +1604,9 @@ compute_followup_influence(int m, int n, int color,
         followup_influence.w[i][j] = UNMARKED;
     }
 
+  followup_influence.intrusion_counter = 0;
+
+  current_influence = &followup_influence;
   /* Match B patterns for saved stones. */
   matchpat(followup_influence_callback, color, &barrierspat_db, 
            &followup_influence, NULL);
@@ -1545,6 +1616,9 @@ compute_followup_influence(int m, int n, int color,
     for (j = 0; j < board_size; j++)
       followup_influence.w[i][j] = UNMARKED;
   
+  /* Now add the intrusions. */
+  add_marked_intrusions(&followup_influence, color);
+
   /* It may happen that we have a low intensity influence source at a
    * blocked intersection (due to an intrusion). Reset the
    * permeability at this point.
@@ -1566,7 +1640,6 @@ compute_followup_influence(int m, int n, int color,
     }
   
   /* Spread influence for new influence sources. */
-  add_marked_intrusions(&followup_influence, color);
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
       if ((color == BLACK

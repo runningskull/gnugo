@@ -32,7 +32,7 @@
 
 /* default attenuation coefficient. */
 #define DEFAULT_ATTENUATION 3.0
-#define EXP_DEFAULT_ATTENUATION 2.1
+#define EXP_DEFAULT_ATTENUATION 2.2
 
 /* Extra damping coefficient for spreading influence diagonally. */
 #define DIAGONAL_DAMPING 2.0

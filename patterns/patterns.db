@@ -5832,14 +5832,14 @@ Pattern EB1102
 O*..
 ----
 
-:8,OXe,followup(4),edge_double_sente_helper
+:8,OXe,followup(4)
 
 ?x??
-?X.b
-a*..
+?Xbd
+c*a.
 ----
 
-;xmoyo(b) && lib(a)==2
+;xmoyo(d) && lib(c)==2 && edge_double_sente(*,a,b,c)
 
 
 #################
@@ -13016,7 +13016,7 @@ O.Xx      fourth line sente kosumi
 ....
 ----
 
-:8,OXebE
+:8,OXebEFY
 
 O.Xx
 .*.a
@@ -13025,6 +13025,16 @@ O.Xx
 ----
 
 ;xmoyo(a)
+
+Pattern LE1Y
+
+O.Xx      fourth line sente kosumi
+.*..
+....
+....
+----
+
+:8,OXebEY
 
 
 Pattern LE2a
@@ -13035,7 +13045,7 @@ O.Xx
 ....
 ----
 
-:8,OX,value(6)
+:8,OXFY,value(6)
 
 ?bc?
 O.Xx
@@ -13054,7 +13064,7 @@ O.Xxx
 .....
 -----
 
-:8,OX,value(10)
+:8,OXFY,value(10)
 
 ?bc??
 O.Xxx
@@ -13063,6 +13073,16 @@ O.Xxx
 -----
 
 ;xmoyo(a) && (!o_somewhere(c)||o_somewhere(b))
+
+Pattern LE2Y
+
+?????     third line sente kosumi
+O.Xxx
+.*...
+.....
+-----
+
+:8,OXY
 
 
 Pattern LE3
@@ -13073,7 +13093,7 @@ xXx       expand territory
 O..
 o..
 
-:8,OX,value(7)
+:8,OXFY,value(7)
 
 xXx
 ...
@@ -13082,6 +13102,16 @@ O..
 oa.
 
 ;omoyo(a)
+
+Pattern LE3Y
+
+xXx       expand territory
+...
+.*.
+O..
+o..
+
+:8,OXY
 
 
 Pattern LE4
@@ -13108,7 +13138,7 @@ O...
 ....
 ----
 
-:8,OX,value(12)
+:8,OXFY,value(12)
 
 ?Xxx
 A...
@@ -13117,6 +13147,16 @@ A...
 ----
 
 ; xmoyo(*) && lib(A) > 2
+
+Pattern LE5Y
+
+?Xxx
+O...
+..*.
+....
+----
+
+:8,OXY
 
 
 Pattern LE6
@@ -13149,7 +13189,7 @@ x.Oo
 X*..
 O...
 
-:8,OX,value(8)
+:8,OXFY,value(8)
 
 x.Oo
 X*.a
@@ -13184,7 +13224,18 @@ O*X..
 .....
 -----
 
-:8,OX,value(10)
+:8,OXFY,value(10)
+
+Pattern LE9Y
+
+oo..?       good local sente
+..O.x
+O*X..
+....X
+.....
+-----
+
+:8,OXY
 
 
 Pattern LE10
@@ -13209,7 +13260,7 @@ Pattern LE11
 ...
 .O?
 
-:8,O,value(8)
+:8,OFY,value(8)
 
 .a.
 .*.
@@ -13217,6 +13268,15 @@ Pattern LE11
 .O?
 
 ; xmoyo(a)
+
+Pattern LE11Y
+
+...       jump towards the opponent's territory
+.*.
+...
+.O?
+
+:8,OY
 
 
 Pattern LE12
@@ -13292,7 +13352,7 @@ x.x
 OoO
 ?o?
 
-:|,OE,value(7)
+:|,OEFY,value(7)
 
 def
 abc
@@ -13303,6 +13363,19 @@ OoO
 ?o?
 
 ; xmoyo(a)||xmoyo(b)||xmoyo(c)||xmoyo(d)||xmoyo(e)||xmoyo(f)
+
+Pattern LE15Y
+# tm decreased value (3.1.20) (see nngs:1150 move G4)
+
+xxx            jump towards moyo
+x.x
+.*.
+...
+...
+OoO
+?o?
+
+:|,OEY
 
 
 Pattern LE16

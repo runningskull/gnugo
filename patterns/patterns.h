@@ -204,6 +204,12 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 #define HAVE_CONSTRAINT 1
 #define HAVE_ACTION     2
 
+/* Values of the action parameter to indicate where an influence autohelper
+ * is called from.
+ */
+#define INFLUENCE_CALLBACK 1
+#define FOLLOWUP_INFLUENCE_CALLBACK 2
+
 
 typedef struct patval {
   int x;
@@ -286,7 +292,6 @@ DECLARE(reinforce_helper);
 DECLARE(throw_in_atari_helper);
 DECLARE(ugly_cutstone_helper);
 DECLARE(cutstone2_helper);
-DECLARE(edge_double_sente_helper);
 
 /* autohelper fns */
 int not_lunch_helper(int apos, int bpos);
@@ -300,6 +305,7 @@ int squeeze_ko_helper(int apos);
 int backfill_helper(int apos, int bpos, int cpos);
 int owl_threatens_attack(int apos, int bpos);
 int connect_and_cut_helper(int Apos, int bpos, int cpos);
+int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
 
 
 /* pattern arrays themselves */

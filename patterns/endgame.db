@@ -218,7 +218,24 @@ Pattern EE6
 ...*..
 ------
 
-:8,OXb,terri(2),followup(1)
+:8,OXbFY,terri(2),followup(1)
+
+.OOOXX
+..a*bc
+------
+
+; proper_eye(a) && !oplay_attack(*,*) && oplay_attack(b,*,a,c,*,a)
+; && xplay_attack(*,a,b,a)
+
+
+Pattern EE6Y
+# gf Added followup value. (3.1.14)
+
+.OOOXX
+...*..
+------
+
+:8,OXbY,terri(2)
 
 .OOOXX
 ..a*bc
@@ -351,7 +368,22 @@ Pattern EE105
 ..*..
 -----
 
-:8,eOX,terri(2),followup(6)
+:8,eOXFY,terri(2),followup(6)
+
+?OE..
+bc*a.
+-----
+
+;proper_eye(a) && proper_eye(b) && oplay_attack_either(*,a,c,a,E)
+
+
+Pattern EE105Y
+
+?OX..      three points sente
+..*..
+-----
+
+:8,eOXY,terri(2)
 
 ?OE..
 bc*a.
@@ -420,7 +452,7 @@ XX?                     first line followup.
 *..
 ---
 
-:8,OX,followup(1)
+:8,OXFY,followup(1)
 
 XX?
 *a.
@@ -451,7 +483,22 @@ OXX.           1 point double sente
 .O*.
 ----
 
-:8,eOX,terri(1),followup(4),reverse_followup(2)
+:8,eOXFY,terri(1),followup(4),reverse_followup(2)
+
+ODDc
+bO*a
+----
+
+;marginal_eye(*) && marginal_eye(a) && marginal_eye(c)
+;&& (oplay_attack(*,a,b,a) || oplay_attack(*,a,b,D))
+
+Pattern EE203Y
+
+OXX.           1 point double sente
+.O*.
+----
+
+:8,eOXY,terri(1),reverse_followup(2)
 
 ODDc
 bO*a
@@ -915,6 +962,7 @@ O.O
 
 
 Pattern EE902
+# Why does this have followup value? -ab
 
 ?.?       endgame move
 O*O       one point sente
@@ -959,7 +1007,7 @@ XX.X       sente endgame move
 ....
 ----       
 
-:8,eOX,terri(1),followup(3)
+:8,eOXY,terri(1),followup(3)
 
 OO*?
 XX.X
@@ -1267,7 +1315,21 @@ Pattern CE15
 .*.       one point sente
 X.O
 
-:8,eOX,terri(1),followup(2)
+:8,eOXFY,terri(1),followup(2)
+
+.X?
+a*.
+X.O
+
+;marginal_eye(*) && proper_eye(a)
+
+Pattern CE15Y
+
+.X?       sente endgame move
+.*.       one point sente
+X.O
+
+:8,eOXY,terri(1)
 
 .X?
 a*.
@@ -1297,7 +1359,21 @@ Pattern CE16
 .*O       one point sente
 X??
 
-:8,eOX,terri(1),followup(2)
+:8,eOXFY,terri(1),followup(2)
+
+.X?
+a*O
+X??
+
+;marginal_eye(*) && proper_eye(a) && olib(*)>2
+
+Pattern CE16Y
+
+.X?       sente endgame move
+.*O       one point sente
+X??
+
+:8,eOXY,terri(1)
 
 .X?
 a*O
@@ -1327,7 +1403,21 @@ XO          endgame move
 .*          one point sente
 xX
 
-:8,eXO,terri(1),followup(2)
+:8,eXOFY,terri(1),followup(2)
+
+XO
+a*
+xX
+
+;marginal_eye(*) && proper_eye(a) && olib(*)>2
+
+Pattern CE17Y
+
+XO          endgame move
+.*          one point sente
+xX
+
+:8,eXOY,terri(1),followup(2)
 
 XO
 a*
@@ -1539,7 +1629,7 @@ Pattern CF1
 *..
 ?X?
 
-:-,X,followup(1)
+:-,XY,followup(1)
 
 ?X?
 *a.
@@ -1557,7 +1647,7 @@ xxx
 x.x
 X*X
 
-:|,X,followup(2)
+:|,XY,followup(2)
 
 xBx
 AdC

@@ -208,6 +208,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"olib",            1, "accurate_approxlib(%s,color, MAXLIBS, NULL)"},
   {"xcut",            1, "cut_possible(%s,OTHER_COLOR(color))"},
   {"ocut",            1, "cut_possible(%s,color)"},
+  {"edge_double_sente",    4, "edge_double_sente_helper(%s, %s, %s, %s)"},
   {"xplay_defend_both",   -2,
    "play_attack_defend2_n(OTHER_COLOR(color), 0, %d"},
   {"oplay_defend_both",   -2, "play_attack_defend2_n(color, 0, %d"},
@@ -1103,6 +1104,16 @@ generate_autohelper_code(int funcno, int number_of_params, int *labels)
     case 3:
       code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
 			  varnames[0], varnames[1], varnames[2]);
+      break;
+    case 4:
+      code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
+			  varnames[0], varnames[1], varnames[2],
+			  varnames[3]);
+      break;
+    default:
+      fprintf(stderr, "%s(%d) : error : unknown number of parameters (pattern %s)",
+	      current_file, current_line_number, pattern_names[patno]);
+      fatal_errors++;
     }
     return;
   }
