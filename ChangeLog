@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in value_territory()
 - comment play_connect_n()
 - document play_connect_n() in the texinfo docs
 - bugfix in play_connect_n (trace output)

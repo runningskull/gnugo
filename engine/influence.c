@@ -1345,10 +1345,15 @@ value_territory(struct influence_data *q, int m, int n, int color)
 	    && (q->non_territory[i][j] & BLACK))
 	  q->territory_value[i][j] = 0.0;
 	
-	/* Dead stone, add one to the territory value. */
-	if (BOARD(i, j) == BLACK)
+	/* Dead stone, add one to the territory value.
+	 *
+	 * We also want to include stones which were captured by the
+	 * last move when computing move influence. Therefore we look
+	 * at worm[POS(i, j)].color instead of just BOARD(i, j).
+	 */
+	if (worm[POS(i, j)].color == BLACK)
 	  q->territory_value[i][j] += 1.0;
-	else if (BOARD(i, j) == WHITE)
+	else if (worm[POS(i, j)].color == WHITE)
 	  q->territory_value[i][j] -= 1.0;
       }
     }
