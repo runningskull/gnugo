@@ -5,6 +5,6 @@ PB[Black]
 GN[White (W) vs. Black (B)]
 DT[2002-01-20]
 SY[Cgoban 1.9.10]TM[30:00+30:00/25];;
-AW[ba][da][ea][fa][bb][eb][fb][ib][bc][cc][hc][ic][cd][dd][hd][de][ee][fe][ge][he][cg][eg][gg]
-AB[ca][ha][ia][cb][db][gb][hb][dc][ec][gc][ed][fd][gd]
+AW[ba][da][ea][fa][bb][eb][fb][ib][ac][bc][cc][hc][ic][bd][dd][hd][be][ce][ee][fe][ge][he][ie][df][ef][eg][bh][ch][dh]
+AB[ca][ha][ia][cb][db][gb][hb][dc][ec][gc][ed][fd][gd][bf][bg][cg][dg][fg][gg][hg][ig][eh][fh][hh][di][gi][hi]
 )

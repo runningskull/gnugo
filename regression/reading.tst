@@ -775,6 +775,10 @@ loadsgf games/reading41.sgf 130
 187 defend A19
 #? [1 E11]*
 
+loadsgf games/reading40.sgf
+188 defend B4
+#? [1 A2]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

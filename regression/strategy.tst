@@ -285,10 +285,10 @@ loadsgf games/strategy11.sgf 77
 44 reg_genmove black
 #? [G2]*
 
-# G17/G18 and C1 are both huge.
+# G17/G18 and C1/H1 are both huge.
 loadsgf games/strategy11.sgf 127
 45 reg_genmove black
-#? [G17|G18|C1]
+#? [G17|G18|C1|H1]
 
 loadsgf games/strategy11.sgf 245
 46 reg_genmove black

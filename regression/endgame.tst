@@ -196,6 +196,10 @@ loadsgf games/endgame11.sgf
 890 restricted_genmove white T4 T5 S6
 #? [T4]
 
+loadsgf games/nngs/gnugo-3.3.21-joshj-200306270402.sgf 222
+900 reg_genmove white
+#? [J19|K19|K18]
+
 
 ############ End of Tests #################
 

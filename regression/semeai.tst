@@ -373,7 +373,7 @@ loadsgf games/semeai/semeai15.sgf
 #? [dead]
 85 dragon_status A13
 #? [alive]
-86 dragon_status C13
+86 dragon_status C11
 #? [critical A2 A2]
 
 ########### end of semeai tests #################

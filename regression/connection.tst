@@ -369,6 +369,10 @@ loadsgf games/gunnar/gunnar11.sgf
 107 connect C14 H12
 #? [0]
 
+loadsgf games/nngs/gnugo-3.3.21-joshj-200306270402.sgf 172
+108 same_dragon E16 F10
+#? [0]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

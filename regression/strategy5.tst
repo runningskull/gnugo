@@ -133,6 +133,14 @@ loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 235
 283 reg_genmove white
 #? [B9]
 
+loadsgf games/nngs/jypower-gnugo-3.3.22-200307050519.sgf 154
+284 reg_genmove black
+#? [R12|Q9]
+
+loadsgf games/nngs/jypower-gnugo-3.3.22-200307050519.sgf 162
+285 restricted_genmove black S10 O11 O10 Q11 N7
+#? [S10]
+
 
 ############ End of Tests #################
 
