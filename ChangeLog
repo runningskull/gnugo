@@ -1,9 +1,8 @@
 -------------------------------------------------------------------------
 -- ChangeLog
 -------------------------------------------------------------------------
-	
-- dragon table in movereason.c now 1D
-- replacement map in movereason.c now 1D
+
+- most parts of move_reasons.c converted to 1D
 - domain calculation in optics.c now 1D
 - hash.c is more 1D
 - new function is_ko_point() in board.c

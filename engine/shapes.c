@@ -427,13 +427,13 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
   /* Followup value specified. */
   if (class & VALUE_FOLLOWUP) {
-    add_followup_value(ti, tj, pattern->followup);
+    add_followup_value(POS(ti, tj), pattern->followup);
     TRACE("...followup value %f\n", pattern->followup);
   }
 
   /* Reverse followup value specified. */
   if (class & VALUE_REV_FOLLOWUP) {
-    add_reverse_followup_value(ti, tj, pattern->reverse_followup);
+    add_reverse_followup_value(POS(ti, tj), pattern->reverse_followup);
     TRACE("...reverse followup value %f\n", pattern->reverse_followup);
   }
 }

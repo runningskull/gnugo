@@ -237,7 +237,7 @@ throw_in_atari_helper(ARGS)
 
   /* The followup is to capture the "a" string. Estimate the value to
      twice the size. */
-  add_followup_value(ti, tj, 2 * worm[ai][aj].effective_size);
+  add_followup_value(POS(ti, tj), 2 * worm[ai][aj].effective_size);
 
   return success;
 }
@@ -444,7 +444,7 @@ edge_double_sente_helper(ARGS)
 void
 threaten_to_save_helper(int ti, int tj, int ai, int aj)
 {
-  add_followup_value(ti, tj, 2 + 2 * worm[ai][aj].effective_size);
+  add_followup_value(POS(ti, tj), 2 + 2 * worm[ai][aj].effective_size);
 }
 
 
@@ -475,7 +475,7 @@ threaten_to_capture_helper(int ti, int tj, int ai, int aj)
 	&& !does_defend(ti, tj, I(adjs[k]), J(adjs[k])))
       return;
     
-  add_followup_value(ti, tj, 2 * worm[ai][aj].effective_size);
+  add_followup_value(POS(ti, tj), 2 * worm[ai][aj].effective_size);
 }
 
 
@@ -508,7 +508,7 @@ defend_against_atari_helper(int ti, int tj, int ai, int aj)
       && is_self_atari(libs[1], OTHER_COLOR(BOARD(ai, aj))))
     return;
   
-  add_reverse_followup_value(ti, tj, 2 * worm[ai][aj].effective_size);
+  add_reverse_followup_value(POS(ti, tj), 2 * worm[ai][aj].effective_size);
 }
 
 

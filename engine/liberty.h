@@ -325,8 +325,8 @@ void set_maximum_move_value(int ti, int tj, float value);
 void set_minimum_territorial_value(int ti, int tj, float value);
 void set_maximum_territorial_value(int ti, int tj, float value);
 void add_shape_value(int ti, int tj, float value);
-void add_followup_value(int ti, int tj, float value);
-void add_reverse_followup_value(int ti, int tj, float value);
+void add_followup_value(int tt, float value);
+void add_reverse_followup_value(int tt, float value);
 void add_replacement_move(int ai, int aj, int bi, int bj);
 
 void find_stones_saved_by_move(int i, int j, int color,

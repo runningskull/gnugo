@@ -69,13 +69,13 @@
 #define MAXEYE 20
 
 static void
-compute_primary_domains(int color, int domain[MAX_BOARD],
+compute_primary_domains(int color, int domain[BOARDMAX],
 			int lively[MAX_BOARD][MAX_BOARD], 
 			int false_margins[MAX_BOARD][MAX_BOARD],
 			int first_time);
 static void count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD]);
 static int is_lively(int owl_call, int i, int j);
-static int has_inf(int color, int pos, int domain[MAX_BOARD],
+static int has_inf(int color, int pos, int domain[BOARDMAX],
 		   int lively[MAX_BOARD][MAX_BOARD]);
 static int false_margin(int i, int j, int color,
 			int lively[MAX_BOARD][MAX_BOARD]);
@@ -339,8 +339,8 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
  */
 
 static void
-compute_primary_domains(int color, int domain[MAX_BOARD],
-			int lively[MAX_BOARD][MAX_BOARD],
+compute_primary_domains(int color, int domain[BOARDMAX],
+			int lively[MAX_BOARD][MAX_BOARD], 
 			int false_margins[MAX_BOARD][MAX_BOARD],
 			int first_time)
 {
