@@ -52,6 +52,9 @@
 /* Semeai Variations. 500 default */
 #define SEMEAI_NODE_LIMIT 500
 
+/* Break-in module. Default not enabled. */
+#define USE_BREAK_IN 0
+
 
 /* Version number of package */
 #define PACKAGE "gnugo"

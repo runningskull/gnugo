@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new configure option --experimental-break-in
 - load_and_score_sgf_file() revised
 - detect_tactical_blunder() revised
 - ko result codes no longer discarded in owl_analyze_semeai()

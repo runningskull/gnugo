@@ -142,7 +142,7 @@ int owl_threats = OWL_THREATS;          /* compute owl threats */
 /* use experimental owl extension (GAIN/LOSS) */
 int experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
 /* use experimental territory break-in module */
-int experimental_break_in = 0;
+int experimental_break_in = USE_BREAK_IN;
 
 int allow_suicide       = 0;    /* allow opponent to make suicide moves */
 int capture_all_dead    = 0;    /* capture all dead opponent stones */

@@ -20,6 +20,7 @@ my %defaults =
    EXPERIMENTAL_READING => 0,
    GRID_OPT => 1,
    OWL_THREATS => 0,
+   USE_BREAK_IN => 0,
    ORACLE => 0);
 
 my @skip = qw/
