@@ -56,6 +56,8 @@ static void add_adjacent_dragons(int a, int b);
 static void add_adjacent_dragon(int a, int b);
 static int dragon_invincible(int pos);
 static int dragon_looks_inessential(int origin);
+static void mark_dragon(int pos, char mx[BOARDMAX], char mark);
+static void identify_thrashing_dragons(void);
 static void analyze_false_eye_territory(void);
 static int connected_to_eye(int pos, int str, int color, int eye_color,
 			    struct eye_data *eye);
@@ -97,12 +99,11 @@ dragon2_func(int pos)
  */
 
 void 
-make_dragons(int color, int stop_before_owl, int save_verbose)
+make_dragons(int color, int stop_before_owl)
 {
   int str;
   int dr;
   int d;
-  int last_move;
 
   start_timer(2);
   dragon2_initialized = 0;
@@ -469,22 +470,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       dragon[str] = dragon[dd->origin];
     }
 
-  /* If the opponent's last move is a dead dragon, this is
-   * called a *thrashing dragon*. We must be careful because
-   * the opponent may be trying to trick us, so even though
-   * GNU Go thinks the stone is dead, we should consider
-   * attacking it, particularly if we are ahead.
-   */
-
-  last_move = get_last_move();
-  if (last_move != NO_MOVE
-      && dragon[last_move].status == DEAD) {
-    thrashing_dragon = dragon[last_move].origin;
-    if (save_verbose)
-      gprintf("thrashing dragon found at %1m\n", thrashing_dragon);
-  }
-  else
-    thrashing_dragon = 0;
+  identify_thrashing_dragons();
 
   /* Owl threats. */
   for (str = BOARDMIN; str < BOARDMAX; str++)
@@ -509,8 +495,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	if (level >= 8
 	    && !disable_threat_computation
 	    && (owl_threats 
-		|| (thrashing_dragon
-		    && is_same_dragon(str, thrashing_dragon)))) {
+		|| thrashing_stone[str])) {
 	  if (acode && !dcode && dragon[str].owl_attack_point != NO_MOVE) {
 	    if (owl_threaten_defense(str, &defense_point,
 				     &second_defense_point)) {
@@ -1116,18 +1101,85 @@ static void
 get_alive_stones(int color, char safe_stones[BOARDMAX])
 {
   int d;
-  int ii;
   get_lively_stones(color, safe_stones);
   for (d = 0; d < number_of_dragons; d++) {
     if (dragon2[d].safety == DEAD
 	|| (dragon2[d].safety == CRITICAL
 	    && board[dragon2[d].origin] == OTHER_COLOR(color))) {
-      for (ii = first_worm_in_dragon(dragon2[d].origin); ii != NO_MOVE;
-	   ii = next_worm_in_dragon(ii))
-	mark_string(ii, safe_stones, 0);
+      mark_dragon(dragon2[d].origin, safe_stones, 0);
     }
   }
 }
+
+
+/* Mark the stones of a dragon. */
+static void
+mark_dragon(int pos, char mx[BOARDMAX], char mark)
+{
+  int w;
+  for (w = first_worm_in_dragon(dragon[pos].origin); w != NO_MOVE;
+       w = next_worm_in_dragon(w))
+    mark_string(w, mx, mark);
+}
+
+
+/* If the opponent's last move is a dead dragon, this is called a
+ * *thrashing dragon*. We must be careful because the opponent may be
+ * trying to trick us, so even though GNU Go thinks the stone is dead,
+ * we should consider attacking it, particularly if we are ahead.
+ *
+ * This function determines whether the last played move is part of a
+ * dead dragon. It also looks for dead friendly neighbors of the
+ * thrashing dragon, which are also considered as thrashing. The
+ * stones of the primary thrashing dragon are marked by 1 in the
+ * thrashing_stone[] array and its neighbors are marked by 2.
+ * Neighbors of neighbors are marked 3, and so on, up to at most
+ * distance 5.
+ */
+static void
+identify_thrashing_dragons()
+{
+  int k;
+  int dist;
+  int last_move;
+  int color;
+
+  thrashing_dragon = 0;
+  memset(thrashing_stone, 0, sizeof(thrashing_stone));
+
+  last_move = get_last_move();
+  if (last_move == NO_MOVE
+      || dragon[last_move].status != DEAD)
+    return;
+
+  thrashing_dragon = dragon[last_move].origin;
+  DEBUG(DEBUG_DRAGONS, "thrashing dragon found at %1m\n", thrashing_dragon);
+  mark_dragon(thrashing_dragon, thrashing_stone, 1);
+  color = board[thrashing_dragon];
+  
+  for (dist = 1; dist < 5; dist++) {
+    int pos;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (board[pos] != color
+	  || dragon[pos].origin != pos
+	  || thrashing_stone[pos] != dist)
+	continue;
+      
+      for (k = 0; k < DRAGON2(pos).neighbors; k++) {
+	int d = DRAGON2(pos).adjacent[k];
+	if (DRAGON(d).color == color
+	    && DRAGON(d).status == DEAD
+	    && thrashing_stone[dragon2[d].origin] == 0) {
+	  DEBUG(DEBUG_DRAGONS,
+		"neighbor at distance %d of thrashing dragon found at %1m\n",
+		dist + 1, DRAGON(d).origin);
+	  mark_dragon(DRAGON(d).origin, thrashing_stone, dist + 1);
+	}
+      }
+    }
+  }
+}
+
 
 static void
 set_dragon_strengths(const char safe_stones[BOARDMAX],

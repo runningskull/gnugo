@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static functions mark_dragon() and identify_thrashing_dragons()
+  in dragon.c
+- dead friendly neighbors of a thrashing dragon also considered thrashing
+- new global array thrashing_stone[] to mark all thrashing dragons
 - drop move reasons in add_move_reason() when the lists become full
 - bugfix in value_move_reasons()
 - MAX_REASONS increased to 120

@@ -775,6 +775,7 @@ extern int owl_threats;              /* compute owl threats */
 extern int experimental_influence;   /* use experimental influence module */
 
 extern int thrashing_dragon; /* Dead opponent's dragon trying to live */
+extern char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
 
 /* Experimental reading */
 extern char *rgoal;

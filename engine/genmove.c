@@ -143,14 +143,14 @@ examine_position(int color, int how_much)
 
     if (how_much == EXAMINE_DRAGONS_WITHOUT_OWL) {
       if (NEEDS_UPDATE(dragons_examined_without_owl))
-	make_dragons(color, 1, save_verbose);
+	make_dragons(color, 1);
       verbose = save_verbose;
       gg_assert(test_gray_border() < 0);
       return;
     }
     
     if (NEEDS_UPDATE(dragons_examined)) {
-      make_dragons(color, 0, save_verbose);
+      make_dragons(color, 0);
       /* We have automatically done a partial dragon analysis as well. */
       dragons_examined_without_owl = position_number;
     }
@@ -672,22 +672,16 @@ revise_thrashing_dragon(int color, float advantage)
       || (color == WHITE && score < advantage))
     return 0;
 
-  /* If an owl threat has been found, a move reason has
-   * probably been generated, so we skip this step. */
-  if (dragon[thrashing_dragon].owl_threat_status == CAN_THREATEN_DEFENSE)
-    return 0;
-
   if (disable_threat_computation
       || !thrashing_dragon 
       || dragon[thrashing_dragon].status != DEAD)
     return 0;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)
-	&& is_same_dragon(pos, thrashing_dragon))
+    if (ON_BOARD(pos) && thrashing_stone[pos]) {
       dragon[pos].status = UNKNOWN;
-
-  DRAGON2(thrashing_dragon).safety = ALIVE;
+      DRAGON2(pos).safety = ALIVE;
+    }
 
   set_strength_data(OTHER_COLOR(color), safe_stones, strength);
   compute_influence(OTHER_COLOR(color), safe_stones, strength,

@@ -48,7 +48,8 @@ int          move_history_color[MAX_MOVE_HISTORY];
 int          move_history_pos[MAX_MOVE_HISTORY];
 int          move_history_pointer;
 
-int thrashing_dragon = 0; /* Dead opponent's dragon trying to live */
+int thrashing_dragon = NO_MOVE; /* Dead opponent's dragon trying to live. */
+char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
 
 float        komi;
 int          movenum;
