@@ -468,9 +468,6 @@ main(int argc, char *argv[])
 	if (EXPERIMENTAL_READING)
 	  fprintf(stderr,
 		  "configure option enabled: experimental reading\n");
-	if (USE_BREAK_IN)
-	  fprintf(stderr,
-		  "configure option enabled: experimental break-in\n");
 	if (HASHING_SCHEME != 2)
 	  fprintf(stderr, "hash scheme %d\n", HASHING_SCHEME);
 	if (OWL_THREATS)
