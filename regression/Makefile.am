@@ -123,7 +123,7 @@ manyfaces: manyfaces.tst
 	$(srcdir)/eval.sh manyfaces.tst $(GG_OPTIONS)
 
 manyfaces1: manyfaces1.tst
-	$(srcdir)/eval.sh manyfaces.tst $(GG_OPTIONS)
+	$(srcdir)/eval.sh manyfaces1.tst $(GG_OPTIONS)
 
 neurogo: neurogo.tst
 	$(srcdir)/eval.sh neurogo.tst $(GG_OPTIONS)
