@@ -65,7 +65,7 @@ static int recognize_eye(int pos, int *attack_point, int *defense_point,
 			 struct half_eye_data heye[BOARDMAX],
 			 struct vital_points *vp);
 static void guess_eye_space(int pos, int effective_eyesize, int margins,
-			    struct eye_data eye[BOARDMAX],
+			    int bulk_score, struct eye_data eye[BOARDMAX],
 			    struct eyevalue *value, int *pessimistic_min);
 static void reset_map(int size);
 static void first_map(int *map_value);
@@ -807,11 +807,15 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX])
 {
+  static int bulk_coefficients[5] = {-1,-1, 1, 4, 12};
+
   int pos2;
   int margins = 0;
   int halfeyes = 0;
   int margins_adjacent_to_margin = 0;
   int effective_eyesize;
+  int bulk_score = 0;
+  char chainlinks[BOARDMAX];
 
   /* Stones inside eyespace which do not coincide with a false eye or
    * a halfeye.
@@ -819,10 +823,11 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   int interior_stones = 0;
 
   for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
-    if (!ON_BOARD(pos2))
+    int k;
+
+    if (!ON_BOARD(pos2) || eye[pos2].origin != pos)
       continue;
-    if (eye[pos2].origin != pos)
-      continue;
+
     if (eye[pos2].marginal || is_halfeye(heye, pos2)) {
       margins++;
       if (eye[pos2].marginal && eye[pos2].marginal_neighbors > 0)
@@ -832,6 +837,21 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
     }
     else if (IS_STONE(board[pos2]))
       interior_stones++;
+
+    bulk_score += bulk_coefficients[(int) eye[pos2].neighbors];
+
+    for (k = 0; k < 4; k++) {
+      int neighbor = pos2 + delta[k];
+
+      if (board[neighbor] == eye[pos].color) {
+	if (!chainlinks[neighbor]) {
+	  bulk_score += 4;
+	  mark_string(neighbor, chainlinks, 1);
+	}
+      }
+      else if (!ON_BOARD(neighbor))
+	bulk_score += 2;
+    }
   }
 
   /* This is a measure based on the simplified assumption that both
@@ -871,7 +891,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
    * eyespaces.
    */
   else {
-    guess_eye_space(pos, effective_eyesize, margins, eye,
+    guess_eye_space(pos, effective_eyesize, margins, bulk_score, eye,
 		    value, pessimistic_min); 
     DEBUG(DEBUG_EYES, "  guess_eye - %s, pessimistic_min=%d\n",
 	  eyevalue_to_string(value), *pessimistic_min);
@@ -881,7 +901,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
     *pessimistic_min = 0;
     DEBUG(DEBUG_EYES, "  pessimistic min revised to 0\n");
   }
-  
+
   /* An eyespace with at least two interior stones is assumed to be
    * worth at least one eye, regardless of previous considerations.
    */
@@ -889,7 +909,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
     *pessimistic_min = 1;
     DEBUG(DEBUG_EYES, "  pessimistic min revised to 1 (interior stones)\n");
   }
-  
+
   if (attack_point
       && *attack_point == NO_MOVE
       && max_eyes(value) != *pessimistic_min) {
@@ -956,19 +976,30 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 
 static void
 guess_eye_space(int pos, int effective_eyesize, int margins,
-		struct eye_data eye[BOARDMAX],
+		int bulk_score, struct eye_data eye[BOARDMAX],
 		struct eyevalue *value, int *pessimistic_min)
 {
   if (effective_eyesize > 3) {
     set_eyevalue(value, 2, 2, 2, 2);
+    *pessimistic_min = 1;
+
     if ((margins == 0 && effective_eyesize > 7)
 	|| (margins > 0 && effective_eyesize > 9)) {
       int eyes = 2 + (effective_eyesize - 2 * (margins > 0) - 8) / 2;
-      *pessimistic_min = eyes;
+      int threshold = (4 * (eye[pos].esize - 2)
+		       + (effective_eyesize - 8) * (effective_eyesize - 9));
+
+      DEBUG(DEBUG_EYES, "size: %d(%d), threshold: %d, bulk score: %d\n",
+	    eye[pos].esize, effective_eyesize, threshold, bulk_score);
+
+      if (bulk_score > threshold && effective_eyesize < 15)
+	eyes = gg_max(2, eyes - ((bulk_score - threshold) / eye[pos].esize));
+
+      if (bulk_score < threshold + eye[pos].esize || effective_eyesize >= 15)
+	*pessimistic_min = eyes;
+
       set_eyevalue(value, eyes, eyes, eyes, eyes);
     }
-    else
-      *pessimistic_min = 1;
   }
   else if (effective_eyesize > 0) {
     set_eyevalue(value, 1, 1, 1, 1);

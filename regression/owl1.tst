@@ -310,6 +310,12 @@ loadsgf games/nngs/gnugo-3.5.2gf1-G28-200312282240.sgf 203
 336 owl_attack M5
 #? [1 (N2|O1)]*
 
+# A problem with extremely enthusiastic guess_eye_space() estimation.
+# Must be solved with "bulky eye" heuristic in compute_eyes_pessimistic().
+loadsgf games/self_play/selfplay1.sgf 206
+337 owl_attack E19
+#? [1 C18]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

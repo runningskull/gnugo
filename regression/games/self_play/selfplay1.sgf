@@ -1,0 +1,27 @@
+(;GM[1]FF[3]
+RU[Japanese]SZ[19]HA[2]KM[0.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2003-05-25]
+SY[Cgoban 1.9.14]TM[-]AB[pd][dp];W[cd];B[pq];W[po];B[qo];W[qn];B[qp];
+W[pn];B[nq];W[qj];B[ed];W[ee];B[fe];W[de];B[gd];W[cn];B[cl];W[cq];
+B[dq];W[cp];B[do];W[bn];B[em];W[qf];B[hp];W[mo];B[lp];W[ci];B[nd];
+W[ec];B[fc];W[eb];B[ek];W[ha];B[kn];W[rd];B[qc];W[rc];B[ll];W[id];
+B[kc];W[mm];B[nk];W[ol];B[fi];W[if];B[ff];W[hg];B[gh];W[ii];B[hj];
+W[ke];B[kk];W[dg];B[ki];W[ib];B[md];W[qb];B[pb];W[qh];B[ij];W[cr];
+B[dr];W[rb];B[ro];W[rn];B[ih];W[kb];B[lb];W[jc];B[ka];W[jb];B[cs];
+W[lc];B[mf];W[mc];B[mh];W[bs];B[ds];W[so];B[sp];W[sn];B[ma];W[pa];
+B[pg];W[nb];B[ph];W[qg];B[oa];W[qa];B[ob];W[bk];B[bl];W[ar];B[bj];
+W[bi];B[ak];W[ok];B[ai];W[nj];B[ag];W[be];B[cj];W[di];B[mk];W[mb];
+B[na];W[pf];B[la];W[og];B[pi];W[oh];B[ld];W[qk];B[kd];W[op];B[jd];
+W[je];B[mp];W[oq];B[or];W[rq];B[qr];W[rp];B[pp];W[np];B[lo];W[mn];
+B[qd];W[rr];B[he];W[qs];B[pr];W[ps];B[os];W[rs];B[mr];W[gb];B[ie];
+W[nf];B[fb];W[fa];B[jf];W[dd];B[dj];W[oe];B[hd];W[od];B[nc];W[gc];
+B[fd];W[ic];B[dn];W[oc];B[pc];W[ng];B[co];W[bo];B[mg];W[nl];B[mj];
+W[ni];B[hc];W[hb];B[mi];W[lm];B[km];W[ef];B[fg];W[eh];B[ei];W[qe];
+B[bm];W[am];B[ja];W[ea];B[cf];W[cm];B[eg];W[df];B[cg];W[bh];B[ah];
+W[dm];B[dl];W[an];B[al];W[ap];B[ne];W[pe];B[nh];W[oi];B[ae];W[ad];
+B[af];W[bd];B[fh];W[dh];B[ml];W[ga];B[bf];W[ln];B[ia];W[bg];B[ch];
+W[qq];B[cb];W[tt];B[dc];W[tt];B[tt]
+)

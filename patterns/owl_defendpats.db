@@ -3804,6 +3804,17 @@ XOO..|
 :8,-,value(76)
 
 
+Pattern D842
+# pp New pattern (3.5.5)
+
+|OOOOO	    workaround lunch problem (the eye is not considered a unit)
+|..*.O
+|.X..O
++-----
+
+:8,-,value(80)
+
+
 #########################################################
 #                                                       #
 #                  Prevent intrusion                    #
