@@ -22,10 +22,11 @@ loadsgf games/ego.sgf 246
 5 combination_attack black
 #? [PASS]
 
-# E8 is bogus
-loadsgf games/endgame1.sgf 3
-6 combination_attack black
-#? [PASS]
+# Retired as endgame1.sgf is no longer in CVS. /ab
+# # E8 is bogus
+# loadsgf games/endgame1.sgf 3
+# 6 combination_attack black
+# #? [PASS]
 
 # D11 can be answered at C12.
 loadsgf games/scoring/score30.sgf
