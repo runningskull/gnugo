@@ -1115,7 +1115,7 @@ find_semeai_backfilling_move(int worm, int liberty)
 		   EMPTY, NO_MOVE)) {
       if (safe_move(liberty, other))
 	result = fill;
-      else
+      else if (board[worm] != EMPTY)
 	result = find_semeai_backfilling_move(worm, liberty);
       popgo();
     }
