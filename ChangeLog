@@ -2,9 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- missing files added to EXTRADIST in Makefile.* in doc/ and regression/
+- new file logo-36.pdf
 - compile fix for VC/Tru64
 
-3.5.11 released September 11, 2004
+3.6 pre 1 released September 11, 2004
 
 - use int arrays instead of char arrays to mark eyes in 
   owl_determine_life() and dependent functions
