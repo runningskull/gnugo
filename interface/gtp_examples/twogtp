@@ -100,7 +100,7 @@ sub initialize {
     my $self = shift;
     my $cmd = shift;
 
-    my $pid = open2(${$self->out}, ${$self->in}, $cmd);
+    my $pid = open2($self->{out}, $self->{in}, $cmd);
     return $pid;
 }
 
@@ -116,35 +116,35 @@ sub genmove {
     } else {
     	die "Illegal color $color\n";
     }
-    my $move = GTP::exec_cmd(${$self->in}, ${$self->out}, $cmd);
+    my $move = GTP::exec_cmd($self->{in}, $self->{out}, $cmd);
 }
 
 sub black {
     my $self = shift;
     my $move = shift;
 
-    GTP::exec_cmd(${$self->in}, ${$self->out}, "black $move");
+    GTP::exec_cmd($self->{in}, $self->{out}, "black $move");
 }
 
 sub white {
     my $self = shift;
     my $move = shift;
 
-    GTP::exec_cmd(${$self->in}, ${$self->out}, "white $move");
+    GTP::exec_cmd($self->{in}, $self->{out}, "white $move");
 }
 
 sub komi {
     my $self = shift;
     my $komi = shift;
 
-    GTP::exec_cmd(${$self->in}, ${$self->out}, "komi $komi");
+    GTP::exec_cmd($self->{in}, $self->{out}, "komi $komi");
 }
 
 sub boardsize {
     my $self = shift;
     my $size = shift;
 
-    GTP::exec_cmd(${$self->in}, ${$self->out}, "boardsize $size");
+    GTP::exec_cmd($self->{in}, $self->{out}, "boardsize $size");
 }
 
 sub handicap {
@@ -152,7 +152,7 @@ sub handicap {
     my $handicap = shift;
 
     my $stones;
-    $stones = GTP::exec_cmd(${$self->in}, ${$self->out}, "handicap $handicap");
+    $stones = GTP::exec_cmd($self->{in}, $self->{out}, "handicap $handicap");
     return split(' ', $stones);
 }
 
@@ -161,26 +161,26 @@ sub fixed_handicap {
     my $handicap = shift;
 
     my $stones;
-    $stones = GTP::exec_cmd(${$self->in}, ${$self->out}, "fixed_handicap $handicap");
+    $stones = GTP::exec_cmd($self->{in}, $self->{out}, "fixed_handicap $handicap");
     return split(' ', $stones);
 }
 
 sub quit {
     my $self = shift;
 
-    $self->in->print("quit\n");
+    $self->{in}->print("quit\n");
 }
 
 sub showboard {
     my $self = shift;
 
-    GTP::exec_cmd(${$self->in}, ${$self->out}, "showboard");
+    GTP::exec_cmd($self->{in}, $self->{out}, "showboard");
 }
 
 sub get_random_seed {
     my $self = shift;
 
-    my $ret = GTP::exec_cmd(${$self->in}, ${$self->out}, "get_random_seed");
+    my $ret = GTP::exec_cmd($self->{in}, $self->{out}, "get_random_seed");
     if ($ret eq "ERROR") {
         return "unknown";
     }
@@ -191,21 +191,21 @@ sub get_random_seed {
 sub get_program_name {
     my $self = shift;
 
-    my $name = GTP::exec_cmd(${$self->in}, ${$self->out}, "name");
-    my $version = GTP::exec_cmd(${$self->in}, ${$self->out}, "version");
+    my $name = GTP::exec_cmd($self->{in}, $self->{out}, "name");
+    my $version = GTP::exec_cmd($self->{in}, $self->{out}, "version");
     return "$name $version";
 }
 
 sub score {
     my $self = shift;
 
-    return GTP::exec_cmd(${$self->in}, ${$self->out}, "score");
+    return GTP::exec_cmd($self->{in}, $self->{out}, "score");
 }
 
 sub estimate_score {
     my $self = shift;
 
-    my $ret = GTP::exec_cmd(${$self->in}, ${$self->out}, "estimate_score");
+    my $ret = GTP::exec_cmd($self->{in}, $self->{out}, "estimate_score");
     my ($result, $rest) = split(' ', $ret, 2);
     return $result;
 }
@@ -264,7 +264,7 @@ sub writesgf {
     my $white_seed = $self->white->get_random_seed;
     my $handicap = $self->handicap;
     my $komi = $self->komi;
-    my $result = $self->result->resultw;
+    my $result = $self->{result}->resultw;
 
     print $handle "(;GM[1]FF[4]RU[Japanese]SZ[$size]HA[$handicap]KM[$komi]RE[$result]\n";
     print $handle "PW[$white_name (random seed $white_seed)]PB[$black_name (random seed $black_seed)]\n";
@@ -396,8 +396,9 @@ sub play {
 	print "Result according to W: $resultw\n";
 	print "****** according to B: $resultb\n";
     }
-    $self->result->resultw($resultw);
-    $self->result->resultb($resultb);
+    $self->{result} = new GTP::Game::Result;
+    $self->{result}->resultw($resultw);
+    $self->{result}->resultb($resultb);
     $self->writesgf($sgffile) if defined $sgffile;
 }
 
@@ -434,8 +435,8 @@ sub play {
         my $sgffile_game = sprintf "%s%03d.sgf", $sgffile_base, $i;
     	$game->play($sgffile_game);
 	my $result = new GTP::Game::Result;
-	$result->resultb($game->result->resultb);
-	$result->resultw($game->result->resultw);
+	$result->resultb($game->{result}->resultb);
+	$result->resultw($game->{result}->resultw);
     	push @results, $result;
     }
     return @results;
