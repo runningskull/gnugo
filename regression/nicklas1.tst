@@ -290,7 +290,7 @@ loadsgf games/nicklas/nicklas19.sgf 60
 
 loadsgf games/nicklas/nicklas20.sgf 37
 2001 gg_genmove black
-#? [G5]
+#? [G5]*
 
 loadsgf games/nicklas/nicklas20.sgf 41
 2002 gg_genmove black

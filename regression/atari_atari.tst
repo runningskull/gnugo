@@ -1,7 +1,7 @@
 # N3 is ineffective
 loadsgf games/incident107.sgf 216
 1 combination_attack black
-#? [N1]*
+#? [N1]
 
 loadsgf games/atari_atari01.sgf 235
 2 combination_attack black
@@ -33,3 +33,13 @@ loadsgf games/scoring/score30.sgf
 loadsgf games/atari_atari02.sgf 140
 8 combination_attack black
 #? [PASS]
+
+loadsgf games/atari_atari03.sgf 222
+9 combination_attack white
+#? [A11]
+
+# Both G5 and J4 capture (at least) the G6 string. After endgame
+# considerations, J4 turns out to be one point bigger.
+loadsgf games/atari_atari04.sgf 279
+10 combination_attack white
+#? [J4|G5]

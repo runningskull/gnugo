@@ -194,7 +194,7 @@ static struct gtp_command commands[] = {
 
 /* Start playing using the Go Text Protocol. */
 void
-play_gtp()
+play_gtp(FILE *gtp_input)
 {
   /* Try to make sure that we have a useful level of buffering of stdout. */
 #ifdef HAVE_SETLINEBUF
@@ -211,7 +211,7 @@ play_gtp()
   reset_engine();
   move_stack_pointer = 0;
   store_position(&starting_position);
-  gtp_main_loop(commands);
+  gtp_main_loop(commands, gtp_input);
 }
 
 
@@ -1124,7 +1124,7 @@ gtp_top_moves_white(char *s, int id)
       gtp_print_vertex(best_movei[k], best_movej[k]);
       gtp_printf(" %.2f ", best_move_values[k]);
     }
-  gtp_printf("\n");
+  gtp_printf("\n\n");
   return GTP_OK;
 }
 
@@ -1140,7 +1140,7 @@ gtp_top_moves_black(char *s, int id)
       gtp_print_vertex(best_movei[k], best_movej[k]);
       gtp_printf(" %.2f ", best_move_values[k]);
     }
-  gtp_printf("\n");
+  gtp_printf("\n\n");
   return GTP_OK;
 }
 

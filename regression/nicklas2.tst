@@ -84,7 +84,7 @@ loadsgf games/nicklas/nicklas21.sgf 76
 
 loadsgf games/nicklas/nicklas22.sgf 42
 2201 gg_genmove black
-#? [C2]*
+#? [C2]
 
 loadsgf games/nicklas/nicklas22.sgf 50
 2202 gg_genmove black

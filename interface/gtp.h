@@ -60,7 +60,7 @@ struct gtp_command {
   gtp_fn_ptr function;
 };
 
-void gtp_main_loop(struct gtp_command commands[]);
+void gtp_main_loop(struct gtp_command commands[], FILE *gtp_input);
 void gtp_internal_set_boardsize(int size);
 void gtp_mprintf(const char *format, ...);
 void gtp_printf(const char *format, ...);

@@ -929,8 +929,8 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
     int bi = i + deltai[k];
     int bj = j + deltaj[k];
     if (ON_BOARD(bi, bj)
-	&& p[bi][bj]
-	&& libs < worm[bi][bj].liberties) {
+	&& p[bi][bj] == color
+	&& libs <= worm[bi][bj].liberties) {
       trouble = 1;
       if (dragon[bi][bj].matcher_status == ALIVE
 	  && DRAGON2(bi, bj).safety != INVINCIBLE

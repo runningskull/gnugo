@@ -38,7 +38,7 @@ loadsgf games/incident104.sgf 215
 # incident 107
 loadsgf games/incident107.sgf 216
 8 gg_genmove black
-#? [N1]*
+#? [N1]
 
 # incident 109
 loadsgf games/incident108b.sgf 172
@@ -139,7 +139,7 @@ loadsgf games/strategy5.sgf 12
 
 loadsgf games/strategy5.sgf 14
 27 gg_genmove black
-#? [C3]
+#? [C3]*
 
 loadsgf games/strategy5.sgf 20
 28 gg_genmove black
@@ -160,7 +160,7 @@ loadsgf games/strategy6.sgf 274
 
 loadsgf games/strategy7.sgf 23
 32 gg_genmove black
-#? [A4]
+#? [A4]*
 
 loadsgf games/strategy8.sgf 283
 33 gg_genmove white

@@ -2,6 +2,27 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+3.1.1 released August 31, 2001
+
+- halfeyes valued slightly more guessing eye value for shapes not in eyes.db
+- all owl data stored in do_owl_attack() and do_owl_defend()
+- revised definition of inessential strings in owl_find_lunches()
+- confirm_safety() revised
+- owl tuning
+- global_matchpat() to perform pattern matching on the whole board.
+- removed scan loops from different files.
+- matchpat() made static
+- size test made one time for all the board.
+- reverse spiral implemented to compute the move's row in the spiral path.
+- bugfixes and improved trace output in atari_atari functions
+- bugfix in dragon.c: broken format crashed printworms option
+- bugfix in play_gtp.c: format needed extra newline
+- configure --enable-profile implemented
+- new game records and regressions
+- new gtp_example vanilla.c
+- missing subheadings added in doc/*texi
+- BREAKAGE reset
+
 3.0.0 released August 24, 2001
 
 - komi can be set from CGoban using the command line

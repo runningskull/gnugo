@@ -932,7 +932,9 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 {
   int m, n;
   int margins = 0;
+  int halfeyes = 0;
   int margins_adjacent_to_margin = 0;
+  int effective_eyesize;
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
@@ -943,8 +945,17 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
 	margins++;
 	if (eye[m][n].marginal && eye[m][n].marginal_neighbors > 0)
 	  margins_adjacent_to_margin++;
+	if (halfeye(heye, m, n))
+	  halfeyes++;
       }
     }
+
+  /* This is a measure based on the simplified assumption that both
+   * players only cares about playing the marginal eye spaces. It is
+   * used later to guess the eye value for unidentified eye shapes.
+   */
+  effective_eyesize = (eye[i][j].esize + halfeyes - 2*margins
+		       - margins_adjacent_to_margin);
 
   if (attacki) *attacki = -1;
   if (attackj) *attackj = -1;
@@ -1016,16 +1027,15 @@ compute_eyes_pessimistic(int i, int  j, int *max, int *min,
    * some additional heuristics to guess the values of unknown
    * eyespaces.
    */
-  else if (eye[i][j].esize - 2*margins - margins_adjacent_to_margin > 3) {
+  else if (effective_eyesize > 3) {
     *min = 2;
     *max = 2;
-    if (margins == 0
-	|| eye[i][j].esize - 2*margins - margins_adjacent_to_margin > 7)
+    if (margins == 0 || effective_eyesize > 7)
       *pessimistic_min = 1;
     else
       *pessimistic_min = 0;
   }
-  else if (eye[i][j].esize - 2*margins - margins_adjacent_to_margin > 0) {
+  else if (effective_eyesize > 0) {
     *min = 1;
     *max = 1;
     if (margins > 0)
@@ -2153,12 +2163,12 @@ evaluate_diagonal_intersection(int m, int n, int color,
   if (color == BLACK
       && b_eye[m][n].color == BLACK_BORDER
       && !b_eye[m][n].marginal
-      && !is_ko(m, n, WHITE, NULL, NULL))
+      && !(p[m][n] == EMPTY && does_capture_something(m, n, WHITE)))
     return 0;
   if (color == WHITE
       && w_eye[m][n].color == WHITE_BORDER
       && !w_eye[m][n].marginal
-      && !is_ko(m, n, BLACK, NULL, NULL))
+      && !(p[m][n] == EMPTY && does_capture_something(m, n, BLACK)))
     return 0;
 
   if (p[m][n] == EMPTY && safe_move(m, n, other) != 0)

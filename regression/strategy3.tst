@@ -47,11 +47,11 @@ loadsgf games/strategy27.sgf 216
 
 loadsgf games/strategy27.sgf 220
 110 gg_genmove white
-#? [A8]
+#? [A8]*
 
 loadsgf games/me.sgf 44
 111 gg_genmove black
-#? [K3]*
+#? [K3]
 
 loadsgf games/me.sgf 84
 112 gg_genmove black
@@ -91,7 +91,7 @@ loadsgf games/incident240.sgf 69
 # incident 221
 loadsgf games/incident221.sgf 35
 120 gg_genmove black
-#? [C7]*
+#? [C7]
 
 # incident 222
 loadsgf games/incident221.sgf 39
@@ -257,6 +257,7 @@ loadsgf games/ssstator.sgf 136
 157 gg_genmove white
 #? [B14|B16]*
 
+# E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51
 158 gg_genmove black
 #? [!E16]
@@ -273,10 +274,12 @@ loadsgf games/strategy38.sgf 197
 161 gg_genmove black
 #? [E12]*
 
+# First live then attack.
 loadsgf games/strategy39.sgf 156
 162 gg_genmove white
 #? [O7|Q7|N7]*
 
+# First live then attack.
 loadsgf games/strategy39.sgf 158
 163 gg_genmove white
 #? [O7]*
@@ -294,6 +297,16 @@ loadsgf games/strategy39.sgf 178
 loadsgf games/incident94.sgf 114
 166 gg_genmove white
 #? [D11]*
+
+# Tenuki instead of urgent edge joseki move.
+loadsgf games/strategy40.sgf 10
+167 gg_genmove black
+#? [D4]
+
+# Safety must come first.
+loadsgf games/strategy40.sgf 30
+168 gg_genmove black
+#? [A3|A4]*
 
 ############ End of Tests #################
 

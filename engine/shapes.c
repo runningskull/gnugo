@@ -448,21 +448,13 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 void
 shapes(int color)
 {
-  int m, n;
-
   TRACE("\nPattern matcher is looking for move reasons for %s!\n",
 	color_to_string(color));
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (p[m][n])
-	matchpat(m, n, shapes_callback, color, &pat_db, NULL, NULL);
+  global_matchpat(shapes_callback, color, &pat_db, NULL, NULL);
 
   if (josekidb)
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++)
-	if (p[m][n])
-	  matchpat(m, n, shapes_callback, color, &joseki_db, NULL, NULL);
+    global_matchpat(shapes_callback, color, &joseki_db, NULL, NULL);
 }
 
 
@@ -472,15 +464,10 @@ shapes(int color)
 void
 endgame_shapes(int color)
 {
-  int m, n;
-
   TRACE("\nEndgame pattern matcher is looking for move reasons for %s!\n",
 	color_to_string(color));
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (p[m][n])
-	matchpat(m, n, shapes_callback, color, &endpat_db, NULL, NULL);
+  global_matchpat(shapes_callback, color, &endpat_db, NULL, NULL);
 }
 
 

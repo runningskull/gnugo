@@ -58,6 +58,9 @@ void init_gnugo(float memory);
 #define GRAY_BORDER  3
 #define WHITE_BORDER 4
 #define BLACK_BORDER 5
+#define ANCHOR_COLOR 6
+#define ANCHOR_OTHER 7
+
 
 #define OTHER_COLOR(color)  (WHITE+BLACK-(color))
 

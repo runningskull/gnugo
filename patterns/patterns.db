@@ -2248,16 +2248,6 @@ Xc*ad
 ; !xplay_attack(*,a,b,c,d,*,c)
 
 
-# Pattern EC72
-# 
-# ?OX??        connect on the edge
-# ..*Oo
-# .....
-# -----
-# 
-# :8,XC
-
-
 Pattern EC73
 
 ?OXXX?       secure connection
@@ -13838,6 +13828,17 @@ Pattern EJ79
 |..cdx?
 
 ; x_somewhere(a,b) && x_somewhere(c,d)
+
+
+Pattern EJ80
+
+|...O.x        even a computer connects after nozoki
+|..X*..
+|...O..
+|......
+|......
+
+:8,J
 
 
 
