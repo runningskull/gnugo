@@ -218,18 +218,16 @@ display_dragon(int i, int j)
 
   wmove(info_window, 4, 55);
   gg_wprintw(info_window, "%-12s", status_to_string(dragon[i][j].owl_status));
-  if (dragon[i][j].owl_attacki == -1)
+  if (dragon[i][j].owl_attack_point == NO_MOVE)
     gg_wprintw(info_window, "[---] ");
   else
     gg_wprintw(info_window, "[%3s] ", 
-	    location_to_string2(dragon[i][j].owl_attacki,
-			       dragon[i][j].owl_attackj));
-  if (dragon[i][j].owl_attacki == -1)
+	       location_to_string(dragon[i][j].owl_attack_point));
+  if (dragon[i][j].owl_defense_point == NO_MOVE)
     gg_wprintw(info_window, "[---] ");
   else
     gg_wprintw(info_window, "[%3s] ", 
-	    location_to_string2(dragon[i][j].owl_defendi,
-			       dragon[i][j].owl_defendj));
+	       location_to_string(dragon[i][j].owl_defense_point));
 
   wmove(info_window, 5, 55);
   switch (dragon[i][j].owl_threat_status) {
@@ -238,13 +236,11 @@ display_dragon(int i, int j)
     break;
   case CAN_THREATEN_ATTACK:
     gg_wprintw(info_window, "att. threat [%3s] [---]",
-	       location_to_string2(dragon[i][j].owl_second_attacki,
-				  dragon[i][j].owl_second_attackj));
+	       location_to_string(dragon[i][j].owl_second_attack_point));
     break;
   case CAN_THREATEN_DEFENSE:
     gg_wprintw(info_window, "def. threat [---] [%3s]",
-	       location_to_string2(dragon[i][j].owl_second_defendi,
-				  dragon[i][j].owl_second_defendj));
+	       location_to_string(dragon[i][j].owl_second_defense_point));
     break;
   default:
     gg_wprintw(info_window, "Error: %3d  [---] [---]",

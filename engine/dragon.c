@@ -77,20 +77,16 @@ make_dragons(int color, int stop_before_owl)
       dragon[m][n].color              = worm[m][n].color;
       dragon[m][n].origin             = worm[m][n].origin;
       dragon[m][n].lunch              = NO_MOVE;
-      dragon[m][n].owl_attacki        = -1;
-      dragon[m][n].owl_attackj        = -1;
+      dragon[m][n].owl_attack_point   = NO_MOVE;
       dragon[m][n].owl_attack_certain =  1;
-      dragon[m][n].owl_defendi        = -1;
-      dragon[m][n].owl_defendj        = -1;
+      dragon[m][n].owl_defense_point  = NO_MOVE;
       dragon[m][n].owl_defend_certain =  1;
       dragon[m][n].owl_status         = UNCHECKED;
       dragon[m][n].status             = UNKNOWN;
       dragon[m][n].matcher_status     = UNKNOWN;
       dragon[m][n].owl_threat_status  = UNCHECKED;
-      dragon[m][n].owl_second_attacki = -1;
-      dragon[m][n].owl_second_attackj = -1;
-      dragon[m][n].owl_second_defendi = -1;
-      dragon[m][n].owl_second_defendj = -1;
+      dragon[m][n].owl_second_attack_point  = NO_MOVE;
+      dragon[m][n].owl_second_defense_point = NO_MOVE;
       dragon[m][n].escape_route       =  0;
       dragon[m][n].heyes              =  0;
       dragon[m][n].heye               = NO_MOVE;
@@ -504,28 +500,22 @@ make_dragons(int color, int stop_before_owl)
 	      && DRAGON2(m, n).moyo > dragon[m][n].size)) {
 	dragon[m][n].owl_status = UNCHECKED;
 	dragon[m][n].owl_threat_status = UNCHECKED;
-	dragon[m][n].owl_attacki = -1;
-	dragon[m][n].owl_attackj = -1;
-	dragon[m][n].owl_defendi = -1;
-	dragon[m][n].owl_defendj = -1;
-	dragon[m][n].owl_second_attacki = -1;
-	dragon[m][n].owl_second_attackj = -1;
-	dragon[m][n].owl_second_defendi = -1;
-	dragon[m][n].owl_second_defendj = -1;
+	dragon[m][n].owl_attack_point  = NO_MOVE;
+	dragon[m][n].owl_defense_point = NO_MOVE;
+	dragon[m][n].owl_second_attack_point  = NO_MOVE;
+	dragon[m][n].owl_second_defense_point = NO_MOVE;
       }
       else {
 	start_timer(3);
 	if (owl_attack(m, n, &attacki, &attackj, 
 		       &dragon[m][n].owl_attack_certain)) {
-	  dragon[m][n].owl_attacki = attacki;
-	  dragon[m][n].owl_attackj = attackj;
+	  dragon[m][n].owl_attack_point = POS(attacki, attackj);
 	  if (attacki != -1
 	      && owl_defend(m, n, &defendi, &defendj, 
 			    &dragon[m][n].owl_defend_certain)) {
 	    if (defendi != -1) {
-	      dragon[m][n].owl_defendi = defendi;
-	      dragon[m][n].owl_defendj = defendj;
 	      dragon[m][n].owl_status = CRITICAL;
+	      dragon[m][n].owl_defense_point = POS(defendi, defendj);
 	    }
 	    else {
 	      /* Due to irregularities in the owl code, it may
@@ -544,17 +534,15 @@ make_dragons(int color, int stop_before_owl)
 	  }
 	  else {
 	    dragon[m][n].owl_status = DEAD; 
-	    dragon[m][n].owl_defendi = -1;
-	    dragon[m][n].owl_defendj = -1;
+	    dragon[m][n].owl_defense_point = NO_MOVE;
 	    if (level >= 8
 		&& !disable_threat_computation) {
 	      if (owl_threaten_defense(m, n, &defendi, &defendj,
 				       &second_defendi, &second_defendj)) {
 		dragon[m][n].owl_threat_status = CAN_THREATEN_DEFENSE;
-		dragon[m][n].owl_defendi = defendi;
-		dragon[m][n].owl_defendj = defendj;
-		dragon[m][n].owl_second_defendi = second_defendi;
-		dragon[m][n].owl_second_defendj = second_defendj;
+		dragon[m][n].owl_defense_point = POS(defendi, defendj);
+		dragon[m][n].owl_second_defense_point = POS(second_defendi, 
+							    second_defendj);
 	      }
 	      else
 		dragon[m][n].owl_threat_status = DEAD;;
@@ -567,21 +555,18 @@ make_dragons(int color, int stop_before_owl)
 			    &dragon[m][n].owl_defend_certain)) {
 	    /* If the result of owl_attack was not certain, we may
 	     * still want the result of owl_defend */
-	    dragon[m][n].owl_defendi = defendi;
-	    dragon[m][n].owl_defendj = defendj;
+	    dragon[m][n].owl_defense_point = POS(defendi, defendj);
 	  }
 	  dragon[m][n].owl_status = ALIVE;
-	  dragon[m][n].owl_attacki = -1;
-	  dragon[m][n].owl_attackj = -1;
+	  dragon[m][n].owl_attack_point = NO_MOVE;
 	  if (level >= 8
 	      && !disable_threat_computation) {
 	    if (owl_threaten_attack(m, n, &attacki, &attackj,
 				    &second_attacki, &second_attackj)) {
 	      dragon[m][n].owl_threat_status = CAN_THREATEN_ATTACK;
-	      dragon[m][n].owl_attacki = attacki;
-	      dragon[m][n].owl_attackj = attackj;
-	      dragon[m][n].owl_second_attacki = second_attacki;
-	      dragon[m][n].owl_second_attackj = second_attackj;
+	      dragon[m][n].owl_attack_point = POS(attacki, attackj);
+	      dragon[m][n].owl_second_attack_point = POS(second_attacki,
+							 second_attackj);
 	    }
 	    else
 	      dragon[m][n].owl_threat_status = ALIVE;
@@ -1099,10 +1084,10 @@ show_dragons(void)
 		  safety_names[d2->safety]);
 	  gprintf(", owl status %s\n", snames[d->owl_status]);
 	  if (d->owl_status == CRITICAL) {
-	    gprintf("... owl attackable at %m\n",
-		    d->owl_attacki, d->owl_attackj);
-	    gprintf("... owl defendable at %m\n",
-		    d->owl_defendi, d->owl_defendj);
+	    gprintf("... owl attackable at %1m\n",
+		    d->owl_attack_point);
+	    gprintf("... owl defendable at %1m\n",
+		    d->owl_defense_point);
 	  }
 	  gprintf("... neighbors");
 	  for (k = 0; k < d2->neighbors; k++) {
@@ -1701,27 +1686,25 @@ report_dragon(int m, int n)
 	  status_to_string(dragon[m][n].matcher_status),
 	  status_to_string(dragon[m][n].owl_threat_status));
 
-  if (dragon[m][n].owl_attacki != -1)
-    gprintf("owl attack point %m, ",
-	    dragon[m][n].owl_attacki, dragon[m][n].owl_attackj);
+  if (dragon[m][n].owl_attack_point != NO_MOVE)
+    gprintf("owl attack point %1m, ", dragon[m][n].owl_attack_point);
   else
     gprintf("no owl attack point, ");
 
-  if (dragon[m][n].owl_second_attacki != -1)
-    gprintf("second owl attack point %m\n",
-	    dragon[m][n].owl_second_attacki, dragon[m][n].owl_second_attackj);
+  if (dragon[m][n].owl_second_attack_point != NO_MOVE)
+    gprintf("second owl attack point %1m\n", 
+	    dragon[m][n].owl_second_attack_point);
   else
     gprintf("no second owl attack point\n");
 
-  if (dragon[m][n].owl_defendi != -1)
-    gprintf("owl defense point %m, ",
-	    dragon[m][n].owl_defendi, dragon[m][n].owl_defendj);
+  if (dragon[m][n].owl_defense_point != NO_MOVE)
+    gprintf("owl defense point %1m, ", dragon[m][n].owl_defense_point);
   else
     gprintf("no owl defense point, ");
 
-  if (dragon[m][n].owl_second_defendi != -1)
-    gprintf("second owl defense point %m\n",
-	    dragon[m][n].owl_second_defendi, dragon[m][n].owl_second_defendj);
+  if (dragon[m][n].owl_second_defense_point != NO_MOVE)
+    gprintf("second owl defense point %1m\n",
+	    dragon[m][n].owl_second_defense_point);
   else
     gprintf("no second owl defense point\n");
 

@@ -96,25 +96,39 @@ gg_init_color()
 #endif /* TERMINFO */
 }
 
-void
-write_color_char(int c, int x)
+void 
+write_color_char_no_space(int c, int x)
 {
 #ifdef TERMINFO
 
-  fprintf(stderr, " %s%c", tparm(setaf, c, 0, 0, 0, 0, 0, 0, 0, 0), x);
+  fprintf(stderr, "%s%c", tparm(setaf, c, 0, 0, 0, 0, 0, 0, 0, 0), x);
   fputs(tparm(setaf, max_color, 0, 0, 0, 0, 0, 0, 0, 0), stderr);
 
 #elif defined(ANSI_COLOR)
 
-  fprintf(stderr, " \033[%dm%c\033[0m", 30+c, x);
+  fprintf(stderr, "\033[%dm%c\033[0m", 30+c, x);
 
 #else
 
-  fprintf(stderr, " %c", x);
+  fprintf(stderr, "%c", x);
 
 #endif
 }
 
+void
+write_color_string(int c, const char *str)
+{
+  while (*str) {
+    write_color_char_no_space(c, *str++);
+  }
+}
+
+void
+write_color_char(int c, int x)
+{
+  fprintf(stderr, " ");
+  write_color_char_no_space(c, x);
+}
 
 /*
  * A wrapper around vsnprintf.

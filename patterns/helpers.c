@@ -628,14 +628,11 @@ int
 owl_threatens_attack(int ai, int aj, int bi, int bj)
 {
   if (dragon[bi][bj].owl_status == CRITICAL
-      && dragon[bi][bj].owl_attacki == ai
-      && dragon[bi][bj].owl_attackj == aj)
+      && dragon[bi][bj].owl_attack_point == POS(ai, aj))
     return 1;
   if (dragon[bi][bj].owl_threat_status == CAN_THREATEN_ATTACK)
-    if ((dragon[bi][bj].owl_attacki == ai
-	 && dragon[bi][bj].owl_attackj == aj)      
-	|| (dragon[bi][bj].owl_second_attacki == ai
-	    && dragon[bi][bj].owl_second_attackj == aj))
+    if ((dragon[bi][bj].owl_attack_point == POS(ai, aj))
+	|| (dragon[bi][bj].owl_second_attack_point == POS(ai, aj)))
       return 1;
   return 0;
 }

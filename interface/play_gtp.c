@@ -955,9 +955,11 @@ gtp_dragon_status(char *s, int id)
   /* Status critical, need to return attack and defense point as well. */
   gtp_printid(id, GTP_SUCCESS);
   gtp_printf("critical ");
-  gtp_print_vertex(dragon[i][j].owl_attacki, dragon[i][j].owl_attackj);
+  gtp_print_vertex(I(dragon[i][j].owl_attack_point),
+		   J(dragon[i][j].owl_attack_point));
   gtp_printf(" ");
-  gtp_print_vertex(dragon[i][j].owl_defendi, dragon[i][j].owl_defendj);
+  gtp_print_vertex(I(dragon[i][j].owl_defense_point),
+		   J(dragon[i][j].owl_defense_point));
   return gtp_finish_response();
 }
 
@@ -2002,18 +2004,15 @@ gtp_dragon_data(char *s, int id)
 		   status_to_string(d->matcher_status));
 	gtp_printf("owl_threat_status       %s\n",   
 		   status_to_string(d->owl_threat_status));
-	gtp_mprintf("owl_attack              %m\n",  
-		    d->owl_attacki, d->owl_attackj);
+	gtp_mprintf("owl_attack              %1m\n", d->owl_attack_point);
 	gtp_printf("owl_attack_certain:     %s\n",   
 		   (d->owl_attack_certain) ? "YES" : "NO");
-	gtp_mprintf("owl_2nd_attack          %m\n",  
-		    d->owl_second_attacki, d->owl_second_attackj);
-	gtp_mprintf("owl_defend              %m\n",  
-		    d->owl_defendi, d->owl_defendj);
+	gtp_mprintf("owl_2nd_attack          %1m\n", d->owl_second_attack_point);
+	gtp_mprintf("owl_defend              %1m\n", d->owl_defense_point);
 	gtp_printf("owl_defend_certain:     %s\n",   
 		   (d->owl_defend_certain) ? "YES" : "NO");
-	gtp_mprintf("owl_2nd_defend          %m\n",  
-		    d->owl_second_defendi, d->owl_second_defendj);
+	gtp_mprintf("owl_2nd_defend          %1m\n", 
+		    d->owl_second_defense_point);
 	gtp_printf("semeai                  %d\n",   
 		   d->semeai);
 	gtp_printf("semeai_margin_of_safety %d\n",   

@@ -184,6 +184,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 	/* A second dragon found, we amalgamate them at once. */
 	TRACE("Pattern %s joins dragons %1m, %1m\n",
 	      pattern->name, first_dragon, second_dragon);
+	fflush(stdout);
 	join_dragons(I(second_dragon), J(second_dragon),
 		     I(first_dragon), J(first_dragon));
 	/* Now look for another second dragon. */

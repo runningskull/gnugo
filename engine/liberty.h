@@ -615,16 +615,12 @@ struct dragon_data {
   int status;   /* (ALIVE, DEAD, UNKNOWN, CRITICAL)                          */
   int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
   int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
-  int owl_attacki;         /* vital point for attack                         */
-  int owl_attackj;
+  int owl_attack_point;    /* vital point for attack                         */
   int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
-  int owl_second_attacki;  /* if attacker gets both attack points, wins      */
-  int owl_second_attackj;
-  int owl_defendi;         /* vital point for defense                        */
-  int owl_defendj;
+  int owl_second_attack_point;/* if attacker gets both attack points, wins   */
+  int owl_defense_point;   /* vital point for defense                        */
   int owl_defend_certain;  /* 0 if owl reading node limit is reached         */
-  int owl_second_defendi;  /* if defender gets both attack points, wins      */
-  int owl_second_defendj;
+  int owl_second_defense_point;/* if defender gets both attack points, wins  */
   int matcher_status;  /* status used by pattern matching                    */
   int semeai;          /* true if a dragon is part of a semeai               */
   int semeai_margin_of_safety; /* if small, the semeai is close              */

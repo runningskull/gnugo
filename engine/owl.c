@@ -2599,15 +2599,13 @@ owl_reasons(int color)
     for (n = 0; n < board_size; n++) {
       if ((dragon[m][n].origin == POS(m, n))
 	  && (dragon[m][n].matcher_status == CRITICAL)
-	  && (dragon[m][n].owl_attacki != -1)
-	  && (dragon[m][n].owl_attackj != -1)) {
+	  && (dragon[m][n].owl_attack_point != NO_MOVE)) {
 	if (BOARD(m, n) == color) {
-	  if (dragon[m][n].owl_defendi != -1) {
-	    add_owl_defense_move(dragon[m][n].owl_defendi,
-				 dragon[m][n].owl_defendj, m, n);
-	    DEBUG(DEBUG_OWL, "owl: %m defends %m at move %d\n",
-		  dragon[m][n].owl_defendi,
-		  dragon[m][n].owl_defendj, m, n, movenum+1);
+	  if (dragon[m][n].owl_defense_point != NO_MOVE) {
+	    add_owl_defense_move(I(dragon[m][n].owl_defense_point),
+				 J(dragon[m][n].owl_defense_point), m, n);
+	    DEBUG(DEBUG_OWL, "owl: %1m defends %m at move %d\n",
+		  dragon[m][n].owl_defense_point, m, n, movenum+1);
 	  }
 	}
 	else { /* opponent's dragon */
@@ -2619,8 +2617,8 @@ owl_reasons(int color)
 	   * scheme should minimize the performance hit, but of course
 	   * it's unfortunate to have the code duplication.
 	   */
-	  int ti = dragon[m][n].owl_attacki;
-	  int tj = dragon[m][n].owl_attackj;
+	  int ti = I(dragon[m][n].owl_attack_point);
+	  int tj = J(dragon[m][n].owl_attack_point);
 
 	  /* No worries if we catch something big. */
 	  if (dragon[m][n].effective_size < 8) {
@@ -2676,40 +2674,38 @@ owl_reasons(int color)
 	       && (dragon[m][n].owl_status == DEAD)
 	       && (dragon[m][n].owl_threat_status == CAN_THREATEN_DEFENSE)) {
 	if (BOARD(m, n) == color
-	    && dragon[m][n].owl_defendi != -1)
-	  add_owl_defense_threat_move(dragon[m][n].owl_defendi,
-				      dragon[m][n].owl_defendj,
+	    && dragon[m][n].owl_defense_point != NO_MOVE)
+	  add_owl_defense_threat_move(I(dragon[m][n].owl_defense_point),
+				      J(dragon[m][n].owl_defense_point),
 				      m, n) ;
 	if (BOARD(m, n) == color
-	    && dragon[m][n].owl_second_defendi != -1
-	    && is_legal2(dragon[m][n].owl_second_defendi,
-			 dragon[m][n].owl_second_defendj, color))
-	  add_owl_defense_threat_move(dragon[m][n].owl_second_defendi,
-				      dragon[m][n].owl_second_defendj,
+	    && dragon[m][n].owl_second_defense_point != NO_MOVE
+	    && is_legal(dragon[m][n].owl_second_defense_point, color))
+	  add_owl_defense_threat_move(I(dragon[m][n].owl_second_defense_point),
+				      J(dragon[m][n].owl_second_defense_point),
 				      m, n) ;
 	/* If the opponent can threaten to live, an attacking
 	 * move gets a small value to make sure it's really dead.
 	 */
 	if ((BOARD(m, n) == OTHER_COLOR(color))
 	    && (dragon[m][n].owl_threat_status == CAN_THREATEN_DEFENSE)
-	    && (dragon[m][n].owl_attacki != -1))
-	  add_owl_prevent_threat_move(dragon[m][n].owl_attacki,
-				      dragon[m][n].owl_attackj,
+	    && (dragon[m][n].owl_attack_point != NO_MOVE))
+	  add_owl_prevent_threat_move(I(dragon[m][n].owl_attack_point),
+				      J(dragon[m][n].owl_attack_point),
 				      m, n);
       }
       else if (dragon[m][n].origin == POS(m, n)
 	       && dragon[m][n].owl_status == ALIVE
 	       && BOARD(m, n) == OTHER_COLOR(color)
 	       && dragon[m][n].owl_threat_status == CAN_THREATEN_ATTACK) {
-	if (dragon[m][n].owl_attacki != -1)
-	  add_owl_attack_threat_move(dragon[m][n].owl_attacki,
-				     dragon[m][n].owl_attackj,
+	if (dragon[m][n].owl_attack_point != NO_MOVE)
+	  add_owl_attack_threat_move(I(dragon[m][n].owl_attack_point),
+				     J(dragon[m][n].owl_attack_point),
 				     m, n);
-	if (dragon[m][n].owl_second_attacki != -1
-	    && is_legal2(dragon[m][n].owl_second_attacki,
-			 dragon[m][n].owl_second_attackj, color))
-	  add_owl_attack_threat_move(dragon[m][n].owl_second_attacki,
-				     dragon[m][n].owl_second_attackj,
+	if (dragon[m][n].owl_second_attack_point != NO_MOVE
+	    && is_legal(dragon[m][n].owl_second_attack_point, color))
+	  add_owl_attack_threat_move(I(dragon[m][n].owl_second_attack_point),
+				     J(dragon[m][n].owl_second_attack_point),
 				     m, n);
       }
       /* The owl code found the friendly dragon alive, but was uncertain,
@@ -2721,10 +2717,9 @@ owl_reasons(int color)
 	       && BOARD(m, n) == color
 	       && !dragon[m][n].owl_attack_certain
 	       && dragon[m][n].owl_defend_certain
-	       && ON_BOARD2(dragon[m][n].owl_defendi,
-			   dragon[m][n].owl_defendj))
-	add_owl_uncertain_defense_move(dragon[m][n].owl_defendi,
-				       dragon[m][n].owl_defendj,
+	       && ON_BOARD(dragon[m][n].owl_defense_point))
+	add_owl_uncertain_defense_move(I(dragon[m][n].owl_defense_point),
+				       J(dragon[m][n].owl_defense_point),
 				       m, n);
       /* The owl code found the dragon dead, but was uncertain,
        * and an extra point of attack was found, so this might
@@ -2734,10 +2729,9 @@ owl_reasons(int color)
 	       && dragon[m][n].owl_status == DEAD
 	       && BOARD(m, n) == OTHER_COLOR(color)
 	       && !dragon[m][n].owl_attack_certain
-	       && ON_BOARD2(dragon[m][n].owl_attacki,
-			   dragon[m][n].owl_attackj))
-	add_owl_uncertain_defense_move(dragon[m][n].owl_attacki,
-				       dragon[m][n].owl_attackj,
+	       && ON_BOARD(dragon[m][n].owl_attack_point))
+	add_owl_uncertain_defense_move(I(dragon[m][n].owl_attack_point),
+				       J(dragon[m][n].owl_attack_point),
 				       m, n);
     }
 }
@@ -3861,10 +3855,10 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
       active[m][n] = (goal[m][n] != 0);
 
   /* Also add critical moves to the active area. */
-  if (move != -1)
+  if (ON_BOARD1(move))
     active[I(move)][J(move)] = 1;
 
-  if (move2 != -1)
+  if (ON_BOARD1(move2))
     active[I(move2)][J(move2)] = 1;
 
   for (k = 1; k < 5; k++) {

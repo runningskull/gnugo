@@ -371,15 +371,15 @@ showboard(int xo)
   
     if (xo == 3) {
       if (i == board_size-5)
-	fprintf(stderr, "    green=alive");
+	write_color_string(GG_COLOR_GREEN, "    green=alive");
       if (i == board_size-4)
-	fprintf(stderr, "    cyan=dead");
+	write_color_string(GG_COLOR_CYAN, "    cyan=dead");
       if (i == board_size-3)
-	fprintf(stderr, "    red=critical");
+	write_color_string(GG_COLOR_RED, "    red=critical");
       if (i == board_size-2)
-	fprintf(stderr, "    yellow=unknown");
+	write_color_string(GG_COLOR_YELLOW, "    yellow=unknown");
       if (i == board_size-1)
-	fprintf(stderr, "    magenta=unchecked");
+	write_color_string(GG_COLOR_MAGENTA, "    magenta=unchecked");
     }
   }
 

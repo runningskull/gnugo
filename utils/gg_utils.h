@@ -53,6 +53,7 @@
 
 void gg_init_color(void);
 void write_color_char(int c, int x);
+void write_color_string(int c, const char *str);
 
 void gg_vsnprintf(char *dest, unsigned long len, const char *fmt,
 		  va_list args);
