@@ -105,7 +105,8 @@ Inge Wallin, Thomas Traber, Douglas Ridgway, Teun Burgers,
 Tanguy Urvoy, Thien-Thi Nguyen, Heikki Levanto, Mark Vytlacil,
 Adriaan van Kessel, Wolfgang Manner, Jens Yllman, Don Dailey,
 M@aa{}ns Ullerstam, Arend Bayer, Trevor Morris, Evan Berggren
-Daniel, Fernando Portela and Paul Pogonyshev.
+Daniel, Fernando Portela, Paul Pogonyshev, S.P. Lee and
+Stephane Nicolet.
 
 @node Thanks, TODO, Authors, Introduction
 @comment node-name,    next,        previous,     up

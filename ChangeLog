@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.21 released June 28, 2003
+
+- VPATH modifications in regression/Makefile*
 - new function thrash_around_helper()
 - thrashing patterns in patterns.db
 - configure --enable-cosmic-gnugo produces a center-oriented engine
