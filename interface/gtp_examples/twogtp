@@ -42,19 +42,20 @@ sub exec_cmd {
 # parse the 2-line response of the GTP program
 
     my $line;
+    my $repchar;
+    my $result = "ERROR";
     $line = <$hout>;
-    print STDERR $line if ($debug);
+    print STDERR "$hin 1:$line" if ($debug);
     return "ERROR" unless (defined $line);
     $line =~ s/\s*$//;
-    my ($repchar, $result) = split(' ', $line, 2);
-    if ($repchar eq '=') {
-    } elsif ($repchar eq '?') {
-    	die "GTP error on executing $cmd:\n $line";
-    } else {
-    	die "Unexpected response on executing $cmd:\n $line";
-    }
+    ($repchar, $result) = split(/\s*/, $line, 2);
+    print STDERR "$hin 2:repchar $repchar\n" if ($debug);
+    print STDERR "$hin 3:result $result\n" if ($debug);
     $line = <$hout>;
-    print STDERR $line if ($debug);
+    print STDERR "$hin 4:$line" if ($debug);
+    if ($repchar eq '?') {
+	return "ERROR";
+    }
     return $result;
 }
 
@@ -63,7 +64,6 @@ sub standard_to_sgf {
     my $size = shift;
     my $board_coords = shift;
     $board_coords =~ tr/A-Z/a-z/;
-#   return "tt" if ($board_coords eq "pass");
     return "" if ($board_coords eq "pass");
     my $first  = substr($board_coords, 0, 1);
     my $number = substr($board_coords, 1);
@@ -177,6 +177,17 @@ sub showboard {
     GTP::exec_cmd(${$self->in}, ${$self->out}, "showboard");
 }
 
+sub get_random_seed {
+    my $self = shift;
+
+    my $ret = GTP::exec_cmd(${$self->in}, ${$self->out}, "get_random_seed");
+    if ($ret eq "ERROR") {
+        return "unknown";
+    }
+    my ($result, $rest) = split(' ', $ret, 2);
+    return $result;
+}
+
 sub score {
     my $self = shift;
 
@@ -217,8 +228,7 @@ struct('GTP::Game' => {
     'handicap'		=> '$',
     'handicap_stones'	=> '@',
     'moves'		=> '@',
-    'result'		=> 'GTP::Game::Result',
-    'seed'		=> '$'
+    'result'		=> 'GTP::Game::Result'
 }
 );
 
@@ -240,8 +250,12 @@ sub writesgf {
     my $handle = new FileHandle;
     $handle->open(">$sgffile") or
     	die "Can't write to $sgffile\n";
-    printf $handle "(;GM[1]FF[4]RU[Japanese]SZ[%s]HA[%s]KM[%s]RE[%s]",
-    	$size, $self->handicap, $self->komi, $self->result->resultw;
+    my $black_seed = $self->black->get_random_seed;
+    my $white_seed = $self->white->get_random_seed;
+
+    printf $handle "(;GM[1]FF[4]RU[Japanese]SZ[%s]HA[%s]KM[%s]RE[%s]GN[black seed:%s white seed:%s]",
+    $size, $self->handicap, $self->komi, $self->result->resultw, $self->black->get_random_seed,
+    $self->white->get_random_seed;
     for my $stone (@{$self->handicap_stones}) {
 	printf $handle "AB[%s]", GTP::standard_to_sgf($self->size, $stone);
     }
@@ -256,6 +270,8 @@ sub writesgf {
     print $handle ")\n";
     $handle->close;
 }
+
+
 
 
 sub play {
@@ -308,9 +324,14 @@ sub play {
 	    print "Black plays $move\n" if $verbose;
 	    $pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
 	    $self->white->black($move) unless ($move =~ /PASS/);
-	    if ($verbose > 1) {
+	    if ($verbose == 3) {
+		my $black_seed = $self->black->get_random_seed;
+		printf "Black seed $black_seed\n";
+	    }
+	    if ($verbose == 2) {
 	        $self->white->showboard;
 	    }
+
 	    $toplay = 'W';
 
         } else {
@@ -324,7 +345,11 @@ sub play {
 	    print "White plays $move\n" if $verbose;
 	    $pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
 	    $self->black->white($move) unless ($move =~ /PASS/);
-	    if ($verbose > 1) {
+	    if ($verbose == 3) {
+		my $white_seed = $self->white->get_random_seed;
+		printf "White seed $white_seed\n";
+	    }
+	    if ($verbose == 2) {
 	        $self->black->showboard;
 	    }
 	    $toplay = 'B';
@@ -334,8 +359,13 @@ sub play {
 
     my $resultw = $self->white->estimate_score;
     my $resultb = $self->black->estimate_score;
-    print "Result according to W: $resultw\n";
-    print "Result according to B: $resultb\n";
+    if ($resultb eq $resultw) {
+	print "Result: $resultw\n";
+    }
+    else {
+	print "Result according to W: $resultw\n";
+	print "****** according to B: $resultb\n";
+    }
     $self->result->resultw($resultw);
     $self->result->resultb($resultb);
     $self->writesgf($sgffile) if defined $sgffile;
@@ -352,8 +382,7 @@ struct('GTP::Match' => {
     'white'	=> 'GTP::Player',
     'size'	=> '$',
     'komi'	=> '$',
-    'handicap'	=> '$',
-    'seed'	=> '$'
+    'handicap'	=> '$'
 }
 );
 
@@ -453,7 +482,12 @@ my @results = $match->play($games, $sgffile);
 my $i=0;
 for my $r (@results) {
     $i++;
-    printf "Game $i: %s %s\n", $r->resultb, $r->resultw;
+    if ($r->resultb eq $r->resultw) {
+	printf "Game $i: %s\n", $r->resultw;	
+    }
+    else {
+	printf "Game $i: %s %s\n", $r->resultb, $r->resultw;
+    }
 }
 
 $white_pl->quit;
