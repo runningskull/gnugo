@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- KOMASTER_SCHEME 4 introduced
+- Tree-based pattern matching introduced.
+- pattern-base reading code supports defense by pattern.
+- new command-line switches "(attack|defend)-by-pattern"
+- OPT enums re-based to 127, to avoid conflict w/ ASCII values.
+- reformatted transform.c to look like matrices.
+- DRAGON_WEAK implemented in a function and checks array bounds.
+- improved fastlib().
+- DRAGON2 macro checks array bounds.
+- bugfix in readconnect.c:moves_to_connect_in_three_moves()
+- for non-variadic, non-VC compilers, add trace_dummy assignment
 - new function init_owl() in owl.c
 - re-order conditions in revise_semeai to insure valid DRAGON2 data
 - organize include file order to facilitate pre-compiled headers.

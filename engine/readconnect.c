@@ -755,7 +755,7 @@ static int moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   adj = chainlinks3(str1, adjs, 2);
   for (r = 0; r < adj; r++) {
     liberties = findlib(adjs[r], 2, libs);
-    for (s = 0; s < 2; s++)
+    for (s = 0; s < liberties; s++)
       if (second_order_liberty_of_string(libs[s], str2))
 	add_array(moves, libs[s]);
   }
@@ -764,7 +764,7 @@ static int moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   adj = chainlinks3(str2, adjs, 2);
   for (r = 0; r < adj; r++) {
     liberties = findlib(adjs[r], 2, libs);
-    for (s = 0; s < 2; s++)
+    for (s = 0; s < liberties; s++)
       if (second_order_liberty_of_string(libs[s], str1))
 	add_array(moves, libs[s]);
   }
