@@ -605,6 +605,13 @@ loadsgf games/trevor/trevor_73.sgf
 730 owl_attack M2
 #? [(2|3) H1]*
 
+
+loadsgf games/trevor/trevor_74.sgf
+740 owl_attack B4
+#? [1 A1]*
+
+
+
 #CATEGORY=OWL_EYES
 #DESCRIPTION=Fixed by eye pattern 402
 #SEVERITY=10
@@ -622,5 +629,35 @@ loadsgf games/trevor/owl111a.sgf
 #SEE_ALSO=global:16
 loadsgf golois/Goemate990903-6.sgf
 1010 owl_does_defend O13 O11 
+#? [0]*
+
+#CATEGORY=OWL
+#DESCRIPTION=Why is this an owl_escape?
+#SEVERITY=8
+loadsgf games/trevor/auto/d32.sgf 240
+1020 owl_does_defend T13 S13
+#? [0]*
+
+
+loadsgf games/trevor/auto/d02.sgf 58
+1030 attack B14
+#? [0]*
+
+loadsgf games/trevor/auto/c17.sgf 55
+1040 attack H13
+#? [(2|3) H12]*
+
+loadsgf games/trevor/auto/c30.sgf 62
+1050 owl_attack C3
+#? [1 C2]*
+
+
+loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
+1060 owl_does_defend J4 E4
+#? [1]*
+
+
+loadsgf games/trevor/trevor_20.sgf  14  
+1070 owl_attack G5
 #? [0]*
 

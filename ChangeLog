@@ -6,6 +6,7 @@
   threaten_to_capture_helper() and in estimate_territorial_value()
 - fuseki tuning
 - regression revisions
+- new test_gray_border() in board.c with assertions in genmove.c
 - checking of sgf GM and FF properties revised
 - html view enhancements
 

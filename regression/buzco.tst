@@ -22,8 +22,9 @@ loadsgf games/buzco1.sgf 70
 
 loadsgf games/buzco1.sgf 82
 # tm - A12 is not unthinkable. (3.1.15)
+# tm - F9 & F10 also OK. (3.1.20)
 6 gg_genmove black
-#? [E8|E9|A12]
+#? [E8|E9|A12|F9|F10]
 
 loadsgf games/buzco1.sgf 94
 7 gg_genmove black

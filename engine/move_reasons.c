@@ -3220,8 +3220,11 @@ estimate_strategical_value(int pos, int color, float score)
 	    if (worm[bb].attack_codes[0] != 0 && !does_defend(pos, bb))
 	      this_value = 0.0;
 	    
-	    if (this_value > dragon_value[d1])
+	    if (this_value > dragon_value[d1]) {
+	      DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m attacked/defended\n",
+		    pos, this_value, bb);
 	      dragon_value[d1] = this_value;
+	  }
 	  }
 
 	break;
@@ -3297,16 +3300,23 @@ estimate_strategical_value(int pos, int color, float score)
 	  this_value = connection_value(aa, bb, pos, gg_abs(score));
 	else
 	  this_value = connection_value(aa, bb, pos, 0);
-	if (this_value > dragon_value[d1])
+	if (this_value > dragon_value[d1]) {
 	  dragon_value[d1] = this_value;
+          DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m cut/connect strategic value\n",
+		    pos, this_value, aa);
+	}
+
 	
 	if ((color == WHITE && score > 20.0)
 	    || (color == BLACK && score < -20.0))
 	  this_value = connection_value(bb, aa, pos, gg_abs(score));
 	else
 	  this_value = connection_value(bb, aa, pos, 0);
-	if (this_value > dragon_value[d2])
+	if (this_value > dragon_value[d2]) {
 	  dragon_value[d2] = this_value;
+          DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m cut/connect strategic value\n",
+		    pos, this_value, bb);
+	}
 	
 	break;
 	
@@ -3415,9 +3425,12 @@ estimate_strategical_value(int pos, int color, float score)
 	  }
 	}
 		
-	if (this_value > dragon_value[d1])
+	if (this_value > dragon_value[d1]) {
 	  dragon_value[d1] = this_value;
+          DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m strategic attack/defend\n",
+		    pos, this_value, aa);
 
+	}
 	break;
 
       case UNCERTAIN_OWL_DEFENSE:
@@ -3448,8 +3461,11 @@ estimate_strategical_value(int pos, int color, float score)
 	else 
 	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(score/2));
 	
-	if (this_value > dragon_value[d1])
+	if (this_value > dragon_value[d1]) {
 	  dragon_value[d1] = this_value;
+	  DEBUG(DEBUG_MOVE_REASONS, "  %1m:   %f - %1m uncertain owl defense bonus\n",
+		    pos, this_value, aa);
+	}
 
 	break;
     }

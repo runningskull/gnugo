@@ -397,6 +397,7 @@ int get_connection_node_counter(void);
 /* board.c */
 /* General board handling. */
 void clear_board(void);
+int test_gray_border(void);
 void setup_board(Intersection new_board[MAX_BOARD][MAX_BOARD], int ko_pos,
 		 int *last, float new_komi, int w_captured, int b_captured);
 

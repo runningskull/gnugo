@@ -110,6 +110,7 @@ examine_position(int color, int how_much)
   }
   if (how_much == EXAMINE_WORMS) {
     verbose = save_verbose;
+    gg_assert(test_gray_border() < 0);
     return;
   }
 
@@ -118,6 +119,7 @@ examine_position(int color, int how_much)
       compute_initial_influence(color, 0);
     if (how_much == EXAMINE_INITIAL_INFLUENCE) {
       verbose = save_verbose;
+      gg_assert(test_gray_border() < 0);
       return;
     }
 
@@ -125,6 +127,7 @@ examine_position(int color, int how_much)
       if (NEEDS_UPDATE(dragons_examined_without_owl))
 	make_dragons(color, 1);
       verbose = save_verbose;
+      gg_assert(test_gray_border() < 0);
       return;
     }
     
@@ -135,6 +138,7 @@ examine_position(int color, int how_much)
     }
     if (how_much == EXAMINE_DRAGONS) {
       verbose = save_verbose;
+      gg_assert(test_gray_border() < 0);
       return;
     }
 
@@ -142,6 +146,7 @@ examine_position(int color, int how_much)
   else if (how_much == EXAMINE_INITIAL_INFLUENCE
 	   || how_much == EXAMINE_DRAGONS) {
     verbose = save_verbose;
+    gg_assert(test_gray_border() < 0);
     return;
   }
   
@@ -152,8 +157,10 @@ examine_position(int color, int how_much)
 
   if (NEEDS_UPDATE(initial_influence2_examined))
     compute_initial_influence(color, 1);
-  if (how_much == EXAMINE_INITIAL_INFLUENCE2)
+  if (how_much == EXAMINE_INITIAL_INFLUENCE2) {
+    gg_assert(test_gray_border() < 0);
     return;
+  }
 }
 
 
@@ -233,6 +240,7 @@ old_estimate_score(int color, float *lower_bound, float *upper_bound)
 
   *lower_bound = lower + komi;
   *upper_bound = upper + komi;
+  gg_assert(test_gray_border() < 0);
 }
 
 
@@ -504,6 +512,7 @@ do_genmove(int *move, int color, float pure_threat_value)
     }
   }
   
+  gg_assert(test_gray_border() < 0);
   return val;
 }
 

@@ -505,6 +505,7 @@ defend_against_atari_helper(int move, int str)
     return;
 #endif 
   
+  gprintf("...reverse followup value %f\n", 2.0 * worm[str].effective_size);
   add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
 }
 

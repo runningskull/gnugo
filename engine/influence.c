@@ -1316,8 +1316,8 @@ influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX])
       }
       
       if (new_value != old_value) {
-	DEBUG(DEBUG_TERRITORY, "  - %m territory change %f (%f -> %f)\n",
-		i, j, new_value - old_value, old_value, new_value);
+	DEBUG(DEBUG_TERRITORY, "  %1m:   - %m territory change %f (%f -> %f)\n",
+		pos, i, j, new_value - old_value, old_value, new_value);
 	delta += new_value - old_value;
       }
     }

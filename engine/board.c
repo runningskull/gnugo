@@ -335,6 +335,22 @@ clear_board(void)
   movenum = 0;
 }
 
+/* test the integrity of the gray border */
+int
+test_gray_border(void)
+{
+  int k;
+
+  gg_assert(board_size > 0 && board_size <= MAX_BOARD);
+  
+  for (k = 0; k < BOARDSIZE; k++)
+    if (I(k) < 0 || I(k) >= board_size || J(k) < 0 || J(k) >= board_size) {
+      if (board[k] != GRAY)
+      	return k;
+    }
+  return -1;
+}
+
 
 /* ================================================================ */
 /*                 Pushing and popping of boards                    */
