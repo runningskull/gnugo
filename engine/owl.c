@@ -3048,7 +3048,6 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
                         struct owl_move_data *moves, int cutoff)
 {
   int top, bottom;
-  float top_val;
   int k;
   int i;
   int move;
@@ -3064,18 +3063,33 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
    * used by the calling function.
    */
   for (top = list->used; top < list->counter; top++) {
+    /*
+     * NOTICE : In order to stabilize the regression test results,
+     * arbitrary parameters like pattern memory address and move position
+     * have been included in the sorting algorythm.
+     */
+    float top_val = list->pattern_list[top].pattern->value;
+    struct pattern *top_pattern = list->pattern_list[top].pattern;
+    int top_move = list->pattern_list[top].move;
+
     /* Maybe we already know the top entry (if previous call was ended
      * by a value cutoff.
      */
-    top_val = list->pattern_list[top].pattern->value;
     if (top >= list->ordered_up_to) {
       /* One bubble sort iteration. */
       for (bottom = list->counter-1; bottom > top; bottom--)
-	if (list->pattern_list[bottom].pattern->value > top_val) {
+       if (list->pattern_list[bottom].pattern->value > top_val
+           || (list->pattern_list[bottom].pattern->value == top_val
+               && list->pattern_list[bottom].pattern < top_pattern)
+           || (list->pattern_list[bottom].pattern->value == top_val
+               && list->pattern_list[bottom].pattern == top_pattern
+               && list->pattern_list[bottom].move < top_move)) {
 	  matched_pattern = list->pattern_list[bottom];
 	  list->pattern_list[bottom] = list->pattern_list[top];
 	  list->pattern_list[top] = matched_pattern;
 	  top_val = list->pattern_list[top].pattern->value;
+         top_pattern = list->pattern_list[top].pattern;
+         top_move = list->pattern_list[top].move;
 	}
       list->ordered_up_to++;
     }
