@@ -707,6 +707,7 @@ Pattern D217c
 O.X?     expand eye-space
 O.*.
 .x..
+----
 
 :8,s,value(10)
 
@@ -3645,6 +3646,20 @@ cB?
 
 ; owl_escape_value(a)>0 &&
 ; oplay_attack(*,a,c)
+
+
+
+Pattern D1136
+#tm new pattern (3.1.14)
+#See strategy:206
+
+OOO	very low value - can't hurt to try!
+..X
+X*.
+???
+
+:8,b,value(5)
+
 
 
 ########################################################

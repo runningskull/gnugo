@@ -155,7 +155,8 @@ if ($make_images) {
 }
 
 if (!$goprog) {
-  $goprog = "../interface/gnugo.exe --mode gtp --quiet -t";  
+  my $s = (lc ($^O) eq 'mswin32') ? '\\' : '/';
+  $goprog = "..${s}interface${s}gnugo.exe --mode gtp --quiet -t -w -d0x1000";  
 }
 
 die $helpstring unless defined $goprog;
@@ -181,7 +182,8 @@ $goprog_in  = new FileHandle;		# stdin of computer player
 $goprog_out = new FileHandle;		# stdout of computer player
 $goprog_err = new FileHandle;		# stdout of computer player
 print "Go program: $goprog\n" if $verbose > 1;
-$pidg = open3($goprog_in, $goprog_out, $goprog_err, $goprog);
+$pidg = open3($goprog_in, $goprog_out, $goprog_err, $goprog)
+  or die "Couldn't launch GNU Go: $!";
 print "goprog pid: $pidg\n" if $verbose > 1;
 my ($goprog_exe) = split (" ", $goprog);
 $goprog_timestamp = (stat $goprog_exe)->mtime;
@@ -240,11 +242,6 @@ sub regress_file {
   $testfile = shift;
   print "$testfile\n" if $verbose;
   
-  foreach (@counters) {
-    go_command("reset_${_}_counter");
-    eat();
-  }
-
   -e "html" or mkdir "html" or die "Couldn't create html";
   -e "html/$testfile" or mkdir "html/$testfile" or die "Couldn't create html/$testfile";
   
@@ -264,7 +261,7 @@ sub regress_file {
         if (/^FINISHED PROBLEM: (.*)/) {
           close TRACER or die "Couldn't close temp trace file";
           my $thisgtp = $1;
-          my ($num) = $thisgtp =~ /^(\d+)/ or die "Missing number: $thisgtp";
+          my ($num) = $thisgtp =~ /^(\d+)/ or confess "Missing number: $thisgtp";
           rename "tracer.ttt", "$num.trace"
               or die "Couldn't rename tracer: $testfile, $num";
           open (TRACER, ">tracer.ttt");
@@ -275,7 +272,10 @@ sub regress_file {
   }
   }
   
-  
+  foreach (@counters) {
+    go_command("reset_${_}_counter");
+    eat();
+  }
 
   #main bit.
   $pidt = open ($testfile_out,"<$testfile");
@@ -406,9 +406,12 @@ sub regress_file {
 
   unless ($one_gg_process) {
     go_command("quit");
-    print "waiting\n" if $verbose > 2;
+    print "waiting\n" if $verbose > 1;
     waitpid $pidg, 0;
-    print "done waiting\n" if $verbose > 2;
+    print "done waiting\n" if $verbose > 1;
+    print "waiting on child\n" if $verbose > 1;
+    waitpid $childpid, 0;
+    print "done waiting on child\n" if $verbose > 1;
   }
 }
 
@@ -720,7 +723,7 @@ sub eat() {
   # ignore empty lines
     my $line = "";
     while ($line eq "") {
-    chop($line = <$goprog_out>) or die "No response!";
+    chop($line = <$goprog_out>) or confess "No response!";
     $line =~ s/\s*$//smg;
     }
   <$goprog_out>;

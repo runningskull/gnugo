@@ -6456,6 +6456,25 @@ O.a.O
 ;!omoyo(a)
 
 
+Pattern EB1808a
+
+??.??              defend!
+O...O
+..*..
+.....
+-----
+
+:8,OXceb
+
+??.??
+O...O
+..a..
+.....
+-----
+
+;!omoyo(a)
+
+
 Pattern EB1809
 
 ..X..              secure fourth line territory
@@ -7253,6 +7272,16 @@ Pattern CB219
 .....
 
 :8,OXb
+
+
+Pattern CB220
+
+*.
+XO	hane at head of two stones.
+XO
+..
+
+:8,shape(2)
 
 
 Pattern CB221
@@ -12025,21 +12054,23 @@ XXA..
 ; !dead(A)
 
 
-Pattern EJ83
 
-..OXOO        make shape and defend cut
-.*.O..
-......
-------
-
-:8,J
-
-..OXCC
-.*bOa.
-......
-------
-
-; xplay_attack(a,b,C)
+#Pattern EJ83
+#This pattern breaks arb:101 - let's remove it and see what happens!
+#
+#..OXOO        make shape and defend cut
+#.*.O..
+#......
+#------
+#
+#:8,J
+#
+#..OXCC
+#.*bOa.
+#......
+#------
+#
+#; xplay_attack(a,b,C)
 
 
 Pattern EJ84
@@ -12754,12 +12785,12 @@ O...
 :8,OX,value(12)
 
 ?Xxx
-O...
+A...
 ..*.
 ....
 ----
 
-; xmoyo(*)
+; xmoyo(*) && lib(A) > 2
 
 
 Pattern LE6

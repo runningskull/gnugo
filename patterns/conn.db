@@ -953,17 +953,17 @@ OB
 #
 ####################################
 
-Pattern CC301
-
-O.O
-...
-
-:8,C
-
-OaO
-dbc
-
-;xplay_attack(a,b,c,c) && xplay_attack(a,b,d,d)
+#Pattern CC301
+#
+#O.O
+#...
+#
+#:8,C
+#
+#OaO
+#dbc
+#
+#;xplay_attack(a,b,c,c) && xplay_attack(a,b,d,d)
 
 
 Pattern CC302

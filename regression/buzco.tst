@@ -18,7 +18,7 @@ loadsgf games/buzco1.sgf 36
 
 loadsgf games/buzco1.sgf 70
 5 gg_genmove black
-#? [C10|C11|E9|A4]*
+#? [C10|C11|E9|A4|F10]*
 
 loadsgf games/buzco1.sgf 82
 6 gg_genmove black

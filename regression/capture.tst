@@ -76,8 +76,9 @@ loadsgf golois/test.sgf
 
 # This test case originally said "defend G5", which must be an error.
 # Changed it to defend the weak stone at F5 instead. /gf
+# F6 works to defend F3 -trevor
 loadsgf golois/web000103.sgf
 18 defend F5
-#? [0]*
+#? [1 F6]*
 
 

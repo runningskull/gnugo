@@ -111,6 +111,9 @@ loadsgf games/strategy42.sgf 214
 172 gg_genmove white
 #? [!N9]
 
+#CATEGORY=KO
+#DESCRIPTION=GNU Go lacks sufficient Ko understanding
+#SEVERITY=4
 # There's no way to win the ko by making atari from above. This move
 # must be at A9. This is a good example showing why only having the
 # difference between a ko where we make the first threat or not is
@@ -146,13 +149,17 @@ loadsgf games/xxlin.sgf 16
 178 gg_genmove black
 #? [P4|P3]
 
+#DESCRIPTION=Tenuki also seems OK here.
+#Added E2 (3.1.14) -trevor
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
-#? [P3|O2|P2|O4]*
+#? [P3|O2|P2|O4|E2]*
 
-loadsgf games/xxlin.sgf 30
-180 gg_genmove black
-#? [Q8]*
+#The point of this problem is that Q8 is locally better than M7.
+#However, GNU Go reasonably tenukis.
+#loadsgf games/xxlin.sgf 30
+#180 gg_genmove black
+##? [Q8]*
 
 loadsgf games/xxlin.sgf 38
 181 gg_genmove black
@@ -227,21 +234,25 @@ loadsgf games/bretz.sgf 100
 196 gg_genmove black
 #? [M17]*
 
+#Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 130
 197 gg_genmove black
-#? [K3]*
+#? [K3|S18]*
 
+#Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 148
 198 gg_genmove black
-#? [C10]*
+#? [C10|S18]*
 
+#Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 164
 199 gg_genmove black
-#? [N5]*
+#? [N5|S18]*
 
+#Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7]*
+#? [P6|P7|Q7|S18]*
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black
@@ -263,6 +274,11 @@ loadsgf games/juka1.sgf 48
 205 gg_genmove black
 #? [!O11]*
 
+#CATEGORY=SEMEAI
+#DESCRIPTION=K6 does take K8 to no eyes, but...
+#SEVERITY=8
+#GNU Go misses that K10 (large B group) has way few liberties
+#than O9 group, hense missing importance of cutting off K8.
 loadsgf games/strategy45.sgf
 206 gg_genmove black
 #? [L8]*

@@ -197,8 +197,14 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 	       && dragon[pos].origin != first_dragon) {
 	second_dragon = dragon[pos].origin;
 	/* A second dragon found, we amalgamate them at once. */
-	TRACE("Pattern %s joins dragons %1m, %1m\n",
-	      pattern->name, first_dragon, second_dragon);
+	/* Want this output if verbose or DEBUG_DRAGONS is on, but not both.*/
+	if (verbose) {
+	  TRACE("Pattern %s joins %C dragons %1m, %1m\n",
+	      pattern->name, color, first_dragon, second_dragon);
+	} else {
+	  DEBUG(DEBUG_DRAGONS, "Pattern %s joins %C dragons %1m, %1m\n",
+	      pattern->name, color, first_dragon, second_dragon);
+	}
 	fflush(stdout);
 	join_dragons(second_dragon, first_dragon);
 	/* Now look for another second dragon. */

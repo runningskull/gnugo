@@ -2,11 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- updated regress.pl
 - DFA_ENABLE ifdefs removed
 - bugfix in find_double_threats()
 - global_matchpat() renamed matchpat()
 - regression view includes node counts, SGF link, and -t output.
 - GTP echo_err added to allow echoing to STDERR.
+- tuning
+- connection tuning
 - owl tuning.
 - revision of rot tests
 - ld_owl_life.tst removed
