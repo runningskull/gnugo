@@ -405,6 +405,12 @@ trymove B P5
 #? [1 L4]
 popgo
 
+loadsgf games/kgs/TheGNUGo-JVD.sgf 19
+trymove white C15
+114 connect C14 C18
+#? [1 B15]
+popgo
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -415,6 +415,12 @@ loadsgf games/semeai/semeai17.sgf 64
 113 analyze_semeai H2 G8
 #? [1 0 PASS]*
 
+loadsgf games/kgs/yagr-nigiri.sgf 214
+117 analyze_semeai F19 F16
+#? [3 3 E16]
+
+
+
 ########### semeai gen_move tests #################
 
 # A6 gives an unfavorable ko while F10 gives seki.

@@ -343,6 +343,13 @@ loadsgf games/disaster.sgf 18
 344 owl_attack N3
 #? [0]*
 
+loadsgf games/kgs/yagr-Mythenmetz.2.sgf 111
+345 owl_defend O13
+#? [1 N13]
+346 owl_defend Q13
+#? [1 N13]
+
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

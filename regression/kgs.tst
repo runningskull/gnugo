@@ -156,4 +156,25 @@ loadsgf games/kgs/yagr-Mythenmetz.sgf 156
 320 reg_genmove white
 #? [K12]*
 
+loadsgf games/kgs/yagr-FKleolio.sgf 211
+330 reg_genmove white
+#? [H1]
+
+loadsgf games/kgs/yagr-nigiri.sgf 121
+340 restricted_genmove white L2 L4
+#? [L4]
+
+# Not L8
+loadsgf games/kgs/SURARIN-yagr.sgf 218
+350 reg_genmove black
+#? [L7|K7]
+
+loadsgf games/kgs/yagr-digibier.sgf 218
+360 reg_genmove white
+#? [B18]
+
+loadsgf games/kgs/yagr-justre1.sgf 133
+370 restricted_genmove white H11 G12
+#? [G12]
+
 
