@@ -21,6 +21,9 @@
 /* Connection module. Default standard. */
 #define EXPERIMENTAL_CONNECTIONS 0
 
+/* Connection module. Default standard. */
+#define ALTERNATE_CONNECTIONS 0
+
 /* Influence module. Default standard. */
 #define EXPERIMENTAL_INFLUENCE 0
 

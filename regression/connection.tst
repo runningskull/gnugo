@@ -146,7 +146,7 @@ loadsgf games/connection4.sgf
 43 disconnect L12 H13
 #? [1 (K12|J12|J13|H12|G13)]
 44 connect M3 N7
-#? [0]*
+#? [0]
 45 disconnect M3 N7
 #? [1 (N4|M4|N5|M5|M6|M7|N8|M8)]*
 46 connect B2 G1

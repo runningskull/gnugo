@@ -166,7 +166,7 @@ loadsgf games/trevor/auto/d08.sgf 48
 #K10 better than J9
 loadsgf games/trevor/auto/d08.sgf 66
 370 gg_genmove white
-#? [!J9]*
+#? [!J9]
 
 
 # L9 or close is better.
@@ -193,7 +193,7 @@ loadsgf games/trevor/auto/d08.sgf 114
 
 loadsgf games/trevor/auto/d08.sgf 118
 420 gg_genmove white
-#? [S9]*
+#? [S9]
 
 
 loadsgf games/trevor/auto/d08.sgf 150
@@ -218,7 +218,7 @@ loadsgf games/trevor/auto/d08.sgf 232
 
 loadsgf games/trevor/auto/d08.sgf 240
 470 gg_genmove white
-#? [J18]*
+#? [J18]
 
 
 
@@ -232,7 +232,7 @@ loadsgf games/trevor/auto/d12.sgf 16
 
 loadsgf games/trevor/auto/d12.sgf 40
 490 gg_genmove white
-#? [D5]
+#? [D5]*
 
 
 loadsgf games/trevor/auto/d12.sgf 52
@@ -461,7 +461,7 @@ loadsgf games/trevor/auto/d39.sgf 30
 #locally, E18 is better.
 loadsgf games/trevor/auto/d39.sgf 38
 890 gg_genmove white
-#? [!F18]*
+#? [!F18]
 
 
 #R7 or R2 are much better.

@@ -179,7 +179,7 @@ loadsgf games/trevor/auto/b25.sgf 70
 
 loadsgf games/trevor/auto/b25.sgf 74
 360 gg_genmove white
-#? [K3]
+#? [K3]*
 
 
 
@@ -462,12 +462,12 @@ loadsgf games/trevor/auto/b72.sgf 38
 
 loadsgf games/trevor/auto/b72.sgf 40
 760 gg_genmove white
-#? [E11]*
+#? [E11]
 
 
 loadsgf games/trevor/auto/b72.sgf 42
 770 gg_genmove white
-#? [E11]*
+#? [E11]
 
 
 loadsgf games/trevor/auto/b72.sgf 52

@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.23 released January 28, 2002
+
+- configure option: alternate-connections
 - experimental influence: followup value computed in influence.c
 - experimental influence: new_value_territory revised
 - experimental influence: new handling for intrusion patterns

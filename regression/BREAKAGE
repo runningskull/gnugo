@@ -1,28 +1,4 @@
-Results after the patches:
-
-heikki_1_23.3. Supercedes heikki_1_23.1 and heikki_1_23.2. 
-arend_1_23.4. Experimental influence. 
-arend_1_23.5. Owl threats. 
-inge_1_23.4. Removal of DEFEND_BOTH_MOVE. 
-gunnar_1_23.5. Test revisions. 
-gunnar_1_23.4. Two groups in hash key. 
-trevor_1_23.3. Test corrections. 
-arend_1_23.3. Hoshi tuning. 
-teun_1_23.3. Don't check constraint diagram when patno == 0 
-trevor_1_23.2a. Regression view enhancements. 
-gunnar_1_23.3. Bugfixes in worm.c and value_moves.c. 
-readconnect_1_23.1. Connection through ponnuki and more. 
-inge_1_23.3. Revaluation of some worms. 
-trevor_1_23.1.tar.gz. Makes VC run the DFA. 
-teun_1_23.2. Turns up some array bound violations. 
-teun_1_23.1. Pattern consistency checking. 
-gunnar_1_23.2. Tuning and pattern bugfixes. 
-gunnar_1_23.1. Atari_atari revision. 
-inge_1_23.2. ALL_MOVE. 
-inge_1_23.1. Removal of ATTACK_EITHER_MOVE. 
-arend_1_23.2. NNGS tests. 
-brandsma_1_22.1. VC revision. 
-teun_1_22.1. Revised config.vcin. 
+========================== 3.1.23 =========================
 
 ./regress.sh . ld_owl.tst
 12 unexpected PASS!

@@ -1523,6 +1523,9 @@ compute_followup_influence(int m, int n, int color,
                            char saved_stones[BOARDMAX])
 {
   int i, j;
+
+  UNUSED(m);
+  UNUSED(n);  
   memcpy(&followup_influence, &move_influence, sizeof(move_influence));
  
   /* We mark the saved stones in the q->w array. */

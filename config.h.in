@@ -1,5 +1,8 @@
 /* config.h.in.  Generated automatically from configure.in by autoheader.  */
 
+/* Connection module. Default standard. */
+#undef ALTERNATE_CONNECTIONS
+
 /* Define to use ansi escape sequences for color debugging */
 #undef ANSI_COLOR
 

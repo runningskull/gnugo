@@ -572,6 +572,7 @@ extern int best_moves[10];
 extern int chinese_rules;
 extern int experimental_semeai;      /* use experimental semeai module */
 extern int experimental_connections; /* use experimental connection module */
+extern int alternate_connections;    /* use alternate connection module */
 extern int owl_threats;              /* compute owl threats */
 extern int experimental_influence;   /* use experimental influence module */
 

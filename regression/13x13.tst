@@ -47,7 +47,7 @@ loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 44
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 48
 7 gg_genmove white
-#? [L7|M7|M6]*
+#? [L7|M7|M6]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 54
@@ -156,7 +156,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 12
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 20
 29 gg_genmove white
-#? [C8]*
+#? [C8]
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 32
 30 gg_genmove white
@@ -193,7 +193,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 12
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 38 gg_genmove white
-#? [G11]*
+#? [G11]
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44

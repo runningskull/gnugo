@@ -201,7 +201,7 @@ loadsgf games/strategy34.sgf 51
 
 loadsgf games/strategy34.sgf 57
 142 gg_genmove black
-#? [F7]*
+#? [F7]
 
 loadsgf games/strategy34.sgf 59
 143 gg_genmove black

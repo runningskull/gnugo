@@ -21,7 +21,7 @@ loadsgf games/dniwog.sgf 62
 #SEVERITY=8
 loadsgf games/dniwog.sgf 78
 5 gg_genmove white
-#? [H4|G4]
+#? [H4|G4]*
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=A more clear-cut case for this tesuji might help.

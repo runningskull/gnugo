@@ -40,7 +40,7 @@ loadsgf games/ego.sgf 68
 
 loadsgf games/ego.sgf 86
 6 gg_genmove white
-#? [!N5]*
+#? [!N5]
 
 # Unreasonable monkey jump
 loadsgf games/ego.sgf 96

@@ -164,7 +164,7 @@ loadsgf games/nicklas/nicklas11.sgf 274
 
 loadsgf games/nicklas/nicklas12.sgf 103
 1206 gg_genmove black
-#? [C15]*
+#? [C15]
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=Needless 2 point loss for B.
