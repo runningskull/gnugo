@@ -58,7 +58,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 40
 130 gg_genmove black
 #? [E14]
 
-loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 40
+loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 60
 140 restricted_genmove black N17 R5 R4
 #? [R5|R4]
 
@@ -73,10 +73,6 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 100
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 168
 170 gg_genmove black
 #? [S6]
-
-loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 168
-180 gg_genmove black
-#? [K8|L8]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 184
 190 gg_genmove black
@@ -96,7 +92,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
 #? [!T2]
 
 # Kill the whole thing, not just a piece.
-loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 221
+loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 222
 230 gg_genmove black
 #? [Q18]
 
