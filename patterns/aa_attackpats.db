@@ -394,4 +394,19 @@ AAB
 
 ;lib(A) == 3 && lib(B) > 1 && oplay_attack(*,A)
 
+
+Pattern A24
+# pp New pattern (3.5.1)
+
+?*?
+XOX
+
+:|,-
+
+?*?
+BAC
+
+; lib(A) == 1 && lib(B) + lib(C) <= 6 && !oplay_defend_both(*,B,C)
+
+
 # END OF FILE
