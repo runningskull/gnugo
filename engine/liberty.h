@@ -347,6 +347,7 @@ void store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
 				    char breakin_shadow[BOARDMAX]);
 void purge_persistent_breakin_cache(void);
 void clear_persistent_breakin_cache(void);
+void print_persistent_breakin_cache(void);
 void purge_persistent_owl_cache(void);
 void clear_persistent_owl_cache(void);
 int search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,

@@ -579,6 +579,8 @@ do_genmove(int *move, int color, float pure_threat_value,
       slowest_movenum = movenum + 1;
     }
   }
+  if (0 && (debug & DEBUG_BREAKIN))
+    print_persistent_breakin_cache();
 
   /* Some consistency checks to verify that things are properly
    * restored and/or have not been corrupted.

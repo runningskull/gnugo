@@ -126,15 +126,21 @@ compute_smaller_goal(int owner, int color_to_move,
     /* We don't want vertices that are at the border of the territory, and
      * from which a break-in is unlikely; these often lead to false
      * positives.
-     * So we throw out every vertex that has only one neighbor in the goal.
+     * So we throw out every vertex that has only one neighbor in the goal,
+     * or that is on an edge and has only two goal neighbors.
      */
     for (j = 0; j < 4; j++)
       if (ON_BOARD(pos + delta[j])
 	  && goal[pos + delta[j]]
 	  && (board[pos] == EMPTY || goal[pos] == OTHER_COLOR(owner)))
 	goal_neighbors++;
-    if (goal_neighbors > 1)
+#if 0
+    if (goal_neighbors > 2
+	|| goal_neighbors == 2 && !is_edge_vertex(pos))
+#else
+    if (goal_neighbors >= 2)
       smaller_goal[pos] = 1;
+#endif
   }
 
   /* Finally, in the case of blocking off, we only want one connected
@@ -202,14 +208,21 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
     		      int color_to_move)
 {
   int move = NO_MOVE;
+  int saved_move = NO_MOVE;
   char smaller_goal[BOARDMAX];
   struct connection_data conn;
 
-  compute_connection_distances(str, NO_MOVE, 3.01, &conn);
+  /* When blocking off, we use a somewhat smaller goal area. */
+  if (color_to_move == board[str])
+    compute_connection_distances(str, NO_MOVE, 3.01, &conn);
+  else
+    compute_connection_distances(str, NO_MOVE, 2.81, &conn);
   compute_smaller_goal(OTHER_COLOR(board[str]), color_to_move,
       		       &conn, goal, smaller_goal);
-  DEBUG(DEBUG_TERRITORY, "Trying to break in from %1m to:\n", str);
-  if (debug & DEBUG_TERRITORY)
+  if (0 && (debug & DEBUG_BREAKIN))
+    print_connection_distances(&conn);
+  DEBUG(DEBUG_BREAKIN, "Trying to break in from %1m to:\n", str);
+  if (debug & DEBUG_BREAKIN)
     goaldump(smaller_goal);
   while ((color_to_move == board[str]
           && break_in(str, smaller_goal, &move))
@@ -223,6 +236,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
      */
     int k;
     int save_num = *num_non_territory;
+    int affected_size = 0;
     float cut_off_distance = 3.5;
     if (ON_BOARD(move) && goal[move]) {
       non_territory[(*num_non_territory)++] = move;
@@ -249,13 +263,33 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
     if (*num_non_territory == save_num)
       break;
 
-    for (k = save_num; k < *num_non_territory; k++)
-      goal[non_territory[k]] = 0;
+    for (k = save_num; k < *num_non_territory; k++) {
+      int j;
+      int pos =  non_territory[k];
+      if (goal[pos]) {
+	affected_size++;
+	goal[pos] = 0;
+      }
+      for (j = 0; j < 4; j++)
+	if (goal[pos + delta[j]])
+	  affected_size++;
+      /* Don't kill too much territory at a time. */
+      if (affected_size >= 5) {
+	*num_non_territory = k;
+	break;
+      }
+    }
 
     compute_smaller_goal(OTHER_COLOR(board[str]), color_to_move,
 			 &conn, goal, smaller_goal);
+    DEBUG(DEBUG_BREAKIN, "Now trying to break to smaller goal:\n", str);
+    if (debug & DEBUG_BREAKIN)
+      goaldump(smaller_goal);
+
+    if (saved_move == NO_MOVE)
+      saved_move = move;
   }
-  return move;
+  return saved_move;
 }
 
 #define MAX_TRIES 10
@@ -274,15 +308,15 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
   int candidates = 0;
   float min_distance = 5.0;
 
-  DEBUG(DEBUG_TERRITORY,
+  DEBUG(DEBUG_BREAKIN,
         "Trying to break (%C to move) %C's territory ", color_to_move, owner);
-  if (debug & DEBUG_TERRITORY)
+  if (debug & DEBUG_BREAKIN)
     goaldump(goal);
   /* Compute nearby fields of goal. */
   init_connection_data(intruder, goal, &conn);
   k = conn.queue_end;
   spread_connection_distances(intruder, NO_MOVE, &conn, 3.01, 1);
-  if (0 && (debug & DEBUG_TERRITORY))
+  if (0 && (debug & DEBUG_BREAKIN))
     print_connection_distances(&conn);
 
   /* Look for nearby stones. */
@@ -330,7 +364,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
 
   for (k = 0; k < num_non_territory; k++)
     influence_erase_territory(q, non_territory[k], owner);
-  if (0 && num_non_territory > 0 && (debug & DEBUG_TERRITORY))
+  if (0 && num_non_territory > 0 && (debug & DEBUG_BREAKIN))
     showboard(0);
 }
 

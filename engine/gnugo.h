@@ -228,7 +228,7 @@ extern int output_flags;       /* amount of output to outfile */
 #define DEBUG_WORMS                 0x0400
 #define DEBUG_MOVE_REASONS          0x0800
 #define DEBUG_OWL_PERFORMANCE       0x1000
-#define DEBUG_LIFE                  0x2000
+#define DEBUG_BREAKIN		    0x2000
 #define DEBUG_FILLLIB               0x4000
 #define DEBUG_READING_PERFORMANCE   0x8000
 #define DEBUG_SCORING               0x010000

@@ -930,7 +930,7 @@ loadsgf games/trevor/auto/c84.sgf 94
 # games/trevor/auto/c86.sgf problems:
 
 loadsgf games/trevor/auto/c86.sgf 44
-1570 gg_genmove white
+1570 restricted_genmove white E1 E2 F2 F3
 #? [E2|F2|F3]
 
 

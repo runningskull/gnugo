@@ -1922,6 +1922,7 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
   int savemove = NO_MOVE;
   int savecode = 0;
   int found_read_result;
+  int tried_moves = 0;
   Read_result *read_result = NULL;
   
   SETUP_TRACE_INFO2("recursive_connect2", str1, str2);
@@ -1987,6 +1988,7 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
     if (komaster_trymove(xpos, color, "recursive_connect2", str1,
 			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
+      tried_moves++;
       if (!ko_move) {
 	int acode = recursive_disconnect2(str1, str2, NULL,
 					  new_komaster, new_kom_pos,
@@ -2013,7 +2015,7 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
     }
   }
 
-  if (num_moves == 0 && distance < 1.0) {
+  if (tried_moves == 0 && distance < 1.0) {
     SGFTRACE2(NO_MOVE, WIN, "no move, probably connected");
     READ_RETURN_CONN(read_result, move, NO_MOVE, WIN);
   }
@@ -2059,6 +2061,7 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
   int savemove = NO_MOVE;
   int savecode = 0;
   int found_read_result;
+  int tried_moves = 0;
   Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO2("recursive_disconnect2", str1, str2);
@@ -2127,6 +2130,7 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
     if (komaster_trymove(xpos, other, "recursive_disconnect2", str1,
 			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
+      tried_moves++;
       if (!ko_move) {
 	int dcode = recursive_connect2(str1, str2, NULL,
 				       new_komaster, new_kom_pos, has_passed);
@@ -2152,7 +2156,7 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
     }
   }
 
-  if (num_moves == 0
+  if (tried_moves == 0
       && distance >= 1.0
       && (has_passed
 	  || !recursive_connect2(str1, str2, NULL, komaster, kom_pos, 1))) {
@@ -2194,7 +2198,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
     		      struct connection_data *conn1,
     		      struct connection_data *conn2,
 		      float max_dist1, float max_dist2,
-		      int moves[MAX_MOVES], float total_distance)
+		      int moves[MAX_MOVES], float total_distance,
+		      float cutoff)
 {
   int color = board[str1];
   int other = OTHER_COLOR(color);
@@ -2385,6 +2390,12 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	gprintf("%o%1M -0.1, disconnect move on edge\n", move);
     }
 
+    if (ladder_capturable(move, color_to_move)) {
+      distances[r] += 0.3;
+      if (verbose > 0)
+	gprintf("%o%1M +0.3, can be captured in a ladder\n", move);
+    }
+
     /* Bonus for moves adjacent to endpoint strings with 3 liberties.
      * Neighbor strings with less than 3 liberties have already
      * generated a bonus above.
@@ -2465,10 +2476,11 @@ find_connection_moves(int str1, int str2, int color_to_move,
 
 
   /* Filter out moves with distance at least 1.5 more than the best
-   * move.
+   * move, or with distance higher than the cutoff specified.
    */
   for (r = 0; r < num_moves; r++)
-    if (distances[r] > distances[0] + 1.5)
+    if (distances[r] > distances[0] + 1.5
+	|| distances[r] > cutoff)
       break;
   num_moves = r;
 
@@ -2527,7 +2539,8 @@ find_string_connection_moves(int str1, int str2, int color_to_move,
 
   num_moves = find_connection_moves(str1, str2, color_to_move,
       				    &conn1, &conn2, max_dist1, max_dist2,
-      			   	    moves, *total_distance);
+      			   	    moves, *total_distance,
+				    HUGE_CONNECTION_DISTANCE);
   return num_moves;
 }
 
@@ -2632,9 +2645,14 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
     print_connection_distances(&conn2);
   }
 
-  num_moves = find_connection_moves(str, str2, color_to_move,
-      				    &conn1, &conn2, max_dist1, max_dist2,
-      			   	    moves, *total_distance);
+  {
+    float cutoff = HUGE_CONNECTION_DISTANCE;
+    if (breakin_depth - stackp <= 5)
+      cutoff = 1.1 + (breakin_depth - stackp) * 0.15;
+    num_moves = find_connection_moves(str, str2, color_to_move,
+				      &conn1, &conn2, max_dist1, max_dist2,
+				      moves, *total_distance, cutoff);
+  }
 
   {
     int move;
@@ -2666,6 +2684,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   int savemove = NO_MOVE;
   int savecode = 0;
   int found_read_result;
+  int tried_moves = 0;
   Read_result *read_result = NULL;
   
   SETUP_TRACE_INFO("recursive_break", str);
@@ -2728,6 +2747,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
     if (komaster_trymove(xpos, color, "recursive_break", str,
 			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
+      tried_moves++;
       if (!ko_move) {
 	int acode = recursive_block(str, goal, NULL,
 				    new_komaster, new_kom_pos,
@@ -2753,7 +2773,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
     }
   }
 
-  if (num_moves == 0 && distance < 1.0) {
+  if (tried_moves == 0 && distance < 1.0) {
     SGFTRACE(NO_MOVE, WIN, "no move, probably connected");
     READ_RETURN(read_result, move, NO_MOVE, WIN);
   }
@@ -2784,6 +2804,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
   int savemove = NO_MOVE;
   int savecode = 0;
   int found_read_result;
+  int tried_moves = 0;
   Read_result *read_result = NULL;
   SETUP_TRACE_INFO("recursive_block", str);
   
@@ -2848,6 +2869,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
     if (komaster_trymove(xpos, other, "recursive_block", str,
 			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
+      tried_moves++;
       if (!ko_move) {
 	int dcode = recursive_break(str, goal, NULL,
 				    new_komaster, new_kom_pos, has_passed,
@@ -2873,7 +2895,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
     }
   }
 
-  if (num_moves == 0
+  if (tried_moves == 0
       && distance >= 1.0
       && (has_passed
 	  || !recursive_break(str, goal, NULL, komaster, kom_pos, 1,
@@ -2893,7 +2915,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
 
 
 
-/* Externably callable frontend to recursive_break_in.
+/* Externably callable frontend to recursive_break.
  * Returns WIN if (str) can connect to the area goal[] (which may or may
  * not contain stones), if he gets the first move.
  */
@@ -2920,7 +2942,7 @@ break_in(int str, const char goal[BOARDMAX], int *move)
 
   if (search_persistent_breakin_cache(BREAK_IN, str, goal_hash,
 				         &result, move)) {
-    if (debug & DEBUG_TERRITORY) {
+    if (debug & DEBUG_BREAKIN) {
       gprintf("Break-in from %1m to:\n", str);
       goaldump(goal);
       gprintf("Result cached: %r %1m\n", result, *move);
@@ -2936,7 +2958,7 @@ break_in(int str, const char goal[BOARDMAX], int *move)
   result = recursive_break(str, goal, move, EMPTY, NO_MOVE, 0, &goal_hash);
   verbose = save_verbose;
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
-  if (0) {
+  if (debug & DEBUG_BREAKIN) {
     gprintf("%obreak_in    %1M, result %d %1M (%d, %d nodes, %f seconds)\n",
 	    str, result, *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);
@@ -2979,7 +3001,7 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   str = find_origin(str);
   if (search_persistent_breakin_cache(BLOCK_OFF, str, goal_hash,
 				         &result, move)) {
-    if (debug & DEBUG_TERRITORY) {
+    if (debug & DEBUG_BREAKIN) {
       gprintf("Blocking off %1m from:\n", str);
       goaldump(goal);
       gprintf("Result cached: %r %1m\n", result, *move);
@@ -2997,7 +3019,7 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   verbose = save_verbose;
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-  if (0) {
+  if (debug & DEBUG_BREAKIN) {
     gprintf("%oblock_off %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
 	    str, result, *move,
 	    nodes_connect, tactical_nodes, gg_cputime() - start);

@@ -1330,6 +1330,14 @@ store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
   persistent_breakin_cache_size++;
 }
 
+void
+print_persistent_breakin_cache()
+{
+  int k;
+  for (k = 0; k < persistent_breakin_cache_size; k++)
+    print_persistent_breakin_cache_entry(k);
+}
+
 
 /* For debugging purposes. */
 static void

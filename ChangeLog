@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- fix "no moves found" logic in various readconnect.c functions
+- new debug flag DEBUG_BREAKIN
+- "smaller goal" in breakin.c revised
+- be more careful when erasing territory after successful break-in
+- break-in move generation bug fix
 - endgame_find_backfilling_dame() revised
 - new global array forced_backfilling_moves[]
 - find_backfilling_move in filllib.c revised
