@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- special_rescue2() generalized and reimplemented
+- bugfix in edge_clamp()
 - mkpat does consistency checking between the diagram and constraint diagram
 - new function connect_and_cut_helper() in helpers.c
 - least significant bit of move reason now denotes a threat

@@ -1699,7 +1699,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
   if (stackp <= backfill_depth) {
     int dcode = special_rescue3(str, libs, &xpos, komaster, kom_pos);
     if (dcode == WIN) {
-      SGFTRACE(xpos, WIN, "special rescue2");
+      SGFTRACE(xpos, WIN, "special rescue3");
       READ_RETURN(read_result, move, xpos, WIN);
     }
     UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
@@ -2043,44 +2043,67 @@ special_rescue(int str, int lib, int *move, int komaster, int kom_pos)
  *   .cO.OX
  *   .X.OOX
  *   ------
+ *
+ *   OOXXXX     It also can find more general moves like 'c' here.
+ *   .OXOOX     
+ *   cXO.OX
+ *   ...OOX
+ *   ------
  */
 static int
 special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int newlibs[3];
+  int newlibs[4];
+  int liberties;
+  int newstr;
   int xpos;
+  int moves[MAX_MOVES];
+  int scores[MAX_MOVES];
+  int num_moves = 0;
   int savemove = 0;
   int savecode = 0;
-  int k;
+  int k, r, s;
 
-  for (k = 0; k < 2; k++) {
-    /* Let (alib) and (blib) be the two liberties. Reverse the
-     * order during the second pass through the loop.
+  for (r = 0; r < 2; r++) {
+    /* Let alib be one of the liberties and require it to be suicide
+     * for the opponent.
      */
-    int alib = libs[k];
-    int blib = libs[1-k];
-    if (is_suicide(alib, other) 
-	&& (approxlib(alib, color, 3, newlibs) == 2)) {
-      if (newlibs[0] != blib)
-	xpos = newlibs[0];
-      else
-	xpos = newlibs[1];
+    int alib = libs[r];
+    if (!is_suicide(alib, other))
+      continue;
 
-      if (!is_self_atari(xpos, color)
-	  && trymove(xpos, color, "special_rescue2", str, komaster, kom_pos)) {
-	int acode = do_attack(str, NULL, komaster, kom_pos);
-	if (acode != WIN) {
-	  if (acode == 0) {
-	    popgo();
-	    *move = xpos;
-	    return WIN;
-	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+    for (k = 0; k < 4; k++) {
+      if (board[alib + delta[k]] == color
+	  && !same_string(alib + delta[k], str)) {
+	newstr = alib + delta[k];
+	liberties = findlib(newstr, 4, newlibs);
+	
+	for (s = 0; s < liberties && s < 4; s++) {
+	  ADD_CANDIDATE_MOVE(newlibs[s], 0, moves, scores, num_moves);
 	}
-	popgo();
+	break_chain_moves(newstr, moves, scores, &num_moves);
+	break_chain2_efficient_moves(newstr, moves, scores, &num_moves);
+	edge_clamp(newstr, moves, scores, &num_moves);
       }
+    }
+  }
+
+  for (k = 0; k < num_moves; k++) {
+    xpos = moves[k];
+    if (!is_self_atari(xpos, color)
+	&& trymove(xpos, color, "special_rescue2", str, komaster, kom_pos)) {
+      int acode = do_attack(str, NULL, komaster, kom_pos);
+      if (acode != WIN) {
+	if (acode == 0) {
+	  popgo();
+	  *move = xpos;
+	  return WIN;
+	}
+	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+      }
+      popgo();
     }
   }
 
@@ -2470,17 +2493,15 @@ edge_clamp(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
   for (r = 0; r < adj; r++) {
     apos = adjs[r];
     /* Find a liberty at the edge. */
-    bpos = 0;
+    bpos = NO_MOVE;
     findlib(apos, 3, libs);
     for (k = 0; k < 3; k++) {
-      int i = I(libs[k]);
-      int j = J(libs[k]);
-      if (i == 0 || i == board_size-1 || j == 0 || j == board_size-1) {
+      if (is_edge_vertex(libs[k])) {
 	bpos = libs[k];
 	break;
       }
     }
-    if (bpos == 0)
+    if (bpos == NO_MOVE)
       continue;
 
     /* Edge liberty found. Establish up and right directions. */
@@ -2492,7 +2513,7 @@ edge_clamp(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
 	continue;
        
       for (l = 0; l < 2; l++) {
-	int right = delta[(k+4)%4];
+	int right = delta[(k+1)%4];
 	if (l == 1)
 	  right = -right;
 
