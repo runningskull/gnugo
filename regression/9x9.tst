@@ -188,3 +188,15 @@ loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312292348.sgf 8
 loadsgf games/nngs/gnugo-3.5.2gf1-Kiskol-200401021557.sgf 10
 370 reg_genmove white
 #? [G7|F7]*
+
+loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 9
+380 reg_genmove black
+#? [C3|D3]
+
+loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 17
+390 reg_genmove black
+#? [D7]
+
+loadsgf games/boardspace/GNUGo-GoFigure0.1-200503171816.sgf 35
+400 reg_genmove black
+#? [A5]
