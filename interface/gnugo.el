@@ -16,7 +16,7 @@
 ;;; PURPOSE.  See the GNU General Public License in file COPYING
 ;;; for more details.                                          
 ;;;                                                            
-;;; You should have received a copy of the GNU General Public  
+;;; You should have received a copy of the GNU General Public
 ;;; License along with this program; if not, write to the Free 
 ;;; Software Foundation, Inc., 59 Temple Place - Suite 330,    
 ;;; Boston, MA 02111, USA.
@@ -1177,6 +1177,21 @@ If FILENAME already exists, Emacs confirms that you wish to overwrite it."
   (interactive "fSGF file to load: ")
   (gnugo-command (format "loadsgf %s" (expand-file-name filename))))
 
+(defun gnugo-undo ()
+  "Undo one move. Interchange the colors of the two players."
+  (interactive)
+  (gnugo-gate)
+  (gnugo-synchronous-send/return "undo")
+  (gnugo-put :move-history (cdr (gnugo-get :move-history)))
+  (gnugo-put :sgf-tree (cdr (gnugo-get :sgf-tree)))
+  (gnugo-put :user-color (gnugo-get :last-mover))
+  (gnugo-put :gnugo-color (gnugo-other (gnugo-get :last-mover)))
+  (gnugo-put :last-mover (gnugo-get :gnugo-color))
+  (gnugo-merge-showboard-results)
+  (gnugo-refresh t)
+  (gnugo-goto-pos (car (cdr (gnugo-get :move-history))))
+)
+
 (defun gnugo-magic-undo (spec)
   "Undo moves on the GNUGO Board, based on SPEC, a string.
 If SPEC has the form of a board position (begins with a letter),
@@ -1186,7 +1201,9 @@ If SPEC has the form of a positive number, remove exactly that many
 moves from the history, signaling an error if the history is exhausted
 before finishing.  Otherwise, signal \"bad spec\" error.
 
-Refresh the board for each move undone.  If (in the case where SPEC is
+Refresh the board for each move undone. Warp the cursor to the next
+to the next-to-last move (which will be the next move undone if
+the command is executed again). If (in the case where SPEC is
 a number) after finishing, the color to play is not the user's color,
 schedule a move by GNU Go."
   (gnugo-gate)
@@ -1224,6 +1241,7 @@ schedule a move by GNU Go."
       (decf n)                          ; is
       (sit-for 0)))                     ; eye candy
   (gnugo-refresh t)
+  (gnugo-goto-pos (car (cdr (gnugo-get :move-history))))
   (when (string= (gnugo-get :last-mover) (gnugo-get :user-color))
     (gnugo-get-move (gnugo-get :gnugo-color))))
 
@@ -1400,7 +1418,8 @@ NOTE: At this time, GTP command handling specification is still
             (let ((hook
                    ;; do not elide this binding; `run-hooks' needs it
                    (plist-get spec :post-hook)))
-              (run-hooks 'hook))))))))
+              (run-hooks 'hook))))
+	(gnugo-refresh t)))))
 
 ;;;---------------------------------------------------------------------------
 ;;; Major mode for interacting with a GNUGO subprocess
@@ -1419,12 +1438,14 @@ In this mode, keys do not self insert.  Default keybindings:
 
   R             Resign.
 
+  u             Undo one move.
+
   U             Pass to `gnugo-magic-undo' either the board position
                 at point (if no prefix arg), or the prefix arg converted
                 to a number.  E.g., to undo 16 moves: `C-u C-u U' (see
                 `universal-argument'); to undo 42 moves: `M-4 M-2 U'.
 
-  C-l           Run `gnugo-refresh'.
+  C-l           Run `gnugo-refresh' to redraw the board.
 
   _ or M-_      Bury the Board buffer (when the boss is near).
 
@@ -1442,7 +1463,9 @@ In this mode, keys do not self insert.  Default keybindings:
 
   !             Run `gnugo-estimate-score'.
 
-  : or ;        Run `gnugo-command' (for GTP commands to GNU Go).
+  : or ;        Run `gnugo-command' (for GTP commands to GNU Go). For
+                example, `showboard' will draw the board in ascii with
+                a coordinate grid, useful for reference.
 
   =             Display board position under point (if valid).
 
@@ -1618,6 +1641,8 @@ starting a new one.  See `gnugo-board-mode' documentation for more info."
         (forward-char (* 2 (1- half)))
         (gnugo-put :last-user-bpos
           (get-text-property (point) 'gnugo-position)))
+      (if (and (fboundp 'display-images-p) (display-images-p))
+	  (gnugo-toggle-image-display))
       ;; first move
       (gnugo-put :game-start-time (current-time))
       (let ((g (gnugo-get :gnugo-color))
@@ -1650,12 +1675,13 @@ starting a new one.  See `gnugo-board-mode' documentation for more info."
                               (message "(not quitting)"))))
             ("Q"        . (lambda () (interactive)
                             (kill-buffer nil)))
+            ("u"        . gnugo-undo)
             ("U"        . (lambda (x) (interactive "P")
                             (gnugo-magic-undo
                              (cond ((numberp x) (number-to-string x))
                                    ((consp x) (number-to-string (car x)))
                                    (t (gnugo-position))))))
-            ("\C-l"     . gnugo-refresh)
+            ("\C-l"     . (gnugo-refresh t))
             ("\M-_"     . bury-buffer)
             ("_"        . bury-buffer)
             ("h"        . (lambda () (interactive)

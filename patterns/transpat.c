@@ -138,7 +138,7 @@ where\n\
     command     is one of 'flipleft' or 'normalize'\n\
     patnames    is a standard glob pattern (like EE*)\n\
     patfilename is an optional filename\n", argv[0]);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   /* Get the command */
@@ -154,7 +154,7 @@ where\n\
   if (argc == 4) {
     if ((infile = fopen(argv[3], "r")) == 0) {
       perror(argv[3]);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
   }
   else 
@@ -181,9 +181,9 @@ where\n\
     }
     else {
       printf("error\n");
-      exit(1);
+      exit(EXIT_FAILURE);
     }
   } while (val != 0 && !feof(infile));
  
-  exit(0);
+  exit(EXIT_SUCCESS);
 }

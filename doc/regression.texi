@@ -21,6 +21,7 @@ if a change breaks something.
 * Test Suites::                 Test Suites
 * Running the Regressions::     Running the Regression Tests
 * Running regress.pike::        Running regress.pike
+* Viewing with Emacs::          Viewing tests with Emacs
 * HTML Views::                  HTML Views
 @end menu
 
@@ -218,6 +219,21 @@ There are also command line options to choose what engine to run, what
 options to send to the engine, to turn on verbose output, and to use a
 file to specify which testcases to run. Run @code{./regress.pike --help}
 for a complete and up to date list of options.
+
+@node Viewing with Emacs
+@section Viewing tests with Emacs
+
+To get a quick regression view, you may use the graphical
+display mode available with Emacs (@pxref{Emacs}). You will
+want the cursor in the regression buffer when you enter
+@command{M-x gnugo}, so that GNU Go opens in the correct
+directory. A good way to be in the right directory is to
+open the window of the test you want to investigate. Then
+you can cut and past GTP commands directly from the test to
+the minibuffer, using the @command{:} command from
+Emacs. Although Emacs mode does not have a coordinate grid,
+you may get an ascii board with the coordinate grid using
+@command{: showboard} command.
 
 @node HTML Views
 @section HTML Regression Views

@@ -234,8 +234,6 @@ static struct gg_option const long_options[] =
   {"experimental-semeai",  no_argument, 0, OPT_EXPERIMENTAL_SEMEAI},
   {"semeai-node-limit",   required_argument, 0, OPT_SEMEAI_NODE_LIMIT},
   {"experimental-connections",  no_argument, 0, OPT_EXPERIMENTAL_CONNECTIONS},
-  {"owl-threats",     no_argument,      0, OPT_OWL_THREATS},
-  {"no-owl-threats",  no_argument,      0, OPT_NO_OWL_THREATS},
   {"standard-connections",  no_argument, 0, OPT_STANDARD_CONNECTIONS},
   {"standard-semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"alternate-connections",  no_argument, 0, OPT_ALTERNATE_CONNECTIONS},
