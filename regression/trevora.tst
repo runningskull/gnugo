@@ -15,10 +15,14 @@ loadsgf games/trevor/auto/a001.sgf 8
 
 # games/trevor/auto/a003.sgf problems:
 
-loadsgf games/trevor/auto/a003.sgf 28
-120 gg_genmove white
-#? [E7|D8|E8]
+# OK, B8 is fine.  Followup is important.  See trevora:121
+#loadsgf games/trevor/auto/a003.sgf 28
+#120 gg_genmove white
+##? [E7|D8|E8]
 
+loadsgf games/trevor/auto/a003.sgf 30
+121 gg_genmove white
+#? [E8]
 
 
 
