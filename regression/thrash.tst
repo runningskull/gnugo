@@ -70,3 +70,9 @@ loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 274
 loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 278
 15 reg_genmove white
 #? [P16]*
+
+#restrain the dragon
+loadsgf games/nngs/gnugo-3.5.5-liza-200404251750.sgf 42
+16 reg_genmove white
+#? [B8|B9|B10|C8|C9]
+
