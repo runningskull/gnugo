@@ -94,7 +94,7 @@ semeai(int color)
  * owl_analyze_semeai() instead of relying on static analysis.
  */
 
-#define MAX_DRAGONS MAX_BOARD*MAX_BOARD
+#define MAX_DRAGONS 50
 
 void
 new_semeai(int color)
@@ -105,8 +105,10 @@ new_semeai(int color)
   int d1, d2;
   int k;
   int other = OTHER_COLOR(color);
+  int num_dragons = number_of_dragons;
 
-  gg_assert (number_of_dragons <= MAX_DRAGONS);
+  if (num_dragons > MAX_DRAGONS)
+    num_dragons = MAX_DRAGONS;
 
   for (d1 = 0; d1 < number_of_dragons; d1++)
     for (d2 = 0; d2 < number_of_dragons; d2++) {
