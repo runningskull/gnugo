@@ -88,9 +88,9 @@ TST = 13x13.tst arb.tst arend.tst arion.tst atari_atari.tst auto01.tst \
        newscore.tst nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst \
        nicklas5.tst niki.tst nngs.tst nngs1.tst nngs2.tst optics.tst \
        optics_rot.tst owl.tst owl1.tst owl_rot.tst reading.tst \
-       reading_rot.tst rosebud.tst score.tst score2.tst score_rot.tst \
-       semeai.tst semeai2.tst strategy.tst strategy2.tst strategy3.tst \
-       strategy4.tst strategy5.tst strategy_rot.tst tactics.tst \
+       reading_rot.tst rosebud.tst safety.tst score.tst score2.tst \
+       score_rot.tst semeai.tst semeai2.tst strategy.tst strategy2.tst \
+       strategy3.tst strategy4.tst strategy5.tst strategy_rot.tst tactics.tst \
        trevor.tst trevora.tst trevorb.tst trevorc.tst trevord.tst \
        vie.tst viking.tst
 
@@ -395,6 +395,9 @@ reading_rot: reading_rot.tst
 rosebud: rosebud.tst
 	$(srcdir)/eval.sh rosebud.tst $(GG_OPTIONS)
 
+safety: safety.tst
+	$(srcdir)/eval.sh safety.tst $(GG_OPTIONS)
+
 score: score.tst
 	$(srcdir)/eval.sh score.tst $(GG_OPTIONS)
 
@@ -520,6 +523,7 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) auto03.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) auto04.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) auto_handtalk.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) safety.tst $(GG_OPTIONS)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

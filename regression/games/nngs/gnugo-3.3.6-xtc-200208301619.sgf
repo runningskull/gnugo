@@ -1,0 +1,50 @@
+(;GM[1]FF[4]
+SZ[19]HA[0]KM[0.5]
+PW[GnuGo (GNU Go 3.3.6)]WR[13k*]
+PB[xtc]BR[NR]
+PC[NNGS]DT[2002-08-30]AP[gnugoclient:2.0]
+RE[W+26.5]
+;B[pd];W[dp];B[pq];W[dd];B[qk];W[nc];B[pf];W[jd];B[jo];W[po];B[np]
+;W[qq];B[qr];W[qp];B[oq];W[nf];B[rn];W[rr];B[pr];W[nh];B[ph];W[qn]
+;B[ro];W[dj];B[nj];W[nn];B[mo];W[pm];B[rm];W[pk];B[rp];W[rq];B[qo]
+;W[lj];B[pp];W[pb];B[qb];W[qc];B[pc];W[rb];B[ob];W[qa];B[oc];W[ld]
+;B[nd];W[cf];B[mc];W[ec];B[cq];W[dq];B[cp];W[co];B[bo];W[cn];B[bn]
+;W[cm];B[dr];W[er];B[cr];W[fq];B[hq];W[bm];B[ar];W[jk];B[ml];W[oi]
+;B[oj];W[pj];B[pi];W[nl];B[ol];W[mm];B[pl];W[om];B[nk];W[ql];B[nm]
+;W[lm];B[qm];W[nl];B[rl];W[lc];B[mb];W[lb];B[mi];W[ji];B[mg];W[jg]
+;B[mf];W[hm];B[jm];W[re];B[kl];W[oo];B[ll];W[il];B[rf];W[qe];B[qf]
+;W[gp];B[ho];W[go];B[hn];W[gn];B[gr];W[md];B[ne];W[gh];B[jf];W[kf]
+;B[kg];W[kh];B[lg];W[if];B[je];W[ke];B[ie];W[he];B[id];W[ic];B[cc]
+;W[cd];B[bd];W[be];B[bb];W[ad];B[eb];W[db];B[fb];W[bc];B[hd];W[hc]
+;B[gd];W[gc];B[jc];W[kd];B[ig];W[jh];B[hf];W[fd];B[ge];W[hg];B[ih]
+;W[ii];B[hh];W[gg];B[fc];W[gb];B[fe];W[ed];B[hi];W[gi];B[hj];W[hl]
+;B[eg];W[dh];B[eh];W[ei];B[gk];W[sf];B[sg];W[se];B[rh];W[ma];B[nb]
+;W[an];B[ap];W[hp];B[ip];W[gq];B[ir];W[fr];B[hr];W[qd];B[pe];W[li]
+;B[mh];W[kk];B[jb];W[ib];B[ka];W[la];B[fm];W[fl];B[gl];W[gm];B[el]
+;W[dl];B[fk];W[ek];B[fj];W[ef];B[fi];W[ff];B[dg];W[ee];B[ch];W[di]
+;B[en];W[cg];B[bh];W[fh];B[do];W[ij];B[hk];W[dm];B[jl];W[ik];B[ep]
+;W[eq];B[kj];W[eo];B[fo];W[fn];B[em];W[ej];B[fl];W[gj];B[eo];W[dn]
+;B[lk];W[im];B[in];W[mj];B[lh];W[gs];B[hs];W[fs];B[mk];W[ki];B[ds]
+;W[fp];B[ck];W[cj];B[bj];W[bl];B[bk];W[dk];B[ci];W[ai];B[ag];W[bg]
+;B[ah];W[af];B[bi];W[nm];B[rs];W[pn];B[kn];W[pa];B[oa];W[me];B[ng]
+;W[lf];B[of];W[na];B[ao];W[am];B[bq];W[if];B[ig];W[ih];B[ha];W[ia]
+;B[ga];W[ea];B[];W[es];B[];W[]
+C[final_score: W+26.5
+G19 removed
+L19 removed
+B18 removed
+E18 removed
+K18 removed
+C17 removed
+G16 removed
+H14 removed
+A13 removed
+D13 removed
+J13 removed
+O12 removed
+P11 removed
+L10 removed
+Q10 removed
+O8 removed
+R4 removed]
+)
