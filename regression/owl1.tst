@@ -339,7 +339,9 @@ loadsgf games/kgs/yagr-r08ert.sgf 140
 343 owl_defend S6
 #? [(2|3) T3]*
 
-
+loadsgf games/disaster.sgf 18
+344 owl_attack N3
+#? [0]*
 
 ########### end of tests #####################
 
