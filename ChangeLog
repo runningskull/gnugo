@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static read_eye() tries to improve recognize_eye() results
+- recognize_eye() sets vp->num_attacks/defenses to 0 when eye is found
+- new file surround.c
+- new is_surrounded(), does_surround() and surround_map()
+- new gtp functions is_surrounded, does_surround and surround_map
+- new autohelper macros is_surrounded, does_surround and surround_map
+- new command line option --decide-surrounded
 - new global variable gtp_version
 - new option --gtp_version
 - new function simple_showboard() in showbord.c
