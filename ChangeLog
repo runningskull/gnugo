@@ -4,6 +4,9 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- make GTP default playing mode (so we don't need options to start gnugo
+  in SPEC runs)
+- silence copyright message in GTP mode
 - remove "#ifdef HAVE_CONFIGH_H"-wrappers
 - backport bugfix in do_owl_analyze_semeai() from semeai_3_15.1a
 - fix potential floating point rounding errors in surround.c

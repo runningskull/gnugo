@@ -763,7 +763,7 @@ main(int argc, char *argv[])
 
 
   /* Display copyright message unless --quiet option used. */
-  if (!quiet) {
+  if (!quiet && playmode != MODE_GTP) {
     fprintf(stderr, "\n");
     show_version();
     show_copyright();
@@ -812,7 +812,7 @@ main(int argc, char *argv[])
     if (infilename)
       playmode = MODE_LOAD_AND_ANALYZE;
     else
-      playmode = MODE_ASCII;
+      playmode = MODE_GTP;
   }
 
   if (outfile && playmode != MODE_LOAD_AND_PRINT) {
@@ -1133,7 +1133,7 @@ Usage: gnugo [-opts]\n\
 \n\
 Main Options:\n\
        --mode <mode>     Force the playing mode ('ascii' or 'gtp').\n\
-                         Default is ASCII.\n\
+                         Default is GTP.\n\
        --quiet           Don't print copyright and informational messages\n\
        --gtp-input <file>Read gtp commands from file instead of stdin\n\
    -l, --infile <file>   Load name sgf file\n\
