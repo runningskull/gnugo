@@ -146,8 +146,8 @@ static void special_rescue2_moves(int str, int libs[2],
     				  struct reading_moves *moves);
 static int special_rescue3(int str, int libs[3], int *move, 
 			   int komaster, int kom_pos);
-static int special_rescue4(int str, int libs[3], int *move, 
-			   int komaster, int kom_pos);
+static void hane_rescue_moves(int str, int libs[4],
+			      struct reading_moves *moves);
 static void special_rescue5_moves(int str, int libs[3],
     				  struct reading_moves *moves);
 static void special_rescue6_moves(int str, int libs[3],
@@ -1127,6 +1127,24 @@ defend1(int str, int *move, int komaster, int kom_pos)
   moves.num = 1;
   
   break_chain_moves(str, &moves);
+
+  /* Try to set up snap-back. */
+  if (stackp <= backfill_depth && countstones(str) == 1) {
+    int adjs[MAXCHAIN];
+    int adj = chainlinks2(str, adjs, 2);
+    int r;
+    int libs[2];
+    for (r = 0; r < adj; r++) {
+      findlib(adjs[r], 2, libs);
+      if (neighbor_of_string(libs[0], str)
+	  && !is_self_atari(libs[1], color))
+	ADD_CANDIDATE_MOVE(libs[1], 0, moves);
+      if (neighbor_of_string(libs[1], str)
+	  && !is_self_atari(libs[0], color))
+	ADD_CANDIDATE_MOVE(libs[0], 0, moves);
+    }
+  }
+
   order_moves(str, &moves, color, read_function_name, 0);
 
   for (k = 0; k < moves.num; k++) {
@@ -1471,6 +1489,9 @@ defend3(int str, int *move, int komaster, int kom_pos)
   propose_edge_moves(str, libs, liberties, &moves, color);
   edge_clamp_moves(str, &moves);
 
+  if (stackp <= backfill2_depth)
+    hane_rescue_moves(str, libs, &moves);
+
   order_moves(str, &moves, color, read_function_name, 0);
 
   for (k = 0; k < moves.num; k++) {
@@ -1571,13 +1592,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
     CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
       			    "special rescue3");
   }
-    
-  if (stackp <= backfill_depth) {
-    int dcode = special_rescue4(str, libs, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
-      			    "special rescue4");
-  }
-    
+
   if (level >= 10 && stackp <= backfill2_depth) {
     int dcode = superstring_breakchain(str, &xpos, komaster, kom_pos, 4);
     CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
@@ -1722,8 +1737,12 @@ defend4(int str, int *move, int komaster, int kom_pos)
   break_chain_moves(str, &moves);
   break_chain2_efficient_moves(str, &moves);
 
-  if (stackp <= backfill_depth)
+  if (stackp <= backfill_depth) {
     break_chain2_defense_moves(str, &moves);
+#if 0 
+    hane_rescue_moves(str, libs, &moves);
+#endif
+  }
 
   order_moves(str, &moves, color, read_function_name, 0);
 
@@ -1960,22 +1979,24 @@ special_rescue3(int str, int libs[3], int *move, int komaster, int kom_pos)
  *   ......     defensive move at '*'.
  *   ------
  *
- *   .*O   acd
- *   OX.   be.
+ *   .*   ac
+ *   OX   bd
+ *
+ * The only requirement is that d has at most as many liberties as b,
+ * and as the newly placed stone at c.
  */
-static int
-special_rescue4(int str, int libs[3], int *move, int komaster, int kom_pos)
+static void
+hane_rescue_moves(int str, int libs[4], struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int apos, bpos, cpos, dpos, epos;
-  int savemove = 0;
-  int savecode = 0;
+  int apos, bpos, cpos, dpos;
+  int num_libs = countlib(str);
   int k, l, r;
 
-  ASSERT1(countlib(str) == 3, str);
+  ASSERT1(num_libs <= 4, str);
   
-  for (r = 0; r < 3; r++) {
+  for (r = 0; r < num_libs; r++) {
     /* Let (apos) be one of the three liberties. */
     apos = libs[r];
     /* Try to find the configuration above. */
@@ -1996,45 +2017,27 @@ special_rescue4(int str, int libs[3], int *move, int komaster, int kom_pos)
 	if (board[cpos] != EMPTY)
 	  continue;
 
-	dpos = cpos + normal;
-	if (board[dpos] != color)
+	dpos = bpos + normal;
+	if (board[dpos] != other)
 	  continue;
 
-	epos = bpos + normal;
-	if (board[epos] != other)
-	  continue;
-
-	/* Configuration found. Now require that (dpos) has at least 3
-         * liberties and (epos) at most 3 liberties.
-	 */
-
-	if (countlib(dpos) < 3)
-	  continue;
-	
-	if (countlib(epos) > 3)
-	  continue;
-	
-	/* Try to play at (cpos). */
-	if (trymove(cpos, color, "special_rescue4", str, komaster, kom_pos)) {
-	  int acode = do_attack(str, NULL, komaster, kom_pos);
-	  if (acode != WIN) {
-	    if (acode == 0) {
-	      popgo();
-	      *move = cpos;
-	      return WIN;
-	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, cpos);
-	  }
-	  popgo();
+	/* Configuration found. Now check liberty constraint. */
+	{
+	  int dlibs = countlib(dpos);
+	  if (dlibs > num_libs
+	      || dlibs > accuratelib(cpos, color, dlibs, NULL))
+	    continue;
 	}
+	
+	if (0 && !in_list(cpos, moves->num, moves->pos)) {
+	  gprintf("hane_rescue_move added for %1m at %1m\n", str, cpos);
+	  dump_stack();
+	  showboard(0);
+	}
+	ADD_CANDIDATE_MOVE(cpos, 0, *moves);
       }
     }
   }
-
-  if (savecode != 0)
-    *move = savemove;
-
-  return savecode;
 }
 
 
