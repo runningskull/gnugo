@@ -571,7 +571,7 @@ loadsgf games/trevor/trevor_68.sgf
 #? [1 H1]
 
 loadsgf games/trevor/trevor_69.sgf
-690 owl_attack H3
+690 owl_attack H2
 #? [1 G2]*
 
 

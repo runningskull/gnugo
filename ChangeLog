@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- TODO revised
 - fixed value of J patterns no longer scaled with board_size
 - bugfix in owl_attackpats.db pattern D1137
 - assertion added in owl_escape_value()
@@ -10,6 +11,7 @@
 - tuning
 - owl tuning
 - influence tuning
+- test revisions
 
 3.1.17 released December 16, 2001
 

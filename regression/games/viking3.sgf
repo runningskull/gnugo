@@ -1,0 +1,43 @@
+(;GM[1]FF[4]
+SZ[19]HA[4]KM[0.5]
+PW[GnuGo (GNU Go 3.1.16)]WR[14k*]
+PB[viking4]BR[17k*]
+PC[NNGS]DT[2001-12-15]AP[gnugoclient:2.0]
+RE[W+8.5]
+AB[dd][pd][dp][pp]
+;W[qn];B[np];W[lq];B[mo];W[cf];B[fd];W[cn];B[hq];W[qf];B[cj];W[nc]
+;B[oe];W[qc];B[qj];W[qd];B[nm];W[bd];B[cc];W[dh];B[bj];W[hc];B[ge]
+;W[bc];B[ei];W[kc];B[en];W[bp];B[eh];W[cq];B[ko];W[rp];B[qq];W[jp]
+;B[in];W[jr];B[ql];W[rn];B[cb];W[bh];B[nr];W[rq];B[rr];W[rl];B[dq]
+;W[qp];B[qh];W[ho];B[hn];W[qr];B[po];W[hp];B[dl];W[gq];B[dm];W[oc]
+;B[gn];W[bl];B[rk];W[pg];B[nf];W[er];B[dr];W[eq];B[eo];W[cr];B[ds]
+;W[rg];B[ef];W[es];B[gp];W[gr];B[bb];W[ac];B[fp];W[fb];B[pq];W[qs]
+;B[qo];W[sm];B[ro];W[sr];B[cs];W[bs];B[br];W[ar];B[as];W[aq];B[so]
+;W[bs];B[ph];W[rs];B[og];W[as];B[bk];W[le];B[lg];W[kf];B[kg];W[jf]
+;B[bi];W[bf];B[ls];W[he];B[hf];W[ci];B[hd];W[bn];B[dg];W[cg];B[jg]
+;W[id];B[ie];W[je];B[ic];W[ib];B[jd];W[ga];B[hb];W[gc];B[jb];W[kb]
+;B[if];W[ia];B[ja];W[kd];B[ha];W[ka];B[mr];W[ri];B[rh];W[sh];B[di]
+;W[ch];B[ag];W[ah];B[qg];W[sg];B[pf];W[qm];B[qe];W[re];B[rf];W[se]
+C[L:9];B[gd];W[cl]C[L:10];B[dk];W[de];B[ee];W[df];B[eg];W[lf];B[mf]
+;W[jc];B[id];W[fq];B[ep];W[cm];B[od];W[pc];B[md];W[mc];B[qi];W[me]
+;B[nd];W[si];B[sf];W[qf];B[sk];W[rf];B[pe];W[ld];B[sp];W[sq];B[ai]
+;W[kp];B[jn];W[lo];B[lm];W[ln];B[kn];W[mn];B[pr];W[mm];B[ml];W[nn]
+;B[mq];W[pl]C[L:8];B[qk];W[ll]C[L:7];B[lk];W[km]C[L:5];B[jl];W[mk]
+C[L:6];B[nl];W[nk]C[L:7];B[kl];W[lm]C[L:5];B[om];W[on]C[L:6];B[ni]
+;W[lj]C[L:7];B[kk];W[mi]C[L:8];B[mh];W[ji]C[L:9];B[ol];W[pk]C[L:7]
+;B[oj];W[ok]C[L:8];B[sl];W[lp];B[hi];W[ik]C[L:9];B[jj];W[ki]C[L:10]
+;B[jm];W[ih];B[os];W[hh];B[gi];W[gg];B[ks];W[pj];B[oi];W[lh];B[fr]
+;W[iq];B[rm];W[sn];B[rl];W[pn];B[io];W[kr];B[ip];W[hr];B[go];W[hq]
+;B[ii];W[jh];B[ig];W[cd];B[ab];W[dc];B[db];W[ed];B[ec];W[dd];B[eb]
+;W[ak];B[fg];W[gf];B[kj];W[gh];B[pi];W[co];B[mj];W[nj];B[cp];W[bq]
+;B[ne];W[fh];B[ck];W[fi];B[fj];W[oo];B[mp];W[op];B[oq];W[lr];B[jo]
+;W[js];B[ms];W[ff];B[fe];W[li];B[kh];W[pm];B[hg];W[mj];B[aj];W[al]
+;B[dn];W[do];B[no];W[ps];B[rj];W[sj];B[];W[]
+C[final_score: W+8.5
+G19 removed
+F18 removed
+G17 removed
+A13 removed
+J9 removed
+F2 removed]
+)

@@ -45,41 +45,58 @@ member.  Some of them are bigger and demand a deeper knowledge of the
 engine internals.  The issues are presented here in an approximate
 order of perceived difficulty.
 
-1. Complete the conversion to 1-dimensional representation.
+1. Add a check in patterns/mkpat.c that the main diagram and the
+   constraint diagram are consistent. A partial implementation would
+   only make sure that they have the same size.
+
+2. Complete the conversion to 1-dimensional representation.
    Check all comments before functions to make them agree with
    the actual function header.  In some cases these comments were
    missed when the function was converted to 1D.
 
-2. Break out handling of movelists into its own file and generalize it.
+3. Break out handling of movelists into its own file and generalize it.
    This is started in 3.1.16. Move lists are used, among other places, 
    in worms.c where it is used to store moves that capture, save, 
    threaten to capture and threaten to save the worm.
 
-3. Implement move lists storing important moves for dragons and eyes
+4. Implement move lists storing important moves for dragons and eyes
    in the same way as it is used for worms.  Half eyes are already
    halfway done.  The moves are stored, but not the attack and defend
    codes (LOSE, KO_A, KO_B and WIN).
 
-4. Make the cache not waste storage on 64 bit systems.
+5. Make the cache not waste storage on 64 bit systems.
 
-5. The dragon data is split into two arrays, dragon[] and dragon2[].
-   The dragon2 array only have one entry per dragon, in opposition to
+6. a) Add move history for "permanent" moves (i.e. ones done with
+   play_move(), in contrast to temporary moves done by
+   trymove()/tryko()) in the board code. Notice that the move history
+   must be added to the state in the Position struct.
+
+   b) Implement undo for "permanent" moves in the board code and
+   replace various other undo implementations in play_gtp.c,
+   play_ascii.c, and play_gmp.c with this.
+
+   c) Implement detection of superko violation in the board code. We
+   probably only want this optionally in play_move() and in a variant
+   of is_legal().
+
+7. The dragon data is split into two arrays, dragon[] and dragon2[].
+   The dragon2 array only have one entry per dragon, in contrast to
    the dragon array where all the data is stored once for every
    intersection of the board.  Complete the conversion of eye_data,
    half_eye_data, worm and dragon to use the same structure as the
    dragon2 array.
 
-6. Support for ko in eyes.db and optics.c.
+8. Support for ko in eyes.db and optics.c.
 
-7. Support for constraints in the eye patterns.
+9. Support for constraints in the eye patterns.
 
-8. Create a paradigm for handling other types of ko (approach move ko,
-   multi-step ko, etc) and then write code that handles them. (Difficult!)
+10. Create a paradigm for handling other types of ko (approach move ko,
+    multi-step ko, etc) and then write code that handles them. (Difficult!)
 
-9. GNU Go should be able to resign some games. This feature should
-   be able to be turned on or off since we don't want it during
-   tournament play. If all dragons are settled and GNU Go is
-   behind by a lot, it should be able to resign.
+11. GNU Go should be able to resign some games. This feature should
+    be able to be turned on or off since we don't want it during
+    tournament play. If all dragons are settled and GNU Go is
+    behind by a lot, it should be able to resign.
 
 //--------------------------------------------------------------
 // long term issues
