@@ -73,22 +73,26 @@ loadsgf games/tiny/4x4a.sgf 5
 405 reg_genmove black
 #? [B1|B4|C1|C4]
 
-# C4 might also be okay.
+# C4 gives the same result under Chinese rules but is one point worse
+# under Japanese rules.
 loadsgf games/tiny/4x4a.sgf 6
 406 reg_genmove white
 #? [C1]
 
-# B1, C4, and D2 might also be okay.
+# A3, B1, C4, and D2 all give jigo under Japanese rules. Under Chinese
+# rules the results are A3:B+2, B1:B+1, C4:jigo, D2:W+1.
 loadsgf games/tiny/4x4a.sgf 7
 407 reg_genmove black
 #? [A3]*
 
-# C4 might also be okay.
+# Under Chinese rules all of B1, D2, and C4 give B+2. Under Japanese
+# rules B1 and D2 give jigo while C4 gives B+1.
 loadsgf games/tiny/4x4a.sgf 8
 408 reg_genmove white
-#? [B1]
+#? [B1|D2]
 
-# C4 and D2 might also be okay.
+# A2, C4, and D2 all give jigo under Japanese rules. Under Chinese
+# rules A2 gives B+2, C4 gives jigo, and D2 gives W+1.  
 loadsgf games/tiny/4x4a.sgf 9
 409 reg_genmove black
 #? [A2]
