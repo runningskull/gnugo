@@ -1128,6 +1128,28 @@ o..x
 :8,-,value(55)
 
 
+Pattern A239
+#spl added 3.5.1
+
+.Yo
+.*O Penetration
+...
+---
+
+:8,-,value(85)
+
+
+Pattern A240
+#spl added 3.5.1
+
+?YO?
+o*XO capture one stone and limiting eye
+o... maybe gote
+----
+
+:8,-,value(50)
+
+
 #########################################################
 #                                                       #
 #          Limiting moves on the first line             #
@@ -1799,6 +1821,16 @@ XYO?
 XX*a
 
 ;owl_escape_value(a) > 0
+
+
+Pattern A425
+#spl added 3.5.1, counter part of D1348d
+
+O.Y	    block connection
+.*.
+X.O
+
+:/,n,value(90)
 
 
 #########################################################

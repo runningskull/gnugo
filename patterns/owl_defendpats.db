@@ -661,9 +661,10 @@ B..
 
 
 Pattern D209b
+#spl modified 3.5.1
 
-?O.O        block on edge
-X*..
+?O.o        block on edge
+X*.o
 ....
 ----
 
