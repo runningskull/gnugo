@@ -1,5 +1,5 @@
-TST =  13x13.tst arb.tst arend.tst arend2.tst arion.tst atari_atari.tst \
-       auto01.tst auto02.tst auto03.tst auto04.tst \
+TST =  13x13.tst 13x13b.tst arb.tst arend.tst arend2.tst arion.tst \
+       atari_atari.tst auto01.tst auto02.tst auto03.tst auto04.tst \
        auto_handtalk.tst blunder.tst buzco.tst capture.tst \
        century2002.tst connect.tst connect_rot.tst \
        connection.tst connection_rot.tst cutstone.tst \
@@ -35,6 +35,9 @@ test: all_batches
 
 13x13: 13x13.tst
 	$(srcdir)/eval.sh 13x13.tst $(GG_OPTIONS)
+
+13x13b: 13x13b.tst
+	$(srcdir)/eval.sh 13x13b.tst $(GG_OPTIONS)
 
 arb: arb.tst
 	$(srcdir)/eval.sh arb.tst $(GG_OPTIONS)
@@ -366,3 +369,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) arend2.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) nando.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) thrash.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) 13x13b.tst $(GG_OPTIONS)
