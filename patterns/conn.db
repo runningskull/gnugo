@@ -1262,6 +1262,22 @@ aO
 ; xplay_attack_either(a,a,B) == WIN
 
 
+Pattern CC209
+
+OO
+XO
+..
+O.
+
+:8,CW
+
+OO
+DO
+ab
+Oc
+
+; xplay_attack_either(a,b,c,a,c) && !xplay_defend(b,a,D)
+
 #############################################
 #
 # CC3xx - patterns with expensive constraints
