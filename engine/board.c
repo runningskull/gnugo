@@ -4322,6 +4322,9 @@ do_play_move(int pos, int color)
   /* Clear string mark. */
   string_mark++;
 
+  /* Put down the stone. */
+  DO_ADD_STONE(pos, color);
+
   /* Look in all directions. Count the number of neighbor strings of the same
    * color, remove captured strings and remove `pos' as liberty for opponent
    * strings that are not captured.
@@ -4385,9 +4388,6 @@ do_play_move(int pos, int color)
     else
       captured_stones += do_remove_string(string_number[EAST(pos)]);
   }
-
-  /* Put down the stone. */
-  DO_ADD_STONE(pos, color);
 
   /* Choose strategy depending on the number of friendly neighbors. */
   if (neighbor_allies == 0)
