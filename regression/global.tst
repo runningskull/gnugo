@@ -171,9 +171,10 @@ loadsgf golois/MeilleurCoup0008.sgf
 42 gg_genmove black
 #? [M4]
 
+# tm - K5 seems OK, if a little touch & go.
 loadsgf golois/MeilleurCoup0009.sgf
 43 gg_genmove black
-#? [L8]*
+#? [L8|K5]*
 
 loadsgf golois/MeilleurCoup0010.sgf
 44 gg_genmove black

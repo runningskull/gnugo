@@ -318,9 +318,10 @@ loadsgf games/trevor/auto/b40.sgf 30
 
 # games/trevor/auto/b42.sgf problems:
 
+#Main point is, !J8
 loadsgf games/trevor/auto/b42.sgf 42
 560 gg_genmove white
-#? [G7|F7]*
+#? [G7|F7|G2]*
 
 
 
@@ -479,9 +480,12 @@ loadsgf games/trevor/auto/b72.sgf 64
 #? [K6|K5]*
 
 
-loadsgf games/trevor/auto/b72.sgf 70
-800 gg_genmove white
-#? [J4]*
+#Actually, L4 is probably best, though J4 leads to
+#  some complicated variations.  Either is fine for
+#  GNU Go.
+##loadsgf games/trevor/auto/b72.sgf 70
+##800 gg_genmove white
+###? [J4]*
 
 
 

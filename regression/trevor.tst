@@ -590,6 +590,10 @@ loadsgf games/trevor/trevor_71.sgf
 #? [1 G5]*
 
 
+loadsgf games/trevor/trevor_73.sgf
+730 owl_attack M2
+#? [(2|3) H1]*
+
 #CATEGORY=OWL_EYES
 #DESCRIPTION=Fixed by eye pattern 402
 #SEVERITY=10
