@@ -472,7 +472,7 @@ atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
       
     memcpy(defense_moves, defense_points, sizeof(defense_points));
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos) || !defense_moves[pos])
+      if (!ON_BOARD(pos) || !defense_moves[pos] || pos == move)
 	continue;
 
       if (!trymove(pos, color, "atari_atari", NO_MOVE)) {
