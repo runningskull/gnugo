@@ -2128,12 +2128,20 @@ estimate_territorial_value(int pos, int color, float our_score,
       
     case CONNECT_MOVE:
     case CUT_MOVE:
-    case STRATEGIC_ATTACK_MOVE:
-    case STRATEGIC_DEFEND_MOVE:
     case EXPAND_MOYO_MOVE:
     case EXPAND_TERRITORY_MOVE:
     case INVASION_MOVE:
       does_block = 1;
+      break;
+
+    case STRATEGIC_ATTACK_MOVE:
+    case STRATEGIC_DEFEND_MOVE:
+      /* Do not trust these when we are scoring. Maybe we shouldn't
+       * trust them otherwise either but require them to be
+       * accompanied by e.g. an EXPAND move reason.
+       */
+      if (!doing_scoring)
+	does_block = 1;
       break;
       
     case SEMEAI_THREAT:

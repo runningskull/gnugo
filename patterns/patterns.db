@@ -14357,6 +14357,7 @@ X..
 
 Pattern Reinforce102
 # FIXME: This pattern should be contingent on being clearly ahead.
+# gf In any case, don't play it while scoring. (3.7.2)
 
 .......
 O..O..O     Eliminate invasion point
@@ -14366,6 +14367,15 @@ O..O..O     Eliminate invasion point
 -------
 
 :8,O,value(8)
+
+.......
+O..O..O
+...*...
+.......
+.......
+-------
+
+;!doing_scoring
 
 
 ######################################################################

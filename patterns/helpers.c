@@ -763,8 +763,13 @@ thrash_around_helper(ARGS)
   UNUSED(pattern);
   UNUSED(trans);
   UNUSED(move);
-  
+
+  /* Do not generate these moves when doing scoring or if fuseki move
+   * generation is disabled (typically used when solving life and
+   * death problems embedded on a big board).
+   */
   if (doing_scoring
+      || disable_fuseki
       || (stones_on_board(BLACK | WHITE) > board_size * board_size * 2 / 5
 	  && stones_on_board(WHITE) > board_size * board_size / 5)
       || color == BLACK
