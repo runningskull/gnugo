@@ -447,30 +447,30 @@ loadsgf games/semeai/semeai19.sgf
 # The ko is very unfavorable for W so in 119 a 1 1 result is 
 # arguably correct.
 loadsgf games/semeai/semeai20.sgf
-118 analyze_semeai C17 C18
+121 analyze_semeai C17 C18
 #? [1 0]
-119 analyze_semeai C18 C17
+122 analyze_semeai C18 C17
 #? [2 2 C19]
 
 # There is also an amalgamation problem here.
 loadsgf games/semeai/semeai19.sgf 80
-120 analyze_semeai K18 N18
+123 analyze_semeai K18 N18
 #? [1 1 M18]
 
 loadsgf games/verybad.sgf 104
-121 analyze_semeai Q16 Q17
+124 analyze_semeai Q16 Q17
 #? [1 1 P19]
-122 analyze_semeai Q17 Q16
+125 analyze_semeai Q17 Q16
 #? [3 3 T17]
 
 loadsgf games/verybad.sgf 114
-123 analyze_semeai Q16 Q17
+126 analyze_semeai Q16 Q17
 #? [2 2 (P19|S17|T17)]
-124 analyze_semeai Q17 Q16
+127 analyze_semeai Q17 Q16
 #? [2 2 (O15|O14|R13)]
 
 loadsgf games/verybad.sgf 118
-126 analyze_semeai Q16 Q17
+129 analyze_semeai Q16 Q17
 #? [3 3 (Q19|S17|T17)]
 
 ########### semeai gen_move tests #################
@@ -501,7 +501,7 @@ loadsgf games/semeai/semeai17.sgf 52
 
 # Take the ko last.
 loadsgf games/verybad.sgf 114
-125 restricted_genmove black T15 T17 S17 P19
+128 restricted_genmove black T15 T17 S17 P19
 #? [!T15]
 
 ########### semeai status tests #################
