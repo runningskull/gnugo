@@ -63,7 +63,8 @@ play_gmp(Gameinfo *gameinfo)
   if (chinese_rules)
     gmp_startGame(ge, -1, -1, 5.5, -1, -1);
   else
-    gmp_startGame(ge, -1, -1, 5.5, 0, -1);	
+    gmp_startGame(ge, -1, -1, 5.5, 0, -1);
+  
   do {
     message = gmp_check(ge, 1, NULL, NULL, &error);
   } while (message == gmp_nothing || message == gmp_reset);
@@ -113,7 +114,8 @@ play_gmp(Gameinfo *gameinfo)
   }
 
   gameinfo->computer_player = mycolor;
-  sgf_write_header(sgftree.root, 1, random_seed, gnugo_get_komi(), level, chinese_rules);
+  sgf_write_header(sgftree.root, 1, random_seed, gnugo_get_komi(),
+		   level, chinese_rules);
   gameinfo->handicap = gnugo_sethand(gameinfo->handicap, sgftree.root);
   sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 
@@ -143,7 +145,7 @@ play_gmp(Gameinfo *gameinfo)
 	    break;
 	  }
 	  sgftreeAddComment(&sgftree, "undone");
-         sgftreeBack(&sgftree);
+	  sgftreeBack(&sgftree);
 	  to_move = OTHER_COLOR(to_move);
 	}
 	continue;

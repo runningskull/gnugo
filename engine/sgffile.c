@@ -38,7 +38,7 @@
 
 #include "liberty.h"
 #include "sgftree.h"
-
+#include "gg_utils.h"
 
 /*
  * Add debug information to a node if user requested it from command
@@ -113,7 +113,6 @@ sgffile_output(SGFTree *tree)
 void
 sgffile_begindump(SGFTree *tree)
 {
-  SGFNode *node;
   static SGFTree local_tree;
   gg_assert(sgf_dumptree == NULL);
 

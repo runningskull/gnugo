@@ -132,7 +132,7 @@ typedef struct SGFTree_t {
 
 
 void sgftree_clear(SGFTree *tree);
-int  sgftree_readfile(SGFTree *tree, const char *infilename);
+int sgftree_readfile(SGFTree *tree, const char *infilename);
 
 int sgftreeBack(SGFTree *tree);
 int sgftreeForward(SGFTree *tree);
@@ -141,7 +141,7 @@ void sgftreeAddPlay(SGFTree *tree, int color, int movex, int movey);
 void sgftreeAddPlayLast(SGFTree *tree, int color, int movex, int movey);
 void sgftreeAddStone(SGFTree *tree, int color, int movex, int movey);
 void sgftreeWriteResult(SGFTree *tree, float score, int overwrite);
-SGFNode *sgftreeNodeCheck(SGFTree *tree, SGFNode *node);
+SGFNode *sgftreeNodeCheck(SGFTree *tree);
 	 
 void sgftreeCircle(SGFTree *tree, int i, int j);
 void sgftreeSquare(SGFTree *tree, int i, int j);

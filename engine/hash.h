@@ -20,7 +20,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <stdio.h>
-#include <gnugo.h>
+#include "gnugo.h"
 
 /*
  * This file, together with engine/hash.c implements hashing of go positions

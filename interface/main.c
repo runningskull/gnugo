@@ -21,7 +21,6 @@
 
 #include "gnugo.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,13 +43,12 @@
 # endif
 #endif
 
-#include <liberty.h>
+#include "liberty.h"
 
 #include "gg-getopt.h"
-#include <gg_utils.h>
+#include "gg_utils.h"
 
 #include "interface.h"
-#include "gmp.h"
 #include "sgftree.h"
 #include "random.h"
 
@@ -258,7 +256,7 @@ main(int argc, char *argv[])
   Gameinfo gameinfo;
   SGFTree sgftree;
 
-  int i, umove;
+  int i;
   int mandated_color = EMPTY;
   enum mode playmode = MODE_UNKNOWN;
   int replay_color = EMPTY;
@@ -331,9 +329,6 @@ main(int argc, char *argv[])
 
   sgftree_clear(&sgftree);
   gameinfo_clear(&gameinfo, board_size, komi);
-  
-  /* Set some standard options. */
-  umove = BLACK;
   
   /* Now weed through all of the command line options. */
   while ((i = gg_getopt_long(argc, argv, 
@@ -1147,16 +1142,16 @@ main(int argc, char *argv[])
 
   case MODE_ASCII_EMACS:  
     if (mandated_color != EMPTY)
-      umove = mandated_color;
-    gameinfo.computer_player = OTHER_COLOR(umove);
+      gameinfo.computer_player = OTHER_COLOR(mandated_color);
+    
     play_ascii_emacs(&sgftree, &gameinfo, infilename, untilstring);
     break;
 
   case MODE_ASCII:  
   default:     
     if (mandated_color != EMPTY)
-      umove = mandated_color;
-    gameinfo.computer_player = OTHER_COLOR(umove);
+      gameinfo.computer_player = OTHER_COLOR(mandated_color);
+    
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;
   }
@@ -1164,7 +1159,7 @@ main(int argc, char *argv[])
   if (profile_patterns)
     report_pattern_profiling();
 
-  clock_report_autolevel(NULL, OTHER_COLOR(umove));
+  clock_report_autolevel(NULL, gameinfo.computer_player);
  
   return 0;
 }  /* end main */

@@ -47,7 +47,8 @@ sgftree_readfile(SGFTree *tree, const char *infilename)
 
 
 /* Go back one node in the tree. If lastnode is NULL, go to the last
-   node (the one in main variant which has no children) */
+ * node (the one in main variant which has no children).
+ */
 
 int
 sgftreeBack(SGFTree *tree)
@@ -60,12 +61,14 @@ sgftreeBack(SGFTree *tree)
   }
   else
     while (sgftreeForward(tree));
+  
   return 1;
 }
 
 
 /* Go forward one node in the tree. If lastnode is NULL, go to the
-   tree root */
+ * tree root.
+ */
 
 int
 sgftreeForward(SGFTree *tree)
@@ -78,6 +81,7 @@ sgftreeForward(SGFTree *tree)
   }
   else
     tree->lastnode = tree->root;
+  
   return 1;
 }
 
@@ -87,27 +91,25 @@ sgftreeForward(SGFTree *tree)
 /* ================================================================ */
 
 /*
- * Returns the node to modify. When node==NULL then lastnode is used,
- * except if lastnode is NULL, then the current end of game is used.
+ * Returns the node to modify. Use lastnode if available, otherwise
+ * follow the main variation to the current end of the game.
  */
 
-/* FIXME: do we need node parameter here? it is never used. */
-
 SGFNode *
-sgftreeNodeCheck(SGFTree *tree, SGFNode *node)
+sgftreeNodeCheck(SGFTree *tree)
 {
-   assert(tree->root);
+  SGFNode *node = NULL;
+  assert(tree->root);
 
-   if (!node) {
-     if (tree->lastnode)
-       node = tree->lastnode;
-     else {
-       node = tree->root;
-       while (node->child)
-	 node = node->child;
-     }
-   }
-   return node;
+  if (tree->lastnode)
+    node = tree->lastnode;
+  else {
+    node = tree->root;
+    while (node->child)
+      node = node->child;
+  }
+
+  return node;
 }
 
 
@@ -119,7 +121,7 @@ sgftreeNodeCheck(SGFTree *tree, SGFNode *node)
 void
 sgftreeAddStone(SGFTree *tree, int color, int movex, int movey)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   sgfAddStone(node, color, movex, movey);
 }
 
@@ -131,7 +133,7 @@ sgftreeAddStone(SGFTree *tree, int color, int movex, int movey)
 void
 sgftreeAddPlay(SGFTree *tree, int color, int movex, int movey)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   tree->lastnode = sgfAddPlay(node, color, movex, movey);
 }
 
@@ -144,7 +146,7 @@ sgftreeAddPlay(SGFTree *tree, int color, int movex, int movey)
 void
 sgftreeAddPlayLast(SGFTree *tree, int color, int movex, int movey)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   tree->lastnode = sgfAddPlayLast(node, color, movex, movey);
 }
 
@@ -171,7 +173,7 @@ sgftreeAddComment(SGFTree *tree, const char *comment)
   SGFNode *node;
   assert(tree && tree->root);
 
-  node = sgftreeNodeCheck(tree, NULL);
+  node = sgftreeNodeCheck(tree);
   sgfAddComment(node, comment);
 }
 
@@ -186,7 +188,7 @@ sgftreeBoardText(SGFTree *tree, int i, int j, const char *text)
   SGFNode *node;
   assert(tree->root);
 
-  node = sgftreeNodeCheck(tree, NULL);
+  node = sgftreeNodeCheck(tree);
   sgfBoardText(node, i, j, text);
 }
 
@@ -201,7 +203,7 @@ sgftreeBoardChar(SGFTree *tree, int i, int j, char c)
   SGFNode *node;
   assert(tree->root);
 
-  node = sgftreeNodeCheck(tree, NULL);
+  node = sgftreeNodeCheck(tree);
   sgfBoardChar(node, i, j, c);
 }
 
@@ -213,7 +215,7 @@ sgftreeBoardChar(SGFTree *tree, int i, int j, char c)
 void
 sgftreeBoardNumber(SGFTree *tree, int i, int j, int number)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   sgfBoardNumber(node, i, j, number);
 }
 
@@ -225,7 +227,7 @@ sgftreeBoardNumber(SGFTree *tree, int i, int j, int number)
 void
 sgftreeTriangle(SGFTree *tree, int i, int j)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   sgfTriangle(node, i, j);
 }
 
@@ -237,7 +239,7 @@ sgftreeTriangle(SGFTree *tree, int i, int j)
 void
 sgftreeCircle(SGFTree *tree, int i, int j)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   sgfCircle(node, i, j);
 }
 
@@ -249,7 +251,7 @@ sgftreeCircle(SGFTree *tree, int i, int j)
 void
 sgftreeSquare(SGFTree *tree, int i, int j)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   sgfSquare(node, i, j);
 }
 
@@ -261,7 +263,7 @@ sgftreeSquare(SGFTree *tree, int i, int j)
 void
 sgftreeMark(SGFTree *tree, int i, int j)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   sgfMark(node, i, j);
 }
 
@@ -273,7 +275,7 @@ sgftreeMark(SGFTree *tree, int i, int j)
 void
 sgftreeStartVariant(SGFTree *tree)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   tree->lastnode = sgfStartVariant(node);
 }
 
@@ -285,7 +287,7 @@ sgftreeStartVariant(SGFTree *tree)
 void
 sgftreeStartVariantFirst(SGFTree *tree)
 {
-  SGFNode *node = sgftreeNodeCheck(tree, NULL);
+  SGFNode *node = sgftreeNodeCheck(tree);
   tree->lastnode = sgfStartVariantFirst(node);
 }
 

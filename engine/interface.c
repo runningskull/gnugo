@@ -28,7 +28,7 @@
 #include "liberty.h"
 #include "clock.h"
 
-#include <gg_utils.h>
+#include "gg_utils.h"
 
 /*
  * Initialize the gnugo engine. This needs to be called 

@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <ctype.h>
 
 #include "liberty.h"
@@ -46,7 +45,7 @@ showterri        display territory\n\
 static int opt_showboard = 1;
 static int showdead = 0;
 static int emacs = 0;
-SGFTree sgftree;
+static SGFTree sgftree;
 static int last_move_i;      /* The position of the last move */
 static int last_move_j;      /* -""-                          */
 
@@ -790,7 +789,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case CMD_BACK:
 	  if (gnugo_undo_move(1)) {
             sgftreeAddComment(&sgftree, "undone");
-           sgftreeBack(&sgftree);
+	    sgftreeBack(&sgftree);
 	    gameinfo->to_move = OTHER_COLOR(gameinfo->to_move);
 	  }
 	  else
@@ -799,19 +798,19 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	case CMD_FORWARD:
          if (sgftreeForward(&sgftree))
            gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
-						   gameinfo->to_move);
+						  gameinfo->to_move);
 	  else
 	    printf("\nEnd of game tree.\n");
 	  break;
 	case CMD_LAST:
          while (sgftreeForward(&sgftree))
            gameinfo->to_move = gnugo_play_sgfnode(sgftree.lastnode,
-						   gameinfo->to_move);
+						  gameinfo->to_move);
 	  break;
 	case COMMENT:
 	  printf("\nEnter comment. Press ENTER when ready.\n");
 	  fgets(line, 80, stdin);
-         sgftreeAddComment(&sgftree, line);
+	  sgftreeAddComment(&sgftree, line);
 	  break;
 	case SCORE:
 	  showscore = !showscore;
@@ -865,7 +864,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    /* discard newline */
 	    tmpstring[strlen(tmpstring)-1] = 0;
 	    /* make sure we are saving proper handicap */
-           init_sgf(gameinfo);
+	    init_sgf(gameinfo);
 	    writesgf(sgftree.root, tmpstring);
 	    printf("You may resume the game");
 	    printf(" with -l %s --mode ascii\n", tmpstring);
@@ -916,11 +915,11 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
     printf("You may optionally save the game as an SGF file.\n");
     state = 0;
     while (state == 0) {
-      printf("\n\
-Type \"save <filename>\" to save,\n\
-     \"count\" to recount,\n\
-     \"quit\" to quit\n\
- or  \"game\" to play again\n");
+      printf("\n");
+      printf("Type \"save <filename>\" to save,\n");
+      printf("     \"count\" to recount,\n");
+      printf("     \"quit\" to quit\n");
+      printf(" or  \"game\" to play again\n");
       line_ptr = line;
       if (!fgets(line, 80, stdin))
 	break;
@@ -991,8 +990,8 @@ endgame(Gameinfo *gameinfo)
   ascii_showboard();
   while (!done) {
     printf("Dead stones are marked with small letters (x,o).\n");
-    printf("\nIf you don't agree, enter the location of a group\n\
-to toggle its state or \"done\".\n");
+    printf("\nIf you don't agree, enter the location of a group\n");
+    printf("to toggle its state or \"done\".\n");
 
     if (!fgets(line, 12, stdin))
       return; /* EOF or some error */
@@ -1023,11 +1022,13 @@ to toggle its state or \"done\".\n");
       printf("dead group, or type \"done\"\n");
     }      
     else if (!strncmp(line, "undo", 4)) {
-      printf("UNDO not allowed anymore. The status of the stones now toggles after entering the location of it.\n");
+      printf("UNDO not allowed anymore. The status of the stones now\n");
+      printf("toggles after entering the location of it.\n");
       ascii_showboard();
     }
     else {
-      if (!string_to_location(board_size, line, &i, &j) || BOARD(i, j) == EMPTY)
+      if (!string_to_location(board_size, line, &i, &j)
+	  || BOARD(i, j) == EMPTY)
 	printf("\ninvalid!\n");
       else {
 	int status = dragon_status(POS(i, j));
@@ -1046,10 +1047,12 @@ showcapture(char *line)
 {
   int i, j, x, y;
   if (line)
-    if (!string_to_location(board_size, line, &i, &j) || BOARD(i, j) == EMPTY) {
+    if (!string_to_location(board_size, line, &i, &j)
+	|| BOARD(i, j) == EMPTY) {
       printf("\ninvalid point!\n");
       return;
     }
+  
   if (gnugo_attack(i, j, &x, &y))
     mprintf("\nSuccessfull attack of %m at %m\n", i, j, x, y);
   else
@@ -1062,7 +1065,8 @@ showdefense(char *line)
 {
   int i, j, x, y;
   if (line)
-    if (!string_to_location(board_size, line, &i, &j) || BOARD(i, j) == EMPTY) {
+    if (!string_to_location(board_size, line, &i, &j)
+	|| BOARD(i, j) == EMPTY) {
       printf("\ninvalid point!\n");
       return;
     }
@@ -1081,16 +1085,16 @@ showdefense(char *line)
 static void
 ascii_goto(Gameinfo *gameinfo, char *line)
 {
-  char *movenumber = line;
+  const char *movenumber = line;
 
   if (!line)
     return;
+  
   if (!strncmp(line, "last", 4))
     movenumber = "9999";
-  else {
-    if (!strncmp(line, "first", 4))
-      movenumber = "1";
-  }
+  else if (!strncmp(line, "first", 4))
+    movenumber = "1";
+  
   printf("goto %s\n", movenumber);
   gameinfo_play_sgftree(gameinfo, &sgftree, movenumber);
 }

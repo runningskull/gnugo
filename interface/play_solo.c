@@ -138,10 +138,6 @@ play_solo(Gameinfo *gameinfo, int moves)
 /* ================================================================ */
 
 
-/* FIXME: This should be in a separate source file.
- */
-
-
 /*
  * Load SGF file and run genmove().
  */
@@ -162,11 +158,9 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   if (is_pass(POS(i, j)))
     gprintf("%s move: PASS!\n", next == WHITE ? "white (O)" : "black (X)");
   else
-    gprintf("%s move %m\n", next == WHITE ? "white (O)" : "black (X)",
-      i, j);
+    gprintf("%s move %m\n", next == WHITE ? "white (O)" : "black (X)", i, j);
 
   gnugo_play_move(i, j, next);
-  sgftreeNodeCheck(&sgftree, 0);
   sgftreeAddPlay(&sgftree, next, i, j);
   sgftreeAddComment(&sgftree, "load and analyze mode");
   sgffile_add_debuginfo(sgftree.lastnode, move_val);

@@ -1345,7 +1345,7 @@ gtp_owl_analyze_semeai(char *s)
   silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
-      reading_cache_clear();
+    reading_cache_clear();
 
   owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 1);
   gtp_start_response(GTP_SUCCESS);

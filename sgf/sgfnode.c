@@ -790,6 +790,7 @@ propident(char *buffer, int size)
 {
   if (lookahead == -1 || !isupper(lookahead)) 
     parse_error("Expected an upper case letter.", 0);
+  
   while (lookahead != -1 && isalpha(lookahead)) {
     if (isupper(lookahead) && size > 1) {
       *buffer++ = lookahead;
@@ -829,6 +830,7 @@ propvalue(char *buffer, int size)
     lookahead = sgf_getch();
   }
   match(']');
+  
   /* Remove trailing whitespace */
   --p;
   while (p > buffer && isspace((int) *p))
@@ -1386,7 +1388,8 @@ unparse_game(FILE *file, SGFNode *node, int root)
 }
 
 void
-sgf_write_header(SGFNode *root, int overwrite, int seed, float komi, int level, int rules)
+sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
+		 int level, int rules)
 {
   time_t curtime = time(NULL);
   struct tm *loctime = localtime(&curtime);
@@ -1430,9 +1433,12 @@ writesgf(SGFNode *root, const char *filename)
 
   unparse_game(outfile, root, 1);
   fclose(outfile);
-  /* remove "printed" marks so that the tree can be written multiple
-     times */
+  
+  /* Remove "printed" marks so that the tree can be written multiple
+   * times.
+   */
   restore_node(root);
+  
   return 1;
 }
 
@@ -1469,4 +1475,3 @@ main()
  * c-basic-offset: 2
  * End:
  */
-

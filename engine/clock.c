@@ -36,8 +36,8 @@
 
 #include "gnugo.h"
 
-#include <liberty.h>
-#include <gg_utils.h>
+#include "liberty.h"
+#include "gg_utils.h"
 #include "clock.h"
 
 /* parameters */
