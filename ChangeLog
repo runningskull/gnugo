@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix for unsigned char's concerning pessimistic_min
 - bugfix: estimate_score was called many places with parameters switched
 - don't crash reading a bogus sgf file
 - more reading functions use candidate move mechanism
