@@ -17,3 +17,9 @@ loadsgf games/nngs/Temnik-gnugo-3.3.15-200301161937.sgf 230
 loadsgf games/nngs/Temnik-gnugo-3.3.15-200301161937.sgf 232
 5 gg_genmove black
 #? [M3|M2|N3|L4|M5|M4]*
+
+# Thrashing dragon in semeai (liberty count is close!)
+loadsgf games/nngs/uno-gnugo-3.3.16-200302050206.sgf 204
+6 gg_genmove black
+#? [T4|M5|O4|O2|P1]*
+
