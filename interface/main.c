@@ -761,6 +761,14 @@ main(int argc, char *argv[])
       }
     }
 
+  
+  /* Figure out a default mode if there was no explicit one. */
+  if (playmode == MODE_UNKNOWN) {
+    if (infilename)
+      playmode = MODE_LOAD_AND_ANALYZE;
+    else
+      playmode = MODE_GTP;
+  }
 
   /* Display copyright message unless --quiet option used. */
   if (!quiet && playmode != MODE_GTP) {
@@ -805,14 +813,6 @@ main(int argc, char *argv[])
     int m, n;
     string_to_location(board_size, debuginfluence_move, &m, &n);
     debug_influence_move(m, n);
-  }
-  
-  /* Figure out a default mode if there was no explicit one. */
-  if (playmode == MODE_UNKNOWN) {
-    if (infilename)
-      playmode = MODE_LOAD_AND_ANALYZE;
-    else
-      playmode = MODE_GTP;
   }
 
   if (outfile && playmode != MODE_LOAD_AND_PRINT) {
