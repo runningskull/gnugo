@@ -1084,7 +1084,7 @@ estimate_territorial_value(int pos, int color, float score)
       /* Defenseless stone. */
       if (worm[aa].defend_codes[0] == 0) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "    %1m: %f (secondary) - attack on %1m (defenseless)\n",
+	      "  %1m:   %f (secondary) - attack on %1m (defenseless)\n",
 	      pos, worm[aa].effective_size, aa);
 	secondary_value += worm[aa].effective_size;
 	break;
@@ -1097,7 +1097,7 @@ estimate_territorial_value(int pos, int color, float score)
        */
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "    %1m: %f (secondary) - attack on %1m (dead)\n",
+	      "  %1m:   %f (secondary) - attack on %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
 	secondary_value += 0.2 * this_value;
 	break;
@@ -1144,7 +1144,7 @@ estimate_territorial_value(int pos, int color, float score)
        */
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "    %1m: %f (secondary) - defense of %1m (dead)\n",
+	      "  %1m:   %f (secondary) - defense of %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
 	secondary_value += 0.2 * this_value;
 	break;
@@ -1237,12 +1237,12 @@ estimate_territorial_value(int pos, int color, float score)
 	 * move is tested.
 	 */
 	if (board[aa] != EMPTY
-	    && find_defense(aa, &defense_move) != 0
+	    && find_defense(aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
 	  if (trymove(defense_move, OTHER_COLOR(color),
 		      "estimate_territorial_value-b", NO_MOVE,
 		      EMPTY, NO_MOVE)) {
-	    if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
+	    if (board[pos] == EMPTY || attack(pos, NULL) == WIN) {
 	      popgo();
 	      popgo();
 	      break;
@@ -1529,12 +1529,13 @@ estimate_territorial_value(int pos, int color, float score)
   else
     saved_stones[pos] = INFLUENCE_CAPTURED_STONE;
   
-  if (does_block) {
+  /* tm added move_safety check (3.1.22) (see trevorc:880) */
+  if (does_block && move[pos].move_safety) {
     this_value = influence_delta_territory(pos, color, saved_stones);
     if (this_value != 0.0)
       TRACE("  %1m: %f - change in territory\n", pos, this_value);
     else
-      DEBUG(DEBUG_MOVE_REASONS, "    %1m: 0.0 - block or expand territory\n", 
+      DEBUG(DEBUG_MOVE_REASONS, "  %1m: 0.00 - change in territory\n", 
 	    pos);
   }
 
@@ -1621,7 +1622,15 @@ estimate_strategical_value(int pos, int color, float score)
 	 *        a followup value.
 	 */
 	if (worm[aa].cutstone2 > 1) {
-	  this_value = 10.0 * (worm[aa].cutstone2 - 1);
+	  double ko_factor = 1;
+	  if (move_reasons[r].type == ATTACK_MOVE_GOOD_KO
+	      || move_reasons[r].type == DEFEND_MOVE_GOOD_KO) {
+	    ko_factor = 0.6;
+	  } else if (move_reasons[r].type == ATTACK_MOVE_BAD_KO
+	      || move_reasons[r].type == DEFEND_MOVE_BAD_KO) {
+	    ko_factor = 0.4;
+	  }
+	  this_value = 10.0 * (worm[aa].cutstone2 - 1) * ko_factor;
 	  TRACE("  %1m: %f - %1m cutstone\n", pos, this_value, aa);
 	}
 	

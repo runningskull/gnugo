@@ -1381,11 +1381,16 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	if (dcode == 0) {
 	  pop_owl(owl);
 	  popgo();
-	  if (origin == 0) {
-	    SGFTRACE(mpos, WIN, "all original stones captured");
-	  }
-	  else {
-	    SGFTRACE(mpos, WIN, "attack effective");
+  	  if (sgf_dumptree) {
+	    const char *wintxt;
+	    char winstr[192];
+	    if (origin == 0)
+	      wintxt = "all original stones captured";
+	    else
+	      wintxt = "attack effective";
+	    sprintf(winstr, "%s)\n  (%d variations", wintxt,
+	  		    count_variations - this_variation_number);
+	    SGFTRACE(mpos, WIN, winstr);
 	  }
 	  READ_RETURN(read_result, move, mpos, WIN);
 	}
@@ -1422,7 +1427,12 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
     READ_RETURN(read_result, move, savemove, savecode);
   }
 
-  SGFTRACE(0, 0, NULL);
+  if (sgf_dumptree) {
+    char winstr[128];
+    sprintf(winstr, "attack failed)\n  (%d variations",
+	  	    count_variations - this_variation_number);
+    SGFTRACE(0, 0, winstr);
+  }
   READ_RETURN0(read_result);
 }
 
@@ -1783,11 +1793,20 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
    * 3. Tactical defense moves
    */
   for (pass = 0; pass < 4; pass++) {
+    int newpass=pass;
     moves = NULL;
     move_cutoff = 1;
     
+#if 0
+    /* If not too deep, evaluate shape moves (like escaping) first. */
+    /* This experiment not too successful - but may return to it; tm */
+    if (stackp < 4 && pass < 2) {
+      newpass = 1 - newpass;
+    }
+#endif
+
     /* Get the shape moves if we are in the right pass. */
-    if (pass == 1) {
+    if (newpass == 1) {
       
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
@@ -1806,13 +1825,13 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       }
       moves = shape_moves;
     }
-    else if (pass == 0 || pass == 2) {
+    else if (newpass == 0 || newpass == 2) {
 
       if (stackp > owl_branch_depth && number_tried_moves > 0)
 	continue;
       
       moves = vital_moves;
-      if (pass == 0 || stackp > owl_distrust_depth) {
+      if (newpass == 0 || stackp > owl_distrust_depth) {
 	if (stackp == 0)
 	  move_cutoff = 70;
 	else if (true_genus + probable_min > 3)
@@ -1826,40 +1845,49 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	move_cutoff = 99; /* Effectively disable vital moves. */
     }
     else {
-#if 0
+#if 1
+      int goalcount=0;
       /* This code came up with a lot of useless moves, and the few cases
        * where it helped can be fixed with patterns.
        * FIXME: Perhaps this code should be reinstated with a test
        * to determine whether the whole dragon is a single worm.
        */
-
-      /* Look for a tactical defense. This is primarily intended for
-       * the case where the whole dragon is a single string, therefore
-       * we only look at the string at the "origin".
-       *
-       * We only accept clearly effective tactical defenses here,
-       * using a liberty heuristic. The reason for this is problems
-       * with ineffective self ataris which do defend tactically but
-       * have no strategical effect other than wasting owl nodes or
-       * confusing the eye analysis.  */
-      int dpos;
-      SGFTree *save_sgf_dumptree = sgf_dumptree;
-      int save_count_variations = count_variations;
-      
-      sgf_dumptree = NULL;
-      count_variations = 0;
-      if (attack_and_defend(str, NULL, NULL, NULL, &dpos)
-	  && (approxlib(dpos, color, 2, NULL) > 1
-	      || does_capture_something(dpos, color))) {
-	shape_moves[0].pos         = dpos;
-	shape_moves[0].value       = 25;
-	shape_moves[0].name        = "tactical defense";
-	shape_moves[0].same_dragon = 1;
-	shape_moves[1].value       = 0;
-	moves = shape_moves;
+      /* Let's say, if the goal is small, try a tactical defense 
+       * tm added (3.1.22) */
+      for (k=0; k<BOARDMAX; k++) {
+	goalcount += owl->goal[k];
       }
-      sgf_dumptree = save_sgf_dumptree;
-      count_variations = save_count_variations;
+
+      if (goalcount < 5) {
+
+	/* Look for a tactical defense. This is primarily intended for
+	 * the case where the whole dragon is a single string, therefore
+	 * we only look at the string at the "origin".
+	 *
+	 * We only accept clearly effective tactical defenses here,
+	 * using a liberty heuristic. The reason for this is problems
+	 * with ineffective self ataris which do defend tactically but
+	 * have no strategical effect other than wasting owl nodes or
+	 * confusing the eye analysis.  */
+	int dpos;
+	SGFTree *save_sgf_dumptree = sgf_dumptree;
+	int save_count_variations = count_variations;
+      
+	sgf_dumptree = NULL;
+	count_variations = 0;
+	if (attack_and_defend(str, NULL, NULL, NULL, &dpos)
+	    && (approxlib(dpos, color, 2, NULL) > 1
+		|| does_capture_something(dpos, color))) {
+	  shape_moves[0].pos         = dpos;
+	  shape_moves[0].value       = 25;
+	  shape_moves[0].name        = "tactical defense";
+	  shape_moves[0].same_dragon = 1;
+	  shape_moves[1].value       = 0;
+	  moves = shape_moves;
+	}
+	sgf_dumptree = save_sgf_dumptree;
+	count_variations = save_count_variations;
+      }
 #endif
     }
 
@@ -1919,7 +1947,12 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	if (!acode) {
 	  pop_owl(owl);
 	  popgo();
-	  SGFTRACE(mpos, WIN, "defense effective - A");
+	  if (sgf_dumptree) {
+	    char winstr[192];
+	    sprintf(winstr, "defense effective)\n  (%d variations",   
+	  		    count_variations - this_variation_number);
+	    SGFTRACE(mpos, WIN, winstr);
+	  }
 	  READ_RETURN(read_result, move, mpos, WIN);
 	}
 	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, mpos);
@@ -1947,13 +1980,15 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     READ_RETURN(read_result, move, 0, WIN);
   }
   
-  if (true_genus == 1) {
-    SGFTRACE(0, 0, "genus 1");
+
+  if (sgf_dumptree) {
+    char winstr[196];
+    int print_genus = true_genus == 1 ? 1 : 0;
+    sprintf(winstr, "defense failed - genus %d)\n  (%d variations",
+	  	    print_genus, count_variations - this_variation_number);
+    SGFTRACE(0, 0, winstr);
   }
-  else {
-    SGFTRACE(0, 0, "genus 0");
-  }
-  
+
   READ_RETURN0(read_result);
 }
 

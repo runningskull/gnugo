@@ -65,7 +65,7 @@ my %colors = ("ALIVE", "green",
 
 my $query = new CGI;
 my ($tstfile, $num, $sortby, $sgf, $reset, $trace, $bycat,
-     $unexpected, $slow, $special, $move);
+     $unexpected, $slow, $special, $move, $small);
 
 ($tstfile, $num) = ($query->query_string() =~ /keywords=(.*)%3A(.*)/);
 
@@ -81,6 +81,7 @@ if (!$tstfile) {
   $slow = $query->param("slow");
   $special = $query->param("special");
   $move = $query->param("move");
+  $small = $query->param("small");
 }
 
 sub sgfFile(%);
@@ -337,9 +338,11 @@ if ($move) {
   
   my $blank=1;
   my $inpattern=0;
+  $move = uc($move);
   print "<PRE>\n";
   while (<FILE>) {
-    if (/$move[^0-9]/i || 
+    if (/^$move[^0-9]/ || 
+        /[^A-Za-z0-9]$move[^0-9]/ || 
         $inpattern && /^\.\.\./) {
       print .encode_entities($_);
       $blank=0;
@@ -509,6 +512,10 @@ if ($num) {
  # print %attribs;
   
 } else {
+  
+  if ($small) {
+    summaryDiagrams();
+  }
 #CASE 3 - test file summary.
 #  if (!-e "html/$tstfile.tst/index.html") {
     summarizeTestFile();
@@ -521,6 +528,58 @@ if ($num) {
 #  }
 #  close TESTFILE;
 }
+
+
+sub summaryDiagrams() {
+  my $content;
+  foreach my $curfile (glob("html/$tstfile.tst/*.xml"))
+  {
+    $curfile =~ s/html.$tstfile.tst.(.*xml)/$1/;
+    local $/;
+    undef($/);
+    open(FILE, "html/$tstfile.tst/$curfile");
+    $content = <FILE>;
+    close FILE;
+
+    my %attribs = %{game_parse($content, 1)};
+
+    print "<HR>$attribs{num}:";
+
+    my $boardsize = $attribs{"boardsize"};  #need to add to export.
+    my $colorboard;
+    $colorboard .= "<TABLE border=0 cellpadding=0 cellspacing=0>\n"
+             . "\n";
+
+  my $img_pix_size = 9;
+    
+  for (my $j = $boardsize; $j > 0; $j--) {
+    my $jA = $j;
+    $jA .= " " if ($j <= 9);
+    $colorboard .= "<TR>\n";
+    for (my $i = 1; $i <= $boardsize; $i++) {
+      my $iA = ord('A') + $i - 1;
+      if ($iA >= ord('I')) { $iA++; }
+      $iA = chr($iA);  
+      my $coord = $iA.$j;
+      my $bw = pval($coord, "stone");
+      my $alt = "";
+      
+      my $colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", "","","","", "");
+      $colorboard .= qq@  <TD>@ .
+                     qq@<IMG border=0 HEIGHT=$img_pix_size WIDTH=$img_pix_size @ . 
+                     qq@SRC="html/images/$colorboard_imgsrc"></A></TD>\n@;
+    }
+    $colorboard .= "</TR>\n";
+  }
+  #$colorboard .= colorboard_letter_row($boardsize);
+  $colorboard .= "\n</TABLE>\n";  
+  
+  print $colorboard;
+  }
+
+  exit;
+}
+
 
 
 my %files;
@@ -545,6 +604,7 @@ sub summarizeTestFile {
   <TH>gtp</TH>
   <TH><A href="?tstfile=$tstfile&sortby=cputime">cputime</A></TH>
   <TH><A href="?tstfile=$tstfile&sortby=owl_node">owl_node</A></TH>
+  <TH>100*time/node</TH>
 </TR>\n@;
 
   my @files = glob("html/$tstfile.tst/*.xml");
@@ -620,12 +680,14 @@ sub summarizeTestFile {
     my $r = $h{result};
     $r =~ s@^([A-Z]*)$@<B>$1</B>@;
     print TF "<TR><TD>$h{filepos}</TD><TD>$numURL</TD><TD>$r</TD><TD>$h{expected}</TD>"
-        . "<TD>$h{got}</TD><TD>$h{gtp}</TD><TD>$h{cputime}</TD><TD>$h{owl_node}</TD></TR>\n";
+        . "<TD>$h{got}</TD><TD>$h{gtp}</TD><TD>$h{cputime}</TD><TD>$h{owl_node}</TD>"
+        . "<TD>".sprintf("%.2f",100*$h{cputime}/$h{owl_node})."</TD></TR>\n";
     $totals{cputime} += $h{cputime};
     $totals{owl_node} += $h{owl_node};
   }
   print TF "<TR><TD>Total</TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD>"
-    . "<TD>&nbsp;</TD><TD>&nbsp;</TD><TD>$totals{cputime}</TD><TD>$totals{owl_node}</TD></TR>\n";
+    . "<TD>&nbsp;</TD><TD>&nbsp;</TD><TD>$totals{cputime}</TD><TD>$totals{owl_node}</TD>"
+    ." <TD>".sprintf("%.2f",100*$totals{cputime}/$totals{owl_node})."</TD></TR>\n";
   print TF "</TABLE>";
   #close TF;
 }
@@ -635,8 +697,11 @@ sub summarizeTestFile {
 sub pval {
   my ($coord, $attrib) = @_;
   if ($points{$coord}) {
-    $points{$coord} =~ m@$attrib="(.*?)"@;
-    if ($1) {
+#    print "$coord $attrib<BR>\n";
+    if ($points{$coord} =~ m@$attrib="(.*?)"@) {
+     # if ($attrib eq 'stone') {
+ #       print "$attrib=$1<BR>\n";
+      #}
       return $1;
     } else {
       return "";
@@ -845,8 +910,6 @@ sub printunexpected{
     print "<HTML><HEAD><TITLE>Unexpected results - GNU Go</TITLE></HEAD>\n";
     print "<BODY><H4>Unexpected results</H4>";
 
-    print "<TABLE border=1>";
-    print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD></TR>\n";
     foreach my $k (sort keys %h) {
       my $status = %{$h{$k}}->{status};
       defined $status or do { warn "missing status for $k"; next;};
@@ -869,22 +932,30 @@ sub printunexpected{
       }
     }
 
+    print "<TABLE border=1>\n";
+    print qq@<TR><TD>FAILS</TD><TD>@.scalar(@ufails).qq@</TD></TR>\n@;
+    print qq@<TR><TD>fails</TD><TD>@.scalar(@fails).qq@</TD></TR>\n@;
+    print qq@<TR><TD>PASSES</TD><TD>@.scalar(@upasses).qq@</TD></TR>\n@;
+    print qq@<TR><TD>passes</TD><TD>@.scalar(@passes).qq@</TD></TR>\n@;
+    print qq@<TR><TD>pass : fail</TD><TD>@.
+              sprintf("%.2f : 1", ((@upasses + @passes) / (@ufails + @fails))).
+              qq@</TD></TR>\n@;
+    print "</TABLE><BR>\n";
+
+    print "<TABLE border=1>";
+    print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD></TR>\n";
     foreach (@ufails) {
       print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>FAILED</TD></TR>\n@;
-    }
-
-    foreach (@upasses) {
-      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>PASSED</TD></TR>\n@;
     }
     foreach (@fails) {
       print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>failed</TD></TR>\n@;
     }
-
+    foreach (@upasses) {
+      print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>PASSED</TD></TR>\n@;
+    }
     foreach (@passes) {
       print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>passed</TD></TR>\n@;
     }
-
-    
     print "</TABLE>\n";
     print "</body></html>\n";
     

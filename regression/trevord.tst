@@ -98,6 +98,12 @@ loadsgf games/trevor/auto/d02.sgf 142
 #? [Q2]*
 
 
+loadsgf games/trevor/auto/d02.sgf 142
+white Q2
+261 defend P2
+#? [0]*
+
+
 #Set up big ko.
 loadsgf games/trevor/auto/d02.sgf 150
 270 gg_genmove white

@@ -124,7 +124,7 @@ timeval_print (FILE* f, double tv)
 }
 
 /******************************/
-/*  Initialisation functions  */
+/*  Initialization functions  */
 /******************************/
 
 

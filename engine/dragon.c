@@ -104,7 +104,7 @@ make_dragons(int color, int stop_before_owl)
       
       if (IS_STONE(board[ii]) && worm[ii].origin == ii)
 	DEBUG(DEBUG_DRAGONS, 
-	      "Initialising dragon from worm at %1m, size %d\n", 
+	      "Initializing dragon from worm at %1m, size %d\n", 
 	      ii, worm[ii].size);
     }
   time_report(2, "  time to initialize dragons", NO_MOVE, 1.0);

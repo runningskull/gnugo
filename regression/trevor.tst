@@ -610,6 +610,10 @@ loadsgf games/trevor/trevor_74.sgf
 740 owl_attack B4
 #? [1 A1]*
 
+#FIXME: Uncomment this problem when the crash (3.1.21) is repaired.
+###loadsgf games/trevor/trevor_75.sgf
+###750 disconnect O9 O7
+####? [0]*
 
 
 #CATEGORY=OWL_EYES

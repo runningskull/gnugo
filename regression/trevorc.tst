@@ -129,7 +129,7 @@ loadsgf games/trevor/auto/c17.sgf 42
 
 loadsgf games/trevor/auto/c17.sgf 50
 300 gg_genmove white
-#? [J2|J3|K2]*
+#? [J2|J3|K2|J13|K13]*
 
 
 loadsgf games/trevor/auto/c17.sgf 54
@@ -221,7 +221,7 @@ loadsgf games/trevor/auto/c23.sgf 72
 
 loadsgf games/trevor/auto/c23.sgf 92
 460 gg_genmove white
-#? [H8]
+#? [H8|K11]
 
 
 loadsgf games/trevor/auto/c23.sgf 96
@@ -246,7 +246,7 @@ loadsgf games/trevor/auto/c24.sgf 34
 # J2 looks bigger to me. /gf
 loadsgf games/trevor/auto/c24.sgf 62
 500 gg_genmove white
-#? [E7]*
+#? [J2]*
 
 
 
@@ -284,7 +284,7 @@ loadsgf games/trevor/auto/c28.sgf 36
 
 loadsgf games/trevor/auto/c30.sgf 62
 550 gg_genmove white
-#? [C2]*
+#? [C2|E3]*
 
 
 loadsgf games/trevor/auto/c30.sgf 80
@@ -293,7 +293,7 @@ loadsgf games/trevor/auto/c30.sgf 80
 
 
 loadsgf games/trevor/auto/c30.sgf 92
-570 gg_genmove white
+570 gg_genmove white 2
 #? [!N9]*
 
 
@@ -477,6 +477,9 @@ loadsgf games/trevor/auto/c51.sgf 62
 #? [C12]*
 
 
+#CATEGORY=CONNECTION
+#DESCRIPTION=
+#SEVERITY=
 loadsgf games/trevor/auto/c51.sgf 74
 860 gg_genmove white
 #? [E3]*
@@ -560,12 +563,12 @@ loadsgf games/trevor/auto/c60.sgf 32
 
 loadsgf games/trevor/auto/c60.sgf 46
 990 gg_genmove white
-#? [!B8]*
+#? [!B8|M5]*
 
 
 loadsgf games/trevor/auto/c60.sgf 64
 1000 gg_genmove white
-#? [E11|G11|E1|M5]*
+#? [N9|M11]*
 
 
 
@@ -731,12 +734,12 @@ loadsgf games/trevor/auto/c70.sgf 38
 
 loadsgf games/trevor/auto/c70.sgf 48
 1270 gg_genmove white
-#? [G13]*
+#? [G13|A7]
 
 
 loadsgf games/trevor/auto/c70.sgf 58
 1280 gg_genmove white
-#? [G13]*
+#? [G13|A7]
 
 
 
@@ -760,16 +763,17 @@ loadsgf games/trevor/auto/c72.sgf 28
 
 loadsgf games/trevor/auto/c72.sgf 64
 1320 gg_genmove white
-#? [K6]*
+#? [K6|E13]
 
 
 
 
 # games/trevor/auto/c73.sgf problems:
 
-loadsgf games/trevor/auto/c73.sgf 32
-1330 gg_genmove white
-#? [C7]*
+# virtual duplicate of 1340 
+#loadsgf games/trevor/auto/c73.sgf 32
+#1330 gg_genmove white
+##? [C7]*
 
 
 loadsgf games/trevor/auto/c73.sgf 34

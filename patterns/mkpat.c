@@ -216,6 +216,10 @@ static struct autohelper_func autohelper_functions[] = {
   {"oplay_attack",   -1, "play_attack_defend_n(color, 1, %d"},
   {"xplay_break_through", -3, "play_break_through_n(OTHER_COLOR(color), %d"},
   {"oplay_break_through", -3, "play_break_through_n(color, %d"},
+  {"oplay_connect", -2, "play_connect_n(color, 1, %d"},
+  {"xplay_connect", -2, "play_connect_n(OTHER_COLOR(color), 1, %d"},
+  {"oplay_disconnect", -2, "play_connect_n(color, 0, %d"},
+  {"xplay_disconnect", -2, "play_connect_n(OTHER_COLOR(color), 0, %d"},
   {"seki_helper",     1, "seki_helper(%s)"},
   {"threaten_to_save",1,"threaten_to_save_helper(move,%s)"},
   {"threaten_to_capture",1,"threaten_to_capture_helper(move,%s)"},
@@ -836,7 +840,7 @@ finish_pattern(char *line)
 
   /* Now parse the line. Only the symmetry character and the class
    * field are mandatory. The compiler guarantees that all the fields
-   * are already initialised to 0.
+   * are already initialized to 0.
    */
 
   {
@@ -1638,8 +1642,8 @@ main(int argc, char *argv[])
       if (patno >= 0) {
 	switch (state) {
 	case 1:
-	  fprintf(stderr, "Warning: empty pattern %s\n",
-		  pattern_names[patno]);
+	  fprintf(stderr, "%s(%d) : Warning: empty pattern %s\n",
+		  current_file, current_line_number, pattern_names[patno]);
 	  break;
 	case 2:
 	case 3:
@@ -1650,8 +1654,8 @@ main(int argc, char *argv[])
 	case 5:
 	case 6:
 	  fprintf(stderr,
-		  "Warning: constraint diagram but no constraint line for pattern %s\n",
-		  pattern_names[patno]);
+		  "%s(%d) : Warning: constraint diagram but no constraint line for pattern %s\n",
+		  current_file, current_line_number, pattern_names[patno]);
 	  break;
 	case 7:
 	case 8:
@@ -1812,11 +1816,6 @@ main(int argc, char *argv[])
 
 
   write_pattern_db(output_FILE, argv[gg_optind]);
-
-  if (fatal_errors) {
-    fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n",
-	    current_file);
-  }
 
   if (fatal_errors) {
     fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n",

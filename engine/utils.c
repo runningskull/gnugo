@@ -419,19 +419,20 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 #endif
   
 
-  /* FIXME: tm - Should be able to return Ko status as well.  Should be
-     a simple fix.  For now, returning WIN (used to return 1) (3.1.20) */
+  /* FIXED: tm - returns ko results correctly (3.1.22) */
   if (do_attack) {
-    if (board[ypos] == EMPTY
-	|| board[zpos] == EMPTY
-	|| attack_either(ypos, zpos))
+    if (board[ypos] == EMPTY || board[zpos] == EMPTY) {
       success = WIN;
+    } else {
+      success = attack_either(ypos, zpos);
+    }
   }
   else {
-    if (board[ypos] != EMPTY
-	&& board[zpos] != EMPTY
-	&& defend_both(ypos, zpos))
-      success = WIN;
+    if (board[ypos] == EMPTY || board[zpos] == EMPTY) {
+      success = 0;
+    } else {
+      success = defend_both(ypos, zpos);
+    }
   }
 
 #if 0
@@ -445,6 +446,88 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
   va_end(ap);
   return success;
 }
+
+
+/* FIXME: documentation needs expanding - identical in concept 
+ * to play_attack_defend2_n
+ */
+
+int 
+play_connect_n(int color, int do_connect, int num_moves, ...)
+{
+  va_list ap;
+  int mcolor = color;
+  int success = 0;
+  int i;
+  int played_moves = 0;
+  int apos;
+  int ypos;
+  int zpos;
+
+  /* FIXME: very pessimistic approach if connections module not
+   * included. */
+  if (!experimental_connections) {
+    return do_connect;
+  }
+
+  va_start(ap, num_moves);
+
+  /* Do all the moves with alternating colors. */
+  for (i = 0; i < num_moves; i++) {
+    apos = va_arg(ap, int);
+
+    if (apos != NO_MOVE
+	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE,
+		    EMPTY, NO_MOVE)
+	    || tryko(apos, mcolor, "play_attack_defend_n", EMPTY, NO_MOVE)))
+      played_moves++;
+    mcolor = OTHER_COLOR(mcolor);
+  }
+
+  /* Now do the real work. */
+  ypos = va_arg(ap, int);
+  zpos = va_arg(ap, int);
+
+  /* Temporarily increase the depth values with the number of explicitly
+   * placed stones.
+   *
+   * This improves the reading of pattern constraints but
+   * unfortunately tends to be too expensive. For the time being it is
+   * disabled.
+   */
+#if 0
+  modify_depth_values(played_moves);
+#endif
+  
+  if (do_connect) {
+    if (board[ypos] == EMPTY || board[zpos] == EMPTY) {
+      success = 0;
+    } else {
+      int move;
+      success = string_connect(ypos, zpos, &move);
+    }
+  }
+  else {
+    if (board[ypos] == EMPTY || board[zpos] == EMPTY) {
+      success = WIN;
+    } else {
+      int move;
+      success = disconnect(ypos, zpos, &move);
+    }
+  }
+
+#if 0
+  modify_depth_values(-played_moves);
+#endif
+  
+  /* Pop all the moves we could successfully play. */
+  for (i = 0; i < played_moves; i++)
+    popgo();
+
+  va_end(ap);
+  return success;
+}
+
 
 
 /* 

@@ -163,7 +163,7 @@ if (!$goprog) {
 }
 
 if ($goprog !~ / /) {
-  $goprog .=  " --mode gtp --quiet -t -w -d0x101800 --showtime";  
+  $goprog .=  " --mode gtp --quiet -t -w -d0x101840 --showtime";  
 }
 
 die $helpstring unless defined $goprog;

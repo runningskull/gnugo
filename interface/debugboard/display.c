@@ -90,7 +90,7 @@ gg_wprintw (WINDOW *w, const char *format, ... )
 
 
 /*
- * Initialise the curses package, and draw the windows.
+ * Initialize the curses package, and draw the windows.
  *
  * Return 1 if ok, otherwise return 0.
  */

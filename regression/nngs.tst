@@ -140,6 +140,11 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 82
 370 gg_genmove black
 #? [!Q1]*
 
+# W misses break-chain (I think!?!) -tm 
+loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 82
+371 attack R5
+#? [0]*
+
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 126
 380 gg_genmove black
@@ -496,6 +501,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 92
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 98
 1100 gg_genmove white
 #? [!B19]
+
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 146

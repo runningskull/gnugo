@@ -97,7 +97,7 @@ make_letterbar(int boardsize, char *letterbar)
 
 /* This array contains +'s and -'s for the empty board positions.
  * hspot_size contains the board size that the grid has been
- * initialised to.
+ * initialized to.
  */
 
 static int hspot_size;

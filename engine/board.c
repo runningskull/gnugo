@@ -567,6 +567,8 @@ do_trymove(int pos, int color, int ignore_ko)
       showboard(0);
       dump_stack();
     }
+    fflush(stdout);
+    fflush(stderr);
     return 0;
   }
 
@@ -694,6 +696,8 @@ dump_stack(void)
 #endif
 
   gprintf("%o\n");
+  fflush(stdout);
+  fflush(stderr);
 }
 
 

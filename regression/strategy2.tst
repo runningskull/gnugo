@@ -121,6 +121,7 @@ loadsgf games/strategy19.sgf 94
 #? [A8]*
 
 # I have added R17, as it seems to kill the huge black dragon --arend
+# Note: E7 doesn't work because of B:D9.
 loadsgf games/semeai2.sgf 116
 73 gg_genmove white
 #? [F7|R17]*

@@ -105,6 +105,7 @@ loadsgf games/incident221.sgf 39
 #? [C7]
 
 # incident 223
+# see also owl:178
 loadsgf games/incident223.sgf 228
 122 gg_genmove black
 #? [(R19|T18)]

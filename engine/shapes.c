@@ -302,7 +302,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     add_expand_moyo_move(move);
     TRACE("...expands moyo\n");
     set_minimum_move_value(move, 27);
-    TRACE("... minimum move value %f\n", 27);
+    TRACE("... minimum move value %f\n", 27.0);
   }
 
   /* Pattern class j, less urgent joseki move. Add expand territory and

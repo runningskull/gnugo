@@ -616,7 +616,7 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
 	if (heye[pos2].value == 3.0)
 	  gprintf("%1m (XH)\n", pos2);
 	else
-	  gprintf("%1m (XH) (topological eye value = %f\n", pos2,
+	  gprintf("%1m (XH) (topological eye value = %f)\n", pos2,
 		  heye[pos2].value);
       }
       else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
@@ -627,7 +627,7 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
 	if (heye[pos2].value == 3.0)
 	  gprintf("%1m (H)\n", pos2);
 	else
-	  gprintf("%1m (H) (topological eye value = %f\n", pos2,
+	  gprintf("%1m (H) (topological eye value = %f)\n", pos2,
 		  heye[pos2].value);
       }
       else

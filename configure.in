@@ -57,12 +57,13 @@ AC_ARG_ENABLE(semeai-variations,
   [  --enable-semeai-variations=n          n = semeai variations (250 standard)])
 
 AC_ARG_ENABLE(dfa,
-  [  --enable-dfa                use new dfa pattern matcher (not default)],
-  [ case "${enableval}" in
-     yes) dfa_c=dfa ;;
-     no)  dfa_c = ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --enable-dfa) ;;
-   esac],[matcher=matchpat])
+ [  --disable-dfa             use old non-dfa pattern matcher],
+ [ if test ${enableval} = no; then	
+     dfa_c=
+   else	
+     dfa_c=dfa
+   fi] ,
+ [ dfa_c=dfa ])
 
 AC_ARG_ENABLE(chinese-rules,
  [  --enable-chinese-rules       tell the Go Modem Protocol to use Chinese Rules
@@ -325,7 +326,7 @@ fi
 
 dnl ------------ dfa -------------------
 
-AM_CONDITIONAL(DFA_ENABLED, test "$enable_dfa" = "yes")
+AM_CONDITIONAL(DFA_ENABLED, test "$enable_dfa" != "no")
 
 dnl FIXME: Is there a more elegant approach for this?
 dnl force owl c files rebuild

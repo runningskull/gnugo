@@ -654,6 +654,7 @@ loadsgf games/incident104.sgf 169
 177 owl_attack J19
 #? [1 (G13|J13|G12|G14)]
 
+# see also strategy3:122
 loadsgf games/incident223.sgf 228
 178 owl_attack R13
 #? [1 (R19|T18)]

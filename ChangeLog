@@ -2,15 +2,24 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- dfa made standard
 - comments added, cleanup around discard_redundant_move_reasons
 - unsafe tactical moves now taken care by discard_redundant_move_reasons
 - FIXME added for reevaluate_ko_threats
 - atari_atari_attack_patterns() uses a goal array to limit search area
 - new functions compute_aa_values(), get_aa_value(), and update_aa_goal()
-- ko contingent defenses excluded in get_saved_worms() and
-  get_saved_dragons()
+- ko contingent defenses excluded in get_saved_worms(), get_saved_dragons()
 - valuation of atari_atari move reasons revised
 - recognize_eye() revised
+- spelling corrections
+- fflush() added a few places
+- owl tries tactical defense for small groups
+- owl logs number of variations per sub-tree in SGF file
+- [ox]play_(attack_either|defend_both) handles ko correctly.
+- added [ox]play_connect and dis_connect helpers
+- allow followup value if defense threat is contingent on ko.
+- only allow territory move values if move is deemed safe.
+- reduce cutstone values in case of ko.
 - debug printing in influence.c slightly restructured
 - new function influence_moyo_color_opposite()
 - one trace output reenabled in confirm_safety()
