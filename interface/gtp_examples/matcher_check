@@ -547,19 +547,19 @@ sub check_matcher {
         eat_no_response($out);
         my $oa_result = "";
         my $oda_result = "";
-        print $in "owl_attack $vertex\n";
+        print $in "owl_attack $il_vertex\n";
         $oa_result = eat_one_line($out);
-        print "owl_attack $vertex\: $oa_result\n";
-        print $in "owl_does_attack $move $vertex\n";
+        print "owl_attack $il_vertex\: $oa_result\n";
+        print $in "owl_does_attack $il_move $il_vertex\n";
 	$oda_result = eat_one_line($out);
-	print "owl_does_attack $move $vertex\: $oda_result\n";
+	print "owl_does_attack $il_move $il_vertex\: $oda_result\n";
 
 	#now try to do something with it
 	if ($oa_result eq "= 0" and $oda_result ne "= 0") {
 	    print "found a missed attack.\n\n";
 	    my $m = $movenum - 1;
 	    print "loadsgf $sgffile $m\n";
-	    print "owl_attack $vertex\n";
+	    print "owl_attack $il_vertex\n";
 	    print "#$oa_result\n";
 	    print "#? [1 $move]*\n\n";
 	} else {
