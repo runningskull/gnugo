@@ -72,6 +72,7 @@ U = @U@
 VERSION = @VERSION@
 dfa_c = @dfa_c@
 glibconfig = @glibconfig@
+perl = @perl@
 
 noinst_LIBRARIES = libutils.a
 

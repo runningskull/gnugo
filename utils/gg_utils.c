@@ -278,7 +278,6 @@ int gg_cputime(void)
     FILETIME creationTime, exitTime, kernelTime, userTime;
     ULARGE_INTEGER uKernelTime,uUserTime,uElapsedTime;
     unsigned long ulElapsedTime;
-    UNUSED(s);
     GetProcessTimes(GetCurrentProcess(), &creationTime, &exitTime, &kernelTime, &userTime);
     uKernelTime.LowPart = kernelTime.dwLowDateTime;
     uKernelTime.HighPart = kernelTime.dwHighDateTime;
