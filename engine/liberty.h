@@ -37,7 +37,6 @@
 
 #define FALSE_EYE          1
 #define HALF_EYE           2
-#define INHIBIT_CONNECTION 4
 
 
 #define REVERSE_RESULT(result)		(WIN - result)
@@ -304,6 +303,7 @@ void restore_depth_values(void);
 int safe_move(int move, int color);
 int does_secure(int color, int move, int pos);
 
+void compute_new_dragons(int dragon_origins[BOARDMAX]);
 void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, char escape_value[BOARDMAX]);
 void compute_refined_dragon_weaknesses(void);
@@ -977,7 +977,6 @@ struct eye_data {
   char type;                 /* Various characteristics of the eyespace    */
   char neighbors;            /* number of neighbors in eyespace            */
   char marginal_neighbors;   /* number of marginal neighbors               */
-  char cut;                  /* Opponent can cut at vertex.                */
 };
 
 struct vital_eye_points {
@@ -990,6 +989,12 @@ extern struct vital_eye_points white_vital_points[BOARDMAX];
 
 extern struct eye_data white_eye[BOARDMAX];
 extern struct eye_data black_eye[BOARDMAX];
+
+/* Array with the information which was previously stored in the cut
+ * field and in the INHIBIT_CONNECTION bit of the type field in struct
+ * eye_data.
+ */
+extern int cutting_points[BOARDMAX];
 
 /* The following declarations have to be postponed until after the
  * definition of struct eye_data or struct half_eye_data.

@@ -105,7 +105,6 @@ clear_eye(struct eye_data *eye)
   eye->type = 0;
   eye->neighbors = 0;
   eye->marginal_neighbors = 0;
-  eye->cut = 0;
 }
 
 
@@ -209,15 +208,6 @@ make_domains(struct eye_data b_eye[BOARDMAX],
       }
     }
   }
-  
-  /* 
-   * If called from make_dragons, search connection database for cutting
-   * points, which may modify the eyespace in order to avoid amalgamation and
-   * reflect the weakness in the position. The following test fails
-   * if called from the owl code.
-   */
-  if (!owl_call)
-    find_cuts();
   
   /* The eye spaces are all found. Now we need to find the origins. */
   partition_eyespaces(b_eye, BLACK);

@@ -26,10 +26,9 @@
 
 
 /* Try to match all (permutations of) connection patterns at (m,n).
- * For each match, if it is a B pattern, set cutting point in worm
- * data structure and make eye space marginal for the connection
- * inhibiting entries of the pattern. If it is a C pattern, amalgamate
- * the dragons in the pattern.
+ * For each match, if it is a B pattern, set cutting point in
+ * cutting_points array. If it is a C pattern, amalgamate the dragons
+ * in the pattern.
  */
 
 static void
@@ -48,10 +47,6 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
   
   if ((pattern->class & CLASS_B) && !safe_move(move, other))
     return;
-
-  /* Reject C patterns in which an INHIBIT_CONNECTION was set
-   * previously during find_cuts.
-   */
 
   if (pattern->class & CLASS_C) {
     /* If C pattern, test if there are more than one dragon in this
@@ -103,9 +98,9 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 	/* transform pattern real coordinate */
 	int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
 
-	if (worm[pos].attack_codes[0] == WIN
-	  && (move == NO_MOVE
-	      || !does_defend(move, pos)))
+	if (attack(pos, NULL) == WIN
+	    && (move == NO_MOVE
+		|| !does_defend(move, pos)))
 	  return; /* Match failed */
       }
     }
@@ -126,23 +121,10 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
     pattern->autohelper(ll, move, color, 1);
   }
 
-  /* If it is a B pattern, set cutting point in eye data and make eye
-   * space marginal. Also set the connection inhibition property.
-   */
+  /* If it is a B pattern, set cutting point. */
   
   if (pattern->class & CLASS_B) {
-    if (color == WHITE) {
-      white_eye[move].cut = 1;
-      white_eye[move].type |= INHIBIT_CONNECTION;
-    }
-    else {
-      black_eye[move].cut = 1;
-      black_eye[move].type |= INHIBIT_CONNECTION;
-    }
-    if (color == WHITE && white_eye[move].color == WHITE)
-      white_eye[move].marginal = 1;
-    else if (color == BLACK && black_eye[move].color == BLACK)
-      black_eye[move].marginal = 1;
+    cutting_points[move] |= color;
   }
   else if (!(pattern->class & CLASS_C))
     return; /* Nothing more to do, up to the helper or autohelper
@@ -164,7 +146,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
     if ((pattern->class & CLASS_C)
 	&& board[pos] == color
 	&& pattern->patn[k].att == ATT_O
-	&& ((pattern->class & CLASS_s) || worm[pos].attack_codes[0] == 0)) {
+	&& ((pattern->class & CLASS_s) || attack(pos, NULL) == 0)) {
       if (first_dragon == NO_MOVE)
 	first_dragon = dragon[pos].origin;
       else if (second_dragon == NO_MOVE
@@ -186,14 +168,8 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
     if (pattern->class & CLASS_B) {
       if (pattern->patn[k].att != ATT_not)
 	break; /* The inhibition points are guaranteed to come first. */
-      if (color == WHITE && white_eye[pos].color == WHITE) {
-	white_eye[pos].type |= INHIBIT_CONNECTION;
-	DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
-      }
-      else if (color == BLACK && black_eye[pos].color == BLACK) {
-	black_eye[pos].type |= INHIBIT_CONNECTION;
-	DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
-      }
+      cutting_points[pos] |= color;
+      DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
     }
   } /* loop over elements */
 }

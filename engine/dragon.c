@@ -108,11 +108,11 @@ make_dragons(int stop_before_owl)
   dragon2_initialized = 0;
   initialize_dragon_data();
 
-  make_domains(black_eye, white_eye, 0);
-
   /* Find explicit connections patterns in database and amalgamate
    * involved dragons.
    */
+  memset(cutting_points, 0, sizeof(cutting_points));
+  find_cuts();
   find_connections();
 
   /* At this time, all dragons have been finalized and we can
@@ -121,6 +121,8 @@ make_dragons(int stop_before_owl)
    */
   initialize_supplementary_dragon_data();
   
+  make_domains(black_eye, white_eye, 0);
+
   /* Find adjacent worms which can be easily captured: */
   find_lunches();
 
@@ -1661,6 +1663,66 @@ show_dragons(void)
 }
 
 
+static int new_dragon_origins[BOARDMAX];
+
+/* Compute new dragons, e.g. after having made a move. This will not
+ * affect any global state.
+ */
+void
+compute_new_dragons(int dragon_origins[BOARDMAX])
+{
+  int pos;
+  int saved_cutting_points[BOARDMAX];
+
+  /* This is currently necessary in order not to mess up the
+   * worm[].cutstone2 field. See cutstone2_helper in
+   * patterns/helpers.c. On the other hand it shouldn't be very
+   * interesting to recompute dragons in the original position.
+   */
+  gg_assert(stackp > 0);
+  
+  memcpy(saved_cutting_points, cutting_points, sizeof(cutting_points));
+  memset(cutting_points, 0, sizeof(cutting_points));
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos)) {
+      if (board[pos] == EMPTY)
+	new_dragon_origins[pos] = NO_MOVE;
+      else
+	new_dragon_origins[pos] = find_origin(pos);
+    }
+  
+  find_cuts();
+  find_connections();
+
+  memcpy(cutting_points, saved_cutting_points, sizeof(cutting_points));
+  memcpy(dragon_origins, new_dragon_origins, sizeof(new_dragon_origins));
+}
+
+
+/* This gets called if we are trying to compute dragons outside of
+ * make_dragons(), typically after a move has been made.
+ */
+static void
+join_new_dragons(int d1, int d2)
+{
+  int pos;
+  /* Normalize dragon coordinates. */
+  d1 = new_dragon_origins[d1];
+  d2 = new_dragon_origins[d2];
+
+  /* If d1 and d2 are the same dragon, we do nothing. */
+  if (d1 == d2)
+    return;
+
+  ASSERT1(board[d1] == board[d2], d1);
+  ASSERT1(IS_STONE(board[d1]), d1);
+
+  /* Don't bother to do anything fance with dragon origins. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos) && new_dragon_origins[pos] == d2)
+      new_dragon_origins[pos] = d1;
+}
+
 /* 
  * join_dragons amalgamates the dragon at (d1) to the
  * dragon at (d2).
@@ -1672,6 +1734,14 @@ join_dragons(int d1, int d2)
   int ii;
   int origin; /* new origin */
 
+  /* If not called from make_dragons(), we don't work on the main
+   * dragon[] array.
+   */
+  if (stackp > 0) {
+    join_new_dragons(d1, d2);
+    return;
+  }
+  
   /* Normalize dragon coordinates. */
   d1 = dragon[d1].origin;
   d2 = dragon[d2].origin;
@@ -1864,12 +1934,7 @@ dragon_escape(char goal[BOARDMAX], int color,
       queue_start++;
 
       /* Do not pass connection inhibited intersections. */
-      if ((color == WHITE
-	   && ((white_eye[ii].type & INHIBIT_CONNECTION)
-	       || white_eye[ii].cut == 1))
-	  || (color == BLACK
-	      && ((black_eye[ii].type & INHIBIT_CONNECTION)
-		  || black_eye[ii].cut == 1)))
+      if (cut_possible(ii, OTHER_COLOR(color)))
 	continue;
       if (distance == 4)
 	escape_potential += escape_value[ii];

@@ -2,6 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- find_cuts() called from make_dragons() instead of make_domains()
+- new function compute_new_dragons() and new static function
+  join_new_dragons() in dragon.c
+- new global array cutting_points[]
+- cut field removed from struct eye_data
+- INHIBIT_CONNECTION bit no longer used in the type field of struct
+  eye_data
+- find_cuts() no longer allowed to modify eyespaces
 - bugfix in do_owl_analyze_semeai()
 - new and revised tests
 

@@ -4114,7 +4114,6 @@ gtp_eye_data(char *s)
   gtp_printf("type                 %d\n", e->type);
   gtp_printf("neighbors            %d\n", e->neighbors);
   gtp_printf("marginal_neighbors   %d\n", e->marginal_neighbors);
-  gtp_printf("cut                  %d\n", e->cut);
   
   gtp_printf("\n");
   return GTP_OK;

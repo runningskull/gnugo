@@ -218,6 +218,9 @@ cutstone2_helper(ARGS)
   int dpos;
   UNUSED(pattern);
   UNUSED(color);
+
+  if (stackp > 0)
+    return 0;
   
   apos = OFFSET_BY(-1, -1);
   bpos = OFFSET_BY(-1,  0);

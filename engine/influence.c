@@ -1303,11 +1303,8 @@ whose_moyo_restricted(const struct influence_data *q, int pos)
     color = WHITE; 
   else
     color = EMPTY;
-  
-  if (color == WHITE && (white_eye[pos].type & INHIBIT_CONNECTION))
-    return EMPTY;
-  
-  if (color == BLACK && (black_eye[pos].type & INHIBIT_CONNECTION))
+
+  if (cut_possible(pos, OTHER_COLOR(color)))
     return EMPTY;
   
   return color;

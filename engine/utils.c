@@ -79,12 +79,7 @@ defend_against(int move, int color, int apos)
 int
 cut_possible(int pos, int color)
 {
-  if (color == WHITE)
-    return (black_eye[pos].cut
-	    || (black_eye[pos].type & INHIBIT_CONNECTION));
-  else
-    return (white_eye[pos].cut
-	    || (white_eye[pos].type & INHIBIT_CONNECTION));
+  return (cutting_points[pos] & OTHER_COLOR(color)) != 0;
 }
 
 
