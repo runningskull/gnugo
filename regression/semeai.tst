@@ -205,6 +205,11 @@ loadsgf games/semeai/semeai10.sgf
 37 owl_analyze_semeai B11 L7
 #? [ALIVE DEAD B12]
 
+loadsgf games/semeai/semeai11.sgf
+38 owl_analyze_semeai B9 B8
+#? [ALIVE DEAD PASS]
+
+
 ########### end of semeai tests #################
 
 # Report number of nodes visited by the tactical reading
