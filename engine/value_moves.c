@@ -2439,36 +2439,33 @@ static void
 print_top_moves(void)
 {
   int k;
-  int m, n;
   int pos;
   float tval;
   
   for (k = 0; k < 10; k++)
     best_move_values[k] = 0.0;
-  
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
 
-      if (move[pos].final_value <= 0.0)
-	continue;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos) || move[pos].final_value <= 0.0)
+      continue;
       
-      tval = move[pos].final_value;
+    tval = move[pos].final_value;
 
-      for (k = 9; k >= 0; k--)
-	if (tval > best_move_values[k]) {
-	  if (k < 9) {
-	    best_move_values[k+1] = best_move_values[k];
-	    best_moves[k+1] = best_moves[k];
-	  }
-	  best_move_values[k] = tval;
-	  best_moves[k] = pos;
+    for (k = 9; k >= 0; k--)
+      if (tval > best_move_values[k]) {
+	if (k < 9) {
+	  best_move_values[k+1] = best_move_values[k];
+	  best_moves[k+1] = best_moves[k];
 	}
-    }
-
-  TRACE("\nTop moves:\n");
-  for (k = 0; k < 10 && best_move_values[k] > 0.0; k++) {
-    TRACE("%d. %1M %f\n", k+1, best_moves[k], best_move_values[k]);
+	best_move_values[k] = tval;
+	best_moves[k] = pos;
+      }
+  }
+  
+  if (verbose > 0 || (debug & DEBUG_TOP_MOVES)) {
+    gprintf("\nTop moves:\n");
+    for (k = 0; k < 10 && best_move_values[k] > 0.0; k++)
+      gprintf("%d. %1M %f\n", k+1, best_moves[k], best_move_values[k]);
   }
 }
 

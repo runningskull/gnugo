@@ -220,6 +220,8 @@ extern int profile_patterns;	/* print statistics of pattern usage */
 #define DEBUG_READING_CACHE         0x080000
 #define DEBUG_TERRITORY             0x100000
 #define DEBUG_OWL_PERSISTENT_CACHE  0x200000
+#define DEBUG_TOP_MOVES             0x400000
+
 /* hash flag bits 
  *
  * Regarding HASH_DEFAULT:

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new debug flag DEBUG_TOP_MOVES
 - regression revisions
 	
 3.2 released April 25, 2002

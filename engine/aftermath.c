@@ -999,6 +999,17 @@ play_aftermath(int color)
       }
     }
   }
+
+  if (debug & DEBUG_AFTERMATH) {
+    gprintf("White captured: %d\n", a->white_captured);
+    gprintf("Black captured: %d\n", a->black_captured);
+    gprintf("White prisoners: %d\n", a->white_prisoners);
+    gprintf("Black prisoners: %d\n", a->black_prisoners);
+    gprintf("White territory: %d\n", a->white_territory);
+    gprintf("Black territory: %d\n", a->black_territory);
+    gprintf("White area: %d\n", a->white_area);
+    gprintf("Black area: %d\n", a->black_area);
+  }
 }
 
 float
