@@ -151,10 +151,6 @@ loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 59
 #? [H8|K14|L15|L14]*
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
-38 gg_genmove black
-#? [R7]*
-
-loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
 39 gg_genmove black
 #? [R7]*
 
@@ -169,3 +165,38 @@ loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 145
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 153
 42 gg_genmove black
 #? [O9]*
+
+loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 10
+43 gg_genmove white
+#? [C18]
+
+loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 36
+44 gg_genmove white
+#? [C11|D12]
+
+loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 46
+45 gg_genmove white
+#? [!B10]
+
+# defense of the top right is urgent
+loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
+46 gg_genmove white
+#? [!J5]
+
+loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 12
+47 gg_genmove white
+#? [G15|F15|G16]
+
+loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 16
+48 gg_genmove white
+#? [R16]
+
+# W is trying to live with S14 but B:T14 threatens the corner.
+# Meanwhile B17 is urgent.
+loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 54
+49 gg_genmove white
+#? [B17]
+
+loadsgf games/nngs/gnugo-3.1.29-merlin-200203281708.sgf 33
+50 gg_genmove white
+#? [O10]
