@@ -146,7 +146,8 @@ int find_common_libs(int str1, int str2, int maxlib, int *libs);
 int have_common_lib(int str1, int str2, int *lib);
 
 void start_timer(int n);
-double time_report(int n, const char *occupation, int i, int j);
+double time_report(int n, const char *occupation, int i, int j, 
+		   double mintime);
 
 /* Play at (m, n) and then count the liberties. */
 int accurate_approxlib(int pos, int color, int maxlib, int *libs);

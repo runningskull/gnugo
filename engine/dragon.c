@@ -93,15 +93,15 @@ make_dragons(int color, int stop_before_owl)
 	      m, n, worm[POS(m, n)].size);
     }
 
-  time_report(2, "  time to initialize dragons", -1, -1);
+  time_report(2, "  time to initialize dragons", -1, -1, 1.0);
   make_domains(black_eye, white_eye, 0);
-  time_report(2, "  time to make domains", -1, -1);
+  time_report(2, "  time to make domains", -1, -1, 1.0);
 
   /* Find explicit connections patterns in database and amalgamate
    * involved dragons.
    */
   find_connections();
-  time_report(2, "  time to find connections", -1, -1);
+  time_report(2, "  time to find connections", -1, -1, 1.0);
   
   /* Amalgamate dragons sharing an eyespace (not ko). At the same time
    * we decide to which dragon an eyespace belongs. Ko eyespaces
@@ -145,14 +145,14 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
     }
-  time_report(2, "  time to amalgamate dragons", -1, -1);
+  time_report(2, "  time to amalgamate dragons", -1, -1, 1.0);
 
   /* At this time, all dragons have been finalized and we can
    * initialize the dragon2[] array. After that we can no longer allow
    * amalgamation of dragons.
    */
   initialize_supplementary_dragon_data();
-  time_report(2, "  time to initialize dragon2", -1, -1);
+  time_report(2, "  time to initialize dragon2", -1, -1, 1.0);
   
   /* Find adjacent worms which can be easily captured: */
   for (m = 0; m < board_size; m++)
@@ -195,7 +195,7 @@ make_dragons(int color, int stop_before_owl)
       }
     }
 
-  time_report(2, "  time to find lunches", -1, -1);
+  time_report(2, "  time to find lunches", -1, -1, 1.0);
 
   /* In case origins of dragons got moved, put the dragons of eyes aright. */
   for (i = 0; i < board_size; i++)
@@ -210,7 +210,7 @@ make_dragons(int color, int stop_before_owl)
 	  white_eye[POS(i, j)].dragon = dr;
       }
     }
-  time_report(2, "  time to fix origins", -1, -1);
+  time_report(2, "  time to fix origins", -1, -1, 1.0);
 
   /* Find topological half eyes and false eyes by analyzing the
    * diagonal intersections, as described in the Texinfo
@@ -300,7 +300,7 @@ make_dragons(int color, int stop_before_owl)
 	propagate_eye(POS(i, j), white_eye);
       }
     }
-  time_report(2, "  time to find eyes", -1, -1);
+  time_report(2, "  time to find eyes", -1, -1, 1.0);
 
   /* Now we compute the genus. */
   for (i = 0; i < board_size; i++)
@@ -338,7 +338,7 @@ make_dragons(int color, int stop_before_owl)
       }
     }
 
-  time_report(2, "  time to compute genus", -1, -1);
+  time_report(2, "  time to compute genus", -1, -1, 1.0);
 
   /* Compute the escape route measure. */
   for (m = 0; m < board_size; m++)
@@ -348,7 +348,7 @@ make_dragons(int color, int stop_before_owl)
 	DRAGON2(m, n).escape_route = compute_escape(m, n, 0);
       }
 
-  time_report(2, "  time to compute escape", -1, -1);
+  time_report(2, "  time to compute escape", -1, -1, 1.0);
 
   /* Update the segmentation of the initial influence before we
    * compute the surrounding moyo sizes. The reason for this is that
@@ -356,7 +356,7 @@ make_dragons(int color, int stop_before_owl)
    * into account.
    */
   resegment_initial_influence();
-  time_report(2, "  resegment_initial_influence", -1, -1);
+  time_report(2, "  resegment_initial_influence", -1, -1, 1.0);
 
   /* Compute the surrounding moyo sizes. */
   for (d = 0; d < number_of_dragons; d++) {
@@ -364,7 +364,7 @@ make_dragons(int color, int stop_before_owl)
 					      J(dragon2[d].origin),
 					      DRAGON(d).color, 1);
   }
-  time_report(2, "  influence_get_moyo_size", -1, -1);
+  time_report(2, "  influence_get_moyo_size", -1, -1, 1.0);
 
   /* Determine status: ALIVE, DEAD, CRITICAL or UNKNOWN */
   for (m = 0; m < board_size; m++)
@@ -374,7 +374,7 @@ make_dragons(int color, int stop_before_owl)
 	sgffile_dragon_status(m, n, dragon[POS(m, n)].status);
       }
     }
-  time_report(2, "  compute_dragon_status", -1, -1);
+  time_report(2, "  compute_dragon_status", -1, -1, 1.0);
 
   /* We must update the dragon status at every intersection before we
    * call the owl code. This updates all fields.
@@ -386,7 +386,7 @@ make_dragons(int color, int stop_before_owl)
     }
   
   find_neighbor_dragons();
-  time_report(2, "  find_neighbor_dragons", -1, -1);
+  time_report(2, "  find_neighbor_dragons", -1, -1, 1.0);
 
   if (stop_before_owl)
     return;
@@ -490,11 +490,11 @@ make_dragons(int color, int stop_before_owl)
 	      dragon[POS(m, n)].owl_threat_status = ALIVE;
 	  }
 	}
-	time_report(3, "    owl reading for dragon at ", m, n);
+	time_report(3, "    owl reading for dragon at ", m, n, 1.0);
       }
     }
 
-  time_report(2, "  owl reading", -1, -1);
+  time_report(2, "  owl reading", -1, -1, 1.0);
 
   /* The dragon data is now correct at the origin of each dragon but
    * we need to copy it to every vertex.  
@@ -527,7 +527,7 @@ make_dragons(int color, int stop_before_owl)
 	  dragon[POS(m, n)].matcher_status = dragon[POS(m, n)].status;
       }
 
-  time_report(2, "  compute matcher status", -1, -1);
+  time_report(2, "  compute matcher status", -1, -1, 1.0);
 
   /* Compute the safety value. */
   for (d = 0; d < number_of_dragons; d++) {
@@ -573,11 +573,11 @@ make_dragons(int color, int stop_before_owl)
       dragon2[d].safety = ALIVE;
   }
 
-  time_report(2, "  compute dragon safety", -1, -1);
+  time_report(2, "  compute dragon safety", -1, -1, 1.0);
 
   /* Resolve semeais. This may revise the safety and status fields. */
   semeai(color);
-  time_report(2, "  semeai module", -1, -1);
+  time_report(2, "  semeai module", -1, -1, 1.0);
 
   /* The matcher_status is now correct at the origin of each dragon
    * but we need to copy it to every vertex.
@@ -619,7 +619,7 @@ make_dragons(int color, int stop_before_owl)
       }
     }
   
-  time_report(2, "  revise inessentiality", -1, -1);
+  time_report(2, "  revise inessentiality", -1, -1, 1.0);
 
   /* Count the non-dead dragons. */
   lively_white_dragons = 0;

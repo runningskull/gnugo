@@ -1615,19 +1615,22 @@ start_timer(int n)
   timers[n] = gg_gettimeofday();
 }
 
-/* Report time spent and restart the timer. */
+/* Report time spent and restart the timer. Make no report if elapsed
+ * time is less than mintime.
+ */
 double
-time_report(int n, const char *occupation, int i, int j)
+time_report(int n, const char *occupation, int i, int j, double mintime)
 {
   double t;
   double dt;
   gg_assert(n >= 0 && n < NUMBER_OF_TIMERS);
+
   if (!showtime)
     return 0.0;
 
   t = gg_gettimeofday();
   dt = t - timers[n];
-  if (dt > 1.0) {
+  if (dt > mintime) {
     gprintf("%s", occupation);
     if (!is_pass(POS(i, j)))
       gprintf("%m", i, j);

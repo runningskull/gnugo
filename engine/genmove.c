@@ -103,7 +103,7 @@ examine_position(int color, int how_much)
   if (NEEDS_UPDATE(worms_examined)) {
     start_timer(0);
     make_worms();
-    time_report(0, "  make worms", -1, -1);
+    time_report(0, "  make worms", -1, -1, 1.0);
   }
   if (how_much == EXAMINE_WORMS) {
     verbose = save_verbose;
@@ -270,7 +270,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   /* Find out information about the worms and dragons. */
   start_timer(1);
   examine_position(color, EXAMINE_ALL);
-  time_report(1, "examine position", -1, -1);
+  time_report(1, "examine position", -1, -1, 1.0);
   if (level >= 8) {
     estimate_score(&lower_bound, &upper_bound);
     if (verbose || showscore) {
@@ -282,7 +282,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
 		lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound),
 		upper_bound > 0 ? "W " : "B ", gg_abs(upper_bound));
     }
-    time_report(1, "estimate score", -1, -1);
+    time_report(1, "estimate score", -1, -1, 1.0);
 
     /* The score will be used to determine when we are safely
      * ahead. So we want the most conservative score.
@@ -332,7 +332,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   /* Pattern matcher. */
   start_timer(1);
   shapes(color);
-  time_report(1, "shapes", -1, -1);
+  time_report(1, "shapes", -1, -1, 1.0);
   gg_assert(stackp == 0);
 
   /* Look for combination attacks. */
@@ -355,14 +355,14 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
       add_your_atari_atari_move(apos, aa_val);
     verbose = save_verbose;
   }
-  time_report(1, "atari atari", -1, -1);
+  time_report(1, "atari atari", -1, -1, 1.0);
 
   /* Review the move reasons and estimate move values. */
   if (review_move_reasons(i, j, &val, color, 
 			  pure_threat_value, lower_bound))
     TRACE("Move generation likes %m with value %f\n", *i, *j, val);
   gg_assert(stackp == 0);
-  time_report(1, "review move reasons", -1, -1);
+  time_report(1, "review move reasons", -1, -1, 1.0);
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
   if (val <= 6.0 && !disable_endgame_patterns) {
@@ -371,7 +371,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     if (review_move_reasons(i, j, &val, color, pure_threat_value, score))
       TRACE("Move generation likes %m with value %f\n", *i, *j, val);
     gg_assert(stackp == 0);
-    time_report(1, "endgame", -1, -1);
+    time_report(1, "endgame", -1, -1, 1.0);
   }
   
   /* If no move found yet, revisit any semeai and change the
@@ -387,7 +387,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
 	      *i, *j, val); 
       }
     }
-    time_report(1, "move reasons with revised semeai status", -1, -1);
+    time_report(1, "move reasons with revised semeai status", -1, -1, 1.0);
   }
 
   /* If still no move, fill a remaining liberty. This should pick up
@@ -398,7 +398,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     val = 1.0;
     TRACE("Filling a liberty at %m\n", *i, *j);
     move_considered(*i, *j, val);
-    time_report(1, "fill liberty", -1, -1);
+    time_report(1, "fill liberty", -1, -1, 1.0);
   }
 
   /* If we're instructed to play out the aftermath or capture all dead
@@ -411,7 +411,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     val = 1.0;
     TRACE("Aftermath move at %m\n", *i, *j);
     move_considered(*i, *j, val);
-    time_report(1, "aftermath_genmove", -1, -1);
+    time_report(1, "aftermath_genmove", -1, -1, 1.0);
   }
 
   /* If we're instructed to capture all dead opponent stones, generate
@@ -424,7 +424,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     val = 1.0;
     TRACE("Aftermath move at %m\n", *i, *j);
     move_considered(*i, *j, val);
-    time_report(1, "aftermath_genmove", -1, -1);
+    time_report(1, "aftermath_genmove", -1, -1, 1.0);
   }
 
   /* If no move is found then pass. */
@@ -445,9 +445,9 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     printf("Read result hits:     %d\n", stats.read_result_hits);
     printf("Hash collisions:      %d\n", stats.hash_collisions);
   }
-
-  if (showtime) {
-    double spent = time_report(0, "TIME to generate move at ", *i, *j);
+ 
+ if (showtime) {
+    double spent = time_report(0, "TIME to generate move at ", *i, *j, 1.0);
     total_time += spent;
     if (spent > slowest_time) {
       slowest_time = spent;

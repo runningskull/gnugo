@@ -50,6 +50,15 @@ loadsgf games/incident108b.sgf 176
 10 gg_genmove black
 #? [Q7]
 
+
+#CATEGORY=BAD_PROBLEM
+#DESCRIPTION=Not clear enough.
+#SEVERITY=0
+# From STRATEGY:
+#    2.7.178 makes the move at P17 which is better than the game
+#    move at P18 but probably inferior to the recommended move at P15.
+#    It is not totally clear to me that the move at P15 is really
+#    best since the 3-3 point is still open. 
 # incident 111
 loadsgf games/incident108b.sgf 178
 11 gg_genmove black
@@ -73,6 +82,13 @@ loadsgf games/incident121.sgf 24
 14 gg_genmove black
 #? [E9]
 
+#CATEGORY=BAD_PROBLEM
+#DESCRIPTION=Problem not clear enough.
+#SEVERITY=0
+#From STRATEGY:
+#     It is unclear that the recommended E9 is the best move. 
+#     W cannot cut at E11, or even threaten to cut and keep sente. 
+#     GNU Go 2.7.205 plays at G10 which is a good move.
 # incident 123
 # Again, E9 is not necessarily the best move.
 loadsgf games/incident121.sgf 60
@@ -84,11 +100,25 @@ loadsgf games/incident121.sgf 116
 16 gg_genmove black
 #? [H12]
 
+
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=N11 may not be biggest, but should be found.
+#SEVERITY=2
+#    2.7.179: This can surely be fixed with the addition of a
+#    pattern. After N11, the strings at M12 and N10 cannot both be 
+#    saved. This is not necessarily the biggest move on the board but 
+#    at least this move should be found.
+#
 # incident 165
 loadsgf games/incident165.sgf 108
 17 gg_genmove black
 #? [N11]*
 
+
+#CATEGORY=DYNAMIC_READING
+#DESCRIPTION=Atari is certainly better.
+#SEVERITY=4
+#PREDICESSOR=reading.tst#124
 # incident 166a
 # E5 is an overplay
 # See reading test 124
@@ -100,6 +130,11 @@ loadsgf games/strategy4.sgf
 19 gg_genmove black
 #? [!PASS]
 
+
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=S13 is terrible - negative value.
+#SEVERITY=8
+#    2.7.179: Owl code finds Q11 but it remains undervalued at 17 points.
 # incident 290
 loadsgf games/incident290.sgf 30
 20 gg_genmove black
@@ -137,6 +172,17 @@ loadsgf games/strategy5.sgf 12
 26 gg_genmove black
 #? [D3]
 
+
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=Blocking in the corner is better.
+#SEVERITY=3
+#    This test passed before 2.7.183, but for the wrong reason: 
+#    the move at C3 was allegedly an owl attack/defense point for 
+#    the dragon at D3, which of course it is not.
+#
+#    Thus this example should be regarded as having been already
+#    broken.
+#
 loadsgf games/strategy5.sgf 14
 27 gg_genmove black
 #? [C3]*
@@ -191,10 +237,32 @@ loadsgf games/nicklas/nicklas8.sgf 96
 39 gg_genmove black
 #? [P16]
 
+
+#CATEGORY=STRATEGY
+#DESCRIPTION=L14 is not a terrible way to attack O13 group.
+#SEVERITY=2
+#Consider retiring this problem, or adding L14.  L14 is not terrible.
+#M11 is better than L4
+#    2.7.231: Broke again. M11 is overrated at 28 points. The
+#    large followup value is responsible.
 loadsgf games/nicklas/nicklas8.sgf 98
 40 gg_genmove black
 #? [E5]*
 
+
+#CATEGORY=STRATEGY
+#DESCRIPTION=N16 is better than M11.  Could be a tough attack, though.
+#SEVERITY=4
+#    2.7.179: After fixing strategy 40, the spurious defenses of D19
+#    will be removed. Now N16 will be the most valuable move. So 
+#    this should be fixed automatically when 40 is fixed.
+#
+#    2.7.180: this test passes.
+#
+#    2.7.220: N12 is found as an owl attack point for the S14 dragon.
+#    This attack will probably fail. More seriously, M16 is preferred
+#    to N16.
+#
 loadsgf games/nicklas/nicklas8.sgf 106
 41 gg_genmove black
 #? [N16]*
@@ -208,6 +276,23 @@ loadsgf games/strategy10.sgf
 43 gg_genmove white
 #? [B13|B14|A14]
 
+#CATEGORY=STRATEGY
+#DESCRIPTION=L4 is awkward.
+#SEVERITY=2
+#    2.7.179: Whether or not the recommended move at G2 is found, the 
+#    move at A6 is egregiously bad. In this situation an owl critical 
+#    dragon adjoins an owl dead one. We need to revisit our policy for 
+#    such situations. The reading code thinks the worm at B4 can be 
+#    defended, so this is an owl lunch.
+#
+#    2.7.180: After revision of semeai.c, the move at A6 is no longer
+#    found. Now GNU plays at M16 on the top. Arguably stabilizing
+#    the bottom at G2 or (worse but still OK) at J2 is better but
+#    I would class this result as ACCEPTABLE.
+#
+#    3.1.9: Best move here is tough.  GnuGo correctly tries
+#    to stabalize G3 group.
+#
 loadsgf games/strategy11.sgf 77
 44 gg_genmove black
 #? [G2]*
@@ -225,6 +310,9 @@ loadsgf games/strategy12.sgf 9
 47 gg_genmove black
 #? [!N17]
 
+#CATEGORY=FUSEKI_STRATEGY
+#DESCRIPTION=B17 better than D17
+#SEVERITY=3
 loadsgf games/strategy12.sgf 19
 48 gg_genmove black
 #? [B17]*
@@ -234,11 +322,16 @@ loadsgf games/strategy12.sgf 21
 49 gg_genmove black
 #? [C17|D16|B17]
 
+
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=P9 is pointless compared to Q9.
+#SEVERITY=8
 # Q9 is clearly better than Q11 because it stops a black connection
 # along the edge.
+# So much better, that I removed Q11 option -trevor
 loadsgf games/strategy13.sgf
 50 gg_genmove white
-#? [Q9|Q11]*
+#? [Q9]*
 
 
 
