@@ -130,6 +130,6 @@ loadsgf games/filllib11.sgf
 
 loadsgf games/nngs/gnugo-3.1.34-guest1-200204242025.sgf 86
 39 gg_genmove white
-#? [G12|F12|G13]*
+#? [G12|F12|G13]
 40 gg_genmove black
 #? [K13]

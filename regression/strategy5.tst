@@ -59,7 +59,7 @@ loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 107
 # If tuning this position be sure GNU Go plays subsequent moves acceptably
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 17
 232 gg_genmove black
-#? [D11|E11]
+#? [D11|E11]*
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 23
 233 gg_genmove black

@@ -844,7 +844,7 @@ loadsgf games/nicklas/nicklas18.sgf 17
 
 loadsgf games/incident240.sgf 69
 229 owl_attack B12
-#? [1 D9]*
+#? [1 D9]
 
 loadsgf games/owl31.sgf 20
 230 owl_defend G7

@@ -50,7 +50,7 @@ loadsgf games/incident278.sgf 322
 # This result appears to be wrong. B can get a ko by playing D10.
 loadsgf games/incident256.sgf 215
 60 gg_genmove black
-#? [H7]
+#? [H7]*
 
 # incident 259
 loadsgf games/incident258.sgf 251

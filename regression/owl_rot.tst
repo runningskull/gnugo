@@ -27,7 +27,7 @@ orientation 1
 loadsgf games/owl23.sgf
 # This isolates the problem in test 4
 170 owl_attack B14
-#? [0]*
+#? [0]
 
 orientation 1
 loadsgf games/golife.sgf 46

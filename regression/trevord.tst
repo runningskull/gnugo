@@ -14,7 +14,7 @@ loadsgf games/trevor/auto/d01.sgf 28
 
 loadsgf games/trevor/auto/d01.sgf 36
 120 gg_genmove white
-#? [B9]*
+#? [B9]
 
 
 loadsgf games/trevor/auto/d01.sgf 46
@@ -564,7 +564,7 @@ loadsgf games/trevor/auto/d46.sgf 156
 
 loadsgf games/trevor/auto/d46.sgf 228
 1070 gg_genmove white
-#? [R13]
+#? [R13]*
 
 
 

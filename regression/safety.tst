@@ -22,5 +22,5 @@ loadsgf games/cgf2002/gnu-har.sgf 21
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203080451.sgf 42
 5 gg_genmove white
-#? [K8|L9|L7]
+#? [K8|L9|L7]*
 

@@ -265,7 +265,7 @@ trymove black C1
 trymove white C2
 trymove black F1
 262 defend C2
-#? [0]*
+#? [0]
 popgo
 popgo
 popgo

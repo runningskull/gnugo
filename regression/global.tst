@@ -54,7 +54,7 @@ loadsgf golois/Goemate990902-15.sgf
 # Semeai problem.
 loadsgf golois/Goemate990902-1.sgf
 14 gg_genmove black
-#? [S9]
+#? [S9]*
 
 loadsgf golois/Goemate990903-10.sgf
 15 gg_genmove black
@@ -131,11 +131,11 @@ loadsgf golois/GoMaster991113-5.sgf
 
 loadsgf golois/GoStar991114-1.sgf
 31 gg_genmove black
-#? [M8]
+#? [M8]*
 
 loadsgf golois/Indigo-Golois-991105-1.sgf
 32 gg_genmove black
-#? [G8]
+#? [G8]*
 
 loadsgf golois/Jimmy990906-1.sgf
 33 gg_genmove black
@@ -159,7 +159,7 @@ loadsgf golois/MeilleurCoup0003.sgf
 
 loadsgf golois/MeilleurCoup0004.sgf
 38 gg_genmove black
-#? [C6]*
+#? [C6]
 
 loadsgf golois/MeilleurCoup0005.sgf
 39 gg_genmove black

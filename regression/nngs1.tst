@@ -109,7 +109,7 @@ loadsgf games/nngs/gnugo-3.1.27-wingjk-200203101039.sgf 78
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 26
 26 gg_genmove white
-#? [P3]
+#? [P3]*
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 46
 27 gg_genmove white
@@ -126,7 +126,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
 30 gg_genmove white
-#? [P17|O18]*
+#? [P17|O18]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 18
 31 gg_genmove white
@@ -188,7 +188,7 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 46
 # defense of the top right is urgent
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
 46 gg_genmove white
-#? [!J5]*
+#? [!J5]
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 12
 47 gg_genmove white

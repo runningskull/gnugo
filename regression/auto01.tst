@@ -1,15 +1,15 @@
 #auto generated owl inconsistencies
 loadsgf games/auto_gen/auto001.sgf 136
 1 owl_defend p11
-#? [1 Q11]*
+#? [1 Q11]
 
 loadsgf games/auto_gen/auto001.sgf 139
 2 owl_attack r16
-#? [1 (O11|M10|T10)]*
+#? [1 (O11|M10|T10)]
 
 loadsgf games/auto_gen/auto001.sgf 140
 3 owl_defend r16
-#? [1 (O11|T15|T13)]*
+#? [1 (O11|T15|T13)]
 
 loadsgf games/auto_gen/auto002.sgf 186
 4 owl_defend n8

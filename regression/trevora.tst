@@ -340,13 +340,13 @@ loadsgf games/trevor/auto/a034.sgf 12
 #important tesuji
 loadsgf games/trevor/auto/a035.sgf 28
 520 gg_genmove white
-#? [B5]*
+#? [B5]
 
 
 #Have to try.
 loadsgf games/trevor/auto/a035.sgf 42
 530 gg_genmove white
-#? [H4]
+#? [H4]*
 
 #Excellect simple semeai problem.
 loadsgf games/trevor/auto/a035.sgf 42
@@ -360,7 +360,7 @@ loadsgf games/trevor/auto/a035.sgf 50
 
 loadsgf games/trevor/auto/a035.sgf 51
 550 owl_attack D3
-#? [1 F2]
+#? [1 F2]*
 
 
 

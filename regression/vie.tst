@@ -212,7 +212,7 @@ loadsgf golois/Vivre990706-3.sgf
 # However, B:H15 lives quite handily.
 loadsgf golois/Vivre990706-4.sgf
 50 owl_defend F16
-#? [1 H15]*
+#? [1 H15]
 
 loadsgf golois/Vivre990706-5.sgf
 51 owl_attack G3

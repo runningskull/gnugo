@@ -17,7 +17,7 @@ loadsgf games/handtalk/handtalk2.sgf 78
 #? [1 (N18|O17)]*
 
 7 owl_analyze_semeai Q17 P19
-#? [ALIVE DEAD (O18|O17|P17)]
+#? [ALIVE DEAD (O18|O17|P17)]*
 
 8 owl_analyze_semeai P19 Q17
 #? [ALIVE DEAD (N18|O17|S15)]*
