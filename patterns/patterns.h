@@ -322,7 +322,7 @@ void init_tree_oracle(void);
 
 /* pattern arrays themselves */
 extern struct pattern_db pat_db;
-extern struct pattern_db joseki_db;
+extern struct corner_db  joseki_db;
 extern struct pattern_db aa_attackpat_db;
 extern struct pattern_db owl_attackpat_db;
 extern struct pattern_db owl_vital_apat_db;
@@ -400,17 +400,18 @@ struct corner_variation {
 
 struct corner_pattern {
   int second_corner_offset;
+  int symmetric;
 
   unsigned int class;
   const char *name;
 
-  float value;
+  float shape;
 
   int autohelper_flag;
   autohelper_fn_ptr autohelper;
-  float constraint_cost;
 };
 
+/* Build time version of corner_variation structure. */
 struct corner_variation_b {
   int move_offset;
   char xor_att;

@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- joseki patterns are matched using corner matcher
+- symmetrical joseki patterns no longer match twice
+- antisuji joseki patterns are handled by callback now
 - goal_elements and callback_data added to all relevant databases to
   drop unnecessary pattern elements
 - add missing break in main.c

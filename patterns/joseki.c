@@ -165,10 +165,10 @@ write_diagram(int movei, int movej, int color, int marki, int markj,
 
 /* Write the colon line of the pattern. */
 static void
-write_colon_line(int move_type, char *text)
+write_colon_line(int move_type, char symmetry, char *text)
 {
   char *p;
-  
+
   /* Locate a possible colon line in the sgf file comment. */
   if (!text)
     p = NULL;
@@ -180,7 +180,7 @@ write_colon_line(int move_type, char *text)
       p += 2;
   }
 
-  printf(":8,sF");
+  printf(":%c,sF", symmetry);
   switch (move_type) {
   case URGENT:
     printf("U");
@@ -216,6 +216,24 @@ write_colon_line(int move_type, char *text)
 }
 
 
+/* Check if the board and labels are symmetric. */
+static int
+board_is_symmetric(int n, char labels[MAX_BOARD][MAX_BOARD])
+{
+  int i;
+  int j;
+
+  for (i = 0; i <= n; i++) {
+    for (j = 0; j < i; j++) {
+      if (BOARD(i, j) != BOARD(j, i)
+	  || (labels && labels[i][j] != labels[j][i]))
+	return 0;
+    }
+  }
+
+  return 1;
+}
+
 /* Write a pattern to stdout. */
 static void
 make_pattern(int movei, int movej, int color,
@@ -225,24 +243,27 @@ make_pattern(int movei, int movej, int color,
 {
   static int pattern_number = 0;
   int move_type;
-  
+  char symmetry = '8';
+
   pattern_number++;
   move_type = identify_move_type(text);
-  
+
   printf("Pattern %s%d\n", prefix, pattern_number);
 
   /* Write comments. */
   write_selected_lines(text, '#');
   printf("\n");
-  
+
   /* Write the main diagram. */
   write_diagram(movei, movej, color, marki, markj, NULL);
   printf("\n");
 
   /* Write the colon line. */
-  write_colon_line(move_type, text);
+  if (movei == movej && marki == markj && board_is_symmetric(marki, labels))
+    symmetry = '/';
+  write_colon_line(move_type, symmetry, text);
   printf("\n");
-  
+
   /* Write the constraint diagram if there are any labels, a
    * constraint line, or an action line.
    */
@@ -256,18 +277,11 @@ make_pattern(int movei, int movej, int color,
     /* Write constraint and action lines. */
     write_selected_lines(text, ';');
     write_selected_lines(text, '>');
-    /* FIXME: Remove these antisuji autohelper lines once the joseki callback
-     *	      handles antisuji moves itself.
-     */
-    if (move_type == ANTISUJI)
-      printf(">antisuji(*);\n");
     printf("\n");
   }
-  else if (move_type == ANTISUJI)
-    printf(">antisuji(*);\n\n");
 
   printf("\n");
-  
+
   /* Basic sanity checking. We do this at the end to simplify debugging. */
   if (multiple_marks)
     fprintf(stderr, "Warning: Multiple square marks in pattern %s%d\n",
@@ -363,6 +377,7 @@ analyze_node(SGFNode *node, const char *prefix)
   if (node->next)
     analyze_node(node->next, prefix);
 }
+
 
 int
 main(int argc, char *argv[])

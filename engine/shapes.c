@@ -75,13 +75,14 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   /* Don't accept fuseki marked patterns while scoring. */
   if (doing_scoring && (class & CLASS_F))
     return;
-  
+
   /* Don't need auxiliary data in this callback. */
   UNUSED(data);
-  
+
   /* Pick up the location of the move */
   move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
-  
+
+  /* For restricted search, the pattern must intersect the search area */
   if (limit_search && !within_search_area(move))
     return;
 
@@ -435,13 +436,13 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
       scale_randomness(move, 5.);
       TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
     }
-    else 
+    else
       TRACE("...minimum move value %f (shape %f)\n",
             min_value, pattern->shape);
     set_minimum_move_value(move, min_value);
   }
 
-  /* Pattern class U, very urgent move joseki. Add strategical defense
+  /* Pattern class U, very urgent joseki move. Add strategical defense
    * and attack, plus a shape bonus of 15 and a minimum value of 40.
    */
   if (class & CLASS_U) {
@@ -520,8 +521,207 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
 }
 
 
+/* This callback is invoked for each matched pattern from joseki database.
+ * This function is just a copy of relevant parts of shapes_callback().
+ */
+static void
+joseki_callback(int move, int color, struct corner_pattern *pattern,
+		int trans, int *stones, int num_stones)
+{
+  int k, l;
+  int class = pattern->class;
+
+  /* Dragons of our color. */
+  int my_dragons[MAX_DRAGONS_PER_PATTERN];
+  int my_ndragons = 0;
+
+  /* Dragons of other color. */
+  int your_dragons[MAX_DRAGONS_PER_PATTERN];
+  int your_ndragons = 0;
+
+  /* For restricted search, the pattern must intersect the search area. */
+  if (limit_search && !within_search_area(move))
+    return;
+
+  /* For urgent joseki patterns we need to find all dragons present in the
+   * pattern since such patterns are assumed to have strategical effect on
+   * them.
+   */
+  if (class & CLASS_U) {
+    /* Loop over all stones in the pattern. */
+    for (k = 0; k < num_stones; k++) {
+      int pos = stones[k];
+      int origin = dragon[pos].origin;
+
+      if (board[pos] == color && my_ndragons < MAX_DRAGONS_PER_PATTERN) {
+	for (l = 0; l < my_ndragons; l++) {
+	  if (my_dragons[l] == origin)
+	    break;
+	}
+
+	if (l == my_ndragons) {
+	  /* We found another dragon of our color. Check that it (or
+           * rather the underlying worm) cannot be tactically
+           * captured before adding it to the list of my_dragons.
+	   */
+	  if (worm[pos].attack_codes[0] == 0 || does_defend(move, pos)) {
+	    /* Ok, add the dragon to the list. */
+	    my_dragons[l] = origin;
+	    my_ndragons++;
+	  }
+	}
+      }
+
+      if (board[pos] != color && your_ndragons < MAX_DRAGONS_PER_PATTERN) {
+	for (l = 0; l < your_ndragons; l++) {
+	  if (your_dragons[l] == origin)
+	    break;
+	}
+	if (l == your_ndragons) {
+	  /* We found another opponent dragon, add it to the list. */
+	  your_dragons[l] = origin;
+	  your_ndragons++;
+	}
+      }
+    }
+  }
+
+  /* For joseki patterns we don't check if the proposed move is safe or legal.
+   */
+
+  /* If the pattern has a constraint, call the autohelper to see
+   * if the pattern must be rejected.
+   */
+  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
+    if (!pattern->autohelper(trans, move, color, 0))
+      return;
+  }
+
+  /* If using -a, want to see all matches even if not -v. */
+  if (allpats || verbose)
+    TRACE("pattern '%s'+%d matched at %1m\n", pattern->name, trans, move);
+
+  /* Does the pattern have an action? */
+  if (pattern->autohelper_flag & HAVE_ACTION)
+    pattern->autohelper(trans, move, color, 1);
+
+  /* Pattern class J, joseki standard move. Add expand territory and
+   * moyo, and require the value at least J_value.
+   */
+  if (class & CLASS_J) {
+    TRACE("...joseki standard move\n");
+    add_expand_territory_move(move);
+    TRACE("...expands territory\n");
+    add_expand_moyo_move(move);
+    TRACE("...expands moyo\n");
+    set_minimum_move_value(move, J_VALUE);
+    TRACE("... minimum move value %f\n", J_VALUE);
+  }
+
+  /* Pattern class j, less urgent joseki move. Add expand territory and
+   * moyo, set a minimum value of j_VALUE. If it is a fuseki pattern, set also
+   * the maximum value to j_VALUE.
+   */
+  if (class & CLASS_j) {
+    float min_value = j_VALUE;
+    TRACE("...less urgent joseki move\n");
+    add_expand_territory_move(move);
+    TRACE("...expands territory\n");
+    add_expand_moyo_move(move);
+    TRACE("...expands moyo\n");
+
+    /* Board size modification. */
+    min_value *= board_size / 19.0;
+
+    if (class & VALUE_SHAPE) {
+      min_value *= (1 + 0.01 * pattern->shape);
+      class &= ~VALUE_SHAPE;
+    };
+
+    if (board_size >= 17) {
+      min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
+                          /* get preferred in value_move_reasons(). */
+      set_maximum_move_value(move, min_value);
+      scale_randomness(move, 5.);
+      TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
+    }
+    else
+      TRACE("...minimum move value %f (shape %f)\n",
+            min_value, pattern->shape);
+    set_minimum_move_value(move, min_value);
+  }
+
+  /* Pattern class t, minor joseki move (tenuki OK).
+   * Set the (min-)value at t_value
+   */
+  if (class & CLASS_t) {
+    float min_value = t_VALUE;
+    TRACE("...minor joseki move\n");
+
+    /* Board size modification. */
+    min_value *= board_size / 19.0;
+
+    if (class & VALUE_SHAPE) {
+      min_value *= (1 + 0.01 * pattern->shape);
+      class &= ~VALUE_SHAPE;
+    };
+
+    if ((board_size >= 17) && (class & CLASS_F)) {
+      min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
+                          /* get preferred in value_move_reasons */
+      set_maximum_move_value(move, min_value);
+      scale_randomness(move, 5.);
+      TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
+    }
+    else
+      TRACE("...minimum move value %f (shape %f)\n",
+            min_value, pattern->shape);
+    set_minimum_move_value(move, min_value);
+  }
+
+  /* Pattern class U, very urgent joseki move. Add strategical defense
+   * and attack, plus a shape bonus of 15 and a minimum value of 40.
+   */
+  if (class & CLASS_U) {
+    TRACE("...joseki urgent move\n");
+    for (k = 0; k < my_ndragons; k++) {
+      add_strategical_defense_move(move, my_dragons[k]);
+      TRACE("...strategical defense of %1m\n", my_dragons[k]);
+    }
+    urgent = 1;
+    for (k = 0; k < your_ndragons; k++) {
+      add_strategical_attack_move(move, your_dragons[k]);
+      TRACE("...strategical attack on %1m\n", your_dragons[k]);
+    }
+    add_shape_value(move, 15);
+    TRACE("...shape value 15\n");
+    set_minimum_move_value(move, U_VALUE);
+    TRACE("...(min) move value %f\n", U_VALUE);
+  }
+
+  /* Pattern class T, joseki trick move. For the moment we never play these. */
+  if (class & CLASS_T) {
+    TRACE("...joseki trick move\n");
+    add_antisuji_move(move);
+    TRACE("...antisuji\n");
+  }
+
+  /* Pattern class N, antisuji move. */
+  if (class & CLASS_N) {
+    TRACE("...antisuji move\n");
+    add_antisuji_move(move);
+  }
+
+  /* Shape value specified. */
+  if (class & VALUE_SHAPE) {
+    add_shape_value(move, pattern->shape);
+    TRACE("...shape value %f\n", pattern->shape);
+  }
+}
+
+
 /*
- * Match all patterns in patterns.db and patterns2.db on all positions.  
+ * Match all patterns in patterns.db and patterns2.db on all positions.
  *
  * This function is one of the basic generators of move reasons, called
  * by genmove().
@@ -534,8 +734,13 @@ shapes(int color)
 
   matchpat(shapes_callback, color, &pat_db, NULL, NULL);
 
-  if (josekidb)
+  /* Don't match joseki patterns while scoring. */
+  if (josekidb && !doing_scoring)
+#if 1
+    corner_matchpat(joseki_callback, color, &joseki_db);
+#else
     matchpat(shapes_callback, color, &joseki_db, NULL, NULL);
+#endif
 
   if (!disable_fuseki && !doing_scoring)
     matchpat(shapes_callback, color, &fusekipat_db, NULL, NULL);

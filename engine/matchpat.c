@@ -1248,15 +1248,27 @@ static const int corner_y[8] = {0, 1, 1, 0, 1, 0, 0, 1};
  * 1 |#####...		Their distances are "incomparable" since E < G but
  *   +--------		3 > 2.
  *    A   E
+ *
+ * Note that we need these values in at most MAX_BOARD x MAX_BOARD array.
+ * However, it may be anchored at any corner of the board, so if the board is
+ * small, we may calculate num_stones[] at negative coordinates. In addition,
+ * this array must have the same coordinate system as board[] (it must be
+ * (MAX_BOARD + 1 elements "wide"). That's why such a strange array allocation.
  */
-static int num_stones[BOARDMAX];
+static int real_num_stones[2*BOARDMAX];
+static int *const num_stones = real_num_stones + BOARDMAX;
+
+/* Stone locations are stored in this array. They might be needed by callback
+ * function.
+ */
+static int pattern_stones[BOARDMAX];
 
 
 /* Recursively performs corner matching. This function checks whether
  * `num_variation' variations pointed by `variation' parameter match.
- * If any of them do, it calls itself recursively. If any pattern
- * corresponding to those variations matches, it notifies callback
- * function.
+ * If any of them does, the function calls itself recursively. If any
+ * pattern corresponding to those variations matches, it notifies
+ * callback function.
  */
 static void
 do_corner_matchpat(int num_variations, struct corner_variation *variation,
@@ -1272,11 +1284,12 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
       int second_corner
 	  = AFFINE_TRANSFORM(pattern->second_corner_offset, trans, anchor);
 
-      if (num_stones[second_corner] == stones) {
+      if (num_stones[second_corner] == stones
+	  && (!pattern->symmetric || trans < 4)) {
 	/* We have found a matching pattern. */
 	ASSERT1(board[move] == EMPTY, move);
 
-	callback(move, callback_color, pattern, trans);
+	callback(move, callback_color, pattern, trans, pattern_stones, stones);
       }
     }
 
@@ -1284,6 +1297,7 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
 	&& num_stones[move] == variation->num_stones
 	&& board[move] == color_check) {
       /* A matching variation. */
+      pattern_stones[stones] = move;
       do_corner_matchpat(variation->num_variations, variation->variations,
 			 match_color, callback, callback_color,
 			 trans, anchor, stones + 1);
@@ -1362,9 +1376,11 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     for (i = 0; i < database->num_top_variations; i++) {
       int move = AFFINE_TRANSFORM(variation->move_offset, k, anchor);
 
-      if (num_stones[move] == 1 && IS_STONE(board[move]))
+      if (num_stones[move] == 1 && IS_STONE(board[move])) {
+	pattern_stones[0] = move;
 	do_corner_matchpat(variation->num_variations, variation->variations,
 			   board[move], callback, color, k, anchor, 1);
+      }
 
       variation++;
     }

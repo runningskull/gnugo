@@ -268,8 +268,8 @@ struct tree_node_list;
 struct match_node;
 
 /*
- * Try to match a pattern in the database to the board. Callback for
- * each match
+ * Try to match a pattern in the database to the board. Callbacks for
+ * each match.
  */
 typedef void (*matchpat_callback_fn_ptr)(int anchor, int color,
                                          struct pattern *, int rotation,
@@ -279,7 +279,8 @@ typedef void (*fullboard_matchpat_callback_fn_ptr)(int move,
                                                    int rotation);
 typedef void (*corner_matchpat_callback_fn_ptr)(int move, int color,
 						struct corner_pattern *pattern,
-						int rotation);
+						int trans,
+						int *stones, int num_stones);
 void matchpat(matchpat_callback_fn_ptr callback, int color,
 	      struct pattern_db *pdb, void *callback_data,
 	      char goal[BOARDMAX]);

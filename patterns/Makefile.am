@@ -102,7 +102,7 @@ patterns.c : $(srcdir)/patterns.db $(srcdir)/patterns2.db mkpat$(EXEEXT)
 		| ./mkpat -b pat >patterns.c
 
 josekidb.c : $(DBBUILT) mkpat$(EXEEXT)
-	cat  $(DBBUILT) | ./mkpat -b joseki >josekidb.c
+	cat  $(DBBUILT) | ./mkpat -C joseki >josekidb.c
 
 apatterns.c : $(srcdir)/attack.db mkpat$(EXEEXT)
 	cat $(srcdir)/attack.db | ./mkpat -X attpat >apatterns.c

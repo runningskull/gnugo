@@ -906,7 +906,6 @@ check_constraint_diagram_size(void)
 static void
 finish_pattern(char *line)
 {
-
   /* end of pattern layout */
   char symmetry;		/* the symmetry character */
   
@@ -1006,23 +1005,29 @@ finish_pattern(char *line)
       p += n;
 
       if (sscanf(entry, "%*[^(](%f)", &v) > 0) {
+	const char *corner_unsupported = NULL;
+
 	if (strncmp(entry, "value", 5) == 0
 	    || strncmp(entry, "minvalue", 8) == 0) {
 	  pattern[patno].value = v;
 	  pattern[patno].class |= VALUE_MINVAL;
+	  corner_unsupported = "value";
 	}
 	else if (strncmp(entry, "maxvalue", 8) == 0) {
 	  pattern[patno].maxvalue = v;
 	  pattern[patno].class |= VALUE_MAXVAL;
+	  corner_unsupported = "maxvalue";
 	}
 	else if (strncmp(entry, "terri", 5) == 0
 		 || strncmp(entry, "minterri", 8) == 0) {
 	  pattern[patno].minterritory = v;
 	  pattern[patno].class |= VALUE_MINTERRITORY;
+	  corner_unsupported = "terri";
 	}
 	else if (strncmp(entry, "maxterri", 8) == 0) {
 	  pattern[patno].maxterritory = v;
 	  pattern[patno].class |= VALUE_MAXTERRITORY;
+	  corner_unsupported = "maxterri";
 	}
 	else if (strncmp(entry, "shape", 5) == 0) {
 	  pattern[patno].shape = v;
@@ -1031,16 +1036,23 @@ finish_pattern(char *line)
 	else if (strncmp(entry, "followup", 8) == 0) {
 	  pattern[patno].followup = v;
 	  pattern[patno].class |= VALUE_FOLLOWUP;
+	  corner_unsupported = "followup";
 	}
 	else if (strncmp(entry, "reverse_followup", 16) == 0) {
 	  pattern[patno].reverse_followup = v;
 	  pattern[patno].class |= VALUE_REV_FOLLOWUP;
+	  corner_unsupported = "reverse_followup";
 	}
 	else {
-	  fprintf(stderr, "%s(%d) : error : Unknown value field: %s\n", 
+	  fprintf(stderr, "%s(%d) : error : Unknown value field: %s\n",
                   current_file, current_line_number, entry);
           fatal_errors++;
 	  break;
+	}
+
+	if (database_type == DB_CORNER && corner_unsupported) {
+	  fprintf(stderr, "%s(%d) : warning : `%s' is unsupported in corner databases\n",
+		  current_file, current_line_number, corner_unsupported);
 	}
       }
       else {
@@ -1048,7 +1060,7 @@ finish_pattern(char *line)
 	break;
       }
     }
-      
+
     {
       char *p;
       for (p = class; *p; p++) {
@@ -1104,15 +1116,15 @@ finish_pattern(char *line)
   case '+' :
     if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
-	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 2;
     break;
 
-  case 'X' : 
+  case 'X' :
     if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
-	      "%s(%d) : Warning : X symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      "%s(%d) : Warning : X symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
     if (maxi != maxj)
       fprintf(stderr,
@@ -1124,15 +1136,15 @@ finish_pattern(char *line)
   case '-' :
     if (where & (NORTH_EDGE|SOUTH_EDGE))
       fprintf(stderr,
-	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 4;
     break;
-    
+
   case '|' :
     if (where & (EAST_EDGE|WEST_EDGE))
       fprintf(stderr,
-	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 4;
     break;
@@ -1144,7 +1156,7 @@ finish_pattern(char *line)
     */
     if (maxi != maxj)
       fprintf(stderr,
-	      "%s(%d) : Warning : \\ or / symmetry requires a square pattern (pattern %s)\n", 
+	      "%s(%d) : Warning : \\ or / symmetry requires a square pattern (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
 
     pattern[patno].trfno = 4;
@@ -1153,23 +1165,22 @@ finish_pattern(char *line)
   case 'O' :
     if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
       fprintf(stderr,
-	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n", 
+	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 5;  /* Ugly special convention. */
     break;
 
   default:
     fprintf(stderr,
-	    "%s(%d) : Warning : symmetry character '%c' not implemented - using '8' (pattern %s)\n", 
+	    "%s(%d) : Warning : symmetry character '%c' not implemented - using '8' (pattern %s)\n",
 	    current_file, current_line_number, symmetry, pattern_names[patno]);
     /* FALLTHROUGH */
   case '8' :
     pattern[patno].trfno = 8;
     break;
   }
-
 }
-      
+
 
 static void
 read_constraint_line(char *line)
@@ -2523,13 +2534,14 @@ write_patterns(FILE *outfile)
     }
 
     if (database_type == DB_CORNER) {
-      fprintf(outfile, "  {%d,0x%x,\"%s\",%f,%d,", second_corner_offset[j],
-	      p->class, pattern_names[j], p->value, p->autohelper_flag);
+      fprintf(outfile, "  {%d,%d,0x%x,\"%s\",%f,%d,",
+	      second_corner_offset[j], (p->trfno == 4),
+	      p->class, pattern_names[j], p->shape,
+	      p->autohelper_flag);
       if (p->autohelper)
-	fprintf(outfile, "autohelper%s%d", prefix, j);
+	fprintf(outfile, "autohelper%s%d}", prefix, j);
       else
-	fprintf(outfile, "NULL");
-      fprintf(outfile, ",%f}", p->constraint_cost);
+	fprintf(outfile, "NULL}");
 
       if (j != patno - 1)
 	fprintf(outfile, ",\n");
@@ -2545,7 +2557,7 @@ write_patterns(FILE *outfile)
      * the pattern, relative to the pattern origin. These just transform same
      * as the elements.
      */
-    
+
     fprintf(outfile, "  {%s%d,%d,%d, \"%s\",%d,%d,%d,%d,%d,%d,0x%x,%d",
 	    prefix, j,
 	    p->patlen,
