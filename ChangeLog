@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- major revision of find_connection_distances()
+- other revisions and tuning in readconnect.c
 - bugfix in find_defense: compare against fourlib_depth when appropriate
 - compiler warnings fixed
 - new struct dfa_rt_t allows different run-time DFA structure from build-time
@@ -53,7 +55,7 @@
 - YOUR_ATARI_ATARI_MOVE considered safe in examine_move_safety()
 - atari_atari tuning
 - new GTP commands attack_either and defend_both
-- optimzation in compute_connection_distances()
+- optimization in compute_connection_distances()
 - owl code reorganization
 - new clear_owl_move_data() set_single_owl_move(), 
 - break out reading_limit_reached(), owl_estimate_life() 
@@ -269,7 +271,7 @@
 - j pattern value increased from 22.0 to 24.0
 - new gtp experimental_score for metamachine
 - new DEBUG_MISCELLANEOUS used only in find_eye_dragons
-- connection tunning
+- connection tuning
 - B patterns found by find_cuts inhibit C patterns by find_connections
 - new connection tests
 - strategic_penalty() adds negative strategical move value a bit more often

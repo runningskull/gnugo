@@ -1084,6 +1084,10 @@ string_connect(int str1, int str2, int *move)
 	      nodes_connect, tactical_nodes, gg_cputime() - start);
       dump_stack();
     }
+    if (0) {
+      gprintf("%oconnect %1m %1m %d %1m ", str1, str2, result, *move);
+      dump_stack();
+    }
 
     return result;
   }
@@ -1217,6 +1221,10 @@ disconnect(int str1, int str2, int *move)
       gprintf("%odisconnect %1m %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
 	      str1, str2, result, *move,
 	      nodes_connect, tactical_nodes, gg_cputime() - start);
+      dump_stack();
+    }
+    if (0) {
+      gprintf("%odisconnect %1m %1m %d %1m ", str1, str2, result, *move);
       dump_stack();
     }
 
@@ -1758,6 +1766,9 @@ get_connection_node_counter()
 struct connection_data {
   float distances[BOARDMAX];
   float deltas[BOARDMAX];
+  int coming_from[BOARDMAX];
+  int vulnerable1[BOARDMAX];
+  int vulnerable2[BOARDMAX];
   int queue[BOARDMAX];
   int queue_start;
   int queue_end;
@@ -1777,6 +1788,9 @@ static int ladder_capture(int str, int *move);
 static int ladder_capturable(int pos, int color);
 static int no_escape_from_atari(int str);
 static int no_escape_from_ladder(int str);
+static int check_self_atari(int pos, int color_to_move);
+static int common_vulnerabilities(int a1, int a2, int b1, int b2, int color);
+static int common_vulnerability(int apos, int bpos, int color);
 
 
 /* Try to connect two strings. This function is called in a mutual
@@ -1987,11 +2001,12 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
       return rr_get_result(*read_result);
     }
   }
-  
+
   if (ladder_capture(str1, &xpos) == WIN) {
     SGFTRACE2(xpos, WIN, "first string capturable");
     READ_RETURN_CONN(read_result, move, xpos, WIN);
   }
+  
   if (ladder_capture(str2, &xpos) == WIN) {
     SGFTRACE2(xpos, WIN, "second string capturable");
     READ_RETURN_CONN(read_result, move, xpos, WIN);
@@ -2106,7 +2121,9 @@ find_connection_moves(int str1, int str2, int color_to_move,
 
   if (findlib(str1, 1, &lib) == 1) {
     conn1.distances[lib] = 0;
+    conn1.coming_from[lib] = NO_MOVE;
     conn2.distances[lib] = conn2.distances[str1];
+    conn2.coming_from[lib] = conn1.coming_from[str1];
   }
 
   if (findlib(str2, 1, &lib) == 1) {
@@ -2128,8 +2145,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
     print_connection_distances(&conn2);
   }
 
-  /* Loop through the points with smallish distance from str1 an look
-   * for ones also having a small distane to str2.
+  /* Loop through the points with smallish distance from str1 and look
+   * for ones also having a small distance to str2.
    */
   for (r = 0; r < conn1.queue_end; r++) {
     int pos = conn1.queue[r];
@@ -2142,16 +2159,13 @@ find_connection_moves(int str1, int str2, int color_to_move,
     float distance;
     
     if (dist1 - deltadist1 + dist2 - deltadist2 > 2.5
-	|| dist1 > max_dist1
-	|| dist2 > max_dist2)
+	|| dist1 > max_dist1 + 0.2
+	|| dist2 > max_dist2 + 0.2)
       continue;
 
-    if (board[pos] == other && find_origin(pos) != pos)
+    if (IS_STONE(board[pos]) && find_origin(pos) != pos)
       continue;
 
-    if (board[pos] == color)
-      continue;
-    
     if (verbose > 0)
       gprintf("%oMove %1m, (%f, %f, %f, %f)\n",
 	      pos, dist1, deltadist1, dist2, deltadist2);
@@ -2174,28 +2188,16 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	gprintf("%o  -0.1, well balanced\n");
     }
 
-    /* Check the surrounding eight vertices to see whether this move
-     * is "between" the two strings.
-     */
-    for (k = 0; k < 8; k++) {
-      if (ON_BOARD(pos + delta[k]) && board[pos + delta[k]] != other) {
-	d1 = dist1 - conn1.distances[pos + delta[k]];
-	d2 = dist2 - conn2.distances[pos + delta[k]];
-	if (d1 * d2 <= 0.0 && (d1 != 0.0 || d2 != 0.0))
-	  break;
-      }
-    }
-    if (k == 8 && board[pos] == EMPTY
-	&& (!((liberty_of_string(pos, str1) && countlib(str1) < 3)
-	      || (liberty_of_string(pos, str2) && countlib(str2) < 3)))) {
+    /* Check whether the move is "between" the two strings. */
+    if (conn1.coming_from[pos] != NO_MOVE
+	&& conn1.coming_from[pos] == conn2.coming_from[pos]) {
       if (verbose > 0)
-	gprintf("%o  discarded, not on the shortest path\n");
+	gprintf("%o  discarded, not between strings\n");
       continue;
     }
     
     if (board[pos] == EMPTY) {
-      if (!is_self_atari(pos, color_to_move)
-	  || is_ko(pos, color_to_move, NULL)) {
+      if (check_self_atari(pos, color_to_move)) {
 	ADD_CANDIDATE_MOVE(pos, distance, moves, distances, num_moves);
       }
       else {
@@ -2226,14 +2228,44 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	ADD_CANDIDATE_MOVE(attack_move, distance - 0.15, moves, distances,
 			   num_moves);
 	if (verbose > 0)
-	  gprintf("%o  -0.15, capturing a string\n");
+	  gprintf("%o  -0.15 at %1m, capturing a string\n", attack_move);
       }
       else if (!connect_move && acode != 0 && dcode != 0) {
 	ADD_CANDIDATE_MOVE(defense_move, distance - 0.5, moves, distances,
 			   num_moves);
 	if (verbose > 0)
-	  gprintf("%o  -0.5, defending a string\n");
+	  gprintf("%o  -0.5 at %1m, defending a string\n", defense_move);
       }
+    }
+    else if (board[pos] == color) {
+      /* Check whether there are common vulnerable points. */
+      for (k = 0; k < 4; k++) {
+	int apos, bpos;
+	if (k & 1)
+	  apos = conn1.vulnerable1[pos];
+	else 
+	  apos = conn1.vulnerable2[pos];
+
+	if (k & 2)
+	  bpos = conn2.vulnerable1[pos];
+	else 
+	  bpos = conn2.vulnerable2[pos];
+
+	if (common_vulnerability(apos, bpos, color)) {
+	  if (check_self_atari(apos, color_to_move)) {
+	    ADD_CANDIDATE_MOVE(apos, distance, moves, distances, num_moves);
+	    if (verbose > 0)
+	      gprintf("%o  +0.0 at %1m, vulnerability\n", apos);
+	  }
+
+	  if (bpos != apos
+	      && check_self_atari(bpos, color_to_move)) {
+	    ADD_CANDIDATE_MOVE(bpos, distance, moves, distances, num_moves);
+	    if (verbose > 0)
+	      gprintf("%o  +0.0 at %1m, vulnerability\n", bpos);
+	  }
+	}
+      } 
     }
   }
 
@@ -2271,6 +2303,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
       }
       else if (board[pos] == color) {
 	if (countlib(pos) <= 2) {
+	  distances[r] -= 0.2;
 	  if (verbose > 0)
 	    gprintf("%o%1M -0.2, adjacent to defender string with at most two liberties\n", move);
 	}
@@ -2283,7 +2316,19 @@ find_connection_moves(int str1, int str2, int color_to_move,
       if (verbose > 0)
 	gprintf("%o%1M -0.1, disconnect move on edge\n", move);
     }
-    
+
+    /* Bonus for moves adjacent to endpoint strings with 3 liberties.
+     * Neighbor strings with less than 3 liberties have already
+     * generated a bonus above.
+     */
+    if ((liberty_of_string(move, str1)
+	 && countlib(str1) == 3)
+	|| (liberty_of_string(move, str2)
+	    && countlib(str2) == 3)) {
+      distances[r] -= 0.1;
+      if (verbose > 0)
+	gprintf("%o%1M -0.1, liberty of endpoint string with 3 libs\n", move);
+    }
   }
 
   /* Normalize distance values. See comment to gg_normalize_float() in
@@ -2360,7 +2405,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
 
 
 /* Helper macro for the function below. */
-#define ENQUEUE(conn, pos, dist, delta) \
+#define ENQUEUE(conn, from, pos, dist, delta, v1, v2) \
   do { \
     if (dist < conn->distances[pos]) { \
       if (board[pos] == EMPTY) { \
@@ -2368,6 +2413,9 @@ find_connection_moves(int str1, int str2, int color_to_move,
           conn->queue[conn->queue_end++] = pos; \
         conn->distances[pos] = dist; \
         conn->deltas[pos] = delta; \
+        conn->coming_from[pos] = from; \
+        conn->vulnerable1[pos] = v1; \
+        conn->vulnerable2[pos] = v2; \
       } \
       else { \
         int r; \
@@ -2377,6 +2425,9 @@ find_connection_moves(int str1, int str2, int color_to_move,
             conn->queue[conn->queue_end++] = stones[r]; \
           conn->distances[stones[r]] = dist; \
           conn->deltas[stones[r]] = delta; \
+          conn->coming_from[stones[r]] = from; \
+          conn->vulnerable1[stones[r]] = v1; \
+          conn->vulnerable2[stones[r]] = v2; \
 	  if (stones[r] == target && dist < cutoff_distance) \
 	    cutoff_distance = dist - 0.0001; \
 	} \
@@ -2409,7 +2460,41 @@ find_connection_moves(int str1, int str2, int color_to_move,
  *
  * The propagation is inhibited when the distance becomes too large,
  * or larger than the shortest path found to the target so far.
+ *
+ *
+ * The purpose of the fields called vulnerable is to keep track of
+ * points where the attacker can threaten an individual
+ * connection. For example the diagonal formation
+ *
+ * .O
+ * O.
+ *
+ * is considered a small distance link but both the empty vertices are
+ * marked as vulnerable. Thus if we are computing connection distance
+ * from the lower left O in this diagram,
+ *
+ * XXX     XXX
+ * .O.     .O.
+ * O.O     OaO
+ * .X.     .X.
+ *
+ * the distance to the middle O is small but the second diagonal link
+ * to the lower right O stone is not given a small distance since a
+ * had already been marked as vulnerable.
+ *
+ * It should also be pointed out that this reasoning is not relevant
+ * in this position where X has no cutting potential,
+ *
+ * XXX     XXX
+ * .O.     .O.
+ * O.O     OaO
+ * ...     ...
+ *
+ * That is because there is a pattern directly recognizing the safe
+ * link between the two lower stones, without taking the longer road
+ * over the two diagonal links.
  */
+
 static void
 compute_connection_distances(int str, int target, struct connection_data *conn)
 {
@@ -2431,11 +2516,14 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     conn->distances[pos] = HUGE_CONNECTION_DISTANCE;
     conn->deltas[pos] = 0.0;
+    conn->coming_from[pos] = NO_MOVE;
+    conn->vulnerable1[pos] = NO_MOVE;
+    conn->vulnerable2[pos] = NO_MOVE;
   }
 
   /* Add all stones in the initial string to the queue. */
   for (k = 0; k < num_stones; k++) {
-    ENQUEUE(conn, stones[k], 0.0, 0.0);
+    ENQUEUE(conn, NO_MOVE, stones[k], 0.0, 0.0, NO_MOVE, NO_MOVE);
   }
 
   /* Loop until we reach the end of the queue. */
@@ -2478,7 +2566,7 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 *  jef.
 	 *  igb.
 	 * kh*ac
-	 *   .d.
+	 *  ....
 	 *
 	 */
 	int right = delta[k];
@@ -2498,14 +2586,44 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	
 	/* Case 1. "a" is empty and would be suicide for the opponent. */
 	if (board[apos] == EMPTY && is_suicide(apos, other)) {
-	  ENQUEUE(conn, apos, distance, 0.0);
+	  ENQUEUE(conn, pos, apos, distance, 0.0, apos, NO_MOVE);
 	}
 	
 	/* Case 2. "a" is empty and would be self atari for the opponent. */
 	if (board[apos] == EMPTY
 	    && conn->distances[apos] > distance + 0.1
 	    && is_self_atari(apos, other)) {
-	  ENQUEUE(conn, apos, distance + 0.1, 0.1);
+	  int lib;
+	  int vulnerable1 = NO_MOVE;
+	  int vulnerable2 = NO_MOVE;
+	  if (approxlib(apos, other, 1, &lib) >= 1) {
+	    if (approxlib(lib, other, 2, NULL) > 2)
+	      vulnerable1 = lib;
+	    if (countlib(pos) == 2) {
+	      int i;
+	      for (i = 0; i < 4; i++) {
+		if (board[lib + delta[i]] == EMPTY
+		    && lib + delta[i] != apos
+		    && trymove(lib + delta[i], other,
+			       "compute_connection_distances", pos,
+			       EMPTY, NO_MOVE)) {
+		  if (ladder_capture(pos, NULL)) {
+		    vulnerable2 = lib + delta[i];
+		    popgo();
+		    break;
+		  }
+		  popgo();
+		}
+	      }
+	    }
+	  }
+	  
+	  if (!common_vulnerabilities(conn->vulnerable1[pos],
+				      conn->vulnerable2[pos],
+				      vulnerable1, vulnerable2, color)) {
+	    ENQUEUE(conn, pos, apos, distance + 0.1, 0.1,
+		    vulnerable1, vulnerable2);
+	  }
 	}
 	
 	/* Case 3. Bamboo joint of "*" + "a" to "e" + "f" through "b" and "g".
@@ -2517,8 +2635,8 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	if (board[apos] == color && board[bpos] == EMPTY
 	    && board[fpos] == color && board[epos] == color
 	    && board[gpos] == EMPTY) {
-	  ENQUEUE(conn, bpos, distance + 0.1, 0.1);
-	  ENQUEUE(conn, gpos, distance + 0.1, 0.1);
+	  ENQUEUE(conn, pos, bpos, distance + 0.1, 0.1, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, gpos, distance + 0.1, 0.1, NO_MOVE, NO_MOVE);
 	}
 	   
 	/* Case 4. Diagonal connection to another stone "b" through
@@ -2527,9 +2645,15 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	if (board[bpos] == color
 	    && board[apos] == EMPTY
 	    && board[gpos] == EMPTY
-	    && conn->distances[bpos] > distance + 0.2) {
-	  ENQUEUE(conn, apos, distance + 0.2, 0.2);
-	  ENQUEUE(conn, gpos, distance + 0.2, 0.2);
+	    && !common_vulnerabilities(conn->vulnerable1[pos],
+				       conn->vulnerable2[pos],
+				       apos, gpos, color)
+	    && conn->distances[bpos] > distance + 0.1) {
+#if 0
+	  ENQUEUE(conn, pos, apos, distance + 0.2, 0.2, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, gpos, distance + 0.2, 0.2, NO_MOVE, NO_MOVE);
+#endif
+	  ENQUEUE(conn, pos, bpos, distance + 0.1, 0.1, apos, gpos);
 	}
 	   
 	/* Case 5. Almost bamboo joint.
@@ -2537,25 +2661,62 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 */
 	if (board[gpos] == EMPTY
 	    && board[epos] == color
-            && conn->distances[gpos] > distance + 0.2
-	    && approxlib(gpos, other, 3, NULL) <= 2
-	    && ((board[bpos] == EMPTY
-		 && approxlib(bpos, color, 3, NULL) >= 3
-		 && (board[apos] == color
-		     || (board[apos] == EMPTY
-			 && approxlib(apos, other, 3, NULL) <= 2))
-		 && (board[fpos] == color
-		     || (board[fpos] == EMPTY
-			 && approxlib(fpos, other, 3, NULL) <= 2)))
-		|| (board[ipos] == EMPTY
-		    && approxlib(ipos, color, 3, NULL) >= 3
-		    && (board[hpos] == color
-			|| (board[hpos] == EMPTY
-			    && approxlib(hpos, other, 3, NULL) <= 2))
-		    && (board[jpos] == color
-			|| (board[jpos] == EMPTY
-			    && approxlib(jpos, other, 3, NULL) <= 2))))) {
-	  ENQUEUE(conn, gpos, distance + 0.2, 0.2);
+            && conn->distances[epos] > distance + 0.2
+	    && approxlib(gpos, other, 3, NULL) <= 2) {
+	  if (board[bpos] == EMPTY
+	      && approxlib(bpos, color, 3, NULL) >= 3
+	      && (board[apos] == color
+		  || (board[apos] == EMPTY
+		      && !common_vulnerabilities(conn->vulnerable1[pos],
+						 conn->vulnerable2[pos],
+						 apos, gpos, color)
+		      && approxlib(apos, other, 3, NULL) <= 2))
+	      && (board[fpos] == color
+		  || (board[fpos] == EMPTY
+		      && !common_vulnerabilities(conn->vulnerable1[pos],
+						 conn->vulnerable2[pos],
+						 fpos, gpos, color)
+		      && approxlib(fpos, other, 3, NULL) <= 2))) {
+	    if (board[apos] == EMPTY && board[fpos] == EMPTY) {
+	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, apos, fpos);
+	    }
+	    else if (board[apos] == EMPTY && board[fpos] != EMPTY) {
+	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, apos, NO_MOVE);
+	    }
+	    else if (board[apos] != EMPTY && board[fpos] == EMPTY) {
+	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, fpos, NO_MOVE);
+	    }
+	    else if (board[apos] != EMPTY && board[fpos] != EMPTY) {
+	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, NO_MOVE, NO_MOVE);
+	    }
+	  }
+	  if (board[ipos] == EMPTY
+	      && approxlib(ipos, color, 3, NULL) >= 3
+	      && (board[hpos] == color
+		  || (board[hpos] == EMPTY
+		      && !common_vulnerabilities(conn->vulnerable1[pos],
+						 conn->vulnerable2[pos],
+						 hpos, gpos, color)
+		      && approxlib(hpos, other, 3, NULL) <= 2))
+	      && (board[jpos] == color
+		  || (board[jpos] == EMPTY
+		      && !common_vulnerabilities(conn->vulnerable1[pos],
+						 conn->vulnerable2[pos],
+						 jpos, gpos, color)
+		      && approxlib(jpos, other, 3, NULL) <= 2))) {
+	    if (board[hpos] == EMPTY && board[jpos] == EMPTY) {
+	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, hpos, jpos);
+	    }
+	    else if (board[hpos] == EMPTY && board[jpos] != EMPTY) {
+	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, hpos, NO_MOVE);
+	    }
+	    else if (board[hpos] != EMPTY && board[jpos] == EMPTY) {
+	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, jpos, NO_MOVE);
+	    }
+	    else if (board[hpos] != EMPTY && board[jpos] != EMPTY) {
+	      ENQUEUE(conn, pos, epos, distance + 0.2, 0.2, NO_MOVE, NO_MOVE);
+	    }
+	  }
 	}
 	   	   
 	/* Case 6. "a" is empty and an opponent move can be captured in
@@ -2564,14 +2725,14 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	if (board[apos] == EMPTY
 	    && conn->distances[apos] > distance + 0.7
 	    && ladder_capturable(apos, other)) {
-	  ENQUEUE(conn, apos, distance + 0.7, 0.7);
+	  ENQUEUE(conn, pos, apos, distance + 0.7, 0.7, apos, NO_MOVE);
 	}
 
 	/* Case 7. "a" is empty or occupied by opponent.
 	 */
 	if ((board[apos] == EMPTY || board[apos] == other)
 	    && conn->distances[apos] > distance + 1.0) {
-	  ENQUEUE(conn, apos, distance + 1.0, 1.0);
+	  ENQUEUE(conn, pos, apos, distance + 1.0, 1.0, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 8. Diagonal connection to empty vertex "b" through
@@ -2582,14 +2743,14 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[apos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.1
 	    && does_secure(color, bpos, apos)) {
-	  ENQUEUE(conn, bpos, distance + 1.1, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 1.1, 1.0, apos, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.1
 	    && does_secure(color, bpos, gpos)) {
-	  ENQUEUE(conn, bpos, distance + 1.1, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 1.1, 1.0, gpos, NO_MOVE);
 	}
 
 	/* Case 9. One-space jump to empty vertex "e" through empty
@@ -2599,19 +2760,32 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[epos] == EMPTY
 	    && conn->distances[epos] > distance + 1.1
 	    && does_secure(color, epos, gpos)) {
-	  ENQUEUE(conn, epos, distance + 1.1, 1.0);
+	  ENQUEUE(conn, pos, epos, distance + 1.1, 1.0, gpos, NO_MOVE);
 	}
 
-	/* Case 10. Diagonal connection to empty vertex "b" through
+	/* Case 10. One-space jump to empty vertex "e" through empty
+	 * vertex "g", making a bamboo joint.
+	 */
+	if (board[gpos] == EMPTY
+	    && board[epos] == EMPTY
+	    && conn->distances[epos] > distance + 1.1
+	    && ((board[apos] == color && board[fpos] == color
+		 && board[bpos] == EMPTY)
+		|| (board[hpos] == color && board[jpos] == color
+		    && board[ipos] == EMPTY))){
+	  ENQUEUE(conn, pos, epos, distance + 1.1, 1.0, gpos, NO_MOVE);
+	}
+
+	/* Case 11. Diagonal connection to empty vertex "b" through
 	 * empty vertices "a" and "g".
 	 */
 	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY && board[gpos] == EMPTY
             && conn->distances[bpos] > distance + 1.3) {
-	  ENQUEUE(conn, bpos, distance + 1.3, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 1.3, 1.0, apos, gpos);
 	}
 
-	/* Case 11. Keima to f or j on edge and one space jump on
+	/* Case 12. Keima to f or j on edge and one space jump on
 	 * first or second line.
 	 */
 	if (board[apos] == EMPTY
@@ -2620,11 +2794,11 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[epos] == EMPTY
 	    && board[fpos] == EMPTY
 	    && (conn->distances[fpos] > distance + 1.3
-		|| conn->distances[epos] > distance + 1.5)
+		|| conn->distances[epos] > distance + 1.3)
 	    && countlib(pos) >= 3
 	    && (!ON_BOARD(cpos) || !ON_BOARD(hpos))) {
-	  ENQUEUE(conn, fpos, distance + 1.3, 1.0);
-	  ENQUEUE(conn, epos, distance + 1.3, 1.0);
+	  ENQUEUE(conn, pos, fpos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, epos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
 	}
 
 	if (countlib(pos) >= 3
@@ -2634,13 +2808,13 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[epos] == EMPTY
 	    && board[jpos] == EMPTY
 	    && (conn->distances[jpos] > distance + 1.3
-		|| conn->distances[epos] > distance + 1.5)
+		|| conn->distances[epos] > distance + 1.3)
 	    && (!ON_BOARD(apos) || !ON_BOARD(kpos))) {
-	  ENQUEUE(conn, jpos, distance + 1.3, 1.0);
-	  ENQUEUE(conn, epos, distance + 1.3, 1.0);
+	  ENQUEUE(conn, pos, jpos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
+	  ENQUEUE(conn, pos, epos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
 	}
 
-	/* Case 12. Diagonal connection to empty vertex "b" through
+	/* Case 13. Diagonal connection to empty vertex "b" through
 	 * empty vertex "a" or "g", which allows opponent move at "a"
 	 * or "g" to be captured in a ladder.
 	 */
@@ -2648,33 +2822,68 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[apos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.2
 	    && does_secure_through_ladder(color, bpos, apos)) {
-	  ENQUEUE(conn, bpos, distance + 1.2, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 1.2, 1.0, apos, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.2
 	    && does_secure_through_ladder(color, bpos, gpos)) {
-	  ENQUEUE(conn, bpos, distance + 1.2, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 1.2, 1.0, gpos, NO_MOVE);
 	}
 
-	/* Case 13. Diagonal connection to empty vertex "b" through
+	/* Case 13b. Diagonal connection to empty vertex "b" through
+	 * one empty and one opponent vertex "a" and "g", where
+	 * the opponent stone is short of liberties.
+	 */
+	if (board[bpos] == EMPTY
+	    && board[apos] == EMPTY
+	    && board[gpos] == other
+	    && countlib(gpos) <= 3
+	    && conn->distances[bpos] > distance + 1.5) {
+	  ENQUEUE(conn, pos, bpos, distance + 1.5, 1.0, apos, NO_MOVE);
+	}
+
+	if (board[bpos] == EMPTY
+	    && board[gpos] == EMPTY
+	    && board[apos] == other
+	    && countlib(apos) <= 3
+	    && conn->distances[bpos] > distance + 1.5) {
+	  ENQUEUE(conn, pos, bpos, distance + 1.5, 1.0, gpos, NO_MOVE);
+	}
+
+	/* Case 14. Diagonal connection to empty vertex "b" through
 	 * empty vertex "a" or "g", with no particular properties.
 	 */
 	if (board[bpos] == EMPTY
 	    && board[apos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.8) {
-	  ENQUEUE(conn, bpos, distance + 1.8, 0.9);
+	  ENQUEUE(conn, pos, bpos, distance + 1.8, 0.9, NO_MOVE, NO_MOVE);
+	}
+
+	if (board[bpos] == EMPTY
+	    && board[gpos] == EMPTY
+	    && conn->distances[bpos] > distance + 1.8) {
+	  ENQUEUE(conn, pos, bpos, distance + 1.8, 0.9, NO_MOVE, NO_MOVE);
+	}
+
+	/* Case 15. Clamp at "e" of single stone at "g".
+	 */
+	if (board[gpos] == other
+	    && board[epos] == EMPTY
+	    && conn->distances[epos] > distance + 2.0
+	    && countstones(gpos) == 1) {
+	  ENQUEUE(conn, pos, epos, distance + 2.0, 1.0, NO_MOVE, NO_MOVE);
 	}
 
 	if (board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.8
 	    && does_secure_through_ladder(color, bpos, gpos)) {
-	  ENQUEUE(conn, bpos, distance + 1.8, 0.9);
+	  ENQUEUE(conn, pos, bpos, distance + 1.8, 0.9, NO_MOVE, NO_MOVE);
 	}
 
-	/* Case 14. Diagonal connection to empty vertex "b" through
+	/* Case 16. Diagonal connection to empty vertex "b" through
 	 * opponent stones "a" or "g" with few liberties.
 	 */
 	if (board[bpos] == EMPTY
@@ -2682,10 +2891,10 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[gpos] == other
 	    && conn->distances[bpos] > distance + 2.0
 	    && (countlib(apos) + countlib(gpos) <= 6)) {
-	  ENQUEUE(conn, bpos, distance + 2.0, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 2.0, 1.0, NO_MOVE, NO_MOVE);
 	}
 
-	/* Case 15. Diagonal connection to own stone "b" through
+	/* Case 17. Diagonal connection to own stone "b" through
 	 * opponent stones "a" or "g" with few liberties.
 	 */
 	if (board[bpos] == color
@@ -2693,24 +2902,24 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[gpos] == other
 	    && conn->distances[bpos] > distance + 2.0
 	    && (countlib(apos) + countlib(gpos) <= 5)) {
-	  ENQUEUE(conn, bpos, distance + 2.0, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 2.0, 1.0, NO_MOVE, NO_MOVE);
 	}
 
-	/* Case 16. Adjacent opponent stone at "a" which can't avoid atari.
+	/* Case 18. Adjacent opponent stone at "a" which can't avoid atari.
 	 */
 	if (board[apos] == other
 	    && conn->distances[apos] > distance + 0.1
 	    && no_escape_from_atari(apos)) {
-	  ENQUEUE(conn, apos, distance + 0.1, 0.1);
+	  ENQUEUE(conn, pos, apos, distance + 0.1, 0.1, NO_MOVE, NO_MOVE);
 	}
 
-	/* Case 17. Adjacent opponent stone at "a" which can't avoid
+	/* Case 19. Adjacent opponent stone at "a" which can't avoid
 	 * ladder capture.
 	 */
 	if (board[apos] == other
 	    && conn->distances[apos] > distance + 0.3
 	    && no_escape_from_ladder(apos)) {
-	  ENQUEUE(conn, apos, distance + 0.3, 0.3);
+	  ENQUEUE(conn, pos, apos, distance + 0.3, 0.3, NO_MOVE, NO_MOVE);
 	}
       }
     }
@@ -2747,10 +2956,11 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 #endif
 	
 	if (board[apos] == color) {
-	  ENQUEUE(conn, apos, distance, 0.0);
+	  ENQUEUE(conn, pos, apos, distance, 0.0,
+		  conn->vulnerable1[pos], conn->vulnerable2[pos]);
 	}
 	else if (ON_BOARD(apos)) {
-	  ENQUEUE(conn, apos, distance + 1.0, 1.0);
+	  ENQUEUE(conn, pos, apos, distance + 1.0, 1.0, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 1. Diagonal connection to empty vertex "b" through
@@ -2760,7 +2970,7 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[apos] == EMPTY
 	    && board[gpos] == EMPTY
             && conn->distances[bpos] > distance + 1.5) {
-	  ENQUEUE(conn, bpos, distance + 1.5, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 1.5, 1.0, NO_MOVE, NO_MOVE);
 	}
 	
 	/* Case 2. Diagonal connection to friendly stone at "b" through
@@ -2770,7 +2980,7 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	    && board[apos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && conn->distances[bpos] > distance + 1.3) {
-	  ENQUEUE(conn, bpos, distance + 1.3, 1.0);
+	  ENQUEUE(conn, pos, bpos, distance + 1.3, 1.0, NO_MOVE, NO_MOVE);
 	}
       }
     }
@@ -2784,6 +2994,7 @@ print_connection_distances(struct connection_data *conn)
 {
   int i, j;
   int ch;
+  int pos;
   
   fprintf(stderr, "  ");
   for (j = 0, ch = 'A'; j < board_size; j++, ch++) {
@@ -2796,7 +3007,7 @@ print_connection_distances(struct connection_data *conn)
   for (i = 0; i < board_size; i++) {
     fprintf(stderr, "%2d ", board_size - i);
     for (j = 0; j < board_size; j++) {
-      int pos = POS(i, j);
+      pos = POS(i, j);
       if (conn->distances[pos] == HUGE_CONNECTION_DISTANCE) {
 	if (board[pos] == WHITE)
 	  fprintf(stderr, " O  ");
@@ -2812,6 +3023,19 @@ print_connection_distances(struct connection_data *conn)
     fprintf(stderr, "\n");
   }
   fprintf(stderr, "\n");
+
+  fprintf(stderr, "Vulnerable:\n");
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (conn->distances[pos] < HUGE_CONNECTION_DISTANCE
+	&& (conn->vulnerable1[pos] != NO_MOVE
+	    || conn->vulnerable2[pos] != NO_MOVE)) {
+      gprintf(" %1m:", pos);
+      if (conn->vulnerable1[pos] != NO_MOVE)
+	gprintf(" %1m", conn->vulnerable1[pos]);
+      if (conn->vulnerable2[pos] != NO_MOVE)
+	gprintf(" %1m", conn->vulnerable2[pos]);
+      gprintf("\n", pos);
+    }
 }
 
 
@@ -2966,7 +3190,7 @@ no_escape_from_atari(int str)
 
 /* Test whether the string str with one liberty is captured in a
  * ladder. This function trivially returns false if the string has
- * more than one liberty to start with.
+ * more than one liberty to start with, except for one special case.
  * FIXME: Needs a simple_ladder_defense().
  */
 static int
@@ -2975,6 +3199,8 @@ no_escape_from_ladder(int str)
   int result = 0;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
+  int adj[MAXCHAIN];
+  int libs[2];
   
   /* We turn off the sgf traces here to avoid cluttering them up with
    * tactical reading moves.
@@ -2984,6 +3210,16 @@ no_escape_from_ladder(int str)
   
   if (countlib(str) == 1 && find_defense(str, NULL) == 0)
     result = 1;
+
+  if (countlib(str) == 2
+      && chainlinks2(str, adj, 1) == 0
+      && findlib(str, 2, libs) == 2
+      && approxlib(libs[0], board[str], 2, NULL) == 1
+      && approxlib(libs[1], board[str], 2, NULL) == 1
+      && ladder_capture(str, NULL)
+      && !find_defense(str, NULL))
+    result = 1;
+      
   
   /* Turn the sgf traces back on. */
   sgf_dumptree = save_sgf_dumptree;
@@ -2992,6 +3228,68 @@ no_escape_from_ladder(int str)
   return result;
 }
 
+/* We usually don't want to spend time with moves which are
+ * self-atari, unless the stone is involved in a ko.
+ */
+static int
+check_self_atari(int pos, int color_to_move)
+{
+#if 0
+  int lib;
+#endif
+  
+  if (!is_self_atari(pos, color_to_move))
+    return 1;
+
+  if (is_ko(pos, color_to_move, NULL))
+    return 1;
+
+#if 0
+  /* FIXME: At some time I added this exceptional case but I can no
+   * longer see how it would be useful. It might still be, however, so
+   * I leave the code in for a while. /gf
+   */
+  if (approxlib(pos, color_to_move, 1, &lib) >= 1
+      && approxlib(lib, OTHER_COLOR(color_to_move), 3, NULL) <= 2
+      && ladder_capturable(lib, OTHER_COLOR(color_to_move)))
+    return 1;
+#endif
+
+  return 0;
+}
+
+/* Check for overlap between (a1, a2) and (b1, b2). */
+static int
+common_vulnerabilities(int a1, int a2, int b1, int b2, int color)
+{
+  return (common_vulnerability(a1, b1, color)
+	  || common_vulnerability(a1, b2, color)
+	  || common_vulnerability(a2, b1, color)
+	  || common_vulnerability(a2, b2, color));
+}
+
+/* Check if apos and bpos are the same or if they are both liberties
+ * of a string of the given color with at most three liberties.
+ */
+static int
+common_vulnerability(int apos, int bpos, int color)
+{
+  int k;
+  
+  if (apos == NO_MOVE || bpos == NO_MOVE)
+    return 0;
+  
+  if (apos == bpos)
+    return 1;
+
+  for (k = 0; k < 4; k++)
+    if (board[apos + delta[k]] == color
+	&& countlib(apos + delta[k]) <= 3
+	&& liberty_of_string(bpos, apos + delta[k]))
+      return 1;
+
+  return 0;
+}
 
 /*
  * Local Variables:
