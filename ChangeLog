@@ -3,13 +3,12 @@
 -------------------------------------------------------------------------
 
 - bugfix (reading uninitialized memory) in sniff_lunch()
+- bugfix (EXPERIMENTAL_CONNECTIONS) in cut_connect_callback()
 - man page revised
 - new options --mirror and --mirror-limit
 - new global variables play_mirror_go and mirror_stones_limit
-- new static functions find_mirror_move() and
-  test_symmetry_after_move() in genmove.c
-- Apply "B" cutting pattern from shapes.db only when connection code
-  confirms it is working
+- new static find_mirror_move(), test_symmetry_after_move() in genmove.c
+- Apply "B" cutting pattern from shapes.db only if connection code confirms
 - new function test_attack_either_move; gets invoked by patterns
   instead of directly adding the attack-either move reason
 - new function mark_changed_dragon() in move_reasons.c
@@ -18,12 +17,10 @@
 - break_chain2_moves() revised
 - placehand() renamed to place_fixed_handicap()
 - new function place_free_handicap() in handicap.c with associated
-  static functions find_free_handicap_pattern() and
-  free_handicap_callback()
+- static find_free_handicap_pattern(), free_handicap_callback() in handicap.c
 - new GTP command place_free_handicap
 - new pattern database handicap.db
-- new autohelper functions remaining_handicap_stones and
-  total_handicap_stones, useful from handicap.db
+- new autohelper macros handicap_stones, total_handicap_stones for handicap.db
 - mkpat.c revised to avoid compiler warnings for constraints using no labels
 - new file engine/handicap.c
 - placehand() moved from genmove.c to handicap.c
@@ -31,6 +28,7 @@
 - FIXME added regarding several EITHER_MOVE reasons
 - tuning
 - influence tuning
+- connection tuning
 - owl tuning
 - revised tests, many new tests, new game files
 - added Evan Berggren Daniel to AUTHORS

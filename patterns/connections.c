@@ -64,7 +64,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
    * previously during find_cuts.
    */
 
-  if (!EXPERIMENTAL_CONNECTIONS && (pattern->class & CLASS_C)) {
+  if (!experimental_connections && (pattern->class & CLASS_C)) {
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
       /* transform pattern real coordinate */
       int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
