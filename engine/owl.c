@@ -553,13 +553,9 @@ do_owl_analyze_semeai(int apos, int bpos,
   const char *best_move_name = NULL;
   int this_resulta = -1;
   int this_resultb = -1;
-#if USE_HASHTABLE_NG
-  int  xpos;
-  int  value1;
-  int  value2;
-#else
-  Read_result *read_result = NULL;
-#endif
+  int xpos;
+  int value1;
+  int value2;
   int this_variation_number = count_variations - 1;
   int you_look_alive = 0;
   int I_look_alive = 0;
@@ -580,14 +576,11 @@ do_owl_analyze_semeai(int apos, int bpos,
   ASSERT1(board[apos] == owla->color, apos);
   ASSERT1(board[bpos] == owlb->color, bpos);
 
-#if USE_HASHTABLE_NG
-
   if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
       && !pass && owl_phase
-      && tt_get(&ttable, SEMEAI, apos, bpos,
-		depth - stackp, NULL,
+      && tt_get(&ttable, SEMEAI, apos, bpos, depth - stackp, NULL,
 		&value1, &value2, &xpos)) {
-    TRACE_CACHED_RESULT2_NG(value1, value2, xpos);
+    TRACE_CACHED_RESULT2(value1, value2, xpos);
     if (value1 != 0)
       *move = xpos;
       
@@ -602,31 +595,6 @@ do_owl_analyze_semeai(int apos, int bpos,
     SGFTRACE_SEMEAI(xpos, *resulta, *resultb, "cached");
     return;
   }
-
-#else
-  if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
-      && !pass && owl_phase) {
-    if (get_read_result2(SEMEAI, &apos, &bpos, &read_result)) {
-      TRACE_CACHED_RESULT2(*read_result);
-
-      if (rr_get_result1(*read_result) != 0)
-	*move = rr_get_move(*read_result);
-      
-      *resulta = rr_get_result1(*read_result);
-      *resultb = rr_get_result2(*read_result);
-
-      TRACE("%oVariation %d: %1m %1m %s %s %1m (cached) ",
-            this_variation_number, apos, bpos,
-	    result_to_string(*resulta),
-	    result_to_string(*resultb),
-	    *move);
-      SGFTRACE_SEMEAI(rr_get_move(*read_result), *resulta,
-	              *resultb, "cached");
-      return;
-    }
-  }
-
-#endif
 
   global_owl_node_counter++;
   local_owl_node_counter++;
@@ -679,12 +647,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  sgf_dumptree = save_sgf_dumptree;
 	  count_variations = save_count_variations;
 	  SGFTRACE_SEMEAI(upos, WIN, WIN, "tactical win found");
-#if USE_HASHTABLE_NG
-	  READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos,
-				depth - stackp, move, upos, WIN, WIN);
-#else
-	  READ_RETURN_SEMEAI(read_result, move, upos, WIN, WIN);
-#endif
+	  READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+			     move, upos, WIN, WIN);
 	}
 	else if (acode != 0
 		 && find_defense(semeai_worms[sworm], NULL)) {
@@ -802,12 +766,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       count_variations = save_count_variations;
       TRACE("Both live\n");
       SGFTRACE_SEMEAI(PASS_MOVE, WIN, 0, "Both live");
-#if USE_HASHTABLE_NG
-	  READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos,
-				depth - stackp, move, PASS_MOVE, WIN, 0);
-#else
-      READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, 0);
-#endif
+      READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+			 move, PASS_MOVE, WIN, 0);
     }
     
     /* Next the shape moves. */
@@ -1044,12 +1004,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 	SGFTRACE_SEMEAI(mpos, WIN, WIN, moves[k].name);
 	close_pattern_list(color, &shape_defensive_patterns);
 	close_pattern_list(color, &shape_offensive_patterns);
-#if USE_HASHTABLE_NG
-	READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos,
-			      depth - stackp, move, mpos, WIN, WIN);
-#else
-	READ_RETURN_SEMEAI(read_result, move, mpos, WIN, WIN);
-#endif
+	READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+			   move, mpos, WIN, WIN);
       }
       /* When there is a choice between ko and seki, the prefer_ko
        * variable decides policy. Thus if prefer_ko == color we
@@ -1083,12 +1039,8 @@ do_owl_analyze_semeai(int apos, int bpos,
     *resultb = 0;
     *move = PASS_MOVE;
     SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You live, I die");
-#if USE_HASHTABLE_NG
-    READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos,
-			  depth - stackp, move, PASS_MOVE, 0, 0);
-#else
-    READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
-#endif
+    READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+		       move, PASS_MOVE, 0, 0);
   }
 
   /* If we can't find a move and we look dead even if including the
@@ -1115,12 +1067,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 	*resultb = 0;
 	*move = PASS_MOVE;
 	SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You live, I die - 2");
-#if USE_HASHTABLE_NG
-	READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos,
-			      depth - stackp, move, PASS_MOVE, 0, 0);
-#else
-	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
-#endif
+	READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+			   move, PASS_MOVE, 0, 0);
       }
       include_semeai_worms_in_eyespace = 0;
     }
@@ -1136,12 +1084,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE("You have more eyes.\n");
       SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You have more eyes");
-#if USE_HASHTABLE_NG
-      READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos,
-			    depth - stackp, move, PASS_MOVE, 0, 0);
-#else
-      READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
-#endif
+      READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+			 move, PASS_MOVE, 0, 0);
     }
     else if (max_eyes(&probable_eyes_b) < min_eyes(&probable_eyes_a)) {
       *resulta = WIN;
@@ -1149,12 +1093,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE("I have more eyes\n");
       SGFTRACE_SEMEAI(PASS_MOVE, WIN, WIN, "I have more eyes");
-#if USE_HASHTABLE_NG
-      READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos,
-			    depth - stackp, move, PASS_MOVE, WIN, WIN);
-#else
-      READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, WIN);
-#endif
+      READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+			 move, PASS_MOVE, WIN, WIN);
     }
     else {
       *resulta = WIN;
@@ -1162,12 +1102,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE("Seki\n");
       SGFTRACE_SEMEAI(PASS_MOVE, WIN, 0, "Seki");
-#if USE_HASHTABLE_NG
-      READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos, 
-			    depth - stackp, move, PASS_MOVE, WIN, 0);
-#else
-      READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, 0);
-#endif
+      READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+			 move, PASS_MOVE, WIN, 0);
     }
   }
   
@@ -1180,12 +1116,8 @@ do_owl_analyze_semeai(int apos, int bpos,
     TRACE("No move found\n");
     SGFTRACE_SEMEAI(PASS_MOVE, *resulta, *resultb, "No move found");
     *move = PASS_MOVE;
-#if USE_HASHTABLE_NG
-    READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos,
-			  depth - stackp, move, PASS_MOVE, *resulta, *resultb);
-#else
-    READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, *resulta, *resultb);
-#endif
+    READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp,
+		       move, PASS_MOVE, *resulta, *resultb);
   }
 
   *resulta = best_resulta;
@@ -1194,12 +1126,8 @@ do_owl_analyze_semeai(int apos, int bpos,
     best_move = PASS_MOVE;
   *move = best_move;
   SGFTRACE_SEMEAI(best_move, best_resulta, best_resultb, best_move_name);
-#if USE_HASHTABLE_NG
-  READ_RETURN_SEMEAI_NG(SEMEAI, apos, bpos, depth - stackp, 
-			move, best_move, best_resulta, best_resultb);
-#else
-  READ_RETURN_SEMEAI(read_result, move, best_move, best_resulta, best_resultb);
-#endif
+  READ_RETURN_SEMEAI(SEMEAI, apos, bpos, depth - stackp, 
+		     move, best_move, best_resulta, best_resultb);
 }
 
 /* Play a move, update goal and boundaries appropriately, and call
@@ -1768,14 +1696,9 @@ do_owl_attack(int str, int *move, int *wormid,
   struct eyevalue probable_eyes; /* Best guess of eyevalue. */
   const char *live_reason;
   int move_cutoff;
-#if USE_HASHTABLE_NG
-  int  xpos;
-  int  value1;
-  int  value2;
-#else
-  Read_result *read_result = NULL;
-  int  found_read_result;
-#endif
+  int xpos;
+  int value1;
+  int value2;
   int this_variation_number = count_variations - 1;
   
   SETUP_TRACE_INFO("owl_attack", str);
@@ -1783,14 +1706,12 @@ do_owl_attack(int str, int *move, int *wormid,
   shape_patterns.initialized = 0;
 
   str = find_origin(str);
-#if USE_HASHTABLE_NG
 
   if ((hashflags & HASH_OWL_ATTACK)
-      && tt_get(&ttable, OWL_ATTACK, str, NO_MOVE,
-		depth - stackp, NULL, 
+      && tt_get(&ttable, OWL_ATTACK, str, NO_MOVE, depth - stackp, NULL, 
 		&value1, &value2, &xpos) == 2) {
 
-    TRACE_CACHED_RESULT_NG(value1, xpos);
+    TRACE_CACHED_RESULT(value1, xpos);
     if (value1 != 0) {
       if (move)
 	*move = xpos;
@@ -1815,49 +1736,10 @@ do_owl_attack(int str, int *move, int *wormid,
   }
 
 
-#else
-
-  if (hashflags & HASH_OWL_ATTACK) {
-    found_read_result = get_read_result(OWL_ATTACK, 
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (move)
-	  *move = rr_get_move(*read_result);
-      }
-      if (rr_get_result(*read_result) == GAIN) {
-	if (wormid) {
-	  if (goal_worms_computed)
-	    *wormid = rr_get_result2(*read_result);
-	  else
-	    *wormid = MAX_GOAL_WORMS;
-	}
-      }
-
-      if (rr_get_result(*read_result) == WIN)
-	TRACE("%oVariation %d: DEAD (cached)\n", this_variation_number);
-      else
-	TRACE("%oVariation %d: ALIVE (cached)\n", this_variation_number);
-
-      SGFTRACE(rr_get_move(*read_result), rr_get_result(*read_result),
-	       "cached");
-      return rr_get_result(*read_result);
-    }
-  }
-
-#endif
-
-
   /* If reading goes to deep or we run out of nodes, we assume life. */
   if (reading_limit_reached(&live_reason, this_variation_number)) {
     SGFTRACE(0, 0, live_reason);
-#if USE_HASHTABLE_NG
-    READ_RETURN_NG(OWL_ATTACK, str, depth - stackp, 
-		   move, 0, 0);
-#else
-    READ_RETURN(read_result, move, 0, 0);
-#endif
+    READ_RETURN(OWL_ATTACK, str, depth - stackp, move, 0, 0);
   }
 
   memset(mw, 0, sizeof(mw));
@@ -1898,22 +1780,14 @@ do_owl_attack(int str, int *move, int *wormid,
     }
     SGFTRACE(0, acode, live_reason);
     TRACE("%oVariation %d: ALIVE (%s)\n", this_variation_number, live_reason);
-    if (acode == 0)
-#if USE_HASHTABLE_NG
-      READ_RETURN_NG(OWL_ATTACK, str, depth - stackp, 
-		     move, 0, 0);
-#else
-      READ_RETURN(read_result, move, 0, 0);
-#endif
+    if (acode == 0) {
+      READ_RETURN(OWL_ATTACK, str, depth - stackp, move, 0, 0);
+    }
     else {
       if (wormid)
 	*wormid = saveworm;
-#if USE_HASHTABLE_NG
-      READ_RETURN2_NG(OWL_ATTACK, str, depth - stackp, 
-		      move, mpos, acode, saveworm);
-#else
-      READ_RETURN2(read_result, move, mpos, acode, saveworm);
-#endif
+      READ_RETURN2(OWL_ATTACK, str, depth - stackp,
+		   move, mpos, acode, saveworm);
     }
   }
 
@@ -2002,12 +1876,7 @@ do_owl_attack(int str, int *move, int *wormid,
 		this_variation_number);
 	  SGFTRACE(0, WIN, "no defense");
 	  close_pattern_list(other, &shape_patterns);
-#if USE_HASHTABLE_NG
-	  READ_RETURN_NG(OWL_ATTACK, str, depth - stackp, 
-			 move, 0, WIN);
-#else
-	  READ_RETURN(read_result, move, 0, WIN);
-#endif
+	  READ_RETURN(OWL_ATTACK, str, depth - stackp, move, 0, WIN);
 	}
 	else if (dpos != NO_MOVE) {
 	  /* The dragon could be defended by one more move. Try to
@@ -2053,11 +1922,7 @@ do_owl_attack(int str, int *move, int *wormid,
       TRACE("%oVariation %d: ALIVE (escaped)\n", this_variation_number);
       SGFTRACE(0, 0, "escaped");
       close_pattern_list(other, &shape_patterns);
-#if USE_HASHTABLE_NG
-      READ_RETURN0_NG(OWL_ATTACK, str, depth - stackp)
-#else
-      READ_RETURN0(read_result);
-#endif
+      READ_RETURN0(OWL_ATTACK, str, depth - stackp);
     }
 #endif
 
@@ -2163,12 +2028,7 @@ do_owl_attack(int str, int *move, int *wormid,
 	    SGFTRACE(mpos, WIN, winstr);
 	  }
           close_pattern_list(other, &shape_patterns);
-#if USE_HASHTABLE_NG
-	  READ_RETURN_NG(OWL_ATTACK, str, depth - stackp,
-			 move, mpos, WIN);
-#else
-	  READ_RETURN(read_result, move, mpos, WIN);
-#endif
+	  READ_RETURN(OWL_ATTACK, str, depth - stackp, move, mpos, WIN);
 	}
 	else if (experimental_owl_ext && dcode == LOSS) {
 	  if (saveworm == MAX_GOAL_WORMS
@@ -2247,21 +2107,12 @@ do_owl_attack(int str, int *move, int *wormid,
       SGFTRACE(savemove, savecode, "attack effective (gain) - E");
       if (wormid)
 	*wormid = saveworm;
-#if USE_HASHTABLE_NG
-      READ_RETURN2_NG(OWL_ATTACK, str, depth - stackp,
-		      move, savemove, savecode, saveworm);
-#else
-      READ_RETURN2(read_result, move, savemove, savecode, saveworm);
-#endif
+      READ_RETURN2(OWL_ATTACK, str, depth - stackp,
+		   move, savemove, savecode, saveworm);
     }
     else {
       SGFTRACE(savemove, savecode, "attack effective (ko) - E");
-#if USE_HASHTABLE_NG
-      READ_RETURN_NG(OWL_ATTACK, str, depth - stackp,
-		     move, savemove, savecode);
-#else
-      READ_RETURN(read_result, move, savemove, savecode);
-#endif
+      READ_RETURN(OWL_ATTACK, str, depth - stackp, move, savemove, savecode);
     }
   }
 
@@ -2271,11 +2122,8 @@ do_owl_attack(int str, int *move, int *wormid,
 	  	    count_variations - this_variation_number);
     SGFTRACE(0, 0, winstr);
   }
-#if USE_HASHTABLE_NG
-  READ_RETURN0_NG(OWL_ATTACK, str, depth - stackp);
-#else
-  READ_RETURN0(read_result);
-#endif
+  
+  READ_RETURN0(OWL_ATTACK, str, depth - stackp);
 }
 
 
@@ -2491,14 +2339,9 @@ do_owl_defend(int str, int *move, int *wormid,
   int escape_route;
   const char *live_reason;
   int move_cutoff;
-# if USE_HASHTABLE_NG
-  int  xpos;
-  int  value1;
-  int  value2;
-#else
-  Read_result *read_result = NULL;
-  int  found_read_result;
-#endif
+  int xpos;
+  int value1;
+  int value2;
   int this_variation_number = count_variations - 1;
 
   SETUP_TRACE_INFO("owl_defend", str);
@@ -2506,14 +2349,12 @@ do_owl_defend(int str, int *move, int *wormid,
   shape_patterns.initialized = 0;
   
   str = find_origin(str);
-#if USE_HASHTABLE_NG
 
   if ((hashflags & HASH_OWL_DEFEND)
-      && tt_get(&ttable, OWL_DEFEND, str, NO_MOVE,
-		depth - stackp, NULL, 
+      && tt_get(&ttable, OWL_DEFEND, str, NO_MOVE, depth - stackp, NULL, 
 		&value1, &value2, &xpos) == 2) {
     
-    TRACE_CACHED_RESULT_NG(value1, xpos);
+    TRACE_CACHED_RESULT(value1, xpos);
     if (value1 != 0) {
       if (move)
 	*move = xpos;
@@ -2537,40 +2378,6 @@ do_owl_defend(int str, int *move, int *wormid,
     return value1;
   }
 
-#else
-
-  if (hashflags & HASH_OWL_DEFEND) {
-    found_read_result = get_read_result(OWL_DEFEND,
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0) {
-	if (move)
-	  *move = rr_get_move(*read_result);
-      }
-      if (rr_get_result(*read_result) == LOSS) {
-	if (wormid) {
-	  if (goal_worms_computed)
-	    *wormid = rr_get_result2(*read_result);
-	  else
-	    *wormid = MAX_GOAL_WORMS;
-	}
-      }
-
-      if (rr_get_result(*read_result) == WIN
-	  || rr_get_result(*read_result) == LOSS)
-	TRACE("%oVariation %d: ALIVE (cached)\n", this_variation_number);
-      else
-	TRACE("%oVariation %d: DEAD (cached)\n", this_variation_number);
-
-      SGFTRACE(rr_get_move(*read_result), rr_get_result(*read_result),
-	       "cached");
-      return rr_get_result(*read_result);
-    }
-  }
-
-#endif
-
   /* In order to get a defense move even if we seem to already have
    * escaped and to reduce the impact of overestimated escape
    * possibilities, we don't declare escape victory on the first move.
@@ -2586,23 +2393,13 @@ do_owl_defend(int str, int *move, int *wormid,
      */
     TRACE("%oVariation %d: ALIVE (escaped)\n", this_variation_number);
     SGFTRACE(0, WIN, "escaped");
-#if USE_HASHTABLE_NG
-    READ_RETURN_NG(OWL_DEFEND, str, depth - stackp,
-		   move, 0, WIN);
-#else
-    READ_RETURN(read_result, move, 0, WIN);
-#endif
+    READ_RETURN(OWL_DEFEND, str, depth - stackp, move, 0, WIN);
   }
 
   /* If reading goes to deep or we run out of nodes, we assume life. */
   if (reading_limit_reached(&live_reason, this_variation_number)) {
     SGFTRACE(0, WIN, live_reason);
-#if USE_HASHTABLE_NG
-    READ_RETURN_NG(OWL_DEFEND, str, depth - stackp,
-		   move, 0, WIN);
-#else
-    READ_RETURN(read_result, move, 0, WIN);
-#endif
+    READ_RETURN(OWL_DEFEND, str, depth - stackp, move, 0, WIN);
   }
 
   memset(mw, 0, sizeof(mw));
@@ -2619,12 +2416,7 @@ do_owl_defend(int str, int *move, int *wormid,
       SGFTRACE(0, WIN, live_reason);
       TRACE("%oVariation %d: ALIVE (%s)\n",
 	    this_variation_number, live_reason);
-#if USE_HASHTABLE_NG
-      READ_RETURN_NG(OWL_DEFEND, str, depth - stackp,
-		     move, 0, WIN);
-#else
-      READ_RETURN(read_result, move, 0, WIN);
-#endif
+      READ_RETURN(OWL_DEFEND, str, depth - stackp, move, 0, WIN);
     }
   }
   else {
@@ -2800,12 +2592,7 @@ do_owl_defend(int str, int *move, int *wormid,
 	    SGFTRACE(mpos, WIN, winstr);
 	  }
 	  close_pattern_list(color, &shape_patterns);
-#if USE_HASHTABLE_NG
-	  READ_RETURN_NG(OWL_DEFEND, str, depth - stackp,
-			 move, mpos, WIN);
-#else
-	  READ_RETURN(read_result, move, mpos, WIN);
-#endif
+	  READ_RETURN(OWL_DEFEND, str, depth - stackp, move, mpos, WIN);
 	}
 	if (acode == GAIN)
 	  saveworm = wid;
@@ -2831,32 +2618,18 @@ do_owl_defend(int str, int *move, int *wormid,
       SGFTRACE(savemove, savecode, "defense effective (loss) - B");
       if (wormid)
 	*wormid = saveworm;
-#if USE_HASHTABLE_NG
-      READ_RETURN2_NG(OWL_DEFEND, str, depth - stackp,
-		      move, savemove, savecode, saveworm);
-#else
-      READ_RETURN2(read_result, move, savemove, savecode, saveworm);
-#endif
+      READ_RETURN2(OWL_DEFEND, str, depth - stackp,
+		   move, savemove, savecode, saveworm);
     }
     else {
       SGFTRACE(savemove, savecode, "defense effective (ko) - B");
-#if USE_HASHTABLE_NG
-      READ_RETURN_NG(OWL_DEFEND, str, depth - stackp,
-		     move, savemove, savecode);
-#else
-      READ_RETURN(read_result, move, savemove, savecode);
-#endif
+      READ_RETURN(OWL_DEFEND, str, depth - stackp, move, savemove, savecode);
     }
   }
 
   if (number_tried_moves == 0 && min_eyes(&probable_eyes) >= 2) {
     SGFTRACE(0, WIN, "genus probably >= 2");
-#if USE_HASHTABLE_NG
-    READ_RETURN_NG(OWL_DEFEND, str, depth - stackp,
-		   move, 0, WIN);
-#else
-    READ_RETURN(read_result, move, 0, WIN);
-#endif
+    READ_RETURN(OWL_DEFEND, str, depth - stackp, move, 0, WIN);
   }
   
 
@@ -2868,11 +2641,7 @@ do_owl_defend(int str, int *move, int *wormid,
     SGFTRACE(0, 0, winstr);
   }
 
-#if USE_HASHTABLE_NG
-  READ_RETURN0_NG(OWL_DEFEND, str, depth - stackp);
-#else
-  READ_RETURN0(read_result);
-#endif
+  READ_RETURN0(OWL_DEFEND, str, depth - stackp);
 }
 
 

@@ -1163,12 +1163,7 @@ do_find_defense(int str, int *move)
   int xpos = NO_MOVE;
   int dcode = 0;
   int liberties;
-#if !USE_HASHTABLE_NG
-  int found_read_result;
-  Read_result *read_result = NULL;
-#else
   int retval;
-#endif
   
   SETUP_TRACE_INFO("find_defense", str);
 
@@ -1199,40 +1194,19 @@ do_find_defense(int str, int *move)
   if (liberties > 2 && move)
     xpos = *move;
 
-#if USE_HASHTABLE_NG
-
-  if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)
-      && tt_get(&ttable, FIND_DEFENSE, str, NO_MOVE, 
-		depth - stackp, NULL, 
+  if (stackp <= depth
+      && (hashflags & HASH_FIND_DEFENSE)
+      && tt_get(&ttable, FIND_DEFENSE, str, NO_MOVE, depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
     /* Note that if return value is 1 (too small depth), the move will
      * still be used for move ordering.
      */
-    TRACE_CACHED_RESULT_NG(retval, xpos);
+    TRACE_CACHED_RESULT(retval, xpos);
     SGFTRACE(xpos, retval, "cached");
     if (move)
       *move = xpos;
     return retval;
   }
-
-#else
-
-  if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)) {
-    found_read_result = get_read_result(FIND_DEFENSE, 
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0)
-	if (move)
-	  *move = rr_get_move(*read_result);
-
-      SGFTRACE(rr_get_move(*read_result),
-	       rr_get_result(*read_result), "cached");
-      return rr_get_result(*read_result);
-    }
-  }
-
-#endif
 
 #if EXPERIMENTAL_READING
   if (defend_by_pattern) {
@@ -1252,19 +1226,10 @@ do_find_defense(int str, int *move)
     dcode = defend4(str, &xpos);
 
   if (dcode) {
-#if USE_HASHTABLE_NG
-    READ_RETURN_NG(FIND_DEFENSE, str, depth - stackp, 
-		   move, xpos, dcode);
-#else
-    READ_RETURN(read_result, move, xpos, dcode);
-#endif
+    READ_RETURN(FIND_DEFENSE, str, depth - stackp, move, xpos, dcode);
   }
     
-#if USE_HASHTABLE_NG
-  READ_RETURN0_NG(FIND_DEFENSE, str, depth - stackp);
-#else
-  READ_RETURN0(read_result);
-#endif
+  READ_RETURN0(FIND_DEFENSE, str, depth - stackp);
 }
 
 
@@ -2955,12 +2920,7 @@ do_attack(int str, int *move)
   int xpos = NO_MOVE;
   int liberties;
   int result = 0;
-#if !USE_HASHTABLE_NG
-  int found_read_result;
-  Read_result *read_result = NULL;
-#else
-  int  retval;
-#endif
+  int retval;
 
   SETUP_TRACE_INFO("attack", str);
 
@@ -2992,40 +2952,19 @@ do_attack(int str, int *move)
   if (liberties > 3 && move)
     xpos = *move;
 
-#if USE_HASHTABLE_NG
-
   /* Note that if return value is 1 (too small depth), the move will
    * still be used for move ordering.
    */
-  if ((stackp <= depth) && (hashflags & HASH_ATTACK)
-      && tt_get(&ttable, ATTACK, str, NO_MOVE, 
-		depth - stackp, NULL, 
+  if (stackp <= depth
+      && (hashflags & HASH_ATTACK)
+      && tt_get(&ttable, ATTACK, str, NO_MOVE, depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
-    TRACE_CACHED_RESULT_NG(retval, xpos);
+    TRACE_CACHED_RESULT(retval, xpos);
     SGFTRACE(xpos, retval, "cached");
     if (move)
       *move = xpos;
     return retval;
   }
-
-#else
-
-  if ((stackp <= depth) && (hashflags & HASH_ATTACK)) {
-    found_read_result = get_read_result(ATTACK, 
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0)
-	if (move)
-	  *move = rr_get_move(*read_result);
-
-      SGFTRACE(rr_get_move(*read_result),
-	       rr_get_result(*read_result), "cached");
-      return rr_get_result(*read_result);
-    }
-  }
-
-#endif
 
 #if EXPERIMENTAL_READING
   if (attack_by_pattern) {
@@ -3053,19 +2992,11 @@ do_attack(int str, int *move)
 
   ASSERT1(result >= 0 && result <= WIN, str);
   
-  if (result)
-#if USE_HASHTABLE_NG
-    READ_RETURN_NG(ATTACK, str, depth - stackp, 
-		   move, xpos, result);
-#else
-    READ_RETURN(read_result, move, xpos, result);
-#endif
+  if (result) {
+    READ_RETURN(ATTACK, str, depth - stackp, move, xpos, result);
+  }
 
-#if USE_HASHTABLE_NG
-  READ_RETURN0_NG(ATTACK, str, depth - stackp);
-#else
-  READ_RETURN0(read_result);
-#endif
+  READ_RETURN0(ATTACK, str, depth - stackp);
 }
 
 

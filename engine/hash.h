@@ -76,12 +76,11 @@ typedef unsigned long Hashvalue;
  */
 
 typedef struct {
-  Hashvalue     hashval[NUM_HASHVALUES];
+  Hashvalue hashval[NUM_HASHVALUES];
 } Hash_data;
 
 extern Hash_data hashdata;
 
-Hash_data xor_hashvalues(Hash_data *key1, Hash_data *key2);
 Hash_data goal_to_hashvalue(const char *goal);
 
 void hash_init(void);

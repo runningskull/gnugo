@@ -32,9 +32,6 @@
  * (Reading/Hashing) for more information.  
  */
 
-/* Define to 1 if you want the new transposition table. */
-#define USE_HASHTABLE_NG 1
-
 
 /* Hashnode: a node stored in the transposition table.
  *
@@ -59,9 +56,9 @@
  *   The last 9 bits together give an index for the total costs.
  */
 typedef struct {
-  Hash_data     key;
-  unsigned int  data; /* Should be 32 bits, but only wastes 25% if 64 bits. */
-} Hashnode_ng;
+  Hash_data key;
+  unsigned int data; /* Should be 32 bits, but only wastes 25% if 64 bits. */
+} Hashnode;
 
 #define HN_MAX_REMAINING_DEPTH  31
 
@@ -69,9 +66,9 @@ typedef struct {
 /* Hashentry: an entry, with two nodes of the hash_table
  */
 typedef struct {
-  Hashnode_ng  deepest;
-  Hashnode_ng  newest;
-} Hashentry_ng;
+  Hashnode deepest;
+  Hashnode newest;
+} Hashentry;
 
 /* Hn is for hash node. */
 #define hn_get_value1(hn)           ((hn >> 23) & 0x0f)
@@ -91,15 +88,13 @@ typedef struct {
 
 /* Transposition_table: transposition table used for caching. */
 typedef struct {
-  unsigned int   num_entries;
-  Hashentry_ng  *entries;
-  int            is_clean;
+  unsigned int num_entries;
+  Hashentry *entries;
+  int is_clean;
 } Transposition_table;
 
-extern Transposition_table  ttable;
+extern Transposition_table ttable;
 
-void tt_init(Transposition_table *table, int memsize);
-void tt_clear(Transposition_table *table);
 void tt_free(Transposition_table *table);
 int  tt_get(Transposition_table *table, enum routine_id routine,
 	    int target1, int target2, int remaining_depth,
@@ -111,185 +106,25 @@ void tt_update(Transposition_table *table, enum routine_id routine,
 	       int value1, int value2, int move);
 
 
-#if !USE_HASHTABLE_NG
-/* ================================================================ */
-/*                    The old transposition table                   */
-
-
-/*
- * This struct contains the attack / defense point and the result.
- * It is kept in a linked list, and each position has a list of 
- * these.
- *
- * When a new result node is created, 'status' is set to 1 'open'.
- * This is then set to 2 'closed' when the result is entered. The main
- * use for this is to identify open result nodes when the hashtable is
- * partially cleared. Another potential use for this field is to
- * identify repeated positions in the reading, in particular local
- * double or triple kos.
- *
- * The data1 field packs into 32 bits the following
- * fields:
- *
- * komaster	   :  3 bits (EMPTY, BLACK, WHITE, GRAY, GRAY_WHITE, ...)
- * kom_pos	   : 10 bits (allows MAX_BOARD up to 31)
- * routine	   :  4 bits (currently 10 different choices)
- * str1 	   : 10 bits
- * remaining_depth :  5 bits (depth - stackp)
- *
- * The data2 field packs into 32 bits the following
- * fields:
- *
- * status :   2 bits (0 free, 1 open, 2 closed)
- * result1:   4 bits
- * result2:   4 bits
- * move   :  10 bits
- * str2   :  10 bits
- */
-
-typedef struct read_result_t {
-  unsigned int data1;	
-  unsigned int data2;
-
-  struct read_result_t *next;
-} Read_result;
-
-/* Bit mask for the input bits in the data2 field. */
-#define RR_INPUT_DATA2		0x3ff
-
-/* Read_result entry status. */
-#define RR_STATUS_OPEN		(1 << 28)
-#define RR_STATUS_CLOSED	(2 << 28)
-
-/* Get parts of a Read_result identifying the input data. */
-#define rr_get_komaster(rr)	    (((rr).data1  >> 29) & 0x07)
-#define rr_get_kom_pos(rr)	    (((rr).data1  >> 19) & 0x3ff)
-#define rr_get_routine(rr)	    (((rr).data1  >> 15) & 0x0f)
-#define rr_get_str1(rr) 	    (((rr).data1  >>  5) & 0x3ff)
-#define rr_get_remaining_depth(rr)  (((rr).data1  >>  0) & 0x1f)
-#define rr_get_str2(rr) 	    (((rr).data2  >>  0) & 0x3ff)
-#define rr_get_str(rr)		    rr_get_str1(rr)
-
-/* Set corresponding parts. */
-#define rr_input_data1(routine, komaster, kom_pos, str1, remaining_depth) \
-	(((((((((komaster) << 10) | (kom_pos)) << 4) \
-	  | (routine)) << 10) | (str1)) << 5) | (remaining_depth))
-#define rr_input_data2(str2) (str2) \
-
-/* Get parts of a Read_result constituting the result of a search. */
-#define rr_get_status(rr)      (((rr).data2 >> 28) & 0x03)
-#define rr_get_result1(rr)     (((rr).data2 >> 24) & 0x0f)
-#define rr_get_result2(rr)     (((rr).data2 >> 20) & 0x0f)
-#define rr_get_move(rr)        (((rr).data2 >> 10) & 0x3ff)
-#define rr_get_result(rr)      rr_get_result1(rr)
-
-#define rr_is_free(rr)	       (((rr).data2 \
-				& (RR_STATUS_OPEN | RR_STATUS_CLOSED)) == 0)
-#define rr_is_open(rr)	       (((rr).data2 & RR_STATUS_OPEN) != 0)
-#define rr_is_closed(rr)       (((rr).data2 & RR_STATUS_CLOSED) != 0)
-
-/* Set corresponding parts. Closes the result entry. */
-#define rr_set_result_move(rr, result, move) \
-	(rr).data2 = (((rr).data2 & 0x3ff) | RR_STATUS_CLOSED \
-		      | (((result) & 0x0f) << 24) | (((move) & 0x3ff) << 10))
-
-/* Variation with two results. */
-#define rr_set_result_move2(rr, result1, result2, move) \
-	(rr).data2 = (((rr).data2 & 0x3ff) | RR_STATUS_CLOSED \
-                      | (((result1) & 0x0f) << 24) \
-                      | (((result2) & 0x0f) << 20) \
-                      | (((move) & 0x3ff) << 10))
-
-/*
- * The hash table consists of hash nodes.  Each hash node consists of
- * The hash value for the position it holds, the position itself and
- * the actual information which is purpose of the table from the start.
- *
- * There is also a pointer to another hash node which is used when
- * the nodes are sorted into hash buckets (see below).
- */
-
-typedef struct hashnode_t {
-  Hash_data            key;
-  Read_result         *results;	/* The results of previous readings */
-
-  struct hashnode_t   *next;
-} Hashnode;
-
-
-/*
- * The hash table consists of three parts:
- * - The hash table proper: a number of hash buckets with collisions
- *   being handled by a linked list.
- * - The hash nodes.  These are allocated at creation time and are 
- *   never removed or reallocated in the current implementation.
- * - The search results.  Since many different searches can
- *   be done in the same position, there should be more of these than
- *   hash nodes.
- */
-
-typedef struct hashtable {
-  int		 hashtablesize;	/* Number of hash buckets. */
-  Hashnode     **hashtable;	/* Pointer to array of hashnode lists. */
-
-  Hashnode	*all_nodes;	/* Pointer to all allocated hash nodes. */
-  Hashnode	*node_limit;	/* Pointer to the end of all_nodes[] array. */
-  Hashnode	*free_node;	/* Pointer to the first free node. */
-
-  Read_result	*all_results;	/* Pointer to all allocated results. */
-  Read_result	*result_limit;	/* Pointer to the enf of all_results[] array. */
-  Read_result	*free_result;	/* Pointer to the first free result. */
-
-  /* True if hashtable_partially_clear() hasn't been called yet. In this case
-   * allocated nodes and results (if any) go continuosly in memory which
-   * simplifies clearing.
-   */
-  int		 first_pass;
-} Hashtable;
-
-
-void read_result_dump(Read_result *result, FILE *outfile);
-void hashtable_dump(Hashtable *table, FILE *outfile);
-void hashnode_dump(Hashnode *node, FILE *outfile);
-#endif
-
 /* ================================================================ */
 
 
-/* Macros used from reading.c and owl.c to store and retrieve read
- * results.
+/* Macros used from reading.c, readconnect.c, and owl.c to store and
+ * retrieve read results.
  */
 
 #if TRACE_READ_RESULTS
 
-#if USE_HASHTABLE_NG
-
-#define TRACE_CACHED_RESULT_NG(result, move) \
+#define TRACE_CACHED_RESULT(result, move) \
       gprintf("%o%s %1m %d %d %1m (cached) ", read_function_name, \
 	      q, stackp, result, move); \
       dump_stack();
 
-#define TRACE_CACHED_RESULT2_NG(result1, result2, move) \
+#define TRACE_CACHED_RESULT2(result1, result2, move) \
       gprintf("%o%s %1m %1m %d %d %d %1m (cached) ", read_function_name, \
 	      q1, q2, stackp, result1, result2, move); \
       dump_stack();
 
-#else
-#define TRACE_CACHED_RESULT(rr) \
-      gprintf("%o%s %1m %d %d %1m (cached) ", read_function_name, \
-	      q, stackp, \
-	      rr_get_result(rr), \
-	      rr_get_move(rr)); \
-      dump_stack();
-
-#define TRACE_CACHED_RESULT2(rr) \
-      gprintf("%o%s %1m %1m %d %d %d %1m (cached) ", read_function_name, \
-	      q1, q2, stackp, \
-	      rr_get_result1(rr), \
-	      rr_get_result2(rr), \
-	      rr_get_move(rr)); \
-      dump_stack();
-#endif
 
 #define SETUP_TRACE_INFO(name, str) \
   const char *read_function_name = name; \
@@ -302,13 +137,8 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 
 #else
 
-#if USE_HASHTABLE_NG
-#define TRACE_CACHED_RESULT_NG(result, move)
-#define TRACE_CACHED_RESULT2_NG(result1, result2, move)
-#else
-#define TRACE_CACHED_RESULT(rr)
-#define TRACE_CACHED_RESULT2(rr)
-#endif
+#define TRACE_CACHED_RESULT(result, move)
+#define TRACE_CACHED_RESULT2(result1, result2, move)
 
 #define SETUP_TRACE_INFO(name, str) \
   const char *read_function_name = name; \
@@ -355,16 +185,6 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
 	             result1, result2, message)
 
 
-#if !USE_HASHTABLE_NG
-int get_read_result(enum routine_id routine,
-		    int *str, Read_result **read_result);
-int get_read_result_hash_modified(enum routine_id routine,
-		    		  int *str, Hash_data *hash_modifier,
-				  Read_result **read_result);
-int get_read_result2(enum routine_id routine,
-		     int *str1, int *str2, Read_result **read_result);
-#endif
-
 /* ================================================================ */
 
 /*
@@ -375,126 +195,67 @@ int get_read_result2(enum routine_id routine,
 
 #if !TRACE_READ_RESULTS
 
-#if USE_HASHTABLE_NG
-#define READ_RETURN0_NG(routine, str, remaining_depth) \
+#define READ_RETURN0(routine, str, remaining_depth) \
   do { \
-    tt_update(&ttable, routine, str, NO_MOVE, \
-              remaining_depth, NULL,\
+    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
 	      0, 0, NO_MOVE);\
     return 0; \
   } while (0)
 
-#define READ_RETURN_NG(routine, str, remaining_depth, point, move, value) \
+#define READ_RETURN(routine, str, remaining_depth, point, move, value) \
   do { \
-    tt_update(&ttable, routine, str, NO_MOVE, \
-              remaining_depth, NULL,\
+    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
   } while (0)
 
-#define READ_RETURN_SEMEAI_NG(routine, str1, str2, remaining_depth, point, move, value1, value2) \
+#define READ_RETURN_SEMEAI(routine, str1, str2, remaining_depth, point, move, value1, value2) \
   do { \
-    tt_update(&ttable, routine, str1, str2, \
-              remaining_depth, NULL, \
+    tt_update(&ttable, routine, str1, str2, remaining_depth, NULL, \
               value1, value2, move); \
     if ((value1) != 0 && (point) != 0) *(point) = (move); \
     return; \
   } while (0)
 
-#define READ_RETURN_CONN_NG(routine, str1, str2, remaining_depth, point, move, value) \
+#define READ_RETURN_CONN(routine, str1, str2, remaining_depth, point, move, value) \
   do { \
-    tt_update(&ttable, routine, str1, str2, \
-              remaining_depth, NULL,\
+    tt_update(&ttable, routine, str1, str2, remaining_depth, NULL,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
   } while (0)
 
-#define READ_RETURN_HASH_NG(routine, str, remaining_depth, hash, point, move, value) \
+#define READ_RETURN_HASH(routine, str, remaining_depth, hash, point, move, value) \
   do { \
-    tt_update(&ttable, routine, str, NO_MOVE, \
-              remaining_depth, hash,\
+    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, hash,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
   } while (0)
 
-#define READ_RETURN2_NG(routine, str, remaining_depth, point, move, value1, value2) \
+#define READ_RETURN2(routine, str, remaining_depth, point, move, value1, value2) \
   do { \
-    tt_update(&ttable, routine, str, NO_MOVE, \
-              remaining_depth, NULL,\
+    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
               value1, value2, move);\
     if ((value1) != 0 && (point) != 0) *(point) = (move); \
     return (value1); \
   } while (0)
 
-#else
-
-#define READ_RETURN0(read_result) \
-  do { \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), 0, 0); \
-    } \
-    return 0; \
-  } while (0)
-
-#define READ_RETURN(read_result, point, move, value) \
-  do { \
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), (value), (move)); \
-    } \
-    return (value); \
-  } while (0)
-
-#define READ_RETURN_SEMEAI(read_result, point, move, value_a, value_b) \
-  do { \
-    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
-    } \
-    return; \
-  } while (0)
-
-#define READ_RETURN_CONN(read_result, point, move, value) \
-  do { \
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), (value), (move)); \
-    } \
-    return (value); \
-  } while (0)
-
-#define READ_RETURN2(read_result, point, move, value_a, value_b) \
-  do { \
-    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
-    } \
-    return (value_a); \
-  } while (0)
-
-#endif
-
 #else /* !TRACE_READ_RESULTS */
 
-#if USE_HASHTABLE_NG
-
-#define READ_RETURN0_NG(routine, str, remaining_depth) \
+#define READ_RETURN0(routine, str, remaining_depth) \
   do { \
-    tt_update(&ttable, routine, str, NO_MOVE, \
-              remaining_depth, NULL,\
+    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
 	      0, 0, NO_MOVE);\
     gprintf("%o%s %1m %d 0 0 ", read_function_name, q, stackp); \
     dump_stack(); \
     return 0; \
   } while (0)
 
-#define READ_RETURN_NG(routine, str, remaining_depth, point, move, value) \
+#define READ_RETURN(routine, str, remaining_depth, point, move, value) \
   do { \
-    tt_update(&ttable, routine, str, NO_MOVE, \
-              remaining_depth, NULL,\
+    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
@@ -503,10 +264,9 @@ int get_read_result2(enum routine_id routine,
     return (value); \
   } while (0)
 
-#define READ_RETURN_SEMEAI_NG(routine, str1, str2, remaining_depth, point, move, value1, value2) \
+#define READ_RETURN_SEMEAI(routine, str1, str2, remaining_depth, point, move, value1, value2) \
   do { \
-    tt_update(&ttable, routine, str1, str2, \
-              remaining_depth, NULL, \
+    tt_update(&ttable, routine, str1, str2, remaining_depth, NULL, \
               value1, value2, move); \
     if ((value1) != 0 && (point) != 0) *(point) = (move); \
     gprintf("%o%s %1m %1m %d %d %d %1m ", read_function_name, q1, q2, stackp, \
@@ -515,10 +275,9 @@ int get_read_result2(enum routine_id routine,
     return; \
   } while (0)
 
-#define READ_RETURN_CONN_NG(routine, str1, str2, remaining_depth, point, move, value) \
+#define READ_RETURN_CONN(routine, str1, str2, remaining_depth, point, move, value) \
   do { \
-    tt_update(&ttable, routine, str1, str2, \
-              remaining_depth, NULL,\
+    tt_update(&ttable, routine, str1, str2, remaining_depth, NULL,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     gprintf("%o%s %1m %1m %d %d %1m ", read_function_name, q1, q2, stackp, \
@@ -527,10 +286,9 @@ int get_read_result2(enum routine_id routine,
     return (value); \
   } while (0)
 
-#define READ_RETURN_HASH_NG(routine, str, remaining_depth, hash, point, move, value) \
+#define READ_RETURN_HASH(routine, str, remaining_depth, hash, point, move, value) \
   do { \
-    tt_update(&ttable, routine, str, NO_MOVE, \
-              remaining_depth, hash,\
+    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, hash,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
@@ -539,10 +297,9 @@ int get_read_result2(enum routine_id routine,
     return (value); \
   } while (0)
 
-#define READ_RETURN2_NG(routine, str, remaining_depth, point, move, value1, value2) \
+#define READ_RETURN2(routine, str, remaining_depth, point, move, value1, value2) \
   do { \
-    tt_update(&ttable, routine, str, NO_MOVE, \
-              remaining_depth, NULL,\
+    tt_update(&ttable, routine, str, NO_MOVE, remaining_depth, NULL,\
               value1, value2, move);\
     if ((value1) != 0 && (point) != 0) *(point) = (move); \
     gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
@@ -550,68 +307,6 @@ int get_read_result2(enum routine_id routine,
     dump_stack(); \
     return (value1); \
   } while (0)
-
-#else
-
-#define READ_RETURN0(read_result) \
-  do { \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), 0, 0); \
-    } \
-    gprintf("%o%s %1m %d 0 0 ", read_function_name, q, stackp); \
-    dump_stack(); \
-    return 0; \
-  } while (0)
-
-#define READ_RETURN(read_result, point, move, value) \
-  do { \
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), (value), (move)); \
-    } \
-    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
-	    (value), (move)); \
-    dump_stack(); \
-    return (value); \
-  } while (0)
-  
-#define READ_RETURN_SEMEAI(read_result, point, move, value_a, value_b) \
-  do { \
-    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
-    } \
-    gprintf("%o%s %1m %1m %d %d %d %1m ", read_function_name, q1, q2, stackp, \
-	    (value_a), (value_b), (move)); \
-    dump_stack(); \
-    return; \
-  } while (0)
-
-#define READ_RETURN_CONN(read_result, point, move, value) \
-  do { \
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), (value), (move)); \
-    } \
-    gprintf("%o%s %1m %1m %d %d %1m ", read_function_name, q1, q2, stackp, \
-	    (value), (move)); \
-    dump_stack(); \
-    return (value); \
-  } while (0)
-
-#define READ_RETURN2(read_result, point, move, value_a, value_b) \
-  do { \
-    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
-    } \
-    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
-	    (value_a), (move)); \
-    dump_stack(); \
-    return (value_a); \
-  } while (0)
-
-#endif
 
 #endif
 
@@ -638,7 +333,6 @@ int get_read_result2(enum routine_id routine,
  * or a backfilling move. If possible, we prefer making non-sacrifice
  * and direct moves. Of course savecode WIN is better than KO_A or KO_B.
  */
-
 
 #define UPDATE_SAVED_KO_RESULT(savecode, save, code, move) \
   if (code != 0 && REVERSE_RESULT(code) > savecode) { \

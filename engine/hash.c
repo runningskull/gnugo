@@ -84,11 +84,6 @@ hash_init(void)
    */
   gg_get_rand_state(&state);
   
-#if TRACE_READ_RESULTS
-  /* We need consistent hash values when this option is enabled. */
-  gg_srand(1);
-#endif
-  
   for (i = 0; i < NUM_HASHVALUES; i++)
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       /* Note: We initialize _all_ positions, not just those on board.
@@ -120,23 +115,16 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 
   for (i = 0; i < NUM_HASHVALUES; i++)
     target->hashval[i] = 0;
+  
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
-      continue;
-    switch (p[pos]) {
-      default:
-      case EMPTY: 
-	break;
-      case WHITE:
-        for (i = 0; i < NUM_HASHVALUES; i++)
-	  target->hashval[i] ^= white_hash[pos][i];
-	break;
-      case BLACK:
-        for (i = 0; i < NUM_HASHVALUES; i++)
-	  target->hashval[i] ^= black_hash[pos][i];
-	break;
+    if (board[pos] == WHITE) {
+      for (i = 0; i < NUM_HASHVALUES; i++)
+	target->hashval[i] ^= white_hash[pos][i];
     }
-
+    else if (board[pos] == BLACK) {
+      for (i = 0; i < NUM_HASHVALUES; i++)
+	target->hashval[i] ^= black_hash[pos][i];
+    }
   }
 
   if (ko_pos != 0)
@@ -200,24 +188,15 @@ goal_to_hashvalue(const char *goal)
 {
   int i, pos;
   Hash_data return_value;
+  
   for (i = 0; i < NUM_HASHVALUES; i++)
     return_value.hashval[i] = 0;
+  
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos) && goal[pos])
       for (i = 0; i < NUM_HASHVALUES; i++) 
 	return_value.hashval[i] += white_hash[pos][i] + black_hash[pos][i];
-  return return_value;
-}
-
-/* Returns an XOR of the two hash values. */
-Hash_data
-xor_hashvalues(Hash_data *hash1, Hash_data *hash2)
-{
-  int i;
-  Hash_data return_value;
-
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    return_value.hashval[i] = hash1->hashval[i] ^ hash2->hashval[i];
+  
   return return_value;
 }
 
