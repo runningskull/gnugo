@@ -1,4 +1,41 @@
+========================== 3.1.21 =========================
+
+./regress.sh . reading.tst
+160 unexpected PASS!
+161 unexpected PASS!
+162 unexpected PASS!
+./regress.sh . lazarus.tst
+1 unexpected FAIL: Correct 'L3', got 'L2'
+3 unexpected FAIL: Correct 'Q8', got 'M7'
+4 unexpected FAIL: Correct 'R12|Q12', got 'O12'
+5 unexpected FAIL: Correct 'R13', got 'O8'
+6 unexpected FAIL: Correct 'H3', got 'Q19'
+7 unexpected FAIL: Correct 'T5', got 'K2'
+8 unexpected FAIL: Correct 'D8', got 'J5'
+10 unexpected FAIL: Correct 'P16', got 'F10'
+11 unexpected FAIL: Correct 'S15', got 'M17'
+12 unexpected FAIL: Correct 'T18', got 'T8'
+./regress.sh . strategy2.tst
+70 unexpected PASS!
+./regress.sh . trevor.tst
+670 unexpected PASS!
+./regress.sh . trevorb.tst
+490 unexpected PASS!
+780 unexpected PASS!
+./regress.sh . trevorc.tst
+710 unexpected PASS!
+1210 unexpected PASS!
+1480 unexpected PASS!
+1490 unexpected PASS!
+./regress.sh . trevord.tst
+760 unexpected PASS!
+960 unexpected PASS!
+1100 unexpected FAIL: Correct 'N5', got 'N6'
+1110 unexpected FAIL: Correct 'O17', got 'P17'
+
 ========================== 3.1.20 =========================
+
+[minus the patch gunnar_1_20.10]
 
 ./regress.sh . reading.tst
 159 unexpected PASS!
