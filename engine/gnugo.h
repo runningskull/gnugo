@@ -357,13 +357,16 @@ void debug_influence_move(int i, int j);
 
 #else
 
-/* else we need fns to do these */
-void TRACE(const char *fmt, ...);
-void RTRACE(const char *fmt, ...);
-void VTRACE(const char *fmt, ...);
-void DEBUG(int level, const char *fmt, ...);
+#define TRACE  if (!(verbose)) ; else gprintf
+#define RTRACE if (!(verbose >= 3)) ; else gprintf
+#define VTRACE if (!(verbose >= 4)) ; else gprintf
+/* if debug == 0, then can skip the function call. */
+#define DEBUG  if (!debug) ; else DEBUG_func
+
+void DEBUG_func(int level, const char *fmt, ...);
 
 #endif
+
 
 /* genmove.c */
 #define EXAMINE_WORMS               1

@@ -308,6 +308,12 @@ int connect_and_cut_helper(int Apos, int bpos, int cpos);
 int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
 
 
+/* FIXME: My appologies for the set_value macro - needed for 
+ * EXPERIMENTAL_READING code.  I will repair shortly - tm.
+ */
+#define set_value(x) patt->value = (x)
+
+
 /* pattern arrays themselves */
 extern struct pattern_db pat_db;
 extern struct pattern_db joseki_db;

@@ -71,7 +71,8 @@ extern Hash_data    hashdata;
  */
 #define MAX_STRINGS (2 * MAX_BOARD * MAX_BOARD / 3)
 
-#define MAXSTACK  MAX_BOARD * MAX_BOARD
+/* VC builds choke at stackp around 304 in reading code. */
+#define MAXSTACK  MAX_BOARD * MAX_BOARD * 2 / 3
 #define MAXCHAIN  160
 
 /* 1D board macros.
@@ -125,6 +126,7 @@ int is_edge_vertex(int pos);
 /* Count and/or find liberties at (pos). */
 int countlib(int str);
 int findlib(int str, int maxlib, int *libs);
+int fastlib(int pos, int color, int ignore_capture);
 int approxlib(int pos, int color, int maxlib, int *libs);
 int count_common_libs(int str1, int str2);
 int find_common_libs(int str1, int str2, int maxlib, int *libs);
@@ -220,6 +222,9 @@ typedef void (*fullboard_matchpat_callback_fn_ptr)(int ti, int tj,
 void matchpat(matchpat_callback_fn_ptr callback, int color,
 	      struct pattern_db *pdb, void *callback_data,
 	      char goal[BOARDMAX]);
+void matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
+	      struct pattern_db *pdb, void *callback_data,
+	      char goal[BOARDMAX], int anchor_in_goal);
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
 void dfa_match_init(void);

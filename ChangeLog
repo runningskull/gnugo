@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- DFA_SORT set to 0
+- new gtp tryko
+- new function fastlib() helper for approxlib family.
+- a pattern can now force the anchor point.
+- matchpat can be run forcing anchor to be in the goal.
+- simplification of UPDATE_SAVED_KO_RESULT
+- reduce overhead in non-variadic macro TRACE definitions
+- reduce MAXSTACK
+- EXPERIMENTAL_READING code much more interesting.
+- moved most of EXPERIMENTAL_READING code out of do_attack.
+- [ox]lib request only up to MAX_LIBERTIES liberties.
 - bugfix in reevaluate_ko_threats
 - floating point exceptions stopped in readconnect.c
 - experimental influence: follow-up specific constraints for B patterns

@@ -29,6 +29,7 @@
 #include "liberty.h"
 #include "cache.h"
 #include "patterns.h"
+#include "gg_utils.h"
 
 
 /* Size of array where candidate moves are stored. */
@@ -2694,11 +2695,15 @@ reading_attack_callback(int m, int n, int color,
 {
   int k;
   int move;
-  int value = pattern->value;
+  int value = gg_max(pattern->maxvalue, pattern->value);
   struct reading_move_data *moves = data;
   UNUSED(data);
 
   move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+
+  if (0) 
+    gprintf("Pattern %s called back at %1m (variation %d).\n", 
+            pattern->name, move, count_variations);
 
   for (k = 0; k < MAX_READING_MOVES; k++) {
     if (moves[k].pos) {
@@ -2721,12 +2726,34 @@ reading_attack_callback(int m, int n, int color,
     if (!pattern->autohelper(pattern, ll, move, color, 0))
       return;
 
-  /* If the pattern has a helper, call it to see if the pattern must
-   * be rejected.
+  /* If the pattern has a helper, call it.  The helper can't reject
+   * the move.
    */
-  if (pattern->helper)
-    if (!pattern->helper(pattern, ll, move, color))
-      return;
+  if (pattern->autohelper_flag & HAVE_ACTION)
+    pattern->autohelper(pattern, ll, move, color,1);
+
+  if (0)
+    gprintf("Pattern %s matched with value %f at %1m.\n", 
+      pattern->name, pattern->value, move);
+
+  /* Note: The reading code allows helper to change pattern->value */
+  value = pattern->value;
+  if (value <= 0)
+    return;
+
+  for (k = 0; k < MAX_READING_MOVES; k++) {
+    if (moves[k].pos) {
+      if (moves[k].pos == move) {
+	if (value <= moves[k].value) {
+	  return;
+	} else {
+	  break;
+	}
+      }
+    } else {
+      break;
+    }
+  }
 
   for (k = 0; k < MAX_READING_MOVES; k++) {
     if (!moves[k].pos) {
@@ -2752,20 +2779,6 @@ reading_attack_callback(int m, int n, int color,
       break;
     }
   }
-
-
-#if 0
-    for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-    if (pattern->patn[k].att == ATT_X) {
-      /* transform pattern real coordinate */
-      int str = find_origin(AFFINE_TRANSFORM(pattern->patn[k].x,
-					     pattern->patn[k].y, ll, m, n));
-      readpat_tried[str] = 1;
-      /*gprintf("Matched at %1m\n", str);*/
-    }
-  }
-#endif
-
 }
 
 
@@ -2808,8 +2821,146 @@ set_larger_goal_worm(int str, char goal[BOARDMAX]) {
   }
 }
 
-#endif /*EXPERIMENTAL_READING*/
+static int
+do_attack_pat(int str, int *move, int komaster, int kom_pos)
+{
 
+  char goal[BOARDMAX];
+  struct reading_move_data moves[MAX_READING_MOVES];
+  int k;
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int best_defense = WIN;
+  int best_move = 0;
+  int new_komaster = 0;
+  int new_kom_pos = 0;
+  int ko_move = 0;
+  int libs;
+
+  SETUP_TRACE_INFO("attack_pat", str);
+
+  ASSERT1(move != 0, str);
+
+  if (count_variations > 15000) {
+    SGFTRACE(0,0, "Way too many variations");
+    return 0;
+  }
+
+  libs = countlib(str);
+
+  if (stackp > depth && libs>2) {
+    SGFTRACE(0,0,"Too deep");
+    return 0;
+  }
+
+  if (libs == 1) {
+    return attack1(str, move, komaster, kom_pos);
+  }
+
+  if (libs == 4) {
+    return attack4(str, move, komaster, kom_pos);
+  }
+  
+  memset(goal, 0, BOARDMAX);
+
+  reading_node_counter++;
+  set_larger_goal_worm(str, goal);
+  moves[0].pos = 0;
+  if (verbose > 1) {TRACE("Stack: "); dump_stack();}
+  rgoal = goal;
+  goallib = libs;
+  matchpat_goal_anchor(reading_attack_callback, other, &read_attack_db, moves, goal, 1);
+  if (verbose > 1) {
+    TRACE("Moves (variation %d): ", count_variations);
+    for (k = 0; k < MAX_READING_MOVES; k++) {
+      if (!moves[k].pos) { break; }
+      TRACE("%o%s@%1m ", moves[k].name, moves[k].pos);
+    }
+    TRACE("\n");
+  }
+
+  if (sgf_dumptree) {
+    char buf[500];
+    char *pos;
+    int chars;
+    gg_snprintf(buf, 500, "Move order for %s: %n", read_function_name, &chars);
+    pos = buf + chars;
+    for (k = 0; k < MAX_READING_MOVES; k++) {
+      if (!moves[k].pos) { break; }
+      sprintf(pos, "%c%d (%s-%d) %n", J(moves[k].pos) + 'A' + (J(moves[k].pos) >= 8),
+	      board_size - I(moves[k].pos), moves[k].name, moves[k].value, &chars);
+      pos += chars;
+    }
+    sgftreeAddComment(sgf_dumptree, NULL, buf);
+  }
+
+ 
+  for (k = 0; k < MAX_READING_MOVES; k++) {
+    if (moves[k].pos) {
+      char namebuf[128];
+      gg_snprintf(namebuf, 128, "%s(%d)", moves[k].name, moves[k].value);
+      if (komaster_trymove(moves[k].pos, other, namebuf, str, 
+			   komaster, kom_pos,
+			   &new_komaster, &new_kom_pos,
+			   &ko_move, 
+			   stackp <= ko_depth && best_defense == WIN)) {
+	int defense;
+	TRACE("Attacking %1m at %1m (Pattern %s)\n", str, 
+	      moves[k].pos, moves[k].name);
+        if (stackp > board_size * 2 && ko_move) {
+          /* trying to avoid komaster problems - this shouldn't be necessary*/
+          continue;
+        }
+	defense = do_find_defense(str, 0, new_komaster, new_kom_pos);
+	if (defense != WIN) {
+          int attack;
+          if (stackp < depth || countlib(str) <= 1) {
+   	    attack = do_attack(str, 0, new_komaster, new_kom_pos);
+	    if (!ko_move && defense == 0 && attack != 0) {
+	      *move = moves[k].pos;
+	      popgo();
+	      SGFTRACE(moves[k].pos, WIN,
+		       "Attack successful - no defense, ko sub-attack");
+	      return WIN;
+	    }
+          } else {
+            attack = 0;
+            SGFTRACE(moves[k].pos, 0, "Too deep, aborting attack");
+          }
+	  /*This defense assignment may be incorrect.*/
+	  defense = gg_max(defense, WIN - attack);
+	}
+	if (!defense) {
+	  if (ko_move) {
+	    TRACE("Ko move good: %1m\n", moves[k].pos);
+	    defense = KO_A;
+	    if (defense < best_defense) {
+	      best_move = moves[k].pos;
+	      best_defense = defense;
+	    }
+	  } else {
+	    popgo();
+	    SGFTRACE(moves[k].pos, WIN, "Attack successful - no defense.");
+	    *move = moves[k].pos;
+	    return WIN;
+	  }
+	} else if (defense < best_defense) {
+	  /* May need to check ko_move in this case, too */
+	  best_move = moves[k].pos;
+	  best_defense = defense;
+	}
+	popgo();
+      }
+    } else {
+      break;
+    }
+  }
+
+  SGFTRACE(best_move, WIN - best_defense, "No good attack.");
+  *move = best_move;
+  return WIN - best_defense;
+}
+#endif /*EXPERIMENTAL_READING*/
 
 static int 
 do_attack(int str, int *move, int komaster, int kom_pos)
@@ -2833,7 +2984,10 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   if (libs > 4
       || (libs == 4 && stackp > fourlib_depth)) {
     /* No need to cache the result in these cases. */
-    SGFTRACE(0, 0, "too many liberties");
+    char buf[100];
+    sprintf(buf, "got 4 liberties (stackp:%d>%d)", 
+            stackp, fourlib_depth);
+    SGFTRACE(0, 0, buf);
     return 0;
   }
 
@@ -2853,122 +3007,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   }
 
 #if EXPERIMENTAL_READING
-  do {
-    char goal[BOARDMAX];
-    struct reading_move_data moves[MAX_READING_MOVES];
-    int k;
-    int other = OTHER_COLOR(color);
-    int best_defense = WIN;
-    int best_move = 0;
-    int new_komaster = 0;
-    int new_kom_pos = 0;
-    int ko_move = 0;
-    UNUSED(xpos);    UNUSED(found_read_result); 
-    UNUSED(libs);    UNUSED(read_result);
-
-    if (count_variations > 15000) {
-      SGFTRACE(0,0, "Way too many variations");
-      return 0;
-    }
-
-    if (stackp > depth && libs>2) {
-      SGFTRACE(0,0,"Too deep");
-      return 0;
-    }
-
-    if (libs == 1) {
-      result = attack1(str, &xpos, komaster, kom_pos);
-      break;
-    }
-
-    if (libs == 4) {
-      result = attack4(str, &xpos, komaster, kom_pos);
-      break;
-    }
-    
-    memset(goal, 0, BOARDMAX);
-  
-    reading_node_counter++;
-    set_larger_goal_worm(str, goal);
-    moves[0].pos = 0;
-    if (verbose > 1) {TRACE("Stack: "); dump_stack();}
-    rgoal = goal;
-    goallib = libs;
-    matchpat(reading_attack_callback, other, &read_attack_db, moves, goal);
-    if (verbose > 1) {
-      TRACE("Moves (variation %d): ", count_variations);
-      for (k = 0; k < MAX_READING_MOVES; k++) {
-	if (!moves[k].pos) { break; }
-	TRACE("%o%s@%1m ", moves[k].name, moves[k].pos);
-      }
-      TRACE("\n");
-    }
-   
-    for (k = 0; k < MAX_READING_MOVES; k++) {
-      if (moves[k].pos) {
-        if (komaster_trymove(moves[k].pos, other, moves[k].name, str, 
-			     komaster, kom_pos,
-			     &new_komaster, &new_kom_pos,
-			     &ko_move, 
-			     stackp <= ko_depth && best_defense == WIN)) {
-/* if (trymove(moves[k].pos, other, moves[k].name, str, komaster, kom_pos)) {*/
-	  int defense;
-	  TRACE("Attacking %1m at %1m (Pattern %s)\n", str, 
-		moves[k].pos, moves[k].name);
-	  if (board[str] == EMPTY) {
-	    /*gprintf("Captured!\n");*/
-	    xpos = moves[k].pos;
-	    popgo();
-	    SGFTRACE(moves[k].pos, WIN, "Attack successful - captured.");
-	    result = WIN;
-	    break;
-	  }
-	  defense = do_find_defense(str, 0, new_komaster, new_kom_pos);
-	  if (defense != WIN) {
-   	    int attack = do_attack(str, NULL, new_komaster, new_kom_pos);
-	    if (!ko_move && defense == 0 && attack != 0) {
-	      xpos = moves[k].pos;
-	      popgo();
-	      SGFTRACE(moves[k].pos, WIN, 
-		       "Attack successful - no defense, ko sub-attack");
-	      result = WIN;
-	      break;
-	    }
-	    /*This defense assignment may be incorrect.*/
-	    defense = gg_max(defense, WIN - attack);
-	  }
-	  if (!defense) {
-	    if (ko_move) {
-	      TRACE("Ko move good: %1m\n", moves[k].pos);
-	      defense = KO_A;
-	      if (defense < best_defense) {
-		best_move = moves[k].pos;
-		best_defense = defense;
-	      }
-	    } else {
-	      popgo();
-	      SGFTRACE(moves[k].pos, WIN, "Attack successful - no defense.");
-	      xpos = moves[k].pos;
-	      result = WIN;
-	      break;
-	    }
-	  } else if (defense < best_defense) {
-	    /* May need to check ko_move in this case, too */
-	    best_move = moves[k].pos;
-	    best_defense = defense;
-	  }
-	  popgo();
-	}
-      } else {
-	break;
-      }
-    }
-    if (result != WIN) {
-      SGFTRACE(best_move, WIN - best_defense, "No good attack.");
-      xpos = best_move;
-      result = WIN - best_defense;
-    }
-  } while (0);
+  result = do_attack_pat(str, &xpos, komaster, kom_pos);
 #else
 
   /* Treat the attack differently depending on how many liberties the 
@@ -2982,8 +3021,9 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   else if (libs == 4)
     result = attack4(str, &xpos, komaster, kom_pos);
 
-  ASSERT1(result >= 0 && result <= WIN, str);
 #endif /*EXPERIMENTAL_READING*/
+
+  ASSERT1(result >= 0 && result <= WIN, str);
   
   if (result)
     READ_RETURN(read_result, move, xpos, result);
@@ -5387,7 +5427,7 @@ static int safe_atari_score                 = 5;
 
 
 /* The string at (str) is under attack. The num_moves moves in
- * (movei[], movej[]) for color color have been deemed interesting in
+ * (moves[]) for color have been deemed interesting in
  * the attack or defense of the group. Most of these moves will be
  * immediate liberties of the group.
  *

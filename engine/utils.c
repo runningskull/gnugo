@@ -550,6 +550,12 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 #define FOURLIB_DEPTH         7
 #define KO_DEPTH              8
 
+#if 0
+#undef FOURLIB_DEPTH
+#define FOURLIB_DEPTH         9
+#endif
+
+
 #define AA_DEPTH              6
 #define AA_THREAT_DEPTH       3
 
@@ -779,7 +785,7 @@ restore_depth_values()
 int
 accurate_approxlib(int pos, int color, int maxlib, int *libs)
 {
-  int fast_liberties = 0;
+  int fast_liberties = -1;
   int liberties = 0;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
@@ -788,20 +794,14 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
 
-  /* FIXME: When we trust this algorithm, short-circuit here, and
-   * remove assert below */
   if (!libs) {
-    int k;
-    for (k = 0; k < 4; k++) {
-      if (board[pos + delta[k]] == color
-	  || (board[pos + delta[k]] == OTHER_COLOR(color) 
-	      && countlib(pos + delta[k]) == 1)) {
-	fast_liberties = 0;
-	break;
-      }
-      if (board[pos + delta[k]] == EMPTY)
-	fast_liberties++;
-    }
+    fast_liberties = fastlib(pos, color, 0);
+  /* FIXME: Remove the 0 here, and assert below, when we trust 
+   * fast_liberties. 
+   */
+    if (0 && fast_liberties >= 0) {
+      return fast_liberties;
+    } 
   }
 
   /* Use tryko() since we don't care whether the move would violate
@@ -815,8 +815,13 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
     popgo();
   }
 
-  if (fast_liberties) {
-    ASSERT1(fast_liberties == liberties, pos);
+  if (fast_liberties >= 0 && liberties > 0) {
+    if (fast_liberties != liberties) {
+      gprintf("%oError in " __FILE__ ":%d\n", __LINE__);
+      gprintf("%o  fast:%d regular:%d color:%d pos:%1m\n",
+        fast_liberties, liberties, color, pos);
+      ASSERT1(fast_liberties == liberties, pos);
+    }
   }
 
   sgf_dumptree = save_sgf_dumptree;

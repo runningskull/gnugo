@@ -564,6 +564,8 @@ do_trymove(int pos, int color, int ignore_ko)
   if (stackp >= MAXSTACK-2) {
     fprintf(stderr, 
 	    "gnugo: Truncating search. This is beyond my reading ability!\n");
+    /* FIXME: Perhaps it's best to just assert here and be done with it? */
+    /*ASSERT1(0 && "trymove stack overflow", pos);*/
     if (verbose > 0) {
       showboard(0);
       dump_stack();
@@ -1320,6 +1322,62 @@ findlib(int str, int maxlib, int *libs)
   return liberties;
 }
 
+/* Count the liberties a stone of the given color would get if played
+ * at (pos).  Captures are ignored based on the ignore_capture flag.
+ * (pos) must be empty.  It will fail if there is more than one
+ * string neighbor of the same color.  In this case, the return value
+ * is -1.  Captures are not handled, so if ignore_capture is 0, and
+ * a capture is required, -1 is returned.
+ *
+ * The intent of this function is to be as fast as possible, not
+ * necessarily complete.
+ */
+
+int
+fastlib(int pos, int color, int ignore_capture) {
+  int k;
+  int ally = 0;
+  int fast_liberties = 0;
+  int other = OTHER_COLOR(color);
+  int neighbor;
+  int neighbor_color;
+
+  ASSERT_ON_BOARD1(pos);
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  if (!strings_initialized)
+    init_board();
+
+  for (k = 0; k < 4; k++) {
+    neighbor = pos + delta[k];
+    if (board[neighbor] == color) {
+      if (ally) {
+        if (string_number[ally] != string_number[neighbor]) { 
+          return -1; /* More than 1 ally not implemented (yet).*/
+        }  /* otherwise, do nothing - keep going */
+      } else {
+        ally = neighbor;
+        fast_liberties += countlib(ally) - 1;
+      }
+    }
+  }
+  for (k = 0; k < 4; k++) {
+    neighbor = pos + delta[k];
+    neighbor_color = board[neighbor];
+    if (!ignore_capture
+        && neighbor_color == other
+	&& countlib(neighbor) == 1) {
+      return -1;
+    }
+    if (neighbor_color == EMPTY) {
+      if (!ally || !liberty_of_string(neighbor, ally)) {
+	fast_liberties++;
+      }
+    }
+  }
+  return fast_liberties;
+}
 
 /* Find the liberties a stone of the given color would get if played
  * at (pos), ignoring possible captures of opponent stones. (pos)
@@ -1338,10 +1396,18 @@ approxlib(int pos, int color, int maxlib, int *libs)
 {
   int k;
   int liberties = 0;
+  int fast_liberties = 0;
 
   ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
+
+  if (!libs) {
+    fast_liberties = fastlib(pos, color, 1);
+    if (fast_liberties >= 0) {
+      return fast_liberties;
+    }
+  }
 
   if (!strings_initialized)
     init_board();

@@ -154,7 +154,7 @@ static void do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 static void matchpat_loop(matchpat_callback_fn_ptr callback, 
 			  int color, int anchor,
 			  struct pattern_db *pdb, void *callback_data,
-			  char goal[BOARDMAX]);
+			  char goal[BOARDMAX], int anchor_in_goal);
 void transform(int i, int j, int *ti, int *tj, int trans);
 
 /* The pattern matcher still works in 2D and has a private copy of the
@@ -611,13 +611,14 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 static void
 matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 	 struct pattern_db *pdb, void *callback_data,
-	 char goal[BOARDMAX]) 
+	 char goal[BOARDMAX], int anchor_in_goal) 
 {
   int i, j;
 
   for (i = 0; i != board_size; i++)
     for (j = 0; j != board_size; j++)
-      if (p[i][j] == anchor)
+      if (p[i][j] == anchor
+          && (!anchor_in_goal || goal[POS(i,j)] != 0))
 	do_matchpat(i, j, callback, color, 
 		    pdb->patterns, callback_data, goal);
 }
@@ -629,7 +630,7 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 
 /* If DFA_SORT, all matched patterns are sorted and checked 
  * in the same order as the standard scheme */
-#define DFA_SORT 1
+#define DFA_SORT 0
 
 /* Set this to show the dfa board in action */
 /* #define DFA_TRACE 1 */
@@ -660,7 +661,7 @@ static void check_pattern_light(int m, int n,
 static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback,
 			      int color, int anchor,
 			      struct pattern_db *pdb, void *callback_data,
-			      char goal[BOARDMAX]);
+			      char goal[BOARDMAX], int anchor_in_goal);
 
 
 /***********************************************************************/
@@ -942,13 +943,14 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 static void
 dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 		  struct pattern_db *pdb, void *callback_data,
-		  char goal[BOARDMAX]) 
+		  char goal[BOARDMAX], int anchor_in_goal) 
 {
   int i, j;
 
   for (i = 0; i != board_size; i++)
     for (j = 0; j != board_size; j++)
-      if (p[i][j] == anchor)
+      if (p[i][j] == anchor
+          && (!anchor_in_goal || goal[POS(i,j)] != 0))
 	do_dfa_matchpat(pdb->pdfa, i, j, callback, color, pdb->patterns, 
 			callback_data, goal);
 }
@@ -963,7 +965,7 @@ dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 typedef void (*loop_fn_ptr_t)(matchpat_callback_fn_ptr callback, 
 			      int color, int anchor,
 			      struct pattern_db *pdb, void *callback_data,
-			      char goal[BOARDMAX]);
+			      char goal[BOARDMAX], int anchor_in_goal);
 
 typedef void (*prepare_fn_ptr_t)(int color);
 
@@ -981,6 +983,14 @@ void
 matchpat(matchpat_callback_fn_ptr callback, int color,
 	 struct pattern_db *pdb, void *callback_data,
 	 char goal[BOARDMAX]) 
+{
+  matchpat_goal_anchor(callback, color, pdb, callback_data, goal, 0);
+}
+
+void 
+matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
+	 struct pattern_db *pdb, void *callback_data,
+	 char goal[BOARDMAX], int anchor_in_goal) 
 {
   loop_fn_ptr_t loop = matchpat_loop;
   prepare_fn_ptr_t prepare = prepare_for_match;
@@ -1029,24 +1039,24 @@ matchpat(matchpat_callback_fn_ptr callback, int color,
     case ANCHOR_COLOR:
       { /* match pattern for the color of their anchor */
 	prepare(WHITE);
-	loop(callback, WHITE, WHITE, pdb, callback_data, goal);
+	loop(callback, WHITE, WHITE, pdb, callback_data, goal, anchor_in_goal);
 	prepare(BLACK);
-	loop(callback, BLACK, BLACK, pdb, callback_data, goal);
+	loop(callback, BLACK, BLACK, pdb, callback_data, goal, anchor_in_goal);
       }
       break;
     case ANCHOR_OTHER:
       { /* match pattern for the opposite color of their anchor */
 	prepare(WHITE);
-	loop(callback, WHITE, BLACK, pdb, callback_data, goal);
+	loop(callback, WHITE, BLACK, pdb, callback_data, goal, anchor_in_goal);
 	prepare(BLACK);
-	loop(callback, BLACK, WHITE, pdb, callback_data, goal);
+	loop(callback, BLACK, WHITE, pdb, callback_data, goal, anchor_in_goal);
       }
       break;
     default:
       { /* match all patterns for color */
 	prepare(color);
-	loop(callback, color, WHITE, pdb, callback_data, goal);
-	loop(callback, color, BLACK, pdb, callback_data, goal);
+	loop(callback, color, WHITE, pdb, callback_data, goal, anchor_in_goal);
+	loop(callback, color, BLACK, pdb, callback_data, goal, anchor_in_goal);
       }
   }
 

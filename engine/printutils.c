@@ -206,7 +206,7 @@ mprintf(const char *fmt, ...)
 /* Some C compilers allows us to define these as macros in liberty.h */
 
 void 
-TRACE(const char *fmt, ...)
+TRACE_func(const char *fmt, ...)
 {
   va_list ap;
 
@@ -219,7 +219,7 @@ TRACE(const char *fmt, ...)
 
 
 void 
-VTRACE(const char *fmt, ...)
+VTRACE_func(const char *fmt, ...)
 {
   va_list ap;
 
@@ -232,7 +232,7 @@ VTRACE(const char *fmt, ...)
 
 
 void 
-RTRACE(const char *fmt, ...)
+RTRACE_func(const char *fmt, ...)
 {
   va_list ap;
 
@@ -245,7 +245,7 @@ RTRACE(const char *fmt, ...)
 
 
 void 
-DEBUG(int flag, const char *fmt, ...)
+DEBUG_func(int flag, const char *fmt, ...)
 {
   va_list ap;
 

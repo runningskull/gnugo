@@ -372,21 +372,16 @@ int get_read_result2(int routine, int komaster, int kom_pos,
 
 
 #define UPDATE_SAVED_KO_RESULT(savecode, save, code, move) \
-  if (code == KO_B && (savecode == 0 || savecode == KO_B)) { \
+  if (code != 0 && (WIN - code) > savecode) { \
     save = move; \
-    savecode = KO_A; \
+    savecode = WIN - code; \
   } \
-  else if (code == KO_A && savecode == 0) { \
-    save = move; \
-    savecode = KO_B; \
-  }
 
 /* Same as above, except this should be used when there's no
  * intervening trymove(). Thus we shouldn't reverse the save code.
  */
 #define UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, save, code, move) \
-  if ((code == KO_B && savecode == 0) \
-      || (code == KO_A && (savecode == 0 || savecode == KO_B))) { \
+  if (code != WIN && code > savecode) { \
     save = move; \
     savecode = code; \
   }

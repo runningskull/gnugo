@@ -146,6 +146,7 @@ DECLARE(gtp_top_moves);
 DECLARE(gtp_top_moves_white);
 DECLARE(gtp_top_moves_black);
 DECLARE(gtp_trymove);
+DECLARE(gtp_tryko);
 DECLARE(gtp_tune_move_ordering);
 DECLARE(gtp_undo);
 DECLARE(gtp_version);
@@ -235,6 +236,7 @@ static struct gtp_command commands[] = {
   {"top_moves_black",         gtp_top_moves_black},
   {"top_moves_white",         gtp_top_moves_white},
   {"trymove",          	      gtp_trymove},
+  {"tryko",          	      gtp_tryko},
   {"tune_move_ordering",      gtp_tune_move_ordering},
   {"undo",                    gtp_undo},
   {"version",                 gtp_version},
@@ -812,6 +814,26 @@ gtp_trymove(char *s, int id)
     return gtp_failure(id, "invalid color or coordinate");
 
   if (!trymove(POS(i, j), color, "gtp_trymove", NO_MOVE, EMPTY, NO_MOVE))
+    return gtp_failure(id, "illegal move");
+
+  return gtp_success(id, "");
+}
+
+/* Function:  Play a stone of the given color at the given vertex, 
+ *            allowing illegal ko capture.
+ * Arguments: move (color + vertex)
+ * Fails:     invalid color, invalid vertex, illegal move
+ * Returns:   nothing
+ */
+static int
+gtp_tryko(char *s, int id)
+{
+  int i, j;
+  int color;
+  if (!gtp_decode_move(s, &color, &i, &j))
+    return gtp_failure(id, "invalid color or coordinate");
+
+  if (!tryko(POS(i, j), color, "gtp_tryko", EMPTY, NO_MOVE))
     return gtp_failure(id, "illegal move");
 
   return gtp_success(id, "");

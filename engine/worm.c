@@ -1351,7 +1351,7 @@ worm_reasons(int color)
 }
 
 
-/* ping_cave(i, j, *lib1, ...) is applied when (i, j) points to a string.
+/* ping_cave(str, *lib1, ...) is applied when (str) points to a string.
  * It computes the vector (*lib1, *lib2, *lib3, *lib4), 
  * where *lib1 is the number of liberties of the string, 
  * *lib2 is the number of second order liberties (empty vertices

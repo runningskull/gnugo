@@ -99,9 +99,9 @@ Usage : mkpat [-cvh] <prefix>\n\
 /* valid characters that can appear in a pattern
  * position in string is att value to store
  */
-const char VALID_PATTERN_CHARS[]     = ".XOxo,a!*?Q";
+const char VALID_PATTERN_CHARS[]     = ".XOxo,a!*?QY";
 const char VALID_EDGE_CHARS[]        = "+-|";
-const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPQRSTUVWYZ";
+const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPRSTUVWZ";
 
 
 /* the offsets into the list are the ATT_* defined in patterns.h
@@ -112,6 +112,7 @@ const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPQ
 #define ATT_star  8
 #define ATT_wild  9
 #define ATT_Q    10
+#define ATT_Y    11
 
 
 /* stuff used in reading/parsing pattern rows */
@@ -204,8 +205,10 @@ static struct autohelper_func autohelper_functions[] = {
   {"xterri",          1, "(influence_territory_color(%s) == OTHER_COLOR(color))"},
   {"oterri",          1, "(influence_territory_color(%s) == color)"},
   {"genus",           1, "dragon[%s].genus"},
-  {"xlib",            1, "accurate_approxlib(%s,OTHER_COLOR(color), MAXLIBS, NULL)"},
-  {"olib",            1, "accurate_approxlib(%s,color, MAXLIBS, NULL)"},
+  {"approx_xlib",     1, "approxlib(%s,OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
+  {"approx_olib",     1, "approxlib(%s,color, MAX_LIBERTIES, NULL)"},
+  {"xlib",            1, "accurate_approxlib(%s,OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
+  {"olib",            1, "accurate_approxlib(%s,color, MAX_LIBERTIES, NULL)"},
   {"xcut",            1, "cut_possible(%s,OTHER_COLOR(color))"},
   {"ocut",            1, "cut_possible(%s,color)"},
   {"edge_double_sente",    4, "edge_double_sente_helper(%s, %s, %s, %s)"},
@@ -368,7 +371,8 @@ check_constraint_diagram(void)
 		  diagram[i][j]);
 	if (strchr(CHECK_CHARS, constraint_diagram[i][j])
 	    && constraint_diagram[i][j] != diagram[i][j]) {
-	  fprintf(stderr, "%s(%d) : Error : xXoO not matched in constraint diagram of pattern pattern_names[patno] %s\n",
+	  fprintf(stderr, "%s(%d) : Error : "
+                  "xXoO not matched in constraint diagram of pattern %s\n",
 		  current_file, current_line_number, pattern_names[patno]);
 	  fatal_errors++;
 	}
@@ -616,7 +620,7 @@ read_pattern_line(char *p)
        ++j, ++p) {
 
     /* char_offset is a pointer within the VALID_PATTERN_CHARS string.
-     * so  (char-VALID_PATTERN_CHARS) is the att (0 to 10) to write to the
+     * so  (char-VALID_PATTERN_CHARS) is the att (0 to 11) to write to the
      * pattern element
      */
 
@@ -638,13 +642,22 @@ read_pattern_line(char *p)
     }
 
     if (off == ATT_Q) {
-      /* 'Q' */
-      pattern[patno].movei = maxi;
-      pattern[patno].movej = j;
-      ++num_stars;
+      off = ATT_O;
+      ci = maxi;
+      cj = j;
+      pattern[patno].anchored_at_X = (off == ATT_X) ? 3 : 0;
+      /*FIXME: Make sure O is valid anchor*/
     }
 
-    assert(off <= ATT_not || off == ATT_Q);
+    if (off == ATT_Y) {
+      off = ATT_X;
+      ci = maxi;
+      cj = j;
+      pattern[patno].anchored_at_X = (off == ATT_X) ? 3 : 0;
+      /*FIXME: Make sure X is valid anchor*/
+    }
+
+    assert(off <= ATT_not);
 
 	
     if ((ci == -1) && (off < 3) && ((off & anchor) != 0)) {
@@ -653,9 +666,6 @@ read_pattern_line(char *p)
       cj = j;
       pattern[patno].anchored_at_X = (off == ATT_X) ? 3 : 0;
     }
-
-    if (off == ATT_Q)
-      off = ATT_O;  /* add an 'O' to the pattern instead */
 
     /* Special limitations for fullboard pattern. */
     if (fullboard) {
@@ -705,7 +715,8 @@ read_pattern_line(char *p)
   return;
 
 fatal:
- fprintf(stderr, "Illegal pattern %s\n", pattern_names[patno]);
+ fprintf(stderr, "%s(%d) : error : Illegal pattern %s\n", 
+         current_file, current_line_number, pattern_names[patno]);
  fatal_errors = 1;
  return;
 
@@ -837,7 +848,8 @@ finish_pattern(char *line)
     
   }
   else if (ci == -1 || cj == -1) {
-    fprintf(stderr, "No origin for pattern %s\n", pattern_names[patno]);
+    fprintf(stderr, "%s(%d) : No origin for pattern %s\n", 
+            current_file, current_line_number, pattern_names[patno]);
     fatal_errors = 1;
     ci = 0;
     cj = 0;
@@ -918,7 +930,9 @@ finish_pattern(char *line)
 	  pattern[patno].class |= VALUE_REV_FOLLOWUP;
 	}
 	else {
-	  fprintf(stderr, "Unknown value field: %s\n", entry);
+	  fprintf(stderr, "%s(%d) : error : Unknown value field: %s\n", 
+                  current_file, current_line_number, entry);
+          fatal_errors++;
 	  break;
 	}
       }
@@ -1786,8 +1800,8 @@ main(int argc, char *argv[])
 	  state = 7;
 	}
 	else {
-	  fprintf(stderr, "Warning: unexpected constraint line in pattern %s\n",
-		  pattern_names[patno]);
+	  fprintf(stderr, "%s(%d) : Warning: unexpected constraint line in pattern %s\n",
+		  current_file, current_line_number, pattern_names[patno]);
 	}
       } 
       else if (line[0] == '>') {
