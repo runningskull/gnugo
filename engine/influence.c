@@ -1011,7 +1011,7 @@ find_influence_patterns(struct influence_data *q, int color)
 	  int dn = deltaj[k];
 	  if (ON_BOARD2(m+dm, n+dn) && q->p[m+dm][n+dn] == EMPTY) {
 	    /* Reduce less diagonally. */
-	    float reduction = (k < 4) ? 0.25 : 0.5;
+	    float reduction = (k < 4) ? 0.25 : 0.65;
 	    if (q->p[m][n] == BLACK)
 	      q->white_permeability[m+dm][n+dn] *= reduction;
 	    else
