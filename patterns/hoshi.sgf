@@ -387,15 +387,66 @@ B[na]MA[mi]C[U];W[oa]MA[mi]C[0];B[sc]MA[mi]C[U])
 (;W[og];B[nd]MA[mi])
 )
 
-(;W[qd]MA[mi]C[S];C[# w jumps ];B[qe]MA[mi]C[S];W[re]MA[mi]C[S];B[pe]
-MA[mi]C[S];W[rg]MA[oh]C[S];B[qc]MA[ni]C[S];W[rd]MA[ni]C[S];B[og]MA[mi]
-C[S];W[ph]MA[mi]C[S])
+(;W[qd]MA[mi]C[S];C[# w jumps ]
+(;B[qe]MA[mi]C[S];W[re]MA[mi]C[S];B[pe]MA[mi]C[S];W[rg]MA[oh]C[S];
+B[qc]MA[ni]C[S];W[rd]MA[ni]C[S];B[og]MA[mi]C[S];W[ph]MA[mi]C[S])
+
+(;B[qc]MA[mi]
+(;W[qe]MA[mi];B[pc]MA[mi];W[qi]MA[mk];B[jc]MA[hj])
+
+(;W[re]MA[mi];B[rd]MA[mi];W[qe]MA[mi];B[rc]MA[mi];W[qj]MA[ml];B[nd]
+MA[kl])
+)
+)
 
 (;W[og];B[qe]MA[mi]C[U
 ])
 
-(;W[qc];B[pc]MA[mi];W[qd]MA[mi];B[qe]MA[mi];W[re]MA[mi]PL[B];B[pe]
-MA[mi];W[rg]MA[mi];B[og]MA[li])
+(;W[qc]
+(;B[pc]MA[mi];W[qd]MA[mi];B[qe]MA[mi];W[re]MA[mi]PL[B];B[pe]MA[mi];
+W[rg]MA[mi];B[og]MA[li])
+
+(;B[qe]MA[mi]
+(;W[ob]MA[ki];B[qg]MA[ki];W[mc]MA[ki])
+
+(;W[qg]C[0
+];B[pc]MA[mi];W[re];B[qd]MA[mi];W[rd];B[rc]MA[mi])
+
+(;W[pc]C[0
+];B[nc]MA[mi];W[nb];B[mb]MA[mi];W[ob];B[mc]MA[mi])
+)
+
+(;B[qd]C[0
+];W[pc];B[oc];W[ob];B[nc];W[nb];B[mc];W[rd];B[re];W[rc];
+B[qe])
+)
+
+(;W[re]MA[mh]
+(;B[qe]MA[mh]
+(;W[qd]C[#reverts to as if w jumped
+]MA[mh])
+
+(;W[rf]MA[mh];B[qc]MA[mh])
+)
+
+(;B[rd]MA[mh];W[qd]MA[mh];B[qc]C[#reverts to w jump
+]MA[mh])
+)
+
+(;W[pc]C[0
+#trick play
+];B[qe]MA[mh]
+(;W[qc]C[#reverts to entering at the 3,3 point
+])
+
+(;W[oc]
+(;B[qc]MA[mh];W[qb];B[rc]MA[mh];W[lc])
+
+(;B[jd];W[tt]C[#if b has extension, for handicap games
+];B[mc]MA[ii];
+W[nd];B[md]MA[ii];W[ne];B[lf]MA[ii];W[mg];B[og]MA[ii])
+)
+)
 )
 
 (;B[qe]MA[mh]C[S];C[#osae];W[of]MA[nh]C[U
@@ -587,7 +638,8 @@ MA[ij];W[qi]MA[ij]C[j
 )
 )
 
-(;W[pf];B[nd]MA[lh]C[S]
+(;W[pf]
+(;B[nd]MA[lh]C[S]
 (;W[qd]MA[mg]C[S];B[qc]MA[mg]C[S];W[qe]MA[mg]C[S];B[rc]MA[mg]C[S];
 W[qj]MA[ml]C[S];B[jc]MA[ig]C[S])
 
@@ -596,6 +648,23 @@ W[qj]MA[ml]C[S];B[jc]MA[ig]C[S])
 (;W[pj]C[S]MA[nl];B[qf]MA[lh]C[t
 ];W[qg]MA[lk]C[S];B[qe]MA[lh]C[S];
 W[pg]MA[lk]C[S])
+)
+
+(;B[tt];W[nd]
+C[U
+#applicable in isolation or if b makes a pincer on the right
+]
+MA[jg]
+(;B[oe]MA[mg];W[qc]MA[mg];B[qd]MA[jg]C[
+];W[pc]MA[jg];B[of]MA[jh];
+W[od]MA[jg];B[pg]MA[ji])
+
+(;B[pc]C[j
+]MA[mg];W[nf]MA[lh];B[nb]MA[lh])
+
+(;B[qc]MA[mg]C[j
+];W[nf]MA[lh])
+)
 )
 
 (;W[qc];B[qd]C[S]MA[nf];W[pc]C[S]MA[nf];B[oc]MA[nf]C[S]
