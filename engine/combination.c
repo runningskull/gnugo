@@ -507,12 +507,22 @@ compute_aa_status(int color, const char safe_stones[BOARDMAX])
     if (board[pos] == other
 	&& worm[pos].origin == pos
 	&& worm[pos].liberties == 2
-	&& aa_status[pos] == ALIVE
-	&& !owl_substantial(pos)) {
-      int pos2;
-      for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
-	if (ON_BOARD(pos2) && is_worm_origin(pos2, pos))
-	  aa_status[pos2] = INSUBSTANTIAL;
+	&& aa_status[pos] == ALIVE) {
+      int libs[2];
+      findlib(pos, 2, libs);
+      /* Don't waste time running owl_substantial() if we can't safely
+       * atari anyway.
+       */
+      if (is_self_atari(libs[0], color)
+	  && is_self_atari(libs[1], color))
+	continue;
+      
+      if (!owl_substantial(pos)) {
+	int pos2;
+	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
+	  if (ON_BOARD(pos2) && is_worm_origin(pos2, pos))
+	    aa_status[pos2] = INSUBSTANTIAL;
+      }
     }
   }
     
