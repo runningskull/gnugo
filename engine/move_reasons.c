@@ -51,8 +51,7 @@ static struct move_reason move_reasons[MAX_MOVE_REASONS];
 static int next_reason;
 
 /* Worms */
-static int wormi[MAX_WORMS];
-static int wormj[MAX_WORMS];
+static int worms[MAX_WORMS];
 static int next_worm;
 
 /* Dragons */
@@ -142,18 +141,18 @@ clear_move_reasons(void)
  * add a new entry. (ai, aj) must point to the origin of the worm.
  */
 static int
-find_worm(int ai, int aj)
+find_worm(int str)
 {
   int k;
-  ASSERT_ON_BOARD2(ai, aj);
+
+  ASSERT_ON_BOARD1(str);
   for (k = 0; k < next_worm; k++)
-    if ((wormi[k] == ai) && (wormj[k] == aj))
+    if (worms[k] == str)
       return k;
   
   /* Add a new entry. */
   gg_assert(next_worm < MAX_WORMS);
-  wormi[next_worm] = ai;
-  wormj[next_worm] = aj;
+  worms[next_worm] = str;
   next_worm++;
   return next_worm - 1;
 }
@@ -269,7 +268,7 @@ add_lunch(int ai, int aj, int bi, int bj)
 {
   int k;
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  int worm1 = find_worm(worm[bi][bj].origini, worm[bi][bj].originj);
+  int worm1   = find_worm(worm[bi][bj].origin);
   ASSERT_ON_BOARD2(ai, aj);
   ASSERT_ON_BOARD2(bi, bj);
   
@@ -294,7 +293,7 @@ remove_lunch(int ai, int aj, int bi, int bj)
 {
   int k;
   int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  int worm1 = find_worm(worm[bi][bj].origini, worm[bi][bj].originj);
+  int worm1   = find_worm(worm[bi][bj].origin);
   ASSERT_ON_BOARD2(ai, aj);
   ASSERT_ON_BOARD2(bi, bj);
   
@@ -310,6 +309,10 @@ remove_lunch(int ai, int aj, int bi, int bj)
   lunch_worm[k] = lunch_worm[next_lunch - 1];
   next_lunch--;
 }
+
+
+/* ---------------------------------------------------------------- */
+
 
 /*
  * Find a reason in the list of reasons. If necessary, add a new entry.
@@ -338,6 +341,7 @@ static void
 add_move_reason(int ti, int tj, int type, int what)
 {
   int k;
+
   ASSERT_ON_BOARD2(ti, tj);
   if (stackp == 0) {
     ASSERT2(BOARD(ti, tj) == EMPTY, ti, tj);
@@ -414,7 +418,8 @@ move_reason_known(int ti, int tj, int type, int what)
 void
 add_attack_move(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, ATTACK_MOVE, worm_number);
 }
@@ -423,7 +428,8 @@ add_attack_move(int ti, int tj, int ai, int aj)
 int
 attack_move_known(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   return move_reason_known(ti, tj, ATTACK_MOVE, worm_number);
 }
@@ -441,7 +447,8 @@ attack_move_known(int ti, int tj, int ai, int aj)
 void
 remove_attack_move(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   if (move_reason_known(ti, tj, ATTACK_MOVE, worm_number))
     add_move_reason(ti, tj, NON_ATTACK_MOVE, worm_number);
@@ -454,8 +461,8 @@ remove_attack_move(int ti, int tj, int ai, int aj)
 void
 add_defense_move(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini,
-			      worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, DEFEND_MOVE, worm_number);
 }
@@ -464,7 +471,8 @@ add_defense_move(int ti, int tj, int ai, int aj)
 int
 defense_move_known(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   return move_reason_known(ti, tj, DEFEND_MOVE, worm_number);
 }
@@ -475,14 +483,15 @@ defense_move_known(int ti, int tj, int ai, int aj)
  * reason and wait until later to actually remove it. Otherwise it may
  * be added again.
  *
- * We must also check that there do exist a defense move reason for
+ * We must also check that there does exist a defense move reason for
  * this worm. Otherwise we may end up in an infinite loop when trying
  * to actually remove it.
  */
 void
 remove_defense_move(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   if (move_reason_known(ti, tj, DEFEND_MOVE, worm_number))
     add_move_reason(ti, tj, NON_DEFEND_MOVE, worm_number);
@@ -496,7 +505,8 @@ remove_defense_move(int ti, int tj, int ai, int aj)
 void
 add_attack_threat_move(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, ATTACK_THREAT_MOVE, worm_number);
 }
@@ -505,7 +515,8 @@ add_attack_threat_move(int ti, int tj, int ai, int aj)
 int
 attack_threat_move_known(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   return move_reason_known(ti, tj, ATTACK_THREAT_MOVE, worm_number);
 }
@@ -517,8 +528,8 @@ attack_threat_move_known(int ti, int tj, int ai, int aj)
 void
 add_defense_threat_move(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini,
-			      worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, DEFEND_THREAT_MOVE, worm_number);
 }
@@ -527,7 +538,8 @@ add_defense_threat_move(int ti, int tj, int ai, int aj)
 int
 defense_threat_move_known(int ti, int tj, int ai, int aj)
 {
-  int worm_number = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+  int worm_number = find_worm(worm[ai][aj].origin);
+
   ASSERT_ON_BOARD2(ai, aj);
   return move_reason_known(ti, tj, DEFEND_THREAT_MOVE, worm_number);
 }
@@ -653,9 +665,10 @@ add_vital_eye_move(int ti, int tj, int ai, int aj, int color)
 void
 add_attack_either_move(int ti, int tj, int ai, int aj, int bi, int bj)
 {
-  int worm1 = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  int worm2 = find_worm(worm[bi][bj].origini, worm[bi][bj].originj);
+  int worm1 = find_worm(worm[ai][aj].origin);
+  int worm2 = find_worm(worm[bi][bj].origin);
   int worm_pair;
+
   ASSERT_ON_BOARD2(ai, aj);
   ASSERT_ON_BOARD2(bi, bj);
   if (worm1 == worm2)
@@ -676,9 +689,10 @@ add_attack_either_move(int ti, int tj, int ai, int aj, int bi, int bj)
 void
 add_defend_both_move(int ti, int tj, int ai, int aj, int bi, int bj)
 {
-  int worm1 = find_worm(worm[ai][aj].origini, worm[ai][aj].originj);
-  int worm2 = find_worm(worm[bi][bj].origini, worm[bi][bj].originj);
+  int worm1 = find_worm(worm[ai][aj].origin);
+  int worm2 = find_worm(worm[bi][bj].origin);
   int worm_pair = find_worm_pair(worm1, worm2);
+
   ASSERT_ON_BOARD2(ai, aj);
   ASSERT_ON_BOARD2(bi, bj);
   add_move_reason(ti, tj, DEFEND_BOTH_MOVE, worm_pair);
@@ -1045,6 +1059,10 @@ add_replacement_move(int ai, int aj, int bi, int bj)
     }
 }
 
+
+/* ---------------------------------------------------------------- */
+
+
 /* Test all moves which defend, attack, connect or cut to see if they
  * also attack or defend some other worm.
  *
@@ -1067,11 +1085,10 @@ find_more_attack_and_defense_moves(int color)
   for (m = 0; m < board_size; m++)
     for (n = 0; n  <board_size; n++)
       if (BOARD(m, n)
-	  && worm[m][n].origini == m
-	  && worm[m][n].originj == n
+	  && worm[m][n].origin == POS(m, n)
 	  && worm[m][n].attack_code != 0
 	  && worm[m][n].defend_code != 0) {
-	unstable_worms[N] = find_worm(m, n);
+	unstable_worms[N] = find_worm(POS(m, n));
 	N++;
       }
   
@@ -1087,9 +1104,9 @@ find_more_attack_and_defense_moves(int color)
 	  break;
 	what = move_reasons[r].what;
 	if ((   move_reasons[r].type == ATTACK_MOVE
-		&& BOARD(wormi[what], wormj[what]) == other)
+		&& board[worms[what]] == other)
 	    || (move_reasons[r].type == DEFEND_MOVE
-		&& BOARD(wormi[what], wormj[what]) == color)
+		&& board[worms[what]] == color)
 	    || move_reasons[r].type == CONNECT_MOVE
 	    || move_reasons[r].type == CUT_MOVE
 	    || move_reasons[r].type == ATTACK_EITHER_MOVE
@@ -1104,8 +1121,8 @@ find_more_attack_and_defense_moves(int color)
 	if (trymove2(m, n, color, "find_more_attack_and_defense_moves",
 		     -1, -1, EMPTY, -1, -1)) {
 	  for (k = 0; k < N; k++) {
-	    int ai = wormi[unstable_worms[k]];
-	    int aj = wormj[unstable_worms[k]];
+	    int ai = I(worms[unstable_worms[k]]);
+	    int aj = J(worms[unstable_worms[k]]);
 	    /* string of our color, see if there still is an attack,
 	     * unless we already know the move works as defense move.
 	     */
@@ -1130,10 +1147,9 @@ find_more_attack_and_defense_moves(int color)
 		 * defend with the stored defense move.
 		 */
 		int attack_works = 1;
-		if (trymove2(worm[ai][aj].defendi, worm[ai][aj].defendj,
-			     other, 
-			     "find_more_attack_and_defense_moves", -1, -1,
-			     EMPTY, -1, -1)) {
+		if (trymove(worm[ai][aj].defense_point, other, 
+			     "find_more_attack_and_defense_moves", 0,
+			     EMPTY, 0)) {
 		  if (!attack(ai, aj, NULL, NULL))
 		    attack_works = 0;
 		  popgo();
@@ -1187,8 +1203,8 @@ remove_opponent_attack_and_defense_moves(int color)
 	  int r = move[m][n].reason[k];
 	  if (r < 0)
 	    break;
-	  ai = wormi[move_reasons[r].what];
-	  aj = wormj[move_reasons[r].what];
+	  ai = I(worms[move_reasons[r].what]);
+	  aj = J(worms[move_reasons[r].what]);
 	  if (move_reasons[r].type == ATTACK_MOVE
 	      && BOARD(ai, aj) == color) {
 	    remove_move_reason(m, n, ATTACK_MOVE, move_reasons[r].what);
@@ -1228,8 +1244,8 @@ do_remove_false_attack_and_defense_moves(void)
 	  if (r < 0)
 	    break;
 	  if (move_reasons[r].type == NON_ATTACK_MOVE) {
-	    int ai = wormi[move_reasons[r].what];
-	    int aj = wormj[move_reasons[r].what];
+	    int ai = I(worms[move_reasons[r].what]);
+	    int aj = J(worms[move_reasons[r].what]);
 	    remove_move_reason(m, n, ATTACK_MOVE, move_reasons[r].what);
 	    /* Remove ourselves too. */
 	    remove_move_reason(m, n, NON_ATTACK_MOVE, move_reasons[r].what);
@@ -1239,11 +1255,11 @@ do_remove_false_attack_and_defense_moves(void)
 	     * FIXME: We should look through the move reasons to see
 	     * whether we could come up with an alternate attack point.
 	     */
-	    change_attack(ai, aj, -1, -1, 0);
+	    change_attack(POS(ai, aj), 0, 0);
 	    /* If there was no attack, there is nothing to defend against. */
 	    if (worm[ai][aj].defend_code != 0) {
 	      remove_move_reason(m, n, DEFEND_MOVE, move_reasons[r].what);
-	      change_defense(ai, aj, -1, -1, 0);
+	      change_defense(POS(ai, aj), 0, 0);
 	    }
 	    /* FIXME: We should also remove all defense reasons for
              * this worm.
@@ -1252,8 +1268,8 @@ do_remove_false_attack_and_defense_moves(void)
 	    break;
 	  }
 	  else if (move_reasons[r].type == NON_DEFEND_MOVE) {
-	    int ai = wormi[move_reasons[r].what];
-	    int aj = wormj[move_reasons[r].what];
+	    int ai = I(worms[move_reasons[r].what]);
+	    int aj = J(worms[move_reasons[r].what]);
 	    remove_move_reason(m, n, DEFEND_MOVE, move_reasons[r].what);
 	    /* Remove ourselves too. */
 	    remove_move_reason(m, n, NON_DEFEND_MOVE, move_reasons[r].what);
@@ -1263,7 +1279,7 @@ do_remove_false_attack_and_defense_moves(void)
 	     * FIXME: We should look through the move reasons to see
 	     * whether we could come up with an alternate defense point.
 	     */
-	    change_defense(ai, aj, -1, -1, 0);
+	    change_defense(POS(ai, aj), 0, 0);
 	    found_one = 1;
 	    break;
 	  }
@@ -1280,7 +1296,7 @@ do_remove_false_attack_and_defense_moves(void)
  * dragon.
  */
 static void
-find_more_owl_attack_and_defense_moves(void)
+find_more_owl_attack_and_defense_moves(int color)
 {
   int m, n;
   int k;
@@ -1303,9 +1319,30 @@ find_more_owl_attack_and_defense_moves(void)
 	}
 	else if (move_reasons[r].type == ATTACK_MOVE
 		 || move_reasons[r].type == DEFEND_MOVE) {
-	  di = wormi[what];
-	  dj = wormj[what];
+	  di = I(worms[what]);
+	  dj = J(worms[what]);
 	}
+	else if (move_reasons[r].type == VITAL_EYE_MOVE) {
+	  int ei = eyei[move_reasons[r].what];
+	  int ej = eyej[move_reasons[r].what];
+	  int ecolor = eyecolor[move_reasons[r].what];
+      
+	  if (ecolor == WHITE) {
+	    di = white_eye[ei][ej].dragoni;
+	    dj = white_eye[ei][ej].dragonj;
+	  }
+	  else {
+	    di = black_eye[ei][ej].dragoni;
+	    dj = black_eye[ei][ej].dragonj;
+	  }
+      
+	  if (di == -1) /* Maybe we should assert this not to happen. */
+	    continue;
+
+	  /* Don't care about inessential dragons. */
+	  if (DRAGON2(di, dj).safety == INESSENTIAL)
+	    continue;
+	}      
 	else
 	  continue;
 
@@ -1313,7 +1350,9 @@ find_more_owl_attack_and_defense_moves(void)
 	  continue;
 
 	if ((move_reasons[r].type == STRATEGIC_ATTACK_MOVE 
-	     || move_reasons[r].type == ATTACK_MOVE)
+	     || move_reasons[r].type == ATTACK_MOVE
+	     || (move_reasons[r].type == VITAL_EYE_MOVE
+		 && BOARD(di, dj) == OTHER_COLOR(color)))
 	    && !move_reason_known(m, n, OWL_ATTACK_MOVE, what)
 	    && owl_does_attack(m, n, di, dj)) {
 	  add_owl_attack_move(m, n, di, dj);
@@ -1321,7 +1360,9 @@ find_more_owl_attack_and_defense_moves(void)
 	}
 	
 	if ((move_reasons[r].type == STRATEGIC_DEFEND_MOVE
-	     || move_reasons[r].type == DEFEND_MOVE)
+	     || move_reasons[r].type == DEFEND_MOVE
+	     || (move_reasons[r].type == VITAL_EYE_MOVE
+		 && BOARD(di, dj) == color))
 	    && !move_reason_known(m, n, OWL_DEFEND_MOVE, what)
 	    && owl_does_defend(m, n, di, dj)) {
 	  add_owl_defense_move(m, n, di, dj);
@@ -1390,8 +1431,8 @@ induce_secondary_move_reasons(int color)
 	    && move_reasons[r].type != DEFEND_MOVE)
 	  continue;
 	
-	ai = wormi[move_reasons[r].what];
-	aj = wormj[move_reasons[r].what];
+	ai = I(worms[move_reasons[r].what]);
+	aj = J(worms[move_reasons[r].what]);
 	
 	if ((   (move_reasons[r].type == ATTACK_MOVE)
 		&& (BOARD(ai, aj) == color))
@@ -1580,8 +1621,8 @@ examine_move_safety(int color)
 	    int k;
 	    
 	    if (type == ATTACK_MOVE) {
-	      ai = wormi[what];
-	      aj = wormj[what];
+	      ai = I(worms[what]);
+	      aj = J(worms[what]);
 	      size = worm[ai][aj].effective_size;
 	    }
 	    else {
@@ -1699,8 +1740,9 @@ examine_move_safety(int color)
 	  }
 	case DEFEND_MOVE:
 	  {
-	    int ai = wormi[what];
-	    int aj = wormj[what];
+	    int ai = I(worms[what]);
+	    int aj = J(worms[what]);
+
 	    if (dragon[ai][aj].matcher_status == ALIVE)
 	      /* It would be better if this never happened, but it does
 	       * sometimes. The owl reading can be very slow then.
@@ -1785,8 +1827,8 @@ list_move_reasons(int color)
 	switch(move_reasons[r].type) {
 	case ATTACK_MOVE:
 	case DEFEND_MOVE:
-	  ai = wormi[move_reasons[r].what];
-	  aj = wormj[move_reasons[r].what];
+	  ai = I(worms[move_reasons[r].what]);
+	  aj = J(worms[move_reasons[r].what]);
 	  
 	  if (move_reasons[r].type == ATTACK_MOVE
 	      && BOARD(ai, aj) != color)
@@ -1799,8 +1841,8 @@ list_move_reasons(int color)
 	  
 	case ATTACK_THREAT_MOVE:
 	case DEFEND_THREAT_MOVE:
-	  ai = wormi[move_reasons[r].what];
-	  aj = wormj[move_reasons[r].what];
+	  ai = I(worms[move_reasons[r].what]);
+	  aj = J(worms[move_reasons[r].what]);
 	  
 	  if (move_reasons[r].type == ATTACK_THREAT_MOVE
 	      && BOARD(ai, aj) != color)
@@ -1811,8 +1853,8 @@ list_move_reasons(int color)
 	  break;
 
 	case UNCERTAIN_OWL_DEFENSE:
-	  ai = wormi[move_reasons[r].what];
-	  aj = wormj[move_reasons[r].what];
+	  ai = I(worms[move_reasons[r].what]);
+	  aj = J(worms[move_reasons[r].what]);
 	  if (BOARD(ai, aj) == color)
 	    gprintf("%m found alive but not certainly, %m defends it again\n",
 		    ai, aj, m, n);
@@ -1869,8 +1911,8 @@ list_move_reasons(int color)
 	  
 	case NON_ATTACK_MOVE:
 	case NON_DEFEND_MOVE:
-	  ai = wormi[move_reasons[r].what];
-	  aj = wormj[move_reasons[r].what];
+	  ai = I(worms[move_reasons[r].what]);
+	  aj = J(worms[move_reasons[r].what]);
 	  
 	  if (move_reasons[r].type == NON_ATTACK_MOVE
 	      && BOARD(ai, aj) != color)
@@ -1884,10 +1926,10 @@ list_move_reasons(int color)
 	case DEFEND_BOTH_MOVE:
 	  worm1 = worm_pair1[move_reasons[r].what];
 	  worm2 = worm_pair2[move_reasons[r].what];
-	  ai = wormi[worm1];
-	  aj = wormj[worm1];
-	  bi = wormi[worm2];
-	  bj = wormj[worm2];
+	  ai = I(worms[worm1]);
+	  aj = J(worms[worm1]);
+	  bi = I(worms[worm2]);
+	  bj = J(worms[worm2]);
 	  
 	  if (move_reasons[r].type == ATTACK_EITHER_MOVE)
 	    gprintf("Move at %m attacks either %m or %m\n",
@@ -1988,8 +2030,8 @@ find_stones_saved_by_move(int m, int n, int color,
       break;
 
     if (move_reasons[r].type == DEFEND_MOVE) {
-      int ai = wormi[move_reasons[r].what];
-      int aj = wormj[move_reasons[r].what];
+      int ai = I(worms[move_reasons[r].what]);
+      int aj = J(worms[move_reasons[r].what]);
       
       /* Defense of enemy stones. */
       if (BOARD(ai, aj) != color)
@@ -1998,8 +2040,8 @@ find_stones_saved_by_move(int m, int n, int color,
       mark_string2(ai, aj, saved_stones, 1);
     }
     else if (move_reasons[r].type == ATTACK_MOVE) {
-      int ai = wormi[move_reasons[r].what];
-      int aj = wormj[move_reasons[r].what];
+      int ai = I(worms[move_reasons[r].what]);
+      int aj = J(worms[move_reasons[r].what]);
       
       /* Attack on our stones. */
       if (BOARD(ai, aj) == color)
@@ -2216,9 +2258,11 @@ estimate_territorial_value(int m, int n, int color,
   int k;
   int ai = -1;
   int aj = -1;
+#if 0
   int bi = -1;
   int bj = -1;
   int ecolor = 0;
+#endif
   
   float this_value = 0.0;
   float tot_value = 0.0;
@@ -2236,8 +2280,8 @@ estimate_territorial_value(int m, int n, int color,
     switch (move_reasons[r].type) {
     case ATTACK_MOVE:
       /* FIXME: Need to take ko attacks properly into account. */
-      ai = wormi[move_reasons[r].what];
-      aj = wormj[move_reasons[r].what];
+      ai = I(worms[move_reasons[r].what]);
+      aj = J(worms[move_reasons[r].what]);
       
       /* Attack on our stones. */
       if (BOARD(ai, aj) == color)
@@ -2291,8 +2335,8 @@ estimate_territorial_value(int m, int n, int color,
       
     case DEFEND_MOVE:
       /* FIXME: Need to take ko defense properly into account. */
-      ai = wormi[move_reasons[r].what];
-      aj = wormj[move_reasons[r].what];
+      ai = I(worms[move_reasons[r].what]);
+      aj = J(worms[move_reasons[r].what]);
       
       /* Defense of enemy stones. */
       if (BOARD(ai, aj) != color)
@@ -2348,8 +2392,8 @@ estimate_territorial_value(int m, int n, int color,
       break;
 
     case ATTACK_THREAT_MOVE:
-      ai = wormi[move_reasons[r].what];
-      aj = wormj[move_reasons[r].what];
+      ai = I(worms[move_reasons[r].what]);
+      aj = J(worms[move_reasons[r].what]);
 
       /* Threat on our stones. */
       if (BOARD(ai, aj) == color)
@@ -2417,8 +2461,8 @@ estimate_territorial_value(int m, int n, int color,
       break;
 
     case DEFEND_THREAT_MOVE:
-      ai = wormi[move_reasons[r].what];
-      aj = wormj[move_reasons[r].what];
+      ai = I(worms[move_reasons[r].what]);
+      aj = J(worms[move_reasons[r].what]);
 
       /* Threat on our stones. */
       if (BOARD(ai, aj) == color)
@@ -2539,8 +2583,8 @@ estimate_territorial_value(int m, int n, int color,
        * that move reason instead.
        */
       if (worm[ai][aj].size == dragon[ai][aj].size
-	  && (move_reason_known(m, n, ATTACK_MOVE, find_worm(ai, aj))
-	      || move_reason_known(m, n, DEFEND_MOVE, find_worm(ai, aj))))
+	  && (move_reason_known(m, n, ATTACK_MOVE, find_worm(POS(ai, aj)))
+	      || move_reason_known(m, n, DEFEND_MOVE, find_worm(POS(ai, aj)))))
 	break;
       
       this_value = 2 * dragon[ai][aj].effective_size;
@@ -2565,8 +2609,8 @@ estimate_territorial_value(int m, int n, int color,
        * that move reason instead.
        */
       if (worm[ai][aj].size == dragon[ai][aj].size
-	  && (move_reason_known(m, n, ATTACK_MOVE, find_worm(ai, aj))
-	      || move_reason_known(m, n, DEFEND_MOVE, find_worm(ai, aj))))
+	  && (move_reason_known(m, n, ATTACK_MOVE, find_worm(POS(ai, aj)))
+	      || move_reason_known(m, n, DEFEND_MOVE, find_worm(POS(ai, aj)))))
 	break;
       
       /* threaten to win the semeai as a ko threat */
@@ -2577,6 +2621,11 @@ estimate_territorial_value(int m, int n, int color,
       break;
       
     case VITAL_EYE_MOVE:
+      /* These are upgraded to owl attacks or defenses in
+       * find_more_owl_attack_and_defense_moves() and should no longer
+       * be counted here.
+       */
+#if 0
       ai = eyei[move_reasons[r].what];
       aj = eyej[move_reasons[r].what];
       ecolor = eyecolor[move_reasons[r].what];
@@ -2638,6 +2687,7 @@ estimate_territorial_value(int m, int n, int color,
 	    secondary_value += dragon[bi][bj].effective_size / 20;
 	}
       }
+#endif
       break;
 	
     case OWL_ATTACK_MOVE:
@@ -2880,8 +2930,8 @@ estimate_strategical_value(int m, int n, int color, float score)
       case ATTACK_MOVE:
       case DEFEND_MOVE:
 	worm1 = move_reasons[r].what;
-	ai = wormi[worm1];
-	aj = wormj[worm1];
+	ai = I(worms[worm1]);
+	aj = J(worms[worm1]);
       
 	/* Attack on our stones. */
 	if (move_reasons[r].type == ATTACK_MOVE
@@ -2949,9 +2999,9 @@ estimate_strategical_value(int m, int n, int color, float score)
 	     */
 	    if (dragon[bi][bj].matcher_status != DEAD
 		&& dragon[bi][bj].size == worm[bi][bj].size
-		&& (move_reason_known(m, n, ATTACK_MOVE, find_worm(bi, bj))
+		&& (move_reason_known(m, n, ATTACK_MOVE, find_worm(POS(bi, bj)))
 		    || move_reason_known(m, n, DEFEND_MOVE,
-					 find_worm(bi, bj))))
+					 find_worm(POS(bi, bj)))))
 	      this_value = 0.0;
 
 	    if (this_value > dragon_value[d1])
@@ -2971,10 +3021,10 @@ estimate_strategical_value(int m, int n, int color, float score)
 	 */
 	worm1 = worm_pair1[move_reasons[r].what];
 	worm2 = worm_pair2[move_reasons[r].what];
-	ai = wormi[worm1];
-	aj = wormj[worm1];
-	bi = wormi[worm2];
-	bj = wormj[worm2];
+	ai = I(worms[worm1]);
+	aj = J(worms[worm1]);
+	bi = I(worms[worm2]);
+	bj = J(worms[worm2]);
 
 	/* If both worms are dead, this move reason has no value. */
 	if (dragon[ai][aj].matcher_status == DEAD 
@@ -3156,8 +3206,8 @@ estimate_strategical_value(int m, int n, int color, float score)
      */
     if (dragon[ai][aj].matcher_status != DEAD
 	&& dragon[ai][aj].size == worm[ai][aj].size
-	&& (move_reason_known(m, n, ATTACK_MOVE, find_worm(ai, aj))
-	    || move_reason_known(m, n, DEFEND_MOVE, find_worm(ai, aj))))
+	&& (move_reason_known(m, n, ATTACK_MOVE, find_worm(POS(ai, aj)))
+	    || move_reason_known(m, n, DEFEND_MOVE, find_worm(POS(ai, aj)))))
       continue;
     
     /* If the dragon has been owl captured, owl defended, or involved
@@ -3623,7 +3673,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
   if (verbose > 0)
     verbose--;
   if (level > 5) {
-    find_more_owl_attack_and_defense_moves();
+    find_more_owl_attack_and_defense_moves(color);
     time_report(2, "  find_more_owl_attack_and_defense_moves", -1, -1);
   }
   verbose = save_verbose;

@@ -138,6 +138,9 @@ static int naive_ladder_break_through(int str, int apos, int color, int other);
 static int in_list(int move, int num_moves, int *moves);
 
 
+/* ================================================================ */
+
+
 /* Persistent reading cache to reuse read results between moves and
  * within the same move when one or more far away moves have been
  * played.
@@ -844,8 +847,7 @@ atari_atari(int color, int *i, int *j, int save_verbose)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
       if (BOARD(m, n) == other
-	  && worm[m][n].origini == m
-	  && worm[m][n].originj == n
+	  && worm[m][n].origin == POS(m, n)
 	  && worm[m][n].liberties == 2
 	  && aa_status[m][n] == ALIVE
 	  && !owl_substantial(m, n)) {
@@ -1219,8 +1221,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
       if (BOARD(m, n) == color
-	  && worm[m][n].origini == m
-	  && worm[m][n].originj == n
+	  && worm[m][n].origin == POS(m, n)
 	  && worm[m][n].liberties == 2
 	  && aa_status[m][n] == ALIVE
 	  && !owl_substantial(m, n)) {
@@ -1352,8 +1353,7 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
       if (BOARD(m, n) == other
-	  && worm[m][n].origini == m
-	  && worm[m][n].originj == n
+	  && worm[m][n].origin == POS(m, n)
 	  && worm[m][n].liberties == 2
 	  && aa_status[m][n] == ALIVE
 	  && !owl_substantial(m, n)) {
@@ -5720,6 +5720,7 @@ get_reading_node_counter()
 
 /* ============ Reading shadow and persistent cache =============== */
 
+
 void
 draw_reading_shadow()
 {
@@ -5786,6 +5787,7 @@ draw_active_area(char p[BOARDMAX])
   end_draw_board();
 }
 
+
 /* Returns 1 if the stored board is compatible with the current board,
  * 0 otherwise.
  */
@@ -5799,6 +5801,7 @@ verify_stored_board(char p[BOARDMAX])
   
   return 1;
 }
+
 
 /* Remove persistent cache entries which have (m, n) within their
  * active areas.
@@ -5855,6 +5858,7 @@ void purge_persistent_reading_cache()
     }
   }
 }
+
 
 /* Look for a valid read result in the persistent cache. */
 static int
@@ -5932,6 +5936,7 @@ search_persistent_reading_cache(int routine, int str, int *result, int *move)
 
   return 0;
 }
+
 
 /* Store a new read result in the persistent cache. */
 static void
@@ -6083,6 +6088,7 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
   persistent_reading_cache_size++;
 }
 
+
 /* For debugging purposes. */
 static void
 print_persistent_reading_cache_entry(int k)
@@ -6107,6 +6113,7 @@ print_persistent_reading_cache_entry(int k)
 
   draw_active_area(entry->board);
 }
+
 
 /* Helper for the reading_hotspots() function below. */
 static void

@@ -54,93 +54,85 @@ change_matcher_status(int m, int n, int status)
 
 
 /* 
- * Change_defense(ai, aj, ti, tj, dcode) moves the point of defense of the
- * worm at (ai, aj) to (ti, tj), and sets worm[a].defend_code to dcode.
+ * Change_defense(str, tpos, dcode) moves the point of defense of the
+ * worm at (str) to (tpos), and sets worm[a].defend_code to dcode.
  *
  * This function is less important with the 3.0 move generation
  * scheme, but not entirely ineffective.
  */
 
 void
-change_defense(int ai, int aj, int ti, int tj, int dcode)
+change_defense(int str, int tpos, int dcode)
 {
-  int origini = worm[ai][aj].origini;
-  int originj = worm[ai][aj].originj;
-  int si = worm[ai][aj].defendi;  /* Old defense point. */
-  int sj = worm[ai][aj].defendj;
+  int origin = worm[I(str)][J(str)].origin;
+  int dpos   = worm[I(str)][J(str)].defense_point;  /* Old defense point. */
   
   gg_assert (stackp == 0);
 
-  if (ti == -1)
-    TRACE("Removed defense of %m (was %m).\n", origini, originj, si, sj);
-  else if (si == -1)
-    TRACE("Setting defense of %m to %m.\n", origini, originj, ti, tj);
+  if (tpos == 0)
+    TRACE("Removed defense of %1m (was %1m).\n", origin, dpos);
+  else if (dpos == 0)
+    TRACE("Setting defense of %1m to %1m.\n", origin, tpos);
   else
-    TRACE("Moved defense of %m from %m to %m.\n", origini, originj,
-	  si, sj, ti, tj);
+    TRACE("Moved defense of %1m from %1m to %1m.\n", origin, dpos, tpos);
   
-  gg_assert(ti == -1 || BOARD(ti, tj) == EMPTY);
-  gg_assert(BOARD(ai, aj) != EMPTY);
+  gg_assert(tpos == 0 || board[tpos] == EMPTY);
+  gg_assert(board[str] != EMPTY);
 
-  if ((worm[ai][aj].attack_code != 0)
-      && (worm[ai][aj].defend_code != 0)
-      && (ti == -1)) 
+  if (worm[I(str)][J(str)].attack_code != 0
+      && worm[I(str)][J(str)].defend_code != 0
+      && tpos == 0)
   {
     int m, n;
 
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
-	if ((dragon[m][n].origini == dragon[ai][aj].origini) 
-	    && (dragon[m][n].originj == dragon[ai][aj].originj))
+	if ((dragon[m][n].origini == dragon[I(str)][J(str)].origini) 
+	    && (dragon[m][n].originj == dragon[I(str)][J(str)].originj))
 	  dragon[m][n].status = DEAD;
   }
-  worm[origini][originj].defendi = ti;
-  worm[origini][originj].defendj = tj;
-  worm[origini][originj].defend_code = dcode;
-  propagate_worm(origini, originj);
+  worm[I(origin)][J(origin)].defend_code = dcode;
+  worm[I(origin)][J(origin)].defense_point = tpos;
+  propagate_worm(I(origin), J(origin));
 
-  if (ti != -1)
-    add_defense_move(ti, tj, origini, originj);
-  else if (si != -1)
-    remove_defense_move(si, sj, origini, originj);
+  if (tpos != 0)
+    add_defense_move(I(tpos), J(tpos), I(origin), J(origin));
+  else if (dpos != 0)
+    remove_defense_move(I(str), J(str), I(origin), J(origin));
 }
 
 
 /*
- * change_attack(ai, aj, ti, tj, acode) moves the point of attack of the
- * worm at (ai, aj) to (ti, tj), and sets worm[a].attack_code to acode.
+ * change_attack(str, tpos, acode) moves the point of attack of the
+ * worm at (str) to (tpos), and sets worm[str].attack_code to acode.
  */
 
 void
-change_attack(int ai, int aj, int ti, int tj, int acode)
+change_attack(int str, int tpos, int acode)
 {
-  int origini = worm[ai][aj].origini;
-  int originj = worm[ai][aj].originj;
-  int si = worm[ai][aj].attacki;  /* Old attack point. */
-  int sj = worm[ai][aj].attackj;
-  
+  int origin = worm[I(str)][J(str)].origin;
+  int apos   = worm[I(str)][J(str)].attack_point;  /* Old attack point. */
+
   gg_assert(stackp == 0);
 
-  if ((ti == -1) && (si != -1)) 
-    TRACE("Removed attack of %m (was %m).\n", origini, originj, si, sj);
-  else if (si == -1)
-    TRACE("Setting attack of %m to %m.\n", origini, originj, ti, tj);
+  if (tpos == 0) 
+    TRACE("Removed attack of %1m (was %1m).\n", origin, apos);
+  else if (apos == 0)
+    TRACE("Setting attack of %1m to %1m.\n", origin, tpos);
   else
-    TRACE("Moved attack of %m from %m to %m.\n", origini, originj,
-	  si, sj, ti, tj);
+    TRACE("Moved attack of %1m from %1m to %1m.\n", origin, apos, tpos);
 
-  gg_assert (ti == -1 || BOARD(ti, tj) == EMPTY);
-  gg_assert (BOARD(ai, aj) != EMPTY);
+  gg_assert (tpos == 0 || board[tpos] == EMPTY);
+  gg_assert (board[str] != EMPTY);
 
-  worm[origini][originj].attacki = ti;
-  worm[origini][originj].attackj = tj;
-  worm[origini][originj].attack_code = acode;
-  propagate_worm(origini, originj);
+  worm[I(origin)][J(origin)].attack_code  = acode;
+  worm[I(origin)][J(origin)].attack_point = tpos;
+  propagate_worm(I(origin), J(origin));
 
-  if (ti != -1)
-    add_attack_move(ti, tj, origini, originj);
-  else if (si != -1)
-    remove_attack_move(si, sj, origini, originj);
+  if (tpos != 0)
+    add_attack_move(I(tpos), J(tpos), I(origin), J(origin));
+  else if (apos != 0)
+    remove_attack_move(I(apos), J(apos), I(origin), J(origin));
 }
 
 
@@ -198,8 +190,8 @@ does_attack(int ti, int tj, int ai, int aj)
   if (stackp == 0) {
     if (worm[ai][aj].attack_code != 0 && worm[ai][aj].defend_code == 0)
       return 0;
-    si = worm[ai][aj].defendi;
-    sj = worm[ai][aj].defendj;
+    si = I(worm[ai][aj].defense_point);
+    sj = J(worm[ai][aj].defense_point);
   }
   else {
     attack_and_defend(ai, aj, &acode, NULL, NULL, &dcode, &si, &sj);
@@ -246,8 +238,8 @@ does_defend(int ti, int tj, int ai, int aj)
     if (worm[ai][aj].attack_code == 0)
       return 0;
     else {
-      si = worm[ai][aj].attacki;
-      sj = worm[ai][aj].attackj;
+      si = I(worm[ai][aj].attack_point);
+      sj = J(worm[ai][aj].attack_point);
     }
   }
   else if (!attack(ai, aj, &si, &sj))
@@ -596,10 +588,10 @@ find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)
 		|| worm[i][j].cutstone > worm[vi][vj].cutstone 
 		|| (worm[i][j].cutstone == worm[vi][vj].cutstone 
 		    && worm[i][j].liberties < worm[vi][vj].liberties)) {
-	      vi = worm[i][j].origini;
-	      vj = worm[i][j].originj;
-	      if (ai) *ai = worm[i][j].attacki;
-	      if (aj) *aj = worm[i][j].attackj;
+	      vi = I(worm[i][j].origin);
+	      vj = J(worm[i][j].origin);
+	      if (ai) *ai = I(worm[i][j].attack_point);
+	      if (aj) *aj = J(worm[i][j].attack_point);
 	    }
 	  }
 
@@ -957,8 +949,7 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
       for (n = 0; issafe && n < board_size; n++)
 	if (issafe
 	    && BOARD(m, n)
-	    && worm[m][n].origini == m
-	    && worm[m][n].originj == n
+	    && worm[m][n].origin == POS(m, n)
 	    && (m != i || n != j)) {
 	  if (BOARD(m, n) == color
 	      && worm[m][n].attack_code == 0

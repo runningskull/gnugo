@@ -75,12 +75,15 @@ extern Hash_data    hashdata;
 #define MAXCHAIN  160
 
 /* 1D board macros. */
+/* Note that POS(-1, -1) == 0 */
 #define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1))
 #define BOARDMIN     (MAX_BOARD + 2)
 #define BOARDMAX     (MAX_BOARD + 1) * (MAX_BOARD + 1)
 #define POS(i, j)    ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))
 #define I(pos)       ((pos) / (MAX_BOARD + 1) - 1)
 #define J(pos)       ((pos) % (MAX_BOARD + 1) - 1)
+#define PASS_MOVE    0
+#define NO_MOVE      PASS_MOVE
 #define NS           (MAX_BOARD + 1)
 #define WE           1
 #define SOUTH(pos)   ((pos) + NS)
@@ -387,8 +390,8 @@ void owl_analyze_semeai(int ai, int aj, int bi, int bj);
 void purge_persistent_owl_cache(void);
 void owl_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 
-void change_defense(int, int, int, int, int);
-void change_attack(int, int, int, int, int);
+void change_attack(int str, int tpos, int acode);
+void change_defense(int str, int tpos, int dcode);
 int does_attack(int, int, int, int);
 int does_defend(int, int, int, int);
 int double_atari(int m, int n, int color);
@@ -561,21 +564,20 @@ struct worm_data {
   int color;         /* its color */
   int size;          /* its cardinality */
   float effective_size; /* stones and surrounding spaces */
-  int origini;       /* (origini, originj) is the origin of the string. Two */
-  int originj;       /* vertices are in the same worm iff they have 
-                      *	same origin. */
+  int origin;        /* the origin of the string. Two vertices are in*/
+                     /* the same worm iff they have same origin. */
   int liberties;     /* number of liberties */
   int liberties2;    /* number of second order liberties */
   int liberties3;    /* third order liberties (empty vertices at distance 3) */
   int liberties4;    /* fourth order liberties */
-  int attacki;       /* (attacki, attackj), if attack_code != 0 points to */
-  int attackj;       /* move which captures the string */
   int attack_code;   /* 1=unconditional win, 2 or 3=win with ko */
-  int defendi;       /* (defendi, defendj), if defend_code != 0 points to a */
-  int defendj;       /* defensive move protecting the string */
+  int attack_point;  /* if attack_code != 0, points to a move which captures */
+		     /* the string. */
   int defend_code;   /* 1=unconditional win, 2 or 3=win with ko */
-  int lunchi;        /* if lunchi != -1 then (lunchi,lunchj) points to a */
-  int lunchj;        /* boundary worm which can be captured easily. */
+  int defense_point; /* if defend_code != 0 points to a defensive move */
+                     /* protecting the string */
+  int lunch;         /* if lunch != 0 then lunch points to a boundary */
+                     /* worm which can be captured easily. */
   int cutstone;      /* 1=potential cutting stone; 2=cutting stone */
   int cutstone2;     /* Number of potential cuts involving the worm. */
   int genus;         /* number of connected components of the complement, less one */
@@ -749,7 +751,7 @@ void abortgo(const char *file, int line, const char *msg, int i, int j);
 #define ASSERT1(x, pos) if (x) ; else abortgo(__FILE__, __LINE__, #x, I(pos), J(pos))
 #else
 #define ASSERT2(x, i, j)
-#define ASSERT1(x, i, j)
+#define ASSERT1(x, pos)
 #endif
 
 #define gg_assert(x) ASSERT2(x, -1, -1);

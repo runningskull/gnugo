@@ -75,8 +75,8 @@ make_dragons(int color, int stop_before_owl)
       dragon[m][n].size               = worm[m][n].size;
       dragon[m][n].effective_size     = worm[m][n].effective_size;
       dragon[m][n].color              = worm[m][n].color;
-      dragon[m][n].origini            = worm[m][n].origini;
-      dragon[m][n].originj            = worm[m][n].originj;
+      dragon[m][n].origini            = I(worm[m][n].origin);
+      dragon[m][n].originj            = J(worm[m][n].origin);
       dragon[m][n].lunchi             = -1;
       dragon[m][n].lunchj             = -1;
       dragon[m][n].owl_attacki        = -1;
@@ -101,7 +101,7 @@ make_dragons(int color, int stop_before_owl)
       dragon[m][n].semeai             =  0;
       half_eye[m][n].type             =  0;
       
-      if (worm[m][n].origini == m && worm[m][n].originj == n)
+      if (worm[m][n].origin == POS(m, n))
 	DEBUG(DEBUG_DRAGONS, 
 	      "Initialising dragon from worm at %m, size %d\n", 
 	      m, n, worm[m][n].size);
@@ -145,11 +145,10 @@ make_dragons(int color, int stop_before_owl)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (BOARD(m, n)
-	  && worm[m][n].origini == m
-	  && worm[m][n].originj == n
+	  && worm[m][n].origin == POS(m, n)
 	  && worm[m][n].genus == 0
 	  && worm[m][n].liberties2 == 0
-	  && worm[m][n].lunchi == -1)
+	  && worm[m][n].lunch == NO_MOVE)
       {
 	int edge;
 	int borigini = -1, boriginj = -1;
@@ -246,14 +245,13 @@ make_dragons(int color, int stop_before_owl)
   /* Find adjacent worms which can be easily captured: */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (worm[m][n].origini != m
-	  || worm[m][n].originj != n
+      if (worm[m][n].origin != POS(m, n)
 	  || BOARD(m, n) == EMPTY
-	  || worm[m][n].lunchi == -1)
+	  || worm[m][n].lunch == NO_MOVE)
 	continue;
 
-      i = worm[m][n].lunchi;
-      j = worm[m][n].lunchj;
+      i = I(worm[m][n].lunch);
+      j = J(worm[m][n].lunch);
 
       /* In contrast to worm lunches, a dragon lunch must also be
        * able to defend itself. 
@@ -282,11 +280,11 @@ make_dragons(int color, int stop_before_owl)
 		&& (worm[i][j].liberties
 		    < worm[dragon[origini][originj].lunchi]
 		    [dragon[origini][originj].lunchj].liberties))) {
-	  dragon[origini][originj].lunchi = worm[i][j].origini;
-	  dragon[origini][originj].lunchj = worm[i][j].originj;
-	  TRACE("at %m setting %m.lunch to %m (cutstone=%d)\n",
+	  dragon[origini][originj].lunchi = I(worm[i][j].origin);
+	  dragon[origini][originj].lunchj = J(worm[i][j].origin);
+	  TRACE("at %m setting %m.lunch to %1m (cutstone=%d)\n",
 		m, n, origini, originj,
-		worm[i][j].origini, worm[i][j].originj, worm[i][j].cutstone);
+		worm[i][j].origin, worm[i][j].cutstone);
 	}
       }
     }
@@ -1079,7 +1077,7 @@ show_dragons(void)
     for (n = 0; n < board_size; n++) {
       struct worm_data *w = &(worm[m][n]);
 
-      if (w->origini == m && w->originj == n) {
+      if (w->origin == POS(m, n)) {
 	if (BOARD(m, n)) {
 	  gprintf("%m : (dragon %m) %s string of size %d (%f), genus %d: (%d,%d,%d,%d)",
 		  m, n, dragon[m][n].origini, dragon[m][n].originj,
@@ -1102,14 +1100,14 @@ show_dragons(void)
 	    gprintf("- cutstone2 = %d\n", w->cutstone2);
 	  
 	  if (w->attack_code != 0)
-	    gprintf("- attackable at %m, attack code = %d\n",
-		    w->attacki, w->attackj, w->attack_code);
+	    gprintf("- attackable at %1m, attack code = %d\n",
+		    w->attack_point, w->attack_code);
 	  if (w->defend_code != 0)
-	    gprintf("- defendable at %m, defend code = %d\n",
-		    w->defendi, w->defendj, w->defend_code);
+	    gprintf("- defendable at %1m, defend code = %d\n",
+		    w->defense_point, w->defend_code);
 
-	  if (w->lunchi != -1)
-	    gprintf("... adjacent worm %m is lunch\n", w->lunchi, w->lunchj);
+	  if (w->lunch != NO_MOVE)
+	    gprintf("... adjacent worm %1m is lunch\n", w->lunch);
 	  
 	  if (w->inessential)
 	    gprintf("- is inessential\n");
@@ -1200,7 +1198,7 @@ dragon_ring(int m, int n, int *ddi, int *ddj)
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (worm[i][j].origini == m && worm[i][j].originj == n) {
+      if (worm[i][j].origin == POS(m, n)) {
 	ASSERT2(BOARD(i, j) != EMPTY, i, j);
 	for (k = 0; k < 4; k++) {
 	  int di = deltai[k];
@@ -1736,8 +1734,7 @@ report_dragon(int m, int n)
   gprintf("strings:");
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (worm[i][j].origini == i
-	  && worm[i][j].originj == j
+      if (worm[i][j].origin == POS(i, j)
 	  && same_dragon(i, j, m, n))
 	gprintf(" %m", i, j);
 

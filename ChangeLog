@@ -2,6 +2,22 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+- bugfix in aftermath_genmove()
+- assertions added to are_neighbor_strings()
+- analyze_neighbor() in filllib.c revised
+- alternative definition of ASSERT1 macro corrected
+- revised valuation of vital eye moves
+- tuning
+- new game record and new and revised filllib regression tests
+- make internals of worm[][] 1-dimensional
+- new macros: PASS_MOVE and NO_MOVE
+- change_attack and change_defense are now 1-dimensional
+- worm handling in move_reasons.c is now 1-dimensional
+- prefix struct option in getopt.c with gg_
+- prefix all occurences of optarg with gg_
+- tuning
+- owl tuning
+
 3.1.6 released September 15, 2001
 
 - limited pushing of p[][] allows one level of recursion in global_matchpat

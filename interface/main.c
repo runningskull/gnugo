@@ -299,33 +299,33 @@ main(int argc, char *argv[])
       case 'a': allpats = 1; break;
 
       case  1 :
-      case 'l': infilename = optarg; 
+      case 'l': infilename = gg_optarg; 
 	break;
 	
-      case 'b': benchmark = atoi(optarg); playmode = MODE_SOLO; break;
-      case 'r': seed = atoi(optarg); break;
+      case 'b': benchmark = atoi(gg_optarg); playmode = MODE_SOLO; break;
+      case 'r': seed = atoi(gg_optarg); break;
       case 's': showstack = 1; break;
       case 'S': showstatistics = 1; break;
       case 'w': printworms = 1; break;
-      case 'm': printmoyo = strtol(optarg, NULL, 0);  /* allows 0x... */ break;
-      case 'd': debug ^= strtol(optarg, NULL, 0);  /* allows 0x... */ break;
-      case 'D': mandated_depth = atoi(optarg); break;
+      case 'm': printmoyo = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
+      case 'd': debug ^= strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
+      case 'D': mandated_depth = atoi(gg_optarg); break;
 
-      case 'M': memory = atof(optarg); break; /* floating point number */
-      case 'H': hashflags = strtol(optarg, NULL, 0);  /* allows 0x... */ break;
+      case 'M': memory = atof(gg_optarg); break; /* floating point number */
+      case 'H': hashflags = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
 
       case 'E': printboard = 2; break;
-      case 'B': mandated_backfill_depth = atoi(optarg); break;
-      case 'F': mandated_fourlib_depth = atoi(optarg); break;
-      case 'K': mandated_ko_depth = atoi(optarg); break;
+      case 'B': mandated_backfill_depth = atoi(gg_optarg); break;
+      case 'F': mandated_fourlib_depth = atoi(gg_optarg); break;
+      case 'K': mandated_ko_depth = atoi(gg_optarg); break;
 
       case 'L':
-	untilstring = optarg;
+	untilstring = gg_optarg;
 	break;
 	
       case 'o':
-	outfile = optarg;
-	strcpy(gameinfo.outfilename, optarg);
+	outfile = gg_optarg;
+	strcpy(gameinfo.outfilename, gg_optarg);
 	break;
 	
       case OPT_QUIET:
@@ -333,7 +333,7 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_GTP_INPUT:
-	gtpfile = optarg;
+	gtpfile = gg_optarg;
 	break;
 	
       case OPT_SHOWTIME:
@@ -346,7 +346,7 @@ main(int argc, char *argv[])
 	
       case OPT_HANDICAPSTONES:
 	{
-	  int handicap = atoi(optarg);
+	  int handicap = atoi(gg_optarg);
 	  
 	  if (handicap < 0 || handicap > MAX_HANDICAP) {
 	    fprintf(stderr, "Illegal handicap: %d.\n", handicap);
@@ -358,7 +358,7 @@ main(int argc, char *argv[])
         break;
       
       case OPT_BOARDSIZE: 
-	boardsize = atoi(optarg);
+	boardsize = atoi(gg_optarg);
 	  
 	if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
 	  fprintf(stderr, "Illegal board size: %d.\n", boardsize);
@@ -369,8 +369,8 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_KOMI: 
-	if (sscanf(optarg, "%f", &komi) !=1 ) {
-	  fprintf(stderr, "Invalid komi selection: %s\n", optarg);
+	if (sscanf(gg_optarg, "%f", &komi) !=1 ) {
+	  fprintf(stderr, "Invalid komi selection: %s\n", gg_optarg);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  exit(EXIT_FAILURE);
 	}
@@ -398,16 +398,16 @@ main(int argc, char *argv[])
 	break;
 
       case OPT_MODE: 
-	if (strcmp(optarg, "ascii") == 0) 
+	if (strcmp(gg_optarg, "ascii") == 0) 
 	  playmode = MODE_ASCII;
-	else if (strcmp(optarg, "emacs") == 0)
+	else if (strcmp(gg_optarg, "emacs") == 0)
 	  playmode = MODE_ASCII_EMACS;
-	else if (strcmp(optarg, "gtp") == 0)
+	else if (strcmp(gg_optarg, "gtp") == 0)
 	  playmode = MODE_GTP;
-	else if (strcmp(optarg, "gmp") == 0)
+	else if (strcmp(gg_optarg, "gmp") == 0)
 	  playmode = MODE_GMP;
 	else {
-	  fprintf(stderr, "Invalid mode selection: %s\n", optarg);
+	  fprintf(stderr, "Invalid mode selection: %s\n", gg_optarg);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  
 	  exit(EXIT_FAILURE);
@@ -415,30 +415,30 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_DECIDE_STRING:
-	if (strlen(optarg) > 3) {
-	  fprintf(stderr, "Invalid board coordinate: %s\n", optarg);
+	if (strlen(gg_optarg) > 3) {
+	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
 	  exit(EXIT_FAILURE);
 	}
-	strcpy(decide_this, optarg);
+	strcpy(decide_this, gg_optarg);
 	playmode = MODE_DECIDE_STRING;
 	break;
 	
       case OPT_DECIDE_DRAGON:
-	if (strlen(optarg) > 3) {
-	  fprintf(stderr, "Invalid board coordinate: %s\n", optarg);
+	if (strlen(gg_optarg) > 3) {
+	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
 	  exit(EXIT_FAILURE);
 	}
-	strcpy(decide_this, optarg);
+	strcpy(decide_this, gg_optarg);
 	playmode = MODE_DECIDE_DRAGON;
 	break;
 	
       case OPT_DECIDE_SEMEAI:
-	if (strlen(optarg) > 7) {
+	if (strlen(gg_optarg) > 7) {
 	  fprintf(stderr, 
 		  "usage: --decidedragon [first dragon]/[second dragon]\n");
 	  return (EXIT_FAILURE);
 	}
-	strcpy(decide_this, optarg);
+	strcpy(decide_this, gg_optarg);
 	strtok(decide_this, "/");
 	decide_that = strtok(NULL, "/");
 	if (!decide_that) {
@@ -455,43 +455,43 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_DECIDE_EYE:
-	if (strlen(optarg) > 3) {
-	  fprintf(stderr, "Invalid board coordinate: %s\n", optarg);
+	if (strlen(gg_optarg) > 3) {
+	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
 	  exit(EXIT_FAILURE);
 	}
-	strcpy(decide_this, optarg);
+	strcpy(decide_this, gg_optarg);
 	playmode = MODE_DECIDE_EYE;
 	break;
 	
       case OPT_BRANCH_DEPTH:
-	mandated_branch_depth = atoi(optarg);
+	mandated_branch_depth = atoi(gg_optarg);
 	break;
 	
       case OPT_BACKFILL2_DEPTH:
-	mandated_backfill2_depth = atoi(optarg);
+	mandated_backfill2_depth = atoi(gg_optarg);
 	break;
 	
       case OPT_SUPERSTRING_DEPTH:
-	mandated_superstring_depth = atoi(optarg);
+	mandated_superstring_depth = atoi(gg_optarg);
 	break;
 	
       case OPT_AA_DEPTH:
-	mandated_aa_depth = atoi(optarg);
+	mandated_aa_depth = atoi(gg_optarg);
 
       case OPT_OWL_DISTRUST:
-	mandated_owl_distrust_depth = atoi(optarg);
+	mandated_owl_distrust_depth = atoi(gg_optarg);
 	break;
 	
       case OPT_OWL_BRANCH:
-	mandated_owl_branch_depth = atoi(optarg);
+	mandated_owl_branch_depth = atoi(gg_optarg);
 	break;
 	
       case OPT_OWL_READING:
-	mandated_owl_reading_depth = atoi(optarg);
+	mandated_owl_reading_depth = atoi(gg_optarg);
 	break;
 	
       case OPT_OWL_NODE_LIMIT:
-	mandated_owl_node_limit = atoi(optarg);
+	mandated_owl_node_limit = atoi(gg_optarg);
 	break;
 	
       case OPT_LIFE:
@@ -500,7 +500,7 @@ main(int argc, char *argv[])
 
       case OPT_LIFE_EYESIZE:
 	life = 1;
-	life_eyesize = atoi(optarg);
+	life_eyesize = atoi(gg_optarg);
 	break;
 	
       case OPT_NOFUSEKIDB:
@@ -512,22 +512,22 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_LEVEL:
-	level = atoi(optarg);
+	level = atoi(gg_optarg);
 	break;
 
       case OPT_CLOCK_TIME:
 
-	clock_init(atoi(optarg), -1, -1);
+	clock_init(atoi(gg_optarg), -1, -1);
 	clock_enable();
 	break;
 
       case OPT_CLOCK_BYO_TIME: 
-	clock_init(-1, atoi(optarg), -1);
+	clock_init(-1, atoi(gg_optarg), -1);
 	clock_enable();
 	break;
 
       case OPT_CLOCK_BYO_PERIOD:
-	clock_init(-1, -1, atoi(optarg));
+	clock_init(-1, -1, atoi(gg_optarg));
 	clock_enable();
 	break;
 
@@ -538,37 +538,37 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_DEBUG_INFLUENCE:
-	if (strlen(optarg) > 3) {
-	  fprintf(stderr, "Invalid board coordinate: %s\n", optarg);
+	if (strlen(gg_optarg) > 3) {
+	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
 	  exit(EXIT_FAILURE);
 	}
-	strcpy(debuginfluence_move, optarg);
+	strcpy(debuginfluence_move, gg_optarg);
         break;
 	
       case OPT_REPLAY_GAME: 
 	playmode = MODE_REPLAY;
-	if (strcmp(optarg, "white") == 0)
+	if (strcmp(gg_optarg, "white") == 0)
 	  replay_color = WHITE;
-	else if (strcmp(optarg, "black") == 0)
+	else if (strcmp(gg_optarg, "black") == 0)
 	  replay_color = BLACK;
-	else if (strcmp(optarg, "both") == 0)
+	else if (strcmp(gg_optarg, "both") == 0)
 	  replay_color = GRAY;
 	else {
-	  fprintf(stderr, "Invalid replay color: %s\n", optarg);
+	  fprintf(stderr, "Invalid replay color: %s\n", gg_optarg);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  exit(EXIT_FAILURE);
 	}
 	break;
 	
       case OPT_SCORE:
-	untilstring = optarg;
+	untilstring = gg_optarg;
 	if (playmode == MODE_UNKNOWN)
 	  playmode = MODE_LOAD_AND_SCORE;
 	break;
 	
       case OPT_PRINTSGF:
 	playmode = MODE_LOAD_AND_PRINT;
-	printsgffile = optarg;
+	printsgffile = gg_optarg;
 	break;
 	
       case OPT_PROFILE_PATTERNS:
@@ -577,12 +577,12 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_COLOR: 
-	if (strcmp(optarg, "white") == 0)
+	if (strcmp(gg_optarg, "white") == 0)
 	  umove = WHITE;
-	else if (strcmp(optarg, "black") == 0) 
+	else if (strcmp(gg_optarg, "black") == 0) 
 	  umove = BLACK;
 	else {
-	  fprintf(stderr, "Invalid color selection: %s\n", optarg);
+	  fprintf(stderr, "Invalid color selection: %s\n", gg_optarg);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  exit(EXIT_FAILURE);
 	}
@@ -600,12 +600,12 @@ main(int argc, char *argv[])
 	
       case 'h': 
 	show_version();
-	if (optarg) {
+	if (gg_optarg) {
 	  /* In the default behavior of getopt_long with optional args
 	   * you need to type "-hdebug"
 	   * I can't get long options "--helpdebug" to work at all
 	   */
-	  if (strncmp(optarg, "debug", 5) == 0)
+	  if (strncmp(gg_optarg, "debug", 5) == 0)
 	    show_debug_help();
 	}
 	else {
@@ -677,7 +677,7 @@ main(int argc, char *argv[])
 	&& playmode != MODE_DECIDE_SEMEAI
 	&& playmode != MODE_DECIDE_EYE)
       if (!sgffile_open_file(outfile)) {
-	fprintf(stderr, "Error: could not open '%s'\n", optarg);
+	fprintf(stderr, "Error: could not open '%s'\n", gg_optarg);
 	exit(EXIT_FAILURE);
       }
   }

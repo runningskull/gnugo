@@ -34,7 +34,7 @@ extern "C" {
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
 
-extern char *optarg;
+extern char *gg_optarg;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller

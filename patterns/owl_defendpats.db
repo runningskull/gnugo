@@ -3344,6 +3344,20 @@ D*
 ;&& oplay_attack(*,C) && oplay_attack(*,D)
 
 
+Pattern D1132
+# db added (3.1.7)
+
+?X*O
+OOX.
+
+:8,-,value(80)
+
+?A*O
+OOB.
+
+; oplay_attack_either(*,A,B)
+
+
 ########################################################
 #                                                       #
 #                       Kikashi                         #

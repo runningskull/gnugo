@@ -72,8 +72,7 @@ display_worm(Position *pos, int i, int j)
 	     location_to_string2(i, j),
 	     color_to_string(worm[i][j].color));
   gg_wprintw(info_window, "(origin %s) ",
-	     location_to_string2(worm[i][j].origini,
-				worm[i][j].originj));
+	     location_to_string(worm[i][j].origin));
 
   wmove(info_window, 3, 16);
   gg_wprintw(info_window, "%3d  %5.3f ",
@@ -92,32 +91,28 @@ display_worm(Position *pos, int i, int j)
   gg_wprintw(info_window, "%d", worm[i][j].genus);
 
   wmove(info_window, 3, 55);
-  if (worm[i][j].attacki == -1)
+  if (worm[i][j].attack_point == 0)
     gg_wprintw(info_window, "--- [code %d]",
 	       worm[i][j].attack_code);
   else
     gg_wprintw(info_window, "%3s [code %d]", 
-	    location_to_string2(worm[i][j].attacki,
-			       worm[i][j].attackj),
+	    location_to_string(worm[i][j].attack_point),
 	    worm[i][j].attack_code);
   
   wmove(info_window, 4, 55);
-  if (worm[i][j].defendi == -1)
+  if (worm[i][j].defense_point == 0)
     gg_wprintw(info_window, "--- [code %d]",
 	       worm[i][j].defend_code);
   else
     gg_wprintw(info_window, "%3s [code %d]", 
-	    location_to_string2(worm[i][j].defendi,
-			       worm[i][j].defendj),
+	    location_to_string(worm[i][j].defense_point),
 	    worm[i][j].defend_code);
 
   wmove(info_window, 5, 55);
-  if (worm[i][j].lunchi == -1)
+  if (worm[i][j].lunch == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
-    gg_wprintw(info_window, "%3s", 
-	    location_to_string2(worm[i][j].lunchi,
-			       worm[i][j].lunchj));
+    gg_wprintw(info_window, "%3s", location_to_string(worm[i][j].lunch));
 
   wmove(info_window, 7, 55);
   gg_wprintw(info_window, "%s         ", 

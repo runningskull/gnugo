@@ -2191,12 +2191,13 @@ aO..
 
 
 Pattern Shape66
+# db increased negative shape (3.1.7)
 
 xX.         often bad to leave a gap
 O.*
 ...
 
-:8,-,shape(-1)
+:8,-,shape(-3)
 
 
 Pattern Shape67

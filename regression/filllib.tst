@@ -80,9 +80,11 @@ loadsgf games/filllib6.sgf 261
 24 gg_genmove black
 #? [P16]
 
+# White J3 is best but with superior ko threats, H1 and J5 can also be
+# played with the same result.
 loadsgf games/filllib7.sgf 72
 25 gg_genmove white
-#? [J3|J5]*
+#? [J3|H1|J5]*
 26 gg_genmove black
 #? [J5|H7|J7]
 
@@ -91,4 +93,12 @@ loadsgf games/filllib8.sgf 303
 #? [Q16]
 28 gg_genmove black
 #? [R14]
+
+# It's not a very good idea to throw in to start a ko, but we accept
+# it anyway.
+loadsgf games/filllib9.sgf 235
+29 gg_genmove white
+#? [B1|A1]
+30 gg_genmove black
+#? [A3|A1|B1]
 

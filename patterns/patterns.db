@@ -1102,6 +1102,22 @@ O..X
 
 
 Pattern CC74
+# gf Split pattern. (3.1.7)
+
+.O*.          connect and constrain X
+OXXO
+
+:8,C
+
+aO*b
+OXXO
+
+; oplay_attack(*,a,a) && oplay_attack(*,b,b)
+
+
+Pattern CC74b
+# gf Split pattern. (3.1.7)
+# Only shape bonus if X stones can't be attacked.
 
 .O*.          connect and constrain X
 OXXO
@@ -1109,9 +1125,10 @@ OXXO
 :8,C,shape(7)
 
 aO*b
-OXXO
+OCCO
 
-; oplay_attack(*,a,a) && oplay_attack(*,b,b)
+;oplay_attack(*,a,a) && oplay_attack(*,b,b) 
+;&& !(attack(C) && oplay_defend(*,C))
 
 
 Pattern CC75
@@ -6671,7 +6688,7 @@ Pattern CB8
 Pattern CB9
 
 ??O..O
-??...O
+?....O
 ?.*...
 ??.???
 ??????
@@ -7873,7 +7890,7 @@ OXO             block opponent
 .*.
 ?.?
 
-:|,OXb
+:|,OXbd
 
 aXb
 .*.
@@ -8539,6 +8556,26 @@ Pattern CB332
 ?....o
 
 :8,OXbeE
+
+
+Pattern CB333
+# db added (3.1.7)
+# shape only --- other patterns matched give other attributes
+
+?.?            prevent X from pushing out
+OXO
+.*.
+?.?
+
+:8,OX,shape(3)
+
+?a?
+BXC
+.*.
+?.?
+
+; !safe_omove(a) && lib(B)>1 && lib(C)>1
+
 
 
 ######################################################################
@@ -9889,6 +9926,26 @@ Pattern ED83
 |XOOX
 |a*.x
 |..O?
+
+> antisuji(a)
+
+
+Pattern ED84
+# db added (3.1.7)
+
+|xXXx        fall back to defend territory
+|XOOX
+|..OX
+|.*.O
+|...o
+
+:8,CXOd,shape(2)
+
+|xXXx
+|XOOX
+|a.OX
+|.*.O
+|...o
 
 > antisuji(a)
 
@@ -13931,6 +13988,23 @@ XXA..
 -----
 
 ; !dead(A)
+
+
+Pattern EJ83
+
+..OXOO        make shape and defend cut
+.*.O..
+......
+------
+
+:8,J
+
+..OXCC
+.*bOa.
+......
+------
+
+; xplay_attack(a,b,C)
 
 
 ######################################################################

@@ -127,8 +127,8 @@ main (argc, argv)
 	{
 	case 0:
 	  printf ("option %s", long_options[option_index].name);
-	  if (optarg)
-	    printf (" with arg %s", optarg);
+	  if (gg_optarg)
+	    printf (" with arg %s", gg_optarg);
 	  printf ("\n");
 	  break;
 
@@ -157,11 +157,11 @@ main (argc, argv)
 	  break;
 
 	case 'c':
-	  printf ("option c with value `%s'\n", optarg);
+	  printf ("option c with value `%s'\n", gg_optarg);
 	  break;
 
 	case 'd':
-	  printf ("option d with value `%s'\n", optarg);
+	  printf ("option d with value `%s'\n", gg_optarg);
 	  break;
 
 	case '?':

@@ -1425,7 +1425,7 @@ main(int argc, char *argv[])
       case 'D':
 	dfa_generate = 1; dfa_c_output = 1; 
 	break;
-      case 'V': dfa_verbose = strtol(optarg, NULL, 10); break;
+      case 'V': dfa_verbose = strtol(gg_optarg, NULL, 10); break;
 
 #endif
       default:

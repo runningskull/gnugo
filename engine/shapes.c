@@ -96,7 +96,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
        */
       if ((class & CLASS_O)
 	  && BOARD(x, y) == color
-	  && worm[x][y].attacki != -1
+	  && worm[x][y].attack_point != 0
 	  && !does_defend(ti, tj, x, y))
 	return;
 

@@ -225,12 +225,12 @@ make_worms(void)
 	     * store it into (ti, tj), otherwise store it into (ui, uj).
 	     */
 	      if (ti == -1) {
-	        ti = worm[i][j].origini;
-	        tj = worm[i][j].originj;
+	        ti = I(worm[i][j].origin);
+	        tj = J(worm[i][j].origin);
 	      }
 	      else if (!is_worm_origin(i, j, ti, tj)) {
-	        ui = worm[i][j].origini;
-	        uj = worm[i][j].originj;
+	        ui = I(worm[i][j].origin);
+	        uj = J(worm[i][j].origin);
 	      }
 	    }
 	  } /* loop over k */
@@ -308,10 +308,10 @@ make_worms(void)
 	int color = BOARD(m, n);
 	int other = OTHER_COLOR(color);
 
-	int ai = worm[m][n].attacki;
-	int aj = worm[m][n].attackj;
-	int di = worm[m][n].defendi;
-	int dj = worm[m][n].defendj;
+	int ai = I(worm[m][n].attack_point);
+	int aj = J(worm[m][n].attack_point);
+	int di = I(worm[m][n].defense_point);
+	int dj = J(worm[m][n].defense_point);
 	  
 	/* For each worm, only work with the origin. */
 	if (BOARD(m, n) == EMPTY || !is_worm_origin(m, n, m, n))
@@ -362,10 +362,9 @@ make_worms(void)
 		     * defense which has been found by other means.
 		     * Try if the old defense move still works.
 		     */
-		    if (worm[i][j].defendi != -1
-			&& trymove2(worm[i][j].defendi, worm[i][j].defendj,
-				   color, "make_worms", -1, -1,
-				   EMPTY, -1, -1)) {
+		    if (worm[i][j].defense_point != 0
+			&& trymove(worm[i][j].defense_point,
+				   color, "make_worms", 0, EMPTY, 0)) {
 		      if (!attack(i, j, NULL, NULL))
 			attack_works = 0;
 		      popgo();
@@ -377,8 +376,7 @@ make_worms(void)
 		    if (attack_works) {
 		      TRACE("moving point of attack of %m to %m\n",
 			    i, j, ai, aj);
-		      worm[i][j].attacki = ai;
-		      worm[i][j].attackj = aj;
+		      worm[i][j].attack_point = POS(ai, aj);
 		      add_attack_move(ai, aj, i, j);
 		      mi[i][j] = 1;
 		    }
@@ -397,9 +395,8 @@ make_worms(void)
 		    else
 		      TRACE("setting point of defense of %m to %m\n",
 			    i, j, di, dj);
-		    worm[i][j].defendi = ai;
-		    worm[i][j].defendj = aj;
-		    worm[i][j].defend_code = WIN;
+		    worm[i][j].defend_code   = WIN;
+		    worm[i][j].defense_point = POS(ai, aj);
 		    add_defense_move(ai, aj, i, j);
 		    mi[i][j] = 1;
 		  }
@@ -445,9 +442,8 @@ make_worms(void)
 		    /* Sometimes find_defense() fails to find a
 		       defense which has been found by other means.
 		       Try if the old defense move still works. */
-		    if (trymove2(worm[i][j].defendi, worm[i][j].defendj,
-				other, "make_worms", -1, -1,
-				EMPTY, -1, -1)) {
+		    if (trymove(worm[i][j].defense_point,
+				other, "make_worms", 0, EMPTY, 0)) {
 		      if (!attack(i, j, NULL, NULL))
 			attack_works = 0;
 		      popgo();
@@ -459,8 +455,7 @@ make_worms(void)
 		    if (attack_works) {
 		      TRACE("moving point of attack of %m to %m\n",
 			    i, j, di, dj);
-		      worm[i][j].attacki = di;
-		      worm[i][j].attackj = dj;
+		      worm[i][j].attack_point = POS(di, dj);
 		      add_attack_move(di, dj, i, j);
 		      mi[i][j] = 1;
 		    }
@@ -479,9 +474,8 @@ make_worms(void)
 		    else
 		      TRACE("setting point of defense of %m to %m\n",
 			    i, j, di, dj);
-		    worm[i][j].defendi = di;
-		    worm[i][j].defendj = dj;
-		    worm[i][j].defend_code = WIN;
+		    worm[i][j].defend_code   = WIN;
+		    worm[i][j].defense_point = POS(di, dj);
 		    add_defense_move(di, dj, i, j);
 		    mi[i][j] = 1;
 		  }
@@ -527,18 +521,16 @@ make_worms(void)
 	  && BOARD(m+1, n) != EMPTY) {
         if (worm[m][n].attack_code != 0 && worm[m+1][n].attack_code != 0) {
 	  if (worm[m][n].defend_code == 0
-	      && does_defend(worm[m+1][n].attacki,
-			     worm[m+1][n].attackj, m, n)) {
+	      && does_defend(I(worm[m+1][n].attack_point),
+			     J(worm[m+1][n].attack_point), m, n)) {
 	    /* FIXME: need to check ko relationship here */
-	    change_defense(m, n, 
-			   worm[m+1][n].attacki, worm[m+1][n].attackj, WIN);
+	    change_defense(POS(m, n), worm[m+1][n].attack_point, WIN);
 	  }
 	  if (worm[m+1][n].defend_code == 0
-              && does_defend(worm[m][n].attacki,
-			     worm[m][n].attackj, m+1, n)) {
+              && does_defend(I(worm[m][n].attack_point),
+			     J(worm[m][n].attack_point), m+1, n)) {
 	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(m+1, n, 
-			   worm[m][n].attacki, worm[m][n].attackj, WIN);
+	    change_defense(POS(m+1, n), worm[m][n].attack_point, WIN);
 	  }
         }
       }
@@ -551,18 +543,16 @@ make_worms(void)
 	  && BOARD(m, n+1) != EMPTY) {
         if (worm[m][n].attack_code != 0 && worm[m][n+1].attack_code != 0) {
 	  if (worm[m][n].defend_code == 0
-              && does_defend(worm[m][n+1].attacki,
-			     worm[m][n+1].attackj, m, n)) {
+              && does_defend(I(worm[m][n+1].attack_point),
+			     J(worm[m][n+1].attack_point), m, n)) {
 	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(m, n, 
-			   worm[m][n+1].attacki, worm[m][n+1].attackj, WIN);
+	    change_defense(POS(m, n), worm[m][n+1].attack_point, WIN);
 	  }
 	  if (worm[m][n+1].defend_code == 0
-              && does_defend(worm[m][n].attacki,
-			     worm[m][n].attackj, m, n+1)) {
+              && does_defend(I(worm[m][n].attack_point),
+			     J(worm[m][n].attack_point), m, n+1)) {
 	    /* FIXME: need to check ko relationship here */	    
-	    change_defense(m, n+1, 
-			   worm[m][n].attacki, worm[m][n].attackj, WIN);
+	    change_defense(POS(m, n+1), worm[m][n].attack_point, WIN);
 	  }
 	}
       }
@@ -582,13 +572,11 @@ make_worms(void)
 	  && (worm[i][j].attack_code == WIN
 	      || worm[i][j].attack_code == KO_A)) {
 	TRACE("lunch found for %m at %m\n", m, n, i, j);
-	worm[m][n].lunchi = i;
-	worm[m][n].lunchj = j;
+	worm[m][n].lunch = POS(i, j);
       }
-      else {
-	worm[m][n].lunchi = -1;
-	worm[m][n].lunchj = -1;
-      }
+      else
+	worm[m][n].lunch = NO_MOVE;
+
       propagate_worm(m, n);
     }
   
@@ -617,18 +605,15 @@ build_worms()
 
   /* Initialize the worm data for each worm. */
   for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      worm[m][n].origini = -1;
-      worm[m][n].originj = -1;
-    }
+    for (n = 0; n < board_size; n++)
+      worm[m][n].origin = -1;
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (worm[m][n].origini != -1)
+      if (worm[m][n].origin != -1)
 	continue;
       worm[m][n].color = BOARD(m, n);
-      worm[m][n].origini = m;
-      worm[m][n].originj = n;
+      worm[m][n].origin = POS(m, n);
       worm[m][n].ko = 0;
       worm[m][n].inessential = 0;
       worm[m][n].invincible = 0;
@@ -697,8 +682,8 @@ compute_effective_worm_sizes()
 	distance[m][n] = -1;
       else {
 	distance[m][n] = 0;
-	wormi[m][n][0] = worm[m][n].origini;
-	wormj[m][n][0] = worm[m][n].originj;
+	wormi[m][n][0] = I(worm[m][n].origin);
+	wormj[m][n][0] = J(worm[m][n].origin);
 	nworms[m][n]++;
       }
     }
@@ -874,18 +859,15 @@ find_worm_attacks_and_defenses()
 
       TRACE ("considering attack of %m\n", m, n);
       /* Initialize all relevant fields at once. */
-      worm[m][n].attacki = -1;
-      worm[m][n].attackj = -1;
-      worm[m][n].attack_code = 0;
-      worm[m][n].defendi = -1;
-      worm[m][n].defendj = -1;
-      worm[m][n].defend_code = 0;
+      worm[m][n].attack_code   = 0;
+      worm[m][n].attack_point  = 0;
+      worm[m][n].defend_code   = 0;
+      worm[m][n].defense_point = 0;
       acode = attack(m, n, &ti, &tj);
       if (acode) {
 	TRACE("worm at %m can be attacked at %m\n", m, n, ti, tj);
-	worm[m][n].attacki = ti;
-	worm[m][n].attackj = tj;
 	worm[m][n].attack_code = acode;
+	worm[m][n].attack_point = POS(ti, tj);
 	add_attack_move(ti, tj, m, n);
       }
       propagate_worm(m, n);
@@ -910,9 +892,8 @@ find_worm_attacks_and_defenses()
 	dcode = find_defense(m, n, &ti, &tj);
 	if (dcode) {
 	  TRACE ("worm at %m can be defended at %m\n", m, n, ti, tj);
-	  worm[m][n].defendi = ti;
-	  worm[m][n].defendj = tj;
-	  worm[m][n].defend_code = dcode;
+	  worm[m][n].defend_code   = dcode;
+	  worm[m][n].defense_point = POS(ti, tj);
 	  if (ti != -1)
 	    add_defense_move(ti, tj, m, n);
 	}
@@ -921,8 +902,8 @@ find_worm_attacks_and_defenses()
 	   * it is possible that this is an overlooked point of
 	   * defense, so we try and see if it defends.
 	   */
-	  int ai = worm[m][n].attacki;
-	  int aj = worm[m][n].attackj;
+	  int ai = I(worm[m][n].attack_point);
+	  int aj = J(worm[m][n].attack_point);
 	  if (!liberty_of_string2(ai, aj, m, n))
 	    if (trymove2(ai, aj, worm[m][n].color, "make_worms", -1, -1,
 			EMPTY, -1, -1)) {
@@ -947,8 +928,7 @@ find_worm_attacks_and_defenses()
 		}
 		
 		if (change_defense) {
-		  worm[m][n].defendi = ai;
-		  worm[m][n].defendj = aj;
+		  worm[m][n].defense_point = POS(ai, aj);
 		  TRACE ("worm at %m can be defended at %m with code %d\n",
 			 m, n, ai, aj, worm[m][n].defend_code);
 		}
@@ -1173,8 +1153,7 @@ find_worm_threats()
 int
 is_same_worm(int ai, int aj, int bi, int bj)
 {
-  return (worm[ai][aj].origini == worm[bi][bj].origini
-	  && worm[ai][aj].originj == worm[bi][bj].originj);
+  return (worm[ai][aj].origin == worm[bi][bj].origin);
 }
 
 
@@ -1185,8 +1164,7 @@ is_same_worm(int ai, int aj, int bi, int bj)
 int
 is_worm_origin(int wi, int wj, int i, int j)
 {
-  return (worm[wi][wj].origini == i
-	  && worm[wi][wj].originj == j);
+  return (worm[wi][wj].origin == POS(i, j));
 }
 
 
@@ -1572,8 +1550,8 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
       x += m;
       y += n;
 
-      ai = worm[x][y].origini;
-      aj = worm[x][y].originj;
+      ai = I(worm[x][y].origin);
+      aj = J(worm[x][y].origin);
 
       /* A string with 5 liberties or more is considered tactically alive. */
       if (countlib2(ai, aj) > 4)
@@ -1608,8 +1586,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	  TRACE("Attack pattern %s+%d found attack on %m at %m\n",
 		pattern->name, ll, ai, aj, ti, tj);
 	  worm[ai][aj].attack_code = WIN;
-	  worm[ai][aj].attacki = ti;
-	  worm[ai][aj].attackj = tj;
+	  worm[ai][aj].attack_point = POS(ti, tj);
 	}
 	else if (dcode == KO_A) {
 	  TRACE("Attack pattern %s+%d found attack on %m at %m with ko (acode=%d)\n",
@@ -1617,8 +1594,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	  if (worm[ai][aj].attack_code == KO_B 
 	      || worm[ai][aj].attack_code == 0) {
 	    worm[ai][aj].attack_code = KO_B;
-	    worm[ai][aj].attacki = ti;
-	    worm[ai][aj].attackj = tj;
+	    worm[ai][aj].attack_point = POS(ti, tj);
 	  }
 	}
 	else if (dcode == KO_B) {
@@ -1626,8 +1602,7 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
 		pattern->name, ll, ai, aj, ti, tj, KO_B);
 	  if (worm[ai][aj].attack_code != WIN) {
 	    worm[ai][aj].attack_code = KO_A;
-	    worm[ai][aj].attacki = ti;
-	    worm[ai][aj].attackj = tj;
+	    worm[ai][aj].attack_point = POS(ti, tj);
 	  }
 	}
 
@@ -1687,8 +1662,8 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
       x += m;
       y += n;
 
-      ai = worm[x][y].origini;
-      aj = worm[x][y].originj;
+      ai = I(worm[x][y].origin);
+      aj = J(worm[x][y].origin);
 
       if (worm[ai][aj].attack_code == 0
 	  || defense_move_known(ti, tj, ai, aj))
@@ -1707,26 +1682,23 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	if (acode == 0) {
 	  TRACE("Defense pattern %s+%d found defense of %m at %m\n",
 		pattern->name, ll, ai, aj, ti, tj);
-	  worm[ai][aj].defend_code = WIN;
-	  worm[ai][aj].defendi = ti;
-	  worm[ai][aj].defendj = tj;
+	  worm[ai][aj].defend_code   = WIN;
+	  worm[ai][aj].defense_point = POS(ti, tj);
 	}
 	else if (acode == KO_A) {
 	  TRACE("Defense pattern %s+%d found defense of %m at %m with ko (acode=%d)\n",
 		pattern->name, ll, ai, aj, ti, tj, 3);
 	  if (worm[ai][aj].defend_code != WIN) {
-	    worm[ai][aj].defend_code = KO_B;
-	    worm[ai][aj].defendi = ti;
-	    worm[ai][aj].defendj = tj;
+	    worm[ai][aj].defend_code   = KO_B;
+	    worm[ai][aj].defense_point = POS(ti, tj);
 	  }
 	}
 	else if (acode == KO_B) {
 	  TRACE("Defense pattern %s+%d found defense of %m at %m with ko (acode=%d)\n",
 		pattern->name, ll, ai, aj, ti, tj, 3);
 	  if (worm[ai][aj].defend_code != WIN) {
-	    worm[ai][aj].defend_code = KO_A;
-	    worm[ai][aj].defendi = ti;
-	    worm[ai][aj].defendj = tj;
+	    worm[ai][aj].defend_code   = KO_A;
+	    worm[ai][aj].defense_point = POS(ti, tj);
 	  }
 	}
 
@@ -1772,10 +1744,9 @@ report_worm(int m, int n)
   }
 
   gprintf("*** worm at %m:\n", m, n);
-  gprintf("color: %s; origin: %m; size: %d; effective size: %f\n",
+  gprintf("color: %s; origin: %1m; size: %d; effective size: %f\n",
 	  (worm[m][n].color == WHITE) ? "White" : "Black",
-	  worm[m][n].origini, worm[m][n].originj,
-	  worm[m][n].size, worm[m][n].effective_size);
+	  worm[m][n].origin, worm[m][n].size, worm[m][n].effective_size);
 
   gprintf("liberties: %d order 2 liberties:%d order 3:%d order 4:%d\n",
 	  worm[m][n].liberties, 
@@ -1783,9 +1754,8 @@ report_worm(int m, int n)
 	  worm[m][n].liberties3, 
 	  worm[m][n].liberties4);
 
-  if (worm[m][n].attacki != -1)
-    gprintf("attack point %m, ",
-	    worm[m][n].attacki, worm[m][n].attackj);
+  if (worm[m][n].attack_point != NO_MOVE)
+    gprintf("attack point %1m, ", worm[m][n].attack_point);
   else
     gprintf("no attack point, ");
 
@@ -1796,9 +1766,8 @@ report_worm(int m, int n)
   else if (worm[m][n].attack_code == KO_B)
     gprintf("attack code KO_B\n");
 
-  if (worm[m][n].defendi != -1)
-    gprintf("defense point %m, ",
-	    worm[m][n].defendi, worm[m][n].defendj);
+  if (worm[m][n].defense_point != NO_MOVE)
+    gprintf("defense point %1m, ", worm[m][n].defense_point);
   else
     gprintf("no defense point, ");
 
@@ -1809,8 +1778,8 @@ report_worm(int m, int n)
   else if (worm[m][n].defend_code == KO_B)
     gprintf("defend code KO_B\n");
 
-  if (worm[m][n].lunchi != -1)
-    gprintf("lunch at %m\n", worm[m][n].lunchi, worm[m][n].lunchj);
+  if (worm[m][n].lunch != NO_MOVE)
+    gprintf("lunch at %1m\n", worm[m][n].lunch);
 
   gprintf("cutstone: %d, cutstone2: %d\n",
 	  worm[m][n].cutstone, worm[m][n].cutstone2);

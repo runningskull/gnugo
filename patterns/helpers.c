@@ -298,9 +298,9 @@ indirect_helper (ARGS)
   UNUSED(pattern);
   UNUSED(color);
 
-  if ((worm[bi][bj].attacki==ti) && (worm[bi][bj].attackj==tj)
+  if ((worm[bi][bj].attack_point == POS(ti, tj))
       && (worm[bi][bj].defend_code == 0) && (does_defend(ai, aj, bi, bj)))
-    change_attack(bi, bj, -1, -1, 0);
+    change_attack(POS(bi, bj), 0, 0);
 
   return 0;
 }
@@ -378,16 +378,16 @@ cutstone2_helper (ARGS)
   if (worm[ai][aj].defend_code == 0)
     return 0;
   
-  di = worm[ai][aj].defendi;
-  dj = worm[ai][aj].defendj;
+  di = I(worm[ai][aj].defense_point);
+  dj = J(worm[ai][aj].defense_point);
 
   if (TRYMOVE(di, dj, BOARD(ai, aj))) {
     if (!BOARD(bi, bj) || attack(bi, bj, NULL, NULL)
 	|| !BOARD(ci, cj) || attack(ci, cj, NULL, NULL)
 	|| safe_move2(ti, tj, BOARD(ai, aj)) != 0) {
       popgo();
-      worm[worm[ai][aj].origini][worm[ai][aj].originj].cutstone2++;
-      propagate_worm(worm[ai][aj].origini, worm[ai][aj].originj);
+      worm[I(worm[ai][aj].origin)][J(worm[ai][aj].origin)].cutstone2++;
+      propagate_worm(I(worm[ai][aj].origin), J(worm[ai][aj].origin));
       return 0;
     }
     popgo();

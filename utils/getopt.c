@@ -104,7 +104,7 @@
    Also, when `ordering' is RETURN_IN_ORDER,
    each non-option ARGV-element is returned here.  */
 
-char *optarg;
+char *gg_optarg;
 
 /* Index in ARGV of the next element to be scanned.
    This is used for communication to and from the caller
@@ -508,7 +508,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
      int *longind;
      int long_only;
 {
-  optarg = NULL;
+  gg_optarg = NULL;
 
   if (gg_optind == 0 || !__getopt_initialized)
     {
@@ -596,7 +596,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	{
 	  if (ordering == REQUIRE_ORDER)
 	    return -1;
-	  optarg = argv[gg_optind++];
+	  gg_optarg = argv[gg_optind++];
 	  return 1;
 	}
 
@@ -682,7 +682,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	      /* Don't test has_arg with >, because some C compilers don't
 		 allow it to be used on enums.  */
 	      if (pfound->has_arg)
-		optarg = nameend + 1;
+		gg_optarg = nameend + 1;
 	      else
 		{
 		  if (gg_opterr)
@@ -708,7 +708,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	  else if (pfound->has_arg == 1)
 	    {
 	      if (gg_optind < argc)
-		optarg = argv[gg_optind++];
+		gg_optarg = argv[gg_optind++];
 	      else
 		{
 		  if (gg_opterr)
@@ -795,7 +795,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	/* This is an option that requires an argument.  */
 	if (*nextchar != '\0')
 	  {
-	    optarg = nextchar;
+	    gg_optarg = nextchar;
 	    /* If we end this ARGV-element by taking the rest as an arg,
 	       we must advance to the next element now.  */
 	    gg_optind++;
@@ -818,12 +818,12 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	else
 	  /* We already incremented `optind' once;
 	     increment it again when taking next ARGV-elt as argument.  */
-	  optarg = argv[gg_optind++];
+	  gg_optarg = argv[gg_optind++];
 
 	/* optarg is now the argument, see if it's in the
 	   table of longopts.  */
 
-	for (nextchar = nameend = optarg; *nameend && *nameend != '='; nameend++)
+	for (nextchar = nameend = gg_optarg; *nameend && *nameend != '='; nameend++)
 	  /* Do nothing.  */ ;
 
 	/* Test all long options for either exact match
@@ -866,7 +866,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 		/* Don't test has_arg with >, because some C compilers don't
 		   allow it to be used on enums.  */
 		if (pfound->has_arg)
-		  optarg = nameend + 1;
+		  gg_optarg = nameend + 1;
 		else
 		  {
 		    if (gg_opterr)
@@ -881,7 +881,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	    else if (pfound->has_arg == 1)
 	      {
 		if (gg_optind < argc)
-		  optarg = argv[gg_optind++];
+		  gg_optarg = argv[gg_optind++];
 		else
 		  {
 		    if (gg_opterr)
@@ -912,11 +912,11 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	    /* This is an option that accepts an argument optionally.  */
 	    if (*nextchar != '\0')
 	      {
-		optarg = nextchar;
+		gg_optarg = nextchar;
 		gg_optind++;
 	      }
 	    else
-	      optarg = NULL;
+	      gg_optarg = NULL;
 	    nextchar = NULL;
 	  }
 	else
@@ -924,7 +924,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	    /* This is an option that requires an argument.  */
 	    if (*nextchar != '\0')
 	      {
-		optarg = nextchar;
+		gg_optarg = nextchar;
 		/* If we end this ARGV-element by taking the rest as an arg,
 		   we must advance to the next element now.  */
 		gg_optind++;
@@ -947,7 +947,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	    else
 	      /* We already incremented `optind' once;
 		 increment it again when taking next ARGV-elt as argument.  */
-	      optarg = argv[gg_optind++];
+	      gg_optarg = argv[gg_optind++];
 	    nextchar = NULL;
 	  }
       }
@@ -962,7 +962,7 @@ gg_getopt (argc, argv, optstring)
      const char *optstring;
 {
   return _getopt_internal (argc, argv, optstring,
-			   (const struct option *) 0,
+			   (const struct gg_option *) 0,
 			   (int *) 0,
 			   0);
 }
@@ -1017,7 +1017,7 @@ main (argc, argv)
 	  break;
 
 	case 'c':
-	  printf ("option c with value `%s'\n", optarg);
+	  printf ("option c with value `%s'\n", gg_optarg);
 	  break;
 
 	case '?':

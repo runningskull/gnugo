@@ -285,8 +285,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (worm[m][n].origini == m
-	  && worm[m][n].originj == n
+      if (worm[m][n].origin == POS(m, n)
 	  && worm[m][n].attack_code == WIN)
 	if ((dragon[m][n].origini == ai
 	     && dragon[m][n].originj == aj)
@@ -331,8 +330,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       if (BOARD(i, j)
-	  && worm[i][j].origini == i
-	  && worm[i][j].originj == j) {
+	  && worm[i][j].origin == POS(i, j)) {
 	if (same_dragon(i, j, ai, aj))
 	  mylibs--;
 	if (same_dragon(i, j, bi, bj))
@@ -808,19 +806,19 @@ small_semeai_analyzer(int i, int j, int m, int n)
 
 
   /* FIXME: There are many more possibilities to consider */
-  if (trymove2(worm[i][j].attacki, worm[i][j].attackj, other, 
-	      "small_semeai_analyzer", i, j, EMPTY, -1, -1)) {
+  if (trymove(worm[i][j].attack_point, other,
+	      "small_semeai_analyzer", POS(i, j), EMPTY, 0)) {
     int acode = attack(m, n, &ai, &aj);
     if (acode == 0) {
       popgo();
-      change_defense(m, n, worm[i][j].attacki, worm[i][j].attackj, 1);
+      change_defense(POS(m, n), worm[i][j].attack_point, 1);
     }
     else if (trymove2(ai, aj, color, "small_semeai_analyzer", i, j,
 		     EMPTY, -1, -1)) {
       if (attack(i, j, NULL, NULL) == 0) {
 	popgo();
 	popgo();
-	change_attack(i, j, -1, -1, 0);
+	change_attack(POS(i, j), 0, 0);
       }
       else {
 	popgo();
@@ -832,19 +830,19 @@ small_semeai_analyzer(int i, int j, int m, int n)
   }
   gg_assert(stackp == 0);
   
-  if (trymove2(worm[m][n].attacki, worm[m][n].attackj, color, 
-	      "small_semeai_analyzer", m, n, EMPTY, -1, -1)) {
+  if (trymove(worm[m][n].attack_point, color, 
+	      "small_semeai_analyzer", POS(m, n), EMPTY, 0)) {
     int acode = attack(i, j, &ai, &aj);
     if (acode == 0) {
       popgo();
-      change_defense(i, j, worm[m][n].attacki, worm[m][n].attackj, 1);
+      change_defense(POS(i, j), worm[m][n].attack_point, 1);
     }
     else if (trymove2(ai, aj, other, "small_semeai_analyzer", m, n,
 		     EMPTY, -1, -1)) {
       if (attack(m, n, NULL, NULL) == 0) {
 	popgo();
 	popgo();
-	change_attack(m, n, -1, -1, 0);
+	change_attack(POS(m, n), 0, 0);
       }
       else {
 	popgo();

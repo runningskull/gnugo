@@ -278,7 +278,7 @@ aftermath_genmove(int *i, int *j, int color,
 	    || (ON_BOARD(EAST(pos))  && distance[m][n+1] == 0))) {
       findlib(pos, 1, &lib);
       /* Make sure we don't play into a ko or a (proper) snapback. */
-      if (countstones(pos) > 1 || !is_self_atari(pos, color)) {
+      if (countstones(pos) > 1 || !is_self_atari(lib, color)) {
 	*i = I(lib);
 	*j = J(lib);
 	return 1;
@@ -459,30 +459,32 @@ aftermath_genmove(int *i, int *j, int color,
 	    safety = INVINCIBLE;
 	  
 	  if (k < 4) {
-	    ai = worm[m+dm][n+dn].origini;
-	    aj = worm[m+dm][n+dn].originj;
+	    int apos = worm[m+dm][n+dn].origin;
 	    
-	    if (!mx[POS(ai, aj)]) {
+	    if (!mx[apos]) {
 	      own_worms++;
-	      if (countstones2(ai, aj) == 1)
+	      if (countstones(apos) == 1)
 		bonus += 2;
-	      mx[POS(ai, aj)] = 1;
+	      mx[apos] = 1;
 	    }
 	    
-	    if (countlib2(ai, aj) <= 2) {
+	    if (countlib(apos) <= 2) {
 	      int r;
 	      int important = 0;
 	      int safe_atari = 0;
 	      for (r = 0; r < 4; r++) {
+		int  d = delta[r];
+#if 0
 		int di = deltai[r];
 		int dj = deltaj[r];
-		if (!ON_BOARD2(ai+di, aj+dj))
+#endif
+		if (!ON_BOARD(apos+d))
 		  continue;
-		if (BOARD(ai+di, aj+dj) == other
-		    && dragon[ai+di][aj+dj].matcher_status == DEAD)
+		if (board[apos+d] == other
+		    && dragon[I(apos+d)][J(apos+d)].matcher_status == DEAD)
 		  important = 1;
-		else if (BOARD(ai+di, aj+dj) == EMPTY
-		    && !is_self_atari2(ai+di, aj+dj, other))
+		else if (board[apos+d] == EMPTY
+		    && !is_self_atari(apos+d, other))
 		  safe_atari = 1;
 	      }
 	      if (approxlib(POS(m, n), color, 3, NULL) > 2) {
@@ -715,8 +717,8 @@ aftermath_genmove(int *i, int *j, int color,
 	  && (DRAGON2(m, n).safety == DEAD
 	      || DRAGON2(m, n).safety == TACTICALLY_DEAD)
 	  && worm[m][n].attack_code != 0) {
-	*i = worm[m][n].attacki;
-	*j = worm[m][n].attackj;
+	*i = I(worm[m][n].attack_point);
+	*j = J(worm[m][n].attack_point);
 	return 1;
       }
       

@@ -61,12 +61,12 @@ analyze_neighbor(int m, int n, int *found_black, int *found_white)
     case EMPTY:
       if (!(*found_black)
 	  && living_neighbor(m, n, BLACK)
-	  && safe_move2(m, n, WHITE) == 0)
+	  && safe_move2(m, n, WHITE) != 3)
 	*found_black = 1;
       
       if (!(*found_white)
 	  && living_neighbor(m, n, WHITE)
-	  && safe_move2(m, n, BLACK) == 0)
+	  && safe_move2(m, n, BLACK) != 3)
 	*found_white = 1;
       
       break;
@@ -289,8 +289,8 @@ fill_liberty(int *i, int *j, int color)
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
 	      && worm[m+dm][n+dn].attack_code == WIN) {
-	    *i = worm[m+dm][n+dn].attacki;
-	    *j = worm[m+dm][n+dn].attackj;
+	    *i = I(worm[m+dm][n+dn].attack_point);
+	    *j = J(worm[m+dm][n+dn].attack_point);
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
 	    return 1;
 	  }
@@ -303,10 +303,9 @@ fill_liberty(int *i, int *j, int color)
 	  int dn = deltaj[k];
 	  if (BOARD(m+dm, n+dn) == other
 	      && worm[m+dm][n+dn].attack_code != 0
-	      && is_legal2(worm[m+dm][n+dn].attacki, worm[m+dm][n+dn].attackj,
-			  color)) {
-	    *i = worm[m+dm][n+dn].attacki;
-	    *j = worm[m+dm][n+dn].attackj;
+	      && is_legal(worm[m+dm][n+dn].attack_point, color)) {
+	    *i = I(worm[m+dm][n+dn].attack_point);
+	    *j = J(worm[m+dm][n+dn].attack_point);
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %m.\n", *i, *j);
 	    return 1;
 	  }

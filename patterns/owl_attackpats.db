@@ -766,6 +766,26 @@ O.*.
 :8,-,value(50)
 
 
+Pattern A232
+# db added (3.1.7)
+
+?OO?
+X..?
+.*..
+....
+----
+
+:8,-,value(80)
+
+?OO?
+Xab?
+.*c.
+....
+----
+
+; oplay_attack(*,a,b,c,c)
+
+
 #########################################################
 #                                                       #
 #          Limiting moves on the first line             #

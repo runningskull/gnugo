@@ -160,8 +160,7 @@ examine_position(int color, int how_much)
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
 	if (BOARD(m, n)
-	    && worm[m][n].origini == m
-	    && worm[m][n].originj == n
+	    && worm[m][n].origin == POS(m, n)
 	    && worm[m][n].cutstone) {
 	  TRACE("%scutting stones found at %m\n",
 		worm[m][n].cutstone==2 ? "potential " : "", m,n); 
@@ -528,11 +527,11 @@ get_level(int *level)
   
 
 /* ================================================================ */
-/*       Set up fixed placement handicap pieces for black side      */
+/*       Set up fixed placement handicap stones for black side      */
 /* ================================================================ */
 
 
-/* Handicap pieces are set up according to the following diagrams:
+/* Handicap stones are set up according to the following diagrams:
  *  
  * 2 stones:                    3 stones:           
  *
@@ -605,7 +604,8 @@ get_level(int *level)
  *
  * Notice that this function only deals with fixed handicap placement.
  * Larger handicaps can be added by free placement if the used
- * interface supports it. */
+ * interface supports it.
+ */
 
 
 /* This table contains the (coded) positions of the stones.

@@ -1654,6 +1654,11 @@ are_neighbor_strings(int str1, int str2)
 {
   int s1, s2;
   int k;
+  
+  ASSERT_ON_BOARD1(str1);
+  ASSERT_ON_BOARD1(str2);
+  ASSERT1(board[str1] != EMPTY, str1);
+  ASSERT1(board[str2] != EMPTY, str2);
 
   if (!strings_initialized)
     init_board();

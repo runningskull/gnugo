@@ -2195,10 +2195,10 @@ evaluate_diagonal_intersection(int m, int n, int color,
 	  value = 2;
 	else if (worm[m][n].defend_code != 0) {
 	  value = 1;
-	  ai = worm[m][n].attacki;
-	  aj = worm[m][n].attackj;
-	  di = worm[m][n].defendi;
-	  dj = worm[m][n].defendj;
+	  ai = I(worm[m][n].attack_point);
+	  aj = J(worm[m][n].attack_point);
+	  di = I(worm[m][n].defense_point);
+	  dj = J(worm[m][n].defense_point);
 	}
       }
     }
@@ -2234,6 +2234,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
       ASSERT_ON_BOARD2(di, dj);
     }
   }
+
   return value;
 }
 
