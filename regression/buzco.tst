@@ -5,33 +5,29 @@ loadsgf games/buzco1.sgf 12
 #? [P2]
 
 loadsgf games/buzco1.sgf 20
-gg_genmove black
-2 #? [N3]
+2 gg_genmove black
+#? [N3]
 
 loadsgf games/buzco1.sgf 28
-gg_genmove black
-3 #? [F16|D18]
+3 gg_genmove black
+#? [F16|D18]
 
 loadsgf games/buzco1.sgf 36
-gg_genmove black
-4 #? [D13]
+4 gg_genmove black
+#? [D13]
 
 loadsgf games/buzco1.sgf 70
-gg_genmove black
-5 #? [C10|C11|E9|A4]
+5 gg_genmove black
+#? [C10|C11|E9|A4]
 
 loadsgf games/buzco1.sgf 82
-gg_genmove black
-6 #? [E8|E9]
+6 gg_genmove black
+#? [E8|E9]
 
 loadsgf games/buzco1.sgf 94
-gg_genmove black
-7 #? [!B7]
+7 gg_genmove black
+#? [!B7]
 
 loadsgf games/buzco1.sgf 108
-gg_genmove black
-8 #? [!N11]
-
-
-
-
+8 gg_genmove black
+#? [!N11]
