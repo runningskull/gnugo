@@ -635,7 +635,9 @@ fatal:
  return;
 
 notrectangle:
- fprintf(stderr, "Warning pattern %s not rectangular\n", pattern_names[patno]);
+ fprintf(stderr, "%s(%d) : error : Pattern %s not rectangular\n", 
+	    current_file, current_line_number, pattern_names[patno]);
+ fatal_errors++;
  return;
 }
 
@@ -1085,8 +1087,9 @@ parse_constraint_or_action(char *line)
 	    label = (int) *p;
 	    if (label_coords[label][0] == -1) {
 	      fprintf(stderr,
-		      "mkpat: The constraint or action uses a label (%c) that wasn't specified in the diagram (pattern %s).\n", 
-		      label, pattern_names[patno]);
+		      "%s(%d) : error : The constraint or action uses a label (%c) that wasn't specified in the diagram (pattern %s).\n", 
+		      current_file, current_line_number, label, pattern_names[patno]);
+	      fatal_errors++;
 	      return;
 	    }
 	  }
@@ -1268,7 +1271,11 @@ write_elements(FILE *outfile, char *name)
   
   for (node = 0;node < el; node++) {
     assert(elements[node].x >= mini && elements[node].y >= minj);
-    assert(elements[node].x <= maxi && elements[node].y <= maxj);
+    if (!(elements[node].x <= maxi && elements[node].y <= maxj)) {
+      fprintf(stderr, "%s(%d) : error : Maximum number of elements exceeded in %s.\n",
+	    current_file, current_line_number, name);
+      fatal_errors++;
+    };
 
     fprintf(outfile, "   {%d,%d,%d}%s",
 	   elements[node].x - ci, elements[node].y - cj, elements[node].att,
@@ -1541,18 +1548,18 @@ main(int argc, char *argv[])
       if (patno >= 0) {
 	switch (state) {
 	case 1:
-	  fprintf(stderr, "Warning, empty pattern %s\n",
+	  fprintf(stderr, "Warning: empty pattern %s\n",
 		  pattern_names[patno]);
 	  break;
 	case 2:
 	case 3:
-	  fprintf(stderr, "Warning, no entry line for pattern %s\n",
-		  pattern_names[patno]);
+	  fprintf(stderr, "%s(%d) : warning : No entry line for pattern %s\n",
+		  current_file, current_line_number, pattern_names[patno]);
 	  break;
 	case 5:
 	case 6:
 	  fprintf(stderr,
-		  "Warning, constraint diagram but no constraint line for pattern %s\n",
+		  "Warning: constraint diagram but no constraint line for pattern %s\n",
 		  pattern_names[patno]);
 	  break;
 	case 7:
@@ -1585,8 +1592,9 @@ main(int argc, char *argv[])
       case 6:
       case 7:
       case 8:
-	fprintf(stderr, "Huh, another diagram here? (pattern %s)\n",
-		pattern_names[patno]);
+	fprintf(stderr, "%s(%d) : error : Huh, another diagram here? (pattern %s)\n",
+		current_file, current_line_number, pattern_names[patno]);
+        fatal_errors++;
 	break;
       case 1:
 	state++; /* fall through */
@@ -1611,8 +1619,8 @@ main(int argc, char *argv[])
 	state = 4;
       }
       else {
-	fprintf(stderr, "Warning, unexpected entry line in pattern %s\n",
-		pattern_names[patno]);
+	fprintf(stderr, "%s(%d) : warning : Unexpected entry line in pattern %s\n",
+		current_file, current_line_number, pattern_names[patno]);
       }
     } 
     else if (line[0] == ';') {
@@ -1621,7 +1629,7 @@ main(int argc, char *argv[])
 	state = 7;
       }
       else {
-	fprintf(stderr, "Warning, unexpected constraint line in pattern %s\n",
+	fprintf(stderr, "Warning: unexpected constraint line in pattern %s\n",
 		pattern_names[patno]);
       }
     } 
@@ -1631,30 +1639,36 @@ main(int argc, char *argv[])
 	state = 8;
       }
       else {
-	fprintf(stderr, "Warning, unexpected action line in pattern %s\n",
+	fprintf(stderr, "Warning: unexpected action line in pattern %s\n",
 		pattern_names[patno]);
       }
     } 
-    else
-      fprintf(stderr, "Warning, malformed line \"%s\" in pattern %s\n",
-	      line, pattern_names[patno]);
+    else {
+      int i = strlen(line);
+      char c = line[i-1];
+      line[i-1] = 0;  /*Chop of \n*/
+      fprintf(stderr, "%s(%d) : error : Malformed line \"%s\" in pattern %s\n",
+	      current_file, current_line_number, line, pattern_names[patno]);
+      line[i-1]=c; /*Put it back - maybe not necessary at this point.*/
+      fatal_errors++;
+    }
   }
 
   if (patno >= 0) {
     switch (state) {
     case 1:
-      fprintf(stderr, "Warning, empty pattern %s\n",
+      fprintf(stderr, "Warning: empty pattern %s\n",
 	      pattern_names[patno]);
       break;
     case 2:
     case 3:
-      fprintf(stderr, "Warning, no entry line for pattern %s\n",
+      fprintf(stderr, "Warning: no entry line for pattern %s\n",
 	      pattern_names[patno]);
       break;
     case 5:
     case 6:
       fprintf(stderr,
-	      "Warning, constraint diagram but no constraint line for pattern %s\n",
+	      "Warning: constraint diagram but no constraint line for pattern %s\n",
 	      pattern_names[patno]);
       break;
     case 7:
@@ -1698,6 +1712,14 @@ main(int argc, char *argv[])
 
 
   write_pattern_db(output_FILE, argv[gg_optind]);
+
+  if (fatal_errors) {
+    fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n", current_file);
+  }
+
+  if (fatal_errors) {
+    fprintf(output_FILE, "\n#error: One or more fatal errors compiling %s\n", current_file);
+  }
 
   return fatal_errors ? 1 : 0;
 }

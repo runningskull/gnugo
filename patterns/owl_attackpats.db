@@ -870,7 +870,7 @@ Xab?
 ; oplay_attack(*,a,b,c,c)
 
 
-Pattern A333
+Pattern A233
 # db added (3.1.10)
 
 OO.?            Jump and block
@@ -880,6 +880,20 @@ X*.?
 ----
 
 :8,-,value(75)
+
+
+# Descend to attack. Possibly defend vulnerable stone.
+# Useful in arb:231
+# new pattern (3.1.13) -trevor
+Pattern A234
+
+xX	  defend vulnerable stone.
+XO
+.*
+..
+--
+
+:8,-,value(20)
 
 
 
@@ -3524,6 +3538,21 @@ Pattern A1340
 |.OXx
 |.*.X
 +----
+
+:8,s,value(40)
+
+
+# Useful for manyfaces:8
+# new pattern 3.1.13 -trevor
+Pattern A1341
+
+?X?|	  vital corner point
+X.X|
+X..|
+X.*|
+...|
+---+
+
 
 :8,s,value(40)
 

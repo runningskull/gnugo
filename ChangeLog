@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- malformed line warning turned into error in mkpat
+- 1D documentation revisions.
+- twogtp-a now give a (halfhearted) default to missing goprog.
+- twogtp-a works for VC builds now.
+- mkpat.c generates more useful errors.
+- mkpat.c forces output to have compile error if input also had errors.
 - comments in readconnect.c
 - snapback only looks at one liberty in readconnect.c
 - do_atari_atari confirms the *defense_point is safe before returning

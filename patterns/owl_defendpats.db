@@ -2752,6 +2752,20 @@ Pattern D832
 ;oplay_defend(*,A) != WIN
 
 
+#useful in manyfaces:8
+#new pattern 3.1.13 -trevor
+Pattern D833
+
+?O?|	  vital corner point.
+O.O|
+O.x|
+O.*|
+...|
+---+
+
+:8,-,value(40)
+
+
 #########################################################
 #                                                       #
 #                  Prevent intrusion                    #

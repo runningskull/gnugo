@@ -2739,10 +2739,10 @@ owl_does_defend(int move, int target)
 }
 
 
-/* Use the owl code to determine whether the dragon at (m, n) is owl
- * safe after an own move at (ti, tj). This is used to detect
+/* Use the owl code to determine whether the dragon at (move) is owl
+ * safe after an own move at (target). This is used to detect
  * blunders. In case the dragon is not safe, it also tries to find a
- * defense point making (ti, tj) safe in a later move.
+ * defense point making (target) safe in a later move.
  *
  * Should be called only when stackp==0.
  */

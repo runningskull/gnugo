@@ -1348,12 +1348,12 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
   return 0;
 }
 
-/* recognize_eye(i, j, *ai, *aj, *di, *dj, *max, *min, eye, heye,
- * add_moves, color), where (i,j) is the origin of an eyespace,
+/* recognize_eye(pos, *attack_point, *defense_point, *max, *min, eye_data, 
+ * half_eye_data, add_moves, color), where pos is the origin of an eyespace,
  * returns 1 if there is a pattern in eyes.c matching the eyespace, or
- * 0 if no match is found. If there is a key point for attack, (*ai,
- * *aj) are set to its location, or (-1, -1) if there is none.
- * Similarly (*di, *dj) is the location of a vital defense point. *min
+ * 0 if no match is found. If there is a key point for attack, (*attack_point)
+ * is set to its location, or (-1, -1) if there is none.
+ * Similarly (*defense_point) is the location of a vital defense point. *min
  * and *max are the minimum and maximum number of eyes that can be
  * made in this eyespace respectively. Vital attack/defense points
  * exist if and only if *min != *max.

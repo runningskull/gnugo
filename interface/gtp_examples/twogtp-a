@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w
+#! /usr/bin/perl -w 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # This program is distributed with GNU GO, a Go program.        #
@@ -55,6 +55,8 @@ use IPC::Open2;
 use Getopt::Long;
 use FileHandle;
 use strict;
+use warnings;
+use Carp;
 
 #following added globally to allow "use strict" :
 my $vertex;
@@ -110,6 +112,15 @@ GetOptions(
            "sgffile|o=s"            => \$sgffilename,
            "games=i"                => \$games
 );
+
+if (!$white) {
+  $white = '../gnugo.exe --mode gtp --quiet';
+  warn "Defaulting white to: $white";
+}
+if (!$black) {
+  $black = '../gnugo.exe --mode gtp --quiet';
+  warn "Defaulting black to: $black";
+}
 
 die $helpstring unless defined $white and defined $black;
 
@@ -277,6 +288,7 @@ sub eat_no_response {
     my $line = "";
     while ($line eq "") {
 	chop($line = <$h>) or die "No response!";
+        $line =~ s/(\s|\n)*$//smg;
     }
 }
 
@@ -285,14 +297,12 @@ sub eat_move {
 # ignore empty lines
     my $line = "";
     while ($line eq "") {
-	chop($line = <$h>) or die "No response!";
-#	$line =~ s/\s*$//m; #chop doesn't work nicely w/ WINDOWS CR-LF combo.
-#	print "L:$line:L\n";
+	defined($line = <$h>) or die "No response!";
+        $line =~ s/(\s|\n)*$//smg;
     }
-#    print "LINE: $line\n";
-    $line =~ s/\s*$//;
     my ($equals, $move) = split(' ', $line, 2);
     $line = <$h>;
+    defined($move) or confess "no move found: line was: '$line'";
     return $move;
 }
 
@@ -328,6 +338,7 @@ sub eat_score {
 }
 
 sub standard_to_sgf {
+    for (@_) { confess "Yikes!" if !defined($_); }
     for (@_) { tr/A-Z/a-z/ };
     $_ = shift(@_);
     /([a-z])([0-9]+)/;
