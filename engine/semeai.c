@@ -86,7 +86,7 @@ semeai(int color)
   }
 }
 
-/* liberty_of_dragon(pos, dr) returns true if the vertex at (pos) is a
+/* liberty_of_dragon(pos, origin) returns true if the vertex at (pos) is a
  * liberty of the dragon with origin at (origin).
  */
 
@@ -171,12 +171,14 @@ analyze_semeai(int my_dragon, int your_dragon)
 #endif
       if (dragon[your_dragon].owl_status == DEAD) {
 	for (m = 0; m < board_size; m++)
-	  for (n = 0; n < board_size; n++)
-	    if (board[POS(m, n)] == board[your_dragon]
-		&& is_same_dragon(POS(m, n), your_dragon)) {
-	      dragon[POS(m, n)].owl_status = CRITICAL;
-	      dragon[POS(m, n)].matcher_status = CRITICAL;
+	  for (n = 0; n < board_size; n++) {
+	    int pos = POS(m, n);
+	    if (board[pos] == board[your_dragon]
+		&& is_same_dragon(pos, your_dragon)) {
+	      dragon[pos].owl_status = CRITICAL;
+	      dragon[pos].matcher_status = CRITICAL;
 	    }
+	  }
 	DEBUG(DEBUG_SEMEAI,
 	      "changed owl_status and matcher_status of %1m to CRITICAL\n",
 	      your_dragon);
@@ -222,12 +224,14 @@ analyze_semeai(int my_dragon, int your_dragon)
 	    my_dragon, dragon[your_dragon].owl_attack_point);
       if (dragon[my_dragon].owl_status == DEAD) {
 	for (m = 0; m < board_size; m++)
-	  for (n = 0; n < board_size; n++)
-	    if (board[POS(m, n)] == board[my_dragon]
-		&& is_same_dragon(POS(m, n), my_dragon)) {
-	      dragon[POS(m, n)].owl_status = CRITICAL;
-	      dragon[POS(m, n)].matcher_status = CRITICAL;
+	  for (n = 0; n < board_size; n++) {
+	    int pos = POS(m, n);
+	    if (board[pos] == board[my_dragon]
+		&& is_same_dragon(pos, my_dragon)) {
+	      dragon[pos].owl_status = CRITICAL;
+	      dragon[pos].matcher_status = CRITICAL;
 	    }
+	  }
 	DEBUG(DEBUG_SEMEAI,
 	      "changed owl_status and matcher_status of %1m to CRITICAL\n",
 	      my_dragon);
@@ -276,20 +280,21 @@ analyze_semeai(int my_dragon, int your_dragon)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (worm[POS(m, n)].origin == POS(m, n)
-	  && worm[POS(m, n)].attack_codes[0] == WIN)
-	if (dragon[POS(m, n)].origin == my_dragon
-	    || dragon[POS(m, n)].origin == your_dragon) {
+      int pos = POS(m, n);
+      if (worm[pos].origin == pos
+	  && worm[pos].attack_codes[0] == WIN)
+	if (dragon[pos].origin == my_dragon
+	    || dragon[pos].origin == your_dragon) {
 	  int adj;
 	  int adjs[MAXCHAIN];
 	  int r;
 	  
-	  adj = chainlinks(POS(m, n), adjs);
+	  adj = chainlinks(pos, adjs);
 	  for (r = 0; r < adj; r++) {
 	    int cpos = adjs[r];
 	    if (dragon[cpos].origin == my_dragon
 		|| dragon[cpos].origin == your_dragon)
-	      if (owl_substantial(POS(m, n))) {
+	      if (owl_substantial(pos)) {
 		DEBUG(DEBUG_SEMEAI, "...tactical situation detected, exiting\n");
 		return;
 	      }
@@ -300,11 +305,13 @@ analyze_semeai(int my_dragon, int your_dragon)
   
   /* Mark the dragons as involved in semeai */
   for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      if (is_same_dragon(POS(i, j), my_dragon)
-	  || is_same_dragon(POS(i, j), your_dragon))
-	DRAGON2(POS(i, j)).semeai = 1;
-
+    for (j = 0; j < board_size; j++) {
+      int pos = POS(i, j);
+      if (is_same_dragon(pos, my_dragon)
+	  || is_same_dragon(pos, your_dragon))
+	DRAGON2(pos).semeai = 1;
+    }
+  
   /* First we try to determine the number of liberties of each
    * dragon, and the number of common liberties. We subtract
    * 1 minus the number of worms of the dragon from the liberty
@@ -315,17 +322,18 @@ analyze_semeai(int my_dragon, int your_dragon)
    */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (board[POS(i, j)]
-	  && worm[POS(i, j)].origin == POS(i, j)) {
-	if (is_same_dragon(POS(i, j), my_dragon))
+      int pos = POS(i, j);
+      if (board[pos]
+	  && worm[pos].origin == pos) {
+	if (is_same_dragon(pos, my_dragon))
 	  mylibs--;
-	if (is_same_dragon(POS(i, j), your_dragon))
+	if (is_same_dragon(pos, your_dragon))
 	  yourlibs--;
       }
-      else if (board[POS(i, j)] == EMPTY) {
-	if (liberty_of_dragon(POS(i, j), your_dragon)) {
+      else if (board[pos] == EMPTY) {
+	if (liberty_of_dragon(pos, your_dragon)) {
 	  yourlibs ++;
-	  if (liberty_of_dragon(POS(i, j), my_dragon)) {
+	  if (liberty_of_dragon(pos, my_dragon)) {
 	    commonlibs++;
 	    mylibs++;
 	    commonlibi = i;
@@ -336,7 +344,7 @@ analyze_semeai(int my_dragon, int your_dragon)
 	    yourlibj = j;
 	  }
 	}
-	else if (liberty_of_dragon(POS(i, j), my_dragon))
+	else if (liberty_of_dragon(pos, my_dragon))
 	  mylibs++;
       }
     }
@@ -602,21 +610,23 @@ analyze_semeai(int my_dragon, int your_dragon)
     }
     else {
       for (i = 0; i < board_size-1; i++)
-	for (j = 0; j < board_size-1; j++)
-	  if (liberty_of_dragon(POS(i, j), your_dragon) 
-	      && !liberty_of_dragon(POS(i, j), my_dragon)
-	      && safe_move(POS(i, j), color)) {
+	for (j = 0; j < board_size-1; j++) {
+	  int pos = POS(i, j);
+	  if (liberty_of_dragon(pos, your_dragon) 
+	      && !liberty_of_dragon(pos, my_dragon)
+	      && safe_move(pos, color)) {
 	    /* add move reasons for EVERY outside liberty where we can
              * play safely. A move to win a semeai might not be a
              * safe move if it is inside the opponent's eyespace. 
              * However we hope that the reading code can analyze the
              * semeai in cases where every safe liberty has been filled.
 	     */
-	    add_appropriate_semeai_moves(POS(i, j), my_dragon, your_dragon,
+	    add_appropriate_semeai_moves(pos, my_dragon, your_dragon,
 					 my_status, your_status,
 					 margin_of_safety);
 	    found_one = 1;
 	  }
+	}
       if (!found_one) {
 	/* No outside liberties --- look for common liberties.
 	 * Filling a common liberty is usually bad but if our 
@@ -626,12 +636,14 @@ analyze_semeai(int my_dragon, int your_dragon)
 	 * be a safe move.
 	 */
 	for (i = 0; i < board_size-1; i++)
-	  for (j = 0; j < board_size-1; j++)
-	    if (liberty_of_dragon(POS(i, j), your_dragon)
-		&& safe_move(POS(i, j), color))
-	      add_appropriate_semeai_moves(POS(i, j), my_dragon, your_dragon,
+	  for (j = 0; j < board_size-1; j++) {
+	    int pos = POS(i, j);
+	    if (liberty_of_dragon(pos, your_dragon)
+		&& safe_move(pos, color))
+	      add_appropriate_semeai_moves(pos, my_dragon, your_dragon,
 					   my_status, your_status,
 					   margin_of_safety);
+	  }
       }
     }
   }
@@ -724,7 +736,7 @@ small_semeai()
 }
 
 /* Helper function for small_semeai. Tries to resolve the
- * semeai between (i,j) and (m,n), possibly revising points
+ * semeai between (str1) and (str2), possibly revising points
  * of attack and defense.
  */
 

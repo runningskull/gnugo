@@ -48,7 +48,7 @@ living_neighbor(int pos, int color)
 }
 
 
-/* Determine whether (m, n) effectively is a black or white point.
+/* Determine whether (pos) effectively is a black or white point.
  * The test for inessentiality is to avoid filling the liberties
  * around a killing nakade string.
  */
@@ -96,7 +96,7 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
  * that several backfilling moves are ultimately necessary.
  *
  * If a move for color is found, return 1, otherwise return 0.
- * The move is returned in (*i, *j).
+ * The move is returned in (*move).
  */
 
 int 
@@ -134,16 +134,15 @@ fill_liberty(int *move, int color)
       
       if (dragon[pos].matcher_status != DEAD) {
 	for (k = 0; k < 12; k++) {
-	  int di = deltai[k%8];
-	  int dj = deltaj[k%8];
+	  int d = delta[k%8];
+
 	  if (k >= 8) {
- 	    if (BOARD(m+di, n+dj) != EMPTY)
+ 	    if (board[pos + d] != EMPTY)
  	      continue;
-	    di *= 2;
-	    dj *= 2;
+	    d *= 2;
 	  }
-	  if (BOARD(m+di, n+dj) == EMPTY)
-	    potential_color[POS(m+di, n+dj)] |= board[pos];
+	  if (board[pos + d] == EMPTY)
+	    potential_color[pos + d] |= board[pos];
 	}
       }
     }
@@ -165,15 +164,14 @@ fill_liberty(int *move, int color)
 	continue;
 
       /* Quick rejection based on preliminary test above. */
-      if (potential_color[POS(m, n)] != GRAY)
+      if (potential_color[pos] != GRAY)
 	continue;
 
       /* Loop over the neighbors. */
       for (k = 0; k < 4; k++) {
-	int dm = deltai[k];
-	int dn = deltaj[k];
-	if (ON_BOARD(POS(m+dm, n+dn)))
-	  analyze_neighbor(POS(m+dm, n+dn), &found_black, &found_white);
+	int d = delta[k];
+	if (ON_BOARD(pos + d))
+	  analyze_neighbor(pos + d, &found_black, &found_white);
       }
       
       /* Do we have neighbors of both colors? */
@@ -190,7 +188,7 @@ fill_liberty(int *move, int color)
        * 6. Move would violate confirm_safety.
        */
 
-      DEBUG(DEBUG_FILLLIB, "Filllib: Considering move at %m.\n", m, n);
+      DEBUG(DEBUG_FILLLIB, "Filllib: Considering move at %1m.\n", pos);
       
       /* Legal and tactically safe, play it if it passes
        * confirm_safety test, i.e. that it isn't a blunder which
@@ -235,7 +233,7 @@ fill_liberty(int *move, int color)
 	DEBUG(DEBUG_FILLLIB,
 	      "Filllib: Legal but not safe, looking for backfilling move.\n");
 
-	if (find_backfilling_move(POS(m, n), color, move)) {
+	if (find_backfilling_move(pos, color, move)) {
 	  DEBUG(DEBUG_FILLLIB, "Filllib: Backfilling move at %1m.\n", *move);
 	  /* In certain positions it may happen that an illegal move
 	   * is found. This probably only can happen if we try to play
@@ -281,11 +279,10 @@ fill_liberty(int *move, int color)
 	 */
 	DEBUG(DEBUG_FILLLIB, "Filllib: Illegal, looking for back-capture.\n");
 	for (k = 0; k < 4; k++) {
-	  int dm = deltai[k];
-	  int dn = deltaj[k];
-	  if (BOARD(m+dm, n+dn) == other
-	      && worm[POS(m+dm, n+dn)].attack_codes[0] == WIN) {
-	    *move = worm[POS(m+dm, n+dn)].attack_points[0];
+	  int d = delta[k];
+	  if (board[pos + d] == other
+	      && worm[pos + d].attack_codes[0] == WIN) {
+	    *move = worm[pos + d].attack_points[0];
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
 	    return 1;
 	  }
@@ -294,12 +291,11 @@ fill_liberty(int *move, int color)
 	DEBUG(DEBUG_FILLLIB,
 	      "Filllib: Nothing found, looking for ko back-capture.\n");
 	for (k = 0; k < 4; k++) {
-	  int dm = deltai[k];
-	  int dn = deltaj[k];
-	  if (BOARD(m+dm, n+dn) == other
-	      && worm[POS(m+dm, n+dn)].attack_codes[0] != 0
-	      && is_legal(worm[POS(m+dm, n+dn)].attack_points[0], color)) {
-	    *move = worm[POS(m+dm, n+dn)].attack_points[0];
+	  int d = delta[k];
+	  if (board[pos + d] == other
+	      && worm[pos + d].attack_codes[0] != 0
+	      && is_legal(worm[pos + d].attack_points[0], color)) {
+	    *move = worm[pos + d].attack_points[0];
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
 	    return 1;
 	  }
@@ -308,13 +304,12 @@ fill_liberty(int *move, int color)
 	DEBUG(DEBUG_FILLLIB,
 	      "Filllib: Nothing found, looking for threat to back-capture.\n");
 	for (k = 0; k < 4; k++) {
-	  int dm = deltai[k];
-	  int dn = deltaj[k];
-	  if (BOARD(m+dm, n+dn) == other
-	      && worm[POS(m+dm, n+dn)].attack_codes[0] != 0) {
+	  int d = delta[k];
+	  if (board[pos + d] == other
+	      && worm[pos + d].attack_codes[0] != 0) {
 	    /* Just pick some other liberty. */
 	    int libs[2];
-	    if (findlib(POS(m+dm, n+dn), 2, libs) > 1) {
+	    if (findlib(pos + d, 2, libs) > 1) {
 	      if (is_legal(libs[0], color))
 		*move = libs[0];
 	      else if (is_legal(libs[1], color))
@@ -336,15 +331,15 @@ fill_liberty(int *move, int color)
 /* The strategy for finding a backfilling move is to first identify
  * moves that
  *
- * 1. defends the position obtained after playing (m,n).
- * 2. captures a stone adjacent to our neighbors to (m,n), before
- *    (m,n) is played.
+ * 1. defends the position obtained after playing (move).
+ * 2. captures a stone adjacent to our neighbors to (move), before
+ *    (move) is played.
  *
- * Then we check which of these are legal before (m,n) is played. If
+ * Then we check which of these are legal before (move) is played. If
  * there is at least one, we take one of these arbitrarily as a
  * backfilling move.
  *
- * Now it may happen that (m,n) still isn't a safe move. In that case
+ * Now it may happen that (move) still isn't a safe move. In that case
  * we recurse to find a new backfilling move. To do things really
  * correctly we should also give the opponent the opportunity to keep
  * up the balance of the position by letting him do a backfilling move
@@ -369,7 +364,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
   int acode;
   int saved_move = NO_MOVE;
   
-  /* Play (m,n) and identify all liberties and adjacent strings. */
+  /* Play (move) and identify all liberties and adjacent strings. */
   if (!trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE))
     return 0; /* This shouldn't happen, I believe. */
 
@@ -385,7 +380,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
   /* Find neighbors. */
   neighbors = chainlinks(move, adjs);
 
-  /* Remove (m,n) again. */
+  /* Remove (move) again. */
   popgo();
   
   /* It's most fun to capture stones. Start by trying to take some
@@ -473,7 +468,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
 }
 
 
-/* Confirm that (m, n) is a safe move for color. In addition to
+/* Confirm that (move) is a safe move for color. In addition to
  * calling the global confirm_safety(), this function also calls the
  * owl code to verify the strategical viability of the move.
  */
