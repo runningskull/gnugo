@@ -595,6 +595,14 @@ move_is_marked_unsafe(int pos, int what)
   return !move[pos].move_safety;
 }
 
+/* Check whether a dragon is non-critical. */
+static int
+concerns_noncritical_dragon(int pos, int what)
+{
+  UNUSED(pos);
+  return dragon[what].status != CRITICAL; 
+}
+
 
 /* (what) points to two worms listed in either_data. Returns true if
  * this is a "attack either" move reason, and one of the worms attackable.
@@ -1882,6 +1890,10 @@ static struct discard_rule discard_rules[] =
       DEFEND_MOVE, DEFEND_MOVE_GOOD_KO, DEFEND_MOVE_BAD_KO, -1},
     move_is_marked_unsafe, REDUNDANT,
     "  %1m: 0.0 - tactical move vs %1m (unsafe move)\n"},
+  { { OWL_ATTACK_MOVE, OWL_ATTACK_MOVE_GOOD_KO, OWL_ATTACK_MOVE_BAD_KO,
+      OWL_DEFEND_MOVE, OWL_DEFEND_MOVE_GOOD_KO, OWL_DEFEND_MOVE_BAD_KO, -1},
+    concerns_noncritical_dragon, REDUNDANT,
+    "  %1m: 0.0 - owl move vs %1m (non-critical)\n"},
   { { -1 }, NULL, 0, ""}  /* Keep this entry at end of the list. */
 };
 

@@ -1006,6 +1006,22 @@ detect_owl_blunder(int move, int color, int *defense_point,
 	&& DRAGON2(bpos).safety != STRONGLY_ALIVE) {
       int kworm = NO_MOVE;
       int acode = owl_confirm_safety(move, bpos, defense_point, &kworm);
+
+      /* If owl couldn't confirm safety, maybe semeai can. */
+      if (acode != WIN) {
+	int r;
+	for (r = 0; r < DRAGON2(bpos).neighbors; r++) {
+	  int neighbor = dragon2[DRAGON2(bpos).adjacent[r]].origin;
+	  int resultb;
+	  if (board[neighbor] == color)
+	    continue;
+	  owl_analyze_semeai_after_move(move, color, neighbor, bpos,
+					NULL, &resultb, NULL, 1, NULL);
+	  if (resultb == 0)
+	    acode = WIN;
+	}
+      }
+      
       if (acode == 0) {
 	verbose = save_verbose;
 	TRACE("Dragon at %1m becomes attackable.\n", bpos);

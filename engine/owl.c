@@ -524,9 +524,10 @@ do_owl_analyze_semeai(int apos, int bpos,
 
     for (sworm = 0; sworm <= s_worms; sworm++) {
       critical_semeai_worms[sworm] = 0;
-      if (board[semeai_worms[sworm]] == other
-	  && attack(semeai_worms[sworm], &upos) == WIN) {
-	if (semeai_trust_tactical_attack(semeai_worms[sworm])
+      if (board[semeai_worms[sworm]] == other) {
+	int acode = attack(semeai_worms[sworm], &upos);
+	if (acode == WIN
+	    && semeai_trust_tactical_attack(semeai_worms[sworm])
 	    && important_semeai_worms[sworm]) {
 	  *resulta = WIN;
 	  *resultb = WIN;
@@ -536,7 +537,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  SGFTRACE_SEMEAI(upos, WIN, WIN, "tactical win found");
 	  READ_RETURN_SEMEAI(read_result, move, upos, WIN, WIN);
 	}
-	else if (find_defense(semeai_worms[sworm], NULL)) {
+	else if (acode != 0
+		 && find_defense(semeai_worms[sworm], NULL)) {
 	  critical_semeai_worms[sworm] = 1;
 	  owl_add_move(moves, upos, 95, "attack semeai worm", 1, 0, NO_MOVE,
 		       MAX_SEMEAI_MOVES);

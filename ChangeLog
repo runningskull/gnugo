@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function break_chain4_moves()
+- owl moves for non-critical dragons discarded
+- do_owl_analyze_semeai() revised
+- detect_owl_blunder() also looks for semeai defenses
+- estimate_strategical_value() revised
 - new function defend_secondary_chain_moves() in reading.c
 - new parameter be_aggressive to break_chain2_moves(),
   break_chain2_defense_moves() and break_chain3_moves()

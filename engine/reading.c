@@ -194,6 +194,8 @@ static void break_chain2_defense_moves(int str, struct reading_moves *moves,
 				       int be_aggressive);
 static void break_chain3_moves(int str, struct reading_moves *moves,
 			       int be_aggressive);
+static void break_chain4_moves(int str, struct reading_moves *moves,
+			       int be_aggressive);
 static void superstring_moves(int str, struct reading_moves *moves, 
     		  	      int liberty_cap, int does_attack);
 static void superstring_break_chain_moves(int str, int liberty_cap,
@@ -1449,6 +1451,9 @@ defend2(int str, int *move, int komaster, int kom_pos)
   if (stackp <= break_chain_depth
       || (be_aggressive && stackp <= backfill_depth))
     break_chain3_moves(str, &moves, be_aggressive);
+
+  if (be_aggressive && stackp <= backfill_depth)
+    break_chain4_moves(str, &moves, be_aggressive);
 
   /* Only order and test the new set of moves. */
   order_moves(str, &moves, other, read_function_name, saved_num_moves, NO_MOVE);
@@ -4670,6 +4675,113 @@ break_chain3_moves(int str, struct reading_moves *moves, int be_aggressive)
   }
 }
 
+/*
+ * (str) points to a group.
+ * If there is a string in the surrounding chain having
+ * exactly four liberties whose attack leads to the rescue of
+ * (str), break_chain4_moves(str, *moves) adds attack moves against
+ * the surrounding string as candidate moves.
+ */
+
+static void
+break_chain4_moves(int str, struct reading_moves *moves, int be_aggressive)
+{
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int r;
+  int k;
+  int u = 0, v;
+  int apos;
+  int adj;
+  int adjs[MAXCHAIN];
+  int libs[4];
+  int possible_moves[MAX_MOVES];
+  int mw[BOARDMAX];
+
+  memset(mw, 0, sizeof(mw));
+  
+  adj = chainlinks2(str, adjs, 4);
+  for (r = 0; r < adj; r++) {
+    int lib1 = 0, lib2 = 0, lib3 = 0, lib4 = 0;
+    apos = adjs[r];
+
+    /* We make a list in the (adjs) array of the liberties
+     * of boundary strings having exactly four liberties. We mark
+     * each liberty in the mw array so that we do not list any
+     * more than once.
+     */
+    findlib(apos, 4, libs);
+
+    /* If the 4 liberty chain easily can run away through one of the
+     * liberties, we don't play on any of the other liberties.
+     */
+    lib1 = approxlib(libs[0], other, 5, NULL);
+    lib2 = approxlib(libs[1], other, 5, NULL);
+    if (lib1 >= 5 && lib2 >= 5)
+      continue;
+    lib3 = approxlib(libs[2], other, 5, NULL);
+
+    if ((lib1 >= 5 || lib2 >= 5) && lib3 >= 5)
+      continue;
+    lib4 = approxlib(libs[3], other, 5, NULL);
+
+    if ((lib1 >= 5 || lib2 >= 5 || lib3 >= 5) && lib4 >= 5)
+      continue;
+
+    if (lib1 >= 5 && !mw[libs[0]]) {
+      mw[libs[0]] = 1;
+      possible_moves[u++] = libs[0];
+      continue;
+    }
+    
+    if (lib2 >= 5 && !mw[libs[1]]) {
+      mw[libs[1]] = 1;
+      possible_moves[u++] = libs[1];
+      continue;
+    }
+    
+    if (lib3 >= 5 && !mw[libs[2]]) {
+      mw[libs[2]] = 1;
+      possible_moves[u++] = libs[2];
+      continue;
+    }
+
+    if (lib4 >= 5 && !mw[libs[3]]) {
+      mw[libs[3]] = 1;
+      possible_moves[u++] = libs[3];
+      continue;
+    }
+
+    /* No easy escape, try all liberties. */
+    for (k = 0; k < 4; k++) {
+      if (!mw[libs[k]]) {
+	mw[libs[k]] = 1;
+	possible_moves[u++] = libs[k];
+      }
+    }
+
+    if (stackp <= backfill2_depth
+	|| (be_aggressive && stackp <= backfill_depth))
+      defend_secondary_chain_moves(adjs[r], moves, 4);
+  }
+
+  for (v = 0; v < u; v++) {
+    /* We do not wish to consider the move if it can be 
+     * immediately recaptured, unless stackp < backfill2_depth.
+     * Beyond backfill2_depth, the necessary capturing move might not
+     * get generated in follow-up for the attacker.
+     * (This currently only makes a difference at stackp == backfill2_depth.)
+     */
+    int xpos = possible_moves[v];
+    if (stackp <= break_chain_depth
+	|| (be_aggressive && stackp <= backfill_depth)
+	|| approxlib(xpos, color, 2, NULL) > 1)
+      /* We use a negative initial score here as we prefer to find
+       * direct defense moves.
+       */
+      ADD_CANDIDATE_MOVE(xpos, -2, *moves, "break_chain4");
+  }
+}
 
 /* This function looks for moves attacking those components
  * of the surrounding chain of the superstring (see find_superstring
