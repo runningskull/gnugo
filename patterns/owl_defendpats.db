@@ -81,9 +81,13 @@
 # D12xx Kikashi
 # D13xx Escape
 # D14xx Ko
+#
+# DCxx  Threats to capture
+# DExx  Threats to create eyes
+# DRxx  Reverse sente defending moves
 
 
-attribute_map value_only
+attribute_map owl_defense
 
 goal_elements Oo
 callback_data none
@@ -7366,6 +7370,174 @@ Pattern D1424
 +---
 
 :8,-,value(45)
+
+
+#########################################################
+#                                                       #
+#		   Threats to capture			#
+#                                                       #
+#########################################################
+
+
+Pattern DC01a
+# pp New pattern (3.5.5).
+
+???	    threaten to cut off vital chain
+X.X
+O*?
+
+:8,c, threatens_to_capture(A), value(35)
+
+abc
+AdX
+O*?
+
+; o_somewhere(a,b,c) && vital_chain(A) && !oplay_defend(*,?,d,A)
+
+
+Pattern DC01b
+# pp New pattern (3.5.5).
+
+???	    threaten to cut off vital chain
+X.X
+O*?
+
+:8,c, threatens_to_capture(B), value(35)
+
+abc
+XdB
+O*?
+
+; o_somewhere(a,b,c) && vital_chain(B) && !oplay_defend(*,?,d,B)
+
+
+Pattern DC02
+# pp New pattern (3.5.5) -- see ld_owl:316.
+
+OX.?
+OX..
+.*..
+----
+
+:8,c, threatens_to_capture(A), value(35)
+
+ABb?
+AB..
+.*..
+----
+
+; lib(A) >= 3 && lib(B) == 3 && olib(b) > 2
+
+
+#########################################################
+#                                                       #
+#		 Threats to create eyes			#
+#                                                       #
+#########################################################
+
+
+Pattern DE01a
+# pp New pattern (3.5.5).
+
+?O*?
+....
+xOOO
+
+:8,c, threatens_eye(a), value(30)
+
+?O*?
+..a.
+xOOO
+
+
+Pattern DE01b
+# pp New pattern (3.5.5).
+
+?O*?
+....
+OOOo
+
+:8,c, threatens_eye(b), value(30)
+
+?O*?
+.b..
+OOOo
+
+
+Pattern DE02
+# pp New pattenr (3.5.5).
+
+?O*
+O..
+---
+
+:8,c, threatens_eye(a), value(30)
+
+bO*
+Oa.
+---
+
+; o_somewhere(b)
+; || (x_somewhere(b) ? !oplay_defend(*,b) : !oplay_defend(*,b,b))
+
+
+Pattern DE03
+# pp New pattern (3.5.5) -- see owl1:326.
+
+OO?
+..*
+---
+
+:8,c, threatens_eye(a), value(30)
+
+OOb
+.a*
+---
+
+; o_somewhere(b)
+; || (x_somewhere(b) ? !oplay_defend(*,b) : !oplay_defend(*,b,b))
+
+
+Pattern DE04
+# pp New pattern (3.5.5) -- see owl1:326.
+
+xXOo?
+XO.O?
+X.OX*
+-----
+
+:8,c, threatens_eye(a), value(30)
+
+xXOo?
+XOaO?
+X.OX*
+-----
+
+
+#########################################################
+#                                                       #
+#	      Reverse sente defending moves		#
+#                                                       #
+#########################################################
+
+
+Pattern DR01
+# pp New pattern (3.5.5) -- see ld_owl:316.
+# FIXME: most likely need variations for other first line moves.
+
+?.OX?	    prevent X's sente move at 'a'
+..OXx
+...*.
+-----
+
+:8,c, reverse_sente(a), value(30)
+
+?.OB?
+.aOBx
+...*.
+-----
+
+; owl_proper_eye(a) && !attack(B)
 
 
 # END OF FILE

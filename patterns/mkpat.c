@@ -212,6 +212,9 @@ static const char *attribute_name[NUM_ATTRIBUTES + 1] = {
   "SHAPE",
   "FOLLOWUP",
   "REVERSE_FOLLOWUP",
+  "THREATENS_TO_CAPTURE",
+  "THREATENS_EYE",
+  "REVERSE_SENTE",
   "LAST_ATTRIBUTE"
 };
 
@@ -236,6 +239,22 @@ struct attribute_description general_attribute_map[] = {
 struct attribute_description value_only_attribute_map[] = {
   { "value",		IN_PATTERN_VALUE },
   { NULL,		LAST_ATTRIBUTE }
+};
+
+struct attribute_description owl_attack_attribute_map[] = {
+  { "value",			IN_PATTERN_VALUE },
+  { "threatens_to_capture",	THREATENS_TO_CAPTURE },
+  { "threatens_eye",		THREATENS_EYE },
+  { "reverse_sente",		REVERSE_SENTE },
+  { NULL,			LAST_ATTRIBUTE }
+};
+
+struct attribute_description owl_defense_attribute_map[] = {
+  { "value",			IN_PATTERN_VALUE },
+  { "threatens_to_capture",	THREATENS_TO_CAPTURE },
+  { "threatens_eye",		THREATENS_EYE },
+  { "reverse_sente",		REVERSE_SENTE },
+  { NULL,			LAST_ATTRIBUTE }
 };
 
 struct attribute_description *attribute_map = NULL;
@@ -1025,12 +1044,45 @@ check_constraint_diagram_size(void)
 	    current_file, current_line_number, pattern_names[patno]);
     fatal_errors++;
   }
-}  
+}
+
+
+static void
+convert_attribute_labels_to_offsets(void)
+{
+  struct pattern_attribute *attribute;
+
+  if (patno < 0 || !pattern[patno].attributes)
+    return;
+
+  for (attribute = pattern[patno].attributes;
+       attribute->type != LAST_ATTRIBUTE;
+       attribute++) {
+    if (attribute->type >= FIRST_OFFSET_ATTRIBUTE) {
+      int label = attribute->offset;
+      int x;
+      int y;
+
+      if (label_coords[label][0] == -1) {
+	fprintf(stderr,
+		"%s(%d) : error : Pattern attribute uses label '%c' that wasn't specified in the diagram\n", 
+		current_file, current_line_number, label);
+	fatal_errors++;
+	return;
+      }
+
+      TRANSFORM2(label_coords[label][0] - ci - movei,
+		 label_coords[label][1] - cj - movej, &x, &y,
+		 labels_transformation);
+      attribute->offset = OFFSET(x, y);
+    }
+  }
+}
+
 
 /* On reading a line starting ':', finish up and write
  * out the current pattern 
  */
-
 static void
 finish_pattern(char *line)
 {
@@ -1127,7 +1179,6 @@ finish_pattern(char *line)
     char *p = line;
     char *p2;
     int n;
-    float v = 0.0;
     
     class[0] = 0;  /* in case sscanf doesn't get that far */
     s = sscanf(p, ":%c,%[^,]%n", &symmetry, class, &n);
@@ -1140,28 +1191,50 @@ finish_pattern(char *line)
 
     pattern[patno].attributes = NULL;
     while (sscanf(p, "%*[, ]%[^,]%n", entry, &n) > 0) {
+      const char *paren;
       p += n;
 
-      if (sscanf(entry, "%*[^(](%f)", &v) > 0) {
+      paren = strchr(entry, '(');
+      if (paren) {
 	struct attribute_description *description;
 
 	if (attribute_map) {
 	  for (description = attribute_map; description->input_name;
 	       description++) {
-	    int length = strlen(description->input_name);
-
-	    if (strncmp(entry, description->input_name, length) == 0
-		&& entry[length] == '(') {
+	    if (strncmp(entry, description->input_name, paren - entry) == 0) {
 	      if (description->type != IN_PATTERN_VALUE) {
 		if (!pattern[patno].attributes)
 		  pattern[patno].attributes = attributes + num_attributes;
 
 		attributes[num_attributes].type = description->type;
-		attributes[num_attributes].value = v;
+		if (description->type >= FIRST_OFFSET_ATTRIBUTE) {
+		  /* We store the label for now, since we don't know
+		   * its offset without having seen the constraint
+		   * diagram.
+		   */
+		  if (*(paren + 1) != '*'
+		      && !strchr(VALID_CONSTRAINT_LABELS, *(paren + 1))) {
+		    fprintf(stderr, "%s(%d) : error : '%c' is not a valid label.\n",
+			    current_file, current_line_number, *(paren + 1));
+		    fatal_errors++;
+		    continue;
+		  }
+
+		  attributes[num_attributes].offset = *(paren + 1);
+		}
+		else
+		  sscanf(paren + 1, "%f", &attributes[num_attributes].value);
+
 		num_attributes++;
 	      }
 	      else
-		pattern[patno].value = v;
+		sscanf(paren + 1, "%f", &pattern[patno].value);
+
+	      if (!strchr(paren + 1, ')')) {
+		fprintf(stderr, "%s(%d) : error : ')' missed\n",
+			current_file, current_line_number);
+		fatal_errors++;
+	      }
 
 	      break;
 	    }
@@ -2645,8 +2718,12 @@ write_attributes(FILE *outfile)
   fprintf(outfile, "#ifdef __GNUC__\n");
 
   for (k = 0; k < num_attributes; k++) {
-    fprintf(outfile, "  {%s,{.value=%f}}",
-	    attribute_name[attributes[k].type], attributes[k].value);
+    fprintf(outfile, "  {%s,", attribute_name[attributes[k].type]);
+    if (attributes[k].type >= FIRST_OFFSET_ATTRIBUTE)
+      fprintf(outfile, "{.offset=%d}}", attributes[k].offset);
+    else
+      fprintf(outfile, "{.value=%f}}", attributes[k].value);
+
     if (k != num_attributes - 1)
       fprintf(outfile, ",\n");
   }
@@ -2654,8 +2731,12 @@ write_attributes(FILE *outfile)
   fprintf(outfile, "\n#else\n");
 
   for (k = 0; k < num_attributes; k++) {
-    fprintf(outfile, "  {%s,%f,0}",
-	    attribute_name[attributes[k].type], attributes[k].value);
+    fprintf(outfile, "  {%s,", attribute_name[attributes[k].type]);
+    if (attributes[k].type >= FIRST_OFFSET_ATTRIBUTE)
+      fprintf(outfile, "0.0,%d}", attributes[k].offset);
+    else
+      fprintf(outfile, "%f,0}", attributes[k].value);
+
     if (k != num_attributes - 1)
       fprintf(outfile, ",\n");
   }
@@ -3093,9 +3174,25 @@ main(int argc, char *argv[])
 	    break;
 	  case 5:
 	  case 6:
-	    fprintf(stderr,
-		    "%s(%d) : Warning: constraint diagram but no constraint line for pattern %s\n",
-		    current_file, current_line_number, pattern_names[patno]);
+	    {
+	      struct pattern_attribute *attribute = NULL;
+
+	      if (pattern[patno].attributes) {
+		for (attribute = pattern[patno].attributes;
+		     attribute->type != LAST_ATTRIBUTE;
+		     attribute++) {
+		  if (attribute->type >= FIRST_OFFSET_ATTRIBUTE)
+		    break;
+		}
+	      }
+
+	      if (attribute == NULL || attribute->type == LAST_ATTRIBUTE) {
+		fprintf(stderr,
+			"%s(%d) : Warning: constraint diagram but no constraint line or offset attributes for pattern %s\n",
+			current_file, current_line_number, pattern_names[patno]);
+	      }
+	    }
+
 	    break;
 	  case 7:
 	  case 8:
@@ -3108,8 +3205,10 @@ main(int argc, char *argv[])
 	}
 
 	if (command == 1) { /* Pattern `name' */
-	  if (!discard_pattern)
+	  if (!discard_pattern) {
+	    convert_attribute_labels_to_offsets();
 	    patno++;
+	  }
 	  else
 	    code_pos = save_code_pos;
 	  reset_pattern();
@@ -3177,6 +3276,14 @@ main(int argc, char *argv[])
 	  else if (strcmp(command_data, "value_only") == 0) {
 	    attribute_map = value_only_attribute_map;
 	    attributes_needed = 0;
+	  }
+	  else if (strcmp(command_data, "owl_attack") == 0) {
+	    attribute_map = owl_attack_attribute_map;
+	    attributes_needed = 1;
+	  }
+	  else if (strcmp(command_data, "owl_defense") == 0) {
+	    attribute_map = owl_defense_attribute_map;
+	    attributes_needed = 1;
 	  }
 	  else if (strcmp(command_data, "none") == 0) {
 	    attribute_map = NULL;
@@ -3300,6 +3407,8 @@ main(int argc, char *argv[])
       }
     } /* while not EOF */
   } /* for each file */
+
+  convert_attribute_labels_to_offsets();
   
   if (patno >= 0) {
     switch (state) {

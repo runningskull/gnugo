@@ -126,11 +126,15 @@ struct owl_move_data {
 
 struct matched_pattern_data {
   int move;
+  int value;
   int ll;
 #if USE_BDIST
   int bdist;
 #endif
   struct pattern *pattern;
+
+  /* To link combinable patterns in chains. */
+  int next_pattern_index;
 };
   
 struct matched_patterns_list_data {
@@ -139,11 +143,10 @@ struct matched_patterns_list_data {
   int used;		/* How many patterns have already been used?*/
   int list_size;	
   struct matched_pattern_data *pattern_list;
+  int first_pattern_index[BOARDMAX];
 
   int heap_num_patterns;
   struct matched_pattern_data **pattern_heap;
-
-  struct matched_pattern_data *next_pattern;
 };
 
 void dump_pattern_list(struct matched_patterns_list_data *list);
@@ -161,9 +164,13 @@ static void owl_shapes(struct matched_patterns_list_data *list,
 static void collect_owl_shapes_callbacks(int anchor, int color,
 	  			         struct pattern *pattern_db,
 				         int ll, void *data);
+
+static void pattern_list_prepare(struct matched_patterns_list_data *list);
 static void pattern_list_build_heap(struct matched_patterns_list_data *list);
-static void pattern_list_get_next_pattern(struct matched_patterns_list_data
-					  *list);
+static void pattern_list_pop_heap_once(struct matched_patterns_list_data *list);
+static void pattern_list_sink_heap_top_element(struct matched_patterns_list_data
+					       *list);
+
 static int get_next_move_from_list(struct matched_patterns_list_data *list,
                                    int color, struct owl_move_data *moves,
 				   int cutoff);
@@ -3711,7 +3718,6 @@ init_pattern_list(struct matched_patterns_list_data *list)
   if (0)
     gprintf("List at %x has new array at %x\n", list, list->pattern_list);
 
-  list->next_pattern = NULL;
   list->initialized = 1;
 }
 
@@ -3809,11 +3815,131 @@ collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
   }
 
   next_pattern = &matched_patterns->pattern_list[matched_patterns->counter];
-  next_pattern->move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
-  next_pattern->ll = ll;
-  next_pattern->pattern = pattern;
+  next_pattern->move	= AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
+  next_pattern->value	= pattern->value;
+  next_pattern->ll	= ll;
+  next_pattern->pattern	= pattern;
+  next_pattern->next_pattern_index = -1;
 
   matched_patterns->counter++;
+}
+
+
+#define MAX_STORED_REASONS	4
+
+static int
+valuate_combinable_pattern_chain(struct matched_patterns_list_data *list,
+				 int pos)
+{
+  /* FIXME: This is just a first attempt at pattern combination.
+   *	    Improve it.  The first idea is to differentiate between
+   *	    move reason types.  For instance, when there is a secure
+   *	    eye already, a threat to create another is more severe.
+   *
+   *	    This will certainly involve splitting the function into
+   *	    attack and defense versions.
+   */
+
+  int pattern_index = list->first_pattern_index[pos];
+  int num_capture_threats = 0;
+  int capture_threats[MAX_STORED_REASONS];
+  int num_eye_threats = 0;
+  int eye_threats[MAX_STORED_REASONS];
+  int num_reverse_sente = 0;
+  int reverse_sente_against[MAX_STORED_REASONS];
+  int num_move_reasons;
+  float full_value = 0.0;
+
+  ASSERT1(pattern_index != -1, pos);
+
+  do {
+    struct matched_pattern_data *pattern_data = (list->pattern_list
+						 + pattern_index);
+    struct pattern_attribute *attribute;
+
+    /* Skip patterns that haven't passed constraint validation. */
+    if (pattern_data->pattern) {
+      for (attribute = pattern_data->pattern->attributes;
+	   attribute->type != LAST_ATTRIBUTE;
+	   attribute++) {
+	int k;
+	int target = AFFINE_TRANSFORM(attribute->offset, pattern_data->ll,
+				      pattern_data->move);
+
+	switch (attribute->type) {
+	case THREATENS_TO_CAPTURE:
+	  if (num_capture_threats < MAX_STORED_REASONS) {
+	    ASSERT1(IS_STONE(board[target]), target);
+	    target = find_origin(target);
+
+	    for (k = 0; k < num_capture_threats; k++) {
+	      if (capture_threats[k] == target)
+		break;
+	    }
+
+	    if (k == num_capture_threats) {
+	      capture_threats[num_capture_threats++] = target;
+	      full_value += pattern_data->pattern->value;
+	    }
+	  }
+
+	  break;
+
+	case THREATENS_EYE:
+	  if (num_eye_threats < MAX_STORED_REASONS) {
+	    target = current_owl_data->my_eye[target].origin;
+
+	    for (k = 0; k < num_eye_threats; k++) {
+	      if (eye_threats[k] == target)
+		break;
+	    }
+
+	    if (k == num_eye_threats) {
+	      eye_threats[num_eye_threats++] = target;
+	      full_value += pattern_data->pattern->value;
+	    }
+	  }
+
+	  break;
+
+	case REVERSE_SENTE:
+	  if (num_reverse_sente < MAX_STORED_REASONS) {
+	    ASSERT1(board[target] == EMPTY, target);
+
+	    for (k = 0; k < num_reverse_sente; k++) {
+	      if (reverse_sente_against[k] == target)
+		break;
+	    }
+
+	    if (k == num_reverse_sente) {
+	      reverse_sente_against[num_reverse_sente++] = target;
+	      full_value += pattern_data->pattern->value;
+	    }
+	  }
+
+	  break;
+
+	default:
+	  gg_assert(0);
+	}
+      }
+    }
+
+    pattern_index = pattern_data->next_pattern_index;
+  } while (pattern_index >= 0);
+
+
+  num_move_reasons = num_capture_threats + num_eye_threats + num_reverse_sente;
+  if (num_move_reasons <= 1) {
+    /* Not much to combine, eh? */
+    return 0;
+  }
+
+  if (num_move_reasons == 2)
+    return gg_min((int) full_value, 75);
+  if (num_move_reasons == 3)
+    return gg_min((int) (full_value * 0.85), 90);
+  return gg_min((int) (full_value * 0.75), 99);
 }
 
 
@@ -3840,8 +3966,8 @@ bdist(int move)
  */
 
 #define BETTER_PATTERN(a, b)				\
-  ((a)->pattern->value > (b)->pattern->value		\
-   || ((a)->pattern->value == (b)->pattern->value	\
+  ((a)->value > (b)->value				\
+   || ((a)->value == (b)->value				\
        && ((a)->pattern < (b)->pattern			\
 	   || ((a)->pattern == (b)->pattern		\
 	       && ((a)->bdist < (b)->bdist		\
@@ -3851,8 +3977,8 @@ bdist(int move)
 #else	/* not USE_BDIST */
 
 #define BETTER_PATTERN(a, b)				\
-  ((a)->pattern->value > (b)->pattern->value		\
-   || ((a)->pattern->value == (b)->pattern->value	\
+  ((a)->value > (b)->value				\
+   || ((a)->value == (b)->value				\
        && ((a)->pattern < (b)->pattern			\
 	   || ((a)->pattern == (b)->pattern		\
 	       && (a)->move < (b)->move))))
@@ -3860,28 +3986,68 @@ bdist(int move)
 #endif	/* not USE_BDIST */
 
 
+static void
+pattern_list_prepare(struct matched_patterns_list_data *list)
+{
+  int k;
+  int pos;
+
+  list->heap_num_patterns = 0;
+
+  /* This is more than needed in case of (combinable) pattern chains,
+   * but it is easier to allocate more than to count real number of
+   * heap elements first.
+   */
+  list->pattern_heap = malloc(list->counter
+			      * sizeof(struct matched_pattern_data *));
+  gg_assert(list->pattern_heap != NULL);
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    list->first_pattern_index[pos] = -1;
+
+  for (k = 0; k < list->counter; k++) {
+    int move = list->pattern_list[k].move;
+
+#if USE_BDIST
+    list->pattern_list[k].bdist = bdist(move);
+#endif
+
+    /* Allocate heap elements for normal patterns.  Link combinable
+     * patterns in chains.
+     */
+    if (!(list->pattern_list[k].pattern->class & CLASS_c))
+      list->pattern_heap[list->heap_num_patterns++] = &list->pattern_list[k];
+    else {
+/*       list->pattern_list[k].next_pattern_index = list->first_pattern_index[move]; */
+/*       list->first_pattern_index[move] = k; */
+    }
+  }
+
+  /* Allocate one heap element for each chain of combinable patterns
+   * and calculate initial chain values (as if all patterns passed
+   * constraint validation).
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (list->first_pattern_index[pos] != -1) {
+      struct matched_pattern_data *pattern_data
+	= &list->pattern_list[list->first_pattern_index[pos]];
+
+      pattern_data->value = valuate_combinable_pattern_chain(list, pos);
+      list->pattern_heap[list->heap_num_patterns++] = pattern_data;
+    }
+  }
+
+  if (list->heap_num_patterns > 0)
+    pattern_list_build_heap(list);
+}
+
+
 /* Fast heap building.  Takes O(n) only. */
 static void
 pattern_list_build_heap(struct matched_patterns_list_data *list)
 {
   int k;
-  int limit;
-
-  if (list->counter > 0) {
-    list->pattern_heap = malloc(list->counter
-				* sizeof(struct matched_pattern_data*));
-    gg_assert(list->pattern_heap != NULL);
-  }
-
-  for (k = 0; k < list->counter; k++) {
-#if USE_BDIST
-    list->pattern_list[k].bdist = bdist(list->pattern_list[k].move);
-#endif
-    list->pattern_heap[k] = &list->pattern_list[k];
-  }
-
-  list->heap_num_patterns = list->counter;
-  limit = list->heap_num_patterns / 2;
+  int limit = list->heap_num_patterns / 2;
 
   for (k = limit; --k >= 0;) {
     int parent;
@@ -3906,16 +4072,12 @@ pattern_list_build_heap(struct matched_patterns_list_data *list)
 }
 
 
-/* Pops patterns list's heap once and makes `list->next_pattern' point
- * to the popped pattern.
- */
+/* Pops patterns list's heap once. */
 static void
-pattern_list_get_next_pattern(struct matched_patterns_list_data *list)
+pattern_list_pop_heap_once(struct matched_patterns_list_data *list)
 {
   int parent;
   int child;
-
-  list->next_pattern = list->pattern_heap[0];
 
   list->heap_num_patterns--;
   for (parent = 0; 2 * parent + 1 < list->heap_num_patterns; parent = child) {
@@ -3935,6 +4097,35 @@ pattern_list_get_next_pattern(struct matched_patterns_list_data *list)
 }
 
 
+/* Sink top element of heap because it got devalued.  This happens
+ * when a combinable pattern doesn't pass check_pattern_hard() -- it
+ * is no longer counted and its whole chain's value is reduced.
+ */
+static void
+pattern_list_sink_heap_top_element(struct matched_patterns_list_data *list)
+{
+  int parent;
+  int child;
+  struct matched_pattern_data *heap_top_element = list->pattern_heap[0];
+
+  for (parent = 0; 2 * parent + 1 < list->heap_num_patterns; parent = child) {
+    child = 2 * parent + 1;
+    if (child + 1 < list->heap_num_patterns
+	&& BETTER_PATTERN(list->pattern_heap[child + 1],
+			  list->pattern_heap[child]))
+      child++;
+
+    if (BETTER_PATTERN(heap_top_element,
+		       list->pattern_heap[child]))
+      break;
+
+    list->pattern_heap[parent] = list->pattern_heap[child];
+  }
+
+  list->pattern_heap[parent] = heap_top_element;
+}
+
+
 /* This function searches in the previously stored list of matched
  * patterns for the highest valued unused patterns that have a valid
  * constraint.  It returns the moves at the next empty positions in
@@ -3945,11 +4136,13 @@ pattern_list_get_next_pattern(struct matched_patterns_list_data *list)
  * If the highest valued pattern found has a value less than cutoff,
  * no move is returned.  Returns 1 if a move is found, 0 otherwise.
  *
- * pattern_list_get_next_pattern() is used to pop the next highest
- * valued pattern from the list's heap.  Then it is checked whether
- * this move has not been tried before, and if the pattern constraint
- * is valid. This is repeated until enough moves are found or the end
- * of the list is reached.
+ * This function also dispatches constraint validation of combinable
+ * pattern chains.  Whenever a pattern from a chain fails constraints,
+ * the chain is reevaluated and most likely drops in value enough to
+ * let other patterns (or chains) climb to the top of pattern heap.
+ *
+ * This function loops until enough moves are found or the end of the
+ * list is reached.
  */
 
 static int
@@ -3963,26 +4156,28 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
   sgf_dumptree = NULL;
   count_variations = 0;
 
+  /* Prepare pattern list if needed. */
   if (!list->pattern_heap)
-    pattern_list_build_heap(list);
+    pattern_list_prepare(list);
 
-  while (list->heap_num_patterns > 0 || list->next_pattern) {
+  while (list->heap_num_patterns > 0) {
     int k;
     struct pattern *pattern;
     int move;
+    int value;
     int ll;
+    int next_pattern_index;
 
-    if (!list->next_pattern)
-      pattern_list_get_next_pattern(list);
-
-    pattern = list->next_pattern->pattern;
-    if (pattern->value < (float) cutoff)
+    /* Peek top element of heap associated with pattern list. */
+    if (list->pattern_heap[0]->value < cutoff)
       break;
 
-    move = list->next_pattern->move;
-    ll = list->next_pattern->ll;
+    pattern = list->pattern_heap[0]->pattern;
+    move    = list->pattern_heap[0]->move;
+    value   = list->pattern_heap[0]->value;
+    ll      = list->pattern_heap[0]->ll;
+    next_pattern_index = list->pattern_heap[0]->next_pattern_index;
 
-    list->next_pattern = NULL;
     list->used++;
 
     ASSERT_ON_BOARD1(move);
@@ -3990,57 +4185,126 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
       if (moves[k].pos == move || moves[k].value <= 0)
 	break;
     }
-    if (moves[k].pos == move)
+
+    if (moves[k].pos == move) {
+      /* No point in testing this pattern/chain.  Throw it out. */
+      pattern_list_pop_heap_once(list);
       continue;
+    }
 
-    gg_assert(k < MAX_MOVES); /* There has to be an empty space. */
-    if (check_pattern_hard(move, color, pattern, ll)) {
-      moves[k].pos = move;
-      moves[k].value = pattern->value;
-      moves[k].name = pattern->name;
-      move_found = 1;
-      TRACE("Pattern %s found at %1m with value %d\n",
-	    pattern->name, move, moves[k].value);
+    /* There has to be an empty space. */
+    gg_assert(k < MAX_MOVES);
 
-      if (pattern->class & CLASS_B)
-	moves[k].same_dragon = 0;
-      else if (pattern->class & CLASS_b) {
-	int i;
-	int same_dragon = 1;
-
-	/* If we do not yet know whether the move belongs to the same dragon,
-	 * we see whether another pattern can clarify.
+    /* If a pattern chain was devalued because its last pattern didn't
+     * pass constraint validation, `pattern' is set NULL (i.e. nothing
+     * more to test).  Note that devalued chains might still be
+     * useful, i.e. if 2 of 3 patterns passed check_pattern_hard().
+     */
+    if (pattern == NULL
+	|| check_pattern_hard(move, color, pattern, ll)) {
+      if (next_pattern_index == -1) {
+	/* Normal pattern or last one in a chain. */
+	pattern_list_pop_heap_once(list);
+      }
+      else {
+	/* We just validated a non-last pattern in a chain.  Since the
+	 * chain remains at the same value, we keep the heap structure
+	 * untouched.  However, we need to set heap's top to point to
+	 * next pattern of the chain.
 	 */
-	for (i = 0; i < list->heap_num_patterns; i++) {
-	  struct matched_pattern_data *pattern_data = list->pattern_heap[i];
+	list->pattern_heap[0] = list->pattern_list + next_pattern_index;
+	list->pattern_heap[0]->value = value;
+	continue;
+      }
 
-	  if (pattern_data->move == move
-	      && ((pattern_data->pattern->class & CLASS_B)
-		  || !(pattern_data->pattern->class & CLASS_b))) {
-	    if (check_pattern_hard(move, color, pattern_data->pattern,
-				   pattern_data->ll)) {
-	      TRACE("Additionally pattern %s found at %1m\n",
-		    pattern_data->pattern->name, move);
-	      if (pattern_data->pattern->class & CLASS_B)
-		same_dragon = 0;
-	      else
-		same_dragon = 2;
+      moves[k].pos = move;
+      moves[k].value = value;
+      move_found = 1;
 
-	      break;
+      if (pattern && !(pattern->class & CLASS_c)) {
+	moves[k].name = pattern->name;
+	TRACE("Pattern %s found at %1m with value %d\n",
+	      pattern->name, move, moves[k].value);
+
+	if (pattern->class & CLASS_B)
+	  moves[k].same_dragon = 0;
+	else if (pattern->class & CLASS_b) {
+	  int i;
+	  int same_dragon = 1;
+
+	  /* If we do not yet know whether the move belongs to the
+	   * same dragon, we see whether another pattern can clarify.
+	   */
+	  for (i = 0; i < list->heap_num_patterns; i++) {
+	    struct matched_pattern_data *pattern_data = list->pattern_heap[i];
+
+	    if (pattern_data->pattern
+		&& pattern_data->move == move
+		&& ((pattern_data->pattern->class & CLASS_B)
+		    || !(pattern_data->pattern->class & CLASS_b))) {
+	      if (check_pattern_hard(move, color, pattern_data->pattern,
+				     pattern_data->ll)) {
+		TRACE("Additionally pattern %s found at %1m\n",
+		      pattern_data->pattern->name, move);
+		if (pattern_data->pattern->class & CLASS_B)
+		  same_dragon = 0;
+		else
+		  same_dragon = 2;
+
+		break;
+	      }
 	    }
 	  }
+
+	  moves[k].same_dragon = same_dragon;
+	}
+	else
+	  moves[k].same_dragon = 2;
+      }
+      else {
+	moves[k].name = "Pattern combination";
+	if (verbose) {
+	  /* FIXME: write names of all patterns in chain. */
 	}
 
-	moves[k].same_dragon = same_dragon;
+	/* FIXME: Add handling of CLASS_b.
+	 *
+	 * FIXME: It is silently assumed that all patterns in the
+	 *	  chain have the same class.  When the last pattern in
+	 *	  chain didn't match, this will not work at all.
+	 */
+	if (pattern && pattern->class & CLASS_B)
+	  moves[k].same_dragon = 0;
+	else
+	  moves[k].same_dragon = 2;
       }
-      else
-	moves[k].same_dragon = 2;
-      if (pattern->class & CLASS_E)
+
+      if (pattern && pattern->class & CLASS_E)
 	moves[k].escape = 1;
       else
 	moves[k].escape = 0;
+
       break;
-    } /* if (check_pattern_hard(...)) */
+    }
+    else {			/* !check_pattern_hard(...) */
+      if (!(pattern->class & CLASS_c)) {
+	/* Just forget about it. */
+	pattern_list_pop_heap_once(list);
+      }
+      else {
+	/* Set this pattern to not matched and advance to next one in
+	 * the chain, if any.
+	 */
+	list->pattern_heap[0]->pattern = NULL;
+	if (next_pattern_index != -1)
+	  list->pattern_heap[0] = list->pattern_list + next_pattern_index;
+
+	/* Reevaluate chain and adjust heap structure accordingly. */
+	list->pattern_heap[0]->value = valuate_combinable_pattern_chain(list,
+									move);
+	pattern_list_sink_heap_top_element(list);
+      }
+    }
   }
 
   sgf_dumptree = save_sgf_dumptree;

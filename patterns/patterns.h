@@ -125,8 +125,9 @@ typedef int (*autohelper_fn_ptr)(int rotation, int move,
 #define CLASS_s     0x0010   /* move is a sacrifice */
 #define CLASS_n     0x0020   /* X could also make this move if we do not */
 #define CLASS_D     0x0040   /* defense pattern */
-#define CLASS_C     0x0080   /* move connects two worms */ 
+#define CLASS_C     0x0080   /* move connects two worms */
 #define CLASS_c     0x0100   /* move weakly connects two worms */ 
+			     /* for owl databases: combinable pattern */
 #define CLASS_B     0x0200   /* move breaks connection between enemy worms */
 #define CLASS_A     0x0400   /* attack pattern */
 #define CLASS_b     0x0800   /* move is intended to block opponent */
@@ -189,6 +190,14 @@ enum attribute_type {
   SHAPE,
   FOLLOWUP,
   REVERSE_FOLLOWUP,
+
+  /* For `mkpat'. */
+  FIRST_OFFSET_ATTRIBUTE,
+
+  THREATENS_TO_CAPTURE = FIRST_OFFSET_ATTRIBUTE,
+  THREATENS_EYE,
+  REVERSE_SENTE,
+
   NUM_ATTRIBUTES,
   LAST_ATTRIBUTE = NUM_ATTRIBUTES
 };

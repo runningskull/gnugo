@@ -81,9 +81,13 @@
 # A14xx Invasion patterns
 # A15xx Ko patterns
 # A16xx Specific edge attacks
+#
+# ACxx  Threats to capture
+# AExx  Threats to destroy eyes
+# ARxx  Reverse sente attacking moves
 
 
-attribute_map value_only
+attribute_map owl_attack
 
 goal_elements Xx
 callback_data none
@@ -6213,6 +6217,65 @@ OX*X
 ----
 
 :8,s,value(75)
+
+
+#########################################################
+#                                                       #
+#		   Threats to capture			#
+#                                                       #
+#########################################################
+
+
+Pattern AC01
+# pp New pattern (3.5.5).
+
+xXO	    threaten a snapback
+x.Y
+*.X
+---
+
+:8,cs, threatens_to_capture(A), value(25)
+
+xXB
+x.A
+*.A
+---
+
+; lib(A) == 2 && lib(B) > 1 && olib(*) > 1
+
+
+#########################################################
+#                                                       #
+#		 Threats to destroy eyes		#
+#                                                       #
+#########################################################
+
+
+Pattern AE01
+# pp New pattern (3.5.5).
+
+|OXx	    threaten to destroy the eye in ko
+|X.X
+|.Yx
+|.*.
++---
+
+:8,cs, threatens_eye(a), value(20)
+
+|BXx
+|XaX
+|.Yx
+|.*.
++---
+
+; owl_proper_eye(a) && !attack(B)
+
+
+#########################################################
+#                                                       #
+#	      Reverse sente attacking moves		#
+#                                                       #
+#########################################################
 
 
 # END OF FILE

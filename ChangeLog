@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- first implementation of owl threat combinator--intended for improving
+  move ordering
 - pattern attributes (shape, followup etc.) are now stored in lists, not
   in `pattern' structure
 - there is now a possibility to define virtually unlimited number of new
