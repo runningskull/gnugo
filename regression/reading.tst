@@ -779,6 +779,14 @@ loadsgf games/reading40.sgf
 188 defend B4
 #? [1 A2]*
 
+loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 194
+trymove black A14
+trymove white A15
+189 defend C19
+#? [1 A17]
+popgo
+popgo
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
