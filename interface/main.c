@@ -507,6 +507,7 @@ main(int argc, char *argv[])
 
       case OPT_METAMACHINE:
         metamachine = 1;
+	break;
 
       case OPT_JAPANESE_RULES: 
 	chinese_rules = 0;
@@ -693,6 +694,7 @@ main(int argc, char *argv[])
 	
       case OPT_AA_DEPTH:
 	mandated_aa_depth = atoi(gg_optarg);
+	break;
 
       case OPT_OWL_DISTRUST:
 	mandated_owl_distrust_depth = atoi(gg_optarg);
@@ -1060,7 +1062,7 @@ main(int argc, char *argv[])
       rotate(bi, bj, &bi, &bj, board_size, orientation);
       decide_connection(POS(ai, aj), POS(bi, bj));
     }
-  break;
+    break;
   
   case MODE_DECIDE_OWL:
     {
