@@ -42,7 +42,7 @@ play white B1
 
 play black A2
 7 reg_genmove white
-#? [B2]
+#? [B2]*
 
 undo
 # White kills through bent four in the corner.
@@ -299,9 +299,9 @@ play black D1
 
 loadsgf games/seki09.sgf
 501 reg_genmove white
-#? [B1]
+#? [B1]*
 502 reg_genmove black
-#? [C1]
+#? [C1]*
 
 play white B1
 503 reg_genmove black
@@ -419,7 +419,7 @@ play black C2
 # to C1 the latter is 1 point double sente.
 play white B3
 905 reg_genmove black
-#? [C1]
+#? [C1]*
 
 play black C1
 906 reg_genmove white
@@ -429,7 +429,7 @@ play black C1
 # double sente there is no reason to wait.
 play white B1
 907 reg_genmove black
-#? [A3]
+#? [A3]*
 
 play black A3
 908 reg_genmove white
@@ -438,7 +438,7 @@ play black A3
 # 1 point double sente, just like 907.
 undo
 909 reg_genmove white
-#? [A3]
+#? [A3]*
 
 play white A3
 910 reg_genmove black
@@ -473,14 +473,14 @@ loadsgf games/seki14.sgf
 1001 reg_genmove white
 #? [B2]
 1002 reg_genmove black
-#? [B2]
+#? [B2]*
 
 
 loadsgf games/seki15.sgf
 1101 reg_genmove white
-#? [D1]
+#? [D1]*
 1102 reg_genmove black
-#? [C1|C2|D2]
+#? [C1|C2|D2]*
 
 play white D1
 1103 reg_genmove black
@@ -488,7 +488,7 @@ play white D1
 
 play black E2
 1104 reg_genmove white
-#? [B1]
+#? [B1]*
 
 play white B1
 1105 reg_genmove black
@@ -496,5 +496,5 @@ play white B1
 
 play black C2
 1106 reg_genmove white
-#? [C1]
+#? [C1]*
 

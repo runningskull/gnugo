@@ -127,7 +127,7 @@ loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 37
 #take the ko!
 loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 195
 282 reg_genmove white
-#? [O13]*
+#? [O13]
 
 loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 235
 283 reg_genmove white

@@ -159,7 +159,7 @@ loadsgf games/mertin13x13/GNGH3.sgf 111
 # Necessary to defend the bottom.
 loadsgf games/mertin13x13/GIGN2.sgf 18
 18 reg_genmove white
-#? [F3]*
+#? [F3]
 
 # One critical point left at B5. K10 is dame.
 loadsgf games/mertin13x13/GIGN2.sgf 60
@@ -267,7 +267,7 @@ loadsgf games/mertin13x13/MFGN3.sgf 58
 # Must connect at F8.
 loadsgf games/mertin13x13/WLGN2.sgf 74
 40 reg_genmove white
-#? [F8]*
+#? [F8]
 
 loadsgf games/mertin13x13/GNWL1.sgf 61
 41 reg_genmove black

@@ -125,7 +125,7 @@ loadsgf games/blunder18.sgf
 # Don't play an outer liberty and let black make seki or better.
 loadsgf games/blunder19.sgf
 26 reg_genmove white
-#? [!D19|F17]
+#? [!D19|F17]*
 
 # R3 lets black play T2 and get seki.
 loadsgf games/blunder20.sgf

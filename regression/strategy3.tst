@@ -172,7 +172,7 @@ loadsgf games/strategy31.sgf 158
 
 loadsgf games/strategy31.sgf 188
 135 reg_genmove white
-#? [M12|N13|M13]*
+#? [M12|N13|M13]
 
 loadsgf games/strategy32.sgf 19
 136 reg_genmove black
@@ -197,7 +197,7 @@ loadsgf games/owl26.sgf 138
 
 loadsgf games/strategy34.sgf 51
 141 reg_genmove black
-#? [C7]
+#? [C7]*
 
 loadsgf games/strategy34.sgf 57
 142 reg_genmove black
@@ -238,7 +238,7 @@ loadsgf games/gwe.sgf 225
 # Owl reading mistake, eyespace related.
 loadsgf games/gwe.sgf 203
 150 reg_genmove white
-#? [Q1]*
+#? [Q1]
 
 ############ End of Tests #################
 

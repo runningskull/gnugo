@@ -6,7 +6,7 @@ loadsgf games/cgf2003/GnuGo-Aya.sgf 48
 # R1 makes seki.
 loadsgf games/cgf2003/GnuGo-Aya.sgf 212
 2 reg_genmove white
-#? [R1]*
+#? [R1]
 
 # Urgent to block. It is okay to sacrifice P16 if black cuts.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 26
@@ -21,7 +21,7 @@ loadsgf games/cgf2003/GnuGo-GORO.sgf 38
 # F18 strange shape, leaves much aji.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 50
 103 restricted_genmove white F18 F17
-#? [F17]*
+#? [F17]
 
 # P2 lives.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 90
@@ -36,7 +36,7 @@ loadsgf games/cgf2003/GnuGo-GORO.sgf 116
 # H1 2 points sente.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 174
 106 reg_genmove white
-#? [H1]*
+#? [H1]
 
 # F5 one point gote. N9, P9, and H19 are bigger.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 194
@@ -62,7 +62,7 @@ loadsgf games/cgf2003/GnuGo-Go4.sgf 129
 # G18 is not worth anything at all.
 loadsgf games/cgf2003/GnuGo-Go4.sgf 141
 204 restricted_genmove black G18 J19
-#? [J19]*
+#? [J19]
 
 # P5 clearly better than N6.
 loadsgf games/cgf2003/GnuGo-Go4.sgf 155
@@ -72,12 +72,12 @@ loadsgf games/cgf2003/GnuGo-Go4.sgf 155
 # C13 only move. D13 unthinkable.
 loadsgf games/cgf2003/GnuGo-Go4.sgf 175
 206 reg_genmove black
-#? [C13]*
+#? [C13]
 
 # E2 urgent for life in the corner.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 41
 301 reg_genmove black
-#? [E2]*
+#? [E2]
 
 # C1 suffices to live, as does B6.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 59
@@ -87,7 +87,7 @@ loadsgf games/cgf2003/GnuGo-GoInt.sgf 59
 # P18 is clearly superior to Q18.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 69
 303 restricted_genmove black Q18 P18
-#? [P18]*
+#? [P18]
 
 # Very uninteresting to save G6.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 119
@@ -97,12 +97,12 @@ loadsgf games/cgf2003/GnuGo-GoInt.sgf 119
 # E1 dies.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 139
 305 reg_genmove black
-#? [!E1]*
+#? [!E1]
 
 # B15 very ineffective.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 197
 306 restricted_genmove black B15 B14
-#? [B14]*
+#? [B14]
 
 # H8 and M7 miai for saving the K7 stones
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 205
@@ -112,12 +112,12 @@ loadsgf games/cgf2003/GnuGo-GoInt.sgf 205
 # No value playing N6.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 207
 308 restricted_genmove black N6 L3
-#? [L3]*
+#? [L3]
 
 # J1 locally better than K1.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 217
 309 restricted_genmove black J1 K1
-#? [J1]*
+#? [J1]
 
 # A3 wins the semeai.
 # Update for 3.5.2: The basic problem is that B6 is thought to be
@@ -130,7 +130,7 @@ loadsgf games/cgf2003/GnuGo-GoInt.sgf 237
 # of H16 is really urgent.
 loadsgf games/cgf2003/GnuGo-GoeMate.sgf 27
 401 reg_genmove black
-#? [R15|O17|K16]*
+#? [R15|O17|K16]
 
 # White is already building the upper side territory, suppressing it and
 # expanding own territory is urgent.
@@ -146,17 +146,17 @@ loadsgf games/cgf2003/GnuGo-GoeMate.sgf 85
 # GNU Go 3.4 completely missed that it would be valuable to capture Q15.
 loadsgf games/cgf2003/GnuGo-GoeMate.sgf 129
 404 restricted_genmove black S12 S10
-#? [S12]*
+#? [S12]
 
 # P14 is an atari which only helps black. Q14 is the only move.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 10
 501 reg_genmove white
-#? [Q14]*
+#? [Q14]
 
 # Tenuki unreasonable. One of the running groups must be strengthened.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 42
 502 reg_genmove white
-#? [R9|L10|K12]*
+#? [R9|L10|K12]
 
 # R10 better eye shape and less cutting aji than R9.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 48
@@ -171,7 +171,7 @@ loadsgf games/cgf2003/GnuGo-Haruka.sgf 54
 # Cutting at E8 urgent.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 86
 505 reg_genmove white
-#? [E8]*
+#? [E8]
 
 # Blocking at G2 very big. Black can jump all the way to J1.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 118
@@ -181,12 +181,12 @@ loadsgf games/cgf2003/GnuGo-Haruka.sgf 118
 # The push through at G13 is prepared.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 168
 507 reg_genmove white
-#? [G13]*
+#? [G13]
 
 # Q14 is not common in the Chinese fuseki. (But is it worth regressing over?)
 loadsgf games/cgf2003/GnuGo-KCC.sgf 7
 601 restricted_genmove black R12 O16 Q14
-#? [R12|O16|Q11|P14]*
+#? [R12|O16|Q11|P14]
 
 # Making moyo here is much better than the game move F14. The
 # important thing is that O5 has some strategic effect on white while
@@ -198,12 +198,12 @@ loadsgf games/cgf2003/GnuGo-KCC.sgf 27
 # The corner is worth 20 points.
 loadsgf games/cgf2003/GnuGo-KCC.sgf 29
 603 reg_genmove black
-#? [B16]*
+#? [B16]
 
 # Not D2. Better to attack something.
 loadsgf games/cgf2003/GnuGo-KCC.sgf 41
 604 reg_genmove black
-#? [C8|F12|E12|G13|O7|P7|P6]*
+#? [C8|F12|E12|G13|O7|P7|P6]
 
 loadsgf games/cgf2003/GnuGo-KCC.sgf 69
 605 reg_genmove black
@@ -222,7 +222,7 @@ loadsgf games/cgf2003/GnuGo-KCC.sgf 201
 # O19 is not the right move if we want to reduce the aji of O18.
 loadsgf games/cgf2003/GnuGo-Katsunari.sgf 71
 701 restricted_genmove black O19 M18 L18 L17
-#? [!O19]*
+#? [!O19]
 
 # N6 locally better than M6.
 loadsgf games/cgf2003/GnuGo-Katsunari.sgf 107

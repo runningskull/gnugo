@@ -284,7 +284,7 @@ loadsgf games/trevor/auto/b33.sgf 32
 
 loadsgf games/trevor/auto/b37.sgf 26
 510 reg_genmove white
-#? [C6|B6]*
+#? [C6|B6]
 
 
 loadsgf games/trevor/auto/b37.sgf 30

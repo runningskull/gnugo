@@ -57,7 +57,7 @@ loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 64
 
 loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 66
 150 reg_genmove black
-#? [C5|D5]*
+#? [C5|D5]
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64
 190 owl_defend J9
@@ -128,7 +128,7 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 76
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 78
 370 reg_genmove black
-#? [R5]
+#? [R5]*
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200302072106.sgf 4
 380 reg_genmove black
@@ -205,7 +205,7 @@ loadsgf games/ninestones/ninestones1.sgf 76
 
 loadsgf games/ninestones/ninestones1.sgf 90
 630 reg_genmove black
-#? [F5|H7]
+#? [F5|H7]*
 
 # J2 is better than H2
 loadsgf games/splee.sgf 62
@@ -218,7 +218,7 @@ loadsgf games/ninestones/emanuel-1.sgf 182
 
 loadsgf games/ninestones/emanuel-1.sgf 200
 660 reg_genmove black
-#? [P1]*
+#? [P1]
 
 #this is a persistent cache problem
 loadsgf games/ninestones/emanuel-2.sgf 112

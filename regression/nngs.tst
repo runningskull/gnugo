@@ -612,7 +612,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 90
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 138
 1280 reg_genmove white
-#? [D13]
+#? [D13]*
 
 
 

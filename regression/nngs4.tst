@@ -68,7 +68,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 94
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 100
 160 reg_genmove black
-#? [K8|L8]*
+#? [K8|L8]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 168
 170 reg_genmove black
@@ -162,11 +162,11 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 142
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 174
 410 restricted_genmove black F2 E1
-#? [E1]*
+#? [E1]
 
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 65
 420 reg_genmove black
-#? [G6]*
+#? [G6]
 
 # G12 allows white to live.
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 185

@@ -137,7 +137,7 @@ black A10
 #CATEGORY=OWL
 loadsgf games/nando/auto018.sgf
 26 owl_does_defend P16 R18
-#? [0]*
+#? [0]
 
 # Move valuation looks way off. No idea what is happening here.
 #CATEGORY=?

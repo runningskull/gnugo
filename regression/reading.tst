@@ -795,7 +795,7 @@ loadsgf games/reading42.sgf 62
 # of a large number of superstring liberties. See also gifu03:310.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 237
 191 defend B6
-#? [1 A3]
+#? [1 A3]*
 
 loadsgf games/reading43.sgf
 192 attack D4

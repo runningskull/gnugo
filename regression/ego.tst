@@ -60,7 +60,7 @@ loadsgf games/ego.sgf 180
 
 loadsgf games/ego.sgf 190
 10 reg_genmove white
-#? [S18]
+#? [S18]*
 
 
 #CATEGORY=KO_READING

@@ -228,13 +228,13 @@ loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 194
 # revised.
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 142
 41 reg_genmove black
-#? [D13]*
+#? [D13]
 
 # Make seki with B18. The problem for 3.5.1 is that the semeai code is
 # not called since E19 is considered owl alive and B18 owl dead.
 loadsgf games/gunnar/gunnar12.sgf
 42 reg_genmove white
-#? [B19]*
+#? [B19]
 
 ############ End of Tests #################
 

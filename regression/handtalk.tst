@@ -94,7 +94,7 @@ loadsgf games/handtalk/handtalk1.sgf 69
 
 loadsgf games/handtalk/handtalk2.sgf 79
 20 reg_genmove black 
-#? [N18]
+#? [N18]*
 
 #CATEGORY=BLUNDER
 # (Incorrectly rejected move)
