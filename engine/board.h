@@ -141,6 +141,18 @@ typedef unsigned char Intersection;
 #define NN(pos)       ((pos) - 2 * NS)
 #define EE(pos)       ((pos) + 2)
 
+#define DIRECT_NEIGHBORS(pos1, pos2)		\
+  ((pos1) == SOUTH(pos2)			\
+   || (pos1) == WEST(pos2)			\
+   || (pos1) == NORTH(pos2)			\
+   || (pos1) == EAST(pos2))
+
+#define DIAGONAL_NEIGHBORS(pos1, pos2)		\
+  ((pos1) == SW(pos2)				\
+   || (pos1) == NW(pos2)			\
+   || (pos1) == NE(pos2)			\
+   || (pos1) == SE(pos2))
+
 #define BOARD(i, j)   board[POS(i, j)]
 
 
@@ -241,6 +253,7 @@ int komaster_trymove(int pos, int color,
 int move_in_stack(int pos, int cutoff);
 void get_move_from_stack(int k, int *move, int *color);
 void dump_stack(void);
+void do_dump_stack(void);
 
 void reset_trymove_counter(void);
 int get_trymove_counter(void);

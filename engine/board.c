@@ -740,7 +740,6 @@ undo_trymove()
 
 
 
-
 /*
  * dump_stack() for use under gdb prints the move stack. 
  */
@@ -748,11 +747,8 @@ undo_trymove()
 void
 dump_stack(void)
 {
-  int n;
+  do_dump_stack();
 
-  for (n = 0; n < stackp; n++)
-    gprintf("%o%s:%1m ", move_color[n] == BLACK ? "B" : "W", stack[n]);
-  
 #if !TRACE_READ_RESULTS
   if (count_variations)
     gprintf("%o (variation %d)", count_variations-1);
@@ -764,6 +760,15 @@ dump_stack(void)
   fflush(stderr);
 }
 
+/* Bare bones of dump_stack(). */
+void
+do_dump_stack(void)
+{
+  int n;
+
+  for (n = 0; n < stackp; n++)
+    gprintf("%o%s:%1m ", move_color[n] == BLACK ? "B" : "W", stack[n]);
+}
 
 /* ================================================================ */
 /*                     Permanent moves                              */
@@ -1219,18 +1224,14 @@ komaster_trymove(int pos, int color, const char *message, int str,
       return 0;
 
     /* If we are komaster, we may only do nested captures. */
-    if (komaster == color
-	&& !(kpos == SW(kom_pos) || kpos == NW(kom_pos)
-	     || kpos == NE(kom_pos) || kpos == SE(kom_pos)))
+    if (komaster == color && !DIAGONAL_NEIGHBORS(kpos, kom_pos))
       return 0;
 
     /* If komaster is WEAK_KO, we may only do nested ko capture or
      * conditional ko capture.
      */
     if (komaster == WEAK_KO) {
-      if (pos != board_ko_pos
-	  && !(kpos == SW(kom_pos) || kpos == NW(kom_pos)
-	       || kpos == NE(kom_pos) || kpos == SE(kom_pos)))
+      if (pos != board_ko_pos && !DIAGONAL_NEIGHBORS(kpos, kom_pos))
 	return 0;
     }
   }
