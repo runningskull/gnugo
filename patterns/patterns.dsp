@@ -232,6 +232,10 @@ SOURCE=.\patterns.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\hoshi_other.db
+# End Source File
+# Begin Source File
+
 SOURCE=.\komoku.db
 # End Source File
 # Begin Source File
@@ -625,14 +629,14 @@ InputPath=.\handicap.db
 # End Source File
 # Begin Source File
 
-SOURCE=.\hoshi.db
+SOURCE=.\hoshi_keima.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"komoku.db"	"sansan.db"	"mokuhazushi.db"	"takamoku.db"	
+USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"hoshi_other.db"	"komoku.db "	"sansan.db "	"mokuhazushi.db "	"takamoku.db "	
 # Begin Custom Build
 IntDir=.\Release
-InputPath=.\hoshi.db
+InputPath=.\hoshi_keima.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -C joseki -i hoshi.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
@@ -641,10 +645,10 @@ InputPath=.\hoshi.db
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"komoku.db"	"sansan.db"	"mokuhazushi.db"	"takamoku.db"	
+USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"hoshi_other.db"	"komoku.db "	"sansan.db "	"mokuhazushi.db "	"takamoku.db "	
 # Begin Custom Build
 IntDir=.\Debug
-InputPath=.\hoshi.db
+InputPath=.\hoshi_keima.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -C joseki -i hoshi.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
@@ -877,29 +881,64 @@ InputPath=.\read_defend.db
 # PROP Default_Filter "sgf"
 # Begin Source File
 
-SOURCE=.\hoshi.sgf
+SOURCE=.\hoshi_keima.sgf
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
+# PROP Ignore_Default_Tool 1
 USERDEP__HOSHI_="$(IntDir)\joseki.exe"	
 # Begin Custom Build
 IntDir=.\Release
-InputPath=.\hoshi.sgf
+InputPath=.\hoshi_keima.sgf
 
-"hoshi.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JH hoshi.sgf >hoshi.db
+"hoshi_keima.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JH hoshi_keima.sgf >hoshi_keima.db
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
+# PROP Ignore_Default_Tool 1
 USERDEP__HOSHI_="$(IntDir)\joseki.exe"	
 # Begin Custom Build
 IntDir=.\Debug
-InputPath=.\hoshi.sgf
+InputPath=.\hoshi_keima.sgf
 
-"hoshi.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\joseki JH hoshi.sgf >hoshi.db
+"hoshi_keima.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JH hoshi_keima.sgf >hoshi_keima.db
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\hoshi_other.sgf
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+USERDEP__HOSHI_O="$(IntDir)\joseki.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\hoshi_other.sgf
+
+"hoshi_other.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JH hoshi_other.sgf >hoshi_other.db
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+USERDEP__HOSHI_O="$(IntDir)\joseki.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\hoshi_other.sgf
+
+"hoshi_other.db" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\joseki JH hoshi_keima.sgf >hoshi_other.db
 
 # End Custom Build
 

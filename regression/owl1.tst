@@ -79,7 +79,7 @@ loadsgf games/owl40.sgf
 
 loadsgf games/nngs/gnugo-3.3.8-Joorin-200209251541.sgf 169
 280 owl_attack F6
-#? [1 F4]*
+#? [1 F4]
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209170730.sgf 227
 281 owl_attack O19
@@ -145,7 +145,7 @@ loadsgf games/owl43.sgf
 
 loadsgf games/owl44.sgf
 296 owl_attack D6
-#? [1 E5|D8]*
+#? [1 E5|D8]
 
 loadsgf games/nngs/gnugo-3.3.16-ccwills-200302151826.sgf 110
 297 owl_defend C8
@@ -218,7 +218,7 @@ white E1
 black B1
 white D1
 314 owl_defend A2
-#? [1 F1]*
+#? [1 F1]
 
 loadsgf games/splee2.sgf 128
 315 owl_does_attack Q9 M10
@@ -231,7 +231,7 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 136
 # J5 and J3 fail spectacularly due to shortage of liberties.
 loadsgf games/owl46.sgf
 317 owl_attack J4
-#? [1 (J7|J6|J8)]
+#? [1 (J7|J6|J8)]*
 
 ########### end of tests #####################
 

@@ -303,7 +303,7 @@ loadsgf games/trevor/auto/d24.sgf 216
 #M11 loses points.
 loadsgf games/trevor/auto/d24.sgf 218
 620 gg_genmove white
-#? [!M11]*
+#? [!M11]
 
 
 loadsgf games/trevor/auto/d24.sgf 224

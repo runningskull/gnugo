@@ -863,7 +863,7 @@ loadsgf games/owl32.sgf
 # There are probably additional moves.
 loadsgf games/owl33.sgf 134
 235 owl_attack O4
-#? [1 (S3|T4)]*
+#? [1 (S3|T4)]
 236 owl_defend O4
 #? [1 (R4|S3|R3|S2|Q5|P5)]
 

@@ -7,7 +7,7 @@ loadsgf games/viking1.sgf 15
 
 loadsgf games/viking1.sgf 23
 2 gg_genmove white 
-#? [E2]
+#? [E2]*
 
 loadsgf games/viking1.sgf 65
 3 gg_genmove white 

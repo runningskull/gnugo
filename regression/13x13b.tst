@@ -267,7 +267,7 @@ loadsgf games/mertin13x13/MFGN3.sgf 58
 # Must connect at F8.
 loadsgf games/mertin13x13/WLGN2.sgf 74
 40 gg_genmove white
-#? [F8]
+#? [F8]*
 
 loadsgf games/mertin13x13/GNWL1.sgf 61
 41 gg_genmove black

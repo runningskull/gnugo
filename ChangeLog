@@ -2,14 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.19 released June 3, 2003
+
 - hoshi.sgf split into hoshi_keima.sgf and hoshi_other.sgf
 - new functions recursive_break(), recursive_block() in readconnect.c:
   decide whether a string can be connected to an arbitrary goal area
 - new functions break_in(), block_off(), frontends to the functions above
 - corresponding GTP commands break_in, block_off
 - new file breakin.c evaluates whether territories can be broken in
-- new command line parameter --experimental-break-in to enable new
-  code evaluating territory break-ins
+- new command line --experimental-break-in to evaluate territory break-ins
 - retire move_safety check in value_moves.c for territorial move valuation
 - read_eye() revised
 - `num_defends' field of half_eye_data strtucture renamed `num_defenses'
@@ -21,17 +22,16 @@
 - new function partition_eyespaces()
 - new function owl_find_relevant_eyespaces()
 - cpu time support for regress.pike
-- new function spread_connection_distances() broken out of
-  compute_connection_distances() and tuned
-- t moves degraded to value 16
+- broke new spread_connection_distances() out of compute_connection_distances()
+- new spread_connection_distances() tuned
+- t moves devalued to value 16
 - new function edge_distance() in board.c
 - CPU time reported by twogtp.py
 - new static function endgame_find_backfilling_dame() in endgame.c
 - new static function endgame_find_liberties() broken out of
   endgame_analyze_worm_liberties()
 - new owl_mineye() and owl_maxeye() and corresponding autohelper functions
-- move_connects_strings revised not to care about connecting
-  invincible strings
+- move_connects_strings revised not to try connecting invincible strings
 - ALL_MOVE move reasons no longer considered to guarantee a safe move
 - never give cutstone bonus for an inessential string
 - new test suite joseki.tst

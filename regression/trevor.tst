@@ -677,5 +677,5 @@ loadsgf games/nngs/theDoor-gnugo-3.3.11-200211130142.sgf 72
 #   ;weak(a) && oplay_defend(*,B)
 loadsgf games/nngs/theDoor-gnugo-3.3.11-200211130142.sgf 208
 1110 gg_genmove black
-#? [O12]*
+#? [O12]
 
