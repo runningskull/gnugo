@@ -27,7 +27,8 @@ EXTRA_DIST = $(DSP)\
 	fuseki9.db\
 	fuseki13.db\
 	fuseki19.db\
-	read_attack.db
+	read_attack.db\
+	read_defend.db
 
 mkpat_SOURCES  = mkpat.c transform.c
 
@@ -38,7 +39,6 @@ DFAFLAGS = -D -m
 else
 DFAFLAGS =
 endif
-
 
 transpat_SOURCES = transpat.c patlib.c transform.c
 transpat_LDADD = 
@@ -62,7 +62,7 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
-		 read_attack.c
+		 read_attack.c read_defend.c
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
 
@@ -149,4 +149,7 @@ fuseki19.c : $(srcdir)/fuseki19.db mkpat$(EXEEXT)
 
 read_attack.c : $(srcdir)/read_attack.db mkpat$(EXEEXT)
 	./mkpat -b read_attack < $(srcdir)/read_attack.db >read_attack.c
+
+read_defend.c : $(srcdir)/read_defend.db mkpat$(EXEEXT)
+	./mkpat -b read_defend < $(srcdir)/read_defend.db >read_defend.c
 
