@@ -585,6 +585,9 @@ examine_move_safety(int color)
       case OWL_DEFEND_MOVE:
       case OWL_DEFEND_MOVE_GOOD_KO:
       case OWL_DEFEND_MOVE_BAD_KO:
+       	/* FIXME: The above imply not necessarily a safe move, if the
+	 * defending move is not connected to the dragon defended.
+	 */
       case MY_ATARI_ATARI_MOVE:
       case EITHER_MOVE:         /* FIXME: More advanced handling? */
       case ALL_MOVE:            /* FIXME: More advanced handling? */
@@ -1544,19 +1547,11 @@ estimate_territorial_value(int pos, int color, float score)
 	break;
       }
 
-      {
-	int ii;
-	for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-	  if (IS_STONE(board[ii]) && is_same_dragon(ii, aa)) {
-	    if (move_reasons[r].type == OWL_ATTACK_MOVE
-		|| move_reasons[r].type == OWL_ATTACK_MOVE_GOOD_KO
-		|| move_reasons[r].type == OWL_ATTACK_MOVE_BAD_KO)
-	      saved_stones[ii] = INFLUENCE_CAPTURED_STONE;
-	    else
-	      saved_stones[ii] = INFLUENCE_SAVED_STONE;
-	  }
-	}
-      }
+      /* Mark the affected dragon for use in the territory analysis. */
+      mark_changed_dragon(pos, color, aa, move_reasons[r].type,
+	  		  saved_stones, &this_value);
+      this_value *= 2.0;
+
       TRACE("  %1m: owl attack/defend for %1m\n", pos, aa);
       
       /* FIXME: How much should we reduce the value for ko attacks? */

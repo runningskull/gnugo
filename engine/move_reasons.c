@@ -1427,6 +1427,87 @@ get_saved_worms(int pos, int saved[BOARDMAX])
   }    
 }
 
+/* This function marks all stones whose status is changed by an owl move
+ * reason according to the following rules:
+ * 1. For an owl attack, all stones belonging to the attacked dragon are
+ *    marked as INFLUENCE_CAPTURED_STONE
+ * 2. For an owl defense, all stones belonging to the defended dragon are
+ *    markes as INFLUENCE_SAVED_STONE if they are also sufficiently
+ *    tactically stable.
+ *
+ * In effective_size, the sum of the effective size of the changed worms
+ * is returned (unless it is a NULL pointer).
+ */
+void
+mark_changed_dragon(int pos, int color, int affected_dragon,
+    		    int move_reason_type, char changed_stones[BOARDMAX],
+		    float *effective_size)
+{
+  int ii;
+  char new_status = INFLUENCE_SAVED_STONE;
+  int result_to_beat = 0;
+
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(board[affected_dragon]), pos);
+
+  if (effective_size != NULL)
+    *effective_size = 0.0;
+
+  switch (move_reason_type) {
+    case OWL_ATTACK_MOVE:
+    case OWL_ATTACK_MOVE_GOOD_KO:
+    case OWL_ATTACK_MOVE_BAD_KO:
+      ASSERT1(board[affected_dragon] == OTHER_COLOR(color), pos);
+      new_status = INFLUENCE_CAPTURED_STONE;
+      if (effective_size != NULL)
+	*effective_size = dragon[affected_dragon].effective_size;
+      break;
+    case OWL_DEFEND_MOVE:
+      ASSERT1(board[affected_dragon] == color, pos);
+      result_to_beat = WIN;
+      break;
+    case OWL_DEFEND_MOVE_GOOD_KO:
+      ASSERT1(board[affected_dragon] == color, pos);
+      result_to_beat = KO_A;
+      break;
+    case OWL_DEFEND_MOVE_BAD_KO:
+      ASSERT1(board[affected_dragon] == color, pos);
+      result_to_beat = KO_B;
+      break;
+    default:
+      /* mark_changed_dragon() called with invalid move reason. */
+      ASSERT1(0, pos);
+  }
+
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    if (board[ii] == board[affected_dragon]
+	&& is_same_dragon(ii, affected_dragon)) {
+      if (new_status == INFLUENCE_CAPTURED_STONE)
+	changed_stones[ii] = new_status;
+      else if (worm[ii].origin == ii) {
+	int worm_is_safe = 0;
+	if (worm[ii].attack_codes[0] == NO_MOVE
+	    || defense_move_reason_known(pos, find_worm(ii)))
+	  worm_is_safe = 1;
+	else if (trymove(pos, color, "mark-changed-dragon", ii,
+	      		 EMPTY, NO_MOVE)) {
+	    if (REVERSE_RESULT(attack(ii, NULL)) >= result_to_beat)
+	      worm_is_safe = 1;
+	    popgo();
+	  }
+	if (worm_is_safe) {
+	  /* This string can now be considered safe. Hence we mark the
+	   * whole string as such:
+	   */
+	  mark_string(ii, changed_stones, new_status);
+	  if (effective_size != NULL)
+	    *effective_size += worm[ii].effective_size;
+	}
+      }
+    }
+  }
+}
+
 
 /* Find dragons rescued by a move at (pos). */
 void
