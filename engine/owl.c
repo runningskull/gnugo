@@ -1697,7 +1697,7 @@ do_owl_attack(int str, int *move, int *wormid,
 
 #if USE_HASHTABLE_NG
 
-  if ((stackp <= owl_branch_depth) && (hashflags & HASH_OWL_ATTACK)
+  if ((hashflags & HASH_OWL_ATTACK)
       && tt_get(&ttable, komaster, kom_pos, OWL_ATTACK, str,
 		depth - stackp, NULL, 
 		&value1, &value2, &xpos) == 2) {
@@ -1729,7 +1729,7 @@ do_owl_attack(int str, int *move, int *wormid,
 
 #else
 
-  if ((stackp <= owl_branch_depth) && (hashflags & HASH_OWL_ATTACK)) {
+  if (hashflags & HASH_OWL_ATTACK) {
     found_read_result = get_read_result(OWL_ATTACK, komaster, kom_pos, 
 					&str, &read_result);
     if (found_read_result) {
@@ -2425,7 +2425,7 @@ do_owl_defend(int str, int *move, int *wormid,
   
 #if USE_HASHTABLE_NG
 
-  if ((stackp <= owl_branch_depth) && (hashflags & HASH_OWL_DEFEND)
+  if ((hashflags & HASH_OWL_DEFEND)
       && tt_get(&ttable, komaster, kom_pos, OWL_DEFEND, str,
 		depth - stackp, NULL, 
 		&value1, &value2, &xpos) == 2) {
@@ -2457,7 +2457,7 @@ do_owl_defend(int str, int *move, int *wormid,
 
 #else
 
-  if ((stackp <= owl_branch_depth) && (hashflags & HASH_OWL_DEFEND)) {
+  if (hashflags & HASH_OWL_DEFEND) {
     found_read_result = get_read_result(OWL_DEFEND, komaster, kom_pos,
 					&str, &read_result);
     if (found_read_result) {
