@@ -380,7 +380,7 @@ trymove(int pos, int color, const char *message, int str,
   if (sgf_dumptree) {
     char buf[100];
     if (str == 0) {
-      if (IS_STONE(komaster))
+      if (komaster != EMPTY)
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, count_variations, hashdata.hashval,
 		    color_to_string(komaster),
@@ -390,7 +390,7 @@ trymove(int pos, int color, const char *message, int str,
 		    message, count_variations, hashdata.hashval);
     }
     else {
-      if (IS_STONE(komaster))
+      if (komaster != EMPTY)
 	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
 		    hashdata.hashval, color_to_string(komaster),
@@ -434,7 +434,7 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
     char buf[100];
     if (!message)
       message = "???";
-    if (IS_STONE(komaster))
+    if (komaster != EMPTY)
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
 		  message, count_variations, hashdata.hashval,
 		  color_to_string(komaster), location_to_string(kom_pos));
@@ -908,7 +908,7 @@ komaster_trymove(int pos, int color, const char *message, int str,
    * there is suicide. If komaster == GRAY we don't remember who
    * owns the ko so we have to try both colors.
    */
-  if (IS_STONE(komaster)
+  if (komaster != EMPTY
       && (IS_STONE(board[kom_pos])
 	  || (komaster != GRAY
 	      && !is_ko(kom_pos, OTHER_COLOR(komaster), NULL)
@@ -1024,7 +1024,7 @@ komaster_trymove(int pos, int color, const char *message, int str,
     return 1;
 
   /* Conditional ko captures are only allowed if the komaster is EMPTY. */
-  if (!consider_conditional_ko || IS_STONE(komaster))
+  if (!consider_conditional_ko || komaster != EMPTY)
     return 0;
 
   if (tryko(pos, color, message, komaster, kom_pos)) {
