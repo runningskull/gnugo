@@ -387,7 +387,7 @@ loadsgf games/trevor/trevor_38.sgf 39
 #SEVERITY=1
 loadsgf games/trevor/trevor_38.sgf 41
 382 gg_genmove black
-#? [E8]*
+#? [E8]
 
 
 #CATEGORY=PATTERN_TUNING

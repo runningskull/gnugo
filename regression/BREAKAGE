@@ -1,3 +1,17 @@
+========================== 3.3.20 pre 5 =====================================
+
+./regress.sh . owl.tst 
+123 unexpected FAIL: Correct '1 C5', got '1 B1'
+150 unexpected FAIL: Correct '0', got '1 G13'
+./regress.sh . ld_owl.tst 
+68 unexpected PASS!
+./regress.sh . connection.tst 
+104 unexpected PASS!
+./regress.sh . trevor.tst 
+382 unexpected PASS!
+./regress.sh . global.tst 
+44 unexpected FAIL: Correct 'D5', got 'G7'
+
 ========================== 3.3.20 pre 4 =====================================
 
 ./regress.sh . connection.tst 
