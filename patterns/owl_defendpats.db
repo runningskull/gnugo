@@ -486,6 +486,26 @@ Pattern D123
 :|,-,value(65)
 
 
+Pattern D124
+# tm New Pattern (3.1.20) (see trevorb:660)
+
+X..   split off weak stones
+*OO
+.Xx
+...
+---
+
+:8,-,value(81)
+
+X..   split off weak stones
+*OO
+.ax
+...
+---
+
+;weak(a)
+
+
 #########################################################
 #                                                       #
 #          Expanding moves on the second line           #
@@ -1091,7 +1111,7 @@ O.OD?
 
 Pattern D308
 # tm added b category (3.1.17)
-# tm increased value (3.1.20)
+# tm modified & increased value (3.1.20)
 
 o.O         chimera
 .*X
@@ -1101,30 +1121,36 @@ o.O         chimera
 ocO
 b*X
 
-; oplay_attack(*,b,b) && oplay_attack(*,c,c)
+; oplay_attack(*,b,b) && oplay_attack(*,c,c) && safe_xmove(*)
 
 
-Pattern D308b
 
-o.O         chimera
-.*X
-
-:8,s,value(75)
-
-ocO
-b*A
-
-;lib(A)<=2 && oplay_attack(*,b,b) && oplay_attack(*,c,c) && safe_xmove(*)
+# tm removed this pattern (3.1.20)
+#   almost identical to D308 - in fact more restrictive, with lesser value.
+#Pattern D308b
+#
+#o.O         chimera
+#.*X
+#
+#:8,s,value(75)
+#
+#ocO
+#b*A
+#
+#;lib(A)<=2 && oplay_attack(*,b,b) && oplay_attack(*,c,c) && safe_xmove(*)
 
 
 Pattern D309
 # tm modified (3.1.16)
+# tm reduced value (3.1.20) (see dniwog:5)
+# FIXME: Adding B attribute solve niki:14 - not sure why -tm.
+#     adding it breaks a lot, however (i.e. trevorb:590)
 
 ?O?        block off area
 X*.
 ooo
 
-:8,-,value(80)
+:8,-,value(65)
 
 ?O?
 b*a
@@ -1696,8 +1722,9 @@ AO..
 
 
 Pattern D600
+# tm modified (3.1.20) (see strategy4:203)
 
-?OX?         eye with reverse sente
+oOX?         eye with reverse sente
 OxOX
 o*..
 ----
@@ -1707,8 +1734,9 @@ o*..
 
 Pattern D600a
 # tm New Pattern (3.1.15)
+# tm modified (3.1.20)
 
-?OX??         eye with reverse sente, avoid ko
+oOX??         eye with reverse sente, avoid ko
 OxOX?
 o.*.X
 -----
@@ -2330,6 +2358,22 @@ OOOaX
 -----
 
 ; oplay_attack(*,a,B,a)
+
+
+Pattern D637
+# tm New Pattern (3.1.20)  (see strategy4:171)
+#   FIXME: This is due to a defect in the eye space handing.
+#          This point should come through as a vital point.
+
+O*.
+XO?
+
+:8,-,value(65)
+
+A*d
+bO?
+
+; ko(b) && owl_topological_eye(*,A) > 2 && !obvious_false_oeye(d)
 
 
 #########################################################
@@ -4849,6 +4893,7 @@ ooo
 
 
 Pattern D1320
+# tm modified (3.1.20)
 
 O*O      connect to friendly dragon
 
@@ -4857,6 +4902,23 @@ O*O      connect to friendly dragon
 a*b
 
 ;!owl_goal_dragon(a) || !owl_goal_dragon(b)
+
+
+Pattern D1320a
+# tm New Pattern (3.1.20)
+
+?X?
+O*O      connect to friendly dragon
+...
+
+:|,n,value(70)
+
+?f?
+A*B
+cde
+
+; (!owl_goal_dragon(A) || !owl_goal_dragon(B)) &&
+; !xplay_attack_either(*,d,c,c,*)
 
 
 Pattern D1321
@@ -5877,6 +5939,25 @@ B.
 
 ; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0) &&
 ; oplay_attack(*,c,d)
+
+
+Pattern D1383
+# tm New Pattern (3.1.20)
+
+?Oo
+...
+?*.
+?.?
+
+:8,s,value(71)
+
+?OD
+fbc
+?We
+?a?
+
+;(owl_escape_value(a) > 0)
+; && (xplay_attack(b,c,f,D,e,e) || xplay_attack(b,c,f,e,D,D))
 
 #########################################################
 #                                                       #

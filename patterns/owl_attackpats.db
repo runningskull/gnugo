@@ -2965,7 +2965,9 @@ b*c
 
 
 Pattern A1101c
-# New Pattern
+# New Pattern (before 3.1.20 - when?)
+# tm - should be !xplay_defend_both ???
+#   see strategy3:150 for wasted move.
 
 O*O   connect against threat
 ?X?
@@ -3303,6 +3305,8 @@ Dcb
 Pattern A1120
 # tm New Pattern (3.1.20)
 #   see also D1380
+# tm Modified (3.1.20)
+#   see global:40 (owl_does_defend F4 H2)
 
 ?..	block escape
 .*.
@@ -3314,7 +3318,9 @@ X.?
 .*C
 X.?
 
-; owl_escape_value(A) + owl_escape_value(B) + owl_escape_value(C) > 3
+; (owl_escape_value(A) > 0)
+; + (owl_escape_value(B) > 0)
+; + (owl_escape_value(C) > 0) > 1
 
 
 Pattern A1121

@@ -64,6 +64,9 @@ loadsgf golois/Goemate990903-6.sgf
 16 gg_genmove black
 #? [O10]*
 
+#CATEGORY=CONNECTION
+#DESCRIPTION=
+#SEVERITY=
 loadsgf golois/Goemate990903-7.sgf
 17 gg_genmove black
 #? [P9]*
@@ -87,6 +90,9 @@ loadsgf golois/Goemate990911-1.sgf
 21 gg_genmove black
 #? [G11]*
 
+#CATEGORY=CONNECTION
+#DESCRIPTION=
+#SEVERITY=
 loadsgf golois/Goemate990911-2.sgf
 22 gg_genmove black
 #? [F2]
@@ -184,6 +190,9 @@ loadsgf golois/MeilleurCoup990428-1.sgf
 45 gg_genmove black
 #? [D5]
 
+#CATEGORY=SEMEAI
+#DESCRIPTION=
+#SEVERITY=
 loadsgf golois/Neurogo97-1.sgf
 46 gg_genmove white
 #? [J2]*

@@ -94,7 +94,7 @@ loadsgf games/nicklas/nicklas14.sgf 43
 1402 gg_genmove black
 #? [J8|J6]
 
-#CATEGORY=OWL_TUNING
+#CATEGORY=SEMEAI
 #DESCRIPTION=PASS here is unthinkable, though RESIGN might be appropriate!
 #SEVERITY=5
 # One eye wins against no eye

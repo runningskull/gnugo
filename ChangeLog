@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- mkpat does consistency checking between the diagram and constraint diagram
 - new function connect_and_cut_helper() in helpers.c
 - least significant bit of move reason now denotes a threat
 - bugfix in add_attack_either_move
@@ -13,11 +14,12 @@
 - defend3() revised
 - avoid giving followup values to non-sente threats in
   threaten_to_capture_helper() and in estimate_territorial_value()
-- regression revisions
 - new test_gray_border() in board.c with assertions in genmove.c
 - xplay_attack_either returns WIN not 1
 - improved debugging and trace output
 - checking of sgf GM and FF properties revised
+- removed redundant EITHER_MOVEs
+- minor cleanup in move_reasons.c
 - html view enhancements
 - tuning
 - influence tuning

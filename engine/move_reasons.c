@@ -618,6 +618,20 @@ concerns_inessential_dragon(int pos, int what)
   return DRAGON2(dragons[what]).safety == INESSENTIAL; 
 }
 
+
+static int
+either_move_redundant(int pos, int what)
+{
+  return ((either_data[what].reason1 == ATTACK_STRING
+	   && attack_move_reason_known(pos, either_data[what].what1))
+	  || (either_data[what].reason2 == ATTACK_STRING
+	      && attack_move_reason_known(pos, either_data[what].what2)));
+}
+
+
+/* ---------------------------------------------------------------- */
+
+
 /*
  * Add to the reasons for the move at (pos) that it attacks the worm
  * at (ww).
@@ -2661,6 +2675,9 @@ static struct discard_rule discard_rules[] =
   { { ATTACK_EITHER_MOVE, DEFEND_BOTH_MOVE, -1 },
     tactical_move_vs_either_worm_known, REDUNDANT,
     "  %1m: 0.0 - att. either/def. both involving %1m (direct att./def. as well)\n"},
+  { { EITHER_MOVE, -1 },
+    either_move_redundant, REDUNDANT,
+    "  %1m: 0.0 - either move is redundant at %1m (direct att./def. as well)\n"},
   /* FIXME: Add handling of EITHER_MOVE */
   { { ATTACK_MOVE, ATTACK_MOVE_GOOD_KO,
       ATTACK_MOVE_BAD_KO, ATTACK_THREAT,
@@ -3248,6 +3265,8 @@ estimate_strategical_value(int pos, int color, float score)
   int l;
   int aa = NO_MOVE;
   int bb = NO_MOVE;
+  float aa_value = 0.0;
+  float bb_value = 0.0;
   int d1 = -1;
   int d2 = -1;
   int worm1 = -1;
@@ -3368,33 +3387,29 @@ estimate_strategical_value(int pos, int color, float score)
 
       case EITHER_MOVE:
 	/* FIXME: Generalize this to more types of threats. */
-	{
-	  float aa_value;
-	  float bb_value;
+	worm1 = either_data[move_reasons[r].what].what1;
+	worm2 = either_data[move_reasons[r].what].what2;
+	aa = worms[worm1];
+	bb = worms[worm2];
 
-	  worm1 = either_data[move_reasons[r].what].what1;
-	  worm2 = either_data[move_reasons[r].what].what2;
-	  aa = worms[worm1];
-	  bb = worms[worm2];
+	/* If both worms are dead, this move reason has no value. */
+	if (dragon[aa].matcher_status == DEAD 
+	    && dragon[bb].matcher_status == DEAD)
+	  break;
 
-	  /* If both worms are dead, this move reason has no value. */
-	  if (dragon[aa].matcher_status == DEAD 
-	      && dragon[bb].matcher_status == DEAD)
-	    break;
+	/* Also if there is a combination attack, we assume it covers
+	 * the same thing.
+	 */
+	if (move_reason_known(pos, MY_ATARI_ATARI_MOVE, -1))
+	  break;
 
-	  /* Also if there is a combination attack, we assume it covers
-	   * the same thing.
-	   */
-	  if (move_reason_known(pos, MY_ATARI_ATARI_MOVE, -1))
-	    break;
+	aa_value = adjusted_worm_attack_value(pos, aa);
+	bb_value = adjusted_worm_attack_value(pos, bb);
+	this_value = gg_min(aa_value, bb_value);
 
-	  aa_value = adjusted_worm_attack_value(pos, aa);
-	  bb_value = adjusted_worm_attack_value(pos, bb);
-	  this_value = gg_min(aa_value, bb_value);
+	TRACE("  %1m: %f - either attacks %1m (%f) or attacks %1m (%f)\n",
+	      pos, this_value, aa, aa_value, bb, bb_value);
 
-	  TRACE("  %1m: %f - either attacks %1m (%f) or attacks %1m (%f)\n",
-		pos, this_value, aa, aa_value, bb, bb_value);
-	}
 	tot_value += this_value;
 	break;
 	
@@ -3423,26 +3438,22 @@ estimate_strategical_value(int pos, int color, float score)
 	    && move_reason_known(pos, YOUR_ATARI_ATARI_MOVE, -1))
 	  break;
 
-	{
-	  float aa_value;
-	  float bb_value;
+	if (move_reasons[r].type == ATTACK_EITHER_MOVE) {
+	  aa_value = adjusted_worm_attack_value(pos, aa);
+	  bb_value = adjusted_worm_attack_value(pos, bb);
+	  this_value = gg_min(aa_value, bb_value);
 
-	  if (move_reasons[r].type == ATTACK_EITHER_MOVE) {
-	    aa_value = adjusted_worm_attack_value(pos, aa);
-	    bb_value = adjusted_worm_attack_value(pos, bb);
-	    this_value = gg_min(aa_value, bb_value);
-
-	    TRACE("  %1m: %f - attacks either %1m (%f) or %1m (%f)\n",
-		  pos, this_value, aa, aa_value, bb, bb_value);
-	  }
-	  else {
-	    this_value = 2 * gg_min(worm[aa].effective_size,
-				    worm[bb].effective_size);
-
-	    TRACE("  %1m: %f - defends both %1m and %1m\n",
-		  pos, this_value, aa, bb);
-	  }
+	  TRACE("  %1m: %f - attacks either %1m (%f) or %1m (%f)\n",
+		pos, this_value, aa, aa_value, bb, bb_value);
 	}
+	else {
+	  this_value = 2 * gg_min(worm[aa].effective_size,
+				  worm[bb].effective_size);
+
+	  TRACE("  %1m: %f - defends both %1m and %1m\n",
+		pos, this_value, aa, bb);
+	}
+
 	tot_value += this_value;
 	break;
 	

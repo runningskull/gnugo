@@ -154,6 +154,10 @@ loadsgf games/strategy14a.sgf
 79 gg_genmove black
 #? [N3]
 
+
+#CATEGORY=SEMEAI
+#DESCRIPTION=
+#SEVERITY=
 # This is essentially a semeai problem
 loadsgf games/strategy22.sgf
 80 gg_genmove white
@@ -224,6 +228,9 @@ loadsgf games/strategy25.sgf 67
 92 gg_genmove black
 #? [G13]
 
+#CATEGORY=SEMEAI
+#DESCRIPTION=
+#SEVERITY=
 loadsgf games/strategy25.sgf 75
 93 gg_genmove black
 #? [D11]*

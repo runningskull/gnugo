@@ -833,7 +833,7 @@ loadsgf games/trevor/auto/c78.sgf 102
 
 # games/trevor/auto/c81.sgf problems:
 
-#Best to slide aroung G11 first.
+#Best to slide around G12 first.
 loadsgf games/trevor/auto/c81.sgf 32
 1430 gg_genmove white
 #? [!G1]

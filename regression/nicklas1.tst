@@ -185,6 +185,9 @@ loadsgf games/nicklas/nicklas12.sgf 123
 1210 dragon_status D18
 #? [dead]
 
+#CATEGORY=SEMEAI
+#DESCRIPTION=
+#SEVERITY=
 loadsgf games/nicklas/nicklas12.sgf 203
 1213 gg_genmove black
 #? [N4]*

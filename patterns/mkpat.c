@@ -126,10 +126,16 @@ int patno;		        /* current pattern */
 int pats_with_constraints = 0;  /* just out of interest */
 int label_coords[256][2];       /* Coordinates for labeled stones in the 
 				   autohelper patterns. */
-int current_i;		        /* Counter for the line number of a 
+int current_i;		        /* Counter for the line number of the
+				   diagram */ 
+int current_c_i;		/* Counter for the line number of a 
 				   constraint diagram. */
 char constraint[MAXCONSTRAINT]; /* Store constraint lines. */
 char action[MAXCONSTRAINT];     /* Store action lines. */
+static char diagram[MAX_BOARD+2][MAX_BOARD+3];
+				/* store pattern diagram*/
+static char constraint_diagram[MAX_BOARD+2][MAX_BOARD+3];
+				/* store pattern constraint diagram */
 
 /* stuff to maintain info about patterns while reading */
 struct pattern pattern[MAXPATNO];  /* accumulate the patterns into here */
@@ -143,6 +149,7 @@ struct autohelper_func {
   int params;
   const char *code;
 };
+
 
 /*
  * current_* are useful for debugging broken patterns.
@@ -318,10 +325,40 @@ dfa_t dfa;
  **************************/
 
 /* reset state of all pattern variables */
+#define CHECK_CHARS "xXoO"
 static void
 reset_pattern(void)
 {
-  int i;
+  int i, j, ino = 0, iso = 0, jwo = 0, jeo = 0;
+
+  if (patno > 0) {
+    int have_constraint = (pattern[patno].autohelper_flag & HAVE_CONSTRAINT);
+    if (where & NORTH_EDGE)
+      ino = 1;
+    if (where & SOUTH_EDGE)
+      iso = 1;
+    if (where & WEST_EDGE)
+      jwo = 1;
+    if (where & EAST_EDGE)
+      jeo = 1;
+    if (verbose) {
+      for(i = ino; i <= maxi+ino+iso; i++)
+        fprintf(stderr, "%02d %s\n", i, diagram[i]);
+      for(i = ino; i <= maxi+ino+iso; i++)
+        fprintf(stderr, "%02d %s\n", i, constraint_diagram[i]);
+    }
+    if (have_constraint) {
+      for(i = ino; i <= maxi+ino; i++)
+        for(j = jwo; j <= maxj+jwo; j++) {
+          if(strchr(CHECK_CHARS, constraint_diagram[i][j]) &&
+            constraint_diagram[i][j] != diagram[i][j] ) {
+	      fprintf(stderr, "%s(%d) : Error : xXoO not matched in constraint diagram of pattern pattern_names[patno] %s\n",
+	        current_file, current_line_number, pattern_names[patno]);
+              fatal_errors++;
+	  }
+        }
+    }
+  }
 
   maxi = 0;
   maxj = 0;
@@ -334,8 +371,15 @@ reset_pattern(void)
   for (i = 0; i < 256; i++)
     label_coords[i][0] = -1;
   current_i = 0;
+  current_c_i = 0;
   constraint[0] = 0;
   action[0] = 0;
+  for(i = 0; i < MAX_BOARD+2; i++) {
+    for(j = 0; j < MAX_BOARD+3; j++) {
+      diagram[i][j] = '\0';
+      constraint_diagram[i][j] = '\0';
+    }
+  }
 }
   
 
@@ -469,8 +513,10 @@ static void
 read_pattern_line(char *p)
 {
   const char *char_offset;
+  char *pcopy = p;
   int j;
   int width;
+  int jwo = 0, jeo = 0;
 
   if (where & SOUTH_EDGE)
     /* something wrong here : pattern line after a SOUTH_EDGE constraint */
@@ -618,6 +664,12 @@ read_pattern_line(char *p)
   if (j > maxj)
     maxj = j;
 
+
+  if (where & WEST_EDGE)
+    jwo = 1;
+  if (where & EAST_EDGE)
+    jeo = 1;
+  strncpy(diagram[maxi], pcopy, maxj + jwo + jeo);
   maxi++;
 
   return;
@@ -644,6 +696,8 @@ static void
 read_constraint_diagram_line(char *p)
 {
   int j;
+  int jwo = 0, jeo = 0;
+  const char *pcopy = p;
 
   /* North or south boundary, no letter to be found. */
   if (*p == '+' || *p == '-')
@@ -660,7 +714,7 @@ read_constraint_diagram_line(char *p)
 	&& label_coords[(int)*p][0] == -1) {
 
       /* New constraint letter */
-      label_coords[(int)*p][0] = current_i;
+      label_coords[(int)*p][0] = current_c_i;
       label_coords[(int)*p][1] = j;
     }
   }
@@ -677,7 +731,12 @@ read_constraint_diagram_line(char *p)
     return;
   }
 
-  current_i++;
+  if (where & WEST_EDGE)
+    jwo = 1;
+  if (where & EAST_EDGE)
+    jeo = 1;
+  strncpy(constraint_diagram[current_c_i], pcopy, maxj+jwo+jeo+1);
+  current_c_i++;
 
   return;
 }
@@ -688,7 +747,7 @@ read_constraint_diagram_line(char *p)
 static void
 check_constraint_diagram_size(void)
 {
-  if (current_i != maxi + 1) {
+  if (current_c_i != maxi + 1) {
     fprintf(stderr, "%s(%d) : error : Mismatching height of constraint diagram in pattern %s\n", 
 	    current_file, current_line_number, pattern_names[patno]);
     fatal_errors++;
@@ -1199,7 +1258,8 @@ finish_constraint_and_action(char *name)
   pattern[patno].autohelper = dummyhelper;
   
   /* Generate autohelper function declaration. */
-  code_pos += sprintf(code_pos, "static int\nautohelper%s%d(struct pattern *patt, int transformation, int move, int color, int action)\n{\n  int",
+  code_pos += sprintf(code_pos, 
+		      "static int\nautohelper%s%d(struct pattern *patt, int transformation, int move, int color, int action)\n{\n  int",
 		      name, patno);
 
   /* Generate variable declarations. */
@@ -1312,7 +1372,8 @@ write_elements(FILE *outfile, char *name)
   for (node = 0;node < el; node++) {
     assert(elements[node].x >= mini && elements[node].y >= minj);
     if (!(elements[node].x <= maxi && elements[node].y <= maxj)) {
-      fprintf(stderr, "%s(%d) : error : Maximum number of elements exceeded in %s.\n",
+      fprintf(stderr, 
+	      "%s(%d) : error : Maximum number of elements exceeded in %s.\n",
 	      current_file, current_line_number, name);
       fatal_errors++;
     };
@@ -1622,7 +1683,8 @@ main(int argc, char *argv[])
       case 6:
       case 7:
       case 8:
-	fprintf(stderr, "%s(%d) : error : Huh, another diagram here? (pattern %s)\n",
+	fprintf(stderr, 
+		"%s(%d) : error : What, another diagram here? (pattern %s)\n",
 		current_file, current_line_number, pattern_names[patno]);
         fatal_errors++;
 	break;
@@ -1630,6 +1692,7 @@ main(int argc, char *argv[])
 	state++; /* fall through */
       case 2:
 	read_pattern_line(line);
+	current_i++;
 	break;
       case 4:
 	state++; /* fall through */
@@ -1641,6 +1704,7 @@ main(int argc, char *argv[])
     else if (line[0] == ':') {
       if (state == 2 || state == 3) {
 	finish_pattern(line);
+
 	write_elements(output_FILE, argv[gg_optind]);
 	if (dfa_generate)
 	  write_to_dfa(patno);

@@ -3276,6 +3276,7 @@ OO..X
 
 
 Pattern EB8
+# tm added d class (3.1.20)
 
 .X..         slide
 O..X
@@ -3283,10 +3284,11 @@ O..X
 ....
 ----
 
-:8,OXe
+:8,OXed
 
 
 Pattern EB9
+# tm added d class (3.1.20)
 
 .X.??          slide
 ...OO
@@ -3294,10 +3296,11 @@ Pattern EB9
 .....
 -----
 
-:8,OXe
+:8,OXed
 
 
 Pattern EB10
+# tm added d class (3.1.20)
 
 ?...X?          large slide
 ?O...?
@@ -3305,7 +3308,7 @@ O...*.
 .....?
 ------
 
-:8,OXe
+:8,OXed
 
 
 Pattern EB11
@@ -4124,11 +4127,26 @@ xaOO.
 
 
 Pattern EB507
+# tm Reduced shape value from 4 to 3 (3.1.20)
 
 ?o??
 ?O..           block
 X*..
 ....
+....
+----
+
+:8,Eb,shape(3)
+
+
+
+Pattern EB507a
+# tm New Pattern (3.1.20) (see strategy:26)
+
+?o??
+?O..           block
+X*..
+O...
 ....
 ----
 
@@ -4848,6 +4866,7 @@ Pattern EB701
 
 
 Pattern EB702a
+# tm modified (3.1.20) (see endgame:102)
 
 ??o???           prevent incursion
 ?XO.??
@@ -4857,11 +4876,12 @@ Pattern EB702a
 :8,OXb,reverse_followup(6)
 
 ??o???
-?Xa.??
-..X*.?
+?Xab??
+.cX*.?
 ------
 
-;lib(a)>2
+;lib(a)>2 ||
+;!oplay_attack_either(*,b,c,*,a)
 
 
 Pattern EB702b
@@ -5014,6 +5034,7 @@ o.bb
 Pattern EB712
 # Probably bigger reverse followup in reality
 # tm Modified (3.1.17)
+# tm Modified (3.1.20)
 
 ?O..          block
 XO..
@@ -5027,7 +5048,7 @@ XOb.
 C*a.
 ----
 
-;!owl_threatens(*,C) && !xplay_attack_either(*,a,b,*,b)
+; !xplay_attack_either(*,a,b,*,b)
 
 
 Pattern EB713
@@ -5112,6 +5133,7 @@ cXA*.
 
 Pattern EB718
 # tm New Pattern (3.1.20)
+# compare to EB715 - slightly different.
 
 O.*    jump back to block
 X..
@@ -8089,6 +8111,7 @@ Pattern CB272
 
 
 Pattern CB273
+# FIXME: See global:8 for unexpected difficulty.
 
 ??O?        jump out
 ?XO?
@@ -8562,6 +8585,7 @@ X.X*.
 
 
 Pattern CB314
+# FIXME: See global:8 for unexpected match.
 
 xX..          block!
 ?...
@@ -8789,13 +8813,14 @@ OB?
 
 
 Pattern CB330
+# tm removed 'd' attribute (3.1.20) (see arend:3)
 
 ?.?       push
 ...
 X*X
 ?O?
 
-:|,OXbeEd,shape(3)
+:|,OXbeE,shape(3)
 
 
 Pattern CB331
@@ -10077,22 +10102,24 @@ XOX
 Pattern ED76
 # gf The negative shape value is a temporary measure to avoid
 #    overvaluation. (3.1.17)
+# tm Added right hand side check (3.1.20) (see strategy4:195)
 
-oOo?     stop expansion and undermine
-o..X
-o.*.
-....
-----
+oOo???     stop expansion and undermine
+o..X??
+o.*.x?
+....??
+------
 
 :8,OXba,shape(-3)
 
-oOo?
-obaX
-oc*.
-....
-----
+oOo???
+obaX?g
+oc*.xf
+....??
+------
 
 ;oplay_attack_either(*,a,b,c,a,c)
+;&& !oarea(f) && !oarea(g)
 
 
 Pattern ED77
@@ -12917,6 +12944,7 @@ O..O..O     Eliminate invasion point
 
 
 Pattern LE1
+# tm Modified (3.1.20) (see arend:31)
 
 O.Xx      fourth line sente kosumi
 .*..
@@ -12924,7 +12952,7 @@ O.Xx      fourth line sente kosumi
 ....
 ----
 
-:8,OX,value(14)
+:8,OXebE
 
 O.Xx      fourth line sente kosumi
 .*.a
@@ -13032,13 +13060,15 @@ Pattern LE6
 # tm - revised (3.1.15) (see trevora:330)
 #   added left-hand ?s
 # gf Revised. (3.1.20)
+# see also trevora:280, arend:23
+# tm Revised. (3.1.20)
 
 ?oo???
 ?..*.x
 ?....X
 ?..O??
 
-:8,OX,value(8)
+:8,OXbeE
 
 ?ocbd?
 ?..*.x
@@ -13366,5 +13396,27 @@ OXOX?
 
 > replace(a,*)
 
+Pattern RE7
+# tm New Pattern (3.1.20) (see strategy4:173)
+# FIXME: This seems a little underhanded, prob. not best fix.
+
+|.??   better for ko threats
+|*.?
+|XO?
+|X.o
+|?O?
+
+:8,-
+
+|.??   better for ko threats
+|*.?
+|bO?
+|bao
+|?O?
+
+; oplay_attack(a,b) &&
+; (oplay_attack(a,b) == oplay_attack(*,b))
+
+> replace(a,*)
 
 # END OF FILE

@@ -41,6 +41,9 @@ loadsgf games/strategy27.sgf 208
 108 gg_genmove white
 #? [C15]
 
+#CATEGORY=SEMEAI
+#DESCRIPTION=
+#SEVERITY=
 # Important semeai example.
 loadsgf games/strategy27.sgf 216
 109 gg_genmove white
