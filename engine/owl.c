@@ -489,7 +489,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  && countlib(semeai_worms[sworm]) < 3
 	  && attack(semeai_worms[sworm], NULL)
 	  && find_defense(semeai_worms[sworm], &upos))
-	owl_add_move(moves, upos, 160, "defend semeai worm", 2, 0, NO_MOVE,
+	owl_add_move(moves, upos, 160, "defend semeai worm", 1, 0, NO_MOVE,
 		     MAX_SEMEAI_MOVES);
   }
   /* 
@@ -571,9 +571,11 @@ do_owl_analyze_semeai(int apos, int bpos,
       sgf_dumptree = save_sgf_dumptree;
       count_variations = save_count_variations;
       if (max_eyes(&probable_eyes_b) == 0) {
+	TRACE("Two eyes versus none\n");
 	SGFTRACE_SEMEAI(PASS_MOVE, ALIVE, "Two eyes versus none");
       }
       else {
+	TRACE("Two eyes versus one\n");
 	SGFTRACE_SEMEAI(PASS_MOVE, ALIVE, "Two eyes versus one");
       }
       READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, DEAD);
@@ -589,9 +591,11 @@ do_owl_analyze_semeai(int apos, int bpos,
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	if (max_eyes(&probable_eyes_b) == 0) {
+	  TRACE("Two eyes or escape versus none\n");
 	  SGFTRACE_SEMEAI(PASS_MOVE, ALIVE, "Two eyes or escape versus none");
 	}
 	else {
+	  TRACE("Two eyes or escape versus one\n");
 	  SGFTRACE_SEMEAI(PASS_MOVE, ALIVE, "Two eyes or escape versus one");
 	}
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, DEAD);
@@ -603,6 +607,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	TRACE("Both live\n");
 	SGFTRACE_SEMEAI(PASS_MOVE, ALIVE, "Both live");
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
       }
@@ -614,12 +619,17 @@ do_owl_analyze_semeai(int apos, int bpos,
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	if (min_eyes(&probable_eyes_b) == 0) {
+	  TRACE("Two eyes or escape versus none, %1m kills certainly\n",
+		vital_offensive_moves[0].pos);
 	  SGFTRACE_SEMEAI(vital_offensive_moves[0].pos,
 			  ALIVE, "Two eyes or escape versus none");
 	}
-	else
+	else {
+	  TRACE("Two eyes or escape versus one, %1m kills certainly\n",
+		vital_offensive_moves[0].pos);
 	  SGFTRACE_SEMEAI(vital_offensive_moves[0].pos, 
 		          ALIVE, "Two eyes or escape versus one");
+	}
 	READ_RETURN_SEMEAI(read_result, move, vital_offensive_moves[0].pos,
 			   ALIVE, DEAD);
       }
@@ -639,6 +649,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	TRACE("You (%C) live, I die\n", other);
 	SGFTRACE_SEMEAI(PASS_MOVE, DEAD, "You live, I die");
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, DEAD, ALIVE);
       }
@@ -649,6 +660,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	TRACE("Both live\n");
 	SGFTRACE_SEMEAI(PASS_MOVE, ALIVE, "Both live");
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
       }
@@ -659,6 +671,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (move) *move = vital_defensive_moves[0].pos;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
+	TRACE("Both live\n");
 	SGFTRACE_SEMEAI(vital_defensive_moves[0].pos, ALIVE, "Both live");
 	READ_RETURN_SEMEAI(read_result, move, vital_defensive_moves[0].pos,
 			   ALIVE, ALIVE);
@@ -893,7 +906,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 	&& stackp < MAX_SEMEAI_DEPTH
 	&& semeai_trymove(mpos, color, moves[k].name, apos, bpos,
 			  owl_phase, moves[k].value)) {
-      if ((debug & DEBUG_SEMEAI) && verbose)
+      TRACE("Trying %C %1m. Current stack: ", color, mpos);
+      if (verbose)
 	dump_stack();
       if (board[bpos] == EMPTY) {
 	this_resultb = DEAD;
@@ -926,6 +940,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	*resulta = ALIVE;
 	*resultb = DEAD;
 	if (move) *move = mpos;
+	TRACE("After %1m I (%C) am alive, you are dead\n", mpos, color);
 	SGFTRACE_SEMEAI(mpos, ALIVE, moves[k].name);
 	close_pattern_list(color, &shape_defensive_patterns);
 	close_pattern_list(color, &shape_offensive_patterns);
@@ -957,6 +972,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     *resulta = ALIVE_IN_SEKI;
     *resultb = ALIVE_IN_SEKI;
     if (move) *move = PASS_MOVE;
+    TRACE("Seki\n");
     SGFTRACE_SEMEAI(PASS_MOVE, ALIVE_IN_SEKI, "Seki");
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 
 		       ALIVE_IN_SEKI, ALIVE_IN_SEKI);
@@ -965,6 +981,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (best_resulta == UNKNOWN) {
     do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
 			  resultb, resulta, NULL, 1, owl_phase);
+    TRACE("No move found\n");
     SGFTRACE_SEMEAI(PASS_MOVE, UNKNOWN, "No move found");
     if (move) *move = PASS_MOVE;
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, *resulta, *resultb);
@@ -1029,8 +1046,10 @@ semeai_move_value(int move, struct local_owl_data *owla,
       }
     }
     popgo();
-    verbose = save_verbose;
   }
+
+  verbose = save_verbose;
+
   if (net < 0)
     net = 0;
 #if 0
