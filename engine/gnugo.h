@@ -106,7 +106,7 @@ void init_gnugo(float memory);
 
 
 /* Board sizes */
-#define MIN_BOARD     3		/* minimum supported board size */
+#define MIN_BOARD     5		/* minimum supported board size */
 #define MAX_BOARD    19         /* maximum supported board size */
 #define MAX_HANDICAP  9		/* maximum supported handicap   */
 
