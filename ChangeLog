@@ -2,8 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- only print debug output for eyes created during owl reading if owl
-  debug is also enabled
+- escape patterns in owl_defendpats.db given E classification
+- owl_determine_life() not called during escape attempt
+- only print debug output for eyes during owl reading if owl debug is on
 - better traces for unused owl patterns
 - --decide-connection also reports ko results
 - bugfix in load_and_score_sgf_file()

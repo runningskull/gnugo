@@ -917,7 +917,7 @@ O*X
 ...
 ---
 
-:8,-,value(45)
+:8,E,value(45)
 
 ?ob
 X.o
@@ -1007,7 +1007,7 @@ X.Oo
 ..??
 ????
 
-:8,sb,value(70)
+:8,sbE,value(70)
 
 ----
 .ooo
@@ -1054,7 +1054,7 @@ X..??          push into the open
 O*..?
 x..??
 
-:8,-,value(80)
+:8,E,value(80)
 
 X..??
 O*.a?
@@ -1069,7 +1069,7 @@ X..?
 O.*.
 O..?
 
-:8,-,value(80)
+:8,E,value(80)
 
 X..?
 O.*a
@@ -3771,7 +3771,7 @@ OXO            connect underneath
 .*.
 ---
 
-:|,n,value(80)
+:|,nE,value(80)
 
 aXb
 .*.
@@ -4144,7 +4144,7 @@ X.X.?
 ...o?
 ?????
 
-:8,-,value(70)
+:8,E,value(70)
 
 oOX.?
 ?*..b
@@ -4163,7 +4163,7 @@ X.X.?
 ...o?
 ?????
 
-:8,-,value(81)
+:8,E,value(81)
 
 ooX.?
 ?O*.b
@@ -4232,7 +4232,7 @@ Pattern D1124
 OXO        double atari
 X*?
 
-:8,b,value(90)
+:8,bE,value(90)
 
 OAc
 B*?
@@ -4247,7 +4247,7 @@ ooo?
 .*X.
 ?OOX
 
-:8,-,value(79)
+:8,E,value(79)
 
 abc?
 ...o
@@ -4334,7 +4334,7 @@ OX       cut to capture something and escape
 X*
 ?O
 
-:8,-,value(90)
+:8,E,value(90)
 
 bC
 D*
@@ -4367,7 +4367,7 @@ Ox*.         escape
 oO..
 ----
 
-:8,-,value(65)
+:8,E,value(65)
 
 ?X.o
 Ox*a
@@ -4397,7 +4397,7 @@ Pattern D1135
 O*.	connect out, threaten cut
 X.?
 
-:8,-,value(35)
+:8,E,value(35)
 
 O*a
 B.?
@@ -4430,7 +4430,7 @@ Pattern D1137
 X*.o
 O.??
 
-:8,B,value(65)
+:8,BE,value(65)
 
 ?oc?
 ?..d
@@ -4449,7 +4449,7 @@ Pattern D1138
 .X*?   breakout!
 XOX?
 
-:8,sb,value(85)
+:8,sbE,value(85)
 
 e?f?
 .B*?
@@ -4469,7 +4469,7 @@ Pattern D1139
 XO
 OX
 
-:8,b,value(75)
+:8,bE,value(75)
 
 ?*
 aO
@@ -4485,7 +4485,7 @@ Pattern D1140
 ?*.
 ???
 
-:8,b,value(70)
+:8,bE,value(70)
 
 ?aO
 b*.
@@ -4644,7 +4644,7 @@ OX         connect out
 .*
 XO
 
-:8,-,value(90)
+:8,E,value(90)
 
 cb
 a*
@@ -4659,7 +4659,7 @@ OX         connect out
 *.
 XO
 
-:8,-,value(89)
+:8,E,value(89)
 
 cX
 *a
@@ -4709,7 +4709,7 @@ X.*o?
 ?O.o?
 ??Xo?
 
-:/,-,value(80)
+:/,E,value(80)
 
 ?????
 ooca?
@@ -4728,7 +4728,7 @@ X.*.o
 ?O..o
 ??X.o
 
-:/,-,value(80)
+:/,E,value(80)
 
 oooab
 ....c
@@ -4747,7 +4747,7 @@ oooo
 X.Ox
 ?O.X
 
-:8,-,value(75)
+:8,E,value(75)
 
 ????
 oabc
@@ -4765,7 +4765,7 @@ xX*.    try to escape
 X.O.
 ?O.X
 
-:8,-,value(79)
+:8,E,value(79)
 
 ??ab
 xX*.
@@ -4782,7 +4782,7 @@ xX.*o    try to escape
 X.O.?
 ?O.??
 
-:8,-,value(80)
+:8,E,value(80)
 
 ???oa
 xX.*o
@@ -4801,7 +4801,7 @@ O.*o?	 try to escape
 ....?
 -----
 
-:8,-,value(75)
+:8,E,value(75)
 
 ooob?
 O.*a?
@@ -4820,7 +4820,7 @@ O..*o    try to escape
 .....
 -----
 
-:8,-,value(81)
+:8,E,value(81)
 
 oo..b
 O..*a
@@ -4841,7 +4841,7 @@ O...O
 .....
 -----
 
-:8,-,value(82)
+:8,E,value(82)
 
 ?ooo?
 o.*.b
@@ -4862,7 +4862,7 @@ Pattern D1310
 X*oo
 ?OX?
 
-:8,-,value(80)
+:8,E,value(80)
 
 dabo
 eooc
@@ -4881,7 +4881,7 @@ o.oo    try to escape
 .*.o
 xOX?
 
-:8,-,value(80)
+:8,E,value(80)
 
 oabo
 o.oc
@@ -4899,7 +4899,7 @@ ooooo
 X*..o
 ?OX??
 
-:8,-,value(80)
+:8,E,value(80)
 
 ooabo
 ....c
@@ -4917,7 +4917,7 @@ O.*.     run away
 ....
 ????
 
-:8,-,value(55)
+:8,E,value(55)
 
 O..b
 O.*a
@@ -4935,7 +4935,7 @@ O.O.     run away
 ....
 .*..
 
-:8,-,value(55)
+:8,E,value(55)
 
 o.o?
 O.O.
@@ -4954,7 +4954,7 @@ O.O     run away
 .*.
 ...
 
-:8,-,value(50)
+:8,E,value(50)
 
 o.o
 O.O
@@ -4985,7 +4985,7 @@ o.*O
 o...
 ??XX
 
-:8,-,value(90)
+:8,E,value(90)
 
 o..X
 a.*O
@@ -5086,7 +5086,7 @@ Pattern D1323
 
 O*O      connect to escape
 
-:+,n,value(35)
+:+,nE,value(35)
 
 a*b
 
@@ -5100,7 +5100,7 @@ Pattern D1323a
 ?O*
 ?.O
 
-:8,n,value(55)
+:8,nE,value(55)
 
 BCd
 AO*
@@ -5117,7 +5117,7 @@ Pattern D1324
 *.O
 O.O      connect by bamboo joint to escape
 
-:8,n,value(86)
+:8,nE,value(86)
 
 *.b
 a.b
@@ -5130,7 +5130,7 @@ Pattern D1325
 .*O
 OXO      connect to friendly dragon by atari to escape
 
-:8,n,value(86)
+:8,nE,value(86)
 
 .*b
 aCb
@@ -5142,7 +5142,7 @@ Pattern D1326
 
 O*O      connect to escape
 
-:+,-,value(35)
+:+,E,value(35)
 
 a*b
 
@@ -5154,7 +5154,7 @@ Pattern D1327
 *.O
 O.O      connect by bamboo joint to escape
 
-:8,-,value(36)
+:8,E,value(36)
 
 *.b
 a.b
@@ -5167,7 +5167,7 @@ Pattern D1328
 .*O
 OXO      connect to friendly dragon by atari to escape
 
-:8,-,value(36)
+:8,E,value(36)
 
 .*b
 aCb
@@ -5191,7 +5191,7 @@ X*.X
 ....
 oooo
 
-:8,-,value(90)
+:8,E,value(90)
 
 ?O.x
 E*cX
@@ -5208,7 +5208,7 @@ XO.X
 .X*.
 oooo
 
-:8,B,value(90)
+:8,BE,value(90)
 
 ?O.x
 COaX
@@ -5226,7 +5226,7 @@ XO*X
 xXO.
 oooo
 
-:8,-,value(95)
+:8,E,value(95)
 
 ?O?x
 XO*X
@@ -5243,7 +5243,7 @@ XOX
 *XO
 ooo
 
-:8,B,value(90)
+:8,BE,value(90)
 
 ?O?
 AdX
@@ -5260,7 +5260,7 @@ XOX
 *XO
 ?O?
 
-:8,-,value(90)
+:8,E,value(90)
 
 ?O?
 XdX
@@ -5277,7 +5277,7 @@ XOX          break out into the center, followup
 OXO
 o*o
 
-:|,-,value(95)
+:|,E,value(95)
 
 XOX
 OXO
@@ -5293,7 +5293,7 @@ Pattern D1335
 o*XO
 oo.?
 
-:/,B,value(95)
+:/,BE,value(95)
 
 ?O??
 .Xb?
@@ -5309,7 +5309,7 @@ XOo           capture to escape
 *XO
 oOX
 
-:8,-,value(95)
+:8,E,value(95)
 
 XOo
 *XO
@@ -5325,7 +5325,7 @@ X..X
 ..*.
 oooo
 
-:8,B,value(90)
+:8,BE,value(90)
 
 ?OO?
 EbaX
@@ -5342,7 +5342,7 @@ X*XX
 ..O.
 oooo
 
-:8,-,value(90)
+:8,E,value(90)
 
 ?OO?
 C*XX
@@ -5359,7 +5359,7 @@ Pattern D1339
 X*X
 oOo
 
-:|,-,value(93)
+:|,E,value(93)
 
 ?O?
 X*X
@@ -5375,7 +5375,7 @@ OX*O
 ....
 ----
 
-:8,-,value(85)
+:8,E,value(85)
 
 obX?
 cX*d
@@ -5393,7 +5393,7 @@ X*.X
 ...?
 ooo?
 
-:8,-,value(60)
+:8,E,value(60)
 
 ?O??
 X*.X
@@ -5422,7 +5422,7 @@ o..X
 o.*.
 ?x.O
 
-:8,-,value(77)
+:8,E,value(77)
 
 obo?
 a..X
@@ -5440,7 +5440,7 @@ o..X
 o.*o
 ?XoO
 
-:8,-,value(60)
+:8,E,value(60)
 
 obo?
 a..X
@@ -5458,7 +5458,7 @@ o..X
 o*.o
 ?.oO
 
-:8,-,value(60)
+:8,E,value(60)
 
 obo?
 a..X
@@ -5476,7 +5476,7 @@ o..X
 o*..
 ?..O
 
-:8,B,value(55)
+:8,BE,value(55)
 
 obo?
 a..X
@@ -5493,7 +5493,7 @@ oO*.o       escape along edge
 o....
 -----
 
-:8,-,value(85)
+:8,E,value(85)
 
 ?XX?o
 oO*.a
@@ -5509,7 +5509,7 @@ Pattern D1345
 OXO        atari to connect
 .*.
 
-:8,b,value(85)
+:8,bE,value(85)
 
 cDe
 a*b
@@ -5526,7 +5526,7 @@ X.*.
 x...
 oooo
 
-:8,-,value(65)
+:8,E,value(65)
 
 ?O.X
 X.*.
@@ -5558,7 +5558,7 @@ Pattern D1348
 O.?	    connect to friendly dragon to escape
 .*O
 
-:8,n,value(36)
+:8,nE,value(36)
 
 a.?
 .*b
@@ -5572,7 +5572,7 @@ a.?
 #O.?
 #.*O      connect to friendly dragon to escape
 #
-#:8,-,value(36)
+#:8,E,value(36)
 #
 #a.?
 #.*b
@@ -5585,7 +5585,7 @@ Pattern D1350
 ?*..       capture lunch to escape (may be undervalued)
 OXO.
 
-:8,-,value(85)
+:8,E,value(85)
 
 ?*bc
 OAOd
@@ -5600,7 +5600,7 @@ XO?
 .*X
 o.?
 
-:8,-,value(65)
+:8,E,value(65)
 
 XO?
 .*X
@@ -5640,7 +5640,7 @@ Pattern D1354
 X...x
 ?OOO?
 
-:8,-,value(65)
+:8,E,value(65)
 
 ?abc?
 ?.*.?
@@ -5671,7 +5671,7 @@ o....         jump towards safety
 O.*..
 o....
 
-:8,-,value(80)
+:8,E,value(80)
 
 o..a.
 O.*b.
@@ -5687,7 +5687,7 @@ O....
 O.*..
 ?OXOo
 
-:8,-,value(61)
+:8,E,value(61)
 
 o...a
 O...b
@@ -5702,7 +5702,7 @@ Pattern D1358
 O..?         connect to escape
 O.*O
 
-:8,-,value(61)
+:8,E,value(61)
 
 bde?
 bc*a
@@ -5719,7 +5719,7 @@ Pattern D1359
 ?..OX
 ?.Oo?
 
-:8,-,value(65)
+:8,E,value(65)
 
 ?bc.?
 a....
@@ -5738,7 +5738,7 @@ Pattern D1360
 ...x
 .O.x
 
-:8,-,value(65)
+:8,E,value(65)
 
 ??ac
 ..*b
@@ -5854,7 +5854,7 @@ Pattern D1368
 ..OX
 XOo?
 
-:8,-,value(70)
+:8,E,value(70)
 
 b..?
 .*X?
@@ -5872,7 +5872,7 @@ oo?        move out
 .*.
 XO?
 
-:8,-,value(75)
+:8,E,value(75)
 
 ao?
 b.X
@@ -5891,7 +5891,7 @@ oOo        move out
 .*X
 .O?
 
-:8,b,value(85)  
+:8,bE,value(85)  
 
 oao
 ...
@@ -5908,7 +5908,7 @@ OX.         escape underneath
 .*O
 ---
 
-:8,-,value(85)
+:8,E,value(85)
 
 aB.
 .*O
@@ -5922,7 +5922,7 @@ Pattern D1373
 
 o*XO        capture to escape
 
-:-,-,value(85)
+:-,E,value(85)
 
 a*BO
 
@@ -5936,7 +5936,7 @@ oo..Xo        connect underneath
 ...*O.
 ------
 
-:8,-,value(55)
+:8,E,value(55)
 
 ab..Xo
 ...*O.
@@ -5969,7 +5969,7 @@ OoX?
 x.*O
 ----
 
-:8,-,value(75)
+:8,E,value(75)
 
 bdE?
 xc*a
@@ -6020,7 +6020,7 @@ x..
 O*X
 ?X?
 
-:8,-,value(65)
+:8,E,value(65)
 
 ?BC
 xeA
@@ -6042,7 +6042,7 @@ Pattern D1380
 .*.
 O.?
 
-:8,-,value(65)
+:8,E,value(65)
 
 ?AB
 .*C
@@ -6057,7 +6057,7 @@ Pattern D1381
 O*.
 ?XO
 
-:8,-,value(70)
+:8,E,value(70)
 
 O*a
 ?CB
@@ -6073,7 +6073,7 @@ Pattern D1382
 *X
 O.
 
-:8,-,value(70)
+:8,E,value(70)
 
 cA
 *d
@@ -6092,7 +6092,7 @@ Pattern D1383
 ?*.
 ?.?
 
-:8,sb,value(71)
+:8,sbE,value(71)
 
 ?Bo
 ...
@@ -6112,7 +6112,7 @@ O..   escape or capture to escape
 .*?
 ?.O
 
-:8,-,value(65)
+:8,E,value(65)
 
 A..
 .*c
@@ -6130,7 +6130,7 @@ Pattern D1385
 X*
 ?O
 
-:8,-,value(75)
+:8,E,value(75)
 
 fB
 dc
