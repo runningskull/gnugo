@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new update_random_seed()
+- gtp_set_boardsize updates the random seed
+- reset engine updates the random seed
 - aftermath revisions
 - combination of --score aftermath and -o options more useful
 - dead function opponent_not_passing() removed from genmove.c

@@ -1740,6 +1740,18 @@ time_report(int n, const char *occupation, int move, double mintime)
   return dt;
 }
 
+/* Update the random seed with the current value in the random sequence. */
+void
+update_random_seed(void)
+{
+  random_seed = gg_rand();
+  /* Since random seed 0 has a special interpretation when given as
+   * command line argument with the -r option, we make sure to avoid
+   * it.
+   */
+  if (random_seed == 0)
+    random_seed = 1;
+}
 
 
 /*

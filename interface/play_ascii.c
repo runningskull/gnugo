@@ -988,6 +988,8 @@ Type \"save <filename>\" to save,\n\
     passes = 0;
     showdead = 0;
     sgf_initialized = 0;
+    /* Play a different game next time. */
+    update_random_seed();
   }
   printf("\nThanks for playing GNU Go.\n\n");
 }

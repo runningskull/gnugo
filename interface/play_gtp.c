@@ -346,11 +346,23 @@ static int
 gtp_set_boardsize(char *s, int id)
 {
   int boardsize;
+  int pos;
+
   if (sscanf(s, "%d", &boardsize) < 1)
     return gtp_failure(id, "boardsize not an integer");
   
   if (boardsize < MIN_BOARD || boardsize > MAX_BOARD)
     return gtp_failure(id, "unacceptable boardsize");
+
+  /* If this is called with a non-empty board, we assume that a new
+   * game will be started, for which we want a new random seed.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos) && board[pos] != EMPTY) {
+      update_random_seed();
+      break;
+    }
+  }
 
   board_size = boardsize;
   clear_board();

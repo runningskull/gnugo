@@ -65,6 +65,14 @@ void sgfShowConsideredMoves(void);
 void
 reset_engine()
 {
+  /* To improve the reproducability of games, we restart the random
+   * number generator with the same seed for each move. Thus we don't
+   * have to know how many previous moves have been played, nor
+   * actually play through them, in order to get the right random
+   * numbers.
+   */
+  gg_srand(random_seed);
+
   /* Initialize things for hashing of positions. */
   reading_cache_clear();
   hashdata_recalc(&hashdata, board, board_ko_pos);

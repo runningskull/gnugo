@@ -165,6 +165,8 @@ int have_common_lib(int str1, int str2, int *lib);
 void start_timer(int n);
 double time_report(int n, const char *occupation, int move, double mintime);
 
+void update_random_seed(void);
+
 
 /* Play at (pos) and then count the liberties. */
 int accurate_approxlib(int pos, int color, int maxlib, int *libs);

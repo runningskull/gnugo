@@ -103,24 +103,6 @@ clear_move_reasons(void)
   next_all = 0;
   next_eye = 0;
   next_lunch = 0;
-
-  /* To improve the reproducability of games, we restart the random
-   * number generator with the same seed for each move. Thus we don't
-   * have to know how many previous moves have been played, nor
-   * actually play through them, in order to get the right random
-   * numbers.
-   *
-   * Comment: This means we might set these numbers only once instead
-   *          of before each move. This is not without complications
-   *          though, since we don't have full control of when the
-   *          random seed is changed. Better to do it for each move.
-   *
-   * Comment 2: While this is a good idea, we're not yet quite ready
-   *            to make use of it.
-   */
-#if 0
-  gg_srand(random_seed);
-#endif
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
