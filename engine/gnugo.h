@@ -309,8 +309,6 @@ extern int mandated_owl_node_limit;
 /* Keep this as 2D until we change the entire API. */
 extern float potential_moves[MAX_BOARD][MAX_BOARD];
 
-extern volatile int time_to_die;   /* set by signal handlers */
-
 /* ================================================================ */
 /*                 tracing and debugging functions                  */
 /* ================================================================ */
