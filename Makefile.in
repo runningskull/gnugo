@@ -79,14 +79,12 @@ SUBDIRS = utils sgf engine patterns interface doc regression
 
 DISTCLEANFILES = *~
 
-EXTRA_DIST = config.vc makevcdist.pl WINDOWS
-
 acdir = m4
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = config.vc
+CONFIG_CLEAN_FILES =
 DIST_SOURCES =
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
@@ -95,8 +93,8 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
 	uninstall-recursive check-recursive installcheck-recursive
 DIST_COMMON = README ./stamp-h.in AUTHORS COPYING ChangeLog INSTALL \
 	Makefile.am Makefile.in NEWS THANKS TODO acconfig.h aclocal.m4 \
-	config.h.in config.vcin configure configure.in depcomp \
-	install-sh missing mkinstalldirs
+	config.h.in configure configure.in depcomp install-sh missing \
+	mkinstalldirs
 DIST_SUBDIRS = $(SUBDIRS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -142,8 +140,6 @@ $(srcdir)/./stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) $(top_srcdir)/a
 
 distclean-hdr:
 	-rm -f config.h
-config.vc: $(top_builddir)/config.status config.vcin
-	cd $(top_builddir) && CONFIG_FILES=$@:config.vcin CONFIG_HEADERS= CONFIG_LINKS= $(SHELL) ./config.status
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -249,7 +245,6 @@ GZIP_ENV = --best
 distdir: $(DISTFILES)
 	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/.
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \

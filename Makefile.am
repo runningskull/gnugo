@@ -4,8 +4,6 @@ SUBDIRS = utils sgf engine patterns interface doc regression
 
 DISTCLEANFILES = *~
 
-EXTRA_DIST = config.vc makevcdist.pl WINDOWS
-
 maintainer-check:
 
 # Tag before making distribution.  Also, don't make a distribution if
