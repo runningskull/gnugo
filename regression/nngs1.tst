@@ -69,7 +69,7 @@ loadsgf games/nngs/gnugo-3.1.26-farrell-200203051803.sgf 84
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 14
 16 reg_genmove white
-#? [M4]*
+#? [M4]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 34
 17 reg_genmove white
@@ -126,11 +126,11 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
 30 reg_genmove white
-#? [P17|O18]*
+#? [P17|O18]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 18
 31 reg_genmove white
-#? [N17]*
+#? [N17]
 
 # better to avoid attack on one of the two top groups
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 34
@@ -155,7 +155,7 @@ loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 64
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 59
 37 reg_genmove black
-#? [H8|K14|L15|L14]*
+#? [H8|K14|L15|L14]
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
 39 reg_genmove black
@@ -175,7 +175,7 @@ loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 153
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 10
 43 reg_genmove white
-#? [C18]*
+#? [C18]
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 36
 44 reg_genmove white
@@ -188,15 +188,15 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 46
 # defense of the top right is urgent
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
 46 reg_genmove white
-#? [!J5]*
+#? [!J5]
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 12
 47 reg_genmove white
-#? [G15|F15|G16]*
+#? [G15|F15|G16]
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 16
 48 reg_genmove white
-#? [R16]
+#? [R16]*
 
 # W is trying to live with S14 but B:T14 threatens the corner.
 # Meanwhile B17 is urgent.
@@ -206,7 +206,7 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 54
 
 loadsgf games/nngs/gnugo-3.1.29-merlin-200203281708.sgf 33
 50 reg_genmove white
-#? [O10]*
+#? [O10]
 
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 26
 51 reg_genmove white
@@ -214,7 +214,7 @@ loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 26
 
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 28
 52 reg_genmove white
-#? [L5]*
+#? [L5]
 
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 30
 53 reg_genmove white

@@ -7,7 +7,7 @@ reset_reading_node_counter
 
 loadsgf games/niki.sgf 24
 1 reg_genmove white
-#? [E17]*
+#? [E17]
 
 #CATEGORY=MIDDLE_STRATEGY
 #DESCRIPTION=Tough middle-game position

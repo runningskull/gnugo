@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.5.2 released November 5, 2003
+
+- Cosmic GNU Go disabled by default.
 - report_dragon() revised
 - gtp_worm_data() revised
 - pattern tagging

@@ -18,7 +18,7 @@ loadsgf games/strategy14.sgf 33
 
 loadsgf games/strategy14.sgf 53
 53 reg_genmove white
-#? [S15]
+#? [S15]*
 
 loadsgf games/strategy14.sgf 81
 54 reg_genmove white
@@ -70,7 +70,7 @@ loadsgf games/incident169.sgf 32
 # incident 171 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 60
 64 reg_genmove white
-#? [B13|C13|C12|E14|D14]*
+#? [B13|C13|C12|E14|D14]
 
 # incident 173 (from the disastrous Indigo game)
 # M17 connects on the edge. L16 does too but allows black to get
@@ -108,7 +108,7 @@ loadsgf games/strategy17.sgf
 # however it may be difficult to save both K16 and M18 so if the 
 # moves listed are not too undervalued we may accept this result
 70 reg_genmove white
-#? [M15|J15|N16|J16]
+#? [M15|J15|N16|J16]*
 
 # E6 is the only move.
 loadsgf games/strategy18.sgf
@@ -181,7 +181,7 @@ loadsgf games/dragon1.sgf 206
 loadsgf games/heikki/heikki01.sgf 17
 # P15 is a joseki, but GNU should at least see that P14 is urgent
 83 reg_genmove black
-#? [P14]*
+#? [P14]
 
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
@@ -227,7 +227,7 @@ loadsgf games/strategy25.sgf 61
 # tm added G13 (3.1.14)
 loadsgf games/strategy25.sgf 63
 91 reg_genmove black
-#? [B14|G13]*
+#? [B14|G13]
 
 loadsgf games/strategy25.sgf 67
 92 reg_genmove black

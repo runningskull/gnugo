@@ -77,7 +77,7 @@ loadsgf games/arend/gnugo-gnugo4.sgf 27
 # C6 is clearly the wrong side for approaching LL corner.
 loadsgf games/arend/gnugo-gnugo4.sgf 31
 15 gg_genmove black 1
-#? [F3]
+#? [F3]*
 
 
 # GNU Go loves this move! (H2 is the point to play here.) It is impossible
@@ -146,7 +146,7 @@ loadsgf games/arend/gnugo-gnugo6.sgf 174
 # D17 is wrong direction; in this position this is really bad.
 loadsgf games/arend/gnugo-gnugo7.sgf 17
 28 reg_genmove black
-#? [C16]*
+#? [C16]
 
 #CATEGORY=FUSKEI_STRATEGY
 # Black C15 is sente here, so W C14 is mandatory.
@@ -184,7 +184,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 173
 # This is a serious mistake. H17 is not huge, its HUGE.
 loadsgf games/arend/gnugo-gnugo8.sgf 32
 35 reg_genmove white
-#? [H17|J19]*
+#? [H17|J19]
 
 #CATEGORY=ENDGAME_TUNING
 # Its just one point difference, but it happens a couple of times every
@@ -209,7 +209,7 @@ loadsgf games/arend/constructed2.sgf
 # highly enough by GNU Go?
 loadsgf games/arend/constructed3.sgf
 38 reg_genmove white
-#? [O5]*
+#? [O5]
 
 #CATEGORY=STRATEGY
 # This is an example for part 1 of my comment of the previous problem.

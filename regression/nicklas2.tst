@@ -35,7 +35,7 @@ loadsgf games/nicklas/nicklas1.sgf 29
 #Added E6, still not thinking G9 is so bad. -trevor
 loadsgf games/nicklas/nicklas6.sgf 23
 601 reg_genmove black
-#? [D8|C8|D6|D4|E6]*
+#? [D8|C8|D6|D4|E6]
 
 #CATEGORY=SEMEAI_MODULE
 #DESCRIPTION=Very tough position.  Even if F1 for B, W E7 is tough.

@@ -6,7 +6,7 @@
 
 loadsgf games/nngs/gnugo-3.3.6-xtc-200208301619.sgf 16
 1 reg_genmove white
-#? [R6|S2]*
+#? [R6|S2]
 
 loadsgf games/nngs/gnugo-3.3.6-xtc-200208301619.sgf 20
 2 reg_genmove white
@@ -31,4 +31,4 @@ loadsgf games/nngs/abcd-gnugo-3.3.8-200209202043.sgf 12
 
 loadsgf games/nngs/abcd-gnugo-3.3.8-200209202043.sgf 22
 7 reg_genmove black
-#? [L5|L6|K6|M5|M3|K7|K6]*
+#? [L5|L6|K6|M5|M3|K7|K6]

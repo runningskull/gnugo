@@ -143,7 +143,7 @@ loadsgf games/nando/auto018.sgf
 #CATEGORY=?
 loadsgf games/nando/auto019.sgf
 27 reg_genmove white
-#? [D6]
+#? [D6]*
 
 # Non-transitivity problem (or is it ok to amalgamate by ko ?)
 #CATEGORY=CONNECTION
@@ -219,7 +219,7 @@ black P4
 #CATEGORY=FUSEKI
 loadsgf games/nando/kisei27_g1.sgf 14
 210 reg_genmove white
-#? [D3]*
+#? [D3]
 
 # D5 is exceedingly urgent. GG should _never_ tenuki !
 #CATEGORY=FUSEKI

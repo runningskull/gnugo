@@ -24,7 +24,7 @@ loadsgf games/century21-2002/golois-gnugo.sgf 239
 
 loadsgf games/century21-2002/goint-gnugo.sgf 37
 40 reg_genmove black 
-#? [J3]*
+#? [J3]
 
 loadsgf games/century21-2002/goint-gnugo.sgf 47
 50 reg_genmove black 
@@ -36,7 +36,7 @@ loadsgf games/century21-2002/goint-gnugo.sgf 55
 
 loadsgf games/century21-2002/goint-gnugo.sgf 111
 60 reg_genmove black 
-#? [Q14]*
+#? [Q14]
 
 loadsgf games/century21-2002/goint-gnugo.sgf 119
 70 reg_genmove black 
@@ -73,11 +73,11 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 29
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 43
 120 reg_genmove black
-#? [L3]*
+#? [L3]
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 45
 130 reg_genmove black
-#? [N4]*
+#? [N4]
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 57
 140 reg_genmove black
@@ -108,7 +108,7 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 26
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 36
 200 reg_genmove white
-#? [F6]*
+#? [F6]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 58
 210 reg_genmove white

@@ -12,7 +12,7 @@ loadsgf games/handtalk/handtalk12.sgf 17
 # -20 (!) by Pattern Shape13.
 loadsgf games/handtalk/handtalk12.sgf 37
 2 reg_genmove black
-#? [P5|Q2|R2]
+#? [P5|Q2|R2]*
 
 # The sagari at F18 (very much liked by 3.1.26-32 influence code) is bad
 # endgame here (as well as in many other situations). Also, defending N7
@@ -36,11 +36,11 @@ loadsgf games/handtalk/handtalk13.sgf 161
 
 loadsgf games/handtalk/handtalk21.sgf 14
 7 reg_genmove white
-#? [R4]*
+#? [R4]
 
 loadsgf games/handtalk/handtalk21.sgf 24
 8 reg_genmove white
-#? [!G14]*
+#? [!G14]
 
 loadsgf games/handtalk/handtalk21.sgf 46
 9 reg_genmove white
@@ -49,7 +49,7 @@ loadsgf games/handtalk/handtalk21.sgf 46
 # Other moves possible, but GNU Go should attack the D8 stone
 loadsgf games/handtalk/handtalk23.sgf 26
 10 reg_genmove white
-#? [E9|F8]*
+#? [E9|F8]
 
 # B9 is quite bad here.
 loadsgf games/handtalk/handtalk23.sgf 30

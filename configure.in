@@ -18,7 +18,7 @@ AH_TEMPLATE([VERSION],
 [Define to the version of the distribution.])
 
 dnl this defines VERSION and PACKAGE
-AM_INIT_AUTOMAKE([gnugo], [3.5.1])
+AM_INIT_AUTOMAKE([gnugo], [3.5.2])
 GNU_PACKAGE="GNU $PACKAGE"
 AC_DEFINE_UNQUOTED(GNU_PACKAGE, "$GNU_PACKAGE")
 
@@ -454,10 +454,10 @@ dnl ------------ Reading -------------------
 AH_TEMPLATE([COSMIC_GNUGO],
 [Center oriented influence. Disabled by default.])
 
-if test "$enable_cosmic_gnugo" = "no" ; then
-   AC_DEFINE(COSMIC_GNUGO, 0)
-else
+if test "$enable_cosmic_gnugo" = "yes" ; then
    AC_DEFINE(COSMIC_GNUGO, 1)
+else
+   AC_DEFINE(COSMIC_GNUGO, 0)
 fi
 
 dnl ------------ Connections -------------------

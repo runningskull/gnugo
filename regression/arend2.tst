@@ -29,12 +29,12 @@ loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 110
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 112
 70 reg_genmove white
-#? [N7|O9]
+#? [N7|O9]*
 
 # Only move.
 loadsgf games/nngs/gnugo-3.3.16-ccwills-200302151826.sgf 74
 80 reg_genmove white
-#? [L2]
+#? [L2]*
 
 loadsgf games/paul.sgf 89
 90 restricted_genmove white P9 O10
@@ -55,7 +55,7 @@ loadsgf games/nngs/gnugo-3.3.18-joshj-200304242104.sgf 58
 # See also arend:24
 loadsgf games/arend/gnugo-gnugo6.sgf 20
 130 restricted_genmove white P17 G16 F16 E15
-#? [P17]
+#? [P17]*
 
 loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf 39
 140 reg_genmove black
@@ -67,7 +67,7 @@ loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf 187
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 6
 160 reg_genmove black
-#? [O16]*
+#? [O16]
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 12
 170 reg_genmove black

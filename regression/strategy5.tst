@@ -11,11 +11,11 @@ loadsgf games/wing-yuhiko-gnugo.sgf 12
 # This might be worth a J pattern.
 loadsgf games/wing-yuhiko-gnugo.sgf 30
 222 reg_genmove black
-#? [R14]
+#? [R14]*
 
 loadsgf games/wing-yuhiko-gnugo.sgf 46
 223 reg_genmove black
-#? [P16]
+#? [P16]*
 
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf 62
@@ -25,7 +25,7 @@ loadsgf games/wing-yuhiko-gnugo.sgf 62
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf 86
 225 reg_genmove black
-#? [O12]*
+#? [O12]
 
 #CATEGORY=CONNECTION
 loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 54
@@ -46,11 +46,11 @@ loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 90
 
 loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 41
 229 reg_genmove black
-#? [D7]*
+#? [D7]
 
 loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 53
 230 reg_genmove black
-#? [H9]*
+#? [H9]
 
 loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 107
 231 reg_genmove black
@@ -59,7 +59,7 @@ loadsgf games/olympiad2002/game1-19-go4-gnugo-1-0.sgf 107
 # If tuning this position be sure GNU Go plays subsequent moves acceptably
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 17
 232 reg_genmove black
-#? [D11|E11]*
+#? [D11|E11]
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 23
 233 reg_genmove black
@@ -67,7 +67,7 @@ loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 23
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 29
 234 reg_genmove black
-#? [H14]*
+#? [H14]
 
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 47
 235 reg_genmove black

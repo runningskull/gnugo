@@ -67,7 +67,7 @@ loadsgf games/cgf2003/GnuGo-Go4.sgf 141
 # P5 clearly better than N6.
 loadsgf games/cgf2003/GnuGo-Go4.sgf 155
 205 restricted_genmove black N6 P5
-#? [P5]
+#? [P5]*
 
 # C13 only move. D13 unthinkable.
 loadsgf games/cgf2003/GnuGo-Go4.sgf 175
@@ -77,7 +77,7 @@ loadsgf games/cgf2003/GnuGo-Go4.sgf 175
 # E2 urgent for life in the corner.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 41
 301 reg_genmove black
-#? [E2]
+#? [E2]*
 
 # C1 suffices to live.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 59
@@ -87,7 +87,7 @@ loadsgf games/cgf2003/GnuGo-GoInt.sgf 59
 # P18 is clearly superior to Q18.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 69
 303 restricted_genmove black Q18 P18
-#? [P18]
+#? [P18]*
 
 # Very uninteresting to save G6.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 119
@@ -149,7 +149,7 @@ loadsgf games/cgf2003/GnuGo-GoeMate.sgf 129
 # P14 is an atari which only helps black. Q14 is the only move.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 10
 501 reg_genmove white
-#? [Q14]
+#? [Q14]*
 
 # Tenuki unreasonable. One of the running groups must be strengthened.
 loadsgf games/cgf2003/GnuGo-Haruka.sgf 42
@@ -201,7 +201,7 @@ loadsgf games/cgf2003/GnuGo-KCC.sgf 29
 # Not D2. Better to attack something.
 loadsgf games/cgf2003/GnuGo-KCC.sgf 41
 604 reg_genmove black
-#? [C8|F12|E12|G13|O7|P7|P6]
+#? [C8|F12|E12|G13|O7|P7|P6]*
 
 loadsgf games/cgf2003/GnuGo-KCC.sgf 69
 605 reg_genmove black

@@ -1,3 +1,5 @@
+========================== 3.5.2 pre 2 =====================================
+
 ./regress.sh . trevora.tst 
 470 unexpected PASS!
 ./regress.sh . strategy2.tst 

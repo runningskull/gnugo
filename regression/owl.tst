@@ -493,9 +493,9 @@ loadsgf games/owl14.sgf 250
 
 loadsgf games/owl15.sgf
 132 owl_attack Q3
-#? [(1|2) R4]*
+#? [(1|2) R4]
 133 owl_defend O3
-#? [1 M3]*
+#? [1 M3]
 
 # see also test 73
 loadsgf games/incident263.sgf 302

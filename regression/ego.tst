@@ -5,7 +5,7 @@
 # An extension to K4 or K3 is urgent here.
 loadsgf games/ego.sgf 12
 1 reg_genmove white
-#? [K4|K3]*
+#? [K4|K3]
 
 # G3 looks good here but is maybe not the only move. E5 is clearly
 # suboptimal, however.

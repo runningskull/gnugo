@@ -232,12 +232,12 @@ loadsgf games/trevor/auto/d12.sgf 16
 
 loadsgf games/trevor/auto/d12.sgf 40
 490 reg_genmove white
-#? [D5]*
+#? [D5]
 
 
 loadsgf games/trevor/auto/d12.sgf 52
 500 reg_genmove white
-#? [E3]*
+#? [E3]
 
 
 loadsgf games/trevor/auto/d12.sgf 66
@@ -251,7 +251,7 @@ loadsgf games/trevor/auto/d12.sgf 66
 
 loadsgf games/trevor/auto/d24.sgf 24
 520 reg_genmove white
-#? [D15]*
+#? [D15]
 
 
 loadsgf games/trevor/auto/d24.sgf 52
@@ -332,7 +332,7 @@ loadsgf games/trevor/auto/d25.sgf 176
 
 loadsgf games/trevor/auto/d25.sgf 178
 670 reg_genmove white
-#? [O11]*
+#? [O11]
 
 
 
@@ -445,12 +445,12 @@ loadsgf games/trevor/auto/d33.sgf 210
 
 loadsgf games/trevor/auto/d39.sgf 24
 860 reg_genmove white
-#? [Q5]*
+#? [Q5]
 
 
 loadsgf games/trevor/auto/d39.sgf 26
 870 reg_genmove white
-#? [R6]*
+#? [R6]
 
 
 loadsgf games/trevor/auto/d39.sgf 30
@@ -587,7 +587,7 @@ loadsgf games/trevor/auto/d47.sgf 100
 
 loadsgf games/trevor/auto/d48.sgf 80
 1100 reg_genmove white
-#? [N5]*
+#? [N5]
 
 
 loadsgf games/trevor/auto/d48.sgf 150

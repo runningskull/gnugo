@@ -1,6 +1,6 @@
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 26
 10 reg_genmove black
-#? [C5]*
+#? [C5]
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 36
 20 reg_genmove black
@@ -99,7 +99,7 @@ loadsgf games/nngs/norate-ggl-200212301513.sgf 234
 # game move is playable but invites trouble.
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 4
 300 reg_genmove black
-#? [P16]*
+#? [P16]
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 8
 310 reg_genmove black
@@ -107,7 +107,7 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 8
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 24
 320 reg_genmove black
-#? [D5]*
+#? [D5]
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 36
 330 reg_genmove black
@@ -185,7 +185,7 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 300
 # collection of bad tenukis
 loadsgf games/ninestones/ninestones1.sgf 18
 590 reg_genmove black
-#? [P4]*
+#? [P4]
 
 loadsgf games/ninestones/ninestones1.sgf 20
 600 reg_genmove black
@@ -205,7 +205,7 @@ loadsgf games/ninestones/ninestones1.sgf 76
 
 loadsgf games/ninestones/ninestones1.sgf 90
 630 reg_genmove black
-#? [F5|H7]*
+#? [F5|H7]
 
 # J2 is better than H2
 loadsgf games/splee.sgf 62

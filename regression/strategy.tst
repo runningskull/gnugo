@@ -28,7 +28,7 @@ loadsgf games/strategy3.sgf 14
 # Probably requires a dynamic connection analysis to solve.
 loadsgf games/incident104.sgf 63
 6 reg_genmove white
-#? [E10]
+#? [E10]*
 
 # incident 106
 loadsgf games/incident104.sgf 215
@@ -80,7 +80,7 @@ loadsgf games/incident108b.sgf 292
 # But the game move at R7 is not urgent!
 loadsgf games/incident121.sgf 24
 14 reg_genmove black
-#? [E9]*
+#? [E9]
 
 # incident 132
 loadsgf games/incident121.sgf 116
@@ -123,7 +123,7 @@ loadsgf games/strategy4.sgf
 # incident 290
 loadsgf games/incident290.sgf 30
 20 reg_genmove black
-#? [Q11]*
+#? [Q11]
 
 # incident 291
 loadsgf games/incident291.sgf 54
@@ -133,7 +133,7 @@ loadsgf games/incident291.sgf 54
 # incident 292
 loadsgf games/incident291.sgf 70
 22 reg_genmove black
-#? [K3]*
+#? [K3]
 
 # incident 294
 loadsgf games/incident291.sgf 88
@@ -200,7 +200,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 reg_genmove black
-#? [E17]*
+#? [E17]
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 reg_genmove black

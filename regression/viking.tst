@@ -3,7 +3,7 @@
 
 loadsgf games/viking1.sgf 15
 1 reg_genmove white 
-#? [O15]*
+#? [O15]
 
 loadsgf games/viking1.sgf 23
 2 reg_genmove white 

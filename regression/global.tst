@@ -69,7 +69,7 @@ loadsgf golois/Goemate990903-6.sgf
 #SEVERITY=
 loadsgf golois/Goemate990903-7.sgf
 17 reg_genmove black
-#? [P9]*
+#? [P9]
 
 loadsgf golois/Goemate990903-9.sgf
 18 reg_genmove black
@@ -106,7 +106,7 @@ loadsgf golois/Goemate991106-4.sgf
 
 loadsgf golois/Goemate991113-1.sgf
 25 reg_genmove black
-#? [D12]
+#? [D12]*
 
 loadsgf golois/Goemate991113-4.sgf
 26 reg_genmove black
@@ -142,7 +142,7 @@ loadsgf golois/Jimmy990906-1.sgf
 
 loadsgf golois/Lanka991113-1.sgf
 34 reg_genmove black
-#? [N6]*
+#? [N6]
 
 loadsgf golois/MeilleurCoup0001.sgf
 35 reg_genmove black

@@ -124,7 +124,7 @@ loadsgf games/mertin13x13/GHGN2.sgf 48
 # Most other moves are better than the game move at M6.
 loadsgf games/mertin13x13/GHGN2.sgf 52
 11 reg_genmove white
-#? [L6]*
+#? [L6]
 
 # J5 not joseki.
 loadsgf games/mertin13x13/GHGN3.sgf 8
@@ -209,7 +209,7 @@ loadsgf games/mertin13x13/GMGN2.sgf 92
 # H9 can be cut off.
 loadsgf games/mertin13x13/GMGN3.sgf 30
 28 reg_genmove white
-#? [!H9]*
+#? [!H9]
 
 # Must connect at F3.
 loadsgf games/mertin13x13/GNGM3.sgf 11
@@ -281,4 +281,4 @@ loadsgf games/mertin13x13/GNWL2.sgf 35
 # J3 is of course bigger than J1.
 loadsgf games/mertin13x13/GNWL3.sgf 109
 43 restricted_genmove black J1 J2 J3
-#? [J3]
+#? [J3]*
