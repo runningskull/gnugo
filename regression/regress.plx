@@ -352,7 +352,7 @@ if ($move) {
     if (/^$move[^0-9]/ || 
         /[^A-Za-z0-9]$move[^0-9]/ || 
         $inpattern && /^\.\.\./) {
-      print .encode_entities($_);
+      print encode_entities($_);
       $blank=0;
       $inpattern ||= /^pattern.*at $move/;
     } else {
@@ -541,7 +541,7 @@ if ($num) {
 }
 
 
-sub summaryDiagrams() {
+sub summaryDiagrams {
   my $content;
   foreach my $curfile (glob("html/$tstfile.tst/*.xml"))
   {
@@ -860,10 +860,11 @@ sub printslow {
   our $VAR1;
   do "html/one.perldata.new" or confess "can't do perldata";
   my %h = %{$VAR1->[0]};
-  sub by_cputime {
-    $h{$b}->{cputime} <=> $h{$a}->{cputime}
-    or $a cmp $b;
-  }
+  my $by_cputime = 
+    sub {
+      $h{$b}->{cputime} <=> $h{$a}->{cputime}
+      or $a cmp $b;
+    };
   
 
   print qq@<HTML>
@@ -876,7 +877,7 @@ sub printslow {
   print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD><TD>CPU Time</TD></TR>\n";
 
   my $i = 0;
-  foreach my $k (sort by_cputime keys %h) {
+  foreach my $k (sort $by_cputime keys %h) {
     $i++;
     last if $i > 50;
     print qq@<TR><TD><A HREF="?$k">$k</TD><TD>$h{$k}->{status}</TD>@;
@@ -1030,7 +1031,8 @@ sub printbycategory {
       $fails{$k} = $hash{$k} if $status =~ /failed/i;
     }
     
-    sub bycat {
+    my $by_cat = 
+    sub {
       defined $fails{$a}{file}
         or do {
           print '$a:'."$a\n";
@@ -1073,7 +1075,7 @@ sub printbycategory {
           my $nb = $fails{$b}{num};
           $na <=> $nb;
         }
-    }
+    };
     
     sub getcat(%) {
       my %h = %{shift()};
@@ -1100,7 +1102,7 @@ sub printbycategory {
     print "<TR><TD><B>Category</B></TD><TD><B>Severity</B></TD><TD><B>Problem</B></TD>\n";
     my $cat = "";
     my $sev = "";
-    foreach my $k (sort bycat keys %fails) {
+    foreach my $k (sort $by_cat keys %fails) {
       if (uc(getcat($fails{$k})) ne $cat) {
         $cat = uc(getcat($fails{$k}));
         print "</TD></TR>\n";

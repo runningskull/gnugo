@@ -201,7 +201,9 @@ $pidg = open3($goprog_in, $goprog_out, $goprog_err, $goprog)
   or die "Couldn't launch GNU Go: $!";
 print "goprog pid: $pidg\n" if $verbose > 1;
 my ($goprog_exe) = split (" ", $goprog);
--e $goprog_exe  or die "Couldn't locate go program: $goprog_exe";
+-e $goprog_exe
+  or ($goprog_exe = "$goprog_exe.exe") && -e $goprog_exe 
+  or die "Couldn't locate go program: $goprog_exe";
 $goprog_timestamp = (stat $goprog_exe)->mtime;
 
 go_command("name");
