@@ -21,7 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "board.h"
-#include "gnugo.h"
 #include "hash.h"
 #include "gg_utils.h"
 
@@ -75,34 +74,6 @@ vgprintf(FILE *outputfile, const char *fmt, va_list ap)
       {
 	double f = va_arg(ap, double); /* passed as double, not float */
 	fprintf(outputfile, "%.2f", f);
-	break;
-      }
-      case 'r':
-      {
-	int result = va_arg(ap, int);
-
-	switch (result) {
-	case 0:             
-	  fprintf(outputfile, "%s", "0");
-	  break;
-	case KO_B:          
-	  fprintf(outputfile, "%s", "KO_B");
-	  break;
-	case LOSS:          
-	  fprintf(outputfile, "%s", "LOSS");
-	  break;
-	case GAIN:          
-	  fprintf(outputfile, "%s", "GAIN");
-	  break;
-	case KO_A:          
-	  fprintf(outputfile, "%s", "KO_A");
-	  break;
-	case WIN:           
-	  fprintf(outputfile, "%s", "WIN");
-	  break;
-	  
-	default:            fprintf(outputfile, "%s", "ERROR");
-	}
 	break;
       }
       case 's':

@@ -528,11 +528,11 @@ find_large_scale_owl_attack_moves(int color)
 		      && acode == WIN) {
 		    add_owl_attack_move(pos, target, kworm, acode);
                     if (debug & DEBUG_LARGE_SCALE)
-		      gprintf("Move at %1m owl-attacks %1m on a large scale(%r).\n", 
-			      pos, target, acode);
+		      gprintf("Move at %1m owl-attacks %1m on a large scale(%s).\n", 
+			      pos, target, result_to_string(acode));
                   }
                   else if (debug & DEBUG_LARGE_SCALE)
-                    gprintf("Move at %1m isn't a clean large scale attack on %1m (%r).\n", pos, target, acode);
+                    gprintf("Move at %1m isn't a clean large scale attack on %1m (%s).\n", pos, target, result_to_string(acode));
                   
                   if (debug & DEBUG_LARGE_SCALE)
 		    gprintf("  owl nodes used = %d, dist = %d\n", 
