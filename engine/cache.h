@@ -115,9 +115,6 @@ void tt_update(Transposition_table *table, enum routine_id routine,
 /*                    The old transposition table                   */
 
 
-/* Dump (almost) all read results. */
-#define TRACE_READ_RESULTS 0
-
 /*
  * This struct contains the attack / defense point and the result.
  * It is kept in a linked list, and each position has a list of 

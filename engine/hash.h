@@ -58,6 +58,9 @@ typedef unsigned long Hashvalue;
 /* for testing: Enables a lot of checks. */
 #define CHECK_HASHING 0
 
+/* Dump (almost) all read results. */
+#define TRACE_READ_RESULTS 0
+
 /* How many bits should be used at least for hashing? Set this to 32 for
  * some memory save and speedup, at the cost of occasional irreproducable
  * mistakes (and possibly assertion failures). 

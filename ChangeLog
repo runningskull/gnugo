@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- moved TRACE_READ_RESULTS definition to hash.h
 - initialize lunch data for single owl move
 - bugfix in compute_eyes_pessimistic(): initialize chainlinks[]
 - improved sgf trace in trymove: location of tried move noted
