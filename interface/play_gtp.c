@@ -111,9 +111,11 @@ DECLARE(gtp_estimate_score);
 DECLARE(gtp_owl_analyze_semeai);
 DECLARE(gtp_tactical_analyze_semeai);
 DECLARE(gtp_owl_attack);
+DECLARE(gtp_owl_connection_defends);
 DECLARE(gtp_owl_defend);
 DECLARE(gtp_owl_does_attack);
 DECLARE(gtp_owl_does_defend);
+DECLARE(gtp_owl_substantial);
 DECLARE(gtp_owl_threaten_attack);
 DECLARE(gtp_owl_threaten_defense);
 DECLARE(gtp_playblack);
@@ -202,9 +204,11 @@ static struct gtp_command commands[] = {
   {"owl_analyze_semeai",      gtp_owl_analyze_semeai},
   {"tactical_analyze_semeai", gtp_tactical_analyze_semeai},
   {"owl_attack",     	      gtp_owl_attack},
+  {"owl_connection_defends",  gtp_owl_connection_defends},
   {"owl_defend",     	      gtp_owl_defend},
   {"owl_does_attack", 	      gtp_owl_does_attack},
   {"owl_does_defend", 	      gtp_owl_does_defend},
+  {"owl_substantial", 	      gtp_owl_substantial},
   {"owl_threaten_attack",     gtp_owl_threaten_attack},
   {"owl_threaten_defense",    gtp_owl_threaten_defense},
   {"popgo",            	      gtp_popgo},
@@ -233,7 +237,7 @@ static struct gtp_command commands[] = {
   {"white",            	      gtp_playwhite},
   {"worm_cutstone",           gtp_worm_cutstone},
   {"worm_data",               gtp_worm_data},
-  {"worm_stones",             gtp_worm_stones},  
+  {"worm_stones",             gtp_worm_stones},
   {NULL,                      NULL}
 };
 
@@ -1123,6 +1127,85 @@ gtp_owl_does_defend(char *s, int id)
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_code(defense_code);
   return gtp_finish_response();
+}  
+
+
+/* Function:  Examine whether a connection defends involved dragons.
+ * Arguments: vertex (move), vertex (dragon1), vertex (dragon2)
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   defense code
+ */
+static int
+gtp_owl_connection_defends(char *s, int id)
+{
+  int ai, aj;
+  int bi, bj;
+  int ti, tj;
+  int defense_code;
+  int n;
+
+  n = gtp_decode_coord(s, &ti, &tj);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(ti, tj) != EMPTY)
+    return gtp_failure(id, "move vertex must be empty");
+
+  s += n;
+  n = gtp_decode_coord(s, &ai, &aj);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  s += n;
+  n = gtp_decode_coord(s, &bi, &bj);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY)
+    return gtp_failure(id, "dragon vertex must not be empty");
+
+  if (BOARD(ai, aj) != BOARD(bi, bj))
+    return gtp_failure(id, "dragon vertices must have the same color");
+
+  silent_examine_position(BOARD(ai, aj), EXAMINE_DRAGONS_WITHOUT_OWL);
+  
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+  
+  defense_code = owl_connection_defends(POS(ti, tj), POS(ai, aj), POS(bi, bj));
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_print_code(defense_code);
+  return gtp_finish_response();
+}
+
+
+/* Function:  Determine whether capturing a string gives a living dragon
+ * Arguments: vertex
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   1 if dragon can live, 0 otherwise
+ */
+static int
+gtp_owl_substantial(char *s, int id)
+{
+  int i, j;
+  int result;
+  
+  if (!gtp_decode_coord(s, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  silent_examine_position(OTHER_COLOR(BOARD(i, j)),
+			  EXAMINE_DRAGONS_WITHOUT_OWL);
+  
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+
+  result = owl_substantial(POS(i, j));
+  return gtp_success(id, "%d", result);
 }  
 
 
