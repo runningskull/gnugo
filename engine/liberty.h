@@ -390,7 +390,8 @@ int owl_confirm_safety(int move, int target, int *defense_point);
 int owl_does_attack(int move, int target);
 int owl_connection_defends(int move, int target1, int target2);
 int owl_substantial(int str);
-void owl_analyze_semeai(int apos, int bpos);
+void owl_analyze_semeai(int apos, int bpos, 
+			int *resulta, int *resultb, int *move);
 void purge_persistent_owl_cache(void);
 void owl_hotspots(float values[BOARDMAX]);
 

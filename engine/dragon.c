@@ -588,7 +588,7 @@ make_dragons(int color, int stop_before_owl)
   time_report(2, "  compute dragon safety", -1, -1, 1.0);
 
   /* Resolve semeais. This may revise the safety and status fields. */
-  semeai(color);
+  if (0) semeai(color);
   time_report(2, "  semeai module", -1, -1, 1.0);
 
   /* The matcher_status is now correct at the origin of each dragon

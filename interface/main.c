@@ -808,7 +808,7 @@ main(int argc, char *argv[])
       }
 
       rotate(m, n, &m, &n, boardsize, orientation);
-      decidestring(m, n, outfile);
+      decidestring(POS(m, n), outfile);
     }
   break;
   
@@ -837,7 +837,7 @@ main(int argc, char *argv[])
 
       rotate(ai, aj, &ai, &aj, boardsize, orientation);
       rotate(bi, bj, &bi, &bj, boardsize, orientation);
-      decideconnection(ai, aj, bi, bj, outfile);
+      decideconnection(POS(ai, aj), POS(bi, bj), outfile);
     }
   break;
   
@@ -860,7 +860,7 @@ main(int argc, char *argv[])
       }
 
       rotate(m, n, &m, &n, boardsize, orientation);
-      decidedragon(m, n, outfile);
+      decidedragon(POS(m, n), outfile);
     }
     break;
   
@@ -891,7 +891,7 @@ main(int argc, char *argv[])
 
       rotate(ai, aj, &ai, &aj, boardsize, orientation);
       rotate(bi, bj, &bi, &bj, boardsize, orientation);
-      decidesemeai(ai, aj, bi, bj, outfile);
+      decidesemeai(POS(ai, aj), POS(bi, bj), outfile);
     }
     break;
     
@@ -928,7 +928,7 @@ main(int argc, char *argv[])
       }
       
       rotate(m, n, &m, &n, boardsize, orientation);
-      decideeye(m, n, outfile);
+      decideeye(POS(m, n), outfile);
     }
     break;
   

@@ -931,9 +931,9 @@ gtp_owl_defend(char *s, int id)
 
 
 /* Function:  Analyze a semeai
- * Arguments: vertex1, vertex2
+ * Arguments: dragona, dragonb
  * Fails:     invalid vertices, empty vertices
- * Returns:   
+ * Returns:   status of dragona, dragonb assuming dragona moves first
  */
 static int
 gtp_owl_analyze_semeai(char *s, int id)
@@ -941,6 +941,7 @@ gtp_owl_analyze_semeai(char *s, int id)
   int i, j;
   int k;
   int dragona, dragonb;
+  int resulta, resultb, move;
   int save_verbose = verbose;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   
@@ -967,12 +968,15 @@ gtp_owl_analyze_semeai(char *s, int id)
   if (sgf_dumptree)
       reading_cache_clear();
 
-  owl_analyze_semeai(dragona, dragonb);
+  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move);
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_mprintf("%s %s %m", 
+	      safety_to_string(resulta),
+	      safety_to_string(resultb),
+	      I(move), J(move));
+
   return gtp_finish_response();
 }  
-
-
-
 
 
 /***********************

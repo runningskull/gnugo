@@ -51,6 +51,7 @@
 #define MAX_MOVES 3           /* maximum number of branches at each node */
 #define MAX_SEMEAI_MOVES 2    /* semeai branch factor--must be <= MAX_MOVES */
 #define MAX_LUNCHES 10
+#define MAX_WORMS 10          /* maximum number of worms in a dragon to be cataloged */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -198,6 +199,8 @@ static int owl_stack_size = 0;
 static int owl_stack_pointer = 0;
 static void push_owl(struct local_owl_data *owl);
 static void pop_owl(struct local_owl_data *owl);
+static int catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS]);
+
 
 /* Called when (apos) and (bpos) point to adjacent dragons
  * of the opposite color, both with matcher_status DEAD or
@@ -208,15 +211,15 @@ static void pop_owl(struct local_owl_data *owl);
 static int owl_phase;
 
 void
-owl_analyze_semeai(int apos, int bpos)
+owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move)
 {
   static struct local_owl_data owla;
   static struct local_owl_data owlb;
-  int resulta, resultb;
   int color = board[apos];
-  int move;
   
   gg_assert(board[apos] == OTHER_COLOR(board[bpos]));
+  /* Temporarily turn the owl phase off until the tactical semeai analyzer is
+   * working. */
   owl_phase = 1;
   TRACE("owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
   owla.lunches_are_current = 0;
@@ -227,12 +230,7 @@ owl_analyze_semeai(int apos, int bpos)
   compute_owl_escape_values(&owlb);
   owl_make_domains(&owla, &owlb);
   do_owl_analyze_semeai(apos, bpos, &owla, &owlb, EMPTY,
-			&resulta, &resultb, &move, 0);
-  gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
-	  color == BLACK ? "black" : "white",
-	  move,
-	  apos, status_to_string(resulta),
-  	  bpos, status_to_string(resultb));
+			resulta, resultb, move, 0);
 }
 
 /* It is assumed that the 'a' player moves first, and
@@ -254,6 +252,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 {
   int color = board[apos];
   int other = OTHER_COLOR(color);
+  int wormsa, wormsb;
+  int goal_wormsa[MAX_WORMS], goal_wormsb[MAX_WORMS];
   struct owl_move_data vital_defensive_moves[MAX_MOVES];
   struct owl_move_data vital_offensive_moves[MAX_MOVES];
   struct owl_move_data shape_defensive_moves[MAX_MOVES];
@@ -280,6 +280,67 @@ do_owl_analyze_semeai(int apos, int bpos,
   int save_owl_phase = owl_phase;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
+
+  wormsa = catalog_goal(owla, goal_wormsa);
+  wormsb = catalog_goal(owlb, goal_wormsb);
+
+  /* First look for a tactical resolution */
+  /* FIXME: This needs to be unified with the tactical code
+   * that comes later in the function. I think that code should
+   * be taken out or moved here.
+   */
+
+#if 0
+  gprintf("%oa worms:");
+  for (k = 0; k < wormsa; k++)
+    gprintf("%o %1m", goal_wormsa[k]);
+  gprintf("\n");
+  gprintf("%ob worms:");
+  for (k = 0; k < wormsb; k++)
+    gprintf("%o %1m", goal_wormsb[k]);
+  gprintf("\n");  
+#endif 
+
+  /* Look for a tactical win */
+
+  for (k = 0; k < wormsb; k++) {
+    int worm_b = goal_wormsb[k];
+    
+    if (countlib(worm_b) > 2)
+      break;
+    
+    /* If any worm of the b dragon can be captured, declare victory.
+     * FIXME: We should confirm this worm is adjacent to the a dragon.
+     */
+    
+    if (attack(worm_b, NULL)) {
+      int dpos;
+      *resulta = ALIVE;
+      *resultb = DEAD;
+      if (move) {
+	if (find_defense(worm_b, &dpos))
+	  *move = dpos;
+	else
+	  *move = PASS_MOVE;
+      }
+      return;
+    }
+  }
+
+  /* Look for a tactical seki */
+  if (wormsa == 1 && wormsb == 1) {
+    int worm_a = goal_wormsa[0];
+    int worm_b = goal_wormsb[0];
+    if ((countlib(worm_a) == 2) 
+	&& (countlib(worm_b) == 2)
+	&& !attack(worm_a, NULL)
+	&& !attack(worm_b, NULL)) {
+      *resulta = ALIVE_IN_SEKI;
+      *resultb = ALIVE_IN_SEKI;
+      if (move) *move = PASS_MOVE;
+      return;
+    }
+  }
 
   if (count_variations > 100)
     return;
@@ -512,7 +573,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 		   shape_defensive_moves[k].name,
 		   shape_defensive_moves[k].same_dragon);
     }
-    for (k= 0; 
+    for (k = 0; 
 	 k < MAX_SEMEAI_MOVES && shape_offensive_moves[k].pos != NO_MOVE;
 	 k++) {
       if (liberty_of_goal(shape_offensive_moves[k].pos, owlb)) {
@@ -626,7 +687,9 @@ do_owl_analyze_semeai(int apos, int bpos,
       && outside_liberty.pos != NO_MOVE)
     owl_add_move(moves, outside_liberty.pos, 50, "safe outside liberty", 0);
   else {
-    if (unsafe_outside_liberty_found && outside_liberty.pos != NO_MOVE) {
+    if (unsafe_outside_liberty_found 
+	&& outside_liberty.pos != NO_MOVE
+	&& is_legal(outside_liberty.pos, color)) {
       owl_add_move(moves, outside_liberty.pos, 30,
 		   "unsafe outside liberty", 0);
       if (backfilling_move_found && backfilling_move.pos != NO_MOVE)
@@ -645,7 +708,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 
     if (mpos != NO_MOVE
 	&& trymove(mpos, color, moves[k].name, apos, EMPTY, 0)) {
-      dump_stack();
+      if (debug & DEBUG_SEMEAI)
+	dump_stack();
       if (moves[k].same_dragon)
 	mark_string(mpos, owla->goal, 1);
       owla->lunches_are_current = 0;
@@ -683,6 +747,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       owl_phase = save_owl_phase;
     }
   }
+#if 0
   /* If the opponent passed and you can't find a safe move, it's seki */
   if (moves[k].value < 40 && pass == 1) {
     *resulta = ALIVE_IN_SEKI;
@@ -731,6 +796,11 @@ do_owl_analyze_semeai(int apos, int bpos,
     if (move) *move = best_move;
     return;
   }
+#endif
+  *resulta = best_resulta;
+  *resultb = best_resultb;
+  if (move) *move = best_move;
+  return;
 }
 
 				   
@@ -4054,6 +4124,39 @@ owl_hotspots(float values[BOARDMAX])
     }
   }
 }
+
+
+/* Returns the number of worms in the goal dragon, and a pointer to each */
+
+static int
+catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS])
+{
+  int m, n;
+  int worms = 0;
+  int k;
+
+  for (k = 0; k < MAX_WORMS; k++)
+    goal_worm[k] = NO_MOVE;
+
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      int pos = POS(m, n);
+      if (owl->goal[pos]) {
+	int origin = find_origin(pos);
+	int found_one = 1;
+
+	if (pos != origin)
+	  break;
+	for (k = 0; found_one && k < worms; k++)
+	  if (goal_worm[k] == pos)
+	    found_one = 0;
+	if (found_one)
+	  goal_worm[worms++] = pos;
+      }
+    }
+  return worms;
+}
+
 
 
 /***********************/

@@ -40,13 +40,13 @@
  */
 
 void
-decidestring(int m, int n, const char *sgf_output)
+decidestring(int pos, const char *sgf_output)
 {
-  int      pos;
+  int      apos, dpos;
   int      acode, dcode;
   SGFTree  tree;
   
-  if (BOARD(m, n) == EMPTY) {
+  if (board[pos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-string called on an empty vertex\n");
     return ;
   }
@@ -58,17 +58,17 @@ decidestring(int m, int n, const char *sgf_output)
   reset_engine();
 
   count_variations = 1;
-  acode = attack(POS(m, n), &pos);
+  acode = attack(pos, &apos);
   if (acode) {
     if (acode == WIN)
-      gprintf("%m can be attacked at %1m (%d variations)\n", 
-	      m, n, pos, count_variations);
+      gprintf("%1m can be attacked at %1m (%d variations)\n", 
+	      pos, apos, count_variations);
     else if (acode == KO_A)
-	gprintf("%m can be attacked with ko (good) at %1m (%d variations)\n", 
-	      m, n, pos, count_variations);
+	gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n", 
+	      pos, apos, count_variations);
     else if (acode == KO_B)
-	gprintf("%m can be attacked with ko (bad) at %1m (%d variations)\n", 
-	      m, n, pos, count_variations);
+	gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
+		pos, apos, count_variations);
 
     if (debug & DEBUG_READING_PERFORMANCE) {
       gprintf("Reading shadow: \n");
@@ -76,21 +76,21 @@ decidestring(int m, int n, const char *sgf_output)
     }
 
     count_variations = 1;
-    dcode = find_defense(POS(m, n), &pos);
+    dcode = find_defense(pos, &dpos);
     if (dcode) {
       if (dcode == WIN)
-	gprintf("%m can be defended at %1m (%d variations)\n", 
-		m, n, pos, count_variations);
+	gprintf("%1m can be defended at %1m (%d variations)\n", 
+		pos, dpos, count_variations);
       else if (dcode == KO_A)
-	gprintf("%m can be defended with ko (good) at %1m (%d variations)\n", 
-		m, n, pos, count_variations);
+	gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n", 
+		pos, dpos, count_variations);
       else if (dcode == KO_B)
 	gprintf("%m can be defended with ko (bad) at %1m (%d variations)\n", 
-		m, n, pos, count_variations);
+		pos, dpos, count_variations);
     }
     else
-      gprintf("%m cannot be defended (%d variations)\n", 
-	      m, n, count_variations);
+      gprintf("%1m cannot be defended (%d variations)\n", 
+	      pos, count_variations);
     if (debug & DEBUG_READING_PERFORMANCE) {
       gprintf("Reading shadow: \n");
       draw_reading_shadow();
@@ -99,7 +99,7 @@ decidestring(int m, int n, const char *sgf_output)
   }
   else {
     gprintf("%m cannot be attacked (%d variations)\n", 
-	    m, n, count_variations);
+	    pos, count_variations);
     if (debug & DEBUG_READING_PERFORMANCE) {
       gprintf("Reading shadow: \n");
       draw_reading_shadow();
@@ -120,21 +120,21 @@ decidestring(int m, int n, const char *sgf_output)
  */
 
 void
-decideconnection(int ai, int aj, int bi, int bj, const char *sgf_output)
+decideconnection(int apos, int bpos, const char *sgf_output)
 {
   int move;
   int result;
   SGFTree tree;
 
-  ASSERT_ON_BOARD2(ai, aj);
-  ASSERT_ON_BOARD2(bi, bj);
+  ASSERT_ON_BOARD1(apos);
+  ASSERT_ON_BOARD1(bpos);
   
-  if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY) {
+  if (board[apos] == EMPTY || board[bpos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-connection called on an empty vertex\n");
     return ;
   }
 
-  if (BOARD(ai, aj) != BOARD(bi, bj)) {
+  if (board[apos] != board[bpos]) {
     fprintf(stderr, "gnugo: --decide-connection called for strings of different colors\n");
     return ;
   }
@@ -146,32 +146,32 @@ decideconnection(int ai, int aj, int bi, int bj, const char *sgf_output)
   reset_engine();
 
   count_variations = 1;
-  result = string_connect(POS(ai, aj), POS(bi, bj), &move);
+  result = string_connect(apos, bpos, &move);
   if (result == WIN) {
     if (move == NO_MOVE)
-      gprintf("%m and %m are connected as it stands (%d variations)\n", 
-	      ai, aj, bi, bj, count_variations);
+      gprintf("%1m and %1m are connected as it stands (%d variations)\n", 
+	      apos, bpos, count_variations);
     else
-	gprintf("%m and %m can be connected at %1m (%d variations)\n", 
-		ai, aj, bi, bj, move, count_variations);
+	gprintf("%1m and %1m can be connected at %1m (%d variations)\n", 
+		apos, bpos, move, count_variations);
   }
   else
     gprintf("%m and %m cannot be connected (%d variations)\n", 
-	    ai, aj, bi, bj, count_variations);
+	    apos, bpos, count_variations);
   
   count_variations = 1;
-  result = disconnect(POS(ai, aj), POS(bi, bj), &move);
+  result = disconnect(apos, bpos, &move);
   if (result == WIN) {
     if (move == NO_MOVE)
       gprintf("%m and %m are disconnected as it stands (%d variations)\n", 
-	      ai, aj, bi, bj, count_variations);
+	      apos, bpos, count_variations);
     else
-	gprintf("%m and %m can be disconnected at %1m (%d variations)\n", 
-		ai, aj, bi, bj, move, count_variations);
+	gprintf("%1m and %1m can be disconnected at %1m (%d variations)\n", 
+		apos, bpos, move, count_variations);
   }
   else
-    gprintf("%m and %m cannot be disconnected (%d variations)\n", 
-	    ai, aj, bi, bj, count_variations);
+    gprintf("%1m and %1m cannot be disconnected (%d variations)\n", 
+	    apos, bpos, count_variations);
   
   if (sgf_output) {
     end_sgftreedump(sgf_output);
@@ -187,7 +187,7 @@ decideconnection(int ai, int aj, int bi, int bj, const char *sgf_output)
  */
 
 void
-decidedragon(int m, int n, const char *sgf_output)
+decidedragon(int pos, const char *sgf_output)
 {
   int move = NO_MOVE;
   int acode, dcode;
@@ -195,7 +195,7 @@ decidedragon(int m, int n, const char *sgf_output)
   SGFTree tree;
   int result_certain;
 
-  if (BOARD(m, n) == EMPTY) {
+  if (board[pos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-dragon called on an empty vertex\n");
     return ;
   }
@@ -204,7 +204,7 @@ decidedragon(int m, int n, const char *sgf_output)
   reset_engine();
 
   verbose = 0;
-  examine_position(BOARD(m, n), EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(pos, EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
   verbose=save_verbose;
 
@@ -216,49 +216,49 @@ decidedragon(int m, int n, const char *sgf_output)
     begin_sgftreedump(&tree);
 
   count_variations = 1;
-  acode = owl_attack(POS(m, n), &move, &result_certain);
+  acode = owl_attack(pos, &move, &result_certain);
   if (acode) {
     if (acode == WIN) {
       if (move == NO_MOVE)
-	gprintf("%1m is dead as it stands", POS(m, n));
+	gprintf("%1m is dead as it stands", pos);
       else
 	gprintf("%1m can be attacked at %1m (%d variations)", 
-		POS(m, n), move, count_variations);
+		pos, move, count_variations);
     }
     else if (acode == KO_A)
       gprintf("%1m can be attacked with ko (good) at %1m (%d variations)", 
-	      POS(m, n), move, count_variations);
+	      pos, move, count_variations);
     else if (acode == KO_B)
       gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)", 
-	      POS(m, n), move, count_variations);
+	      pos, move, count_variations);
   }
   else 
-    gprintf("%1m cannot be attacked (%d variations)", POS(m, n), count_variations);
+    gprintf("%1m cannot be attacked (%d variations)", pos, count_variations);
   if (result_certain)
     gprintf("\n");
   else
     gprintf(" result uncertain\n");
 
   count_variations = 1;
-  dcode = owl_defend(POS(m, n), &move, &result_certain);
+  dcode = owl_defend(pos, &move, &result_certain);
   if (dcode) {
     if (dcode == WIN) {
       if (move == NO_MOVE)
-	gprintf("%1m is alive as it stands", POS(m, n));
+	gprintf("%1m is alive as it stands", pos);
       else 
 	gprintf("%1m can be defended at %1m (%d variations)", 
-		POS(m, n), move, count_variations);
+		pos, move, count_variations);
     }
     else if (dcode == KO_A)
       gprintf("%1m can be defended with ko (good) at %1m (%d variations)", 
-	      POS(m, n), move, count_variations);
+	      pos, move, count_variations);
     else if (dcode == KO_B)
       gprintf("%1m can be defended with ko (bad) at %1m (%d variations)", 
-	      POS(m, n), move, count_variations);
+	      pos, move, count_variations);
   }
   else
     gprintf("%1m cannot be defended (%d variations)",
-	    POS(m, n), count_variations);
+	    pos, count_variations);
   if (result_certain)
     gprintf("\n");
   else
@@ -272,22 +272,23 @@ decidedragon(int m, int n, const char *sgf_output)
 
 
 void
-decidesemeai(int ai, int aj, int bi, int bj, const char *sgf_output)
+decidesemeai(int apos, int bpos, const char *sgf_output)
 {
   int save_verbose = verbose;
   SGFTree tree;
+  int resulta, resultb, move;
+  int color = board[apos];
 
-  if ((BOARD(ai, aj) == EMPTY)
-      || (BOARD(bi, bj) == EMPTY)) {
-    fprintf(stderr, "gnugo: --decide-semeai called on an empty vertex\n");
-    return ;
+  if (color == EMPTY || board[bpos] != OTHER_COLOR(color)) {
+    gprintf("gnugo: --decide-semeai called on invalid data\n");
+    return;
   }
 
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
   verbose = 0;
-  examine_position(BOARD(ai, aj), EXAMINE_DRAGONS_WITHOUT_OWL);
+  examine_position(apos, EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
   verbose=save_verbose;
   count_variations = 1;
@@ -298,8 +299,18 @@ decidesemeai(int ai, int aj, int bi, int bj, const char *sgf_output)
   
   if (sgf_output)
     begin_sgftreedump(&tree);
-  owl_analyze_semeai(POS(ai, aj), POS(bi, bj));
-  owl_analyze_semeai(POS(bi, bj), POS(ai, aj));
+  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move);
+  gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
+	  color == BLACK ? "black" : "white",
+	  move,
+	  apos, safety_to_string(resulta),
+  	  bpos, safety_to_string(resultb));
+  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move);
+  gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
+	  color == BLACK ? "white" : "black",
+	  move,
+	  apos, safety_to_string(resulta),
+  	  bpos, safety_to_string(resultb));
 
   if (sgf_output) {
     end_sgftreedump(sgf_output);
@@ -408,17 +419,17 @@ decideposition(int color, const char *sgf_output)
 
 
 /*
- * Evaluates the eyespace at (m,n) and prints a report.
+ * Evaluates the eyespace at (pos) and prints a report.
  */
 
 void
-decideeye(int m, int n, const char *sgf_output)
+decideeye(int pos, const char *sgf_output)
 {
   int  color;
   int  max, min;
   int  attack_point;
   int  defense_point;
-  int  pos;
+  int  eyepos;
   int  save_verbose = verbose;
   int  save_debug = debug;
   SGFTree tree;
@@ -430,12 +441,12 @@ decideeye(int m, int n, const char *sgf_output)
   verbose = save_verbose;
   debug = save_debug;
   
-  if (black_eye[POS(m, n)].color == BLACK_BORDER) 
+  if (black_eye[pos].color == BLACK_BORDER) 
     color = BLACK;
-  else if (white_eye[POS(m, n)].color == WHITE_BORDER) 
+  else if (white_eye[pos].color == WHITE_BORDER) 
     color = WHITE;
   else {
-    gprintf("The eye at %m is not of a single color.\n", m, n);
+    gprintf("The eye at %1m is not of a single color.\n", pos);
     return;
   }
 
@@ -450,21 +461,21 @@ decideeye(int m, int n, const char *sgf_output)
     begin_sgftreedump(&tree);
   count_variations = 1;
   
-  if (black_eye[POS(m, n)].color == BLACK_BORDER) {
-    pos = black_eye[POS(m, n)].origin;
-    compute_eyes(pos, &max, &min, &attack_point, &defense_point,
+  if (black_eye[pos].color == BLACK_BORDER) {
+    eyepos = black_eye[pos].origin;
+    compute_eyes(eyepos, &max, &min, &attack_point, &defense_point,
 		 black_eye, half_eye, 0, EMPTY);
-    gprintf("Black eyespace at %1m: min=%d, max=%d\n", pos, min, max);
+    gprintf("Black eyespace at %1m: min=%d, max=%d\n", eyepos, min, max);
     if (max != min) {
       gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
 	      defense_point);
     }
   }
-  if (white_eye[POS(m, n)].color == WHITE_BORDER) {
-    pos = white_eye[POS(m, n)].origin;
-    compute_eyes(pos, &max, &min, &attack_point, &defense_point,
+  if (white_eye[pos].color == WHITE_BORDER) {
+    eyepos = white_eye[pos].origin;
+    compute_eyes(eyepos, &max, &min, &attack_point, &defense_point,
 		 white_eye, half_eye, 0, EMPTY);
-    gprintf("White eyespace at %1m: min=%d, max=%d\n", pos, min, max);
+    gprintf("White eyespace at %1m: min=%d, max=%d\n", eyepos, min, max);
     if (max != min) {
       gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
 	      defense_point);
@@ -489,3 +500,4 @@ decideeye(int m, int n, const char *sgf_output)
  * c-basic-offset: 2
  * End:
  */
+
