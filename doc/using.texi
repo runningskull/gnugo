@@ -209,6 +209,10 @@ into your @file{site-lisp} directory (often
 @noindent
 in your @file{.emacs} file. 
 
+The @file{.xpm} bitmaps for the default size Go stones are 30 
+pixels. For a larger board, alternative 36 pixel stones
+may be found in @file{gnugo-big-xpms.el}.
+
 You may start GNU Go by @command{M-x gnugo}. You will be
 prompted for command line options (@pxref{Invoking GNU
 Go}). Using these, you may set the handicap, board size,
@@ -216,132 +220,121 @@ color and komi. For example if you want to play white and
 give a nine-stone handicap, use the options
 @option{--handicap 9 --color white}.
 
-You will immediately see an ascii board. However (unless you
-are using the alternate version @file{gnugo.el-ascii}, or
-if you are not running Emacs 21.x or later) you can get
-switch to a graphical Go board by typing `i'. You can also
-get help at any time by typing `?'.
+By default, Emacs gives you a graphical Go board. You can
+toggle an alternative ascii board (for example, if you
+want to paste a diagram into an email) with
+@command{gnugo-toggle-image-display}, which is bound to
+@samp{i}. If you want a grid, @samp{g} toggles the grid
+display on or off. The grid is not displayed by
+default.
 
 You play a move either by moving to the location with the
 arrow keys, then hitting the SPACE key, or by clicking on
-the location with the mouse. You can save or load a game,
-and undo moves. You can get an estimate of the score at
-any time by typing @samp{!}.
+an empty location with the mouse. You can save or load a game,
+and undo moves.
 
-You can also enter commands directly to the GTP engine.
+You can get help at any time by typing @samp{?}. This will
+give a description of the default keybindings. If you want
+to find out what a particular function does, you can use
+`C-h f <function-name>' to get documentation on it. For example,
+after examining the default keybindings with @samp{?} we
+learn that @samp{v} is bound to @code{gnugo-view-regression}.
+To find out more information about this function we type
+`C-h f gnugo-view-regression' to view the help string for
+the function.
 
-Although a grid is not displayed you can get the board
-position with a grid by entering @command{: showboard RET}.
-This will enter the GTP @command{showboard} command to
-draw an ascii map of the board, which includes a grid.
+You may save the game you are playing as an sgf file
+with @command{gnugo-write-sgf-file}, which is bound to
+@samp{s}. You may also restore a saved game with
+@command{gnugo-read-sgf-file}, bound to @samp{l}.
+When the sgf file is loaded, it is assumed to be your
+move, since typically the game is saved on your move.
+You may resume play by entering a move.
 
-The file @file{gnugo.el} is under active development.
-A more recent version may work better or have more
-features. The version distributed with GNU Go 3.6
-corresponds to @file{gnugo.el-2.2.8} at
-@url{http://www.glug.org/people/ttn/software/ttn-pers-elisp/standalone/}.
-You can look there or in the GNU Go CVS for a more current version.
+At the end of the game, after both players pass, GNU
+Go will run @command{gnugo-venerate} to render all
+dead stones as ghostly shades. You can then type
+@samp{F} to run @command{gnugo-display-final-score},
+which will tell you the score. (You may get a
+score estimate at any time before the end of the
+game with @command{gnugo-estimate-score}, bound
+to @samp{!}.
 
-@itemize @bullet
-@item
-@quotation
-@samp{?} Gets help.
-@end quotation
-@item  @code{RET} or @code{SPC}    
-@quotation
-Enters a move at the current position of the cursor,
-or mouse cursor in the graphical mode.
-@end quotation
-@item @samp{q} or @samp{Q}        
-@quotation
-Quit (the latter without confirmation).
-@end quotation
-@item @samp{R}             
-@quotation
-Resign.
-@end quotation
-@samp{u}             
-@quotation
-Undo one two moves. (Yours and your opponents.)
-@end quotation
-@samp{U}          
-@quotation
-Undo back to the location of the mouse cursor. After a
-move this is the last move just played, and (since you
-cannot enter this command until the computer has replied)
-the default behavior is to undo two moves. Alternatively,
-you can move the cursor to the move you want to undo
-before entering 'U', or use the prefix @command{C-} to
-enter the number of moves you want to undo. Then all
-moves are undone back to the move you selected.
-@end quotation
-@command{C-l}
-@quotation
-Redraw the board.
-@end quotation
-@samp{_} or @command{M-_}
-@quotation
-Bury the Board buffer.
-@end quotation
-@samp{P}
-@quotation
-Pass.
-@end quotation
-@samp{i}
-@quotation
-Toggle display using XPM images (if supported).
-@end quotation
-@samp{w}
-@quotation
-Run `gnugo-worm-stones'.
-@end quotation
-@samp{d}
-@quotation
-Run `gnugo-dragon-stones'.
-@end quotation
-@samp{W}
-@quotation
-Run `gnugo-worm-data'.
-@end quotation
-@samp{D}
-@quotation
-Run `gnugo-dragon-data'.
-@end quotation
-@samp{t}
-@quotation
-Run `gnugo-toggle-dead-group'.
-@end quotation
-@samp{!}
-@quotation
-Get GNU Go's score estimate.
-@end quotation
-@samp{:} or @samp{;}
-@quotation
-Enter a command directly to the GTP engine.
-@end quotation
-@samp{=}
-@quotation
-Display board position at the cursor point.
-@end quotation
-@samp{h}
-@quotation
-Display in the echo area \"(N moves)\" followed by the
-move history, most recent move first.  This line is
-subsequently available in the *Messages* buffer.
-@end quotation        
-@samp{F}
-@quotation
-Run `gnugo-display-final-score'.
-@end quotation
-@samp{s} or @command{C-x C-w} or @command{C-x C-s}
-@quotation
-Run `gnugo-write-sgf-file'.
-@end quotation
-@samp{l}
-@quotation
-Run `gnugo-read-sgf-file'."
-@end quotation
-@end itemize
+You may undo your move with @command{gnugo-undo-two-moves},
+which is bound to @samp{u}. This takes back your move,
+and also the last computer move, so it goes back to
+the position two moves ago. If you undo one or many
+moves, you may redo them with @command{gnugo-redo-two-moves},
+which is bound to @samp{r}.
+
+Although if you are playing a game it is most
+natural to undo or redo two moves at a time, since
+this does not change the color of the player to
+move, you may also undo or redo a single move with
+@command{gnugo-undo} and @command{gnugo-redo},
+bound to @samp{b} and @samp{f}. This is convenient
+for scrolling forward or backward in a game to
+review the moves. Note that if you undo once,
+then play a move (by clicking on the board, or by
+hitting the space or enter key), you have changed
+the color of the player to move. GNU Go will
+begin to generate moves as soon as you play.
+
+You may also use @command{gnugo-jump-to-move}, bound
+to @samp{j} to jump to a particular move in the
+game. You will be prompted for the game move. After
+you type the number of the move, Emacs will undo
+back to that move number. You may then redo or
+further undo using @samp{f} and @samp{f}. You may
+also jump to the beginning or end of the game with
+@samp{<} and @samp{>}.
+
+Another way to undo back to a given move is to move
+the cursor to a stone (which must be one of your
+own), then execute @command{gnugo-magic-undo},
+bound to @samp{U}.
+
+As we have noted, GNU Go normally answers each move
+that you play by generating a move of its own.  If
+you want to suppress GNU Go's automatic generation
+of moves, you may toggle an `editing mode' with
+@command{gnugo-toggle-edit-mode}. In the editing
+mode, GNU Go does not automatically answer each
+move that you play. For example, you can use the
+editing mode to write an sgf file from scratch.
+If you are playing a game, you can turn off
+GNU Go's automatic responses, play a few moves
+in editing mode to see what the board position
+will look like, then back up to the last move,
+toggle the editing mode off, then resume the game.
+
+You may view a GNU Go regression test with 
+@command{gnugo-view-regression}, which will prompt you
+for the name of a test. You may type (for example)
+@command{strategy:6}. The first time you do this
+you will be prompted for the path to the
+@file{regression/} directory. (Once Emacs knows this
+path, you will not be prompted again.) This command
+takes a while to execute since GNU Go will run the
+regression. When it is completed, Emacs will display
+the board position (with the grid) and a message
+below the board such as:
+@example
+ loadsgf games/incident104.sgf 63
+ strategy:6 reg_genmove white
+ #? [E10]*
+ =6 J13
+@end example
+This gives the actual test followed by the move that GNU Go
+generates when running the test.
+
+You may also ask GNU Go to identify a dragon on the
+board. Click on one stone to move the cursor to that
+location. Then type @samp{d}. The dragon in question
+will then be marked flashing. You may also type
+@samp{D}, which will report the dragon data. You
+may run other gtp commands with @command{gnugo-command},
+which is bound to @samp{:}.
 
 @node GMP and GTP
 @section The Go Modem Protocol and Go Text Protocol
