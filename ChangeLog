@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- indented debug output of secondary move values
 - new local struct aa_move in combinations.c
 - new pattern class 'c' for conditional moves in aa_attackspats.db
 - atari_atari() tries to attack smallest targets first

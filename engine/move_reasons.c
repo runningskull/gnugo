@@ -2609,7 +2609,7 @@ estimate_territorial_value(int pos, int color, float score)
       /* Defenseless stone. */
       if (worm[aa].defend_codes[0] == 0) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: %f (secondary) - attack on %1m (defenseless)\n",
+	      "    %1m: %f (secondary) - attack on %1m (defenseless)\n",
 	      pos, worm[aa].effective_size, aa);
 	secondary_value += worm[aa].effective_size;
 	break;
@@ -2618,7 +2618,7 @@ estimate_territorial_value(int pos, int color, float score)
       /* Strategically unsafe move. */
       if (!move[pos].move_safety) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: 0.0 - attack on %1m (unsafe move)\n", pos, aa);
+	      "    %1m: 0.0 - attack on %1m (unsafe move)\n", pos, aa);
 	break;
       }
 
@@ -2629,7 +2629,7 @@ estimate_territorial_value(int pos, int color, float score)
        */
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: %f (secondary) - attack on %1m (dead)\n",
+	      "    %1m: %f (secondary) - attack on %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
 	secondary_value += 0.2 * this_value;
 	break;
@@ -2669,7 +2669,7 @@ estimate_territorial_value(int pos, int color, float score)
        */
       if (!strategically_sound_defense(aa, pos)) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: 0.0 - defense of %1m (strategically unsound defense)\n",
+	      "    %1m: 0.0 - defense of %1m (strategically unsound defense)\n",
 	      pos, aa);
 	break;
       }	
@@ -2683,7 +2683,7 @@ estimate_territorial_value(int pos, int color, float score)
        */
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: %f (secondary) - defense of %1m (dead)\n",
+	      "    %1m: %f (secondary) - defense of %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
 	secondary_value += 0.2 * this_value;
 	break;
@@ -2720,7 +2720,7 @@ estimate_territorial_value(int pos, int color, float score)
       
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: 0.0 - threatens to capture %1m (dead)\n", pos, aa);
+	      "    %1m: 0.0 - threatens to capture %1m (dead)\n", pos, aa);
 	break;
       }
 
@@ -2799,7 +2799,7 @@ estimate_territorial_value(int pos, int color, float score)
       
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: 0.0 - threatens to defend %1m (dead)\n", pos, aa);
+	      "    %1m: 0.0 - threatens to defend %1m (dead)\n", pos, aa);
 	break;
       }
 
@@ -2920,7 +2920,7 @@ estimate_territorial_value(int pos, int color, float score)
 
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: 0.0 - threatens to owl attack %1m (dead)\n", pos, aa);
+	      "    %1m: 0.0 - threatens to owl attack %1m (dead)\n", pos, aa);
 	break;
       }
 
@@ -3049,7 +3049,7 @@ estimate_territorial_value(int pos, int color, float score)
     if (this_value != 0.0)
       TRACE("  %1m: %f - change in territory\n", pos, this_value);
     else
-      DEBUG(DEBUG_MOVE_REASONS, "  %1m: 0.0 - block or expand territory\n", 
+      DEBUG(DEBUG_MOVE_REASONS, "    %1m: 0.0 - block or expand territory\n", 
 	    pos);
   }
 
@@ -3323,7 +3323,7 @@ estimate_strategical_value(int pos, int color, float score)
 	if (owl_defense_move_reason_known(pos, find_dragon(bb))
 	    || owl_attack_move_reason_known(pos, find_dragon(bb))) {
 	  DEBUG(DEBUG_MOVE_REASONS,
-		"  %1m: 0.0 - vital for %1m: owl attack/defense as well\n",
+		"    %1m: 0.0 - vital for %1m: owl attack/defense as well\n",
 		pos, bb);
 	  break;
 	}
