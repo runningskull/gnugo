@@ -70,9 +70,10 @@ loadsgf golois/connecter990614-1.sgf
 18 disconnect Q14 N10
 #? [1 N11]*
 
+# Added O12 and P11. /gf
 loadsgf golois/connecter990614-2.sgf
 19 connect O11 O13
-#? [1 P13]*
+#? [1 (P13|O12|P11)]*
 
 loadsgf golois/Connecter990621-1.sgf
 20 connect O11 P12
@@ -82,9 +83,10 @@ loadsgf golois/Connecter990621-1.sgf
 21 connect N12 P12
 #? [1 O12]
 
+# Q10 also works, although K12 is lost in the process. /gf
 loadsgf golois/Connecter990621-1.sgf
 22 connect Q9 P12
-#? [1 O12]*
+#? [1 (O12|Q10)]*
 
 loadsgf golois/Connecter990628-1.sgf
 23 connect L6 N6
@@ -94,9 +96,10 @@ loadsgf golois/Connecter990628-2.sgf
 24 disconnect G15 F17
 #? [0]
 
+# Added F3. /gf
 loadsgf golois/Connecter990628-2.sgf
 25 connect E2 J3
-#? [1 G1]*
+#? [1 (G1|F3)]*
 
 loadsgf golois/Connecter990630-1.sgf
 26 connect F2 D2
@@ -118,17 +121,20 @@ loadsgf golois/Goemate990903-1.sgf
 30 disconnect J9 H12
 #? [0]*
 
+# Lots of moves work here, probably even more than those added. /gf
 loadsgf golois/Goemate990903-3.sgf
 31 connect N10 K11
-#? [1 L10]*
+#? [1 (L10|L11|M11|M10|K10)]*
 
 loadsgf golois/Goemate990903-4.sgf
 32 disconnect R12 Q14
 #? [0]*
 
+# F14 is of course the real cutting point, but technically the
+# moves (threatening) to capture either string are also effective. /gf
 loadsgf golois/Goemate990904-3.sgf
 33 disconnect J11 E10
-#? [1 F14]*
+#? [1 (F14|J10|E11|D11|C11)]*
 
 loadsgf golois/Goemate990906-1.sgf
 34 connect S7 Q7
@@ -170,17 +176,19 @@ loadsgf golois/Goemate991109-3.sgf
 43 disconnect L5 K6
 #? [1 H2]
 
+# Added G17 and G18. /gf
 loadsgf golois/Goemate991218-1.sgf
 44 connect H17 F17
-#? [1 H18]*
+#? [1 (H18|G17|G18)]*
 
 loadsgf golois/Goemate991218-1.sgf
 45 disconnect H17 F17
 #? [1 G17]
 
+# A7 is also okay. /gf
 loadsgf golois/GoMaster991113-3.sgf
 46 disconnect C5 B8
-#? [1 B4]*
+#? [1 (B4|A7)]*
 
 loadsgf golois/Handtalk980802.sgf
 47 disconnect J4 K3
@@ -202,9 +210,10 @@ loadsgf golois/Handtalk980820-1.sgf
 51 disconnect P16 Q15
 #? [1 O15]*
 
+# Added B15. /gf
 loadsgf golois/Handtalk980820-2.sgf
 52 disconnect C12 B14
-#? [1 C13]*
+#? [1 (C13|B15)]*
 
 loadsgf golois/Handtalk980820-6.sgf
 53 disconnect M12 M15
@@ -222,13 +231,16 @@ loadsgf golois/Handtalk980822-3.sgf
 56 disconnect P3 R4
 #? [0]*
 
+# This one is hard to read out. I'm not convinced that D5 works, but
+# if it does, then C6 is also okay. Added C6. /gf
 loadsgf golois/Handtalk980828-2.sgf
 57 disconnect C4 D7
-#? [1 D5]*
+#? [1 (D5|C6)]*
 
+# Added B13, C13, and C11. /gf
 loadsgf golois/Handtalk980828-3.sgf
 58 disconnect B11 C14
-#? [1 B12]*
+#? [1 (B12|B13|C13|C11)]*
 
 loadsgf golois/Indigo20000718-3.sgf
 59 connect O10 N9
@@ -258,9 +270,10 @@ loadsgf golois/Indigo-Golois-991105-1.sgf
 65 connect G7 D15
 #? [1 G8]*
 
+# Added L3, M2, M1, and L1. /gf
 loadsgf golois/Indigo-Golois-991105-2.sgf
 66 disconnect N2 K2
-#? [1 K1]*
+#? [1 (K1|L3|M2|M1|L1)]*
 
 loadsgf golois/Indigo-Golois-991106-1.sgf
 67 disconnect N12 N14
@@ -280,9 +293,10 @@ loadsgf golois/Indigo-Golois-991106-3.sgf
 70 disconnect P3 M3
 #? [0]*
 
+# gf Added Q3. /gf
 loadsgf golois/Indigo-Golois-991106-3.sgf
 71 connect R3 P3
-#? [1 P4]*
+#? [1 (P4|Q3)]*
 
 loadsgf golois/Jimmy990711-2.sgf
 72 disconnect R12 Q13
@@ -300,10 +314,12 @@ loadsgf golois/Jimmy990904-3.sgf
 75 connect R17 P17
 #? [1 R18]
 
+# Added G4 and F3. /gf
 loadsgf golois/Neurogo97-1.sgf
 76 connect H2 H4
-#? [1 J3]*
+#? [1 (J3|G4|F3)]*
 
+# Added J3 and J4. /gf
 loadsgf golois/Neurogo97-1.sgf
 77 disconnect H2 H4
 #? [1 J2]*
@@ -323,4 +339,3 @@ loadsgf golois/test_prendre.sgf
 loadsgf golois/Vivre990710-1.sgf
 81 disconnect S12 R11
 #? [0]*
-
