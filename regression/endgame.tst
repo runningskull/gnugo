@@ -178,6 +178,22 @@ loadsgf games/endgame5.sgf
 501 gg_genmove black
 #? [E5]
 
+# An endgame sente pattern.
+loadsgf games/endgame6.sgf 1
+601 gg_genmove black
+#? [J8]
+
+loadsgf games/endgame6.sgf 1
+602 gg_genmove white
+#? [J8]
+
+loadsgf games/endgame6.sgf 2
+603 gg_genmove black
+#? [C1]
+
+loadsgf games/endgame6.sgf 2
+604 gg_genmove white
+#? [D1]
 
 ############ End of Tests #################
 
