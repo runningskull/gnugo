@@ -5,23 +5,28 @@ DT[1999-05-10]
 SY[Cgoban 1.9.5]TM[-];B[pd]C[0]
 (;B[pj];C[#kosumi tsuke for 6-9 stone games]PL[W]
 (;W[qf]PL[B]
-(;B[qe]MA[mk];W[pf]C[S]MA[mi]
+(;B[qe]MA[mk]
+(;W[pf]C[S]MA[mi]
 (;B[nd]MA[mk]C[U]PL[W];W[ph]C[j];B[re]MA[lk]C[j])
 
 (;B[tt];W[od]MA[mi];B[oc];W[nd]TR[mi];B[nc];W[pc]MA[mi];B[qc];W[pb]
 MA[mi];B[qb];W[pe]MA[mi];B[qd])
 )
 
+(;W[oe]
+(;B[od]MA[lk])
+
+(;B[pf]C[0
+# playable if ladder works but dangerous for GNU Go
+]MA[mh])
+)
+)
+
 (;B[qh]C[j
 ]MA[nl])
 )
 
-(;W[pg];B[nd];W[ld];B[nf];W[oe]
-(;B[od]MA[ki])
-
-(;B[oh]C[#gnugo likes this.
-])
-)
+(;W[pg];B[nd];W[ld];B[nf];W[oe];B[od]MA[ki])
 )
 
 (;B[qg]C[0];C[#17 stone concrete];B[pj]C[0]
