@@ -176,12 +176,7 @@ gtp_mprintf(const char *fmt, ...)
       {
 	int m = va_arg(ap, int);
 	int n = va_arg(ap, int);
-	if (m == -1 && n == -1)
-	  fputs("PASS", stdout);
-	else if ((m<0) || (n<0) || (m>=gtp_boardsize) || (n>=gtp_boardsize))
-	  fprintf(stdout, "??");
-	else
-	  fprintf(stdout, "%c%d", 'A' + n + (n >= 8), gtp_boardsize - m);
+        gtp_print_vertex(m, n);
 	break;
       }
       case 'C':

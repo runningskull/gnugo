@@ -235,6 +235,7 @@ gg_version(void) {
 
 /* Reorientation of point (i,j) into (*ri, *rj) */
 void rotate(int i, int j, int *ri, int *rj, int bs, int rot) {
+  int bs1;
   assert (bs > 0);
   assert (ri != NULL && rj != NULL);
   assert (rot >= 0 && rot < 8);
@@ -247,38 +248,39 @@ void rotate(int i, int j, int *ri, int *rj, int bs, int rot) {
   assert (i >= 0 && i < bs);
   assert (j >= 0 && j < bs);
 
+  bs1 = bs - 1;
   if (rot == 0) {
     /* identity map */
     *ri = i;
     *rj = j;
   } else if (rot == 1) {
     /* rotation over 90 degrees */
-    *ri = bs - j;
+    *ri = bs1 - j;
     *rj = i;
   } else if (rot == 2) {
     /* rotation over 180 degrees */
-    *ri = bs - i;
-    *rj = bs - j;
+    *ri = bs1 - i;
+    *rj = bs1 - j;
   } else if (rot == 3) {
     /* rotation over 270 degrees */
     *ri = j;
-    *rj = bs - i;
+    *rj = bs1 - i;
   } else if (rot == 4) {
     /* flip along diagonal */
     *ri = j;
     *rj = i;
   } else if (rot == 5) {
     /* flip */
-    *ri = bs - i;
+    *ri = bs1 - i;
     *rj = j;
   } else if (rot == 6) {
     /* flip along diagonal */
-    *ri = bs - j;
-    *rj = bs - i;
+    *ri = bs1 - j;
+    *rj = bs1 - i;
   } else if (rot == 7) {
     /* flip */
     *ri = i;
-    *rj = bs - j;
+    *rj = bs1 - j;
   }
 }
 

@@ -109,6 +109,7 @@ DECLARE(gtp_popgo);
 DECLARE(gtp_captures);
 DECLARE(gtp_protocol_version);
 DECLARE(gtp_query_boardsize);
+DECLARE(gtp_query_orientation);
 DECLARE(gtp_quit);
 DECLARE(gtp_report_uncertainty);
 DECLARE(gtp_reset_life_node_counter);
@@ -117,6 +118,7 @@ DECLARE(gtp_reset_reading_node_counter);
 DECLARE(gtp_reset_trymove_counter);
 DECLARE(gtp_same_dragon);
 DECLARE(gtp_set_boardsize);
+DECLARE(gtp_set_orientation);
 DECLARE(gtp_set_komi);
 DECLARE(gtp_set_level);
 DECLARE(gtp_showboard);
@@ -137,6 +139,7 @@ static struct gtp_command commands[] = {
   {"attack",           	      gtp_attack},
   {"black",            	      gtp_playblack},
   {"boardsize",        	      gtp_set_boardsize},
+  {"captures",        	      gtp_captures},
   {"color",            	      gtp_what_color},
   {"combination_attack",      gtp_combination_attack},
   {"connect",         	      gtp_connect},
@@ -178,9 +181,10 @@ static struct gtp_command commands[] = {
   {"owl_attack",     	      gtp_owl_attack},
   {"owl_defend",     	      gtp_owl_defend},
   {"popgo",            	      gtp_popgo},
-  {"captures",        	      gtp_captures},
+  {"orientation",     	      gtp_set_orientation},
   {"protocol_version",        gtp_protocol_version},
   {"query_boardsize",         gtp_query_boardsize},
+  {"query_orientation",       gtp_query_orientation},
   {"quit",             	      gtp_quit},
   {"report_uncertainty",      gtp_report_uncertainty},
   {"reset_life_node_counter", gtp_reset_life_node_counter},
@@ -326,8 +330,43 @@ gtp_query_boardsize(char *s, int id)
   return gtp_success(id, "%d", board_size);
 }
 
+/****************************
+ * Setting the orientation. *
+ ****************************/
 
+/* Function:  Set the orienation to N and clear the board
+ * Arguments: integer
+ * Fails:     illegal orientation
+ * Returns:   nothing
+ */
+static int
+gtp_set_orientation(char *s, int id)
+{
+  int orientation;
+  if (sscanf(s, "%d", &orientation) < 1)
+    return gtp_failure(id, "orientation not an integer");
+  
+  if (orientation < 0 || orientation > 7)
+    return gtp_failure(id, "unacceptable orientation");
 
+  clear_board();
+  gtp_internal_set_orientation(orientation);
+  store_position(&starting_position);
+  return gtp_success(id, "");
+}
+
+/* Function:  Find the current orientation
+ * Arguments: none
+ * Fails:     never
+ * Returns:   orientation
+ */
+static int
+gtp_query_orientation(char *s, int id)
+{
+  UNUSED(s);
+
+  return gtp_success(id, "%d", gtp_internal_get_orientation());
+}
 
 /***************************
  * Setting komi.           *
