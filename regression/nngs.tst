@@ -342,7 +342,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 257
 
 loadsgf games/nngs/gnugo-3.1.18-Mikael-200201062258.sgf 42
 850 gg_genmove white
-#? [!Q9|R9]*
+#? [!Q9|R9]
 
 
 loadsgf games/nngs/gnugo-3.1.18-Mikael-200201062258.sgf 74

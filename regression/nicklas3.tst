@@ -17,7 +17,7 @@ loadsgf games/nicklas/nicklas4.sgf 73
 
 loadsgf games/nicklas/nicklas6.sgf 25
 602 gg_genmove black
-#? [C6]*
+#? [C6]
 
 # J6 gives a gote seki.
 # However, playing sente moves against the group, starting with H9,

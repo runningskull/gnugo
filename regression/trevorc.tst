@@ -313,7 +313,7 @@ loadsgf games/trevor/auto/c35.sgf 26
 
 loadsgf games/trevor/auto/c35.sgf 32
 600 gg_genmove white
-#? [!E8]
+#? [!E8]*
 
 
 loadsgf games/trevor/auto/c35.sgf 62

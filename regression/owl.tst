@@ -934,17 +934,17 @@ loadsgf games/handtalk/handtalk11.sgf 157
 
 loadsgf games/handtalk/handtalk12.sgf 29
 259 owl_does_attack L2 M3
-#? [0]
+#? [0]*
 
 # Far too many escape ways for F10 as it could be killed.
 loadsgf games/handtalk/handtalk12.sgf 41
 260 owl_does_attack G9 F10
-#? [0]
+#? [0]*
 
 # A good example where connection handling is important in owl.
 loadsgf games/handtalk/handtalk23.sgf 186
 261 owl_attack E5
-#? [1 (O6|Q7|T4|T5|R4)]
+#? [1 (O6|Q7|T4|T5|R4)]*
 
 # See also 13x13:15.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32

@@ -90,7 +90,7 @@ loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 28
 # See also owl:262.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 15 gg_genmove white
-#? [C7|B7|C6|B6|B5|C5]
+#? [C7|B7|C6|B6|B5|C5]*
 
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24

@@ -253,11 +253,11 @@ loadsgf games/nngs/gnugo-3.1.34-viking4-200204240801.sgf
 
 loadsgf games/handtalk/handtalk13.sgf 106
 81 connect L5 R5
-#? [1 O5]
+#? [1 O5]*
 
 loadsgf games/handtalk/handtalk13.sgf 116
 82 same_dragon M7 M10
-#? [0]
+#? [0]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

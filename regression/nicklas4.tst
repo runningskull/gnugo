@@ -40,7 +40,7 @@ loadsgf games/nicklas/nicklas11.sgf 172
 # doubt it checks whether both will be defended by S7. /ab
 loadsgf games/nicklas/nicklas12.sgf 29
 1201 gg_genmove black
-#? [Q9]*
+#? [Q9]
 
 # I have some doubt about the correct move. I might be advisable for B
 # to defend his center group, although W E16 hurts, of course. However,

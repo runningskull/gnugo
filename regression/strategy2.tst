@@ -108,7 +108,7 @@ loadsgf games/strategy17.sgf
 # however it may be difficult to save both K16 and M18 so if the 
 # moves listed are not too undervalued we may accept this result
 70 gg_genmove white
-#? [M15|J15|N16|J16]*
+#? [M15|J15|N16|J16]
 
 # E6 is the only move.
 loadsgf games/strategy18.sgf
@@ -214,7 +214,7 @@ loadsgf games/strategy25.sgf 55
 # considered. B17 (game move) is inferior.
 loadsgf games/strategy25.sgf 61
 90 gg_genmove black
-#? [B14|D17]*
+#? [B14|D17]
 
 # Connecting with ko at B14 is still best. The game move at B13 is
 # nothing but horrible. G13 would of course be superior if it killed

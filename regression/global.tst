@@ -16,7 +16,7 @@ loadsgf golois/Aya991113-1.sgf
 
 loadsgf golois/Aya991113-2.sgf
 5 gg_genmove black
-#? [O4]*
+#? [O4]
 
 loadsgf golois/Aya991113-3.sgf
 6 gg_genmove black

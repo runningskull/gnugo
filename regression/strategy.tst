@@ -203,7 +203,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
-#? [E17]*
+#? [E17]
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.2 released May 6, 2002
+
 - Macro PATTERN_CHECK_ON_DEMAND retired
 - allpats options for owl shape moves repaired
 - new function extended_chainlinks() in board.c
