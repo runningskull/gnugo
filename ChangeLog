@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- edge_block and double_atari_chain2 renamed to *_moves
+- do_attack uses simple_ladder_attack when stackp > depth+5
 - dragon field in struct eye_data removed
 - new function find_eye_dragons() in optics.c
 - dragon_invincible() and genus computation in make_dragons() revised

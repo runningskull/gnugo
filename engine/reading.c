@@ -126,8 +126,8 @@ static int special_attack4(int str, int libs[2], int *move,
 			   int komaster, int kom_pos);
 static int draw_back(int str, int *move, int komaster, int kom_pos);
 static int edge_closing_backfill(int str, int apos, int *move);
-static void edge_block(int str, int apos, int moves[MAX_MOVES],
-		       int scores[MAX_MOVES], int *num_moves);
+static void edge_block_moves(int str, int apos, int moves[MAX_MOVES],
+		       	     int scores[MAX_MOVES], int *num_moves);
 static void propose_edge_moves(int str, int *libs, int liberties,
 			       int moves[MAX_MOVES], int scores[MAX_MOVES],
 			       int *num_moves, int color);
@@ -144,8 +144,8 @@ static int break_chain3(int str, int *move, int komaster, int kom_pos);
 static int superstring_breakchain(int str, int *move,
 				  int komaster, int kom_pos,
 				  int liberty_cap);
-static void double_atari_chain2(int str, int moves[MAX_MOVES],
-				int scores[MAX_MOVES], int *num_moves);
+static void double_atari_chain2_moves(int str, int moves[MAX_MOVES],
+				      int scores[MAX_MOVES], int *num_moves);
 static void order_moves(int str, int num_moves, int *moves,
 			int *scores, int color, const char *funcname);
 static int simple_ladder_attack(int str, int *move, int komaster, int kom_pos);
@@ -2385,7 +2385,7 @@ special_rescue5(int str, int libs[3], int moves[MAX_MOVES],
 	}
   
 	/* Defend against double atari in the surrounding chain early. */
-	double_atari_chain2(bpos, moves, scores, num_moves);
+	double_atari_chain2_moves(bpos, moves, scores, num_moves);
       }
     }
   }
@@ -3156,8 +3156,12 @@ do_attack(int str, int *move, int komaster, int kom_pos)
      string at (str) has. */
   if (libs == 1)
     result = attack1(str, &xpos, komaster, kom_pos);
-  else if (libs == 2)
-    result = attack2(str, &xpos, komaster, kom_pos);
+  else if (libs == 2) {
+    if (stackp > depth + 5)
+      result = simple_ladder_attack(str, &xpos, komaster, kom_pos);
+    else
+      result = attack2(str, &xpos, komaster, kom_pos);
+  }
   else if (libs == 3)
     result = attack3(str, &xpos, komaster, kom_pos);
   else if (libs == 4)
@@ -3465,7 +3469,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
   /* If we can't make a direct atari, look for edge blocking moves. */
   if (!atari_possible)
     for (k = 0; k < 2; k++) 
-      edge_block(str, libs[k], moves, scores, &num_moves);
+      edge_block_moves(str, libs[k], moves, scores, &num_moves);
     
 
   /* If one of the surrounding chains have only two liberties, which
@@ -3690,7 +3694,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
   }
   
   /* Defend against double atari in the surrounding chain early. */
-  double_atari_chain2(str, moves, scores, &num_moves);
+  double_atari_chain2_moves(str, moves, scores, &num_moves);
   
   /* Get the three liberties of (str). */
   liberties = findlib(str, 3, libs);
@@ -3727,7 +3731,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
 #endif
     
     /* Look for edge blocking moves. */
-    edge_block(str, apos, moves, scores, &num_moves);
+    edge_block_moves(str, apos, moves, scores, &num_moves);
   }
   
   /* Pick up some edge moves. */
@@ -3949,7 +3953,7 @@ attack4(int str, int *move, int komaster, int kom_pos)
 
 
   /* Defend against double atari in the surrounding chain early. */
-  double_atari_chain2(str, moves, scores, &num_moves);
+  double_atari_chain2_moves(str, moves, scores, &num_moves);
 
   /* Give a score bonus to the chain preserving moves. */
   for (k = 0; k < num_moves; k++)
@@ -3979,7 +3983,7 @@ attack4(int str, int *move, int komaster, int kom_pos)
       ADD_CANDIDATE_MOVE(xpos, 10, moves, scores, num_moves);
 
     /* Look for edge blocking moves. */
-    edge_block(str, apos, moves, scores, &num_moves);
+    edge_block_moves(str, apos, moves, scores, &num_moves);
   }
 
   /* Pick up some edge moves. */
@@ -4593,8 +4597,8 @@ edge_closing_backfill(int str, int apos, int *move)
  */
 
 static void
-edge_block(int str, int apos, int moves[MAX_MOVES], int scores[MAX_MOVES],
-	   int *num_moves)
+edge_block_moves(int str, int apos, int moves[MAX_MOVES], int scores[MAX_MOVES],
+	         int *num_moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -4692,8 +4696,8 @@ edge_block(int str, int apos, int moves[MAX_MOVES], int scores[MAX_MOVES],
  */
 
 static void
-edge_block(int str, int apos, int moves[MAX_MOVES], int scores[MAX_MOVES],
-	   int *num_moves)
+edge_block_moves(int str, int apos, int moves[MAX_MOVES], int scores[MAX_MOVES],
+	         int *num_moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -5240,14 +5244,14 @@ superstring_breakchain(int str, int *move, int komaster, int kom_pos,
 }
 
 /*
- * If str points to a group, double_atari_chain2() adds all moves
+ * If str points to a group, double_atari_chain2_moves() adds all moves
  * which make a double atari on some strings in the surrounding chain
  * to the (movei[], movej[]) arrays.
  */
 
 static void
-double_atari_chain2(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
-		    int *num_moves)
+double_atari_chain2_moves(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
+		    	  int *num_moves)
 {
   int r, k;
   int apos;
@@ -6564,6 +6568,14 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
   str = find_origin(str);
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
+
+  /* Give up if we attacked depending on ko for too long. */
+  if (stackp > depth + 20 && komaster == OTHER_COLOR(board[str])) {
+    SGFTRACE(0, 0, NULL);
+    if (move)
+      *move = PASS_MOVE;
+    return 0;
+  }
 
   /* Get the two liberties of (str). */
   findlib(str, 2, libs);

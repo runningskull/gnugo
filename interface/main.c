@@ -422,6 +422,9 @@ main(int argc, char *argv[])
 	if (OWL_THREATS)
 	  fprintf(stderr,
 		  "configure option enabled: owl threats\n");
+	fprintf(stderr,
+		"Owl node limit: %d\n", OWL_NODE_LIMIT);
+
 	return EXIT_SUCCESS;
 	break;
 
