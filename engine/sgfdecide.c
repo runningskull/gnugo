@@ -79,7 +79,7 @@ decidestring(int m, int n, const char *sgf_output)
     dcode = find_defense(POS(m, n), &pos);
     if (dcode) {
       if (dcode == WIN)
-	gprintf("%m can be defended at 1m (%d variations)\n", 
+	gprintf("%m can be defended at %1m (%d variations)\n", 
 		m, n, pos, count_variations);
       else if (dcode == KO_A)
 	gprintf("%m can be defended with ko (good) at %1m (%d variations)\n", 
