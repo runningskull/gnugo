@@ -1432,7 +1432,11 @@ class Controller
 			      ->pack_start(new_engine_button, 0, 0, 0),
 			      GTK.Label("Engines"));
 	notebook->signal_connect_new("switch_page", add_markup);
-	
+
+	if (has_prefix(testcase_command, "reg_genmove")
+	    || has_prefix(testcase_command, "restricted_genmove"))
+	    notebook->set_page(1);
+
 	notebook_window->show_all();
     }
 
@@ -1622,8 +1626,12 @@ class Controller
 	{
 	    int this_number;
 	    string testline = testlines[k];
-	    if (testline[0..0] >= "a" && testline[0..0] <= "z")
-		complete_testcase += ({testline});
+	    if (testline[0..0] >= "a" && testline[0..0] <= "z") {
+	        if (testline[0..6] != "loadsgf")
+		    complete_testcase += ({ testline });
+		else
+		    complete_testcase = ({ testline });
+	    }
 	    else if (sscanf(testline, "%d %s", this_number, testline) == 2
 		&& this_number == number)
 	    {
