@@ -2783,6 +2783,16 @@ Oa*o
 ;owl_proper_eye(a)
 
 
+Pattern D721
+# nn New pattern. (3.3.9)
+
+OoO        good shape can help
+o.O
+O*X
+
+:8,-,value(55)
+
+
 #########################################################
 #                                                       #
 #           Make eyeshape in the corner                 #
