@@ -1419,6 +1419,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 	if (distance == 0) {
 	  if (board[SOUTH(ii)] == EMPTY
 	      && board[WEST(ii)] == EMPTY
+	      && !mx[SW(ii)]
 	      && (board[SW(ii)] == color
 		  || (board[SW(ii)] == color
 		      && ON_BOARD(SOUTH(SW(ii)))
@@ -1429,6 +1430,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 		      
 	  if (board[WEST(ii)] == EMPTY
 	      && board[NORTH(ii)] == EMPTY
+	      && !mx[NW(ii)]
 	      && (board[NW(ii)] == color
 		  || (board[NW(ii)] == color
 		      && ON_BOARD(WEST(NW(ii)))
@@ -1439,6 +1441,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 		      
 	  if (board[NORTH(ii)] == EMPTY
 	      && board[EAST(ii)] == EMPTY
+	      && !mx[NE(ii)]
 	      && (board[NE(ii)] == color
 		  || (board[NE(ii)] == color
 		      && ON_BOARD(NORTH(NE(ii)))
@@ -1449,6 +1452,7 @@ dragon_escape(char goal[BOARDMAX], int color,
 		      
 	  if (board[EAST(ii)] == EMPTY
 	      && board[SOUTH(ii)] == EMPTY
+	      && !mx[SE(ii)]
 	      && (board[SE(ii)] == color
 		  || (board[SE(ii)] == color
 		      && ON_BOARD(EAST(SE(ii)))
@@ -1462,8 +1466,14 @@ dragon_escape(char goal[BOARDMAX], int color,
   }
 
   /* Reset used mx cells. */
-  for (k = 0; k < queue_end; k++)
+  for (k = 0; k < queue_end; k++) {
+    /* The assertion fails if the same element should have been queued
+     * twice, which might happen if ENQUEUE() is called without
+     * checking mx[].
+     */
+    ASSERT1(mx[queue[k]] == 1, queue[k]);
     mx[queue[k]] = 0;
+  }
 
   return escape_potential;
 }
