@@ -4794,6 +4794,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
       showboard(0);
       componentdump(component2);
     }
+    free(conn_data);
   }
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
