@@ -234,4 +234,18 @@ A*B
 ;&& !oplay_connect(*,A,B)
 
 
+Pattern A15
+#evand new pattern 3.3.13
+
+?X?
+X*.
+?XX
+
+:8,s
+
+?X?
+X*b
+?AA
+
+;lib(A) == 2 && xlib(b) <= 2
 # END OF FILE
