@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- ATTACK_EITHER_MOVE taken down
+- new ALL_MOVE reasons
+- new tests 
+
 3.1.22 released January 20, 2002
 
 - find_backfilling_move() in filllib.c revised
