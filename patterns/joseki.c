@@ -237,17 +237,22 @@ make_pattern(int movei, int movej, int color,
    */
   if (labels
       || selected_line_exists(text, ';')
-      || selected_line_exists(text, '>'))
+      || selected_line_exists(text, '>')) {
     write_diagram(movei, movej, color, marki, markj, labels);
 
-  printf("\n");
+    printf("\n");
 
-  /* Write constraint and action lines. */
-  write_selected_lines(text, ';');
-  write_selected_lines(text, '>');
-  if (move_type == ANTISUJI)
-    printf(">antisuji(*);\n");
-  printf("\n\n");
+    /* Write constraint and action lines. */
+    write_selected_lines(text, ';');
+    write_selected_lines(text, '>');
+    if (move_type == ANTISUJI)
+      printf(">antisuji(*);\n");
+    printf("\n");
+  }
+  else if (move_type == ANTISUJI)
+    printf(">antisuji(*);\n\n");
+
+  printf("\n");
   
   /* Basic sanity checking. We do this at the end to simplify debugging. */
   if (multiple_marks)

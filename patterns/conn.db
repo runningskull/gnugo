@@ -128,9 +128,9 @@ O*!
 :8,B
 
 ?XO
-O*.
+O*!
 cab
-...
+.!.
 ---
 
 ;!xplay_attack(*,a,b,b) || !xplay_attack(*,a,c,c)
@@ -213,7 +213,7 @@ O*O.
 
 ?XX?
 O*Oc
-.ab.
+!ab.
 .!..
 ----
 
@@ -270,7 +270,7 @@ O.*O
 ??X?
 Oc*O
 .bad
-..ef
+.!ef
 ..!.
 ----
 
@@ -430,7 +430,6 @@ Pattern EB24
 ;!xplay_defend(*,a)
 
 
-
 ##########################
 #
 # B patterns in the center
@@ -521,9 +520,9 @@ O*
 :\,B,ugly_cutstone_helper
 
 AO
-OB
+O*
 
-;attack(A) && safe_xmove(B)
+;attack(A) && safe_xmove(*)
 
 
 Pattern CB7
@@ -577,9 +576,9 @@ X!o
 
 :8,B
 
-.aB
+oaB
 O*O
-Cd.
+Cdo
 
 ;xplay_defend_both(*,a,*,B) && xplay_defend_both(*,d,*,C)
 
@@ -630,9 +629,9 @@ dae
 O*O
 Fbx
 
-; xplay_defend_both(*,a,b,d,e) &&
-; xplay_defend_both(*,a,b,e,d) &&
-; xplay_defend_both(*,b,a,a,F)
+; xplay_defend_both(*,a,b,d,e)
+; && xplay_defend_both(*,a,b,e,d)
+; && xplay_defend_both(*,b,a,a,F)
 
 
 ########################
@@ -954,8 +953,8 @@ Obc
 daO
 ooo
 
-; xplay_attack_either(a,b,c,a,c) == WIN && 
-; xplay_attack_either(b,a,d,b,d) == WIN
+; xplay_attack_either(a,b,c,a,c) == WIN
+; && xplay_attack_either(b,a,d,b,d) == WIN
 
 
 Pattern CC206a
@@ -1050,7 +1049,6 @@ daF
 ;&& xplay_attack_either(b,a,d,b,d)==WIN
 
 
-
 Pattern CC312
 
 .O
@@ -1065,9 +1063,9 @@ ab
 Oc
 oO
 
-;(xplay_attack(a,b,c,a) || xplay_attack(a,b,c,c)) &&
-;(xplay_attack(b,a,d,b) || xplay_attack(b,a,d,d)) &&
-;!xcut(c)
+;(xplay_attack(a,b,c,a) || xplay_attack(a,b,c,c))
+;&& (xplay_attack(b,a,d,b) || xplay_attack(b,a,d,d))
+;&& !xcut(c)
 
 
 Pattern CC313
@@ -1234,7 +1232,7 @@ o.|
 
 ba|
 cX|
-Od|
+od|
 
 ;!attack(c) && !safe_xmove(d)
 >not_lunch(a,b);

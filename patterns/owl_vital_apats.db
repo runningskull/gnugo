@@ -164,7 +164,7 @@ XXO
 
 :8,s,value(45)
 
-*XX
+*Xx
 A.X
 AAO
 
@@ -527,7 +527,7 @@ X.*X
 :8,s,value(45)
 
 ?XXb
-xa*X
+Xa*X
 ?CC?
 
 ;lib(C)==2 && owl_eyespace(a,C) && oplay_attack(*,a,b,b)!=WIN
@@ -596,7 +596,6 @@ XO.|
 
 :8,s,value(45)
 
-
 ?XX|
 XAB|
 X*X|
@@ -656,8 +655,7 @@ x..
 ;owl_big_eyespace(*,A) && !oplay_defend(*,A)
 
 
-
-Pattern VA38
+Pattern VA39
 # tm New Pattern (3.1.16)
 
 XO*|	  atari to kill eye
@@ -673,7 +671,7 @@ XOO|
 ; owl_eyespace(A,B)
 
 
-Pattern VA39
+Pattern VA40
 # tm New Pattern (3.1.16) (see trevora:550)
 
 OXx	  Threaten snapback inside eyespace.
@@ -691,7 +689,7 @@ X..
 ; lib(A) == 3
 
 
-Pattern VA40
+Pattern VA41
 # tm New Pattern (3.1.16)
 
 XXO
@@ -707,7 +705,7 @@ XBO
 ;lib(A) ==2 || lib(B) == 2
 
 
-Pattern VA41
+Pattern VA42
 # tm New Pattern (3.1.16)
 
 X*X	double attack on safe eye
@@ -725,7 +723,7 @@ DXX
 ;!attack(D) && oplay_attack(*,b) && oplay_attack(*,c)
 
 
-Pattern VA42
+Pattern VA43
 # tm New Pattern (3.1.17)
 
 XXX.
@@ -742,7 +740,7 @@ aO*c
 ; && !oplay_attack(*,d,c,c)
 
 
-Pattern VA43
+Pattern VA44
 # tm New Pattern (3.1.17)
 
 XoX
@@ -758,7 +756,7 @@ A*C
 ; && safe_xmove(*)
 
 
-Pattern VA44
+Pattern VA45
 # tm New Pattern (3.1.17)
 
 X*     cut to create false eye
@@ -774,7 +772,7 @@ OX
 ; !ko(*)
 
 
-Pattern VA45
+Pattern VA46
 # tm New Pattern (3.1.17)
 #   see trevor:650
 
@@ -793,7 +791,7 @@ CbX??
 ; && owl_topological_eye(b,C) < 4 && owl_topological_eye(b,C) > 0
 
 
-Pattern VA46
+Pattern VA47
 # tm Moved from owl_attackpats (3.1.17)
 #   was A1107
 
@@ -808,7 +806,7 @@ Xb
 ;vital_chain(a) && vital_chain(b) && !xplay_defend_both(*,a,b)
 
 
-Pattern VA47
+Pattern VA48
 # tm New Pattern (3.1.18)
 
 +----
@@ -818,9 +816,8 @@ Pattern VA47
 :8,s,value(75)
 
 
-Pattern VA48
+Pattern VA49
 # tm New Pattern (3.1.18) (see trevor:430)
-
 
 X*    atari outside eyespace
 oX

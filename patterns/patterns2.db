@@ -838,8 +838,8 @@ O.XO
 Ob*c
 OaDO
 
-;oplay_attack_either(*,a,b,c,a,c) && oplay_attack(*,c,c) &&
-;oplay_attack(*,b,a,c,D) 
+;oplay_attack_either(*,a,b,c,a,c) && oplay_attack(*,c,c)
+;&& oplay_attack(*,b,a,c,D)
 
 
 Pattern Conn704
@@ -1128,7 +1128,6 @@ Pattern AS1
 #
 # descending is the *only* move to live. So this should not be an antisuji.
 
-
 ?XO     don't defend by moving straight down if it gives X a free forcing move
 XO.
 .*.
@@ -1403,14 +1402,14 @@ XOX
 
 :|,-,shape(5)
 
-bdB     don't give opponent ponnuki
+bdB
 c*C
 eOf
 .X.
 
-; lib(e) > 1 && lib(f) > 1 &&
-; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
-; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
+; lib(e) > 1 && lib(f) > 1
+; && (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1)
+; && !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
 
 
 Pattern Shape9b
@@ -1424,14 +1423,14 @@ XOX
 
 :8,-,shape(4)
 
-bdB     don't give opponent ponnuki
+bdB
 c*C
 eOf
 .XX
 
-; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
-; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B))) &&
-; !attack(e) && !attack(f)
+; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1)
+; && !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
+; && !attack(e) && !attack(f)
 
 
 Pattern Shape9c
@@ -1449,9 +1448,9 @@ c*C
 eOA
 .fO
 
-; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
-; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B))) &&
-; !attack(A) && !attack(e) && !attack(f)
+; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1)
+; && !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
+; && !attack(A) && !attack(e) && !attack(f)
 
 
 Pattern Shape10
@@ -1520,7 +1519,6 @@ bax
 
 Pattern Shape13
 
-
 ?X?     don't set up double cut
 *.O
 .O.
@@ -1536,7 +1534,6 @@ cOb
 
 Pattern Shape14
 
-
 xXO?    better connect solid at once than leaving a kikashi
 .O.x
 xX*?
@@ -1551,7 +1548,6 @@ xB*?
 
 
 Pattern Shape15
-
 
 xXO?    better connect solid at once than leaving a kikashi
 .O.*
@@ -1691,6 +1687,7 @@ O.*X
 
 ;oplay_attack(*,a,b,c,d,*)
 
+
 Pattern Shape23
 
 .OXx    Usually better to connect solidly
@@ -1798,7 +1795,7 @@ XOX
 :|,X,shape(1)
 
 ?O?
-...
+o.o
 XaX
 .*.
 ---
@@ -2358,7 +2355,7 @@ XO..
 :8,-,shape(-4)
 
 ?Xc.
-Xba.      
+Xba.
 *...
 ----
 
@@ -2857,7 +2854,7 @@ Pattern DD2b
 *ca
 ?bX
 
-;!xplay_defend_both(c,a,b) 
+;!xplay_defend_both(c,a,b)
 ;&& (oplay_attack(*,c,c) || oplay_defend_both(*,c,a,b))
 
 >add_defend_both_move(a,b);
@@ -2875,8 +2872,8 @@ OEE
 D*c
 Dba
 
-;oplay_attack(*,D) && oplay_attack_either(*,a,D,E) && 
-;!oplay_defend_both(*,b,c,D,E)
+;oplay_attack(*,D) && oplay_attack_either(*,a,D,E)
+;&& !oplay_defend_both(*,b,c,D,E)
 
 >add_attack_either_move(D,E);
 
@@ -2893,8 +2890,8 @@ Xee
 dac
 db*
 
-;xplay_attack(a,d) && xplay_attack_either(a,*,d,e) && 
-;!xplay_defend_both(a,b,c,d,e) && !xplay_defend_both(a,c,b,d,e)
+;xplay_attack(a,d) && xplay_attack_either(a,*,d,e)
+;&& !xplay_defend_both(a,b,c,d,e) && !xplay_defend_both(a,c,b,d,e)
 
 >add_defend_both_move(d,e);
 
@@ -3002,7 +2999,7 @@ Pattern DD10
 *ba
 ?Xc
 
-;(alive(b) || alive(c)) 
+;(alive(b) || alive(c))
 ;&& safe_xmove(a)==WIN && !xplay_defend_both(a,b,c) && oplay_attack(*,a,a)==WIN
 
 >add_defend_both_move(b,c);
@@ -3155,7 +3152,6 @@ Pattern Temp5
 # Don't make a short jump along the edge before shimari.
 # existed since at least 3.0.0
 # tm Modified (3.1.20)
-
 
 ???xxxxx|
 ........|

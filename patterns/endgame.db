@@ -111,11 +111,11 @@ Pattern EE1
 
 :8,bOX,terri(1)
 
-?ddx
-cbax
+?ccx
+ba*x
 ----
 
-;marginal_eye(a) && proper_eye(b) && proper_eye(c) && !xplay_attack(a,d)
+;marginal_eye(*) && proper_eye(a) && proper_eye(b) && !xplay_attack(*,c)
 
 
 Pattern EE2
@@ -129,7 +129,7 @@ xOOX      Start by backfilling
 
 OXXx
 xbbX
-*.a.
+*.ax
 ----
 
 ;xplay_attack(a,b)
@@ -178,10 +178,10 @@ XOO.
 :8,bOX,terri(1),followup(1)
 
 XOO.
-.Xa.
+.X*.
 ----
 
-;marginal_eye(a)
+;marginal_eye(*)
 
 
 Pattern EE5
@@ -219,7 +219,7 @@ O.*.
 
 :8,sOX,terri(0.75)
 
-o.X?
+?.X?
 O.*a
 
 ;proper_eye(a) && safe_omove(*)
@@ -412,8 +412,6 @@ XX?
 ;&& !oplay_attack(*,a,*)
 
 
-
-
 Pattern EE202
 
 OXX.           endgame move
@@ -423,10 +421,10 @@ OXX.           endgame move
 :8,eOX,terri(1),reverse_followup(1)
 
 OXX.
-.Oab
+.O*a
 ----
 
-;marginal_eye(a) && marginal_eye(b)
+;marginal_eye(*) && marginal_eye(a)
 
 
 Pattern EE203
@@ -437,12 +435,12 @@ OXX.           1 point double sente
 
 :8,eOX,terri(1),followup(4),reverse_followup(2)
 
-OEEd
-cOab
+ODDc
+bO*a
 ----
 
-;marginal_eye(a) && marginal_eye(b) && marginal_eye(d) &&
-;(oplay_attack(a,b,c,b) || oplay_attack(a,b,c,E))
+;marginal_eye(*) && marginal_eye(a) && marginal_eye(c)
+;&& (oplay_attack(*,a,b,a) || oplay_attack(*,a,b,D))
 
 
 Pattern EE204
@@ -457,8 +455,8 @@ O*.        2 points gote
 O*a
 ---
 
-;marginal_eye(*) && proper_eye(a) && 
-;(!oplay_defend(*,a,b,a) || !oplay_defend(*,a,b,C))
+;marginal_eye(*) && proper_eye(a)
+;&& (!oplay_defend(*,a,b,a) || !oplay_defend(*,a,b,C))
 
 
 Pattern EE205
@@ -484,7 +482,6 @@ O*
 --
 
 :8,eOX
-
 
 
 # first line blocks (except in corner)
@@ -513,11 +510,11 @@ X*        2 points reverse sente
 
 :8,bOX,terri(2),reverse_followup(5)
 
-cb
-da
+ba
+C*
 --
 
-;eye(a) && eye(b) && oplay_defend_both(a,b,a,c)
+;eye(*) && eye(a) && oplay_defend_both(*,a,*,C)
 
 
 Pattern EE303
@@ -525,6 +522,7 @@ Pattern EE303
 OXO
 .*.
 ---
+
 :8,bOX,terri(2)
 
 
@@ -561,10 +559,10 @@ Pattern EE403
 :8,eOX,terri(1)
 
 |OX
-|.a
+|.*
 +--
 
-;marginal_eye(a)
+;marginal_eye(*)
 
 
 Pattern EE404
@@ -576,10 +574,10 @@ Pattern EE404
 :8,esOX,terri(0.5)
 
 |OX?
-|.a.
+|.*.
 +---
 
-;marginal_eye(a)
+;marginal_eye(*)
 
 
 Pattern EE405
@@ -592,10 +590,10 @@ Pattern EE405
 :8,bOX,terri(1)
 
 |XO?
-|.a.
+|.*.
 +---
 
-;marginal_eye(a)
+;marginal_eye(*)
 
 
 Pattern EE406
@@ -890,12 +888,12 @@ O.O
 
 :8,eOX,terri(1),reverse_followup(2)
 
-?b?
-XaX
+?a?
+X*X
 O.O
 ---
 
-;marginal_eye(a) && proper_eye(b)
+;marginal_eye(*) && proper_eye(a)
 
 
 Pattern EE902
@@ -907,12 +905,12 @@ X.X
 
 :8,bOX,terri(1),followup(2)
 
-?b?
-OaO
+?a?
+O*O
 X.X
 ---
 
-;marginal_eye(a) && proper_eye(b)
+;marginal_eye(*) && proper_eye(a)
 
 
 # third line moves
@@ -930,7 +928,7 @@ XX.X       sente endgame move
 OO*?
 XX.X
 ....
-----       
+----
 
 ;olib(*)>2
 
@@ -1099,11 +1097,11 @@ O.
 
 :8,O,terri(1),reverse_followup(3)
 
-Ac
-DB
+ac
+*b
 
 ;proper_eye(c) && oterri(c) && !oplay_attack(*,*)
-;&& !xplay_attack(*,*) && xplay_attack_either(*,A,B) 
+;&& !xplay_attack(*,*) && xplay_attack_either(*,a,b)
 
 
 ######################################################################
@@ -1184,10 +1182,10 @@ Pattern CE9
 
 :8,eOXn,terri(1)
 
-bX
-aO
+aX
+*O
 
-;marginal_eye(a) && !safe_omove(b) && !obvious_false_xeye(b)
+;marginal_eye(*) && !safe_omove(a) && !obvious_false_xeye(a)
 
 
 Pattern CE12
@@ -1236,10 +1234,10 @@ X.O
 :8,eOX,terri(1),followup(2)
 
 .X?
-ba.
+a*.
 X.O
 
-;marginal_eye(a) && proper_eye(b)
+;marginal_eye(*) && proper_eye(a)
 
 
 Pattern CE15b
@@ -1251,10 +1249,10 @@ X.O
 :8,eOX,terri(1)
 
 XX?
-ba.
+a*.
 X.O
 
-;marginal_eye(a) && proper_eye(b)
+;marginal_eye(*) && proper_eye(a)
 
 
 Pattern CE16
@@ -1266,10 +1264,10 @@ X??
 :8,eOX,terri(1),followup(2)
 
 .X?
-baO
+a*O
 X??
 
-;marginal_eye(a) && proper_eye(b) && olib(a)>2
+;marginal_eye(*) && proper_eye(a) && olib(*)>2
 
 
 Pattern CE16b
@@ -1280,11 +1278,11 @@ O??
 
 :8,eOX,terri(1),reverse_followup(2)
 
-.X?
-baO
-X??
+.O?
+a*X
+O??
 
-;marginal_eye(a) && proper_eye(b) && xlib(a)>2
+;marginal_eye(*) && proper_eye(a) && xlib(*)>2
 
 
 Pattern CE17
@@ -1296,10 +1294,10 @@ xX
 :8,eXO,terri(1),followup(2)
 
 XO
-ba
+a*
 xX
 
-;marginal_eye(a) && proper_eye(b) && olib(a)>2
+;marginal_eye(*) && proper_eye(a) && olib(*)>2
 
 
 Pattern CE18
@@ -1313,10 +1311,10 @@ oO
 :8,bXO,terri(1)
 
 OX
-ba
+a*
 oO
 
-;marginal_eye(a) && proper_eye(b)
+;marginal_eye(*) && proper_eye(a)
 
 
 Pattern CE19
@@ -1327,11 +1325,11 @@ O.O
 
 :|,eOX,terri(1)
 
-?c?       endgame move
-XaX       one point gote
-ObO
+?b?
+X*X
+OaO
 
-;marginal_eye(a) && proper_eye(c) && oplay_attack(a,b,b)
+;marginal_eye(*) && proper_eye(b) && oplay_attack(*,a,a)
 
 
 Pattern CE20
@@ -1342,11 +1340,11 @@ O*O         one point reverse sente
 
 :|,bOXn,terri(1),reverse_followup(2)
 
-?b?
-OaO
+?a?
+O*O
 ?X?
 
-;marginal_eye(a) && proper_eye(b)
+;marginal_eye(*) && proper_eye(a)
 
 
 Pattern CE21
@@ -1438,7 +1436,7 @@ X*X
 
 :8,-,terri(3)
 
-.b.   
+.b.
 A*C
 ?O?
 
@@ -1458,8 +1456,7 @@ OX
 A*
 OB
 
-; eye(A) &&
-; oplay_attack(*,B,B)
+; eye(A) && oplay_attack(*,B,B)
 
 
 Pattern CE29
@@ -1511,8 +1508,8 @@ xBx
 AdC
 X*X
 
-; proper_eye(d) &&
-; (x_somewhere(A) + x_somewhere(B) + x_somewhere(C) <=1) 
+; proper_eye(d)
+; && (x_somewhere(A) + x_somewhere(B) + x_somewhere(C) <=1)
 
 
 ######################################################################

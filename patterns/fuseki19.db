@@ -16339,7 +16339,6 @@ Pattern Fuseki584
 :8,-,value(13)
 
 
-
 # Pattern Fuseki585
 # # 4/31
 # Irregular approach move
@@ -17207,7 +17206,6 @@ Pattern Fuseki615
 +-------------------+
 
 :8,-,value(11)
-
 
 
 # Pattern Fuseki616
@@ -18135,7 +18133,6 @@ Pattern Fuseki648
 :8,-,value(28)
 
 
-
 # Pattern Fuseki649
 # # 25/28
 # Dangerous double hane leaving a gap
@@ -18751,7 +18748,6 @@ Pattern Fuseki670
 +-------------------+
 
 :8,-,value(3)
-
 
 
 # Pattern Fuseki671
@@ -19958,7 +19954,6 @@ Pattern Fuseki713
 +-------------------+
 
 :8,-,value(16)
-
 
 
 # Pattern Fuseki714
@@ -23572,7 +23567,6 @@ Pattern Fuseki842
 +-------------------+
 
 :8,-,value(4)
-
 
 
 # Pattern Fuseki843
@@ -28112,7 +28106,6 @@ Pattern Fuseki1007
 :8,-,value(27)
 
 
-
 # Pattern Fuseki1008
 # # 19/4382
 # Irregular enclosure
@@ -28140,7 +28133,6 @@ Pattern Fuseki1007
 # +-------------------+
 # 
 # :8,-,value(19)
-
 
 
 # Pattern Fuseki1009
@@ -28174,7 +28166,6 @@ Pattern Fuseki1007
 
 Pattern Fuseki1010
 # 10/4382
-
 
 |...................|
 |...................|
@@ -28340,7 +28331,6 @@ Pattern Fuseki1015
 :8,-,value(45)
 
 
-
 # Pattern Fuseki1016
 # # 20/2547
 # Irregular enclosure
@@ -28396,7 +28386,6 @@ Pattern Fuseki1017
 +-------------------+
 
 :8,-,value(17)
-
 
 
 # Pattern Fuseki1018
@@ -28876,7 +28865,6 @@ Pattern Fuseki1034
 :8,-,value(29)
 
 
-
 Pattern Fuseki1035
 # 17/1642
 
@@ -28903,7 +28891,6 @@ Pattern Fuseki1035
 +-------------------+
 
 :8,-,value(17)
-
 
 
 # Pattern Fuseki1036
@@ -29747,7 +29734,6 @@ Pattern Fuseki1065
 :8,-,value(19)
 
 
-
 # Pattern Fuseki1066
 # # 10/1088
 # Irregular approach
@@ -30559,7 +30545,6 @@ Pattern Fuseki1094
 +-------------------+
 
 :8,-,value(41)
-
 
 
 # Pattern Fuseki1095
@@ -34147,7 +34132,6 @@ Pattern Fuseki1222
 :8,-,value(13)
 
 
-
 # Pattern Fuseki1223
 # # 12/258
 # Irregular enclosure
@@ -34175,7 +34159,6 @@ Pattern Fuseki1222
 # +-------------------+
 # 
 # :8,-,value(12)
-
 
 
 # Pattern Fuseki1224
@@ -35997,7 +35980,6 @@ Pattern Fuseki1288
 +-------------------+
 
 :8,-,value(11)
-
 
 
 # Pattern Fuseki1289
@@ -38213,7 +38195,6 @@ Pattern Fuseki1367
 :8,-,value(3)
 
 
-
 # Pattern Fuseki1368
 # # 3/87
 # Bad unless O has a stone on middle right
@@ -38467,7 +38448,6 @@ Pattern Fuseki1376
 :8,-,value(6)
 
 
-
 # Pattern Fuseki1377
 # # 5/83
 # Not Joseki. Strengthens the opponent with no benefit
@@ -38523,7 +38503,6 @@ Pattern Fuseki1378
 +-------------------+
 
 :8,-,value(4)
-
 
 
 # Pattern Fuseki1379
@@ -39479,7 +39458,6 @@ Pattern Fuseki1412
 :8,-,value(15)
 
 
-
 # Pattern Fuseki1413
 # # 12/76
 # Not joseki. If X plays up, exchange favors X.
@@ -39731,7 +39709,6 @@ Pattern Fuseki1421
 +-------------------+
 
 :8,-,value(3)
-
 
 
 # Pattern Fuseki1422
@@ -40405,7 +40382,6 @@ Pattern Fuseki1445
 +-------------------+
 
 :8,-,value(6)
-
 
 
 Pattern Fuseki1446
@@ -41610,7 +41586,6 @@ Pattern Fuseki1488
 +-------------------+
 
 :8,-,value(17)
-
 
 
 # Pattern Fuseki1489

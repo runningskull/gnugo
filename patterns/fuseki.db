@@ -388,8 +388,8 @@ Pattern F101
 
 Pattern F102
 
-|.........        ikken shimari
-|.........
+|.........        lower shimari is better if X can approach
+|.........        at 7-3 (left of a) too easily
 |..O.*.ooo
 |......ooo
 |.........
@@ -398,15 +398,16 @@ Pattern F102
 
 :8,FjEe,shape(3)
 
-|.........        lower shimari is better if X can approach
-|.........        at the left of a too easily
-|..O.*....
-|.......a.
+|.........
+|.........
+|..O.*.ooo
+|......oao
 |.........
 |.........
 +---------
 
 ;!xmoyo(a)
+
 
 Pattern F103
 
@@ -513,7 +514,6 @@ Pattern F110
 +----------
 
 :8,FtE,shape(-1)
-
 
 
 #######################################
@@ -728,7 +728,7 @@ oo.....x
 
 :8,Ft
 
-oo......      
+oo......
 oo...*..
 ab.....x
 .....O.x
@@ -760,7 +760,6 @@ X.*..abc
 ; o_somewhere(a,b,c,d,e,f)
 
 
-
 #################
 # Edge extensions
 #################
@@ -783,6 +782,7 @@ x.*..O.cd
 ---------
 
 ; x_somewhere(a,b,c,d)
+
 
 Pattern F402
 
@@ -1125,7 +1125,6 @@ x........
 :8,Fj
 
 
-
 ##############################################
 # Edge extensions combined with approach moves
 ##############################################
@@ -1190,6 +1189,7 @@ O..*.X
 o....x
 ......
 ------
+
 :8,Fteda,shape(1)
 
 
@@ -1247,7 +1247,7 @@ O.*.O
 # Invasions in the middle of the edge
 #####################################
 
-Pattern F701 
+Pattern F701
 
 X.........xx    invade with space to extend in both directions
 x....*....xx
@@ -1257,15 +1257,16 @@ x....*....xx
 
 :8,FstE,shape(1)
 
-X.........ab    
+X.........ab
 x....*....cd
 ............
 ............
 ------------
+
 ; x_somewhere(a,b,c,d)
 
 
-Pattern F702  
+Pattern F702
 
 x.........xx    invade with space to extend in both directions
 X....*....xx
@@ -1275,11 +1276,12 @@ X....*....xx
 
 :8,FstE,shape(1)
 
-x.........ab    
+x.........ab
 X....*....cd
 ............
 ............
 ------------
+
 ; x_somewhere(a,b,c,d)
 
 
@@ -1741,9 +1743,9 @@ Pattern J10
 
 :8,FsjE
 
-|.abcx...???
-|.defx...???
-|.ghix...???
+|.abc....???
+|.def....???
+|.ghi....???
 |...........
 |...........
 |...........

@@ -146,7 +146,6 @@ oO*.
 :8,-,value(83)
 
 
-
 #########################################################
 #                                                       #
 #          Expanding moves on the third line            #
@@ -464,7 +463,7 @@ OO...
 
 :8,-,value(80)
 
-??...        hane moving out
+??...
 XX*..
 OOa..
 .....
@@ -497,7 +496,7 @@ X..   split off weak stones
 
 :8,-,value(81)
 
-X..   split off weak stones
+X..
 *OO
 .ax
 ...
@@ -917,7 +916,7 @@ O*X
 :8,-,value(45)
 
 ?ob
-X.o       
+X.o
 a*X
 ...
 ---
@@ -1085,7 +1084,7 @@ X.?
 
 :8,-,value(75)
 
-OO?         block
+OO?
 a.?
 *..
 
@@ -1147,7 +1146,6 @@ ocO
 b*X
 
 ; oplay_attack(*,b,b) && oplay_attack(*,c,c) && safe_xmove(*)
-
 
 
 # tm removed this pattern (3.1.20)
@@ -1374,7 +1372,6 @@ o.O?
 :8,-,value(50)
 
 
-
 #########################################################
 #                                                       #
 #           Expanding moves in the corner               #
@@ -1582,7 +1579,7 @@ OOX         hanging connection to defend and make eye
 
 :8,-,value(85)
 
-Oax
+OaX
 .bc
 .*.
 ---
@@ -1602,7 +1599,7 @@ Pattern D506
 
 :8,-,value(75)
 
-.ax
+.aX
 dbc
 .*.
 ---
@@ -2509,7 +2506,7 @@ X*o
 
 :8,-,value(45)
 
-O.X           
+O.X
 a*o
 ---
 
@@ -2558,11 +2555,10 @@ O.O?
 
 :8,-,value(77)
 
-
 ?A??
 O*O?
 O.O?
-X.oo
+?.oo
 ??Oo
 
 ; oplay_attack(*,A)
@@ -2686,7 +2682,7 @@ O..o
 :8,-,value(60)
 
 ?*OO
-o.bo
+O.bo
 ?oaX
 
 ;owl_eyespace(b,a) && !owl_big_eyespace(b,a)
@@ -3036,7 +3032,7 @@ Pattern D817
 :8,s,value(45)
 
 |.aX
-|X.O       
+|X.O
 |*.O
 |...
 +---
@@ -3466,7 +3462,6 @@ XOX         hane to prevent connection
 *..
 ---
 
-
 :8,-,value(84)
 
 AOX
@@ -3673,10 +3668,10 @@ Pattern D1004
 
 ??D?
 ?*ab
-??Oc
+?OOc
 
 ;(lib(b)>1 && oplay_attack(*,a,a) && !xplay_attack_either(*,?,a,a,c))
-;&& (!x_somewhere(D) || oplay_attack(*,D)) 
+;&& (!x_somewhere(D) || oplay_attack(*,D))
 
 
 Pattern D1004b
@@ -3762,10 +3757,10 @@ OX
 
 :/,b,value(90)
 
-ba
-Oc
+A*
+OB
 
-;vital_chain(b) && vital_chain(c) && !oplay_defend_both(a,b,c)
+;vital_chain(A) && vital_chain(B) && !oplay_defend_both(*,A,B)
 
 
 Pattern D1101
@@ -4085,7 +4080,6 @@ X*X?
 OXOX
 ?O.?
 
-
 :8,-,value(85)
 
 
@@ -4329,6 +4323,7 @@ oO..
 
 ;owl_escape_value(a)>0
 
+
 Pattern D1134
 # tm new pattern (3.1.14)
 # Give a very low value, unless add lots of constraints.
@@ -4447,7 +4442,6 @@ cd?
 ;&& oplay_attack(*,a)
 
 
-
 ########################################################
 #                                                       #
 #                       Kikashi                         #
@@ -4543,7 +4537,6 @@ O*O
 ?A?
 O*O
 ?X?
-
 
 ;oplay_attack(*,A)
 
@@ -4818,7 +4811,7 @@ xOX?
 oabo
 o.oc
 .*.o
-XOX?
+xOX?
 
 ;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
 
@@ -4978,8 +4971,8 @@ O*O      connect to friendly dragon
 A*B
 cde
 
-; (!owl_goal_dragon(A) || !owl_goal_dragon(B)) &&
-; !xplay_attack_either(*,d,c,c,*)
+; (!owl_goal_dragon(A) || !owl_goal_dragon(B))
+; && !xplay_attack_either(*,d,c,c,*)
 
 
 Pattern D1321
@@ -5242,7 +5235,7 @@ oOX
 
 :8,-,value(95)
 
-?Oo
+XOo
 *Xb
 aOX
 
@@ -5294,7 +5287,7 @@ oOo
 
 ?O?
 X*X
-.d.
+odo
 
 ;owl_escape_value(d)>0
 
@@ -5357,8 +5350,8 @@ o.*.
 
 obo?
 a..X
-o.*o
-?xoO
+o.*.
+?x.O
 
 ;owl_escape_value(a) + owl_escape_value(b) > 0
 
@@ -5411,8 +5404,8 @@ o*..
 
 obo?
 a..X
-o*.o
-?.oO
+o*..
+?..O
 
 ;owl_escape_value(a) + owl_escape_value(b) > 0
 
@@ -5569,7 +5562,6 @@ Pattern D1354
 X...x
 ?OOO?
 
-
 :8,-,value(65)
 
 ?abc?
@@ -5593,6 +5585,7 @@ aXXb
 ----
 
 ;lib(a)>1 && lib(b)>1
+
 
 Pattern D1356
 
@@ -5684,7 +5677,7 @@ Pattern D1361
 X.X         push to expose weakness
 O*.
 ?X?
- 
+
 :8,-,value(65)
 
 
@@ -5778,7 +5771,7 @@ XOo?
 :8,-,value(70)
 
 b..?
-.*X?       
+.*X?
 ..OX
 Xao?
 
@@ -5814,8 +5807,8 @@ oOo        move out
 
 :8,b,value(85)  
 
-oao        move out
-...        
+oao
+...
 .*X
 .O?
 
@@ -5842,7 +5835,6 @@ Pattern D1373
 # gf New pattern. (3.1.14)
 
 o*XO        capture to escape
-
 
 :-,-,value(85)
 
@@ -5982,8 +5974,8 @@ O*.
 O*a
 ?CB
 
-; (owl_escape_value(B) > 0 || owl_escape_value(a) > 0) &&
-; oplay_attack_either(*,a,a,C)
+; (owl_escape_value(B) > 0 || owl_escape_value(a) > 0)
+; && oplay_attack_either(*,a,a,C)
 
 
 Pattern D1382
@@ -5995,12 +5987,12 @@ O.
 
 :8,-,value(70)
 
-cA   threaten attack and connect
+cA
 *d
 B.
 
-; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0) &&
-; oplay_attack(*,c,d)
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
+; && oplay_attack(*,c,d)
 
 
 Pattern D1383
@@ -6015,11 +6007,12 @@ Pattern D1383
 
 ?OD
 fbc
-?We
+?*e
 ?a?
 
 ;(owl_escape_value(a) > 0)
 ; && (xplay_attack(b,c,f,D,e,e) || xplay_attack(b,c,f,e,D,D))
+
 
 #########################################################
 #                                                       #
@@ -6072,11 +6065,11 @@ O.OX
 :8,-,value(35)
 
 ----
-..X?
-O*Oa
-?Ob?
+.*X?
+O.OA
+?OB?
 
-; (lib(a)>1) && (lib(b)>1)
+; (lib(A)>1) && (lib(B)>1)
 
 
 Pattern D1402
@@ -6393,7 +6386,7 @@ Pattern D1422
 
 |XX??
 |OXOO
-|.OAA         
+|.OAA
 |O.O*
 +----
 

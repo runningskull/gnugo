@@ -96,7 +96,7 @@ Pattern A1
 
 :8,n,value(80)
 
-?.*Ax        connect
+?.*Ax
 ..OXX
 .....
 .....
@@ -180,7 +180,7 @@ Pattern A104
 
 :8,-,value(90)
 
-?..O        pull back
+?..O
 .*Oa
 ..X.
 ....
@@ -358,13 +358,13 @@ XXOO.
 
 :8,-,value(60)
 
-OOd.c    
-XXOOb
-..XXa
+OOc.b
+XXOOa
+..XX*
 .....
 -----
 
-; oplay_attack(a,b,b) || !oplay_attack(a,b,c,d,a)
+; oplay_attack(*,a,a) || !oplay_attack(*,a,b,c,*)
 
 
 # tm Removed (3.1.16)
@@ -684,7 +684,7 @@ eX*d
 ..f?
 ----
 
-;(xlib(a)==1 || lib(b)>2) && lib(A)<=3 && olib(e)>1 
+;(xlib(a)==1 || lib(b)>2) && lib(A)<=3 && olib(e)>1
 ;&& oplay_attack(*,c,a,d,e,f,A)
 ;&& oplay_defend(*,c,a,e,*)
 
@@ -793,7 +793,7 @@ X.X..
 
 :8,-,value(35)
 
-??Oxx
+?XOxx
 ?XO*a
 X.X..
 -----
@@ -1070,11 +1070,11 @@ X*..
 
 :8,-,value(80)
 
-cb.?
-Xa..
+ba.?
+X*..
 ?..?
 
-; oplay_defend_both(a,b,a,c) && !oplay_attack(a,b,c)
+; oplay_defend_both(*,a,*,b) && !oplay_attack(*,a,b)
 
 
 Pattern A401a
@@ -1088,11 +1088,11 @@ X*..
 
 :8,-,value(60)
 
-cb.?
-Xa..
+ba.?
+X*..
 ?..?
 
-; oplay_defend_both(a,b,a,c)
+; oplay_defend_both(*,a,*,b)
 
 
 Pattern A402
@@ -1340,7 +1340,7 @@ oo...oo
 ??e..??
 ab.*.fg
 cd...hi
-??xXxjk
+??.X.jk
 
 ; o_somewhere(a,b,c,d) && owl_escape_value(e)>0 && o_somewhere(f,g,h,i,j,k)
 
@@ -1380,7 +1380,7 @@ xxxx
 
 ?X.O
 O.*.
-oo..
+o...
 xabc
 
 ;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
@@ -1652,7 +1652,6 @@ X..?
 :8,-,value(75)
 
 
-
 Pattern A602
 
 --+         hane in corner
@@ -1682,8 +1681,8 @@ xCX.a
 DB*..
 -----
 
-;!attack(a) && owl_proper_eye(B,C) &&
-; (x_somewhere(D) || owl_proper_eye(D,C))
+;!attack(a) && owl_proper_eye(B,C)
+;&& (x_somewhere(D) || owl_proper_eye(D,C))
 
 
 Pattern A603b
@@ -1695,7 +1694,7 @@ xX.x       reduce eye space
 
 :8,s,value(35)
 
-xC..
+xC.x
 b*.a
 ----
 
@@ -1874,7 +1873,7 @@ X.*.
 ;!oplay_attack(a,*,*)
 
 
-Pattern A614
+Pattern A615
 # tm New Pattern (3.1.15)
 
 OXXXO	attack shortage of liberties
@@ -1892,7 +1891,7 @@ OXAXO
 ;lib(A) == 3
 
 
-Pattern A615
+Pattern A616
 # tm New Pattern (3.1.15)
 # tm Modified (3.1.17)
 
@@ -1912,7 +1911,7 @@ Pattern A615
 ; && (!x_somewhere(b) || (x_somewhere(b) && o_somewhere(a)))
 
 
-Pattern A616
+Pattern A617
 # tm New Pattern (3.1.15)
 
 OX?	threaten snapback.
@@ -1923,7 +1922,7 @@ X*.
 
 :8,s,value(50)
 
-OX?	threaten snapback.
+OX?
 A.X
 X.O
 X*.
@@ -1932,7 +1931,7 @@ X*.
 ; lib(A) == 3
 
 
-Pattern A617
+Pattern A618
 # tm New Pattern (3.1.17)
 
 XXO   falsify eye
@@ -1950,7 +1949,7 @@ XA*
 ; oplay_defend_both(*,A,b,*)
 
 
-Pattern A618
+Pattern A619
 #tm New Pattern (3.1.17)
 
 |.X
@@ -2155,9 +2154,9 @@ x*x
 :8,-,value(45)
 
 bb?
-OaO
-O.O
-o*o
+XaX
+X.X
+x*x
 
 ;!attack(b) && xplay_attack(a,b)
 
@@ -2224,7 +2223,7 @@ XO*X
 XO*X
 ?XAb
 
-; owl_big_eyespace(A,b) 
+; owl_big_eyespace(A,b)
 ; && oplay_attack(*,b)
 
 
@@ -2277,7 +2276,7 @@ oAXO
 ..*.
 ----
 
-; attack(A) && !oplay_attack(*,A) 
+; attack(A) && !oplay_attack(*,A)
 
 
 Pattern A804
@@ -2364,7 +2363,6 @@ A.X
 ?*?
 
 ;owl_eyespace(*,A) && safe_omove(*)
-
 
 
 Pattern A811
@@ -2518,7 +2516,7 @@ Pattern A908
 :8,s,value(35)
 
 |X???
-|OXX?       
+|OXX?
 |.OX?
 |O*aX
 +----
@@ -2692,6 +2690,7 @@ Xa
 
 
 Pattern A1002
+
 ????
 ?*.X     threaten to cut
 ??XO
@@ -2853,8 +2852,9 @@ x*x
 
 :|,-,value(80)
 
-a*b
-?O?
+aOb
+x*x
+---
 
 ;owl_escape_value(a)>0 || owl_escape_value(b)>0
 
@@ -2867,7 +2867,7 @@ oOX?
 
 :8,-,value(45)
 
-Xa??          cut
+Xa??
 OX*O
 obX?
 
@@ -2916,11 +2916,11 @@ X..X
 
 :8,-,value(75)
 
-Ae*D   
+Ae*D
 BfgC
 
-; (owl_escape_value(A) > 0 || owl_escape_value(C) > 0) &&
-; oplay_defend_both(*,g,f,e,f,*)
+; (owl_escape_value(A) > 0 || owl_escape_value(C) > 0)
+; && oplay_defend_both(*,g,f,e,f,*)
 
 
 #########################################################
@@ -2974,7 +2974,6 @@ O*O   connect against threat
 ?X?
 
 :8,-,value(81)
-
 
 A*B
 ?X?
@@ -3099,7 +3098,7 @@ Xc
 Pattern A1107c
 # tm New pattern. (3.1.17)
 # tm Modified (3.1.20) - reduced value (see nngs:320)
-   
+
 .*       defend the surrounding chain
 O.
 XO
@@ -3177,7 +3176,7 @@ XO..
 
 :8,-,value(50)
 
-X.*O         
+X.*O
 Xa..
 ....
 ----
@@ -3333,7 +3332,7 @@ Pattern A1121
 O.O         block to protect weakness
 X*.
 ?O?
- 
+
 :8,-,value(35)
 
 
@@ -3406,8 +3405,8 @@ XO
 *X
 AO
 
-;wormsize(A)<=3 && does_attack(*,A) && 
-; (olib(*) > 1 || ko(*))
+;wormsize(A)<=3 && does_attack(*,A)
+;&& (olib(*) > 1 || ko(*))
 
 
 Pattern A1207
@@ -3448,7 +3447,7 @@ OAA*
 .O..
 ----
 
-;owl_proper_eye(*,A) 
+;owl_proper_eye(*,A)
 
 
 #########################################################
@@ -3472,7 +3471,7 @@ Pattern A1301
 
 |..a???
 |.Oboo?
-|.XOO..
+|.XOO.o
 |.XX..O
 |...*..
 |......
@@ -3861,7 +3860,6 @@ Pattern A1328
 :8,s,value(45)
 
 
-
 Pattern A1329
 
 |X??        try to make nakade
@@ -3871,7 +3869,6 @@ Pattern A1329
 +---
 
 :8,s,value(45)
-
 
 
 Pattern A1330
@@ -4149,7 +4146,7 @@ Pattern A1348
 :8,s,value(75)
 
 |xX?
-|axB     
+|axB
 |aBB
 |X*B
 +---
@@ -4239,7 +4236,6 @@ OXO
 ?O?
 
 ;owl_escape_value(A) > 0 || owl_escape_value(B) > 0
-
 
 
 #########################################################
@@ -4408,7 +4404,7 @@ X...O
 
 :8,-,value(45)
 
-bAAA?      edge tesuji
+bAAA?
 XedfO
 .Xc*.
 -----
@@ -4426,7 +4422,7 @@ X...XO
 
 :8,-,value(35)
 
-OXXXx?      edge tesuji
+OXXXx?
 X.edXf
 .a*cb.
 ------

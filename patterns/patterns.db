@@ -118,11 +118,11 @@ O*O
 
 :8,CBn
 
-?bX
-cAd
+?aX
+b*c
 ?X?
 
-;xplay_attack_either(A,b,b,c) || xplay_attack(A,b,d)
+;xplay_attack_either(*,a,a,b) || xplay_attack(*,a,c)
 
 
 Pattern CC3
@@ -175,10 +175,10 @@ O...?
 :8,C
 
 ?xxx?
-XOOb?
+XOO*?
 Oa..?
 
-;xcut(a) && odefend_against(b,a)
+;xcut(a) && odefend_against(*,a)
 
 
 Pattern CC7
@@ -309,7 +309,7 @@ O*.X
 ?Xac
 d*bX
 
-;(alive(c) || alive(d)) 
+;(alive(c) || alive(d))
 ;&& (!oplay_attack_either(*,a,b,b,c) || !oplay_attack_either(*,b,a,*,a))
 
 
@@ -365,11 +365,11 @@ Pattern CC20
 :8,C
 
 .O.?
-e..?
-dbaX
-?cO?
+d..?
+c*aX
+?bO?
 
-;!omoyo(d) || !omoyo(e) || !xplay_attack(a,b,c,c)
+;!omoyo(c) || !omoyo(d) || !xplay_attack(a,*,b,b)
 
 
 Pattern CC21
@@ -531,7 +531,7 @@ O*X
 :-,-
 
 ?ca
-X*d
+O*d
 ?eb
 
 ;oplay_defend_both(*,a,b,*,b) && oplay_defend_both(*,b,a,*,a)
@@ -659,11 +659,11 @@ XXOX
 
 :8,C
 
-?Oax
+?O*x
 XXOX
-?Ob?
+?Oa?
 
-;odefend_against(a,b)
+;odefend_against(*,a)
 
 
 Pattern CC41
@@ -709,12 +709,12 @@ XO*
 
 :8,BO
 
-cbX
-eOa
-?d.
+baX
+dO*
+?c.
 
-;oplay_attack(a,b,b) || oplay_attack(a,b,e) || 
-;(oplay_attack(a,b,d) && !oplay_attack(a,b,c))
+;oplay_attack(*,a,a) || oplay_attack(*,a,d)
+;|| (oplay_attack(*,a,c) && !oplay_attack(*,a,b))
 
 
 Pattern CC45
@@ -743,10 +743,10 @@ OXO
 :8,BO
 
 .XO
-cab
-dXO
+b*a
+cXO
 
-;oplay_attack(a,b,b) && !oplay_attack(a,c,b,d)
+;oplay_attack(*,a,a) && !oplay_attack(*,b,a,c)
 
 
 Pattern CC47
@@ -757,11 +757,11 @@ X..X
 
 :8,BO
 
-.adX
-XbcX
-?eO?
+.*cX
+XabX
+?dO?
 
-;!oplay_attack(a,b,c,d,e) && !oplay_attack(a,b,c,d,a)
+;!oplay_attack(*,a,b,c,d) && !oplay_attack(*,a,b,c,*)
 
 
 Pattern CC48
@@ -836,8 +836,8 @@ OX..     connect if invaded
 Odbe
 c*aO
 
-;oplay_attack(*,a,b,d) && oplay_attack(*,a,b,a) &&
-;oplay_attack(*,a,b,e,e) && oplay_attack(*,a,b,c,c)
+;oplay_attack(*,a,b,d) && oplay_attack(*,a,b,a)
+;&& oplay_attack(*,a,b,e,e) && oplay_attack(*,a,b,c,c)
 
 
 Pattern CC53
@@ -975,7 +975,7 @@ x.O
 
 O..
 .*.
-..O
+x.O
 
 ;!omoyo(*)
 
@@ -1085,6 +1085,7 @@ aX*E
 
 
 Pattern CC72
+
 ?....        atari
 .OX*X
 ..O..
@@ -1129,7 +1130,7 @@ OXXO
 aO*b
 OCCO
 
-;oplay_attack(*,a,a) && oplay_attack(*,b,b) 
+;oplay_attack(*,a,a) && oplay_attack(*,b,b)
 ;&& !(attack(C) && oplay_defend(*,C))
 
 
@@ -1164,7 +1165,7 @@ C?
 *b
 aD
 
-; !same_dragon(C,D) && xplay_attack_either(*,a,a,b) 
+; !same_dragon(C,D) && xplay_attack_either(*,a,a,b)
 
 
 Pattern CC78
@@ -1218,7 +1219,7 @@ Pattern CC81
 
 O*X
 XO?
-?O.
+?O?
 
 :8,B,shape(3)
 
@@ -1238,7 +1239,7 @@ X*O.
 
 :8,CdaE,shape(3)
 
-..??          
+..??
 .AXX
 X*B.
 ...?
@@ -1649,15 +1650,15 @@ X..
 
 :8,BO
 
-fcX
-dOa
-dbe
+ebX
+cO*
+cad
 ---
 
-;!xplay_defend_both(a,b,c,b,f)
-;&& xplay_attack_either(a,c,b,e,e,c)
-;&& oplay_attack_either(a,c,c,d)
-;&& oplay_attack_either(a,b,e,c,c,d)
+;!xplay_defend_both(*,a,b,a,e)
+;&& xplay_attack_either(*,b,a,d,d,b)
+;&& oplay_attack_either(*,b,b,c)
+;&& oplay_attack_either(*,a,d,b,b,c)
 
 
 Pattern EC26
@@ -1670,13 +1671,13 @@ X..
 
 :8,BO
 
-fcX
-dOa
-dbe
+d*X
+XOa
+Xbc
 ---
 
-;(!xplay_defend(a,b,c,b) || !xplay_defend(a,b,c,f)) &&
-;xplay_attack(a,c,b,e,e)
+;(!xplay_defend(a,b,*,b) || !xplay_defend(a,b,*,d))
+;&& xplay_attack(a,*,b,c,c)
 
 
 Pattern EC27
@@ -1701,6 +1702,7 @@ Pattern EC27
 
 
 Pattern EC28
+
 O.XO?        capture to connect
 OXOXO
 o..*.
@@ -1800,13 +1802,12 @@ OXO
 
 :8,C
 
-
-?O?
-O*O
-XaX
+?X?
+X*X
+OAO
 ---
 
-;ko(a)
+;ko(A)
 
 
 Pattern EC35
@@ -1817,7 +1818,6 @@ O*O
 ---
 
 :8,C
-
 
 ?X?
 XaX
@@ -1874,7 +1874,7 @@ O.*X
 :8,C
 
 ??o?
-...O
+X..O
 O.*A
 ?.??
 
@@ -2050,13 +2050,13 @@ Pattern EC55
 
 :8,BO
 
-?df?
-eObX
-cXa.
+?ce?
+dOaX
+bX*.
 ....
 ----
 
-;!oplay_attack(a,b,c,d,e,f)
+;!oplay_attack(*,a,b,c,d,e)
 
 
 Pattern EC56
@@ -2449,6 +2449,7 @@ a..
 ; !oplay_attack(*)
 ; || !oplay_attack(*,a,b,b)
 
+
 ##############################################
 # First line, one space, cuts and connections.
 ##############################################
@@ -2806,10 +2807,10 @@ X*.X
 :8,BO
 
 ?O??
-CabD
+B*aC
 ----
 
-;(lib(C)>1) && (lib(D)>1) && xplay_attack(a,b,b)
+;lib(B)>1 && lib(C)>1 && xplay_attack(*,a,a)
 
 
 Pattern EC218
@@ -3024,7 +3025,7 @@ X*.X
 
 :8,aOX
 
-.O..
+?O.x
 A*.B
 
 ;!same_dragon(A,B)
@@ -3179,7 +3180,6 @@ O*X..
 -----
 
 :8,dX
-
 
 
 ######################################################################
@@ -3395,7 +3395,6 @@ Pattern EB106
 .......
 -------
 
-
 :8,OXed
 
 
@@ -3490,7 +3489,6 @@ O..*.?
 :8,OXe
 
 
-
 ###################
 # Center expansions
 ###################
@@ -3520,7 +3518,6 @@ X.O.X
 -----
 
 :8,OXd
-
 
 
 Pattern EB203
@@ -3596,7 +3593,6 @@ O....
 .....
 .....
 -----
-
 
 :8,OXd
 
@@ -3886,7 +3882,7 @@ O.*.x	       jump along edge
 :8,Oe,jump_out_far_helper
 
 ....a
-O.*.b	       jump along edge
+O.*.b
 ....?
 ....?
 -----
@@ -3974,11 +3970,11 @@ O..*.
 :8,Oe,jump_out_helper
 
 o....
-O..a.
+O..*.
 .....
 -----
 
-;oarea(a)
+;oarea(*)
 
 
 Pattern EB410
@@ -4027,8 +4023,6 @@ OXX.
 ----
 
 :8,deE,shape(3)
-
-
 
 
 ##############################
@@ -4137,7 +4131,6 @@ X*..
 ----
 
 :8,Eb,shape(3)
-
 
 
 Pattern EB507a
@@ -4386,12 +4379,12 @@ O*X
 
 :8,XOb
 
-?BO
-OaX
+?aO
+O*X
 ?..
 ---
 
-;odefend_against(a,B)
+;odefend_against(*,a)
 
 
 Pattern EB605
@@ -4404,11 +4397,11 @@ X*X
 :8,XOb
 
 ?.O
-BaX
+A*X
 ?..
 ---
 
-;does_attack(a,B)
+;does_attack(*,A)
 
 
 Pattern EB606
@@ -4472,14 +4465,14 @@ XXO.
 
 :8,OXb
 
-???c
-.Ob.
+???b
+.Oa.
 XXO.
-..a.
+..*.
 ....
 ----
 
-;odefend_against(a,b) || omoyo(c)
+;odefend_against(*,a) || omoyo(b)
 
 
 Pattern EB615
@@ -4532,12 +4525,12 @@ oO.?           Prevent monkey jump or other incursion
 
 :8,XOb
 
-oOb?
-..aX
+oOa?
+..*X
 ...X
 ----
 
-;oplay_attack(a,b,b)
+;oplay_attack(*,a,a)
 
 
 Pattern EB624
@@ -4692,7 +4685,6 @@ Pattern EB634
 .....x
 ------
 
-
 :8,Xb
 
 
@@ -4708,7 +4700,7 @@ X*..OO
 
 Pattern EB637
 
-??.?         stop intrusion on first line
+?o.?         stop intrusion on first line
 .*.O
 ..XX
 ----
@@ -4769,7 +4761,7 @@ X..
 :8,OXb
 
 Ooo
-.*.
+x*.
 Xab
 ---
 
@@ -4786,7 +4778,7 @@ X..
 :8,OXb
 
 .Oo
-.*.
+x*.
 Xab
 ---
 
@@ -4803,7 +4795,7 @@ X..
 :8,OXb
 
 ..O
-.*.
+x*.
 Xab
 ---
 
@@ -4946,11 +4938,11 @@ Pattern EB706
 :8,OXb
 
 ??Oo???
-..BO...
-..Ba...
+..AO...
+..A*...
 -------
 
-;oplay_attack(a,B)
+;oplay_attack(*,A)
 
 
 Pattern EB707
@@ -5127,8 +5119,8 @@ Pattern EB717
 cXA*.
 -----
 
-; lib(A) == 2 &&
-; !oplay_attack_either(*,B,*)
+; lib(A) == 2
+; && !oplay_attack_either(*,B,*)
 
 
 Pattern EB718
@@ -5141,7 +5133,7 @@ X..
 
 :8,OXb
 
-ac*    jump back to block
+ac*
 Xb.
 ---
 
@@ -5243,6 +5235,7 @@ bC.*.
 ;!weak(a) && oplay_attack(*,b,b)
 
 >defend_against_atari(C)
+
 
 ###########################
 # Third line push or extend
@@ -5505,7 +5498,7 @@ O.O*.x
 
 :8,Ed,shape(3),value(12)
 
-XX...x         extend on third line
+XX...x
 A.O*.x
 ......
 ......
@@ -5575,13 +5568,13 @@ Pattern EB1005
 :8,OXe
 
 ??o??
-?oaXX
-?.bOO
+?o*XX
+?.aOO
 ?....
 .....
 -----
 
-;odefend_against(a,b)
+;odefend_against(*,a)
 
 
 Pattern EB1006
@@ -5798,11 +5791,11 @@ O*..
 :8,OXe,followup(6)
 
 ?x??
-?Xcd
-Oab.
+?Xbc
+O*a.
 ----
 
-;xmoyo(d) && oplay_attack(a,b,b) && !oplay_attack(a,b,c,a)
+;xmoyo(c) && oplay_attack(*,a,a) && !oplay_attack(*,a,b,*)
 
 
 Pattern EB1102
@@ -5992,7 +5985,7 @@ Pattern EB1310
 
 :8,OXeda,value(20)
 
-?.c??
+?.cX?
 .bXOO
 da*eo
 .f..o
@@ -6166,7 +6159,6 @@ x*..
 :8,OXEd
 
 
-
 ########
 # Attach
 ########
@@ -6254,12 +6246,12 @@ o..*.?
 
 ????.?
 ?....?
-oO.Edo
-o.cab?
+oO.Dco
+o.b*a?
 .....?
 ------
 
-;!weak(E) && !oplay_attack(a,b,c,?,d,d)
+;!weak(D) && !oplay_attack(*,a,b,?,c,c)
 
 
 Pattern EB1606
@@ -6309,7 +6301,6 @@ O.*.
 
 
 Pattern EB1608
-
 
 O..X.       attach below
 oO.*.
@@ -6363,7 +6354,6 @@ OOX.O
 -----
 
 :8,cda,shape(10)
-
 
 
 ###################
@@ -6526,12 +6516,12 @@ O...O
 
 :8,Oe
 
-..a..
+..*..
 O...O
 .....
 -----
 
-;!omoyo(a)
+;!omoyo(*)
 
 
 Pattern EB1802
@@ -6568,13 +6558,13 @@ O.*..
 :8,Oceb
 
 ??.??
-O.a..
+O.*..
 ....O
 .....
 .....
 -----
 
-;!omoyo(a)
+;!omoyo(*)
 
 
 Pattern EB1805
@@ -6589,13 +6579,13 @@ O.*.O
 :8,Oceb
 
 ??.??
-O.a.O
+O.*.O
 .....
 .....
 .....
 -----
 
-;!omoyo(a)
+;!omoyo(*)
 
 
 Pattern EB1806
@@ -6632,12 +6622,12 @@ O.*.O
 :8,OXceb
 
 ??.??
-O.a.O
+O.*.O
 .....
 .....
 -----
 
-;!omoyo(a)
+;!omoyo(*)
 
 
 Pattern EB1808a
@@ -6652,11 +6642,11 @@ O...O
 
 ??.??
 O...O
-..a..
+..*..
 .....
 -----
 
-;!omoyo(a)
+;!omoyo(*)
 
 
 Pattern EB1809
@@ -6724,12 +6714,12 @@ XX..
 
 :8,OXb
 
-.Ob.
+.O*.
 XXa.
 ....
 ----
 
-;!odefend_against(a,b)
+;!odefend_against(a,*)
 
 
 Pattern EB1903
@@ -6790,7 +6780,6 @@ Oab.
 ----
 
 ;!xplay_attack(*,a,b,b)
-
 
 
 ###############
@@ -7036,7 +7025,7 @@ Pattern CB14
 
 :8,OXEd,shape(2)
 
-?o?? 
+?o??
 ..bO
 .*ac
 .XdO
@@ -7055,7 +7044,7 @@ Pattern CB14a
 
 :8,OXEd,shape(3)
 
-?o?? 
+?o??
 ..aO
 .OX.
 .X*O
@@ -7074,7 +7063,7 @@ Pattern CB14b
 
 :8,OXEd,shape(2)
 
-?o?? 
+?o??
 ..*O
 .OXa
 .X.O
@@ -7214,7 +7203,7 @@ Pattern CB203
 
 
 Pattern CB204
-# Kosumi is better if GNU is going to go back and defend anyway
+# Kosumi is better if GNU is going to go back and defend anyway.
 
 .....        knight's move to claim space
 .....
@@ -7224,13 +7213,13 @@ O....
 
 :8,OXE
 
-f....
+e....
 .....
-dca..
-eb...
+cb*..
+da...
 ?X...
 
-;!xmoyo(f) && oplay_defend(a,b,c,d,e)
+;!xmoyo(e) && oplay_defend(*,a,b,c,d)
 
 
 Pattern CB204b
@@ -7243,13 +7232,13 @@ O....
 
 :8,OXEd,shape(2)
 
-f....
+e....
 .....
-dca..
-eb...
+cb*..
+da...
 ?X...
 
-;!xmoyo(f) && oplay_attack(a,b,c,d,d)
+;!xmoyo(e) && oplay_attack(*,a,b,c,c)
 
 
 Pattern CB205
@@ -7275,11 +7264,11 @@ O*...
 
 .....
 .....
-.ed..
-Oab..
-?Xc..
+.dc..
+O*a..
+?Xb..
 
-;!oplay_attack(a,b,c,c) || !oplay_attack(a,b,d,e,a)
+;!oplay_attack(*,a,b,b) || !oplay_attack(*,a,c,d,*)
 
 
 Pattern CB207
@@ -7350,7 +7339,7 @@ Pattern CB212
 
 :8,OXbEd
 
-.X.Oa?    hane to defend
+.X.Oa?
 ...B*.
 
 ;!oplay_attack_either(*,a,a,B)
@@ -7553,12 +7542,12 @@ Pattern CB226
 
 ?????
 .....
-ab...
+a*...
 .....
 .O.X.
 .....
 
-;xarea(a) || xarea(b)
+;xarea(a) || xarea(*)
 
 
 Pattern CB227
@@ -7635,11 +7624,11 @@ O...
 :8,OXbed
 
 ..X.
-Ocd.
-eba.
-f...
+Obc.
+da*.
+e...
 
-;omoyo(f) || (oplay_attack(a,b,c,d,b) && oplay_attack_either(a,c,b,e,c,e))
+;omoyo(e) || (oplay_attack(*,a,b,c,a) && oplay_attack_either(*,b,a,d,b,d))
 
 
 Pattern CB234
@@ -7700,11 +7689,11 @@ O*O
 
 :8,OXb
 
-dbc
-OaO
+cab
+O*O
 ?X?
 
-;omoyo(c) && omoyo(d) && !xplay_attack(a,b,c,c)
+;omoyo(b) && omoyo(c) && !xplay_attack(*,a,b,b)
 
 
 Pattern CB240
@@ -7732,11 +7721,11 @@ O?
 :8,XOb
 
 ..
-ba
+a*
 OX
 O?
 
-;odefend_against(a,b)
+;odefend_against(*,a)
 
 
 Pattern CB241b
@@ -7749,11 +7738,11 @@ OX
 :8,XOb
 
 ..
-ba
+a*
 OX
 .x
 
-;odefend_against(a,b)
+;odefend_against(*,a)
 
 
 Pattern CB241c
@@ -7771,7 +7760,6 @@ OX
 bO
 
 ;odefend_against(*,b)
-
 
 
 Pattern CB242
@@ -7821,10 +7809,11 @@ OXX*?
 cXe*F
 ?bbAD
 
-; lib(c)>1 
+; lib(c)>1
 ; && !oplay_attack(*,b)
-; && oplay_defend_both(*,A,*,b) 
+; && oplay_defend_both(*,A,*,b)
 ; && (oplay_attack(*,A,e) || !x_somewhere(D,F))
+
 
 Pattern CB246
 
@@ -8228,10 +8217,10 @@ X.X.*..?
 :-,E
 
 .......?
-X.X.a..?
+X.X.*..?
 .......?
 
-;!xmoyo(a)
+;!xmoyo(*)
 
 
 Pattern CB283
@@ -8245,7 +8234,6 @@ X..?
 
 
 Pattern CB284
-
 
 .O.X.?        make shape to enclose
 ....OO
@@ -8405,10 +8393,10 @@ OX??
 :8,OXb,followup(5)
 
 Oooo
-.a.o
-OB??
+.*.o
+OA??
 
-;!attack(B) && oplay_attack(a,B)
+;!attack(A) && oplay_attack(*,A)
 
 
 Pattern CB298
@@ -8678,10 +8666,10 @@ xxX.*.?
 :-,XE
 
 ??....?
-xxX.a.b
+xxX.*.a
 ??....?
 
-;!xmoyo(a) && !xarea(b)
+;!xmoyo(*) && !xarea(a)
 
 
 Pattern CB322
@@ -8697,11 +8685,11 @@ xxX.*.?
 
 ??.ooo?
 ??....?
-xxB.a.?
+xxA.*.?
 ??....?
 ??.ooo?
 
-;!xterri(a) && weak(B)
+;!xterri(*) && weak(A)
 
 
 Pattern CB322a
@@ -8715,14 +8703,14 @@ xxX.*.?
 
 :-,XEa
 
-??.cde?
-??.fgh?
+??.bcd?
+??.efg?
 ??....?
-xxB.a.?
+xxA.*.?
 ??....?
 ??.ooo?
 
-;!xterri(a) && weak(B) && o_somewhere(c,d,e,f,g,h)
+;!xterri(*) && weak(A) && o_somewhere(b,c,d,e,f,g)
 
 
 Pattern CB323
@@ -8788,7 +8776,7 @@ OX?
 :8,OXC,shape(10)
 
 ?.?
-...      
+...
 a*O
 OB?
 
@@ -9290,9 +9278,9 @@ BOC
 .*.
 ---
 
-;lib(A)<=2 && lib(B)>1 && lib(C)>1 &&
-;!oplay_attack(*,a) && !oplay_attack(*,b) &&
-;oplay_attack(*,A) && oplay_attack(*,B) && oplay_attack(*,C)
+;lib(A)<=2 && lib(B)>1 && lib(C)>1
+;&& !oplay_attack(*,a) && !oplay_attack(*,b)
+;&& oplay_attack(*,A) && oplay_attack(*,B) && oplay_attack(*,C)
 
 
 Pattern ED30
@@ -9559,7 +9547,7 @@ OO.O*.
 :8,OXeda,value(30)
 
 ?XX...
-OOaO..
+OOaO*.
 ?cbd..
 ?.....
 ------
@@ -9696,12 +9684,12 @@ XX*X..
 :8,OXeda,value(25)
 
 ?OO...
-FFaE..
-?cbd..
+EE*D..
+?bac..
 ?.....
 ------
 
-; oplay_attack(a,b,c,d,F)&&oplay_attack(a,b,d,E)
+; oplay_attack(*,a,b,c,E)&&oplay_attack(*,a,c,D)
 
 
 Pattern ED54
@@ -9764,7 +9752,7 @@ OOXX??      push to defend
 
 :8,-,shape(8)
 
-OOXX..
+OOXX??
 .AOX..
 ..O*..
 ......
@@ -10341,11 +10329,11 @@ XO?
 :8,X,followup(5)
 
 ???
-.a.
-.Xb
+.*.
+.Xa
 XO?
 
-;!oplay_attack(a,b)
+;!oplay_attack(*,a)
 
 
 Pattern CD7
@@ -10493,11 +10481,11 @@ O.X.
 
 gf..
 ibX.
-.acd
+.*cd
 O.he
 
-;oplay_attack(a,b,c,d,e,d) && oplay_attack(a,b,c,d,e,h) &&
-;oplay_attack(a,c,b,f,g,f) && oplay_attack(a,c,b,f,g,i)
+;oplay_attack(*,b,c,d,e,d) && oplay_attack(*,b,c,d,e,h)
+;&& oplay_attack(*,c,b,f,g,f) && oplay_attack(*,c,b,f,g,i)
 
 
 Pattern CD64
@@ -10544,14 +10532,14 @@ OX*
 
 :8,X
 
-Xbo
-cXa
+Xao
+bX*
 ?.o
 
-;attack(c) && !defend(c) && !oplay_attack(a,b)
+;attack(b) && !defend(b) && !oplay_attack(*,a)
 
 # Estimate a followup value
->threaten_to_save(c);
+>threaten_to_save(b);
 
 
 Pattern CD77
@@ -10632,13 +10620,13 @@ Pattern CD87
 
 :-,adOX,shape(5)
 
+cXO
+a*b
 dXO
-bac
-eXO
 
 # The second move by X at b is intentional and has the effect of X passing.
-;oplay_attack(a,c,c) && 
-;!oplay_attack(a,b,c,b,d,d) && !oplay_attack(a,b,c,b,e,e)
+;oplay_attack(*,b,b)
+;&& !oplay_attack(*,a,b,a,c,c) && !oplay_attack(*,a,b,a,d,d)
 
 
 Pattern CD88
@@ -10710,11 +10698,12 @@ XO*
 
 :8,da,shape(3)
 
-.X.        ponnuki is worth thirty points
+.X.
 XO*
 .aO
 
 ; !attack(a)
+
 
 Pattern CD92a
 
@@ -10738,6 +10727,7 @@ OX*
 .OX
 
 ; !xplay_attack_either(*,?,a,*,a)
+
 
 Pattern CD93
 
@@ -10892,8 +10882,8 @@ OXO.
 
 ?FFO
 eFOa
-bd*o
-?co?
+bd*x
+?cx?
 
 ;xlib(b)>=2 && !attack(e) && !attack(d) && !attack(F)
 ;&& xplay_attack_either(*,a,b,c,d,e)
@@ -10980,7 +10970,7 @@ O...?
 
 :8,OXdae
 
-xX..?       
+xX..?
 .a*.?
 Abc.?
 
@@ -11164,12 +11154,12 @@ ooooo
 .oooo
 .e.oo
 IcB..
-gDaFX
+gD*FX
 ..H..
 .....
 -----
 
-;oplay_attack(a,B,c,D,e,B) && oplay_attack(a,B,c,D,e,F,g,H,I);
+;oplay_attack(*,B,c,D,e,B) && oplay_attack(*,B,c,D,e,F,g,H,I);
 
 
 Pattern EJ13
@@ -11183,7 +11173,6 @@ X.*.X
 -----
 
 :8,E
-
 
 .....
 ..a..
@@ -11464,7 +11453,7 @@ x.......
 :8,de
 
 ?a..?b??
-x.X.....
+xxX.....
 x.O*.X.O
 x.......
 ?.......
@@ -11485,7 +11474,7 @@ x.......
 :8,de
 
 ?a..?b??
-x.XX....
+xxXX....
 x.OO*X.O
 x.......
 ?.......
@@ -11553,9 +11542,6 @@ Pattern EJ37
 :8,J
 
 
-
-
-
 Pattern EJ39
 # sometimes the solid connection would be better
 
@@ -11620,6 +11606,7 @@ X.O.x
 
 :8,t
 
+
 Pattern EJ43
 
 ?...        connect after peep
@@ -11665,7 +11652,7 @@ bXOO
 ....
 ----
 
-; !safe_omove(a) 
+; !safe_omove(a)
 
 
 Pattern EJ46
@@ -11926,7 +11913,7 @@ oOXX
 
 :8,J
 
-o...          
+o...
 o.*O
 oOAA
 ....
@@ -12242,7 +12229,7 @@ Pattern EJ79
 
 |..X??b
 |.O.X.a
-|......
+|.....x
 |..O...
 |......
 |..*...
@@ -12452,8 +12439,8 @@ Pattern S1
 
 |AA??
 |.AA?
-|..AA
-|...A
+|o*AA
+|.o.A
 +----
 
 ;lib(A)==3 && seki_helper(A)
@@ -12472,8 +12459,8 @@ Pattern S2
 
 |aa??
 |.aa?
-|..aa
-|...a
+|*xaa
+|.x.a
 +----
 
 ;lib(a)<=3 && seki_helper(a)
@@ -12937,7 +12924,6 @@ O..O..O     Eliminate invasion point
 :8,O,value(8)
 
 
-
 ######################################################################
 #
 # Large Endgame moves
@@ -12963,7 +12949,7 @@ O.Xx      fourth line sente kosumi
 
 :8,OXebE
 
-O.Xx      fourth line sente kosumi
+O.Xx
 .*.a
 ....
 ....
@@ -13267,7 +13253,6 @@ Pattern LE16
 > replace(a,*)
 
 
-
 ######################################################################
 #
 # Replacement patterns
@@ -13406,6 +13391,7 @@ OXOX?
 
 > replace(a,*)
 
+
 Pattern RE7
 # tm New Pattern (3.1.20) (see strategy4:173)
 # FIXME: This seems a little underhanded, prob. not best fix.
@@ -13418,15 +13404,16 @@ Pattern RE7
 
 :8,-
 
-|.??   better for ko threats
+|.??
 |*.?
 |bO?
 |bao
 |?O?
 
-; oplay_attack(a,b) &&
-; (oplay_attack(a,b) == oplay_attack(*,b))
+; oplay_attack(a,b)
+; && (oplay_attack(a,b) == oplay_attack(*,b))
 
 > replace(a,*)
+
 
 # END OF FILE

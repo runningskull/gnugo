@@ -176,7 +176,7 @@ X,X
 
 :8,A
 
-Xb.
+Xbo
 Xac
 
 ;!oplay_attack_either(a,b,b,c)
@@ -241,8 +241,8 @@ O,X
 
 :8,A
 
-cao
-obd
+caO
+Obd
 
 ;!oplay_attack_either(a,b,c,d) && !oplay_attack_either(b,a,c,d)
 
@@ -404,7 +404,7 @@ Pattern Barrier29
 
 :8,D
 
-?b
+,b
 aX
 --
 
@@ -559,7 +559,7 @@ O.XO
 :8,D
 
 OcXO
-.bao
+.baO
 
 ;!oplay_attack_either(a,b,c,a,c)
 
@@ -694,12 +694,12 @@ o,X..
 
 :8,Ds
 
-o.a.?
-o*X..
+o.b.?
+oaX..
 .,...
 -----
 
-;!oplay_attack(*,a)
+;!oplay_attack(a,b)
 
 
 Pattern Barrier53
@@ -746,7 +746,7 @@ bA.c
 
 Pattern Barrier56
 
-XXOo
+xXOo
 XOX,
 ...,
 ----
@@ -763,7 +763,7 @@ XOXa
 
 Pattern Barrier56b
 
-XXOo
+xXOo
 XO.,
 .X.,
 ----
@@ -941,7 +941,7 @@ O!!
 :8,B,value(30)
 
 B.X
-Oa.
+Oa!
 ?X.
 
 ;oplay_attack(a,B)
@@ -993,7 +993,7 @@ Pattern Intrusion11
 
 dOb
 cXa
-...
+.!.
 ...
 ---
 
@@ -1279,7 +1279,6 @@ XO.
 .!.
 ?.?
 
-
 :8,B,value(30)
 
 
@@ -1369,7 +1368,7 @@ X?
 
 :8,B,value(5)
 
-XX
+X?
 aO
 --
 
@@ -1444,7 +1443,7 @@ Pattern Intrusion43
 
 :8,B,value(50)
 
-?OAO
+??AO
 .cAO
 ?dbo
 
