@@ -3,6 +3,10 @@ out how GNU Go understands a given position. These
 methods will be of interest to anyone working on the
 program, or simply curious about its workings.
 
+In practice, most tuning of GNU Go is done in conjunction
+with maintaining the @file{regression/} directory
+(@pxref{Regression}).
+
 We assume that you have a game GNU Go played saved
 as an sgf file, and you want to know why it made a
 certain move.

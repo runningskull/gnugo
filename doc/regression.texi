@@ -16,6 +16,14 @@ mistake being done by the engine, which are waiting to be fixed, and
 positions where the engine does the right thing, where we want to detect
 if a change breaks something.
 
+@menu
+* Regression Testing::          Regression Testing in GNU Go
+* Test Suites::                 Test Suites
+* Performance Testing::         Performance Testing
+* HTML Views::                  HTML Views
+@end menu
+
+@node Regression Testing, Test Suites, , Regression
 @section Regression testing in GNU Go
 
 Regression testing is performed by the files in the @file{regression/}
@@ -29,6 +37,7 @@ this. If you @command{make all_batches} most of the tests are run.
 Game records used by the regression tests are stored in the
 directory @file{regression/games/} and its subdirectories.
 
+@node Test Suites, Performance Testing, Regression Testing, Regression
 @section Test suites
 
 The regression tests are grouped into suites and stored in files as GTP
@@ -76,7 +85,7 @@ followed by a @samp{&}, meaning that the result is ignored. This is
 primarily used to report statistics, e.g. how many tactical reading
 nodes were spent while running the test suite.
 
-
+@node Performance Testing, HTML Views, Test Suites, Regression
 @section Performing tests
 
 @code{./test.sh blunder.tst} runs the tests in @file{blunder.tst} and
@@ -165,3 +174,25 @@ For convenience the tests are also available as makefile targets. For
 example, @code{make blunder} runs the tests in the blunder test suite by
 executing @code{eval.sh blunder.tst}. @code{make test} runs all test
 suites in a sequence using the @code{regress.sh} script.
+
+@node HTML Views, , Performance Testing, Regression
+@section HTML Regression Views
+
+Extremely useful HTML Views of the regression tests may be
+produced using two perl scripts @file{regression/regress.pl}
+and @file{regression/regress.plx}.
+
+@enumerate
+@item The driver program (regress.pl) which:
+@itemize @bullet
+@item Runs the regression tests, invoking GNU Go.
+@item Captures the trace output, board position, and pass/fail status,
+sgf output, and dragon status information.
+@end itemize
+@item The interface to view the captured output (regress.plx) which:
+@itemize @bullet
+@item Never invokes GNU Go.
+@item Displays the captured output in helpful formats (i.e. HTML).
+@end itemize
+@end enumerate
+
