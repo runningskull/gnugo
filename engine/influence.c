@@ -1358,7 +1358,7 @@ value_territory(struct influence_data *q)
         float diff = 0.0;
         if (q->white_influence[ii] + q->black_influence[ii] > 0)
           diff = (q->white_influence[ii] - q->black_influence[ii])
-                /(q->white_influence[ii] + q->black_influence[ii]);
+                 / (q->white_influence[ii] + q->black_influence[ii]);
         first_guess[ii] = diff * diff * diff;
 
 	/* If both side have small influence, we have to reduce this value.

@@ -525,7 +525,7 @@ goal_dist(int pos, char goal[BOARDMAX])
   int dist = 10000;
   int ii;
 
-  for (ii = BOARDMIN; ii <BOARDMAX; ii++)
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii) && goal[ii])
       dist = gg_min(dist, square_dist(ii, pos));
 

@@ -1134,7 +1134,6 @@ Pattern D234
 # gf New pattern. (3.5.3).
 # See e.g. nngs:1090.
 
-
 ...x?
 ..*X?
 ...Oo
@@ -3791,7 +3790,7 @@ Pattern D841
 :8,-,value(45)
 
 
-Pattern D841
+Pattern D842
 # gf New pattern. (3.5.5)
 
 ???X.|
@@ -3804,7 +3803,7 @@ XOO..|
 :8,-,value(76)
 
 
-Pattern D842
+Pattern D843
 # pp New pattern (3.5.5)
 
 |OOOOO	    workaround lunch problem (the eye is not considered a unit)
@@ -4996,7 +4995,7 @@ Pattern D1142
 
 ?C?
 *AX
-?DB
+?XB
 
 ; does_defend(*,A) && !oplay_attack(*,B)
 ; && !same_string(B,C) && vital_chain(B) && vital_chain(C)
@@ -5006,7 +5005,6 @@ Pattern D1142
 Pattern D1143
 # gf New pattern. (3.5.3).
 # See e.g. nngs:1090.
-
 
 .*XO
 XOXO
@@ -5050,7 +5048,7 @@ OXO	    escape by capturing
 
 :8,-,value(40)
 
-bXc
+OXO
 .*A
 ---
 
@@ -6982,6 +6980,7 @@ OX..?
 o*bc.
 ABa.?
 ?x.??
+-----
 
 ; owl_escape_value(d) > 0
 ; && oplay_attack_either(*,a,b,c,d,B,c) && oplay_connect(*,a,b,c,d,?,A,C)
@@ -7488,10 +7487,10 @@ Pattern DE01b
 ....
 OOOo
 
-:8,c, threatens_eye(b), value(30)
+:8,c, threatens_eye(a), value(30)
 
 ?O*?
-.b..
+.a..
 OOOo
 
 

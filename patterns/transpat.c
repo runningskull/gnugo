@@ -63,7 +63,7 @@
 
 
 static void flippat(Textpattern *tp);
-static int  match_name(Textpattern *tp, char *patnames);
+static int match_name(Textpattern *tp, char *patnames);
 
 
 /*
@@ -78,7 +78,7 @@ static int  match_name(Textpattern *tp, char *patnames);
 static void
 flippat(Textpattern *tp)
 {
-  int  transno;
+  int transno;
 
   switch (tp->edge_constraints) {
   case 0:     return;		  /* Nothing to do here */
@@ -130,7 +130,7 @@ main(int argc, char *argv[])
   Textpattern tp;
   int val;
   char *patnames;
-  int  command = 0;
+  int command = 0;
 
   if (argc < 2 || argc > 4) {
     printf("usage: %s command patnames [patfilename]\n\
@@ -151,7 +151,7 @@ where\n\
   patnames = argv[2];
 
   /* Try to open infile. */
-  if (argc == 4){
+  if (argc == 4) {
     if ((infile = fopen(argv[3], "r")) == 0) {
       perror(argv[3]);
       exit(1);

@@ -354,11 +354,11 @@ static struct autohelper_func autohelper_functions[] = {
   {"xplay_break_through",	3, 1, 5.00,
 		"play_break_through_n(OTHER_COLOR(color), %d"},
   {"oplay_break_through",	3, 1, 5.00, "play_break_through_n(color, %d"},
-  {"oplay_connect",		2, 1,10.00, "play_connect_n(color, 1, %d"},
-  {"xplay_connect",		2, 1,10.00,
+  {"oplay_connect",		2, 1, 10.00, "play_connect_n(color, 1, %d"},
+  {"xplay_connect",		2, 1, 10.00,
 		"play_connect_n(OTHER_COLOR(color), 1, %d"},
-  {"oplay_disconnect",		2, 1,10.00, "play_connect_n(color, 0, %d"},
-  {"xplay_disconnect",		2, 1,10.00,
+  {"oplay_disconnect",		2, 1, 10.00, "play_connect_n(color, 0, %d"},
+  {"xplay_disconnect",		2, 1, 10.00,
 		"play_connect_n(OTHER_COLOR(color), 0, %d"},
   {"seki_helper",		1, 0, 0.0, "seki_helper(%s)"},
   {"threaten_to_save",		1, 0, 0.0, "threaten_to_save_helper(move,%s)"},
@@ -432,7 +432,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"surround_map",		2, 0, 0.01, "surround_map(%s, %s)"},
   {"oracle_threatens",		2, 0, 0.01, "oracle_threatens(%s, %s)"},
   {"value",			0, 2, 0.0,  "(%s->value)"},
-  {"adjacent_to_stone_in_atari",1, 0, 1.0,
+  {"adjacent_to_stone_in_atari", 1, 0, 1.0,
                 "adjacent_to_stone_in_atari(%s)"},
   {"adjacent_to_defendable_stone_in_atari", 1, 0, 1.0,
                 "adjacent_to_defendable_stone_in_atari(%s)"},
@@ -501,9 +501,9 @@ static int labels_transformation = 0;
 
 
 struct hint_data {
-  char		    name[MAXNAME];
-  int		    transformation_hint;
-  struct hint_data  *next;
+  char name[MAXNAME];
+  int transformation_hint;
+  struct hint_data *next;
 };
 
 static struct hint_data *first_hint = NULL;
@@ -516,7 +516,7 @@ parse_transformations_file(FILE *file)
 
   while (!feof(file)) {
     int n;
-    struct hint_data *hint = malloc(sizeof(struct hint_data));
+    struct hint_data *hint = malloc(sizeof(*hint));
 
     n = fscanf(file, "%s %d", hint->name, &hint->transformation_hint);
     if (n == 2) {
@@ -584,7 +584,7 @@ check_constraint_diagram(void)
     for (i = ino; i <= maxi+ino; i++)
       for (j = jwo; j <= maxj+jwo; j++) {
 	if (0)
-	  fprintf(stderr,"%2d %2d %c %c\n", i, j, constraint_diagram[i][j], 
+	  fprintf(stderr, "%2d %2d %c %c\n", i, j, constraint_diagram[i][j], 
 		  diagram[i][j]);
 	if (strchr(CHECK_CHARS, constraint_diagram[i][j])
 	    && constraint_diagram[i][j] != diagram[i][j]) {
@@ -648,7 +648,7 @@ find_extents(void)
 
   /* apply edge constraints to the size of the pattern */
 
-  if (where & (NORTH_EDGE|SOUTH_EDGE|EAST_EDGE|WEST_EDGE))
+  if (where & (NORTH_EDGE | SOUTH_EDGE | EAST_EDGE | WEST_EDGE))
     ++pats_with_constraints;
 
   if (verbose)
@@ -1310,7 +1310,7 @@ finish_pattern(char *line)
   
   switch (symmetry) {
   case '+' :
-    if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
+    if (where & (NORTH_EDGE | EAST_EDGE | SOUTH_EDGE | WEST_EDGE))
       fprintf(stderr,
 	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
@@ -1318,7 +1318,7 @@ finish_pattern(char *line)
     break;
 
   case 'X' :
-    if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
+    if (where & (NORTH_EDGE | EAST_EDGE | SOUTH_EDGE | WEST_EDGE))
       fprintf(stderr,
 	      "%s(%d) : Warning : X symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
@@ -1330,7 +1330,7 @@ finish_pattern(char *line)
     break;
 
   case '-' :
-    if (where & (NORTH_EDGE|SOUTH_EDGE))
+    if (where & (NORTH_EDGE | SOUTH_EDGE))
       fprintf(stderr,
 	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
@@ -1338,7 +1338,7 @@ finish_pattern(char *line)
     break;
 
   case '|' :
-    if (where & (EAST_EDGE|WEST_EDGE))
+    if (where & (EAST_EDGE | WEST_EDGE))
       fprintf(stderr,
 	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
@@ -1359,7 +1359,7 @@ finish_pattern(char *line)
     break;
 
   case 'O' :
-    if (where & (NORTH_EDGE|EAST_EDGE|SOUTH_EDGE|WEST_EDGE))
+    if (where & (NORTH_EDGE | EAST_EDGE | SOUTH_EDGE | WEST_EDGE))
       fprintf(stderr,
 	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
@@ -1920,7 +1920,7 @@ tree_push_elements(struct element_node *elist,
   struct element_node *elist_prev;
 
    if (!tree_start->next_list) {
-     tree_start->next_list = malloc(sizeof(struct tree_node_list));
+     tree_start->next_list = malloc(sizeof(*(tree_start->next_list)));
      tree_start->next_list->next = 0;
    }
 
@@ -1949,7 +1949,7 @@ tree_push_elements(struct element_node *elist,
 	   grptr = grptr->next)
 	;
       
-      grptr->next = malloc(sizeof(struct tree_node_list));
+      grptr->next = malloc(sizeof(*(grptr->next)));
       grptr = grptr->next;
       grptr->node.matches = 0;
       grptr->node.att = elist->next->e.att;
@@ -1963,7 +1963,7 @@ tree_push_elements(struct element_node *elist,
       }
       grptr->node.x = elist->next->e.x;
       grptr->node.y = elist->next->e.y;
-      grptr->node.next_list= 0;
+      grptr->node.next_list = 0;
       grptr->next = 0;
       elist->next = elist->next->next;
       if (verbose) {
@@ -1981,7 +1981,7 @@ tree_push_elements(struct element_node *elist,
       matches = tree_start->matches;
       
       if (!matches) {
-        matches = malloc(sizeof(struct match_node));
+        matches = malloc(sizeof(*matches));
         matches->next = 0;
         tree_start->matches = matches;
       }
@@ -1989,7 +1989,7 @@ tree_push_elements(struct element_node *elist,
       while (matches->next != NULL)
         matches = matches->next;
 
-      matches->next = malloc(sizeof(struct match_node));
+      matches->next = malloc(sizeof(*(matches->next)));
       matches = matches->next;
       matches->patnum = patno;
       matches->next = 0;
@@ -2019,18 +2019,18 @@ tree_push_pattern_DOX(struct element_node *elist, int ll)
   }
     
   if (need_copy) {
-    struct element_node *elist_copy1 = malloc(sizeof(struct element_node));
-    struct element_node *elist_copy2 = malloc(sizeof(struct element_node));
+    struct element_node *elist_copy1 = malloc(sizeof(*elist_copy1));
+    struct element_node *elist_copy2 = malloc(sizeof(*elist_copy2));
     struct element_node *elist1_next = elist_copy1;
     struct element_node *elist2_next = elist_copy2;
     int found_copy_element = 0;
     
     elist_next = elist->next;
     while (elist_next) {
-      elist1_next->next = malloc(sizeof(struct element_node));
+      elist1_next->next = malloc(sizeof(*(elist1_next->next)));
       elist1_next = elist1_next->next;
       elist1_next->e = elist_next->e;
-      elist2_next->next = malloc(sizeof(struct element_node));
+      elist2_next->next = malloc(sizeof(*(elist2_next->next)));
       elist2_next = elist2_next->next;
       elist2_next->e = elist_next->e;
       if (!found_copy_element) {
@@ -2085,10 +2085,10 @@ tree_push_pattern_rot(int ll)
   struct element_node *elist_next = 0;
   int i;
   
-  elist = malloc(sizeof(struct element_node));
+  elist = malloc(sizeof(*elist));
   elist_next = elist;
   for (i = 0; i < el; i++) {
-    elist_next->next = malloc(sizeof(struct element_node)); /*or die*/
+    elist_next->next = malloc(sizeof(*(elist_next->next))); /*or die*/
     elist_next = elist_next->next;
     elist_next->e.att = elements[i].att;
     /* or continue if we don't need this transformation */
@@ -2144,7 +2144,7 @@ tree_push_pattern(void)
   int i;
     for (i = 0; i < el; i++) {
       fprintf(stderr, "E[%d, %d, %c]\n",
-	      elements[i].x - ci, elements[i].y -cj, 
+	      elements[i].x - ci, elements[i].y - cj, 
 	      *(VALID_PATTERN_CHARS + elements[i].att));
     }
     fprintf(stderr, "\n");
@@ -2293,8 +2293,8 @@ tree_write_patterns(FILE *outfile)
   oanchor_index = tnl_count+1;
   dump_tree_node(outfile, &graph[1], 0, PASS_COUNT);
 
-  tnl_dump = malloc(sizeof(struct tree_node_list) * tnl_count);
-  matches_dump = malloc(sizeof(struct match_node) * mn_count);
+  tnl_dump = malloc(sizeof(*tnl_dump) * tnl_count);
+  matches_dump = malloc(sizeof(*matches_dump) * mn_count);
 
   tnl_dump[0].next = (void *) 1;  /* X anchor node */
   tnl_dump[0].node.att = -1;    /* Not used */
@@ -2469,12 +2469,12 @@ corner_best_element(struct corner_element *el, int n,
 
 
 /* Dynamically allocates a new variation structure. */
-static struct corner_variation_b*
+static struct corner_variation_b *
 corner_variation_new(int move_offset, char xor_att, char num_stones)
 {
   struct corner_variation_b *variation;
    
-  variation = malloc(sizeof(struct corner_variation_b));
+  variation = malloc(sizeof(*variation));
 
   variation->move_offset = move_offset;
   variation->xor_att = xor_att;
@@ -2494,7 +2494,7 @@ corner_variation_new(int move_offset, char xor_att, char num_stones)
 /* Follow a variation. If such a variation already exists, returns
  * a pointer to it. Otherwise, creates and initializes a new one.
  */
-static struct corner_variation_b*
+static struct corner_variation_b *
 corner_follow_variation(struct corner_variation_b *variation,
 			int offset, int color, char num_stones)
 {
@@ -2741,7 +2741,7 @@ write_attributes(FILE *outfile)
       fprintf(outfile, ",\n");
   }
 
-  fprintf(outfile,"\n#endif\n};\n\n");
+  fprintf(outfile, "\n#endif\n};\n\n");
 }
 
 
@@ -2829,10 +2829,10 @@ write_patterns(FILE *outfile)
       int ll;
 
       for (ll = 0; ll < 8; ++ll)
-	fprintf(outfile, " 0x%08x%s", p->and_mask[ll], ll<7 ? "," : "");
+	fprintf(outfile, " 0x%08x%s", p->and_mask[ll], ll < 7 ? "," : "");
       fprintf(outfile, "},\n    {");
       for (ll = 0; ll < 8; ++ll)
-	fprintf(outfile, " 0x%08x%s", p->val_mask[ll], ll<7 ? "," : "");
+	fprintf(outfile, " 0x%08x%s", p->val_mask[ll], ll < 7 ? "," : "");
     }
     fprintf(outfile, "}\n   ");
 #endif

@@ -929,7 +929,7 @@ store_persistent_connection_cache(enum routine_id routine,
 
   /* Distance two expansion through empty intersections and own stones. */
   for (k = 1; k < 3; k++) {
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++){
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
 	continue;
       if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
@@ -1266,7 +1266,7 @@ store_persistent_breakin_cache(enum routine_id routine,
 
   /* Distance two expansion through empty intersections and own stones. */
   for (k = 1; k < 3; k++) {
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++){
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
 	continue;
       if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
@@ -1526,7 +1526,7 @@ store_persistent_owl_cache(enum routine_id routine,
 
   /* Distance four expansion through empty intersections and own stones. */
   for (k = 1; k < 5; k++) {
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++){
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       if (!ON_BOARD(pos) || board[pos] == other || active[pos] > 0) 
 	continue;
       if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)

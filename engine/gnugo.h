@@ -118,22 +118,22 @@ int   gnugo_get_move_number(void);
 
 
 typedef struct {
-  int       handicap;
+  int handicap;
 
-  int       to_move;		/* whose move it currently is */
-  SGFTree   game_record;	/* Game record in sgf format. */
+  int to_move;		/* whose move it currently is */
+  SGFTree game_record;	/* Game record in sgf format. */
 
-  int       computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
+  int computer_player;	/* BLACK, WHITE, or EMPTY (used as BOTH) */
 } Gameinfo;
 
 void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi);
 void gameinfo_print(Gameinfo *ginfo);
 void gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head);
 void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color);
-int  gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
-			       const char *untilstr, int orientation);
-int  gameinfo_play_sgftree(Gameinfo *gameinfo, SGFTree *tree,
-			   const char *untilstr);
+int gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
+			      const char *untilstr, int orientation);
+int gameinfo_play_sgftree(Gameinfo *gameinfo, SGFTree *tree,
+			  const char *untilstr);
 
 
 /* ================================================================ */

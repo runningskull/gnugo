@@ -2748,7 +2748,7 @@ Pattern Shape87
 :8,sX,shape(-1)
 
 .aXx
-.Cb.
+.Xb.
 .*..
 
 ;!dead(a) && !dead(b) && weak(a) && weak(b) && oplay_disconnect(*,a,b)

@@ -1218,7 +1218,6 @@ Pattern A242
 # gf New pattern. (3.5.3).
 # See e.g. nngs:1090.
 
-
 ...o?
 ..*O?
 ...Xx
@@ -2607,7 +2606,7 @@ X..*.
 
 
 Pattern A622
-# gf New patterm. (3.5.3)
+# gf New pattern. (3.5.3)
 # Compare D704b. See nngs3:450.
 
 xX.O	    half eye sometimes missed
@@ -4583,7 +4582,7 @@ xxx
 
 ?AY
 b*e
-cd.
+cdx
 
 ;(owl_escape_value(d) > 0
 ; || owl_escape_value(b) > 0
@@ -4831,7 +4830,7 @@ XOY	    prevent escaping by capturing
 
 :8,-,value(40)
 
-BOY
+XOY
 .*a
 ---
 
@@ -4848,7 +4847,7 @@ YOX	    prevent escaping by capturing
 
 :8,-,value(40)
 
-YOB
+YOX
 .*a
 ---
 

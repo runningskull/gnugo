@@ -44,7 +44,7 @@ decide_string(int pos)
 {
   int aa, dd;
   int acode, dcode;
-  SGFTree  tree;
+  SGFTree tree;
   
   if (board[pos] == EMPTY) {
     fprintf(stderr, "gnugo: --decide-string called on an empty vertex\n");

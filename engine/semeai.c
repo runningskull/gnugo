@@ -389,7 +389,7 @@ semeai_move_reasons(int color)
 	  && (dragon2[d].owl_defense_point == NO_MOVE
 	      || dragon2[d].semeai_defense_certain >= 
 	         dragon2[d].owl_defense_certain)) {
-	/* My dragon can be defended */
+	/* My dragon can be defended. */
 	add_semeai_move(dragon2[d].semeai_defense_point, dragon2[d].origin);
 	DEBUG(DEBUG_SEMEAI, "Adding semeai defense move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_defense_point);
@@ -432,7 +432,7 @@ semeai_move_reasons(int color)
 		   || dragon2[d].owl_defense_point == NO_MOVE
 		   || dragon2[d].semeai_attack_certain >= 
 		      dragon2[d].owl_attack_certain)) {
-	/* Your dragon can be attacked */
+	/* Your dragon can be attacked. */
 	add_semeai_move(dragon2[d].semeai_attack_point, dragon2[d].origin);
 	DEBUG(DEBUG_SEMEAI, "Adding semeai attack move for %1m at %1m\n",
 	      DRAGON(d).origin, dragon2[d].semeai_attack_point);

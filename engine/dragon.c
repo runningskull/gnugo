@@ -711,7 +711,7 @@ initialize_dragon_data(void)
       dragon[str].color              = worm[str].color;
       dragon[str].origin             = worm[str].origin;
       dragon[str].crude_status       = UNKNOWN;
-      dragon[str].status     = UNKNOWN;
+      dragon[str].status             = UNKNOWN;
       half_eye[str].type             =  0;
       half_eye[str].value            =  10.0; /* Something big. */
       
@@ -854,8 +854,8 @@ find_neighbor_dragons()
   }
 
   /* Expand from dist-1 to dist. Break out of the loop at the end if
-     * we couldn't expand anything. Never expand more than five steps.
-     */
+   * we couldn't expand anything. Never expand more than five steps.
+   */
   for (dist = 1; dist <= 5; dist++) {
     int found_one = 0;
       

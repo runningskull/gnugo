@@ -61,7 +61,7 @@ static void show_debug_help(void);
 static void show_debug_flags(void);
 
 /* long options which have no short form */
-enum {OPT_BOARDSIZE=127,
+enum {OPT_BOARDSIZE = 127,
       OPT_HANDICAPSTONES,
       OPT_COLOR,
       OPT_KOMI,
@@ -149,7 +149,7 @@ enum {OPT_BOARDSIZE=127,
 /* names of playing modes */
 
 enum mode {
-  MODE_UNKNOWN=0,
+  MODE_UNKNOWN = 0,
   MODE_ASCII,
   MODE_ASCII_EMACS,
   MODE_GTP,
@@ -428,7 +428,7 @@ main(int argc, char *argv[])
 	outflags = gg_optarg;
 	output_flags = 0;
 	if (outflags)
-	  while (*outflags){
+	  while (*outflags) {
 	    switch (*outflags) {
 	    case 'd':
 	      output_flags |= OUTPUT_MARKDRAGONS;
@@ -1365,6 +1365,7 @@ main(int argc, char *argv[])
     }
 
     play_gtp(gtp_input_FILE, gtp_dump_commands_FILE, orientation);
+    fclose(gtp_dump_commands_FILE);
     break;
 
   case MODE_ASCII_EMACS:  

@@ -74,7 +74,7 @@
 
 /* terminfo attributes */
 static char *setaf;		/* terminfo string to set color */
-static int   max_color;		/* terminfo max colour */
+static int max_color;		/* terminfo max colour */
 
 static int init = 0;
 
@@ -411,7 +411,7 @@ gg_interpolate(struct interpolation_data *f, float x)
     return f->values[f->sections];
   else {
     ratio = ((float) f->sections) * (x - f->range_lowerbound)
-              /(f->range_upperbound - f->range_lowerbound);
+              / (f->range_upperbound - f->range_lowerbound);
     i = (int) ratio;
     diff = ratio - ((float) i);
     if (0)

@@ -384,7 +384,7 @@ void add_either_move(int pos, int reason1, int target1,
 void add_all_move(int pos, int reason1, int target1,
 		  int reason2, int target2);
 
-int  set_minimum_move_value(int pos, float value);
+int set_minimum_move_value(int pos, float value);
 void set_maximum_move_value(int pos, float value);
 void set_minimum_territorial_value(int pos, float value);
 void set_maximum_territorial_value(int pos, float value);
@@ -683,9 +683,9 @@ void move_considered(int move, float value);
 /*                         global variables                         */
 /* ================================================================ */
 
-extern int          disable_threat_computation;
-extern int          disable_endgame_patterns;
-extern int          doing_scoring;
+extern int disable_threat_computation;
+extern int disable_endgame_patterns;
+extern int doing_scoring;
 
 /* Reading parameters */
 extern int depth;               /* deep reading cutoff */
@@ -732,8 +732,8 @@ extern char thrashing_stone[BOARDMAX];        /* All thrashing stones. */
 extern char *rgoal;
 extern int goallib;
 
-extern int          transformation[MAX_OFFSET][8];
-extern const int    transformation2[8][2][2];
+extern int transformation[MAX_OFFSET][8];
+extern const int transformation2[8][2][2];
 
 
 /* Arrays pointing out the closest worms from each vertex.  The first
@@ -759,8 +759,8 @@ extern int false_eye_territory[BOARDMAX];
 extern int forced_backfilling_moves[BOARDMAX];
 
 extern double slowest_time;      /* Timing statistics */
-extern int    slowest_move;
-extern int    slowest_movenum;
+extern int slowest_move;
+extern int slowest_movenum;
 extern double total_time;
 
 
@@ -877,7 +877,7 @@ struct dragon_data2 {
 
   int moyo_size;		      /* size of surrounding influence moyo, */
   float moyo_territorial_value;       /* ...and its territorial value        */
-  enum dragon_status safety;           /* a more detailed status estimate     */
+  enum dragon_status safety;          /* a more detailed status estimate     */
   float weakness; /* A new (3.4) continuous estimate of the dragon's safety  */
   float weakness_pre_owl;     /* Dragon safety based on pre-owl computations */
   int escape_route; /* a measurement of likelihood of escape                 */

@@ -254,8 +254,8 @@ resize_dfa(dfa_t *pdfa, int max_states, int max_indexes)
   assert(pdfa->last_state <= pdfa->max_states);
   assert(pdfa->last_index <= pdfa->max_indexes);
 
-  pBuf = realloc(pdfa->states, max_states * sizeof(state_t));
-  pBuf2 = realloc(pdfa->indexes, max_indexes * sizeof(attrib_t));
+  pBuf = realloc(pdfa->states, max_states * sizeof(*pBuf));
+  pBuf2 = realloc(pdfa->indexes, max_indexes * sizeof(*pBuf2));
   if (pBuf == NULL || pBuf2 == NULL) {
     fprintf(stderr, "No memory left for dfa: %s", pdfa->name);
     exit(EXIT_FAILURE);
@@ -599,7 +599,7 @@ add_to_entry_list(entry_t **pplist, int l, int r, int val)
   assert(val > 0);
   assert(!get_from_entry_list(*pplist, l, r));
 
-  new_entry = malloc(sizeof(entry_t));
+  new_entry = malloc(sizeof(*new_entry));
   if (new_entry == NULL) {
     fprintf(stderr, "No memory left for new entry\n");
     exit(EXIT_FAILURE);
@@ -836,11 +836,11 @@ dfa_shuffle(dfa_t *pdfa)
   int q2p;
   int i, j;
 
-  state_to = calloc(pdfa->last_state+1, sizeof(int));
-  state_from = calloc(pdfa->last_state+1, sizeof(int));
+  state_to = calloc(pdfa->last_state+1, sizeof(*state_to));
+  state_from = calloc(pdfa->last_state+1, sizeof(*state_from));
 
-  queue1 = malloc((pdfa->last_state+1) * sizeof(int));
-  queue2 = malloc((pdfa->last_state+1) * sizeof(int));
+  queue1 = malloc((pdfa->last_state+1) * sizeof(*queue1));
+  queue2 = malloc((pdfa->last_state+1) * sizeof(*queue2));
   q1p = 1;
   q2p = 0;
   queue1[0] = 1;  /* i.e. start at state 1. */
@@ -867,7 +867,7 @@ dfa_shuffle(dfa_t *pdfa)
     q2p = 0;
   }
 
-  old_states = malloc((pdfa->last_state+1) * sizeof(struct state));
+  old_states = malloc((pdfa->last_state+1) * sizeof(*old_states));
   for (i = 1; i <= pdfa->last_state; i++) {
     for (j = 0; j < 4; j++) {
       old_states[i].next[j] = pdfa->states[i].next[j];
@@ -1179,7 +1179,7 @@ dfa_attrib_new(dfa_attrib_array *array, int string_index)
   dfa_attrib *attribute;
 
   if (array->allocated == DFA_ATTRIB_BLOCK_SIZE) {
-    dfa_attrib_block *new_block = malloc(sizeof(dfa_attrib_block));
+    dfa_attrib_block *new_block = malloc(sizeof(*new_block));
     assert(new_block);
 
     new_block->previous = array->last_block;
@@ -1243,7 +1243,7 @@ dfa_node_new(dfa_graph *graph)
   dfa_node *node;
 
   if (graph->allocated == DFA_NODE_BLOCK_SIZE) {
-    dfa_node_block *new_block = malloc(sizeof(dfa_node_block));
+    dfa_node_block *new_block = malloc(sizeof(*new_block));
     assert(new_block);
 
     new_block->previous = graph->last_block;
@@ -1272,7 +1272,7 @@ static dfa_hash_entry *
 dfa_hash_entry_new(void)
 {
   if (dfa_hash_allocated == DFA_HASH_BLOCK_SIZE) {
-    dfa_hash_block *new_block = malloc(sizeof(dfa_hash_block));
+    dfa_hash_block *new_block = malloc(sizeof(*new_block));
     assert(new_block);
 
     new_block->previous = dfa_hash_last_block;
@@ -1668,7 +1668,7 @@ dfa_patterns_add_pattern(dfa_patterns *patterns, const char *string, int index)
 
     while (patterns->num_patterns <= index) {
       patterns->num_patterns++;
-      pattern = malloc(sizeof(dfa_pattern));
+      pattern = malloc(sizeof(*pattern));
       pattern->num_variations = 0;
 
       if (patterns->last_pattern)
@@ -1735,7 +1735,7 @@ dfa_patterns_build_graph(dfa_patterns *patterns)
   dfa_graph *graph = &(patterns->graph);
   dfa_pattern *pattern;
   
-  strings = malloc(patterns->num_patterns * sizeof(char *));
+  strings = malloc(patterns->num_patterns * sizeof(*strings));
   assert(strings);
 
   dfa_graph_clear(graph);
@@ -1791,7 +1791,7 @@ dfa_patterns_optimize_variations(dfa_patterns *patterns, int iterations)
   double change_probability = 4.0 / patterns->num_patterns;
   dfa_pattern *pattern;
 
-  best_variations = malloc(patterns->num_patterns * sizeof(int));
+  best_variations = malloc(patterns->num_patterns * sizeof(*best_variations));
   assert(best_variations);
   for (pattern = patterns->patterns; pattern; pattern = pattern->next, k++)
     best_variations[k] = pattern->current_variation;

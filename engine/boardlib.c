@@ -41,15 +41,15 @@ int          move_history_color[MAX_MOVE_HISTORY];
 int          move_history_pos[MAX_MOVE_HISTORY];
 int          move_history_pointer;
 
-float        komi;
-int          movenum;
-int allow_suicide       = 0;    /* allow opponent to make suicide moves */
+float komi;
+int movenum;
+int allow_suicide = 0;  /* allow opponent to make suicide moves */
 
 
 Intersection shadow[BOARDMAX];
 
 /* Hashing of positions. */
-Hash_data     hashdata;
+Hash_data hashdata;
 
 int stackp;             /* stack pointer */
 int position_number;    /* position number */

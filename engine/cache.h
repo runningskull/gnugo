@@ -60,7 +60,7 @@ typedef struct {
   unsigned int data; /* Should be 32 bits, but only wastes 25% if 64 bits. */
 } Hashnode;
 
-#define HN_MAX_REMAINING_DEPTH  31
+#define HN_MAX_REMAINING_DEPTH 31
 
 
 /* Hashentry: an entry, with two nodes of the hash_table

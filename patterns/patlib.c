@@ -100,7 +100,7 @@ textpattern_clear(Textpattern *tp)
 static void
 textpattern_ns_edge_print(FILE *outfile, Textpattern *tp)
 {
-  int  i;
+  int i;
 
   if (tp->edge_constraints & WEST_EDGE)
     fputc('+', outfile);
@@ -271,7 +271,7 @@ int
 parse_whitespace(int to_end_of_line_only)
 {
   char *p = whitespacebuffer;
-  int  is_comment;
+  int is_comment;
 
   if (!isspace(next_char) 
       && next_char != '#')
@@ -333,7 +333,7 @@ parse_away_whitespace(void)
 static int
 parse_int(void)
 {
-  int  val = 0;
+  int val = 0;
 
   if (!isdigit(next_char))
     return 0;
@@ -425,7 +425,7 @@ parse_pattern_line(Textpattern *tp)
 static int
 parse_north_south_constraint(Textpattern *tp)
 {
-  int  width;
+  int width;
 
   width = 0;
   while (next_char == '-') {
@@ -438,7 +438,7 @@ parse_north_south_constraint(Textpattern *tp)
     return 0;
   }
 
-  if (tp->width >0) {
+  if (tp->width > 0) {
     /* This has to be the south border */
     if (width != tp->width
 	|| (next_char == '+' && (tp->edge_constraints & EAST_EDGE) == 0)) {
@@ -465,7 +465,7 @@ parse_north_south_constraint(Textpattern *tp)
 static int
 parse_pattern_diagram(Textpattern *tp)
 {
-  int  width;
+  int width;
 
   /* See if there is a north border constraint. */
   if (next_char == '+' || next_char == '-') {
@@ -536,9 +536,9 @@ parse_pattern_diagram(Textpattern *tp)
     {
       /* FIXME: Only one row of explanation possible */
       /* FIXME: Check boundaries */
-      char  buf[1024];
+      char buf[1024];
       char *p = buf;
-      int  only_spaces = 1;
+      int only_spaces = 1;
 
       while (next_char != EOF && next_char != '\n') {
 	*p++ = next_char;
@@ -613,7 +613,7 @@ parse_entry_line(Textpattern *tp)
 static int
 parse_constraint_diagram(Textpattern *tp)
 {
-  int  width;
+  int width;
 
   /* Constraint diagram is optional. */
   if (!strchr(VALID_PATTERN_CHARS, next_char)
@@ -848,10 +848,10 @@ textpattern_transform(Textpattern *tp, int transform)
   char *p1, *p2;
   int mini, minj;
   int maxi, maxj;
-  int  r;
-  int  newedge;
-  int  i=0, j=0;
-  int  i1, j1;
+  int r;
+  int newedge;
+  int i = 0, j = 0;
+  int i1, j1;
 
   assert(0 <= transform && transform < 8);
 
@@ -862,8 +862,8 @@ textpattern_transform(Textpattern *tp, int transform)
   size++;
   size2 = size*2;
 
-  array1 = (char *) malloc(size2 * size2);
-  array2 = (char *) malloc(size2 * size2);
+  array1 = malloc(size2 * size2);
+  array2 = malloc(size2 * size2);
 
   assert(array1 != NULL && array2 != NULL);
 

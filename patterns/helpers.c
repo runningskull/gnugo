@@ -722,7 +722,6 @@ adjacent_to_defendable_stone_in_atari(int str)
   return 0;
 }
 
-
 void
 backfill_replace(int move, int str)
 {

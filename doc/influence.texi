@@ -277,7 +277,7 @@ and we see that @samp{X} has 16 territory fewer and @samp{O}
 has two territory more, for a total difference of 18 points.
 
 That the influence function counts the value of captured stones was
-introduced in GNU Go 3.2.. Previously this was instead done using the
+introduced in GNU Go 3.2. Previously this was instead done using the
 effective_size heuristic. The effective size is the number of
 stones plus the surrounding empty spaces which are closer to
 this string or dragon than to any other stones. Here the @samp{O}

@@ -293,7 +293,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
    * what's stored in the game record.
    *
    * FIXME: No comparison is made if the stored result was 0. Wins by
-   *        time or forfeit or not handled either.
+   *        time or forfeit are not handled either.
    *
    * FIXME: Does anybody actually care about this information? Just
    *        removing this piece of code is a tempting alternative.

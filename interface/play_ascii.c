@@ -329,7 +329,7 @@ show_commands(void)
   printf("\n");
 }
 
-enum commands {INVALID=-1, END, EXIT, QUIT, RESIGN, 
+enum commands {INVALID = -1, END, EXIT, QUIT, RESIGN, 
 	       PASS, MOVE, FORCE, SWITCH,
 	       PLAY, PLAYBLACK, PLAYWHITE,
 	       SETHANDICAP, FREEHANDICAP, SETBOARDSIZE, SETKOMI,

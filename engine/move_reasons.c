@@ -851,7 +851,6 @@ add_antisuji_move(int pos)
 void
 add_semeai_move(int pos, int dr)
 {
-  
   ASSERT_ON_BOARD1(dr);
   add_move_reason(pos, SEMEAI_MOVE, dragon[dr].origin);
 }

@@ -805,7 +805,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX])
 {
-  static int bulk_coefficients[5] = {-1,-1, 1, 4, 12};
+  static int bulk_coefficients[5] = {-1, -1, 1, 4, 12};
 
   int pos2;
   int margins = 0;
@@ -2701,7 +2701,7 @@ white_area(int mx[BOARDMAX], int pos, int up, int right, int marginpos,
       if (!ON_BOARD(pos2)) {
 	if (!edge)
 	  return 0;
-	else if (u >= 0 && u <=3 && v >= 0 && v <= 3)
+	else if (u >= 0 && u <= 3 && v >= 0 && v <= 3)
 	  return 0;
 	else if (I(pos2) != I(NORTH(marginpos))
 		 && I(pos2) != I(SOUTH(marginpos))

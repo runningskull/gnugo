@@ -2729,7 +2729,7 @@ do_tactical_pat(int is_attack, int str, int *move)
 
   libs = countlib(str);
 
-  if (stackp > depth && libs>2) {
+  if (stackp > depth && libs > 2) {
     SGFTRACE(0, 0, "Too deep");
     return 0;
   }
@@ -4343,7 +4343,7 @@ do_find_break_chain2_efficient_moves(int str, int adj,
 }
 
 
-/* (str) points to a group with two liberties. break_chain2_moves()
+/* (str) points to a string with two or more liberties. break_chain2_moves()
  * tries to defend this string by attacking a neighbouring string with
  * two liberties.
  * This is done by playing on either of its liberties

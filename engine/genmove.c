@@ -462,7 +462,7 @@ do_genmove(int *move, int color, float pure_threat_value,
 	      *move, val); 
       }
     }
-    time_report(1, "move reasons with revised semeai status", NO_MOVE, 1.0);
+    time_report(1, "move reasons with revised thrashing status", NO_MOVE, 1.0);
   }
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
@@ -492,7 +492,8 @@ do_genmove(int *move, int color, float pure_threat_value,
 	      *move, val); 
       }
     }
-    time_report(1, "move reasons with revised semeai status", NO_MOVE, 1.0);
+    time_report(1, "move reasons with revised semeai or thrashing status",
+		NO_MOVE, 1.0);
   }
 
   /* If still no move, fill a remaining liberty. This should pick up
@@ -553,7 +554,7 @@ do_genmove(int *move, int color, float pure_threat_value,
     /* Maybe time to resign...
      */
     if (resign_allowed && val < 10.0 && should_resign(color, our_score)) {
-      TRACE("... though, genmove() thinks the position is hopeless\n" );
+      TRACE("... though, genmove() thinks the position is hopeless\n");
       /* Signal resignation by negating the move value */
       val = -val;
     }

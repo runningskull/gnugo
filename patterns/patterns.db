@@ -10978,7 +10978,7 @@ hgeXd
 > replace(a,*)
 
 
-Pattern ED96
+Pattern ED97
 # gf New pattern. (3.5.3)
 # See gifu03:401
 
@@ -11001,7 +11001,7 @@ d.......
 ;weak(a) && weak(B) && x_somewhere(c,d)
 
 
-Pattern ED97
+Pattern ED98
 # evand new Pattern (3.5.4)
 
 .....
@@ -12116,7 +12116,7 @@ o..c..o
 
 
 Pattern EJ20
-				   
+
 ?x.XOOo       Connect underneath.
 oOXOX.o
 o.*O..o
@@ -14784,7 +14784,7 @@ a*b.
 
 
 Pattern RE14
-# gf New pattern. (3.3.20)
+# gf New pattern. (3.3.22)
 # See filllib:35.
 
 +---

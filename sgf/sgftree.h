@@ -20,8 +20,8 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef _SGFTREE_H
-#define _SGFTREE_H 1
+#ifndef _SGFTREE_H_
+#define _SGFTREE_H_
 
 #include <stdio.h>
 

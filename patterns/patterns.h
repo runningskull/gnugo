@@ -26,12 +26,12 @@
  * describing the patterns.
  */
 
+#ifndef _PATTERN_H_
+#define _PATTERN_H_
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-
-#ifndef __PATTERN_H__
-#define __PATTERN_H__
 
 /* local versions of absolute value, min and max */
 
@@ -459,7 +459,7 @@ struct corner_variation_b {
 };
 
 
-#endif /* __PATTERN_H__ */
+#endif /* _PATTERN_H_ */
 
 
 /*

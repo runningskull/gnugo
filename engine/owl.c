@@ -2042,7 +2042,7 @@ do_owl_attack(int str, int *move, int *wormid,
 	 */
 	else if (experimental_owl_ext && goal_worms_computed
 #if 0
-		 && stackp>1
+		 && stackp > 1
 #endif
 		 && captured >= 3) {
 	  int w = MAX_GOAL_WORMS;
@@ -3165,8 +3165,8 @@ owl_determine_life(struct local_owl_data *owl,
 	   * If we capture the lunch by an illegal ko capture, we become
 	   * ko master with this move, and hence the above is true.
 	   */
-	  if  (owl->lunch_attack_code[lunch] ==  WIN
-	       || is_illegal_ko_capture(attack_point, owl->color))
+	  if (owl->lunch_attack_code[lunch] ==  WIN
+	      || is_illegal_ko_capture(attack_point, owl->color))
 	    owl_add_move(moves, attack_point, value, "eat lunch",
 			 1, owl->lunch[lunch], 0, NO_MOVE, MAX_MOVES);
 	  else
@@ -3540,7 +3540,7 @@ dump_pattern_list(struct matched_patterns_list_data *list)
   struct matched_pattern_data *matched_pattern;
   if (!list->initialized)
     return;
-  gprintf("%oList size %d. %d Patterns in list, %d have been used, .\n",
+  gprintf("%oList size %d. %d Patterns in list, %d have been used.\n",
 	  list->list_size, list->counter, list->used);
   for (i = 0; i < list->counter; i++) {
     matched_pattern = &list->pattern_list[i];
@@ -3569,7 +3569,7 @@ collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
     matched_patterns->pattern_list
         = realloc(matched_patterns->pattern_list,
 	          matched_patterns->list_size
-	          * sizeof(struct matched_pattern_data));
+	          * sizeof(matched_patterns->pattern_list[0]));
   }
 
   next_pattern = &matched_patterns->pattern_list[matched_patterns->counter];
@@ -3756,8 +3756,7 @@ pattern_list_prepare(struct matched_patterns_list_data *list)
    * but it is easier to allocate more than to count real number of
    * heap elements first.
    */
-  list->pattern_heap = malloc(list->counter
-			      * sizeof(struct matched_pattern_data *));
+  list->pattern_heap = malloc(list->counter * sizeof(*(list->pattern_heap)));
   gg_assert(list->pattern_heap != NULL);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
@@ -4559,6 +4558,7 @@ owl_reasons(int color)
     if (!IS_STONE(board[pos])
         || dragon[pos].origin != pos)
       continue;
+    
     if (dragon[pos].status == CRITICAL
 	&& DRAGON2(pos).owl_attack_point != NO_MOVE) {
       if (board[pos] == color) {
@@ -4893,7 +4893,7 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
   if (defense_point)
     *defense_point = defense;
   if (kworm)
-    *kworm= wpos;
+    *kworm = wpos;
 
   return result;
 }
@@ -4938,10 +4938,10 @@ owl_does_attack(int move, int target, int *kworm)
    * some stones of the goal dragon from the board.
    */
 #if 1
-    init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
+  init_owl(&owl, target, NO_MOVE, NO_MOVE, 1);
 #endif
 
-    if (trymove(move, other, "owl_does_attack", target)) {
+  if (trymove(move, other, "owl_does_attack", target)) {
     /* Check if a compatible owl_defend() is cached. */
     if (search_persistent_owl_cache(OWL_DEFEND, origin, 0, 0,
 				    &result, NULL, kworm, NULL)) {

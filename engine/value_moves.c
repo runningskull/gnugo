@@ -398,7 +398,7 @@ find_large_scale_owl_attack_moves(int color)
   int y_max_dragon[MAX_WORMS];
   int maximum_distance = 3;  /* maximum Manhatan distance tried */
   int dist;
-  int other= OTHER_COLOR(color);
+  int other = OTHER_COLOR(color);
   
   if (debug & DEBUG_LARGE_SCALE)
     gprintf("\nTrying to find large scale attack moves.\n");
@@ -416,9 +416,10 @@ find_large_scale_owl_attack_moves(int color)
 	if (debug & DEBUG_LARGE_SCALE)
 	  gprintf("Small critical dragon found at %1m\n", pos);
 	
-	/* Find the physical extension of the dragon, and remember it */
-	/* FIXME : probably there should be a better place to calculate
-	   them, maybe a new field in the dragon2 array ? */
+	/* Find the physical extension of the dragon, and remember it
+	 * FIXME : probably there should be a better place to calculate
+	 * them, maybe a new field in the dragon2 array ?
+	 */
 	x = I(pos);
 	y = J(pos);
 	x_min_dragon[N] = x_max_dragon[N] = x;
@@ -443,20 +444,21 @@ find_large_scale_owl_attack_moves(int color)
   }
   
   /* For each unstable dragon, try to find large scale attacks.
-     We do this by first trying to find attacks at dist = 0, then
-     dist = 1, etc., up to maximum_distance */
+   * We do this by first trying to find attacks at dist = 0, then
+   * dist = 1, etc., up to maximum_distance.
+   */
   for (k = 0; k < N; k++)
     for (dist = 0; dist <= maximum_distance; dist++)
       for (x = x_min_dragon[k]-dist; x <= x_max_dragon[k]+dist; x++)
         for (y = y_min_dragon[k]-dist; y <= y_max_dragon[k]+dist; y++) {
           target = unstable_dragons[k];
-          pos = POS(x,y);
+          pos = POS(x, y);
           
-          if (ON_BOARD2(x,y) && ON_BOARD1(pos) && (board[pos] == EMPTY)) {
+          if (ON_BOARD2(x, y) && ON_BOARD1(pos) && (board[pos] == EMPTY)) {
             int a, b;
             a = abs(x - x_min_dragon[k]);
             b = abs(x - x_max_dragon[k]);
-            dx = gg_min(a,b);
+            dx = gg_min(a, b);
             a = abs(y - y_min_dragon[k]);
             b = abs(y - y_max_dragon[k]);
             dy = gg_min(a, b);
@@ -477,9 +479,10 @@ find_large_scale_owl_attack_moves(int color)
               
               
               /* We try all large scale attacks on small dragons (and 
-                 only moves with other move reason) */
+               * only moves with other move reason).
+	       */
               if (board[target] == other)
-                worth_trying = ((dragon[target].size <= 6) 
+                worth_trying = (dragon[target].size <= 6
                                 && has_move_reasons);
 	      
               if (worth_trying) {
@@ -492,13 +495,14 @@ find_large_scale_owl_attack_moves(int color)
                   gprintf("Trying large scale move %1m on %1m\n", pos, target);
 		
 	        /* To avoid horizon effects, we temporarily increase 
-	         * the depth values to find the large scale attacks. */
+	         * the depth values to find the large scale attacks.
+		 */
                 increase_depth_values(); 
 		
                 /* To reduce the amount of aji allowed for large scale
                  * attacks, we reduce the owl limit to 350 nodes for
                  * attacks at distance <= 1, and 150 nodes for attacks at
-                 * distance >= 2     
+                 * distance >= 2.
                  */
                 if (dist <= 1)
                   new_node_limit = gg_min(350, owl_node_limit);
@@ -506,21 +510,22 @@ find_large_scale_owl_attack_moves(int color)
                   new_node_limit = gg_min(150, owl_node_limit);
                 change_owl_node_limit(new_node_limit, &old_node_limit); 
                 
-                /* Try large scale killing moves on opponent's stones */
+                /* Try large scale killing moves on opponent's stones. */
                 owl_nodes_before = get_owl_node_counter(); 
                 if (board[target] == other
 		    && !owl_attack_move_reason_known(pos, target)) {
                   int kworm = NO_MOVE;
                   int acode;
 		  int save_verbose = verbose;
-		  if (verbose > 0) verbose--;
+		  if (verbose > 0)
+		    verbose--;
 
 		  acode = owl_does_attack(pos, target, &kworm);
                   
                   owl_nodes_used = get_owl_node_counter() - owl_nodes_before;
                   
-                  if ((acode >= DRAGON2(target).owl_attack_code) &&
-		      (acode == WIN)) {
+                  if (acode >= DRAGON2(target).owl_attack_code
+		      && acode == WIN) {
 		    add_owl_attack_move(pos, target, kworm, acode);
                     if (debug & DEBUG_LARGE_SCALE)
 		      gprintf("Move at %1m owl-attacks %1m on a large scale(%r).\n", 
@@ -540,7 +545,6 @@ find_large_scale_owl_attack_moves(int color)
 		
                 /* Restore the depth values */
                 decrease_depth_values(); 
-		
 	      }
 	    }
 	  }
@@ -1302,8 +1306,8 @@ dragon_weakness(int dr, int ignore_dead_dragons)
 static float
 connection_value(int dragona, int dragonb, int tt, float margin)
 {
-  struct dragon_data2* da = &DRAGON2(dragona);
-  struct dragon_data2* db = &DRAGON2(dragonb);
+  struct dragon_data2 *da = &DRAGON2(dragona);
+  struct dragon_data2 *db = &DRAGON2(dragonb);
   float sizea = dragon[dragona].effective_size;
   float sizeb = dragon[dragonb].effective_size;
   int safetya = da->safety;
@@ -1672,7 +1676,7 @@ max_lunch_eye_value(int pos)
 }
 
 /*
- * Estimate the direct territorial value of a move at (pos).
+ * Estimate the direct territorial value of a move at (pos) by (color).
  */
 static void
 estimate_territorial_value(int pos, int color, float our_score,
@@ -2119,7 +2123,8 @@ estimate_territorial_value(int pos, int color, float our_score,
 	  && attack_move_reason_known(pos, aa) != WIN) {
 	if (large_scale)
 	  this_value = (2.0 + 0.05 * (2 * worm[aa].effective_size));
-	else this_value = 0.05 * (2 * worm[aa].effective_size);
+	else
+	  this_value = 0.05 * (2 * worm[aa].effective_size);
 	TRACE("  %1m: -%f - suspected ineffective owl attack of worm %1m\n",
 	      pos, this_value, aa);
 	tot_value -= this_value;
@@ -2253,7 +2258,8 @@ estimate_territorial_value(int pos, int color, float our_score,
   if (move[pos].move_safety == 1 && safe_move(pos, color) == WIN) {
     safe_stones[pos] = INFLUENCE_SAVED_STONE;
     strength[pos] = DEFAULT_STRENGTH;
-    if (0) TRACE("  %1m: is a safe move\n", pos);
+    if (0)
+      TRACE("  %1m: is a safe move\n", pos);
   }
   else {
     TRACE("  %1m: not a safe move\n", pos);
@@ -3587,8 +3593,7 @@ review_move_reasons(int *the_move, float *val, int color,
 
 /*
  * Choosing a strategy based on the current score estimate 
- * and the game status (between 0.0 (start) and 1.0 (game over))
- *
+ * and the game status (between 0.0 (start) and 1.0 (game over)).
  */
 
 void 
@@ -3619,7 +3624,7 @@ choose_strategy(int color, float our_score, float game_status)
       invasion_malus_weight = 1.3;
       followup_weight       = 1.1;
       TRACE("  %s is leading, using conservative settings.\n",
-               color == WHITE ? "White" : "Black");
+	    color == WHITE ? "White" : "Black");
     }
     else if (game_status > 0.16) {
       

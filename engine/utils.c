@@ -695,7 +695,7 @@ set_depth_values(int level, int report_levels)
   else if (level == 9)
     aa_depth = gg_max(0, AA_DEPTH);
   else if (level >= 7)
-    aa_depth = gg_max(0, AA_DEPTH -1);
+    aa_depth = gg_max(0, AA_DEPTH - 1);
   else
     aa_depth = gg_max(0, AA_DEPTH - (8 - level));
 

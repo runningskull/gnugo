@@ -86,9 +86,11 @@ gtp_main_loop(struct gtp_command commands[], FILE *gtp_input,
     if (!fgets(line, GTP_BUFSIZE, gtp_input))
       break; /* EOF or some error */
 
-    if (gtp_dump_commands)
+    if (gtp_dump_commands) {
       fputs(line, gtp_dump_commands);
-    
+      fflush(gtp_dump_commands);
+    }    
+
     /* Preprocess the line. */
     for (i = 0, p = line; line[i]; i++) {
       char c = line[i];

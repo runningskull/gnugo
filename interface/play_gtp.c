@@ -253,7 +253,7 @@ static struct gtp_command commands[] = {
   {"get_life_node_counter",   gtp_get_life_node_counter},
   {"get_owl_node_counter",    gtp_get_owl_node_counter},
   {"get_random_seed",  	      gtp_get_random_seed},
-  {"get_reading_node_counter",gtp_get_reading_node_counter},
+  {"get_reading_node_counter", gtp_get_reading_node_counter},
   {"get_trymove_counter",     gtp_get_trymove_counter},
   {"gg-undo",                 gtp_gg_undo},
   {"gg_genmove",              gtp_gg_genmove},

@@ -2207,12 +2207,15 @@ Pattern Intrusion59
 
 Pattern Intrusion60
 #pp New pattern (3.5.1)
+# gf FIXME: This pattern looks rather likely to introduce more
+#           problems than it solves. We may need to find some other
+#           solution to endgame:880. (3.5.7)
 
 OQ?	    this pattern should prevent attempts to cut bamboo joint
 X.!
 OO?
 
-:-,B,value(20)
+:8,B,value(20)
 
 
 Pattern Intrusion61

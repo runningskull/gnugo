@@ -494,7 +494,7 @@ estimate_score(float *upper, float *lower)
       l = white_area - black_area + komi;
     else {
       DEBUG(DEBUG_SCORING,
-	  "black captured: %d\nwhite captured: %d\nkomi: %f\n",
+	    "black captured: %d\nwhite captured: %d\nkomi: %f\n",
 	    black_captured, white_captured, komi);
       l = white_territory 
 	+ black_captured - black_territory - white_captured + komi;

@@ -329,7 +329,7 @@ similar data. Each dragon is a union of worms. Just as the data maintained in
 @code{worm[]} is constant on each worm, the data in
 @code{dragon[]} is constant on each dragon.
 
-Amalgamation of worms in GNU Go 3.0 proceeds as follows.
+Amalgamation of worms in GNU Go proceeds as follows.
 First we amalgamate all boundary components of an eyeshape. Thus in
 the following example:
 

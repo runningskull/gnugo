@@ -1295,7 +1295,8 @@ get_komaster()
   return komaster;
 }
 
-int get_kom_pos()
+int
+get_kom_pos()
 {
   return kom_pos;
 }
@@ -2266,7 +2267,7 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
       
       libs1 = string[n].libs;
       for (k = 0; k < liberties2; k++)
-	if (!UNMARKED_LIBERTY(libs1[k])){
+	if (!UNMARKED_LIBERTY(libs1[k])) {
           if (commonlibs < maxlib)
 	    libs[commonlibs] = libs1[k];
 	  commonlibs++;

@@ -565,7 +565,7 @@ store_pattern_if_winner(struct invariant_hash *pre,
 	    move_number++;
 	  }
 	  else { /* something is wrong */
-	    fprintf(stderr, "Error in store_pattern_if_winner: %d\n",k);
+	    fprintf(stderr, "Error in store_pattern_if_winner: %d\n", k);
 	    winning_moves[k].pattern[i][j] = '.';
 	  }
 	}
@@ -641,7 +641,7 @@ examine_game(SGFNode *sgf, int collect_statistics)
       if (k > 0) {
 	/* something is wrong with the file */
 	if (0)
-	  fprintf(stderr, "move number:%d\n",k);
+	  fprintf(stderr, "move number:%d\n", k);
 	return 0;
       }
       continue;
@@ -1162,7 +1162,7 @@ main(int argc, char *argv[])
   number_of_games = read_sgf_filenames(argv[1], NULL);
   
   /* Allocate space for the list of unused files. */
-  unused_games = calloc(number_of_games, sizeof(int));
+  unused_games = calloc(number_of_games, sizeof(*unused_games));
   if (unused_games == NULL) {
     fprintf(stderr, "Fatal error, failed to allocate memory.\n");
     exit(EXIT_FAILURE);

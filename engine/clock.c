@@ -113,8 +113,8 @@ static double estimate_time_by_move(int color, int move);
 static void
 timeval_print(FILE *outfile, double tv)
 {
-  int     min;
-  double  sec;
+  int min;
+  double sec;
 
   min = (int) tv / 60;
   sec = tv - min*60;
@@ -222,7 +222,7 @@ clock_byoyomi_update(int color, double dt)
 void
 clock_push_button(int color)
 {
-  double  now, dt, tme;
+  double now, dt, tme;
 
   if (!clk.clock_on)
     return;

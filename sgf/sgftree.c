@@ -63,7 +63,8 @@ sgftreeBack(SGFTree *tree)
       return 0;
   }
   else
-    while (sgftreeForward(tree));
+    while (sgftreeForward(tree))
+      ;
   
   return 1;
 }

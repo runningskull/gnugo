@@ -58,7 +58,7 @@ extract_fuseki_SOURCES  = extract_fuseki.c
 extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
 		       ../engine/libengine.a libpatterns.a\
                        ../sgf/libsgf.a ../utils/libutils.a
-extract_fuseki_LDFLAGS = -I$(top_srcdir)/sgf
+extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
 
 
 noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h dfa-mkpat.h
