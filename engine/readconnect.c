@@ -1005,6 +1005,7 @@ string_connect(int str1, int str2, int *move)
 {
   int dummy_move;
   int save_verbose;
+  int result;
 
   if (move == NULL)
     move = &dummy_move;
@@ -1016,8 +1017,9 @@ string_connect(int str1, int str2, int *move)
     save_verbose = verbose;
     if (verbose > 0)
       verbose--;
-    return recursive_connect2(str1, str2, move, EMPTY, NO_MOVE, 0);
+    result = recursive_connect2(str1, str2, move, EMPTY, NO_MOVE, 0);
     verbose = save_verbose;
+    return result;
   }
 
   return recursive_connect(str1, str2, move);
@@ -1120,6 +1122,8 @@ int disconnect(int str1, int str2, int *move) {
   int res = WIN;
   int Moves[MAX_MOVES];
   int dummy_move;
+  int result;
+  int save_verbose;
   
   if (move == NULL)
     move = &dummy_move;
@@ -1127,8 +1131,14 @@ int disconnect(int str1, int str2, int *move) {
   nodes_connect = 0;
   *move = PASS_MOVE;
   
-  if (alternate_connections)
-    return recursive_disconnect2(str1, str2, move, EMPTY, NO_MOVE, 0);
+  if (alternate_connections) {
+    save_verbose = verbose;
+    if (verbose > 0)
+      verbose --;
+    result = recursive_disconnect2(str1, str2, move, EMPTY, NO_MOVE, 0);
+    verbose = save_verbose;
+    return result;
+  }
 
   Moves[0]=0;
   moves_to_prevent_connection_in_three_moves (Moves, str1, str2);

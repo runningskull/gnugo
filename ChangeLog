@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in close_bubbles()
 - revised "stepped on a bug" message
 - bugfix in update_status in semeai.c
 - bugfix in estimate_time_by_move
