@@ -149,6 +149,15 @@ loadsgf games/self_play/354-34-3.sgf 194
 287 reg_genmove white
 #? [C2]*
 
+# By Andreas Braendle: 3.5.4 level 15 plays F4, and doesn't see the
+# value of a pincer.
+loadsgf games/ab1_fuseki.sgf 32
+288 reg_genmove black
+#? [R12|R11|Q12|Q11]
+
+289 restricted_genmove black F4 M16
+#? [M16]
+
 
 ############ End of Tests #################
 

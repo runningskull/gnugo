@@ -1,0 +1,14 @@
+(;SZ[19];AB[jj][pp][dd][dp][pd];W[qf];B[nd];W[lc];B[nf];W[cf];B[fd];W[fq];B[hq];W[cn];B[eo];W[cq];B[dq];W[cp];B[em];W[nq];B[qn];W[jq];B[jc];W[nb];B[gr];W[jp];B[ho];W[qc];B[ef];W[bd];B[cc];W[ci];B[oq];W[no];B[qd];W[pc]C[goes after extremely
+weak stone instead of
+big fuseki pincer+extend move
+traces:
+-t --level 15
+actually two mistakes in one:
+1) pincers like R12 are not even considered
+2) F4 weighted too high
+
+F4 is not in the top 10 at level 10
+but at top1 at level 15, so level 10 (by chance) is "better".
+-------
+Version 3.5.4 (patched from 3.4)];B[fp];W[qi];B[qk];W[pf]
+;B[bc];W[oe];B[od];W[ne];B[md];W[ld];B[me];W[kf];B[jn];W[dl];B[if];W[jd];B[id];W[kc];B[jb];W[oj];B[cr];W[br];B[np];W[mp];B[op];W[nr];B[or];W[mo];B[fk];W[ej];B[fh];W[fj];B[rd];W[rc];B[mg];W[lf];B[mf];W[li];B[be];W[bf];B[cd];W[dr];B[er];W[cs];B[ns];W[mr];B[af];W[ag];B[ae];W[bg];B[je];W[kd];B[lk];W[mj];B[gk];W[gj];B[lm];W[om];B[rk];W[jh];B[sh];W[rg];B[sg];W[sf];B[ms];W[ls];B[os];W[kr];B[si];W[ri];B[sj];W[ce];B[ad];W[kb];B[ic];W[hg];B[hh];W[ig];B[hj];W[gf];B[gg];W[fg];B[gh];W[ff];B[eg];W[hf];B[dn];W[cm];B[jf];W[jg];B[ke];W[le];B[ie];W[gd];B[gc];W[hd];B[hc];W[el];B[fl];W[ii];B[dh];W[ij];B[ik];W[kj];B[hi];W[kk];B[kl];W[jk];B[jl];W[mk];B[ir];W[io];B[in];W[qm];B[rm];W[pn];B[qo];W[pk];B[ql];W[pl];B[ml];W[nl];B[nm];W[nn];B[mm];W[ko];B[jo];W[ip];B[kn];W[ln];B[mn];W[lo];B[he];W[ge];B[ih];W[ji];B[rh];W[qh];B[ek];W[dk];B[di];W[dj];B[ch];W[bh];B[jr];W[rj];B[sk];W[qj];B[pm];W[es];B[fr];W[fs];B[qm];W[gs];B[hs];W[ds];B[hp];W[ja];B[ia];W[ka];B[hb];W[ee];B[de];W[fe];B[ed];W[df];B[dg];W[bj];B[co];W[bo];B[iq];W[lq];B[js];W[ks];B[do];W[dm];B[ll];W[lj];B[hk];W[oo];B[po];W[on];B[eh];W[ei];B[cg];W[fi];B[gi];AE[md][me][mf][mg][nd][nf][od][pd][qd][rd][fq])

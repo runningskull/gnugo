@@ -42,3 +42,12 @@ trymove black B3
 90 block_off F4 E8 F8 E7 D6 E6 D5
 #? [0]
 popgo
+
+# See trevora:370
+loadsgf games/trevor/auto/a021.sgf 16
+trymove white F6
+100 block_off D6 E9 F9 E8 F8 G8 H8 F7 G7 H7 G6 H6 G5 H5 G4 H4 G3 H3 
+#? [0]
+popgo
+
+
