@@ -13,7 +13,7 @@ loadsgf games/auto_gen/auto001.sgf 140
 
 loadsgf games/auto_gen/auto002.sgf 186
 4 owl_defend N8
-#? [1 (R1|N3|N5|M5|N6)]*
+#? [1 (R1|N3|N5|M5|N6|Q2)]*
 
 loadsgf games/auto_gen/auto003.sgf 52
 5 owl_defend S9

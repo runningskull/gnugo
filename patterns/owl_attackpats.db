@@ -1115,6 +1115,17 @@ X.bo
 ; (x_somewhere(a) || ! safe_omove(a)) && !xplay_defend(*,b,c,A)
 
 
+Pattern A238
+# evand New pattern (3.3.20) See nngs4:570
+
+oO?Y	Jump down to enclose
+o..x
+.*.X
+....
+----
+
+:8,-,value(55)
+
 #########################################################
 #                                                       #
 #          Limiting moves on the first line             #
@@ -1984,6 +1995,24 @@ XOba.
 -----
 
 ;!oplay_attack(*,a,b,*)
+
+
+Pattern A516
+# evand New pattern (3.3.20)
+
+oOXY.		Begin to falsify eye in reverse sente
+..O*X
+.....
+-----
+
+:8,-,value(70)
+
+oOXYa
+..O*X
+....b
+-----
+
+;!obvious_false_xeye(a) || !obvious_false_oeye(b)
 
 
 #########################################################
@@ -3054,6 +3083,28 @@ X.Y?
 ????
 
 :8,s,value(40)
+
+
+Pattern A919
+# evand New pattern. (3.3.20)
+
+o?XX??
+OX..Y?
+..*..x
+------
+
+:8,s,value(35)
+
+
+Pattern A920
+# evand New pattern. (3.3.20)
+
+?XX??
+X..Y?
+xO*.x
+-----
+
+:8,s,value(35)
 
 
 #########################################################
@@ -4227,6 +4278,47 @@ Pattern A1132
 +----
 
 :8,-,value(70)
+
+
+Pattern A1133a
+# evand New pattern. (3.3.20)
+
+?O.X
+?..x
+?.*.
+?..O
+????
+
+:8,-,value(65)
+
+?O.X
+?..x
+a.*.
+b..O
+cd??
+
+;owl_escape_value(a) + owl_escape_value(b) +
+;owl_escape_value(c) + owl_escape_value(d) > 0
+
+Pattern A1133b
+# evand New pattern. (3.3.20)
+
+?O.X
+?.*.
+?...
+?..O
+????
+
+:8,-,value(45)
+
+?O.X
+?.*.
+a...
+b..O
+cd??
+
+;owl_escape_value(a) + owl_escape_value(b) +
+;owl_escape_value(c) + owl_escape_value(d) > 0
 
 
 #########################################################

@@ -2552,6 +2552,24 @@ Oa...
 ;!obvious_false_oeye(a) && !oplay_attack(b,*,*)
 
 
+Pattern D640
+# evand New pattern. (3.3.20)
+
+xXOO.
+..X*O
+.....
+-----
+
+:8,-,value(75)
+
+xXOOa
+..X*O
+....b
+-----
+
+;!obvious_false_oeye(a) || !obvious_false_oeye(b)
+
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #

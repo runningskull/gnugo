@@ -4,7 +4,7 @@
 
 loadsgf games/trevor/auto/c01.sgf 42
 100 gg_genmove white
-#? [K7]*
+#? [K7|J7|H8]*
 
 
 loadsgf games/trevor/auto/c01.sgf 44

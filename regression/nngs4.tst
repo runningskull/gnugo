@@ -241,6 +241,10 @@ loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 88
 580 gg_genmove white
 #? [E5]*
 
+loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 70
+590 gg_genmove black
+#? [E2]
+
 
 ############ End of Tests #################
 

@@ -201,6 +201,14 @@ loadsgf games/nngs/gnugo-3.3.18-spewnboy-200304291635.sgf 91
 310 owl_defend N5
 #? [1 L2|L4]*
 
+loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 72
+311 owl_attack K6
+#? [1 E2]
+
+312 owl_defend K6
+#? [1 C3]
+
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
