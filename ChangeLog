@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in reevaluate_ko_threats
+- floating point exceptions stopped in readconnect.c
+- experimental influence: follow-up specific constraints for B patterns
+- experimental influence: new_value_territory revised (center correction)
+- experimental influence: most fixed follow-up values taken down
+- experimental influence: tuning, joseki values increased, some bugs fixed
+- experimental_influence ignored for escape influence
+- edge_double_sente_helper is now autohelper
+- owl threat loop broken out
+- new global thrashing_dragon
+
 3.1.24 released February 3, 2002
 
 - cleanup of clock.c, filllib.c, fuseki.c, genmove.c, globals.c,
