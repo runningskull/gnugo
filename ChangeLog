@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- support for 'make gnugo.pdf' and make 'gnugo.html' in doc/
 - slowest move statistics from regress.pike
 - update usages of time_report()
 - breakin and readconnect fixes

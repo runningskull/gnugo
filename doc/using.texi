@@ -32,15 +32,15 @@ documentation contains this User's Guide and extensive information
 about the algorithms of GNU Go, for developers.
 
 If you want a typeset copy of the Texinfo documentation, you can
-@command{make gnugo.dvi} or @command{make gnugo.ps} in the @file{doc/}
-directory. 
+@command{make gnugo.dvi}, @command{make gnugo.ps}, or @command{make
+gnugo.pdf} in the @file{doc/} directory. (@command{make gnugo.pdf} only
+works after you have converted all .eps-files in the doc/ directory to
+.pdf files, e.g. with the utility epstopdf.)
 
-You can make an HTML version with the command @command{makeinfo
---html gnugo.texi}. Better HTML documentation may be obtained
-using @command{texi2html -split_chapter gnugo.texi}. You can
-obtain the @command{texi2html} utility (version 1.61 or later) from
-@url{http://www.mathematik.uni-kl.de/~obachman/Texi2html/}. (See also
-@url{http://texinfo.org/texi2html/}.)
+You can make an HTML version with the command @command{makeinfo --html
+gnugo.texi}. If you have @command{texi2html}, better HTML documentation
+may be obtained by @command{make gnugo.html} in the @file{doc/}
+directory.
 
 User documentation can be obtained by running @command{gnugo --help} 
 or @command{man gnugo} from any terminal, or from the Texinfo
