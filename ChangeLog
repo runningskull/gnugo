@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- compactify_att() removes duplicates from attribute list in DFA
 - dfa_rt_t.next now stores offset to next state
 - new fucntion dfa_shuffle() to minimize jump sizes between DFA states
 - shorten generated pattern files to avoid too many lines warning

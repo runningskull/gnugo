@@ -228,14 +228,14 @@ buildSpiralOrder(int order[8][MAX_ORDER])
 static int
 member_att(dfa_t *pdfa, int att, int val)
 {
-  int res;
-
-  res = 0;
-  while (!res && att != 0) {
-    res = (pdfa->indexes[att].val == val);
+  while (att != 0) {
+    if (pdfa->indexes[att].val == val)
+      return 1;
+    
     att = pdfa->indexes[att].next;
   }
-  return res;
+  
+  return 0;
 }
 
 /* 
@@ -283,6 +283,74 @@ union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
   return att;
 }
 
+
+/* Remove all attribute entry repetitions from a dfa.
+ */
+static void
+compactify_att(dfa_t *pdfa)
+{
+  int k;
+  int last = 0;
+  int save_last = pdfa->lastIndex;
+  int *map;
+  int *search_first;
+  int *search_next;
+  int size = (save_last + 1) * sizeof(int);
+
+  map = malloc(size);
+  map[0] = 0;
+  search_first = malloc(size);
+  memset(search_first, 0, size);
+  search_next = malloc(size);
+  memset(search_next, 0, size);
+
+  for (k = 1; k <= save_last; k++) {
+    int i = search_first[pdfa->indexes[k].val];
+
+    if (i) {
+      while (pdfa->indexes[i].next != pdfa->indexes[k].next) {
+	if (!search_next[i]) {
+	  search_next[i] = ++last;
+	  i = 0;
+	  break;
+	}
+
+	i = search_next[i];
+      }
+    }
+    else
+      search_first[pdfa->indexes[k].val] = ++last;
+
+    if (i)
+      map[k] = i;
+    else {
+      map[k] = last;
+      pdfa->indexes[last] = pdfa->indexes[k];
+    }
+  }
+
+  free(search_first);
+  free(search_next);
+  
+  if (last < save_last) {
+    pdfa->lastIndex = last;
+    for (k = 0; k <= pdfa->lastIndex; k++)
+      pdfa->indexes[k].next = map[pdfa->indexes[k].next];
+
+    for (k = 0; k <= pdfa->lastState; k++)
+      pdfa->states[k].att = map[pdfa->states[k].att];
+
+    if (0)
+      fprintf(stderr, "compactified: %d attributes left of %d\n",
+	      last, save_last);
+
+    compactify_att(pdfa);
+  }
+  
+  free(map);
+}
+
+
 /**********************
  * manipulating dfa's *
  **********************/
@@ -297,10 +365,10 @@ dfa_size(dfa_t *pdfa)
 {
   int states_size, indexes_size;
 
-  states_size = (pdfa->lastState + 1) * sizeof(state_t);
-  indexes_size = (pdfa->lastIndex + 1) * sizeof(attrib_t);
+  states_size = (pdfa->lastState + 1) * sizeof(state_rt_t);
+  indexes_size = (pdfa->lastIndex + 1) * sizeof(attrib_rt_t);
 
-  return (states_size + indexes_size + sizeof(dfa_t)) / 1024;
+  return (states_size + indexes_size + sizeof(dfa_rt_t)) / 1024;
 }
 
 
@@ -337,7 +405,6 @@ resize_dfa(dfa_t *pdfa, int maxStates, int maxIndexes)
   pdfa->maxStates = maxStates;
   pdfa->indexes = pBuf2;
   pdfa->maxIndexes = maxIndexes;
-
 }
 
 
@@ -985,6 +1052,8 @@ dfa_finalize(dfa_t *pdfa)
     next_bin = aux_count;
   }
   copy_dfa(pdfa, &aux_dfa[last_bin % DFA_BINS]);
+  
+  compactify_att(pdfa);
 }
 
 
@@ -1224,7 +1293,6 @@ pattern_2_string(struct pattern *pat, char *str, int trans, int ci, int cj)
 
   if (0 && dfa_verbose > 0)
     fprintf(stderr, "converted pattern %s into string: %s\n", pat->name, str);
-
 }
 
 
