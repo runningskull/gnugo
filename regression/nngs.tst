@@ -620,7 +620,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 248
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 16
 1310 gg_genmove white
-#? [Q15|Q14]*
+#? [Q15|Q14]
 
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 20

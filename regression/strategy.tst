@@ -80,7 +80,7 @@ loadsgf games/incident108b.sgf 292
 # But the game move at R7 is not urgent!
 loadsgf games/incident121.sgf 24
 14 gg_genmove black
-#? [E9]*
+#? [E9]
 
 # incident 132
 loadsgf games/incident121.sgf 116

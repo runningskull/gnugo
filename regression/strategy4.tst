@@ -332,16 +332,16 @@ loadsgf games/owl33.sgf 200
 # B6 is too slow at this time.
 loadsgf games/handtalk.sgf 45
 216 gg_genmove black
-#? [!B6]
+#? [!B6]*
 
 loadsgf games/handtalk.sgf 49
 217 gg_genmove black
-#? [!R9]
+#? [!R9]*
 
 # locally F12 is better. Similar problem at move 51
 loadsgf games/handtalk.sgf 55
 218 gg_genmove black
-#? [!E12]
+#? [!E12]*
 
 ############ End of Tests #################
 

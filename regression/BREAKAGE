@@ -1,3 +1,35 @@
+======================= 3.1.30 pre 1  ==================
+
+The unexpected FAILs are all new tests.
+
+./regress.sh . nngs1.tst
+18 unexpected PASS!
+19 unexpected PASS!
+37 unexpected PASS!
+40 unexpected PASS!
+41 unexpected PASS!
+44 unexpected FAIL: Correct 'C11|D12', got 'D10'
+45 unexpected FAIL: Correct '!B10', got 'B10'
+46 unexpected FAIL: Correct '!J5', got 'J5'
+47 unexpected FAIL: Correct 'G15|F15|G16', got 'O17'
+48 unexpected FAIL: Correct 'R16', got 'O15'
+49 unexpected FAIL: Correct 'B17', got 'B16'
+50 unexpected FAIL: Correct 'O10', got 'C3'
+./regress.sh . strategy.tst
+14 unexpected PASS!
+./regress.sh . viking.tst
+2 unexpected PASS!
+./regress.sh . nngs.tst
+1310 unexpected PASS!
+./regress.sh . trevord.tst
+490 unexpected PASS!
+520 unexpected PASS!
+860 unexpected PASS!
+./regress.sh . strategy4.tst
+216 unexpected FAIL: Correct '!B6', got 'B6'
+217 unexpected FAIL: Correct '!R9', got 'R9'
+218 unexpected FAIL: Correct '!E12', got 'E12'
+
 ======================= 3.1.29  =========================
 
 ./regress.sh . connection.tst

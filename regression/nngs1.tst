@@ -70,11 +70,11 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 34
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 38
 18 gg_genmove white
-#? [!L2]*
+#? [!L2]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 16
 19 gg_genmove white
-#? [Q14]*
+#? [Q14]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 36
 20 gg_genmove white
@@ -148,7 +148,7 @@ loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 64
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 59
 37 gg_genmove black
-#? [H8|K14|L15|L14]*
+#? [H8|K14|L15|L14]
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
 39 gg_genmove black
@@ -156,11 +156,11 @@ loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 131
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 141
 40 gg_genmove black
-#? [R6]*
+#? [R6]
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 145
 41 gg_genmove black
-#? [P6]*
+#? [P6]
 
 loadsgf games/nngs/ManyFaces4-gnugo-3.1.28-200203262339.sgf 153
 42 gg_genmove black
@@ -172,31 +172,31 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 10
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 36
 44 gg_genmove white
-#? [C11|D12]
+#? [C11|D12]*
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 46
 45 gg_genmove white
-#? [!B10]
+#? [!B10]*
 
 # defense of the top right is urgent
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
 46 gg_genmove white
-#? [!J5]
+#? [!J5]*
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 12
 47 gg_genmove white
-#? [G15|F15|G16]
+#? [G15|F15|G16]*
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 16
 48 gg_genmove white
-#? [R16]
+#? [R16]*
 
 # W is trying to live with S14 but B:T14 threatens the corner.
 # Meanwhile B17 is urgent.
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 54
 49 gg_genmove white
-#? [B17]
+#? [B17]*
 
 loadsgf games/nngs/gnugo-3.1.29-merlin-200203281708.sgf 33
 50 gg_genmove white
-#? [O10]
+#? [O10]*
