@@ -2,7 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- maximum 15 points of territorial_value will get shape
+- read_eye() revised
+- `num_defends' field of half_eye_data strtucture renamed `num_defenses'
+- maximum 15 points of territorial_value will get shape bonus
 - change of semantics for --seed option
 - new GTP command printsgf
 - debugboard repaired

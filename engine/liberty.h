@@ -864,7 +864,7 @@ struct half_eye_data {
   char type;            /* HALF_EYE or FALSE_EYE; */
   int num_attacks;      /* number of attacking points */
   int attack_point[4];  /* the moves to attack a topological halfeye */
-  int num_defends;      /* number of defending points */
+  int num_defenses;     /* number of defending points */
   int defense_point[4]; /* the moves to defend a topological halfeye */
 };
 

@@ -994,8 +994,8 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
 
 
 /* This function does some minor reading to improve the results of
- * recognize_eye(). Currently, its only purpose is to read positions
- * like this:
+ * recognize_eye(). Currently, it has to duties. One is to read
+ * positions like this:
  *
  *     .XXXX|        with half eye         with proper eye
  *     XXOOO|
@@ -1011,6 +1011,23 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
  * eyes and chooses the best alternative. Note that we don't have any
  * attack/defense codes here, since owl will determine them itself.
  *
+ * Another one is related to some cases when replacing half eyes with
+ * '!.' doesn't work. E.g. consider this eye (optics:328):
+ *
+ *     XXXOO         eye graph is 310:
+ *     X..X.
+ *     XOXX.             !.!  (second '!' is due to the halfeye)
+ *     OXO..
+ *     O.O..
+ *
+ * When this function detects such a half eye that can be attacked
+ * and/or defended inside its eyespace, it tries to turn it into a
+ * proper eye and see what happens. In case it gives an improvement
+ * for attacker and/or defender, the function keeps new result but
+ * only if new vital points are also vital points for the half eye.
+ * The heuristics used here might need improvements since they are
+ * based on a single game position.
+ *
  * If add_moves != 0, this function may add move reasons for (color)
  * at the vital points which are found by recognize_eye(). If add_moves 
  * == 0, set color to be EMPTY.
@@ -1024,32 +1041,131 @@ read_eye(int pos, int *attack_point, int *defense_point,
   int eye_color;
   int k;
   int pos2;
+  int combination_halfeye = NO_MOVE;
+  int combination_attack = NO_MOVE;
+  int combination_defense = NO_MOVE;
+  int num_ko_halfeyes = 0;
   int ko_halfeye = NO_MOVE;
-  int apos = NO_MOVE, dpos = NO_MOVE;
-  struct eyevalue ko_value;
   struct vital_points vp;
   struct vital_points ko_vp;
   struct vital_points *best_vp = &vp;
-  
+
   eye_color = recognize_eye(pos, attack_point, defense_point, value,
-                            eye, heye, &vp);
+			    eye, heye, &vp);
   if (!eye_color)
     return 0;
 
-  for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
+  /* Find ko half eyes and "combination" half eyes if any. */
+  for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
     if (ON_BOARD(pos2)
 	&& eye[pos2].origin == pos
-        && heye[pos2].type == HALF_EYE && heye[pos2].value < 3.0) {
-      if (ko_halfeye != NO_MOVE) {
-	ko_halfeye = NO_MOVE;   /* We can't win two kos at once. */
-	break;            
+	&& heye[pos2].type == HALF_EYE) {
+      if (combination_halfeye == NO_MOVE) {
+	int apos = NO_MOVE;
+	int dpos = NO_MOVE;
+ 
+	for (k = 0; k < heye[pos2].num_attacks; k++) {
+	  if (eye[heye[pos2].attack_point[k]].origin == pos) {
+	    apos = heye[pos2].attack_point[k];
+	    break;
+	  }
+	}
+  
+	for (k = 0; k < heye[pos2].num_defenses; k++) {
+	  if (eye[heye[pos2].defense_point[k]].origin == pos) {
+	    dpos = heye[pos2].defense_point[k];
+	    break;
+	  }
+	}
+ 
+	if (apos || dpos) {
+	  combination_halfeye = pos2;
+	  combination_attack = apos;
+	  combination_defense = dpos;
+	}
       }
-      
-      ko_halfeye = pos2;
+ 
+      if (heye[pos2].value < 3.0) {
+	num_ko_halfeyes++;
+	ko_halfeye = pos2;
+      }
     }
+  }
 
-  if (ko_halfeye != NO_MOVE) {
+  /* In case we have a "combination" half eye, turn it into a proper eye
+   * vertex for a while and see what happens.
+   */
+  if (combination_halfeye != NO_MOVE) {
     int result;
+    int apos = NO_MOVE;
+    int dpos = NO_MOVE;
+    struct eyevalue combination_value;
+    struct vital_points combination_vp;
+
+    heye[combination_halfeye].type = 0;
+    result = recognize_eye(pos, &apos, &dpos, &combination_value, eye,
+			   heye, &combination_vp);
+    heye[combination_halfeye].type = HALF_EYE;
+
+    if (result) {
+      if (combination_attack
+	  && min_eyes(value) > min_eyes(&combination_value)) {
+	/* FIXME: I'm not sure we can ever get here. */
+	for (k = 0; k < combination_vp.num_attacks; k++) {
+	  if (combination_vp.attacks[k] == combination_attack) {
+	    value->a = combination_value.a;
+	    value->b = combination_value.b;
+	    *attack_point = apos;
+	    best_vp->num_attacks = 1;
+	    best_vp->attacks[0] = combination_attack;
+	    break;
+	  }
+	}
+      }
+
+      if (combination_defense
+	  && max_eyes(value) < max_eyes(&combination_value)) {
+	/* Turning the half eye into a proper eye gives an improvement.
+	 * However, we can only accept this result if there is a vital
+	 * point that defends both the half eye and the whole eyespace.
+	 */
+	for (k = 0; k < combination_vp.num_defenses; k++) {
+	  if (combination_vp.defenses[k] == combination_defense) {
+	    value->c = combination_value.c;
+	    value->d = combination_value.d;
+	    *defense_point = dpos;
+	    best_vp->num_defenses = 1;
+	    best_vp->defenses[0] = combination_defense;
+	    break;
+	  }
+	}
+      }
+
+      if (min_eyes(value) != max_eyes(value)) {
+	ASSERT1(combination_attack || combination_defense, combination_halfeye);
+	if (*attack_point == NO_MOVE) {
+	  *attack_point = combination_attack;
+	  if (*attack_point == NO_MOVE)
+	    *attack_point = combination_defense;
+	}
+
+	if (*defense_point == NO_MOVE) {
+	  *defense_point = combination_defense;
+	  if (*defense_point == NO_MOVE)
+	    *defense_point = combination_defense;
+	}
+      }
+    }
+  }
+
+  /* The same with ko half eye (we cannot win two kos at once, therefore we
+   * give up if there is more than one ko half eye).
+   */
+  if (num_ko_halfeyes == 1) {
+    int result;
+    int apos = NO_MOVE;
+    int dpos = NO_MOVE;
+    struct eyevalue ko_value;
 
     heye[ko_halfeye].type = 0;
     result = recognize_eye(pos, &apos, &dpos, &ko_value, eye,
@@ -1075,7 +1191,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
 	add_vital_eye_move(best_vp->attacks[k], pos, eye_color);
     }
   }
-  
+
   return 1;
 }
 
@@ -1299,7 +1415,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      int ix;
 	      struct half_eye_data *he = &heye[vpos[map[k] - 1]];
 	      
-	      for (ix = 0; ix < he->num_defends; ix++)
+	      for (ix = 0; ix < he->num_defenses; ix++)
 		vp->defenses[vp->num_defenses++] = he->defense_point[ix];
 	    }
 	    else
@@ -1608,7 +1724,7 @@ find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
       heye[pos].type = HALF_EYE;
       ASSERT1(heye[pos].num_attacks > 0, pos);
       ASSERT_ON_BOARD1(heye[pos].attack_point[0]);
-      ASSERT1(heye[pos].num_defends > 0, pos);
+      ASSERT1(heye[pos].num_defenses > 0, pos);
       ASSERT_ON_BOARD1(heye[pos].defense_point[0]);
     }
   }
@@ -1734,7 +1850,7 @@ topological_eye(int pos, int color,
   }
 
   heye[pos].num_attacks = num_attacks;
-  heye[pos].num_defends = num_defenses;
+  heye[pos].num_defenses = num_defenses;
   heye[pos].value = sum;
 
   return sum;
