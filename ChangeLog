@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function spread_connection_distances() broken out of
+  compute_connection_distances() and tuned
 - t moves degraded to value 16
 - new function edge_distance() in board.c
 - CPU time reported by twogtp.py

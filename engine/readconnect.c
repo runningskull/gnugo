@@ -2524,7 +2524,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
       } \
       else { \
         int r; \
-        num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones); \
+        int num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones); \
         for (r = 0; r < num_stones; r++) { \
           if (conn->distances[stones[r]] == HUGE_CONNECTION_DISTANCE) \
             conn->queue[conn->queue_end++] = stones[r]; \
@@ -2538,12 +2538,11 @@ find_connection_moves(int str1, int str2, int color_to_move,
 	} \
       } \
     } \
-  } while (0);
+  } while (0)
 
-/* Compute connection distances from the string str to nearby
- * vertices. This is a rough approximation of the number of moves
- * required to secure a connection from str to another vertex of the
- * board. We also compute delta values which are intended to tell how
+/* Do the real work of computing connection distances.
+ * This is a rough approximation of the number of moves required to secure
+ * a connection. We also compute delta values which are intended to tell how
  * big difference a particular move locally has on the connection
  * distance. However, remember that this is only a heuristic with the
  * sole purpose of helping to find relevant moves for connection
@@ -2598,38 +2597,26 @@ find_connection_moves(int str1, int str2, int color_to_move,
  * That is because there is a pattern directly recognizing the safe
  * link between the two lower stones, without taking the longer road
  * over the two diagonal links.
+ *
+ * (color) is the color for which we are computing connection distances,
+ * (target) the position we want to reach (can be set to NO_MOVE),
+ * (*conn) has to have the queue initialized with the positions
+ * from which we want to know the distances,
+ * (cutoff_distance) is the highest distance before we give up,
+ * (speculative) controls some special cases in the propagation rules
+ * below.
  */
 
 static void
-compute_connection_distances(int str, int target, struct connection_data *conn)
+spread_connection_distances(int color, int target,
+    			    struct connection_data *conn,
+    			    float cutoff_distance, int speculative)
 {
-  int color = board[str];
   int other = OTHER_COLOR(color);
+  float distance;
   int pos;
   int k;
-  float distance;
   int stones[MAX_BOARD * MAX_BOARD];
-  int num_stones = findstones(str, MAX_BOARD * MAX_BOARD, stones);
-  float cutoff_distance = 3.0001;
-  
-  conn->queue_start = 0;
-  conn->queue_end = 0;
-
-  /* Initialize distance and delta values so that the former are
-   * everywhere huge and the latter everywhere zero.
-   */
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    conn->distances[pos] = HUGE_CONNECTION_DISTANCE;
-    conn->deltas[pos] = 0.0;
-    conn->coming_from[pos] = NO_MOVE;
-    conn->vulnerable1[pos] = NO_MOVE;
-    conn->vulnerable2[pos] = NO_MOVE;
-  }
-
-  /* Add all stones in the initial string to the queue. */
-  for (k = 0; k < num_stones; k++) {
-    ENQUEUE(conn, NO_MOVE, stones[k], 0.0, 0.0, NO_MOVE, NO_MOVE);
-  }
 
   /* Loop until we reach the end of the queue. */
   for (; conn->queue_start < conn->queue_end; conn->queue_start++) {
@@ -2828,16 +2815,26 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	 * a ladder.
 	 */
 	if (board[apos] == EMPTY
-	    && conn->distances[apos] > distance + 0.7
+	    && conn->distances[apos] > distance + 0.6
 	    && ladder_capturable(apos, other)) {
-	  ENQUEUE(conn, pos, apos, distance + 0.7, 0.7, apos, NO_MOVE);
+	  ENQUEUE(conn, pos, apos, distance + 0.6, 0.6, apos, NO_MOVE);
 	}
 
-	/* Case 7. "a" is empty or occupied by opponent.
-	 */
-	if ((board[apos] == EMPTY || board[apos] == other)
+	/* Case 7a. "a" is empty. */
+	if (board[apos] == EMPTY) {
+	  float this_delta
+	    = 0.85 + 0.05 * gg_min(approxlib(apos, other, 5, NULL), 5);
+	  ENQUEUE(conn, pos, apos, distance + this_delta, this_delta,
+	    	  NO_MOVE, NO_MOVE);
+	}
+
+	/* Case 7b. "a" is occupied by opponent. */
+	if (board[apos] == other
 	    && conn->distances[apos] > distance + 1.0) {
-	  ENQUEUE(conn, pos, apos, distance + 1.0, 1.0, NO_MOVE, NO_MOVE);
+	  if (speculative)
+	    ENQUEUE(conn, pos, apos, distance + 1.0, 1.0, NO_MOVE, NO_MOVE);
+	  else
+	    ENQUEUE(conn, pos, apos, distance + 1.1, 1.1, NO_MOVE, NO_MOVE);
 	}
 
 	/* Case 8. Diagonal connection to empty vertex "b" through
@@ -3064,9 +3061,14 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 	  ENQUEUE(conn, pos, apos, distance, 0.0,
 		  conn->vulnerable1[pos], conn->vulnerable2[pos]);
 	}
-	else if (ON_BOARD(apos)) {
-	  ENQUEUE(conn, pos, apos, distance + 1.0, 1.0, NO_MOVE, NO_MOVE);
+	else if (board[apos] == EMPTY) {
+	  float this_delta
+	    = 0.8 + 0.05 * gg_min(approxlib(apos, other, 6, NULL), 6);
+	  ENQUEUE(conn, pos, apos, distance + this_delta, this_delta,
+	      	  NO_MOVE, NO_MOVE);
 	}
+	else if (board[apos] == OTHER_COLOR(color))
+	  ENQUEUE(conn, pos, apos, distance + 1.0, 1.0, NO_MOVE, NO_MOVE);
 
 	/* Case 1. Diagonal connection to empty vertex "b" through
 	 * empty vertices "a" and "g".
@@ -3093,8 +3095,56 @@ compute_connection_distances(int str, int target, struct connection_data *conn)
 }
 
 
-/* Print the connection distances in a struct connection_data. */
+/* Initialize distance and delta values so that the former are
+ * everywhere huge and the latter everywhere zero.
+ */
 static void
+clear_connection_data(struct connection_data *conn)
+{
+  int pos;
+
+  conn->queue_start = 0;
+  conn->queue_end = 0;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    conn->distances[pos] = HUGE_CONNECTION_DISTANCE;
+    conn->deltas[pos] = 0.0;
+    conn->coming_from[pos] = NO_MOVE;
+    conn->vulnerable1[pos] = NO_MOVE;
+    conn->vulnerable2[pos] = NO_MOVE;
+  }
+}
+
+
+/* Compute the connection distances from string (str) to nearby
+ * vertices, until we reach target or the distance gets too high.
+ */
+static void
+compute_connection_distances(int str, int target, struct connection_data *conn)
+{
+  int color = board[str];
+  
+  clear_connection_data(conn);
+
+  /* Add all stones in the initial string to the queue. */
+  { 
+    int stones[MAX_BOARD * MAX_BOARD];
+    int num_stones = findstones(str, MAX_BOARD * MAX_BOARD, stones);
+    int k;
+    for (k = 0; k < num_stones; k++) {
+      conn->queue[conn->queue_end++] = stones[k];
+      conn->distances[stones[k]] = 0.0;
+      conn->deltas[stones[k]] = 0.0;
+      conn->coming_from[stones[k]] = NO_MOVE;
+      conn->vulnerable1[stones[k]] = NO_MOVE;
+      conn->vulnerable2[stones[k]] = NO_MOVE;
+    }
+  }
+  spread_connection_distances(color, target, conn, 3.0501, 1);
+}
+
+
+/* Print the connection distances in a struct connection_data. */
+void
 print_connection_distances(struct connection_data *conn)
 {
   int i, j;
