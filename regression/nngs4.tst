@@ -277,7 +277,7 @@ loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 42
 #? [Q2]*
 
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 4
-660 reg_gemove black
+660 reg_genmove black
 #? [O16]
 
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 12
