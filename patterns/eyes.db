@@ -5361,6 +5361,24 @@ xXX
 
 Pattern 77000
 
+ x
+ XX
+.*.!
+
+:1122
+
+
+Pattern 77001
+
+ x
+ XX
+.X.!
+
+:0111
+
+
+Pattern 77010
+
  !
  .x
 !.*x

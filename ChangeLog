@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- defend4() generates superstring moves
+- semeai_move_reasons() revised
+- induce_secondary_move_reasons() revised; do not allow owl attack moves
+  to induce strategic defense of neighbors if involved in a semeai
+- connection_value() revised to never give points for connection to
+  inessential strings
 - get_influence() revised
 - list_move_reasons() revised and made global
 - new functions print_all_move_values() and prepare_move_influence_debugging()
@@ -18,6 +24,8 @@
   store_persistent_breakin_cache(), and store_persistent_owl_cache()
 - move_is_marked_unsafe() in move_reasons.h revised
 - modify_stupid_eye_vital_point() revised
+- influence tuning
+- fuseki tuning
 - eye tuning
 - endgame tuning
 - owl tuning

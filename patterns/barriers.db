@@ -428,9 +428,10 @@ xxxx
 
 
 Pattern Barrier26
+# gf Revised pattern. (3.5.3)
 
-X,.x
-x.,X
+X,,x
+x,,X
 
 :O,A
 
@@ -999,6 +1000,18 @@ Pattern Barrier66
 |..,...
 |......
 +------
+
+:8,D
+
+
+Pattern Barrier67
+# gf New pattern. (3.5.3)
+
+....O
+O,,,.
+.....
+.....
+-----
 
 :8,D
 
@@ -1954,15 +1967,16 @@ a....
 Pattern Intrusion48
 # ab New pattern. (3.1.23)
 # FIXME: This would need a constraint. The one below did not work.
+# gf Revised. (3.5.3)
 
-?X.
+?x.
 ...
 Q.!
 ..X
 
 :8,B,value(20)
 
-# .X.
+# .x.
 # fce
 # Oba
 # .dX
@@ -2216,6 +2230,24 @@ Pattern Intrusion61
 |.OO?
 
 ;!oplay_connect(a,b,c,D,E)
+
+
+Pattern Intrusion62
+# gf New pattern. (3.5.3)
+# See gifu03:206
+
+.Xo
+.Q.
+!XO
+
+:8,B,value(20)
+
+.Xo
+bQa
+cDO
+
+;oplay_attack(c,b,D)
+>return !safe_xmove(a) && !oplay_defend_both(c,b,a,b,D);
 
 
 #########################################################
@@ -3202,5 +3234,81 @@ CaebD
 
 >non_oterritory(e);
 
+
+Pattern Nonterritory48
+# gf New pattern. (3.5.3)
+# See gifu03:507.
+
+?.?
+O..
+?XO
+
+:8,t
+
+?d?
+Oab
+?Xc
+
+;!oplay_defend_both(a,b,a,c)
+
+>non_oterritory(b);
+>non_oterritory(d);
+
+
+Pattern Nonterritory51
+# gf New pattern. (3.5.3)
+# See gifu03:205.
+
+?O?
+..X
+..?
+
+:8,t
+
+?O?
+baX
+dc?
+
+;!oplay_attack(a,b,c,a) && !oplay_attack(a,c,b,a)
+
+>non_xterritory(d);
+
+
+Pattern Nonterritory52
+# gf New pattern. (3.5.3)
+# See gifu03:205.
+
+??O
+X..
+?..
+
+:8,t
+
+??O
+Xba
+?dc
+
+;!oplay_attack(a,b,c,a) && !oplay_attack(a,c,b,a)
+
+>non_xterritory(d);
+
+
+Pattern Nonterritory54
+# gf New pattern. (3.5.3)
+# See gifu03:206.
+
+.Ox
+.X.
+.OX
+
+:8,t
+
+.Ox
+bXa
+cdX
+
+;!safe_omove(a) && !oplay_defend_both(b,a,?,c,b,d)
+
+>non_oterritory(c);
 
 # END OF FILE

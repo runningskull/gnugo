@@ -314,6 +314,7 @@ semeai_move_reasons(int color)
       else if (DRAGON(d).color == other
 	       && dragon2[d].semeai_attack_point
 	       && (dragon2[d].owl_attack_point == NO_MOVE
+		   || dragon2[d].owl_defense_point == NO_MOVE
 		   || dragon2[d].semeai_attack_certain >= 
 		      dragon2[d].owl_attack_certain)) {
 	/* Your dragon can be attacked */

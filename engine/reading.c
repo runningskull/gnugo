@@ -1819,6 +1819,8 @@ defend4(int str, int *move, int komaster, int kom_pos)
 #if 0 
     hane_rescue_moves(str, libs, &moves);
 #endif
+  if (stackp <= superstring_depth)
+    superstring_moves(str, &moves, 4, 0);
   }
 
   order_moves(str, &moves, color, read_function_name, *move);

@@ -599,7 +599,8 @@ induce_secondary_move_reasons(int color)
 	aa = move_reasons[r].what;
 	for (i = 0; i < DRAGON2(aa).neighbors; i++) {
 	  int bb = dragon2[DRAGON2(aa).adjacent[i]].origin;
-	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0) {
+	  if (dragon[bb].color == color && worm[bb].attack_codes[0] == 0
+	      && !DRAGON2(bb).semeai) {
 	    add_strategical_defense_move(pos, bb);
 	    DEBUG(DEBUG_MOVE_REASONS, "Strategic defense at %1m induced for %1m due to owl attack on %1m\n",
 		  pos, bb, aa);
@@ -1023,6 +1024,9 @@ connection_value(int dragona, int dragonb, int tt, float margin)
       return 0.0;
   }
 
+  if (safetyb == INESSENTIAL)
+    return 0.0;
+  
   if (crude_weakness_a == 0.0
       || dragon[dragona].status == DEAD)
     return 0.0;
