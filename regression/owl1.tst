@@ -151,6 +151,12 @@ loadsgf games/nngs/gnugo-3.3.16-ccwills-200302151826.sgf 110
 297 owl_defend C8
 #? [1 A13]*
 
+loadsgf games/nngs/halti-gnugo-3.3.17-200303162357.sgf 228
+298 owl_attack P3
+#? [2 Q3]
+299 owl_defend P3
+#? [1 Q1]
+
 
 ########### end of tests #####################
 

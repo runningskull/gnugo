@@ -739,6 +739,11 @@ loadsgf games/reading40.sgf
 178 attack C9
 #? [0]
 
+loadsgf games/nngs/halti-gnugo-3.3.17-200303162357.sgf 228
+179 attack P1
+#? [1 Q1]
+180 defend P1
+#? [2 Q3]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
