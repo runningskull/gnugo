@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- break_chain2_moves() revised	
+- do_play_move() revised to improve performance
 - corrects quoting of special characters in regress.plx
 - sgffile_loadandprint() renamed to sgffile_printsgf() and revised
 - use EOF rather than -1 the code to read sgf files in sgfnode.c

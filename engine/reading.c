@@ -4561,7 +4561,7 @@ break_chain2_moves(int str, struct reading_moves *moves, int require_safe)
 	ADD_CANDIDATE_MOVE(libs[k], 0, *moves);
     }
 
-    if (stackp <= backfill2_depth) {
+    if (stackp <= backfill2_depth || have_common_lib(str, apos, NULL)) {
       break_chain_moves(apos, moves);
       if (unsafe[0] && unsafe[1]) {
 	int libs2[3];
