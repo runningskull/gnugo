@@ -1,4 +1,27 @@
-==============-=========== 3.3.12 ==============================
+========================== 3.3.13 pre 1 ============================
+
+./regress.sh . ld_owl.tst 
+302 unexpected PASS!
+./regress.sh . optics.tst 
+1201 unexpected FAIL: Correct '1 2 T8 T8', got '0 0'
+./regress.sh . atari_atari.tst 
+17 unexpected PASS!
+./regress.sh . connection.tst 
+96 unexpected PASS!
+./regress.sh . trevora.tst 
+130 unexpected FAIL: Correct 'F4', got 'B7'
+./regress.sh . arb.tst 
+150 unexpected FAIL: Correct 'J5', got 'B8'
+./regress.sh . golife.tst 
+4 unexpected FAIL: Correct 'H5', got 'B4'
+./regress.sh . lazarus.tst 
+3 unexpected PASS!
+./regress.sh . 13x13.tst 
+67 unexpected PASS!
+./regress.sh . nngs3.tst 
+770 unexpected PASS!
+
+========================== 3.3.12 ==============================
 
 ./regress.sh . blunder.tst 
 30 unexpected FAIL: Correct '!O7', got 'O7'

@@ -8,7 +8,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 38
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 48
 3 gg_genmove black
-#? [Q8|P8]*
+#? [Q8|P8]
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 4 gg_genmove black

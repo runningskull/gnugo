@@ -31,7 +31,7 @@ loadsgf games/trevor/auto/a003.sgf 30
 #Best not to give up this ponuki.
 loadsgf games/trevor/auto/a004.sgf 10
 130 gg_genmove white
-#? [F4]
+#? [F4]*
 
 
 

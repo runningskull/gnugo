@@ -358,7 +358,7 @@ loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 47
 # EB1404b produces nonsense here. 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 77
 67 gg_genmove black
-#? [B9]*
+#? [B9]
 
 loadsgf games/mertin13x13/gnugo-katsunari2.B+66.sgf 79
 68 gg_genmove black

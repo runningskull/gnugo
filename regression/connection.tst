@@ -316,7 +316,7 @@ loadsgf games/reading39.sgf
 
 loadsgf games/handtalk/handtalk1.sgf 31
 96 same_dragon C16 C13
-#? [0]*
+#? [0]
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 201
 97 disconnect P8 O9
