@@ -4,17 +4,22 @@
 * Protocol applications::         Protocol applications
 * Protocol conventions::	  Protocol conventions
 * Regression with GTP::           Regression testing with GTP
+* GTP command reference::         Details on every GTP command
 @end menu
 
 @node The Go Text Protocol, Protocol applications, GTP, GTP
 @comment  node-name,  next,  previous,  up
 @section The GNU Go Text Protocol
 
-GNU Go 3.0 introduces a new interface, the Go Text Protocol
+GNU Go 3.0 introduced a new interface, the Go Text Protocol
 (GTP). The intention is to make an interface that is better suited
 for machine-machine communication than the ascii interface and
 simpler, more powerful, and more flexible than the Go Modem
-Protocol. 
+Protocol.
+
+There are two versions of the protocol. Version 1 was used with
+GNU Go 3.0 and 3.2. GNU Go 3.4 uses version 2. The specification 
+is available at @url{http:http://www.lysator.liu.se/~gunnar/gtp/}.
 
 The GTP has two principal current applications: it is used
 in the test suite (@pxref{Regression}) and it is used to
@@ -151,8 +156,9 @@ worm_cutstone
 worm_data
 @end example
 
-For exact specification of their arguments and results we refer to the
-comments of the functions in @file{interface/play_gtp.c}.
+For exact specification of their arguments and results,
+@xref{GTP command reference}.
+
 
 @node Protocol applications, Protocol conventions, The Go Text Protocol, GTP
 @section Protocol applications
@@ -339,7 +345,7 @@ gtp_report_uncertainty(char *s)
 @}
 @end example
 
-@node Regression with GTP, , Protocol conventions, GTP
+@node Regression with GTP, GTP command reference, Protocol conventions, GTP
 @comment  node-name,  next,  previous,  up
 @section Regression testing with GTP
 
@@ -350,3 +356,31 @@ and responses from commands without id numbers are removed. These
 results are then compared with expected results encoded in GTP comments
 in the file, using matching with regular expressions. More information
 can be found in the regression chapter (@pxref{Regression}).
+
+@node GTP command reference, , Regression with GTP, GTP
+@section GTP command reference
+
+This section lists the GTP command set along with some information about each
+command.  Each entry in the list has the following fields:
+
+@itemize @bullet
+@item Function: What this command does.
+@item Arguments: What other information, if any, this command requires.
+Typical values include @dfn{none} or @dfn{vertex} or @dfn{integer} (there
+are others).
+@item Fails: Circumstances which cause this command to fail.
+@item Returns: What is displayed after the @dfn{=} and before the two
+newlines.  Typical values include @dfn{nothing} or @dfn{a move coordinate}
+or some status string (there are others).
+@item Status: How this command fits in with the GTP API.
+@end itemize
+
+For suggestions on how to make effective use of the GTP command set,
+@xref{Protocol applications}. Some of these commands are standard
+commands in the protocol, others are GNU Go private commands.
+
+Without further ado, here is the big list (in no particular order):
+
+@itemize @bullet
+@include gtp-commands.texi
+@end itemize

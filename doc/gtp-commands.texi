@@ -1,0 +1,1418 @@
+@cindex quit
+@item quit
+
+@example
+
+ Function:  Quit
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex protocol_version
+@item protocol_version
+
+@example
+
+ Function:  Report protocol version.
+ Arguments: none
+ Fails:     never
+ Returns:   protocol version number
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex name
+@item name
+
+@example
+
+ Function:  Report the name of the program.
+ Arguments: none
+ Fails:     never
+ Returns:   program name
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex version
+@item version
+
+@example
+
+ Function:  Report the version number of the program.
+ Arguments: none
+ Fails:     never
+ Returns:   version number
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex boardsize
+@item boardsize
+
+@example
+
+ Function:  Set the board size to NxN and clear the board.
+ Arguments: integer
+ Fails:     board size outside engine's limits
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex query_boardsize
+@item query_boardsize
+
+@example
+
+ Function:  Find the current boardsize
+ Arguments: none
+ Fails:     never
+ Returns:   board_size
+
+@end example
+
+@cindex clear_board
+@item clear_board
+
+@example
+
+ Function:  Clear the board.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex orientation
+@item orientation
+
+@example
+
+ Function:  Set the orienation to N and clear the board
+ Arguments: integer
+ Fails:     illegal orientation
+ Returns:   nothing
+
+@end example
+
+@cindex query_orientation
+@item query_orientation
+
+@example
+
+ Function:  Find the current orientation
+ Arguments: none
+ Fails:     never
+ Returns:   orientation
+
+@end example
+
+@cindex komi
+@item komi
+
+@example
+
+ Function:  Set the komi.
+ Arguments: float
+ Fails:     incorrect argument
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex get_komi
+@item get_komi
+
+@example
+
+ Function:  Get the komi
+ Arguments: none
+ Fails:     never
+ Returns:   Komi 
+
+@end example
+
+@cindex black
+@item black
+
+@example
+
+ Function:  Play a black stone at the given vertex.
+ Arguments: vertex
+ Fails:     invalid vertex, illegal move
+ Returns:   nothing
+
+ Status:    Obsolete GTP version 1 command.
+
+@end example
+
+@cindex playwhite
+@item playwhite
+
+@example
+
+ Function:  Play a white stone at the given vertex.
+ Arguments: vertex
+ Fails:     invalid vertex, illegal move
+ Returns:   nothing
+
+ Status:    Obsolete GTP version 1 command.
+
+@end example
+
+@cindex play
+@item play
+
+@example
+
+ Function:  Play a stone of the given color at the given vertex.
+ Arguments: vertex
+ Fails:     invalid vertex, illegal move
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex fixed_handicap
+@item fixed_handicap
+
+@example
+
+ Function:  Set up fixed placement handicap stones.
+ Arguments: number of handicap stones
+ Fails:     invalid number of stones for the current boardsize
+ Returns:   list of vertices with handicap stones
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex place_free_handicap
+@item place_free_handicap
+
+@example
+
+ Function:  Choose free placement handicap stones and put them on the board.
+ Arguments: number of handicap stones
+ Fails:     invalid number of stones
+ Returns:   list of vertices with handicap stones
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex set_free_handicap
+@item set_free_handicap
+
+@example
+
+ Function:  Put free placement handicap stones on the board.
+ Arguments: list of vertices with handicap stones
+ Fails:     board not empty, bad list of vertices
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex get_handicap
+@item get_handicap
+
+@example
+
+ Function:  Get the handicap
+ Arguments: none
+ Fails:     never
+ Returns:   handicap
+
+@end example
+
+@cindex loadsgf
+@item loadsgf
+
+@example
+
+ Function:  Load an sgf file, possibly up to a move number or the first
+            occurence of a move.           
+ Arguments: filename + move number, vertex, or nothing
+ Fails:     missing filename or failure to open or parse file
+ Returns:   color to play
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex color
+@item color
+
+@example
+
+ Function:  Return the color at a vertex.
+ Arguments: vertex
+ Fails:     invalid vertex
+ Returns:   "black", "white", or "empty"
+
+@end example
+
+@cindex list_stones
+@item list_stones
+
+@example
+
+ Function:  List vertices with either black or white stones.
+ Arguments: color
+ Fails:     invalid color
+ Returns:   list of vertices
+
+@end example
+
+@cindex countlib
+@item countlib
+
+@example
+
+ Function:  Count number of liberties for the string at a vertex.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   Number of liberties.
+
+@end example
+
+@cindex findlib
+@item findlib
+
+@example
+
+ Function:  Return the positions of the liberties for the string at a vertex.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   Sorted space separated list of vertices.
+
+@end example
+
+@cindex accuratelib
+@item accuratelib
+
+@example
+
+ Function:  Determine which liberties a stone of given color
+            will get if played at given vertex.
+ Arguments: move (color + vertex)
+ Fails:     invalid color, invalid vertex, occupied vertex
+ Returns:   Sorted space separated list of liberties
+
+@end example
+
+@cindex accurate_approxlib
+@item accurate_approxlib
+
+@example
+
+ Function:  Determine which liberties a stone of given color
+            will get if played at given vertex.
+ Arguments: move (color + vertex)
+ Fails:     invalid color, invalid vertex, occupied vertex
+ Returns:   Sorted space separated list of liberties
+
+ Supposedly identical in behavior to the above function and
+ can be retired when this is confirmed.
+
+@end example
+
+@cindex is_legal
+@item is_legal
+
+@example
+
+ Function:  Tell whether a move is legal.
+ Arguments: move
+ Fails:     invalid move
+ Returns:   1 if the move is legal, 0 if it is not.
+
+@end example
+
+@cindex all_legal
+@item all_legal
+
+@example
+
+ Function:  List all legal moves for either color.
+ Arguments: color
+ Fails:     invalid color
+ Returns:   Sorted space separated list of vertices.
+
+@end example
+
+@cindex captures
+@item captures
+
+@example
+
+ Function:  List the number of captures taken by either color.
+ Arguments: color
+ Fails:     invalid color
+ Returns:   Number of captures.
+
+@end example
+
+@cindex trymove
+@item trymove
+
+@example
+
+ Function:  Play a stone of the given color at the given vertex.
+ Arguments: move (color + vertex)
+ Fails:     invalid color, invalid vertex, illegal move
+ Returns:   nothing
+
+@end example
+
+@cindex tryko
+@item tryko
+
+@example
+
+ Function:  Play a stone of the given color at the given vertex, 
+            allowing illegal ko capture.
+ Arguments: move (color + vertex)
+ Fails:     invalid color, invalid vertex, illegal move
+ Returns:   nothing
+
+@end example
+
+@cindex popgo
+@item popgo
+
+@example
+
+ Function:  Undo a trymove or tryko.
+ Arguments: none
+ Fails:     stack empty
+ Returns:   nothing
+
+@end example
+
+@cindex attack
+@item attack
+
+@example
+
+ Function:  Try to attack a string.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   attack code followed by attack point if attack code nonzero.
+
+@end example
+
+@cindex attack_either
+@item attack_either
+
+@example
+
+ Function:  Try to attack either of two strings
+ Arguments: two vertices
+ Fails:     invalid vertex, empty vertex
+ Returns:   attack code against the strings.  Guarantees there
+            exists a move which will attack one of the two
+            with attack_code, but does not return the move.
+
+@end example
+
+@cindex defend
+@item defend
+
+@example
+
+ Function:  Try to defend a string.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   defense code followed by defense point if defense code nonzero.
+
+@end example
+
+@cindex ladder_attack
+@item ladder_attack
+
+@example
+
+ Function:  Try to attack a string strictly in a ladder.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   attack code followed by attack point if attack code nonzero.
+
+@end example
+
+@cindex increase_depths
+@item increase_depths
+
+@example
+
+ Function:  Increase depth values by one.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex decrease_depths
+@item decrease_depths
+
+@example
+
+ Function:  Decrease depth values by one.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex owl_attack
+@item owl_attack
+
+@example
+
+ Function:  Try to attack a dragon.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   attack code followed by attack point if attack code nonzero.
+
+@end example
+
+@cindex owl_defend
+@item owl_defend
+
+@example
+
+ Function:  Try to defend a dragon.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   defense code followed by defense point if defense code nonzero.
+
+@end example
+
+@cindex owl_threaten_attack
+@item owl_threaten_attack
+
+@example
+
+ Function:  Try to attack a dragon in 2 moves.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   attack code followed by the two attack points if
+            attack code nonzero.
+
+@end example
+
+@cindex owl_threaten_defense
+@item owl_threaten_defense
+
+@example
+
+ Function:  Try to defend a dragon with 2 moves.
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   defense code followed by the 2 defense points if
+            defense code nonzero.
+
+@end example
+
+@cindex owl_does_attack
+@item owl_does_attack
+
+@example
+
+ Function:  Examine whether a specific move attacks a dragon.
+ Arguments: vertex (move), vertex (dragon)
+ Fails:     invalid vertex, empty vertex
+ Returns:   attack code
+
+@end example
+
+@cindex owl_does_defend
+@item owl_does_defend
+
+@example
+
+ Function:  Examine whether a specific move defends a dragon.
+ Arguments: vertex (move), vertex (dragon)
+ Fails:     invalid vertex, empty vertex
+ Returns:   defense code
+
+@end example
+
+@cindex owl_connection_defends
+@item owl_connection_defends
+
+@example
+
+ Function:  Examine whether a connection defends involved dragons.
+ Arguments: vertex (move), vertex (dragon1), vertex (dragon2)
+ Fails:     invalid vertex, empty vertex
+ Returns:   defense code
+
+@end example
+
+@cindex defend_both
+@item defend_both
+
+@example
+
+ Function:  Try to defend both of two strings
+ Arguments: two vertices
+ Fails:     invalid vertex, empty vertex
+ Returns:   defend code for the strings.  Guarantees there
+            exists a move which will defend both of the two
+            with defend_code, but does not return the move.
+
+@end example
+
+@cindex owl_substantial
+@item owl_substantial
+
+@example
+
+ Function:  Determine whether capturing a string gives a living dragon
+ Arguments: vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   1 if dragon can live, 0 otherwise
+
+@end example
+
+@cindex owl_analyze_semeai
+@item owl_analyze_semeai
+
+@example
+
+ Function:  Analyze a semeai
+ Arguments: dragona, dragonb
+ Fails:     invalid vertices, empty vertices
+ Returns:   status of dragona, dragonb assuming dragona moves first
+
+@end example
+
+@cindex tactical_analyze_semeai
+@item tactical_analyze_semeai
+
+@example
+
+ Function:  Analyze a semeai, not using owl
+ Arguments: dragona, dragonb
+ Fails:     invalid vertices, empty vertices
+ Returns:   status of dragona, dragonb assuming dragona moves first
+
+@end example
+
+@cindex connect
+@item connect
+
+@example
+
+ Function:  Try to connect two strings.
+ Arguments: vertex, vertex
+ Fails:     invalid vertex, empty vertex, vertices of different colors
+ Returns:   connect result followed by connect point if successful.
+
+@end example
+
+@cindex disconnect
+@item disconnect
+
+@example
+
+ Function:  Try to disconnect two strings.
+ Arguments: vertex, vertex
+ Fails:     invalid vertex, empty vertex, vertices of different colors
+ Returns:   disconnect result followed by disconnect point if successful.
+
+@end example
+
+
+@cindex eval_eye
+@item eval_eye
+
+@example
+
+ Function:  Evaluate an eye space
+ Arguments: vertex
+ Fails:     invalid vertex
+ Returns:   Minimum and maximum number of eyes. If these differ an
+            attack and a defense point are additionally returned.
+            If the vertex is not an eye space or not of unique color,
+            a single -1 is returned.
+
+@end example
+
+
+@cindex dragon_status
+@item dragon_status
+
+@example
+
+ Function:  Determine status of a dragon.
+ Arguments: optional vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   status ("alive", "critical", "dead", or "unknown"),
+            attack point, defense point. Points of attack and
+            defense are only given if the status is critical.
+            If no vertex is given, the status is listed for all
+            dragons, one per row in the format "A4: alive".
+
+ FIXME: Should be able to distinguish between life in seki
+        and independent life. Should also be able to identify ko.
+
+@end example
+
+
+@cindex same_dragon
+@item same_dragon
+
+@example
+
+ Function:  Determine whether two stones belong to the same dragon.
+ Arguments: vertex, vertex
+ Fails:     invalid vertex, empty vertex
+ Returns:   1 if the vertices belong to the same dragon, 0 otherwise
+
+@end example
+
+
+@cindex combination_attack
+@item combination_attack
+
+@example
+
+ Function:  Find a move by color capturing something through a
+            combination attack.
+ Arguments: color
+ Fails:     invalid color
+ Returns:   Recommended move, PASS if no move found
+
+@end example
+
+
+@cindex aa_confirm_safety
+@item aa_confirm_safety
+
+@example
+
+ Function:  Run atari_atari_confirm_safety().
+ Arguments: move, optional int
+ Fails:     invalid move
+ Returns:   success code, if failure also defending move
+
+@end example
+
+@cindex genmove_black
+@item genmove_black
+
+@example
+
+ Function:  Generate and play the supposedly best black move.
+ Arguments: none
+ Fails:     never
+ Returns:   a move coordinate (or "PASS")
+
+ Status:    Obsolete GTP version 1 command.
+
+@end example
+
+@cindex genmove_white
+@item genmove_white
+
+@example
+
+ Function:  Generate and play the supposedly best white move.
+ Arguments: none
+ Fails:     never
+ Returns:   a move coordinate (or "PASS")
+
+ Status:    Obsolete GTP version 1 command.
+
+@end example
+
+@cindex genmove
+@item genmove
+
+@example
+
+ Function:  Generate and play the supposedly best move for either color.
+ Arguments: color to move
+ Fails:     invalid color
+ Returns:   a move coordinate (or "PASS")
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex reg_genmove
+@item reg_genmove
+
+@example
+
+ Function:  Generate the supposedly best move for either color.
+ Arguments: color to move
+ Fails:     invalid color
+ Returns:   a move coordinate (or "PASS")
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex gg_genmove
+@item gg_genmove
+
+@example
+
+ Function:  Generate the supposedly best move for either color.
+ Arguments: color to move, optionally a random seed
+ Fails:     invalid color
+ Returns:   a move coordinate (or "PASS")
+
+ This differs from reg_genmove in the optional random seed.
+
+@end example
+
+@cindex level
+@item level
+
+@example
+
+ Function:  Set the playing level.
+ Arguments: int
+ Fails:     incorrect argument
+ Returns:   nothing
+
+@end example
+
+
+@cindex undo
+@item undo
+
+@example
+
+ Function:  Undo a number of moves
+ Arguments: none
+ Fails:     If move history is too short.
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+
+@cindex gg-undo
+@item gg-undo
+
+@example
+
+ Function:  Undo a number of moves
+ Arguments: optional int
+ Fails:     If move history is too short.
+ Returns:   nothing
+
+@end example
+
+
+@cindex time_settings
+@item time_settings
+
+@example
+
+ Function:  Set time allowance
+ Arguments: int main_time, int byo_yomi_time, int byo_yomi_stones
+ Fails:     syntax error
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+ FIXME: This command stores the time settings but no one ever takes notice.
+
+@end example
+
+
+@cindex time_left
+@item time_left
+
+@example
+
+ Function:  Report remaining time
+ Arguments: color color, int time, int stones
+ Fails:     syntax error
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+ FIXME: This command does not take any action.
+
+@end example
+
+@cindex final_score
+@item final_score
+
+@example
+
+ Function:  Compute the score of a finished game.
+ Arguments: Optional random seed
+ Fails:     never
+ Returns:   Score in SGF format (RE property).
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex final_status
+@item final_status
+
+@example
+
+ Function:  Report the final status of a vertex in a finished game.
+ Arguments: Vertex, optional random seed
+ Fails:     invalid vertex
+ Returns:   Status in the form of one of the strings "alive", "dead",
+            "seki", "white_territory", "black_territory", or "dame".
+
+@end example
+
+@cindex final_status_list
+@item final_status_list
+
+@example
+
+ Function:  Report vertices with a specific final status in a finished game.
+ Arguments: Status in the form of one of the strings "alive", "dead",
+            "seki", "white_territory", "black_territory", or "dame".
+            An optional random seed can be added.
+ Fails:     missing or invalid status string
+ Returns:   Vertices having the specified status. These are split with
+            one string on each line if the vertices are nonempty (i.e.
+            for "alive", "dead", and "seki").
+
+ Status:    GTP version 2 standard command.
+            However, "dame", "white_territory", and "black_territory"
+            are private extensions.
+
+@end example
+
+
+@cindex estimate_score
+@item estimate_score
+
+@example
+
+ Function:  Estimate the score
+ Arguments: None
+ Fails:     never
+ Returns:   upper and lower bounds for the score
+
+@end example
+
+
+@cindex experimental_score
+@item experimental_score
+
+@example
+
+ Function:  Estimate the score, taking into account which player moves next
+ Arguments: Color to play
+ Fails:     Invalid color
+ Returns:   Score.
+
+ This function generates a move for color, then adds the
+ value of the move generated to the value of the position.
+ Critical dragons are awarded to the opponent since the
+ value of rescuing a critical dragon is taken into account
+ in the value of the move generated.
+
+@end example
+
+@cindex reset_life_node_counter
+@item reset_life_node_counter
+
+@example
+
+ Function:  Reset the count of life nodes.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+ Note: This function is obsolete and only remains for backwards
+ compatibility.
+
+@end example
+
+@cindex get_life_node_counter
+@item get_life_node_counter
+
+@example
+
+ Function:  Retrieve the count of life nodes.
+ Arguments: none
+ Fails:     never
+ Returns:   number of life nodes
+
+ Note: This function is obsolete and only remains for backwards
+ compatibility.
+
+@end example
+
+@cindex reset_owl_node_counter
+@item reset_owl_node_counter
+
+@example
+
+ Function:  Reset the count of owl nodes.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex get_owl_node_counter
+@item get_owl_node_counter
+
+@example
+
+ Function:  Retrieve the count of owl nodes.
+ Arguments: none
+ Fails:     never
+ Returns:   number of owl nodes
+
+@end example
+
+@cindex reset_reading_node_counter
+@item reset_reading_node_counter
+
+@example
+
+ Function:  Reset the count of reading nodes.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex get_reading_node_counter
+@item get_reading_node_counter
+
+@example
+
+ Function:  Retrieve the count of reading nodes.
+ Arguments: none
+ Fails:     never
+ Returns:   number of reading nodes
+
+@end example
+
+@cindex reset_trymove_counter
+@item reset_trymove_counter
+
+@example
+
+ Function:  Reset the count of trymoves/trykos.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex get_trymove_counter
+@item get_trymove_counter
+
+@example
+
+ Function:  Retrieve the count of trymoves/trykos.
+ Arguments: none
+ Fails:     never
+ Returns:   number of trymoves/trykos
+
+@end example
+
+@cindex reset_connection_node_counter
+@item reset_connection_node_counter
+
+@example
+
+ Function:  Reset the count of connection nodes.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex get_connection_node_counter
+@item get_connection_node_counter
+
+@example
+
+ Function:  Retrieve the count of connection nodes.
+ Arguments: none
+ Fails:     never
+ Returns:   number of connection nodes
+
+@end example
+
+@cindex test_eyeshape
+@item test_eyeshape
+
+@example
+
+ Function:  Test an eyeshape for inconsistent evaluations
+ Arguments: Eyeshape vertices
+ Fails:     Bad vertices
+ Returns:   Failure reports on stderr.
+
+@end example
+
+@cindex cputime
+@item cputime
+
+@example
+
+ Function:  Returns elapsed CPU time in seconds.
+ Arguments: none
+ Fails:     never
+ Returns:   Total elapsed (user + system) CPU time in seconds.
+
+@end example
+
+@cindex showboard
+@item showboard
+
+@example
+
+ Function:  Write the position to stdout.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex dump_stack
+@item dump_stack
+
+@example
+
+ Function:  Dump stack to stderr.
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex influence
+@item influence
+
+@example
+
+ Function:  Return information about the influence function.
+ Arguments: color to move
+ Fails:     never
+ Returns:   Influence data formatted like:
+
+ white:
+   0.51   1.34   3.20   6.60   9.09   8.06   1.96   0.00   0.00 
+   0.45   1.65   4.92  12.19  17.47  15.92   4.03   0.00   0.00 
+                   .
+                   .
+                   .
+   0.00   0.00   0.00   0.00   0.00 100.00  75.53  41.47  23.41
+ black:
+   1.57   2.51   4.10   3.10   3.60   4.54   8.32   4.15   2.71 
+   2.96   4.62   9.18   5.47   5.89  10.88  20.54  10.19   4.08 
+                   .
+                   .
+                   .
+ 100.00 139.39 100.00 139.39 100.00   0.00   0.00   0.00   0.00
+ regions:
+ -1  0  0  1  1  0 -1 -3 -3
+              .
+              .
+              .
+ -3 -3 -3 -3 -3  3  3  3  3
+
+ The encoding of the regions is as follows:
+  3 white territory
+  2 white moyo
+  1 white area
+  0 neutral
+ -1 black area
+ -2 black moyo
+ -3 black territory
+
+@end example
+
+@cindex worm_data
+@item worm_data
+
+@example
+
+ Function:  Return the information in the worm data structure.
+ Arguments: optional vertex
+ Fails:     never
+ Returns:   Worm data formatted like:
+
+ A19:
+ color           black
+ size            10
+ effective_size  17.83
+ origin          A19
+ liberties       8
+ liberties2      15
+ liberties3      10
+ liberties4      8
+ attack          PASS
+ attack_code     0
+ lunch           B19
+ defend          PASS
+ defend_code     0
+ cutstone        2
+ cutstone2       0
+ genus           0
+ inessential     0
+ B19:
+ color           white
+ .
+ .
+ .
+ inessential     0
+ C19:
+ ...
+
+ If an intersection is specified, only data for this one will be returned.
+
+@end example
+
+@cindex worm_stones
+@item worm_stones
+
+@example
+
+ Function:  List the stones of a worm
+ Arguments: the location, "BLACK" or "WHITE"
+ Fails:     if called on an empty or off-board location
+ Returns:   list of stones
+
+@end example
+
+@cindex worm_cutstone
+@item worm_cutstone
+
+@example
+
+ Function:  Return the cutstone field in the worm data structure.
+ Arguments: non-empty vertex
+ Fails:     never
+ Returns:   cutstone
+
+@end example
+
+@cindex dragon_data
+@item dragon_data
+
+@example
+
+ Function:  Return the information in the dragon data structure.
+ Arguments: optional intersection
+ Fails:     never
+ Returns:   Dragon data formatted in the corresponding way to worm_data.
+
+@end example
+
+@cindex dragon_stones
+@item dragon_stones
+
+@example
+
+ Function:  List the stones of a dragon
+ Arguments: the location
+ Fails:     if called on an empty or off-board location
+ Returns:   list of stones
+
+@end example
+
+@cindex start_sgftrace
+@item start_sgftrace
+
+@example
+
+ Function:  Start storing moves executed during reading in an sgf
+            tree in memory. 
+ Arguments: none
+ Fails:     never
+ Returns:   nothing
+
+ Warning: You had better know what you're doing if you try to use this
+          command.
+
+@end example
+
+@cindex finish_sgftrace
+@item finish_sgftrace
+
+@example
+
+ Function:  Finish storing moves in an sgf tree and write it to file. 
+ Arguments: filename
+ Fails:     never
+ Returns:   nothing
+
+ Warning: You had better know what you're doing if you try to use this
+          command.
+
+@end example
+
+@cindex tune_move_ordering
+@item tune_move_ordering
+
+@example
+
+ Function:  Tune the parameters for the move ordering in the tactical
+            reading.
+ Arguments: MOVE_ORDERING_PARAMETERS integers
+ Fails:     incorrect arguments
+ Returns:   nothing
+
+@end example
+
+@cindex echo
+@item echo
+
+@example
+
+ Function:  Echo the parameter
+ Arguments: string
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex echo_err
+@item echo_err
+
+@example
+
+ Function:  Echo the parameter to stdout AND stderr
+ Arguments: string
+ Fails:     never
+ Returns:   nothing
+
+@end example
+
+@cindex help
+@item help
+
+@example
+
+ Function:  List all known commands
+ Arguments: none
+ Fails:     never
+ Returns:   list of known commands, one per line
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex known_command
+@item known_command
+
+@example
+
+ Function:  Tell whether a command is known.
+ Arguments: command name
+ Fails:     never
+ Returns:   "true" if command exists, "false" if not
+
+ Status:    GTP version 2 standard command.
+
+@end example
+
+@cindex report_uncertainty
+@item report_uncertainty
+
+@example
+
+ Function:  Turn uncertainty reports from owl_attack
+            and owl_defend on or off.
+ Arguments: "on" or "off"
+ Fails:     invalid argument
+ Returns:   nothing
+
+@end example
+
+@cindex get_random_seed
+@item get_random_seed
+
+@example
+
+ Function:  Get the random seed
+ Arguments: none
+ Fails:     never
+ Returns:   random seed
+
+@end example
+
+@cindex set_random_seed
+@item set_random_seed
+
+@example
+
+ Function:  Set the random seed
+ Arguments: integer
+ Fails:     invalid data
+ Returns:   nothing
+
+@end example
+
+@cindex is_surrounded
+@item is_surrounded
+
+@example
+
+ Function:  Determine if a dragon is surrounded
+ Arguments: vertex (dragon)
+ Fails:     invalid vertex, empty vertex
+ Returns:   1 if surrounded, 2 if weakly surrounded, 0 if not
+
+@end example
+
+@cindex does_surround
+@item does_surround
+
+@example
+
+ Function:  Determine if a move surrounds a dragon
+ Arguments: vertex (move), vertex (dragon)
+ Fails:     invalid vertex, empty (dragon, nonempty (move)
+ Returns:   1 if (move) surrounds (dragon)
+
+@end example
+
+
+@cindex surround_map
+@item surround_map
+
+@example
+
+ Function:  Report the surround map for dragon at a vertex
+ Arguments: vertex (dragon), vertex (mapped location)
+ Fails:     invalid vertex, empty dragon
+ Returns:   value of surround map at (mapped location), or -1 if
+            dragon not surrounded.
+
+@end example
+
