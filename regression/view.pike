@@ -518,6 +518,7 @@ class RegressionViewer
     mapping(string:array(string)) worms = ([]);
     mapping(string:array(string)) dragons = ([]);
 
+    string name;
     string result;
     string testcase_command;
     array(string) fulltest;
@@ -526,12 +527,14 @@ class RegressionViewer
 
     static void create(SimpleGtp engine_,
 		       array(string) fulltest_, string testcase_command_,
-		       function callback, Controller parent_)
+		       function callback, string name_,
+		       Controller parent_)
     {
 	engine = engine_;
 	parent = parent_;
 	fulltest = fulltest_;
         testcase_command = testcase_command_;
+	name = name_;
 
 	load_testcase();
 	werror("%s\n", send_command("showboard"));
@@ -1124,11 +1127,13 @@ class RegressionViewer
     }
 
     void do_reading(string reset_counter, string get_counter,
-	    	    string sgffilename,
+	    	    string sgffilename, string sgf_viewer_cmd,
     		    string first_command, string second_command)
     {
 	string result;
 	send_command("clear_cache");
+        if (sizeof(parent->viewers) > 1)
+            sgffilename += "." + name;
 	if (sgffilename != "")
 	    send_command("start_sgftrace");
 
@@ -1146,6 +1151,9 @@ class RegressionViewer
 	}
 	if (sgffilename != "")
 	    send_command("finish_sgftrace " + sgffilename);
+        if (sgf_viewer_cmd != "")
+            Process.create_process(sprintf(sgf_viewer_cmd, sgffilename)
+                                   / " ");
 	clist->columns_autosize();
 	parent->set_title(this_object(), "Reading result");
      }
@@ -1206,8 +1214,9 @@ class Controller
     GTK.RadioButton owl_reading_button;
     GTK.RadioButton connection_reading_button;
     GTK.RadioButton semeai_reading_button;
-    GTK.CheckButton sgf_traces_button;
-    GTK.Entry sgf_filename_entry;
+    GTK.CheckButton sgf_traces_button, sgf_viewer_button;
+    GTK.Entry sgf_filename_entry, sgf_viewer_entry;
+    GTK.Table sgf_stuff;
     GTK.Button new_engine_button;
     GTK.Entry engine_path_entry;
     GTK.Entry engine_name_entry;
@@ -1400,6 +1409,18 @@ class Controller
 	sgf_filename_entry->set_text("vars.sgf");
 	sgf_filename_entry->set_editable(1);
 
+	sgf_viewer_button = GTK.CheckButton("start sgf viewer as");
+        sgf_viewer_entry = GTK.Entry()->set_text("quarry %s")
+                           ->set_editable(1);
+        sgf_viewer_button->signal_connect("toggled", sgf_viewer_button_toggled);
+        sgf_traces_button->signal_connect("toggled", sgf_traces_button_toggled);
+        sgf_stuff = GTK.Table(2, 2, 0)
+                    ->attach_defaults(sgf_traces_button, 0, 1, 0, 1)
+                    ->attach_defaults(sgf_filename_entry, 1, 2, 0, 1)
+                    ->attach_defaults(sgf_viewer_button, 0, 1, 1, 2)
+                    ->attach_defaults(sgf_viewer_entry, 1, 2, 1, 2);
+
+
 	engine_path_entry = GTK.Entry();
 	engine_path_entry->set_text("../interface/gnugo");
 	engine_path_entry->set_editable(1);
@@ -1473,11 +1494,7 @@ class Controller
 	       ->pack_start(connection_reading_button, 0, 0, 0)
 	       ->pack_start(semeai_reading_button, 0, 0, 0)
 	       ->pack_start(GTK.Label(""), 0, 0, 0)
-	       ->pack_start(GTK.Hbox(0, 0)
-			    ->pack_start(sgf_traces_button,
-					 0, 0, 0)
-			    ->pack_start(sgf_filename_entry,
-					 0, 0, 0), 0, 0, 0));
+	       ->pack_start(sgf_stuff, 0, 0, 0));
 	controller_notebook->append_page(reading_page, GTK.Label("reading"));
 
 	GTK.Widget engines_page
@@ -1504,8 +1521,8 @@ class Controller
 					       complete_testcase,
 					       testcase_command,
 					       button_pressed_on_a_board,
-					       this_object()),
-			      "Default engine");
+					       "Default engine",
+					       this_object()));
 	add_markup(controller_notebook->get_current_page());
     }
 
@@ -1516,13 +1533,12 @@ class Controller
     	if (!new_engine)
 	    werror("Failed to start new engine.\n");
 	else {
-	    add_regression_viewer(RegressionViewer(new_engine,
-						   full_testcase,
-						   testcase_command,
-						   button_pressed_on_a_board,
-						   this_object()),
-				  (single_window_mode
-				   ? engine_name_entry->get_text() : ""));
+	    add_regression_viewer(
+		RegressionViewer(new_engine, full_testcase, testcase_command,
+			         button_pressed_on_a_board,
+				 (single_window_mode ?
+				  engine_name_entry->get_text() : ""),
+				 this_object()));
 	}
 
 	if (single_window_mode) {
@@ -1531,7 +1547,7 @@ class Controller
 	}
     }
 
-    static void add_regression_viewer(RegressionViewer viewer, string name)
+    static void add_regression_viewer(RegressionViewer viewer)
     {
 	viewers += ({ viewer });
 	if (single_window_mode) {
@@ -1551,7 +1567,7 @@ class Controller
 		->append_page((GTK.Alignment(0.0, 0.5, 0.0, 0.0)
 			       ->set_border_width(4)
 			       ->add(GTK.Label(viewer->engine->command_line))),
-			      GTK.Label(name));
+			      GTK.Label(viewer->name));
 	    selector_notebook->show_all();
 	    selector_notebook->set_page(sizeof(viewers) - 1);
 	}
@@ -1650,12 +1666,21 @@ class Controller
 	case 4:
 	    // Reading.
 	    string sgffilename;
+	    string sgf_viewer_cmd;
 	    string reset_counter, get_counter;
 	    
-	    if (sgf_traces_button->get_active())
+            if (sgf_viewer_button->get_active()) {
+                sgffilename = sgf_filename_entry->get_text();
+                sgf_viewer_cmd = sgf_viewer_entry->get_text();
+            }
+	    else if (sgf_traces_button->get_active()) {
 	    	sgffilename = sgf_filename_entry->get_text();
-	    else
+                sgf_viewer_cmd = "";
+	    }
+	    else {
 	    	sgffilename = "";
+                sgf_viewer_cmd = "";
+	    }
 
 	    if (first_semeai_or_connection_vertex == ""
 		|| tactical_reading_button->get_active()
@@ -1680,7 +1705,8 @@ class Controller
 		    get_counter = "get_owl_node_counter";
 		}
 		
-		viewers->do_reading(reset_counter, get_counter, sgffilename,
+		viewers->do_reading(reset_counter, get_counter,
+				    sgffilename, sgf_viewer_cmd,
 				    prefix + "attack " + vertex,
 				    prefix + "defend " + vertex);
 	    }
@@ -1703,7 +1729,8 @@ class Controller
 			c2 = "dis" + c1;
 			viewers->do_reading("reset_connection_node_counter",
 					    "get_connection_node_counter",
-					    sgffilename, c1, c2);
+					    sgffilename, sgf_viewer_cmd,
+					    c1, c2);
 		    }
 		    else
 		    {
@@ -1717,7 +1744,8 @@ class Controller
 			// exist yet.
 			viewers->do_reading("reset_owl_node_counter",
 					    "get_owl_node_counter",
-					    sgffilename, c1, c2);
+					    sgffilename, sgf_viewer_cmd,
+					    c1, c2);
 		    }
 		    first_semeai_or_connection_vertex = "";
 		}
@@ -1790,6 +1818,17 @@ class Controller
 	return 0;
     }
 
+    void sgf_traces_button_toggled()
+    {
+        if (!sgf_traces_button->get_active())
+            sgf_viewer_button->set_active(0);
+    }
+
+    void sgf_viewer_button_toggled()
+    {
+        if (sgf_viewer_button->get_active())
+            sgf_traces_button->set_active(1);
+    }
     
     void debug_callback(mixed ... args)
     {

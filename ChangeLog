@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- view.pike enhancement: directly start sgf viewer
 - remove special case of CLASS_C in matchpat.c
 - tuning
 - implement persistent semeai caching
