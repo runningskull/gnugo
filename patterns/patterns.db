@@ -7192,20 +7192,21 @@ Pattern CB106
 
 Pattern CB107
 # db New pattern (3.1.28)
+# db corrected (3.1.28)
 
-?Oxxxx       defend the cut before leaping
+?OXxxx       defend the cut before leaping
 ..O...
 ?*....
 ?.....
 
 :8,O
 
-?Oxxxx
+?OAxxx
 .bO...
 ?*c.a.
 ?.....
 
-; oplay_defend(a,b,c,b)
+; oplay_defend(a,b,c,b) && !attack(A)
 > replace(a,*)
 
 
