@@ -613,8 +613,9 @@ static int moves_to_connect_in_three_moves(int *moves, int str1, int str2,
 	 */
 	for (k = 0; k < 8; k++) {
 	  if (!does_connect
-	      || secondlib1[libs[s] + delta[k]]
-	      || secondlib2[libs[s] + delta[k]]) {
+             || (ON_BOARD(libs[s] + delta[k])
+                 && (secondlib1[libs[s] + delta[k]]
+                     || secondlib2[libs[s] + delta[k]]))) {
 	    add_array(moves, libs[s]);
 	    break;
 	  }
