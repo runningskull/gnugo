@@ -899,9 +899,9 @@ find_neighbor_dragons()
 	  }
 	}
       }
-      if (!found_one)
-	break;
     }
+    if (!found_one)
+      break;
   }
   
   if (0) {
