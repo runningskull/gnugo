@@ -908,7 +908,8 @@ read_pattern_line(char *p)
     assert(off <= ATT_not);
 
 	
-    if ((ci == -1) && (off < 3) && ((off & anchor) != 0)) {
+    if ((ci == -1) && (off < 3) && ((off & anchor) != 0)
+	&& !fixed_anchor) {
       /* Use this position as the pattern origin. */
       ci = maxi;
       cj = j;

@@ -90,7 +90,7 @@
 attribute_map owl_attack
 
 goal_elements Xx
-callback_data none
+callback_data Xx
 
  
 #########################################################
@@ -1220,14 +1220,14 @@ Pattern A242
 
 ...o?
 ..*O?
-...Xx
+...Yx
 -----
 
 :8,-,value(35)
 
 ...o?
 ba*c?
-...Xx
+...Yx
 -----
 
 ;xplay_disconnect(*,a,a,c) && xplay_disconnect(*,b,b,c)
@@ -1630,7 +1630,7 @@ Pattern A411a
 ???..??      try to stop escape into center
 ??...oo
 ??.*.oo
-??o.X??
+??o.Y??
 ??oo???
 ??oo???
 
@@ -1639,7 +1639,7 @@ Pattern A411a
 ???a.??
 ??...de
 ??.*.bc
-??f.X??
+??f.Y??
 ??gh???
 ??ij???
 
@@ -2168,13 +2168,13 @@ A*O|
 Pattern A515
 # gf New pattern. See owl1:286. (3.3.17)
 
-XXX*O          sacrifice lunch and falsify eye
+XXY*O          sacrifice lunch and falsify eye
 XOO..
 -----
 
 :8,-,value(35)
 
-XXX*O
+XXY*O
 XOba.
 -----
 
@@ -2215,7 +2215,7 @@ Pattern A518
 # See nngs2:460
 
 O.xx?      destroye eye
-.*.XX
+.*.YX
 ....X
 -----
 
@@ -2595,13 +2595,13 @@ Pattern A619
 Pattern A620
 #evand New Pattern. (3.3.18)
 
-.XO	push in to destroy eyespace
+.YO	push in to destroy eyespace
 *Ox
 ---
 
 :8,s,value(65)
 
-aXO
+aYO
 *Ox
 ---
 
@@ -2612,7 +2612,7 @@ Pattern A621
 # spl added 3.3.22
 # gf Revised constraint. (3.5.3)
 
-?XOo? threaten to make ko or nakade
+?YOo? threaten to make ko or nakade
 X..*.
 -----
 
@@ -2629,13 +2629,13 @@ Pattern A622
 # gf New pattern. (3.5.3)
 # Compare D704b. See nngs3:450.
 
-xX.O	    half eye sometimes missed
+xY.O	    half eye sometimes missed
 X.*o
 ----
 
 :8,-,value(35)
 
-bXaO
+bYaO
 X.*o
 ----
 
@@ -2704,7 +2704,7 @@ O*.Y
 
 Pattern A704
 
-?OX?         capture one stone
+?OY?         capture one stone
 OXOX
 .*.?
 
@@ -2944,13 +2944,13 @@ Pattern A719
 # gf New pattern. (3.3.20)
 # gf Revised constraint. (3.5.2)
 
-?XXO   reduce eye space 
+?XYO   reduce eye space 
 X.*X
 ?XX.
 
 :8,s,value(50)
 
-?XXc
+?XYc
 Xa*X
 ?XXb
 
@@ -2960,13 +2960,13 @@ Xa*X
 Pattern A719b
 # gf New pattern. (3.3.20)
 
-|XXO   reduce eye space 
+|XYO   reduce eye space 
 |.*X
 |XX.
 
 :8,s,value(50)
 
-|XXc
+|XYc
 |a*X
 |XXb
 
@@ -3192,14 +3192,14 @@ Pattern A813
 # gf Revised constraint. (3.5.1)
 
 X*.
-OXO sacrifice to eliminate eye
+OYO sacrifice to eliminate eye
 .X.
 ---
 
 :8,Cs,value(85)
 
 X*.
-aXb
+aYb
 cXd
 ---
 
@@ -3212,7 +3212,7 @@ Pattern A814
 # See ld_owl:321.
 
 X..        try to squeeze eyespace
-OX*
+OY*
 ?X.
 ---
 
@@ -4652,7 +4652,7 @@ cdx
 Pattern A1124b
 # gf New pattern. (3.5.4) (see nngs:770 decide-dragon K4)
 
-?OX
+?OY
 x.*
 xx?
 
@@ -4807,7 +4807,7 @@ Pattern A1132
 Pattern A1133a
 # evand New pattern. (3.3.20)
 
-?O.X
+?O.Y
 ?..x
 ?.*.
 ?..O
@@ -4815,7 +4815,7 @@ Pattern A1133a
 
 :8,-,value(65)
 
-?O.X
+?O.Y
 ?..x
 a.*.
 b..O
@@ -4828,7 +4828,7 @@ cd??
 Pattern A1133b
 # evand New pattern. (3.3.20)
 
-?O.X
+?O.Y
 ?.*.
 ?...
 ?..O
@@ -4836,7 +4836,7 @@ Pattern A1133b
 
 :8,-,value(45)
 
-?O.X
+?O.Y
 ?.*.
 a...
 b..O
@@ -4954,14 +4954,14 @@ Pattern A1137
 xxx?
 ...x
 .*O.
-?XXO
+?YXO
 
 :8,-,value(79)
 
 abc?
 ...x
 .*O.
-?XXO
+?YXO
 
 ;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
 
@@ -4971,7 +4971,7 @@ Pattern A1138
 
 xx.??
 xx.O?
-..*OX
+..*OY
 ...X.
 -----
 
@@ -4981,14 +4981,14 @@ xx.O?
 Pattern A1139
 # gf New pattern. (3.5.7)
 
-.OXx        
+.OYx        
 *XOX
 o..O
 ??O?
 
 :8,-,value(60)
 
-.dXx
+.dYx
 *XOX
 oabc
 ??O?
@@ -5116,7 +5116,7 @@ Pattern A1210
 # See ld_owl:318.
 
 ?O?     not always found as lunch defense
-X*X
+Y*X
 
 :|,-,value(65)
 
@@ -5944,7 +5944,7 @@ Pattern A1351
 
 |OO??   better than capturing
 |XOX?
-|.X.X
+|.Y.X
 |*.X?
 |..X?
 +----
@@ -6075,14 +6075,14 @@ Pattern A1504
 #   redundant, as long as A1107c isn't removed
 
 OXXXO         threaten to take an eye by ko
-.OX.X
+.OY.X
 *..X.
 -----
 
 :8,-,value(60)
 
 OXXXa
-bcX.X
+bcY.X
 *..X.
 -----
 

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- fixed anchor building of owl_attackpats.db repaired
 - thrashing dragon heuristics revised
 - readline support in ASCII mode
 - liberties and neighbors list broken out of string_data array in board.c
