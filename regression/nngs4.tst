@@ -263,6 +263,10 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 152
 620 gg_genmove white
 #? [G13|G14]*
 
+loadsgf games/nngs/evand-gnugo-3.3.21-200306130638 156
+630 gg_genmove black
+#? [B6]
+
 
 ############ End of Tests #################
 
