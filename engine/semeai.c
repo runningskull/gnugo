@@ -315,14 +315,16 @@ analyze_semeai(int my_dragon, int your_dragon)
     if (dragon[your_dragon].owl_attack_point
 	== dragon[my_dragon].owl_defense_point)
       return;
-    /* FIXME: Keep track of the return code from owl_does_attack(). */
-    if (dragon[my_dragon].owl_defense_point != NO_MOVE
-	&& owl_does_attack(dragon[my_dragon].owl_defense_point, your_dragon)) {
-      add_owl_attack_move(dragon[my_dragon].owl_defense_point, your_dragon,
-			  WIN);
-      DEBUG(DEBUG_SEMEAI, "added owl attack of %1m at %1m\n",
-	    your_dragon, dragon[my_dragon].owl_defense_point);
-      owl_code_sufficient = 1;
+    if (dragon[my_dragon].owl_defense_point != NO_MOVE) {
+      int acode = owl_does_attack(dragon[my_dragon].owl_defense_point,
+				  your_dragon);
+      if (acode != 0) {
+	add_owl_attack_move(dragon[my_dragon].owl_defense_point, your_dragon,
+			    acode);
+	DEBUG(DEBUG_SEMEAI, "added owl attack of %1m at %1m with code %d\n",
+	      your_dragon, dragon[my_dragon].owl_defense_point, acode);
+	owl_code_sufficient = 1;
+      }
     }
   }
 
@@ -337,28 +339,30 @@ analyze_semeai(int my_dragon, int your_dragon)
     if (dragon[your_dragon].owl_attack_point
 	== dragon[my_dragon].owl_defense_point)
       return;
-    /* FIXME: Keep track of the return code from owl_does_defend(). */
-    if (dragon[your_dragon].owl_attack_point != NO_MOVE
-	&& owl_does_defend(dragon[your_dragon].owl_attack_point, my_dragon)) {
-      add_owl_defense_move(dragon[your_dragon].owl_attack_point, my_dragon,
-			   WIN);
-      DEBUG(DEBUG_SEMEAI, "added owl defense of %1m at %1m\n",
-	    my_dragon, dragon[your_dragon].owl_attack_point);
-      if (dragon[my_dragon].owl_status == DEAD) {
-	for (m = 0; m < board_size; m++)
-	  for (n = 0; n < board_size; n++) {
-	    int pos = POS(m, n);
-	    if (board[pos] == board[my_dragon]
-		&& is_same_dragon(pos, my_dragon)) {
-	      dragon[pos].owl_status = CRITICAL;
-	      dragon[pos].matcher_status = CRITICAL;
+    if (dragon[your_dragon].owl_attack_point != NO_MOVE) {
+      int dcode = owl_does_defend(dragon[your_dragon].owl_attack_point,
+				  my_dragon);
+      if (dcode != 0) {
+	add_owl_defense_move(dragon[your_dragon].owl_attack_point, my_dragon,
+			     dcode);
+	DEBUG(DEBUG_SEMEAI, "added owl defense of %1m at %1m with code %d\n",
+	      my_dragon, dragon[your_dragon].owl_attack_point, dcode);
+	if (dragon[my_dragon].owl_status == DEAD) {
+	  for (m = 0; m < board_size; m++)
+	    for (n = 0; n < board_size; n++) {
+	      int pos = POS(m, n);
+	      if (board[pos] == board[my_dragon]
+		  && is_same_dragon(pos, my_dragon)) {
+		dragon[pos].owl_status = CRITICAL;
+		dragon[pos].matcher_status = CRITICAL;
+	      }
 	    }
-	  }
-	DEBUG(DEBUG_SEMEAI,
-	      "changed owl_status and matcher_status of %1m to CRITICAL\n",
-	      my_dragon);
+	  DEBUG(DEBUG_SEMEAI,
+		"changed owl_status and matcher_status of %1m to CRITICAL\n",
+		my_dragon);
+	}
+	owl_code_sufficient = 1;
       }
-      owl_code_sufficient = 1;
     }
   }
 

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- ko return codes from owl_does_attack() and owl_does_defend() handled
+  in analyze_semeai()
 - special_rescue2() generalized and reimplemented
 - bugfix in edge_clamp()
 - mkpat does consistency checking between the diagram and constraint diagram
