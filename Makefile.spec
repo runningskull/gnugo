@@ -15,9 +15,8 @@ EXEBASE   = gnugo
 BENCHLANG = C
 SOURCES   = \
 	sgf/sgf_utils.c \
-	sgf/sgfgen.c \
-	sgf/sgfnode.c \
 	sgf/sgftree.c \
+	sgf/sgfnode.c \
 	engine/aftermath.c \
 	engine/board.c \
 	engine/cache.c \
@@ -56,14 +55,9 @@ SOURCES   = \
 	interface/play_gtp.c \
 	interface/play_solo.c \
 	interface/play_test.c \
-	interface/gtp_examples/metamachine.c \
-	interface/gtp_examples/vanilla.c \
 	patterns/connections.c \
 	patterns/dfa.c \
 	patterns/helpers.c \
-	patterns/joseki.c \
-	patterns/mkeyes.c \
-	patterns/mkpat.c \
 	patterns/transform.c \
 	patterns/owl_attackpat.c \
 	patterns/conn.c \
@@ -88,8 +82,7 @@ SOURCES   = \
 	utils/gg_utils.c \
 	utils/random.c
 
-define NEED_MATH
-endef
+NEED_MATH = 1
 
 # Include standard template for this suite
 -include ../../../../Makefile.defaults
