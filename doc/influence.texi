@@ -1,26 +1,32 @@
 @menu
 * Influential Concepts::        Conceptual Outline of Influence
+* Influence Usage::		Where influence gets used in the engine
 * Influence and Territory::     Influence and Territory
+* Territorial Details::		Details of the Territory Valuation
 * The Influence Core::          The Core of the Influence Function
 * The Influence Algorithm::     The algorithm of @code{accumlate_influence()}
 * Permeability::                Permeability
 * Escape::                      Escape
+* Influential Patterns::	Patterns used by the Influence module
 * Influential Functions::       Functions in @file{engine/influence.c}
 * Influential Display::         Colored display and debugging of influence
 @end menu
 
-@node Influential Concepts, Influence and Territory, Influence, Influence
+@node Influential Concepts, Influence Usage, Influence, Influence
 @comment  node-name,  next,  previous,  up
 @section Conceptual Outline of Influence
 @cindex moyo
 @cindex territory
 @cindex area
 
-We define @dfn{lively} stones to be all stones that can't be tactically
-attacked or have a tactical defense. Stones that have been found to be
-strategically dead are called dead while all other stones are called
-@dfn{alive}. If we want to use the influence function before deciding the
-strategical status, all lively stones count as alive.
+We define call stones @dfn{lively} if they cannot be tactically
+attacked, or if they have a tactical defense and belong to the player
+whose turn it is. Similarly, stones that cannot be strategically attacked
+(in the sense of the life-and-death analysis), or that have a strategical
+defense and belong to the player to move, are called @dfn{alive} while all
+other stones are called @dfn{alive}. If we want to use the influence
+function before deciding the strategical status, all lively stones count
+as alive.
 
 Every alive stone on the board works as an influence source, with
 influence of its color radiating outwards in all directions. The
@@ -56,43 +62,120 @@ the influence from the stones building the wall. To accommodate for this
 phenomenon, we also add extra influence sources in empty space at
 certain distances away from walls.
 
-@node Influence and Territory, The Influence Core, Influential Concepts, Influence
+All these extra influence sources, as well as connections, are controlled
+by a pattern database, which consists of the two files patterns/influence.db
+and patterns/barriers.db. The details are explained in
+@ref{Influential Patterns}.
+
+
+@node Influence Usage, Influence and Territory, Influential Concepts, Influence
+@comment  node-name,  next,  previous,  up
+@section Where influence gets used in the engine
+
+The information obtained from the influence computation is used in a variety
+of places in the engine, and the influence module is called several times
+in the process of the move generation. The details of the influence
+computation vary according to the needs of the calling function.
+
+After GNU Go has decided about the tactical stability of strings, the
+influence module gets called the first time. Here all lively stones act
+as an influence source of default strength 100. The result is stored in
+the variables @code{initial_influence} and @code{initial_opposite_influence},
+and it is used as an important information for guessing the strength of
+dragons. For example,
+a dragon that is part of a moyo of size 25 is immediately considered alive.
+For dragons with a smaller moyo size, a life-and-death analysis will be
+done by the owl code (see @ref{Life and Death Reading}). A dragon with a
+moyo size of only 5 will be considered weak, even if the owl code has
+decided that it cannot be killed.
+
+As a tool for the owl code, an "escape" influence gets computed for each
+dragon going through the life-and-death analysis (@ref{Escape}).
+
+Once all dragons have been evaluated, the influence module is called again
+and the variables @code{initial_influence} and
+@code{initial_opposite_influence} get overwritten. Of course, the dragon
+status', which are available now, are taken into account. Stones belonging
+to a dead dragon will not serve as an influence source, and the strengths of
+other stones get adjusted according to the strength of their respective
+dragon.
+
+The result of this run is the most important tool for move evaluation. All
+helper functions of patterns as explained in @ref{Patterns} that
+refer to influence results (e. g. @code{olib(*)} etc.) actually use these
+results. More important, @code{initial_influence} serves as the reference for
+computing the territorial value of a move. That is, from the influence
+strengths stored in @code{initial_influence}, a territory value is
+assigned to each intersection. This value is supposed to estimate the
+likelyhood that this intersection will become white or black territory.
+
+Then, for each move that gets considered in the function @code{value_moves},
+the influence module is called again via the function
+@code{compute_move_influence} to assess the likely territorial balance after
+this move, and the result is compared with the state before that move.
+
+There are a number of changes from 3.0 to 3.2 in these influence
+computations relevant for territorial evaluation. Also, now an additional
+influence computation is done in order to compute the followup value of
+a move. Some explainations are in @ref{Territorial Details}.
+
+
+@node Influence and Territory, Territorial Details, Influence Usage, Influence
+@comment  node-name,  next,  previous,  up
+@section Influence and Territory
 
 In this section we consider how the influence function is used to
 estimate territory in the function @code{estimate_territorial_value()}.
 
-A move like @samp{*} below is worth one point in gote:
+A move like @samp{*} by @samp{O} below is worth one point:
 
 @example
-OOOX
-O.*X
-OOOX
+OXXX.
+OX.XX
+O*a.X
+OX.XX
+OXXX.
 @end example
 
-and given the value 1. A move in sente or reverse sente is counted
-double, e.g. the move at @samp{*} here
-
-@example
-OOOOOOOXXX
-O.*XXXX.X
-OOOOOOOXXX
-@end example
-
-would be one point sente for @samp{O} and one point reverse sente for 
-@samp{X} and should be given the value 2. Double sente moves
-should be valued much higher than their nominal value, which we
-discuss later.
-
-The territorial valuation done by the influence function uses
-the idea that if @samp{O} makes a move at @code{pos}, we first
-assign territory under the assumption that X moves first in all
-local positions in the original position and then under the
-assumption that @samp{X} moves first in all local positions
-after @samp{O} having made the move at @code{pos}. These two
+This is evaluated by the influence function in the following way:
+We first assign territory under the assumption that X moves first in all
+local positions in the original position;  then we reassing territory,
+again under the assumption that @samp{X} moves first in all local positions,
+but after we let @samp{O} make the move at @samp{*}. These two
 territory assignments are compared and the difference gives the
-territorial value of the move. To give an example, consider
-this position where we want to estimate the value of an @samp{O} move
-at @samp{*}:
+territorial value of the move.
+
+Technically, the assumption that @samp{X} plays first everywhere is
+implemented via an asymmetric pattern database in @code{barriers.db}.
+What exactly is a safe connection that stops hostile influence from
+passing through is different for @samp{O} and @samp{X}; of course such a
+connection has to be tighter for stones with color @samp{O}. Also,
+additional intrusion influence sources are added for @samp{X} in places
+where @samp{X} stones have natural followup moves.
+
+In this specific example above, the asymmetry (before any move has been made)
+would turn out as follows: If @samp{X} is in turn to move, the white influence
+would get stopped by a barrier at @samp{*}, leaving 4 points of territory
+for @samp{X}.  However, if @samp{O} was next to move, then a followup move
+for the white stones at the left would be assumed in the form of an extra
+("intrusion") influence source at @samp{*}. This would get stopped at
+@samp{a}, leaving three points of territory.
+
+Returning to the valuation of a move by @samp{O} at @samp{*}, we get a
+value of 1 for the move at @samp{*}.
+However, of course this move is sente once it is worth playing, and should
+therefore (in miai counting) be awarded an effective value of 2. Hence we
+need to recognize the followup value of a move. GNU Go 3.0 took care of
+this by using patterns in @code{patterns.db} that enforced an explicit
+followup value. Version 3.2 instead computes a seperate followup influence
+to each move considered. In the above example, an intrusion source will
+be added at @samp{a} as a followup move to @samp{*}. This destroys all of
+Black's territory and hence gives a followup value of 3.
+
+The pattern based followup value are still needed at some places, however.
+
+To give another example, consider this position where we want to
+estimate the value of an @samp{O} move at @samp{*}:
 
 @example
 OOOXXX
@@ -127,20 +210,14 @@ oo.O.x
 @end example
 
 We see that this makes a difference in territory of 4, which is what
-influence_delta_territory() should report. Then we have the question
-of sente, reverse sente and double sente. This is implemented by the
-concepts of followup_value (sente) and reverse_followup_value (reverse
-sente) and is a lot less exact. Basically certain patterns try to
-detect whether there are more points to gain if we are allowed another
-move in a row and add a followup_value. Other patterns try to decide
-whether the opponent would have more points to gain by two moves in a
-row in the local area and add a reverse_followup_value. These followup
-values are added to the territorial value so that a sente move (high
-followup_value, no or low reverse_followup_value) and reverse sente
-move (no or low followup_value, high reverse_followup_value) both get
-about double the value, while a double sente move (high followup_value
-+ high reverse_followup_value) gets still more. The double sente value
-computation is probably not very good.
+influence_delta_territory() should report. Then again, we have followup
+value, and here also a reverse followup value. The reverse followup value,
+which in this case will be so high that the move is treated as reverse
+sente, is added by an explicit pattern. Other sources for followup or
+reverse followup values are threats to capture a rescue a string of stones.
+See the code and comments in the function @code{value_move_reaons} for how
+followup and reverse followup values are used to adjust the effective 
+move value.
 
 To give an example of territorial value where something is captured,
 consider the @samp{O} move at @samp{*} here,
@@ -189,17 +266,63 @@ the string, split half each with the surrounding X string) +
 reasonably close to the correct value of 18. The effective size
 heuristic is still used in certain parts of the move valuation
 where we can't easily get a more accurate value from the
-influence function.
+influence function (e. g. attacks depending on a ko, attack threats).
 
-This account is simplified to the extent that it ignores the moyo and
-area concepts (areas of influence which are not secure territory),
-strategical value (weakening and strengthening of other stones on the
-board), various other issues in the move valuation, and the fact that
-the influence function isn't quite as well tuned as the examples above
-may indicate. But it should give a fairly good idea of how the design
+Note that this section only describes the territorial valuation of a move.
+Apart from that, GNU Go uses various heuristics in assigning a strategical
+value (weakening and strengthening of other stones on the board) to a move.
+Also, the influence function isn't quite as well tuned as the examples above
+may seem to claim. But it should give a fairly good idea of how the design
 is intended.
 
-@node The Influence Core, The Influence Algorithm, Influence and Territory, Influence
+Another matter is that so far we have only considered the change in secure
+territory. GNU Go 3.2 uses a revised heuristic, which is explained in the
+next section, to assign probable territory to each player.
+
+
+@node Territorial Details, The Influence Core, Influence and Territory, Influence
+@comment  node-name,  next,  previous,  up
+@section Details of the Territory Valuation
+
+
+This section explains how GNU Go assigns a territorial value to an
+intersection once the white and black influence have been computed.
+The intention is that an intersection that has a chance of xx% of
+becoming white territory is counted as 0.xx points of territory for
+white, and similar for black.
+
+The algorithm in the function @code{new_value_territory} goes roughly
+as follows:
+
+If @code{wi} is the white influence at a point, and @code{bi} the black
+influence, then @code{ value = ( (wi-bi)/ (wi+bi) )^3} (positive values
+indicates likley white territory, negative stand for black territory)
+turns out to be very simple first guess that is still far off, but
+reasonable enough to be useful.
+
+This value is then suspect a number of corrections. Assume that this first
+guess resulted in a positive value.
+
+If both @code{bi} and @code{wi} are small, it gets reduced. What exactly is
+"small" depends on whether the intersection is close to a corner or an edge
+of the board, since it is easier to claim territory in the corner than in
+the center.
+
+Then the value at each intersection is degraded to the minimum value of
+its neighbors. This can be seen as a second implementation of the proverb
+saying that there is no territory in the center of the board. This step
+substantially reduces the size of spheres of territory that are open at
+several sides.
+
+Finally, there are a number of patterns that explicitly forbid GNU Go to
+count territory at some intersections. This is used e. g. for false eyes that
+will eventually have to be filled in. Also, points for prisoners are added.
+
+To fine tune this scheme, some revisions have been made to the influence
+computations that are relevant for territorial evaluation. This includes
+a reduced default attenuation and some revised pattern handling.
+
+@node The Influence Core, The Influence Algorithm, Territorial Details, Influence
 @comment  node-name,  next,  previous,  up
 @section The Core of the Influence Function
 
@@ -222,7 +345,7 @@ board, and for each influence source on the board, the function
 @code{accumulate_influence()} is called. This is the core of the
 influence function. Before we get into the details, this is how
 the influence field from a single isolated influence source of
-strength 100 turns out:
+strength 100 turns out (with an attenuation of 3.0):
 
 @example
   0  0  0  0  0  0  0  0  0  0  0
@@ -336,6 +459,7 @@ called once for each influence source. These invocations are
 totally independent and the influence contributions from the
 different sources are added together.
 
+
 @node Permeability, Escape, The Influence Algorithm, Influence
 @comment  node-name,  next,  previous,  up
 @section Permeability
@@ -383,7 +507,7 @@ We don't want @samp{X} influence to be spread from @samp{a} to
 @samp{b}, and since the permeability at both c and d is zero, the
 rule above stops this.
 
-@node Escape, Influential Functions, Permeability, Influence
+@node Escape, Influential Patterns, Permeability, Influence
 @comment  node-name,  next,  previous,  up
 @section Escape
 
@@ -472,7 +596,130 @@ The current escape route mechanism seems good enough to be useful
 but is not completely reliable. Mostly it seems to err on the side of
 being too optimistic.
 
-@node Influential Functions, Influential Display, Escape, Influence
+
+@node Influential Patterns, Influential Functions, Escape, Influence
+@comment  node-name,  next,  previous,  up
+@section Patterns used by the Influence module
+
+This section explains the details of the pattern databases used for
+the influence computation.
+
+First, we have the patterns in @file{influence.db}, which get matched
+symmetrically for both colors.
+
+@itemize
+@item @samp{E}
+@quotation
+These patterns add extra influence sources close to some shapes like walls.
+This tries to reflect their extra strength. These patterns are not used
+in the influence computations relevant for territory valuations, but they
+are useful for getting a better estimate of strengths of groups.
+@end quotation
+@item @samp{I}
+@quotation
+These patterns add extra influence sources at typical invasion points. 
+Usually they are of small strength. If they additionally have the class
+@samp{s}, the extra influence source is added for both colors. Otherwise,
+only the player assumed to be next to move gets the benefit.
+@end quotation
+@end itemize 
+
+The patterns in @file{barriers.db} get matched only for @samp{O}
+being the player next to move.
+
+@itemize
+@item @samp{A}
+@quotation
+Connections between @samp{X} stones that stop influence of @samp{O}. They
+have to be tight enough that @samp{O} cannot break through, even though
+he is allowed to move first.
+@end quotation
+@item @samp{D}
+@quotation
+Connections between @samp{O} stones that stop influence of @samp{X}. The
+stones involved can be more loosely connected than those in @samp{A}
+patterns.
+@end quotation
+@item @samp{B}
+@quotation
+These indicate positions of followup moves for the @samp{O} stone marked
+with @samp{Q} in the pattern. They are used to reduce the territory e. g.
+where a monkey jump is possible. Also, they are used in the computation
+of the followup influence, if the @samp{Q} stone was the move played
+(or a stone saved by the move played).
+@end quotation
+@item @samp{t}
+@quotation
+These patterns indicate intersections where one color will not be able
+to get territory, for example in a false eye. The points are set with
+a call to the helper non_oterritory or non_xterritory in the action of
+the pattern.
+@end quotation
+@end itemize 
+
+The intrusion patterns (@samp{B}) are more powerful than the description
+above might suggest. They can be very helpful in identifying weak shapes
+(by adding an intrusion source for the opponent where he can break through).
+A negative inference for this is that a single bad @samp{B} pattern, e. g.
+one that has a wrong constraint, typically causes 5 to 10 @code{FAIL}s in
+the regression test suite.
+
+Influence Patterns can have autohelper constraints as usual. As for
+the constraint attributes, there are (additionally to the usual
+ones @samp{O}, @samp{o}, @samp{X} and @samp{x}),
+attributes @samp{Y} and @samp{FY}. A pattern marked with @samp{Y} will
+only be used in the influence computations relevant for the territory
+valuation, while @samp{FY} patterns only get used in the other influence
+computations.
+
+The action of an influence pattern is at the moment only used for
+non-territory patterns as mentioned above, and as a workaround for a
+problem with @samp{B} patterns in the followup influence.
+
+To see why this workaround is necessary, consider the follwoing situation:
+
+@example
+
+..XXX
+.a*.O
+.X.O.
+..XXO
+
+@end example
+
+(Imagine that there is @samp{X} territory on the left.)
+
+The move by @samp{O} at @samp{*} has a natural followup move at @samp{a}.
+So, in the computation of the followup influence for @samp{*}, there would
+be an extra influence source for @samp{O} at @samp{a} which would destroy
+a lot of black territory on the left. This would give a big followup value,
+and in effect the move @samp{*} would be treated as sente. 
+
+But of course it is gote, since @samp{X} will answer at @samp{a}, which
+both stops the possible intrusion and  threatens to capture @samp{*}. This
+situation is in fact quite common.
+
+Hence we need an additional constraint that can tell when an intrusion
+pattern can be used in followup influence. This is done by misusing the
+action line: An additional line
+
+@example
+>return <condition>;
+@end example
+
+gets added to the pattern. The @code{condition} should be true if the
+intrusion cannot be stopped in sente. In the above example, the relevant
+intrusion pattern will have an action line of the form
+
+@example
+>return (!xplay_attack(a,b));
+@end example
+
+where @samp{b} refers to the stone at @samp{*}. In fact, almost all 
+followup-specific constraints look similar to this.
+
+
+@node Influential Functions, Influential Display, Influential Patterns, Influence
 @comment  node-name,  next,  previous,  up
 @section Influential Functions
 
