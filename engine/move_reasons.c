@@ -1333,12 +1333,15 @@ add_reverse_followup_value(int pos, float value)
 /*
  * Set a minimum allowed value for the move.
  */
-void
+int
 set_minimum_move_value(int pos, float value)
 {
   ASSERT_ON_BOARD1(pos);
-  if (value > move[pos].min_value)
+  if (value > move[pos].min_value) {
     move[pos].min_value = value;
+    return 1;
+  }
+  return 0;
 }
 
 /*

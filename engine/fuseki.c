@@ -47,6 +47,11 @@
 #define LOWER_LEFT  2
 #define LOWER_RIGHT 3
 
+/* Global variables remembering which symmetries the position has. */
+int horizontally_symmetric; /* symmetry with respect to K column */
+int vertically_symmetric;   /* symmetry with respect to 10 row */
+int diagonally_symmetric;   /* ... with respect to diagonal from UR to LL */
+
 /* This value must be lower than the value for an ongoing joseki. 
  * (Gets multiplied with board_size / 19.) 
  */
@@ -71,6 +76,29 @@ openregion(int i1, int i2, int j1, int j2)
   return 1;
 }
 
+/* This function sets the global variables indicating symmetries of the
+ * position. (Important for etiquette.)
+ */
+static void
+set_symmetries(void)
+{
+  int i, j;
+  horizontally_symmetric = 1;
+  vertically_symmetric = 1; 
+  diagonally_symmetric = 1;
+  for (i = 0; i < board_size
+              && (vertically_symmetric || horizontally_symmetric
+		  || diagonally_symmetric); i++)
+    for (j = 0; j < board_size; j++) {
+      if (board[POS(i, j)] != board[POS(i, board_size - 1 - j)])
+	horizontally_symmetric = 0;
+      if (board[POS(i, j)] != board[POS(board_size - 1 - i, j)])
+	vertically_symmetric = 0;
+      if (board[POS(i, j)]
+	  != board[POS(board_size - 1 - j, board_size - 1 - i)])
+	diagonally_symmetric = 0;
+    }
+}
 
 /* The corner moves. */
 
@@ -177,15 +205,41 @@ choose_corner_move(int corner, int *m, int *n)
 }
 
 
+/* Announce move, but check for politeness first. */
 static void
-announce_move(int move, int val)
+announce_move(int move, int val, int color)
 {
+  int i, j;
   /* This shouldn't happen. */
   if (board[move] != EMPTY)
     return;
-
-  TRACE("Fuseki Player suggests %1m with value %d\n", move, val);
-  set_minimum_move_value(move, val);
+  
+  /* Politeness: Black plays in lower right half of upper right corner first.
+   * White plays in upper left half of lower left corner first.
+   * (Not sure whether this is correct for handicap games. Is this an
+   * urgent FIXME? :-) )
+   */
+  if (horizontally_symmetric) {
+    i = I(move);
+    j = J(move);
+    if ((2 * j < board_size - 1) ^ (color == WHITE))
+      move = POS(i, board_size - 1 - j);
+  }
+  if (vertically_symmetric) {
+    i = I(move);
+    j = J(move);
+    if ((2 * i > board_size - 1) ^ (color == WHITE))
+      move = POS(board_size - 1 - i, j);
+  }
+  if (diagonally_symmetric) {
+    i = I(move);
+    j = J(move);
+    if ((board_size - 1 - j > i) ^ (color == WHITE))
+      move = POS(board_size - 1 - j, board_size - 1 - i);
+  }
+  
+  if (set_minimum_move_value(move, val))
+    TRACE("Fuseki Player suggests %1m with value %d\n", move, val);
 }
 
 
@@ -262,7 +316,7 @@ search_fuseki_database(int color)
    * matter much since the intention is that we should play this move
    * whatever the rest of the analysis thinks.
    */
-  announce_move(fuseki_moves[k], 75);
+  announce_move(fuseki_moves[k], 75, color);
 
   /* Also make sure the other considered moves can be seen in the
    * traces and in the output file.
@@ -285,6 +339,8 @@ fuseki(int color)
   /* Return immediately if --disable_fuseki option used. */
   if (disable_fuseki)
     return;
+  
+  set_symmetries();
 
   /* Search in fuseki database unless disabled by --nofusekidb option. */
   if (fusekidb && search_fuseki_database(color))
@@ -300,7 +356,7 @@ fuseki(int color)
     /* For boards of size 11x11 or smaller we first go for the center point. */
     int middle = board_size/2;
     if (openregion(middle-2, middle+2, middle-2, middle+2)) {
-      announce_move(POS(middle, middle), 45);
+      announce_move(POS(middle, middle), 45, color);
     }
   }
 
@@ -316,22 +372,22 @@ fuseki(int color)
   
   if (openregion(0, width-1, board_size-width, board_size-1)) {
     choose_corner_move(UPPER_RIGHT, &i, &j);
-    announce_move(POS(i, j), empty_corner_value);
+    announce_move(POS(i, j), empty_corner_value, color);
   }
   
   if (openregion(board_size-width, board_size-1, 0, width-1)) {
     choose_corner_move(LOWER_LEFT, &i, &j);
-    announce_move(POS(i, j), empty_corner_value);
+    announce_move(POS(i, j), empty_corner_value, color);
   }
   if (openregion(board_size-width, board_size-1,
 		 board_size-width, board_size-1)) {
     choose_corner_move(LOWER_RIGHT, &i, &j);
-    announce_move(POS(i, j), empty_corner_value);
+    announce_move(POS(i, j), empty_corner_value, color);
   }
   
   if (openregion(0, width-1, 0, width-1)) {
     choose_corner_move(UPPER_LEFT, &i, &j);
-    announce_move(POS(i, j), empty_corner_value);
+    announce_move(POS(i, j), empty_corner_value, color);
   }
 }
 

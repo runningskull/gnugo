@@ -343,7 +343,7 @@ void add_strategical_attack_move(int pos, int dr);
 void add_strategical_defense_move(int pos, int dr);
 void add_worthwhile_threat_move(int pos);
 void add_replacement_move(int from, int to);
-void set_minimum_move_value(int pos, float value);
+int  set_minimum_move_value(int pos, float value);
 void set_maximum_move_value(int pos, float value);
 void set_minimum_territorial_value(int pos, float value);
 void set_maximum_territorial_value(int pos, float value);
