@@ -704,10 +704,8 @@ break_through_helper(int apos, int bpos, int cpos,
     /* If F can be attacked we can't start in this way. */
     if (!attack(Fpos, NULL)) {
       /* If d is safe too, we have at least managed to break through. */
-      if (!attack(dpos, &gpos)) {
+      if (!attack(dpos, &gpos))
 	success = CUT;
-
-      }
 
       /* Too bad, d could be attacked. We let O play the attack and
        * then try to make a second cut at e. But first we must test if
