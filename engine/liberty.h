@@ -483,7 +483,7 @@ void shapes(int color);
 void endgame_shapes(int color);
 
 void combinations(int color);
-int atari_atari(int color, int *attack_move, int *defense_move,
+int atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
 		int save_verbose);
 int atari_atari_confirm_safety(int color, int tpos, int *move, int minsize,
 			       const char saved_dragons[BOARDMAX],

@@ -46,7 +46,7 @@ combinations(int color)
 {
   int save_verbose;
   int attack_point;
-  int defense_point;
+  char defense_points[BOARDMAX];
   int other = OTHER_COLOR(color);
   int aa_val;
 
@@ -68,25 +68,19 @@ combinations(int color)
     add_my_atari_atari_move(attack_point, aa_val);
   }
   
-  aa_val = atari_atari(other, &attack_point, &defense_point, save_verbose);
+  aa_val = atari_atari(other, &attack_point, defense_points, save_verbose);
   if (aa_val > 0) {
-    int libs[2];
+    int pos;
     if (save_verbose)
-      gprintf("Combination attack for %C with size %d found at %1m, defense at %1m\n",
-	      other, aa_val, attack_point, defense_point);
-    if (defense_point != NO_MOVE && safe_move(defense_point, color))
-      add_your_atari_atari_move(defense_point, aa_val);
-    /* Playing at the attack point is probably also a defense. */
-    if (safe_move(attack_point, color))
-      add_your_atari_atari_move(attack_point, aa_val);
-    /* If the attacking move gets two liberties, playing first on one
-     * of them is probably a defense.
-     */
-    if (approxlib(attack_point, other, 2, libs) == 2) {
-      if (safe_move(libs[0], color))
-	add_your_atari_atari_move(libs[0], aa_val);
-      if (safe_move(libs[1], color))
-	add_your_atari_atari_move(libs[1], aa_val);
+      gprintf("Combination attack for %C with size %d found at %1m\n",
+	      other, aa_val, attack_point);
+    
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (ON_BOARD(pos) && defense_points[pos]) {
+	add_your_atari_atari_move(pos, aa_val);
+	if (save_verbose)
+	  gprintf("- defense at %1m\n", pos);
+      }
     }
   }
   verbose = save_verbose;
@@ -215,9 +209,9 @@ static int aa_values[BOARDMAX];
 static void compute_aa_status(int color, const char safe_stones[BOARDMAX]);
 static void compute_aa_values(int color);
 static int get_aa_status(int pos);
-static int do_atari_atari(int color, int *attack_point,
-			  int *defense_point, int last_friendly,
-			  int save_verbose, int minsize,
+static int do_atari_atari(int color, int *attack_point, int *defense_point,
+			  char all_potential_defenses[BOARDMAX],
+			  int last_friendly, int save_verbose, int minsize,
 			  char goal[BOARDMAX]);
 static int atari_atari_succeeded(int color, int *attack_point,
                                 int *defense_point, int last_friendly,
@@ -246,11 +240,14 @@ static void aa_sort_moves(struct aa_move attacks[AA_MAX_MOVES]);
 /* Set to 1 if you want verbose traces from this function. */
 
 int
-atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
+atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
+	    int save_verbose)
 {
+  int other = OTHER_COLOR(color);
   int apos;
   int dpos;
   int aa_val;
+  char saved_defense_moves[BOARDMAX];
 
   /* Collect worm statuses of opponent's worms. We need to
    * know this because we only want to report unexpected
@@ -266,7 +263,9 @@ atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
   compute_aa_status(color, NULL);
   compute_aa_values(color);
   
-  aa_val = do_atari_atari(color, &apos, &dpos, NO_MOVE,
+  if (defense_moves)
+    memset(defense_moves, 0, BOARDMAX);
+  aa_val = do_atari_atari(color, &apos, &dpos, defense_moves, NO_MOVE,
 			  save_verbose, 0, NULL);
 
   if (aa_val == 0)
@@ -280,11 +279,13 @@ atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
     
     if (attack_move)
       *attack_move = apos;
-    if (defense_move)
-      *defense_move = dpos;
     
     forbidden[apos] = 1;
-    new_aa_val = do_atari_atari(color, &apos, &dpos, NO_MOVE,
+    if (defense_moves) {
+      memcpy(saved_defense_moves, defense_moves, BOARDMAX);
+      memset(defense_moves, 0, BOARDMAX);
+    }
+    new_aa_val = do_atari_atari(color, &apos, &dpos, defense_moves, NO_MOVE,
 				save_verbose, aa_val, NULL);
 
     /* The last do_atari_atari call fails. When do_atari_atari fails,
@@ -292,15 +293,48 @@ atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
      * to a move that works and is necessary.
      */
     if (new_aa_val == 0)
-      return aa_val;
+      break;
     else
       aa_val = new_aa_val;
   }
 
-  /* We'll never get here, but the compiler may be more happy if it
-   * looks like we're returning something.
-   */
-  return 0;
+  if (defense_moves) {
+    int pos;
+    memcpy(defense_moves, saved_defense_moves, BOARDMAX);
+    /* defense_moves[] contains potential defense moves. Now we
+     * examine which of them really work.
+     */
+    forbidden[apos] = 0;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos) || !defense_moves[pos])
+	continue;
+
+      if (!trymove(pos, other, "atari_atari", NO_MOVE, EMPTY, NO_MOVE)) {
+	defense_moves[pos] = 0;
+	if (save_verbose)
+	  gprintf("%1m deleted defense point, illegal\n", pos);
+	continue;
+      }
+
+      if (attack(pos, NULL)) {
+	defense_moves[pos] = 0;
+	popgo();
+	if (save_verbose)
+	  gprintf("%1m deleted defense point, unsafe\n", pos);
+	continue;
+      }
+      
+      if (do_atari_atari(color, &apos, &dpos, NULL, NO_MOVE,
+			 save_verbose, aa_val, NULL) > 0) {
+	if (save_verbose)
+	  gprintf("%1m deleted defense point, didn't work\n", pos);
+	defense_moves[pos] = 0;
+      }
+      
+      popgo();
+    }
+  }
+  return aa_val;
 }
 
 
@@ -356,7 +390,8 @@ atari_atari_blunder_size(int color, int move, int *defense,
     abortgo(__FILE__, __LINE__, "trymove", I(move), J(move));
   increase_depth_values();
 
-  aa_val = do_atari_atari(other, &apos, &defense_point, NO_MOVE, 0, 0, NULL);
+  aa_val = do_atari_atari(other, &apos, &defense_point, NULL,
+			  NO_MOVE, 0, 0, NULL);
   after_aa_val = aa_val;
 
   if (aa_val == 0 || defense_point == NO_MOVE) {
@@ -381,8 +416,8 @@ atari_atari_blunder_size(int color, int move, int *defense,
      */
     after_defense_point = defense_point;
     forbidden[apos] = 1;
-    aa_val = do_atari_atari(other, &apos, &defense_point, NO_MOVE, 0, aa_val,
-			    NULL);
+    aa_val = do_atari_atari(other, &apos, &defense_point, NULL,
+			    NO_MOVE, 0, aa_val, NULL);
   }
 
   popgo();
@@ -393,7 +428,7 @@ atari_atari_blunder_size(int color, int move, int *defense,
    */
   compute_aa_status(other, NULL);
   compute_aa_values(other);
-  aa_val = do_atari_atari(other, NULL, NULL, NO_MOVE, 0, 0, NULL);
+  aa_val = do_atari_atari(other, NULL, NULL, NULL, NO_MOVE, 0, 0, NULL);
   if (after_aa_val - aa_val > 0) {
     if (defense)
       *defense = after_defense_point;
@@ -554,8 +589,8 @@ get_aa_status(int pos)
 
 static int
 do_atari_atari(int color, int *attack_point, int *defense_point,
-	       int last_friendly, int save_verbose, int minsize,
-	       char goal[BOARDMAX])
+	       char all_potential_defenses[BOARDMAX], int last_friendly,
+	       int save_verbose, int minsize, char goal[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int k;
@@ -625,7 +660,18 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     
     if (!trymove(apos, color, "do_atari_atari-A", str, EMPTY, NO_MOVE))
       continue;
-	
+    
+    if (all_potential_defenses) {
+      all_potential_defenses[apos] = 1;
+      if (countlib(apos) <= 2) {
+	int libs[2];
+	int num_libs = findlib(apos, 2, libs);
+	all_potential_defenses[libs[0]] = 1;
+	if (num_libs == 2)
+	  all_potential_defenses[libs[1]] = 1;
+      }
+    }
+
     if (!IS_STONE(board[str])) {
       /* Error situation. This could be caused by a wrong matcher status. */
       if (save_verbose || (debug & DEBUG_ATARI_ATARI))
@@ -650,6 +696,9 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     for (r = 0; r < num_defense_moves; r++) {
       bpos = defense_moves[r];
 
+      if (all_potential_defenses)
+	all_potential_defenses[bpos] = 1;
+
       if (trymove(bpos, other, "do_atari_atari-B", str, EMPTY, NO_MOVE)) {
 	int new_aa_val;
 	char new_goal[BOARDMAX];
@@ -660,8 +709,8 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 	modify_depth_values(2);
 	update_aa_goal(goal, new_goal, apos, color);
 	new_aa_val = do_atari_atari(color, NULL, defense_point,
-				    apos, save_verbose, minsize,
-				    new_goal);
+				    all_potential_defenses,
+				    apos, save_verbose, minsize, new_goal);
 	modify_depth_values(-2);
 	if (new_aa_val < aa_val)
 	  aa_val = new_aa_val;

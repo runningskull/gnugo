@@ -59,10 +59,6 @@
 #       pattern that threatens some other string.
 # 
 #########################################################
-#                                                       #
-#          Limiting moves on the fourth line            #
-#                                                       #
-#########################################################
 
 
 Pattern A1
@@ -220,6 +216,22 @@ Pattern A13
 --
 
 ;lib(A)==3 && olib(*)>=3
+
+
+Pattern A14
+
+.X.
+X*X
+?O?
+
+:|,-
+
+.X.
+A*B
+?O?
+
+;safe_omove(*) && oplay_attack_either(*,A,B)
+;&& !oplay_connect(*,A,B)
 
 
 # END OF FILE

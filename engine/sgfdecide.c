@@ -572,8 +572,10 @@ void
 decide_combination(int color)
 {
   int attack_move;
-  int defense_move;
+  char defense_moves[BOARDMAX];
   SGFTree tree;
+  int first = 1;
+  int pos;
 
   /* Prepare pattern matcher and reading code. */
   reset_engine();
@@ -584,9 +586,20 @@ decide_combination(int color)
     sgffile_begindump(&tree);
   count_variations = 1;
 
-  if (atari_atari(color, &attack_move, &defense_move, verbose))
-    gprintf("Combination attack for %C at %1m, defense at %1m\n", color,
-	    attack_move, defense_move);
+  if (atari_atari(color, &attack_move, defense_moves, verbose)) {
+    gprintf("Combination attack for %C at %1m, defense at ", color,
+	    attack_move);
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (ON_BOARD(pos) && defense_moves[pos]) {
+	if (first)
+	  first = 0;
+	else
+	  gprintf(", ");
+	gprintf("%1m", pos);
+      }
+    }
+    gprintf("\n");
+  }
   else
     gprintf("No Combination attack for %C\n", color);
   

@@ -610,6 +610,7 @@ examine_move_safety(int color)
 	 * defending move is not connected to the dragon defended.
 	 */
       case MY_ATARI_ATARI_MOVE:
+      case YOUR_ATARI_ATARI_MOVE:
       case EITHER_MOVE:         /* FIXME: More advanced handling? */
       case ALL_MOVE:            /* FIXME: More advanced handling? */
 	tactical_safety = 1;

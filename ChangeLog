@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- combinations() revised
+- atari_atari() generates lots of defense moves and validates them
+- do_atari_atari() generates lots of potential defense moves
+- decide_combination() revised
+- YOUR_ATARI_ATARI_MOVE considered safe in examine_move_safety()
+- atari_atari tuning
 - new GTP commands attack_either and defend_both
 - optimzation in compute_connection_distances()
 - owl code reorganization
