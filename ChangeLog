@@ -8,18 +8,21 @@
 - revision of readconnect.c
 - bugfix for Cygwin: gtp_dragon_data misreports invalid coordinate
 - revision of trevor.tst
+- bugfix in inv_rotate: use bs-1 instead of bs
+- new gtp function orientation
+- new gtp function query_orientation
+- in gtp_mprintf use gtp_print_vertex for the %m format specifier.
+- revision of regress.pl, Stone.pm
 - revision of engine/engine.dsp: remember readconnect.c
 - make gtp_loadsgf reorient gamerecords
 - make gtp_printvertices orient output points back
 - new function count_common_libs() in board.c
-- struct worm_data now keeps track of all attack, defense, attack threat,
-  and defense threat points
+- struct worm_data tracks all attack, defense, attack and defense threat points
 - remove_attack_move() and remove_defense_move() removed
 - attack_move_known(), defense_move_known(), attack_threat_move_known(),
   and defense_threat_move_known() moved from move_reasons.c to worm.c
 - change_attack() and change_defense() moved from utils.c to worm.c
-- new function change_attack_threat() and change_defense_threat() in
-  worm.c
+- new functions change_attack_threat() and change_defense_threat() in worm.c
 - new function worm_reasons() in worm.c
 - trace messages in worm.c changed to DEBUG_WORMS messages
 - remove_opponent_attack_and_defense_moves() and

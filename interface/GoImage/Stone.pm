@@ -35,9 +35,9 @@ BEGIN {
       # set the version for version checking
       $VERSION     = 0.01;
       # if using RCS/CVS, this may be preferred (???-tm)
-      $VERSION = do { my @r = (q$Revision: 1.1 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+      $VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
       @ISA         = qw(Exporter);
-      @EXPORT      = qw(&createPngFile);
+      @EXPORT      = qw(&createPngFile &parseFileName);
       %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
       # your exported package globals go here,
       # as well as any optionally exported functions
@@ -74,8 +74,33 @@ our @EXPORT_OK;
   # this one isn't exported, but could be called!
   #sub func4(\%)  {}    # proto'd to 1 hash ref
 
+my $overwrite = "";
 
 my $image_dir = "html/images";
+
+sub parseFileName {
+  my $fn = shift;
+  $fn =~ s/(.png)?\s*$//mg;
+#  print "$fn\n";
+  $fn =~ /([WBE])([1-9][0-9]*)([NSEWH]{0,2})((?:x[0-9a-fA-F]{2})*)_?([a-z]*)(?:-s([a-z]*))?/;
+  my ($color, $pixels, $position, $text, $text_color, $square_color) = ($1,$2,$3,$4,$5,$6);
+  #print "$1:$2:$3:$4:$5\n";
+  if ($color eq "B") { $color = "black"; }
+  elsif ($color eq "W") { $color = "white"; }
+  elsif ($color =~ /^E/ || die "bad color in: $fn;$color;") { $color = ""; }
+  if ($text) {
+    my $new_text="";
+    while ($text =~ s/(...)//) {
+      $new_text .= chr(hex("0$1"));
+    }
+    $text = $new_text;
+  }
+  my $out = createPngFile($color, $pixels, $position, $text, $text_color, $square_color);
+  if ("$fn.png" ne $out) {
+    print "IN:$fn\tOUT:$out\n";
+  }
+}
+
 
 #createStone:
 #Does: Creates an appropriate PNG file if it doesn't exist, and...
@@ -85,11 +110,14 @@ my $image_dir = "html/images";
 # text  - stone label: "3 char max recommended."
 # text_color - "white", "black", "green","cyan","red","yellow","magenta","blue", ""
 # position - "H", "N", "S", "E", "W", "NE", "SW", "SE", "NW", ""  (H == hoshi)
-# pixels - default 15.
 #          : edge or star point location.
+# pixels - default 15.
+# square_color - same choices as text_color
+#
 #Details:
 # creates file named like:
-#  [WBE]$pixels[NSEWH]{0,2}${text}(_(white|black|green|cyan|red|blue|yellow|magenta|grey))?
+#  COLORLIST := white|black|green|cyan|red|blue|yellow|magenta|grey
+#  [WBE]$pixels[NSEWH]{0,2}${text}(_(COLORLIST))?(-s(COLORLIST))?
 #  Note that $text is written with each character converted to it's ord value
 #   in hex preceeded by an underscore to avoid bogus file names.  Also allows
 #   upper & lower case easily on case-insensitive file systems, like Windows.
@@ -100,13 +128,14 @@ my $image_dir = "html/images";
 
 
 sub createPngFile {
-  my ($color, $pixels, $position, $text, $text_color)= @_;
+  my ($color, $pixels, $position, $text, $text_color, $square_color)= @_;
   if (!$color) {$color = "";}
   elsif (!($color eq "black" || $color eq "white")) { die "invalid color: $color"; }
   if (!$text) {$text = "";}
   if (!$text_color) {$text_color = "blue";}
   if (!$position) {$position = ""};
   if (!$pixels) {$pixels = 15};
+  if (!$square_color) {$square_color = ""};
   
   my $image_name;
   if ($color eq "black") { $image_name = "B"; }
@@ -121,13 +150,18 @@ sub createPngFile {
   if ($text) {
     $image_name .= "_" . $text_color;
   }
+  if ($square_color) {
+    $image_name .= "-s" . $square_color;
+  }
   
 
 #gdGiantFont, gdLargeFont, gdMediumBoldFont, gdSmallFont and gdTinyFont  
   $image_name .= ".png";
 
   #Note: Create image name first; don't re-create if it already exists.
-  if (-e "$image_dir/$image_name") {
+  #The caller now caches the images names, so they're regenerated every
+  #time.  Maybe make this a package-level option?
+  if ((!$overwrite) && -e "$image_dir/$image_name") {
     return $image_name;
   }
 
@@ -138,7 +172,7 @@ sub createPngFile {
                 "blue",  $im->colorAllocate(0,0,255),
                 "green", $im->colorAllocate(0,255,0),
                 "grey",  $im->colorAllocate(127,127,127),
-                "brown", $im->colorAllocate(150,110,60),
+                "brown", $im->colorAllocate(170,140,70),
                 "cyan",  $im->colorAllocate(0,255,255),
                 "yellow",$im->colorAllocate(255,255,0),
                 "magenta",$im->colorAllocate(255,0,255),
@@ -149,7 +183,6 @@ sub createPngFile {
     $im->arc($pixels/2, $pixels/2, $pixels+1, $pixels+1, 0, 360, $colors{$color});
     $im->fill($pixels/2, $pixels/2, $colors{$color});
   } else {
-    #my ($
     $im->line($pixels/2,0,$pixels/2,$pixels, $colors{"black"});
     $im->line(0,$pixels/2,$pixels,$pixels/2, $colors{"black"});
   }
@@ -160,6 +193,10 @@ sub createPngFile {
     my ($tw, $th) = ($fw * length($text), $fh);  #TODO: Allow multi-line text.
     my ($ulx, $uly) = ($pixels/2 - $tw/2 + 1, $pixels/2 - $th/2);
     $im->string(gdSmallFont, $ulx, $uly, $text, $colors{$text_color});
+  }
+  
+  if ($square_color) {
+    $im->rectangle(1,1,$pixels-2, $pixels-2, $colors{$square_color});
   }
 
 

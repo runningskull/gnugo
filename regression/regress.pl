@@ -45,6 +45,11 @@ use GoImage::Stone;
 
 use strict;
 use warnings;
+
+use IO::Handle;
+
+STDOUT->autoflush(1);
+
 #
 #GTPtoSGF("H1");
 #GTPtoSGF("J2");
@@ -56,6 +61,7 @@ Run with:
 
 regress.pl --goprog \'<path to program> --mode gtp [program options]\' \\
            --testfile \'<path to gtp test file>\' \\
+           --all_batches  Ignores --testfile, gets test files from Makefile.in
            --numbers \'regexp of test numbers the next test after which won\'t be run\'
            [options]
 
@@ -67,8 +73,9 @@ Possible options:
 
 ";
 
-my @categories = 
- {"JOSEKI_DATABASE", "",
+
+my %categories = 
+ ("JOSEKI_DATABASE", "",
   "JOSEKI_PATTERN", "", 
   "FUSEKI_CONCEPT", "",
   "DYNAMIC_CONNECTION", "Dynamic Connection Reading",
@@ -80,7 +87,7 @@ my @categories =
   "ATARI_ATARI", "",
   "SEMEAI_MODULE", "",
   "KO_READING", ""
- };
+ );
 
   my %colors = ("ALIVE", "green",
 	"DEAD", "cyan",
@@ -88,6 +95,10 @@ my @categories =
 	"UNKNOWN", "yellow",
 	"UNCHECKED", "magenta");
 
+my $cur_passed;
+my $result;
+my $correct_re;
+my $bang;
 my $top_moves;
 my $html = 1;
 my $handicap_stones;
@@ -117,22 +128,38 @@ my $unexpected_fail;
 my $numbers = "";
 my $boardsize = 19;  #current boardsize
 my $testfile_out;
+my $all_batches;
+my $make_images;
 
 my $goprog_name = "unknown";
 my $goprog_version = "0";
 
+my $do_topmove = 0;
+
 my @failed_links;
 my @FAILED_links;
+
+
+my $next_cmd = "";
+my $prev_cmd = "";
 
 
 GetOptions(
            "goprog|g=s"         => \$goprog,
            "verbose|v=i"        => \$verbose,
            "html|h=i"		=> \$html,
-           "numbers|n=s"	=> \$numbers
+           "numbers|n=s"	=> \$numbers,
+           "all_batches|all-batches=s" => \$all_batches,
+           "make_images|m=i"    => \$make_images
 );
 
+if ($make_images) {
+  make_images();
+  exit;
+}
+
 die $helpstring unless defined $goprog;
+
 
 if ($html > 0  && !-e "html") {
 	mkdir "html";
@@ -154,14 +181,15 @@ $pidg = open2($goprog_out, $goprog_in, $goprog);
 print "goprog pid: $pidg\n" if $verbose > 1;
 
 
-
-print $goprog_in "name\n";
+go_command("name");
+#print $goprog_in "name\n";
 $_ = <$goprog_out>;
 if (/^=\s*(.*)/) {
   ($goprog_name = $1) =~ s/\s*$//;
 }
 <$goprog_out>;
-print $goprog_in "version\n";
+go_command("version");
+#print $goprog_in "version\n";
 $_ = <$goprog_out>;
 if (/^=\s*(.*)/) {
   ($goprog_version = $1) =~ s/\s*$//;
@@ -173,6 +201,7 @@ print "Name: " .  $goprog_name ." ". $goprog_version . "\n" if $verbose > 1;
 
 my $index_out = new FileHandle;
 open($index_out, "> html/index.html");
+$index_out->autoflush(1);
 print $index_out 
 "<HTML><HEAD><TITLE>Regression test summary - $goprog_name $goprog_version</TITLE></HEAD>
  <BODY>
@@ -184,18 +213,18 @@ print $index_out
 
 my $file_count = 0;
 while ($file_count <= $#ARGV) {
-	print $index_out "<TR><TD><A href=\"" . $ARGV[$file_count] . ".html\">" . $ARGV[$file_count] . "</A>";
+	print $index_out "<TR><TD><A href=\"" . $ARGV[$file_count] . ".html\">" . $ARGV[$file_count] . "</A></TD>\n";
 	print "regressing file $ARGV[$file_count]\n" if $verbose > 1;
 	regress_file ($ARGV[$file_count]);
 	print $index_out "<TD>".($passes-$unexpected_pass)."</TD><TD>$unexpected_pass</TD>" .
 	      "<TD>".($failures-$unexpected_fail)."</TD><TD>$unexpected_fail</TD></TR>\n"; 
 	print $index_out "<TR><TD colspan=3</TD><TD>";
 	foreach (@failed_links) {
-	  print $index_out "<A HREF=\"$ARGV[$file_count]\/$_.html\">$_</A> ";
+	  print $index_out "  <A HREF=\"$ARGV[$file_count]\/$_.html\">$_</A>\n";
 	}
 	print $index_out "</TD><TD>";
 	foreach (@FAILED_links) {
-	  print $index_out "<A HREF=\"$ARGV[$file_count]\/$_.html\">$_</A> ";
+	  print $index_out "  <A HREF=\"$ARGV[$file_count]\/$_.html\">$_</A>\n";
 	}
 	$file_count++;
 	@failed_links = @FAILED_links = ();
@@ -203,21 +232,24 @@ while ($file_count <= $#ARGV) {
 print $index_out "</Table></body></html>\n";
 
 
-print $goprog_in "quit\n";
+go_command("quit");#print $goprog_in "quit\n";
 print "waiting\n" if $verbose > 2;
 waitpid $pidg, 0;
 print "done waiting\n" if $verbose > 2;
 
+#	        foreach (times) {
+#	          print  "$_  ";
+#	        } print "\n";
 
 
 exit;
 
 
-my $prev_cmd = "";
 
 
 sub regress_file {
 $testfile = shift;
+print "$testfile\n" if $verbose;
 
 #my $testfile_in  = new FileHandle;		# stdin of test file
 #my $testfile_out = new FileHandle;		# stdout of white player
@@ -233,6 +265,7 @@ print "testfile pid: $pidt\n" if $verbose > 1;
 
 if ($html > 0) {
 	open($htmlfile_out, "> html/$testfile\.html");
+	$htmlfile_out->autoflush(1);
 #	open($sgffile_out,  "> html/$testfile\.sgf");
 	print $htmlfile_out 
 "<HTML><HEAD><TITLE>$testfile regression results - $goprog_name $goprog_version</TITLE>
@@ -254,15 +287,14 @@ if ($html > 0) {
 
 
 my $negate;
-my $correct_re;
 my $ignore;
 my $fail;
 $passes=0;
 $unexpected_pass=0;
 $failures=0;
 $unexpected_fail=0;
-my $result= "";
-my $next_cmd = "";
+$result = "";
+$next_cmd = "";
 $num = 0;
 my $skipping = 0;
 while (defined($next_cmd))
@@ -276,7 +308,7 @@ while (defined($next_cmd))
 	    chop($next_cmd);
 	    print "$next_cmd\n" if ($verbose > 1);
 	    if (($next_cmd =~ /^\s*#\?\s+\[(\!*)(.*)\]\s*(\*)*(\&)*\s*$/)) {
-  	      my $bang = $1;
+  	      $bang = $1;
 	      if ($1) { $negate = 1} else {$negate = 0};
 	      $correct_re = $2;
 	      if ($3) { $fail = 1} else { $fail = 0};
@@ -288,6 +320,9 @@ while (defined($next_cmd))
 	      	  print "$num skipped.\n";
 	      	  html_results ($num, "skipped", "&nbsp;", "&nbsp;", 0);
 	      } else {
+	        foreach (times) {
+	          print  "$_  ";
+	        } print ":TIMES\n";
    	        print "TST: $negate - $correct_re - $fail - $ignore\n" if $verbose > 1;
    	      
 		    if (!$ignore) {
@@ -340,11 +375,13 @@ while (defined($next_cmd))
    	  if (!$skipping) {
 	    print "CMD: $next_cmd\n" if $verbose > 1;
 	    $top_moves = "";
-	    if ($next_cmd =~ /gg_genmove\s+([blackwhite])+/) {
-	      $next_cmd =~ s/gg_genmove\s+([blackwhite]+)/top_moves_$1/;
-	      $top_moves = 1;
+	    if ($do_topmove) {
+	      if ($next_cmd =~ /gg_genmove\s+([blackwhite])+/) {
+	        $next_cmd =~ s/gg_genmove\s+([blackwhite]+)/top_moves_$1/;
+	        $top_moves = 1;
+	      }
 	    }
- 	    print $goprog_in "$next_cmd\n";
+ 	    go_command($next_cmd); #print $goprog_in "$next_cmd\n";
  	    if ($top_moves) {
  	      $top_moves = eat_move($goprog_out);
  	      if ($top_moves) {
@@ -392,6 +429,7 @@ my $fail_string;
 sub html_results {
   if ($html) {
 	  (  my $number, my $status, my $correct, my $incorrect, my $showboard) = @_;
+	  $cur_passed = ($status =~ /pass/i);
 	  my $htmllink = "&nbsp;";
 	  if ($showboard > 0) {
 	  	$htmllink = "<A href=\"$testfile/$num.html\">link</A>";
@@ -409,10 +447,16 @@ sub html_results {
 	  	print $brd "<TR><TD>status:</TD><TD>$status<BR></TD></TR>\n";
 	  	print $brd "<TR><TD>correct:</TD><TD>$correct<BR></TD></TR>\n";
 	  	print $brd "<TR><TD>answer:</TD><TD>$incorrect</TD></TR>\n";
-	  	print $brd "<TR><TD>gtp:</TD><TD>$html_whole_gtp</TD></TR>\n";
+	  	print $brd "<TR><TD>gtp:</TD><TD>$prev_cmd</TD></TR>\n";
+	  	foreach ("DESCRIPTION", "CATEGORY", "SEVERITY") {
+	  	  $html_whole_gtp =~ /$_=(.*?)<BR>/)
+	  	  $_ = defined($1) ? $1 : "";
+	          print $brd "<TR><TD>".lc($_).":</TD><TD>$1</TD>\n";
+  	        }
 	  	print $brd "</TABLE>\n\n<HR>\n";
 	  	print $brd "<A HREF=\"$num.sgf\">sgf board</A><HR>\n";
 	  	print $brd $brdout;
+	  	print $brd "<TABLE border=1><TR><TD>full gtp:</TD><TD>$html_whole_gtp</TD></TR></TABLE>\n";
 	  	print $brd "</BODY></HTML>\n";
 	  	my $sgfappend = "C[number: $number\nstatus: $status\ncorrect: $correct\n"
 	  			."answer: $incorrect\ngtp: \n$html_whole_gtp\n";
@@ -449,7 +493,7 @@ sub eat_no_response {
 }
 
 sub eat_board {
-  print $goprog_in "query_boardsize\n";
+  go_command("query_boardsize");
     my $line = "";
     while ($line eq "") {
 	chop($line = <$goprog_out>) or die "No response!";
@@ -462,7 +506,12 @@ sub eat_board {
 
   my $preboard = "";
  
-  print $goprog_in "dragon_data\n";
+  my $owlboard = "";
+  my $dragonboard = "";
+  my $colorboard = "";
+  my $sgfboard = "(;FF[4]GM[1]GN[1]SZ[$boardsize]\n";
+          
+
   my $cur_point = 0;
   my $cur_color = 0;
   my $cur_matcher_status = 0;
@@ -475,11 +524,18 @@ sub eat_board {
   my $black_letter = chr(ord('A')-1);
   my $iline = 1;
   my $no_dragon_data = 0;
-  while ($iline) {
+  my %stones;
+
+  if ($prev_cmd =~ /gg_genmove/) {
+    #FIXME: There may be other commands that won't require dragon_data
+    #to be regenerated.  Better might be to provide a way to query the
+    #engine whether dragon_data is currently available w/out regenerating.
+    go_command("dragon_data\n");
+    while ($iline) {
         $iline = $_ = <$goprog_out>;
         #print $iline;
-        if ($iline =~ /^\?/) {
-          $no_dragon_data = 1;
+        if ($iline =~ /^\?(.*)/) {
+          $no_dragon_data = $1;
           $iline = $_ = <$goprog_out>;
           last;
         }
@@ -500,6 +556,7 @@ sub eat_board {
   	    				";color_letter=" . $cur_color_letter.
   	    				";color_sgf=" . $cur_color_sgf .
   	    				";";
+  	    #print "$dragons{$cur_point}\n";
   	    $cur_color = 0;
   	    $cur_matcher_status = 0;
 	    $cur_dragon_status=0;
@@ -524,18 +581,65 @@ sub eat_board {
   	  $preboard .= "no match: $iline\n";
   	}
     }
-  my $owlboard = "";
-  my $dragonboard = "";
-  my $colorboard = "";
-  my $sgfboard = "(;FF[4]GM[1]GN[1]SZ[$boardsize]\n";
-          
+  } else {
+    $no_dragon_data=1;
+    foreach $cur_color ("white", "black") {
+      $iline = 1;
+      go_command("worm_stones $cur_color");
+      if ($cur_color eq "white") {
+        $cur_color_letter = "O";
+        $cur_color_sgf = "W";
+      } elsif ($cur_color eq "black"  || die "invalid color $cur_color") {
+        $cur_color_letter = "X";
+        $cur_color_sgf = "B";
+      }
+      while ($iline) {
+        $iline = <$goprog_out>;
+        $iline =~ s/^[=]\s*//;
+        $iline =~ s/\s*$//mg;
+        foreach (split (/\s+/,$iline)) {
+         # print "$_:color_letter=" . $cur_color_letter.
+  	 #   	       ";color_sgf=" . $cur_color_sgf.
+  	 #   	       ";\n";
+          $stones{$_} =";color_letter=" . $cur_color_letter.
+  	    	       ";color_sgf=" . $cur_color_sgf.
+  	    	       ";";
+        }
+        #print "$iline\n";
+      }
+     # print " : $cur_color \n";
+    }
+  }
+  
+  if ($prev_cmd =~ /^[0-9]*\s*gg_genmove/) {
+    if (! ($next_cmd =~ /^#\?\s*\[(!)?\(?(.*)\)?\]\*?\s*$/)) {
+      print "BAD TEST: $next_cmd\n";
+    }
+    #$1 and $2 are just $bang and $correct_re, right?
+    #print "Genmove test:\n";
+    #print "  $1;$2\n";
+    foreach (split(/\|/,$2)) {
+      if ($1) {
+        #print "  KW:'$_'\n";
+        $stones{$_} .= ";known_wrong;";
+      } else {
+        #print "  KR:'$_'\n";
+        $stones{$_} .= ";known_right;";
+      }
+    }
+    if ($cur_passed) {
+      $stones{$result} .= ";try_right;";
+    } else {
+      $stones{$result} .= ";try_wrong;";
+    }
+    
+  }
 
   if ($no_dragon_data) {
-     $owlboard = $dragonboard = $colorboard = "No dragon data available."
+     $owlboard = $dragonboard = $colorboard = "No dragon data available: $no_dragon_data"
   } else {	
-        print $goprog_in "dragon_stones\n";
+        go_command("dragon_stones");
         $iline = 1;
-        my %stones;
         while ($iline) {
           $iline = <$goprog_out>;
           $iline =~ s/\s*$//mg;
@@ -554,6 +658,11 @@ sub eat_board {
           }
           $iline =~ s/\s*//mg;
         }      
+   }
+ # foreach (keys(%stones)) {
+  #  print "$_ $stones{$_}\n";
+  #}
+    
 
 
   my %tmarr;
@@ -577,12 +686,6 @@ sub eat_board {
       $sgfboard .= "\n";
     }
   }
-  # else {
-  #    print "NOTOP:$tm\n";
-  #  }
-  #}
-
-
         
         my $j;
         $owlboard = "  ";
@@ -617,36 +720,69 @@ sub eat_board {
             $iA = chr($iA);
             my $colorboard_imgsrc;
             if ($stones{$iA.$j}) {
+              my $dragonletter = "";
+              my $dragoncolor = "";
+              my $label = "";
+              if (!$no_dragon_data) {
             	$_ = $stones{$iA.$j};
             	/(.).*;owl_status=([^;]*);/;
-            	my $label = $1;
-            	$owlboard .= " <B><FONT color=\"$colors{$2}\">$1</FONT></B>";
+            	if ($1 && $2) {
+            	  $label = $1;
+            	  $owlboard .= " <B><FONT color=\"$colors{$2}\">$1</FONT></B>";
+            	}
             	$_ = $stones{$iA.$j};
             	/(.).*;status=([^;]*);/;
-            	my $dragonletter = $1;
-            	my $dragoncolor = $colors{$2};
-            	$dragonboard .= " <B><FONT color=\"$dragoncolor\">$dragonletter</FONT></B>";
-            	/(.).*;color_letter=([^;]*);/;
-            	my $bw = $2;
-            	if ($bw eq 'X') {$bw = 'black';} else {$bw = 'white';}
-            	#print "$bw\n";
-            	
-            	$colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", $dragonletter, $dragoncolor);
-            	
-            	$_ = $stones{$iA.$j};
-            	my $sgfcoord = chr(ord('a') + $i -1) .  chr(ord('a') + $boardsize  - $j) ;
-            	/(.).*;color_sgf=([^;]*);/;
-            	$sgfboard .= "A$2\[$sgfcoord]LB[$sgfcoord:$label]\n";
-            } else {
+            	if ($1 && $2) {
+            	  $dragonletter = $1;
+            	  $dragoncolor = $colors{$2};
+            	  $dragonboard .= " <B><FONT color=\"$dragoncolor\">$dragonletter</FONT></B>";
+            	}
+              }
+              $_ = $stones{$iA.$j};
+              /(.*);color_letter=([^;]*);/;
+              my $bw = $2;
+              if (!defined($bw)) {
+                $bw = "";
+              } elsif ($bw eq 'X') {$bw = 'black';} else {$bw = 'white';}
+              
+              my $markcolor = "";
+              my $status = $stones{$iA.$j};
+              if ($status =~ /;known_wrong;/) {
+                print "  known_wrong: $iA$j\n";
+                $markcolor = "magenta";
+              }
+              if ($status =~ /;known_right;/) {
+                print "  known_right: $iA$j\n";
+                $markcolor = "green";
+              }
+              if ($status =~ /;try_right;/) {
+                print "  try_right: $iA$j\n";
+                $markcolor = "cyan";
+              }              
+              if ($status =~ /;try_wrong;/) {
+                print "  try_wrong: $iA$j\n";
+                $markcolor = "red";
+              }
+              
+              $colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", $dragonletter, $dragoncolor, $markcolor);
+              #print "$colorboard_imgsrc\n";
+              
+              $_ = $stones{$iA.$j};
+              my $sgfcoord = chr(ord('a') + $i -1) .  chr(ord('a') + $boardsize  - $j) ;
+              /(.).*;color_sgf=([^;]*);/;
+              if ($2) {
+                $sgfboard .= "A$2\[$sgfcoord]" . ($label ? "LB[$sgfcoord:$label]" : "") . "\n";
+              }
+          } else {
             	$owlboard .= " " . ".";
             	$dragonboard .= " " . ".";
             	my $top_label = $tmarr{$iA.$j};
             	if ($top_label) {
             	  $top_label = sprintf "%f", $top_label;
             	  ($top_label = substr($top_label, 0, 3)) =~ s/\.$//;
-            	  print "$top_label\n";
+            	  #print "$top_label\n";
             	}
-            	$colorboard_imgsrc = createPngFile("", $img_pix_size, "", $top_label, "blue"); #TOP MOVE CHECK GOES HERE!!!!!!!!
+            	$colorboard_imgsrc = createPngFile("", $img_pix_size, "", $top_label, "blue"); 
             }
             $colorboard .= "  <TD><IMG HEIGHT=$img_pix_size WIDTH=$img_pix_size SRC=\"../images/$colorboard_imgsrc\"></TD>\n";
           }
@@ -658,7 +794,7 @@ sub eat_board {
         $dragonboard .= $letterrow;
         $colorboard .= "$colorboard_letter_row\n";
         $colorboard .= "</TABLE>\n";
-  }
+
 
 #  my %tmarr;
 #  my $topmoves = "top moves unavailable";
@@ -683,8 +819,10 @@ sub eat_board {
 #
 
   $sgfboard .= ")";
-  $preboard = "$colorboard<BR>\ntopmoves:  $top_moves<BR>\n" . #\ndragon_status:\n$dragonboard\n
-              "<PRE>owl_status:\n$owlboard</PRE><P>";
+  $preboard = "$colorboard<BR>\ntopmoves:  $top_moves<BR>\n" ;
+  if (!$no_dragon_data) { #\ndragon_status:\n$dragonboard\n
+   $preboard .=           "<PRE>owl_status:\n$owlboard</PRE><P>";
+  }
   my $legend ="\nLegend:\n";
   foreach (keys(%colors)) {
     $legend .= "<B><FONT color=\"$colors{$_}\">$colors{$_}=$_</FONT></B>\n";
@@ -763,3 +901,62 @@ sub rename_sgffile {
 }
 
 
+sub go_command {
+  $_ = shift;
+  print $goprog_in "$_\n";
+  print "CMD:$_\n" if $verbose > 1;
+}
+
+
+my %images;
+
+sub extract_images {
+  my $line = shift;
+  #i.e.: <TD><IMG HEIGHT=25 WIDTH=25 SRC="../images/B25x43_green.png"></TD>
+  if ($line =~ /SRC=.*images.(.*)\"><.TD>.*/) {
+    if ($verbose) {
+      print "  found: $1\n" unless ($images{$1});
+    }
+    $images{$1} = 1;
+  }
+}
+
+our $curdir;
+our $curfile;  
+our $CURDIR;
+sub extract_image_dir {
+  local $curdir = shift;
+  local $CURDIR;
+  opendir $CURDIR, $curdir;
+  while (local $curfile = readdir $CURDIR) {
+    $_ = "$curdir/$curfile";
+    #print -d."\n";
+    #print "X:".($curfile=~/^\.+$/)."\n";
+    if ((-d ) && !($curfile=~/^\.{1,2}$/)) {
+      print "diving into: $curdir/$curfile\n" if $verbose>2;
+      extract_image_dir ("$curdir/$curfile");
+    } elsif (($curfile =~ /\.html$/) && ($curdir =~ /d2/)) {
+      print "processing: $curdir/$curfile\n" if $verbose;
+      open IMGFILE, "<$curdir/$curfile" or die "Couldn't open: $curdir/$curfile" ;
+      while (<IMGFILE>) {
+        extract_images($_);
+      }
+      close IMGFILE;
+    } else {
+      #print "no match: $curdir/$curfile\n" if $verbose;
+    }
+  }
+  closedir CURDIR;
+}
+ 
+
+sub make_images {
+  print "Starting processing\n" if $verbose;
+  extract_image_dir (".") ;
+  print "Processed files, generated ".((scalar keys(%images))/2)
+         ." unique images:\n" if $verbose;
+  foreach (keys(%images)) {
+    parseFileName($_);
+  }
+  print "Done.\n" if $verbose;
+}
