@@ -170,7 +170,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 81
 #SEVERITY=9
 loadsgf games/arend/gnugo-gnugo7.sgf 137
 32 reg_genmove black
-#? [F9|E8]
+#? [F9|E8|G8]
  
 loadsgf games/arend/gnugo-gnugo7.sgf 140
 33 reg_genmove white

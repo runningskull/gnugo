@@ -16,9 +16,11 @@ loadsgf games/golife.sgf 30
 3 reg_genmove white
 #? [E3|E2]
 
-loadsgf games/golife.sgf 32
-4 reg_genmove white
-#? [H5]
+# # H5 is nice but not the only move. Securing the connection to A3 or
+# # expanding around E2 or E3 is also okay. Testcase removed.
+# loadsgf games/golife.sgf 32
+# 4 reg_genmove white
+# #? [H5]
 
 # GNU Go did play this connection. The test is to make sure it never forgets it.
 loadsgf games/golife.sgf 34

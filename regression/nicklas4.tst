@@ -42,13 +42,14 @@ loadsgf games/nicklas/nicklas12.sgf 29
 1201 reg_genmove black
 #? [Q9]
 
-# I have some doubt about the correct move. I might be advisable for B
-# to defend his center group, although W E16 hurts, of course. However,
-# W's attack after W N11, B N12 and next W L9 or similar might be
-# very useful as well.
-loadsgf games/nicklas/nicklas12.sgf 95
-1205 reg_genmove black
-#? [E16]*
+# # I have some doubt about the correct move. I might be advisable for B
+# # to defend his center group, although W E16 hurts, of course. However,
+# # W's attack after W N11, B N12 and next W L9 or similar might be
+# # very useful as well.
+# # gf This testcase is too unclear, removed. (3.5.3)
+# loadsgf games/nicklas/nicklas12.sgf 95
+# 1205 reg_genmove black
+# #? [E16]*
 
 loadsgf games/nicklas/nicklas12.sgf 215
 1215 dragon_status A4

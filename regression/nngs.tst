@@ -303,7 +303,7 @@ loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 152
 # games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf problems:
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 47
-700 reg_genmove white
+700 restricted_genmove white K17 K18 J18 J17 K16 J16
 #? [K17]
 
 

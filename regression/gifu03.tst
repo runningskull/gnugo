@@ -30,8 +30,8 @@ loadsgf games/cgf2003/GnuGo-GORO.sgf 90
 
 # G18 misses the point. More important to cover cut at L17.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 116
-105 restricted_genmove white G18 H17 H16 J16 K16 K17 L16 L17
-#? [!G18]*
+105 restricted_genmove white G18 H17 H16 J16 K16 K17 L16 L17 F17 F16 H18
+#? [!G18|F17|F16|H18]*
 
 # H1 2 points sente.
 loadsgf games/cgf2003/GnuGo-GORO.sgf 174
@@ -120,6 +120,8 @@ loadsgf games/cgf2003/GnuGo-GoInt.sgf 217
 #? [J1]*
 
 # A3 wins the semeai.
+# Update for 3.5.2: The basic problem is that B6 is thought to be
+# tactically dead. See also reading:191.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 237
 310 reg_genmove black
 #? [A3]*
@@ -184,7 +186,7 @@ loadsgf games/cgf2003/GnuGo-Haruka.sgf 168
 # Q14 is not common in the Chinese fuseki. (But is it worth regressing over?)
 loadsgf games/cgf2003/GnuGo-KCC.sgf 7
 601 restricted_genmove black R12 O16 Q14
-#? [R12|O16]*
+#? [R12|O16|Q11|P14]*
 
 # Making moyo here is much better than the game move F14. The
 # important thing is that O5 has some strategic effect on white while

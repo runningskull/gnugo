@@ -791,6 +791,16 @@ loadsgf games/reading42.sgf 62
 190 attack E16
 #? [1 F15]
 
+# A3 wins the semeai. This is very ugly since it requires backfilling
+# of a large number of superstring liberties. See also gifu03:310.
+loadsgf games/cgf2003/GnuGo-GoInt.sgf 237
+191 defend B6
+#? [1 A3]
+
+loadsgf games/reading43.sgf
+192 attack D4
+#? [0]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
