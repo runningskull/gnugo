@@ -136,6 +136,9 @@
 /* Define if `major', `minor', and `makedev' are declared in <sysmacros.h>. */
 #undef MAJOR_IN_SYSMACROS
 
+/* Owl Node Limit */
+#undef OWL_NODE_LIMIT
+
 /* Owl Threats. 0 standard. */
 #undef OWL_THREATS
 

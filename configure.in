@@ -46,6 +46,7 @@ AC_ARG_ENABLE(grid-opt,
 default_cache_size=8
 default_level=10
 default_semeai_variations=250
+default_owl_node_limit=1000
 
 AC_ARG_ENABLE(cache-size,
   [  --enable-cache-size=n     reserve n Mb RAM for caching (16 default)])
@@ -331,6 +332,18 @@ if test "$enable_level" ; then
 else
    AC_DEFINE_UNQUOTED(DEFAULT_LEVEL, $default_level)
 fi
+
+dnl ------------ set cache size ----------
+
+AH_TEMPLATE([OWL_NODE_LIMIT],
+[Owl Node Limit])
+
+if test "$enable_owl_node_limit" ; then
+   AC_DEFINE_UNQUOTED(OWL_NODE_LIMIT, $enable_owl_node_limit)
+else
+   AC_DEFINE_UNQUOTED(OWL_NODE_LIMIT, $default_owl_node_limit)
+fi
+
 
 dnl ------------ set semeai variations  ----------
 

@@ -557,7 +557,6 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 #define OWL_DISTRUST_DEPTH    6
 #define OWL_BRANCH_DEPTH      8
 #define OWL_READING_DEPTH    20
-#define OWL_NODE_LIMIT     1000
 
 /* Set the various reading depth parameters. If mandated_depth_value
  * is not -1 that value is used; otherwise the depth values are

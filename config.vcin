@@ -16,7 +16,7 @@
 #define DEFAULT_LEVEL 10
 
 /* Default hash table size in megabytes */
-#define DEFAULT_MEMORY 16
+#define DEFAULT_MEMORY 8
 
 /* Semeai Variations. 250 default */
 #define DEFAULT_SEMEAI_VARIATIONS 250
@@ -39,6 +39,9 @@
 
 /* Hashing scheme. Default scheme 2 (new). */
 #define HASHING_SCHEME 2
+
+/* Owl Node Limit */
+#define OWL_NODE_LIMIT 1000
 
 /* Owl Threats. 0 standard. */
 #define OWL_THREATS 0
