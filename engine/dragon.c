@@ -452,8 +452,6 @@ make_dragons(int color, int stop_before_owl)
       dragon[str] = dragon[dd->origin];
     }
 
-  identify_thrashing_dragons();
-
   /* Owl threats. */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str) 
@@ -552,11 +550,6 @@ make_dragons(int color, int stop_before_owl)
       dragon2[d].safety = ALIVE;
   }
   time_report(2, "  post owl dragon data", NO_MOVE, 1.0);
-
-  /* Resolve semeais. This may revise the safety and status fields. */
-  semeai();
-
-  time_report(2, "  semeai module", NO_MOVE, 1.0);
 
   /* The status is now correct at the origin of each dragon
    * but we need to copy it to every vertex.
@@ -657,6 +650,11 @@ make_dragons(int color, int stop_before_owl)
     }
   }
   time_report(2, "  revise dragon inessentiality", NO_MOVE, 1.0);
+
+  semeai();
+  time_report(2, "  semeai module", NO_MOVE, 1.0);
+  
+  identify_thrashing_dragons();
 
   /* Count the non-dead dragons. */
   lively_white_dragons = 0;

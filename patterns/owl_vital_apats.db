@@ -546,6 +546,7 @@ Xa*X
 
 Pattern VA31
 # tm New pattern (3.1.15)  (see maeda0:60)
+# gf Added constraint. (3.5.5)
 
 ?O.|
 OX.|
@@ -555,9 +556,18 @@ X!*|
 
 :8,s,value(76)
 
+?Oa|
+OXb|
+X.X|
+X!*|
+??.|
+
+;!oplay_attack(a,?,b,a)
+
 
 Pattern VA32
 # tm New pattern (3.1.15)  (see maeda0:60)
+# gf Added constraint. (3.5.5)
 
 ?O*|
 OX!|
@@ -565,6 +575,13 @@ X.X|
 XXO|
 
 :8,s,value(76)
+
+?O*|
+OXb|
+X.X|
+XXa|
+
+;lib(a)>1 || !oplay_attack(*,?,b,*)==WIN
 
 
 Pattern VA33

@@ -4889,6 +4889,18 @@ abc?
 ;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
 
 
+Pattern A1138
+# gf New pattern. (3.5.5)
+
+xx.??
+xx.O?
+..*OX
+...X.
+-----
+
+:8,-,value(30)
+
+
 #########################################################
 #                                                       #
 #       Kill or threaten a worm of the dragon           #
@@ -5226,6 +5238,7 @@ Pattern A1313
 
 
 Pattern A1314
+# gf Added constraint. (3.5.5)
 
 |x.X?        sometimes correct attack in corner
 |..YO
@@ -5233,6 +5246,13 @@ Pattern A1314
 +----
 
 :8,s,value(45)
+
+|x.X?
+|..Ya
+|.*.o
++----
+
+;!attack(a)
 
 
 Pattern A1315

@@ -2640,10 +2640,21 @@ C*O?
 Pattern D643
 # spl added 3.3.22
 
-?oO try to make 2 eyes
+?oO      try to make 2 eyes
 OO.
 o.*
 ---
+
+:8,-,value(40)
+
+
+Pattern D643b
+# gf New pattern. (3.5.5)
+
+??OO     try to make 2 eyes
+OO..
+o.*.
+----
 
 :8,-,value(40)
 
@@ -3745,6 +3756,19 @@ Pattern D840
 :8,-,value(25)
 
 
+Pattern D841
+# gf New pattern. (3.5.5)
+
+???X.|
+?XXO.|       aim for ko
+XOO..|
+...*.|
+.....|
+-----+
+
+:8,-,value(76)
+
+
 #########################################################
 #                                                       #
 #                  Prevent intrusion                    #
@@ -4145,16 +4169,31 @@ bAc
 
 
 Pattern D1100
+# gf Split and revised pattern. (3.5.5)
 
 X*          attack the surrounding chain
 OX
 
-:/,b,value(90)
+:/,b,value(88)
 
 A*
 OB
 
 ;vital_chain(A) && vital_chain(B) && !oplay_defend_both(*,A,B)
+
+
+Pattern D1100b
+# gf Split and revised pattern. (3.5.5)
+
+X*          attack the surrounding chain
+OX
+
+:/,b,value(92)
+
+A*
+OB
+
+;vital_chain(A)>1 && vital_chain(B)>1 && !oplay_defend_both(*,A,B)
 
 
 Pattern D1101

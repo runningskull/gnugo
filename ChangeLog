@@ -2,8 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- semeai analysis in make_dragons() postponed until after revision of
+  inessentiality 
+- identification of thrashing dragons in make_dragons() postponed
+  until after semeai analysis 
 - avoid overflow in reading_cache_init()
 - converted owl to use new cache implementation
+- owl tuning
 - new game records and test cases
 
 3.5.4 released January 23, 2004
