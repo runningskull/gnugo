@@ -1,0 +1,18 @@
+(;GM[1]FF[4]
+SZ[9]HA[4]KM[0.5]
+PW[whitemouse]WR[2d*]
+PB[GnuGo (GNU Go 3.5.2)]BR[8k*]
+PC[NNGS]DT[2003-12-04]AP[gnugoclient:2.0]
+RE[W+31.5]
+AB[cc][gc][cg][gg]
+;W[fg];B[ff];W[gf];B[hg];W[ge];B[hd];W[fc];B[fd];W[gd];B[he];W[fe]
+;B[ed];W[hc];B[gb];W[hf];B[ef];W[ie];B[hb];W[id];B[fh];W[ee];B[dd]
+;W[df];B[eg];W[de];B[ce];W[cf];B[dg];W[be];B[cd];W[bg];B[bh];W[ah]
+;B[ci];W[ig];B[bd];W[hh];B[ae];W[bf];B[ih];W[gh];B[if];W[fb];B[eb]
+;W[ig];B[fg];W[ii];B[gi];W[dh];B[ch];W[af];B[ai];W[ad];B[ag];W[fa]
+;B[ea];W[ah];B[bi];W[bb];B[bc];W[ac];B[cb];W[ab];B[ib];W[ba];B[ic]
+;W[hd];B[ca];W[];B[]C[final_score: W+31.5
+F9 removed
+E4 removed
+G1 removed]
+)
