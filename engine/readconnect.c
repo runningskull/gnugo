@@ -1004,6 +1004,7 @@ int
 string_connect(int str1, int str2, int *move)
 {
   int dummy_move;
+  int save_verbose;
 
   if (move == NULL)
     move = &dummy_move;
@@ -1011,8 +1012,13 @@ string_connect(int str1, int str2, int *move)
   nodes_connect = 0;
   *move = PASS_MOVE;
   
-  if (alternate_connections)
+  if (alternate_connections) {
+    save_verbose = verbose;
+    if (verbose > 0)
+      verbose--;
     return recursive_connect2(str1, str2, move, EMPTY, NO_MOVE, 0);
+    verbose = save_verbose;
+  }
 
   return recursive_connect(str1, str2, move);
 }
