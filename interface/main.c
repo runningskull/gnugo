@@ -80,6 +80,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_DECIDE_DRAGON,
       OPT_DECIDE_DRAGON_DATA,
       OPT_DECIDE_SEMEAI,
+      OPT_DECIDE_SURROUNDED,
       OPT_DECIDE_TACTICAL_SEMEAI,
       OPT_EXPERIMENTAL_SEMEAI,
       OPT_EXPERIMENTAL_OWL_EXT,
@@ -148,7 +149,8 @@ enum mode {
   MODE_DECIDE_TACTICAL_SEMEAI,
   MODE_DECIDE_POSITION,
   MODE_DECIDE_EYE,
-  MODE_DECIDE_COMBINATION
+  MODE_DECIDE_COMBINATION,
+  MODE_DECIDE_SURROUNDED
 };
 
 
@@ -231,6 +233,7 @@ static struct gg_option const long_options[] =
   {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
   {"decide-tactical-semeai", required_argument, 0, OPT_DECIDE_TACTICAL_SEMEAI},
   {"decide-position", no_argument,      0, OPT_DECIDE_POSITION},
+  {"decide-surrounded",  required_argument, 0, OPT_DECIDE_SURROUNDED},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
   {"decide-combination", no_argument,   0, OPT_DECIDE_COMBINATION},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
@@ -644,6 +647,15 @@ main(int argc, char *argv[])
 	
       case OPT_DECIDE_COMBINATION:
 	playmode = MODE_DECIDE_COMBINATION;
+	break;
+	
+      case OPT_DECIDE_SURROUNDED:
+	if (strlen(gg_optarg) > 3) {
+	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
+	  exit(EXIT_FAILURE);
+	}
+	strcpy(decide_this, gg_optarg);
+	playmode = MODE_DECIDE_SURROUNDED;
 	break;
 	
       case OPT_BRANCH_DEPTH:
@@ -1132,6 +1144,21 @@ main(int argc, char *argv[])
     }
     break;
     
+  case MODE_DECIDE_SURROUNDED:
+    {
+      int m, n;
+
+      if (!string_to_location(board_size, decide_this, &m, &n)) {
+	fprintf(stderr, 
+		"usage: --decide-surrounded [pos]\n");
+	return EXIT_FAILURE;
+      }
+
+      rotate(m, n, &m, &n, board_size, orientation);
+      decide_surrounded(POS(m, n));
+      break;
+    }
+
   case MODE_GTP:  
     if (gtpfile != NULL) {
       gtp_input_FILE = fopen(gtpfile, "r");

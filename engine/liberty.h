@@ -294,7 +294,6 @@ int simple_ladder(int str, int *move);
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
 void draw_reading_shadow(void);
 
-
 /* persistent.c */
 void purge_persistent_reading_cache(void);
 int search_persistent_reading_cache(int routine, int str, int *result,
@@ -312,7 +311,6 @@ void store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
 				int tactical_nodes, char goal[BOARDMAX],
 				int goal_color);
 void owl_hotspots(float values[BOARDMAX]);
-
 
 /* readconnect.c */
 int string_connect(int str1, int str2, int *move);
@@ -374,6 +372,11 @@ int movelist_move_known(int move, int max_points, int points[], int codes[]);
 void movelist_change_point(int move, int code, int max_points, 
 			   int points[], int codes[]);
 
+/* safety.c */
+int is_surrounded(int pos, int apos, int showboard, int cache_result);
+int does_surround(int move, int dragon);
+void reset_surround_data(void);
+int surround_map(int dr, int pos);
 
 /* functions to add (or remove) move reasons */
 void clear_move_reasons(void);
@@ -793,6 +796,17 @@ struct worm_data {
 
 extern struct worm_data worm[BOARDMAX];
 
+/* Surround cache (see surround.c) */
+
+#define MAX_SURROUND 10
+
+struct surround_data {
+  int dragon_number;           /* number of the (surrounded) beast */
+  char surround_map[BOARDMAX]; /* surround map                    */
+};
+
+extern struct surround_data surroundings[MAX_SURROUND];
+extern int surround_pointer;
 
 /*
  * data concerning a dragon. A copy is kept at each stone of the string.
@@ -850,6 +864,7 @@ struct dragon_data2 {
                 /* can be captured easily.                                   */
   int semeai;          /* true if a dragon is part of a semeai               */
   int semeai_margin_of_safety; /* if small, the semeai is close              */
+  int surround_status;         /* Is it surrounded?                         */
 };
 
 /* dragon2 is dynamically allocated */

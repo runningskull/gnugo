@@ -308,7 +308,10 @@ static struct autohelper_func autohelper_functions[] = {
   {"x_captures_something", 	1, 0.02,
                 "does_capture_something(%s, OTHER_COLOR(color))"},
   {"false_eye_territory",	1, 0.0, "false_eye_territory[%s]"},
-  {"false_eye",        		1, 0.01, "is_false_eye(half_eye,%s)"}
+  {"false_eye",        		1, 0.01, "is_false_eye(half_eye,%s)"},
+  {"is_surrounded",             1, 0.01, "is_surrounded(%s, 0, 0)"},
+  {"does_surround",             2, 1.00, "does_surround(%s, %s)"},
+  {"surround_map",              2, 0.01, "surround_map(%s, %s)"}
 };
 
 

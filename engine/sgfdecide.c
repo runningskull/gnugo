@@ -595,6 +595,31 @@ decide_combination(int color)
 }
 
 
+void
+decide_surrounded(int pos)
+{
+  int surround_status;
+
+  if (board[pos] == EMPTY) {
+    fprintf(stderr, "location must not be empty!\n");
+    return;
+  }
+
+  /* Prepare pattern matcher and reading code. */
+  reset_engine();
+
+  silent_examine_position(board[pos], EXAMINE_ALL);
+  surround_status = is_surrounded(pos, NO_MOVE, 1, 0);
+  if (surround_status == 1)
+    gprintf("the dragon at %1m is SURROUNDED!\n", pos);
+  else if (surround_status == 2)
+    gprintf("the dragon at %1m is WEAKLY SURROUNDED!\n", pos);
+  else
+    gprintf("the dragon at %1m is not surrounded.\n", pos);
+}  
+
+
+
 /*
  * Local Variables:
  * tab-width: 8

@@ -121,6 +121,9 @@ DECLARE(gtp_reset_owl_node_counter);
 DECLARE(gtp_reset_reading_node_counter);
 DECLARE(gtp_reset_trymove_counter);
 DECLARE(gtp_same_dragon);
+DECLARE(gtp_is_surrounded);
+DECLARE(gtp_does_surround);
+DECLARE(gtp_surround_map);
 DECLARE(gtp_set_boardsize);
 DECLARE(gtp_set_orientation);
 DECLARE(gtp_set_komi);
@@ -222,6 +225,9 @@ static struct gtp_command commands[] = {
   {"reset_trymove_counter",   gtp_reset_trymove_counter},
   {"same_dragon",    	      gtp_same_dragon},
   {"showboard",        	      gtp_showboard},
+  {"is_surrounded",           gtp_is_surrounded},
+  {"does_surround",           gtp_does_surround},
+  {"surround_map",            gtp_surround_map},
   {"start_sgftrace",  	      gtp_start_sgftrace},
   {"test_eyeshape",           gtp_test_eyeshape},
   {"top_moves",               gtp_top_moves},
@@ -3005,6 +3011,94 @@ gtp_set_random_seed(char *s)
   random_seed = seed;
   return gtp_success("");
 }
+
+
+/***************
+ * surrounding *
+ ***************/
+
+/* Function:  Determine if a dragon is surrounded
+ * Arguments: vertex (dragon)
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   1 if surrounded, 2 if weakly surrounded, 0 if not
+ */
+static int
+gtp_is_surrounded(char *s)
+{
+  int i, j;
+  int n;
+
+  n = gtp_decode_coord(s, &i, &j);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure("dragon vertex must be nonempty");
+
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS);
+  return gtp_success("%d", DRAGON2(POS(i, j)).surround_status);
+}
+
+/* Function:  Determine if a move surrounds a dragon
+ * Arguments: vertex (move), vertex (dragon)
+ * Fails:     invalid vertex, empty (dragon, nonempty (move)
+ * Returns:   1 if (move) surrounds (dragon)
+ */
+static int
+gtp_does_surround(char *s)
+{
+  int si, sj, di, dj;
+  int n;
+
+  n = gtp_decode_coord(s, &si, &sj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(si, sj) != EMPTY)
+    return gtp_failure("move vertex must be empty");
+
+  n = gtp_decode_coord(s + n, &di, &dj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(di, dj) == EMPTY)
+    return gtp_failure("dragon vertex must be nonempty");
+
+  silent_examine_position(BOARD(di, dj), EXAMINE_DRAGONS);
+  return gtp_success("%d", does_surround(POS(si, sj), POS(di, dj)));
+}
+
+/* Function:  Report the surround map for dragon at a vertex
+ * Arguments: vertex (dragon), vertex (mapped location)
+ * Fails:     invalid vertex, empty dragon
+ * Returns:   value of surround map at (mapped location), or -1 if
+ *            dragon not surrounded.
+ */
+
+static int
+gtp_surround_map(char *s)
+{
+  int di, dj, mi, mj;
+  int n;
+
+  n = gtp_decode_coord(s, &di, &dj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  if (BOARD(di, dj) == EMPTY)
+    return gtp_failure("dragon vertex must not be empty");
+
+  n = gtp_decode_coord(s + n, &mi, &mj);
+  if (n == 0)
+    return gtp_failure("invalid coordinate");
+
+  silent_examine_position(BOARD(di, dj), EXAMINE_DRAGONS);
+  return gtp_success("%d", surround_map(POS(di, dj), POS(mi, mj)));
+}
+
+
+  
+
 
 
 

@@ -167,3 +167,5 @@ struct eye_data       black_eye[BOARDMAX];
 struct eye_data       white_eye[BOARDMAX];
 struct eye_data       owl_black_eye[BOARDMAX];
 struct eye_data       owl_white_eye[BOARDMAX];
+struct surround_data  surroundings[MAX_SURROUND];
+int                   surround_pointer;

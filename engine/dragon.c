@@ -543,6 +543,19 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 
   time_report(2, "  owl threats ", NO_MOVE, 1.0);
   
+  for (d = 0; d < number_of_dragons; d++) {
+    dragon2[d].surround_status = is_surrounded(dragon2[d].origin, 
+					       NO_MOVE, 0, 1);
+    if (debug & DEBUG_DRAGONS) {
+      if (dragon2[d].surround_status == 1)
+	gprintf ("surrounded dragon found at %1m\n", dragon2[d].origin);
+      if (dragon2[d].surround_status == 2)
+	gprintf ("weakly surrounded dragon found at %1m\n", dragon2[d].origin);
+    }
+  }
+
+  time_report(2, "  surround status", NO_MOVE, 0.0);
+
   /* Compute the safety value. */
   for (d = 0; d < number_of_dragons; d++) {
     int true_genus;
@@ -760,18 +773,19 @@ initialize_supplementary_dragon_data(void)
   
   /* Initialize the rest of the dragon2 data. */
   for (d = 0; d < number_of_dragons; d++) {
-    dragon2[d].neighbors            = 0;
-    dragon2[d].hostile_neighbors    = 0;
-    dragon2[d].moyo_size_pre_owl    = -1;
-    dragon2[d].moyo_size_post_owl   = -1;
+    dragon2[d].neighbors               = 0;
+    dragon2[d].hostile_neighbors       = 0;
+    dragon2[d].moyo_size_pre_owl       = -1;
+    dragon2[d].moyo_size_post_owl      = -1;
     dragon2[d].moyo_territorial_value  = 0.0;
-    dragon2[d].safety               = -1;
-    dragon2[d].escape_route         = 0;
-    set_eyevalue(&dragon2[d].genus, 0, 0, 0, 0);
-    dragon2[d].heye                 = NO_MOVE;
-    dragon2[d].lunch                = NO_MOVE;
-    dragon2[d].semeai               = 0;
+    dragon2[d].safety                  = -1;
+    dragon2[d].escape_route            = 0;
+    dragon2[d].heye                    = NO_MOVE;
+    dragon2[d].lunch                   = NO_MOVE;
+    dragon2[d].semeai                  = 0;
     dragon2[d].semeai_margin_of_safety = -1;
+    dragon2[d].surround_status         = 0;
+    set_eyevalue(&dragon2[d].genus, 0, 0, 0, 0);
   }
   
   dragon2_initialized = 1;

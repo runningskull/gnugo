@@ -40,6 +40,7 @@ libengine_a_SOURCES = \
       printutils.c \
       readconnect.c \
       reading.c \
+      surround.c \
       score.c \
       semeai.c \
       sgfdecide.c \

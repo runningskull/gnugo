@@ -100,6 +100,11 @@ void init_gnugo(float memory);
 #define CAN_THREATEN_ATTACK  11
 #define CAN_THREATEN_DEFENSE 12
 
+/* Surrounded */
+
+#define SURROUNDED 1
+#define WEAKLY_SURROUNDED 2
+
 /* Final statuses for empty vertices. */
 #define BLACK_TERRITORY 13
 #define WHITE_TERRITORY 14
@@ -492,6 +497,7 @@ void decide_tactical_semeai(int apos, int bpos);
 void decide_position(int color);
 void decide_eye(int pos);
 void decide_combination(int color);
+void decide_surrounded(int pos);
 
 
 #endif  /* _GNUGO_H_ */

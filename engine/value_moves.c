@@ -1934,10 +1934,10 @@ estimate_strategical_value(int pos, int color, float score)
 	    d1 = lunch_dragon[l];
 	    bb = dragons[d1];
 
-	    /* FIXME: This value cannot be computed without some
-	     * measurement of how the actual move affects the dragon.
-	     * The dragon safety alone is not enough. The question is
-	     * whether the dragon is threatened by the move or not.
+	    /* FIXME: This value cannot be computed without some measurement
+	     * of how the actual move affects the dragon.  The dragon safety
+	     * alone is not enough. The question is whether the dragon is
+	     * threatened or defended by the move or not.  
 	     */
 	    this_value = (dragon[bb].effective_size
 			  * (1.0 - dragon_safety(bb, 0)));
