@@ -222,6 +222,20 @@ loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 194
 40 reg_genmove black
 #? [A14]
 
+# 3.5.1 finds an owl attack on H17 at E16 but no defense. The semeai
+# code correctly understands the vitality of D13 for both players and
+# revises the status to critical. However, the attack point is not
+# revised.
+loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 142
+41 reg_genmove black
+#? [D13]
+
+# Make seki with B18. The problem for 3.5.1 is that the semeai code is
+# not called since E19 is considered owl alive and B18 owl dead.
+loadsgf games/gunnar/gunnar12.sgf
+42 reg_genmove white
+#? [B19]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

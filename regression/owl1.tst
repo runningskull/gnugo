@@ -294,6 +294,9 @@ loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 194
 332 owl_attack B19
 #? [1 A14]
 
+loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 126
+333 owl_defend C17
+#? [0]
 
 ########### end of tests #####################
 
