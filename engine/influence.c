@@ -1980,14 +1980,8 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
 	escape_value[ii] = 0;
     }
 
-  if (0 && (debug & DEBUG_ESCAPE) && verbose > 0) {
-    print_numeric_influence(&escape_influence,
-			    escape_influence.white_influence,
-			    "%3.0f", 3, 1, 1);
-    print_numeric_influence(&escape_influence,
-			    escape_influence.black_influence,
-			    "%3.0f", 3, 1, 1);
-  }    
+  if (0 && (debug & DEBUG_ESCAPE) && verbose > 0)
+    print_influence(&escape_influence, "escape influence");
 
   if (!goal) {
     /* Save the computed values in the cache. */
@@ -2325,16 +2319,10 @@ print_influence(const struct influence_data *q, const char *info_string)
   if (printmoyo & PRINTMOYO_NUMERIC_INFLUENCE) {
     /* Print the white influence values. */
     fprintf(stderr, "white influence (%s):\n", info_string);
-    if (q->is_territorial_influence)
-      print_numeric_influence(q, q->white_influence, "%5.1f", 5, 1, 0);
-    else
-      print_numeric_influence(q, q->white_influence, "%3.0f", 3, 1, 1);
+    print_numeric_influence(q, q->white_influence, "%5.1f", 5, 1, 0);
     /* Print the black influence values. */
     fprintf(stderr, "black influence (%s):\n", info_string);
-    if (q->is_territorial_influence)
-      print_numeric_influence(q, q->black_influence, "%5.1f", 5, 1, 0);
-    else
-      print_numeric_influence(q, q->black_influence, "%3.0f", 3, 1, 1);
+    print_numeric_influence(q, q->black_influence, "%5.1f", 5, 1, 0);
   }
 
   if (printmoyo & PRINTMOYO_PRINT_INFLUENCE) {

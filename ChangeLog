@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- use print_numeric_influence() for printing escape influence
 - take neighbouring half/false eyes into account when estimating lunch value
 - do not trust strategic attack and defense moves to be safe when
   scoring
