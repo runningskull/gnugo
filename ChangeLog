@@ -2,14 +2,20 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.17 released December 16, 2001
+
+- new configure and runtime options semeai-variations
+- new function semeai_trymove()
+- bugfix in catalog_goal
+- semeai revisions
+- warning avoided in dfa_avoid_string()
 - code cleanup
 - devalued attacking dead group bonus
 - corrected value to final_value in review_move_reasons()
 - value_territory() in influence.c revised
-- common debug code moved from compute_eyes() and
-  compute_eyes_pessimistic() to print_eyes()
-- inactive support to test the impact of linear_eyes() in
-  compute_eyes_pessimistic()
+- common debug code moved from compute_eyes(), compute_eyes_pessimistic() 
+  to print_eyes()
+- inactive support to test against linear_eyes() in compute_eyes_pessimistic()
 - MAXPATNO increased to 400 in mkeyes.c
 - naive_ladder() replaced by simple_ladder()
 - bugfixes in attack_threats()

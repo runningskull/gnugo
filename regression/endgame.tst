@@ -37,7 +37,7 @@ loadsgf games/endgame1.sgf 7
 # tm - H1 also seems fine.
 loadsgf games/endgame1.sgf 8
 108 gg_genmove white
-#? [G1|H1]*
+#? [G1|H1]
 
 loadsgf games/endgame1.sgf 9
 109 gg_genmove black

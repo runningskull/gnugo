@@ -6,7 +6,7 @@ reset_trymove_counter
 
 loadsgf games/strategy1.sgf
 1 gg_genmove white
-#? [Q13]*
+#? [Q13]
 
 loadsgf games/strategy2.sgf 5
 2 gg_genmove black
@@ -157,7 +157,7 @@ loadsgf games/incident291.sgf 250
 
 loadsgf games/strategy5.sgf 12
 26 gg_genmove black
-#? [D3]
+#? [D3]*
 
 
 #CATEGORY=PATTERN_TUNING
@@ -172,7 +172,7 @@ loadsgf games/strategy5.sgf 12
 #
 loadsgf games/strategy5.sgf 14
 27 gg_genmove black
-#? [C3]*
+#? [C3]
 
 loadsgf games/strategy5.sgf 20
 28 gg_genmove black
@@ -310,7 +310,7 @@ loadsgf games/strategy12.sgf 19
 loadsgf games/strategy12.sgf 21
 # D16 is the strongest but these are acceptable
 49 gg_genmove black
-#? [C17|D16|B17]*
+#? [C17|D16|B17]
 
 
 #CATEGORY=OWL_TUNING

@@ -94,7 +94,7 @@ loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 #CATEGORY=STRATEGY
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
 16 gg_genmove white
-#? [C6|C5]
+#? [C6|C5]*
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
@@ -156,7 +156,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 12
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 20
 29 gg_genmove white
-#? [C8]
+#? [C8]*
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 32
 30 gg_genmove white
@@ -243,7 +243,7 @@ loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 31
 # L3 is 2pt double sente.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 85
 46 gg_genmove black
-#? [L3]*
+#? [L3]
 
 #CATEGORY=FUSEKI_STRATEGY
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 7
@@ -256,7 +256,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 11
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 49 gg_genmove black
-#? [K7]*
+#? [K7]
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
 49 gg_genmove black
@@ -266,7 +266,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
 # the black dragon is still dead after black connects at N11
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 27
 50 gg_genmove black
-#? [!N11|M10]*
+#? [!N11|M10]
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
 51 gg_genmove black
@@ -275,7 +275,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
 # GNU Go 3.1.15 wants to play F10 here (although 3.0.0 got H10)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
 52 gg_genmove black
-#? [H10]
+#? [H10]*
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
@@ -303,13 +303,13 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 99
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 111
 57 gg_genmove black
-#? [C5|D5]*
+#? [C5|D5]
 
 #CATEGORY=OWL_TUNING
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-goliath3.B+16.sgf 55
 58 owl_attack J2
-#? [0]*
+#? [0]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 13
@@ -448,7 +448,7 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 29
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 45
 86 owl_attack L5
-#? [1 (H5|J4)]*
+#? [1 (H5|J4)]
 
 #CATEGORY=TACTICAL_READING
 # GNU Go claims that D6 defends the worms D9 and F9
@@ -467,7 +467,7 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 69
 # (I hope I read this out correctly. See variations in sgf-file.)
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 83
 89 owl_attack K2
-#? [0]*
+#? [0]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 99

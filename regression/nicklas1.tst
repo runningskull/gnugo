@@ -171,7 +171,7 @@ loadsgf games/nicklas/nicklas12.sgf 103
 #SEVERITY=7
 loadsgf games/nicklas/nicklas12.sgf 113
 1207 gg_genmove black
-#? [C17]*
+#? [C17]
 
 loadsgf games/nicklas/nicklas12.sgf 117
 1208 gg_genmove black
@@ -187,12 +187,12 @@ loadsgf games/nicklas/nicklas12.sgf 123
 
 loadsgf games/nicklas/nicklas12.sgf 203
 1213 gg_genmove black
-#? [N4]
+#? [N4]*
 
 # Added A6 among the correct moves. /gf (2.7.203)
 loadsgf games/nicklas/nicklas12.sgf 215
 1214 gg_genmove black
-#? [A1|A6]
+#? [A1|A6]*
 
 # H3 doesn't seem critical. /gf
 loadsgf games/nicklas/nicklas12.sgf 259
@@ -299,7 +299,7 @@ loadsgf games/nicklas/nicklas18.sgf 15
 
 loadsgf games/nicklas/nicklas19.sgf 34
 1901 gg_genmove black
-#? [B7]*
+#? [B7]
 
 loadsgf games/nicklas/nicklas19.sgf 46
 1902 gg_genmove black
@@ -328,7 +328,7 @@ loadsgf games/nicklas/nicklas21.sgf 52
 
 loadsgf games/nicklas/nicklas23.sgf 26
 2301 gg_genmove black
-#? [G6|F7]
+#? [G6|F7]*
 
 loadsgf games/nicklas/nicklas23.sgf 40
 2302 gg_genmove black

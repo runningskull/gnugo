@@ -14,7 +14,7 @@ reset_trymove_counter
 
 loadsgf games/nicklas/nicklas8.sgf 116
 802 gg_genmove black
-#? [O12]*
+#? [O12]
 
 loadsgf games/nicklas/nicklas8.sgf 134
 803 gg_genmove black

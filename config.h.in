@@ -15,14 +15,14 @@
 /* Default hash table size in megabytes */
 #undef DEFAULT_MEMORY
 
+/* Semeai Variations. 250 default */
+#undef DEFAULT_SEMEAI_VARIATIONS
+
 /* Connection module. Default standard. */
 #undef EXPERIMENTAL_CONNECTIONS
 
 /* Semeai module. Default standard. */
 #undef EXPERIMENTAL_SEMEAI
-
-/* Max variations to consider reading semeai. */
-#undef DEFAULT_SEMEAI_VARIATIONS
 
 /* Give the directory where gnugo was compiled */
 #undef GNUGO_PATH

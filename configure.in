@@ -18,7 +18,7 @@ AH_TEMPLATE([VERSION],
 [Define to the version of the distribution.])
 
 dnl this defines VERSION and PACKAGE
-AM_INIT_AUTOMAKE([gnugo], [3.1.16])
+AM_INIT_AUTOMAKE([gnugo], [3.1.17])
 GNU_PACKAGE="GNU $PACKAGE"
 AC_DEFINE_UNQUOTED(GNU_PACKAGE, "$GNU_PACKAGE")
 
@@ -314,7 +314,7 @@ fi
 
 dnl ------------ set semeai variations  ----------
 
-AH_TEMPLATE([DEFAULT_LEVEL],
+AH_TEMPLATE([DEFAULT_SEMEAI_VARIATIONS],
 [Semeai Variations. 250 default])
 
 if test "$enable_semeai_variations" ; then

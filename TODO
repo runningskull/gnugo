@@ -12,7 +12,7 @@ you to sign a copyright disclaimer. Of course you can work on a forked
 version without signing such a disclaimer. If you want your changes to
 the program to be incorporated into the version we distribute we need
 such a disclaimer. Please contact the GNU Go maintainers, Daniel Bump
-(bump@math.stanford.edu) and Gunnar Farneb@"ack (gf@isy.liu.se), to 
+(bump@math.stanford.edu) and Gunnar Farneback (gf@isy.liu.se), to
 get more information and the papers to sign.
 
 Below is a list of things YOU could work on. We are already working on
@@ -20,11 +20,8 @@ some of these tasks, but don't let that stop you. Please contact us or
 the person assigned to task for further discussion.
 
 //--------------------------------------------------------------
-// long term issues
+// General
 //--------------------------------------------------------------
-
-These issues are strategic in nature. They will help us to improve the
-playing strength of the program and/or enhance certain aspects of it.
 
 1. If you can, send us bug FIXES as well as bug reports. If you see
    some bad behavior, figure out what causes it, and what to do about
@@ -36,7 +33,62 @@ playing strength of the program and/or enhance certain aspects of it.
    want to know what operating system and compiler you were using, in
    order to determine if the problem is platform dependent.
 
-2. Extend the regression test suites. 
+//--------------------------------------------------------------
+// smaller projects
+//--------------------------------------------------------------
+
+These issues are of tactical nature, i.e. they concern some specific
+feature or the infrastructure of the engine.  Some of these are quiet
+small, maybe doable in a day for an experienced GNU Go programmer.
+They might also be useful project to start with for a new project
+member.  Some of them are bigger and demand a deeper knowledge of the
+engine internals.  The issues are presented here in an approximate
+order of perceived difficulty.
+
+1. Complete the conversion to 1-dimensional representation.
+   Check all comments before functions to make them agree with
+   the actual function header.  In some cases these comments were
+   missed when the function was converted to 1D.
+
+2. Break out handling of movelists into its own file and generalize it.
+   This is started in 3.1.16. Move lists are used, among other places, 
+   in worms.c where it is used to store moves that capture, save, 
+   threaten to capture and threaten to save the worm.
+
+3. Implement move lists storing important moves for dragons and eyes
+   in the same way as it is used for worms.  Half eyes are already
+   halfway done.  The moves are stored, but not the attack and defend
+   codes (LOSE, KO_A, KO_B and WIN).
+
+4. Make the cache not waste storage on 64 bit systems.
+
+5. The dragon data is split into two arrays, dragon[] and dragon2[].
+   The dragon2 array only have one entry per dragon, in opposition to
+   the dragon array where all the data is stored once for every
+   intersection of the board.  Complete the conversion of eye_data,
+   half_eye_data, worm and dragon to use the same structure as the
+   dragon2 array.
+
+6. Support for ko in eyes.db and optics.c.
+
+7. Support for constraints in the eye patterns.
+
+8. Create a paradigm for handling other types of ko (approach move ko,
+   multi-step ko, etc) and then write code that handles them. (Difficult!)
+
+9. GNU Go should be able to resign some games. This feature should
+   be able to be turned on or off since we don't want it during
+   tournament play. If all dragons are settled and GNU Go is
+   behind by a lot, it should be able to resign.
+
+//--------------------------------------------------------------
+// long term issues
+//--------------------------------------------------------------
+
+These issues are strategic in nature. They will help us to improve the
+playing strength of the program and/or enhance certain aspects of it.
+
+1. Extend the regression test suites.
    See the texinfo manual in the doc directory for a description of
    how to do this. In particular it would be useful with test suites
    for common life and death problems. Currently second line groups, L
@@ -45,24 +97,40 @@ playing strength of the program and/or enhance certain aspects of it.
    square, and so on. Other areas where test suites would be most
    welcome are fuseki, tesuji, and endgame.
 
-3. Tuning the pattern databases. This is a sort of art. It is not
+2. Tuning the pattern databases. This is a sort of art. It is not
    necessary to do any programming to do this since most of the
    patterns do not require helpers. We would like it if a few more Dan
    level players would learn this skill.
 
-4. Extend and tune the Joseki database.
+3. Extend and tune the Joseki database.
 
-5. The semeai module is vastly in need of improvement. In fact, semeai
+4. The semeai module is vastly in need of improvement. In fact, semeai
    can probably only be analyzed by reading to discover what
-   backfilling is needed before we can make atari.
+   backfilling is needed before we can make atari. (This is underway.)
 
-6. The connection analysis is today completely static and has a hard
+5. The connection analysis is today completely static and has a hard
    time identifying mutually dependent connections or moves that
    simultaneously threatens two or more connections. This could be
    improved by writing a connection reader, which like the owl code
    uses pattern matching to find a small amount of key moves to try.
+   (This is underway.)
 
-7. Speed up the tactical reading. GNU Go is reasonably accurate when
+6. GNU Go has a problem with opponents that build big moyos.  This is
+   because there is no move generator that tries explicitly to neither
+   build nor enter opponent moyos. Such a move generator could be
+   built using the same type of code that is used in the owl life and
+   death reader, or the connection reader mentioned in point 5 above.
+
+7. A much improved combination module.  The combination module of
+   today only finds combinations of threats to capture enemy groups.
+   A more useful combination module would e.g. find combinations of
+   threats to capture a group or enter opponent territory.  It would
+   also be strong enough to find combinations of strategic moves and
+   more indirect threats (a threat to a threat).  Possibly it could
+   combine threats in AND-OR trees (DAGs?) that could be searched
+   using ordinary tree search algorithms.
+
+8. Speed up the tactical reading. GNU Go is reasonably accurate when
    it comes to tactical reading, but not always very fast. The main
    problem is that too many ineffective moves are tested, leading to
    strange variations that shouldn't need consideration. To improve
@@ -70,13 +138,82 @@ playing strength of the program and/or enhance certain aspects of it.
    refined. Some improvements should also be possible to obtain by
    tuning the move ordering.
 
-8. In some positions GNU Go may report a group as alive or connected
-   with a living group. But after the opponent has placed one stone
-   GNU Go may change the status to dead, without going through a
-   critical status. It would be nice if these positions could be
-   identified and logged for later analysis of the GNU Go
-   team. [Nicklas is thinking about this.]
+9. Create a way to quickly assess the safety of a group.  This might
+   take into account number of eyes / half eyes, moyo in corners, moyo
+   along the edge, moyo in the center, proximity to living friendly
+   groups, weak opponent groups etc.  The point is that it should
+   involve no reading and that it is quick.  This could be used to
+   make a strategic estimation of how a move strengthens a friendly
+   group and/or weakens an opponent group and how strong/weak groups
+   influence each other.
 
-9. Automatic search for missing patterns by analysing games from
-   NNGS.
+10. A move generator that identifies invasions or places to make
+    reducing moves (and of course threats to make invasions).
+
+11. In some positions GNU Go may report a group as alive or connected
+    with a living group. But after the opponent has placed one stone
+    GNU Go may change the status to dead, without going through a
+    critical status. It would be nice if these positions could be
+    identified and logged for later analysis of the GNU Go
+    team.
+
+12. Automatic search for missing patterns by analysing games from
+    NNGS.
+
+//--------------------------------------------------------------
+// Ideas
+//--------------------------------------------------------------
+
+These are some ideas that have been floated on the mailing list.  Some
+of them are down-to-earth, and some are just blue sky ramblings.  They
+are presented here for inspiration.
+
+1. A good GUI.
+   A start is being made with GoThic, a goban widget based on the QT
+   toolkit.  This is linked from the GNU Go development web page on
+   gnu.org. Other starts have been made based on GTK, but so far
+   nothing more than a start has been attempted.
+
+2. A graphical pattern editor.
+   This would make it much easier for non-programmers to improve the
+   strength of GNU Go.  It could also be used as a debugging tool for
+   the programmers.  This project has the GUI as a prerequisite.
+   The challenge here is not to make a tool which makes it easier to
+   create patterns but to make it easier to overview and maintain the
+   database.
+
+3. Make the engine thread safe and use multiple CPUs on an SMP
+   machine.
+
+4. Making the engine use many machines loosely connected on the
+   internet or in a cluster.
+
+5. Think on the opponents time.
+
+6. A global alpha-beta reader.  This would probably be very slow and
+   could only read 2 or 3 moves ahead.  Still it could find fatal
+   errors and improve the moves that GNU Go makes.
+
+7. A pattern based tactical reader instead of the hard coded one.
+   This could be made stronger than the current by taking into account
+   more moves.  The challenge is to keep it on focus so that the
+   reading does not take forever.
+
+8. A strategic module that identifies high-level goals and then gives
+   these goals to the rest of the engine.  It should be able to
+   identify if we are ahead in territory or thickness, if we should
+   play safe or if we should play daringly (e.g. if behind).  It
+   should also identify weak areas where we can attack or where we
+   should defend.  Maybe this module doesn't have to be written in C.
+   Maybe PROLOG, LISP or some other AI language would be better.
+
+9. A parameter that makes GNU Go play different styles.  Such styles
+   could be 'play for territory', 'play aggressively', 'play tricky
+   moves (hamete)', and so on.  It could be used to present human
+   users with different kinds of opponents or to tell GNU Go how to
+   play certain computer opponents in tournaments.
+
+10.Generalize representation and handling of threats so that we have a
+   graph representation of threats that can be searched to see how
+   different threats interact.
 

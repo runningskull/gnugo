@@ -111,7 +111,7 @@ loadsgf games/trevor/auto/b16.sgf 74
 
 loadsgf games/trevor/auto/b16.sgf 86
 270 gg_genmove white
-#? [G11]*
+#? [G11]
 
 
 #B4 is a better ko threat than A4
@@ -137,7 +137,7 @@ loadsgf games/trevor/auto/b17.sgf 54
 
 loadsgf games/trevor/auto/b20.sgf 38
 300 gg_genmove white
-#? [F2]*
+#? [F2]
 
 
 
@@ -155,7 +155,7 @@ loadsgf games/trevor/auto/b23.sgf 60
 
 loadsgf games/trevor/auto/b24.sgf 78
 320 gg_genmove white
-#? [!B7]*
+#? [!B7]
 
 
 loadsgf games/trevor/auto/b24.sgf 91
@@ -174,12 +174,12 @@ loadsgf games/trevor/auto/b25.sgf 10
 
 loadsgf games/trevor/auto/b25.sgf 70
 350 gg_genmove white
-#? [!D8]*
+#? [!D8]
 
 
 loadsgf games/trevor/auto/b25.sgf 74
 360 gg_genmove white
-#? [K3]*
+#? [K3]
 
 
 
@@ -189,7 +189,7 @@ loadsgf games/trevor/auto/b25.sgf 74
 #L7 locally better than N6
 loadsgf games/trevor/auto/b27.sgf 24
 370 gg_genmove white
-#? [L7]*
+#? [L7]
 
 
 loadsgf games/trevor/auto/b27.sgf 72
@@ -223,7 +223,7 @@ loadsgf games/trevor/auto/b28.sgf 64
 
 loadsgf games/trevor/auto/b28.sgf 80
 430 gg_genmove white
-#? [!F13]*
+#? [!F13]
 
 
 
@@ -329,7 +329,7 @@ loadsgf games/trevor/auto/b42.sgf 42
 
 loadsgf games/trevor/auto/b47.sgf 92
 570 gg_genmove white
-#? [N9]*
+#? [N9]
 
 
 
@@ -404,7 +404,7 @@ loadsgf games/trevor/auto/b62.sgf 18
 #L5 locally better than N6
 loadsgf games/trevor/auto/b64.sgf 44
 670 gg_genmove white
-#? [L5]*
+#? [L5]
 
 
 
@@ -423,7 +423,7 @@ loadsgf games/trevor/auto/b67.sgf 58
 
 loadsgf games/trevor/auto/b67.sgf 78
 700 gg_genmove white
-#? [C5|D3]*
+#? [C5|D3]
 
 
 
@@ -432,7 +432,7 @@ loadsgf games/trevor/auto/b67.sgf 78
 
 loadsgf games/trevor/auto/b69.sgf 110
 710 gg_genmove white
-#? [!A2]*
+#? [!A2]
 
 
 loadsgf games/trevor/auto/b69.sgf 112
@@ -519,7 +519,7 @@ loadsgf games/trevor/auto/b75.sgf 62
 
 loadsgf games/trevor/auto/b76.sgf 50
 850 gg_genmove white
-#? [!B3]*
+#? [!B3]
 
 
 loadsgf games/trevor/auto/b76.sgf 58
@@ -576,7 +576,7 @@ loadsgf games/trevor/auto/b83.sgf 94
 
 loadsgf games/trevor/auto/b86.sgf 70
 940 gg_genmove white
-#? [!M11]*
+#? [!M11]
 
 
 loadsgf games/trevor/auto/b86.sgf 74
@@ -599,6 +599,6 @@ loadsgf games/trevor/auto/b88.sgf 26
 
 loadsgf games/trevor/auto/b99.sgf 74
 970 gg_genmove white
-#? [B7]*
+#? [B7]
 
 

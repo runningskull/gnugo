@@ -144,7 +144,7 @@ loadsgf games/trevor/trevor_14.sgf
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
 15 gg_genmove white
-#? [E7]*
+#? [E7]
 
 # C1 looks best here.  A7 very unorthodox, and at least
 # worse for ko threats.
@@ -161,7 +161,7 @@ loadsgf games/trevor/trevor_16.sgf 54
 # W can live here unconditionally.
 loadsgf games/trevor/trevor_16.sgf 58
 162 gg_genmove white
-#? [B1]
+#? [B1]*
 
 # If Black B9, White can't connect at C7.
 loadsgf games/trevor/trevor_16.sgf 67
@@ -219,7 +219,7 @@ loadsgf games/trevor/trevor_22.sgf 23
 # F2 is not really sente, nor useful if it were!
 loadsgf games/trevor/trevor_23.sgf 27
 230 gg_genmove black
-#? [C2|B2]
+#? [C2|B2]*
 
 
 # Connect the dragons!  One eye is not enough, anyway.
@@ -284,7 +284,7 @@ loadsgf games/trevor/trevor_28.sgf 36
 # Yikes, short of liberties!
 loadsgf games/trevor/trevor_29.sgf 54
 290 gg_genmove white
-#? [!A9]
+#? [!A9]*
 
 
 # Black A7 is a serious threat.  Also, white should at least 
@@ -367,7 +367,7 @@ loadsgf games/trevor/trevor_38.sgf 22
 # Added E8. /gf
 loadsgf games/trevor/trevor_38.sgf 39
 381 gg_genmove black
-#? [D7|C7|E8]
+#? [D7|C7|E8]*
 
 #CATEGORY=KO_THREATS
 #DESCRIPTION=E9 is terrible for leaving Ko threats.
@@ -397,7 +397,7 @@ loadsgf games/trevor/trevor_40.sgf 1
 #SEVERITY=4
 loadsgf games/trevor/trevor_40a.sgf 2
 401 gg_genmove white
-#? [F8]*
+#? [F8]
 
 #CATEGORY=
 #DESCRIPTION=White can live!
@@ -463,7 +463,7 @@ loadsgf games/trevor/trevor_43.sgf
 #So, gg_genmove defends appropriately.
 loadsgf games/trevor/trevor_44.sgf
 440 owl_attack E6
-#? [1 (F4|F5|E4)]*
+#? [1 (F4|F5|E4)]
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Double-threat to eye-space missed.
@@ -492,11 +492,11 @@ loadsgf games/trevor/trevor_46.sgf
 #SEE_ALSO=owl:181
 loadsgf games/trevor/trevor_47.sgf
 470 owl_attack G9
-#? [(2|3) G6]*
+#? [(2|3) G6]
 
 #SEE_ALSO=trevor:470
 471 owl_attack A7
-#? [(2|3) A3]*
+#? [(2|3) A3]
 
 
 #CATEGORY=pattern_tuning
@@ -549,14 +549,14 @@ loadsgf games/trevor/trevor_64.sgf
 #SEVERITY=6
 loadsgf games/trevor/trevor_65.sgf
 650 owl_attack G2
-#? [(2|3) E1]*
+#? [(2|3) E1]
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=short of liberties
 #SEVERITY=6
 loadsgf games/trevor/trevor_66.sgf
 660 owl_attack G2
-#? [1 L1]*
+#? [1 L1]
 
 loadsgf games/trevor/trevor_67.sgf
 670 attack G1
@@ -568,7 +568,7 @@ loadsgf games/trevor/trevor_67.sgf
 
 loadsgf games/trevor/trevor_68.sgf
 680 owl_attack H3
-#? [1 H1]*
+#? [1 H1]
 
 loadsgf games/trevor/trevor_69.sgf
 690 owl_attack H3

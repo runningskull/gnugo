@@ -40,6 +40,9 @@
 /* Semeai module. Default standard. */
 #define EXPERIMENTAL_SEMEAI 0
 
+/* Max variations to consider reading semeai. */
+#define DEFAULT_SEMEAI_VARIATIONS 250
+
 /* Define as 1 to enable the DFA pattern matcher */
 #define DFA_ENABLED 0
 
@@ -110,6 +113,6 @@
 #define PACKAGE "gnugo"
 
 /* Version number of package */
-#define VERSION "3.1.16"
+#define VERSION "3.1.17"
 
 #pragma warning(disable: 4244 4305)

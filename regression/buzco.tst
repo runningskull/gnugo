@@ -27,11 +27,11 @@ loadsgf games/buzco1.sgf 82
 
 loadsgf games/buzco1.sgf 94
 7 gg_genmove black
-#? [!B7]*
+#? [!B7]
 
 loadsgf games/buzco1.sgf 108
 8 gg_genmove black
-#? [!N11]
+#? [!N11]*
 
 
 

@@ -22,7 +22,7 @@ loadsgf games/trevor/auto/a001.sgf 8
 
 loadsgf games/trevor/auto/a003.sgf 30
 121 gg_genmove white
-#? [E8]*
+#? [E8]
 
 
 
@@ -195,7 +195,7 @@ loadsgf games/trevor/auto/a018.sgf 14
 #In this shape, G5 is best, not J6.
 loadsgf games/trevor/auto/a018.sgf 18
 340 gg_genmove white
-#? [!J6]*
+#? [!J6]
 
 
 
@@ -224,7 +224,7 @@ loadsgf games/trevor/auto/a021.sgf 16
 
 loadsgf games/trevor/auto/a022.sgf 42
 380 gg_genmove white
-#? [G8|G7]*
+#? [G8|G7]
 
 
 
@@ -322,7 +322,7 @@ loadsgf games/trevor/auto/a031.sgf 40
 #Locally, D2 is best.
 loadsgf games/trevor/auto/a033.sgf 26
 500 gg_genmove white
-#? [D2|D1]*
+#? [D2|D1]
 
 
 

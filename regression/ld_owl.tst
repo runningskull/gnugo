@@ -270,7 +270,7 @@ loadsgf games/life_and_death/tripod6.sgf
 181 owl_attack R3
 #? [1 (R2|S4|P1)]
 182 owl_defend R3
-#? [2 S1]
+#? [2 S1]*
 183 owl_attack C3
 #? [3 B2]
 184 owl_defend C3

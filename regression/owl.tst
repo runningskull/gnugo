@@ -22,7 +22,7 @@ loadsgf games/incident156.sgf 246
 5 owl_attack C3
 #? [1 (B4|C4)]
 6 owl_defend C3
-#? [1 B5]*
+#? [1 B5]
 
 # incident 160
 loadsgf games/incident156.sgf 250
@@ -66,7 +66,7 @@ loadsgf games/incident234.sgf 164
 # The attack at B2 only gives ko. A2 looks more effective.
 loadsgf games/owl01.sgf
 18 owl_attack C3
-#? [1 A2]*
+#? [1 A2]
 19 owl_defend C3
 #? [1 A2]
 
@@ -263,7 +263,7 @@ loadsgf games/incident263.sgf 32
 # incident 264
 loadsgf games/incident263.sgf 116
 72 owl_defend D13
-#? [1 C14]
+#? [1 C14]*
 
 # incident 265
 # see also test 134
@@ -306,7 +306,7 @@ loadsgf games/incident291.sgf 86
 # incident 297
 loadsgf games/incident297.sgf 95
 80 owl_attack G5
-#? [1 J2]
+#? [1 J2]*
 
 loadsgf games/strategy5.sgf 40
 81 owl_attack R6
@@ -552,7 +552,7 @@ loadsgf games/FSF-neurogo.sgf 40
 # There might be an attack at G13, but it looks like it fails.
 loadsgf games/strategy25.sgf 63
 150 owl_attack D15
-#? [0]*
+#? [0]
 
 # Now G13 works.
 loadsgf games/strategy25.sgf 67
@@ -623,7 +623,7 @@ loadsgf games/poka.sgf 42
 loadsgf games/owl23.sgf
 # This isolates the problem in test 4
 170 owl_attack B14
-#? [0]
+#? [0]*
 
 # incident 284
 loadsgf games/incident278.sgf 318
@@ -666,7 +666,7 @@ loadsgf games/incident269.sgf 200
 
 # tm (3.1.17)  T18 lives.  Note the W sente at R16.
 181 owl_defend R19
-#? [1 T18]*
+#? [1 T18]
 
 # A17 is a better defense than B18 because B18 gives W two ko threats
 loadsgf games/incident144.sgf 242
@@ -722,7 +722,7 @@ loadsgf games/strategy33.sgf 119
 195 owl_attack B11
 #? [1 (B10|A9|C9|A10|A8)]
 196 owl_defend B11
-#? [1 (B10|A9)]
+#? [1 (B10|A9)]*
 197 owl_attack D15
 #? [1 (F18|G19)]
 198 owl_defend D15
@@ -908,11 +908,11 @@ loadsgf games/marginal_ko.sgf
 # See also strategy2:100.
 loadsgf games/strategy26.sgf 257
 254 owl_defend O13
-#? [1 (M16|O14|N16|N17)]*
+#? [1 (M16|O14|N16|N17)]
 
 loadsgf games/owl34.sgf 211
 255 owl_defend D13
-#? [1 (D14|E13|G16)
+#? [1 (D14|E13|G16)*
 
 ########### end of tests #####################
 

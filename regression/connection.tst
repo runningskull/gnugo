@@ -79,9 +79,9 @@ loadsgf games/nicklas/nicklas12.sgf 69
 
 loadsgf games/trevor/trevor_09.sgf
 21 connect D4 G5
-#? [1 (E5|D5|C5|C6|E6|C7|D7|E7)]*
+#? [1 (E5|D5|C5|C6|E6|C7|D7|E7)]
 22 disconnect D4 G5
-#? [1 (E5|D5|E6|F6)]*
+#? [1 (E5|D5|E6|F6)]
 
 loadsgf games/incident169.sgf 110
 23 connect K17 N16
@@ -99,7 +99,7 @@ loadsgf games/nicklas/nicklas16.sgf 38
 
 loadsgf games/golife.sgf 38
 28 disconnect H5 H7
-#? [0]*
+#? [0]
 
 loadsgf games/incident240.sgf 69
 29 disconnect B12 F7
@@ -124,15 +124,15 @@ loadsgf games/connection3.sgf
 34 disconnect B11 A9
 #? [0]
 35 disconnect L12 H13
-#? [0]
+#? [0]*
 36 connect M3 N7
-#? [1 (N4|M4|N5|N6)]
+#? [1 (N4|M4|N5|N6)]*
 37 disconnect M3 N7
-#? [1 (N4|M4|N5|M5|M6)]
+#? [1 (N4|M4|N5|M5|M6)]*
 38 connect B2 G1
-#? [1 E1]
+#? [1 E1]*
 39 disconnect B2 G1
-#? [1 (F2|F1|E2|E1|D2|D1|C2|C1|G2|H1|B1)]
+#? [1 (F2|F1|E2|E1|D2|D1|C2|C1|G2|H1|B1)]*
 
 # More monkey jumps and relatives.
 loadsgf games/connection4.sgf
@@ -141,21 +141,21 @@ loadsgf games/connection4.sgf
 41 disconnect B11 A8
 #? [1 (B9|A10|B10|B8|A7)]
 42 connect L12 H13
-#? [1 K12]
+#? [1 K12]*
 43 disconnect L12 H13
 #? [1 (K12|J12|J13|H12|G13)]
 44 connect M3 N7
-#? [3 M6]
+#? [3 M6]*
 45 disconnect M3 N7
-#? [1 (N4|M4|N5|M5|M6|M7|N8|M8)]
+#? [1 (N4|M4|N5|M5|M6|M7|N8|M8)]*
 46 connect B2 G1
-#? [1 (B1|C1|C2|D2|E1|F1)]
+#? [1 (B1|C1|C2|D2|E1|F1)]*
 47 disconnect B2 G1
-#? [1 (C1|E1)]
+#? [1 (C1|E1)]*
 
 loadsgf games/trevor/auto/a038.sgf 34
 48 disconnect C3 G3
-#? [1 D2|F2]
+#? [1 D2|F2]*
 
 loadsgf games/trevor/trevor_15.sgf 
 49 disconnect D7 G6

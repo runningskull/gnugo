@@ -71,7 +71,7 @@ loadsgf golois/Goemate990903-5.sgf
 # tm - running out at E6 looks fine.
 loadsgf golois/Goemate990910-1.sgf
 17 owl_defend D3
-#? [1 (E2|E6)]*
+#? [1 (E2|E6)]
 
 loadsgf golois/Goemate990911-2.sgf
 18 owl_attack E2
@@ -113,7 +113,7 @@ loadsgf golois/GoStar991114-2.sgf
 
 loadsgf golois/Handtalk980820-4.sgf
 27 owl_defend G2
-#? [1 (H2|F3)]
+#? [1 (H2|F3)]*
 
 loadsgf golois/Handtalk980820-5.sgf
 28 owl_attack N17

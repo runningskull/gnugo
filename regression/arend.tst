@@ -41,7 +41,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 57
 # should be accepted as well
 loadsgf games/arend/gnugo-gnugo2.sgf 60
 8 gg_genmove white
-#? [!S16]
+#? [!S16]*
 
 #CATEGORY=TACTICAL_READING
 # GNU Go rejects S17 because it is "strategically or tactically unsafe".
@@ -71,7 +71,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 163
 # GNU Go does not see that P17 helps his group as well, and plays O13.
 loadsgf games/arend/gnugo-gnugo4.sgf 27
 14 gg_genmove black
-#? [P17]*
+#? [P17]
 
 #CATEGORY=FUSEKI_STRATEGY
 # C6 is clearly the wrong side for approaching LL corner.
@@ -156,7 +156,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 24
 # GNU Go played F8.
 loadsgf games/arend/gnugo-gnugo7.sgf 79
 30 gg_genmove black
-#? [C13]
+#? [C13]*
 
 #CATEGORY=OWL_DEFEND (?)
 # B14 can (and should) be saved here

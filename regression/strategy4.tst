@@ -62,7 +62,7 @@ loadsgf games/strategy39.sgf 156
 # tm - P8, though not as clean, also kills all the B stones.
 loadsgf games/strategy39.sgf 158
 163 gg_genmove white
-#? [O7|P8]*
+#? [O7|P8]
 
 #### N4 is clearly superior to O5.
 #### tm - N4 has it's weaknesses (at O5) too.  Both clearly kill.
@@ -84,7 +84,7 @@ loadsgf games/incident94.sgf 114
 # Tenuki instead of urgent edge joseki move.
 loadsgf games/strategy40.sgf 10
 167 gg_genmove black
-#? [D4]*
+#? [D4]
 
 # Safety must come first. This is almost a whole-board semeai.
 loadsgf games/strategy40.sgf 30
@@ -108,7 +108,7 @@ loadsgf games/strategy42.sgf 174
 # move is A5.
 loadsgf games/strategy42.sgf 188
 171 gg_genmove white
-#? [A5]
+#? [A5]*
 
 # It's correct to make a ko threat, but N9 is inefficient because it
 # doesn't utilize the full ko potential of the position. Locally M8 is
@@ -153,13 +153,13 @@ loadsgf games/xxlin.sgf 8
 # should be added. /gf
 loadsgf games/xxlin.sgf 16
 178 gg_genmove black
-#? [P4|P3|E2]*
+#? [P4|P3|E2]
 
 #DESCRIPTION=Tenuki also seems OK here.
 #Added E2 (3.1.14) -trevor
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
-#? [P3|O2|P2|O4|E2]
+#? [P3|O2|P2|O4|E2]*
 
 #The point of this problem is that Q8 is locally better than M7.
 #However, GNU Go reasonably tenukis.
@@ -173,7 +173,7 @@ loadsgf games/xxlin.sgf 38
 
 loadsgf games/xxlin.sgf 48
 182 gg_genmove black
-#? [E7|F8]*
+#? [E7|F8]
 
 loadsgf games/xxlin.sgf 76
 183 gg_genmove black
@@ -212,7 +212,7 @@ loadsgf games/pooo.sgf 50
 
 loadsgf games/pooo.sgf 52
 190 gg_genmove black
-#? [D13]*
+#? [D13]
 
 loadsgf games/pooo.sgf 56
 191 gg_genmove black
@@ -230,7 +230,7 @@ loadsgf games/bretz.sgf 26
 
 loadsgf games/bretz.sgf 58
 194 gg_genmove black
-#? [A13]
+#? [A13]*
 
 loadsgf games/bretz.sgf 88
 195 gg_genmove black
@@ -274,7 +274,7 @@ loadsgf games/juka1.sgf 18
 
 loadsgf games/juka1.sgf 28
 204 gg_genmove black
-#? [B2]*
+#? [B2]
 
 loadsgf games/juka1.sgf 48
 205 gg_genmove black

@@ -123,7 +123,7 @@ loadsgf games/strategy19.sgf 94
 # I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 116
 73 gg_genmove white
-#? [F7|R17]
+#? [F7|R17]*
 
 # I have added R17, as it seems to kill the huge black dragon --arend
 loadsgf games/semeai2.sgf 118
@@ -178,7 +178,7 @@ loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
 # But Q13 seems larger -arend
 84 gg_genmove black
-#? [Q13]*
+#? [Q13]
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white
@@ -203,7 +203,7 @@ loadsgf games/strategy25.sgf 45
 
 loadsgf games/strategy25.sgf 55
 89 gg_genmove black
-#? [(D16|B7|G13)]
+#? [(D16|B7|G13)]*
 
 # Connecting with ko at B14 looks best. Cutting at D17 might be
 # considered. B17 (game move) is inferior.

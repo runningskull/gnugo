@@ -25,7 +25,7 @@ loadsgf games/niki.sgf 68
 
 loadsgf games/niki.sgf 92
 4 gg_genmove white
-#? [Q8]*
+#? [Q8]
 
 #S10 seems OK, much better than game move of S14. Added it -trevor
 #S14 is thought to owl attack the corner. If this is correct the move
@@ -50,12 +50,12 @@ loadsgf games/niki.sgf 110
 # important. Added H15, G15, and F15. /gf
 loadsgf games/niki.sgf 124
 8 gg_genmove white
-#? [G16|H15|G15|F15]*
+#? [G16|H15|G15|F15]
 
 #gg_genmove bug requires reloading game.
 loadsgf games/niki.sgf 124
 9 gg_genmove black
-#? [F15]*
+#? [F15]
 
 loadsgf games/niki.sgf 128
 10 gg_genmove white
