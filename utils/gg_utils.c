@@ -307,7 +307,8 @@ gg_cputime(void)
  * ordering changes depends on implementation specific details like
  * the strategy for choosing the pivot element. Thus a list with
  * "equal" values may be sorted differently between platforms, which
- * potentially can lead to significant differences in the move engine.
+ * potentially can lead to significant differences in the move
+ * generation.
  *
  * This is an implementation of the combsort algorithm.
  *
@@ -317,6 +318,10 @@ gg_cputime(void)
  * special cases (i.e. sorted or reversed data) but it seems to be
  * susceptible to O(N^2) behavior for repetitive data with specific
  * cycle lengths.
+ *
+ * Like qsort() this algorithm is unstable, but since the same
+ * implementation (this one) is used on all platforms, the reordering
+ * of equal elements will be consistent.
  */
 void
 gg_sort(void *base, size_t nel, size_t width,
