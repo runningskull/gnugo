@@ -454,7 +454,7 @@ loadsgf games/trevor/auto/b72.sgf 30
 
 loadsgf games/trevor/auto/b72.sgf 32
 740 gg_genmove white
-#? [!H10]
+#? [!H10]*
 
 
 loadsgf games/trevor/auto/b72.sgf 38

@@ -1,3 +1,36 @@
+========================== 3.3.13 pre 3 ============================
+
+./regress.sh . strategy.tst 
+20 unexpected PASS!
+./regress.sh . lazarus.tst 
+4 unexpected FAIL: Correct 'R12|Q12|M8', got 'T5'
+./regress.sh . trevorb.tst 
+740 unexpected FAIL: Correct '!H10', got 'H10'
+./regress.sh . strategy2.tst 
+75 unexpected PASS!
+./regress.sh . strategy4.tst 
+163 unexpected FAIL: Correct 'O7|P8', got 'N8'
+./regress.sh . owl1.tst 
+293 unexpected FAIL: Correct '0', got '1 Q5'
+./regress.sh . nngs3.tst 
+800 unexpected FAIL: Correct 'G4', got 'E3'
+1170 unexpected PASS!
+./regress.sh . nngs4.tst 
+110 unexpected FAIL: Correct 'D17', got 'C16'
+120 unexpected FAIL: Correct 'C13', got 'B5'
+130 unexpected FAIL: Correct 'E14', got 'C8'
+140 unexpected FAIL: Correct 'R5|R4', got 'N17'
+150 unexpected FAIL: Correct 'N3|M3', got 'M2'
+170 unexpected FAIL: Correct 'S6', got 'J14'
+210 unexpected FAIL: Correct '!S5', got 'S5'
+220 unexpected FAIL: Correct '!T2', got 'T2'
+230 unexpected FAIL: Correct 'Q18', got 'L18'
+240 unexpected FAIL: Correct 'B4', got 'C4'
+250 unexpected FAIL: Correct 'F7', got 'C7'
+270 unexpected FAIL: Correct '!P5', got 'P5'
+./regress.sh . gunnar.tst 
+1 unexpected PASS!
+
 ========================== 3.3.13 pre 2 ============================
 
 ./regress.sh . filllib.tst 

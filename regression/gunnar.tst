@@ -7,7 +7,7 @@ reset_trymove_counter
 # M19 is a serious blunder.
 loadsgf games/nngs/gnugo-3.3.10-viking4-200210261703.sgf 181
 1 gg_genmove white
-#? [M17]*
+#? [M17]
 
 # D19 is locally worse than both E17 and E18.
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 83

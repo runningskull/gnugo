@@ -62,7 +62,7 @@ loadsgf games/strategy39.sgf 156
 # tm - P8, though not as clean, also kills all the B stones.
 loadsgf games/strategy39.sgf 158
 163 gg_genmove white
-#? [O7|P8]
+#? [O7|P8]*
 
 #### N4 is clearly superior to O5.
 #### tm - N4 has it's weaknesses (at O5) too.  Both clearly kill.

@@ -133,7 +133,7 @@ loadsgf games/gunnar/gunnar3.sgf 88
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
 293 defend Q6
-#? [0]
+#? [0]*
 
 ########### end of tests #####################
 

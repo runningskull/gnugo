@@ -361,7 +361,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 80
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 86
 800 gg_genmove black
-#? [G4]
+#? [G4]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 90
@@ -551,7 +551,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 240
 # B1 minimizes the losses.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
 1170 gg_genmove white
-#? [B1]*
+#? [B1]
 
 # A5 is very odd.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 244

@@ -126,7 +126,7 @@ loadsgf games/strategy4.sgf
 # incident 290
 loadsgf games/incident290.sgf 30
 20 gg_genmove black
-#? [Q11]*
+#? [Q11]
 
 # incident 291
 loadsgf games/incident291.sgf 54
