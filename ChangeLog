@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new struct reading_moves in reading.c
 - owl stack can now handle two local_owl_data structs
 - semeai code now uses owl stack
 - don't push owl data in owl_analyze_semeai below branch depth
