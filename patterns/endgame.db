@@ -104,12 +104,13 @@
 ########################################
 
 Pattern EE1
+# gf Removed terri(1) value because move might be inside own territory. (3.3.7)
 
 ?OOx      block on edge
 ..*x      1 point gote
 ----
 
-:8,OXe,terri(1)
+:8,OXe
 
 ?ccx
 ba*x
@@ -572,6 +573,24 @@ Pattern EE404
 :8,sOXe,terri(0.5)
 
 |OX?
+|.*.
++---
+
+;marginal_eye(*)
+
+
+Pattern EE404b
+# gf New pattern. See nngs:1480. (3.3.7)
+
+|.OX
+|OX.       endgame move
+|.*.       at least 1.5 points gote as sacrifice
++---
+
+:8,sOXe,value(1.5)
+
+|.OX
+|OX.
 |.*.
 +---
 

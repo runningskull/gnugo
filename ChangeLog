@@ -27,6 +27,9 @@
 - placehand() moved from genmove.c to handicap.c
 - bug fix in adjusted_worm_attack_value()
 - FIXME added regarding several EITHER_MOVE reasons
+- tuning
+- influence tuning
+- owl tuning
 - revised tests, many new tests, new game files
 - added Evan Berggren Daniel to AUTHORS
 

@@ -3349,18 +3349,6 @@ Pattern EB11
 ####################
 
 
-# Pattern EB101
-# # gf Redundant (special case of EB102). (3.3.3)
-#
-# ?..XXX             jump out from below
-# ?.*.O.
-# ?....O
-# ?.....
-# ------
-# 
-# :8,OXe
-
-
 Pattern EB102
 
 ?XX.??     Jump underneath
@@ -3370,18 +3358,6 @@ O....?
 ------
 
 :8,OXe
-
-
-# Pattern EB103
-# # gf Redundant (special case of EB104). (3.3.3)
-# 
-# ..X.O  jump under a stone on 4-th row
-# .*..O
-# ....O
-# .....
-# -----
-# 
-# :8,OXe
 
 
 Pattern EB104
@@ -6952,37 +6928,6 @@ O.*.?
 :8,OEd,jump_out_helper
 
 
-# tm removed this pattern (3.1.18)
-#
-#Pattern CB11
-##    This pattern needs revision. It often comes up with
-##    stupid moves, e.g. in a position like this,
-##
-##    X.....
-##    .O...X
-##    O.*...
-##    XX....
-##    ......
-##
-##    where X can respond to the left of * and O only has time to
-##    defend one cutting point.
-## FIXME: see also arend:10
-#
-#.xxxxx          prevent X from sealing an area
-#O.xxxx
-#.*....
-#X.....
-#
-#:8,OXEe,value(12)
-#
-#.abcde
-#O.fghi
-#.*....
-#X.....
-#
-#; x_somewhere(a,b,c,d,e,f,g,h,i)
-
-
 Pattern CB12
 
 ....           atari to break X connection
@@ -7550,6 +7495,7 @@ XX*.
 
 
 Pattern CB228
+# gf Sometimes it's better shape to jump. See nngs:1180. (3.3.7)
 
 ?XX.             prevent bend
 OO*.
@@ -7769,22 +7715,6 @@ Pattern CB242
 ?OX?
 
 :8,OXe
-
-
-# Pattern CB243
-# # gf Redundant (subset of CB242). (3.3.3)
-# 
-# ?..?            Push into enemy area
-# ?*.?
-# ?OX?
-# 
-# :8,OXe
-# 
-# ?ab?
-# ?*.?
-# ?OX?
-# 
-# ;xarea(a) || xarea(b)
 
 
 Pattern CB244
@@ -10598,7 +10528,7 @@ Pattern ED93
 
 :8,dO
 
-.....X?        don't make the wrong atari
+.....X?
 ..X.a.?
 ...*XO?
 ....Ooo
@@ -11107,38 +11037,40 @@ OaX
 ; oplay_attack(*,a,B)
 
 
-Pattern CD97
-
-OOXO?       defend everything
-..O..
-.*..?
-?????
-
-:8,ed,value(15)
-
-BBXD?
-.aOc.
-.*..?
-?????
-
-; xplay_attack(a,B) && xplay_attack(c,D) && oplay_defend(*,c,D)
-
-
-Pattern CD98
-
-OOXO?        defend as much as we can
-..O..
-.*..?
-?????
-
-:8,ed,value(12)
-
-BBXD?
-.aOc.
-.*..?
-?????
-
-; xplay_attack(a,B) && xplay_attack(c,D)
+# Pattern CD97
+# # gf Removed pattern. (3.3.7)
+# 
+# OOXO?       defend everything
+# ..O..
+# .*..?
+# ?????
+# 
+# :8,ed,value(15)
+# 
+# BBXD?
+# .aOc.
+# .*..?
+# ?????
+# 
+# ; xplay_attack(a,B) && xplay_attack(c,D) && oplay_defend(*,c,D)
+# 
+# 
+# Pattern CD98
+# # gf Removed pattern. (3.3.7)
+# 
+# OOXO?        defend as much as we can
+# ..O..
+# .*..?
+# ?????
+# 
+# :8,ed,value(12)
+# 
+# BBXD?
+# .aOc.
+# .*..?
+# ?????
+# 
+# ; xplay_attack(a,B) && xplay_attack(c,D)
 
 
 Pattern CD99
@@ -11815,6 +11747,8 @@ x.......
 
 
 Pattern EJ33
+# gf Sometimes it's better to play one step to the left. See
+# nngs:1180. (3.3.7)
 
 ...XX          common important follow up 
 .O.*O
@@ -12619,24 +12553,6 @@ XXA..
 ; !dead(A)
 
 
-#Pattern EJ83
-#This pattern breaks arb:101 - let's remove it and see what happens!
-#
-#..OXOO        make shape and defend cut
-#.*.O..
-#......
-#------
-#
-#:8,J
-#
-#..OXCC
-#.*bOa.
-#......
-#------
-#
-#; xplay_attack(a,b,C)
-
-
 Pattern EJ84
 # gf Made pattern more powerful. (3.1.9)
 # gf Added one more replacement point. (3.1.10)
@@ -13382,29 +13298,6 @@ X..
 #
 ######################################################################
 
-# ab: I think this is well treated by our "attack dragon XX, although
-# it seems dead, as we are ahead"-policy.
-# Pattern Reinforce101
-# #FIXME: This should at least be contingent on being ahead.
-# #  see trevorc:1170
-# 
-# oO?      Eliminate aji
-# .*X
-# ...
-# ...
-# ---
-# 
-# :8,O,value(5)
-# 
-# oO?
-# .*A
-# ...
-# ...
-# ---
-# 
-# ; has_aji(A)
-# 
-
 Pattern Reinforce102
 # This pattern should be contingent on being clearly ahead.
 
@@ -13604,31 +13497,6 @@ Pattern LE13
 ; oplay_attack(*,a,a)
 
 
-##tm Removed this pattern (3.1.20)
-#Pattern LE14
-## FIXME: This pattern looks way to general/overvalued
-##   see global:27, strategy4:212, trevorc:1190
-#
-#xxx      safe jump into opponent's moyo
-#..x
-#.*.
-#...
-#o.O
-#
-#
-#:8,OE,value(9)
-#
-#abc
-#..d
-#.*h
-#.fe
-#ogO
-#
-#;(xmoyo(a) || xmoyo(b) || xmoyo(c) || xmoyo(d)) && oplay_attack(*,e,f,g,g)
-#; && oplay_attack(*,f,e,h,f)
-
-
-
 Pattern LE15
 # tm decreased value (3.1.20) (see nngs:1150 move G4)
 # gf Don't bother with this inside own territory. (3.1.29)
@@ -13669,7 +13537,6 @@ Pattern LE16
 |?.X?
 
 > replace(a,*)
-
 
 
 ######################################################################

@@ -730,7 +730,7 @@ X!O
 
 baO
 O*.
-B!O
+X!O
 
 ;xplay_defend_both(*,a,b,*,b)
 
@@ -889,7 +889,6 @@ O*b
 B.?
 
 ; !dead(A) && !dead(B) && o_somewhere(a,b)
-
 
 
 ########################
