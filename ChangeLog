@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.2 released April 25, 2002
+
 - revision of copyright statements and THANKS
 - handtalk games moved to their own directory
 - correct move number reported in influence for illegal move error
