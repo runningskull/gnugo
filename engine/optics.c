@@ -307,8 +307,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 			int false_margins[BOARDMAX],
 			int first_time)
 {
-#if 0
-  /* This is a new implementation, which has not been enabled yet. */
+#if 1
   int other = OTHER_COLOR(color);
   int found_one;
   int i, j;

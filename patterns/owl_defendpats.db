@@ -3187,7 +3187,7 @@ X.X.?
 
 :8,-,value(70)
 
-oOX.?      might break through somewhere
+oOX.?
 ?*..b
 X.X.?
 ...o?
@@ -3206,7 +3206,7 @@ X.X.?
 
 :8,-,value(81)
 
-ooX.?       might break through
+ooX.?
 ?O*.b
 X.X.?
 ...o?
@@ -3870,13 +3870,14 @@ o...
 
 
 Pattern D1318
+# gf Too vague, reduced. (3.1.9)
 
 ??...      try to run towards center
 ??...
 ??.*.
 ??..O
 
-:8,-,value(76)
+:8,-,value(65)
 
 
 Pattern D1319

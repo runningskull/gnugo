@@ -1225,6 +1225,7 @@ Pattern AS6
 
 
 Pattern Shape1
+# gf Revised constraint. (3.1.9)
 
 OO      empty triangle. Ok if the empty point of the triangle is an eye.
 .*
@@ -1234,7 +1235,7 @@ OO      empty triangle. Ok if the empty point of the triangle is an eye.
 OO
 a*
 
-;!eye(a)
+;!proper_eye(a)
 
 
 Pattern Shape2

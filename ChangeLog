@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- tuning, owl tuning
+- new implementation of compute_primary_domains()
 - new eye pattern
 - bugfix in fuseki.c
 - cleanup and further 1D conversion in optics.c
