@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- persistent cache code moved from reading.c and owl.c to new file
+  persistent.c
 - speed optimization in order_moves() in reading.c
 - speed optimizations in fastlib(), count_common_libs(), find_common_libs()
 - duplicate lines removed from safety_to_string()

@@ -36,6 +36,7 @@ libengine_a_SOURCES = \
       movelist.c \
       optics.c \
       owl.c \
+      persistent.c \
       printutils.c \
       readconnect.c \
       reading.c \

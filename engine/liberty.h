@@ -293,8 +293,25 @@ int simple_ladder(int str, int *move);
 #define MOVE_ORDERING_PARAMETERS 67
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
 void draw_reading_shadow(void);
+
+
+/* persistent.c */
 void purge_persistent_reading_cache(void);
+int search_persistent_reading_cache(int routine, int str, int *result,
+				    int *move);
+void store_persistent_reading_cache(int routine, int str, int result,
+				    int move, int nodes);
 void reading_hotspots(float values[BOARDMAX]);
+void purge_persistent_owl_cache(void);
+int search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
+				int *result, int *move, int *move2,
+				int *certain);
+void store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
+				int result, int move, int move2, int certain,
+				int tactical_nodes, char goal[BOARDMAX],
+				int goal_color);
+void owl_hotspots(float values[BOARDMAX]);
+
 
 /* readconnect.c */
 int string_connect(int str1, int str2, int *move);
@@ -485,8 +502,6 @@ int owl_substantial(int str);
 void owl_analyze_semeai(int apos, int bpos, 
 			int *resulta, int *resultb, int *move,
 			int owl);
-void purge_persistent_owl_cache(void);
-void owl_hotspots(float values[BOARDMAX]);
 
 void change_attack(int str, int move, int acode);
 void change_defense(int str, int move, int dcode);
@@ -934,8 +949,6 @@ void abortgo(const char *file, int line, const char *msg, int i, int j);
 #endif
 
 #define gg_assert(x) ASSERT2(x, -1, -1);
-
-void draw_active_area(char board[BOARDMAX], int apos);
 
 #endif  /* _LIBERTY_H_ */
 

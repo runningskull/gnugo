@@ -363,8 +363,19 @@ int get_read_result2(int routine, int komaster, int kom_pos,
 #define MAX_ROUTINE     DISCONNECT
 #define NUM_ROUTINES    (MAX_ROUTINE + 1)
   
-#endif
 
+/* Routine numbers for the persistent owl cache, in addition to
+ * OWL_ATTACK and OWL_DEFEND defined above.
+ */
+#define OWL_THREATEN_ATTACK    2
+#define OWL_THREATEN_DEFENSE   3
+#define OWL_DOES_DEFEND        4
+#define OWL_DOES_ATTACK        5
+#define OWL_CONNECTION_DEFENDS 6
+#define OWL_SUBSTANTIAL        7
+#define OWL_CONFIRM_SAFETY     8
+
+ 
 
 /* ================================================================ */
 /* This has actually nothing to do with caching, but is useful in
@@ -404,6 +415,18 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     save = move; \
     savecode = code; \
   }
+
+
+/* This too isn't really related to caching but is convenient to have here.
+ * (Needs to be available in reading.c and persistent.c.)
+ *
+ * Minimum number of nodes for which DEBUG_READING_PERFORMANCE reports
+ * anything.
+ */
+#define MIN_READING_NODES_TO_REPORT 1000
+
+
+#endif /* _CACHE_H_ */
 
   
 /*

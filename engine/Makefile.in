@@ -118,6 +118,7 @@ libengine_a_SOURCES = \
       movelist.c \
       optics.c \
       owl.c \
+      persistent.c \
       printutils.c \
       readconnect.c \
       reading.c \
@@ -159,7 +160,7 @@ am_libengine_a_OBJECTS = aftermath.$(OBJEXT) board.$(OBJEXT) \
 	genmove.$(OBJEXT) globals.$(OBJEXT) handicap.$(OBJEXT) \
 	hash.$(OBJEXT) influence.$(OBJEXT) interface.$(OBJEXT) \
 	life.$(OBJEXT) matchpat.$(OBJEXT) move_reasons.$(OBJEXT) \
-	movelist.$(OBJEXT) optics.$(OBJEXT) owl.$(OBJEXT) \
+	movelist.$(OBJEXT) optics.$(OBJEXT) owl.$(OBJEXT) persistent.$(OBJEXT) \
 	printutils.$(OBJEXT) readconnect.$(OBJEXT) reading.$(OBJEXT) \
 	score.$(OBJEXT) semeai.$(OBJEXT) sgfdecide.$(OBJEXT) \
 	sgffile.$(OBJEXT) shapes.$(OBJEXT) showbord.$(OBJEXT) \
@@ -181,7 +182,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/influence.Po $(DEPDIR)/interface.Po \
 @AMDEP_TRUE@	$(DEPDIR)/life.Po $(DEPDIR)/matchpat.Po \
 @AMDEP_TRUE@	$(DEPDIR)/move_reasons.Po $(DEPDIR)/movelist.Po \
-@AMDEP_TRUE@	$(DEPDIR)/optics.Po $(DEPDIR)/owl.Po \
+@AMDEP_TRUE@	$(DEPDIR)/optics.Po $(DEPDIR)/owl.Po $(DEPDIR)/persistent.Po \
 @AMDEP_TRUE@	$(DEPDIR)/printutils.Po $(DEPDIR)/readconnect.Po \
 @AMDEP_TRUE@	$(DEPDIR)/reading.Po $(DEPDIR)/score.Po \
 @AMDEP_TRUE@	$(DEPDIR)/semeai.Po $(DEPDIR)/sgfdecide.Po \
@@ -250,6 +251,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/movelist.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/optics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/owl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/persistent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/printutils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/readconnect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/reading.Po@am__quote@
