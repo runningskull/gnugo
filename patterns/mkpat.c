@@ -2528,6 +2528,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "%d / %d patterns have edge-constraints\n",
 	    pats_with_constraints, patno);
 
+#if 0
   /* Forward declaration, which autohelpers might need. */
   if (database_type != DB_FULLBOARD) {
     if (database_type != DB_CORNER)
@@ -2535,6 +2536,7 @@ main(int argc, char *argv[])
     else
       fprintf(output_FILE, "extern struct corner_pattern %s[];\n\n", prefix);
   }
+#endif
 
   /* Write the autohelper code. */
   fprintf(output_FILE, "%s", autohelper_code);
