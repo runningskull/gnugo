@@ -2608,6 +2608,10 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     int c;
     float followup_value;
 
+    /* Negative territorial followup doesn't make make sense. */
+    if (move[pos].influence_followup_value < 0.0)
+      move[pos].influence_followup_value = 0.0;
+     
     followup_value = move[pos].followup_value
 		     + move[pos].influence_followup_value;
     TRACE("  %1m:   %f - total followup value, added %f as territorial followup\n",
@@ -2617,11 +2621,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * be 0 points + followup.  But we want to take the intersections first
      * were we actually get some points.  0.5 points is a 1 point ko which
      * is the smallest value that is actually worth something.
-     * tm - But with reverse_followup values, we may want to play a 0
-     *      point move. 
      */
-    if (tot_value >= 0.5 
-	|| (move[pos].reverse_followup_value >= 1.0)) {
+    if (tot_value >= 0.5) {
       float old_tot_value = tot_value;
       float contribution;
       /* We adjust the value according to followup and reverse followup

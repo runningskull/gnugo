@@ -3225,6 +3225,25 @@ Oa*b
 > good_attack_threat(*,A)
 
 
+Pattern Sente23
+# gf New pattern. (3.5.4)
+# See trevorc:450.
+
+?OX
+O.O
+O*X
+
+:8,O
+
+?OX
+a.c
+a*B
+
+;lib(a)>3 && alive(B) && xplay_attack(*,c)
+
+>prevent_attack_threat(c);
+
+
 ########################################################
 #
 # Double threat moves and defense against double threats

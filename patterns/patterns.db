@@ -280,6 +280,7 @@ Pattern CC13
 # tm modified (3.1.10)
 # (compare Conn315)
 # gf Added n classification. (3.3.16)
+# gf Revised constraint. (3.5.4)
 
 O?        cut!
 *X
@@ -289,9 +290,9 @@ XO
 
 O?
 *A
-BO
+Bc
 
-; oplay_attack_either(*,A,B)
+;lib(c)>1 && oplay_attack_either(*,A,B)
 
 
 Pattern CC13b
@@ -12776,23 +12777,24 @@ Pattern EJ60
 ; owl_threatens(*,A)
 
 
-Pattern EJ61
-
-o.X??       follow through after hane
-O.XO.
-.XO*.
-.....
------
-
-:8,J
-
-o.X??
-O.XA.
-.XO*.
-.....
------
-
-; !critical(A)
+# Pattern EJ61
+# gf Removed. This move may fail to secure life. (3.5.4)
+# 
+# o.X??       follow through after hane
+# O.XO.
+# .XO*.
+# .....
+# -----
+# 
+# :8,J
+# 
+# o.X??
+# O.XA.
+# .XO*.
+# .....
+# -----
+# 
+# ; !critical(A)
 
 
 Pattern EJ62a
