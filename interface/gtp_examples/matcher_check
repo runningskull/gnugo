@@ -36,7 +36,6 @@
 # be captured, and that vertex go unused until a new piece was
 # played in that spot, resulting in a false positive.  However,
 # this should be rare (?).
-# FIXME: better $verbose levels
 
 package TWOGTP_A;
 
@@ -126,14 +125,14 @@ GetOptions(
 );
 
 if ($wanthelp) {
-  print $helpstring;
-  exit;
+    print $helpstring;
+    exit;
 }
 
 
 if (!$program) {
-  $program = '../gnugo --mode gtp --quiet';
-  warn "Defaulting program to: $program\n";
+    $program = '../gnugo --mode gtp --quiet';
+    warn "Defaulting program to: $program\n";
 }
 
 # create FileHandles
@@ -153,10 +152,6 @@ specify the number of moves to check with --movecount <n>.
 	exit;
     }
 
-    #if (defined($stable)) {
-    #    warn "When loading a file, --stable is ignored.";
-    #}
-
     $pidp = open2($prog_out, $prog_in, $program);
     $pids = open2($stable_out, $stable_in, $stable) if defined($stable);
     print "program pid: $pidp\n" if $verbose;
@@ -165,56 +160,50 @@ specify the number of moves to check with --movecount <n>.
     if (defined($randseed)) {
         print $prog_in "set_random_seed $randseed\n";
 	eat_no_response($prog_out);
-        if (defined($stable)) {
-           print $stable_in "set_random_seed $randseed\n";
-           eat_no_response($stable_out);
-       }
     } else {
         print $prog_in "get_random_seed\n";
-       my $rand = eat_one_line($prog_out);
-       print "random seed $rand\n";
-        if (defined($stable)) {
-           $rand =~ s/^= //smg;
-           print $stable_in "set_random_seed $rand\n";
-           eat_no_response($stable_out);
-       }
+        $randseed = eat_one_line($prog_out);
+        print "random seed $randseed\n";
     }
 
+    if (defined($stable)) {
+        $randseed =~ s/^= //smg;
+        print $stable_in "set_random_seed $rand\n";
+        eat_no_response($stable_out);
+    }
 
     for ($movenum = 1; $movenum <= $movecount + 1; $movenum++)
     {
         #load the file, check the statuses, next move.
-       my $lmove = $movenum + 1;#number to load up to
+        my $lmove = $movenum + 1;#number to load up to
 	print "loading move $movenum\n" if $verbose;
-       print $prog_in "loadsgf $loadfile $lmove\n";
+        print $prog_in "loadsgf $loadfile $lmove\n";
 	eat_no_response($prog_out);
-       if (!defined($noilcheck)) {
-           check_matcher($prog_in, $prog_out);
-           print "done checking status.\n" if ($verbose);
-       }
+        if (!defined($noilcheck)) {
+            check_matcher($prog_in, $prog_out);
+            print "done checking status.\n" if ($verbose);
+        }
 
-       #do stable checks
-       if (defined($stable)) {
-           print $stable_in "loadsgf $loadfile $lmove\n";
-           $toplay = eat_one_line($stable_out); #whole word in this case
-           $toplay =~ s/^=//smg;
-           $toplay =~ s/ //smg;
-           print $prog_in "genmove_$toplay\n";
-           print $stable_in "genmove_$toplay\n";
-           $move = eat_move($prog_out);
-           $stable_move = eat_move($stable_out);
-           if ($move ne $stable_move and defined ($stable)) {
-               print "At move $movenum, $toplay\:\n";
-               print "Test version played   $move\n";
-               print "Stable version played $stable_move\n";
-           } else {
-               print "$toplay plays $move\n" if $verbose;
-           }
-       }
+        #do stable checks
+        if (defined($stable)) {
+            print $stable_in "loadsgf $loadfile $lmove\n";
+            $toplay = eat_one_line($stable_out);
+            $toplay =~ s/^=//smg;
+            $toplay =~ s/ //smg;
+            print $prog_in "genmove_$toplay\n";
+            print $stable_in "genmove_$toplay\n";
+            $move = eat_move($prog_out);
+            $stable_move = eat_move($stable_out);
+            if ($move ne $stable_move and defined ($stable)) {
+                print "At move $movenum, $toplay\:\n";
+                print "Test version played   $move\n";
+                print "Stable version played $stable_move\n";
+            } else {
+                print "$toplay plays $move\n" if $verbose;
+            }
+        }
     }
 
-    print "movenum: $movenum\n" if ($verbose);
-    print "movecount: $movecount\n" if ($verbose);
     print "done reading sgf file\n" if ($verbose);
     exit;
 }
@@ -238,9 +227,7 @@ while ($games > 0) {
     }
 
     #set autoflushing for sgf file
-    select(SGFFILEHANDLE);
-    $| = 1;
-    select(STDOUT);
+    SGFFILEHANDLE->autoflush(1);
 
     print $prog_in  "boardsize $size\n";
     eat_no_response($prog_out);
@@ -257,19 +244,16 @@ while ($games > 0) {
     if (defined($randseed)) {
         print $prog_in "set_random_seed $randseed\n";
 	eat_no_response($prog_out);
-        if (defined($stable)) {
-	    print $stable_in "set_random_seed $randseed\n";
-	    eat_no_response($stable_out);
-	}
     } else {
         print $prog_in "get_random_seed\n";
-	my $rand = eat_one_line($prog_out);
-	print "random seed $rand\n";
-        if (defined($stable)) {
-	    $rand =~ s/^= //smg;
-	    print $stable_in "set_random_seed $rand\n";
-	    eat_no_response($stable_out);
-	}
+	$randseed = eat_one_line($prog_out);
+        $randseed =~ s/^= //smg;
+	print "random seed $randseed\n";
+    }
+
+    if (defined($stable)) {
+        print $stable_in "set_random_seed $rand\n";
+        eat_no_response($stable_out);
     }
 
     print SGFFILEHANDLE "(;GM[1]FF[4]RU[Japanese]SZ[$size]HA[$handicap]KM[$komi]"
@@ -279,17 +263,26 @@ while ($games > 0) {
     $move = "";
 
     if ($handicap < 2) {
-	$toplay = 'B';
+	$toplay = "black";
     }
     else {
-	$toplay = 'W';
+	$toplay = "white";
 	print $prog_in "fixed_handicap $handicap\n";
-        if (defined($stable)) {
-	    print $stable_in "fixed_handicap $handicap\n";
-	    eat_handicap($stable_out);
-	}
 
 	$handicap_stones = eat_handicap($prog_out);
+	my $stable_stones = $handicap_stones;
+
+        if (defined($stable)) {
+	    print $stable_in "fixed_handicap $handicap\n";
+	    $stable_stones = eat_handicap($stable_out);
+	}
+
+	if ($stable_stones ne $handicap_stones) {
+	    print "Handicap discrepancy:\n";
+	    print "Test:   $handicap_stones\n";
+	    print "Stable: $stable_stones\n";
+	}
+
 	if (defined $sgffilename) {
 	    print SGFFILEHANDLE $handicap_stones;
 	}
@@ -297,16 +290,11 @@ while ($games > 0) {
 
     $movenum = 1;
     while ($pass < 2) {
-        if ($toplay eq 'B') {
-	    print $prog_in "genmove_black\n";
-	    print $stable_in "genmove_black\n" if defined($stable);
-	} else {
-	    print $prog_in "genmove_white\n";
-	    print $stable_in "genmove_white\n" if defined($stable);
-	}
-
+	print $prog_in "genmove_$toplay\n";
 	$move = eat_move($prog_out);
+
 	if (defined($stable)) {
+	    print $stable_in "genmove_$toplay\n" if defined($stable);
 	    $stable_move = eat_move($stable_out);
 	    print $stable_in "undo\n";
 	    eat_no_response($stable_out);
@@ -321,34 +309,49 @@ while ($games > 0) {
 	}
 
 	$sgfmove = standard_to_sgf($move);
-	print SGFFILEHANDLE ";$toplay\[$sgfmove\]\n" if defined $sgffilename;
+	my $tpc = "B"; #toplay char
+	$tpc = "W" if ($toplay eq "white");
+	print SGFFILEHANDLE ";$tpc\[$sgfmove\]\n" if defined $sgffilename;
 
-	if ($toplay eq 'B') {
-	    print $stable_in "black $move\n" if defined($stable);
-	    $toplay = 'W';
-	} else {
-	    print $stable_in "white $move\n" if defined($stable);
-	    $toplay = 'B';
-	}
+	print $stable_in "$toplay $move\n" if defined($stable);
 	eat_no_response($stable_out) if defined($stable);
+
+	if ($toplay eq "black") {
+	    $toplay = "white";
+	} else {
+	    $toplay = "black";
+	}
 
 	if ($move =~ /PASS/i) {
 	    $pass++;
 	} else {
 	    $pass = 0;
 	}
-	if ($verbose > 1) {
+
+	if ($verbose > 2) {
 	    print $prog_in "showboard\n";
 	    eat_no_response($prog_out);
+	    if (defined($stable)) {
+	        print $stable_in "showboard\n";
+		eat_no_response($stable_out);
+	    }
 	}
 
 	check_matcher($prog_in, $prog_out) if !defined($noilcheck);
-	$movenum++;	#next move
+	$movenum++;
     }
     print $prog_in "estimate_score\n";
     $result = eat_score($prog_out);
+    if (defined($stable)) {
+        print $stable_in "estimate_score\n";
+	my $stable_result = eat_score($stable_out);
+	print "scoring discrepancy. Stable score: $stable_result.\n" if ($stable_result ne $result);
+    }
+
     print "Result: $result\n";
     print $prog_in "quit\n";
+    print $stable_in "quit\n" if defined($stable);
+
     if (defined $sgffilename) {
 	print "sgf file: $sgffile\n";
 	print SGFFILEHANDLE ")";
