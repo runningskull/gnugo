@@ -24,7 +24,7 @@ loadsgf games/nicklas/nicklas8.sgf 212
 # point worse than J12. K12 loses the tail.
 loadsgf games/nicklas/nicklas8.sgf 242
 812 gg_genmove black
-#? [J12]*
+#? [J12]
 
 loadsgf games/nicklas/nicklas11.sgf 56
 1102 gg_genmove black

@@ -1,3 +1,74 @@
+========================== 3.1.11 =========================
+
+./regress.sh . owl.tst
+166 unexpected PASS!
+./regress.sh . owl_rot.tst
+215 unexpected FAIL: Correct '1 M2', got '1 K1'
+65 unexpected PASS!
+152 unexpected PASS!
+./regress.sh . strategy.tst
+6 unexpected PASS!
+27 unexpected PASS!
+29 unexpected FAIL: Correct 'R4', got 'E16'
+50 unexpected PASS!
+./regress.sh . neurogo.tst
+11 unexpected FAIL: Correct 'N5', got 'M1'
+13 unexpected FAIL: Correct '!P7', got 'P7'
+./regress.sh . arb.tst
+232 unexpected PASS!
+./regress.sh . arion.tst
+6 unexpected PASS!
+./regress.sh . strategy2.tst
+80 unexpected PASS!
+84 unexpected PASS!
+./regress.sh . nicklas1.tst
+1206 unexpected FAIL: Correct 'C15', got 'N10'
+1216 unexpected FAIL: Correct 'H3', got 'F3'
+./regress.sh . nicklas2.tst
+1402 unexpected PASS!
+1701 unexpected PASS!
+./regress.sh . nicklas4.tst
+812 unexpected PASS!
+./regress.sh . nicklas5.tst
+1204 unexpected PASS!
+./regress.sh . trevor.tst
+7 unexpected FAIL: Correct '!C5', got 'C5'
+14 unexpected PASS!
+370 unexpected PASS!
+381 unexpected PASS!
+390 unexpected PASS!
+420 unexpected PASS!
+421 unexpected PASS!
+./regress.sh . tactics.tst
+3 unexpected FAIL: Correct 'M18', got 'N17'
+./regress.sh . capture.tst
+7 unexpected PASS!
+./regress.sh . global.tst
+1 unexpected PASS!
+11 unexpected PASS!
+26 unexpected PASS!
+34 unexpected PASS!
+41 unexpected PASS!
+./regress.sh . vie.tst
+2 unexpected PASS!
+9 unexpected PASS!
+10 unexpected PASS!
+19 unexpected PASS!
+27 unexpected PASS!
+38 unexpected PASS!
+39 unexpected PASS!
+41 unexpected PASS!
+./regress.sh . strategy4.tst
+164 unexpected PASS!
+165 unexpected PASS!
+166 unexpected PASS!
+183 unexpected PASS!
+184 unexpected PASS!
+186 unexpected PASS!
+188 unexpected PASS!
+193 unexpected FAIL: Correct 'F16', got 'N18'
+200 unexpected PASS!
+
 ========================== 3.1.10 =========================
 
 The failures in strategy4.tst, tactics.tst, connect.tst

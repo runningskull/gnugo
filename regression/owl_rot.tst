@@ -1,36 +1,20 @@
-reset_reading_node_counter
-reset_owl_node_counter
+orientation 1
+loadsgf games/incident263.sgf 32
+70 owl_attack M4
+#? [1 (J2|K2|N2)]*
 
-loadsgf rot0/games/strategy25.sgf 63
-150 owl_attack P16
+orientation 2
+loadsgf games/strategy25.sgf 63
+150 owl_attack D15
 #? [0]*
 
-loadsgf rot1/games/incident263.sgf 32
-70 owl_attack H16
-#? [1 (L18|K18|G18)]*
+orientation 3
+loadsgf games/strategy33.sgf 15
+193 owl_attack Q16
+#? [0]*
 
-loadsgf rot1/games/strategy33.sgf 15
-193 owl_attack D4
-#? [0]
-
-loadsgf rot1/games/FSF-neurogo.sgf 286
-215 owl_attack L5
-#? [1 M2]
-
-loadsgf rot5/games/incident256.sgf 157
-65 owl_defend J14
-#? [1 L12]*
-
-loadsgf rot5/games/strategy25.sgf 197
-152 owl_attack C9
-#? [1 B6]*
-
-
-# Report number of nodes visited by the tactical reading
-10000 get_reading_node_counter
-#?[0]&
-
-# Report number of nodes visited by the owl code
-10001 get_owl_node_counter
-#?[0]&
-
+orientation 2
+# E6 almost kills tactically.
+loadsgf games/trevor/trevor_27.sgf 36
+222 owl_attack E5
+#? [1 E6]*

@@ -1,9 +1,10 @@
-VERSION 3.1.10
+VERSION 3.1.11
 
 New since 3.1
 
 - 1-dimensional board
 - experimental dynamic connection analysis
+- new html views of the regressions, and many more tests
 
 New in 3.0 (since 2.6)
 

@@ -100,7 +100,7 @@ loadsgf games/trevor/trevor_06.sgf 22
 #DIFFICULTY=6
 loadsgf games/trevor/trevor_07.sgf 32
 7 gg_genmove white
-#? [!C5]
+#? [!C5]*
 
 #Pattern missing here?  B8 is almost always better than B9.
 loadsgf games/trevor/trevor_08.sgf 24
@@ -139,7 +139,7 @@ loadsgf games/trevor/trevor_13.sgf
 #Must protect double cut at C2 & E2
 loadsgf games/trevor/trevor_14.sgf
 14 gg_genmove white
-#? [!PASS]*
+#? [!PASS]
 
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
@@ -356,7 +356,7 @@ loadsgf games/trevor/trevor_36.sgf
 #SEVERITY=10
 loadsgf games/trevor/trevor_37.sgf
 370 owl_defend C9
-#? [1 F8]*
+#? [1 F8]
 
 
 #CATEGORY=PATTERN_TUNING
@@ -371,7 +371,7 @@ loadsgf games/trevor/trevor_38.sgf 22
 #SEVERITY=3
 loadsgf games/trevor/trevor_38.sgf 39
 381 gg_genmove black
-#? [D7|C7]*
+#? [D7|C7]
 
 #CATEGORY=KO_THREATS
 #DESCRIPTION=E9 is terrible for leaving Ko threats.
@@ -386,7 +386,7 @@ loadsgf games/trevor/trevor_38.sgf 41
 #SEVERITY=10
 loadsgf games/trevor/trevor_39.sgf 38
 390 gg_genmove white
-#? [!PASS]*
+#? [!PASS]
 
 
 #CATEGORY=OWL_TUNING
@@ -442,14 +442,14 @@ loadsgf games/trevor/trevor_41.sgf 37
 #  Attachment is the SGF file.
 loadsgf games/trevor/trevor_42.sgf 211
 420 gg_genmove black
-#? [G16]*
+#? [G16]
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=Minus 1 point, attacking very dead stone.
 #SEVERITY=10
 loadsgf games/trevor/trevor_42.sgf 191
 421 gg_genmove black
-#? [!C2]*
+#? [!C2]
 
 
 #CATEGORY=owl_tuning

@@ -28,7 +28,7 @@ loadsgf games/strategy3.sgf 14
 # Probably requires a dynamic connection analysis to solve.
 loadsgf games/incident104.sgf 63
 6 gg_genmove white
-#? [E10]*
+#? [E10]
 
 # incident 106
 loadsgf games/incident104.sgf 215
@@ -185,7 +185,7 @@ loadsgf games/strategy5.sgf 12
 #
 loadsgf games/strategy5.sgf 14
 27 gg_genmove black
-#? [C3]*
+#? [C3]
 
 loadsgf games/strategy5.sgf 20
 28 gg_genmove black
@@ -193,7 +193,7 @@ loadsgf games/strategy5.sgf 20
 
 loadsgf games/strategy5.sgf 40
 29 gg_genmove black
-#? [R4]
+#? [R4]*
 
 loadsgf games/strategy5.sgf 44
 30 gg_genmove black
@@ -331,7 +331,7 @@ loadsgf games/strategy12.sgf 21
 # So much better, that I removed Q11 option -trevor
 loadsgf games/strategy13.sgf
 50 gg_genmove white
-#? [Q9]*
+#? [Q9]
 
 
 

@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.10 released October 21, 2001
+
+- tuning
+- owl tuning
+- eye tuning
 - new function owl_proper_eye() and autohelper with the same name
 - valuation of uncertain owl defense moves revised
 - evaluate_diagonal_intersection() revised
@@ -22,15 +27,16 @@
 - Updated regress.pl to latest ever evolving version.
 - Adds several test cases and SGF files to trevor.tst & games/trevor/
 - reorientation code moved from gtp.c to play_gtp.c
+- owl_rot.tst uses reorientation code
 - fixed sscanf problem in (worm|dragon)_(stones|data)
 - allow dragon_stones to take color parameter, as well as coord.
 - revisions to capture.tst and vie.tst
 - further 1D revision in dragon.c
 - top_move functionality added to regress.pl
 - filllib.c and semeai.c made 1-dimensional
-- tuning
-- owl tuning
-- eye tuning
+- new gg_cputime in gg_utils.c
+- improved configuration for ncurses/{term,curses}.h
+- new and improved tests
 
 3.1.10 released October 14, 2001
 

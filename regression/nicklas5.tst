@@ -35,7 +35,7 @@ loadsgf games/nicklas/nicklas12.sgf 71
 
 loadsgf games/nicklas/nicklas12.sgf 89
 1204 gg_genmove black
-#? [H15]*
+#? [H15]
 
 loadsgf games/nicklas/nicklas12.sgf 182
 1211 dragon_status L8

@@ -64,16 +64,16 @@ loadsgf games/strategy39.sgf 158
 # N4 is clearly superior to O5.
 loadsgf games/strategy39.sgf 172
 164 gg_genmove white
-#? [!O5]*
+#? [!O5]
 
 # K1 is out of the question. K3 is locally better and L6 might kill with ko.
 loadsgf games/strategy39.sgf 178
 165 gg_genmove white
-#? [K3|L6]*
+#? [K3|L6]
 
 loadsgf games/incident94.sgf 114
 166 gg_genmove white
-#? [D11]*
+#? [D11]
 
 # Tenuki instead of urgent edge joseki move.
 loadsgf games/strategy40.sgf 10
@@ -162,11 +162,11 @@ loadsgf games/xxlin.sgf 48
 
 loadsgf games/xxlin.sgf 76
 183 gg_genmove black
-#? [P10|H9]*
+#? [P10|H9]
 
 loadsgf games/xxlin.sgf 106
 184 gg_genmove black
-#? [H13|F15]*
+#? [H13|F15]
 
 # We may want to move this to a dedicated seki or semeai test suite in
 # the future.
@@ -177,7 +177,7 @@ loadsgf games/seki02.sgf
 # O8 only move.
 loadsgf games/owl29.sgf 134
 186 gg_genmove white
-#? [O8]*
+#? [O8]
 
 # B can play at C4 if we remember the tesuji B:C4 W:E4 B:B2.
 
@@ -187,7 +187,7 @@ loadsgf games/pooo.sgf 16
 
 loadsgf games/pooo.sgf 24
 188 gg_genmove black
-#? [B6|C4]*
+#? [B6|C4]
 
 # The dragon at A2 is misclassified as inessential.
 
@@ -211,7 +211,7 @@ loadsgf games/pooo.sgf 74
 
 loadsgf games/bretz.sgf 26
 193 gg_genmove black
-#? [F16]
+#? [F16]*
 
 loadsgf games/bretz.sgf 58
 194 gg_genmove black
@@ -239,7 +239,7 @@ loadsgf games/bretz.sgf 164
 
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7]*
+#? [P6|P7|Q7]
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black
@@ -260,6 +260,10 @@ loadsgf games/juka1.sgf 28
 loadsgf games/juka1.sgf 48
 205 gg_genmove black
 #? [!O11]*
+
+loadsgf games/strategy45.sgf
+206 gg_genmove black
+#? [L8]*
 
 
 ############ End of Tests #################

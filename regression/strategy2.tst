@@ -149,7 +149,7 @@ loadsgf games/strategy14a.sgf
 # This is essentially a semeai problem
 loadsgf games/strategy22.sgf
 80 gg_genmove white
-#? [P4|Q4|Q3]*
+#? [P4|Q4|Q3]
 
 loadsgf games/strategy23.sgf
 81 gg_genmove white
@@ -167,7 +167,7 @@ loadsgf games/heikki/heikki01.sgf 17
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
 84 gg_genmove black
-#? [J18]*
+#? [J18]
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white

@@ -30,7 +30,7 @@ loadsgf golois/Handtalk980821-2.sgf
 
 loadsgf golois/Handtalk980821-2.sgf
 7 defend R3
-#? [1 (S3|O3|N2|P1|O1|S2)]*
+#? [1 (S3|O3|N2|P1|O1|S2)]
 
 loadsgf golois/Handtalk980824-1.sgf
 8 defend K5

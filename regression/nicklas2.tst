@@ -90,7 +90,7 @@ loadsgf games/nicklas/nicklas14.sgf 31
 #SEVERITY=9
 loadsgf games/nicklas/nicklas14.sgf 43
 1402 gg_genmove black
-#? [J8|J6]*
+#? [J8|J6]
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=PASS here is unthinkable, though RESIGN might be appropriate!
@@ -114,7 +114,7 @@ loadsgf games/nicklas/nicklas14.sgf 61
 # work as well. /gf
 loadsgf games/nicklas/nicklas17.sgf 47
 1701 gg_genmove black
-#? [C9|A8]*
+#? [C9|A8]
 
 loadsgf games/nicklas/nicklas18.sgf 17
 1802 gg_genmove black

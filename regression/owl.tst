@@ -606,7 +606,7 @@ loadsgf games/owl20.sgf
 
 loadsgf games/owl21.sgf
 166 owl_attack Q17
-#? [2 P18]*
+#? [2 P18]
 
 loadsgf games/owl22.sgf 138
 167 owl_defend Q12

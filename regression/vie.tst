@@ -5,7 +5,7 @@ loadsgf golois/Aya991113-12.sgf
 # This attack doesn't work without ko. Changed the correct result. /gf
 loadsgf golois/Aya991113-13.sgf
 2 owl_attack G5
-#? [2 H4]*
+#? [2 H4]
 
 loadsgf golois/BiwakoFost97-1.sgf
 3 owl_attack G3
@@ -35,11 +35,11 @@ loadsgf golois/DeuxYeuxManyFacesIng98.sgf
 
 loadsgf golois/GoAheadMarseille97.sgf
 9 owl_defend O14
-#? [1 (P15|R14)]*
+#? [1 (P15|R14)]
 
 loadsgf golois/GoAheadMarseille97.sgf
 10 owl_attack R15
-#? [1 P15]*
+#? [1 P15]
 
 loadsgf golois/Goemate990902-15.sgf
 11 owl_defend T8
@@ -77,7 +77,7 @@ loadsgf golois/Goemate990911-2.sgf
 # S8, T8, T9 and T7 all work. S9 and T10 do not.
 loadsgf golois/Goemate990911-3.sgf
 19 owl_attack R8
-#? [1 S8|T8|T9|T7]*
+#? [1 S8|T8|T9|T7]
 
 # B can tenuki. J8 and H9 are miai.
 loadsgf golois/Goemate991106-3.sgf
@@ -110,7 +110,7 @@ loadsgf golois/GoStar991114-2.sgf
 
 loadsgf golois/Handtalk980820-4.sgf
 27 owl_defend G2
-#? [1 (H2|F3)]*
+#? [1 (H2|F3)]
 
 loadsgf golois/Handtalk980820-5.sgf
 28 owl_attack N17
@@ -155,12 +155,12 @@ loadsgf golois/MeilleurCoup0002.sgf
 # db added A4
 loadsgf golois/MeilleurCoup0003.sgf
 38 owl_defend B8
-#? [1 (B6|A4)]*
+#? [1 (B6|A4)]
 
 # D7 is one point smaller, but also lives.
 loadsgf golois/MeilleurCoup0004.sgf
 39 owl_defend B6
-#? [1 (C6|D7)]*
+#? [1 (C6|D7)]
 
 loadsgf golois/MeilleurCoup0005.sgf
 40 owl_defend D9
@@ -168,7 +168,7 @@ loadsgf golois/MeilleurCoup0005.sgf
 
 loadsgf golois/MeilleurCoup0007.sgf
 41 owl_defend B6
-#? [1 B4]*
+#? [1 B4]
 
 loadsgf golois/Neurogo97-1.sgf
 42 owl_defend H2

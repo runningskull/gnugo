@@ -14,7 +14,7 @@ loadsgf games/tactics02.sgf
 
 loadsgf games/tactics03.sgf
 3 gg_genmove black
-#? [M18]
+#? [M18]*
 
 
 ############ End of Tests #################
