@@ -536,69 +536,6 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
 }
 
 
-/* find_lunch(m, n, *wi, *wj, *ai, *aj) looks for a worm adjoining the
- * string at (m,n) which can be easily captured. Whether or not it can
- * be defended doesn't matter.
- *
- * Returns the location of the string in (*wi, *wj), and the location
- * of the attacking move in (*ai, *aj).
- *
- * FIXME: Move this function to worm.c.
- */
-	
-int
-find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)
-{
-  int i, j, vi, vj;
-
-  ASSERT2(BOARD(m, n) != 0, m, n);
-  ASSERT2(stackp == 0, m, n);
-
-  vi = -1;
-  vj = -1;
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      if (BOARD(i, j) == OTHER_COLOR(BOARD(m, n)))
-	if ((   i > 0            && is_same_worm(i-1, j, m, n))
-	    || (i < board_size-1 && is_same_worm(i+1, j, m, n))
-	    || (j > 0            && is_same_worm(i, j-1, m, n))
-	    || (j < board_size-1 && is_same_worm(i, j+1, m, n))
-	    || (i > 0 && j > 0
-		&& is_same_worm(i-1, j-1, m, n))
-	    || (i > 0 && j < board_size-1
-		&& is_same_worm(i-1, j+1, m, n))
-	    || (i < board_size-1 && j > 0
-		&& is_same_worm(i+1, j-1, m, n))
-	    || (i < board_size-1 && j < board_size-1
-		&& is_same_worm(i+1, j+1, m, n)))
-	  if (worm[POS(i, j)].attack_code != 0 && !is_ko_point2(i, j)) {
-	    /*
-	     * If several adjacent lunches are found, we pick the 
-	     * juiciest. First maximize cutstone, then minimize liberties. 
-	     * We can only do this if the worm data is available, 
-	     * i.e. if stackp==0.
-	     */
-	    if (vi == -1
-		|| worm[POS(i, j)].cutstone > worm[POS(vi, vj)].cutstone 
-		|| (worm[POS(i, j)].cutstone == worm[POS(vi, vj)].cutstone 
-		    && worm[POS(i, j)].liberties < worm[POS(vi, vj)].liberties)) {
-	      vi = I(worm[POS(i, j)].origin);
-	      vj = J(worm[POS(i, j)].origin);
-	      if (ai) *ai = I(worm[POS(i, j)].attack_point);
-	      if (aj) *aj = J(worm[POS(i, j)].attack_point);
-	    }
-	  }
-
-  if (vi != -1) {
-    if (wi) *wi = vi;
-    if (wj) *wj = vj;
-    return 1;
-  }
-  else
-    return 0;
-}
-
-
 /* 
  * It is assumed in reading a ladder if stackp >= depth that
  * as soon as a bounding stone is in atari, the string is safe.

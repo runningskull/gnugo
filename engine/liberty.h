@@ -277,6 +277,7 @@ void join_dragons(int ai, int aj, int bi, int bj);
 int dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
 		  int escape_value[MAX_BOARD][MAX_BOARD]);
 int lively_dragon_exists(int color);
+int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
 void propagate_worm(int pos);
 void transform(int i, int j, int *ti, int *tj, int trans);
@@ -379,7 +380,6 @@ int aftermath_genmove(int *i, int *j, int color,
 		      int under_control[MAX_BOARD][MAX_BOARD],
 		      int do_capture_dead_stones);
 int revise_semeai(int color);
-int find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj);
 
 int owl_attack(int m, int n, int *ui, int *uj, int *certain);
 int owl_defend(int m, int n, int *ui, int *uj, int *certain);

@@ -423,7 +423,6 @@ int aftermath_final_status(int color, int m, int n);
 /* worm.c */
 void build_worms(void);
 void make_worms(void);
-int is_same_worm(int ai, int aj, int bi, int bj);
 
 /* dragon.c */
 void make_dragons(int color, int stop_before_owl);
