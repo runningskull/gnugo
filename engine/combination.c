@@ -80,8 +80,10 @@ find_double_threats(int color)
     for (j = 0; j < board_size; ++j) {
       int num_a_threatened_groups;
       int a_threatened_groups[MAX_THREATENED_STRINGS];
+#if 0
       int num_d_threatened_groups;
       int d_threatened_groups[MAX_THREATENED_STRINGS];
+#endif
 
       ii = POS(i, j);
       

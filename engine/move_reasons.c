@@ -2233,8 +2233,13 @@ connection_value(int dragona, int dragonb, int tt, float margin)
 }
 
 
-/* The value attacking a worm at (ww) is twice its effective size, 
- * with the following adjustments:
+/*
+ * Usually the value of a worm is twice its effective size, but when
+ * evaluating certain move reasons we need to adjust this to take
+ * effects on neighbors into account, e.g. for an attack_either move
+ * reason. This does not apply to the attack and defense move reasons,
+ * however, because then the neighbors already have separate attack or
+ * defense move reasons (if such apply).
  *
  * If the worm has an adjacent (friendly) dead dragon we add its
  * value. At least one of the surrounding dragons must be alive. 
@@ -2249,13 +2254,13 @@ connection_value(int dragona, int dragonb, int tt, float margin)
  */
 
 static float
-attacked_worm_value(int ww)
+adjusted_worm_value(int pos, int ww)
 {
   int color;
   int num_adj;
   int adjs[MAXCHAIN];
   int has_live_neighbor = 0;
-  int adjusted_value = 2 * worm[ww].effective_size;
+  float adjusted_value = 2 * worm[ww].effective_size;
   float adjustment_up = 0.0;
   float adjustment_down = 0.0;
   int s;
@@ -2269,13 +2274,12 @@ attacked_worm_value(int ww)
 	|| dragon[adj].matcher_status == CRITICAL)
       has_live_neighbor = 1;
 
-    if (dragon[adj].color == color
-	&& dragon[adj].matcher_status == DEAD
+    if (dragon[adj].matcher_status == DEAD
 	&& 2*dragon[adj].effective_size > adjustment_up)
       adjustment_up = 2*dragon[adj].effective_size;
 
-    if (dragon[adj].color == color
-	&& attack(adj, NULL)
+    if (worm[adj].attack_codes[0] != 0
+	&& !does_defend(pos, ww)
 	&& 2*worm[adj].effective_size > adjustment_down)
       adjustment_down = 2*worm[adj].effective_size;
   }
@@ -2285,19 +2289,6 @@ attacked_worm_value(int ww)
   adjusted_value -= adjustment_down;
 
   return adjusted_value;
-
-  /*
-   * FIXME: It might be possible that parts of the dragon
-   *        can be cut in the process of capturing the (ww)
-   *        worm. In that case, not the entire size of the 
-   *        adjacent dead dragon should be counted as a positive
-   *        adjustment.  However, it seems difficult to do this
-   *        analysis, and in most cases it won't apply, so we
-   *        leave it as it is for now.
-   *
-   * TODO:
-   *   - cache the result?
-   */
 }
 
 
@@ -2355,11 +2346,8 @@ estimate_territorial_value(int pos, int color,
 	break;
       }
 
-#if 0
       this_value = 2 * worm[aa].effective_size;
-#else
-      this_value = attacked_worm_value(aa);
-#endif
+
       /* If the stones are dead, there is only a secondary value in
        * capturing them tactically as well.
        */
@@ -2511,9 +2499,8 @@ estimate_territorial_value(int pos, int color,
        *        leave it as it is for now.
        *
        * FIXME: The same analysis should be applied to
-       *        DEFEND_THREAT_MOVE, ATTACK_MOVE, DEFEND_MOVE;
-       *        ATTACK_EITHER_MOVE, DEFEND_BOTH_MOVE, and possibly
-       *        the owl attack/defend move reasons.  It should be 
+       *        DEFEND_THREAT_MOVE,
+       *        ATTACK_EITHER_MOVE, DEFEND_BOTH_MOVE. It should be 
        *        broken out as separate functions and dealt with in
        *        a structured manner.
        */
@@ -3079,8 +3066,8 @@ estimate_strategical_value(int pos, int color, float score)
 	  float bb_value;
 
 	  if (move_reasons[r].type == ATTACK_EITHER_MOVE) {
-	    aa_value = attacked_worm_value(aa);
-	    bb_value = attacked_worm_value(bb);
+	    aa_value = adjusted_worm_value(pos, aa);
+	    bb_value = adjusted_worm_value(pos, bb);
 	    this_value = gg_min(aa_value, bb_value);
 
 	    TRACE("  %1m: %f - attacks either %1m (%f) or %1m (%f)\n",
