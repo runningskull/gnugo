@@ -30,20 +30,19 @@ import re
 
 help_string = """
 Usage:
-breakage2tst.py <BREAKAGE_FILE >testfile.tst
+breakage2tst.py [--pike] <BREAKAGE_FILE >testfile.tst
 	This creates an excerpt of all test cases that appear as unexpected
 	PASS or FAIL in BREAKAGE_FILE and writes these test to testfile.tst.
-breakage2tst.py --update <BREAKAGE_FILE
+breakage2tst.py [--pike] --update <BREAKAGE_FILE
 	This changes all .tst files so that the expected results match
 	the behaviour of the version that produced BREAKAGE_FILE.
 In both cases, it needs to be run from the regression test directory.
 """
 
 start_tst_string = """
-# Reset owl node counter
 reset_owl_node_counter
-# Reset reading node counter
 reset_reading_node_counter
+reset_connection_node_counter
 """
 		
 finish_tst_string = """
@@ -55,6 +54,10 @@ finish_tst_string = """
 
 # Report number of nodes visited by the owl code
 100001 get_owl_node_counter
+#? [0]&
+
+# Report number of nodes visited by connection reading
+100002 get_connection_node_counter
 #? [0]&
 """
 
@@ -180,36 +183,7 @@ def update_tstfile(tstfilename, tests):
 	tstfile.write(new_tstfile)
 	tstfile.close
 
-
-def main():
-	global command_id
-	mode = 0
-	try:
-		opts, args = getopt.getopt(sys.argv[1:], "", ["update", "help"])
-	except getopt.GetoptError:
-		print "breakage2tst: Unrecognized option."
-		print help_string
-		sys.exit(2)
-	if (args != []):
-		print "I know nothing about arguments", args
-		print help_string
-		sys.exit(2)
-
-	for o, a in opts:	
-		if (o == "--help"):
-			print help_string
-			sys.exit()
-		if (o == "--update"):
-			mode = 1
-	
-	if (mode == 0):
-		print start_tst_string
-		command_id = 10
-		do_work = write_tests
-	else:
-		do_work = update_tstfile
-
-
+def parse_input(do_work):
 	tests = []
 	filename = ''
 	while 1:
@@ -232,6 +206,75 @@ def main():
 				tests.append([int(s[0]), 1])
 			elif (re.search("FAIL", string.join(s[1:3]))):
 				tests.append([int(s[0]), 0])
+
+def parse_pike_input(do_work):
+	tests = []
+	filename = ''
+	while 1:
+		try:
+			inputline = raw_input()
+		except EOFError:
+			if (filename != ''):
+				do_work(filename, tests)
+			break
+		else:
+			s = string.split(inputline)
+			if (not re.search(r"\:", s[0])):
+				continue
+			new_filename = re.search(r"[^:]+", s[0]).group() \
+				       + ".tst"
+			if (filename != new_filename):
+				if (filename != ''):
+					do_work(filename, tests)
+				filename = new_filename
+				tests = []
+			number = int(re.search(r"[\d]+$", s[0]).group())
+			if (s[1] == "PASS"):
+				tests.append([number, 1])
+			elif (s[1] == "FAIL"):
+				tests.append([number, 0])
+			else:
+				print "Inconsistent input line:", inputline
+				sys.exit(2)
+
+
+def main():
+	global command_id
+	mode = 0
+	pike = 0
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "",
+					   ["update", "help", "pike"])
+	except getopt.GetoptError:
+		print "breakage2tst: Unrecognized option."
+		print help_string
+		sys.exit(2)
+	if (args != []):
+		print "I know nothing about arguments", args
+		print help_string
+		sys.exit(2)
+
+	for o, a in opts:	
+		if (o == "--help"):
+			print help_string
+			sys.exit()
+		if (o == "--update"):
+			mode = 1
+		if (o == "--pike"):
+			pike = 1
+	
+	if (mode == 0):
+		print start_tst_string
+		command_id = 10
+		do_work = write_tests
+	else:
+		do_work = update_tstfile
+
+
+	if (pike):
+		parse_pike_input(do_work)
+	else:
+		parse_input(do_work)
 
 	if (mode == 0):
 		print finish_tst_string
