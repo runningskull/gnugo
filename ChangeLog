@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- speed optimizations in board.c, particularly fastlib()
 - now possible to reduce MAX_BOARD and still get working GNU go
 - mkpat now has amechanism for dropping patterns
 - corner database creation implemented

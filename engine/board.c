@@ -208,8 +208,38 @@ static int next_stone[BOARDMAX];
 
 #define MARK_STRING(pos) string[string_number[pos]].mark = string_mark
 
-#define STRING_AT_VERTEX(pos, s)\
-  (IS_STONE(board[pos]) && string_number[pos] == (s))
+#define STRING_AT_VERTEX(pos, s, color)\
+  ((board[pos] == color) && string_number[pos] == (s))
+
+#define NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(SOUTH(pos), s, color)\
+   || STRING_AT_VERTEX(WEST(pos), s, color)\
+   || STRING_AT_VERTEX(NORTH(pos), s, color)\
+   || STRING_AT_VERTEX(EAST(pos), s, color))
+
+/* These four macros have rather confusing names. It should be read as:
+ * "(pos) is a neighbor of string (s) of (color) in any direction except
+ * the specified one".
+ */
+#define NON_SOUTH_NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(SOUTH(pos), s, color)\
+   || STRING_AT_VERTEX(WEST(pos), s, color)\
+   || STRING_AT_VERTEX(EAST(pos), s, color))
+  
+#define NON_WEST_NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(WEST(pos), s, color)\
+   || STRING_AT_VERTEX(NORTH(pos), s, color)\
+   || STRING_AT_VERTEX(SOUTH(pos), s, color))
+  
+#define NON_NORTH_NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(NORTH(pos), s, color)\
+   || STRING_AT_VERTEX(EAST(pos), s, color)\
+   || STRING_AT_VERTEX(WEST(pos), s, color))
+  
+#define NON_EAST_NEIGHBOR_OF_STRING(pos, s, color)\
+  (STRING_AT_VERTEX(EAST(pos), s, color)\
+   || STRING_AT_VERTEX(SOUTH(pos), s, color)\
+   || STRING_AT_VERTEX(NORTH(pos), s, color))
   
 #define LIBERTIES(pos)\
   string[string_number[pos]].liberties
@@ -2016,7 +2046,161 @@ findlib(int str, int maxlib, int *libs)
  */
 
 int
-fastlib(int pos, int color, int ignore_capture)
+fastlib(int pos, int color, int ignore_captures)
+{
+  int ally1 = -1;
+  int ally2 = -1;
+  int fast_liberties = 0;
+
+  ASSERT1(board[pos] == EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
+
+  /* Find neighboring strings of the same color. If there are more than two of
+   * them, we give up (it's too difficult to count their common liberties).
+   */
+  if (board[SOUTH(pos)] == color) {
+    ally1 = string_number[SOUTH(pos)];
+
+    if (board[WEST(pos)] == color
+	&& string_number[WEST(pos)] != ally1) {
+      ally2 = string_number[WEST(pos)];
+
+      if (board[NORTH(pos)] == color
+	  && string_number[NORTH(pos)] != ally1
+	  && string_number[NORTH(pos)] != ally2)
+	return -1;
+    }
+    else if (board[NORTH(pos)] == color
+	     && string_number[NORTH(pos)] != ally1)
+      ally2 = string_number[NORTH(pos)];
+
+    if (board[EAST(pos)] == color
+	&& string_number[EAST(pos)] != ally1) {
+      if (ally2 < 0)
+	ally2 = string_number[EAST(pos)];
+      else if (string_number[EAST(pos)] != ally2)
+	return -1;
+    }
+  }
+  else if (board[WEST(pos)] == color) {
+    ally1 = string_number[WEST(pos)];
+
+    if (board[NORTH(pos)] == color
+	&& string_number[NORTH(pos)] != ally1) {
+      ally2 = string_number[NORTH(pos)];
+
+      if (board[EAST(pos)] == color
+	  && string_number[EAST(pos)] != ally1
+	  && string_number[EAST(pos)] != ally2)
+	return -1;
+    }
+    else if (board[EAST(pos)] == color
+	&& string_number[EAST(pos)] != ally1)
+      ally2 = string_number[EAST(pos)];
+  }
+  else if (board[NORTH(pos)] == color) {
+    ally1 = string_number[NORTH(pos)];
+    
+    if (board[EAST(pos)] == color
+	&& string_number[EAST(pos)] != ally1)
+      ally2 = string_number[EAST(pos)];
+  }
+  else if (board[EAST(pos)] == color)
+    ally1 = string_number[EAST(pos)];
+
+  /* If we are to ignore captures, the things are very easy. */
+  if (ignore_captures) {
+    if (ally1 < 0) {			/* No allies */
+      if (LIBERTY(SOUTH(pos)))
+	fast_liberties++;
+      if (LIBERTY(WEST(pos)))
+	fast_liberties++;
+      if (LIBERTY(NORTH(pos)))
+	fast_liberties++;
+      if (LIBERTY(EAST(pos)))
+	fast_liberties++;
+    }
+    else if(ally2 < 0) {		/* One ally */
+      if (LIBERTY(SOUTH(pos))
+	  && !NON_SOUTH_NEIGHBOR_OF_STRING(SOUTH(pos), ally1, color))
+	fast_liberties++;
+      if (LIBERTY(WEST(pos))
+	  && !NON_WEST_NEIGHBOR_OF_STRING(WEST(pos), ally1, color))
+	fast_liberties++;
+      if (LIBERTY(NORTH(pos))
+	  && !NON_NORTH_NEIGHBOR_OF_STRING(NORTH(pos), ally1, color))
+	fast_liberties++;
+      if (LIBERTY(EAST(pos))
+	  && !NON_EAST_NEIGHBOR_OF_STRING(EAST(pos), ally1, color))
+	fast_liberties++;
+
+      fast_liberties += string[ally1].liberties - 1;
+    }
+    else {				/* Two allies */
+      if (LIBERTY(SOUTH(pos))
+	  && !NON_SOUTH_NEIGHBOR_OF_STRING(SOUTH(pos), ally1, color)
+	  && !NON_SOUTH_NEIGHBOR_OF_STRING(SOUTH(pos), ally2, color))
+	fast_liberties++;
+      if (LIBERTY(WEST(pos))
+	  && !NON_WEST_NEIGHBOR_OF_STRING(WEST(pos), ally1, color)
+	  && !NON_WEST_NEIGHBOR_OF_STRING(WEST(pos), ally2, color))
+	fast_liberties++;
+      if (LIBERTY(NORTH(pos))
+	  && !NON_NORTH_NEIGHBOR_OF_STRING(NORTH(pos), ally1, color)
+	  && !NON_NORTH_NEIGHBOR_OF_STRING(NORTH(pos), ally2, color))
+	fast_liberties++;
+      if (LIBERTY(EAST(pos))
+	  && !NON_EAST_NEIGHBOR_OF_STRING(EAST(pos), ally1, color)
+	  && !NON_EAST_NEIGHBOR_OF_STRING(EAST(pos), ally2, color))
+	fast_liberties++;
+
+      fast_liberties += string[ally1].liberties + string[ally2].liberties
+	- count_common_libs(string[ally1].origin, string[ally2].origin) - 1;
+    }
+  }
+  /* We are to take captures into account. This case is much more rare, so
+   * it is not optimized much.
+   */
+  else {
+    int k;
+
+    for (k = 0; k < 4; k++) {
+      int neighbor = pos + delta[k];
+
+      if (LIBERTY(neighbor)
+	  && (ally1 < 0 || !NEIGHBOR_OF_STRING(neighbor, ally1, color))
+	  && (ally2 < 0 || !NEIGHBOR_OF_STRING(neighbor, ally2, color)))
+	fast_liberties++;
+      else if (board[neighbor] == OTHER_COLOR(color)	/* A capture */
+	       && LIBERTIES(neighbor) == 1) {
+	int neighbor_size = COUNTSTONES(neighbor);
+
+	if (neighbor_size == 1 || (neighbor_size == 2 && ally1 < 0))
+	  fast_liberties++;
+	else
+	  return -1;
+      }
+    }
+
+    if (ally1 >= 0) {
+      fast_liberties += string[ally1].liberties - 1;
+      if (ally2 >= 0)
+	fast_liberties += string[ally2].liberties
+	  - count_common_libs(string[ally1].origin, string[ally2].origin);
+    }
+  }
+
+  return fast_liberties;
+}
+
+
+/* Enable this to check that the newer implementation above gives
+ * correct answers (using the older implementation). Don't forget to
+ * rename the newer implementation to `fastlib_new'.
+ */
+#if 0
+static int
+fastlib_old(int pos, int color, int ignore_capture)
 {
   int k;
   int ally1 = NO_MOVE;
@@ -2085,6 +2269,18 @@ fastlib(int pos, int color, int ignore_capture)
   
   return fast_liberties;
 }
+
+
+int fastlib(int pos, int color, int ignore_captures)
+{
+  int liberties1 = fastlib_old(pos, color, ignore_captures);
+  int liberties2 = fastlib_new(pos, color, ignore_captures);
+
+  ASSERT1(liberties1 == liberties2, pos);
+
+  return liberties1;
+}
+#endif
 
 /* Find the liberties a stone of the given color would get if played
  * at (pos), ignoring possible captures of opponent stones. (pos)
@@ -2520,7 +2716,7 @@ count_common_libs(int str1, int str2)
     liberties2 = string[n].liberties;
     
     if (liberties2 <= MAX_LIBERTIES) {
-      /* Speed optimization: neighbor_of_string is quite expensive */
+      /* Speed optimization: NEIGHBOR_OF_STRING is quite expensive */
       liberty_mark++;
       
       for (k = 0; k < liberties1; k++)
@@ -2540,7 +2736,7 @@ count_common_libs(int str1, int str2)
   }
   
   for (k = 0; k < liberties1; k++)
-    if (neighbor_of_string(libs1[k], str2))
+    if (NEIGHBOR_OF_STRING(libs1[k], string_number[str2], board[str2]))
       commonlibs++;
   
   return commonlibs;
@@ -2588,7 +2784,7 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
     liberties2 = string[n].liberties;
 
     if (liberties2 <= MAX_LIBERTIES) {
-      /* Speed optimization: neighbor_of_string is quite expensive */
+      /* Speed optimization: NEIGHBOR_OF_STRING is quite expensive */
       liberty_mark++;
 
       for (k = 0; k < liberties1; k++)
@@ -2611,7 +2807,7 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
   }
   
   for (k = 0; k < liberties1; k++)
-    if (neighbor_of_string(libs1[k], str2)) {
+    if (NEIGHBOR_OF_STRING(libs1[k], string_number[str2], board[str2])) {
       if (commonlibs < maxlib)
 	libs[commonlibs] = libs1[k];
       commonlibs++;
@@ -2657,7 +2853,7 @@ have_common_lib(int str1, int str2, int *lib)
   }
 
   for (k = 0; k < liberties1; k++) {
-    if (neighbor_of_string(libs1[k], str2)) {
+    if (NEIGHBOR_OF_STRING(libs1[k], string_number[str2], board[str2])) {
       if (lib)
 	*lib = libs1[k];
       return 1;
@@ -3008,7 +3204,7 @@ liberty_of_string(int pos, int str)
   if (IS_STONE(board[pos]))
     return 0;
 
-  return neighbor_of_string(pos, str);
+  return NEIGHBOR_OF_STRING(pos, string_number[str], board[str]);
 }
 
 
@@ -3024,7 +3220,7 @@ second_order_liberty_of_string(int pos, int str)
 
   for (k = 0; k < 4; k++)
     if (board[pos + delta[k]] == EMPTY
-	&& neighbor_of_string(pos + delta[k], str))
+	&& NEIGHBOR_OF_STRING(pos + delta[k], string_number[str], board[str]))
       return 1;
 
   return 0;
@@ -3038,31 +3234,12 @@ second_order_liberty_of_string(int pos, int str)
 int
 neighbor_of_string(int pos, int str)
 {
-  int s;
   int color = board[str];
 
   ASSERT1(IS_STONE(color), str);
   ASSERT_ON_BOARD1(pos);
 
-  s = string_number[str];
-  
-  if (board[SOUTH(pos)] == color
-      && string_number[SOUTH(pos)] == s)
-    return 1;
-
-  if (board[WEST(pos)] == color
-      && string_number[WEST(pos)] == s)
-    return 1;
-
-  if (board[NORTH(pos)] == color
-      && string_number[NORTH(pos)] == s)
-    return 1;
-
-  if (board[EAST(pos)] == color
-      && string_number[EAST(pos)] == s)
-    return 1;
-
-  return 0;
+  return NEIGHBOR_OF_STRING(pos, string_number[str], color);
 }
 
 /*
@@ -3794,7 +3971,8 @@ extend_neighbor_string(int pos, int s)
 {
   int k;
   int liberties_updated = 0;
-  int other = OTHER_COLOR(board[pos]);
+  int color = board[pos];
+  int other = OTHER_COLOR(color);
 
   /* Link in the stone in the cyclic list. */
   int pos2 = string[s].origin;
@@ -3842,9 +4020,7 @@ extend_neighbor_string(int pos, int s)
    */
   if (LIBERTY(SOUTH(pos))) {
     if (!liberties_updated
-	&& !(STRING_AT_VERTEX(SS(pos), s)
-	     || STRING_AT_VERTEX(SW(pos), s)
-	     || STRING_AT_VERTEX(SE(pos), s)))
+	&& !NON_SOUTH_NEIGHBOR_OF_STRING(SOUTH(pos), s, color))
       ADD_LIBERTY(s, SOUTH(pos));
   }
   else if (UNMARKED_COLOR_STRING(SOUTH(pos), other)) {
@@ -3858,9 +4034,7 @@ extend_neighbor_string(int pos, int s)
   
   if (LIBERTY(WEST(pos))) {
     if (!liberties_updated
-	&& !(STRING_AT_VERTEX(WW(pos), s)
-	     || STRING_AT_VERTEX(NW(pos), s)
-	     || STRING_AT_VERTEX(SW(pos), s)))
+	&& !NON_WEST_NEIGHBOR_OF_STRING(WEST(pos), s, color))
       ADD_LIBERTY(s, WEST(pos));
   }
   else if (UNMARKED_COLOR_STRING(WEST(pos), other)) {
@@ -3874,9 +4048,7 @@ extend_neighbor_string(int pos, int s)
   
   if (LIBERTY(NORTH(pos))) {
     if (!liberties_updated
-	&& !(STRING_AT_VERTEX(NN(pos), s)
-	     || STRING_AT_VERTEX(NW(pos), s)
-	     || STRING_AT_VERTEX(NE(pos), s)))
+	&& !NON_NORTH_NEIGHBOR_OF_STRING(NORTH(pos), s, color))
       ADD_LIBERTY(s, NORTH(pos));
   }
   else if (UNMARKED_COLOR_STRING(NORTH(pos), other)) {
@@ -3890,9 +4062,7 @@ extend_neighbor_string(int pos, int s)
   
   if (LIBERTY(EAST(pos))) {
     if (!liberties_updated
-	&& !(STRING_AT_VERTEX(EE(pos), s)
-	     || STRING_AT_VERTEX(NE(pos), s)
-	     || STRING_AT_VERTEX(SE(pos), s)))
+	&& !NON_EAST_NEIGHBOR_OF_STRING(EAST(pos), s, color))
       ADD_LIBERTY(s, EAST(pos));
   }
   else if (UNMARKED_COLOR_STRING(EAST(pos), other)) {
