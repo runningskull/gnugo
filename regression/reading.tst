@@ -601,7 +601,7 @@ loadsgf games/reading31.sgf
 #? [0]
 
 # Irrelevant ataris on boundary strings exhaust the reading depths too early.
-loadsgf games/unsorted_03.sgf 29
+loadsgf games/trevor/trevor_03.sgf 29
 154 attack E4
 #? [1 G4]*
 
