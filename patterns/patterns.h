@@ -284,6 +284,7 @@ int finish_ko_helper(int apos);
 int squeeze_ko_helper(int apos);
 int backfill_helper(int apos, int bpos, int cpos);
 int owl_threatens_attack(int apos, int bpos);
+int connect_and_cut_helper(int Apos, int bpos, int cpos);
 
 
 /* pattern arrays themselves */

@@ -245,6 +245,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"finish_ko_helper",1, "finish_ko_helper(%s)"},
   {"squeeze_ko_helper",1,"squeeze_ko_helper(%s)"},
   {"backfill_helper", 3, "backfill_helper(%s, %s, %s)"},
+  {"connect_and_cut_helper", 3, "connect_and_cut_helper(%s, %s, %s)"},
   {"owl_threatens",   2, "owl_threatens_attack(%s,%s)"},
   {"replace",         2, "add_replacement_move(%s,%s)"},
   {"non_oterritory",  1, "influence_mark_non_territory(%s, color)"},

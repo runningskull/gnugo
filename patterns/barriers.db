@@ -1451,6 +1451,40 @@ Pattern Intrusion43
 ;lib(A)==2 && !attack(A) && !oplay_attack(b,c,d,d)
 
 
+Pattern Intrusion44
+# gf New pattern. (3.1.20)
+
+.XO
+!!o
+
+:8,B,value(30)
+
+cDO
+bae
+
+;safe_omove(a)
+;&& (o_somewhere(e) || oplay_attack(a,e,e))
+;&& !oplay_defend_both(a,b,c,b,D)
+
+
+Pattern Intrusion45
+# gf New pattern. (3.1.20)
+
+X.Oo
+.!X.
+....
+----
+
+:8,B,value(30)
+
+XbOo
+.aC.
+....
+----
+
+;safe_omove(a) && oplay_attack(a,b,C)
+
+
 Pattern Nonterritory1
 
 OxO

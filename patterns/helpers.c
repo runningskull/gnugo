@@ -495,15 +495,9 @@ defend_against_atari_helper(int move, int str)
 
   /* No value if opponent has no safe atari. */
   findlib(str, 2, libs);
-#if 0
-  if (is_self_atari(libs[0], OTHER_COLOR(board[str]))
-      && is_self_atari(libs[1], OTHER_COLOR(board[str])))
-    return;
-#else
   if (!safe_move(libs[0], OTHER_COLOR(board[str]))
       && !safe_move(libs[1], OTHER_COLOR(board[str])))
     return;
-#endif 
   
   TRACE("...reverse followup value %f\n", 2.0 * worm[str].effective_size);
   add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
@@ -629,6 +623,63 @@ owl_threatens_attack(int apos, int bpos)
       return 1;
   
   return 0;
+}
+
+
+/* Returns true if O needs to connect at c in the position below after
+ * O at b and X at d, because X can cut at c. In general d is the
+ * second liberty of A, which must have exactly two liberties.
+ *
+ * |.X   |dX
+ * |XO	 |AO
+ * |XO	 |Ae
+ * |..	 |bc
+ */
+   
+int
+connect_and_cut_helper(int Apos, int bpos, int cpos)
+{
+  int dpos;
+  int epos = NO_MOVE;
+  int other = board[Apos];
+  int color = OTHER_COLOR(other);
+  int libs[2];
+  int liberties = findlib(Apos, 2, libs);
+  int result = 0;
+  int k;
+
+  gg_assert(IS_STONE(color));
+  gg_assert(liberties == 2);
+
+  if (libs[0] == bpos)
+    dpos = libs[1];
+  else
+    dpos = libs[0];
+
+  for (k = 0; k < 4; k++)
+    if (board[cpos + delta[k]] == color
+	&& neighbor_of_string(cpos + delta[k], Apos)) {
+      epos = cpos + delta[k];
+      break;
+    }
+
+  gg_assert(epos != NO_MOVE);
+  
+  if (TRYMOVE(bpos, color)) {
+    if (TRYMOVE(dpos, other)) {
+      if (TRYMOVE(cpos, other)) {
+	if (board[bpos] == EMPTY
+	    || board[epos] == EMPTY
+	    || !defend_both(bpos, epos))
+	  result = 1;
+	popgo();
+      }
+      popgo();
+    }
+    popgo();
+  }
+  
+  return result;
 }
 
 

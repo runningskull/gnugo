@@ -275,34 +275,36 @@ Pattern EE103
 ;proper_eye(a)
 
 
-Pattern EE103b
+# Pattern EE103b
+# # gf Bad pattern, removed. (3.1.20)
+# 
+# ?OX?        max two points if really gote 
+# ?.*.
+# ----
+# 
+# :8,eOX,maxterri(2)
+# 
+# ?OX?
+# ?b*a
+# ----
+# 
+# ;proper_eye(a) && !oplay_attack(*,a,b,a)
 
-?OX?        max two points if really gote 
-?.*.
-----
 
-:8,eOX,maxterri(2)
-
-?OX?
-?b*a
-----
-
-;proper_eye(a) && !oplay_attack(*,a,b,a)
-
-
-Pattern EE103c
-
-?OX?        max one point if really gote 
-O.*.
-----
-
-:8,eOX,maxterri(1)
-
-?OX?
-?b*a
-----
-
-;proper_eye(a) && !oplay_attack(*,a,b,a) && !oplay_attack(*,a,a)
+# Pattern EE103c
+# # gf Bad pattern, removed. (3.1.20)
+# 
+# ?OX?        max one point if really gote 
+# O.*.
+# ----
+# 
+# :8,eOX,maxterri(1)
+# 
+# ?OX?
+# ?b*a
+# ----
+# 
+# ;proper_eye(a) && !oplay_attack(*,a,b,a) && !oplay_attack(*,a,a)
 
 
 Pattern EE104
@@ -1480,20 +1482,17 @@ O.X
 
 
 Pattern CF1
-# This pattern is too general. One example is this position.
-#    OXX
-#    *.X
-#    XXX
+# gf Revised pattern. (3.1.20)
 
-?X	Threaten to destroy another point.
-*.
-?X
+?X?	Threaten to destroy another point.
+*..
+?X?
 
 :-,X,followup(1)
 
-?X
-*a
-?X
+?X?
+*a.
+?X?
 
 ;proper_eye(a)
 

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function connect_and_cut_helper() in helpers.c
 - least significant bit of move reason now denotes a threat
 - bugfix in add_attack_either_move
 - new move reason: EITHER_MOVE
