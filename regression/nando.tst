@@ -60,9 +60,10 @@ loadsgf games/nando/auto009.sgf
 #? [1 (S2|T2|S1)]*
 
 #CATEGORY=OWL/OPTICS
+# Note that K12 connects out (sacrificing L11 if necessary)
 loadsgf games/nando/auto010.sgf
-12 owl_defend L17
-#? [1 (K19|L18|K18|H19)]*
+12 owl_attack L17
+#? [0]*
 
 #CATEGORY=OWL/OPTICS
 # (If white B2 in reply to B1, Black A1 kills cleanly. /ab)
@@ -81,13 +82,6 @@ loadsgf games/nando/auto012.sgf 90
 loadsgf games/nando/auto012.sgf 92
 15 gg_genmove white
 #? [P7]*
-
-# Either the reverse followup or the constraint of EE106 is
-# wrong IMHO
-#CATEGORY=ENDGAME
-loadsgf games/nando/auto012.sgf 112
-16 gg_genmove white
-#? [!D1]*
 
 # D5 is just stupid
 # (but A5 doesn't work. /ab)
