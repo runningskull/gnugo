@@ -810,6 +810,11 @@ loadsgf games/incident108b.sgf 292
 194 attack L16
 #? [0]*
 
+# See also semeai:58.
+loadsgf games/test4lose.sgf
+195 defend H6
+#? [1 J4]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -286,6 +286,7 @@ loadsgf games/test4win.sgf
 57 analyze_semeai C5 H6
 #? [1 1 J4]
 
+# See also reading:195.
 loadsgf games/test4lose.sgf
 58 analyze_semeai F5 H6
 #? [0 0 PASS]*

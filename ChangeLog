@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- defend4() and special_rescue_moves() revised
 - avoid ko captures when filling outer liberties in semeai reading
 - adjust breakin_depth in modify_depth_values()
 - owl tuning

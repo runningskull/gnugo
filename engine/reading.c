@@ -1774,6 +1774,15 @@ defend4(int str, int *move, int komaster, int kom_pos)
   order_moves(str, &moves, color, read_function_name, *move);
   DEFEND_TRY_MOVES(1, &suggest_move);
 
+  if (stackp <= depth) {
+    for (k = 0; k < liberties; k++)
+      special_rescue_moves(str, libs[k], &moves);
+    bamboo_rescue_moves(str, liberties, libs, &moves);
+  }
+
+  order_moves(str, &moves, color, read_function_name, *move);
+  DEFEND_TRY_MOVES(1, &suggest_move);
+
   RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
@@ -1815,6 +1824,31 @@ special_rescue_moves(int str, int lib, struct reading_moves *moves)
       /* Don't play into a self atari. */
       if (is_self_atari(lib + d, color))
 	continue;
+
+      /* Be more demanding when the string has four liberties. (Mostly
+       * because attack4() otherwise would need more move generators.)
+       * More precisely we require not only the first order liberty to
+       * become a self atari for the opponent but also one more of the
+       * neighbors of the proposed move. See reading:144 for a
+       * position where we otherwise would try to defend at D9 and
+       * attack4() then lacks move generators to stop black from
+       * continuing towards the top left corner.
+       */
+      if (countlib(str) > 3) {
+	int r;
+	int number_protected = 0;
+	
+	for (r = 0; r < 4; r++) {
+	  if (board[lib + d + delta[r]] == EMPTY
+	      && approxlib(lib + d + delta[r], other, 3, NULL) < 3)
+	    number_protected++;
+	  if (number_protected == 2)
+	    break;
+	}
+
+	if (number_protected < 2)
+	  continue;
+      }
       
       ADD_CANDIDATE_MOVE(lib + d, 0, *moves, "special_rescue");
     }
