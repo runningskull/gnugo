@@ -872,14 +872,10 @@ blunder_size(int move, int color, int *defense_point,
 
   /* We start by checking whether we have accidentally killed an own
    * dragon.
-   *
-   * FIXME: The liberties check isn't appropriate since the move may
-   * reduce own eyespace regardless of the number of outer liberties.
    */
-  if (liberties <= 4)
-    trouble = detect_owl_blunder(move, color, defense_point,
-				 safe_stones, liberties,
-				 &return_value, save_verbose);
+  trouble = detect_owl_blunder(move, color, defense_point,
+			       safe_stones, liberties,
+			       &return_value, save_verbose);
   
 
   /* Next we see whether the move has caused tactical complications.
@@ -928,27 +924,51 @@ detect_owl_blunder(int move, int color, int *defense_point,
   int ii;
   int trouble = 0;
   int current_verbose = verbose;
+  int dragon_analyzed[4] = {0, 0, 0, 0};
   
   for (k = 0; k < 4; k++) {
     int bpos = move + delta[k];
-    if (board[bpos] == color
-	&& liberties <= worm[bpos].liberties) {
+    int j;
+    /* We get worried if there is a liberty problem (and in this case
+     * there might also be tactical trouble), or if we play inside
+     * our eye space and the dragon is only just alive.
+     */
+    if (board[bpos] != color)
+      continue;
+    if (liberties <= worm[bpos].liberties
+	&& liberties <= 4)
       trouble = 1;
-      if ((dragon[bpos].status == ALIVE
-	   || (safe_stones 
-	       && safe_stones[bpos]))
-	  && DRAGON2(bpos).safety != INVINCIBLE
-	  && DRAGON2(bpos).safety != STRONGLY_ALIVE
-	  && !owl_confirm_safety(move, bpos, defense_point)) {
-	verbose = save_verbose;
-	TRACE("Dragon at %1m becomes attackable.\n", bpos);
-	verbose = current_verbose;
-	*return_value += 2.0 * dragon[bpos].effective_size;
-	if (safe_stones)
-	  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-	    if (ON_BOARD(ii) && dragon[ii].origin == dragon[bpos].origin)
-	      safe_stones[ii] = 0;
-      }
+    else
+      if (min_eyes(&(DRAGON2(bpos).genus)) > 2
+	  || !is_proper_eye_space(move))
+	continue;
+
+    /* Don't test the same dragon twice. */
+    for (j = 0; j < k; j++)
+      if (dragon_analyzed[j] == dragon[bpos].origin)
+	break;
+    if (j < k)
+      continue;
+    dragon_analyzed[k] = dragon[bpos].origin;
+
+    /* Don't reanalyze if (move) is an owl defense for (bpos). */
+    if (safe_stones && safe_stones[bpos] == OWL_SAVED_STONE)
+      continue;
+
+    if ((dragon[bpos].status == ALIVE
+	 || (safe_stones 
+	     && safe_stones[bpos]))
+	&& DRAGON2(bpos).safety != INVINCIBLE
+	&& DRAGON2(bpos).safety != STRONGLY_ALIVE
+	&& !owl_confirm_safety(move, bpos, defense_point)) {
+      verbose = save_verbose;
+      TRACE("Dragon at %1m becomes attackable.\n", bpos);
+      verbose = current_verbose;
+      *return_value += 2.0 * dragon[bpos].effective_size;
+      if (safe_stones)
+	for (ii = first_worm_in_dragon(bpos); ii != NO_MOVE; 
+	     ii = next_worm_in_dragon(ii))
+	  mark_string(ii, safe_stones, 0);
     }
   }
 

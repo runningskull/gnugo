@@ -1549,16 +1549,19 @@ mark_safe_stones(int color, int move_pos, const char saved_dragons[BOARDMAX],
 	      && worm[pos].defend_codes[0] == 0))
 	safe_stones[pos] = 0;
       else
-	safe_stones[pos] = 1;
+	safe_stones[pos] = SAFE_STONE;
     }
     else if (board[pos] == color) {
-      if (dragon[pos].status == DEAD
-	  || (dragon[pos].status == CRITICAL && !saved_dragons[pos])
-	  || (worm[pos].attack_codes[0] != 0
-	      && (worm[pos].defend_codes[0] == 0 || !saved_worms[pos])))
+      if ((worm[pos].attack_codes[0] != 0
+	   && (worm[pos].defend_codes[0] == 0 || !saved_worms[pos]))
+	  || dragon[pos].status == DEAD)
+	safe_stones[pos] = 0;
+      else if (saved_dragons[pos])
+	safe_stones[pos] = OWL_SAVED_STONE;
+      else if (dragon[pos].status == CRITICAL)
 	safe_stones[pos] = 0;
       else
-	safe_stones[pos] = 1;
+	safe_stones[pos] = SAFE_STONE;
     }
     else
       safe_stones[pos] = 0;

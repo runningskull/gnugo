@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- mark_safe_stones() distinguishes between SAFE_STONE and OWL_SAVED_STONE
+- detect_owl_blunder() calls owl_confirm_safety() if move may have
+  reduced own eye space
 - bugfix and speedups in accumulate_influence()
 - bugfix in value_territory()
 - comment play_connect_n()

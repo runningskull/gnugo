@@ -531,6 +531,13 @@ int somewhere(int color, int num_moves, ...);
 #define INFLUENCE_SAVED_STONE     1
 #define INFLUENCE_CAPTURED_STONE  2
 
+/* These values are used to communicate the status of stones when analyzing
+ * a move for potentially being a blunder.
+ */
+/* 	dead		0 */
+#define SAFE_STONE 	1
+#define OWL_SAVED_STONE	2
+
 /* This format is used when exporting the moyo segmentation. */
 #define MAX_MOYOS MAX_BOARD*MAX_BOARD
 
