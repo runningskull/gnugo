@@ -1,0 +1,189 @@
+
+Some remarks concerning the files collected:
+
+seki1.sgf
+
+The "classical" seki. gnugo plays correctly, but the score is wrong.
+
+seki2.sgf
+
+Each side has an eye
+
+seki3.sgf
+
+Another one.
+
+seki_stupid.sgf
+
+Here i wanted to see, if gnugo plays the stupid move C 1. Well it doesnt.
+But maybe it is good to keep the file, just to make sure that future
+"improvements" dont spoil it.
+
+sekichallenge.sgf
+
+Thats what it is. gnugo makes mistakes and loses everything. But i get
+the impression that the reading depth is just a little bit too short.
+
+seki_score.sgf
+
+a seki. unless i counted it wrongly, assuming an equal number of
+prisoners
+the japanese rules give:
+
+territory b 96  w 97
+prisoners b  0  w  0
+seki      b  0  w  0
+
+the chinese rules give:
+
+territory b 96  w 97
+stones    b 79  w 79
+seki      b 8.5 w 1.5
+
+so there is a difference of 7 points, depending on which rules you take.
+
+twoko_seki1.sgf
+
+A double ko seki. with the present program and playing japanese rules
+the eternal loop can only be avoided, if both players have enough
+intelligence to see that it is impossible to win. i said already
+before that i think that the program is wrong. that is after two
+passes, i thought the game is finished, but do_pass allows gnugo
+to play another move, so the loop continues. if we change do_pass,
+it would be good enough to have one intelligent player to avoid
+the loop. Since we know nothing about the intelligence of our
+opponent, the intelligent player would have to be gnugo.
+So if we stick to japanese rules, this needs a detailed analysis
+of the situation.
+In principle the japanese rules define in their precedents
+that this position is seki, should gnugo know the precedents ?
+chinese rules avoid the loop and give the interesting result, that
+whoever insists on playing, loses everything. maybe not everybody
+knows that already by heart, so it goes like this:
+
+w takes ko 1
+b takes ko 2
+w tenuki
+b takes ko 1
+w takes ko 2
+b tenuki
+
+finally there will be no playable point left on the board.
+lets assume that b has played the last possible move.
+then if w insists:
+
+w takes ko 1
+b takes ko 2
+w passes
+b takes ko 1
+
+now w would like to take ko 2, but that is forbidden, because it
+reproduces a position, which has already existed before.
+so
+
+w passes
+b takes all.
+
+If there is another ko somewhere else on the board, then this
+double ko would be an example of what Ing calls a disturbing ko.
+
+
+twoko_seki2.sgf
+
+Another double ko seki. twoko_seki1 has two groups with an eye each,
+this one has one liberty common to both groups.
+
+twoko_live.sgf
+
+B is alive.
+
+
+twoko_dead.sgf
+
+W is dead.
+
+
+fourko.sgf
+
+A quadruple ko. I have never heard about that, but i guess the
+japanese will have to cancel the game. with chinese rules one
+can play it of course, but it is rather tricky.
+
+onadare_ko.sgf
+
+The double ko variation of the onadare joseki.
+
+onadare_ko2.sgf
+
+Here i have added a ko in the lower right corner. This is completely
+different from twoko_seki1.sgf plus another ko. here the black group
+in the double ko is alive. however white has an unlimited supply
+of ko threats, so it will win any other ko. If i understand this
+correctly, the japanese do not consider this to be a triple ko
+I thought that Ing should call the double ko a "fighting ko",
+but apparently he doesnt. So the Ing rules would have to treat
+the two cases twoko_seki1.sgf plus another ko and the present one
+the same way.
+gnugo does not know how to handle this.
+
+bent4.sgf
+
+gnugo handles this correctly. when i said maybe for the wrong reasons
+Gunnar said, what do i mean. well first one should look, if it does
+all possible variations correctly. But what i really was afraid of, was
+maybe it treats it the same way it handles seki. only for seki it is
+wrong and here it is right. anyway, whenever the seki has been fixed, 
+one should look, if this is still ok.
+
+bent4_2.sgf
+
+Another one. This one is also handled correctly.
+
+
+seki_bent4.sgf
+
+The combination of a bent4 with a seki, which gives an unremovable
+ko threat. The japanese rules kill the bent4 anyway. gnugo has
+various difficulties.
+
+
+doublebent4.sgf
+
+I guess the japanese rules say that both groups are dead ???
+Apart from that gnugo handles it correctly.
+
+threeko1.sgf
+
+The "classical" triple ko. i guess, if we play japanese rules,
+gnugo should realise that the game should be cancelled.
+Playing chinese rules one can usually neutralise two ko's
+and then play the one which is remaining as before.
+
+threeko2.sgf
+
+This is a fake. white can never win this.
+
+threeko3.sgf
+
+Similar to threeko2.sgf, with a slight difference. If it is
+white's turn it can play B 5 and then it becomes a double ko
+which black cannot win.
+If it is black's turn, the japanese will cancel the game and
+for the chinese white can never win.
+
+chosei.sgf
+
+A chosei( long life / eternal life ).
+Apart from the fact that the game should be cancelled,
+gnugo makes a lot of mistakes and loses everything.
+It seems everybody who writes about that, shows the same diagram.
+Maybe this is the only one ?
+If people think that this is interesting, I would have to do
+some work.
+
+junkan-ko.sgf
+
+A junkan-ko (round robin ko). Everything I wrote about chosei
+is valid here as well. i thought a little about these positions,
+but i dont want to bore everybody, unless somebody really wants
+to hear about it.

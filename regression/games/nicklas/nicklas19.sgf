@@ -1,0 +1,23 @@
+(;GM[1]FF[3]
+RU[Japanese]SZ[9]HA[2]KM[0.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2000-10-19]
+SY[Cgoban 1.9.10]TM[-]AB[gc][cg]
+RE[W+32.5]
+;W[ee];B[cd];W[ge];B[ed];W[fd];B[fg];W[ec];B[fb];W[dd];B[hd];W[he];
+B[cc];W[eb];B[hb];W[df];B[ce];W[cf];B[dg];W[bf];B[db];W[ea];B[bb];
+W[da];B[ca];W[dc];B[bd];W[ac];B[cb];W[ab];B[aa];W[be];B[ad];W[ba];
+B[bg];W[aa];B[ff];W[fe];B[ie];W[if];B[id];W[hg];B[gh];W[hh];B[hi];
+W[ih];B[hf];W[gf];B[ef];W[de];B[bc];W[ab];B[ag];W[aa];B[af];W[ae];
+B[fa];W[fc];B[gg];W[gd];B[ga];W[ib];B[hc];W[ha];B[ia];W[eh];B[dh];
+W[ha];B[ei];W[gb];B[gi];W[ii];B[tt];W[tt];
+TW[ba][ca][fa][ga][ia][bb][cb][db][fb][hb][ac][bc][cc][gc][hc][ic][ad][bd][cd][ed][hd][id][ce][ie][hf][ig]
+TB[eg][ah][bh][ch][eh][fh][ai][bi][ci][di][fi]
+C[The game is over.  Final score:
+   White = 26 territory + 23 captures + 0.5 komi = 49.5
+   Black = 11 territory + 6 captures = 17
+White wins by 32.5.
+]
+)

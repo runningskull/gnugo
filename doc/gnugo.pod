@@ -1,0 +1,416 @@
+
+=head1 NAME
+
+gnugo - The GNU program to play the game of Go
+
+=head1 SYNOPSIS
+
+B<gnugo>
+[B<--boardsize <num>>]
+[B<--color <color>>]
+[B<--handicap <num>>]
+[B<--komi <num>>]
+[B<-p, --playstyle <style>>]
+[B<--quiet>]
+[B<-v, --version>]
+[B<-h, --help>]
+[B<--help analyze>]
+[B<--help debug>]
+[B<--help playstyle>]
+[B<--copyright>]
+[B<--mode <mode>>]
+[B<--replay <color>>]
+[B<-l, --infile <filename>>]
+[B<-L, --until <move>>]
+[B<-o, --outfile <filename>>]
+[B<--printsgf <filename>>]
+[B<-D, --depth <num>>]
+[B<-B, --backfill_depth <num>>]
+[B<--score [end|last|move]> ]
+[B<-a, --allpats>]
+[B<-T, --printboard>]
+[B<-d, --debug <level>>]
+[B<-H, --hash <level>>]
+[B<-w, --worms>]
+[B<-m, --moyo <level>>]
+[B<-b, --benchmark num>]
+[B<-s, --stack>]
+[B<-S, --statistics>]
+[B<-t, --trace>]
+[B<-r, --seed num>]
+[B<--decidestring <string>>]
+[B<--analyzerfile <filename>>]
+[B<--analyze <options>>]
+
+=head1 DESCRIPTION
+
+GNU Go plays a game of Go against the user. It has many other features: it 
+can play against itself or another program, analyse and score a recorded 
+game. GNU Go is compliant with Go modem protocol, load and save game in
+the Smart Go format. 
+
+GNU Go default is a simple alpha-numeric board display, but you can use
+a client such as B<CGoban>.
+
+The game of Go Go is a game of strategy between two players usually played on a
+19x19 grid called B<goban>. The two players put black and white B<stones> on
+the goban to enclose B<territory>. Go was invented about 4000 years ago in
+ancient China, other names for this game are (Chinese) B<Wei Chi>, (Korean)
+B<Baduk> and (Ing) B<Goe>.
+
+=head2 Playing a game in ASCII mode
+
+To start a game with default options, just invoke "gnugo". The board will be
+drawn at your terminal using ASCII letters.  In this mode, you can get help on
+available commands by the B<h> key.  To play as Black with 4 stones handicap,
+with a 0.5 komi, recording the game in the file record.sgf:
+
+ gnugo --color black --handicap 4 --komi 0.5 -o record.sgf
+
+=head2 Playing a game with CGoban
+
+CGoban is a general purpose client program by Bill Shubert for
+playing Go. It runs under X-Windows with a beautiful resizeable
+graphic display. To use GNU Go under X-windows, obtain the most recent 
+version of CGoban from Bill Shubert's web site
+
+L<http://www.inetarena.com/~wms/comp/cgoban/>
+
+Start CGoban. When the CGoban Control panel comes up, select `Go Modem.'
+You will get the Go Modem Protocol Setup. Choose one (or both) of the
+playsers to be ``Program,'' and fill out the box to the path to
+gnugo. After clicking OK, you get the Game Setup window. Choose
+``Rules Set'' to be Japanese (otherwise handicaps won't work). Set the
+board size and handicap if you want. Click OK and you are ready to go.
+
+In the Go Modem Protocol Setup window, when you specify the path
+to GNU Go, you can give it command line options, such as --quiet
+to suppress most messages. Since the Go Modem Protocol preempts
+standard I/O other messages are sent to stderr, even if they are
+not error messages. These will appear in the terminal from which
+you started CGoban. 
+
+=head2 Scoring system
+
+The game stops when both players pass. GNU Go will attempt to
+compute and report the score to you. It may occasionally make
+mistakes due to wrong evaluation of the status of a group. You
+can check the score as follows. In ASCII mode, at the end of
+the game, stones believed dead are marked in lower case letters,
+and you have the option of toggling their status before counting.
+Using CGoban, you may use CGoban's counting facility to count
+the game using either Japanese or Chinese rules.
+
+=head2 Viewing a stored game
+
+gnugo B<-l> filename.sgf --mode ascii
+
+loads filename.sgf and lets you navigate through the game by using the
+commands I<forward>, I<back>, I<goto> and I<last>.
+It is not possible to navigate through variations in ascii mode.
+You may also use CGoban to view stored games. CGoban can navigate
+variations.
+
+=head2 Documentation
+
+The files in the gnugo-3.0/doc directory contain detailed documentation about
+debugging options and internal program structure. Other documentation may
+be found in comments throughout the source code.
+
+=head2 Go Modem Protocol
+
+The Go Modem Protocol is a standard interface between Go programs and
+graphical display. 
+
+The Go Modem Protocol was developed by Bruce Wilcox with input from
+David Fotland, Anders Kierulf and others. Any Go program *should*
+use this protocol since it is standard. Since CGoban supports this
+protocol, the user interface for any Go program can be done
+entirely through CGoban. Using the Go Modem Protocol, you can play
+with another computer running a different program (even on a
+different operating system) using a modem, a serial cable or over
+the internet if the other program also supports the protocol. You
+can also communicate with the Go servers using CGoban.
+
+=head2 Smart Go Format
+
+Games (with comments, variations and other features) can be
+stored in the Smart Go Format (SGF). This format originated in
+Anders Kierulf's program Smart Go. Martin Muller and Arno
+Hollosi developed the current standard, which may be found
+at 
+
+L<http://www.sbox.tu-graz.ac.at/home/h/hollosi/sgf/>
+
+GNU Go supports the Smart Go Format.
+
+=head1 OPTIONS
+
+=head2 Main options
+
+B<--mode I<mode>>
+
+force the playing mode (I<ascii'>, I<gtp> or I<gmp>). Default is 
+ASCII. If no terminal is detected GMP (Go Modem Protocol) will be assumed.
+
+B<--replay I<color>>
+
+replay the game generating moves for color, where color is I<white>,
+I<black>, or I<both>. (requires B<-l>)
+
+B<--quiet>
+
+Don't print copyright and other informational messages.
+
+B<-l, --infile I<file>>
+
+Load the SGF file (to score or analyze a recorded game).
+
+B<-L, --until I<move>>
+
+Stop loading just before I<move> is played (eg L10).
+
+B<-o, --outfile I<file>>
+
+Save the played game to I<file> in SGF format.
+
+=head2 Game Options: 
+
+B<--boardsize I<num>>
+
+Set the board size to use (3-21). Default is 19, other common formats are
+13 and 9.
+
+B<--color I<color>>
+
+Choose your color (I<black> or I<white>). Black plays first, White gets
+the komi compensation.
+
+B<--handicap I<num>>
+
+Set the number of handicap stones.
+
+B<--komi I<num>>
+
+Set the komi (points given to white player to compensate advantage of the 
+first move, usually 5.5 or 0.5). Default is 5.5.
+
+=head2 Informative Output:
+
+B<-v, --version>
+
+Display the version of GNU Go. 
+
+B<-h, --help>
+
+Display help message.
+
+B<--help analyze>
+
+Display help about analyzer options.
+
+B<--help debug>
+
+Display help about debugging options. 
+
+B<--help playstyle>
+
+Display help about playstyle options. 
+
+B<--copyright>
+
+Display copyright notice.
+
+=head2 Debugging and advanced options:
+
+B<-a, --allpats>
+
+Try all patterns, even those valued less than the best move
+found so far. This causes GNU Go to run more slowly with no
+improvement in strength but is useful for developers.
+
+B<-T, --printboard>
+
+Show board each move.
+
+B<-d, --debug I<level>>
+
+Debugging output (see liberty.h for bits).
+
+B<-D, --depth I<num>>
+
+Deep reading cutoff (default 14; higher=stronger, slower).
+
+B<-B, --backfill_depth I<num>>
+
+Deep reading cutoff (default 8; higher=stronger, slower).
+
+B<-H, --hash I<level>>
+
+Hash (see liberty.h for bits). 
+
+B<-w, --worms>
+
+Worm debugging.
+
+B<-m, --moyo I<level>>
+
+Moyo debugging, show moyo board. The parameter is an integer,
+which can be a sum of the following possibilities (e.g. B<-m> 9
+to get territory evaluation+delta_moyo values). See docs/MOYO
+for definitions. Use color rxvt window or linux console for 
+color diagrams.
+
+    1 = territory (5/21 algorithm)
+    2 = table of delta_terri values
+    4 = moyo evaluation (5/10 algorithm)
+    8 = table of delta_moyo values
+   16 = area (4/0 algorithm)
+   32 = list of area characteristics
+   64 = table of meta_connect values
+  128 = trace -p fearless option 
+
+B<-b, --benchmark I<num>>
+
+Benchmarking mode - can be used with B<-l>.
+
+B<-s, --stack>
+
+Stack trace (for debugging purposes).
+
+B<-S, --statistics>
+
+Print statistics (for debugging purposes).
+
+B<-t, --trace>
+
+Verbose tracing (use twice or more to trace reading).
+
+B<-r, --seed I<num>>
+
+Set random number seed.
+
+B<--decidestring I<string>>
+
+I<string> is the coordinate of one stone in the string.
+Determine whether the string can be captured, and if so,
+whether it can be defended. Use with B<-t> or B<-o>. See docs/READING
+for suggestions about using --decidestring.
+
+B<--score [I<end|last|move>]>
+
+Count or estimate territory of the input file. Usage:
+
+B<gnugo --score last -l filename>
+
+Loads the SGF file and estimates the winner after the last stored move by
+measuring the influence.
+
+B<gnugo --score end -l filename>
+
+Loads the SGF file and gnugo continues to play after the last stored move by
+itself up to the very end. Then the winner is determined by counting the
+territory.
+
+B<gnugo --score L10 -l filename>
+
+Loads the SGF file until a stone is placed on L10. Now the winner will be
+estimated as with gnugo --score last.
+
+B<gnugo --score 100 -l filename>
+
+Loads the SGF file until move number 100. Now the winner will be estimated as
+with gnugo B<--score last>.
+
+If the option B<-o outputfilename> is provided, 
+the results will also be written as comment at the end of the output file.
+
+If the option B<--analyzerfile outputfilename> is provided, the results
+will be written as comment at the end of the output file, the result property
+will be set and the territory will be marked.
+
+B<--printsgf I<outfile>>
+
+Load SGF file, output final position (requires B<-l>).
+
+B<--analyzerfile I<name>>
+
+Filenname for analyzer output.
+
+B<--analyze I<options>>
+
+Analyze a game stored as sgf file by using --testmode. Game tree variations
+are will be ignored. This option may also be used with --score or --benchmark.
+The analyze functions will be executed on every move in --benchmark
+and --testmode game.
+
+Analyzed board states on other modes:
+
+B<--score end:>
+
+gnugo analyzes every move it makes at the end of the file until the game is
+finished.
+
+B<--score last:>
+
+board state at the end of the file will be analyzed
+
+B<--score <movenum>:>
+
+board state just before <movenum> will be analyzed
+
+B<--score <position>:>
+
+board state just before <position> is occupied will be analyzed
+
+B<--testmode annotation:>
+
+board state just before the annotated node is reached will be analyzed.
+
+The results of the analyze functions are written to the filename provided by
+--analyzerfilename.
+
+
+Current options are :
+
+ areacolor     show color of influence 
+ capture       show capturing moves
+ considered    show considered moves
+ defense       show defending moves
+ dragoninfo    print info about all dragons
+ dragonstatus  show dragonstatus the dragons are are marked on
+               the board with the status: aLive, Dead, Critial, Unknown
+ eyeinfo       print info about all eyes
+ eyes          show eyes and their vital points
+ moyocolor     show color of moyos
+ moyovalue     show moyo values 
+ overwrite     overwrites game info from the inputfile
+ recommended   show moves recommend by modules show moves recommended
+               by the various modules:
+
+ A = attacker
+ B = very big move
+ D = defender
+ E = eyefinder
+ F = fuseki
+ L = liberty filling
+ P = pattern
+ p = reconsidered pattern
+ S = semeai
+
+ terricolor    show color of territories (moyo)
+ territory     show territory (worms)
+ terrivalue    show territory values (moyo)
+ worminfo      print info about all worms
+ wormliberties show liberties of the worm
+
+You may use "option1 option2 ..." or option1,option2,... to specifiy more than
+one option for --analyze. The analyzer functions will work in all playing
+modes except ASCII and GMP. Testmode GAME does not test variations when
+invoked with --analyze.
+
+=head1 BUGS
+
+If you find a bug, please send the SGF output file to gnugo@gnu.org
+
+=cut

@@ -1,0 +1,1368 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999, 2000, 2001 by the Free Software Foundation.   #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  The Endgame Pattern Database.
+#
+#  Further documentation may be found in the Texinfo documentation.
+#
+#  First there is a pattern title of the form: Pattern [string]. The
+#  string is used for identifying the pattern while tuning or debugging.
+#
+#  Then a block of the following characters representing the pattern
+#  itself.
+#  
+#  ?     : don't care
+#  .     : empty
+#  X     : your piece,
+#  O     : my piece,
+#  x     : your piece or empty
+#  o     : my piece or empty
+#  *     : my next move
+#  -, |  : edge of board
+#  +     : corner of board
+#
+#  If a pattern must not match at the edge of the board,
+#  an extra row of ?'s in the pattern may be added. (This
+#  will not add to the time taken to check the pattern.)
+#
+#################
+#
+#  After the pattern, some supplementary information in the format:
+#
+# :trfno, classification, [values], helper_function
+#   
+#  These and other aspects of the pattern database are documented
+#  in the Texinfo documentation. 
+#
+#################
+#
+#  Any line beginning with #, or any part of a line following
+#  whitespace is a comment. 
+#
+#  The patterns are classified into a number of different categories:
+#  
+#  EE    edge endgame
+#  EF    edge followups
+#  CE    center endgame
+#  CF    center followups
+#  EY    eye stealing/saving endgame
+#
+#  The patterns are grouped in the file by category. New patterns
+#  should be added close to a similar pattern or at the end of the
+#  category where it belongs. When a new pattern is added, the names
+#  of later patterns in the category should usually not be changed.
+#  This can be accomplished by introducing names like CC35b and so on.
+#
+
+
+######################################################################
+#
+# Edge endgame patterns
+#
+# These patterns need to be revised.
+#
+# Moves along the edge with small weights, intended to come into play
+# in the endgame.
+#
+# These patterns are further subdivided into the following classes
+#
+# first line descents (except in corner)
+# first line hanes (except in corner)
+# first line pushes (except in corner)
+# first line blocks (except in corner)
+# first line corner moves
+# miscellaneous first line moves
+# second line descents
+# second line hanes
+# second line extensions
+# second line clamps
+# miscellaneous second line moves
+# third line moves
+#
+######################################################################
+
+# first line descents (except in corner)
+########################################
+
+Pattern EE1
+
+?OOx      block on edge
+..*x      1 point gote
+----
+
+:8,bOX,terri(1)
+
+?ddx
+cbax
+----
+
+;marginal_eye(a) && proper_eye(b) && proper_eye(c) && !xplay_attack(a,d)
+
+
+Pattern EE2
+
+OXXx
+xOOX      Start by backfilling
+*..x      At least 1 point gote
+----
+
+:8,OX,terri(1)
+
+OXXx
+xbbX
+*.a.
+----
+
+;xplay_attack(a,b)
+
+
+Pattern EE2b
+
+OXXx
+*OOX      Start by backfilling
+...x      At least 1 point gote
+----
+
+:8,OX,terri(1)
+
+OXXx
+*ddX
+cbax
+----
+
+;marginal_eye(a) && proper_eye(b) && proper_eye(c) && xplay_attack(a,d)
+
+
+Pattern EE2c
+
+OXX?     Start by backfilling if block is unsafe
+*OO?     At least 1 point gote
+...?
+----
+
+:8,OX,terri(1)
+
+OXX?
+*OOb
+..ac
+----
+
+;x_somewhere(b,c) && oplay_attack(a,a) && !oplay_attack(*,?,a,a)
+
+
+Pattern EE4
+
+XOO.
+.X*.            one point sente
+----
+
+:8,bOX,terri(1),followup(1)
+
+XOO.
+.Xa.
+----
+
+;marginal_eye(a)
+
+
+Pattern EE5
+
+XO?       descend to edge
+.*?       may quite possibly be 0 points gote
+---
+
+:8,bOX,terri(0.1)
+
+
+Pattern EE6
+
+.OOOXX
+...*..
+------
+
+:8,OXb,terri(2)
+
+.OOOXX
+..a*bc
+------
+
+; proper_eye(a) && !oplay_attack(*,*) && oplay_attack(b,*,a,c,*,a)
+; && xplay_attack(*,a,b,a)
+
+
+# first line hanes (except in corner)
+#####################################
+
+Pattern EE101
+
+OOXX     endgame move
+..*.     2 points gote
+----
+
+:8,eOX,terri(2)
+
+OOXX
+b.*a
+----
+
+;proper_eye(a) && proper_eye(b)
+
+
+Pattern EE102
+
+???X?        sente hane
+OXX..        1 or 2 points sente
+.*..?
+-----
+
+:8,eOX,terri(2),followup(7)
+
+???X?
+OAA..
+.*..?
+-----
+
+;lib(A)==3
+
+
+Pattern EE103
+
+?OX?        one point gote (and a little extra)
+?.*.
+----
+
+:8,eOX,terri(1)
+
+?OX?
+?.*a
+----
+
+;proper_eye(a)
+
+
+Pattern EE103b
+
+?OX?        max two points if really gote 
+?.*.
+----
+
+:8,eOX,maxterri(2)
+
+?OX?
+?b*a
+----
+
+;proper_eye(a) && !oplay_attack(*,a,b,a)
+
+
+Pattern EE103c
+
+?OX?        max one point if really gote 
+O.*.
+----
+
+:8,eOX,maxterri(1)
+
+?OX?
+?b*a
+----
+
+;proper_eye(a) && !oplay_attack(*,a,b,a) && !oplay_attack(*,a,a)
+
+
+Pattern EE104
+
+?OX?        two points gote
+..*.
+----
+
+:8,eOX,terri(2)
+
+?OX?
+b.*a
+----
+
+;proper_eye(a) && proper_eye(b)
+
+
+#
+# If both EE105 and EE106 match, it's a double sente situation.
+# (followup and reverse followup probably bigger in reality.)
+#
+
+Pattern EE105
+
+?OX..      three points sente
+..*..
+-----
+
+:8,eOX,terri(2),followup(6)
+
+?OE..
+bc*a.
+-----
+
+;proper_eye(a) && proper_eye(b) && oplay_attack_either(*,a,c,a,E)
+
+
+Pattern EE106
+
+..OX?      three points reverse sente
+...*.
+-----
+
+:8,eOX,terri(2),reverse_followup(6)
+
+..dX?
+.bc*a
+-----
+
+;proper_eye(a) && proper_eye(b) && xplay_attack_either(c,b,*,b,d)
+;&& !xplay_attack(c,b,*,*)
+
+
+# first line pushes (except in corner)
+######################################
+
+Pattern EE201
+
+?XX                     push on first line.
+O*.                     one point gote (and a little extra)
+---
+
+:8,eOX,terri(1)     
+
+?XX
+O*a
+---
+
+;marginal_eye(*) && proper_eye(a) && max_eye_value(a) > 0
+
+
+Pattern EE202
+
+OXX.           endgame move
+.O*.           1 point reverse sente
+----
+
+:8,eOX,terri(1),reverse_followup(1)
+
+OXX.
+.Oab
+----
+
+;marginal_eye(a) && marginal_eye(b)
+
+
+Pattern EE203
+
+OXX.           1 point double sente
+.O*.
+----
+
+:8,eOX,terri(1),followup(4),reverse_followup(2)
+
+OEEd
+cOab
+----
+
+;marginal_eye(a) && marginal_eye(b) && marginal_eye(d) &&
+;(oplay_attack(a,b,c,b) || oplay_attack(a,b,c,E))
+
+
+Pattern EE204
+
+?X.        endgame move
+O*.        2 points gote
+---
+
+:8,eOX,terri(2)
+
+?Cb
+O*a
+---
+
+;marginal_eye(*) && proper_eye(a) && 
+;(!oplay_defend(*,a,b,a) || !oplay_defend(*,a,b,C))
+
+
+Pattern EE205
+
+X.X	at least 2 points, possibly more (followup)
+O*.
+---
+
+:8,eOX,terri(2)
+
+XaX
+O*b
+---
+
+;marginal_eye(*) && proper_eye(a) && proper_eye(b)
+
+
+
+# first line blocks (except in corner)
+######################################
+
+Pattern EE301
+
+O.        endgame move
+X*        1 points gote
+--
+
+:8,bOX,terri(1)
+
+Oa
+X*
+--
+
+;marginal_eye(*) && proper_eye(a) && oplay_attack(*,a,a)
+
+
+Pattern EE302
+
+O.        endgame move
+X*        2 points reverse sente
+--
+
+:8,bOX,terri(2),reverse_followup(5)
+
+cb
+da
+--
+
+;eye(a) && eye(b) && !oplay_attack(a,b,b)
+
+
+# first line corner moves
+#########################
+
+Pattern EE401
+
+|.O?        big endgame move
+|.OX        at least 2 points gote
+|.*x
++---
+
+:8,deOX,terri(2)
+
+
+Pattern EE402
+# May look risky, but if it is, the safe_move test will reject it.
+
+|xxXO       big endgame move
+|.XO.       at least 3 points reverse sente
+|.*..
++----
+
+:8,deOX,terri(3),reverse_followup(5)
+
+
+Pattern EE403
+
+|OX       endgame move
+|.*       one point gote
++--
+
+:8,eOX,terri(1)
+
+|OX
+|.a
++--
+
+;marginal_eye(a)
+
+
+Pattern EE404
+
+|OX?       endgame move
+|.*.       half point gote as sacrifice
++---
+
+:8,esOX,terri(0.5)
+
+|OX?
+|.a.
++---
+
+;marginal_eye(a)
+
+
+Pattern EE405
+
+|XO      endgame move
+|.*      one point gote
++--
+
+:8,bOX,terri(1)
+
+|XO?
+|.a.
++---
+
+;marginal_eye(a)
+
+
+Pattern EE406
+
+|XO     endgame move
+|.*     possibly only filling dame
++--
+
+:8,bOX,terri(0.1)
+
+
+Pattern EE407
+
+|OX?     fill ko at end of game
+|*OX     1/2 point gote
++---
+
+:8,X,terri(0.5)
+
+|aX?
+|*OX
++---
+
+;!dead(a)
+
+
+Pattern EE408
+
+|XO?     fill ko at end of game
+|O*O     1/2 point gote
++---
+
+:8,X,terri(0.5)
+
+|Xa?
+|O*O
++---
+
+;!dead(a)
+
+
+Pattern EE409
+
+|OX?     take ko at end of game
+|X*X     1/2 point
++---
+
+:8,Os,terri(0.5)
+
+|OA?
+|X*X
++---
+
+;!dead(A)
+
+
+Pattern EE410
+
+|XO?     take ko at end of game
+|*XO     1/2 point
++---
+
+:8,Os,terri(0.5)
+
+|AO?
+|*XO
++---
+
+;!dead(A)
+
+
+Pattern EE411
+
+|*O     endgame ko
+|XO     zero points sente or better
+|.X
++--
+
+:8,OX,terri(0.1),followup(0.5)
+
+
+Pattern EE412
+
+|.X     endgame ko
+|OX     zero points reverse sente or better
+|*O
++--
+
+:8,OX,terri(0.1),reverse_followup(0.5)
+
+
+Pattern EE413
+
+|.X?    endgame ko
+|OXO    1/2 point
+|.O*
++---
+
+:8,OX,terri(0.5)
+
+
+Pattern EE414
+
+|xX?        three points gote 
+|*OX        plus possibly more for the eye in the corner
+|.OX
+|..O
++---
+
+:8,deOX,terri(3)
+
+
+# miscellaneous first line moves
+################################
+
+Pattern EE501
+
+?OX?     fill ko at end of game
+O*OX     1/2 point gote
+----
+
+:8,X,terri(0.5)
+
+?aX?
+O*OX
+----
+
+;!dead(a)
+
+
+Pattern EE502
+
+?OX?     take ko at end of game
+OX*X     1/2 point
+----
+
+:8,Os,terri(0.5)
+
+?OA?
+OX*X
+----
+
+;!dead(A)
+
+
+Pattern EE504
+
+...           jump on the edge
+*.O
+---
+
+:8,eO,terri(2)
+
+...
+*.O
+---
+
+;!omoyo(*)
+
+
+# second line descents
+######################
+
+# second line hanes
+###################
+
+# second line extensions
+########################
+
+Pattern EE801
+# 1: not really gote and larger than 2.5 points
+# 2: Well, without making the pattern more specific we should be
+#    prepared that the x really is in place and that there is an X two
+#    steps below * too. Then it is usually gote and about this size.
+#    We certainly can and should add patterns to deal with the case
+#    that there is more space below, when it very likely is sente,
+#    unless such patterns already exist in the EB class.
+
+|.O?      endgame move
+|.*X      2.5 points gote
+|..x
+
+:8,eOX,terri(2.5)
+
+
+Pattern EE802
+
+|.X             extend on second line
+|.*             2 points gote
+|.O
+
+:8,eOX,terri(2)
+
+|bX
+|.*
+|aO
+
+;proper_eye(a) && proper_eye(b)
+
+
+Pattern EE803
+
+?xx?
+X.*O           extend on second line
+....           about 2 points gote
+----
+
+:8,eOX,terri(2)
+
+?xx?
+X.*O
+b..a
+----
+
+;proper_eye(a) && proper_eye(b)
+
+
+Pattern EE804
+
+O*X            endgame move
+..X            at least 0 points sente or one point gote
+---
+
+:8,eOX,terri(0.5)
+
+O*X
+a.X
+---
+
+;marginal_eye(a)
+
+
+Pattern EE805
+
+XX.           extend on second line
+OO*           not guaranteed to yield a single point
+...
+---
+
+:8,eOX,terri(0.1)
+
+
+# second line extensions
+########################
+
+Pattern EE851
+
+Ox.           clamp on second line
+OX*           almost too big to be classified as endgame move
+...
+---
+
+:8,eOX,terri(8)
+
+Ox.
+OX*
+.a.
+---
+
+;oplay_attack(*,a,a)
+
+
+# miscellaneous second line moves
+#################################
+
+
+Pattern EE901
+
+?.?       endgame move
+X*X       one point reverse sente
+O.O
+---
+
+:8,eOX,terri(1),reverse_followup(2)
+
+?b?
+XaX
+O.O
+---
+
+;marginal_eye(a) && proper_eye(b)
+
+
+Pattern EE902
+
+?.?       endgame move
+O*O       one point sente
+X.X
+---
+
+:8,bOX,terri(1),followup(2)
+
+?b?
+OaO
+X.X
+---
+
+;marginal_eye(a) && proper_eye(b)
+
+
+# third line moves
+##################
+
+Pattern EE1001
+
+OO*?       one point sente (at least)
+XX.X       sente endgame move
+....
+----       
+
+:8,eOX,terri(1),followup(3)
+
+OO*?
+XX.X
+....
+----       
+
+;olib(*)>2
+
+
+Pattern EE1002
+
+??X?           endgame move
+?X*O           at least one point reverse sente
+OO..
+....
+----
+
+:8,bOX,terri(1),reverse_followup(4)
+
+??X?
+?X*O
+aa..
+....
+----
+
+;lib(a)>3
+
+
+######################################################################
+#
+# Edge followup patterns
+#
+# Patterns on the edge which enhance the precision of the EE patterns.
+#
+######################################################################
+
+
+# proper followups
+######################################
+
+Pattern EF1
+# Only gives followup value if * is not gote.
+
+?x?	Possible to jump into other territory. Possibly bigger followup.
+x.X
+..*
+---
+
+:8,OX,followup(4)
+
+?b?
+a.X
+.c*
+---
+
+;!(x_somewhere(a) && x_somewhere(b)) && !oplay_attack(*,c,*)
+
+
+# Bigger and bigger the more space there is.
+
+Pattern EF2
+
+?XX.
+O*..
+----
+
+:8,OX,followup(2)
+
+?XX.
+O*ab
+----
+
+;proper_eye(b) && !oplay_attack(*,?,a,b,a) && oplay_attack(*,?,a,b,b)
+
+
+Pattern EF2b
+
+?XX..
+O*...
+-----
+
+:8,OX,followup(4)
+
+?XX..
+O*ab.
+-----
+
+;proper_eye(b) && !oplay_attack(*,?,a,b,a) && oplay_attack(*,?,a,b,b)
+
+
+Pattern EF2c
+
+?XX...
+O*....
+------
+
+:8,OX,followup(6)
+
+?XX...
+O*ab..
+------
+
+;proper_eye(b) && !oplay_attack(*,?,a,b,a) && oplay_attack(*,?,a,b,b)
+
+
+# reverse followups
+######################################
+
+
+Pattern EF101
+# This is the least value for the followup. A more precise value can
+# only be had by dynamic reading.
+
+O..
+X*.
+---
+
+:8,OX,reverse_followup(4)
+
+Oa.
+X*.
+---
+
+;marginal_eye(*) && proper_eye(a) && oplay_attack(*,a,a)
+
+
+######################################################################
+#
+# Center endgame patterns
+#
+# Moves in the center with small weights, intended to come into play
+# in the endgame.
+#
+######################################################################
+
+Pattern CE1
+
+?OX?     fill ko at end of game
+O*OX     1/2 point gote
+?OX?
+
+:-,X,terri(0.5)
+
+?OX?
+a*OX
+?OX?
+
+;!dead(a)
+
+
+Pattern CE2
+
+?OX?     take ko at end of game
+OX*X     1/2 point
+?OX?
+
+:-,Os,terri(0.5)
+
+?OX?
+OX*A
+?OX?
+
+;!dead(A)
+
+
+Pattern CE3
+
+...           push against opponent
+O*X           about 1 point gote
+...
+
+:8,eOX,terri(1)
+
+
+Pattern CE4
+
+??X     endgame move
+O*.     about 1 point reverse sente
+?.O
+
+:8,bOX,terri(1),reverse_followup(2)
+
+??X
+O*.
+?aO
+
+;marginal_eye(*) && proper_eye(a)
+
+
+Pattern CE6
+
+X?        push in
+*O        0 points gote
+
+:8,eOX,terri(0.1)
+
+
+Pattern CE9
+
+.X        push in
+*O        1 points gote
+
+:8,eOXn,terri(1)
+
+bX
+aO
+
+;marginal_eye(a) && !safe_omove(b) && !obvious_false_xeye(b)
+
+
+Pattern CE12
+
+X*O                               worth a point in chinese rules
+
+:-,eOX,terri(0.1)
+
+
+Pattern CE13
+
+X.X      sometimes double sente endgame move
+.*.      one point gote
+O.O
+
+:8,eOX,terri(1)
+
+XbX
+.*.
+OaO
+
+;proper_eye(a) || proper_eye(b)
+
+
+Pattern CE14
+
+X.X      sometimes double sente endgame move
+.*.      two points gote
+O.O
+
+:8,eOX,terri(2)
+
+XbX
+.*.
+OaO
+
+;proper_eye(a) && proper_eye(b)
+
+
+Pattern CE15
+
+.X?       sente endgame move
+.*.       one point sente
+X.O
+
+:8,eOX,terri(1),followup(2)
+
+.X?
+ba.
+X.O
+
+;marginal_eye(a) && proper_eye(b)
+
+
+Pattern CE15b
+
+XX?       gote endgame move
+.*.       one point gote
+X.O
+
+:8,eOX,terri(1)
+
+XX?
+ba.
+X.O
+
+;marginal_eye(a) && proper_eye(b)
+
+
+Pattern CE16
+
+.X?       sente endgame move
+.*O       one point sente
+X??
+
+:8,eOX,terri(1),followup(2)
+
+.X?
+baO
+X??
+
+;marginal_eye(a) && proper_eye(b) && olib(a)>2
+
+
+Pattern CE16b
+
+.O?       sente endgame move
+.*X       one point reverse sente
+O??
+
+:8,eOX,terri(1),reverse_followup(2)
+
+.X?
+baO
+X??
+
+;marginal_eye(a) && proper_eye(b) && xlib(a)>2
+
+
+Pattern CE17
+
+XO          endgame move
+.*          one point sente
+xX
+
+:8,eXO,terri(1),followup(2)
+
+XO
+ba
+xX
+
+;marginal_eye(a) && proper_eye(b) && olib(a)>2
+
+
+Pattern CE18
+
+OX          endgame move
+.*          one point reverse sente
+oO
+
+:8,bXO,terri(1),reverse_followup(2)
+
+OX
+ba
+oO
+
+;marginal_eye(a) && proper_eye(b)
+
+
+Pattern CE19
+
+?.?       endgame move
+X*X       one point gote
+O.O
+
+:|,eOX,terri(1)
+
+?c?       endgame move
+XaX       one point gote
+ObO
+
+;marginal_eye(a) && proper_eye(c) && oplay_attack(a,b,b)
+
+
+Pattern CE20
+
+?.?         Smallish endgame
+O*O         one point reverse sente
+?X?
+
+:|,bOXn,terri(1),reverse_followup(2)
+
+?b?
+OaO
+?X?
+
+;marginal_eye(a) && proper_eye(b)
+
+
+Pattern CE21
+#    This pattern is not entirely sound. If a move by X at * is
+#    tactically safe but the stone ends up strategically dead anyway,
+#    this move just loses a point.
+
+*OX         Smallish endgame
+O.O         one point reverse sente
+
+:8,bOXn,terri(1),reverse_followup(2)
+
+*bX
+OaO
+
+;proper_eye(a) && lib(b)==2
+
+
+Pattern CE22
+
+?X?
+.*.      one point gote
+O.O
+ooo
+
+:8,eOX,terri(1)
+
+
+Pattern CE23
+
+O??
+*Xx      endgame move
+..X      two points gote
+xXO
+
+:8,eOX,terri(2)
+
+O??
+*Xx
+baX
+xXO
+
+;proper_eye(a) && proper_eye(b)
+
+
+Pattern CE24
+
+??OX        rescue one stone making territory
+X*.O
+?O..
+
+:8,X,terri(5)
+
+??OX
+X*.A
+?Ob.
+
+; omoyo(b) && lib(A)==2
+
+
+######################################################################
+#
+# Center followup patterns
+#
+# Patterns in the center which enhance the precision of the CE patterns.
+#
+######################################################################
+
+
+Pattern CF1
+# This pattern is too general. One example is this position.
+#    OXX
+#    *.X
+#    XXX
+
+?X	Threaten to destroy another point.
+*.
+?X
+
+:-,X,followup(1)
+
+?X
+*a
+?X
+
+;proper_eye(a)
+
+
+######################################################################
+#
+# Eye patterns
+#
+# Moves which steal or save a few points by making eye points false.
+#
+######################################################################
+
+
+Pattern EY1
+
+X*O
+.X?
+
+:8,OXen,terri(1)
+
+X*b
+aX?
+
+;halfeye(a) && !weak(b)
+
+
+Pattern EY2
+
+?.O
+X*.
+.X?
+
+:/,OXen,terri(1)
+
+?.b
+X*.
+aX?
+
+;halfeye(a) && !weak(b)
+
+
+Pattern EY3
+
+O*X
+.O?
+
+:8,OXen,terri(1)
+
+O*X
+aO?
+
+;halfeye(a)
+
+
+Pattern EY4
+
+?.X
+O*.
+.O?
+
+:/,OXen,terri(1)
+
+?.X
+O*.
+aO?
+
+;halfeye(a)
+
+
+Pattern EY5
+
+?.X
+O.*
+.O?
+
+:8,OXen,terri(1)
+
+?.X
+Ob*
+aO?
+
+;halfeye(a) && oplay_attack(*,b,b) == WIN
+
+
+# END OF FILE

@@ -1,0 +1,26 @@
+                      Acknowledgements
+
+We would like to thank Arthur Britto, Tim Hunt, Piotr Lakomy, Paul Leonard,
+Jean-Louis Martineau, Andreas Roever and Pierce Wetter for helpful
+correspondence. Thanks to everyone who stepped on a bug (and sent us a
+report)!
+
+Thanks to Gary Boos, Peter Gucwa, Martijn van der Kooij, Michael
+Margolis, Trevor Morris, Mans Ullerstam, Don Wagner and Yin Zheng for help
+with Visual C++.
+
+And thanks to Allan Crossman, Pierce Wetter, Stephan Somogyi and 
+Mathias Wagner for help with Macintosh.
+
+Special thanks to Ebba Berggren for creating our logo, based on a
+design by Tanguy Urvoy and comments by Alan Crossman. The old
+GNU Go logo was adapted from Jamal Hannah's typing GNU:
+http://www.gnu.org/graphics/atypinggnu.html. Both logos
+can be found in doc/newlogo.* and doc/oldlogo.*
+
+We would like to thank Stuart Cracraft, Richard Stallman and Man Lung Li for
+their interest in making this program a part of GNU, William Shubert for
+writing CGoban and gmp.c, Rene Grothmann for Jago and Erik van Riper and his
+collaborators for NNGS.
+
+

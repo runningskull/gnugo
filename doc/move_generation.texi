@@ -1,0 +1,887 @@
+
+@menu
+* MG Intro::                    Introduction.
+* MG Overview ::                Overview.
+* MG Info::                     Information gathering.
+* MG Reasons::                  Generation of move reasons.
+* MG Details::                  Detailed Descriptions of Move Reasons
+* Valuation:: 			Valuating the moves
+* Move Generation Functions::   Move Generation Functions
+* Local MG Functions::		Static Functions
+* End Game::			Endgame move generation
+@end menu
+
+@node MG Intro, MG Overview, Move Generation, Move Generation
+@comment  node-name,  next,  previous,  up
+@section Introduction
+
+GNU Go 3.0 has a move generation scheme that is substantially different
+from earlier versions. In particular, it is different from the method of move
+generation in GNU Go 2.6.
+
+In the old scheme, various move generators suggested different moves with
+attached values. The highest such value then decided the move. There were two
+important drawbacks with this scheme:
+
+@itemize @bullet
+@item 
+Efficient multipurpose moves could only be found by patterns which
+explicitly looked for certain combinations, such as a simultaneous
+connection and cut. There was also no good way to e.g. choose among
+several attacking moves.
+
+@item
+The absolute move values were increasingly becoming harder to tune with
+the increasing number of patterns. They were also fairly subjective and
+the tuning could easily break in unexpected ways when something changed,
+e.g. the worm valuation.
+@end itemize
+
+The basic idea of the new move generation scheme is that the various
+move generators suggest reasons for moves, e.g. that a move captures
+something or connects two strings, and so on. When all reasons for the
+different moves have been found, the valuation starts. The primary
+advantages are
+
+@itemize @bullet
+@item
+The move reasons are objective, in contrast to the move values in
+the old scheme. Anyone can verify whether a suggested move reason is
+correct.
+
+@item
+The centralized move valuation makes tuning easier. It also allows
+for style dependent tuning, e.g. how much to value influence
+compared to territory. Another possibility is to increase the value
+of safe moves in a winning position.
+@end itemize
+
+@node MG Overview, MG Info, MG Intro, Move Generation
+@comment  node-name,  next,  previous,  up
+@section Overview
+
+The engine of GNU Go takes a position and a color to move and
+generates the (supposedly) optimal move. This is done by the function
+genmove() in engine/genmove.c.
+
+The move generation is done in three steps:
+
+@enumerate
+@item information gathering
+@item generation of moves and move reasons
+@item valuation of the suggested moves
+@end enumerate
+
+This is somewhat simplified. In reality there is some overlap between
+the steps.
+
+@node MG Info, MG Reasons, MG Overview, Move Generation
+@comment  node-name,  next,  previous,  up
+@section Information gathering
+
+First we have to collect as much information as possible about the
+current position. Such information could be life and death of the
+groups, moyo status, connection of groups and so on. Information
+gathering are performed by the following functions, called in this
+order:
+
+@itemize @bullet
+@item @code{make_worms}
+@quotation
+Collect information about all connected sets of stones
+(strings) and cavities.  This information is stored in
+the @code{worm[][]} array.
+@end quotation
+@item @code{make_dragons}
+@quotation
+Collect information about connected strings, which are
+called dragons.  Important information here is number
+of eyes, life status, and connectedness between
+strings. The information is stored mainly in the array
+@code{dragon[][]} but also in @code{dragon2[][]}. @end quotation
+@end itemize
+
+@xref{Examining the Position}, for a more exact itinerary of the
+information-gathering portion of the move-generation proces.
+
+@xref{Worms and Dragons}, for more detailed documentation about 
+@code{make_worms} and @code{make_dragons}.
+
+@node MG Reasons, MG Details, MG Info, Move Generation
+@comment  node-name,  next,  previous,  up
+@section Generation of move reasons
+
+Each move generator suggests a number of moves.  It justifies each move
+suggestion with one or move @dfn{move reasons}.  These move reasons
+are collected at each intersection where the moves are suggested for
+later valuation.  The different kinds of move reasons considered by GNU
+Go are:
+
+@table @code
+@item ATTACK_MOVE
+@itemx DEFEND_MOVE
+Attack or defend a worm.
+@item ATTACK_THREAT_MOVE
+@itemx DEFEND_THREAT_MOVE
+Threaten to attack or defend a worm.
+@item NON_ATTACK_MOVE
+@itemx NON_DEFEND_MOVE
+a non-attacking or non-defending move.
+@item ATTACK_EITHER_MOVE
+a move that attacks either on of two worms.
+@item DEFEND_BOTH_MOVE
+a move that simultaneously defends two worms.
+@item CONNECT_MOVE
+@itemx CUT_MOVE
+Connect or cut two worms.
+@item ANTISUJI_MOVE
+Declare an antisuji or forbidden move.
+@item SEMEAI_MOVE
+@itemx SEMEAI_THREAT
+Win or threaten to win a semeai.
+@item EXPAND_TERRITORY_MOVE
+@itemx BLOCK_TERRITORY_MOVE
+a move that expands our territory or blocks opponents expansion.
+@item EXPAND_MOYO_MOVE
+a move expanding a moyo.
+@item VITAL_EYE_MOVE
+a vital point for life and death.
+@item STRATEGIC_ATTACK_MOVE
+@itemx STRATEGIC_DEFEND_MOVE
+Moves added by 'a' and 'd' class patterns (@pxref{Pattern Classification})
+which (perhaps intangibly) attack or defend a dragon.
+@item OWL_ATTACK_MOVE
+@itemx OWL_DEFEND_MOVE
+an owl attack or defense move.
+@item OWL_ATTACK_THREAT
+@itemx OWL_DEFEND_THREAT
+a threat to owl attack or defend a group.
+@item OWL_PREVENT_THREAT
+a move to remove an owl threat.
+@item UNCERTAIN_OWL_ATTACK
+@itemx UNCERTAIN_OWL_DEFENSE
+an uncertain owl attack or defense.
+@item MY_ATARI_ATARI_MOVE
+a move that starts a chain of ataris, eventually leading to a
+capture.
+@item YOUR_ATARI_ATARI_MOVE
+a move that if played by the opponent starts a chain of ataris for the
+opponent, leading to capture, which is also a safe move for us. Preemptively
+playing such a move almost always defends the threat.
+@end table
+
+@strong{NOTE:} Some of these are reasons for @strong{not} playing a move.
+
+More detailed discussion of these move reasons will be found in the
+next section.
+
+@node MG Details, Valuation, MG Reasons, Move Generation
+@section Detailed Descriptions of various Move Reasons
+
+@menu
+* Attack and Defense::             Worm Attack and Defense
+* Threats to Attack or Defend::    Worm Threats
+* Non-Working Moves::              Marking attacks and defenses as failing
+* Multi Attack or Defense::        Combined Attacks and Defenses
+* Cutting and Connecting::         Cutting and Connecting moves
+* Semeai::                         Semeai winning moves
+* Making eyes::                    Vital eye moves
+* Antisuji moves::                 Never play these!
+* Territorial moves::              Block or expand territory
+* Owl attack and defense::         Owl Attack and Defense
+* Combination Attacks::            Coordinated threats such as double ataris
+@end menu
+
+@node Attack and Defense, Threats to Attack or Defend, , MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Attacking and defending moves
+
+A move which tactically captures a worm is called an @dfn{attack move} and a
+move which saves a worm from being tactically captured is called a
+@dfn{defense move}. It is understood that a defense move can only exist if
+the worm can be captured, and that a worm without defense only is
+attacked by moves that decrease the liberty count or perform necessary
+backfilling.
+
+It is important that all moves which attack or defend a certain string
+are found, so that the move generation can make an informed choice
+about how to perform a capture, or find moves which capture and/or
+defend several worms.
+
+Attacking and defending moves are first found in @code{make_worms} while it
+evaluates the tactical status of all worms, although this step only
+gives one attack and defense (if any) move per worm. Immediately
+after, still in @code{make_worms}, all liberties of the attacked worms are
+tested for additional attack and defense moves. More indirect moves
+are found by @code{find_attack_patterns} and @code{find_defense_patterns},
+which match the A (attack) and D (defense) class patterns in
+@file{patterns/attack.db} and @file{patterns/defense.db} As a final step, all
+moves which fill some purpose at all are tested whether they additionally
+attacks or defends some worm. (Only unstable worms are analyzed.)
+
+@node Threats to Attack or Defend, Non-Working Moves , Attack and Defense, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Threats to Attack or Defend
+
+A threat to attack a worm, but where the worm can be defended is used as
+a secondary move reason.  This move reason can enhance the value of a
+move so that it becomes sente.  A threatening move without any other
+justification can also be used as a ko threat.  The same is true for a
+move that threatens defense of a worm, but where the worm can still be
+captured if the attacker doesn't tenuki.
+
+Threats found by the owl code are called @strong{owl threats} and they
+have their own owl reasons.
+
+@node Non-Working Moves , Multi Attack or Defense, Threats to Attack or Defend, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Not working attack and defense moves
+
+The tactical reading may come up with ineffective attacks or defenses
+occasionally. When these can be detected by patterns, it's possible to
+cancel the attack and/or defense potential of the moves by using these
+move reasons. This can only be done by action lines in the patterns.
+
+@node Multi Attack or Defense, Cutting and Connecting, Non-Working Moves , MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Multiple attack or defense moves
+
+Sometimes a move attacks at least one of a number of worms or
+simultaneously defends all of several worms. These moves are noted
+by their own move reasons.
+
+@node Cutting and Connecting, Semeai, Multi Attack or Defense, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Cutting and connecting moves
+
+Moves which connect two distinct dragons are called @code{connecting moves}.
+Moves which prevent such connections are called @dfn{cutting moves}. Cutting
+and connecting moves are primarily found by pattern matching, the @code{C}
+and @code{B} class patterns.
+
+A second source of cutting and connecting moves comes from the attack
+and defense of cutting stones. A move which attacks a worm
+automatically counts as a connecting move if there are multiple
+dragons adjacent to the attacked worm. Similarly a defending move
+counts as a cutting move. The action taken when a pattern of
+this type is found is to induce a connect or cut move reason.
+
+When a cut or connect move reason is registered, the involved dragons
+are of course stored. Thus the same move may cut and/or connect
+several pairs of dragons.
+
+@node Semeai, Making eyes, Cutting and Connecting, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Semeai winning moves
+
+A move which is necessary to win a capturing race is called a @dfn{semeai
+move}. These are similar to attacking moves, except that they involve
+the simultaneous attack of one worm and the defense of another. As for
+attack and defense moves, it's important that all moves which win a
+semeai are found, so an informed choice can be made between them.
+
+Semeai move reasons should be set by the semeai module. However this
+has not been implemented yet. One might also wish to list moves
+which increase the lead in a semeai race (removes ko threats) for use
+as secondary move reasons. Analogously if we are behind in the race.
+
+@node  Making eyes, Antisuji moves, Semeai, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Making or destroying eyes
+
+A move which makes a difference in the number of eyes produced from an
+eye space is called an @dfn{eye move}. It's not necessary that the eye is
+critical for the life and death of the dragon in question, although it
+will be valued substantially higher if this is the case. As usual it's
+important to find all moves that change the eye count.
+
+(This is part of what eye_finder was doing. Currently it only finds
+one vital point for each unstable eye space.)
+
+@node  Antisuji moves, Territorial moves, Making eyes, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Antisuji moves
+
+Moves which are locally inferior or for some other reason must not be
+played are called @dfn{antisuji moves}. These moves are generated by pattern
+matching. Care must be taken with this move reason as the move under
+no circumstances will be played.
+
+@node Territorial moves, Owl attack and defense, Antisuji moves, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Territorial moves
+
+Any move that increases territory gets a move reason. These are
+the block territory and expand territory move reasons. Such move
+reasons are added by the @samp{b} and @samp{e} patterns in
+@file{patterns/patterns.db}. Similarly the @samp{E} patterns attempt to
+generate or mitigate an moyo, which is a region of influence not yet secure
+territory, yet valuable. Such a pattern sets the ``expand moyo'' move
+reason.
+
+@node Owl attack and defense, Combination Attacks, Territorial moves, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Attacking and Defending Dragons
+
+Just as the tactical reading code tries to determine when a worm
+can be attacked or defended, the owl code tries to determine
+when a dragon can get two eyes and live. The function @code{owl_reasons()}
+generates the corresponding move reasons.
+
+The owl attack and owl defense move reasons are self explanatory.
+
+The owl attack threat reason is generated if owl attack on an
+opponent's dragon fails but the owl code determines that the
+dragon can be killed with two consecutive moves. The killing
+moves are stored in @code{(dragon[ai][aj].owl_attacki_i,
+dragon[ai][aj].owl_attacki_j)} and
+@code{(dragon[ai][aj].owl_second_attacki_i,
+dragon[ai][aj].owl_second_attacki_j)}.
+
+Similarly if a friendly dragon is dead but two moves can revive it,
+an owl defense threat move reason is generated.
+
+The prevent threat reasons are similar but with the colors
+reversed: if the opponent has an attack threat move then a
+move which removes the threat gets a prevent threat move
+reason.
+
+The owl uncertain move reasons are generated when the owl
+code runs out of nodes. In order to prevent the owl code from
+running too long, a cap is put on the number of nodes one owl
+read can generate. If this is exceeded, the reading is cut
+short and the result is cached as usual, but marked uncertain.
+In this case an owl uncertain move reason may be generated.
+For example, if the owl code finds the dragon alive but is
+unsure, a move to defend may still be generated.
+
+@node Combination Attacks,  , Owl attack and defense, MG Details
+@comment  node-name,  next,  previous,  up
+@subsection Combination Attacks
+@findex atari_atari
+
+The function @code{atari_atari} tries to find a sequence of ataris
+culminating in an unexpected change of status of any opponent string,
+from ALIVE to CRITICAL, or from CRITICAL to DEAD. Once such a sequence
+of ataris is found, it tries to shorten it by rejecting irrelevant
+moves.
+
+@node Valuation, Move Generation Functions, MG Details, Move Generation
+@comment  node-name,  next,  previous,  up
+@section Valuation of suggested moves
+
+Moves are valued with respect to five different criteria. These are
+
+@itemize @bullet
+@item territorial value
+@item influence value
+@item strategical value
+@item shape value,
+@item secondary value. 
+@end itemize
+
+All of these are floats and should be measured in terms of actual
+points.
+
+Territorial value is the amount of secure territory generated (or
+saved) by the move. Attack and defense moves have territorial values
+given by twice the number of stones in the worm plus adjacent empty
+space. This value is in practice approximated from the ``effective
+size'' measure.
+
+Influence value is an estimation of the move's effect on the size of
+potential territory and possibly ``area''. This is currently implemented by
+using delta_moyo_simple(). This can probably be improved quite a bit. If the
+move captures some stones, this fact should be taken into account when
+computing moyo/area.
+
+Strategical value is a measure of the effect the move has on the
+safety of all groups on the board. Typically cutting and connecting
+moves have their main value here. Also edge extensions, enclosing
+moves and moves towards the center have high strategical value. The
+strategical value should be the sum of a fraction of the territorial
+value of the involved dragons. The fraction is determined by the
+change in safety of the dragon.
+
+Shape value is a purely local shape analysis, which primarily is
+intended to choose between moves having the same set of reasons. An
+important role of this measure is to offset mistakes made by the
+estimation of territorial and influence values. In open positions it's
+often worth sacrificing a few points of (apparent) immediate profit to
+make good shape. Shape value is implemented by pattern matching, the
+Shape patterns.
+
+Secondary value is given for move reasons which by themselves are not
+sufficient to play the move. One example is to reduce the number of
+eyes for a dragon that has several or to attack a defenseless worm.
+
+When all these values have been computed, they are summed, possibly
+weighted (secondary value should definitely have a small weight), into
+a final move value. This value is used to decide the move.
+
+@menu
+* Territorial value::		  How much territory does a move gain
+* Influence value::		  How much influence does a move gain
+* Strategical value::             Strategical gains from a move
+* Shape factor::		  Local shape
+* Minimum Value::                 Minimum value
+* Secondary Value::               Other, more indirect, gains from a move
+* Threats and Followup Value::    Valuation of attack and defense threats
+@end menu
+
+@node Territorial value, Influence value, , Valuation
+@comment  node-name,  next,  previous,  up
+@subsection Territorial Value
+@findex estimate_territorial_value
+
+The algorithm for computing territorial value is in the function
+@code{estimate_territorial_value}. As the name suggests, it seeks
+to estimate the amount the move adds to secure territory.
+
+This function examines every reason for the move and takes into account the
+safety of different dragons. For example if the reason for the move is that it
+attacks and kills a worm, no value is assigned if the worm is already DEAD. If
+the worm is not DEAD the value of the move is twice the effective size of the
+worm.
+
+In addition to such additions to territory, if the move is
+found to be a block or expanding move, the function
+@code{influence_delta_territory} is consulted to find areas
+where after the move the influence function becomes so strong
+that these are counted as secure territory, or where the
+influence function is sufficiently weakened that these are
+removed from the secure territory of the opponent
+(@pxref{Influential Functions}).
+
+@node Influence value, Strategical value, Territorial value, Valuation
+@comment  node-name,  next,  previous,  up
+@subsection Influence Value
+@findex estimate_influence_value
+
+The function @code{estimate_influence_value} attempts to assign
+a value to the influence a move. The functions
+@code{influence_delta_strict_moyo}
+@code{influence_delta_strict_area} are called to find areas
+where after the move the influence function becomes strong
+enough that these are counted as friendly moyo or area, or
+which are taken away from the opponent's moyo or area
+(@pxref{Influential Functions}).
+
+@node Strategical value, Shape factor, Influence value, Valuation
+@comment  node-name,  next,  previous,  up
+@subsection Strategical Value
+
+Strategical defense or attack reasons are assigned to any move
+which matches a pattern of type @samp{a} or @samp{d}. These are
+moves which in some (often intangible) way tend to help
+strengthen or weaken a dragon. Of course strengthening a
+dragon which is already alive should not be given much value,
+but when the move reason is generated it is not necessary
+to check its status or safety. This is done later, during
+the valuation phase.
+
+@node Shape factor, Minimum Value, Strategical value, Valuation
+@comment  node-name,  next,  previous,  up
+@subsection Shape Factor
+
+In the value field of a pattern (@pxref{Pattern Values}) one may
+specify a shape value. 
+
+This is used to compute the shape factor, which multiplies the
+score of a move. We take the largest positive contribution to
+shape and add 1 for each additional positive contribution
+found.  Then we take the largest negative contribution to
+shape, and add 1 for each additional negative contribution. The
+resulting number is raised to the power 1.05 to obtain the
+shape factor.
+
+The rationale behind this complicated scheme is that every
+shape point is very significant. If two shape contributions
+with values (say) 5 and 3 are found, the second contribution
+should be devalued to 1. Otherwise the engine is too difficult
+to tune since finding multiple contributions to shape can cause
+significant overvaluing of a move.
+
+@node Minimum Value, Secondary Value, Shape factor, Valuation
+@comment  node-name,  next,  previous,  up
+@subsection Minimum Value
+
+A pattern may assign a minimum (and sometimes also a maximum) 
+value. For example the Joseki patterns have values which are
+prescribed in this way, or ones with a @code{value} field.
+One prefers not to use this approach but in practice it is
+sometimes needed.
+
+@node Secondary Value, Threats and Followup Value, Minimum Value, Valuation
+@comment  node-name,  next,  previous,  up
+@subsection Secondary Value
+
+Secondary move reasons are weighed very slightly. Such a move
+can tip the scales if all other factors are equal.
+
+@node Threats and Followup Value, , Secondary Value, Valuation
+
+Followup value refers to value which may acrue if we get two
+moves in a row in a local area. It is assigned by the function
+@code{add_followup_value}, for example through the
+@code{followup_value} autohelper macro.
+
+Attack and defense threats, including owl threats are usually
+given a small amount of weight, as is followup value.
+
+If the largest move on the board is a ko which we cannot legally
+take, then such a move becomes attractive as a ko threat and
+the followup value or the value of the threat are taken in full.
+
+@node Move Generation Functions, Local MG Functions, Valuation, Move Generation
+@comment  node-name,  next,  previous,  up
+@section Move Generation Functions
+
+The following functions are defined in @file{move_reasons.c}. 
+
+@itemize @bullet
+@item @code{void clear_move_reasons(void)}
+@findex clear_move_reasons
+@quotation
+Initialize move reason data structures.
+@end quotation
+@item @code{void add_lunch(int ai, int aj, int bi, int bj)}
+@findex add_lunch
+@quotation
+See if a lunch is already in the list of lunches, otherwise add a new
+entry. A lunch is in this context a pair of eater (a dragon) and food
+(a worm).
+@end quotation
+@item @code{void remove_lunch(int ai, int aj, int bi, int bj)}
+@findex remove_lunch
+@quotation
+Remove a lunch from the list of lunches.
+@end quotation
+@item @code{void add_defense_move(int ti, int tj, int ai, int aj)}
+@findex add_defense_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it defends the worm
+at (ai, aj).
+@end quotation
+@item @code{int defense_move_known(int ti, int tj, int ai, int aj)}
+@findex defense_move_known
+@quotation
+Query whether a defense move is already known.
+Add to the reasons for the move at (ti, tj) that it attacks the worm
+at (ai, aj).
+@end quotation
+@item @code{int attack_move_known(int ti, int tj, int ai, int aj)}
+@findex attack_move_known
+@quotation
+Query whether an attack move is already known.
+@end quotation
+@item @code{void remove_defense_move(int ti, int tj, int ai, int aj)}
+@findex remove_defense_move
+@quotation
+Remove from the reasons for the move at (ti, tj) that it defends
+the worm at (ai, aj). We do this by adding a NON_DEFEND move
+reason and wait until later to actually remove it. Otherwise it
+may be added again. We must also check that there do exist a
+defense move reason for this worm. Otherwise we may end up in an
+infinite loop when trying to actually remove it.
+@end quotation
+@item @code{void remove_attack_move(int ti, int tj, int ai, int aj)}
+@findex remove_attack_move
+@quotation
+Remove from the reasons for the move at (ti, tj) that it attacks
+the worm at (ai, aj). We do this by adding a NON_ATTACK move
+reason and wait until later to actually remove it. Otherwise it may
+be added again.
+@end quotation
+@item @code{void add_connection_move(int ti, int tj, int ai, int aj, int bi, int bj)}
+@findex add_connection_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it connects the
+dragons at (ai, aj) and (bi, bj). Require that the dragons are
+distinct.
+@end quotation
+@item @code{void add_cut_move(int ti, int tj, int ai, int aj, int bi, int bj)}
+@findex add_cut_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it cuts the
+dragons at (ai, aj) and (bi, bj). Require that the dragons are
+distinct.
+@end quotation
+@item @code{void add_antisuji_move(int ti, int tj)}
+@findex add_antisuji_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it is an anti-suji.
+This means that it's a locally inferior move or for some other reason
+must @strong{not} be played.
+@end quotation
+@item @code{void add_semeai_move(int ti, int tj, int ai, int aj, int bi, int bj)}
+@findex add_semeai_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it wins a semeai
+between my worm at (ai, aj) and your worm at (bi, bj).
+@end quotation
+@item @code{void add_vital_eye_move(int ti, int tj, int ai, int aj, int color)}
+@findex add_vital_eye_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it's the vital
+point for the eye space at (ai, aj) of color color.
+@end quotation
+@item @code{void add_attack_either_move(int ti, int tj, int ai, int aj, int bi, int bj)}
+@findex add_attack_either_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it attacks either
+(ai, aj) or (bi, bj) (e.g. a double atari). This move reason is
+only used for double attacks on opponent stones.  Before accepting
+the move reason, check that the worms are distinct and that neither
+is undefendable.
+@end quotation
+@item @code{void add_defend_both_move(int ti, int tj, int ai, int aj, int bi, int bj)}
+@findex add_defend_both_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it defends
+both (ai, aj) and (bi, bj) (e.g. from a double atari). This move
+reason is only used for defense of own stones.
+@end quotation
+@item @code{void add_block_territory_move(int ti, int tj)}
+@findex add_block_territory_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it secures
+territory by blocking.
+@end quotation
+@item @code{void add_expand_territory_move(int ti, int tj)}
+@findex add_expand_territory_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it expands
+territory.
+@end quotation
+@item @code{void add_expand_moyo_move(int ti, int tj)}
+@findex add_expand_moyo_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it expands
+moyo.
+@end quotation
+@item @code{void add_shape_value(int ti, int tj, float value)}
+@findex add_shape_value
+@quotation
+Increase or decrease the shape value for the move at (ti, tj).
+@end quotation
+@item @code{void add_strategical_attack_move(int ti, int tj, int ai, int aj)}
+@findex add_strategical_attack_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it attacks
+the dragon (ai, aj) on a strategical level.
+@end quotation
+@item @code{void add_strategical_defense_move(int ti, int tj, int ai, int aj)}
+@findex add_strategical_defense_move
+@quotation
+Add to the reasons for the move at (ti, tj) that it defends
+the dragon (ai, aj) on a strategical level.
+@end quotation
+@item @code{void add_followup_value(int ti, int tj, float value)}
+@findex add_followup_value
+@quotation
+Add value of followup moves. 
+@end quotation
+@item @code{void set_minimum_move_value(int ti, int tj, float value)}
+@findex set_minimum_move_value
+@quotation
+Set a minimum allowed value for the move.
+@end quotation
+@item @code{void set_maximum_move_value(int ti, int tj, float value)}
+@findex set_maximum_move_value
+@quotation
+Set a maximum allowed value for the move.
+@end quotation
+@item @code{void set_minimum_territorial_value(int ti, int tj, float value)}
+@findex set_minimum_territorial_value
+@quotation
+Set a minimum allowed territorial value for the move.
+@end quotation
+@item @code{void set_maximum_territorial_value(int ti, int tj, float value)}
+@findex set_maximum_territorial_value
+@quotation
+Set a maximum allowed territorial value for the move.
+@end quotation
+@item @code{int review_move_reasons(int *i, int *j, float *val, int color)}
+@findex review_move_reasons
+@quotation
+Review the move reasons to find which (if any) move we want to play.
+@end quotation
+@end itemize
+
+@node Local MG Functions, End Game, Move Generation Functions, Move Generation
+@comment  node-name,  next,  previous,  up
+@section Local Move Generation Functions
+
+The following functions in @file{move_reasons.c} are declared
+static. Their scope is limited to that file.
+
+@itemize @bullet
+@item @code{static int find_worm(int ai, int aj)}
+@findex find_worm
+@quotation
+Find the index of a worm in the list of worms. If necessary,
+add a new entry. (ai, aj) must point to the origin of the worm.
+@end quotation
+@item @code{static int find_dragon(int ai, int aj)}
+@findex find_dragon
+@quotation
+Find the index of a dragon in the list of dragons. If necessary,
+add a new entry. (ai, aj) must point to the origin of the dragon.
+@end quotation
+@item @code{static int find_connection(int dragon1, int dragon2)}
+@findex find_connection
+@quotation
+Find the index of a connection in the list of connections.
+If necessary, add a new entry.
+@end quotation
+@item @code{static int find_semeai(int myworm, int yourworm)}
+@findex find_semeai
+@quotation
+Find the index of a semeai in the list of semeais.
+If necessary, add a new entry.
+@end quotation
+@item @code{static int find_worm_pair(int worm1, int worm2)}
+@findex find_worm_pair
+@quotation
+Find the index of an unordered pair of worms in the list of worm pairs.
+If necessary, add a new entry.
+@end quotation
+@item @code{static int find_eye(int i, int j, int color)}
+@findex find_eye
+@quotation
+Find the index of an eye space in the list of eye spaces.
+If necessary, add a new entry.
+@end quotation
+@item @code{static int find_reason(int type, int what)}
+@findex find_reason
+@quotation
+Find a reason in the list of reasons. If necessary, add a new entry.
+@end quotation
+@item @code{static void add_move_reason(int ti, int tj, int type, int what)}
+@findex add_move_reason
+@quotation
+Add a move reason for (ti, tj) if it's not already there or the
+table is full.
+@end quotation
+@item @code{static void remove_move_reason(int ti, int tj, int type, int what)}
+@findex remove_move_reason
+@quotation
+Remove a move reason for (ti, tj). Ignore silently if the reason
+wasn't there.
+@end quotation
+@item @code{static int move_reason_known(int ti, int tj, int type, int what)}
+@findex move_reason_known
+@quotation
+Check whether a move reason already is recorded for a move.
+@end quotation
+@item @code{static void find_more_attack_and_defense_moves(int color)}
+@findex find_more_attack_and_defense_moves
+@quotation
+Test all moves that defends, attacks, connects or cuts to see if
+they also attack or defend some other worm.
+@end quotation
+@item @code{static void remove_opponent_attack_and_defense_moves(int color)}
+@findex remove_opponent_attack_and_defense_moves
+@quotation
+Remove attacks on own stones and defense of opponent stones, i.e.
+moves which are only relevant for the opponent. It might seem
+useful to take these into account (proverb "my enemy's vital point
+is my vital point") but now it seems they only lead to trouble. 
+It's easiest just to remove them altogether.
+@end quotation
+@item @code{static void do_remove_false_attack_and_defense_moves(void)}
+@findex do_remove_false_attack_and_defense_moves
+@quotation
+Remove attacks and defenses that have earlier been marked as
+NON_ATTACK or NON_DEFEND respectively, because they actually don't
+work.
+@end quotation
+@item @code{static int strategically_sound_defense(int ai, int aj, int ti, int tj)}
+@findex strategically_sound_defense
+@quotation
+It's often bad to run away with a worm that is in a strategically
+weak position. This function gives heuristics for determining
+whether a move at (ti, tj) to defend the worm (ai, aj) is
+strategically sound. These heuristics need improvement. The
+biggest weakness is that they sometimes fail to detect when we're
+running away towards open ground. It would help much to have a
+reliable escape route mechanism.
+@end quotation
+@item @code{static void induce_secondary_move_reasons(int color)}
+@findex induce_secondary_move_reasons
+@quotation
+Any move that captures or defends a worm also connects or cuts
+the surrounding dragons. Find these secondary move reasons.
+@itemize @minus
+@item There is a certain amount of optimizations that could be done here.
+@item Even when we defend a worm, it's possible that the opponent
+still can secure a connection, e.g. underneath a string with
+few liberties. Thus a defense move isn't necessarily a cut move.
+@item Connections are transitive. If a move connects A with B and B
+with C, we should infer that it connects A with C as well.
+@end itemize
+@end quotation
+@item @code{static float effective_dragon_size(int ai, int aj)}
+@findex effective_dragon_size
+@quotation
+Measure the "effective" size of a dragon. This measure is a
+reasonable approximation of how much area a dragon cover, including
+some amount of surrounding empty spaces.
+@end quotation
+@item @code{static float dragon_safety(int ai, int aj, int ignore_dead_dragons)}
+@findex dragon_safety
+@quotation
+An attempt to estimate the safety of a dragon. This should be
+possible to improve considerably. The resulting value is
+interpreted so that 1.0 means a fully safe dragon while 0.0 is an
+almost dead dragon.
+@end quotation
+@item @code{static float connection_value2(int ai, int aj, int bi, int bj, int ti, int tj)}
+@findex connection_value2
+@quotation
+Strategical value of connecting (or cutting) the dragon at (ai, aj)
+to the dragon at (bi, bj). This function is assymetric.
+@end quotation
+@item @code{static void estimate_territorial_value(int m, int n, int color)}
+@findex estimate_territorial_value
+@quotation
+Estimate the direct territorial value of a move at (m,n).
+@end quotation
+@item @code{static void estimate_influence_value(int m, int n, int color)}
+@findex estimate_influence_value
+@quotation
+Estimate the influence value of a move at (m,n).
+@end quotation
+@item @code{static void estimate_strategical_value(int m, int n, int color)}
+@findex estimate_strategical_value
+@quotation
+Estimate the strategical value of a move at (m,n).
+@end quotation
+@item @code{static int is_antisuji_move(int m, int n)}
+@findex is_antisuji_move
+@quotation
+Look through the move reasons to see whether (m, n) is an antisuji move.
+@end quotation
+@item @code{static float value_move_reasons(int m, int n, int color)}
+@findex value_move_reasons
+@quotation
+Combine the reasons for a move at (m, n) into an old style value.
+These heuristics are now somewhat less ad hoc but probably still
+need a lot of improvement.
+@end quotation
+@item @code{static void value_moves(int color)}
+@findex value_moves
+@quotation
+Loop over all possible moves and value the move reasons for each.
+@end quotation
+@end itemize
+
+@node End Game,  , Local MG Functions, Move Generation
+@comment  node-name,  next,  previous,  up
+@section End Game
+
+Endgame moves are generated just like any other move by GNU Go. In fact,
+the concept of endgame does not exist explicitly, but if the largest
+move initially found is worth 6 points or less, an extra set of patterns
+in @file{endgame.db} is matched and the move valuation is redone.

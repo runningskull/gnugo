@@ -1,0 +1,1315 @@
+This is gnugo.info, produced by makeinfo version 4.0 from gnugo.texi.
+
+INFO-DIR-SECTION GNU games
+START-INFO-DIR-ENTRY
+* GNU go: (gnugo).          The GNU Go program
+END-INFO-DIR-ENTRY
+
+
+File: gnugo.info,  Node: Autohelper Functions,  Next: Attack and Defense DB,  Prev: Autohelper Actions,  Up: Patterns
+
+Autohelper Functions
+====================
+
+   The autohelper functions are translated into C code by the program in
+`mkpat.c'. To see exactly how the functions are implemented, consult
+the autohelper function definitions in that file. Autohelper functions
+can be used in both constraint and action lines.
+
+
+     `lib(x)'
+     `lib2(x)'
+     `lib3(x)'
+     `lib4(x)'
+
+   Number of first, second, third, and fourth order liberties of a worm
+respectively. *Note Worms and Dragons::, the documentation on worms for
+definitions.
+
+
+     `xlib(x)'
+     `olib(x)'
+
+   The number of liberties that an enemy or own stone, respectively,
+would obtain if played at the empty intersection x.
+
+     `xcut(x)'
+     `ocut(x)'
+
+   Calls `cut_possible' (*note General Utilities::) to determine
+whether `X' or `O' can cut at the empty intersection x.
+
+     `ko(x)'
+
+   True if x is either a stone or an empty point involved in a ko
+position.
+
+     `status(x)'
+
+   The matcher status of a dragon. status(x) returns an integer that
+can have the values `ALIVE', `UNKNOWN', `CRITICAL', or `DEAD' (*note
+Worms and Dragons::).
+
+     `alive(x)'
+     `unknown(x)'
+     `critical(x)'
+     `dead(x)'
+
+   Each function true if the dragon has the corresponding matcher
+status and false otherwise (*note Worms and Dragons::).
+
+     `status(x)'
+
+   Returns the status of the dragon at `x' (*note Worms and Dragons::).
+
+     `genus(x)'
+
+   The number of eyes of a dragon. It is only meaningful to compare this
+value against 0, 1, or 2.
+
+
+     `xarea(x)'
+     `oarea(x)'
+     `xmoyo(x)'
+     `omoyo(x)'
+     `xterri(x)'
+     `oterri(x)'
+
+   Functions related to various kinds of influence and territory
+estimations, as described in *Note Moyo::. xarea(x) evaluates to true if
+x is either a living enemy stone or an empty point within his "area".
+`oarea(x)' is analogous but with respect to our stones and area.   The
+main difference between area, moyo, and terri is that area is a very
+far reaching kind of influence, moyo gives a more realistic estimate of
+what may turn in to territory, and terri gives the points that already
+are believed to be secure territory.
+
+     `weak(x)'
+
+   True for a dragon that is perceived as weak. The definition of weak
+is given in *Note Moyo::.
+
+
+     `attack(x)'
+     `defend(x)'
+
+   Results of tactical reading. attack(x) is true if the worm can be
+captured, defend(x) is true if there also is a defending move. Please
+notice that defend(x) will return false if there is no attack on the
+worm.
+
+
+     `safe_xmove(x)'
+     `safe_omove(x)'
+
+   True if an enemy or friendly stone, respectively, can safely be
+played at x. By safe it is understood that the move is legal and that
+it cannot be captured right away.
+
+
+     `legal_xmove(x)'
+     `legal_omove(x)'
+
+   True if an enemy or friendly stone, respectively, can legally be
+played at x.
+
+
+     o_somewhere(x,y,z, ...)
+     x_somewhere(x,y,z, ...)
+
+   True if O (respectively X) has a stone at one of the labelled
+vertices.  In the diagram, these vertices should be marked with a `?'.
+
+
+     odefend_against(x,y)
+     xdefend_against(x,y)
+
+   True if an own stone at x would stop the enemy from safely playing at
+y, and conversely for the second function.
+
+
+     `does_defend(x,y)'
+     `does_attack(x,y)'
+
+   True if a move at x defends/attacks the worm at y. For defense a move
+of the same color as y is tried and for attack a move of the opposite
+color.
+
+
+     `xplay_defend(a,b,c,...,z)'
+     `oplay_defend(a,b,c,...,z)'
+     `xplay_attack(a,b,c,...,z)'
+     `oplay_attack(a,b,c,...,z)'
+
+   These functions make it possible to do more complex reading
+experiments in the constraints. All of them work so that first the
+sequence of moves a,b,c,... is played through with alternating colors,
+starting with X or O as indicated by the name. Then it is tested
+whether the worm at z can be attacked or defended, respectively. It
+doesn't matter who would be in turn to move, a worm of either color may
+be attacked or defended. For attacks the opposite color of the string
+being attacked starts moving and for defense the same color starts. The
+defend functions return true if the worm cannot be attacked in the
+position or if it can be attacked but also defended.  The attack
+functions return true if there is a way to capture the worm, whether or
+not it can also be defended. If there is no stone present at z after
+the moves have been played, it is assumed that an attack has already
+been successful or a defense has already failed.  If some of the moves
+should happen to be illegal, typically because it would have been
+suicide, the following moves are played as if nothing has happened and
+the attack or defense is tested as usual. It is assumed that this
+convention will give the relevant result without requiring a lot of
+special cases.
+
+   The special label `?' can be used to represent a tenuki.  Thus
+`oplay_defend(a,?,b,c)' tries moves by `O' at `a' and `b', as if `X'
+plays the second move in another part of the board, then asks if `c'
+can be defended. The tenuki cannot be the first move of the sequence,
+nor does it need to be: instead of `oplay_defend(?,a,b,c)' you can use
+`xplay_defend(a,b,c)'.
+
+     `xplay_defend_both(a,b,c,...,y,z)'
+     `oplay_defend_both(a,b,c,...,y,z)'
+     `xplay_attack_either(a,b,c,...,y,z)'
+     `oplay_attack_either(a,b,c,...,y,z)'
+
+   These functions are similar to the previous ones. The difference is
+that the last *two* arguments denote worms to be attacked or defended
+simultaneously. Obviously y and z must have the same color. If either
+location is empty, it is assumed that an attack has been successful or
+a defense has failed. The typical use for these functions is in cutting
+patterns, where it usually suffices to capture either cutstone.
+
+   The function `xplay_defend_both' plays alternate moves beginning
+with an X at `a'. Then it passes the last two arguments to
+`defend_both' in `engine/utils.c'. This function checks to determine
+whether the two strings can be simultaneously defended.
+
+   The function `xplay_attack_either' plays alternate moves beginning
+with an X move at `a'. Then it passes the last two arguments to
+`attack_either' in `engine/utils.c'. This function looks for a move
+which captures at least one of the two strings. In its current
+implementation `attack_either' only looks for uncoordinated attacks and
+would thus miss a double atari.
+
+
+     `xplay_break_through(a,b,c,...,x,y,z)'
+     `oplay_break_through(a,b,c,...,x,y,z)'
+
+   These functions are used to set up a position like
+
+
+     .O.    .y.
+     OXO    xXz
+
+and X aims at capturing at least one of x, y, and z. If this succeeds 1
+is returned. If it doesn't, X tries instead to cut through on either
+side and if this succeeds, 2 is returned. Of course the same shape with
+opposite colors can also be used.
+
+   Important notice: x, y, and z must be given in the order they have in
+the diagram above, or any reflection and/or rotation of it.
+
+     seki_helper(x)
+
+   Checks whether the string at `x' can attack any surrounding string.
+If so, return false as the move to create a seki (probably) wouldn't
+work.
+
+     threaten_to_save(x)
+
+   Calls `add_followup_value' to add as a move reason a conservative
+estimate of the value of saving the string `x' by capturing one opponent
+stone.
+
+     area_stone(x)
+
+   Returns the number of stones in the area around `x'.
+
+     area_space(x)
+
+   Returns the amount of space in the area around `x'.
+
+     `eye(x)'
+     `proper_eye(x)'
+     `marginal_eye(x)'
+
+   True if x is an eye space for either color, a non-marginal eye space
+for either color, or a marginal eye space for either color,
+respectively.
+
+     `antisuji(x)'
+
+   Tell the move generation that x is a substandard move that never
+should be played.
+
+     same_dragon(x,y)
+     same_worm(x,y)
+
+   Return true if x and y are the same dragon or worm respectively.
+
+     `dragonsize(x)'
+     `wormsize(x)'
+
+   Number of stones in the indicated dragon or worm.
+
+     `add_connect_move(x,y)'
+     `add_cut_move(x,y)'
+     `add_attack_either_move(x,y)'
+     `add_defend_both_move(x,y)'
+
+   Explicitly notify the move generation about move reasons for the move
+in the pattern.
+
+     `halfeye(x)'
+
+   Returns true if the empty intersection at `x' is a half eye.
+
+     `remove_attack(x)'
+
+   Inform the tactical reading that a supposed attack does in fact not
+work.
+
+     `potential_cutstone(x)'
+
+   True if cutstone2 field from worm data is larger than one. This
+indicates that saving the worm would introduce at least two new cutting
+points.
+
+     `not_lunch(x,y)'
+
+   Prevents the misreporting of `x' as lunch for `y'.  For example, the
+following pattern tells GNU Go that even though the stone at `a' can be
+captured, it should not be considered "lunch" for the dragon at `b',
+because capturing it does not produce an eye:
+
+     XO|          ba|
+     O*|          O*|
+     oo|          oo|
+     ?o|          ?o|
+     
+     > not_lunch(a,b)
+
+     `vital_chain(x)'
+
+   Calls `vital_chain' to determine whether capturing the stone at `x'
+will result in one eye for an adjacent dragon. The current
+implementation just checks that the stone is not a singleton on the
+first line.
+
+     `amalgamate(x,y)'
+
+   Amalgamate (join) the dragons at `x' and `y' (*note Worms and
+Dragons::).
+
+     `amalgamate_most_valuable(x,y,z)'
+
+   Called when (x,y,z) point to three (preferably distinct) dragons, in
+situations such as this:
+
+
+     .O.X
+     X*OX
+     .O.X
+
+   In this situation, the opponent can play at *, preventing the three
+dragons from becoming connected. However `O' can decide which cut to
+allow. The helper amalgamates the dragon at `y' with either `x' or `z',
+whichever is largest.
+
+     make_proper_eye(x)
+
+   This autohelper should be called when `x' is an eyespace which is
+misidentified as marginal. It is reclassified as a proper eyespace
+(*note Eye Space::).
+
+     remove_halfeye(x)
+
+   Remove a half eye from the eyespace. This helper should not be run
+after `make_dragons' is finished, since by that time the eyespaces have
+already been analyzed.
+
+     remove_eyepoint(x)
+
+   Remove an eye point. This function can only be used before the
+segmentation into eyespaces.
+
+     `owl_topological_eye(x,y)'
+
+   Here `x' is an empty intersection which may be an eye or half eye
+for some dragon, and `y' is a stone of the dragon, used only to
+determine the color of the eyespace in question. Returns the sum of the
+values of the diagonal intersections, relative to `x', as explained in
+*Note Eye Topology::, equal to 4 or more if the eye at `x' is false, 3
+if it is a half eye, and 2 if it is a true eye.
+
+     `owl_escape_value(x)'
+
+   Returns the escape value at `x'. This is only useful in owl attack
+and defense patterns and only if the `--alternative_escape' option is
+turned on. Otherwise 0 is returned.
+
+
+File: gnugo.info,  Node: Attack and Defense DB,  Next: Connections Database,  Prev: Autohelper Functions,  Up: Patterns
+
+Attack and Defense Database
+===========================
+
+   The patterns in `attack.db' and `defense.db' are used to assist the
+tactical reading in finding moves that attacks or defends worms. The
+matching is performed during `make_worms()', at the time when the
+tactical status of all worms is decided. None of the classes described
+above are useful in these databases, instead we have two other classes.
+
+D  :  For each O worm in the pattern that can be tactically captured
+      (worm[m][n].attack_code != 0), the move at `*' is tried. If it
+      is found to defend the stone, this is registered as a reason
+      for the move * and the defense point of the worm is set to `*'.
+
+A  :  For each X worm in the pattern, it's tested whether the move
+      at * captures the worm. If that is the case, this is
+      registered as a reason for the move at `*'. The attack point of
+      the worm is set to * and if it wasn't attacked before, a
+      defense is searched for.
+
+   Furthermore, A patterns can only be used in `attack.db' and D
+patterns only in `defense.db'. Unclassified patterns may appear in these
+databases, but then they must work through actions to be effective.
+
+
+File: gnugo.info,  Node: Connections Database,  Next: Connection Functions,  Prev: Attack and Defense DB,  Up: Patterns
+
+The Connections Database
+========================
+
+   The patterns in `conn.db' are used for helping `make_dragons()'
+amalgamate worms into dragons and to some extent for modifying eye
+spaces.  The patterns in this database use the classifications `B',
+`C', and `e'. `B' patterns are used for finding cutting points, where
+amalgamation should not be performed, `C' patterns are used for finding
+existing connections, over which amalgamation is to be done, and `e'
+patterns are used for modifying eye spaces and reevaluating lunches.
+There are also some patterns without classification, which use action
+lines to have an impact. These are matched together with the `C'
+patterns. Further details and examples can be found in *Note Worms and
+Dragons::.
+
+   We will illustrate these databases by example. In this situation:
+
+     XOO
+     O.O
+     ...
+
+`X' cannot play safely at the cutting point, so the `O' dragons are to
+be amalgamated. Two patterns are matched here:
+
+     Pattern CC204
+     
+     O
+     .
+     O
+     
+     :+,C
+     
+     O
+     A
+     O
+     
+     ;!safe_xmove(A) && !ko(A) && !xcut(A)
+     
+     Pattern CC205
+     
+     XO
+     O.
+     
+     :\,C
+     
+     AO
+     OB
+     
+     ;attack(A) || (!safe_xmove(B) && !ko(B) && !xcut(B))
+
+   The constraints are mostly clear. For example the second pattern
+should not be matched if the `X' stone cannot be attacked and `X' can
+play safely at `B', or if `B' is a ko. The constraint `!xcut(B)' means
+that connection has not previously been inhibited by `find_cuts'. For
+example consider this situation:
+
+
+     OOXX
+     O.OX
+     X..O
+     X.OO
+
+The previous pattern is matched here twice, yet X can push in and break
+one of the connections. To fix this, we include a pattern:
+
+     Pattern CB11
+     
+     ?OX?
+     O!OX
+     ?*!O
+     ??O?
+     
+     :8,B
+     
+     ?OA?
+     OaOB
+     ?*bO
+     ??O?
+     
+     ; !attack(A) && !attack(B) && !xplay_attack(*,a,b,*) && !xplay_attack(*,b,a,*)
+
+   After this pattern is found, the `xcut' autohelper macro will return
+true at any of the points `*', `a' and `b'. Thus the patterns CB204 and
+CB205 will not be matched, and the dragons will not be amalgamated.
+
+
+File: gnugo.info,  Node: Connection Functions,  Next: Tuning,  Prev: Connections Database,  Up: Patterns
+
+Connections Functions
+=====================
+
+   Here are the public functions in `connections.c'.
+
+   * `static void cut_connect_callback(int m, int n, int color, 	struct
+     pattern *pattern, int ll, void *data)'
+          Try to match all (permutations of) connection patterns at
+          (m,n).  For each match, if it is a B pattern, set cutting
+          point in worm data structure and make eye space marginal for
+          the connection inhibiting entries of the pattern. If it is a
+          C pattern, amalgamate the dragons in the pattern.
+
+   * `void find_cuts(void)'
+          Find cutting points which should inhibit amalgamations and
+          sever the adjacent eye space. This goes through the
+          connection database consulting only patterns of type B. When
+          such a function is found, the function `cut_connect_callback'
+          is invoked.
+
+   * `void find_connections(void)'
+          Find explicit connection patterns and amalgamate the involved
+          dragons.  This goes through the connection database
+          consulting patterns except those of type B, E or e. When such
+          a function is found, the function `cut_connect_callback' is
+          invoked.
+
+   * void modify_eye_spaces1(void)
+          Find explicit connection patterns and amalgamate the involved
+          dragons.  This goes through the connection database
+          consulting only patterns of type E (*note Connections
+          Database::). When such a function is found, the function
+          `cut_connect_callback' is invoked.
+
+   * void modify_eye_spaces1(void)
+          Find explicit connection patterns and amalgamate the involved
+          dragons.  This goes through the connection database
+          consulting only patterns of type e (*note Connections
+          Database::). When such a function is found, the function
+          `cut_connect_callback' is invoked.
+
+
+File: gnugo.info,  Node: Tuning,  Next: PM Implementation,  Prev: Connection Functions,  Up: Patterns
+
+Tuning the Pattern databases
+============================
+
+   Since the pattern databases, together with the valuation of move
+reasons, decide GNU Go's personality, much time can be devoted to
+"tuning" them. Here are some suggestions.
+
+   If you want to experiment with modifying the pattern database, invoke
+with the -a option. This will cause every pattern to be evaluated, even
+when some of them may be skipped due to various optimizations.
+
+   You can obtain a Smart Go Format (SGF) record of your game in at
+least two different ways. One is to use CGoban to record the game. You
+can also have GNU Go record the game in Smart Go Format, using the -o
+option. It is best to combine this with -a. Do not try to read the SGF
+file until the game is finished and you have closed the game window.
+This does not mean that you have to play the game out to its
+conclusion. You may close the CGoban window on the game and GNU Go will
+close the SGF file so that you can read it.
+
+   If you record a game in SGF form using the -o option, GNU Go will add
+labels to the board to show all the moves it considered, with their
+values. This is an extremely useful feature, since one can see at a
+glance whether the right moves with appropriate weights are being
+proposed by the move generation.
+
+   First, due to a bug of unknown nature, it occasionally happens that
+GNU Go will not receive the `SIGTERM' signal from CGoban that it needs
+to know that the game is over. When this happens, the SGF file ends
+without a closing parenthesis, and CGoban will not open the file. You
+can fix the file by typing:
+
+
+      echo ")" >>[filename]
+
+at the command line to add this closing parenthesis. Or you could add
+the ) using an editor.
+
+   Move values exceeding 99 (these should be rare) can be displayed by
+CGoban but you may have to resize the window in order to see all three
+digits. Grab the lower right margin of the CGoban window and pull it
+until the window is large. All three digits should be visible.
+
+   If you are playing a game without the -o option and you wish to
+analyze a move, you may still use CGoban's "Save Game" button to get an
+SGF file. It will not have the values of the moves labelled, of course.
+
+   Once you have a game saved in SGF format, you can analyze any
+particular move by running:
+
+
+       gnugo -l [filename] -L [move number] -t -a -w
+
+to see why GNU Go made that move, and if you make changes to the
+pattern database and recompile the program, you may ask GNU Go to
+repeat the move to see how the behavior changes. If you're using emacs,
+it's a good idea to run GNU Go in a shell in a buffer (M-x shell) since
+this gives good navigation and search facilities.
+
+   Instead of a move number, you can also give a board coordinate to -L
+in order to stop at the first move played at this location. If you omit
+the -L option, the move after those in the file will be considered.
+
+   If a bad move is proposed, this can have several reasons. To begin
+with, each move should be valued in terms of actual points on the
+board, as accurately as can be expected by the program. If it's not,
+something is wrong. This may have two reasons. One possibility is that
+there are reasons missing for the move or that bogus reasons have been
+found. The other possibility is that the move reasons have been
+misevaluated by the move valuation functions. Tuning of patterns is
+with a few exceptions a question of fixing the first kind of problems.
+
+   If there are bogus move reasons found, search through the trace
+output for the pattern that is responsible. (Some move reasons, e.g.
+most tactical attack and defense, do not originate from patterns. If no
+pattern produced the bogus move reason, it is not a tuning problem.)
+Probably this pattern was too general or had a faulty constraint. Try
+to make it more specific or correct bugs if there were any. If the
+pattern and the constraint looks right, verify that the tactical
+reading evaluates the constraint correctly. If not, this is either a
+reading bug or a case where the reading is too complicated for GNU Go.
+
+   If a connecting move reason is found, but the strings are already
+effectively connected, there may be missing patterns in `conn.db'.
+Similarly, worms may be incorrectly amalgamated due to some too general
+or faulty pattern in `conn.db'. To get trace output from the matching
+of patterns in `conn.db' you need to add a second -t option.
+
+   If a move reason is missing, there may be a hole in the database. It
+could also be caused by some existing pattern being needlessly
+specific, having a faulty constraint, or being rejected due to a
+reading mistake. Unless you are familiar with the pattern databases, it
+may be hard to verify that there really is a pattern missing. Look
+around the databases to try to get a feeling for how they are
+organized. (This is admittedly a weak point of the pattern databases,
+but the goal is to make them more organized with time.) If you decide
+that a new pattern is needed, try to make it as general as possible,
+without allowing incorrect matches, by using proper classification from
+among snOoXx and constraints. The reading functions can be put to good
+use. The reason for making the patterns as general as they can be is
+that we need a smaller number of them then, which makes the database
+much easier to maintain. Of course, if you need too complicated
+constraints, it's usually better to split the pattern.
+
+   If a move has the correct set of reasons but still is misevaluated,
+this is usually not a tuning problem. There are, however, some
+possibilities to work around these mistakes with the use of patterns.
+In particular, if the territorial value is off because `delta_terri()'
+give strange results, the (min)terri and maxterri values can be set by
+patterns as a workaround. This is typically done by the endgame
+patterns, where we can know the (minimum) value fairly well from the
+pattern. If it should be needed, (min)value and maxvalue can be used
+similarly. These possibilities should be used conservatively though,
+since such patterns are likely to become obsolete when better (or at
+least different) functions for e.g. territory estimation are being
+developed.
+
+   In order to choose between moves with the same move reasons, e.g.
+moves that connect two dragons in different ways, patterns with a
+nonzero shape value should be used. These should give positive shape
+values for moves that give good shape or good aji and negative values
+for bad shape and bad aji. Notice that these values are additive, so
+it's important that the matches are unique.
+
+   Sente moves are indicated by the use of the pattern followup value.
+This can usually not be estimated very accurately, but a good rule is
+to be rather conservative. As usual it should be measured in terms of
+actual points on the board. These values are also additive so the same
+care must be taken to avoid unintended multiple matches.
+
+   You can also get a visual display of the dragons using the -T
+option. The default GNU Go configuration tries to build a version with
+color support using either curses or the ansi escape sequences. You are
+more likely to find color support in rxvt than xterm, at least on many
+systems, so we recommend running:
+
+       gnugo -l [filename] -L [move number] -T
+
+in an rxvt window. If you do not see a color display, and if your host
+is a GNU/Linux machine, try this again in the Linux console.
+
+   Worms belonging to the same dragon are labelled with the same
+letters.  The colors indicate the value of the field `dragon.safety',
+which is set in `moyo.c'.
+
+Green:  GNU Go thinks the dragon is alive
+Yellow: Status unknown
+Blue:   GNU Go thinks the dragon is dead
+Red:    Status critical (1.5 eyes) or weak by the algorithm
+        in `moyo.c'
+
+   If you want to get the same game over and over again, you can
+eliminate the randomness in GNU Go's play by providing a fixed random
+seed with the -r option.
+
+
+File: gnugo.info,  Node: PM Implementation,  Next: Symmetry & transformations,  Prev: Tuning,  Up: Patterns
+
+Implementation
+==============
+
+   The pattern code in GNU Go is fairly straightforward conceptually,
+but because the matcher consumes a significant part of the time in
+choosing a move, the code is optimized for speed. Because of this there
+are implementation details which obscure things slightly.
+
+   In GNU Go, the ascii `.db' files are precompiled into tables (see
+`patterns.h') by a standalone program `mkpat.c', and the resulting `.c'
+files are compiled and linked into the main gnugo executable.
+
+   Each pattern is compiled to a header, and a sequence of elements,
+which are (notionally) checked sequentially at every position and
+orientation of the board. These elements are relative to the pattern
+'anchor' (or origin).  One X or O stone is (arbitrarily) chosen to
+represent the origin of the pattern. (We cannot dictate one or the
+other since some patterns contain only one colour or the other.)  All
+the elements are in co-ordinates relative to this position. So a
+pattern matches "at" board position (m,n,o) if the the pattern anchor
+stone is on (m,n), and the other elements match the board when the
+pattern is transformed by transformation number `o'. (See below for the
+details of the transformations, though these should not be necessary)
+
+
+File: gnugo.info,  Node: Symmetry & transformations,  Next: Details,  Prev: PM Implementation,  Up: Patterns
+
+Symmetry and transformations
+============================
+
+   In general, each pattern must be tried in each of 8 different
+permutations, to reflect the symmetry of the board. But some patterns
+have symmetries which mean that it is unnecessary (and therefore
+inefficient) to try all eight. The first character after the `:' can be
+one of `8',`|',`\',`/', `X', `-', `+', representing the axes of
+symmetry. It can also be `O', representing symmetry under 180 degrees
+rotation.
+
+transformation   I    -    |     .     \    l    r     /
+                ABC  GHI  CBA   IHG   ADG  CFI  GDA   IFC
+                DEF  DEF  FED   FED   BEH  BEH  HEB   HEB
+                GHI  ABC  IHG   CBA   CFI  ADG  IFC   GDA
+
+                 a    b    c     d     e    f    g     h
+
+   Then if the pattern has the following symmetries, the following are
+true:
+
+
+     |  c=a, d=b, g=e, h=f
+     -  b=a, c=d, e=f, g=h
+     \  e=a, g=b, f=c, h=d
+     /  h=a, f=b, g=c, e=d
+     O  a=d, b=c, e=h, f=g
+     X  a=d=e=h, b=c=f=g
+     +  a=b=c=d, e=f=g=h
+
+   We can choose to use transformations a,d,f,g as the unique
+transformations for patterns with either `|', `-', `\', or `/' symmetry.
+
+   Thus we choose to order the transformations a,g,d,f,h,b,e,c and
+choose first 2 for `X' and `+', the first 4 for `|', `-', `/', and `\',
+the middle 4 for `O', and all 8 for non-symmetrical patterns.
+
+   Each of the reflection operations (e-h) is equivalent to reflection
+about one arbitrary axis followed by one of the rotations (a-d).  We
+can choose to reflect about the axis of symmetry (which causes no net
+change) and can therefore conclude that each of e-h is equivalent to
+the reflection (no-op) followed by a-d.  This argument therefore
+extends to include - and / as well as | and \.
+
+
+File: gnugo.info,  Node: Details,  Next: grid optimization,  Prev: Symmetry & transformations,  Up: Patterns
+
+Implementation Details
+======================
+
+  1. An entry in the pattern header states whether the anchor is an X or
+     an O. This helps performance, since all transformations can be
+     rejected at once if the anchor stone does not match. (Ideally, we
+     could just define that the anchor is always O or always X, but some
+     patterns contain no O's and some contain no X's.)
+
+  2. The pattern header contains the size of the pattern (ie the
+     co-ordinates of the top left and bottom right elements) relative to
+     the anchor. This allows the pattern can be rejected quickly if
+     there is not room for the pattern to fit around the anchor stone
+     in a given orientation (ie it is too near the edge of the board).
+     The bounding box information must first be transformed like the
+     elements before it can be tested, and after transforming, we need
+     to work out where the top-left and bottom-right corners are.
+
+  3. The edge constraints are implemented by notionally padding the
+     pattern with rows or columns of `?' until it is exactly 19 (or
+     whatever the current board size is) elements wide or high. Then the
+     pattern is quickly rejected by (ii) above if it is not at the
+     edge. So the example pattern above is compiled as if it was written
+
+
+          "example"
+          .OO????????????????
+          *XX????????????????
+          o??????????????????
+          :8,80
+
+  4. The elements in a pattern are sorted so that non-space elements
+     are checked before space elements. It is hoped that, for most of
+     the game, more squares are empty, and so the pattern can be more
+     quickly rejected doing it this way.
+
+  5. The actual tests are performed using an 'and-compare' sequence.
+     Each board position is a 2-bit quantity.  %00 for empty, %01 for
+     O, %10 for X.  We can test for an exact match by and-ing with %11
+     (no-op), then comparing with 0, 1 or 2. The test for `o' is the
+     same as a test for 'not-X', ie not %10. So and with %01 should
+     give 0 if it matches. Similarly `x' is a test that bit 0 is not
+     set.
+
+
+
+File: gnugo.info,  Node: grid optimization,  Next: Joseki Compiler,  Prev: Details,  Up: Patterns
+
+The "Grid" Optimization
+=======================
+
+   The comparisons between pattern and board are performed as 2-bit
+bitwise operations. Therefore they can be performed in parallel,
+16-at-a-time on a 32-bit machine.
+
+   Suppose the board is layed out as follows :
+
+
+      .X.O....OO
+      XXXXO.....
+      .X..OOOOOO
+      X.X.......
+      ....X...O.
+
+which is internally stored internally in a 2d array (binary)
+
+
+      00 10 00 01 00 00 00 00 01 01
+      10 10 10 10 01 00 00 00 00 00
+      00 10 00 00 01 01 01 01 01 01
+      10 00 10 00 00 00 00 00 00 00
+      00 00 00 00 10 00 00 00 01 00
+
+we can compile this to a composite array in which each element stores
+the state of a 4x4 grid of squares :
+
+
+      ????????  ????????  ???????? ...
+      ??001000  00100001  10000100
+      ??101010  10101010  10101001
+      ??001000  00100000  10000001
+     
+      ??001000  00100001  ...
+      ??101010  10101010
+      ??001000  00100000
+      ??001000  10001000
+     
+     ...
+     
+      ??100010  ...
+      ??000000
+      ????????
+      ????????
+
+   Where '??' is off the board.
+
+   We can store these 32-bit composites in a 2d merged-board array,
+substituting the illegal value %11 for '??'.
+
+   Similarly, for each pattern, mkpat produces appropriate 32-bit
+and-value masks for the pattern elements near the anchor. It is a
+simple matter to test the pattern with a similar test to (5) above, but
+for 32-bits at a time.
+
+
+File: gnugo.info,  Node: Joseki Compiler,  Next: Ladders in Joseki,  Prev: grid optimization,  Up: Patterns
+
+The Joseki Compiler
+===================
+
+   GNU Go includes a joseki compiler in `patterns/joseki.c'. This
+processes an SGF file (with variations) and produces a sequence of
+patterns which can then be fed back into mkpat. The joseki database is
+currently in files in `patterns/' called `hoshi.sgf', `komoku.sgf',
+`sansan.sgf', `mokuhazushi.sgf' and `takamoku.sgf'.  This division can
+be revised whenever need arises.
+
+   The SGF files are transformed into the pattern database `.db' format
+by the program in `joseki.c'. These files are in turn transformed into C
+code by the program in `mkpat.c' and the C files are compiled and linked
+into the GNU Go binary.
+
+   Not every node in the SGF file contributes a pattern. The nodes which
+contribute patterns have the joseki in the upper right corner, with the
+boundary marked with a square mark and other information to determine
+the resulting pattern marked in the comments.
+
+   The intention is that the move valuation should be able to choose
+between the available variations by normal valuation. When this fails
+the primary workaround is to use shape values to increase or decrease
+the value. It is also possible to add antisuji variations to forbid
+popular suboptimal moves. As usual constraints can be used, e.g. to
+condition a variation on a working ladder.
+
+   The joseki format has the following components for each SGF node:
+
+   * A square mark (`SQ' or `MA' property) to decide how large part of
+     the board should be included in the pattern.
+
+   * A move (`W' or `B' property) with the natural interpretation.  If
+     the square mark is missing or the move is a pass, no pattern is
+     produced for the node.
+
+   * Optional labels (`LB' property), which must be a single letter
+     each.  If there is at least one label, a constraint diagram will be
+     produced with these labels.
+
+   * A comment (`C' property). As the first character it should have
+     one of the following characters to decide its classification:
+        - `U' - urgent move
+
+        - `S' or `J' - standard move
+
+        - `s' or `j' - lesser joseki
+
+        - `T' - trick move
+
+        - `t' - minor joseki move (tenuki OK)
+
+        - `0' - antisuji (`A' can also be used)
+     The rest of the line is ignored, as is the case of the letter. If
+     neither of these is found, it's assumed to be a standard joseki
+     move.
+
+     In addition to this, rows starting with the following characters
+     are recognized:
+        - `#' - Comments. These are copied into the patterns file,
+          above the diagram.
+
+        - `;' - Constraints. These are copied into the patterns file,
+          below the constraint diagram.
+
+        - `>' - Actions. These are copied into the patterns file, below
+          the constraint diagram.
+
+        - `:' - Colon line. This is a little more complicated, but the
+          colon line of the produced patterns always start out with
+          ":8,s" for transformation number and sacrifice pattern class
+          (it usually isn't a sacrifice, but it's pointless spending
+          time checking for tactical safety). Then a joseki pattern
+          class character is appended and finally what is included on
+          the colon line in the comment for the SGF node.
+
+   Example: If the comment in the SGF file looks like
+
+     F
+     :C,shape(3)
+     ;xplay_attack(A,B,C,D,*)
+
+the generated pattern will have a colon line
+
+     :8,sjC,shape(3)
+
+and a constraint
+
+     ;xplay_attack(A,B,C,D,*)
+
+
+File: gnugo.info,  Node: Ladders in Joseki,  Prev: Joseki Compiler,  Up: Patterns
+
+Ladders in Joseki
+=================
+
+   As an example of how to use autohelpers with the Joseki compiler, we
+consider an example where a Joseki is bad if a ladder fails. Assume we
+have the taisha and are considering connecting on the outside with the
+pattern
+
+     --------+
+     ........|
+     ........|
+     ...XX...|
+     ...OXO..|
+     ...*O...|
+     ....X...|
+     ........|
+     ........|
+
+   But this is bad unless we have a ladder in our favor. To check this
+we add a constraint which may look like
+
+     --------+
+     ........|
+     ........|
+     ...XX...|
+     ...OXO..|
+     ...*OAC.|
+     ....DB..|
+     ........|
+     ........|
+     
+     ;oplay_attack(*,A,B,C,D)
+
+   In order to accept the pattern we require that the constraint on the
+semicolon line evaluates to true. This particular constraint has the
+interpretation "Play with alternating colors, starting with `O', on the
+intersections `*', `A', `B', and `C'. Then check whether the stone at
+`D' can be captured." I.e. play to this position
+
+     --------+
+     ........|
+     ........|
+     ...XX...|
+     ...OXO..|
+     ...OOXX.|
+     ....XO..|
+     ........|
+     ........|
+
+and call `attack()' to see whether the lower `X' stone can be captured.
+This is not limited to ladders, but in this particular case the
+reading will of course involve a ladder.
+
+   The constraint diagram above with letters is how it looks in the
+`.db' file. The joseki compiler knows how to create these from labels in
+the SGF node. `Cgoban' has an option to create one letter labels, but
+this ought to be a common feature for SGF editors.
+
+   Thus in order to implement this example in SGF, one would add labels
+to the four intersections and a comment:
+
+     ;oplay_attack(*,A,B,C,D)
+
+   The appropriate constraint (autohelper macro) will then be added to
+the Joseki `.db' file.
+
+
+File: gnugo.info,  Node: DFA,  Next: Tactical Reading,  Prev: Patterns,  Up: Top
+
+The DFA pattern matcher
+***********************
+
+   In this chapter, we describe the principles of the gnugo DFA pattern
+matcher.  The aim of this system is to permit a fast pattern matching
+when it becomes time critical like in owl module (*Note The Owl
+Code::).  The actual version is still experimental but is expected to
+be fully integrated in later versions of gnugo.  If you want to test it
+with version 3.0 you must run `configure --enable-dfa' then recompile
+GNU Go (*Note Using DFA::).  The basic principle is to generate off
+line a finite state machine called a Deterministic Finite State
+Automaton (*Note What is a DFA::) from the pattern database and then
+use it at runtime to speedup pattern matching (*Note Pattern matching
+with DFA:: and *Note Incremental Algorithm::).
+
+* Menu:
+
+* Using DFA::  How to use DFA's with gnugo.
+* Scan Path::  The path used to scan the board.
+* What is a DFA:: A recall of language theory.
+* Pattern matching with DFA:: How to retrieve go patterns with a dfa ?
+* Building the DFA:: Playing with explosives.
+* Incremental Algorithm:: The joy of determinism.
+* DFA Optimizations:: Some possible optimizations.
+
+
+File: gnugo.info,  Node: Using DFA,  Next: Scan Path,  Prev: DFA,  Up: DFA
+
+Using DFA
+---------
+
+   First build the program with 'configure -enable-dfa', then type
+'make' as usual.
+
+   Some .db files will be compiled into DFA's by the program mkpat.
+DFA are stored into C files and compiled with the engine.  When a DFA
+is found, gnugo write "<pattern database name> -> using dfa" at startup
+and use the dfa to "filter" patterns.  When no DFA is found, the
+standard pattern matcher is used.
+
+
+File: gnugo.info,  Node: Scan Path,  Next: What is a DFA,  Prev: Using DFA,  Up: DFA
+
+Scan Path
+---------
+
+   The board is scanned following a predefined path.  The default path
+is a spiral starting from the center of the pattern.  This path is used
+both to build the DFA and to scan the board.
+
+       +---B--------------+
+       | C 4 A . . . . . .|
+       D 5 1 3 9 . . . . .|
+       E 6 2 8 . . X . . .|
+       | F 7 . . . . . . .|
+       | . +-> . . . . . .|
+       | . . . . . . . . .|
+       | . O . . . X . . .|
+       | . . . . . . . . .|
+       | . . . . . . . . .|
+       +------------------+
+
+   This path is encoded by two arrays of integers order_i[k] and
+order_j[k] giving the offset where to read the values on the board.
+
+   Reading the board following a predefined path reduces the two
+dimentional pattern matching to a linear text searching problem.  This
+pattern for example:
+
+     ?X?
+     .O?
+     ?OO
+
+scanned following the path
+
+     149
+     238
+     567
+     
+     (i,j)->(i+1,j)->(i+1,j+1)->(i,j+1)->(i+2,j+0)->(i+2,j+1)->(i+2,j+2)...
+
+gives the string "?.OX?OO??"  where "?" means 'don't care'.  We can
+forget the two dimensional patterns for a time to focus on linear
+patterns.
+
+
+File: gnugo.info,  Node: What is a DFA,  Next: Pattern matching with DFA,  Prev: Scan Path,  Up: DFA
+
+What is a DFA
+-------------
+
+   The acronym DFA means Deterministic Finite state Automaton (See
+`http://www.eti.pg.gda.pl/~jandac/thesis/node12.html' or `Hopcroft &
+Ullman "Introduction to Language Theory"' for more details).  DFA are
+common tools in compilers design (Read `Aho, Ravi Sethi, Ullman
+"COMPILERS: Principles, Techniques and Tools"' for a complete
+introduction), a lot of powerfull text searching algorithm like
+`Knuth-Morris-Pratt' or `Boyer-Moore' algorithms are based on DFA's
+(See `http://www-igm.univ-mlv.fr/~lecroq/string/' for a bibliography of
+pattern matching algorithms).
+
+   Basically, a DFA is a set of "states" connected by labeled
+"transitions".  The labels are the values read on the board, in gnugo
+these values are EMPTY, WHITE, BLACK or OUT_BOARD, denoted respectively
+by '.','O','X' and '#'.
+
+   The best way to represent a dfa is to draw its transition graph: the
+pattern "????..X" is recognized by the following DFA:
+
+        .,X,O     .,X,O    .,X,O    .,X,O     .      .      X
+     [1]------>[2]----->[3]----->[4]----->[5]--->[6]--->[7]--->[8 OK!]
+     Start
+
+   This means that starting from state [1], if you read '.','X' or 'O'
+on the board, go to state [2] and so on until you reach state [5].
+From state [5], if you read '.', go to state [6] otherwise go to error
+state [0].  And so on until you reach state [8].  As soon as you reach
+state [8], you recognize Pattern "????..X"
+
+   Adding a pattern like "XXo" ('o' is a wildcard for not 'X') will
+transform directly the automaton by synchronization product (*Note
+Building the DFA::).  Consider the following DFA:
+
+     Start .,O   .,X,O    .,O,X   .,X,O      .      .       X
+     [1]---->[2]----->[3]----->[4]------>[5]--->[6]---->[7]--->[8 OK!]
+      |                ^        ^         ^
+      |            .,O |        |         |
+      |            ----         |         |
+      |           |          X  |         |
+      |           |          ---    .,X,O |
+      |           |         |             |
+      |     X     |   X     | O,.         |
+       --------->[9]------>[A]--->[B OK!]-
+
+   By adding a special "error" state and completing each state by a
+transition to error state when there is none, we transform easily a DFA
+in a "Complete Deterministic Finite state Automaton" (CDFA).  The
+synchronization product (*Note Building the DFA::) is only possible on
+CDFA's.
+
+     Start .,O   .,X,O    .,O,X   .,X,O      .      .       X
+     [1]---->[2]----->[3]----->[4]------>[5]--->[6]---->[7]--->[8 OK!]
+      |                ^        ^         ^      |       |      |
+      |            .,O |        |         |      |       |      |
+      |            ----         |         |      |       |      |
+      |           |          X  |         |      |X,O    | .,O  |X,.,O
+      |           |          ---    .,X,O |      |       |      |
+      |           |         |             |      |       |      |
+      |     X     |   X     | O,.         |     \ /     \ /    \ /
+       --------->[9]------>[A]--->[B OK!]-      [0  Error state !]
+
+   The graph of a CDFA is coded by an array of states: The 0 state is
+the "error" state and the start state is 1.
+
+     ----------------------------------------------------
+      state  |   .    |   O    |   X    |   #    |  att
+     ----------------------------------------------------
+           1 |      2 |      2 |      9 |      0 |
+           2 |      3 |      3 |      3 |      0 |
+           3 |      4 |      4 |      4 |      0 |
+           5 |      6 |      0 |      0 |      0 |
+           6 |      7 |      0 |      0 |      0 |
+           7 |      0 |      0 |      8 |      0 |
+           8 |      0 |      0 |      0 |      0 | Found pattern "????..X"
+           9 |      3 |      3 |      A |      0 |
+           A |      B |      B |      4 |      0 |
+           B |      5 |      5 |      5 |      0 | Found pattern "XXo"
+     ----------------------------------------------------
+
+   To each state we associate an often empty list of attributes which
+is the list of pattern indexes recognized when this state is reached.
+In '`dfa.h'' this is basically represented by two stuctures:
+
+     `
+     /* dfa state */
+     typedef struct state
+     {
+       int next[4]; /* transitions for EMPTY, BLACK, WHITE and OUT_BOARD */
+       attrib_t *att;
+     }
+     state_t;
+     
+     /* dfa */
+     typedef struct dfa
+     {
+       attrib_t *indexes; /* Array of pattern indexes */
+       int maxIndexes;
+     
+       state_t *states; /* Array of states */
+       int maxStates;
+     }
+     dfa_t;'
+
+
+File: gnugo.info,  Node: Pattern matching with DFA,  Next: Building the DFA,  Prev: What is a DFA,  Up: DFA
+
+Pattern matching with DFA
+-------------------------
+
+   Recognizing with a DFA is very simple and thus very fast (See
+'`scan_for_pattern()'' in the '`engine/matchpat.c'' file).
+
+   Starting from the start state, we only need to read the board
+following the spiral path, jump from states to states following the
+transitions labelled by the values read on the board and collect the
+patterns indexes on the way.  If we reach the error state (zero), it
+means that no more patterns will be matched.  The worst case complexity
+of this algorithm is o(m) where m is the size of the biggest pattern.
+
+   Here is an example of scan:
+
+   First we build a minimal dfa recognizing these patterns: "X..X",
+"X???", "X.OX" and "X?oX".  Note that wildcards like '?','o', or 'x'
+give multiple out-transitions.
+
+     ----------------------------------------------------
+      state  |   .    |   O    |   X    |   #    |  att
+     ----------------------------------------------------
+           1 |      0 |      0 |      2 |      0 |
+           2 |      3 |     10 |     10 |      0 |
+           3 |      4 |      7 |      9 |      0 |
+           4 |      5 |      5 |      6 |      0 |
+           5 |      0 |      0 |      0 |      0 |    2
+           6 |      0 |      0 |      0 |      0 |    4    2    1
+           7 |      5 |      5 |      8 |      0 |
+           8 |      0 |      0 |      0 |      0 |    4    2    3
+           9 |      5 |      5 |      5 |      0 |
+          10 |     11 |     11 |      9 |      0 |
+          11 |      5 |      5 |     12 |      0 |
+          12 |      0 |      0 |      0 |      0 |    4    2
+     ----------------------------------------------------
+
+   We perform the scan of the string "X..XXO...." starting from state 1:
+
+   Current state:     1, substring to scan : X..XXO....
+
+   We read an 'X' value, so from state 1 we must go to state 2.
+
+   Current state:     2, substring to scan : ..XXO....
+
+   We read a '.' value, so from state 2 we must go to state 3 and so on
+...
+
+     Current state:     3, substring to scan : .XXO....
+     Current state:     4, substring to scan : XXO....
+     Current state:     6, substring to scan : XO....
+     Found pattern 4
+     Found pattern 2
+     Found pattern 1
+
+   After reaching state 6 where we match patterns 1,2 and 4, there is
+no out-transitions so we stop the matching.  To keep the same match
+order as in the standard algorithm, the patterns indexes are collected
+in an array and sorted by indexes.
+
+
+File: gnugo.info,  Node: Building the DFA,  Next: Incremental Algorithm,  Prev: Pattern matching with DFA,  Up: DFA
+
+Building the DFA
+----------------
+
+   The most flavouring point is the building of the minimal DFA
+recognizing a given set of patterns.  To perform the insertion of a new
+pattern into an already existing DFA one must completly rebuild the
+DFA: the principle is to build the minimal CDFA recognizing the new
+pattern to replace the original CDFA with its "synchronised product" by
+the new one.
+
+   We first give a formal definition: Let L be the left CDFA and R be
+the right one.  Let B be the "synchronised product" of L by R.  Its
+states are the couples (l,r) where l is a state of L and r is a state
+of R.  The state (0,0) is the error state of B and the state (1,1) is
+its initial state.  To each couple (l,r) we associate the union of
+patterns recognized in both l and r.  The transitions set of B is the
+set of transitions (l1,r1)--a-->(l2,r2) for each symbol 'a' such that
+both l1--a-->l2 in L and r1--a-->r2 in R.
+
+   The maximal number of states of B is the product of the number of
+states of L and R but almost all this states are non reachable from the
+initial state (1,1).
+
+   The algorithm used in function '`sync_product()'' builds the minimal
+product DFA only by keeping the reachable states.  It recursively scans
+the product CDFA by following simultaneously the transitions of L and
+R. A hast table (`gtest') is used to check if a state (l,r) has already
+been reached, the reachable states are remapped on a new DFA. The CDFA
+thus obtained is minimal and recognizes the union of the two patterns
+sets.
+
+   It is possible to construct a special pattern database that
+generates an "explosive" automaton: the size of the DFA is in the worst
+case exponential in the number of patterns it recognizes.  But it
+doesn't occur in pratical situations: the dfa size tends to be
+"stable".  By "stable" we mean that if we add a pattern which greatly
+increases the size of the dfa it also increases the chance that the
+next added pattern does not increase its size at all.  Nevertheless
+there are many ways to reduce the size of the DFA. Good compression
+methods are explained in `Aho, Ravi Sethi, Ullman "COMPILERS:
+Principles, Techniques and Tools" chapter Optimization of DFA-based
+pattern matchers'.
+

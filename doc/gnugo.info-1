@@ -1,0 +1,1237 @@
+This is gnugo.info, produced by makeinfo version 4.0 from gnugo.texi.
+
+INFO-DIR-SECTION GNU games
+START-INFO-DIR-ENTRY
+* GNU go: (gnugo).          The GNU Go program
+END-INFO-DIR-ENTRY
+
+
+File: gnugo.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
+
+GNU GO
+******
+
+   This file documents `GNU Go', a Go program and its sources.  This is
+Edition 3.0.0 of the `GNU Go Program Documentation'
+
+   Copyright 1999, 2000 and 2001, The Free Software Foundation, Inc.
+
+   Permission is granted to make and distribute verbatim or modified
+copies of this manual is given provided that the terms of the GNU Free
+Documentation License (*note GFDL::) are respected.
+
+   Permission is granted to make and distribute verbatim or modified
+copies of the program GNU Go is given provided the terms of the GNU
+General Public License (*note GPL::) are respected.
+
+* Menu:
+
+* Introduction::                What is GNU Go ?
+* Installation::                Installing GNU Go
+* User Guide::                  Using GNU Go
+
+Programmer's Introduction
+* Overview::                    Overview of the GNU Go engine
+* Analyzing::                   Analyzing GNU Go's moves
+* API::                         API to the GNU Go engine
+* SGF::                         Handling SGF trees in memory
+* Libboard::                    The basic go board library.
+
+GNU Go Internals
+* Move Generation::             How GNU Go generates moves
+* Worms and Dragons::           Dragons and Worms
+* Eyes::                        Eyes and half eyes
+* Patterns::                    Pattern database
+* DFA::                         The DFA Pattern Matcher
+* Tactical Reading::            Tactical Reading
+* Life and Death Reading::      Life and Death reading: Owl and Life
+* Influence::                   Influence Function
+* Moyo::                        Estimation of Moyos : Bouzy's 5/21 algorithm
+* Utility Functions::           `utils.c' and `printutils.c'
+* Incremental Board::           Incremental Algorithms in Reading
+* GTP::                         The Go Text Protocol
+* Regression::                  Regression testing
+
+Appendices
+* Copying::                     Software and Documentation Licenses
+
+Indices
+* Concept Index::               Concept Index
+* Functions Index::             Functions Index
+
+
+File: gnugo.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: Top
+
+Introduction
+************
+
+   This is GNU Go 3.0, a Go program. Development versions of GNU Go may
+be found at <http://www.gnu.org/software/gnugo/devel.html>. Contact us
+at <gnugo@gnu.org> if you are interested in helping.
+
+* Menu:
+
+* About::                       About GNU Go and this Manual
+* Copyright::                   Copyright
+* Authors::                     The Authors of GNU Go
+* Thanks::			Acknowledgements
+* TODO::                        The GNU Go Task list
+
+
+File: gnugo.info,  Node: About,  Next: Copyright,  Up: Introduction
+
+About GNU Go and this Manual
+============================
+
+   The challenge of Computer Go is not to *beat* the computer, but to
+*program* the computer.
+
+   In Computer Chess, strong programs are capable of playing at the
+highest level, even challenging such a player as Garry Kasparov. No Go
+program even as strong as amateur shodan exists. The challenge is to
+write such a program.
+
+   To be sure, existing Go programs are strong enough to be interesting
+as opponents, and the hope exists that some day soon a truly strong
+program can be written.
+
+   GNU Go is getting stronger. For one thing, we've paid a lot of
+attention to life and death. GNU Go 3.0 can consistently give GNU Go
+2.6 a four stone handicap. In a four stone game against GNU Go 2.6, GNU
+Go 3.0 very often kills a group.
+
+   Until now, Go programs have always been distributed as binaries
+only. The algorithms in these proprietary programs are secret. No-one
+but the programmer can examine them to admire or criticise. As a
+consequence, anyone who wished to work on a Go program usually had to
+start from scratch. This may be one reason that Go programs have not
+reached a higher level of play.
+
+   Unlike most Go programs, GNU Go is Free Software. Its algorithms and
+source code are open and documented. They are free for any one to
+inspect or enhance. We hope this freedom will give GNU Go's descendents
+a certain competetive advantage.
+
+   Here is GNU Go's Manual. There are doubtless inaccuracies. The
+ultimate documentation is in the commented source code itself.
+
+   The first three chapters of this manual are for the general user.
+Chapter 3 is the User's Guide. The rest of the book is for programmers,
+or persons curious about how GNU Go works.  Chapter 4 is a general
+overview of the engine.  Chapter 5 introduces various tools for looking
+into the GNU Go engine and finding out why it makes a certain move, and
+Chapters 6-7 form a general programmer's reference to the GNU Go API.
+The remaining chapters are more detailed explorations of different
+aspects of GNU Go's internals.
+
+
+File: gnugo.info,  Node: Copyright,  Next: Authors,  Prev: About,  Up: Introduction
+
+Copyrights
+==========
+
+   Copyright 1999, 2000, 2001 by the Free Software Foundation except for
+the files `gmp.c' and `gmp.h', which are copyrighted by Bill Shubert
+(<wms@igoweb.org>).
+
+   All files are under the GNU General Public License (*note GPL::),
+except `gmp.c', `gmp.h', `gtp.c', `gtp.h', the files `interface/html/*'
+and `win/makefile.win'.
+
+   The two files `gmp.c' and `gmp.h' were placed in the public domain
+by William Shubert, their author, and are free for unrestricted use.
+
+   The files `gtp.c' and `gtp.h' are copyright the Free Software
+Foundation. In the interests of promoting the Go Text Protocol these
+two files are licensed under a less restrictive license than the GPL
+and are free for unrestricted use (*note GTP License::).
+
+   The files `interface/html/*' are not part of GNU Go but are a
+separate program and are included in the distribution for the
+convenience of anyone looking for a CGI interface to GNU Go. They were
+placed in the public domain by their author, Douglas Ridgway, and are
+free for unrestricted use. The file `win/makefile.win' is also in the
+public domain and is free for unrestricted use.
+
+
+File: gnugo.info,  Node: Authors,  Next: Thanks,  Prev: Copyright,  Up: Introduction
+
+Authors
+=======
+
+   GNU Go maintainers are Daniel Bump and Gunnar Farneba"ck.  GNU Go
+authors (in chronological order of contribution) are Man Li, Daniel
+Bump, David Denholm, Gunnar Farneba"ck, Nils Lohner, Jerome Dumonteil,
+Tommy Thorn, Nicklas Ekstrand, Inge Wallin, Thomas Traber, Douglas
+Ridgway, Teun Burgers, Tanguy Urvoy, Thien-Thi Nguyen, Heikki Levanto,
+Mark Vytlacil, Adriaan van Kessel, Wolfgang Manner, Jens Yllman and Don
+Dailey.
+
+
+File: gnugo.info,  Node: Thanks,  Next: TODO,  Prev: Authors,  Up: Introduction
+
+Thanks
+======
+
+   We would like to thank Arthur Britto, Tim Hunt, Piotr Lakomy, Paul
+Leonard, Jean-Louis Martineau, Andreas Roever and Pierce Wetter for
+helpful correspondence. Thanks to everyone who stepped on a bug (and
+sent us a report)!
+
+   Thanks to Gary Boos, Peter Gucwa, Martijn van der Kooij, Michael
+Margolis, Trevor Morris, Mans Ullerstam, Don Wagner and Yin Zheng for
+help with Visual C++.
+
+   And thanks to Alan Crossman, Stephan Somogyi, Pierce Wetter and
+Mathias Wagner for help with Macintosh.
+
+   Special thanks to Ebba Berggren for creating our logo, based on a
+design by Tanguy Urvoy and comments by Alan Crossman. The old GNU Go
+logo was adapted from Jamal Hannah's typing GNU:
+<http://www.gnu.org/graphics/atypinggnu.html>.  Both logos can be found
+in `doc/newlogo.*' and `doc/oldlogo.*'.
+
+   We would like to thank Stuart Cracraft, Richard Stallman and Man
+Lung Li for their interest in making this program a part of GNU,
+William Shubert for writing CGoban and gmp.c, Rene Grothmann for Jago
+and Erik van Riper and his collaborators for NNGS.
+
+
+File: gnugo.info,  Node: TODO,  Prev: Thanks,  Up: Introduction
+
+The GNU Go Task List
+====================
+
+   You can help make GNU Go the best Go program.
+
+   This is a task-list for anyone who is interested in helping with GNU
+Go. If you want to work on such a project you should correspond with us
+until we reach a common vision of how the feature will work!
+
+   A note about copyright. The Free Software Foundation has the
+copyright to GNU Go. For this reason, before any code can be accepted
+as a part of the official release of GNU Go, the Free Software
+Foundation will want you to sign a copyright assignment.
+
+   Of course you could work on a forked version without signing such a
+disclaimer. You can also distribute such a forked version of the
+program so long as you also distribute the source code to your
+modifications under the GPL (*note GPL::). But if you want your changes
+to the program to be incorporated into the version we distribute we
+need you to assign the copyright.
+
+   Please contact the GNU Go maintainers, Daniel Bump
+(<bump@math.stanford.edu>) and Gunnar Farneba"ck (<gf@isy.liu.se>), to
+get more information and the papers to sign.
+
+   Below is a list of things YOU could work on. We are already working
+on some of these tasks, but don't let that stop you. Please contact us
+or the person assigned to task for further discussion.
+
+  1. Report and fix bugs.
+          Bugs are an important cause of weakness in any Go program!
+          If you can, send us bug FIXES as well as bug reports. If you
+          see some bad behavior, figure out what causes it, and what to
+          do about fixing it. And send us a patch! If you find an
+          interesting bug and cannot tell us how to fix it, we would be
+          happy to have you tell us about it anyway. Send us the sgf
+          file (if possible) and attach other relevant information,
+          such as the GNU Go version number. In cases of assertion
+          failures and segmentation faults we probably want to know
+          what operating system and compiler you were using, in order
+          to determine if the problem is platform dependent.
+
+  2. Extend the regression test suites.
+          See the texinfo manual in the doc directory for a description
+          of how to do this. In particular it would be useful with test
+          suites for common life and death problems. Currently second
+          line groups, L groups and the tripod shape are reasonably
+          well covered, but there is for example almost nothing on comb
+          formations, carpenter's square, and so on. Other areas where
+          test suites would be most welcome are fuseki, tesuji, and
+          endgame.
+
+  3. Tune the pattern databases.
+          This is a sort of art. It is not necessary to do any
+          programming to do this since most of the patterns do not
+          require helpers. We would like it if a few more Dan level
+          players would learn this skill.
+
+  4. Extend and tune the Joseki database.
+
+  5. Rewrite the semeai module
+          The semeai module is vastly in need of improvement. In fact,
+          semeai can probably only be analyzed by reading to discover
+          what backfilling is needed before we can make atari.
+
+  6. Write a connection analysis module.
+          The connection analysis is today completely static and has a
+          hard time identifying mutually dependent connections or moves
+          that simultaneously threatens two or more connections. This
+          could be improved by writing a connection reader, which like
+          the owl code uses pattern matching to find a small amount of
+          key moves to try.
+
+  7. Speed up the tactical reading.
+          GNU Go is reasonably accurate when it comes to tactical
+          reading, but not always very fast. The main problem is that
+          too many ineffective moves are tested, leading to strange
+          variations that shouldn't need consideration. To improve this
+          the move generation heuristics in the reading code needs to
+          be refined. Some improvements should also be possible to
+          obtain by tuning the move ordering.
+
+  8. Automatically search for errors.
+          In some positions GNU Go may report a group as alive or
+          connected with a living group. But after the opponent has
+          placed one stone GNU Go may change the status to dead,
+          without going through a critical status. It would be nice if
+          these positions could be automatically identified and logged
+          for later analysis.
+
+
+
+File: gnugo.info,  Node: Installation,  Next: User Guide,  Prev: Introduction,  Up: Top
+
+Installation
+************
+
+   You can get the most recent version of GNU Go ftp.gnu.org or a mirror
+(see <http://www.gnu.org/order/ftp.html> for a list).  You can read
+about newer versions and get other information at
+<http://www.gnu.org/software/gnugo/>.
+
+* Menu:
+
+* GNU/Linux and Unix::          GNU Linux and Unix Installation
+* Configure Options::           Configure Options
+* Windows and MS-DOS::          Windows Installation
+* Macintosh::                   Macintosh Installation
+
+
+File: gnugo.info,  Node: GNU/Linux and Unix,  Next: Configure Options,  Up: Installation
+
+GNU/Linux and Unix
+==================
+
+   Untar the sources, change to the directory gnugo-3.0.0. Now do:
+
+        ./configure [OPTIONS]
+        make
+
+   The most important configure options, cache size, default level and
+dfa will be explained in detail in the next section (*note Configure
+Options::). Probably you do not need to set these unless you are
+dissatisfied with GNU Go's performance for any reason.
+
+   As an example,
+
+        ./configure --enable-cache-size=32 --enable-level=8
+
+creates a 48 Mb cache in RAM and sets the level to 8. Both these
+defaults can be overridden at run time.
+
+   If you do not specify any options, the default level is 10 (highest
+supported), and the default cache size is 16, and the DFA is not
+enabled.
+
+   If you have a slow machine or find GNU Go too slow you may want to
+decrease the default level. At level 8 the engine is playing about 1.6
+times faster than at level 10.
+
+   Increasing the cache size will improve performance up to a point --
+once the cache is so large that it cannot be kept in RAM, GNU Go will
+start swapping (characterized by frequent hard drive accesses) and
+performance will degrade.
+
+   You have now made a binary called `interface/gnugo'. Now (running as
+root) type
+
+        make install
+
+to install gnugo in `/usr/local/bin'.
+
+   There are different methods of using GNU Go. You may run it from the
+command line by just typing:
+
+        gnugo
+
+but it is nicer to run it using CGoban 1 (under X-Windows) or Jago (on
+any platform with a Java runtime environment).
+
+   You can get the most recent version of CGoban 1 from Bill Shubert's
+web site: <http://www.igoweb.org/~wms/comp/cgoban/index.html> The
+CGoban version number MUST be 1.9.1 at least or it won't work. CGoban 2
+will not work.
+
+   *Note CGoban::, for instructions on how to run GNU Go from Cgoban, or
+*Note Jago::, for Jago.
+
+
+File: gnugo.info,  Node: Configure Options,  Next: Windows and MS-DOS,  Prev: GNU/Linux and Unix,  Up: Installation
+
+   There are three options which you should consider configuring,
+particularly if you are dissatisfied with GNU Go's performance.
+
+* Menu:
+
+* Ram Cache::                 Ram Cache
+* Default Level::             Default Level
+* DFA Option::                DFA Option
+
+
+File: gnugo.info,  Node: Ram Cache,  Next: Default Level,  Up: Configure Options
+
+Ram Cache
+---------
+
+   By default, GNU Go makes a cache of 16 Megabytes in RAM for its
+internal use. The cache is used to store intermediate results during
+its analysis of the position.
+
+   Increasing the cache size will often give a modest speed improvement.
+If your system has lots of RAM, consider increasing the cache size. But
+if the cache is too large, swapping will occur, causing hard drive
+accesses and degrading performance. If your hard drive seems to be
+running excessively your cache may be too large. On GNU/Linux systems,
+you may detect swapping using the program 'top'. Use the 'f' command to
+toggle SWAP display.
+
+   You may override the size of the default cache at compile time by
+running one of:
+
+        ./configure --enable-cache-size=n
+
+to set the cache size to `n' megabytes. For example
+
+        ./configure --enable-cache-size=48
+
+creates a cache of size 48 megabytes. If you omit this, your default
+cache size will be 16 MB. You must recompile and reinstall GNU Go after
+reconfiguring it by running `make' and `make install'.
+
+   You may override the compile-time defaults by running gnugo with the
+option `--cache-size n', where `n' is the size in megabytes of the
+cache you want, and `--level' where n is the level desired.  We will
+discuss setting these parameters next in detail.
+
+
+File: gnugo.info,  Node: Default Level,  Next: DFA Option,  Prev: Ram Cache,  Up: Configure Options
+
+Default Level
+-------------
+
+   GNU Go can play at different levels. Up to level 10 is supported. At
+level 10 GNU Go is much more accurate but takes an average of about 1.6
+times longer to play than at level 8.
+
+   The level can be set at run time using the `--level' option.  If you
+don't set this, the default level will be used. You can set the default
+level with the configure option `--enable-level=n'. For example
+
+     ./configure --enable-level=9
+
+sets the default level to 9. If you omit this parameter, the compiler
+sets the default level to 10. We recommend using level 10 unless you
+find it too slow. If you decide you want to change the default you may
+rerun configure and recompile the program.
+
+
+File: gnugo.info,  Node: DFA Option,  Prev: Default Level,  Up: Configure Options
+
+DFA Configure Option
+--------------------
+
+   If you `./configure --enable-dfa' you get the experimental DFA
+(Discrete Finite-State Automata) pattern matcher. This will result in a
+larger but somewhat faster engine. The option is considered experimental
+because it is new and harder to debug but sufficiently tested that it is
+probably safe.
+
+
+File: gnugo.info,  Node: Windows and MS-DOS,  Next: Macintosh,  Prev: Configure Options,  Up: Installation
+
+Compiling GNU Go on Microsoft platforms
+=======================================
+
+   GNU Go is being developed on Unix variants. GNU Go is easy to build
+and install on those platforms. GNU Go 3.0 has support for building on
+MS-DOS, Windows 3.x, Windows NT/2000 and Windows 95/98.
+
+   There are two approaches to building GNU Go on Microsoft platforms.
+
+  1. The first approach is to install a Unix-like environment based on
+     ports of GCC to Microsoft platforms. This approach is fully
+     supported by the GNU Go developers and works well. Several high
+     quality free Unix-environments for Microsoft platforms are
+     available.
+
+     One benefit of this approach is that it is easier to participate
+     in Gnu Go's development. These unix environments come for instance
+     with the `diff' and `patch' programs necessary to generate and
+     apply patches.
+
+     Another benefit of the unix environments is that development
+     versions (which may be stronger than the latest stable version)
+     can be built too.  The supporting files for VC are not always
+     actively worked on and consequently are often out of sync for
+     development versions, so that VC will not build cleanly.
+
+  2. The second approach is to use compilers such as Visual C developed
+     specially for the Microsoft platform. GNU Go 2.6 and later support
+     Visual C. Presently we support Visual C through the project files
+     which are supplied with the distribution.
+
+   The rest of this section gives more details on the various ways to
+compile GNU go for Microsoft platforms.
+
+* Menu:
+
+* DJGPP::      Windows 95/98, MS-DOS and Windows 3.x using DJGPP
+* Cygwin::     Windows NT, 95/98 using Cygwin
+* MinGW32::    Windows NT, 95/98 using MINGW32
+* VC::         Visual C++ using Project Files
+
+
+File: gnugo.info,  Node: DJGPP,  Next: Cygwin,  Up: Windows and MS-DOS
+
+Windows 95/98, MS-DOS and Windows 3.x using DJGPP
+-------------------------------------------------
+
+   On these platforms DJGPP can be used. GNU Go installation has been
+tested in a DOS-Box with long filenames on Windows 95/98. GNU Go
+compiles out-of-the box with the DJGPP port of GCC using the standard
+Unix build and install procedure.
+
+   Some URLs for DJGPP:
+
+   DJGPP home page: <http://www.delorie.com/djgpp/>
+
+   DJGPP ftp archive on simtel:
+
+   <ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/>
+
+   <ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/>
+
+   Once you have a working DJGPP environment and you have downloaded
+the gnugo source available as gnugo-3.0.0.tar.gz you can build the
+executable as follows:
+
+            tar zxvf gnugo-3.0.0.tar.gz
+            cd gnugo-3.0.0
+            ./configure
+            make
+
+   Optionally you can download glib for DJGPP to get a working version
+of snprintf.
+
+
+File: gnugo.info,  Node: Cygwin,  Next: MinGW32,  Prev: DJGPP,  Up: Windows and MS-DOS
+
+Windows NT, Windows 95/98 using Cygwin
+--------------------------------------
+
+   On these platforms the Cygwin environment can be installed. Recent
+versions of Cygwin install very easily with the setup program available
+from the cygwin homepage.  <<http://sourceware.cygnus.com/cygwin/>.
+GNU Go compiles out-of-the box using the standard Unix build procedure
+on the Cygwin environment. After installation of cygwin and fetching
+`gnugo-3.0.0.tar.gz' you can type:
+
+       tar zxvf gnugo-3.0.0.tar.gz
+       cd gnugo-3.0.0
+       ./configure
+       make
+
+   The generated executable is not a stand-alone executable: it needs
+cygwin1.dll that comes with the Cygwin environment. cygwin1.dll
+contains the emulation layer for Unix.
+
+   Cygwin Home page: <http://sourceware.cygnus.com/cygwin/>
+
+   Optionally you can use glib to get a working version of snprintf.
+Glib builds out of the box on cygwin.
+
+
+File: gnugo.info,  Node: MinGW32,  Next: VC,  Prev: Cygwin,  Up: Windows and MS-DOS
+
+Windows NT, Windows 95/98 using MinGW32
+---------------------------------------
+
+   The Cygwin environment also comes with MinGW32. This generates an
+executable that relies only on Microsoft DLLs. This executable is thus
+completely comparable to a Visual C executable and easier to distribute
+than the Cygwin executable. To build on cygwin an executable suitable
+for the win32 platform type the following at your cygwin prompt:
+
+       tar zxvf gnugo-3.0.0.tar.gz
+       cd gnugo-3.0.0
+       env CC='gcc -mno-cygwin' ./configure
+       make
+
+
+File: gnugo.info,  Node: VC,  Prev: MinGW32,  Up: Windows and MS-DOS
+
+Windows NT, Windows 95/98 using Visual C and project files
+----------------------------------------------------------
+
+   We assume that you do not want to change any configure options.  If
+you do, you should edit the file `config.vc'. Note that when
+`configure' is run, this file is overwritten with the contents of
+`config.vcin', so you may also want to edit `config.vcin', though the
+instructions below do not have you running `configure'.
+
+  1. Open the VC++ 6 workspace file gnugo.dsw
+
+  2. Set the gnugo project as the active project (right-click on it,
+     and select "Set as Active Project".  Select 'Build' from the main
+     menu, then select 'Build gnugo.exe', this will make all of the
+     runtime subprojects.
+
+   Notes:
+
+   * a) The build can also be done from the command line:
+              msdev gnugo.dsw /make "gnugo - Win32 Release"
+
+   * b) The default configuration is 'Debug', build the optimized
+     version by selecting 'Build' from the main menu , then select 'Set
+     active Configuration' and click on 'gnugo - Win32 Release'.  See
+     the Visual Studio help for more on project configurations.
+
+   * c) A custom build step in the first dependent subproject (utils)
+     copys config.vc to config.h in the root directory. If you want to
+     modify config.h, copy any changes to config.vc. In particular if
+     you want to change the default level or default cache size, whose
+     significance is discussed in *Note GNU/Linux and Unix::, you must
+     edit this file.
+
+   * d) This project was built and tested using VC version 6.0.  It has
+     not been tested, and will most likely not work with earlier
+     versions of VC.
+
+   * e) If for any reason some or all of the automatically built files
+     in the patterns directory do not build you can run mkpat on the
+     command line to make these files. For reference here are the
+     recommended mkpat options:
+
+            FILE             MKPAT OPTIONS      INPUT FILES
+          
+           conn.c           mkpat -c conn            conn.db
+           patterns.c       mkpat -b pat             patterns.db, patterns2.db
+           apatterns.c      mkpat -X attpat          attack.db
+           dpatterns.c      mkpat defpat             defense.db
+           influence.c      mkpat -c influencepat    influence.db
+           endgame.c        mkpat -b endpat          endgame.db
+           owl_attackpat.c  mkpat -b owl_attackpat   owl_attackpats.db
+           owl_vital_apat.c mkpat -b owl_vital_apat  owl_vital_apats.db
+           owl_defendpat.c  mkpat -b owl_defendpat   owl_defendpats.db
+           fuseki9.c        mkpat -b -f fuseki9      fuseki9.db
+           fuseki19.c       mkpat -b -f fuseki19     fuseki19.db
+           josekidb.c       mkpat -b joseki          hoshi.db, komoku.db,
+                                                     sansan.db, takamoku.db
+                                                     mokuhazushi.db
+
+Running GNU Go on Windows NT and Windows 95/98
+----------------------------------------------
+
+   GNU Go does not come with its own graphical user interface. The Java
+client jago can be used.
+
+   To run Jago you need a Java Runtime Environment (JRE). This can be
+obtained from <http://www.javasoft.com/>.  This is the runtime part of
+the Java Development Kit (JDK) and consists of the Java virtual
+machine, Java platform core classes, and supporting files.  The Java
+virtual machine that comes with I.E. 5.0 works also.
+
+   Jago:
+<http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html>
+
+  1. Invoke GNU Go with `gnugo --quiet --mode gmp'
+
+  2. Run `gnugo --help' from a cygwin or DOS window for a list of
+     options
+
+  3. optionally specify `--level <level>' to make the game faster
+
+   Jago works well with both the Cygwin and MinGW32 executables. The
+DJGPP executable also works, but has some problems in the interaction
+with jago after the game has been finished and scored.
+
+
+File: gnugo.info,  Node: Macintosh,  Prev: Windows and MS-DOS,  Up: Installation
+
+Macintosh
+=========
+
+   If you have Mac OS X you can build GNU Go using Apple's compiler,
+which is derived from GCC. We recommend adding the flag -no-cpp-precom
+to CFLAGS.
+
+
+File: gnugo.info,  Node: User Guide,  Next: Overview,  Prev: Installation,  Up: Top
+
+Using GNU Go
+************
+
+* Menu:
+
+* Documentation::            Getting Documentation
+* CGoban::                   Running GNU Go with CGoban
+* Ascii::                    The Ascii Interface
+* Emacs::                    GNU Go mode in Emacs
+* Jago::                     Jago
+* GMP and GTP::              The Go Modem Protocol and Go Text Protocol
+* Tournaments::              Computer Tournaments
+* SGF Support::              The Smart Go Format
+* Invoking GNU Go::          Command line options
+
+
+File: gnugo.info,  Node: Documentation,  Next: CGoban,  Up: User Guide
+
+Getting Documentation
+=====================
+
+   You can obtain a printed copy of the manual by running `make
+gnugo.ps' in the `doc/'directory, then printing the resulting
+postscript file. The manual contains a great deal of information about
+the algorithms of GNU Go.
+
+   On platforms supporting info documentation, you can usually install
+the manual by executing `make install' (running as root) from the
+`doc/' directory. The info documentation can be read conveniently from
+within Emacs by executing the command `Control-h i'.
+
+   Documentation in `doc/' consists of a man page `gnugo.6', the info
+files `gnugo.info', `gnugo.info-1', ... and the Texinfo files from
+which the info files are built. The Texinfo documentation contains this
+User's Guide and extensive information about the algorithms of GNU Go,
+for developers.
+
+   If you want a typeset copy of the Texinfo documentation, you can
+`make gnugo.dvi' or `make gnugo.ps' in the `doc/' directory.
+
+   You can make an HTML version with the command `makeinfo --html
+gnugo.texi'. Better HTML documentation may be obtained using `texi2html
+-split_chapter gnugo.texi'. You can obtain the `texi2html' utility
+(version 1.61 or later) from
+<http://www.mathematik.uni-kl.de/~obachman/Texi2html/>. (See also
+<http://texinfo.org/texi2html/>.)
+
+   User documentation can be obtained by running `gnugo --help' or `man
+gnugo' from any terminal, or from the Texinfo documentation.
+
+   Documentation for developers is in the Texinfo documentation, and in
+comments throughout the source. Contact us at <gnugo@gnu.org> if you are
+interested in helping to develop this program.
+
+
+File: gnugo.info,  Node: CGoban,  Next: Ascii,  Prev: Documentation,  Up: User Guide
+
+Running GNU Go via CGoban
+=========================
+
+   This is an extremely nice way to run GNU Go. CGoban provides a
+beautiful graphic user interface under X-Windows.
+
+   Start CGoban. When the CGoban Control panel comes up, select "Go
+Modem". You will get the Go Modem Protocol Setup. Choose one (or both)
+of the players to be "Program," and fill out the box with the path to
+gnugo. After clicking OK, you get the Game Setup window.  Choose "Rules
+Set" to be Japanese (otherwise handicaps won't work).  Set the board
+size and handicap if you want.
+
+   If you want to play with a komi, you should bear in mind that the
+GMP does not have any provision for communicating the komi.  Because of
+this misfeature, unless you set the komi at the command line GNU Go
+will have to guess it. It assumes the komi is 5.5 for even games, 0.5
+for handicap games. If this is not what you want, you can specify the
+komi at the command line with the `--komi' option, in the Go Modem
+Protocol Setup window.  You have to set the komi again in the Game
+Setup window, which comes up next.
+
+   Click OK and you are ready to go.
+
+   In the Go Modem Protocol Setup window, when you specify the path to
+GNU Go, you can give it command line options, such as `--quiet' to
+suppress most messages. Since the Go Modem Protocol preempts standard
+I/O other messages are sent to stderr, even if they are not error
+messages. These will appear in the terminal from which you started
+CGoban.
+
+
+File: gnugo.info,  Node: Ascii,  Next: Emacs,  Prev: CGoban,  Up: User Guide
+
+Ascii Interface
+===============
+
+   Even if you do not have CGoban installed you can play with GNU Go
+using its default Ascii interface. Simply type `gnugo' at the command
+line, and GNU Go will draw a board. Typing `help' will give a list of
+options. At the end of the game, pass twice, and GNU Go will prompt you
+through the counting. You and GNU Go must agree on the dead groups--you
+can toggle the status of groups to be removed, and when you are done,
+GNU Go will report the score.
+
+   You can save the game at any point using the `save FILENAME'
+command. You can reload the game from the resulting SGF file with the
+command `gnugo -l FILENAME --mode ascii'. Reloading games is not
+supported when playing with CGoban. However you can use CGoban to save
+a file, then reload it in ascii mode.
+
+
+File: gnugo.info,  Node: Emacs,  Next: Jago,  Prev: Ascii,  Up: User Guide
+
+GNU Go mode in Emacs
+====================
+
+   You can run GNU Go from Emacs. This has the advantage that you place
+the stones using the cursor arrow keys.  This may require Emacs 20.4 or
+later--it has been tested with Emacs 20.4 but does not work with Emacs
+19 or Emacs 20.2.
+
+   Load `interface/gnugo.el', either by `M-x load-file', or by copying
+the file into your `site-lisp' directory and adding a line
+
+     (autoload 'gnugo "gnugo" "GNU Go" t)
+
+in your `.emacs' file.
+
+   Now you may start GNU Go by `M-x gnugo'. You will be prompted for
+command line options *note Invoking GNU Go::. Using these, you may set
+the handicap, board size, color and komi.
+
+   You can enter commands from the GNU Go ASCII interface after typing
+`:'. For example, to take a move back, type `:back', or to list all
+commands, type `:help'.
+
+   Here are the default keybindings:
+
+   * `Return' or `Space'
+          Select point as the next move.  An error is signalled for
+          invalid locations.  Illegal locations, on the other hand,
+          show up in the GNUGO Console buffer.
+
+   * `q' or `Q'
+          Quit. Both Board and Console buffers are deleted.
+
+   * `R'
+          Resign.
+
+   * `C-l'
+          Refresh.  Includes restoring default window configuration.
+
+   * `M-_'
+          Bury both Board and Console buffers (when the boss is near).
+
+   * `p'
+          Pass; i.e., select no location for your move.
+
+   * `:'
+          Extended command. After typing the `:' you can type a command
+          for GNU Go. The possible commands are as in *Note Ascii::.
+
+
+File: gnugo.info,  Node: Jago,  Next: GMP and GTP,  Prev: Emacs,  Up: User Guide
+
+Running GNU Go via Jago
+=======================
+
+   Jago, like CGoban is a client capable of providing GNU Go with a
+graphical user interface. Unlike CGoban, it does not require X-Windows,
+so it is an attractive alternative under Windows.  You will need a Java
+runtime environment. Obtain Jago at
+
+   <http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html>
+
+and follow the links there for the Java runtime environment.
+
+
+File: gnugo.info,  Node: GMP and GTP,  Next: Tournaments,  Prev: Jago,  Up: User Guide
+
+The Go Modem Protocol and Go Text Protocol
+==========================================
+
+   The Go Modem Protocol (GMP) was developed by Bruce Wilcox with input
+from David Fotland, Anders Kierulf and others, according to the history
+in <http://www.britgo.org/tech/gmp.html>.
+
+   Any Go program _should_ support this protocol since it is a
+standard. Since CGoban supports this protocol, the user interface for
+any Go program can be done entirely through CGoban. The programmer can
+concentrate on the real issues without worrying about drawing stones,
+resizing the board and other distracting issues.
+
+   GNU Go 3.0 introduces a new protocol, the Go Text Protocol (*note
+GTP::) which we hope can serve the functions currently used by the GMP.
+
+
+File: gnugo.info,  Node: Tournaments,  Next: SGF Support,  Prev: GMP and GTP,  Up: User Guide
+
+Computer Go Tournaments
+=======================
+
+   Computer Tournaments currently use the Go Modem Protocol.  The
+current method followed in such tournaments is to connect the serial
+ports of the two computers by a "null modem" cable.  If you are running
+GNU/Linux it is convenient to use CGoban.  If your program is black,
+set it up in the Go Modem Protocol Setup window as usual. For White,
+select "Device" and set the device to `/dev/cua0' if your serial port
+is COM1 and `/dev/cua1' if the port is COM2.
+
+
+File: gnugo.info,  Node: SGF Support,  Next: Invoking GNU Go,  Prev: Tournaments,  Up: User Guide
+
+Smart Go Format
+===============
+
+   The Smart Go Format (SGF), is the standard format for storing Go
+games.  GNU Go supports both reading and writing SGF files. The SGF
+specification (FF[4]) is at: <http://www.red-bean.com/sgf/>
+
+
+File: gnugo.info,  Node: Invoking GNU Go,  Prev: SGF Support,  Up: User Guide
+
+Invoking GNU Go: Command line options
+=====================================
+
+Some basic options
+------------------
+
+   * `--help', `-h'
+          Print a help message describing the options. This will also
+          tell you the defaults of various parameters, most importantly
+          the level and cache size. The default values of these
+          parameters can be set before compiling by `configure'.  If
+          you forget the defaults you can find out using `--help'.
+
+   * `--boardsize SIZE'
+          Set the board size
+
+   * `--komi NUM'
+          Set the komi
+
+   * `--level LEVEL'
+          GNU Go can play with different strengths and speeds. Level 10
+          is the default. Decreasing the level will make GNU Go faster
+          but less accurate in its reading.
+
+   * `--quiet', `--silent'
+          Don't print copyright and other messages. Messages
+          specifically requested by other command line options, such as
+          `--trace', are not supressed.
+
+   * `-l', `--infile FILENAME'
+          Load the named SGF file
+
+   * `-L', `--until MOVE'
+          Stop loading just before the indicated move is played. MOVE
+          can be either the move number or location.
+
+   * `-o', `--outfile FILENAME'
+          Write sgf output to file
+
+   * `--mode MODE'
+          Force the playing mode ('ascii', 'test,' 'gmp' or 'gtp'). The
+          default is ASCII, but if no terminal is detected GMP (Go
+          Modem Protocol) will be assumed. In practice this is usually
+          what you want, so you may never need this option.
+
+Other general options:
+----------------------
+
+   * `-M', `--cache-size MEGS'
+          Memory in megabytes used for hashing. The default size is 16
+          unless you configure gnugo with the command `configure
+          --enable-cache-size=SIZE' before compiling to make SIZE the
+          default (*note Installation::).  GNU Go stores results of its
+          reading calculations in a Hash table (*note Hashing::). If
+          the Hash table is filled, it is emptied and the reading
+          continues, but some reading may have to be repeated that was
+          done earlier, so a larger cache size will make GNU Go run
+          faster, provided the cache is not so large that swapping
+          occurs. Swapping may be detected on GNU/Linux machines using
+          the program `top'. However if you have ample memory or if
+          performance seems to be a problem may want to increase the
+          size of the Hash cache using this option.
+
+   * `--chinese-rules'
+          Use Chinese rules. This means that the Chinese or Area
+          Counting is followed. It may affect the score of the game by
+          one point in even games, more if there is a handicap (since
+          in Chinese Counting the handicap stones count for Black).
+
+   * `--japanese-rules'
+          Use Japanese Rules. This is the default unless you specify
+          `--enable-chinese-rules' as a configure option.
+
+   * `--copyright': Display the copyright notice
+
+   * `--version' or `-v': Print the version number
+
+   * `--printsgf FILENAME': Create an SGF file containing a diagram of
+     the board. Useful with `-L' to create diagrams from games.
+
+Other options affecting strength and speed
+------------------------------------------
+
+   The single parameter `--level' is a convenient way of choosing
+whether to play stronger or faster. This single parameter controls a
+host of other parameters which may optionally be set individually at
+the command line.  The default values of these parameters may be found
+by running `gnugo --help'. Unless you are working on the program you
+probably don't need these options. Instead, just adjust the single
+variable `--level'.
+
+   These options are of use to developers tuning the program for
+performance and accuracy.
+
+   * `-D', `--depth DEPTH'
+          Deep reading cutoff. When reading beyond this depth (default
+          14) GNU Go assumes that any string which can obtain 3
+          liberties is alive. Thus GNU Go can read ladders to an
+          arbitrary depth, but will miss other types of capturing moves.
+
+   * `--branch-depth'
+          This sets the `branch_depth', typically a little below the
+          `depth'. Between `branch_depth' and `depth', attacks on
+          strings with 3 liberties are considered but branching is
+          inhibited, so fewer variations are considered.
+
+   * `-B', `--backfill-depth DEPTH'
+          Deep reading cutoff. Beyond this depth (default 9) GNU Go
+          will no longer try backfilling moves in its reading.
+
+   * `--backfill2-depth DEPTH'
+          Another depth controlling how deeply GNU Go looks for
+          backfilling moves. The moves tried below `backfill2_depth'
+          are generally more obscure and time intensive than those
+          controlled by `backfill_depth', so this parameter has a lower
+          default.
+
+   * `-F', `--fourlib-depth DEPTH'
+          Deep reading cutoff. When reading beyond this depth (default
+          5) GNU Go assumes that any string which can obtain 4
+          liberties is alive.
+
+   * `-K', `--ko-depth DEPTH'
+          Deep reading cutoff. Beyond this depth (default 8) GNU Go no
+          longer tries very hard to analyze kos.
+
+   * `--branch-depth DEPTH'
+          Deep reading cutoff. Below this depth (default 8), GNU Go
+          still tries to attack strings with only 3 liberties, but only
+          tries one move at each node.
+
+   * `--aa_depth DEPTH'
+          The reading function `atari_atari' looks for combinations
+          beginning with a series of ataris, and culminating with some
+          string having an unexpected change in status (e.g. alive to
+          dead or critical). This command line optio sets the parameter
+          `aa_depth' which determines how deeply this function looks
+          for combinations.
+
+   * `--superstring-depth'
+          A superstring (*note Superstrings::) is an amalgamation of
+          tightly strings. Sometimes the best way to attack or defend a
+          string is by attacking or defending an element of the
+          superstring.  Such tactics are tried below
+          `superstring_depth' and this command line option allows this
+          parameter to be set.
+
+   The preceeding options are documented with the reading code (*note
+Reading Basics::).
+
+   * `owl-branch' Below this depth Owl only considers one move. Default
+     8.
+
+   * `owl-reading' Below this depth Owl assumes the dragon has escaped.
+     Default 20.
+
+   * `owl-node-limit' If the number of variations exceeds this limit,
+     Owl assumes the dragon can make life. Default 10000.  We caution
+     the user that increasing `owl_node_limit' does not necessarily
+     increase the strength of the program.
+
+   * `--level AMOUNT'
+          The higher the level, the deeper GNU Go reads. Level 10 is
+          the default.  If GNU Go plays too slowly on your machine, you
+          may want to decrease it.
+
+Ascii Mode Options
+------------------
+
+   * `--color COLOR'
+          Choose your color ('black' or 'white')
+
+   * `--handicap NUMBER'
+          Choose the number of handicap stones (0-9)
+
+Development options:
+--------------------
+
+   * `--replay COLOR'
+          Replay all moves in a game for either or both colors. If used
+          with the `-o' option the game record is annotated with move
+          values. This option requires `-l FILENAME'. The color can be:
+             * white: replay white moves only
+
+             * black: replay black moves only
+
+             * both: replay all moves
+          When the move found by genmove differs from the move in the
+          sgf file the values of both moves are reported thus:
+               Move 13 (white): GNU Go plays C6 (20.60) - Game move F4 (20.60)
+
+          This option is useful if one wants to confirm that a change
+          such as an speedup or other optimization has not affected the
+          behavior of the engine. Note that when the several moves have
+          the same top value (or nearly equal) the move generated is
+          not deterministic (though it can be made deterministic by
+          starting with the same random seed). Thus a few deviations
+          from the move in the sgf file are to be expected. Only if the
+          two reported values differ should we conclude that the engine
+          plays differently from the engine which generated the sgf
+          file.  *Note Regression::.
+
+   * `-a', `--allpats'
+          Test all patterns, even those smaller in value than the
+          largest move found so far. This should never affect GNU Go's
+          final move, and it will make it run slower. However this can
+          be very useful when "tuning" GNU Go. It causes both the
+          traces and the output file (`-o') to be more informative.
+
+   * `-T', `--printboard': colored display of dragons.
+          Use rxvt, xterm or Linux Console. (*note Colored Display::)
+
+   * `-E': colored display of eye spaces
+          Use rxvt, xterm or Linux Console. (*note Colored Display::)
+
+   * `-d', `--debug LEVEL'
+          Produce debugging output. The debug level is given in
+          hexadecimal, using the bits defined in the following table
+          from `engine/gnugo.h'.
+             * DEBUG_INFLUENCE    0x0001
+
+             * DEBUG_EYES         0x0002
+
+             * DEBUG_OWL          0x0004
+
+             * DEBUG_ESCAPE       0x0008
+
+             * DEBUG_MATCHER      0x0010
+
+             * DEBUG_DRAGONS      0x0020
+
+             * DEBUG_SEMEAI       0x0040
+
+             * DEBUG_LOADSGF      0x0080
+
+             * DEBUG_HELPER       0x0100
+
+             * DEBUG_READING      0x0200
+
+             * DEBUG_WORMS        0x0400
+
+             * DEBUG_MOVE_REASONS 0x0800
+
+   * `-H', `--hash LEVEL'
+          hash (see `engine/gnugo.h' for bits).
+
+   * `-w', `--worms'
+          Print more information about worm data.
+
+   * `-m', `--moyo LEVEL'
+          moyo debugging, show moyo board. The LEVEL is fully
+          documented elsewhere (*note Colored Display::).
+
+   * `-b', `--benchmark NUMBER'
+          benchmarking mode - can be used with `-l'.
+
+   * `-s', `--stack'
+          stack trace (for debugging purposes).
+
+   * `-S', `--statistics'
+          Print statistics (for debugging purposes).
+
+   * `-t', `--trace'
+          Print debugging information. Use twice for more detail.
+
+   * `-r', `--seed SEED'
+          Set random number seed. This can be used to guarantee that
+          GNU Go will make the same decisions on multiple runs through
+          the same game. If `seed' is zero, GNU Go will play a
+          different game each time.
+
+   * `--decide-string LOCATION'
+          Invoke the tactical reading code (*note Tactical Reading:: to
+          decide whether the string at LOCATION can be captured, and if
+          so, whether it can be defended. If used with `-o', this will
+          produce a variation tree in SGF.
+
+   * `--decide-dragon LOCATION'
+          Invoke the owl code (*note The Owl Code::) to decide whether
+          the dragon at LOCATION can be captured, and whether it can be
+          defended. If used with `-o', this will produce a variation
+          tree in SGF.
+
+   * `--score METHOD'
+          Requires `-l'. METHOD can be "end", "last", "aftermath" or a
+          move.  "end" and "aftermath" are appropriate when the game is
+          complete, or nearly so, and both try to supply an accurate
+          final score. The other options may be used to get an estimate
+          during the middle of the game. Any of these options may be
+          combined with `--chinese-rule' if you want to use Chinese
+          (Area) counting.
+             * last
+                    load the sgf file up to the last move, then
+                    estimate territory using the Bouzy 5/21 algorithm
+                    (*note Moyo::).
+
+             * end
+                    finish the game by selfplaying from the end of the
+                    file until two passes, then estimate territory
+                    using the Bouzy 5/21 algorithm (*note Moyo::).
+
+             * aftermath
+                    finish the game by selfplaying from the end of the
+                    file until two passes, then estimate territory
+                    using the most accurate scoring algorithm available.
+                    Slower than `--score last', and while these
+                    algorithms usually agree, if they differ, `--score
+                    aftermath' is most likely to be correct.
+
+             * move, e.g. `--score J17'
+                    load file until move is reached and estimate
+                    territorial balance using the Bouzy 5/21 algorithm.
+                    The `--score end' and `--score aftermath' options
+                    are only useful at or near the end of the game, so
+                    if you want an estimate of the score in the middle,
+                    use this method.
+
+   * `--printsgf OUTPUT FILE'
+          load SGF file, output final position (requires `-l') as
+          another SGF file. Illegal moves are indicated with the
+          private `IL' property.  This property is not used in the FF4
+          SGF specification, so we are free to preempt it. This feature
+          is used in the CGI interface in `interface/html/gg.cgi'.
+
+
+File: gnugo.info,  Node: Overview,  Next: Analyzing,  Prev: User Guide,  Up: Top
+
+GNU Go engine overview
+**********************
+
+   This chapter is an overview of the GNU Go internals. Further
+documentation of how any one module or routine works may be found in
+later chapters or comments in the source files.
+
+* Menu:
+
+* Definitions::                Some words used in this documentation.
+* Move Generation Basics::     How GNU Go generates a move.
+* Examining the Position::     What `examine_position()' does.
+* Sequence of Events::         Outline of `genmove()'.
+* Roadmap::                    Description of the different files.
+* Coding Styles::              Coding conventions.
+* Navigating the Source::      Navigating the Source.
+

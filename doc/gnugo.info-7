@@ -1,0 +1,1127 @@
+This is gnugo.info, produced by makeinfo version 4.0 from gnugo.texi.
+
+INFO-DIR-SECTION GNU games
+START-INFO-DIR-ENTRY
+* GNU go: (gnugo).          The GNU Go program
+END-INFO-DIR-ENTRY
+
+
+File: gnugo.info,  Node: Incremental Algorithm,  Next: DFA Optimizations,  Prev: Building the DFA,  Up: DFA
+
+Incremental Algorithm
+---------------------
+
+   The incremental version of the DFA pattern matcher is not yet
+implemented in gnugo but we explain here how it will work.  By
+definition of a deterministic automaton, scanning the same string will
+reach the same states every time.
+
+   Each reached state during pattern matching is stored in a stack
+`top_stack[i][j]' and `state_stack[i][j][stack_idx]' We use one stack
+by intersection `(i,j)'.  A precomputed reverse path list allows to
+know for each couple of board intersections `(x,y)' its position
+`reverse(x,y)' in the spiral scan path starting from `(0,0)'.
+
+   When a new stone is put on the board at `(lx,ly)', the only work of
+the pattern matcher is:
+
+     `
+      for(each stone on the board at (i,j))
+         if(reverse(lx-i,ly-j) < top_stack[i][j])
+           {
+              begin the dfa scan from the state
+              state_stack[i][j][reverse(lx-i,ly-j)];
+           }
+     '
+
+   In most situations reverse(lx-i,ly-j) will be inferior to
+top_stack[i][j]. This should speedup a lot pattern matching.
+
+
+File: gnugo.info,  Node: DFA Optimizations,  Prev: Incremental Algorithm,  Up: DFA
+
+Some DFA Optimizations
+----------------------
+
+   The dfa is constructed to minimize jumps in memory making some
+assumptions about the frequencies of the values: the EMPTY value is
+supposed to appear often on the board, so the the '.'  transition are
+almost always successors in memory.  The OUT_BOARD are supposed to be
+rare, so '#' transitions will almost always imply a big jump.
+
+
+File: gnugo.info,  Node: Tactical Reading,  Next: Life and Death Reading,  Prev: DFA,  Up: Top
+
+Tactical reading
+****************
+
+   The process of visualizing potential moves done by you and your
+opponent to learn the result of different moves is called "reading".
+GNU Go does three distinct types of reading: "tactical reading" which
+typically is concerned with the life and death of individual strings,
+"Owl reading" which is concerned with the life and death of dragons,
+and "life reading" which attempts evaluate eye spaces. In this Chapter,
+we document the tactical reading code, which is in `engine/reading.c'.
+For a summary of the reading functions see *Note Reading Functions::.
+
+* Menu:
+
+* Reading Basics::               Reading Basics
+* Hashing::                      Hashing of positions
+* Persistent Cache::             Persistent Reading Cache
+* Ko::                           Ko handling
+* A Ko Example::                 A Ko Example
+* Another Ko Example::           Another Ko Example
+* Alternate Komaster Schemes::   Alternate Komaster Schemes
+* Superstrings::                 Superstrings
+* Reading Functions::            Utilities from `engine/reading.c'
+* Debugging::                    Debugging the reading code
+
+
+File: gnugo.info,  Node: Reading Basics,  Next: Hashing,  Prev: Tactical Reading,  Up: Tactical Reading
+
+Reading Basics
+==============
+
+   In GNU Go, tactical reading is done by the functions in
+`engine/reading.c'. Each of these functions has a separate goal to fill,
+and they call each other recursively to carry out the reading process.
+
+   The reading code makes use of a stack onto which board positions can
+be pushed. The parameter `stackp' is zero if GNU Go is examining the
+true board position; if it is higher than zero, then GNU Go is
+examining a hypothetical position obtained by playing several moves.
+
+   The most important public reading functions are `attack' and
+`find_defense'. These are wrappers for functions `do_attack' and
+`do_find_defense' which are declared statically in `reading.c'. The
+functions `do_attack' and `do_find_defense' call each other recursively.
+
+   The return codes of the reading (and owl) functions and owl can be
+0, 1, 2 or 3. Each reading function determines whether a particular
+player (assumed to have the move) can solve a specific problem,
+typically attacking or defending a string.
+
+   The nonzero return codes are called these names in the source:
+
+        #define WIN  3
+        #define KO_A 2
+        #define KO_B 1
+
+   A return code of WIN means success, 0 failure, while KO_A and KO_B
+are success conditioned on ko. A function returns KO_A if the position
+results in ko and that the player to move will get the first ko capture
+(so the opponent has to make the first ko threat). A return code of
+KO_B means that the player to move will have to make the first ko
+threat.
+
+   Many of the reading functions make use of "null pointers".  For
+example, a call to `attack(i, j, &ai, &aj)' will return WIN if the
+string at `(i, j)' can be captured. The point of attack (in case it is
+vulnerable) is returned in `(ai, aj)'. However many times we do not
+care about the point of attack. In this case, we can substitute a null
+pointer: `attack(i, j, NULL, NULL)'.
+
+   Depth of reading is controlled by the parameters `depth' and
+`branch_depth'. The `depth' has a default value `DEPTH' (in
+`liberty.h'), which is set to 14 in the distribution, but it may also be
+set at the command line using the `-D' or `--depth' option.  If `depth'
+is increased, GNU Go will be stronger and slower. GNU Go will read
+moves past depth, but in doing so it makes simplifying assumptions that
+can cause it to miss moves.
+
+   Specifically, when `stackp > depth', GNU Go assumes that as soon as
+the string can get 3 liberties it is alive. This assumption is
+sufficient for reading ladders.
+
+   The `branch_depth' is typically set a little below `depth'.  Between
+`branch_depth' and `depth', attacks on strings with 3 liberties are
+considered, but branching is inhibited, so fewer variations are
+considered.
+
+   Currently the reading code does not try to defend a string by
+attacking a boundary string with more than two liberties. Because of
+this restriction, it can make oversights. A symptom of this is two
+adjacent strings, each having three or four liberties, each classified
+as `DEAD'. To resolve such situations, a function `small_semeai()' (in
+`engine/semeai.c') looks for such pairs of strings and corrects their
+classification.
+
+   The backfill_depth is a similar variable with a default 10. Below
+this depth, GNU Go will try "backfilling" to capture stones.  For
+example in this situation:
+
+
+     .OOOOOO.    on the edge of the board, O can capture X but
+     OOXXXXXO    in order to do so he has to first play at a in
+     .aObX.XO    preparation for making the atari at b. This is
+     --------    called backfilling.
+
+   Backfilling is only tried with `stackp <= backfill_depth'. The
+parameter `backfill_depth' may be set using the `-B' option.
+
+   The `fourlib_depth' is a parameter with a default of only 5.  Below
+this depth, GNU Go will try to attack strings with four liberties. The
+`fourlib_depth' may be set using the `-F' option.
+
+   The parameter `ko_depth' is a similar cutoff. If `stackp<ko_depth',
+the reading code will make experiments involving taking a ko even if it
+is not legal to do so (i.e., it is hypothesized that a remote ko threat
+is made and answered before continuation).  This parameter may be set
+using the `-K' option.
+
+   A partial list of the functions in `reading.c':
+
+   * `int attack(int m, int n, int *i, int *j)':
+          The basic function `attack(m, n, *i, *j)' determines if the
+          string at `(m, n)' can be attacked, and if so, `(*i, *j)'
+          returns the attacking move, unless `*i' and `*j' are null
+          pointers. (Use null pointers if you are interested in the
+          result of the attack but not the attacking move itself.)
+          Returns 1 if the attack succeeds, otherwise 0. Returns KO_A
+          or KO_B if the result depends on ko: returns KO_A if the
+          attack succeeds provided attacker is willing to ignore any ko
+          threat. Returns KO_B if attack succeeds provided attacker has
+          a ko threat which must be answered.
+
+   * `find_defense(int m, int n, int *i, int *j)':
+          The function `find_defense(m, n, *i, *j)' attempts to find a
+          move that will save the string at `(m,n)'. It returns true if
+          such a move is found, with `(*i, *j)' the location of the
+          saving move (unless `(*i, *j)' are null pointers). It is not
+          checked that tenuki defends, so this may give an erroneous
+          answer if `!attack(m,n)'.  Returns KO_A or KO_B if the result
+          depends on ko. Returns KO_A if the string can be defended
+          provided (color) is willing to ignore any ko threat. Returns
+          KO_B if (color) has a ko threat which must be answered.
+
+   * `safe_move(int i, int j, int color)' :
+          The function `safe_move(i, j, color)' checks whether a move at
+          `(i, j)' is illegal or can immediately be captured. If
+          `stackp==0' the result is cached. If the move only can be
+          captured by a ko, it's considered safe. This may or may not
+          be a good convention.
+
+   The next few functions are essentially special cases of `attack' and
+`find_defense'. They are coded individually, and are static in
+`engine/reading.c'.
+
+   * `attack2(int m, int n, int *i, int *j)' :
+          Determine whether a string with 2 liberties can be captured.
+          Usage is similar to `attack'.
+
+   * `attack3(int m, int n, int *i, int *j)' :
+          Determine whether a string with 3 liberties can be captured.
+          Usage is similar to `attack'.
+
+   * `attack4(int m, int n, int *i, int *j)' :
+          Determine whether a string with 4 liberties can be captured.
+          Usage is similar to `attack'.
+
+   * `defend1(int m, int n, int *i, int *j)' :
+          Determine whether a string with 1 liberty can be rescued.
+          Usage is similar to `find_defense'.
+
+   * `defend2()' :
+          Determine whether a string with 2 liberties can be rescued.
+          Usage is similar to `find_defense'.
+
+   * `defend3()' :
+          Determine whether a string with 3 liberties can be rescued.
+          Usage is similar to `find_defense'.
+
+   * `find_cap2()' :
+          If `(m,n)' points to a string with 2 liberties,
+          `find_cap2(m,n,&i,&j)' looks for a configuration:
+
+                 O.
+                 .*
+
+          where `O' is an element of the string in question. It tries
+          the move at `*' and returns true this move captures the
+          string, leaving `(i,j)' pointing to *.
+
+   * `break_chain(int si, int sj, int *i, int *j, int *k, int *l)':
+          The function `break_chain(si, sj, *i, *j, *k, *l)' returns 1
+          if part of some surrounding string is in atari, and if
+          capturing this string results in a live string at `(si, sj)'.
+          Returns 2 if the capturing string can be taken (as in a
+          snapback), or the the saving move depends on ignoring a ko
+          threat; Returns 3 if the saving move requires making a ko
+          threat and winning the ko. The pointers `(i,j)', if not NULL,
+          are left pointing to the appropriate defensive move. The
+          pointers `(k,l)', if not NULL, are left pointing to the
+          boundary string which is in atari.
+
+   * `break_chain2(int si, int sj, int *i, int *j)':
+          The function `break_chain2(si, sj, *i, *j)' returns 1 if
+          there is a string in the surrounding chain having exactly two
+          liberties whose attack leads to the rescue of `(si, sj)'.
+          Then `*i, *j' points to the location of the attacking move.
+          Returns 2 if the attacking stone can be captured, 1 if it
+          cannot.
+
+   * `snapback(snapback(int si, int sj, int i, int j, int color)':
+          The function `snapback(si, sj, i, j, color)' considers a move
+          by color at `(i, j)' and returns true if the move is a
+          snapback.  Algorithm: It removes dead pieces of the other
+          color, then returns 1 if the stone at `(si, sj)' has <2
+          liberties. The purpose of this test is to avoid snapbacks.
+          The locations `(i, j)' and `(si,sj)' may be either same or
+          different. Also returns 1 if the move at `(i, j)' is illegal,
+          with the trace message "ko violation" which is the only way I
+          think this could happen. It is not a snapback if the
+          capturing stone can be recaptured on its own, e.g.
+
+                 XXOOOOO
+                 X*XXXXO
+                 -------
+
+          Here `O' capturing at `*' is in atari, but this is not a
+          snapback. Use with caution: you may want to condition the
+          test on the string being captured not being a singleton. For
+          example
+
+                 XXXOOOOOOOO
+                 XO*XXXXXXXO
+                 -----------
+          is rejected as a snapback, yet `O' captures more than it
+          gives up.
+
+
+File: gnugo.info,  Node: Hashing,  Next: Hash Calculation,  Prev: Reading Basics,  Up: Tactical Reading
+
+Hashing of Positions
+====================
+
+   To speed up the reading process, we note that a position can be
+reached in several different ways.  In fact, it is a very common
+occurrence that a previously checked position is rechecked, often
+within the same search but from a different branch in the recursion
+tree.
+
+   This wastes a lot of computing resources, so in a number of places,
+we store away the current position, the function we are in, and which
+worm is under attack or to be defended.  When the search for this
+position is finished, we also store away the result of the search and
+which move made the attack or defense succeed.
+
+   All this data is stored in a hash table, sometimes also called a
+transposition table, where Go positions are the key and results of the
+reading for certain functions and groups are the data. You can increase
+the size of the Hash table using the `-M' or `--memory' option *note
+Invoking GNU Go::.
+
+   The hash table is created once and for all at the beginning of the
+game by the function `hashtable_new()'. Although hash memory is thus
+allocated only once in the game, the table is reinitialized at the
+beginning of each move by a call to `hashtable_clear()' from
+`genmove()'.
+
+* Menu:
+
+* Hash Calculation::            Calculation of the hash value
+* Hash Organization::           Organization of the hash table
+* Hash Structures::             Structures in `hash.h'
+* Hash Functions::              Hash functions and macros
+
+
+File: gnugo.info,  Node: Hash Calculation,  Next: Hash Organization,  Prev: Hashing,  Up: Hashing
+
+Calculation of the hash value
+-----------------------------
+
+   The hash algorithm is called Zobrist hashing, and is a standard
+technique for go and chess programming. The algorithm as used by us
+works as follows:
+
+  1. First we define a "go position".  This positions consists of
+        * the actual board, i.e. the locations and colors of the stones
+
+        * A "ko point", if a ko is going on.  The ko point is defined as
+          the empty point where the last single stone was situated
+          before it was captured.
+
+     It is not necessary to specify the color to move (white or black)
+     as part of the position. The reason for this is that read results
+     are stored separately for the various reading functions such as
+     `attack3', and it is implicit in the calling function which player
+     is to move.
+
+  2. For each location on the board we generate random numbers:
+        * A number which is used if there is a white stone on this
+          location
+
+        * A number which is used if there is a black stone on this
+          location
+
+        * A number which is used if there is a ko on this location
+
+     These random numbers are generated once at initialization time and
+     then used throughout the life time of the hash table.
+
+  3. The hash key for a position is the XOR of all the random numbers
+     which are applicable for the position (white stones, black stones,
+     and ko position).
+
+
+File: gnugo.info,  Node: Hash Organization,  Next: Hash Structures,  Prev: Hash Calculation,  Up: Hashing
+
+Organization of the hash table
+------------------------------
+
+   The hash table consists of 3 parts:
+
+   * An area which contains so called "Hash Nodes". Each hash node
+     contains:
+        - A go position as defined above.
+
+        - A computed hash value for the position
+
+        - A pointer to Read Results (see below)
+
+        - A pointer to another hash node.
+
+   * An area with so called Read Results.  These are used to store
+     which function was called in the go position, which string was
+     under attack or to be defended, and the result of the reading.
+
+     Each Read Result contains:
+        - the function ID (an int between 0 and 255), the position of
+          the string under attack and a depth value, which is used to
+          determine how deep the search was when it was made, packed
+          into one 32 bit integer.
+
+        - The result of the search (a numeric value) and a position to
+          play to get the result packed into one 32 bit integer.
+
+        - A pointer to another Read Result.
+
+   * An array of pointers to hash nodes.  This is the hash table proper.
+
+
+   When the hash table is created, these 3 areas are allocated using
+`malloc()'.  When the hash table is populated, all contents are taken
+from the Hash nodes and the Read results. No further allocation is done
+and when all nodes or results are used, the hash table is full.
+Nothing is deleted from the hash table except when it is totally
+emptied, at which point it can be used again as if newly initialized.
+
+   When a function wants to use the hash table, it looks up the current
+position using `hashtable_search()'. If the position doesn't already
+exist there, it can be entered using
+
+   `hashtable_enter_position()'.
+
+   Once the function has a pointer to the hash node containing a
+function, it can search for a result of a previous search using
+`hashnode_search()'.  If a result is found, it can be used, and if not,
+a new result can be entered after a search using
+`hashnode_new_result()'.
+
+   Hash nodes which hash to the same position in the hash table
+(collisions) form a simple linked list.  Read results for the same
+position, created by different functions and different attacked or
+defended strings also form a linked list.
+
+   This is deemed sufficiently efficient for now, but the representation
+of collisions could be changed in the future.  It is also not
+determined what the optimum sizes for the hash table, the number of
+positions and the number of results are.
+
+
+File: gnugo.info,  Node: Hash Structures,  Next: Hash Functions,  Prev: Hash Organization,  Up: Hashing
+
+Hash Structures
+---------------
+
+   The basic hash structures are declared in `hash.h'.
+
+     typedef struct hashposition_t {
+       Compacttype  board[COMPACT_BOARD_SIZE];
+       int          ko_i;
+       int          ko_j;
+     } Hashposition;
+
+   Represents the board and optionally the location of a ko, which is
+an illegal move. The player whose move is next is not recorded.
+
+     typedef struct {
+       Hashvalue     hashval;
+       Hashposition  hashpos;
+     } Hash_data;
+
+   Represents the return value of a function (`hashval') and the board
+state (`hashpos').
+
+     typedef struct read_result_t {
+       unsigned int compressed_data;
+     
+       int result_ri_rj;
+       struct read_result_t *next;
+     } Read_result;
+
+   Here the `compressed_data' field packs into 32 bits the following
+fields:
+
+      komaster: 2 bits (EMPTY, BLACK, WHITE, or GRAY)
+      kom_i   : 5 bits
+      kom_j   : 5 bits
+      routine : 4 bits (currently 10 different choices)
+      i       : 5 bits
+      j       : 5 bits
+      stackp  : 5 bits
+
+   The `komaster' and `(kom_i,kom_j)' field are documented in *Note
+Ko::. The integer `result_ri_rj' encodes:
+
+       unsigned char  status;
+       unsigned char  result;
+       unsigned char  ri;
+       unsigned char  rj;
+
+   When a new result node is created, 'status' is set to 1 'open'.
+This is then set to 2 'closed' when the result is entered. The main use
+for this is to identify open result nodes when the hashtable is
+partially cleared. Another potential use for this field is to identify
+repeated positions in the reading, in particular local double or triple
+kos.
+
+     typedef struct hashnode_t {
+       Hash_data            key;
+       Read_result        * results;
+       struct hashnode_t  * next;
+     } Hashnode;
+
+   The hash table consists of hash nodes.  Each hash node consists of
+The hash value for the position it holds, the position itself and the
+actual information which is purpose of the table from the start.
+
+   There is also a pointer to another hash node which is used when the
+nodes are sorted into hash buckets (see below).
+
+     typedef struct hashtable {
+       size_t         hashtablesize;	/* Number of hash buckets */
+       Hashnode    ** hashtable;	/* Pointer to array of hashnode lists */
+     
+       int            num_nodes;	/* Total number of hash nodes */
+       Hashnode     * all_nodes;	/* Pointer to all allocated hash nodes. */
+       int            free_node;	/* Index to next free node. */
+     
+       int            num_results;	/* Total number of results */
+       Read_result  * all_results;	/* Pointer to all allocated results. */
+       int            free_result;	/* Index to next free result. */
+     } Hashtable;
+
+   The hash table consists of three parts:
+
+   * The hash table proper: a number of hash buckets with collisions
+     being handled by a linked list.
+
+   * The hash nodes.  These are allocated at creation time and are
+     never removed or reallocated in the current implementation.
+
+   * The results of the searches.  Since many different searches can be
+     done in the same position, there should be more of these than hash
+     nodes.
+
+
+File: gnugo.info,  Node: Hash Functions,  Next: Persistent Cache,  Prev: Hash Structures,  Up: Hashing
+
+Hash Functions
+--------------
+
+   The following functions are defined in `hash.c':
+
+   * `void hash_init()'
+          Initialize the entire hash system.
+
+   * `int hashdata_compare(Hash_data *key1, Hash_data *key2)'
+          Returns 0 if `*key1 == *key2', 2 if the hashvalues differ, or
+          1 if only the hashpositions differ.  This adheres (almost) to
+          the standard compare function semantics which are used e.g.
+          by the comparison functions used in qsort().
+
+   * `void hashposition_dump(Hashposition *pos, FILE *outfile)'
+          Dump an ASCII representation of the contents of a
+          Hashposition onto the FILE outfile.
+
+   * `int hashdata_diff_dump(Hash_data *key1,Hash_data *key2 )'
+          Compare two Hashdata structs. If equal: return zero. If not:
+          dump a human readable summary of any differences to stderr.
+          The return value is the same as for hashdata_compare. This
+          function is primarily intended to be used in assert
+          statements.
+
+   * `void hashdata_recalc(Hash_data *target, Intersection
+     board[MAX_BOARD][MAX_BOARD], int koi, int koj)'
+          Calculate the compactboard and the hashvalue in one function.
+          They are always used together and it saves us a loop and a
+          function call.
+
+   * `void hashdata_set_ko(Hash_data *hd, int i, int j)'
+          Set or remove a ko at (i, j).
+
+   * `void hashdata_remove_ko(Hash_data *hd)'
+          Remove any ko from the hash value and hash position.
+
+   * `void hashdata_invert_stone(Hash_data *hd, int i, int j, int
+     color)'
+          Set or remove a stone of COLOR at (I, J) in a Hash_data.
+
+   * `void read_result_dump(Read_result *result, FILE *outfile)'
+          Dump an ASCII representation of the contents of a Read_result
+          onto the FILE outfile.
+
+   * `void hashnode_dump(Hashnode *node, FILE *outfile)'
+          Dump an ASCII representation of the contents of a Hashnode
+          onto the FILE outfile.
+
+   * `int hashtable_init(Hashtable *table, int tablesize, int
+     num_nodes, int num_results)'
+          Initialize a hash table for a given total size and size of the
+          hash table. Returns 0 if something went wrong. Just now this
+          means that there wasn't enough memory available.
+
+   * `Hashtable * hashtable_new(int tablesize, int num_nodes, int
+     num_results)'
+          Allocate a new hash table and return a pointer to it. Return
+          NULL if there is insufficient memory.
+
+   * `void hashtable_clear(Hashtable *table)'
+          Clear an existing hash table.
+
+   * `void hashtable_clear_if_full(Hashtable *table)'
+          Clear an existing hash table only if it happens to be full.
+          By full we mean that we are either out of positions or read
+          results.
+
+   * `Hashnode * hashtable_enter_position(Hashtable *table, Hash_data
+     *hd)'
+          Enter a position with a given hash value into the table.
+          Return a pointer to the hash node where it was stored.  If it
+          is already there, don't enter it again, but return a pointer
+          to the old one.
+
+   * `Hashnode * hashtable_search(Hashtable *table, Hash_data *hd)'
+          Given a Hashposition and a Hash value, find the hashnode
+          which contains this position with the given hash value.
+
+   * `void hashtable_dump(Hashtable *table, FILE *outfile)'
+          Dump an ASCII representation of the contents of a Hashtable
+          onto the FILE outfile.
+
+   * `Read_result * hashnode_search(Hashnode *node, int routine, int i,
+     int j)'
+          Search the result list in a hash node for a particular
+          result. This result is from `routine' (the calling function)
+          at `(i, j)' and reading depth stackp. All these numbers must
+          be unsigned, and 0<= x <= 255).
+
+   * `Read_result * hashnode_new_result(Hashtable *table, Hashnode
+     *node, int routine, int i, int j)'
+          Enter a new Read_result into a Hashnode. We already have the
+          node, now we just want to enter the result itself. We will
+          fill in the result itself later, so we only need the routine
+          number for now.
+
+   The following macros are defined in `hash.h'
+
+   * `rr_get_routine(Read_result rr)'
+
+   * `rr_get_pos_i(Read_result rr)'
+
+   * `rr_get_pos_j(Read_result rr)'
+
+   * `rr_get_stackp(Read_result rr)'
+          Get the constituent parts of a `Read_result'.
+
+   The following macros and functions are defined in `engine/reading.c':
+
+   * `static int get_read_result(int routine, int *si, int *sj,
+     Read_result **read_result)'
+          Return a Read_result for the current position, routine and
+          location.  For performance, the location is changed to the
+          origin of the string.
+
+   * `READ_RETURN0(Read_result *read_result)'
+          Cache a negative read result.
+
+   * `READ_RETURN(Read_result *read_result, int *pointi, int *pointj,
+     int resulti, int resultj, int value)'
+          If `pointi' and `pointj' are not null pointers, then give
+          `(*pointi, *pointj)' the values `(resulti, resultj)'. Then
+          cache the `read_result'. Clear the hashtable if full and
+          return `value'.
+
+
+File: gnugo.info,  Node: Persistent Cache,  Next: Ko,  Prev: Hash Functions,  Up: Tactical Reading
+
+Persistent Reading Cache
+------------------------
+
+   Some reading calculations can be safely saved from move to move.
+
+   The function `store_persistent_cache()' is called only by `attack'
+and `find_defense', never from their static recursive counterparts
+`do_attack' and `do_defend'.  The function
+`store_persistent_reading_cache()' attempts to cache the most expensive
+reading results. The function `search_persistent_reading_cache'
+attempts to retrieve a result from the cache.
+
+   If all cache entries are occupied, we try to replace the least useful
+one. This is indicated by the score field, which is initially the
+number of nodes expended by this particular reading, and later
+multiplied by the number of times it has been retrieved from the cache.
+
+   Once a (permanent) move is made, a number of cache entries
+immediately become invalid.  These are cleaned away by the function
+`purge_persistent_reading_cache().' To have a criterion for when a
+result may be purged, the function `store_persistent_cache()' computes
+the "reading shadow" and "active area". If a permanent move is
+subsequently played in the active area, the cached result is
+invalidated. We now explain this algorithm in detail.
+
+   The "reading shadow" is the concatenation of all moves in all
+variations, as well as locations where an illegal move has been tried.
+
+   Once the read is finished, the reading shadow is expanded to the
+"active area" which may be cached. The intention is that as long as no
+stones are played in the active area, the cached value may safely be
+used.
+
+   Here is the algorithm used to compute the active area.  This
+algorithm is in the function `store_persistent_reading_cache()'.  The
+most expensive readings so far are stored in the persistent cache.
+
+   * The reading shadow and the string under attack are marked with the
+     character `1'. We also include the successful move, which is most
+     often a part of the reading shadow, but sometimes not, for example
+     with the function `attack1()'.
+
+   * Next the reading shadow is expanded by marking strings and empty
+     vertices adjacent to the area marked `1' with the character `2'.
+
+   * Next vertices adjacent to empty vertices marked `2' are labelled
+     with the character `3'.
+
+   * Next all vertices adjacent to previously marked vertices. These are
+     marked `-1' instead of the more logical `4' because it is slightly
+     faster to code this way.
+
+   * If the stack pointer is >0 we add the moves already played from the
+     moves stack with mark 4.
+
+
+File: gnugo.info,  Node: Ko,  Next: A Ko Example,  Prev: Persistent Cache,  Up: Tactical Reading
+
+Ko Handling
+===========
+
+   The principles of ko handling are the same for tactical reading and
+owl reading.
+
+   We have already mentioned (*note Reading Basics::) that GNU Go uses
+a return code of KO_A or KO_B if the result depends on ko. The return
+code of KO_B means that the position can be won provided the player
+whose move calls the function can come up with a sufficiently large ko
+threat. In order to verify this, the function must simulate making a ko
+threat and having it answered by taking the ko even if it is illegal.
+We call such an experimental taking of the ko a "conditional" ko
+capture.
+
+   Conditional ko captures are accomplished by the function `tryko()'.
+This function is like `trymove()' except that it does not require
+legality of the move in question.
+
+   The static reading functions, and the global functions `do_attack'
+and `do_find_defense' have arguments `komaster', `kom_i' and `kom_j'.
+These mediate ko captures to prevent the occurrence of infinite loops.
+
+   Normally `komaster' is EMPTY but it can also be BLACK, WHITE or
+GRAY. The komaster is set to COLOR when COLOR makes a conditional ko
+capture. In this case `kom_i, kom_j' is set to the location of the
+captured ko stone.
+
+   If the opponent is komaster, the reading functions will not try to
+take the ko at `kom_i, kom_j'. Also, the komaster is normally not
+allowed to take another ko. The exception is a nested ko, characterized
+by the condition that the captured ko stone is at distance 1 both
+vertically and horizontally from `(kom_i, kom_j)', which is the location
+of the last stone taken by the komaster. Thus in this situation:
+
+
+              .OX
+              OX*X
+             OmOX
+              OO
+
+   Here if `m' is the location of `(kom_i,kom_j)', then the move at `*'
+is allowed.
+
+   The rationale behind this rule is that in the case where there are
+two kos on the board, the komaster cannot win both, and by becoming
+komaster he has already chosen which ko he wants to win. But in the
+case of a nested ko, taking one ko is a precondition to taking the
+other one, so we allow this.
+
+   If the komaster's opponent takes a ko, then both players have taken
+one ko. In this case `komaster' is set to GRAY and after this further
+ko captures are not allowed.
+
+   If the ko at `(kom_i, kom_j)' is filled, then the komaster reverts
+to EMPTY.
+
+   The komaster scheme may be summarized as follows. It is assumed that
+`O' is about to move.
+
+   * 1. Komaster is EMPTY.
+        - Unconditional ko capture is allowed. Komaster remains EMPTY.
+
+        - Conditional ko capture is allowed. Komaster is set to `O' and
+          `(kom_i, kom_j)' to the location of the ko, where a stone was
+          just removed.
+
+   * Komaster is O:
+        - Only nested ko captures are allowed.
+
+        - If komaster fill the ko at `(kom_i,kom_j)' then komaster
+          reverts to EMPTY.
+
+   * Komaster is X:
+        - Play at `(kom_i,kom_j)' is not allowed. Any other ko capture
+          is allowed. If `O' takes another ko, komaster becomes GRAY.
+
+   * Komaster is GRAY:
+        - Ko captures are not allowed. If the ko at `(kom_i,kom_j)' is
+          filled then the komaster reverts to EMPTY.
+
+
+File: gnugo.info,  Node: A Ko Example,  Next: Another Ko Example,  Prev: Ko,  Up: Tactical Reading
+
+A Ko Example
+============
+
+   To see the komaster scheme in action, consider this position from
+the file `regressions/games/life_and_death/tripod9.sgf'.  We recommend
+studying this example by examining the variation file produced by the
+command:
+
+       gnugo -l tripod9.sgf --decidedragon C3 -o vars.sgf
+
+   In the lower left hand corner, there are kos at A2 and B4.  Black is
+unconditionally dead because if W wins either ko there is nothing B can
+do.
+
+
+      8 . . . . . . . .
+      7 . . O . . . . .
+      6 . . O . . . . .
+      5 O O O . . . . .
+      4 O . O O . . . .
+      3 X O X O O O O .
+      2 . X X X O . . .
+      1 X O . . . . . .
+        A B C D E F G H
+
+   This is how the komaster scheme sees this. B (i.e. X) starts by
+taking the ko at B4. W replies by taking the ko at A1. The board looks
+like this:
+
+
+      8 . . . . . . . .
+      7 . . O . . . . .
+      6 . . O . . . . .
+      5 O O O . . . . .
+      4 O X O O . . . .
+      3 X . X O O O O .
+      2 O X X X O . . .
+      1 . O . . . . . .
+        A B C D E F G H
+
+   Now any move except the ko recapture (currently illegal) at A1 loses
+for B, so B retakes the ko and becomes komaster.  The board looks like
+this:
+
+
+      8 . . . . . . . .         komaster: BLACK
+      7 . . O . . . . .         (kom_i, kom_j): A2
+      6 . . O . . . . .
+      5 O O O . . . . .
+      4 O X O O . . . .
+      3 X . X O O O O .
+      2 . X X X O . . .
+      1 X O . . . . . .
+        A B C D E F G H
+
+   W takes the ko at B3 after which the komaster is GRAY and ko
+recaptures are not allowed.
+
+
+      8 . . . . . . . .         komaster: GRAY
+      7 . . O . . . . .         (kom_i, kom_j): B4
+      6 . . O . . . . .
+      5 O O O . . . . .
+      4 O . O O . . . .
+      3 X O X O O O O .
+      2 . X X X O . . .
+      1 X O . . . . . .
+        A B C D E F G H
+
+   Since X is not allowed any ko recaptures, there is nothing he can do
+and he is found dead. Thus the komaster scheme produces the correct
+result.
+
+
+File: gnugo.info,  Node: Another Ko Example,  Next: Alternate Komaster Schemes,  Prev: A Ko Example,  Up: Tactical Reading
+
+   We now consider an example to show why the komaster is reset to
+EMPTY if the ko is resolved in the komaster's favor. This means that
+the ko is filled, or else that is becomes no longer a ko and it is
+illegal for the komaster's opponent to play there.
+
+   The position resulting under consideration is in the file
+`regressions/games/ko5.sgf'.  This is the position:
+
+      . . . . . . O O 8
+      X X X . . . O . 7
+      X . X X . . O . 6
+      . X . X X X O O 5
+      X X . X . X O X 4
+      . O X O O O X . 3
+      O O X O . O X X 2
+      . O . X O X X . 1
+      F G H J K L M N
+
+   We recommend studying this example by examining the variation file
+produced by the command:
+
+     gnugo -l ko5.sgf --quiet --decidestring L1 -o vars.sgf
+
+   The correct resolution is that H1 attacks L1 while K2 defends it
+with ko (code KO_A).
+
+   After Black (X) takes the ko at K3, white can do nothing but retake
+the ko conditionally, becoming komaster. B cannot do much, but in one
+variation he plays at K4 and W takes at H1. The following position
+results:
+
+      . . . . . . O O 8
+      X X X . . . O . 7
+      X . X X . . O . 6
+      . X . X X X O O 5
+      X X . X X X O X 4
+      . O X O O O X . 3
+      O O X O . O X X 2
+      . O O . O X X . 1
+      F G H J K L M N
+
+   Now it is important the `O' is no longer komaster. Were `O' still
+komaster, he could capture the ko at N3 and there would be no way to
+finish off B.
+
+
+File: gnugo.info,  Node: Alternate Komaster Schemes,  Next: Superstrings,  Prev: Another Ko Example,  Up: Tactical Reading
+
+   The following alternate schemes have been proposed. It is assumed
+that `O' is the player about to move.
+
+Essentially the 2.7.232 scheme.
+-------------------------------
+
+   * Komaster is EMPTY.
+        - Unconditional ko capture is allowed. Komaster remains EMPTY.
+
+        - Conditional ko capture is allowed. Komaster is set to O and
+          `(kom_i, kom_j)' to the location of the ko, where a stone was
+          just removed.
+
+   * Komaster is O:
+        - Conditional ko capture is not allowed.
+
+        - Unconditional ko capture is allowed. Komaster parameters
+          unchanged.
+
+   * Komaster is X:
+        - Conditional ko capture is not allowed.
+
+        - Unconditional ko capture is allowed except for a move at
+          `(kom_i, kom_j)'. Komaster parameters unchanged.
+
+Revised 2.7.232 version
+-----------------------
+
+   * Komaster is EMPTY.
+        - Unconditional ko capture is allowed. Komaster remains EMPTY.
+
+        - Conditional ko capture is allowed. Komaster is set to `O' and
+          `(kom_i, kom_j)' to the location of the ko, where a stone was
+          just removed.
+
+   * Komaster is `O':
+        - Ko capture (both kinds) is allowed only if after playing the
+          move, `is_ko(kom_i, kom_j, X)' returns false. In that case,
+          `(kom_i, kom_j)' is updated to the new ko position, i.e. the
+          stone captured by this move.
+
+   * Komaster is X:
+        - Conditional ko capture is not allowed.
+
+        - Unconditional ko capture is allowed except for a move at
+          `(kom_i, kom_j)'. Komaster parameters unchanged.
+
+
+File: gnugo.info,  Node: Superstrings,  Next: Reading Functions,  Prev: Alternate Komaster Schemes,  Up: Tactical Reading
+
+Superstrings
+============
+
+   A _superstring_ is an extended string, where the extensions are
+through the following kinds of connections:
+
+  1. Solid connections (just like ordinary string).
+            OO
+
+  2. Diagonal connection or one space jump through an intersection
+     where an opponent move would be suicide or self-atari.
+            ...
+            O.O
+            XOX
+            X.X
+
+  3. Bamboo joint.
+            OO
+            ..
+            OO
+
+  4. Diagonal connection where both adjacent intersections are empty.
+            .O
+            O.
+
+  5. Connection through adjacent or diagonal tactically captured stones.
+     Connections of this type are omitted when the superstring code is
+     called from `reading.c', but included when the superstring code is
+     called from `owl.c'.
+
+   Like a dragon, a superstring is an amalgamation of strings, but it is
+a much tighter organization of stones than a dragon, and its purpose is
+different. Superstrings are encountered already in the tactical reading
+because sometimes attacking or defending an element of the superstring
+is the best way to attack or defend a string. This is in contrast with
+dragons, which are ignored during tactical reading.
+
+
+File: gnugo.info,  Node: Reading Functions,  Next: Debugging,  Prev: Superstrings,  Up: Tactical Reading
+
+Reading Functions
+=================
+
+   Here we list the publically callable functions in `reading.c'.  The
+return codes of these functions are explained elsewhere (*note Reading
+Basics::).
+
+   * `attack(si, sj, *i, *j)'
+          Determines if the string at (m, n) can be captured, and if
+          so, (*i, *j) returns the attacking move, unless (*i, *j) are
+          null pointers. Use null pointers if you are interested in the
+          result of the attack but not the attacking move itself. The
+          string is assumed to be alive if it can get five
+          liberties--fewer if `stackp' is large.
+             - Returns 1 if the attack succeeds unconditionally
+
+             - Returns 0 if the attack fails unconditionally
+
+             - Returns 2 if the attack succeeds provided attacker is
+               willing to ignore any ko threat (the attacker makes the
+               first ko capture).
+
+             - Returns 3 if attack succeeds provided attacker has a ko
+               threat which must be answered (the defender makes the
+               first ko capture).
+
+   * `find_defense(m, n, *i, *j)'
+          Attempts to find a move that will save the string at `(m, n)'.
+          It returns 1 if such a move is found, with `(*i, *j)' the
+          location of the saving move, unless `(*i, *j)' are null
+          pointers. It is not checked that tenuki defends, so this may
+          give an erroneous answer if `!attack(m,n)'.  Returns 2 or 3
+          if the result depends on ko. Returns 2 if the string can be
+          defended provided the defender is willing to ignore any ko
+          threat. Returns 3 if the defender wins by having a ko threat
+          which must be answered.
+
+   * `int attack_and_defend(int si, int sj, int *attack_code, int
+     *attacki, int *attackj,int *defend_code, int *defendi, int
+     *defendj)'
+          This is a frontend to the `attack()' and `find_defense()'
+          which guarantees a consistent result. If a string cannot be
+          attacked, 0 is returned and acode is 0. If a string can be
+          attacked and defended, WIN is returned, acode and dcode are
+          both non-zero, and `(ai, aj)', `(di, dj)' both point to
+          vertices on the board. If a string can be attacked but not
+          defended, 0 is again returned, acode is non-zero, dcode is 0,
+          and (ai, aj) point to a vertex on the board.  This function
+          in particular guarantees that if there is an attack, it will
+          never return `(di, dj) = (-1, -1)', which means the string is
+          safe without defense. Separate calls to `attack()' and
+          `find_defense()' may occasionally give this result, due to
+          irregularities introduced by the persistent reading cache.
+
+   * `attack_either(ai, aj, bi, bj)'
+          returns true if there is a move which guarantees that at
+          least one of the strings `(ai, aj)' and `(bi, bj)' can be
+          captured. A typical application for this is in connection
+          patterns, where after a cut it suffices to capture one of the
+          cutting stones. The current implementation looks only for
+          uncoordinated attacks and is not even sufficient to find a
+          double atari.
+
+   * `defend_both(ai, aj, bi, bj)'
+          Returns true if both the strings `(ai, aj)' and `(bi, bj)'
+          can be defended simultaneously or if there is no attack.  A
+          typical application for this is in connection patterns, where
+          after a cut it's necessary to defend both cutting stones.
+
+   * `int break_through(int ai, int aj, int bi, int bj, int ci, int cj)'
+          Returns 1 if a position can succesfully be broken through and
+          2 if it can be cut. The position is assumed to have the shape
+          (the colors may be reversed)
+
+                .O.       dbe
+                OXO       aFc
+          It is `X' to move and try to capture at least one of `a',
+          `b', and `c'. If this succeeds, `X' is said to have broken
+          through the position.  Otherwise `X' may try to cut through
+          the position, which means keeping `F' safe and getting a
+          tactically safe string at either `d' or `e'. *Important*:
+          `a', `b', and `c' must be given in the correct order.
+
+   * `int atari_atari(int color, int *i, int *j, int save_verbose)'
+          Looks for a series of ataris on strings of the other color
+          culminating in the capture of a string which is thought to be
+          invulnerable by the reading code. Such a move can be missed
+          since it may be that each string involved individually can be
+          rescued, but nevertheless one of them can be caught. The
+          simplest example is a double atari. The return value is the
+          size of the smallest opponent worm. A danger with this scheme
+          is that the first atari tried might be irrelevant to the
+          actual combination. To avoid this, once we've found a
+          combination, we mark the first move as forbidden, then try
+          again. If no combination of the same size or larger turns up,
+          then the first move was indeed essential. Returns the size of
+          the smallest of the worms under attack.
+
+   * `int atari_atari_confirm_safety(int color, int ti, int tj, int *i,
+     int *j, int minsize)'
+          Uses the `atari_atari' code to detect blunders.  Ask whether
+          there appears any combination attack which would capture at
+          least minsize stones after playing at `(ti, tj)'. If this
+          happens, `(*i, *j)' points to a defensive move which prevents
+          this blunder.
+
+   * `int atari_atari_try_combination(int color, int ai, int aj, int
+     bi, int bj)'
+          Ask the atari_atari code if after color plays at (ai,aj) and
+          other plays at (bi,bj) there appears any combination attack.
+          Returns the size of the combination.
+

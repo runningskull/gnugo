@@ -1,0 +1,100 @@
+(;GM[1]FF[3]
+RU[Japanese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[ld9_variations]
+DT[2000-05-28]
+SY[Cgoban 1.9.2]TM[30:00(5x1:00)];;
+AW[db][eb][nb][ob][dc][oc][pc][dd][pd][be][ce][de][pe][qe][re][bf][rf][bm][rm][bn][cn][qn][rn][co][do][po][qo][dp][pp][dq][eq][pq][er][fr][or][pr]
+AB[cb][pb][qb][cc][qc][bd][cd][qd][rd][bo][ro][bp][cp][qp][rp][cq][qq][cr][dr][qr]
+(;B[bb]C[Critical.
+attack: A17, C19
+defend: A17, C19, A16, A18
+]PL[1]
+(;B[ae];W[ca];B[ba];W[ac];B[ab];W[ad])
+
+(;B[da];W[ac];B[ad];W[ca];B[ab];W[ba])
+)
+
+(;B[ab]C[Critical.
+attack: B19
+defend: B19, A16, B18, C19
+]PL[1]
+(;W[ba];B[ca];W[ad];B[ac];W[bb])
+
+(;W[ad];B[ba];W[ac];B[bc])
+
+(;B[da];W[ba];B[bb];W[ca])
+
+(;B[ae];W[ba];B[ca];W[bb];B[bc];W[ad])
+)
+
+(;B[ad];W[ae]PL[1]
+C[Critical.
+attack: C19, B19, B18, A18
+defend: A18, B18
+]
+(;W[da]C[Ko.
+]
+(;B[bb]
+(;W[ba];B[ca];W[ab])
+
+(;W[ab];B[aa];W[ba];B[ca];W[ac];B[aa])
+)
+
+(;B[ab];W[ba];B[ca];W[bb])
+)
+
+(;B[da];W[bb];B[ab];W[ba];B[bc];W[ea])
+)
+
+(;B[ca];W[da]PL[1]C[Critical.
+attack: A16, A17, A18, B18
+defend: A18
+]
+(;W[ac]
+(;B[ad];W[bb]
+(;B[ba];W[ab])
+
+(;B[aa];W[ab])
+
+(;B[ab];W[aa];B[ba];W[ab])
+
+(;B[bc];W[ab])
+)
+
+(;B[ab];W[ad]
+(;B[bc];W[ba];B[ae];W[ad])
+
+(;B[ba];W[bc])
+)
+)
+
+(;W[ba]C[ko
+];B[bb];W[ac];B[ad];W[ab])
+
+(;W[aa];B[ab];W[ac];B[ba])
+
+(;W[ab];B[bb];W[ac];B[ad];W[aa])
+
+(;W[bb];B[ab];W[ba])
+
+(;B[bb]C[ko
+];W[ac];B[ad];W[ab];B[aa])
+
+(;B[ab];W[bb];B[ba];W[ac];B[bc])
+)
+
+(;B[ad];W[ae];B[ca];W[da]PL[1]
+C[Critical.
+attack: B18
+defend: A18, B18
+]
+(;W[ba]C[ko
+];B[bb];W[ab])
+
+(;W[ab]C[ko
+];B[bb];W[ac];B[aa])
+)
+
+)

@@ -1,0 +1,252 @@
+
+@menu
+* Moyo history::		History of @file{moyo.c} and @file{score.c}
+* Bouzy::                       Bouzy's algorithm
+@end menu
+
+The file @file{score.c} contains algorithms for the computation of
+a number of useful things. Most can be displayed visually using
+the @option{-m} option (@pxref{Colored Display}).
+
+@node Moyo history, Bouzy, Moyo, Moyo
+
+In GNU Go 2.6 extensive use was made of an algorithm from
+Bruno Bouzy's dissertation, which is available at:
+@url{ftp://www.joy.ne.jp/welcome/igs/Go/computer/bbthese.ps.Z}
+This algorithm starts with the characteristic function of the
+live groups on the board and performs @samp{n} operations
+called dilations, then @samp{m} operations called erosions.
+If n=5 and m=21 this is called the 5/21 algorithm.
+
+The Bouzy 5/21 algorithm is interesting in that it corresponds
+reasonably well to the human concept of territory.  This
+algorithm is still used in GNU Go 3.0 in the function
+@code{estimate_score}. Thus we associate the 5/21 algorithm
+with the word @dfn{territory}. Similarly we use words
+@dfn{moyo} and @dfn{area} in reference to the 5/10
+and 4/0 algorithms, respectively.
+
+The principle defect of the algorithm is that it is not
+tunable. The current method of estimating moyos and territory
+is in @file{influence.c} (@pxref{Influence}). The territory,
+moyo and area concepts have been reimplemented using the
+influence code.
+
+The Bouzy algorithm is briefly reimplemented in the file
+@file{scoring.c} and is used by GNU Go 3.0 in estimating
+the score.
+
+Not all features of the old @file{moyo.c} from
+GNU Go 2.6 were reimplemented---particularly the deltas were
+not---but the reimplementation may be more readable.
+
+@node Bouzy, , Moyo history, Moyo
+@comment  node-name,  next,  previous,  up
+@section Bouzy's 5/21 algorithm
+
+Bouzy's algorithm was inspired by prior work of Zobrist and ideas from
+computer vision for determining territory. This algorithm is based on two
+simple operations, DILATION and EROSION. Applying dilation 5 times and erosion
+21 times determines the territory.
+
+To get a feeling for the algorithm, take a position in the early
+middle game and try the colored display using the @option{-m 1} option
+in an RXVT window. The regions considered territory by this algorithm
+tend to coincide with the judgement of a strong human player.
+
+Before running the algorithm, dead stones (@code{dragon.status==0}) 
+must be "removed."
+
+Referring to page 86 of Bouzy's thesis, we start with a function
+taking a high value (ex : +128 for black, -128 for white) on stones on
+the goban, 0 to empty intersections. We may iterate the following
+operations:
+
+@dfn{dilation}: for each intersection of the goban, if the intersection
+is >= 0, and not adjacent to a <0 one, then add to the intersection
+the number of adjacent >0 intersections. The same for other color : if
+the intersection is <=0, and not adjacent to a >0 one, then sub to
+it the number of <0 intersections.
+
+@dfn{erosion}: for each intersection >0 (or <0), subtract (or add) the
+number of adjacent <=0 (or >=0) intersection. Stop at zero.
+The algorithm is just : 5 dilations, then 21 erosions. The number of
+erosions should be 1+n(n-1) where n=number of dilation, since this
+permit to have an isolated stone to give no territory. Thus the
+couple 4/13 also works, but it is often not good, for example when
+there is territory on the 6th line.
+
+For example, let us start with a tobi. 
+
+@example
+
+           128    0    128   
+
+@end example
+
+1 dilation :
+
+@example
+@group
+
+            1          1 
+
+       1   128    2   128   1
+
+            1          1
+
+@end group
+@end example
+            
+2 dilations :
+
+@example
+@group
+
+            1          1
+
+       2    2     3    2    2
+
+   1   2   132    4   132   2   1
+
+       2    2     3    2    2
+              
+            1          1
+
+@end group
+@end example
+
+3 dilations :
+
+@example
+@group
+
+            1          1
+
+       2    2     3    2    2
+     
+   2   4    6     6    6    4   2
+
+1  2   6   136    8   136   6   2   1
+
+   2   4    6     6    6    4   2
+
+       2    2     3    2    2
+
+            1          1
+
+@end group
+@end example
+
+and so on...
+
+Next, with the same example 
+
+3 dilations and 1 erosion :
+
+
+@example
+@group
+
+             2     2     2
+
+    0   4    6     6     6    4
+
+0   2   6   136    8    136   6    2
+
+    0   4    6     6     6    4
+
+             2     2     2
+
+@end group
+@end example
+
+
+3 dilations and 2 erosions :
+
+@example
+@group
+
+                 1
+
+      2    6     6     6    2
+
+      6   136    8    136   6
+
+      2    6     6     6    2
+      
+                 1
+
+@end group
+@end example
+
+3 dil. / 3 erosions :
+
+
+@example
+@group
+
+           5     6     5
+
+      5   136    8    136   5
+      
+           5     6     5
+           
+@end group
+@end example
+           
+3/4 :
+
+
+@example
+@group
+
+          3     5     3 
+          
+      2  136    8    136   2          
+           
+          3     5     3
+          
+@end group
+@end example
+          
+3/5 :
+
+@example
+@group
+
+          1     4     1
+
+         136    8    136
+          
+          1     4     1
+          
+@end group
+@end example
+
+3/6 :
+
+@example
+@group
+
+                3
+         
+         135    8    135
+         
+                3
+
+@end group
+@end example
+
+3/7 :
+
+@example
+@group
+
+         132    8    132
+         
+@end group
+@end example
+
+We interpret this as a 1 point territory.
+

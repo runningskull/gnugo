@@ -1,0 +1,151 @@
+
+# not used, but it should be
+set usage [list \
+	"Click on locations to move."\
+	"[bold Pass] to pass."\
+	"[bold Score] to score a finished (or unfinished) game."\
+	"[bold Save] will put game into your local SGF viewer for analysis and storage, otherwise your browser should prompt you to save to a file."\
+	"[bold Load] to reload a saved game or arbitrary SGF file."\
+	"[bold New] to start a new game with specified parameters."\
+]
+
+
+
+
+
+set message(score) "The count? I'm not so good at figuring out when
+		the game is over, but here's my best guess at the score:
+		<br><br><pre>%s</pre><br>"
+
+set message(youwin) "It looks like you're a bit ahead. Congratulations! You deserve it.<br>"
+
+set message(iwin) "It seems as though I'm a bit ahead. Either I'm
+		    awfully lucky, or I counted wrong, because you're playing
+		    exceptionally well. A word to the wise: %s"
+
+set message(jigo) "Wow! Looks like a tie. Dude, that's never happened to me before."
+
+set message(upyours) " You might want to take another handicap stone. Just until you're back in form, of course."
+
+set message(upmine) " I hate to admit it, but I think I might need another handicap stone. I'm so bad at this stupid game."
+
+
+set message(downmine) " I seem to be doing well recently. Do you think it might be time for me to take fewer stones?"
+
+set message(downyours) " It looks like you're getting good results. I suspect you'll do well with fewer stones."
+
+set message(stats) " That's %d for you, and %d for me."
+
+set message(another) " Shall we play again? Do you have time for another game?"
+
+set message(restart) "You want to play this old game? All right, let's take a look..."
+
+set message(handichange) "New handicap? Okay! "
+
+# just the mumble
+set message(new) "%s"
+set message(move) "%s"
+
+set message(resume) "Hello, old friend! I'm %s! 
+	Last time I saw you, I think the 
+        board looked a bit like this. We can resume if you like, or start a
+	new game..."
+
+# is a Newbie like a Newfie?
+set message(newbie) "Welcome! You're playing Go with %s! 
+	I'll go first.
+	To play, click on your move. To undo a 
+	move, use the [bold Back] button on your browser. I won't mind. In
+	fact, I won't even notice..."
+
+set message(pass1) "I pass! Your move..."
+set message(pass2) "I pass too. Thank you for the game! Shall we count? Hit [bold Score]."
+
+
+set mumble(move) [list \
+	THWOK!\
+	Hrmmm...\
+	Heh.\
+	"Doomed. I'm doomed..."\
+	"Oy vey."\
+	"Now I see what you're up to."\
+	Oops.\
+	"That ladder doesn't work, you know..."\
+	"No. No. Hm, not that either. No..."\
+	"Area counting is much more logical, don't you think?"\
+	"Please don't smoke. It activates my asthma."\
+	"You don't mind if I smoke, do you?"\
+	"Would you like another cup of tea?"\
+	"At my club, we use the fixed ko rule."\
+	"Bingo!"\
+	"I must apologize for my dreadful play. I've been up all night, playing in a tournament againt my prior selves."\
+	"(* spits blood *)"\
+	"(* ears redden *)"\
+	"(* brow furrows *)"\
+	"(* pout *)"\
+	"Mwa ha ha ha haaa..."\
+	"How about that local sports team?"\
+	"Atari!"\
+	"You crafty devil, you!"\
+	"I'm sure there's a brilliant tesuji here. Somewhere..."\
+	"This isn't joseki, is it?"\
+	"Area counting is an abomination against the spirit of the game. Imagine, filling dame is worth a point!"\
+	"I don't know when to resign. Of course, it seems as though you don't either."\
+	"Hm. Both sides lose!"\
+	"My group. My group..."\
+	"An eye for an eye."\
+	"I hate playing on the servers. The politics, the escapers, no time to think, no artistry."\
+	"The servers have done wonders for my game. I can get a high level game anytime I want. I'll be shodan in no time."\
+	"I much prefer playing face to face. Without the feel of shell and slate under my fingers, I can't see the positions properly."\
+	"I'm using a board over here to help read out this variation. I hope you don't mind."\
+	"Wow! That's a good move. Do you give lessons?"\
+	"Yeah, you can live there. But you'll have to pay big money!"\
+  	"Fool me once, shame on you. Fool me twice..."\
+	"It's all fun and games until someone loses an eye."\
+]
+
+set mumble(new) [list \
+  	"[bold This] time, I will crush you."\
+	"Hope springs eternal."\
+	"Die yuppie scum!"\
+]
+
+set mumble(advice) [list \
+	"Cut when you can cut, connect when you can connect. In that order :-&gt;"\
+	"Remember the eye-stealing tesuji."\
+	"Remember your wins. Forget your defeats. Essential for health. "\
+       "Be happy to win. How to be happy? Win at least. "\
+       "Listen to Baroque Music timed at sixty beats per minute. Then you will win. "\
+       "When you're winning, you're losing." \
+       "Go makes your right brain active, only when the left one is active. "\
+       "When your eyes are over on the left side you are activating primarily the right brain, and [italic {vice versa}]."\
+       "Brain hormone makes a vivid play. A vivid play makes brain hormone. "\
+       "Joseki addiction is a symptom of brain hormone deficit. "\
+       "Take calcium to win. "\
+       "Go or alcohol may jeopardize your job. The synergy will jeopardize your life. "\
+       "He laughs best who laughs last."\
+       "Don't fear my strength. Enjoy it. "\
+       "The best problem solvers are those that laugh. "\
+       "Don't try to win. Try not to lose."\
+       "He can do anything who can do tenuki. "\
+       "Suspect a trick, if your opponent moves faster than usual."\
+       "The larger the handicap, the more you lose."\
+       "A strong move lacks flexibility. "\
+       "A flexible move lacks strength. "\
+       "A strategy without tactics goes wrong. "\
+       "A go book which first makes you weaker, might make you stronger later. "\
+       "A corner move is a center move, and [italic {vice versa}]."\
+       "The whole board can't be separated from the details. "\
+       "Change is the ultimate nature of reality. Nothing is permanent. Flux alone is real. (Heraclitus) "\
+       "You can't teach an old dog new tricks."\
+       "Don't look at it. See it. "\
+       "Don't move your eyeballs. Move your mind. "\
+       "You can't tell if I'm drinking,vice versa. "\
+       "You can't beat me with your charms. "\
+       "Strange things happen at the one-two points."\
+       "If a formation is symmetrical play at the center. "\
+       "Against three in a row, play right in the center. "\
+       "The enemy's key play is my own key play. "\
+       "The semeai where only one player has an eye is a fight over nothing. "\
+]
+

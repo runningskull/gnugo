@@ -1,0 +1,122 @@
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define to use ansi escape sequences for color debugging */
+#undef ANSI_COLOR
+
+/* Ruleset. Default Japanese */
+#undef CHINESE_RULES
+
+/* Define to use curses for color debugging */
+#undef CURSES
+
+/* Default level (strength). Up to 10 supported */
+#undef DEFAULT_LEVEL
+
+/* Default hash table size in megabytes */
+#undef DEFAULT_MEMORY
+
+/* Define as 1 to enable the DFA pattern matcher */
+#undef DFA_ENABLED
+
+/* Give the directory where gnugo was compiled */
+#undef GNUGO_PATH
+
+/* The concatenation of the strings "GNU ", and PACKAGE. */
+#undef GNU_PACKAGE
+
+/* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
+   */
+#undef GRID_OPT
+
+/* Define if you have the `alarm' function. */
+#undef HAVE_ALARM
+
+/* Define if the curses headers defines KEY_{UP,DOWN,LEFT,RIGHT} */
+#undef HAVE_CURSES_ARROWS
+
+/* Define if you have the <curses.h> header file. */
+#undef HAVE_CURSES_H
+
+/* Define if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define if you have the <glib.h> header file. */
+#undef HAVE_GLIB_H
+
+/* Define if you have the `g_vsnprintf' function. */
+#undef HAVE_G_VSNPRINTF
+
+/* Define if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define if you have the `keypad' function. */
+#undef HAVE_KEYPAD
+
+/* Define if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define if you have the `setlinebuf' function. */
+#undef HAVE_SETLINEBUF
+
+/* Define if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define if you have the <term.h> header file. */
+#undef HAVE_TERM_H
+
+/* Define if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define if you have the `usleep' function. */
+#undef HAVE_USLEEP
+
+/* Define if #define can take a variable number of arguments */
+#undef HAVE_VARIADIC_DEFINE
+
+/* Define if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
+/* Define if you have the `vwprintw' function. */
+#undef HAVE_VWPRINTW
+
+/* Define if the preprocessor recognizes __FUNCTION__ */
+#undef HAVE___FUNCTION__
+
+/* Define if `major', `minor', and `makedev' are declared in <mkdev.h>. */
+#undef MAJOR_IN_MKDEV
+
+/* Define if `major', `minor', and `makedev' are declared in <sysmacros.h>. */
+#undef MAJOR_IN_SYSMACROS
+
+/* Name of package */
+#undef PACKAGE
+
+/* The size of a `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of a `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* Define if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if termcap/terminfo is available. */
+#undef TERMINFO
+
+/* Define if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const

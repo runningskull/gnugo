@@ -1,0 +1,22 @@
+(;GM[1]FF[3]
+US[Brought to you by No Name Go Server]
+CP[
+  This game was played on the No Name Go Server
+  Permission to reproduce this game is given.]
+GN[rosebud-GnuGo(B) NNGS]
+EV[None]
+RE[W+21.5]
+PW[rosebud]
+WR[15k ]
+PB[GnuGo]
+BR[17k*]PC[NNGS Worldwide: nngs.cosmic.org 9696]
+DT[2000-10-03]
+SZ[19]TM[600]KM[0.5]HA[9]AB[pd][dp][dd][pp][dj][pj][jp][jd][jj]
+C[
+ Tscherkan started observation.
+];W[fc];B[fd];W[gd];B[fe];W[ec];
+B[dc];W[ic];B[df];W[nq];B[np];W[qq];B[mq];W[pq]
+C[
+ bump started observation.
+];B[oq];W[nr];B[or];W[mr]
+)

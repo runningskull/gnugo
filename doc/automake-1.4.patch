@@ -1,0 +1,11 @@
+--- automake.orig	Sat Jan 16 19:37:42 1999
++++ automake	Sat Oct 30 15:55:04 1999
+@@ -2367,7 +2367,7 @@
+ 	$output_rules .= "\t  d=\$(srcdir); \\\n";
+     }
+     $output_rules .= ("\t  if test -d \$\$d/\$\$file; then \\\n"
+-		      . "\t    cp -pr \$\$/\$\$file \$(distdir)/\$\$file; \\\n"
++		      . "\t    cp -pr \$\$d/\$\$file \$(distdir)/\$\$file; \\\n"
+ 		      . "\t  else \\\n"
+ 		      . "\t    test -f \$(distdir)/\$\$file \\\n"
+ 		      . "\t    || ln \$\$d/\$\$file \$(distdir)/\$\$file 2> /dev/null \\\n"

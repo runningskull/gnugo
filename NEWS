@@ -1,0 +1,59 @@
+VERSION 3.0.0
+
+New in 3.0 (since 2.6)
+
+- stronger than 2.6
+- new move generation scheme
+- new influence function
+- more accurate reading
+- board information maintained incrementally during reading
+- new "owl" and "life" modules for accurate life and death analysis
+- persistent caching of reading and owl results for speed
+- revised semeai module
+- experimental Deterministic Finite State Automaton (DFA) pattern matcher
+- new debugging tools
+- level option
+
+New in 2.6 (since 2.4)
+
+- stronger than 2.4
+- more portable code
+- Texinfo documentation
+- Emacs mode
+
+New in 2.4 (since 2.0)
+
+Enhancements for the user:
+
+- stronger: able to give GNU Go 2.0 a 5 stone handicap
+  - life and death evaluation drastically improved
+  - more efficient and accurate reading
+  - (small) joseki database
+  - takes influence and territory into account
+- Ascii interface as an alternative to CGoban
+- uses GNU configure
+- undo supported
+- man page
+
+Enhancements for the developer:
+
+- expanded pattern database
+- autohelpers for patterns
+- joseki library in Smart Go Format
+- fuseki module
+- backfilling and numerous other improvements to reading code
+- algorithms for estimating territory and influence
+- eye_finder module uses a static algorithm for life and death
+- eyeshape database
+- connection database
+- reading code uses Zobrist hashing and other speedups
+- greater modularity
+- documentation of key algorithms
+- expanded support for Smart Go Format
+- various debugging tools
+
+
+
+
+
+

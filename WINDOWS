@@ -1,0 +1,192 @@
+              COMPILING GNU GO ON MICROSOFT PLATFORMS
+
+GNU Go is being developed on Unix variants. GNU Go is easy to build
+and install on those platforms. GNU Go 3.0 has support for building
+on MS-DOS, Windows 3.x, Windows NT/2000 and Windows 95/98.
+
+There are two approaches to building GNU Go on Microsoft platforms.
+
+1) The first approach is to install a Unix-like environment based
+   on ports of GCC to Microsoft platforms. This approach is fully
+   supported by the GNU Go developers and works well. Several
+   high quality free Unix-environments for Microsoft platforms
+   are available.
+
+   One benefit of this approach is that it is easier to
+   participate in Gnu Go's development. These unix environments
+   come for instance with the `diff' and `patch' programs
+   necessary to generate and apply patches.
+
+   Another benefit of the unix environments is that development
+   versions (which may be stronger than the latest stable
+   version) can be built too.  The supporting files for VC are
+   not always actively worked on and consequently are often out
+   of sync for development versions, so that VC will not build
+   cleanly.
+
+2) The second approach is to use compilers such as Visual C
+   developed specially for the Microsoft platform. Presently we 
+   support Visual C through the project files which are supplied 
+   with the distribution.
+
+The rest of this document gives more details on the various ways
+to compile GNU go for Microsoft platforms.
+
+1. Using free Unix-environments and GCC
+
+    * A) Windows 95/98, MS-DOS and Windows 3.x using DJGPP
+    * B) Windows NT, Windows 95/98 using Cygwin
+    * C) Windows NT, Windows 95/98 using MINGW32
+
+2. Visual C:
+
+   * D) Windows NT, Windows 95/98 using Visual C and project files
+
+A) Windows 95/98, MS-DOS and Windows 3.x using DJGPP
+
+On these platforms DJGPP can be used. GNU Go installation has been
+tested in a DOS-Box with long filenames on Windows 95/98. GNU Go
+compiles out-of-the box with the DJGPP port of GCC using the
+standard Unix build and install procedure.
+
+Some URLs for DJGPP:
+
+DJGPP home page: <http://www.delorie.com/djgpp/>
+
+DJGPP ftp archive on simtel:
+
+<ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/>
+<ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/>
+
+Once you have a working DJGPP environment and you have downloaded
+the gnugo source available as gnugo-3.0.tar.gz you can build the
+executable as follows:
+
+       tar zxvf gnugo-3.0.tar.gz
+       cd gnugo-3.0
+       ./configure
+       make
+
+Optionally you can download glib for DJGPP to get a working version
+of snprintf.
+
+B) Windows NT, Windows 95/98 using Cygwin
+
+   On these platforms the Cygwin environment can be installed. Recent
+versions of Cygwin install very easily with the setup program available
+from the cygwin homepage.  (<http://sourceware.cygnus.com/cygwin/>).
+GNU Go compiles out-of-the box using the standard Unix build procedure
+on the Cygwin environment. After installation of cygwin and fetching
+`gnugo-3.0.tar.gz' you can type:
+
+       tar zxvf gnugo-3.0.tar.gz
+       cd gnugo-3.0
+       ./configure
+       make
+
+   The generated executable is not a stand-alone executable: it needs
+cygwin1.dll that comes with the Cygwin environment. cygwin1.dll
+contains the emulation layer for Unix.
+
+   Cygwin Home page:
+
+   <http://sourceware.cygnus.com/cygwin/>
+
+   Optionally you can use glib to get a working version of snprintf.
+Glib builds out of the box on cygwin.
+
+C) Windows NT, Windows 95/98 using MINGW32
+
+   The Cygwin environment also comes with MINGW32. This generates an
+executable that relies only on Microsoft DLLs. This executable is thus
+completely comparable to a Visual C executable and easier to distribute
+than the Cygwin executable. To build on cygwin an executable suitable
+for the win32 platform type the following at your cygwin prompt:
+
+        tar zxvf gnugo-3.0.tar.gz
+        cd gnugo-3.0
+        env CC='gcc -mno-cygwin' ./configure
+        make
+
+D) Windows NT, Windows 95/98 using Visual C and project files
+
+1) Open the VC++ 6 workspace file gnugo.dsw
+
+2) Set the gnugo project as the active project (right-click on it,
+   and select "Set as Active Project".  Select 'Build' from the main 
+   menu, then select 'Build gnugo.exe', this will make all of the 
+   runtime subprojects.
+
+Notes:
+
+a) The build can also be done from the command line:
+   
+    msdev gnugo.dsw /make "gnugo - Win32 Release"
+	   
+b) The default configuration is 'Debug', build the optimized
+   version by selecting 'Build' from the main menu , then select
+   'Set active Configuration' and click on 'gnugo - Win32 Release'.
+   See the Visual Studio help for more on project configurations.
+
+c) A custom build step in the first dependent subproject (utils)
+   copys config.vc to config.h in the root directory. If you want
+   to modify config.h, copy any changes to config.vc. In
+   particular if you want to change the default level
+   or default cache size, whose significance is discussed in
+   INSTALL, you must edit this file.
+
+d) This project was built and tested using VC version 6.0.
+   It has not been tested, and will most likely not work with
+   earlier versions of VC.
+
+e) If for any reason some or all of the automatically built
+   files in the patterns directory do not build you can run 
+   mkpat on the command line to make these files. For reference 
+   here are the recommended mkpat options:
+
+  FILE             MKPAT OPTIONS      INPUT FILES
+
+  conn.c           mkpat -c conn            conn.db
+  patterns.c       mkpat -b pat             patterns.db, patterns2.db
+  apatterns.c      mkpat -X attpat          attack.db
+  dpatterns.c      mkpat defpat             defense.db
+  influence.c      mkpat -c influencepat    influence.db
+  endgame.c        mkpat -b endpat          endgame.db
+  owl_attackpat.c  mkpat -b owl_attackpat   owl_attackpats.db
+  owl_vital_apat.c mkpat -b owl_vital_apat  owl_vital_apats.db
+  owl_defendpat.c  mkpat -b owl_defendpat   owl_defendpats.db
+  fuseki9.c        mkpat -b -f fuseki9      fuseki9.db
+  fuseki19.c       mkpat -b -f fuseki19     fuseki19.db
+  josekidb.c       mkpat -b joseki          hoshi.db, komoku.db, sansan.db,
+                                            mokuhazushi.db, takamoku.db
+
+
+
+         Running GNU Go on Windows NT and Windows 95/98
+
+GNU Go does not come with its own graphical user interface. The Java
+client jago can be used.
+
+To run Jago you need a Java Runtime Environment (JRE). This can
+be obtained from http://www.javasoft.com/.  This is the runtime
+part of the Java Development Kit (JDK) and consists of the Java
+virtual machine, Java platform core classes, and supporting files.
+The Java virtual machine that comes with I.E. 5.0 works also.
+
+Jago: <http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html>
+
+1) Invoke GNU Go with `gnugo --quiet --mode gmp'
+
+2) Run `gnugo --help' from a cygwin or DOS window for a list of
+   options
+
+3) optionally specify `--level <level>' to make the game faster
+
+Jago works well with both the Cygwin and Mingw32 executables. The
+DJGPP executable also works, but has some problems in the interaction
+with jago after the game has been finished and scored.
+
+
+
+
+

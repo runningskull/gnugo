@@ -1,0 +1,13 @@
+                       GTP Demonstration Programs
+
+twogtp    : a very useful perl script for playing two gtp processes together.
+
+twogtp-a  : alternative implementation
+
+2ptkgo.pl : Requires perltk and the next program. Plays two gtp processes 
+            together with graphical display
+
+ttgo.pm   : required by 2ptkgo.pl
+
+gtp2_6    : patch to GNU Go 2.6 allowing use of the gtp with a
+            limited command set sufficient to use twogtp.

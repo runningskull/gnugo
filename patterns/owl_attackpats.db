@@ -1,0 +1,3361 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 2000, 2001 by the Free Software Foundation.         #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  The Owl offensive pattern database.
+#
+#  Further documentation may be found in the Texinfo documentation.
+#
+#  First there is a pattern title of the form: Pattern [string]. The
+#  string is used for identifying the pattern while tuning or debugging.
+#
+#  Then a block of the following characters representing the pattern
+#  itself.
+#  
+#  ?     : don't care
+#  .     : empty
+#  X     : your piece,
+#  O     : my piece,
+#  x     : your piece or empty
+#  o     : my piece or empty
+#  *     : my next move
+#  -, |  : edge of board
+#  +     : corner of board
+#
+#  If a pattern must not match at the edge of the board,
+#  an extra row of ?'s in the pattern may be added. (This
+#  will not add to the time taken to check the pattern.)
+#
+#################
+#
+#  In the second field (classification) the following pattern attributes
+#  are possible. Friendly stones are 'O', opponent stones are 'X'.
+# 
+# s  :  "Sacrifice" pattern. Omit the usual check that an O stone here
+#       cannot be capture.
+# 
+# n  :  In addition to usual check that an O stone here cannot be
+#       captured, check also that an X move cannot be captured.
+# 
+#################
+#
+# The patterns in this database are sorted into the following
+# categories:
+# 
+# Axx   Limiting moves on the fourth line
+# A1xx  Limiting moves on the third line
+# A2xx  Limiting moves on the second line
+# A3xx  Limiting moves on the first line
+# A4xx  Limiting moves in the center
+# A5xx  Eye reducing moves on the second line
+# A6xx  Eye reducing moves on the first line
+# A7xx  Eye reducing moves in the center
+# A8xx  Invade the eye space
+# A9xx  Nakade patterns
+# A10xx Cuts
+# A11xx Reinforce the perimeter
+# A12xx Kill or threaten a worm of the dragon
+# A13xx Specific corner attacks
+# A14xx Invasion patterns
+# A15xx Ko patterns
+# A16xx Specific edge attacks
+# 
+#########################################################
+#                                                       #
+#          Limiting moves on the fourth line            #
+#                                                       #
+#########################################################
+
+
+Pattern A1
+# sometimes sagari is better
+
+?.*Ox        connect
+..OXX
+.....
+.....
+-----
+
+:8,n,value(80)
+
+
+Pattern A2
+
+?..X.
+?.*.x        block
+..OX.
+.....
+.....
+-----
+
+:8,-,value(65)
+
+
+
+#########################################################
+#                                                       #
+#          Limiting moves on the third line             #
+#                                                       #
+#########################################################
+
+
+Pattern A101
+
+Oo?         Block
+X*.
+...
+...
+---
+
+:8,-,value(70)
+
+
+Pattern A102
+
+OO..?       Draw back
+XXO*.
+..X..
+.....
+-----
+
+:8,-,value(80)
+
+
+Pattern A103
+
+?Oo?      draw back
+x*.X
+x.OX
+?...
+----
+
+:8,-,value(50)
+
+
+Pattern A104
+
+?..O        pull back
+.*OX
+..X.
+....
+----
+
+:8,-,value(90)
+
+?..O        pull back
+.*Oa
+..X.
+....
+----
+
+; lib(a)>2
+
+
+Pattern A105
+
+?..OxX        mandatory block
+..*X..
+......
+......
+------
+
+:8,-,value(99)
+
+
+Pattern A106
+
+?X??         push in
+..*O
+X.XO
+....
+----
+
+:8,-,value(60)
+
+
+Pattern A107
+
+....      block on third line
+X.*.
+....
+....
+----
+
+:8,-,value(50)
+
+
+Pattern A108
+
+*.x         stand on third line
+OXx
+...
+---
+
+:8,n,value(70)
+
+
+Pattern A109
+
+oOo         block on third line
+X*.
+...
+...
+---
+
+:8,-,value(79)
+
+
+Pattern A110
+
+O..o        draw back --- the only move!
+XO*.
+XX..
+....
+----
+
+:8,-,value(85)
+
+
+#########################################################
+#                                                       #
+#          Limiting moves on the second line            #
+#                                                       #
+#########################################################
+
+
+Pattern A201
+
+OO...       Block if safe
+XXOO.
+..XX*
+.....
+-----
+
+:8,-,value(60)
+
+OOd.c    
+XXOOb
+..XXa
+.....
+-----
+
+; oplay_attack(a,b,b) || !oplay_attack(a,b,c,d,a)
+
+
+Pattern A202
+
+O?               second line block
+*X
+..
+--
+
+:8,-,value(39)
+
+
+Pattern A203
+
+?O??              second line block
+x*X?
+...X
+----
+
+:8,-,value(60)
+
+
+Pattern A204
+
+??O??              second line block
+..*X?
+.....
+-----
+
+:8,-,value(60)
+
+
+Pattern A205
+
+?Oo             second line block (needs a helper)
+XX*
+...
+---
+
+:8,-,value(60)
+
+
+Pattern A205b
+
+?Oo             second line block (needs a helper)
+XX*
+.O.
+---
+
+:8,-,value(70)
+
+
+Pattern A206
+
+?O?        block
+XOo
+.X*
+...
+---
+
+:8,-,value(80)
+
+
+Pattern A206b
+
+?.O        block
+XO.
+.X*
+...
+---
+
+:8,-,value(78)
+
+
+Pattern A207
+
+O.X         second line kosumi
+.*.
+...
+---
+
+:8,-,value(35)
+
+
+Pattern A207b
+
+O.Xx         second line kosumi
+.*.x
+...?
+----
+
+:8,-,value(58)
+
+
+Pattern A207c
+
+O.Xxx         second line kosumi
+.*.xx
+...??
+-----
+
+:8,-,value(78)
+
+
+Pattern A208
+# This pattern has the problem that it's often inappropriate in
+# positions like
+#
+# ..OO
+# O.XO
+# .*XX
+# ....
+# ----
+#
+# where X can play above * and get miai between capturing * and
+# escaping through the gap towards the center.
+
+O.X         third line kosumi
+.*X
+...
+---
+
+:8,-,value(55)
+
+
+Pattern A209
+
+?Ooo
+xX*.        second line block
+x...
+----
+
+:8,-,value(70)
+
+?aoo
+xX*.
+x...
+----
+
+;lib(a)>2
+
+
+Pattern A210
+
+?OO?x
+xX*.x       second line block
+x....
+-----
+
+:8,-,value(85)
+
+?OO?x
+xX*.a
+x....
+-----
+
+;owl_escape_value(a)>0
+
+
+Pattern A211
+
+?Oo?      second line block
+o..X
+o.*.
+?...
+----
+
+:8,-,value(80)
+
+
+Pattern A212
+
+|..xX         prevent connection
+|....
+|..*O
+|..X?
+
+:8,-,value(99)
+
+
+Pattern A213
+
+|..X.         prevent connection
+|....
+|..*O
+|..X?
+
+:8,-,value(99)
+
+
+Pattern A214
+
+----           connect
+....
+XO*.
+xXO?
+
+:8,-,value(85)
+
+----
+....
+XO*.
+xAO?
+
+;lib(A)>1
+
+
+Pattern A215
+
+?oOx              sagari
+?OXX
+x*..
+....
+----
+
+:8,-,value(80)
+
+
+Pattern A216
+
+??O              descend to attack
+XXO
+..*
+...
+---
+
+:8,-,value(50)
+
+
+Pattern A217
+
+?OXX            sometimes more effective to just descend
+.*..
+....
+----
+
+:8,-,value(40)
+
+
+Pattern A217b
+
+?OXX            sometimes more effective to just descend
+.*..
+....
+----
+
+:8,-,value(60)
+
+?aXX
+.*..
+....
+----
+
+;lib(a)==2
+
+
+Pattern A218
+
+..OO             reverse sente sagari
+.OXX       
+.*..
+....
+----
+
+:8,-,value(75)
+
+
+Pattern A219
+
+O..?
+XO.?               double hane
+.X*.
+...?
+----
+
+:8,s,value(70)
+
+ba.?
+AOc?
+eX*d
+..f?
+----
+
+;(xlib(a)==1 || lib(b)>2) && lib(A)<=3 && olib(e)>1 
+;&& oplay_attack(*,c,a,d,e,f,A)
+;&& oplay_defend(*,c,a,e,*)
+
+
+Pattern A220
+
+?xx.              prevent jump
+xX*.
+....
+----
+
+:8,-,value(45)
+
+
+Pattern A221
+
+?xx.             back off to prevent jump
+xX.*
+....
+----
+
+:8,-,value(50)
+
+
+Pattern A222
+
+?oOo??           clamp
+?Oooo?
+XOX*..
+.X....
+------
+
+:8,-,value(35)
+
+
+Pattern A223
+
+O.X         attach underneath
+..*
+...
+---
+
+:8,-,value(80)
+
+O.B
+.a*
+...
+---
+
+;lib(B)<=3 && oplay_attack(*,a,B)
+
+
+Pattern A224
+
+????        block if O can't cut
+OO.?
+XX*.
+....
+----
+
+:8,-,value(80)
+
+????
+OOa?
+XX*.
+....
+----
+
+; oplay_attack(*,a,a)
+
+
+Pattern A225
+
+?OX?       descend to prevent hane and eye
+.*.X
+...x
+----
+
+:8,-,value(50)
+
+
+Pattern A226
+
+.OX?       descend to prevent hane and eye in sente
+.*.X
+...x
+----
+
+:8,-,value(80)
+
+bCX?
+a*.X
+...x
+----
+
+;xplay_attack(*,a,C) || !xplay_defend_both(*,a,b,a,C)
+
+
+Pattern A227
+
+?XOxx
+?XO*.         stop escape
+X.X..
+-----
+
+:8,-,value(35)
+
+??Oxx
+?XO*a
+X.X..
+-----
+
+;owl_escape_value(a)>0
+
+
+Pattern A228
+
+.*O           eliminate kikashi
+..X
+---
+
+:8,-,value(45)
+
+.*a
+..X
+---
+
+; xplay_attack(*,a)
+
+
+Pattern A229
+
+xx.O?        stop escape
+x.*OX
+...X.
+-----
+
+:8,-,value(80)
+
+ac.O?
+b.*OX
+...X.
+-----
+
+;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
+
+
+Pattern A229b
+
+xxx?        stop escape
+..*O
+...X
+----
+
+:8,-,value(79)
+
+abx?
+..*O
+...X
+----
+
+;owl_escape_value(a) + owl_escape_value(b) > 0
+
+
+Pattern A229c
+
+xx?        stop escape
+.*O
+..X
+---
+
+:8,-,value(79)
+
+ab?
+.*O
+..X
+---
+
+;owl_escape_value(a) + owl_escape_value(b) > 0
+
+
+Pattern A229d
+
+X?        stop escape
+*O
+.X
+--
+
+:8,-,value(79)
+
+a?
+*O
+.X
+--
+
+;owl_escape_value(a) > 0
+
+
+Pattern A230
+
+?Oo?       stop escape along edge
+..*X
+....
+----
+
+:8,-,value(80)
+
+?Oo?
+a.*X
+b...
+----
+
+;owl_escape_value(a)+owl_escape_value(b) > 0
+
+
+Pattern A231
+
+?..X       jump to undermine
+O.*.
+....
+
+:8,-,value(50)
+
+
+#########################################################
+#                                                       #
+#          Limiting moves on the first line             #
+#                                                       #
+#########################################################
+
+
+Pattern A301
+
+XO.X           prevent connection
+X*..
+----
+
+:8,-,value(60)
+
+XO.A
+X*..
+----
+
+;!owl_goal_dragon(A)
+
+
+Pattern A302
+
+oOX?        descend
+OX.x
+*.Xo
+----
+
+:8,-,value(30)
+
+
+Pattern A303
+# In this position, X often cannot get away by pushing on the first
+# line. Still it may be possible to evade long enough to hit various
+# reading depth limits. This move is only intended to stop such
+# nonsense, thus the low value.
+
+?O..           prevent escape
+X*..
+----
+
+:8,-,value(30)
+
+?O.a
+X*..
+----
+
+;owl_escape_value(a)>0
+
+
+Pattern A304
+# In this position, X often cannot get away by pushing on the first
+# line. Still it may be possible to evade long enough to hit various
+# reading depth limits. This move is only intended to stop such
+# nonsense, thus the low value.
+
+??....
+?O....           prevent escape
+X*....
+------
+
+:8,-,value(20)
+
+
+#########################################################
+#                                                       #
+#          Limiting moves in the center                 #
+#                                                       #
+#########################################################
+
+
+Pattern A401
+
+O..?       block strongly if possible
+X*..
+?..?
+
+:8,-,value(80)
+
+cb.?
+Xa..
+?..?
+
+; oplay_defend_both(a,b,a,c)
+
+
+Pattern A402
+
+O*.?        fall back to confine
+X...
+?..?
+
+:8,-,value(70)
+
+b*.?
+Xa..
+?..?
+
+;lib(b)<=2 || xlib(*)>2
+
+
+Pattern A403
+
+..*          knight's move to block
+O..
+OXX
+
+:8,-,value(75)
+
+cb*
+Aad
+OXX
+
+; oplay_defend_both(*,a,b,c,A,b) && oplay_defend_both(*,b,a,d,*,A)
+
+
+Pattern A404
+
+xXx          attack eyeshape
+X.X
+.*.
+
+:|,-,value(75)
+
+
+Pattern A405
+
+???
+?..         center block
+?*O
+?X?
+
+:8,-,value(35)
+
+?a?
+?..
+?*O
+?X?
+
+;owl_escape_value(a)>0
+
+
+Pattern A406
+
+xxx
+...         center block
+.*O
+OX?
+
+:8,-,value(85)
+
+xax
+b..
+.*O
+OX?
+
+; (owl_escape_value(a)>0)||(owl_escape_value(b)>0)
+
+
+Pattern A406b
+
+xxx
+...         center block
+.*O
+.X?
+
+:8,-,value(80)
+
+xax
+...
+.*O
+.X?
+
+;owl_escape_value(a)>0
+
+
+Pattern A407
+
+O.X
+*X.
+...
+...
+
+:8,-,value(45)
+
+
+Pattern A408
+
+?oOo        seal the opponent in
+?...
+.*.X
+....
+???.
+???.
+
+:8,-,value(70)
+
+?oOo
+?...
+.*.X
+....
+?ab.
+?cd.
+
+; o_somewhere(a,b,c,d)
+
+
+Pattern A409
+
+??xxx
+oO*..        try to contain
+O.X.O
+?X.Oo
+
+:8,-,value(80)
+
+??abc
+oO*..
+O.X.O
+?X.Oo
+
+;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
+
+
+Pattern A410
+
+xxx          try to block
+.*.
+OXO
+?X?
+
+:|,-,value(90)
+
+xax
+.*.
+OXO
+?X?
+
+;owl_escape_value(a)>0
+
+
+Pattern A411
+
+??...      try to stop escape into center
+??...
+??.*.
+??..X
+
+:8,-,value(81)
+
+??.a.
+??...
+??.*.
+??..X
+
+;owl_escape_value(a)>0
+
+
+Pattern A412
+
+????
+?*.O        (possibly desperate) center block
+?.X?
+?O??
+
+:8,-,value(55)
+
+ba??
+?*.O
+?.X?
+?O??
+
+;owl_escape_value(a) + owl_escape_value(b) > 0
+
+
+Pattern A413
+# Converse to D1318
+
+??...      stop victim from running towards center
+??...
+??.*.
+??..X
+
+:8,-,value(45)
+
+
+Pattern A414
+
+??xxx??       cap to prevent escape
+??...??
+oo.*.oo
+oo...oo
+??.X.??
+
+:8,-,value(82)
+
+??xxx??
+??e..??
+ab.*.oo
+cd...oo
+??xXx??
+
+; o_somewhere(a,b,c,d) && owl_escape_value(e)>0
+
+
+Pattern A415
+
+o..         cut off escape
+.*X
+X.O
+
+:8,-,value(80)
+
+o..
+.*X
+Abc
+
+;owl_escape_value(A)>0 && oplay_defend_both(*,b,*,c)
+
+
+Pattern A416
+
+?.O??        hane
+.*X.X
+?...x
+
+:8,-,value(65)
+
+
+Pattern D1346
+
+?X.O          prevent center escape
+O.*.
+o...
+xxxx
+
+:8,-,value(75)
+
+?X.O
+O.*.
+oo..
+xabc
+
+;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
+
+
+
+
+#########################################################
+#                                                       #
+#          Eye reducing moves on the second line        #
+#                                                       #
+#########################################################
+
+
+Pattern A501
+
+x.X?      jump under
+.*.O
+....
+----
+
+:8,-,value(75)
+
+
+Pattern A502
+
+?Xo         extend to kill eye 
+O*X
+X.X
+---
+
+:8,n,value(45)
+
+?Xo
+a*X
+X.X
+---
+
+; attack(a)
+
+
+Pattern A503
+
+?XX         push in to eliminate eye
+X*O
+X.X
+---
+
+:8,s,value(45)
+
+
+Pattern A504
+
+X*           cut off one stone
+OX
+--
+
+:8,-,value(35)
+
+
+Pattern A505
+
+?OXX       there is death in the hane
+..*.
+....
+----
+
+:8,-,value(45)
+
+
+Pattern A506
+
+?XX       undermine eyespace
+O*.
+...
+---
+
+:8,-,value(35)
+
+
+Pattern A507
+
+?O?           destroy eye space and threaten to cut
+X*X
+...
+---
+
+:8,-,value(80)
+
+
+Pattern A508
+
+o.Xx?        undermine potential eye space
+O.*.X
+....x
+-----
+
+:8,-,value(65)
+
+
+Pattern A509
+
+X.O           destroy eye space by damezumari
+X*X
+x.x
+---
+
+:8,-,value(80)
+
+AbO
+A*X
+x.x
+---
+
+;lib(A)<=3 && xlib(b) <= 2 && oplay_attack(*,b,b)
+
+
+Pattern A510
+
+.XX.X       destroy eyespace in reverse sente
+OXO*.
+.O...
+-----
+
+:8,-,value(55)
+
+
+#########################################################
+#                                                       #
+#          Eye reducing moves on the first line         #
+#                                                       #
+#########################################################
+
+
+Pattern A601
+
+----        jump along edge
+O.*.
+X..?
+?Xxx
+
+:8,-,value(75)
+
+
+
+Pattern A602
+
+--+         hane in corner
+..|
+X*|
+Oo|
+
+:8,-,value(70)
+
+--+
+..|
+X*|
+ao|
+
+;!attack(a)
+
+
+Pattern A603
+
+XX.O       reduce eye space
+.*..
+----
+
+:8,s,value(35)
+
+XX.a
+.*..
+----
+
+;!attack(a)
+
+
+Pattern A603b
+
+xX..       reduce eye space
+.*.O
+----
+
+:8,s,value(35)
+
+xC..
+b*.a
+----
+
+;owl_eyespace(b,C) && !attack(a)
+
+
+Pattern A604
+
+XX..O       reduce eye space
+.*...
+-----
+
+:8,s,value(35)
+
+
+Pattern A605
+
+|.X.O       reduce eye space
+|.*..
++----
+
+:8,s,value(35)
+
+
+Pattern A606
+
+XxX.O        try to destroy eye
+xO*..
+-----
+
+:8,s,value(50)
+
+XxXaO
+xc*b.
+-----
+
+;lib(c) > 1 && !oplay_attack(*,a,b,*)
+
+
+Pattern A607
+
+xXO        there is death in the hane
+.*.
+---
+
+:8,s,value(36)
+
+xXa
+b*.
+---
+
+;!oplay_attack(*,a) && !obvious_false_xeye(b)
+
+
+Pattern A608
+
+xXO        hane with atari on more than one stone
+.*.
+---
+
+:8,s,value(75)
+
+xCa
+b*.
+---
+
+;lib(C)==2 && wormsize(C)>1 && !oplay_attack(*,a) && !obvious_false_xeye(b)
+
+
+Pattern A609
+
+XOX         destroy eye
+.*.
+---
+
+:8,s,value(35)
+
+
+Pattern A610
+
+X.XO         try to damage eyespace in sente
+.*.?
+----
+
+:8,s,value(55)
+
+X.Xa
+.*.?
+----
+
+;!attack(a)
+
+
+Pattern A611
+
+?Ox?          placement where X cannot cut
+XX.X
+O.*.
+----
+
+:8,-,value(80)
+
+?Ox?
+AA.X
+O.*.
+----
+
+;lib(A)==2
+
+
+Pattern A612
+
+oOX?        threaten snapback to destroy eye
+OX.X
+*X.O
+----
+
+:8,-,value(60)
+
+oOX?
+OX.X
+*X.a
+----
+
+;lib(a) > 1
+
+
+Pattern A613
+
+X.X?        extra forceful hane
+..XO
+..*.
+----
+
+:8,-,value(65)
+
+X.D?
+.bDO
+.a*c
+----
+
+;oplay_attack(*,a,b,c,D)
+
+
+#########################################################
+#                                                       #
+#          Eye reducing moves in the center             #
+#                                                       #
+#########################################################
+
+
+Pattern A701
+
+?XOo        make atari
+X.XO
+..*.
+
+:8,-,value(79)
+
+?AOo
+X.XO
+..*.
+
+;lib(A)>1
+
+
+Pattern A702
+
+?XOo        make atari
+X.XO
+..*O
+??x?
+
+:8,-,value(80)
+
+?AOo
+X.XO
+..*O
+??x?
+
+;lib(A)>1
+
+
+Pattern A703
+
+?XX?       push in to limit eyeshape
+O*.X
+?..x
+
+:8,-,value(80)
+
+
+Pattern A704
+
+?OX?         capture one stone
+OXOX
+.*.?
+
+:8,-,value(80)
+
+
+Pattern A705
+
+?*?        attack eye shape
+X.X
+?.?
+
+:|,-,value(60)
+
+?*?
+X.B
+?a?
+
+;owl_eyespace(a,B)
+
+
+Pattern A705b
+
+?.?        attack eye shape
+X*X
+?.?
+
+:|,-,value(61)
+
+?c?
+X*B
+?a?
+
+;owl_eyespace(a,B) && xlib(c) <= 2 && oplay_attack(*,c,c)
+
+
+Pattern A706
+
+?*?
+X.X
+?X.
+
+:8,-,value(70)
+
+?*?
+XaA
+?Xb
+
+; (owl_topological_eye(a,A)<=2) && (owl_topological_eye(b,A)==2)
+
+
+Pattern A707
+
+?O?
+X*X
+.X.
+
+:8,-,value(70)
+
+?O?
+X*A
+aXb
+
+; (owl_topological_eye(a,A)==2)
+; && ((owl_topological_eye(b,A)==2) || (owl_topological_eye(b,A)==3))
+
+
+Pattern A708
+
+?X*         attack eye with sente
+x.X
+?x?
+
+:8,n,value(80)
+
+?X*
+xaB
+?x?
+
+; does_attack(*,B) && owl_topological_eye(a,B)==3
+
+
+Pattern A709
+
+xX.         half eye sometimes missed
+X.*
+?x?
+
+:8,-,value(45)
+
+xXb
+Aa*
+?x?
+
+; safe_omove(b) && safe_omove(*) && xplay_attack(*,b,b)
+; && (owl_topological_eye(a,A)==3)
+
+
+Pattern A710
+
+?X*          kill a half eye with an atari
+x.X
+?x?
+
+:8,-,value(35)
+
+?A*
+xba
+?x?
+
+; lib(a)==2 && owl_topological_eye(b,A)==3
+
+
+Pattern A711
+
+O*.X        destroy eye
+X..X
+xXX?
+
+:8,-,value(35)
+
+
+Pattern A712
+
+?XX?       eye stealing tesuji
+...X
+.*.X
+oo.?
+
+:8,-,value(60)
+
+
+Pattern A713
+
+OO?         destroy potential eye
+X.X
+X.X
+x*x
+
+:8,-,value(45)
+
+bb?
+OaO
+O.O
+o*o
+
+;!attack(b) && xplay_attack(a,b)
+
+
+Pattern A714
+
+?XX?       capture to spoil eyespace
+O..X
+X*.x
+OX.x
+
+:8,-,value(82)
+
+?XX?
+O..X
+A*.x
+OX.x
+
+;lib(A)==1
+
+
+#########################################################
+#                                                       #
+#            Invade the eye space                       #
+#                                                       #
+#########################################################
+#                                                       #
+#          These are patterns where a live stone        #
+#          is played where the opponent might get       #
+#          an eye. They do not include sacrifice        #
+#          patterns.                                    #
+#                                                       #
+#########################################################
+
+
+Pattern A801
+
+?xXx       attack chimera
+xX.X
+X.*O
+----
+
+:8,n,value(80)
+
+
+Pattern A802
+
+xXx       destroy eye
+X.X
+.*O
+---
+
+:8,n,value(50)
+
+
+Pattern A803
+
+xxX?      connect under
+.OXO
+..*.
+----
+
+:8,-,value(80)
+
+xxX?
+.AOO
+..*.
+----
+
+; !oplay_attack(*,A) && attack(A)
+
+
+Pattern A804
+
+.XO?        connect out on first line
+O*oo
+----
+
+:8,-,value(45)
+
+.XO?
+A*oo
+----
+
+; does_attack(*,A)
+
+
+Pattern A805
+
+XxxX?       connect under
+..OXO
+...*.
+-----
+
+:8,-,value(60)
+
+
+Pattern A806
+
+O..X
+OX*.
+....
+----
+
+:8,-,value(75)
+
+
+Pattern A807
+
+?X.         connect under
+OX*
+.O.
+---
+
+:8,-,value(65)
+
+
+Pattern A808
+
+|.OXO        avoid leaving ko by connecting on the outside
+|*XO.
++----
+
+:8,-,value(60)
+
+
+Pattern A809
+
+XX.O?       connect out
+O.XO?
+O.*..
+-----
+
+:8,-,value(80)
+
+XX.O?
+A.XO?
+A.*..
+-----
+
+; lib(A)>2
+
+
+Pattern A810
+
+?O?
+X.X        safe invasion into eye
+?*?
+
+:8,-,value(45)
+
+?O?
+A.X
+?*?
+
+;owl_eyespace(*,A) && safe_omove(*)
+
+
+#########################################################
+#                                                       #
+#                Nakade patterns                        #
+#                                                       #
+#########################################################
+#                                                       #
+#          These are patterns where a sacrifice stone   #
+#          is played in the opponent's eye space to     #
+#          prevent two eyes. Use the s (sacrifice)      #
+#          classification                               #
+#                                                       #
+#########################################################
+
+
+Pattern A901
+
+|X???
+|OXXX         connect corner ko to make nakade
+|*O.X
++----
+
+:8,s,value(70)
+
+
+Pattern A902
+
+XOX           nakade trick
+O*O
+---
+
+:8,s,value(70)
+
+XbX
+a*c
+---
+
+;lib(a)==1 && lib(b)==1 && lib(c)<=2
+
+
+Pattern A902b
+
+XOX           nakade trick
+O*O
+---
+
+:8,s,value(30)
+
+XbX
+a*c
+---
+
+;lib(a)<=2 && lib(b)==1 && lib(c)<=2
+
+
+Pattern A903
+
+|xXX?
+|.O.X         try to make nakade
+|..*.
++----
+
+:8,s,value(35)
+
+
+Pattern A904
+
+|OX?        try to form nakade
+|XOX
+|*.x
++---
+
+:8,s,value(55)
+
+|aB?
+|XOX
+|*.x
++---
+
+;lib(a) == 1 && lib(B) > 1
+
+
+Pattern A905
+
+|O.X        try to form nakade
+|XOX
+|*..
++---
+
+:8,s,value(35)
+
+
+Pattern A906
+
+|O.X        try to form nakade
+|XOX
+|*..
++---
+
+:8,s,value(35)
+
+
+Pattern A907
+
+|.X??
+|OXX?        critical point, might kill
+|*.Xx
+|....
++----
+
+:8,s,value(65)
+
+|.X??
+|aXX?
+|*.Xx
+|....
++----
+
+;!defend(a)
+
+
+Pattern A908
+
+|X???       nakade if ko can be won
+|OXX?       
+|.OX?
+|O*.X
++----
+
+:8,s,value(35)
+
+|X???
+|OXX?       
+|.OX?
+|O*aX
++----
+
+;xlib(a) == 2
+
+
+Pattern A909
+
+|.X?        capture to form nakade
+|OXX       
+|XOX
+|*O.
++---
+
+:8,s,value(35)
+
+
+Pattern A910
+
+XXX|          try nakade in corner
+.*.|
+---+
+
+:8,s,value(25)
+
+XXX|
+a*.|
+---+
+
+;!obvious_false_xeye(a)
+
+
+Pattern A911
+
+X.Xo|          try nakade
+X.*.|
+----+
+
+:8,s,value(25)
+
+A.Xo|
+A.*.|
+----+
+
+;lib(A)==2
+
+
+Pattern A912
+
+OXOo       destroy eyespace
+X.XO
+.*..
+----
+
+:8,s,value(35)
+
+
+Pattern A913
+
+XX.X         try sente eyeshape reduction
+X.*.
+----
+
+:8,s,value(80)
+
+AAbX
+A.*.
+----
+
+;lib(A)==2 && !safe_omove(b)
+
+
+Pattern A914
+
+XX.X            try nakade 
+X.*.
+----
+
+:8,s,value(25)
+
+AAbX
+A.*.
+----
+
+;!safe_omove(b)
+
+
+Pattern A915
+
+X.Xoo      destroy eyespace
+.*.Xo
+.....
+-----
+
+:8,s,value(85)
+
+X.Xao
+.*.Xb
+.....
+-----
+
+;o_somewhere(a,b)
+
+
+Pattern A916
+
+??Xx        play inside to kill one eye
+XX.X
+..*.
+----
+
+:8,s,value(65)
+
+
+Pattern A917
+
+?X??        always worth considering
+X.X?
+?*.X
+??X?
+
+:/,s,value(45)
+
+
+#########################################################
+#                                                       #
+#                        Cuts                           #
+#                                                       #
+#########################################################
+
+
+Pattern A1001
+
+XO          cut if safe
+*X
+
+:/,n,value(80)
+
+Ba
+*C
+
+;(owl_escape_value(B)>0 || owl_escape_value(C)>0)
+;&& !oplay_attack_either(*,*,a)
+
+
+Pattern A1001b
+
+XO          cut if safe
+*X
+
+:/,n,value(50)
+
+Xa
+*X
+
+; !oplay_attack_either(*,*,a)
+
+
+Pattern A1002
+????
+?*.X     threaten to cut
+??XO
+
+:8,-,value(75)
+
+????
+?*aX
+??Xc
+
+; !safe_omove(a) && !oplay_attack_either(*,?,a,a,c) && !oplay_attack(*,a,*)
+
+
+Pattern A1003
+
+????
+?*.X     threaten to cut
+??XO
+
+:8,-,value(55)
+
+????
+?*aX
+??Xc
+
+; !safe_omove(a) && !oplay_attack_either(*,?,a,a,c)
+
+
+Pattern A1004
+
+----
+?*.X     threaten to cut
+??XO
+
+:8,-,value(50)
+
+----
+?*aX
+??Xc
+
+; !safe_omove(a) && !oplay_attack_either(*,?,a,a,c)
+
+
+Pattern A1005
+
+X?          cut!
+*O
+.X
+
+:8,-,value(90)
+
+X?
+*b
+aC
+
+;owl_escape_value(C)>0 && xplay_attack_either(*,a,a,b)
+
+
+Pattern A1006
+
+XOX        push out
+.*.
+?.?
+
+:8,-,value(70)
+
+
+Pattern A1007
+
+X*X      stop connection
+
+:+,-,value(35)
+
+a*b
+
+;!owl_goal_dragon(a) || !owl_goal_dragon(b)
+
+
+Pattern A1008
+
+X*X      stop connection
+?O?
+
+:|,-,value(80)
+
+a*b
+?O?
+
+;owl_escape_value(a)>0 || owl_escape_value(b)>0
+
+
+Pattern A1008b
+
+X*X      stop connection
+O.?
+
+:8,-,value(80)
+
+a*b
+Oc?
+
+;(owl_escape_value(a)>0 || owl_escape_value(b)>0) && oplay_attack(*,c,c)
+
+
+Pattern A1009
+
+XO*X         stop connection underneath
+....
+----
+
+:8,-,value(55)
+
+XO*X
+.a..
+----
+
+;xplay_attack(*,a,a)
+
+
+Pattern A1010
+
+X.O        cut and capture to destroy eyespace
+.*X
+...
+---
+
+:8,-,value(75)
+
+XaO
+.*B
+...
+---
+
+;oplay_attack(*,a,B)
+
+
+Pattern A1011
+
+XOX      stop connection underneath
+x*x
+---
+:|,-,value(80)
+
+a*b
+?O?
+
+;owl_escape_value(a)>0 || owl_escape_value(b)>0
+
+
+Pattern A1012
+
+X.??          cut
+OX*O
+oOX?
+
+:8,-,value(45)
+
+Xa??          cut
+OX*O
+obX?
+
+; !safe_omove(a) && lib(b)>1
+
+
+#########################################################
+#                                                       #
+#              Reinforce the perimeter                  #
+#                                                       #
+#########################################################
+#                                                       #
+#   Patterns where the perimeter is already in place    #
+#   but has a defect which needs repair.                #
+#                                                       #
+#########################################################
+
+
+Pattern A1101
+
+...
+O*O
+?X?
+
+:|,-,value(93)
+
+.a.
+b*c
+?X?
+
+; xplay_break_through(*,a,b,a,c) == WIN
+
+
+Pattern A1101b
+
+...
+O*O
+?X?
+
+:|,-,value(94)
+
+.a.
+b*c
+?X?
+
+; lib(b)<=4 && lib(c)<=4 && xplay_break_through(*,a,b,a,c) == WIN
+
+
+Pattern A1102
+
+..X
+O*O
+?X?
+
+:8,-,value(95)
+
+baX
+c*O
+?X?
+
+;!xplay_defend_both(*,a,b,a,c)
+
+
+Pattern A1103
+# Eliminating this test breaks Owl test 138. But the pattern is
+#    in the wrong category. Notice also the similarites with A1206.
+
+X*         unconditional cut
+OX
+
+:8,-,value(30)
+
+
+Pattern A1104
+
+OXO        connect to prevent double atari
+XO*
+...
+
+:8,-,value(85)
+
+OXB
+AO*
+.a.
+
+; xplay_attack(*,a,B) && !oplay_defend(*,A)
+
+
+Pattern A1105
+
+O..
+XO*        connect against double threat
+xXO
+x..
+---
+
+:8,-,value(85)
+
+Oa.
+XO*
+xAb
+x..
+---
+
+;!attack(A) && xplay_attack(*,a,b)
+
+
+Pattern A1106
+
+OO.?
+XOX*       capture cutting stone to defend
+xXO.
+xx..
+----
+
+:8,-,value(70)
+
+OO.?
+XOB*
+xAa.
+xx..
+----
+
+;!attack(A) && attack(a) && !oplay_defend(*,B)
+
+
+Pattern A1107
+
+O*          defend the surrounding chain
+XO
+
+:/,-,value(95)
+
+ba
+Xc
+
+; !xplay_defend_both(a,b,c) && vital_chain(b) && vital_chain(c)
+
+
+Pattern A1108
+
+?XO         don't let defender capture to escape
+*OX
+
+:8,-,value(80)
+
+?BO
+*aX
+
+;owl_escape_value(B) > 0 && does_defend(*,a)
+
+
+Pattern A1109
+
+?Xx??       connect underneath
+?OXoo
+O.*..
+.....
+-----
+
+:8,-,value(65)
+
+?Xx??
+?cXab
+O.*..
+.....
+-----
+
+; o_somewhere(a,b) && attack(c)
+
+
+Pattern A1110
+
+o..XO?       connect underneath
+O.*Ooo
+------
+
+:8,-,value(50)
+
+
+Pattern A1111
+
+?.x..|      defend bottom while emphasizing top
+.OXX.|
+.*OX.|
+?..O.|
+??...|
+
+:8,-,value(65)
+
+
+Pattern A1112
+#    Strict speaking we should not need patterns
+#    like this
+
+X.*O         save lunch
+XO..
+....
+----
+
+:8,-,value(50)
+
+X.*O         
+Xa..
+....
+----
+
+; attack(a)
+
+
+
+
+
+#########################################################
+#                                                       #
+#       Kill or threaten a worm of the dragon           #
+#                                                       #
+#########################################################
+
+
+Pattern A1201
+
+?O?          capture one stone to rescue
+*XO
+
+:8,-,value(75)
+
+?a?
+*BO
+
+; (lib(a)==1) && (lib(B)==1)
+
+
+# Pattern A1202
+# 
+# ?.           atari inside eyespace
+# X*
+# 
+# :8,s,value(65)
+# 
+# ?.?
+# A*.
+# 
+# ; lib(A)==2 && olib(*)>1 && !safe_omove(*)
+
+
+Pattern A1203
+
+?*?         capture 3 stones
+OXO
+
+:8,s,value(80)
+
+?*?
+OAO
+
+;wormsize(A)>3 && lib(A)==1
+
+
+Pattern A1204
+
+?*?         capture 1 or two stones
+OXO
+
+:8,s,value(30)
+
+?*?
+OAO
+
+;wormsize(A)<=3 && lib(A)==1
+
+
+Pattern A1205
+
+*X          kill one string!
+XO
+
+:8,s,value(75)
+
+*X
+AO
+
+;wormsize(A)>3 && does_attack(*,A)
+
+
+Pattern A1206
+
+*X          kill one string!
+XO
+
+:8,s,value(30)
+
+*X
+AO
+
+;wormsize(A)<=3 && does_attack(*,A)
+
+
+Pattern A1207
+
+..X         attack one stone
+.*X
+.XO
+
+:8,-,value(45)
+
+..X
+.*X
+.AO
+
+; does_attack(*,A)
+
+
+Pattern A1208
+
+?Ooo       cut off one stone
+X..o
+.*XO
+....
+----
+
+:8,-,value(40)
+
+
+#########################################################
+#                                                       #
+#               Specific corner attacks                 #
+#                                                       #
+#########################################################
+
+
+Pattern A1301
+
+|..o???
+|.Oooo?	      kill corner
+|.XOO.o
+|.XX..O
+|...*..
+|......
++------
+
+:8,-,value(90)
+
+|..a???
+|.Oboo?
+|.XOO..
+|.XX..O
+|...*..
+|......
++------
+
+; o_somewhere(a,b)
+
+
+Pattern A1302
+
+|..X?         corner clamp, often resourceful
+|.*XO
+|....
++----
+
+:8,s,value(30)
+
+
+Pattern A1303
+
+|..X?         obligatory corner attack
+|X.XO
+|.*.?
++----
+
+:8,s,value(90)
+
+
+Pattern A1303b
+
+|..X?         followup
+|X*XO
+|.OX?
++----
+
+:8,s,value(50)
+
+
+Pattern A1304
+
+|.XO          throw in threatening to destroy two corner eye vertices
+|.*X
++---
+
+:8,s,value(60)
+
+|.XO
+|.*A
++---
+
+;lib(A)==2
+
+
+Pattern A1305
+
+|XXX?         try to kill corner formation
+|.*.X
+|...X
++----
+
+:8,s,value(90)
+
+
+Pattern A1305b
+
+|XX.?         try to kill corner formation
+|.*.X
+|...X
++----
+
+:8,s,value(35)
+
+
+Pattern A1306
+
+|XXX?         try to make ko in corner
+|...X
+|.*.X
++----
+
+:8,s,value(85)
+
+
+Pattern A1307
+
+|XxX?          kill one eye
+|.X.X
+|.O*X
++----
+
+:8,s,value(85)
+
+
+Pattern A1308
+
+|Xx??         attack bent four in the corner
+|.XXx
+|.*.X
++----
+
+:8,s,value(90)
+
+
+Pattern A1309
+
+|.XxX         try to damage corner eye space
+|.*Ox
++----
+
+:8,s,value(90)
+
+|bXxX
+|.*ax
++----
+
+;lib(a)>1 && !obvious_false_xeye(b)
+
+
+Pattern A1310
+
+|*X.X          try to make ko or bent four in the corner
+|.OOx
++----
+
+:8,s,value(30)
+
+
+Pattern A1310b
+
+|XxX?
+|.X.X          better to kill without ko if we can
+|*OOX
++----
+
+:8,s,value(31)
+
+
+Pattern A1311
+
+|.XX?
+|XO.X          set up corner ko
+|..*.
++----
+
+:8,s,value(80)
+
+
+Pattern A1312
+
+|OX??
+|.XX?         try to kill corner formation
+|.*.X
+|...x
++----
+
+:8,s,value(35)
+
+
+Pattern A1313
+
+|.??Ooo       attack 3-3 invasion
+|.xX.oo
+|...*..
+|......
++------
+
+:8,-,value(50)
+
+
+Pattern A1314
+
+|x.X?        sometimes correct attack in corner
+|..XO
+|.*.o
++----
+
+:8,s,value(45)
+
+
+Pattern A1315
+
+|.XO?        attack corner eye space
+|..X?
+|.X*O
+|....
++----
+
+:8,-,value(55)
+
+
+Pattern A1316
+
+|.XX?         try to make ko in corner
+|.*.X
+|..OX
++----
+
+:8,s,value(35)
+
+
+Pattern A1317
+
+|..X?        try to make ko in corner
+|.XXO
+|.*.O
++----
+
+:8,s,value(55)
+
+|..A?
+|.AAO
+|.*.O
++----
+
+;lib(A) == 4 && attack(A) != WIN
+
+
+Pattern A1318
+
+|..X?        create ko
+|*XXO
+|.OXO
++----
+
+:8,s,value(55)
+
+|..A?
+|*AAO
+|.OXO
++----
+
+;lib(A) == 2 && attack(A) != WIN
+
+
+Pattern A1319
+
+|.XO?        critical point, might give ko
+|*.X?
+|..Xx
+|....
++----
+
+:8,s,value(61)
+
+|.AO?
+|*.X?
+|..Xx
+|....
++----
+
+;!attack(A)
+
+
+Pattern A1319b
+
+|.XO        critical point, might kill
+|O.X
+|*.X
+|...
++---
+
+:8,s,value(30)
+
+
+Pattern A1320
+
+|X??        try to make nakade instead of playing ko
+|OXX
+|*O.
++---
+
+:8,s,value(80)
+
+
+Pattern A1321
+
+|X??        prevent throwin for ko
+|.XX
+|*O.
++---
+
+:8,s,value(45)
+
+
+Pattern A1322
+
+|X.X        sometimes correct attack point
+|..X
+|.*.
++---
+
+:8,s,value(40)
+
+
+Pattern A1323
+
+|XXO        eye stealing move might kill
+|..X
+|*.X
+|...
++---
+
+:8,s,value(50)
+
+
+Pattern A1324
+
+|oo???
+|..O..     even if another attack works, try this first
+|...O.
+|..X*.
+|.....
+|.....
++-----
+
+:8,-,value(90)
+
+
+Pattern A1325
+# This pattern could be generalized
+
+OOO.|      kill the eye
+.X*.|
+X.X.|
+?X..|
+----+
+
+:8,-,value(50)
+
+
+Pattern A1326
+
++-----      block to kill
+|.....
+|...X*
+|..X.O
+|..OO.
+|oo???
+
+:8,-,value(85)
+
+
+Pattern A1327
+
++-----      try to kill without ko
+|.....
+|.*.XO
+|..X.O
+|.XOO.
+|oo???
+|oo???
+
+:8,s,value(85)
+
+
+Pattern A1328
+
+|xX??       almost certain life if defender plays here
+|xoX?
+|.*oX
+|..xx
++----
+
+:8,s,value(45)
+
+
+
+Pattern A1329
+
+|X??        try to make nakade
+|OX?
+|*Ox
+|Oox
++---
+
+:8,s,value(45)
+
+
+
+Pattern A1330
+
+|XX?        take ko to maybe kill
+|*XX
+|XOX
+|OoO
++---
+
+:8,s,value(75)
+
+|AA?
+|*AA
+|XaA
+|OoO
++---
+
+;lib(A)<=3 && defend(a) != WIN
+
+
+Pattern A1331
+
+|*X?        capture to deny X trivial life
+|XOX
+|O.O
++---
+
+:8,s,value(55)
+
+|*X?
+|XOX
+|OaO
++---
+
+;oplay_attack(a,a)
+
+
+Pattern A1332
+
+|xXx?       make nakade or escape
+|O.*X
+|.X.x
++----
+
+:8,s,value(55)
+
+|xXx?
+|Oa*X
+|.X.x
++----
+
+;oplay_defend(*,a,*)
+
+
+Pattern A1333
+
+|XXX?       try to get ko
+|.*.X
+|XOOX
+|...X
++----
+
+:8,s,value(55)
+
+|XXXa
+|.*.B
+|XOOB
+|...B
++----
+
+;!x_somewhere(a) || (lib(B) <= 6)
+
+
+Pattern A1334
+
+|XXX?       try to get ko
+|XO.X
+|XOOX
+|..*X
++----
+
+:8,s,value(55)
+
+
+Pattern A1335
+
+|..X?         vital point
+|*.XO
+|.XOO
++----
+
+:8,s,value(41)
+
+|..X?
+|*aXb
+|.Xbb
++----
+
+;oplay_attack(a,a) != 0 && !oplay_attack(a,b)
+
+
+Pattern A1336
+
+|XXXO         very special pattern
+|...X
+|*XO.
++----
+
+:8,s,value(35)
+
+|XXXO
+|acbX
+|*Xd.
++----
+
+;!oplay_attack(*,a,b,b) && oplay_defend(*,c,d)
+
+
+Pattern A1334
+
+|XXx?       kill without ko
+|.OXx
+|XOOX
+|.*oX
++----
+
+:8,s,value(35)
+
+
+Pattern A1335
+
+|OOo
+|OXO       kill without ko
+|X.X
+|.Xx
+|*OX
++---
+
+:8,s,value(35)
+
+
+Pattern A1336
+
+|xXx      strange things happen at the 1-2 point
+|X.X
+|.*x
++---
+
+:8,s,value(75)
+
+
+#########################################################
+#                                                       #
+#               Invasion patterns                       #
+#                                                       #
+#########################################################
+#                                                       #
+#   These are not ordinary owl attack patterns.         #
+#                                                       #
+#########################################################
+
+
+Pattern A1401
+
+X...|       don't let opponent live easily in the corner
+.*..|
+....|
+....|
+----+
+
+:8,-,value(45)
+
+
+Pattern A1402
+
+..X..|       contest the corner territory
+*....|
+.....|
+.....|
+-----+
+
+:8,-,value(45)
+
+
+#########################################################
+#                                                       #
+#               Ko patterns                             #
+#                                                       #
+#########################################################
+
+Pattern A1501
+# Necessary to have one O stone in the pattern to identify the goal.
+# The helper is reused from a similar defense pattern.
+
+?O            fill outer liberty in two-step ko
+X*
+
+:8,-,value(35)
+
+?O
+A*
+
+;lib(A)==2 && olib(*)>1 && finish_ko_helper(A)
+
+
+Pattern A1502
+# Necessary to have one O stone in the pattern to identify the goal.
+# The helper is reused from a similar defense pattern.
+
+X*O           fill outer liberty in two-step ko
+
+:-,-,value(35)
+
+A*O
+
+;lib(A)==2 && olib(*)>1 && finish_ko_helper(A)
+
+
+Pattern A1503
+
+OX?           capture ko to stop escape
+X*X
+OXO
+?O?
+
+:8,s,value(75)
+
+OX?
+A*B
+OXO
+?O?
+
+;owl_escape_value(A) > 0 || owl_escape_value(B) > 0
+
+
+
+#########################################################
+#                                                       #
+#               Specific edge attacks                   #
+#                                                       #
+#########################################################
+
+
+Pattern A1601
+
+?xx
+X..
+.*X
+---
+
+:8,s,value(35)
+
+?xx
+Xac
+b*X
+---
+
+;!safe_omove(a) && oplay_defend(*,a,*) && !oplay_attack(*,b,c,c)
+
+
+Pattern A1602
+
+.XO?      peep to destroy eyeshape
+*.XO
+.X.?
+----
+
+:8,s,value(55)
+
+aXO?
+*bCO
+.X.?
+----
+
+;!oplay_defend(*,a,b,C)
+
+
+Pattern A1603
+
+.XO?      peep to destroy eyeshape
+*.XO
+..X?
+----
+
+:8,s,value(55)
+
+aXO?
+*bCO
+..X?
+----
+
+;!oplay_defend(*,a,b,C)
+
+
+Pattern A1604
+
+?XXO?      peep to destroy eyeshape
+O*.XO
+..X.?
+-----
+
+:8,s,value(55)
+
+?XXO?
+O*aBO
+..X.?
+-----
+
+;!oplay_defend(*,?,a,B)
+
+
+Pattern A1605
+
+?XXO?      peep to destroy eyeshape
+O*.XO
+...X?
+-----
+
+:8,s,value(55)
+
+?XXO?
+O*aBO
+...B?
+-----
+
+;!oplay_defend(*,?,a,B)
+
+
+Pattern A1606
+
+XXO?      peep to destroy eyeshape
+*.XO
+.X.?
+----
+
+:8,s,value(35)
+
+XXO?
+*aBO
+.X.?
+----
+
+;!oplay_defend(*,?,a,B)
+
+
+Pattern A1607
+
+XXO?      peep to destroy eyeshape
+*.XO
+..X?
+----
+
+:8,s,value(35)
+
+XXO?
+*aBO
+..X?
+----
+
+;!oplay_defend(*,?,a,B)
+
+
+Pattern A1608
+
+XXO?      throw in to destroy eyespace
+.*XO
+.X.O
+----
+
+:8,s,value(45)
+
+
+Pattern A1608b
+
+xXXO?      atari to reduce eyespace, with further reduction as followup
+...XO
+..X*O
+-----
+
+:8,s,value(50)
+
+
+Pattern A1609
+
+?OOX?
+O.X.X
+OX.*.
+-----
+
+:8,s,value(35)
+
+
+# END OF FILE

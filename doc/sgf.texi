@@ -1,0 +1,575 @@
+@cindex SGF files in memory
+
+@dfn{SGF} - Smart Game Format - is a file format which is used for storing
+game records for a number of different games, among them chess and
+go. The format is a framework with special adaptions to each game. This
+is not a description of the file format standard. Too see the exact
+definition of the file format, see @url{http://www.red-bean.com/sgf/}.
+
+GNU Go contains a library to handle go game records in the SGF format in
+memory and to read and write SGF files. This library - @code{libsgf.a} -
+is in the @code{sgf} subdirectory. To use the SGF routines, include the
+file @code{sgftree.h}.
+
+Each game record is stored as a tree of @dfn{nodes}, where each node
+represents a state of the game, often after some move is made. Each node
+contains zero or more @dfn{properties}, which gives meaning to the
+node. There can also be a number of @dfn{child nodes} which are
+different variations of the game tree. The first child node is the main
+variation. 
+
+Here is the definition of @code{SGFNode}, and @code{SGFProperty}, the
+data structures which are used to encode the game tree. 
+
+@example
+@group
+
+typedef struct SGFProperty_t @{
+  struct SGFProperty_t *next;
+  short  name;
+  char   value[1];
+@} SGFProperty;
+
+@end group
+@group
+
+typedef struct SGFNode_t @{
+  SGFProperty      *props;
+  struct SGFNode_t *parent;
+  struct SGFNode_t *child;
+  struct SGFNode_t *next;
+@} SGFNode;
+
+@end group
+@end example
+
+Each node of the SGF tree is stored in an @code{SGFNode} struct. It has
+a pointer to a linked list of properties (see below) called
+@code{props}. It also has a pointer to a linked list of children, where
+each child is a variation which starts at this node. The variations are
+linked through the @code{next} pointer and each variation continues
+through the @code{child} pointer. Each and every node also has a pointer
+to its parent node (the @code{parent} field), except the top node whose
+parent pointer is @code{NULL}.
+
+An SGF property is encoded in the @code{SGFPoperty} struct. It is linked
+in a list through the @code{next} field.  A property has a @code{name}
+which is encoded in a short int.  Symbolic names of properties can be
+found in @file{sgf_properties.h}.
+
+Some properties also have a value, which could be an integer, a floating
+point value, a character or a string. These values can be accessed or
+set through special functions (see below).
+
+@section Functions which manipulate SGF nodes and properties
+
+All the functions which create and manipulate SGF trees are prefixed by
+@code{sgf}.  The SGF code was donated to us by Thomas Traber, so they
+don't follow the naming conventions of GNU Go perfectly.
+
+@subsection Low level functions
+
+These functions let the caller create nodes or access nodes easier.
+ 
+@itemize
+@item @code{SGFNode *sgfNewNode(void)}
+@findex sgfNewNode
+@quotation
+Allocate and return a new instance of @code{SGFNode}. The node is
+cleared.
+@end quotation
+
+@item @code{SGFProperty *sgfMkProperty(const char *name, const  char *value,
+			   SGFNode *node, SGFProperty *last)}
+@findex sgfMkProperty
+@quotation
+Allocate and return a new instance of @code{SGFProperty}. The
+@code{name} should be 1 or 2 characters long.  This function should
+probably not be used directly. Instead, use the @code{sgfAddProperty}
+functions.
+@end quotation
+
+@item @code{SGFNode *sgfPrev(SGFNode *node)}
+@findex sgfPrev
+@quotation
+Return the previous node in a chain. This is done by going to the parent
+node and then search through the children until the same node is found.
+If there is no previous node, @code{NULL} is returned.
+@end quotation
+
+@item @code{SGFNode *sgfRoot(SGFNode *node)}
+@findex sgfRoot
+@quotation
+Return the root of the tree.  If @code{node} already is the root,
+@code{node} itself is returned.
+@end quotation
+
+@end itemize
+
+@subsection Functions which manipulate SGF properties
+
+@itemize
+
+@item @code{int sgfGetIntProperty(SGFNode *node, const char *name, int
+*value)}
+@findex sgfGetIntProperty
+@quotation
+Get the property @code{name} in @code{node} as an integer. The value is
+returned in @code{value}. Returns 1 if successful, otherwise returns 0.
+@end quotation
+
+@item @code{int sgfGetFloatProperty(SGFNode *node, const char *name,
+float *value)}
+@findex sgfGetFloatProperty
+@quotation
+Get the property @code{name} in @code{node} as a floating point
+value. The value is returned in @code{value}. Returns 1 if successful,
+otherwise returns 0.
+@end quotation
+
+@item @code{int sgfGetCharProperty(SGFNode *node, const char *name, char
+**value)}
+@findex sgfGetCharProperty
+@quotation
+Get the property @code{name} in @code{node} as a string of
+characters. The value is returned in @code{value}. Returns 1 if
+successful, otherwise returns 0.
+@end quotation
+
+@item @code{void sgfAddProperty(SGFNode *node, const char *name, const
+char *value)}
+@findex sgfAddProperty
+@quotation
+Add a new property to @code{node}. There is no check to see if there
+already is a property with the same name. The property value has to be a
+character string. 
+@end quotation
+
+@item @code{void sgfAddPropertyInt(SGFNode *node, const char *name, long
+val)}
+@findex sgfAddPropertyInt
+@quotation
+Add an integer property to @code{node}. This function converts the value
+to a string and calls @code{sgfAddProperty}.
+@end quotation
+
+@item @code{void sgfAddPropertyFloat(SGFNode *node, const char *name,
+float val)}
+@findex sgfAddPropertyFloat
+@quotation
+Add a floating point property to @code{node}. This function converts the
+value to a string and calls @code{sgfAddProperty}.
+@end quotation
+
+@item @code{void sgfOverwriteProperty(SGFNode *node, const char *name,
+const char *text)}
+@findex sgfOverwriteProperty
+@quotation
+Overwrite the property @code{name} in @code{node} with the string
+@code{text}.  If the property does not yet exist in @code{node}, it is
+added using @code{sgfAddProperty}. 
+@end quotation
+
+@item @code{void sgfOverwritePropertyInt(SGFNode *node, const char
+*name, int value)}
+@findex sgfOverwritePropertyInt
+@quotation
+Overwrite the property @code{name} in @code{node} with the integer
+@code{value}.  If the property does not yet exist in @code{node}, it is
+added using @code{sgfAddPropertyInt}.
+@end quotation
+
+@item @code{void sgfOverwritePropertyFloat(SGFNode *node, const char
+*name, float value)}
+@findex sgfOverwritePropertyFloat
+@quotation
+Overwrite the property @code{name} in @code{node} with the floating
+point number @code{value}.  If the property does not yet exist in
+@code{node}, it is added using @code{sgfAddPropertyFloat}.
+@end quotation
+
+@end itemize
+
+@subsection Functions which manipulate SGF nodes
+
+@itemize
+
+@item @code{SGFNode *sgfAddStone(SGFNode *node, int color, int movex,
+int movey)}
+@findex sgfAddStone
+@quotation
+Add a stone to @code{node}. Properties added is either @code{AB} (black
+stone) or @code{AW} (white stone).
+@end quotation
+
+@item @code{SGFNode *sgfAddPlay(SGFNode *node, int who, int movex, int
+movey)}
+@findex sgfAddPlay
+@anchor{sgfAddPlay}
+@quotation
+Add a child node with a move to @code{node}. Properties added is either
+@code{B} (black move) or @code{W} (white move).  A pass is coded by
+@code{(-1, -1)}.
+
+This function does not add a property to the node itself, but adds a
+child node instead. If there are previous child nodes, the new node is
+placed before the other ones, so this function should be used if you
+want to add a main branch to the tree. To add a variation, use
+@code{sgfAddPlayLast} instead.
+@end quotation
+
+@item @code{SGFNode *sgfAddPlayLast(SGFNode *node, int who, int movex,
+int movey)}
+@findex sgfAddPlayLast
+@anchor{sgfAddPlayLast}
+@quotation
+Add a child node with a move to @code{node}. Properties added is either
+@code{B} (black move) or @code{W} (white move).  A pass is coded by
+@code{(-1, -1)}.
+
+If there are previous child nodes in @code{node}, the move is added by
+adding the child node last, so this function should be used when you
+want to add a variation to the game tree.
+@end quotation
+
+@item @code{int sgfPrintCharProperty(FILE *file, SGFNode *node, const
+char *name)}
+@findex sgfPrintCharProperty
+@quotation
+Print the properties of type @code{name} in @code{node} on @code{file}.
+@end quotation
+
+@item @code{int sgfPrintCommentProperty(FILE *file, SGFNode *node, const
+char *name)}
+@findex sgfPrintCommentProperty
+@quotation
+Print the comment properties of type @code{name} in @code{node} on
+@code{file}.
+@end quotation
+
+@item @code{void sgfWriteResult(SGFNode *node, float score, int
+overwrite)}
+@findex sgfWriteResult
+@quotation
+Add a @code{RE} (result) property to @code{node}. This property will
+contain the game result. If @code{overwrite} is zero the result is
+written only if no previous result property exists.
+@end quotation
+
+
+@item @code{SGFNode *sgfCircle(SGFNode *node, int i, int j)}
+@findex sgfCircle
+@quotation
+Add a @code{CR} (circle) property at @code{(i, j)} to @code{node}.
+@end quotation
+
+@item @code{SGFNode *sgfSquare(SGFNode *node, int i, int j)}
+@findex sgfSquare
+@quotation
+Calls @code{sgfMark} to add a @code{MA} (mark) property at @code{(i, j)}
+to @code{node}. 
+@end quotation
+
+@item @code{SGFNode *sgfTriangle(SGFNode *node, int i, int j)}
+@findex sgfTriangle
+@quotation
+Add a @code{TR} (triangle) property at @code{(i, j)} to @code{node}.
+@end quotation
+
+@item @code{SGFNode *sgfMark(SGFNode *node, int i, int j)}
+@findex sgfMark
+@quotation
+Add a @code{MA} (mark) property at @code{(i, j)} to @code{node}.
+@end quotation
+
+@item @code{SGFNode *sgfAddComment(SGFNode *node, const char *comment)}
+@findex sgfAddComment
+@quotation
+Add a @code{C} (comment) property to @code{node}.
+@end quotation
+
+@item @code{SGFNode *sgfBoardText(SGFNode *node, int i, int j, const
+char *text)}
+@findex sgfBoardText
+@quotation
+Add a @code{LB} (label) property at @code{(i, j)} to @code{node}.
+@end quotation
+
+@item @code{SGFNode *sgfBoardChar(SGFNode *node, int i, int j, char c)}
+@findex sgfBoardChar
+@quotation
+Add a @code{LB} (label) property at @code{(i, j)} to @code{node}. This
+functions is a utility function that converts the character to a string
+and calls @code{sgfBoardText}.
+@end quotation
+
+@item @code{SGFNode *sgfBoardNumber(SGFNode *node, int i, int j, int
+number)}
+@findex sgfBoardNumber
+@quotation
+Add a numeric label at @code{(i, j)} by calling @code{sgfBoardText}.
+@end quotation
+
+@item @code{SGFNode *sgfStartVariant(SGFNode *node)}
+@findex sgfStartVariant
+@anchor{sgfStartVariant}
+@quotation
+Start a new variation in the game tree. This means that the @code{next}
+pointer of @code{node} is followed to the end of the list and a new node
+is inserted there. A pointer to the new node is returned.
+@end quotation
+
+@item @code{SGFNode *sgfStartVariantFirst(SGFNode *node)}
+@findex sgfStartVariantFirst
+@anchor{sgfStartVariantFirst}
+@quotation
+Same as @code{sgfStartVariant}, except that the node is placed first in
+the list. This means that the new variation will be the main variation
+of the game tree. Returns a pointer to the new node.
+@end quotation
+
+@item @code{SGFNode *sgfAddChild(SGFNode *node)}
+@findex sgfAddChild
+@quotation
+Adds a child node to @code{node}. If there already are children, the new
+node is placed last in the list. Returns a pointer to the new node.
+@end quotation
+
+@end itemize
+
+@subsection High level functions
+
+@itemize
+@item @code{SGFNode *sgfCreateHeaderNode(int boardsize, float komi)}
+@findex sgfCreateHeaderNode
+@quotation
+Create a new SGF node with the two properties @code{SZ} (size) and
+@code{KM} (komi).  More properties, like @code{HA} (handicap), can later
+be added to it.
+
+The idea with this node is to store the game info and to use as a root
+node for the game.
+@end quotation
+
+@item @code{SGFNode *readsgffile(const char *filename)}
+@findex readsgffile
+@quotation
+Read an SGF file and return the resulting tree.
+@end quotation
+
+@item @code{void sgf_write_header(SGFNode *root, int overwrite, int
+seed, float komi)}
+@findex sgf_write_header
+@quotation
+Write random seed, date, ruleset, komi and SGF file version to the
+header node @code{root}. If @code{overwrite} is non-zero, it overwrites
+the values in the node, otherwise it just writes those that are
+missing. 
+
+Ruleset is always set to "Japanese", date is set to the current date.
+@end quotation
+
+@item @code{int writesgf(SGFNode *root, const char *filename)}
+@findex writesgf
+@quotation
+Write the tree starting in @code{root} to the file @code{filename}.  If
+@code{filename} is @code{-}, the tree is written to
+@code{stdout}. Returns 1 if successful, otherwise returns 0.
+@end quotation
+
+@end itemize
+
+@section The SGFTree datatype
+
+Sometimes we just want to record an ongoing game or something similarly
+simple and not do any sofisticated tree manipulation.  In that case we
+can use the simplified interface provided by @code{SGFTree} below. 
+
+@example
+@group
+
+typedef struct SGFTree_t @{
+  SGFNode *root;
+  SGFNode *lastnode;
+@} SGFTree;
+
+@end group
+@end example
+
+An @code{SGFTree} contains a pointer to the root node of an SGF tree and
+a pointer to the node that we last accessed. Most of the time this will
+be the last move of an ongoing game.
+
+Most of the functions which manipulate an @code{SGFTree} work exactly
+like their @code{SGFNode} counterparts, except that they work on the
+current node of the tree.
+
+All the functions below that take arguments @code{tree} and @code{node}
+will work on:
+
+@enumerate
+@item
+@code{node} if non-@code{NULL}
+@item
+@code{tree->lastnode} if non-@code{NULL}
+@item
+The current end of the game tree.
+@end enumerate
+in that order.
+
+@subsection Functions that manipulate sgftrees
+
+@itemize
+
+@item @code{void sgftree_clear(SGFTree *tree)}
+@findex sgftree_clear
+@quotation
+Clear the @code{root} and @code{lastnode} pointers of
+@code{tree}. @samp{NOTE:} This function does not free any memory. That
+has to be done separately.
+@end quotation
+
+@item @code{int sgftree_readfile(SGFTree *tree, const char *infilename)}
+@findex sgftree_readfile
+@quotation
+Read an SGF file with the name @code{infilename} and store it in
+@code{tree}. Return 1 if successful, otherwise return 0. @code{lastnode}
+will be set to @code{NULL}.
+@end quotation
+
+
+@item @code{SGFNode *sgftreeNodeCheck(SGFTree *tree, SGFNode *node)}
+@findex sgftreeNodeCheck
+@quotation
+Return the node to work on as described above. This is:
+@enumerate
+@item
+@code{node} if non-@code{NULL}
+@item
+@code{tree->lastnode} if non-@code{NULL}
+@item
+The current end of the tree.
+@end enumerate
+in that order.
+
+@end quotation
+
+	 
+@item @code{SGFNode *sgftreeAddPlay(SGFTree *tree, SGFNode *node, int
+color int movex, int movey)}
+@findex sgftreeAddPlay
+@quotation
+Add a move of @code{color} at @code{(movex,movey)} to the
+tree. @xref{sgfAddPlay,,sgfAddPlay}.
+@end quotation
+
+@item @code{SGFNode *sgftreeAddPlayLast(SGFTree *tree, SGFNode *node,
+int color, int movex, int movey)}
+@findex sgftreeAddPlayLast
+@quotation
+Add a variation of @code{color} at @code{(movex,movey)} to the
+tree. @xref{sgfAddPlayLast,,sgfAddPlayLast}. 
+@end quotation
+
+@item @code{SGFNode *sgftreeAddStone(SGFTree *tree, SGFNode *node, int
+color, int movex, int movey)}
+@findex sgftreeAddStone
+@quotation
+Add a stone of @code{color} at @code{(movex,movey)} to the tree.
+@end quotation
+
+@item @code{void sgftreeWriteResult(SGFTree *tree, float score, int
+overwrite)}
+@findex sgftreeWriteResult
+@quotation
+Add the result to the tree. If there already is a result, only overwrite
+it if @code{overwrite} is non-zero.
+@end quotation
+
+@item @code{SGFNode *sgftreeCircle  (SGFTree *tree, SGFNode *node, int
+i, int j)}
+@findex sgftreeCircle  
+@quotation
+Add a circle property at @code{(i, j)} to the tree.
+@end quotation
+
+@item @code{SGFNode *sgftreeSquare  (SGFTree *tree, SGFNode *node, int
+i, int j)}
+@findex sgftreeSquare  
+@quotation
+Add a square property at @code{(i, j)} to the tree.
+@end quotation
+
+@item @code{SGFNode *sgftreeTriangle(SGFTree *tree, SGFNode *node, int
+i, int j)}
+@findex sgftreeTriangle
+@quotation
+Add a triangle property at @code{(i, j)} to the tree.
+@end quotation
+
+@item @code{SGFNode *sgftreeMark(SGFTree *tree, SGFNode *node, int i, int j)}
+@findex sgftreeMark    
+@quotation
+Add a mark property at @code{(i, j)} to the tree.
+@end quotation
+
+@item @code{SGFNode *sgftreeAddComment(SGFTree *tree, SGFNode *node,
+const char *comment)}
+@findex sgftreeAddComment
+@quotation
+Add a comment property to the tree. This is a property of the node
+itself, and has no position on the board.
+@end quotation
+
+@item @code{SGFNode *sgftreeBoardText(SGFTree *tree, SGFNode *node, int
+i, int j, const char *text)}
+@findex sgftreeBoardText
+@quotation
+Add a text property at @code{(i, j)} to the tree.
+@end quotation
+
+@item @code{SGFNode *sgftreeBoardChar(SGFTree *tree, SGFNode *node, int
+i, int j, char c)}
+@findex sgftreeBoardChar
+@quotation
+Add a character at @code{(i, j)} to the tree.
+@end quotation
+
+@item @code{SGFNode *sgftreeBoardNumber(SGFTree *tree, SGFNode *node,
+int i, int j, int number)}
+@findex sgftreeBoardNumber
+@quotation
+Add a number at @code{(i, j)} to the tree.
+@end quotation
+
+@item @code{SGFNode *sgftreeStartVariant(SGFTree *tree, SGFNode *node)}
+@findex sgftreeStartVariant
+@quotation
+Start a new variation in the tree. @xref{sgfStartVariant,,sgfStartVariant}.
+@end quotation
+
+@item @code{SGFNode *sgftreeStartVariantFirst(SGFTree *tree, SGFNode
+*node)}
+@findex sgftreeStartVariantFirst
+@quotation
+Start a new main variation in the
+tree. @xref{sgfStartVariantFirst,,sgfStartVariantFirst}.
+@end quotation
+
+@item @code{SGFNode *sgftreeCreateHeaderNode(SGFTree *tree, int
+boardsize, float komi)}
+@findex sgftreeCreateHeaderNode
+@quotation
+Add a header node first in @code{tree}.
+@end quotation
+
+@item @code{void sgftreeSetLastNode(SGFTree *tree, SGFNode
+*last_node)}
+@findex sgftreeSetLastNode
+@quotation
+Explicitly set the last accessed node in @code{tree} to
+@code{last_node}. 
+@end quotation
+
+@end itemize
+

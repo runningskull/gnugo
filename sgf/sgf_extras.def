@@ -1,0 +1,22 @@
+#
+# These are additions to the SGF spec- old commands and some others
+#
+
+#
+# outdated FF3 properties
+#
+BS
+WS
+ID
+RG
+SC
+
+#
+# some random ones used by CGoban
+#
+SY
+
+#
+# nonstandard SGF property used by GNU Go to mark illegal moves
+#
+IL

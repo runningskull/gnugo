@@ -1,0 +1,1280 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999, 2000, 2001 by the Free Software Foundation.   #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Database of influence patterns.
+#
+#  ? - don't care
+#  . - empty
+#  O - color of dragon looking for escape
+#  X - opposite color of O
+#  o - O or empty
+#  x - X or empty
+#  , - point which influence can't pass through
+#
+#
+# Two different classes of patterns are used here.
+#
+#  C - Territorial connection, stopping opponent influence from
+#      passing through.
+#  E - Enhance influence. By convention, the influence is enhanced
+#      in the eastwards direction. The value of the pattern decides
+#      the level of influence enhancement.
+
+Pattern Barrier1
+
+O,O
+
+:+,D
+
+
+Pattern Barrier1b
+
+o,o
+O,O
+
+:+,D
+
+
+Pattern Barrier2
+
+xxx
+X,X
+xxx
+
+:+,A
+
+
+Pattern Barrier3
+
+.,.
+X,X
+
+:|,A
+
+.b.
+cad
+
+;!(oplay_break_through(a,b,c,b,d)==WIN)
+
+
+Pattern Barrier4
+
+|,O
+
+:-,D
+
+
+Pattern Barrier5
+
+xXx
+x,x
+---
+
+:|,A
+
+
+Pattern Barrier6
+
+,X
+,.
+--
+
+:8,A
+
+cd
+ba
+--
+
+;oplay_attack_either(a,b,c,a,c) || !oplay_attack_either(a,b,b,d)
+
+
+Pattern Barrier7
+
+XX
+,,
+--
+
+:|,A
+
+
+Pattern Barrier8
+
+,O
+O,
+
+:X,D
+
+
+Pattern Barrier9
+
+,X
+X,
+
+:X,A
+
+
+Pattern Barrier10
+
+XO
+O,
+
+:\,D
+
+
+Pattern Barrier11
+
+OX
+X,
+
+:\,A
+
+Oc
+ba
+
+;!safe_omove(a) || oplay_defend_both(a,b,c)
+
+
+Pattern Barrier12
+
+O,.
+?,O
+
+:8,D
+
+
+Pattern Barrier13
+
+X,X
+X,X
+
+:+,A
+
+
+Pattern Barrier14
+
+X,o
+X,X
+
+:8,A
+
+Xb.
+Xac
+
+;!oplay_attack_either(a,b,b,c)
+
+
+Pattern Barrier15
+
+xxx
+X,x
+x,X
+xxx
+
+:8,A
+
+
+Pattern Barrier16
+
+X,.
+.,X
+
+:O,A
+
+cae
+fbd
+
+;(oplay_attack_either(a,b,f,a,f) || !oplay_attack_either(a,b,c,d))
+;&& (oplay_attack_either(b,a,e,b,e) || !oplay_attack_either(b,a,c,d))
+
+
+Pattern Barrier16b
+
+X,X
+.,X
+
+:8,A
+
+cad
+fbd
+
+;(oplay_attack_either(a,b,f,a,f) || !oplay_attack_either(a,b,c,d))
+;&& !oplay_attack(b,a,c)
+
+
+Pattern Barrier17
+
+X,.
+O,X
+
+:8,A
+
+cae
+Obd
+
+;!oplay_attack_either(a,b,c,d)
+;&& (oplay_attack_either(b,a,e,b,e) || !oplay_attack_either(b,a,c,d))
+
+
+Pattern Barrier18
+
+X,O
+O,X
+
+:8,A
+
+cao
+obd
+
+;!oplay_attack_either(a,b,c,d) && !oplay_attack_either(b,a,c,d)
+
+
+Pattern Barrier19
+
+O,,O
+...o
+
+:8,D
+
+dbaO
+.c.o
+
+;!oplay_break_through(a,b,c,a,c,d)
+
+
+Pattern Barrier20
+
+O,,O
+O..o
+
+:|,D
+
+Obae
+Ocdo
+
+;!oplay_attack_either(a,b,c,a,c) || !oplay_attack_either(b,a,d,d,e)
+
+
+Pattern Barrier21
+
+?xx?
+xxxx
+X,,X
+xxxx
+?xx?
+
+:+,A
+
+
+Pattern Barrier22
+
+x..x
+X,,X
+x..x
+
+:|,A
+
+x..x
+XdaX
+xcbx
+
+;!oplay_attack_either(a,b,c,d,b,d) && !oplay_attack_either(d,c,b,a,c,a)
+
+
+Pattern Barrier22a
+# This pattern could have '|' symmetry, but to improve the chances
+# that it's matched before the expensive next one, we let it have
+# '8' symmetry.
+
+?xxxx?
+xxxxxx
+xX,,Xx
+xx,,xx
+xxxxxx
+------
+
+:8,A
+
+
+Pattern Barrier22b
+
+X..X
+x,,x
+xxxx
+
+:|,A
+
+XdaX
+xcbx
+xxxx
+
+;!oplay_attack_either(a,b,c,d,b,d) && !oplay_attack_either(d,c,b,a,c,a)
+
+
+Pattern Barrier23
+
+O,..
+..,O
+
+:O,D
+
+Oab.
+.dcO
+
+;oplay_attack_either(a,b,c,d,b,d) || !oplay_defend_both(a,b,c,d,a,c)
+
+
+Pattern Barrier24
+
+?O...
+oo,,O
+?O...
+
+:-,D
+
+
+Pattern Barrier25
+
+?xx?
+xxxx
+X,.x
+x.,X
+xxxx
+?xx?
+
+:8,A
+
+
+Pattern Barrier26
+
+X,.x
+x.,X
+
+:O,A
+
+Xdax
+xcbX
+
+;!oplay_attack_either(a,b,c,d,b,d) && !oplay_attack_either(d,c,b,a,c,a)
+
+
+Pattern Barrier27
+
+oOo
+o,o
+o,o
+---
+
+:|,D
+
+
+Pattern Barrier28
+
+xXx
+x,x
+x,x
+---
+
+:|,A
+
+
+Pattern Barrier29
+
+,O
+,X
+--
+
+:8,D
+
+?b
+aX
+--
+
+;!oplay_attack_either(a,a,b)
+
+
+Pattern Barrier30
+
+OO
+,X
+--
+
+:8,D
+
+
+Pattern Barrier31
+
+?.O,o
+?.X,o
+o..,o
+-----
+
+:8,D
+
+
+Pattern Barrier32
+
+?Ooo
+X,,o
+..,o
+----
+
+:8,D
+
+
+Pattern Barrier33
+
+XOoo
+.X,o
+..,o
+----
+
+:8,D
+
+XOoo
+.Bao
+..,o
+----
+
+;oplay_attack(a,B)
+
+
+Pattern Barrier34
+
+XOo
+.,o
+.,o
+---
+
+:8,D
+
+
+Pattern Barrier34b
+
+XOO
+.,X
+.,?
+---
+
+:8,D
+
+XOO
+.,A
+.,?
+---
+
+;attack(A)
+
+
+Pattern Barrier35
+
+oOoOo
+o,,,o
+o,,,o
+-----
+
+:|,D
+
+
+Pattern Barrier36
+
+xXxXx
+x,,,x
+x,,,x
+-----
+
+:|,A
+
+
+Pattern Barrier37
+
+OXxx
+.,,x
+..,x
+----
+
+:8,A
+
+
+Pattern Barrier38
+
+OXO
+,,?
+---
+
+:8,D
+
+OAO
+,,?
+---
+
+;lib(A)==1
+
+
+Pattern Barrier39
+
+oooO?
+oO..o
+o.,,o
+o.,,o
+-----
+
+:8,D
+
+
+Pattern Barrier40
+
+xxxX?
+xX..x
+x.,,x
+x.,,x
+-----
+
+:8,A
+
+
+Pattern Barrier41a
+
+O.XO
+.,,O
+
+:8,D
+
+OcXO
+.bao
+
+;!oplay_attack_either(a,b,c,a,c)
+
+
+Pattern Barrier41b
+
+O.XO
+.,,.
+
+:8,D
+
+OcXe
+.bad
+
+;oplay_defend_both(a,b,c,d,a,e)
+
+
+Pattern Barrier42
+
+OX?
+.,O
+
+:8,D
+
+cD?
+baO
+
+;oplay_attack_either(a,b,b,D) || oplay_defend_both(a,b,a,c)
+
+
+Pattern Barrier43
+
+?X..O
+oO,,o
+o..,o
+-----
+
+:8,D
+
+
+Pattern Barrier44
+
+?X.O
+O,,.
+..,o
+----
+
+:8,D
+
+?EbO
+Oacd
+..,o
+----
+
+;oplay_attack_either(a,b,c,d,d,b) && !oplay_defend_both(a,c,b,c,E)
+
+
+Pattern Barrier45
+
+X.XX
+X,,.
+.,,.
+----
+
+:8,A
+
+
+Pattern Barrier46
+
+.X.O
+O..,
+.,,o
+
+:8,D
+
+
+Pattern Barrier47
+
+ooOoOoo
+oo,,,oo
+oo,,,oo
+oo,,,oo
+-------
+
+:|,D
+
+
+Pattern Barrier48
+
+xxxxxxx
+xxXxXxx
+xx,,,xx
+xx,,,xx
+xx,,,xx
+-------
+
+:|,A
+
+
+Pattern Barrier49
+
+O.?
+,,.
+.,O
+
+:/,D
+
+
+Pattern Barrier50
+
+O??
+,,?
+.,O
+
+:/,D
+
+
+Pattern Barrier51
+
+o.??
+O,,O
+
+:8,D
+
+
+Pattern Barrier52
+
+
+o.O.?
+o,X..
+.,...
+-----
+
+:8,Ds
+
+o.a.?
+o*X..
+.,...
+-----
+
+;!oplay_attack(*,a)
+
+
+Pattern Barrier53
+
+
+?O?
+OXO
+.,x
+---
+
+:8,Ds
+
+
+Pattern Barrier54
+
+xx.xx
+xXOXx
+x,,,x
+.....
+-----
+
+:|,A
+
+xx.xx
+xXOXx
+x,a,x
+.....
+-----
+
+;oplay_attack(a,a)
+
+
+Pattern Intrusion1
+
+xxxx
+...X
+!!.O
+----
+
+:8,B,value(30)
+
+
+Pattern Intrusion1b
+
+xxxx
+X..X
+..!O
+----
+
+:8,B,value(30)
+
+
+Pattern Intrusion1c
+
+xxxx
+X..X
+.!.O
+----
+
+:8,B,value(30)
+
+xxxx
+X..X
+.a.O
+----
+
+;safe_omove(a)
+
+
+Pattern Intrusion2
+
+xXx?
+...O
+!!..
+----
+
+:8,B,value(30)
+
+
+Pattern Intrusion3
+
+xxX?
+...O
+!!..
+----
+
+:8,B,value(30)
+
+
+Pattern Intrusion4
+
+XOOX
+!!X.
+!...
+----
+
+:8,B,value(30)
+
+XOOX
+baC.
+!...
+----
+
+;oplay_attack(a,b,C)
+
+
+Pattern Intrusion5
+
+X.OX
+.!X.
+.!..
+----
+
+:8,B,value(30)
+
+XbOX
+.aC.
+.!..
+----
+
+;oplay_attack(a,b,C)
+
+
+Pattern Intrusion6
+
+?OX
+X!!
+x..
+
+:8,B,value(30)
+
+
+Pattern Intrusion7
+
+OX.
+.!!
+X.x
+
+:8,B,value(30)
+
+OA.
+.!!
+X.x
+
+;lib(A)==2
+
+
+Pattern Intrusion8
+
+X.X
+O!!
+?X.
+
+:8,B,value(30)
+
+B.X
+Oa.
+?X.
+
+;oplay_attack(a,B)
+
+
+Pattern Intrusion9
+
+X.
+OX
+.!
+
+:8,B,value(30)
+
+X.
+OC
+ba
+
+;oplay_attack(a,b,C)
+
+
+Pattern Intrusion10
+
+xxx?
+..XO
+!!.O
+----
+
+:8,B,value(30)
+
+xxx?
+..CO
+!baO
+----
+
+;oplay_attack_either(a,b,b,C)
+
+
+Pattern Intrusion11
+# O can intrude on either side. The position of the influence source
+# here isn't entirely accurate.
+
+.O.
+.X.
+.!.
+...
+---
+
+:|,B,value(30)
+
+dOb
+cXa
+...
+...
+---
+
+;oplay_attack(a,b,b) && oplay_attack(c,d,d)
+
+
+Pattern Intrusion12
+# O can intrude on either side. The position of the influence source
+# here isn't entirely accurate.
+
+!O!
+!X!
+...
+...
+---
+
+:|,B,value(30)
+
+dOb
+cXa
+...
+...
+---
+
+;oplay_attack(a,b,b) || oplay_attack(c,d,d)
+
+
+Pattern Intrusion13
+
+?OoO?
+X.!X.
+X.!..
+.....
+-----
+
+:8,B,value(30)
+
+?boa?
+X.!X.
+X.!..
+.....
+-----
+
+;lib(a)>=2 && lib(b)>=2
+
+
+Pattern Intrusion14
+
+?OO?
+X!X.
+.!..
+.!..
+----
+
+:8,B,value(30)
+
+?OO?
+XaXd
+.bc.
+.!..
+----
+
+;oplay_attack_either(a,b,c,d,b,d)
+
+
+Pattern Intrusion15
+
+oOo
+.XO
+!.X
+
+:8,B,value(30)
+
+oOo
+aXO
+cbX
+
+;!oplay_attack(a,b,c,a)
+
+
+Pattern Intrusion16
+
+O!.
+!!.
+.xX
+
+:8,B,value(30)
+
+
+Pattern Intrusion17
+
+O!.
+.!.
+XxX
+
+:8,B,value(30)
+
+
+Pattern Intrusion18
+
+xXx
+o..
+O!!
+o..
+xXx
+
+:8,B,value(30)
+
+
+Pattern Intrusion19
+
+X..
+O!.
+o..
+xXx
+
+:8,B,value(30)
+
+
+Pattern Intrusion20
+
+oO!
+OX!
+
+:8,B,value(30)
+
+oO!
+OAb
+
+;lib(A)==2 && !oplay_attack(b,b)
+
+
+Pattern Intrusion21
+
+O.X
+.!.
+x..
+
+:8,B,value(30)
+
+
+Pattern Intrusion21b
+
+ooX
+O!.
+x..
+
+:8,B,value(30)
+
+
+Pattern Intrusion22
+
+O.X
+...
+.!.
+
+:8,B,value(10)
+
+
+Pattern Intrusion23
+
+O..
+.!!
+---
+
+:8,B,value(10)
+
+Ob.
+dca
+---
+
+;oplay_attack_either(a,b,c,d,b,d)
+
+
+Pattern Intrusion24
+
+O..
+O!!
+---
+
+:8,B,value(30)
+
+
+Pattern Intrusion25
+
+!!.O
+!XO.
+....
+....
+----
+
+:8,B,value(30)
+
+
+Pattern Intrusion26
+
+!!.O
+.XO.
+..X!
+....
+----
+
+:8,B,value(30)
+
+
+Pattern Intrusion27
+
+O..
+.!.
+.!.
+...
+
+:8,B,value(30)
+
+
+Pattern Intrusion28
+
+??O?
+x.!X
+..!.
+....
+----
+
+:8,B,value(30)
+
+??O?
+xdaX
+.cb.
+....
+----
+
+;oplay_attack_either(a,b,c,d,b,d)
+
+
+Pattern Intrusion29
+
+oooo
+oooo
+.O.o
+....
+.!!.
+.!..
+
+:8,B,value(30)
+
+
+Pattern Intrusion30
+
+oooo
+oooo
+XO.o
+....
+.!!.
+.!..
+
+:8,B,value(30)
+
+oooo
+oooo
+XOfo
+dbc.
+.ae.
+.!..
+
+;oplay_attack(a,b,c,d,e,f,f)
+
+
+Pattern Intrusion31
+
+ooo
+XO.
+.!!
+.!.
+?.?
+
+:8,B,value(30)
+
+
+Pattern Intrusion32
+
+ooo
+XO.
+.!.
+?.?
+
+
+:8,B,value(30)
+
+
+Pattern Intrusion33
+
+oOo
+XOX
+.!.
+?.?
+
+:8,B,value(30)
+
+
+Pattern Intrusion34
+
+o.o
+XOX
+.!.
+?.?
+
+:8,B,value(30)
+
+obo
+XOX
+.a.
+?.?
+
+;oplay_attack(a,b,b)
+
+
+Pattern Intrusion35
+
+|..X??
+|...O?
+|..X!X
+|...!.
+|...!.
++-----
+
+:8,B,value(30)
+
+|..X??
+|.baO?
+|.fXcX
+|..ed.
+|...!.
++-----
+
+;oplay_attack(a,b,c,d,e,f,d)
+
+
+Pattern Intrusion36
+
+?X
+O!
+Xx
+
+:8,B,value(30)
+
+?X
+Oa
+Xx
+
+;safe_omove(a)
+
+
+Pattern Intrusion37
+
+?X
+O!
+oX
+
+:8,B,value(30)
+
+?X
+Oa
+oX
+
+;safe_omove(a)
+
+
+# END OF FILE

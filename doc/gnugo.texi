@@ -1,0 +1,261 @@
+\input texinfo @c -*-Texinfo-*-
+@c %**start of header
+@setfilename gnugo.info
+@settitle GNU Go Documentation
+@c %**end of header
+
+@dircategory GNU games
+@direntry
+* GNU go: (gnugo).          The GNU Go program
+@end direntry
+
+@set EDITION 3.0.0
+@set VERSION 3.0
+
+@titlepage
+@subtitle Documentation for the GNU Go Project
+@subtitle Edition @value{EDITION}
+@subtitle August, 2001
+@vskip 0pt plus 1filll
+@image{newlogo}
+@vskip 0pt plus 1filll
+@author By Daniel Bump, David Denholm, Jerome Dumonteil, 
+@author Gunnar Farneb@"ack, Thomas Traber, Tanguy Urvoy, Inge Wallin
+@sp 1
+@page
+@title{GNU GO 3.0}
+@vskip 0pt plus 1filll
+Copyright @copyright{} 1999, 2000, 2001 Free Software Foundation, Inc.
+@sp 2
+
+This is Edition @value{EDITION} of @cite{The GNU Go Project documentation}, @*
+for the @value{VERSION} version of the GNU GO program.
+
+@sp 2
+Published by the Free Software Foundation @*
+675 Massachusetts Avenue @*
+Cambridge, MA 02139-3309 USA @*
+Phone: +1-617-876-3296 @*
+
+Permission is granted to make and distribute verbatim
+or modified copies of this manual is given provided
+that the terms of the GNU Free Documentation License
+(@pxref{GFDL}) are respected.
+
+Permission is granted to make and distribute verbatim
+or modified copies of the program GNU Go is given provided
+the terms of the GNU General Public License (@pxref{GPL})
+are respected.
+
+@end titlepage
+
+@node Top, Introduction, (dir), (dir)
+@comment node-name, next,         previous, up
+@ifinfo
+@unnumbered GNU GO
+
+This file documents @code{GNU Go}, a Go program and its sources.
+This is Edition @value{EDITION} of the @cite{GNU Go Program Documentation}
+
+Copyright 1999, 2000 and 2001, The Free Software Foundation, Inc.
+     
+Permission is granted to make and distribute verbatim
+or modified copies of this manual is given provided
+that the terms of the GNU Free Documentation License
+(@pxref{GFDL}) are respected.
+
+Permission is granted to make and distribute verbatim
+or modified copies of the program GNU Go is given provided
+the terms of the GNU General Public License (@pxref{GPL})
+are respected.
+
+@end ifinfo
+
+@menu
+* Introduction::                What is GNU Go ?
+* Installation::                Installing GNU Go 
+* User Guide::                  Using GNU Go
+
+Programmer's Introduction
+* Overview::                    Overview of the GNU Go engine
+* Analyzing::                   Analyzing GNU Go's moves
+* API::                         API to the GNU Go engine
+* SGF::                         Handling SGF trees in memory
+* Libboard::                    The basic go board library.
+
+GNU Go Internals
+* Move Generation::             How GNU Go generates moves
+* Worms and Dragons::           Dragons and Worms
+* Eyes::                        Eyes and half eyes
+* Patterns::                    Pattern database
+* DFA::                         The DFA Pattern Matcher
+* Tactical Reading::            Tactical Reading
+* Life and Death Reading::      Life and Death reading: Owl and Life
+* Influence::                   Influence Function
+* Moyo::                        Estimation of Moyos : Bouzy's 5/21 algorithm
+* Utility Functions::           @file{utils.c} and @file{printutils.c}
+* Incremental Board::           Incremental Algorithms in Reading
+* GTP::                         The Go Text Protocol
+* Regression::                  Regression testing
+
+Appendices
+* Copying::                     Software and Documentation Licenses
+
+Indices
+* Concept Index::               Concept Index
+* Functions Index::             Functions Index
+
+@end menu
+
+@node    Introduction, Installation, Top, Top
+@comment node-name,    next,        previous,     up
+@chapter Introduction
+
+@include introduction.texi
+
+@node Installation, User Guide, Introduction, Top
+@comment node-name,    next,        previous,     up
+@chapter Installation
+
+@include install.texi
+
+@node User Guide, Overview, Installation, Top
+@comment node-name,    next,        previous,     up
+@chapter Using GNU Go
+
+@include using.texi
+
+@node  Overview, Analyzing, User Guide, Top
+@comment node-name,    next,             previous,    up
+@chapter GNU Go engine overview
+
+@include overview.texi
+
+@node  Analyzing, API, Overview, Top
+@comment  node-name,  next,  previous,  up
+@chapter Analyzing GNU Go's moves
+
+@include analyze.texi
+
+@node API, SGF, Analyzing, Top
+@chapter Application Programmers Interface to GNU Go
+
+@include api.texi
+
+@node SGF, Libboard, API, Top
+@chapter Handling SGF trees in memory
+
+@include sgf.texi
+
+@node Libboard, Move Generation, SGF, Top
+@chapter The Board Library
+
+@include board.texi
+
+@node Move Generation, Worms and Dragons, Libboard, Top
+@comment  node-name,  next,  previous,  up
+@chapter Move generation
+
+@include move_generation.texi
+
+@node Worms and Dragons, Eyes, Move Generation, Top
+@comment node-name,    next,            previous,      up
+@chapter Worms and Dragons
+
+@include dragon.texi
+
+@node Eyes, Patterns, Worms and Dragons, Top
+@comment  node-name,  next,  previous,  up
+@chapter Eyes and Half Eyes
+
+@include eyes.texi
+
+@node Patterns, DFA, Eyes, Top
+@comment  node-name,  next,  previous,  up
+@chapter The Pattern Code
+
+@include patterns.texi
+
+@node DFA, Tactical Reading, Patterns, Top
+@comment  node-name,  next,  previous,  up
+@chapter The DFA pattern matcher
+
+@include dfa.texi
+
+@node Tactical Reading, Life and Death Reading, DFA, Top
+@comment  node-name,  next,  previous,  up
+@chapter Tactical reading
+
+@include reading.texi
+
+@node Life and Death Reading, Influence, Tactical Reading, Top
+@comment  node-name,  next,  previous,  up
+@chapter Life and Death Reading
+
+@include owl.texi
+
+@node Influence, Moyo, Life and Death Reading, Top
+@comment  node-name,  next,  previous,  up
+@chapter Influence Function
+
+@include influence.texi
+
+@node Moyo, Utility Functions, Influence, Top
+@comment  node-name,  next,  previous,  up
+@chapter Moyo
+
+@include moyo.texi
+
+@node Utility Functions, Incremental Board, Moyo, Top
+@comment  node-name,  next,  previous,  up
+@chapter Utility Functions
+
+@include utils.texi
+
+@node Incremental Board, GTP, Utility Functions, Top
+@comment  node-name,  next,  previous,  up
+@chapter Incremental Algorithms in Reading
+
+@include incremental.texi
+
+@node GTP, Regression, Incremental Board, Top
+@comment  node-name,  next,  previous,  up
+@chapter The Go Text Protocol
+
+@include gtp.texi
+
+@node Regression, Copying, GTP, Top
+@comment  node-name,  next,  previous,  up
+@chapter Regression testing
+
+@include regression.texi
+
+@node Copying, Concept Index, Regression, Top
+@comment node-name,    next,        previous,     up
+@appendix Copying
+
+@include copying.texi
+
+@c ------------------------
+@c *  END OF THE DOCUMENT *
+@c ------------------------
+
+
+@node  Concept Index, Functions Index, Copying, Top
+@comment node-name,    next,  previous,      up
+@unnumbered Concept Index
+
+@printindex cp
+
+@node  Functions Index,  , Concept Index, Top
+@comment  node-name,  next,  previous,  up
+@unnumbered Functions Index
+
+@printindex fn
+
+@contents
+@bye
+
+
+
+

@@ -1,0 +1,12 @@
+(;GM[1]FF[3]
+RU[Japanese]SZ[9]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[2001-01-06]
+SY[Cgoban 1.9.2]TM[5:00:00(5x1:00)];
+AW[fb][bc][cc][dc][fc][cd][ed][fe][df][ef][ff][gf][hg][eh][fh][hh][ci][di]
+AB[gb][gc][bd][fd][gd][hd][be][ge][cf][hf][if][ag][bg][cg][dg][gg][ch][gh][bi]
+;B[fa];W[ea];B[ga];W[eb];B[ih];W[fg];B[ig];W[gi];B[ac];W[ab];B[ad];
+W[bb];B[dh];W[ei];B[ce];W[de]
+)

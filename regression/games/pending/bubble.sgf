@@ -1,0 +1,23 @@
+(;GM[1]FF[3]
+RU[Japanese]SZ[9]HA[0]KM[5.5]
+PW[Rook]
+PB[Mike]
+GN[Rook (W) vs. Mike (B)]
+DT[2000-11-15]
+SY[Cgoban 1.9.7]TM[30:00(5x1:00)]
+RE[B+11.5]
+;B[fd]BL[1790];W[dd]WL[1800];B[ef]BL[1781];W[fc]WL[1800];B[gc]BL[1770]
+;W[ec]WL[1799];B[gd]BL[1766];W[cc]WL[1799];B[de]BL[1760];W[ce]WL[1797]
+;B[cf]BL[1756];W[be]WL[1796];B[fb]BL[1746];W[bf]WL[1795];B[cg]BL[1736]
+;W[ee]WL[1794];B[fe]BL[1727];W[df]WL[1793];B[dg]BL[1708];W[eb]WL[1792]
+;B[ga]BL[1687];W[bg]WL[1791];B[bh]BL[1685];W[de]WL[1789];B[eg]BL[1676]
+;W[ag]WL[1789];B[ah]BL[1666];W[ea]WL[1788];B[ff]BL[1630];W[fa]WL[1788]
+;B[gb]BL[1615];W[ed]WL[1788];B[tt]BL[1603];W[tt]WL[1787];
+TW[aa][ba][ca][da][ab][bb][cb][db][ac][bc][dc][ad][bd][cd][ae][af]
+TB[ha][ia][hb][ib][hc][ic][hd][id][ge][he][ie][gf][hf][if][fg][gg][hg][ig][ch][dh][eh][fh][gh][hh][ih][ai][bi][ci][di][ei][fi][gi][hi][ii]
+C[The game is over.  Final score:
+   White = 16 territory + 1 captures + 5.5 komi = 22.5
+   Black = 34 territory + 0 captures = 34
+Black wins by 11.5.
+]
+)
