@@ -1149,6 +1149,7 @@ readsgffilefuseki(const char *filename, int moves_per_game)
 
   if (sgferr) {
     fprintf(stderr, "Parse error: %s at position %d\n", sgferr, sgferrpos);
+    sgfFreeNode(root);
     return NULL;
   }
 
@@ -1205,6 +1206,7 @@ readsgffile(const char *filename)
 
   if (sgferr) {
     fprintf(stderr, "Parse error: %s at position %d\n", sgferr, sgferrpos);
+    sgfFreeNode(root);
     return NULL;
   }
 

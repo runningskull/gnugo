@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- free memory allocated in a failed read of an sgf file
+- extract_fuseki revisions: statistics on outcomes,
+  popularity cutoffs based on unique players added to command line
+  parameters, tweaks and bugfixes in game selection
 - atari_atari moves considered blocking in estimate_territorial_value()
 - MAX_LIBERTIES reduced to 8
 - popgo() bugfix to repair sgf traces	
