@@ -576,11 +576,8 @@ do_genmove(int color, float pure_threat_value,
 void 
 move_considered(int move, float value)
 {
-  int i = I(move);
-  int j = J(move);
-  if (value > potential_moves[i][j]) {
-    potential_moves[i][j] = value;
-  }
+  if (value > potential_moves[move])
+    potential_moves[move] = value;
 }
 
 

@@ -174,16 +174,16 @@ replay_node(SGFNode *node, int color_to_replay)
       else {
 	mprintf("GNU Go plays %m ", i, j);
 	if (!gnugo_is_pass(i, j))
-	  printf("(%.2f) ", potential_moves[i][j]);
+	  printf("(%.2f) ", potential_moves[POS(i, j)]);
       }
       mprintf("- Game move %m ", m, n);
-      if (!gnugo_is_pass(m, n) && potential_moves[m][n] > 0.0)
-	printf("(%.2f) ", potential_moves[m][n]);
+      if (!gnugo_is_pass(m, n) && potential_moves[POS(m, n)] > 0.0)
+	printf("(%.2f) ", potential_moves[POS(m, n)]);
       printf("\n");
 
       if (!quiet) {
-	replay_score += (potential_moves[i][j] - potential_moves[m][n]);
-	total_score += potential_moves[i][j];
+	replay_score += (potential_moves[POS(i, j)] - potential_moves[POS(m, n)]);
+	total_score += potential_moves[POS(i, j)];
       }
     }
     if (i != m || j != n) {
@@ -191,23 +191,23 @@ replay_node(SGFNode *node, int color_to_replay)
 	gg_snprintf(buf, 127, "GNU Go resigns - Game move %s (%.2f)",
 		    location_to_string(POS(m, n)),
 		    gnugo_is_pass(m, n)
-		    && potential_moves[m][n] < 0.0 ?
-			0 : potential_moves[m][n]);
+		    && potential_moves[POS(m, n)] < 0.0 ?
+			0 : potential_moves[POS(m, n)]);
       else {      
 	gg_snprintf(buf, 127, "GNU Go plays %s (%.2f) - Game move %s (%.2f)",
 		    location_to_string(POS(i, j)),
-		    gnugo_is_pass(i, j) ? 0 : potential_moves[i][j],
+		    gnugo_is_pass(i, j) ? 0 : potential_moves[POS(i, j)],
 		    location_to_string(POS(m, n)),
 		    gnugo_is_pass(m, n)
-		    && potential_moves[m][n] < 0.0 ?
-			0 : potential_moves[m][n]);
+		    && potential_moves[POS(m, n)] < 0.0 ?
+			0 : potential_moves[POS(m, n)]);
 	sgfCircle(node, i, j);
       }
     }
     else
       gg_snprintf(buf, 127, "GNU Go plays the same move %s (%.2f)",
                  location_to_string(POS(i, j)),
-                 gnugo_is_pass(i, j) ? 0 : potential_moves[i][j]);
+                 gnugo_is_pass(i, j) ? 0 : potential_moves[POS(i, j)]);
     sgfAddComment(node, buf);
     sgffile_add_debuginfo(node, 0.0);
   }

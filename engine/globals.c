@@ -37,7 +37,7 @@ char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
 
 int hashflags = HASH_DEFAULT;
 
-float potential_moves[MAX_BOARD][MAX_BOARD];
+float potential_moves[BOARDMAX];
 
 /* Used by reading. */
 int depth;              /* deep reading cut off */

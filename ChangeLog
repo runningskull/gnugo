@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- potential_moves[] array converted to 1D
 - distance measures converted from floating to fixed point arithmetic
   in connection reading code.
 - owl threats disabled as a command line option

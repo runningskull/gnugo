@@ -259,7 +259,7 @@ extern int mandated_owl_reading_depth;
 extern int mandated_owl_node_limit; 
 
 /* Keep this as 2D until we change the entire API. */
-extern float potential_moves[MAX_BOARD][MAX_BOARD];
+extern float potential_moves[BOARDMAX];
 
 extern int limit_search;  /* limit move search to a portion of the board */
 extern int oracle_exists; /* oracle is available for consultation        */

@@ -49,36 +49,32 @@
 void
 sgffile_add_debuginfo(SGFNode *node, float value)
 {
-  int m, n;
+  int pos;
   char comment[24];
 
   if (!outfilename[0])
     return;
   
-  for (m = 0; m < board_size; ++m)
-    for (n = 0; n < board_size; ++n) {
-      if (BOARD(m, n) && (output_flags & OUTPUT_MARKDRAGONS)) {
-	switch (dragon[POS(m, n)].crude_status) {
-	case DEAD:
-	  sgfLabel(node, "X", m, n);
-	  break;
-	case CRITICAL:
-	  sgfLabel(node, "!", m, n);
-	  break;
-	default:
-	  ;
-	}
-      }
-      
-      if (potential_moves[m][n] > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
-	if (potential_moves[m][n] < 1.0)
-	  sgfLabel(node, "<1", m, n);
-	else
-	  sgfLabelInt(node, (int) potential_moves[m][n], m, n);
-      }
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    
+    if (IS_STONE(board[pos]) && (output_flags & OUTPUT_MARKDRAGONS)) {
+      if (dragon[pos].crude_status == DEAD)
+	sgfLabel(node, "X", I(pos), J(pos));
+      else if (dragon[pos].crude_status == CRITICAL)
+	sgfLabel(node, "!", I(pos), J(pos));
     }
+	
+    if (potential_moves[pos] > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
+      if (potential_moves[pos] < 1.0)
+	sgfLabel(node, "<1", I(pos), J(pos));
+      else
+	sgfLabelInt(node, (int) potential_moves[pos], I(pos), J(pos));
+    }
+  }
   
-  if (value > 0 && (output_flags & OUTPUT_MOVEVALUES)) {
+  if (value > 0.0 && (output_flags & OUTPUT_MOVEVALUES)) {
     sprintf(comment, "Value of move: %.2f", value);
     sgfAddComment(node, comment);
   }
