@@ -175,19 +175,19 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 144
 
 # prevent loss of four stones a couple of moves later. E16 doesn't
 # look very good, but it works.
-450 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 170
-gg_genmove white
+loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 170
+450 gg_genmove white
 #? [E14|D15|E16]
 
 # black is getting to deep, time to defend.
-460 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 196
-gg_genmove white
+loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 196
+460 gg_genmove white
 #? [J4|K2|K3|K4|K5|L2]
 
 #CATEGORY=SEMEAI
 # If we move first, black can only get a ko in the semeai.
-470 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 212
-gg_genmove white
+loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 212
+470 gg_genmove white
 #? [H6|H5|H3]
 
 
