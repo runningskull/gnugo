@@ -26,7 +26,7 @@
 ;;;
 ;;; Maintainer: Thien-Thi Nguyen
 ;;;
-;;; Rel:standalone-gnugo-el-2-2-6
+;;; Rel:standalone-gnugo-el-2-2-7
 ;;;
 ;;; Description: Run GNU Go in a buffer.
 
@@ -47,13 +47,14 @@
 ;; both komi and handicap.
 ;;
 ;; To play a stone, move the cursor to the desired vertice and type `SPC' or
-;; `RET'; to pass, `P' (note: uppercase); to quit, `q'.  To undo, place the
-;; cursor on a stone that you played and type `U' (note: uppercase).  Other
-;; keybindings are described in the `gnugo-board-mode' documentation, which
-;; you may view with the command `describe-mode' (normally `C-h m') in that
-;; buffer.  The buffer name shows the last move and who is currently to play.
-;; Capture counts and other info are shown on the mode line immediately
-;; following the major mode name.
+;; `RET'; to pass, `P' (note: uppercase); to quit, `q'; to undo one of your
+;; moves (as well as a possibly intervening move by GNU Go), `u'.  To undo
+;; back through an arbitrary stone that you played, place the cursor on a
+;; stone and type `U' (note: uppercase).  Other keybindings are described in
+;; the `gnugo-board-mode' documentation, which you may view with the command
+;; `describe-mode' (normally `C-h m') in that buffer.  The buffer name shows
+;; the last move and who is currently to play.  Capture counts and other info
+;; are shown on the mode line immediately following the major mode name.
 ;;
 ;; While GNU Go is pondering its next move, certain commands that rely on its
 ;; assistence will result in a "still waiting" error.  Do not be alarmed; that
@@ -147,7 +148,7 @@
 ;;          multiple independent buffers/games
 ;;          XPM set can be changed on the fly (global and/or local)
 ;;          font-locking for "X", "O", "[xo]"
-;;          undo by count or by board position
+;;          undo by count, by board position, or by "pairs"
 ;;
 ;;
 ;; History Predicted
@@ -160,7 +161,8 @@
 ;; For users who are not elisp programmers, you can look forward to gradual
 ;; refinement in 2.x, splitting into gnugo.el and sgf.el in 3.x, and then
 ;; eventual merging into GNU Emacs for 4.x (if RMS gives it the thumbs-up).
-;; If it is not accepted into Emacs at that time, it will remain in GNU Go.
+;; If it is not accepted into Emacs at that time, a new maintainer will be
+;; sought.  In any case, it will no longer be bundled w/ ttn-pers-elisp.
 
 ;;; Code:
 
@@ -170,7 +172,7 @@
 ;;;---------------------------------------------------------------------------
 ;;; Political arts
 
-(defconst gnugo-version "2.2.6"
+(defconst gnugo-version "2.2.7"
   "Version of gnugo.el currently loaded.
 Note that more than two dots in the value indicates \"pre-release\",
 or \"alpha\" or \"hackers-invited-all-else-beware\"; use at your own risk!
@@ -965,6 +967,10 @@ Signal error if done out-of-turn or if game-over.
 To start a game try M-x gnugo."
   (interactive)
   (gnugo-gate t)
+  (let ((accept (cdr (gnugo-synchronous-send/return
+                      (format "play %s PASS" (gnugo-get :user-color))))))
+    (unless (= ?= (aref accept 0))
+      (error accept)))
   (let ((donep (gnugo-push-move t "PASS"))
         (buf (current-buffer)))
     (let (inhibit-gnugo-refresh)
@@ -1155,42 +1161,25 @@ If FILENAME already exists, Emacs confirms that you wish to overwrite it."
         (aft-newline-appreciated '(:C :B :W :SZ :PB :PW))       ;;;  license
         (sz (gnugo-get :board-size))
         (tree (gnugo-get :sgf-tree)))
-    (find-file filename)
-    (erase-buffer)
-    (insert "(")
-    (dolist (node (reverse tree))
-      (insert ";")
-      (dolist (prop (reverse node))
-        (let ((name (car prop))
-              (v (cdr prop)))
-          (insert
-           (if (memq name bef-newline-appreciated) "\n" "")
-           (substring (symbol-name name) 1)
-           "[" (format "%s" v) "]"
-           (if (memq name aft-newline-appreciated) "\n" "")))))
-    (insert ")\n")
-    (save-buffer)
-    (kill-buffer nil)))
+    (with-temp-buffer
+      (insert "(")
+      (dolist (node (reverse tree))
+        (insert ";")
+        (dolist (prop (reverse node))
+          (let ((name (car prop))
+                (v (cdr prop)))
+            (insert
+             (if (memq name bef-newline-appreciated) "\n" "")
+             (substring (symbol-name name) 1)
+             "[" (format "%s" v) "]"
+             (if (memq name aft-newline-appreciated) "\n" "")))))
+      (insert ")\n")
+      (write-file filename))))
 
 (defun gnugo-read-sgf-file (filename)
   "Load a game tree from FILENAME, a file in SGF format."
   (interactive "fSGF file to load: ")
   (gnugo-command (format "loadsgf %s" (expand-file-name filename))))
-
-(defun gnugo-undo ()
-  "Undo one move. Interchange the colors of the two players."
-  (interactive)
-  (gnugo-gate)
-  (gnugo-synchronous-send/return "undo")
-  (gnugo-put :move-history (cdr (gnugo-get :move-history)))
-  (gnugo-put :sgf-tree (cdr (gnugo-get :sgf-tree)))
-  (gnugo-put :user-color (gnugo-get :last-mover))
-  (gnugo-put :gnugo-color (gnugo-other (gnugo-get :last-mover)))
-  (gnugo-put :last-mover (gnugo-get :gnugo-color))
-  (gnugo-merge-showboard-results)
-  (gnugo-refresh t)
-  (gnugo-goto-pos (car (cdr (gnugo-get :move-history))))
-)
 
 (defun gnugo-magic-undo (spec)
   "Undo moves on the GNUGO Board, based on SPEC, a string.
@@ -1201,9 +1190,7 @@ If SPEC has the form of a positive number, remove exactly that many
 moves from the history, signaling an error if the history is exhausted
 before finishing.  Otherwise, signal \"bad spec\" error.
 
-Refresh the board for each move undone. Warp the cursor to the next
-to the next-to-last move (which will be the next move undone if
-the command is executed again). If (in the case where SPEC is
+Refresh the board for each move undone.  If (in the case where SPEC is
 a number) after finishing, the color to play is not the user's color,
 schedule a move by GNU Go."
   (gnugo-gate)
@@ -1240,10 +1227,25 @@ schedule a move by GNU Go."
       (gnugo-refresh)                   ; this
       (decf n)                          ; is
       (sit-for 0)))                     ; eye candy
-  (gnugo-refresh t)
-  (gnugo-goto-pos (car (cdr (gnugo-get :move-history))))
-  (when (string= (gnugo-get :last-mover) (gnugo-get :user-color))
-    (gnugo-get-move (gnugo-get :gnugo-color))))
+  (let* ((ulastp (string= (gnugo-get :last-mover) (gnugo-get :user-color)))
+         (ubpos (funcall (if ulastp 'car 'cadr) (gnugo-get :move-history))))
+    (gnugo-put :last-user-bpos (if (and ubpos (not (string= "PASS" ubpos)))
+                                   ubpos
+                                 (gnugo-get :center-position)))
+    (gnugo-refresh t)
+    (when ulastp
+      (gnugo-get-move (gnugo-get :gnugo-color)))))
+
+(defun gnugo-undo-two-moves ()
+  "Undo a pair of moves (GNU Go's and yours).
+However, if you are the last mover, undo only one move.
+Regardless, after undoing, it is your turn to play again."
+  (interactive)
+  (gnugo-gate)
+  (gnugo-magic-undo (if (string= (gnugo-get :user-color)
+                                 (gnugo-get :last-mover))
+                        "1"
+                      "2")))
 
 (defun gnugo-display-final-score ()
   "Display final score and other info in another buffer (when game over).
@@ -1418,8 +1420,7 @@ NOTE: At this time, GTP command handling specification is still
             (let ((hook
                    ;; do not elide this binding; `run-hooks' needs it
                    (plist-get spec :post-hook)))
-              (run-hooks 'hook))))
-	(gnugo-refresh t)))))
+              (run-hooks 'hook))))))))
 
 ;;;---------------------------------------------------------------------------
 ;;; Major mode for interacting with a GNUGO subprocess
@@ -1438,14 +1439,14 @@ In this mode, keys do not self insert.  Default keybindings:
 
   R             Resign.
 
-  u             Undo one move.
+  u             Run `gnugo-undo-two-moves'.
 
   U             Pass to `gnugo-magic-undo' either the board position
                 at point (if no prefix arg), or the prefix arg converted
                 to a number.  E.g., to undo 16 moves: `C-u C-u U' (see
                 `universal-argument'); to undo 42 moves: `M-4 M-2 U'.
 
-  C-l           Run `gnugo-refresh' to redraw the board.
+  C-l           Run `gnugo-refresh'.
 
   _ or M-_      Bury the Board buffer (when the boss is near).
 
@@ -1463,9 +1464,7 @@ In this mode, keys do not self insert.  Default keybindings:
 
   !             Run `gnugo-estimate-score'.
 
-  : or ;        Run `gnugo-command' (for GTP commands to GNU Go). For
-                example, `showboard' will draw the board in ascii with
-                a coordinate grid, useful for reference.
+  : or ;        Run `gnugo-command' (for GTP commands to GNU Go).
 
   =             Display board position under point (if valid).
 
@@ -1640,9 +1639,8 @@ starting a new one.  See `gnugo-board-mode' documentation for more info."
         (gnugo-goto-pos (format "A%d" half))
         (forward-char (* 2 (1- half)))
         (gnugo-put :last-user-bpos
-          (get-text-property (point) 'gnugo-position)))
-      (if (and (fboundp 'display-images-p) (display-images-p))
-	  (gnugo-toggle-image-display))
+          (gnugo-put :center-position
+            (get-text-property (point) 'gnugo-position))))
       ;; first move
       (gnugo-put :game-start-time (current-time))
       (let ((g (gnugo-get :gnugo-color))
@@ -1675,13 +1673,13 @@ starting a new one.  See `gnugo-board-mode' documentation for more info."
                               (message "(not quitting)"))))
             ("Q"        . (lambda () (interactive)
                             (kill-buffer nil)))
-            ("u"        . gnugo-undo)
             ("U"        . (lambda (x) (interactive "P")
                             (gnugo-magic-undo
                              (cond ((numberp x) (number-to-string x))
                                    ((consp x) (number-to-string (car x)))
                                    (t (gnugo-position))))))
-            ("\C-l"     . (gnugo-refresh t))
+            ("u"        . gnugo-undo-two-moves)
+            ("\C-l"     . gnugo-refresh)
             ("\M-_"     . bury-buffer)
             ("_"        . bury-buffer)
             ("h"        . (lambda () (interactive)

@@ -138,6 +138,7 @@ DECLARE(gtp_move_influence);
 DECLARE(gtp_move_probabilities);
 DECLARE(gtp_move_reasons);
 DECLARE(gtp_move_uncertainty);
+DECLARE(gtp_move_history);
 DECLARE(gtp_name);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_connection_defends);
@@ -278,6 +279,7 @@ static struct gtp_command commands[] = {
   {"move_probabilities",      gtp_move_probabilities},
   {"move_reasons",            gtp_move_reasons},
   {"move_uncertainty",	      gtp_move_uncertainty},
+  {"move_history",	      gtp_move_history},
   {"name",                    gtp_name},
   {"new_score",               gtp_estimate_score},
   {"orientation",     	      gtp_set_orientation},
@@ -1115,6 +1117,23 @@ gtp_last_move(char *s)
   gtp_mprintf("%C %m", color, I(pos), J(pos));
   return gtp_finish_response();
 }
+
+/* Function:  Print the move history in reverse order
+ * Arguments: none
+ * Fails:     never
+ * Returns:   List of moves played in reverse order
+ */
+static int
+gtp_move_history(char *s)
+{
+  UNUSED(s);
+  
+  gtp_start_response(GTP_SUCCESS);
+  dump_move_history();
+  return gtp_finish_response();
+}
+
+
 
 
 /**********************
