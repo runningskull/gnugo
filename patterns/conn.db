@@ -103,9 +103,22 @@ x.!?
 
 
 Pattern EB4
+# db split (3.3.6)
 
 X.O?
-.*!?
+.*!x
+..!!
+----
+
+:8,BW
+
+
+Pattern EB4a
+# db split (3.3.6)
+# do not inhibit a potential connection
+
+X.Ox
+.*.O
 ..!!
 ----
 

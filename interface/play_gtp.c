@@ -95,6 +95,7 @@ DECLARE(gtp_matcher_status);
 DECLARE(gtp_name);
 DECLARE(gtp_new_game);
 DECLARE(gtp_estimate_score);
+DECLARE(gtp_experimental_score);
 DECLARE(gtp_owl_analyze_semeai);
 DECLARE(gtp_tactical_analyze_semeai);
 DECLARE(gtp_owl_attack);
@@ -164,6 +165,7 @@ static struct gtp_command commands[] = {
   {"echo" ,                   gtp_echo},
   {"echo_err" ,               gtp_echo_err},
   {"estimate_score",          gtp_estimate_score},
+  {"experimental_score",      gtp_experimental_score},
   {"eval_eye",         	      gtp_eval_eye},
   {"final_score",             gtp_final_score},
   {"final_status",            gtp_final_status},
@@ -2120,6 +2122,11 @@ gtp_final_status_list(char *s, int id)
   return gtp_finish_response();
 }
 
+/* Function:  Estimate the score
+ * Arguments: None
+ * Fails:     never
+ * Returns:   upper and lower bounds for the score
+ */
 
 static int
 gtp_estimate_score(char *s, int id)
@@ -2137,6 +2144,44 @@ gtp_estimate_score(char *s, int id)
   else if (score < 0.0)
     gtp_printf("B+%3.1f (upper bound: %3.1f, lower: %3.1f)", 
 	       -score, upper_bound, lower_bound);
+  return gtp_finish_response();
+}  
+
+/* Function:  Estimate the score, taking into account which player moves next
+ * Arguments: Color to play
+ * Fails:     Invalid color
+ * Returns:   Score.
+ *
+ * This function generates a move for color, then adds the
+ * value of the move generated to the value of the position.
+ * Critical dragons are awarded to the opponent since the
+ * value of rescuing a critical dragon is taken into account
+ * in the value of the move generated.
+ */
+
+static int
+gtp_experimental_score(char *s, int id)
+{
+  float upper_bound, lower_bound, score;
+  int color;
+
+  if (!gtp_decode_color(s, &color)
+      || (color != BLACK && color != WHITE))
+    return gtp_failure(id, "invalid color");
+
+  genmove_conservative(NULL, NULL, color);
+  estimate_score(&upper_bound, &lower_bound);
+
+  if (debug & DEBUG_SCORING)
+    fprintf(stderr, "upper = %3.1f, lower = %3.1f, best = %3.1f\n",
+	    upper_bound, lower_bound, best_move_values[0]);
+  if (color == WHITE)
+    score = lower_bound + best_move_values[0];
+  else
+    score = upper_bound - best_move_values[0];
+
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_printf("%3.1f", score);
   return gtp_finish_response();
 }  
 

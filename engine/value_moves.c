@@ -1904,7 +1904,13 @@ estimate_strategical_value(int pos, int color, float score)
 	TRACE("  %1m: %f - either attacks %1m (%f) or attacks %1m (%f)\n",
 	      pos, this_value, aa, aa_value, bb, bb_value);
 
-	tot_value += this_value;
+	/* FIXME: The restriction to this_value > 0 
+	 * should not be necessary. See century-2002:30.
+	 * Debugging this example might show a deeper problem
+	 * with EITHER_MOVE reasons.
+	 */
+	if (this_value > 0)
+	  tot_value += this_value;
 	break;
 	
       case ALL_MOVE:

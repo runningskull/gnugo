@@ -36,20 +36,21 @@ loadsgf games/century21-2002/goint-gnugo.sgf 161
 80 owl_attack D17
 #? [1 C17]
 
-# A19 produces seki
+# A17 and A18 produce 10,000 year ko. But A17 is better
+# since B has the option of making seki. B19 produces
+# an unfavorable ko for B.
 loadsgf games/century21-2002/goint-gnugo.sgf 237
 90 gg_genmove black
-#? [A19]
+#? [A17]
 
 # locally B7 is better
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 27
 100 gg_genmove black
 #? [!B6]
 
-# locally B7 is better
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 29
 110 gg_genmove black
-#? [C8
+#? [C8]
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 43
 120 gg_genmove black

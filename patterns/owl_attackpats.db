@@ -994,6 +994,17 @@ XO
 :8,-,value(20)
 
 
+Pattern A235
+# db new pattern (3.3.6)
+
+?XXO?         prevent the hane
+?X.*.
+.....
+-----
+
+:8,-,value(77)
+
+
 #########################################################
 #                                                       #
 #          Limiting moves on the first line             #

@@ -4793,13 +4793,14 @@ Xab
 
 
 Pattern EB640b
+# db modified (3.3.5)
 
 .Oo        block on edge
 x*.
 X..
 ---
 
-:8,OXe
+:8,OXe,shape(3)
 
 .Oo
 x*.
@@ -8809,7 +8810,7 @@ OB?
 
 
 #tm - removed this pattern (3.1.20)
-#Pattern CB329
+# Pattern CB329
 ## FIXME: This could be very bad aji-keshi.
 ##   For a not great example, see trevorb:490
 ## FIXME: This is actually much worse than that.
@@ -8824,6 +8825,17 @@ OB?
 #bA
 #
 #;lib(A)==2 && lib(b)>1
+
+
+Pattern CB329a
+# db added (3.3.6)
+
+?.??         atari
+.*.?
+OX.X
+oOX?
+
+:8,OXE,followup(5),shape(2)
 
 
 Pattern CB330
@@ -10573,6 +10585,29 @@ oOXx??
 ; lib(A)>2
 
 
+Pattern ED93
+# db new pattern (3.3.6)
+# see century-2002:120
+
+.....X?        don't make the wrong atari
+..X...?
+...*XO?
+....Ooo
+.......
+-------
+
+:8,dO
+
+.....X?        don't make the wrong atari
+..X.a.?
+...*XO?
+....Ooo
+.......
+-------
+
+> replace(a,*)
+
+
 #####################################################################
 #
 # Center defend/attack patterns
@@ -10981,12 +11016,13 @@ XO*
 
 
 Pattern CD92a
+# db added X class (3.3.5)
 
 .O.        ponnuki is worth thirty points
 OX*
 .Ox
 
-:8,Ead,shape(1)
+:8,XEad,shape(1)
 
 
 Pattern CD92b
@@ -12808,6 +12844,61 @@ Pattern EJ94
 > replace(a,*)
 
 
+Pattern EJ95
+# db added (3.3.6)
+
+.....?         attach below
+..X.O?
+O.*.oo
+......
+......
+------
+
+:8,j
+
+
+Pattern EJ96
+# db added (3.3.6)
+
+..XXOO        Don't allow the cut with sente!
+.OXOX.
+..*O..
+......
+------
+
+:8,j
+
+..XXOO
+.OXOA.
+..*O..
+......
+------
+
+; !oplay_defend(*,A)
+
+
+Pattern EJ97
+# db added (3.3.6)
+
+......         seal the opponent, connecting loosely
+oo.*O.
+ooo.XX
+......
+......
+------
+
+:8,j
+
+......
+ab.*O.
+cde.XX
+......
+......
+------
+
+; o_somewhere(a,b,c,d,e)
+
+
 ######################################################################
 #
 # Seki patterns.
@@ -13580,6 +13671,7 @@ Pattern LE16
 > replace(a,*)
 
 
+
 ######################################################################
 #
 # Replacement patterns
@@ -13740,6 +13832,68 @@ Pattern RE7
 ; oplay_attack(a,b)
 ; && (oplay_attack(a,b) == oplay_attack(*,b))
 
+> replace(a,*)
+
+
+Pattern RE8
+# db new pattern (3.3.6)
+# see century-2002:10
+
+?..O??        first line block just helps the opponent
+X.*OX?
+..OX..
+...X..
+------
+
+:8,-
+
+?..O??
+X.*OX?
+..OX..
+..aX..
+------
+
+> replace(a,*)
+
+
+Pattern RE9
+# db new pattern (3.3.6)
+# see century-2002:100
+
+?o.X??        to slide is better than kosumi
+.O...?
+...*..
+......
+------
+
+:8,-
+
+?o.X??
+.O...?
+..a*..
+......
+------
+
+> replace(a,*)
+
+
+Pattern RE10
+# db new pattern (3.3.6)
+# see century-2002:130
+
+xxxx         don't allow the cut
+...X
+x.O*
+?XXO
+
+:8,d
+
+xxxx
+.a.X
+x.O*
+?XXb
+
+; !dead(b)
 > replace(a,*)
 
 
