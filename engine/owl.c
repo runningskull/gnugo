@@ -4576,17 +4576,18 @@ init_owl(struct local_owl_data **owl, int target1, int target2, int move,
 static void
 push_owl(struct local_owl_data **owl)
 {
-  /* Do we need to enlarge the stack. */
+  gg_assert(*owl == &owl_stack[owl_stack_pointer]);
+  /* Do we need to enlarge the stack? */
   if (owl_stack_pointer == owl_stack_size - 1) {
     if (0)
       gprintf("Have to enlarge owl stack!");
     owl_stack_size++;
     owl_stack = realloc(owl_stack, owl_stack_size * sizeof(*owl_stack));
     gg_assert(owl_stack != NULL);
+    *owl = &owl_stack[owl_stack_pointer];
   }
 
   /* Copy the owl data. */
-  gg_assert(*owl == &owl_stack[owl_stack_pointer]);
   owl_stack_pointer++;
   owl_stack[owl_stack_pointer] = **owl;
   *owl = &owl_stack[owl_stack_pointer];

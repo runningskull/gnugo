@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in push_owl
 - corrected assertion in examine_cavity()
 - shadowed variables fixed in dragon.c
 - major aftermath code revisions
