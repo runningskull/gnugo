@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in fill_liberty()
+- filllib_confirm_safety() revised
 - In make_dragon(): resolve inconsistent owl result by calling
   owl_does_defend()
 - add assert on inconsistent do_genmove result() in genmove()

@@ -297,7 +297,7 @@ fill_liberty(int *move, int color)
 	  return 1;
 	}
       }
-      
+
       DEBUG(DEBUG_FILLLIB,
 	    "Filllib: Nothing found, looking for threat to back-capture.\n");
       for (k = 0; k < 4; k++) {
@@ -305,12 +305,16 @@ fill_liberty(int *move, int color)
 	if (board[pos + d] == other
 	    && worm[pos + d].attack_codes[0] != 0) {
 	  /* Just pick some other liberty. */
+	  /* FIXME: Something is odd about this code. */
 	  int libs[2];
 	  if (findlib(pos + d, 2, libs) > 1) {
 	    if (is_legal(libs[0], color))
 	      *move = libs[0];
 	    else if (is_legal(libs[1], color))
 	      *move = libs[1];
+	    else
+	      continue;
+	    
 	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
 	    return 1;
 	  }
@@ -517,7 +521,7 @@ filllib_confirm_safety(int move, int color, int *defense_point)
 	  && !play_attack_defend_n(color, 0, 1, move, pos2)) {
 	int adj;
 	adj = chainlinks(pos2, adjs);
-	/* It seems unlikely that we would ever get adjacent strings
+	/* It seems unlikely that we would ever get no adjacent strings
          * here, but if it should happen we simply give up and say the
          * move is unsafe.
 	 */
@@ -529,6 +533,24 @@ filllib_confirm_safety(int move, int color, int *defense_point)
       }
     }
 
+  /* Next attempt are diagonal neighbors. */
+  if (apos == NO_MOVE) {
+    for (k = 4; k < 8; k++)
+      if (board[move + delta[k]] == color) {
+	apos = move + delta[k];
+	break;
+      }
+  }
+
+  /* And two steps away. */
+  if (apos == NO_MOVE) {
+    for (k = 0; k < 4; k++)
+      if (board[move + 2 * delta[k]] == color) {
+	apos = move + 2 * delta[k];
+	break;
+      }
+  }
+  
   /* We should have found something by now. If not something's
    * probably broken elsewhere. Declare the move unsafe if it happens.
    */
