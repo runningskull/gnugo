@@ -164,6 +164,16 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 174
 410 restricted_genmove black F2 E1
 #? [E1]
 
+loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 65
+420 gg_genmove black
+#? [G6]
+
+# G12 allows white to live.
+loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 185
+430 gg_genmove black
+#? [H10|G9|G10|G11|M6|L7|K7]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
