@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- pattern tuning: remove "t" classification from various patterns
 - WHITE_BORDER, BLACK_BORDER, GRAY_BORDER retired 
 - colors and komaster state, safety values and dragon status, cache routine
   ids are now "enum"
