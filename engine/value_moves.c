@@ -192,12 +192,35 @@ find_more_attack_and_defense_moves(int color)
 	      && !defense_move_reason_known(ii, unstable_worms[k])) {
 	    int acode = attack(aa, NULL);
 	    if (acode < worm[aa].attack_codes[0]) {
-	      if (!cursor_at_start_of_line)
-		TRACE("\n");
-	      TRACE("%ofound extra point of defense of %1m at %1m code %d\n",
-		    aa, ii, REVERSE_RESULT(acode));
-	      cursor_at_start_of_line = 1;
-	      add_defense_move(ii, aa, REVERSE_RESULT(acode));
+	      /* Maybe attack() doesn't find the attack. Try to
+	       * attack with the stored attack move.
+	       */
+	      int defense_works = 1;
+
+	      if (trymove(worm[aa].attack_points[0], other, 
+			  "find_more_attack_and_defense_moves", 0,
+			  EMPTY, 0)) {
+		if (!board[aa])
+		  defense_works = 0;
+		else {
+		  int this_acode = REVERSE_RESULT(find_defense(aa, NULL));
+		  if (this_acode > acode) {
+		    acode = this_acode;
+		    if (acode >= worm[aa].attack_codes[0])
+		      defense_works = 0;
+		  }
+		}
+		popgo();
+	      }
+		
+	      if (defense_works) {
+		if (!cursor_at_start_of_line)
+		  TRACE("\n");
+		TRACE("%ofound extra point of defense of %1m at %1m code %d\n",
+		      aa, ii, REVERSE_RESULT(acode));
+		cursor_at_start_of_line = 1;
+		add_defense_move(ii, aa, REVERSE_RESULT(acode));
+	      }
 	    }
 	  }
 	    
