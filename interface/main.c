@@ -1435,7 +1435,7 @@ Main Options:\n\
        --quiet           Don't print copyright and informational messages\n\
        --level <amount>  strength (default %d)\n\
        --never-resign    Forbid GNU Go to resign\n\
-       --allow-resign	 Allow resignation (default)\n\
+       --resign-allowed	 Allow resignation (default)\n\
        --gtp-input <file>Read gtp commands from file instead of stdin\n\
    -l, --infile <file>   Load name sgf file\n\
    -L, --until <move>    Stop loading just before move is played. <move>\n\
