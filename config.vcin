@@ -34,6 +34,12 @@
 /* Default hash table size in megabytes */
 #define DEFAULT_MEMORY 16
 
+/* Connection module. Default standard. */
+#define EXPERIMENTAL_CONNECTIONS 0
+
+/* Semeai module. Default standard. */
+#define EXPERIMENTAL_SEMEAI 0
+
 /* Define as 1 to enable the DFA pattern matcher */
 #define DFA_ENABLED 0
 

@@ -44,7 +44,9 @@
 - removed final VC warning in dfa.c
 - revised trace in value_move_reasons()
 - regress.plx improvements
+- speedup in gtp_same_dragon
 - test revisions
+- 13x13 tests
 
 3.1.15 released November 30, 2001
 
