@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new tests
 - eyes.db revised
 - bugfixes in cut_connect_callback() in connections.c
 

@@ -212,6 +212,14 @@ loadsgf games/endgame7.sgf 2
 704 gg_genmove white
 #? [G5]
 
+
+loadsgf games/nngs/gnugo-3.3.11-bconwil-200211202359.sgf 242
+801 gg_genmove white
+#? [S14]*
+
+802 gg_genmove black
+#? [S14]*
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
