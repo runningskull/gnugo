@@ -8,7 +8,8 @@ DTR = aa_attackpats.dtr owl_attackpats.dtr owl_defendpats.dtr \
 EXTRA_DIST = $(DSP)\
         $(DTR)\
 	dfa.c\
-	hoshi.sgf\
+	hoshi_keima.sgf\
+	hoshi_other.sgf\
 	komoku.sgf\
 	mokuhazushi.sgf\
 	sansan.sgf\
@@ -69,7 +70,8 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
 		 read_attack.c read_defend.c handipat.c oraclepat.c
 
-DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
+DBBUILT = hoshi_keima.db hoshi_other.db komoku.db sansan.db \
+	  mokuhazushi.db takamoku.db
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = $(GGBUILTSOURCES) $(DBBUILT) *~
@@ -85,8 +87,11 @@ noinst_LIBRARIES = libpatterns.a libdfa.a
 libpatterns_a_SOURCES = connections.c helpers.c $(GGBUILTSOURCES)
 libdfa_a_SOURCES = dfa.c transform.c
 
-hoshi.db : $(srcdir)/hoshi.sgf joseki$(EXEEXT)
-	./joseki JH $(srcdir)/hoshi.sgf >hoshi.db
+hoshi_keima.db : $(srcdir)/hoshi.sgf joseki$(EXEEXT)
+	./joseki JH $(srcdir)/hoshi_keima.sgf >hoshi_keima.db
+
+hoshi_other.db : $(srcdir)/hoshi.sgf joseki$(EXEEXT)
+	./joseki JH $(srcdir)/hoshi_other.sgf >hoshi_other.db
 
 komoku.db : $(srcdir)/komoku.sgf joseki$(EXEEXT)
 	./joseki JK $(srcdir)/komoku.sgf >komoku.db
