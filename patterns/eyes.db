@@ -164,6 +164,27 @@ x@x
 :2,0
 
 
+Pattern 307
+
+$*.
+
+:1,0
+
+
+Pattern 308
+
+$.X
+
+:1,1
+
+
+Pattern 309
+
+$X.
+
+:0,0
+
+
 Pattern 391
 
 !x!
@@ -260,37 +281,73 @@ Pattern 414
 
 Pattern 415
 
-!X.x
+@X.X
+
+:2,1
+
+
+Pattern 416
+
+!X..
 
 :1,1
 
 
-Pattern 416
+Pattern 417
 
 @XXx
 
 :1,0
 
 
-Pattern 417
+Pattern 418
 
 (.x@
 
 :1,0
 
 
-Pattern 418
+Pattern 419
 
 !x@x
 
 :1,0
  
 
-Pattern 419
+Pattern 420
 
 !XX!
 
 :0,0
+
+
+Pattern 421
+
+!.x$
+
+:0,0
+
+
+Pattern 422
+
+@X.$
+
+:1,0
+
+
+Pattern 423
+
+.XX$
+
+:1,1
+
+
+Pattern 424
+
+$xx$
+
+:0,0
+
 
 #
 # Do we ever get more than 2 marginal eye points with a linear 4 pattern?
@@ -300,8 +357,8 @@ Pattern 419
 # Topology: ...
 #
 
-Pattern 420
-# Match before 421
+Pattern 430
+# Match before 431
 
  X
 X.X
@@ -309,7 +366,7 @@ X.X
 :2,2
 
 
-Pattern 421
+Pattern 431
 
  x
 x*x
@@ -317,7 +374,7 @@ x*x
 :2,1
 
 
-Pattern 422
+Pattern 432
 
  x
 xXx
@@ -325,7 +382,7 @@ xXx
 :1,1
 
 
-Pattern 423
+Pattern 433
 
  !
 x*x
@@ -333,7 +390,7 @@ x*x
 :2,1
 
 
-Pattern 424
+Pattern 434
 
  x
 x@x
@@ -341,7 +398,7 @@ x@x
 :2,0
 
 
-Pattern 425
+Pattern 435
 
  !
 !*x
@@ -349,7 +406,7 @@ Pattern 425
 :1,0
 
 
-Pattern 426
+Pattern 436
 
  x
 @Xx
@@ -361,8 +418,8 @@ Pattern 426
 # Topology: ..
 #
 
-Pattern 431
-# Must be matched before 432.
+Pattern 441
+# Must be matched before 442.
 
 *X
 X.
@@ -370,7 +427,7 @@ X.
 :2,1
 
 
-Pattern 432
+Pattern 442
 
 xx
 xx
@@ -378,7 +435,7 @@ xx
 :1,1
 
 
-Pattern 433
+Pattern 443
 
 @x
 xx
@@ -386,7 +443,7 @@ xx
 :1,0
 
 
-Pattern 434
+Pattern 444
 
 !@
 .x
@@ -710,12 +767,6 @@ Pattern 527
 # Linear, two marginal vertices.
 #
 
-#Pattern 529
-# This actually turned up once, but it was bent...
-#!!...
-#:1,1
-
-
 Pattern 528
 
 !.x.!
@@ -757,6 +808,28 @@ Pattern 533
 !.@.!
 
 :1,0
+
+
+Pattern 534
+
+xx.x$
+
+:1,1
+
+
+Pattern 535
+
+x*XX$
+
+:2,1
+
+
+Pattern 536
+# FIXME: This is of course too general. Taken from linear_eye().
+
+!xxx!
+
+:1,1
 
 
 #            .
@@ -1212,33 +1285,63 @@ Pattern 6016
 
 
 Pattern 6017
+# FIXME: Can be generalized.
+
+!...X!
+
+:1,1
+
+
+Pattern 6018
 
 (.@x.x
 
 :2,1
 
 
+Pattern 6019
+# FIXME: This is of course too general. Taken from linear_eye().
+
+!xxxx!
+
+:1,1
+
+
 # FIXME POST3.0: Do all size 6 linear patterns with 2 or more marginal eye
 #                points.
 
 
-Pattern 6018
+Pattern 6030
 
 @XX>X!
 
 :1,0
 
 
-Pattern 6019
+Pattern 6031
 
 @XXX.!
 
 :1,0
 
 
-Pattern 6020
+Pattern 6032
 
 .@.).!
+
+:1,0
+
+
+Pattern 6033
+
+!....$
+
+:1,1
+
+
+Pattern 6034
+
+@X...$
 
 :1,0
 
@@ -1578,6 +1681,14 @@ xXX@
 
 Pattern 6421
 
+..
+@.xx
+
+:2,1
+
+
+Pattern 6422
+
 @X
 xXX.
 
@@ -1826,7 +1937,7 @@ Pattern 7000
 
 Pattern 7001
 # tm added (3.1.15)
-# Though pattern 7002 matches with a defense point at
+# Though pattern 7003 matches with a defense point at
 # the proper place, the code doesn't seem to provide
 # more than one defense point.
 |(
@@ -1839,8 +1950,31 @@ Pattern 7001
 
 
 Pattern 7002
+# FIXME: Can be generalized.
+
+@..>X.(
+
+:2,1
+
+
+Pattern 7003
 
 @..>..@
+
+:2,1
+
+
+Pattern 7004
+# FIXME: This is of course too general. Taken from linear_eye().
+
+@xxxxx@
+
+:2,1
+
+
+Pattern 7005
+
+$.....@
 
 :2,1
 

@@ -888,10 +888,10 @@ loadsgf games/marginal_ko.sgf
 #? [(2|3) F11]
 245 owl_defend D11
 #? [1 (F11|H8|F8)]*
-246 owl_attack N9
-#? [3 (L6|P8)]
-247 owl_defend N9
-#? [1 (L6|P8)]
+246 owl_attack O9
+#? [3 (M6|Q8)]
+247 owl_defend O9
+#? [1 (M6|Q8)]
 248 owl_attack A6
 #? [1 (J1|L2)]
 249 owl_defend A6
@@ -909,6 +909,10 @@ loadsgf games/marginal_ko.sgf
 loadsgf games/strategy26.sgf 257
 254 owl_defend O13
 #? [1 (M16|O14|N16|N17)]*
+
+loadsgf games/owl34.sgf 211
+255 owl_defend D13
+#? [1 (D14|E13|G16)
 
 ########### end of tests #####################
 

@@ -602,6 +602,40 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
   int mini, maxi;
   int minj, maxj;
   int origin = eye[pos].origin;
+
+  gprintf("Eyespace at %1m: color=%C, esize=%d, msize=%d\n",
+	  pos, eye[pos].color, eye[pos].esize, eye[pos].msize);
+  
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      int pos2 = POS(m, n);
+      if (eye[pos2].origin != pos) 
+	continue;
+      
+      if (eye[pos2].marginal && IS_STONE(board[pos2]))
+	gprintf("%1m (X!)\n", pos2);
+      else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2])) {
+	if (heye[pos2].value == 3.0)
+	  gprintf("%1m (XH)\n", pos2);
+	else
+	  gprintf("%1m (XH) (topological eye value = %f\n", pos2,
+		  heye[pos2].value);
+      }
+      else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
+	gprintf("%1m (X)\n", pos2);
+      else if (eye[pos2].marginal && board[pos2] == EMPTY)
+	gprintf("%1m (!)\n", pos2);
+      else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY) {
+	if (heye[pos2].value == 3.0)
+	  gprintf("%1m (H)\n", pos2);
+	else
+	  gprintf("%1m (H) (topological eye value = %f\n", pos2,
+		  heye[pos2].value);
+      }
+      else
+	gprintf("%1m\n", pos2);
+    }
+  gprintf("\n");
   
   /* Determine the size of the eye. */
   mini = board_size;
@@ -669,48 +703,12 @@ compute_eyes(int pos, int *max, int *min,
 	     struct half_eye_data heye[BOARDMAX],
 	     int add_moves, int color)
 {
-  int m, n;
-
   if (attack_point)
     *attack_point = NO_MOVE;
   if (defense_point)
     *defense_point = NO_MOVE;
 
   if (debug & DEBUG_EYES) {
-    DEBUG(DEBUG_EYES, "Eyespace at %1m: color=%C, esize=%d, msize=%d\n",
-	  pos, eye[pos].color, eye[pos].esize, 
-	  eye[pos].msize);
-
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int pos2 = POS(m, n);
-	if (eye[pos2].origin != pos) 
-	  continue;
-
-	if (eye[pos2].marginal && IS_STONE(board[pos2]))
-	  DEBUG(DEBUG_EYES, "%1m (X!)\n", pos2);
-	else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2])) {
-	  if (heye[pos2].value == 3.0)
-	    DEBUG(DEBUG_EYES, "%1m (XH)\n", pos2);
-	  else
-	    DEBUG(DEBUG_EYES, "%1m (XH) (topological eye value = %f\n", pos2,
-		  heye[pos2].value);
-	}
-	else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
-	  DEBUG(DEBUG_EYES, "%1m (X)\n", pos2);
-	else if (eye[pos2].marginal && board[pos2] == EMPTY)
-	  DEBUG(DEBUG_EYES, "%1m (!)\n", pos2);
-	else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY) {
-	  if (heye[pos2].value == 3.0)
-	    DEBUG(DEBUG_EYES, "%1m (H)\n", pos2);
-	  else
-	    DEBUG(DEBUG_EYES, "%1m (H) (topological eye value = %f\n", pos2,
-		  heye[pos2].value);
-	}
-	else
-	  DEBUG(DEBUG_EYES, "%1m\n", pos2);
-      }
-    DEBUG(DEBUG_EYES, "\n");
     print_eye(eye, heye, pos);
     DEBUG(DEBUG_EYES, "\n");
   }
@@ -771,7 +769,7 @@ compute_eyes(int pos, int *max, int *min,
       print_eye(eye, heye, pos);
     }
   }
-  
+
   /* If not found we examine whether we have a linear eye space. */
   if (linear_eye_space(pos, attack_point, max, min, eye)) {
     *defense_point = *attack_point; /* Duplicate attack point to defense point. */
@@ -853,39 +851,6 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
     *defense_point = NO_MOVE;
 
   if (debug & DEBUG_EYES) {
-    DEBUG(DEBUG_EYES, "Eyespace at %1m: color=%C, esize=%d, msize=%d\n",
-	  pos, eye[pos].color, eye[pos].esize, eye[pos].msize);
-
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int pos2 = POS(m, n);
-	if (eye[pos2].origin != pos) 
-	  continue;
-
-	if (eye[pos2].marginal && IS_STONE(board[pos2]))
-	  DEBUG(DEBUG_EYES, "%1m (X!)\n", pos2);
-	else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2])) {
-	  if (heye[pos2].value == 3.0)
-	    DEBUG(DEBUG_EYES, "%1m (XH)\n", pos2);
-	  else
-	    DEBUG(DEBUG_EYES, "%1m (XH) (topological eye value = %f\n", pos2,
-		  heye[pos2].value);
-	}
-	else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
-	  DEBUG(DEBUG_EYES, "%1m (X)\n", pos2);
-	else if (eye[pos2].marginal && board[pos2] == EMPTY)
-	  DEBUG(DEBUG_EYES, "%1m (!)\n", pos2);
-	else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY) {
-	  if (heye[pos2].value == 3.0)
-	    DEBUG(DEBUG_EYES, "%1m (H)\n", pos2);
-	  else
-	    DEBUG(DEBUG_EYES, "%1m (H) (topological eye value = %f\n", pos2,
-		  heye[pos2].value);
-	}
-	else
-	  DEBUG(DEBUG_EYES, "%1m\n", pos2);
-      }
-    DEBUG(DEBUG_EYES, "\n");
     print_eye(eye, heye, pos);
     DEBUG(DEBUG_EYES, "\n");
   }
@@ -926,9 +891,32 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
     *pessimistic_min = *min - margins;
     if (*pessimistic_min == 2)
       *pessimistic_min = 1;
+    if (*pessimistic_min < 0)
+      *pessimistic_min = 0;
 
     DEBUG(DEBUG_EYES, "  linear_eye - max=%d, min=%d, pessimistic_min=%d\n",
 	  *max, *min, *pessimistic_min);
+
+    /* Change this to 1 to get notification when linear_eye() would
+     * give a different result than guess_eye_space(), for eyespaces
+     * without a matching graph.
+     */
+    if (0) {
+      int max2, min2, pessimistic_min2;
+      guess_eye_space(pos, effective_eyesize, margins, eye, &max2, &min2,
+		      &pessimistic_min2);
+      if (*max != *min
+	  || *max != max2
+	  || *min != min2) {
+	gprintf("  linear_eye - max=%d, min=%d, pessimistic_min=%d\n",
+		*max, *min, *pessimistic_min);
+	gprintf("  guess_eye - max=%d, min=%d, pessimistic_min=%d\n",
+		max2, min2, pessimistic_min2);
+	print_eye(eye, heye, pos);
+	gprintf("Linear eye space failure.\n");
+	showboard(0);
+      }
+    }
   }
 
   /* Ideally any eye space that hasn't been matched yet should be two

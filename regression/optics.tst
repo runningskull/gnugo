@@ -206,17 +206,16 @@ loadsgf games/marginal_ko.sgf
 #? [1 1]
 1807 eval_eye F7
 #? [1 2 F11 (F11|H8|F8)]
-1808 eval_eye N7
-#? [0 1 (L6|P8) (L6|P8)]
-1809 eval_eye K5
-#? [0 1 (L6 L6)]
+1808 eval_eye O7
+#? [0 1 (M6|Q8) (M6|Q8)]
+1809 eval_eye N12
+#? [0 1 (O11 O11)]
 1810 eval_eye A1
 #? [0 1 B2 B2]
 1811 eval_eye H1
 #? [1 2 (J1|L2) J1]*
 1812 eval_eye S1
 #? [0 1 R2 R2]
-
 
 
 # Report number of nodes visited by the tactical reading
