@@ -93,6 +93,7 @@ will get the first ko capture (so the opponent has to make the
 first ko threat). A return code of @code{KO_B} means that the player
 to move will have to make the first ko threat.
 
+@anchor{Experimental Owl Extension}
 If GNU Go is compiled with the configure option
 @option{--enable-experimental-owl-ext} then the owl functions also have
 possible return codes of @code{GAIN} and @code{LOSS}. A code of @code{GAIN}
@@ -461,14 +462,38 @@ hash nodes.
 @node Persistent Cache
 @section Persistent Reading Cache
 
-@cindex Persistent reading cache
+@cindex persistent cache
 @findex store_persistent_reading_cache
 @findex purge_persistent_reading_cache
+@findex purge_persistent_connection_cache
+@findex purge_persistent_breakin_cache
+@findex purge_persistent_owl_cache
+
 @findex search_persistent_reading_cache
 @findex store_persistent_reading_cache
 
-Some reading calculations can be safely saved from move to
-move. 
+Some calculations can be safely saved from move to move. If the
+opponent's move is not close to our worm or dragon, we do not have to
+reconsider the life or death of that group on the next move. So
+the result is saved in a persistent cache. Persistent caches are used for
+are used in the engine for several types of read results.
+
+@itemize @bullet
+@item Tactical reading
+@item Owl reading
+@item Connection reading
+@item Breakin code
+@end itemize
+
+In this section we will discuss the persistent caching of tactical
+reading but the same principles apply to the other persistent caches.
+
+Persistent caching is an important performance feature. However it
+can lead to mistakes and debugging problems---situations where GNU
+Go generates the right move during debugging but plays a wrong move
+during a game. If you suspect a persistent cache effect you may
+try loading the sgf file with the @option{--replay} option and see if the
+mistake is repeated (@pxref{Invoking GNU Go}).
 
 The function @code{store_persistent_cache()} is called only
 by @code{attack} and @code{find_defense}, never from their

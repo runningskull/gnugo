@@ -8,6 +8,7 @@
 * The Influence Algorithm::     The algorithm of @code{accumlate_influence()}
 * Permeability::                Permeability
 * Escape::                      Escape
+* Break Ins::                   Break Ins
 * Surrounded Dragons::          Surrounded Dragons
 * Influential Patterns::	Patterns used by the Influence module
 * Influential Display::         Colored display and debugging of influence
@@ -415,7 +416,7 @@ than once and after being visited no more influence will be
 propagated to the intersection.
 
 @node The Influence Algorithm
-@section The Core of the Influence Function
+@section The Influence Algorithm
 
 Let @code{(m, n)} be the coordinates of the influence source and
 @code{(i, j)} the coordinates of a an intersection being visited
@@ -613,6 +614,43 @@ it is after all the opponent's turn.
 The current escape route mechanism seems good enough to be useful
 but is not completely reliable. Mostly it seems to err on the side of
 being too optimistic.
+
+@node Break Ins
+@section Break Ins
+
+The code in @file{breakin.c} break-ins into territories that require
+deeper tactical reading and are thus impossible to detect for the
+influence module. It gets run after the influence module and revises
+its territory valuations.
+
+The procedure is as follows: We look at all big (>= 10) territory regions
+as detected by the influence code. Using the computation of
+connection distances from readconnect.c, we compute all nearby vertices
+of this territory. We look for the closest safe stones belonging to
+the opponent. 
+
+For each such string @code{str} we call
+
+@itemize @bullet
+@item @code{break_in(str, territory)} if the opponent is assumed to be next to move,
+@item @code{block_off(str, territory)} if the territory owner is next.
+@end itemize
+
+If the break in is successful resp. the blocking unsuccessful, we
+shrink the territory, and see whether the opponent can still break in.
+We repeat this until the territory is shrunk so much that the opponent
+can no longer reach it.
+
+To see the break in code in action run GNU Go on the file
+@file{regression/games/break_in.sgf} with the option @code{-d0x102000}. The
+break in code is able to find the move at G7 to break into White's territory,
+a move which is otherwise overlooked by the engine.
+
+The break in code is slow, and only changes a few moves by the engine
+per game. Nevertheless we believe that it contributes substantially
+to the strength of the program. The break in code is enabled by default 
+in GNU Go 3.4 at level 10, and disabled at level 9. In fact, this is the
+@strong{only} difference between levels 9 and 10 in GNU Go 3.4.
 
 @node Surrounded Dragons
 @section Surrounded Dragons

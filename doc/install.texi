@@ -154,27 +154,80 @@ faster (@pxref{DFA}).
 @node Experimental Options
 @subsection Experimental Options
 
-There are a number of experimental configure options. For example
-you can @command{./configure --enable-experimental-semeai} or
-@command{./configure --disable-experimental-semeai} to turn
-the experimental reading module on or off. If you want to
-find out what experimental options were compiled into your
-GNU Go binary you can run @command{gnugo --options} to find
-out.
+Anything new in the engine is generally tested as an experimental
+option which can be turned on or off at compile time or run time.
+Some ``experimental'' options such as the break-in code and the
+semeai code are no longer experimental but are enabled by default.
+
+This section can be skipped unless you are interested in the
+experimental options.
+
+The term ``default'' must be clarified, since there
+are really two sets of defaults at hand, runtime defaults
+specified in @file{config.h} and compile time default
+values for the runtime defaults, contained in @file{configure}
+(which is created by editing @file{configure.in} then running
+@command{autoconf}. For example we find in @file{config.h}
+
+@example
+/* Experimental pattern based reading. Disabled by default. */
+/* GAIN/LOSS codes. Disabled by default. */
+#define EXPERIMENTAL_OWL_EXT 0
+
+/* Break-in module. Enabled by default. */
+#define USE_BREAK_IN 1
+
+@end example
+
+This means that the experimental owl extension (@pxref{Experimental Owl
+Extension}) is disabled by default, but the break-in module (@pxref{Break
+Ins}) is turned on. At run time you can override the default by running GNU Go
+with the command line options
+
+@example
+gnugo --experimental-owl-ext --without-break-in
+@end example
+
+Alternatively you can configure GNU Go as follows:
+
+@example
+./configure --enable-experimental-owl-ext --disable-experimental-break-in
+@end example
+
+then recompile GNU Go. This changes the defaults in @file{config.h},
+so that you do not have to pass any command line options to GNU Go
+at run time to get the experimental owl extension turned on and
+the experimental break-in code turned off.
+
+If you want to find out what experimental options were compiled into your GNU
+Go binary you can run @command{gnugo --options} to find out. Here is a list
+of experimental options in GNU Go.
 
 @itemize @bullet
-@item @code{experimental-semeai}. Use the new semeai module based on
-the owl code.
+@item @code{experimental-break-in}. Experimental break-in code
+(@pxref{Break Ins}). You should not need to configure this because
+the break in code is enabled by default in level 10, and is turned
+off at level 9. If you don't want the breakin code just play at
+level 9.
+@item @code{experimental-owl-ext}. Experimental Owl extension 
+(@pxref{Experimental Owl Extension}).
+@item @code{cosmic-gnugo}. An experimental style which plays a center
+oriented game and has a good winning rate against standard GNU Go,
+though it may not be stronger than standard GNU Go against other
+opponents. This experimental option is a configure option only and
+is not available as a run-time option.
+@item @code{owl-threats}. Compute owl threats. Potentially this could
+makes GNU Go stronger but it also makes the program slower. Moreover the
+owl threat code has not been tested recently and may need some work.
 @item @code{experimental-influence}. Use the experimental influence
 module. @strong{Enabled by default.}
+@item @code{experimental-semeai}. Use the reading semeai module based on
+the owl code. @strong{Enabled by default}.
 @item @code{experimental-connections}. Use the experimental connection
 analysis. @strong{Enabled by default.}
 @item @code{alternate-connections}. Use in conjunction with
 @code{experimental-connections}. Uses an alternative implementation of
 the experimental connection analysis. @strong{Enabled by default.}
-@item @code{owl-threats}. Compute owl threats. This makes GNU Go
-stronger but can make the program slower. Enable this option if you have a
-fast CPU.
 @end itemize
 
 @node Windows and MS-DOS, Macintosh, Configure Options, Installation

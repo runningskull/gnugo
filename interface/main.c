@@ -447,6 +447,12 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_OPTIONS:
+	if (USE_BREAK_IN)
+	  fprintf(stderr,
+		  "configure option enabled: experimental break-ins\n");
+	if (COSMIC_GNUGO)
+	  fprintf(stderr,
+		  "configure option enabled: cosmic GNU Go \n");
 	if (EXPERIMENTAL_CONNECTIONS)
 	  fprintf(stderr,
 		  "configure option enabled: experimental connections\n");
@@ -1371,6 +1377,7 @@ Main Options:\n\
                          If no terminal is detected GMP (Go Modem Protocol)\n\
                          will be assumed.\n\
        --quiet           Don't print copyright and informational messages\n\
+       --level <amount>  strength (default %d, up to 10 supported)\n\
        --gtp-input <file>Read gtp commands from file instead of stdin\n\
    -l, --infile <file>   Load name sgf file\n\
    -L, --until <move>    Stop loading just before move is played. <move>\n\
@@ -1378,7 +1385,8 @@ Main Options:\n\
    -o, --outfile <file>  Write sgf output to file\n\
    --printsgf <file>     Write position as a diagram to file (use with -l)\n\
 \n\
-Options that affect strength (higher = stronger, slower):\n\
+Other options affecting strength (higher = stronger, slower):\n\
+(Unless you are working on the program --level <n> is all you need.)\n\
    -D, --depth <depth>          deep reading cutoff (default %d)\n\
    -B, --backfill-depth <depth> deep reading cutoff (default %d)\n\
    -F, --fourlib-depth <depth>  deep reading cutoff (default %d)\n\
@@ -1392,20 +1400,21 @@ Options that affect strength (higher = stronger, slower):\n\
    --owl-branch <depth>         owl branching depth (default %d)\n\
    --owl-reading <depth>        owl reading depth (default %d)\n\
    --owl-node-limit <limit>     max nodes for owl reading (default %d)\n\
-   --level <amount>             strength (default %d, up to 10 supported)\n\
+"
+
+#define USAGE1 "\
    --min-level <amount>         minimum level for adjustment schemes\n\
    --max-level <amount>         maximum level for adjustment schemes\n\
    --autolevel                  adapt gnugo level during game to respect\n\
                                 the time specified by --clock <sec>.\n\
-"
-
-#define USAGE1 "\n\
 Experimental options:\n\
+   --with-break-in         use the break-in code (on at level 10 by default)\n\
+   --without-break-in      do not use the break-in code\n\
    --nofusekidb            turn off fuseki database\n\
    --nofuseki              turn off fuseki moves entirely\n\
    --nojosekidb            turn off joseki database\n\
    --mirror                try to play mirror go\n\
-   --mirror-limit <n>      stop mirroring when n stones on board\n\
+   --mirror-limit <n>      stop mirroring when n stones on board\n\n\
 Scoring:\n\
    --score estimate        estimate score at loaded position\n\
    --score finish          generate moves to finish game, then score\n\
@@ -1422,7 +1431,7 @@ Game Options: (--mode ascii)\n\
        --komi <num>      Set the komi\n\
        --clock <sec>     Initialize the timer.\n\
        --byo-time <sec>  Initialize the byo-yomi timer.\n\
-       --byo-period <stones>  Initialize the byo-yomi period.\n\n\
+       --byo-period <stones>  Initialize the byo-yomi period.\n\
 \n\
 Informative Output:\n\
    -v, --version         Display the version of GNU Go\n\
@@ -1515,7 +1524,7 @@ DEBUG_READING               0x0200\n\
 DEBUG_WORMS                 0x0400\n\
 DEBUG_MOVE_REASONS          0x0800\n\
 DEBUG_OWL_PERFORMANCE       0x1000\n\
-DEBUG_LIFE                  0x2000\n\
+DEBUG_BREAKIN               0x2000\n\
 DEBUG_FILLLIB               0x4000\n\
 DEBUG_READING_PERFORMANCE   0x8000\n\
 DEBUG_SCORING               0x010000\n\
@@ -1541,7 +1550,7 @@ show_help(void)
 	  depth, backfill_depth, fourlib_depth, ko_depth, branch_depth,
 	  backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
 	  owl_distrust_depth, owl_branch_depth,
-	  owl_reading_depth, owl_node_limit, DEFAULT_LEVEL);
+	  owl_reading_depth, owl_node_limit);
   fprintf(stderr, USAGE1,
 	  (float) DEFAULT_MEMORY, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }

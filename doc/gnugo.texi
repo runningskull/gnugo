@@ -12,6 +12,7 @@
 @set EDITION 3.4
 @set VERSION 3.4
 
+@finalout
 @titlepage
 @subtitle Documentation for the GNU Go Project
 @subtitle Edition @value{EDITION}

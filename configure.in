@@ -432,7 +432,7 @@ fi
 dnl ------------ Experimental Breakin enabled-------------------
 
 AH_TEMPLATE([USE_BREAK_IN],
-[Break-in module. Default not enabled.])
+[Break-in module. Enabled by default.])
 
 if test "$enable_experimental_break_in" = "no" ; then
    AC_DEFINE(USE_BREAK_IN, 0)

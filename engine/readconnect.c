@@ -2932,7 +2932,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
 
 
 
-/* Externably callable frontend to recursive_break.
+/* Externally callable frontend to recursive_break.
  * Returns WIN if (str) can connect to the area goal[] (which may or may
  * not contain stones), if he gets the first move.
  */

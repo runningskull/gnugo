@@ -720,5 +720,52 @@ most likely to be correct.
 @end quotation
 @end itemize
 @end quotation
+@item @code{--score aftermath --capture-all-dead --chinese-rules}
+@quotation
+This combination mandates @strong{Tromp-Taylor} scoring. The
+Tromp-Taylor ruleset requires the game to be played out until
+all dead stones are removed, then uses area (Chinese) scoring.
+The option @option{--capture-all-dead} requires the aftermath
+code to finish capturing all dead stones.
+@end quotation
 @end itemize
 
+@subsection Experimental options
+
+Most of these are available as configure options and are
+described in @ref{Experimental Options}.
+
+@itemize @bullet
+@item @option{--options}
+@quotation 
+Print which experimental configure options were compiled into the program.
+@end quotation
+@item @option{--with-break-in}
+@item @option{--without-break-in}
+@quotation
+Use or do not use the experimental break-in code. This option
+has no effect at level 9 or below. The break in code is enabled
+by default at level 10, and the only difference between levels
+9 and level 10 is that the break in code is disabled at level 9.
+@end quotation
+@item @option{--nofusekidb}
+@quotation
+Turn off the fuseki database.
+@end quotation
+@item @option{--nofuseki}
+@quotation
+Turn off fuseki moves entirely
+@end quotation
+@item @option{--nojosekidb}
+@quotation
+Turn off the joseki database.
+@end quotation
+@item @option{--mirror}
+@quotation
+Try to play mirror go.
+@end quotation
+@item @option{--mirror-limit @var{n}}
+@quotation
+Stop mirroring when @var{n} stones are on the board.
+@end quotation
+@end itemize

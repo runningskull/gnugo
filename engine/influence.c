@@ -69,10 +69,10 @@ static struct influence_data *current_influence = NULL;
 #if COSMIC_GNUGO
 
 /* Threholds values used in the whose_moyo() function */
- struct moyo_determination_data moyo_data;
+struct moyo_determination_data moyo_data;
  
 /* Threholds value used in the whose_territory() function */
- float territory_determination_value;
+float territory_determination_value;
  
 #endif
 
