@@ -4453,7 +4453,10 @@ static void
 break_chain2_efficient_moves(int str, int moves[MAX_MOVES],
 			     int scores[MAX_MOVES], int *num_moves)
 {
+  int color = board[str];
+  int other = OTHER_COLOR(color);
   int r;
+  int k;
   int adj, adjs[MAXCHAIN];
   int adj2, adjs2[MAXCHAIN];
   int libs[2];
@@ -4477,10 +4480,10 @@ break_chain2_efficient_moves(int str, int moves[MAX_MOVES],
       continue;
     
     findlib(adjs[r], 2, libs);
-    if (approxlib(libs[0], board[adjs[r]], 3, NULL) <= 2)
-      ADD_CANDIDATE_MOVE(libs[1], 0, moves, scores, *num_moves);
-    if (approxlib(libs[1], board[adjs[r]], 3, NULL) <= 2)
-      ADD_CANDIDATE_MOVE(libs[0], 0, moves, scores, *num_moves);
+    for (k = 0; k < 2; k++)
+      if (approxlib(libs[k], other, 3, NULL) <= 2
+	  && !is_self_atari(libs[1 - k], color))
+	ADD_CANDIDATE_MOVE(libs[1 - k], 0, moves, scores, *num_moves);
     
     /* A common special case is this kind of edge position
      * 
@@ -4550,6 +4553,7 @@ break_chain2_moves(int str, int moves[MAX_MOVES],
     for (k = 0; k < 2; k++) {
       unsafe[k] = is_self_atari(libs[k], color);
       if (!unsafe[k]
+	  || is_ko(libs[k], color, NULL)
 	  || (!require_safe
 	      && approxlib(libs[k], other, 5, NULL) < 5))
 	ADD_CANDIDATE_MOVE(libs[k], 0, moves, scores, *num_moves);

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- break_chain2_efficient_moves() and break_chain2_moves() revised
 - add_array() in readconnect.c simplified
 - bugfix in moves_to_connect_in_two_moves()
 - sgf traces turned off in quiescence_capture()
