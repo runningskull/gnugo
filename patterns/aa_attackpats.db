@@ -361,4 +361,21 @@ Pattern A21
 ;lib(A)==2 && olib(*)>2
 
 
+Pattern A22
+#evand New pattern. (3.3.18)
+
+?.X
+O.X
+X*X
+?X?
+
+:8,s
+
+?.A
+ObA
+X*A
+?X?
+
+;lib(A) <= 4 && oplay_attack(*,b,A) && oplay_defend(*,?,*)
+
 # END OF FILE
