@@ -57,3 +57,10 @@ loadsgf games/arend/gnugo-gnugo6.sgf 20
 130 restricted_genmove white P17 G16 F16 E15
 #? [P17]*
 
+loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf C10
+140 genmove black
+#? [D11|H10|G9|E10]
+
+loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf B12
+150 genmove black
+#? [B6|C6]
