@@ -170,17 +170,22 @@ new_semeai(int color)
 	  continue;
 	
 	/* A dragon consisting of a single worm which is tactically dead or
-	 * critical and having just one neighbor should be ignored.
+	 * critical and having just one neighbor should be ignored, since
+	 * the owl code is more reliable than the semeai code in such cases.
+	 * We do allow these cases if the worm has 4 liberties and can be
+	 * defended.
 	 */
 	if (dragon[apos].size == worm[apos].size
-	    && worm[apos].attack_codes[0] == WIN
-	    && DRAGON2(apos).hostile_neighbors == 1)
+	    && worm[apos].attack_codes[0]
+	    && (worm[apos].liberties < 4
+		|| worm[apos].defense_codes[0] == 0))
 	  continue;
 	if (dragon[bpos].size == worm[bpos].size
-	    && worm[bpos].attack_codes[0] == WIN
-	    && DRAGON2(bpos).hostile_neighbors == 1)
+	    && worm[bpos].attack_codes[0]
+	    && (worm[bpos].liberties < 4
+		|| worm[bpos].defense_codes[0] == 0))
 	  continue;
-
+	
 	/* If one dragon consist of a single stone, don't treat it
 	 * as a semeai. (But see nicklas1:1405 for an example where
 	 * this rule is bad.

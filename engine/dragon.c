@@ -985,6 +985,7 @@ add_adjacent_dragon(int a, int b)
       return;
 
   dragon2[a].adjacent[dragon2[a].neighbors++] = b;
+
   if (DRAGON(a).color == OTHER_COLOR(DRAGON(b).color))
     dragon2[a].hostile_neighbors++;
 }
@@ -2271,9 +2272,14 @@ lively_dragon_exists(int color)
 void
 ascii_report_dragon(char *string)
 {
-  int m, n;
+  int m, n, pos;
+
   string_to_location(board_size, string, &m, &n);
-  report_dragon(stderr, POS(m, n));
+  pos = POS(m, n);
+  if (!ON_BOARD1(pos))
+    fprintf(stderr, "unknown position %s\n", string);
+  else
+    report_dragon(stderr, pos);
 }
 
 
@@ -2282,9 +2288,12 @@ report_dragon(FILE *outfile, int pos)
 {
   int ii;
   int k;
-  struct dragon_data *d = &(dragon[pos]);
-  struct dragon_data2 *d2 = &(dragon2[d->id]);
+  struct dragon_data *d;
+  struct dragon_data2 *d2;
   
+  d = &(dragon[pos]);
+  d2 = &(dragon2[d->id]);
+
   if (board[pos] == EMPTY) {
     gprintf("There is no dragon at %1m\n", pos);
     return;
