@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- move generation of most superstring related moves in reading.c into
+  separate function superstring_moves()
 - try (a bit) harder in attack_either()
 - semeai worms do not have to be adjacent but may instead share a liberty
 - only claim win for attacking a semeai worm if the attack is unconditional
