@@ -92,14 +92,17 @@ keyhash_init(void)
 }
 
 static void
-calculate_hashval_for_tt(int komaster, int kom_pos, int routine, int target,
+calculate_hashval_for_tt(int komaster, int kom_pos, int routine, 
+			 int target1, int target2,
 			 Hash_data *hashdata2)
 { 
   *hashdata2 = hashdata;                /* from globals.c */
   hashdata_xor(*hashdata2, komaster_hash[komaster]);
   hashdata_xor(*hashdata2, kom_pos_hash[kom_pos]);
   hashdata_xor(*hashdata2, routine_hash[routine]);
-  hashdata_xor(*hashdata2, target1_hash[target]);
+  hashdata_xor(*hashdata2, target1_hash[target1]);
+  if (target2 != NO_MOVE)
+    hashdata_xor(*hashdata2, target2_hash[target2]);
 }
 
 
@@ -174,8 +177,8 @@ tt_free(Transposition_table *table)
  
 int
 tt_get(Transposition_table *table, 
-       int komaster, int kom_pos, enum routine_id routine, int target, 
-       int remaining_depth,
+       int komaster, int kom_pos, enum routine_id routine, 
+       int target1, int target2, int remaining_depth,
        Hash_data *extra_hash,
        int *value1, int *value2, int *move)
 {
@@ -184,7 +187,8 @@ tt_get(Transposition_table *table,
   Hashnode_ng   *node;
  
   /* Get the combined hash value. */
-  calculate_hashval_for_tt(komaster, kom_pos, routine, target, &hashval);
+  calculate_hashval_for_tt(komaster, kom_pos, routine, target1, target2,
+			   &hashval);
   if (extra_hash)
     hashdata_xor(hashval, *extra_hash);
 
@@ -226,7 +230,8 @@ tt_get(Transposition_table *table,
 
 void
 tt_update(Transposition_table *table,
-	  int komaster, int kom_pos, enum routine_id routine, int target, 
+	  int komaster, int kom_pos, enum routine_id routine, 
+	  int target1, int target2, 
 	  int remaining_depth,
 	  Hash_data *extra_hash, 
 	  int value1, int value2, int move)
@@ -238,7 +243,8 @@ tt_update(Transposition_table *table,
   unsigned int data;
 
   /* Get the combined hash value. */
-  calculate_hashval_for_tt(komaster, kom_pos, routine, target, &hashval);
+  calculate_hashval_for_tt(komaster, kom_pos, routine, target1, target2,
+			   &hashval);
   if (extra_hash)
     hashdata_xor(hashval, *extra_hash);
 
@@ -1017,7 +1023,8 @@ get_read_result(enum routine_id routine, int komaster, int kom_pos, int *str,
  */
 int
 get_read_result2(enum routine_id routine, int komaster, int kom_pos,
-    		 int *str1, int *str2, Read_result **read_result)
+    		 int *str1, int *str2,
+		 Read_result **read_result)
 {
   /* Only store the result if stackp <= depth. Above that, there
    * is no branching, so we won't gain anything.

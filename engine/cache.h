@@ -100,12 +100,12 @@ void tt_clear(Transposition_table *table);
 void tt_free(Transposition_table *table);
 int  tt_get(Transposition_table *table, 
 	    int komaster, int kom_pos, enum routine_id routine,
-	    int target, int remaining_depth,
+	    int target1, int target2, int remaining_depth,
 	    Hash_data *extra_hash,
 	    int *value1, int *value2, int *move);
 void tt_update(Transposition_table *table,
 	       int komaster, int kom_pos, enum routine_id routine,
-	       int target, int remaining_depth,
+	       int target, int target2, int remaining_depth,
 	       Hash_data *extra_hash,
 	       int value1, int value2, int move);
 
@@ -357,14 +357,34 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
 
 #define READ_RETURN0_NG(komaster, kom_pos, routine, str, remaining_depth) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, \
-	      NULL, 0, 0, NO_MOVE);\
+    tt_update(&ttable, komaster, kom_pos, routine, str, NO_MOVE, \
+              remaining_depth, NULL,\
+	      0, 0, NO_MOVE);\
    return 0; \
   } while (0)
 
 #define READ_RETURN_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, NULL,\
+    tt_update(&ttable, komaster, kom_pos, routine, str, NO_MOVE, \
+              remaining_depth, NULL,\
+              value, 0, move);\
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    return (value); \
+  } while (0)
+
+#define READ_RETURN_SEMEAI_NG(komaster, kom_pos, routine, str1, str2, remaining_depth, point, move, value1, value2) \
+  do { \
+    tt_update(&ttable, komaster, kom_pos, routine, str1, str2, \
+              remaining_depth, NULL, \
+              value1, value2, move); \
+    if ((value1) != 0 && (point) != 0) *(point) = (move); \
+    return; \
+  } while (0)
+
+#define READ_RETURN_CONN_NG(komaster, kom_pos, routine, str1, str2, remaining_depth, point, move, value) \
+  do { \
+    tt_update(&ttable, komaster, kom_pos, routine, str1, str2, \
+              remaining_depth, NULL,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
@@ -372,7 +392,8 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
 
 #define READ_RETURN_HASH_NG(komaster, kom_pos, routine, str, remaining_depth, hash, point, move, value) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, hash,\
+    tt_update(&ttable, komaster, kom_pos, routine, str, NO_MOVE, \
+              remaining_depth, hash,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
@@ -380,7 +401,8 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
 
 #define READ_RETURN2_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value1, value2) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, NULL,\
+    tt_update(&ttable, komaster, kom_pos, routine, str, NO_MOVE, \
+              remaining_depth, NULL,\
               value1, value2, move);\
     if ((value1) != 0 && (point) != 0) *(point) = (move); \
     return (value1); \

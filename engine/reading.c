@@ -1223,7 +1223,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 #if USE_HASHTABLE_NG
 
   if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)
-      && tt_get(&ttable, komaster, kom_pos, FIND_DEFENSE, str, 
+      && tt_get(&ttable, komaster, kom_pos, FIND_DEFENSE, str, NO_MOVE, 
 		depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
     /* Note that if return value is 1 (too small depth), the move will
@@ -3025,7 +3025,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
    * still be used for move ordering.
    */
   if ((stackp <= depth) && (hashflags & HASH_ATTACK)
-      && tt_get(&ttable, komaster, kom_pos, ATTACK, str, 
+      && tt_get(&ttable, komaster, kom_pos, ATTACK, str, NO_MOVE, 
 		depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
     SGFTRACE(xpos, retval, "cached");

@@ -547,7 +547,16 @@ do_owl_analyze_semeai(int apos, int bpos,
   const char *best_move_name = NULL;
   int this_resulta = -1;
   int this_resultb = -1;
+/* FIXME: Temporary measure to turn new cache off for semeai. */
+#undef USE_HASHTABLE_NG
+#define USE_HASHTABLE_NG 0
+#if USE_HASHTABLE_NG
+  int  xpos;
+  int  value1;
+  int  value2;
+#else
   Read_result *read_result = NULL;
+#endif
   int this_variation_number = count_variations - 1;
   int you_look_alive = 0;
   int I_look_alive = 0;
@@ -568,9 +577,33 @@ do_owl_analyze_semeai(int apos, int bpos,
   ASSERT1(board[apos] == owla->color, apos);
   ASSERT1(board[bpos] == owlb->color, bpos);
 
+#if USE_HASHTABLE_NG
+
+  if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
+      && !pass && owl_phase
+      && tt_get(&ttable, komaster, kom_pos, SEMEAI, apos, bpos,
+		depth - stackp, NULL,
+		&value1, &value2, &xpos)) {
+    /* TRACE_CACHED_RESULT2(*read_result);*/
+    if (value1 != 0)
+      *move = xpos;
+      
+    *resulta = value1;
+    *resultb = value2;
+
+    TRACE("%oVariation %d: %1m %1m %s %s %1m (cached) ",
+	  this_variation_number, apos, bpos,
+	  result_to_string(*resulta),
+	  result_to_string(*resultb),
+	  *move);
+    SGFTRACE_SEMEAI(xpos, *resulta, *resultb, "cached");
+    return;
+  }
+
+#else
   if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
       && !pass && owl_phase) {
-    if (get_read_result2(SEMEAI, EMPTY, 0, &apos, &bpos, &read_result)) {
+    if (get_read_result2(SEMEAI, EMPTY, NO_MOVE, &apos, &bpos, &read_result)) {
       TRACE_CACHED_RESULT2(*read_result);
 
       if (rr_get_result1(*read_result) != 0)
@@ -589,6 +622,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       return;
     }
   }
+
+#endif
 
   global_owl_node_counter++;
   local_owl_node_counter++;
@@ -640,7 +675,12 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  sgf_dumptree = save_sgf_dumptree;
 	  count_variations = save_count_variations;
 	  SGFTRACE_SEMEAI(upos, WIN, WIN, "tactical win found");
+#if USE_HASHTABLE_NG
+	  READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos,
+				depth - stackp, move, upos, WIN, WIN);
+#else
 	  READ_RETURN_SEMEAI(read_result, move, upos, WIN, WIN);
+#endif
 	}
 	else if (acode != 0
 		 && find_defense(semeai_worms[sworm], NULL)) {
@@ -758,7 +798,12 @@ do_owl_analyze_semeai(int apos, int bpos,
       count_variations = save_count_variations;
       TRACE("Both live\n");
       SGFTRACE_SEMEAI(PASS_MOVE, WIN, 0, "Both live");
+#if USE_HASHTABLE_NG
+	  READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos,
+				depth - stackp, move, PASS_MOVE, WIN, 0);
+#else
       READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, 0);
+#endif
     }
     
     /* Next the shape moves. */
@@ -991,7 +1036,12 @@ do_owl_analyze_semeai(int apos, int bpos,
 	SGFTRACE_SEMEAI(mpos, WIN, WIN, moves[k].name);
 	close_pattern_list(color, &shape_defensive_patterns);
 	close_pattern_list(color, &shape_offensive_patterns);
+#if USE_HASHTABLE_NG
+	READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos,
+			      depth - stackp, move, mpos, WIN, WIN);
+#else
 	READ_RETURN_SEMEAI(read_result, move, mpos, WIN, WIN);
+#endif
       }
       /* When there is a choice between ko and seki, the prefer_ko
        * variable decides policy. Thus if prefer_ko == color we
@@ -1025,7 +1075,12 @@ do_owl_analyze_semeai(int apos, int bpos,
     *resultb = 0;
     *move = PASS_MOVE;
     SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You live, I die");
+#if USE_HASHTABLE_NG
+    READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos,
+			  depth - stackp, move, PASS_MOVE, 0, 0);
+#else
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
+#endif
   }
 
   /* If we can't find a move and we look dead even if including the
@@ -1052,7 +1107,12 @@ do_owl_analyze_semeai(int apos, int bpos,
 	*resultb = 0;
 	*move = PASS_MOVE;
 	SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You live, I die - 2");
+#if USE_HASHTABLE_NG
+	READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos,
+			      depth - stackp, move, PASS_MOVE, 0, 0);
+#else
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
+#endif
       }
       include_semeai_worms_in_eyespace = 0;
     }
@@ -1068,7 +1128,12 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE("You have more eyes.\n");
       SGFTRACE_SEMEAI(PASS_MOVE, 0, 0, "You have more eyes");
+#if USE_HASHTABLE_NG
+      READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos,
+			    depth - stackp, move, PASS_MOVE, 0, 0);
+#else
       READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 0, 0);
+#endif
     }
     else if (max_eyes(&probable_eyes_b) < min_eyes(&probable_eyes_a)) {
       *resulta = WIN;
@@ -1076,7 +1141,12 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE("I have more eyes\n");
       SGFTRACE_SEMEAI(PASS_MOVE, WIN, WIN, "I have more eyes");
+#if USE_HASHTABLE_NG
+      READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos,
+			    depth - stackp, move, PASS_MOVE, WIN, WIN);
+#else
       READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, WIN);
+#endif
     }
     else {
       *resulta = WIN;
@@ -1084,7 +1154,12 @@ do_owl_analyze_semeai(int apos, int bpos,
       *move = PASS_MOVE;
       TRACE("Seki\n");
       SGFTRACE_SEMEAI(PASS_MOVE, WIN, 0, "Seki");
+#if USE_HASHTABLE_NG
+      READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos, 
+			    depth - stackp, move, PASS_MOVE, WIN, 0);
+#else
       READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, 0);
+#endif
     }
   }
   
@@ -1097,7 +1172,12 @@ do_owl_analyze_semeai(int apos, int bpos,
     TRACE("No move found\n");
     SGFTRACE_SEMEAI(PASS_MOVE, *resulta, *resultb, "No move found");
     *move = PASS_MOVE;
+#if USE_HASHTABLE_NG
+    READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos,
+			  depth - stackp, move, PASS_MOVE, *resulta, *resultb);
+#else
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, *resulta, *resultb);
+#endif
   }
 
   *resulta = best_resulta;
@@ -1106,7 +1186,12 @@ do_owl_analyze_semeai(int apos, int bpos,
     best_move = PASS_MOVE;
   *move = best_move;
   SGFTRACE_SEMEAI(best_move, best_resulta, best_resultb, best_move_name);
+#if USE_HASHTABLE_NG
+  READ_RETURN_SEMEAI_NG(komaster, kom_pos, SEMEAI, apos, bpos, depth - stackp, 
+			move, best_move, best_resulta, best_resultb);
+#else
   READ_RETURN_SEMEAI(read_result, move, best_move, best_resulta, best_resultb);
+#endif
 }
 
 /* Play a move, update goal and boundaries appropriately, and call
@@ -1681,6 +1766,9 @@ do_owl_attack(int str, int *move, int *wormid,
   struct eyevalue probable_eyes; /* Best guess of eyevalue. */
   const char *live_reason;
   int move_cutoff;
+/* FIXME: Temporary measure to turn new cache back on for owl. */
+#undef USE_HASHTABLE_NG
+#define USE_HASHTABLE_NG 1
 #if USE_HASHTABLE_NG
   int  xpos;
   int  value1;
@@ -1698,7 +1786,7 @@ do_owl_attack(int str, int *move, int *wormid,
 #if USE_HASHTABLE_NG
 
   if ((hashflags & HASH_OWL_ATTACK)
-      && tt_get(&ttable, komaster, kom_pos, OWL_ATTACK, str,
+      && tt_get(&ttable, komaster, kom_pos, OWL_ATTACK, str, NO_MOVE,
 		depth - stackp, NULL, 
 		&value1, &value2, &xpos) == 2) {
 
@@ -2426,7 +2514,7 @@ do_owl_defend(int str, int *move, int *wormid,
 #if USE_HASHTABLE_NG
 
   if ((hashflags & HASH_OWL_DEFEND)
-      && tt_get(&ttable, komaster, kom_pos, OWL_DEFEND, str,
+      && tt_get(&ttable, komaster, kom_pos, OWL_DEFEND, str, NO_MOVE,
 		depth - stackp, NULL, 
 		&value1, &value2, &xpos) == 2) {
 
