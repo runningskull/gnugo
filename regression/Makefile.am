@@ -186,6 +186,9 @@ trevorb: trevorb.tst
 trevorc: trevorc.tst
 	$(srcdir)/eval.sh trevorc.tst
 
+trevord: trevord.tst
+	$(srcdir)/eval.sh trevord.tst
+
 semeai: semeai.tst
 	$(srcdir)/eval.sh semeai.tst
 
@@ -245,5 +248,6 @@ fourth_batch: strategy4.tst capture.tst connect.tst global.tst vie.tst
 	$(srcdir)/regress.sh $(srcdir) trevora.tst
 	$(srcdir)/regress.sh $(srcdir) trevorb.tst
 	$(srcdir)/regress.sh $(srcdir) trevorc.tst
+	$(srcdir)/regress.sh $(srcdir) trevord.tst
 	$(srcdir)/regress.sh $(srcdir) semeai.tst
 	$(srcdir)/regress.sh $(srcdir) strategy4.tst

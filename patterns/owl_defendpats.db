@@ -1594,6 +1594,7 @@ Xaa.O
 
 
 Pattern D509
+# FIXME: (see trevor:360)
 
 XO?      capture to defend
 *XO
@@ -1605,7 +1606,7 @@ Xa?
 *XO
 ---
 
-;does_defend(*,a)
+;does_defend(*,a) == WIN
 
 
 Pattern D510
@@ -4291,7 +4292,7 @@ Pattern D1136
 #tm new pattern (3.1.14)
 #See strategy:206
 #FIXME:  This pattern may match inappropriately, and
-#        probably need a constraint.
+#        probably needs a constraint.
 
 OOO	very low value
 ..X
@@ -5828,7 +5829,8 @@ O*X
 ; && oplay_attack(*,e,d)
 
 
-Pattern 1380
+Pattern D1380
+# tm (?) New Pattern (3.1.17)
 
 ?..	escape
 .*.
@@ -5842,6 +5844,37 @@ O.?
 
 ; owl_escape_value(A) + owl_escape_value(B) + owl_escape_value(C) > 3
 
+
+Pattern D1381
+# tm New Pattern (3.1.19)
+
+O*.
+?XO
+
+:8,-,value(70)
+
+O*a
+?CB
+
+; (owl_escape_value(B) > 0 || owl_escape_value(a) > 0) &&
+; oplay_attack_either(*,a,a,C)
+
+
+Pattern D1382
+# tm New Pattern (3.1.19)
+
+.O   threaten attack and connect
+*X
+O.
+
+:8,-,value(70)
+
+cA   threaten attack and connect
+*d
+B.
+
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0) &&
+; oplay_attack(*,c,d)
 
 #########################################################
 #                                                       #

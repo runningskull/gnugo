@@ -260,6 +260,17 @@ loadsgf games/trevor/trevor_26.sgf 39
 261 gg_genmove black
 #? [F9]
 
+loadsgf games/trevor/trevor_26.sgf 33
+trymove black C1
+trymove white C2
+trymove black F1
+262 defend C2
+#? [0]*
+popgo
+popgo
+popgo
+
+
 
 # Ack, protect the cut!
 loadsgf games/trevor/trevor_27.sgf 35

@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- tuning
+- owl tuning
+- sgf2tst repair
+- regress.plx improvements
+	
 3.1.18 released December 23, 2001
 
 - 1D conversion of incremental.texi

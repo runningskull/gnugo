@@ -5115,6 +5115,24 @@ Xbd
 ;!oplay_defend_both(b,*,a,b) && oplay_defend_both(*,b,d,c,a,d)
 
 
+Pattern EB717
+# tm New Pattern (3.1.18)
+
+?OO..        prevent incursion
+.XX*.
+-----
+
+:8,sOXb
+
+?OB..
+cXA*.
+-----
+
+; lib(A) == 2 &&
+; !oplay_attack_either(*,B,*)
+
+
+
 ############################################################
 # Monkey jump and other intrusions on first and second lines
 ############################################################
@@ -6934,32 +6952,35 @@ O.*.?
 :8,OEd,jump_out_helper
 
 
-Pattern CB11
-#    This pattern needs revision. It often comes up with
-#    stupid moves, e.g. in a position like this,
+# tm removed this pattern (3.1.18)
 #
-#    X.....
-#    .O...X
-#    O.*...
-#    XX....
-#    ......
+#Pattern CB11
+##    This pattern needs revision. It often comes up with
+##    stupid moves, e.g. in a position like this,
+##
+##    X.....
+##    .O...X
+##    O.*...
+##    XX....
+##    ......
+##
+##    where X can respond to the left of * and O only has time to
+##    defend one cutting point.
+## FIXME: see also arend:10
 #
-#    where X can respond to the left of * and O only has time to
-#    defend one cutting point.
-
-.xxxxx          prevent X from sealing an area
-O.xxxx
-.*....
-X.....
-
-:8,OXEe,value(12)
-
-.abcde
-O.fghi
-.*....
-X.....
-
-; x_somewhere(a,b,c,d,e,f,g,h,i)
+#.xxxxx          prevent X from sealing an area
+#O.xxxx
+#.*....
+#X.....
+#
+#:8,OXEe,value(12)
+#
+#.abcde
+#O.fghi
+#.*....
+#X.....
+#
+#; x_somewhere(a,b,c,d,e,f,g,h,i)
 
 
 Pattern CB12
@@ -7634,6 +7655,8 @@ XX*.     block! this can be life or death
 
 
 Pattern CB237
+# FIXME:  Need a connection helper to verify
+#   that * can't be cut off & die in X moyo. (see viking:13)
 
 ??x?          extend
 O..X
@@ -13173,7 +13196,7 @@ Pattern LE13
 
 Pattern LE14
 # FIXME: This pattern looks way to general/overvalued
-#   see global:27
+#   see global:27, strategy4:212
 
 xxx      safe jump into opponent's moyo
 ..x

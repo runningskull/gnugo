@@ -36,14 +36,15 @@
 # interpretted in order:
 # 
 #  1) Lines starting with "#" are copied into the tst file.
-#  2) owl_attack or owl_defend commands can be put in such as:
+#  2) owl_attack, owl_defend, attack, defend, and eval_eye commands can 
+#     be put in such as:
 #         owl_attack A1
 #         1 G2
 #  3) Otherwise, a single line is interpreted as the correct answer, with
 #     the appropriate "gg_genmove" directive added automatically.
 # 
 # See regression/trevora.tst for examples. The sgf files for this test
-# are in regression/games/trevor/auto .
+# are in regression/games/trevor/auto/a??.sgf
 
 use strict;
 use warnings;
@@ -51,30 +52,35 @@ use warnings;
 local $/;
 undef $/;
 
-my $probnum = 100;
+my $autoprobnum = 100;
 my $increment = 10;
 
 while (<>) {
   my $content = $_;
   if ($content !~ /C\[/) {
-    warn "$ARGV: No comments.";
+    print STDERR "Warning : $ARGV : No comments.\n";
     next;
   }
 
   print "\n\n# $ARGV problems:\n\n";
-
+  
   $content =~ s/^\(;//;
-
+  $content .= ';';
+  
+  my $DEBUG = 0;  
+  
   my $i=0;
-  while ($content =~ /(.*?);/sg) {  # for each node.
+  my $done=0;
+  while ($content =~ /(.*?);/sg  && ($done=1)) {  # for each node.
     $i++;
     my $node = $1;
-    next if $node !~ /C\[(.*)\]/s;
+    print "CONTENT:'$content':CONTENT\n\n" if $DEBUG;
+    print "NODE:'$node':NODE\n\n" if $DEBUG;
+    next if $node !~ /C\[(.*)\]/s ;
     my $comments = "";
     my $command = "";
     my $comment = $1;
-    my ($othercolor) = $node =~ /(W|B)\[/       or die "No W or B move
-here: $ARGV($i): $node";
+    my ($othercolor) = $node =~ /(W|B)\[/       or die "No W or B move here: $ARGV($i): $node";
     while ($comment =~ /^(.*)$/mg) { # i.e. for each line of comment
       my $line = $1;
       $line =~ s/\s*$//;
@@ -84,24 +90,29 @@ here: $ARGV($i): $node";
         next;
       }
       $command .= "loadsgf $ARGV $i\n";
-      #$command .= "showboard\n" if 0;
-      if ($line =~ /owl_attack|owl_defend/) {
-        $command .= "$probnum $line\n";  #ah, this line is a specific gtp
-command.
+      my $probnum = $autoprobnum;
+      if ($line =~ /^([0-9]*)\s*((?:owl_attack|attack|owl_defend|defend|eval_eye).*)$/) {
+        if ($1 eq "") {
+          $probnum = $autoprobnum;
+        } else {
+          $probnum = $1;
+          $autoprobnum -= $increment;
+        }
+
+        $command .= "$probnum $2\n";  #ah, this line is a specific gtp command.
         $comment =~ /^(.*)$/mg;          #read next line for answer.
         $line = $1;
         $line =~ s/\s*$//;
         $line =~ s/^\s*//;
       } else {
-        $command .= "$probnum gg_genmove " . ($othercolor eq 'B' ? 'white'
-: 'black') . "\n";
+        $command .= "$probnum gg_genmove " . ($othercolor eq 'B' ? 'white' : 'black') . "\n";
       }
-      $probnum += $increment;
-      $command .= "#? [$line]\n";
-
+      $autoprobnum += $increment;
+      $command .= "#? [$line]*\n";
+      print $command if $DEBUG;
     }
-    print "$comments$command\n\n";# print "\t$i: $1\n";
+    print "$comments$command\n\n";
   }
-
+  
 }
 

@@ -372,6 +372,8 @@ if ($num) {
 </TD></TR></TABLE>
 @;
 
+  print qq@<TABLE><TR><TD> dragon_status:\n@;
+
   my $boardsize = $attribs{"boardsize"};  #need to add to export.
 
   my $colorboard;
@@ -414,6 +416,17 @@ if ($num) {
   $colorboard .= "\n</TABLE>\n";
 
   print $colorboard;
+ 
+  print qq@</TD><TD valign=top>
+<PRE>\n\n\n\n
+<FONT color=green>green=alive</FONT>
+<FONT color=cyan>cyan=dead</FONT>
+<FONT color=red>red=critical</FONT>
+<FONT color=yellow>yellow=unknown</FONT>
+<FONT color=magenta>magenta=unchecked</FONT>
+</PRE>
+</TD></TR>
+<TR><TD>owl_status: coming soon.</TD><TD></TD></TR></TABLE>@;
  
   my $gtpall = $attribs{gtp_all};
   $gtpall  =~ s/<BR>//mg;

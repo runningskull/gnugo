@@ -614,6 +614,25 @@ BaO
 ;xplay_defend_both(*,a,*,B)
 
 
+Pattern CB13
+# tm New pattern (3.1.18)
+
+xxx	cut!
+.!.
+O*O
+Xxx
+
+:8,B
+
+xxx
+dae
+O*O
+Fbx
+
+; xplay_defend_both(*,a,b,d,e) &&
+; xplay_defend_both(*,a,b,e,d) &&
+; xplay_defend_both(*,b,a,a,F)
+
 
 ########################
 #

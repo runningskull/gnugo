@@ -1364,40 +1364,60 @@ xXx
 
 
 Pattern Shape9a
+# tm modified (3.1.18)
 
-...     don't give opponent ponnuki
-.*.
+ooo     don't give opponent ponnuki
+o*o
 XOX
 .X.
 
 :|,-,shape(5)
 
+bdB     don't give opponent ponnuki
+c*C
+XOX
+.X.
+
+
+; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
+; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
+
 
 Pattern Shape9b
+# tm modified (3.1.18)
 
-...     don't give opponent ponnuki
-.*.
+ooo     don't give opponent ponnuki
+o*o
 XOX
 .XX
 
-:8,-,shape(5)
+:8,-,shape(4)
 
+bdB     don't give opponent ponnuki
+c*C
+XOX
+.XX
+
+; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
+; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B)))
 
 Pattern Shape9c
 
-...     don't give opponent ponnuki
-.*.
+ooo     don't give opponent ponnuki
+o*o
 XOX
 .XO
 
 :8,-,shape(5)
 
-...
-.*.
+bdB
+c*C
 XOA
 .XO
 
-;!attack(A)
+; (o_somewhere(c) + o_somewhere(C) + o_somewhere(d) <= 1) &&
+; !(o_somewhere(d) && (o_somewhere(b) || o_somewhere(B))) &&
+; !attack(A)
 
 
 Pattern Shape10

@@ -1138,7 +1138,7 @@ X.X
 
 #tm removed (3.1.15)
 #Pattern A405
-## FIXME: Bad pattern.  Probably can be deleted.
+## FIXED: Bad pattern.  Probably can be deleted.
 ##   See vie:19 for unnecessary blocking.
 #
 #???
@@ -3302,9 +3302,10 @@ AX*
 Pattern A1119
 # tm New Pattern (3.1.17)
 #   analog to defense pattern D1348
+# tm Modified (3.1.18)  (see trevorc:100)
 
 X*?	    cut off escape route.
-..X
+o.X
 
 :8,n,value(36)
 

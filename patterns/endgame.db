@@ -210,6 +210,21 @@ Pattern EE6
 ; && xplay_attack(*,a,b,a)
 
 
+Pattern EE7
+# tm New Pattern (3.1.19)
+#   s classification, in case of ko (see trevorc:180)
+
+?.X?
+O.*.
+
+:8,sOX,terri(0.75)
+
+o.X?
+O.*a
+
+;proper_eye(a) && safe_omove(*)
+
+
 # first line hanes (except in corner)
 #####################################
 
@@ -376,6 +391,25 @@ O*a
 ---
 
 ;marginal_eye(*) && proper_eye(a) && max_eye_value(a) > 0
+
+
+Pattern EE201a
+# tm New Pattern (3.1.19)
+
+XX?                     first line followup.
+*..
+---
+
+:8,OX,followup(1)
+
+XX?
+*a.
+---
+
+;marginal_eye(*) && proper_eye(a) && max_eye_value(a) > 0
+;&& !oplay_attack(*,a,*)
+
+
 
 
 Pattern EE202
@@ -1037,6 +1071,7 @@ X*.
 Pattern EF102
 # tm New Pattern (3.1.16)
 # tm modified (3.1.17)
+# FIXME: see endgame:218
 
 O.
 *O
@@ -1414,6 +1449,24 @@ Pattern CF1
 ?X
 
 ;proper_eye(a)
+
+
+Pattern CF2
+# tm New Pattern (3.1.19)  (see trevorc:130)
+#   see comment for Patterm CF1 on over-generality
+
+xxx
+x.x
+X*X
+
+:-,X,followup(2)
+
+xBx
+AdC
+X*X
+
+; proper_eye(d) &&
+; (x_somewhere(A) + x_somewhere(B) + x_somewhere(C) <=1) 
 
 
 ######################################################################

@@ -818,4 +818,19 @@ Pattern VA47
 :8,s,value(75)
 
 
+Pattern VA48
+# tm New Pattern (3.1.18) (see trevor:430)
+
+
+X*    atari outside eyespace
+oX
+
+:8,-,value(35)
+
+X*
+AB
+
+; lib(B) <= 2 && owl_eyespace(A,B)
+
+
 # END OF FILE
