@@ -152,6 +152,8 @@ static void special_rescue5_moves(int str, int libs[3],
     				  struct reading_moves *moves);
 static void special_rescue6_moves(int str, int libs[3],
     				  struct reading_moves *moves);
+static void set_up_snapback_moves(int str, int lib,
+    				  struct reading_moves *moves);
 static void edge_clamp_moves(int str, struct reading_moves *moves);
 static int do_attack(int str, int *move, int komaster, int kom_pos);
 static int attack1(int str, int *move, int komaster, int kom_pos);
@@ -1109,7 +1111,7 @@ defend1(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("defend1", str);
   reading_node_counter++;
   
-  gg_assert(IS_STONE(board[str]));
+  ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 1, str);
   RTRACE("try to escape atari on %1m.\n", str);
 
@@ -1120,29 +1122,14 @@ defend1(int str, int *move, int komaster, int kom_pos)
   /* Collect moves to try in the first batch.
    * 1. First order liberty.
    * 2. Chain breaking moves.
+   * 3. Moves to set up a snapback.
    */
   moves.pos[0] = lib;
   moves.score[0] = 0;
   moves.num = 1;
   
   break_chain_moves(str, &moves);
-
-  /* Try to set up snap-back. */
-  if (stackp <= backfill_depth && countstones(str) == 1) {
-    int adjs[MAXCHAIN];
-    int adj = chainlinks2(str, adjs, 2);
-    int r;
-    int libs[2];
-    for (r = 0; r < adj; r++) {
-      findlib(adjs[r], 2, libs);
-      if (neighbor_of_string(libs[0], str)
-	  && !is_self_atari(libs[1], color))
-	ADD_CANDIDATE_MOVE(libs[1], 0, moves);
-      if (neighbor_of_string(libs[1], str)
-	  && !is_self_atari(libs[0], color))
-	ADD_CANDIDATE_MOVE(libs[0], 0, moves);
-    }
-  }
+  set_up_snapback_moves(str, lib, &moves);
 
   order_moves(str, &moves, color, read_function_name, 0);
 
@@ -4817,12 +4804,14 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
   /* Collect moves to try in the first batch.
    * 1. First order liberty.
    * 2. Chain breaking moves.
+   * 3. Moves to set up a snapback.
    */
   moves.pos[0] = lib;
   moves.score[0] = 0;
   moves.num = 1;
   
   break_chain_moves(str, &moves);
+  set_up_snapback_moves(str, lib, &moves);
   order_moves(str, &moves, color, read_function_name, 0);
 
   for (k = 0; k < moves.num; k++) {
@@ -5370,6 +5359,51 @@ tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS])
     gprintf("static int safe_atari_score                 = %d;\n", safe_atari_score);
   }
 }
+
+/*
+ * set_up_snapback_moves() is called with (str) a string having a
+ * single liberty at (lib).
+ *
+ * This adds moves which may defend a string in atari by capturing a
+ * neighbor in a snapback. One example is this position:
+ *
+ * OOOOO
+ * OXXXO
+ * OX.OX
+ * OXOXX
+ * OX*..
+ * -----
+ *
+ * This code also finds the move * to defend the lone O stone with ko
+ * in this position:
+ *
+ * |XXXXX
+ * |XOOOX
+ * |OX.OO
+ * |.*...
+ * +-----
+ *
+ */
+
+static void
+set_up_snapback_moves(int str, int lib, struct reading_moves *moves)
+{
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int libs2[2];
+
+  ASSERT1(countlib(str) == 1, str);
+
+  /* This can only work if our string is a single stone and the
+   * opponent is short of liberties.
+   */
+  if (stackp <= backfill_depth
+      && countstones(str) == 1
+      && approxlib(lib, other, 2, libs2) == 1
+      && !is_self_atari(libs2[0], color))
+    ADD_CANDIDATE_MOVE(libs2[0], 0, *moves);
+}
+
 
 
 

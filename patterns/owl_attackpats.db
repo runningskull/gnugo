@@ -1207,18 +1207,38 @@ Y...
 
 
 Pattern A403
+# gf Devalued. See also A403b. (3.3.13)
 
 ..*          knight's move to block
 O..
 OYX
 
-:8,-,value(75)
+:8,-,value(55)
 
 cb*
 Aad
 OYX
 
 ; oplay_defend_both(*,a,b,c,A,b) && oplay_defend_both(*,b,a,d,*,A)
+
+
+Pattern A403b
+# gf More specific pattern and constraint. (3.3.13)
+
+???
+..*          knight's move to block
+O..
+OYX
+
+:8,-,value(75)
+
+??e
+cb*
+Aad
+OYX
+
+; owl_escape_value(e)>0
+; && oplay_defend_both(*,a,b,c,A,b) && oplay_defend_both(*,b,a,d,*,A)
 
 
 Pattern A404
@@ -4296,6 +4316,17 @@ Pattern A1311
 +----
 
 :8,s,value(80)
+
+
+Pattern A1311b
+# gf New pattern. (3.3.13)
+
+|.XY??
+|XO.XO          kill without ko
+|.*..?
++-----
+
+:8,s,value(81)
 
 
 Pattern A1312

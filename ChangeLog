@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function set_up_snapback_moves() in reading.c
+- defend1() and restricted_defend1() revised
 - TRACE macros and friends unified
 - matchpat.c converted to 1D
 - strategic bonus for connecting critical dragons out reintroduced

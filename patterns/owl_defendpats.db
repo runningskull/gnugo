@@ -1605,6 +1605,7 @@ Pattern D504
 
 Pattern D505
 #tm modified (3.1.22)
+# gf Changed does_attack to xplay_defend for better ko handling. (3.3.13)
 
 OOX         hanging connection to defend and make eye
 ..O
@@ -1618,7 +1619,8 @@ dbc
 .*.
 ---
 
-; lib(a)>1 && safe_xmove(b) && oplay_attack(*,d,b,d) && does_attack(b,c)
+; lib(a)>1 && safe_xmove(b) && oplay_attack(*,d,b,d)
+; && xplay_defend(b,c) != WIN
 
 
 Pattern D506
