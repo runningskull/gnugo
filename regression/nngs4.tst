@@ -173,6 +173,25 @@ loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 185
 430 gg_genmove black
 #? [H10|G9|G10|G11|M6|L7|K7]*
 
+loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 20
+440 restricted_genmove black E6 B5
+#? [E6]
+
+loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 92
+450 gg_genmove black
+#? [O8]
+
+loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 204
+460 gg_genmove black
+#? [N10]
+
+
+
+
+
+
+
+
 
 ############ End of Tests #################
 
