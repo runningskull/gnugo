@@ -80,7 +80,12 @@
 # A14xx Invasion patterns
 # A15xx Ko patterns
 # A16xx Specific edge attacks
-# 
+
+
+goal_elements Xx
+callback_data none
+
+ 
 #########################################################
 #                                                       #
 #          Limiting moves on the fourth line            #

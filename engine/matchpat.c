@@ -1052,7 +1052,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 
     if (!anchor_in_goal) { 
       /* goal check */
-      if (goal != NULL) {
+      if (goal != NULL && board[pos] != EMPTY) {
         if (goal[pos])
 	  found_goal = 1;
         else if (board[pos] == color)

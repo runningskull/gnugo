@@ -60,6 +60,11 @@
 #       captured, check also that an X move cannot be captured.
 # 
 
+
+goal_elements Xx
+callback_data !
+
+
 Pattern VA1
 
 ?x??        threaten two eyes simultaneously

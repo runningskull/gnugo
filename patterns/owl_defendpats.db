@@ -80,7 +80,12 @@
 # D12xx Kikashi
 # D13xx Escape
 # D14xx Ko
-# 
+
+
+goal_elements Oo
+callback_data none
+
+ 
 #########################################################
 #                                                       #
 #         Expanding moves on the fourth line            #
