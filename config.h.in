@@ -49,12 +49,6 @@
 /* Define if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 
-/* Define if you have the <glib.h> header file. */
-#undef HAVE_GLIB_H
-
-/* Define if you have the `g_vsnprintf' function. */
-#undef HAVE_G_VSNPRINTF
-
 /* Define if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -69,9 +63,6 @@
 
 /* Define if you have the <ncurses/term.h> header file. */
 #undef HAVE_NCURSES_TERM_H
-
-/* Define if you have the `setlinebuf' function. */
-#undef HAVE_SETLINEBUF
 
 /* Define if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -105,12 +96,6 @@
 
 /* Define if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
-
-/* Define if you have the `usleep' function. */
-#undef HAVE_USLEEP
-
-/* Define if you have the `vsnprintf' function. */
-#undef HAVE_VSNPRINTF
 
 /* Define if you have the `vwprintw' function. */
 #undef HAVE_VWPRINTW

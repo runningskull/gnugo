@@ -293,11 +293,7 @@ void
 play_gtp(FILE *gtp_input, int gtp_initial_orientation)
 {
   /* Try to make sure that we have a useful level of buffering of stdout. */
-#ifdef HAVE_SETLINEBUF
-  setlinebuf(stdout);
-#else
   setbuf(stdout, NULL);
-#endif
 
   /* Inform the GTP utility functions about the board size. */
   gtp_internal_set_boardsize(board_size);

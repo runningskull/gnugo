@@ -26,10 +26,6 @@
 
 #include "gg_utils.h"
 
-#ifdef HAVE_GLIB_H
-#include <glib.h>
-#endif
-
 /* Avoid compiler warnings with unused parameters */
 #define UNUSED(x)  (void)x
 
@@ -219,18 +215,11 @@ write_color_char(int c, int x)
 void
 gg_vsnprintf(char *dest, unsigned long len, const char *fmt, va_list args)
 {
-    
-#ifdef HAVE_VSNPRINTF
-  vsnprintf(dest, len, fmt, args);
-#elif HAVE_G_VSNPRINTF
-  g_vsnprintf(dest, len, fmt, args);
-#elif HAVE_VISUAL_C
-  _vsnprintf(dest, len, fmt, args);
-#else
+  /* Removed calls to vsnprintf() for SPEC as it is not guaranteed to exist
+   * in ANSI C. /ab
+   */
   UNUSED(len);
   vsprintf(dest, fmt, args);
-#endif
-
 }
 
 void

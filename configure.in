@@ -168,32 +168,9 @@ AC_PATH_PROG(perl, perl)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
 
-dnl results of setlinebuf test used in interface/play_ascii.c
-dnl vsnprintf not universally available
 dnl usleep not available in Unicos and mingw32
-AC_CHECK_FUNCS(setlinebuf vsnprintf gettimeofday usleep times)
+AC_CHECK_FUNCS(gettimeofday times)
 
-dnl if snprintf not available try to use g_snprintf from glib
-if test $ac_cv_func_vsnprintf = no; then
-    AC_CHECK_PROG(glibconfig,glib-config,yes,no)
-    if test $ac_cv_prog_glibconfig = yes;then
-	glib_cflags=`glib-config --cflags`
-	glib_libs=`glib-config --libs`
-	CPPFLAGS="$CPPFLAGS $glib_cflags"
-	LIBS="$LIBS $glib_libs"
-	AC_CHECK_FUNCS(g_vsnprintf)
-	AC_CHECK_HEADERS(glib.h)
-	if test $ac_cv_func_g_vsnprintf = no; then
-    	   AC_MSG_WARN([glib installation problem.
-	   Continuing without glib ])
-        fi
-    else
-    	   AC_MSG_WARN([Neither vsnprintf nor glib found. Gnugo is
-	   compiled but it is safer to get glib at
-	   http://www.gtk.org/])
-    fi
-fi
- 
 dnl AM_FUNC_ERROR_AT_LINE
 
 AH_TEMPLATE([HAVE___FUNCTION__],
@@ -293,18 +270,6 @@ else
   else
     AC_DEFINE(GRID_OPT, 1)
   fi
-fi
-
-
-dnl ------------ set cache size ----------
-
-AH_TEMPLATE([DEFAULT_MEMORY],
-[Default hash table size in megabytes])
-
-if test "$enable_cache_size" ; then
-   AC_DEFINE_UNQUOTED(DEFAULT_MEMORY, $enable_cache_size)
-else
-   AC_DEFINE_UNQUOTED(DEFAULT_MEMORY, $default_cache_size)
 fi
 
 
