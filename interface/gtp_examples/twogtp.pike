@@ -21,7 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-#define DUMP_GTP_PIPES		0
+#define DUMP_GTP_PIPES		1
 
 
 int
@@ -334,9 +334,12 @@ class GtpServer {
     string result;
     int time_notch = 0;
 
-    if (use_time_control && main_time >= 0.0) {
-      send_command(sprintf("time_left %s %d %d", color,
-			   (int) time_left, stones_left));
+    if (use_time_control) {
+      if (main_time >= 0.0) {
+	send_command(sprintf("time_left %s %d %d", color,
+			     (int) time_left, stones_left));
+      }
+
 #ifdef __AUTO_BIGNUM__
       time_notch = gethrtime();
 #else
