@@ -656,6 +656,10 @@ add_to_entry_list(entry_t **pplist, int l, int r, int val)
   gg_assert(!get_from_entry_list(*pplist, l, r));
 
   new_entry = malloc(sizeof(entry_t));
+  if (new_entry == NULL) {
+    fprintf (stderr, "No memory left for new entry\n");
+    exit (1);
+  }
   new_entry->pnext = *pplist;
   new_entry->l = l;
   new_entry->r = r;

@@ -1358,23 +1358,23 @@ write_patterns(FILE *outfile, char *name)
   }
 
   if (fullboard) {
-    printf("  {NULL,0,NULL,0,0,0.0}\n};\n");
+    fprintf(outfile, "  {NULL,0,NULL,0,0,0.0}\n};\n");
     return;
   }
   
   /* Add a final empty entry. */
-  printf("  {NULL, 0,0,NULL,0,0,0,0,0,0,0,0,0");
+  fprintf(outfile, "  {NULL, 0,0,NULL,0,0,0,0,0,0,0,0,0");
 #if GRID_OPT
-  printf(",{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}");
+  fprintf(outfile, ",{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}");
 #endif
-  printf(",0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,NULL,NULL,0");
+  fprintf(outfile, ",0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,NULL,NULL,0");
 #if PROFILE_PATTERNS
-  printf(",0,0");
+  fprintf(outfile, ",0,0");
 #if DFA_ENABLED
-    printf(",0");
+    fprintf(outfile, ",0");
 #endif /* DFA_ENABLED */
 #endif
-  printf("}\n};\n");
+  fprintf(outfile, "}\n};\n");
 }
 
 /* Write out the pattern db */
@@ -1660,7 +1660,7 @@ main(int argc, char *argv[])
 	    pats_with_constraints, patno);
 
   /* Write the autohelper code. */
-  printf("%s", autohelper_code);
+  fprintf(output_FILE, "%s", autohelper_code);
 
   write_patterns(output_FILE, argv[gg_optind]);
 
