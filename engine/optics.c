@@ -1772,11 +1772,56 @@ topological_eye(int pos, int color,
   
   /* Loop over the diagonal directions. */
   for (k = 4; k < 8; k++) {
+    int diag = pos + delta[k];
     val = evaluate_diagonal_intersection(I(pos) + deltai[k],
 					 J(pos) + deltaj[k], color,
 					 &attack_point, &defense_point, 
 					 my_eye);
+    if (val < 2.0 && board[diag] == OTHER_COLOR(color) && !is_edge_vertex(pos) 
+	&& neighbor_of_string(pos, diag) && countstones(diag) >= 3) {
+      int strings[3];
+      int string_count;
+      int s;
+      string_count = 0;
+      for (r = 0; r < 4; r++) {
+	int str;
+	str = pos + delta[r];
+
+	if (board[str] != color)
+	  continue;
+
+	ASSERT1(string_count < 3, pos);
+	for (s = 0; s < string_count; s++)
+	  if (same_string(str, strings[s]))
+	    break;
+	if (s != string_count)
+	  continue;
+
+	strings[string_count++] = str;
+      }
+      if (string_count > 1) {
+	for (s = 0; s < string_count; s++) {
+	  int libs[MAX_LIBERTIES];
+	  int adj_eye_count;
+	  int lib_count;
+	  adj_eye_count = 0;
+	  lib_count = findlib(strings[s], MAX_LIBERTIES, libs);
+	  if (lib_count > MAX_LIBERTIES)
+	    continue;
+
+	  for (r = 0; r < lib_count && adj_eye_count < 2; r++)
+	    if (is_proper_eye_space(libs[r]))
+	      adj_eye_count++;
+	  if (adj_eye_count < 2) {
+	    val = 2.0;
+	    break;
+	  }
+	}
+      }
+    }
+
     sum += val;
+
     if (val > 0.0 && val < 2.0) {
       /* Diagonals off the edge has value 1.0 but no attack or defense
        * point.
