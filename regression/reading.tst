@@ -835,6 +835,10 @@ trymove W L4
 popgo
 popgo
 
+loadsgf games/reading45.sgf
+199 defend D2
+#? [0]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
