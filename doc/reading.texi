@@ -15,7 +15,6 @@ individual strings, @dfn{Owl reading} which is concerned
 with the life and death of dragons, and @dfn{connection reading}.
 In this Chapter, we document
 the tactical reading code, which is in @file{engine/reading.c}.
-For a summary of the reading functions see @xref{Reading Functions}.
 
 @menu
 * Reading Basics::               Reading Basics
@@ -26,7 +25,6 @@ For a summary of the reading functions see @xref{Reading Functions}.
 * Another Ko Example::           Another Ko Example
 * Alternate Komaster Schemes::   Alternate Komaster Schemes
 * Superstrings::                 Superstrings
-* Reading Functions::            Utilities from @file{engine/reading.c}
 * Debugging::                    Debugging the reading code
 @end menu
 
@@ -158,9 +156,6 @@ before continuation).  This parameter may be set using the
 
 @cindex reading.c
 
-A partial list of the functions in @file{reading.c} (@pxref{Reading
-Functions} for a fuller list).
-
 @itemize @bullet
 @item @code{int attack(int str, int *move)}
 @findex attack
@@ -230,7 +225,6 @@ reinitialized at the beginning of each move by a call to
 * Hash Calculation::            Calculation of the hash value
 * Hash Organization::           Organization of the hash table
 * Hash Structures::             Structures in @file{hash.h}
-* Hash Functions::              Hash functions and macros
 @end menu
 
 @node Hash Calculation
@@ -454,162 +448,6 @@ never removed or reallocated in the current implementation.
 @item The results of the searches.  Since many different searches can
 be done in the same position, there should be more of these than
 hash nodes.
-@end itemize
-
-@node Hash Functions
-@subsection Hash Functions
-
-The following functions are defined in @file{hash.c}:
-
-@itemize @bullet
-@item @code{void hash_init()}
-@quotation
-Initialize the entire hash system.
-@end quotation
-@item @code{int hashdata_compare(Hash_data *key1, Hash_data *key2)}
-@findex hashdata_compare
-@quotation 
-Returns 0 if @code{*key1 == *key2}, 2 if the hashvalues differ, or 1 if 
-only the hashpositions differ.
-This adheres (almost) to the standard compare function semantics 
-which are used e.g. by the comparison functions used in qsort().
-@end quotation
-@item @code{void hashposition_dump(Hashposition *pos, FILE *outfile)}
-@findex hashposition_dump
-@quotation
-Dump an ASCII representation of the contents of a Hashposition onto
-the FILE outfile. 
-@end quotation
-@item @code{int hashdata_diff_dump(Hash_data *key1,Hash_data *key2 )}
-@findex hashdata_diff_dump
-@quotation
-Compare two Hashdata structs. If equal: return zero. If not: dump a 
-human readable summary of any differences to stderr.
-The return value is the same as for hashdata_compare. This function is
-primarily intended to be used in assert statements.
-@end quotation
-@item @code{void hashdata_recalc(Hash_data *target, Intersection *p, int kopos)}
-@findex hashdata_recalc
-@quotation
-Calculate the compactboard and the hashvalue in one function.
-They are always used together and it saves us a loop and a
-function call.
-@end quotation
-@item @code{void hashdata_set_ko(Hash_data *hd, int pos)}
-@findex hashdata_set_ko
-@quotation
-Set or remove a ko at @code{pos}. 
-@end quotation
-@item @code{void hashdata_remove_ko(Hash_data *hd)}
-@findex hashdata_remove_ko
-@quotation
-Remove any ko from the hash value and hash position.
-@end quotation
-@item @code{void hashdata_invert_stone(Hash_data *hd, int pos, int color)}
-@findex hashdata_invert_stone
-@quotation
-Set or remove a stone of @code{color} at @code{pos} in a Hash_data.
-@end quotation
-@item @code{void read_result_dump(Read_result *result, FILE *outfile)}
-@findex read_result_dump
-@quotation
-Dump an ASCII representation of the contents of a Read_result onto
-the FILE outfile.
-@end quotation
-@item @code{void hashnode_dump(Hashnode *node, FILE *outfile)}
-@findex hashnode_dump
-@quotation 
-Dump an ASCII representation of the contents of a Hashnode onto
-the FILE outfile. 
-@end quotation
-@item @code{int hashtable_init(Hashtable *table, int tablesize, int num_nodes, int num_results)}
-@findex hashtable_init
-@quotation 
-Initialize a hash table for a given total size and size of the
-hash table. Returns 0 if something went wrong. Just now this means that there
-wasn't enough memory available.
-@end quotation
-@item @code{Hashtable * hashtable_new(int tablesize, int num_nodes, int num_results)}
-@findex hashtable_new
-@quotation 
-Allocate a new hash table and return a pointer to it. Return NULL if there is
-insufficient memory.
-@end quotation
-@item @code{void hashtable_clear(Hashtable *table)}
-@findex hashtable_clear
-@quotation
-Clear an existing hash table.  
-@end quotation
-@item @code{void hashtable_clear_if_full(Hashtable *table)}
-@findex hashtable_clear_if_full
-@quotation
-Clear an existing hash table only if it happens to be full. By full
-we mean that we are either out of positions or read results.
-@end quotation
-@item @code{Hashnode * hashtable_enter_position(Hashtable *table, Hash_data *hd)}
-@findex hashtable_enter_position
-@quotation
-Enter a position with a given hash value into the table. Return 
-a pointer to the hash node where it was stored.  If it is already
-there, don't enter it again, but return a pointer to the old one.
-@end quotation
-@item @code{Hashnode * hashtable_search(Hashtable *table, Hash_data *hd)}
-@findex hashtable_search
-@quotation
-Given a Hashposition and a Hash value, find the hashnode which contains
-this position with the given hash value.
-@end quotation
-@item @code{void hashtable_dump(Hashtable *table, FILE *outfile)}
-@findex hashtable_dump
-@quotation
-Dump an ASCII representation of the contents of a Hashtable onto
-the FILE outfile. 
-@end quotation
-@end itemize
-
-The following macros are defined in @file{hash.h}
-
-@itemize @bullet
-@item @code{rr_get_komaster(rr)}
-@item @code{rr_get_kom_pos(rr)}
-@item @code{rr_get_routine(rr)}
-@item @code{rr_get_str1(rr)}
-@item @code{rr_get_stackp(rr)}
-@item @code{rr_get_str2(rr)}
-@item @code{rr_get_str(rr)}
-@item @code{rr_get_status(rr)}
-@item @code{rr_get_result1(rr)}
-@item @code{rr_get_result2(rr)}
-@item @code{rr_get_move(rr)}
-@item @code{rr_get_result(rr)}
-@quotation
-Get the constituent parts of a @code{Read_result}.
-@end quotation
-@end itemize
-
-The following macros and functions are defined in
-@file{engine/reading.c}:
-
-@itemize @bullet
-@item @code{static int get_read_result(int routine, int *si, int *sj, Read_result **read_result)}
-@findex get_read_result
-@quotation
-Return a Read_result for the current position, routine and location.
-For performance, the location is changed to the origin of the string.
-@end quotation
-@item @code{READ_RETURN0(Read_result *read_result)}
-@findex READ_RETURN0
-@quotation
-Cache a negative read result.
-@end quotation
-@item @code{READ_RETURN(Read_result *read_result, int *pointi, int *pointj, int resulti, int resultj, int value)}
-@findex READ_RETURN
-@quotation
-If @code{pointi} and @code{pointj} are not null pointers, then give
-@code{(*pointi, *pointj)} the values @code{(resulti, resultj)}. Then
-cache the @code{read_result}. Clear the hashtable if full and return
-@code{value}.
-@end quotation
 @end itemize
 
 @node Persistent Cache
@@ -1083,132 +921,6 @@ is different. Superstrings are encountered already in the tactical
 reading because sometimes attacking or defending an element of the
 superstring is the best way to attack or defend a string. This is
 in contrast with dragons, which are ignored during tactical reading.
-
-@node Reading Functions
-@section Reading Functions
-
-Here we list the publically callable functions in @file{reading.c}.
-The return codes of these functions are explained elsewhere
-(@pxref{Reading Basics}). To briefly repeat this, a reading
-function return @code{WIN} if the attack succeeds unconditionally, 0 if it doesn't.
-It returns @code{KO_A} or @code{KO_B} if the result depends on ko: 
-@itemize @bullet
-@item Returns @code{KO_A} if the attack succeeds provided attacker is willing to
-ignore any ko threat (the attacker makes the first ko capture).
-@item Returns @code{KO_B} if attack succeeds provided attacker has a ko threat
-which must be answered (the defender makes the first ko capture).
-@end itemize
-@itemize @bullet
-@item @code{int attack(int str, int *move)}
-@findex attack
-@quotation
-Determines if the string at @code{str} can be captured, and if so,
-@code{*move} returns the attacking move, unless @code{move} is a null
-pointer. Use a null pointer if you are interested in the result of the
-attack but not the attacking move itself.
-@end quotation
-@item @code{int find_defense(int str, int *move)}
-@findex find_defense
-@quotation
-Attempts to find a move that will save the string at @code{str}. It
-returns @code{WIN} if such a move is found, with @code{*move} the location of
-the saving move, unless @code{move} is a null pointer. It is not checked
-that tenuki defends, so this may give an erroneous answer if
-@code{!attack(str)}.
-@end quotation
-@item @code{int attack_and_defend(int str, int *attack_code, int *attack_point, int *defend_code, int *defense_point)}
-@findex attack_and_defend
-@quotation
-This is a frontend to the @code{attack()} and @code{find_defense()}
-functions, which guarantees a consistent result. If a string cannot be
-attacked, 0 is returned and @code{*attack_code} is 0. If a string can be
-attacked and defended, @code{WIN} is returned, @code{*attack_code} and
-@code{*defend_code} are both non-zero, and @code{*attack_point},
-@code{*defense_point} both point to vertices on the board. If a string
-can be attacked but not defended, 0 is again returned,
-@code{*attack_code} is non-zero, @code{*defend_code} is 0, and
-@code{*attack_point} points to a vertex on the board. This function in
-particular guarantees that if there is an attack, it will never return
-@code{defense_point = NO_MOVE}, which means the string is safe
-without defense. Separate calls to @code{attack()} and
-@code{find_defense()} may occasionally give this result, due to
-irregularities introduced by the persistent reading cache.
-@end quotation
-@item @code{int attack_either(int astr, int bstr)}
-@findex attack_either
-@quotation
-Returns true if there is a move which guarantees that at least one of
-the strings @code{astr} and @code{bstr} can be captured. A typical
-application for this is in connection patterns, where after a cut it
-suffices to capture one of the cutting stones. The current
-implementation only looks for uncoordinated attacks. This is
-insufficient to find double ataris or moves such as @samp{a} in
-positions like
-@example
-       XOOOOOOOX
-       XOXXOXXOX
-       XX..a..XX
-       ---------
-@end example
-where neither of the threatened @samp{X} stones can be captured outright.
-Still either can be captured by a move down to @samp{a}.
-@end quotation
-@item @code{int defend_both(int astr, int bstr)}
-@findex defend_both
-@quotation
-Returns true if both the strings @code{astr} and @code{bstr} can be defended
-simultaneously or if there is no attack. A typical application for this is in
-connection patterns, where after a cut it's necessary to defend both cutting
-stones. The current implementation only makes halfhearted attempts to find
-coordinated defense moves. A proper implementation would require some serious
-reading.
-@end quotation
-@item @code{int break_through(int apos, int bpos, int cpos)}
-@findex break_through
-@quotation
-returns @code{WIN} if a position can succesfully be broken through and
-@code{CUT} if it can be cut. The position is assumed to have the shape
-(the colors may be reversed)
-@example
-.O.       dbe
-OXO       aFc
-@end example
-It is @samp{X} to move and try to capture at least one of @samp{a},
-@samp{b}, and @samp{c}. If this succeeds, @samp{X} is said to have
-broken through the position. Otherwise @samp{X} may try to cut through
-the position, which means keeping @samp{F} safe and getting a tactically
-safe string at either @samp{d} or @samp{e}. @strong{Important}:
-@samp{a}, @samp{b}, and @samp{c} must be given in the correct order.
-@end quotation
-@item @code{int attack_threats(int str, int max_points, int moves[], int codes[])}
-@findex attack_threats
-@quotation
-Return up to max_threats threats to capture the string at @code{str}. If
-the string is directly attackable the number of threats is reported to
-be 0. NOTE: You can call attack_threats with @code{moves[]} and
-@code{codes[]} already partly filled in. So if you want to get the
-threats from scratch, you have to set them to 0 yourself.
-@end quotation
-@item @code{int safe_move(int move, int color)}
-@findex safe_move
-@quotation
-Checks whether a move at @code{move} is illegal or can immediately be captured. If
-@code{stackp==0} the result is cached. If the move only can be captured by a
-ko, it's considered safe.
-@end quotation
-@item @code{void purge_persistent_reading_cache()}
-@findex purge_persistent_reading_cache
-@quotation
-Remove persistent cache entries which are no longer current.
-@end quotation
-@item @code{void reading_hotspots(float values[BOARDMAX])}
-@findex reading_hotspots
-@quotation
-Based on the entries in the reading cache and their nodes field,
-compute where the relatively most expensive tactical reading is
-going on.
-@end quotation
-@end itemize
 
 @node Debugging
 @section Debugging the reading code

@@ -1,9 +1,5 @@
 In this Chapter, we document some of the utilities which may be
-called from the GNU Go engine. If there are differences between
-this documentation and the source files, the source files are
-the ultimate reference. You may find it convenient to use
-Emacs' built in facility for navigating the source to find
-functions and their in-source documentation (@pxref{Navigating the Source}).
+called from the GNU Go engine.
 
 @menu
 * General Utilities::              Utilities from @file{engine/utils.c}
@@ -319,7 +315,7 @@ time is less than mintime.
 @node Print Utilities
 @section Print utilities
 
-Utility functions from @file{engine/printutils.c}.
+Some utility functions from @file{engine/printutils.c}.
 @findex TRACE
 @findex DEBUG
 
@@ -359,54 +355,4 @@ writes to stdout.
 TRACE(const char *fmt, ...)
 Like @code{gprintf}, but silent if the global variable @code{verbose} is
 zero.
-@item @code{void abortgo(const char *file, int line, const char *msg, int x, int y)}
-@findex abortgo
-@quotation
-A wrapper around @code{abort()} which shows the state variables at the time
-of the problem. @code{(i, j)} are typically a related move, or @code{(-1, -1)}.
-@end quotation
-@item @code{const char *color_to_string(int color)}
-@findex color_to_string
-@quotation
-Convert a color value to a string.
-@end quotation
-@item @code{const char *location_to_string(int pos)}
-@findex location_to_string
-@quotation
-Convert a location to a string.
-@end quotation
-@item @code{void location_to_buffer(int pos, char *buf)}
-@findex location_to_buffer
-@quotation
-Convert a location to a string, writing to a buffer
-@end quotation
-@item @code{const char *status_to_string(int status)}
-@findex status_to_string
-@quotation
-Convert a status value to a string.
-@end quotation
-@item @code{const char *safety_to_string(int status)}
-@findex safety_to_string
-@quotation
-Convert a safety value to a string.
-@end quotation
-@item @code{const char *routine_to_string(int routine)}
-@findex routine_to_string
-@quotation
-Convert a routine to a string.
-@end quotation
-@item @code{const char *result_to_string(int result)}
-@findex result_to_string
-@quotation
-Convert a read result to a string.
-@end quotation
-@item @code{int string_to_location(int boardsize, char *str, int *m, int *n)}
-@findex string_to_location
-@quotation
-Get the @code{(m, n)} coordinates from the string str.  This
-means that @samp{m} is the nth row from the top and @samp{n}
-is the column. Both coordinates are between 0 and
-@code{boardsize-1}, inclusive. Return 1 if ok, otherwise
-return 0; 
-@end quotation
 @end itemize

@@ -75,28 +75,29 @@ are respected.
 @end ifinfo
 
 @menu
+User's manual
 * Introduction::                What is GNU Go ?
 * Installation::                Installing GNU Go 
 * User Guide::                  Using GNU Go
 
-Programmer's Introduction
+An introduction to the GNU Go engine
 * Overview::                    Overview of the GNU Go engine
 * Analyzing::                   Analyzing GNU Go's moves
-* API::                         API to the GNU Go engine
-* SGF::                         Handling SGF trees in memory
-* Libboard::                    The basic go board library.
-
-GNU Go Internals
 * Move Generation::             How GNU Go generates moves
 * Worms and Dragons::           Dragons and Worms
 * Eyes::                        Eyes and half eyes
 * Patterns::                    Pattern database
-* DFA::                         The DFA Pattern Matcher
 * Tactical Reading::            Tactical Reading
 * Pattern Based Reading::       Pattern Based Reading: Owl and Combinations
 * Influence::                   Influence Function
 * Moyo::                        Estimation of Moyos : Bouzy's 5/21 algorithm
+
+Infrastructure and Interfaces
+* Libboard::                    The basic go board library.
+* SGF::                         Handling SGF trees in memory
+* DFA::                         The DFA Pattern Matcher
 * Utility Functions::           @file{utils.c} and @file{printutils.c}
+* API::                         API to the GNU Go engine
 * GTP::                         The Go Text Protocol
 * Regression::                  Regression testing
 
@@ -134,20 +135,6 @@ Indices
 
 @include analyze.texi
 
-@node API
-@chapter Application Programmers Interface to GNU Go
-
-@include api.texi
-
-@node SGF
-@chapter Handling SGF trees in memory
-
-@include sgf.texi
-
-@node Libboard
-@chapter The Board Library
-
-@include board.texi
 
 @node Move Generation
 @chapter Move generation
@@ -193,6 +180,21 @@ Indices
 @chapter Moyo
 
 @include moyo.texi
+
+@node Libboard
+@chapter The Board Library
+
+@include board.texi
+
+@node SGF
+@chapter Handling SGF trees in memory
+
+@include sgf.texi
+
+@node API
+@chapter Application Programmers Interface to GNU Go
+
+@include api.texi
 
 @node Utility Functions
 @chapter Utility Functions

@@ -12,7 +12,6 @@ us at @email{gnugo@@gnu.org} if you are interested in helping.
 @end menu
 
 @node About
-
 @section About GNU Go and this Manual
 
 The challenge of Computer Go is not to @strong{beat} the computer,

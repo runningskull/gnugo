@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- doc: delete most lists of functions
+- doc: remove move_generation.texi overview sections
+- doc: reorder
 - doc: Consistently use hierarchical structure instead of next/previous/up
 - tuning
 - owl tuning
