@@ -1951,8 +1951,12 @@ gtp_worm_data(char *s, int id)
 static int
 gtp_worm_stones(char *s, int id)
 {
-  int m, n, i, j;
-  if (!gtp_decode_coord(s, &i, &j))
+  int i = -1;
+  int j = -1;
+  int m, n;
+  int u, v;
+
+  if (sscanf(s, " %*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
   if (BOARD(i, j) == EMPTY)
@@ -1961,12 +1965,23 @@ gtp_worm_stones(char *s, int id)
   examine_position(EMPTY, EXAMINE_WORMS);
 
   gtp_printid(id, GTP_SUCCESS);
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (worm[m][n].origin == worm[i][j].origin)
-	gtp_mprintf("%m ", m, n);
-
-  gtp_printf("\n\n");
+  
+  for (u = 0; u < board_size; u++)
+    for (v = 0; v < board_size; v++) {
+      if (BOARD(u, v) == EMPTY)
+	continue;
+      if (worm[u][v].origin != POS(u, v))
+	continue;
+      if (ON_BOARD2(i, j) && worm[i][j].origin != POS(u, v))
+	continue;
+      for (m = 0; m < board_size; m++)
+	for (n = 0; n < board_size; n++)
+	  if (worm[m][n].origin == POS(u, v))
+	    gtp_mprintf("%m ", m, n);
+      gtp_printf("\n");
+    }
+  
+  gtp_printf("\n");
   return GTP_OK;
 }
 
@@ -2102,8 +2117,12 @@ gtp_dragon_data(char *s, int id)
 static int
 gtp_dragon_stones(char *s, int id)
 {
-  int m, n, i, j;
-  if (!gtp_decode_coord(s, &i, &j))
+  int i = -1;
+  int j = -1;
+  int m, n;
+  int u, v;
+
+  if (sscanf(s, " %*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
   if (BOARD(i, j) == EMPTY)
@@ -2112,12 +2131,24 @@ gtp_dragon_stones(char *s, int id)
   examine_position(EMPTY, EXAMINE_DRAGONS);
 
   gtp_printid(id, GTP_SUCCESS);
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (dragon[m][n].origin == dragon[i][j].origin)
-	gtp_mprintf("%m ", m, n);
 
-  gtp_printf("\n\n");
+  
+  for (u = 0; u < board_size; u++)
+    for (v = 0; v < board_size; v++) {
+      if (BOARD(u, v) == EMPTY)
+	continue;
+      if (dragon[u][v].origin != POS(u, v))
+	continue;
+      if (ON_BOARD2(i, j) && dragon[i][j].origin != POS(u, v))
+	continue;
+      for (m = 0; m < board_size; m++)
+	for (n = 0; n < board_size; n++)
+	  if (dragon[m][n].origin == POS(u, v))
+	    gtp_mprintf("%m ", m, n);
+      gtp_printf("\n");
+    }
+  
+  gtp_printf("\n");
   return GTP_OK;
 }
 

@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- extended functionality of gtp commands dragon_stones and worm_stones
+- gtp_dragon_data returns a list of strings
+- new gtp functions dragon_stones and worm_stones
 - most parts of move_reasons.c converted to 1D
 - domain calculation in optics.c now 1D
 - hash.c is more 1D
