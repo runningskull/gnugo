@@ -41,13 +41,15 @@
 /* ================================================================ */
 
 
-static int is_initialized = 0;
 
 
 /* Random values for the board hash function. For stones and ko position. */
 static Hash_data white_hash[BOARDMAX];
 static Hash_data black_hash[BOARDMAX];
 static Hash_data ko_hash[BOARDMAX];
+static Hash_data komaster_hash[NUM_KOMASTER_STATES];
+static Hash_data kom_pos_hash[BOARDMAX];
+static Hash_data goal_hash[BOARDMAX];
 
 
 /* Get a random Hashvalue, where all bits are used. */
@@ -80,13 +82,17 @@ hash_init_zobrist_array(Hash_data *array, int size)
 void
 hash_init(void)
 {
+  static int is_initialized = 0;
   if (is_initialized)
     return;
   
-  hash_init_zobrist_array(black_hash, BOARDMAX);
-  hash_init_zobrist_array(white_hash, BOARDMAX);
-  hash_init_zobrist_array(ko_hash, BOARDMAX);
-  
+  INIT_ZOBRIST_ARRAY(black_hash);
+  INIT_ZOBRIST_ARRAY(white_hash);
+  INIT_ZOBRIST_ARRAY(ko_hash);
+  INIT_ZOBRIST_ARRAY(komaster_hash);
+  INIT_ZOBRIST_ARRAY(kom_pos_hash);
+  INIT_ZOBRIST_ARRAY(goal_hash);
+
   is_initialized = 1;
 }
 
@@ -119,10 +125,7 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 }
 
 
-/*
- * Set or remove ko in the hash value and hash position.
- */
-
+/* Set or remove ko in the hash value and hash position.  */
 void
 hashdata_invert_ko(Hash_data *hd, int pos)
 {
@@ -130,10 +133,7 @@ hashdata_invert_ko(Hash_data *hd, int pos)
 }
 
 
-/*
- * Set or remove a stone of COLOR at pos in a Hash_data.
- */
-
+/* Set or remove a stone of COLOR at pos in a Hash_data.  */
 void
 hashdata_invert_stone(Hash_data *hd, int pos, int color)
 {
@@ -144,11 +144,19 @@ hashdata_invert_stone(Hash_data *hd, int pos, int color)
 }
 
 
-/* Compute hash value to identify the goal area.
- *
- * FIXME: It would be cleaner to have a separate zobrist array for the
- *        goal and xor the values in goal as usual.
- */
+/* Set or remove the komaster value in the hash data. */
+void hashdata_invert_komaster(Hash_data *hd, int komaster)
+{
+  hashdata_xor(*hd, komaster_hash[komaster]);
+}
+
+/* Set or remove the komaster position in the hash data. */
+void hashdata_invert_kom_pos(Hash_data *hd, int kom_pos)
+{
+  hashdata_xor(*hd, kom_pos_hash[kom_pos]);
+}
+
+/* Compute hash value to identify the goal area. */
 Hash_data
 goal_to_hashvalue(const char *goal)
 {
@@ -161,8 +169,7 @@ goal_to_hashvalue(const char *goal)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos) && goal[pos])
       for (i = 0; i < NUM_HASHVALUES; i++) 
-	return_value.hashval[i] += (white_hash[pos].hashval[i]
-				    + black_hash[pos].hashval[i]);
+	return_value.hashval[i] ^= goal_hash[pos].hashval[i];
   
   return return_value;
 }

@@ -84,10 +84,14 @@ Hash_data goal_to_hashvalue(const char *goal);
 
 void hash_init_zobrist_array(Hash_data *array, int size);
 void hash_init(void);
+#define INIT_ZOBRIST_ARRAY(a) \
+  hash_init_zobrist_array(a, (int) (sizeof(a) / sizeof(a[0])))
 
 void hashdata_recalc(Hash_data *hd, Intersection *board, int ko_pos);
 void hashdata_invert_ko(Hash_data *hd, int pos);
 void hashdata_invert_stone(Hash_data *hd, int pos, int color);
+void hashdata_invert_komaster(Hash_data *hd, int komaster);
+void hashdata_invert_kom_pos(Hash_data *hd, int kom_pos);
 
 char *hashdata_to_string(Hash_data *hashdata);
 

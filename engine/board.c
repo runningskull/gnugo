@@ -1132,6 +1132,25 @@ is_illegal_ko_capture(int pos, int color)
 	      || (board[EAST(pos)] == OTHER_COLOR(color))));
 }
 
+/* Necessary work to set the new komaster state. */
+static void
+set_new_komaster(int new_komaster)
+{
+  PUSH_VALUE(komaster);
+  hashdata_invert_komaster(&board_hash, komaster);
+  komaster = new_komaster;
+  hashdata_invert_komaster(&board_hash, komaster);
+}
+
+/* Necessary work to set the new komaster position. */
+static void
+set_new_kom_pos(int new_kom_pos)
+{
+  PUSH_VALUE(kom_pos);
+  hashdata_invert_kom_pos(&board_hash, kom_pos);
+  kom_pos = new_kom_pos;
+  hashdata_invert_kom_pos(&board_hash, kom_pos);
+}
 
 /* Variation of trymove()/tryko() where ko captures (both conditional
  * and unconditional) must follow a komaster scheme.
@@ -1202,10 +1221,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
 	  && (IS_STONE(board[kom_pos])
 	      || (!is_ko(kom_pos, WHITE, NULL)
 		  && is_suicide(kom_pos, WHITE))))) {
-    PUSH_VALUE(komaster);
-    PUSH_VALUE(kom_pos);
-    komaster = EMPTY;
-    kom_pos = NO_MOVE;
+    set_new_komaster(EMPTY);
+    set_new_kom_pos(NO_MOVE);
   }
 
   *is_conditional_ko = 0;
@@ -1213,10 +1230,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
 
   if (!ko_move) {
     if (komaster == WEAK_KO) {
-      PUSH_VALUE(komaster);
-      PUSH_VALUE(kom_pos);
-      komaster = EMPTY;
-      kom_pos = NO_MOVE;
+      set_new_komaster(EMPTY);
+      set_new_kom_pos(NO_MOVE);
     }
   }
   else {
@@ -1252,10 +1267,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
 
     /* Conditional ko capture, set komaster parameters. */
     if (komaster == EMPTY || komaster == WEAK_KO) {
-      PUSH_VALUE(komaster);
-      PUSH_VALUE(kom_pos);
-      komaster = color;
-      kom_pos = kpos;
+      set_new_komaster(color);
+      set_new_kom_pos(kpos);
       return 1;
     }
   }
@@ -1263,26 +1276,23 @@ komaster_trymove(int pos, int color, const char *message, int str,
   if (!ko_move)
     return 1;
 
-  PUSH_VALUE(komaster);
-  PUSH_VALUE(kom_pos);
-
   if (komaster == other) {
     if (color == WHITE)
-      komaster = GRAY_BLACK;
+      set_new_komaster(GRAY_BLACK);
     else
-      komaster = GRAY_WHITE;
+      set_new_komaster(GRAY_WHITE);
   }
   else if (komaster == color) {
     /* This is where we update kom_pos after a nested capture. */
-    kom_pos = kpos;
+    set_new_kom_pos(kpos);
   }
   else {
     /* We can reach here when komaster is EMPTY or WEAK_KO. If previous
      * move was also a ko capture, we now set komaster to WEAK_KO.
      */
     if (previous_board_ko_pos != NO_MOVE) {
-      komaster = WEAK_KO;
-      kom_pos = previous_board_ko_pos;
+      set_new_komaster(WEAK_KO);
+      set_new_kom_pos(previous_board_ko_pos);
     }
   }
   

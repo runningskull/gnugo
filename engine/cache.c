@@ -45,15 +45,10 @@ static void tt_clear(Transposition_table *table);
 Transposition_table ttable;
 
 
-#define INIT_ARRAY(a) \
-  hash_init_zobrist_array(a, (int) (sizeof(a) / sizeof(a[0])))
-
 /* Arrays with random numbers for Zobrist hashing of input data (other
  * than the board position). If you add an array here, do not forget
  * to also initialize it in keyhash_init() below.
  */
-static Hash_data komaster_hash[NUM_KOMASTER_STATES];
-static Hash_data kom_pos_hash[BOARDMAX];
 static Hash_data target1_hash[BOARDMAX];
 static Hash_data target2_hash[BOARDMAX];
 static Hash_data routine_hash[NUM_CACHE_ROUTINES];
@@ -65,11 +60,9 @@ keyhash_init(void)
   
   if (!is_initialized) {
     
-    INIT_ARRAY(komaster_hash);
-    INIT_ARRAY(kom_pos_hash);
-    INIT_ARRAY(target1_hash);
-    INIT_ARRAY(target2_hash);
-    INIT_ARRAY(routine_hash);
+    INIT_ZOBRIST_ARRAY(target1_hash);
+    INIT_ZOBRIST_ARRAY(target2_hash);
+    INIT_ZOBRIST_ARRAY(routine_hash);
     
     is_initialized = 1;
   }
@@ -80,8 +73,6 @@ calculate_hashval_for_tt(Hash_data *hashdata, int routine, int target1,
 			 int target2, Hash_data *extra_hash)
 { 
   *hashdata = board_hash;                /* from globals.c */
-  hashdata_xor(*hashdata, komaster_hash[get_komaster()]);
-  hashdata_xor(*hashdata, kom_pos_hash[get_kom_pos()]);
   hashdata_xor(*hashdata, routine_hash[routine]);
   hashdata_xor(*hashdata, target1_hash[target1]);
   if (target2 != NO_MOVE)
