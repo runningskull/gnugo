@@ -3468,9 +3468,9 @@ main(int argc, char *argv[])
     /* Forward declaration, which autohelpers might need. */
     if (database_type != DB_FULLBOARD) {
       if (database_type != DB_CORNER)
-	fprintf(output_FILE, "extern struct pattern %s[];\n\n", prefix);
+	fprintf(output_FILE, "static struct pattern %s[];\n\n", prefix);
       else
-	fprintf(output_FILE, "extern struct corner_pattern %s[];\n\n", prefix);
+	fprintf(output_FILE, "static struct corner_pattern %s[];\n\n", prefix);
     }
 
     /* Write the autohelper code. */
