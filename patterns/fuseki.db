@@ -2287,4 +2287,29 @@ Pattern J40
 :8,FJ
 
 
+Pattern J41
+# db added (3.3.3)
+# see nngs1:48
+
+|......          Play the Joseki!
+|......
+|..*X..
+|..OX.O
+|......
+|......
++------
+
+:8,J
+
+|......
+|.....a
+|..*X..
+|..OX.O
+|......
+|......
++------
+
+> replace(a,*)
+
+
 # END OF FILE

@@ -7719,6 +7719,23 @@ O*o
 :8,OXe
 
 
+Pattern CB239
+# db added (3.3.3)
+# see nngs1:50
+
+..?       connect to reinforce and attack
+O*O
+?X?
+
+:8,OXeda
+
+..?
+a*b
+?X?
+
+; !same_dragon(a,b)
+
+
 Pattern CB240
 
 ..            block off area
@@ -7791,7 +7808,7 @@ Pattern CB242
 ?*.?
 ?OX?
 
-:8,OXe
+:8,OXed
 
 
 Pattern CB243
@@ -8937,6 +8954,18 @@ obO*a.
 
 ; oplay_attack(a,b,*,c) || x_somewhere(d,e)
 > replace(a,*)
+
+
+Pattern CB337
+# db added (3.3.3)
+# see nngs1:47
+
+.X.      Don't get sealed!
+...
+O*.
+X..
+
+:8,OXeda,shape(3)
 
 
 ######################################################################
@@ -12725,6 +12754,29 @@ Pattern EJ93
 > replace(a,*)
 
 
+Pattern EJ94
+# db new pattern (3.3.3)
+# See nngs1:53
+
+.....       Block!
+..O..
+..X*.
+.X.O.
+.....
+.....
+-----
+
+:8,j
+
+.....
+.aO..
+..X*.
+.X.O.
+.....
+.....
+-----
+
+> replace(a,*)
 
 ######################################################################
 #

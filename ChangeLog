@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- consistency checking of replacement patterns reenabled for unstable line
+- tuning
+
 3.3.2 released May 6, 2002
 
 - Macro PATTERN_CHECK_ON_DEMAND retired
