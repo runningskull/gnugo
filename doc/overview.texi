@@ -5,6 +5,7 @@ later chapters or comments in the source files.
 
 @menu
 * Definitions::                Some words used in this documentation.
+* The Board::                  The Board
 * Move Generation Basics::     How GNU Go generates a move.
 * Examining the Position::     What @code{examine_position()} does.
 * Sequence of Events::         Outline of @code{genmove()}.
@@ -13,8 +14,7 @@ later chapters or comments in the source files.
 * Navigating the Source::      Navigating the Source.
 @end menu
 
-@node    Definitions,  Move Generation Basics, ,  Overview
-@comment node-name,    next,             previous,    up
+@node    Definitions, The Board, Overview,  Overview
 @section Definitions
 @cindex worm
 @cindex dragon
@@ -42,7 +42,153 @@ code is in @file{engine/utils.c}. The definition of a superstring is
 slightly different if the code is called from @file{owl.c} or from
 @file{reading.c}.
 
-@node Move Generation Basics, Examining the Position, Definitions, Overview
+@node The Board, Move Generation Basics, Definitions, Overview
+
+GNU Go represents the board in a one-dimensional array called
+@code{board}. For some purposes a two dimensional indexing of the
+board by parameters @code{(i,j)} might be used.
+
+The @code{board} array includes out-of-board markers around the
+board. To make the relation to the old two-dimensional board
+representation clear, this figure shows how the 1D indices correspond
+to the 2D indices when MAX_BOARD is 7.
+
+@example
+  j  -1   0   1   2   3   4   5   6
+i +----------------------------------
+-1|   0   1   2   3   4   5   6   7
+ 0|   8   9  10  11  12  13  14  15
+ 1|  16  17  18  19  20  21  22  23
+ 2|  24  25  26  27  28  29  30  31
+ 3|  32  33  34  35  36  37  38  39
+ 4|  40  41  42  43  44  45  46  47
+ 5|  48  49  50  51  52  53  54  55
+ 6|  56  57  58  59  60  61  62  63
+ 7|  64  65  66  67  68  69  70  71  72
+@end example
+
+To convert between a 1D index pos and a 2D index @code{(i,j)}, the macros
+@code{POS}, @code{I}, and @code{J} are provided, defined as below:
+
+@example
+#define POS(i, j)    ((MAX_BOARD + 2) + (i) * (MAX_BOARD + 1) + (j))
+#define I(pos)       ((pos) / (MAX_BOARD + 1) - 1)
+#define J(pos)       ((pos) % (MAX_BOARD + 1) - 1)
+@end example
+
+All 1D indices not corresponding to points on the board have the out
+of board marker value @code{GRAY}. Thus if @code{board_size} and
+@code{MAX_BOARD} both are 7, this looks like
+
+@example
+  j  -1   0   1   2   3   4   5   6
+i +----------------------------------
+-1|   #   #   #   #   #   #   #   #
+ 0|   #   .   .   .   .   .   .   .
+ 1|   #   .   .   .   .   .   .   .
+ 2|   #   .   .   .   .   .   .   .
+ 3|   #   .   .   .   .   .   .   .
+ 4|   #   .   .   .   .   .   .   .
+ 5|   #   .   .   .   .   .   .   .
+ 6|   #   .   .   .   .   .   .   .
+ 7|   #   #   #   #   #   #   #   #   #
+@end example
+
+The indices marked @samp{#} have value @code{GRAY}.
+If @code{MAX_BOARD} is 7 and @code{board_size} is only 5:
+
+@example
+  j  -1   0   1   2   3   4   5   6
+i +----------------------------------
+-1|   #   #   #   #   #   #   #   #
+ 0|   #   .   .   .   .   .   #   #
+ 1|   #   .   .   .   .   .   #   #
+ 2|   #   .   .   .   .   .   #   #
+ 3|   #   .   .   .   .   .   #   #
+ 4|   #   .   .   .   .   .   #   #
+ 5|   #   #   #   #   #   #   #   #
+ 6|   #   #   #   #   #   #   #   #
+ 7|   #   #   #   #   #   #   #   #   #
+@end example
+
+Navigation on the board is done by the @code{SOUTH}, @code{WEST},
+@code{NORTH}, and @code{EAST}macros,
+
+@example
+#define NS           (MAX_BOARD + 1)
+#define WE           1
+#define SOUTH(pos)   ((pos) + NS)
+#define WEST(pos)    ((pos) - 1)
+#define NORTH(pos)   ((pos) - NS)
+#define EAST(pos)    ((pos) + 1)
+@end example
+
+There are also shorthand macros @code{SW}, @code{NW}, @code{NE},
+@code{SE}, @code{SS}, @code{WW}, @code{NN}, @code{EE} for two step
+movements.
+
+Any movement from a point on the board to an adjacent or diagonal
+vertex is guaranteed to produce a valid index into the board array, and
+the color found is GRAY if it is not on the board. To do explicit tests
+for out of board there are two macros
+
+@example
+#define ON_BOARD(pos) (board[pos] != GRAY)
+#define ON_BOARD1(pos) (((unsigned) (pos) < BOARDSIZE) && board[pos] != GRAY)
+@end example
+
+where the first one should be used in the algorithms and the second
+one is useful for assertion tests.
+
+@strong{Important}: The 2D coordinate @code{(-1,-1)}, which is used for
+pass and sometimes to indicate no point, maps to the 1D coordinate 0,
+not to -1.
+
+A loop over multiple directions is straightforwardly written:
+
+@example
+  for (k = 0; k < 4; k++) @{
+    int d = delta[k];
+    do_something(pos + d);
+  @}
+@end example
+
+The following constants are useful for loops over the entire board and
+allocation of arrays with a 1-1 mapping to the board.
+
+@example
+#define BOARDSIZE    ((MAX_BOARD + 2) * (MAX_BOARD + 1))
+#define BOARDMIN     (MAX_BOARD + 2)
+#define BOARDMAX     (MAX_BOARD + 1) * (MAX_BOARD + 1)
+@end example
+
+@code{BOARDSIZE} is the actual size of the 1D board array,
+@code{BOARDMIN} is the first index corresponding to a point on the
+board, and @code{BOARDMAX} is one larger than the last index corresponding to
+a point on the board. 
+
+Often one wants to traverse the board, carrying out some function
+at every vertex. Here are two possible ways of doing this:
+
+@example
+  int m, n;
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) @{
+        do_something(POS(m, n));
+    @}
+@end example
+
+Or:
+
+@example
+  int pos;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) @{
+    if (ON_BOARD(pos))
+        do_something(pos);
+  @}
+@end example
+
+@node Move Generation Basics, Examining the Position, The Board, Overview
 @comment node-name,       next,          previous,     up
 @section Move Generation Basics
 @cindex move generation

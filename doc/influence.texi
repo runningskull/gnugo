@@ -1,5 +1,6 @@
 @menu
 * Influential Concepts::        Conceptual Outline of Influence
+* Influence and Territory::     Influence and Territory
 * The Influence Core::          The Core of the Influence Function
 * The Influence Algorithm::     The algorithm of @code{accumlate_influence()}
 * Permeability::                Permeability
@@ -8,7 +9,7 @@
 * Influential Display::         Colored display and debugging of influence
 @end menu
 
-@node Influential Concepts, The Influence Core, Influence, Influence
+@node Influential Concepts, Influence and Territory, Influence, Influence
 @comment  node-name,  next,  previous,  up
 @section Conceptual Outline of Influence
 @cindex moyo
@@ -55,8 +56,150 @@ the influence from the stones building the wall. To accommodate for this
 phenomenon, we also add extra influence sources in empty space at
 certain distances away from walls.
 
+@node Influence and Territory, The Influence Core, Influential Concepts, Influence
 
-@node The Influence Core, The Influence Algorithm, Influential Concepts, Influence
+In this section we consider how the influence function is used to
+estimate territory in the function @code{estimate_territorial_value()}.
+
+A move like @samp{*} below is worth one point in gote:
+
+@example
+OOOX
+O.*X
+OOOX
+@end example
+
+and given the value 1. A move in sente or reverse sente is counted
+double, e.g. the move at @samp{*} here
+
+@example
+OOOOOOOXXX
+O.*XXXX.X
+OOOOOOOXXX
+@end example
+
+would be one point sente for @samp{O} and one point reverse sente for 
+@samp{X} and should be given the value 2. Double sente moves
+should be valued much higher than their nominal value, which we
+discuss later.
+
+The territorial valuation done by the influence function uses
+the idea that if @samp{O} makes a move at @code{pos}, we first
+assign territory under the assumption that X moves first in all
+local positions in the original position and then under the
+assumption that @samp{X} moves first in all local positions
+after @samp{O} having made the move at @code{pos}. These two
+territory assignments are compared and the difference gives the
+territorial value of the move. To give an example, consider
+this position where we want to estimate the value of an @samp{O} move
+at @samp{*}:
+
+@example
+OOOXXX
+..OX..
+..OX..
+...*..
+------
+@end example
+
+Before the move we assume @samp{X} moves first in the local position (and
+that @samp{O} has to connect), which gives territory like this (lower case
+letter identify territory for each player):
+
+@example
+OOOXXX
+ooOXxx
+o.OXxx
+o...xx
+------
+@end example
+
+Then we let @samp{O} make the move at @samp{*} and assume
+@samp{X} moves first again next.  The territory then becomes (@samp{X}
+is also assumed to have to connect):
+
+@example
+OOOXXX
+ooOXxx
+ooOX.x
+oo.O.x
+------
+@end example
+
+We see that this makes a difference in territory of 4, which is what
+influence_delta_territory() should report. Then we have the question
+of sente, reverse sente and double sente. This is implemented by the
+concepts of followup_value (sente) and reverse_followup_value (reverse
+sente) and is a lot less exact. Basically certain patterns try to
+detect whether there are more points to gain if we are allowed another
+move in a row and add a followup_value. Other patterns try to decide
+whether the opponent would have more points to gain by two moves in a
+row in the local area and add a reverse_followup_value. These followup
+values are added to the territorial value so that a sente move (high
+followup_value, no or low reverse_followup_value) and reverse sente
+move (no or low followup_value, high reverse_followup_value) both get
+about double the value, while a double sente move (high followup_value
++ high reverse_followup_value) gets still more. The double sente value
+computation is probably not very good.
+
+To give an example of territorial value where something is captured,
+consider the @samp{O} move at @samp{*} here,
+
+@example
+XXXXXXXO
+X.OOOOXO
+X.O..O*O
+--------
+@end example
+
+As before we first let the influence function determine territory
+assuming X moves first, i.e. with a captured group:
+
+@example
+XXXXXXXO
+XxyyyyXO
+Xxyxxy.O
+--------
+@end example
+
+Here @samp{y} indicates @samp{X} territory + captured stone,
+i.e. these count for two points. After the @samp{O} move at @samp{*} we
+instead get
+
+@example
+XXXXXXXO
+X.OOOOXO
+X.OooOOO
+--------
+@end example
+
+and we see that @samp{X} has 16 territory fewer and @samp{O}
+has two territory more, for a total difference of 18 points.
+
+That the influence function counts the value of captured stones is new
+in GNU Go 3.2.. Previously this was instead done using the
+effective_size heuristic. The effective size is the number of
+stones plus the surrounding empty spaces which are closer to
+this string or dragon than to any other stones. Here the @samp{O}
+string would thus have effective size 6 (number of stones) + 2
+(interior eye) + 2*0.5 (the two empty vertices to the left of
+the string, split half each with the surrounding X string) +
+1*0.33 (the connection point, split between three strings) =
+9.33. As noted this value was doubled, giving 18.67 which is
+reasonably close to the correct value of 18. The effective size
+heuristic is still used in certain parts of the move valuation
+where we can't easily get a more accurate value from the
+influence function.
+
+This account is simplified to the extent that it ignores the moyo and
+area concepts (areas of influence which are not secure territory),
+strategical value (weakening and strengthening of other stones on the
+board), various other issues in the move valuation, and the fact that
+the influence function isn't quite as well tuned as the examples above
+may indicate. But it should give a fairly good idea of how the design
+is intended.
+
+@node The Influence Core, The Influence Algorithm, Influence and Territory, Influence
 @comment  node-name,  next,  previous,  up
 @section The Core of the Influence Function
 

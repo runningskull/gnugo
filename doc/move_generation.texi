@@ -15,8 +15,8 @@
 @comment  node-name,  next,  previous,  up
 @section Introduction
 
-GNU Go 3.0 has a move generation scheme that is substantially different
-from earlier versions. In particular, it is different from the method of move
+GNU Go 3.0 introduced a move generation scheme substantially different
+from earlier versions. In particular, it was different from the method of move
 generation in GNU Go 2.6.
 
 In the old scheme, various move generators suggested different moves with
@@ -370,6 +370,19 @@ moves.
 @comment  node-name,  next,  previous,  up
 @section Valuation of suggested moves
 
+At the end of the move generation process, the function
+@code{value_move_reasons()} tries to assign values to the
+moves for the purpose of selecting the best move. The
+single purpose of the move valuation is to try to rank
+the moves so that the best move gets the highest
+score. In principle these values could be arbitrary,
+but in order to make it easier to evaluate how well the
+valuation performs, not to mention simplify the tuning,
+we try to assign values which are consistent with the
+usual methods of counting used by human Go players,
+as explained for example in @emph{The Endgame} by Ogawa
+and Davies.
+
 Moves are valued with respect to five different criteria. These are
 
 @itemize @bullet
@@ -386,14 +399,15 @@ points.
 Territorial value is the amount of secure territory generated (or
 saved) by the move. Attack and defense moves have territorial values
 given by twice the number of stones in the worm plus adjacent empty
-space. This value is in practice approximated from the ``effective
-size'' measure.
+space.
 
 Influence value is an estimation of the move's effect on the size of
 potential territory and possibly ``area''. This is currently implemented by
-using delta_moyo_simple(). This can probably be improved quite a bit. If the
-move captures some stones, this fact should be taken into account when
-computing moyo/area.
+using @code{delta_moyo_simple()}. This can probably be improved quite a
+bit. If the move captures some stones, this fact should be taken into account
+when computing moyo/area. Beginning with GNU Go 3.2, the influence
+function plays an important role in estimating
+territory (@pxref{Influence and Territory}).
 
 Strategical value is a measure of the effect the move has on the
 safety of all groups on the board. Typically cutting and connecting

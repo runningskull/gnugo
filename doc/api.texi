@@ -161,11 +161,9 @@ the definition of @code{Position}:
      typedef struct @{
        int          boardsize;
        Intersection board[MAX_BOARD][MAX_BOARD];
-       int          ko_i;
-       int          ko_j;
-       int          last_i[2];
-       int          last_j[2];
-
+       int          ko_pos;
+       int          last[2];
+     
        float        komi;
        int          white_captured;
        int          black_captured;
@@ -249,8 +247,9 @@ important input to the move generation.
 @section Functions which manipulate a Position
 
 All the functions in the engine that manipulate Positions have names
-prefixed by @code{gnugo_}.  Here is a complete list, as defined in 
-@file{gnugo.h}:
+prefixed by @code{gnugo_}. These functions still use the two-dimensional
+representation of the board (@pxref{The Board}). Here is a complete list, as
+prototyped in @file{gnugo.h}:
 
 @subsection Functions which manipulate the go position
 
@@ -485,7 +484,7 @@ will be set to @code{NULL}.
 @subsection Functions which manipulate a Gameinfo
 
 All the functions in the engine that manipulate Gameinfos have names
-prefixed by @code{gameinfo_}.  Here is a complete list, as defined in 
+prefixed by @code{gameinfo_}.  Here is a complete list, as prototyped in
 @file{gnugo.h}:
 
 @itemize
