@@ -1,0 +1,45 @@
+(;GM[1]FF[4]
+SZ[19]HA[9]KM[0.5]
+PW[Lazarus]WR[7k*]
+PB[GnuGo (GNU Go 3.2)]BR[14k*]
+PC[NNGS]DT[2002-05-01]AP[gnugoclient:2.0]
+RE[W+32.5]
+AB[dd][jd][pd][dj][jj][pj][dp][jp][pp]
+;W[fc];B[df];W[hd];B[eb];W[cd];B[ce];W[cc];B[dc];W[cb];B[bd];W[bc]
+;B[be];W[db];B[fb];W[gc];B[gb];W[ic];B[jc];W[ec];B[hb];W[ib];B[da]
+;W[ea];B[fa];W[ba];B[ab];W[ed];B[de];W[ac];B[ad];W[hc];B[fq];W[dh]
+;B[bb];W[aa];B[ha];W[ia];B[ff];W[hf];B[ei];W[eg];B[fg];W[ef];B[ee]
+;W[eh];B[fh];W[cj];B[ck];W[di];B[ej];W[bi];B[ge];W[bk];B[cl]C[L:8]
+;W[bl];B[he]C[L:9];W[kb];B[if]C[L:10];W[lc];B[mf];W[cm];B[el];W[ne]
+;B[pf]C[L:8];W[lf];B[kf]C[L:9];W[lg];B[le]C[L:10];W[me];B[dm];W[cn]
+;B[ni];W[ke];B[je];W[kd];B[oc];W[dn];B[en]C[L:9];W[eo];B[fo];W[fn]
+;B[em]C[L:8];W[fp];B[go];W[ep];B[io]C[L:9];W[eq];B[cq]C[L:8];W[gp]
+;B[bo]C[L:9];W[ho];B[gn]C[L:7];W[hn];B[gm]C[L:8];W[ip];B[fr];W[er]
+;B[es];W[ds];B[bn];W[cr];B[jo];W[hm];B[qn]C[L:9];W[gl];B[fm]C[L:8]
+;W[nq];B[hl]C[L:7];W[il];B[hk];W[jm];B[or];W[kq];B[jq]C[L:8];W[lp]
+;B[do]C[L:9];W[bm];B[kg]C[L:7];W[ln];B[mg]C[L:5];W[lh];B[lj]C[L:6]
+;W[kh];B[jh]C[L:3];W[ji];B[ki]C[L:4];W[jg];B[jf]C[L:5];W[ih];B[ml]
+;W[ik];B[ij];W[hj];B[gk]C[L:4];W[gj];B[hg];W[fk];B[gi];W[fj];B[fi]
+C[L:5];W[ek];B[dk];W[hi];B[nn]C[L:6];W[hh];B[mh]C[L:7];W[li];B[kj]
+;W[qe];B[pe];W[rc];B[qf];W[pb];B[qd]C[L:8];W[ob];B[rd]C[L:9];W[qc]
+;B[nr]C[L:10];W[mq];B[sc];W[sb];B[sd];W[rb];B[nc];W[nb];B[mr];W[lr]
+;B[bg];W[bh];B[cg];W[ch];B[jb];W[ja];B[ig];W[jh];B[mc];W[mb];B[oq]
+;W[mi];B[nf];W[nj];B[mj];W[nh];B[oi];W[of];B[og];W[ng];B[oh];W[no]
+;B[oo];W[nm];B[mm]C[L:9];W[mn];B[on]C[L:7];W[np];B[kc]C[L:8];W[ld]
+;B[oe]C[L:9];W[nf];B[ah]C[L:10];W[ai];B[ag];W[lm];B[ll];W[kl];B[kk]
+;W[jk];B[ms];W[ii];B[nk];W[ls];B[pc];W[iq];B[id];W[fs];B[gh];W[ka]
+;B[md];W[br];B[nd];W[lb];B[op];W[ca];B[bb];W[ea];B[bj];W[aj];B[da]
+;W[mk];B[oj];W[ea];B[gr];W[ga];B[dg];W[fd];B[fe];W[];B[fl];W[];B[gd]
+;W[];B[]
+C[final_score: W+32.5
+B18 removed
+R15 removed
+H14 removed
+N9 removed
+O7 removed
+B6 removed
+D5 removed
+J5 removed
+C3 removed
+F3 removed]
+)
