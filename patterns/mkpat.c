@@ -235,8 +235,6 @@ static struct autohelper_func autohelper_functions[] = {
   {"amalgamate_most_valuable_helper",3,
    "amalgamate_most_valuable_helper(%s,%s,%s)"},
   {"amalgamate",      2, "join_dragons(%s,%s)"},
-  {"make_proper_eye", 1, "make_proper_eye_space(%s,color)"},
-  {"remove_eyepoint", 1, "remove_eyepoint(%s,color)"},
   {"owl_escape_value",1, "owl_escape_value(%s)"},
   {"owl_goal_dragon", 1, "owl_goal_dragon(%s)"},
   {"owl_eyespace",    2, "owl_eyespace(%s,%s)"},

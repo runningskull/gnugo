@@ -484,8 +484,6 @@ int is_eye_space(int pos);
 int is_proper_eye_space(int pos);
 int is_marginal_eye_space(int pos);
 int max_eye_value(int pos);
-void make_proper_eye_space(int pos, int color);
-void remove_eyepoint(int pos, int color);
 void test_eyeshape(int eyesize, int *eye_vertices);
 
 
@@ -560,6 +558,7 @@ extern struct stats_data stats;
 
 
 struct half_eye_data {
+  float value;      /* Topological eye value. */
   int type;         /* HALF_EYE or FALSE_EYE; */
   int num_attacks;  /* number of attacking points */
   int attack_point[4];  /* the move to attack a topological halfeye */
@@ -744,12 +743,12 @@ int recognize_eye2(int pos, int *attack_point,
 		   struct half_eye_data heye[BOARDMAX],
                     int add_moves, int color);
 void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
-int topological_eye(int pos, int color,
-                    struct eye_data b_eye[BOARDMAX],
-                    struct eye_data w_eye[BOARDMAX],
-                    struct half_eye_data heye[BOARDMAX]);
-void add_half_eye(int pos, struct eye_data eye[BOARDMAX], 
-                  struct half_eye_data heye[BOARDMAX]);
+float topological_eye(int pos, int color,
+		      struct eye_data b_eye[BOARDMAX],
+		      struct eye_data w_eye[BOARDMAX],
+		      struct half_eye_data heye[BOARDMAX]);
+void add_false_eye(int pos, struct eye_data eye[BOARDMAX], 
+		   struct half_eye_data heye[BOARDMAX]);
 void make_domains(struct eye_data b_eye[BOARDMAX],
                   struct eye_data w_eye[BOARDMAX],
 		  int owl_call);

@@ -79,7 +79,7 @@ static void first_map(int q, int map[MAXEYE]);
 static int next_map(int *q, int map[MAXEYE], int esize);
 static void print_eye(struct eye_data eye[BOARDMAX],
 		      struct half_eye_data heye[BOARDMAX], int pos);
-static int 
+static float 
 evaluate_diagonal_intersection(int m, int n, int color,
 			       int *attack_point, int *defense_point,
 			       struct eye_data b_eye[BOARDMAX],
@@ -116,9 +116,9 @@ clear_eye(struct eye_data *eye)
 
 
 /*
- * make_domains() is called from make_dragons(). It marks the black
- * and white domains (eyeshape regions) and collects some statistics
- * about each one.
+ * make_domains() is called from make_dragons() and from
+ * owl_determine_life(). It marks the black and white domains
+ * (eyeshape regions) and collects some statistics about each one.
  */
 
 void
@@ -572,7 +572,7 @@ originate_eye(int origin, int pos,
  */
 
 void
-propagate_eye (int origin, struct eye_data eye[BOARDMAX])
+propagate_eye(int origin, struct eye_data eye[BOARDMAX])
 {
   int pos;
 
@@ -652,7 +652,7 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
 
 
 /* 
- * Given an eyespace with origin (i,j), this function computes the
+ * Given an eyespace with origin (pos), this function computes the
  * minimum and maximum numbers of eyes the space can yield. If max and
  * min are different, then vital points of attack and defense are also
  * generated.
@@ -689,14 +689,24 @@ compute_eyes(int pos, int *max, int *min,
 
 	if (eye[pos2].marginal && IS_STONE(board[pos2]))
 	  DEBUG(DEBUG_EYES, "%1m (X!)\n", pos2);
-	else if (eye[pos2].marginal && board[pos2] == EMPTY)
-	  DEBUG(DEBUG_EYES, "%1m (!)\n", pos2);
+	else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2])) {
+	  if (heye[pos2].value == 3.0)
+	    DEBUG(DEBUG_EYES, "%1m (XH)\n", pos2);
+	  else
+	    DEBUG(DEBUG_EYES, "%1m (XH) (topological eye value = %f\n", pos2,
+		  heye[pos2].value);
+	}
 	else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
 	  DEBUG(DEBUG_EYES, "%1m (X)\n", pos2);
-	else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY)
-	  DEBUG(DEBUG_EYES, "%1m (H)\n", pos2);
-	else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2]))
-	  DEBUG(DEBUG_EYES, "%1m (XH)\n", pos2);
+	else if (eye[pos2].marginal && board[pos2] == EMPTY)
+	  DEBUG(DEBUG_EYES, "%1m (!)\n", pos2);
+	else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY) {
+	  if (heye[pos2].value == 3.0)
+	    DEBUG(DEBUG_EYES, "%1m (H)\n", pos2);
+	  else
+	    DEBUG(DEBUG_EYES, "%1m (H) (topological eye value = %f\n", pos2,
+		  heye[pos2].value);
+	}
 	else
 	  DEBUG(DEBUG_EYES, "%1m\n", pos2);
       }
@@ -854,14 +864,24 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
 
 	if (eye[pos2].marginal && IS_STONE(board[pos2]))
 	  DEBUG(DEBUG_EYES, "%1m (X!)\n", pos2);
-	else if (eye[pos2].marginal && board[pos2] == EMPTY)
-	  DEBUG(DEBUG_EYES, "%1m (!)\n", pos2);
+	else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2])) {
+	  if (heye[pos2].value == 3.0)
+	    DEBUG(DEBUG_EYES, "%1m (XH)\n", pos2);
+	  else
+	    DEBUG(DEBUG_EYES, "%1m (XH) (topological eye value = %f\n", pos2,
+		  heye[pos2].value);
+	}
 	else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
 	  DEBUG(DEBUG_EYES, "%1m (X)\n", pos2);
-	else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY)
-	  DEBUG(DEBUG_EYES, "%1m (H)\n", pos2);
-	else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2]))
-	  DEBUG(DEBUG_EYES, "%1m (XH)\n", pos2);
+	else if (eye[pos2].marginal && board[pos2] == EMPTY)
+	  DEBUG(DEBUG_EYES, "%1m (!)\n", pos2);
+	else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY) {
+	  if (heye[pos2].value == 3.0)
+	    DEBUG(DEBUG_EYES, "%1m (H)\n", pos2);
+	  else
+	    DEBUG(DEBUG_EYES, "%1m (H) (topological eye value = %f\n", pos2,
+		  heye[pos2].value);
+	}
 	else
 	  DEBUG(DEBUG_EYES, "%1m\n", pos2);
       }
@@ -1373,7 +1393,7 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
 
 /* recognize_eye(pos, *attack_point, *defense_point, *max, *min, eye_data, 
  * half_eye_data, add_moves, color), where pos is the origin of an eyespace,
- * returns 1 if there is a pattern in eyes.c matching the eyespace, or
+ * returns 1 if there is a pattern in eyes.db matching the eyespace, or
  * 0 if no match is found. If there is a key point for attack, (*attack_point)
  * is set to its location, or NO_MOVE if there is none.
  * Similarly (*defense_point) is the location of a vital defense point. *min
@@ -1716,31 +1736,26 @@ next_map(int *q, int map[MAXEYE], int esize)
 }     
 
 
-/* add_half_eye adds a half eye or false eye to an eye shape. */
+/* add_false_eye() turns a proper eyespace into a margin. */
 
 void
-add_half_eye(int pos, struct eye_data eye[BOARDMAX],
-	     struct half_eye_data heye[BOARDMAX])
+add_false_eye(int pos, struct eye_data eye[BOARDMAX],
+	      struct half_eye_data heye[BOARDMAX])
 {
   int k;
-  if (heye[pos].type)
-    DEBUG(DEBUG_EYES, "half or false eye found at %1m\n", pos);
+  ASSERT1(heye[pos].type == FALSE_EYE, pos);
+  DEBUG(DEBUG_EYES, "false eye found at %1m\n", pos);
 
-  if (heye[pos].type == FALSE_EYE) {
-    DEBUG(DEBUG_EYES, "false eye at %1m for dragon at %1m\n",
-	  pos, eye[pos].dragon);
-    if (eye[pos].color != GRAY) {
-      if (eye[pos].marginal == 0) {
-	eye[pos].marginal = 1;
-	eye[eye[pos].origin].msize++;
-	for (k = 0; k < 4; k++)
-	  if (ON_BOARD(pos + delta[k])
-	      && eye[pos + delta[k]].origin == eye[pos].origin)
-	    eye[pos + delta[k]].marginal_neighbors++;
-	propagate_eye(eye[pos].origin, eye);
-      }
-    }
-  }
+  if (eye[pos].color == GRAY || eye[pos].marginal != 0)
+    return;
+  
+  eye[pos].marginal = 1;
+  eye[eye[pos].origin].msize++;
+  for (k = 0; k < 4; k++)
+    if (ON_BOARD(pos + delta[k])
+	&& eye[pos + delta[k]].origin == eye[pos].origin)
+      eye[pos + delta[k]].marginal_neighbors++;
+  propagate_eye(eye[pos].origin, eye);
 }
 
 
@@ -1795,68 +1810,38 @@ is_halfeye(struct half_eye_data heye[BOARDMAX], int pos)
   return heye[pos].type == HALF_EYE;
 }
 
-/* Turn a marginal eye space into a proper eye space. */
-void
-make_proper_eye_space(int pos, int color)
-{
-  struct eye_data  *eye;
-  int k;
-
-  if (color == WHITE)
-    eye = white_eye;
-  else
-    eye = black_eye;
-
-  gg_assert(eye[pos].color != GRAY_BORDER);
-  gg_assert(eye[pos].marginal == 1);
-  
-  eye[pos].marginal = 0;
-  
-  eye[eye[pos].origin].msize--;
-  for (k = 0; k < 4; k++)
-    if (ON_BOARD(pos + delta[k])
-	&& eye[pos + delta[k]].origin == eye[pos].origin)
-      eye[pos + delta[k]].marginal_neighbors--;
-
-  propagate_eye(eye[pos].origin, eye);
-}
-
-/* Remove an eye point. This function can only be used before the
- * segmentation into eyespaces.
- */
-void
-remove_eyepoint(int pos, int color)
-{
-  if (color == WHITE)
-    white_eye[pos].color = GRAY_BORDER;
-  else
-    black_eye[pos].color = GRAY_BORDER;
-}
-
-
 /* See Texinfo documentation (Eyes:Eye Topology). Returns:
- * 2 or less if (m, n) is a proper eye for (color);
- * 3 if (m, n) is a half eye;
- * 4 if (m, n) is a false eye.
+ * - 2 or less if (pos) is a proper eye for (color);
+ * - between 2 and 3 if the eye can be made false only by ko
+ * - 3 if (pos) is a half eye;
+ * - between 3 and 4 if the eye can be made real only by ko
+ * - 4 or more if (pos) is a false eye.
  *
- * (*ai, *aj) and (*di, *dj) returns the coordinates of an empty
- * unsettled diagonal intersection, or an attack and defense point
- * respectively of an unsettled diagonal opponent worm.
+ * Attack and defense points for control of the diagonals are stored
+ * in the heye[] array.
  */
 
-int
+float
 topological_eye(int pos, int color,
 		struct eye_data b_eye[BOARDMAX],
 		struct eye_data w_eye[BOARDMAX],
 		struct half_eye_data heye[BOARDMAX])
 {
-  int sum = 0;
-  int val;
+  float sum = 0.0;
+  float val;
   int num_attacks = 0;
   int num_defenses = 0;
+  int attack_values[4];
+  int defense_values[4];
   int k;
+  int r;
   int attack_point;
   int defense_point;
+  int attack_value;
+  int defense_value;
+
+  memset(attack_values, 0, sizeof(attack_values));
+  memset(defense_values, 0, sizeof(defense_values));
   
   /* Loop over the diagonal directions. */
   for (k = 4; k < 8; k++) {
@@ -1865,15 +1850,60 @@ topological_eye(int pos, int color,
 					 &attack_point, &defense_point, 
 					 b_eye, w_eye);
     sum += val;
-    if (val == 1) {
-      if (attack_point != NO_MOVE) {
+    if (val > 0.0 && val < 2.0) {
+      /* Diagonals off the edge has value 1.0 but no attack or defense
+       * point.
+       */
+      if (attack_point != NO_MOVE && defense_point != NO_MOVE) {
 	ASSERT_ON_BOARD1(attack_point);
-	heye[pos].attack_point[num_attacks] = attack_point;
-	num_attacks++;
-      }
-      if (defense_point != NO_MOVE) {
 	ASSERT_ON_BOARD1(defense_point);
-	heye[pos].defense_point[num_defenses] = defense_point;
+	/* Store these in sorted (descending) order. We remap val
+         * differently for attack and defense points according to:
+	 *
+	 * val    attack_value     defense_value
+	 * ---    ------------     -------------
+	 * 1.0    3                3
+	 * <1.0   2                1
+	 * >1.0   1                2
+	 *
+	 * This means that we primarily want to take control of
+	 * diagonals without ko and secondarily of diagonals we can
+	 * take unconditionally but not the opponent.
+	 */
+	if (val == 1.0) {
+	  attack_value = 3;
+	  defense_value = 3;
+	}
+	else if (val < 1.0) {
+	  attack_value = 2;
+	  defense_value = 3;
+	}
+	else {
+	  attack_value = 3;
+	  defense_value = 2;
+	}
+
+	for (r = 0; r < 4; r++) {
+	  if (attack_values[r] < attack_value) {
+	    int tmp_value = attack_values[r];
+	    int tmp_point = heye[pos].attack_point[r];
+	    attack_values[r] = attack_value;
+	    heye[pos].attack_point[r] = attack_point;
+	    attack_value = tmp_value;
+	    attack_point = tmp_point;
+	  }
+	
+	  if (defense_values[r] < defense_value) {
+	    int tmp_value = defense_values[r];
+	    int tmp_point = heye[pos].defense_point[r];
+	    defense_values[r] = defense_value;
+	    heye[pos].defense_point[r] = defense_point;
+	    defense_value = tmp_value;
+	    defense_point = tmp_point;
+	  }
+	}
+	
+	num_attacks++;
 	num_defenses++;
       }
     }
@@ -1881,40 +1911,53 @@ topological_eye(int pos, int color,
 
   heye[pos].num_attacks = num_attacks;
   heye[pos].num_defends = num_defenses;
+  heye[pos].value = sum;
+  
   return sum;
 }
 
 
 
-/* Evaluate an intersection (m, n) which is diagonal to an eye space
- * (i, j), as described in the Texinfo documentation (Eyes/Eye
- * Topology).
- * Returns 0 if the opponent cannot safely play at the vertex;
- * Returns 1 if empty and the opponent can safely play on it;
- * Returns 2 if safely occupied by the opponent.
+/* Evaluate an intersection (m, n) which is diagonal to an eye space,
+ * as described in the Texinfo documentation (Eyes/Eye Topology).
  *
- * Exception: if one coordinate is off the board, returns 1;
- * if both are off the board, returns 0. This guarantees
- * correct behavior for diagonal intersections of points
- * on the edge or in the corner.
+ * Returns:
+ *
+ * 0 if both coordinates are off the board
+ * 1 if one coordinate is off the board
+ *
+ * 0    if (color) has control over the vertex
+ * a    if (color) can take control over the vertex unconditionally and
+ *      the opponent can take control by winning a ko.
+ * 1    if both (color) and the opponent can take control of the vertex
+ *      unconditionally
+ * b    if (color) can take control over the vertex by winning a ko and
+ *      the opponent can take control unconditionally.
+ * 2    if the opponent has control over the vertex
+ *
+ * The values a and b are discussed in the documentation. We are
+ * currently using a = 0.75 and b = 1.25.
  *
  * Notice that it's necessary to pass the coordinates separately
  * instead of as a 1D coordinate. The reason is that the 1D mapping
  * can't uniquely identify "off the corner" points.
  */
-static int 
+static float
 evaluate_diagonal_intersection(int m, int n, int color,
 			       int *attack_point, int *defense_point,
 			       struct eye_data b_eye[BOARDMAX],
 			       struct eye_data w_eye[BOARDMAX])
 {
-  int value = 0;
+  float value = 0;
   int other = OTHER_COLOR(color);
   int pos = POS(m, n);
   int acode = 0;
   int apos = NO_MOVE;
   int dcode = 0;
   int dpos = NO_MOVE;
+  int off_edge = 0;
+  const float a = 0.75;
+  const float b = 2 - a;
 
   *attack_point = NO_MOVE;
   *defense_point = NO_MOVE;
@@ -1924,13 +1967,14 @@ evaluate_diagonal_intersection(int m, int n, int color,
    * are special cases.
    */
   if (m < 0 || m >= board_size)
-    value++;
+    off_edge++;
 
   if (n < 0 || n >= board_size)
-    value++;
+    off_edge++;
 
-  if (value > 0)
-    return value % 2; /* Must return 0 if both coordinates out of bounds. */
+  /* Must return 0 if both coordinates out of bounds. */
+  if (off_edge > 0)
+    return (float) (off_edge % 2);
 
   /* Discard points within own eyespace, unless marginal or ko point.
    *
@@ -1973,64 +2017,96 @@ evaluate_diagonal_intersection(int m, int n, int color,
       && !b_eye[pos].marginal
       && b_eye[pos].marginal_neighbors < 2
       && !(board[pos] == EMPTY && does_capture_something(pos, WHITE)))
-    return 0;
+    return 0.0;
   if (color == WHITE
       && w_eye[pos].color == WHITE_BORDER
       && !w_eye[pos].marginal
       && w_eye[pos].marginal_neighbors < 2
       && !(board[pos] == EMPTY && does_capture_something(pos, BLACK)))
-    return 0;
+    return 0.0;
 
-  if (board[pos] == EMPTY && safe_move(pos, other) != 0)
-    value = 1;
-  else {
-    if (stackp == 0) {
-      if (board[pos] == other) {
-	if (worm[pos].attack_codes[0] == 0)
-	  value = 2;
-	else if (worm[pos].defend_codes[0] != 0) {
-	  value = 1;
-	  apos = worm[pos].attack_points[0];
-	  dpos = worm[pos].defense_points[0];
-	}
-      }
-    }
-    else {
-      if (board[pos] == other) {
-	attack_and_defend(pos, &acode, &apos, &dcode, &dpos);
-	if (acode == 0)
-	  value = 2;
-	else if (dcode != 0)
-	  value = 1;
-      }
-    }   
+  if (board[pos] == EMPTY) {
+    /* We should normally have a safe move, but occasionally it may
+     * happen that it's not safe. There are complications, however,
+     * with a position like this
+     *
+     * .XXXX|
+     * XXOO.|
+     * XO.O.|
+     * XXO.O|
+     * -----+
+     *
+     */
+
+    int our_safety = safe_move(pos, color);
+    int your_safety = safe_move(pos, other);
+    
+    if (your_safety == 0)
+      value = 0.0;
+    else if (our_safety == 0 && your_safety == WIN)
+      value = 2.0;
+    else if (our_safety == WIN && your_safety == WIN)
+      value = 1.0;
+    else if (our_safety == WIN && your_safety != WIN)
+      value = a;
+    else if (our_safety != WIN && your_safety == WIN)
+      value = b;
+    else
+      value = 1.0; /* Both contingent on ko. Probably can't happen. */
+
+    apos = pos;
+    dpos = pos;
   }
+  else if (board[pos] == color) {
+    /* This stone had better be safe, otherwise we wouldn't have an
+     * eyespace in the first place.
+     */
+    value = 0.0;
+  }
+  else if (board[pos] == other) {
+    if (stackp == 0) {
+      acode = worm[pos].attack_codes[0];
+      apos  = worm[pos].attack_points[0];
+      dcode = worm[pos].defend_codes[0];
+      dpos  = worm[pos].defense_points[0];
+    }
+    else
+      attack_and_defend(pos, &acode, &apos, &dcode, &dpos);
 
-  if (value == 1) {
-    if (board[pos] == EMPTY) {
-      if (!safe_move(pos, color))
-	value = 2;
-      else {
-	*attack_point = pos;
-	*defense_point = pos;
-      }
-    }
-    else {
-      /* FIXME:
-       * Usually there are several attack and defense moves that would
-       * be equally valid. It's not good that we make an arbitrary
-       * choice at this point.
-       */
-      ASSERT_ON_BOARD1(apos);
-      ASSERT_ON_BOARD1(dpos);
-      /* Notice:
-       * The point to ATTACK the half eye is the point which DEFENDS
-       * the stones on the diagonal intersection and vice versa. Thus
-       * we must switch attack and defense points here.
-       */
-      *attack_point = dpos;
-      *defense_point = apos;
-    }
+    /* Must test acode first since dcode only is reliable if acode is
+     * non-zero.
+     */
+    if (acode == 0)
+      value = 2.0;
+    else if (dcode == 0)
+      value = 0.0;
+    else if (acode == WIN && dcode == WIN)
+      value = 1.0;
+    else if (acode == WIN && dcode != WIN)
+      value = a;
+    else if (acode != WIN && dcode == WIN)
+      value = b;
+    else if (acode != WIN && dcode != WIN)
+      value = 1.0; /* Both contingent on ko. Probably can't happen. */
+  }
+  
+  if (value > 0.0 && value < 2.0) {
+    /* FIXME:
+     * Usually there are several attack and defense moves that would
+     * be equally valid. It's not good that we make an arbitrary
+     * choice at this point.
+     */
+    ASSERT_ON_BOARD1(apos);
+    ASSERT_ON_BOARD1(dpos);
+    /* Notice:
+     * The point to ATTACK the half eye is the point which DEFENDS
+     * the stones on the diagonal intersection and vice versa. Thus
+     * we must switch attack and defense points here.
+     * If the vertex is empty, dpos == apos and it doesn't matter
+     * whether we switch.
+     */
+    *attack_point = dpos;
+    *defense_point = apos;
   }
 
   return value;

@@ -1939,10 +1939,13 @@ owl_determine_life(struct local_owl_data *owl,
       }
     }
 
+  /* Reset halfeye data. Set topological eye value to something big. */
   for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
+    for (n = 0; n < board_size; n++) {
       owl->half_eye[POS(m, n)].type = 0;
-
+      owl->half_eye[POS(m, n)].value = 10.0;
+    }
+  
   /* Find topological half eyes and false eyes by analyzing the
    * diagonal intersections, as described in the Texinfo
    * documentation (Eyes/Eye Topology).
@@ -1968,7 +1971,7 @@ owl_determine_life(struct local_owl_data *owl,
     for (m = 0; m<board_size; m++)
       for (n = 0; n<board_size; n++) {
 	int pos = POS(m, n);
-	int sum;
+	float sum;
 
 	if (mx[pos] <= 0)
 	  continue;
@@ -1978,14 +1981,15 @@ owl_determine_life(struct local_owl_data *owl,
 	
 	sum = topological_eye(pos, color, owl->black_eye, owl->white_eye,
 			      owl->half_eye);
-
-	if (sum >= 4) {
+	
+	if (sum >= 4.0) {
+	  /* False eye. */
 	  int previously_marginal = eye[pos].marginal;
 	  owl->half_eye[pos].type = FALSE_EYE;
 	  if (eye[pos].esize == 1
 	      || is_legal(pos, OTHER_COLOR(color))
 	      || board[pos] == OTHER_COLOR(color)) {
-	    add_half_eye(pos, eye, owl->half_eye);
+	    add_false_eye(pos, eye, owl->half_eye);
 	    
 	    /* Marginal status may have changed. This can change the
              * topological eye evaluation for diagonal neighbors, so
@@ -2005,7 +2009,7 @@ owl_determine_life(struct local_owl_data *owl,
 	    }
 	  }
 	}
-	else if (sum == 3) {
+	else if (sum > 2.0) {
 	  owl->half_eye[pos].type = HALF_EYE;
 	  ASSERT1(owl->half_eye[pos].num_attacks > 0, pos);
 	  ASSERT_ON_BOARD1(owl->half_eye[pos].attack_point[0]);
@@ -2122,12 +2126,12 @@ owl_determine_life(struct local_owl_data *owl,
 	   *
 	   * In both cases * is the vital point according to the graph
 	   * matching. The significant difference is that in the first
-	   * case the vital point is a margin.
+	   * case the vital point is adjacent to stones in the goal.
 	   */
 	  else if (!does_attack
 		   && defense_point != NO_MOVE
 		   && board[defense_point] == EMPTY
-		   && (!eye[attack_point].marginal
+		   && (!liberty_of_goal(defense_point, owl)
 		       || !is_self_atari(defense_point, color)
 		       || is_ko(defense_point, color, NULL)
 		       || safe_move(defense_point, color) != 0)) {
@@ -2152,11 +2156,10 @@ owl_determine_life(struct local_owl_data *owl,
 	}
       }
     }
-  /* sniff each lunch for nutritional value. The
-     assumption is that capturing the lunch is gote,
-     therefore the number of half eyes equals the
-     MINIMUM number of eyes yielded by the resulting
-     eye space.
+  /* Sniff each lunch for nutritional value. The assumption is that
+   * capturing the lunch is gote, therefore the number of half eyes
+   * equals the MINIMUM number of eyes yielded by the resulting eye
+   * space.
    */
   {
     for (lunch = 0; (lunch < MAX_LUNCHES); lunch++)
@@ -3621,14 +3624,25 @@ obvious_false_eye(int pos, int color)
 }
 
 
-/* Trampoline to topological_eye(). */
+/* Retrieve topological eye values stored in the half_eye[] array of
+ * the current owl data.
+ *
+ * FIXME: Sooner or later we'll want this to return a non-rounded
+ * value. When we change this, we have to review all patterns using
+ * the autohelper owl_topological_eye().
+ */
 int
 owl_topological_eye(int pos, int color)
 {
-  return topological_eye(pos, color,
-			 current_owl_data->black_eye,
-			 current_owl_data->white_eye,
-			 current_owl_data->half_eye);
+  float value;
+  UNUSED(color);
+  value = current_owl_data->half_eye[pos].value;
+  if (value > 2.0 && value < 4.0)
+    return 3;
+  else if (value <= 2.0)
+    return (int) (value + 0.99); /* Round up. */
+  else
+    return (int) value;          /* Round down. */
 }
 
 /* This function returns true if it is judged that the capture of the

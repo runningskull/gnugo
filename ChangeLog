@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new field value in struct half_eye_data
+- topological_eye() and evaluate_diagonal_intersection() reimplemented
+  to take ko into account
+- improved debug output in compute_eyes() and compute_eyes_pessimistic()
+- add_half_eye() renamed add_false_eye
+- make_proper_eye_space() and remove_eyepoint() removed
+- owl_topological_eye() reimplemented to look up stored data
 - new function special_rescue5() in reading.c
 - defend2() and defend3() revised
 - new GTP command list_stones

@@ -97,9 +97,10 @@ make_dragons(int color, int stop_before_owl)
       dragon[ii].owl_threat_status  = UNCHECKED;
       dragon[ii].owl_second_attack_point  = NO_MOVE;
       dragon[ii].owl_second_defense_point = NO_MOVE;
-      half_eye[ii].type        =  0;
+      half_eye[ii].type             =  0;
+      half_eye[ii].value            =  10.0; /* Something big. */
       
-      if (worm[ii].origin == ii)
+      if (IS_STONE(board[ii]) && worm[ii].origin == ii)
 	DEBUG(DEBUG_DRAGONS, 
 	      "Initialising dragon from worm at %1m, size %d\n", 
 	      ii, worm[ii].size);
@@ -225,11 +226,14 @@ make_dragons(int color, int stop_before_owl)
   /* Find topological half eyes and false eyes by analyzing the
    * diagonal intersections, as described in the Texinfo
    * documentation (Eyes/Eye Topology).
+   *
+   * FIXME: Consolidate this piece of code with the very similar one
+   * in owl_determine_life().
    */
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      int sum;
+      float sum;
       ii = POS(m, n);
 
       if (black_eye[ii].color == BLACK_BORDER
@@ -237,14 +241,14 @@ make_dragons(int color, int stop_before_owl)
 	  && black_eye[ii].neighbors <= 1
 	  && black_eye[ii].dragon != NO_MOVE) {
 	sum = topological_eye(ii, BLACK, black_eye, white_eye, half_eye);
-	if (sum >= 4) {
+	if (sum >= 4.0) {
 	  half_eye[ii].type = FALSE_EYE;
 	  if (black_eye[ii].esize == 1
 	      || is_legal(ii, WHITE)
 	      || board[ii] == WHITE)
-	    add_half_eye(ii, black_eye, half_eye);
+	    add_false_eye(ii, black_eye, half_eye);
 	}
-	else if (sum == 3)
+	else if (sum > 2.0)
 	  half_eye[ii].type = HALF_EYE;
       }
       
@@ -253,14 +257,14 @@ make_dragons(int color, int stop_before_owl)
 	  && white_eye[ii].neighbors <= 1
 	  && white_eye[ii].dragon != NO_MOVE) {
 	sum = topological_eye(ii, WHITE, black_eye, white_eye, half_eye);
-	if (sum >= 4) {
+	if (sum >= 4.0) {
 	  half_eye[ii].type = FALSE_EYE;
 	  if (white_eye[ii].esize == 1
 	      || is_legal(ii, BLACK)
 	      || board[ii] == BLACK)
-	    add_half_eye(ii, white_eye, half_eye);
+	    add_false_eye(ii, white_eye, half_eye);
 	}
-	else if (sum == 3)
+	else if (sum > 2.0)
 	  half_eye[ii].type = HALF_EYE;
       }
     }
