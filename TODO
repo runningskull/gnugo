@@ -211,3 +211,7 @@ are presented here for inspiration.
    To be really useful this would have to deal with early endgame
    positions.
 
+ * Fuseki tuning by hand is difficult. People who are interested
+   in doing machine learning experiments with GNU Go could try
+   working with fuseki. This may be one of the areas with most
+   potential for substantial and reasonably quick improvements.

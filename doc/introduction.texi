@@ -358,6 +358,13 @@ threats interact.
 To be really useful this would have to deal with early endgame
 positions.
 @end quotation
+@item automated fuseki tuning 
+@quotation
+Fuseki tuning by hand is difficult. I'd like to encourage people who
+are interested in doing machine learning experiments with GNU Go
+work with the fuseki. This may be one of the areas with most
+potential for substantial and reasonably quick improvements.
+@end quotation
 @end itemize
 
 
