@@ -865,6 +865,7 @@ struct dragon_data2 {
   int semeai_defense_certain;
   int semeai_attack_point; /* Move found by semeai code to kill dragon       */
   int semeai_attack_certain;
+  int semeai_target;       /* The opponent dragon involved in the semeai     */
   enum dragon_status owl_threat_status; /* CAN_THREATEN_ATTACK/DEFENSE       */
   enum dragon_status owl_status; /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
   int owl_attack_point;    /* vital point for attack                         */

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- find additional semeai moves in semeai_reasons()
 - added more robust handling of .dtr files
 - removed option to build pre-rotated DFAs
 - unconditional_status in struct worm_data changed to enum dragon_status
