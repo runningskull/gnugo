@@ -351,10 +351,12 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   int dummy_semeai_move;
   double start = 0.0;
   int reading_nodes_when_called = get_reading_node_counter();
+  int nodes_used;
   int new_dragons[BOARDMAX];
   
   struct local_owl_data *owla;
   struct local_owl_data *owlb;
+  Hash_data goal_hash;
   
   if (!resulta)
     resulta = &dummy_resulta;
@@ -362,7 +364,7 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     resultb = &dummy_resultb;
   if (!semeai_move)
     semeai_move = &dummy_semeai_move;
-  
+
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
 
@@ -397,6 +399,8 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
       }
     }
   }
+
+
   
   sgf_dumptree = NULL;
   if (verbose > 0)
@@ -448,9 +452,9 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   ASSERT1(board[apos] == OTHER_COLOR(board[bpos]), apos);
   count_variations = 1;
   if (move == PASS_MOVE)
-    TRACE("owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
+    DEBUG(DEBUG_SEMEAI, "owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
   else
-    TRACE("owl_analyze_semeai_after_move %C %1m: %1m vs. %1m\n",
+    DEBUG(DEBUG_SEMEAI, "owl_analyze_semeai_after_move %C %1m: %1m vs. %1m\n",
 	  color, move, apos, bpos);
   
   if (owl) {
@@ -473,6 +477,29 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
   }
 
   result_certain = 1;
+
+  {
+    Hash_data temp = goal_to_hashvalue(owla->goal);
+    goal_hash = goal_to_hashvalue(owlb->goal);
+    hashdata_xor(goal_hash, temp);
+  }
+  if (owl
+      && search_persistent_semeai_cache(ANALYZE_SEMEAI,
+					apos, bpos, move, color, &goal_hash,
+					resulta, resultb, semeai_move,
+					semeai_result_certain)) {
+    if (move == PASS_MOVE) {
+      DEBUG(DEBUG_OWL_PERFORMANCE,
+	    "analyze_semeai %1m vs. %1m, result %d %d %1m (cached)\n",
+	    apos, bpos, *resulta, *resultb, *semeai_move);
+    }
+    else {
+      DEBUG(DEBUG_OWL_PERFORMANCE,
+	    "analyze_semeai_after_move %C %1m: %1m vs. %1m, result %d %d %1m (cached)\n",
+	    color, move, apos, bpos, *resulta, *resultb, *semeai_move);
+    }
+    return;
+  }
 
   /* In some semeai situations one or both players have the option to
    * choose between seki and ko for the life and death of both. In
@@ -504,24 +531,30 @@ owl_analyze_semeai_after_move(int move, int color, int apos, int bpos,
     *resultb = REVERSE_RESULT(*resultb);
   }
 
+  nodes_used = get_reading_node_counter() - reading_nodes_when_called;
   if (move == PASS_MOVE) {
     DEBUG(DEBUG_OWL_PERFORMANCE,
 	  "analyze_semeai %1m vs. %1m, result %d %d %1m (%d, %d nodes, %f seconds)\n",
 	  apos, bpos, *resulta, *resultb, *semeai_move, local_owl_node_counter,
-	  get_reading_node_counter() - reading_nodes_when_called,
-	  gg_cputime() - start);
+	  nodes_used, gg_cputime() - start);
   }
   else {
     DEBUG(DEBUG_OWL_PERFORMANCE,
 	  "analyze_semeai_after_move %C %1m: %1m vs. %1m, result %d %d %1m (%d, %d nodes, %f seconds)\n",
 	  color, move, apos, bpos, *resulta, *resultb, *semeai_move,
 	  local_owl_node_counter,
-	  get_reading_node_counter() - reading_nodes_when_called,
-	  gg_cputime() - start);
+	  nodes_used, gg_cputime() - start);
   }
   
   if (semeai_result_certain)
     *semeai_result_certain = result_certain;
+
+  if (owl)
+    store_persistent_semeai_cache(ANALYZE_SEMEAI, apos, bpos, move, color,
+				  &goal_hash,
+				  *resulta, *resultb, *semeai_move,
+				  result_certain, nodes_used,
+				  owla->goal, owlb->goal);
 }
 
 

@@ -75,6 +75,9 @@
 #define MAX_BREAKIN_CACHE_DEPTH 1
 #define MAX_BREAKIN_CACHE_SIZE 150
 
+#define MAX_SEMEAI_CACHE_DEPTH 0
+#define MAX_SEMEAI_CACHE_SIZE 150
+
 #define MAX_CACHE_DEPTH 	5
 
 
@@ -91,13 +94,15 @@ struct persistent_cache_entry {
   int apos; /* first input coordinate */
   int bpos; /* second input coordinate */
   int cpos; /* third input coordinate */
-  Hash_data goal_hash; /* hash of the goal in break-in reading */
+  int color; /* Move at (cpos) by (color) in analyze_semeai_after_move() */
+  Hash_data goal_hash; /* hash of the goals in break-in and semeai reading */
   int result;
+  int result2;
   int result_certain;
   int remaining_depth;
   int node_limit; 
   int move; /* first result coordinate */
-  int move2; /* second result coordinate */
+  int move2;/* second result coordinate */
   int cost; /* Usually no. of tactical nodes spent on this reading result. */
   int score; /* Heuristic guess of the worth of the cache entry. */
 };
@@ -123,6 +128,9 @@ struct persistent_cache {
 static void compute_active_owl_area(struct persistent_cache_entry *entry,
 				    const char goal[BOARDMAX],
 				    int goal_color);
+static void compute_active_semeai_area(struct persistent_cache_entry *entry,
+				       const char goal[BOARDMAX],
+				       int dummy);
 static void compute_active_reading_area(struct persistent_cache_entry *entry,
 					const char reading_shadow[BOARDMAX],
 					int dummy);
@@ -154,6 +162,10 @@ struct persistent_cache owl_cache =
     "owl cache", compute_active_owl_area,
     NULL, 0, -1 };
 
+struct persistent_cache semeai_cache =
+  { MAX_SEMEAI_CACHE_SIZE, MAX_SEMEAI_CACHE_DEPTH, 0.75,
+    "semeai cache", compute_active_semeai_area,
+    NULL, 0, -1 };
 
 /* ================================================================ */
 /* Common helper functions.   		                            */
@@ -246,6 +258,8 @@ print_persistent_cache_entry(struct persistent_cache_entry *entry)
   if (entry->cpos != NO_MOVE)
     gprintf("%ocpos            = %1m\n", entry->cpos);
   gprintf("%oresult          = %s\n",  result_to_string(entry->result));
+  if (entry->result2 != 0)
+    gprintf("%oresult2         = %s\n",  result_to_string(entry->result2));
   if (entry->result_certain != -1)
     gprintf("%oresult_certain  = %d\n",  entry->result_certain);
   if (entry->node_limit != -1)
@@ -363,7 +377,8 @@ purge_persistent_cache(struct persistent_cache *cache)
 static struct persistent_cache_entry *
 find_persistent_cache_entry(struct persistent_cache *cache,
 			    enum routine_id routine, int apos, int bpos,
-			    int cpos, Hash_data *goal_hash, int node_limit)
+			    int cpos, int color,
+			    Hash_data *goal_hash, int node_limit)
 {
   int k;
   for (k = 0; k < cache->current_size; k++) {
@@ -372,6 +387,7 @@ find_persistent_cache_entry(struct persistent_cache *cache,
 	&& entry->apos == apos
 	&& entry->bpos == bpos
 	&& entry->cpos == cpos
+	&& entry->color == color
         && depth - stackp <= entry->remaining_depth
         && (entry->node_limit >= node_limit || entry->result_certain)
         && (goal_hash == NULL
@@ -389,18 +405,22 @@ find_persistent_cache_entry(struct persistent_cache *cache,
 static int 
 search_persistent_cache(struct persistent_cache *cache,
 			enum routine_id routine, int apos, int bpos,
-			int cpos, Hash_data *goal_hash, int node_limit, 
-			int *result, int *move, int *move2, int *certain)
+			int cpos, int color,
+			Hash_data *goal_hash, int node_limit, 
+			int *result, int *result2, int *move, int *move2,
+			int *certain)
 {
   /* Try to find entry. */
   struct persistent_cache_entry *entry;
-  entry = find_persistent_cache_entry(cache, routine, apos, bpos, cpos,
+  entry = find_persistent_cache_entry(cache, routine, apos, bpos, cpos, color,
 				      goal_hash, node_limit);
   if (entry == NULL)
     return 0;
 
   /* Set return values. */
   *result = entry->result;
+  if (result2)
+    *result2 = entry->result2;
   if (move)
     *move = entry->move;
   if (move2)
@@ -415,6 +435,7 @@ search_persistent_cache(struct persistent_cache *cache,
     gprintf("%oRetrieved position from %s:\n", cache->name);
     print_persistent_cache_entry(entry);
   }
+  /* FIXME: This is an ugly hack. */
   if (cache->name == "reading cache"
       && (debug & DEBUG_READING_PERFORMANCE)
       && entry->cost >= MIN_READING_NODES_TO_REPORT) {
@@ -440,8 +461,9 @@ search_persistent_cache(struct persistent_cache *cache,
 static void
 store_persistent_cache(struct persistent_cache *cache,
 		       enum routine_id routine,
-		       int apos, int bpos, int cpos, Hash_data *goal_hash,
-		       int result, int move, int move2,
+		       int apos, int bpos, int cpos, int color,
+		       Hash_data *goal_hash,
+		       int result, int result2, int move, int move2,
 		       int certain, int node_limit,
 		       int cost, const char goal[BOARDMAX], int goal_color)
 {
@@ -480,9 +502,11 @@ store_persistent_cache(struct persistent_cache *cache,
   entry->apos	     	 = apos;
   entry->bpos	     	 = bpos;
   entry->cpos	     	 = cpos;
+  entry->color	     	 = color;
   if (goal_hash)
     entry->goal_hash	 = *goal_hash;
   entry->result     	 = result;
+  entry->result2     	 = result2;
   entry->result_certain  = certain;
   entry->node_limit      = node_limit;
   entry->remaining_depth = depth - stackp;
@@ -536,6 +560,7 @@ persistent_cache_init()
   init_cache(&breakin_cache);
   init_cache(&connection_cache);
   init_cache(&owl_cache);
+  init_cache(&semeai_cache);
 }
 
 
@@ -547,6 +572,7 @@ clear_persistent_caches()
   connection_cache.current_size = 0;
   breakin_cache.current_size = 0;
   owl_cache.current_size = 0;
+  semeai_cache.current_size = 0;
 }
 
 /* Discards all persistent cache entries that are no longer useful. 
@@ -560,12 +586,12 @@ purge_persistent_caches()
   purge_persistent_cache(&connection_cache);
   purge_persistent_cache(&breakin_cache);
   purge_persistent_cache(&owl_cache);
+  purge_persistent_cache(&semeai_cache);
 }
 
 /* ================================================================ */
 /*                  Tactical reading functions                      */
 /* ================================================================ */
-
 
 /* Look for a valid read result in the persistent cache.
  * Return 1 if found, 0 otherwise.
@@ -575,8 +601,8 @@ search_persistent_reading_cache(enum routine_id routine, int str,
     				int *result, int *move)
 {
   return search_persistent_cache(&reading_cache,
-				 routine, str, NO_MOVE, NO_MOVE, NULL,
-				 -1, result, move, NULL, NULL);
+				 routine, str, NO_MOVE, NO_MOVE, EMPTY, NULL,
+				 -1, result, NULL, move, NULL, NULL);
 }
 
 
@@ -586,8 +612,8 @@ store_persistent_reading_cache(enum routine_id routine, int str,
     			       int result, int move, int nodes)
 {
   store_persistent_cache(&reading_cache, routine,
-      			 str, NO_MOVE, NO_MOVE, NULL,
-			 result, move, NO_MOVE, -1, -1,
+      			 str, NO_MOVE, NO_MOVE, EMPTY, NULL,
+			 result, NO_MOVE, move, NO_MOVE, -1, -1,
 			 nodes, shadow, EMPTY);
 }
 
@@ -784,9 +810,9 @@ search_persistent_connection_cache(enum routine_id routine, int str1,
     				   int str2, int *result, int *move)
 {
   return search_persistent_cache(&connection_cache, routine,
-      				 str1, str2, NO_MOVE, NULL,
+      				 str1, str2, NO_MOVE, EMPTY, NULL,
 				 connection_node_limit,
-				 result, move, NULL, NULL);
+				 result, NULL, move, NULL, NULL);
 }
 
 /* Store a new connection result in the persistent cache. */
@@ -796,8 +822,10 @@ store_persistent_connection_cache(enum routine_id routine,
 				  int result, int move, int tactical_nodes,
 				  char connection_shadow[BOARDMAX])
 {
-  store_persistent_cache(&connection_cache, routine, str1, str2, NO_MOVE, NULL,
-      			 result, move, NO_MOVE, -1, connection_node_limit,
+  store_persistent_cache(&connection_cache, routine,
+      			 str1, str2, NO_MOVE, EMPTY, NULL,
+      			 result, NO_MOVE, move, NO_MOVE, -1,
+			 connection_node_limit,
 			 tactical_nodes, connection_shadow, EMPTY);
 }
 
@@ -931,8 +959,8 @@ search_persistent_breakin_cache(enum routine_id routine,
 				int node_limit, int *result, int *move)
 {
   return search_persistent_cache(&breakin_cache, routine,
-      				 str, NO_MOVE, NO_MOVE, goal_hash, 
-				 node_limit, result, move, NULL, NULL);
+      				 str, NO_MOVE, NO_MOVE, EMPTY, goal_hash, 
+				 node_limit, result, NULL, move, NULL, NULL);
 }
       		          
 /* Store a new breakin result in the persistent cache. */
@@ -944,8 +972,8 @@ store_persistent_breakin_cache(enum routine_id routine,
 			       char breakin_shadow[BOARDMAX])
 {
   store_persistent_cache(&breakin_cache, routine,
-      			 str, NO_MOVE, NO_MOVE, goal_hash,
-      			 result, move, NO_MOVE, -1, breakin_node_limit,
+      			 str, NO_MOVE, NO_MOVE, EMPTY, goal_hash,
+      			 result, NO_MOVE, move, NO_MOVE, -1, breakin_node_limit,
 			 tactical_nodes, breakin_shadow, EMPTY);
 }
   
@@ -1071,9 +1099,9 @@ search_persistent_owl_cache(enum routine_id routine,
 			    int *result, int *move, int *move2, int *certain)
 {
   return search_persistent_cache(&owl_cache,
-      				 routine, apos, bpos, cpos, NULL,
+      				 routine, apos, bpos, cpos, EMPTY, NULL,
 				 owl_node_limit,
-				 result, move, move2, certain);
+				 result, NULL, move, move2, certain);
 }
   
 
@@ -1084,20 +1112,25 @@ store_persistent_owl_cache(enum routine_id routine,
 			   int tactical_nodes,
 			   char goal[BOARDMAX], int goal_color)
 {
-  store_persistent_cache(&owl_cache, routine, apos, bpos, cpos, NULL,
-      			 result, move, move2, certain, owl_node_limit,
+  store_persistent_cache(&owl_cache, routine, apos, bpos, cpos, EMPTY, NULL,
+      			 result, NO_MOVE, move, move2, certain, owl_node_limit,
 			 tactical_nodes, goal, goal_color);
 }
 
 
-static void compute_active_owl_area(struct persistent_cache_entry *entry,
-				    const char goal[BOARDMAX],
-				    int goal_color)
+/* This function is used by owl and semai active area computation. We assume
+ * that (goal) marks a dragon of color (goal_color), i.e. all intersections
+ * in the goal that are not a stone of this color are ignored. The calling
+ * functions must have zeroed the active area, and is allowed to preset
+ * some intersection to be active.
+ */
+static void
+compute_active_owl_type_area(const char goal[BOARDMAX], int goal_color,
+			     signed char active[BOARDMAX])
 {
   int k, r;
   int pos;
   int other = OTHER_COLOR(goal_color);
-  signed char active[BOARDMAX];
 
   /* We let the active area be the goal +
    * distance four expansion through empty intersections and own stones +
@@ -1109,14 +1142,8 @@ static void compute_active_owl_area(struct persistent_cache_entry *entry,
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos))
-      active[pos] = (goal[pos] != 0);
-
-  /* Also add critical moves to the active area. */
-  if (ON_BOARD1(entry->move))
-    active[entry->move] = 1;
-
-  if (ON_BOARD1(entry->move2))
-    active[entry->move2] = 1;
+      active[pos] |= (goal[pos]
+	  	      && board[pos] == goal_color);
 
   /* Distance four expansion through empty intersections and own stones. */
   for (k = 1; k < 5; k++) {
@@ -1181,7 +1208,25 @@ static void compute_active_owl_area(struct persistent_cache_entry *entry,
       }
     }
   }
-  
+}
+
+static void
+compute_active_owl_area(struct persistent_cache_entry *entry,
+			const char goal[BOARDMAX], int goal_color)
+{
+  int pos;
+  signed char active[BOARDMAX];
+  memset(active, 0, BOARDMAX);
+
+  /* Add critical moves to the active area. */
+  if (ON_BOARD1(entry->move))
+    active[entry->move] = 1;
+
+  if (ON_BOARD1(entry->move2))
+    active[entry->move2] = 1;
+
+  compute_active_owl_type_area(goal, goal_color, active);
+
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     int value = board[pos];
     if (!ON_BOARD(pos))
@@ -1194,6 +1239,88 @@ static void compute_active_owl_area(struct persistent_cache_entry *entry,
     entry->board[pos] = value;
   }
 }
+
+
+/* ================================================================ */
+/*                    Semeai reading functions                      */
+/* ================================================================ */
+
+/* Look for stored result in semeai cache. Returns 1 if result found, 0
+ * otherwise.
+ */
+int
+search_persistent_semeai_cache(enum routine_id routine,
+    			       int apos, int bpos, int cpos, int color,
+			       Hash_data *goal_hash,
+    			       int *resulta, int *resultb,
+			       int *move, int *certain)
+{
+  return search_persistent_cache(&semeai_cache, routine, apos, bpos, cpos,
+      				 color, goal_hash, semeai_node_limit,
+				 resulta, resultb, move, NULL, certain);
+}
+
+
+/* Store a new read result in the persistent semeai cache. */
+void
+store_persistent_semeai_cache(enum routine_id routine,
+    			      int apos, int bpos, int cpos, int color,
+			      Hash_data *goal_hash,
+    			      int resulta, int resultb, int move, int certain,
+			      int tactical_nodes,
+			      char goala[BOARDMAX], char goalb[BOARDMAX])
+{
+  char goal[BOARDMAX];
+  int pos;
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    goal[pos] = goala[pos] || goalb[pos];
+  store_persistent_cache(&semeai_cache, routine,
+      			 apos, bpos, cpos, color, goal_hash,
+			 resulta, resultb, move, NO_MOVE,
+			 certain, semeai_node_limit,
+			 tactical_nodes, goal, EMPTY);
+}
+
+
+static void
+compute_active_semeai_area(struct persistent_cache_entry *entry,
+			   const char goal[BOARDMAX], int dummy)
+{
+  int pos;
+  signed char active_b[BOARDMAX];
+  signed char active_w[BOARDMAX];
+  UNUSED(dummy);
+  memset(active_b, 0, BOARDMAX);
+  memset(active_w, 0, BOARDMAX);
+
+  /* Add critical move to the active area. */
+  if (ON_BOARD1(entry->move)) {
+    active_b[entry->move] = 1;
+    active_w[entry->move] = 1;
+  }
+  if (ON_BOARD1(entry->cpos)) {
+    active_b[entry->cpos] = 1;
+    active_w[entry->cpos] = 1;
+  }
+
+  compute_active_owl_type_area(goal, BLACK, active_b);
+  compute_active_owl_type_area(goal, WHITE, active_b);
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int value = board[pos];
+    if (!ON_BOARD(pos))
+      continue;
+    if (!active_b[pos] && !active_w[pos])
+      value = GRAY;
+    else if (IS_STONE(board[pos]) && countlib(pos) > 4
+	     && (active_b[pos] > 0 || active_w[pos] > 0))
+      value |= HIGH_LIBERTY_BIT;
+    
+    entry->board[pos] = value;
+  }
+}
+
 
 
 /* Helper for the owl_hotspots() function below. */
