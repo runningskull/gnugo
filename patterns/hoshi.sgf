@@ -1,23 +1,3 @@
-This is GNU GO, a Go program. Contact gnugo@gnu.org, or see
-http://www.gnu.org/software/gnugo/ for more information.
-
-Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation - version 2.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License in file COPYING for more details.
-
-You should have received a copy of the GNU General Public
-License along with this program; if not, write to the Free
-Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111, USA.
-
-
 (;GM[1]FF[3]
 RU[Japanese]SZ[19]HA[0]KM[5.5]
 GN[Hoshi joseki variations]
@@ -37,7 +17,7 @@ MA[mi];B[qb];W[pe]MA[mi];B[qd])
 )
 
 (;W[pg];B[nd];W[ld];B[nf];W[oe]
-(;B[od]MA[kj])
+(;B[od]MA[ki])
 
 (;B[oh]C[#gnugo likes this.
 ])
@@ -224,8 +204,8 @@ MA[mg];W[od]MA[mg]C[S];B[oc]MA[mg];W[pe]MA[mg]C[U
 (;W[qc];B[qd]MA[mg])
 )
 
-(;B[pj]C[0]PL[B];B[pf]MA[ml];C[#tsuke nobi 6-9 stone games];W[pg]
-MA[mi]C[U];B[of]MA[ml]C[U];C[#tsuke nobi 6-9 stone games])
+(;B[pj]C[0]PL[B];B[pf]MA[ml];C[#tsuke nobi 6-9 stone games];W[pg];
+B[of]MA[ml]C[U];C[#tsuke nobi 6-9 stone games])
 
 (;B[pf]MA[mj]C[j
 ];C[#tsuke nobi normal]
@@ -263,8 +243,11 @@ W[ob]MA[mi]C[0];B[qb]MA[mi]C[U]
 W[sa]MA[mi]C[0];B[na]MA[li]C[U])
 
 (;W[qc]MA[mi]C[0];B[rc]MA[mi]C[U];W[qa]MA[mi]C[0];B[qc]MA[mi]C[U];
-W[pa]MA[mi]C[0];B[sb]MA[mi]C[U];W[ra]MA[mi]C[0];B[na]MA[mi]C[U];
-C[# wrong plays Bsc ])
+W[pa]MA[mi]C[0];B[sb]MA[mi]C[U]
+(;W[ra]MA[mi]C[0];B[na]MA[mi]C[U];C[# wrong plays Bsc ])
+
+(;W[re]MA[mi]C[0];B[na]MA[mi]C[U])
+)
 )
 
 (;W[ob]MA[mi]C[0];B[nb]MA[mi]C[U]
@@ -294,7 +277,7 @@ W[na]MA[mi]C[0];B[oa]MA[mi]C[U])
 (;W[qa]MA[mi]C[0];B[oa]MA[mi]C[U];W[pb]MA[mi]C[0];B[oa]MA[mi]C[U];
 W[pa]MA[mi]C[0];B[tt]MA[mi]C[S];W[ma]MA[ke]C[0];B[lb]MA[ke]C[U];W[la]
 MA[jc]C[0]
-(;B[kb]MA[jb]C[U])
+(;B[kb])
 
 (;B[ka]MA[jb]C[0])
 )
@@ -304,9 +287,7 @@ MA[jc]C[0]
 )
 
 (;W[qc]MA[mi]C[0];C[#stupid move];B[pc]MA[mi]C[U];W[pb]MA[mi]C[0];
-B[qb]MA[mi]C[U];W[rb]MA[mi]C[0];B[rc]MA[mi]C[U];W[qa]MA[mi]C[0];B[qc]
-MA[mi]C[U];W[pa]MA[mi]C[0];B[sb]MA[li]C[U];W[re]MA[mi]C[0];B[na]MA[li]
-C[U])
+B[qb]MA[mi]C[U];W[rb]MA[mi]C[0])
 )
 
 (;W[pc]MA[mi]C[0];C[stupid move];B[qb]MA[mi]C[U];C[improve that];W[pb]
@@ -334,10 +315,6 @@ W[oa]MA[mi]C[0];B[pb]MA[mi]C[U];W[pa]MA[mi]C[0];B[pc]MA[mi]C[U];W[sb]
 MA[mi]C[0];B[na]MA[mi]C[U])
 
 (;W[qc]MA[mi]C[0];C[#maybe this needs more];B[rc]MA[mi]C[U])
-
-(;W[qb]MA[mi]C[0];C[#improve that];B[rb]MA[mi]C[U];W[ra]MA[mi]C[0];
-B[qc]MA[mi]C[U];W[oa]MA[mi]C[0];B[pb]MA[mi]C[U];W[pa]MA[mi]C[0];B[pc]
-MA[mi]C[U];W[sb]MA[mi]C[0];B[na]MA[mi]C[U])
 )
 
 (;W[pc]MA[mi]C[0];C[#stupid move];B[qb]MA[mi]C[U];W[qc]MA[mi]C[0];
@@ -465,7 +442,7 @@ MA[mf]C[S];W[pb]MA[mf]C[S])
 ];W[re]MA[ng])
 )
 
-(;B[rb]MA[mg]C[S];W[re]MA[og]C[S];B[sc]MA[ng]C[S];W[pe]MA[mh]C[S]
+(;B[rb]MA[mg]C[S];W[re];B[sc]MA[ng]C[S];W[pe]MA[mh]C[S]
 (;B[od]MA[mg]C[S];W[rd]MA[ng]C[S];B[pb]MA[ng]C[S;D])
 
 (;B[rd]MA[mg]C[0];W[od]MA[mh]C[S])
