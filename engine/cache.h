@@ -248,8 +248,6 @@ void sgf_trace2(const char *func, int str1, int str2, int move, int result,
     sgf_trace2(read_function_name, q1, q2, move, result, message)
 
 
-extern Hashtable *movehash;
-
 int get_read_result(int routine, int komaster, int kom_pos,
 		    int *str, Read_result **read_result);
 int get_read_result2(int routine, int komaster, int kom_pos,

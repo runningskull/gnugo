@@ -2083,11 +2083,17 @@ xx?
 
 
 Pattern Shape48
+# gf Added constraint. (3.3.15)
 
 .X.     makes it harder for X to make eyes
 *.X
 
 :8,s,shape(1)
+
+.A.
+*.X
+
+;weak(A)
 
 
 Pattern Shape49
@@ -2640,6 +2646,21 @@ xxx
 
 ;(xlib(*)==2 || (lib(a)>2 && xlib(*) < xlib(c)))
 ;&& !oplay_defend(c,B)
+
+
+Pattern Shape86
+# gf New pattern. (3.3.15)
+# Prefer cut to peep as ko threat.
+
+XO        ko threat
+*X
+
+:/,sX,shape(1)
+
+AO
+*B
+
+;oplay_attack_either(*,A,B)
 
 
 ###########################

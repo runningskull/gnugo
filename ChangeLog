@@ -2,6 +2,17 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- defend_both() revised to require that both strings can be saved
+  without ko
+- adjacent_to_nondead_stone() in value_moves.c generalized
+- try harder in estimate_territorial_value() to detect when an
+  ATTACK_THREAT should not yield a followup value
+- do not use tactical defense threats as ko threats unless the move
+  itself is strategically safe
+- do not count strategical value for tactically critical dragons
+- small bonus to dame moves which have a cut or connect move reason
+- threaten_to_capture_helper() revised
+- new autohelper adjacent_to_defendable_stone_in_atari
 - new corner_point in owl.c
 - revision of improve_lunch_attack
 - surround code revised
@@ -20,6 +31,7 @@
 - fixed broken indentation in play_ascii.c
 - bugfix in gtp_known_command
 - new visible_along_edge() and autohelpers
+- influence tuning
 - tuning
 - eye tuning
 - new game records and regression tests

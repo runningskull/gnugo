@@ -354,7 +354,9 @@ static struct autohelper_func autohelper_functions[] = {
   {"does_surround",		2, 0, 1.00, "does_surround(%s, %s)"},
   {"surround_map",		2, 0, 0.01, "surround_map(%s, %s)"},
   {"oracle_threatens",		2, 0, 0.01, "oracle_threatens(%s, %s)"},
-  {"value",			0, 2, 0.0,  "(%s->value)"}
+  {"value",			0, 2, 0.0,  "(%s->value)"},
+  {"adjacent_to_defendable_stone_in_atari", 1, 0, 1.0,
+                "adjacent_to_defendable_stone_in_atari(%s)"}
 };
 
 

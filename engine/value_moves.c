@@ -1273,8 +1273,10 @@ strategic_penalty(int pos, int color)
 
 
 /* True if pos is adjacent to a nondead stone of the given color. This
- * function can be called when stackp>0 but the result is given for the
- * position when stackp==0.
+ * function can be called when stackp>0 but the result is given for
+ * the position when stackp==0. It also checks for nondead stones two
+ * steps away from pos if a move by color at pos cannot be cut off
+ * from that stone.
  *
  * FIXME: Move this somewhere more generally accessible, probably
  *        utils.c
@@ -1283,13 +1285,41 @@ static int
 adjacent_to_nondead_stone(int pos, int color)
 {
   int k;
-  for (k = 0; k < 4; k++)
-    if (ON_BOARD(pos + delta[k])
-	&& worm[pos + delta[k]].color == color
-	&& dragon[pos + delta[k]].status != DEAD)
-      return 1;
+
+  int stack[MAXSTACK];
+  int move_color[MAXSTACK];
+  int saved_stackp = stackp;
+  int result = 0;
+
+  while (stackp > 0) {
+    get_move_from_stack(stackp - 1, &stack[stackp - 1],
+			&move_color[stackp - 1]);
+    popgo();
+  }
+
+  if (trymove(pos, color, NULL, EMPTY, NO_MOVE, EMPTY)) {
+    for (k = 0; k < 12; k++) {
+      int pos2;
+      if (k < 8)
+	pos2 = pos + delta[k];
+      else
+	pos2 = pos + 2 * delta[k - 8];
+      
+      if (ON_BOARD(pos2)
+	  && worm[pos2].color == color
+	  && dragon[pos2].status != DEAD
+	  && !disconnect(pos, pos2, NULL)) {
+	result = 1;
+	break;
+      }
+    }
+    popgo();
+  }
+
+  while (stackp < saved_stackp)
+    tryko(stack[stackp], move_color[stackp], NULL, NO_MOVE, EMPTY);
   
-  return 0;
+  return result;
 }
 
 
@@ -1328,7 +1358,7 @@ estimate_territorial_value(int pos, int color, float score)
     case ATTACK_MOVE_BAD_KO:
       aa = move_reasons[r].what;
       
-      gg_assert(board[aa] != color);
+      ASSERT1(board[aa] != color, aa);
       
       /* Defenseless stone. */
       if (worm[aa].defense_codes[0] == 0) {
@@ -1381,7 +1411,7 @@ estimate_territorial_value(int pos, int color, float score)
     case DEFEND_MOVE_BAD_KO:
       aa = move_reasons[r].what;
       
-      gg_assert(board[aa] == color);
+      ASSERT1(board[aa] == color, aa);
       
       /* 
        * Estimate value 
@@ -1509,15 +1539,38 @@ estimate_territorial_value(int pos, int color, float score)
 		|| adjacent_to_nondead_stone(pos, color))
 	    && find_defense(aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
+	  int bad_followup;
 	  if (trymove(defense_move, other,
 		      "estimate_territorial_value-b", NO_MOVE,
 		      EMPTY, NO_MOVE)) {
-	    if (board[pos] == EMPTY || attack(pos, NULL) == WIN) {
+	    if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
 	      popgo();
 	      popgo();
 	      break;
 	    }
 	    popgo();
+	  }
+	  
+	  bad_followup = 0;
+	  for (s = 0; s < num_adj; s++) {
+	    int lib;
+	    if (countlib(adjs[s]) == 1) {
+	      findlib(adjs[s], 1, &lib);
+	      if (trymove(lib, other, "estimate_territorial_value-c", NO_MOVE,
+			  EMPTY, NO_MOVE)) {
+		if (!attack(aa, NULL)
+		    && (board[pos] == EMPTY || attack(pos, NULL) != 0)) {
+		  popgo();
+		  bad_followup = 1;
+		  break;
+		}
+		popgo();
+	      }
+	    }
+	  }
+	  if (bad_followup) {
+	    popgo();
+	    break;
 	  }
 	}
 
@@ -1555,8 +1608,7 @@ estimate_territorial_value(int pos, int color, float score)
 	adjusted_value -= adjustment_down;
 	if (adjusted_value > 0.0) {
 	  add_followup_value(pos, adjusted_value);
-	  /* Inside trymove, so don't re-indented.*/
-	  TRACE("%1m:   %f (followup) - threatens to capture %1m\n",
+	  TRACE("  %1m:   %f (followup) - threatens to capture %1m\n",
 		pos, adjusted_value, aa);
 	}
       }
@@ -1585,7 +1637,7 @@ estimate_territorial_value(int pos, int color, float score)
 	  if (trymove(attack_move, other,
 		      "estimate_territorial_value-b", NO_MOVE,
 		      EMPTY, NO_MOVE)) {
-	    if (board[pos] == EMPTY || attack(pos, NULL) == WIN) {
+	    if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
 	      popgo();
 	      popgo();
 	      break;
@@ -1596,9 +1648,15 @@ estimate_territorial_value(int pos, int color, float score)
 	popgo();
       }
       
+      /* We don't trust tactical defense threats as ko threats, unless
+       * the move is safe.
+       */
+      if (move[pos].move_safety == 0)
+	break;
+
       add_followup_value(pos, 2 * worm[aa].effective_size);
 
-      TRACE("  %1m: %f (followup) - threatens to defend %1m\n",
+      TRACE("  %1m:   %f (followup) - threatens to defend %1m\n",
 	    pos, 2 * worm[aa].effective_size, aa);
 
       break;
@@ -1878,7 +1936,7 @@ estimate_territorial_value(int pos, int color, float score)
 	 			  move[pos].influence_followup_value);	
     }
     popgo();
-					   
+    
     if (this_value != 0.0)
       TRACE("  %1m: %f - change in territory\n", pos, this_value);
     else
@@ -2357,7 +2415,9 @@ estimate_strategical_value(int pos, int color, float score)
      * in a semeai, we have likewise already counted the points as
      * territorial value.
      */
-    if (owl_attack_move_reason_known(pos, aa)
+    if (attack_move_reason_known(pos, aa)
+	|| defense_move_reason_known(pos, aa)
+	|| owl_attack_move_reason_known(pos, aa)
 	|| owl_defense_move_reason_known(pos, aa)
 	|| move_reason_known(pos, SEMEAI_MOVE, aa)) {
       /* But if the strategical value was larger than the territorial
@@ -2555,6 +2615,19 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 		shape_factor2);
       }
       tot_value += base_value * shape_factor2;
+    }
+
+    /* Dame points which have a cut or connect move reason get a small
+     * extra bonus because these have a tendency to actually be worth
+     * a point.
+     */
+    if (tot_value < 0.3
+	&& (move_reason_known(pos, CONNECT_MOVE, -1)
+	    || move_reason_known(pos, CUT_MOVE, -1))) {
+      float old_tot_value = tot_value;
+      tot_value = gg_min(0.3, tot_value + 0.1);
+      TRACE("  %1m: %f - cut/connect dame bonus\n", pos,
+	    tot_value - old_tot_value);
     }
   }
   else {

@@ -1129,22 +1129,23 @@ x...........
 
 
 Pattern F410d
+# gf Revised pattern. (3.3.15)
 
-......xxx      extend while limiting opponent
-O.....xxx
-...*..xxx
-.........
-.........
----------
+o......xxx      extend while limiting opponent
+oO.....xxx
+o...*..xxx
+..........
+..........
+----------
 
 :8,Fedt
 
-......xxx
-O.....abx
-...*..cdx
-.........
-.........
----------
+o......xxx
+oO.....abx
+o...*..cdx
+..........
+..........
+----------
 
 ; x_alive_somewhere(a,b,c,d)
 

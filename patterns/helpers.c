@@ -224,7 +224,8 @@ throw_in_atari_helper(ARGS)
   }
 
   /* The followup is to capture the "a" string. Estimate the value to
-     twice the size. */
+   * twice the size.
+   */
   add_followup_value(move, 2 * worm[apos].effective_size);
   TRACE("...followup value %f\n", 2 * worm[apos].effective_size);
 
@@ -440,6 +441,25 @@ threaten_to_capture_helper(int move, int str)
     }
     popgo();
   }
+
+  /* In addition to the move found by find_defense(), also try all
+   * chain breaking moves in the same way.
+   */
+  adj = chainlinks2(str, adjs, 1);
+  for (k = 0; k < adj; k++) {
+    int lib;
+    findlib(adjs[k], 1, &lib);
+    if (TRYMOVE(lib, board[str])) {
+      if (!attack(str, NULL)
+	  && (board[move] == EMPTY || attack(move, NULL) != 0)) {
+	popgo();
+	popgo();
+	return;
+      }
+      popgo();
+    }
+  }
+
   popgo();
   
   add_followup_value(move, 2.0 * worm[str].effective_size);
@@ -768,6 +788,23 @@ test_attack_either_move(int move, int color, int worma, int wormb)
   }
 }
 
+/* True if str is adjacent to a stone in atari, which is tactically
+ * defendable.
+ */
+int
+adjacent_to_defendable_stone_in_atari(int str)
+{
+  int adj;
+  int adjs[MAXCHAIN];
+  int k;
+
+  adj = chainlinks2(str, adjs, 1);
+  for (k = 0; k < adj; k++)
+    if (attack_and_defend(adjs[k], NULL, NULL, NULL, NULL))
+      return 1;
+  
+  return 0;
+}
 
 /*
  * LOCAL Variables:

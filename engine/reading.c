@@ -506,14 +506,14 @@ defend_both(int astr, int bstr)
   attack_and_defend(astr, &acode, NULL, &dcode, &a_savepos);
   if (acode != 0) {
     a_threatened = 1;
-    if (dcode == 0)
+    if (dcode != WIN)
       return 0; /* (astr) already lost */
   }
   
   attack_and_defend(bstr, &acode, NULL, &dcode, &b_savepos);
   if (acode != 0) {
     b_threatened = 1;
-    if (dcode == 0)
+    if (dcode != WIN)
       return 0; /* (bstr) already lost */
   }
 

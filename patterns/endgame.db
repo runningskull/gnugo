@@ -858,12 +858,13 @@ b..a
 
 
 Pattern EE804
+# gf Revised value. (3.3.15)
 
 O*X            endgame move
-..X            at least 0 points sente or one point gote
+..X            not guaranteed to be more than 0 points gote
 ---
 
-:8,OXe,terri(0.5)
+:8,OXe,terri(0.1)
 
 O*X
 a.X
@@ -1131,6 +1132,7 @@ X?        push in
 
 
 Pattern CE9
+# gf Revised constraint. (3.3.15)
 
 .X        push in
 *O        1 points gote
@@ -1140,7 +1142,8 @@ Pattern CE9
 aX
 *O
 
-;marginal_eye(*) && !safe_omove(a) && !obvious_false_xeye(a)
+;marginal_eye(*) && max_eye_value(*)>0
+;&& !safe_omove(a) && !obvious_false_xeye(a)
 
 
 Pattern CE12
@@ -1226,6 +1229,7 @@ X??
 
 
 Pattern CE16b
+# gf Revised constraint. (3.3.15)
 
 .O?       sente endgame move
 .*X       one point reverse sente
@@ -1237,7 +1241,7 @@ O??
 a*X
 O??
 
-;marginal_eye(*) && proper_eye(a) && xlib(*)>2
+;marginal_eye(*) && proper_eye(a) && max_eye_value(a)>0 && xlib(*)>2
 
 
 Pattern CE17
@@ -1258,6 +1262,7 @@ xX
 Pattern CE18
 # tm removed reverse_followup value
 #   see trevorb:700
+# gf Revised constraint. (3.3.15)
 
 OX          endgame move
 .*          one point gote.
@@ -1269,10 +1274,11 @@ OX
 a*
 oO
 
-;marginal_eye(*) && proper_eye(a)
+;marginal_eye(*) && proper_eye(a) && max_eye_value(a)>0
 
 
 Pattern CE19
+# gf Revised constraint. (3.3.15)
 
 ?.?       endgame move
 X*X       one point gote
@@ -1284,11 +1290,12 @@ O.O
 X*X
 OaO
 
-;marginal_eye(*) && proper_eye(b) && oplay_attack(*,a,a)
+;marginal_eye(*) && proper_eye(b) && max_eye_value(b)>0 && oplay_attack(*,a,a)
 
 
 Pattern CE20a
 # gf Split and revised pattern. (3.3.10)
+# gf Revised constraint. (3.3.15)
 
 ?.?         Smallish endgame
 O*O         one point, possibly reverse sente
@@ -1300,7 +1307,7 @@ O*O         one point, possibly reverse sente
 O*O
 ?X?
 
-;marginal_eye(*) && proper_eye(a)
+;marginal_eye(*) && proper_eye(a) && max_eye_value(a)>0
 
 
 Pattern CE20b
@@ -1474,21 +1481,22 @@ OaX
 ;oplay_attack_either(*,a,a,B)
 
 
-Pattern CE30
-# tm New Pattern (3.1.20)  (see trevorc:650, trevorc:470)
-
-???    threaten to capture
-?*X
-??.
-
-:8,nOXe,terri(1),followup(3)
-
-?c?
-d*A
-??b
-
-; o_alive_somewhere(c,d) && (!weak(c) || !weak(d))
-; && proper_eye(b) && oplay_attack(*,A)
+# Pattern CE30
+# # tm New Pattern (3.1.20)  (see trevorc:650, trevorc:470)
+# # gf Too general, removed. (3.3.15)
+# 
+# ???    threaten to capture
+# ?*X
+# ??.
+# 
+# :8,nOXe,terri(1),followup(3)
+# 
+# ?c?
+# d*A
+# ??b
+# 
+# ; o_alive_somewhere(c,d) && (!weak(c) || !weak(d))
+# ; && proper_eye(b) && oplay_attack(*,A)
 
 
 Pattern CE31

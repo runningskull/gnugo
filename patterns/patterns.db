@@ -1284,6 +1284,68 @@ Xb*.
 ;!oplay_defend(*,a,b,a) && oplay_attack(*,b,a,c,c)
 
 
+Pattern CC84
+# Formerly called EC37
+
+XO??           prevent double nozoki
+O.O?
+?*.O
+??OX
+
+:8,nC
+
+
+Pattern CC85
+# Formerly called EC38
+
+?XO?          prevent ko
+.O*O
+O..X
+?XXX
+
+:8,C
+
+
+Pattern CC86
+# Formerly called EC39
+
+??o?           connect out
+X..O
+O.*X
+?.??
+
+:8,C
+
+??o?
+X..O
+O.*A
+?.??
+
+; lib(A)==2
+
+
+Pattern CC87
+# Formerly called EC40
+
+??o?           connect out
+X*.O
+O.OX
+?.??
+
+:8,C
+
+
+Pattern CC88
+# Formerly called EC41
+
+.O.        cut!
+.*X
+X..
+..O
+
+:8,OB
+
+
 ##########################
 #
 # General Edge Connections
@@ -1881,63 +1943,6 @@ XaX
 ;ko(a) && alive(b)
 
 
-Pattern EC37
-
-XO??           prevent double nozoki
-O.O?
-?*.O
-??OX
-
-:8,nC
-
-
-Pattern EC38
-
-?XO?          prevent ko
-.O*O
-O..X
-?XXX
-
-:8,C
-
-
-Pattern EC39
-
-??o?           connect out
-X..O
-O.*X
-?.??
-
-:8,C
-
-??o?
-X..O
-O.*A
-?.??
-
-; lib(A)==2
-
-
-Pattern EC40
-
-??o?           connect out
-X*.O
-O.OX
-?.??
-
-:8,C
-
-
-Pattern EC41
-
-.O.        cut!
-.*X
-X..
-..O
-
-:8,OB
-
-
 Pattern EC42
 
 ..OO?    cut
@@ -2500,6 +2505,22 @@ O..
 ---
 
 :8,C
+
+
+Pattern EC80
+# gf New Pattern (3.3.15)
+
+XOOX     block edge connection
+X.*.
+----
+
+:8,OB
+
+XOOX
+Xa*.
+----
+
+;xplay_attack(*,a,a)
 
 
 ##############################################

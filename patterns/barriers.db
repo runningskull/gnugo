@@ -2870,4 +2870,59 @@ XabO
 >non_xterritory(c);
 
 
+Pattern Nonterritory42
+# gf New pattern. (3.3.15)
+
+OX
+.O
+
+:8,t
+
+bX
+ac
+
+;!xplay_defend_both(a,b,c) && !adjacent_to_defendable_stone_in_atari(b)
+;&& !adjacent_to_defendable_stone_in_atari(c)
+
+>non_oterritory(a);
+
+
+Pattern Nonterritory43
+# gf New pattern. (3.3.15)
+
+oOXx
+O..X
+oO.X
+
+:8,t
+
+oODx
+OabX
+oOcX
+
+;!oplay_attack(b,D) && !oplay_attack(b,c,c)
+
+>non_oterritory(a);
+
+
+Pattern Nonterritory44
+# gf New pattern. (3.3.15)
+
+OXXx?
+.OOXx
+.....
+-----
+
+:8,t
+
+OXXx?
+eccXx
+..abd
+-----
+
+;oplay_attack(a,b,c) && !oplay_attack(b,d,d)
+
+>non_oterritory(e);
+
+
 # END OF FILE
