@@ -1199,8 +1199,21 @@ detect_tactical_blunder(int move, int color, int *defense_point,
       
       if (defense_effective && defense_point) {
 	int dpos;
-	if (attack(pos, &dpos))
+	if (attack(pos, &dpos)) {
 	  *defense_point = dpos;
+	  /* Check that this move is legal and effective also on the
+           * original board, otherwise find a tactical attack there
+           * instead.
+	   */
+	  popgo();
+	  
+	  if (!is_legal(dpos, color)
+	      || play_attack_defend_n(color, 0, 1, dpos, pos))
+	    attack(pos, defense_point);
+
+	  /* Redo the move, we know that it won't fail. */
+	  trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
+	}
 	else {
 	  verbose = save_verbose;
 	  TRACE("No attack found (unexpectedly) on %1m after move at %1m.\n",
