@@ -85,7 +85,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 192
 # Make a ko threat. How about T8 or T10?
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 202
 210 gg_genmove black
-#? [!S5]*
+#? [!S5]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
 220 gg_genmove black
@@ -106,7 +106,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 246
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 258
 260 gg_genmove black
-#? [A4]*
+#? [A4]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 292
 270 gg_genmove black
@@ -265,7 +265,7 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 152
 
 loadsgf games/nngs/evand-gnugo-3.3.21-200306130638.sgf 156
 630 gg_genmove black
-#? [B6]
+#? [B6]*
 
 
 ############ End of Tests #################

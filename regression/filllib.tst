@@ -117,7 +117,7 @@ loadsgf games/filllib10.sgf
 
 loadsgf games/nngs/speciman-gnugo-3.1.32-200204211014.sgf 53
 35 gg_genmove black
-#? [A8|B8]*
+#? [A8|B8]
 36 gg_genmove white
 #? [A5|A8|B8]
 
@@ -143,4 +143,4 @@ loadsgf games/nngs/gnugo-3.3.11-rcde05-200211090008.sgf 271
 
 loadsgf games/filllib12.sgf
 43 gg_genmove black
-#? [C6]*
+#? [C6]

@@ -8,7 +8,7 @@ reset_trymove_counter
 # See also reading:173
 loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 1 gg_genmove white
-#? [B1|A2]*
+#? [B1|A2]
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 22
 10 gg_genmove black
@@ -250,7 +250,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 # We still can live.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 224
 600 gg_genmove white
-#? [B5]
+#? [B5]*
 
 ############ End of Tests #################
 

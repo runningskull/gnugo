@@ -51,7 +51,7 @@ loadsgf games/trevor/auto/a005.sgf 12
 #Must stay connected.
 loadsgf games/trevor/auto/a006.sgf 12
 150 gg_genmove white
-#? [F6]*
+#? [F6]
 
 
 
@@ -215,7 +215,7 @@ loadsgf games/trevor/auto/a019.sgf 6
 #Break through important
 loadsgf games/trevor/auto/a021.sgf 16
 370 gg_genmove white
-#? [F6]*
+#? [F6]
 
 
 
@@ -234,7 +234,7 @@ loadsgf games/trevor/auto/a022.sgf 42
 #A3 just looses points.
 loadsgf games/trevor/auto/a023.sgf 50
 390 gg_genmove white
-#? [A2]*
+#? [A2]
 
 
 

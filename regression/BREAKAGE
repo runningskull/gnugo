@@ -1,3 +1,78 @@
+========================== 3.3.22 pre 1 =====================================
+
+./regress.sh . reading.tst 
+58 unexpected FAIL: Correct '0', got '1 M18'
+173 unexpected PASS!
+185 unexpected FAIL: Correct '2 A16', got '1 E11'
+187 unexpected FAIL: Correct '1 E11', got '0'
+./regress.sh . filllib.tst 
+35 unexpected PASS!
+43 unexpected PASS!
+./regress.sh . connection.tst 
+94 unexpected PASS!
+./regress.sh . break_in.tst 
+60 unexpected FAIL: Correct '0', got '1 K13'
+./regress.sh . trevora.tst 
+150 unexpected PASS!
+370 unexpected PASS!
+390 unexpected PASS!
+./regress.sh . strategy.tst 
+36 unexpected PASS!
+./regress.sh . neurogo.tst 
+12 unexpected FAIL: Correct 'B10', got 'S8'
+./regress.sh . golife.tst 
+1 unexpected FAIL: Correct 'C7', got 'H5'
+./regress.sh . viking.tst 
+2 unexpected PASS!
+./regress.sh . trevorb.tst 
+590 unexpected FAIL: Correct 'H12|M9', got 'E9'
+740 unexpected PASS!
+./regress.sh . nicklas1.tst 
+1406 unexpected FAIL: Correct 'B6', got 'B9'
+./regress.sh . nicklas3.tst 
+401 unexpected FAIL: Correct 'A5', got 'F9'
+./regress.sh . nicklas5.tst 
+1212 unexpected PASS!
+./regress.sh . nngs.tst 
+1280 unexpected PASS!
+./regress.sh . trevorc.tst 
+130 unexpected PASS!
+./regress.sh . strategy3.tst 
+120 unexpected PASS!
+141 unexpected PASS!
+./regress.sh . global.tst 
+1 unexpected PASS!
+44 unexpected PASS!
+./regress.sh . 13x13.tst 
+65 unexpected FAIL: Correct 'H4', got 'L4'
+./regress.sh . semeai.tst 
+51 unexpected FAIL: Correct '1 0 (A19|E11)', got '0 0 PASS'
+52 unexpected FAIL: Correct '1 3 A17', got '1 1 F17'
+./regress.sh . nngs2.tst 
+1 unexpected PASS!
+600 unexpected FAIL: Correct 'B5', got 'D6'
+./regress.sh . nngs4.tst 
+210 unexpected PASS!
+260 unexpected PASS!
+630 unexpected FAIL: Correct 'B6', got 'P13'
+./regress.sh . century2002.tst 
+240 unexpected FAIL: Correct 'F18', got 'C7'
+./regress.sh . ninestones.tst 
+240 unexpected PASS!
+./regress.sh . gunnar.tst 
+36 unexpected PASS!
+./regress.sh . arend2.tst 
+70 unexpected FAIL: Correct 'N7|O9', got 'N16'
+160 unexpected FAIL: Correct 'O16', got 'F17'
+170 unexpected FAIL: Correct 'O14', got 'S18'
+180 unexpected FAIL: Correct 'L17', got 'L18'
+190 unexpected FAIL: Correct 'O1|P1|Q1', got 'O4'
+200 unexpected FAIL: Correct 'Q5|R5', got 'M4'
+210 unexpected FAIL: Correct 'K2', got 'N3'
+220 unexpected FAIL: Correct 'K11|L11', got 'G12'
+230 unexpected FAIL: Correct '!H14', got 'H14'
+240 unexpected FAIL: Correct 'N7', got 'H16'
+
 ========================== 3.3.21 pre 1 =====================================
 
 ./regress.sh . connection.tst 

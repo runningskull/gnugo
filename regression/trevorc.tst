@@ -19,7 +19,7 @@ loadsgf games/trevor/auto/c01.sgf 44
 
 loadsgf games/trevor/auto/c08.sgf 58
 130 gg_genmove white
-#? [H9]*
+#? [H9]
 
 
 loadsgf games/trevor/auto/c08.sgf 60

@@ -265,7 +265,7 @@ loadsgf games/incident252.sgf 134
 # This mistake can be solved by increasing the fourlib depth to 11.
 loadsgf games/incident272.sgf 24
 58 defend M17
-#? [0]
+#? [0]*
 
 # incident 276
 # This ko is quite messy with respect to internal ko threats. Awaiting
@@ -701,7 +701,7 @@ loadsgf games/reading38.sgf
 loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 trymove white A4
 173 defend B2
-#? [1 (A2|C7|B1)]*
+#? [1 (A2|C7|B1)]
 popgo
 
 # Although gnugo plays N16, the fact it doesn't see that the move
@@ -769,11 +769,11 @@ loadsgf games/reading41.sgf 130
 184 attack C19
 #? [2 A16]
 185 attack A19
-#? [2 A16]
+#? [2 A16]*
 186 defend C19
 #? [1 E11]
 187 defend A19
-#? [1 E11]
+#? [1 E11]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

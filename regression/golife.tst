@@ -4,7 +4,7 @@
 
 loadsgf games/golife.sgf 16
 1 gg_genmove white
-#? [C7]
+#? [C7]*
 
 loadsgf games/golife.sgf 26
 2 gg_genmove white

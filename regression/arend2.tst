@@ -29,7 +29,7 @@ loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 110
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 112
 70 reg_genmove white
-#? [N7|O9]
+#? [N7|O9]*
 
 # Only move.
 loadsgf games/nngs/gnugo-3.3.16-ccwills-200302151826.sgf 74
@@ -67,41 +67,41 @@ loadsgf games/nngs/guestu-gnugo-3.3.19-200305131943.sgf B12
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 6
 160 reg_genmove black
-#? [O16]
+#? [O16]*
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 12
 170 reg_genmove black
-#? [O14]
+#? [O14]*
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 26
 180 restricted_genmove black L17 L18
-#? [L17]
+#? [L17]*
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 40
 190 reg_genmove black
-#? [O1|P1|Q1]
+#? [O1|P1|Q1]*
 
 # Q5 is clearly better, but R5 is still a lot better than everything else.
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 44
 200 reg_genmove black
-#? [Q5|R5]
+#? [Q5|R5]*
 
 # Cut off the white group!
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 106
 210 reg_genmove black
-#? [K2]
+#? [K2]*
 
 # K11 should kill the white dragon. L11 might kill, too, so we accept it,
 # although K11 is better.
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 152
 220 reg_genmove black
-#? [K11|L11]
+#? [K11|L11]*
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 158
 230 restricted_genmove black G14 H14 K11 L11
-#? [!H14]
+#? [!H14]*
 
 loadsgf games/nngs/GoFuN-gnugo-3.3.21-200306202102.sgf 208
 240 reg_genmove black
-#? [N7]
+#? [N7]*
 

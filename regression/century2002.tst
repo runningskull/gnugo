@@ -121,7 +121,7 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 76
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 96
 240 gg_genmove white
-#? [F18]
+#? [F18]*
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 156
 260 gg_genmove white

@@ -52,7 +52,7 @@ loadsgf games/nicklas/nicklas12.sgf 182
 # B G13, I do not think the black P13 dragon can make eyes. /ab
 loadsgf games/nicklas/nicklas12.sgf 199
 1212 dragon_status P13
-#? [dead]*
+#? [dead]
 
 loadsgf games/nicklas/nicklas12.sgf 263
 1217 gg_genmove black

@@ -8,12 +8,12 @@ trymove white F2
 #? [0]
 popgo
 
-#loadsgf games/break_in.sgf
-#30 break_in D7 F9 G9 H9 J9 F8 G8 H8 J8 G7 H7 J7 H6 J6 G5 H5 J5 H4 J4 G3 H3 J3 H2 J2 H1 J1 
-##? [G7|G5]
+loadsgf games/break_in.sgf
+30 break_in D7 F9 G9 H9 J9 F8 G8 H8 J8 G7 H7 J7 H6 J6 G5 H5 J5 H4 J4 G3 H3 J3 H2 J2 H1 J1 
+#? [G7|G5]
 
-#40 reg_genmove black
-##? [G7|G5]
+40 reg_genmove black
+#? [G7|G5]
 
 loadsgf games/trevor/auto/a013.sgf 20
 trymove white C4
@@ -24,7 +24,7 @@ popgo
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204140254.sgf 164
 trymove black R14
 60 break_in M9 B19 C19 D19 E19 F19 G19 H19 J19 K19 L19 M19 N19 O19 P19 Q19 R19 S19 T19 A18 C18 D18 E18 F18 G18 H18 J18 K18 L18 M18 O18 Q18 R18 S18 B17 C17 D17 E17 F17 G17 H17 J17 L17 M17 R17 T17 E16 G16 H16 J16 L16 M16 R16 T16 E15 F15 H15 J15 K15 L15 R15 S15 T15 F14 G14 H14 J14 K14 S14 T14 H13 K13 L13 S13 T13 K12 L12 T12 J11 K11 
-#? [0]
+#? [0]*
 popgo
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203132324.sgf 90

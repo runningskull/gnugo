@@ -197,7 +197,7 @@ loadsgf games/gunnar/gunnar10.sgf
 # Clearly filling ko at B18 is the only worthwhile move here.
 loadsgf games/gunnar/gunnar11.sgf
 36 gg_genmove white
-#? [B18]*
+#? [B18]
 
 
 ############ End of Tests #################
