@@ -248,4 +248,23 @@ X*b
 ?AA
 
 ;lib(A) == 2 && xlib(b) <= 2
+
+
+Pattern A16
+#evand new pattern (3.3.13)
+
+*x
+X.
+x.
+--
+
+:8,-
+
+*x
+A.
+x.
+--
+
+;lib(A) == 3
+
 # END OF FILE

@@ -73,3 +73,7 @@ loadsgf games/atari_atari06.sgf
 loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 194
 17 combination_attack white
 #? [S10]
+
+loadsgf games/nngs/gnugo-3.3.12-guest-200212171626.sgf 148
+18 combination_attack black
+#? [R11|R14]
