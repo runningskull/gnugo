@@ -20,7 +20,7 @@ loadsgf games/auto_gen/auto003.sgf 52
 #? [1 Q10]*
 
 loadsgf games/auto_gen/auto004.sgf 9
-6 dragon_defend f3
+6 owl_defend f3
 #? [!0]
 
 loadsgf games/auto_gen/auto006.sgf 25
