@@ -915,8 +915,16 @@ remove_stone(int pos)
   new_position();
 }
 
+
+/* Play a move. Basically the same as play_move() below, but doesn't store
+ * the move in history list.
+ *
+ * Set `update_internals' to zero if you want to play several moves in a
+ * row to avoid overhead caused by new_position(). Don't forget to call
+ * it yourself after all the moves have been played.
+ */
 static void
-play_move_no_history(int pos, int color)
+play_move_no_history(int pos, int color, int update_internals)
 {
 #if CHECK_HASHING
   Hash_data oldkey;
@@ -955,7 +963,11 @@ play_move_no_history(int pos, int color)
 #endif
 #endif
   }
-  new_position();
+
+  if (update_internals || next_string == MAX_STRINGS)
+    new_position();
+  else
+    CLEAR_STACKS();
 }
 
 /* Load the initial position and replay the first n moves. */
@@ -971,7 +983,9 @@ replay_move_history(int n)
   new_position();
 
   for (k = 0; k < n; k++)
-    play_move_no_history(move_history_pos[k], move_history_color[k]);
+    play_move_no_history(move_history_pos[k], move_history_color[k], 0);
+
+  new_position();
 }
 
 /* Play a move. If you want to test for legality you should first call
@@ -1032,7 +1046,7 @@ play_move(int pos, int color)
   move_history_pos[move_history_pointer] = pos;
   move_history_pointer++;
   
-  play_move_no_history(pos, color);
+  play_move_no_history(pos, color, 1);
   
   movenum++;
 }
