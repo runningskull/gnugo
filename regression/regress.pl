@@ -211,8 +211,10 @@ print $index_out
  <TR><TD>file</TD><TD>passed</TD><TD>PASSED</TD><TD>failed</TD><TD>FAILED</TD>
  </TR>\n";
 
+my $curtstfile = "";
 my $file_count = 0;
 while ($file_count <= $#ARGV) {
+        $curtstfile = $ARGV[$file_count];
 	print $index_out "<TR><TD><A href=\"" . $ARGV[$file_count] . ".html\">" . $ARGV[$file_count] . "</A></TD>\n";
 	print "regressing file $ARGV[$file_count]\n" if $verbose > 1;
 	regress_file ($ARGV[$file_count]);
@@ -513,7 +515,7 @@ sub eat_board {
   my $owlboard = "";
   my $dragonboard = "";
   my $colorboard = "";
-  my $sgfboard = "(;FF[4]GM[1]GN[1]SZ[$boardsize]\n";
+  my $sgfboard = "(;FF[4]GM[1]GN[$curtstfile#$num]SZ[$boardsize]\n";
           
 
   my $cur_point = 0;
@@ -670,24 +672,26 @@ sub eat_board {
 
 
   my %tmarr;
-  #my $topmoves = "top moves unavailable";
-  #if ($prev_cmd =~ /.*gg_genmove\s+([whiteblack]+)/) {
-  #  print $goprog_in "top_moves_$1\n";
-  #  my $tm = <$goprog_out>;
-  #  <$goprog_out>;
-  if ($top_moves) {
-    print "$top_moves\n" if $verbose > 1;
-    if ($top_moves =~ /^\s*(.*)\s*/) { #i.e. always!
-      my $t = $1;
-      %tmarr = split(/\s+/,$t);
-      #Skip putting topmove labels in SGF board, for now.
-      #$sgfboard .= "\n;\nLB";
-      foreach (keys(%tmarr)) {
-      	my $k = $_;
-      	my $coord = GTPtoSGF($k);
-        #$sgfboard .= "[$coord:$tmarr{$k}]";
+  if ($prev_cmd =~ /.*gg_genmove\s+([whiteblack]+)/) {
+    go_command ("top_moves");
+    my $top_moves = <$goprog_out>;
+    <$goprog_out>;
+    if ($top_moves) {
+      $top_moves =~ s/^=\s*//;
+      $top_moves =~ s/\s*$//mg;
+      print "TOP_MOVES:'$top_moves'\n" if $verbose > 1;
+      if ($top_moves =~ /^\s*(.*)\s*/) { #i.e. always!
+        my $t = $1;
+        %tmarr = split(/\s+/,$t);
+        #Skip putting topmove labels in SGF board, for now.
+        #$sgfboard .= "\n;\nLB";
+        foreach (keys(%tmarr)) {
+        	my $k = $_;
+        	my $coord = GTPtoSGF($k);
+          #$sgfboard .= "[$coord:$tmarr{$k}]";
+        }
+        $sgfboard .= "\n";
       }
-      $sgfboard .= "\n";
     }
   }
         
@@ -751,25 +755,11 @@ sub eat_board {
               
               my $markcolor = "";
               my $status = $stones{$iA.$j};
-              if ($status =~ /;known_wrong;/) {
-                #print "  known_wrong: $iA$j\n";
-                $markcolor = "magenta";
-              }
-              if ($status =~ /;known_right;/) {
-                #print "  known_right: $iA$j\n";
-                $markcolor = "green";
-              }
-              if ($status =~ /;try_right;/) {
-                #print "  try_right: $iA$j\n";
-                $markcolor = "cyan";
-              }              
-              if ($status =~ /;try_wrong;/) {
-                #print "  try_wrong: $iA$j\n";
-                $markcolor = "yellow";
-              }
+              $markcolor = "magenta" if ($status =~ /;known_wrong;/);
+              $markcolor = "green"  if ($status =~ /;known_right;/);
+              $markcolor = "cyan" if ($status =~ /;try_right;/);
+              $markcolor = "red" if ($status =~ /;try_wrong;/);
               
-              $colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", $dragonletter, $dragoncolor, $markcolor);
-              #print "$colorboard_imgsrc\n";
               
               $_ = $stones{$iA.$j};
               my $sgfcoord = chr(ord('a') + $i -1) .  chr(ord('a') + $boardsize  - $j) ;
@@ -777,7 +767,21 @@ sub eat_board {
               if ($2) {
                 $sgfboard .= "A$2\[$sgfcoord]" . ($label ? "LB[$sgfcoord:$label]" : "") . "\n";
               }
-          } else {
+              
+              if (!$bw) {
+            	$owlboard .= " " . ".";
+            	$dragonboard .= " " . ".";
+            	my $top_label = $tmarr{$iA.$j};
+            	if ($top_label) {
+            	  $top_label = sprintf "%f", $top_label;
+            	  ($top_label = substr($top_label, 0, 3)) =~ s/\.$//;
+            	  #print "$top_label\n";
+            	}
+            	$dragonletter = $top_label;
+            	$dragoncolor = "blue"; 
+              }
+              $colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", $dragonletter, $dragoncolor, $markcolor);
+            } else {
             	$owlboard .= " " . ".";
             	$dragonboard .= " " . ".";
             	my $top_label = $tmarr{$iA.$j};

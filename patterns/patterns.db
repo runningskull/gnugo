@@ -1229,6 +1229,23 @@ XO?
 ; does_attack(*,a)
 
 
+Pattern CC82
+
+..??          reverse sente connection
+.OXX
+X*O.
+...?
+
+:8,CdaE,shape(3)
+
+..??          
+.AXX
+X*B.
+...?
+
+; !dead(A) && (xplay_attack(*,B) || xplay_attack(*,A))
+
+
 ##########################
 #
 # General Edge Connections
@@ -12875,6 +12892,38 @@ Pattern LE16
 |?.X?
 
 > replace(a,*)
+
+
+
+######################################################################
+#
+# Replacement patterns
+#
+# Patterns using the "replace" autohelper macro for when
+# "this move is better than that move"
+#
+######################################################################
+
+
+Pattern RE1
+# db added (3.1.11)
+
+XOO?      better to make an eye
+O*.O
+XO.O
+?OO?
+
+:8,-
+
+XOO?
+A*aO
+XO.O
+?OO?
+
+; lib(A)==1
+
+> replace(a,*)
+
 
 
 

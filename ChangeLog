@@ -19,6 +19,9 @@
 - allow dragon_stones to take color parameter, as well as coord.
 - revisions to capture.tst and vie.tst
 - further 1D revision in dragon.c
+- top_move functionality added to regress.pl
+- filllib.c and semeai.c made 1-dimensional
+- tuning
 
 3.1.10 released October 14, 2001
 

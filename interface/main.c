@@ -77,6 +77,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_OUTFILE, 
       OPT_QUIET,
       OPT_GTP_INPUT,
+      OPT_GTP_INITIAL_ORIENTATION,
       OPT_SHOWCOPYRIGHT,
       OPT_REPLAY_GAME,
       OPT_DECIDE_STRING,
@@ -149,6 +150,8 @@ static struct gg_option const long_options[] =
   {"quiet",          no_argument,       0, OPT_QUIET},
   {"silent",         no_argument,       0, OPT_QUIET},
   {"gtp-input",      required_argument, 0, OPT_GTP_INPUT},
+  {"gtp-initial-orientation",
+  		     required_argument, 0, OPT_GTP_INITIAL_ORIENTATION},
   {"infile",         required_argument, 0, 'l'},
   {"until",          required_argument, 0, 'L'},
   {"outfile",        required_argument, 0, 'o'},
@@ -243,6 +246,7 @@ main(int argc, char *argv[])
   int benchmark = 0;  /* benchmarking mode (-b) */
   float komi = 0.0;
   FILE *gtp_input_FILE;
+  int gtp_initial_orientation = 0;
   
   int seed = 0;      /* If seed is zero, GNU Go will play a different game 
 			each time. If it is set using -r, GNU Go will play the
@@ -340,6 +344,16 @@ main(int argc, char *argv[])
 	
       case OPT_GTP_INPUT:
 	gtpfile = gg_optarg;
+	break;
+	
+      case OPT_GTP_INITIAL_ORIENTATION:
+	gtp_initial_orientation = atoi(gg_optarg);
+	if (gtp_initial_orientation < 0 || gtp_initial_orientation > 7) {
+	  fprintf(stderr, "Illegal orientation: %d.\n",
+                  gtp_initial_orientation);
+	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
+	  exit(EXIT_FAILURE);
+	}
 	break;
 	
       case OPT_SHOWTIME:
@@ -910,7 +924,7 @@ main(int argc, char *argv[])
     else
       gtp_input_FILE = stdin;
 
-    play_gtp(gtp_input_FILE);
+    play_gtp(gtp_input_FILE, gtp_initial_orientation);
     break;
 
   case MODE_ASCII_EMACS:  

@@ -35,7 +35,7 @@ BEGIN {
       # set the version for version checking
       $VERSION     = 0.01;
       # if using RCS/CVS, this may be preferred (???-tm)
-      $VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+      $VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
       @ISA         = qw(Exporter);
       @EXPORT      = qw(&createPngFile &parseFileName);
       %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
@@ -172,6 +172,8 @@ sub createPngFile {
                 "blue",  $im->colorAllocate(0,0,255),
                 "green", $im->colorAllocate(0,255,0),
                 "grey",  $im->colorAllocate(127,127,127),
+                "dkgrey",  $im->colorAllocate(63,63,63),
+                "ltgrey",  $im->colorAllocate(190,190,190),
                 "brown", $im->colorAllocate(170,140,70),
                 "cyan",  $im->colorAllocate(0,255,255),
                 "yellow",$im->colorAllocate(255,255,0),
@@ -192,11 +194,16 @@ sub createPngFile {
     my ($fw, $fh) = ($f->width,$f->height);
     my ($tw, $th) = ($fw * length($text), $fh);  #TODO: Allow multi-line text.
     my ($ulx, $uly) = ($pixels/2 - $tw/2 + 1, $pixels/2 - $th/2);
+    my ($lrx, $lry) = ($ulx + $tw, $uly + $th);
+    if (!$color) {
+      $im->filledRectangle($ulx-2, $uly, $lrx, $lry, $colors{"ltgrey"});
+    }
     $im->string(gdSmallFont, $ulx, $uly, $text, $colors{$text_color});
   }
   
   if ($square_color) {
     $im->rectangle(1,1,$pixels-2, $pixels-2, $colors{$square_color});
+    $im->rectangle(2,2,$pixels-3, $pixels-3, $colors{$square_color});
   }
 
 
@@ -204,7 +211,7 @@ sub createPngFile {
   open(IMAGE, ">$image_dir/$image_name") || die "Couldn't create file: $image_dir/$image_name";
   binmode IMAGE;
   print IMAGE $im->png;
-  
+  close IMAGE;
   return $image_name;
 }
 

@@ -223,7 +223,7 @@ static struct gtp_command commands[] = {
 
 /* Start playing using the Go Text Protocol. */
 void
-play_gtp(FILE *gtp_input)
+play_gtp(FILE *gtp_input, int gtp_initial_orientation)
 {
   /* Try to make sure that we have a useful level of buffering of stdout. */
 #ifdef HAVE_SETLINEBUF
@@ -235,6 +235,7 @@ play_gtp(FILE *gtp_input)
   /* Inform the GTP utility functions about the board size. */
   board_size = 19;
   gtp_internal_set_boardsize(19);
+  gtp_orientation = gtp_initial_orientation;
   
   /* Prepare pattern matcher and reading code. */
   reset_engine();

@@ -162,11 +162,11 @@ loadsgf games/xxlin.sgf 48
 
 loadsgf games/xxlin.sgf 76
 183 gg_genmove black
-#? [P10]*
+#? [P10|H9]*
 
 loadsgf games/xxlin.sgf 106
 184 gg_genmove black
-#? [H13]*
+#? [H13|F15]*
 
 # We may want to move this to a dedicated seki or semeai test suite in
 # the future.

@@ -28,9 +28,10 @@ loadsgf golois/DeuxYeuxIndigoIng98.sgf
 #? [1 B17]
 
 # S9 seems unlikely to be the only defense. /gf
+# GNU Go likes R7 but this leave W with Q8. R8 looks good. /db
 loadsgf golois/DeuxYeuxManyFacesIng98.sgf
 8 owl_defend R10
-#? [1 S9]*
+#? [1 (R8|S9)]*
 
 loadsgf golois/GoAheadMarseille97.sgf
 9 owl_defend O14
@@ -77,6 +78,7 @@ loadsgf golois/Goemate990911-3.sgf
 19 owl_attack R8
 #? [1 S8]*
 
+# B can tenuki. J8 and H9 are miai.
 loadsgf golois/Goemate991106-3.sgf
 20 owl_defend K8
 #? [1 H9]*
@@ -107,7 +109,7 @@ loadsgf golois/GoStar991114-2.sgf
 
 loadsgf golois/Handtalk980820-4.sgf
 27 owl_defend G2
-#? [1 H2]*
+#? [1 (H2|F3)]*
 
 loadsgf golois/Handtalk980820-5.sgf
 28 owl_attack N17
@@ -149,9 +151,10 @@ loadsgf golois/MeilleurCoup0002.sgf
 37 owl_defend D4
 #? [1 B6]*
 
+# db added A4
 loadsgf golois/MeilleurCoup0003.sgf
 38 owl_defend B8
-#? [1 B6]*
+#? [1 (B6|A4)]*
 
 loadsgf golois/MeilleurCoup0004.sgf
 39 owl_defend B6
@@ -197,9 +200,10 @@ loadsgf golois/Vivre990706-3.sgf
 49 owl_attack R17
 #? [0]
 
+# ko after B:G14 W:H15 B:G15 W:K17 B:J17 W:L16 B:J19 W:K19 /db
 loadsgf golois/Vivre990706-4.sgf
 50 owl_defend F16
-#? [1 G14]*
+#? [2 G14]*
 
 loadsgf golois/Vivre990706-5.sgf
 51 owl_attack G3

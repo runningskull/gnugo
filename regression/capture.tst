@@ -13,10 +13,13 @@ loadsgf golois/Goemate990904-4.sgf
 # This problem is much harder than it may look. After black H5, white
 # can force with the sequence W E1, B F2, W H2, B J2, W H3, B J3.
 # After that, white plays H6 and black has to work hard to stop escape. /gf
+# Changed point of attack to H6, which looks correct. /db
 loadsgf golois/Goemate991109-1.sgf
 4 attack G5
-#? [1 H5]*
+#? [1 H6]*
 
+# It looks as if the originally recommended solution [1 S3] is wrong.
+# After W:S3 B:S2 W:T2 B:S1 W:O1 B:S5 black wins the semeai. /db
 loadsgf golois/Handtalk980821-2.sgf
 5 attack R4
 #? [1 S3]*
