@@ -752,6 +752,21 @@
 @end example
 
 
+@cindex combination_defend
+@item combination_defend
+
+@example
+
+ Function:  If color can capture something through a
+            combination attack, list moves by the opponent of color
+            to defend against this attack.
+ Arguments: color
+ Fails:     invalid color
+ Returns:   Recommended moves, PASS if no combination attack found.
+
+@end example
+
+
 @cindex aa_confirm_safety
 @item aa_confirm_safety
 

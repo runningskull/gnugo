@@ -77,6 +77,7 @@ DECLARE(gtp_break_in);
 DECLARE(gtp_clear_board);
 DECLARE(gtp_clear_cache);
 DECLARE(gtp_combination_attack);
+DECLARE(gtp_combination_defend);
 DECLARE(gtp_connect);
 DECLARE(gtp_countlib);
 DECLARE(gtp_cputime);
@@ -202,6 +203,7 @@ static struct gtp_command commands[] = {
   {"clear_cache",	      gtp_clear_cache},
   {"color",            	      gtp_what_color},
   {"combination_attack",      gtp_combination_attack},
+  {"combination_defend",      gtp_combination_defend},
   {"connect",         	      gtp_connect},
   {"countlib",         	      gtp_countlib},
   {"cputime",		      gtp_cputime},
@@ -2169,6 +2171,46 @@ gtp_combination_attack(char *s)
   
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(I(attack_point), J(attack_point));
+  return gtp_finish_response();
+}
+
+/* Function:  If color can capture something through a
+ *            combination attack, list moves by the opponent of color
+ *            to defend against this attack.
+ * Arguments: color
+ * Fails:     invalid color
+ * Returns:   Recommended moves, PASS if no combination attack found.
+ */
+
+static int
+gtp_combination_defend(char *s)
+{
+  int color;
+  char defense_points[BOARDMAX];
+  int pos;
+  int first = 1;
+  int n;
+
+  n = gtp_decode_color(s, &color);
+  if (!n)
+    return gtp_failure("invalid color");
+
+  silent_examine_position(BLACK, EXAMINE_ALL);
+
+  memset(defense_points, 0, sizeof(defense_points));
+  if (!atari_atari(color, NULL, defense_points, verbose))
+    return gtp_success("PASS");
+  
+  gtp_start_response(GTP_SUCCESS);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos) && defense_points[pos]) {
+      if (!first)
+	gtp_printf(" ");
+      else
+	first = 0;
+      gtp_print_vertex(I(pos), J(pos));
+    }
+  
   return gtp_finish_response();
 }
 

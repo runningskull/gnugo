@@ -2,9 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new GTP command combination_defend
 - don't use stdint.h
 - revised hash table scheme
-- new tests
 - new COSMIC_GNUGO function choose_best_strategy() sets tuning parameters
 - new global tuning parameters: minimum_value_weight, maximum_value_weight,
   invasion_malus_weight, strategical_weight, territorial_weight,
@@ -13,6 +13,7 @@
 - replace setlinebuf by setvbuf
 - add safety_hash field to delta territory cache, reenable this cache
 - cgi interface in interface/html directory removed
+- new game records and test cases
 
 3.4 released July 31, 2003
 
