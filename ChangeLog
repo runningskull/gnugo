@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- Macro PATTERN_CHECK_ON_DEMAND retired
+- allpats options for owl shape moves repaired
 - new function extended_chainlinks() in board.c
 - connection and cut move reasons are relative to worms, not dragons
 - unused find_worm_pair() and related variables removed from move_reasons.c 
