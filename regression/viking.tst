@@ -54,7 +54,12 @@ loadsgf games/viking3.sgf 137
 #? [S14|S15]
 
 # J9 is an overplay since it can be cut off.
+#CATEGORY=CONNECTION
+# J10 is not much better either, as black can cut J10/K11 off with M11.
+# This is a non-transitivity connection problem.
+# L10 looks best, but anything repairing the connection K11/N9 should
+# make us happy. /ab
 loadsgf games/viking3.sgf 213
 13 gg_genmove white
-#? [J10]*
+#? [L10|L11|M11|N10|K7]*
 

@@ -1053,10 +1053,11 @@ strategic_penalty(int pos, int color)
    * whether all neighboring intersections belong to the opponent's moyo.
    */
   for (k = 0; k < 4; k++)
-    if (ON_BOARD(pos + delta[k])
-	&& board[pos + delta[k]] != OTHER_COLOR(color)
-        && influence_moyo_color(pos + delta[k]) != OTHER_COLOR(color))
+    if (board[pos + delta[k]] == EMPTY
+        && influence_area_color(pos + delta[k]) != OTHER_COLOR(color))
       return 0.0;
+  if (influence_area_color(pos) != OTHER_COLOR(color))
+    return 0.0;
 
   for (k = 0; k < MAX_REASONS; k++) {
     int r = move[pos].reason[k];

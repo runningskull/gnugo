@@ -27,6 +27,23 @@ loadsgf games/wing-yuhiko-gnugo.sgf 86
 225 gg_genmove black
 #? [O12]*
 
+#CATEGORY=CONNECTION
+loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 54
+226 gg_genmove white
+#? [F5]*
+
+#CATEGORY=OWL
+# F1 was played in the game as an owl defense of E4.
+loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 66
+227 gg_genmove white
+#? [!F1]*
+
+#CATEGORY=STRATEGY
+# Don't run away with an unimportant, weak stone.
+loadsgf games/olympiad2002/game2-19-gnugo-goint-1-0.sgf 90
+228 gg_genmove white
+#? [!N12]*
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
