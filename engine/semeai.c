@@ -226,7 +226,7 @@ new_semeai(int color)
 	}
       }
       else if (worst_result == ALIVE_IN_SEKI)
-	update_status(DRAGON(d1).origin, ALIVE, ALIVE);
+	update_status(DRAGON(d1).origin, ALIVE, ALIVE_IN_SEKI);
       else if (worst_result != UNKNOWN)
 	update_status(DRAGON(d1).origin, worst_result, worst_result);
     }

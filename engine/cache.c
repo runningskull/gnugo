@@ -811,8 +811,8 @@ sgf_trace(const char *func, int str, int move, int result,
  */
 
 void
-sgf_trace2(const char *func, int str1, int str2, int move, int result,
-	   const char *message)
+sgf_trace2(const char *func, int str1, int str2, int move, 
+           const char *result, const char *message)
 {
   char buf[100];
 
@@ -820,16 +820,14 @@ sgf_trace2(const char *func, int str1, int str2, int move, int result,
 	  J(str1) + 'A' + (J(str1) >= 8), board_size - I(str1),
 	  J(str2) + 'A' + (J(str2) >= 8), board_size - I(str2));
   
-  if (result == 0)
-    sprintf(buf + strlen(buf), "0");
-  else if (ON_BOARD(move))
-    sprintf(buf + strlen(buf), "%s %c%d", result_to_string(result), 
+  if (ON_BOARD(move))
+    sprintf(buf + strlen(buf), "%s %c%d", result,
 	    J(move) + 'A' + (J(move) >= 8),
 	    board_size - I(move));
   else if (is_pass(move))
-    sprintf(buf + strlen(buf), "%s PASS", result_to_string(result));
+    sprintf(buf + strlen(buf), "%s PASS", result);
   else
-    sprintf(buf + strlen(buf), "%s [%d]", result_to_string(result), move);
+    sprintf(buf + strlen(buf), "%s [%d]", result, move);
 
   if (message)
     sprintf(buf + strlen(buf), " (%s)", message);

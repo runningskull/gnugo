@@ -587,6 +587,7 @@ semeai_trymove(int pos, int color, const char *message, int str1, int str2,
 		  message, sbuf1, sbuf2, count_variations, value);
     else
       gg_snprintf(buf, 100, 
+		  "%s in semeai %s-%s (variation %d, value %d)",
 		  message, sbuf1, sbuf2, count_variations, value);
     sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
     sgftreeAddComment(sgf_dumptree, buf);

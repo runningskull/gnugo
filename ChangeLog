@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- semeai tracing improved
 - fix arraybound violation in corner_matchpat()
 
 3.3.17 released March 2, 2003

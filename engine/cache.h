@@ -215,8 +215,8 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 void sgf_trace(const char *func, int str, int move, int result,
 	       const char *message);
 /* Trace messages in decideconnection/decidesemeai sgf file. */
-void sgf_trace2(const char *func, int str1, int str2, int move, int result,
-		const char *message);
+void sgf_trace2(const char *func, int str1, int str2, int move, 
+	        const char* result, const char *message);
 
 /* Macro to hide the call to sgf_trace(). Notice that a little black
  * magic is going on here. Before using this macro, SETUP_TRACE_INFO
@@ -233,7 +233,13 @@ void sgf_trace2(const char *func, int str1, int str2, int move, int result,
  */
 #define SGFTRACE2(move, result, message) \
   if (sgf_dumptree) \
-    sgf_trace2(read_function_name, q1, q2, move, result, message)
+    sgf_trace2(read_function_name, q1, q2, move, \
+	       result_to_string(result), message)
+
+#define SGFTRACE_SEMEAI(move, result, message) \
+  if (sgf_dumptree) \
+    sgf_trace2(read_function_name, q1, q2, move, \
+	       safety_to_string(result), message)
 
 
 int get_read_result(int routine, int komaster, int kom_pos,
