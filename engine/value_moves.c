@@ -619,241 +619,241 @@ induce_secondary_move_reasons(int color)
 static void
 examine_move_safety(int color)
 {
-  int i, j;
+  int pos;
   int k;
   
   start_timer(3);
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      int pos = POS(i, j);
-      int safety = 0;
-      int tactical_safety = 0;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int safety = 0;
+    int tactical_safety = 0;
+    if (!ON_BOARD(pos))
+      continue;
       
-      for (k = 0; k < MAX_REASONS; k++) {
-	int r = move[pos].reason[k];
-	int type;
-	int what;
-
-	if (r == -1)
-	  break;
-	type = move_reasons[r].type;
-	what = move_reasons[r].what;
-	switch (type) {
-	case CUT_MOVE:
-	  /* We don't trust cut moves, unless some other move reason
-           * indicates they are safe.
-	   */
-	  break;
-	case SEMEAI_MOVE:
-	case OWL_DEFEND_MOVE:
-	case OWL_DEFEND_MOVE_GOOD_KO:
-	case OWL_DEFEND_MOVE_BAD_KO:
-	case MY_ATARI_ATARI_MOVE:
-	case EITHER_MOVE:         /* FIXME: More advanced handling? */
-	case ALL_MOVE:            /* FIXME: More advanced handling? */
-	  tactical_safety = 1;
-	  safety = 1;
-	  break;
-	case BLOCK_TERRITORY_MOVE:
-	case EXPAND_TERRITORY_MOVE:
-	case EXPAND_MOYO_MOVE:
-	  safety = 1;
-	  break;
-	case ATTACK_MOVE:
-	case ATTACK_MOVE_GOOD_KO:
-	case ATTACK_MOVE_BAD_KO:
-	case OWL_ATTACK_MOVE:
-	case OWL_ATTACK_MOVE_GOOD_KO:
-	case OWL_ATTACK_MOVE_BAD_KO:
-	  {
-	    int aa = NO_MOVE;
-	    int bb = NO_MOVE;
-	    int size;
-	    int m;
-	    int our_color_neighbors;
-	    
-	    if (type == ATTACK_MOVE
-		|| type == ATTACK_MOVE_GOOD_KO
-		|| type == ATTACK_MOVE_BAD_KO) {
-	      aa = worms[what];
-	      size = worm[aa].effective_size;
-	    }
-	    else {
-	      aa = dragons[what];
-	      size = dragon[aa].effective_size;
-	    }
-	    
-	    /* No worries if we catch something big. */
-	    if (size >= 8) {
-	      tactical_safety = 1;
-	      safety = 1;
-	      break;
-	    }
-	    
-	    /* If the victim has multiple neighbor dragons of our
-             * color, we leave it to the connection move reason to
-             * determine safety.
-	     *
-	     * The exception is an owl_attack where we only require
-	     * one neighbor to be alive.
-	     */
-	    our_color_neighbors = 0;
-	    if (type == ATTACK_MOVE
-		|| type == ATTACK_MOVE_GOOD_KO
-		|| type == ATTACK_MOVE_BAD_KO) {
-	      /* We could use the same code as for OWL_ATTACK_MOVE
-               * below if we were certain that the capturable string
-               * had not been amalgamated with a living dragon.
-	       */
-	      int num_adj, adjs[MAXCHAIN];
-
-	      num_adj = chainlinks(aa, adjs);
-	      for (m = 0; m < num_adj; m++) {
-		int adj = adjs[m];
-
-		if (board[adj] == color) {
-		  /* Check whether this string is part of the same
-                   * dragon as an earlier string. We only want to
-                   * count distinct neighbor dragons.
-		   */
-		  int n;
-
-		  for (n = 0; n < m; n++)
-		    if (dragon[adjs[n]].id == dragon[adj].id)
-		      break;
-		  if (n == m) {
-		    /* New dragon. */
-		    our_color_neighbors++;
-		    bb = adj;
-		  }
-		}
-	      }
-	    }
-	    else {
-	      for (m = 0; m < DRAGON2(aa).neighbors; m++)
-		if (DRAGON(DRAGON2(aa).adjacent[m]).color == color) {
-		  our_color_neighbors++;
-		  bb = dragon2[DRAGON2(aa).adjacent[m]].origin;
-		  if (dragon[bb].matcher_status == ALIVE) {
-		    tactical_safety = 1;
-		    safety = 1;
-		  }
-		}
-	    }
-	    
-	    if (our_color_neighbors > 1)
-	      break;
-	    
-	    /* It may happen in certain positions that no neighbor of
-             * our color is found. The working hypothesis is that
-	     * the move is safe then. One example is a position like
-	     *
-	     * ----+
-	     * OX.X|
-	     * OOX.|
-	     *  OOX|
-	     *   OO|
-	     *
-	     * where the top right stone only has friendly neighbors
-	     * but can be attacked.
-	     *
-	     * As a further improvement, we also look for a friendly
-	     * dragon adjacent to the considered move.
-	     */
-
-	    for (m = 0; m < 4; m++) {
-	      int d = delta[m];
-	      if (board[pos+d] == color) {
-		bb = pos + d;
-		break;
-	      }
-	    }
-	    
-	    if (bb == NO_MOVE) {
-	      tactical_safety = 1;
-	      safety = 1;
-	      break;
-	    }
-	    
-	    /* If the attacker is thought to be alive, we trust that
-             * sentiment.
-	     */
-	    if (dragon[bb].matcher_status == ALIVE) {
-	      tactical_safety = 1;
-	      safety = 1;
-	      break;
-	    }
-	    
-	    /* It remains the possibility that what we have captured
-             * is just a nakade shape. Ask the owl code whether this
-             * move saves our attacking dragon.
-	     *
-	     * FIXME: Might need to involve semeai code too here.
-	     */
-	    if (owl_does_defend(pos, bb)) {
-	      tactical_safety = 1;
-	      safety = 1;
-	    }
-	    break;
+    for (k = 0; k < MAX_REASONS; k++) {
+      int r = move[pos].reason[k];
+      int type;
+      int what;
+      
+      if (r == -1)
+	break;
+      type = move_reasons[r].type;
+      what = move_reasons[r].what;
+      switch (type) {
+      case CUT_MOVE:
+	/* We don't trust cut moves, unless some other move reason
+	 * indicates they are safe.
+	 */
+	break;
+      case SEMEAI_MOVE:
+      case OWL_DEFEND_MOVE:
+      case OWL_DEFEND_MOVE_GOOD_KO:
+      case OWL_DEFEND_MOVE_BAD_KO:
+      case MY_ATARI_ATARI_MOVE:
+      case EITHER_MOVE:         /* FIXME: More advanced handling? */
+      case ALL_MOVE:            /* FIXME: More advanced handling? */
+	tactical_safety = 1;
+	safety = 1;
+	break;
+      case BLOCK_TERRITORY_MOVE:
+      case EXPAND_TERRITORY_MOVE:
+      case EXPAND_MOYO_MOVE:
+        safety = 1;
+	break;
+      case ATTACK_MOVE:
+      case ATTACK_MOVE_GOOD_KO:
+      case ATTACK_MOVE_BAD_KO:
+      case OWL_ATTACK_MOVE:
+      case OWL_ATTACK_MOVE_GOOD_KO:
+      case OWL_ATTACK_MOVE_BAD_KO:
+        {
+	  int aa = NO_MOVE;
+	  int bb = NO_MOVE;
+	  int size;
+	  int m;
+	  int our_color_neighbors;
+	  
+	  if (type == ATTACK_MOVE
+	      || type == ATTACK_MOVE_GOOD_KO
+	      || type == ATTACK_MOVE_BAD_KO) {
+	    aa = worms[what];
+	    size = worm[aa].effective_size;
 	  }
-	case DEFEND_MOVE:
-	case DEFEND_MOVE_GOOD_KO:
-	case DEFEND_MOVE_BAD_KO:
-	  {
-	    int aa = worms[what];
-
-	    if (dragon[aa].matcher_status == ALIVE)
-	      /* It would be better if this never happened, but it does
-	       * sometimes. The owl reading can be very slow then.
-	       */
-	      safety = 1;
-	    
-	    else if (owl_does_defend(pos, aa))
-	      safety = 1;
+	  else {
+	    aa = dragons[what];
+	    size = dragon[aa].effective_size;
+	  }
+	  
+	  /* No worries if we catch something big. */
+	  if (size >= 8) {
+	    tactical_safety = 1;
+	    safety = 1;
 	    break;
 	  }
 	  
-	case ATTACK_THREAT:
-	case DEFEND_THREAT:
-	  break;
-
-	case CONNECT_MOVE:
-	  {
-	    int dragon1 = conn_dragon1[move_reasons[r].what];
-	    int dragon2 = conn_dragon2[move_reasons[r].what];
-	    int aa = dragons[dragon1];
-	    int bb = dragons[dragon2];
-
-	    if (dragon[aa].owl_status == ALIVE
-		|| dragon[bb].owl_status == ALIVE) {
-	      tactical_safety = 1;
-	      safety = 1;
+	  /* If the victim has multiple neighbor dragons of our
+	   * color, we leave it to the connection move reason to
+	   * determine safety.
+	   *
+	   * The exception is an owl_attack where we only require
+	   * one neighbor to be alive.
+	   */
+	  our_color_neighbors = 0;
+	  if (type == ATTACK_MOVE
+	      || type == ATTACK_MOVE_GOOD_KO
+	      || type == ATTACK_MOVE_BAD_KO) {
+	    /* We could use the same code as for OWL_ATTACK_MOVE
+	     * below if we were certain that the capturable string
+	     * had not been amalgamated with a living dragon.
+	     */
+	    int num_adj, adjs[MAXCHAIN];
+	    
+	    num_adj = chainlinks(aa, adjs);
+	    for (m = 0; m < num_adj; m++) {
+	      int adj = adjs[m];
+	      
+	      if (board[adj] == color) {
+		/* Check whether this string is part of the same
+		 * dragon as an earlier string. We only want to
+		 * count distinct neighbor dragons.
+		 */
+		int n;
+		
+		for (n = 0; n < m; n++)
+		  if (dragon[adjs[n]].id == dragon[adj].id)
+		    break;
+		if (n == m) {
+		  /* New dragon. */
+		  our_color_neighbors++;
+		  bb = adj;
+		}
+	      }
 	    }
-	    else if ((dragon[aa].owl_status == UNCHECKED
-		      && dragon[aa].status == ALIVE)
-		     || (dragon[bb].owl_status == UNCHECKED
-			 && dragon[bb].status == ALIVE)) {
-	      tactical_safety = 1;
-	      safety = 1;
+	  }
+	  else {
+	    for (m = 0; m < DRAGON2(aa).neighbors; m++)
+	      if (DRAGON(DRAGON2(aa).adjacent[m]).color == color) {
+		our_color_neighbors++;
+		bb = dragon2[DRAGON2(aa).adjacent[m]].origin;
+		if (dragon[bb].matcher_status == ALIVE) {
+		  tactical_safety = 1;
+		  safety = 1;
+		}
+	      }
+	  }
+	  
+	  if (our_color_neighbors > 1)
+	    break;
+	  
+	  /* It may happen in certain positions that no neighbor of
+	   * our color is found. The working hypothesis is that
+	   * the move is safe then. One example is a position like
+	   *
+	   * ----+
+	   * OX.X|
+	   * OOX.|
+	   *  OOX|
+	   *   OO|
+	   *
+	   * where the top right stone only has friendly neighbors
+	   * but can be attacked.
+	   *
+	   * As a further improvement, we also look for a friendly
+	   * dragon adjacent to the considered move.
+	   */
+	  
+	  for (m = 0; m < 4; m++) {
+	    int d = delta[m];
+	    if (board[pos+d] == color) {
+	      bb = pos + d;
+	      break;
 	    }
-	    else if (owl_connection_defends(pos, aa, bb)) {
-	      tactical_safety = 1;
-	      safety = 1;
-	    }
+	  }
+	  
+	  if (bb == NO_MOVE) {
+	    tactical_safety = 1;
+	    safety = 1;
 	    break;
 	  }
-	}
-	if (safety == 1 && (tactical_safety == 1 || safe_move(pos, color)))
+	  
+	  /* If the attacker is thought to be alive, we trust that
+	   * sentiment.
+	   */
+	  if (dragon[bb].matcher_status == ALIVE) {
+	    tactical_safety = 1;
+	    safety = 1;
+	    break;
+	  }
+	  
+	  /* It remains the possibility that what we have captured
+	   * is just a nakade shape. Ask the owl code whether this
+	   * move saves our attacking dragon.
+	   *
+	   * FIXME: Might need to involve semeai code too here.
+	   */
+	  if (owl_does_defend(pos, bb)) {
+	    tactical_safety = 1;
+	    safety = 1;
+	  }
 	  break;
-      }
-      
-      if (safety == 1 && (tactical_safety || safe_move(pos, color)))
-	move[pos].move_safety = 1;
-      else
-	move[pos].move_safety = 0;
+	}
+      case DEFEND_MOVE:
+      case DEFEND_MOVE_GOOD_KO:
+      case DEFEND_MOVE_BAD_KO:
+	{
+	  int aa = worms[what];
+	  
+	  if (dragon[aa].matcher_status == ALIVE)
+	    /* It would be better if this never happened, but it does
+	     * sometimes. The owl reading can be very slow then.
+	     */
+	    safety = 1;
+	  
+	  else if (owl_does_defend(pos, aa))
+	    safety = 1;
+	  break;
+	}
+	
+      case ATTACK_THREAT:
+      case DEFEND_THREAT:
+	break;
 
-      time_report(3, "    examine_move_safety: ", pos, 1.0);
+      case CONNECT_MOVE:
+        {
+	  int dragon1 = conn_dragon1[move_reasons[r].what];
+	  int dragon2 = conn_dragon2[move_reasons[r].what];
+	  int aa = dragons[dragon1];
+	  int bb = dragons[dragon2];
+	  
+	  if (dragon[aa].owl_status == ALIVE
+	      || dragon[bb].owl_status == ALIVE) {
+	    tactical_safety = 1;
+	    safety = 1;
+	  }
+	  else if ((dragon[aa].owl_status == UNCHECKED
+		    && dragon[aa].status == ALIVE)
+		   || (dragon[bb].owl_status == UNCHECKED
+		       && dragon[bb].status == ALIVE)) {
+	    tactical_safety = 1;
+	    safety = 1;
+	  }
+	  else if (owl_connection_defends(pos, aa, bb)) {
+	    tactical_safety = 1;
+	    safety = 1;
+	  }
+	  break;
+	}
+      }
+      if (safety == 1 && (tactical_safety == 1 || safe_move(pos, color)))
+	break;
     }
+      
+    if (safety == 1 && (tactical_safety || safe_move(pos, color)))
+      move[pos].move_safety = 1;
+    else
+      move[pos].move_safety = 0;
+    
+    time_report(3, "    examine_move_safety: ", pos, 1.0);
+  }
 }
 
 
@@ -2504,36 +2504,34 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 static void
 value_moves(int color, float pure_threat_value, float score)
 {
-  int m;
-  int n;
   int pos;
 
   TRACE("\nMove valuation:\n");
   
   /* Visit the moves in the standard lexicographical order */
-  for (n = 0; n < board_size; n++)
-    for (m = board_size-1; m >= 0; m--) {
-      pos = POS(m, n);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
 
-      move[pos].value = value_move_reasons(pos, color, 
-					   pure_threat_value, score);
-      if (move[pos].value == 0.0)
-	continue;
-
-      /* Maybe this test should be performed elsewhere. This is just
-       * to get some extra safety. We don't filter out illegal ko
-       * captures here though, because if that is the best move, we
-       * should reevaluate ko threats.
-       */
-      if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
-	/* Add a random number between 0 and 0.01 to use in comparisons. */
-	move[pos].value += 0.01 * move[pos].random_number;
-      }
-      else {
-	move[pos].value = 0.0;
-	TRACE("Move at %1m wasn't legal.\n", pos);
-      }
+    move[pos].value = value_move_reasons(pos, color, 
+					 pure_threat_value, score);
+    if (move[pos].value == 0.0)
+      continue;
+    
+    /* Maybe this test should be performed elsewhere. This is just
+     * to get some extra safety. We don't filter out illegal ko
+     * captures here though, because if that is the best move, we
+     * should reevaluate ko threats.
+     */
+    if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
+      /* Add a random number between 0 and 0.01 to use in comparisons. */
+      move[pos].value += 0.01 * move[pos].random_number;
     }
+    else {
+      move[pos].value = 0.0;
+      TRACE("Move at %1m wasn't legal.\n", pos);
+    }
+  }
 }
 
 
@@ -2712,33 +2710,28 @@ reevaluate_ko_threats(int ko_move, int color)
 static void
 redistribute_points(void)
 {
-  int m, n;
-  int pos;
-  int ii;
+  int source;
+  int target;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-
-      move[pos].final_value = move[pos].value;
-    }
+  for (target = BOARDMIN; target < BOARDMAX; target++)
+    if (ON_BOARD(target))
+      move[target].final_value = move[target].value;
   
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      pos = POS(m, n);
-      
-      ii = replacement_map[pos];
-      if (ii == NO_MOVE)
-	continue;
+  for (source = BOARDMIN; source < BOARDMAX; source++) {
+    if (!ON_BOARD(source))
+      continue;
+    target = replacement_map[source];
+    if (target == NO_MOVE)
+      continue;
 
-      TRACE("Redistributing points from %1m to %1m.\n", pos, ii);
-      if (move[ii].final_value < move[pos].final_value) {
-	TRACE("%1m is now valued %f.\n", ii, move[pos].final_value);
-	move[ii].final_value = move[pos].final_value;
-      }
-      TRACE("%1m is now valued 0.\n", pos);
-      move[pos].final_value = 0.0;
+    TRACE("Redistributing points from %1m to %1m.\n", source, target);
+    if (move[target].final_value < move[source].final_value) {
+      TRACE("%1m is now valued %f.\n", target, move[source].final_value);
+      move[target].final_value = move[source].final_value;
     }
+    TRACE("%1m is now valued 0.\n", source);
+    move[source].final_value = 0.0;
+  }
 }
 
 
@@ -2754,8 +2747,7 @@ int
 review_move_reasons(int *the_move, float *val, int color,
 		    float pure_threat_value, float score)
 {
-  int m, n;
-  int ii;
+  int pos;
   float tval;
   float bestval = 0.0;
   int best_move = NO_MOVE;
@@ -2808,27 +2800,24 @@ review_move_reasons(int *the_move, float *val, int color,
     best_move = NO_MOVE;
 
     /* Search through all board positions for the highest valued move. */
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	ii = POS(m, n);
-
-	if (move[ii].final_value == 0.0)
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos) || move[pos].final_value == 0.0)
 	  continue;
 	
-	tval = move[ii].final_value;
+      tval = move[pos].final_value;
 	
-	if (tval > bestval) {
-	  if (is_legal(ii, color) || is_illegal_ko_capture(ii, color)) {
-	    bestval = tval;
-	    best_move = ii;
-	  }
-	  else {
-	    TRACE("Move at %1m would be suicide.\n", ii);
-	    move[ii].value = 0.0;
-	    move[ii].final_value = 0.0;
-	  }
+      if (tval > bestval) {
+	if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
+	  bestval = tval;
+	  best_move = pos;
+	}
+	else {
+	  TRACE("Move at %1m would be suicide.\n", pos);
+	  move[pos].value = 0.0;
+	  move[pos].final_value = 0.0;
 	}
       }
+    }
     
     /* Compute the size of strings we can allow to lose due to blunder
      * effects. If ko threat values have been added, only the base
@@ -2864,7 +2853,7 @@ review_move_reasons(int *the_move, float *val, int color,
      */
     else if (bestval > 0.0
 	     && !value_moves_confirm_safety(best_move, color,
-					     allowed_blunder_size)) {
+					    allowed_blunder_size)) {
       TRACE("Move at %1m would be a blunder.\n", best_move);
       move[best_move].value = 0.0;
       move[best_move].final_value = 0.0;
