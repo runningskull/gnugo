@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- speed optimization in order_moves() in reading.c
 - speed optimizations in fastlib(), count_common_libs(), find_common_libs()
 - duplicate lines removed from safety_to_string()
 - draw_active_area() functions in reading.c and owl.c unified

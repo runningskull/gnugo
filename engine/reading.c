@@ -5312,8 +5312,8 @@ order_moves(int str, struct reading_moves *moves, int color,
 
     /* Find the move with the biggest score. */
     maxscore = moves->score[i];
-    max_at = i;
-    for (j = i+1; j < moves->num; j++) {
+    max_at = 0; /* This is slightly faster than max_at = i. */
+    for (j = i + 1; j < moves->num; j++) {
       if (moves->score[j] > maxscore) {
 	maxscore = moves->score[j];
 	max_at = j;
@@ -5323,15 +5323,15 @@ order_moves(int str, struct reading_moves *moves, int color,
     /* Now exchange the move at i with the move at max_at.
      * Don't forget to exchange the scores as well.
      */
-    if (max_at != i) {
-      int temp = moves->pos[i];
-      int tempmax = moves->score[i];
+    if (max_at != 0) {
 
-      moves->pos[i] = moves->pos[max_at];
-      moves->score[i] = moves->score[max_at];
+      int temp = moves->pos[max_at];
 
-      moves->pos[max_at] = temp;
-      moves->score[max_at] = tempmax;
+      moves->pos[max_at] = moves->pos[i];
+      moves->score[max_at] = moves->score[i];
+
+      moves->pos[i] = temp;
+      moves->score[i] = maxscore;
     }
   }
 
