@@ -183,7 +183,7 @@ trevora: trevora.tst
 trevorb: trevorb.tst
 	$(srcdir)/eval.sh trevorb.tst
 
-trevorb: trevorc.tst
+trevorc: trevorc.tst
 	$(srcdir)/eval.sh trevorc.tst
 
 semeai: semeai.tst
