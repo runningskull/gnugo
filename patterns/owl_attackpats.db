@@ -2220,13 +2220,13 @@ Pattern A701
 
 ?XOo        make atari
 X.YO
-..*.
+x.*.
 
 :8,-,value(79)
 
 ?AOo
 X.YO
-..*.
+x.*.
 
 ;lib(A)>1
 
