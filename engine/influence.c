@@ -2204,7 +2204,6 @@ static void
 print_influence_areas(const struct influence_data *q)
 {
   int ii;
-  fprintf(stderr, "territory:\n\n");
   start_draw_board();
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
@@ -2225,23 +2224,7 @@ print_influence_areas(const struct influence_data *q)
 	c = 'x';
 	color = GG_COLOR_CYAN;
       }
-      draw_color_char(I(ii), J(ii), c, color);
-    }
-  end_draw_board();
-  fprintf(stderr, "moyo:\n\n");
-  start_draw_board();
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      int c = EMPTY;
-      int color = GG_COLOR_BLACK;
-      if (q->safe[ii]) {
-	color = GG_COLOR_BLACK;
-        if (board[ii] == WHITE)
-	  c = 'O';
-        else
-	  c = 'X';
-      }
-      if (whose_moyo(q, ii) == WHITE) {
+      else if (whose_moyo(q, ii) == WHITE) {
 	c = 'o';
 	color = GG_COLOR_YELLOW;
       }
@@ -2249,23 +2232,7 @@ print_influence_areas(const struct influence_data *q)
 	c = 'x';
 	color = GG_COLOR_YELLOW;
       }
-      draw_color_char(I(ii), J(ii), c, color);
-    }
-  end_draw_board();
-  fprintf(stderr, "area:\n\n");
-  start_draw_board();
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
-      int c = EMPTY;
-      int color = GG_COLOR_BLACK;
-      if (q->safe[ii]) {
-	color = GG_COLOR_BLACK;
-        if (board[ii] == WHITE)
-	  c = 'O';
-        else
-	  c = 'X';
-      }
-      if (whose_area(q, ii) == WHITE) {
+      else if (whose_area(q, ii) == WHITE) {
 	c = 'o';
 	color = GG_COLOR_RED;
       }
