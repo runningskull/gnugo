@@ -39,10 +39,7 @@
 #include "eyes.h"
 
 
-#define DEBUG(x)  /* printf x */
-
 int fatal_errors = 0;
-
 
 int
 main(void)
