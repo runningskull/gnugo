@@ -358,26 +358,62 @@ loadsgf games/semeai/semeai16.sgf 222
 #? [1 1 (Q19|S19|T18|T16)]
 88 analyze_semeai S18 N19
 #? [2 0 T12]*
+
 loadsgf games/semeai/semeai16.sgf 224
 90 analyze_semeai N19 S18
 #? [1 3 (Q19|S19|T18|T16)]*
 91 analyze_semeai S18 N19
 #? [2 0 Q17]*
+
 loadsgf games/semeai/semeai16.sgf 226
 93 analyze_semeai N19 S18
 #? [1 3 S19]*
 94 analyze_semeai S18 N19
 #? [1 1 S19]
+
 loadsgf games/semeai/semeai16.sgf 230
 96 analyze_semeai N19 S18
 #? [1 0 S19]
 97 analyze_semeai S18 N19
 #? [1 1 S19]*
+
 loadsgf games/nngs/beedee-gnugo-3.5.3-200401140035.sgf 280
 99 analyze_semeai R13 Q13
 #? [1 0 (M12|K9|M6|L7|S17)]
 100 analyze_semeai Q13 R13
 #? [1 1 (P10|Q11|S10|T11)]
+
+loadsgf games/semeai/semeai17.sgf 52
+101 analyze_semeai D9 C6
+#? [1 1 (D6|C7)]
+102 analyze_semeai C6 D9
+#? [1 1 (D6|C7)]
+103 analyze_semeai D9 E9
+#? [1 1 (D6|C7)]
+104 analyze_semeai E9 D9
+#? [1 1 (D6|C7)]
+105 analyze_semeai G8 E9
+#? [1 1 (D6|C7)]
+106 analyze_semeai E9 G8
+#? [1 0 (D6|C7)]
+
+loadsgf games/semeai/semeai17.sgf 60
+108 analyze_semeai G8 H2
+#? [1 1 J2]
+109 analyze_semeai H2 G8
+#? [1 1 E1]
+
+loadsgf games/semeai/semeai17.sgf 62
+110 analyze_semeai G8 H2
+#? [1 0 (PASS|F3|E1)]
+111 analyze_semeai H2 G8
+#? [1 0 (PASS|F3|E1)]
+
+loadsgf games/semeai/semeai17.sgf 64
+112 analyze_semeai G8 H2
+#? [1 0 PASS]
+113 analyze_semeai H2 G8
+#? [1 0 PASS]
 
 ########### semeai gen_move tests #################
 
@@ -400,6 +436,11 @@ loadsgf games/semeai/semeai16.sgf 230
 98 reg_genmove black
 #? [S19]
 
+# Doubtful whether C7 should be accepted even if it kills all white.
+loadsgf games/semeai/semeai17.sgf 52
+107 reg_genmove black
+#? [D6|C7]
+
 ########### semeai status tests #################
 
 loadsgf games/semeai/semeai15.sgf
@@ -415,6 +456,12 @@ loadsgf games/semeai/semeai15.sgf
 #? [alive]
 86 dragon_status C11
 #? [critical A2 A2]
+
+loadsgf games/semeai/semeai17.sgf 64
+114 dragon_status G8
+#? [alive]
+115 dragon_status H2
+#? [alive]
 
 ########### end of semeai tests #################
 

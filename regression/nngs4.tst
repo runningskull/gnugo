@@ -116,6 +116,7 @@ loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 32
 280 restricted_genmove black F3 H3
 #? [F3]*
 
+# See also connection:110
 loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 38
 290 restricted_genmove black H1 H6 F1
 #? [!H1]*

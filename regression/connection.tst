@@ -377,6 +377,11 @@ loadsgf games/nngs/gnugo-3.5.1-viking4-200309231039.sgf 123
 109 same_dragon O3 N5
 #? [0]*
 
+# See also nngs4:290
+loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 38
+110 connect E3 G3
+#? [0]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
