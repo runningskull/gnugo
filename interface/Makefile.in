@@ -96,7 +96,6 @@ INCLUDES = \
 LDADD = \
 	../engine/libengine.a \
 	../patterns/libpatterns.a \
-	../patterns/libdfa.a \
 	../sgf/libsgf.a \
 	../utils/libutils.a
 
@@ -126,7 +125,7 @@ am_gnugo_OBJECTS = main.$(OBJEXT) play_ascii.$(OBJEXT) \
 gnugo_OBJECTS = $(am_gnugo_OBJECTS)
 gnugo_LDADD = $(LDADD)
 gnugo_DEPENDENCIES = ../engine/libengine.a ../patterns/libpatterns.a \
-	../patterns/libdfa.a ../sgf/libsgf.a ../utils/libutils.a
+	../sgf/libsgf.a ../utils/libutils.a
 gnugo_LDFLAGS =
 
 DEFS = @DEFS@

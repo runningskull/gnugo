@@ -87,7 +87,7 @@ If output file is not specified, writes to stdout.\n\
 #include "gg-getopt.h"
 #include "gg_utils.h"
 
-#include "dfa.h"
+#include "dfa-mkpat.h"
 
 
 #define DB_GENERAL	((int) 'p')
@@ -612,7 +612,8 @@ find_extents(void)
 static void
 write_to_dfa(int index)
 {
-  char str[MAX_ORDER + 1], strrot[MAX_ORDER + 1];
+  char str[DFA_MAX_ORDER + 1];
+  char strrot[DFA_MAX_ORDER + 1];
 
   assert(ci != -1 && cj != -1);
 #if 0

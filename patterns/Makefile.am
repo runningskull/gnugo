@@ -37,9 +37,9 @@ EXTRA_DIST = $(DSP)\
 	read_defend.db\
 	oracle.db
 
-mkpat_SOURCES  = mkpat.c transform.c
+mkpat_SOURCES  = mkpat.c transform.c dfa.c
 
-mkpat_LDADD = libdfa.a ../utils/libutils.a
+mkpat_LDADD = ../utils/libutils.a
 
 if DFA_ENABLED
 DFAFLAGS = -D -m
@@ -57,12 +57,11 @@ extract_fuseki_SOURCES  = extract_fuseki.c
 # Yes, we currently need duplicate libengine.a and libpatterns.a.
 extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
 		       ../engine/libengine.a libpatterns.a\
-                       ../sgf/libsgf.a ../utils/libutils.a\
-		       libdfa.a
-extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
+                       ../sgf/libsgf.a ../utils/libutils.a
+extract_fuseki_LDFLAGS = -I$(top_srcdir)/sgf
 
 
-noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
+noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h dfa-mkpat.h
 
 GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  influence.c barriers.c endgame.c aa_attackpat.c\
@@ -83,10 +82,9 @@ dist-hook:
 # source files in this directory get access to private prototypes
 INCLUDES = -I$(top_srcdir)/engine -I$(top_srcdir)/utils -I$(top_srcdir)/sgf
 
-noinst_LIBRARIES = libpatterns.a libdfa.a
+noinst_LIBRARIES = libpatterns.a
 
-libpatterns_a_SOURCES = connections.c helpers.c $(GGBUILTSOURCES)
-libdfa_a_SOURCES = dfa.c transform.c
+libpatterns_a_SOURCES = connections.c helpers.c transform.c $(GGBUILTSOURCES)
 
 hoshi_keima.db : $(srcdir)/hoshi_keima.sgf joseki$(EXEEXT)
 	./joseki JH $(srcdir)/hoshi_keima.sgf >hoshi_keima.db

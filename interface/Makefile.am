@@ -17,7 +17,6 @@ INCLUDES = \
 LDADD = \
 	../engine/libengine.a \
 	../patterns/libpatterns.a \
-	../patterns/libdfa.a \
 	../sgf/libsgf.a \
 	../utils/libutils.a
 

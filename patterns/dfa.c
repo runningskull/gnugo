@@ -26,7 +26,7 @@
 
 #include "liberty.h"
 #include "patterns.h"
-#include "dfa.h"
+#include "dfa-mkpat.h"
 #include "random.h"
 
 #include <assert.h>
@@ -53,9 +53,6 @@ int dfa_verbose = 0;
  *  Private data     *
  *********************/
 
-/* the private board */
-int dfa_p[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
-
 /* auxiliary dfa's for high level functions */
 #define DFA_BINS 33 /* Number of temporary bins used to store intermediate DFAs */
 static dfa_t aux_dfa[DFA_BINS];	/* used to store intermediate DFAs */
@@ -64,14 +61,6 @@ static dfa_t aux_temp;          /* used to store temporary DFAs */
 /* To be sure that everything was well initialized */
 static int dfa_was_initialized = 0;
 static int aux_count = 0;
-
-
-/* convert is a table to convert the colors */
-const int convert[3][4] = {
-  {-1, -1, -1, -1},		/* not used */
-  {EMPTY, WHITE, BLACK, OUT_BOARD},	/* WHITE */
-  {EMPTY, BLACK, WHITE, OUT_BOARD}	/* BLACK */
-};
 
 
 /* convert ATT_* values to the corresponding expected values on the board */
@@ -91,114 +80,8 @@ static void create_dfa(dfa_t *pdfa, const char *str, int att_val);
 static void do_sync_product(int l, int r);
 static void sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright);
 
+static void dfa_prepare_rotation_data(void);
 
-/********************************
- *   manipulating scan orders   *
- ********************************/
-
-/* The spiral order is the way we scan the board,
- * we begin on the anchor and we 
- * progressively scan all its neigbouring intersections,
- * collecting all the known patterns we meet on our way:
- *
- *                  4      4      4
- * 1    1     13    13    513    513  ... and so on until we reach
- *      2     2     2      2     827      a stopping state in the
- *                                6        dfa.
- */
-
-int spiral[MAX_ORDER][8];
-
-/*
- * Build the spiral order for each
- * transformation: instead of changing the board
- * or changing the patterns, we only change the order,
- * for eg. the same dfa can perform the pattern matching
- *
- * that way for identity:
- *
- *     765                                            567
- *     814F      and this way for mirror symetry:    F418
- *     923E                                          E329
- *     CABD                                          DBAC
- *
- * Anther possibility is to generate one string by pattern and by
- * transformation in mkpat to avoid any runtime transformation 
- * but it may increase the size of the dfa.
- * 
- */
-
-static const int generator[4] = {
-  4 * DFA_MAX_BOARD, 1, -4 * DFA_MAX_BOARD, -1
-};
-
-void
-buildSpiralOrder(int order[MAX_ORDER][8])
-{
-  int mark[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
-  int fifo[8 * MAX_ORDER];
-  int top = 0, end = 0;
-  int i, j, i0, j0;
-  int k, ll;
-  int ii;
-  int delta;
-
-  if (dfa_verbose > 1)
-    fprintf(stderr, "Building spiral order\n");
-
-  /* First we build the basic (pseudo)spiral order */
-
-  /* initialization */
-
-  for (ii = 0; ii < DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4; ii++)
-    mark[ii] = 1;
-
-  for (i = DFA_MAX_BOARD; i < DFA_MAX_BOARD * 3; i++)
-    for (j = DFA_MAX_BOARD; j < DFA_MAX_BOARD * 3; j++)
-      mark[DFA_POS(i, j)] = 0;
-
-  end = 0;
-  top = 1;
-  fifo[end] = 2 * DFA_OFFSET;
-  mark[fifo[end]] = 1;
-
-  /* generation */
-  while (end < MAX_ORDER) {
-    ii = fifo[end];
-    order[end][0] = ii - 2 * DFA_OFFSET;
-    end++;
-    
-    for (k = 0; k != 4; k++) {
-      delta = generator[k];
-      
-      if (!mark[ii + delta]) {
-	fifo[top] = ii + delta;
-	mark[ii + delta] = 1;
-	top++;
-      }
-    }
-  }
-
-  /* Then we compute all the geometric transformations on this order */
-  for (k = 0; k < MAX_ORDER; k++) {
-    j0 = order[k][0] % (4 * DFA_MAX_BOARD);
-    if (j0 >= 2 * DFA_MAX_BOARD)
-      j0 -= 4 * DFA_MAX_BOARD;
-    if (j0 < - 2 * DFA_MAX_BOARD)
-      j0 += 4 * DFA_MAX_BOARD;
-    i0 = (order[k][0] - j0) / (4 * DFA_MAX_BOARD);
-    for (ll = 1; ll != 8; ll++) {
-      TRANSFORM2(i0, j0, &i, &j, ll);
-      order[k][ll] = DFA_POS(i, j);
-    }
-  }
-
-  if (0) {
-    for (ll = 0; ll < 8; ll++)
-      for (i = 0; i < 13; i++)
-        fprintf(stderr, "i:%d; ll:%d; %d(%c)\n", i, ll, order[i][ll], 'A'+i);
-  }
-}
 
 /********************************
  * manipulating attributes list *
@@ -547,7 +430,7 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
   }
 
 
-  fprintf(of, "\n#include \"dfa.h\"\n");
+  fprintf(of, "\n#include \"dfa-mkpat.h\"\n");
 
   fprintf(of, "static const state_rt_t state_%s[%d] = {\n",
 	  name, pdfa->last_state + 1);
@@ -867,20 +750,18 @@ sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright)
 void
 dfa_init(void)
 {
-  int ii;
   int j;
 
   if (dfa_verbose > 1)
     fprintf(stderr, "dfa: init\n");
   dfa_was_initialized++;
-  buildSpiralOrder(spiral);
+
+  build_spiral_order();
+  dfa_prepare_rotation_data();
+
   for (j = 0; j < DFA_BINS; j++)
     new_dfa(&(aux_dfa[j]), "binAux ");
   new_dfa(&aux_temp, "tempAux ");
-
-  /* set the private board to OUT_BOARD */
-  for (ii = 0; ii < 4 * DFA_MAX_BOARD * 4 * DFA_MAX_BOARD; ii++)
-    dfa_p[ii] = OUT_BOARD;
 }
 
 void
@@ -1069,51 +950,52 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
 }
 
 
-/* Create a transformation of `str' and store it in `strrot'. */
-void
-dfa_rotate_string(char *strrot, const char *str, int ll)
+/* Used for quick string rotation. */
+static int dfa_rotation_data[DFA_BASE * DFA_BASE];
+
+static void
+dfa_prepare_rotation_data(void)
 {
-  int i, j;
-  char strdollar[MAX_ORDER+1];
+  int k;
 
-  if (ll == 0) {
-    strcpy(strrot, str);
-    return;
-  }
+  for (k = 0; k < DFA_MAX_ORDER; k++)
+    dfa_rotation_data[DFA_POS(0, 0) + spiral[k][0]] = k;
+}
 
-  memset(strdollar, '$', sizeof(char) * (MAX_ORDER + 1));
-  strcpy(strdollar, str);
-  strdollar[strlen(str)] = '$';
-  memset(strrot, '$', sizeof(char) * (MAX_ORDER + 1));
 
-  for (i = 0; i < MAX_ORDER/2; i++) {
-    for (j = 0; j < MAX_ORDER+1; j++) {
-      if (spiral[i][0] == spiral[j][ll]) {
-	if (0 && (spiral[i][0] == 84 || spiral[i][0] == -84
-	    || spiral[i][0]== 1   || spiral[i][0] == -1
-	    || spiral[j][ll] == 84 || spiral[j][ll] == -84
-	    || spiral[j][ll] == 1  || spiral[j][ll] == -1 ) )
-	  fprintf(stderr, "i: %d  j: %d\n", i, j);
+/* Create a transformation of `string' and store it in
+ * `rotated_string'.  The latter must be of at least DFA_MAX_ORDER
+ * characters in length. */
+void
+dfa_rotate_string(char *rotated_string, const char *string, int transformation)
+{
+  if (transformation > 0) {
+    int k;
+    int length = strlen(string);
+    int new_length = 0;
 
-	assert(strrot[i] == '$');
-	strrot[i] = strdollar[j];
-	break;
+    memset(rotated_string, '$', DFA_MAX_ORDER);
+
+    for (k = 0; k < length; k++) {
+      if (string[k] != '$') {
+	int string_position = dfa_rotation_data[DFA_POS(0, 0)
+						+ spiral[k][transformation]];
+	rotated_string[string_position] = string[k];
+	if (string_position + 1 > new_length)
+	  new_length = string_position + 1;
       }
     }
 
-    assert(j < MAX_ORDER+1);
+    rotated_string[new_length] = 0;
   }
-
-  j = MAX_ORDER;
-  while (strrot[j] == '$')
-    j--;
-  strrot[j+1] = 0;
+  else
+    strcpy(rotated_string, string);
 }
 
 
 /*
- * Build a pattern string from a pattern.
- * str must refer a buffer of size greater than MAX_ORDER.
+ * Build a pattern string from a pattern.  `str' must refer a buffer
+ * of size greater than DFA_MAX_ORDER.
  */
 void
 pattern_2_string(struct pattern *pat, struct patval_b *elements,
@@ -1129,7 +1011,7 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
   n = DFA_MAX_BOARD * 2 + cj;	/* position of the anchor */
 
   assert(dfa_was_initialized);
-  memset(str, 0, MAX_ORDER);
+  memset(str, 0, DFA_MAX_ORDER);
   memset(work_space, '#', sizeof(work_space));
 
   if (dfa_verbose > 0)
@@ -1235,14 +1117,14 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
    */
 
   for (k = 0;
-       (k != MAX_ORDER - 1) && ((borders > 0) || edges || to_test > 0);
+       (k != DFA_MAX_ORDER - 1) && ((borders > 0) || edges || to_test > 0);
        k++) {
-    j = spiral[k][0] % (4 * DFA_MAX_BOARD);
-    if (j >= 2 * DFA_MAX_BOARD)
-      j -= 4 * DFA_MAX_BOARD;
-    if (j <  - 2 * DFA_MAX_BOARD)
-      j += 4 * DFA_MAX_BOARD;
-    i = (spiral[k][0] - j) / (4 * DFA_MAX_BOARD);
+    j = spiral[k][0] % DFA_BASE;
+    if (j >= DFA_MAX_BOARD)
+      j -= DFA_BASE;
+    if (j <= -DFA_MAX_BOARD)
+      j += DFA_BASE;
+    i = (spiral[k][0] - j) / DFA_BASE;
 
     if (i == pat->maxi)
       borders &= ~SOUTH_EDGE;
@@ -1271,7 +1153,7 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
     }
   }
   
-  assert(k < MAX_ORDER);
+  assert(k < DFA_MAX_ORDER);
   str[k] = '\0';		/* end of string */
 
   if (0 && dfa_verbose > 0)

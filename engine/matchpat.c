@@ -775,14 +775,16 @@ tree_initialize_pointers(struct tree_node_list *tnl,
 /* Set this to show the dfa board in action */
 /* #define DFA_TRACE 1 */
 
-/* data */
-extern int board_size;
+/* Data. */
 static int dfa_board_size = -1;
-extern int dfa_p[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
-extern int spiral[MAX_ORDER][8];
+static int dfa_p[DFA_BASE * DFA_BASE];
 
 /* This is used by the EXPECTED_COLOR macro. */
-extern const int convert[3][4];
+static const int convert[3][4] = {
+  {-1, -1, -1, -1},		/* not used */
+  {EMPTY, WHITE, BLACK, OUT_BOARD},	/* WHITE */
+  {EMPTY, BLACK, WHITE, OUT_BOARD}	/* BLACK */
+};
 
 /* Forward declarations. */
 static void dfa_prepare_for_match(int color);
@@ -813,7 +815,7 @@ static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback,
 void
 dfa_match_init(void)
 {
-  buildSpiralOrder(spiral);
+  build_spiral_order();
 
   if (owl_vital_apat_db.pdfa != NULL)
     DEBUG(DEBUG_MATCHER, "owl_vital_apat --> using dfa\n");
@@ -850,36 +852,38 @@ static void
 dfa_prepare_for_match(int color)
 {
   int i, j;
-  int ii;
+  int pos;
     
   if (dfa_board_size != board_size) {
     dfa_board_size = board_size;
     /* clean up the board */
-    for (ii = 0; ii < 4 * DFA_MAX_BOARD * 4 * DFA_MAX_BOARD; ii++)
-      dfa_p[ii] = OUT_BOARD;
+    for (pos = 0; pos < DFA_BASE * DFA_BASE; pos++)
+      dfa_p[pos] = OUT_BOARD;
   }
 
   /* copy the board */
   for (i = 0; i < dfa_board_size; i++)
     for (j = 0; j < dfa_board_size; j++)
-      dfa_p[DFA_POS(i, j) + DFA_OFFSET] = EXPECTED_COLOR(color, BOARD(i, j));
+      dfa_p[DFA_POS(i, j)] = EXPECTED_COLOR(color, BOARD(i, j));
 
   prepare_for_match(color);
 }
 
 #if 0
-/* debug function */
+/* Debug function. */
 static void
 dump_dfa_board(int m, int n)
 {
   int i, j;
 
-  for (i = DFA_MAX_BOARD / 2; i < DFA_MAX_BOARD*1.5 ; i++) {
-    for (j = DFA_MAX_BOARD / 2 ; j < DFA_MAX_BOARD*1.5 ; j++)
-      if (i != (m+DFA_MAX_BOARD) || j != (n+DFA_MAX_BOARD))
+  for (i = 0; i < dfa_board_size ; i++) {
+    for (j = 0; j < dfa_board_size; j++) {
+      if (i != m || j != n)
 	fprintf(stderr, "%1d", dfa_p[DFA_POS(i, j)]);
       else
 	fprintf(stderr, "*");
+    }
+
     fprintf(stderr, "\n");
   }
 }
@@ -914,7 +918,7 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos, int *pat_list)
     row++;
   } while (delta != 0); /* while not on error state */
 
-  gg_assert(row < MAX_ORDER);
+  gg_assert(row < DFA_MAX_ORDER);
   return id;
 }
 
@@ -931,7 +935,7 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
   int ll;      /* Iterate over transformations (rotations or reflections)  */
   int patterns[DFA_MAX_MATCHED + 8];
   int num_matched = 0;
-  int *dfa_pos = dfa_p + DFA_POS(I(anchor), J(anchor)) + DFA_OFFSET;
+  int *dfa_pos = dfa_p + DFA_POS(I(anchor), J(anchor));
 
   /* Basic sanity checks. */
   ASSERT_ON_BOARD1(anchor);
