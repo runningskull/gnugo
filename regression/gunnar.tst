@@ -155,6 +155,39 @@ loadsgf games/nngs/gnugo-3.3.17-joshj-200304172202.sgf 226
 28 gg_genmove white
 #? [S9|T9]
 
+# H5 is the only move. H11 can connect to either of two invincible
+# dragons and is therefore not weak at all.
+loadsgf games/gunnar/gunnar9.sgf
+29 gg_genmove white
+#? [H5]
+
+# F18 should be a better and bigger way to live than B18.
+loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 110
+30 restricted_genmove white F18 B18
+#? [F18]
+
+# F18 is clearly bigger and better shape than E17.
+loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 120
+31 restricted_genmove white F18 E17
+#? [F18]
+
+# C18 looks like the simplest way to live. There may be other effective
+# moves which should also be accepted.
+loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 124
+32 gg_genmove white
+#? [C18]
+
+# Important to strengthen the wall at M11. P10 is not so large.
+loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 184
+33 restricted_genmove white M11 P10
+#? [M11]
+
+# The game move at P7 is worthless. M4 or M5 take the last point.
+loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 234
+34 gg_genmove white
+#? [M4|M5]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

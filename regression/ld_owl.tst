@@ -179,6 +179,15 @@ loadsgf games/life_and_death/ld18.sgf
 67 dragon_status C9
 #? [critical A9 A7]
 
+# No need to play ko with B2
+loadsgf games/life_and_death/ld13.sgf
+play white A5
+play black A4
+play white D1
+play black A2
+68 owl_attack C4
+#? [1 B1]
+
 loadsgf games/life_and_death/lunches.sgf
 101 dragon_status A17
 #? [dead]
