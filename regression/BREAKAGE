@@ -55,6 +55,7 @@
 410 unexpected PASS!
 420 unexpected PASS!
 ./regress.sh . strategy5.tst 
+223 unexpected PASS!
 282 unexpected PASS!
 ./regress.sh . safety.tst 
 3 unexpected PASS!
