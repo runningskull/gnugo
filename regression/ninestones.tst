@@ -57,7 +57,7 @@ loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 64
 
 loadsgf games/ninestones/bobo-gnugo-3.3.9-200210111309.sgf 66
 150 gg_genmove black
-#? [C5|D5]
+#? [C5|D5]*
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 64
 190 owl_defend J9
@@ -165,7 +165,7 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 228
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 254
 550 gg_genmove black
-#? [G5|J4]*
+#? [G5|J4]
 
 # B can win the semeai, which is a close race. Tenuki is
 # possible but the policy should be to play it out.
@@ -210,7 +210,7 @@ loadsgf games/ninestones/ninestones1.sgf 90
 # J2 is better than H2
 loadsgf games/splee.sgf 62
 640 gg_genmove black
-#? [J2|H2]
+#? [J2|H2]*
 
 
 

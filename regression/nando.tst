@@ -29,7 +29,7 @@ loadsgf games/nando/auto004.sgf
 #CATEGORY=OWL
 loadsgf games/nando/auto005.sgf
 6 owl_does_defend S2 Q2
-#? [0]*
+#? [0]
 
 #CATEGORY=ATARI_ATARI
 loadsgf games/nando/auto006.sgf
@@ -131,7 +131,7 @@ loadsgf games/nando/auto017.sgf
 white A8
 black A10
 25 gg_genmove white
-#? [!P16]*
+#? [!P16]
 
 # Another lunch "mirage" at N16/O15.
 #CATEGORY=OWL

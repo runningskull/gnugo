@@ -129,14 +129,14 @@ loadsgf games/nngs/gnugo-3.3.16-rubus-200302281805.sgf 69
 # See also owl1:300
 loadsgf games/gunnar/gunnar7.sgf
 24 restricted_genmove black L17 K3
-#? [K3]*
+#? [K3]
 25 restricted_genmove black P9 K3
 #? [K3]*
 
 # J2 is not a relevant cutstone and saving it should not be worth a bonus.
 loadsgf games/gunnar/gunnar8.sgf
 26 restricted_genmove black K1 H1 J3 J4 F9
-#? [F9]*
+#? [F9]
 
 # White cannot make two proper eyes but can make life with
 # topologically false eyes. G18 and M19 both live but G18 is

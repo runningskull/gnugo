@@ -1,3 +1,48 @@
+========================== 3.3.20 pre 3 =====================================
+
+./regress.sh . filllib.tst 
+41 unexpected PASS!
+./regress.sh . blunder.tst 
+25 unexpected PASS!
+./regress.sh . nngs1.tst 
+20 unexpected FAIL: Correct 'F17', got 'S13'
+./regress.sh . trevorb.tst 
+160 unexpected PASS!
+590 unexpected PASS!
+./regress.sh . trevorc.tst 
+100 unexpected PASS!
+240 unexpected PASS!
+820 unexpected FAIL: Correct 'A6', got 'B12'
+1420 unexpected FAIL: Correct 'J4', got 'A11'
+./regress.sh . semeai.tst 
+47 unexpected FAIL: Correct 'ALIVE ALIVE (PASS|T11|T9|R9|T10|R10|R11)', got 'ALIVE DEAD T11'
+50 unexpected PASS!
+./regress.sh . owl1.tst 
+309 unexpected PASS!
+310 unexpected PASS!
+311 unexpected FAIL: Correct '1 E2', got '0'
+312 unexpected FAIL: Correct '1 C3', got '1 E2'
+./regress.sh . nngs3.tst 
+1180 unexpected PASS!
+./regress.sh . nngs4.tst 
+340 unexpected PASS!
+570 unexpected PASS!
+590 unexpected FAIL: Correct 'E2', got 'H7'
+./regress.sh . century2002.tst 
+240 unexpected FAIL: Correct 'F18', got 'C7'
+./regress.sh . auto01.tst 
+4 unexpected PASS!
+./regress.sh . ninestones.tst 
+150 unexpected FAIL: Correct 'C5|D5', got 'G14'
+550 unexpected PASS!
+640 unexpected FAIL: Correct 'J2|H2', got 'J3'
+./regress.sh . gunnar.tst 
+24 unexpected PASS!
+26 unexpected PASS!
+./regress.sh . nando.tst 
+6 unexpected PASS!
+25 unexpected PASS!
+
 ========================== 3.3.20 pre 2 =====================================
 
 ./regress.sh . owl.tst 

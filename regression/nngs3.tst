@@ -560,7 +560,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
 # A5 is very odd.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 244
 1180 gg_genmove white
-#? [A6]*
+#? [A6]
 
 loadsgf games/nngs/gnugo-3.3.10-tsuku-200210241808.sgf 136
 1190 gg_genmove white

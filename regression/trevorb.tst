@@ -42,7 +42,7 @@ loadsgf games/trevor/auto/b08.sgf 16
 
 loadsgf games/trevor/auto/b08.sgf 32
 160 owl_attack M9
-#? [1 ..*]*
+#? [1 ..*]
 
 
 loadsgf games/trevor/auto/b08.sgf 94
@@ -345,7 +345,7 @@ loadsgf games/trevor/auto/b52.sgf 14
 
 loadsgf games/trevor/auto/b52.sgf 18
 590 gg_genmove white
-#? [H12|M9]*
+#? [H12|M9]
 
 
 loadsgf games/trevor/auto/b52.sgf 42

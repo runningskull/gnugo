@@ -134,7 +134,7 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 40
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 76
 340 restricted_genmove black B1 D2
-#? [D2]*
+#? [D2]
 
 loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 102
 350 gg_genmove black
@@ -235,7 +235,7 @@ loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 66
 # New failure (3.3.18)
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 86
 570 gg_genmove white
-#? [F6]*
+#? [F6]
 
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 88
 580 gg_genmove white
@@ -243,7 +243,7 @@ loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 88
 
 loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 70
 590 gg_genmove black
-#? [E2]
+#? [E2]*
 
 
 ############ End of Tests #################
