@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- BOARD_MIN reduced to 2
 - free memory allocated in a failed read of an sgf file
 - extract_fuseki revisions: statistics on outcomes,
   popularity cutoffs based on unique players added to command line
@@ -15,6 +16,7 @@
 - influence tuning
 - owl tuning
 - tuning
+- new testsuite tiny.tst
 - new and revised tests
 	
 3.7.1 released November 23, 2004
