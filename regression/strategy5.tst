@@ -158,6 +158,16 @@ loadsgf games/ab1_fuseki.sgf 32
 289 restricted_genmove black F4 M16
 #? [M16]
 
+# avoid bad exchange at E2
+loadsgf games/gg-040225.sgf 220
+290 reg_genmove black
+#? [S16|S17|T16]
+
+# P7 creates a shortage of liberties.
+loadsgf games/kisei28_g7.sgf 189
+291 restricted_genmove black P7 L9
+#? [L9]
+
 
 ############ End of Tests #################
 

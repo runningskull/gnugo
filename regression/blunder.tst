@@ -155,3 +155,9 @@ loadsgf games/atari_atari09.sgf
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 283
 32 reg_genmove white
 #? [E3|H4]*
+
+# This needs a detect_semeai_blunder().
+loadsgf games/kisei28_g7.sgf 280
+33 reg_genmove white
+#? [!H6|J1]*
+
