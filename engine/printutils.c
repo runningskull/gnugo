@@ -422,18 +422,18 @@ routine_to_string(int routine)
 const char *
 result_to_string(int result)
 {
-  if (result == 0)
-    return "0";
-  else if (result == KO_A)
-    return "KO_A";
-  else if (result == KO_B)
-    return "KO_B";
-  else if (result == WIN)
-    return "WIN";
-  else if (result == ALIVE_IN_SEKI)
-    return "SEKI";
-  else
-    return "ERROR";
+  switch (result) {
+  case 0:             return "0";
+  case KO_B:          return "KO_B";
+  case LOSS:          return "LOSS";
+  case GAIN:          return "GAIN";
+  case KO_A:          return "KO_A";
+  case WIN:           return "WIN";
+
+  /* ALIVE_IN_SEKI is not defined as a return code, but is used here anyhow. */
+  case ALIVE_IN_SEKI: return "SEKI";
+  default:            return "ERROR";
+  }
 }
 
 

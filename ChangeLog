@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- report_worm(): print all attack, defense, threat points/codes
+- worm_data::defend_codes is now called defense_codes
+- enhanced result_to_string() with new return codes.
+- removed strategically_sound_defense()
+- mingw build searches for mingwex
 - pattern symmetry corrections in owl_defendpats.db and patterns2.db
 - bugfix in topological_eye()
 - don't spread any influence below INFLUENCE_CUTOFF
@@ -30,8 +35,7 @@
 - mark_changed_dragon() revised using dragon loop
 - bugfix in fill_liberty()
 - filllib_confirm_safety() revised
-- In make_dragon(): resolve inconsistent owl result by calling
-  owl_does_defend()
+- make_dragon(): resolve inconsistent owl result by calling owl_does_defend()
 - add assert on inconsistent do_genmove result() in genmove()
 - life code completely disabled
 - global variables life and life_eyesize removed
@@ -43,8 +47,7 @@
 - configure test for alarm removed
 - sigterm_handler() and volatile variable time_to_die removed
 - functions special_rescue(), special_rescue2() converted to .._moves()
-- break_chain2() removed; use new function break_chain2_defense_moves()
-  instead
+- break_chain2() removed; use new break_chain2_defense_moves() instead
 - defend2() and defend3() simplified
 - new reading codes GAIN/LOSS for later use in owl
 - more consistent use of WIN and REVERSE_RESULT() macros

@@ -761,7 +761,7 @@ struct worm_data {
   int attack_points[MAX_TACTICAL_POINTS];
   int attack_codes[MAX_TACTICAL_POINTS];
   int defense_points[MAX_TACTICAL_POINTS];
-  int defend_codes[MAX_TACTICAL_POINTS];
+  int defense_codes[MAX_TACTICAL_POINTS];
   int attack_threat_points[MAX_TACTICAL_POINTS];
   int attack_threat_codes[MAX_TACTICAL_POINTS]; 
   int defense_threat_points[MAX_TACTICAL_POINTS];

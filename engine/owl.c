@@ -3418,6 +3418,7 @@ owl_reasons(int color)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos) || board[pos] == EMPTY)
       continue;
+
     if (dragon[pos].origin == pos
 	&& dragon[pos].status == CRITICAL
 	&& dragon[pos].owl_attack_point != NO_MOVE) {

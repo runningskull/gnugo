@@ -339,7 +339,7 @@ get_pos(int reason, int what)
   case YOUR_ATARI_ATARI_MOVE:
     return NO_MOVE;
   }
-  /* We shoud never get here: */
+  /* We should never get here: */
   gg_assert(1>2);
   return 0; /* To keep gcc happy. */
 }
@@ -854,8 +854,8 @@ add_cut_move(int pos, int w1, int w2)
    * Ignore the cut or connection if either (w1) or (w2)
    * points to a tactically captured worm.
    */
-  if ((worm[w1].attack_codes[0] != 0 && worm[w1].defend_codes[0] == 0)
-      || (worm[w2].attack_codes[0] != 0 && worm[w2].defend_codes[0] == 0))
+  if ((worm[w1].attack_codes[0] != 0 && worm[w1].defense_codes[0] == 0)
+      || (worm[w2].attack_codes[0] != 0 && worm[w2].defense_codes[0] == 0))
     return;
   
   add_move_reason(pos, CUT_MOVE, connection);
@@ -968,7 +968,7 @@ add_either_move(int pos, int reason1, int target1, int reason2, int target2)
       /* If this string is already attacked, and with no defense, then
        * there is no additional value of this move reason. */
       if (worm[target1].attack_codes[0] != 0
-	  && worm[target1].defend_codes[0] == 0)
+         && worm[target1].defense_codes[0] == 0)
 	return;
     }
     break;
@@ -985,7 +985,7 @@ add_either_move(int pos, int reason1, int target1, int reason2, int target2)
       /* If this string is already attacked, and with no defense, then
        * there is no additional value of this move reason. */
       if (worm[target2].attack_codes[0] != 0 
-	  && worm[target2].defend_codes[0] == 0)
+         && worm[target2].defense_codes[0] == 0)
 	return;
     }
     break;
@@ -1546,14 +1546,14 @@ mark_safe_stones(int color, int move_pos, const char saved_dragons[BOARDMAX],
     if (board[pos] == OTHER_COLOR(color)) {
       if (dragon[pos].status == DEAD
 	  || (worm[pos].attack_codes[0] != 0
-	      && worm[pos].defend_codes[0] == 0))
+             && worm[pos].defense_codes[0] == 0))
 	safe_stones[pos] = 0;
       else
 	safe_stones[pos] = SAFE_STONE;
     }
     else if (board[pos] == color) {
       if ((worm[pos].attack_codes[0] != 0
-	   && (worm[pos].defend_codes[0] == 0 || !saved_worms[pos]))
+	   && (worm[pos].defense_codes[0] == 0 || !saved_worms[pos]))
 	  || dragon[pos].status == DEAD)
 	safe_stones[pos] = 0;
       else if (saved_dragons[pos])
@@ -1602,17 +1602,17 @@ list_move_reasons(int color)
 	case ATTACK_MOVE:
 	  aa = worms[move_reasons[r].what];
 	  gprintf("Move at %1m attacks %1m%s\n", pos, aa,
-		  (worm[aa].defend_codes[0] == 0) ? " (defenseless)" : "");
+                 (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	case ATTACK_MOVE_GOOD_KO:
 	  aa = worms[move_reasons[r].what];
 	  gprintf("Move at %1m attacks %1m%s with good ko\n", pos, aa,
-		  (worm[aa].defend_codes[0] == 0) ? " (defenseless)" : "");
+                 (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	case ATTACK_MOVE_BAD_KO:
 	  aa = worms[move_reasons[r].what];
 	  gprintf("Move at %1m attacks %1m%s with bad ko\n", pos, aa,
-		  (worm[aa].defend_codes[0] == 0) ? " (defenseless)" : "");
+                 (worm[aa].defense_codes[0] == 0) ? " (defenseless)" : "");
 	  break;
 	  
 	case DEFEND_MOVE:

@@ -863,7 +863,7 @@ small_semeai_analyzer(int apos, int bpos, int save_verbose)
 
   owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0);
   if (resulta != DEAD
-      && worm[apos].defend_codes[0] == 0 
+      && worm[apos].defense_codes[0] == 0
       && move != NO_MOVE) {
     if (save_verbose)
       gprintf("small semeai: changing defense of %1m to %1m\n",

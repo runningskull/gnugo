@@ -142,7 +142,7 @@ find_more_attack_and_defense_moves(int color)
       if (board[ii]
 	  && worm[ii].origin == ii
 	  && worm[ii].attack_codes[0] != 0
-	  && worm[ii].defend_codes[0] != 0) {
+         && worm[ii].defense_codes[0] != 0) {
 	unstable_worms[N] = find_worm(ii);
 	N++;
       }
@@ -208,7 +208,7 @@ find_more_attack_and_defense_moves(int color)
 	      && !attack_move_reason_known(ii, unstable_worms[k])) {
 	    
 	    int dcode = find_defense(aa, NULL);
-	    if (dcode < worm[aa].defend_codes[0]) {
+           if (dcode < worm[aa].defense_codes[0]) {
 	      /* Maybe find_defense() doesn't find the defense. Try to
 	       * defend with the stored defense move.
 	       */
@@ -220,7 +220,7 @@ find_more_attack_and_defense_moves(int color)
 		int this_dcode = REVERSE_RESULT(attack(aa, NULL));
 		if (this_dcode > dcode) {
 		  dcode = this_dcode;
-		  if (dcode >= worm[aa].defend_codes[0])
+                 if (dcode >= worm[aa].defense_codes[0])
 		    attack_works = 0;
 		}
 		popgo();
@@ -409,22 +409,6 @@ find_more_owl_attack_and_defense_moves(int color)
 }
 
 
-/*
- * It's often bad to run away with a worm that is in a strategically
- * weak position. This function gives heuristics for determining
- * whether a move at (ti, tj) to defend the worm (ai, aj) is
- * strategically sound.
- *
- * FIXME: This function has played out its role. Should be eliminated.
- */
-static int
-strategically_sound_defense(int aa, int tt)
-{
-  UNUSED(aa);
-  return move[tt].move_safety;
-}
-
-
 
 /*
  * Any move that captures or defends a worm also potentially connects
@@ -472,7 +456,7 @@ induce_secondary_move_reasons(int color)
 	  color_to_move = board[aa];
 	}
 		
-	if (worm[aa].defend_codes[0] == 0)
+       if (worm[aa].defense_codes[0] == 0)
 	  continue; /* No defense. */
 	
 	/* Don't care about inessential dragons. */
@@ -486,7 +470,7 @@ induce_secondary_move_reasons(int color)
 	 *
 	 * FIXME: We may want to revise this policy.
 	 */
-	if (!attack_move && !strategically_sound_defense(aa, pos))
+       if (!attack_move && !move[pos].move_safety)
 	  continue;
 	
 	num_adj = extended_chainlinks(aa, adjs, 1);
@@ -1236,7 +1220,7 @@ estimate_territorial_value(int pos, int color, float score)
       gg_assert(board[aa] != color);
       
       /* Defenseless stone. */
-      if (worm[aa].defend_codes[0] == 0) {
+      if (worm[aa].defense_codes[0] == 0) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m:   %f (secondary) - attack on %1m (defenseless)\n",
 	      pos, worm[aa].effective_size, aa);
@@ -1835,7 +1819,7 @@ estimate_strategical_value(int pos, int color, float score)
 	aa = worms[worm1];
       
 	/* Defenseless stone */
-	if (worm[aa].defend_codes[0] == 0)
+       if (worm[aa].defense_codes[0] == 0)
 	  break;
 
 	/* FIXME: This is totally ad hoc, just guessing the value of
@@ -1943,6 +1927,8 @@ estimate_strategical_value(int pos, int color, float score)
 
 	/* Also if there is a combination attack, we assume it covers
 	 * the same thing.
+        * FIXME: This is only applicable as long as the only moves
+        *        handled by EITHER_MOVE are attacks.
 	 */
 	if (move_reason_known(pos, MY_ATARI_ATARI_MOVE, -1))
 	  break;

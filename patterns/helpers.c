@@ -329,7 +329,7 @@ cutstone2_helper(ARGS)
   bpos = OFFSET(-1,  0);
   cpos = OFFSET( 0, -1);
 
-  if (worm[apos].defend_codes[0] == 0)
+  if (worm[apos].defense_codes[0] == 0)
     return 0;
   
   dpos = worm[apos].defense_points[0];
@@ -424,7 +424,7 @@ threaten_to_capture_helper(int move, int str)
   
   adj = chainlinks2(str, adjs, 1);
   for (k = 0; k < adj; k++)
-    if (worm[adjs[k]].defend_codes[0] != 0
+    if (worm[adjs[k]].defense_codes[0] != 0
 	&& !does_defend(move, adjs[k]))
       return;
 
@@ -466,7 +466,7 @@ defend_against_atari_helper(int move, int str)
   /* No value if the string can capture out of atari. */
   adj = chainlinks2(str, adjs, 1);
   for (k = 0; k < adj; k++)
-    if (worm[adjs[k]].defend_codes[0] != 0
+    if (worm[adjs[k]].defense_codes[0] != 0
 	&& !does_defend(move, adjs[k]))
       return;
 

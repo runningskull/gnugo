@@ -404,7 +404,7 @@ init_influence(struct influence_data *q, int color,
 	    || (saved_stones[pos] == INFLUENCE_UNCHANGED_STONE
 		&& ((worm[pos].attack_codes[0] != 0
 		    && (OTHER_COLOR(q->p[i][j]) == color
-			|| worm[pos].defend_codes[0] == 0))
+                       || worm[pos].defense_codes[0] == 0))
 		    || (q->dragons_known
 			&& dragon[pos].id != -1
 			&& (DRAGON2(pos).safety == DEAD
@@ -1167,7 +1167,7 @@ whose_moyo_restricted(struct influence_data *q, int m, int n)
   int territory_color = whose_territory(q, m, n);
 
   if (worm[POS(m, n)].attack_codes[0] != 0
-      && worm[POS(m, n)].defend_codes[0] != 0)
+      && worm[POS(m, n)].defense_codes[0] != 0)
     return EMPTY;
   
   /* default */

@@ -453,7 +453,7 @@ is_lively(int owl_call, int pos)
   else
     result = (!worm[pos].inessential
 	      && (worm[pos].attack_codes[0] == 0
-		  || worm[pos].defend_codes[0] != 0));
+                 || worm[pos].defense_codes[0] != 0));
 
   return result;
 }
@@ -1654,7 +1654,7 @@ evaluate_diagonal_intersection(int m, int n, int color,
     if (stackp == 0) {
       acode = worm[pos].attack_codes[0];
       apos  = worm[pos].attack_points[0];
-      dcode = worm[pos].defend_codes[0];
+      dcode = worm[pos].defense_codes[0];
       dpos  = worm[pos].defense_points[0];
     }
     else

@@ -118,11 +118,11 @@ display_worm(int w)
   
     wmove(info_window, 10, 19 + i * 6);
     if (worm[w].defense_points[i] == 0)
-      gg_wprintw(info_window, "---:0 ", worm[w].defend_codes[i]);
+      gg_wprintw(info_window, "---:0 ", worm[w].defense_codes[i]);
     else
       gg_wprintw(info_window, "%3s:%d ", 
 		 location_to_string(worm[w].defense_points[i]),
-		 worm[w].defend_codes[i]);
+                worm[w].defense_codes[i]);
 
     wmove(info_window, 11, 19 + i * 6);
     if (worm[w].attack_threat_points[i] == 0)
@@ -162,7 +162,7 @@ display_worm_tactical_data(int m, int n)
     if (worm[ii].attack_codes[i] != 0)
       display_board_char(I(worm[ii].attack_points[i]),
 			 J(worm[ii].attack_points[i]), 'A');
-    if (worm[ii].defend_codes[i] != 0)
+    if (worm[ii].defense_codes[i] != 0)
       display_board_char(I(worm[ii].defense_points[i]),
 			 J(worm[ii].defense_points[i]), 'D');
     if (worm[ii].attack_threat_codes[i] != 0)

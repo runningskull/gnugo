@@ -105,7 +105,7 @@ does_attack(int move, int str)
   
   if (stackp == 0) {
     if (worm[str].attack_codes[0] != 0 
-	&& worm[str].defend_codes[0] == 0)
+       && worm[str].defense_codes[0] == 0)
       return 0;
     spos = worm[str].defense_points[0];
   }
@@ -1023,7 +1023,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
     else if (board[pos] == other
 	     && worm[pos].origin == pos
 	     && worm[pos].attack_codes[0] != 0
-	     && worm[pos].defend_codes[0] == 0
+            && worm[pos].defense_codes[0] == 0
 	     && find_defense(pos, NULL)) {
       /* A dead opponent's worm has become defendable.
        * Also ask the owl code whether the string can live

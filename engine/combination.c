@@ -447,7 +447,7 @@ compute_aa_status(int color, const char safe_stones[BOARDMAX])
 	else if (dragon[pos].status == CRITICAL)
 	  aa_status[pos] = CRITICAL;
 	else if (worm[pos].attack_codes[0] != 0) {
-	  if (worm[pos].defend_codes[0] != 0)
+         if (worm[pos].defense_codes[0] != 0)
 	    aa_status[pos] = CRITICAL;
 	  else
 	    aa_status[pos] = DEAD;
