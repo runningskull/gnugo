@@ -1,23 +1,20 @@
-TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
-      ld_owl.tst connection.tst  \
-      neurogo.tst arb.tst strategy2.tst strategy3.tst rosebud.tst \
-      heikki.tst golife.tst dniwog.tst strategy4.tst \
-      nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
-      filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst \
-      score.tst manyfaces.tst cutstone.tst newscore.tst blunder.tst \
-      niki.tst trevor.tst tactics.tst buzco.tst \
-      capture.tst connect.tst global.tst vie.tst \
-      endgame_rot.tst optics_rot.tst connection_rot.tst ld_owl_rot.tst \
-      owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst \
-      reading_rot.tst arend.tst \
-      trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst \
-      nngs.tst lazarus.tst nngs1.tst score2.tst
+TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst blunder.tst \
+       buzco.tst capture.tst connect.tst connect_rot.tst connection.tst \
+       connection_rot.tst cutstone.tst dniwog.tst ego.tst endgame.tst \
+       endgame_rot.tst filllib.tst global.tst golife.tst heikki.tst \
+       lazarus.tst ld_owl.tst ld_owl_rot.tst life.tst manyfaces.tst \
+       neurogo.tst newscore.tst nicklas1.tst nicklas2.tst nicklas3.tst \
+       nicklas4.tst nicklas5.tst niki.tst nngs.tst nngs1.tst optics.tst \
+       optics_rot.tst owl.tst owl_rot.tst reading.tst reading_rot.tst \
+       rosebud.tst score.tst score2.tst score_rot.tst semeai.tst \
+       semeai2.tst strategy.tst strategy2.tst strategy3.tst strategy4.tst \
+       strategy_rot.tst tactics.tst trevor.tst trevora.tst trevorb.tst \
+       trevorc.tst trevord.tst vie.tst viking.tst
 
-noinst_SCRIPTS = eval.sh regress.sh test.sh
+noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 
 EXTRA_DIST = golois games $(TST) $(noinst_SCRIPTS) regress.awk \
-             STRATEGY NICKLAS READING BREAKAGE \
-	     regress.pl regress.plx
+             BREAKAGE regress.pl regress.plx
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *.orig *~

@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.33 released April 19, 2002
+
+- regression/READING, STRATEGY and NICKLAS removed
+- makevcdist.pl, doc/gnugo-32.[jpg|eps]added to EXTRADIST
+- eval3.sh and semeai2.tst added to automake control
 - TODO list in texinfo updated
 - class field in struct pattern and class_mask in made unsigned int
 - input_FILE and output_FILE in mkpat.c explicitly initialized
@@ -16,7 +21,7 @@
 - put GNU Go's passes in permanent move history
 - assertion in compute_connection_distances corrected
 
-3.1.31 released April 4, 2002	
+3.1.32 released April 13, 2002	
 	
 - new update_random_seed()
 - gtp_set_boardsize updates the random seed

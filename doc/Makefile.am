@@ -13,7 +13,7 @@ gnugo_TEXINFOS = analyze.texi api.texi board.texi copying.texi dfa.texi \
 man_MANS = gnugo.6
 
 EPS = cdfa.eps dfa.eps dfa2.eps oldlogo.eps newlogo.eps \
-	path.eps sync-prod1.eps sync-prod2.eps
+	path.eps sync-prod1.eps sync-prod2.eps logo-32.eps logo-32.jpg
 
 FIG = cdfa.fig dfa.fig dfa2.fig path.fig sync-prod1.fig sync-prod2.fig
 
