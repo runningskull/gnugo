@@ -5084,6 +5084,20 @@ OX
 ;!owl_goal_dragon(a)
 
 
+Pattern D1316b
+# gf New pattern. (3.3.17)
+
+OX          connect out to strong dragon
+*O
+
+:8,n,value(90)
+
+OX
+*a
+
+;owl_strong_dragon(a)
+
+
 Pattern D1317
 
 o..X         move out, separate, and escape
@@ -5157,6 +5171,18 @@ cd.
 ; && !xplay_attack_either(*,d,c,c,*)
 
 
+Pattern D1320b
+# gf New pattern. (3.3.17)
+
+O*O      connect to strong friendly dragon
+
+:+,n,value(90)
+
+a*b
+
+;owl_strong_dragon(a) || owl_strong_dragon(b)
+
+
 Pattern D1321
 
 *.O
@@ -5168,6 +5194,20 @@ O.O      connect to friendly dragon by bamboo joint
 a.b
 
 ;!owl_goal_dragon(a) || !owl_goal_dragon(b)
+
+
+Pattern D1321b
+# gf New pattern. (3.3.17)
+
+*.O
+O.O      connect to strong friendly dragon by bamboo joint
+
+:8,n,value(91)
+
+*.b
+a.b
+
+;owl_strong_dragon(a) || owl_strong_dragon(b)
 
 
 Pattern D1322
@@ -5670,6 +5710,49 @@ a.?
 .*b
 
 ;owl_escape_value(a)>0 || owl_escape_value(b)>0
+
+
+Pattern D1348b
+# gf New pattern. (3.3.17)
+
+O.?	    connect to strong friendly dragon to escape
+.*O
+
+:8,nE,value(90)
+
+a.?
+.*b
+
+;owl_strong_dragon(a) || owl_strong_dragon(b)
+
+
+Pattern D1348c
+# gf New pattern. (3.3.17)
+
+Oxx	    connect to strong friendly dragon to escape
+.*O
+
+:8,nE,value(90)
+
+a.?
+.*b
+
+;(owl_strong_dragon(a) || owl_strong_dragon(b)) && !oplay_disconnect(*,a,b)
+
+
+Pattern D1348d
+# gf New pattern. (3.3.17)
+
+O.?	    connect to strong friendly dragon to escape
+.*.
+?.O
+:8,nE,value(90)
+
+a.?
+.*.
+?.b
+
+;owl_strong_dragon(a) || owl_strong_dragon(b)
 
 
 # tm Removed 3.1.17 (duplicate of D1348)
