@@ -3,6 +3,7 @@
 -------------------------------------------------------------------------
 
 - all move reason handling is 1D
+- owl goal and other date are 1D
 - new and revised test cases
 - bugfix in random.c
 - revision of readconnect.c
