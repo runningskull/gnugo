@@ -1,86 +1,172 @@
-This is GNU GO, a Go program. Contact gnugo@gnu.org, or see
-http://www.gnu.org/software/gnugo/ for more information.
-
-Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation - version 2.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License in file COPYING for more details.
-
-You should have received a copy of the GNU General Public
-License along with this program; if not, write to the Free
-Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111, USA.
-
-
 (;GM[1]FF[3]
-RU[Japanese]SZ[19]HA[0]KM[5.5]
-PW[White]
-PB[Black]
+SZ[19]AP[SGFC:1.13b]
 GN[White (W) vs. Black (B)]
+PB[Black]
+HA[0]
+PW[White]
+KM[5.5]
 DT[1999-05-27]
-SY[Cgoban 1.9.2]TM[5:00:00(5x1:00)];B[qd]
-(;W[od]PL[B]
+TM[5:00:00(5x1:00)]RU[Japanese]SY[Cgoban 1.9.2];B[qd]
+(;W[od]
 (;B[oc]MA[mg]
-(;W[nc]MA[lg]C[U
-];B[pc]MA[mf]C[U
+(;W[nc]MA[lg]C[
+];B[pc]MA[mf]C[U]
+(;W[nd]MA[lg]C[:-,shape(6)]
+(;B[qf]MA[mh]C[U];W[jc]MA[if]C[U];B[hc]MA[gg]C[t
 ]
-(;W[nd]MA[lg]C[:-,shape(6)
-]PL[B]
-(;B[qf]MA[mh]C[U
-];W[jc]C[U
-]MA[if])
+(;W[je]C[
+]MA[gg])
 
-(;B[tt]C[
-];W[qe]C[s
-]MA[li];B[re]MA[li];W[pd]MA[li];B[rc]MA[li];W[qf]
+(;W[tt];B[lc]MA[hg]
+(;W[ld]C[0
+#an obvious, but wrong, move
+];B[lb])
+
+(;W[lb]MA[gg])
+)
+)
+
+(;B[tt];W[qe]MA[li]C[s];B[re]MA[li];W[pd]MA[li];B[rc]MA[li];W[qf]
 MA[li];B[rf]MA[li];W[qg]MA[li])
+
+(;B[kd]MA[if];W[qe]MA[ig];B[re]MA[ig];W[pd]MA[ig];B[rc]MA[ig];
+C[:-,shape(6)
+#here
+]W[qf]MA[ii];B[rf]MA[ii]
+(;W[qh]MA[ij])
+
+(;W[qg]MA[ii])
 )
 
-(;W[md]MA[jg]C[:-, shape(6)
-];B[qf]MA[mh];W[ic]MA[hf])
+(;B[pe]MA[lg];W[jc]MA[if];B[qj]MA[ik];W[tt];B[nf]C[t
+]MA[ik])
 )
 
-(;W[pd]MA[mh]C[0
-# We currently avoid the avalanche joseki
-];B[pc]
-MA[nf]C[U
-];W[qe]MA[ng]C[U
-];B[qc]MA[ng];W[nd]MA[mg]C[U
-];B[mc]MA[lg];
-W[pf]MA[lg]C[:-,shape(6)
+(;W[md]MA[jg]C[:-, shape(6)]
+(;B[qf]MA[mh];W[ic]MA[hf])
+
+(;B[ne]MA[lg]
+(;W[oe]MA[lg];B[nb]MA[lg]
+(;W[nf]MA[lg]C[:-,shape(6)
+];B[mb]MA[lg];W[qe]MA[lg];B[re]MA[lg];W[qg]
+MA[lg])
+
+(;W[mb]MA[lg]C[0
+#gnugo likes this move, which is bad.];B[nd]MA[lg];
+W[mc]MA[lg];B[of]MA[lg])
+)
+
+(;W[nd]MA[lg];B[pe]MA[lg];W[ic]MA[hg];B[qj]MA[hk]C[t
+:-,shape(8)
 ])
+)
+
+(;B[pe]C[0
+#bad idea without the peep first
+]MA[kg];W[ic]MA[hg];B[ne]
+MA[hg];W[me]C[:-,shape(8)
+]MA[hg])
+)
+)
+
+(;W[pd]MA[mh];B[pc]MA[nf]C[U];W[qe]MA[ng]C[U]
+(;B[qc]MA[ng];W[nd]MA[mg]C[U]
+(;B[mc]MA[lg];W[pf]MA[lg]C[:-,shape(6)])
+
+(;B[re]MA[lh];W[qf]MA[lh];B[rf]MA[lh];W[qg]MA[li];B[mc]MA[ki];W[le]
+MA[ji]C[U];B[lc]MA[ji]C[U])
+)
+
+(;B[nd]MA[ki]
+LB[qc:A][rd:B][qb:C][re:D][qf:E][rf:F][nc:G][oe:H][pe:I][qg:J][pf:K][of:L][pg:M]
+C[; xplay_attack(A,B,C,D,E,F,G,H,I,J,K,L,M,M)
+];W[qc]MA[ki]C[U];B[rd]
+MA[ki];W[qb]MA[ki];B[re]MA[ki];W[pf]MA[ki]C[U]
+(;B[qf]MA[ki]C[U];W[nc]MA[ki]C[U];B[pe]MA[ki];W[oe]MA[ki];B[of]MA[ki];
+W[ne]MA[ki];B[pg]MA[ki];W[md]MA[ki])
+
+(;B[pb]MA[mg]
+C[0
+#this is bad, and gnugo will try it.
+#actually, probably ok.  See Ishida p31.  this is simply a non-standard order.
+])
+)
+
+(;B[nc]MA[kg]
+C[0
+#we don't start the large avalanche.  It probably has complications to
+check.]
+;W[nd]MA[kg];B[md]MA[kg]
+(;W[qc]MA[kg];B[rd]MA[kg];W[qb]MA[kg];B[rc]MA[kg];W[mc]MA[jg];B[lc]
+MA[ji];W[rb]MA[ji]C[U];B[re]MA[ji];W[mb]MA[ji];B[nb]MA[ii];W[lb]MA[ii]
+;B[pb]MA[ih];W[kc]MA[ii];B[me]MA[ii];W[of]MA[ii]C[U];B[qf]MA[ii];W[nf]
+MA[ii]C[U];B[ke]MA[ii];W[hc]MA[fi];B[lg]MA[fi];W[oi]MA[fk];B[qi]MA[fk])
+
+(;W[me]MA[kg]C[0
+#bad
+])
+)
+
+(;B[re]MA[mg];W[rd]MA[mg]C[U];B[qc]MA[mg]C[U];W[rf]MA[mg]C[U];B[nd]
+MA[lg]C[:-,shape(6)];W[pf]MA[lg]C[:-,shape(6)]
+(;B[of]C[t
+]MA[lh]
+(;W[og]C[U
+]MA[mi]
+(;B[ne]C[0
+#don't worry so much about the two stones.
+]MA[mi];W[ng]
+C[:-,shape(8)
+]MA[mi];B[pe]C[0
+]MA[mi];W[qf]C[U
+]MA[mi])
+
+(;B[ng]MA[lj];W[oh]MA[lj];B[ne]MA[lj];W[nh]MA[lj])
+)
+
+(;W[pg]C[0
+#too submissive.  the hane is better.
+]MA[mh])
+)
+
+(;B[tt];W[rc]C[t
+:-,shape(6)
+]MA[lg]
+(;B[mc]MA[lg]C[:-,shape(8)
+])
+
+(;B[of]MA[lh];W[og]MA[lh];B[ng]MA[lh];W[oh]MA[li];B[ne]MA[li];W[pe]
+MA[li];B[lc]MA[ki])
+)
+)
+
+(;B[rd]MA[mg]C[0
+#not very good for b.])
+)
 )
 
 (;B[pf]MA[lh]
-(;W[qc]MA[lh]C[:-,shape(3)
-];B[rc]MA[lh];W[pc]MA[lh]C[U
-];B[re]MA[lh]
-C[:-,shape(8)
-]
-(;W[kc]MA[jg]C[:-,shape(10)
-])
+(;W[qc]MA[lh]C[:-,shape(3)];B[rc]MA[lh];W[pc]MA[lh]C[U]
+(;B[re]MA[lh]C[:-,shape(8)]
+(;W[kc]MA[jg]C[:-,shape(10)])
 
-(;W[lc]MA[kh]C[:-,shape(10)
-])
+(;W[lc]MA[kh]C[:-,shape(10)])
 )
 
-(;W[lc]MA[lh]C[0
-])
+(;B[rb]MA[kg]
+(;W[kc]MA[jg]C[:-,shape(10)];B[qj]MA[jk]C[:-,shape(10)])
 
-(;W[nf]MA[lh]C[0
-])
+(;W[lc]MA[kh]C[:-,shape(10)];B[qj]MA[jk]C[:-,shape(10)])
+)
 )
 
-(;B[oe];W[ne]MA[lg]
-(;B[pe]MA[lg];W[md]MA[kg]C[U
-];B[oc]MA[kg]C[j
-];W[nc]MA[kg])
+(;W[lc]MA[lh]C[0])
+
+(;W[nf]MA[lh]C[0])
+)
+
+(;B[oe]MA[lg];W[ne]MA[lg]
+(;B[pe]MA[lg];W[md]MA[kg]C[U];B[oc]MA[kg]C[j];W[nc]MA[kg])
 
 (;B[of];W[md]MA[kg]
 (;B[oc];W[pd])
@@ -88,13 +174,9 @@ C[:-,shape(8)
 (;B[pd]MA[lg];W[oc]MA[kg])
 )
 
-(;B[nd];W[pe]MA[mg]C[U
-];B[of];W[pd]MA[lh]C[U
-]
-(;B[me];W[nc]C[U
-]MA[kh]
-(;B[nf];W[mc]MA[kh]C[U
-])
+(;B[nd];W[pe]MA[mg]C[U];B[of];W[pd]MA[lh]C[U]
+(;B[me];W[nc]MA[kh]C[U]
+(;B[nf];W[mc]MA[kh]C[U])
 
 (;B[md];W[pf]MA[li])
 )
@@ -107,19 +189,12 @@ C[:-,shape(8)
 (;W[of]MA[ki]C[U];B[qf]MA[ki]C[S];W[oh]MA[ki]C[S];B[qh]MA[ki]C[S];
 W[id]MA[ii]C[S])
 
-(;W[pg]MA[ki]C[U
-];B[oe]MA[ki]C[U
-];W[ne]MA[ki]C[U
-];B[of]MA[ki]C[U
-];
-W[pd]MA[ki]C[U
-]
-(;B[pe]MA[ki]C[U
-];W[qc]MA[ki];B[qe]MA[ki];W[nc]MA[ki];B[rc]MA[ki];
+(;W[pg]MA[ki]C[U];B[oe]MA[ki]C[U];W[ne]MA[ki]C[U];B[of]MA[ki]C[U];
+W[pd]MA[ki]C[U]
+(;B[pe]MA[ki]C[U];W[qc]MA[ki];B[qe]MA[ki];W[nc]MA[ki];B[rc]MA[ki];
 W[qb]MA[ki])
 
-(;B[qf]MA[ki]C[U
-]
+(;B[qf]MA[ki]C[U]
 (;W[qc]MA[ki];B[qe]MA[ki];W[nc]MA[ki];B[rc]MA[ki];W[qb]MA[ki]
 (;B[qj]MA[kk])
 
@@ -128,9 +203,7 @@ W[qb]MA[ki])
 (;B[ql]MA[km])
 )
 
-(;W[nf]MA[ki];B[og]MA[ki]C[U
-];W[qc]MA[ki];B[qe]MA[ki]C[U
-]
+(;W[nf]MA[ki];B[og]MA[ki]C[U];W[qc]MA[ki];B[qe]MA[ki]C[U]
 (;W[pb]MA[ki]
 (;B[ql]MA[km])
 
@@ -138,13 +211,11 @@ W[qb]MA[ki])
 )
 
 (;W[rc]MA[ki]C[0
-# Requires a ladder.
-];B[pi]MA[kj];W[nc]MA[kj])
+# Requires a ladder.];B[pi]MA[kj];W[nc]MA[kj])
 )
 
 (;W[pe]MA[ki]C[0
-# Bad
-];B[pf]MA[ki];W[qe]MA[ki];B[nd]MA[ki];W[rf]
+# Bad];B[pf]MA[ki];W[qe]MA[ki];B[nd]MA[ki];W[rf]
 MA[ki];B[rg]MA[ki];W[re]MA[ki];B[qg]MA[ki];W[nc]MA[ki];B[md]MA[ki])
 )
 )
@@ -152,71 +223,39 @@ MA[ki];B[rg]MA[ki];W[re]MA[ki];B[qg]MA[ki];W[nc]MA[ki];B[md]MA[ki])
 )
 
 (;W[oc]
-(;B[pe]MA[mi]PL[B]
-(;W[md]C[
-]MA[kg];B[pc]MA[jh]C[U
-];W[od]MA[kh]C[:-,shape(5)
-])
+(;B[pe]MA[mi]
+(;W[md]MA[kg];B[pc]MA[jh]C[U];W[od]MA[kh]C[:-,shape(5)])
 
 (;W[lc]MA[jf];B[jc];W[qb]MA[if])
 
 (;B[nd]MA[mg]
-(;W[mc]MA[kh]C[U
-];B[pc]MA[kh];W[nc];B[qj]MA[ll]C[:-,value(28)
-])
+(;W[mc]MA[kh]C[U];B[pc]MA[kh];W[nc];B[qj]MA[ll]C[:-,value(28)])
 
-(;W[nc];B[md]MA[lh];W[lc]MA[kh];B[qj]MA[kk]C[:-,value(28)
-])
+(;W[nc];B[md]MA[lh];W[lc]MA[kh];B[qj]MA[kk]C[:-,value(28)])
 )
 )
 
-(;B[ld]MA[ig]C[
-]
-(;W[of]C[:-,shape(5)
-]MA[ki]
+(;B[ld]MA[ig]
+(;W[of]MA[ki]C[:-,shape(5)]
 (;B[qg]MA[ki])
 
-(;B[oe]MA[jh];W[ne]C[U
-]MA[ki];B[pe]C[U
-]MA[kg];W[nd]C[U
-]MA[kh];B[nf]
-C[U
-]MA[kh];W[mf]C[U
-]MA[ki];B[ng]C[U
-]MA[ji];W[le]C[U
-]MA[ji]
-(;B[og]MA[ji]C[:-,shape(8)
-];W[kd]MA[ji]C[U
-])
+(;B[oe]MA[jh];W[ne]MA[ki]C[U];B[pe]MA[kg]C[U];W[nd]MA[kh]C[U];B[nf]
+MA[kh]C[U];W[mf]MA[ki]C[U];B[ng]MA[ji]C[U];W[le]MA[ji]C[U]
+(;B[og]MA[ji]C[:-,shape(8)];W[kd]MA[ji]C[U])
 
-(;B[jd]MA[hi]C[:-,shape(8)
-];W[qf]C[U
-]MA[ii];B[pf]C[U
-]MA[ji];W[og]
-C[U
-]MA[ii];B[pg]C[U
-]MA[ii];W[oh]C[U
-]MA[ij];B[qi]C[U
-]MA[ik];W[mh]
-C[U
-])
+(;B[jd]MA[hi]C[:-,shape(8)];W[qf]MA[ii]C[U];B[pf]MA[ji]C[U];W[og]
+MA[ii]C[U];B[pg]MA[ii]C[U];W[oh]MA[ij]C[U];B[qi]MA[ik]C[U];W[mh]C[U])
 )
 )
 
-(;W[nd]C[:-,shape(5)
-]MA[jg];B[pf]C[:-,shape(5)
-]MA[ki];W[qb]C[U
-]
-MA[ki];B[qj]C[:-,shape(5)
-]MA[kl])
+(;W[nd]MA[jg]C[:-,shape(5)];B[pf]MA[ki]C[:-,shape(5)];W[qb]MA[ki]C[U];
+B[qj]MA[kl]C[:-,shape(5)])
 )
 
-(;B[kc]MA[ig]C[:-,shape(8)
-])
+(;B[kc]MA[ig]C[:-,shape(8)])
 
-(;B[mc]MA[kf]LB[kc:A]C[;!xarea(A)
-];W[oe]MA[lg];B[pf]MA[lh];W[md]
-MA[kh];B[ld];W[me]MA[kh];B[nc];W[od]MA[kg])
+(;B[mc]MA[kf]LB[kc:A]C[;!xarea(A)];W[oe]MA[lg];B[pf]MA[lh];W[md]MA[kh]
+;B[ld];W[me]MA[kh];B[nc];W[od]MA[kg])
 )
 
 )
