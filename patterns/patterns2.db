@@ -557,6 +557,7 @@ e*bc
 
 
 Pattern Conn505
+# gf Revised constraint. (3.7.2)
 
 ?..?
 OX.O
@@ -564,18 +565,11 @@ OX.O
 
 :8,C
 
-?c.?
-fHbg
-e*ad
+?..?
+aX.b
+.*..
 
-# FIXME : A readconnect constraint should be better.
-;!oplay_attack_either(*,f,g)
-;&& (oplay_attack(*,a,H)
-;    || (!oplay_defend(*,a,b,c,d,a)
-;        && oplay_attack(*,a,b,c,d,e,e))
-;    || !oplay_defend(*,a,b,c,e,a))
-;&& (oplay_attack(*,b,a,d,d)
-;    && oplay_attack(*,b,a,e,e))
+;!oplay_disconnect(*,a,b)
 
 
 Pattern Conn506
