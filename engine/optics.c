@@ -1359,7 +1359,7 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
  * half_eye_data, add_moves, color), where pos is the origin of an eyespace,
  * returns 1 if there is a pattern in eyes.c matching the eyespace, or
  * 0 if no match is found. If there is a key point for attack, (*attack_point)
- * is set to its location, or (-1, -1) if there is none.
+ * is set to its location, or NO_MOVE if there is none.
  * Similarly (*defense_point) is the location of a vital defense point. *min
  * and *max are the minimum and maximum number of eyes that can be
  * made in this eyespace respectively. Vital attack/defense points
@@ -1390,6 +1390,9 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
   int kpos;
   int num_marginals = 0;
 
+  gg_assert(attack_point != NULL);
+  gg_assert(defense_point != NULL);
+    
   /* Set `eye_color' to the owner of the eye. */
   eye_color = eye[pos].color;
   if (eye_color == BLACK_BORDER)
@@ -1544,70 +1547,73 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
       }
     }
 
+    /* We have found a match! Now sort out the vital moves. */
     if (q == eye_size) {
       *max = graphs[graph].max;
       *min = graphs[graph].min;
       if (*max != *min) {
-	gg_assert(graphs[graph].vital >= 0);
-	if (attack_point)
-	  *attack_point = vpos[map[graphs[graph].vital]];
-	if (defense_point)
-	  *defense_point = vpos[map[graphs[graph].vital]];
+	/* Collect all attack and defense points in the pattern. */
+	int attack_points[4 * MAXEYE];
+	int defense_points[4 * MAXEYE];
+	int num_attacks = 0;
+	int num_defenses = 0;
+
+	for (k = 0; k < graphs[graph].esize; k++) {
+	  if (graphs[graph].vertex[k].type == '*'
+	      || graphs[graph].vertex[k].type == '<')
+	    attack_points[num_attacks++] = vpos[map[k]];
+	  else if (graphs[graph].vertex[k].type == '@'
+		   || graphs[graph].vertex[k].type == '(') {
+	    /* check for marginal matching half eye diagonal
+	     * If it is a half eye diagonal, the half eye preceeds
+	     * the diagonal in the list of vertices
+	     */
+	    if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
+	      /* add all diagonals as vital */
+	      int ix;
+	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
+	      
+	      for (ix = 0; ix < this_half_eye->num_attacks; ix++)
+		attack_points[num_attacks++] = this_half_eye->attack_point[ix];
+	    }
+	    else
+	      attack_points[num_attacks++] = vpos[map[k]];
+	  }
+	  
+	  if (graphs[graph].vertex[k].type == '*'
+	      || graphs[graph].vertex[k].type == '>')
+	    defense_points[num_defenses++] = vpos[map[k]];
+	  else if (graphs[graph].vertex[k].type == '@'
+		   || graphs[graph].vertex[k].type == ')') {
+	    /* check for marginal matching half eye diagonal */
+	    if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
+	      /* add all diagonals as vital */
+	      int ix;
+	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
+
+	      for (ix = 0; ix < this_half_eye->num_defends; ix++)
+		defense_points[num_defenses++] = this_half_eye->defense_point[ix];
+	    }
+	    else
+	      defense_points[num_defenses++] = vpos[map[k]];
+	  }
+	}
+	
+	gg_assert(num_attacks > 0 && num_defenses > 0);
+	*attack_point = attack_points[0];
+	*defense_point = defense_points[0];
 	DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
 	      *attack_point, *defense_point);
 	DEBUG(DEBUG_EYES, "  pattern matched:  %d\n", graphs[graph].id);
 
 	if (add_moves) {
-	  for (k = graphs[graph].vital; k < graphs[graph].esize; k++) {
-	    if (eye_color != color) {
-	      if (graphs[graph].vertex[k].type == '*'
-		  || graphs[graph].vertex[k].type == '<') {
-		/* add attack vital move */
-		add_vital_eye_move(vpos[map[k]], pos, eye_color);
-	      }
-	      else if (graphs[graph].vertex[k].type == '@'
-		       || graphs[graph].vertex[k].type == '(') {
- 
- 		/* check for marginal matching half eye diagonal
- 		 * If it is a half eye diagonal, the half eye preceeds
- 		 * the diagonal in the list of vertices
- 		 */
-		if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
-		  /* add all diagonals as vital */
-		  int ix;
-		  struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
-
-		  for (ix = 0; ix < this_half_eye->num_attacks; ix++) {
-		    add_vital_eye_move(this_half_eye->attack_point[ix],
-				       pos, eye_color);
-		  }
-		}
-		else
-		  add_vital_eye_move(vpos[map[k]], pos, eye_color);
-	      }
-	    }
-	    else {
-	      if (graphs[graph].vertex[k].type == '*'
-		  || graphs[graph].vertex[k].type == '>')
-		/* add defense vital move */
-		add_vital_eye_move(vpos[map[k]], pos, eye_color);
-	      else if (graphs[graph].vertex[k].type == '@'
-		       || graphs[graph].vertex[k].type == ')') {
-		/* check for marginal matching half eye diagonal */
-		if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
-		  /* add all diagonals as vital */
-		  int ix;
-		  struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
-
-		  for (ix = 0; ix < this_half_eye->num_defends; ix++) {
-		    add_vital_eye_move(this_half_eye->defense_point[ix],
-				       pos, eye_color);
-		  }
-		}
-		else
-		  add_vital_eye_move(vpos[map[k]], pos, eye_color);
-	      }
-	    }
+	  if (eye_color != color) {
+	    for (k = 0; k < num_attacks; k++)
+	      add_vital_eye_move(attack_points[k], pos, eye_color);
+	  }
+	  else {
+	    for (k = 0; k < num_defenses; k++)
+	      add_vital_eye_move(defense_points[k], pos, eye_color);
 	  }
 	}
       }
@@ -1999,6 +2005,185 @@ evaluate_diagonal_intersection(int m, int n, int color,
   }
 
   return value;
+}
+
+
+/* Test whether the optics code evaluates an eyeshape consistently. */
+void test_eyeshape(int eyesize, int *eye_vertices)
+{
+  int k;
+  int n, N;
+  int mx[BOARDMAX];
+  int pos;
+  int str = NO_MOVE;
+  int attack_code;
+  int attack_point;
+  int defense_code;
+  int defense_point;
+  int save_verbose;
+  Position starting_position;
+
+  /* Clear the board and initialize the engine properly. */
+  clear_board();
+  reset_engine();
+
+  /* Mark the eyespace in the mx array. */
+  memset(mx, 0, sizeof(mx));
+  for (k = 0; k < eyesize; k++) {
+    ASSERT_ON_BOARD1(eye_vertices[k]);
+    mx[eye_vertices[k]] = 1;
+  }
+
+  /* Play white stones surrounding the eyespace, including diagonals. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos) || mx[pos] == 1)
+      continue;
+    for (k = 0; k < 8; k++) {
+      if (ON_BOARD(pos + delta[k]) && mx[pos + delta[k]] == 1) {
+	play_move(pos, WHITE);
+	str = pos;
+	break;
+      }
+    }
+  }
+
+  /* Play black stones surrounding the white group, but leaving all
+   * liberties empty.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (mx[pos] == 1 || board[pos] != EMPTY || liberty_of_string(pos, str))
+      continue;
+    for (k = 0; k < 8; k++) {
+      if (ON_BOARD(pos + delta[k])
+	  && liberty_of_string(pos + delta[k], str)) {
+	play_move(pos, BLACK);
+	break;
+      }
+    }
+  }
+
+  /* Show the board if verbose is on. Then turn off traces so we don't
+   * get any from make_worms(), make_dragons(), or the owl reading.
+   */
+  if (verbose)
+    showboard(0);
+  save_verbose = verbose;
+  verbose = 0;
+  
+  
+  /* Store this position so we can come back to it. */
+  store_position(&starting_position);
+
+  /* Loop over all configurations of black stones inserted in the
+   * eyeshape. There are N = 2^(eyesize) configurations and we can
+   * straightforwardly use binary representation to enumerate them.
+   */
+  N = 1 << eyesize;
+  for (n = 0; n < N; n++) {
+    int valid = 1;
+    int internal_stones = 0;
+    
+    restore_position(&starting_position);
+    /* Play the stones for this configuration. */
+    for (k = 0; k < eyesize; k++) {
+      if (n & (1 << k)) {
+	if (!is_legal(eye_vertices[k], BLACK)) {
+	  valid = 0;
+	  break;
+	}
+	play_move(eye_vertices[k], BLACK);
+	internal_stones++;
+      }
+    }
+
+    if (!valid)
+      continue;
+
+    if (save_verbose > 1)
+      showboard(0);
+
+    /* Now we are ready to test the consistency. This is most easily
+     * done with help from the owl code. First we must prepare for
+     * this though.
+     */
+    examine_position(WHITE, EXAMINE_DRAGONS_WITHOUT_OWL);
+
+    attack_code = owl_attack(str, &attack_point, NULL);
+
+    if (attack_code == 0) {
+      /* The owl code claims there is no attack. We test this by
+       * trying to attack on all empty spaces in the eyeshape.
+       */
+      for (k = 0; k < eyesize; k++) {
+	if (board[eye_vertices[k]] == EMPTY
+	    && is_legal(eye_vertices[k], BLACK)
+	    && owl_does_attack(eye_vertices[k], str)) {
+	  gprintf("%1m alive, but %1m attacks:\n",
+		  str, eye_vertices[k]);
+	  showboard(0);
+	  gprintf("\n");
+	}
+      }
+
+      /* Furthermore, if the eyespace is almost filled, white should
+       * be able to play on the remaining eyespace point and still be
+       * alive.
+       */
+      if (internal_stones == eyesize - 1) {
+	for (k = 0; k < eyesize; k++) {
+	  if (board[eye_vertices[k]] == EMPTY
+	      && !owl_does_defend(eye_vertices[k], str)) {
+	    gprintf("%1m alive, but almost filled with nakade:\n",
+		    str);
+	    showboard(0);
+	  }
+	}
+      }
+    }
+    else {
+      defense_code = owl_defend(str, &defense_point, NULL);
+      if (defense_code == 0) {
+	/* The owl code claims there is no defense. We test this by
+	 * trying to defend on all empty spaces in the eyeshape.
+	 */
+	for (k = 0; k < eyesize; k++) {
+	  if (board[eye_vertices[k]] == EMPTY
+	      && is_legal(eye_vertices[k], WHITE)
+	      && owl_does_defend(eye_vertices[k], str)) {
+	    gprintf("%1m dead, but %1m defends:\n",
+		    str, eye_vertices[k]);
+	    showboard(0);
+	    gprintf("\n");
+	  }
+	}
+      }
+      else {
+	/* The owl code claims the dragon is critical. Verify the
+         * attack and defense points.
+	 */
+	if (board[attack_point] != EMPTY
+		 || !is_legal(attack_point, BLACK)) {
+	  gprintf("Bad attack point %1m:\n", attack_point);
+	  showboard(0);
+	}
+	else if (!owl_does_attack(attack_point, str)) {
+	  gprintf("Attack point %1m failed:\n", attack_point);
+	  showboard(0);
+	}
+
+	if (board[defense_point] != EMPTY
+		 || !is_legal(defense_point, WHITE)) {
+	  gprintf("Bad defense point %1m:\n", defense_point);
+	  showboard(0);
+	}
+	else if (!owl_does_defend(defense_point, str)) {
+	  gprintf("Defense point %1m failed:\n", defense_point);
+	  showboard(0);
+	}
+      }
+    }
+  }
+  verbose = save_verbose;
 }
 
 

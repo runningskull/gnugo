@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- recognize_eye() revised
+- new function test_eyeshape() in optics.c
+- new gtp command test_eyeshape
+- vital and num_vital fields removed from struct eye_graph
+- mkeyes.c revised
 - non-territory patterns introduced in the influence code
 - revised formula for addition of followup_value
 - better trace output for followup_value and reverse_followup_value

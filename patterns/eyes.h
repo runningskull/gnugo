@@ -58,9 +58,6 @@ struct eye_graph {
   int three_neighbors;            /* number of vertices with 3 neighbors   */
   int max;                        /* number of eyes if O plays first       */
   int min;                        /* number of eyes if X plays first       */
-  int vital;                      /* 1st attack and defense vital point    */
-				  /* (only if max != min)  */
-  int num_vital;                  /* number of vital points                */
 };
 
 extern struct eye_graph graphs[];

@@ -62,8 +62,8 @@ main(void)
   int ends[MAXPATNO];
   int two_neighbors[MAXPATNO];
   int three_neighbors[MAXPATNO];
-  int vital[MAXPATNO];
-  int num_vital[MAXPATNO];
+  int num_attacks = 0;
+  int num_defenses = 0;
   int debug = 0;
   
   printf("\
@@ -78,8 +78,6 @@ main(void)
   memset(two_neighbors, 0, sizeof(two_neighbors));
   memset(three_neighbors, 0, sizeof(three_neighbors));
   memset(esize, 0, sizeof(esize));
-  memset(vital, -1, sizeof(vital));
-  memset(num_vital, 0, sizeof(num_vital));
 
   while (fgets(line, MAXLINE, stdin)) {
 
@@ -112,6 +110,8 @@ main(void)
       m = 0;
       esize[patno] = 0;
       msize[patno] = 0;
+      num_attacks = 0;
+      num_defenses = 0;
       continue;
     }
     
@@ -164,16 +164,20 @@ main(void)
 	  case '@':
 	    msize[patno]++;
 	    marginal[m][n] = 1;
-	    if (vital[patno] < 0)
-	      vital[patno] = esize[patno];
-	    num_vital[patno]++;
+	    num_attacks++;
+	    num_defenses++;
 	    break;
 	    
 	  case '(':
+	    msize[patno]++;
+	    marginal[m][n] = 1;
+	    num_attacks++;
+	    break;
+	    
 	  case ')':
 	    msize[patno]++;
 	    marginal[m][n] = 1;
-	    num_vital[patno]++;
+	    num_defenses++;
 	    break;
 	    
 	  case 'x':
@@ -182,15 +186,18 @@ main(void)
 	    
 	  case '*':
 	    marginal[m][n] = 0;
-	    if (vital[patno] < 0)
-	      vital[patno] = esize[patno];
-	    num_vital[patno]++;
+	    num_attacks++;
+	    num_defenses++;
 	    break;
 	    
 	  case '<':
+	    marginal[m][n] = 0;
+	    num_attacks++;
+	    break;
+
 	  case '>':
 	    marginal[m][n] = 0;
-	    num_vital[patno]++;
+	    num_defenses++;
 	    break;
 	    
 	  case 'X':
@@ -199,8 +206,8 @@ main(void)
 	    
 	  default:
 	    fprintf(stderr, 
-		    "mkeyes: invalid character %c in pattern\n",
-		    line[n]);
+		    "mkeyes: invalid character %c in pattern %d\n",
+		    line[n], eye_number[patno]);
 	    abort();
 	    break;
 	}
@@ -215,6 +222,25 @@ main(void)
       sscanf(line, ":%d,%d", &(max[patno]), &(min[patno]));
       if (debug)
 	fprintf(stderr, "max=%d, min=%d\n", max[patno], min[patno]);
+
+      if (max[patno] != min[patno]) {
+	if (num_attacks == 0 || num_defenses == 0) {
+	  fprintf(stderr,
+		  "mkeyes: missing attack or defense point in pattern %d\n",
+		  eye_number[patno]);
+	  abort();
+	}
+      }
+      
+      if (max[patno] == min[patno]) {
+	if (num_attacks > 0 || num_defenses > 0) {
+	  fprintf(stderr,
+		  "mkeyes: attack or defense point in settled pattern %d\n",
+		  eye_number[patno]);
+	  abort();
+	}
+      }
+      
       printf("static struct eye_vertex eye%d[] = {\n", eye_number[patno]);
       for (l = 0; l < esize[patno]; l++) {
 	
@@ -292,10 +318,11 @@ main(void)
 	else
 	  printf("\n};\n\n");
       }
+      
       patno++;
       if (patno >= MAXPATNO) {
 	fprintf(stderr,
-		"Error: Too many eye patterns. Increase MAXPATNO in mkeyes.c\n");
+		"mkeyes: Too many eye patterns. Increase MAXPATNO in mkeyes.c\n");
 	abort();
       }
     }
@@ -305,14 +332,13 @@ main(void)
   printf("\nstruct eye_graph graphs[] = {\n");
   for (l = 0; l < patno; l++) {
 
-    printf("   {eye%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d}",
+    printf("   {eye%d, %d, %d, %d, %d, %d, %d, %d, %d}",
 	   eye_number[l], eye_number[l], esize[l], msize[l], ends[l],
-	   two_neighbors[l], three_neighbors[l], max[l], min[l], vital[l],
-	   num_vital[l]);
+	   two_neighbors[l], three_neighbors[l], max[l], min[l]);
     if (l < patno-1)
       printf(",\n");
     else
-      printf(",\n{NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}\n};\n");
+      printf(",\n{NULL, 0, 0, 0, 0, 0, 0, 0, 0}\n};\n");
   }
   return 0;
 }

@@ -278,7 +278,7 @@ Pattern 420
 # Match before 421
 
  X
-X*X
+X.X
 
 :2,2
 
@@ -931,7 +931,7 @@ xx
 Pattern 572
 
 xx
-@X!
+!X!
 
 :0,0
 

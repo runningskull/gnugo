@@ -127,6 +127,7 @@ DECLARE(gtp_set_komi);
 DECLARE(gtp_set_level);
 DECLARE(gtp_showboard);
 DECLARE(gtp_start_sgftrace);
+DECLARE(gtp_test_eyeshape);
 DECLARE(gtp_top_moves);
 DECLARE(gtp_top_moves_white);
 DECLARE(gtp_top_moves_black);
@@ -201,6 +202,7 @@ static struct gtp_command commands[] = {
   {"same_dragon",    	      gtp_same_dragon},
   {"showboard",        	      gtp_showboard},
   {"start_sgftrace",  	      gtp_start_sgftrace},
+  {"test_eyeshape",           gtp_test_eyeshape},
   {"top_moves",               gtp_top_moves},
   {"top_moves_black",         gtp_top_moves_black},
   {"top_moves_white",         gtp_top_moves_white},
@@ -1801,6 +1803,37 @@ gtp_get_trymove_counter(char *s, int id)
 /*********
  * debug *
  *********/
+
+
+/* Function:  Test an eyeshape for inconsistent evaluations
+ * Arguments: Eyeshape vertices
+ * Fails:     Bad vertices
+ * Returns:   Failure reports on stderr.
+ */
+static int
+gtp_test_eyeshape(char *s, int id)
+{
+  int n;
+  int i, j;
+  int eye_vertices[MAX_BOARD * MAX_BOARD];
+  int eyesize = 0;
+
+  n = gtp_decode_coord(s, &i, &j);
+  while (n > 0) {
+    eye_vertices[eyesize] = POS(i, j);
+    eyesize++;
+    s += n;
+    n = gtp_decode_coord(s, &i, &j);
+  }
+  
+  if (eyesize == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  test_eyeshape(eyesize, eye_vertices);
+
+  return gtp_success(id, "");
+}
+
 
 
 /* Function:  Returns elapsed CPU time in seconds.
