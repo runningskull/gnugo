@@ -55,6 +55,8 @@
 # documentation for explanation and influence.c for details.
 
 
+attribute_map value_only
+
 goal_elements none
 callback_data XO,!
 

@@ -44,6 +44,8 @@
 ##################################################################
 
 
+attribute_map none
+
 goal_elements none
 callback_data X
 

@@ -151,20 +151,6 @@ typedef int (*autohelper_fn_ptr)(int rotation, int move,
 			    CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t | \
                             CLASS_W | CLASS_c | CLASS_F)
 
-/* Values associated with patterns. Stored together with classes. */
-#define VALUE_MINVAL       0x01000000 /* pattern has a minimum value */
-#define VALUE_MAXVAL       0x02000000 /* pattern has a maximum value */
-#define VALUE_MINTERRITORY 0x04000000 /* pattern has a min territorial value */
-#define VALUE_MAXTERRITORY 0x08000000 /* pattern has a max territorial value */
-#define VALUE_SHAPE        0x10000000 /* pattern has a shape value */
-#define VALUE_FOLLOWUP     0x20000000 /* pattern has a followup value */
-#define VALUE_REV_FOLLOWUP 0x40000000 /* pattern has a reverse followup value */
-
-/* Collection of the classes inducing move values. */
-#define CLASS_MOVE_VALUES (VALUE_MINVAL | VALUE_MAXVAL | VALUE_MINTERRITORY \
-			   | VALUE_MAXTERRITORY | VALUE_SHAPE \
-			   | VALUE_FOLLOWUP | VALUE_REV_FOLLOWUP)
-
 /* directions for applying edge-constraints */
 #define NORTH_EDGE 1
 #define SOUTH_EDGE 2
@@ -195,10 +181,45 @@ typedef struct patval_b {
 } Patval_b;
 
 
+enum attribute_type {
+  MIN_VALUE,
+  MAX_VALUE,
+  MIN_TERRITORY,
+  MAX_TERRITORY,
+  SHAPE,
+  FOLLOWUP,
+  REVERSE_FOLLOWUP,
+  NUM_ATTRIBUTES,
+  LAST_ATTRIBUTE = NUM_ATTRIBUTES
+};
+
+
+#ifdef __GNUC__
+
+struct pattern_attribute {
+  enum attribute_type type;
+
+  /* GCC allows unnamed (and transparent) unions. */
+  union {
+    float value;
+    int offset;
+  };
+};
+
+#else
+
+struct pattern_attribute {
+  enum attribute_type type;
+  float value;
+  int offset;
+};
+
+#endif
+
+
 /*
  * Each pattern as a whole is compiled to an instance of this structure.
  */
-
 struct pattern {
   struct patval *patn;  /* array of elements */
   int patlen;           /* number of elements */
@@ -219,13 +240,14 @@ struct pattern {
 #endif
 
   unsigned int class;   /* classification of pattern */
-  float value;          /* value for pattern, if matched */
-  float maxvalue;
-  float minterritory;
-  float maxterritory;
-  float shape;
-  float followup;
-  float reverse_followup;
+
+  /* Value (owl-style, used for pattern sorting) is not stored as an
+   * attribute, because it is very common.
+   */
+  float value;
+
+  /* Pattern attributes like shape, followup etc. */
+  struct pattern_attribute *attributes;
 
   int autohelper_flag;  /* whether autohelper has constraint and/or action */
   pattern_helper_fn_ptr helper;  /* helper function, or NULL */
@@ -406,7 +428,8 @@ struct corner_pattern {
   unsigned int class;	/* Pattern class. */
   const char *name;	/* Pattern name (optional). */
 
-  float shape;		/* Pattern shape value. */
+  /* Pattern attributes like shape (the only one used currently). */
+  struct pattern_attribute *attributes;
 
   int autohelper_flag;	/* Whether autohelper has constraint and/or action. */
   autohelper_fn_ptr autohelper; /* Automatically generated helper (or NULL). */

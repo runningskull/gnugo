@@ -62,6 +62,8 @@
 #########################################################
 
 
+attribute_map none
+
 goal_elements Xx
 callback_data X
 

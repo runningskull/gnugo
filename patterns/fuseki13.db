@@ -37,6 +37,10 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+
+attribute_map value_only
+
+
 Pattern Fuseki1
 # 799/1591
 

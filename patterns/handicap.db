@@ -73,6 +73,8 @@
 #  cutoffs involved, see engine/handicap.c for details.
 
 
+attribute_map value_only
+
 goal_elements none
 callback_data !
 

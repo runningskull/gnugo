@@ -38,6 +38,8 @@
 #  I - Invasion points.
 
 
+attribute_map value_only
+
 goal_elements none
 # callback_data is pattern class dependent for this database
 

@@ -62,6 +62,8 @@
 # 
 
 
+attribute_map value_only
+
 goal_elements Xx
 callback_data !
 

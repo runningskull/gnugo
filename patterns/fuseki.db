@@ -94,6 +94,8 @@
 ######################################################################
 
 
+attribute_map general
+
 goal_elements none
 callback_data XOxo
 

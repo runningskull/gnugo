@@ -24,6 +24,11 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+
+# FIXME: Pattern-based reading code is broken.  This makes it even more so.
+attribute_map general
+
+
 ##Pattern RD001
 ##
 ##X*

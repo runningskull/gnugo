@@ -40,6 +40,10 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+
+attribute_map value_only
+
+
 Pattern Fuseki1
 # 504/1625
 

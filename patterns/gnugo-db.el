@@ -51,7 +51,8 @@
 
 (defvar gnugo-db-font-lock-keywords (list "Pattern"
 					  "goal_elements"
-					  "callback_data"))
+					  "callback_data"
+					  "attribute_map"))
 
 
 (defun gnugo-db-mode()

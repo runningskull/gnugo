@@ -39,10 +39,161 @@
 #define t_VALUE 16.0
 
 
+/* Take care of joseki patterns. */
+static void
+handle_joseki_patterns(struct pattern_attribute *attributes,
+		       unsigned int class, int move,
+		       int my_dragons[MAX_DRAGONS_PER_PATTERN],
+		       int my_ndragons,
+		       int your_dragons[MAX_DRAGONS_PER_PATTERN],
+		       int your_ndragons)
+{
+  struct pattern_attribute *attribute;
+
+  /* Pattern class J, joseki standard move. Add expand territory and
+   * moyo, and require the value at least J_value.
+   */
+  if (class & CLASS_J) {
+    TRACE("...joseki standard move\n");
+    add_expand_territory_move(move);
+    TRACE("...expands territory\n");
+    add_expand_moyo_move(move);
+    TRACE("...expands moyo\n");
+    set_minimum_move_value(move, J_VALUE);
+    TRACE("... minimum move value %f\n", J_VALUE);
+  }
+
+  /* Class `j' and `t' patterns are treated similarly. */
+  if (class & (CLASS_j | CLASS_t)) {
+    float min_value;
+    float shape_value = 0.0;
+
+    if (class & CLASS_j) {
+      min_value = j_VALUE;
+      TRACE("...less urgent joseki move\n");
+      add_expand_territory_move(move);
+      TRACE("...expands territory\n");
+      add_expand_moyo_move(move);
+      TRACE("...expands moyo\n");
+    }
+    else {
+      min_value = t_VALUE;
+      TRACE("...minor joseki move\n");
+    }
+
+    /* Board size modification. */
+    min_value *= board_size / 19.0;
+
+    for (attribute = attributes; attribute->type != LAST_ATTRIBUTE;
+	 attribute++) {
+      if (attribute->type == SHAPE) {
+	shape_value = attribute->value;
+	min_value *= (1 + 0.01 * shape_value);
+	break;
+      }
+    }
+
+    if ((board_size >= 17) && (class & CLASS_F)) {
+      /* Otherwise, `j' and `t' patterns not of CLASS_F would get
+       * preferred in value_move_reasons().
+       */
+      min_value *= 1.005;
+
+      set_maximum_move_value(move, min_value);
+      scale_randomness(move, 5.0);
+      TRACE("...move value %f (shape %f)\n", min_value, shape_value);
+    }
+    else
+      TRACE("...minimum move value %f (shape %f)\n", min_value, shape_value);
+
+    set_minimum_move_value(move, min_value);
+  }
+
+  /* Pattern class U, very urgent joseki move. Add strategical defense
+   * and attack, plus a shape bonus of 15 and a minimum value of 40.
+   */
+  if (class & CLASS_U) {
+    int k;
+
+    TRACE("...joseki urgent move\n");
+    for (k = 0; k < my_ndragons; k++) {
+      add_strategical_defense_move(move, my_dragons[k]);
+      TRACE("...strategical defense of %1m\n", my_dragons[k]);
+    }
+    for (k = 0; k < your_ndragons; k++) {
+      add_strategical_attack_move(move, your_dragons[k]);
+      TRACE("...strategical attack on %1m\n", your_dragons[k]);
+    }
+    add_shape_value(move, 15);
+    TRACE("...shape value 15\n");
+    set_minimum_move_value(move, U_VALUE);
+    TRACE("...(min) move value %f\n", U_VALUE);
+  }
+
+  /* Pattern class T, joseki trick move. For the moment we never play
+   * these.
+   */
+  if (class & CLASS_T) {
+    TRACE("...joseki trick move\n");
+    add_antisuji_move(move);
+    TRACE("...antisuji\n");
+  }
+
+  for (attribute = attributes; attribute->type != LAST_ATTRIBUTE;
+       attribute++) {
+    switch (attribute->type) {
+    case MIN_VALUE:
+      set_minimum_move_value(move, attribute->value);
+      TRACE("...(min) move value %f\n", attribute->value);
+      break;
+
+    case MAX_VALUE:
+      set_maximum_move_value(move, attribute->value);
+      TRACE("...max move value %f\n", attribute->value);
+      break;
+
+    case MIN_TERRITORY:
+      set_minimum_territorial_value(move, attribute->value);
+      TRACE("...(min) territorial value %f\n", attribute->value);
+      break;
+
+    case MAX_TERRITORY:
+      set_maximum_territorial_value(move, attribute->value);
+      TRACE("...max territorial value %f\n", attribute->value);
+      break;
+
+    case SHAPE:
+      /* For class `j' and `t' patterns shape value has been counted
+       * already.
+       */
+      if (!(class & (CLASS_j | CLASS_t))) {
+	add_shape_value(move, attribute->value);
+	TRACE("...shape value %f\n", attribute->value);
+      }
+
+      break;
+
+    case FOLLOWUP:
+      add_followup_value(move, attribute->value);
+      TRACE("...followup value %f\n", attribute->value);
+      break;
+
+    case REVERSE_FOLLOWUP:
+      add_reverse_followup_value(move, attribute->value);
+      TRACE("...reverse followup value %f\n", attribute->value);
+      break;
+
+    default:
+      /* Must not happen. */
+      gg_assert(0);
+    }
+  }
+}
+
+
 /* 
  * This callback is invoked for each matched pattern.
  */
-
 static void
 shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
 		void *data)
@@ -202,7 +353,8 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   if (!pattern->helper
       && !allpats
       && !(pattern->autohelper_flag & HAVE_ACTION)
-      && !(class & (CLASS_MOVE_REASONS | CLASS_MOVE_VALUES)))
+      && !(class & CLASS_MOVE_REASONS)
+      && pattern->attributes->type == LAST_ATTRIBUTE)
     return;
   
   /* For sacrifice patterns, the survival of the stone to be played is
@@ -355,160 +507,21 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
     }
   }
 
-  /* Pattern class J, joseki standard move. Add expand territory and
-   * moyo, and require the value at least J_value.
-   */
-  if (class & CLASS_J) {
-    TRACE("...joseki standard move\n");
-    add_expand_territory_move(move);
-    TRACE("...expands territory\n");
-    add_expand_moyo_move(move);
-    TRACE("...expands moyo\n");
-    set_minimum_move_value(move, J_VALUE);
-    TRACE("... minimum move value %f\n", J_VALUE);
-  }
-
-  /* Pattern class j, less urgent joseki move. Add expand territory and
-   * moyo, set a minimum value of j_VALUE. If it is a fuseki pattern, set also
-   * the maximum value to j_VALUE.
-   */
-  if (class & CLASS_j) {
-    float min_value = j_VALUE;
-    TRACE("...less urgent joseki move\n");
-    add_expand_territory_move(move);
-    TRACE("...expands territory\n");
-    add_expand_moyo_move(move);
-    TRACE("...expands moyo\n");
-
-    /* Board size modification. */
-    min_value *= board_size / 19.0;
-    
-    if (class & VALUE_SHAPE) {
-      min_value *= (1 + 0.01 * pattern->shape);
-      class &= ~VALUE_SHAPE;
-    };
-
-    if ((board_size >= 17) && (class & CLASS_F)) {
-      min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
-                          /* get preferred in value_move_reasons */
-      set_maximum_move_value(move, min_value);
-      scale_randomness(move, 5.);
-      TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
-    }
-    else 
-      TRACE("...minimum move value %f (shape %f)\n",
-            min_value, pattern->shape);
-    set_minimum_move_value(move, min_value);
-  }
-
-  /* Pattern class t, minor joseki move (tenuki OK).
-   * Set the (min-)value at t_value
-   */
-  if (class & CLASS_t) {
-    float min_value = t_VALUE;
-    TRACE("...minor joseki move\n");
-    
-    /* Board size modification. */
-    min_value *= board_size / 19.0;
-    
-    if (class & VALUE_SHAPE) {
-      min_value *= (1 + 0.01 * pattern->shape);
-      class &= ~VALUE_SHAPE;
-    };
-    
-    if ((board_size >= 17) && (class & CLASS_F)) {
-      min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
-                          /* get preferred in value_move_reasons */
-      set_maximum_move_value(move, min_value);
-      scale_randomness(move, 5.);
-      TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
-    }
-    else
-      TRACE("...minimum move value %f (shape %f)\n",
-            min_value, pattern->shape);
-    set_minimum_move_value(move, min_value);
-  }
-
-  /* Pattern class U, very urgent joseki move. Add strategical defense
-   * and attack, plus a shape bonus of 15 and a minimum value of 40.
-   */
-  if (class & CLASS_U) {
-    TRACE("...joseki urgent move\n");
-    for (k = 0; k < my_ndragons; k++) {
-      add_strategical_defense_move(move, my_dragons[k]);
-      TRACE("...strategical defense of %1m\n", my_dragons[k]);
-    }
-    for (k = 0; k < your_ndragons; k++) {
-      add_strategical_attack_move(move, your_dragons[k]);
-      TRACE("...strategical attack on %1m\n", your_dragons[k]);
-    }
-    add_shape_value(move, 15);
-    TRACE("...shape value 15\n");
-    set_minimum_move_value(move, U_VALUE);
-    TRACE("...(min) move value %f\n", U_VALUE);
-  }
-
-  /* Pattern class T, joseki trick move. For the moment we never play
-   * these.
-   */
-  if (class & CLASS_T) {
-    TRACE("...joseki trick move\n");
-    add_antisuji_move(move);
-    TRACE("...antisuji\n");
-  }
-
   /* Pattern class W, worthwhile threat move. */
   if (class & CLASS_W) {
     TRACE("...worthwhile threat move\n");
     add_worthwhile_threat_move(move);
   }
 
-  /* Minimum move value specified. */
-  if (class & VALUE_MINVAL) {
-    set_minimum_move_value(move, pattern->value);
-    TRACE("...(min) move value %f\n", pattern->value);
-  }
-
-  /* Maximum move value specified. */
-  if (class & VALUE_MAXVAL) {
-    set_maximum_move_value(move, pattern->maxvalue);
-    TRACE("...max move value %f\n", pattern->maxvalue);
-  }
-
-  /* Minimum territorial value specified. */
-  if (class & VALUE_MINTERRITORY) {
-    set_minimum_territorial_value(move, pattern->minterritory);
-    TRACE("...(min) territorial value %f\n", pattern->minterritory);
-  }
-
-  /* Maximum territorial value specified. */
-  if (class & VALUE_MAXTERRITORY) {
-    set_maximum_territorial_value(move, pattern->maxterritory);
-    TRACE("...max territorial value %f\n", pattern->maxterritory);
-  }
-
-  /* Shape value specified. */
-  if (class & VALUE_SHAPE) {
-    add_shape_value(move, pattern->shape);
-    TRACE("...shape value %f\n", pattern->shape);
-  }
-
-  /* Followup value specified. */
-  if (class & VALUE_FOLLOWUP) {
-    add_followup_value(move, pattern->followup);
-    TRACE("...followup value %f\n", pattern->followup);
-  }
-
-  /* Reverse followup value specified. */
-  if (class & VALUE_REV_FOLLOWUP) {
-    add_reverse_followup_value(move, pattern->reverse_followup);
-    TRACE("...reverse followup value %f\n", pattern->reverse_followup);
-  }
+  handle_joseki_patterns(pattern->attributes, class, move,
+			 my_dragons, my_ndragons, your_dragons, your_ndragons);
 }
 
 
-/* This callback is invoked for each matched pattern from joseki database.
- * This function is just a copy of relevant parts of shapes_callback().
+/* This callback is invoked for each matched pattern from joseki
+ * database.  This function is just a copy of relevant parts of
+ * shapes_callback().  However, most of the common code resides in
+ * handle_joseki_patterns().
  */
 static void
 joseki_callback(int move, int color, struct corner_pattern *pattern,
@@ -591,117 +604,14 @@ joseki_callback(int move, int color, struct corner_pattern *pattern,
   if (pattern->autohelper_flag & HAVE_ACTION)
     pattern->autohelper(trans, move, color, 1);
 
-  /* Pattern class J, joseki standard move. Add expand territory and
-   * moyo, and require the value at least J_value.
-   */
-  if (class & CLASS_J) {
-    TRACE("...joseki standard move\n");
-    add_expand_territory_move(move);
-    TRACE("...expands territory\n");
-    add_expand_moyo_move(move);
-    TRACE("...expands moyo\n");
-    set_minimum_move_value(move, J_VALUE);
-    TRACE("... minimum move value %f\n", J_VALUE);
-  }
-
-  /* Pattern class j, less urgent joseki move. Add expand territory and
-   * moyo, set a minimum value of j_VALUE. If it is a fuseki pattern, set also
-   * the maximum value to j_VALUE.
-   */
-  if (class & CLASS_j) {
-    float min_value = j_VALUE;
-    TRACE("...less urgent joseki move\n");
-    add_expand_territory_move(move);
-    TRACE("...expands territory\n");
-    add_expand_moyo_move(move);
-    TRACE("...expands moyo\n");
-
-    /* Board size modification. */
-    min_value *= board_size / 19.0;
-
-    if (class & VALUE_SHAPE) {
-      min_value *= (1 + 0.01 * pattern->shape);
-      class &= ~VALUE_SHAPE;
-    };
-
-    if (board_size >= 17) {
-      min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
-                          /* get preferred in value_move_reasons(). */
-      set_maximum_move_value(move, min_value);
-      scale_randomness(move, 5.);
-      TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
-    }
-    else
-      TRACE("...minimum move value %f (shape %f)\n",
-            min_value, pattern->shape);
-    set_minimum_move_value(move, min_value);
-  }
-
-  /* Pattern class t, minor joseki move (tenuki OK).
-   * Set the (min-)value at t_value
-   */
-  if (class & CLASS_t) {
-    float min_value = t_VALUE;
-    TRACE("...minor joseki move\n");
-
-    /* Board size modification. */
-    min_value *= board_size / 19.0;
-
-    if (class & VALUE_SHAPE) {
-      min_value *= (1 + 0.01 * pattern->shape);
-      class &= ~VALUE_SHAPE;
-    };
-
-    if ((board_size >= 17) && (class & CLASS_F)) {
-      min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
-                          /* get preferred in value_move_reasons */
-      set_maximum_move_value(move, min_value);
-      scale_randomness(move, 5.);
-      TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
-    }
-    else
-      TRACE("...minimum move value %f (shape %f)\n",
-            min_value, pattern->shape);
-    set_minimum_move_value(move, min_value);
-  }
-
-  /* Pattern class U, very urgent joseki move. Add strategical defense
-   * and attack, plus a shape bonus of 15 and a minimum value of 40.
-   */
-  if (class & CLASS_U) {
-    TRACE("...joseki urgent move\n");
-    for (k = 0; k < my_ndragons; k++) {
-      add_strategical_defense_move(move, my_dragons[k]);
-      TRACE("...strategical defense of %1m\n", my_dragons[k]);
-    }
-    for (k = 0; k < your_ndragons; k++) {
-      add_strategical_attack_move(move, your_dragons[k]);
-      TRACE("...strategical attack on %1m\n", your_dragons[k]);
-    }
-    add_shape_value(move, 15);
-    TRACE("...shape value 15\n");
-    set_minimum_move_value(move, U_VALUE);
-    TRACE("...(min) move value %f\n", U_VALUE);
-  }
-
-  /* Pattern class T, joseki trick move. For the moment we never play these. */
-  if (class & CLASS_T) {
-    TRACE("...joseki trick move\n");
-    add_antisuji_move(move);
-    TRACE("...antisuji\n");
-  }
-
   /* Pattern class N, antisuji move. */
   if (class & CLASS_N) {
     TRACE("...antisuji move\n");
     add_antisuji_move(move);
   }
 
-  /* Shape value specified. */
-  if (class & VALUE_SHAPE) {
-    add_shape_value(move, pattern->shape);
-    TRACE("...shape value %f\n", pattern->shape);
-  }
+  handle_joseki_patterns(pattern->attributes, class, move,
+			 my_dragons, my_ndragons, your_dragons, your_ndragons);
 }
 
 

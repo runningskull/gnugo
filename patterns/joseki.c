@@ -430,6 +430,7 @@ main(int argc, char *argv[])
 "
 
   printf(PREAMBLE);
+  printf("attribute_map general\n\n");
 
   /* Call the engine to setup and clear the board. */
   board_size = MAX_BOARD;

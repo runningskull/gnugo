@@ -102,6 +102,8 @@
 ######################################################################
 
 
+attribute_map general
+
 goal_elements none
 # Several patterns here have a or d class, so we need these elements.
 callback_data XOxo

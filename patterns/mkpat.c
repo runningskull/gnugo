@@ -173,6 +173,8 @@ static char constraint_diagram[MAX_BOARD+2][MAX_BOARD+3];
 static char *prefix;
 static struct pattern pattern[MAXPATNO]; /* accumulate the patterns into here */
 static char pattern_names[MAXPATNO][MAXNAME]; /* with optional names here, */
+static int num_attributes;
+static struct pattern_attribute attributes[MAXPATNO * NUM_ATTRIBUTES];
 static char helper_fn_names[MAXPATNO][MAXNAME]; /* helper fn names here */
 static char autohelper_code[MAXPATNO*300]; /* code for automatically generated */
 					   /* helper functions here */
@@ -194,6 +196,50 @@ struct autohelper_func {
  */
 static const char *current_file = NULL;
 static int current_line_number = 0;
+
+
+struct attribute_description {
+  const char *input_name;	/* The name used in `.db' files. */
+  enum attribute_type type;
+};
+
+
+static const char *attribute_name[NUM_ATTRIBUTES + 1] = {
+  "MIN_VALUE",
+  "MAX_VALUE",
+  "MIN_TERRITORY",
+  "MAX_TERRITORY",
+  "SHAPE",
+  "FOLLOWUP",
+  "REVERSE_FOLLOWUP",
+  "LAST_ATTRIBUTE"
+};
+
+
+/* Owl-style value stored in pattern itself. */
+#define IN_PATTERN_VALUE	NUM_ATTRIBUTES
+
+struct attribute_description general_attribute_map[] = {
+  { "value",		MIN_VALUE },
+  { "minvalue",		MIN_VALUE },
+  { "maxvalue",		MAX_VALUE },
+  { "terri",		MIN_TERRITORY },
+  { "minterri",		MIN_TERRITORY },
+  { "maxterri",		MAX_TERRITORY },
+  { "shape",		SHAPE },
+  { "followup",		FOLLOWUP },
+  { "followup_value",	FOLLOWUP },
+  { "reverse_followup",	REVERSE_FOLLOWUP },
+  { NULL,		LAST_ATTRIBUTE }
+};
+
+struct attribute_description value_only_attribute_map[] = {
+  { "value",		IN_PATTERN_VALUE },
+  { NULL,		LAST_ATTRIBUTE }
+};
+
+struct attribute_description *attribute_map = NULL;
+static int attributes_needed = 0;
 
 
 /* ================================================================ */
@@ -1092,64 +1138,53 @@ finish_pattern(char *line)
       fatal_errors++;
     }
 
+    pattern[patno].attributes = NULL;
     while (sscanf(p, "%*[, ]%[^,]%n", entry, &n) > 0) {
       p += n;
 
       if (sscanf(entry, "%*[^(](%f)", &v) > 0) {
-	const char *corner_unsupported = NULL;
+	struct attribute_description *description;
 
-	if (strncmp(entry, "value", 5) == 0
-	    || strncmp(entry, "minvalue", 8) == 0) {
-	  pattern[patno].value = v;
-	  pattern[patno].class |= VALUE_MINVAL;
-	  corner_unsupported = "value";
+	if (attribute_map) {
+	  for (description = attribute_map; description->input_name;
+	       description++) {
+	    int length = strlen(description->input_name);
+
+	    if (strncmp(entry, description->input_name, length) == 0
+		&& entry[length] == '(') {
+	      if (description->type != IN_PATTERN_VALUE) {
+		if (!pattern[patno].attributes)
+		  pattern[patno].attributes = attributes + num_attributes;
+
+		attributes[num_attributes].type = description->type;
+		attributes[num_attributes].value = v;
+		num_attributes++;
+	      }
+	      else
+		pattern[patno].value = v;
+
+	      break;
+	    }
+	  }
 	}
-	else if (strncmp(entry, "maxvalue", 8) == 0) {
-	  pattern[patno].maxvalue = v;
-	  pattern[patno].class |= VALUE_MAXVAL;
-	  corner_unsupported = "maxvalue";
-	}
-	else if (strncmp(entry, "terri", 5) == 0
-		 || strncmp(entry, "minterri", 8) == 0) {
-	  pattern[patno].minterritory = v;
-	  pattern[patno].class |= VALUE_MINTERRITORY;
-	  corner_unsupported = "terri";
-	}
-	else if (strncmp(entry, "maxterri", 8) == 0) {
-	  pattern[patno].maxterritory = v;
-	  pattern[patno].class |= VALUE_MAXTERRITORY;
-	  corner_unsupported = "maxterri";
-	}
-	else if (strncmp(entry, "shape", 5) == 0) {
-	  pattern[patno].shape = v;
-	  pattern[patno].class |= VALUE_SHAPE;
-	}
-	else if (strncmp(entry, "followup", 8) == 0) {
-	  pattern[patno].followup = v;
-	  pattern[patno].class |= VALUE_FOLLOWUP;
-	  corner_unsupported = "followup";
-	}
-	else if (strncmp(entry, "reverse_followup", 16) == 0) {
-	  pattern[patno].reverse_followup = v;
-	  pattern[patno].class |= VALUE_REV_FOLLOWUP;
-	  corner_unsupported = "reverse_followup";
-	}
-	else {
+
+	if (attribute_map == NULL || description->input_name == NULL) {
 	  fprintf(stderr, "%s(%d) : error : Unknown value field: %s\n",
-                  current_file, current_line_number, entry);
-          fatal_errors++;
+		  current_file, current_line_number, entry);
+	  fatal_errors++;
 	  break;
-	}
-
-	if (database_type == DB_CORNER && corner_unsupported) {
-	  fprintf(stderr, "%s(%d) : warning : `%s' is unsupported in corner databases\n",
-		  current_file, current_line_number, corner_unsupported);
 	}
       }
       else {
 	strncpy(helper_fn_names[patno], entry, 79);
 	break;
       }
+    }
+
+    if (pattern[patno].attributes != NULL) {
+      attributes[num_attributes].type = LAST_ATTRIBUTE;
+      attributes[num_attributes].value = 0.0;
+      num_attributes++;
     }
 
     for (p2 = class; *p2; p2++) {
@@ -2601,7 +2636,35 @@ corner_write_variations(struct corner_variation_b *variation, FILE *outfile)
 }
 
 
-/* sort and write out the patterns */
+static void
+write_attributes(FILE *outfile)
+{
+  int k;
+
+  fprintf(outfile, "static struct pattern_attribute attributes[] = {\n");
+  fprintf(outfile, "#ifdef __GNUC__\n");
+
+  for (k = 0; k < num_attributes; k++) {
+    fprintf(outfile, "  {%s,{.value=%f}}",
+	    attribute_name[attributes[k].type], attributes[k].value);
+    if (k != num_attributes - 1)
+      fprintf(outfile, ",\n");
+  }
+
+  fprintf(outfile, "\n#else\n");
+
+  for (k = 0; k < num_attributes; k++) {
+    fprintf(outfile, "  {%s,%f,0}",
+	    attribute_name[attributes[k].type], attributes[k].value);
+    if (k != num_attributes - 1)
+      fprintf(outfile, ",\n");
+  }
+
+  fprintf(outfile,"\n#endif\n};\n\n");
+}
+
+
+/* Sort and write out the patterns. */
 static void
 write_patterns(FILE *outfile)
 {
@@ -2634,10 +2697,19 @@ write_patterns(FILE *outfile)
     }
 
     if (database_type == DB_CORNER) {
-      fprintf(outfile, "  {%d,%d,0x%x,\"%s\",%f,%d,",
+      fprintf(outfile, "  {%d,%d,0x%x,\"%s\",",
 	      second_corner_offset[j], (p->trfno == 4),
-	      p->class, pattern_names[j], p->shape,
-	      p->autohelper_flag);
+	      p->class, pattern_names[j]);
+
+      if (attributes_needed) {
+	fprintf(outfile, "attributes+%d,",
+		p->attributes ? p->attributes - attributes : 0);
+      }
+      else
+	fprintf(outfile, "NULL,");
+
+      fprintf(outfile, "%d,", p->autohelper_flag);
+
       if (p->autohelper)
 	fprintf(outfile, "autohelper%s%d}", prefix, j);
       else
@@ -2684,17 +2756,17 @@ write_patterns(FILE *outfile)
     fprintf(outfile, "}\n   ");
 #endif
 
-    fprintf(outfile, ", 0x%x,%f,%f,%f,%f,%f,%f,%f,%d,%s,",
-	    p->class,
-	    p->value,
-	    p->maxvalue,
-	    p->minterritory,
-	    p->maxterritory,
-	    p->shape,
-	    p->followup,
-	    p->reverse_followup,
-	    p->autohelper_flag,
-	    helper_fn_names[j]);
+    fprintf(outfile, ", 0x%x,%f,", p->class, p->value);
+
+    if (attributes_needed) {
+      fprintf(outfile, "attributes+%d,",
+	      p->attributes ? p->attributes - attributes : 0);
+    }
+    else
+      fprintf(outfile, "NULL,");
+
+    fprintf(outfile, "%d,%s,", p->autohelper_flag, helper_fn_names[j]);
+
     if (p->autohelper)
       fprintf(outfile, "autohelper%s%d", prefix, j);
     else
@@ -2722,10 +2794,9 @@ write_patterns(FILE *outfile)
 #if GRID_OPT
   fprintf(outfile, ",{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}");
 #endif
-  fprintf(outfile, ",0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,NULL,NULL,0,0.0");
+  fprintf(outfile, ",0,0.0,NULL,0,NULL,NULL,0,0.0");
 #if PROFILE_PATTERNS
-  fprintf(outfile, ",0,0");
-  fprintf(outfile, ",0");
+  fprintf(outfile, ",0,0,0");
 #endif
   fprintf(outfile, "}\n};\n");
 }
@@ -2936,6 +3007,9 @@ main(int argc, char *argv[])
   autohelper_code[0] = 0;
   code_pos = autohelper_code;
 
+  num_attributes = 1;
+  attributes[0].type = LAST_ATTRIBUTE;
+
   /* Parse the input file, output pattern elements as as we find them,
    * and store pattern entries for later output.
    *
@@ -2996,6 +3070,8 @@ main(int argc, char *argv[])
 	command = 2;
       else if (sscanf(line, "callback_data %s", command_data) == 1)
 	command = 3;
+      else if (sscanf(line, "attribute_map %s", command_data) == 1)
+	command = 4;
 
       if (command) {
 	char *p = strpbrk(command_data, " \t");
@@ -3050,7 +3126,7 @@ main(int argc, char *argv[])
 	  state = 1;
 	  discard_pattern = 0;
 	}
-	else {
+	else if (command == 2 || command == 3) {
 	  int *sort_out = (command == 2 ? nongoal : callback_unneeded);
 	  int k;
 
@@ -3090,6 +3166,40 @@ main(int argc, char *argv[])
 	  }
 
 	  state = 0;
+	}
+	else {
+	  struct attribute_description *old_map = attribute_map;
+
+	  if (strcmp(command_data, "general") == 0) {
+	    attribute_map = general_attribute_map;
+	    attributes_needed = 1;
+	  }
+	  else if (strcmp(command_data, "value_only") == 0) {
+	    attribute_map = value_only_attribute_map;
+	    attributes_needed = 0;
+	  }
+	  else if (strcmp(command_data, "none") == 0) {
+	    attribute_map = NULL;
+	    attributes_needed = 0;
+	  }
+	  else {
+	    fprintf(stderr, "%s(%d) : Error : unknown attribute map `%s'",
+		    current_file, current_line_number, command_data);
+	    fatal_errors++;
+	  }
+
+	  if (patno != -1 && attribute_map != old_map) {
+	    fprintf(stderr, "%s(%d) : Error : attribute map can only be set before the first pattern\n",
+		    current_file, current_line_number);
+	    fatal_errors++;
+	  }
+
+	  if (attributes_needed
+	      && (database_type == DB_FULLBOARD || database_type == DB_TREE)) {
+	    fprintf(stderr, "%s(%d) : Error : attributes other than `value' are not allowed in fullboard and tree databases\n",
+		    current_file, current_line_number);
+	    fatal_errors++;
+	  }
 	}
       }
       else if (line[0] == '\n' || line[0] == '#') { 
@@ -3242,6 +3352,11 @@ main(int argc, char *argv[])
 
     /* Write the autohelper code. */
     fprintf(output_FILE, "%s", autohelper_code);
+
+    if (attributes_needed)
+      write_attributes(output_FILE);
+    else
+      assert(num_attributes == 1);
 
     write_patterns(output_FILE);
 

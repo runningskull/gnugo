@@ -83,6 +83,8 @@
 # A16xx Specific edge attacks
 
 
+attribute_map value_only
+
 goal_elements Xx
 callback_data none
 

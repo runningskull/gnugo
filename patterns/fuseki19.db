@@ -41,6 +41,9 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
+attribute_map value_only
+
+
 Pattern Fuseki1
 # 4924/6203
 

@@ -25,6 +25,10 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
+# FIXME: Pattern-based reading code is broken.  This makes it even more so.
+attribute_map general
+
+
 # thoughts:
 #  Need some way to specify two patterns, one on this end, one on that end.
 #  Need some better backfill & superstring helpers.

@@ -1204,7 +1204,9 @@ main(int argc, char *argv[])
      */
     generate_patterns();
     fprintf(stderr, "generate OK.\n");
-    
+
+    printf("attribute_map value_only\n\n\n");
+
     /* Write the patterns to stdout in patterns.db format.
      */
     print_patterns();

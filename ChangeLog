@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- pattern attributes (shape, followup etc.) are now stored in lists, not
+  in `pattern' structure
+- there is now a possibility to define virtually unlimited number of new
+  pattern attributes
+- common code of shapes_callback() and joseki_callback() is broken into
+  new static function handle_joseki_patterns()
 - major improvement of analyze_eyegraph functionality in optics.c
 - adjust min_level and max_level if --level is set outside their range
 - do not malloc() 0 bytes in pattern_list_build_heap()
