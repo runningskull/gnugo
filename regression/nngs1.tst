@@ -42,7 +42,7 @@ loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 46
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 104
 11 gg_genmove black
-#? [T12]*
+#? [T12]
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 150
 12 gg_genmove black

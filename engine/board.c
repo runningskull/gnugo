@@ -496,25 +496,25 @@ trymove(int pos, int color, const char *message, int str,
     if (str == NO_MOVE) {
       if (!komaster_is_empty(komaster, kom_pos))
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
-		    message, count_variations, hashdata.hashval,
+		    message, count_variations, hashdata.hashval[0],
 		    komaster_to_string(komaster, kom_pos),
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx)", 
-		    message, count_variations, hashdata.hashval);
+		    message, count_variations, hashdata.hashval[0]);
     }
     else {
       if (!komaster_is_empty(komaster, kom_pos))
 	gg_snprintf(buf, 100, 
 		    "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
-		    hashdata.hashval, 
+		    hashdata.hashval[0], 
                     komaster_to_string(komaster, kom_pos),
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx)", 
 		    message, location_to_string(str), count_variations,
-		    hashdata.hashval);
+		    hashdata.hashval[0]);
     }
     sgftreeAddPlayLast(sgf_dumptree, NULL, color, I(pos), J(pos));
     sgftreeAddComment(sgf_dumptree, NULL, buf);
@@ -597,12 +597,12 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
       message = "UNKNOWN";
     if (!komaster_is_empty(komaster, kom_pos))
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
-		  message, count_variations, hashdata.hashval,
+		  message, count_variations, hashdata.hashval[0],
 		  komaster_to_string(komaster, kom_pos), 
                   location_to_string(kom_pos));
     else
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx)", 
-		  message, count_variations, hashdata.hashval);
+		  message, count_variations, hashdata.hashval[0]);
     if (0) {
       /* tm - I don't find these pass moves helpful in the tree. */
       sgftreeAddPlayLast(sgf_dumptree, NULL, color, -1, -1);
@@ -715,8 +715,9 @@ do_trymove(int pos, int color, int ignore_ko)
   PUSH_VALUE(board_ko_pos);
   memcpy(&hashdata_stack[stackp], &hashdata, sizeof(hashdata));
 
-  board_ko_pos = 0;
-  hashdata_remove_ko(&hashdata);
+  if (board_ko_pos != NO_MOVE)
+    hashdata_invert_ko(&hashdata, board_ko_pos);
+  board_ko_pos = NO_MOVE;
   
   PUSH_VALUE(black_captured);
   PUSH_VALUE(white_captured);
@@ -817,7 +818,7 @@ dump_stack(void)
   if (count_variations)
     gprintf("%o (variation %d)", count_variations-1);
 #else
-  gprintf("%o (%d)", hashdata.hashval);
+  gprintf("%o (%d)", hashdata.hashval[0]);
 #endif
 
   gprintf("%o\n");
@@ -884,11 +885,16 @@ play_move_no_history(int pos, int color)
 
   /* Check the hash table to see if it corresponds to the cumulative one. */
   hashdata_recalc(&oldkey, board, board_ko_pos);
+#if FULL_POSITION_IN_HASH
   gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
+#else
+  gg_assert(hashdata_compare(&oldkey, &hashdata) == 0);
+#endif
 #endif
 
+  if (board_ko_pos != NO_MOVE)
+    hashdata_invert_ko(&hashdata, board_ko_pos);
   board_ko_pos = NO_MOVE;
-  hashdata_remove_ko(&hashdata);
 
   /* If the move is a pass, we can skip some steps. */
   if (pos != PASS_MOVE) {
@@ -901,7 +907,11 @@ play_move_no_history(int pos, int color)
 #if CHECK_HASHING
     /* Check the hash table to see if it equals the previous one. */
     hashdata_recalc(&oldkey, board, board_ko_pos);
+#if FULL_POSITION_IN_HASH
     gg_assert(hashdata_diff_dump(&oldkey, &hashdata) == 0);
+#else
+    gg_assert(hashdata_compare(&oldkey, &hashdata) == 0);
+#endif
 #endif
   }
   new_position();
@@ -3759,8 +3769,11 @@ do_play_move(int pos, int color)
   if (string[s].liberties == 1
       && string[s].size == 1
       && captured_stones == 1) {
+    /* In case of a double ko: clear old ko position first. */
+    if (board_ko_pos != NO_MOVE)
+      hashdata_invert_ko(&hashdata, board_ko_pos);
     board_ko_pos = string[s].libs[0];
-    hashdata_set_ko(&hashdata, board_ko_pos);
+    hashdata_invert_ko(&hashdata, board_ko_pos);
   }
 }
 

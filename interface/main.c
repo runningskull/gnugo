@@ -413,6 +413,8 @@ main(int argc, char *argv[])
 	if (EXPERIMENTAL_READING)
 	  fprintf(stderr,
 		  "configure option enabled: experimental reading\n");
+	if (HASHING_SCHEME != 2)
+	  fprintf(stderr, "hash scheme %d\n", HASHING_SCHEME);
 	if (OWL_THREATS)
 	  fprintf(stderr,
 		  "configure option enabled: owl threats\n");

@@ -24,7 +24,7 @@
 /* Connection module. Default standard. */
 #undef EXPERIMENTAL_CONNECTIONS
 
-/* Influence module. Default standard. */
+/* Influence module. Default experimental. */
 #undef EXPERIMENTAL_INFLUENCE
 
 /* Experimental pattern based reading. Disabled by default. */
@@ -42,6 +42,9 @@
 /* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
    */
 #undef GRID_OPT
+
+/* Hashing scheme. Default scheme 2 (new). */
+#undef HASHING_SCHEME
 
 /* Define if you have the `alarm' function. */
 #undef HAVE_ALARM

@@ -844,8 +844,6 @@ static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback,
 
 
 /* prepare the dfa board (gnugo initialization) */
-static const char *s=" --> using dfa\n";
-
 void
 dfa_match_init(void)
 {
@@ -856,28 +854,28 @@ dfa_match_init(void)
 
   buildSpiralOrder(spiral);
 
-  if (owl_vital_apat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "owl_vital_apat %s", s);
-  if (owl_attackpat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "owl_attackpat %s", s);
-  if (owl_defendpat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "owl_defendpat %s", s);
-  if (pat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "pat %s", s);
-  if (attpat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "attpat %s", s);
-  if (defpat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "defpat %s", s);
-  if (endpat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "endpat %s", s);
-  if (conn_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "conn %s", s);
-  if (influencepat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "influencepat %s", s);
-  if (barrierspat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "barrierspat %s", s);
-  if (fusekipat_db.pdfa != NULL && !quiet)
-    fprintf(stderr, "barrierspat %s", s);
+  if (owl_vital_apat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "owl_vital_apat --> using dfa\n");
+  if (owl_attackpat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "owl_attackpat --> using dfa\n");
+  if (owl_defendpat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "owl_defendpat --> using dfa\n");
+  if (pat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "pat --> using dfa\n");
+  if (attpat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "attpat --> using dfa\n");
+  if (defpat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "defpat --> using dfa\n");
+  if (endpat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "endpat --> using dfa\n");
+  if (conn_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "conn --> using dfa\n");
+  if (influencepat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "influencepat --> using dfa\n");
+  if (barrierspat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "barrierspat --> using dfa\n");
+  if (fusekipat_db.pdfa != NULL)
+    DEBUG(DEBUG_MATCHER, "barrierspat --> using dfa\n");
 
   /* force out_board initialization */
   dfa_board_size = -1;

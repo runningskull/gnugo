@@ -20,6 +20,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <stdio.h>
+#include <gnugo.h>
 
 /*
  * This file, together with engine/hash.c implements hashing of go positions
@@ -55,12 +56,39 @@ typedef unsigned long Compacttype;
 /* for testing: Enables a lot of checks. */
 #define CHECK_HASHING 0
 
+/* Old hashing. */
+#if (HASHING_SCHEME==1)		
+#define NUM_HASHVALUES 		1
+#define FULL_POSITION_IN_HASH 	1
+#endif
+
+/* Proposed new hashing. */
+#if (HASHING_SCHEME==2)
+
+/* How many bits should be used at least for hashing? Set this to 32 for
+ * some memory save and speedup, at the cost of occasional irreproducable
+ * mistakes (and possibly assertion failures). 
+ * With 64 bits, there should be less than one such mistake in 10^9 games.
+ * Set this to 96 if this is not safe enough for you.
+ */
+#define MIN_HASHBITS 		64		
+
+#define NUM_HASHVALUES 		(MIN_HASHBITS / ( 8 * SIZEOF_LONG))
+#define FULL_POSITION_IN_HASH 	0	/* Set this to 1 for debugging. */
+#endif
+
+/* Use this for self-defined values. */
+#if (HASHING_SCHEME==3)
+#define NUM_HASHVALUES 		?
+#define FULL_POSITION_IN_HASH 	?
+#endif
+
 
 /*
  * We define a special compact representation of the board for the 
- * positions.  In this representation each location is represented
- * by 2 bits with 0 meaning EMPTY, 1 meaning WHITE and 2 meaning 
- * BLACK as defined in gnugo.h.
+ * positions, used if FULL_POSITION_IN_HASH is set. In this representation
+ * each location is represented by 2 bits with 0 meaning EMPTY, 1 meaning
+ * WHITE and 2 meaning BLACK as defined in gnugo.h.
  * COMPACT_BOARD_SIZE is the size of such a compact representation
  * for the maximum board size allowed.
  *
@@ -84,11 +112,12 @@ typedef unsigned long Compacttype;
 #define POINTSPERCOMPACT    ((int) sizeof(Compacttype) * 4)
 #define COMPACT_BOARD_SIZE  ((MAX_BOARD) * (MAX_BOARD) / POINTSPERCOMPACT + 1)
 
-
+#if FULL_POSITION_IN_HASH
 typedef struct hashposition_t {
   Compacttype  board[COMPACT_BOARD_SIZE];
   int          ko_pos;
 } Hashposition;
+#endif
 
 
 /*
@@ -97,19 +126,22 @@ typedef struct hashposition_t {
  */
 
 typedef struct {
-  Hashvalue     hashval;
+  Hashvalue     hashval[NUM_HASHVALUES];
+#if FULL_POSITION_IN_HASH
   Hashposition  hashpos;
+#endif
 } Hash_data;
 
 
 void hash_init(void);
+#if FULL_POSITION_IN_HASH
 int hashposition_compare(Hashposition *pos1, Hashposition *pos2);
 void hashposition_dump(Hashposition *pos, FILE *outfile);
+#endif
 
 void hashdata_recalc(Hash_data *hd, Intersection *board, int ko_pos);
 int hashdata_compare(Hash_data *hd1, Hash_data *hd2);
-void hashdata_set_ko(Hash_data *hd, int pos);
-void hashdata_remove_ko(Hash_data *hd);
+void hashdata_invert_ko(Hash_data *hd, int pos);
 void hashdata_invert_stone(Hash_data *hd, int pos, int color);
 void hashdata_set_tomove(Hash_data *hd, int to_move);
 

@@ -147,9 +147,8 @@ LIBRARIES = $(noinst_LIBRARIES)
 
 libboard_a_AR = $(AR) cru
 libboard_a_LIBADD =
-am_libboard_a_OBJECTS = board.$(OBJEXT) cache.$(OBJEXT) \
-	globals.$(OBJEXT) hash.$(OBJEXT) printutils.$(OBJEXT) \
-	sgffile.$(OBJEXT) showbord.$(OBJEXT)
+am_libboard_a_OBJECTS = board.$(OBJEXT) globals.$(OBJEXT) hash.$(OBJEXT) \
+	printutils.$(OBJEXT) sgffile.$(OBJEXT) showbord.$(OBJEXT)
 libboard_a_OBJECTS = $(am_libboard_a_OBJECTS)
 libengine_a_AR = $(AR) cru
 libengine_a_LIBADD =

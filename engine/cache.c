@@ -93,7 +93,9 @@ hashnode_dump(Hashnode *node, FILE *outfile)
 
   /* Data about the node itself. */
   fprintf(outfile, "Hash value: %lx\n", (unsigned long) node->key.hashval);
+#if FULL_POSITION_IN_HASH
   hashposition_dump(&(node->key.hashpos), outfile);
+#endif
 
   for (result = node->results; result != NULL; result = result->next) {
     read_result_dump(result, outfile);
@@ -367,7 +369,7 @@ hashtable_partially_clear(Hashtable *table)
    */
   for (k = 0; k < table->num_nodes; k++) {
     node = &(table->all_nodes[k]);
-    bucket = node->key.hashval % table->hashtablesize;
+    bucket = node->key.hashval[0] % table->hashtablesize;
     previous = NULL;
     current = table->hashtable[bucket];
 
@@ -469,7 +471,7 @@ hashtable_enter_position(Hashtable *table, Hash_data *hd)
   node->results = NULL;
 
   /* ...and enter it into the table. */
-  bucket = hd->hashval % table->hashtablesize;
+  bucket = hd->hashval[0] % table->hashtablesize;
   node->next = table->hashtable[bucket];
   table->hashtable[bucket] = node;
 
@@ -493,13 +495,24 @@ hashtable_search(Hashtable *table, Hash_data *hd)
 {
   Hashnode *node;
   int bucket;
+  int i;
 
-  bucket = hd->hashval % table->hashtablesize;
+  bucket = hd->hashval[0] % table->hashtablesize;
   for (node = table->hashtable[bucket]; node != NULL; node = node->next) {
-    if (node->key.hashval != hd->hashval)
+    if (node->key.hashval[0] != hd->hashval[0])
       continue;
-    if (hashposition_compare(&hd->hashpos, &node->key.hashpos) == 0)
+    for (i = 1; i < NUM_HASHVALUES; i++)
+      if (node->key.hashval[i] != hd->hashval[i]) {
+	stats.hash_collisions++;
+	break;
+      }
+    if (i >= NUM_HASHVALUES)
+#if FULL_POSITION_IN_HASH
+      if (hashposition_compare(&hd->hashpos, &node->key.hashpos) == 0)
+	break;
+#else
       break;
+#endif
   }
   return node;
 }
@@ -589,6 +602,8 @@ reading_cache_init(int bytes)
 		 / (1.5 * sizeof(Hashnode *)
 		    + sizeof(Hashnode)
 		    + 1.4 * sizeof(Read_result)));
+  if (0)
+    gprintf("Allocated memory for %d hash nodes. \n", (int) nodes);
   /* If we get a zero size hash table, disable hashing completely. */
   if (nodes < 1.0)
     hashflags = HASH_NOTHING;
@@ -691,7 +706,11 @@ do_get_read_result(int routine, int komaster, int kom_pos,
 
   /* Check the hash table to see if we have had this position before. */
   hashdata_recalc(&key, board, board_ko_pos);
+#if FULL_POSITION_IN_HASH
   gg_assert(hashdata_diff_dump(&key, &hashdata) == 0);
+#else
+  gg_assert(hashdata_compare(&key, &hashdata) == 0);
+#endif
 
   /* Find this position in the table.  If it wasn't found, enter it. */
   hashnode = hashtable_search(movehash, &hashdata);

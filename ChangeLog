@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.28 released March 24, 2002
+
+- hashing dependent on compiler switches, default 64 bit and no full position
+- default cache size set to 8
 - --stack option and showstack global variable removed
 - cache.o removed from libboard.a
 - unneeded include of dfa.h removed from patterns.h
@@ -33,9 +37,12 @@
 - Added several .h files to appropriate .dsp files
 - corrected gcc warnings & other cleanup in mkpat.c
 - komaster_to_string now takes 2 arguments
-- new define KOMASTER_TRACE; set to log all komaster_trymove calls
+- new KOMASTER_TRACE; set to log all komaster_trymove calls
+- dfa ise announced only as a debug message
 - copyright notices updated
 - DRAGON2 macro array bounds checking is not the default
+- tuning
+- test revision
 - doc revision
 - additional correct answers added to reading.tst
 

@@ -8982,11 +8982,32 @@ O.Xx
 Pattern CB335
 # gf New pattern. (3.1.18)
 
-x.O
+x.O           block
 X*.
 O.o
 
 :8,bOX
+
+
+Pattern CB336
+# db New pattern (3.1.28)
+
+?Xxx??         simply extend to avoid bad aji
+oOX.x?
+o.O*..
+......
+------
+
+:8,O,shape(2)
+
+?Xxd??         
+ocX.e?
+obO*a.
+......
+------
+
+; oplay_attack(a,b,*,c) || x_somewhere(d,e)
+> replace(a,*)
 
 
 ######################################################################
@@ -10472,6 +10493,74 @@ oo..b.a
 
 ; lib(a)>2
 > replace(b,a)
+
+
+Pattern ED89
+# db New pattern (3.1.28)
+# It is difficult to give an exact criterion for when it is good to
+# fight this ko. But it is bad to lose it, may even threaten the
+# life of the O dragon. See nngs1:11
+
+??X?Oo?          Don't fight an unfavorable ko!
+..XO.Oo
+.XO*O.?
+-------
+
+:8,-
+
+??X?Oo?
+.aXO.bo
+.XO*O.?
+-------
+
+; alive(b)
+> replace(a,*)
+
+
+Pattern ED90
+# db New pattern (3.1.28)
+
+???..o?          Jump under on the third line
+???X.oo
+?O..*.o
+?O....o
+o......
+-------
+
+:8,j
+
+???..o?
+???X.oo
+?hfa*.o
+?hcbd.o
+o.e....
+-------
+
+; oplay_attack(*,a,b,c,d,e,e) && !oplay_attack(*,a,b,c,d,f,e,h)
+> replace(b,*)
+
+
+Pattern ED91
+# db New pattern (3.1.28)
+
+???..o?          Extend after the push
+???XXoo
+?O..O*.
+?O....o
+o......
+-------
+
+:8,j
+
+???..o?
+???XXfo
+?O.aO*.
+?Ocbd.o
+o.e....
+-------
+
+; oplay_attack(*,a,b,c,d,e,e) || !oplay_defend(*,a,b,d,c,d)
+> replace(f,*)
 
 
 #####################################################################

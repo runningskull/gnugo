@@ -40,15 +40,15 @@
 static int is_initialized = 0;
 
 
-
 /* Random values for the hash function.  For stones and ko position. */
-static Hashvalue white_hash[BOARDMAX];	
-static Hashvalue black_hash[BOARDMAX];	
-static Hashvalue ko_hash[BOARDMAX];
+static Hashvalue white_hash[BOARDMAX][NUM_HASHVALUES];	
+static Hashvalue black_hash[BOARDMAX][NUM_HASHVALUES];	
+static Hashvalue ko_hash[BOARDMAX][NUM_HASHVALUES];
 
-
+#if FULL_POSITION_IN_HASH
 static Compacttype white_patterns[4 * sizeof(Compacttype)];
 static Compacttype black_patterns[4 * sizeof(Compacttype)];
+#endif
 
 
 /* Get a random Hashvalue, where all bits are used. */
@@ -73,8 +73,11 @@ void
 hash_init(void)
 {
   int pos;
-  int x;
+  int i;
   struct gg_rand_state state;
+#if FULL_POSITION_IN_HASH
+  int x;
+#endif
 
   if (is_initialized)
     return;
@@ -90,15 +93,17 @@ hash_init(void)
   gg_srand(1);
 #endif
   
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (ON_BOARD(pos)) {
-      black_hash[pos] = hash_rand();
-      white_hash[pos] = hash_rand();
-      ko_hash[pos]    = hash_rand();
-    }
-  
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (ON_BOARD(pos)) {
+	black_hash[pos][i] = hash_rand();
+	white_hash[pos][i] = hash_rand();
+	ko_hash[pos][i]    = hash_rand();
+      }
+
   gg_set_rand_state(&state);
   
+#if FULL_POSITION_IN_HASH
   {
     Compacttype mask;
 
@@ -107,6 +112,7 @@ hash_init(void)
       black_patterns[x] = mask << 1;
     }
   }
+#endif
 
   is_initialized = 1;
 }
@@ -120,6 +126,7 @@ hash_init(void)
  * which are used e.g. by the comparison functions used in qsort().
  */
 
+#if FULL_POSITION_IN_HASH
 int
 hashposition_compare(Hashposition *pos1, Hashposition *pos2)
 {
@@ -160,12 +167,13 @@ hashposition_dump(Hashposition *pos, FILE *outfile)
   else
     gfprintf(outfile, "  Ko position: %1m", pos->ko_pos);
 }
+#endif 		/* FULL_POSITION_IN_HASH */
 
 
 /* ---------------------------------------------------------------- */
 
 
-/* Calculate the compactboard and the hashvalue in one function.
+/* Calculate the compactboard and the hashvalues in one function.
  * They are always used together and it saves us a loop and a function 
  * call.
  */
@@ -173,50 +181,50 @@ hashposition_dump(Hashposition *pos, FILE *outfile)
 void 
 hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 {
-  /* USE_SHIFTING is a (CPU dependent?) optimization.
-   * The theory behind it is that shifting is relatively cheap.
-   * Referencing a precomputed array uses the bus, and might consume 
-   * a cacheslot. 
-   *
-   * FIXME: Do some more measuring.
-   *   Here is the result so far:
-   *   Platform		Speedup (comparing SHIFT to TABLE)
-   *   ------------------------------------------------
-   *   Intel PII	2-3% of total run-time
-   *   SPARC		???
-   */
-
-#define USE_SHIFTING 1
-#if USE_SHIFTING
+#if FULL_POSITION_IN_HASH
   unsigned int index;
-  int pos;
   Compacttype bits;
+#endif
+  int pos;
+  int i;
 
-  target->hashval = 0;
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    target->hashval[i] = 0;
+#if FULL_POSITION_IN_HASH
   bits = 1;
   index = 0;
   target->hashpos.board[index] = 0;
+#endif
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos))
       continue;
     switch (p[pos]) {
       default:
       case EMPTY: 
+#if FULL_POSITION_IN_HASH
 	bits <<= 2;
+#endif
 	break;
       case WHITE:
-	target->hashval ^= white_hash[pos];
+        for (i = 0; i < NUM_HASHVALUES; i++)
+	  target->hashval[i] ^= white_hash[pos][i];
+#if FULL_POSITION_IN_HASH
 	target->hashpos.board[index] |= bits;
 	bits <<= 2;
+#endif
 	break;
       case BLACK:
-	target->hashval ^= black_hash[pos];
+        for (i = 0; i < NUM_HASHVALUES; i++)
+	  target->hashval[i] ^= black_hash[pos][i];
+#if FULL_POSITION_IN_HASH
 	bits <<= 1;
 	target->hashpos.board[index] |= bits;
 	bits <<= 1;
+#endif
 	break;
     }
 
+#if FULL_POSITION_IN_HASH
     if (!bits) {
       /* This means the bit fell off the left side. */
       bits = 1;
@@ -224,84 +232,42 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
       if (index < COMPACT_BOARD_SIZE)
 	target->hashpos.board[index] = 0;
     }
+#endif
   }
 
   /* This cleans up garbage bits at the (unused) end of the array.
    * It probably should not really be necessary.
    */
+#if FULL_POSITION_IN_HASH
   while (++index < COMPACT_BOARD_SIZE)
     target->hashpos.board[index] = 0;
-
-#else /* USE_SHIFTING */
-
-  int index;
-  int subindex;
-  int pos;
-  Compacttype bits;
-
-  target->hashval = 0;
-  index = 0;
-  subindex = 0;
-  bits = 0;
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (!ON_BOARD(pos))
-      continue;
-    switch (p[pos]) {
-    default:
-    case EMPTY: 
-      break;
-    case WHITE:
-      target->hashval ^= white_hash[pos];
-      bits |= white_patterns[subindex];
-      break;
-    case BLACK:
-      target->hashval ^= black_hash[pos];
-      bits |= black_patterns[subindex];
-      break;
-    }
-
-    if (++subindex == POINTSPERCOMPACT) {
-      target->hashpos.board[index++] = bits;
-      bits = 0;
-      subindex = 0;
-    }
-  }
-  
-  if (subindex != 0)
-    target->hashpos.board[index] = bits;
-#endif /* USE_SHIFTING */
+#endif
 
   if (ko_pos != 0)
-    target->hashval ^= ko_hash[ko_pos];
+    for (i = 0; i < NUM_HASHVALUES; i++)
+      target->hashval[i] ^= ko_hash[ko_pos][i];
 
+#if FULL_POSITION_IN_HASH
   target->hashpos.ko_pos = ko_pos;
+#endif
 }
 
 
 /*
- * Set ko in the hash value and hash position.
+ * Set or remove ko in the hash value and hash position.
  */
 
 void
-hashdata_set_ko(Hash_data *hd, int pos)
+hashdata_invert_ko(Hash_data *hd, int pos)
 {
-  hd->hashval ^= ko_hash[pos];
+  int i;
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    hd->hashval[i] ^= ko_hash[pos][i];
+#if FULL_POSITION_IN_HASH
   hd->hashpos.ko_pos = pos;
+#endif
 }
 
-
-/*
- * Remove any ko from the hash value and hash position.
- */
-
-void
-hashdata_remove_ko(Hash_data *hd)
-{
-  if (hd->hashpos.ko_pos != 0) {
-    hd->hashval ^= ko_hash[hd->hashpos.ko_pos];
-    hd->hashpos.ko_pos = 0;
-  }
-}
 
 
 /*
@@ -311,18 +277,27 @@ hashdata_remove_ko(Hash_data *hd)
 void
 hashdata_invert_stone(Hash_data *hd, int pos, int color)
 {
+#if FULL_POSITION_IN_HASH
   int i = I(pos);
   int j = J(pos);
   int index = (i * board_size + j) / POINTSPERCOMPACT;
   int subindex = (i * board_size + j) % POINTSPERCOMPACT;
+#endif
+  int k;
 
   if (color == BLACK) {
-    hd->hashval ^= black_hash[pos];
+    for (k = 0; k < NUM_HASHVALUES; k++)
+      hd->hashval[k] ^= black_hash[pos][k];
+#if FULL_POSITION_IN_HASH
     hd->hashpos.board[index] ^= black_patterns[subindex];
+#endif
   }
   else if (color == WHITE) {
-    hd->hashval ^= white_hash[pos];
+    for (k = 0; k < NUM_HASHVALUES; k++)
+      hd->hashval[k] ^= white_hash[pos][k];
+#if FULL_POSITION_IN_HASH
     hd->hashpos.board[index] ^= white_patterns[subindex];
+#endif
   }
 }
 
@@ -333,6 +308,7 @@ hashdata_invert_stone(Hash_data *hd, int pos, int color)
  * return is the same as for hashposition_compare()
  */
 
+#if FULL_POSITION_IN_HASH
 int
 hashdata_diff_dump(Hash_data *hd1, Hash_data *hd2)
 {
@@ -392,16 +368,25 @@ hashdata_diff_dump(Hash_data *hd1, Hash_data *hd2)
 
   return retval;
 }
+#endif
 
 
 int
 hashdata_compare(Hash_data *hd1, Hash_data *hd2)
 {
-  int rc;
+  int rc = 0;
+  int i;
 
-  rc = (hd1->hashval == hd2->hashval) ? 0 : 2;
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    if (hd1->hashval[i] != hd2->hashval[i]) 
+      rc = 2;
+  if ( rc == 2 && i > 0)
+    stats.hash_collisions++;
+
+#if FULL_POSITION_IN_HASH
   if (rc == 0)
     rc = hashposition_compare(&hd1->hashpos, &hd2->hashpos);
+#endif
 
   return rc;
 }
