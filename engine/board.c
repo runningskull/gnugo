@@ -1021,6 +1021,7 @@ play_move(int pos, int color)
     board_ko_pos = saved_board_ko_pos;
     white_captured = saved_white_captured;
     black_captured = saved_black_captured;
+    new_position();
   }
 
   move_history_color[move_history_pointer] = color;
