@@ -1561,8 +1561,15 @@ examine_cavity(int pos, int *edge)
 
   /* We should have returned now, unless the board is completely empty.
    * Verify that this is the case and then return GRAY_BORDER.
+   *
+   * Notice that the board appears completely empty if there's only a
+   * single string and pos points to it.
    */
-  gg_assert(border_color == EMPTY && stones_on_board(BLACK | WHITE) == 0);
+  gg_assert(border_color == EMPTY
+	    && ((pos == NO_MOVE
+		 && stones_on_board(BLACK | WHITE) == 0)
+		|| (pos != NO_MOVE
+		    && stones_on_board(BLACK | WHITE) == countstones(pos))));
   
   return GRAY_BORDER;
 }

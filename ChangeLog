@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- corrected assertion in examine_cavity()
 - shadowed variables fixed in dragon.c
 - major aftermath code revisions
 - doing_scoring contingent revisions in influence_callback(), shapes(),
