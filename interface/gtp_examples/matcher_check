@@ -79,6 +79,8 @@ my $movenum;
 my $movecount;
 my $move;
 my $toplay;
+my $randseed;
+
 
 my $helpstring = "
 
@@ -97,6 +99,7 @@ Possible matcher_check options:
   --sgffile <filename>			  (file to save games as)
   --loadsgf <filename>			  (file to analyze)
   --movecount <number of moves to check>
+  --randseed <number>			  (sets the random seed)
   --help                                  (show this)
 
 
@@ -112,6 +115,7 @@ GetOptions(
 	   "loadsgf|o=s"	    => \$loadfile,
            "games=i"                => \$games,
 	   "movecount=i"	    => \$movecount,
+	   "randseed=i"		    => \$randseed,
            "help"                   => \$wanthelp,
 );
 
@@ -134,10 +138,6 @@ my $prog_out = new FileHandle;		# stdout of program
 
 if ($loadfile)
 {
-
-    print "--loadsgf not currently supported.\n";
-    exit;
-
     #we need to analyze an sgf file
     if (not defined $movecount) {
 	print "Error: When analyzing an sgf file with --loadsgf <filename>, you also need to
@@ -147,6 +147,14 @@ specify the number of moves to check with --movecount <n>.
     }
     $pidp = open2($prog_out, $prog_in, $program);
     print "program pid: $pidp\n" if $verbose;
+
+    if (defined($randseed)) {
+        print $prog_in "set_random_seed $randseed\n";
+	eat_no_response($prog_out);
+    } else {
+        print $prog_in "get_random_seed\n";
+	print "random seed " . eat_one_line($prog_out) . "\n";
+    }
 
     for ($movenum = 2; $movenum <= $movecount + 1; $movenum++)
     {
@@ -181,6 +189,14 @@ while ($games > 0) {
     eat_no_response($prog_out);
     print $prog_in  "komi $komi\n";
     eat_no_response($prog_out);
+
+    if (defined($randseed)) {
+        print $prog_in "set_random_seed $randseed\n";
+	eat_no_response($prog_out);
+    } else {
+        print $prog_in "get_random_seed\n";
+	print "random seed " . eat_one_line($prog_out) . "\n";
+    }
 
     print SGFFILEHANDLE "(;GM[1]FF[4]RU[Japanese]SZ[$size]HA[$handicap]KM[$komi]"
 	if defined $sgffilename;
