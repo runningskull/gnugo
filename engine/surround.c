@@ -46,6 +46,9 @@
  * the friendly dragon lies within the area marked 1,
  * WEAKLY_SURROUNDED if it lies in the slightly larger area marked 1
  * and 2, and 0 otherwise.
+ *
+ * The notion of weak surroundedness seems to be much less indicative
+ * of a dragon's immanent danger than surroundedness.
  * 
  * An exception: if the larger area contains any stone of a different
  * friendly dragon (which is not DEAD) the return code is 0, unless
@@ -58,12 +61,17 @@
  * If the parameter showboard is 1, the figure is drawn. If showboard
  * is 2, the figure is only drawn if the region is surrounded.  
  *
- * If the parameter cache_answer is not null, the result is saved
- * in the surround_data cache.
+ * If (apos) is NULL, the result is saved in the surround_data cache. 
+ * The assumption is that the function will only be called once
+ * with (apos) null, during make_dragons; thereafter the surroundedness
+ * will be accessed using the function is_surrounded().
+ *
+ * If not *surround_size is not a NULL pointer, then surround_size
+ * returns the 
  */
 
 int
-is_surrounded(int pos, int apos, int showboard, int cache_result)
+compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 {
   int i, j;
   int m, n;
@@ -304,7 +312,7 @@ is_surrounded(int pos, int apos, int showboard, int cache_result)
 	     && board[NORTH(dpos)] == EMPTY
 	     && ON_BOARD(NORTH(NORTH(dpos)))
 	     && board[NORTH(NORTH(dpos))] == color
-	     && !mn[NORTH(NORTH(dpos))]
+	     && mn[NORTH(NORTH(dpos))] != 1
 	     && ON_BOARD(EAST(NORTH(dpos)))
 	     && board[EAST(NORTH(dpos))] != other
 	     && ON_BOARD(WEST(NORTH(dpos)))
@@ -313,7 +321,7 @@ is_surrounded(int pos, int apos, int showboard, int cache_result)
 		&& board[SOUTH(dpos)] == EMPTY
 		&& ON_BOARD(SOUTH(SOUTH(dpos)))
 		&& board[SOUTH(SOUTH(dpos))] == color
-		&& !mn[SOUTH(SOUTH(dpos))]
+		&& mn[SOUTH(SOUTH(dpos))] != 1
 		&& ON_BOARD(EAST(SOUTH(dpos)))
 		&& board[EAST(SOUTH(dpos))] != other
 		&& ON_BOARD(WEST(SOUTH(dpos)))
@@ -322,7 +330,7 @@ is_surrounded(int pos, int apos, int showboard, int cache_result)
 		&& board[EAST(dpos)] == EMPTY
 		&& ON_BOARD(EAST(EAST(dpos)))
 		&& board[EAST(EAST(dpos))] == color
-		&& !mn[EAST(EAST(dpos))]
+		&& mn[EAST(EAST(dpos))] != 1
 		&& ON_BOARD(NORTH(EAST(dpos)))
 		&& board[NORTH(EAST(dpos))] != other
 		&& ON_BOARD(SOUTH(EAST(dpos)))
@@ -331,7 +339,7 @@ is_surrounded(int pos, int apos, int showboard, int cache_result)
 		&& board[WEST(dpos)] == EMPTY
 		&& ON_BOARD(WEST(WEST(dpos)))
 		&& board[WEST(WEST(dpos))] == color
-		&& !mn[WEST(WEST(dpos))]
+		&& mn[WEST(WEST(dpos))] != 1
 		&& ON_BOARD(NORTH(WEST(dpos)))
 		&& board[NORTH(WEST(dpos))] != other
 		&& ON_BOARD(SOUTH(WEST(dpos)))
@@ -370,12 +378,26 @@ is_surrounded(int pos, int apos, int showboard, int cache_result)
       }
     end_draw_board();
   }
-  if (surrounded && cache_result && surround_pointer < MAX_SURROUND) {
+  if (!apos && surrounded && surround_pointer < MAX_SURROUND) {
     memcpy(surroundings[surround_pointer].surround_map, mn, sizeof(mn));
     surroundings[surround_pointer].dragon_number = dragon[pos].id;
     surround_pointer++;
   }
+  if (surround_size) {
+    int pos;
+
+    *surround_size = 0;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (ON_BOARD(pos) && mn[pos] == 1)
+	(*surround_size)++;
+  }
   return surrounded;
+}
+
+int
+is_surrounded(int dr)
+{
+  return(DRAGON2(dr).surround_status);
 }
 
 /* Returns true if (dragon) is not surrounded, but (move) surrounds it.
@@ -386,9 +408,11 @@ does_surround(int move, int dr)
 {
   if (DRAGON2(dr).surround_status)
     return 0;
-  return is_surrounded(dr, move, 0, 1);
+  return compute_surroundings(dr, move, 0, NULL);
 }
 
+
+/* Should be run once per genmove, before make_dragons. */
 
 void
 reset_surround_data(void)
@@ -401,7 +425,6 @@ reset_surround_data(void)
  * (respectively expanded hull boundary) of the surrounding
  * dragons. Returns -1 if the dragon is not found.
  */
-
 int
 surround_map(int dr, int pos)
 {
@@ -413,6 +436,8 @@ surround_map(int dr, int pos)
   return -1;
 }
 
+
+  
 
 
 /*

@@ -371,7 +371,9 @@ void movelist_change_point(int move, int code, int max_points,
 			   int points[], int codes[]);
 
 /* safety.c */
-int is_surrounded(int pos, int apos, int showboard, int cache_result);
+int compute_surroundings(int pos, int apos, int showboard,
+			 int *surround_size);
+int is_surrounded(int pos);
 int does_surround(int move, int dragon);
 void reset_surround_data(void);
 int surround_map(int dr, int pos);
@@ -814,7 +816,7 @@ extern struct worm_data worm[BOARDMAX];
 
 struct surround_data {
   int dragon_number;           /* number of the (surrounded) beast */
-  char surround_map[BOARDMAX]; /* surround map                    */
+  char surround_map[BOARDMAX]; /* surround map                     */
 };
 
 extern struct surround_data surroundings[MAX_SURROUND];
@@ -876,7 +878,8 @@ struct dragon_data2 {
                 /* can be captured easily.                                   */
   int semeai;          /* true if a dragon is part of a semeai               */
   int semeai_margin_of_safety; /* if small, the semeai is close              */
-  int surround_status;         /* Is it surrounded?                         */
+  int surround_status;         /* Is it surrounded?                          */
+  int surround_size;           /* Size of the surrounding area               */
 };
 
 /* dragon2 is dynamically allocated */

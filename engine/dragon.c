@@ -544,8 +544,9 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   time_report(2, "  owl threats ", NO_MOVE, 1.0);
   
   for (d = 0; d < number_of_dragons; d++) {
-    dragon2[d].surround_status = is_surrounded(dragon2[d].origin, 
-					       NO_MOVE, 0, 1);
+    dragon2[d].surround_status 
+      = compute_surroundings(dragon2[d].origin, NO_MOVE, 0,
+			     &(dragon2[d].surround_size));
     if (debug & DEBUG_DRAGONS) {
       if (dragon2[d].surround_status == 1)
 	gprintf ("surrounded dragon found at %1m\n", dragon2[d].origin);

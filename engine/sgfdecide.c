@@ -622,7 +622,7 @@ decide_surrounded(int pos)
   reset_engine();
 
   silent_examine_position(board[pos], EXAMINE_ALL);
-  surround_status = is_surrounded(pos, NO_MOVE, 1, 0);
+  surround_status = compute_surroundings(pos, NO_MOVE, 1, NULL);
   if (surround_status == 1)
     gprintf("the dragon at %1m is SURROUNDED!\n", pos);
   else if (surround_status == 2)
