@@ -44,7 +44,8 @@ static void print_numeric_influence(struct influence_data *q,
 static void print_influence_areas(struct influence_data *q);
  
 /* The following functions are used with experimental_influence is set. */
-static void new_value_territory(struct influence_data *q);
+static void new_value_territory(struct influence_data *q,
+				int m, int n, int color);
 static void enter_intrusion_source(int source_pos, int strength_pos,
                                    float strength, float attenuation,
                                    struct influence_data *q);
@@ -410,6 +411,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 		    || (dragons_known
 			&& dragon[pos].id != -1
 			&& (DRAGON2(pos).safety == DEAD
+			    || DRAGON2(pos).safety == TACTICALLY_DEAD
 			    || (DRAGON2(pos).safety == CRITICAL
 				&& board[pos] == OTHER_COLOR(color))))))) {
 	  if (q->p[i][j] == WHITE)
@@ -422,6 +424,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 		 || !dragons_known
 		 || dragon[pos].id == -1
 		 || (DRAGON2(pos).safety != DEAD
+		     && DRAGON2(pos).safety != TACTICALLY_DEAD
 		     && DRAGON2(pos).safety != CRITICAL)
 		 || (DRAGON2(pos).safety == CRITICAL
 		     && board[pos] == color)) {
@@ -445,6 +448,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 	    && (DRAGON2(pos).safety == INESSENTIAL
 	        || (worm[pos].inessential
 		    && ((DRAGON2(pos).safety != DEAD
+			 && DRAGON2(pos).safety != TACTICALLY_DEAD
 		         && DRAGON2(pos).safety != CRITICAL)
 		        || (DRAGON2(pos).safety == CRITICAL
 		            && board[pos] == color)))) 
@@ -1266,7 +1270,7 @@ struct interpolation_data territory_correction =
   { 5, (float) 0.0, 1.0, {0.0, 0.25, 0.45, 0.65, 0.85, 1.0}};
 
 static void
-new_value_territory(struct influence_data *q)
+new_value_territory(struct influence_data *q, int m, int n, int color)
 {
   int i, j;
   int dist_i, dist_j;
@@ -1378,6 +1382,16 @@ new_value_territory(struct influence_data *q)
 	  q->territory_value[i][j] -= 1.0;
       }
     }
+
+  /* Final correction. Never count the last played move as territory
+   * for the color playing it. Ideally this should never happen, but
+   * currently we need this workaround.
+   */
+  ASSERT2(color == EMPTY || ON_BOARD2(m, n), m, n);
+  if (color == BLACK && q->territory_value[m][n] < 0.0)
+    q->territory_value[m][n] = 0.0;
+  else if (color == WHITE && q->territory_value[m][n] > 0.0)
+    q->territory_value[m][n] = 0.0;
 }
 
 /* Give territorial value to each vertex.
@@ -1652,7 +1666,7 @@ compute_initial_influence(int color, int dragons_known)
 		    dragons_known, NULL, NULL);
   if (dragons_known) {
     if (experimental_influence)
-      new_value_territory(&initial_influence);
+      new_value_territory(&initial_influence, -1, -1, EMPTY);
     else
       value_territory(&initial_influence);
     if ((printmoyo & PRINTMOYO_VALUE_TERRITORY)
@@ -1789,12 +1803,15 @@ compute_move_influence(int m, int n, int color,
       compute_followup_influence(m, n, color, saved_stones);
     decrease_depth_values();
     popgo();
+
     if (experimental_influence) {
-      new_value_territory(&move_influence);
-      new_value_territory(&followup_influence);
+      new_value_territory(&move_influence, m, n, color);
+      new_value_territory(&followup_influence, m, n, color);
     }
     else
       value_territory(&move_influence);
+
+
     if (m == debug_influence_i
 	&& n == debug_influence_j && m >= 0) {
       if (printmoyo & PRINTMOYO_VALUE_TERRITORY)

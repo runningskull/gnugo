@@ -49,9 +49,7 @@ static int initial_influence_examined = -1;
 static int dragons_examined_without_owl = -1;
 static int dragons_examined = -1;
 static int initial_influence2_examined = -1;
-#if 0
-static int opponent_not_passing(int color, int score);
-#endif
+
 static int revise_semeai(int color);
 static int revise_thrashing_dragon(int color, float advantage);
 
@@ -293,33 +291,6 @@ genmove_conservative(int *i, int *j, int color)
   return retval;
 }
 
-
-#if 0
-
-/* If we're way ahead, and opponent has not been passing when we
- * think there are not even dame left, let's start playing aftermath
- * moves, too.  This funtion returns 1 if we should play an aftermath
- * or capturing move.
- * See, disaster in games/nngs/gnugo-3.1.22-heeroy-200201252006.sgf
- * See also TurboGo in the 2001 European Congress (Dublin), where GNU
- *   Go took some really unnecessary risks in passing over & over.
- *   http://www.britgo.org/results/computer/egc01/tg-gg.sgf
- */
-static int
-opponent_not_passing(int color, int score)
-{
-  /* Feel free to pass if we're losing. */
-  if ((color == BLACK && score > 0)
-      || (color == WHITE && score < 0))
-    return 0;
-
-  /*FIXME: re-implement... My initial approach caused many
-   * failures in filllib.tst - tm */
-  return 0;
- /*(last_moves[0] != NO_MOVE*/
-}
-
-#endif
 
 /* 
  * Perform the actual move generation. 

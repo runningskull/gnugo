@@ -2,6 +2,18 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- aftermath revisions
+- combination of --score aftermath and -o options more useful
+- dead function opponent_not_passing() removed from genmove.c
+- init_influence() and new_value_territory() revised
+- sgftree_printboard() made global
+- bugfix in owl_hotspots()
+- valuation of attack threats revised to allow more ko threats
+- bugfix in estimate_strategical_value()
+- solid string connection bonus revised to also favor cuts of opponent
+- play_gtp() starts with boardsize of board loaded with -l instead of
+  always 19 
+- no warning by default for FF[1] sgf game records
 - bugfix in push_owl
 - corrected assertion in examine_cavity()
 - shadowed variables fixed in dragon.c

@@ -367,8 +367,6 @@ sgffile_printboard(int next)
  * ================================================================ */
 
 
-static void sgftree_printboard(SGFTree *tree);
-
 /*
  * begin_sgftreedump begins storing all moves considered by
  * trymove and tryko in an sgf tree in memory.
@@ -413,7 +411,7 @@ end_sgftreedump(const char *filename)
  * sgftree_printboard adds the current board position to the tree.
  */
 
-static void
+void
 sgftree_printboard(SGFTree *tree)
 {
   int i, j;

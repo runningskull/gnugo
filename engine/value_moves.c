@@ -28,7 +28,6 @@
 
 #include "liberty.h"
 #include "gg_utils.h"
-#include "random.h"
 #include "move_reasons.h"
 
 
@@ -1311,7 +1310,8 @@ estimate_territorial_value(int pos, int color, float score)
        * of each type.
        *
        * No followup value is awarded if the defense move is a threat
-       * back on our move because we're likely to end in gote then.
+       * back on our move because we're likely to end in gote then,
+       * unless the move is unsafe anyway and played as a ko threat.
        *
        * FIXME: It might be possible that parts of the dragon
        *        can be cut in the process of capturing the (aa)
@@ -1347,12 +1347,15 @@ estimate_territorial_value(int pos, int color, float score)
 	  num_adj = chainlinks(aa, adjs);
 
 	/* No followup value if string can be defended with threat
-         * against our move.
+         * against our move. An exception to this is when our move
+         * isn't safe anyway and we play this only for the followup
+         * value, typically as a ko threat.
 	 *
 	 * FIXME: This is somewhat halfhearted since only one defense
 	 * move is tested.
 	 */
 	if (board[aa] != EMPTY
+	    && move[pos].move_safety == 1
 	    && find_defense(aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
 	  if (trymove(defense_move, other,
@@ -1366,7 +1369,7 @@ estimate_territorial_value(int pos, int color, float score)
 	    popgo();
 	  }
 	}
-	
+
 	for (s = 0; s < num_adj; s++) {
 	  int adj = adjs[s];
 
@@ -1381,6 +1384,22 @@ estimate_territorial_value(int pos, int color, float score)
 	      && 2*worm[adj].effective_size > adjustment_down)
 	    adjustment_down = 2*worm[adj].effective_size;
 	}
+
+	popgo();
+
+	/* No followup if the string is not substantial. */
+	{
+	  int save_verbose = verbose;
+	  if (verbose > 0)
+	    verbose --;
+	  if (move[pos].move_safety == 0
+	      && !owl_substantial(aa)) {
+	    verbose = save_verbose;
+	    break;
+	  }
+	  verbose = save_verbose;
+	}
+	
 	adjusted_value += adjustment_up;
 	adjusted_value -= adjustment_down;
 	if (adjusted_value > 0.0) {
@@ -1389,7 +1408,6 @@ estimate_territorial_value(int pos, int color, float score)
 	  TRACE("%1m:   %f (followup) - threatens to capture %1m\n",
 		pos, adjusted_value, aa);
 	}
-	popgo();
       }
       break;
 
@@ -1704,7 +1722,12 @@ estimate_strategical_value(int pos, int color, float score)
   /* Strategical value of connecting or cutting dragons. */
   static float dragon_value[MAX_DRAGONS];
 
-  for (k = 0; k < next_dragon; k++)
+  /* This loop used to be up to next_dragon, but that is not safe
+   * because while doing the computations below, next_dragon might
+   * increase (through calls to find_dragon()). Thus we could then
+   * reference improperly initialized memory.
+   */
+  for (k = 0; k < MAX_DRAGONS; k++)
     dragon_value[k] = 0.0;
   
   for (k = 0; k < MAX_REASONS; k++) {
@@ -2276,8 +2299,11 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       }
     }
 
-    /* Add a special shape bonus for moves which connect strings. */
-    c = move_connects_strings(pos, color);
+    /* Add a special shape bonus for moves which connect own strings
+     * or cut opponent strings.
+     */
+    c = (move_connects_strings(pos, color)
+	 + move_connects_strings(pos, OTHER_COLOR(color)));
     if (c > 0) {
       float shape_factor2 = pow(1.02, (float) c) - 1;
       float base_value = gg_max(gg_min(tot_value, 5.0), 1.0);

@@ -2533,6 +2533,24 @@ XOO
 :8,X,shape(1)
 
 
+Pattern Shape82
+# gf New pattern. (3.1.32) (see trevorb:280)
+
+|XXO        Prefer this as ko threat since it gives a second one
+|.*X
+|.X?
+|.??
+
+:8,Xs,shape(2)
+
+|AAO
+|.*X
+|.X?
+|b??
+
+;!weak(A) && lib(A)==2 && xterri(b)
+
+
 ###########################
 #
 # Followup moves. 

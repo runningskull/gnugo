@@ -801,7 +801,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 	    if (countlib(origin) < 3 && attack(origin, &upos)) {
 	      *resulta = ALIVE;
 	      *resultb = DEAD;
-	      if (move) *move = upos;
+	      if (move)
+		*move = upos;
 	      sgf_dumptree = save_sgf_dumptree;
 	      count_variations = save_count_variations;
 	      SGFTRACE2(upos, ALIVE, "tactical win found");
@@ -4979,6 +4980,7 @@ owl_hotspots(float values[BOARDMAX])
       break;
     case OWL_DOES_DEFEND:
     case OWL_DOES_ATTACK:
+    case OWL_CONFIRM_SAFETY:
       mark_dragon_hotspot_values(values, entry->bpos,
 				 contribution, entry->board);
       break;

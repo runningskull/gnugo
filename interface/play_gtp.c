@@ -248,8 +248,7 @@ play_gtp(FILE *gtp_input, int gtp_initial_orientation)
 #endif
 
   /* Inform the GTP utility functions about the board size. */
-  board_size = 19;
-  gtp_internal_set_boardsize(19);
+  gtp_internal_set_boardsize(board_size);
   gtp_orientation = gtp_initial_orientation;
   gtp_set_vertex_transform_hooks(rotate_on_input, rotate_on_output);
   
@@ -1336,7 +1335,7 @@ gtp_tactical_analyze_semeai(char *s, int id)
   silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
-      reading_cache_clear();
+    reading_cache_clear();
 
   owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 0);
   gtp_printid(id, GTP_SUCCESS);
@@ -1900,7 +1899,7 @@ finish_and_score_game(int seed)
     next = OTHER_COLOR(next);
   } while (pass < 2 && moves < board_size * board_size);
 
-  final_score = aftermath_compute_score(next, komi);
+  final_score = aftermath_compute_score(next, komi, NULL);
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       final_status[i][j] = aftermath_final_status(next, POS(i, j));

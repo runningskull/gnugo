@@ -442,7 +442,7 @@ int genmove(int *i, int *j, int color);
 int genmove_conservative(int *i, int *j, int color);
 
 /* Play through the aftermath. */
-float aftermath_compute_score(int color, float komi);
+float aftermath_compute_score(int color, float komi, SGFTree *tree);
 int aftermath_final_status(int color, int pos);
 
 /* Basic information gathering. */

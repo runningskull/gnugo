@@ -27,6 +27,8 @@
 #include <string.h>
 #include "liberty.h"
 
+SGFTree *aftermath_sgftree;
+
 /* Generate a move to definitely settle the position after the game
  * has been finished. The purpose of this is to robustly determine
  * life and death status and to distinguish between life in seki and
@@ -75,6 +77,18 @@
  * In order to remove the O stones, it is necessary to play on one of
  * the inner liberties, but one of them lets O live. Thus we have to
  * check carefully for blunders at this step.
+ *
+ * Update: Step 0 is only safe against blunders if care is taken not
+ *         to get into a shortage of liberties.
+ *         Step 5 also has some risks. Consider this position:
+ *
+ *         |XXXXX.
+ *         |OOOOXX
+ *         |..O.OX
+ *         |OX*OOX
+ *         +------
+ *
+ *         Playing at * allows X to make seki.
  *
  * IMPORTANT RESTRICTION:
  * Before calling this function it is mandatory to call genmove() or
@@ -232,10 +246,13 @@ aftermath_genmove(int *aftermath_move, int color,
     
     for (k = 0; k < 4; k++) {
       int dir = delta[k];
+      int right = delta[(k+1)%4];
       if (!ON_BOARD(pos - dir)
 	  && board[pos + dir] == color
+	  && board[pos + dir + right] == other
+	  && board[pos + dir - right] == other
 	  && (libs > countlib(pos + dir)
-	      || (libs >= 4
+	      || (libs > 4
 		  && libs == countlib(pos + dir)))
 	  && (DRAGON2(pos + dir).safety == INVINCIBLE
 	      || DRAGON2(pos + dir).safety == STRONGLY_ALIVE)) {
@@ -592,6 +609,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	score[move] = 0;
       else {
 	*aftermath_move = move;
+	DEBUG(DEBUG_AFTERMATH, "Splitting eyespace at %1m\n", move);
 	return 1;
       }
     }
@@ -602,11 +620,13 @@ aftermath_genmove(int *aftermath_move, int color,
    * dragons, carefully checking against mistakes.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int bb;
+    int move;
+    int target;
+    int cc = NO_MOVE;
     int self_atari_ok = 0;
     if (board[pos] != EMPTY || distance[pos] != -1)
       continue;
-    move = NO_MOVE;
+    target = NO_MOVE;
     for (k = 0; k < 4; k++) {
       int pos2 = pos + delta[k];
       if (!ON_BOARD(pos2))
@@ -616,18 +636,18 @@ aftermath_genmove(int *aftermath_move, int color,
 	  && (do_capture_dead_stones 
 	      || worm[pos2].unconditional_status != DEAD)
 	  && DRAGON2(pos2).safety != INESSENTIAL) {
-	move = pos2;
+	target = pos2;
 	break;
       }
     }
-    if (move == NO_MOVE)
+    if (target == NO_MOVE)
       continue;
     
-    /* At this point, (m, n) is a move that potentially may capture
-     * a dead opponent string at (move).
+    /* At this point, (pos) is a move that potentially may capture
+     * a dead opponent string at (target).
      */
     
-    if (!trymove(pos, color, "aftermath-A", move, EMPTY, NO_MOVE))
+    if (!trymove(pos, color, "aftermath-A", target, EMPTY, NO_MOVE))
       continue;
     
     /* It is frequently necessary to sacrifice own stones in order
@@ -652,21 +672,19 @@ aftermath_genmove(int *aftermath_move, int color,
      * |.O.OX
      * +-----
      */
+
+    self_atari_ok = 1;
+    for (k = 0; k < 4; k++) {
+      if (board[pos + delta[k]] == color
+	  && DRAGON2(pos + delta[k]).safety != INESSENTIAL) {
+	self_atari_ok = 0;
+	cc = pos + delta[k];
+	break;
+      }
+    }
     
-    if ((board[SOUTH(pos)] == color
-	 && DRAGON2(SOUTH(pos)).safety != INESSENTIAL)
-	|| (board[WEST(pos)] == color
-	    && DRAGON2(WEST(pos)).safety != INESSENTIAL)
-	|| (board[NORTH(pos)] == color
-	    && DRAGON2(NORTH(pos)).safety != INESSENTIAL)
-	|| (board[EAST(pos)] == color
-	    && DRAGON2(EAST(pos)).safety != INESSENTIAL))
-      self_atari_ok = 0;
-    else
-      self_atari_ok = 1;
-    
-    /* Copy the potential move to (bb). */
-    bb = pos;
+    /* Copy the potential move to (move). */
+    move = pos;
     
     /* If the move is a self atari, but that isn't okay, try to
      * recursively find a backfilling move which later makes the
@@ -676,19 +694,19 @@ aftermath_genmove(int *aftermath_move, int color,
       while (countlib(pos) == 1) {
 	int lib;
 	findlib(pos, 1, &lib);
-	bb = lib;
-	if (!trymove(bb, color, "aftermath-B", move, EMPTY, NO_MOVE))
+	move = lib;
+	if (!trymove(move, color, "aftermath-B", target, EMPTY, NO_MOVE))
 	  break;
       }
       
       if (countlib(pos) == 1)
-	bb = NO_MOVE;
+	move = NO_MOVE;
     }
 
     while (stackp > 0)
       popgo();
     
-    if (bb == NO_MOVE)
+    if (move == NO_MOVE)
       continue;
       
     /* Make sure that the potential move really isn't a self
@@ -696,14 +714,27 @@ aftermath_genmove(int *aftermath_move, int color,
      * could happen (because the backfilling moves happened to
      * capture some stones).
      */
-    if (!self_atari_ok && is_self_atari(bb, color))
+    if (!self_atari_ok && is_self_atari(move, color))
       continue;
     
     /* Consult the owl code to determine whether the considered move
      * really is effective. Blunders should be detected here.
      */
-    if (owl_does_attack(bb, move) == WIN) {
-      *aftermath_move = bb;
+    if (owl_does_attack(move, target) == WIN) {
+      /* If we have an adjacent own dragon, which is not inessential,
+       * verify that it remains safe.
+       */
+      if (cc != NO_MOVE && !owl_does_defend(move, cc))
+	continue;
+
+      /* If we don't allow self atari, also call confirm safety to
+       * avoid setting up combination attacks.
+       */
+      if (!self_atari_ok && !confirm_safety(move, color, 0, NULL, NULL, NULL))
+	continue;
+	  
+      *aftermath_move = move;
+      DEBUG(DEBUG_AFTERMATH, "Filling opponent liberty at %1m\n", move);
       return 1;
     }
   }
@@ -736,6 +767,8 @@ aftermath_genmove(int *aftermath_move, int color,
 	&& worm[pos].attack_codes[0] != 0
 	&& !is_illegal_ko_capture(worm[pos].attack_points[0], color)) {
       *aftermath_move = worm[pos].attack_points[0];
+      DEBUG(DEBUG_AFTERMATH, "Tactically attack %1m at %1m\n",
+	    pos, *aftermath_move);
       return 1;
     }
   }
@@ -849,12 +882,19 @@ do_play_aftermath(int color, struct aftermath_data *a)
     int reading_nodes = get_reading_node_counter();
     int owl_nodes = get_owl_node_counter();
     int move_val = reduced_genmove(&move, color_to_play);
-    if (move_val < 0)
+    if (move_val < 0) {
+      int save_verbose = verbose;
+      if (verbose > 0)
+	verbose--;
       move_val = aftermath_genmove(&move, color_to_play,
 				   (color_to_play == WHITE ?
 				    a->white_control : a->black_control),
 				   0);
+      verbose = save_verbose;
+    }
     play_move(move, color_to_play);
+    if (aftermath_sgftree)
+      sgftreeAddPlay(aftermath_sgftree, NULL, color_to_play, I(move), J(move));
     moves++;
     DEBUG(DEBUG_AFTERMATH, "%d %C move %1m (nodes %d, %d  total %d, %d)\n",
 	  movenum, color_to_play, move, get_owl_node_counter() - owl_nodes,
@@ -962,9 +1002,10 @@ play_aftermath(int color)
 }
 
 float
-aftermath_compute_score(int color, float komi)
+aftermath_compute_score(int color, float komi, SGFTree *tree)
 {
   struct aftermath_data *a = &aftermath;
+  aftermath_sgftree = tree;
   play_aftermath(color);
   if (chinese_rules)
     return (a->white_area
@@ -988,6 +1029,7 @@ int
 aftermath_final_status(int color, int pos)
 {
   ASSERT_ON_BOARD1(pos);
+  aftermath_sgftree = NULL;
   play_aftermath(color);
   return aftermath.final_status[pos];
 }

@@ -11121,15 +11121,35 @@ cb.
 ; xplay_attack(a,b,c,c) && !oplay_attack(*,a,b,c,c)
 
 
-Pattern CD104
+Pattern CD104a
 # gf Revised constraint.
+# gf Split pattern. We can't have eE classification unless b is alive. (3.1.32)
 
 ...          atari using dead stone
 .*.
 OX.
 XO?
 
-:8,deE,shape(3)
+:8,deE
+
+...
+.*.
+bX.
+XA?
+
+;lib(b)>1 && alive(b) && attack(A) && !defend(A)
+
+
+Pattern CD104b
+# gf Revised constraint.
+# gf Split pattern. We can't have eE classification unless b is alive. (3.1.32)
+
+...          atari using dead stone
+.*.
+OX.
+XO?
+
+:8,d,shape(3)
 
 ...
 .*.

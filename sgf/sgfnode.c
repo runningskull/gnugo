@@ -981,7 +981,7 @@ readsgffilefuseki(const char *filename, int moves_per_game)
     if (VERBOSE_WARNINGS)
       fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
   }
-  else if (tmpi < 3 || tmpi > 4)
+  else if ((tmpi < 3 || tmpi > 4) && VERBOSE_WARNINGS)
     fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
 
   return root;
@@ -1035,7 +1035,7 @@ readsgffile(const char *filename)
     if (VERBOSE_WARNINGS)
       fprintf(stderr, "Can not determine SGF spec version (FF)!\n");
   }
-  else if (tmpi < 3 || tmpi > 4)
+  else if ((tmpi < 3 || tmpi > 4) && VERBOSE_WARNINGS)
     fprintf(stderr, "Unsupported SGF spec version: %d\n", tmpi);
 
   return root;
