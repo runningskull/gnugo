@@ -12,7 +12,7 @@ loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 42
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 48
 40 reg_genmove black
-#? [!D2]*
+#? [!D2]
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 62
 50 reg_genmove black
@@ -211,7 +211,7 @@ loadsgf games/ninestones/ninestones1.sgf 90
 # J2 is better than H2
 loadsgf games/splee.sgf 62
 640 reg_genmove black
-#? [J2|H2]*
+#? [J2|H2]
 
 loadsgf games/ninestones/emanuel-1.sgf 182
 650 reg_genmove black
@@ -219,7 +219,7 @@ loadsgf games/ninestones/emanuel-1.sgf 182
 
 loadsgf games/ninestones/emanuel-1.sgf 200
 660 reg_genmove black
-#? [P1]*
+#? [P1]
 
 #this is a persistent cache problem
 loadsgf games/ninestones/emanuel-2.sgf 112

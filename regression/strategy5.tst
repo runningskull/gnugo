@@ -147,7 +147,7 @@ loadsgf games/self_play/354-34-1.sgf 180
 
 loadsgf games/self_play/354-34-3.sgf 194
 287 reg_genmove white
-#? [C2]
+#? [C2]*
 
 
 ############ End of Tests #################

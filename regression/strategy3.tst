@@ -68,7 +68,7 @@ loadsgf games/me.sgf 150
 
 loadsgf games/poka.sgf 42
 114 reg_genmove white
-#? [D7]
+#? [D7]*
 
 loadsgf games/poka.sgf 52
 115 reg_genmove white

@@ -72,7 +72,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 100
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 168
 170 reg_genmove black
-#? [S6]*
+#? [S6]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 184
 190 reg_genmove black
@@ -94,7 +94,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
 # Kill the whole thing, not just a piece.
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 222
 230 reg_genmove black
-#? [Q18]*
+#? [Q18]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 242
 240 reg_genmove black
@@ -275,7 +275,7 @@ loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 16
 
 loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 42
 650 reg_genmove black
-#? [Q2]*
+#? [Q2]
 
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 4
 660 reg_genmove black
@@ -453,7 +453,7 @@ loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 78
 #S12 seems to live in ko
 loadsgf games/nngs/gnugo-3.5.3-JanErik-200401081615.sgf 90
 1040 restricted_genmove white T13 S12
-#? [S12]*
+#? [S12]
 
 loadsgf games/nngs/ccwills-gnugo-3.5.3-200401100810.sgf 55
 1050 reg_genmove black

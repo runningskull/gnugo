@@ -421,7 +421,7 @@ loadsgf games/life_and_death/invasion1.sgf
 502 owl_defend R17
 #? [1 (R14|S14|R16)]
 503 owl_defend R3
-#? [1 S2]
+#? [1 S2]*
 504 owl_attack C3
 #? [1 B1]
 
@@ -431,21 +431,21 @@ loadsgf games/life_and_death/invasion2.sgf
 506 owl_defend R17
 #? [1 S16]
 507 owl_defend R3
-#? [1 S2]
+#? [1 S2]*
 508 owl_defend R5
 #? [1 (S2|S7)]
 509 owl_defend C5
-#? [1 A5]
+#? [1 A5]*
 
 loadsgf games/life_and_death/invasion3.sgf
 510 owl_defend C15
-#? [1 B15]
+#? [1 B15]*
 511 owl_defend R15
-#? [1 (R12|R11)]
+#? [1 (R12|R11)]*
 512 owl_defend R3
 #? [1 S5]
 513 owl_defend C3
-#? [1 C2]
+#? [1 C2]*
 
 loadsgf games/life_and_death/invasion4.sgf
 514 owl_defend C17
@@ -455,7 +455,7 @@ loadsgf games/life_and_death/invasion4.sgf
 516 owl_defend R3
 #? [1 S2]
 517 owl_defend C3
-#? [1 C8]
+#? [1 C8]*
 
 
 # Report number of nodes visited by the tactical reading

@@ -113,4 +113,4 @@ play black T14
 
 loadsgf games/self_play/354-34-2.sgf 150
 26 combination_defend white
-#? [E11|E12]
+#? [E11|E12]*
