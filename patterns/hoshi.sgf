@@ -411,9 +411,16 @@ C[S];W[sg]MA[mi]C[S];B[nc]MA[mi]C[S])
 
 (;W[pe]
 (;B[qe]LB[oe:A][qd:B][pf:C]MA[mi]C[;!oplay_attack(*,A,B,C)
-];W[oe];
-B[qd]MA[mi];W[qg];B[nd]MA[mi];W[ne];B[me]MA[li];W[od];B[oc]MA[li];
+];W[oe]
+(;B[qd]MA[mi];W[qg];B[nd]MA[mi];W[ne];B[me]MA[li];W[od];B[oc]MA[li];
 W[og];B[md]MA[li])
+
+(;B[re]MA[mi]C[0
+])
+
+(;B[pg]MA[mi]C[0
+])
+)
 
 (;B[oe]MA[mi]LB[qe:A][qd:B][pf:C]C[;!oplay_attack(A,*,B,C)
 ];W[qe]

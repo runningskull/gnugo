@@ -1329,6 +1329,7 @@ aO
 Pattern Shape3
 # tm modified (3.1.23) (reduce shape penalty)
 #  see blunder:15, trevord:800
+# gf Revised constraint. (3.3.17)
 
 O*      dango
 OO
@@ -1338,7 +1339,7 @@ OO
 O*
 OO
 
-;!ko(*)
+;!ko(*) && !o_captures_something(*)
 
 
 Pattern Shape4
@@ -2961,6 +2962,29 @@ Oba
 ;&& (safe_xmove(b) || safe_xmove(c))
 ;&& oplay_attack(*,b,b)==WIN
 ;&& oplay_attack(*,c,c)==WIN
+# Action adds a reverse followup value.
+>defend_against_atari(a)
+
+
+Pattern Sente13d
+# gf New pattern. (3.3.17)
+
+..X
+*.O
+..O
+oOX
+
+:8,sO
+
+..X
+*ca
+.ba
+oOX
+
+;lib(a) == 2 && !attack(a) && safe_omove(*)
+;&& safe_xmove(*)
+;&& !oplay_defend(*,b,c,b)
+;&& xplay_attack(*,a)
 # Action adds a reverse followup value.
 >defend_against_atari(a)
 

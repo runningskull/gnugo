@@ -2061,7 +2061,7 @@ xX
 !Q
 X?
 
-:8,BF,value(30)
+:8,B,value(30)
 
 xX
 ab
@@ -2070,6 +2070,24 @@ X?
 ;safe_omove(a)
 
 >return !xplay_attack(a,b);
+
+
+Pattern Intrusion58
+# gf New pattern (3.3.17)
+
+XOoo
+.XQo
+..X!
+?..!
+
+:8,B,value(30)
+
+Xgoo
+bXfo
+.aXc
+?.de
+
+;!oplay_disconnect(f,g) && !oplay_disconnect(a,b,c,d,e,c,f)
 
 
 Pattern Nonterritory1
@@ -3032,6 +3050,22 @@ Xcef
 >non_xterritory(d);
 >non_xterritory(e);
 >non_xterritory(f);
+
+
+Pattern Nonterritory47
+# gf New pattern. (3.3.17)
+
+?ooo?
+X...X
+
+:|,t
+
+?ooo?
+CaebD
+
+;!oplay_attack(a,C) && !oplay_attack(b,D)
+
+>non_oterritory(e);
 
 
 # END OF FILE

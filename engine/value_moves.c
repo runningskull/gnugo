@@ -2896,7 +2896,7 @@ reevaluate_ko_threats(int ko_move, int color)
        */
       if (type == -1)
         threat_does_work = 1;
-      else
+      else {
         if (trymove(pos, color, "reevaluate_ko_threats", ko_move,
                     EMPTY, ko_move)) {
 	  ASSERT_ON_BOARD1(ko_stone);
@@ -2923,10 +2923,21 @@ reevaluate_ko_threats(int ko_move, int color)
                 threat_does_work = (ko_move_target != what);
               }
               popgo();
+
+	      /* Is this a losing ko threat? */
+	      if (threat_does_work && type == ATTACK_THREAT) {
+		int apos;
+		if (attack(pos, &apos)
+		    && does_defend(apos, what)
+		    && !is_proper_eye_space(apos)) {
+		  threat_does_work = 0;
+		}
+	      }
             }
           }
           popgo();
         }
+      }
  
       if (threat_does_work) {
 	TRACE("%1m: %f + %f = %f\n", pos, move[pos].value,

@@ -1185,8 +1185,9 @@ O..*..cdx
 
 
 Pattern F411
+# gf Revised pattern. (3.3.17)
 
-??...??       extend between two stones on 4-th line
+.......       extend between two stones on 4-th line
 O..*..O
 .......
 .......

@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- reevaluate_ko_threats() revised
+- new helper backfill_replace
+- influence tuning
+- tuning
+- joseki tuning
 - revisions of twogtp.py
 - bugfix in play_move()
 - improved output files from scoring mode

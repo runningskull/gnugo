@@ -792,6 +792,23 @@ adjacent_to_defendable_stone_in_atari(int str)
   return 0;
 }
 
+
+void
+backfill_replace(int move, int str)
+{
+  int defense_move = NO_MOVE;
+
+  if (TRYMOVE(move, OTHER_COLOR(board[str]))) {
+    if (attack_and_defend(str, NULL, NULL, NULL, &defense_move)) {
+      /* Must undo the trymove before adding the replacement move. */
+      popgo();
+      add_replacement_move(move, defense_move);
+    }
+    else
+      popgo();
+  }
+}
+
 /*
  * LOCAL Variables:
  * tab-width: 8
