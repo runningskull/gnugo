@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- TRACE macros and friends unified
 - matchpat.c converted to 1D
 - strategic bonus for connecting critical dragons out reintroduced
 - strategic effect on critical dragon ignored unless move has owl move reason

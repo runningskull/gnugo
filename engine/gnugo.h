@@ -361,34 +361,21 @@ double gg_gettimeofday(void);
 /* influence.c */
 void debug_influence_move(int i, int j);
 
+
+#define TRACE  (!(verbose)) ? (void)0 : (void)gprintf
+#define RTRACE (!(verbose >= 3)) ? (void)0 : (void)gprintf
+#define VTRACE (!(verbose >= 4)) ? (void)0 : (void)gprintf
+
 #ifdef HAVE_VARIADIC_DEFINE
 
 /* gnuc allows variadic macros, so the tests can be done inline */
-#define TRACE(fmt, args...) \
-    do { if (verbose) gprintf(fmt, ##args); } while (0)
-#define RTRACE(fmt, args...) \
-    do { if (verbose >= 3) gprintf(fmt, ##args); } while (0)
-#define VTRACE(fmt, args...) \
-    do { if (verbose >= 4) gprintf(fmt, ##args); } while (0)
 #define DEBUG(level, fmt, args...) \
     do { if ((debug & (level))) gprintf(fmt, ##args); } while (0)
 
 #else /*HAVE_VARIADIC_DEFINE*/
 
-/* Using these without assignment causes compiler warnings on some systems. */
-extern int trace_dummy;
-# ifdef HAVE_VISUAL_C
-#  define TRACE_ASSIGN 
-# else
-#  define TRACE_ASSIGN trace_dummy =
-# endif
-
-#define TRACE  TRACE_ASSIGN (verbose) && gprintf
-#define RTRACE TRACE_ASSIGN (verbose >= 3) && gprintf
-#define VTRACE TRACE_ASSIGN (verbose >= 4) && gprintf
 /* if debug == 0, then can skip the function call. */
-#define DEBUG  TRACE_ASSIGN (debug) && DEBUG_func
-
+#define DEBUG  (!(debug)) ? (void)0 : (void)DEBUG_func
 int DEBUG_func(int level, const char *fmt, ...);
 
 #endif  /*HAVE_VARIADIC_DEFINE*/
