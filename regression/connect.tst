@@ -145,7 +145,7 @@ loadsgf golois/Goemate990906-1.sgf
 
 loadsgf golois/Goemate990906-2.sgf
 35 disconnect N14 M15
-#? [0]
+#? [0]*
 
 loadsgf golois/Goemate990908-2.sgf
 36 disconnect C14 C17

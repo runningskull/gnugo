@@ -44,7 +44,7 @@ loadsgf games/nando/auto007.sgf
 white A1
 black B5
 9 gg_genmove white
-#? [E1|E2|F1|G1|G2]
+#? [E1|E2|F1|G1|G2]*
 
 # GG (as of 3.3.15) doesn't even try a single move. On the other
 # side, GG doesn't have (yet) any mechanism for detecting a
@@ -52,49 +52,49 @@ black B5
 #CATEGORY=OWL
 loadsgf games/nando/auto008.sgf
 10 owl_defend D12
-#? [1 (C11|F11|C12)]
+#? [1 (C11|F11|C12)]*
 
 #CATEGORY=OWL/OPTICS
 loadsgf games/nando/auto009.sgf
 11 owl_attack S8
-#? [1 (S2|T2|S1)]
+#? [1 (S2|T2|S1)]*
 
 #CATEGORY=OWL/OPTICS
 loadsgf games/nando/auto010.sgf
 12 owl_defend L17
-#? [1 (K19|L18|K18|H19)]
+#? [1 (K19|L18|K18|H19)]*
 
 #CATEGORY=OWL/OPTICS
 # (If white B2 in reply to B1, Black A1 kills cleanly. /ab)
 loadsgf games/nando/auto011.sgf
 13 owl_attack A4
-#? [1 B1]
+#? [1 B1]*
 
 # W should better counter-attack
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto012.sgf 90
 14 gg_genmove white
-#? [P7]
+#? [P7]*
 
 # Still the better choice, S7 only strengthens B.
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto012.sgf 92
 15 gg_genmove white
-#? [P7]
+#? [P7]*
 
 # Either the reverse followup or the constraint of EE106 is
 # wrong IMHO
 #CATEGORY=ENDGAME
 loadsgf games/nando/auto012.sgf 112
 16 gg_genmove white
-#? [!D1]
+#? [!D1]*
 
 # D5 is just stupid
 # (but A5 doesn't work. /ab)
 #CATEGORY=OWL
 loadsgf games/nando/auto012.sgf 124
 17 gg_genmove white
-#? [B4|B5]
+#? [B4|B5]*
 
 #--------------------------------------------------------------
 # Cascade of chain breakings

@@ -1,3 +1,22 @@
+========================== 3.3.16 pre 5 ============================
+
+./regress.sh . connect.tst 
+35 unexpected FAIL: Correct '0', got '1 M14'
+./regress.sh . trevord.tst 
+500 unexpected PASS!
+./regress.sh . strategy5.tst 
+225 unexpected PASS!
+./regress.sh . nando.tst 
+9 unexpected FAIL: Correct 'E1|E2|F1|G1|G2', got 'T9'
+10 unexpected FAIL: Correct '1 (C11|F11|C12)', got '0'
+11 unexpected FAIL: Correct '1 (S2|T2|S1)', got '0'
+12 unexpected FAIL: Correct '1 (K19|L18|K18|H19)', got '0'
+13 unexpected FAIL: Correct '1 B1', got '0'
+14 unexpected FAIL: Correct 'P7', got 'Q6'
+15 unexpected FAIL: Correct 'P7', got 'S7'
+16 unexpected FAIL: Correct '!D1', got 'D1'
+17 unexpected FAIL: Correct 'B4|B5', got 'D5'
+
 ========================== 3.3.16 pre 3 ============================
 
 ./regress.sh . connection.tst 

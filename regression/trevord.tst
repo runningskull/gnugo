@@ -237,7 +237,7 @@ loadsgf games/trevor/auto/d12.sgf 40
 
 loadsgf games/trevor/auto/d12.sgf 52
 500 gg_genmove white
-#? [E3]*
+#? [E3]
 
 
 loadsgf games/trevor/auto/d12.sgf 66
