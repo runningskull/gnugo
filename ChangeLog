@@ -18,6 +18,7 @@
   GTP commands
 - adjust conection and semeai depth parameters according to levels
 - don't forget to switch exchange sgf_messages in order_moves()
+- joseki tuning
 - owl tuning
 - eye tuning
 - atari_atari tuning
