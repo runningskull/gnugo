@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- caching of recent compute_escape_influence() results
 - tuning
 - reading cache stores depth-stackp instead of stackp
 - infl_followup_value in struct move_data renamed to

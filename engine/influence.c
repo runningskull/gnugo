@@ -1824,9 +1824,47 @@ compute_escape_influence(char goal[BOARDMAX], int color,
 			 int dragons_known)
 {
   int i, j;
+  int k;
   int ii;
   int save_experimental_influence;
 
+  /* IMPORTANT: This caching relies on the fact that the goal
+   * parameter currently is not used.
+   */
+  static int cached_board[BOARDMAX];
+  static int escape_values[BOARDMAX][4];
+  static int active_caches[4];
+
+  /* Encode the values of color and dragons_known into an integer
+   * between 0 and 3.
+   */
+  int cache_number = 2 * (color == WHITE) + dragons_known;
+
+  int board_was_cached = 1;
+
+  /* Notice that we compare the out of board markers as well, in case
+   * the board size should have changed between calls.
+   */
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+    if (cached_board[ii] != board[ii]) {
+      cached_board[ii] = board[ii];
+      board_was_cached = 0;
+    }
+  }
+
+  if (!board_was_cached)
+    for (k = 0; k < 4; k++)
+      active_caches[k] = 0;
+  
+  if (active_caches[cache_number]) {
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+      if (ON_BOARD(ii))
+	escape_value[ii] = escape_values[ii][cache_number];
+    
+    return;
+  }
+
+  
   /* Use traditional influence for escape influence. */
   save_experimental_influence = experimental_influence;
   experimental_influence = 0;
@@ -1856,6 +1894,12 @@ compute_escape_influence(char goal[BOARDMAX], int color,
 			    "%3.0f", 3, 1);
   }    
   experimental_influence = save_experimental_influence;
+
+  /* Save the computed values in the cache. */
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (ON_BOARD(ii))
+      escape_values[ii][cache_number] = escape_value[ii];
+  active_caches[cache_number] = 1;
 }
 
 
