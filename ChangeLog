@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- let stdout be unbuffered instead of line buffered in play_gtp()
 - if one dragon is considerably smaller than the other in a semeai,
   prefer to get ko over seki in do_owl_analyze_semeai()
 - in a semeai, consider also the eyespaces including opponent semeai

@@ -330,8 +330,10 @@ static struct gtp_command commands[] = {
 void
 play_gtp(FILE *gtp_input, int gtp_initial_orientation)
 {
-  /* Set line buffering of stdout. */
-  setvbuf(stdout, (char *)NULL, _IOLBF, 0);
+  /* Make sure stdout is unbuffered. (Line buffering is also okay but
+   * not necessary. Block buffering breaks GTP mode.)
+   */
+  setbuf(stdout, NULL);
 
   /* Inform the GTP utility functions about the board size. */
   gtp_internal_set_boardsize(board_size);
