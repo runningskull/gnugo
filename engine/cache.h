@@ -50,14 +50,11 @@
  * The data1 field packs into 32 bits the following
  * fields:
  *
- * komaster:  3 bits (EMPTY, BLACK, WHITE, or GRAY)
- * kom_pos : 10 bits (allows MAX_BOARD up to 31)
- * routine :  4 bits (currently 10 different choices)
- * str1    : 10 bits
- * stackp  :  5 bits (actually remaining depth, depth - stackp)
- *
- * FIXME: Rename stackp to something like remaining_depth at some
- *        appropriate time.
+ * komaster	   :  3 bits (EMPTY, BLACK, WHITE, or GRAY)
+ * kom_pos	   : 10 bits (allows MAX_BOARD up to 31)
+ * routine	   :  4 bits (currently 10 different choices)
+ * str1 	   : 10 bits
+ * remaining_depth :  5 bits (depth - stackp)
  *
  * The data2 field packs into 32 bits the following
  * fields:
@@ -84,18 +81,18 @@ typedef struct read_result_t {
 #define RR_STATUS_CLOSED	(2 << 28)
 
 /* Get parts of a Read_result identifying the input data. */
-#define rr_get_komaster(rr)   (((rr).data1  >> 29) & 0x07)
-#define rr_get_kom_pos(rr)    (((rr).data1  >> 19) & 0x3ff)
-#define rr_get_routine(rr)    (((rr).data1  >> 15) & 0x0f)
-#define rr_get_str1(rr)       (((rr).data1  >>  5) & 0x3ff)
-#define rr_get_stackp(rr)     (((rr).data1  >>  0) & 0x1f)
-#define rr_get_str2(rr)       (((rr).data2  >>  0) & 0x3ff)
-#define rr_get_str(rr)        rr_get_str1(rr)
+#define rr_get_komaster(rr)	    (((rr).data1  >> 29) & 0x07)
+#define rr_get_kom_pos(rr)	    (((rr).data1  >> 19) & 0x3ff)
+#define rr_get_routine(rr)	    (((rr).data1  >> 15) & 0x0f)
+#define rr_get_str1(rr) 	    (((rr).data1  >>  5) & 0x3ff)
+#define rr_get_remaining_depth(rr)  (((rr).data1  >>  0) & 0x1f)
+#define rr_get_str2(rr) 	    (((rr).data2  >>  0) & 0x3ff)
+#define rr_get_str(rr)		    rr_get_str1(rr)
 
 /* Set corresponding parts. */
-#define rr_input_data1(routine, komaster, kom_pos, str1, stackp) \
+#define rr_input_data1(routine, komaster, kom_pos, str1, remaining_depth) \
 	(((((((((komaster) << 10) | (kom_pos)) << 4) \
-	  | (routine)) << 10) | (str1)) << 5) | (stackp))
+	  | (routine)) << 10) | (str1)) << 5) | (remaining_depth))
 #define rr_input_data2(str2) (str2) \
 
 /* Get parts of a Read_result constituting the result of a search. */
@@ -104,6 +101,11 @@ typedef struct read_result_t {
 #define rr_get_result2(rr)     (((rr).data2 >> 20) & 0x0f)
 #define rr_get_move(rr)        (((rr).data2 >> 10) & 0x3ff)
 #define rr_get_result(rr)      rr_get_result1(rr)
+
+#define rr_is_free(rr)	       (((rr).data2 \
+				& (RR_STATUS_OPEN | RR_STATUS_CLOSED)) == 0)
+#define rr_is_open(rr)	       (((rr).data2 & RR_STATUS_OPEN) != 0)
+#define rr_is_closed(rr)       (((rr).data2 & RR_STATUS_CLOSED) != 0)
 
 /* Set corresponding parts. Closes the result entry. */
 #define rr_set_result_move(rr, result, move) \
@@ -156,6 +158,12 @@ typedef struct hashtable {
   Read_result	*all_results;	/* Pointer to all allocated results. */
   Read_result	*result_limit;	/* Pointer to the enf of all_results[] array. */
   Read_result	*free_result;	/* Pointer to the first free result. */
+
+  /* True if hashtable_partially_clear() hasn't been called yet. In this case
+   * allocated nodes and results (if any) go continuosly in memory which
+   * simplifies clearing.
+   */
+  int		 first_pass;
 } Hashtable;
 
 

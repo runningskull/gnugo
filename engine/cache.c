@@ -52,7 +52,7 @@ static Read_result *hashnode_new_result(Hashtable *table, Hashnode *node,
 
 static void hashnode_unlink_closed_results(Hashnode *node, 
 					   int exclusions, 
-					   unsigned int stackplimit,
+					   unsigned int remaining_depth_limit,
 					   int statistics[][20]);
 static void hashtable_partially_clear(Hashtable *table);
 static int do_get_read_result(int routine, int komaster, int kom_pos,
@@ -73,7 +73,7 @@ read_result_dump(Read_result *result, FILE *outfile)
 	  rr_get_routine(*result),
 	  I(rr_get_str(*result)),
 	  J(rr_get_str(*result)),
-	  rr_get_stackp(*result));
+	  rr_get_remaining_depth(*result));
   fprintf(outfile, "Result: %u %u, (%d, %d)\n",
 	  rr_get_status(*result),
 	  rr_get_result(*result),
@@ -232,7 +232,8 @@ hashtable_init(Hashtable *table,
   }
   table->result_limit = table->all_results + num_results;
 
-  /* Initialize the table and all nodes to the empty state . */
+  /* Force complete table clearing. */
+  table->first_pass = 0;
   hashtable_clear(table);
 
   return 1;
@@ -277,34 +278,45 @@ hashtable_clear(Hashtable *table)
 {
   int bucket;
   Hashnode *node;
+  Hashnode *node_limit;
   Read_result *result;
+  Read_result *result_limit;
 
   if (!table)
+    return;
+
+  /* If the table is alredy clean, return immediatly. */
+  if (table->first_pass && table->free_node == table->all_nodes)
     return;
 
   /* Initialize all hash buckets to the empty list. */
   for (bucket = 0; bucket < table->hashtablesize; ++bucket)
     table->hashtable[bucket] = NULL;
 
-  /* Mark all nodes as free. */
+  /* Mark all nodes as free. Don't clean non-allocated nodes. */
+  node_limit = table->first_pass ? table->free_node : table->node_limit;
   table->free_node = table->all_nodes;
-  for (node = table->all_nodes; node < table->node_limit; node++)
+  for (node = table->all_nodes; node < node_limit; node++)
     node->results = NULL;
 
-  /* Mark all read_results as free. */
+  /* Mark all read_results as free. Don't clean non-allocated results. */
+  result_limit = table->first_pass ? table->free_result : table->result_limit;
   table->free_result = table->all_results;
-  for (result = table->all_results; result < table->result_limit; result++)
+  for (result = table->all_results; result < result_limit; result++)
     result->data2 = 0;
+
+  table->first_pass = 1;
 }
 
 
 /* Unlink all closed results except for those which has `routine' value marked
- * in `exceptions' or large enough `stackp' from the linked list of results at
- * a node. It is assumed that the node contains at least one result.
+ * in `exceptions' or large enough `remaining_depth' from the linked list of
+ * results at a node. It is assumed that the node contains at least one result.
  */
 static void
 hashnode_unlink_closed_results(Hashnode *node, 
-			       int exclusions, unsigned int stackplimit,
+			       int exclusions,
+			       unsigned int remaining_depth_limit,
 			       int statistics[][20])
 {
   Read_result *result = node->results;
@@ -312,11 +324,11 @@ hashnode_unlink_closed_results(Hashnode *node,
 
   /* Traverse all node results. */
   do {
-    unsigned int result_stackp = depth - rr_get_stackp(*result);
+    unsigned int result_remaining_depth = rr_get_remaining_depth(*result);
     int result_routine = rr_get_routine(*result);
 
     if (debug & DEBUG_READING_PERFORMANCE) {
-      int stat_stackp = result_stackp;
+      int stat_stackp = depth - result_remaining_depth;
 
       if (stat_stackp > 19)
 	stat_stackp = 19;
@@ -324,12 +336,12 @@ hashnode_unlink_closed_results(Hashnode *node,
 	stat_stackp = 0;
 
       gg_assert(result_routine >= 0 && result_routine < NUM_ROUTINES);
-      statistics[result_routine][result_stackp]++;
+      statistics[result_routine][stat_stackp]++;
     }
 
-    if (rr_get_status(*result) == 2	/* Closed. */
-	&& ((1 << result_routine) & exclusions) == 0
-	&& result_stackp >= stackplimit) {
+    if (rr_is_closed(*result)
+	&& result_remaining_depth <= remaining_depth_limit
+	&& ((1 << result_routine) & exclusions) == 0) {
       /* Unlink the result and mark it as free. */
       *link = result->next;
       result->data2 = 0;
@@ -360,6 +372,7 @@ hashtable_partially_clear(Hashtable *table)
 {
   int k, l;
   Hashnode *node;
+  const int remaining_depth_limit = depth - 3;
 
   int statistics[NUM_ROUTINES][20];
 
@@ -387,7 +400,7 @@ hashtable_partially_clear(Hashtable *table)
      */
     hashnode_unlink_closed_results(node, 
 				   (1 << OWL_ATTACK | 1 << OWL_DEFEND
-				    | 1 << SEMEAI), 3,
+				    | 1 << SEMEAI), remaining_depth_limit,
 				   statistics);
 
     if (node->results == NULL) {
@@ -444,6 +457,8 @@ hashtable_partially_clear(Hashtable *table)
    */
   table->free_node = table->all_nodes;
   table->free_result = table->all_results;
+
+  table->first_pass = 0;
 }
 
 
@@ -565,7 +580,7 @@ hashnode_new_result(Hashtable *table, Hashnode *node,
 
   /* If the first result is not free, skip until we find one which is free. */
   while (table->free_result < table->result_limit
-	 && rr_get_status(*(table->free_result)) != 0)
+	 && !rr_is_free(*(table->free_result)))
     table->free_result++;
   
   if (table->free_result == table->result_limit) {
@@ -582,7 +597,7 @@ hashnode_new_result(Hashtable *table, Hashnode *node,
     }
 
     while (table->free_result < table->result_limit
-	   && rr_get_status(*(table->free_result)) != 0)
+	   && !rr_is_free(*(table->free_result)))
       table->free_result++;
 
     if (table->free_result == table->result_limit) {
