@@ -4,7 +4,7 @@
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 6
 100 gg_genmove black
-#? [Q13|P13|Q12|P12|P11|P8|P9]*
+#? [Q13|P13|Q12|P12|P11|P8|P9]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.31-200204122203.sgf 14

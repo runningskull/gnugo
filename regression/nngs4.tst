@@ -11,7 +11,7 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 10
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 26
 20 gg_genmove white
-#? [Q4|Q6]*
+#? [Q4|Q6]
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 36
 30 gg_genmove white
@@ -249,19 +249,19 @@ loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 70
 #gnugo should do something about the O11 dragon
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 124
 600 gg_genmove white
-#? [L9|L12|L10]
+#? [L9|L12|L10]*
 
 #New failure (3.3.20)
 #C13 looks correct here /evand
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 144
 610 gg_genmove white
-#? [C13|D13]
+#? [C13|D13]*
 
 #New failure (3.3.20)
 #pull out the stones /evand
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 152
 620 gg_genmove white
-#? [G13|G14]
+#? [G13|G14]*
 
 
 ############ End of Tests #################

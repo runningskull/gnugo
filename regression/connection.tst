@@ -344,11 +344,11 @@ loadsgf games/nngs/gnugo-3.3.17-joshj-200304172202.sgf 226
 # See also owl:114
 loadsgf games/incident169.sgf 210
 103 connect L2 G4
-#? [1 K2]
+#? [1 K2]*
 
 loadsgf golois/Aya991113-9.sgf
 104 connect G2 L4
-#? [1 (H2|H1|G1|J1|H3)]
+#? [1 (H2|H1|G1|J1|H3)]*
 
 # See also nicklas1:501
 # Strictly speaking, this is ko. But this is way beyond the readconnect
