@@ -34,7 +34,7 @@
 
 
 /* The go board and position. */
-int          board_size = 19; /* board size */
+int          board_size = DEFAULT_BOARD_SIZE; /* board size */
 Intersection board[BOARDSIZE];
 int          board_ko_pos;
 int          white_captured;    /* number of black and white stones captured */

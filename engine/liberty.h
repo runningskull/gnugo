@@ -258,6 +258,8 @@ void restore_board(struct board_state *state);
 struct pattern;
 struct pattern_db;
 struct fullboard_pattern;
+struct corner_pattern;
+struct corner_db;
 struct half_eye_data;
 struct movelist;
 struct tree_node_list;
@@ -273,6 +275,9 @@ typedef void (*matchpat_callback_fn_ptr)(int anchor, int color,
 typedef void (*fullboard_matchpat_callback_fn_ptr)(int move,
                                                    struct fullboard_pattern *,
                                                    int rotation);
+typedef void (*corner_matchpat_callback_fn_ptr)(int move, int color,
+						struct corner_pattern *pattern,
+						int rotation);
 void matchpat(matchpat_callback_fn_ptr callback, int color,
 	      struct pattern_db *pdb, void *callback_data,
 	      char goal[BOARDMAX]);
@@ -281,6 +286,8 @@ void matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
 	      char goal[BOARDMAX], int anchor_in_goal);
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
+void corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
+		     struct corner_db *database);
 void dfa_match_init(void);
 void tree_match_init(void);
 void tree_initialize_pointers(struct tree_node_list *tnl,

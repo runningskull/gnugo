@@ -1257,6 +1257,123 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
 }
 
 
+/**************************************************************************/
+/* Corner matcher                                                         */
+/**************************************************************************/
+
+#if 0
+/* These arrays specify anchor corner for each transformation. They _must_
+ * be in line with transformation2[][] array in patterns/transform.c.
+ */
+static const int corner_x[8] = {0, 1, 1, 0, 1, 0, 0, 1};
+static const int corner_y[8] = {0, 0, 1, 1, 1, 1, 0, 0};
+
+static int num_stones[BOARDMAX];
+
+
+static void
+do_corner_matchpat(int num_variations, struct corner_variation *variation,
+		   int match_color, corner_matchpat_callback_fn_ptr callback,
+		   int callback_color, int trans, int anchor, int stones)
+{
+  for (; --num_variations >= 0; variation++) {
+    int move = AFFINE_TRANSFORM(variation->move_offset, trans, anchor);
+    char color_check = match_color ^ variation->xor_att;
+    struct corner_pattern *pattern = variation->pattern;
+
+    if (pattern && color_check == callback_color) {
+      int second_corner
+	  = AFFINE_TRANSFORM(pattern->second_corner_offset, trans, anchor);
+
+      if (num_stones[second_corner] == stones) {
+	ASSERT1(board[move] == EMPTY, move);
+
+	callback(move, callback_color, pattern, trans);
+      }
+    }
+
+    if (variation->num_variations
+	&& num_stones[move] == variation->num_stones
+	&& board[move] == color_check) {
+      do_corner_matchpat(variation->num_variations, variation->variations,
+			 match_color, callback, callback_color,
+			 trans, anchor, stones + 1);
+    }
+  }
+}
+
+
+void
+corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
+		struct corner_db *database)
+{
+  int k;
+
+  for (k = 0; k < 8; k++) {
+    int anchor = POS(corner_x[k] * (board_size - 1),
+		     corner_y[k] * (board_size - 1));
+    int i;
+    int j;
+    int dx = TRANSFORM(OFFSET(1, 0), k);
+    int dy = TRANSFORM(OFFSET(0, 1), k);
+    int pos;
+    struct corner_variation *variation = database->top_variations;
+
+    num_stones[anchor] = IS_STONE(board[anchor]);
+
+    pos = anchor;
+    for (i = 1; i < database->max_height; i++) {
+      pos += dx;
+      if (!ON_BOARD1(pos)) {
+	do {
+	  num_stones[pos] = BOARDMAX;
+	  pos += dx;
+	} while (++i < database->max_height);
+
+	break;
+      }
+
+      num_stones[pos] = num_stones[pos - dx] + IS_STONE(board[pos]);
+    }
+
+    pos = anchor;
+    for (j = 1; j < database->max_width; j++) {
+      pos += dy;
+      if (!ON_BOARD1(pos)) {
+	do {
+	  num_stones[pos] = BOARDMAX;
+	  pos += dy;
+	} while (++j < database->max_width);
+
+	break;
+      }
+      
+      num_stones[pos] = num_stones[pos - dy] + IS_STONE(board[pos]);
+    }
+    
+    for (i = 1; i < database->max_height; i++) {
+      pos = anchor + i * dy;
+      for (j = 1; j < database->max_width; j++) {
+	pos += dx;
+	num_stones[pos] = num_stones[pos - dx] + num_stones[pos - dy]
+			- num_stones[pos - dx - dy] + IS_STONE(board[pos]);
+      }
+    }
+
+    for (i = 0; i < database->num_top_variations; i++) {
+      int move = AFFINE_TRANSFORM(variation->move_offset, k, anchor);
+
+      if (num_stones[move] == 1 && IS_STONE(board[move]))
+	do_corner_matchpat(variation->num_variations, variation->variations,
+			   board[move], callback, color, k, anchor, 1);
+
+      variation++;
+    }
+  }
+}
+#endif
+
+
 /*
  * Local Variables:
  * tab-width: 8

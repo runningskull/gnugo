@@ -66,7 +66,7 @@ Usage : mkpat [options] <prefix>\n\
 	-a = require anchor in all patterns. Sets fixed_anchor flag in db\n\
 	-r = pre-rotate patterns before storing in database\n\
 If no input files specified, reads from stdin.\n\
-If outpuf file is not specified, writes to stdout.\n\
+If output file is not specified, writes to stdout.\n\
 "
 
 
@@ -135,7 +135,7 @@ const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPR
  * Modify them using `goal_elements ...' and `callback_data ..'
  * commands in a database. By default, we don't drop any elements.
  */
-int nongoal[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+int nongoal[8]		 = {0, 0, 0, 0, 0, 0, 0, 0};
 int callback_unneeded[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 /* stuff used in reading/parsing pattern rows */
@@ -150,11 +150,11 @@ int num_stars;
 int ci = -1, cj = -1;           /* position of origin (first piece element)
 				   relative to top-left */
 int patno;		        /* current pattern */
+int discard_pattern = 0;	/* Set to nonzero to discard a pattern (if e.g.
+				 * it is too large or duplicated). */
 int pats_with_constraints = 0;  /* just out of interest */
 int label_coords[256][2];       /* Coordinates for labeled stones in the 
 				   autohelper patterns. */
-int current_i;		        /* Counter for the line number of the
-				   diagram */ 
 int current_c_i;		/* Counter for the line number of a 
 				   constraint diagram. */
 char constraint[MAXCONSTRAINT]; /* Store constraint lines. */
@@ -448,7 +448,7 @@ check_constraint_diagram(void)
   
   if (0)
     fprintf(stderr, "have_constraint: %d\n", have_constraint);
-  if (have_constraint) {
+  if (have_constraint && el) {
     for (i = ino; i <= maxi+ino; i++)
       for (j = jwo; j <= maxj+jwo; j++) {
 	if (0)
@@ -487,7 +487,6 @@ reset_pattern(void)
   strcpy(helper_fn_names[patno], "NULL");
   for (i = 0; i < 256; i++)
     label_coords[i][0] = -1;
-  current_i = 0;
   current_c_i = 0;
   constraint[0] = 0;
   action[0] = 0;
@@ -497,18 +496,16 @@ reset_pattern(void)
       constraint_diagram[i][j] = '\0';
     }
   }
+  memset(&pattern[patno], 0, sizeof(struct pattern));
 }
   
 
-
-/* this is called to compute the extents of the pattern, applying
- * edge constraints as necessary
+/* This is called to compute the extents of the pattern, applying
+ * edge constraints as necessary.
  */
-
 static void
 find_extents(void)
 {
-
   /* When this is called, elements go from (mini,minj) inclusive to
    * (maxi-1, maxj-1) [ie exclusive]. Make them inclusive.
    * Ie maximum element lies on (maxi,maxj).
@@ -642,12 +639,11 @@ compute_grids(void)
 }
 
 
-
-/* We've just read a line that looks like a pattern line.
- * Now process it.
+/* We've just read a line that looks like a pattern line. Now process it.
+ * If the pattern becomes larger than maximal supported board, the function
+ * returns zero, so that the pattern can be discarded.
  */
-
-static void
+static int
 read_pattern_line(char *p)
 {
   const char *char_offset;
@@ -695,7 +691,7 @@ read_pattern_line(char *p)
     if (maxi > 0 && width != maxj)
       goto notrectangle;
 
-    return;
+    return 1;
   }
 
   /* get here => its a real pattern entry, 
@@ -783,6 +779,7 @@ read_pattern_line(char *p)
     elements[el].x = maxi;
     elements[el].y = j;
     elements[el].att = off;  /* '*' mapped to '.' and 'Q' to 'O' above */
+    
     ++el;
   }
 
@@ -812,22 +809,23 @@ read_pattern_line(char *p)
     jwo = 1;
   if (where & EAST_EDGE)
     jeo = 1;
-  strncpy(diagram[maxi], pcopy, maxj + jwo + jeo);
+  if (maxi <= MAX_BOARD)
+    strncpy(diagram[maxi], pcopy, maxj + jwo + jeo);
   maxi++;
 
-  return;
+  return maxi <= MAX_BOARD && maxj <= MAX_BOARD;
 
 fatal:
  fprintf(stderr, "%s(%d) : error : Illegal pattern %s\n", 
          current_file, current_line_number, pattern_names[patno]);
  fatal_errors = 1;
- return;
+ return 0;
 
 notrectangle:
  fprintf(stderr, "%s(%d) : error : Pattern %s not rectangular\n", 
 	 current_file, current_line_number, pattern_names[patno]);
  fatal_errors++;
- return;
+ return 0;
 }
 
 
@@ -879,7 +877,8 @@ read_constraint_diagram_line(char *p)
     jwo = 1;
   if (where & EAST_EDGE)
     jeo = 1;
-  strncpy(constraint_diagram[current_c_i], pcopy, maxj+jwo+jeo+1);
+  if (el)
+    strncpy(constraint_diagram[current_c_i], pcopy, maxj+jwo+jeo+1);
   current_c_i++;
 
   return;
@@ -922,6 +921,10 @@ finish_pattern(char *line)
     ci = (maxi-1)/2;
     cj = (maxj-1)/2;
   }
+  else if (database_type == DB_CORNER) {
+    ci = 0;
+    cj = 0;
+  }
   else if (choose_best_anchor) { 
 
     /* Try to find a better anchor if
@@ -953,7 +956,7 @@ finish_pattern(char *line)
   }
   else if (ci == -1 || cj == -1) {
     fprintf(stderr, "%s(%d) : No origin for pattern %s\n", 
-            current_file, current_line_number, pattern_names[patno]);
+	    current_file, current_line_number, pattern_names[patno]);
     fatal_errors = 1;
     ci = 0;
     cj = 0;
@@ -1072,6 +1075,7 @@ finish_pattern(char *line)
 	  case 'U': pattern[patno].class |= CLASS_U; break;
 	  case 'W': pattern[patno].class |= CLASS_W; break;
 	  case 'F': pattern[patno].class |= CLASS_F; break;
+	  case 'N': pattern[patno].class |= CLASS_N; break;
 	  case 'Y': pattern[patno].class |= CLASS_Y; break;
 	  case '-': break;
 	  default:
@@ -1240,6 +1244,7 @@ generate_autohelper_code(int funcno, int number_of_params, int *labels)
       fatal_errors++;
     }
     break;
+
   case 1:
     /* This is a very special case where there is assumed to be a
      * variable number of parameters and these constitute a series of
@@ -2124,6 +2129,316 @@ tree_write_patterns(FILE *outfile)
 
 #endif
 
+
+/* ================================================================ */
+/*		    Corner database creation stuff		    */
+/* ================================================================ */
+
+#define CORNER_DB_SIZE(patterns, variations)\
+  (( patterns * sizeof(struct corner_pattern)\
+   + variations * sizeof(struct corner_variation)) / 1024)
+
+static struct corner_variation_b corner_root;
+static int second_corner_offset[MAXPATNO];
+
+static int total_variations = 0;
+static int variations_written = 0;
+
+static int corner_max_width = 0;
+static int corner_max_height = 0;
+
+/* This structure is used by corner_add_pattern() */
+struct corner_element {
+  int x;
+  int y;
+  int color;
+};
+
+
+static void
+corner_init(void)
+{
+  corner_root.num_variations = 0;
+  corner_root.child = NULL;
+}
+
+
+static int corner_best_element(struct corner_element *el, int n, int x, int y,
+			       struct corner_variation_b *variations,
+			       int color)
+{
+  int k;
+  int i;
+  int best = 0;
+  int best_value = 0;
+
+  int candidate[MAX_BOARD * MAX_BOARD];
+  int candidates = 0;
+  int existing_variation[MAX_BOARD * MAX_BOARD];
+  int have_existing_variation = 0;
+
+  for (k = 0; k < n; k++) {
+    for (i = 0; i < n; i++) {
+      if (i == k)
+	continue;
+
+      if (el[k].x >= el[i].x && el[k].y >= el[i].y)
+        break;
+    }
+
+    if (i == n) {
+      struct corner_variation_b *v;
+      int move_offset = OFFSET(el[k].x, el[k].y);
+      int xor_att = (el[k].color == color ? ATT_O ^ ATT_O : ATT_O ^ ATT_X);
+
+      candidate[candidates] = k;
+      existing_variation[candidates] = 0;
+
+      for (v = variations; v != NULL; v = v->next) {
+	if (v->move_offset == move_offset
+	    && (v->xor_att == xor_att || color == 0)) {
+	  existing_variation[candidates] = 1;
+	  have_existing_variation = 1;
+	  break;
+	}
+      }
+
+      candidates++;
+    }
+  }
+
+  for (k = 0; k < candidates; k++) {
+    int m = candidate[k];
+    int value = 2 * MAX_BOARD * ((el[m].x + 1) * (el[m].y + 1)
+	        - (gg_min(el[m].x, x) + 1) * (gg_min(el[m].y, y) + 1))
+	        - 2 * gg_abs(el[m].x - el[m].y) + (el[m].x < el[m].y ? 1 : 0);
+
+    if (existing_variation[k] == have_existing_variation
+	&& value > best_value) {
+      best = k;
+      best_value = value;
+    }
+  }
+
+  return candidate[best];
+}
+
+
+static struct corner_variation_b*
+corner_variation_new(int move_offset, char xor_att, char num_stones)
+{
+  struct corner_variation_b *variation;
+   
+  variation = malloc(sizeof(struct corner_variation_b));
+
+  variation->move_offset = move_offset;
+  variation->xor_att = xor_att;
+  variation->num_stones = num_stones;
+  variation->num_variations = 0;
+  variation->next = NULL;
+  variation->child = NULL;
+  variation->child_num = -1;
+  variation->pattern_num = -1;
+
+  total_variations++;
+
+  return variation;
+}
+
+
+static struct corner_variation_b*
+corner_follow_variation(struct corner_variation_b *variation,
+			int offset, int color, char num_stones)
+{
+  char xor_att = color ? ATT_O ^ ATT_O : ATT_O ^ ATT_X;
+  struct corner_variation_b *subvariation = variation->child;
+  struct corner_variation_b **link = &(variation->child);
+
+  while (subvariation) {
+    if (subvariation->move_offset == offset
+	&& subvariation->xor_att == xor_att) {
+      assert(subvariation->num_stones == num_stones);
+      return subvariation;
+    }
+
+    link = &(subvariation->next);
+    subvariation = subvariation->next;
+  }
+
+  variation->num_variations++;
+  *link = corner_variation_new(offset, xor_att, num_stones);
+
+  return *link;
+}
+
+
+static void
+corner_add_pattern(void)
+{
+  int k;
+  struct corner_element stone[MAX_BOARD * MAX_BOARD];
+  int stones = 0;
+  int trans;
+  int corner_x = 0;
+  int corner_y = 0;
+  int color = 0;
+  int move_pos;
+  int move_x;
+  int move_y;
+  char num_stones;
+  struct corner_variation_b *variation = &corner_root;
+
+  switch (where) {
+    case SOUTH_EDGE | WEST_EDGE: trans = 5; corner_x = maxi; break;
+    case WEST_EDGE | NORTH_EDGE: trans = 0; break;
+    case NORTH_EDGE | EAST_EDGE: trans = 7; corner_y = maxj; break;
+    case EAST_EDGE | SOUTH_EDGE:
+      trans = 2; corner_x = maxi; corner_y = maxj; break;
+
+    default:
+      fprintf(stderr, "%s(%d) : error : Illegal edge constraint in pattern %s\n",
+	      current_file, current_line_number, pattern_names[patno]);
+      return;
+  }
+
+  move_pos = AFFINE_TRANSFORM(pattern[patno].move_offset
+             - OFFSET_DELTA(corner_x, corner_y), trans, POS(0, 0));
+  move_x = I(move_pos);
+  move_y = J(move_pos);
+
+  for (k = 0; k < el; k++) {
+    if (elements[k].att == ATT_X || elements[k].att == ATT_O) {
+      TRANSFORM2(elements[k].x, elements[k].y,
+		 &stone[stones].x, &stone[stones].y, trans);
+      stone[stones].x += corner_x;
+      stone[stones].y += corner_y;
+      stone[stones].color = elements[k].att;
+      stones++;
+    }
+    else if (elements[k].att != ATT_dot) {
+      fprintf(stderr, "%s(%d) : error : Illegal element in pattern %s\n",
+	      current_file, current_line_number, pattern_names[patno]);
+      return;
+    }
+  }
+
+  for (k = 0; k < stones; k++) {
+    int i;
+    int best;
+    struct corner_element stone_t;
+     
+    if (k > 0) {
+      best = k + corner_best_element(stone + k, stones - k, stone[k-1].x,
+				     stone[k-1].y, variation->child, color);
+      stone_t = stone[k];
+      stone[k] = stone[best];
+      stone[best] = stone_t;
+    }
+    else {
+      best = corner_best_element(stone, stones, 0, 0, variation->child, color);
+      stone_t = stone[0];
+      stone[0] = stone[best];
+      stone[best] = stone_t;
+      color = stone[0].color;
+
+      if (stone[0].x > stone[0].y) {
+	int t;
+
+	t = maxi;
+	maxi = maxj;
+	maxj = t;
+
+	t = move_x;
+	move_x = move_y;
+	move_y = t;
+
+	for (i = 0; i < stones; i++) {
+	  t = stone[i].x;
+	  stone[i].x = stone[i].y;
+	  stone[i].y = t;
+	}
+      }
+    }
+
+    num_stones = 0;
+    for (i = 0; i < k; i++) {
+      if (stone[i].x <= stone[k].x && stone[i].y <= stone[k].y)
+	num_stones++;
+    }
+
+    variation = corner_follow_variation(variation,
+		OFFSET(stone[k].x, stone[k].y), stone[k].color == color,
+		num_stones);
+  }
+
+  num_stones = 0;
+  for (k = 0; k < stones; k++) {
+    if (stone[k].x <= move_x && stone[k].y <= move_y)
+      num_stones++;
+  }
+
+  variation = corner_follow_variation(variation, OFFSET(move_x, move_y),
+				      ATT_O == color, num_stones);
+  if (variation->pattern_num == -1) {
+    variation->pattern_num = patno;
+    second_corner_offset[patno] = OFFSET(maxi, maxj);
+    if (maxi > corner_max_height)
+      corner_max_height = maxi;
+    if (maxj > corner_max_width)
+      corner_max_width = maxj;
+  }
+  else {
+    fprintf(stderr, "%s(%d) : warning : duplicated patterns encountered (%s and %s)\n",
+	    current_file, current_line_number,
+	    pattern_names[variation->pattern_num], pattern_names[patno]);
+    discard_pattern = 1;
+  }
+}
+
+
+static int
+corner_pack_variations(struct corner_variation_b *variation, int counter)
+{
+  counter++;
+  if (variation->next)
+    counter = corner_pack_variations(variation->next, counter);
+  if (variation->child) {
+    variation->child_num = counter;
+    counter = corner_pack_variations(variation->child, counter);
+  }
+
+  return counter;
+}
+
+
+static void
+corner_write_variations(struct corner_variation_b *variation, FILE *outfile)
+{                     
+  fprintf(outfile, "  {%d,%d,%d,%d,", variation->move_offset,
+	  variation->xor_att, variation->num_stones,
+	  variation->num_variations);
+  if (variation->child)
+    fprintf(outfile, "&%s_variations[%d],", prefix, variation->child_num);
+  else
+    fprintf(outfile, "NULL,");
+  if (variation->pattern_num != -1)
+    fprintf(outfile, "&%s[%d]", prefix, variation->pattern_num);
+  else
+    fprintf(outfile, "NULL");
+
+  variations_written++;
+  if (variations_written != total_variations)
+    fprintf(outfile, "},\n");
+  else
+    fprintf(outfile, "}\n};\n\n\n");
+
+  if (variation->next)
+    corner_write_variations(variation->next, outfile);
+  if (variation->child)
+    corner_write_variations(variation->child, outfile);
+}
+
+
 /* sort and write out the patterns */
 static void
 write_patterns(FILE *outfile)
@@ -2142,8 +2457,10 @@ write_patterns(FILE *outfile)
   /* Write out the patterns. */
   if (database_type == DB_FULLBOARD)
     fprintf(outfile, "struct fullboard_pattern %s[] = {\n", prefix);
+  else if (database_type == DB_CORNER)
+    fprintf(outfile, "static struct corner_pattern %s[] = {\n", prefix);
   else
-    fprintf(outfile, "struct pattern %s[] = {\n", prefix);
+    fprintf(outfile, "static struct pattern %s[] = {\n", prefix);
 
   for (j = 0; j < patno; ++j) {
     struct pattern *p = pattern + j;
@@ -2153,7 +2470,24 @@ write_patterns(FILE *outfile)
 	      pattern_names[j], p->move_offset, p->value);
       continue;
     }
-    
+
+    if (database_type == DB_CORNER) {
+      fprintf(outfile, "  {%d,0x%x,\"%s\",%f,%d,", second_corner_offset[j],
+	      p->class, pattern_names[j], p->value, p->autohelper_flag);
+      if (p->autohelper)
+	fprintf(outfile, "autohelper%s%d", prefix, j);
+      else
+	fprintf(outfile, "NULL");
+      fprintf(outfile, ",%f}", p->constraint_cost);
+
+      if (j != patno - 1)
+	fprintf(outfile, ",\n");
+      else
+	fprintf(outfile, "\n};\n\n\n");
+
+      continue;
+    }
+
     /* p->min{i,j} and p->max{i,j} are the maximum extent of the elements,
      * including any rows of '?' which do not feature in the elements list.
      * ie they are the positions of the topleft and bottomright corners of
@@ -2213,6 +2547,9 @@ write_patterns(FILE *outfile)
     fprintf(outfile, "},\n");
   }
 
+  if (database_type == DB_CORNER)
+    return;
+
   if (database_type == DB_FULLBOARD) {
     fprintf(outfile, "  {NULL,0,NULL,0,0.0}\n};\n");
     return;
@@ -2238,7 +2575,18 @@ write_pattern_db(FILE *outfile)
   /* Don't want this for fullboard patterns. */
   if (database_type == DB_FULLBOARD)
     return;
-  
+
+  if (database_type == DB_CORNER) {
+    fprintf(outfile, "struct corner_db %s_db = {\n", prefix);
+    fprintf(outfile, "  %d,\n", corner_max_width);
+    fprintf(outfile, "  %d,\n", corner_max_height);
+    fprintf(outfile, "  %d,\n", corner_root.num_variations);
+    fprintf(outfile, "  %s_variations\n", prefix);
+    fprintf(outfile, "};\n");
+
+    return;
+  }
+
   /* Write out the pattern database. */
   fprintf(outfile, "\n");
   fprintf(outfile, "struct pattern_db %s_db = {\n", prefix);
@@ -2271,6 +2619,7 @@ main(int argc, char *argv[])
   FILE *input_FILE = stdin;
   FILE *output_FILE = stdout;
   int state = 0;
+  char *save_code_pos = autohelper_code;
 
   transformation_init();
 
@@ -2381,11 +2730,10 @@ main(int argc, char *argv[])
     dfa.pre_rotated = pre_rotate;
   }
 
-  fprintf(output_FILE, PREAMBLE);
+  if (database_type == DB_CORNER)
+    corner_init();
 
-  /* Parse the input file, output pattern elements as as we find them,
-   * and store pattern entries for later output.
-   */
+  fprintf(output_FILE, PREAMBLE);
 
   /* Initialize pattern number and buffer for automatically generated
    * helper code.
@@ -2393,8 +2741,11 @@ main(int argc, char *argv[])
   patno = -1;
   autohelper_code[0] = 0;
   code_pos = autohelper_code;
-  
-  /* We do this parsing too with the help of a state machine.
+
+  /* Parse the input file, output pattern elements as as we find them,
+   * and store pattern entries for later output.
+   *
+   * We do this parsing too with the help of a state machine.
    * state
    *   0     Waiting for a Pattern line.
    *   1     Pattern line found, waiting for a position diagram.
@@ -2441,7 +2792,7 @@ main(int argc, char *argv[])
 	int i = strlen(line) - 2;  /* Start removing backwards just before newline */
 	while (i >= 0 && isspace(line[i]))
 	  i--;
-	line[i+1]   = '\n';
+	line[i+1] = '\n';
 	line[i+2] = '\0';
       }
       
@@ -2487,7 +2838,10 @@ main(int argc, char *argv[])
 	}
 
 	if (command == 1) { /* Pattern `name' */
-	  patno++;
+	  if (!discard_pattern)
+	    patno++;
+	  else
+	    code_pos = save_code_pos;
 	  reset_pattern();
 
 	  if (strlen(command_data) > 79) {
@@ -2498,6 +2852,7 @@ main(int argc, char *argv[])
 	  strcpy(pattern_names[patno], command_data);
 
 	  state = 1;
+	  discard_pattern = 0;
 	}
 	else {
 	  int *sort_out = (command == 2 ? nongoal : callback_unneeded);
@@ -2567,8 +2922,10 @@ main(int argc, char *argv[])
 	case 1:
 	  state++; /* fall through */
 	case 2:
-	  read_pattern_line(line);
-	  current_i++;
+	  if (!read_pattern_line(line)) {
+	    discard_pattern = 1;
+	    el = 0;
+	  }
 	  break;
 	case 4:
 	  state++; /* fall through */
@@ -2581,11 +2938,17 @@ main(int argc, char *argv[])
 	if (state == 2 || state == 3) {
 	  finish_pattern(line);
 	  
-	  if (database_type == DB_DFA)
-	    write_to_dfa(patno);
-	  write_elements(output_FILE);
+	  if (!discard_pattern) {
+	    if (database_type == DB_DFA)
+	      write_to_dfa(patno);
+	    if (database_type != DB_CORNER)
+	      write_elements(output_FILE);
+	    else
+	      corner_add_pattern();
+	  }
 
 	  state = 4;
+	  save_code_pos = code_pos;
 	}
 	else {
 	  fprintf(stderr,
@@ -2659,14 +3022,25 @@ main(int argc, char *argv[])
       reset_pattern();
     }
   } 
- 
+
+  if (discard_pattern) {
+    patno--;
+    code_pos = save_code_pos;
+  }
+
+  *code_pos = 0;
+
   if (verbose)
     fprintf(stderr, "%d / %d patterns have edge-constraints\n",
 	    pats_with_constraints, patno);
 
   /* Forward declaration, which autohelpers might need. */
-  if (database_type != DB_FULLBOARD && database_type != DB_CORNER)
-    fprintf(output_FILE, "extern struct pattern %s[];\n\n", prefix);
+  if (database_type != DB_FULLBOARD) {
+    if (database_type != DB_CORNER)
+      fprintf(output_FILE, "static struct pattern %s[];\n\n", prefix);
+    else
+      fprintf(output_FILE, "static struct corner_pattern %s[];\n\n", prefix);
+  }
 
   /* Write the autohelper code. */
   fprintf(output_FILE, "%s", autohelper_code);
@@ -2698,6 +3072,19 @@ main(int argc, char *argv[])
     dfa_end();
   }
 
+  if (database_type == DB_CORNER) {
+    fprintf(stderr, "---------------------------\n");
+
+    corner_pack_variations(corner_root.child, 0);
+    fprintf(output_FILE, "static struct corner_variation %s_variations[] = {\n",
+	    prefix);
+    corner_write_variations(corner_root.child, output_FILE);
+
+    fprintf(stderr, "corner database for %s\n", prefix);
+    fprintf(stderr, "size: %d kB for %d patterns (%d variations)\n",
+	    CORNER_DB_SIZE(patno, total_variations), patno, total_variations);
+    fprintf(stderr, "---------------------------\n");
+  }
 
   write_pattern_db(output_FILE);
 

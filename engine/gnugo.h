@@ -53,6 +53,10 @@ void init_gnugo(float memory);
 /* ================================================================ */
 
 
+/* Board size */
+
+#define DEFAULT_BOARD_SIZE 19
+
 /* Colors */
 #define EMPTY        0
 #define WHITE        1

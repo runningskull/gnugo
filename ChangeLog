@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- now possible to reduce MAX_BOARD and still get working GNU go
+- mkpat now has amechanism for dropping patterns
+- corner database creation implemented
+- corner database pattern matcher implemented but not activated
+- bugfix in play_ascii.c: allow changing handicap/komi etc. in new games
+- fixed broken indentation in play_ascii.c
 - bugfix in gtp_known_command
 - new visible_along_edge() and autohelpers
 - tuning

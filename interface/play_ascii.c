@@ -336,7 +336,7 @@ enum commands {INVALID=-1, END, EXIT, QUIT, RESIGN,
                CMD_CAPTURE, CMD_DEFEND,
                CMD_HELPDEBUG, CMD_SHOWAREA, CMD_SHOWMOYO, CMD_SHOWTERRI,
                CMD_GOTO, CMD_SAVE, CMD_LOAD, CMD_SHOWDRAGONS, CMD_LISTDRAGONS,
-              SETHURRY, SETLEVEL, NEW, COUNT, FREEHANDICAP
+	       SETHURRY, SETLEVEL, NEW, COUNT, FREEHANDICAP
 };
 
 
@@ -680,15 +680,15 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  printf("\nSet handicap to %d\n", gameinfo->handicap);
           gameinfo->to_move = (gameinfo->handicap ? WHITE : BLACK);
 	  break;
-       case FREEHANDICAP:
-         if (sgf_initialized) {
-           printf("Handicap cannot be changed after game is started!\n");
-           break;
-         }
-         while (*command && *command != ' ')
-           command++;
-         ascii_free_handicap(gameinfo, command);
-         break;
+	case FREEHANDICAP:
+	  if (sgf_initialized) {
+	    printf("Handicap cannot be changed after game is started!\n");
+	    break;
+	  }
+	  while (*command && *command != ' ')
+	    command++;
+	  ascii_free_handicap(gameinfo, command);
+	  break;
 	case SETKOMI:
 	  if (sgf_initialized) {
 	    printf("Komi cannot be modified after game record is started!\n");
@@ -972,7 +972,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
     }
     sgffile_output(&sgftree);
     passes = 0;
-    showdead = 0;
     
     /* Play a different game next time. */
     update_random_seed();
@@ -981,6 +980,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
     sgfFreeNode(sgftree.root);
     sgftree_clear(&sgftree);
     sgftreeCreateHeaderNode(&sgftree, board_size, komi);
+    sgf_initialized = 0;
 
     gameinfo_clear(gameinfo, board_size, komi);
   }
@@ -1162,40 +1162,41 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
 
       if (!strncmp(line, "undo", 4)) {
         if (!handi)
-         printf("\nNothing to undo.\n");
-        else {
-         remove_stone(stones[--handi]);
-         gprintf("\nRemoved the stone at %m.\n", I(stones[handi]),
-           J(stones[handi]));
-       }
+	  printf("\nNothing to undo.\n");
+	else {
+	  remove_stone(stones[--handi]);
+	  gprintf("\nRemoved the stone at %m.\n", I(stones[handi]),
+		  J(stones[handi]));
+	}
       }
       else if (!strncmp(line, "clear", 5)) {
         gnugo_clear_board(board_size);
         handi = 0;
       }
       else if (!strncmp(line, "done", 4)) {
-       if (handi == 1) /* Don't bother with checks later */
-         printf ("\nHandicap cannot be one stone. Either add "
-           "some more, or delete the only stone.\n");
-       else
-         break;
+	if (handi == 1) /* Don't bother with checks later */
+	  printf ("\nHandicap cannot be one stone. Either add "
+		  "some more, or delete the only stone.\n");
+	else
+	  break;
       }
       else if (string_to_location(board_size, line, &x, &y)) {
-       pos = POS(x,y);
-       if (board[pos] != EMPTY)
-         printf("\nThere's already a stone there.\n");
-       else {
-         add_stone(pos, BLACK);
-         stones[handi++] = pos;
-       }
+	pos = POS(x,y);
+	if (board[pos] != EMPTY)
+	  printf("\nThere's already a stone there.\n");
+	else {
+	  add_stone(pos, BLACK);
+	  stones[handi++] = pos;
+	}
       }
       else
-       printf("\nInvalid command: %s", line);
+	printf("\nInvalid command: %s", line);
     }
   }
   gameinfo->handicap = handi;
   gameinfo->to_move = (handi ? WHITE : BLACK);
 }
+
 
 /*
  * Local Variables:

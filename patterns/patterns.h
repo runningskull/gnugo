@@ -119,31 +119,32 @@ typedef int (*autohelper_fn_ptr)(int rotation, int move,
  * databases. The descriptions here mostly relate to patterns in
  * patterns.db and other databases which are handled by shapes.c.
  */
-#define CLASS_O 0x0001   /* O stones must be alive or unknown */
-#define CLASS_o 0x0002   /* O stones must be dead or unknown */
-#define CLASS_X 0x0004   /* X stones must be alive or unknown */
-#define CLASS_x 0x0008   /* X stones must be dead or unknown */
-#define CLASS_s 0x0010   /* move is a sacrifice */
-#define CLASS_n 0x0020   /* X could also make this move if we do not */
-#define CLASS_D 0x0040   /* defense pattern */
-#define CLASS_C 0x0080   /* move connects two worms */ 
-#define CLASS_c 0x0100   /* move weakly connects two worms */ 
-#define CLASS_B 0x0200   /* move breaks connection between enemy worms */
-#define CLASS_A 0x0400   /* attack pattern */
-#define CLASS_b 0x0800   /* move is intended to block opponent */
-#define CLASS_e 0x1000   /* move is intended to expand territory */
-#define CLASS_E 0x2000   /* move is intended to expand moyo */
-#define CLASS_a 0x4000   /* strategical level attack */
-#define CLASS_d 0x8000   /* strategical level defense */
-#define CLASS_I 0x10000  /* invasions patterns (influence.db) */
-#define CLASS_J 0x20000  /* joseki standard move */
-#define CLASS_j 0x40000  /* joseki move, slightly less urgent */
-#define CLASS_t 0x80000  /* minor joseki move (tenuki OK) */
-#define CLASS_U 0x100000 /* very urgent joseki move */
-#define CLASS_T 0x200000 /* joseki trick move */
-#define CLASS_W 0x400000 /* worthwhile threat move */
-#define CLASS_F 0x800000 /* for joseki moves: a fuseki pattern */
-#define CLASS_Y 0x80000000 /* used for experimental patterns */
+#define CLASS_O     0x0001   /* O stones must be alive or unknown */
+#define CLASS_o     0x0002   /* O stones must be dead or unknown */
+#define CLASS_X     0x0004   /* X stones must be alive or unknown */
+#define CLASS_x     0x0008   /* X stones must be dead or unknown */
+#define CLASS_s     0x0010   /* move is a sacrifice */
+#define CLASS_n     0x0020   /* X could also make this move if we do not */
+#define CLASS_D     0x0040   /* defense pattern */
+#define CLASS_C     0x0080   /* move connects two worms */ 
+#define CLASS_c     0x0100   /* move weakly connects two worms */ 
+#define CLASS_B     0x0200   /* move breaks connection between enemy worms */
+#define CLASS_A     0x0400   /* attack pattern */
+#define CLASS_b     0x0800   /* move is intended to block opponent */
+#define CLASS_e     0x1000   /* move is intended to expand territory */
+#define CLASS_E     0x2000   /* move is intended to expand moyo */
+#define CLASS_a     0x4000   /* strategical level attack */
+#define CLASS_d     0x8000   /* strategical level defense */
+#define CLASS_I 0x00010000   /* invasions patterns (influence.db) */
+#define CLASS_J 0x00020000   /* joseki standard move */
+#define CLASS_j 0x00040000   /* joseki move, slightly less urgent */
+#define CLASS_t 0x00080000   /* minor joseki move (tenuki OK) */
+#define CLASS_U 0x00100000   /* very urgent joseki move */
+#define CLASS_T 0x00200000   /* joseki trick move */
+#define CLASS_W 0x00400000   /* worthwhile threat move */
+#define CLASS_F 0x00800000   /* for joseki moves: a fuseki pattern */
+#define CLASS_N 0x01000000   /* antisuji move (do _not_ play) */
+#define CLASS_Y 0x80000000   /* used for experimental patterns */
 
 /* Collection of the classes inducing move reasons. */
 #define CLASS_MOVE_REASONS (CLASS_C | CLASS_B | CLASS_b | \
@@ -378,16 +379,20 @@ struct corner_variation;
 struct corner_pattern;
 
 struct corner_db {
-  int num_top_variations;
-  struct corner_variation *variations;
+  int max_width;
+  int max_height;
+
+  char num_top_variations;
+  struct corner_variation *top_variations;
 };
 
 struct corner_variation {
-  int att;
   int move_offset;
+  char xor_att;
+  char num_stones;
 
-  int num_variations;
-  struct corner_variation *subvariations;
+  char num_variations;
+  struct corner_variation *variations;
 
   struct corner_pattern *pattern;
 };
@@ -403,6 +408,19 @@ struct corner_pattern {
   int autohelper_flag;
   autohelper_fn_ptr autohelper;
   float constraint_cost;
+};
+
+struct corner_variation_b {
+  int move_offset;
+  char xor_att;
+  char num_stones;
+
+  char num_variations;
+  struct corner_variation_b *next;
+  struct corner_variation_b *child;
+  int child_num;
+
+  int pattern_num;
 };
 
 
