@@ -338,16 +338,13 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
  * The name saved_stones is historic and should probably be changed
  * since it also includes captured stones.
  *
- * The relative strength for inessential stones must be somewhat
- * larger than 0. Otherwise they may be considered as territory for
- * the opponent and the territory evaluations may mess up.
  */
 
 static float strength_map[10] = {
   0.0,   /* DEAD            */
   0.9,   /* ALIVE           */
   0.5,   /* CRITICAL        */
-  0.01,  /* INESSENTIAL     */
+  0.0,   /* INESSENTIAL     */
   0.0,   /* TACTICALLY DEAD */
   0.7,   /* WEAK            */
   0.8,   /* WEAKLY_ALIVE    */
@@ -445,7 +442,12 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 	if (IS_STONE(board[pos])
 	    && dragons_known
 	    && dragon[pos].id != -1
-	    && DRAGON2(pos).safety == INESSENTIAL
+	    && (DRAGON2(pos).safety == INESSENTIAL
+	        || (worm[pos].inessential
+		    && ((DRAGON2(pos).safety != DEAD
+		         && DRAGON2(pos).safety != CRITICAL)
+		        || (DRAGON2(pos).safety == CRITICAL
+		            && board[pos] == color)))) 
 	    && q->p[i][j] == EMPTY)
 	  q->p[i][j] = board[pos];
       }
@@ -1279,8 +1281,7 @@ new_value_territory(struct influence_data *q)
     for (j = 0; j < board_size; j++) {
       first_guess[i][j] = 0.0;
 
-      if (q->p[i][j] == EMPTY
-	  || (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0)) {
+      if (q->p[i][j] == EMPTY) {
         float diff = 0.0;
         if (q->white_influence[i][j] + q->black_influence[i][j] > 0)
           diff = (q->white_influence[i][j] - q->black_influence[i][j])
@@ -1318,7 +1319,10 @@ new_value_territory(struct influence_data *q)
    */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      /* Do not overrule dead stone territory above. */
+      /* Do not overrule dead stone territory above.
+       * FIXME: This does not do what it claims to do. Correcting it
+       * seems to break some tests, though.
+       */
       if (q->p[i][j] == EMPTY) {
 	/* Loop over all neighbors. */
         for (k = 0; k < 4; k++) {
@@ -1355,8 +1359,7 @@ new_value_territory(struct influence_data *q)
   /* Third loop: Nonterritory patterns, points for prisoners. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if (q->p[i][j] == EMPTY
-	  || (q->black_strength[i][j] == 0 && q->white_strength[i][j] == 0)) {
+      if (q->p[i][j] == EMPTY) {
 	/* If marked as non-territory for the color currently owning
          * it, reset the territory value.
 	 */
