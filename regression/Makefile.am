@@ -1,6 +1,6 @@
 TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst auto01.tst \
        auto02.tst auto03.tst auto04.tst blunder.tst buzco.tst \
-       capture.tst century-2002.tst connect.tst connect_rot.tst \
+       capture.tst century2002.tst connect.tst connect_rot.tst \
        connection.tst connection_rot.tst cutstone.tst dniwog.tst \
        ego.tst endgame.tst endgame_rot.tst filllib.tst global.tst \
        golife.tst handtalk.tst heikki.tst lazarus.tst ld_owl.tst \
@@ -58,8 +58,8 @@ buzco: buzco.tst
 capture: capture.tst
 	$(srcdir)/eval.sh capture.tst  $(GG_OPTIONS)
 
-century: century-2002.tst
-	$(srcdir)/eval.sh century-2002.tst  $(GG_OPTIONS)
+century: century2002.tst
+	$(srcdir)/eval.sh century2002.tst  $(GG_OPTIONS)
 
 connect: connect.tst
 	$(srcdir)/eval.sh connect.tst $(GG_OPTIONS)
@@ -312,7 +312,7 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) handtalk.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) nngs2.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) strategy5.tst $(GG_OPTIONS)
-	$(srcdir)/regress.sh $(srcdir) century-2002.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) century2002.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) auto01.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) auto02.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) auto03.tst $(GG_OPTIONS)
