@@ -2232,6 +2232,7 @@ find_connection_moves(int str1, int str2, int color_to_move,
   int i, j;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
+  float distance_limit;
 
   /* We turn off the sgf traces here to avoid cluttering them up with
    * tactical reading moves.
@@ -2496,8 +2497,13 @@ find_connection_moves(int str1, int str2, int color_to_move,
   /* Filter out moves with distance at least 1.5 more than the best
    * move, or with distance higher than the cutoff specified.
    */
+  if (num_moves <= 1 || !is_ko(moves[0], color_to_move, NULL))
+    distance_limit = distances[0] + 1.5;
+  else
+    distance_limit = distances[1] + 1.5;
+
   for (r = 0; r < num_moves; r++)
-    if (distances[r] > distances[0] + 1.5
+    if (distances[r] > distance_limit
 	|| distances[r] > cutoff)
       break;
   num_moves = r;
