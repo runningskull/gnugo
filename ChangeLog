@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new static bamboo_rescue_moves() in `reading.c'.
 - computation of safety and status values in make_dragons() revised to
   more robustly handle invincible dragons
 - dragon_invincible() revised

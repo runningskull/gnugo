@@ -257,6 +257,8 @@ static int defend3(int str, int *move, int komaster, int kom_pos);
 static int defend4(int str, int *move, int komaster, int kom_pos);
 static void special_rescue_moves(int str, int lib,
     				 struct reading_moves *moves);
+static void bamboo_rescue_moves(int str, int num_libs, int libs[], 
+                                struct reading_moves *moves);
 static void special_rescue2_moves(int str, int libs[2],
     				  struct reading_moves *moves);
 static void special_rescue3_moves(int str, int libs[3],
@@ -1464,6 +1466,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
   if (stackp <= depth) {
     for (k = 0; k < liberties; k++)
       special_rescue_moves(str, libs[k], &moves);
+    bamboo_rescue_moves(str, liberties, libs, &moves);
   }
 
   if (stackp <= backfill_depth)
@@ -1666,6 +1669,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
   if (stackp <= depth) {
     for (k = 0; k < liberties; k++)
       special_rescue_moves(str, libs[k], &moves);
+    bamboo_rescue_moves(str, liberties, libs, &moves);
   }
 
   if (level >= 8 && stackp <= backfill2_depth)
@@ -1792,14 +1796,14 @@ special_rescue_moves(int str, int lib, struct reading_moves *moves)
   int other = OTHER_COLOR(color);
   int k;
 
+  /* Use approxlib() to test for trivial capture. */
+  if (approxlib(lib, other, 3, NULL) > 2)
+    return;
+
   /* Loop over the four neighbours of the liberty, (lib + d). */
   for (k = 0; k < 4; k++) {
     int d = delta[k];
     if (board[lib + d] == EMPTY) {
-
-      /* Use approxlib() to test for trivial capture. */
-      if (approxlib(lib, other, 3, NULL) > 2)
-	continue;
 
       /* Don't play into a self atari. */
       if (is_self_atari(lib + d, color))
@@ -1808,6 +1812,53 @@ special_rescue_moves(int str, int lib, struct reading_moves *moves)
       ADD_CANDIDATE_MOVE(lib + d, 0, *moves, "special_rescue");
     }
   }
+}
+
+
+/*
+ * In situations like 
+ *
+ * XXXXXO
+ * XO.*.O
+ * XO.O.O
+ * XXXXXO
+ *
+ * playing at * is the correct rescue move, although the opponent cannot 
+ * be captured at the respective first-order liberty.
+ */
+static void
+bamboo_rescue_moves(int str, int num_libs, int libs[], 
+                    struct reading_moves *moves)
+{
+  int color = board[str];
+  int l1, l2;
+
+  for (l1 = 0; l1 < num_libs; l1++)
+    for (l2 = 0; l2 < num_libs; l2++) {
+      if (l1 == l2) 
+	continue;
+
+      if (libs[l1] == WEST(libs[l2]) || libs[l1] == EAST(libs[l2])) {
+	if (board[SOUTH(libs[l1])] == EMPTY 
+	    && board[SOUTH(libs[l2])] == color
+	    && !is_self_atari(SOUTH(libs[l1]), color))
+	  ADD_CANDIDATE_MOVE(SOUTH(libs[l1]), 0, *moves, "bamboo_rescue");
+	if (board[NORTH(libs[l1])] == EMPTY 
+	    && board[NORTH(libs[l2])] == color
+	    && !is_self_atari(NORTH(libs[l1]), color))
+	  ADD_CANDIDATE_MOVE(NORTH(libs[l1]), 0, *moves, "bamboo_rescue");
+      } 
+      else if (libs[l1] == NORTH(libs[l2]) || libs[l1] == SOUTH(libs[l2])) {
+	if (board[WEST(libs[l1])] == EMPTY 
+	    && board[WEST(libs[l2])] == color
+	    && !is_self_atari(WEST(libs[l1]), color))
+	  ADD_CANDIDATE_MOVE(WEST(libs[l1]), 0, *moves, "bamboo_rescue");
+	if (board[EAST(libs[l1])] == EMPTY 
+	    && board[EAST(libs[l2])] == color
+	    && !is_self_atari(EAST(libs[l1]), color))
+	  ADD_CANDIDATE_MOVE(EAST(libs[l1]), 0, *moves, "bamboo_rescue");
+      }
+    }
 }
 
 
