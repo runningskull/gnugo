@@ -529,10 +529,14 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
       DEBUG(DEBUG_LOADSGF, "Loading until move %d\n", until);
     }
     else {
-      untiln = *untilstr - 'A';
-      if (*untilstr >= 'I')
+      if ('A' <= *untilstr && *untilstr <= 'Z')
+	untiln = *untilstr - 'A';
+      else
+	untiln = *untilstr - 'a';
+
+      if (untiln >= 'I' - 'A')
 	--untiln;
-	  
+
       untilm = board_size - atoi(untilstr+1);
       DEBUG(DEBUG_LOADSGF, "Loading until move at %d,%d (%m)\n", 
 	    untilm, untiln, untilm, untiln);
