@@ -2,9 +2,6 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- experimental influence: yet another new_value_territory revision
-- experimental influence: fixed followup values really taken down (shapes.c)
-- experimental influence: pattern tuning
 - command line option --options reports configure options
 - verbose reduced in readconnect.
 - do_genmove tries harder to restrain thrashing dragons.
@@ -21,11 +18,15 @@
 - [ox]lib request only up to MAX_LIBERTIES liberties.
 - bugfix in reevaluate_ko_threats
 - floating point exceptions stopped in readconnect.c
+- experimental influence: yet another new_value_territory revision
+- experimental influence: fixed followup values really taken down (shapes.c)
+- experimental influence: pattern tuning
 - experimental influence: follow-up specific constraints for B patterns
 - experimental influence: new_value_territory revised (center correction)
 - experimental influence: most fixed follow-up values taken down
 - experimental influence: tuning, joseki values increased, some bugs fixed
 - experimental_influence ignored for escape influence
+- influential doc revision
 - edge_double_sente_helper is now autohelper
 - owl threat loop broken out
 - new global thrashing_dragon

@@ -551,8 +551,11 @@ move at (i, j).
 @comment  node-name,  next,  previous,  up
 @section Colored display and debugging of influence
 
-It is possible to obtain colored diagrams showing influence from
-a colored xterm or rxvt window.
+There are various ways to obtain detailed information about the influence
+computations. Colored diagrams showing influence are possible from
+a colored xterm or rxvt window. 
+
+There are two options controlling when to generate diagrams:
 
 @itemize @bullet
 @item @option{-m 0x08} or @option{-m 8}
@@ -563,6 +566,19 @@ after. The difference is that dead dragons are taken into account the
 second time. Tactically captured worms are taken into account both
 times. 
 @end quotation
+@item @option{--debuginfluence @var{location}}
+@quotation
+Show influence diagrams after the move at the given location. An
+important limitation of this option is that it's only effective for
+moves that the move generation is considering.
+@end quotation
+@end itemize
+
+The other options control which diagrams should be generated in these
+situations. You have to specify at least one of the options above and
+at least one of the options below to generate any output.
+
+@itemize @bullet
 @item @option{-m 0x010} or @option{-m 16}.
 @quotation
 Show colored display of territory/moyo/area regions.
@@ -571,8 +587,8 @@ Show colored display of territory/moyo/area regions.
 @item moyo: yellow
 @item area: red
 @end itemize
-Use either with @option{-m 0x8} (i.e. use @option{-m 0x18}) or
-with @option{--debuginfluence}.
+This feature is very useful to get an immediate impression of the influence
+regions as GNU Go sees them.
 @end quotation
 @item @option{-m 0x20} or @option{-m 32}.
 @quotation
@@ -580,26 +596,39 @@ Show numerical influence values for white and black. These come in
 two separate diagrams, the first one for white, the second one for
 black. Notice that the influence values are represented by floats and
 thus have been rounded in these diagrams.
-Use either with @option{-m 0x8} (i.e. use @option{-m 0x28}) or
-with @option{--debuginfluence}.
 @end quotation
-@item @option{--debuginfluence @var{location}}
+@item @option{-m 0x40} or @option{-m 64}.
 @quotation
-Show influence diagrams after the move at the given location. An
-important limitation of this option is that it's only effective for
-moves that the move generation is considering.
+This generates two diagrams showing the permeability for black and white
+influence on the board.
 @end quotation
-@item @option{-d 0x20}
+@item @option{-m 0x80} or @option{-m 128}.
 @quotation
-Turn on @code{DEBUG_INFLUENCE}. This gives tons of messages from the pattern
-matching performed by the influence code. Too many to be really
-useful, unfortunately.
+This shows the strength of the influence sources for black and white 
+across the board. You will see sources at each lively stone (with strength
+depending on the strength of this stone), and sources contributed by
+patterns.
+@end quotation
+@item @option{-m 0x100} or @option{-m 256}.
+@quotation
+This shows the attenuation with which the influence sources spread
+influence across the board. Low attenuation indicates far-reaching
+influence sources.
+@end quotation
+@item @option{-m 0x200} or @option{-m 512}.
+@quotation
+This shows the territory valuation of GNU Go. Each intersection is
+shown with a value between -1.0 and +1.0 (or -2 resp. +2 if there is
+a dead stone on this intersection). Positive values indicate territory
+for white. A value of -0.5 thus indicates a point where black has a
+50% chance of getting territory.
 @end quotation
 @end itemize
 
-Notice that you need to activate at least one of @option{-m 0x8} or
-@option{--debuginfluence}, and at least one of @option{-m 0x10} and
-@option{-m 0x20}, to get any diagrams at all. The first two determine when to
-print diagrams while the last two determine what diagrams to print.
-
+Finally, there is the debug option @option{-d 0x1} which turns on
+on @code{DEBUG_INFLUENCE}. This gives a message for each influence pattern
+that gets matched. Unfortunately, these are way too many messages making
+it tedious to navigate the output. However, if you discover an influence
+source with @option{-m 0x80} that looks wrong, the debug output can
+help you to quickly find out the responsible pattern.
 
