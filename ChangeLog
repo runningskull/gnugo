@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new command line option --no-cosmic-gnugo
 - joseki tuning
 - remove global variables score, lower_bound, upper_bound
 - remove (level >= 8) condition for estimate_score() call
