@@ -87,6 +87,8 @@ static int special_rescue3(int str, int libs[3], int *move,
 			   int komaster, int kom_pos);
 static int special_rescue4(int str, int libs[3], int *move, 
 			   int komaster, int kom_pos);
+static void special_rescue5(int str, int libs[3], int moves[MAX_MOVES],
+			    int scores[MAX_MOVES], int *num_moves);
 static void edge_clamp(int str, int moves[MAX_MOVES],
 		       int scores[MAX_MOVES], int *num_moves);
 static int do_attack(int str, int *move, int komaster, int kom_pos);
@@ -1345,7 +1347,50 @@ defend2(int str, int *move, int komaster, int kom_pos)
     READ_RETURN(read_result, move, xpos, bc);
   }
   UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
-  
+
+  if (stackp <= backfill_depth) {
+    int saved_num_moves = num_moves;
+    special_rescue5(str, libs, moves, scores, &num_moves);
+    
+    /* Only order and test the new set of moves. */
+    order_moves(str, num_moves-saved_num_moves,
+		&(moves[saved_num_moves]),
+		&(scores[saved_num_moves]), other, read_function_name);
+    
+    for (k = saved_num_moves; k < num_moves; k++) {
+      int new_komaster;
+      int new_kom_pos;
+      int ko_move;
+      xpos = moves[k];
+      if (is_self_atari(xpos, color))
+	continue;
+      
+      if (komaster_trymove(xpos, color, "defend2-F", str,
+			   komaster, kom_pos, &new_komaster, &new_kom_pos,
+			   &ko_move, stackp <= ko_depth && savecode == 0)) {
+	if (!ko_move) {
+	  int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
+	  popgo();
+	  if (acode == 0) {
+	    SGFTRACE(xpos, WIN, "defense effective - A");
+	    READ_RETURN(read_result, move, xpos, WIN);
+	  }
+	  /* if the move works with ko we save it, then look for something
+	   * better.
+	   */
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	}
+	else {
+	  if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	    savemove = xpos;
+	    savecode = KO_B;
+	  }
+	  popgo();
+	}
+      }
+    }
+  }
+
   if (stackp <= backfill2_depth) {
     bc = break_chain3(str, &xpos, komaster, kom_pos);
     if (bc == WIN) {
@@ -1354,7 +1399,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
     }
     UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
-  
+
   if (savecode != 0) {
     SGFTRACE(savemove, savecode, "saved move");
     READ_RETURN(read_result, move, savemove, savecode);
@@ -1378,10 +1423,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
   int xpos;
   int liberties;
   int libs[3];
-#if 0
-  int liberties2;
-  int libs2[6];
-#endif
   int moves[MAX_MOVES];
   int scores[MAX_MOVES];
   int num_moves = 0;
@@ -1389,10 +1430,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
   int savecode = 0;
   int bc;
   int k;
-#if 0
-  int r;
-  int s;
-#endif
   int found_read_result;
   Read_result *read_result;
 
@@ -1485,30 +1522,14 @@ defend3(int str, int *move, int komaster, int kom_pos)
     }
   }
 
-#if 0
-  if (stackp <= backfill_depth) {
-    bc = break_chain2(str, &xpos, komaster);
-    if (bc == WIN) {
-      SGFTRACE(xpos, bc, "break chain2");
-      READ_RETURN(read_result, move, xpos, bc);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
-  }
-  
-  if (stackp <= backfill2_depth) {
-    bc = break_chain3(str, &xpos, komaster);
-    if (bc == WIN) {
-      SGFTRACE(xpos, bc, "break chain3");
-      READ_RETURN(read_result, move, xpos, bc);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
-  }
-#endif
-  
   /* This looks a little too expensive. */
 #if 0
   /* Look for backfilling moves. */
   if (stackp <= backfill_depth) {
+    int liberties2;
+    int libs2[6];
+    int r;
+    int s;
     for (k = 0; k < liberties; k++) {
       if (is_self_atari(libs[k], other)) {
 	liberties2 = approxlib(libs[k], color, 6, libs2);
@@ -1553,7 +1574,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	      continue;
 	    
 	    if (!is_self_atari(xpos, color)
-		&& trymove(xpos, color, "defend2-D", str, komaster, kom_pos)) {
+		&& trymove(xpos, color, "defend2-G", str, komaster, kom_pos)) {
 	      int acode = do_attack(str, NULL, komaster, kom_pos);
 	      popgo();
 	      if (acode == 0) {
@@ -1661,7 +1682,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
    * with 2 or 3 liberties last, because these moves often are not
    * really relevant.
    */
-#if 1
   if (stackp <= backfill2_depth) {
     bc = break_chain2(str, &xpos, komaster, kom_pos);
     if (bc == WIN) {
@@ -1670,7 +1690,50 @@ defend3(int str, int *move, int komaster, int kom_pos)
     }
     UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
-  
+
+  if (stackp <= backfill_depth) {
+    int saved_num_moves = num_moves;
+    special_rescue5(str, libs, moves, scores, &num_moves);
+    
+    /* Only order and test the new set of moves. */
+    order_moves(str, num_moves-saved_num_moves,
+		&(moves[saved_num_moves]),
+		&(scores[saved_num_moves]), other, read_function_name);
+    
+    for (k = saved_num_moves; k < num_moves; k++) {
+      int new_komaster;
+      int new_kom_pos;
+      int ko_move;
+      xpos = moves[k];
+      if (is_self_atari(xpos, color))
+	continue;
+      
+      if (komaster_trymove(xpos, color, "defend3-E", str,
+			   komaster, kom_pos, &new_komaster, &new_kom_pos,
+			   &ko_move, stackp <= ko_depth && savecode == 0)) {
+	if (!ko_move) {
+	  int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
+	  popgo();
+	  if (acode == 0) {
+	    SGFTRACE(xpos, WIN, "defense effective - A");
+	    READ_RETURN(read_result, move, xpos, WIN);
+	  }
+	  /* if the move works with ko we save it, then look for something
+	   * better.
+	   */
+	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	}
+	else {
+	  if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	    savemove = xpos;
+	    savecode = KO_B;
+	  }
+	  popgo();
+	}
+      }
+    }
+  }
+    
   if (stackp <= backfill2_depth) {
     bc = break_chain3(str, &xpos, komaster, kom_pos);
     if (bc == WIN) {
@@ -1679,7 +1742,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
     }
     UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
   }
-#endif
   
   if (savecode != 0) {
     SGFTRACE(savemove, savecode, "saved move");
@@ -2109,6 +2171,80 @@ special_rescue4(int str, int libs[3], int *move, int komaster, int kom_pos)
     *move = savemove;
 
   return savecode;
+}
+
+
+/* In situations like these
+ *
+ *   |XXXX    |.X...    |.X...
+ *   |OOOX    |.XOO.    |XXOO.
+ *   |..OX    |OOXO.    |OOXO.
+ *   |O.OX    |O.X*O    |O.XOO
+ *   |.X*.    |O.X.O    |O.X*O
+ *   +----    +-----    +-----
+ *
+ * the smaller of the O strings can be defended by *. The property
+ * they have in common is that the defended string has (at least) two
+ * liberties in common with an X string and it's effective to play on
+ * an exterior liberty of this string. Similarly it may be worth
+ * defending a weak neighbor of the X string.
+ *
+ * This function may be called for strings with 2 or 3 liberties and
+ * returns moves which are potentially useful in these positions.
+ */
+static void
+special_rescue5(int str, int libs[3], int moves[MAX_MOVES],
+		int scores[MAX_MOVES], int *num_moves)
+{
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int apos, bpos;
+  int k, r, s;
+  int liberties = countlib(str);
+  int libs2[4];
+  int liberties2;
+
+  ASSERT1(liberties == 2 || liberties == 3, str);
+  
+  for (r = 0; r < liberties; r++) {
+    apos = libs[r];
+    
+    for (k = 0; k < 4; k++) {
+      bpos = apos + delta[k];
+      if (board[bpos] != other)
+	continue;
+
+      /* Don't bother if it has too many liberties. */
+      if (countlib(bpos) > liberties + 1)
+	continue;
+
+      if (count_common_libs(str, bpos) < 2)
+	continue;
+
+      liberties2 = findlib(bpos, 4, libs2);
+      for (s = 0; s < liberties2; s++)
+	if (!liberty_of_string(libs2[s], str))
+	  ADD_CANDIDATE_MOVE(libs2[s], 0, moves, scores, *num_moves);
+
+      /* Reinforce the second order chain. */
+      if (liberties2 <= liberties) {
+	int adj;
+	int adjs[MAXCHAIN];
+	int t;
+	adj = chainlinks2(bpos, adjs, 1);
+	for (t = 0; t < adj; t++) {
+	  int cpos;
+	  break_chain_moves(adjs[t], moves, scores, num_moves);
+	  
+	  findlib(adjs[t], 1, &cpos);
+	  ADD_CANDIDATE_MOVE(cpos, 0, moves, scores, *num_moves);
+	}
+  
+	/* Defend against double atari in the surrounding chain early. */
+	double_atari_chain2(bpos, moves, scores, num_moves);
+      }
+    }
+  }
 }
 
 
