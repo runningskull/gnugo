@@ -668,8 +668,7 @@ O!O!
 XA*O	double cut.
 ObOc
 
-; xplay_attack(*,A) && !xplay_attack(*,b,c,c)
-; && (gprintf("CB14 matched: %1m %1m",b,c),1)
+; xplay_attack(*,A) && !xplay_attack_either(*,b,c,c,*)
 
 
 Pattern CB15
