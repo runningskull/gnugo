@@ -36,17 +36,22 @@ typedef void (*connection_helper_fn_ptr) (struct connection_data *conn,
  * push_connection_heap_entry() for organization of the heap.
  */
 struct heap_entry {
-  float distance;
+  int distance;
   int coming_from;
   int target;
   connection_helper_fn_ptr helper;
 };
 
-#define HUGE_CONNECTION_DISTANCE 100.0
+/* Fixed-point arithmetic helper macros */
+#define FIXED_POINT_BASIS 10000
+#define FP(x) ((int) (0.5 + FIXED_POINT_BASIS * (x)))
+#define FIXED_TO_FLOAT(x) ((x) / (float) FIXED_POINT_BASIS)
+
+#define HUGE_CONNECTION_DISTANCE FP(100.0)
 
 struct connection_data {
-  float distances[BOARDMAX];
-  float deltas[BOARDMAX];
+  int distances[BOARDMAX];
+  int deltas[BOARDMAX];
   int coming_from[BOARDMAX];
   int vulnerable1[BOARDMAX];
   int vulnerable2[BOARDMAX];
@@ -60,16 +65,16 @@ struct connection_data {
   struct heap_entry *heap[BOARDMAX];
 
   int target;
-  float cutoff_distance;
+  int cutoff_distance;
   int speculative;
 };
 
 
-void compute_connection_distances(int str, int target, float cutoff,
+void compute_connection_distances(int str, int target, int cutoff,
 				  struct connection_data *conn,
 				  int speculative);
 void init_connection_data(int color, const char goal[BOARDMAX],
-			  int target, float cutoff,
+			  int target, int cutoff,
 			  struct connection_data *conn, int speculative);
 void spread_connection_distances(int color, struct connection_data *conn);
 void sort_connection_queue_tail(struct connection_data *conn);

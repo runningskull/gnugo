@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- distance measures converted from floating to fixed point arithmetic
+  in connection reading code.
 - owl threats disabled as a command line option
 - EXIT_SUCCESS and EXIT_FAILURE used in transpat.c and sgfgen.c
 - revised interface to all genmove() type functions

@@ -4745,7 +4745,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
 	  mark_string(cuts[k], this_goal, 1);
 	  mark_string(cuts[k], component2, c_id);
 	}
-      init_connection_data(color, this_goal, NO_MOVE, 3.01,
+      init_connection_data(color, this_goal, NO_MOVE, FP(3.01),
 	  		   conn_data + c_id, 1);
       spread_connection_distances(color, conn_data + c_id);
     }
@@ -4754,7 +4754,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
      * smallest distance.
      */
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      float closest_dist = HUGE_CONNECTION_DISTANCE;
+      int closest_dist = HUGE_CONNECTION_DISTANCE;
       int closest_component = -1;
       if (!goal[pos] || board[pos] != color)
 	continue;

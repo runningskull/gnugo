@@ -227,9 +227,9 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 
   /* When blocking off, we use a somewhat smaller goal area. */
   if (color_to_move == board[str])
-    compute_connection_distances(str, NO_MOVE, 3.01, &conn, 1);
+    compute_connection_distances(str, NO_MOVE, FP(3.01), &conn, 1);
   else
-    compute_connection_distances(str, NO_MOVE, 2.81, &conn, 1);
+    compute_connection_distances(str, NO_MOVE, FP(2.81), &conn, 1);
 
   sort_connection_queue_tail(&conn);
   expand_connection_queue(&conn);
@@ -253,7 +253,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
     int k;
     int save_num = *num_non_territory;
     int affected_size = 0;
-    float cut_off_distance = 3.5;
+    int cut_off_distance = FP(3.5);
     if (ON_BOARD(move) && goal[move]) {
       non_territory[(*num_non_territory)++] = move;
       DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", move);
@@ -261,7 +261,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 
     for (k = 0; k < conn.queue_end; k++) {
       int pos = conn.queue[k];
-      if (conn.distances[pos] > cut_off_distance + 0.31)
+      if (conn.distances[pos] > cut_off_distance + FP(0.31))
 	break;
       if (goal[pos]
 	  && (!ON_BOARD(conn.coming_from[pos])
@@ -322,14 +322,14 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
   int num_non_territory = 0;
   int candidate_strings[MAX_TRIES];
   int candidates = 0;
-  float min_distance = 5.0;
+  int min_distance = FP(5.0);
 
   DEBUG(DEBUG_BREAKIN,
         "Trying to break (%C to move) %C's territory ", color_to_move, owner);
   if (debug & DEBUG_BREAKIN)
     goaldump(goal);
   /* Compute nearby fields of goal. */
-  init_connection_data(intruder, goal, NO_MOVE, 3.01, &conn, 1);
+  init_connection_data(intruder, goal, NO_MOVE, FP(3.01), &conn, 1);
   k = conn.queue_end;
   spread_connection_distances(intruder, &conn);
   sort_connection_queue_tail(&conn);
@@ -340,7 +340,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
   memset(used, 0, BOARDMAX);
   for (; k < conn.queue_end; k++) {
     int pos = conn.queue[k];
-    if (conn.distances[pos] > min_distance + 1.001)
+    if (conn.distances[pos] > min_distance + FP(1.001))
       break;
     if (board[pos] == intruder
 	&& influence_considered_lively(q, pos)) {
