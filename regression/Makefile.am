@@ -7,7 +7,7 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       score.tst manyfaces.tst cutstone.tst newscore.tst blunder.tst \
       niki.tst trevor.tst tactics.tst buzco.tst \
       capture.tst connect.tst global.tst vie.tst \
-      owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst
+      owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst arend.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
@@ -173,6 +173,9 @@ global: global.tst
 vie: vie.tst
 	$(srcdir)/eval.sh vie.tst
 
+arend: arend.tst
+	$(srcdir)/eval.sh arend.tst
+
 all_batches: first_batch second_batch third_batch fourth_batch
 
 first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst filllib.tst atari_atari.tst connection.tst blunder.tst strategy.tst
@@ -218,4 +221,5 @@ fourth_batch: strategy4.tst capture.tst connect.tst global.tst vie.tst
 	$(srcdir)/regress.sh $(srcdir) connect.tst
 	$(srcdir)/regress.sh $(srcdir) global.tst
 	$(srcdir)/regress.sh $(srcdir) vie.tst
+	$(srcdir)/regress.sh $(srcdir) arend.tst
 	$(srcdir)/regress.sh $(srcdir) strategy4.tst
