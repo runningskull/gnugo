@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new atari_atari_find_attack_moves() and atari_atari_find_defense_moves()
+- do_atari_atari() restructured
+- experimental-semeai configure option
+- experimental_semeai command line option
+- owl_analyze_semeai improvements
+
 3.1.14 released November 30, 2001
 
 - new field value in struct half_eye_data

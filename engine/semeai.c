@@ -29,6 +29,7 @@
 #define INFINITY 1000
 
 static void analyze_semeai(int my_dragon, int your_dragon);
+static void experimental_analyze_semeai(int my_dragon, int your_dragon);
 static void add_appropriate_semeai_moves(int move, 
 					 int my_dragon, int your_dragon, 
 					 int my_status, int your_status,
@@ -81,7 +82,9 @@ semeai(int color)
 	  || DRAGON2(bpos).safety == INESSENTIAL)
 	continue;
 
-      analyze_semeai(apos, bpos);      
+      if (experimental_semeai)
+	experimental_analyze_semeai(apos, bpos);
+      else analyze_semeai(apos, bpos);      
     }
   }
 }
@@ -127,6 +130,45 @@ update_status(int dr, int new_status, int new_safety)
 
   DRAGON2(dr).safety = new_safety;
 }
+
+/* Experimental replacement for analyze_semeai() */
+
+static void
+experimental_analyze_semeai(int my_dragon, int your_dragon) 
+{
+  int my_status, your_status;
+
+  int my_best_result, my_worst_result;
+  int your_best_result, your_worst_result;
+  int my_move, your_move;
+
+  DEBUG(DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
+	my_dragon, your_dragon);
+  owl_analyze_semeai(my_dragon, your_dragon, 
+		     &my_best_result, &your_worst_result, &my_move, 1);
+  owl_analyze_semeai(your_dragon, my_dragon, 
+		     &your_best_result, &my_worst_result, &your_move, 1);
+  /* At the moment we don't distinguish between life and life with seki */
+  /* FIXME: If one dragon is involved in multiple semeais, the calculations
+   * are more complex.
+   */
+  if (my_best_result != DEAD && my_worst_result == DEAD)
+    my_status = CRITICAL;
+  else my_status = my_worst_result;
+
+  if (your_best_result != DEAD && your_worst_result == DEAD)
+    your_status = CRITICAL;
+  else your_status = your_worst_result;
+  update_status(my_dragon, my_status, dragon[my_dragon].matcher_status);
+  update_status(your_dragon, your_status, dragon[your_dragon].matcher_status);
+  if (my_status == CRITICAL)
+    add_owl_defense_move(my_move, my_dragon, WIN);
+  if (your_status == CRITICAL)
+    add_owl_attack_move(my_move, your_dragon, WIN);
+}
+
+
+
 
 /* analyzes a pair of adjacent dragons which are 
  * DEAD or CRITICAL.
@@ -667,11 +709,11 @@ add_appropriate_semeai_moves(int move, int my_dragon, int your_dragon,
 {
   if (my_status == CRITICAL)
     add_semeai_move(move, my_dragon);
-  else if (margin_of_safety==1)
+  else if (margin_of_safety == 1)
     add_semeai_threat(move, my_dragon);
   if (your_status == CRITICAL)
       add_semeai_move(move, your_dragon);
-  else if (margin_of_safety==1)
+  else if (margin_of_safety == 1)
     add_semeai_threat(move, your_dragon);
 }
 

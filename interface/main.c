@@ -86,6 +86,8 @@ enum {OPT_BOARDSIZE=2,
       OPT_DECIDE_DRAGON,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_TACTICAL_SEMEAI,
+      OPT_EXPERIMENTAL_SEMEAI,
+      OPT_STANDARD_SEMEAI,
       OPT_DECIDE_POSITION,
       OPT_DECIDE_EYE,
       OPT_BRANCH_DEPTH,
@@ -188,6 +190,8 @@ static struct gg_option const long_options[] =
   {"autolevel",      no_argument,       0, OPT_AUTOLEVEL},
   {"chinese-rules",  no_argument,       0, OPT_CHINESE_RULES},
   {"japanese-rules", no_argument,       0, OPT_JAPANESE_RULES},
+  {"experimental_semeai",  no_argument, 0, OPT_EXPERIMENTAL_SEMEAI},
+  {"standard_semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
   {"play-out-aftermath", no_argument,   0, OPT_PLAY_OUT_AFTERMATH},
@@ -290,6 +294,8 @@ main(int argc, char *argv[])
     chinese_rules = 1;
   else 
     chinese_rules = 0;
+  experimental_semeai = EXPERIMENTAL_SEMEAI;
+
   allow_suicide = 0;
   capture_all_dead = 0;
   play_out_aftermath = 0;
@@ -409,6 +415,14 @@ main(int argc, char *argv[])
 
       case OPT_JAPANESE_RULES: 
 	chinese_rules = 0;
+	break;
+
+      case OPT_EXPERIMENTAL_SEMEAI:
+	experimental_semeai = 1;
+	break;
+
+      case OPT_STANDARD_SEMEAI: 
+	experimental_semeai = 0;
 	break;
 
       case OPT_ALLOW_SUICIDE:

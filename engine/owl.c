@@ -621,7 +621,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	      *resultb = DEAD;
 	      if (move) *move = upos;
 	      sgf_dumptree = save_sgf_dumptree;
-
+	      count_variations = save_count_variations;
 	      return;
 	    }
 	    /* we mark the strings we've tried and failed to prevent 

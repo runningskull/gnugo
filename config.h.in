@@ -6,6 +6,9 @@
 /* Ruleset. Default Japanese */
 #undef CHINESE_RULES
 
+/* Ruleset. Default Japanese */
+#undef EXPERIMENTAL_SEMEAI
+
 /* Define to use curses for color debugging */
 #undef CURSES
 

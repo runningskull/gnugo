@@ -539,6 +539,7 @@ extern float best_move_values[10];
 extern int best_moves[10];
 
 extern int chinese_rules;
+extern int experimental_semeai; /* use experimental semeai module */
 
 extern int stackp;                /* stack pointer */
 extern int count_variations;      /* count (decidestring) */

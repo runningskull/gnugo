@@ -113,10 +113,11 @@ int disable_threat_computation = 0;
 int disable_endgame_patterns   = 0;
 int doing_scoring              = 0;
 
-int chinese_rules      = 0;    /* ruleset choice for GMP connection */
-int allow_suicide      = 0;    /* allow opponent to make suicide moves */
-int capture_all_dead   = 0;    /* capture all dead opponent stones */
-int play_out_aftermath = 0;    /* make everything unconditionally settled */
+int chinese_rules       = 0;    /* ruleset choice for GMP connection */
+int experimental_semeai = EXPERIMENTAL_SEMEAI;    /* use experimental semeai module */
+int allow_suicide       = 0;    /* allow opponent to make suicide moves */
+int capture_all_dead    = 0;    /* capture all dead opponent stones */
+int play_out_aftermath  = 0;    /* make everything unconditionally settled */
 
 float best_move_values[10];
 int best_moves[10];
