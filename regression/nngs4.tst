@@ -214,6 +214,13 @@ loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 54
 520 restricted_genmove black J8 J9 H14 F13 E13 B16 G13 J15 C14
 #? [!J8|J9]
 
+loadsgf games/nngs/gnugo-3.3.17-ylamaki-200303262305.sgf 9
+530 gg_genmove white
+#? [Q2]
+
+loadsgf games/nngs/gnugo-3.3.17-ylamaki-200303262305.sgf 11
+540 gg_genmove white
+#? [Q2]
 
 
 ############ End of Tests #################
