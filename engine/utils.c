@@ -101,17 +101,9 @@ does_attack(int move, int str)
   int dcode = 0;
   int spos = NO_MOVE;
   
-  if (stackp == 0) {
-    if (worm[str].attack_codes[0] != 0 
-	&& worm[str].defense_codes[0] == 0)
-      return 0;
-    spos = worm[str].defense_points[0];
-  }
-  else {
-    attack_and_defend(str, &acode, NULL, &dcode, &spos);
-    if (acode != 0 && dcode == 0)
-      return 0;
-  }
+  attack_and_defend(str, &acode, NULL, &dcode, &spos);
+  if (acode != 0 && dcode == 0)
+    return 0;
   
   if (trymove(move, other, "does_attack-A", str)) {
     if (!board[str])
@@ -156,13 +148,7 @@ does_defend(int move, int str)
   int result = 0;
   int spos = NO_MOVE;
 
-  if (stackp == 0) {
-    if (worm[str].attack_codes[0] == 0)
-      return 0;
-    else
-      spos = worm[str].attack_points[0];
-  }
-  else if (!attack(str, &spos))
+  if (!attack(str, &spos))
     return 0;
 
   gg_assert(spos != NO_MOVE);

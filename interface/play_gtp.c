@@ -1356,9 +1356,6 @@ gtp_does_attack(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("string vertex must not be empty");
 
-  if (stackp == 0)
-    silent_examine_position(EXAMINE_WORMS);
-  
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
     reading_cache_clear();
@@ -1397,9 +1394,6 @@ gtp_does_defend(char *s)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure("string vertex must not be empty");
 
-  if (stackp == 0)
-    silent_examine_position(EXAMINE_WORMS);
-  
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
     reading_cache_clear();

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- stop using worm data at stackp==0 in does_attack() and does_defend()
 - concerns_noncritical_dragon() revised
 - BOARD_MIN reduced to 2
 - free memory allocated in a failed read of an sgf file
