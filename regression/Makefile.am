@@ -15,7 +15,7 @@ TST =  13x13.tst arb.tst arend.tst arend2.tst arion.tst atari_atari.tst \
        score.tst score2.tst score_rot.tst semeai.tst \
        semeai2.tst strategy.tst strategy2.tst strategy3.tst \
        strategy4.tst strategy5.tst strategy_rot.tst \
-       tactics.tst tactics1.tst trevor.tst trevora.tst \
+       tactics.tst tactics1.tst thrash.tst trevor.tst trevora.tst \
        trevorb.tst trevorc.tst trevord.tst vie.tst viking.tst \
        semeai_rot.tst
 
@@ -263,6 +263,9 @@ tactics: tactics.tst
 tactics1: tactics1.tst
 	$(srcdir)/eval.sh tactics1.tst $(GG_OPTIONS)
 
+thrash: thrash.tst
+	$(srcdir)/eval.sh thrash.tst $(GG_OPTIONS)
+
 trevor: trevor.tst
 	$(srcdir)/eval.sh trevor.tst $(GG_OPTIONS)
 
@@ -362,3 +365,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) gunnar.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) arend2.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) nando.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) thrash.tst $(GG_OPTIONS)
