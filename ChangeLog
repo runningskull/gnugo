@@ -2,10 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- wariuchi fuseki: invade between shimaris
 - new sgmp mode
 - regress.pike added to EXTRADIST
 - revision of copyright notices
 - warnings fixed on some platforms
+- doc revision
 
 3.3.23 released July 15, 2003
 
