@@ -1,3 +1,39 @@
+After compiling 3.3.4 with --experimental-semeai we get the following
+results. For discussion of particular failures see:
+
+http://mail.gnu.org/pipermail/gnugo-devel/2002-June/002205.html
+
+./regress.sh . strategy.tst 
+45 unexpected PASS!
+./regress.sh . lazarus.tst 
+16 unexpected FAIL: Correct '!L17|J5|K5|K6', got 'L17'
+./regress.sh . trevorb.tst 
+430 unexpected PASS!
+./regress.sh . strategy2.tst 
+72 unexpected PASS!
+73 unexpected PASS!
+75 unexpected FAIL: Correct 'Q11', got 'F7'
+76 unexpected FAIL: Correct 'Q11', got 'F7'
+80 unexpected PASS!
+93 unexpected FAIL: Correct 'D11', got 'C11'
+./regress.sh . nicklas1.tst 
+301 unexpected FAIL: Correct 'H3|H6', got 'J8'
+./regress.sh . trevor.tst 
+461 unexpected PASS!
+./regress.sh . nngs.tst 
+290 unexpected PASS!
+2040 unexpected PASS!
+./regress.sh . strategy3.tst 
+113 unexpected FAIL: Correct 'P1', got 'S9'
+135 unexpected PASS!
+./regress.sh . global.tst 
+46 unexpected PASS!
+./regress.sh . strategy4.tst 
+188 unexpected PASS!
+./regress.sh . nngs2.tst 
+50 unexpected FAIL: Correct 'K2', got 'N1'
+60 unexpected PASS!
+
 ======================= 3.3.4 =========================
 
 ./regress.sh . owl_rot.tst 
