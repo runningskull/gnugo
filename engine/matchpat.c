@@ -363,7 +363,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
       int end_transformation;
       int ll;   /* Iterate over transformations (rotations or reflections)  */
       int k;    /* Iterate over elements of pattern */
-      int found_goal, found_nongoal;
+      int found_goal;
   
       /* We can check the color of the anchor stone now.
        * Roughly half the patterns are anchored at each
@@ -467,7 +467,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 
 	/* Now iterate over the elements of the pattern. */
 	found_goal = 0;
-	found_nongoal = 0;
 	for (k = 0; k < pattern->patlen; ++k) { /* match each point */
 	  int pos; /* absolute coords of (transformed) pattern element */
 	  int att = pattern->patn[k].att;  /* what we are looking for */
@@ -483,12 +482,8 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	  if ((board[pos] & and_mask[color-1][att]) != val_mask[color-1][att])
 	    goto match_failed;
 
-	  if (goal != NULL && board[pos] != EMPTY) {
-	    if (goal[pos])
-	      found_goal = 1;
-	    else if (board[pos] == color)
-	      found_nongoal = 1;
-	  }
+	  if (goal != NULL && board[pos] != EMPTY && goal[pos])
+	    found_goal = 1;
 	  
 	  /* Check out the class_X, class_O, class_x, class_o
 	   * attributes - see patterns.db and above.
@@ -501,12 +496,10 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 
 
 #if GRID_OPT == 2
-
 	/* Make sure the grid optimisation wouldn't have 
            rejected this pattern */
 	ASSERT2((merged_val & pattern->and_mask[ll])
 		== pattern->val_mask[ll], m, n);
-
 #endif /* we don't trust the grid optimisation */
 
 
@@ -514,14 +507,9 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	++totals[4];
 #endif
 
-
 	/* Make it here ==> We have matched all the elements to the board. */
 	if ((goal != NULL) && !found_goal)
 	  goto match_failed;
-	if ((goal != NULL) && ((pattern->class) & CLASS_C) && !found_nongoal)
-	  goto match_failed;
-	
-
 
 #ifdef PROFILE_MATCHER
 	++totals[5];
@@ -983,7 +971,6 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 {
   int k;			/* Iterate over elements of pattern */
   int found_goal = 0;
-  int found_nongoal = 0;
   
 #if PROFILE_PATTERNS
   int nodes_before;
@@ -1020,12 +1007,8 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
 
     if (!anchor_in_goal) { 
       /* goal check */
-      if (goal != NULL && board[pos] != EMPTY) {
-        if (goal[pos])
-	  found_goal = 1;
-        else if (board[pos] == color)
-	  found_nongoal = 1;
-      }
+      if (goal != NULL && board[pos] != EMPTY && goal[pos])
+	found_goal = 1;
     }
 
     /* class check */
@@ -1038,8 +1021,6 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
   /* Make it here ==> We have matched all the elements to the board. */
   if (!anchor_in_goal) { 
     if (goal != NULL && !found_goal)
-      goto match_failed;
-    if (goal != NULL && (pattern->class & CLASS_C) && !found_nongoal)
       goto match_failed;
   }
 

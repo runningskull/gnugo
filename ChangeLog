@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- remove special case of CLASS_C in matchpat.c
 - tuning
 - implement persistent semeai caching
 - don't crash on some .sgf-files from kgs
