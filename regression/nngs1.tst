@@ -111,3 +111,21 @@ loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 126
 28 gg_genmove white
 #? [J18]
 
+# GNU Go 3.1.27 invades the 3-3 point too early
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6
+29 gg_genmove white
+#? [!R17]
+
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
+30 gg_genmove white
+#? [P17|O18]
+
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 18
+31 gg_genmove white
+#? [N17]
+
+# better to avoid attack on one of the two top groups
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 34
+32 gg_genmove white
+#? [L12|K16|H16]
+

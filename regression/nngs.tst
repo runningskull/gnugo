@@ -355,10 +355,11 @@ loadsgf games/nngs/gnugo-3.1.18-Mikael-200201062258.sgf 138
 #? [A18]*
 
 
-
-
 # games/nngs/gnugo-3.1.18-Rufus-200201051408.sgf problems:
 
+loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051408.sgf 5
+875 gg_genmove white
+#? [C5]
 
 
 # games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf problems:
