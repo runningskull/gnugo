@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- merge various code to generate superstring related tactical moves into
+  new function superstring_moves()
 - resigning of hopeless games implemented (over GTP and in replay mode)
 - new command-line option --resign-allowed
 - twogtp script updated to understand resignation
