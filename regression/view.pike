@@ -428,21 +428,27 @@ string font_filename = "";
 
 int main(int argc, array(string) argv)
 {
+    if (argc != 2) {
+	werror("Usage: %s TEST-FILE:TEST-NUMBER\n", basename(argv[0]));
+	return 1;
+    }
+
     if (!find_font())
 	return 1;
-    
+
     SimpleGtp engine = SimpleGtp("../interface/gnugo --quiet --mode gtp -w -t -d0x101840" / " ");
     if (!engine)
     {
 	werror("Failed to start engine.");
 	return 1;
     }
-    
+
     GTK.setup_gtk(argv);
     Controller controller = Controller(engine, argv[1]);
-    
-    return -1;
 
+    GTK.main();
+
+    return 0;
 }
 
 array(string) recursive_find_files(string dir, string suffix)
@@ -508,7 +514,6 @@ class RegressionViewer
     GTK.Widget data_widget;
 
     GTK.ScrolledWindow scrolled_data_window;
-    array(GTK.Window) all_windows = ({});
     GTK.Image gtk_image;
     GDK.Image gdk_image;
     GTK.Clist clist;
@@ -517,7 +522,10 @@ class RegressionViewer
 
     mapping(string:array(string)) worms = ([]);
     mapping(string:array(string)) dragons = ([]);
+    int worms_initialized = 0;
+    int dragons_initialized = 0;
 
+    string name;
     string result;
     string testcase_command;
     array(string) fulltest;
@@ -526,25 +534,38 @@ class RegressionViewer
 
     static void create(SimpleGtp engine_,
 		       array(string) fulltest_, string testcase_command_,
-		       function callback, Controller parent_)
+		       function callback, string name_,
+		       Controller parent_)
     {
 	engine = engine_;
 	parent = parent_;
 	fulltest = fulltest_;
         testcase_command = testcase_command_;
+	name = name_;
 
 	load_testcase();
 	werror("%s\n", send_command("showboard"));
 	int boardsize = (int) send_command("query_boardsize");
 	on_board_click_callback = callback;
 
-	foreach (send_command("worm_stones") / "\n", string worm)
-	    worms[(worm / " ")[0]] = worm / " " - ({""});
-	
+	setup_board(boardsize);
+
+	scrolled_data_window = GTK.ScrolledWindow();
+	scrolled_data_window->set_policy(GTK.POLICY_AUTOMATIC,
+					 GTK.POLICY_AUTOMATIC);
+
+	clist = GTK.Clist(3);
+	scrolled_data_window->add(clist);
+	handle_testcase();
+    }
+
+    static void setup_board(int boardsize)
+    {
 	goban = Goban(boardsize, 600);
 	goban->add_stones("WHITE", send_command("list_stones white") / " ");
 	goban->add_stones("BLACK", send_command("list_stones black") / " ");
 	Image.Image im = goban->draw_board();
+
 	gdk_image = GDK.Image(0)->set(im);
 	gtk_image = GTK.Image(gdk_image);
 	goban_widget = GTK.EventBox()->add(gtk_image);
@@ -554,19 +575,32 @@ class RegressionViewer
 					 button_pressed_on_board);
 	goban_widget->signal_connect_new("key_press_event",
 					 key_pressed_on_board);
-
-	scrolled_data_window = GTK.ScrolledWindow();
-	scrolled_data_window->set_policy(GTK.POLICY_AUTOMATIC,
-					 GTK.POLICY_AUTOMATIC);
-
-	all_windows = ({});
-	
-	clist = GTK.Clist(3);
-	scrolled_data_window->add(clist);
-	
-//	thread_create(handle_testcase);
-	handle_testcase();
     }
+
+
+    void new_testcase(array(string) fulltest_, string testcase_command_)
+    {
+	werror("Loading new testcase.\n");
+        worms_initialized = 0;
+        dragons_initialized = 0;
+        result = "";
+        worms = ([]);
+        dragons = ([]);
+
+        fulltest = fulltest_;
+	testcase_command = testcase_command_;
+
+	load_testcase();
+	werror("%s\n", send_command("showboard"));
+	int boardsize = (int) send_command("query_boardsize");
+
+	werror("Loaded new testcase.\n");
+	goban = Goban(boardsize, 600);
+	goban->add_stones("WHITE", send_command("list_stones white") / " ");
+	goban->add_stones("BLACK", send_command("list_stones black") / " ");
+	redraw_board();
+    }
+
 
     static void load_testcase()
     {
@@ -577,18 +611,12 @@ class RegressionViewer
         }
     }
 
-    static void handle_testcase()
+    void handle_testcase()
     {
 	traces = ({});
 	engine->trace_callback = collect_traces;
         result = send_command(testcase_command);
 	engine->trace_callback = 0;
-
-	// Due to a bug in the examine_position caching, we can't do
-	// this before a genmove call.
-	foreach (send_command("dragon_stones") / "\n", string dragon)
-	    dragons[(dragon / " ")[0]] = dragon / " " - ({""});
-
 	redraw_board();
     }
 
@@ -596,6 +624,21 @@ class RegressionViewer
     {
 	traces += ({s});
     }
+    
+    void get_dragons()
+    {
+        foreach (send_command("dragon_stones") / "\n", string dragon)
+            dragons[(dragon / " ")[0]] = dragon / " " - ({""});
+        dragons_initialized = 1;
+    }
+
+    static void get_worms()
+    {
+	foreach (send_command("worm_stones") / "\n", string worm)
+	    worms[(worm / " ")[0]] = worm / " " - ({""});
+	worms_initialized = 1;
+    }
+	
     
     void add_markup(int mode)
     {
@@ -628,6 +671,8 @@ class RegressionViewer
 	
 	if (parent->dragon_status_button->get_active())
 	{
+            if (!dragons_initialized)
+                get_dragons();
 	    foreach (dragons; string dragon; array(string) stones)
 	    {
 		string status = get_worm_or_dragon_data("dragon", "status",
@@ -639,6 +684,8 @@ class RegressionViewer
 	}
 	else if (parent->dragon_safety_button->get_active())
 	{
+            if (!dragons_initialized)
+                get_dragons();
 	    foreach (dragons; string dragon; array(string) stones)
 	    {
 		string safety = get_worm_or_dragon_data("dragon", "safety",
@@ -650,6 +697,8 @@ class RegressionViewer
 	}
 	else if (parent->worm_status_button->get_active())
 	{
+            if (!worms_initialized)
+                get_worms();
 	    foreach (worms; string worm; array(string) stones)
 	    {
 		string attack = get_worm_or_dragon_data("worm", "attack_code",
@@ -944,8 +993,8 @@ class RegressionViewer
     {
 	if ((parent->connection_reading_button->get_active()
 	     || parent->semeai_reading_button->get_active())
-	    && parent->first_semeai_or_connection_vertex != "")
-	    goban->add_symbol(parent->first_semeai_or_connection_vertex,
+	    && parent->first_vertex != "")
+	    goban->add_symbol(parent->first_vertex,
 	    		      "big_dot", "green");
     }
     
@@ -1094,9 +1143,7 @@ class RegressionViewer
     string send_command(string command)
     {
 	string result;
-	//all_windows->set_cursor(GDK.Watch);
 	result = engine->send_command(command)->text;
-	//all_windows->set_cursor(GDK.TopLeftArrow);
 	return result;
     }
 
@@ -1124,11 +1171,13 @@ class RegressionViewer
     }
 
     void do_reading(string reset_counter, string get_counter,
-	    	    string sgffilename,
+	    	    string sgffilename, string sgf_viewer_cmd,
     		    string first_command, string second_command)
     {
 	string result;
 	send_command("clear_cache");
+        if (sizeof(parent->viewers) > 1)
+            sgffilename += "." + replace(name, " ", "_");
 	if (sgffilename != "")
 	    send_command("start_sgftrace");
 
@@ -1137,7 +1186,7 @@ class RegressionViewer
 	clist->append(({first_command, result,
 			"(" + send_command(get_counter) + " nodes)"}));
 	
-	if (result[0..0] != "0")
+	if (result[0..0] != "0" && second_command != "")
 	{
 	    send_command(reset_counter);
 	    string result = send_command(second_command);
@@ -1146,6 +1195,9 @@ class RegressionViewer
 	}
 	if (sgffilename != "")
 	    send_command("finish_sgftrace " + sgffilename);
+        if (sgf_viewer_cmd != "")
+            Process.create_process(sprintf(sgf_viewer_cmd, sgffilename)
+                                   / " ");
 	clist->columns_autosize();
 	parent->set_title(this_object(), "Reading result");
      }
@@ -1166,6 +1218,8 @@ class Controller
     GTK.Notebook gobans_notebook;
     GTK.Notebook data_notebook;
     GTK.Notebook selector_notebook;
+
+    GTK.Widget testcase_label;
 
     GTK.RadioButton worm_data_button;
     GTK.RadioButton dragon_data1_button;
@@ -1202,19 +1256,18 @@ class Controller
     GTK.RadioButton white_eyes_button;
     GTK.RadioButton black_eyes_button;
     
-    GTK.RadioButton tactical_reading_button;
-    GTK.RadioButton owl_reading_button;
-    GTK.RadioButton connection_reading_button;
-    GTK.RadioButton semeai_reading_button;
-    GTK.CheckButton sgf_traces_button;
-    GTK.Entry sgf_filename_entry;
-    GTK.Button new_engine_button;
-    GTK.Entry engine_path_entry;
-    GTK.Entry engine_name_entry;
+    GTK.RadioButton tactical_reading_button, owl_reading_button,
+	owl_does_attack_button, owl_does_defend_button,
+	connection_reading_button, semeai_reading_button;
+    GTK.CheckButton sgf_traces_button, sgf_viewer_button;
+    GTK.Entry sgf_filename_entry, sgf_viewer_entry;
+    GTK.Table sgf_stuff;
+    GTK.Button new_testcase_button, new_engine_button;
+    GTK.Entry new_testcase_entry, engine_path_entry, engine_name_entry;
     
     string delta_territory_move = "PASS";
     string move_influence_move = "PASS";
-    string first_semeai_or_connection_vertex = "";
+    string first_vertex = "";
 
     string testcase_name;
     string testcase_command;
@@ -1228,6 +1281,8 @@ class Controller
     // testcase correctly.
     array(string) complete_testcase;
 
+    static mixed nasty_signal_id;
+
     static void create(SimpleGtp engine_, string testcase)
     {
 	if (!excerpt_testcase(testcase, engine_))
@@ -1237,8 +1292,8 @@ class Controller
 	}
 	testcase_name = testcase;
 
-	GTK.Widget testcase_label = (GTK.Label(full_testcase * "\n")
-				     ->set_justify(GTK.JUSTIFY_LEFT));
+	testcase_label = (GTK.Label(full_testcase * "\n")
+		          ->set_justify(GTK.JUSTIFY_LEFT));
 
 	main_window = GTK.Window(GTK.WindowToplevel);
 	controller_notebook = GTK.Notebook();
@@ -1278,8 +1333,8 @@ class Controller
 	}
 
 	main_window->set_title(testcase);
-	main_window->signal_connect("destroy", exit, 0);
-	
+	main_window->signal_connect_new("destroy", quit);
+
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove"))
 	{
@@ -1390,6 +1445,10 @@ class Controller
 	tactical_reading_button = GTK.RadioButton("tactical reading");
 	owl_reading_button = GTK.RadioButton("owl reading",
 					     tactical_reading_button);
+        owl_does_attack_button = GTK.RadioButton("owl_does_attack",
+                                                 tactical_reading_button);
+        owl_does_defend_button = GTK.RadioButton("owl_does_defend",
+                                                 tactical_reading_button);
 	connection_reading_button = GTK.RadioButton("connection reading",
 						    tactical_reading_button);
 	semeai_reading_button = GTK.RadioButton("semeai reading",
@@ -1400,6 +1459,22 @@ class Controller
 	sgf_filename_entry->set_text("vars.sgf");
 	sgf_filename_entry->set_editable(1);
 
+	sgf_viewer_button = GTK.CheckButton("start sgf viewer as");
+        sgf_viewer_entry = GTK.Entry()->set_text("quarry %s")
+                           ->set_editable(1);
+        sgf_viewer_button->signal_connect("toggled", sgf_viewer_button_toggled);
+        sgf_traces_button->signal_connect("toggled", sgf_traces_button_toggled);
+        sgf_stuff = GTK.Table(2, 2, 0)
+                    ->attach_defaults(sgf_traces_button, 0, 1, 0, 1)
+                    ->attach_defaults(sgf_filename_entry, 1, 2, 0, 1)
+                    ->attach_defaults(sgf_viewer_button, 0, 1, 1, 2)
+                    ->attach_defaults(sgf_viewer_entry, 1, 2, 1, 2);
+
+	new_testcase_entry = GTK.Entry();
+        new_testcase_entry->set_text("owl:1");
+        new_testcase_entry->set_editable(1);
+        new_testcase_button = GTK.Button("Load new testcase");
+        new_testcase_button->signal_connect_new("clicked", new_testcase);
 	engine_path_entry = GTK.Entry();
 	engine_path_entry->set_text("../interface/gnugo");
 	engine_path_entry->set_editable(1);
@@ -1470,14 +1545,12 @@ class Controller
 	    = (GTK.Vbox(0, 0)
 	       ->pack_start(tactical_reading_button, 0, 0, 0)
 	       ->pack_start(owl_reading_button, 0, 0, 0)
+	       ->pack_start(owl_does_attack_button, 0, 0, 0)
+               ->pack_start(owl_does_defend_button, 0, 0, 0)
 	       ->pack_start(connection_reading_button, 0, 0, 0)
 	       ->pack_start(semeai_reading_button, 0, 0, 0)
 	       ->pack_start(GTK.Label(""), 0, 0, 0)
-	       ->pack_start(GTK.Hbox(0, 0)
-			    ->pack_start(sgf_traces_button,
-					 0, 0, 0)
-			    ->pack_start(sgf_filename_entry,
-					 0, 0, 0), 0, 0, 0));
+	       ->pack_start(sgf_stuff, 0, 0, 0));
 	controller_notebook->append_page(reading_page, GTK.Label("reading"));
 
 	GTK.Widget engines_page
@@ -1486,11 +1559,14 @@ class Controller
 	if (single_window_mode)
 	    engines_page->pack_start(engine_name_entry, 0, 0, 0);
 	engines_page->pack_start(GTK.Alignment(1.0, 0.0, 0.0, 0.0)
-				 ->add(new_engine_button), 0, 0, 0);
+				 ->add(new_engine_button), 0, 0, 0)
+		     ->pack_start(new_testcase_entry, 0, 0, 0)
+		     ->pack_start(new_testcase_button, 0, 0, 0);
 	controller_notebook->append_page(engines_page->set_border_width(12),
 					 GTK.Label("engines"));
 
-	controller_notebook->signal_connect_new("switch_page", add_markup);
+	nasty_signal_id = controller_notebook->signal_connect_new("switch_page",
+								  add_markup);
 
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove")) {
@@ -1504,8 +1580,8 @@ class Controller
 					       complete_testcase,
 					       testcase_command,
 					       button_pressed_on_a_board,
-					       this_object()),
-			      "Default engine");
+					       "Default engine",
+					       this_object()));
 	add_markup(controller_notebook->get_current_page());
     }
 
@@ -1516,13 +1592,12 @@ class Controller
     	if (!new_engine)
 	    werror("Failed to start new engine.\n");
 	else {
-	    add_regression_viewer(RegressionViewer(new_engine,
-						   full_testcase,
-						   testcase_command,
-						   button_pressed_on_a_board,
-						   this_object()),
-				  (single_window_mode
-				   ? engine_name_entry->get_text() : ""));
+	    add_regression_viewer(
+		RegressionViewer(new_engine, full_testcase, testcase_command,
+			         button_pressed_on_a_board,
+				 (single_window_mode ?
+				  engine_name_entry->get_text() : ""),
+				 this_object()));
 	}
 
 	if (single_window_mode) {
@@ -1531,7 +1606,7 @@ class Controller
 	}
     }
 
-    static void add_regression_viewer(RegressionViewer viewer, string name)
+    static void add_regression_viewer(RegressionViewer viewer)
     {
 	viewers += ({ viewer });
 	if (single_window_mode) {
@@ -1551,13 +1626,13 @@ class Controller
 		->append_page((GTK.Alignment(0.0, 0.5, 0.0, 0.0)
 			       ->set_border_width(4)
 			       ->add(GTK.Label(viewer->engine->command_line))),
-			      GTK.Label(name));
+			      GTK.Label(viewer->name));
 	    selector_notebook->show_all();
 	    selector_notebook->set_page(sizeof(viewers) - 1);
 	}
 	else {
 	    GTK.Widget board_window = GTK.Window(GTK.WindowToplevel);
-	    board_window->signal_connect("destroy", exit, 0);
+	    board_window->signal_connect_new("destroy", quit);
 
 	    board_window->add(viewer->goban_widget);
 	    board_window->set_title(testcase_name);
@@ -1650,14 +1725,23 @@ class Controller
 	case 4:
 	    // Reading.
 	    string sgffilename;
+	    string sgf_viewer_cmd;
 	    string reset_counter, get_counter;
 	    
-	    if (sgf_traces_button->get_active())
+            if (sgf_viewer_button->get_active()) {
+                sgffilename = sgf_filename_entry->get_text();
+                sgf_viewer_cmd = sgf_viewer_entry->get_text();
+            }
+	    else if (sgf_traces_button->get_active()) {
 	    	sgffilename = sgf_filename_entry->get_text();
-	    else
+                sgf_viewer_cmd = "";
+	    }
+	    else {
 	    	sgffilename = "";
+                sgf_viewer_cmd = "";
+	    }
 
-	    if (first_semeai_or_connection_vertex == ""
+	    if (first_vertex == ""
 		|| tactical_reading_button->get_active()
 		|| owl_reading_button->get_active())
 		viewers->goban->clear_markup();
@@ -1680,51 +1764,89 @@ class Controller
 		    get_counter = "get_owl_node_counter";
 		}
 		
-		viewers->do_reading(reset_counter, get_counter, sgffilename,
+		viewers->do_reading(reset_counter, get_counter,
+				    sgffilename, sgf_viewer_cmd,
 				    prefix + "attack " + vertex,
 				    prefix + "defend " + vertex);
 	    }
-	    else if (connection_reading_button->get_active()
+	    else if (owl_does_attack_button->get_active()
+                     || owl_does_defend_button->get_active()
+		     || connection_reading_button->get_active()
 		     || semeai_reading_button->get_active())
 	    {
-		if (first_semeai_or_connection_vertex == "")
+		if (first_vertex == "")
 		{
-		    first_semeai_or_connection_vertex = vertex;
+		    first_vertex = vertex;
 		}
-		else if (first_semeai_or_connection_vertex != vertex)
+		else if (first_vertex != vertex)
 		{
 		    string c1, c2;
 		    
-		    if (connection_reading_button->get_active())
+                    if (owl_does_attack_button->get_active()) {
+                        c1 = sprintf("owl_does_attack %s %s\n",
+                                     first_vertex, vertex);
+                        viewers->do_reading("reset_owl_node_counter",
+                                            "get_owl_node_counter",
+                                            sgffilename, sgf_viewer_cmd,
+                                            c1, "");
+                    }
+                    else if (owl_does_defend_button->get_active()) {
+                        c1 = sprintf("owl_does_defend %s %s\n",
+                                     first_vertex, vertex);
+                        viewers->do_reading("reset_owl_node_counter",
+                                            "get_owl_node_counter",
+                                            sgffilename, sgf_viewer_cmd,
+                                            c1, "");
+                    }
+		    else if (connection_reading_button->get_active())
 		    {
 			c1 = sprintf("connect %s %s\n",
-				    first_semeai_or_connection_vertex,
+				    first_vertex,
 				    vertex);
 			c2 = "dis" + c1;
 			viewers->do_reading("reset_connection_node_counter",
 					    "get_connection_node_counter",
-					    sgffilename, c1, c2);
+					    sgffilename, sgf_viewer_cmd,
+					    c1, c2);
 		    }
 		    else
 		    {
 			c1 = sprintf("analyze_semeai %s %s",
-				     first_semeai_or_connection_vertex,
-				     vertex);
+				     first_vertex, vertex);
 			c2 = sprintf("analyze_semeai %s %s", vertex,
-				     first_semeai_or_connection_vertex);
+				     first_vertex);
 			// FIXME: We should use a semeai node counter rather
 			// than the owl node counter, except that it doesn't
 			// exist yet.
 			viewers->do_reading("reset_owl_node_counter",
 					    "get_owl_node_counter",
-					    sgffilename, c1, c2);
+					    sgffilename, sgf_viewer_cmd,
+					    c1, c2);
 		    }
-		    first_semeai_or_connection_vertex = "";
+		    first_vertex = "";
 		}
 	    }
 	    break;
 	}
     }
+
+
+    static void new_testcase()
+    {
+        string new_testcase = new_testcase_entry->get_text();
+        werror("Trying to load new testcase %s.", new_testcase);
+        if (!excerpt_testcase(new_testcase, viewers[0]->engine))
+        {
+            werror("Failed to load testcase.\n");
+            return;
+        }
+        testcase_name = new_testcase;
+	main_window->set_title(testcase_name);
+	testcase_label->set_text(full_testcase * "\n");
+        viewers->new_testcase(full_testcase, testcase_command);
+        viewers->handle_testcase();
+    }
+
 
     // The engine parameter is only needed to find out the color to
     // move when an sgf file is given. Since there can be multiple
@@ -1790,10 +1912,28 @@ class Controller
 	return 0;
     }
 
+    void sgf_traces_button_toggled()
+    {
+        if (!sgf_traces_button->get_active())
+            sgf_viewer_button->set_active(0);
+    }
+
+    void sgf_viewer_button_toggled()
+    {
+        if (sgf_viewer_button->get_active())
+            sgf_traces_button->set_active(1);
+    }
     
     void debug_callback(mixed ... args)
     {
 	write("Debug callback:%O\n", args);
+    }
+
+    static void quit()
+    {
+	// Otherwise Pike errors occur.
+	controller_notebook->signal_disconnect(nasty_signal_id);
+	GTK.main_quit();
     }
 }
 
