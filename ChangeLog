@@ -15,6 +15,7 @@
 - new function influence_moyo_color_opposite()
 - one trace output reenabled in confirm_safety()
 - bugfix in sgftreeAddStone
+- bugfix in komaster_trymove
 - tuning
 - eye tuning
 - atari_atari tuning
