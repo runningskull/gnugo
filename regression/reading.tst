@@ -787,6 +787,10 @@ trymove white A15
 popgo
 popgo
 
+loadsgf games/reading42.sgf 62
+190 attack E16
+#? [1 F15]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
