@@ -471,6 +471,7 @@ loadsgf games/trevor/trevor_45.sgf
 450 owl_attack E4
 #? [1 D4]*
 
+
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=Missing simple cut pattern
 #SEVERITY=10
@@ -478,3 +479,39 @@ loadsgf games/trevor/trevor_45.sgf
 loadsgf games/trevor/trevor_46.sgf
 460 owl_attack B14
 #? [1 E14]*
+
+#SEE_ALSO trevor:460
+461 gg_genmove black
+#? [E14]*
+
+
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=Yikes, major Ko misunderstanding.
+#SEVERITY=10
+#SEE_ALSO=owl:181
+loadsgf games/trevor/trevor_47.sgf
+470 owl_attack G9
+#? [2 G6]*
+
+#SEE_ALSO=trevor:470
+471 owl_attack A7
+#? [2 A3]*
+
+
+#CATEGORY=pattern_tuning
+#DESCRIPTION=Of course, B8 is inferior to C9
+#SEVERITY=3
+#Shouldn't the move valuator include counting of the eye spaces?
+loadsgf games/trevor/trevor_48.sgf
+480 gg_genmove black
+#? [C9]*
+
+#CATEGORY=owl_tuning
+#DESCRIPTION=Does OWL really need to get this one right?
+#SEVERITY=3
+#SEE_ALSO=owl:191
+#Is it in OWL's charter to get this problem?  
+#attack gets it just fine, of course.
+481 owl_attack C8
+#? [1 B8]*
+

@@ -524,10 +524,11 @@ O*..
 
 
 Pattern D204
+# tm Pattern revised. (3.1.13)
 
 ?X?          push
 O*.
-...
+.x.
 ---
 
 :8,-,value(60)
@@ -678,10 +679,11 @@ O.*.     make eye on edge
 
 
 Pattern D217
+# tm Pattern revised. (3.1.13)
 
-O...
+o...
 O.*.     expand eyespace
-....
+.x..
 ----
 
 :8,-,value(60)
@@ -751,11 +753,12 @@ O.*.
 
 
 Pattern D222
+# tm Pattern revised. (3.1.13)
 
 ????        come straight out
-XX.?
+xX.?
 OO*.
-....
+..x.
 ----
 
 :8,-,value(75)

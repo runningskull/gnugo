@@ -578,7 +578,22 @@ OaOB
 ?*bO
 ??O?
 
-; !attack(A) && !attack(B) && !xplay_attack(*,a,b,*) && !xplay_attack(*,b,a,*)
+;!attack(A) && !attack(B) && !xplay_attack(*,a,b,*) && !xplay_attack(*,b,a,*)
+
+
+Pattern CB12
+# tm New pattern. (3.1.13)
+
+O*.         another way to cut!
+X!O
+
+:8,B
+
+O*.
+BaO
+
+;xplay_defend_both(*,a,*,B)
+
 
 
 ########################

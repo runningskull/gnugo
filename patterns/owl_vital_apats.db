@@ -339,8 +339,9 @@ AA..
 ;lib(A)==2 && owl_big_eyespace(*,A)
 
 
-#trevor:450 new patten 3.1.13 -trevor
 Pattern VA20
+# tm New pattern. (3.1.13)
+# see trevor:450
 
 ?X?
 X.X
@@ -348,7 +349,7 @@ X.X
 X.X
 ?X?
 
-:8,-,value(75)
+:-,-,value(75)
 
 ?X?
 XaX
@@ -358,7 +359,6 @@ XbX
 
 ; owl_topological_eye(a,C) == 2 && 
 ; owl_topological_eye(b,C) == 2
-
 
 
 # END OF FILE

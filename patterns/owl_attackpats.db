@@ -2506,8 +2506,10 @@ obX?
 ; !safe_omove(a) && lib(b)>1
 
 
-#see owl:229; new pattern 3.1.13 -trevor
 Pattern A1013
+# tm New pattern. (3.1.13)
+# see owl:229
+
 ?O?         enclose!
 X..
 X*?

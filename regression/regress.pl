@@ -104,6 +104,7 @@ my $pidg;
 my $testdir;
 my $goprog;
 my $verbose = 0;
+my $old_whole_gtp = "";
 my $html_whole_gtp = "";
 my $testfile;
 my $num;
@@ -119,6 +120,7 @@ my $boardsize = 19;  #current boardsize
 my $testfile_out;
 my $all_batches;
 my $make_images;
+my $cputime;
 
 my $goprog_name = "unknown";
 my $goprog_version = "0";
@@ -253,6 +255,12 @@ sub regress_file {
   $next_cmd = "";
   $num = 0;
   $filepos = 0;
+  go_command("cputime");
+  $cputime = <$goprog_out>;
+  print "cputime: $cputime\n" if $verbose > 1 or 1;
+  ($cputime) = ($cputime =~ /((\d|\.)+)/);
+  print "cputime: $cputime\n" if $verbose > 1 or 1;
+  <$goprog_out>;  
   my $skipping = 0;
   while (defined($next_cmd))
   {
@@ -299,6 +307,7 @@ sub regress_file {
 	      }
 	    }
           }
+	  $old_whole_gtp = $html_whole_gtp;
 	  $html_whole_gtp = "";
 	} else {
 	  if (!($next_cmd =~ /^\s*$/)) {
@@ -385,6 +394,10 @@ sub tally_result {
     print $brd qq@<ENGINE version="$goprog_version" name="goprog_name" timestamp="goprog_timestamp">\n@;
     print $brd "<CORRECT>$correct</CORRECT>\n";
     print $brd "<ANSWER>$incorrect</ANSWER>\n";
+    if ($html_whole_gtp !~ /^\s*loadsgf/m) {
+      $old_whole_gtp .= $html_whole_gtp;
+      $html_whole_gtp = $old_whole_gtp;
+    }
     print $brd "<GTP_ALL>\n$html_whole_gtp\n</GTP_ALL>";
     foreach my $listval ("DESCRIPTION", "CATEGORY", "SEVERITY") {
       my $astxt;
@@ -393,7 +406,15 @@ sub tally_result {
       print $brd "<$listval>$astxt</$listval>\n";
     }
     print $brd "<NODES owl=123 reading=123>\n";
-    print $brd "<TIME wall=0.123 CPU=0.123>\n";
+
+    go_command("cputime");
+    my $new_cputime = <$goprog_out>;
+    ($new_cputime) = ($new_cputime =~ /((\d|\.)+)/);
+    print "cputime: ".$new_cputime."\n" if $verbose > 1 or 1;
+    <$goprog_out>;  
+    print $brd "<TIME wall=0.123 CPU=" . sprintf("%.5f", $new_cputime - $cputime) .  ">\n";
+    $cputime = $new_cputime;
+
     print $brd "<GTP_COMMAND>$prev_cmd</GTP_COMMAND>\n";
     print $brd $brdout;
     print $brd "</GOPROB>\n";
