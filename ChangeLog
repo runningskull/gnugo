@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- always print copyright string on stdout
+- do not include "Version" in the --version output
 - old cache implementation removed
 - ignore inessential critical dragons in in dilate_erode()
 - TRACE_CACHED_RESULT* macros implemented for new caching scheme

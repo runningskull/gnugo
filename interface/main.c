@@ -54,7 +54,7 @@
 #include "sgftree.h"
 #include "random.h"
 
-static void show_copyright(FILE *where);
+static void show_copyright(void);
 static void show_version(void);
 static void show_help(void);
 static void show_debug_help(void);
@@ -916,7 +916,7 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_SHOWCOPYRIGHT: 
-	show_copyright(stdout);
+	show_copyright();
 	return EXIT_SUCCESS;
 	break;
 	
@@ -942,7 +942,7 @@ main(int argc, char *argv[])
 
       case 'v':
 	show_version();
-	show_copyright(stderr);
+	show_copyright();
 	return EXIT_SUCCESS;
 	break;
 	
@@ -1381,9 +1381,8 @@ main(int argc, char *argv[])
 
   /* Display copyright message in ASCII mode unless --quiet option used. */
     if (!quiet) {
-      fprintf(stderr, "\n");
       show_version();
-      show_copyright(stderr);
+      show_copyright();
     }
   
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
@@ -1403,8 +1402,7 @@ main(int argc, char *argv[])
 static void
 show_version(void)
 {
-  printf("GNU Go Version %s\n", VERSION);
-
+  printf("GNU Go %s\n", VERSION);
 }
 
 
@@ -1622,9 +1620,9 @@ show_debug_flags(void)
 }
 
 static void
-show_copyright(FILE *where)
+show_copyright(void)
 {
-  fputs(COPYRIGHT, where);
+  printf(COPYRIGHT);
 }
 
 
