@@ -170,7 +170,7 @@ make_dragons(int color, int stop_before_owl)
 	continue;
 
       /* Tell the move generation code about the lunch. */
-      if (color != EMPTY)
+      if (IS_STONE(color))
 	add_lunch(POS(m, n), food);
 	
       /* If several lunches are found, we pick the juiciest.
@@ -341,7 +341,7 @@ make_dragons(int color, int stop_before_owl)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) 
       if (dragon[POS(m, n)].origin == POS(m, n)
-	  && BOARD(m, n) != EMPTY) {
+	  && IS_STONE(BOARD(m, n))) {
 	DRAGON2(POS(m, n)).escape_route = compute_escape(m, n, 0);
       }
 
@@ -507,7 +507,7 @@ make_dragons(int color, int stop_before_owl)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (BOARD(m, n) != EMPTY) {
+      if (IS_STONE(BOARD(m, n))) {
 	if (dragon[POS(m, n)].owl_status != UNCHECKED)
 	  dragon[POS(m, n)].matcher_status = dragon[POS(m, n)].owl_status;
 	else if (dragon[POS(m, n)].status == DEAD 
@@ -672,7 +672,7 @@ initialize_supplementary_dragon_data()
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n) != EMPTY
+      if (IS_STONE(BOARD(m, n))
 	  && dragon[POS(m, n)].origin == POS(m, n)) {
 	DRAGON2(POS(m, n)).origin = POS(m, n);
       }
@@ -722,7 +722,7 @@ find_neighbor_dragons()
   /* Initialize the arrays. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n) != EMPTY) {
+      if (IS_STONE(BOARD(m, n))) {
 	dragons[m][n] = dragon[POS(m, n)].id;
 	distances[m][n] = 0;
       }
@@ -886,7 +886,7 @@ dragon_invincible(int m, int n)
 
   int strong_eyes = 0;
 
-  gg_assert(BOARD(m, n) != EMPTY);
+  gg_assert(IS_STONE(BOARD(m, n)));
 
   /* First look for invincible strings in the dragon. */
   for (i = 0; i < board_size; i++)
@@ -1130,7 +1130,7 @@ join_dragons(int d1, int d2)
   
   gg_assert(board[d1] == board[d2]);
   gg_assert(dragon2_initialized == 0);
-  gg_assert(board[d1] != EMPTY);
+  gg_assert(IS_STONE(board[d1]));
 
   /* We want to have the origin pointing to the largest string of
    * the dragon.  If this is not unique, we take the "upper
@@ -1274,7 +1274,7 @@ dragon_escape(char goal[BOARDMAX], int color,
   int distance;
   int escape_potential = 0;
 
-  gg_assert(color != EMPTY);
+  gg_assert(IS_STONE(color));
   
   if (!mx_initialized) {
     memset(mx, 0, sizeof(mx));
@@ -1408,7 +1408,7 @@ compute_escape(int m, int n, int dragon_status_known)
   char goal[BOARDMAX];
   int escape_value[BOARDMAX];
 
-  ASSERT1(board[POS(m, n)] != EMPTY, POS(m, n));
+  ASSERT1(IS_STONE(board[POS(m, n)]), POS(m, n));
   
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {

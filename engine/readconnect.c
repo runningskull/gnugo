@@ -114,7 +114,7 @@ static int snapback (int str) {
   if (trymove(libs[0], OTHER_COLOR(board[str]),
 	      "snapback", str, EMPTY, 0)) {
     liberties=0;
-    if (board[libs[0]] != EMPTY)
+    if (IS_STONE(board[libs[0]]))
       liberties = countlib(libs[0]);
     popgo();
     if (liberties > 1)

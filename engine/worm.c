@@ -489,8 +489,8 @@ make_worms(void)
     for (n = 0; n < board_size; n++) {
       int pos = POS(m, n);
       if (!is_same_worm(pos, SOUTH(pos))
-	  && IS_COLOR(board[pos])
-	  && IS_COLOR(board[SOUTH(pos)])) {
+	  && IS_STONE(board[pos])
+	  && IS_STONE(board[SOUTH(pos)])) {
         if (worm[pos].attack_codes[0] != 0
 	    && worm[SOUTH(pos)].attack_codes[0] != 0) {
 	  if (worm[pos].defend_codes[0] == 0
@@ -512,8 +512,8 @@ make_worms(void)
     for (n = 0; n < board_size-1; n++) {
       int pos = POS(m, n);
       if (!is_same_worm(pos, EAST(pos))
-	  && IS_COLOR(board[pos])
-	  && IS_COLOR(board[EAST(pos)])) {
+	  && IS_STONE(board[pos])
+	  && IS_STONE(board[EAST(pos)])) {
         if (worm[pos].attack_codes[0] != 0
 	    && worm[EAST(pos)].attack_codes[0] != 0) {
 	  if (worm[pos].defend_codes[0] == 0
@@ -633,7 +633,7 @@ build_worms()
       worm[pos].invincible = 0;
       worm[pos].unconditional_status = UNKNOWN;
       worm[pos].effective_size = 0.0;
-      if (IS_COLOR(board[pos])) {
+      if (IS_STONE(board[pos])) {
 	worm[pos].liberties = countlib(pos);
 	worm[pos].size = countstones(pos);
 	propagate_worm(pos);
@@ -740,7 +740,7 @@ compute_effective_worm_sizes()
   /* Propagate the effective size values all over the worms. */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (IS_COLOR(BOARD(m, n)) && is_worm_origin(POS(m, n), POS(m, n)))
+      if (IS_STONE(BOARD(m, n)) && is_worm_origin(POS(m, n), POS(m, n)))
 	propagate_worm(POS(m, n));
 }
 
@@ -1004,7 +1004,7 @@ find_worm_threats()
 	      int bb = libs[k] + delta[l];
 
 	      if (!ON_BOARD(bb)
-		  || IS_COLOR(board[bb])
+		  || IS_STONE(board[bb])
 		  || liberty_of_string(bb, pos))
 		continue;
 
@@ -1066,7 +1066,7 @@ find_worm_threats()
 	    int bb = libs[k] + delta[l];
 
 	    if (!ON_BOARD(bb)
-		|| IS_COLOR(board[bb])
+		|| IS_STONE(board[bb])
 		|| liberty_of_string(bb, pos))
 	      continue;
 
@@ -1107,7 +1107,7 @@ find_lunch(int str, int *lunch)
   int i, j;
   int k;
 
-  ASSERT1(IS_COLOR(board[str]), str);
+  ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(stackp == 0, str);
 
   *lunch = NO_MOVE;
@@ -1402,7 +1402,7 @@ propagate_worm(int pos)
   int num_stones;
   int stones[MAX_BOARD * MAX_BOARD];
   gg_assert(stackp == 0);
-  ASSERT1(IS_COLOR(board[pos]), pos);
+  ASSERT1(IS_STONE(board[pos]), pos);
 
   num_stones = findstones(pos, MAX_BOARD * MAX_BOARD, stones);
   for (k = 0; k < num_stones; k++)
@@ -1422,7 +1422,7 @@ propagate_worm2(int str)
 {
   int pos;
   ASSERT_ON_BOARD1(str);
-  ASSERT1(IS_COLOR(worm[str].color), str);
+  ASSERT1(IS_STONE(worm[str].color), str);
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (board[pos] == board[str] && is_same_worm(pos, str))
@@ -1662,7 +1662,7 @@ examine_cavity(int pos, int *edge)
 
   *edge = 0;
 
-  if (IS_COLOR(board[pos]))
+  if (IS_STONE(board[pos]))
     origin = find_origin(pos);
   
   cavity_recurse(pos, ml, &border_color, edge, origin);

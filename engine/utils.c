@@ -701,7 +701,7 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
   int liberties = 0;
 
   ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(color != EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   /* Use tryko() since we don't care whether the move would violate
    * the ko rule.

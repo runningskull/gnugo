@@ -1137,7 +1137,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
        * marked when stackp==0, which has not been captured. If no
        * such string is found, owl_attack declares victory.
        */
-      if (board[str] != EMPTY)
+      if (IS_STONE(board[str]))
 	origin = str;
       else {
 	int found_string = 0;
@@ -1272,7 +1272,7 @@ owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)
 	    int found_string = 0;
 	    for (oi = 0; oi < board_size && !found_string; oi++)
 	      for (oj = 0; oj < board_size && !found_string; oj++) {
-		if (BOARD(oi, oj) != EMPTY 
+		if (IS_STONE(BOARD(oi, oj)) 
 		    && owl.goal[POS(oi, oj)] == 1) {
 		  origin = find_origin(POS(oi, oj));
 		  found_string = 1;
@@ -1774,7 +1774,7 @@ owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj)
 	    move = moves[k].pos;
 	    popgo();
 	    /* Don't return the second move if occupied before trymove */
-	    if (move2 != 0 && board[move2] != EMPTY)
+	    if (move2 != 0 && IS_STONE(board[move2]))
 	      move2 = 0;
 	    result = WIN;
 	    break;
@@ -3351,7 +3351,7 @@ sniff_lunch(int pos, int *min, int *probable, int *max,
   int other = OTHER_COLOR(board[pos]);
   int size;
 
-  ASSERT1(board[pos] != EMPTY, pos);
+  ASSERT1(IS_STONE(board[pos]), pos);
 
   if (owl->boundary[pos] == 2) {
     *min = 2;
@@ -3531,7 +3531,7 @@ int
 owl_eyespace(int ai, int aj, int bi, int bj)
 {
   int opos;
-  ASSERT2(BOARD(bi, bj) != EMPTY, bi, bj);
+  ASSERT2(IS_STONE(BOARD(bi, bj)), bi, bj);
   
   if (BOARD(bi, bj) == WHITE) {
     opos = current_owl_data->white_eye[POS(ai, aj)].origin;
@@ -3556,7 +3556,7 @@ int
 owl_big_eyespace(int ai, int aj, int bi, int bj)
 {
   int opos;
-  ASSERT2(BOARD(bi, bj) != EMPTY, bi, bj);
+  ASSERT2(IS_STONE(BOARD(bi, bj)), bi, bj);
   
   ASSERT_ON_BOARD2(ai, aj);
 
@@ -3859,7 +3859,7 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
       int value = board[pos];
       if (!active[pos])
 	value = GRAY;
-      else if (board[pos] != EMPTY && countlib2(m, n) > 4)
+      else if (IS_STONE(board[pos]) && countlib2(m, n) > 4)
 	value |= HIGH_LIBERTY_BIT;
 	
       persistent_owl_cache[persistent_owl_cache_size].board[pos] = value;
@@ -3900,7 +3900,7 @@ mark_dragon_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
 			   int pos, float contribution)
 {
   int i, j, k;
-  ASSERT1(board[pos] != EMPTY, pos);
+  ASSERT1(IS_STONE(board[pos]), pos);
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       if (BOARD(i, j) != EMPTY)
@@ -3909,7 +3909,7 @@ mark_dragon_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
 	int di = deltai[k];
 	int dj = deltaj[k];
 	if (ON_BOARD2(i+di, j+dj)
-	    && BOARD(i+di, j+dj) != EMPTY
+	    && IS_STONE(BOARD(i+di, j+dj))
 	    && same_dragon(POS(i+di, j+dj), pos)
 	    && (countlib2(i+di, j+dj) <= 4
 		|| i == 0 || i == board_size-1

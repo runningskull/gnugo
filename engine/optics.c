@@ -348,7 +348,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 	      domain[pos] = 1;
 	  }
 	  else {
-	    if (board[pos] != EMPTY || false_margins[pos] != 1)
+	    if (IS_STONE(board[pos]) || false_margins[pos] != 1)
 	      domain[pos] = 1;
 	  }
 	}
@@ -444,7 +444,7 @@ compute_primary_domains(int color, int domain[BOARDMAX],
 	    }
 	  }
 	  else {
-	    if (board[pos] != EMPTY || false_margins[pos] != 1) {
+	    if (IS_STONE(board[pos]) || false_margins[pos] != 1) {
 	      found_one = 1;
 	      domain[pos] = 1;
 	    }
@@ -824,15 +824,15 @@ compute_eyes(int pos, int *max, int *min,
 	if (eye[POS(m, n)].origin != pos) 
 	  continue;
 
-	if (eye[POS(m, n)].marginal && BOARD(m, n) != EMPTY)
+	if (eye[POS(m, n)].marginal && IS_STONE(BOARD(m, n)))
 	  DEBUG(DEBUG_EYES, "%m (X!)\n", m, n);
 	else if (eye[POS(m, n)].marginal && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (!)\n", m, n);
-	else if (!eye[POS(m, n)].marginal && BOARD(m, n) != EMPTY)
+	else if (!eye[POS(m, n)].marginal && IS_STONE(BOARD(m, n)))
 	  DEBUG(DEBUG_EYES, "%m (X)\n", m, n);
 	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (H)\n", m, n);
-	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) != EMPTY)
+	else if (is_halfeye(heye, POS(m, n)) && IS_STONE(BOARD(m, n)))
 	  DEBUG(DEBUG_EYES, "%m (XH)\n", m, n);
 	else
 	  DEBUG(DEBUG_EYES, "%m\n", m, n);
@@ -980,15 +980,15 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
 	if (eye[POS(m, n)].origin != pos) 
 	  continue;
 
-	if (eye[POS(m, n)].marginal && BOARD(m, n) != EMPTY)
+	if (eye[POS(m, n)].marginal && IS_STONE(BOARD(m, n)))
 	  DEBUG(DEBUG_EYES, "%m (X!)\n", m, n);
 	else if (eye[POS(m, n)].marginal && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (!)\n", m, n);
-	else if (!eye[POS(m, n)].marginal && BOARD(m, n) != EMPTY)
+	else if (!eye[POS(m, n)].marginal && IS_STONE(BOARD(m, n)))
 	  DEBUG(DEBUG_EYES, "%m (X)\n", m, n);
 	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) == EMPTY)
 	  DEBUG(DEBUG_EYES, "%m (H)\n", m, n);
-	else if (is_halfeye(heye, POS(m, n)) && BOARD(m, n) != EMPTY)
+	else if (is_halfeye(heye, POS(m, n)) && IS_STONE(BOARD(m, n)))
 	  DEBUG(DEBUG_EYES, "%m (XH)\n", m, n);
 	else
 	  DEBUG(DEBUG_EYES, "%m\n", m, n);
@@ -1301,7 +1301,7 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
        * .OX.O
        * -----
        */
-      if (board[*vital_point] != EMPTY) {
+      if (IS_STONE(board[*vital_point])) {
 	*max = 0;
 	*vital_point = NO_MOVE;
       }
@@ -1315,10 +1315,10 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
 
 	/* Exceptional cases. (eyes.tst:312) */
 	if ((eye[POS(end1i, end1j)].marginal
-	     && BOARD(end1i, end1j) != EMPTY
+	     && IS_STONE(BOARD(end1i, end1j))
 	     && BOARD(end2i, end2j) == EMPTY)
 	    || (eye[POS(end2i, end2j)].marginal
-		&& BOARD(end2i, end2j) != EMPTY
+		&& IS_STONE(BOARD(end2i, end2j))
 		&& BOARD(end1i, end1j) == EMPTY)) {
 	  *min = 0;
 	  *vital_point = POS(middlei, middlej);
@@ -1333,7 +1333,7 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
 	    *vital_point = POS(end1i, end1j);
 	  }
 	  else {
-	    if (BOARD(end2i, end2j) != EMPTY)
+	    if (IS_STONE(BOARD(end2i, end2j)))
 	      *min = 1; /* three tactically dead stones in a row. */
 	    else
 	      *max = 0;
@@ -1344,7 +1344,7 @@ linear_eye_space(int pos, int *vital_point, int *max, int *min,
 	    *vital_point = POS(end2i, end2j);
 	  }
 	  else {
-	    if (BOARD(end1i, end1j) != EMPTY)
+	    if (IS_STONE(BOARD(end1i, end1j)))
 	      *min = 1; /* three tactically dead stones in a row. */
 	    else
 	      *max = 0;
@@ -1601,7 +1601,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      (graphs[graph].vertex[q].type == '@')))
 	ok = 0;
       
-      if (ok && (board[vpos[map[q]]] != EMPTY) 
+      if (ok && (IS_STONE(board[vpos[map[q]]])) 
 	  && (graphs[graph].vertex[q].type != 'X')
 	  && (graphs[graph].vertex[q].type != 'x'))
 	ok = 0;

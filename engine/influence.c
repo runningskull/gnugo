@@ -352,7 +352,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       q->black_strength[i][j] = 0.0;
       q->p[i][j] = BOARD(i, j);
       
-      if (BOARD(i, j) != EMPTY) {
+      if (IS_STONE(BOARD(i, j))) {
 	if (worm[POS(i, j)].attack_codes[0] == WIN
 	    && (OTHER_COLOR(q->p[i][j]) == color
 		|| worm[POS(i, j)].defend_codes[0] == 0)) {
@@ -383,7 +383,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       /* When evaluating influence after a move, the newly placed
        * stone will have the invalid dragon id -1.
        */
-      if (BOARD(i, j) != EMPTY) {
+      if (IS_STONE(BOARD(i, j))) {
 	if (!dragons_known || dragon[POS(i, j)].id == -1) {
 	  if (q->p[i][j] == WHITE)
 	    q->white_strength[i][j] = DEFAULT_STRENGTH;
@@ -657,7 +657,7 @@ find_influence_patterns(struct influence_data *q, int color)
   int m,n;
 
   global_matchpat(influence_callback, ANCHOR_COLOR, &influencepat_db, q, NULL);
-  if (color != EMPTY)
+  if (IS_STONE(color))
     global_matchpat(influence_callback, color, &barrierspat_db, q, NULL);
 
   /* When color == EMPTY, we introduce a weaker kind of barriers
@@ -665,7 +665,7 @@ find_influence_patterns(struct influence_data *q, int color)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (BOARD(m, n) != EMPTY) {
+      if (IS_STONE(BOARD(m, n))) {
 	int k;
 	for (k = 0; k < 8; k++) {
 	  int dm = deltai[k];
@@ -792,7 +792,7 @@ whose_moyo(struct influence_data *q, int m, int n)
   float wi = q->white_influence[m][n];
 
   int territory_color = whose_territory(q, m, n);
-  if (territory_color != EMPTY)
+  if (IS_STONE(territory_color))
     return territory_color;
   
   if (bi > 7.0 * wi && bi > 5.0 && wi < 10.0)
@@ -828,7 +828,7 @@ whose_moyo_restricted(struct influence_data *q, int m, int n)
     return EMPTY;
   
   /* default */
-  if (territory_color != EMPTY)
+  if (IS_STONE(territory_color))
     color = territory_color;
   else if ((bi > 10.0 * wi && bi > 10.0 && wi < 10.0) || bi > 25.0 * wi)
     color = BLACK;
@@ -859,7 +859,7 @@ whose_area(struct influence_data *q, int m, int n)
   float wi = q->white_influence[m][n];
 
   int moyo_color = whose_moyo(q, m, n);
-  if (moyo_color != EMPTY)
+  if (IS_STONE(moyo_color))
     return moyo_color;
   
   if (bi > 3.0 * wi && bi > 1.0 && wi < 40.0)
@@ -885,7 +885,7 @@ segment_region(struct influence_data *q, owner_function_ptr region_owner,
   int m, n;
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (q->w[m][n] == UNMARKED && region_owner(q, m, n) != EMPTY) {
+      if (q->w[m][n] == UNMARKED && IS_STONE(region_owner(q, m, n))) {
 	/* Found an unlabelled intersection. Use flood filling to find
          * the rest of the region.
 	 */

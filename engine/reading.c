@@ -391,7 +391,7 @@ int
 attack_either(int astr, int bstr)
 {
   int color = board[astr];
-  ASSERT1(color != EMPTY , astr);
+  ASSERT1(IS_STONE(color) , astr);
   ASSERT1(color == board[bstr], bstr);
 
   /* Start by attacking the string with the fewest liberties. On
@@ -425,7 +425,7 @@ defend_both(int astr, int bstr)
   int dcode = 0;
   
   int color = board[astr];
-  ASSERT1(color != EMPTY , astr);
+  ASSERT1(IS_STONE(color) , astr);
   ASSERT1(color == board[bstr], bstr);
 
   attack_and_defend(astr, &acode, NULL, &dcode, &cpos);
@@ -569,7 +569,7 @@ break_through(int apos, int bpos, int cpos)
   int success2 = 0;
   
   /* Basic sanity checking. */
-  ASSERT1(color != EMPTY , apos);
+  ASSERT1(IS_STONE(color) , apos);
   ASSERT1(color == board[bpos], bpos);
   ASSERT1(color == board[cpos], cpos);
 
@@ -1469,7 +1469,7 @@ defend1(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("defend1", str);
   reading_node_counter++;
   
-  gg_assert(board[str] != EMPTY);
+  gg_assert(IS_STONE(board[str]));
   ASSERT1(countlib(str) == 1, str);
   RTRACE("try to escape atari on %1m.\n", str);
 
@@ -1622,7 +1622,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
   color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(board[str] != EMPTY);
+  gg_assert(IS_STONE(board[str]));
   gg_assert(countlib(str) == 2);
 
   if ((stackp <= depth) && (hashflags & HASH_DEFEND2)) {
@@ -1905,7 +1905,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
   color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(board[str] != EMPTY);
+  gg_assert(IS_STONE(board[str]));
   gg_assert(countlib(str) == 3);
 
   if ((stackp <= depth) && (hashflags & HASH_DEFEND3)) {
@@ -2223,7 +2223,7 @@ defend4(int str, int *move, int komaster, int kom_pos)
   color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(board[str] != EMPTY);
+  gg_assert(IS_STONE(board[str]));
   gg_assert(countlib(str) == 4);
 
   if ((stackp <= depth) && (hashflags & HASH_DEFEND4)) {
@@ -3104,7 +3104,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
   reading_node_counter++;
 
   str = find_origin(str);
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
 
   RTRACE("checking attack on %1m with 2 liberties\n", str);
@@ -3400,7 +3400,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("attack3", str);
   reading_node_counter++;
   
-  gg_assert(board[str] != EMPTY);
+  gg_assert(IS_STONE(board[str]));
   
   if ((stackp <= depth) && (hashflags & HASH_ATTACK3)) {
     found_read_result = get_read_result(ATTACK3, komaster, kom_pos,
@@ -3679,7 +3679,7 @@ attack4(int str, int *move, int komaster, int kom_pos)
 
   SETUP_TRACE_INFO("attack4", str);
   
-  gg_assert(board[str] != EMPTY);
+  gg_assert(IS_STONE(board[str]));
   reading_node_counter++;
   
   if (stackp > depth) {
@@ -4733,7 +4733,7 @@ break_chain2(int str, int *move, int komaster, int kom_pos)
 	if (!ko_move) {
 	  if (countlib(bpos) <= 2)
 	    try_harder = 1;
-	  if (board[str] != EMPTY) {
+	  if (IS_STONE(board[str])) {
 	    int dcode = do_find_defense(str, NULL, newer_komaster,
 					newer_kom_pos);
 	    if (dcode == WIN && !try_harder) {
@@ -4753,7 +4753,7 @@ break_chain2(int str, int *move, int komaster, int kom_pos)
 	}
 	else {
 	  try_harder = 1;
-	  ASSERT1(board[str] != EMPTY, str);
+	  ASSERT1(IS_STONE(board[str]), str);
 	  if (do_find_defense(str, NULL, newer_komaster, newer_kom_pos) != 0) {
 	    savecode = KO_A; /* Not KO_B since we are one move deeper 
 			      * than usual. */
@@ -5062,7 +5062,7 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
   SETUP_TRACE_INFO("restricted_defend1", str);
   reading_node_counter++;
   
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 1, str);
 
   RTRACE("try to escape atari on %1m.\n", str);
@@ -5190,7 +5190,7 @@ restricted_attack2(int str, int *move, int komaster, int kom_pos,
   reading_node_counter++;
 
   str = find_origin(str);
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
 
   RTRACE("restricted attack on %1m with 2 liberties\n", str);
@@ -6031,7 +6031,7 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
 	|| (ON_BOARD(WEST(k)) && active[WEST(k)] == 1)
 	|| (ON_BOARD(NORTH(k)) && active[NORTH(k)] == 1)
 	|| (ON_BOARD(EAST(k)) && active[EAST(k)] == 1)) {
-      if (board[k] != EMPTY)
+      if (IS_STONE(board[k]))
 	mark_string(k, active, 2);
       else
 	active[k] = 2;
@@ -6044,13 +6044,13 @@ store_persistent_reading_cache(int routine, int str, int result, int move,
   for (k = BOARDMIN; k < BOARDMAX; k++) {
     if (!ON_BOARD(k))
       continue;
-    if (board[k] != EMPTY && worm[k].invincible)
+    if (IS_STONE(board[k]) && worm[k].invincible)
       active[k] = 0;
   }
   
   /* Expand empty to empty. */
   for (k = BOARDMIN; k < BOARDMAX; k++) {
-    if (board[k] != EMPTY || active[k] != 0) 
+    if (IS_STONE(board[k]) || active[k] != 0) 
       continue;
     if ((board[SOUTH(k)] == EMPTY && active[SOUTH(k)] == 2)
 	|| (board[WEST(k)] == EMPTY && active[WEST(k)] == 2)
@@ -6153,7 +6153,7 @@ mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
 	int di = deltai[k];
 	int dj = deltaj[k];
 	if (ON_BOARD2(i+di, j+dj)
-	    && BOARD(i+di, j+dj) != EMPTY
+	    && IS_STONE(BOARD(i+di, j+dj))
 	    && same_string(POS(i+di, j+dj), POS(m, n))) {
 	  if (k < 4) {
 	    values[i][j] += contribution;
@@ -6269,7 +6269,7 @@ naive_ladder(int str, int *move)
   int scores[2];
   int k;
   
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
   DEBUG(DEBUG_READING, "naive_ladder(%1m)\n", str);
 

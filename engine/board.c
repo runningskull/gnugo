@@ -189,7 +189,7 @@ static int next_stone[BOARDMAX];
 #define MARK_STRING(pos) string[string_number[pos]].mark = string_mark
 
 #define STRING_AT_VERTEX(pos, s)\
-  (board[pos] != EMPTY && board[pos] != GRAY && string_number[pos] == (s))
+  (IS_STONE(board[pos]) && string_number[pos] == (s))
   
 #define LIBERTIES(pos)\
   string[string_number[pos]].liberties
@@ -380,7 +380,7 @@ trymove(int pos, int color, const char *message, int str,
   if (sgf_dumptree) {
     char buf[100];
     if (str == 0) {
-      if (komaster != EMPTY)
+      if (IS_STONE(komaster))
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, count_variations, hashdata.hashval,
 		    color_to_string(komaster),
@@ -390,7 +390,7 @@ trymove(int pos, int color, const char *message, int str,
 		    message, count_variations, hashdata.hashval);
     }
     else {
-      if (komaster != EMPTY)
+      if (IS_STONE(komaster))
 	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
 		    hashdata.hashval, color_to_string(komaster),
@@ -434,7 +434,7 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
     char buf[100];
     if (!message)
       message = "???";
-    if (komaster != EMPTY)
+    if (IS_STONE(komaster))
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
 		  message, count_variations, hashdata.hashval,
 		  color_to_string(komaster), location_to_string(kom_pos));
@@ -680,7 +680,7 @@ remove_stone(int pos)
 {
   ASSERT1(stackp == 0, pos);
   ASSERT_ON_BOARD1(pos);
-  ASSERT1(board[pos] != EMPTY, pos);
+  ASSERT1(IS_STONE(board[pos]), pos);
 
   do_remove_stone(pos);
   new_position();
@@ -908,8 +908,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
    * there is suicide. If komaster == GRAY we don't remember who
    * owns the ko so we have to try both colors.
    */
-  if (komaster != EMPTY 
-      && (board[kom_pos] != EMPTY
+  if (IS_STONE(komaster)
+      && (IS_STONE(board[kom_pos])
 	  || (komaster != GRAY
 	      && !is_ko(kom_pos, OTHER_COLOR(komaster), NULL)
 	      && is_suicide(kom_pos, OTHER_COLOR(komaster)))
@@ -1024,7 +1024,7 @@ komaster_trymove(int pos, int color, const char *message, int str,
     return 1;
 
   /* Conditional ko captures are only allowed if the komaster is EMPTY. */
-  if (!consider_conditional_ko || komaster != EMPTY)
+  if (!consider_conditional_ko || IS_STONE(komaster))
     return 0;
 
   if (tryko(pos, color, message, komaster, kom_pos)) {
@@ -1138,7 +1138,7 @@ int
 countlib(int str)
 {
   ASSERT_ON_BOARD1(str);
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
   
   if (!strings_initialized)
     init_board();
@@ -1165,7 +1165,7 @@ findlib(int str, int maxlib, int *libs)
   int s;
   
   ASSERT_ON_BOARD1(str);
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(libs != NULL, str);
   
   if (!strings_initialized)
@@ -1254,7 +1254,7 @@ approxlib(int pos, int color, int maxlib, int *libs)
 
   ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(color != EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   if (!strings_initialized)
     init_board();
@@ -1390,8 +1390,8 @@ count_common_libs(int str1, int str2)
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
-  ASSERT1(board[str1] != EMPTY, str1);
-  ASSERT1(board[str2] != EMPTY, str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
   
   if (!strings_initialized)
     init_board();
@@ -1431,8 +1431,8 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
-  ASSERT1(board[str1] != EMPTY, str1);
-  ASSERT1(board[str2] != EMPTY, str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
   ASSERT1(libs != NULL, str1);
   
   if (!strings_initialized)
@@ -1471,8 +1471,8 @@ have_common_lib(int str1, int str2, int *lib)
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
-  ASSERT1(board[str1] != EMPTY, str1);
-  ASSERT1(board[str2] != EMPTY, str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
   
   if (!strings_initialized)
     init_board();
@@ -1504,7 +1504,7 @@ int
 countstones(int str)
 {
   ASSERT_ON_BOARD1(str);
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   if (!strings_initialized)
     init_board();
@@ -1527,7 +1527,7 @@ findstones(int str, int maxstones, int *stones)
   int k;
   
   ASSERT_ON_BOARD1(str);
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   if (!strings_initialized)
     init_board();
@@ -1556,7 +1556,7 @@ chainlinks(int str, int adj[MAXCHAIN])
   struct string_data *s;
   int k;
 
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   if (!strings_initialized)
     init_board();
@@ -1584,7 +1584,7 @@ chainlinks2(int str, int adj[MAXCHAIN], int lib)
   int k;
   int neighbors;
 
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   if (!strings_initialized)
     init_board();
@@ -1612,7 +1612,7 @@ chainlinks2(int str, int adj[MAXCHAIN], int lib)
 int
 find_origin(int str)
 {
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   if (!strings_initialized)
     init_board();
@@ -1634,7 +1634,7 @@ is_self_atari(int pos, int color)
   
   ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
-  ASSERT1(color != EMPTY, pos);
+  ASSERT1(IS_STONE(color), pos);
 
   if (!strings_initialized)
     init_board();
@@ -1664,7 +1664,7 @@ is_self_atari(int pos, int color)
 int
 liberty_of_string(int pos, int str)
 {
-  if (board[pos] != EMPTY)
+  if (IS_STONE(board[pos]))
     return 0;
 
   return neighbor_of_string(pos, str);
@@ -1681,7 +1681,7 @@ neighbor_of_string(int pos, int str)
   int s;
   int color = board[str];
 
-  ASSERT1(color != EMPTY, str);
+  ASSERT1(IS_STONE(color), str);
 
   if (!strings_initialized)
     init_board();
@@ -1717,8 +1717,8 @@ same_string(int str1, int str2)
 {
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
-  ASSERT1(board[str1] != EMPTY, str1);
-  ASSERT1(board[str2] != EMPTY, str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
 
   if (!strings_initialized)
     init_board();
@@ -1739,8 +1739,8 @@ adjacent_strings(int str1, int str2)
   
   ASSERT_ON_BOARD1(str1);
   ASSERT_ON_BOARD1(str2);
-  ASSERT1(board[str1] != EMPTY, str1);
-  ASSERT1(board[str2] != EMPTY, str2);
+  ASSERT1(IS_STONE(board[str1]), str1);
+  ASSERT1(IS_STONE(board[str2]), str2);
 
   if (!strings_initialized)
     init_board();
@@ -1851,7 +1851,7 @@ is_ko_point(int pos)
       color = board[SOUTH(pos)];
     else
       color = board[NORTH(pos)];
-    if (color != EMPTY && is_ko(pos, OTHER_COLOR(color), NULL))
+    if (IS_STONE(color) && is_ko(pos, OTHER_COLOR(color), NULL))
       return 1;
   }
   else {
@@ -1904,7 +1904,7 @@ mark_string(int str, char mx[BOARDMAX], char mark)
 {
   int pos = str;
 
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   if (!strings_initialized)
     init_board();
@@ -1922,7 +1922,7 @@ mark_string2(int m, int n, char mx[MAX_BOARD][MAX_BOARD], char mark)
   int str = POS(m, n);
   int pos = str;
 
-  ASSERT1(board[str] != EMPTY, str);
+  ASSERT1(IS_STONE(board[str]), str);
 
   if (!strings_initialized)
     init_board();
@@ -2066,7 +2066,7 @@ init_board()
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos))
       continue;
-    if (board[pos] != EMPTY && string_number[pos] == -1) {
+    if (IS_STONE(board[pos]) && string_number[pos] == -1) {
       string_number[pos] = next_string;
       string[next_string].size = propagate_string(pos, pos);
       string[next_string].color = board[pos];

@@ -63,7 +63,7 @@ void init_gnugo(float memory);
 
 
 #define OTHER_COLOR(color)  (WHITE+BLACK-(color))
-#define IS_COLOR(arg)  ((arg) == WHITE || (arg) == BLACK)
+#define IS_STONE(arg)  ((arg) == WHITE || (arg) == BLACK)
 
 /* Return codes for reading functions */
 
