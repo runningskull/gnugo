@@ -183,7 +183,7 @@ extern int output_flags;       /* amount of output to outfile */
 #define DEBUG_ATARI_ATARI           0x040000
 #define DEBUG_READING_CACHE         0x080000
 #define DEBUG_TERRITORY             0x100000
-#define DEBUG_OWL_PERSISTENT_CACHE  0x200000
+#define DEBUG_PERSISTENT_CACHE	    0x200000
 #define DEBUG_TOP_MOVES             0x400000
 #define DEBUG_MISCELLANEOUS         0x800000
 #define DEBUG_ORACLE_STREAM         0x1000000

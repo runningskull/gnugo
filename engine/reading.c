@@ -316,6 +316,7 @@ static int in_list(int move, int num_moves, int *moves);
 static int reading_node_counter = 0;
 static int nodes_when_called = 0;
 
+ 
 
 /* ================================================================ */  
 /*                          Goal functions                          */
@@ -357,12 +358,16 @@ attack(int str, int *move)
   int nodes;
   int origin;
   int the_move = NO_MOVE;
+  int liberties = countlib(str);
 
   nodes_when_called = reading_node_counter;
   /* Don't even spend time looking in the cache if there are more than
-   * four liberties.
+   * enough liberties. We need this before the persistent cache lookup
+   * to avoid results inconsistent with find_defense().
    */
-  if (countlib(str) > 4)
+  if (liberties > 4
+      || (liberties == 4 && stackp > fourlib_depth)
+      || (liberties == 3 && stackp > depth))
     return 0;
 
   origin = find_origin(str);
@@ -422,12 +427,14 @@ find_defense(int str, int *move)
   int nodes;
   int origin;
   int the_move = NO_MOVE;
+  int liberties = countlib(str);
 
   nodes_when_called = reading_node_counter;
   /* Don't even spend time looking in the cache if there are more than
-   * four liberties.
+   * enough liberties.
    */
-  if (countlib(str) > 4) {
+  if (liberties > 4
+      || (liberties == 4 && stackp > fourlib_depth)) {
     if (move)
       *move = NO_MOVE;
     return WIN;
@@ -501,21 +508,8 @@ attack_and_defend(int str,
   int dpos = NO_MOVE;
 
   acode = attack(str, &apos);
-  if (acode != 0) {
+  if (acode != 0)
     dcode = find_defense(str, &dpos);
-    
-    /* If find_defense() says the string is safe as is, contradicting
-     * the opinion of attack(), we remove the corresponding entries
-     * from the persistent cache and try again.
-     */
-    if (dcode == WIN && dpos == NO_MOVE) {
-      delete_persistent_reading_cache_entry(ATTACK, str);
-      delete_persistent_reading_cache_entry(FIND_DEFENSE, str);
-      acode = attack(str, &apos);
-      if (acode != 0)
-        dcode = find_defense(str, &dpos);
-    }
-  }
 
   ASSERT1(!(acode != 0 && dcode == WIN && dpos == NO_MOVE), str);
 
@@ -3075,7 +3069,8 @@ do_attack(int str, int *move)
   liberties = countlib(str);
 
   if (liberties > 4
-      || (liberties == 4 && stackp > fourlib_depth)) {
+      || (liberties == 4 && stackp > fourlib_depth)
+      || (liberties == 3 && stackp > depth)) {
     /* No need to cache the result in these cases. */
     if (sgf_dumptree) {
       char buf[100];
@@ -3557,8 +3552,7 @@ attack3(int str, int *move)
 
   ASSERT1(IS_STONE(board[str]), str);
   
-  if (stackp > depth)
-    RETURN_RESULT(0, 0, move, "stackp > depth");
+  ASSERT1(stackp <= depth, str);
   
   for (pass = 0; pass < 4; pass++) {
 

@@ -231,16 +231,15 @@ void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
 void draw_reading_shadow(void);
 
 /* persistent.c */
-void purge_persistent_reading_cache(void);
-void clear_persistent_reading_cache(void);
+void persistent_cache_init(void);
+void purge_persistent_caches(void);
+void clear_persistent_caches(void);
+
 int search_persistent_reading_cache(enum routine_id routine, int str,
 				    int *result, int *move);
 void store_persistent_reading_cache(enum routine_id routine, int str,
 				    int result, int move, int nodes);
-void delete_persistent_reading_cache_entry(enum routine_id routine, int str);
 void reading_hotspots(float values[BOARDMAX]);
-void purge_persistent_connection_cache(void);
-void clear_persistent_connection_cache(void);
 int search_persistent_connection_cache(enum routine_id routine,
 				       int str1, int str2,
 				       int *result, int *move);
@@ -250,18 +249,15 @@ void store_persistent_connection_cache(enum routine_id routine,
 				       int tactical_nodes,
 				       char connection_shadow[BOARDMAX]);
 int search_persistent_breakin_cache(enum routine_id routine,
-				    int str, Hash_data goal_hash,
+				    int str, Hash_data *goal_hash,
+				    int breakin_node_limit,
 				    int *result, int *move);
 void store_persistent_breakin_cache(enum routine_id routine,
-				    int str, Hash_data goal_hash,
+				    int str, Hash_data *goal_hash,
 				    int result, int move,
 				    int tactical_nodes,
+				    int breakin_node_limit,
 				    char breakin_shadow[BOARDMAX]);
-void purge_persistent_breakin_cache(void);
-void clear_persistent_breakin_cache(void);
-void print_persistent_breakin_cache(void);
-void purge_persistent_owl_cache(void);
-void clear_persistent_owl_cache(void);
 int search_persistent_owl_cache(enum routine_id routine,
 				int apos, int bpos, int cpos,
 				int *result, int *move, int *move2,

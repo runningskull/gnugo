@@ -3048,8 +3048,8 @@ break_in(int str, const char goal[BOARDMAX], int *move)
     return 0;
   str = find_origin(str);
 
-  if (search_persistent_breakin_cache(BREAK_IN, str, goal_hash,
-				         &result, move)) {
+  if (search_persistent_breakin_cache(BREAK_IN, str, &goal_hash,
+				      breakin_node_limit, &result, move)) {
     if (debug & DEBUG_BREAKIN) {
       gprintf("Break-in from %1m to:\n", str);
       goaldump(goal);
@@ -3078,8 +3078,9 @@ break_in(int str, const char goal[BOARDMAX], int *move)
     dump_stack();
     goaldump(goal);
   }
-  store_persistent_breakin_cache(BREAK_IN, str, goal_hash, result, *move,
-				 tactical_nodes, breakin_shadow);
+  store_persistent_breakin_cache(BREAK_IN, str, &goal_hash, result, *move,
+      				 tactical_nodes, breakin_node_limit,
+				 breakin_shadow);
 
   return result;
 }
@@ -3107,8 +3108,8 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   *move = PASS_MOVE;
   
   str = find_origin(str);
-  if (search_persistent_breakin_cache(BLOCK_OFF, str, goal_hash,
-				         &result, move)) {
+  if (search_persistent_breakin_cache(BLOCK_OFF, str, &goal_hash,
+				      breakin_node_limit, &result, move)) {
     if (debug & DEBUG_BREAKIN) {
       gprintf("Blocking off %1m from:\n", str);
       goaldump(goal);
@@ -3138,8 +3139,9 @@ block_off(int str, const char goal[BOARDMAX], int *move)
     goaldump(goal);
     dump_stack();
   }
-  store_persistent_breakin_cache(BLOCK_OFF, str, goal_hash, result, *move,
-				 tactical_nodes, breakin_shadow);
+  store_persistent_breakin_cache(BLOCK_OFF, str, &goal_hash, result, *move,
+				 tactical_nodes, breakin_node_limit,
+				 breakin_shadow);
 
   return result;
 }

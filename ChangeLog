@@ -2,7 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.5.8 released July 18, 2004
+- persistent caches reorganized to share common code
+
+3.5.9 released July 18, 2004
 
 - bugfix in read_eye()	
 - bugfix in fast_defense()

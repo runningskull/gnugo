@@ -246,7 +246,6 @@ make_dragons(int stop_before_owl)
    * if necessary.
    */
   start_timer(2);
-  purge_persistent_owl_cache();
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
       int attack_point = NO_MOVE;

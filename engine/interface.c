@@ -46,6 +46,7 @@ init_gnugo(float memory, unsigned int seed)
   set_random_seed(12345);
   reading_cache_init(memory * 1024 * 1024);
   set_random_seed(seed);
+  persistent_cache_init();
   clear_board();
 
   transformation_init();
