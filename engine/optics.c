@@ -1005,7 +1005,7 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
  * (there's a half eye at a and it is considered the same as '!.' by
  * the optics code). Normally, that eye shape gives only one secure
  * eye, and owl thinks that the white dragon is dead unconditionally.
- * This function tries to turn such ko-depended half eyes into proper
+ * This function tries to turn such ko-dependent half eyes into proper
  * eyes and chooses the best alternative. Note that we don't have any
  * attack/defense codes here, since owl will determine them itself.
  *
@@ -1103,6 +1103,8 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
   char marginal[MAXEYE], edge[MAXEYE], neighbors[MAXEYE];
   int graph;
   int map[MAXEYE];
+  int best_score;
+  int r;
 
   gg_assert(attack_point != NULL);
   gg_assert(defense_point != NULL);
@@ -1304,15 +1306,108 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	
 	gg_assert(vp->num_attacks > 0 && vp->num_defenses > 0);
 
-	*attack_point = vp->attacks[0];
-	/* If possible, choose a non-sacrificial defense point.
-         * Compare white T8 and T6 in lazarus:21.
+	/* We now have all vital attack and defense points listed but
+         * we are also expected to single out of one of each to return
+         * in *attack_point and *defense_point. Since sometimes those
+         * are the only vital points considered, we want to choose the
+         * best ones, in the sense that they minimize the risk for
+         * error in the eye space analysis.
+	 *
+	 * One example is this position
+	 *
+	 * |..XXXX
+	 * |XXX..X
+	 * |..!O.X
+	 * |OO.O.X
+	 * |.O.!XX
+	 * +------
+	 *
+	 * where O has an eyespace of the !..! type. The graph
+	 * matching finds that both marginal vertices are vital points
+	 * but here the one at 3-3 fails to defend. (For attack both
+	 * points work but the 3-3 one is still worse since it leaves
+	 * a ko threat.)
+	 *
+	 * In order to differentiate between the marginal points we
+	 * count the number of straight and diagonal neighbors within
+	 * the eye space. In the example above both have one straight
+	 * neighbor each but the edge margin wins because it also has
+	 * a diagonal margin.
 	 */
-	*defense_point = vp->defenses[0];
+
+	best_score = -10;
+	for (k = 0; k < vp->num_attacks; k++) {
+	  int apos = vp->attacks[k];
+	  int score = 0;
+	  for (r = 0; r < 8; r++)
+	    if (ON_BOARD(apos + delta[r])
+		&& eye[apos + delta[r]].color == eye[pos].color
+		&& !eye[apos + delta[r]].marginal) {
+	      score++;
+	      if (r < 4) {
+		score++;
+		if (board[apos + delta[r]] != EMPTY)
+		  score++;
+	      }
+	    }
+
+	  /* If a vital point is not adjacent to any point in the eye
+           * space, it must be a move to capture or defend a string
+           * related to a halfeye, e.g. the move * in this position,
+	   *
+	   * ......|
+	   * .XXXX.|
+	   * .X.O..|
+	   * .XO.OO|
+	   * .*XO..|
+	   * ------+
+	   *
+	   * Playing this is probably a good idea.
+	   */
+	  if (score == 0)
+	    score += 2;
+	  
+	  if (0)
+	    gprintf("attack point %1m score %d\n", apos, score);
+	  
+	  if (score > best_score) {
+	    *attack_point = apos;
+	    best_score = score;
+	  }
+	}
+
+	best_score = -10;
 	for (k = 0; k < vp->num_defenses; k++) {
-	  if (safe_move(vp->defenses[k], eye_color) == WIN) {
-	    *defense_point = vp->defenses[k];
-	    break;
+	  int dpos = vp->defenses[k];
+	  int score = 0;
+	  for (r = 0; r < 8; r++)
+	    if (ON_BOARD(dpos + delta[r])
+		&& eye[dpos + delta[r]].color == eye[pos].color
+		&& !eye[dpos + delta[r]].marginal) {
+	      score++;
+	      if (r < 4) {
+		score++;
+		if (board[dpos + delta[r]] != EMPTY)
+		  score++;
+	      }
+	    }
+
+	  /* If possible, choose a non-sacrificial defense point.
+	   * Compare white T8 and T6 in lazarus:21.
+	   */
+	  if (safe_move(dpos, eye_color) != WIN)
+	    score -= 5;
+
+	  /* See comment to the same code for attack points. */
+	  if (score == 0)
+	    score += 2;
+
+	  if (0)
+	    gprintf("defense point %1m score %d\n", dpos, score);
+	  
+	  if (score > best_score) {
+	    *defense_point = dpos;
+	    best_score = score;
 	  }
 	}
 	
@@ -1571,10 +1666,28 @@ topological_eye(int pos, int color,
     }
   }
 
+  /* Remove attacks and defenses with smaller value than the best
+   * ones. (These might be useful to save as well, but not unless we
+   * also store the attack/defense values in the half_eye_data.)
+   */
+  for (r = 0; r < num_attacks; r++) {
+    if (attack_values[r] < attack_values[0]) {
+      num_attacks = r;
+      break;
+    }
+  }
+  
+  for (r = 0; r < num_defenses; r++) {
+    if (defense_values[r] < defense_values[0]) {
+      num_defenses = r;
+      break;
+    }
+  }
+
   heye[pos].num_attacks = num_attacks;
   heye[pos].num_defends = num_defenses;
   heye[pos].value = sum;
-  
+
   return sum;
 }
 
