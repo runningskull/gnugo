@@ -166,6 +166,7 @@ static void owl_shapes_callback(int m, int n, int color,
 static void owl_add_move(struct owl_move_data *moves, int move, int value,
 			 const char *reason, int same_dragon);
 static int owl_determine_life(struct local_owl_data *owl,
+			      struct local_owl_data *second_owl,
 			      struct eye_data eye[BOARDMAX],
 			      int color, int komaster, int does_attack,
 			      struct owl_move_data *moves, int *probable_min,
@@ -338,23 +339,23 @@ do_owl_analyze_semeai(int apos, int bpos,
       }
     }
     if (color == BLACK)
-      owl_determine_life(owla, owla->black_eye,
+      owl_determine_life(owla, owlb, owla->black_eye,
 			 BLACK, komaster, 1, 
 			 vital_defensive_moves,
 			 &probable_mina, &probable_maxa);
     else
-      owl_determine_life(owla, owla->white_eye,
+      owl_determine_life(owla, owlb, owla->white_eye,
 			 WHITE, komaster, 1, 
 			 vital_defensive_moves,
 			 &probable_mina, &probable_maxa);
     
     if (other == BLACK)
-      owl_determine_life(owlb, owlb->black_eye,
+      owl_determine_life(owlb, owla, owlb->black_eye,
 			 BLACK, komaster, 1,
 			 vital_offensive_moves,
 			 &probable_minb, &probable_maxb);
     else
-      owl_determine_life(owlb, owlb->white_eye,
+      owl_determine_life(owlb, owla, owlb->white_eye,
 			 WHITE, komaster, 1, 
 			 vital_offensive_moves,
 			 &probable_minb, &probable_maxb);
@@ -956,11 +957,11 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
     sgf_dumptree = NULL;
     count_variations = 0;
     if (color == BLACK)
-      true_genus = owl_determine_life(owl, owl->black_eye,
+      true_genus = owl_determine_life(owl, NULL, owl->black_eye,
 				      BLACK, komaster, 1, vital_moves,
 				      &probable_min, &probable_max);
     else 
-      true_genus = owl_determine_life(owl, owl->white_eye,
+      true_genus = owl_determine_life(owl, NULL, owl->white_eye,
 				      WHITE, komaster, 1, vital_moves,
 				      &probable_min, &probable_max);
     
@@ -1540,11 +1541,11 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     sgf_dumptree = NULL;
     count_variations = 0;
     if (color == BLACK)
-      true_genus = owl_determine_life(owl, owl->black_eye,
+      true_genus = owl_determine_life(owl, NULL, owl->black_eye,
 				      BLACK, komaster, 0, vital_moves,
 				      &probable_min, &probable_max);
     else 
-      true_genus = owl_determine_life(owl, owl->white_eye,
+      true_genus = owl_determine_life(owl, NULL, owl->white_eye,
 				      WHITE, komaster, 0, vital_moves,
 				      &probable_min, &probable_max);
     
@@ -1854,17 +1855,47 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
 
 
 /* 
- * This function is invoked when a terminal node is reached. It runs
- * make_domains() and returns twice the number of eyes, counted very
- * pessimistically.
- * 
- * The support of goal is a dragon for which no defensive move is
- * found. If the string is BLACK then eye is owl_black_eye, and if
- * the string is WHITE then eye is owl_white_eye.
+ * This function is invoked from do_owl_attack() and do_owl_defend()
+ * for each node to determine whether the the dragon has sufficient
+ * eye potential to live. It also generates vital moves to attack or
+ * defend the eyes. There are two distinct sources for eyes. The first
+ * is the eyespaces found by make_domains() and evaluated by
+ * compute_eyes_pessimistic(). The second is the lunches found by
+ * owl_find_lunches() and evaluated by sniff_lunch().
+ *
+ * The return value is a pessimistic estimate of the min number of
+ * eyes. If this is 2 or more we should be certain of life.
+ * (Unfortunately this is not 100% reliable. The patterns in
+ * owl_vital_apats.db are used to compensate for this. See
+ * do_owl_attack() and do_owl_defend() for how these are used.)
+ *
+ * More optimistic estimates of the number of eyes are returned in
+ * *probable_min and *probable_max.
+ *
+ * Vital moves to attack or defend eyes are returned in the moves[]
+ * array. Also moves to reduce the uncertainty of the eye estimates
+ * are added to this array, but with smaller move values. The
+ * parameter does_attack determines whether to generate vital attack
+ * moves or vital defense moves.
+ *
+ * The dragon is specified by the information in the owl struct. The
+ * color of the dragon is passed in the color parameter. If color is
+ * BLACK, eye should be owl->black_eye and if color is WHITE, eye
+ * should be owl->white_eye.
+ *
+ * For use in the semeai code, a second dragon 
+ *
+ * FIXME: Both the color and the eye parameters are redundant since
+ * this information is already provided through the owl struct.
+ *
+ * The parameter komaster is currently unused. It is included to
+ * prepare better handling of ko once the optics code becomes more ko
+ * aware.
  */
 
 static int
 owl_determine_life(struct local_owl_data *owl,
+		   struct local_owl_data *second_owl,
 		   struct eye_data eye[BOARDMAX],
 		   int color, int komaster, int does_attack,
 		   struct owl_move_data *moves, int *probable_min,
@@ -1907,7 +1938,7 @@ owl_determine_life(struct local_owl_data *owl,
 		owl->lunch_defense_point[k]);
   }
 
-  owl_make_domains(owl, NULL);
+  owl_make_domains(owl, second_owl);
 
   /* The eyespaces we want to evaluate are the ones which
    * are adjacent to the dragon (whose stones comprise the
@@ -1955,8 +1986,8 @@ owl_determine_life(struct local_owl_data *owl,
 
   /* First mark the potential halfeyes or false eyes. */
   topological_intersections = 0;
-  for (m = 0; m<board_size; m++)
-    for (n = 0; n<board_size; n++) {
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
       int pos = POS(m, n);
       if (eye[pos].color == eye_color
 	  && eye[pos].origin != NO_MOVE
@@ -1970,8 +2001,8 @@ owl_determine_life(struct local_owl_data *owl,
 
   /* Then examine them. */
   while (topological_intersections > 0) {
-    for (m = 0; m<board_size; m++)
-      for (n = 0; n<board_size; n++) {
+    for (m = 0; m < board_size; m++)
+      for (n = 0; n < board_size; n++) {
 	int pos = POS(m, n);
 	float sum;
 
@@ -2000,7 +2031,7 @@ owl_determine_life(struct local_owl_data *owl,
 	     */
 	    if (!previously_marginal) {
 	      int k;
-	      for (k=4; k<8; k++) {
+	      for (k = 4; k < 8; k++) {
 		int i = m + deltai[k];
 		int j = n + deltaj[k];
 		if (ON_BOARD(POS(i, j)) && mx[POS(i, j)] == -1) {
@@ -3346,22 +3377,33 @@ owl_lively(int pos)
     return 0;
   origin = find_origin(pos);
 
-  /* Lunches that can't be saved are dead, so don't report them as lively */
-  for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
-    if (current_owl_data->lunch[lunch] == origin
-	&& current_owl_data->lunch_defense_point[lunch] == NO_MOVE)
-      return 0;
-
-  /* Inessential stones are not lively. */
-  if (current_owl_data->inessential[origin])
-    return 0;
-  
-  /* When reading a semeai there is a second set of owl data to consider */
-  if (other_owl_data)
+  /* When reading a semeai there is a second set of owl data to consider.
+   * Strings of the second owl are considered lively no matter what,
+   * since declaring such a string dead prematurely can prevent the
+   * semeai code from finishing its job.
+   *
+   * On the other hand a friendly string which is a lunch of the
+   * other dragon and can't be saved is not lively.
+   */
+  if (other_owl_data) {
+    if (other_owl_data->goal[pos])
+      return 1;
     for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
       if (other_owl_data->lunch[lunch] == origin
 	  && other_owl_data->lunch_defense_point[lunch] == NO_MOVE)
 	return 0;
+  }
+  /* Lunches that can't be saved are dead, so don't report them as lively. */
+
+  for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
+    if (current_owl_data->lunch[lunch] == origin
+	&& current_owl_data->lunch_defense_point[lunch] == NO_MOVE)
+      return 0;
+  
+  /* Inessential stones are not lively. */
+  if (current_owl_data->inessential[origin])
+    return 0;
+  
   return 1;
 }
 
