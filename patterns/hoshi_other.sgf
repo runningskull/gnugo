@@ -45,6 +45,29 @@ MA[mi];B[qb];W[pe]MA[mi];B[qd])
 )
 
 (;W[pg];B[nd];W[ld];B[nf];W[oe];B[od]MA[ki])
+
+(;W[qg]
+(;B[qe]MA[ml]C[j
+:-,shape(0.015)
+])
+
+(;B[nc]MA[ll]C[j
+])
+
+(;B[mc]MA[kl]C[j
+])
+
+(;B[nd]MA[mk]C[j
+:-,shape(-0.02)
+])
+
+(;B[jj]PL[B];B[jd]PL[B];B[og]MA[ik]C[j
+:-,shape(-0.02)
+])
+
+(;B[md]MA[mj]C[0
+])
+)
 )
 
 (;B[qg]C[0];C[#17 stone concrete];B[pj]C[0]
@@ -91,8 +114,8 @@ C[j
 #applicable in isolation or if b makes a pincer on the right
 ]
 MA[jg]
-(;B[oe]MA[mg];W[qc]MA[mg];B[qd]MA[jg];W[pc]MA[jg];B[of]MA[jh];
-W[od]MA[jg];B[pg]MA[ji])
+(;B[oe]MA[mg];W[qc]MA[mg];B[qd]MA[jg];W[pc]MA[jg];B[of]MA[jh];W[od]
+MA[jg];B[pg]MA[ji])
 
 (;B[pc]C[j
 ]MA[mg];W[nf]MA[lh];B[nb]MA[lh])

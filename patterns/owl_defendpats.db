@@ -559,6 +559,19 @@ Pattern D126
 :8,-,value(85)
 
 
+Pattern D127
+# ab New pattern (3.7.1)
+
+???..o
+?..*Oo
+oO.X.o
+o....o
+------
+
+:8,-,value(80)
+
+
+
 #########################################################
 #                                                       #
 #          Expanding moves on the second line           #
