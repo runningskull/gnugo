@@ -2966,7 +2966,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
     /* Maybe we already know the top entry (if previous call was ended
      * by a value cutoff.
      */
-    top_val = (int) list->pattern_list[top].pattern->value;
+    top_val = list->pattern_list[top].pattern->value;
     if (top >= list->ordered_up_to) {
       /* One bubble sort iteration. */
       for (bottom = list->counter-1; bottom > top; bottom--)
@@ -2979,7 +2979,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
       list->ordered_up_to++;
     }
     matched_pattern = list->pattern_list[top];
-    if (top_val < cutoff) {
+    if (top_val < (float) cutoff) {
       list->ordered_up_to = top + 1;
       list->used = top;
       sgf_dumptree = save_sgf_dumptree;

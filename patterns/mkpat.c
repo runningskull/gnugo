@@ -852,24 +852,19 @@ finish_pattern(char *line)
     /* Try to find a better anchor if
      * the -m option is set.
      */
-    float mi, mj; /* middle */
-    float d, min_d = 361.0;
+    int mi, mj; /* middle */
+    int d, min_d = 36100;
     int k, min_k = -1;
       
     /* We seek the element of suitable value minimizing
      * the distance to the middle.
-     *
-     * FIXME: What's the purpose of this 0.01 offset? It introduces
-     * potential for platform dependency in the floating point
-     * calculations.
      */
-    mi = ((float)maxi - 1.0) / 2.0;
-    mj = ((float)maxj - 1.0) / 2.0 - 0.01;
+    mi = (maxi - 1) * 50;
+    mj = (maxj - 1) * 50 - 1;
     for (k = 0; k != el; k++)
       if (elements[k].att < 3 && (elements[k].att & anchor) != 0) {
-	d = gg_abs((float)elements[k].x - mi)
-	  + gg_abs((float)elements[k].y - mj);
-	d = gg_normalize_float(d, 0.01);
+	d = gg_abs(100 * elements[k].x - mi)
+	  + gg_abs(100 * elements[k].y - mj);
 	if (d < min_d) {
 	  min_k = k;
 	  min_d = d;

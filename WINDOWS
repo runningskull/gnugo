@@ -1,7 +1,7 @@
               COMPILING GNU GO ON MICROSOFT PLATFORMS
 
 GNU Go is being developed on Unix variants. GNU Go is easy to build
-and install on those platforms. GNU Go 3.0 has support for building
+and install on those platforms. GNU Go 3.2 has support for building
 on MS-DOS, Windows 3.x, Windows NT/2000 and Windows 95/98.
 
 There are two approaches to building GNU Go on Microsoft platforms.
@@ -59,11 +59,11 @@ DJGPP ftp archive on simtel:
 <ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/>
 
 Once you have a working DJGPP environment and you have downloaded
-the gnugo source available as gnugo-3.0.tar.gz you can build the
+the gnugo source available as gnugo-3.2.tar.gz you can build the
 executable as follows:
 
-       tar zxvf gnugo-3.0.tar.gz
-       cd gnugo-3.0
+       tar zxvf gnugo-3.2.tar.gz
+       cd gnugo-3.2
        ./configure
        make
 
@@ -77,10 +77,10 @@ versions of Cygwin install very easily with the setup program available
 from the cygwin homepage.  (<http://sourceware.cygnus.com/cygwin/>).
 GNU Go compiles out-of-the box using the standard Unix build procedure
 on the Cygwin environment. After installation of cygwin and fetching
-`gnugo-3.0.tar.gz' you can type:
+`gnugo-3.2.tar.gz' you can type:
 
-       tar zxvf gnugo-3.0.tar.gz
-       cd gnugo-3.0
+       tar zxvf gnugo-3.2.tar.gz
+       cd gnugo-3.2
        ./configure
        make
 
@@ -103,8 +103,8 @@ completely comparable to a Visual C executable and easier to distribute
 than the Cygwin executable. To build on cygwin an executable suitable
 for the win32 platform type the following at your cygwin prompt:
 
-        tar zxvf gnugo-3.0.tar.gz
-        cd gnugo-3.0
+        tar zxvf gnugo-3.2.tar.gz
+        cd gnugo-3.2
         env CC='gcc -mno-cygwin' ./configure
         make
 

@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- "choose best anchor"-platform dependency patch in mkpat.c
+- bogus (int) conversion removed in get_next_move_from_list
+- 3.0 replaced by 3.2 in WINDOWS
+
 3.1.33 released April 19, 2002
 
 - regression/READING, STRATEGY and NICKLAS removed
