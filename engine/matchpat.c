@@ -31,6 +31,7 @@
 #endif
 
 #include "liberty.h"
+#include "gg_utils.h"
 #include "patterns.h"
 #include "dfa.h"
 
@@ -854,7 +855,7 @@ do_dfa_matchpat(dfa_t *pdfa,
   /* Sorting patterns keep the same order as 
    * standard pattern matching algorithm */
 #if DFA_SORT
-  qsort(reorder, maxr, sizeof(int), compare_int);
+  gg_sort(reorder, maxr, sizeof(int), compare_int);
 #endif /* DFA_SORT */
 
 

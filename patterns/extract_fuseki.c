@@ -71,6 +71,7 @@
 #include <limits.h>
 #include "../sgf/sgftree.h"
 #include "liberty.h"
+#include "gg_utils.h"
 #include "random.h"
 
 #define USAGE "\n\
@@ -349,7 +350,7 @@ hash_board(struct invariant_hash *hash, int color_to_play)
 {
   common_hash_board(hash, color_to_play);
   /* Sort the 8 hash values. */
-  qsort(hash->values, 8, sizeof(hash->values[0]), compare_numbers);
+  gg_sort(hash->values, 8, sizeof(hash->values[0]), compare_numbers);
 }
 
 /* Compute invariant hash for the current situation, i.e. position
@@ -369,7 +370,7 @@ hash_board_and_move(struct invariant_hash *hash, int color_to_play,
   /* Notice that we of course must wait with sorting until we have
    * added the move to the hash values.
    */
-  qsort(hash->values, 8, sizeof(hash->values[0]), compare_numbers);
+  gg_sort(hash->values, 8, sizeof(hash->values[0]), compare_numbers);
 }
 
 
@@ -906,8 +907,8 @@ analyze_statistics(void)
 {
   int k;
   /* Sort all the collected situations. */
-  qsort(situation_table, number_of_situations, sizeof(*situation_table),
-	compare_situations);
+  gg_sort(situation_table, number_of_situations, sizeof(*situation_table),
+	  compare_situations);
   
   /* Debug output. */
   if (0) {
@@ -943,8 +944,8 @@ analyze_statistics(void)
   }
   
   /* Sort the frequency table, in falling order. */
-  qsort(frequency_table, number_of_distinct_positions,
-	sizeof(*frequency_table), compare_frequencies);
+  gg_sort(frequency_table, number_of_distinct_positions,
+	  sizeof(*frequency_table), compare_frequencies);
   
   /* Debug output. */
   if (0) {
@@ -991,8 +992,8 @@ analyze_statistics(void)
     }
     
     /* Sort the moves, in falling order. */
-    qsort(move_frequencies, number_of_moves,
-	  sizeof(*move_frequencies), compare_frequencies);
+    gg_sort(move_frequencies, number_of_moves,
+	    sizeof(*move_frequencies), compare_frequencies);
     
     /* Debug output. */
     if (0) {

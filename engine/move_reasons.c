@@ -27,6 +27,7 @@
 #include <math.h>
 
 #include "liberty.h"
+#include "gg_utils.h"
 #include "random.h"
 #include "move_reasons.h"
 
@@ -3613,9 +3614,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
     num_reasons = 0;
     while (move[pos].reason[num_reasons] >= 0)
       num_reasons++;
-    qsort(&(move[pos].reason[0]), num_reasons, 
-	  sizeof(move[pos].reason[0]),
-	  compare_move_reasons);
+    gg_sort(move[pos].reason, num_reasons, sizeof(move[pos].reason[0]),
+	    compare_move_reasons);
     /* Discard move reasons that only duplicate another. */
     discard_redundant_move_reasons(pos);
 

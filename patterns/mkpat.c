@@ -69,6 +69,7 @@ Usage : mkpat [-cvh] <prefix>\n\
 
 #include "patterns.h"
 #include "gg-getopt.h"
+#include "gg_utils.h"
 
 #include "dfa.h"
 
@@ -1259,7 +1260,7 @@ write_elements(FILE *outfile, char *name)
   assert(ci != -1 && cj != -1);
 
   /* sort the elements so that least-likely elements are tested first. */
-  qsort(elements, el, sizeof(struct patval), compare_elements);
+  gg_sort(elements, el, sizeof(struct patval), compare_elements);
 
   fprintf(outfile, "static struct patval %s%d[] = {\n", name, patno);
 

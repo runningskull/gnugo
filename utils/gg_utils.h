@@ -63,6 +63,10 @@ int gg_gettimeofday2(struct timeval *tv, void *p);
 double gg_gettimeofday(void);
 double gg_cputime(void);
 
+void gg_sort(void *base, size_t nel, size_t width,
+	     int (*compar)(const void *, const void *));
+
+
 const char *gg_version(void);
 
 /* prototypes for basic reorientation functions */
