@@ -4805,7 +4805,6 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
 	    struct local_owl_data *owl)
 {
   int other = OTHER_COLOR(board[lunch]);
-  int size;
   int libs[MAXLIBS];
   int liberties;
   int r;
@@ -4836,19 +4835,29 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
       }
     }
   }
-  
-  size = countstones(lunch);
+
+  estimate_lunch_eye_value(lunch, min, probable, max, 1);
+
+  if (*probable < 2)
+    eat_lunch_escape_bonus(lunch, min, probable, max, owl);
+}
+
+void
+estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
+			 int appreciate_one_two_lunches)
+{
+  int other = OTHER_COLOR(board[lunch]);
+  int size = countstones(lunch);
+
   if (size > 6) {
     *min = 2;
     *probable = 2;
     *max = 2;
-    return;
   }
   else if (size > 4) {
     *min = 1;
     *probable = 2;
     *max = 2;
-    return;
   }
   else if (size > 2) {
     *min = 0;
@@ -4861,7 +4870,8 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
     /* A lunch on a 1-2 point tends always to be worth contesting. */
     if ((obvious_false_eye(stones[0], other)
 	|| obvious_false_eye(stones[1], other))
-	&& !(one_two_point(stones[0]) || one_two_point(stones[1]))) {
+	&& (!appreciate_one_two_lunches
+	    || !(one_two_point(stones[0]) || one_two_point(stones[1])))) {
       *min = 0;
       *probable = 0;
       *max = 0;
@@ -4884,10 +4894,7 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
       *max = 0;
     }
   }
-
-  eat_lunch_escape_bonus(lunch, min, probable, max, owl);
 }
-
 
 /* Gives a bonus for a lunch capture which joins a (or some) friendly
  * string(s) to the goal dragon and improves the escape potential at
@@ -4947,36 +4954,6 @@ eat_lunch_escape_bonus(int lunch, int *min, int *probable, int *max,
 }
 
  
-/* Conservative relative of topological_eye. Essentially the same
- * algorithm is used, but only tactically safe opponent strings on
- * diagonals are considered. This may underestimate the false/half eye
- * status, but it should never be overestimated.
- */
-int
-obvious_false_eye(int pos, int color)
-{
-  int i = I(pos);
-  int j = J(pos);
-  int k;
-  int diagonal_sum = 0;
-  for (k = 4; k < 8; k++) {
-    int di = deltai[k];
-    int dj = deltaj[k];
-    
-    if (!ON_BOARD2(i+di, j) && !ON_BOARD2(i, j+dj))
-      diagonal_sum--;
-    
-    if (!ON_BOARD2(i+di, j+dj))
-      diagonal_sum++;
-    else if (BOARD(i+di, j+dj) == OTHER_COLOR(color)
-	     && !attack(POS(i+di, j+dj), NULL))
-      diagonal_sum += 2;
-  }
-  
-  return diagonal_sum >= 4;
-}
-
-
 /* Retrieve topological eye values stored in the half_eye[] array of
  * the current owl data.
  *

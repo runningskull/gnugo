@@ -120,7 +120,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
       return;
   }
 
-  if ((pattern->class & (CLASS_B | CLASS_I))
+  if ((pattern->class & CLASS_B)
       && !(pattern->class & CLASS_s)) {
     /* Require that the X stones in the pattern are tactically safe. */
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
@@ -144,9 +144,6 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
   }
   else if (pattern->class & CLASS_C)
     DEBUG(DEBUG_DRAGONS, "Connecting pattern %s+%d found at %1m\n",
-	  pattern->name, ll, anchor);
-  else if (pattern->class & CLASS_I)
-    DEBUG(DEBUG_DRAGONS, "Lunch invalidating pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
 
   /* does the pattern have an action? */
@@ -242,16 +239,7 @@ static void
 conn_callback(int anchor, int color, struct pattern *pattern, int ll,
 	      void *data)
 {
-  if (!(pattern->class & (CLASS_B | CLASS_I)))
-    cut_connect_callback(anchor, color, pattern, ll, data);
-}
-  
-/* Only consider e patterns. */
-static void
-modify_eye_callback(int anchor, int color, struct pattern *pattern,
-		     int ll, void *data)
-{
-  if (pattern->class & CLASS_I)
+  if (!(pattern->class & CLASS_B))
     cut_connect_callback(anchor, color, pattern, ll, data);
 }
   
@@ -269,12 +257,6 @@ void
 find_connections(void)
 {
   matchpat(conn_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
-}
-
-void
-modify_eye_spaces(void)
-{
-  matchpat(modify_eye_callback, ANCHOR_COLOR, &conn_db, NULL, NULL);
 }
 
 

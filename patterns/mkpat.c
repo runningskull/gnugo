@@ -300,7 +300,6 @@ static struct autohelper_func autohelper_functions[] = {
     		"threaten_to_capture_helper(move,%s)"},
   {"prevent_attack_threat",	1, 0, 0.0,
 		"prevent_attack_threat_helper(move, %s)"},
-  {"not_lunch",			2, 0, 0.0, "not_lunch_helper(%s, %s)"},
   {"eye",			1, 0, 0.01, "is_eye_space(%s)"},
   {"proper_eye", 		1, 0, 0.01, "is_proper_eye_space(%s)"},
   {"marginal_eye",		1, 0, 0.01, "is_marginal_eye_space(%s)"},

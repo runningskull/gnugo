@@ -285,7 +285,6 @@ DECLARE(ugly_cutstone_helper);
 DECLARE(cutstone2_helper);
 
 /* autohelper fns */
-int not_lunch_helper(int apos, int bpos);
 int seki_helper(int str);
 void threaten_to_save_helper(int move, int str);
 void threaten_to_capture_helper(int move, int str);

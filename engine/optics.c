@@ -1962,6 +1962,36 @@ evaluate_diagonal_intersection(int m, int n, int color,
 }
 
 
+/* Conservative relative of topological_eye(). Essentially the same
+ * algorithm is used, but only tactically safe opponent strings on
+ * diagonals are considered. This may underestimate the false/half eye
+ * status, but it should never be overestimated.
+ */
+int
+obvious_false_eye(int pos, int color)
+{
+  int i = I(pos);
+  int j = J(pos);
+  int k;
+  int diagonal_sum = 0;
+  for (k = 4; k < 8; k++) {
+    int di = deltai[k];
+    int dj = deltaj[k];
+    
+    if (!ON_BOARD2(i+di, j) && !ON_BOARD2(i, j+dj))
+      diagonal_sum--;
+    
+    if (!ON_BOARD2(i+di, j+dj))
+      diagonal_sum++;
+    else if (BOARD(i+di, j+dj) == OTHER_COLOR(color)
+	     && !attack(POS(i+di, j+dj), NULL))
+      diagonal_sum += 2;
+  }
+  
+  return diagonal_sum >= 4;
+}
+
+
 void
 set_eyevalue(struct eyevalue *e, int a, int b, int c, int d)
 {

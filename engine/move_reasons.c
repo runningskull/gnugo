@@ -350,33 +350,6 @@ add_lunch(int eater, int food)
   return;
 }
 
-/*
- * Remove a lunch from the list of lunches.  A lunch is in this context a pair
- * of eater (a dragon) and food (a worm).  
- */
-void
-remove_lunch(int eater, int food)
-{
-  int k;
-  int dragon1 = dragon[eater].origin;
-  int worm1   = worm[food].origin;
-  ASSERT_ON_BOARD1(eater);
-  ASSERT_ON_BOARD1(food);
-  
-  for (k = 0; k < next_lunch; k++)
-    if ((lunch_dragon[k] == dragon1) && (lunch_worm[k] == worm1))
-      break;
-  
-  if (k == next_lunch)
-    return; /* Not found */
-  
-  /* Remove entry k. */
-  lunch_dragon[k] = lunch_dragon[next_lunch - 1];
-  lunch_worm[k] = lunch_worm[next_lunch - 1];
-  next_lunch--;
-}
-
-
 /* ---------------------------------------------------------------- */
 
 

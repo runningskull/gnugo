@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- modify_eye_spaces(), remove_lunch(), and not_lunch_helper() removed
+- new function estimate_lunch_eye_value() broken out of sniff_lunch()
+- obvious_false_eye() moved from owl.c to optics.c
+- lunch invalidating patterns removed from conn.db together with
+  corresponding code in connections.c
 - semeai moves stored in dragon2 array
 - new functions collect_move_reasons(), semeai_move_reasons()
 - new prevent_attach_threat_helper() adds reverse followup value

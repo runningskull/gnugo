@@ -2052,6 +2052,17 @@ estimate_strategical_value(int pos, int color, float score)
 	    || worm[aa].inessential)
 	  break;
 
+	/* If the lunch has no potential to create eyes, no points. */
+	{
+	  int min;
+	  int probable;
+	  int max;
+
+	  estimate_lunch_eye_value(aa, &min, &probable, &max, 0);
+	  if (max == 0)
+	    break;
+	}
+	
 	/* Can't use k in this loop too. */
 	for (l = 0; l < next_lunch; l++)
 	  if (lunch_worm[l] == aa) {

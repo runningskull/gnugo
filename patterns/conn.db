@@ -42,7 +42,6 @@
 #
 #  B - Indicate cutting points and inhibit connections.
 #  C - Amalgamate worms into dragons.
-#  I - Invalidate lunches, late matching.
 #
 # Additionally there are a few acceptance modifiers. 
 #
@@ -1724,68 +1723,6 @@ db
 ac
 
 ;attack(a) && attack(b) && !xcut(c) && !xcut(d)
-
-
-#############################
-#
-# lunch invalidating patterns
-#
-#############################
-
-callback_data X
-
-
-Pattern Lunch1
-# O stone on edge is not lunch!
-
-XO|            not lunch!
-O.|
-oo|
-?o|
-
-:8,sI
-
-ba|
-O.|
-oo|
-?o|
-
->not_lunch(a,b);
-
-
-Pattern Lunch2
-# O stone on edge is not lunch!
-
-XO|            not lunch!
-OX|
-o.|
-
-:8,sI
-
-ba|
-cX|
-od|
-
-;!attack(c) && !safe_xmove(d)
->not_lunch(a,b);
-
-
-Pattern Lunch3
-# O stone on edge is not lunch!
-
-XO|            not lunch!
-O.|
-oo|
---+
-
-:8,sI
-
-ba|
-O.|
-oo|
---+
-
->not_lunch(a,b);
 
 
 # END OF FILE

@@ -192,11 +192,6 @@ make_dragons(int color, int stop_before_owl)
   find_half_and_false_eyes(BLACK, black_eye, half_eye, NULL);
   find_half_and_false_eyes(WHITE, white_eye, half_eye, NULL);
 
-  /* Pattern based modification of the eye shapes computed by
-   * make_domains and halfeye analysis.
-   */
-  modify_eye_spaces();
-  
   /* Compute the number of eyes, half eyes, etc. in an eye space. */
   for (str = BOARDMIN; str < BOARDMAX; str++) {
     if (!ON_BOARD(str))

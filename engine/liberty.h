@@ -377,6 +377,8 @@ void get_move_from_stack(int k, int *move, int *color);
 int stones_on_board(int color);
 
 int obvious_false_eye(int pos, int color);
+void estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
+			      int appreciate_one_two_lunches);
 int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
 int confirm_safety(int move, int color, int *defense_point,
@@ -418,7 +420,6 @@ void propagate_worm(int pos);
 void transform2(int i, int j, int *ti, int *tj, int trans);
 void find_cuts(void);
 void find_connections(void);
-void modify_eye_spaces(void);
 
 /* movelist.c */
 int movelist_move_known(int move, int max_points, int points[], int codes[]);
@@ -438,7 +439,6 @@ void collect_move_reasons(int color);
 
 void clear_move_reasons(void);
 void add_lunch(int eater, int food);
-void remove_lunch(int eater, int food);
 void add_attack_move(int pos, int ww, int code);
 void add_defense_move(int pos, int ww, int code);
 void add_attack_threat_move(int pos, int ww, int code);

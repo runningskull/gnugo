@@ -233,35 +233,6 @@ throw_in_atari_helper(ARGS)
 }
 
 
-/*
- *
- * Prevent misreporting of a as lunch for b.
- * To be used in autohelper action line. E.g.
- *
- *  XO|          ba|
- *  O*|          O*|
- *  oo|          oo|
- *  ?o|          ?o|
- *  
- *  >not_lunch(a,b);
- */
-
-int
-not_lunch_helper(int apos, int bpos)
-{
-  if (worm[apos].size > 2)
-    return 0;
-
-  /* Tell the move generation code about the change in status. */
-  remove_lunch(bpos, apos);
-  
-  if (DRAGON2(bpos).lunch == apos)
-    DRAGON2(bpos).lunch = NO_MOVE;
-
-  return 0;
-}
-  
-
 /* This is intended for use in autohelpers. */
 
 /* Check whether the string at (str) can attack any surrounding
