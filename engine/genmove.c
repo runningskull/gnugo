@@ -377,6 +377,8 @@ do_genmove(int *move, int color, float pure_threat_value,
       fflush(stderr);
     }
     time_report(1, "estimate score", NO_MOVE, 1.0);
+    choose_strategy(color, (upper_bound + lower_bound)/2.0,
+		    game_status(color));
 
     /* The score will be used to determine when we are safely
      * ahead. So we want the most conservative score.
@@ -386,8 +388,10 @@ do_genmove(int *move, int color, float pure_threat_value,
     else
       score = upper_bound;
   }
-  else
+  else {
     score = 0.0;
+    choose_strategy(color, score, 0.0);
+  }
 
   /*
    * Print some of the information if the user wants to.

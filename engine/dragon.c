@@ -2334,6 +2334,35 @@ dragon_weak(int pos)
 }
 
 
+
+
+/* Returns the size of the biggest critical dragon on the board. */
+
+int  
+size_of_biggest_critical_dragon(void)
+{ 
+  int str;
+  int max_size = 0;
+  
+  for (str = BOARDMIN; str < BOARDMAX; str++)
+    if (ON_BOARD(str)) {
+      
+      if (board[str] == EMPTY
+	  || dragon[str].origin != str)
+	continue;
+        
+      /* Get the best available status for the dragon */
+      if (dragon[str].status == CRITICAL)
+        {
+        if (dragon[str].size >= max_size)
+          max_size = dragon[str].size;
+        }
+    }
+  return max_size;
+}
+
+
+
 /* ================================================================ */
 /*                      Debugger functions                          */
 /* ================================================================ */

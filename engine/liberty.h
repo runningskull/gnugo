@@ -399,6 +399,7 @@ int vital_chain(int pos);
 int confirm_safety(int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
 int dragon_weak(int pos);
+int size_of_biggest_critical_dragon(void);
 float blunder_size(int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
 void set_depth_values(int level, int report_levels);
@@ -715,6 +716,7 @@ void store_delta_territory_cache(int pos, int color, float move_value,
 			         Hash_data safety_hash);
 
 int whose_territory(const struct influence_data *q, int pos);
+int whose_loose_territory(const struct influence_data *q, int pos);
 int whose_moyo(const struct influence_data *q, int pos);
 int whose_area(const struct influence_data *q, int pos);
 float influence_territory(const struct influence_data *q, int pos, int color);
@@ -742,6 +744,7 @@ void clear_break_in_list(void);
 void break_in_move_reasons(int color);
 
 float estimate_score(float *upper, float *lower);
+void choose_strategy(int color, float score, float game_status);
 
 /* Eye space functions. */
 int is_eye_space(int pos);
@@ -834,8 +837,9 @@ extern int alternate_connections;    /* use alternate connection module */
 extern int owl_threats;              /* compute owl threats */
 extern int experimental_break_in;    /* use experimental module breakin.c */
 
-extern int thrashing_dragon; /* Dead opponent's dragon trying to live */
-extern char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
+
+extern int thrashing_dragon;                  /* Dead opponent's dragon trying to live */
+extern char thrashing_stone[BOARDMAX];        /* All thrashing stones. */
 
 /* Experimental reading */
 extern char *rgoal;
@@ -1042,6 +1046,18 @@ struct dragon_data2 * dragon2_func(int pos);
 #endif
 
 #define DRAGON(d) dragon[dragon2[d].origin]
+
+
+/* Global variables to tune strategy. */
+
+extern int use_optimistic_territory;
+
+extern float minimum_value_weight;
+extern float maximum_value_weight;
+extern float invasion_malus_weight;
+extern float strategical_weight;
+extern float territorial_weight;
+extern float attack_dragon_weigth;
 
 struct aftermath_data {
   int white_captured;

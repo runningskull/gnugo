@@ -149,7 +149,7 @@ struct influence_data
 };
 
 /* Typedef for pointer to either of the functions whose_territory(),
- * whose_moyo(), and whose_area().
+ * whose_loose_territory(), whose_moyo(), and whose_area().
  */
 typedef int (*owner_function_ptr)(const struct influence_data *q, int pos);
 

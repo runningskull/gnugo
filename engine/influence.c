@@ -68,11 +68,12 @@ static struct influence_data *current_influence = NULL;
 
 #if COSMIC_GNUGO
 
-/* Threholds values used in the whose_moyo() function */
+/* Threholds values used in the whose_moyo() functions */
 struct moyo_determination_data moyo_data;
+struct moyo_determination_data moyo_restricted_data;
  
 /* Threholds value used in the whose_territory() function */
-float territory_determination_value;
+float territory_determination_value; 
  
 #endif
 
@@ -392,14 +393,23 @@ init_influence(struct influence_data *q, int color,
     if ((board_size != 19) || (movenum <= 2) || ((movenum / 2) % 2)   )
       cosmic_importance = 0.0;
     else {
-      cosmic_importance = 1.0 - (movenum / 120.0)*(movenum / 120.0); 
+      cosmic_importance = 1.0 - (movenum / 150.0)*(movenum / 150.0); 
       cosmic_importance = gg_max(0.0, cosmic_importance);
     }
 
     t = cosmic_importance;
-    moyo_data.influence_balance     = t * 5.0  +  (1.0-t) * 7.0;  
-    moyo_data.my_influence_minimum  = t * 5.0  +  (1.0-t) * 5.0;
-    moyo_data.opp_influence_maximum = t * 20.0 +  (1.0-t) * 10.0;
+    
+    moyo_data.influence_balance     = t * 15.0  +  (1.0-t) * 5.0;  
+    moyo_data.my_influence_minimum  = t * 5.0   +  (1.0-t) * 5.0;
+    moyo_data.opp_influence_maximum = t * 30.0  +  (1.0-t) * 30.0;
+    
+    /* we use the same values for moyo and moyo_restricted */
+    moyo_restricted_data.influence_balance
+      = moyo_data.influence_balance;
+    moyo_restricted_data.my_influence_minimum
+      = moyo_data.my_influence_minimum;
+    moyo_restricted_data.opp_influence_maximum
+      = moyo_data.opp_influence_maximum;
     
     territory_determination_value   = t * 0.95 +  (1.0-t) * 0.95;  
      
@@ -407,14 +417,13 @@ init_influence(struct influence_data *q, int color,
      * { 6,  0.0, 24.0, { 6.0, 15.0, 26.0, 36.0, 45.0, 50.0, 55.0 }};
      */
       
-    min_infl_for_territory.values[0] = t * 20.0  +  (1.0-t) *  6.0;
-    min_infl_for_territory.values[1] = t * 20.0  +  (1.0-t) * 15.0;
-    min_infl_for_territory.values[2] = t * 20.0  +  (1.0-t) * 26.0;
-    min_infl_for_territory.values[3] = t * 25.0  +  (1.0-t) * 36.0;
-    min_infl_for_territory.values[4] = t * 25.0  +  (1.0-t) * 45.0;
-    min_infl_for_territory.values[5] = t * 25.0  +  (1.0-t) * 50.0;
-    min_infl_for_territory.values[6] = t * 25.0  +  (1.0-t) * 55.0;   
-    
+    min_infl_for_territory.values[0] = t * 6.0   +  (1.0-t) * 10.0;
+    min_infl_for_territory.values[1] = t * 10.0  +  (1.0-t) * 15.0;
+    min_infl_for_territory.values[2] = t * 20.0  +  (1.0-t) * 15.0;
+    min_infl_for_territory.values[3] = t * 20.0  +  (1.0-t) * 20.0;
+    min_infl_for_territory.values[4] = t * 20.0  +  (1.0-t) * 20.0;
+    min_infl_for_territory.values[5] = t * 15.0  +  (1.0-t) * 15.0;
+    min_infl_for_territory.values[6] = t * 10.0  +  (1.0-t) * 15.0;   
 #endif  
 
   if (q != &escape_influence) {
@@ -1197,9 +1206,7 @@ whose_territory(const struct influence_data *q, int pos)
     return BLACK;
   if (wi > 0.0 && bi == 0.0 && terr > territory_determination_value)
     return WHITE;
-
 #else
-
   if (bi > 0.0 && wi == 0.0 && terr < -0.95)
     return BLACK;
   if (wi > 0.0 && bi == 0.0 && terr > 0.95)
@@ -1208,6 +1215,57 @@ whose_territory(const struct influence_data *q, int pos)
 
   return EMPTY;
 }
+
+
+/* whose_loose_territory()
+ *
+ * Another function that return the color of the player who has
+ * (almost) territory at pos. If it's territory for neither color, 
+ * EMPTY is returned.
+ * If the global flag use_optimistic_territory is set to 1,
+ * we use a much looser definition of "territory" (essentially,
+ * we use moyo instead of therritory in that case). This will
+ * enable us to use the break-in code to break into moyos instead
+ * of inside hard territories. 
+ */
+int
+whose_loose_territory(const struct influence_data *q, int pos)
+{
+  float bi = q->black_influence[pos];
+  float wi = q->white_influence[pos];
+  float terr = q->territory_value[pos];
+  int owner;
+
+  ASSERT_ON_BOARD1(pos);
+  
+  /* if the global flag use_optimistic_territory is not set,
+   * be very strict.
+   */
+  if (!use_optimistic_territory)
+    return whose_territory(q, pos);
+  
+  /* If set, we use essentially a somewhat conservative 
+   * version of whose_moyo().
+   */
+   
+  owner = whose_territory(q, pos);
+  
+  if ((owner == EMPTY) && (bi > 20.0 * wi && bi > 7.0 && wi < 30.0))
+    owner = BLACK;
+  if ((owner == EMPTY) && (wi > 20.0 * bi && wi > 7.0 && bi < 30.0))
+    owner = WHITE;
+
+  if (ON_BOARD(pos) && IS_STONE(board[pos]) && !q->safe[pos]) { 
+    if (0)
+      TRACE("dead stone : %1m, territory for %s\n", pos,
+	    (owner == WHITE ? "White" : 
+	      (owner == BLACK ? "Black" : "nobody????")));
+    owner = OTHER_COLOR(board[pos]);
+  }
+    
+  return owner;
+}
+
 
 /* Return the color who has a moyo at (pos). If neither color has a
  * moyo there, EMPTY is returned. The definition of moyo in terms of the
@@ -1224,13 +1282,13 @@ whose_moyo(const struct influence_data *q, int pos)
     return territory_color;
     
 #if COSMIC_GNUGO
-  if (bi > moyo_data.influence_balance * wi && 
-      bi > moyo_data.my_influence_minimum && 
-      wi < moyo_data.opp_influence_maximum)
+  if (bi > moyo_data.influence_balance * wi
+      && bi > moyo_data.my_influence_minimum
+      && wi < moyo_data.opp_influence_maximum)
     return BLACK;
-  if (wi > moyo_data.influence_balance * bi && 
-      wi > moyo_data.my_influence_minimum && 
-      bi < moyo_data.opp_influence_maximum)
+  if (wi > moyo_data.influence_balance * bi
+      && wi > moyo_data.my_influence_minimum
+      && bi < moyo_data.opp_influence_maximum)
     return WHITE;
 #else
   if (bi > 7.0 * wi && bi > 5.0 && wi < 10.0)
@@ -1268,10 +1326,22 @@ whose_moyo_restricted(const struct influence_data *q, int pos)
   /* default */
   if (territory_color != EMPTY)
     color = territory_color;
+#if COSMIC_GNUGO
+  else if (bi > moyo_restricted_data.influence_balance * wi
+           && bi > moyo_restricted_data.my_influence_minimum
+	   && wi < moyo_restricted_data.opp_influence_maximum)
+    color = BLACK;
+  else if (wi > moyo_restricted_data.influence_balance * bi
+      	   && wi > moyo_restricted_data.my_influence_minimum
+	   && bi < moyo_restricted_data.opp_influence_maximum)
+    color = WHITE;
+#else
   else if (bi > 10.0 * wi && bi > 10.0 && wi < 10.0)
     color = BLACK;
   else if (wi > 10.0 * bi && wi > 10.0 && bi < 10.0)
     color = WHITE;
+#endif    
+
   else
     color = EMPTY;
   
@@ -1516,7 +1586,9 @@ segment_influence(struct influence_data *q)
       q->moyo_segmentation[ii] = 0;
       q->area_segmentation[ii] = 0;
     }
-  segment_region(q, whose_territory, IS_TERRITORY, q->territory_segmentation);
+    
+  segment_region(q, whose_loose_territory, IS_TERRITORY,
+	 	 q->territory_segmentation);
   segment_region(q, whose_moyo_restricted, IS_MOYO, q->moyo_segmentation);
   segment_region(q, whose_area,      IS_AREA,      q->area_segmentation);
 }

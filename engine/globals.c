@@ -48,6 +48,7 @@ int          move_history_color[MAX_MOVE_HISTORY];
 int          move_history_pos[MAX_MOVE_HISTORY];
 int          move_history_pointer;
 
+
 int thrashing_dragon = NO_MOVE; /* Dead opponent's dragon trying to live. */
 char thrashing_stone[BOARDMAX]; /* All thrashing stones. */
 
@@ -194,3 +195,12 @@ double slowest_time = 0.0;
 int    slowest_move = NO_MOVE;
 int    slowest_movenum = 0;
 double total_time = 0.0;
+
+
+int use_optimistic_territory = 0;
+float minimum_value_weight  = 1.0;
+float maximum_value_weight  = 1.0;
+float invasion_malus_weight = 1.0;
+float territorial_weight    = 1.0;
+float strategical_weight    = 1.0;
+float attack_dragon_weigth  = 1.0;
