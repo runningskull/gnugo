@@ -1650,6 +1650,7 @@ list_move_reasons(FILE *out, int move_pos)
   int worm1 = -1;
   int worm2 = -1;
   int ecolor = 0;
+  int num_move_reasons = 0;
 
   gprintf("\nMove reasons:\n");
   
@@ -1665,6 +1666,8 @@ list_move_reasons(FILE *out, int move_pos)
 
 	if (r < 0)
 	  break;
+
+	num_move_reasons++;
 
 	switch (move_reasons[r].type) {
 	case ATTACK_MOVE:
@@ -1861,7 +1864,7 @@ list_move_reasons(FILE *out, int move_pos)
 	gfprintf(out, "Move at %1m strategically or tactically unsafe\n", pos);
     }
   
-  return k;
+  return num_move_reasons;
 }
 
 
@@ -1888,10 +1891,10 @@ static struct discard_rule discard_rules[] =
     "  %1m: 0.0 - (threat of) attack/defense of %1m (owl attack/defense as well)\n" },
   { { SEMEAI_MOVE, SEMEAI_THREAT, -1 },
     owl_move_reason_known, REDUNDANT,
-    "  %1m: 0.0 - (threat to) win semai involving %1m (owl move as well)\n"},
+    "  %1m: 0.0 - (threat to) win semeai involving %1m (owl move as well)\n"},
   { { SEMEAI_MOVE, SEMEAI_THREAT, -1 },
     tactical_move_vs_whole_dragon_known, REDUNDANT,
-    "  %1m: 0.0 - (threat to) win semai involving %1m (tactical move as well)\n"},
+    "  %1m: 0.0 - (threat to) win semeai involving %1m (tactical move as well)\n"},
   { { EITHER_MOVE, -1 },
     either_worm_attackable, REDUNDANT,
     "  %1m: 0.0 - 'attack either' is redundant at %1m (direct att./def. as well)\n"},
