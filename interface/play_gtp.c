@@ -1435,7 +1435,7 @@ finish_and_score_game(int seed)
   final_score = aftermath_compute_score(next, komi);
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      final_status[i][j] = aftermath_final_status(next, i, j);
+      final_status[i][j] = aftermath_final_status(next, POS(i, j));
       saved_board[i][j] = BOARD(i, j);
     }
 

@@ -177,7 +177,7 @@ loadsgf games/seki02.sgf
 # O8 only move.
 loadsgf games/owl29.sgf 134
 186 gg_genmove white
-#? [1 O8]*
+#? [O8]*
 
 # B can play at C4 if we remember the tesuji B:C4 W:E4 B:B2.
 
@@ -233,11 +233,11 @@ loadsgf games/bretz.sgf 148
 198 gg_genmove black
 #? [C10]
 
-loadsgf games/bretz 164
+loadsgf games/bretz.sgf 164
 199 gg_genmove black
 #? [N5]*
 
-loadsgf games/bretz.sgf 149
+loadsgf games/bretz.sgf 212
 200 gg_genmove black
 #? [P6|P7|Q7]*
 

@@ -74,9 +74,10 @@ loadsgf golois/Goemate990911-2.sgf
 18 owl_attack E2
 #? [1 F2]
 
+# S8, T8, T9 and T7 all work. S9 and T10 do not.
 loadsgf golois/Goemate990911-3.sgf
 19 owl_attack R8
-#? [1 S8]*
+#? [1 S8|T8|T9|T7]*
 
 # B can tenuki. J8 and H9 are miai.
 loadsgf golois/Goemate991106-3.sgf
@@ -156,9 +157,10 @@ loadsgf golois/MeilleurCoup0003.sgf
 38 owl_defend B8
 #? [1 (B6|A4)]*
 
+# D7 is one point smaller, but also lives.
 loadsgf golois/MeilleurCoup0004.sgf
 39 owl_defend B6
-#? [1 C6]*
+#? [1 (C6|D7)]*
 
 loadsgf golois/MeilleurCoup0005.sgf
 40 owl_defend D9

@@ -31,7 +31,7 @@ loadsgf games/nicklas/nicklas12.sgf 69
 
 loadsgf games/nicklas/nicklas12.sgf 71
 1203 gg_genmove black
-#? [N18]*
+#? [N18|N19|M19]*
 
 loadsgf games/nicklas/nicklas12.sgf 89
 1204 gg_genmove black

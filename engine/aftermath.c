@@ -737,9 +737,10 @@ static void
 play_aftermath(int color)
 {
   int m, n;
+  int ii;
   Position saved_pos;
   struct aftermath_data *a = &aftermath;
-  static int current_board[MAX_BOARD][MAX_BOARD];
+  static int current_board[BOARDMAX];
   static int current_color = EMPTY;
   int cached_board = 1;
   gg_assert(color == BLACK || color == WHITE);
@@ -750,11 +751,14 @@ play_aftermath(int color)
   }
 
   for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (board[POS(m, n)] != current_board[m][n]) {
-	current_board[m][n] = board[POS(m, n)];
+    for (n = 0; n < board_size; n++) {
+      ii = POS(m, n);
+
+      if (board[ii] != current_board[ii]) {
+	current_board[ii] = board[ii];
 	cached_board = 0;
       }
+    }
 
   /* If this is exactly the same position as the one we analyzed the
    * last time, the content of the aftermath struct is up to date.
@@ -777,40 +781,42 @@ play_aftermath(int color)
   
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (a->black_control[POS(m, n)]) {
+      ii = POS(m, n);
+
+      if (a->black_control[ii]) {
 	a->black_area++;
-	if (board[POS(m, n)] == WHITE) {
+	if (board[ii] == WHITE) {
 	  a->black_territory++;
 	  a->white_prisoners++;
-	  a->final_status[POS(m, n)] = DEAD;
+	  a->final_status[ii] = DEAD;
 	}
-	else if (board[POS(m, n)] == EMPTY) {
+	else if (board[ii] == EMPTY) {
 	  a->black_territory++;
-	  a->final_status[POS(m, n)] = BLACK_TERRITORY;
+	  a->final_status[ii] = BLACK_TERRITORY;
 	}
 	else
-	  a->final_status[POS(m, n)] = ALIVE;
+	  a->final_status[ii] = ALIVE;
       }
-      else if (a->white_control[POS(m, n)]) {
+      else if (a->white_control[ii]) {
 	a->white_area++;
-	if (board[POS(m, n)] == BLACK) {
+	if (board[ii] == BLACK) {
 	  a->white_territory++;
 	  a->black_prisoners++;
-	  a->final_status[POS(m, n)] = DEAD;
+	  a->final_status[ii] = DEAD;
 	}
-	else if (board[POS(m, n)] == EMPTY) {
+	else if (board[ii] == EMPTY) {
 	  a->white_territory++;
-	  a->final_status[POS(m, n)] = WHITE_TERRITORY;
+	  a->final_status[ii] = WHITE_TERRITORY;
 	}
 	else
-	  a->final_status[POS(m, n)] = ALIVE;
+	  a->final_status[ii] = ALIVE;
       }
       else {
-	if (board[POS(m, n)] == EMPTY)
-	  a->final_status[POS(m, n)] = DAME;
+	if (board[ii] == EMPTY)
+	  a->final_status[ii] = DAME;
 	else {
-	  a->final_status[POS(m, n)] = ALIVE_IN_SEKI;
-	  if (board[POS(m, n)] == WHITE)
+	  a->final_status[ii] = ALIVE_IN_SEKI;
+	  if (board[ii] == WHITE)
 	    a->white_area++;
 	  else
 	    a->black_area++;
@@ -843,11 +849,11 @@ aftermath_compute_score(int color, float komi)
  * BLACK_TERRITORY, and DAME.
  */
 int
-aftermath_final_status(int color, int m, int n)
+aftermath_final_status(int color, int pos)
 {
-  ASSERT_ON_BOARD1(POS(m, n));
+  ASSERT_ON_BOARD1(pos);
   play_aftermath(color);
-  return aftermath.final_status[POS(m, n)];
+  return aftermath.final_status[pos];
 }
 
 /*

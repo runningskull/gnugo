@@ -416,7 +416,7 @@ int genmove_conservative(int *i, int *j, int color);
 
 /* Play through the aftermath. */
 float aftermath_compute_score(int color, float komi);
-int aftermath_final_status(int color, int m, int n);
+int aftermath_final_status(int color, int pos);
 
 /* Basic information gathering. */
 /* worm.c */

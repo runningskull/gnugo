@@ -19,9 +19,12 @@ loadsgf games/nicklas/nicklas8.sgf 212
 809 gg_genmove black
 #? [B10]*
 
+# Changed correct answer from K12 to J12. /gf
+# K14 also secures a connection of all important stones but is one
+# point worse than J12. K12 loses the tail.
 loadsgf games/nicklas/nicklas8.sgf 242
 812 gg_genmove black
-#? [K12]*
+#? [J12]*
 
 loadsgf games/nicklas/nicklas11.sgf 56
 1102 gg_genmove black
@@ -31,6 +34,7 @@ loadsgf games/nicklas/nicklas11.sgf 172
 1103 gg_genmove black
 #? [C3]*
 
+# P9 must be an error. /gf
 loadsgf games/nicklas/nicklas12.sgf 29
 1201 gg_genmove black
 #? [P9]*
@@ -39,8 +43,9 @@ loadsgf games/nicklas/nicklas12.sgf 95
 1205 gg_genmove black
 #? [E16]*
 
+loadsgf games/nicklas/nicklas12.sgf 215
 1215 dragon_status A4
-#? [dead]*
+#? [critical]*
 
 loadsgf games/nicklas/nicklas15.sgf 185
 1501 gg_genmove black

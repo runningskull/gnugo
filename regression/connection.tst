@@ -73,19 +73,11 @@ loadsgf games/dublin1.sgf 71
 19 same_dragon B15 E16
 #? [0]*
 
+loadsgf games/nicklas/nicklas12.sgf 69
+20 connect K17 N17
+#? [1 K18]*
+
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
-
-
-
-
-
-
-
-
-
-
-
-

@@ -46,7 +46,7 @@ loadsgf games/trevor/trevor_04.sgf 30
 4 gg_genmove white
 #? [G1]
 
-#E5 is the only move.  Is GnuGo playing somewhat randomly here?
+#E5 is the only move.  Is GNU Go playing somewhat randomly here?
 #Dan said:
 #Looking at unsorted test 5, a typical way to solve this would be
 #to add an edge Joseki pattern, such as this:
@@ -433,10 +433,10 @@ loadsgf games/trevor/trevor_41.sgf 37
 #? [C4]*
 
 #CATEGORY=KO
-#DESCRIPTION=Terrible confusion on GnuGo's part here.
+#DESCRIPTION=Terrible confusion on GNU Go's part here.
 #SEVERITY=10
 #Submitted by:softlife@8848.net (Cai Qiang)
-#Cai said: I made a play between GnuGo 3.0.0 and FunGo with 3 
+#Cai said: I made a play between GNU Go 3.0.0 and FunGo with 3 
 #  handicaps. Gnugo played quite well. And in the end it almost 
 #  killed a corner of FunGo, but it played a big blunder:-(. 
 #  Attachment is the SGF file.

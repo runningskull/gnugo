@@ -189,7 +189,7 @@ loadsgf games/owl04.sgf
 # incident 199
 loadsgf games/incident199.sgf 42
 54 owl_attack F4
-#? [1 H2]
+#? [1 (H2|J2)]
 55 owl_defend F4
 #? [1 (H2|G2)]
 

@@ -109,6 +109,9 @@ loadsgf games/nicklas/nicklas14.sgf 61
 #DESCRIPTION=Protect those borders!
 #SEVERITY=8
 #Added A8, for the faint of heart.
+# It's black to move!. The business is to kill white, which is most
+# solidly done with C9, but I think A5 and maybe some other moves
+# work as well. /gf
 loadsgf games/nicklas/nicklas17.sgf 47
 1701 gg_genmove black
 #? [C9|A8]*
