@@ -61,3 +61,26 @@ loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 192
 loadsgf games/kgs/20040517-siRNA-GnuGoCVS.sgf 198
 130 reg_genmove black
 #? [S18]
+
+# Awful tenuki.
+loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 56
+140 gg_genmove white
+#? [P14|N15|G12]
+
+# Another tenuki from same fight - lots of cutting points are opportunities
+# for escape.
+loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 64
+150 gg_genmove white
+#? [M14|Q13]
+
+# Later, ignores a fight and misreads a ladder - anything related to the
+# fight or the ladder is better than the move made in the game.
+loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 94
+160 gg_genmove white
+#? [G12|H8|J7|G7]
+
+# Again the move made in the game doesn't help the fight in the slightest
+# nor resolve the ladder.
+loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 96
+170 gg_genmove white
+#? [G12|H8|G7]
