@@ -2759,12 +2759,14 @@ spread_connection_distances(int color, int target,
 	      && approxlib(bpos, color, 3, NULL) >= 3
 	      && (board[apos] == color
 		  || (board[apos] == EMPTY
+		      && countlib(pos) > 2
 		      && !common_vulnerabilities(conn->vulnerable1[pos],
 						 conn->vulnerable2[pos],
 						 apos, gpos, color)
 		      && approxlib(apos, other, 3, NULL) <= 2))
 	      && (board[fpos] == color
 		  || (board[fpos] == EMPTY
+		      && countlib(epos) > 2
 		      && !common_vulnerabilities(conn->vulnerable1[pos],
 						 conn->vulnerable2[pos],
 						 fpos, gpos, color)
@@ -2786,12 +2788,14 @@ spread_connection_distances(int color, int target,
 	      && approxlib(ipos, color, 3, NULL) >= 3
 	      && (board[hpos] == color
 		  || (board[hpos] == EMPTY
+		      && countlib(pos) > 2
 		      && !common_vulnerabilities(conn->vulnerable1[pos],
 						 conn->vulnerable2[pos],
 						 hpos, gpos, color)
 		      && approxlib(hpos, other, 3, NULL) <= 2))
 	      && (board[jpos] == color
 		  || (board[jpos] == EMPTY
+		      && countlib(epos) > 2
 		      && !common_vulnerabilities(conn->vulnerable1[pos],
 						 conn->vulnerable2[pos],
 						 jpos, gpos, color)
