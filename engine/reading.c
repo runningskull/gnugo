@@ -2412,7 +2412,7 @@ r_scan_moves(int move, int value, struct reading_move_data *moves)
       break;
     
     if (moves[k].pos == move) {
-      if (value <= moves.pos[k].value)
+      if (value <= moves[k].value)
 	return 1;
       else
 	break;
@@ -2431,9 +2431,9 @@ r_push_move(int move, int value, const char * name,
   int k;
   for (k = 0; k < MAX_READING_MOVES; k++) {
     if (!moves[k].pos) {
-      moves.pos[k].pos = move;
-      moves.pos[k].value = value;
-      moves.pos[k].name = name;
+      moves[k].pos = move;
+      moves[k].value = value;
+      moves[k].name = name;
       moves[++k].pos = 0;
       break;
     }
@@ -2452,9 +2452,9 @@ r_push_move(int move, int value, const char * name,
 	moves[j+1].name = moves[j].name;
       }
       
-      moves.pos[k].pos = move;
-      moves.pos[k].value = value;
-      moves.pos[k].name = name;
+      moves[k].pos = move;
+      moves[k].value = value;
+      moves[k].name = name;
       break;
     }
   }
@@ -2651,7 +2651,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
     for (k = 0; k < MAX_READING_MOVES; k++) {
       if (!moves[k].pos)
 	break;
-      TRACE("%o%s@%1m ", moves.pos[k].name, moves[k].pos);
+      TRACE("%o%s@%1m ", moves[k].name, moves[k].pos);
     }
     TRACE("\n");
   }
@@ -2668,7 +2668,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
       if (moves[k].pos == NO_MOVE)
 	break;
       sprintf(pos, "%s (%s-%d) %n", location_to_string(moves[k].pos),
-              moves.pos[k].name, moves[k].value, &chars);
+              moves[k].name, moves[k].value, &chars);
       pos += chars;
     }
     sgftreeAddComment(sgf_dumptree, buf);
@@ -2679,7 +2679,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
     if (moves[k].pos == NO_MOVE)
       break;
 
-    gg_snprintf(namebuf, 128, "%s(%d)", moves.pos[k].name, moves[k].value);
+    gg_snprintf(namebuf, 128, "%s(%d)", moves[k].name, moves[k].value);
     if (k > 3 + skipped && k > 12 - stackp + skipped) {
       if (sgf_dumptree) {
         if (trymove(moves[k].pos, next_color, namebuf, str, 0, 0)) {
@@ -2698,7 +2698,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
       int other_tactic;
       ASSERT1(countlib(str) >= 1, str);
       RTRACE("%sing %1m at %1m (Pattern %s)\n", attack_defend_str, str, 
-	     moves.pos[k].pos, moves[k].name);
+	     moves[k].pos, moves[k].name);
       if (sgf_dumptree) {
         char buf[500];
         sprintf(buf, "tactical_pat komaster: %d %s  new_komaster: %d %s ko_move: %d", 
@@ -2730,7 +2730,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
      	    same_tactic = do_find_defense(str, 0, new_komaster, new_kom_pos);
 
 	  if (!ko_move && other_tactic == 0 && same_tactic != 0) {
-	    *move = moves.pos[k].pos;
+	    *move = moves[k].pos;
 	    popgo();
 	    SGFTRACE(moves[k].pos, WIN,
 		     "tactic successful - no defense, ko sub-attack");
@@ -2746,10 +2746,10 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
       }
       if (!other_tactic) {
 	if (ko_move) {
-	  TRACE("Ko move good: %1m\n", moves.pos[k].pos);
+	  TRACE("Ko move good: %1m\n", moves[k].pos);
 	  other_tactic = KO_A;
 	  if (other_tactic < best_other_tactic) {
-	    best_move = moves.pos[k].pos;
+	    best_move = moves[k].pos;
 	    best_other_tactic = other_tactic ;
 	  }
 	}
@@ -2757,13 +2757,13 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 	  popgo();
           /* FIXME: add explicit attack/defense verbage here */
 	  SGFTRACE(moves[k].pos, WIN, "tactic successful - no counter.");
-	  *move = moves.pos[k].pos;
+	  *move = moves[k].pos;
 	  return WIN;
 	}
       }
       else if (other_tactic < best_other_tactic) {
 	/* May need to check ko_move in this case, too */
-	best_move = moves.pos[k].pos;
+	best_move = moves[k].pos;
 	best_other_tactic = other_tactic;
       }
       popgo();
