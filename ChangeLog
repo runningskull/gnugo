@@ -27,7 +27,7 @@
 - don't forget to switch exchange sgf_messages in order_moves()
 - joseki tuning
 - owl tuning
-- eye tuning
+- major eye tuning
 - atari_atari tuning
 - new tests and test revisions
 

@@ -29,7 +29,7 @@
 #define MAXLINE 80
 #define MAXDIMEN 20
 #define MAXSIZE 20
-#define MAXPATNO 700
+#define MAXPATNO 800
 
 #include <stdio.h>
 #include <stdlib.h>
