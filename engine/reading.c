@@ -991,8 +991,6 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
   
   SETUP_TRACE_INFO("find_defense", str);
   
-  RTRACE("Can we rescue %1m?\n", str);
-
   /* We first check if the number of liberties is larger than four. In
    * that case we don't cache the result and to avoid needlessly
    * storing the position in the hash table, we must do this test
@@ -1035,7 +1033,6 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
     dcode = defend4(str, &xpos, komaster, kom_pos);
 
   if (dcode) {
-    RTRACE("saving move for %1m found at %1m!\n", str, xpos);
     READ_RETURN(read_result, move, xpos, dcode);
   }
     
@@ -1079,7 +1076,6 @@ defend1(int str, int *move, int komaster, int kom_pos)
   
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 1, str);
-  RTRACE("try to escape atari on %1m.\n", str);
 
   /* lib will be the liberty of the string. */
   liberties = findlib(str, 1, &lib);
@@ -1183,7 +1179,6 @@ defend2(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("defend2", str);
   reading_node_counter++;
 
-  RTRACE("trying to rescue %1m\n", str);
   color = board[str];
   other = OTHER_COLOR(color);
 
@@ -1382,7 +1377,6 @@ defend2(int str, int *move, int komaster, int kom_pos)
   if (savecode != 0)
     RETURN_RESULT(savecode, savemove, move, "saved move");
 
-  RTRACE("failed to find rescuing move.\n");
   RETURN_RESULT(savecode, savemove, move, NULL);
 }
 
@@ -1408,7 +1402,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("defend3", str);
   reading_node_counter++;
 
-  RTRACE("trying to rescue %1m\n", str);
   color = board[str];
   other = OTHER_COLOR(color);
 
@@ -1587,7 +1580,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
   if (savecode != 0)
     RETURN_RESULT(savecode, savemove, move, "saved move");
 
-  RTRACE("failed to find rescuing move.\n");
   RETURN_RESULT(0, 0, move, NULL);
 }
 
@@ -1613,7 +1605,6 @@ defend4(int str, int *move, int komaster, int kom_pos)
   SETUP_TRACE_INFO("defend4", str);
   reading_node_counter++;
 
-  RTRACE("trying to rescue %1m\n", str);
   color = board[str];
   other = OTHER_COLOR(color);
 
@@ -1675,7 +1666,6 @@ defend4(int str, int *move, int komaster, int kom_pos)
   if (savecode != 0)
     RETURN_RESULT(savecode, savemove, move, "saved move");
 
-  RTRACE("failed to find rescuing move.\n");
   RETURN_RESULT(0, 0, move, NULL);
 }
 
@@ -2562,8 +2552,6 @@ attack2(int str, int *move, int komaster, int kom_pos)
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
 
-  RTRACE("checking attack on %1m with 2 liberties\n", str);
-
   /* The attack may fail if a boundary string is in atari and cannot 
    * be defended.  First we must try defending such a string. 
    *
@@ -2766,7 +2754,6 @@ attack2(int str, int *move, int komaster, int kom_pos)
   }
 
   if (savecode == 0) {
-    RTRACE("ALIVE!!\n");
     RETURN_RESULT(0, 0, move, NULL);
   }
 
@@ -3171,26 +3158,21 @@ find_cap2(int str, int alib, int blib, int *move, int komaster, int kom_pos)
     return 0;
 
   /* Ok, we found the spot. Now see if the move works. */
-  RTRACE("trying to capture %1m with capping move at %1m\n", str, *move);
   if (trymove(*move, OTHER_COLOR(board[str]), "find_cap2", str,
 	      komaster, kom_pos)) {
     int dcode = do_find_defense(str, NULL, komaster, kom_pos);
     popgo();
     switch (dcode) {
     case 0:
-      RTRACE("cap2 succeeded!\n");
       return WIN;
       break;
     case WIN:
-      RTRACE("cap2 failed!\n");
       return 0;
       break;
     case KO_B:
-      RTRACE("cap2 succeeded with ko return code KO_B\n");
       return KO_B;
       break;
     case KO_A:
-      RTRACE("cap2 succeeded with ko return code KO_A\n");
       return KO_A;
       break;
     }
@@ -3976,7 +3958,6 @@ break_chain3_moves(int str, struct reading_moves *moves)
 
   memset(mw, 0, sizeof(mw));
   
-  RTRACE("in break_chain3 at %1m\n", str);
   adj = chainlinks2(str, adjs, 3);
   for (r = 0; r < adj; r++) {
     int lib1 = 0, lib2 = 0, lib3 = 0;
@@ -4158,8 +4139,6 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 1, str);
 
-  RTRACE("try to escape atari on %1m.\n", str);
-
   /* (lib) will be the liberty of the string. */
   liberties = findlib(str, 1, &lib);
   ASSERT1(liberties == 1, str);
@@ -4288,8 +4267,6 @@ restricted_attack2(int str, int *move, int komaster, int kom_pos,
   str = find_origin(str);
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 2, str);
-
-  RTRACE("restricted attack on %1m with 2 liberties\n", str);
 
   /* The attack may fail if a boundary string is in atari and cannot 
    * be defended.  First we must try defending such a string. 

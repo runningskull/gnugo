@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- remove RTRACE/VTRACE
 - remove VC specific files from top-level directory
 - remove a lot of #if 0'ed code
 - remove autolevel code (engine/clock.c)

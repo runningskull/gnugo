@@ -350,9 +350,6 @@ void debug_influence_move(int i, int j);
 
 
 #define TRACE  (!(verbose)) ? (void)0 : (void)gprintf
-#define RTRACE (!(verbose >= 3)) ? (void)0 : (void)gprintf
-#define VTRACE (!(verbose >= 4)) ? (void)0 : (void)gprintf
-
 
 #define TRACE_INFLUENCE		!(debug & DEBUG_INFLUENCE) ? \
 				 (void)0 : (void)gprintf 
