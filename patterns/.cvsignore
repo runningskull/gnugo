@@ -15,7 +15,7 @@ owl_attackpat.c
 fusekipat.c
 fuseki*.c
 joseki
-hoshi.db
+hoshi*.db
 komoku.db
 sansan.db
 mokuhazushi.db
