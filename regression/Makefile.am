@@ -11,7 +11,7 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst \
       reading_rot.tst arend.tst \
       trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst \
-      nngs.tst lazarus.tst
+      nngs.tst lazarus.tst nngs1.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
@@ -219,6 +219,9 @@ semeai2: semeai2.tst
 nngs: nngs.tst
 	$(srcdir)/eval.sh nngs.tst
 
+nngs1: nngs1.tst
+	$(srcdir)/eval.sh nngs1.tst
+
 lazarus: lazarus.tst
 	$(srcdir)/eval.sh lazarus.tst
 
@@ -235,6 +238,7 @@ first_batch:
 	$(srcdir)/regress.sh $(srcdir) connection.tst
 	$(srcdir)/regress.sh $(srcdir) blunder.tst
 	$(srcdir)/regress.sh $(srcdir) trevora.tst
+	$(srcdir)/regress.sh $(srcdir) nngs1.tst
 	$(srcdir)/regress.sh $(srcdir) strategy.tst
 
 second_batch: 
