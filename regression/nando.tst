@@ -165,6 +165,16 @@ loadsgf games/nando/auto021.sgf
 31 connect E18 H19
 #? [0]
 
+# O12 and Q14 are amalgamated per pattern CC502. The OWL engine
+# thinks that the dragon can simply escape by playing O13 in
+# response to black P13. And unfortunately, no other safeguards
+# prevent the blunder (as of 3.5.5)
+#CATEGORY=ATARI_ATARI (?)
+loadsgf games/nando/auto022.sgf 206
+32 reg_genmove white
+#? [N13|O13]
+
+
 #--------------------------------------------------------------
 # Cascade of chain breakings
 #CATEGORY=TACTICAL_READING

@@ -2883,7 +2883,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   int num_moves;
   float distance = 0.0;
   int k;
-  int xpos;
+  int xpos = NO_MOVE;
   int savemove = NO_MOVE;
   int savecode = 0;
   int tried_moves = 0;
@@ -3039,7 +3039,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
   int num_moves;
   float distance = 0.0;
   int k;
-  int xpos;
+  int xpos = NO_MOVE;
   int savemove = NO_MOVE;
   int savecode = 0;
   int tried_moves = 0;
