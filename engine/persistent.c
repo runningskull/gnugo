@@ -621,7 +621,7 @@ static void
 compute_active_reading_area(struct persistent_cache_entry *entry,
 			    const char goal[BOARDMAX], int dummy)
 {
-  char active[BOARDMAX];
+  signed char active[BOARDMAX];
   int pos, r;
   UNUSED(dummy);
 
@@ -633,7 +633,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     active[pos] = goal[pos];
 
-  mark_string(entry->apos, active, 1);
+  signed_mark_string(entry->apos, active, 1);
 
   /* To be safe, also add the successful move. */
   if (entry->result != 0 && entry->move != 0)
@@ -650,7 +650,7 @@ compute_active_reading_area(struct persistent_cache_entry *entry,
 	|| (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == 1)
 	|| (ON_BOARD(EAST(pos)) && active[EAST(pos)] == 1)) {
       if (IS_STONE(board[pos]))
-	mark_string(pos, active, 2);
+	signed_mark_string(pos, active, 2);
       else
 	active[pos] = 2;
     }
@@ -839,7 +839,7 @@ compute_active_connection_area(struct persistent_cache_entry *entry,
 {
   int pos;
   int k, r;
-  char active[BOARDMAX];
+  signed char active[BOARDMAX];
   int other = OTHER_COLOR(board[entry->apos]);
   UNUSED(dummy);
 
@@ -987,7 +987,7 @@ compute_active_breakin_area(struct persistent_cache_entry *entry,
 {
   int pos;
   int k, r;
-  char active[BOARDMAX];
+  signed char active[BOARDMAX];
   int other = OTHER_COLOR(board[entry->apos]);
   UNUSED(dummy);
 

@@ -110,7 +110,7 @@ If output file is not specified, writes to stdout.\n\
 #define MAXACTION		10000
 #define MAXPATNO		5000
 #define MAXLABELS		20
-#define MAXPARAMS		15
+#define MAXPARAMS		20
 #define MAX_INPUT_FILE_NAMES	10
 #define MAXNAME			80
 
@@ -436,7 +436,8 @@ static struct autohelper_func autohelper_functions[] = {
                 "adjacent_to_stone_in_atari(%s)"},
   {"adjacent_to_defendable_stone_in_atari", 1, 0, 1.0,
                 "adjacent_to_defendable_stone_in_atari(%s)"},
-  {"good_attack_threat",	2, 0, 0.01, "register_good_attack_threat(%s, %s)"}
+  {"good_attack_threat",	2, 0, 0.01, "register_good_attack_threat(%s, %s)"},
+  {"break_mirror_helper",	1, 0, 0.01, "break_mirror_helper(%s, color)"}
 };
 
 
@@ -2784,7 +2785,7 @@ write_patterns(FILE *outfile)
 
       if (attributes_needed) {
 	fprintf(outfile, "attributes+%d,",
-		p->attributes ? p->attributes - attributes : 0);
+		(int) (p->attributes ? p->attributes - attributes : 0));
       }
       else
 	fprintf(outfile, "NULL,");
@@ -2841,7 +2842,7 @@ write_patterns(FILE *outfile)
 
     if (attributes_needed) {
       fprintf(outfile, "attributes+%d,",
-	      p->attributes ? p->attributes - attributes : 0);
+	      (int) (p->attributes ? p->attributes - attributes : 0));
     }
     else
       fprintf(outfile, "NULL,");
@@ -3467,9 +3468,9 @@ main(int argc, char *argv[])
     /* Forward declaration, which autohelpers might need. */
     if (database_type != DB_FULLBOARD) {
       if (database_type != DB_CORNER)
-	fprintf(output_FILE, "extern struct pattern %s[];\n\n", prefix);
+	fprintf(output_FILE, "static struct pattern %s[];\n\n", prefix);
       else
-	fprintf(output_FILE, "extern struct corner_pattern %s[];\n\n", prefix);
+	fprintf(output_FILE, "static struct corner_pattern %s[];\n\n", prefix);
     }
 
     /* Write the autohelper code. */

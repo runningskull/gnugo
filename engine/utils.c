@@ -267,6 +267,48 @@ visible_along_edge(int color, int apos, int bpos)
   return 0;
 }
 
+/* Is the board symmetric (or rather antisymmetric) with respect to
+ * mirroring in tengen after a specific move has been played? If the
+ * move is PASS_MOVE, check the current board.
+ *
+ * If strict is set we require that each stone is matched by a stone
+ * of the opposite color at the mirrored vertex. Otherwise we only
+ * require that each stone is matched by a stone of either color.
+ */
+int
+test_symmetry_after_move(int move, int color, int strict)
+{
+  int pos;
+  int result = 1;
+
+  if (move != PASS_MOVE) {
+    if (board[move] != EMPTY)
+      return 0;
+    if (!trymove(move, color, "find_mirror_move", NO_MOVE))
+      return 0;
+  }
+  
+  for (pos = BOARDMIN; pos < MIRROR_MOVE(pos); pos++) {
+    int sum;
+    if (!ON_BOARD(pos))
+      continue;
+    
+    sum = board[pos] + board[MIRROR_MOVE(pos)];
+    if (sum != EMPTY + EMPTY && sum != BLACK + WHITE) {
+      if (strict || sum == EMPTY + WHITE || sum == EMPTY + BLACK) {
+      result = 0;
+      break;
+      }
+    }
+  }
+
+  if (move != PASS_MOVE)
+    popgo();
+  
+  return result;
+}
+
+
 /* The function play_break_through_n() plays a sequence of moves,
  * alternating between the players and starting with color. After
  * having played through the sequence, the three last coordinate pairs

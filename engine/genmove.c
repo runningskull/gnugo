@@ -52,8 +52,8 @@ static int revise_semeai(int color);
 static int revise_thrashing_dragon(int color, float our_score,
     			 	   float advantage);
 
+static void break_mirror_go(int color);
 static int find_mirror_move(int *move, int color);
-static int test_symmetry_after_move(int move, int color);
 static int should_resign(int color, float our_score);
 
 void sgfShowConsideredMoves(void);
@@ -428,6 +428,9 @@ do_genmove(int *move, int color, float pure_threat_value,
     fuseki(color);
   gg_assert(stackp == 0);
 
+  /* Look for moves too break mirror play by the opponent. */
+  break_mirror_go(color);
+  
   /* The general pattern database. */
   shapes(color);
   time_report(1, "shapes", NO_MOVE, 1.0);
@@ -709,7 +712,6 @@ revise_thrashing_dragon(int color, float our_score, float advantage)
  * To be able to deal with handicap stones we use a somewhat weak
  * definition of symmetry.
  */
-#define MIRROR_MOVE(pos) POS(board_size - 1 - I(pos), board_size - 1 - J(pos))
 
 static int
 find_mirror_move(int *move, int color)
@@ -718,7 +720,7 @@ find_mirror_move(int *move, int color)
   int mirror_move;
   if (last_move != NO_MOVE) {
     mirror_move = MIRROR_MOVE(last_move);
-    if (test_symmetry_after_move(mirror_move, color)) {
+    if (test_symmetry_after_move(mirror_move, color, 0)) {
       *move = mirror_move;
       return 1;
     }
@@ -726,7 +728,7 @@ find_mirror_move(int *move, int color)
   else {
     for (mirror_move = BOARDMIN; mirror_move < BOARDMAX; mirror_move++) {
       if (ON_BOARD(mirror_move)
-	  && test_symmetry_after_move(mirror_move, color)) {
+	  && test_symmetry_after_move(mirror_move, color, 0)) {
 	*move = mirror_move;
 	return 1;
       }
@@ -736,28 +738,26 @@ find_mirror_move(int *move, int color)
   return 0;
 }
 
-static int
-test_symmetry_after_move(int move, int color)
+
+/* Detect if a white opponent has played mirror go for at least 10
+ * moves and if so play on tengen.
+ *
+ * Mirror breaking moves in other situations are handled by patterns
+ * in patterns.db.
+ */
+static void
+break_mirror_go(int color)
 {
-  int pos;
-  int result = 1;
-
-  if (board[move] != EMPTY)
-    return 0;
-  if (!trymove(move, color, "find_mirror_move", NO_MOVE))
-    return 0;
-  
-  for (pos = BOARDMIN; pos <= MIRROR_MOVE(pos); pos++) {
-    if ((board[pos] == EMPTY) ^ (board[MIRROR_MOVE(pos)] == EMPTY)) {
-      result = 0;
-      break;
-    }
+  int tengen = POS((board_size - 1) / 2, (board_size - 1) / 2);
+  if (board[tengen] == EMPTY
+      && color == BLACK
+      && stones_on_board(BLACK | WHITE) > 10
+      && test_symmetry_after_move(tengen, color, 1)) {
+    set_minimum_move_value(tengen, 30.0);
+    TRACE("Play %1m to break mirror go, value 30.\n", tengen);
   }
-  
-  popgo();
-
-  return result;
 }
+
 
 /* Helper to decide whether GG should resign a game
  */

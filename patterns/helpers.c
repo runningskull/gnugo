@@ -775,6 +775,35 @@ thrash_around_helper(ARGS)
 }
 
 
+/* Returns true if
+ *
+ * 1. The board size is odd.
+ * 2. A white move is being generated.
+ * 3. The komi is less than or equal to zero.
+ * 4. str is placed at tengen.
+ * 5. At least 10 moves have been played.
+ * 6. The board is currently mirror symmetric.
+ *
+ * This is intended for patterns to break mirror go when black starts at
+ * tengen and then mirrors white. We only care about breaking the mirroring
+ * if komi is non-positive, otherwise the mirroring is to our advantage.
+ */
+int
+break_mirror_helper(int str, int color)
+{
+  if (board_size % 2 == 1
+      && color == WHITE
+      && komi <= 0.0
+      && I(str) == (board_size - 1) / 2
+      && J(str) == (board_size - 1) / 2
+      && stones_on_board(BLACK | WHITE) > 10
+      && test_symmetry_after_move(PASS_MOVE, EMPTY, 1))
+    return 1;
+
+  return 0;
+}
+
+
 /*
  * LOCAL Variables:
  * tab-width: 8

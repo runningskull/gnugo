@@ -175,7 +175,6 @@ values for the runtime defaults, contained in @file{configure}
 @command{autoconf}. For example we find in @file{config.h}
 
 @example
-/* Experimental pattern based reading. Disabled by default. */
 /* GAIN/LOSS codes. Disabled by default. */
 #define EXPERIMENTAL_OWL_EXT 0
 
@@ -219,19 +218,14 @@ level 9.
 @item @code{cosmic-gnugo}. An experimental style which plays a center
 oriented game and has a good winning rate against standard GNU Go,
 though it may not be stronger than standard GNU Go against other
-opponents. This experimental option is a configure option only and
-is not available as a run-time option.
+opponents.
 @item @code{owl-threats}. Compute owl threats. Potentially this could
 makes GNU Go stronger but it also makes the program slower. Moreover the
 owl threat code has not been tested recently and may need some work.
-@item @code{experimental-influence}. Use the experimental influence
-module. @strong{Enabled by default.}
-@item @code{experimental-semeai}. Use the reading semeai module based on
-the owl code. @strong{Enabled by default}.
 @item @code{experimental-connections}. Use the experimental connection
-analysis. @strong{Enabled by default.}
-@item @code{alternate-connections}. Use in conjunction with
-@code{experimental-connections}. Uses an alternative implementation of
+analysis. @strong{Enabled by default.} Turning it off currently makes
+no difference.
+@item @code{alternate-connections}. Uses an alternative implementation of
 the experimental connection analysis. @strong{Enabled by default.}
 @end itemize
 

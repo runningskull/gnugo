@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- added .eps-version of new logo
+- help string revised
+- warnings fixed
+- doc revisions
+- TODO revised
+- basic strategies to break mirror go implemented
 - matcher_check verbosity refined
 - new function are_neighbors()
 - 9x9 opening moves tuned

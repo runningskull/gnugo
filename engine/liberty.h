@@ -548,6 +548,7 @@ int cut_possible(int pos, int color);
 int defend_against(int move, int color, int apos);
 int somewhere(int color, int check_alive, int num_moves, ...);
 int visible_along_edge(int color, int apos, int bpos);
+int test_symmetry_after_move(int move, int color, int strict);
 
 /* Printmoyo values, specified by -m flag. */
 #define PRINTMOYO_TERRITORY         0x01

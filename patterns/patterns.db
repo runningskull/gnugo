@@ -15093,4 +15093,193 @@ Pattern Th24
 :8,s,value(3),thrash_around_helper
 
 
+######################################################################
+#
+# Mirror breaking patterns.
+#
+# Patterns to break mirror go strategies being employed by the opponent.
+#
+######################################################################
+
+Pattern M1
+# gf New pattern. (3.5.11)
+
+.....
+.....
+..X..
+..*..
+.....
+
+:|,-,value(30)
+
+.mil.
+.dbgq
+.fAe.
+ph*c.
+.kjn.
+
+;oplay_attack(*,b,c,d,e,f,g,h,i,j,k,l,m,n,p,q,A) && break_mirror_helper(A)
+
+
+Pattern M2
+# gf New pattern. (3.5.11)
+
+.....
+..X..
+..X..
+..O*.
+.....
+
+:8,-,value(40)
+
+.mil.
+.dXgq
+.fAe.
+phO*.
+.kjn.
+
+;oplay_attack(*,d,e,f,g,h,i,j,k,l,m,n,p,q,A) && break_mirror_helper(A)
+
+
+Pattern M3
+# gf New pattern. (3.5.11)
+
+.....
+.XX..
+..X*.
+..OO.
+.....
+
+:8,-,value(40)
+
+.mil.
+.XXgq
+.fA*.
+phOO.
+.kjn.
+
+;oplay_attack(*,f,g,h,i,j,k,l,m,n,p,q,A) && break_mirror_helper(A)
+
+
+Pattern M4
+# gf New pattern. (3.5.11)
+
+.....
+.XX*.
+.XXO.
+..OO.
+.....
+
+:8,-,value(40)
+
+.mil.
+.XX*q
+.XAO.
+phOO.
+.kjn.
+
+;oplay_attack(*,h,i,j,k,l,m,n,p,q,A) && break_mirror_helper(A)
+
+
+Pattern M5
+# gf New pattern. (3.5.11)
+
+..*..
+.XXO.
+.XXO.
+.XOO.
+.....
+
+:8,-,value(40)
+
+.m*l.
+.XXOq
+.XAO.
+pXOO.
+.kjn.
+
+;oplay_attack(*,j,k,l,m,n,p,q,A) && break_mirror_helper(A)
+
+
+Pattern M6
+# gf New pattern. (3.5.11)
+
+..O..
+.XXO.
+.XXO.
+.XOO.
+.*X..
+
+:8,-,value(40)
+
+.mOl.
+.XXOq
+.XAO.
+pXOO.
+.*Xn.
+
+;oplay_attack(*,l,m,n,p,q,A) && break_mirror_helper(A)
+
+
+Pattern M7
+# gf New pattern. (3.5.11)
+
+.*OX.
+.XXO.
+.XXO.
+.XOO.
+.OX..
+
+:8,-,value(70)
+
+.*OX.
+.XXOq
+.XAO.
+pXOO.
+.OXn.
+
+;oplay_attack(*,n,p,q,A) && break_mirror_helper(A)
+
+
+Pattern M8
+# gf New pattern. (3.5.11)
+
+.OOX.
+.XXO.
+.XXO.
+*XOO.
+.OXX.
+
+:8,-,value(60)
+
+.OOX.
+.XXOq
+.XAO.
+*XOO.
+.OXX.
+
+;oplay_attack(*,q,A) && break_mirror_helper(A)
+
+
+Pattern M9
+# gf New pattern. (3.5.11)
+#    FIXME:
+#    This is a complete dummy pattern with no effect at all (notice
+#    the lack of classifications, values, helpers, and actions).
+#    It is only included because a pattern with constraint or action
+#    at the end of patterns.db triggers a bug in mkpat, causing the
+#    same autohelper to be written twice, yielding a compilation
+#    error for patterns.c. This seems to have something to do with
+#    the fact that patterns.db and patterns2.db are concatenated by
+#    mkpat.
+
+.OOX.
+.XXO.
+.XXO.
+.XOO.
+*OXX.
+
+:8,-
+
+
 # END OF FILE
