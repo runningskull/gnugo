@@ -1338,6 +1338,25 @@ is_corner_vertex(int pos)
 }
 
 
+/* Returns true if the empty vertex respectively the string at pos1 is
+ * adjacent to the empty vertex respectively the string at pos2.
+ */
+int are_neighbors(int pos1, int pos2)
+{
+  if (board[pos1] == EMPTY) {
+    if (board[pos2] == EMPTY)
+      return (gg_abs(pos1 - pos2) == NS || gg_abs(pos1 - pos2) == WE);
+    else
+      return neighbor_of_string(pos1, pos2);
+  }
+  else {
+    if (board[pos2] == EMPTY)
+      return neighbor_of_string(pos2, pos1);
+    else
+      return adjacent_strings(pos1, pos2);
+  }
+}
+
 
 /* Count the number of liberties of the string at pos. pos must not be
  * empty.
@@ -2901,12 +2920,7 @@ does_capture_something(int pos, int color)
 }
 
 
-/* For each stone in the string at pos, set mx to value mark. If
- * some of the stones in the string are marked prior to calling this
- * function, only the connected unmarked stones starting from pos
- * are guaranteed to become marked. The rest of the string may or may
- * not become marked. (In the current implementation, it will.)
- */
+/* For each stone in the string at pos, set mx to value mark. */
 void
 mark_string(int str, char mx[BOARDMAX], char mark)
 {
