@@ -42,13 +42,18 @@
 
 use strict;
 use warnings;
+
+use CGI qw/:standard/;
+use CGI::Carp 'fatalsToBrowser';
+
 use FindBin;
 use lib "$FindBin::Bin/../interface";
 
 use GoImage::Stone;
 
-use CGI::Carp;
-use CGI qw/:standard/;
+use HTML::Entities ;#qw/encode_entity/;
+  
+
 
 my $debug=2;
 
@@ -60,7 +65,7 @@ my %colors = ("ALIVE", "green",
 
 my $query = new CGI;
 my ($tstfile, $num, $sortby, $sgf, $reset, $trace, $bycat,
-     $unexpected, $slow, $special);
+     $unexpected, $slow, $special, $move);
 
 ($tstfile, $num) = ($query->query_string() =~ /keywords=(.*)%3A(.*)/);
 
@@ -75,6 +80,7 @@ if (!$tstfile) {
   $unexpected = $query->param("unexpected");
   $slow = $query->param("slow");
   $special = $query->param("special");
+  $move = $query->param("move");
 }
 
 sub sgfFile(%);
@@ -90,9 +96,9 @@ print "Content-type: " .
         } . "\r\n\r\n";
 
 if ($tstfile) {
-  $tstfile .= '.tst' if $tstfile !~ /.tst$/;
+  $tstfile = $1 if $tstfile =~ /(.*)\.tst$/;
 }
-if ($tstfile && !($tstfile =~ /^[a-zA-Z0-9_]+\.tst$/)) {
+if ($tstfile && !($tstfile =~ /^[a-zA-Z0-9_]+$/)) {
   print "bad test file: $tstfile\n";
   exit;
 }
@@ -105,7 +111,7 @@ if ($reset) {
 }
 
 if ($trace) {
-  open (TRACER, "html/$tstfile/$num.trace") or
+  open (TRACER, "html/$tstfile.tst/$num.trace") or
     do {print "Couldn't find trace file: $!";  exit;};
   while (<TRACER>) {
     print;
@@ -202,7 +208,7 @@ sub createIndex {
     local $/; undef($/);
     my $content = <FILE>;
     close FILE;
-    $h{"$tst:$prob"} = game_parse($content);
+    $h{"$tst:$prob"} = game_parse($content, 0);
     delete $h{"$tst:$prob"}->{gtp_all};
   }
   
@@ -315,11 +321,45 @@ sub fptonum {
  
 my @counters = qw/life_node owl_node reading_node trymove/;
 
+if ($move) {
+#CASE 2a - move detail - extract interesting info from trace file.
+  if (!$num) {
+    print "Must provide num if providing move.<BR>";
+    exit;
+  }
+  
+  print "<HTML><HEAD><TITLE>$tstfile:$num move $move</TITLE></HEAD><BODY>\n";
+  
+  open (FILE, "html/$tstfile.tst/$num.trace") or die "couldn't open trace file $tstfile, $num: $!.";
+  #local $/; undef($/);
+  #my $content = <FILE>;
+  #close FILE;
+  
+  my $blank=1;
+  my $inpattern=0;
+  print "<PRE>\n";
+  while (<FILE>) {
+    if (/$move[^0-9]/i || 
+        $inpattern && /^\.\.\./) {
+      print .encode_entities($_);
+      $blank=0;
+      $inpattern ||= /^pattern.*at $move/;
+    } else {
+      print "\n" unless $blank;
+      $blank++;
+      $inpattern=0;
+    }
+  }
+  print "</PRE></BODY></HTML>\n";
+  exit;
+}
+  
+
 if ($num) {
 #CASE 2 - problem detail.
 
-  if ($sgf && -e "html/$tstfile/$num.sgf") {
-    open (SGFFILE, "html/$tstfile/$num.sgf") or confess "couldn't open file";
+  if ($sgf && -e "html/$tstfile.tst/$num.sgf") {
+    open (SGFFILE, "html/$tstfile.tst/$num.sgf") or confess "couldn't open file";
     while (<SGFFILE>) {
       print;
     }
@@ -327,11 +367,11 @@ if ($num) {
     exit;
   }
 
-  open (FILE, "html/$tstfile/$num.xml");
+  open (FILE, "html/$tstfile.tst/$num.xml") or die "couldn't open xml file\n";
   local $/; undef($/);
   my $content = <FILE>;
   close FILE;
-  my %attribs = %{game_parse($content)};
+  my %attribs = %{game_parse($content, 1)};
 
   if ($sgf) {
     foreach (sort keys %attribs) {
@@ -341,7 +381,7 @@ if ($num) {
     exit;
   }
   
-  print qq@<HTML><HEAD><TITLE>$tstfile test $attribs{"num"} details.</TITLE></HEAD>\n@;
+  print qq@<HTML><HEAD><TITLE>$tstfile:$num details.</TITLE></HEAD>\n@;
   print qq@<BODY><TABLE border=1>\n@;
   print qq@
  <TR>
@@ -368,11 +408,11 @@ if ($num) {
   print qq@
 <TABLE border=0>
 <TR><TD><A HREF="?tstfile=$tstfile&num=$num&sgf=1">SGF File</A>
-</TD><TD>&nbsp;&nbsp;&nbsp;<A HREF="?tstfile=$tstfile&num=$num&trace=1">Trace File</A>
+</TD><TD>&nbsp;&nbsp;&nbsp;<A HREF="?tstfile=$tstfile&num=$num&trace=1" target=tracefile>Trace File</A>
 </TD></TR></TABLE>
 @;
 
-  print qq@<TABLE><TR><TD> dragon_status:\n@;
+  print qq@<TABLE><TR><TD> dragon_status | owl_status\n@;
 
   my $boardsize = $attribs{"boardsize"};  #need to add to export.
 
@@ -394,6 +434,9 @@ if ($num) {
       my $img_pix_size = 25;
       my $dragonletter = pval($coord, "dragon_letter");
       my $dragoncolor = $colors{pval($coord, "dragon_status")};
+      my $owlcolor = $colors{pval($coord, "owl_status")};
+      my $owlletter = $dragonletter;
+      my $alt = "";
       
       my ($markcolor, $known, $try) = ("", pval($coord, "known"), pval($coord, "try"));
       $markcolor = "magenta" if ($known and $known eq "wrong");
@@ -404,11 +447,24 @@ if ($num) {
       my $question = pval($coord, "question");
       if ($question) {
         $dragonletter .= "*";
+        $owlletter = "";
         $dragoncolor = "blue" unless $dragoncolor;
       }
+      
+      my $score = pval($coord, "move_value");
+      if ($score) {
+        # FIXME: Should round this, not truncate it.
+        #     Also, should remove trailing "." if not necessary.
+        $dragonletter = substr($score, 0,3);
+        $dragoncolor = "blue";
+        $owlletter="";
+        $alt = "whack";
+      }
 
-      my $colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", $dragonletter, $dragoncolor, $markcolor);
-      $colorboard .= "  <TD><IMG HEIGHT=$img_pix_size WIDTH=$img_pix_size SRC=\"html/images/$colorboard_imgsrc\"></TD>\n";
+      my $colorboard_imgsrc = createPngFile($bw, $img_pix_size, "", $dragonletter, $dragoncolor, $owlletter, $owlcolor, $markcolor);
+      $colorboard .= qq@  <TD><A href="?tstfile=$tstfile&num=$num&move=$coord" target=movewin>@ .
+                     qq@<IMG border=0 HEIGHT=$img_pix_size WIDTH=$img_pix_size @ . 
+                     qq@SRC="html/images/$colorboard_imgsrc"></A></TD>\n@;
     }
     $colorboard .= "  <TD align=center valign=center>&nbsp;$j&nbsp;</TD>\n </TR>\n";
   }
@@ -426,7 +482,7 @@ if ($num) {
 <FONT color=magenta>magenta=unchecked</FONT>
 </PRE>
 </TD></TR>
-<TR><TD>owl_status: coming soon.</TD><TD></TD></TR></TABLE>@;
+</TABLE>@;
  
   my $gtpall = $attribs{gtp_all};
   $gtpall  =~ s/<BR>//mg;
@@ -438,7 +494,7 @@ if ($num) {
   if ($gtpall =~ m@ .* (owl_attack|owl_defend|dragon_status) \s* ([A-Z]\d{1,2}) \s* $ @x) {
     $cmdline .= "--decide-dragon $2 -o x.sgf" ;
   } elsif ($gtpall =~ m@ .* (gg_genmove\s+[whiteblack]*)  \s* $@x) {
-    $cmdline .= "-t";
+    $cmdline .= "-t -w -d0x101800";
   } elsif ($gtpall =~ m@ .* (attack|defend) \s* ([A-Z]\d{1,2}) \s* $ @x) {
     $cmdline .= "--decide-string $2 -o x.sgf";
   } else {
@@ -454,12 +510,12 @@ if ($num) {
   
 } else {
 #CASE 3 - test file summary.
-#  if (!-e "html/$tstfile/index.html") {
+#  if (!-e "html/$tstfile.tst/index.html") {
     summarizeTestFile();
 #  } else {
 #    print "Cached:<HR>";
 #  }
-#  open (TESTFILE, "html/$tstfile/index.html") or (print "$! ".__LINE__, die);
+#  open (TESTFILE, "html/$tstfile.tst/index.html") or (print "$! ".__LINE__, die);
 #  while (<TESTFILE>) {
 #    print;
 #  }
@@ -472,7 +528,7 @@ sub summarizeTestFile {
 
   unless ($sortby) { $sortby = "filepos"; }
   
- # open (TF, "> html/$tstfile/index.html")
+ # open (TF, "> html/$tstfile.tst/index.html")
  #   or print "couldn't open for output; $!\n", die;
  *TF = *STDOUT;
   
@@ -491,12 +547,12 @@ sub summarizeTestFile {
   <TH><A href="?tstfile=$tstfile&sortby=owl_node">owl_node</A></TH>
 </TR>\n@;
 
-  my @files = glob("html/$tstfile/*.xml");
+  my @files = glob("html/$tstfile.tst/*.xml");
   foreach my $curfile (@files) {
-    $curfile =~ s/html.$tstfile.(.*xml)/$1/;
+    $curfile =~ s/html.$tstfile.tst.(.*xml)/$1/;
     local $/;
     undef($/);
-    open(FILE, "html/$tstfile/$curfile");
+    open(FILE, "html/$tstfile.tst/$curfile");
     my $content = <FILE>;
     close FILE;
     my $gtp_all = $1
@@ -558,11 +614,9 @@ sub summarizeTestFile {
   
   my %totals = (cputime=>0, owl_node=>0);
   
-  my ($tstfileshort) = $tstfile =~ /(.*)\.tst$/;
-  
   foreach my $curfile (sort {filesby($sortby)} keys %files) {
     my %h = %{$files{$curfile}};
-    my $numURL = qq@<A HREF="?$tstfileshort:$h{num}">$h{num}</A>@;
+    my $numURL = qq@<A HREF="?$tstfile:$h{num}">$h{num}</A>@;
     my $r = $h{result};
     $r =~ s@^([A-Z]*)$@<B>$1</B>@;
     print TF "<TR><TD>$h{filepos}</TD><TD>$numURL</TD><TD>$r</TD><TD>$h{expected}</TD>"
@@ -596,6 +650,7 @@ sub pval {
 
 sub game_parse {
   my $content = shift;
+  my $details = shift;
   my %attribs;
   $attribs{"num"} = $1
     if $content =~ m@<GOPROB.*?number=(\d*)@s;
@@ -625,17 +680,21 @@ sub game_parse {
     $attribs{$_."_counter"} = $1
       if $content =~ m@<COUNTER[^>]*$_="?(\d+)@s;
   }
+  
+  return \%attribs  unless $details;
+  
   $content =~ s@.*?<POINT@<POINT@s;
   while ($content =~ s@<POINT(.*?)></POINT>@@s) {
     my $pattr = $1;
     if ($pattr =~ m@coord="(.*?)"@s) {
       $points{$1} = $pattr;
     } else {
-      print "<P>MISSING coord: " . encodeHTML($content) . "<P>" . 
-          encodeHTML($pattr);
+      print "<P>MISSING coord: " . encode($content) . "<P>" . 
+          encode($pattr);
       die;
     }
   }
+  
   return \%attribs;
 }
     
@@ -778,9 +837,10 @@ sub printunexpected{
     our $VAR1;
     do "html/one.perldata.new" or confess "can't do perldata";
     my %h = %{$VAR1->[0]};
-
+ 
     my @fails;  my @ufails;      
     my @passes; my @upasses;     
+
 
     print "<HTML><HEAD><TITLE>Unexpected results - GNU Go</TITLE></HEAD>\n";
     print "<BODY><H4>Unexpected results</H4>";
@@ -800,15 +860,15 @@ sub printunexpected{
         }
       } elsif ($status eq 'passed') {
         if (defined ($breakage{lc $k})) {
-        push @passes, $k;
-      }
+          push @passes, $k;
+        }
       } elsif ($status eq 'failed') {
         if (defined ($breakage{lc $k})) {
           push @fails, $k;
         }
+      }
     }
-    }
-    
+
     foreach (@ufails) {
       print qq@<TR><TD><A HREF="?$_">$_</A></TD><TD>FAILED</TD></TR>\n@;
     }

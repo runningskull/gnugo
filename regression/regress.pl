@@ -163,7 +163,7 @@ if (!$goprog) {
 }
 
 if ($goprog !~ / /) {
-  $goprog .=  " --mode gtp --quiet -t -w -d0x1000";  
+  $goprog .=  " --mode gtp --quiet -t -w -d0x101800 --showtime";  
 }
 
 die $helpstring unless defined $goprog;
@@ -327,8 +327,8 @@ sub regress_file {
           close TRACER or die "Couldn't close temp trace file";
           print "closed trace file\n" if $verbose > 2; 
           if ($t =~ /^\s*FINISHED PROBLEM:\s*$/) {
-          rename "tracer.ttt", "$num.trace"
-              or die "Couldn't rename tracer: $testfile, $num";
+            rename "tracer.ttt", "$num.trace"
+                or die "Couldn't rename tracer: $testfile, $num";
           }
           open (TRACER, ">tracer.ttt");
         }
@@ -389,7 +389,7 @@ sub regress_file {
           if ($skipping) {
             go_command("echo_err SKIPPED PROBLEM:\n");
           } else {
-          go_command("echo_err FINISHED PROBLEM:\n");
+            go_command("echo_err FINISHED PROBLEM:\n");
           }
           eat();  #ignore output!
           go_command("echo_err $num\n");

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- html view enhancements
+
 3.1.19 released January 2, 2002
 
 - bugfix in aftermath_genmove()

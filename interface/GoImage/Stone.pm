@@ -39,7 +39,7 @@ BEGIN {
       # set the version for version checking
       $VERSION     = 0.01;
       # if using RCS/CVS, this may be preferred (???-tm)
-      $VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+      $VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
       @ISA         = qw(Exporter);
       @EXPORT      = qw(&createPngFile &parseFileName);
       %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
@@ -83,11 +83,15 @@ my $overwrite = "";
 my $image_dir = "html/images";
 
 sub parseFileName {
+
+  #FIXME: !!!!!!!!!!!!!!!!!!!!!!!
+  #   Need to support text2 & text2_color attributes correctly.
   my $fn = shift;
   $fn =~ s/(.png)?\s*$//mg;
 #  print "$fn\n";
   $fn =~ /([WBE])([1-9][0-9]*)([NSEWH]{0,2})((?:x[0-9a-fA-F]{2})*)_?([a-z]*)(?:-s([a-z]*))?/;
   my ($color, $pixels, $position, $text, $text_color, $square_color) = ($1,$2,$3,$4,$5,$6);
+  my ($text2, $text2_color);
   #print "$1:$2:$3:$4:$5\n";
   if ($color eq "B") { $color = "black"; }
   elsif ($color eq "W") { $color = "white"; }
@@ -99,7 +103,10 @@ sub parseFileName {
     }
     $text = $new_text;
   }
-  my $out = createPngFile($color, $pixels, $position, $text, $text_color, $square_color);
+
+
+
+  my $out = createPngFile($color, $pixels, $position, $text, $text_color, $text2, $text2_color, $square_color);
   if ("$fn.png" ne $out) {
     print "IN:$fn\tOUT:$out\n";
   }
@@ -111,17 +118,19 @@ sub parseFileName {
 #Returns: name of the image file to use
 #Parameters:
 # color - stone color: "black", "white", ""
-# text  - stone label: "3 char max recommended."
-# text_color - "white", "black", "green","cyan","red","yellow","magenta","blue", ""
+# pixels - default 15.
 # position - "H", "N", "S", "E", "W", "NE", "SW", "SE", "NW", ""  (H == hoshi)
 #          : edge or star point location.
-# pixels - default 15.
+# text  - stone label: "3 char max recommended."
+# text_color - "white", "black", "green","cyan","red","yellow","magenta","blue", ""
+# text2 - appended t text...;
+# text2_color - ...but in this color.
 # square_color - same choices as text_color
 #
 #Details:
 # creates file named like:
 #  COLORLIST := white|black|green|cyan|red|blue|yellow|magenta|grey
-#  [WBE]$pixels[NSEWH]{0,2}${text}(_(COLORLIST))?(-s(COLORLIST))?
+#  [WBE]$pixels[NSEWH]{0,2}(${text}_(COLORLIST))?(__?${text}$(_COLORLIST))?(-s(COLORLIST))?
 #  Note that $text is written with each character converted to it's ord value
 #   in hex preceeded by an underscore to avoid bogus file names.  Also allows
 #   upper & lower case easily on case-insensitive file systems, like Windows.
@@ -132,11 +141,13 @@ sub parseFileName {
 
 
 sub createPngFile {
-  my ($color, $pixels, $position, $text, $text_color, $square_color)= @_;
+  my ($color, $pixels, $position, $text, $text_color, $text2, $text2_color, $square_color)= @_;
   if (!$color) {$color = "";}
   elsif (!($color eq "black" || $color eq "white")) { die "invalid color: $color"; }
   if (!$text) {$text = "";}
   if (!$text_color) {$text_color = "blue";}
+  if (!$text2) {$text2 = "";}
+  if (!$text2_color) {$text2_color = "blue";}
   if (!$position) {$position = ""};
   if (!$pixels) {$pixels = 15};
   if (!$square_color) {$square_color = ""};
@@ -148,12 +159,20 @@ sub createPngFile {
 
   $image_name .= $pixels;
   $image_name .= $position;
-  foreach (split(//,$text)) {
-    $image_name .= "x" . (sprintf "%x", ord($_));
-  }
   if ($text) {
+    foreach (split(//,$text)) {
+      $image_name .= "x" . (sprintf "%x", ord($_));
+    }
     $image_name .= "_" . $text_color;
   }
+  if ($text2) {
+    $image_name .= '__';
+    foreach (split(//,$text2)) {
+      $image_name .= "x" . (sprintf "%x", ord($_));
+    }
+    $image_name .= "_" . $text2_color;
+  }
+  
   if ($square_color) {
     $image_name .= "-s" . $square_color;
   }
@@ -193,16 +212,19 @@ sub createPngFile {
     $im->line(0,$pixels/2,$pixels,$pixels/2, $colors{"black"});
   }
 
-  if ($text) {
+  if ($text || $text2) {
     my $f = gdSmallFont;#gdLargeFont;#gdMediumBoldFont;#
+    my $ftext = $text.$text2;
     my ($fw, $fh) = ($f->width,$f->height);
-    my ($tw, $th) = ($fw * length($text), $fh);  #TODO: Allow multi-line text.
+    my ($tw, $th) = ($fw * length($ftext), $fh);  #TODO: Allow multi-line text.
     my ($ulx, $uly) = ($pixels/2 - $tw/2 + 1, $pixels/2 - $th/2);
     my ($lrx, $lry) = ($ulx + $tw, $uly + $th);
-    if (!$color or $text_color eq "blue") {
+    if (!$color or $text_color eq "blue" or $text2_color eq "blue"
+        or ($color eq "white" and $text_color eq "yellow" and $text2_color eq "yellow")) {
       $im->filledRectangle($ulx-2, $uly, $lrx, $lry, $colors{"ltgrey"});
     }
     $im->string($f, $ulx, $uly, $text, $colors{$text_color});
+    $im->string($f, $ulx+ length($text) * $fw, $uly, $text2, $colors{$text2_color});
   }
   
   if ($square_color) {
