@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- warnings fixed
+- doc revisions
 - TODO revised
 - basic strategies to break mirror go implemented
 - fix ./configure help string with respect to resignation default

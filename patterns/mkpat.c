@@ -2785,7 +2785,7 @@ write_patterns(FILE *outfile)
 
       if (attributes_needed) {
 	fprintf(outfile, "attributes+%d,",
-		p->attributes ? p->attributes - attributes : 0);
+		(int) (p->attributes ? p->attributes - attributes : 0));
       }
       else
 	fprintf(outfile, "NULL,");
@@ -2842,7 +2842,7 @@ write_patterns(FILE *outfile)
 
     if (attributes_needed) {
       fprintf(outfile, "attributes+%d,",
-	      p->attributes ? p->attributes - attributes : 0);
+	      (int) (p->attributes ? p->attributes - attributes : 0));
     }
     else
       fprintf(outfile, "NULL,");

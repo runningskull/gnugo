@@ -1239,7 +1239,12 @@ fast_defense(int str, int liberties, int *libs, int *move)
   int j, k, l;
   int goal_liberties = (stackp < fourlib_depth ? 5 : 4);
   int adj, adjs[MAXCHAIN];
-  static unsigned liberty_mark = -1;
+
+  /* We would like to initialize liberty_mark to -1, but some
+   * compilers warn, quite correctly, that -1 is not an unsigned
+   * number.
+   */
+  static unsigned liberty_mark = ~0U;
   static unsigned lm[BOARDMAX];
 
   ASSERT1(libs != NULL, str);

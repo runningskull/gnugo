@@ -745,7 +745,8 @@ find_mirror_move(int *move, int color)
  * Mirror breaking moves in other situations are handled by patterns
  * in patterns.db.
  */
-static void break_mirror_go(int color)
+static void
+break_mirror_go(int color)
 {
   int tengen = POS((board_size - 1) / 2, (board_size - 1) / 2);
   if (board[tengen] == EMPTY
