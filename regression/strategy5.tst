@@ -116,6 +116,24 @@ loadsgf games/reading41.sgf 130
 279 reg_genmove black
 #? [!A18]
 
+loadsgf games/nngs/takeda-gnugo-3.3.23-200307302010.sgf 10
+280 reg_genmove black
+#? [P3]
+
+loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 37
+281 reg_genmove white
+#? [E13]
+
+#take the ko!
+loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 195
+282 reg_genmove white
+#? [O13]
+
+loadsgf games/nngs/gnugo-3.3.23-viking4-200307312134.sgf 235
+282 reg_genmove white
+#? [B9]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
