@@ -103,7 +103,7 @@ loadsgf games/strategy49.sgf
 # R19 defends everything.
 loadsgf games/strategy50.sgf
 277 gg_genmove white
-#? [R19]*
+#? [R19]
 
 
 

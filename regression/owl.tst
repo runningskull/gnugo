@@ -239,7 +239,7 @@ loadsgf games/incident256.sgf 157
 # there's some mistake during the following moves.
 loadsgf games/incident258.sgf 147
 66 owl_defend C4
-#? [1 B5]*
+#? [1 B5]
 
 # incident 260
 loadsgf games/incident258.sgf 283
@@ -406,7 +406,7 @@ loadsgf games/jahy.sgf 36
 108 owl_attack C3
 #? [1 (B4|C4)]
 109 owl_defend C3
-#? [1 (B5|C4)]
+#? [1 (B5|C4)]*
 
 # incident 287
 loadsgf games/incident287.sgf 103
@@ -897,7 +897,7 @@ loadsgf games/marginal_ko.sgf
 248 owl_attack A6
 #? [1 (J1|L2)]
 249 owl_defend A6
-#? [2 (J1|B7|B2)]*
+#? [2 (J1|B7|B2)]
 250 owl_attack R3
 #? [1 (T3|R2)]
 251 owl_defend R3

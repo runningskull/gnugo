@@ -127,7 +127,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 8
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 12
 320 gg_genmove black
-#? [B15|B16]
+#? [B15|B16]*
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 14
@@ -272,7 +272,7 @@ loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 8
 
 loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 38
 630 gg_genmove white
-#? [!J16]*
+#? [!J16]
 
 
 loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 40
@@ -309,7 +309,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 47
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 57
 710 gg_genmove white
-#? [!B12]*
+#? [!B12]
 
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 59
@@ -682,8 +682,7 @@ loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 24
 # Other moves possible, !G6
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 44
 1520 gg_genmove white
-#? [F15|F14]*
-
+#? [F15|F14]
 
 
 

@@ -115,7 +115,7 @@ loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 48
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 60
 20 gg_genmove white
-#? [M8]*
+#? [M8]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 66
@@ -153,7 +153,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 10
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 12
 28 gg_genmove white
-#? [L10]
+#? [L10]*
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 20
 29 gg_genmove white
@@ -264,7 +264,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 # Renumbered since there were 2 test 49's
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 19
 149 gg_genmove black
-#? [L7]*
+#? [L7]
 
 # Here N11 is generated as an "additional attack/defense move", although
 # the black dragon is still dead after black connects at N11.

@@ -89,7 +89,7 @@ loadsgf games/strategy40.sgf 10
 # Safety must come first. This is almost a whole-board semeai.
 loadsgf games/strategy40.sgf 30
 168 gg_genmove black
-#? [A3|A4]
+#? [A3|A4]*
 
 # Both J7 and J9 rescue the threatened stones, but J7 is the proper
 # choice since it leaves a smaller ko threat behind. (That there's no
@@ -253,12 +253,12 @@ loadsgf games/bretz.sgf 148
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 164
 199 gg_genmove black
-#? [N5|S18]*
+#? [N5|S18]
 
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7|S18]
+#? [P6|P7|Q7|S18]*
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black

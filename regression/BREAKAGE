@@ -1,3 +1,100 @@
+======================= 3.3.10 pre 3  =========================
+
+./regress.sh . owl.tst 
+66 unexpected PASS!
+109 unexpected FAIL: Correct '1 (B5|C4)', got '1 B2'
+249 unexpected PASS!
+./regress.sh . owl_rot.tst 
+66 unexpected FAIL: Correct '1 B5', got '1 D2'
+70 unexpected FAIL: Correct '1 (J2|K2|N2)', got '0'
+./regress.sh . ld_owl.tst 
+168 unexpected FAIL: Correct '1 (R19|T16|T18|T19)', got '1 Q19'
+./regress.sh . optics.tst 
+1811 unexpected PASS!
+./regress.sh . connection.tst 
+93 unexpected PASS!
+./regress.sh . trevora.tst 
+130 unexpected PASS!
+./regress.sh . nngs1.tst 
+48 unexpected FAIL: Correct 'R16', got 'F15'
+50 unexpected PASS!
+52 unexpected PASS!
+./regress.sh . strategy.tst 
+29 unexpected PASS!
+34 unexpected FAIL: Correct 'E17', got 'N15'
+45 unexpected PASS!
+50 unexpected FAIL: Correct 'Q9', got 'D9'
+./regress.sh . golife.tst 
+4 unexpected FAIL: Correct 'H5', got 'B4'
+./regress.sh . lazarus.tst 
+6 unexpected PASS!
+./regress.sh . trevorb.tst 
+130 unexpected FAIL: Correct '!J4', got 'J4'
+590 unexpected FAIL: Correct 'H12|M9', got 'E9'
+./regress.sh . strategy2.tst 
+83 unexpected PASS!
+91 unexpected PASS!
+./regress.sh . niki.tst 
+4 unexpected PASS!
+./regress.sh . trevor.tst 
+360 unexpected PASS!
+./regress.sh . nngs.tst 
+320 unexpected FAIL: Correct 'B15|B16', got 'F12'
+630 unexpected PASS!
+710 unexpected PASS!
+1520 unexpected PASS!
+./regress.sh . trevorc.tst 
+350 unexpected PASS!
+600 unexpected PASS!
+1080 unexpected PASS!
+./regress.sh . strategy3.tst 
+105 unexpected FAIL: Correct 'J2', got 'A5'
+126 unexpected FAIL: Correct 'B19', got 'H17'
+137 unexpected FAIL: Correct 'F5', got 'P3'
+./regress.sh . global.tst 
+4 unexpected PASS!
+./regress.sh . arend.tst 
+35 unexpected FAIL: Correct 'H17|J19', got 'F15'
+./regress.sh . 13x13.tst 
+20 unexpected PASS!
+28 unexpected FAIL: Correct 'L10', got 'E3'
+149 unexpected PASS!
+./regress.sh . semeai.tst 
+21 unexpected FAIL: Correct 'ALIVE DEAD (T17|T19)', got 'DEAD ALIVE PASS'
+22 unexpected FAIL: Correct 'ALIVE DEAD (L15|L17|L18)', got 'ALIVE DEAD H18'
+./regress.sh . trevord.tst 
+870 unexpected PASS!
+./regress.sh . strategy4.tst 
+168 unexpected FAIL: Correct 'A3|A4', got 'B8'
+199 unexpected PASS!
+200 unexpected FAIL: Correct 'P6|P7|Q7|S18', got 'Q8'
+./regress.sh . owl1.tst 
+284 unexpected FAIL: Correct '1 (M7|H7)', got '1 K5'
+285 unexpected FAIL: Correct '1 B3', got '3 B5'
+286 unexpected FAIL: Correct '1 B3', got '2 A3'
+./regress.sh . handtalk.tst 
+13 unexpected PASS!
+./regress.sh . nngs2.tst 
+110 unexpected PASS!
+150 unexpected FAIL: Correct 'M3|L3', got 'M2'
+400 unexpected PASS!
+./regress.sh . nngs3.tst 
+230 unexpected FAIL: Correct '!L12', got 'L12'
+290 unexpected PASS!
+330 unexpected FAIL: Correct 'P12|Q11', got 'S9'
+400 unexpected FAIL: Correct 'N13', got 'Q15'
+460 unexpected FAIL: Correct 'N17|M17|Q17|Q18', got 'G15'
+680 unexpected FAIL: Correct '!G12', got 'G12'
+./regress.sh . strategy5.tst 
+277 unexpected PASS!
+./regress.sh . auto04.tst 
+2 unexpected PASS!
+./regress.sh . safety.tst 
+1 unexpected PASS!
+3 unexpected PASS!
+4 unexpected PASS!
+7 unexpected PASS!
+
 ======================= 3.3.10 pre 2  =========================
 
 ./regress.sh . owl.tst 

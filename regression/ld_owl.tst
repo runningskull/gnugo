@@ -236,7 +236,7 @@ loadsgf games/life_and_death/tripod4.sgf
 167 owl_attack R17
 #? [3 T15]
 168 owl_defend R17
-#? [1 (R19|T16|T18|T19)]
+#? [1 (R19|T16|T18|T19)]*
 169 owl_attack R3
 #? [1 Q1]
 170 owl_defend R3

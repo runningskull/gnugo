@@ -177,7 +177,7 @@ loadsgf games/dragon1.sgf 206
 loadsgf games/heikki/heikki01.sgf 17
 # P15 is a joseki, but GNU should at least see that P14 is urgent
 83 gg_genmove black
-#? [P14]*
+#? [P14]
 
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
@@ -223,7 +223,7 @@ loadsgf games/strategy25.sgf 61
 # tm added G13 (3.1.14)
 loadsgf games/strategy25.sgf 63
 91 gg_genmove black
-#? [B14|G13]*
+#? [B14|G13]
 
 loadsgf games/strategy25.sgf 67
 92 gg_genmove black

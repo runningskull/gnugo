@@ -356,7 +356,7 @@ loadsgf games/trevor/trevor_35.sgf
 #SEVERITY=
 loadsgf games/trevor/trevor_36.sgf
 360 owl_defend G8
-#? [(2|3) J9]*
+#? [(2|3) J9]
 
 #CATEGORY=OWL_BUG
 #DESCRIPTION=Can safely connect out!

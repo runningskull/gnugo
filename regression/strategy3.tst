@@ -27,7 +27,7 @@ loadsgf games/strategy27.sgf 12
 
 loadsgf games/strategy27.sgf 62
 105 gg_genmove white
-#? [J2]
+#? [J2]*
 
 loadsgf games/strategy27.sgf 152
 106 gg_genmove white
@@ -130,7 +130,7 @@ loadsgf games/incident156.sgf 232
 # attack and defense with or without ko.
 loadsgf games/strategy29.sgf 138
 126 gg_genmove white
-#? [B19]
+#? [B19]*
 
 # incident 74
 loadsgf games/incident74.sgf 236
@@ -180,7 +180,7 @@ loadsgf games/strategy32.sgf 19
 
 loadsgf games/mf1.sgf 29
 137 gg_genmove black
-#? [F5]
+#? [F5]*
 
 loadsgf games/manner.sgf 12
 138 gg_genmove white

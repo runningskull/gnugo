@@ -213,7 +213,7 @@ loadsgf games/marginal_ko.sgf
 1810 eval_eye A1
 #? [0 1 B2 B2]
 1811 eval_eye H1
-#? [1 2 (J1|L2) J1]*
+#? [1 2 (J1|L2) J1]
 1812 eval_eye S1
 #? [0 1 R2 R2]
 

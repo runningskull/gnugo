@@ -182,7 +182,7 @@ loadsgf games/arend/gnugo-gnugo7.sgf 173
 # This is a serious mistake. H17 is not huge, its HUGE.
 loadsgf games/arend/gnugo-gnugo8.sgf 32
 35 gg_genmove white
-#? [H17|J19]
+#? [H17|J19]*
 
 #CATEGORY=ENDGAME_TUNING
 # Its just one point difference, but it happens a couple of times every

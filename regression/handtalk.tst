@@ -64,7 +64,7 @@ loadsgf games/handtalk/handtalk23.sgf 38
 
 loadsgf games/handtalk/handtalk23.sgf 48
 13 gg_genmove white
-#? [!P14]*
+#? [!P14]
 
 loadsgf games/handtalk/handtalk23.sgf 80
 14 gg_genmove white

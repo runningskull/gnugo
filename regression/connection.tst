@@ -303,7 +303,7 @@ loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 91
 # See also nngs2:130
 loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 124
 93 disconnect K2 L3
-#? [3 L2]*
+#? [3 L2]
 
 # See also nngs2:520
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 193
