@@ -259,7 +259,7 @@ Pattern 305
 
 
 Pattern 306
-# a chimera
+# A chimera.
 
 x@x
 
@@ -583,7 +583,6 @@ Pattern 451
 #
 
 Pattern 461
-# Must be matched before 462.
 
 *X
 X.
@@ -661,19 +660,13 @@ Pattern 469
 
 Pattern 491
 
- .
-!X!
-
-:0001
-
-Pattern 492
-
 !!
 XX
 
 :0001
 
-Pattern 493
+
+Pattern 492
 
 !x
 x!
@@ -681,7 +674,7 @@ x!
 :0002
 
 
-Pattern 494
+Pattern 493
 
  !
 !x!
@@ -1025,7 +1018,7 @@ Pattern 5122
 
 !.XXX
 
-:0112
+:1112
 
 
 Pattern 5123
@@ -1229,7 +1222,7 @@ XXX.
 Pattern 5204
 
  x
-xXXx
+xXX.
 
 :1111
 
@@ -1268,6 +1261,7 @@ Pattern 5214
 
 
 Pattern 5215
+# Must be matched before 5216.
 
  X
 !.XX
@@ -1278,7 +1272,7 @@ Pattern 5215
 Pattern 5216
 
  x
-!*xx
+!*Xx
 
 :0122
 
@@ -1352,7 +1346,7 @@ Pattern 5225
  X
 XX.!
 
-:0112
+:1112
 
 
 Pattern 5226
@@ -2425,7 +2419,7 @@ Pattern 6091
 
 !....$
 
-:1111
+:0111
 
 
 Pattern 6092
@@ -2592,7 +2586,6 @@ x*x.!
 
 
 Pattern 6152
-# Attacking at the other marginal vertices is sometimes incorrect.
 
  !
 !..x@
@@ -2649,7 +2642,7 @@ Pattern 6206
   x
 .XX.!
 
-:1111
+:0111
 
 
 Pattern 6207
@@ -2673,7 +2666,7 @@ Pattern 6209
   x
 ..XX!
 
-:0111
+:0112
 
 
 Pattern 6210
@@ -2783,13 +2776,14 @@ x..x@
 Pattern 6261
 # tm New Pattern (3.1.22) (see owl:111)
 
-  @
-!.*.!
+  )
+@.>.@
 
 :0011
 
 
 Pattern 6262
+# FIXME: I don't understand this pattern. Is it correct? -pp
 
   !
 !x..!
@@ -3296,7 +3290,7 @@ Pattern 6427
 Xx
 x.x!
 
-:1111
+:1112
 
 
 Pattern 6428
@@ -4399,6 +4393,8 @@ Pattern 70004
 
 
 Pattern 70005
+# FIXME: This pattern looks like 1112 to me. "$...<." seems to be
+#	 attackable at '<'. -pp
 
 $.....@
 
