@@ -1,21 +1,21 @@
 In this chapter, we describe the principles of the gnugo DFA
 pattern matcher.  The aim of this system is to permit a fast
 pattern matching when it becomes time critical like in owl
-module (@ref{The Owl Code}).  The actual version is still
-experimental but is expected to be fully integrated in later
-versions of gnugo.  If you want to test it with version
-@value{VERSION} you must run @command{configure --enable-dfa}
-then recompile GNU Go (@ref{Using DFA}).  The basic principle
-is to generate off line a finite state machine called a
-Deterministic Finite State Automaton (@ref{What is a DFA})
-from the pattern database and then use it at runtime to
-speedup pattern matching (@ref{Pattern matching with DFA} and
-@ref{Incremental Algorithm}).
+module (@ref{The Owl Code}). Since GNU Go 3.2, this is enabled
+by default. You can still get back the traditional pattern matcher
+by running @command{configure --disable-dfa} and then recompiling
+GNU Go. 
+
+Otherwise, a finite state machine called a Deterministic Finite
+State Automaton (@ref{What is a DFA}) will be built off line from the
+pattern database. This is used at runtime to speedup pattern matching
+(@ref{Pattern matching with DFA} and @ref{Incremental Algorithm}). The
+runtime speedup is at the cost of an increase in memory use and
+compile time.
 
 
 @menu
-* Using DFA::  How to use DFA's with gnugo.
-* Scan Path::  The path used to scan the board.
+* Introduction to the DFA::  Scanning the board along a path
 * What is a DFA:: A recall of language theory.
 * Pattern matching with DFA:: How to retrieve go patterns with a dfa ?
 * Building the DFA:: Playing with explosives.
@@ -36,29 +36,15 @@ speedup pattern matching (@ref{Pattern matching with DFA} and
 @cindex product
 
 
-@node Using DFA, Scan Path, DFA, DFA
+@node Introduction to the DFA, What is a DFA, DFA, DFA
 @comment  node-name,  next,  previous,  up
-@subsection Using DFA
+@subsection Introduction to the DFA
 
-First build the program with
-'configure --enable-dfa', then type 'make' as usual.
+The general idea is as follows:
 
-Some .db files will be compiled into DFA's by the program mkpat.
-DFA are stored into C files and compiled with the engine.
-When a DFA is found, gnugo write
-"<pattern database name> --> using dfa" at startup and use the dfa
-to "filter" patterns.
-When no DFA is found, the standard pattern matcher is used.
-
-
-@node Scan Path, What is a DFA, Using DFA, DFA
-@comment  node-name,  next,  previous,  up
-@subsection Scan Path
-
-The board is scanned following a predefined path.
-The default path is a spiral starting from 
-the center of the pattern.
-This path is used both to build the DFA and to scan the board.
+For each intersection of the board, its neighbourhood is scanned following
+a predefined path.  The actual path used does not matter very much; GNU Go
+uses a spiral as shown below.
 
 @ifinfo
 @example
@@ -79,14 +65,23 @@ This path is used both to build the DFA and to scan the board.
 @image{path}
 @end ifnotinfo
 
+In each step of the path, the pattern matcher jumps into a state
+determined by what it has found on the board so far. If we have
+successfully matched one or several patterns in this step, this state
+immediately tells us so (in its @dfn{attribute}).
+But the state also implicitly encodes which further patterns can still
+get matched: The information stored in the state contains in which state
+to jump next, depending on whether we find a black, white or empty
+intersection (or an intersection out of board) in the next step of the
+path. The state will also immediately tell us if we cannot find any
+further pattern (by telling us to jump into the @dfn{error} state).
 
-This path is encoded by
-two arrays of integers order_i[k] and order_j[k]
-giving the offset where to read the values on the board.
+These sloppy explanations may become clearer with the definitions in
+the next section (@ref{What is a DFA}).
 
 Reading the board following a predefined path reduces
 the two dimentional pattern matching to a linear text searching problem.
-This pattern for example:
+For example, this pattern
 
 @example
 ?X?
@@ -98,21 +93,23 @@ This pattern for example:
 scanned following the path
 
 @example
-149
-238
-567
-
-(i,j)->(i+1,j)->(i+1,j+1)->(i,j+1)->(i+2,j+0)->(i+2,j+1)->(i+2,j+2)...
+ B
+C4A
+5139
+628
+ 7
 @end example
 
 @noindent
-gives the string
-@b{"?.OX?OO??"}
-where @b{"?"} means @b{'don't care'}.
-We can forget the two dimensional patterns for a time to
-focus on linear patterns.
+gives the string @b{"OO?X.?*O*?*?"}
+where @b{"?"} means @b{'don't care'} and @b{"*"} means @b{'don't care, can
+even be out of board'}.
 
-@node What is a DFA, Pattern matching with DFA, Scan Path, DFA
+So we can forget that we are dealing with two dimensional patterns and
+consider linear patterns.
+
+
+@node What is a DFA, Pattern matching with DFA, Introduction to the DFA, DFA
 @comment  node-name,  next,  previous,  up
 @subsection What is a DFA
 
