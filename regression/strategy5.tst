@@ -23,9 +23,9 @@ loadsgf games/wing-yuhiko-gnugo.sgf 62
 #? [N15]*
 
 #CATEGORY=STRATEGY
-loadsgf games/wing-yuhiko-gnugo.sgf O12
+loadsgf games/wing-yuhiko-gnugo.sgf 86
 225 gg_genmove black
-#? [N15]*
+#? [O12]*
 
 ############ End of Tests #################
 
