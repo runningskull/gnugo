@@ -524,12 +524,12 @@ do_genmove(int *move, int color, float pure_threat_value)
   
   /* If statistics is turned on, this is the place to show it. */
   if (showstatistics) {
-    printf("Nodes:                %d\n", stats.nodes);
-    printf("Positions entered:    %d\n", stats.position_entered);
-    printf("Position hits:        %d\n", stats.position_hits);
-    printf("Read results entered: %d\n", stats.read_result_entered);
-    printf("Read result hits:     %d\n", stats.read_result_hits);
-    printf("Hash collisions:      %d\n", stats.hash_collisions);
+    gprintf("Nodes:                %d\n", stats.nodes);
+    gprintf("Positions entered:    %d\n", stats.position_entered);
+    gprintf("Position hits:        %d\n", stats.position_hits);
+    gprintf("Read results entered: %d\n", stats.read_result_entered);
+    gprintf("Read result hits:     %d\n", stats.read_result_hits);
+    gprintf("Hash collisions:      %d\n", stats.hash_collisions);
   }
  
  if (showtime) {

@@ -94,12 +94,14 @@ hash_init(void)
 #endif
   
   for (i = 0; i < NUM_HASHVALUES; i++)
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-      if (ON_BOARD(pos)) {
-	black_hash[pos][i] = hash_rand();
-	white_hash[pos][i] = hash_rand();
-	ko_hash[pos][i]    = hash_rand();
-      }
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      /* Note: We initialize _all_ positions, not just those on board.
+       * This way we don't have to worry about changing board sizes.
+       */
+      black_hash[pos][i] = hash_rand();
+      white_hash[pos][i] = hash_rand();
+      ko_hash[pos][i]    = hash_rand();
+    }
 
   gg_set_rand_state(&state);
   

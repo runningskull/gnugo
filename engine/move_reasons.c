@@ -1619,19 +1619,25 @@ list_move_reasons(int color)
 	  break;
 	  
 	case EITHER_MOVE:
+	  reason1 = either_data[move_reasons[r].what].reason1;
+	  reason2 = either_data[move_reasons[r].what].reason2;
+	  worm1 = either_data[move_reasons[r].what].what1;
+	  worm2 = either_data[move_reasons[r].what].what2;
+	  aa = worms[worm1];
+	  bb = worms[worm2];
+	  gprintf("Move at %1m either %s %1m or %s %1m\n", pos, 
+		  reason1 == ATTACK_STRING ? "attacks" : "defends", aa, 
+		  reason2 == ATTACK_STRING ? "attacks" : "defends", bb);
+	  break;
+
 	case ALL_MOVE:
-	  /* FIXME: Generalize this. */
-	  /* FIXME: This is broken.  EITHER_MOVE should reference either_data 
-	         see, for example: 
-		 http://www.public32.com/regress/?tstfile=nngs&num=850&move=R9*/
 	  reason1 = all_data[move_reasons[r].what].reason1;
 	  reason2 = all_data[move_reasons[r].what].reason2;
 	  worm1 = all_data[move_reasons[r].what].what1;
 	  worm2 = all_data[move_reasons[r].what].what2;
 	  aa = worms[worm1];
 	  bb = worms[worm2];
-	  gprintf("Move at %1m %s %s %1m or %s %1m\n", 
-		  pos, move_reasons[r].type == EITHER_MOVE ? "either" : "both",
+	  gprintf("Move at %1m both %s %1m or %s %1m\n", pos, 
 		  reason1 == ATTACK_STRING ? "attacks" : "defends", aa, 
 		  reason2 == ATTACK_STRING ? "attacks" : "defends", bb);
 	  break;
