@@ -135,10 +135,11 @@ loadsgf games/arend/gnugo-gnugo6.sgf 20
 
 #CATEGORY=ENDGAME_TUNING
 # C19 is either double sente, or worth at least 5 pts in reverse sente,
-# which is 10 pts. T14 (chosen by GNU Go) is dame.
+# which is 10 pts. T14 (chosen by GNU Go) is dame. F7 is nearly as large
+# as C19.
 loadsgf games/arend/gnugo-gnugo6.sgf 174
 25 gg_genmove white
-#? [C19]
+#? [C19|F7]
 
 #CATEGORY=FUSEKI_STRATEGY
 # D17 is wrong direction; in this position this is really bad.

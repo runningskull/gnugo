@@ -135,6 +135,10 @@ loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
 293 owl_defend Q6
 #? [0]*
 
+loadsgf games/owl42.sgf
+294 owl_defend L11
+#? [1 M19]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

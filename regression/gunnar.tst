@@ -52,7 +52,7 @@ loadsgf games/gunnar/gunnar1.sgf 34
 9 gg_genmove white
 #? [F13]*
 
-# Q15 was supposed to attack either Q14 and Q16 but obviously doesn't work.
+# Q15 was supposed to attack either Q14 or Q16 but obviously doesn't work.
 # R12 is probably better than R14 but both get the point.
 loadsgf games/gunnar/gunnar1.sgf 96
 10 gg_genmove white

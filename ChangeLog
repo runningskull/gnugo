@@ -13,6 +13,7 @@
 - new visible_along_edge() and autohelpers
 - tuning
 - eye tuning
+- new game records and regression tests
 
 3.3.14 released January 1, 2003
 

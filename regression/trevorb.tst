@@ -81,7 +81,7 @@ loadsgf games/trevor/auto/b09.sgf 92
 
 #J3 locally better than G1
 loadsgf games/trevor/auto/b13.sgf 48
-220 gg_genmove white
+220 restricted_genmove white J3 G1
 #? [J3]*
 
 
@@ -189,8 +189,8 @@ loadsgf games/trevor/auto/b25.sgf 74
 #L7 locally better than N6
 #Other moves possible.
 loadsgf games/trevor/auto/b27.sgf 24
-370 gg_genmove white
-#? [L7|B10]
+370 restricted_genmove white N6 L7
+#? [L7]
 
 
 loadsgf games/trevor/auto/b27.sgf 72

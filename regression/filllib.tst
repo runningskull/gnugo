@@ -141,3 +141,7 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 244
 loadsgf games/nngs/gnugo-3.3.11-rcde05-200211090008.sgf 271
 42 gg_genmove white
 #? [N19]
+
+loadsgf games/filllib12.sgf
+43 gg_genmove black
+#? [C6]

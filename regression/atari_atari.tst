@@ -77,3 +77,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.34-200204280120.sgf 194
 loadsgf games/nngs/gnugo-3.3.12-guest-200212171626.sgf 148
 18 combination_attack black
 #? [R11|R14]
+
+loadsgf games/nngs/gnugo-3.3.10-deye-200210211347.sgf 135
+19 combination_attack black
+#? [P9|Q7]
