@@ -164,22 +164,22 @@ user interfaces, are listed at
 @section The Metamachine
 
 An interesting application of the GTP is the concept of
-using GNU Go as an ``Oracle'' which can be consulted by another
-process. This could be another computer program which asks GNU Go
+using GNU Go as an ``Oracle'' that can be consulted by another
+process. This could be another computer program that asks GNU Go
 to generate future board positions, then evaluate them.
 
-David Doshay has done interesting experiments with a parallel
-engine, known as SlugGo, which is based on GNU Go at the University of
-California at Santa Cruz.  These are described in
+David Doshay at the University of California at Santa Cruz has done
+interesting experiments with a parallel engine, known as SlugGo, that is based
+on GNU Go.  These are described in
 @url{http://lists.gnu.org/archive/html/gnugo-devel/2004-08/msg00060.html}.
 
-A more modest approach using the GTP to communicate with a GNU
-Go process which is used as an oracle is the ``Metamachine'' experiment.
-The following scheme is used.
+The ``Metamachine'' experiment is a more modest approach using the GTP to
+communicate with a GNU Go process that is used as an oracle. The following
+scheme is used.
 
 @itemize @bullet
 @item The GNU Go ``oracle'' is asked to generate its top moves using
-the gtp @code{top_moves_black} and @code{top_moves} command.
+the GTP @code{top_moves} commands.
 @item Both moves are tried and @code{estimate_score} is called
 from the resulting board position.
 @item The higher scoring position is selected as the engine's move.
@@ -190,11 +190,11 @@ suggestive, and the SlugGo experiment seems to show that a
 more elaborate scheme along the same lines could produce
 a stronger engine.
 
-Two implementations are distributed. Both make use of @command{fork} and
-@command{pipe} system calls, so they require a Unix-like environment.
-The Metamachine has been tested under GNU/Linux.
+Two implementations are distributed with GNU Go. Both make use of
+@command{fork} and @command{pipe} system calls, so they require a Unix-like
+environment.  The Metamachine has been tested under GNU/Linux.
 
-@strong{Note:} If the Metamachine terminates normally, the GNU Go
+@strong{Important:} If the Metamachine terminates normally, the GNU Go
 process will be killed. However there is a danger that
 something will go wrong. When you are finished running the
 Metamachine, it is a good idea to run @command{ps -A|grep gnugo}
@@ -209,21 +209,21 @@ implementation of the Metamachine. Compile it with
 a @code{gnugo} process with which it communicates through the
 GTP, to use as an oracle. 
 
-The Metamachine then appears to the client as GTP engine.
-Thus the following scheme is followed:
+The following scheme is followed:
 
 @example
              stdin             pipe a
-  GTP client ----> metamachine -----> GTP engine
+  GTP client ----> Metamachine -----> GNU Go
              <----             <-----
             stdout             pipe b
 @end example
 
-Most commands are passed verbatim to the engine. The exception
+Most commands issued by the client are passed along
+verbatim to GNU Go by the Metamachine. The exception
 is gg_genmove, which is intercepted then processed differently,
-as described above. The top two moves are both tried, the
-position evaluated by estimate_score, and the move yielding the
-higher score is selected.
+as described above. The client is unaware of this, and only
+knows that it issued a gg_genmove command and received a reply.
+Thus to the the Metamachine appears as an ordinary GTP engine.
 
 Usage: no arguments gives normal GTP behavior.
 @command{metamachine --debug} sends diagnostics to stderr.
