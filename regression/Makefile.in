@@ -103,7 +103,8 @@ TST = 13x13b.tst 13x13.tst arb.tst arend2.tst arend.tst \
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 
 EXTRA_DIST = golois games $(TST) $(noinst_SCRIPTS) regress.awk \
-             BREAKAGE regress.pl regress.plx regress.pike breakage2tst.py
+             BREAKAGE regress.pl regress.plx regress.pike breakage2tst.py \
+	     view.pike
 
 
 # Remove these files here... they are created locally
