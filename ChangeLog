@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.7.1 released November 23, 2004
+
 - new function send_two_return_one() in utils.c
 - don't consider send-two-return-one moves in
   do_find_more_owl_attack_and_defense_moves() 
