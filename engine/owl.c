@@ -4415,8 +4415,32 @@ owl_find_lunches(struct local_owl_data *owl)
 }
 
 
+/* Returns true if and only if `pos' is a corner (1-1) point.
+ */
+static int
+corner_point(int pos)
+{
+  ASSERT_ON_BOARD1(pos);
+  
+  return pos == POS(0, 0)
+	 || pos == POS(0, board_size - 1)
+	 || pos == POS(board_size - 1, 0)
+	 || pos == POS(board_size - 1, board_size - 1);
+}
+
+
 /* Try to improve the move to attack a lunch. Essentially we try to
  * avoid unsafe moves when there are less risky ways to attack.
+ *
+ * This function also improves lunch attack point in this special case:
+ *
+ * |.XXX	In this case it is better to play A2 rather than A1 since
+ * |XXOO	it saves an eye in the corner. We replace attack point if
+ * |XO..	three conditions are satisfied:
+ * |.O.O	  a) lunch is a single stone
+ * |.XO.	  b) it's attack point is a corner point
+ * +----	  c) it has no neighbors in atari
+ *
  */
 static int
 improve_lunch_attack(int lunch, int attack_point)
@@ -4424,9 +4448,24 @@ improve_lunch_attack(int lunch, int attack_point)
   int color = OTHER_COLOR(board[lunch]);
   int defense_point;
   int k;
+  int adj[MAXCHAIN];
 
-  if (safe_move(attack_point, color))
+  if (safe_move(attack_point, color)) {
+    if (countstones(lunch) == 1 && corner_point(attack_point)
+	&& chainlinks2(lunch, adj, 1) == 0) {
+      for (k = 0; k < 4; k++) {
+	int apos = attack_point + delta[k];
+
+	if (board[apos] == EMPTY) {
+	  if (safe_move(apos, color))
+	    return apos;
+	  break;
+	}
+      }
+    }
+  
     return attack_point;
+  }
 
   for (k = 0; k < 4; k++) {
     int pos = attack_point + delta[k];

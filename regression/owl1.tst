@@ -139,6 +139,11 @@ loadsgf games/owl42.sgf
 294 owl_defend L11
 #? [1 M19]*
 
+loadsgf games/owl43.sgf
+295 owl_attack C4
+#? [1 C3]
+
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
