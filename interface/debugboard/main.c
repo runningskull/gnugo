@@ -54,7 +54,6 @@
 #include "gnugo.h"
 #include "sgftree.h"
 #include "interface.h"
-#include "random.h"
 
 #include "display.h"
 #include "gui.h"
@@ -116,17 +115,17 @@ main(int argc, char *argv[])
   fusekidb = 1;
   josekidb = 1;
   
-  gameinfo_clear(&gameinfo, 19, 5.5);
-  next = gameinfo_play_sgftree(&gameinfo, &sgftree, until);
-
-
   /* Check if there is enough screen space. */
   if (!display_init(MINWIDTH, MINHEIGHT, board_size))
     exit(1);
 
   /* Initialize the GNU Go engine. */
-  gg_srand(time(0));
-  init_gnugo(8);
+  init_gnugo(8, time(0));
+
+  gameinfo_clear(&gameinfo, 19, 5.5);
+  next = gameinfo_play_sgftree(&gameinfo, &sgftree, until);
+
+
   reset_engine();
 
   display_message("Hit 'h' for help!");

@@ -223,8 +223,18 @@ prepare_dragons_tab()
 void
 display_dragon(int pos)
 {
-  struct dragon_data *d = &dragon[pos];
-  struct dragon_data2 *d2 = &(dragon2[d->id]);
+  struct dragon_data *d;
+  struct dragon_data2 *d2;
+
+  /* FIXME: We should clear the old entries here rather than just
+   * returning when called on an empty vertex. We can't continue now,
+   * however, since we may crash on bad field values.
+   */
+  if (board[pos] == EMPTY)
+    return;
+    
+  d = &dragon[pos];
+  d2 = &(dragon2[d->id]);
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s dragon ",
 	     location_to_string(pos), color_to_string(d->color));
@@ -264,38 +274,38 @@ display_dragon(int pos)
 
   /* owl status */
   wmove(info_window, 4, 55);
-  gg_wprintw(info_window, "%-12s", status_to_string(d->owl_status));
-  if (d->owl_attack_point == NO_MOVE)
+  gg_wprintw(info_window, "%-12s", status_to_string(d2->owl_status));
+  if (d2->owl_attack_point == NO_MOVE)
     gg_wprintw(info_window, "[---] ");
   else
     gg_wprintw(info_window, "[%3s] ",
-	       location_to_string(d->owl_attack_point));
-  if (d->owl_defense_point == NO_MOVE)
+	       location_to_string(d2->owl_attack_point));
+  if (d2->owl_defense_point == NO_MOVE)
     gg_wprintw(info_window, "[---] ");
   else
     gg_wprintw(info_window, "[%3s] ",
-	       location_to_string(d->owl_defense_point));
+	       location_to_string(d2->owl_defense_point));
 
   wmove(info_window, 5, 55);
-  switch (d->owl_threat_status) {
+  switch (d2->owl_threat_status) {
   case DEAD:
   case ALIVE:
     gg_wprintw(info_window, "%-12s[---] [---]", 
-	       status_to_string(d->owl_threat_status));
+	       status_to_string(d2->owl_threat_status));
     break;
   case UNCHECKED:
     gg_wprintw(info_window, "unchecked   [---] [---]");
     break;
   case CAN_THREATEN_ATTACK:
     gg_wprintw(info_window, "att. threat [%3s] [---]",
-	       location_to_string(d->owl_second_attack_point));
+	       location_to_string(d2->owl_second_attack_point));
     break;
   case CAN_THREATEN_DEFENSE:
     gg_wprintw(info_window, "def. threat [---] [%3s]",
-	       location_to_string(d->owl_second_defense_point));
+	       location_to_string(d2->owl_second_defense_point));
     break;
   default:
-    gg_wprintw(info_window, "Error: %3d  [---] [---]", d->owl_threat_status);
+    gg_wprintw(info_window, "Error: %3d  [---] [---]", d2->owl_threat_status);
     break;
   }
 

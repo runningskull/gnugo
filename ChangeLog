@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- debugboard repaired
 - TODO revised
 - new function partition_eyespaces()
 - new function owl_find_relevant_eyespaces()
