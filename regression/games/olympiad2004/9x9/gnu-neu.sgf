@@ -1,0 +1,15 @@
+(;GM[1]FF[4]
+SZ[9]HA[0]KM[6.5]
+PW[NeuroGo]PB[GNU Go]DT[2004-07-04]GN[NeuroGo (W) vs. GNU Go (B)]
+RE[B+38.5]
+TM[30:00]RU[Chinese]
+C[GNU Go 3.5.8 Random Seed 1088983006 level 12
+NeuroGo used 29:38 minutes
+GNU Go used 2:08 minutes]
+;B[fe];W[dc];B[de];W[fc];B[gf];W[cf];B[df];W[cg];B[ce];W[gd];B[dg]
+;W[bd];B[be];W[dh];B[ag];W[fh];B[hh];W[cd];B[he];W[gh];B[gg];W[hi]
+;B[ig];W[bh];B[ah];W[ih];B[ii];W[bf];B[af];W[ad];B[ae];W[ih];B[hg]
+;W[eg];B[ef];W[hd];B[ed];W[fg];B[ff];W[bi];B[ec];W[eb];B[db];W[cb]
+;B[fb];W[ea];B[gc];W[fd];B[gb];W[dd];B[ee];W[gi];B[bg];W[ch];B[fa]
+;W[da];B[hc];W[id];B[ie];W[ai];B[ii];W[ic];B[ib];W[ih];B[di];W[]
+;B[ei];W[ci];B[eh];W[];B[])
