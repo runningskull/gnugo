@@ -1,3 +1,69 @@
+Current CVS 3/20/02 after tuning_1_28.1
+
+./regress.sh . reading.tst
+168 unexpected PASS!
+./regress.sh . owl.tst
+./regress.sh . owl_rot.tst
+./regress.sh . ld_owl.tst
+./regress.sh . optics.tst
+./regress.sh . filllib.tst
+./regress.sh . atari_atari.tst
+15 unexpected PASS!
+./regress.sh . connection.tst
+72 unexpected PASS!
+./regress.sh . blunder.tst
+./regress.sh . trevora.tst
+./regress.sh . nngs1.tst
+4 unexpected PASS!
+5 unexpected PASS!
+6 unexpected PASS!
+8 unexpected PASS!
+21 unexpected PASS!
+26 unexpected PASS!
+29 unexpected PASS!
+./regress.sh . strategy.tst
+27 unexpected PASS!
+./regress.sh . endgame.tst
+./regress.sh . heikki.tst
+./regress.sh . neurogo.tst
+./regress.sh . arb.tst
+./regress.sh . rosebud.tst
+./regress.sh . golife.tst
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+./regress.sh . ego.tst
+./regress.sh . dniwog.tst
+./regress.sh . lazarus.tst
+16 unexpected FAIL: Correct '!L17|J5|K5|K6', got 'L17'
+./regress.sh . trevorb.tst
+./regress.sh . strategy2.tst
+./regress.sh . nicklas1.tst
+./regress.sh . nicklas2.tst
+./regress.sh . nicklas3.tst
+./regress.sh . nicklas4.tst
+./regress.sh . nicklas5.tst
+./regress.sh . manyfaces.tst
+./regress.sh . niki.tst
+./regress.sh . trevor.tst
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+./regress.sh . nngs.tst
+1050 unexpected FAIL: Correct 'J10|H10|G10|F10', got 'M5'
+./regress.sh . trevorc.tst
+./regress.sh . strategy3.tst
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+9 unexpected FAIL: Correct 'F4', got 'F2'
+38 unexpected FAIL: Correct 'C6', got 'C10'
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+./regress.sh . 13x13.tst
+./regress.sh . semeai.tst
+./regress.sh . trevord.tst
+1050 unexpected PASS!
+./regress.sh . strategy4.tst
+
 ======================= 3.1.28 pre 3  =========================
 
 ./regress.sh . atari_atari.tst
