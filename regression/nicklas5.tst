@@ -35,6 +35,8 @@ loadsgf games/nicklas/nicklas12.sgf 71
 1203 gg_genmove black
 #? [K18|N18|N19|M19]
 
+
+# tm - Looks like a semeai problem.  E18 is good except for semeai.
 loadsgf games/nicklas/nicklas12.sgf 89
 1204 gg_genmove black
 #? [H15]*

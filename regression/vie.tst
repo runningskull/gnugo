@@ -67,9 +67,11 @@ loadsgf golois/Goemate990903-5.sgf
 16 owl_attack M4
 #? [0]*
 
+
+# tm - running out at E6 looks fine.
 loadsgf golois/Goemate990910-1.sgf
 17 owl_defend D3
-#? [1 E2]*
+#? [1 (E2|E6)]*
 
 loadsgf golois/Goemate990911-2.sgf
 18 owl_attack E2
@@ -204,9 +206,10 @@ loadsgf golois/Vivre990706-3.sgf
 #? [0]
 
 # ko after B:G14 W:H15 B:G15 W:K17 B:J17 W:L16 B:J19 W:K19 /db
+# However, B:H15 lives quite handily.
 loadsgf golois/Vivre990706-4.sgf
 50 owl_defend F16
-#? [2 G14]*
+#? [1 H15]
 
 loadsgf golois/Vivre990706-5.sgf
 51 owl_attack G3

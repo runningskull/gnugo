@@ -317,7 +317,7 @@ loadsgf games/trevor/trevor_31.sgf
 
 loadsgf games/trevor/trevor_32.sgf
 320 gg_genmove black
-#? [J2]
+#? [J2|H3]
 
 loadsgf games/trevor/trevor_33.sgf
 330 owl_defend L9
@@ -543,6 +543,23 @@ loadsgf games/trevor/trevor_63.sgf
 loadsgf games/trevor/trevor_64.sgf
 640 owl_defend G11
 #? [1 (..+)]*
+
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=KO!
+#SEVERITY=6
+loadsgf games/trevor/trevor_65.sgf
+650 owl_attack G2
+#? [(2|3) E1]*
+
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=short of liberties
+#SEVERITY=6
+loadsgf games/trevor/trevor_66.sgf
+660 owl_attack G2
+#? [1 L1]*
+
+
+
 
 
 #CATEGORY=OWL_EYES

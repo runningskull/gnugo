@@ -139,9 +139,10 @@ loadsgf games/strategy30.sgf 171
 #? [O8]*
 
 # Semeai problem.
+# tm - S12 also works ok.
 loadsgf games/strategy30.sgf 201
 129 gg_genmove black
-#? [Q9]*
+#? [Q9|S12]*
 
 loadsgf games/strategy31.sgf 34
 130 gg_genmove white

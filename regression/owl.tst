@@ -783,7 +783,7 @@ loadsgf games/incident189.sgf 186
 
 loadsgf games/owl27.sgf
 214 owl_defend N3
-#? [1 L4]
+#? [1 (L4|N5)]
 
 # K19 only gives ko.
 loadsgf games/FSF-neurogo.sgf 286

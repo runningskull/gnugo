@@ -28,9 +28,12 @@ loadsgf games/nicklas/nicklas2.sgf 23
 203 gg_genmove black
 #? [J5]
 
-loadsgf games/nicklas/nicklas2.sgf 39
-204 gg_genmove black
-#? [F8]*
+##tm - if B J8, W J5 kills bigger B corner.  
+##So, there's no really effective move here.
+## GNU Go 3.1.16 gets J5, which is prob. best.
+#loadsgf games/nicklas/nicklas2.sgf 39
+#204 gg_genmove black
+##? [F8]*
 
 loadsgf games/nicklas/nicklas2.sgf 55
 205 dragon_status G1
