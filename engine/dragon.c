@@ -551,6 +551,8 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     if (save_verbose)
       gprintf("thrashing dragon found at %1m\n", thrashing_dragon);
   }
+  else
+    thrashing_dragon = 0;
 
   /* Owl threats. */
   for (str = BOARDMIN; str < BOARDMAX; str++)
