@@ -1351,7 +1351,8 @@ is_corner_vertex(int pos)
 /* Returns true if the empty vertex respectively the string at pos1 is
  * adjacent to the empty vertex respectively the string at pos2.
  */
-int are_neighbors(int pos1, int pos2)
+int
+are_neighbors(int pos1, int pos2)
 {
   if (board[pos1] == EMPTY) {
     if (board[pos2] == EMPTY)

@@ -296,8 +296,8 @@ test_symmetry_after_move(int move, int color, int strict)
     sum = board[pos] + board[MIRROR_MOVE(pos)];
     if (sum != EMPTY + EMPTY && sum != BLACK + WHITE) {
       if (strict || sum == EMPTY + WHITE || sum == EMPTY + BLACK) {
-      result = 0;
-      break;
+	result = 0;
+	break;
       }
     }
   }

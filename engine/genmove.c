@@ -419,7 +419,7 @@ do_genmove(int color, float pure_threat_value,
     fuseki(color);
   gg_assert(stackp == 0);
 
-  /* Look for moves too break mirror play by the opponent. */
+  /* Look for moves to break mirror play by the opponent. */
   break_mirror_go(color);
   
   /* The general pattern database. */

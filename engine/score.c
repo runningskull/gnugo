@@ -552,8 +552,8 @@ captured_territory(int pos, int color)
   for (d = 0; d < DRAGON2(pos).neighbors; d++)
     if (DRAGON(DRAGON2(pos).adjacent[d]).color == OTHER_COLOR(board[pos])
 	&& (DRAGON(DRAGON2(pos).adjacent[d]).status == ALIVE
-	    || (DRAGON(DRAGON2(pos).adjacent[d]).status == UNKNOWN &&
-		dragon2[DRAGON2(pos).adjacent[d]].weakness < .1)
+	    || (DRAGON(DRAGON2(pos).adjacent[d]).status == UNKNOWN
+		&& dragon2[DRAGON2(pos).adjacent[d]].weakness < .1)
 	    || (board[pos] != color
 		&& DRAGON(DRAGON2(pos).adjacent[d]).status == CRITICAL)))
       return 1;

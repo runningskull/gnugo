@@ -567,10 +567,10 @@ find_more_owl_attack_and_defense_moves(int color)
   int dd = NO_MOVE;
   int worth_trying;
   int save_verbose;
-  struct eye_data* our_eyes;
-  struct eye_data* your_eyes;
-  struct vital_eye_points * our_vital_points;
-  struct vital_eye_points * your_vital_points;
+  struct eye_data *our_eyes;
+  struct eye_data *your_eyes;
+  struct vital_eye_points *our_vital_points;
+  struct vital_eye_points *your_vital_points;
 
   if (verbose)
     gprintf("\nTrying to upgrade strategical attack and defense moves.\n");

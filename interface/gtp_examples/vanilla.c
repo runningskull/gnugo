@@ -58,7 +58,7 @@ main()
     error("can't open pipe a");
   if (pipe(pfd_b) == -1)
     error("can't open pipe b");
-  switch(fork()) {
+  switch (fork()) {
   case -1:
     error("fork failed (try chopsticks)");
   case 0:

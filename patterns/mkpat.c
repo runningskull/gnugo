@@ -2356,7 +2356,7 @@ tree_write_patterns(FILE *outfile)
 /* ================================================================ */
 
 #define CORNER_DB_SIZE(patterns, variations)\
-  ((int) (( patterns * sizeof(struct corner_pattern)\
+  ((int) ((patterns * sizeof(struct corner_pattern)\
    + variations * sizeof(struct corner_variation)) / 1024))
 
 static struct corner_variation_b corner_root;
@@ -3453,7 +3453,7 @@ main(int argc, char *argv[])
       patno++;
       reset_pattern();
     }
-  } 
+  }
 
   if (discard_pattern) {
     patno--;

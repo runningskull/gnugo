@@ -362,7 +362,7 @@ location_to_buffer(int pos, char *buf)
  */
 
 int
-string_to_location(int boardsize, char *str, int *m, int *n)
+string_to_location(int boardsize, const char *str, int *m, int *n)
 {
   if (*str == '\0')
     return 0;

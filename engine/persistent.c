@@ -120,7 +120,7 @@ struct persistent_cache {
   const float age_factor; /* Reduce value of old entries with this factor. */
   const char *name; /* For debugging purposes. */
   const compute_active_area_fn compute_active_area;
-  struct persistent_cache_entry* table; /* Array of actual results. */
+  struct persistent_cache_entry *table; /* Array of actual results. */
   int current_size; /* Current number of entries. */
   int last_purge_position_number;
 };

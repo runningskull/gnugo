@@ -145,13 +145,15 @@ hashdata_invert_stone(Hash_data *hd, int pos, int color)
 
 
 /* Set or remove the komaster value in the hash data. */
-void hashdata_invert_komaster(Hash_data *hd, int komaster)
+void
+hashdata_invert_komaster(Hash_data *hd, int komaster)
 {
   hashdata_xor(*hd, komaster_hash[komaster]);
 }
 
 /* Set or remove the komaster position in the hash data. */
-void hashdata_invert_kom_pos(Hash_data *hd, int kom_pos)
+void
+hashdata_invert_kom_pos(Hash_data *hd, int kom_pos)
 {
   hashdata_xor(*hd, kom_pos_hash[kom_pos]);
 }

@@ -189,7 +189,7 @@ static void owl_add_move(struct owl_move_data *moves, int move, int value,
 			 int escape, int defense_pos, int max_moves);
 static void owl_determine_life(struct local_owl_data *owl,
 			       struct local_owl_data *second_owl,
-			        int does_attack,
+			       int does_attack,
 			       struct owl_move_data *moves,
 			       struct eyevalue *probable_eyes,
 			       int *eyemin, int *eyemax);
@@ -199,7 +199,7 @@ static int owl_estimate_life(struct local_owl_data *owl,
 			     struct local_owl_data *second_owl,
     		  	     struct owl_move_data vital_moves[MAX_MOVES],
 		  	     const char **live_reason,
-			      int does_attack,
+			     int does_attack,
 		  	     struct eyevalue *probable_eyes,
 			     int *eyemin, int *eyemax);
 static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
@@ -2400,8 +2400,7 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
  */
 
 static int
-do_owl_defend(int str, int *move, int *wormid,
-	      struct local_owl_data *owl,
+do_owl_defend(int str, int *move, int *wormid, struct local_owl_data *owl,
 	      int escape)
 {
   int color = board[str];
@@ -3842,10 +3841,10 @@ pattern_list_prepare(struct matched_patterns_list_data *list)
    * heap elements first.
    */
   if (list->counter > 0) { /* avoid malloc(0) */
-    list->pattern_heap = (struct matched_pattern_data**)
-	    	malloc(list->counter * sizeof(struct matched_pattern_data*));
+    list->pattern_heap = malloc(list->counter * sizeof(*(list->pattern_heap)));
     gg_assert(list->pattern_heap != NULL);
-  } else {
+  }
+  else {
     /* free() has defined behaviour for NULL pointer */
     list->pattern_heap = NULL;
   }
@@ -4629,7 +4628,7 @@ connected_components(char graph[MAX_CUTS][MAX_CUTS], int graph_size,
     return 0;
 
   memset(component, -1, MAX_CUTS);
-  for (;;)  {
+  for (;;) {
     int found_one;
     /* Find unidentified string. */
     for (k = 0; k < graph_size; k++)
@@ -4713,7 +4712,7 @@ owl_test_cuts(char goal[BOARDMAX], int color, int cuts[MAX_CUTS])
     int component_size[MAX_CUTS];
     int num_components;
     int biggest_component = -1;
-    struct connection_data* conn_data;
+    struct connection_data *conn_data;
     int c_id;
     int pos;
 
@@ -5528,10 +5527,10 @@ owl_find_lunches(struct local_owl_data *owl)
 	  owl->lunch_attack_code[lunches]  = acode;
 	  owl->lunch_attack_point[lunches] = apos;
 	  owl->lunch_defend_code[lunches]  = dcode;
-	  ASSERT1(board[apos == EMPTY], lunch);
+	  ASSERT1(board[apos] == EMPTY, lunch);
 	  if (dcode != 0) {
 	    owl->lunch_defense_point[lunches] = dpos;
-	    ASSERT1(board[apos == EMPTY], lunch);
+	    ASSERT1(board[dpos] == EMPTY, lunch);
 	  }
 	  else
 	    owl->lunch_defense_point[lunches] = NO_MOVE;

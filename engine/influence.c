@@ -863,8 +863,8 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
        add_influence_source(pos, this_color, strength, attenuation, q);
 
      DEBUG(DEBUG_INFLUENCE,
-	  "  low intensity influence source at %1m, strength %f, color %C\n",
-	  pos, strength, this_color);
+	   "  low intensity influence source at %1m, strength %f, color %C\n",
+	   pos, strength, this_color);
      return;
   }
     

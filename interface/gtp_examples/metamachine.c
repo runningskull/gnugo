@@ -83,7 +83,7 @@ main(int argc, char *const *argv)
     error("can't open pipe a");
   if (pipe(pfd_b) == -1)
     error("can't open pipe b");
-  switch(fork()) {
+  switch (fork()) {
   case -1:
     error("fork failed (try chopsticks)");
   case 0:
@@ -221,8 +221,8 @@ main(int argc, char *const *argv)
 	  gprintf(stdout, "=%d PASS\n\n", id);
 	fflush(stdout);
       }
-      else if (moves_considered == 1 ||
-	       position_value[0] > position_value[1]) {
+      else if (moves_considered == 1
+	       || position_value[0] > position_value[1]) {
 	gprintf(to_gnugo_stream, "%s %m\n", color == BLACK ? "black" : "white",
 		move_i[0], move_j[0]);
 	ask_gnugo(gnugo_line, 0, "6");
@@ -294,7 +294,7 @@ ask_gnugo(char *gnugo_line, int verbose, const char *msg)
   int line_length = 0;
   char line[GTP_BUFSIZE];
 
-  while(line_length != 1) {
+  while (line_length != 1) {
     if (!fgets(line, 128, from_gnugo_stream))
       error("can't get response");
     line_length = strlen(line);
@@ -341,7 +341,7 @@ trace(const char *fmt, ...)
 int
 vgprintf(FILE *outputfile, const char *fmt, va_list ap)
 {
-  for ( ; *fmt ; ++fmt ) {
+  for ( ; *fmt; ++fmt) {
     if (*fmt == '%') {
       switch (*++fmt) {
       case 'c':
@@ -366,7 +366,7 @@ vgprintf(FILE *outputfile, const char *fmt, va_list ap)
 	}
       case 's':
 	{
-	  char *s = va_arg(ap, char*);
+	  char *s = va_arg(ap, char *);
 	  fputs(s, outputfile);
 	  break;
 	}

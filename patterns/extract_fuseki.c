@@ -305,8 +305,8 @@ init_situations(void)
 static int
 compare_numbers(const void *a, const void *b)
 {
-  unsigned int aa = *((const unsigned int *)a);
-  unsigned int bb = *((const unsigned int *)b);
+  unsigned int aa = *((const unsigned int *) a);
+  unsigned int bb = *((const unsigned int *) b);
   if (aa > bb)
     return 1;
   if (aa < bb)

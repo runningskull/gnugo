@@ -755,7 +755,6 @@ backfill_replace(int move, int str)
 int 
 thrash_around_helper(ARGS)
 {
-  int d;
   UNUSED(pattern);
   UNUSED(trans);
   UNUSED(move);

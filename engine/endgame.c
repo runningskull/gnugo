@@ -318,7 +318,7 @@ endgame_analyze_worm_liberties(int pos, int color)
   if (value <= 0 && num_attacks2 == 0)
     return;
 
-  /* We filled the liberties with stones of "other" color. That could leed to
+  /* We filled the liberties with stones of "other" color. That could lead to
    * some strange attacks, since inessential liberties are not always really
    * inessential (see trevorb:320 and trevorb:940 for examples where this step
    * is necessary). Now we fill the liberties with stones of the same color as

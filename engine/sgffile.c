@@ -23,11 +23,10 @@
 /*
  * sgffile.c
  *
- * This file contains functions that create an SGF file on the fly.
- * There can be only one file open simultaneously.
+ * This file used to contain functions that create an SGF file on the fly.
  *
- * See sgf/sgftree.c for more general handling of SGF trees and file I/O.
- *
+ * Today it contains supporting code around the more general SGF library
+ * found in the sgf/ directory.
  */
 
 #include "gnugo.h"

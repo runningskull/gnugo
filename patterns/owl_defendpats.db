@@ -571,7 +571,6 @@ o....o
 :8,-,value(80)
 
 
-
 #########################################################
 #                                                       #
 #          Expanding moves on the second line           #
@@ -6490,7 +6489,7 @@ O*.
 
 A.B
 O*.
-?C?
+?Co
 
 ;!same_string(A,B) && (lib(A) <= 4 || lib(B) <= 4 || lib(C) <= 4)
 
@@ -6508,7 +6507,7 @@ O*.
 
 A.B
 O*.
-?C?
+?CX
 
 ;!same_string(A,B) && (lib(A) <= 4 || lib(B) <= 4 || lib(C) <= 4)
 ;&& !oplay_connect(*,A,C)

@@ -219,16 +219,10 @@ void
 partition_eyespaces(struct eye_data eye[BOARDMAX], int color)
 {
   int pos;
-  int eye_color;
 
   if (!eye)
     return;
 
-  if (color == WHITE)
-    eye_color = WHITE;
-  else
-    eye_color = BLACK;
-  
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos))
       eye[pos].origin = NO_MOVE;
@@ -236,7 +230,7 @@ partition_eyespaces(struct eye_data eye[BOARDMAX], int color)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos))
       continue;
-    if (eye[pos].origin == NO_MOVE && eye[pos].color == eye_color) {
+    if (eye[pos].origin == NO_MOVE && eye[pos].color == color) {
       int esize = 0;
       int msize = 0;
       
@@ -463,8 +457,8 @@ is_lively(int owl_call, int pos)
     return owl_lively(pos);
   else
     return (!worm[pos].inessential
-      && (worm[pos].attack_codes[0] == 0
-      ||  worm[pos].defense_codes[0] != 0));
+	    && (worm[pos].attack_codes[0] == 0
+		|| worm[pos].defense_codes[0] != 0));
 }
 
 
@@ -545,9 +539,10 @@ false_margin(int pos, int color, int lively[BOARDMAX])
 
 
 /*
- * originate_eye(pos, pos, *size) creates an eyeshape with origin (pos).
- * the last variable returns the size. The repeated variables (pos) are due
- * to the recursive definition of the function.
+ * originate_eye(pos, pos, *esize, *msize, eye) creates an eyeshape
+ * with origin pos. esize and msize return the size and the number of
+ * marginal vertices. The repeated variables (pos) are due to the
+ * recursive definition of the function.
  */
 static void
 originate_eye(int origin, int pos,
@@ -1197,7 +1192,7 @@ read_eye(int pos, int *attack_point, int *defense_point,
   }
 
   if (add_moves) {
-    struct vital_eye_points* vital;
+    struct vital_eye_points *vital;
     if (eye_color == WHITE)
       vital = white_vital_points;
     else

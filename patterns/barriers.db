@@ -1660,6 +1660,7 @@ dbc.
 
 ;oplay_attack(a,b,c,d,e,f,f)
 
+
 Pattern Intrusion30a
 
 ????
@@ -1680,6 +1681,7 @@ ocoo
 
 ;oplay_connect(a,b,a,c)
 >return (!xplay_attack(b,c))
+
 
 Pattern Intrusion31
 

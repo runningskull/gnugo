@@ -1617,7 +1617,7 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
    * the moves that prevent capture and that might also
    * connect.
    */
-  if ( (ForcedMoves[0] != 0) && (Moves[0] != 0) )
+  if ((ForcedMoves[0] != 0) && (Moves[0] != 0))
     intersection_array(Moves, ForcedMoves);
 
   order_connection_moves(Moves, str1, str2, board[str1],
@@ -2868,8 +2868,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   if (stackp <= depth
       && (hashflags & HASH_BREAK_IN)
       && !has_passed
-      && tt_get(&ttable, BREAK_IN, str, NO_MOVE, 
-		depth - stackp, goal_hash,
+      && tt_get(&ttable, BREAK_IN, str, NO_MOVE, depth - stackp, goal_hash,
 		&retval, NULL, &xpos) == 2) {
     /* FIXME: Use move for move ordering if tt_get() returned 1 */
     TRACE_CACHED_RESULT(retval, xpos);
@@ -2897,9 +2896,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       tried_moves++;
       if (!ko_move) {
-	int acode = recursive_block(str, goal, NULL,
-				   
-				    has_passed, goal_hash);
+	int acode = recursive_block(str, goal, NULL, has_passed, goal_hash);
 	popgo();
 	if (acode == 0) {
 	  SGFTRACE(xpos, WIN, "break effective");
@@ -2912,8 +2909,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
       }
       else {
-	if (recursive_block(str, goal, NULL,
-			    has_passed, goal_hash) != WIN) {
+	if (recursive_block(str, goal, NULL, has_passed, goal_hash) != WIN) {
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
@@ -2946,8 +2942,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 /* Can (str) connect to goal[] if the other color moves first? */
 static int
 recursive_block(int str, const char goal[BOARDMAX], int *move,
-    		  int has_passed,
-		Hash_data *goal_hash)
+		int has_passed,	Hash_data *goal_hash)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -3018,9 +3013,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       tried_moves++;
       if (!ko_move) {
-	int dcode = recursive_break(str, goal, NULL,
-				    has_passed,
-				    goal_hash);
+	int dcode = recursive_break(str, goal, NULL, has_passed, goal_hash);
 	popgo();
 	if (dcode == 0) {
 	  SGFTRACE(xpos, WIN, "block effective");
@@ -3049,13 +3042,13 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
 	  || !recursive_break(str, goal, NULL, 1,
 	                      goal_hash))) {
     SGFTRACE(NO_MOVE, WIN, "no move, probably disconnected");
-    READ_RETURN_HASH(BLOCK_OFF, str,	depth - stackp, goal_hash,
+    READ_RETURN_HASH(BLOCK_OFF, str, depth - stackp, goal_hash,
 		     move, NO_MOVE, WIN);
   }
   
   if (savecode != 0) {
     SGFTRACE(savemove, savecode, "saved move");
-    READ_RETURN_HASH(BLOCK_OFF, str,	depth - stackp, goal_hash,
+    READ_RETURN_HASH(BLOCK_OFF, str, depth - stackp, goal_hash,
 		     move, savemove, savecode);
   }
 

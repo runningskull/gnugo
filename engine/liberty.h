@@ -941,7 +941,7 @@ extern struct dragon_data2 *dragon2;
 #if 1 /* Trust DRAGON2 accesses */
 #define DRAGON2(pos) dragon2[dragon[pos].id]
 #else
-struct dragon_data2 * dragon2_func(int pos);
+struct dragon_data2 *dragon2_func(int pos);
 #define DRAGON2(pos) (*dragon2_func(pos))
 #endif
 

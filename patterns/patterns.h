@@ -353,7 +353,6 @@ void init_tree_oracle(void);
 
 /* pattern arrays themselves */
 extern struct pattern_db pat_db;
-extern struct corner_db  joseki_db;
 extern struct pattern_db aa_attackpat_db;
 extern struct pattern_db owl_attackpat_db;
 extern struct pattern_db owl_vital_apat_db;
@@ -367,6 +366,8 @@ extern struct pattern_db barrierspat_db;
 extern struct pattern_db fusekipat_db;
 extern struct pattern_db handipat_db;
 extern struct pattern_db oracle_db;
+
+extern struct corner_db joseki_db;
 
 extern struct fullboard_pattern fuseki19[];
 extern struct fullboard_pattern fuseki13[];

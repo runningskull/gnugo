@@ -2689,7 +2689,7 @@ r_scan_moves(int move, int value, struct reading_move_data *moves)
 /* reading_callback helper.
  * pushes moves onto the move list. */
 static void
-r_push_move(int move, int value, const char * name, 
+r_push_move(int move, int value, const char *name, 
             struct reading_move_data *moves)
 {
   int k;

@@ -479,7 +479,7 @@ main(int argc, char *argv[])
       case OPT_GTP_INITIAL_ORIENTATION:
 	orientation = atoi(gg_optarg);
 	if (orientation < 0 || orientation > 7) {
-	  fprintf(stderr, "Illegal orientation: %d.\n", orientation);
+	  fprintf(stderr, "Invalid orientation: %d.\n", orientation);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	  exit(EXIT_FAILURE);
 	}
@@ -543,7 +543,7 @@ main(int argc, char *argv[])
 	  int handicap = atoi(gg_optarg);
 	  
 	  if (handicap < 0 || handicap > MAX_HANDICAP) {
-	    fprintf(stderr, "Illegal handicap: %d.\n", handicap);
+	    fprintf(stderr, "Unsupported handicap: %d.\n", handicap);
 	    fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	    exit(EXIT_FAILURE);
 	  }
@@ -556,7 +556,7 @@ main(int argc, char *argv[])
 	  int boardsize = atoi(gg_optarg);
 	  
 	  if (boardsize < MIN_BOARD || boardsize > MAX_BOARD) {
-	    fprintf(stderr, "Illegal board size: %d.\n", boardsize);
+	    fprintf(stderr, "Unsupported board size: %d.\n", boardsize);
 	    fprintf(stderr, "Try `gnugo --help' for more information.\n");
 	    exit(EXIT_FAILURE);
 	  }
@@ -1025,8 +1025,7 @@ main(int argc, char *argv[])
       exit(EXIT_FAILURE);
     }
     
-    gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring,
-                             orientation);
+    gameinfo_play_sgftree_rot(&gameinfo, &sgftree, untilstring, orientation);
   }
   else
   /* Initialize and empty sgf tree if there was no infile. */

@@ -384,7 +384,7 @@ const char *color_to_string(int color);
 const char *location_to_string(int pos);
 void location_to_buffer(int pos, char *buf);
 
-int string_to_location(int boardsize, char *str, int *m, int *n);
+int string_to_location(int boardsize, const char *str, int *m, int *n);
 
 int is_hoshi_point(int m, int n);
 void draw_letter_coordinates(FILE *outfile);
