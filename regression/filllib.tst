@@ -108,3 +108,9 @@ loadsgf games/trevor/auto/d29.sgf 188
 #? [S16|T17|O18|Q19]
 32 gg_genmove black
 #? [O18|O19|N18|P19|N19]
+
+loadsgf games/filllib10.sgf
+33 gg_genmove white
+#? [PASS]
+34 gg_genmove black
+#? [PASS]*

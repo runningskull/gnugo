@@ -337,13 +337,17 @@ accumulate_influence(struct influence_data *q, int m, int n, int color)
  *
  * The name saved_stones is historic and should probably be changed
  * since it also includes captured stones.
+ *
+ * The relative strength for inessential stones must be somewhat
+ * larger than 0. Otherwise they may be considered as territory for
+ * the opponent and the territory evaluations may mess up.
  */
 
 static float strength_map[10] = {
   0.0,   /* DEAD            */
   0.9,   /* ALIVE           */
   0.5,   /* CRITICAL        */
-  0.0,   /* INESSENTIAL     */
+  0.01,  /* INESSENTIAL     */
   0.0,   /* TACTICALLY DEAD */
   0.7,   /* WEAK            */
   0.8,   /* WEAKLY_ALIVE    */
@@ -429,6 +433,21 @@ init_influence(struct influence_data *q, int color, int dragons_known,
 	  else
 	    q->white_permeability[i][j] = 0.0;
 	}
+
+	/* We need to make an exception to the rules above for
+         * INESSENTIAL stones. Instead of making the conditions above
+         * still more complex we correct it here.
+	 *
+	 * If q->p[i][j] is allowed to be 0, the territory evaluation
+	 * will think it's a prisoner for the opponent, and various
+	 * territory corrections and interpolations will mess up.
+	 */
+	if (IS_STONE(board[pos])
+	    && dragons_known
+	    && dragon[pos].id != -1
+	    && DRAGON2(pos).safety == INESSENTIAL
+	    && q->p[i][j] == EMPTY)
+	  q->p[i][j] = board[pos];
       }
       
       /* When evaluating influence after a move, the newly placed

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revised handling of inessential stones in init_influence()
 - bugfix in strategic_penalty()
 - owl speedup: owl data immediately stored in owl_stack
 - bugfix in do_owl_defense()
