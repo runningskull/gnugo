@@ -133,3 +133,16 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 34
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203132324.sgf 90
 33 gg_genmove white
 #? [!S9]
+
+loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 30
+34 gg_genmove white
+#? [!N10|N9|N11|O11|O10]*
+
+loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 44
+35 gg_genmove white
+#? [D13]*
+
+loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 64
+36 gg_genmove white
+#? [N11|L7]*
+
