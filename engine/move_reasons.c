@@ -2116,7 +2116,7 @@ dragon_safety(int ai, int aj, int ignore_dead_dragons)
 
   /* More detailed guesses for WEAK and WEAKLY_ALIVE dragons. */
   if (dragon_safety == WEAK || dragon_safety == WEAKLY_ALIVE) {
-    int escape = dragon[ai][aj].escape_route;
+    int escape = DRAGON2(ai, aj).escape_route;
     int moyo = DRAGON2(ai, aj).moyo;
     /* If escape <= 5 and moyo <= 10, the dragon won't be WEAK, since
      * the owl code has been run.
@@ -2217,8 +2217,8 @@ connection_value(int ai, int aj, int bi, int bj, int ti, int tj, float margin)
 {
   int safety1 = DRAGON2(ai, aj).safety;
   int safety2 = DRAGON2(bi, bj).safety;
-  int true_genus1 = 2 * dragon[ai][aj].genus + dragon[ai][aj].heyes;
-  int true_genus2 = 2 * dragon[bi][bj].genus + dragon[bi][bj].heyes;
+  int true_genus1 = 2 * DRAGON2(ai, aj).genus + DRAGON2(ai, aj).heyes;
+  int true_genus2 = 2 * DRAGON2(bi, bj).genus + DRAGON2(bi, bj).heyes;
   float impact;
 
   /* If the connected dragon gets sufficient eyespace to live on its
@@ -2228,8 +2228,8 @@ connection_value(int ai, int aj, int bi, int bj, int ti, int tj, float margin)
   if (true_genus1 < 4 && true_genus2 < 4) {
     if (true_genus1 + true_genus2 >= 4
 	||  (true_genus1 + true_genus2 >= 3
-	     && (dragon[ai][aj].heye == POS(ti, tj)
-		 || dragon[bi][bj].heye == POS(ti, tj))))
+	     && (DRAGON2(ai, aj).heye == POS(ti, tj)
+		 || DRAGON2(bi, bj).heye == POS(ti, tj))))
       safety2 = ALIVE;
   }
 
@@ -2538,7 +2538,7 @@ estimate_territorial_value(int m, int n, int color,
        * territorial value for it. This isn't exactly right but a
        * reasonable workaround to avoid or at least limit overvaluation.
        */
-      if (dragon[ai][aj].size == 1 && worm[ai][aj].ko == 1) {
+      if (dragon[ai][aj].size == 1 && is_ko_point2(ai, aj)) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %m: 0 - owl attack/defend for ko stone (workaround) %m\n",
 	      m, n, ai, aj);
@@ -2689,7 +2689,7 @@ estimate_territorial_value(int m, int n, int color,
 	if (verbose > 0)
 	  verbose --;
 
-	if (2 * dragon[bi][bj].genus + dragon[bi][bj].heyes == 3
+	if (2 * dragon[bi][bj].genus + DRAGON2(bi, bj).heyes == 3
 	    && (dragon[bi][bj].owl_status == CRITICAL
 		&& ((BOARD(bi, bj) == color
 		     && owl_does_defend(m, n, bi, bj))
@@ -2703,7 +2703,7 @@ estimate_territorial_value(int m, int n, int color,
 	}
 	else {
 	  verbose = save_verbose;
-	  if (2*dragon[bi][bj].genus + dragon[bi][bj].heyes < 6)
+	  if (2*dragon[bi][bj].genus + DRAGON2(bi, bj).heyes < 6)
 	    secondary_value += dragon[bi][bj].effective_size / 4;
 	  else
 	    secondary_value += dragon[bi][bj].effective_size / 20;
@@ -2728,7 +2728,7 @@ estimate_territorial_value(int m, int n, int color,
        * territorial value for it. This isn't exactly right but a
        * reasonable workaround to avoid or at least limit overvaluation.
        */
-      if (dragon[ai][aj].size == 1 && worm[ai][aj].ko == 1) {
+      if (dragon[ai][aj].size == 1 && is_ko_point2(ai, aj)) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %m: 0 - owl attack/defend for ko stone (workaround) %m\n",
 	      m, n, ai, aj);

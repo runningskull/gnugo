@@ -422,21 +422,20 @@ aftermath_genmove(int *i, int *j, int color,
 	}
 	
 	if (BOARD(m+dm, n+dn) == other) {
-	  int oi = I(dragon[m+dm][n+dn].origin);
-	  int oj = J(dragon[m+dm][n+dn].origin);
+	  int origin = dragon[m+dm][n+dn].origin;
 
 	  if (k < 4) {
 	    if (dragon[m+dm][n+dn].matcher_status == ALIVE) {
 	      safety = DEAD;
 	      break;
 	    }
-	    else if (!mx[POS(oi, oj)]) {
+	    else if (!mx[origin]) {
 	      eyespace_neighbors++;
 	      opponent_dragons++;
 	    }
 	  }
 
-	  if (!mx[POS(oi, oj)] && dragon[m+dm][n+dn].matcher_status == DEAD) {
+	  if (!mx[origin] && dragon[m+dm][n+dn].matcher_status == DEAD) {
 	    bonus++;
 	    if (k < 4 
 		&& countlib2(m+dm, n+dn) <= 2 
@@ -446,7 +445,7 @@ aftermath_genmove(int *i, int *j, int color,
 	    if (k < 4 && countlib2(m+dm, n+dn) == 1)
 	      bonus += 3;
 	  }
-	  mx[POS(oi, oj)] = 1;
+	  mx[origin] = 1;
 	}
 	else if (BOARD(m+dm, n+dn) == color) {
 	  dragoni[m][n] = m+dm;

@@ -3527,7 +3527,7 @@ compute_owl_escape_values(struct local_owl_data *owl)
 	if (dragon[i][j].status == ALIVE)
 	  owl->escape_values[i][j] = 6;
 	else if (dragon[i][j].status == UNKNOWN
-		 && (dragon[i][j].escape_route > 5 || DRAGON2(i, j).moyo > 5))
+		 && (DRAGON2(i, j).escape_route > 5 || DRAGON2(i, j).moyo > 5))
 	  owl->escape_values[i][j] = 4;
       }
       DEBUG(DEBUG_ESCAPE, "%o%d", owl->escape_values[i][j]);

@@ -600,6 +600,11 @@ loadsgf games/reading31.sgf
 153 attack C3
 #? [0]
 
+# Irrelevant ataris on boundary strings exhaust the reading depths too early.
+loadsgf games/unsorted_03.sgf 29
+154 attack E4
+#? [1 G4]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

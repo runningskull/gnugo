@@ -120,6 +120,7 @@ extern Hash_data    hashdata;
         neighbor_of_string(POS(m, n), POS(i, j))
 #define liberty_of_string2(m, n, i, j) \
         liberty_of_string(POS(m, n), POS(i, j))
+#define is_ko_point2(m, n) is_ko_point(POS(m, n))
 #define does_capture_something2(m, n, color) \
         does_capture_something(POS(m, n), color)
 #define add_stone2(m, n, color) add_stone(POS(m, n), color)
@@ -247,6 +248,7 @@ int neighbor_of_string(int pos, int str);
 int same_string(int str1, int str2);
 int are_neighbor_strings(int str1, int str2);
 int is_ko(int pos, int color, int *ko_pos);
+int is_ko_point(int pos);
 int komaster_trymove(int pos, int color,
 		     const char *message, int str,
 		     int komaster, int kom_pos,
@@ -274,8 +276,6 @@ void join_dragons(int ai, int aj, int bi, int bj);
 int dragon_escape(char goal[MAX_BOARD][MAX_BOARD], int color,
 		  int escape_value[MAX_BOARD][MAX_BOARD]);
 int lively_dragon_exists(int color);
-int examine_cavity(int m, int n, int *edge, int *size,
-		   int *vertexi, int *vertexj);
 void propagate_worm(int wormi, int wormj);
 void transform(int i, int j, int *ti, int *tj, int trans);
 void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
@@ -564,16 +564,16 @@ struct worm_data {
   int color;         /* its color */
   int size;          /* its cardinality */
   float effective_size; /* stones and surrounding spaces */
-  int origin;        /* the origin of the string. Two vertices are in*/
+  int origin;        /* the origin of the string. Two vertices are in */
                      /* the same worm iff they have same origin. */
   int liberties;     /* number of liberties */
   int liberties2;    /* number of second order liberties */
   int liberties3;    /* third order liberties (empty vertices at distance 3) */
   int liberties4;    /* fourth order liberties */
-  int attack_code;   /* 1=unconditional win, 2 or 3=win with ko */
-  int attack_point;  /* if attack_code != 0, points to a move which captures */
-		     /* the string. */
-  int defend_code;   /* 1=unconditional win, 2 or 3=win with ko */
+  int attack_code;   /* 3=unconditional win, 1 or 2=win with ko */
+  int attack_point;  /* if attack_code != 0, points to a move which */
+		     /* captures the string. */
+  int defend_code;   /* 3=unconditional win, 1 or 2=win with ko */
   int defense_point; /* if defend_code != 0 points to a defensive move */
                      /* protecting the string */
   int lunch;         /* if lunch != 0 then lunch points to a boundary */
@@ -581,7 +581,6 @@ struct worm_data {
   int cutstone;      /* 1=potential cutting stone; 2=cutting stone */
   int cutstone2;     /* Number of potential cuts involving the worm. */
   int genus;         /* number of connected components of the complement, less one */
-  int ko;            /* 1=ko at this location */
   int inessential;   /* 1=inessential worm */
   int invincible;    /* 1=strongly unconditionally non-capturable */
   int unconditional_status; /* ALIVE, DEAD, WHITE_BORDER, BLACK_BORDER, UNKNOWN */
@@ -599,19 +598,8 @@ struct dragon_data {
   int id;       /* the index into the dragon2 array, not valid for caves     */
   int origin;   /* the origin of the string. Two vertices are in the same    */
                 /* dragon iff they have same origin.                         */
-
-  /* FIXME: Border is never used.  Remove? */
-  int border;   /* if color=BLACK_BORDER or WHITE_BORDER the worm is a cavity*/
-                /* surrounded by the BLACK or WHITE dragon with origin border*/
-
   int size;     /* size of the dragon                                        */
   float effective_size; /* stones and surrounding spaces                     */
-  int heyes;    /* the number of half eyes                                   */
-  int heye;     /* coordinates of a half eye                                 */
-  int genus;    /* the number of eyes (approximately)                        */
-  int escape_route; /* a measurement of likelihood of escape                 */
-  int lunch;    /* if lunch != 0 then lunch points to a boundary worm which  */
-                /* can be captured easily.                                   */
   int status;   /* (ALIVE, DEAD, UNKNOWN, CRITICAL)                          */
   int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
   int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
@@ -622,8 +610,6 @@ struct dragon_data {
   int owl_defend_certain;  /* 0 if owl reading node limit is reached         */
   int owl_second_defense_point;/* if defender gets both attack points, wins  */
   int matcher_status;  /* status used by pattern matching                    */
-  int semeai;          /* true if a dragon is part of a semeai               */
-  int semeai_margin_of_safety; /* if small, the semeai is close              */
 };
 
 extern struct dragon_data dragon[MAX_BOARD][MAX_BOARD];
@@ -640,6 +626,14 @@ struct dragon_data2 {
   int neighbors;                      /* number of adjacent dragons          */
   int moyo;                           /* size of surrounding influence moyo  */
   int safety;                         /* a more detailed status estimate     */
+  int escape_route; /* a measurement of likelihood of escape                 */
+  int genus;    /* the number of eyes (approximately)                        */
+  int heyes;    /* the number of half eyes                                   */
+  int heye;     /* coordinates of a half eye                                 */
+  int lunch;    /* if lunch != 0 then lunch points to a boundary worm which  */
+                /* can be captured easily.                                   */
+  int semeai;          /* true if a dragon is part of a semeai               */
+  int semeai_margin_of_safety; /* if small, the semeai is close              */
 };
 
 /* dragon2 is dynamically allocated */
@@ -682,7 +676,6 @@ struct eye_data {
   /* The below fields are not. */
 
   int marginal;             /* This vertex is marginal                    */
-  int false_margin;         /* This vertex is false margin                */
   int type;                 /* Various characteristics of the eyespace    */
   int neighbors;            /* number of neighbors in eyespace            */
   int marginal_neighbors;   /* number of marginal neighbors               */

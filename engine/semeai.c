@@ -304,7 +304,7 @@ analyze_semeai(int ai, int aj, int bi, int bj)
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
       if (same_dragon(i, j, ai, aj) || same_dragon(i, j, bi, bj))
-	dragon[i][j].semeai = 1;
+	DRAGON2(i, j).semeai = 1;
 
   /* First we try to determine the number of liberties of each
    * dragon, and the number of common liberties. We subtract
@@ -409,8 +409,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
    * (2) If Y+C=M whoever moves first wins. CRITICAL.
    * (3) If Y+C<M I win.  */
 
-  if (dragon[ai][aj].genus == 0
-      && dragon[bi][bj].genus == 0) {
+  if (DRAGON2(ai, aj).genus == 0
+      && DRAGON2(bi, bj).genus == 0) {
     if (commonlibs == 0) {
       if (mylibs > yourlibs) {
 	my_status = ALIVE;
@@ -469,8 +469,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
       margin_of_safety = yourlibs - mylibs - commonlibs;
     }
   }
-  if (dragon[ai][aj].genus > 0
-      && dragon[bi][bj].genus > 0) {
+  if (DRAGON2(ai, aj).genus > 0
+      && DRAGON2(bi, bj).genus > 0) {
     if (mylibs > yourlibs + commonlibs) {
       my_status = ALIVE;
       your_status = DEAD;
@@ -508,8 +508,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
       margin_of_safety = 0;
     }
   }
-  if (dragon[ai][aj].genus > 0
-      && dragon[bi][bj].genus == 0) {
+  if (DRAGON2(ai, aj).genus > 0
+      && DRAGON2(bi, bj).genus == 0) {
     if (mylibs > commonlibs + yourlibs) {
       my_status = ALIVE;
       your_status = DEAD;
@@ -525,8 +525,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
       margin_of_safety = mylibs + commonlibs - yourlibs;
     }
   }
-  if (dragon[ai][aj].genus == 0
-      && dragon[bi][bj].genus > 0) {
+  if (DRAGON2(ai, aj).genus == 0
+      && DRAGON2(bi, bj).genus > 0) {
     if (yourlibs + commonlibs > mylibs) {
       my_status = DEAD;
       your_status = ALIVE;
@@ -639,14 +639,14 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 				   ai, aj, bi, bj, my_status, your_status,
 				   margin_of_safety);
     else if (commonlibs > 1) {
-      if (dragon[ai][aj].heyes > 0)
-	add_appropriate_semeai_moves(I(dragon[ai][aj].heye),
-				     J(dragon[ai][aj].heye),
+      if (DRAGON2(ai, aj).heyes > 0)
+	add_appropriate_semeai_moves(I(DRAGON2(ai, aj).heye),
+				     J(DRAGON2(ai, aj).heye),
 				     ai, aj, bi, bj, my_status, your_status,
 				     margin_of_safety);
-      if (dragon[bi][bj].heyes > 0)
-	add_appropriate_semeai_moves(I(dragon[bi][bj].heye),
-				     J(dragon[bi][bj].heye),
+      if (DRAGON2(bi, bj).heyes > 0)
+	add_appropriate_semeai_moves(I(DRAGON2(bi, bj).heye),
+				     J(DRAGON2(bi, bj).heye),
 				     ai, aj, bi, bj, my_status, your_status,
 				     margin_of_safety);
     }
@@ -719,9 +719,9 @@ revise_semeai(int color)
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if ((dragon[m][n].semeai) 
-	  && (dragon[m][n].matcher_status == DEAD) 
-	  && (dragon[m][n].color == other)) 
+      if (DRAGON2(m, n).semeai
+	  && dragon[m][n].matcher_status == DEAD
+	  && dragon[m][n].color == other)
       {
 	found_one = 1;
 	dragon[m][n].matcher_status = UNKNOWN;

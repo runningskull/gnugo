@@ -35,10 +35,10 @@ static void find_worm_threats(void);
 static int  genus(int i, int j);
 static void markcomponent(int i, int j, int m, int n,
 			  int mg[MAX_BOARD][MAX_BOARD]);
+static int examine_cavity(int m, int n, int *edge);
 static void cavity_recurse(int i, int j, 
 			   int mx[MAX_BOARD][MAX_BOARD], 
-			   int *border_color, int *edge, int *size,
-			   int *vertexi, int *vertexj, int ai, int aj);
+			   int *border_color, int *edge, int ai, int aj);
 static void ping_cave(int i, int j, int *result1,  int *result2,
 		      int *result3, int *result4);
 static int touching(int i, int j, int color);
@@ -99,29 +99,6 @@ make_worms(void)
   
   find_worm_attacks_and_defenses();
   
-  /* Find kos. Both the empty vertex and the stone involved in the ko
-   * are marked.
-   */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int color;  /* Color of the capturing stone. */
-      int ko_pos;
-
-      if (BOARD(m, n) != EMPTY
-	  || worm[m][n].size != 1
-	  || worm[m][n].color == GRAY_BORDER)
-	continue;
-
-      if (worm[m][n].color == WHITE_BORDER)
-	color = BLACK;
-      else
-	color = WHITE;
-
-      if (is_ko(POS(m, n), color, &ko_pos)) {
-	worm[m][n].ko = 1;
-	worm[I(ko_pos)][J(ko_pos)].ko = 1;
-      }
-    }
   gg_assert(stackp == 0);
 
   /* Count liberties of different orders and initialize cutstone fields. */
@@ -582,6 +559,47 @@ make_worms(void)
   
   if (!disable_threat_computation)
     find_worm_threats();
+
+  /* Identify INESSENTIAL strings.
+   *
+   * These are defined as surrounded strings which have no life
+   * potential unless part of their surrounding chain can be captured.
+   * We give a conservative definition of inessential:
+   *  - the genus must be zero 
+   *  - there can no second order liberties
+   *  - there can be no more than two edge liberties
+   *  - if it is removed from the board, the remaining cavity has
+   *    border color the opposite color of the string 
+   *  - it contains at most two edge vertices.
+   *
+   * If we get serious about identifying seki, we might want to add:
+   *
+   *  - if it has fewer than 4 liberties it is tactically dead.
+   *
+   * The last condition is helpful in excluding strings which are
+   * alive in seki.
+   *
+   * An inessential string can be thought of as residing inside the
+   * opponent's eye space.
+   */
+
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      if (BOARD(m, n)
+	  && worm[m][n].origin == POS(m, n)
+	  && worm[m][n].genus == 0
+	  && worm[m][n].liberties2 == 0
+	  && worm[m][n].lunch == NO_MOVE)
+      {
+	int edge;
+
+	int border_color = examine_cavity(m, n, &edge);
+	if (border_color != GRAY_BORDER && edge < 3) {
+	  worm[m][n].inessential = 1;
+	  propagate_worm(m, n);
+	}
+      }
+    }
 }
 
 
@@ -594,11 +612,7 @@ make_worms(void)
 void
 build_worms()
 {
-  int vertexi[MAX_BOARD * MAX_BOARD];
-  int vertexj[MAX_BOARD * MAX_BOARD];
   int m, n;
-  int k;
-  int size;
 
   /* Set all worm data fields to 0. */
   memset(worm, 0 , sizeof(worm));
@@ -614,7 +628,6 @@ build_worms()
 	continue;
       worm[m][n].color = BOARD(m, n);
       worm[m][n].origin = POS(m, n);
-      worm[m][n].ko = 0;
       worm[m][n].inessential = 0;
       worm[m][n].invincible = 0;
       worm[m][n].unconditional_status = UNKNOWN;
@@ -623,15 +636,6 @@ build_worms()
 	worm[m][n].liberties = countlib2(m, n);
 	worm[m][n].size = countstones2(m, n);
 	propagate_worm(m, n);
-      }
-      else { /* cavity */
-	worm[m][n].color = examine_cavity(m, n, NULL, &size,
-					  vertexi, vertexj);
-	worm[m][n].size = size;
-	/* Propagate to the rest of the cavity. */
-	for (k = 0; k<size; k++)
-	  if (vertexi[k] != m || vertexj[k] != n)
-	    worm[vertexi[k]][vertexj[k]] = worm[m][n];
       }
     }
 }
@@ -1293,7 +1297,7 @@ ping_recurse(int i, int j, int *counter,
     }
   }
   
-  if (!worm[i][j].ko) {
+  if (!is_ko_point2(i, j)) {
     for (k = 0; k < 4; k++) {
       int ai = i + deltai[k];
       int aj = j + deltaj[k];
@@ -1369,13 +1373,10 @@ markcomponent(int i, int j, int m, int n, int mg[MAX_BOARD][MAX_BOARD])
 }
 
 
-/* examine_cavity(m, n, *edge, *size), if (m, n) is EMPTY, examines the
- * cavity at (m, n), determines its size and returns its bordercolor,
+/* examine_cavity(m, n, *edge), if (m, n) is EMPTY, examines the
+ * cavity at (m, n) and returns its bordercolor,
  * which can be BLACK_BORDER, WHITE_BORDER or GRAY_BORDER. The edge
  * parameter is set to the number of edge vertices in the cavity.
- * (vertexi[], vertexj[]) hold the vertices of the cavity. vertexi[]
- * and vertexj[] should be dimensioned to be able to hold the whole
- * board.
  *
  * If (m, n) is nonempty, it returns the same result, imagining
  * that the string at (m, n) is removed. The edge parameter is
@@ -1383,8 +1384,8 @@ markcomponent(int i, int j, int m, int n, int mg[MAX_BOARD][MAX_BOARD])
  * edge in a point outside the removed string.  
  */
 
-int
-examine_cavity(int m, int n, int *edge, int *size, int *vertexi, int *vertexj)
+static int
+examine_cavity(int m, int n, int *edge)
 {
   int border_color = EMPTY;
   int ml[MAX_BOARD][MAX_BOARD];
@@ -1393,8 +1394,6 @@ examine_cavity(int m, int n, int *edge, int *size, int *vertexi, int *vertexj)
   
   ASSERT_ON_BOARD2(m, n);
 
-  ASSERT2(((vertexi == NULL) ^ (vertexj == NULL)) == 0, m, n);
-  
   memset(ml, 0, sizeof(ml));
 
   sz = 0;
@@ -1411,11 +1410,8 @@ examine_cavity(int m, int n, int *edge, int *size, int *vertexi, int *vertexj)
     oj = -1;
   }
   
-  cavity_recurse(m, n, ml, &border_color, edge, &sz, vertexi, vertexj, oi, oj);
+  cavity_recurse(m, n, ml, &border_color, edge, oi, oj);
 
-  if (size)
-    *size = sz;
-  
   if (border_color == (BLACK | WHITE))
     return GRAY_BORDER;  
   if (border_color == BLACK)
@@ -1444,8 +1440,6 @@ examine_cavity(int m, int n, int *edge, int *size, int *vertexi, int *vertexj)
  * On (fully-unwound) exit
  *   *border_color should be BLACK, WHITE or BLACK | WHITE
  *   *edge is the count of edge pieces
- *   *size is the count of vertices
- *   (vertexi[], vertexj[]) holds a list of the vertices
  *
  * *border_color should be EMPTY if and only if the board
  * is completely empty or only contains the ignored string.
@@ -1453,24 +1447,17 @@ examine_cavity(int m, int n, int *edge, int *size, int *vertexi, int *vertexj)
 
 static void 
 cavity_recurse(int i, int j, int mx[MAX_BOARD][MAX_BOARD], 
-	       int *border_color, int *edge, int *size,
-	       int *vertexi, int *vertexj,
-	       int ai, int aj)
+	       int *border_color, int *edge, int ai, int aj)
 {
   int k;
   ASSERT2(mx[i][j] == 0, i, j);
 
   mx[i][j] = 1;
 
-  if (vertexi) {
-    vertexi[*size] = i;
-    vertexj[*size] = j;
-  }
-  (*size)++;
   
-  if ((edge)
-      && ((i == 0) || (i == board_size-1) || (j == 0) || (j == board_size-1))
-      && (BOARD(i, j) == EMPTY)) 
+  if (edge
+      && (i == 0 || i == board_size-1 || j == 0 || j == board_size-1)
+      && BOARD(i, j) == EMPTY) 
     (*edge)++;
 
   /* Loop over the four neighbors. */
@@ -1493,8 +1480,7 @@ cavity_recurse(int i, int j, int mx[MAX_BOARD][MAX_BOARD],
       if (!neighbor_empty)
 	*border_color |= BOARD(i+di, j+dj);
       else
-	cavity_recurse(i+di, j+dj, mx, border_color, edge, size,
-		       vertexi, vertexj, ai, aj);
+	cavity_recurse(i+di, j+dj, mx, border_color, edge, ai, aj);
     }
   }
 }

@@ -34,7 +34,6 @@ static void find_neighbor_dragons(void);
 static void add_adjacent_dragons(int a, int b);
 static void add_adjacent_dragon(int a, int b);
 static int dragon_invincible(int m, int n);
-static void dragon_ring(int m, int n, int *i, int *j);
 static int compute_dragon_status(int i, int j);
 static void dragon_eye(int m, int n, struct eye_data[MAX_BOARD][MAX_BOARD]);
 static int compute_escape(int m, int n, int dragon_status_known);
@@ -76,7 +75,6 @@ make_dragons(int color, int stop_before_owl)
       dragon[m][n].effective_size     = worm[m][n].effective_size;
       dragon[m][n].color              = worm[m][n].color;
       dragon[m][n].origin             = worm[m][n].origin;
-      dragon[m][n].lunch              = NO_MOVE;
       dragon[m][n].owl_attack_point   = NO_MOVE;
       dragon[m][n].owl_attack_certain =  1;
       dragon[m][n].owl_defense_point  = NO_MOVE;
@@ -87,11 +85,6 @@ make_dragons(int color, int stop_before_owl)
       dragon[m][n].owl_threat_status  = UNCHECKED;
       dragon[m][n].owl_second_attack_point  = NO_MOVE;
       dragon[m][n].owl_second_defense_point = NO_MOVE;
-      dragon[m][n].escape_route       =  0;
-      dragon[m][n].heyes              =  0;
-      dragon[m][n].heye               = NO_MOVE;
-      dragon[m][n].genus              =  0;
-      dragon[m][n].semeai             =  0;
       half_eye[POS(m, n)].type        =  0;
       
       if (worm[m][n].origin == POS(m, n))
@@ -100,63 +93,7 @@ make_dragons(int color, int stop_before_owl)
 	      m, n, worm[m][n].size);
     }
 
-  /* Amalgamate cavities. 
-   *
-   * Begin by finding the INESSENTIAL strings. These are defined as
-   * surrounded strings which have no life potential unless part of
-   * their surrounding chain can be captured. We give a conservative
-   * definition of inessential: 
-   *  - the genus must be zero 
-   *  - there can no second order liberties
-   *  - there can be no more than two edge liberties
-   *  - if it is removed from the board, the remaining cavity has
-   *    border color the opposite color of the string 
-   *  - it contains at most two edge vertices.
-   *
-   * If we get serious about identifying seki, we might want to add:
-   *
-   *  - if it has fewer than 4 liberties it is tactically dead.
-   *
-   * The last condition is helpful in excluding strings which are
-   * alive in seki.
-   *
-   * An inessential string can be thought of as residing inside the
-   * opponent's eye space. It then makes sense to amalgamate the
-   * surrounding cavities into a single cave (empty dragon) with
-   * bordercolor the opposite of the inessential worm.
-   *
-   * For example, in the following situation:
-   *
-   *   OOOOO
-   *   O.X.O
-   *   OOOOO
-   *
-   * we find two graybordered cavities of size one. The X string is
-   * inessential, so these two cavities are amalgamated into a single cave.
-   */
-
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (BOARD(m, n)
-	  && worm[m][n].origin == POS(m, n)
-	  && worm[m][n].genus == 0
-	  && worm[m][n].liberties2 == 0
-	  && worm[m][n].lunch == NO_MOVE)
-      {
-	int edge;
-	int borigini = -1, boriginj = -1;
-
-	int border_color = examine_cavity(m, n, &edge, NULL, NULL, NULL);
-	if (border_color != GRAY_BORDER && edge < 3) {
-	  dragon_ring(m, n, &borigini, &boriginj);
-	  worm[m][n].inessential = 1;
-	  propagate_worm(m, n);
-	  dragon[borigini][boriginj].color = border_color;
-	}
-      }
-    }
-
-  time_report(2, "  time to make dragons", -1, -1);
+  time_report(2, "  time to initialize dragons", -1, -1);
   make_domains(black_eye, white_eye, 0);
   time_report(2, "  time to make domains", -1, -1);
 
@@ -176,34 +113,34 @@ make_dragons(int color, int stop_before_owl)
 
       if (black_eye[m][n].color == BLACK_BORDER
 	  && black_eye[m][n].origin == POS(m, n)) {
-	if (!worm[m][n].ko
-	   || (black_eye[m][n].esize > 1)) /* Only exclude living kos. */
+	if (!is_ko_point2(m, n)
+	   || black_eye[m][n].esize > 1) /* Only exclude living kos. */
 	  dragon_eye(m, n, black_eye);
 	else {
-	  if (m > 0 && !worm[m-1][n].ko)
+	  if (m > 0 && !is_ko_point2(m-1, n))
 	    black_eye[m][n].dragon = dragon[m-1][n].origin;
-	  else if (m < board_size-1 && !worm[m+1][n].ko)
+	  else if (m < board_size-1 && !is_ko_point2(m+1, n))
 	    black_eye[m][n].dragon = dragon[m+1][n].origin;
-	  else if (n > 0 && !worm[m][n-1].ko)
+	  else if (n > 0 && !is_ko_point2(m, n-1))
 	    black_eye[m][n].dragon = dragon[m][n-1].origin;
-	  else if (n < board_size-1 && !worm[m][n+1].ko)
+	  else if (n < board_size-1 && !is_ko_point2(m, n+1))
 	    black_eye[m][n].dragon = dragon[m][n+1].origin;
 	}
       }
 	  
       if (white_eye[m][n].color == WHITE_BORDER
 	  && white_eye[m][n].origin == POS(m, n)) {
-	if (!worm[m][n].ko
-	    || (white_eye[m][n].esize > 1)) /* Only exclude living kos. */
+	if (!is_ko_point2(m, n)
+	    || white_eye[m][n].esize > 1) /* Only exclude living kos. */
 	  dragon_eye(m, n, white_eye);
 	else {
-	  if (m > 0 && !worm[m-1][n].ko)
+	  if (m > 0 && !is_ko_point2(m-1, n))
 	    white_eye[m][n].dragon = dragon[m-1][n].origin;
-	  else if (m < board_size-1 && !worm[m+1][n].ko)
+	  else if (m < board_size-1 && !is_ko_point2(m+1, n))
 	    white_eye[m][n].dragon = dragon[m+1][n].origin;
-	  else if (n > 0 && !worm[m][n-1].ko)
+	  else if (n > 0 && !is_ko_point2(m, n-1))
 	    white_eye[m][n].dragon = dragon[m][n-1].origin;
-	  else if (n < board_size-1 && !worm[m][n+1].ko)
+	  else if (n < board_size-1 && !is_ko_point2(m, n+1))
 	    white_eye[m][n].dragon = dragon[m][n+1].origin;
 	}
       }
@@ -244,18 +181,14 @@ make_dragons(int color, int stop_before_owl)
       {
 	int origini = I(dragon[m][n].origin);
 	int originj = J(dragon[m][n].origin);
+	int lunch = DRAGON2(origini, originj).lunch;
 
-	if ((dragon[origini][originj].lunch == NO_MOVE)
-	    || (worm[i][j].cutstone
-		> worm[I(dragon[origini][originj].lunch)]
-		      [J(dragon[origini][originj].lunch)].cutstone)
-	    || ((worm[i][j].cutstone 
-		 == worm[I(dragon[origini][originj].lunch)]
-		        [J(dragon[origini][originj].lunch)].cutstone) 
+	if (lunch == NO_MOVE
+	    || worm[i][j].cutstone > worm[I(lunch)][J(lunch)].cutstone
+	    || (worm[i][j].cutstone == worm[I(lunch)][J(lunch)].cutstone
 		&& (worm[i][j].liberties
-		    < worm[I(dragon[origini][originj].lunch)]
-		          [J(dragon[origini][originj].lunch)].liberties))) {
-	  dragon[origini][originj].lunch = worm[i][j].origin;
+		    < worm[I(lunch)][J(lunch)].liberties))) {
+	  DRAGON2(origini, originj).lunch = worm[i][j].origin;
 	  TRACE("at %m setting %m.lunch to %1m (cutstone=%d)\n",
 		m, n, origini, originj,
 		worm[i][j].origin, worm[i][j].cutstone);
@@ -263,13 +196,6 @@ make_dragons(int color, int stop_before_owl)
       }
     }
 
-  /* Propagate lunch to rest of the dragon. */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      dragon[i][j].lunch
-	= dragon[I(dragon[i][j].origin)][J(dragon[i][j].origin)].lunch;
-    }
-  
   time_report(2, "  time to find lunches", -1, -1);
 
   /* In case origins of dragons got moved, put the dragons of eyes aright. */
@@ -382,20 +308,20 @@ make_dragons(int color, int stop_before_owl)
   /* Now we compute the genus. */
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
-      if ((black_eye[i][j].color == BLACK_BORDER) 
-	  && (black_eye[i][j].dragon != NO_MOVE) 
-	  && (black_eye[i][j].origin == POS(i, j))) 
+      if (black_eye[i][j].color == BLACK_BORDER
+	  && black_eye[i][j].dragon != NO_MOVE
+	  && black_eye[i][j].origin == POS(i, j))
       {
 	m = I(black_eye[i][j].dragon);
 	n = J(black_eye[i][j].dragon);
 	gg_assert (BOARD(m, n) == BLACK);
 	TRACE("eye at %m found for dragon at %m--augmenting genus\n",
 	      i, j, m, n);
-	dragon[m][n].genus += (black_eye[i][j].mineye);
-	dragon[m][n].heyes += (black_eye[i][j].maxeye-black_eye[i][j].mineye);
-	if (black_eye[i][j].maxeye - black_eye[i][j].mineye > 0) {
-	  dragon[m][n].heye = black_eye[i][j].attack_point;
-	}
+	DRAGON2(m, n).genus += (black_eye[i][j].mineye);
+	DRAGON2(m, n).heyes += (black_eye[i][j].maxeye
+				- black_eye[i][j].mineye);
+	if (black_eye[i][j].maxeye - black_eye[i][j].mineye > 0)
+	  DRAGON2(m, n).heye = black_eye[i][j].attack_point;
       }
       if ((white_eye[i][j].color == WHITE_BORDER) 
 	  && (white_eye[i][j].dragon != NO_MOVE)
@@ -406,19 +332,14 @@ make_dragons(int color, int stop_before_owl)
 	gg_assert (BOARD(m, n) == WHITE);
 	TRACE("eye at %m found for dragon at %m--augmenting genus\n",
 	      i, j, m, n);
-	dragon[m][n].genus += (white_eye[i][j].mineye);
-	dragon[m][n].heyes += (white_eye[i][j].maxeye-white_eye[i][j].mineye);
+	DRAGON2(m, n).genus += (white_eye[i][j].mineye);
+	DRAGON2(m, n).heyes += (white_eye[i][j].maxeye
+				- white_eye[i][j].mineye);
 	if (white_eye[i][j].maxeye - white_eye[i][j].mineye > 0) {
-	  dragon[m][n].heye = white_eye[i][j].attack_point;
+	  DRAGON2(m, n).heye = white_eye[i][j].attack_point;
 	}
       }
     }
-
-  /* Propagate genus to rest of the dragon. */
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++)
-      dragon[i][j].genus
-	= dragon[I(dragon[i][j].origin)][J(dragon[i][j].origin)].genus;
 
   time_report(2, "  time to compute genus", -1, -1);
 
@@ -427,7 +348,7 @@ make_dragons(int color, int stop_before_owl)
     for (n = 0; n < board_size; n++) 
       if (dragon[m][n].origin == POS(m, n)
 	  && BOARD(m, n) != EMPTY) {
-	dragon[m][n].escape_route = compute_escape(m, n, 0);
+	DRAGON2(m, n).escape_route = compute_escape(m, n, 0);
       }
 
   time_report(2, "  time to compute escape", -1, -1);
@@ -494,7 +415,7 @@ make_dragons(int color, int stop_before_owl)
 
       /* Some dragons can be ignored. But
        * Be extra careful with big dragons. */
-      if (dragon[m][n].escape_route > 25
+      if (DRAGON2(m, n).escape_route > 25
 	  || DRAGON2(m, n).moyo > 20
 	  || (DRAGON2(m, n).moyo > 10
 	      && DRAGON2(m, n).moyo > dragon[m][n].size)) {
@@ -616,7 +537,7 @@ make_dragons(int color, int stop_before_owl)
     int true_genus;
     m = I(dragon2[d].origin);
     n = J(dragon2[d].origin);
-    true_genus = 2 * dragon[m][n].genus + dragon[m][n].heyes;
+    true_genus = 2 * dragon2[d].genus + dragon2[d].heyes;
     /* FIXME: Probably need a better definition of INESSENTIAL dragons.
      *        There are cases where a string is owl insubstantial
      *        yet allowing it to be captured greatly weakens our
@@ -644,7 +565,7 @@ make_dragons(int color, int stop_before_owl)
     else if (true_genus >= 6 || dragon2[d].moyo > 20)
       dragon2[d].safety = STRONGLY_ALIVE;
     else if ((2 * true_genus + dragon2[d].moyo < 8
-	      && DRAGON(d).escape_route < 10)
+	      && dragon2[d].escape_route < 10)
 	     || (dragon[m][n].owl_threat_status == CAN_THREATEN_ATTACK)) {
       if (DRAGON(d).owl_attack_certain)
 	  dragon2[d].safety = WEAKLY_ALIVE;
@@ -762,9 +683,16 @@ initialize_supplementary_dragon_data()
 
   /* Initialize the rest of the dragon2 data. */
   for (d = 0; d < number_of_dragons; d++) {
-    dragon2[d].neighbors = 0;
-    dragon2[d].moyo = -1;
-    dragon2[d].safety = -1;
+    dragon2[d].neighbors    = 0;
+    dragon2[d].moyo         = -1;
+    dragon2[d].safety       = -1;
+    dragon2[d].escape_route = 0;
+    dragon2[d].genus        = 0;
+    dragon2[d].heyes        = 0;
+    dragon2[d].heye         = NO_MOVE;
+    dragon2[d].lunch        = NO_MOVE;
+    dragon2[d].semeai       = 0;
+    dragon2[d].semeai_margin_of_safety = -1;
   }
 
   dragon2_initialized = 1;
@@ -999,9 +927,6 @@ dragon_invincible(int m, int n)
 void 
 show_dragons(void)
 {
-  static const char *cnames[] = 
-    {"(empty)", "white dragon", "black dragon",
-     "gray-bordered cave", "black-bordered cave", "white-bordered cave"};
   static const char *snames[] = 
     {"dead", "alive", "critical", "unknown", "unchecked"};
 
@@ -1053,11 +978,9 @@ show_dragons(void)
 	  if (w->invincible)
 	    gprintf("- is invincible\n");
 	  
-	  if (w->ko == 1)
+	  if (is_ko_point2(m, n))
 	    gprintf("- is a ko stone\n");
 	}
-	else 
-	  gprintf("%m : cavity of size %d\n",m,n,w->size);
       }
     }
 
@@ -1075,9 +998,9 @@ show_dragons(void)
 		  BOARD(m, n)==BLACK ? "B" : "W",
 		  d->size,
 		  d->effective_size,
-		  d->genus,
-		  d->heyes,
-		  d->escape_route,
+		  d2->genus,
+		  d2->heyes,
+		  d2->escape_route,
 		  snames[d->status],
 		  snames[d->matcher_status],
 		  d2->moyo,
@@ -1095,20 +1018,8 @@ show_dragons(void)
 	    gprintf(" %1m", dragon2[d].origin);
 	  }
 	  gprintf("\n");
-	  if (d->lunch != NO_MOVE)
-	    gprintf("... adjacent worm %1m is lunch\n", d->lunch);
-	}
-	else {
-	  gprintf("%m : cave of size %d and border color %s\n",
-		  m,n,
-		  d->size,
-		  cnames[d->color]);
-	  if (d->color == BLACK_BORDER || d->color == WHITE_BORDER) {
-	    if (!worm[m][n].ko)
-	      gprintf("... surrounded by dragon at %1m\n", d->border);
-	    else
-	      gprintf("... is a ko\n");
-	  }
+	  if (d2->lunch != NO_MOVE)
+	    gprintf("... adjacent worm %1m is lunch\n", d2->lunch);
 	}
       }
     }
@@ -1116,55 +1027,6 @@ show_dragons(void)
 
 
   
-/* The function dragon_ring(m, n, *di, *dj) amalgamates every cave
- * adjacent to the worm at (m, n). The amalgamated caves then form a
- * bigger cave ringing the worm at (m, n).
- *
- * The name is historic. Today it is only used for amalgamating caves.
- */
-
-static void
-dragon_ring(int m, int n, int *ddi, int *ddj)
-{
-  int i, j;
-  int dragoni = -1, dragonj = -1;
-  int k;
-
-  ASSERT2(BOARD(m, n) != EMPTY, m, n);
-  DEBUG(DEBUG_DRAGONS, "amalgamate dragons around %m\n", m, n);
-  
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      if (worm[i][j].origin == POS(m, n)) {
-	ASSERT2(BOARD(i, j) != EMPTY, i, j);
-	for (k = 0; k < 4; k++) {
-	  int di = deltai[k];
-	  int dj = deltaj[k];
-	  if (BOARD(i+di, j+dj) == EMPTY) {
-	    if (dragoni == -1) {
-	      dragoni = I(dragon[i+di][j+dj].origin);
-	      dragonj = J(dragon[i+di][j+dj].origin);
-	      ASSERT_ON_BOARD2(dragoni, dragonj);
-	      ASSERT2(BOARD(dragoni, dragonj) == EMPTY, dragoni, dragonj);
-	    }
-	    else if (dragon[i+di][j+dj].origin != POS(dragoni, dragonj)) {
-	      join_dragons(i+di, j+dj, dragoni, dragonj);
-	      dragoni = I(dragon[i+di][j+dj].origin);
-	      dragonj = J(dragon[i+di][j+dj].origin);
-	      ASSERT_ON_BOARD2(dragoni, dragonj);
-	      ASSERT2(BOARD(dragoni, dragonj) == EMPTY, dragoni, dragonj);
-	    }
-	  }
-	}
-      }
-    }
-
-  *ddi = dragoni;   /* (m, n) is an inessential string. */
-  *ddj = dragonj;
-}
-
-
-
 /* 
  * dragon_eye(m, n, *di, *dj) is invoked with (m, n) the origin of an
  * eyespace. It unites all the worms adjacent to non-marginal points of
@@ -1249,6 +1111,7 @@ join_dragons(int ai, int aj, int bi, int bj)
   
   gg_assert(BOARD(i, j) == BOARD(m, n));
   gg_assert(dragon2_initialized == 0);
+  gg_assert(BOARD(i, j) != EMPTY);
 
   if (BOARD(i, j) == EMPTY) {
     /* Joining caves. */
@@ -1279,7 +1142,6 @@ join_dragons(int ai, int aj, int bi, int bj)
   dragon[oi][oj].size  = dragon[m][n].size + dragon[i][j].size;
   dragon[oi][oj].effective_size  = (dragon[m][n].effective_size
 				    + dragon[i][j].effective_size);
-  dragon[oi][oj].genus = dragon[m][n].genus + dragon[i][j].genus;
 
   for (t = 0; t < board_size; t++)
     for (u = 0; u < board_size; u++) {
@@ -1304,7 +1166,8 @@ join_dragons(int ai, int aj, int bi, int bj)
 static int 
 compute_dragon_status(int i, int j)
 {
-  int true_genus = 2*dragon[i][j].genus + dragon[i][j].heyes;
+  int true_genus = 2*DRAGON2(i, j).genus + DRAGON2(i, j).heyes;
+  int lunch = DRAGON2(i, j).lunch;
 
   gg_assert(dragon2_initialized);
   
@@ -1322,28 +1185,28 @@ compute_dragon_status(int i, int j)
       && true_genus < 3)
     return DEAD;
   
-  if (dragon[i][j].lunch != NO_MOVE
+  if (lunch != NO_MOVE
       && true_genus < 3
-      && worm[I(dragon[i][j].lunch)][J(dragon[i][j].lunch)].defend_code != 0
-      && dragon[i][j].escape_route < 5)
+      && worm[I(lunch)][J(lunch)].defend_code != 0
+      && DRAGON2(i, j).escape_route < 5)
     if (true_genus == 2
-	|| worm[I(dragon[i][j].lunch)][J(dragon[i][j].lunch)].size > 2)
+	|| worm[I(lunch)][J(lunch)].size > 2)
       return CRITICAL;
 
-  if (dragon[i][j].lunch != NO_MOVE
+  if (lunch != NO_MOVE
       && true_genus >= 3)
     return ALIVE;
 
-  if (dragon[i][j].lunch == NO_MOVE
-      || worm[I(dragon[i][j].lunch)][J(dragon[i][j].lunch)].cutstone < 2) 
+  if (lunch == NO_MOVE
+      || worm[I(lunch)][J(lunch)].cutstone < 2) 
   {
     if (true_genus < 3
-	&& dragon[i][j].escape_route == 0
+	&& DRAGON2(i, j).escape_route == 0
 	&& DRAGON2(i, j).moyo < 5)
       return DEAD;
 
     if (true_genus == 3
-	&& dragon[i][j].escape_route < 5)
+	&& DRAGON2(i, j).escape_route < 5)
       return CRITICAL;
   }
 
@@ -1548,7 +1411,8 @@ compute_escape(int m, int n, int dragon_status_known)
       goal[i][j] = same_dragon(i, j, m, n);
     }
 
-  compute_escape_influence(goal, BOARD(m, n), escape_value, dragon_status_known);
+  compute_escape_influence(goal, BOARD(m, n), escape_value,
+			   dragon_status_known);
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
@@ -1556,7 +1420,7 @@ compute_escape(int m, int n, int dragon_status_known)
 	if (dragon[i][j].status == ALIVE)
 	  escape_value[i][j] = 6;
 	else if (dragon[i][j].status == UNKNOWN
-		 && (dragon[i][j].escape_route > 5 || DRAGON2(i, j).moyo > 5))
+		 && (DRAGON2(i, j).escape_route > 5 || DRAGON2(i, j).moyo > 5))
 	  escape_value[i][j] = 4;
       }
       else {
@@ -1649,16 +1513,20 @@ void
 report_dragon(int m, int n)
 {
   int i, j, k;
-
+  struct dragon_data *d = &(dragon[m][n]);
+  struct dragon_data2 *d2 = &(dragon2[d->id]);
+  
   if (BOARD(m, n) == EMPTY) {
     gprintf("There is no dragon at %m\n", m, n);
     return;
   }
 
+  ASSERT2(d->id >= 0, m, n);
+
   gprintf("*** dragon at %m:\n", m, n);
   gprintf("color: %s; origin: %1m; size: %d; effective size: %f\n",
-	  (dragon[m][n].color == WHITE) ? "WHITE" : "BLACK",
-	  dragon[m][n].origin, dragon[m][n].size, dragon[m][n].effective_size);
+	  (d->color == WHITE) ? "WHITE" : "BLACK",
+	  d->origin, d->size, d->effective_size);
 
   gprintf("strings:");
   for (i = 0; i < board_size; i++)
@@ -1667,60 +1535,55 @@ report_dragon(int m, int n)
 	  && same_dragon(i, j, m, n))
 	gprintf(" %m", i, j);
 
-  gprintf("\nhalf eyes: %d, ", dragon[m][n].heyes);
-  if (dragon[m][n].heye != NO_MOVE)
-    gprintf("half eye: %1m, ", dragon[m][n].heye);
+  gprintf("\nhalf eyes: %d, ", d2->heyes);
+  if (d2->heye != NO_MOVE)
+    gprintf("half eye: %1m, ", d2->heye);
   else
     gprintf("half eye: NONE,");
 
-  gprintf(" genus %d, escape_route %d,", dragon[m][n].genus,
-	  dragon[m][n].escape_route);
-  if (dragon[m][n].lunch != NO_MOVE)
-    gprintf(" lunch at %1m\n", dragon[m][n].lunch);
+  gprintf(" genus %d, escape_route %d,", d2->genus, d2->escape_route);
+  if (d2->lunch != NO_MOVE)
+    gprintf(" lunch at %1m\n", d2->lunch);
   else
     gprintf(" no lunch\n");
 
   gprintf("dragon status %s, owl status %s, matcher status %s, owl threat status %s\n",
-	  status_to_string(dragon[m][n].status),
-	  status_to_string(dragon[m][n].owl_status),
-	  status_to_string(dragon[m][n].matcher_status),
-	  status_to_string(dragon[m][n].owl_threat_status));
+	  status_to_string(d->status),
+	  status_to_string(d->owl_status),
+	  status_to_string(d->matcher_status),
+	  status_to_string(d->owl_threat_status));
 
-  if (dragon[m][n].owl_attack_point != NO_MOVE)
-    gprintf("owl attack point %1m, ", dragon[m][n].owl_attack_point);
+  if (d->owl_attack_point != NO_MOVE)
+    gprintf("owl attack point %1m, ", d->owl_attack_point);
   else
     gprintf("no owl attack point, ");
 
-  if (dragon[m][n].owl_second_attack_point != NO_MOVE)
-    gprintf("second owl attack point %1m\n", 
-	    dragon[m][n].owl_second_attack_point);
+  if (d->owl_second_attack_point != NO_MOVE)
+    gprintf("second owl attack point %1m\n", d->owl_second_attack_point);
   else
     gprintf("no second owl attack point\n");
 
-  if (dragon[m][n].owl_defense_point != NO_MOVE)
-    gprintf("owl defense point %1m, ", dragon[m][n].owl_defense_point);
+  if (d->owl_defense_point != NO_MOVE)
+    gprintf("owl defense point %1m, ", d->owl_defense_point);
   else
     gprintf("no owl defense point, ");
 
-  if (dragon[m][n].owl_second_defense_point != NO_MOVE)
-    gprintf("second owl defense point %1m\n",
-	    dragon[m][n].owl_second_defense_point);
+  if (d->owl_second_defense_point != NO_MOVE)
+    gprintf("second owl defense point %1m\n", d->owl_second_defense_point);
   else
     gprintf("no second owl defense point\n");
 
-  if (dragon[m][n].semeai)
+  if (d2->semeai)
     gprintf("This dragon is involved in a semeai. Margin of safety %d\n",
-	    dragon[m][n].semeai_margin_of_safety);
+	    d2->semeai_margin_of_safety);
   else
     gprintf("This dragon is not involved in a semeai.\n");
 
-  if (dragon[m][n].id != -1) {
-    gprintf("neighbor dragons: ");
-    for (k = 0; k < DRAGON2(m, n).neighbors; k++)
-      gprintf("%1m ", dragon2[DRAGON2(m, n).adjacent[k]].origin);
-  gprintf("\nmoyo: %d; safety: %d\n",
-	  DRAGON2(m, n).moyo, DRAGON2(m, n).safety);
-  }
+  gprintf("neighbor dragons: ");
+  for (k = 0; k < d2->neighbors; k++)
+    gprintf("%1m ", dragon2[d2->adjacent[k]].origin);
+
+  gprintf("\nmoyo: %d; safety: %d\n", d2->moyo, d2->safety);
 }
 
 

@@ -166,7 +166,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"critical",        1, "(dragon[%ci][%cj].matcher_status == CRITICAL)"},
   {"dead",            1, "(dragon[%ci][%cj].matcher_status == DEAD)"},
   {"status",          1, "dragon[%ci][%cj].matcher_status"},
-  {"ko",              1, "worm[%ci][%cj].ko"},
+  {"ko",              1, "is_ko_point2(%ci,%cj)"},
   {"xdefend_against", 2, "defend_against(%ci,%cj,OTHER_COLOR(color),%ci,%cj)"},
   {"odefend_against", 2, "defend_against(%ci,%cj,color,%ci,%cj)"},
   {"defend_against_atari",1,"defend_against_atari_helper(ti,tj,%ci,%cj)"},

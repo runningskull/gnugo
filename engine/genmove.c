@@ -83,7 +83,6 @@ void
 examine_position(int color, int how_much)
 {
   int save_verbose;
-  int m, n;
 
   /* Position numbers for which various examinations were last made. */
   static int worms_examined = -1;
@@ -153,19 +152,8 @@ examine_position(int color, int how_much)
   
   verbose = save_verbose;
 
-  if (printworms) {
+  if (printworms)
     show_dragons();
-  }
-  else if (verbose) {
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++)
-	if (BOARD(m, n)
-	    && worm[m][n].origin == POS(m, n)
-	    && worm[m][n].cutstone) {
-	  TRACE("%scutting stones found at %m\n",
-		worm[m][n].cutstone==2 ? "potential " : "", m,n); 
-	}
-  }	  
 
   if (NEEDS_UPDATE(initial_influence2_examined))
     compute_initial_influence(color, 1);

@@ -573,7 +573,7 @@ find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)
 		&& is_same_worm(i+1, j-1, m, n))
 	    || (i < board_size-1 && j < board_size-1
 		&& is_same_worm(i+1, j+1, m, n)))
-	  if (worm[i][j].attack_code != 0 && !worm[i][j].ko) {
+	  if (worm[i][j].attack_code != 0 && !is_ko_point2(i, j)) {
 	    /*
 	     * If several adjacent lunches are found, we pick the 
 	     * juiciest. First maximize cutstone, then minimize liberties. 

@@ -275,12 +275,12 @@ decideposition(int color, const char *sgf_output)
     for (n = 0; n < board_size; n++) {
       if ((dragon[m][n].origin != POS(m, n))
 	  || (BOARD(m, n) == EMPTY)
-	  || (dragon[m][n].escape_route >= 6))
+	  || (DRAGON2(m, n).escape_route >= 6))
 	continue;
 
       gprintf("\nanalyzing %m\n", m, n);
       gprintf("status=%s, escape=%d\n", 
-	      snames[dragon[m][n].status], dragon[m][n].escape_route);
+	      snames[dragon[m][n].status], DRAGON2(m, n).escape_route);
       acode = owl_attack(m, n, &i, &j, NULL);
       if (acode) {
 	if (acode == WIN) {

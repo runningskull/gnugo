@@ -49,9 +49,29 @@
 #
 #
 
+package TWOGTP_A;
+
 use IPC::Open2;
 use Getopt::Long;
 use FileHandle;
+use strict;
+
+#following added globally to allow "use strict" :
+my $vertex;
+my $first;
+my $sgfmove;
+my $sgffilename;
+my $pidw;
+my $pidb;
+my $sgffile;
+my $handicap_stones;
+my $resultw;
+my $resultb;
+my @vertices;
+my $second;
+my %game_list;
+#end of "use strict" repairs
+
 
 my $white;
 my $black;
@@ -105,6 +125,7 @@ while ($games > 0) {
     print "black pid: $pidb\n" if $verbose;
     $pidw = open2($white_out, $white_in, $white);
     print "white pid: $pidw\n" if $verbose;
+    
     $sgffile = rename_sgffile($games, $sgffilename) if defined $sgffilename;
 
     if ((defined $sgffilename) && !open(SGFFILEHANDLE, ">$sgffile")) {
@@ -190,11 +211,64 @@ while ($games > 0) {
     print $black_in "quit\n";
     if (defined $sgffilename) {
 	print "sgf file: $sgffile\n";
+	print SGFFILEHANDLE ")";
 	close SGFFILEHANDLE;
+	$game_list{$sgffile} = $resultw . "|" . $resultb
     }
     $games-- if $games > 0;
     print "games remaining: $games\n";
 }
+
+if (defined $sgffilename) {
+  my $index_out  = new FileHandle;
+  open ($index_out, "> " . index_name($sgffilename));
+  print $index_out
+"<HTML><HEAD><TITLE>game results</TITLE></HEAD>
+<BODY><H3>Game Results</H3>
+<H4>White: ".html_encode($white)."</H4>
+<H4>Black: ".html_encode($black)."</H4>
+<TABLE border=1>
+ <TR>
+  <TD>SGF file</TD>
+  <TD>Result</TD>
+ </TR>
+";
+ foreach (sort by_result keys(%game_list)) {
+    print $index_out "<TR><TD><A href=\"$_\">$_</A></TD>" .
+    		"<TD>".html_encode(game_result($_))."</TD></TR>\n";
+  }
+  print $index_out "</TABLE></BODY></HTML>\n";
+}
+
+sub game_result {
+  $_ = shift;
+  $_ = $game_list{$_};
+  #i.e.:  B+13.5 (upper bound: -13.5, lower: -13.5)|B+13.5 (upper bound: -13.5, lower: -13.5)
+  #Make sure that all 4 values are the same.  I've not seen them different yet.
+  #If they are ever different, need to improve the HTML output (now just -999) -
+  # an explanation of the score mismatch problem would be appropriate.	
+  $_ =~ /^.*upper bound..([0-9+.\-]*)..lower..\1.\|.*upper bound..\1..lower..\1./;
+  if (defined($1)) {
+    return $1;
+  } else {
+    return -999;
+  }
+}
+
+sub by_result {
+  game_result($a) <=> game_result($b) || $a cmp $b;
+}
+
+sub html_encode {
+  #print shift;
+  my $r = shift;
+  $r =~ s/&/&amp;/g;
+  $r =~ s/</&lt;/g;
+  $r =~ s/>/&gt;/g;
+  return $r;
+}
+
+
 
 sub eat_no_response {
     my $h = shift;
@@ -212,7 +286,10 @@ sub eat_move {
     my $line = "";
     while ($line eq "") {
 	chop($line = <$h>) or die "No response!";
+#	$line =~ s/\s*$//m; #chop doesn't work nicely w/ WINDOWS CR-LF combo.
+#	print "L:$line:L\n";
     }
+#    print "LINE: $line\n";
     $line =~ s/\s*$//;
     my ($equals, $move) = split(' ', $line, 2);
     $line = <$h>;
@@ -269,8 +346,14 @@ sub rename_sgffile {
     my $nogames = int shift(@_);
     $_ = shift(@_);
     s/\.sgf$//;
-    return "$_.sgf" if ($nogames == 1);
-    return "$_$nogames.sgf";
+    # Annoying to loose _001 on game #1 in multi-game set.
+    # Could record as an additional parameter.
+    # return "$_.sgf" if ($nogames == 1);
+    return sprintf("$_" . "_%03d.sgf", $nogames);
 }
 
-
+sub index_name {
+  $_ = shift;
+  s/\.sgf$//;
+  return $_ . "_index.html";
+}

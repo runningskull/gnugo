@@ -1752,6 +1752,37 @@ is_ko(int pos, int color, int *ko_pos)
 }
 
 
+/* Return true if pos is either a stone, which if captured would give
+ * ko, or if pos is an empty intersection adjacent to a ko stone.
+ */
+int
+is_ko_point(int pos)
+{
+  ASSERT_ON_BOARD1(pos);
+
+  if (!strings_initialized)
+    init_board();
+  
+  if (board[pos] == EMPTY) {
+    int color;
+    if (ON_BOARD(SOUTH(pos)))
+      color = board[SOUTH(pos)];
+    else
+      color = board[NORTH(pos)];
+    if (color != EMPTY && is_ko(pos, OTHER_COLOR(color), NULL))
+      return 1;
+  }
+  else {
+    struct string_data *s = &string[string_number[pos]];
+    if (s->liberties == 1 && s->size == 1
+	&& is_ko(s->libs[0], OTHER_COLOR(s->color), NULL))
+      return 1;
+  }
+
+  return 0;
+}
+
+
 /* Returns 1 if at least one string is captured when color plays at pos.
  */
 int

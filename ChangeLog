@@ -2,6 +2,24 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+- new function is_ko_point() in board.c
+- computation of cavities removed from worm.c
+- computation of caves removed from dragon.c
+- computation of inessential worms moved from make_dragons() to make_worms()
+- computation of ko points removed from make_worms()
+- printing of cutting stones removed from genmove.c
+- examine_cavity() simplified and made static
+- cavity_recurse() simplified
+- ko field removed from worm_data struct
+- border field removed from dragon_data struct
+- several fields moved from struct dragon_data to struct dragon_data2
+- false_margin field eliminated from struct eye_data
+- cleanup of sgf code
+- twogtp-a writes html
+- tuning
+- owl tuning
+- one new test case in reading.tst
+
 3.1.7 released September 24, 2001
 
 - heye[] is now stored as a 1-dimensional array

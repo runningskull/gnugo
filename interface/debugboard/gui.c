@@ -122,8 +122,6 @@ display_worm(Position *pos, int i, int j)
   wmove(info_window, 8, 49);
   gg_wprintw(info_window, "                          ");
   wmove(info_window, 8, 49);
-  if (worm[i][j].ko)
-    gg_wprintw(info_window, "ko ");
   if (worm[i][j].inessential)
     gg_wprintw(info_window, "inessential ");
   if (worm[i][j].invincible)
@@ -181,84 +179,80 @@ prepare_dragons_tab()
 void
 display_dragon(int i, int j)
 {
+  struct dragon_data *d = &dragon[i][j];
+  struct dragon_data2 *d2 = &(dragon2[d->id]);
   wmove(info_window, 1, 2);
   gg_wprintw(info_window, "%3s: %5s dragon ",
-	     location_to_string2(i, j),
-	     color_to_string(dragon[i][j].color));
+	     location_to_string2(i, j), color_to_string(d->color));
   gg_wprintw(info_window, "(origin %s)  id %d   ",
-	     location_to_string(dragon[i][j].origin),
-	     dragon[i][j].id);
+	     location_to_string(d->origin), d->id);
 
   wmove(info_window, 3, 16);
-  gg_wprintw(info_window, "%3d  %5.3f ",
-	     dragon[i][j].size, dragon[i][j].effective_size);
+  gg_wprintw(info_window, "%3d  %5.3f ", d->size, d->effective_size);
 
   wmove(info_window, 8, 18);
-  gg_wprintw(info_window, "%d  ", dragon[i][j].heyes);
+  gg_wprintw(info_window, "%d  ", d2->heyes);
   wmove(info_window, 8, 21);
-  if (dragon[i][j].heyes > 0)
-    gg_wprintw(info_window, "[%s] ", 
-	       location_to_string(dragon[i][j].heye));
+  if (d2->heyes > 0)
+    gg_wprintw(info_window, "[%s] ", location_to_string(d2->heye));
   else
     gg_wprintw(info_window, "[---]");
 
   wmove(info_window, 9, 18);
-  gg_wprintw(info_window, "%d  ", dragon[i][j].genus);
+  gg_wprintw(info_window, "%d  ", d2->genus);
   wmove(info_window, 10, 18);
-  gg_wprintw(info_window, "%d  ", dragon[i][j].escape_route);
+  gg_wprintw(info_window, "%d  ", d2->escape_route);
   wmove(info_window, 11, 18);
-  if (dragon[i][j].lunch == NO_MOVE)
+  if (d2->lunch == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
-    gg_wprintw(info_window, "%3s", 
-	       location_to_string(dragon[i][j].lunch));
+    gg_wprintw(info_window, "%3s", location_to_string(d2->lunch));
 
   wmove(info_window, 3, 55);
-  gg_wprintw(info_window, "%s     ", status_to_string(dragon[i][j].status));
+  gg_wprintw(info_window, "%s     ", status_to_string(d->status));
 
   wmove(info_window, 4, 55);
-  gg_wprintw(info_window, "%-12s", status_to_string(dragon[i][j].owl_status));
-  if (dragon[i][j].owl_attack_point == NO_MOVE)
+  gg_wprintw(info_window, "%-12s", status_to_string(d->owl_status));
+  if (d->owl_attack_point == NO_MOVE)
     gg_wprintw(info_window, "[---] ");
   else
-    gg_wprintw(info_window, "[%3s] ", 
-	       location_to_string(dragon[i][j].owl_attack_point));
-  if (dragon[i][j].owl_defense_point == NO_MOVE)
+    gg_wprintw(info_window, "[%3s] ",
+	       location_to_string(d->owl_attack_point));
+  if (d->owl_defense_point == NO_MOVE)
     gg_wprintw(info_window, "[---] ");
   else
-    gg_wprintw(info_window, "[%3s] ", 
-	       location_to_string(dragon[i][j].owl_defense_point));
+    gg_wprintw(info_window, "[%3s] ",
+	       location_to_string(d->owl_defense_point));
 
   wmove(info_window, 5, 55);
-  switch (dragon[i][j].owl_threat_status) {
+  switch (d->owl_threat_status) {
   case UNCHECKED:
     gg_wprintw(info_window, "unchecked   [---] [---]");
     break;
   case CAN_THREATEN_ATTACK:
     gg_wprintw(info_window, "att. threat [%3s] [---]",
-	       location_to_string(dragon[i][j].owl_second_attack_point));
+	       location_to_string(d->owl_second_attack_point));
     break;
   case CAN_THREATEN_DEFENSE:
     gg_wprintw(info_window, "def. threat [---] [%3s]",
-	       location_to_string(dragon[i][j].owl_second_defense_point));
+	       location_to_string(d->owl_second_defense_point));
     break;
   default:
-    gg_wprintw(info_window, "Error: %3d  [---] [---]",
-	       dragon[i][j].owl_threat_status);
+    gg_wprintw(info_window, "Error: %3d  [---] [---]", d->owl_threat_status);
     break;
   }
 
   wmove(info_window, 6, 55);
-  gg_wprintw(info_window, "%s     ", status_to_string(dragon[i][j].matcher_status));
+  gg_wprintw(info_window, "%s     ", status_to_string(d->matcher_status));
 
   wmove(info_window, 8, 55);
   wmove(info_window, 9, 55);
-  gg_wprintw(info_window, "%s     ", status_to_string(DRAGON2(i, j).safety));
+  gg_wprintw(info_window, "%s     ", status_to_string(d2->safety));
   wmove(info_window, 10, 55);
-  gg_wprintw(info_window, "%d  ", dragon[i][j].semeai);
+  gg_wprintw(info_window, "%d  ", d2->semeai);
 
   wmove(info_window, 11, 55);
-  gg_wprintw(info_window, "%d  ", dragon[i][j].semeai_margin_of_safety);
+  gg_wprintw(info_window, "%d  ", d2->semeai_margin_of_safety);
 
   wrefresh(info_window);
 }
@@ -291,8 +285,6 @@ prepare_eyes_tab()
   gg_wprintw(info_window, "type:           ");
   wmove(info_window, 12, 2);
   gg_wprintw(info_window, "marginal:       ");
-  wmove(info_window, 13, 2);
-  gg_wprintw(info_window, "false margin:   ");
 
   wmove(info_window, 4, 36);
   gg_wprintw(info_window, "max eyes:        ");
@@ -347,8 +339,6 @@ display_eye(int color, struct eye_data eyedata[MAX_BOARD][MAX_BOARD],
   gg_wprintw(info_window, "%d  ", eyedata[i][j].type);
   wmove(info_window, 12, 18);
   gg_wprintw(info_window, "%d  ", eyedata[i][j].marginal);
-  wmove(info_window, 13, 18);
-  gg_wprintw(info_window, "%d  ", eyedata[i][j].false_margin);
 
   wmove(info_window, 4, 55);
   gg_wprintw(info_window, "%d ", eyedata[i][j].maxeye);

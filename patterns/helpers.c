@@ -78,9 +78,9 @@ basic_cut_helper (ARGS)
   /* If c is a ko stone, assume that we would lose the ko. */
   if (worm[ci][cj].attack_code != 0
       && (ccolor == color
-	  || !worm[ci][cj].ko))
+	  || is_ko_point2(ci, cj)))
     return 0;
-  if (worm[ti][tj].ko)
+  if (is_ko_point2(ti, tj))
     return 0;
 
   if (TRYMOVE(ti, tj, ccolor)) {
@@ -259,19 +259,14 @@ throw_in_atari_helper(ARGS)
 int
 not_lunch_helper(int ai, int aj, int bi, int bj)
 {
-  int m, n;
-
   if (worm[ai][aj].size > 2)
     return 0;
 
   /* Tell the move generation code about the change in status. */
   remove_lunch(bi, bj, ai, aj);
   
-  if (dragon[bi][bj].lunch == POS(ai, aj))
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++)
-	if (dragon[m][n].origin == dragon[bi][bj].origin)
-	  dragon[m][n].lunch = NO_MOVE;
+  if (DRAGON2(bi, bj).lunch == POS(ai, aj))
+    DRAGON2(bi, bj).lunch = NO_MOVE;
 
   return 0;
 }

@@ -3269,38 +3269,48 @@ abc?
 
 
 Pattern D1126
+# gf Revised constraint and added B classification. (3.1.8)
 
 OX.      cut to capture something
 X*.
 ..?
 
-:8,-,value(82)
+:8,B,value(82)
 
-OB.
+cB.
 A*.
 b.?
 
-; oplay_attack(*,A) && oplay_attack(*,b,B)
+;lib(c)>1 && oplay_attack(*,A) && oplay_attack(*,b,B)
 
 
 Pattern D1127
+# gf Added constraint and B classification. (3.1.8)
 
 .O.        atari!       
 X*X
 OX.
 oO?
 
-:8,-,value(35)
+:8,B,value(35)
+
+.O.
+X*X
+aX.
+oO?
+
+;lib(a)>1
 
 
 Pattern D1128
+# gf Added B classification. (3.1.8)
 
 ...o       set up multiple ataris
 ...O
 .*XO
 ?XO?
 
-:8,-,value(45)
+:8,B,value(45)
 
 
 Pattern D1129

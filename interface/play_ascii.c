@@ -924,7 +924,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    /* discard newline */
 	    tmpstring[strlen(tmpstring)-1] = 0;
 	    sgf_write_header(sgftree.root, 1, gameinfo->seed, 
-			     gameinfo->position.komi);
+			     gameinfo->position.komi, level);
 	    writesgf(sgftree.root, tmpstring);
 	    sgf_initialized = 0;
 	    printf("You may resume the game");
@@ -1000,7 +1000,7 @@ Type \"save <filename>\" to save,\n\
 	  /* discard newline */
 	  tmpstring[strlen(tmpstring)-1] = 0;
 	  sgf_write_header(sgftree.root, 1, gameinfo->seed, 
-			   gameinfo->position.komi);
+			   gameinfo->position.komi, level);
 	  writesgf(sgftree.root, tmpstring);
 	    sgf_initialized = 0;
 	}

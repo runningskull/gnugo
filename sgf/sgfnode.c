@@ -32,7 +32,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "liberty.h"
 
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -907,7 +906,7 @@ gametreefuseki(SGFNode **p, SGFNode *parent, int mode,
       }
       nexttoken();
     }
-
+  
   /* The head is parsed */
   {
 
@@ -915,23 +914,23 @@ gametreefuseki(SGFNode **p, SGFNode *parent, int mode,
     SGFNode *last;
     head->parent = parent;
     *p = head;
-
+    
     last = sequence(head);
     p = &last->child;
     while (lookahead == '(') {
-    	if (last->props 
-	    && (last->props->name == SGFB || last->props->name == SGFW))
-    		i++;
-	  /* break after number_of_moves moves in SGF file */
-    	if (i >= moves_per_game) { 
-    		last->child = NULL;
-    		last->next = NULL;
-       		break;
-    	}
-    	else {
-		gametreefuseki(p, last->parent, mode, moves_per_game, i);
-      		p = &((*p)->next);
-      	}
+      if (last->props 
+	  && (last->props->name == SGFB || last->props->name == SGFW))
+	i++;
+      /* break after number_of_moves moves in SGF file */
+      if (i >= moves_per_game) { 
+	last->child = NULL;
+	last->next = NULL;
+	break;
+      }
+      else {
+	gametreefuseki(p, last->parent, mode, moves_per_game, i);
+	p = &((*p)->next);
+      }
     }
     if (mode == STRICT_SGF)
       match(')');
@@ -1339,7 +1338,7 @@ unparse_game(FILE *file, SGFNode *node, int root)
 }
 
 void
-sgf_write_header(SGFNode *root, int overwrite, int seed, float komi)
+sgf_write_header(SGFNode *root, int overwrite, int seed, float komi, int level)
 {
   time_t curtime = time(NULL);
   struct tm *loctime = localtime(&curtime);

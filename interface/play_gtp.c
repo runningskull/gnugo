@@ -1880,7 +1880,6 @@ gtp_move_influence(char *s, int id)
  * cutstone        2
  * cutstone2       0
  * genus           0
- * ko              0
  * inessential     0
  * B19:
  * color           white
@@ -1916,20 +1915,23 @@ gtp_worm_data(char *s, int id)
 	gtp_mprintf("color           %C\n",  w->color);
 	gtp_printf("size            %d\n",   w->size);
 	gtp_printf("effective_size  %.2f\n", w->effective_size);
-	gtp_mprintf("origin          %1m\n", w->origin);
+	gtp_mprintf("origin          %m\n", 
+		    I(w->origin), J(w->origin));
 	gtp_printf("liberties       %d\n",   w->liberties);
 	gtp_printf("liberties2      %d\n",   w->liberties2);
 	gtp_printf("liberties3      %d\n",   w->liberties3);
 	gtp_printf("liberties4      %d\n",   w->liberties4);
-	gtp_mprintf("attack_point   %1m\n",  w->attack_point);
+	gtp_mprintf("attack_point    %m\n",  
+		    I(w->attack_point), J(w->attack_point));
 	gtp_printf("attack_code     %d\n",   w->attack_code);
-	gtp_mprintf("lunch          %1m\n",  w->lunch);
-	gtp_mprintf("defense_point  %1m\n",  w->defense_point);
+	gtp_mprintf("lunch           %m\n",  
+		    I(w->lunch), J(w->lunch));
+	gtp_mprintf("defense_point   %m\n",  
+		    I(w->defense_point), J(w->defense_point));
 	gtp_printf("defend_code     %d\n",   w->defend_code);
 	gtp_printf("cutstone        %d\n",   w->cutstone);
 	gtp_printf("cutstone2       %d\n",   w->cutstone2);
 	gtp_printf("genus           %d\n",   w->genus);
-	gtp_printf("ko              %d\n",   w->ko);
 	gtp_printf("inessential     %d\n",   w->inessential);
       }
   
@@ -1982,19 +1984,28 @@ gtp_dragon_data(char *s, int id)
       if (i == -1 || (m == i && n == j)) {
 	int k;
 	struct dragon_data *d = &dragon[m][n];
+	struct dragon_data2 *d2 = &(dragon2[d->id]);
 	gtp_print_vertex(m, n);
 	gtp_printf(":\n");
 	gtp_printf("color                   %s\n",   
 		   color_to_string(d->color));
-	gtp_mprintf("origin                  %1m\n", d->origin);
-	gtp_mprintf("border                  %1m\n", d->border);
+	gtp_mprintf("origin                  %m\n", 
+		    I(d->origin), J(d->origin));
 	gtp_printf("size                    %d\n",   d->size);
 	gtp_printf("effective_size          %.2f\n", d->effective_size);
-	gtp_printf("heyes                   %d\n",   d->heyes);
-	gtp_mprintf("heye                    %1m\n", d->heye);
-	gtp_printf("genus                   %d\n",   d->genus);
-	gtp_printf("escape_route            %d\n",   d->escape_route);
-	gtp_mprintf("lunch                   %1m\n", d->lunch);
+	gtp_printf("heyes                   %d\n",   d2->heyes);
+	gtp_mprintf("heye                    %m\n", 
+		    I(d2->heye), J(d2->heye));
+	gtp_printf("genus                   %d\n",   d2->genus);
+	gtp_printf("escape_route            %d\n",   d2->escape_route);
+	/* We would like to use the %1m format used in gprintf
+	 * but this is not implemented in gtp_mprintf. Moreover adding this
+	 * format would entail including liberty.h in gtp.c, which we
+	 * don't want to do in order to maintain independence of the
+	 * GNU Go internals. Therefore we use the I and J macros here.
+	 */
+	gtp_mprintf("lunch                   %m\n", 
+		    I(d2->lunch), J(d2->lunch));
 	gtp_printf("status                  %s\n",   
 		   status_to_string(d->status));
 	gtp_printf("owl_status              %s\n",   
@@ -2003,23 +2014,29 @@ gtp_dragon_data(char *s, int id)
 		   status_to_string(d->matcher_status));
 	gtp_printf("owl_threat_status       %s\n",   
 		   status_to_string(d->owl_threat_status));
-	gtp_mprintf("owl_attack              %1m\n", d->owl_attack_point);
+	gtp_mprintf("owl_attack              %m\n", 
+		    I(d->owl_attack_point), J(d->owl_attack_point));
 	gtp_printf("owl_attack_certain:     %s\n",   
 		   (d->owl_attack_certain) ? "YES" : "NO");
-	gtp_mprintf("owl_2nd_attack          %1m\n", d->owl_second_attack_point);
-	gtp_mprintf("owl_defend              %1m\n", d->owl_defense_point);
+	gtp_mprintf("owl_2nd_attack          %m\n", 
+		    I(d->owl_second_attack_point), 
+		    J(d->owl_second_attack_point));
+	gtp_mprintf("owl_defend              %m\n", 
+		    I(d->owl_defense_point), J(d->owl_defense_point));
 	gtp_printf("owl_defend_certain:     %s\n",   
 		   (d->owl_defend_certain) ? "YES" : "NO");
-	gtp_mprintf("owl_2nd_defend          %1m\n", 
-		    d->owl_second_defense_point);
+	gtp_mprintf("owl_2nd_defend          %m\n", 
+		    I(d->owl_second_defense_point), 
+		    J(d->owl_second_defense_point));
 	gtp_printf("semeai                  %d\n",   
-		   d->semeai);
+		   d2->semeai);
 	gtp_printf("semeai_margin_of_safety %d\n",   
-		   d->semeai_margin_of_safety);
+		   d2->semeai_margin_of_safety);
 	gtp_printf("neighbors:              ");
 	for (k = 0; k < DRAGON2(m, n).neighbors; k++)
-	  gtp_mprintf("%1m ", 
-		      DRAGON(DRAGON2(m, n).adjacent[k]).origin);
+	  gtp_mprintf("%m ", 
+		      I(DRAGON(DRAGON2(m, n).adjacent[k]).origin),
+		      J(DRAGON(DRAGON2(m, n).adjacent[k]).origin));
 	gtp_printf("\n");
 	gtp_printf("moyo:                   %d\n", DRAGON2(m, n).moyo);
 	gtp_printf("safety:                 %s\n", 

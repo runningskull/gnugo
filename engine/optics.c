@@ -69,11 +69,10 @@
 #define MAXEYE 20
 
 static void
-compute_primary_domains(int color, 
-			int domain[MAX_BOARD][MAX_BOARD],
-			struct eye_data color_eye[MAX_BOARD][MAX_BOARD],
-			struct eye_data other_eye[MAX_BOARD][MAX_BOARD],
-			int lively[MAX_BOARD][MAX_BOARD], int first_time);
+compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
+			int lively[MAX_BOARD][MAX_BOARD], 
+			int false_margins[MAX_BOARD][MAX_BOARD],
+			int first_time);
 static void count_neighbours(struct eye_data eyedata[MAX_BOARD][MAX_BOARD]);
 static int is_lively(int owl_call, int i, int j);
 static int has_inf(int color, int i, int j, int domain[MAX_BOARD][MAX_BOARD],
@@ -124,7 +123,6 @@ clear_eye(struct eye_data *eye)
   eye->defense_point = NO_MOVE;
   eye->dragon = NO_MOVE;
   eye->marginal = 0;
-  eye->false_margin = 0;
   eye->type = 0;
   eye->neighbors = 0;
   eye->marginal_neighbors = 0;
@@ -145,9 +143,11 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
 {
   int i, j;
   int lively[MAX_BOARD][MAX_BOARD];
+  int false_margins[MAX_BOARD][MAX_BOARD];
   
   memset(black_domain, 0, sizeof(black_domain));
   memset(white_domain, 0, sizeof(white_domain));
+  memset(false_margins, 0, sizeof(false_margins));
 
   /* Initialize eye data and compute the lively array. */
   for (i = 0; i < board_size; i++)
@@ -158,8 +158,8 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
     }
 
   /* Compute the domains of influence of each color. */
-  compute_primary_domains(BLACK, black_domain, b_eye, w_eye, lively, 1);
-  compute_primary_domains(WHITE, white_domain, w_eye, b_eye, lively, 0);
+  compute_primary_domains(BLACK, black_domain, lively, false_margins, 1);
+  compute_primary_domains(WHITE, white_domain, lively, false_margins, 0);
 
   /* Now we fill out the arrays b_eye and w_eye with data describing
    * each eye shape.
@@ -334,11 +334,10 @@ make_domains(struct eye_data b_eye[MAX_BOARD][MAX_BOARD],
  */
 
 static void
-compute_primary_domains(int color, 
-			int domain[MAX_BOARD][MAX_BOARD],
-			struct eye_data color_eye[MAX_BOARD][MAX_BOARD],
-			struct eye_data other_eye[MAX_BOARD][MAX_BOARD],
-			int lively[MAX_BOARD][MAX_BOARD], int first_time)
+compute_primary_domains(int color, int domain[MAX_BOARD][MAX_BOARD],
+			int lively[MAX_BOARD][MAX_BOARD],
+			int false_margins[MAX_BOARD][MAX_BOARD],
+			int first_time)
 {
   int other = OTHER_COLOR(color);
   int found_one;
@@ -375,19 +374,17 @@ compute_primary_domains(int color,
 	   */
 	  if (first_time) {
 	    if (BOARD(i, j) == EMPTY && false_margin(i, j, color, lively))
-	      color_eye[i][j].false_margin = 1;
+	      false_margins[i][j] = 1;
 	    else if (BOARD(i, j) == EMPTY
 		     && false_margin(i, j, other, lively))
-	      other_eye[i][j].false_margin = 1;
+	      false_margins[i][j] = 1;
 	    else {
 	      domain[i][j] = 1;
 	      found_one = 1;
 	    }
 	  }
 	  else {
-	    if (BOARD(i, j) != EMPTY
-		|| (color_eye[i][j].false_margin != 1
-		    && other_eye[i][j].false_margin != 1)) {
+	    if (BOARD(i, j) != EMPTY || false_margins[i][j] != 1) {
 	      found_one = 1;
 	      domain[i][j] = 1;
 	    }
