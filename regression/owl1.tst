@@ -208,6 +208,10 @@ loadsgf games/nngs/qly-gnugo-3.3.18-200305022134.sgf 72
 312 owl_defend K6
 #? [1 C3]*
 
+loadsgf games/owl45.sgf
+313 owl_attack B18
+#? [1 (A18|C19)]
+
 
 # See also ld_owl:12
 loadsgf games/life_and_death/ld3.sgf
