@@ -473,6 +473,10 @@ loadsgf games/verybad.sgf 118
 129 analyze_semeai Q16 Q17
 #? [3 3 (Q19|S17|T17)]
 
+loadsgf games/owl54.sgf
+130 analyze_semeai D3 G2
+#? [0 0 PASS]
+
 ########### semeai gen_move tests #################
 
 # A6 gives an unfavorable ko while F10 gives seki.

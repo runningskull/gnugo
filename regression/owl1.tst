@@ -384,6 +384,21 @@ loadsgf games/owl53.sgf
 353 owl_attack G6
 #? [0]
 
+loadsgf games/scoring/score14.sgf
+354 owl_defend Q13
+#? [0]
+
+# See also olympiad2004:123.
+loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
+355 owl_attack Q3
+#? [1 K3|L3|L1|J2]
+356 owl_defend Q3
+#? [1 L3]
+
+loadsgf games/owl54.sgf
+357 owl_defend D3
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

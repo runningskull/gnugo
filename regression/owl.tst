@@ -276,12 +276,12 @@ loadsgf games/incident263.sgf 116
 # R18 is refuted by S17
 loadsgf games/incident263.sgf 302
 73 owl_defend S14
-#? [1 R17|S18]
+#? [1 (R17|S18|T14)]
 
 # incident 266
 loadsgf games/incident263.sgf 304
 74 owl_defend S14
-#? [1 R18|S18]
+#? [1 (R18|S18|T14|R17)]
 
 # incident 268
 loadsgf games/incident267.sgf 54

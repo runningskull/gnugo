@@ -123,6 +123,7 @@ loadsgf games/nngs/gnugo-3.5.2gf1-kisome-200312131322.sgf 22
 ##240 reg_genmove black
 ##? [G9]*
 
+# See also reading:207-216.
 loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312161910.sgf 52
 250 reg_genmove black
 #? [A2|C1|C2]

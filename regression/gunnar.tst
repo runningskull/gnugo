@@ -338,6 +338,16 @@ loadsgf games/gunnar/gunnar18.sgf
 59 reg_genmove black
 #? [P13]
 
+# R10 is clearly bigger than R11.
+loadsgf games/gunnar/gunnar19.sgf
+60 restricted_genmove white R10 R11
+#? [R10]
+
+# Major endgame tesuji.
+loadsgf games/gunnar/gunnar20.sgf
+61 genmove black
+#? [D8]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

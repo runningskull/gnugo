@@ -189,6 +189,11 @@ play black A2
 68 owl_attack C4
 #? [1 B1]
 
+# Clean capture, no ko.
+loadsgf games/life_and_death/ld13.sgf
+69 owl_attack R16
+#? [1 (T16|T18)]
+
 loadsgf games/life_and_death/lunches.sgf
 101 dragon_status A17
 #? [dead]

@@ -215,6 +215,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 202
 
 # We are ahead. Even if owl misreads, the thrashing dragon
 # suppression should generate a move at L3 or K3.
+# See also owl1:355,356.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
 123 reg_genmove white
 #? [K3|L3|L1]
