@@ -1,0 +1,44 @@
+(;GM[1]FF[4]
+SZ[19]HA[9]KM[0.5]
+PW[halti]WR[4k*]
+PB[GnuGo (GNU Go 3.3.17)]BR[10k*]
+PC[NNGS]DT[2003-03-16]AP[gnugoclient:2.0]
+RE[W+12.5]
+AB[dd][jd][pd][dj][jj][pj][dp][jp][pp]
+;W[nc];B[pf];W[fd];B[df];W[jf];B[ec];W[fc];B[ie];W[gg];B[fi];W[if]
+;B[hj];W[mf];B[ph];W[nq];B[oq];W[np];B[pn];W[mm];B[lq];W[pl];B[km]
+;W[om];B[gq];W[cp];B[co];W[bo];B[cq];W[bp];B[cn];W[dq];B[dr];W[eq]
+;B[bq];W[ep];B[er];W[do];B[bn];W[gp];B[em];W[hq];B[ir];W[gr];B[hp]
+;W[fr];B[ap];W[ao];B[hr];W[iq];B[ip];W[fq];B[br];W[fo];B[en];W[ho]
+;B[cs];W[jq];B[jr];W[kq];B[kr];W[kp];B[mr];W[nr];B[or];W[jo];B[ns]
+;W[eg];B[dg];W[eh];B[hc];W[lc];B[ge];W[fe];B[ld];W[md];B[kc];W[le]
+;B[kd];W[lb];B[gb];W[fb];B[ib];W[cc];B[eb];W[be];B[cd];W[bd];B[dh]
+;W[bg];B[hh];W[gf];B[mo];W[lp];B[mp];W[mq];B[lr];W[no];B[lo];W[on]
+;B[qk];W[kn];B[pb];W[ei];B[ej];W[di];B[ci];W[ch];B[bi];W[fa];B[ql]
+;W[he];B[ha];W[id];B[ic];W[je];B[kb];W[kl];B[jm];W[lm];B[hm];W[qm]
+;B[pm];W[po];B[qn];W[qo];B[rm];W[rn];B[qr];W[qm];B[an];W[aq];B[ar]
+;W[ja];B[ka];W[gm];B[gn];W[fn];B[fm];W[gl];B[hn];W[dn];B[dm];W[cm]
+;B[ap];W[dp];B[bm];W[cl];B[bl];W[dl];B[el];W[ek];B[ck];W[hl];B[il]
+;W[qc];B[pc];W[qe];B[pe];W[rf];B[qd];W[qi];B[pi];W[rd];B[rh];W[rg]
+;B[ri];W[rb];B[qb];W[rc];B[sg];W[ra];B[mi];W[kj];B[ki];W[ji];B[lj]
+;W[kk];B[jk];W[kh];B[li];W[jh];B[in];W[io];B[sl];W[qg];B[pg];W[qh]
+;B[rj];W[qj];B[pk];W[sn];B[ll];W[rq];B[mk];W[rr];B[qq];W[ps];B[qs]
+;W[qp];B[bh];W[cg];B[nl];W[os];B[pr];W[os];B[ms];W[op];B[hs];W[rs]
+;B[ol];W[pm];B[ag];W[af];B[nb];W[mc];B[ah];W[bb];B[gd];W[gc];B[hd]
+;W[jb];B[ie];W[hf];B[ga];W[fj];B[fh];W[ef];B[mg];W[lg];B[ng];W[hi]
+;B[ii];W[gi];B[gh];W[gj];B[ih];W[pq];B[lh];W[kg];B[ps];W[os];B[sh]
+;W[sf];B[nm];W[nn];B[ml];W[jn];B[jl];W[de];B[qf];W[re];B[sm];W[go]
+;B[im];W[eo];B[dk];W[nf];B[of];W[ig];B[ke];W[kf];B[oc];W[la];B[id]
+;W[qa];B[oe];W[ne];B[fg];W[ff];B[ij];W[es];B[pa];W[na];B[oa];W[ma]
+;B[aq];W[fs];B[ds];W[nd];B[gs];W[mb];B[ob];W[hg];B[od];W[];B[]
+C[final_score: W+12.5
+K19 removed
+E18 removed
+C16 removed
+D14 removed
+G11 removed
+L10 removed
+E9 removed
+G8 removed
+M5 removed]
+)
