@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in hashdata_init macro
 - caching enabled for unbranched owl nodes
 - comments added explaining heap in readconnect.c
 - provide links to html regression views from regress.sh

@@ -114,7 +114,7 @@ char *hashdata_to_string(Hash_data *hashdata);
    } while (0)
 #define hashdata_init(hd, uint1, uint2) \
    do { \
-    (hd).hashval[0] = ((uint1) << 32 | (uint2)); \
+    (hd).hashval[0] = (((Hashvalue) uint1) << 32 | (uint2)); \
    } while (0)
 
 #define hashdata_is_equal(hd1, hd2) \
