@@ -2852,4 +2852,22 @@ dab
 >non_oterritory(e);
 
 
+Pattern Nonterritory41
+# gf New pattern. (3.3.13)
+
+?oOo
+X..O
+..X?
+
+:8,t
+
+?oOo
+XabO
+.cX?
+
+;oplay_attack(a,b,b)
+
+>non_xterritory(c);
+
+
 # END OF FILE
