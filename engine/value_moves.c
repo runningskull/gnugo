@@ -567,7 +567,7 @@ induce_secondary_move_reasons(int color)
 	      if (attack_move
 		  && board[adj1] != board[aa]
 		  && !disconnect(adj1, adj2, NULL)) {
-		DEBUG(DEBUG_MOVE_REASONS,
+		TRACE_MOVE_REASONS(
 		      "Connection move at %1m induced for %1m/%1m due to attack of %1m\n",
 		      pos, adj1, adj2, aa);
 		add_connection_move(pos, adj1, adj2);
@@ -576,7 +576,7 @@ induce_secondary_move_reasons(int color)
 	      if (!attack_move
 		  && board[adj1] != board[aa]
 		  && !string_connect(adj1, adj2, NULL)) {
-		DEBUG(DEBUG_MOVE_REASONS,
+		TRACE_MOVE_REASONS(
 		      "Cut move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
 		add_cut_move(pos, adj1, adj2);
@@ -585,7 +585,7 @@ induce_secondary_move_reasons(int color)
 	      if (!attack_move
 		  && board[adj1] == board[aa]
 		  && !disconnect(adj1, adj2, NULL)) {
-		DEBUG(DEBUG_MOVE_REASONS,
+		TRACE_MOVE_REASONS(
 		      "Connection move at %1m induced for %1m/%1m due to defense of %1m\n",
 		      pos, adj1, adj2, aa);
 		add_connection_move(pos, adj1, adj2);
@@ -1340,7 +1340,7 @@ estimate_territorial_value(int pos, int color, float score)
       
       /* Defenseless stone. */
       if (worm[aa].defense_codes[0] == 0) {
-	DEBUG(DEBUG_MOVE_REASONS,
+	TRACE_MOVE_REASONS(
 	      "  %1m:   %f (secondary) - attack on %1m (defenseless)\n",
 	      pos, worm[aa].effective_size, aa);
 	secondary_value += worm[aa].effective_size;
@@ -1354,7 +1354,7 @@ estimate_territorial_value(int pos, int color, float score)
        * capturing them tactically as well.
        */
       if (dragon[aa].status == DEAD) {
-	DEBUG(DEBUG_MOVE_REASONS,
+	TRACE_MOVE_REASONS(
 	      "  %1m:   %f (secondary) - attack on %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
 	secondary_value += 0.2 * this_value;
@@ -1402,7 +1402,7 @@ estimate_territorial_value(int pos, int color, float score)
        * dead stones.
        */
       if (dragon[aa].status == DEAD) {
-	DEBUG(DEBUG_MOVE_REASONS,
+	TRACE_MOVE_REASONS(
 	      "  %1m:   %f (secondary) - defense of %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
 	secondary_value += 0.2 * this_value;
@@ -1453,7 +1453,7 @@ estimate_territorial_value(int pos, int color, float score)
       ASSERT1(board[aa] == other, aa);
       
       if (dragon[aa].status == DEAD) {
-	DEBUG(DEBUG_MOVE_REASONS,
+	TRACE_MOVE_REASONS(
 	      "    %1m: 0.0 - threatens to capture %1m (dead)\n", pos, aa);
 	break;
       }
@@ -1741,7 +1741,7 @@ estimate_territorial_value(int pos, int color, float score)
       aa = move_reasons[r].what;
 
       if (dragon[aa].status == DEAD) {
-	DEBUG(DEBUG_MOVE_REASONS,
+	TRACE_MOVE_REASONS(
 	      "    %1m: 0.0 - threatens to owl attack %1m (dead)\n", pos, aa);
 	break;
       }
@@ -1890,7 +1890,7 @@ estimate_territorial_value(int pos, int color, float score)
     if (this_value != 0.0)
       TRACE("  %1m: %f - change in territory\n", pos, this_value);
     else
-      DEBUG(DEBUG_MOVE_REASONS, "  %1m: 0.00 - change in territory\n", 
+      TRACE_MOVE_REASONS("  %1m: 0.00 - change in territory\n", 
 	    pos);
   }
 
@@ -2035,7 +2035,7 @@ estimate_strategical_value(int pos, int color, float score)
 	      this_value = 0.0;
 	    
 	    if (this_value > dragon_value[bb]) {
-	      DEBUG(DEBUG_MOVE_REASONS,
+	      TRACE_MOVE_REASONS(
 		    "  %1m:   %f - %1m attacked/defended\n",
 		    pos, this_value, bb);
 	      dragon_value[bb] = this_value;
@@ -2138,7 +2138,7 @@ estimate_strategical_value(int pos, int color, float score)
 	    
 	    if (this_value > dragon_value[dragon[cc].origin]) {
 	      dragon_value[dragon[cc].origin] = this_value;
-	      DEBUG(DEBUG_MOVE_REASONS,
+	      TRACE_MOVE_REASONS(
 		    "  %1m:   %f - connect %1m and %1m to attack thrashing dragon %1m\n",
 		    pos, this_value, aa, bb, cc);
 	    }
@@ -2166,7 +2166,7 @@ estimate_strategical_value(int pos, int color, float score)
 	  this_value = connection_value(aa, bb, pos, 0);
 	if (this_value > dragon_value[aa]) {
 	  dragon_value[aa] = this_value;
-          DEBUG(DEBUG_MOVE_REASONS,
+          TRACE_MOVE_REASONS(
 		"  %1m:   %f - %1m cut/connect strategic value\n",
 		pos, this_value, aa);
 	}
@@ -2179,7 +2179,7 @@ estimate_strategical_value(int pos, int color, float score)
 	  this_value = connection_value(bb, aa, pos, 0);
 	if (this_value > dragon_value[bb]) {
 	  dragon_value[bb] = this_value;
-          DEBUG(DEBUG_MOVE_REASONS,
+          TRACE_MOVE_REASONS(
 		"  %1m:   %f - %1m cut/connect strategic value\n",
 		pos, this_value, bb);
 	}
@@ -2223,7 +2223,7 @@ estimate_strategical_value(int pos, int color, float score)
 	 */
 	if (owl_defense_move_reason_known(pos, bb)
 	    || owl_attack_move_reason_known(pos, bb)) {
-	  DEBUG(DEBUG_MOVE_REASONS,
+	  TRACE_MOVE_REASONS(
 		"    %1m: 0.0 - vital for %1m: owl attack/defense as well\n",
 		pos, bb);
 	  break;
@@ -2287,7 +2287,7 @@ estimate_strategical_value(int pos, int color, float score)
 		
 	if (this_value > dragon_value[aa]) {
 	  dragon_value[aa] = this_value;
-          DEBUG(DEBUG_MOVE_REASONS,
+          TRACE_MOVE_REASONS(
 		"  %1m:   %f - %1m strategic attack/defend\n",
 		pos, this_value, aa);
 
@@ -2323,7 +2323,7 @@ estimate_strategical_value(int pos, int color, float score)
 	
 	if (this_value > dragon_value[aa]) {
 	  dragon_value[aa] = this_value;
-	  DEBUG(DEBUG_MOVE_REASONS,
+	  TRACE_MOVE_REASONS(
 		"  %1m:   %f - %1m uncertain owl defense bonus\n",
 		pos, this_value, aa);
 	}
@@ -2343,7 +2343,7 @@ estimate_strategical_value(int pos, int color, float score)
      */
     if (dragon[aa].status == CRITICAL
 	&& !owl_move_reason_known(pos, aa)) {
-      DEBUG(DEBUG_MOVE_REASONS, "  %1m: 0.0 - disregarding strategic effect on %1m (critical dragon)\n",
+      TRACE_MOVE_REASONS("  %1m: 0.0 - disregarding strategic effect on %1m (critical dragon)\n",
 	    pos, aa);
       continue;
     }
@@ -2868,7 +2868,7 @@ reevaluate_ko_threats(int ko_move, int color)
 	move[pos].value += move[pos].additional_ko_value;
       }
       else
-        DEBUG(DEBUG_MOVE_REASONS,
+        TRACE_MOVE_REASONS(
               "%1m: no additional ko value (threat does not work as ko threat)\n", pos);
     }
 }

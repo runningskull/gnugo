@@ -763,7 +763,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
       count_variations = save_count_variations;
     }
     
-    DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n", aa_val, str);
+    TRACE_ATARI_ATARI("%oreturn value:%d (%1m)\n", aa_val, str);
     return aa_val;
   }
     
@@ -830,7 +830,7 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
 	  }
 	}
 	
-	DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n",
+	TRACE_ATARI_ATARI("%oreturn value:%d (%1m)\n",
 	      get_aa_value(ii), ii);
 	return get_aa_value(ii);
       }
@@ -987,7 +987,7 @@ atari_atari_attack_callback(int anchor, int color,
 	  if ((pattern->class & CLASS_c)
 	      && !aa_move_known(current_attacks, move, NO_MOVE)) {
 	    /* Conditional pattern. */
-	    DEBUG(DEBUG_ATARI_ATARI,
+	    TRACE_ATARI_ATARI(
 		  "aa_attack pattern %s+%d (conditional) found threat on %1m at %1m with code %d\n",
 		  pattern->name, ll, str, move, acode);
 	    if (conditional_attack_point[move] == NO_MOVE)
@@ -1000,7 +1000,7 @@ atari_atari_attack_callback(int anchor, int color,
 	  }
 	  else {
 	    aa_add_move(current_attacks, move, str);
-	    DEBUG(DEBUG_ATARI_ATARI,
+	    TRACE_ATARI_ATARI(
 		  "aa_attack pattern %s+%d found threat on %1m at %1m with code %d\n",
 		  pattern->name, ll, str, move, acode);
 	  }
@@ -1158,7 +1158,7 @@ compute_aa_values(int color)
 
     aa_values[pos] = value;
     if (1)
-      DEBUG(DEBUG_ATARI_ATARI, "aa_value for %1m = %d\n", pos, value);
+      TRACE_ATARI_ATARI("aa_value for %1m = %d\n", pos, value);
   }
 }
 

@@ -115,9 +115,6 @@
 /* Define if you have the `usleep' function. */
 #undef HAVE_USLEEP
 
-/* Define if #define can take a variable number of arguments */
-#undef HAVE_VARIADIC_DEFINE
-
 /* Define if you have the `vsnprintf' function. */
 #undef HAVE_VSNPRINTF
 

@@ -438,7 +438,7 @@ enter_intrusion_source(int source_pos, int strength_pos,
                        struct influence_data *q)
 {
   if (q->intrusion_counter >= MAX_INTRUSIONS) {
-    DEBUG(DEBUG_INFLUENCE, "intrusion list exhausted\n");
+    TRACE_INFLUENCE("intrusion list exhausted\n");
     return;
   }
   q->intrusions[q->intrusion_counter].source_pos = source_pos;
@@ -479,12 +479,12 @@ reset_unblocked_blocks(struct influence_data *q)
     if (ON_BOARD(pos)) {
       if (!q->safe[pos] && q->white_strength[pos] > 0.0
 	  && q->white_permeability[pos] != 1.0) {
-	DEBUG(DEBUG_INFLUENCE, "  black block removed from %1m\n", pos);
+	TRACE_INFLUENCE("  black block removed from %1m\n", pos);
 	q->white_permeability[pos] = 1.0;
       }
       if (!q->safe[pos] && q->black_strength[pos] > 0.0
 	  && q->black_permeability[pos] != 1.0) {
-	DEBUG(DEBUG_INFLUENCE, "  white block removed from %1m\n", pos);
+	TRACE_INFLUENCE("  white block removed from %1m\n", pos);
 	q->black_permeability[pos] = 1.0;
       }
     }
@@ -520,7 +520,7 @@ add_marked_intrusions(struct influence_data *q, int color)
       add_influence_source(q->intrusions[i].strength_pos, color,
                            q->intrusions[j].strength,
                            q->intrusions[j].attenuation, q);
-      DEBUG(DEBUG_INFLUENCE, "Adding %s intrusion at %1m, value %f\n",
+      TRACE_INFLUENCE("Adding %s intrusion at %1m, value %f\n",
 	    (color == BLACK) ? "black" : "white",
 	    q->intrusions[j].strength_pos, q->intrusions[j].strength);
       j = i+1;
@@ -559,7 +559,7 @@ add_marked_intrusions(struct influence_data *q, int color)
         add_influence_source(q->intrusions[j].strength_pos, color,
                              correction * q->intrusions[j].strength,
                              q->intrusions[j].attenuation, q);
-        DEBUG(DEBUG_INFLUENCE,
+        TRACE_INFLUENCE(
               "Adding %s intrusion for %1m at %1m, value %f (correction %f)\n",
               (color == BLACK) ? "black" : "white", source_pos,
               q->intrusions[j].strength_pos,
@@ -710,14 +710,14 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
    */
   if (pattern->helper) {
     if (!pattern->helper(pattern, ll, pos, color)) {
-      DEBUG(DEBUG_INFLUENCE,
+      TRACE_INFLUENCE(
 	    "Influence pattern %s+%d rejected by helper at %1m\n",
 	    pattern->name, ll, pos);
       return;
     }
   }
 
-  DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
+  TRACE_INFLUENCE("influence pattern '%s'+%d matched at %1m\n",
 	pattern->name, ll, anchor);
 
   /* For t patterns, everything happens in the action. */
@@ -744,7 +744,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
     else
       add_influence_source(pos, this_color, pattern->value, 1.5, q);
 
-    DEBUG(DEBUG_INFLUENCE,
+    TRACE_INFLUENCE(
 	  "  low intensity influence source at %1m, strength %f, color %C\n",
 	  pos, pattern->value, this_color);
     return;
@@ -756,7 +756,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
   if (pattern->class & CLASS_E) {
     add_influence_source(pos, color,
 			 pattern->value, DEFAULT_ATTENUATION, q);
-    DEBUG(DEBUG_INFLUENCE,
+    TRACE_INFLUENCE(
 	  "  extra %C source at %1m, strength %f\n", color,
 	  pos, pattern->value);
     return;
@@ -782,7 +782,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 	  blocking_color = color;
 	else
 	  blocking_color = OTHER_COLOR(color);
-	DEBUG(DEBUG_INFLUENCE, "  barrier for %s influence at %1m\n",
+	TRACE_INFLUENCE("  barrier for %s influence at %1m\n",
 	      color_to_string(OTHER_COLOR(blocking_color)), ii);
 	if (pattern->patn[k].att == ATT_comma) {
 	  if (blocking_color == WHITE)
@@ -808,7 +808,7 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
         else
           add_influence_source(ii, color,
 			       pattern->value, DEFAULT_ATTENUATION, q);
-	DEBUG(DEBUG_INFLUENCE, "  intrusion at %1m\n", ii);
+	TRACE_INFLUENCE("  intrusion at %1m\n", ii);
       }
     }
   }
@@ -854,7 +854,7 @@ followup_influence_callback(int anchor, int color, struct pattern *pattern,
    */
   if (pattern->helper) {
     if (!pattern->helper(pattern, ll, t, color)) {
-      DEBUG(DEBUG_INFLUENCE,
+      TRACE_INFLUENCE(
             "Influence pattern %s+%d rejected by helper at %1m\n",
             pattern->name, ll, t);
       return;
@@ -867,7 +867,7 @@ followup_influence_callback(int anchor, int color, struct pattern *pattern,
                              FOLLOWUP_INFLUENCE_CALLBACK))
     return;
 
-  DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
+  TRACE_INFLUENCE("influence pattern '%s'+%d matched at %1m\n",
 	pattern->name, ll, anchor);
 
   for (k = 0; k < pattern->patlen; ++k)  /* match each point */
@@ -878,7 +878,7 @@ followup_influence_callback(int anchor, int color, struct pattern *pattern,
       /* Low intensity influence source for the color in turn to move. */
       enter_intrusion_source(anchor, ii, pattern->value,
 			     TERR_DEFAULT_ATTENUATION, q);
-      DEBUG(DEBUG_INFLUENCE, "  followup for %1m: intrusion at %1m\n",
+      TRACE_INFLUENCE("  followup for %1m: intrusion at %1m\n",
             anchor, ii);
     }
 }
@@ -889,7 +889,7 @@ followup_influence_callback(int anchor, int color, struct pattern *pattern,
 void
 influence_mark_non_territory(int pos, int color)
 {
-  DEBUG(DEBUG_INFLUENCE, "  non-territory for %C at %1m\n", color, pos);
+  TRACE_INFLUENCE("  non-territory for %C at %1m\n", color, pos);
   current_influence->non_territory[pos] |= color;
 }
 
@@ -1646,7 +1646,7 @@ influence_delta_territory(const struct influence_data *base,
       if (move != -1
 	  && (this_delta > 0.02
               || -this_delta > 0.02))
-	DEBUG(DEBUG_TERRITORY,
+	TRACE_TERRITORY(
 	      "  %1m:   - %1m territory change %f (%f -> %f)\n",
 	      move, ii, this_delta, old_value, new_value);
       total_delta += this_delta;
@@ -1659,7 +1659,7 @@ influence_delta_territory(const struct influence_data *base,
       this_delta = -this_delta;
     if (move != -1
 	&& this_delta != 0.0)
-      DEBUG(DEBUG_TERRITORY, "  %1m:   - captured stones %f\n",
+      TRACE_TERRITORY("  %1m:   - captured stones %f\n",
 	    move, this_delta);
     total_delta += this_delta;
   }

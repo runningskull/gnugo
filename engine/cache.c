@@ -363,7 +363,7 @@ hashtable_partially_clear(Hashtable *table)
   
   int statistics[NUM_ROUTINES][20];
 
-  DEBUG(DEBUG_READING_PERFORMANCE,
+  TRACE_READING_PERFORMANCE(
 	"Hashtable cleared because it was full.\n");
 
   for (k = 0; k < NUM_ROUTINES; ++k)
@@ -725,13 +725,13 @@ do_get_read_result(int routine, int komaster, int kom_pos,
   hashnode = hashtable_search(movehash, &hashdata);
   if (hashnode != NULL) {
     stats.position_hits++;
-    DEBUG(DEBUG_READING_CACHE, "We found position %H in the hash table...\n",
+    TRACE_READING_CACHE("We found position %H in the hash table...\n",
 	  (unsigned long) hashdata.hashval);
   }
   else {
     hashnode = hashtable_enter_position(movehash, &hashdata);
     if (hashnode)
-      DEBUG(DEBUG_READING_CACHE, "Created position %H in the hash table...\n",
+      TRACE_READING_CACHE("Created position %H in the hash table...\n",
 	    (unsigned long) hashdata.hashval);
   }
 #else
@@ -739,13 +739,13 @@ do_get_read_result(int routine, int komaster, int kom_pos,
   hashnode = hashtable_search(movehash, &hashdata);
   if (hashnode != NULL) {
     stats.position_hits++;
-    DEBUG(DEBUG_READING_CACHE, "We found position %H in the hash table...\n",
+    TRACE_READING_CACHE("We found position %H in the hash table...\n",
 	  (unsigned long) hashdata.hashval);
   }
   else {
     hashnode = hashtable_enter_position(movehash, &hashdata);
     if (hashnode)
-      DEBUG(DEBUG_READING_CACHE, "Created position %H in the hash table...\n",
+      TRACE_READING_CACHE("Created position %H in the hash table...\n",
 	    (unsigned long) hashdata.hashval);
   }
 #endif
@@ -767,7 +767,7 @@ do_get_read_result(int routine, int komaster, int kom_pos,
       retval = 1;
     }
     else {
-      DEBUG(DEBUG_READING_CACHE,
+      TRACE_READING_CACHE(
 	    "...but no previous result for routine %d and (%1m, %1m)...",
 	    routine, str1, str2);
 
@@ -775,10 +775,10 @@ do_get_read_result(int routine, int komaster, int kom_pos,
 					 komaster, kom_pos, str1, str2);
       
       if (*read_result == NULL)
-	DEBUG(DEBUG_READING_CACHE,
+	TRACE_READING_CACHE(
 	      "%o...and unfortunately there was no room for one.\n");
       else
-	DEBUG(DEBUG_READING_CACHE, "%o...so we allocate a new one.\n");
+	TRACE_READING_CACHE("%o...so we allocate a new one.\n");
     }
   }
 

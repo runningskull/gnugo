@@ -396,12 +396,12 @@ estimate_score(float *upper, float *lower)
       }
     }
     if (chinese_rules) {
-      DEBUG(DEBUG_SCORING,
+      TRACE_SCORING(
 	    "in row %d, white area=%d, black=%d\n",
 	  board_size - i, white_area_in_row, black_area_in_row);
     }
     else {
-      DEBUG(DEBUG_SCORING, 
+      TRACE_SCORING(
 	    "in row %d, white territory=%d, black=%d\n",
 	    board_size - i, white_territory_in_row, black_territory_in_row);
     }
@@ -410,7 +410,7 @@ estimate_score(float *upper, float *lower)
   if (chinese_rules)
     u = white_area - black_area + komi;
   else {
-    DEBUG(DEBUG_SCORING,
+    TRACE_SCORING(
 	  "black captured: %d\nwhite captured: %d\nkomi: %f\n",
 	  black_captured, white_captured, komi);
     u = white_territory 
@@ -468,11 +468,11 @@ estimate_score(float *upper, float *lower)
 	}
       }
       if (chinese_rules) {
-	DEBUG(DEBUG_SCORING, "in row %d, white area=%d, black=%d\n",
+	TRACE_SCORING("in row %d, white area=%d, black=%d\n",
 	      board_size-i, white_area_in_row, black_area_in_row);
       }
       else {
-	DEBUG(DEBUG_SCORING, 
+	TRACE_SCORING(
 	      "in row %d, white territory=%d, black=%d\n",
 	      board_size-i, white_territory_in_row, black_territory_in_row);
       }
@@ -481,7 +481,7 @@ estimate_score(float *upper, float *lower)
     if (chinese_rules)
       l = white_area - black_area + komi;
     else {
-      DEBUG(DEBUG_SCORING,
+      TRACE_SCORING(
 	  "black captured: %d\nwhite captured: %d\nkomi: %f\n",
 	    black_captured, white_captured, komi);
       l = white_territory 

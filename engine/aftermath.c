@@ -271,7 +271,7 @@ aftermath_genmove(int *aftermath_move, int color,
   if (best_scoring_move != NO_MOVE
       && safe_move(best_scoring_move, color) == WIN) {
     *aftermath_move = best_scoring_move;
-    DEBUG(DEBUG_AFTERMATH, "Closing edge at %1m\n", best_scoring_move);
+    TRACE_AFTERMATH("Closing edge at %1m\n", best_scoring_move);
     return 1;
   }
 
@@ -588,8 +588,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	      if (worm[adjs[r]].attack_codes[0] != 0
 		  && (find_defense(adjs[r], NULL)
 		      > worm[adjs[r]].defense_codes[0])) {
-		DEBUG(DEBUG_AFTERMATH,
-		      "Blunder: %1m becomes tactically safer after %1m\n",
+		TRACE_AFTERMATH("Blunder: %1m becomes tactically safer after %1m\n",
 		      adjs[r], move);
 		move_ok = 0;
 	      }
@@ -598,7 +597,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	    for (r = 0; r < neighbors && move_ok; r++) {
 	      if (dragon[adjs[r]].status == DEAD
 		  && !owl_does_attack(move, adjs[r], NULL)) {
-		DEBUG(DEBUG_AFTERMATH,
+		TRACE_AFTERMATH(
 		      "Blunder: %1m becomes more alive after %1m\n",
 		      adjs[r], move);
 		move_ok = 0;
@@ -612,7 +611,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	score[move] = 0;
       else {
 	*aftermath_move = move;
-	DEBUG(DEBUG_AFTERMATH, "Splitting eyespace at %1m\n", move);
+	TRACE_AFTERMATH("Splitting eyespace at %1m\n", move);
 	return 1;
       }
     }
@@ -736,7 +735,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	continue;
 	  
       *aftermath_move = move;
-      DEBUG(DEBUG_AFTERMATH, "Filling opponent liberty at %1m\n", move);
+      TRACE_AFTERMATH("Filling opponent liberty at %1m\n", move);
       return 1;
     }
   }
@@ -769,7 +768,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	&& worm[pos].attack_codes[0] != 0
 	&& !is_illegal_ko_capture(worm[pos].attack_points[0], color)) {
       *aftermath_move = worm[pos].attack_points[0];
-      DEBUG(DEBUG_AFTERMATH, "Tactically attack %1m at %1m\n",
+      TRACE_AFTERMATH("Tactically attack %1m at %1m\n",
 	    pos, *aftermath_move);
       return 1;
     }
@@ -873,7 +872,7 @@ do_play_aftermath(int color, struct aftermath_data *a)
   int pass = 0;
   int moves = 0;
   int color_to_play = color;
-  DEBUG(DEBUG_AFTERMATH, "The aftermath starts.\n");
+  TRACE_AFTERMATH("The aftermath starts.\n");
 
   /* Disable computing worm and owl threats. */
   disable_threat_computation = 1;
@@ -898,7 +897,7 @@ do_play_aftermath(int color, struct aftermath_data *a)
     if (aftermath_sgftree)
       sgftreeAddPlay(aftermath_sgftree, color_to_play, I(move), J(move));
     moves++;
-    DEBUG(DEBUG_AFTERMATH, "%d %C move %1m (nodes %d, %d  total %d, %d)\n",
+    TRACE_AFTERMATH("%d %C move %1m (nodes %d, %d  total %d, %d)\n",
 	  movenum, color_to_play, move, get_owl_node_counter() - owl_nodes,
 	  get_reading_node_counter() - reading_nodes,
 	  get_owl_node_counter(), get_reading_node_counter());

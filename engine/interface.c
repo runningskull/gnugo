@@ -516,7 +516,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
   if (untilstr) {
     if (*untilstr > '0' && *untilstr <= '9') {
       until = atoi(untilstr);
-      DEBUG(DEBUG_LOADSGF, "Loading until move %d\n", until);
+      TRACE_LOADSGF("Loading until move %d\n", until);
     }
     else {
       untiln = *untilstr - 'A';
@@ -524,7 +524,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	--untiln;
 	  
       untilm = board_size - atoi(untilstr+1);
-      DEBUG(DEBUG_LOADSGF, "Loading until move at %d,%d (%m)\n", 
+      TRACE_LOADSGF("Loading until move at %d,%d (%m)\n", 
 	    untilm, untiln, untilm, untiln);
     }
   }
@@ -545,7 +545,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
     int i, j;
       
     for (prop = tree->lastnode->props; prop; prop = prop->next) {
-      DEBUG(DEBUG_LOADSGF, "%c%c[%s]\n", 
+      TRACE_LOADSGF("%c%c[%s]\n", 
 	    prop->name & 0xff, (prop->name >> 8), prop->value);
       switch (prop->name) {
       case SGFAB:

@@ -364,19 +364,57 @@ void debug_influence_move(int i, int j);
 #define RTRACE (!(verbose >= 3)) ? (void)0 : (void)gprintf
 #define VTRACE (!(verbose >= 4)) ? (void)0 : (void)gprintf
 
-#ifdef HAVE_VARIADIC_DEFINE
 
-/* gnuc allows variadic macros, so the tests can be done inline */
-#define DEBUG(level, fmt, args...) \
-    do { if ((debug & (level))) gprintf(fmt, ##args); } while (0)
-
-#else /*HAVE_VARIADIC_DEFINE*/
-
-/* if debug == 0, then can skip the function call. */
-#define DEBUG  (!(debug)) ? (void)0 : (void)DEBUG_func
-int DEBUG_func(int level, const char *fmt, ...);
-
-#endif  /*HAVE_VARIADIC_DEFINE*/
+#define TRACE_INFLUENCE		!(debug & DEBUG_INFLUENCE) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_EYES		!(debug & DEBUG_EYES) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_OWL		!(debug & DEBUG_OWL) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_ESCAPE		!(debug & DEBUG_ESCAPE) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_MATCHER		!(debug & DEBUG_MATCHER) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_DRAGONS		!(debug & DEBUG_DRAGONS) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_SEMEAI		!(debug & DEBUG_SEMEAI) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_LOADSGF		!(debug & DEBUG_LOADSGF) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_HELPER		!(debug & DEBUG_HELPER) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_READING		!(debug & DEBUG_READING) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_WORMS		!(debug & DEBUG_WORMS) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_MOVE_REASONS	!(debug & DEBUG_MOVE_REASONS) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_OWL_PERFORMANCE	!(debug & DEBUG_OWL_PERFORMANCE) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_LIFE		!(debug & DEBUG_LIFE) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_FILLLIB		!(debug & DEBUG_FILLLIB) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_READING_PERFORMANCE !(debug & DEBUG_READING_PERFORMANCE) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_SCORING		!(debug & DEBUG_SCORING) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_AFTERMATH		!(debug & DEBUG_AFTERMATH) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_ATARI_ATARI	!(debug & DEBUG_ATARI_ATARI) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_READING_CACHE	!(debug & DEBUG_READING_CACHE) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_TERRITORY		!(debug & DEBUG_TERRITORY) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_OWL_PERSISTENT_CACHE !(debug & DEBUG_OWL_PERSISTENT_CACHE) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_TOP_MOVES		!(debug & DEBUG_TOP_MOVES) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_MISCELLANEOUS	!(debug & DEBUG_MISCELLANEOUS) ? \
+				 (void)0 : (void)gprintf 
+#define TRACE_ORACLE_STREAM	!(debug & DEBUG_ORACLE_STREAM) ? \
+				 (void)0 : (void)gprintf 
 
 
 /* genmove.c */

@@ -71,7 +71,7 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 		 && (white_eye[pos].type & INHIBIT_CONNECTION))
 		|| (color == BLACK
 		  && (black_eye[pos].type & INHIBIT_CONNECTION)))) {
-	  DEBUG(DEBUG_DRAGONS, 
+	  TRACE_DRAGONS(
 		"Connection pattern of type %s inhibited at %1m\n",
 		pattern->name, pos);
 	  return;
@@ -138,15 +138,15 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 
   /* Get here => Pattern matches. */
   if (pattern->class & CLASS_B) {
-    DEBUG(DEBUG_DRAGONS, "Cutting pattern %s+%d found at %1m\n",
+    TRACE_DRAGONS("Cutting pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
-    DEBUG(DEBUG_DRAGONS, "cutting point %1m\n", move);
+    TRACE_DRAGONS("cutting point %1m\n", move);
   }
   else if (pattern->class & CLASS_C)
-    DEBUG(DEBUG_DRAGONS, "Connecting pattern %s+%d found at %1m\n",
+    TRACE_DRAGONS("Connecting pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
   else if (pattern->class & CLASS_I)
-    DEBUG(DEBUG_DRAGONS, "Lunch invalidating pattern %s+%d found at %1m\n",
+    TRACE_DRAGONS("Lunch invalidating pattern %s+%d found at %1m\n",
 	  pattern->name, ll, anchor);
 
   /* does the pattern have an action? */
@@ -217,11 +217,11 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
 	break; /* The inhibition points are guaranteed to come first. */
       if (color == WHITE && white_eye[pos].color == WHITE_BORDER) {
 	white_eye[pos].type |= INHIBIT_CONNECTION;
-	DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
+	TRACE_DRAGONS("inhibiting connection at %1m\n", pos);
       }
       else if (color == BLACK && black_eye[pos].color == BLACK_BORDER) {
 	black_eye[pos].type |= INHIBIT_CONNECTION;
-	DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
+	TRACE_DRAGONS("inhibiting connection at %1m\n", pos);
       }
     }
   } /* loop over elements */

@@ -253,16 +253,16 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   if (pattern->helper) {
     /* ask helper function to consider the move */
     int accepted;
-    DEBUG(DEBUG_HELPER, "  asking helper to consider '%s'+%d at %1m\n", 
+    TRACE_HELPER("  asking helper to consider '%s'+%d at %1m\n", 
 	  pattern->name, ll, move);
     accepted = pattern->helper(pattern, ll, move, color);
     
     if (accepted) {
-      DEBUG(DEBUG_HELPER, "helper likes pattern '%s' at %1m\n",
+      TRACE_HELPER("helper likes pattern '%s' at %1m\n",
 	    pattern->name, move);
     }
     else {
-      DEBUG(DEBUG_HELPER, "  helper does not like pattern '%s' at %1m\n", 
+      TRACE_HELPER("  helper does not like pattern '%s' at %1m\n", 
 	    pattern->name, move);
       return;  /* pattern matcher does not like it */
     }

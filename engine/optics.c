@@ -546,7 +546,7 @@ false_margin(int pos, int color, int lively[BOARDMAX])
   }
   
   if (potential_false_margin && safe_move(pos, other) == 0) {
-    DEBUG(DEBUG_EYES, "False margin for %C at %1m.\n", color, pos);
+    TRACE_EYES("False margin for %C at %1m.\n", color, pos);
     return 1;
   }
 
@@ -627,7 +627,7 @@ find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
   int pos;
 
   memset(mx, 0, sizeof(mx));
-  DEBUG(DEBUG_MISCELLANEOUS, "find_eye_dragons: %1m %C\n", origin, eye_color);
+  TRACE_MISCELLANEOUS("find_eye_dragons: %1m %C\n", origin, eye_color);
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == eye_color
 	&& mx[dragon[pos].origin] == 0
@@ -643,7 +643,7 @@ find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
 	    || (ON_BOARD(EAST(pos))
 		&& eye[EAST(pos)].origin == origin
 		&& !eye[EAST(pos)].marginal))) {
-      DEBUG(DEBUG_MISCELLANEOUS, 
+      TRACE_MISCELLANEOUS(
 	    "  dragon: %1m %1m\n", pos, dragon[pos].origin);
       mx[dragon[pos].origin] = 1;
       if (dragons != NULL && num_dragons < max_dragons)
@@ -774,7 +774,7 @@ compute_eyes(int pos, struct eyevalue *value,
 
   if (debug & DEBUG_EYES) {
     print_eye(eye, heye, pos);
-    DEBUG(DEBUG_EYES, "\n");
+    TRACE_EYES("\n");
   }
   
   /* Look up the eye space in the graphs database. */
@@ -850,7 +850,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 
   if (debug & DEBUG_EYES) {
     print_eye(eye, heye, pos);
-    DEBUG(DEBUG_EYES, "\n");
+    TRACE_EYES("\n");
   }
   
   /* Look up the eye space in the graphs database. */
@@ -863,7 +863,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 	&& is_ko(pos, eye[pos].color == WHITE_BORDER ? BLACK : WHITE, NULL))
       *pessimistic_min = 0;
 
-    DEBUG(DEBUG_EYES, "  graph matching - %s, pessimistic_min=%d\n",
+    TRACE_EYES("  graph matching - %s, pessimistic_min=%d\n",
 	  eyevalue_to_string(value), *pessimistic_min);
   }
   
@@ -875,13 +875,13 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   else {
     guess_eye_space(pos, effective_eyesize, margins, eye,
 		    value, pessimistic_min); 
-    DEBUG(DEBUG_EYES, "  guess_eye - %s, pessimistic_min=%d\n",
+    TRACE_EYES("  guess_eye - %s, pessimistic_min=%d\n",
 	  eyevalue_to_string(value), *pessimistic_min);
   }
 
   if (*pessimistic_min < 0) {
     *pessimistic_min = 0;
-    DEBUG(DEBUG_EYES, "  pessimistic min revised to 0\n");
+    TRACE_EYES("  pessimistic min revised to 0\n");
   }
   
   /* An eyespace with at least two interior stones is assumed to be
@@ -889,7 +889,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
    */
   if (*pessimistic_min < 1 && interior_stones >= 2) {
     *pessimistic_min = 1;
-    DEBUG(DEBUG_EYES, "  pessimistic min revised to 1 (interior stones)\n");
+    TRACE_EYES("  pessimistic min revised to 1 (interior stones)\n");
   }
   
   if (attack_point
@@ -1316,9 +1316,9 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	  }
 	}
 	
-	DEBUG(DEBUG_EYES, "  vital points: %1m (attack) %1m (defense)\n",
+	TRACE_EYES("  vital points: %1m (attack) %1m (defense)\n",
 	      *attack_point, *defense_point);
-	DEBUG(DEBUG_EYES, "  pattern matched:  %d\n", graphs[graph].patnum);
+	TRACE_EYES("  pattern matched:  %d\n", graphs[graph].patnum);
 	
       }
       TRACE("eye space at %1m of type %d\n", pos, graphs[graph].patnum);
@@ -1399,7 +1399,7 @@ add_false_eye(int pos, struct eye_data eye[BOARDMAX],
 {
   int k;
   ASSERT1(heye[pos].type == FALSE_EYE, pos);
-  DEBUG(DEBUG_EYES, "false eye found at %1m\n", pos);
+  TRACE_EYES("false eye found at %1m\n", pos);
 
   if (eye[pos].color == GRAY || eye[pos].marginal != 0)
     return;

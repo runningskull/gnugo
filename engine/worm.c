@@ -224,7 +224,7 @@ make_worms(void)
       if (count_common_libs(w1, w2) > 0)
 	worm[pos].cutstone = 1;
       
-      DEBUG(DEBUG_WORMS, "Worm at %1m has w1 %1m and w2 %1m, cutstone %d\n",
+      TRACE_WORMS("Worm at %1m has w1 %1m and w2 %1m, cutstone %d\n",
 	    pos, w1, w2, worm[pos].cutstone);
     }
   }
@@ -288,7 +288,7 @@ make_worms(void)
 	 * incremented we must also increment depth values.
 	 */
 	
-	DEBUG(DEBUG_WORMS, "trying %1m\n", pos);
+	TRACE_WORMS("trying %1m\n", pos);
 	increase_depth_values();
 	
 	/* Now we try to find a group which is saved or attacked as well
@@ -328,7 +328,7 @@ make_worms(void)
 	      
 	      /* ...then add an attack point of that worm at pos. */
 	      if (attack_works) {
-		DEBUG(DEBUG_WORMS,
+		TRACE_WORMS(
 		      "adding point of attack of %1m at %1m with code %d\n",
 		      str, pos, REVERSE_RESULT(dcode));
 		change_attack(str, pos, REVERSE_RESULT(dcode));
@@ -368,7 +368,7 @@ make_worms(void)
 	      
 	      /* ...then add an attack point of that worm at pos. */
 	      if (defense_works) {
-		DEBUG(DEBUG_WORMS,
+		TRACE_WORMS(
 		      "adding point of defense of %1m at %1m with code %d\n",
 		      str, pos, REVERSE_RESULT(acode));
 		change_defense(str, pos, REVERSE_RESULT(acode));
@@ -456,7 +456,7 @@ make_worms(void)
     if (find_lunch(pos, &lunch)
 	&& (worm[lunch].attack_codes[0] == WIN
 	    || worm[lunch].attack_codes[0] == KO_A)) {
-      DEBUG(DEBUG_WORMS, "lunch found for %1m at %1m\n", pos, lunch);
+      TRACE_WORMS("lunch found for %1m at %1m\n", pos, lunch);
       worm[pos].lunch = lunch;
     }
     else
@@ -501,7 +501,7 @@ make_worms(void)
       int edge;
       int border_color = examine_cavity(pos, &edge);
       if (border_color != GRAY_BORDER && edge < 3) {
-	DEBUG(DEBUG_WORMS, "Worm %1m identified as inessential.\n", pos);
+	TRACE_WORMS("Worm %1m identified as inessential.\n", pos);
 	worm[pos].inessential = 1;
 	propagate_worm(pos);
       }
@@ -759,7 +759,7 @@ find_worm_attacks_and_defenses()
     
     acode = attack(str, &attack_point);
     if (acode != 0) {
-      DEBUG(DEBUG_WORMS, "worm at %1m can be attacked at %1m\n",
+      TRACE_WORMS("worm at %1m can be attacked at %1m\n",
 	    str, attack_point);
       change_attack(str, attack_point, acode);
     }
@@ -1076,7 +1076,7 @@ void
 change_attack(int str, int move, int acode)
 {
   str = worm[str].origin;
-  DEBUG(DEBUG_WORMS, "change_attack: %1m %1m %d\n", str, move, acode);
+  TRACE_WORMS("change_attack: %1m %1m %d\n", str, move, acode);
   change_tactical_point(str, move, acode,
 			worm[str].attack_points, worm[str].attack_codes);
 }
@@ -1581,7 +1581,7 @@ attack_callback(int anchor, int color, struct pattern *pattern, int ll,
    */
   if (pattern->helper) {
     if (!pattern->helper(pattern, ll, move, color)) {
-      DEBUG(DEBUG_WORMS,
+      TRACE_WORMS(
 	    "Attack pattern %s+%d rejected by helper at %1m\n",
 	    pattern->name, ll, move);
       return;
@@ -1631,7 +1631,7 @@ attack_callback(int anchor, int color, struct pattern *pattern, int ll,
 	 */
 	if (dcode != WIN && REVERSE_RESULT(dcode) >= worm[str].attack_codes[0]) {
 	  change_attack(str, move, REVERSE_RESULT(dcode));
-	  DEBUG(DEBUG_WORMS,
+	  TRACE_WORMS(
 		"Attack pattern %s+%d found attack on %1m at %1m with code %d\n",
 		pattern->name, ll, str, move, REVERSE_RESULT(dcode));
 	}
@@ -1669,7 +1669,7 @@ defense_callback(int anchor, int color, struct pattern *pattern, int ll,
    */
   if (pattern->helper) {
     if (!pattern->helper(pattern, ll, move, color)) {
-      DEBUG(DEBUG_WORMS,
+      TRACE_WORMS(
 	    "Defense pattern %s+%d rejected by helper at %1m\n",
 	    pattern->name, ll, move);
       return;
@@ -1699,7 +1699,7 @@ defense_callback(int anchor, int color, struct pattern *pattern, int ll,
 	
 	if (acode < worm[str].attack_codes[0]) {
 	  change_defense(str, move, REVERSE_RESULT(acode));
-	  DEBUG(DEBUG_WORMS,
+	  TRACE_WORMS(
 		"Defense pattern %s+%d found defense of %1m at %1m with code %d\n",
 		pattern->name, ll, str, move, REVERSE_RESULT(acode));
 	}

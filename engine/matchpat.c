@@ -452,7 +452,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	   * to just test enough cases to be safe.
 	   */
 
-	  DEBUG(DEBUG_MATCHER, 
+	  TRACE_MATCHER(
 		"---\nconsidering pattern '%s', rotation %d at %1m. Range %d,%d -> %d,%d\n",
 		pattern->name, ll, anchor, mi, mj, xi, xj);
 
@@ -541,7 +541,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	
 	/* We jump to here as soon as we discover a pattern has failed. */
       match_failed:
-	DEBUG(DEBUG_MATCHER, 
+	TRACE_MATCHER(
 	      "end of pattern '%s', rotation %d at %1m\n---\n", 
 	      pattern->name, ll, anchor);
 	 
@@ -823,27 +823,27 @@ dfa_match_init(void)
   buildSpiralOrder(spiral);
 
   if (owl_vital_apat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "owl_vital_apat --> using dfa\n");
+    TRACE_MATCHER("owl_vital_apat --> using dfa\n");
   if (owl_attackpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "owl_attackpat --> using dfa\n");
+    TRACE_MATCHER("owl_attackpat --> using dfa\n");
   if (owl_defendpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "owl_defendpat --> using dfa\n");
+    TRACE_MATCHER("owl_defendpat --> using dfa\n");
   if (pat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "pat --> using dfa\n");
+    TRACE_MATCHER("pat --> using dfa\n");
   if (attpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "attpat --> using dfa\n");
+    TRACE_MATCHER("attpat --> using dfa\n");
   if (defpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "defpat --> using dfa\n");
+    TRACE_MATCHER("defpat --> using dfa\n");
   if (endpat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "endpat --> using dfa\n");
+    TRACE_MATCHER("endpat --> using dfa\n");
   if (conn_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "conn --> using dfa\n");
+    TRACE_MATCHER("conn --> using dfa\n");
   if (influencepat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "influencepat --> using dfa\n");
+    TRACE_MATCHER("influencepat --> using dfa\n");
   if (barrierspat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "barrierspat --> using dfa\n");
+    TRACE_MATCHER("barrierspat --> using dfa\n");
   if (fusekipat_db.pdfa != NULL)
-    DEBUG(DEBUG_MATCHER, "barrierspat --> using dfa\n");
+    TRACE_MATCHER("barrierspat --> using dfa\n");
 
   /* force out_board initialization */
   dfa_board_size = -1;
@@ -1089,7 +1089,7 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
   
   /* We jump to here as soon as we discover a pattern has failed. */
  match_failed:
-  DEBUG(DEBUG_MATCHER, "end of pattern '%s', rotation %d at %1m\n---\n",
+  TRACE_MATCHER("end of pattern '%s', rotation %d at %1m\n---\n",
 	pattern->name, ll, anchor);
   
 } /* check_pattern_light */

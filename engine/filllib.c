@@ -186,17 +186,17 @@ fill_liberty(int *move, int color)
      * 6. Move would violate confirm_safety.
      */
     
-    DEBUG(DEBUG_FILLLIB, "Filllib: Considering move at %1m.\n", pos);
+    TRACE_FILLLIB("Filllib: Considering move at %1m.\n", pos);
     
     /* Legal and tactically safe, play it if it passes
      * confirm_safety test, i.e. that it isn't a blunder which
      * causes problems for other strings.
      */
     if (safe_move(pos, color) == WIN) {
-      DEBUG(DEBUG_FILLLIB, "Filllib: Tactically safe.\n");
+      TRACE_FILLLIB("Filllib: Tactically safe.\n");
       if (filllib_confirm_safety(pos, color, &defense_point)) {
 	/* Safety confirmed. */
-	DEBUG(DEBUG_FILLLIB, "Filllib: Safety confirmed.\n");
+	TRACE_FILLLIB("Filllib: Safety confirmed.\n");
 	*move = pos;
 	return 1;
       }
@@ -207,7 +207,7 @@ fill_liberty(int *move, int color)
 	 *
 	 * FIXME: We should verify that (defense_point) really is effective.
 	 */
-	DEBUG(DEBUG_FILLLIB,
+	TRACE_FILLLIB(
 	      "Filllib: Safety not confirmed, but %1m defends.\n",
 	      defense_point);
 	*move = defense_point;
@@ -218,7 +218,7 @@ fill_liberty(int *move, int color)
 	 * we have to discard it. If everything works right this
 	 * should not happen at this time.
 	 */
-	DEBUG(DEBUG_FILLLIB, "Filllib: Safety not confirmed, discarded.\n");
+	TRACE_FILLLIB("Filllib: Safety not confirmed, discarded.\n");
 	TRACE("Warning: Blunder detected in fill_liberty().\n");
 	continue;
       }
@@ -228,18 +228,18 @@ fill_liberty(int *move, int color)
     if (trymove(pos, color, "fill_liberty", NO_MOVE, EMPTY, NO_MOVE)) {
       popgo();
       /* Legal, but not safe. Look for backfilling move. */
-      DEBUG(DEBUG_FILLLIB,
+      TRACE_FILLLIB(
 	    "Filllib: Legal but not safe, looking for backfilling move.\n");
       
       if (find_backfilling_move(pos, color, move)) {
-	DEBUG(DEBUG_FILLLIB, "Filllib: Backfilling move at %1m.\n", *move);
+	TRACE_FILLLIB("Filllib: Backfilling move at %1m.\n", *move);
 	/* In certain positions it may happen that an illegal move
 	 * is found. This probably only can happen if we try to play
 	 * a move inside a lost semeai. Anyway we should discard the
 	 * move.
 	 */
 	if (!is_legal(*move, color)) {
-	  DEBUG(DEBUG_FILLLIB, "Filllib: Was illegal, discarded.\n");
+	  TRACE_FILLLIB("Filllib: Was illegal, discarded.\n");
 	  *move = NO_MOVE;
 	  continue;
 	}
@@ -248,7 +248,7 @@ fill_liberty(int *move, int color)
 	 * setting up a double threat elsewhere, also discard it.
 	 */
 	if (!filllib_confirm_safety(*move, color, &defense_point)) {
-	  DEBUG(DEBUG_FILLLIB,
+	  TRACE_FILLLIB(
 		"Filllib: Safety not confirmed, discarded.\n");
 	  continue;
 	}
@@ -259,10 +259,10 @@ fill_liberty(int *move, int color)
       else {
 	/* If we captured some stones, this move should be ok anyway. */
 	if (does_capture_something(pos, color)) {
-	  DEBUG(DEBUG_FILLLIB,
+	  TRACE_FILLLIB(
 		"Filllib: Not tactically safe, but captures stones.\n");
 	  if (!filllib_confirm_safety(pos, color, &defense_point)) {
-	    DEBUG(DEBUG_FILLLIB,
+	    TRACE_FILLLIB(
 		  "Filllib: Safety not confirmed, discarded.\n");
 	    continue;
 	  }
@@ -275,18 +275,18 @@ fill_liberty(int *move, int color)
       /* Move is illegal. Look for an attack on one of the neighbor
        * worms. If found, return that move for back-capture.
        */
-      DEBUG(DEBUG_FILLLIB, "Filllib: Illegal, looking for back-capture.\n");
+      TRACE_FILLLIB("Filllib: Illegal, looking for back-capture.\n");
       for (k = 0; k < 4; k++) {
 	int d = delta[k];
 	if (board[pos + d] == other
 	    && worm[pos + d].attack_codes[0] == WIN) {
 	  *move = worm[pos + d].attack_points[0];
-	  DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
+	  TRACE_FILLLIB("Filllib: Found at %1m.\n", *move);
 	  return 1;
 	}
       }
       
-      DEBUG(DEBUG_FILLLIB,
+      TRACE_FILLLIB(
 	    "Filllib: Nothing found, looking for ko back-capture.\n");
       for (k = 0; k < 4; k++) {
 	int d = delta[k];
@@ -294,12 +294,12 @@ fill_liberty(int *move, int color)
 	    && worm[pos + d].attack_codes[0] != 0
 	    && is_legal(worm[pos + d].attack_points[0], color)) {
 	  *move = worm[pos + d].attack_points[0];
-	  DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
+	  TRACE_FILLLIB("Filllib: Found at %1m.\n", *move);
 	  return 1;
 	}
       }
 
-      DEBUG(DEBUG_FILLLIB,
+      TRACE_FILLLIB(
 	    "Filllib: Nothing found, looking for threat to back-capture.\n");
       for (k = 0; k < 4; k++) {
 	int d = delta[k];
@@ -316,7 +316,7 @@ fill_liberty(int *move, int color)
 	    else
 	      continue;
 	    
-	    DEBUG(DEBUG_FILLLIB, "Filllib: Found at %1m.\n", *move);
+	    TRACE_FILLLIB("Filllib: Found at %1m.\n", *move);
 	    return 1;
 	  }
 	}
@@ -325,7 +325,7 @@ fill_liberty(int *move, int color)
   }
   
   /* Nothing found. */
-  DEBUG(DEBUG_FILLLIB, "Filllib: No move found.\n");
+  TRACE_FILLLIB("Filllib: No move found.\n");
   return 0;
 }
 

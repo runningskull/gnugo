@@ -698,7 +698,7 @@ search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
       if (certain)
 	*certain = persistent_owl_cache[k].result_certain;
 
-      DEBUG(DEBUG_OWL_PERSISTENT_CACHE,
+      TRACE_OWL_PERSISTENT_CACHE(
 	    "persistent owl cache hit: routine %s at %1m result %d\n",
 	    routine_to_string(routine), apos, bpos, cpos, 
 	    result_to_string(persistent_owl_cache[k].result));
@@ -727,7 +727,7 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
 
   /* FIXME: Kick out oldest or least expensive entry instead of giving up. */
   if (persistent_owl_cache_size == MAX_OWL_CACHE_SIZE) {
-    DEBUG(DEBUG_OWL_PERFORMANCE, "Persistent owl cache full.\n");
+    TRACE_OWL_PERFORMANCE("Persistent owl cache full.\n");
     return;
   }
 

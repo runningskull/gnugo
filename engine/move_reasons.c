@@ -1906,7 +1906,7 @@ discard_redundant_move_reasons(int pos)
           break;
         if ((move_reasons[r].type == discard_rules[k1].reason_type[k2])
             && (discard_rules[k1].condition(pos, move_reasons[r].what))) {
-          DEBUG(DEBUG_MOVE_REASONS, discard_rules[k1].trace_message,
+          TRACE_MOVE_REASONS(discard_rules[k1].trace_message,
                 pos, get_pos(move_reasons[r].type, move_reasons[r].what)); 
           move_reasons[r].status |= discard_rules[k1].flags;
         }

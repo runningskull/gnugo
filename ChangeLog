@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
+
+- replace variadic DEBUG macros with TRACE_EYES etc.
+
+CVS tag SPEC_branch_point January 4, 2003
+
 - speed optimizations in board.c, particularly fastlib()
 - now possible to reduce MAX_BOARD and still get working GNU go
 - mkpat now has amechanism for dropping patterns

@@ -218,24 +218,6 @@ AC_CACHE_CHECK(
 if test "$gnugo_cv_c___function__" = "yes";then
       AC_DEFINE(HAVE___FUNCTION__)
 fi
-dnl ------ variadic #define -----------------------
-
-AH_TEMPLATE([HAVE_VARIADIC_DEFINE],
-[Define if #define can take a variable number of arguments])
-
-AC_CACHE_CHECK(
-	[for variadic cpp define],
-	gnugo_cv_cpp_variadic_define,
-	AC_TRY_COMPILE(
-[#include <stdio.h>
-#define zz(fmt,arg...) printf(fmt,##arg)],
-		[zz("Hello");zz("%s","Hello");zz("%s%s","Hello","World")],
-		gnugo_cv_cpp_variadic_define="yes",
-		gnugo_cv_cpp_variadic_define="no")
-)
-if test "$gnugo_cv_cpp_variadic_define" = "yes";then
-      AC_DEFINE(HAVE_VARIADIC_DEFINE)
-fi
 
 dnl check for a working curses library for use in debugboard
 

@@ -196,11 +196,11 @@ new_semeai(int color)
 	b_worst_status = UNKNOWN;
 
 	if (pass == 0) {
-	  DEBUG(DEBUG_SEMEAI, "Considering semeai between %1m and %1m\n",
+	  TRACE_SEMEAI("Considering semeai between %1m and %1m\n",
 		apos, bpos);
 	  owl_analyze_semeai(apos, bpos,
 			     best_result_a+k, worst_result_b+k, move+k, 1);
-	  DEBUG(DEBUG_SEMEAI, "Result1: %s %s %1m, ",
+	  TRACE_SEMEAI("Result1: %s %s %1m, ",
 	        safety_to_string(best_result_a[k]),
 	        safety_to_string(worst_result_b[k]), move[k]);
 	  if (a_best_status == DEAD
@@ -212,7 +212,7 @@ new_semeai(int color)
 	  }
 	  owl_analyze_semeai(bpos, apos, 
 			     best_result_b+k, worst_result_a+k, NULL, 1);
-	  DEBUG(DEBUG_SEMEAI, "Result2 %s %s.\n",
+	  TRACE_SEMEAI("Result2 %s %s.\n",
 	        safety_to_string(best_result_b[k]),
 	        safety_to_string(worst_result_a[k]));
 	  if (b_best_status == DEAD
@@ -291,7 +291,7 @@ update_status(int dr, int new_status, int new_safety)
 
   if (dragon[dr].status != new_status
       && (dragon[dr].status != CRITICAL || new_status != DEAD))  {
-    DEBUG(DEBUG_SEMEAI, "Changing status of %1m from %s to %s.\n", dr,
+    TRACE_SEMEAI("Changing status of %1m from %s to %s.\n", dr,
 	  status_to_string(dragon[dr].status),
 	  status_to_string(new_status));
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
@@ -301,7 +301,7 @@ update_status(int dr, int new_status, int new_safety)
 
   if (DRAGON2(dr).safety != new_safety
       && (DRAGON2(dr).safety != CRITICAL || new_safety != DEAD)) {
-    DEBUG(DEBUG_SEMEAI, "Changing safety of %1m from %s to %s.\n", dr,
+    TRACE_SEMEAI("Changing safety of %1m from %s to %s.\n", dr,
 	  safety_to_string(DRAGON2(dr).safety), safety_to_string(new_safety));
     DRAGON2(dr).safety = new_safety;
   }
@@ -327,7 +327,7 @@ analyze_semeai(int my_dragon, int your_dragon)
   int owl_code_sufficient = 0;
   int pos;
   
-  DEBUG(DEBUG_SEMEAI, "semeai_analyzer: %1m (me) vs %1m (them)\n",
+  TRACE_SEMEAI("semeai_analyzer: %1m (me) vs %1m (them)\n",
 	my_dragon, your_dragon);
 
   /* If both dragons are owl-critical, and the defense point for my
@@ -345,7 +345,7 @@ analyze_semeai(int my_dragon, int your_dragon)
       if (acode != 0) {
 	add_owl_attack_move(dragon[my_dragon].owl_defense_point, your_dragon,
 			    acode);
-	DEBUG(DEBUG_SEMEAI, "added owl attack of %1m at %1m with code %d\n",
+	TRACE_SEMEAI("added owl attack of %1m at %1m with code %d\n",
 	      your_dragon, dragon[my_dragon].owl_defense_point, acode);
 	owl_code_sufficient = 1;
       }
@@ -369,7 +369,7 @@ analyze_semeai(int my_dragon, int your_dragon)
       if (dcode != 0) {
 	add_owl_defense_move(dragon[your_dragon].owl_attack_point, my_dragon,
 			     dcode);
-	DEBUG(DEBUG_SEMEAI, "added owl defense of %1m at %1m with code %d\n",
+	TRACE_SEMEAI("added owl defense of %1m at %1m with code %d\n",
 	      my_dragon, dragon[your_dragon].owl_attack_point, dcode);
 	if (dragon[my_dragon].owl_status == DEAD) {
 	  int pos;
@@ -383,7 +383,7 @@ analyze_semeai(int my_dragon, int your_dragon)
 	      dragon[pos].status = CRITICAL;
 	    }
 	  }
-	  DEBUG(DEBUG_SEMEAI,
+	  TRACE_SEMEAI(
 		"changed owl_status and status of %1m to CRITICAL\n",
 		my_dragon);
 	}
@@ -394,7 +394,7 @@ analyze_semeai(int my_dragon, int your_dragon)
 
   /* If the owl code was able to resolve the semeai, exit. */
   if (owl_code_sufficient) {
-    DEBUG(DEBUG_SEMEAI, "...owl code sufficient to resolve semeai, exiting\n");
+    TRACE_SEMEAI("...owl code sufficient to resolve semeai, exiting\n");
     return;
   }
 
@@ -425,7 +425,7 @@ analyze_semeai(int my_dragon, int your_dragon)
 	  if (dragon[cpos].origin == my_dragon
 	      || dragon[cpos].origin == your_dragon) {
 	    if (owl_substantial(pos)) {
-	      DEBUG(DEBUG_SEMEAI, 
+	      TRACE_SEMEAI(
 		    "...tactical situation detected, exiting\n");
 	      return;
 	    }

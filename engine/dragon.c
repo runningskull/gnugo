@@ -209,7 +209,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       
       compute_eyes(str, &value, &attack_point, &defense_point, 
 		   black_eye, half_eye, 1, color);
-      DEBUG(DEBUG_EYES, "Black eyespace at %1m: %s\n", str,
+      TRACE_EYES("Black eyespace at %1m: %s\n", str,
 	    eyevalue_to_string(&value));
       black_eye[str].value = value;
       black_eye[str].attack_point = attack_point;
@@ -224,7 +224,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       
       compute_eyes(str, &value, &attack_point, &defense_point,
 		   white_eye, half_eye, 1, color);
-      DEBUG(DEBUG_EYES, "White eyespace at %1m: %s\n", str,
+      TRACE_EYES("White eyespace at %1m: %s\n", str,
 	    eyevalue_to_string(&value));
       white_eye[str].value = value;
       white_eye[str].attack_point = attack_point;
@@ -370,7 +370,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 		 * for connection moves to be properly valued.
 		 */
 		dragon[str].owl_status = acode==GAIN ? ALIVE : CRITICAL;
-		DEBUG(DEBUG_OWL_PERFORMANCE,
+		TRACE_OWL_PERFORMANCE(
 		      "Inconsistent owl attack and defense results for %1m.\n", 
 		      str);
 		/* Let's see whether the attacking move might be the right
@@ -651,7 +651,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	  }
 
 	if (!essential && neighbors > 0) {
-	  DEBUG(DEBUG_WORMS, "Worm %1m revised to be inessential.\n", str);
+	  TRACE_WORMS("Worm %1m revised to be inessential.\n", str);
 	  worm[str].inessential = 1;
 	  propagate_worm(str);
 	}
@@ -676,7 +676,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       }
 
       if (w == NO_MOVE) {
-	DEBUG(DEBUG_DRAGONS, "Dragon %1m revised to be inessential.\n", str);
+	TRACE_DRAGONS("Dragon %1m revised to be inessential.\n", str);
 	DRAGON2(str).safety = INESSENTIAL;
       }
     }
@@ -726,7 +726,7 @@ initialize_dragon_data(void)
       half_eye[str].value            =  10.0; /* Something big. */
       
       if (IS_STONE(board[str]) && worm[str].origin == str)
-	DEBUG(DEBUG_DRAGONS, 
+	TRACE_DRAGONS(
 	      "Initializing dragon from worm at %1m, size %d\n", 
 	      str, worm[str].size);
     }
@@ -1532,7 +1532,7 @@ dragon_eye(int pos, struct eye_data eye[BOARDMAX])
   if (eye[pos].esize == 3 && eye[pos].msize > 1)
     return;
 
-  DEBUG(DEBUG_DRAGONS, "amalgamate dragons around %1m\n", pos);
+  TRACE_DRAGONS("amalgamate dragons around %1m\n", pos);
   if (eye[pos].color == BLACK_BORDER)
     color = BLACK;
   else {
@@ -1595,11 +1595,11 @@ join_dragons(int d1, int d2)
       || (worm[d1].size == worm[d2].size
 	  && d1 < d2)) {
     origin = d1;
-    DEBUG(DEBUG_DRAGONS, "joining dragon at %1m to dragon at %1m\n", d2, d1);
+    TRACE_DRAGONS("joining dragon at %1m to dragon at %1m\n", d2, d1);
   }
   else {
     origin = d2;
-    DEBUG(DEBUG_DRAGONS, "joining dragon at %1m to dragon at %1m\n", d1, d2);
+    TRACE_DRAGONS("joining dragon at %1m to dragon at %1m\n", d1, d2);
   }
   
   dragon[origin].size  = dragon[d2].size + dragon[d1].size;
@@ -2065,7 +2065,7 @@ crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
   weakness_value[1] = gg_interpolate(&escape_route2weakness, escape_route);
   weakness_value[2] = gg_interpolate(&genus2weakness, true_genus);
 
-  DEBUG(DEBUG_DRAGONS,
+  TRACE_DRAGONS(
 	"  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f,",
 	moyo_value, weakness_value[0],
 	escape_route, weakness_value[1],
@@ -2115,7 +2115,7 @@ compute_dragon_weakness_value(int d)
    * - possible connections to neighbour dragons
    */
 
-  DEBUG(DEBUG_DRAGONS, "Computing weakness of dragon at %1m:\n", origin);
+  TRACE_DRAGONS("Computing weakness of dragon at %1m:\n", origin);
 
   weakness = crude_dragon_weakness(dragon2[d].safety, &dragon2[d].genus,
 				   dragon2[d].lunch != NO_MOVE,
@@ -2135,7 +2135,7 @@ compute_dragon_weakness_value(int d)
   if (weakness > 1.0)
     weakness = 1.0;
 
-  DEBUG(DEBUG_DRAGONS, " result: %f.\n", weakness);
+  TRACE_DRAGONS(" result: %f.\n", weakness);
   return weakness;
 }
 

@@ -1168,7 +1168,7 @@ owl_attack(int target, int *attack_point, int *certain, int *kworm)
   finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-  DEBUG(DEBUG_OWL_PERFORMANCE,
+  TRACE_OWL_PERFORMANCE(
     "owl_attack %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
     target, result, move, local_owl_node_counter,
     tactical_nodes, gg_cputime() - start);
@@ -1757,7 +1757,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   gg_assert(stackp == 0);
 
-  DEBUG(DEBUG_OWL_PERFORMANCE,
+  TRACE_OWL_PERFORMANCE(
     "owl_threaten_attack %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
     target, move, move2, result, local_owl_node_counter,
     tactical_nodes, gg_cputime() - start);
@@ -1827,7 +1827,7 @@ owl_defend(int target, int *defense_point, int *certain, int *kworm)
   finish_goal_list(&goal_worms_computed, &wpos, owl_goal_worm, wid);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-  DEBUG(DEBUG_OWL_PERFORMANCE,
+  TRACE_OWL_PERFORMANCE(
     "owl_defend %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
 	    target, result, move, local_owl_node_counter,
 	    tactical_nodes, gg_cputime() - start);
@@ -2248,7 +2248,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   gg_assert(stackp == 0);
 
-  DEBUG(DEBUG_OWL_PERFORMANCE, 
+  TRACE_OWL_PERFORMANCE(
     "owl_threaten_defense %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
 	    target, move, move2, result, local_owl_node_counter,
 	    tactical_nodes, gg_cputime() - start);
@@ -3298,16 +3298,16 @@ owl_shapes_callback(int anchor, int color, struct pattern *pattern,
   if (pattern->helper) {
     /* ask helper function to consider the move */
     gg_assert(0);
-    DEBUG(DEBUG_HELPER, "  asking helper to consider '%s'+%d at %1m\n",
+    TRACE_HELPER("  asking helper to consider '%s'+%d at %1m\n",
 	  pattern->name, ll, move);
     tval = pattern->helper(pattern, ll, move, color);
     
     if (tval > 0) {
-      DEBUG(DEBUG_HELPER, "helper likes pattern '%s' value %d at %1m\n",
+      TRACE_HELPER("helper likes pattern '%s' value %d at %1m\n",
 	    pattern->name, tval, move);
     }
     else {
-      DEBUG(DEBUG_HELPER, "  helper does not like pattern '%s' at %1m\n",
+      TRACE_HELPER("  helper does not like pattern '%s' at %1m\n",
 	    pattern->name, move);
       return;  /* pattern matcher does not like it */
     }
@@ -3665,13 +3665,13 @@ owl_reasons(int color)
 	  if (dragon[pos].owl_defense_code == LOSS) {
 	    add_loss_move(dragon[pos].owl_defense_point, pos,
 			  dragon[pos].owl_defense_kworm);
-	    DEBUG(DEBUG_OWL, "owl: %1m defends %1m with loss at move %d\n",
+	    TRACE_OWL("owl: %1m defends %1m with loss at move %d\n",
 		  dragon[pos].owl_defense_point, pos, movenum+1);
 	  }
 	  else {
 	    add_owl_defense_move(dragon[pos].owl_defense_point, pos,
 				 dragon[pos].owl_defense_code);
-	    DEBUG(DEBUG_OWL, "owl: %1m defends %1m at move %d\n",
+	    TRACE_OWL("owl: %1m defends %1m at move %d\n",
 		  dragon[pos].owl_defense_point, pos, movenum+1);
 	  }
 	}
@@ -3723,7 +3723,7 @@ owl_reasons(int color)
 	     * owl attack defends the (largest) attacker.
 	     */
 	  if (!safe && owl_does_defend(move, bpos, &kworm) != WIN) {
-	    DEBUG(DEBUG_OWL,
+	    TRACE_OWL(
 		  "owl: %1m attacks %1m at move %d, but the attacker dies.\n",
 		  move, pos, movenum+1);
 	    DRAGON2(pos).safety = INESSENTIAL;
@@ -3734,12 +3734,12 @@ owl_reasons(int color)
 	/* If we've reached this far, the attack is okay. */
 	if (dragon[pos].owl_attack_code == GAIN) {
 	  add_gain_move(move, pos, dragon[pos].owl_attack_kworm );
-	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n", move, pos,
+	  TRACE_OWL("owl: %1m attacks %1m with gain at move %d\n", move, pos,
 		movenum+1);
 	}
 	else {
 	  add_owl_attack_move(move, pos, dragon[pos].owl_attack_code);
-	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m at move %d\n", move, pos,
+	  TRACE_OWL("owl: %1m attacks %1m at move %d\n", move, pos,
 		movenum+1);
 	}
       }
@@ -3749,7 +3749,7 @@ owl_reasons(int color)
       if (board[pos] == color 
 	  && dragon[pos].owl_defense_point != NO_MOVE) {
 	add_owl_defense_threat_move(dragon[pos].owl_defense_point, pos, WIN);
-	DEBUG(DEBUG_OWL, "owl: %1m threatens to defend %1m at move %d\n", 
+	TRACE_OWL("owl: %1m threatens to defend %1m at move %d\n", 
 	      dragon[pos].owl_defense_point, pos, movenum+1);
       }
       if (board[pos] == color
@@ -3757,7 +3757,7 @@ owl_reasons(int color)
 	  && is_legal(dragon[pos].owl_second_defense_point, color)) {
 	add_owl_defense_threat_move(dragon[pos].owl_second_defense_point,
 				    pos, WIN);
-	DEBUG(DEBUG_OWL, "owl: %1m threatens to defend %1m at move %d\n", 
+	TRACE_OWL("owl: %1m threatens to defend %1m at move %d\n", 
 	      dragon[pos].owl_second_defense_point, pos, movenum+1);
       }
 
@@ -3768,7 +3768,7 @@ owl_reasons(int color)
 	  && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE
 	  && dragon[pos].owl_attack_point != NO_MOVE) {
 	add_owl_prevent_threat_move(dragon[pos].owl_attack_point, pos);
-	DEBUG(DEBUG_OWL, "owl: %1m prevents a threat against %1m at move %d\n",
+	TRACE_OWL("owl: %1m prevents a threat against %1m at move %d\n",
 	      dragon[pos].owl_attack_point, pos, movenum+1);
       }
     }
@@ -3777,14 +3777,14 @@ owl_reasons(int color)
 	  && dragon[pos].owl_threat_status == CAN_THREATEN_ATTACK) {
 	if (dragon[pos].owl_attack_point != NO_MOVE) {
 	  add_owl_attack_threat_move(dragon[pos].owl_attack_point, pos, WIN);
-	  DEBUG(DEBUG_OWL, "owl: %1m threatens %1m at move %d\n",
+	  TRACE_OWL("owl: %1m threatens %1m at move %d\n",
 		dragon[pos].owl_attack_point, pos, movenum+1);
 	}
 	if (dragon[pos].owl_second_attack_point != NO_MOVE
 	    && is_legal(dragon[pos].owl_second_attack_point, color)) {
 	  add_owl_attack_threat_move(dragon[pos].owl_second_attack_point, pos,
 				     WIN);
-	  DEBUG(DEBUG_OWL, "owl: %1m threatens %1m at move %d\n",
+	  TRACE_OWL("owl: %1m threatens %1m at move %d\n",
 		dragon[pos].owl_second_attack_point, pos, movenum+1);
 	}
       }
@@ -3793,7 +3793,7 @@ owl_reasons(int color)
 	       && dragon[pos].owl_attack_code == GAIN) {
 	add_gain_move(dragon[pos].owl_attack_point, pos,
 		      dragon[pos].owl_attack_kworm);
-	DEBUG(DEBUG_OWL, "owl: %1m attacks %1m with gain at move %d\n", 
+	TRACE_OWL("owl: %1m attacks %1m with gain at move %d\n", 
 	      dragon[pos].owl_attack_point, pos, movenum+1);
       }
       else if (board[pos] == color
@@ -3801,7 +3801,7 @@ owl_reasons(int color)
 	       && dragon[pos].owl_defense_code == LOSS) {
 	add_loss_move(dragon[pos].owl_defense_point, pos,
 		      dragon[pos].owl_defense_kworm);
-	DEBUG(DEBUG_OWL, "owl: %1m defends %1m with loss at move %d\n",
+	TRACE_OWL("owl: %1m defends %1m with loss at move %d\n",
 	      dragon[pos].owl_defense_point, pos, movenum+1);
       }
       else if (board[pos] == color
@@ -3811,7 +3811,7 @@ owl_reasons(int color)
 	       && dragon[pos].owl_defense_point != NO_MOVE) {
 	add_owl_defense_move(dragon[pos].owl_defense_point, pos,
 			     dragon[pos].owl_defense_code);
-	DEBUG(DEBUG_OWL, "owl: %1m defends %1m against possible loss at move %d\n",
+	TRACE_OWL("owl: %1m defends %1m against possible loss at move %d\n",
 	      dragon[pos].owl_defense_point, pos, movenum+1);
 
       }
@@ -3824,7 +3824,7 @@ owl_reasons(int color)
 	       && dragon[pos].owl_defense_certain
 	       && ON_BOARD(dragon[pos].owl_defense_point)) {
 	add_owl_uncertain_defense_move(dragon[pos].owl_defense_point, pos);
-	DEBUG(DEBUG_OWL, 
+	TRACE_OWL(
 	      "owl: %1m defends the uncertain dragon at %1m at move %d\n",
 	      dragon[pos].owl_defense_point, pos, movenum+1);
       }
@@ -3839,7 +3839,7 @@ owl_reasons(int color)
 	     && !dragon[pos].owl_attack_certain
 	     && ON_BOARD(dragon[pos].owl_attack_point)) {
       add_owl_uncertain_defense_move(dragon[pos].owl_attack_point, pos);
-      DEBUG(DEBUG_OWL,
+      TRACE_OWL(
 	    "owl: %1m might defend the uncertain dragon at %1m at move %d\n",
 	    dragon[pos].owl_attack_point, pos, movenum+1);
     }
@@ -3902,7 +3902,7 @@ owl_does_defend(int move, int target, int *kworm)
 
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-  DEBUG(DEBUG_OWL_PERFORMANCE,
+  TRACE_OWL_PERFORMANCE(
 	"owl_does_defend %1m %1m(%1m), result %d (%d, %d nodes, %f seconds)\n",
 	move, target, origin, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
@@ -3982,7 +3982,7 @@ owl_confirm_safety(int move, int target, int *defense_point, int *kworm)
 
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-  DEBUG(DEBUG_OWL_PERFORMANCE,
+  TRACE_OWL_PERFORMANCE(
 	"owl_confirm_safety %1m %1m(%1m), result %d %1m (%d, %d nodes, %f seconds)\n",
 	move, target, origin, result, defense,
 	local_owl_node_counter, tactical_nodes,
@@ -4080,7 +4080,7 @@ owl_does_attack(int move, int target, int *kworm)
 
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-  DEBUG(DEBUG_OWL_PERFORMANCE,
+  TRACE_OWL_PERFORMANCE(
 	"owl_does_attack %1m %1m(%1m), result %d (%d, %d nodes, %f seconds)\n",
 	move, target, origin, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
@@ -4136,7 +4136,7 @@ owl_connection_defends(int move, int target1, int target2)
   }
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   
-  DEBUG(DEBUG_OWL_PERFORMANCE,
+  TRACE_OWL_PERFORMANCE(
 	"owl_conn_defends %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
 	move, target1, target2, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
@@ -4675,7 +4675,7 @@ owl_substantial(int str)
   }
 
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
-  DEBUG(DEBUG_OWL_PERFORMANCE,
+  TRACE_OWL_PERFORMANCE(
 	"owl_substantial %1m, result %d (%d, %d nodes, %f seconds)\n",
 	str, result, local_owl_node_counter,
 	tactical_nodes, gg_cputime() - start);
@@ -4937,7 +4937,7 @@ compute_owl_escape_values(struct local_owl_data *owl)
   
   get_lively_stones(OTHER_COLOR(owl->color), safe_stones);
   compute_escape_influence(owl->color, safe_stones, NULL, owl->escape_values);
-  DEBUG(DEBUG_ESCAPE, "Owl escape values:\n");
+  TRACE_ESCAPE("Owl escape values:\n");
 
   for (m = 0; m < board_size; m++) {
     for (n = 0; n < board_size; n++) {
@@ -4950,9 +4950,9 @@ compute_owl_escape_values(struct local_owl_data *owl)
 		     || DRAGON2(pos).moyo_size > 5))
 	  owl->escape_values[pos] = 4;
       }
-      DEBUG(DEBUG_ESCAPE, "%o%d", owl->escape_values[pos]);
+      TRACE_ESCAPE("%o%d", owl->escape_values[pos]);
     }
-    DEBUG(DEBUG_ESCAPE, "%o\n");
+    TRACE_ESCAPE("%o\n");
   }
 }
 
@@ -5321,7 +5321,7 @@ catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_GOAL_WORMS])
       int origin = find_origin(pos);
       if (pos == origin) {
 	if (0) {
-	  DEBUG(DEBUG_SEMEAI, "goal worm: %1m\n", pos);
+	  TRACE_SEMEAI("goal worm: %1m\n", pos);
 	}
 	goal_worm[worms++] = pos;
       }
