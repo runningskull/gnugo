@@ -1,4 +1,4 @@
-Current CVS 3/20/02 after tuning_1_28.1
+======================= 3.1.28 pre 4  =========================
 
 ./regress.sh . reading.tst
 168 unexpected PASS!

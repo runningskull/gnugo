@@ -173,7 +173,7 @@ loadsgf games/strategy5.sgf 12
 #
 loadsgf games/strategy5.sgf 14
 27 gg_genmove black
-#? [C3]*
+#? [C3]
 
 loadsgf games/strategy5.sgf 20
 28 gg_genmove black

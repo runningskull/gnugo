@@ -1456,7 +1456,7 @@ compare_elements_closest(const void *a, const void *b)
 }
 
 
-static void tree_push_pattern();
+static void tree_push_pattern(void);
 
 
 /* flush out the pattern stored in elements[]. Don't forget
@@ -1711,7 +1711,7 @@ tree_push_pattern_rot(int ll) {
  * then a pattern has matched (with a given orientation).
  */
 static void
-tree_push_pattern() {
+tree_push_pattern(void) {
   static int init = 0;
   int ll;
   int start_transformation = 0;

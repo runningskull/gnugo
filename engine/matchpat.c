@@ -644,6 +644,7 @@ void tree_match_init(void) {
 static void 
 tree_prepare_for_match(int color)
 {
+  UNUSED(color);
   /* Nothing to prepare! */
 }
 

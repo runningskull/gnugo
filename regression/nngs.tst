@@ -475,7 +475,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 28
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 36
 1050 gg_genmove white
-#? [J10|H10|G10|F10]
+#? [J10|H10|G10|F10]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52

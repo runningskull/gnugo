@@ -211,6 +211,8 @@ find_connection(int dragon1, int dragon2)
 }
 
 
+#if 0
+
 /*
  * Find the index of an unordered pair of worms in the list of worm pairs.
  * If necessary, add a new entry.
@@ -239,6 +241,7 @@ find_worm_pair(int worm1, int worm2)
   return next_worm_pair - 1;
 }
 
+#endif
 
 static int
 find_either_data(int reason1, int what1, int reason2, int what2)
@@ -642,6 +645,8 @@ either_move_redundant(int pos, int what)
 	      && attack_move_reason_known(pos, either_data[what].what2)));
 }
 
+#if 0
+
 static int
 all_move_redundant(int pos, int what)
 {
@@ -651,6 +656,7 @@ all_move_redundant(int pos, int what)
 	      && defense_move_reason_known(pos, all_data[what].what2)));
 }
 
+#endif
 
 /* ---------------------------------------------------------------- */
 

@@ -665,7 +665,7 @@ loadsgf games/doubleko.sgf
 # This position can reveal komaster scheme weaknesses.
 loadsgf games/reading37.sgf
 168 defend B5
-#? [2 B2]*
+#? [2 B2]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

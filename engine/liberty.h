@@ -189,6 +189,7 @@ void report_worm(int m, int n);
 void ascii_report_worm(char *string);
 void report_dragon(int m, int n);
 void ascii_report_dragon(char *string);
+struct dragon_data2 * dragon2_func(int pos);
 
 /* prototypes for reorientation functions */
 

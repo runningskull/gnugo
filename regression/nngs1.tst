@@ -13,15 +13,15 @@ loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 74
 
 loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 18
 4 gg_genmove white
-#? [H3|J5]*
+#? [H3|J5]
 
 loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 20
 5 gg_genmove white
-#? [H3|J5]*
+#? [H3|J5]
 
 loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 22
 6 gg_genmove white
-#? [H4]*
+#? [H4]
 
 # Unsupported keimas like this lead to trouble quickly
 loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 24
@@ -30,7 +30,7 @@ loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 24
 
 loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 32
 8 gg_genmove white
-#? [M10|L9]*
+#? [M10|L9]
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 44
 9 gg_genmove black
@@ -82,7 +82,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 36
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 40
 21 gg_genmove white
-#? [!M6]*
+#? [!M6]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203111825.sgf 92
 22 gg_genmove white
@@ -102,7 +102,7 @@ loadsgf games/nngs/gnugo-3.1.27-wingjk-200203101039.sgf 78
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 26
 26 gg_genmove white
-#? [P3]*
+#? [P3]
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 46
 27 gg_genmove white
@@ -115,7 +115,7 @@ loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 126
 # GNU Go 3.1.27 invades the 3-3 point too early
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6
 29 gg_genmove white
-#? [!R17]*
+#? [!R17]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
 30 gg_genmove white
