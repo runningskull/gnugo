@@ -37,3 +37,8 @@ loadsgf games/gunnar/gunnar11.sgf
 80 break_in C14 K13 J12 K12 H11 J11 H10
 #? [0]
 
+loadsgf golois/Aya991113-11.sgf
+trymove black B3
+90 block_off F4 E8 F8 E7 D6 E6 D5
+#? [0]
+popgo

@@ -2746,6 +2746,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   }
 
 #if USE_HASHTABLE_NG
+  str = find_origin(str);
   if (stackp <= depth
       && (hashflags & HASH_BREAK_IN)
       && !has_passed
@@ -2806,8 +2807,8 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 	if (acode == 0) {
 	  SGFTRACE(xpos, WIN, "break effective");
 #if USE_HASHTABLE_NG
-	  READ_RETURN_NG(komaster, kom_pos, BREAK_IN, str, depth - stackp, 
-	      		 move, xpos, WIN);
+	  READ_RETURN_HASH_NG(komaster, kom_pos, BREAK_IN, str, depth - stackp, 
+	      		      goal_hash, move, xpos, WIN);
 #else
 	  READ_RETURN(read_result, move, xpos, WIN);
 #endif
@@ -2831,8 +2832,8 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   if (tried_moves == 0 && distance < 1.0) {
     SGFTRACE(NO_MOVE, WIN, "no move, probably connected");
 #if USE_HASHTABLE_NG
-    READ_RETURN_NG(komaster, kom_pos, BREAK_IN, str, depth -stackp, 
-		   move, xpos, WIN);
+    READ_RETURN_HASH_NG(komaster, kom_pos, BREAK_IN, str, depth - stackp, 
+		        goal_hash, move, xpos, WIN);
 #else
     READ_RETURN(read_result, move, NO_MOVE, WIN);
 #endif
@@ -2841,8 +2842,8 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   if (savecode != 0) {
     SGFTRACE(savemove, savecode, "saved move");
 #if USE_HASHTABLE_NG
-    READ_RETURN_NG(komaster, kom_pos, BREAK_IN, str, depth -stackp, 
-		   move, xpos, savecode);
+    READ_RETURN_HASH_NG(komaster, kom_pos, BREAK_IN, str, depth - stackp, 
+		        goal_hash, move, xpos, savecode);
 #else
     READ_RETURN(read_result, move, savemove, savecode);
 #endif
@@ -2850,8 +2851,8 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
 
   SGFTRACE(0, 0, NULL);
 #if USE_HASHTABLE_NG
-  READ_RETURN_NG(komaster, kom_pos, BREAK_IN, str, depth -stackp, 
-		 move, xpos, 0);
+  READ_RETURN_HASH_NG(komaster, kom_pos, BREAK_IN, str, depth - stackp, 
+		      goal_hash, move, xpos, 0);
 #else
   READ_RETURN(read_result, move, NO_MOVE, 0);
 #endif
@@ -2873,9 +2874,13 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
   int xpos;
   int savemove = NO_MOVE;
   int savecode = 0;
-  int found_read_result;
   int tried_moves = 0;
+#if USE_HASHTABLE_NG
+  int retval;
+#else
+  int found_read_result;
   Read_result *read_result = NULL;
+#endif
   SETUP_TRACE_INFO("recursive_block", str);
   
   nodes_connect++;
@@ -2906,6 +2911,18 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
     return WIN;
   }
   
+#if USE_HASHTABLE_NG
+  str = find_origin(str);
+  if ((stackp <= depth)
+      && (hashflags & HASH_BLOCK_OFF)
+      && (tt_get(&ttable, komaster, kom_pos, BLOCK_OFF, str,
+                 depth - stackp, goal_hash, &retval, NULL, &xpos) == 2)) {
+    SGFTRACE(xpos, retval, "cached");
+    if (move)
+      *move = xpos;
+    return retval;
+  }
+#else
   if ((stackp <= depth) && (hashflags & HASH_BLOCK_OFF)) {
     found_read_result
       = get_read_result_hash_modified(BLOCK_OFF, komaster, kom_pos, 
@@ -2921,10 +2938,16 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
       return rr_get_result(*read_result);
     }
   }
+#endif
 
   if (ladder_capture(str, &xpos) == WIN) {
     SGFTRACE(xpos, WIN, "string capturable");
+#if USE_HASHTABLE_NG
+    READ_RETURN_HASH_NG(komaster, kom_pos, BLOCK_OFF, str, depth - stackp,
+	                goal_hash, move, xpos, WIN);
+#else
     READ_RETURN(read_result, move, xpos, WIN);
+#endif
   }
   
   num_moves = find_break_moves(str, goal, other, moves, &distance);
@@ -2947,7 +2970,12 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
 	popgo();
 	if (dcode == 0) {
 	  SGFTRACE(xpos, WIN, "block effective");
+#if USE_HASHTABLE_NG
+	  READ_RETURN_HASH_NG(komaster, kom_pos, BLOCK_OFF, str,
+	      		      depth - stackp, goal_hash, move, xpos, WIN);
+#else
 	  READ_RETURN(read_result, move, xpos, WIN);
+#endif
 	}
 	/* if the move works with ko we save it, then look for something
 	 * better.
@@ -2971,16 +2999,31 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
 	  || !recursive_break(str, goal, NULL, komaster, kom_pos, 1,
 	                      goal_hash))) {
     SGFTRACE(NO_MOVE, WIN, "no move, probably disconnected");
+#if USE_HASHTABLE_NG
+    READ_RETURN_HASH_NG(komaster, kom_pos, BLOCK_OFF, str,
+			depth - stackp, goal_hash, move, NO_MOVE, WIN);
+#else
     READ_RETURN(read_result, move, NO_MOVE, WIN);
+#endif
   }
   
   if (savecode != 0) {
     SGFTRACE(savemove, savecode, "saved move");
+#if USE_HASHTABLE_NG
+    READ_RETURN_HASH_NG(komaster, kom_pos, BLOCK_OFF, str,
+			depth - stackp, goal_hash, move, savemove, savecode);
+#else
     READ_RETURN(read_result, move, savemove, savecode);
+#endif
   }
 
   SGFTRACE(0, 0, NULL);
+#if USE_HASHTABLE_NG
+  READ_RETURN_HASH_NG(komaster, kom_pos, BLOCK_OFF, str,
+		      depth - stackp, goal_hash, move, NO_MOVE, 0);
+#else
   READ_RETURN(read_result, move, NO_MOVE, 0);
+#endif
 }
 
 

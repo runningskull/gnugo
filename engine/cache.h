@@ -370,6 +370,14 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
     return (value); \
   } while (0)
 
+#define READ_RETURN_HASH_NG(komaster, kom_pos, routine, str, remaining_depth, hash, point, move, value) \
+  do { \
+    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, hash,\
+              value, 0, move);\
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    return (value); \
+  } while (0)
+
 #define READ_RETURN2_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value1, value2) \
   do { \
     tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, NULL,\
