@@ -150,6 +150,7 @@ loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 208
 510 gg_genmove black
 #? [E19]
 
+# First solve optics:328.
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 210
 520 gg_genmove black
 #? [!G19]*

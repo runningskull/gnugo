@@ -87,3 +87,7 @@ loadsgf games/nando/auto017.sgf
 white P16
 20 combination_attack black
 #? [L17]*
+
+loadsgf games/nngs/leftd-gnugo-3.3.16-200302252226.sgf -L 256
+21 combination_attack black
+#? [Q9|N13|O13]

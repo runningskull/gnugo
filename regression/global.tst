@@ -186,9 +186,10 @@ loadsgf golois/MeilleurCoup0010.sgf
 44 gg_genmove black
 #? [D5]
 
-loadsgf golois/MeilleurCoup990428-1.sgf
-45 gg_genmove black
-#? [D5]
+# gf This is a duplicate of 44, removed. (3.3.17)
+# loadsgf golois/MeilleurCoup990428-1.sgf
+# 45 gg_genmove black
+# #? [D5]
 
 #CATEGORY=SEMEAI
 #DESCRIPTION=

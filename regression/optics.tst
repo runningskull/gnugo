@@ -115,6 +115,8 @@ loadsgf games/eyes3.sgf
 #? [1 1]
 327 eval_eye T14
 #? [0 0]
+328 eval_eye O16
+#? [0 1 (N16|N13) N16]
 
 # False margins of various shapes and sizes
 loadsgf games/marginal.sgf
