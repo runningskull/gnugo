@@ -12,6 +12,9 @@
 /* Ruleset. Default Japanese */
 #define CHINESE_RULES 0
 
+/* Center oriented influence. Disabled by default. */
+#define COSMIC_GNUGO 0
+
 /* Default level (strength). Up to 10 supported */
 #define DEFAULT_LEVEL 10
 

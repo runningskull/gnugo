@@ -9,6 +9,9 @@
 /* Ruleset. Default Japanese */
 #undef CHINESE_RULES
 
+/* Center oriented influence. Disabled by default. */
+#undef COSMIC_GNUGO
+
 /* Define to use curses for color debugging */
 #undef CURSES
 

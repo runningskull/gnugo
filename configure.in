@@ -76,7 +76,7 @@ AC_ARG_ENABLE(chinese-rules,
   --disable-chinese-rules     use Japanese counting (default)])
 
 AC_ARG_ENABLE(resignation-allowed,
- [  --enable-resignation allowed       resign lost games
+ [  --enable-resignation-allowed       resign lost games
   --disable-resignation-allowed      never resign (default)])
 
 AC_ARG_ENABLE(oracle,
@@ -98,6 +98,10 @@ AC_ARG_ENABLE(experimental-owl-ext,
 AC_ARG_ENABLE(experimental-reading,
  [  --enable-experimental-reading      use experimental pattern-based reading
   --disable-experimental-reading     use standard reading (default)])
+
+AC_ARG_ENABLE(cosmic-gnugo,
+ [  --enable-cosmic-gnugo              use center-oriented influence code
+  --disable-cosmic-gnugo             use standard influence code (default)])
 
 AC_ARG_ENABLE(experimental-connections,
  [  --enable-experimental-connections  use experimental connection analysis 
@@ -467,6 +471,17 @@ if test "$enable_experimental_reading" = "yes" ; then
    AC_DEFINE(EXPERIMENTAL_READING, 1)
 else
    AC_DEFINE(EXPERIMENTAL_READING, 0)
+fi
+
+dnl ------------ Reading -------------------
+
+AH_TEMPLATE([COSMIC_GNUGO],
+[Center oriented influence. Disabled by default.])
+
+if test "$enable_cosmic_gnugo" = "yes" ; then
+   AC_DEFINE(COSMIC_GNUGO, 1)
+else
+   AC_DEFINE(COSMIC_GNUGO, 0)
 fi
 
 dnl ------------ Connections -------------------

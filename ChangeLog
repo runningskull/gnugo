@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- configure --enable-cosmic-gnugo produces a center-oriented engine
 - added cache for results of approxlib() and accuratelib()
 - new static functions do_approxlib() and do_accuratelib() in board.c
 - finish_sgftrace() will not free the trace tree if not written successfully

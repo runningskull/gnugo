@@ -66,6 +66,46 @@ static struct influence_data escape_influence;
 /* Pointer to influence data used during pattern matching. */
 static struct influence_data *current_influence = NULL;
 
+#if COSMIC_GNUGO
+
+/* Threholds values used in the whose_moyo() function */
+ struct moyo_determination_data moyo_data;
+ 
+/* Threholds value used in the whose_territory() function */
+ float territory_determination_value;
+ 
+#endif
+
+/* This curve determines how much influence is needed at least to claim
+ * an intersection as territory, in dependence of the "center value".
+ * (In the center, more effort is needed to get territory!)
+ * The center value is at the moment defined as follows:
+ * If d1, d2 are the distance to vertical and horizontal border, resp.,
+ * with d1<d2, then
+ * central = 3 * d1 + min(d2, 4)
+ * So this is mainly a function of the distance to the border; the
+ * distance to the second-nearest border gives a small correction of at
+ * most 4. This distinguishes edge and corner positions.
+ *
+ * The values for intersections close to a corner or to the edge have
+ * to be consistent such that standard corner enclosure etc. are
+ * sufficient to claim territory. The center values are more arbitrary
+ * suspect to tuning.
+ */
+
+static struct interpolation_data min_infl_for_territory =
+  { 6,  0.0, 24.0, { 6.0, 15.0, 26.0, 36.0, 45.0, 50.0, 55.0 }};
+
+/* Determines the territory correction factor in dependence of the ratio
+ * ( influence of stronger color / min_infl_for_territory(intersection))
+ */
+static struct interpolation_data territory_correction = 
+  { 5, (float) 0.0, 1.0, {0.0, 0.25, 0.45, 0.65, 0.85, 1.0}};
+
+
+
+
+
 /* If set, print influence map when computing this move. Purely for
  * debugging.
  */
@@ -227,7 +267,7 @@ accumulate_influence(struct influence_data *q, int pos, int color)
        * 3. Directed outwards. For the origin all directions are outwards.
        */
       if (ON_BOARD(ii + d_ii)
-	  && q->p[ii + d_ii] == EMPTY
+      	  && (!q->safe[ii + d_ii])
 	  && (di*(delta_i) + dj*(delta_j) > 0
 	      || queue_start == 1)) {
 
@@ -330,6 +370,8 @@ accumulate_influence(struct influence_data *q, int pos, int color)
   }
 }
 
+
+
 /* Initialize the influence_data structure.  */
 
 static void
@@ -339,6 +381,41 @@ init_influence(struct influence_data *q, int color,
 {
   int ii;
   float attenuation;
+  
+#if COSMIC_GNUGO
+    
+  float t;
+
+  /* Initialisation of some global positional values, based on 
+   * game stage. 
+   */
+    if ((board_size != 19) || (movenum <= 2) || ((movenum / 2) % 2)   )
+      cosmic_importance = 0.0;
+    else {
+      cosmic_importance = 1.0 - (movenum / 120.0)*(movenum / 120.0); 
+      cosmic_importance = gg_max(0.0, cosmic_importance);
+    }
+
+    t = cosmic_importance;
+    moyo_data.influence_balance     = t * 5.0  +  (1.0-t) * 7.0;  
+    moyo_data.my_influence_minimum  = t * 5.0  +  (1.0-t) * 5.0;
+    moyo_data.opp_influence_maximum = t * 20.0 +  (1.0-t) * 10.0;
+    
+    territory_determination_value   = t * 0.95 +  (1.0-t) * 0.95;  
+     
+    /* non-cosmic values are: 
+     * { 6,  0.0, 24.0, { 6.0, 15.0, 26.0, 36.0, 45.0, 50.0, 55.0 }};
+     */
+      
+    min_infl_for_territory.values[0] = t * 20.0  +  (1.0-t) *  6.0;
+    min_infl_for_territory.values[1] = t * 20.0  +  (1.0-t) * 15.0;
+    min_infl_for_territory.values[2] = t * 20.0  +  (1.0-t) * 26.0;
+    min_infl_for_territory.values[3] = t * 25.0  +  (1.0-t) * 36.0;
+    min_infl_for_territory.values[4] = t * 25.0  +  (1.0-t) * 45.0;
+    min_infl_for_territory.values[5] = t * 25.0  +  (1.0-t) * 50.0;
+    min_infl_for_territory.values[6] = t * 25.0  +  (1.0-t) * 55.0;   
+    
+#endif  
 
   if (q != &escape_influence) {
     q->color_to_move = color;
@@ -407,6 +484,7 @@ init_influence(struct influence_data *q, int color,
 	q->safe[ii] = 0;
     }
 }
+
 
 /* Adds an influence source at position pos with prescribed strength
  * and attenuation. color can be BLACK, WHITE or both. If there
@@ -725,7 +803,40 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
     pattern->autohelper(ll, pos, color, INFLUENCE_CALLBACK);
   }
   
-  
+#if COSMIC_GNUGO  
+
+  /* For I patterns, add a low intensity, both colored, influence
+   * source at *.
+   */
+  if (pattern->class & CLASS_I) {
+    int this_color = EMPTY;
+    float t = 0.15 + (1.0 - cosmic_importance);
+    float source_strength;
+
+    if (q->color_to_move == EMPTY || (pattern->class & CLASS_s))
+      this_color = BLACK | WHITE;
+    else if (q->color_to_move != color)
+      this_color = q->color_to_move;
+      
+    t = gg_min(1.0, t);
+    t = gg_max(0.0, t);
+    
+    source_strength = t * pattern->value;  
+
+    /* Increase strength if we're computing escape influence. */
+    if (q == &escape_influence && (pattern->class & CLASS_e))
+      add_influence_source(pos, this_color, 20 * source_strength, 1.6, q);
+    else
+      add_influence_source(pos, this_color, source_strength, 1.6, q);
+
+    DEBUG(DEBUG_INFLUENCE,
+	  "  low intensity influence source at %1m, strength %f, color %C\n",
+	  pos, pattern->value, this_color);
+    return;
+  }
+
+#else
+
   /* For I patterns, add a low intensity, both colored, influence
    * source at *.
    */
@@ -748,6 +859,9 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 	  pos, pattern->value, this_color);
     return;
   }
+
+
+#endif
   
   /* For E patterns, add a new influence source of the same color and
    * pattern defined strength at *.
@@ -773,6 +887,10 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 	    && pattern->patn[k].att == ATT_not)) {
       /* transform pattern real coordinate */
       int ii = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
+#if COSMIC_GNUGO
+      float t = 0.15 + (1.0 - cosmic_importance);
+      float source_strength;
+#endif
 
       /* Territorial connection, making a barrier for opponent influence. */
       if (pattern->class & (CLASS_A | CLASS_D)) {
@@ -798,7 +916,26 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 	  
 	}
       }
+
+#if COSMIC_GNUGO
+      t = gg_min(1.0, t);
+      t = gg_max(0.0, t);
       
+      source_strength = t * pattern->value;  
+      
+      /* Low intensity influence source for the color in turn to move. */
+      if (pattern->class & CLASS_B) {
+        if (q->is_territorial_influence)
+          enter_intrusion_source(anchor, ii, source_strength, 
+	  		         TERR_DEFAULT_ATTENUATION, q);
+        else
+          add_influence_source(ii, color, source_strength, 
+                                 DEFAULT_ATTENUATION, q); 
+	DEBUG(DEBUG_INFLUENCE, "  intrusion at %1m\n", ii);
+      }
+      
+#else
+
       /* Low intensity influence source for the color in turn to move. */
       if (pattern->class & CLASS_B) {
         if (q->is_territorial_influence)
@@ -809,6 +946,10 @@ influence_callback(int anchor, int color, struct pattern *pattern, int ll,
 			       pattern->value, DEFAULT_ATTENUATION, q);
 	DEBUG(DEBUG_INFLUENCE, "  intrusion at %1m\n", ii);
       }
+
+
+#endif
+      
     }
   }
 }
@@ -1050,12 +1191,20 @@ whose_territory(const struct influence_data *q, int pos)
   float terr = q->territory_value[pos];
 
   ASSERT_ON_BOARD1(pos);
-  
+
+#if COSMIC_GNUGO
+  if (bi > 0.0 && wi == 0.0 && terr < -territory_determination_value)
+    return BLACK;
+  if (wi > 0.0 && bi == 0.0 && terr > territory_determination_value)
+    return WHITE;
+
+#else
+
   if (bi > 0.0 && wi == 0.0 && terr < -0.95)
     return BLACK;
-
   if (wi > 0.0 && bi == 0.0 && terr > 0.95)
     return WHITE;
+#endif
 
   return EMPTY;
 }
@@ -1073,12 +1222,22 @@ whose_moyo(const struct influence_data *q, int pos)
   int territory_color = whose_territory(q, pos);
   if (territory_color != EMPTY)
     return territory_color;
-  
+    
+#if COSMIC_GNUGO
+  if (bi > moyo_data.influence_balance * wi && 
+      bi > moyo_data.my_influence_minimum && 
+      wi < moyo_data.opp_influence_maximum)
+    return BLACK;
+  if (wi > moyo_data.influence_balance * bi && 
+      wi > moyo_data.my_influence_minimum && 
+      bi < moyo_data.opp_influence_maximum)
+    return WHITE;
+#else
   if (bi > 7.0 * wi && bi > 5.0 && wi < 10.0)
     return BLACK;
-
   if (wi > 7.0 * bi && wi > 5.0 && bi < 10.0)
     return WHITE;
+#endif
   
   return EMPTY;
 }
@@ -1150,31 +1309,7 @@ whose_area(const struct influence_data *q, int pos)
   return EMPTY;
 }
 
-/* This curve determines how much influence is needed at least to claim
- * an intersection as territory, in dependence of the "center value".
- * (In the center, more effort is needed to get territory!)
- * The center value is at the moment defined as follows:
- * If d1, d2 are the distance to vertical and horizontal border, resp.,
- * with d1<d2, then
- * central = 3 * d1 + min(d2, 4)
- * So this is mainly a function of the distance to the border; the
- * distance to the second-nearest border gives a small correction of at
- * most 4. This distinguishes edge and corner positions.
- *
- * The values for intersections close to a corner or to the edge have
- * to be consistent such that standard corner enclosure etc. are
- * sufficient to claim territory. The center values are more arbitrary
- * suspect to tuning.
- */
-static struct interpolation_data min_infl_for_territory =
-  { 6,  0.0, 24.0, { 6.0, 15.0, 26.0, 36.0, 45.0, 50.0, 55.0 }};
-
-/* Determines the territory correction factor in dependence of the ratio
- * ( influence of stronger color / min_infl_for_territory(intersection))
- */
-static struct interpolation_data territory_correction = 
-  { 5, (float) 0.0, 1.0, {0.0, 0.25, 0.45, 0.65, 0.85, 1.0}};
-
+ 
 static void
 value_territory(struct influence_data *q)
 {
@@ -2117,3 +2252,4 @@ print_influence_areas(const struct influence_data *q)
  * c-basic-offset: 2
  * End:
  */
+

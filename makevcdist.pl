@@ -21,6 +21,7 @@ my %defaults =
    GRID_OPT => 1,
    OWL_THREATS => 0,
    USE_BREAK_IN => 1,
+   COSMIC_GNUGO => 0,
    ORACLE => 0);
 
 my @skip = qw/

@@ -27,6 +27,32 @@
 
 #include "liberty.h"
 
+
+/* STEPHANE NICOLET's modification : playing for influence in the fuseki */
+
+#if COSMIC_GNUGO
+
+
+/* We use much more influence than the defaults attenuation coefficients !
+ * The "TERR_.."-values are used in the influence computations used
+ * for territory evaluation. (initial_influence with dragons_known,
+ * move_influence)
+ */
+#define DEFAULT_ATTENUATION \
+       	(cosmic_importance * 2.7  + (1.0 - cosmic_importance) * 3.0)
+#define TERR_DEFAULT_ATTENUATION \
+	(cosmic_importance * 2.15 + (1.0 - cosmic_importance) * 2.4)
+
+/* Extra damping coefficient for spreading influence diagonally. */
+#define DIAGONAL_DAMPING \
+	(cosmic_importance * 2.5 + (1.0 - cosmic_importance) * 2.0)
+#define TERR_DIAGONAL_DAMPING \
+	(cosmic_importance * 2.5 + (1.0 - cosmic_importance) * 1.7)
+
+
+#else
+
+
 /* Default attenuation coefficient.
  * The "TERR_.."-values are used in the influence computations used
  * for territory evaluation. (initial_influence with dragons_known,
@@ -38,6 +64,11 @@
 /* Extra damping coefficient for spreading influence diagonally. */
 #define DIAGONAL_DAMPING 2.0
 #define TERR_DIAGONAL_DAMPING 1.7
+
+#endif
+
+
+
 
 
 /* Smallest amount of influence that we care about distributing. */
@@ -127,9 +158,38 @@ typedef int (*owner_function_ptr)(const struct influence_data *q, int pos);
 #define WEIGHT_MOYO       3
 #define WEIGHT_AREA       1
 
+
+
+#if COSMIC_GNUGO
+
+/* cosmic_importance is a number between 0.0 and 1.0 ;
+ * when cosmic_importance is 0.0, the default influence
+ * values are used; when cosmic_importance is 1.0, GNU Go
+ * will try to play an influence-oriented fuseki by 
+ * over-estimatingthe potential territory values of moyos.
+ * In the current implementation, cosmic_importance decreases 
+ * slowly for 19*19 games from 1.0 at move 4 to 0.0 at move 120.
+ */
+float cosmic_importance;
+
+
+/* Used in the whose_moyo() function */
+struct moyo_determination_data
+{
+  float influence_balance;
+  float my_influence_minimum;
+  float opp_influence_maximum;
+};
+
+
+#endif
+
+
+
 /*
  * Local Variables:
  * tab-width: 8
  * c-basic-offset: 2
  * End:
  */
+
