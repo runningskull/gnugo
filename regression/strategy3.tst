@@ -195,7 +195,7 @@ loadsgf games/strategy34.sgf 57
 
 loadsgf games/strategy34.sgf 59
 143 gg_genmove black
-#? [F8]*
+#? [F8]
 
 loadsgf games/strategy34.sgf 61
 144 gg_genmove black

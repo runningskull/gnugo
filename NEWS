@@ -1,8 +1,9 @@
-VERSION 3.1.8
+VERSION 3.1.9
 
 New since 3.1
 
 - 1-dimensional board
+- experimental dynamic connection analysis
 
 New in 3.0 (since 2.6)
 

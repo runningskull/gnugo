@@ -1,3 +1,61 @@
+========================== 3.1.9 =========================
+
+./regress.sh . owl.tst
+221 unexpected PASS!
+222 unexpected PASS!
+./regress.sh . connection.tst
+4 unexpected PASS!
+./regress.sh . strategy.tst
+34 unexpected PASS!
+./regress.sh . strategy2.tst
+78 unexpected PASS!
+84 unexpected PASS!
+99 unexpected PASS!
+./regress.sh . neurogo.tst
+11 unexpected PASS!
+./regress.sh . arb.tst
+231 unexpected FAIL: Correct 'F5', got 'D8'
+./regress.sh . dniwog.tst
+./regress.sh . strategy3.tst
+143 unexpected PASS!
+./regress.sh . strategy4.tst
+161 unexpected PASS!
+165 unexpected FAIL: Correct 'K3|L6', got 'M2'
+./regress.sh . nicklas1.tst
+501 unexpected FAIL: Correct 'G7', got 'F6'
+./regress.sh . nicklas2.tst
+1407 unexpected PASS!
+2401 unexpected PASS!
+./regress.sh . nicklas3.tst
+1403 unexpected PASS!
+./regress.sh . nicklas4.tst
+./regress.sh . nicklas5.tst
+./regress.sh . manyfaces.tst
+7 unexpected PASS!
+10 unexpected PASS!
+./regress.sh . niki.tst
+4 unexpected FAIL: Correct 'Q8', got 'R13'
+5 unexpected PASS!
+8 unexpected PASS!
+9 unexpected PASS!
+./regress.sh . trevor.tst
+2 unexpected PASS!
+4 unexpected PASS!
+5 unexpected PASS!
+13 unexpected PASS!
+15 unexpected PASS!
+162 unexpected PASS!
+201 unexpected PASS!
+210 unexpected PASS!
+240 unexpected PASS!
+270 unexpected PASS!
+281 unexpected PASS!
+290 unexpected PASS!
+300 unexpected PASS!
+301 unexpected PASS!
+./regress.sh . buzco.tst
+4 unexpected PASS!
+
 ========================== 3.1.8 =========================
 
 ./regress.sh . reading.tst

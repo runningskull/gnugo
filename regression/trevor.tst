@@ -8,7 +8,7 @@ loadsgf games/trevor/trevor_01.sgf 28
 #DIFFICULTY=1
 loadsgf games/trevor/trevor_02.sgf
 2 gg_genmove white
-#? [!PASS]*
+#? [!PASS]
 
 # underlying reading problem
 #Gunnar wrote:
@@ -44,7 +44,7 @@ loadsgf games/trevor/trevor_03.sgf 28
 #simple edge block missed.
 loadsgf games/trevor/trevor_04.sgf 30
 4 gg_genmove white
-#? [G1]*
+#? [G1]
 
 #E5 is the only move.  Is GnuGo playing somewhat randomly here?
 #Dan said:
@@ -84,7 +84,7 @@ loadsgf games/trevor/trevor_04.sgf 30
 #DIFFICULTY=8
 loadsgf games/trevor/trevor_05.sgf 6
 5 gg_genmove white
-#? [E5]*
+#? [E5]
 
 #locally B9 is terrible.  There are other big moves on the board.
 loadsgf games/trevor/trevor_06.sgf 22
@@ -134,18 +134,17 @@ loadsgf games/trevor/trevor_12.sgf
 #E2 is obvious.
 loadsgf games/trevor/trevor_13.sgf
 13 gg_genmove black
-#? [E2]*
+#? [E2]
 
 #Must protect double cut at C2 & E2
 loadsgf games/trevor/trevor_14.sgf
 14 gg_genmove white
 #? [!PASS]*
 
-
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
 15 gg_genmove white
-#? [E7]*
+#? [E7]
 
 # C1 looks best here.  A7 very unorthodox, and at least
 # worse for ko threats.
@@ -162,7 +161,7 @@ loadsgf games/trevor/trevor_16.sgf 54
 # W can live here unconditionally.
 loadsgf games/trevor/trevor_16.sgf 58
 162 gg_genmove white
-#? [B1]*
+#? [B1]
 
 # If Black B9, White can't connect at C7.
 loadsgf games/trevor/trevor_16.sgf 67
@@ -203,7 +202,7 @@ loadsgf games/trevor/trevor_20.sgf 14
 # W can live on the right pretty easily (i.e. G8)
 loadsgf games/trevor/trevor_20.sgf
 201 gg_genmove white
-#? [!PASS]*
+#? [!PASS]
 
 # W can live on the right pretty easily (i.e. G8)
 # Black really does pass here, but eval.sh reports a PASSED result. (?)
@@ -214,7 +213,7 @@ loadsgf games/trevor/trevor_20.sgf
 # Huge negative sacrifice at D8.
 loadsgf games/trevor/trevor_21.sgf 22
 210 gg_genmove white
-#? [!D8]*
+#? [!D8]
 
 # In this case, the knight's move connection looks best.
 # Black seems not to see the cut coming.
@@ -233,8 +232,7 @@ loadsgf games/trevor/trevor_23.sgf 27
 # See also owl.tst 221
 loadsgf games/trevor/trevor_24.sgf 33
 240 gg_genmove black 1
-#? [E8|D8]*
-
+#? [E8|D8]
 
 
 # G2 is a gift to white.
@@ -271,7 +269,7 @@ loadsgf games/trevor/trevor_26.sgf 39
 # Ack, protect the cut!
 loadsgf games/trevor/trevor_27.sgf 35
 270 gg_genmove black
-#? [E6|D6]*
+#? [E6|D6]
 
 
 # D5 misses a big problem cut.
@@ -284,7 +282,7 @@ loadsgf games/trevor/trevor_28.sgf 27
 # Perhaps need to replace H6 w/ F6?
 loadsgf games/trevor/trevor_28.sgf 36
 281 gg_genmove white
-#? [F6]*
+#? [F6]
 
 
 #CATEGORY=OWL_TUNING
@@ -294,19 +292,19 @@ loadsgf games/trevor/trevor_31.sgf
 310 gg_genmove black
 #? [A8]*
 290 gg_genmove white
-#? [!A9]*
+#? [!A9]
 
 # Black A7 is a serious threat.  Also, white should at least 
 # try to invade.
 loadsgf games/trevor/trevor_30.sgf
 300 gg_genmove white
-#? [!PASS]*
+#? [!PASS]
 
 # Black A7 is a serious threat.  Also, white should at least 
 # try to invade.
 loadsgf games/trevor/trevor_30.sgf
 301 gg_genmove black
-#? [!PASS]*
+#? [!PASS]
 
 loadsgf games/trevor/trevor_32.sgf
 320 gg_genmove black

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.9 released October 7, 2001
+
 - revised examine_move_safety heuristics
 - owl_determine_life() revised
 - new gtp functions connect and disconnect
@@ -16,25 +18,26 @@
 - 9x9 case revised in fuseki()
 - bugfix in goal detection in matchpat, don't accept empty goal vertices
 - bugfix in gtp_genmove()
-- tuning, owl tuning
 - new test cases in owl.tst
 - further 1D revisions in worm.c
 - find_lunch() moved from utils.c to worm.c
 - is_same_worm() converted to 1D
 - bugfix in list_move_reasons()
 - revised test case in niki.tst
-- tuning, owl tuning
+- tuning
+- owl tuning
+- connection tuning
 - new implementation of compute_primary_domains()
 - new eye pattern
 - bugfix in fuseki.c
 - cleanup and further 1D conversion in optics.c
 - sgf_decideeye doesn't require owl computation
 - 1D revisions in worm.c
-- is_worm_origin(), propagate_worms(), does_attack(), and does_defend()
-  converted to 1D 
+- is_worm_origin(), propagate_worms(), does_attack(), does_defend() are 1D
 - NNGS customization removed from ascii interface
 - gtp_worm_stones can be run with stackp>0 and can take a color argument
 - mkpat can take -i and -o options
+- MIN_BOARD is 5
 
 3.1.8 released October 1, 2001
 

@@ -43,7 +43,7 @@ loadsgf games/mfgg2.sgf 23
 #SEVERITY=8
 loadsgf games/mfgg2.sgf 45
 7 gg_genmove black
-#? [R2|S7]*
+#? [R2|S7]
 
 
 #CATEGORY=OWL_TUNING
@@ -60,7 +60,7 @@ loadsgf games/mfgg3.sgf 42
 
 loadsgf games/mfgg3.sgf 44
 10 gg_genmove black
-#? [N3]*
+#? [N3]
 
 
 ############ End of Tests #################

@@ -52,7 +52,7 @@ loadsgf games/FSF-neurogo.sgf 136
 
 loadsgf games/FSF-neurogo.sgf 148
 11 gg_genmove white
-#? [N5]*
+#? [N5]
 
 loadsgf games/FSF-neurogo.sgf 152
 12 gg_genmove white

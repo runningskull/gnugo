@@ -13,7 +13,7 @@ loadsgf games/strategy11.sgf 87
 
 loadsgf games/incident104.sgf 63
 4 same_dragon C14 E14
-#? [0]*
+#? [0]
 
 loadsgf games/strategy13.sgf
 5 same_dragon S11 R12

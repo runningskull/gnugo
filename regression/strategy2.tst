@@ -139,7 +139,7 @@ loadsgf games/strategy21.sgf 86
 # Compare reading test 131.
 loadsgf games/strategy21.sgf 96
 78 gg_genmove black
-#? [H2]*
+#? [H2]
 
 loadsgf games/strategy14a.sgf
 # see test 51
@@ -167,7 +167,7 @@ loadsgf games/heikki/heikki01.sgf 17
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
 84 gg_genmove black
-#? [J18]*
+#? [J18]
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white
@@ -244,7 +244,7 @@ loadsgf games/strategy26.sgf 237
 # classify the Q2 dragon as inessential.
 loadsgf games/strategy26.sgf 251
 99 gg_genmove black
-#? [M13]*
+#? [M13]
 
 loadsgf games/strategy26.sgf 257
 100 gg_genmove black

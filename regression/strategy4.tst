@@ -49,7 +49,7 @@ loadsgf games/strategy38.sgf 133
 
 loadsgf games/strategy38.sgf 197
 161 gg_genmove black
-#? [E12]*
+#? [E12]
 
 # First live then attack.
 loadsgf games/strategy39.sgf 156
@@ -69,7 +69,7 @@ loadsgf games/strategy39.sgf 172
 # K1 is out of the question. K3 is locally better and L6 might kill with ko.
 loadsgf games/strategy39.sgf 178
 165 gg_genmove white
-#? [K3|L6]
+#? [K3|L6]*
 
 loadsgf games/incident94.sgf 114
 166 gg_genmove white
