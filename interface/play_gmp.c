@@ -215,7 +215,7 @@ play_gmp(Gameinfo *gameinfo)
   /* play_gmp() does not return to main(), therefore the score
    * writing code is here.
    */
-  score = gnugo_estimate_score(&lower_bound, &upper_bound);
+  score = gnugo_estimate_score(&upper_bound, &lower_bound);
 
   sgfWriteResult(sgftree.root, score, 1);
   sgffile_output(&sgftree);

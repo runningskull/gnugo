@@ -351,7 +351,7 @@ do_genmove(int *move, int color, float pure_threat_value,
    * we are behind, we have to play more daringly.
    */
   if (level >= 8) {
-    estimate_score(&lower_bound, &upper_bound);
+    estimate_score(&upper_bound, &lower_bound);
     if (verbose || showscore) {
       if (lower_bound == upper_bound)
 	gprintf("\nScore estimate: %s %f\n",
@@ -429,7 +429,7 @@ do_genmove(int *move, int color, float pure_threat_value,
 
   /* Review the move reasons and estimate move values. */
   if (review_move_reasons(move, &val, color, 
-			  pure_threat_value, lower_bound, allowed_moves))
+			  pure_threat_value, score, allowed_moves))
     TRACE("Move generation likes %1m with value %f\n", *move, val);
   gg_assert(stackp == 0);
   time_report(1, "review move reasons", NO_MOVE, 1.0);

@@ -446,7 +446,7 @@ computer_move(Gameinfo *gameinfo, int *passes)
   /* Generate computer move. */
   move_val = gnugo_genmove(&i, &j, gameinfo->to_move);
   if (showscore) {
-    gnugo_estimate_score(&lower_bound, &upper_bound);
+    gnugo_estimate_score(&upper_bound, &lower_bound);
     current_score_estimate = (int) ((lower_bound + upper_bound) / 2.0);
   }
     

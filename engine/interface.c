@@ -335,7 +335,7 @@ gnugo_who_wins(int color, FILE *outfile)
 float
 gnugo_estimate_score(float *upper, float *lower)
 {
-  return estimate_score(lower, upper);
+  return estimate_score(upper, lower);
 }
 
 

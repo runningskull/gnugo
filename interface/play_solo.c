@@ -113,7 +113,7 @@ play_solo(Gameinfo *gameinfo, int moves)
   /* Two passes and it's over. (EMPTY == BOTH) */
   gnugo_who_wins(EMPTY, stdout);
 
-  score = gnugo_estimate_score(&lower_bound, &upper_bound);
+  score = gnugo_estimate_score(&upper_bound, &lower_bound);
   sgfWriteResult(sgftree.root, score, 1);
   sgffile_output(&sgftree);
 
@@ -232,7 +232,7 @@ load_and_score_sgf_file(SGFTree *tree, Gameinfo *gameinfo,
       if (!strcmp(scoringmode, "aftermath"))
 	score = aftermath_compute_score(next, komi, &score_tree);
       else
-	score = gnugo_estimate_score(&lower_bound, &upper_bound);
+	score = gnugo_estimate_score(&upper_bound, &lower_bound);
 
       if (score < 0.0) {
 	sprintf(text, "Black wins by %1.1f points\n", -score);
