@@ -37,31 +37,13 @@
 #include <unistd.h>
 #endif
 
-#define gg_assert(x) assert(x);
-
 
 /*********************
  *   Public data     *
  *********************/
 
-/* If > 0 more detailled infomation is given */
+/* If > 0 more detailed information is given */
 int dfa_verbose = 0;
-
-/* conversion array (stupid hack) */
-int dfa_asc2val[90] = {
-  3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-  3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-  3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-  3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-  3, 3, 3, 3, 3, 3, 0, 3, 3, 3,	/* '.' == 46 */
-  3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-  3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-  3, 3, 3, 3, 3, 3, 3, 3, 3, 1,	/* 'O' == 79 */
-  3, 3, 3, 3, 3, 3, 3, 3, 2, 3	/* 'X' == 88 */
-};
-
-char dfa_val2asc[4] = {
-    '.', 'O', 'X', '#' };
 
 
 /*********************
@@ -86,13 +68,13 @@ const int convert[3][4] = {
   {-1, -1, -1, -1},		/* not used */
   {EMPTY, WHITE, BLACK, OUT_BOARD},	/* WHITE */
   {EMPTY, BLACK, WHITE, OUT_BOARD}	/* BLACK */
-
 };
 
 
 /* convert ATT_* values to the corresponding expected values on the board */
-static const char att2val[8] =
-  { '.', 'X', 'O', 'x', 'o', ',', 'a', '!' };
+static const char att2val[8] = {
+  '.', 'X', 'O', 'x', 'o', ',', 'a', '!'
+};
 
 #define EXPECTED_VAL(att_val) att2val[att_val]
 
@@ -101,7 +83,7 @@ static const char att2val[8] =
  *   forward declaration of private functions   *
  ************************************************/
 static void clean_dfa(dfa_t *pdfa);
-static void resize_dfa(dfa_t *pdfa, int maxStates, int maxIndexes);
+static void resize_dfa(dfa_t *pdfa, int max_states, int max_indexes);
 static void create_dfa(dfa_t *pdfa, const char *str, int att_val);
 static void do_sync_product(int l, int r);
 static void sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright);
@@ -143,21 +125,20 @@ int spiral[MAX_ORDER][8];
  * 
  */
 
-static const int generator[4] =
-  { 4 * DFA_MAX_BOARD, 1, -4 * DFA_MAX_BOARD, -1 };
+static const int generator[4] = {
+  4 * DFA_MAX_BOARD, 1, -4 * DFA_MAX_BOARD, -1
+};
 
 void
 buildSpiralOrder(int order[MAX_ORDER][8])
 {
-  int Mark[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
+  int mark[DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4];
   int fifo[8 * MAX_ORDER];
   int top = 0, end = 0;
   int i, j, i0, j0;
   int k, ll;
   int ii;
   int delta;
-
-  
 
   if (dfa_verbose > 1)
     fprintf(stderr, "Building spiral order\n");
@@ -167,16 +148,16 @@ buildSpiralOrder(int order[MAX_ORDER][8])
   /* initialization */
 
   for (ii = 0; ii < DFA_MAX_BOARD * 4 * DFA_MAX_BOARD * 4; ii++)
-    Mark[ii] = 1;
+    mark[ii] = 1;
 
   for (i = DFA_MAX_BOARD; i < DFA_MAX_BOARD * 3; i++)
     for (j = DFA_MAX_BOARD; j < DFA_MAX_BOARD * 3; j++)
-      Mark[DFA_POS(i, j)] = 0;
+      mark[DFA_POS(i, j)] = 0;
 
   end = 0;
   top = 1;
   fifo[end] = 2 * DFA_OFFSET;
-  Mark[fifo[end]] = 1;
+  mark[fifo[end]] = 1;
 
   /* generation */
   while (end < MAX_ORDER) {
@@ -187,16 +168,15 @@ buildSpiralOrder(int order[MAX_ORDER][8])
     for (k = 0; k != 4; k++) {
       delta = generator[k];
       
-      if (!Mark[ii + delta]) {
+      if (!mark[ii + delta]) {
 	fifo[top] = ii + delta;
-	Mark[ii + delta] = 1;
+	mark[ii + delta] = 1;
 	top++;
       }
     }
   }
 
-  /* Then we compute all the geometric transformations
-     on this order */
+  /* Then we compute all the geometric transformations on this order */
   for (k = 0; k < MAX_ORDER; k++) {
     j0 = order[k][0] % (4 * DFA_MAX_BOARD);
     if (j0 >= 2 * DFA_MAX_BOARD)
@@ -211,11 +191,9 @@ buildSpiralOrder(int order[MAX_ORDER][8])
   }
 
   if (0) {
-    for (ll = 0; ll < 8; ll++) {
-      for (i = 0; i < 13; i++) {
-        fprintf(stderr, "i:%d; ll:%d; %d(%c)\n", i, ll, order[i][ll],'A'+i);
-      }
-    }
+    for (ll = 0; ll < 8; ll++)
+      for (i = 0; i < 13; i++)
+        fprintf(stderr, "i:%d; ll:%d; %d(%c)\n", i, ll, order[i][ll], 'A'+i);
   }
 }
 
@@ -255,11 +233,10 @@ union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
   /* copy att1 in att */
   att = 0;
   while (att1 != 0) {
-    pdfa->lastIndex++;
-    if (pdfa->lastIndex >= pdfa->maxIndexes)
-      resize_dfa(pdfa, pdfa->maxStates,
-		 pdfa->maxIndexes + DFA_RESIZE_STEP);
-    att_aux = pdfa->lastIndex;
+    pdfa->last_index++;
+    if (pdfa->last_index >= pdfa->max_indexes)
+      resize_dfa(pdfa, pdfa->max_states, pdfa->max_indexes + DFA_RESIZE_STEP);
+    att_aux = pdfa->last_index;
     
     pdfa->indexes[att_aux].val = pdfa1->indexes[att1].val;
     pdfa->indexes[att_aux].next = att;
@@ -270,10 +247,10 @@ union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
   /* add to att the new elements of att2 */
   while (att2 != 0) {
     if (!member_att(pdfa, att, pdfa2->indexes[att2].val)) {
-      pdfa->lastIndex++;
-      if (pdfa->lastIndex >= pdfa->maxIndexes)
-	resize_dfa(pdfa, pdfa->maxStates, pdfa->maxIndexes + DFA_RESIZE_STEP);
-      att_aux = pdfa->lastIndex;
+      pdfa->last_index++;
+      if (pdfa->last_index >= pdfa->max_indexes)
+	resize_dfa(pdfa, pdfa->max_states, pdfa->max_indexes + DFA_RESIZE_STEP);
+      att_aux = pdfa->last_index;
 
       pdfa->indexes[att_aux].val = pdfa2->indexes[att2].val;
       pdfa->indexes[att_aux].next = att;
@@ -293,7 +270,7 @@ compactify_att(dfa_t *pdfa)
 {
   int k;
   int last = 0;
-  int save_last = pdfa->lastIndex;
+  int save_last = pdfa->last_index;
   int *map;
   int *search_first;
   int *search_next;
@@ -335,11 +312,11 @@ compactify_att(dfa_t *pdfa)
   free(search_next);
   
   if (last < save_last) {
-    pdfa->lastIndex = last;
-    for (k = 0; k <= pdfa->lastIndex; k++)
+    pdfa->last_index = last;
+    for (k = 0; k <= pdfa->last_index; k++)
       pdfa->indexes[k].next = map[pdfa->indexes[k].next];
 
-    for (k = 0; k <= pdfa->lastState; k++)
+    for (k = 0; k <= pdfa->last_state; k++)
       pdfa->states[k].att = map[pdfa->states[k].att];
 
     if (0)
@@ -367,8 +344,8 @@ dfa_size(dfa_t *pdfa)
 {
   int states_size, indexes_size;
 
-  states_size = (pdfa->lastState + 1) * sizeof(state_rt_t);
-  indexes_size = (pdfa->lastIndex + 1) * sizeof(attrib_rt_t);
+  states_size = (pdfa->last_state + 1) * sizeof(state_rt_t);
+  indexes_size = (pdfa->last_index + 1) * sizeof(attrib_rt_t);
 
   return (states_size + indexes_size + sizeof(dfa_rt_t)) / 1024;
 }
@@ -379,7 +356,7 @@ dfa_size(dfa_t *pdfa)
  */
 
 static void
-resize_dfa(dfa_t *pdfa, int maxStates, int maxIndexes)
+resize_dfa(dfa_t *pdfa, int max_states, int max_indexes)
 {
   state_t *pBuf;
   attrib_t *pBuf2;
@@ -388,25 +365,25 @@ resize_dfa(dfa_t *pdfa, int maxStates, int maxIndexes)
   if (dfa_verbose > 1)
     fprintf(stderr, "Resizing dfa %s\n", pdfa->name);
 
-  gg_assert(pdfa->lastState <= pdfa->maxStates);
-  gg_assert(pdfa->lastIndex <= pdfa->maxIndexes);
+  assert(pdfa->last_state <= pdfa->max_states);
+  assert(pdfa->last_index <= pdfa->max_indexes);
 
-  pBuf = realloc(pdfa->states, maxStates * sizeof(state_t));
-  pBuf2 = realloc(pdfa->indexes, maxIndexes * sizeof(attrib_t));
+  pBuf = realloc(pdfa->states, max_states * sizeof(state_t));
+  pBuf2 = realloc(pdfa->indexes, max_indexes * sizeof(attrib_t));
   if (pBuf == NULL || pBuf2 == NULL) {
     fprintf(stderr, "No memory left for dfa: %s", pdfa->name);
     exit(EXIT_FAILURE);
   }
 
-  for (i = pdfa->maxStates; i < maxStates; i++)
+  for (i = pdfa->max_states; i < max_states; i++)
     memset(pBuf + i, 0, sizeof(state_t));
-  for (i = pdfa->maxIndexes; i < maxIndexes; i++)
+  for (i = pdfa->max_indexes; i < max_indexes; i++)
     memset(pBuf2 + i, 0, sizeof(attrib_t));
 
   pdfa->states = pBuf;
-  pdfa->maxStates = maxStates;
+  pdfa->max_states = max_states;
   pdfa->indexes = pBuf2;
-  pdfa->maxIndexes = maxIndexes;
+  pdfa->max_indexes = max_indexes;
 }
 
 
@@ -426,10 +403,10 @@ dump_dfa(FILE *f, dfa_t *pdfa)
 
   fprintf(f, line);
   fprintf(f, " name : %s\n", pdfa->name);
-  fprintf(f, " Nb states :  %7d, max= %d\n", pdfa->lastState + 1,
-	  pdfa->maxStates);
-  fprintf(f, " Nb Indexes : %7d, max= %d\n", pdfa->lastIndex,
-	  pdfa->maxIndexes);
+  fprintf(f, " Nb states :  %7d, max= %d\n", pdfa->last_state + 1,
+	  pdfa->max_states);
+  fprintf(f, " Nb Indexes : %7d, max= %d\n", pdfa->last_index,
+	  pdfa->max_indexes);
   fprintf(f, " memory needed : %d Mb\n", dfa_size(pdfa) / 1024);
   fprintf(f, line);
 
@@ -437,7 +414,7 @@ dump_dfa(FILE *f, dfa_t *pdfa)
     return;
   fprintf(f, " state  |   .    |   O    |   X    |   #    |  att \n");
   fprintf(f, line);
-  for (i = 1; i != pdfa->lastState + 1; i++) {
+  for (i = 1; i != pdfa->last_state + 1; i++) {
     int *pnext = pdfa->states[i].next;
     fprintf(f, " %6d |", i);
     fprintf(f, " %6d | %6d | %6d |", pnext[0], pnext[1], pnext[2]);
@@ -466,10 +443,10 @@ dump_dfa(FILE *f, dfa_t *pdfa)
 static void
 clean_dfa(dfa_t *pdfa)
 {
-  memset(pdfa->states, 0, pdfa->maxStates * sizeof(state_t));
-  memset(pdfa->indexes, 0, pdfa->maxIndexes * sizeof(attrib_t));
-  pdfa->lastState = 1;		/* initial state */
-  pdfa->lastIndex = 0;
+  memset(pdfa->states, 0, pdfa->max_states * sizeof(state_t));
+  memset(pdfa->indexes, 0, pdfa->max_indexes * sizeof(attrib_t));
+  pdfa->last_state = 1;		/* initial state */
+  pdfa->last_index = 0;
   pdfa->indexes[0].val = -1;
 }
 
@@ -511,30 +488,29 @@ kill_dfa(dfa_t *pdfa)
 
 
 /*
- * Copy a dfa.
- * and resize the destination dfa if necessary.
+ * Copy a dfa and resize the destination dfa if necessary.
  */
 
 void
 copy_dfa(dfa_t *p_to, dfa_t *p_from)
 {
-  gg_assert(p_to != p_from);
+  assert(p_to != p_from);
 
-  if (p_to->maxStates < p_from->lastState)
-    resize_dfa(p_to, p_from->maxStates, p_to->maxIndexes);
+  if (p_to->max_states < p_from->last_state)
+    resize_dfa(p_to, p_from->max_states, p_to->max_indexes);
 
-  if (p_to->maxIndexes < p_from->lastIndex)
-    resize_dfa(p_to, p_to->maxStates, p_from->maxIndexes);
+  if (p_to->max_indexes < p_from->last_index)
+    resize_dfa(p_to, p_to->max_states, p_from->max_indexes);
 
   clean_dfa(p_to);
 
   memcpy(p_to->states, p_from->states,
-	 sizeof(state_t) * (p_from->lastState + 1));
+	 sizeof(state_t) * (p_from->last_state + 1));
   memcpy(p_to->indexes, p_from->indexes,
-	 sizeof(attrib_t) * (p_from->lastIndex + 1));
+	 sizeof(attrib_t) * (p_from->last_index + 1));
 
-  p_to->lastState = p_from->lastState;
-  p_to->lastIndex = p_from->lastIndex;
+  p_to->last_state = p_from->last_state;
+  p_to->last_index = p_from->last_index;
 }
 
 
@@ -554,14 +530,14 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
     exit(EXIT_FAILURE);
   }
 
-  assert (dfa_minmax_delta(pdfa, -1, 1) > 0);
+  assert(dfa_minmax_delta(pdfa, -1, 1) > 0);
   if (dfa_minmax_delta(pdfa, -1, 0)  > 65535) {
     fprintf(of, "#error too many states");
     fprintf(stderr, "Error: The dfa states are too disperse. Can't fit delta into a short.\n");
     exit(EXIT_FAILURE);
   }
 
-  if (pdfa->lastIndex + 1 > 65535) {
+  if (pdfa->last_index + 1 > 65535) {
     fprintf(of, "#error too many states");
     fprintf(stderr, "Error: Too many index entries. Can't fit delta into a short.\n");
     exit(EXIT_FAILURE);
@@ -570,25 +546,27 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
 
   fprintf(of, "\n#include \"dfa.h\"\n");
 
-  fprintf(of, "static const state_rt_t state_%s[%d] = {\n", name, pdfa->lastState + 1);
-  for (i = 0; i != pdfa->lastState + 1; i++) {
+  fprintf(of, "static const state_rt_t state_%s[%d] = {\n",
+	  name, pdfa->last_state + 1);
+  for (i = 0; i != pdfa->last_state + 1; i++) {
     int j;
     fprintf(of, "{%d,", pdfa->states[i].att);
     fprintf(of, "{");
-    for (j=0;j<4;j++) {
+    for (j = 0; j < 4; j++) {
       int n = pdfa->states[i].next[j];
-      assert ((n == 0) || ( (n - i > 0) && (n - i < 65535) ));
+      assert((n == 0) || ((n - i > 0) && (n - i < 65535)));
       fprintf(of, "%d", n ? n - i : 0);
       if (j != 3)
         fprintf(of, ",");
     }
-    fprintf(of, "}},%s", ((i+1)%3 ? "\t" : "\n") );
+    fprintf(of, "}},%s", ((i+1)%3 ? "\t" : "\n"));
   }
   fprintf(of, "};\n\n");
 
 
-  fprintf(of, "static const attrib_rt_t idx_%s[%d] = {\n", name, pdfa->lastIndex + 1);
-  for (i = 0; i != pdfa->lastIndex + 1; i++)
+  fprintf(of, "static const attrib_rt_t idx_%s[%d] = {\n",
+	  name, pdfa->last_index + 1);
+  for (i = 0; i != pdfa->last_index + 1; i++)
     fprintf(of, "{%d,%d},%s", pdfa->indexes[i].val, pdfa->indexes[i].next,
                               ((i+1)%4 ? "\t" : "\n"));
   fprintf(of, "};\n\n");
@@ -637,9 +615,9 @@ create_dfa(dfa_t *pdfa, const char *str, int att_val)
   if (dfa_verbose > 1)
     fprintf(stderr, "linear dfa in %s with string: %s\n", pdfa->name, str);
 
-  gg_assert(str != NULL);
-  gg_assert(pdfa->maxStates > 1);
-  gg_assert(pdfa->maxIndexes > 1);
+  assert(str != NULL);
+  assert(pdfa->max_states > 1);
+  assert(pdfa->max_indexes > 1);
 
   clean_dfa(pdfa);
   new_state = 1;
@@ -654,23 +632,23 @@ create_dfa(dfa_t *pdfa, const char *str, int att_val)
     if (strchr("$#+-|", *str))
       pdfa->states[new_state].next[OUT_BOARD] = new_state + 1;
     new_state++;
-    if (new_state >= pdfa->maxStates)
-      resize_dfa(pdfa, pdfa->maxStates + DFA_RESIZE_STEP,
-		 pdfa->maxIndexes);
+    if (new_state >= pdfa->max_states)
+      resize_dfa(pdfa, pdfa->max_states + DFA_RESIZE_STEP,
+		 pdfa->max_indexes);
   }
   memset(pdfa->states[new_state].next, 0, 4 * sizeof(int));
 
-  pdfa->lastIndex++;
-  if (pdfa->lastIndex >= pdfa->maxIndexes)
-    resize_dfa(pdfa, pdfa->maxStates,
-	       pdfa->maxIndexes + DFA_RESIZE_STEP);
+  pdfa->last_index++;
+  if (pdfa->last_index >= pdfa->max_indexes)
+    resize_dfa(pdfa, pdfa->max_states,
+	       pdfa->max_indexes + DFA_RESIZE_STEP);
 
-  memset(&(pdfa->indexes[pdfa->lastIndex]), 0, sizeof(attrib_t));
-  pdfa->states[new_state].att = pdfa->lastIndex;
+  memset(&(pdfa->indexes[pdfa->last_index]), 0, sizeof(attrib_t));
+  pdfa->states[new_state].att = pdfa->last_index;
 
   pdfa->indexes[pdfa->states[new_state].att].val = att_val;
   pdfa->indexes[pdfa->states[new_state].att].next = 0;
-  pdfa->lastState = new_state;
+  pdfa->last_state = new_state;
 }
 
 
@@ -734,8 +712,8 @@ add_to_entry_list(entry_t **pplist, int l, int r, int val)
   entry_t *new_entry;
 
   /* make sure val > 0: val = 0 is used in get_from_entry_list */
-  gg_assert(val > 0);
-  gg_assert(!get_from_entry_list(*pplist, l, r));
+  assert(val > 0);
+  assert(!get_from_entry_list(*pplist, l, r));
 
   new_entry = malloc(sizeof(entry_t));
   if (new_entry == NULL) {
@@ -814,7 +792,7 @@ do_sync_product(int l, int r)
   int nextl, nextr;
   int state;
 
-  state = gpout->lastState;
+  state = gpout->last_state;
 
   /* unify the attributes of states l and r */
   gpout->states[state].att = union_att(gpout, gpleft, gpleft->states[l].att,
@@ -824,23 +802,23 @@ do_sync_product(int l, int r)
   for (c = 0; c != 4; c++) {
     nextl = gpleft->states[l].next[c];
     nextr = gpright->states[r].next[c];
-    gg_assert(nextl < gpleft->lastState + 1);
-    gg_assert(nextr < gpright->lastState + 1);
+    assert(nextl < gpleft->last_state + 1);
+    assert(nextr < gpright->last_state + 1);
     
     /* transition to (0,0) mean no transition at all */
     if (nextl != 0 || nextr != 0) {
       /* if the out-state doesn't already exist */
       if (get_from_test_array(&gtest, nextl, nextr) == 0) {
 	/* create it! */
-	gpout->lastState++;
-	if (gpout->lastState >= gpout->maxStates)
-	  resize_dfa(gpout, gpout->maxStates + DFA_RESIZE_STEP,
-		     gpout->maxIndexes);
+	gpout->last_state++;
+	if (gpout->last_state >= gpout->max_states)
+	  resize_dfa(gpout, gpout->max_states + DFA_RESIZE_STEP,
+		     gpout->max_indexes);
 	
-	add_to_test_array(&gtest, nextl, nextr, gpout->lastState);
+	add_to_test_array(&gtest, nextl, nextr, gpout->last_state);
 	
 	/* link it */
-	gpout->states[state].next[c] = gpout->lastState;
+	gpout->states[state].next[c] = gpout->last_state;
 	
 	/* create also its sub-automaton */
 	do_sync_product(nextl, nextr);
@@ -861,11 +839,10 @@ do_sync_product(int l, int r)
 static void
 sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright)
 {
-  pout->lastIndex = 0;
+  pout->last_index = 0;
 
   if (dfa_verbose > 2) {
-    fprintf(stderr, "Product between %s and %s\n", pleft->name,
-	    pright->name);
+    fprintf(stderr, "Product between %s and %s\n", pleft->name, pright->name);
     fprintf(stderr, "result in %s\n", pout->name);
   }
 
@@ -875,7 +852,7 @@ sync_product(dfa_t *pout, dfa_t *pleft, dfa_t *pright)
   gpright = pright;
   new_test_array(&gtest);
   add_to_test_array(&gtest, 1, 1, 1);
-  pout->lastState = 1;
+  pout->last_state = 1;
 
   do_sync_product(1, 1);
 
@@ -931,34 +908,30 @@ dfa_minmax_delta(dfa_t *pdfa, int next_index, int isMin) {
   int ret, i, j;
   assert(next_index <= 3);
  
-  if (isMin) {
+  if (isMin)
     ret = 99999;
-  } else {
+  else
     ret = -1;
-  }
 
-  for (i=0; i<=pdfa->lastState; i++) {
-    for (j=0; j<4; j++) {
+  for (i = 0; i <= pdfa->last_state; i++) {
+    for (j = 0; j < 4; j++) {
       if (j == next_index || next_index < 0) { 
         int next = pdfa->states[i].next[j];
         if (!next)
           continue;
         if (isMin) {
-          if (ret > next - i) {
+          if (ret > next - i)
             ret = next - i;
-          } 
-        } else {
-          if (ret < next - i) {
+        }
+	else {
+          if (ret < next - i)
             ret = next - i;
-          } 
         }
       }
     }
   }
 
   return ret;
-
-
 }
 
 
@@ -970,37 +943,37 @@ dfa_minmax_delta(dfa_t *pdfa, int next_index, int isMin) {
 void
 dfa_shuffle(dfa_t *pdfa)
 {
-  struct state *oldStates;
-  int *stateTo;
-  int *stateFrom;
+  struct state *old_states;
+  int *state_to;
+  int *state_from;
   int *queue1;
   int *queue2;
   int *tempq;
-  int nextNewState;
+  int next_new_state;
   int q1p;
   int q2p;
   int i, j;
 
-  stateTo = calloc(pdfa->lastState+1, sizeof(int));
-  stateFrom = calloc(pdfa->lastState+1, sizeof(int));
+  state_to = calloc(pdfa->last_state+1, sizeof(int));
+  state_from = calloc(pdfa->last_state+1, sizeof(int));
 
-  queue1 = malloc((pdfa->lastState+1) * sizeof(int));
-  queue2 = malloc((pdfa->lastState+1) * sizeof(int));
+  queue1 = malloc((pdfa->last_state+1) * sizeof(int));
+  queue2 = malloc((pdfa->last_state+1) * sizeof(int));
   q1p = 1;
   q2p = 0;
   queue1[0] = 1;  /* i.e. start at state 1. */
-  stateFrom[0] = stateTo[0] = 0;
-  stateFrom[1] = stateTo[1] = 1;
-  nextNewState = 2;
+  state_from[0] = state_to[0] = 0;
+  state_from[1] = state_to[1] = 1;
+  next_new_state = 2;
 
   while (q1p) {
-    for (i=0;i<q1p;i++) {
-      for (j=0;j<4;j++) {
+    for (i = 0; i < q1p; i++) {
+      for (j = 0; j < 4; j++) {
         int n = pdfa->states[queue1[i]].next[j];
-        if (n && !stateTo[n]) {
-          stateTo[n] = nextNewState;
-          stateFrom[nextNewState] = n;
-          nextNewState++;
+        if (n && !state_to[n]) {
+          state_to[n] = next_new_state;
+          state_from[next_new_state] = n;
+          next_new_state++;
           queue2[q2p++] = n;
         }
       }
@@ -1012,21 +985,20 @@ dfa_shuffle(dfa_t *pdfa)
     q2p = 0;
   }
 
-  oldStates = malloc((pdfa->lastState+1) * sizeof(struct state));
-  for (i=1; i<=pdfa->lastState; i++) {
-    for (j=0;j<4;j++) {
-      oldStates[i].next[j] = pdfa->states[i].next[j];
-      oldStates[i].att = pdfa->states[i].att;
+  old_states = malloc((pdfa->last_state+1) * sizeof(struct state));
+  for (i = 1; i <= pdfa->last_state; i++) {
+    for (j = 0; j < 4; j++) {
+      old_states[i].next[j] = pdfa->states[i].next[j];
+      old_states[i].att = pdfa->states[i].att;
     }
   }
-  for (i=1; i<=pdfa->lastState; i++) {
-    for (j=0;j<4;j++) {
-      assert(stateTo[i]>0);
-      pdfa->states[i].next[j] = stateTo[oldStates[stateFrom[i]].next[j]];
+  for (i = 1; i <= pdfa->last_state; i++) {
+    for (j = 0; j < 4; j++) {
+      assert(state_to[i] > 0);
+      pdfa->states[i].next[j] = state_to[old_states[state_from[i]].next[j]];
     } 
-    pdfa->states[i].att = oldStates[stateFrom[i]].att;
+    pdfa->states[i].att = old_states[state_from[i]].att;
   } 
-
 }
 
 
@@ -1049,7 +1021,7 @@ dfa_finalize(dfa_t *pdfa)
                      &aux_dfa[(j+1) % DFA_BINS]);
       next_bin++;
     }
-    last_bin = next_bin-1;
+    last_bin = next_bin - 1;
     aux_count--;
     next_bin = aux_count;
   }
@@ -1074,10 +1046,10 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
   float ratio;
   char strrot[MAX_ORDER+1];
 
-  if (ll == 0) {
+  if (ll == 0)
     strcpy(strrot, str);
-  } else {
-    int i,j;
+  else {
+    int i, j;
     char strdollar[MAX_ORDER+1];
     memset(strdollar, '$', sizeof(char) * (MAX_ORDER + 1));
     strcpy(strdollar, str);
@@ -1107,11 +1079,12 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
 
   if (dfa_verbose > 1) {
     fprintf(stderr, "Adding to dfa %s the string: %s\n", pdfa->name, strrot);
-    fprintf(stderr, "  pat_ind: %d; rotation: %d at bin: %d\n", pattern_index, ll, aux_count);
+    fprintf(stderr, "  pat_ind: %d; rotation: %d at bin: %d\n",
+	    pattern_index, ll, aux_count);
   }
 
-  gg_assert(dfa_was_initialized > 0);
-  gg_assert(pdfa != NULL);
+  assert(dfa_was_initialized > 0);
+  assert(pdfa != NULL);
 
   if (pdfa->pre_rotated)
     pattern_index = pattern_index * 8 + ll;
@@ -1147,7 +1120,7 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
   m = DFA_MAX_BOARD * 2 + ci;
   n = DFA_MAX_BOARD * 2 + cj;	/* position of the anchor */
 
-  gg_assert(dfa_was_initialized);
+  assert(dfa_was_initialized);
   memset(str, 0, MAX_ORDER);
   memset(work_space, '#', sizeof(work_space));
 
@@ -1219,8 +1192,7 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
   /* pattern representation on the work space */
   for (k = 0; k != pat->patlen; k++) {
     c = EXPECTED_VAL(elements[k].att);
-    gg_assert(work_space[m + elements[k].x - ci]
-	      [n + elements[k].y - cj] == '?');
+    assert(work_space[m + elements[k].x - ci][n + elements[k].y - cj] == '?');
     work_space[m + elements[k].x - ci][n + elements[k].y - cj] = c;
   }
 
@@ -1273,9 +1245,9 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
     if (j == pat->minj)
       borders &= ~WEST_EDGE;
     
-    gg_assert(m + i < DFA_MAX_BOARD * 3 && m + i < DFA_MAX_BOARD * 3);
+    assert(m + i < DFA_MAX_BOARD * 3 && m + i < DFA_MAX_BOARD * 3);
     str[k] = work_space[m + i][n + j];
-    gg_assert(strchr("XOxo.,a!?$#|-+", str[k]));
+    assert(strchr("XOxo.,a!?$#|-+", str[k]));
     
     if (strchr("XOxo.,a!", str[k]))
       to_test--;
@@ -1291,7 +1263,7 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
     }
   }
   
-  gg_assert(k < MAX_ORDER);
+  assert(k < MAX_ORDER);
   str[k] = '\0';		/* end of string */
 
   if (0 && dfa_verbose > 0)

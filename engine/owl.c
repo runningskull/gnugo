@@ -3073,7 +3073,8 @@ collect_owl_shapes_callbacks(int anchor, int color, struct pattern *pattern,
  * to the center of the board
  */
 
-static int bdist(int move)
+static int
+bdist(int move)
 {
   /* i = 0:              idist = - (board_size - 1)
      i = board_size -1 : idist =    board_size - 1

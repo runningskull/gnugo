@@ -2205,12 +2205,14 @@ are_neighbor_dragons(int d1, int d2)
  * At the moment first_worm(pos) will always be the origin of the dragon,
  * but you should not rely on that.
  */
-int first_worm_in_dragon(int w)
+int
+first_worm_in_dragon(int w)
 {
   return dragon[w].origin;
 }
 
-int next_worm_in_dragon(int w)
+int
+next_worm_in_dragon(int w)
 {
   gg_assert(worm[w].origin == w);
   return next_worm_list[w];

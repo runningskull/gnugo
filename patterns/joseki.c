@@ -29,10 +29,6 @@
 #include "../sgf/sgftree.h"
 #include "liberty.h"
 
-#ifndef VARIADIC_MACROS
-int trace_dummy;
-#endif
-
 #define USAGE "\
 Usage : joseki prefix filename\n\
 "

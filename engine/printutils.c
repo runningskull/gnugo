@@ -216,8 +216,6 @@ mprintf(const char *fmt, ...)
 
 /* See gnugo.h for related TRACE family macro definitions */
 
-int trace_dummy;
-
 /* Always returns 1 to allow use in short-circuit logical expressions. */
 int 
 DEBUG_func(int flag, const char *fmt, ...)

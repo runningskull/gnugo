@@ -566,13 +566,14 @@ write_to_dfa(int index)
   pattern_2_string(pattern+index, elements, str, 0, ci, cj);
       
   if (pre_rotate) {
-    if (pattern[index].trfno != 5) {
+    if (pattern[index].trfno != 5)
       rot_stop = pattern[index].trfno;
-    } else {
+    else {
       rot_start = 2;
       rot_stop = 6;
     }
   }
+
   for (ll = 0; ll < rot_stop; ll++) {
     /* Then We add this string to the DFA */
     ratio = (dfa_add_string(&dfa, str, index, ll) - 1)*100;
@@ -2676,7 +2677,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "dfa for %s\n", prefix);
     fprintf(stderr, "size: %d kB for ", dfa_size(&dfa));
     fprintf(stderr, "%d patterns", patno);
-    fprintf(stderr, "(%d states)\n", dfa.lastState);
+    fprintf(stderr, "(%d states)\n", dfa.last_state);
 
     if (0 && dfa.pre_rotated)
       dump_dfa(stderr, &dfa);

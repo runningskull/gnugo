@@ -62,7 +62,7 @@ clear_profile(struct pattern *pattern)
 /* Print profiling information for one pattern struct array. */
 static void
 print_profile(struct pattern *pattern, int *total_hits,
-			   int *total_nodes, int *total_dfa_hits)
+	      int *total_nodes, int *total_dfa_hits)
 {
   for (; pattern->patn; ++pattern)
     if (pattern->hits > 0) {
@@ -649,9 +649,9 @@ do_tree_matchpat_rec(int color, int m, int n, int goal_found,
                      struct tree_node_list *tnl, 
                      struct rec_data *pdata)
 {
-  if (0 && !tnl) {
+  if (0 && !tnl)
     return;
-  }
+
   tnl = tnl->next;
   while (tnl) {
     struct tree_node *node = &(tnl->node);
@@ -914,11 +914,10 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int dfa_pos, int *pat_list)
     /* collect patterns indexes */
     int att = pdfa->states[state].att;
     while (att != 0) {
-      if (pdfa->pre_rotated) {
+      if (pdfa->pre_rotated)
         pat_list[id] = pdfa->indexes[att].val;
-      } else {
+      else
         pat_list[id] = l + 8 * (int)(pdfa->indexes[att].val);
-      }
       id++;
       att = pdfa->indexes[att].next;
     }

@@ -111,7 +111,7 @@ summon_oracle(void)
     error("can't open pipe a");
   if (pipe(pfd_b) == -1)
     error("can't open pipe b");
-  switch(fork()) {
+  switch (fork()) {
   case -1:
     error("fork failed (try chopsticks)");
   case 0:
@@ -238,7 +238,7 @@ ask_oracle(void)
   int line_length = 0;
   char line[128];
 
-  while(line_length != 1) {
+  while (line_length != 1) {
     if (!fgets(line, 128, from_gnugo_stream))
       error("can't get response");
     line_length = strlen(line);
@@ -460,7 +460,8 @@ search_width(void)
     return 3;
   else if (stackp == 1)
     return 2;
-  else return 0;
+  else
+    return 0;
 }
 
 

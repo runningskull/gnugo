@@ -361,7 +361,8 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	    col = GG_COLOR_RED;
 	  else if (mn[POS(m,n)] == 2)
 	    col = GG_COLOR_YELLOW;
-	else col = GG_COLOR_GREEN;
+	  else
+	    col = GG_COLOR_GREEN;
 	}
 	else if (mn[POS(m,n)] == 1)
 	  col = GG_COLOR_BLUE;

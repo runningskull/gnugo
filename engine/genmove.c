@@ -817,7 +817,8 @@ draw_search_area(void)
 	
       if (search_mask[POS(m,n)])
 	col = GG_COLOR_RED;
-      else col = GG_COLOR_BLACK;
+      else
+	col = GG_COLOR_BLACK;
       
       if (board[POS(m, n)] == BLACK)
 	c = 'X';

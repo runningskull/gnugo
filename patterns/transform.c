@@ -53,7 +53,8 @@ const int transformation2[8][2][2] = {
 
 
 /* Initialize transformation[][] array. */
-void transformation_init(void)
+void
+transformation_init(void)
 {
   int k;
   int dx;

@@ -60,8 +60,7 @@ typedef struct attrib
 {
   int val;
   int next;
-}
-attrib_t;
+} attrib_t;
 
 
 /* dfa state */
@@ -70,8 +69,7 @@ typedef struct state
 {
   int att;
   int next[4];
-}
-state_t;
+} state_t;
 
 
 /* dfa */
@@ -84,15 +82,14 @@ typedef struct dfa
   
   /* transition graph */
   state_t *states;
-  int maxStates;
-  int lastState;
+  int max_states;
+  int last_state;
 
   /* attributes sets */
   attrib_t *indexes;
-  int maxIndexes;
-  int lastIndex;
-}
-dfa_t;
+  int max_indexes;
+  int last_index;
+} dfa_t;
 
 
 /* The run-time data structures are different from those used
@@ -103,16 +100,14 @@ typedef struct attrib_rt
 {
   short val;
   short next;
-}
-attrib_rt_t;
+} attrib_rt_t;
 
 /* dfa state */
 typedef struct state_rt
 {
   short att;
   unsigned short next[4];
-}
-state_rt_t;
+} state_rt_t;
 
 typedef struct dfa_rt
 {
@@ -125,8 +120,7 @@ typedef struct dfa_rt
 
   /* attributes sets */
   const attrib_rt_t *indexes;
-}
-dfa_rt_t;
+} dfa_rt_t;
 
 
 /* scan order */
@@ -136,8 +130,7 @@ typedef struct
 {
   int i;
   int j;
-}
-order_t;
+} order_t;
 #endif
 
 
@@ -150,7 +143,7 @@ void dfa_end(void);	/* between calls of those 2 functions. */
 void buildSpiralOrder(int order[MAX_ORDER][8]); /* Needed by matchpat */
 
 /* basic dfa manipulation */
-void print_c_dfa(FILE* of, const char *name, dfa_t *pdfa);
+void print_c_dfa(FILE *of, const char *name, dfa_t *pdfa);
 void new_dfa(dfa_t *pdfa, const char *name);
 void copy_dfa(dfa_t *p_to, dfa_t *p_from);
 void kill_dfa(dfa_t *pdfa);
@@ -175,11 +168,6 @@ float dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll);
 /* conversion macros */
 
 #define EXPECTED_COLOR(player_c, position_c) convert[player_c][position_c]
-
-extern int dfa_asc2val[90];
-extern char dfa_val2asc[4];
-#define ASC2VAL(c) (c < 90 ? dfa_asc2val[(int)c] : 3)
-#define VAL2ASC(n) (n < 4 ? dfa_val2asc[n] : '!')
 
 /* incremental macro */
 

@@ -2290,10 +2290,10 @@ accuratelib(int pos, int color, int maxlib, int *libs)
 	for (l = 0; l < s->liberties; l++) {
 	  lib = s->libs[l];
 	  if (UNMARKED_LIBERTY(lib)) {
-	    if(libs)
+	    if (libs)
 	      libs[liberties] = lib;
 	    liberties++;
-	    if(liberties >= maxlib)
+	    if (liberties >= maxlib)
 	      return liberties;
 
 	    MARK_LIBERTY(lib);
@@ -3060,11 +3060,13 @@ neighbor_of_string(int pos, int str)
 
   return 0;
 }
+
 /*
  * Returns true if (pos) has a neighbor of color (color).
  */
 
-int has_neighbor(int pos, int color)
+int
+has_neighbor(int pos, int color)
 {
   ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), pos);
