@@ -32,7 +32,8 @@
 #define MAX_MOVES 362
 
 static int add_array(int *array, int elt);
-static int intersection_array(int *array1, int *array2);
+static int element_array (int *array,int elt);
+static void intersection_array(int *array1, int *array2);
 static int snapback(int str);
 static int connection_one_move(int str1, int str2);
 static int prevent_connection_one_move(int *moves, int str1, int str2);
@@ -50,7 +51,8 @@ static int prevent_simple_connection_three_moves(int *moves,
 						 int str1, int str2);
 #endif
 static int quiescence_connect(int str1, int str2);
-static int capture_one_move(int str);
+static int quiescence_capture(int str);
+/* static int capture_one_move(int str); */
 static int prevent_capture_one_move(int *moves, int str1);
 
 int nodes_connect=0,max_nodes_connect=500,max_connect_depth=64;
@@ -68,15 +70,24 @@ static int add_array (int *array, int elt) {
   return add;
 }
 
-/* FIXME: Added this function to avoid compiler warning. Obviously it
- * needs to do something also. /gunnar
- */
-static int
-intersection_array(int *array1, int *array2)
-{
-  UNUSED(array1);
-  UNUSED(array2);
+static int element_array (int *array,int elt) {
+  int r;
+  for (r = 1; r < array[0] + 1; r++)
+    if (array[r] == elt)
+      return 1;
   return 0;
+}
+
+static void intersection_array(int *array1, int *array2) {
+  int r, s;
+  
+  for (r = 1; r < array1[0] + 1; r++)
+    if (!element_array(array2, array1[r])) {
+      for (s = r; s< array1[0]; s++)
+	array1[s]=array1[s+1];
+      array1[0]--;
+      r--;
+    }
 }
 
 /* verifies that capturing the stone at str is not a snapback */
@@ -96,7 +107,9 @@ static int snapback (int str) {
 
   /* if only one liberty after capture */
   if (trymove(libs[0], OTHER_COLOR(board[str]), NULL, 0, EMPTY, 0)) {
-    liberties = countlib(libs[0]);
+    liberties=0;
+    if (board[libs[0]] != EMPTY)
+      liberties = countlib(libs[0]);
     popgo();
     if (liberties > 1)
       return 0;
@@ -313,7 +326,7 @@ static int quiescence_connect(int str1, int str2) {
   adj = chainlinks2(str1, adjs, 2);
   for (r = 0; r < adj; r++)
     if (adjacent_strings(adjs[r], str2))
-      if (naive_ladder(adjs[r], NULL))
+      if (quiescence_capture(adjs[r]))
 	return 1;
   
   return 0;
@@ -340,10 +353,8 @@ int recursive_connect (int str1, int str2, int *move) {
 
   ForcedMoves[0] = 0;
   Moves[0] = 0;
-  if (prevent_capture_one_move(ForcedMoves, str1))
-    ; 
-  else if (prevent_capture_one_move(ForcedMoves, str2))
-    ; 
+  if (!prevent_capture_one_move(ForcedMoves, str1))
+    prevent_capture_one_move(ForcedMoves, str2);
 /*   else if (prevent_capture_two_moves(ForcedMoves, str1)) */
 /*     ;  */
 /*   else if (prevent_capture_two_moves(ForcedMoves, str2)) */
@@ -372,9 +383,9 @@ int recursive_disconnect (int str1, int str2, int *move) {
   if ((board[str1] == EMPTY) || (board[str2] == EMPTY))
     return 1;
 
-  if (naive_ladder(str1, NULL))
+  if (quiescence_capture(str1))
     return 1;
-  if (naive_ladder(str2, NULL))
+  if (quiescence_capture(str2))
     return 1;
 
   if (same_string(str1, str2))
@@ -406,11 +417,19 @@ int recursive_disconnect (int str1, int str2, int *move) {
   return res;
 }
  
-static int capture_one_move (int str) {
+static int quiescence_capture (int str) {
   if (countlib(str) == 1)
     return 1;
+  else if (countlib(str) == 2)
+    return naive_ladder(str,NULL);
   return 0;
 }
+
+/* static int capture_one_move (int str) { */
+/*   if (countlib(str) == 1) */
+/*     return 1; */
+/*   return 0; */
+/* } */
 
 static int prevent_capture_one_move(int *moves, int str1) {
   int r, res=0;
