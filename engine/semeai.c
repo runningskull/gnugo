@@ -108,6 +108,8 @@ liberty_of_dragon(int pos, int origin)
   return 0;
 }
 
+/* Change the status and safety of a dragon */
+
 static void
 update_status(int dr, int new_status, int new_safety)
 {
@@ -123,7 +125,7 @@ update_status(int dr, int new_status, int new_safety)
     if (IS_STONE(board[pos]) && is_same_dragon(dr, pos))
       dragon[pos].matcher_status = new_status;
 
-  DRAGON2(dr).safety = ALIVE_IN_SEKI;
+  DRAGON2(dr).safety = new_safety;
 }
 
 /* analyzes a pair of adjacent dragons which are 
