@@ -89,6 +89,10 @@ SOURCE=.\board.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\boardlib.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cache.c
 # End Source File
 # Begin Source File
@@ -118,7 +122,7 @@ SOURCE=.\sgffile.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\showbord.c
+SOURCE=.\board.h
 # End Source File
 # End Group
 # Begin Group "Header Files"

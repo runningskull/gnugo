@@ -69,10 +69,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
-#include "../sgf/sgftree.h"
 #include "liberty.h"
 #include "gg_utils.h"
 #include "random.h"
+#include "../sgf/sgftree.h"
 
 #define USAGE "\n\
 Usage: extract_fuseki files boardsize moves patterns handicap strength half_board [output file]\n\

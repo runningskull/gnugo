@@ -111,6 +111,10 @@ SOURCE=.\board.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\boardlib.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\breakin.c
 
 !IF  "$(CFG)" == "engine - Win32 Release"
@@ -525,6 +529,10 @@ SOURCE=.\worm.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\board.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\cache.h
