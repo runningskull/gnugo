@@ -68,7 +68,7 @@ loadsgf golois/Goemate990903-12.sgf
 # This is more of a semeai. /gf
 loadsgf golois/Goemate990903-5.sgf
 16 owl_attack M4
-#? [0]*
+#? [0]
 
 
 # tm - running out at E6 looks fine.

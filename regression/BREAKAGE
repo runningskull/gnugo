@@ -1,3 +1,47 @@
+============================= 3.3.18 pre 4 ===============================
+
+./regress.sh . reading.tst 
+181 unexpected FAIL: Correct '1 E4', got '1 F5'
+./regress.sh . arb.tst 
+231 unexpected FAIL: Correct 'F5', got 'C6'
+./regress.sh . arion.tst 
+6 unexpected FAIL: Correct 'E19|F19|F18', got 'G19'
+./regress.sh . viking.tst 
+6 unexpected FAIL: Correct 'B17|B18', got 'A12'
+./regress.sh . lazarus.tst 
+4 unexpected FAIL: Correct 'R12|Q12|M8', got 'O11'
+9 unexpected FAIL: Correct 'D15|F15', got 'S12'
+./regress.sh . trevorb.tst 
+100 unexpected PASS!
+./regress.sh . trevor.tst 
+640 unexpected PASS!
+1010 unexpected PASS!
+./regress.sh . nngs.tst 
+1020 unexpected PASS!
+./regress.sh . trevorc.tst 
+1440 unexpected PASS!
+./regress.sh . strategy3.tst 
+137 unexpected FAIL: Correct 'F5', got 'Q18'
+./regress.sh . vie.tst 
+16 unexpected PASS!
+./regress.sh . 13x13.tst 
+25 unexpected FAIL: Correct 'J5', got 'L4'
+./regress.sh . trevord.tst 
+710 unexpected PASS!
+./regress.sh . owl1.tst 
+281 unexpected PASS!
+./regress.sh . nngs3.tst 
+230 unexpected PASS!
+760 unexpected FAIL: Correct 'Q14', got 'B9'
+./regress.sh . strategy5.tst 
+223 unexpected FAIL: Correct 'P16', got 'S4'
+./regress.sh . ninestones.tst 
+240 unexpected FAIL: Correct '!M19', got 'M19'
+./regress.sh . manyfaces1.tst 
+60 unexpected PASS!
+./regress.sh . thrash.tst 
+6 unexpected PASS!
+
 ============================= 3.3.18 pre 3 ===============================
 
 ./regress.sh . owl.tst 

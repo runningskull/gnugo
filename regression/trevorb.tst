@@ -4,7 +4,7 @@
 
 loadsgf games/trevor/auto/b01.sgf 48
 100 gg_genmove white
-#? [B1]*
+#? [B1]
 
 
 loadsgf games/trevor/auto/b01.sgf 56

@@ -23,4 +23,4 @@ loadsgf games/arion.sgf 213
 # F19 seems to be best way to live from a yose perspective.
 loadsgf games/arion.sgf 225
 6 gg_genmove black
-#? [E19|F19|F18]
+#? [E19|F19|F18]*

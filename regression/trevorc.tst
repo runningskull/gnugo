@@ -849,7 +849,7 @@ loadsgf games/trevor/auto/c81.sgf 32
 
 loadsgf games/trevor/auto/c81.sgf 34
 1440 gg_genmove white
-#? [E12|F11]*
+#? [E12|F11]
 
 
 

@@ -73,7 +73,7 @@ loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 118
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 154
 240 gg_genmove black
-#? [!M19]
+#? [!M19]*
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 170
 250 gg_genmove black

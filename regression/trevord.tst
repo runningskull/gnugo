@@ -360,7 +360,7 @@ loadsgf games/trevor/auto/d29.sgf 188
 
 loadsgf games/trevor/auto/d32.sgf 90
 710 gg_genmove white
-#? [M2]*
+#? [M2]
 
 
 loadsgf games/trevor/auto/d32.sgf 94

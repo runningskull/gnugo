@@ -12,7 +12,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 48
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 4 gg_genmove black
-#? [R12|Q12|M8]
+#? [R12|Q12|M8]*
 
 # M8 is better than the game move but R13 seems best
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 70
@@ -33,7 +33,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 164
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 216
 9 gg_genmove black
-#? [D15|F15]
+#? [D15|F15]*
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
 10 gg_genmove black

@@ -35,7 +35,7 @@ loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 65
 # W:P19 threatens the corner but still N18 is important
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 79
 60 gg_genmove black
-#? [N18|G18]*
+#? [N18|G18]
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 83
 70 gg_genmove black

@@ -15,7 +15,7 @@ loadsgf games/wing-yuhiko-gnugo.sgf 30
 
 loadsgf games/wing-yuhiko-gnugo.sgf 46
 223 gg_genmove black
-#? [P16]
+#? [P16]*
 
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf 62

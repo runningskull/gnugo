@@ -69,7 +69,7 @@ loadsgf games/arb/dumonteil-5.sgf 125
 
 loadsgf games/arb/dumonteil-6.sgf 33
 231 gg_genmove black
-#? [F5]
+#? [F5]*
 
 loadsgf games/arb/game03.sgf 109
 232 gg_genmove black

@@ -555,7 +555,7 @@ loadsgf games/trevor/trevor_63.sgf
 #SEE_ALSO=niki:9
 loadsgf games/trevor/trevor_64.sgf
 640 owl_defend G11
-#? [1 (..+)]*
+#? [1 (..+)]
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=KO!
@@ -634,7 +634,7 @@ loadsgf games/trevor/owl111a.sgf
 #SEE_ALSO=global:16
 loadsgf golois/Goemate990903-6.sgf
 1010 owl_does_defend O13 O11 
-#? [0]*
+#? [0]
 
 #CATEGORY=OWL
 #DESCRIPTION=Why is this an owl_escape?
