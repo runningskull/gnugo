@@ -167,7 +167,7 @@ static int owl_estimate_life(struct local_owl_data *owl,
 		  	     const char **live_reason,
 			     int komaster, int does_attack,
 		  	     struct eyevalue *probable_eyes,
-			     int *eyemin, int *eyemax, int escape);
+			     int *eyemin, int *eyemax);
 static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
 					 int *vital_point,
 					 int is_attack_point);
@@ -1266,7 +1266,7 @@ do_owl_attack(int str, int *move, int *wormid,
 
   /* First see whether there is any chance to kill. */
   if (owl_estimate_life(owl, vital_moves, &live_reason, komaster, 1,
-			&probable_eyes, &eyemin, &eyemax, escape)) {
+			&probable_eyes, &eyemin, &eyemax)) {
     /*
      * We need to check here if there's a worm under atari. If yes,
      * locate it and report a (gote) GAIN.
@@ -1942,7 +1942,7 @@ do_owl_defend(int str, int *move, int *wormid,
   /* First see whether we might already be alife. */
   if (escape < MAX_ESCAPE) {
     if (owl_estimate_life(owl, vital_moves, &live_reason, komaster, 0,
-	  		  &probable_eyes, &eyemin, &eyemax, escape)) {
+	  		  &probable_eyes, &eyemin, &eyemax)) {
       SGFTRACE(0, WIN, live_reason);
       TRACE("%oVariation %d: ALIVE (%s)\n",
 	    this_variation_number, live_reason);
@@ -2278,8 +2278,7 @@ static int
 owl_estimate_life(struct local_owl_data *owl,
     		  struct owl_move_data vital_moves[MAX_MOVES],
 		  const char **live_reason, int komaster, int does_attack,
-		  struct eyevalue *probable_eyes, int *eyemin, int *eyemax, 
-		  int escape)
+		  struct eyevalue *probable_eyes, int *eyemin, int *eyemax)
 {
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
@@ -2317,8 +2316,7 @@ owl_estimate_life(struct local_owl_data *owl,
       || (*eyemin == 1 && min_eyes(probable_eyes) >= 4)
       || (stackp > owl_distrust_depth
 	  && min_eyes(probable_eyes) >= 2
-	  && !matches_found
-	  && escape)) {
+	  && !matches_found)) {
     if (*eyemin >= 2)
       *live_reason = "2 or more secure eyes";
     else if (*eyemin == 1 && min_eyes(probable_eyes) >= 4)
@@ -2336,8 +2334,7 @@ owl_estimate_life(struct local_owl_data *owl,
       && (*eyemin + matches_found >= 2
 	  || (*eyemin + matches_found == 1 && min_eyes(probable_eyes) >= 4)
       || (stackp > owl_distrust_depth
-	  && min_eyes(probable_eyes) >= 2))
-      && dummy_moves[0].pos) {
+	  && min_eyes(probable_eyes) >= 2))) {
     /* We are not yet alive only due to owl vital attack patterns matching.
      * Let's try to defend against it.
      */
