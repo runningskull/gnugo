@@ -383,7 +383,7 @@ hashdata_compare(Hash_data *hd1, Hash_data *hd2)
   for (i = 0; i < NUM_HASHVALUES; i++)
     if (hd1->hashval[i] != hd2->hashval[i]) 
       rc = 2;
-  if ( rc == 2 && i > 0)
+  if (rc == 2 && i > 0)
     stats.hash_collisions++;
 
 #if FULL_POSITION_IN_HASH
@@ -392,6 +392,38 @@ hashdata_compare(Hash_data *hd1, Hash_data *hd2)
 #endif
 
   return rc;
+}
+
+/* Compute hash value to identify the goal area. */
+Hash_data
+goal_to_hashvalue(char *goal)
+{
+  int i, pos;
+  Hash_data return_value;
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    return_value.hashval[i] = 0;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos) && goal[pos])
+      for (i = 0; i < NUM_HASHVALUES; i++) 
+	return_value.hashval[i] += white_hash[pos][i] + black_hash[pos][i];
+  return return_value;
+}
+
+/* Returns an XOR of the two hash values. The full board position is copied
+ * over from hash1 if FULL_POSITION_IN_HASH is set.
+ */
+Hash_data
+xor_hashvalues(Hash_data *hash1, Hash_data *hash2)
+{
+  int i;
+  Hash_data return_value;
+
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    return_value.hashval[i] = hash1->hashval[i] ^ hash2->hashval[i];
+#if FULL_POSITION_IN_HASH
+  return_value.hashpos = hash1->hashpos;
+#endif
+  return return_value;
 }
 
 

@@ -56,7 +56,8 @@ static void hashnode_unlink_closed_results(Hashnode *node,
 					   int statistics[][20]);
 static void hashtable_partially_clear(Hashtable *table);
 static int do_get_read_result(int routine, int komaster, int kom_pos,
-			      int str1, int str2, Read_result **read_result);
+			      int str1, int str2, Read_result **read_result,
+		   	      Hash_data *hashmodifier);
 
 
 /*
@@ -662,6 +663,27 @@ reading_cache_clear()
   hashtable_clear(movehash);
 }
 
+int
+get_read_result_hash_modified(int routine, int komaster, int kom_pos,
+    			      int *str, Hash_data *hashmodifier,
+			      Read_result **read_result)
+{
+  /* Only store the result if stackp <= depth. Above that, there
+   * is no branching, so we won't gain anything.
+   */
+  if (stackp > depth) {
+    *read_result = NULL;
+    return 0;
+  }
+  
+  /* Find the origin of the string in order to make the caching of read
+   * results work better.
+   */
+  *str = find_origin(*str);
+  
+  return do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
+			    read_result, hashmodifier);
+}
 
 /*
  * Return a Read_result for the current position, routine and location.
@@ -685,7 +707,7 @@ get_read_result(int routine, int komaster, int kom_pos, int *str,
   *str = find_origin(*str);
   
   return do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
-			    read_result);
+			    read_result, NULL);
 }
 
 
@@ -711,18 +733,20 @@ get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
   *str2 = find_origin(*str2);
   
   return do_get_read_result(routine, komaster, kom_pos, *str1, *str2,
-			    read_result);
+			    read_result, NULL);
 }
 
 
 static int
 do_get_read_result(int routine, int komaster, int kom_pos,
-		   int str1, int str2, Read_result **read_result)
+		   int str1, int str2, Read_result **read_result,
+		   Hash_data *hashmodifier)
 {
   Hashnode *node;
   unsigned int data1 = rr_input_data1(routine, komaster, kom_pos,
 				      str1, depth - stackp);
   unsigned int data2 = rr_input_data2(str2);
+  Hash_data modified_hash;
 
 #if CHECK_HASHING
   Hash_data    key;
@@ -737,8 +761,13 @@ do_get_read_result(int routine, int komaster, int kom_pos,
 
 #endif /* CHECK_HASHING */
 
+  if (hashmodifier)
+    modified_hash = xor_hashvalues(&hashdata, hashmodifier);
+  else
+    modified_hash = hashdata;
+
   /* First try to look this position up in the table. */
-  node = hashtable_search(movehash, &hashdata);
+  node = hashtable_search(movehash, &modified_hash);
   if (node != NULL) {
     Read_result *result;
 
@@ -758,10 +787,10 @@ do_get_read_result(int routine, int komaster, int kom_pos,
 	  routine, str1, str2);
   }
   else {
-    node = hashtable_enter_position(movehash, &hashdata);
+    node = hashtable_enter_position(movehash, &modified_hash);
     if (node) {
       DEBUG(DEBUG_READING_CACHE, "Created position %H in the hash table...\n",
-	    (unsigned long) hashdata.hashval);
+	    (unsigned long) modified_hash.hashval);
     }
     else {
       DEBUG(DEBUG_READING_CACHE, "Unable to clean up the hash table!\n");

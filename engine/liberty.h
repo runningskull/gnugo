@@ -40,7 +40,7 @@
 /* ================================================================ */
 
 
-/* A few variables below are of types defined in hash.h. */
+/* We need the defintion of type Hash_data here. */
 #include "hash.h"
 
 /* Other modules get read-only access to this variable. */

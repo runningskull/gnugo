@@ -255,6 +255,9 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
 
 int get_read_result(int routine, int komaster, int kom_pos,
 		    int *str, Read_result **read_result);
+int get_read_result_hash_modified(int routine, int komaster, int kom_pos,
+		    		  int *str, Hash_data *hash_modifier,
+				  Read_result **read_result);
 int get_read_result2(int routine, int komaster, int kom_pos,
 		     int *str1, int *str2, Read_result **read_result);
 
@@ -388,7 +391,10 @@ int get_read_result2(int routine, int komaster, int kom_pos,
 #define CONNECT         5
 #define DISCONNECT      6
 
-#define MAX_ROUTINE     DISCONNECT
+#define BREAK_IN	7
+#define BLOCK_OFF	8
+
+#define MAX_ROUTINE     BLOCK_OFF
 #define NUM_ROUTINES    (MAX_ROUTINE + 1)
   
 

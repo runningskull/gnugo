@@ -48,9 +48,11 @@ static int recursive_connect2(int str1, int str2, int *move,
 static int recursive_disconnect2(int str1, int str2, int *move,
 				 int komaster, int kom_pos, int has_passed);
 static int recursive_break(int str, char goal[BOARDMAX], int *move,
-    			   int komaster, int kom_pos, int has_passed);
+    			   int komaster, int kom_pos, int has_passed,
+			   Hash_data *goal_hash);
 static int recursive_block(int str, char goal[BOARDMAX], int *move,
-    			   int komaster, int kom_pos, int has_passed);
+    			   int komaster, int kom_pos, int has_passed,
+			   Hash_data *goal_hash);
 
 static int add_array(int *array, int elt);
 static int element_array(int *array,int elt);
@@ -2632,13 +2634,14 @@ find_break_moves(int str, char goal[BOARDMAX], int color_to_move,
 /* These depth values are set relative to the standard readconnnect depth
  * limits at each call of break_in()/block_off().
  * */
-int break_in_node_limit;
-int break_in_depth;
+static int break_in_node_limit;
+static int break_in_depth;
 
 /* Can (str) connect to goal[] if the other color moves first? */
 static int
 recursive_break(int str, char goal[BOARDMAX], int *move,
-    		int komaster, int kom_pos, int has_passed)
+    		int komaster, int kom_pos, int has_passed,
+		Hash_data *goal_hash)
 {
   int color = board[str];
   int moves[MAX_MOVES];
@@ -2648,9 +2651,7 @@ recursive_break(int str, char goal[BOARDMAX], int *move,
   int xpos;
   int savemove = NO_MOVE;
   int savecode = 0;
-#if 0
   int found_read_result;
-#endif
   Read_result *read_result = NULL;
   
   SETUP_TRACE_INFO("recursive_break", str);
@@ -2676,24 +2677,23 @@ recursive_break(int str, char goal[BOARDMAX], int *move,
     return 0;
   }
 
-#if 0
   if (stackp <= depth
-      && (hashflags & HASH_CONNECT)
+      && (hashflags & HASH_BREAK_IN)
       && !has_passed) {
-    found_read_result = get_read_result2(CONNECT, komaster, kom_pos, 
-					 &str1, &str2, &read_result);
+    found_read_result
+      = get_read_result_hash_modified(BREAK_IN, komaster, kom_pos, 
+				      &str, goal_hash, &read_result);
     if (found_read_result) {
-      TRACE_CACHED_RESULT2(*read_result);
+      TRACE_CACHED_RESULT(*read_result);
       if (rr_get_result(*read_result) != 0)
 	if (move)
 	  *move = rr_get_move(*read_result);
 
-      SGFTRACE2(rr_get_move(*read_result),
-		rr_get_result(*read_result), "cached");
+      SGFTRACE(rr_get_move(*read_result),
+	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
   }
-#endif
   
 #if 0
   if (trivial_connection(str1, str2, &xpos) == WIN) {
@@ -2717,7 +2717,7 @@ recursive_break(int str, char goal[BOARDMAX], int *move,
       if (!ko_move) {
 	int acode = recursive_block(str, goal, NULL,
 				    new_komaster, new_kom_pos,
-				    has_passed);
+				    has_passed, goal_hash);
 	popgo();
 	if (acode == 0) {
 	  SGFTRACE(xpos, WIN, "break effective");
@@ -2730,7 +2730,7 @@ recursive_break(int str, char goal[BOARDMAX], int *move,
       }
       else {
 	if (recursive_block(str, goal, NULL, new_komaster, new_kom_pos,
-			    has_passed) != WIN) {
+			    has_passed, goal_hash) != WIN) {
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
@@ -2757,7 +2757,8 @@ recursive_break(int str, char goal[BOARDMAX], int *move,
 /* Can (str) connect to goal[] if the other color moves first? */
 static int
 recursive_block(int str, char goal[BOARDMAX], int *move,
-    		int komaster, int kom_pos, int has_passed)
+    		int komaster, int kom_pos, int has_passed,
+		Hash_data *goal_hash)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -2768,9 +2769,7 @@ recursive_block(int str, char goal[BOARDMAX], int *move,
   int xpos;
   int savemove = NO_MOVE;
   int savecode = 0;
-#if 0
   int found_read_result;
-#endif
   Read_result *read_result = NULL;
   SETUP_TRACE_INFO("recursive_block", str);
   
@@ -2802,22 +2801,21 @@ recursive_block(int str, char goal[BOARDMAX], int *move,
     return WIN;
   }
   
-#if 0
-  if ((stackp <= depth) && (hashflags & HASH_DISCONNECT)) {
-    found_read_result = get_read_result2(DISCONNECT, komaster, kom_pos, 
-					 &str1, &str2, &read_result);
+  if ((stackp <= depth) && (hashflags & HASH_BLOCK_OFF)) {
+    found_read_result
+      = get_read_result_hash_modified(BLOCK_OFF, komaster, kom_pos, 
+				      &str, goal_hash, &read_result);
     if (found_read_result) {
-      TRACE_CACHED_RESULT2(*read_result);
+      TRACE_CACHED_RESULT(*read_result);
       if (rr_get_result(*read_result) != 0)
 	if (move)
 	  *move = rr_get_move(*read_result);
 
-      SGFTRACE2(rr_get_move(*read_result),
-		rr_get_result(*read_result), "cached");
+      SGFTRACE(rr_get_move(*read_result),
+	       rr_get_result(*read_result), "cached");
       return rr_get_result(*read_result);
     }
   }
-#endif
 
   if (ladder_capture(str, &xpos) == WIN) {
     SGFTRACE(xpos, WIN, "string capturable");
@@ -2838,7 +2836,8 @@ recursive_block(int str, char goal[BOARDMAX], int *move,
 			 &ko_move, stackp <= ko_depth && savecode == 0)) {
       if (!ko_move) {
 	int dcode = recursive_break(str, goal, NULL,
-				    new_komaster, new_kom_pos, has_passed);
+				    new_komaster, new_kom_pos, has_passed,
+				    goal_hash);
 	popgo();
 	if (dcode == 0) {
 	  SGFTRACE(xpos, WIN, "block effective");
@@ -2851,7 +2850,7 @@ recursive_block(int str, char goal[BOARDMAX], int *move,
       }
       else {
 	if (recursive_break(str, goal, NULL, new_komaster, new_kom_pos,
-			    has_passed) != WIN) {
+			    has_passed, goal_hash) != WIN) {
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
@@ -2863,7 +2862,8 @@ recursive_block(int str, char goal[BOARDMAX], int *move,
   if (num_moves == 0
       && distance >= 1.0
       && (has_passed
-	  || !recursive_break(str, goal, NULL, komaster, kom_pos, 1))) {
+	  || !recursive_break(str, goal, NULL, komaster, kom_pos, 1,
+	                      goal_hash))) {
     SGFTRACE(NO_MOVE, WIN, "no move, probably disconnected");
     READ_RETURN(read_result, move, NO_MOVE, WIN);
   }
@@ -2884,7 +2884,7 @@ recursive_block(int str, char goal[BOARDMAX], int *move,
  * not contain stones), if he gets the first move.
  */
 int
-break_in(int str, char goal [BOARDMAX], int *move)
+break_in(int str, char goal[BOARDMAX], int *move)
 {
   int dummy_move;
   int save_verbose;
@@ -2892,6 +2892,7 @@ break_in(int str, char goal [BOARDMAX], int *move)
   int reading_nodes_when_called = get_reading_node_counter();
   double start = 0;
   int tactical_nodes;
+  Hash_data goal_hash = goal_to_hashvalue(goal);
 
   break_in_node_limit = connection_node_limit / 5;
   break_in_depth = connect_depth2 - 5;
@@ -2911,7 +2912,7 @@ break_in(int str, char goal [BOARDMAX], int *move)
     verbose--;
   start = gg_cputime();
   memset(connection_shadow, 0, sizeof(connection_shadow));
-  result = recursive_break(str, goal, move, EMPTY, NO_MOVE, 0);
+  result = recursive_break(str, goal, move, EMPTY, NO_MOVE, 0, &goal_hash);
   verbose = save_verbose;
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   if (0) {
@@ -2943,6 +2944,7 @@ block_off(int str, char goal[BOARDMAX], int *move)
   int reading_nodes_when_called = get_reading_node_counter();
   double start = 0;
   int tactical_nodes;
+  Hash_data goal_hash = goal_to_hashvalue(goal);
   
   if (move == NULL)
     move = &dummy_move;
@@ -2957,7 +2959,8 @@ block_off(int str, char goal[BOARDMAX], int *move)
     verbose--;
   start = gg_cputime();
   memset(connection_shadow, 0, sizeof(connection_shadow));
-  result = recursive_block(str, goal, move, EMPTY, NO_MOVE, 0);
+  result = recursive_block(str, goal, move, EMPTY, NO_MOVE, 0,
+      			   &goal_hash);
   verbose = save_verbose;
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 

@@ -419,6 +419,10 @@ routine_to_string(int routine)
     return "CONNECT";
   else if (routine == DISCONNECT)
     return "DISCONNECT";
+  else if (routine == BREAK_IN)
+    return "BREAK_IN";
+  else if (routine == BLOCK_OFF)
+    return "BLOCK_OFF";
   else
     return "ERROR";
 }

@@ -255,11 +255,14 @@ extern int output_flags;       /* amount of output to outfile */
 #define HASH_SEMEAI       0x0400
 #define HASH_CONNECT      0x0800
 #define HASH_DISCONNECT   0x1000
+#define HASH_BREAK_IN	  0x2000
+#define HASH_BLOCK_OFF	  0x4000
 #define HASH_NOTHING      0
 #define HASH_ALL          0xffff
 #define HASH_DEFAULT      (HASH_ATTACK | HASH_FIND_DEFENSE\
 			   | HASH_OWL_ATTACK | HASH_OWL_DEFEND | HASH_SEMEAI\
-                           | HASH_CONNECT | HASH_DISCONNECT)
+                           | HASH_CONNECT | HASH_DISCONNECT\
+			   | HASH_BREAK_IN | HASH_BLOCK_OFF)
 
 extern int debug;		/* debug flags */
 extern int hashflags;		/* hash flags */
