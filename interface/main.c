@@ -149,6 +149,7 @@ enum mode {
   MODE_ASCII_EMACS,
   MODE_GTP,
   MODE_GMP,
+  MODE_SGMP,
   MODE_SGF,
   MODE_LOAD_AND_ANALYZE,
   MODE_LOAD_AND_SCORE,
@@ -608,6 +609,8 @@ main(int argc, char *argv[])
 	  playmode = MODE_GTP;
 	else if (strcmp(gg_optarg, "gmp") == 0)
 	  playmode = MODE_GMP;
+	else if (strcmp(gg_optarg, "sgmp") == 0)
+	  playmode = MODE_SGMP;
 	else {
 	  fprintf(stderr, "Invalid mode selection: %s\n", gg_optarg);
 	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
@@ -1005,10 +1008,11 @@ main(int argc, char *argv[])
     }
     fclose(output_check);
   }
-  
+
   switch (playmode) {
-  case MODE_GMP:     
-    
+  case MODE_GMP:
+  case MODE_SGMP:
+
     /* not supported by the protocol */
     resign_allowed = 0;
 
@@ -1017,7 +1021,9 @@ main(int argc, char *argv[])
       summon_oracle();
 #endif
 
-    play_gmp(&gameinfo);
+    /* EMPTY is valid for play_gmp.c. */
+    gameinfo.computer_player = mandated_color;
+    play_gmp(&gameinfo, playmode == MODE_SGMP);
 
 #if ORACLE
     if (metamachine)
@@ -1369,8 +1375,8 @@ show_version(void)
 Usage: gnugo [-opts]\n\
 \n\
 Main Options:\n\
-       --mode <mode>     Force the playing mode ('ascii', 'gmp', or 'gtp').\n\
-                         Default is ASCII.\n\
+       --mode <mode>     Force the playing mode ('ascii', 'gmp', 'sgmp',\n\
+                         or 'gtp'). Default is ASCII.\n\
                          If no terminal is detected GMP (Go Modem Protocol)\n\
                          will be assumed.\n\
        --quiet           Don't print copyright and informational messages\n\

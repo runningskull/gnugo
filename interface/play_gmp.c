@@ -36,7 +36,7 @@
 /* Play a game against a go-modem-protocol (GMP) client.         */
 /* --------------------------------------------------------------*/
 void
-play_gmp(Gameinfo *gameinfo)
+play_gmp(Gameinfo *gameinfo, int simplified)
 {
   SGFTree sgftree;
 
@@ -49,25 +49,45 @@ play_gmp(Gameinfo *gameinfo)
   int passes = 0; /* two passes and its over */
   int to_move;  /* who's turn is next ? */
 
-  int mycolor;  /* who has which color */
+  int mycolor = -1;  /* who has which color */
   int yourcolor;
-  
-  mycolor = gameinfo->computer_player;
+
+  if (gameinfo->computer_player == WHITE)
+    mycolor = 1;
+  else if (gameinfo->computer_player == BLACK)
+    mycolor = 0;
 
   sgftree_clear(&sgftree);
   sgftreeCreateHeaderNode(&sgftree, gnugo_get_boardsize(), gnugo_get_komi());
 
-  yourcolor = OTHER_COLOR(mycolor);
-
   ge = gmp_create(0, 1);
   TRACE("board size=%d\n", gnugo_get_boardsize());
 
-  /* Leave all the -1's so the client can negotiate the game parameters. */
-  if (chinese_rules)
-    gmp_startGame(ge, -1, -1, 5.5, -1, -1);
-  else
-    gmp_startGame(ge, -1, -1, 5.5, 0, -1);
-  
+  /* 
+   * The specification of the go modem protocol doesn't even discuss
+   * komi. So we have to guess the komi. If the komi is set on the
+   * command line, keep it. Otherwise, its value will be 0.0 and we
+   * use 5.5 in an even game, 0.5 otherwise.
+   */
+  if (gnugo_get_komi() == 0.0) {
+    if (gameinfo->handicap == 0)
+      gnugo_set_komi(5.5);
+    else
+      gnugo_set_komi(0.5);
+  }
+
+  if (!simplified) {
+    /* Leave all the -1's so the client can negotiate the game parameters. */
+    if (chinese_rules)
+      gmp_startGame(ge, -1, -1, 5.5, -1, mycolor, 0);
+    else
+      gmp_startGame(ge, -1, -1, 5.5, 0, mycolor, 0);
+  }
+  else {
+    gmp_startGame(ge, board_size, gameinfo->handicap,
+		  gnugo_get_komi(), chinese_rules, mycolor, 1);
+  }
+
   do {
     message = gmp_check(ge, 1, NULL, NULL, &error);
   } while (message == gmp_nothing || message == gmp_reset);
@@ -85,23 +105,13 @@ play_gmp(Gameinfo *gameinfo)
   gameinfo->handicap = gmp_handicap(ge);
   gnugo_clear_board(gmp_size(ge));
 
+  /* Let's pretend GMP knows about komi in case something will ever change. */
+  gnugo_set_komi(gmp_komi(ge));
+
 #if ORACLE
   if (metamachine && oracle_exists)
     oracle_clear_board(gnugo_get_boardsize());
 #endif
-
-  /* 
-   * The specification of the go modem protocol doesn't even discuss
-   * komi. So we have to guess the komi. If the komi is set on the
-   * command line, keep it. Otherwise, its value will be 0.0 and we
-   * use 5.5 in an even game, 0.5 otherwise.
-   */
-  if (gnugo_get_komi() == 0.0) {
-    if (gameinfo->handicap == 0)
-      gnugo_set_komi(5.5);
-    else
-      gnugo_set_komi(0.5);
-  }
 
   sgfOverwritePropertyInt(sgftree.root, "SZ", gnugo_get_boardsize());
 
@@ -205,21 +215,17 @@ play_gmp(Gameinfo *gameinfo)
   /* two passes: game over */
   gmp_sendPass(ge);   
   
-  /* We hang around here until cgoban asks us to go, since
-   * sometimes cgoban crashes if we exit first.
-   */
-  
   if (!quiet)
     fprintf(stderr, "Game over - waiting for client to shut us down\n");
   who_wins(mycolor, stderr);
 
   if (showtime) {
-      gprintf("\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
-      fprintf(stderr, "(%.2f seconds)\n", slowest_time);
-      fprintf(stderr, "\nAVERAGE TIME: %.2f seconds per move\n",
-	      total_time / movenum);
-      fprintf(stderr, "\nTOTAL TIME: %.2f seconds\n",
-	      total_time);
+    gprintf("\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
+    fprintf(stderr, "(%.2f seconds)\n", slowest_time);
+    fprintf(stderr, "\nAVERAGE TIME: %.2f seconds per move\n",
+	    total_time / movenum);
+    fprintf(stderr, "\nTOTAL TIME: %.2f seconds\n",
+	    total_time);
   }
   
   
@@ -230,13 +236,21 @@ play_gmp(Gameinfo *gameinfo)
 
   sgfWriteResult(sgftree.root, score, 1);
   sgffile_output(&sgftree);
-  
-  while (1) {
-    message = gmp_check(ge, 1, &j, &i, &error);
-    if (!quiet)
-      fprintf(stderr, "Message %d from gmp\n", message);
-    if (message == gmp_err)
-      break;
+
+  if (!simplified) {
+    /* We hang around here until cgoban asks us to go, since
+     * sometimes cgoban crashes if we exit first.
+     *
+     * FIXME: Check if this is still needed.  I made it dependand on
+     *	      `simplifed' just to avoid changes in GMP mode.
+     */
+    while (1) {
+      message = gmp_check(ge, 1, &j, &i, &error);
+      if (!quiet)
+	fprintf(stderr, "Message %d from gmp\n", message);
+      if (message == gmp_err)
+	break;
+    }
   }
 
 #if ORACLE

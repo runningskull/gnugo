@@ -23,6 +23,10 @@
  *   above copyright notices.
  */
 
+/* Modified by Paul Pogonyshev on 10.07.2003.
+ * Added support for Simplified GTP.
+ */
+
 #ifndef  _GMP_H_
 #define  _GMP_H_  1
 
@@ -60,7 +64,8 @@ extern void  gmp_destroy(Gmp *ge);
  *   set to -1, and you can start the game.
  */
 extern void  gmp_startGame(Gmp *ge, int boardsize, int handicap,
-			   float komi, int chineseRules, int iAmWhite);
+			   float komi, int chineseRules, int iAmWhite,
+			   int simplified);
 
 /*
  * Pretty self-explanatory set of routines.  For sendMove, (0,0) is the

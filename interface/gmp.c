@@ -15,6 +15,10 @@
    version distributed with GoDummy.
 */
 
+/* Modified by Paul Pogonyshev on 10.07.2003.
+ * Added support for Simplified GTP.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -60,7 +64,10 @@
  * Constants
  **********************************************************************/
 
-#define  GMP_TIMEOUTSECS      60
+#define  GMP_TIMEOUTRETRIES   60
+#define  GMP_RETRYSECS	       1
+#define  SGMP_TIMEOUTRETRIES   9
+#define  SGMP_RETRYSECS       20
 #define  GMP_MAXSENDSQUEUED   16
 
 
@@ -92,7 +99,8 @@ typedef struct Gmp_struct  {
   int  iAmWhite, colorVerified;
   Query  lastQuerySent;
 
-  int  recvSoFar, sendsQueued, sendFailures;
+  int  recvSoFar, sendsQueued;
+  int  sendFailures, noResponseSecs;
   int  waitingHighAck;
   time_t  lastSendTime;
   int  myLastSeq, hisLastSeq;
@@ -104,6 +112,8 @@ typedef struct Gmp_struct  {
 
   int  earlyMovePresent;
   int  earlyMoveX, earlyMoveY;
+
+  int simplified;
 } Gmp;
 
 
@@ -177,6 +187,7 @@ Gmp  *gmp_create(int inFile, int outFile)  {
   ge->recvSoFar = 0;
   ge->sendsQueued = 0;
   ge->sendFailures = 0;
+  ge->noResponseSecs = 0;
   ge->waitingHighAck = 0;
   ge->lastSendTime = 0;
   ge->myLastSeq = 0;
@@ -348,6 +359,7 @@ static GmpResult  parsePacket(Gmp *ge, int *out1, int *out2,
     } else  {
       ge->hisLastSeq = seq;
       ge->sendFailures = 0;
+      ge->noResponseSecs = 0;
       return(processCommand(ge, command, val, out1, out2, error));
     }
   } else  {
@@ -359,6 +371,7 @@ static GmpResult  parsePacket(Gmp *ge, int *out1, int *out2,
 	return(gmp_nothing);
       }
       ge->sendFailures = 0;
+      ge->noResponseSecs = 0;
       ge->waitingHighAck = 0;
       if (!gmp_verified(ge)) {
 	askQuery(ge);
@@ -374,6 +387,7 @@ static GmpResult  parsePacket(Gmp *ge, int *out1, int *out2,
       /* His command is old. */
     } else if (ack == ge->myLastSeq)  {
       ge->sendFailures = 0;
+      ge->noResponseSecs = 0;
       ge->waitingHighAck = 0;
       ge->hisLastSeq = seq;
       result = processCommand(ge, command, val, out1, out2, error);
@@ -565,18 +579,27 @@ static GmpResult  respond(Gmp *ge, Query query)  {
 
 
 static void  askQuery(Gmp *ge)  {
-  if (!ge->rulesVerified) {
-    ge->lastQuerySent = query_rules;
-  } else if (!ge->sizeVerified) {
-    ge->lastQuerySent = query_boardSize;
-  } else if (!ge->handicapVerified) {
-    ge->lastQuerySent = query_handicap;
-/*  } else if (!ge->komiVerified) {
- ge->lastQuerySent = query_komi; query komi is not define in GMP !?*/
-  } else {
-    assert(!ge->colorVerified);
-    ge->lastQuerySent = query_color;
+  if (!ge->simplified) {
+    if (!ge->rulesVerified) {
+      ge->lastQuerySent = query_rules;
+    } else if (!ge->sizeVerified) {
+      ge->lastQuerySent = query_boardSize;
+    } else if (!ge->handicapVerified) {
+      ge->lastQuerySent = query_handicap;
+    /*  } else if (!ge->komiVerified) {
+	  ge->lastQuerySent = query_komi; query komi is not define in GMP !? */
+    } else {
+      assert(!ge->colorVerified);
+      ge->lastQuerySent = query_color;
+    }
   }
+  else {
+    if (!ge->colorVerified)
+      ge->lastQuerySent = query_color;
+    else if (!ge->handicapVerified)
+      ge->lastQuerySent = query_handicap;
+  }
+
   putCommand(ge, cmd_query, ge->lastQuerySent);
 }
 
@@ -691,24 +714,28 @@ static GmpResult  gotQueryResponse(Gmp *ge, int val, const char **err)  {
 static int  heartbeat(Gmp *ge)  {
   Command  cmd;
   
-  if (ge->waitingHighAck)  {
-    if (++ge->sendFailures > GMP_TIMEOUTSECS)  {
-      return(0);
-    } else  {
-      if (gmp_debug) {
-	cmd = (ge->sendData[2] >> 4) & 7;
-	if (cmd == cmd_query) {
-	  if (gmp_debug)
-	    fprintf(stderr, "GMP: Sending command: %s %s (retry)\n",
-		    commandNames[cmd],
-		    queryNames[ge->sendData[3] & 0x7f]);
+  if (ge->waitingHighAck) {
+    if (++ge->noResponseSecs
+	> (ge->simplified ? SGMP_RETRYSECS : GMP_RETRYSECS))  {
+      if (++ge->sendFailures
+	  > (ge->simplified ? SGMP_TIMEOUTRETRIES : GMP_TIMEOUTRETRIES))  {
+	return(0);
+      } else  {
+	if (gmp_debug) {
+	  cmd = (ge->sendData[2] >> 4) & 7;
+	  if (cmd == cmd_query) {
+	    if (gmp_debug)
+	      fprintf(stderr, "GMP: Sending command: %s %s (retry)\n",
+		      commandNames[cmd],
+		      queryNames[ge->sendData[3] & 0x7f]);
+	  }
+	  else
+	    if (gmp_debug)
+	      fprintf(stderr, "GMP: Sending command: %s (retry)\n",
+		      commandNames[cmd]);
 	}
-	else
-	  if (gmp_debug)
-	    fprintf(stderr, "GMP: Sending command: %s (retry)\n",
-		    commandNames[cmd]);
+	write(ge->outFile, ge->sendData, 4);
       }
-      write(ge->outFile, ge->sendData, 4);
     }
   }
   return(1);
@@ -716,14 +743,14 @@ static int  heartbeat(Gmp *ge)  {
 
 
 void  gmp_startGame(Gmp *ge, int size, int handicap, float komi,
-		    int chineseRules, int iAmWhite)  {
+		    int chineseRules, int iAmWhite, int simplified)  {
   assert((size == -1) || ((size > 1) && (size <= 22)));
   assert((handicap >= -1) && (handicap <= 27));
   assert((chineseRules >= -1) && (chineseRules <= 1));
   assert((iAmWhite >= -1) && (iAmWhite <= 1));
 
   ge->boardSize = size;
-  ge->sizeVerified = 0;
+  ge->sizeVerified = simplified;
 
   ge->handicap = handicap;
   ge->handicapVerified = 0;
@@ -731,12 +758,14 @@ void  gmp_startGame(Gmp *ge, int size, int handicap, float komi,
   ge->komi = komi;
 
   ge->chineseRules = chineseRules;
-  ge->rulesVerified = 0;
+  ge->rulesVerified = simplified;
 
   ge->iAmWhite = iAmWhite;
   ge->colorVerified = 0;
 
   ge->earlyMovePresent = 0;
+
+  ge->simplified = simplified;
 
   if (iAmWhite != 1) {
     putCommand(ge, cmd_reset, 0);

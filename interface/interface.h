@@ -36,7 +36,7 @@ void play_ascii(SGFTree *tree, Gameinfo *gameinfo,
 void play_ascii_emacs(SGFTree *tree, Gameinfo *gameinfo, 
 		      char *filename, char *until);
 void play_gtp(FILE *gtp_input, int gtp_initial_orientation);
-void play_gmp(Gameinfo *gameinfo);
+void play_gmp(Gameinfo *gameinfo, int simplified);
 void play_solo(Gameinfo *gameinfo, int benchmark);
 void play_replay(Gameinfo *gameinfo, int color_to_test);
 
