@@ -185,6 +185,9 @@ loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 204
 460 gg_genmove black
 #? [N10]
 
+loadsgf games/nngs/looknglass-ggl-200302271041.sgf 99
+470 gg_genmove black
+#? [R9]
 
 
 
