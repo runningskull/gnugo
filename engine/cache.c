@@ -552,6 +552,11 @@ reading_cache_init()
    */
   int nodes = READING_CACHE_ENTRIES;
 
+  if (sizeof(Hashvalue) != SIZEOF_LONG) {
+    fprintf(stderr, "Warning: SIZEOF_LONG was set incorrectly, exiting.\n");
+    abort(); 
+  }
+
   if (0)
     gprintf("Allocated memory for %d hash nodes. \n", (int) nodes);
   movehash = hashtable_new((int) (1.5 * nodes),  /* table size   */
