@@ -101,12 +101,12 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 241
 # Looks like a tough problem for GNU Go.
 loadsgf games/owl41.sgf 1
 285 owl_defend A6
-#? [1 B3]*
+#? [1 B3]
 
 # Getting into a ko with A3 is not good.
 loadsgf games/owl41.sgf
 286 owl_attack A6
-#? [1 B3]*
+#? [1 B3]
 
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 230
 287 owl_attack D4
@@ -123,13 +123,13 @@ loadsgf games/nngs/gnugo-3.3.9-pogonyshev-200210142137.sgf 62
 
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 253
 290 owl_attack M19
-#? [1 O19]*
+#? [1 O19]
 291 owl_defend M19
 #? [2 O19]*
 
 loadsgf games/gunnar/gunnar3.sgf 88
 292 owl_defend T2
-#? [1 T4]*
+#? [1 T4]
 
 loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
 293 owl_defend Q6
@@ -137,7 +137,7 @@ loadsgf games/nngs/gnugo-3.3.12-RikiTiki-200212042341.sgf 80
 
 loadsgf games/owl42.sgf
 294 owl_defend L11
-#? [1 M9]*
+#? [1 M9]
 
 loadsgf games/owl43.sgf
 295 owl_attack C4

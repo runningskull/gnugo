@@ -1,3 +1,55 @@
+========================== 3.3.17 pre 4  ============================
+
+./regress.sh . atari_atari.tst 
+20 unexpected FAIL: Correct 'L17', got 'P9'
+./regress.sh . arb.tst 
+210 unexpected PASS!
+./regress.sh . nngs.tst 
+480 unexpected FAIL: Correct 'G14', got 'F14'
+./regress.sh . global.tst 
+32 unexpected PASS!
+34 unexpected PASS!
+./regress.sh . owl1.tst 
+285 unexpected PASS!
+286 unexpected PASS!
+290 unexpected PASS!
+292 unexpected PASS!
+294 unexpected PASS!
+./regress.sh . nngs3.tst 
+230 unexpected FAIL: Correct '!L12', got 'L12'
+310 unexpected FAIL: Correct 'C5|B5', got 'B7'
+./regress.sh . ninestones.tst 
+300 unexpected FAIL: Correct 'P16', got 'Q14'
+310 unexpected FAIL: Correct 'P16', got 'Q13'
+330 unexpected FAIL: Correct 'M17|M16', got 'N13'
+340 unexpected FAIL: Correct 'H4', got 'H5'
+350 unexpected FAIL: Correct 'L17', got 'N19'
+360 unexpected FAIL: Correct 'S5', got 'S3'
+370 unexpected FAIL: Correct 'R5', got 'O4'
+380 unexpected FAIL: Correct 'D3|E3|E7|F6', got 'O3'
+390 unexpected FAIL: Correct 'D3', got 'C4'
+490 unexpected FAIL: Correct 'R10', got 'S10'
+500 unexpected FAIL: Correct 'A8|A6', got 'K2'
+510 unexpected FAIL: Correct 'E19', got 'A6'
+520 unexpected FAIL: Correct '!G19', got 'G19'
+530 unexpected FAIL: Correct 'E13', got 'M2'
+540 unexpected FAIL: Correct 'B15', got 'L19'
+550 unexpected FAIL: Correct 'G5|J4', got 'K19'
+560 unexpected FAIL: Correct 'A9|B10|C11|F11|J15|A16', got 'L9'
+570 unexpected FAIL: Correct 'A9|B10|C11|F11|J15|A16', got 'H1'
+580 unexpected FAIL: Correct 'A10', got 'L3'
+./regress.sh . manyfaces1.tst 
+100 unexpected PASS!
+./regress.sh . nando.tst 
+7 unexpected PASS!
+8 unexpected PASS!
+9 unexpected PASS!
+20 unexpected PASS!
+21 unexpected PASS!
+24 unexpected PASS!
+./regress.sh . 13x13b.tst 
+4 unexpected PASS!
+
 ========================== 3.3.17 pre 3  ============================
 
 ./regress.sh . owl_rot.tst 

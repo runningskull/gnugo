@@ -34,9 +34,9 @@ loadsgf games/nando/auto005.sgf
 #CATEGORY=ATARI_ATARI
 loadsgf games/nando/auto006.sgf
 7 gg_genmove black
-#? [N16]*
+#? [N16]
 8 gg_genmove white
-#? [M16|N16]*
+#? [M16|N16]
 
 # Beware of the double snapback.
 #CATEGORY=ATARI_ATARI
@@ -44,7 +44,7 @@ loadsgf games/nando/auto007.sgf
 white A1
 black B5
 9 gg_genmove white
-#? [E1|E2|F1|G1|G2]*
+#? [E1|E2|F1|G1|G2]
 
 # GG (as of 3.3.15) doesn't even try a single move. On the other
 # side, GG doesn't have (yet) any mechanism for detecting a
@@ -104,14 +104,14 @@ loadsgf games/nando/auto013.sgf
 loadsgf games/nando/auto014.sgf
 black S16
 20 gg_genmove white
-#? [S8|S9|T12]*
+#? [S8|S9|T12]
 # With another move ordering
 loadsgf games/nando/auto014.sgf
 black S8
 white T9
 black S16
 21 gg_genmove white
-#? [S9|T12]*
+#? [S9|T12]
 
 # Another non-transitivity problem.
 #CATEGORY=CONNECTION
@@ -124,7 +124,7 @@ loadsgf games/nando/auto015.sgf
 #CATEGORY=OWL
 loadsgf games/nando/auto016.sgf
 24 owl_defend P17
-#? [1 M13]*
+#? [1 M13]
 
 #CATEGORY=BLUNDER
 loadsgf games/nando/auto017.sgf

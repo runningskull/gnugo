@@ -89,7 +89,7 @@ loadsgf games/mertin13x13/GAGN1.sgf 28
 # Hane at K1 is not appropriate.
 loadsgf games/mertin13x13/GAGN1.sgf 42
 4 restricted_genmove white F4 H2 K1
-#? [F4]*
+#? [F4]
 
 # Unreasonable to block at A5.
 loadsgf games/mertin13x13/GAGN1.sgf 66

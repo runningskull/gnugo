@@ -99,11 +99,11 @@ loadsgf games/nngs/norate-ggl-200212301513.sgf 234
 # game move is playable but invites trouble.
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 4
 300 gg_genmove black
-#? [P16]
+#? [P16]*
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 8
 310 gg_genmove black
-#? [P16]
+#? [P16]*
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 24
 320 gg_genmove black
@@ -111,73 +111,73 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 24
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 36
 330 gg_genmove black
-#? [M17|M16]
+#? [M17|M16]*
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 48
 340 gg_genmove black
-#? [H4]
+#? [H4]*
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 56
 350 restricted_genmove black N19 L17
-#? [L17]
+#? [L17]*
 
 # S3 is the worst move, S5 is the best.
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 76
 360 restricted_genmove black S3 S4 S5
-#? [S5]
+#? [S5]*
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 78
 370 gg_genmove black
-#? [R5]
+#? [R5]*
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200302072106.sgf 4
 380 gg_genmove black
-#? [D3|E3|E7|F6]
+#? [D3|E3|E7|F6]*
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200302072106.sgf 8
 390 gg_genmove black
-#? [D3]
+#? [D3]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 164
 490 restricted_genmove black S10 R10
-#? [R10]
+#? [R10]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 200
 500 gg_genmove black
-#? [A8|A6]
+#? [A8|A6]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 208
 510 gg_genmove black
-#? [E19]
+#? [E19]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 210
 520 gg_genmove black
-#? [!G19]
+#? [!G19]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 214
 530 gg_genmove black
-#? [E13]
+#? [E13]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 228
 540 gg_genmove black
-#? [B15]
+#? [B15]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 254
 550 gg_genmove black
-#? [G5|J4]
+#? [G5|J4]*
 
 # B can win the semeai, which is a close race. Tenuki is
 # possible but the policy should be to play it out.
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 272
 560 gg_genmove black
-#? [A9|B10|C11|F11|J15|A16]
+#? [A9|B10|C11|F11|J15|A16]*
 
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 274
 570 gg_genmove black
-#? [A9|B10|C11|F11|J15|A16]
+#? [A9|B10|C11|F11|J15|A16]*
 
 # L3 just loses a point, as do K1 and H1.
 loadsgf games/nngs/uhu-gnugo-3.3.16-200302112129.sgf 300
 580 restricted_genmove black L3 K1 H1 A10
-#? [A10]
+#? [A10]*
 

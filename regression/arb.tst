@@ -55,7 +55,7 @@ loadsgf games/arb/dumonteil-3.sgf 185
 
 loadsgf games/arb/dumonteil-4.sgf 189
 210 gg_genmove black
-#? [D8]*
+#? [D8]
 
 # Ko mistake observed in gnugo-2.7.231 --level 8 -M 32
 loadsgf games/arb/dumonteil-5.sgf 83
