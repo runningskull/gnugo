@@ -1,10 +1,10 @@
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 26
 10 gg_genmove black
-#? [C5]*
+#? [C5]
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 36
 20 gg_genmove black
-#? [H2|H3]*
+#? [H2|H3]
 
 loadsgf games/ninestones/halti-gnugo-3.3.9-200210111409.sgf 42
 30 gg_genmove black

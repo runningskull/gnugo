@@ -792,7 +792,7 @@ loadsgf games/trevor/auto/c76.sgf 60
 
 loadsgf games/trevor/auto/c76.sgf 68
 1360 gg_genmove white
-#? [F12]*
+#? [F12]
 
 
 

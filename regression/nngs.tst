@@ -313,7 +313,7 @@ loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 57
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 59
 720 gg_genmove white
-#? [F16]
+#? [F16]*
 
 
 
