@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- duplicate lines removed from safety_to_string()
+- draw_active_area() functions in reading.c and owl.c unified
 - new ascii command: freehandicap <num>.
 - new function: ascii_free_handicap
 - report_worm(): print all attack, defense, threat points/codes

@@ -223,7 +223,6 @@ struct reading_cache {
 static struct reading_cache persistent_reading_cache[MAX_READING_CACHE_SIZE];
 static int persistent_reading_cache_size = 0;
 
-static void draw_active_area(char p[BOARDMAX]);
 static int verify_stored_board(char p[BOARDMAX]);
 static int search_persistent_reading_cache(int routine, int str,
 					   int *result, int *move);
@@ -5584,40 +5583,6 @@ draw_reading_shadow()
   end_draw_board();
 }
 
-/* Draw the active area, for debugging purposes */
-
-static void
-draw_active_area(char p[BOARDMAX])
-{
-  int i, j, ii;
-  int c = ' ';
-
-  start_draw_board();
-  
-  for (i = 0; i < board_size; i++) {
-    ii = board_size - i;
-    fprintf(stderr, "\n%2d", ii);
-    
-    for (j = 0; j < board_size; j++) {
-      if (p[POS(i, j)] == EMPTY)
-	c = '.';
-      else if (p[POS(i, j)] == WHITE)
-	c = 'O';
-      else if (p[POS(i, j)] == BLACK)
-	c = 'X';
-      if (p[POS(i, j)] == GRAY)
-	c = '?';
-      
-      fprintf(stderr, " %c", c);
-    }
-    
-    fprintf(stderr, " %d", ii);
-  }
-
-  end_draw_board();
-}
-
-
 /* Returns 1 if the stored board is compatible with the current board,
  * 0 otherwise.
  */
@@ -5946,7 +5911,7 @@ print_persistent_reading_cache_entry(int k)
 	    entry->stack[r]);
   }
 
-  draw_active_area(entry->board);
+  draw_active_area(entry->board, NO_MOVE);
 }
 
 

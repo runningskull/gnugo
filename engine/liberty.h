@@ -935,6 +935,8 @@ void abortgo(const char *file, int line, const char *msg, int i, int j);
 
 #define gg_assert(x) ASSERT2(x, -1, -1);
 
+void draw_active_area(char board[BOARDMAX], int apos);
+
 #endif  /* _LIBERTY_H_ */
 
 

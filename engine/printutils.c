@@ -372,10 +372,6 @@ safety_to_string(int status)
     return "INESSENTIAL";
   else if (status == TACTICALLY_DEAD)
     return "TACTICALLY_DEAD";
-  else if (status == INESSENTIAL)
-    return "INESSENTIAL";
-  else if (status == TACTICALLY_DEAD)
-    return "TACTICALLY_DEAD";
   else if (status == WEAK)
     return "WEAK";
   else if (status == WEAKLY_ALIVE)

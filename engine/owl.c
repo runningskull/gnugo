@@ -4812,12 +4812,13 @@ pop_owl(struct local_owl_data **owl)
 
 #define HIGH_LIBERTY_BIT 4
 
-/* FIXME: Unify with the same function in reading.c. */
-static void
+void
 draw_active_area(char board[BOARDMAX], int apos)
 {
   int i, j, ii;
   int c = ' ';
+  int cw = apos==NO_MOVE ? 'O' : 'o';
+  int cb = apos==NO_MOVE ? 'X' : 'x';
 
   start_draw_board();
   
@@ -4826,20 +4827,21 @@ draw_active_area(char board[BOARDMAX], int apos)
     fprintf(stderr, "\n%2d", ii);
     
     for (j = 0; j < board_size; j++) {
-      if (board[POS(i, j)] == EMPTY)
+      int pos = POS(i, j);
+      if (board[pos] == EMPTY)
 	c = '.';
-      else if (board[POS(i, j)] == WHITE)
-	c = 'o';
-      else if (board[POS(i, j)] == (WHITE | HIGH_LIBERTY_BIT))
+      else if (board[pos] == WHITE)
+	c = cw;
+      else if (board[pos] == (WHITE | HIGH_LIBERTY_BIT))
 	c = 'O';
-      else if (board[POS(i, j)] == BLACK)
-	c = 'x';
-      else if (board[POS(i, j)] == (BLACK | HIGH_LIBERTY_BIT))
+      else if (board[pos] == BLACK)
+	c = cb;
+      else if (board[pos] == (BLACK | HIGH_LIBERTY_BIT))
 	c = 'X';
-      if (board[POS(i, j)] == GRAY)
+      if (board[pos] == GRAY)
 	c = '?';
       
-      if (POS(i, j) == apos)
+      if (pos == apos)
 	fprintf(stderr, "[%c", c);
       else if (j > 0 && POS(i, j-1) == apos)
 	fprintf(stderr, "]%c", c);
@@ -4852,6 +4854,7 @@ draw_active_area(char board[BOARDMAX], int apos)
 
   end_draw_board();
 }
+
 
 /* Returns 1 if the stored board is compatible with the current board,
  * 0 otherwise.
