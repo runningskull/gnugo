@@ -84,7 +84,6 @@ enum {OPT_BOARDSIZE=127,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_SURROUNDED,
       OPT_DECIDE_TACTICAL_SEMEAI,
-      OPT_DECIDE_ORACLE,
       OPT_EXPERIMENTAL_SEMEAI,
       OPT_EXPERIMENTAL_OWL_EXT,
       OPT_SEMEAI_VARIATIONS,
@@ -129,7 +128,6 @@ enum {OPT_BOARDSIZE=127,
       OPT_DEFEND_BY_PATTERN,
       OPT_MIRROR,
       OPT_MIRROR_LIMIT,
-      OPT_METAMACHINE
 };
 
 /* names of playing modes */
@@ -156,7 +154,6 @@ enum mode {
   MODE_DECIDE_EYE,
   MODE_DECIDE_COMBINATION,
   MODE_DECIDE_SURROUNDED,
-  MODE_DECIDE_ORACLE
 };
 
 
@@ -245,7 +242,6 @@ static struct gg_option const long_options[] =
   {"decide-surrounded",  required_argument, 0, OPT_DECIDE_SURROUNDED},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
   {"decide-combination", no_argument,   0, OPT_DECIDE_COMBINATION},
-  {"decide-oracle",  no_argument,       0, OPT_DECIDE_ORACLE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
   {"nofuseki",       no_argument,       0, OPT_NOFUSEKI},
   {"nojosekidb",     no_argument,       0, OPT_NOJOSEKIDB},
@@ -259,7 +255,6 @@ static struct gg_option const long_options[] =
   {"defend-by-pattern", no_argument,    0, OPT_DEFEND_BY_PATTERN},
   {"mirror",         no_argument,       0, OPT_MIRROR},
   {"mirror-limit",   required_argument, 0, OPT_MIRROR_LIMIT},
-  {"metamachine",    no_argument,       0, OPT_METAMACHINE},
   {NULL, 0, NULL, 0}
 };
 
@@ -499,9 +494,6 @@ main(int argc, char *argv[])
 	owl_threats = 0;
 	break;
 
-      case OPT_METAMACHINE:
-        metamachine = 1;
-
       case OPT_JAPANESE_RULES: 
 	chinese_rules = 0;
 	break;
@@ -667,10 +659,6 @@ main(int argc, char *argv[])
 	}
 	strcpy(decide_this, gg_optarg);
 	playmode = MODE_DECIDE_SURROUNDED;
-	break;
-	
-      case OPT_DECIDE_ORACLE:
-	playmode = MODE_DECIDE_ORACLE;
 	break;
 	
       case OPT_BRANCH_DEPTH:
@@ -936,19 +924,7 @@ main(int argc, char *argv[])
   
   switch (playmode) {
   case MODE_GMP:     
-    
-#if ORACLE
-    if (metamachine)
-      summon_oracle();
-#endif
-
     play_gmp(&gameinfo);
-
-#if ORACLE
-    if (metamachine)
-      dismiss_oracle();
-#endif
-
     break;
     
   case MODE_SOLO:
@@ -971,20 +947,7 @@ main(int argc, char *argv[])
       fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
       exit(EXIT_FAILURE);
     }
-
-#if ORACLE
-    if (metamachine) {
-      summon_oracle();
-      oracle_loadsgf(infilename, untilstring);
-    }
-#endif
-
     load_and_analyze_sgf_file(&gameinfo);
-
-#if ORACLE
-    dismiss_oracle();
-#endif
-
     break;
     
   case MODE_LOAD_AND_SCORE:
@@ -1212,22 +1175,6 @@ main(int argc, char *argv[])
       break;
     }
 
-#if ORACLE
-  case MODE_DECIDE_ORACLE:
-    {
-      if (mandated_color != EMPTY)
-	gameinfo.to_move = mandated_color;
-      
-      if (!infilename) {
-	fprintf(stderr, "You must use -l infile with load and analyze mode.\n");
-	exit(EXIT_FAILURE);
-      }
-
-      decide_oracle(&gameinfo, infilename, untilstring);
-      break;
-    }
-#endif
-
   case MODE_GTP:  
     if (gtpfile != NULL) {
       gtp_input_FILE = fopen(gtpfile, "r");
@@ -1445,7 +1392,6 @@ DEBUG_TERRITORY             0x100000\n\
 DEBUG_OWL_PERSISTENT_CACHE  0X200000\n\
 DEBUG_TOP_MOVES             0x400000\n\
 DEBUG_MISCELLANEOUS         0x800000\n\
-DEBUG_ORACLE_STREAM         0x1000000\n\
 "
 
 /*

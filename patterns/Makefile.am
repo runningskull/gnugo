@@ -29,8 +29,7 @@ EXTRA_DIST = $(DSP)\
 	fuseki19.db\
 	handicap.db\
 	read_attack.db\
-	read_defend.db\
-	oracle.db
+	read_defend.db
 
 mkpat_SOURCES  = mkpat.c transform.c
 
@@ -64,7 +63,7 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
-		 read_attack.c read_defend.c handipat.c oraclepat.c
+		 read_attack.c read_defend.c handipat.c
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
 
@@ -130,9 +129,6 @@ aa_attackpat.c : $(srcdir)/aa_attackpats.db mkpat$(EXEEXT)
 
 owl_attackpat.c : $(srcdir)/owl_attackpats.db mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b owl_attackpat < $(srcdir)/owl_attackpats.db >owl_attackpat.c
-
-oraclepat.c : $(srcdir)/oracle.db mkpat$(EXEEXT)
-	./mkpat -b oracle < $(srcdir)/oracle.db >oraclepat.c
 
 owl_vital_apat.c : $(srcdir)/owl_vital_apats.db mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b owl_vital_apat < $(srcdir)/owl_vital_apats.db >owl_vital_apat.c
