@@ -316,6 +316,10 @@ loadsgf games/self_play/selfplay1.sgf 206
 337 owl_attack E19
 #? [1 C18]*
 
+loadsgf games/owl50.sgf
+338 owl_defend F18
+#? [1 M16]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

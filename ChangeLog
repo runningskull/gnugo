@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new and revised tests
+
 3.5.5 released April 15, 2004
 
 - moved TRACE_READ_RESULTS definition to hash.h
