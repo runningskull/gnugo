@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in do_owl_analyze_semeai()
 - global variable urgent retired
 - num_stones pointer in do_corner_matchpat() replaced with macro
 - joseki tuning

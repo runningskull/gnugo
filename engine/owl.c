@@ -399,7 +399,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   struct owl_move_data common_liberty;
   struct owl_move_data backfill_outside_liberty;
   struct owl_move_data backfill_common_liberty;
-  char saved_goal[BOARDMAX];
   int safe_outside_liberty_found = 0;
   int safe_common_liberty_found = 0;
   char mw[BOARDMAX];  
@@ -795,10 +794,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       TRACE("%s, value %d, same_dragon %d\n", moves[k].name, moves[k].value,
 	    moves[k].same_dragon);
 
-      if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1)
-	push_owl(&owla, &owlb);
-      else
-	memcpy(saved_goal, owla->goal, sizeof(saved_goal));
+      push_owl(&owla, &owlb);
       
       owl_update_goal(mpos, moves[k].same_dragon, owla, 1);
       owla->lunches_are_current = 0;
@@ -820,12 +816,9 @@ do_owl_analyze_semeai(int apos, int bpos,
 	this_resultb = REVERSE_RESULT(this_resultb);
       }
 
-      if (owl_phase && stackp <= SEMEAI_BRANCH_DEPTH + 1) {
-	pop_owl(&owlb);
-	pop_owl(&owla);
-      }
-      else
-	memcpy(owla->goal, saved_goal, sizeof(saved_goal));
+      pop_owl(&owlb);
+      pop_owl(&owla);
+      
       popgo();
 
       if (ko_move) {
