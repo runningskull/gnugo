@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- matcher_check can analyze existing sgf files
 - break_chain2_moves() revised
 - placehand() renamed to place_fixed_handicap()
 - new function place_free_handicap() in handicap.c with associated

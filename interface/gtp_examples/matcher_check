@@ -75,16 +75,18 @@ my $wanthelp;
 
 #added for matcher_check
 my %match_hist;
+my $loadfile;
 my $movenum;
+my $movecount;
 
 my $helpstring = "
 
 Run with:
 
 twogtp --program \'<path to program> --mode gtp [program options]\' \\
-       [twogtp options]
+       [matcher_check options]
 
-Possible twogtp options:
+Possible matcher_check options:
 
   --verbose 1 (to list moves) or --verbose 2 (to draw board)
   --komi <amount>
@@ -92,7 +94,10 @@ Possible twogtp options:
   --size <board size>                     (default 19)
   --games <number of games to play>       (-1 to play forever)
   --sgffile <filename>			  (file to save games as)
+  --loadsgf <filename>			  (file to analyze)
+  --movecount <number of moves to check>
   --help                                  (show this)
+
 
 ";
 
@@ -103,7 +108,9 @@ GetOptions(
            "handicap|h=i"           => \$handicap,
            "size|boardsize|s=i"     => \$size,
            "sgffile|o=s"            => \$sgffilename,
+	   "loadsgf|o=s"	    => \$loadfile,
            "games=i"                => \$games,
+	   "movecount=i"	    => \$movecount,
            "help"                   => \$wanthelp,
 );
 
@@ -124,7 +131,31 @@ die $helpstring unless defined $program;
 my $prog_in  = new FileHandle;		# stdin of program
 my $prog_out = new FileHandle;		# stdout of program
 
+if ($loadfile)
+{
+    #we need to analyze an sgf file
+    $pidp = open2($prog_out, $prog_in, $program);
+    print "program pid: $pidp\n" if $verbose;
+
+    for ($movenum = 2; $movenum <= $movecount + 1; $movenum++)
+    {
+        #load the file, check the statuses, next move.
+	print "loading move $movenum\n" if $verbose;
+	print $prog_in "loadsgf $loadfile $movenum\n";
+	eat_no_response($prog_out);
+	check_matcher($prog_in, $prog_out);
+	print "done checking status.\n" if ($verbose);
+    }
+
+    print "movenum: $movenum\n" if ($verbose);
+    print "movecount: $movecount\n" if ($verbose);
+    print "done reading sgf file\n" if ($verbose);
+    exit;
+}
+
+
 while ($games > 0) {
+    %match_hist = ();
     $pidp = open2($prog_out, $prog_in, $program);
     print "program pid: $pidp\n" if $verbose;
 
@@ -162,12 +193,13 @@ while ($games > 0) {
     while ($pass < 2) {
 	if ($toplay eq 'B') {
 	    print $prog_in "genmove_black\n";
-	    print "$toplay plays $move\n" if $verbose;
+#	    FIXME: we want this debug code in, but fixed.
+#	    print "$toplay plays $move\n" if $verbose;
 
 	    $toplay = 'W';
 	} else {
 	    print $prog_in "genmove_white\n";
-	    print "$toplay plays $move\n" if $verbose;
+#	    print "$toplay plays $move\n" if $verbose;
 
 	    $toplay = 'B';
 	}
@@ -199,6 +231,8 @@ while ($games > 0) {
 	$game_list{$sgffile} = $result;
     }
     $games-- if $games > 0;
+    close $prog_in;
+    close $prog_out;
     print "games remaining: $games\n";
 }
 
@@ -355,26 +389,27 @@ sub check_matcher {
     my $out = shift;
     my $line = "";
     my $legality = "illegal";
+    my $vertex = " ";
+    my $new_status = " ";
 
     #send command
     print $in "dragon_status\n";
 
-    #ignore empty lines
-    #while ($line eq "")
-    #{
-    #    #print "ignoring a line\n";
-    #    $line = <$out>;
-    #    $line =~ s/\s*//msg;
-    #}
+    while ($line eq "") {
+        chop($line = <$out>);
+	$line =~ s/^\s*//smg;
+	$line =~ s/\s*$//smg;
+    }
 
-    while ($line = <$out>)
+    while ($line ne "")
     {
-        #print "parsing a line\n";
-        if ($line eq "\n") {last;}	#stop at end of response
-        $line =~ s/= //g;	#zap the = at the front of the response
+#       print "parsing a line\n";
+        $line =~ s/= //g;	#zap the "= " at the front of the response
 	$line =~ s/\n//g;	#zap newlines...
-	my ($vertex, $new_status) = split(": ", $line);
-	$new_status =~ s/ .+//; #zap everything after the status
+	$line =~ s/://g;	#zap the :
+	print $line . "\n" if ($verbose);
+	($vertex, $new_status) = split(" ", $line);	#and split on spaces
+							#extra get trashed
 	my $old_status;
 	$old_status = $match_hist{$vertex} if (exists($match_hist{$vertex}));
 
@@ -437,6 +472,8 @@ sub check_matcher {
 	    }
 	    $match_hist{$vertex} = $new_status;
 	}
+    } continue {
+        chop($line = <$out>);
     }
     print "\n" if ($verbose > 0);
 }
