@@ -131,11 +131,11 @@ static int snapback (int str) {
   return 0;
 }
 
-/* verifies that the strings str1 and str2 can be connected
+/* Verifies that the strings str1 and str2 can be connected
  * directly by playing one move, either by playing a common liberty
- * of the two strings, either by capturing a common adjacent string
+ * of the two strings, either by capturing a common adjacent string.
  *
- * this is the gi1 game function
+ * This is the gi1 game function.
  */
 
 static int connection_one_move(int str1, int str2) {
@@ -156,12 +156,11 @@ static int connection_one_move(int str1, int str2) {
   return 0;
 }
 
-/* if the two strings str1 and str2 can be connected sends back WIN
- * fill the array moves with the only move that can prevent a connection
- * in one move (common liberties, liberties of common adjacent strings in atari)
+/* If the two strings str1 and str2 can be connected sends back WIN fill the
+ * array moves with the only move that can prevent a connection in one move
+ * (common liberties, liberties of common adjacent strings in atari).
  *
- * this is the ip1 game function
- */
+ * This is the ip1 game function. */
 
 static int prevent_connection_one_move (int *moves, int str1, int str2) {
   int r, s;
@@ -194,14 +193,14 @@ static int prevent_connection_one_move (int *moves, int str1, int str2) {
   return 0;
 }
 
-/* returns WIN if str1 and str2 are connected in at most
+/* Returns WIN if str1 and str2 are connected in at most
  * one move even if the opponent plays first.
  * Verify that the strings are connectable in one move
  * and find the only possible moves that can prevent
  * using prevent_connection_one_move. If none of these
  * moves works, the two strings are connected.
  *
- * this is the g1 game function
+ * This is the g1 game function.
  */
 
 static int connected_one_move (int str1, int str2) {
@@ -223,17 +222,18 @@ static int connected_one_move (int str1, int str2) {
   return res;
 }
 
-/* find the moves that might be able to connect in less than three plies
+/* Find the moves that might be able to connect in less than three plies
  * that is moves that can connect the strings if another move of the same
  * color is played jut after :
- * - common liberties of the two strings
+ * - common liberties of the two strings;
  * - moves on the liberties of an opponent string with less than two liberties
  *   adjacent to both strings, or adjacent to one string and that has a common
- *   liberty with the second string
- * - liberties of one string that are second order liberties of the other string
- * returns WIN if a direct connection has been found
- * returns 0 elsewhere
- */
+ *   liberty with the second string;
+ * - liberties of one string that are second order liberties of the other
+ *   string.
+ *
+ * returns WIN if a direct connection has been found returns 0
+ * elsewhere */
 
 static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   int r, s, common_adj_liberty;
@@ -347,15 +347,13 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
   return 0;
 }
   
-/* tests if the strings can be connected in three plies
- * starts with finding the possible moves that can connect
- * if two moves in a row are played, then try them
- * and stops at the first working move
- * the strings are connected in two moves if the
- * function connected_one_move is verified after a move
+/* Tests if the strings can be connected in three plies starts
+ * with finding the possible moves that can connect.  If two
+ * moves in a row are played, then try them and stops at the
+ * first working move.  The strings are connected in two moves
+ * if the function connected_one_move is verified after a move.
  *
- * this is the gi2 game function
- */
+ * This is the gi2 game function. */
 
 static int connection_two_moves (int str1, int str2) {
   int r, res = 0, moves[MAX_MOVES];
@@ -373,10 +371,11 @@ static int connection_two_moves (int str1, int str2) {
   return res;
 }
 
-/* find the complete set of possible moves that can prevent
- * a connection in three plies
- * the function is not yet written, but moves_to_connect_in_two_moves does
- * a similar job, so it is called temporarly
+/* Find the complete set of possible moves that can prevent
+ * a connection in three plies.
+ *
+ * The function is not yet written, but moves_to_connect_in_two_moves does
+ * a similar job, so it is called temporarly.
  */
 
 static int moves_to_prevent_connection_in_two_moves (int *moves,
@@ -386,15 +385,15 @@ static int moves_to_prevent_connection_in_two_moves (int *moves,
   return 0;
 }
 
-/* find all the move that prevent to connect in a three plies deep search
- * and put them in the moves array 
- * returns 0 if there is no three plies connection
- * else it tries all the possible preventing moves
- * if after a possible preventing moves, there no connection in
- * one move and no connection in two moves, then the moves
- * prevents a three plies deep connection, and it is added to the moves array
- * this is the ip2 game function
- */
+/* Find all the moves that prevent to connect in a three plies
+ * deep search and put them in the moves array.  Returns 0 if
+ * there is no three plies connection, or else it tries all the
+ * possible preventing moves.  If after a possible preventing
+ * moves, there no connection in one move and no connection in
+ * two moves, then the moves prevents a three plies deep
+ * connection, and it is added to the moves array.
+ *
+ * this is the ip2 game function */
 
 static int prevent_connection_two_moves (int *moves, int str1, int str2) {
   int r, res=0;
@@ -416,16 +415,18 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
   return res;
 }
 
-/* not yet written
- * find all the moves than can connect if two subsequent
- * moves of the same color are played after
- * - common liberties
- * - liberties of common adjacent strings with 3 liberties or less
+/* Not yet written.
+ *
+ * Find all the moves than can connect if two subsequent moves
+ * of the same color are played after
+ * - common liberties;
+ * - liberties of common adjacent strings with 3 liberties or less;
  * - liberties of adjacent strings with 2 liberties or less that have
- *   liberties that are second order liberties of the other string
- * - liberties of one string that are second order liberties of the other string
+ *   liberties that are second order liberties of the other string;
+ * - liberties of one string that are second order liberties of
+ *   the other string;
  * - second order liberties of the first string that are second order 
- *   liberties of the other string 
+ *   liberties of the other string.
  */
 
 static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
@@ -434,9 +435,10 @@ static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
   return 0;
 }
 
-/* not yet written
- * find the complete set of possible moves that can prevent
- * a connection in 5 plies
+/* Not yet written.
+ *
+ * Find the complete set of possible moves that can prevent
+ * a connection in 5 plies.
  */
 
 static int moves_to_prevent_connection_in_three_moves (int *moves,
@@ -447,13 +449,13 @@ static int moves_to_prevent_connection_in_three_moves (int *moves,
 }
 
 /* 
- * the most simple depth 4 connection
- * if there are forced moves to prevent connection in
- * one move, try them, and verify that they all 
- * lead to a depth 1 or depth 3 connection
+ * The simplest depth 4 connection:
+ *
+ * If there are forced moves to prevent connection in one move,
+ * try them, and verify that they all lead to a depth 1 or
+ * depth 3 connection.
  * 
- * this is the g211 game function
- */
+ * This is the g211 game function */
 
 static int simply_connected_two_moves (int str1, int str2) {
   int r, res=0;
@@ -475,9 +477,9 @@ static int simply_connected_two_moves (int str1, int str2) {
   return res;
 }
 
-/* test if a move is a simple depth 5 connection
+/* Test if a move is a simple depth 5 connection.
  *
- * this is the gi311 game function
+ * This is the gi311 game function.
  */
 
 static int simple_connection_three_moves (int str1, int str2) {
@@ -496,22 +498,26 @@ static int simple_connection_three_moves (int str1, int str2) {
   return res;
 }
 
-/* find the forced moves that prevent a simple depth 5 connection
- * fills the array moves with the forced moves
+/* Find the forced moves that prevent a simple depth 5 connection.
+ * Fills the array moves with the forced moves.
  *
- * this is the ip311 game function
- * it finds moves in very important situations such as :
+ * This is the ip311 game function.
+ *
+ * It finds moves in very important situations such as :
+ *
  * + + + O + +
  * + @ @ O + +
  * + @ O @ @ +
  * + @ O + + +
  * + + + + + +
  * - - - - - -
+ *
  * and enables recursive_disconnect to prove the two black
- * strings are connected in these situations
+ * strings are connected in these situations.
  */
 
-static int prevent_simple_connection_three_moves (int *moves, int str1, int str2) {
+static int prevent_simple_connection_three_moves (int *moves, 
+						  int str1, int str2) {
   int r, res=0;
   int possible_moves[MAX_MOVES];
   
@@ -532,9 +538,9 @@ static int prevent_simple_connection_three_moves (int *moves, int str1, int str2
   return res;
 }
 
-/* find simple connections by looking at common liberties
+/* Find simple connections by looking at common liberties
  * or directly capturing a common adjacent string without a snapback
- * or looking at a ladder for a common adjacent string
+ * or looking at a ladder for a common adjacent string.
  */
 
 static int quiescence_connect(int str1, int str2, int *move) {
@@ -579,7 +585,7 @@ string_connect(int str1, int str2, int *move)
 }
 
 
-/* returns WIN if str1 and str2 can be connected */
+/* returns WIN if str1 and str2 can be connected. */
 
 static int recursive_connect (int str1, int str2, int *move) {
   int i, res = 0, Moves[MAX_MOVES], ForcedMoves[MAX_MOVES];
@@ -622,15 +628,17 @@ static int recursive_connect (int str1, int str2, int *move) {
    */
   if (!prevent_capture_one_move(ForcedMoves, str1))
     prevent_capture_one_move(ForcedMoves, str2);
-/*   else if (prevent_capture_two_moves(ForcedMoves, str1)) */
-/*     ;  */
-/*   else if (prevent_capture_two_moves(ForcedMoves, str2)) */
-/*     ;  */
+#if 0
+  else if (prevent_capture_two_moves(ForcedMoves, str1))
+     ; 
+  else if (prevent_capture_two_moves(ForcedMoves, str2))
+     ; 
+#endif
   
-  /* we are at a max node, so any move we can find
+  /* We are at a max node, so any move we can find
    * is ok. Try moves that can connect in three moves
    * because the function that prevent connection in one
-   * and two moves are called at and nodes
+   * and two moves are called at AND nodes.
    */
   moves_to_connect_in_three_moves (Moves, str1, str2);
 
@@ -674,7 +682,7 @@ disconnect(int str1, int str2, int *move)
 }
 
 
-/* returns WIN if str1 and str2 can be disconnected */
+/* Returns WIN if str1 and str2 can be disconnected. */
 
 static int recursive_disconnect (int str1, int str2, int *move) {
   int i, res = WIN, Moves[MAX_MOVES];
@@ -746,7 +754,7 @@ static int recursive_disconnect (int str1, int str2, int *move) {
   return res;
 }
  
-/* reads simple ladders
+/* Reads simple ladders.
  */
 
 static int quiescence_capture (int str, int *move) {
@@ -774,16 +782,19 @@ static int quiescence_capture (int str, int *move) {
   return result;
 }
 
-/* static int capture_one_move (int str) { */
-/*   if (countlib(str) == 1) */
-/*     return 1; */
-/*   return 0; */
-/* } */
+#if 0
+static int capture_one_move (int str) 
+{
+  if (countlib(str) == 1)
+    return 1;
+  return 0;
+}
+#endif
 
-/* find all the possible moves that can prevent the capture
- * of a string in atari
+/* Find all the possible moves that can prevent the capture
+ * of a string in atari.
  *
- * the ip1 game function
+ * The ip1 game function.
  */
 
 static int prevent_capture_one_move(int *moves, int str1) {
