@@ -117,7 +117,7 @@ loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 46
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 126
 28 gg_genmove white
-#? [J18]*
+#? [J18]
 
 # GNU Go 3.1.27 invades the 3-3 point too early
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6

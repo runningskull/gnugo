@@ -94,7 +94,7 @@ loadsgf games/arend/gnugo-gnugo4.sgf 45
 # GNU Go moves at C9. I do not know what it is afraid of.
 loadsgf games/arend/gnugo-gnugo4.sgf 153
 17 gg_genmove black
-#? [C7]*
+#? [C7]
 
 # Maybe this problem is suboptimal, because there is a ko involved, and
 # GNU Go gets it wrong even without the ko.

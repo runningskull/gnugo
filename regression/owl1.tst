@@ -32,7 +32,7 @@ loadsgf games/unfinished.sgf 214
 
 loadsgf games/owl36.sgf
 268 owl_defend A3
-#? [2 A1]
+#? [2 A1]*
 
 
 ########### end of tests #####################

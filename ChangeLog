@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.5 released July 5, 2002
+
 - bugfix in break_through_helper()
 - bugfix in combinations()
 - reduced_init_owl() allocates bigger owl stack with --experimental-semeai
@@ -19,6 +21,7 @@
 - bugfix in play_ascii.c: don't crash on unusual boardsizes
 - dead stones with no neighbors are captured territory
 - improved debug traces in score.c
+- decide-dragon clears cache between owl attack and defend
 - influence pattern tuning
 - new tests and regressions
 

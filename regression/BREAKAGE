@@ -1,3 +1,46 @@
+======================= 3.3.5 =========================
+
+./regress.sh . reading.tst 
+169 unexpected FAIL: Correct '0', got '1 F13'
+./regress.sh . owl.tst 
+66 unexpected PASS!
+./regress.sh . nngs1.tst 
+28 unexpected PASS!
+./regress.sh . viking.tst 
+7 unexpected PASS!
+./regress.sh . lazarus.tst 
+16 unexpected FAIL: Correct '!L17|J5|K5|K6', got 'L17'
+./regress.sh . trevorb.tst 
+620 unexpected FAIL: Correct '!J10', got 'J10'
+660 unexpected FAIL: Correct 'D3', got 'H5'
+./regress.sh . strategy2.tst 
+73 unexpected PASS!
+./regress.sh . nicklas1.tst 
+502 unexpected PASS!
+./regress.sh . nicklas4.tst 
+1201 unexpected FAIL: Correct 'Q9', got 'S7'
+./regress.sh . trevor.tst 
+15 unexpected PASS!
+380 unexpected PASS!
+./regress.sh . trevorc.tst 
+770 unexpected PASS!
+890 unexpected FAIL: Correct 'J10', got 'G12'
+1480 unexpected FAIL: Correct 'A8', got 'F6'
+1530 unexpected FAIL: Correct 'A9', got 'G5'
+./regress.sh . global.tst 
+46 unexpected PASS!
+./regress.sh . arend.tst 
+17 unexpected PASS!
+./regress.sh . 13x13.tst 
+65 unexpected PASS!
+./regress.sh . semeai.tst 
+32 unexpected PASS!
+37 unexpected PASS!
+./regress.sh . trevord.tst 
+310 unexpected FAIL: Correct 'S17', got 'Q13'
+./regress.sh . owl1.tst 
+268 unexpected FAIL: Correct '2 A1', got '0'
+
 After compiling 3.3.4 with --experimental-semeai we get the following
 results. For discussion of particular failures see:
 

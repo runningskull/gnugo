@@ -144,7 +144,7 @@ loadsgf games/trevor/trevor_14.sgf
 #protecting at E7 is very necessary.
 loadsgf games/trevor/trevor_15.sgf 
 15 gg_genmove white
-#? [E7]*
+#? [E7]
 
 # C1 looks best here.  A7 very unorthodox, and at least
 # worse for ko threats.
@@ -371,7 +371,7 @@ loadsgf games/trevor/trevor_37.sgf
 #SEVERITY=2
 loadsgf games/trevor/trevor_38.sgf 22
 380 gg_genmove white
-#? [!E4]*
+#? [!E4]
 
 #CATEGORY=READING
 #DESCRIPTION=C6 is wrong way to protect the cut.  Loses one point.

@@ -195,7 +195,7 @@ loadsgf golois/MeilleurCoup990428-1.sgf
 #SEVERITY=
 loadsgf golois/Neurogo97-1.sgf
 46 gg_genmove white
-#? [J2]*
+#? [J2]
 
 loadsgf golois/test.sgf
 47 gg_genmove black

@@ -49,7 +49,7 @@ loadsgf games/nicklas/nicklas5.sgf 23
 
 loadsgf games/nicklas/nicklas5.sgf 27
 502 gg_genmove black
-#? [G5]*
+#? [G5]
 
 loadsgf games/nicklas/nicklas6.sgf 31
 # semeai problem

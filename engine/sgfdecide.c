@@ -249,6 +249,7 @@ decide_dragon(int pos, const char *sgf_output)
   else
     gprintf(" result uncertain\n");
 
+  reading_cache_clear();
   count_variations = 1;
   dcode = owl_defend(pos, &move, &result_certain);
 

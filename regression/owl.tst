@@ -239,7 +239,7 @@ loadsgf games/incident256.sgf 157
 # there's some mistake during the following moves.
 loadsgf games/incident258.sgf 147
 66 owl_defend C4
-#? [1 B5]*
+#? [1 B5]
 
 # incident 260
 loadsgf games/incident258.sgf 283

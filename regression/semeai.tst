@@ -178,7 +178,7 @@ loadsgf games/strategy11.sgf 127
 
 loadsgf games/nicklas/nicklas14.sgf 55
 32 owl_analyze_semeai B8 D9
-#? [ALIVE_IN_SEKI ALIVE_IN_SEKI B6]*
+#? [ALIVE_IN_SEKI ALIVE_IN_SEKI B6]
 
 loadsgf games/nicklas/nicklas14.sgf 55
 33 owl_analyze_semeai D9 B8
@@ -201,7 +201,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 
 loadsgf games/semeai/semeai10.sgf
 37 owl_analyze_semeai B11 L7
-#? [ALIVE DEAD B12]*
+#? [ALIVE DEAD B12]
 
 ########### end of semeai tests #################
 
