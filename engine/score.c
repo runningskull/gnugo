@@ -69,8 +69,10 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
       continue;
 
     if (board[ii] && dragon[ii].status == CRITICAL
-	&& DRAGON2(ii).safety != INESSENTIAL)
+	&& DRAGON2(ii).safety != INESSENTIAL) {
       critical_found = 1;
+      DEBUG(DEBUG_SCORING, "critical dragon found at %1m\n", ii);
+    }
     if (board[ii] == WHITE && !captured_territory(ii, color))
       gb[ii] = 128;
     else if (board[ii] == BLACK && !captured_territory(ii, color))      
@@ -550,10 +552,11 @@ captured_territory(int pos, int color)
   for (d = 0; d < DRAGON2(pos).neighbors; d++)
     if (DRAGON(DRAGON2(pos).adjacent[d]).color == OTHER_COLOR(board[pos])
 	&& (DRAGON(DRAGON2(pos).adjacent[d]).status == ALIVE
-	|| (board[pos] != color
-	    && DRAGON(DRAGON2(pos).adjacent[d]).status == CRITICAL)))
+	    || (DRAGON(DRAGON2(pos).adjacent[d]).status == UNKNOWN &&
+		dragon2[DRAGON2(pos).adjacent[d]].weakness < .1)
+	    || (board[pos] != color
+		&& DRAGON(DRAGON2(pos).adjacent[d]).status == CRITICAL)))
       return 1;
-
   return 0;
 }
 
