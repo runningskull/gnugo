@@ -112,8 +112,6 @@ main(int argc, char *argv[])
   /* FIXME: Want to do this somewhere more structured. */
   debug = 0;
   level = 10;
-  life  = 0;
-  life_eyesize = LIFE_EYESIZE;
   fusekidb = 1;
   josekidb = 1;
   
@@ -129,7 +127,6 @@ main(int argc, char *argv[])
   gg_srand(time(0));
   init_gnugo(8);
   reset_engine();
-  life = 1;
 
   display_message("Hit 'h' for help!");
 

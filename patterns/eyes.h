@@ -19,6 +19,8 @@
  * Boston, MA 02111, USA.                                            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "liberty.h"
+
 /*
  * The vertices of each eye is defined by an array of struct eye_vertex.
  */
@@ -54,8 +56,7 @@ struct eye_graph {
   int ends;                       /* number of vertices with one neighbor  */
   int two_neighbors;              /* number of vertices with 2 neighbors   */
   int three_neighbors;            /* number of vertices with 3 neighbors   */
-  int max;                        /* number of eyes if O plays first       */
-  int min;                        /* number of eyes if X plays first       */
+  struct eyevalue value;          /* eye value                             */
 };
 
 extern struct eye_graph graphs[];

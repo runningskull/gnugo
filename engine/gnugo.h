@@ -105,9 +105,6 @@ void init_gnugo(float memory);
 #define WHITE_TERRITORY 14
 #define DAME            15
 
-/* Eye reading */
-#define LIFE_EYESIZE         10
-
 /* ================================================================ */
 /*                        Board manipulation                        */
 /* ================================================================ */
@@ -259,8 +256,6 @@ extern int output_flags;       /* amount of output to outfile */
 
 extern int debug;		/* debug flags */
 extern int hashflags;		/* hash flags */
-extern int life;                /* use "life" reading code */
-extern int life_eyesize;        /* max eye size for life code */
 extern int fusekidb;            /* use fuseki database */
 extern int disable_fuseki;      /* do not generate fuseki moves */
 extern int josekidb;            /* use joseki database */
@@ -404,8 +399,6 @@ void silent_examine_position(int color, int how_much);
 
 
 /* These are mostly used for GTP examination. */
-void reset_life_node_counter(void);
-int get_life_node_counter(void);
 void reset_owl_node_counter(void);
 int get_owl_node_counter(void);
 void reset_reading_node_counter(void);

@@ -234,6 +234,7 @@ display_dragon(int pos)
   wmove(info_window, 3, 16);
   gg_wprintw(info_window, "%3d  %5.3f ", d->size, d->effective_size);
 
+#if 0
   wmove(info_window, 8, 18);
   if (board[pos] == EMPTY)
     gg_wprintw(info_window, "    ", d2->heyes);
@@ -247,6 +248,7 @@ display_dragon(int pos)
 
   wmove(info_window, 9, 18);
   gg_wprintw(info_window, "%d  ", d2->genus);
+#endif
   wmove(info_window, 10, 18);
   gg_wprintw(info_window, "%d  ", 
 	     board[pos] == EMPTY ? 0 : d2->escape_route);
@@ -397,9 +399,9 @@ display_eye(int color, struct eye_data eyedata[BOARDMAX], int pos)
   gg_wprintw(info_window, "%d  ", eyedata[pos].marginal);
 
   wmove(info_window, 4, 55);
-  gg_wprintw(info_window, "%d ", eyedata[pos].value.maxeye);
+  gg_wprintw(info_window, "%d ", max_eyes(&eyedata[pos].value));
   wmove(info_window, 5, 55);
-  gg_wprintw(info_window, "%d ", eyedata[pos].value.mineye);
+  gg_wprintw(info_window, "%d ", min_eyes(&eyedata[pos].value));
 
   wmove(info_window, 6, 55);
   if (eyedata[pos].attack_point == NO_MOVE)

@@ -547,8 +547,8 @@ analyze_semeai(int my_dragon, int your_dragon)
    * (2) If Y+C=M whoever moves first wins. CRITICAL.
    * (3) If Y+C<M I win.  */
 
-  if (DRAGON2(my_dragon).genus == 0
-      && DRAGON2(your_dragon).genus == 0) {
+  if (min_eyes(&DRAGON2(my_dragon).genus) == 0
+      && min_eyes(&DRAGON2(your_dragon).genus) == 0) {
     if (commonlibs == 0) {
       if (mylibs > yourlibs) {
 	my_status = ALIVE;
@@ -607,8 +607,8 @@ analyze_semeai(int my_dragon, int your_dragon)
       margin_of_safety = yourlibs - mylibs - commonlibs;
     }
   }
-  if (DRAGON2(my_dragon).genus > 0
-      && DRAGON2(your_dragon).genus > 0) {
+  if (min_eyes(&DRAGON2(my_dragon).genus) > 0
+      && min_eyes(&DRAGON2(your_dragon).genus) > 0) {
     if (mylibs > yourlibs + commonlibs) {
       my_status = ALIVE;
       your_status = DEAD;
@@ -646,8 +646,8 @@ analyze_semeai(int my_dragon, int your_dragon)
       margin_of_safety = 0;
     }
   }
-  if (DRAGON2(my_dragon).genus > 0
-      && DRAGON2(your_dragon).genus == 0) {
+  if (min_eyes(&DRAGON2(my_dragon).genus) > 0
+      && min_eyes(&DRAGON2(your_dragon).genus) == 0) {
     if (mylibs > commonlibs + yourlibs) {
       my_status = ALIVE;
       your_status = DEAD;
@@ -663,8 +663,8 @@ analyze_semeai(int my_dragon, int your_dragon)
       margin_of_safety = mylibs + commonlibs - yourlibs;
     }
   }
-  if (DRAGON2(my_dragon).genus == 0
-      && DRAGON2(your_dragon).genus > 0) {
+  if (min_eyes(&DRAGON2(my_dragon).genus) == 0
+      && min_eyes(&DRAGON2(your_dragon).genus) > 0) {
     if (yourlibs + commonlibs > mylibs) {
       my_status = DEAD;
       your_status = ALIVE;
@@ -730,11 +730,11 @@ analyze_semeai(int my_dragon, int your_dragon)
 				   my_dragon, your_dragon,
 				   my_status, your_status, margin_of_safety);
     else if (commonlibs > 1) {
-      if (DRAGON2(my_dragon).heyes > 0)
+      if (eye_move_urgency(&DRAGON2(my_dragon).genus) > 0)
 	add_appropriate_semeai_moves(DRAGON2(my_dragon).heye,
 				     my_dragon, your_dragon,
 				     my_status, your_status, margin_of_safety);
-      if (DRAGON2(your_dragon).heyes > 0)
+      if (eye_move_urgency(&DRAGON2(your_dragon).genus))
 	add_appropriate_semeai_moves(DRAGON2(your_dragon).heye,
 				     my_dragon, your_dragon,
 				     my_status, your_status, margin_of_safety);

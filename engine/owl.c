@@ -201,12 +201,12 @@ static void owl_shapes_callback(int m, int n, int color,
 				int ll, void *data);
 static void owl_add_move(struct owl_move_data *moves, int move, int value,
 			 const char *reason, int same_dragon, int escape);
-static int owl_determine_life(struct local_owl_data *owl,
-			      struct local_owl_data *second_owl,
-			      struct eye_data eye[BOARDMAX],
-			      int color, int komaster, int does_attack,
-			      struct owl_move_data *moves, int *probable_min,
-			      int *probable_max);
+static void owl_determine_life(struct local_owl_data *owl,
+			       struct local_owl_data *second_owl,
+			       int komaster, int does_attack,
+			       struct owl_move_data *moves,
+			       struct eyevalue *probable_eyes,
+			       int *eyemin, int *eyemax);
 static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
 					 int *vital_point,
 					 int is_attack_point);
@@ -368,9 +368,16 @@ do_owl_analyze_semeai(int apos, int bpos,
   int found_read_result;
   Read_result *read_result;
   int this_variation_number = count_variations - 1;
+  int dummy_move;
   
   SETUP_TRACE_INFO2("do_owl_analyze_semeai", apos, bpos);
 
+  /* If NULL, set the move pointer to a local dummy variable so we can
+   * avoid checking for NULL everywhere else.
+   */
+  if (!move)
+    move = &dummy_move;
+  
   shape_offensive_patterns.initialized = 0;
   shape_defensive_patterns.initialized = 0;
   
@@ -380,16 +387,15 @@ do_owl_analyze_semeai(int apos, int bpos,
   gg_assert(board[apos] == owla->color);
   gg_assert(board[bpos] == owlb->color);
 
-  if ((stackp <= owl_branch_depth) && (hashflags & HASH_SEMEAI)
-      && (!pass) && owl_phase) {
+  if (stackp <= owl_branch_depth && (hashflags & HASH_SEMEAI)
+      && !pass && owl_phase) {
     found_read_result = get_read_result2(SEMEAI, EMPTY, 0,
-					&apos, &bpos, &read_result);
+					 &apos, &bpos, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT2(*read_result);
-      if (rr_get_result1(*read_result) != 0) {
-	if (move)
-	  *move = rr_get_move(*read_result);
-      }
+      if (rr_get_result1(*read_result) != 0)
+	*move = rr_get_move(*read_result);
+
       if (rr_get_result1(*read_result) == ALIVE)
 	TRACE("%oVariation %d: %1m ALIVE (cached)\n", 
 	      this_variation_number, apos);
@@ -456,7 +462,8 @@ do_owl_analyze_semeai(int apos, int bpos,
      * defend the eyespace (e.g. nakade, or hane to reduce the
      * number of eyes) or moves to capture a lunch. 
      */
-    int probable_mina, probable_maxa, probable_minb, probable_maxb;
+    struct eyevalue probable_eyes_a;
+    struct eyevalue probable_eyes_b;
     
     /* We do not wish for any string of the 'b' dragon to be 
      * counted as a lunch of the 'a' dragon since owl_determine_life 
@@ -481,75 +488,74 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
 #endif
 
-    owl_determine_life(owla, owlb, owla->my_eye,
-		       color, komaster, 1, 
-		       vital_defensive_moves,
-		       &probable_mina, &probable_maxa);
+    owl_determine_life(owla, owlb, komaster, 1, vital_defensive_moves,
+		       &probable_eyes_a, NULL, NULL);
     if (level >= 9) {
       current_owl_data = owla;
       matches_found = 0;
       memset(found_matches, 0, sizeof(found_matches));
       matchpat(owl_shapes_callback, other,
 	       &owl_vital_apat_db, vital_defensive_moves, owla->goal);
-      probable_mina -= matches_found;
+      /* FIXME: This is kind of quick and dirty. */
+      probable_eyes_a.b -= matches_found;
     }
 
-    owl_determine_life(owlb, owla, owlb->my_eye,
-		       other, komaster, 1,
-		       vital_offensive_moves,
-		       &probable_minb, &probable_maxb);
+    owl_determine_life(owlb, owla, komaster, 1, vital_offensive_moves,
+		       &probable_eyes_b, NULL, NULL);
     if (level >= 9) {
       current_owl_data = owlb;
       matches_found = 0;
       memset(found_matches, 0, sizeof(found_matches));
       matchpat(owl_shapes_callback, other,
 	       &owl_vital_apat_db, vital_offensive_moves, owla->goal);
-      probable_minb -= matches_found;
+      /* FIXME: This is kind of quick and dirty. */
+      probable_eyes_b.b -= matches_found;
     }
 
     /* Certain cases can be handled immediately. */
     /* I live, you die, no move needed. */
-    if ((probable_mina >= 2) && (probable_maxb < 2)) {
+    if (min_eyes(&probable_eyes_a) >= 2
+	&& max_eyes(&probable_eyes_b) < 2) {
       *resulta = ALIVE;
       *resultb = DEAD;
-      if (move)
-	*move = PASS_MOVE;
+      *move = PASS_MOVE;
       sgf_dumptree = save_sgf_dumptree;
-      count_variations =   save_count_variations;
-      if (probable_maxb == 0) {
+      count_variations = save_count_variations;
+      if (max_eyes(&probable_eyes_b) == 0) {
 	SGFTRACE2(PASS_MOVE, ALIVE, "Two eyes versus none");
       }
-      else
+      else {
 	SGFTRACE2(PASS_MOVE, ALIVE, "Two eyes versus one");
+      }
       READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, DEAD);
     }
     /* I am alive */
-    if (probable_mina >= 2
+    if (min_eyes(&probable_eyes_a) >= 2
 	|| (stackp > 2 && owl_escape_route(owla) >= 5)) {
-      if (probable_maxb < 2) {
+      if (max_eyes(&probable_eyes_b) < 2) {
 	/* you are already dead */
 	*resulta = ALIVE;
 	*resultb = DEAD;
-	if (move) *move = PASS_MOVE;
+	*move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
-	if (probable_maxb == 0) {
+	if (max_eyes(&probable_eyes_b) == 0) {
 	  SGFTRACE2(PASS_MOVE, ALIVE, "Two eyes or escape versus none");
 	}
-	else
+	else {
 	  SGFTRACE2(PASS_MOVE, ALIVE, "Two eyes or escape versus one");
+	}
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, DEAD);
       }
-      else if (probable_minb < 2) {
+      else if (min_eyes(&probable_eyes_b) < 2) {
 	/* I can kill */
 	gg_assert(vital_offensive_moves[0].pos != NO_MOVE);
 	*resulta = ALIVE;
 	*resultb = DEAD;
-	if (move)
-	  *move = vital_offensive_moves[0].pos;
+	*move = vital_offensive_moves[0].pos;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
-	if (probable_minb == 0) {
+	if (min_eyes(&probable_eyes_b) == 0) {
 	  SGFTRACE2(vital_offensive_moves[0].pos,
 		    ALIVE, "Two eyes or escape versus none");
 	}
@@ -563,31 +569,31 @@ do_owl_analyze_semeai(int apos, int bpos,
 	/* both live */
 	*resulta = ALIVE;
 	*resultb = ALIVE;
-	if (move) *move = PASS_MOVE;
+	*move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
       }
     }
-    if ((probable_minb >= 2) || owl_escape_route(owlb) >= 5) {
+    if (min_eyes(&probable_eyes_b) >= 2 || owl_escape_route(owlb) >= 5) {
       /* you are alive */
-      if (probable_maxa < 2) {
+      if (max_eyes(&probable_eyes_a) < 2) {
 	/* I am dead */
 	*resulta = DEAD;
 	*resultb = ALIVE;
-	if (move) *move = PASS_MOVE;
+	*move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	SGFTRACE2(PASS_MOVE, DEAD, "You live, I die");
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, DEAD, ALIVE);
       }
-      else if (probable_mina < 2) {
+      else if (min_eyes(&probable_eyes_a) < 2) {
 	/* I can live */
 	gg_assert(vital_defensive_moves[0].pos != NO_MOVE);
 	*resulta = ALIVE;
 	*resultb = ALIVE;
-	if (move) *move = vital_defensive_moves[0].pos;
+	*move = vital_defensive_moves[0].pos;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	SGFTRACE2(vital_defensive_moves[0].pos, ALIVE,
@@ -599,7 +605,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	/* I am already alive */
 	*resulta = ALIVE;
 	*resultb = ALIVE;
-	if (move) *move = PASS_MOVE;
+	*move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
@@ -807,8 +813,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	    if (countlib(origin) < 3 && attack(origin, &upos)) {
 	      *resulta = ALIVE;
 	      *resultb = DEAD;
-	      if (move)
-		*move = upos;
+	      *move = upos;
 	      sgf_dumptree = save_sgf_dumptree;
 	      count_variations = save_count_variations;
 	      SGFTRACE2(upos, ALIVE, "tactical win found");
@@ -894,8 +899,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       if (this_resultb == DEAD && this_resulta == ALIVE) {
 	*resulta = ALIVE;
 	*resultb = DEAD;
-	if (move)
-	  *move = mpos;
+	*move = mpos;
 	SGFTRACE2(mpos, ALIVE, moves[k].name);
 	close_pattern_list(color, &shape_defensive_patterns);
 	close_pattern_list(color, &shape_offensive_patterns);
@@ -926,7 +930,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (best_resulta == UNKNOWN && pass == 1) {
     *resulta = ALIVE_IN_SEKI;
     *resultb = ALIVE_IN_SEKI;
-    if (move) *move = PASS_MOVE;
+    *move = PASS_MOVE;
     SGFTRACE2(PASS_MOVE, ALIVE_IN_SEKI, "Seki");
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, 
 		       ALIVE_IN_SEKI, ALIVE_IN_SEKI);
@@ -936,7 +940,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
 			  resultb, resulta, NULL, 1, owl_phase);
     SGFTRACE2(PASS_MOVE, UNKNOWN, "No move found");
-    if (move) *move = PASS_MOVE;
+    *move = PASS_MOVE;
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, *resulta, *resultb);
   }
 
@@ -944,7 +948,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   *resultb = best_resultb;
   if (best_resulta == DEAD)
     best_move = PASS_MOVE;
-  if (move) *move = best_move;
+  *move = best_move;
   SGFTRACE2(best_move, best_resulta, moves[best_move_k].name);
   READ_RETURN_SEMEAI(read_result, move, best_move, best_resulta, best_resultb);
 }
@@ -1169,9 +1173,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
   int k;
   int savemove = 0;
   int savecode = 0;
-  int true_genus = -1;
-  int probable_min = -1;
-  int probable_max = -1;
+  int eyemin = -1;               /* Lower bound on the number of eyes. */
+  int eyemax = -1;               /* Upper bound on the number of eyes. */
+  struct eyevalue probable_eyes; /* Best guess of eyevalue. */
   int move_cutoff;
   int dcode;
   int found_read_result;
@@ -1237,9 +1241,8 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
     
     sgf_dumptree = NULL;
     count_variations = 0;
-    true_genus = owl_determine_life(owl, NULL, owl->my_eye,
-				    color, komaster, 1, vital_moves,
-				    &probable_min, &probable_max);
+    owl_determine_life(owl, NULL, komaster, 1, vital_moves,
+		       &probable_eyes, &eyemin, &eyemax);
 
     current_owl_data = owl;
     memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
@@ -1254,22 +1257,21 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
     count_variations = save_count_variations;
 
     if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
-      gprintf("owl: true_genus=%d matches_found=%d\n",
-	      true_genus, matches_found);
-    true_genus -= matches_found;
+      gprintf("owl: eyemin=%d matches_found=%d\n", eyemin, matches_found);
+    eyemin -= matches_found;
 
-    if (true_genus >= 2
-	|| (true_genus == 1 && probable_min >= 4)
+    if (eyemin >= 2
+	|| (eyemin == 1 && min_eyes(&probable_eyes) >= 4)
 	|| (stackp > owl_distrust_depth
-	    && probable_min >= 2
+	    && min_eyes(&probable_eyes) >= 2
 	    && !matches_found)) {
       const char *live_reason = "";
-      if (true_genus >= 2) 
+      if (eyemin >= 2) 
 	live_reason = "2 or more secure eyes";
-      else if (true_genus == 1 && probable_min >= 4)
+      else if (eyemin == 1 && min_eyes(&probable_eyes) >= 4)
 	live_reason = "1 secure eye, likely >= 4";
       else if (stackp > owl_distrust_depth 
-	       && probable_min >= 2
+	       && min_eyes(&probable_eyes) >= 2
 	       && !matches_found)
 	live_reason = "getting deep, looks lively";
       else
@@ -1287,10 +1289,11 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
    * 0. Vital moves in the interval  [70..]      [45..]
    * 1. Shape moves
    * 2. Vital moves in the interval  [..69]      [..44]
-   * 3. Tactical attack moves
+   * 3. Tactical attack moves (except certain kos)
    * 4. Moves found by the defender
+   * 5. Tactical ko attack moves which were not tried in pass 3
    */
-  for (pass = 0; pass < 5; pass++) {
+  for (pass = 0; pass < 6; pass++) {
     moves = NULL;
     move_cutoff = 1;
     
@@ -1329,17 +1332,19 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	else
 	  move_cutoff = 45;
       }
-      if (probable_max < 2 && stackp > 2)
+      if (eyemax < 2 && stackp > 2)
 	move_cutoff = 99; /* Effectively disable vital moves. */
     }
-    else if (pass == 3) {
+    else if (pass == 3 || pass == 5) {
       /* Look for a tactical attack. This is primarily intended for
        * the case where the whole dragon is a single string, therefore
        * we only look at the string at the "origin".
        *
        * We must be wary with attacks giving ko. Unless the dragon
        * otherwise looks alive, this may turn a dead dragon into one
-       * which can live by ko.
+       * which can live by ko. Such moves will be tried anyway in
+       * pass 5. Notice though that we can only reach there if an owl
+       * defense was found in pass 4.
        */
       int apos;
       int result;
@@ -1349,7 +1354,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       sgf_dumptree = NULL;
       count_variations = 0;
       result = attack(str, &apos);
-      if (result == WIN || (result != 0 && probable_min >= 2)) {
+      if (result == WIN ||
+	  (result != 0 && (min_eyes(&probable_eyes) >= 2
+			   || pass == 5))) {
 	shape_moves[0].pos         = apos;
 	shape_moves[0].value       = 25;
 	shape_moves[0].name        = "tactical attack";
@@ -1445,7 +1452,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       if (stackp > owl_branch_depth && k > 0)
 	break;
 
-    current_owl_data = owl;
+      current_owl_data = owl;
 
       /* Shape moves are selected on demand. */
       if (pass == 1) {
@@ -1774,9 +1781,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
   int k;
   int savemove = 0;
   int savecode = 0;
-  int true_genus = -1;
-  int probable_min = -1;
-  int probable_max = -1;
+  int eyemin = -1;               /* Lower bound on the number of eyes. */
+  int eyemax = -1;               /* Upper bound on the number of eyes. */
+  struct eyevalue probable_eyes; /* Best guess of eyevalue. */
   int move_cutoff;
   int acode;
   int found_read_result;
@@ -1861,13 +1868,13 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     count_variations = 0;
 
     if (escape < MAX_ESCAPE) {
-      true_genus = owl_determine_life(owl, NULL, owl->my_eye,
-				      color, komaster, 0, vital_moves,
-				      &probable_min, &probable_max);
+      owl_determine_life(owl, NULL, komaster, 0, vital_moves,
+			 &probable_eyes, &eyemin, &eyemax);
     }
     else {
       vital_moves[0].pos = 0;
       vital_moves[0].value = -1;
+      set_eyevalue(&probable_eyes, 0, 0, 0, 0);
     }
     
     current_owl_data = owl;
@@ -1892,25 +1899,25 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	       &owl_vital_apat_db, shape_moves, owl->goal);
 
     if ((debug & DEBUG_EYES) && (debug & DEBUG_OWL))
-      gprintf("owl: true_genus=%d matches_found=%d\n",
-	      true_genus, matches_found);
-    true_genus -= matches_found;
+      gprintf("owl: eyemin=%d matches_found=%d\n",
+	      eyemin, matches_found);
+    eyemin -= matches_found;
 
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
     
-    if (true_genus >= 2
-	|| (true_genus == 1 && probable_min >= 4)
+    if (eyemin >= 2
+	|| (eyemin == 1 && min_eyes(&probable_eyes) >= 4)
 	|| (stackp > owl_distrust_depth
-	    && probable_min >= 2
+	    && min_eyes(&probable_eyes) >= 2
 	    && !matches_found)) {
       const char *live_reason = "";
-      if (true_genus >= 2) 
+      if (eyemin >= 2) 
 	live_reason = "2 or more secure eyes";
-      else if (true_genus == 1 && probable_min >= 4)
+      else if (eyemin == 1 && min_eyes(&probable_eyes) >= 4)
 	live_reason = "1 secure eye, likely >= 4";
       else if (stackp > owl_distrust_depth 
-	       && probable_min >= 2
+	       && min_eyes(&probable_eyes) >= 2
 	       && !matches_found)
 	live_reason = "getting deep, looks lively";
       else
@@ -1965,14 +1972,14 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       if (pass == 0 || stackp > owl_distrust_depth) {
 	if (stackp == 0)
 	  move_cutoff = 70;
-	else if (true_genus + probable_min > 3)
+	else if (eyemin + min_eyes(&probable_eyes) > 3)
 	  move_cutoff = 25;
-	else if (true_genus + probable_min >= 3)
+	else if (eyemin + min_eyes(&probable_eyes) >= 3)
 	  move_cutoff = 35;
 	else
 	  move_cutoff = 45;
       }
-      if (probable_max < 2 && stackp > 2)
+      if (eyemax < 2 && stackp > 2)
 	move_cutoff = 99; /* Effectively disable vital moves. */
     }
     else {
@@ -1981,10 +1988,9 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 
       /* If the goal is small, try a tactical defense. */
 
-      for (k = BOARDMIN; k < BOARDMAX; k++) {
+      for (k = BOARDMIN; k < BOARDMAX; k++)
 	if (ON_BOARD(k))
 	  goalcount += owl->goal[k];
-      }
 
       if (goalcount < 5) {
 
@@ -1996,7 +2002,8 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	 * using a liberty heuristic. The reason for this is problems
 	 * with ineffective self ataris which do defend tactically but
 	 * have no strategical effect other than wasting owl nodes or
-	 * confusing the eye analysis.  */
+	 * confusing the eye analysis.
+	 */
 	int dpos;
 	SGFTree *save_sgf_dumptree = sgf_dumptree;
 	int save_count_variations = count_variations;
@@ -2123,7 +2130,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     READ_RETURN(read_result, move, savemove, savecode);
   }
 
-  if (number_tried_moves == 0 && probable_min >= 2) {
+  if (number_tried_moves == 0 && min_eyes(&probable_eyes) >= 2) {
     SGFTRACE(0, WIN, "genus probably >= 2");
     READ_RETURN(read_result, move, 0, WIN);
   }
@@ -2131,7 +2138,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 
   if (sgf_dumptree) {
     char winstr[196];
-    int print_genus = true_genus == 1 ? 1 : 0;
+    int print_genus = eyemin == 1 ? 1 : 0;
     sprintf(winstr, "defense failed - genus %d)\n  (%d variations",
 	  	    print_genus, count_variations - this_variation_number);
     SGFTRACE(0, 0, winstr);
@@ -2235,14 +2242,19 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
  * compute_eyes_pessimistic(). The second is the lunches found by
  * owl_find_lunches() and evaluated by sniff_lunch().
  *
- * The return value is a pessimistic estimate of the min number of
- * eyes. If this is 2 or more we should be certain of life.
- * (Unfortunately this is not 100% reliable. The patterns in
- * owl_vital_apats.db are used to compensate for this. See
- * do_owl_attack() and do_owl_defend() for how these are used.)
+ * The best guess of the eye potential is stored as an eyevalue in
+ * *probable_eyes. This is not entirely reliable though since the
+ * graph matching techniques in optics.c fail to understand subtleties
+ * like atari inside the eyespace, cutting points in the wall, and
+ * shortage of outside liberties. (The patterns in owl_vital_apats.db
+ * are used to compensate for this. See do_owl_attack() and
+ * do_owl_defend() for how these are used.) Also the estimates from
+ * sniff_lunch() are fairly unreliable.
  *
- * More optimistic estimates of the number of eyes are returned in
- * *probable_min and *probable_max.
+ * A lower and upper bound on the number of eyes are returned in
+ * *eyemin and *eyemax. The value of *eyemin must be offset by the
+ * matches of owl_vital_apats.db. If that number is 2 or larger, we
+ * should be certain of life.
  *
  * Vital moves to attack or defend eyes are returned in the moves[]
  * array. Also moves to reduce the uncertainty of the eye estimates
@@ -2253,28 +2265,29 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
  * The dragon is specified by the information in the owl struct. The
  * color of the dragon is passed in the color parameter.
  *
- * For use in the semeai code, a second dragon 
- *
- * FIXME: Both the color and the eye parameters are redundant since
- * this information is already provided through the owl struct.
+ * For use in the semeai code, a second dragon can be provided. Set
+ * this to NULL when only one dragon is involved.
  *
  * The parameter komaster is currently unused. It is included to
  * prepare better handling of ko once the optics code becomes more ko
  * aware.
  */
 
-static int
+static void
 owl_determine_life(struct local_owl_data *owl,
 		   struct local_owl_data *second_owl,
-		   struct eye_data eye[BOARDMAX],
-		   int color, int komaster, int does_attack,
-		   struct owl_move_data *moves, int *probable_min,
-		   int *probable_max)
+		   int komaster, int does_attack,
+		   struct owl_move_data *moves,
+		   struct eyevalue *probable_eyes, int *eyemin, int *eyemax)
 {
+  int color = owl->color;
+  struct eye_data *eye = owl->my_eye;
   char mw[BOARDMAX];  /* mark relevant eye origins */
+  char mz[BOARDMAX];  /* mark potentially irrelevant eye origins */
   signed char mx[BOARDMAX]; /* mark potential half or false eyes */
   int vital_values[BOARDMAX];
-  int true_genus = 0;
+  int dummy_eyemin = 0;
+  int dummy_eyemax = 0;
   struct eyevalue eyevalue;
   char pessimistic_min;
   int attack_point;
@@ -2287,9 +2300,18 @@ owl_determine_life(struct local_owl_data *owl,
   int save_debug = debug;
   memset(mw, 0, sizeof(mw));
   memset(mx, 0, sizeof(mx));
+  memset(mz, 0, sizeof(mz));
   memset(vital_values, 0, sizeof(vital_values));
   UNUSED(komaster);
 
+  if (!eyemin)
+    eyemin = &dummy_eyemin;
+  if (!eyemax)
+    eyemax = &dummy_eyemax;
+
+  *eyemin = 0;
+  *eyemax = 0;
+  
   /* Turn off eye debugging if we're not also debugging owl. */
   if (!(debug & DEBUG_OWL))
     debug &= ~DEBUG_EYES;
@@ -2336,14 +2358,18 @@ owl_determine_life(struct local_owl_data *owl,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       int pos = POS(m, n);
-      if (board[pos] && owl->goal[pos]) {
+      if (board[pos] == color) {
 	for (k = 0; k < 8; k++) {
 	  int pos2 = pos + delta[k];
 	  if (ON_BOARD(pos2)
 	      && eye[pos2].color == eye_color
 	      && eye[pos2].origin != NO_MOVE
-	      && !eye[pos2].marginal)
-	    mw[eye[pos2].origin]++;
+	      && !eye[pos2].marginal) {
+	    if (owl->goal[pos])
+	      mw[eye[pos2].origin]++;
+	    else
+	      mz[eye[pos2].origin]++;
+	  }	      
 	}
       }
     }
@@ -2368,7 +2394,7 @@ owl_determine_life(struct local_owl_data *owl,
       if (eye[pos].color == eye_color
 	  && eye[pos].origin != NO_MOVE
 	  && mw[eye[pos].origin] > 1
-	  && (!eye[pos].marginal || life)
+	  && !eye[pos].marginal
 	  && eye[pos].neighbors <= 1) {
 	mx[pos] = 1;
 	topological_intersections++;
@@ -2426,8 +2452,7 @@ owl_determine_life(struct local_owl_data *owl,
       }
   }
 
-  *probable_min = 0;
-  *probable_max = 0;
+  set_eyevalue(probable_eyes, 0, 0, 0, 0);
   /* This test must be conditioned on (m, n) being its own origin,
    * because some origins get moved during the topological eye
    * code.
@@ -2454,39 +2479,57 @@ owl_determine_life(struct local_owl_data *owl,
 		&& eye[POS(i, j)].origin == pos
 		&& owl->inessential[POS(i, j)])
 	      pessimistic_min = 0;
-	
-	true_genus += pessimistic_min;
-	*probable_min += eyevalue.mineye;
-	*probable_max += eyevalue.maxeye;
 
+	/* If the eyespace is more in contact with own stones not in the
+         * goal, than with ones in the goal, there is a risk that we
+         * can be cut off from a major part of the eyespace. Thus we
+         * can't trust the opinion of compute_eyes().
+	 *
+	 * (Obviously this is a quite fuzzy heuristic. With more
+	 * accurate connection analysis in the owl code we could do
+	 * this more robustly.)
+	 */
+	for (i = 0; i < board_size; i++)
+	  for (j = 0; j < board_size; j++)
+	    if (eye[POS(i, j)].origin == pos
+		&& (mw[POS(i, j)] < mz[POS(i,j)]
+		    || (mw[POS(i, j)] < 3 * mz[POS(i, j)]
+			&& mz[POS(i, j)] > 5)))
+	      pessimistic_min = 0;
+	
+	add_eyevalues(probable_eyes, &eyevalue, probable_eyes);
+	*eyemin += pessimistic_min;
+	*eyemax += max_eyes(probable_eyes);
+
+	
 	/* Fill in the value field for use by the owl_eyespace() function. */
 	eye[pos].value = eyevalue;
 	
 	/* This shortcut has been disabled for two reasons:
 	 * 1. Due to the vital attack moves being able to later reduce
-	 * the true genus, we can't say that a certain true_genus is
+	 * the *eyemin, we can't say that a certain *eyemin is
 	 * sufficient.
 	 * 2. This part of the code is in now way time critical. If
 	 * the life code is enabled, this may change.
 	 */
 #if 0
 	/* Found two certain eyes---look no further. */
-	if (true_genus >= 2) {
+	if (*eyemin >= 2) {
 	  debug = save_debug;
 	  return 2;
 	}
 #endif
 	
-	if (eyevalue.maxeye != eyevalue.mineye) {
+	if (eye_move_urgency(&eyevalue)) {
 	  value = 50;
-	  if (eyevalue.maxeye - eyevalue.mineye == 2)
+	  if (max_eyes(&eyevalue) - min_eyes(&eyevalue) == 2)
 	    value = 70;
-	  else if (eyevalue.maxeye - pessimistic_min == 2)
+	  else if (max_eyes(&eyevalue) - pessimistic_min == 2)
 	    value = 60;
 	  reason = "vital move";
 	}
-	else if (eyevalue.maxeye != pessimistic_min) {
-	  if (eyevalue.maxeye - pessimistic_min == 2)
+	else if (max_eyes(&eyevalue) != pessimistic_min) {
+	  if (max_eyes(&eyevalue) - pessimistic_min == 2)
 	    value = 40;
 	  else
 	    value = 30;
@@ -2501,9 +2544,9 @@ owl_determine_life(struct local_owl_data *owl,
 		value = 98; /* Higher values may get special interpretation. */
 	    }
 	    
-	    TRACE("%s at %1m, score %d (eye at %1m, max %d, min %d, pessimistic_min %d)\n",
+	    TRACE("%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
 		  reason, attack_point, value,
-		  pos, eyevalue.maxeye, eyevalue.mineye, pessimistic_min);
+		  pos, eyevalue_to_string(&eyevalue), pessimistic_min);
 	    
 	    if (eye[attack_point].marginal
 		&& modify_stupid_eye_vital_point(owl, &attack_point, 1))
@@ -2550,9 +2593,9 @@ owl_determine_life(struct local_owl_data *owl,
 		value = 98; /* Higher values may get special interpretation. */
 	    }
 	    
-	    TRACE("%s at %1m, score %d (eye at %1m, max %d, min %d, pessimistic_min %d)\n",
+	    TRACE("%s at %1m, score %d (eye at %1m, value %s, pessimistic_min %d)\n",
 		  reason, defense_point, value, pos,
-		  eyevalue.maxeye, eyevalue.mineye, pessimistic_min);
+		  eyevalue_to_string(&eyevalue), pessimistic_min);
 
 	    if ((eye[defense_point].marginal
 		 || eye[defense_point].origin != pos)
@@ -2566,6 +2609,7 @@ owl_determine_life(struct local_owl_data *owl,
 	}
       }
     }
+
   /* Sniff each lunch for nutritional value. The assumption is that
    * capturing the lunch is gote, therefore the number of half eyes
    * equals the MINIMUM number of eyes yielded by the resulting eye
@@ -2579,10 +2623,13 @@ owl_determine_life(struct local_owl_data *owl,
 	int lunch_min;
 	int lunch_probable;
 	int lunch_max;
+	struct eyevalue e;
 	sniff_lunch(owl->lunch[lunch], 
 		    &lunch_min, &lunch_probable, &lunch_max, owl);
 
-	*probable_max += lunch_max;
+	set_eyevalue(&e, 0, 0, lunch_probable, lunch_probable);
+	add_eyevalues(probable_eyes, &e, probable_eyes);
+	*eyemax += lunch_max;
 	
 	if (lunch_probable == 0)
 	  value = 20;
@@ -2618,7 +2665,6 @@ owl_determine_life(struct local_owl_data *owl,
   }
   
   debug = save_debug;
-  return true_genus;
 }
 
 
@@ -4621,13 +4667,13 @@ owl_eyespace(int pos)
   return (ON_BOARD(origin)
 	  && (current_owl_data->my_eye[origin].color
 	      == BORDER_COLOR(current_owl_data->color))
-	  && current_owl_data->my_eye[origin].value.maxeye > 0);
+	  && max_eyes(&current_owl_data->my_eye[origin].value) > 0);
 }
 
 
 /* Used by autohelpers.
  * Returns 1 if (pos) is an eyespace for the color of the dragon currently
- * under owl inverstigation, which is possibly worth 2 eyes.
+ * under owl investigation, which is possibly worth (at least) 2 eyes.
  */
 int
 owl_big_eyespace(int pos)
@@ -4639,7 +4685,7 @@ owl_big_eyespace(int pos)
   return (ON_BOARD(origin) 
 	  && (current_owl_data->my_eye[origin].color
 	      == BORDER_COLOR(current_owl_data->color))
-	  && current_owl_data->my_eye[origin].value.maxeye == 2);
+	  && max_eyes(&current_owl_data->my_eye[origin].value) >= 2);
 }
 
 
@@ -4677,7 +4723,7 @@ owl_strong_dragon(int pos)
   
   return (!current_owl_data->goal[pos]
 	  && dragon[pos].color == board[pos]
-	  && DRAGON2(pos).genus >= 2);
+	  && min_eyes(&DRAGON2(pos).genus) >= 2);
 }
   
 

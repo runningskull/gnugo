@@ -104,8 +104,6 @@ enum {OPT_BOARDSIZE=127,
       OPT_OWL_BRANCH,
       OPT_OWL_READING,
       OPT_OWL_NODE_LIMIT,
-      OPT_LIFE,
-      OPT_LIFE_EYESIZE,
       OPT_NOFUSEKIDB,
       OPT_NOFUSEKI,
       OPT_NOJOSEKIDB,
@@ -235,8 +233,6 @@ static struct gg_option const long_options[] =
   {"decide-position", no_argument,      0, OPT_DECIDE_POSITION},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
   {"decide-combination", no_argument,   0, OPT_DECIDE_COMBINATION},
-  {"life",           no_argument,       0, OPT_LIFE},
-  {"life-eyesize",   required_argument, 0, OPT_LIFE_EYESIZE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
   {"nofuseki",       no_argument,       0, OPT_NOFUSEKI},
   {"nojosekidb",     no_argument,       0, OPT_NOJOSEKIDB},
@@ -311,8 +307,6 @@ main(int argc, char *argv[])
   mandated_aa_depth            = -1;
 
   debug = 0;
-  life  = 0;
-  life_eyesize = LIFE_EYESIZE;
   fusekidb = 1;
   disable_fuseki = 0;
   josekidb = 1;
@@ -676,15 +670,6 @@ main(int argc, char *argv[])
 	
       case OPT_OWL_NODE_LIMIT:
 	mandated_owl_node_limit = atoi(gg_optarg);
-	break;
-	
-      case OPT_LIFE:
- 	life = 1;
-	break;
-
-      case OPT_LIFE_EYESIZE:
-	life = 1;
-	life_eyesize = atoi(gg_optarg);
 	break;
 	
       case OPT_NOFUSEKIDB:
@@ -1242,8 +1227,6 @@ Options that affect strength (higher = stronger, slower):\n\
 
 #define USAGE1 "\n\
 Experimental options:\n\
-   --life                  use life code\n\
-   --life-eyesize <n>      use life code, life_eyesize=n (default %d)\n\
    --nofusekidb            turn off fuseki database\n\
    --nofuseki              turn off fuseki moves entirely\n\
    --nojosekidb            turn off joseki database\n\
@@ -1333,7 +1316,6 @@ Debugging Options:\n\
        --decide-eye <string>     evaluate the eye\n\
        --decide-combination      search for combination attack (try with -o)\n\
        --genmove <color>         generate a move for color\n\
-       --life <eyesize>          use eye reading code\n\
        --nofusekidb              turn off fuseki database\n\
        --nofuseki                turn off fuseki moves entirely\n\
        --nojosekidb              turn off joseki database\n\
@@ -1385,7 +1367,6 @@ show_help(void)
 	  owl_distrust_depth, owl_branch_depth,
 	  owl_reading_depth, owl_node_limit, DEFAULT_LEVEL);
   fprintf(stderr, USAGE1,
-	   LIFE_EYESIZE,
 	  (float) DEFAULT_MEMORY, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }
 

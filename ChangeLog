@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- life code completely disabled
+- global variables life and life_eyesize removed
+- options --life and --life-eyesize removed
+- new eye value scheme; all code handling eye values revised
+- new functions set_eyevalue(), min_eyes(), max_eyes(),
+  add_eyevalues(), eye_move_urgency(), eyevalue_to_string()
+- eyes.db revised for new eye value scheme and substantially extended
 - configure test for alarm removed
 - sigterm_handler() and volatile variable time_to_die removed
 - functions special_rescue(), special_rescue2() converted to .._moves()

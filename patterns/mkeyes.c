@@ -28,7 +28,7 @@
 #define MAXLINE 80
 #define MAXDIMEN 20
 #define MAXSIZE 20
-#define MAXPATNO 400
+#define MAXPATNO 700
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,8 +59,10 @@ main(void)
   int eye_number[MAXPATNO];
   int esize[MAXPATNO];
   int msize[MAXPATNO];
-  int max[MAXPATNO];
-  int min[MAXPATNO];
+  int value_a[MAXPATNO];
+  int value_b[MAXPATNO];
+  int value_c[MAXPATNO];
+  int value_d[MAXPATNO];
   int ends[MAXPATNO];
   int two_neighbors[MAXPATNO];
   int three_neighbors[MAXPATNO];
@@ -120,7 +122,7 @@ main(void)
     /* Empty line or comment line, skip. */
     if (strncmp("#", line, 1) == 0 || strncmp("\n", line, 1) == 0)
       continue;
-    
+
     if (strncmp(":", line, 1) != 0) {
       /* diagram line. */
       for (n = 0; n < MAXDIMEN && strncmp("\n", line + n, 1); n++) {
@@ -226,11 +228,13 @@ main(void)
     }
     else {
       /* Colon line. */
-      sscanf(line, ":%d,%d", &(max[patno]), &(min[patno]));
+      sscanf(line, ":%1d%1d%1d%1d", &value_a[patno], &value_b[patno],
+	     &value_c[patno], &value_d[patno]);
       if (debug)
-	fprintf(stderr, "max=%d, min=%d\n", max[patno], min[patno]);
+	fprintf(stderr, "value=%d%d%d%d\n", value_a[patno], value_b[patno],
+		value_c[patno], value_d[patno]);
 
-      if (max[patno] != min[patno]) {
+      if (value_b[patno] != value_c[patno]) {
 	if (num_attacks == 0 || num_defenses == 0) {
 	  fprintf(stderr,
 		  "mkeyes: missing attack or defense point in pattern %d\n",
@@ -239,7 +243,7 @@ main(void)
 	}
       }
       
-      if (max[patno] == min[patno]) {
+      if (value_b[patno] == value_c[patno]) {
 	if (num_attacks > 0 || num_defenses > 0) {
 	  fprintf(stderr,
 		  "mkeyes: attack or defense point in settled pattern %d\n",
@@ -339,13 +343,14 @@ main(void)
   printf("\nstruct eye_graph graphs[] = {\n");
   for (l = 0; l < patno; l++) {
 
-    printf("   {eye%d, \"%d\", %d, %d, %d, %d, %d, %d, %d}",
+    printf("   {eye%d, \"%d\", %d, %d, %d, %d, %d, {%d, %d, %d, %d}}",
 	   eye_number[l], eye_number[l], esize[l], msize[l], ends[l],
-	   two_neighbors[l], three_neighbors[l], max[l], min[l]);
+	   two_neighbors[l], three_neighbors[l],
+	   value_a[l], value_b[l], value_c[l], value_d[l]);
     if (l < patno-1)
       printf(",\n");
     else
-      printf(",\n{NULL, 0, 0, 0, 0, 0, 0, 0, 0}\n};\n");
+      printf(",\n{NULL, 0, 0, 0, 0, 0, 0, {0, 0, 0, 0}}\n};\n");
   }
 
   if (fatal_errors) {

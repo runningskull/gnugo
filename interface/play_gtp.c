@@ -1521,8 +1521,8 @@ gtp_eval_eye(char *s)
     return gtp_success("-1");
 
   gtp_start_response(GTP_SUCCESS);
-  gtp_printf("%d %d", value.mineye, value.maxeye);
-  if (value.maxeye != value.mineye) {
+  gtp_printf("%d %d", min_eyes(&value), max_eyes(&value));
+  if (eye_move_urgency(&value) > 0) {
     gtp_printf(" ");
     gtp_print_vertex(I(attack_point), J(attack_point));
     gtp_printf(" ");
@@ -2229,12 +2229,14 @@ gtp_experimental_score(char *s)
  * Arguments: none
  * Fails:     never
  * Returns:   nothing
+ *
+ * Note: This function is obsolete and only remains for backwards
+ * compatibility.
  */
 static int
 gtp_reset_life_node_counter(char *s)
 {
   UNUSED(s);
-  reset_life_node_counter();
   return gtp_success("");
 }
 
@@ -2243,13 +2245,15 @@ gtp_reset_life_node_counter(char *s)
  * Arguments: none
  * Fails:     never
  * Returns:   number of life nodes
+ *
+ * Note: This function is obsolete and only remains for backwards
+ * compatibility.
  */
 static int
 gtp_get_life_node_counter(char *s)
 {
-  int nodes = get_life_node_counter();
   UNUSED(s);
-  return gtp_success("%d", nodes);
+  return gtp_success("0");
 }
 
 

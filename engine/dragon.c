@@ -193,7 +193,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       float sum;
 
       if (black_eye[str].color == BLACK_BORDER
-	  && (!black_eye[str].marginal || life)
+	  && !black_eye[str].marginal
 	  && black_eye[str].neighbors <= 1) {
 	sum = topological_eye(str, BLACK, black_eye, half_eye);
 	if (sum >= 4.0) {
@@ -208,7 +208,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       }
       
       if (white_eye[str].color == WHITE_BORDER
-	  && (!white_eye[str].marginal || life)
+	  && !white_eye[str].marginal
 	  && white_eye[str].neighbors <= 1) {
 	sum = topological_eye(str, WHITE, white_eye, half_eye);
 	if (sum >= 4.0) {
@@ -240,8 +240,8 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       
       compute_eyes(str, &value, &attack_point, &defense_point, 
 		   black_eye, half_eye, 1, color);
-      DEBUG(DEBUG_EYES, "Black eyespace at %1m: min=%d, max=%d\n",
-	    str, value.mineye, value.maxeye);
+      DEBUG(DEBUG_EYES, "Black eyespace at %1m: %s\n", str,
+	    eyevalue_to_string(&value));
       black_eye[str].value = value;
       black_eye[str].attack_point = attack_point;
       black_eye[str].defense_point = defense_point;
@@ -255,8 +255,8 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       
       compute_eyes(str, &value, &attack_point, &defense_point,
 		   white_eye, half_eye, 1, color);
-      DEBUG(DEBUG_EYES, "White eyespace at %1m: min=%d, max=%d\n",
-	    str, value.mineye, value.maxeye);
+      DEBUG(DEBUG_EYES, "White eyespace at %1m: %s\n", str,
+	    eyevalue_to_string(&value));
       white_eye[str].value = value;
       white_eye[str].attack_point = attack_point;
       white_eye[str].defense_point = defense_point;
@@ -278,11 +278,11 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       gg_assert(board[dr] == BLACK);
       TRACE("eye at %1m found for dragon at %1m--augmenting genus\n",
 	    str, dr);
-      DRAGON2(dr).genus += black_eye[str].value.mineye;
-      DRAGON2(dr).heyes += (black_eye[str].value.maxeye
-			    - black_eye[str].value.mineye);
-      if (black_eye[str].value.maxeye - black_eye[str].value.mineye > 0)
-	DRAGON2(dr).heye = black_eye[str].attack_point;
+      if (eye_move_urgency(&black_eye[str].value)
+	  > eye_move_urgency(&DRAGON2(dr).genus))
+	DRAGON2(dr).heye = black_eye[str].defense_point;
+      add_eyevalues(&DRAGON2(dr).genus, &black_eye[str].value,
+		    &DRAGON2(dr).genus);
     }
     
     if (white_eye[str].color == WHITE_BORDER
@@ -293,12 +293,11 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
       gg_assert(board[dr] == WHITE);
       TRACE("eye at %1m found for dragon at %1m--augmenting genus\n",
 	    str, dr);
-      DRAGON2(dr).genus += white_eye[str].value.mineye;
-      DRAGON2(dr).heyes += (white_eye[str].value.maxeye
-			    - white_eye[str].value.mineye);
-      if (white_eye[str].value.maxeye - white_eye[str].value.mineye > 0) {
-	DRAGON2(dr).heye = white_eye[str].attack_point;
-      }
+      if (eye_move_urgency(&white_eye[str].value)
+	  > eye_move_urgency(&DRAGON2(dr).genus))
+	DRAGON2(dr).heye = white_eye[str].defense_point;
+      add_eyevalues(&DRAGON2(dr).genus, &white_eye[str].value,
+		    &DRAGON2(dr).genus);
     }
   }
   time_report(2, "  time to compute genus", NO_MOVE, 1.0);
@@ -559,8 +558,12 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   for (d = 0; d < number_of_dragons; d++) {
     int true_genus;
     int origin = dragon2[d].origin;
+    struct eyevalue *genus = &dragon2[d].genus;
 
-    true_genus = 2 * dragon2[d].genus + dragon2[d].heyes;
+    /* FIXME: We lose information when constructing true_genus. This
+     * code can be improved.
+     */
+    true_genus = max_eyes(genus) + min_eyes(genus);
     if (dragon_looks_inessential(origin))
       dragon2[d].safety = INESSENTIAL;
     else if (dragon[origin].size == worm[origin].size
@@ -750,8 +753,7 @@ initialize_supplementary_dragon_data(void)
     dragon2[d].moyo_territorial_value  = 0.0;
     dragon2[d].safety               = -1;
     dragon2[d].escape_route         = 0;
-    dragon2[d].genus                = 0;
-    dragon2[d].heyes                = 0;
+    set_eyevalue(&dragon2[d].genus, 0, 0, 0, 0);
     dragon2[d].heye                 = NO_MOVE;
     dragon2[d].lunch                = NO_MOVE;
     dragon2[d].semeai               = 0;
@@ -1002,7 +1004,7 @@ dragon_invincible(int dr)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (mx[pos]
 	&& eye[pos].msize == 0
-	&& eye[pos].value.mineye > 0)
+	&& min_eyes(&eye[pos].value) > 0)
       strong_eyes++;
   }
 
@@ -1157,13 +1159,12 @@ show_dragons(void)
     d2 = &(dragon2[dd->id]);
     
     if (dd->origin == pos) {
-      gprintf("%1m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, crude status %s, status %s, moyo size pre owl %d, moyo size post owl %d, moyo territory value %f, safety %s, weakness %f",
+      gprintf("%1m : %s dragon size %d (%f), genus %s, escape factor %d, crude status %s, status %s, moyo size pre owl %d, moyo size post owl %d, moyo territory value %f, safety %s, weakness %f",
 	      pos,
 	      board[pos] == BLACK ? "B" : "W",
 	      dd->size,
 	      dd->effective_size,
-	      d2->genus,
-	      d2->heyes,
+	      eyevalue_to_string(&d2->genus),
 	      d2->escape_route,
 	      snames[dd->crude_status],
 	      snames[dd->status],
@@ -1307,7 +1308,11 @@ join_dragons(int d1, int d2)
 static int 
 compute_crude_status(int pos)
 {
-  int true_genus = 2*DRAGON2(pos).genus + DRAGON2(pos).heyes;
+  /* FIXME: We lose information when constructing true_genus. This
+   * code can be improved.
+   */
+  struct eyevalue *genus = &DRAGON2(pos).genus;
+  int true_genus = max_eyes(genus) + min_eyes(genus);
   int lunch = DRAGON2(pos).lunch;
 
   gg_assert(dragon2_initialized);
@@ -1724,9 +1729,12 @@ struct interpolation_data genus2weakness =
 static float
 compute_dragon_weakness_value(int d)
 {
-  float true_genus = (((float) dragon2[d].genus)
-		      + 0.5 * ((float) dragon2[d].heyes
-			       + (dragon2[d].lunch != NO_MOVE ? 1.0 : 0.0)));
+  /* FIXME: We lose information when constructing true_genus. This
+   * code can be improved.
+   */
+  struct eyevalue *genus = &dragon2[d].genus;
+  float true_genus = 0.5 * (max_eyes(genus) + min_eyes(genus)
+			    + (dragon2[d].lunch != NO_MOVE));
   int origin = dragon2[d].origin;
   float escape_route = (float) dragon2[d].escape_route;
   int dragon_safety = dragon2[d].safety;
@@ -1946,9 +1954,9 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile, "origin                  %1m\n", d->origin);
   gfprintf(outfile, "size                    %d\n", d->size);
   gfprintf(outfile, "effective_size          %f\n", d->effective_size);
-  gfprintf(outfile, "heyes                   %d\n", d2->heyes);
+  gfprintf(outfile, "genus                   %s\n",
+	   eyevalue_to_string(&d2->genus));
   gfprintf(outfile, "heye                    %1m\n", d2->heye);
-  gfprintf(outfile, "genus                   %d\n", d2->genus);
   gfprintf(outfile, "escape_route            %d\n", d2->escape_route);
   gfprintf(outfile, "lunch                   %1m\n", d2->lunch);
   gfprintf(outfile, "crude status            %s\n",

@@ -98,8 +98,7 @@ clear_eye(struct eye_data *eye)
   eye->esize = 0;
   eye->msize = 0;
   eye->origin = NO_MOVE;
-  eye->value.maxeye = 0;
-  eye->value.mineye = 0;
+  set_eyevalue(&eye->value, 0, 0, 0, 0);
   eye->attack_point = NO_MOVE;
   eye->defense_point = NO_MOVE;
   eye->marginal = 0;
@@ -497,10 +496,6 @@ false_margin(int pos, int color, int lively[BOARDMAX])
   int all_lively;
   int potential_false_margin;
   
-  /* The life code needs the false margins to remain in the eyespace. */
-  if (life)
-    return 0;
-  
   /* Require neighbors of both colors. */
   for (k = 0; k < 4; k++)
     if (ON_BOARD(pos + delta[k]))
@@ -763,82 +758,22 @@ compute_eyes(int pos, struct eyevalue *value,
     DEBUG(DEBUG_EYES, "\n");
   }
   
-  /* First we try to let the life code evaluate the eye space. */
-  if (life && eye[pos].esize <= life_eyesize) {
-    struct eyevalue value1;
-    int attack_point1;
-    int defense_point1;
-    int status;
-
-    if (recognize_eye2(pos, attack_point, defense_point, value,
-		       eye, heye, add_moves, color)) {
-
-      /* made these printouts contingent on DEBUG_EYES /gf */
-      if (debug & DEBUG_EYES) {
-	fprintf(stderr, "\n");
-	showboard(2);
-	
-	status = recognize_eye(pos, &attack_point1, &defense_point1,
-			       &value1, eye, heye, 0, EMPTY);
-	
-	if (status) {
-	  gprintf("Number of eyes:  --life: (%d, %d)  old: (%d, %d) at %1m\n", 
-		  value->maxeye, value->mineye, value1.maxeye, value1.mineye,
-		  pos);
-	  if (value->mineye != value->maxeye) {
-	    gprintf("  vital point:     attack: %1m   defense: %1m\n",
-		    *attack_point, *defense_point);
-	    gprintf("  old vital point: attack: %1m   defense: %1m\n",
-		    attack_point1, defense_point1);
-	  }
-	}
-	else {
-	  gprintf("Number of eyes:  new: (%d, %d) at %1m\n",
-		  value->maxeye, value->mineye, pos);
-	  if (value->mineye != value->maxeye)
-	    gprintf("  vital point:   attack: %1m   defense: %1m\n",
-		    *attack_point, *defense_point);
-	}
-      }
-      
-      return;
-    }
-  }
-
-  /* Fall back on the graphs database if the eye is too big or the
-   * life code is disabled.
-   */
+  /* Look up the eye space in the graphs database. */
   if (recognize_eye(pos, attack_point, defense_point, value,
 		    eye, heye, add_moves, color))
     return;
-
-  if (eye[pos].esize < 6) {
-    /* made these printouts contingent on DEBUG_EYES /gf */
-    if (debug & DEBUG_EYES) {
-      gprintf("===========================================================\n");
-      gprintf("Unrecognized eye of size %d shape at %1m\n", 
-	      eye[pos].esize, pos);
-      print_eye(eye, heye, pos);
-    }
-  }
 
   /* Ideally any eye space that hasn't been matched yet should be two
    * secure eyes. Until the database becomes more complete we have
    * some additional heuristics to guess the values of unknown
    * eyespaces.
    */
-  if (eye[pos].esize - 2*eye[pos].msize > 3) {
-    value->mineye = 2;
-    value->maxeye = 2;
-  }
-  else if (eye[pos].esize - 2*eye[pos].msize > 0) {
-    value->mineye = 1;
-    value->maxeye = 1;
-  }
-  else {
-    value->mineye = 0;
-    value->maxeye = 0;
-  }
+  if (eye[pos].esize - 2*eye[pos].msize > 3)
+    set_eyevalue(value, 2, 2, 2, 2);
+  else if (eye[pos].esize - 2*eye[pos].msize > 0)
+    set_eyevalue(value, 1, 1, 1, 1);
+  else
+    set_eyevalue(value, 0, 0, 0, 0);
 }
 
 
@@ -899,31 +834,18 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
     DEBUG(DEBUG_EYES, "\n");
   }
   
-  /* First we try to let the life code evaluate the eye space. */
-  if (life
-      && eye[pos].esize <= life_eyesize
-      && recognize_eye2(pos, attack_point, defense_point, value,
-			eye, heye, 0, EMPTY)) {
-    *pessimistic_min = value->mineye - margins;
-
-    DEBUG(DEBUG_EYES, "  life - max=%d, min=%d, pessimistic_min=%d\n",
-	  value->maxeye, value->mineye, *pessimistic_min);
-  }
-  /* Fall back on the graphs database if the eye is too big or the
-   * life code is disabled.
-   */
-  else if (recognize_eye(pos, attack_point, defense_point, value,
-			 eye, heye, 0, EMPTY)) {
-    *pessimistic_min = value->mineye - margins;
+  /* Look up the eye space in the graphs database. */
+  if (recognize_eye(pos, attack_point, defense_point, value,
+		    eye, heye, 0, EMPTY)) {
+    *pessimistic_min = min_eyes(value) - margins;
 
     /* A single point eye which is part of a ko can't be trusted. */
     if (eye[pos].esize == 1
 	&& is_ko(pos, eye[pos].color == WHITE_BORDER ? BLACK : WHITE, NULL))
       *pessimistic_min = 0;
 
-    DEBUG(DEBUG_EYES,
-	  "  graph matching - max=%d, min=%d, pessimistic_min=%d\n",
-	  value->maxeye, value->mineye, *pessimistic_min);
+    DEBUG(DEBUG_EYES, "  graph matching - %s, pessimistic_min=%d\n",
+	  eyevalue_to_string(value), *pessimistic_min);
   }
   
   /* Ideally any eye space that hasn't been matched yet should be two
@@ -934,8 +856,8 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   else {
     guess_eye_space(pos, effective_eyesize, margins, eye,
 		    value, pessimistic_min); 
-    DEBUG(DEBUG_EYES, "  guess_eye - max=%d, min=%d, pessimistic_min=%d\n",
-	  value->maxeye, value->mineye, *pessimistic_min);
+    DEBUG(DEBUG_EYES, "  guess_eye - %s, pessimistic_min=%d\n",
+	  eyevalue_to_string(value), *pessimistic_min);
   }
 
   if (*pessimistic_min < 0) {
@@ -953,7 +875,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
   
   if (attack_point
       && *attack_point == NO_MOVE
-      && value->maxeye != *pessimistic_min) {
+      && max_eyes(value) != *pessimistic_min) {
     /* Find one marginal vertex and set as attack and defense point.
      *
      * We make some effort to find the best marginal vertex by giving
@@ -1023,28 +945,28 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
 		struct eyevalue *value, char *pessimistic_min)
 {
   if (effective_eyesize > 3) {
-    value->mineye = 2;
-    value->maxeye = 2;
+    set_eyevalue(value, 2, 2, 2, 2);
     if ((margins == 0 && effective_eyesize > 7)
-	|| (margins > 0 && effective_eyesize > 9))
-      *pessimistic_min = 2;
+	|| (margins > 0 && effective_eyesize > 9)) {
+      int eyes = 2 + (effective_eyesize - 2 * (margins > 0) - 8) / 2;
+      *pessimistic_min = eyes;
+      set_eyevalue(value, eyes, eyes, eyes, eyes);
+    }
     else
       *pessimistic_min = 1;
   }
   else if (effective_eyesize > 0) {
-    value->mineye = 1;
-    value->maxeye = 1;
+    set_eyevalue(value, 1, 1, 1, 1);
     if (margins > 0)
       *pessimistic_min = 0;
     else
       *pessimistic_min = 1;
   }
   else {
-    value->mineye = 0;
     if (eye[pos].esize - margins > 2)
-      value->maxeye = 1;
+      set_eyevalue(value, 0, 0, 1, 1);
     else
-      value->maxeye = 0;
+      set_eyevalue(value, 0, 0, 0, 0);
     *pessimistic_min = 0;
   }
 }
@@ -1248,9 +1170,8 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 
     /* We have found a match! Now sort out the vital moves. */
     if (q == eye_size) {
-      value->maxeye = graphs[graph].max;
-      value->mineye = graphs[graph].min;
-      if (value->maxeye != value->mineye) {
+      *value = graphs[graph].value;
+      if (eye_move_urgency(value) > 0) {
 	/* Collect all attack and defense points in the pattern. */
 	int attack_points[4 * MAXEYE];
 	int defense_points[4 * MAXEYE];
@@ -1461,10 +1382,10 @@ max_eye_value(int pos)
   int max_black = 0;
   
   if (white_eye[pos].color == WHITE_BORDER)
-    max_white = white_eye[pos].value.maxeye;
+    max_white = max_eyes(&white_eye[pos].value);
 
   if (black_eye[pos].color == BLACK_BORDER)
-    max_black = black_eye[pos].value.maxeye;
+    max_black = max_eyes(&black_eye[pos].value);
 
   return gg_max(max_white, max_black);
 }
@@ -1779,6 +1700,99 @@ evaluate_diagonal_intersection(int m, int n, int color,
 }
 
 
+void
+set_eyevalue(struct eyevalue *e, int a, int b, int c, int d)
+{
+  e->a = a;
+  e->b = b;
+  e->c = c;
+  e->d = d;
+}
+
+/* Number of eyes if attacker plays first followed by alternating play. */
+int
+min_eyes(struct eyevalue *e)
+{
+  return e->b;
+}
+
+/* Number of eyes if defender plays first followed by alternating play. */
+int
+max_eyes(struct eyevalue *e)
+{
+  return e->c;
+}
+
+/* Add the eyevalues *e1 and *e2, leaving the result in *sum. It is
+ * safe to let sum be the same as e1 or e2.
+ */
+void
+add_eyevalues(struct eyevalue *e1, struct eyevalue *e2, struct eyevalue *sum)
+{
+  struct eyevalue res;
+  res.a = gg_min(gg_min(e1->a + e2->c, e1->c + e2->a),
+		 gg_max(e1->a + e2->b, e1->b + e2->a));
+  res.b = gg_min(gg_max(e1->b + e2->b, gg_min(e1->a + e2->d, e1->b + e2->c)),
+		 gg_max(e1->b + e2->b, gg_min(e1->d + e2->a, e1->c + e2->b)));
+  res.c = gg_max(gg_min(e1->c + e2->c, gg_max(e1->d + e2->a, e1->c + e2->b)),
+		 gg_min(e1->c + e2->c, gg_max(e1->a + e2->d, e1->b + e2->c)));
+  res.d = gg_max(gg_max(e1->d + e2->b, e1->b + e2->d),
+		 gg_min(e1->d + e2->c, e1->c + e2->d));
+
+  /* The rules above give 0011 + 0002 = 0012, which is incorrect. Thus
+   * we need this annoying exception.
+   */
+  if ((e1->d - e1->c == 2 && e2->c - e2->b == 1)
+      || (e1->c - e1->b == 1 && e2->d - e2->c == 2)) {
+    res.d = gg_max(gg_min(e1->c + e2->d, e1->d + e2->b),
+		   gg_min(e1->d + e2->c, e1->b + e2->d));
+  }
+
+  /* The temporary storage in res is necessary if sum is the same as
+   * e1 or e2.
+   */
+  sum->a = res.a;
+  sum->b = res.b;
+  sum->c = res.c;
+  sum->d = res.d;
+}
+
+/* The impact on the number of eyes (counting up to two) if a vital
+ * move is made. The possible values are
+ * 0 - settled eye, no vital move
+ * 2 - 1/2 eye or 3/2 eyes
+ * 3 - 3/4 eyes or 5/4 eyes
+ * 4 - 1* eyes (a chimera)
+ */
+int
+eye_move_urgency(struct eyevalue *e)
+{
+  int a = gg_min(e->a, 2);
+  int b = gg_min(e->b, 2);
+  int c = gg_min(e->c, 2);
+  int d = gg_min(e->d, 2);
+  if (b == c)
+    return 0;
+  else
+    return d + c - b - a;
+}
+
+/* Note: the result string is stored in a statically allocated buffer
+ * which will be overwritten the next time this function is called.
+ */
+char *
+eyevalue_to_string(struct eyevalue *e)
+{
+  static char result[30];
+  if (e->a < 10 && e->b < 10 && e->c < 10 && e->d < 10)
+    gg_snprintf(result, 29, "%d%d%d%d", e->a, e->b, e->c, e->d);
+  else
+    gg_snprintf(result, 29, "[%d,%d,%d,%d]", e->a, e->b, e->c, e->d);
+  return result;
+}
+
+
+
 /* Test whether the optics code evaluates an eyeshape consistently. */
 void
 test_eyeshape(int eyesize, int *eye_vertices)
@@ -1912,6 +1926,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
     }
     else {
       defense_code = owl_defend(str, &defense_point, NULL);
+
       if (defense_code == 0) {
 	/* The owl code claims there is no defense. We test this by
 	 * trying to defend on all empty spaces in the eyeshape.

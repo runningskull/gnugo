@@ -926,8 +926,13 @@ connection_value(int dragona, int dragonb, int tt, float margin)
 {
   int safety1 = DRAGON2(dragona).safety;
   int safety2 = DRAGON2(dragonb).safety;
-  int true_genus1 = 2 * DRAGON2(dragona).genus + DRAGON2(dragona).heyes;
-  int true_genus2 = 2 * DRAGON2(dragonb).genus + DRAGON2(dragonb).heyes;
+  /* FIXME: We lose information when constructing true_genus. This
+   * code can be improved.
+   */
+  struct eyevalue *genus1 = &DRAGON2(dragona).genus;
+  struct eyevalue *genus2 = &DRAGON2(dragonb).genus;
+  int true_genus1 = max_eyes(genus1) + min_eyes(genus1);
+  int true_genus2 = max_eyes(genus2) + min_eyes(genus2);
   float impact;
 
   /* If the connected dragon gets sufficient eyespace to live on its

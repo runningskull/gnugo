@@ -692,6 +692,19 @@ struct stats_data {
 extern struct stats_data stats;
 
 
+struct eyevalue {
+#if 0
+  char maxeye;       /* number of eyes if defender plays first               */
+  char mineye;       /* number of eyes if attacker plays first               */
+#else
+  unsigned char a; /* number of eyes if attacker plays first twice */
+  unsigned char b; /* number of eyes if attacker plays first */
+  unsigned char c; /* number of eyes if defender plays first */
+  unsigned char d; /* number of eyes if defender plays first twice */
+#endif
+};
+
+
 struct half_eye_data {
   float value;      /* Topological eye value. */
   char type;         /* HALF_EYE or FALSE_EYE; */
@@ -797,8 +810,7 @@ struct dragon_data2 {
   int safety;                         /* a more detailed status estimate     */
   float weakness; /* A new (3.3.x) continuos estimate of the dragon's safety */
   int escape_route; /* a measurement of likelihood of escape                 */
-  int genus;    /* the number of eyes (approximately)                        */
-  int heyes;    /* the number of half eyes                                   */
+  struct eyevalue genus;    /* the number of eyes (approximately)            */
   int heye;     /* coordinates of a half eye                                 */
   int lunch;    /* if lunch != 0 then lunch points to a boundary worm which  */
                 /* can be captured easily.                                   */
@@ -834,11 +846,6 @@ struct aftermath_data {
   int white_control[BOARDMAX];
   int black_control[BOARDMAX];
   int final_status[BOARDMAX];
-};
-
-struct eyevalue {
-  char maxeye;       /* number of eyes if defender plays first               */
-  char mineye;       /* number of eyes if attacker plays first               */
 };
 
 struct eye_data {
@@ -878,11 +885,6 @@ void compute_eyes_pessimistic(int pos, struct eyevalue *value,
                               int *attack_point, int *defense_point,
                               struct eye_data eye[BOARDMAX],
                               struct half_eye_data heye[BOARDMAX]);
-int recognize_eye2(int pos, int *attack_point,
-		   int *defense_point, struct eyevalue *value,
-		   struct eye_data eye[BOARDMAX],
-		   struct half_eye_data heye[BOARDMAX],
-                    int add_moves, int color);
 void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
 int find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
 		     int dragons[], int max_dragons);
@@ -894,6 +896,14 @@ void add_false_eye(int pos, struct eye_data eye[BOARDMAX],
 void make_domains(struct eye_data b_eye[BOARDMAX],
                   struct eye_data w_eye[BOARDMAX],
 		  int owl_call);
+
+void set_eyevalue(struct eyevalue *e, int a, int b, int c, int d);
+int min_eyes(struct eyevalue *e);
+int max_eyes(struct eyevalue *e);
+void add_eyevalues(struct eyevalue *e1, struct eyevalue *e2,
+		   struct eyevalue *sum);
+int eye_move_urgency(struct eyevalue *e);
+char *eyevalue_to_string(struct eyevalue *e);
 
 int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);
 

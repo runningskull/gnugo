@@ -516,9 +516,6 @@ decide_eye(int pos)
   if (printboard)
     showboard(0);
 
-  if (life)
-    reset_life_node_counter();
-
   /* Enable sgf output. */
   if (*outfilename)
     sgffile_begindump(&tree);
@@ -528,9 +525,8 @@ decide_eye(int pos)
     eyepos = black_eye[pos].origin;
     compute_eyes(eyepos, &value, &attack_point, &defense_point,
 		 black_eye, half_eye, 0, EMPTY);
-    gprintf("Black eyespace at %1m: min=%d, max=%d\n", eyepos,
-	    value.mineye, value.maxeye);
-    if (value.maxeye != value.mineye) {
+    gprintf("Black eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
+    if (eye_move_urgency(&value) > 0) {
       gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
 	      defense_point);
     }
@@ -540,18 +536,13 @@ decide_eye(int pos)
     eyepos = white_eye[pos].origin;
     compute_eyes(eyepos, &value, &attack_point, &defense_point,
 		 white_eye, half_eye, 0, EMPTY);
-    gprintf("White eyespace at %1m: min=%d, max=%d\n", eyepos,
-	    value.mineye, value.maxeye);
-    if (value.maxeye != value.mineye) {
+    gprintf("White eyespace at %1m: %s\n", eyepos, eyevalue_to_string(&value));
+    if (eye_move_urgency(&value) > 0) {
       gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
 	      defense_point);
     }
   }
   
-  if (life)
-    printf("%d positions examined by the life module.\n",
-	   get_life_node_counter());
-
   /* Finish sgf output. */
   sgffile_enddump(outfilename);
   count_variations = 0;
