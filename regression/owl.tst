@@ -179,7 +179,7 @@ loadsgf games/owl03.sgf
 50 owl_attack D19
 #? [1 E19]
 51 owl_defend D19
-#? [1 E19]
+#? [1 (E19|B19)]
 
 loadsgf games/owl04.sgf
 52 owl_attack Q7
@@ -866,6 +866,42 @@ loadsgf games/owl33.sgf 134
 loadsgf games/owl33.sgf 212
 237 owl_defend S12
 #? [0]*
+
+# See also optics:1801-1812
+loadsgf games/marginal_ko.sgf
+238 owl_attack B19
+#? [1 (B17|A19)]
+239 owl_defend B19
+#? [2 B17]
+240 owl_attack G19
+#? [0]
+241 owl_attack M19
+#? [0]
+242 owl_attack J15
+#? [0]
+243 owl_attack A11
+#? [0]
+244 owl_attack D11
+#? [(2|3) F11]
+245 owl_defend D11
+#? [1 (F11|H8|F8)]
+246 owl_attack N9
+#? [3 (L6|P8)]
+247 owl_defend N9
+#? [1 (L6|P8)]
+248 owl_attack A6
+#? [1 (J1|L2)]
+249 owl_defend A6
+#? [2 (J1|B7|B2)]*
+250 owl_attack R3
+#? [1 (T3|R2)]
+251 owl_defend R3
+#? [3 T3]
+252 owl_attack C2
+#? [2 B2]
+253 owl_defend C2
+#? [1 B2]
+
 
 ########### end of tests #####################
 

@@ -189,6 +189,36 @@ loadsgf games/eyes_edge.sgf
 1705 eval_eye A19
 #? [1 2 A18 A18]
 
+# Eye spaces with ko contingent margins.
+# Either min or max in these depends on ko.
+loadsgf games/marginal_ko.sgf
+1801 eval_eye A19
+#? [0 1 (A19|B17) B17]
+1802 eval_eye B17
+#? [0 1 (A19|B17) A19]
+1803 eval_eye N17
+#? [1 1]
+1804 eval_eye J12
+#? [1 1]
+1805 eval_eye A13
+#? [0 1 B12 B12]
+1806 eval_eye A8
+#? [1 1]
+1807 eval_eye F7
+#? [1 2 F11 (F11|H8|F8)]
+1808 eval_eye N7
+#? [0 1 (L6|P8) (L6|P8)]
+1809 eval_eye K5
+#? [0 1 (L6 L6)]
+1810 eval_eye A1
+#? [0 1 B2 B2]
+1811 eval_eye H1
+#? [1 2 (J1|L2) J1]*
+1812 eval_eye S1
+#? [0 1 R2 R2]
+
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -257,10 +257,10 @@ loadsgf games/trevor/auto/a025.sgf 12
 
 # games/trevor/auto/a026.sgf problems:
 
-#Once you've haned, you've gotta connect.  (Or you souldn't have haned.
+#Once you've haned, you've gotta connect.  (Or you shouldn't have haned.)
 loadsgf games/trevor/auto/a026.sgf 16
 420 gg_genmove white
-#? [J6]*
+#? [J5]*
 
 
 

@@ -115,6 +115,10 @@ loadsgf games/incident240.sgf 69
 32 disconnect B12 E9
 #? [1 D9]*
 
+loadsgf games/trevor/auto/a035.sgf 28
+33 disconnect B4 C6
+#? [B5]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
