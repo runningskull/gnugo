@@ -857,7 +857,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	if (liberty_of_goal(pos, owlb)) {
 	  if (!liberty_of_goal(pos, owla)) {
 	    /* outside liberty */
-	    if (safe_move(pos, color)) {
+	    if (safe_move(pos, color) == WIN) {
 	      safe_outside_liberty_found = 1;
 	      outside_liberty.pos = pos;
 	      break;
@@ -1416,7 +1416,7 @@ find_semeai_backfilling_move(int worm, int liberty)
   int other = OTHER_COLOR(color);
   int result = NO_MOVE;
 
-  if (safe_move(liberty, other))
+  if (safe_move(liberty, other) == WIN)
     return liberty;
   if (is_self_atari(liberty, other)) {
     int fill;

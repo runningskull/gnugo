@@ -1059,6 +1059,27 @@ Yab?
 ; oplay_attack(*,a,b,c,c)
 
 
+Pattern A232b
+# gf New pattern. (3.5.4)
+# See trevorc:240.
+
+?O.            Jump down to block
+Y..
+.*.
+...
+---
+
+:8,-,value(80)
+
+?ed
+Yab
+.*c
+...
+---
+
+; xlib(d)<=2 && lib(e)>3 && oplay_attack(*,a,b,c,c)
+
+
 Pattern A233
 # db added (3.1.10)
 
@@ -4473,21 +4494,42 @@ bd*
 Pattern A1124a
 # tm New Pattern (3.1.22) (see nngs:770 decide-dragon K4)
 #   see also D1140
+# gf Revised. Might still be too general. (3.5.4)
 
 ?OY
-?*.
-???
+x*.
+xx.
 
 :8,-,value(70)
 
 ?AY
 b*e
-cd?
+cd.
 
 ;(owl_escape_value(d) > 0
 ; || owl_escape_value(b) > 0
 ; || owl_escape_value(c) > 0)
 ;&& !oplay_defend_both(e,*,A,e)
+
+
+Pattern A1124b
+# gf New pattern. (3.5.4) (see nngs:770 decide-dragon K4)
+
+?OX
+x.*
+xx?
+
+:8,-,value(70)
+
+?OA
+be*
+cd?
+
+;(owl_escape_value(d) > 0
+; || owl_escape_value(b) > 0
+; || owl_escape_value(c) > 0)
+;&& xplay_connect(e,*,e,A)
+;&& oplay_disconnect(*,e,e,A)
 
 
 Pattern A1125

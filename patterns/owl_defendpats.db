@@ -1367,12 +1367,13 @@ oo?
 
 
 Pattern D311
+# gf Added n classification. (3.5.4)
 
 OX?        try to seal off some space
 .*O
 .??
 
-:8,-,value(60)
+:8,n,value(60)
 
 OX?
 a*O
