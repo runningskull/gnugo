@@ -20,8 +20,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <stdio.h>
-#include <stdlib.h>
-
 #include "liberty.h"
 #include "patterns.h"
 
@@ -774,16 +772,16 @@ test_attack_either_move(int move, int color, int worma, int wormb)
 }
 
 
+void
+set_value_helper(struct pattern *patt, int value)
+{
+  patt->value = value;
+}
+
+
 /*
  * LOCAL Variables:
  * tab-width: 8
  * c-basic-offset: 2
  * End:
  */
-
-
-void
-set_value_helper(struct pattern *patt, int value)
-{
-  patt->value = value;
-}
