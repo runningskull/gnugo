@@ -305,6 +305,7 @@ int squeeze_ko_helper(int apos);
 int backfill_helper(int apos, int bpos, int cpos);
 int owl_threatens_attack(int apos, int bpos);
 int connect_and_cut_helper(int Apos, int bpos, int cpos);
+int connect_and_cut_helper2(int Apos, int bpos, int cpos, int color);
 int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
 int dragon_weak(int pos);
 

@@ -5557,18 +5557,6 @@ Pattern EB1001
 :8,OXe
 
 
-# Pattern EB1002
-# # gf Redundant, strict subset of EB1001. (3.1.23)
-# 
-# ?X.?..     extend if opponent attaches!
-# .X.O..
-# *O....
-# ......
-# ------
-# 
-# :8,OXe
-
-
 Pattern EB1003
 
 XX..              move out on second line
@@ -5679,17 +5667,6 @@ O*.
 ---
 
 :8,OXe
-
-
-# Pattern EB1010
-# # gf Redundant, strict subset of EB1007. (3.1.23)
-# 
-# X...          extend on second line
-# O*..
-# ....
-# ----
-# 
-# :8,OXe
 
 
 Pattern EB1011
@@ -7237,18 +7214,6 @@ Pattern CB107
 # Miscellaneous
 ###############
 
-# Pattern CB201
-# # Too specific and probably redundant anyway. (3.1.23)
-# 
-# .O.?    large value to override defender
-# .*XX
-# OXO.
-# ...X
-# ..O?
-# 
-# :8,bE
-
-
 Pattern CB202
 
 ?o.?         hane if attached
@@ -7361,22 +7326,6 @@ O*.
 .ba
 
 ;(lib(a)>1) && (!attack(b) || defend(b))
-
-
-# Pattern CB208
-# # gf Merged with CB207 and reduced shape value. (3.1.23)
-# 
-# ??x      threaten connection
-# O*.
-# .XO
-# 
-# :8,nOX,shape(3)
-# 
-# ??x
-# O*.
-# .ba
-# 
-# ;(lib(a)>1) && (!attack(b) || defend(b))
 
 
 Pattern CB209
@@ -7767,22 +7716,6 @@ O*o
 :8,OXbe
 
 
-# Pattern CB239
-# gf Redundant, strict subset of CB238
-# 
-# ...            block off area
-# O*O
-# ?X?
-# 
-# :8,OXb
-# 
-# cab
-# O*O
-# ?X?
-# 
-# ;omoyo(b) && omoyo(c) && !xplay_attack(*,a,b,b)
-
-
 Pattern CB240
 
 ..            block off area
@@ -7966,15 +7899,6 @@ O*.
 OX?
 
 :8,OXe
-
-
-# Pattern CB253
-# 
-# ...       bend around
-# O*.
-# OXX
-# 
-# :8,OXe
 
 
 Pattern CB254

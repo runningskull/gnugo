@@ -674,6 +674,22 @@ ca*.
 ;!oplay_break_through(*,a,b,*,b,c)
 
 
+Pattern Conn603b
+# gf New experimental pattern. Useful in nngs1:41. (3.1.30)
+
+...o          Block across large knight's move
+O.*.
+?.XO
+
+:8,C
+
+...o
+a.*.
+?.Xb
+
+;!oplay_disconnect(*,a,b)
+
+
 Pattern Conn604
 
 O...

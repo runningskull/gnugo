@@ -289,6 +289,8 @@ static struct autohelper_func autohelper_functions[] = {
   {"finish_ko_helper",		1, 0.05, "finish_ko_helper(%s)"},
   {"squeeze_ko_helper",		1, 0.03, "squeeze_ko_helper(%s)"},
   {"backfill_helper", 		3, 1.50, "backfill_helper(%s, %s, %s)"},
+  {"connect_and_cut_helper2", 	3, 3.00,
+                "connect_and_cut_helper2(%s, %s, %s, color)"},
   {"connect_and_cut_helper", 	3, 3.00, "connect_and_cut_helper(%s, %s, %s)"},
   {"owl_threatens",   		2, 0.01, "owl_threatens_attack(%s,%s)"},
   {"replace",         		2, 0.0, "add_replacement_move(%s,%s)"},

@@ -493,7 +493,10 @@ enter_intrusion_source(int source_pos, int strength_pos,
                        float strength, float attenuation,
                        struct influence_data *q)
 {
-  gg_assert(q->intrusion_counter < MAX_INTRUSIONS);
+  if (q->intrusion_counter >= MAX_INTRUSIONS) {
+    DEBUG(DEBUG_INFLUENCE, "intrusion list exhausted\n");
+    return;
+  }
   q->intrusions[q->intrusion_counter].source_pos = source_pos;
   q->intrusions[q->intrusion_counter].strength_pos = strength_pos;
   q->intrusions[q->intrusion_counter].strength = strength;

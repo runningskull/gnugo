@@ -74,7 +74,7 @@
  */ 
 #define MAX_REGIONS (3*MAX_BOARD*MAX_BOARD + 1)
 
-#define MAX_INTRUSIONS (MAX_BOARD * MAX_BOARD)
+#define MAX_INTRUSIONS (2 * MAX_BOARD * MAX_BOARD)
 
 struct intrusion_data
 {

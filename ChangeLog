@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- MAX_INTRUSIONS doubled in size
+- intrusions beyond MAX_INTRUSION silently discarded
+- new connect_and_cut_helper2 autohelper macro
+- tuning
+- influence tuning
+
 3.1.29 released March 26, 2002
 
 - assymmetry in influence computation reduced
