@@ -7,6 +7,7 @@
 - MAX_INTRUSIONS doubled in size
 - intrusions beyond MAX_INTRUSION silently discarded
 - new connect_and_cut_helper2 autohelper macro
+- EXP_J_VALUE increased to 35 in shapes.c
 - tuning
 - influence tuning
 

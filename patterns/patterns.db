@@ -6154,7 +6154,7 @@ ecDO?
 
 Pattern EB1501
 
-??o??           Hane atop opponent's attachment on third line
+??oo?           Hane atop opponent's attachment on third line
 ..*..
 ..XO.
 .....
@@ -10488,6 +10488,27 @@ o.e....
 
 ; oplay_attack(*,a,b,c,d,e,e) || !oplay_defend(*,a,b,d,c,d)
 > replace(f,*)
+
+
+Pattern ED92
+# db New pattern (3.1.30)
+# See nngs1:18, where * is found as an owl defense
+
+oOXx??       don't do this!
+..OXx?
+...*.x
+.....?
+------
+
+:8,-,shape(-3)
+
+oOXx??       don't do this!
+..OAx?
+...*.x
+.....?
+------
+
+; lib(A)>2
 
 
 #####################################################################

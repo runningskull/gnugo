@@ -37,7 +37,7 @@
 #define t_VALUE 15
 
 /* Values of joseki patterns if using experimental influence. */
-#define EXP_J_VALUE 30
+#define EXP_J_VALUE 35
 #define EXP_j_VALUE 22
 #define EXP_t_VALUE 17
 

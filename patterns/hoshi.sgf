@@ -1,31 +1,15 @@
-This is GNU GO, a Go program. Contact gnugo@gnu.org, or see
-http://www.gnu.org/software/gnugo/ for more information.
-
-Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation - version 2.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License in file COPYING for more details.
-
-You should have received a copy of the GNU General Public
-License along with this program; if not, write to the Free
-Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111, USA.
-
-
 (;GM[1]FF[3]
 RU[Japanese]SZ[19]HA[0]KM[5.5]
 GN[Hoshi joseki variations]
 DT[1999-05-10]
 SY[Cgoban 1.9.5]TM[-];B[pd]C[0]
-(;B[pj];C[#kosumi tsuke for 6-9 stone games];W[qf]PL[1]
-(;B[qe]MA[mk];W[pf]MA[mk]C[S];B[nd]MA[mk]C[U]PL[2];W[ph]C[j];B[re]
-MA[lk]C[j])
+(;B[pj];C[#kosumi tsuke for 6-9 stone games];W[qf]PL[B]
+(;B[qe]MA[mk];W[pf]C[S]MA[mi]
+(;B[nd]MA[mk]C[U]PL[W];W[ph]C[j];B[re]MA[lk]C[j])
+
+(;B[tt];W[od]MA[mi];B[oc];W[nd]TR[mi];B[nc];W[pc]MA[mi];B[qc];W[pb]
+MA[mi];B[qb];W[pe]MA[mi];B[qd])
+)
 
 (;B[qh]C[j
 ]MA[nl])
@@ -195,26 +179,26 @@ MA[mg];W[od]MA[mg]C[S];B[oc]MA[mg];W[pe]MA[mg]C[U
 (;W[qc];B[qd]MA[mg])
 )
 
-(;B[pj]C[0]PL[1];B[pf]MA[ml];C[#tsuke nobi 6-9 stone games];W[pg]
+(;B[pj]C[0]PL[B];B[pf]MA[ml];C[#tsuke nobi 6-9 stone games];W[pg]
 MA[mi]C[U];B[of]MA[ml]C[U];C[#tsuke nobi 6-9 stone games])
 
 (;B[pf]MA[mi]C[j
 ];C[#tsuke nobi normal]
 (;W[pg]MA[mi]C[U]
 (;B[of]MA[mh]C[U];C[#nobi]
-(;W[qe]MA[mi]C[U];C[#w crawls];B[qd]MA[mh]C[U]PL[2]
+(;W[qe]MA[mi]C[U];C[#w crawls];B[qd]MA[mh]C[U]PL[W]
 (;W[qj]MA[nk]C[U];C[#standard joseki];B[nd]MA[mh]C[U])
 
 (;W[qh]MA[nk]C[S];C[#alternative joseki];B[nd]MA[mh]C[U
-]PL[1]
-(;W[pe]PL[2]
+]PL[B]
+(;W[pe]PL[W]
 (;B[oe]MA[mh])
 
 (;W[oe];B[od]MA[lh]C[S
 ])
 )
 
-(;B[jd]PL[1];B[jc]MA[if]PL[1]
+(;B[jd]PL[B];B[jc]MA[if]PL[B]
 C[t
 #Usually good in high handicap games (HL 2-nov-2000)
 ];B[jf]C[t
@@ -404,7 +388,7 @@ C[S];W[sg]MA[mi]C[S];B[nc]MA[mi]C[S])
 ]MA[jj];B[rb]
 C[0];W[pb]MA[kg]C[S];B[qb]C[0];W[oc]C[S]MA[kg])
 
-(;W[tt]PL[2]
+(;W[tt]PL[W]
 (;B[pj];W[ph]C[S]MA[mk])
 
 (;W[qk]C[0];B[tt];W[ph]C[S]MA[ml])
