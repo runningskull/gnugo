@@ -242,7 +242,7 @@ genmove_conservative(int *i, int *j, int color)
   int move;
   int retval;
 
-  retval = do_genmove(&move, color, 0.4);
+  retval = do_genmove(&move, color, 0.0);
 
   if (i) *i = I(move);
   if (j) *j = J(move);
@@ -407,7 +407,7 @@ do_genmove(int *move, int color, float pure_threat_value)
   if (val < 0.0 
       && fill_liberty(move, color)) {
     val = 1.0;
-    TRACE("Filling a liberty at %1m\n", move);
+    TRACE("Filling a liberty at %1m\n", *move);
     move_considered(I(*move), J(*move), val);
     time_report(1, "fill liberty", -1, -1, 1.0);
   }

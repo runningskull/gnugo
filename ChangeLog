@@ -3,6 +3,7 @@
 -------------------------------------------------------------------------
 
 
+- typo fixed (whose_moyo for whose_area) in value_territory()
 - new debug flag DEBUG_TERRITORY
 - computation of change in territory, moyo, and area in influence.c
   restructured 

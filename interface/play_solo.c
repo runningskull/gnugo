@@ -137,7 +137,7 @@ play_solo(Gameinfo *gameinfo, int moves)
 
 void 
 load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo, 
-			  const char *untilstr, int benchmark)
+			  const char *untilstr, int benchmark, int to_move)
 {
   int i, j;
   int next;
@@ -149,7 +149,9 @@ load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo,
   gameinfo_load_sgfheader(gameinfo, head); 
   sgffile_write_gameinfo(gameinfo, "load and analyze");
   next = gameinfo_play_sgftree(gameinfo, head, untilstr);
-  
+  if (to_move != EMPTY)
+    next = to_move;
+
   if (benchmark) {
     for (r = 0; r < benchmark; ++r) {
       genmove(&i, &j, next);

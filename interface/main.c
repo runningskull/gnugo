@@ -87,6 +87,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_POSITION,
       OPT_DECIDE_EYE,
+      OPT_GENMOVE,
       OPT_BRANCH_DEPTH,
       OPT_BACKFILL2_DEPTH,
       OPT_SUPERSTRING_DEPTH,
@@ -204,6 +205,7 @@ static struct gg_option const long_options[] =
   {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
   {"decide-position", no_argument,       0, OPT_DECIDE_POSITION},
   {"decide-eye",     required_argument, 0, OPT_DECIDE_EYE},
+  {"genmove",        required_argument, 0, OPT_GENMOVE},
   {"life",           no_argument,       0, OPT_LIFE},
   {"life-eyesize",   required_argument, 0, OPT_LIFE_EYESIZE},
   {"nofusekidb",     no_argument,       0, OPT_NOFUSEKIDB},
@@ -249,6 +251,7 @@ main(int argc, char *argv[])
   float komi = 0.0;
   FILE *gtp_input_FILE;
   int orientation = 0;
+  int to_move = EMPTY;
   
   int seed = 0;      /* If seed is zero, GNU Go will play a different game 
 			each time. If it is set using -r, GNU Go will play the
@@ -500,6 +503,20 @@ main(int argc, char *argv[])
 	}
 	strcpy(decide_this, gg_optarg);
 	playmode = MODE_DECIDE_EYE;
+	break;
+	
+      case OPT_GENMOVE:
+	if (strcmp(gg_optarg, "white") == 0) 
+	  to_move = WHITE;
+	else if (strcmp(gg_optarg, "black") == 0)
+	  to_move = BLACK;
+	else {
+	  fprintf(stderr, "Invalid color for genmove: %s\n", gg_optarg);
+	  fprintf(stderr, "Try `gnugo --help' for more information.\n");
+	  
+	  exit(EXIT_FAILURE);
+	}
+	playmode = MODE_LOAD_AND_ANALYZE;
 	break;
 	
       case OPT_BRANCH_DEPTH:
@@ -754,7 +771,7 @@ main(int argc, char *argv[])
       exit(EXIT_FAILURE);
     }
     load_and_analyze_sgf_file(sgftree.root, &gameinfo, untilstring,
-			      benchmark);
+			      benchmark, to_move);
     break;
     
   case MODE_LOAD_AND_SCORE:
@@ -1137,6 +1154,7 @@ Debugging Options:\n\
        --decide-dragon <dragon>  can this dragon live? (try with -o or -t)\n\
        --decide-position         evaluate all dragons (try with -o or -t)\n\
        --decide-eye <string>     evaluate the eye\n\
+       --genmove <color>         generate a move for color\n\
        --life <eyesize>          use eye reading code\n\
        --nofusekidb              turn off fuseki database\n\
        --nofuseki                turn off fuseki moves entirely\n\
