@@ -140,12 +140,10 @@ static int defend1(int str, int *move, int komaster, int kom_pos);
 static int defend2(int str, int *move, int komaster, int kom_pos);
 static int defend3(int str, int *move, int komaster, int kom_pos);
 static int defend4(int str, int *move, int komaster, int kom_pos);
-static int special_rescue(int str, int lib, int *move, 
-			  int komaster, int kom_pos,
-			  int tried[], int num_tried);
-static int special_rescue2(int str, int libs[2], int *move, 
-			   int komaster, int kom_pos,
-			   int tried[], int num_tried);
+static void special_rescue_moves(int str, int lib,
+    				 struct reading_moves *moves);
+static void special_rescue2_moves(int str, int libs[2],
+    				  struct reading_moves *moves);
 static int special_rescue3(int str, int libs[3], int *move, 
 			   int komaster, int kom_pos);
 static int special_rescue4(int str, int libs[3], int *move, 
@@ -180,7 +178,7 @@ static void break_chain2_efficient_moves(int str,
 					 struct reading_moves *moves);
 static void break_chain2_moves(int str, struct reading_moves *moves,
 			       int require_safe);
-static int break_chain2(int str, int *move, int komaster, int kom_pos);
+static void break_chain2_defense_moves(int str, struct reading_moves *moves);
 static int break_chain3(int str, int *move, int komaster, int kom_pos);
 static int superstring_breakchain(int str, int *move,
 				  int komaster, int kom_pos,
@@ -1227,9 +1225,9 @@ defend2(int str, int *move, int komaster, int kom_pos)
   int liberties2;
   int libs2[6];
   struct reading_moves moves;
+  int saved_num_moves;
   int savemove = 0;
   int savecode = 0;
-  int bc;
   int k;
   int r;
   int s;
@@ -1263,6 +1261,14 @@ defend2(int str, int *move, int komaster, int kom_pos)
   break_chain2_efficient_moves(str, &moves);
   propose_edge_moves(str, libs, liberties, &moves, color);
   edge_clamp_moves(str, &moves);
+
+  if (stackp <= depth) {
+    for (k = 0; k < liberties; k++)
+      special_rescue_moves(str, libs[k], &moves);
+  }
+
+  if (stackp <= backfill_depth)
+    special_rescue2_moves(str, libs, &moves);
 
   order_moves(str, &moves, color, read_function_name, 0);
 
@@ -1346,31 +1352,17 @@ defend2(int str, int *move, int komaster, int kom_pos)
     }
   }
 
-  if (stackp <= depth) {
-    for (k = 0; k < liberties; k++) {
-      int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos,
-				 moves.pos, moves.num);
-      CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
-			      "special rescue");
-    }
-  }
-  
-  if (stackp <= backfill_depth) {
-    int dcode = special_rescue2(str, libs, &xpos, komaster, kom_pos,
-				moves.pos, moves.num);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
-      			    "special rescue2");
-  }
-  
   if (level >= 10 && stackp <= superstring_depth) {
     int dcode = superstring_breakchain(str, &xpos, komaster, kom_pos, 4);
     CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
       			    "superstring_breakchain");
   }
 
+
   /* If nothing else works, we try playing a liberty of the
    * super_string.
    */
+  saved_num_moves = moves.num;
   if (level >= 10 && stackp <= superstring_depth) {
     int ss_liberties;
     int ss_libs[MAX_LIBERTIES + 4];
@@ -1379,28 +1371,11 @@ defend2(int str, int *move, int komaster, int kom_pos)
     for (k = 0; k < ss_liberties; k++) {
       int apos = ss_libs[k];
       
-      /* Skip if already tried */
-      for (s = 0; s < moves.num; s++)
-	if (apos == moves.pos[s])
-	  break;
-      if (s < moves.num)
-	continue;
-      
       if (liberty_of_string(apos, str))
 	continue;
-      if (trymove(apos, color, "defend2-E", str, komaster, kom_pos)) {
-	int acode;
-	/* If the newly placed stone is in atari, we give up without fight. */
-	if (countlib(apos) == 1)
-	  acode = WIN;
-	else {
-	  acode = do_attack(str, NULL, komaster, kom_pos);
-	  moves.pos[s] = apos;
-	}
-	popgo();
-	CHECK_RESULT(savecode, savemove, acode, apos, move,
-	    	     "superstring liberty");
-      }
+      /* If the newly placed would be in atari, we won't even try. */
+      if (approxlib(apos, color, 2, NULL) > 1)
+	ADD_CANDIDATE_MOVE(apos, 0, moves);
     }
     
     /* Now we are truly desperate. Try playing second order liberties of
@@ -1408,15 +1383,45 @@ defend2(int str, int *move, int komaster, int kom_pos)
      */
     for (k = 0; k < ss_liberties; k++) {
       int apos = ss_libs[k];
-      int dcode;
-	
+
       if (liberty_of_string(apos, str))
 	continue;
-      
-      dcode = special_rescue(str, apos, &xpos, komaster, kom_pos,
-			     moves.pos, moves.num);
-      CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
-			      "special rescue");
+
+      special_rescue_moves(str, apos, &moves);
+    }
+  }
+
+  break_chain2_defense_moves(str, &moves);
+
+  if (stackp <= backfill_depth) {
+    special_rescue5_moves(str, libs, &moves);
+  }
+    
+  /* Only order and test the new set of moves. */
+  order_moves(str, &moves, other, read_function_name, saved_num_moves);
+    
+  for (k = saved_num_moves; k < moves.num; k++) {
+    int new_komaster;
+    int new_kom_pos;
+    int ko_move;
+    xpos = moves.pos[k];
+    
+    if (komaster_trymove(xpos, color, "defend2-E", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
+			 &ko_move, stackp <= ko_depth && savecode == 0)) {
+      if (!ko_move) {
+	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
+	popgo();
+	CHECK_RESULT(savecode, savemove, acode, xpos, move,
+		     "defense effective - A");
+      }
+      else {
+	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	  savemove = xpos;
+	  savecode = KO_B;
+	}
+	popgo();
+      }
     }
   }
 
@@ -1424,48 +1429,9 @@ defend2(int str, int *move, int komaster, int kom_pos)
    * with 2 or 3 liberties last, because these moves often are not
    * really relevant.
    */
-  
-  bc = break_chain2(str, &xpos, komaster, kom_pos);
-  CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
-    			  "break chain2");
-
-  if (stackp <= backfill_depth) {
-    int saved_num_moves = moves.num;
-    special_rescue5_moves(str, libs, &moves);
-    
-    /* Only order and test the new set of moves. */
-    order_moves(str, &moves, other, read_function_name, saved_num_moves);
-    
-    for (k = saved_num_moves; k < moves.num; k++) {
-      int new_komaster;
-      int new_kom_pos;
-      int ko_move;
-      xpos = moves.pos[k];
-      if (is_self_atari(xpos, color))
-	continue;
-      
-      if (komaster_trymove(xpos, color, "defend2-F", str,
-			   komaster, kom_pos, &new_komaster, &new_kom_pos,
-			   &ko_move, stackp <= ko_depth && savecode == 0)) {
-	if (!ko_move) {
-	  int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
-	  popgo();
-	  CHECK_RESULT(savecode, savemove, acode, xpos, move,
-	    	       "defense effective - A");
-	}
-	else {
-	  if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
-	    savemove = xpos;
-	    savecode = KO_B;
-	  }
-	  popgo();
-	}
-      }
-    }
-  }
 
   if (stackp <= backfill2_depth) {
-    bc = break_chain3(str, &xpos, komaster, kom_pos);
+    int bc = break_chain3(str, &xpos, komaster, kom_pos);
     CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
       			    "break chain3");
   }
@@ -1491,9 +1457,9 @@ defend3(int str, int *move, int komaster, int kom_pos)
   int liberties;
   int libs[3];
   struct reading_moves moves;
+  int saved_num_moves;
   int savemove = 0;
   int savecode = 0;
-  int bc;
   int k;
 
   SETUP_TRACE_INFO("defend3", str);
@@ -1620,14 +1586,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
 #endif
   
   /* If nothing else works, try to defend with second order liberties. */
-  if (stackp <= depth) {
-    for (k = 0; k < liberties; k++) {
-      int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos,
-				 moves.pos, moves.num);
-      CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
-			      "special rescue");
-    }
-  }
 
   if (stackp <= backfill_depth) {
     int dcode = special_rescue3(str, libs, &xpos, komaster, kom_pos);
@@ -1647,6 +1605,17 @@ defend3(int str, int *move, int komaster, int kom_pos)
       			    "superstring_breakchain");
   }
 
+
+  saved_num_moves = moves.num;
+
+  if (stackp <= depth) {
+    for (k = 0; k < liberties; k++)
+      special_rescue_moves(str, libs[k], &moves);
+  }
+
+  if (stackp <= backfill2_depth)
+    break_chain2_defense_moves(str, &moves);
+
   /* If nothing else works, we try playing a liberty of the
    * super_string.
    */
@@ -1660,18 +1629,9 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	
       if (liberty_of_string(apos, str))
 	continue;
-      if (trymove(apos, color, "defend3-C", str, komaster, kom_pos)) {
-	int acode;
-	/* If the newly placed stone is in atari, we give up without fight. */
-	if (countlib(apos) == 1)
-	  acode = WIN;
-	else
-	  acode = do_attack(str, NULL, komaster, kom_pos);
-
-	popgo();
-	CHECK_RESULT(savecode, savemove, acode, apos, move,
-	  	     "superstring liberty");
-      }
+      /* If the newly placed would be in atari, we won't even try. */
+      if (approxlib(apos, color, 2, NULL) > 1)
+	ADD_CANDIDATE_MOVE(apos, 0, moves);
     }
 
     /* Now we are truly desperate. Try playing second order liberties of
@@ -1679,15 +1639,44 @@ defend3(int str, int *move, int komaster, int kom_pos)
      */
     for (k = 0; k < ss_liberties; k++) {
       int apos = ss_libs[k];
-      int dcode;
 	
       if (liberty_of_string(apos, str))
 	continue;
       
-      dcode = special_rescue(str, apos, &xpos, komaster, kom_pos,
-			     moves.pos, moves.num);
-      CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
-			      "special rescue");
+      special_rescue_moves(str, apos, &moves);
+    }
+  }
+
+  if (stackp <= backfill_depth) {
+    special_rescue5_moves(str, libs, &moves);
+    special_rescue6_moves(str, libs, &moves);
+  }
+    
+  /* Only order and test the new set of moves. */
+  order_moves(str, &moves, other, read_function_name, saved_num_moves);
+  
+  for (k = saved_num_moves; k < moves.num; k++) {
+    int new_komaster;
+    int new_kom_pos;
+    int ko_move;
+    xpos = moves.pos[k];
+    
+    if (komaster_trymove(xpos, color, "defend3-E", str,
+			 komaster, kom_pos, &new_komaster, &new_kom_pos,
+			 &ko_move, stackp <= ko_depth && savecode == 0)) {
+      if (!ko_move) {
+	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
+	popgo();
+	CHECK_RESULT(savecode, savemove, acode, xpos, move,
+		     "defense effective - A");
+      }
+      else {
+	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	  savemove = xpos;
+	  savecode = KO_B;
+	}
+	popgo();
+      }
     }
   }
 
@@ -1695,50 +1684,9 @@ defend3(int str, int *move, int komaster, int kom_pos)
    * with 2 or 3 liberties last, because these moves often are not
    * really relevant.
    */
-  if (stackp <= backfill2_depth) {
-    bc = break_chain2(str, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
-      			    "break chain2");
-  }
 
-  if (stackp <= backfill_depth) {
-    int saved_num_moves = moves.num;
-    special_rescue5_moves(str, libs, &moves);
-    special_rescue6_moves(str, libs, &moves);
-    
-    /* Only order and test the new set of moves. */
-    order_moves(str, &moves, other, read_function_name, saved_num_moves);
-    
-    for (k = saved_num_moves; k < moves.num; k++) {
-      int new_komaster;
-      int new_kom_pos;
-      int ko_move;
-      xpos = moves.pos[k];
-      if (is_self_atari(xpos, color))
-	continue;
-      
-      if (komaster_trymove(xpos, color, "defend3-E", str,
-			   komaster, kom_pos, &new_komaster, &new_kom_pos,
-			   &ko_move, stackp <= ko_depth && savecode == 0)) {
-	if (!ko_move) {
-	  int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
-	  popgo();
-	  CHECK_RESULT(savecode, savemove, acode, xpos, move,
-	    	       "defense effective - A");
-	}
-	else {
-	  if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
-	    savemove = xpos;
-	    savecode = KO_B;
-	  }
-	  popgo();
-	}
-      }
-    }
-  }
-    
   if (stackp <= backfill2_depth) {
-    bc = break_chain3(str, &xpos, komaster, kom_pos);
+    int bc = break_chain3(str, &xpos, komaster, kom_pos);
     CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
       			    "break chain3");
   }
@@ -1795,6 +1743,9 @@ defend4(int str, int *move, int komaster, int kom_pos)
   break_chain_moves(str, &moves);
   break_chain2_efficient_moves(str, &moves);
 
+  if (stackp <= backfill_depth)
+    break_chain2_defense_moves(str, &moves);
+
   order_moves(str, &moves, color, read_function_name, 0);
 
   for (k = 0; k < moves.num; k++) {
@@ -1826,11 +1777,6 @@ defend4(int str, int *move, int komaster, int kom_pos)
     }
   }
 
-  if (stackp <= backfill_depth) {
-    int bc = break_chain2(str, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
-      			    "break chain2");
-  }
 
   if (savecode != 0)
     RETURN_RESULT(savecode, savemove, move, "saved move");
@@ -1841,12 +1787,11 @@ defend4(int str, int *move, int komaster, int kom_pos)
 
 
 /*
- * special_rescue(str, lib, *move) is called with (str) a
- * string having a liberty at (lib). The saving move is returned
- * in (*move).
+ * special_rescue_moves(str, lib, *move) is called with (str) a
+ * string having a liberty at (lib).
  *
- * This checks whether a move on a second order liberty is a rescuing
- * move, e.g. in shapes like:
+ * This adds moves on a second order liberty to the list of candidate
+ * moves in the struct *moves; e.g. in shapes like:
  *
  *   .        O        O       X.XXO
  *  O.*  or  ..*  or  O.*  or  XOOXO
@@ -1859,25 +1804,17 @@ defend4(int str, int *move, int komaster, int kom_pos)
  * corresponding first order liberty.
  */
 
-static int
-special_rescue(int str, int lib, int *move, int komaster, int kom_pos,
-	       int tried[], int num_tried)
+static void
+special_rescue_moves(int str, int lib, struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int k, r;
-  int savemove = 0;
-  int savecode = 0;
+  int k;
 
   /* Loop over the four neighbours of the liberty, (lib + d). */
   for (k = 0; k < 4; k++) {
     int d = delta[k];
     if (board[lib + d] == EMPTY) {
-      for (r = 0; r < num_tried; r++)
-	if (lib + d == tried[r]) 
-	  break;
-      if (r < num_tried)
-	continue;
 
       /* Use approxlib() to test for trivial capture. */
       if (approxlib(lib, other, 3, NULL) > 2)
@@ -1887,22 +1824,9 @@ special_rescue(int str, int lib, int *move, int komaster, int kom_pos,
       if (is_self_atari(lib + d, color))
 	continue;
       
-      if (trymove(lib + d, color, "special_rescue", str, komaster, kom_pos)) {
-	int acode = do_attack(str, NULL, komaster, kom_pos);
-	popgo();
-	if (acode == 0) {
-	  *move = lib + d;
-	  return WIN;
-	}
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, lib + d);
-      }
+      ADD_CANDIDATE_MOVE(lib + d, 0, *moves);
     }
   }
-
-  if (savecode != 0)
-    *move = savemove;
-
-  return savecode;
 }
 
 
@@ -1920,23 +1844,16 @@ special_rescue(int str, int lib, int *move, int komaster, int kom_pos,
  *   ...OOX
  *   ------
  */
-static int
-special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos,
-		int tried[], int num_tried)
+static void
+special_rescue2_moves(int str, int libs[2], struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
   int newlibs[4];
   int liberties;
   int newstr;
-  int xpos;
-  struct reading_moves moves;
-  int savemove = 0;
-  int savecode = 0;
   int k, r, s;
   
-  moves.num = 0;
-
   for (r = 0; r < 2; r++) {
     /* Let alib be one of the liberties and require it to be suicide
      * for the opponent.
@@ -1952,42 +1869,15 @@ special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos,
 	liberties = findlib(newstr, 4, newlibs);
 	
 	for (s = 0; s < liberties && s < 4; s++) {
-	  ADD_CANDIDATE_MOVE(newlibs[s], 0, moves);
+	  if (!is_self_atari(newlibs[s], color))
+	    ADD_CANDIDATE_MOVE(newlibs[s], 0, *moves);
 	}
-	break_chain_moves(newstr, &moves);
-	break_chain2_efficient_moves(newstr, &moves);
-	edge_clamp_moves(newstr, &moves);
+	break_chain_moves(newstr, moves);
+	break_chain2_efficient_moves(newstr, moves);
+	edge_clamp_moves(newstr, moves);
       }
     }
   }
-
-  for (k = 0; k < moves.num; k++) {
-    xpos = moves.pos[k];
-    for (r = 0; r < num_tried; r++)
-      if (xpos == tried[r]) 
-	break;
-    if (r < num_tried) 
-      continue;
-    
-    if (!is_self_atari(xpos, color)
-	&& trymove(xpos, color, "special_rescue2", str, komaster, kom_pos)) {
-      int acode = do_attack(str, NULL, komaster, kom_pos);
-      if (acode != WIN) {
-	if (acode == 0) {
-	  popgo();
-	  *move = xpos;
-	  return WIN;
-	}
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
-      }
-      popgo();
-    }
-  }
-
-  if (savecode != 0)
-    *move = savemove;
-
-  return savecode;
 }
 
 
@@ -2218,7 +2108,8 @@ special_rescue5_moves(int str, int libs[3],
 
       liberties2 = findlib(bpos, 4, libs2);
       for (s = 0; s < liberties2; s++)
-	if (!liberty_of_string(libs2[s], str))
+	if (!liberty_of_string(libs2[s], str)
+	    && !is_self_atari(libs2[s], color))
 	  ADD_CANDIDATE_MOVE(libs2[s], 0, *moves);
 
       /* Reinforce the second order chain. */
@@ -2232,7 +2123,8 @@ special_rescue5_moves(int str, int libs[3],
 	  break_chain_moves(adjs[t], moves);
 	  
 	  findlib(adjs[t], 1, &cpos);
-	  ADD_CANDIDATE_MOVE(cpos, 0, *moves);
+	  if (!is_self_atari(cpos, color))
+	    ADD_CANDIDATE_MOVE(cpos, 0, *moves);
 	}
   
 	/* Defend against double atari in the surrounding chain early. */
@@ -2311,8 +2203,10 @@ special_rescue6_moves(int str, int libs[3], struct reading_moves *moves)
 	  continue;
 	
 	
-	ADD_CANDIDATE_MOVE(cpos + right, 0, *moves);
-	ADD_CANDIDATE_MOVE(cpos + up, 0, *moves);
+	if (!is_self_atari(cpos + right, color))
+	  ADD_CANDIDATE_MOVE(cpos + right, 0, *moves);
+	if (!is_self_atari(cpos + up, color))
+	  ADD_CANDIDATE_MOVE(cpos + up, 0, *moves);
       }
     }
   }
@@ -4616,9 +4510,18 @@ break_chain2_efficient_moves(int str, struct reading_moves *moves)
   }
 }
 
+/*
+ * (str) points to a group with two liberties. break_chain2_moves
+ * tries to defend this worm by attacking * a neighbouring worm with
+ * two liberties.
+ * This is done by playing on either of its liberties
+ * (if (require_safe) is true these are only used if they are not
+ * self-ataris), taking a neighbour out of atari or by backfilling if
+ * both liberties are self-ataris.
+ */
+
 static void
-break_chain2_moves(int str, struct reading_moves *moves,
-		   int require_safe)
+break_chain2_moves(int str, struct reading_moves *moves, int require_safe)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -4676,147 +4579,25 @@ break_chain2_moves(int str, struct reading_moves *moves,
 }
 
 /*
- * (str) points to a group. break_chain2(str, &move)
- * returns WIN if there is a string in the surrounding chain having
- * exactly two liberties whose attack leads to the rescue of
- * (str). Then (*move) points to the location of the attacking move.
- * 
- * Returns KO_A if the saving move depends on ignoring a ko threat;
- * 
- * Returns KO_B if the saving move requires making a ko threat and winning
- * the ko.
+ * (str) points to a group to be defended. 
+ * break_chain2_defense_moves is a wrapper around break_chain2_moves.
+ * It devalues all entries by 2.
+ *
+ * Rationale: Otherwise, these moves get overvalued by order_moves. In
+ * particular, if there is both a direct and a break_chain2 defense,
+ * then the latter one might be just an irrelevant intermediate forcing
+ * move. Hence, we should rather return the direct defense.
  */
 
-static int 
-break_chain2(int str, int *move, int komaster, int kom_pos)
+static void
+break_chain2_defense_moves(int str, struct reading_moves *moves)
 {
-  int color = board[str];
-  int other = OTHER_COLOR(color);
-  int v;
-  int libs[2];
-  int liberties;
-  struct reading_moves moves;
-  int savemove = 0;
-  int savecode = 0;
+  int saved_num_moves = moves->num;
+  int k;
 
-  SETUP_TRACE_INFO("break_chain2", str);
-  moves.num = 0;
-  
-  RTRACE("in break_chain2 at %1m\n", str);
-  
-  break_chain2_moves(str, &moves, 0);
-  order_moves(str, &moves, color, read_function_name, 0);
-
-  /* We do not wish to consider the move if it can be 
-   * immediately recaptured, unless stackp <= backfill_depth.
-   *
-   * With the incremental board code it's not much point in using
-   * approxlib() as heuristic whether we want to play the move. Better
-   * and more accurate to really play the move and then use findlib() to
-   * see how many liberties we obtained.
-   */
-
-  for (v = 0; v < moves.num; v++) {
-    int new_komaster;
-    int new_kom_pos;
-    int ko_move;
-
-    if (komaster_trymove(moves.pos[v], color, "break_chain2-A", str,
-			 komaster, kom_pos, &new_komaster, &new_kom_pos,
-			 &ko_move, savecode == 0 && stackp <= ko_depth)) {
-      if (ko_move) {
-	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
-	  savecode = KO_B;
-	  savemove = moves.pos[v];
-	}
-	popgo();
-	continue;
-      }
-    }
-    else
-      continue;
-
-    /* If we reach here, we have made a move, which was not a
-     * conditional ko capture.
-     */
-    liberties = findlib(moves.pos[v], 2, libs);
-    if (liberties > 1) {
-      int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
-      if (acode == 0) {
-	*move = moves.pos[v];
-	popgo();
-	SGFTRACE(moves.pos[v], 1, "attack defended-A");
-	return WIN;
-      }
-      UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, moves.pos[v]);
-    }
-    else if (stackp <= backfill_depth) {
-      int newer_komaster;
-      int newer_kom_pos;
-      int bpos = libs[0];
-      int try_harder = 0;
-
-      ASSERT1(liberties == 1, str);
-
-      if (komaster_trymove(bpos, other, "break_chain2-C", str,
-			   new_komaster, new_kom_pos,
-			   &newer_komaster, &newer_kom_pos,
-			   &ko_move, savecode == 0 && stackp <= ko_depth)) {
-	if (!ko_move) {
-	  if (countlib(bpos) <= 2)
-	    try_harder = 1;
-	  if (IS_STONE(board[str])) {
-	    int dcode = do_find_defense(str, NULL, newer_komaster,
-					newer_kom_pos);
-	    if (dcode == WIN && !try_harder) {
-	      *move = moves.pos[v];
-	      popgo();
-	      popgo();
-	      SGFTRACE(moves.pos[v], WIN, "attack defended-B");
-	      return WIN;
-	    }
-	    /* FIXME: Possibly the ko result codes are not handled
-	     * correctly in the presence of two trymove().
-	     */
-	    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove,
-					      dcode, moves.pos[v]);
-	  }
-	  popgo();
-	}
-	else {
-	  try_harder = 1;
-	  ASSERT1(IS_STONE(board[str]), str);
-	  if (do_find_defense(str, NULL, newer_komaster, newer_kom_pos) != 0) {
-	    savecode = KO_A; /* Not KO_B since we are one move deeper 
-			      * than usual. */
-	    savemove = moves.pos[v];
-	  }
-	  popgo();
-	}
-      }
-
-      if (try_harder) {
-	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
-	if (acode == 0) {
-	  *move = moves.pos[v];
-	  popgo();
-	  SGFTRACE(moves.pos[v], WIN, "attack defended-C");
-	  return WIN;
-	}
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, moves.pos[v]);
-      }
-    }
-    popgo(); /* (moves.pos[v]) */
-  }
-
-  if (savecode != 0) {
-    *move = savemove;
-    SGFTRACE(savemove, savecode, "saved move");
-    return savecode;
-  }
-
-  SGFTRACE(0, 0, NULL);
-  return 0;
+  break_chain2_moves(str, moves, !(stackp <= backfill_depth));
+  for (k = saved_num_moves; k < moves->num; k++)
+    moves->score[k] = -2;
 }
 
 

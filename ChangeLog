@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- functions special_rescue(), special_rescue2() converted to .._moves()
+- break_chain2() removed; use new function break_chain2_defense_moves()
+  instead
+- defend2() and defend3() simplified
 - more consistent use of WIN and REVERSE_RESULT() macros
 - new function sgffile_load_and_print()
 - new call convention for sgftree* functions
