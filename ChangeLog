@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new visible_along_edge() and autohelpers
+- tuning
+- eye tuning
+
 3.3.14 released January 1, 2003
 
 - life.c removed from the distribution
