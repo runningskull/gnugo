@@ -3778,8 +3778,14 @@ pattern_list_prepare(struct matched_patterns_list_data *list)
    * but it is easier to allocate more than to count real number of
    * heap elements first.
    */
-  list->pattern_heap = malloc(list->counter * sizeof(*(list->pattern_heap)));
-  gg_assert(list->pattern_heap != NULL);
+  if (list->counter > 0) { /* avoid malloc(0) */
+    list->pattern_heap = (struct matched_pattern_data**)
+	    	malloc(list->counter * sizeof(struct matched_pattern_data*));
+    gg_assert(list->pattern_heap != NULL);
+  } else {
+    /* free() has defined behaviour for NULL pointer */
+    list->pattern_heap = NULL;
+  }
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     list->first_pattern_index[pos] = -1;
