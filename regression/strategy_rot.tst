@@ -1,14 +1,6 @@
-orientation 2
-loadsgf games/incident104.sgf 63
-6 gg_genmove white
-#? [E10]*
+# last updated for gnugo 3.3.13 with #USE_BDIST=1 in owl.c
 
-orientation 4
+orientation 1
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
 #? [E17]*
-
-orientation 1
-loadsgf games/strategy11.sgf 127
-45 gg_genmove black
-#? [G17|G18|C1]*

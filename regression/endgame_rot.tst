@@ -1,4 +1,2 @@
-orientation 1
-loadsgf games/endgame1.sgf 1
-101 gg_genmove black
-#? [F9]*
+# last updated for gnugo 3.3.13 with #USE_BDIST=1 in owl.c
+# No orientation problems

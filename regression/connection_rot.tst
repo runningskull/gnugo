@@ -1,4 +1,2 @@
-orientation 1
-loadsgf games/incident169.sgf 110
-25 disconnect L14 M12
-#? [1 L13]*
+# last updated for gnugo 3.3.13 with #USE_BDIST=1 in owl.c
+# No orientation problems

@@ -96,7 +96,8 @@ TST = 13x13.tst arb.tst arend.tst arend2.tst arion.tst atari_atari.tst \
        semeai2.tst strategy.tst strategy2.tst strategy3.tst \
        strategy4.tst strategy5.tst strategy_rot.tst \
        tactics.tst tactics1.tst trevor.tst trevora.tst \
-       trevorb.tst trevorc.tst trevord.tst vie.tst viking.tst
+       trevorb.tst trevorc.tst trevord.tst vie.tst viking.tst \
+       semeai_rot.tst
 
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
@@ -428,6 +429,9 @@ score_rot: score_rot.tst
 
 semeai: semeai.tst
 	$(srcdir)/eval.sh semeai.tst $(GG_OPTIONS)
+
+semeai_rot: semeai_rot.tst
+	$(srcdir)/eval.sh semeai_rot.tst $(GG_OPTIONS)
 
 semeai2: semeai2.tst
 	$(srcdir)/eval.sh semeai2.tst $(GG_OPTIONS)
