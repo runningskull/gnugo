@@ -123,11 +123,13 @@ aftermath_genmove(int *aftermath_move, int color,
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (!ON_BOARD(pos))
       continue;
-    else if (board[pos] == color && worm[pos].unconditional_status == ALIVE)
+    else if (board[pos] == color && worm[pos].invincible)
       distance[pos] = 0;
     else if (!do_capture_dead_stones
-	     && board[pos] == other 
-	     && worm[pos].unconditional_status == DEAD)
+	     && ((board[pos] == other 
+		  && worm[pos].unconditional_status == DEAD)
+		 || (board[pos] == color
+		     && worm[pos].unconditional_status == ALIVE)))
       distance[pos] = 0;
     else
       distance[pos] = -1;
