@@ -107,10 +107,11 @@ Pogonyshev, S.P. Lee and Stephane Nicolet.
 @node Thanks
 @section Thanks
 
-We would like to thank Arthur Britto, Tim Hunt, Piotr Lakomy, Paul Leonard,
-Jean-Louis Martineau, Andreas Roever and Pierce Wetter for helpful
-correspondence. Thanks to everyone who stepped on a bug (and sent us a
-report)!
+We would like to thank Arthur Britto, David Doshay, Martin Holters, Tim Hunt,
+Matthias Krings, Piotr Lakomy, Paul Leonard, Jean-Louis Martineau, Andreas
+Roever and Pierce Wetter for helpful correspondence. 
+
+Thanks to everyone who stepped on a bug (and sent us a report)!
 
 Thanks to Gary Boos, Peter Gucwa, Martijn van der Kooij, Michael
 Margolis, Trevor Morris, M@aa{}ns Ullerstam, Don Wagner and Yin Zheng for help
