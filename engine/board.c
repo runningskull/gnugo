@@ -494,6 +494,7 @@ static Hash_data board_hash_stack[MAXSTACK];
 int 
 trymove(int pos, int color, const char *message, int str)
 {
+  UNUSED(str);
   /* Do the real work elsewhere. */
   if (!do_trymove(pos, color, 0))
     return 0;
@@ -524,7 +525,7 @@ trymove(int pos, int color, const char *message, int str)
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %s)", 
-		    message, location_to_string(str), count_variations,
+		    message, location_to_string(pos), count_variations,
 		    hashdata_to_string(&board_hash));
     }
     sgftreeAddPlayLast(sgf_dumptree, color, I(pos), J(pos));
