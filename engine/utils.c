@@ -462,12 +462,6 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
   int ypos;
   int zpos;
 
-  /* FIXME: very pessimistic approach if connections module not
-   * included. */
-  if (!experimental_connections) {
-    return do_connect;
-  }
-
   va_start(ap, num_moves);
 
   /* Do all the moves with alternating colors. */

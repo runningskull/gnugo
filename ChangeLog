@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- dragon field in struct eye_data removed
+- new function find_eye_dragons() in optics.c
+- dragon_invincible() and genus computation in make_dragons() revised
+- play_connect_n() uses string_connect() and disconnect()
+  unconditionally, no longer contingent on experimental_connections
+- default value for experimental_connections reset to 0
 - new command line option --decide-dragon-data
 - consistency checking of replacement patterns reenabled for unstable line
 - tuning

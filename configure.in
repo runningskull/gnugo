@@ -414,10 +414,10 @@ dnl ------------ Connections -------------------
 AH_TEMPLATE([EXPERIMENTAL_CONNECTIONS],
 [Connection module. Default standard.])
 
-if test "$enable_experimental_connections" = "no" ; then
-   AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 0)
-else
+if test "$enable_experimental_connections" = "yes" ; then
    AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 1)
+else
+   AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 0)
 fi
 
 dnl ------------ Connections -------------------
