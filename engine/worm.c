@@ -240,7 +240,9 @@ make_worms(int save_verbose)
   gg_assert(stackp == 0);
 
   /* We try first to resolve small semeais. */
+#if 0
   small_semeai(save_verbose);
+#endif
   gg_assert(stackp == 0);
 
   /* Now we try to improve the values of worm.attack and worm.defend.
