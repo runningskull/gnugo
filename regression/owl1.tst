@@ -74,16 +74,29 @@ loadsgf games/owl39a.sgf
 
 # GNU Go tries to "eat lunch" at B1 instead of recognizing this as seki.
 loadsgf games/owl40.sgf
-277 owl_defend A3
+279 owl_defend A3
 #? [1 PASS]*
 
 loadsgf games/nngs/gnugo-3.3.8-Joorin-200209251541.sgf 169
-278 owl_attack E6
+280 owl_attack E6
 #? [1 F4]
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209170730.sgf 227
-279 owl_attack O19
+281 owl_attack O19
 #? [1 O12]
+
+# Not sure whether there is a defense, but J9 certainly can be attacked.
+loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 77
+282 owl_attack J9
+#? [1 .*]
+
+loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 231
+283 owl_defend J9
+#? [0]
+
+loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 241
+284 owl_defend J9
+#? [1 (M7|H7)]
 
 ########### end of tests #####################
 
