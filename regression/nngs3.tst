@@ -482,9 +482,6 @@ loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 232
 1030 gg_genmove black
 #? [P12|Q12]*
 
-
-
-
 # gnugo-3.2-merlin-200205071828.sgf problems:
 
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 40
@@ -520,5 +517,18 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 224
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 244
 1100 gg_genmove white
 #? [!N9]*
+
+
+loadsgf games/nngs/gnugo-3.3.8-evand-200209122040.sgf 38
+1110 gg_genmove white
+#? [B7]
+
+loadsgf games/nngs/gnugo-3.3.8-evand-200209130704.sgf 160
+1120 gg_genmove white
+#? [!T7]
+
+loadsgf games/nngs/gnugo-3.3.8-evand-200209130704.sgf 162
+1130 gg_genmove white
+#? [S7]
 
 
