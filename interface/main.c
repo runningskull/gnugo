@@ -74,6 +74,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_OUTFILE, 
       OPT_QUIET,
       OPT_GTP_INPUT,
+      OPT_GTP_DUMP_COMMANDS,
       OPT_GTP_INITIAL_ORIENTATION,
       OPT_GTP_VERSION,
       OPT_SHOWCOPYRIGHT,
@@ -186,6 +187,7 @@ static struct gg_option const long_options[] =
   {"quiet",          no_argument,       0, OPT_QUIET},
   {"silent",         no_argument,       0, OPT_QUIET},
   {"gtp-input",      required_argument, 0, OPT_GTP_INPUT},
+  {"gtp-dump-commands", required_argument, 0, OPT_GTP_DUMP_COMMANDS},
   {"orientation",    required_argument, 0, OPT_GTP_INITIAL_ORIENTATION},
   {"gtp-initial-orientation",
   		     required_argument, 0, OPT_GTP_INITIAL_ORIENTATION},
@@ -304,6 +306,7 @@ main(int argc, char *argv[])
   char *outfile = NULL;
   char *outflags = NULL;
   char *gtpfile = NULL;
+  char *gtp_dump_commands_file = NULL;
   
   char *printsgffile = NULL;
   
@@ -312,7 +315,9 @@ main(int argc, char *argv[])
   char debuginfluence_move[4] = "\0";
   
   int benchmark = 0;  /* benchmarking mode (-b) */
-  FILE *gtp_input_FILE, *output_check;
+  FILE *gtp_input_FILE;
+  FILE *gtp_dump_commands_FILE = NULL;
+  FILE *output_check;
   int orientation = 0;
 
   float memory = (float) DEFAULT_MEMORY; /* Megabytes used for hash table. */
@@ -437,6 +442,10 @@ main(int argc, char *argv[])
 	
       case OPT_GTP_INPUT:
 	gtpfile = gg_optarg;
+	break;
+	
+      case OPT_GTP_DUMP_COMMANDS:
+	gtp_dump_commands_file = gg_optarg;
 	break;
 	
       case OPT_GTP_INITIAL_ORIENTATION:
@@ -1333,7 +1342,16 @@ main(int argc, char *argv[])
     else
       gtp_input_FILE = stdin;
 
-    play_gtp(gtp_input_FILE, orientation);
+    if (gtp_dump_commands_file != NULL) {
+      gtp_dump_commands_FILE = fopen(gtp_dump_commands_file, "w");
+      if (gtp_dump_commands_FILE == NULL) {
+	fprintf(stderr, "gnugo: Cannot open file %s\n",
+		gtp_dump_commands_file);
+	return EXIT_FAILURE;
+      } 
+    }
+
+    play_gtp(gtp_input_FILE, gtp_dump_commands_FILE, orientation);
     break;
 
   case MODE_ASCII_EMACS:  
@@ -1507,6 +1525,7 @@ Debugging Options:\n\
    --replay <color>              replay game. Use with -o.\n\
    --showscore                   print estimated score\n\
    -r, --seed number             set random number seed\n\
+   --gtp-dump-commands <file>    dump commands received in GTP mode\n\
 "
 #define USAGE_DEBUG2 "\
        --decide-string <string>  can this string live? (try with -o)\n\

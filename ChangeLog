@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new option --gtp-dump-commands to dump all incoming GTP commands to file
 - new function and autohelper owl_lunch()
 - lunches_are_current field no longer reset in owl_safe_move()
 - don't claim levels higher than 10 are unsupported

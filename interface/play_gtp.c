@@ -332,7 +332,7 @@ static struct gtp_command commands[] = {
 
 /* Start playing using the Go Text Protocol. */
 void
-play_gtp(FILE *gtp_input, int gtp_initial_orientation)
+play_gtp(FILE *gtp_input, FILE *gtp_dump_commands, int gtp_initial_orientation)
 {
   /* Make sure stdout is unbuffered. (Line buffering is also okay but
    * not necessary. Block buffering breaks GTP mode.)
@@ -349,7 +349,7 @@ play_gtp(FILE *gtp_input, int gtp_initial_orientation)
   
   /* Prepare pattern matcher and reading code. */
   reset_engine();
-  gtp_main_loop(commands, gtp_input);
+  gtp_main_loop(commands, gtp_input, gtp_dump_commands);
 }
 
 

@@ -64,7 +64,8 @@ struct gtp_command {
   gtp_fn_ptr function;
 };
 
-void gtp_main_loop(struct gtp_command commands[], FILE *gtp_input);
+void gtp_main_loop(struct gtp_command commands[], FILE *gtp_input,
+		   FILE *gtp_dump_commands);
 void gtp_internal_set_boardsize(int size);
 void gtp_set_vertex_transform_hooks(gtp_transform_ptr in,
 				    gtp_transform_ptr out);
