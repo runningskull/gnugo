@@ -272,6 +272,32 @@ loadsgf games/reading41.sgf 130
 54 analyze_semeai B16 C19
 #? [1 2 A16]
 
+#Test 55-60 for nakade moves during semeai
+loadsgf games/test3win.sgf
+55 analyze_semeai F4 F7
+#? [1 1 H6]
+
+loadsgf games/test3lose.sgf
+56 analyze_semeai F4 F7
+#? [0 0 PASS]
+
+loadsgf games/test4win.sgf
+57 analyze_semeai C5 H6
+#? [1 1 J4]
+
+loadsgf games/test4lose.sgf
+58 analyze_semeai F5 H6
+#? [0 0 PASS]
+
+loadsgf games/test5win.sgf
+59 analyze_semeai B7 E6
+#? [1 1 J4]
+
+loadsgf games/test5lose.sgf
+60 analyze_semeai C8 E6
+#? [0 0 PASS]
+
+
 
 ########### end of semeai tests #################
 
