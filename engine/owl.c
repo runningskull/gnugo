@@ -3592,6 +3592,9 @@ close_pattern_list(int color, struct matched_patterns_list_data *list)
       sgf_dumptree = NULL;
       count_variations = 0;
 
+      if (!current_owl_data->lunches_are_current)
+	owl_find_lunches(current_owl_data);
+
       if (!list->pattern_heap)
 	pattern_list_build_heap(list);
 
