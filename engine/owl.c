@@ -6568,6 +6568,18 @@ get_owl_node_counter()
 }
 
 
+/* Change the owl node limit and sets it to new_limit
+ * Use *old_value to get the previous (old) limit
+ */  
+void
+change_owl_node_limit(int new_limit, int *old_value)
+{
+  if (old_value)
+    *old_value = owl_node_limit;
+  owl_node_limit = new_limit;
+}
+
+
 /*
  * Local Variables:
  * tab-width: 8

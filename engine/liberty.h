@@ -723,7 +723,7 @@ extern int alternate_connections;    /* use alternate connection module */
 extern int owl_threats;              /* compute owl threats */
 extern int experimental_break_in;    /* use experimental module breakin.c */
 extern int cosmic_gnugo;             /* use center oriented influence */
-
+extern int large_scale;              /* seek large scale captures */
 
 extern int thrashing_dragon;        /* Dead opponent's dragon trying to live */
 extern char thrashing_stone[BOARDMAX];        /* All thrashing stones. */

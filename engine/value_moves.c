@@ -388,7 +388,183 @@ do_find_more_owl_attack_and_defense_moves(int color, int pos,
 }
 
 
-/* Test certain moves to see whether they (too) can owl attack or
+/* Test all the moves to see whether they can owl-attack on
+ * a large scale . Tested moves are
+ * 1. Moves that already have a move reason. 
+ * 2. Are not too far away from a small critical dragon (<= 6 stones). 
+ *    The distance used is the Manhatan distance, and the maximum 
+ *    distance is currently 3.
+ */
+static void
+find_large_scale_owl_attack_moves(int color)
+{
+  int pos;
+  int target;
+  int x, y;
+  int dx, dy;
+  int N = 0; /* number of critical dragons found */
+  int k;
+  int unstable_dragons[MAX_WORMS];
+  int x_min_dragon[MAX_WORMS];
+  int x_max_dragon[MAX_WORMS];
+  int y_min_dragon[MAX_WORMS];
+  int y_max_dragon[MAX_WORMS];
+  int maximum_distance = 3;  /* maximum Manhatan distance tried */
+  int dist;
+  int other= OTHER_COLOR(color);
+  
+  if (debug & DEBUG_LARGE_SCALE)
+    gprintf("\nTrying to find large scale attack moves.\n");
+    
+  /* Identify the unstable dragons and store them in a list. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (IS_STONE(board[pos]) 
+        && dragon[pos].origin == pos
+        && board[pos] == other) 
+      if (dragon[pos].status == CRITICAL
+	  || DRAGON2(pos).owl_status == CRITICAL) {
+    	
+	unstable_dragons[N] = pos;
+	
+	if (debug & DEBUG_LARGE_SCALE)
+	  gprintf("Small critical dragon found at %1m\n", pos);
+	
+	/* Find the physical extension of the dragon, and remember it */
+	/* FIXME : probably there should be a better place to calculate
+	   them, maybe a new field in the dragon2 array ? */
+	x = I(pos);
+	y = J(pos);
+	x_min_dragon[N] = x_max_dragon[N] = x;
+	y_min_dragon[N] = y_max_dragon[N] = y;
+	for (dx = 0; dx < board_size; dx++)
+	  for (dy = 0; dy < board_size; dy++) {
+	    
+	    if (ON_BOARD2(dx, dy) 
+		&& is_same_dragon(pos, POS(dx, dy))) {
+	      if (dx < x_min_dragon[N]) 
+		x_min_dragon[N] = dx;
+	      if (dx > x_max_dragon[N]) 
+		x_max_dragon[N] = dx;
+	      if (dy < y_min_dragon[N]) 
+		y_min_dragon[N] = dy;
+	      if (dy > y_max_dragon[N]) 
+		y_max_dragon[N] = dy;
+	    }
+	  }
+	N++;
+      }
+  }
+  
+  /* For each unstable dragon, try to find large scale attacks.
+     We do this by first trying to find attacks at dist = 0, then
+     dist = 1, etc., up to maximum_distance */
+  for (k = 0; k < N; k++)
+    for (dist = 0; dist <= maximum_distance; dist++)
+      for (x = x_min_dragon[k]-dist; x <= x_max_dragon[k]+dist; x++)
+        for (y = y_min_dragon[k]-dist; y <= y_max_dragon[k]+dist; y++) {
+          target = unstable_dragons[k];
+          pos = POS(x,y);
+          
+          if (ON_BOARD2(x,y) && ON_BOARD1(pos) && (board[pos] == EMPTY)) {
+            int a, b;
+            a = abs(x - x_min_dragon[k]);
+            b = abs(x - x_max_dragon[k]);
+            dx = gg_min(a,b);
+            a = abs(y - y_min_dragon[k]);
+            b = abs(y - y_max_dragon[k]);
+            dy = gg_min(a, b);
+	    
+            if (gg_max(dx, dy) == dist) { /* maximum Manhatan distance */
+              int has_move_reasons = 0;
+              int worth_trying = 0;
+	      
+              /* See if that move has other move reasons */
+              has_move_reasons = 0;
+              for (a = 0; a < MAX_REASONS; a++) {
+                int r = move[pos].reason[a];
+                if (r < 0)
+                  break;
+		
+                has_move_reasons = 1;
+	      }
+              
+              
+              /* We try all large scale attacks on small dragons (and 
+                 only moves with other move reason) */
+              if (board[target] == other)
+                worth_trying = ((dragon[target].size <= 6) 
+                                && has_move_reasons);
+	      
+              if (worth_trying) {
+		int owl_nodes_before;
+		int owl_nodes_used;
+		int old_node_limit;
+		int new_node_limit;
+		
+                if (debug & DEBUG_LARGE_SCALE)
+                  gprintf("Trying large scale move %1m on %1m\n", pos, target);
+		
+	        /* To avoid horizon effects, we temporarily increase 
+	         * the depth values to find the large scale attacks. */
+                increase_depth_values(); 
+		
+                /* To reduce the amount of aji allowed for large scale
+                 * attacks, we reduce the owl limit to 350 nodes for
+                 * attacks at distance <= 1, and 150 nodes for attacks at
+                 * distance >= 2     
+                 */
+                if (dist <= 1)
+                  new_node_limit = gg_min(350, owl_node_limit);
+                else
+                  new_node_limit = gg_min(150, owl_node_limit);
+                change_owl_node_limit(new_node_limit, &old_node_limit); 
+                
+                /* Try large scale killing moves on opponent's stones */
+                owl_nodes_before = get_owl_node_counter(); 
+                if (board[target] == other
+		    && !owl_attack_move_reason_known(pos, target)) {
+                  int kworm = NO_MOVE;
+                  int acode;
+		  int save_verbose = verbose;
+		  if (verbose > 0) verbose--;
+
+		  acode = owl_does_attack(pos, target, &kworm);
+                  
+                  owl_nodes_used = get_owl_node_counter() - owl_nodes_before;
+                  
+                  if ((acode >= DRAGON2(target).owl_attack_code) &&
+		      (acode == WIN)) {
+                    if (acode == GAIN)
+                      add_gain_move(pos, target, kworm);
+                    else
+                      add_owl_attack_move(pos, target, kworm, acode);
+                    if (debug & DEBUG_LARGE_SCALE)
+		      gprintf("Move at %1m owl-attacks %1m on a large scale(%r).\n", 
+			      pos, target, acode);
+                  }
+                  else if (debug & DEBUG_LARGE_SCALE)
+                    gprintf("Move at %1m isn't a clean large scale attack on %1m (%r).\n", pos, target, acode);
+                  
+                  if (debug & DEBUG_LARGE_SCALE)
+		    gprintf("  owl nodes used = %d, dist = %d\n", 
+			    owl_nodes_used, dist);
+		  verbose = save_verbose;
+                }
+                
+                /* Restore owl node limit */
+                change_owl_node_limit(old_node_limit, NULL);
+		
+                /* Restore the depth values */
+                decrease_depth_values(); 
+		
+	      }
+	    }
+	  }
+	}	
+}
+
+
+/* Test certain moves to see whether they (too) can owl-attack or
  * defend an owl critical dragon. Tested moves are
  * 1. Strategical attacks or defenses for the dragon.
  * 2. Vital eye points for the dragon.
@@ -1902,7 +2078,9 @@ estimate_territorial_value(int pos, int color, float our_score,
 	  && dragon[aa].size == worm[aa].size
 	  && worm[aa].attack_codes[0] == WIN
 	  && attack_move_reason_known(pos, aa) != WIN) {
-	this_value = 0.05 * (2 * worm[aa].effective_size);
+	if (large_scale)
+	  this_value = (2.0 + 0.05 * (2 * worm[aa].effective_size));
+	else this_value = 0.05 * (2 * worm[aa].effective_size);
 	TRACE("  %1m: -%f - suspected ineffective owl attack of worm %1m\n",
 	      pos, this_value, aa);
 	tot_value -= this_value;
@@ -3368,6 +3546,12 @@ review_move_reasons(int *the_move, float *val, int color,
   find_more_attack_and_defense_moves(color);
   time_report(2, "  find_more_attack_and_defense_moves", NO_MOVE, 1.0);
 
+  if (large_scale && level >= 6) {
+    find_large_scale_owl_attack_moves(color);
+    time_report(2, "  find_large_scale_owl_attack_moves", NO_MOVE, 1.0);
+  }
+
+  reading_cache_clear();
   if (level >= 6) {
     find_more_owl_attack_and_defense_moves(color);
     time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);

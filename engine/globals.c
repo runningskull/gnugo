@@ -124,6 +124,7 @@ int cosmic_gnugo = COSMIC_GNUGO;
 int capture_all_dead    = 0;    /* capture all dead opponent stones */
 int play_out_aftermath  = 0;    /* make everything unconditionally settled */
 int resign_allowed      = 0;    /* resign hopeless games */
+int large_scale         = 0;    /* search for large scale owl moves */
 
 int play_mirror_go      = 0;    /* try to play mirror go if possible */
 int mirror_stones_limit = -1;   /* but stop at this number of stones */

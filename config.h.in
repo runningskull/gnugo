@@ -130,6 +130,9 @@
 /* Break-in module. Enabled by default. */
 #undef USE_BREAK_IN
 
+/* Large scale captures. Disabled by default. */
+#undef LARGE_SCALE
+
 /* Version number of package */
 #undef VERSION
 

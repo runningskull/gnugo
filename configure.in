@@ -103,6 +103,10 @@ AC_ARG_ENABLE(cosmic-gnugo,
  [  --enable-cosmic-gnugo              use center-oriented influence code
   --disable-cosmic-gnugo             use standard influence code (default)])
 
+AC_ARG_ENABLE(large-scale,
+ [  --enable-large-scale               look for large scale captures
+  --disable-large-scale              don't seek large scale captures (default)])
+
 AC_ARG_ENABLE(experimental-connections,
  [  --enable-experimental-connections  use experimental connection analysis 
                                          (default)
@@ -449,7 +453,7 @@ else
    AC_DEFINE(EXPERIMENTAL_READING, 0)
 fi
 
-dnl ------------ Reading -------------------
+dnl ------------ Cosmic Consciousness -------------------
 
 AH_TEMPLATE([COSMIC_GNUGO],
 [Center oriented influence. Disabled by default.])
@@ -458,6 +462,17 @@ if test "$enable_cosmic_gnugo" = "yes" ; then
    AC_DEFINE(COSMIC_GNUGO, 1)
 else
    AC_DEFINE(COSMIC_GNUGO, 0)
+fi
+
+dnl ------------ Large Scale -------------------
+
+AH_TEMPLATE([LARGE_SCALE],
+[Large Scale Captures. Disabled by default.])
+
+if test "$enable_large_scale" = "yes" ; then
+   AC_DEFINE(LARGE_SCALE, 1)
+else
+   AC_DEFINE(LARGE_SCALE, 0)
 fi
 
 dnl ------------ Connections -------------------

@@ -152,6 +152,7 @@ struct owl_cache {
   int cpos;  /* third input coordinate */
   int result;
   int result_certain;
+  int owl_node_limit; 
   int move;  /* first result coordinate */
   int move2;  /* second result coordinate */
 };
@@ -1443,6 +1444,8 @@ search_persistent_owl_cache(enum routine_id routine,
 	&& persistent_owl_cache[k].apos == apos
 	&& persistent_owl_cache[k].bpos == bpos
 	&& persistent_owl_cache[k].cpos == cpos
+	&& ((persistent_owl_cache[k].owl_node_limit >= owl_node_limit)
+	    || persistent_owl_cache[k].result_certain)
 	&& verify_stored_board(persistent_owl_cache[k].board)) {
       *result = persistent_owl_cache[k].result;
       if (move)
@@ -1493,6 +1496,8 @@ store_persistent_owl_cache(enum routine_id routine,
   persistent_owl_cache[persistent_owl_cache_size].cpos	     	 = cpos;
   persistent_owl_cache[persistent_owl_cache_size].result     	 = result;
   persistent_owl_cache[persistent_owl_cache_size].result_certain = certain;
+  persistent_owl_cache[persistent_owl_cache_size].owl_node_limit = 
+    owl_node_limit;
   persistent_owl_cache[persistent_owl_cache_size].move	         = move;
   persistent_owl_cache[persistent_owl_cache_size].move2	         = move2;
   persistent_owl_cache[persistent_owl_cache_size].tactical_nodes =
@@ -1617,6 +1622,8 @@ print_persistent_owl_cache_entry(int k)
   gprintf("%o(bpos)          = %1m\n", entry->bpos);
   gprintf("%o(cpos)          = %1m\n", entry->cpos);
   gprintf("%oresult          = %d\n",  entry->result);
+  gprintf("%oresult_certain  = %d\n",  entry->result_certain);
+  gprintf("%oowl_node_limit  = %d\n",  entry->owl_node_limit);
   gprintf("%o(move)          = %1m\n", entry->move);
   gprintf("%o(move2)         = %1m\n", entry->move2);
   

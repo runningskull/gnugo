@@ -97,6 +97,8 @@ enum {OPT_BOARDSIZE=127,
       OPT_WITHOUT_BREAK_IN,
       OPT_COSMIC_GNUGO,
       OPT_NO_COSMIC_GNUGO,
+      OPT_LARGE_SCALE,
+      OPT_NO_LARGE_SCALE,
       OPT_OPTIONS,
       OPT_STANDARD_SEMEAI,
       OPT_STANDARD_CONNECTIONS,
@@ -245,6 +247,8 @@ static struct gg_option const long_options[] =
   {"without-break-in",  no_argument, 0, OPT_WITHOUT_BREAK_IN},
   {"cosmic-gnugo",   no_argument, 0, OPT_COSMIC_GNUGO},
   {"no-cosmic-gnugo",   no_argument, 0, OPT_NO_COSMIC_GNUGO},
+  {"large-scale",    no_argument, 0, OPT_LARGE_SCALE},
+  {"no-large-scale",    no_argument, 0, OPT_NO_LARGE_SCALE},
   {"options",        no_argument, 0, OPT_OPTIONS},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
@@ -365,6 +369,7 @@ main(int argc, char *argv[])
   experimental_semeai = EXPERIMENTAL_SEMEAI;
   experimental_connections = EXPERIMENTAL_CONNECTIONS;
   cosmic_gnugo = COSMIC_GNUGO;
+  large_scale = LARGE_SCALE;
 
   allow_suicide = 0;
   capture_all_dead = 0;
@@ -468,6 +473,9 @@ main(int argc, char *argv[])
 	if (COSMIC_GNUGO)
 	  fprintf(stderr,
 		  "configure option enabled: cosmic GNU Go \n");
+	if (LARGE_SCALE)
+	  fprintf(stderr,
+		  "configure option enabled: large scale captures \n");
 	if (EXPERIMENTAL_CONNECTIONS)
 	  fprintf(stderr,
 		  "configure option enabled: experimental connections\n");
@@ -598,6 +606,14 @@ main(int argc, char *argv[])
 
       case OPT_NO_COSMIC_GNUGO:
 	cosmic_gnugo = 0;
+	break;
+
+      case OPT_LARGE_SCALE:
+	large_scale = 1;
+	break;
+
+      case OPT_NO_LARGE_SCALE:
+	large_scale = 0;
 	break;
 
       case OPT_ALLOW_SUICIDE:
@@ -1452,6 +1468,8 @@ Experimental options:\n\
    --without-break-in      do not use the break-in code\n\
    --cosmic-gnugo          use center oriented influence\n\
    --no-cosmic-gnugo       don't use center oriented influence\n\
+   --large-scale           look for large scale captures\n\
+   --no-large-scape        don't seek large scale captures\n\
    --nofusekidb            turn off fuseki database\n\
    --nofuseki              turn off fuseki moves entirely\n\
    --nojosekidb            turn off joseki database\n\
@@ -1580,6 +1598,7 @@ DEBUG_OWL_PERSISTENT_CACHE  0X200000\n\
 DEBUG_TOP_MOVES             0x400000\n\
 DEBUG_MISCELLANEOUS         0x800000\n\
 DEBUG_ORACLE_STREAM         0x1000000\n\
+DEBUG_LARGE_SCALE           0x1000000\n\
 "
 
 /*

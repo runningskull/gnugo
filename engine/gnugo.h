@@ -188,6 +188,7 @@ extern int output_flags;       /* amount of output to outfile */
 #define DEBUG_TOP_MOVES             0x400000
 #define DEBUG_MISCELLANEOUS         0x800000
 #define DEBUG_ORACLE_STREAM         0x1000000
+#define DEBUG_LARGE_SCALE           0x1000000
 
 /* hash flag bits 
  *
@@ -339,6 +340,8 @@ void reset_reading_node_counter(void);
 int get_reading_node_counter(void);
 void reset_connection_node_counter(void);
 int get_connection_node_counter(void);
+void change_owl_node_limit(int new_limit, int *old_value);
+
 
 
 /* ================================================================ */

@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new configure and runtime option large-scale
+- new change_owl_nodes()
+- gprintf supports %r
 - cleanup of patterns/*.sgf
 - revision of dragon_invincible()
 - default to quiet unless in ASCII playing mode
