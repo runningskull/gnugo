@@ -428,21 +428,27 @@ string font_filename = "";
 
 int main(int argc, array(string) argv)
 {
+    if (argc != 2) {
+	werror("Usage: %s TEST-FILE:TEST-NUMBER\n", basename(argv[0]));
+	return 1;
+    }
+
     if (!find_font())
 	return 1;
-    
+
     SimpleGtp engine = SimpleGtp("../interface/gnugo --quiet --mode gtp -w -t -d0x101840" / " ");
     if (!engine)
     {
 	werror("Failed to start engine.");
 	return 1;
     }
-    
+
     GTK.setup_gtk(argv);
     Controller controller = Controller(engine, argv[1]);
-    
-    return -1;
 
+    GTK.main();
+
+    return 0;
 }
 
 array(string) recursive_find_files(string dir, string suffix)
@@ -1275,6 +1281,8 @@ class Controller
     // testcase correctly.
     array(string) complete_testcase;
 
+    static mixed nasty_signal_id;
+
     static void create(SimpleGtp engine_, string testcase)
     {
 	if (!excerpt_testcase(testcase, engine_))
@@ -1325,8 +1333,8 @@ class Controller
 	}
 
 	main_window->set_title(testcase);
-	main_window->signal_connect("destroy", exit, 0);
-	
+	main_window->signal_connect_new("destroy", quit);
+
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove"))
 	{
@@ -1557,7 +1565,8 @@ class Controller
 	controller_notebook->append_page(engines_page->set_border_width(12),
 					 GTK.Label("engines"));
 
-	controller_notebook->signal_connect_new("switch_page", add_markup);
+	nasty_signal_id = controller_notebook->signal_connect_new("switch_page",
+								  add_markup);
 
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove")) {
@@ -1623,7 +1632,7 @@ class Controller
 	}
 	else {
 	    GTK.Widget board_window = GTK.Window(GTK.WindowToplevel);
-	    board_window->signal_connect("destroy", exit, 0);
+	    board_window->signal_connect_new("destroy", quit);
 
 	    board_window->add(viewer->goban_widget);
 	    board_window->set_title(testcase_name);
@@ -1918,6 +1927,13 @@ class Controller
     void debug_callback(mixed ... args)
     {
 	write("Debug callback:%O\n", args);
+    }
+
+    static void quit()
+    {
+	// Otherwise Pike errors occur.
+	controller_notebook->signal_disconnect(nasty_signal_id);
+	GTK.main_quit();
     }
 }
 
