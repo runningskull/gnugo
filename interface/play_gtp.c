@@ -130,6 +130,7 @@ DECLARE(gtp_set_orientation);
 DECLARE(gtp_set_komi);
 DECLARE(gtp_set_level);
 DECLARE(gtp_showboard);
+DECLARE(gtp_top_moves);
 DECLARE(gtp_top_moves_white);
 DECLARE(gtp_top_moves_black);
 DECLARE(gtp_trymove);
@@ -202,6 +203,7 @@ static struct gtp_command commands[] = {
   {"reset_trymove_counter",   gtp_reset_trymove_counter},
   {"same_dragon",    	      gtp_same_dragon},
   {"showboard",        	      gtp_showboard},
+  {"top_moves",               gtp_top_moves},
   {"top_moves_black",         gtp_top_moves_black},
   {"top_moves_white",         gtp_top_moves_white},
   {"trymove",          	      gtp_trymove},
@@ -1252,6 +1254,30 @@ gtp_genmove(char *s, int id)
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_vertex(i, j);
   return gtp_finish_response();
+}
+
+/* Function : Generate a list of the best moves in the previous genmove
+ *            command (either of genmove_black, genmove_white, gg_genmove).
+ *            If no previous genmove command has been issued, the result
+ *            of this command will be meaningless.
+ * Arguments: none
+ * Fails:   : never
+ * Returns  : list of moves with weights
+ */
+
+static int
+gtp_top_moves(char *s, int id)
+{
+  int i, j, k;
+  UNUSED(s);
+  gtp_printid(id, GTP_SUCCESS);
+  for (k = 0; k < 10; k++)
+    if (best_move_values[k] > 0.0) {
+      gtp_print_vertex(best_movei[k], best_movej[k]);
+      gtp_printf(" %.2f ", best_move_values[k]);
+    }
+  gtp_printf("\n\n");
+  return GTP_OK;
 }
 
 /* Function : Generate a list of the best moves for White with weights

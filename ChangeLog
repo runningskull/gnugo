@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new gtp command top_moves
 - bugfix in draw_back
 - Add ON_BOARD1 assertions in liberty_of_string and neighbour_of_string
 - Use Win32 API to get CPU time usage for all Win32 builds, not just VC
