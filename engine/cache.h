@@ -32,6 +32,85 @@
 #ifndef _CACHE_H_
 #define _CACHE_H_
 
+
+/* Hashnode: a node stored in the transposition table.
+ *
+ * In addition to the position, the hash lock encodes the following data,
+ * all hashed:
+ *   komaster
+ *   kom_pos
+ *   routine
+ *   str1
+ *   str2
+ *
+ * The data field packs into 32 bits the following
+ * fields:
+ *
+ *   RESERVED       :  5 bits
+ *   remaining_depth:  5 bits (depth - stackp)  NOTE: HN_MAX_REMAINING_DEPTH
+ *   result1        :  4 bits
+ *   result2        :  4 bits
+ *   move           : 10 bits
+ *   flags          :  4 bits
+ */
+typedef struct {
+  Hashvalue_ng  key;
+  uint32_t      data;
+} Hashnode_ng;
+
+#define HN_MAX_REMAINING_DEPTH  31
+
+
+/* Hashentry: an entry, with two nodes of the hash_table
+ */
+typedef struct {
+  Hashnode_ng  deepest;
+  Hashnode_ng  newest;
+} Hashentry_ng;
+
+/* Hn is for hash node. */
+#define hn_get_remaining_depth(hn)  (((hn).data >> 22) & 0x1f)
+#define hn_get_result1(hn)          (((hn).data >> 18) & 0x0f)
+#define hn_get_result2(hn)          (((hn).data >> 14) & 0x0f)
+#define hn_get_move(hn)             (((hn).data >>  4) & 0x3ff)
+#define hn_get_flags(hn)            (((hn).data >>  0) & 0x0f)
+
+#define hn_create_data(remaining_depth, result1, result2, move, flags) \
+  (((remaining_depth & 0x1f)  << 22) \
+   | (((result1)     & 0x0f)  << 18) \
+   | (((result2)     & 0x0f)  << 14) \
+   | (((move)        & 0x3ff) << 4) \
+   | (((flags)       & 0x0f)  << 0))
+
+
+/* Transposition_table: transposition table used for caching. */
+typedef struct {
+  unsigned int   num_entries;
+  Hashentry_ng  *entries;
+  int            is_clean;
+} Transposition_table;
+
+
+extern void  tt_init(Transposition_table *table, int memsize);
+extern void  tt_clear(Transposition_table *table);
+extern void  tt_free(Transposition_table *table);
+extern int   tt_get(Transposition_table *table, 
+		    int komaster, int kom_pos, int routine, int target,
+		    int remaining_depth,
+		    int *result, int *move);
+extern void  tt_update(Transposition_table *table,
+		       int komaster, int kom_pos, int routine, int target, 
+		       int remaining_depth,
+		       int result, int move);
+
+
+/* ================================================================ */
+/*                    The old transposition table                   */
+
+
+/* Dump (almost) all read results. */
+#define TRACE_READ_RESULTS 0
+
 /*
  * This struct contains the attack / defense point and the result.
  * It is kept in a linked list, and each position has a list of 
@@ -168,7 +247,9 @@ void read_result_dump(Read_result *result, FILE *outfile);
 void hashtable_dump(Hashtable *table, FILE *outfile);
 void hashnode_dump(Hashnode *node, FILE *outfile);
 
+
 /* ================================================================ */
+
 
 /* Macros used from reading.c and owl.c to store and retrieve read
  * results.
@@ -268,6 +349,19 @@ int get_read_result2(int routine, int komaster, int kom_pos,
  */
 #if !TRACE_READ_RESULTS
 
+#define READ_RETURN0_NG(komaster, kom_pos, routine, str, remaining_depth) \
+  do { \
+    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, 0, 0);\
+    return 0; \
+  } while (0)
+
+#define READ_RETURN_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value) \
+  do { \
+    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, value, move);\
+    if ((value) != 0 && (point) != 0) *(point) = (move); \
+    return (value); \
+  } while (0)
+
 #define READ_RETURN0(read_result) \
   do { \
     if (read_result) { \
@@ -284,6 +378,7 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     } \
     return (value); \
   } while (0)
+
 
 #define READ_RETURN_SEMEAI(read_result, point, move, value_a, value_b) \
   do { \

@@ -38,6 +38,154 @@
  */
 
 
+/* Random values for the hash function. */
+static Hashvalue_ng  white_hash_ng[BOARDMAX];
+static Hashvalue_ng  black_hash_ng[BOARDMAX];
+static Hashvalue_ng  ko_hash_ng[BOARDMAX];
+
+static Hashvalue_ng  komaster_hash[4]; /* EMPTY, BLACK, WHITE, GRAY */
+static Hashvalue_ng  kom_pos_hash[BOARDMAX];
+static Hashvalue_ng  target1_hash[BOARDMAX];
+static Hashvalue_ng  target2_hash[BOARDMAX];
+static Hashvalue_ng  routine_hash[NUM_ROUTINES];
+
+static struct init_struct {
+  Hashvalue_ng  *array;
+  int            array_size;
+} hash_init_values[] = {
+  {white_hash_ng, BOARDMAX},
+  {black_hash_ng, BOARDMAX},
+  {ko_hash_ng,    BOARDMAX},
+  {komaster_hash, 4},
+  {kom_pos_hash,  BOARDMAX},
+  {target1_hash,  BOARDMAX},
+  {target2_hash,  BOARDMAX},
+  {routine_hash,  NUM_ROUTINES},
+};
+
+
+/*
+ * Initialize the entire hash and transposition table system.
+ *
+ * This should only be called once, and before calling any other 
+ * functions in this file.
+ */
+
+void
+hash_ng_init(void)
+{
+  static int  is_initialized = 0;
+  Hashvalue_ng  *array;
+  int         size;
+  unsigned    i;
+  int         j;
+  
+
+  if (is_initialized)
+    return;
+  
+#if TRACE_READ_RESULTS
+  /* We need consistent hash values when this option is enabled. */
+  gg_srand(1);
+#endif
+  
+  for (i = 0; 
+       i < sizeof(hash_init_values) / sizeof(struct init_struct);
+       i++) {
+    array = hash_init_values[i].array;
+    size  = hash_init_values[i].array_size;
+
+    for (j = 0; j < size; j++)
+      hashdata_init(array[j], gg_urand(), gg_urand()); 
+  }
+
+  is_initialized = 1;
+}
+
+
+/* Calculate the hashvalue for a position.
+ */
+
+Hashvalue_ng
+hashvalue_ng_recalc(Intersection *p, int ko_pos)
+{
+  Hashvalue_ng  hashval;
+  int           pos;
+
+  hashdata_clear(hashval);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+
+    switch (p[pos]) {
+      default:
+      case EMPTY: 
+	break;
+
+      case WHITE:
+	hashdata_xor(hashval, white_hash_ng[pos]);
+	break;
+
+      case BLACK:
+	hashdata_xor(hashval, black_hash_ng[pos]);
+	break;
+    }
+  }
+
+  if (ko_pos != NO_MOVE)
+    hashdata_xor(hashval, ko_hash_ng[ko_pos]);
+
+  return hashval;
+}
+
+
+Hashvalue_ng
+calculate_hashval_ng(int komaster, int kom_pos, int routine, int target)
+{
+  Hashvalue_ng  hashval;
+
+  hashval = hashval_ng;		/* from globals.c */
+  hashdata_xor(hashval, komaster_hash[komaster]);
+  hashdata_xor(hashval, kom_pos_hash[kom_pos]);
+  hashdata_xor(hashval, routine_hash[routine]);
+  hashdata_xor(hashval, target1_hash[target]);
+
+  return hashval;
+}
+
+
+/*
+ * Set or remove ko in the hash value.
+ */
+
+Hashvalue_ng
+hashvalue_ng_invert_ko(Hashvalue_ng hashval, int ko_pos)
+{
+  hashdata_xor(hashval, ko_hash_ng[ko_pos]);
+  return hashval;
+}
+
+
+
+/*
+ * Set or remove a stone of COLOR at pos in a Hash_data.
+ */
+
+Hashvalue_ng
+hashvalue_ng_invert_stone(Hashvalue_ng hashval, int pos, int color)
+{
+  if (color == BLACK)
+    hashdata_xor(hashval, black_hash_ng[pos]);
+  else if (color == WHITE)
+    hashdata_xor(hashval, white_hash_ng[pos]);
+
+  return hashval;
+}
+
+
+/* ================================================================ */
+
+
 static int is_initialized = 0;
 
 

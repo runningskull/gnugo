@@ -58,7 +58,9 @@ int          movenum;
 Intersection shadow[BOARDMAX];
 
 /* Hashing of positions. */
-Hash_data    hashdata;
+Hash_data     hashdata;
+Hashvalue_ng  hashval_ng;
+Transposition_table  ttable;
 
 int hashflags = HASH_DEFAULT;
 

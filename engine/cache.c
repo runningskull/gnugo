@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
+#include "random.h"
 #include "gnugo.h"
 
 #include <stdio.h>
@@ -32,6 +33,197 @@
 #include "hash.h"
 #include "cache.h"
 #include "sgftree.h"
+
+
+/* ================================================================ */
+/*                    The new transposition table                   */
+
+
+
+/* ---------------------------------------------------------------- */
+
+
+/* Initialize the transposition table.
+ */
+ 
+void
+tt_init(Transposition_table *table, int memsize)
+{
+  int  num_entries;
+ 
+  /* Make sure the hash system is initialized. */
+  hash_ng_init();
+
+  num_entries = memsize / sizeof(Hashentry_ng);
+
+#if 0
+  printf("Creating hash table of size double entries (%d bytes)\n", 
+	 bits, size);
+#endif
+ 
+  table->num_entries = num_entries;
+  table->entries     = (Hashentry_ng *) malloc(num_entries
+					       * sizeof(Hashentry_ng));
+
+  if (table->entries == NULL) {
+    perror("Couldn't allocate memory for transposition table. \n");
+    exit(1);
+  }
+
+  table->is_clean = 0;
+  tt_clear(table);
+}
+
+
+/* Clear the transposition table.
+ */
+
+void
+tt_clear(Transposition_table *table)
+{
+  Hashentry_ng  hash_null = {{hashdata_NULL, 0}, {hashdata_NULL, 0}};
+  unsigned      i;
+ 
+  if (table->is_clean)
+    return;
+
+  for (i = 0; i < table->num_entries; i++)
+    table->entries[i] = hash_null;
+
+  table->is_clean = 1;
+}
+ 
+ 
+/* Free the transposition table.
+ */
+
+void
+tt_free(Transposition_table *table)
+{
+  free(table->entries);
+}
+
+
+/* Set result and move. Return value:
+ *   0 if not found
+ *   1 if found, but depth to small to be trusted.  In this case the move
+ *     can be used for move ordering.
+ *   2 if found and depth is enough so that the result can be trusted.
+ */
+ 
+int
+tt_get(Transposition_table *table, 
+       int komaster, int kom_pos, int routine, int target, 
+       int remaining_depth,
+       int *result, int *move)
+{
+  Hashvalue_ng  hashval;
+  Hashentry_ng *entry;
+  Hashnode_ng  *node;
+ 
+  hashval = calculate_hashval_ng(komaster, kom_pos, routine, target);
+
+  /* Sanity check. */
+  if (remaining_depth < 0)
+    remaining_depth = 0;
+  if (remaining_depth > HN_MAX_REMAINING_DEPTH)
+    remaining_depth = HN_MAX_REMAINING_DEPTH;
+
+  /* Get the correct entry and node. */
+  entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
+  if (hashdata_is_equal(hashval, entry->deepest.key))
+    node = &entry->deepest;
+  else if (hashdata_is_equal(hashval, entry->newest.key))
+    node = &entry->newest;
+  else
+    return 0;
+
+  /* Return data.  Only set the result if remaining depth in the table
+   * is big enough to be trusted.  The move can always be used for move
+   * ordering if nothing else.
+   */
+  if (move)
+    *move = hn_get_move(*node);
+  if ((unsigned) remaining_depth <= hn_get_remaining_depth(*node)) {
+    if (result)
+      *result = hn_get_result1(*node);
+    return 2;
+  }
+
+  return 1;
+}
+
+
+/* Update a transposition table entry.
+ */
+
+void
+tt_update(Transposition_table *table,
+	  int komaster, int kom_pos, int routine, int target, 
+	  int remaining_depth,
+	  int result, int move)
+{
+  Hashvalue_ng  hashval;
+  Hashentry_ng *entry;
+  Hashnode_ng  *deepest;
+  Hashnode_ng  *newest;
+  uint32_t      data;
+
+  /* Calculate the hash value. */
+  hashval = calculate_hashval_ng(komaster, kom_pos, routine, target);
+  data = hn_create_data(remaining_depth, result, 0, move, 0);
+
+  /* Get the entry and nodes. */ 
+  entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
+  deepest = &entry->deepest;
+  newest  = &entry->newest;
+ 
+  /* See if we found an already existing node. */
+  if (hashdata_is_equal(hashval, deepest->key)
+      && (unsigned) remaining_depth >= hn_get_remaining_depth(*deepest)) {
+ 
+    /* Found deepest */
+    deepest->data = data;
+ 
+  } 
+  else if (hashdata_is_equal(hashval, newest->key)
+	   && (unsigned) remaining_depth >= hn_get_remaining_depth(*newest)) {
+ 
+    /* Found newest */
+    newest->data = data;
+ 
+    /* If newest has become deeper than deepest, then switch them. */
+    if (hn_get_remaining_depth(*newest) > hn_get_remaining_depth(*deepest)) {
+      Hashnode_ng temp;
+ 
+      temp = *deepest;
+      *deepest = *newest;
+      *newest = temp;
+    }
+ 
+  } 
+  else if ((unsigned) remaining_depth > hn_get_remaining_depth(*deepest)) {
+ 
+    /* This can only happen if newest is empty. */
+    if (hn_get_remaining_depth(*newest) < hn_get_remaining_depth(*deepest))
+      *newest = *deepest;
+ 
+    deepest->key  = hashval;
+    deepest->data = data;
+  } 
+  else {
+    /* Replace newest. */
+    newest->key  = hashval;
+    newest->data = data;
+  }
+
+  table->is_clean = 0;
+}
+
+
+/* ================================================================ */
+/*                    The old transposition table                   */
+
 
 static Hashtable *movehash;
 
@@ -630,16 +822,41 @@ hashnode_new_result(Hashtable *table, Hashnode *node,
 void
 reading_cache_init(int bytes)
 {
+  float nodes;
+
+#ifdef USE_HASHTABLE_NG
+
+  /* Use a majority of the memory for the transposition table because
+   * that one is used for the tactical reading.  Tests reveal that we
+   * use approximately 500 tactical reading nodes for each owl node.
+   * This would point to 99.8%, but it is better to have a bit too
+   * many owl nodes in the cache than too few.
+   *
+   * Using 5% for the owl nodes and 95% for the transposition table
+   * seems to give a 2% speedup, but this should be better once the
+   * owl table is gone and everything is in the new transposition
+   * table.
+   */
+#define NG_PERCENTAGE  95
+  tt_init(&ttable, bytes * NG_PERCENTAGE / 100);
+
+  /* Use the rest of the available memory for the old cache where
+   * still owl, semeai and readconnect caching takes place.
+   */
+  bytes = bytes * (100 - NG_PERCENTAGE) / 100;
+#endif
+  
+    
   /* Initialize hash table.
    *
    * The number 1.4 below is the quotient between the number of nodes
    * and the number of read results.  It was found in a test that this 
    * number varies between 1.15 and 1.4.  Thus we use 1.4.
    */
-  float nodes = ((float) bytes
-		 / (1.5 * sizeof(Hashnode *)
-		    + sizeof(Hashnode)
-		    + 1.4 * sizeof(Read_result)));
+  nodes = ((float) bytes
+	   / (1.5 * sizeof(Hashnode *)
+	      + sizeof(Hashnode)
+	      + 1.4 * sizeof(Read_result)));
   if (0)
     gprintf("Allocated memory for %d hash nodes. \n", (int) nodes);
   /* If we get a zero size hash table, disable hashing completely. */
@@ -662,6 +879,7 @@ void
 reading_cache_clear()
 {
   hashtable_clear(movehash);
+  tt_clear(&ttable);
 }
 
 int

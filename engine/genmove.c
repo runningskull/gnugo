@@ -77,7 +77,9 @@ reset_engine()
 
   /* Initialize things for hashing of positions. */
   reading_cache_clear();
+  
   hashdata_recalc(&hashdata, board, board_ko_pos);
+  hashval_ng = hashvalue_ng_recalc(board, board_ko_pos);
 
   worms_examined = -1;
   initial_influence_examined = -1;

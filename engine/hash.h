@@ -21,6 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <stdio.h>
+#include <stdint.h>
 #include "gnugo.h"
 
 /*
@@ -55,6 +56,7 @@
  */
 typedef unsigned long Hashvalue;
 typedef unsigned long Compacttype;
+
 
 /* for testing: Enables a lot of checks. */
 #define CHECK_HASHING 0
@@ -151,6 +153,66 @@ void hashdata_invert_stone(Hash_data *hd, int pos, int color);
 void hashdata_set_tomove(Hash_data *hd, int to_move);
 
 int hashdata_diff_dump(Hash_data *key1, Hash_data *key2);
+
+
+/* ---------------------------------------------------------------- */
+
+
+/* Next generation hash implementation.  
+ * 
+ * FIXME: Once this is the standard, remove all the _ng suffixes
+ *        and clean it up.
+ */
+#if 0
+typedef uint64_t      Hashvalue_ng;
+
+#define hashdata_init(hd, uint1, uint2) \
+   (hd) = ((uint64_t) (uint1) << 32) | ((uint64_t) (uint2))
+
+#else
+
+#define Hashvalue_ng  Hash_data
+
+#define hashdata_NULL  {{0, 0}}
+#define hashdata_clear(hd) \
+   do { \
+    (hd).hashval[0] = 0; \
+    (hd).hashval[1] = 0; \
+   } while (0)
+#define hashdata_init(hd, uint1, uint2) \
+   do { \
+    (hd).hashval[0] = (uint1); \
+    (hd).hashval[1] = (uint2); \
+   } while (0)
+
+#define hashdata_is_equal(hd1, hd2) \
+   ((hd1).hashval[0] == (hd2).hashval[0] \
+    && (hd1).hashval[1] == (hd2).hashval[1])
+#define hashdata_xor(hd1, hd2) \
+   do { \
+    (hd1).hashval[0] ^= (hd2).hashval[0]; \
+    (hd1).hashval[1] ^= (hd2).hashval[1]; \
+   } while (0)
+
+/* FIXME: This is only an approximation. 
+ *        The real remainder can be calculated by 
+ *            (ax+y)%z = (a%z)(x%z)+(y%z)
+ *        but this probably is good enough for the cache.
+ */
+#define hashdata_remainder(hd, num) \
+  (((hd).hashval[0] + (hd).hashval[1]) % (num))
+
+#endif
+
+
+extern void          hash_ng_init(void);
+extern Hashvalue_ng  calculate_hashval_ng(int komaster, int kom_pos, 
+					  int routine, int target);
+extern Hashvalue_ng  hashvalue_ng_recalc(Intersection *p, int ko_pos);
+extern Hashvalue_ng  hashvalue_ng_invert_ko(Hashvalue_ng hashval, int ko_pos);
+extern Hashvalue_ng  hashvalue_ng_invert_stone(Hashvalue_ng hashval, 
+					       int pos, int color);
+
 
 #endif
 

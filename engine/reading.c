@@ -1058,6 +1058,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
   int liberties;
   int found_read_result;
   Read_result *read_result = NULL;
+  int retval;
   
   SETUP_TRACE_INFO("find_defense", str);
   
@@ -1069,6 +1070,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
    * storing the position in the hash table, we must do this test
    * before we look for cached results.
    */
+  str = find_origin(str);
   liberties = countlib(str);
   
   if (liberties > 4
@@ -1080,6 +1082,17 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
       *move = 0;
     return WIN;
   }
+
+#ifdef USE_HASHTABLE_NG
+
+  if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)
+      && tt_get(&ttable, komaster, kom_pos, FIND_DEFENSE, str, 
+		depth - stackp,
+		&retval, move) == 2)
+    /* FIXME: Use move for move ordering if tt_get() returned 1 */
+    return retval;
+
+#else
 
   if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)) {
     found_read_result = get_read_result(FIND_DEFENSE, komaster, kom_pos, 
@@ -1095,6 +1108,8 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
       return rr_get_result(*read_result);
     }
   }
+
+#endif
 
 #if EXPERIMENTAL_READING
   if (defend_by_pattern) {
@@ -1114,10 +1129,19 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
     dcode = defend4(str, &xpos, komaster, kom_pos);
 
   if (dcode) {
+#ifdef USE_HASHTABLE_NG
+    READ_RETURN_NG(komaster, kom_pos, FIND_DEFENSE, str, depth - stackp, 
+		   move, xpos, dcode);
+#else
     READ_RETURN(read_result, move, xpos, dcode);
+#endif
   }
     
+#ifdef USE_HASHTABLE_NG
+  READ_RETURN0_NG(komaster, kom_pos, FIND_DEFENSE, str, depth - stackp);
+#else
   READ_RETURN0(read_result);
+#endif
 }
 
 
@@ -2945,6 +2969,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   int result = 0;
   int found_read_result;
   Read_result *read_result = NULL;
+  int  retval;
 
   SETUP_TRACE_INFO("attack", str);
 
@@ -2956,6 +2981,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   if (color == 0)      /* if assertions are turned off, silently fails */
     return 0;
 
+  str = find_origin(str);
   libs = countlib(str);
 
   if (libs > 4
@@ -2969,6 +2995,17 @@ do_attack(int str, int *move, int komaster, int kom_pos)
     }
     return 0;
   }
+
+#ifdef USE_HASHTABLE_NG
+
+  if ((stackp <= depth) && (hashflags & HASH_ATTACK)
+      && tt_get(&ttable, komaster, kom_pos, ATTACK, str, 
+		depth - stackp,
+		&retval, move) == 2)
+    /* FIXME: Use move for move ordering if tt_get() returned 1 */
+    return retval;
+
+#else
 
   if ((stackp <= depth) && (hashflags & HASH_ATTACK)) {
     found_read_result = get_read_result(ATTACK, komaster, kom_pos, 
@@ -2984,6 +3021,8 @@ do_attack(int str, int *move, int komaster, int kom_pos)
       return rr_get_result(*read_result);
     }
   }
+
+#endif
 
 #if EXPERIMENTAL_READING
   if (attack_by_pattern) {
@@ -3012,9 +3051,18 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   ASSERT1(result >= 0 && result <= WIN, str);
   
   if (result)
+#ifdef USE_HASHTABLE_NG
+    READ_RETURN_NG(komaster, kom_pos, ATTACK, str, depth - stackp, 
+		   move, xpos, result);
+#else
     READ_RETURN(read_result, move, xpos, result);
+#endif
 
+#ifdef USE_HASHTABLE_NG
+  READ_RETURN0_NG(komaster, kom_pos, ATTACK, str, depth - stackp);
+#else
   READ_RETURN0(read_result);
+#endif
 }
 
 

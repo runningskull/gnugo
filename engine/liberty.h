@@ -42,10 +42,15 @@
 
 /* We need the defintion of type Hash_data here. */
 #include "hash.h"
+#include "cache.h"
 
 /* Other modules get read-only access to this variable. */
-extern Hash_data    hashdata;
+extern Hash_data     hashdata;
+extern Hashvalue_ng  hashval_ng;
+extern Transposition_table  ttable;
 
+/* Define if you want the new transposition table. */
+#define USE_HASHTABLE_NG
 
 
 /* ================================================================ */
