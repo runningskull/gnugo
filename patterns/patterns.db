@@ -12502,6 +12502,32 @@ Pattern EJ89
 :8,J
 
 
+Pattern EJ90
+# db New pattern (3.1.26)
+
+?XX....         extend on the fourth line
+..O*...
+O......
+.......
+.......
+-------
+
+:8,J
+
+
+Pattern EJ91
+# db New pattern (3.1.26)
+
+?.....         large block affecting stability of both
+..O.oo
+.X*..o
+......
+......
+------
+
+:8,J
+
+
 ######################################################################
 #
 # Seki patterns.
