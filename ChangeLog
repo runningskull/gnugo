@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- give less bonus to connection moves when scoring
+	
 3.7.1 released November 23, 2004
 
 - new function send_two_return_one() in utils.c

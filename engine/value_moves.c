@@ -1411,16 +1411,13 @@ connection_value(int dragona, int dragonb, int tt, float margin)
   if (margin > 20.0)
     margin = 20.0;
 
-  /* When scoring, we want to be restrictive with reinforcement moves
-   * inside own territory. Thus if both dragons are weakly_alive,
-   * alive, strongly alive, or invincible, no bonus is awarded.
-   *
-   * Notice that this requires that the territorial value is computed
-   * before the strategical value.
+  /* When scoring, we want to be restrictive with reinforcement moves.
+   * Thus if both dragons are alive, strongly alive, or invincible, no
+   * bonus is awarded.
    *
    * FIXME: Shouldn't it be sufficient to check this for dragon a?
    */
-  if (doing_scoring && terr_val < 0.0) {
+  if (doing_scoring) {
     if ((safetya == ALIVE
 	 || safetya == STRONGLY_ALIVE
 	 || safetya == INVINCIBLE)

@@ -11400,6 +11400,7 @@ Pattern CD79
 
 Pattern CD82
 # Hard to value accurately. Wild guess that it may be worth 20 points.
+# gf Inappropriate when scoring, disabled in that case. (3.7.2)
 
 ?xxxx       capture ladder to eliminate aji
 ?xxxx
@@ -11415,7 +11416,7 @@ O*.xx
 aCb.?
 ?O???
 
-;!same_dragon(a,b) || potential_cutstone(C)
+;!doing_scoring && (!same_dragon(a,b) || potential_cutstone(C))
 
 
 Pattern CD83
