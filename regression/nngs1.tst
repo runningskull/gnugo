@@ -216,3 +216,17 @@ loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 30
 loadsgf games/nngs/gnugo-3.1.31-niki-200204131518.sgf 14
 54 gg_genmove white
 #? [Q14]
+
+loadsgf games/nngs/speciman-gnugo-3.1.32-200204211014.sgf 9
+55 gg_genmove black
+#? [!C7]
+
+# Capture properly.
+loadsgf games/nngs/speciman-gnugo-3.1.32-200204211014.sgf 33
+56 gg_genmove black
+#? [H4]
+
+# J2 inefficient
+loadsgf games/nngs/speciman-gnugo-3.1.32-200204211014.sgf 39
+57 gg_genmove black
+#? [J4|J5]

@@ -114,3 +114,22 @@ loadsgf games/filllib10.sgf
 #? [PASS]
 34 gg_genmove black
 #? [PASS]
+
+# J2 inefficient
+loadsgf games/nngs/speciman-gnugo-3.1.32-200204211014.sgf 53
+35 gg_genmove black
+#? [A8|B8]*
+36 gg_genmove white
+#? [A5|A8|B8]
+
+loadsgf games/filllib11.sgf
+37 gg_genmove white
+#? [H5]*
+38 gg_genmove black
+#? [E4]
+
+loadsgf games/nngs/gnugo-3.1.34-guest1-200204242025.sgf 86
+39 gg_genmove white
+#? [G12|F12|G13]*
+40 gg_genmove black
+#? [K13]

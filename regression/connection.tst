@@ -245,6 +245,12 @@ loadsgf games/trevor/auto/b20.sgf 38
 78 same_dragon D2 G2
 #? [0]*
 
+loadsgf games/nngs/gnugo-3.1.34-viking4-200204240801.sgf
+79 connect S4 R7
+#? [1 S6]*
+80 connect R2 R7
+#? [1 S6]*
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

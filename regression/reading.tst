@@ -31,7 +31,7 @@ loadsgf games/incident79.sgf 168
 
 11 attack K18
 #? [1 J17]
-# FIXME PRE/POST3.0: Not sure whether defense at J16 works without ko.
+# FIXME: Not sure whether defense at J16 works without ko.
 12 defend K18
 #? [1 J16]
 
