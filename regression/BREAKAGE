@@ -1,3 +1,314 @@
+Compiled with standard semeai.
+
+Patches: gunnar_1_16.7, gunnar_1_16.6, trevor_1_16.1, trevor_1_16.2,
+         gunnar_1_16.5, arend_1_16.1, gunnar_1_16.4, semeai_1_16.4,
+         gunnar_1_16.3, inge_1_16.1, compute_eyes_1_16.2, semeai_1_16.3,
+         semeai_1_16.2, gunnar_1_16.2, semeai_1_16.1.
+
+23 P + 13 F
+
+meep gnugo-3.1.16$ cd regression/
+meep regression$ make all_batches
+./regress.sh . reading.tst
+./regress.sh . owl.tst
+254 unexpected FAIL: Correct '1 (M16|O14|N16|N17)', got '0'
+./regress.sh . owl_rot.tst
+228 unexpected PASS!
+./regress.sh . ld_owl.tst
+./regress.sh . optics.tst
+./regress.sh . filllib.tst
+./regress.sh . atari_atari.tst
+./regress.sh . connection.tst
+./regress.sh . blunder.tst
+1 unexpected PASS!
+16 unexpected PASS!
+17 unexpected PASS!
+./regress.sh . strategy.tst
+18 unexpected PASS!
+27 unexpected FAIL: Correct 'C3', got 'F2'
+29 unexpected PASS!
+34 unexpected PASS!
+44 unexpected PASS!
+./regress.sh . endgame.tst
+./regress.sh . heikki.tst
+./regress.sh . neurogo.tst
+14 unexpected PASS!
+./regress.sh . arb.tst
+101 unexpected FAIL: Correct '(C2|D2|F2|G2|F1|D1|E1)', got 'B3'
+./regress.sh . rosebud.tst
+./regress.sh . golife.tst
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+./regress.sh . ego.tst
+./regress.sh . dniwog.tst
+7 unexpected PASS!
+./regress.sh . strategy2.tst
+73 unexpected FAIL: Correct 'F7|R17', got 'E7'
+100 unexpected FAIL: Correct 'M16', got 'N13'
+./regress.sh . nicklas1.tst
+1510 unexpected FAIL: Correct 'C12', got 'B13'
+./regress.sh . nicklas2.tst
+./regress.sh . nicklas3.tst
+./regress.sh . nicklas4.tst
+812 unexpected PASS!
+1201 unexpected PASS!
+./regress.sh . nicklas5.tst
+804 unexpected FAIL: Correct 'D6', got 'H6'
+./regress.sh . manyfaces.tst
+./regress.sh . niki.tst
+./regress.sh . trevor.tst
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+./regress.sh . strategy3.tst
+103 unexpected PASS!
+108 unexpected PASS!
+121 unexpected FAIL: Correct 'C7', got 'B6'
+137 unexpected PASS!
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+22 unexpected PASS!
+26 unexpected FAIL: Correct 'D12', got 'H4'
+36 unexpected PASS!
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+2 unexpected PASS!
+17 unexpected FAIL: Correct 'C7', got 'C9'
+33 unexpected PASS!
+./regress.sh . trevora.tst
+120 unexpected FAIL: Correct 'E7|D8|E8', got 'B8'
+460 unexpected PASS!
+./regress.sh . strategy4.tst
+166 unexpected FAIL: Correct 'D11', got 'F12'
+168 unexpected PASS!
+179 unexpected FAIL: Correct 'P3|O2|P2|O4|E2', got 'O5'
+210 unexpected PASS!
+215 unexpected PASS!
+
+Same version with experimental semeai
+
+Patches: gunnar_1_16.7, gunnar_1_16.6, trevor_1_16.1, trevor_1_16.2,
+         gunnar_1_16.5, arend_1_16.1, gunnar_1_16.4, semeai_1_16.4,
+         gunnar_1_16.3, inge_1_16.1, compute_eyes_1_16.2, semeai_1_16.3,
+         semeai_1_16.2, gunnar_1_16.2, semeai_1_16.1.
+
+33 P + 30 F
+
+./regress.sh . reading.tst
+./regress.sh . owl.tst
+254 unexpected FAIL: Correct '1 (M16|O14|N16|N17)', got '0'
+./regress.sh . owl_rot.tst
+228 unexpected PASS!
+./regress.sh . ld_owl.tst
+./regress.sh . optics.tst
+./regress.sh . filllib.tst
+./regress.sh . atari_atari.tst
+./regress.sh . connection.tst
+./regress.sh . blunder.tst
+1 unexpected PASS!
+16 unexpected PASS!
+17 unexpected PASS!
+./regress.sh . strategy.tst
+1 unexpected PASS!
+18 unexpected PASS!
+27 unexpected FAIL: Correct 'C3', got 'F2'
+29 unexpected PASS!
+34 unexpected PASS!
+37 unexpected FAIL: Correct '!A17|A18|C19', got 'A17'
+44 unexpected PASS!
+./regress.sh . endgame.tst
+./regress.sh . heikki.tst
+./regress.sh . neurogo.tst
+11 unexpected FAIL: Correct 'N5', got 'L2'
+12 unexpected FAIL: Correct 'B10', got 'C11'
+14 unexpected PASS!
+./regress.sh . arb.tst
+101 unexpected FAIL: Correct '(C2|D2|F2|G2|F1|D1|E1)', got 'B3'
+104 unexpected FAIL: Correct 'A7|B7', got 'B10'
+./regress.sh . rosebud.tst
+./regress.sh . golife.tst
+1 unexpected PASS!
+2 unexpected PASS!
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+./regress.sh . ego.tst
+./regress.sh . dniwog.tst
+5 unexpected PASS!
+7 unexpected PASS!
+./regress.sh . strategy2.tst
+66 unexpected FAIL: Correct 'N11', got 'L7'
+72 unexpected PASS!
+93 unexpected PASS!
+100 unexpected FAIL: Correct 'M16', got 'N13'
+./regress.sh . nicklas1.tst
+501 unexpected FAIL: Correct 'G7', got 'F6'
+1213 unexpected PASS!
+1405 unexpected FAIL: Correct 'B7', got 'B6'
+1406 unexpected FAIL: Correct 'B6', got 'C7'
+1510 unexpected FAIL: Correct 'C12', got 'B13'
+./regress.sh . nicklas2.tst
+1407 unexpected PASS!
+./regress.sh . nicklas3.tst
+./regress.sh . nicklas4.tst
+812 unexpected PASS!
+1201 unexpected PASS!
+./regress.sh . nicklas5.tst
+804 unexpected FAIL: Correct 'D6', got 'H6'
+./regress.sh . manyfaces.tst
+7 unexpected FAIL: Correct 'R2|S7', got 'E14'
+./regress.sh . niki.tst
+./regress.sh . trevor.tst
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+6 unexpected FAIL: Correct 'E8|E9|A12', got 'F10'
+./regress.sh . strategy3.tst
+103 unexpected PASS!
+108 unexpected PASS!
+110 unexpected PASS!
+113 unexpected FAIL: Correct 'P1', got 'T6'
+121 unexpected FAIL: Correct 'C7', got 'B6'
+124 unexpected PASS!
+126 unexpected FAIL: Correct 'B19', got 'G10'
+137 unexpected PASS!
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+22 unexpected PASS!
+26 unexpected FAIL: Correct 'D12', got 'H4'
+36 unexpected PASS!
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+2 unexpected PASS!
+17 unexpected FAIL: Correct 'C7', got 'C9'
+30 unexpected FAIL: Correct 'C13', got 'J13'
+33 unexpected PASS!
+./regress.sh . trevora.tst
+120 unexpected FAIL: Correct 'E7|D8|E8', got 'B8'
+460 unexpected PASS!
+530 unexpected PASS!
+./regress.sh . strategy4.tst
+166 unexpected FAIL: Correct 'D11', got 'F12'
+179 unexpected FAIL: Correct 'P3|O2|P2|O4|E2', got 'Q5'
+199 unexpected FAIL: Correct 'N5|S18', got 'S19'
+200 unexpected FAIL: Correct 'P6|P7|Q7|S18', got 'S19'
+210 unexpected PASS!
+215 unexpected PASS!
+
+Same version plus the patch semeai_1_16.5, experimental semeai
+
+Patches: gunnar_1_16.7, gunnar_1_16.6, trevor_1_16.1, trevor_1_16.2,
+         gunnar_1_16.5, arend_1_16.1, gunnar_1_16.4, semeai_1_16.4,
+         gunnar_1_16.3, inge_1_16.1, compute_eyes_1_16.2, semeai_1_16.3,
+         semeai_1_16.2, gunnar_1_16.2, semeai_1_16.1
+       + semeai_1_16.5
+
+30 P + 27 F
+
+./regress.sh . reading.tst
+./regress.sh . owl.tst
+254 unexpected FAIL: Correct '1 (M16|O14|N16|N17)', got '0'
+./regress.sh . owl_rot.tst
+228 unexpected PASS!
+./regress.sh . ld_owl.tst
+./regress.sh . optics.tst
+./regress.sh . filllib.tst
+./regress.sh . atari_atari.tst
+./regress.sh . connection.tst
+./regress.sh . blunder.tst
+1 unexpected PASS!
+16 unexpected PASS!
+17 unexpected PASS!
+./regress.sh . strategy.tst
+1 unexpected PASS!
+18 unexpected PASS!
+27 unexpected FAIL: Correct 'C3', got 'F2'
+29 unexpected PASS!
+34 unexpected PASS!
+37 unexpected FAIL: Correct '!A17|A18|C19', got 'A17'
+44 unexpected PASS!
+./regress.sh . endgame.tst
+./regress.sh . heikki.tst
+`./regress.sh . neurogo.tst
+11 unexpected FAIL: Correct 'N5', got 'L2'
+12 unexpected FAIL: Correct 'B10', got 'C11'
+14 unexpected PASS!
+./regress.sh . arb.tst
+101 unexpected FAIL: Correct '(C2|D2|F2|G2|F1|D1|E1)', got 'B3'
+104 unexpected FAIL: Correct 'A7|B7', got 'B10'
+./regress.sh . rosebud.tst
+./regress.sh . golife.tst
+1 unexpected PASS!
+2 unexpected PASS!
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+./regress.sh . ego.tst
+./regress.sh . dniwog.tst
+7 unexpected PASS!
+./regress.sh . strategy2.tst
+66 unexpected FAIL: Correct 'N11', got 'L7'
+72 unexpected PASS!
+73 unexpected FAIL: Correct 'F7|R17', got 'E7'
+93 unexpected PASS!
+100 unexpected FAIL: Correct 'M16', got 'N13'
+./regress.sh . nicklas1.tst
+501 unexpected FAIL: Correct 'G7', got 'F6'
+1213 unexpected PASS!
+1405 unexpected FAIL: Correct 'B7', got 'B6'
+1406 unexpected FAIL: Correct 'B6', got 'C7'
+1510 unexpected FAIL: Correct 'C12', got 'B13'
+./regress.sh . nicklas2.tst
+904 unexpected FAIL: Correct 'B1|E1', got 'H7'
+./regress.sh . nicklas3.tst
+./regress.sh . nicklas4.tst
+812 unexpected PASS!
+1201 unexpected PASS!
+./regress.sh . nicklas5.tst
+804 unexpected FAIL: Correct 'D6', got 'H6'
+./regress.sh . manyfaces.tst
+7 unexpected FAIL: Correct 'R2|S7', got 'E14'
+./regress.sh . niki.tst
+./regress.sh . trevor.tst
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+./regress.sh . strategy3.tst
+103 unexpected PASS!
+108 unexpected PASS!
+110 unexpected PASS!
+121 unexpected FAIL: Correct 'C7', got 'B6'
+126 unexpected FAIL: Correct 'B19', got 'G10'
+137 unexpected PASS!
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+22 unexpected PASS!
+26 unexpected FAIL: Correct 'D12', got 'H4'
+36 unexpected PASS!
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+2 unexpected PASS!
+17 unexpected FAIL: Correct 'C7', got 'C9'
+30 unexpected FAIL: Correct 'C13', got 'J13'
+33 unexpected PASS!
+./regress.sh . trevora.tst
+120 unexpected FAIL: Correct 'E7|D8|E8', got 'B8'
+460 unexpected PASS!
+530 unexpected PASS!
+./regress.sh . strategy4.tst
+166 unexpected FAIL: Correct 'D11', got 'F12'
+179 unexpected FAIL: Correct 'P3|O2|P2|O4|E2', got 'Q5'
+199 unexpected FAIL: Correct 'N5|S18', got 'S19'
+200 unexpected FAIL: Correct 'P6|P7|Q7|S18', got 'S19'
+210 unexpected PASS!
+215 unexpected PASS!
+
+
+
+
+
+
+
+
+
 After the patches compute_eyes_1_16.2 semeai_1_16.3, semeai_1_16.2,
 gunnar_1_16.2, semeai_1_16.1:
 
