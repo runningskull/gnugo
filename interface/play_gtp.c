@@ -91,6 +91,7 @@ DECLARE(gtp_is_legal);
 DECLARE(gtp_ladder_attack);
 DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
+DECLARE(gtp_matcher_status);
 DECLARE(gtp_name);
 DECLARE(gtp_new_game);
 DECLARE(gtp_estimate_score);
@@ -191,6 +192,7 @@ static struct gtp_command commands[] = {
   {"level",        	      gtp_set_level},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
+  {"matcher_status",          gtp_matcher_status},
   {"name",                    gtp_name},
   {"new_game",                gtp_new_game},
   {"new_score",               gtp_estimate_score},
@@ -2646,6 +2648,37 @@ gtp_dragon_data(char *s, int id)
   return GTP_OK;
 }
 
+/* Function:  List the matcher status of all dragons
+ * Arguments: none
+ * Fails:     never
+ * Returns:   List of matcher states for all dragons, formatted as
+ * D4: ALIVE
+ *
+ * FIXME:     Should optionally only list for a single dragon,
+ *            callable as "matcher_status vertex"
+ */
+static int
+gtp_matcher_status(char *s, int id)
+{
+  int m, n;
+  UNUSED(s);
+
+  examine_position(EMPTY, EXAMINE_DRAGONS);
+
+  gtp_printid(id, GTP_SUCCESS);
+  
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++)
+      if (BOARD(m, n) != EMPTY
+	  && dragon[POS(m, n)].origin == POS(m, n)) {
+        struct dragon_data *d = &dragon[POS(m, n)];
+	gtp_print_vertex(m, n);
+	gtp_printf(": ");
+	gtp_printf("%s\n", status_to_string(d->matcher_status));
+      }
+  gtp_printf("\n");
+  return GTP_OK;
+}
 
 /* Function:  List the stones of a dragon
  * Arguments: the location
