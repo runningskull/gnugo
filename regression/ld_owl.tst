@@ -366,6 +366,42 @@ loadsgf games/life_and_death/ld19.sgf
 313 owl_defend C3
 #? [1 (B1|A4)]
 
+
+# tough under the stones problem from Sensei's Library
+loadsgf games/owl47.sgf 5
+404 owl_attack Q4
+#? [1 S4]
+loadsgf games/owl47.sgf 6
+405 owl_defend Q4
+#? [0]
+loadsgf games/owl47.sgf 7
+406 owl_attack Q4
+#? [1 R3]
+loadsgf games/owl47.sgf 8
+407 owl_defend Q4
+#? [0]
+loadsgf games/owl47.sgf 9
+408 owl_attack Q4
+#? [1 T3]
+loadsgf games/owl47.sgf 10
+409 owl_defend Q4
+#? [0]
+loadsgf games/owl47.sgf 11
+410 owl_attack Q4
+#? [1 T2]
+loadsgf games/owl47.sgf 12
+411 owl_defend Q4
+#? [0]
+loadsgf games/owl47.sgf 13
+412 owl_attack Q4
+#? [1 (R3|T2)]
+loadsgf games/owl47.sgf 14
+413 owl_defend Q4
+#? [0]
+loadsgf games/owl47.sgf 15
+414 owl_attack Q4
+#? [1 S2]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
