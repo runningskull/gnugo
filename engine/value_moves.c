@@ -2569,7 +2569,7 @@ remove_top_move(int move)
   for (k = 0; k < 10; k++) {
     if (best_moves[k] == move) {
       int l;
-      for (l = k; l < 10; l++) {
+      for (l = k; l < 9; l++) {
 	best_moves[l] = best_moves[l+1];
 	best_move_values[l] = best_move_values[l+1];
       }
