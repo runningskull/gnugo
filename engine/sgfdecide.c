@@ -438,7 +438,7 @@ decide_position(int color, const char *sgf_output)
 
     gprintf("\nanalyzing %1m\n", pos);
     gprintf("status=%s, escape=%d\n", 
-	    snames[dragon[pos].status], DRAGON2(pos).escape_route);
+	    snames[dragon[pos].crude_status], DRAGON2(pos).escape_route);
     acode = owl_attack(pos, &move, NULL);
     if (acode) {
       if (acode == WIN) {

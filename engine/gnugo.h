@@ -434,7 +434,7 @@ int tryko(int pos, int color, const char *message,
 void popgo(void);
 
 /* utils.c */
-void change_matcher_status(int dr, int status);
+void change_dragon_status(int dr, int status);
 void who_wins(int color, FILE* outfile);
 
 /* high-level routine to generate the best move for the given color */
@@ -454,8 +454,8 @@ void make_dragons(int color, int stop_before_owl, int save_verbose);
 void compute_refined_dragon_weaknesses(void);
 void initialize_dragon_data(void);
 void show_dragons(void);
+int crude_status(int pos);
 int dragon_status(int pos);
-int matcher_status(int pos);
 int same_dragon(int dr1, int dr2);
 
 /* moyo functions */

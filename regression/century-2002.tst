@@ -12,6 +12,7 @@ loadsgf games/century21-2002/golois-gnugo.sgf 69
 20 gg_genmove black
 #? [!A6]
 
+# same bug as nngs2:160
 loadsgf games/century21-2002/golois-gnugo.sgf 183
 30 gg_genmove black
 #? [D15|C15]

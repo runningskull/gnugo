@@ -39,7 +39,7 @@ living_neighbor(int pos, int color)
   int k;
   for (k = 0; k < 4; k++) {
     if (board[pos + delta[k]] == color
-	&& dragon[pos + delta[k]].matcher_status != DEAD)
+	&& dragon[pos + delta[k]].status != DEAD)
       return 1;
   }
 
@@ -70,8 +70,8 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
 
     case BLACK:
       if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
-	if (dragon[pos].matcher_status == ALIVE
-	    || dragon[pos].matcher_status == UNKNOWN)
+	if (dragon[pos].status == ALIVE
+	    || dragon[pos].status == UNKNOWN)
 	  *found_black = 1;
 	else
 	  *found_white = 1;
@@ -80,8 +80,8 @@ analyze_neighbor(int pos, int *found_black, int *found_white)
 
     case WHITE:
       if (!worm[pos].inessential && DRAGON2(pos).safety != INESSENTIAL) {
-	if (dragon[pos].matcher_status == ALIVE
-	    || dragon[pos].matcher_status == UNKNOWN)
+	if (dragon[pos].status == ALIVE
+	    || dragon[pos].status == UNKNOWN)
 	  *found_white = 1;
 	else
 	  *found_black = 1;
@@ -125,7 +125,7 @@ fill_liberty(int *move, int color)
       if (worm[pos].inessential || DRAGON2(pos).safety == INESSENTIAL)
 	continue;
 
-      if (dragon[pos].matcher_status != ALIVE) {
+      if (dragon[pos].status != ALIVE) {
 	for (k = 0; k < 4; k++) {
 	  int pos2 = pos + delta[k];
 	  if (board[pos2] == EMPTY)
@@ -133,7 +133,7 @@ fill_liberty(int *move, int color)
 	}
       }
       
-      if (dragon[pos].matcher_status != DEAD) {
+      if (dragon[pos].status != DEAD) {
 	for (k = 0; k < 12; k++) {
 	  int d = delta[k%8];
 

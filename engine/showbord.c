@@ -317,7 +317,7 @@ showchar(int i, int j, int empty, int xo)
     
     /* Now draw it. */
     if (xo == 1)
-      write_color_char(colors[BOARD(i, j)][d->status], w);
+      write_color_char(colors[BOARD(i, j)][d->crude_status], w);
     else if (xo == 2) {
       if (BOARD(i, j) == BLACK)
 	write_color_char(domain_colors[1], 'X');
@@ -327,7 +327,7 @@ showchar(int i, int j, int empty, int xo)
     else if (xo == 3)
       write_color_char(colors[BOARD(i, j)][d->owl_status], w);
     else if (xo == 4)
-      write_color_char(colors[BOARD(i, j)][d->matcher_status], w);
+      write_color_char(colors[BOARD(i, j)][d->status], w);
   }
 }
 

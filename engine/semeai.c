@@ -59,15 +59,15 @@ semeai(int color)
 
   for (d1 = 0; d1 < number_of_dragons; d1++) {
     if (DRAGON(d1).color != color
-	|| (DRAGON(d1).matcher_status != DEAD
-	    && DRAGON(d1).matcher_status != CRITICAL))
+	|| (DRAGON(d1).status != DEAD
+	    && DRAGON(d1).status != CRITICAL))
       continue;
 
     for (k = 0; k < dragon2[d1].neighbors; k++) {
       d2 = dragon2[d1].adjacent[k];
       if (DRAGON(d2).color != other
-	  || (DRAGON(d2).matcher_status != DEAD
-	      && DRAGON(d2).matcher_status != CRITICAL))
+	  || (DRAGON(d2).status != DEAD
+	      && DRAGON(d2).status != CRITICAL))
 	continue;
 
       /* Dragons d1 (our) and d2 (opponent) are adjacent and both DEAD
@@ -119,8 +119,8 @@ new_semeai(int color)
   for (d1 = 0; d1 < number_of_dragons; d1++) {
     int semeai_found = 0;
     if (DRAGON(d1).color != color
-	|| (DRAGON(d1).matcher_status != DEAD
-	    && DRAGON(d1).matcher_status != CRITICAL))
+	|| (DRAGON(d1).status != DEAD
+	    && DRAGON(d1).status != CRITICAL))
       continue;
     
     /* First pass : collect data
@@ -137,8 +137,8 @@ new_semeai(int color)
       for (k = 0; k < dragon2[d1].neighbors; k++) {
 	d2 = dragon2[d1].adjacent[k];
 	if (DRAGON(d2).color != other
-	    || (DRAGON(d2).matcher_status != DEAD
-		&& DRAGON(d2).matcher_status != CRITICAL))
+	    || (DRAGON(d2).status != DEAD
+		&& DRAGON(d2).status != CRITICAL))
 	  continue;
 	
 	/* Dragons d1 (our) and d2 (opponent) are adjacent and both DEAD
@@ -152,8 +152,8 @@ new_semeai(int color)
 	 * with ko. See nicklas2 test 1401.
 	 */
 #if 0
-	if (DRAGON(d1).matcher_status == CRITICAL
-	    && DRAGON(d2).matcher_status == DEAD) {
+	if (DRAGON(d1).status == CRITICAL
+	    && DRAGON(d2).status == DEAD) {
 	  update_status(bpos, CRITICAL, CRITICAL);
 	  add_owl_attack_move(dragon[apos].owl_attack_point,
 			      bpos, WIN);
@@ -232,8 +232,8 @@ new_semeai(int color)
 	}
       } /* loop over neighbor dragons */
       if (pass == 0 && semeai_found) {
-	int a_matcher_status;
-	int b_matcher_status;
+	int a_status;
+	int b_status;
 
 	if (a_best_status != DEAD && a_worst_status == DEAD)
 	  a_status = CRITICAL;
@@ -245,15 +245,15 @@ new_semeai(int color)
 	else
 	  b_status = b_worst_status;
 	
-	a_matcher_status = a_status;
-	b_matcher_status = b_status;
-	if (a_matcher_status == ALIVE_IN_SEKI)
-	  a_matcher_status = ALIVE;
-	if (b_matcher_status == ALIVE_IN_SEKI)
-	  b_matcher_status = ALIVE;
+	a_status = a_status;
+	b_status = b_status;
+	if (a_status == ALIVE_IN_SEKI)
+	  a_status = ALIVE;
+	if (b_status == ALIVE_IN_SEKI)
+	  b_status = ALIVE;
 	
-	update_status(apos, a_matcher_status, a_status);
-	update_status(bpos, b_matcher_status, b_status);
+	update_status(apos, a_status, a_status);
+	update_status(bpos, b_status, b_status);
       }
     }
   }
@@ -288,14 +288,14 @@ update_status(int dr, int new_status, int new_safety)
 {
   int pos;
 
-  if (dragon[dr].matcher_status != new_status
-      && (dragon[dr].matcher_status != CRITICAL || new_status != DEAD))  {
-    DEBUG(DEBUG_SEMEAI, "Changing matcher_status of %1m from %s to %s.\n", dr,
-	  status_to_string(dragon[dr].matcher_status),
+  if (dragon[dr].status != new_status
+      && (dragon[dr].status != CRITICAL || new_status != DEAD))  {
+    DEBUG(DEBUG_SEMEAI, "Changing status of %1m from %s to %s.\n", dr,
+	  status_to_string(dragon[dr].status),
 	  status_to_string(new_status));
     for (pos = BOARDMIN; pos < BOARDMAX; pos++)
       if (IS_STONE(board[pos]) && is_same_dragon(dr, pos))
-	dragon[pos].matcher_status = new_status;
+	dragon[pos].status = new_status;
   }
 
   if (DRAGON2(dr).safety != new_safety
@@ -380,11 +380,11 @@ analyze_semeai(int my_dragon, int your_dragon)
 	    if (board[pos] == board[my_dragon]
 		&& is_same_dragon(pos, my_dragon)) {
 	      dragon[pos].owl_status = CRITICAL;
-	      dragon[pos].matcher_status = CRITICAL;
+	      dragon[pos].status = CRITICAL;
 	    }
 	  }
 	  DEBUG(DEBUG_SEMEAI,
-		"changed owl_status and matcher_status of %1m to CRITICAL\n",
+		"changed owl_status and status of %1m to CRITICAL\n",
 		my_dragon);
 	}
 	owl_code_sufficient = 1;

@@ -230,7 +230,7 @@ ascii_showboard(void)
 	pos_is_move = 128;
       else
 	pos_is_move = 0;
-      dead = (matcher_status(POS(i, j))==DEAD) && showdead;
+      dead = (dragon_status(POS(i, j))==DEAD) && showdead;
       switch (BOARD(i, j) + pos_is_move + last_pos_was_move) {
 	case EMPTY+128:
 	case EMPTY:
@@ -1059,9 +1059,9 @@ to toggle its state or \"done\".\n");
       if (!ascii2pos(line, &i, &j) || BOARD(i, j) == EMPTY)
 	printf("\ninvalid!\n");
       else {
-	int status = matcher_status(POS(i, j));
+	int status = dragon_status(POS(i, j));
 	status = (status == DEAD) ? ALIVE : DEAD;
-	change_matcher_status(POS(i, j), status);
+	change_dragon_status(POS(i, j), status);
 	ascii_showboard();
       }
     }

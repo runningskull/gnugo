@@ -258,7 +258,7 @@ display_dragon(int pos)
 
   /* status */
   wmove(info_window, 3, 55);
-  gg_wprintw(info_window, "%s     ", status_to_string(d->status));
+  gg_wprintw(info_window, "%s     ", status_to_string(d->crude_status));
 
   /* owl status */
   wmove(info_window, 4, 55);
@@ -298,7 +298,7 @@ display_dragon(int pos)
   }
 
   wmove(info_window, 6, 55);
-  gg_wprintw(info_window, "%s     ", status_to_string(d->matcher_status));
+  gg_wprintw(info_window, "%s     ", status_to_string(d->status));
 
   wmove(info_window, 8, 55);
   wmove(info_window, 9, 55);

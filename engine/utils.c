@@ -38,7 +38,7 @@
  */
 
 void
-change_matcher_status(int dr, int status)
+change_dragon_status(int dr, int status)
 {
   int pos;
   int origin = dragon[dr].origin;
@@ -46,7 +46,7 @@ change_matcher_status(int dr, int status)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos)) {
       if (dragon[pos].origin == origin)
-	dragon[pos].matcher_status = status;
+	dragon[pos].status = status;
     }
 }
 
@@ -197,7 +197,7 @@ somewhere(int color, int last_move, ...)
     pos = va_arg(ap, int);
 
     if (board[pos] == color
-	&& (stackp > 0 || dragon[pos].matcher_status != DEAD))
+	&& (stackp > 0 || dragon[pos].status != DEAD))
       return 1;
   }
 
@@ -870,8 +870,8 @@ confirm_safety(int move, int color, int size, int *defense_point,
     if (board[bpos] == color
 	&& liberties <= worm[bpos].liberties) {
       trouble = 1;
-      if ((dragon[bpos].matcher_status == ALIVE
-	   || (dragon[bpos].matcher_status == CRITICAL
+      if ((dragon[bpos].status == ALIVE
+	   || (dragon[bpos].status == CRITICAL
 	       && saved_dragons != NULL
 	       && saved_dragons[bpos]))
 	  && DRAGON2(bpos).safety != INVINCIBLE

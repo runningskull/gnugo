@@ -418,7 +418,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	int origin = dragon[pos2].origin;
 	
 	if (k < 4) {
-	  if (dragon[pos2].matcher_status == ALIVE) {
+	  if (dragon[pos2].status == ALIVE) {
 	    safety = DEAD;
 	    break;
 	  }
@@ -428,7 +428,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	  }
 	}
 
-	if (!mx[origin] && dragon[pos2].matcher_status == DEAD) {
+	if (!mx[origin] && dragon[pos2].status == DEAD) {
 	  bonus++;
 	  if (k < 4 
 	      && countlib(pos2) <= 2 
@@ -443,7 +443,7 @@ aftermath_genmove(int *aftermath_move, int color,
       else if (board[pos2] == color) {
 	dragons[pos] = pos2;
 	
-	if (safety == UNKNOWN && dragon[pos2].matcher_status == ALIVE)
+	if (safety == UNKNOWN && dragon[pos2].status == ALIVE)
 	  safety = ALIVE;
 	
 	if (DRAGON2(pos2).safety == INVINCIBLE)
@@ -471,7 +471,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	      if (!ON_BOARD(apos+d))
 		continue;
 	      if (board[apos+d] == other
-		  && dragon[apos+d].matcher_status == DEAD)
+		  && dragon[apos+d].status == DEAD)
 		important = 1;
 	      else if (board[apos+d] == EMPTY
 		       && !is_self_atari(apos+d, other))
@@ -595,7 +595,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	    }
 	    popgo();
 	    for (r = 0; r < neighbors && move_ok; r++) {
-	      if (dragon[adjs[r]].matcher_status == DEAD
+	      if (dragon[adjs[r]].status == DEAD
 		  && !owl_does_attack(move, adjs[r])) {
 		DEBUG(DEBUG_AFTERMATH,
 		      "Blunder: %1m becomes more alive after %1m\n",
@@ -633,7 +633,7 @@ aftermath_genmove(int *aftermath_move, int color,
       if (!ON_BOARD(pos2))
 	continue;
       if (board[pos2] == other 
-	  && dragon[pos2].matcher_status != ALIVE
+	  && dragon[pos2].status != ALIVE
 	  && (do_capture_dead_stones 
 	      || worm[pos2].unconditional_status != DEAD)
 	  && DRAGON2(pos2).safety != INESSENTIAL) {

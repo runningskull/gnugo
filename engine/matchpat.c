@@ -534,7 +534,7 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	   * attributes - see patterns.db and above.
 	   */
 	  if ((pattern->class
-	       & class_mask[dragon[POS(x, y)].matcher_status][p[x][y]]) != 0)
+	       & class_mask[dragon[POS(x, y)].status][p[x][y]]) != 0)
 	    goto match_failed; 
 	  
 	} /* loop over elements */
@@ -1090,9 +1090,9 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
     }
 
    /* class check */
-    ASSERT2(dragon[POS(x,y)].matcher_status < 4, x, y);
+    ASSERT2(dragon[POS(x,y)].status < 4, x, y);
     if ((pattern->class
-	 & class_mask[dragon[POS(x, y)].matcher_status][p[x][y]]) != 0)
+	 & class_mask[dragon[POS(x, y)].status][p[x][y]]) != 0)
       goto match_failed;
     
   } /* loop over elements */

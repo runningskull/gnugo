@@ -61,7 +61,7 @@ dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
     for (j = 0; j < board_size; j++) {
       ii = POS(i, j);
 
-      if (board[ii] && dragon[ii].matcher_status == CRITICAL)
+      if (board[ii] && dragon[ii].status == CRITICAL)
 	critical_found = 1;
       if (board[ii] == WHITE && !captured_territory(ii, color))
 	gb[ii] = 128;
@@ -250,7 +250,7 @@ close_bubbles(int gb[BOARDMAX])
 
 /* Generic function to print the regions in gb, rendering
  * positive as white territory, negative as black. Stones
- * with matcher_status == DEAD are invisible and appear as
+ * with status == DEAD are invisible and appear as
  * territory.
  */
 
@@ -265,7 +265,7 @@ print_regions(int gb[BOARDMAX])
     for (j = 0; j < board_size; j++) {
       ii = POS(i, j);
 
-      if (board[ii] && dragon[ii].matcher_status != DEAD)
+      if (board[ii] && dragon[ii].status != DEAD)
 	k = board[ii];
       else
 	k = EMPTY;
@@ -281,14 +281,14 @@ print_regions(int gb[BOARDMAX])
 	break;
 
       case BLACK:
-	if (dragon[ii].matcher_status == CRITICAL)
+	if (dragon[ii].status == CRITICAL)
 	  draw_color_char(I(ii), J(ii), 'X', GG_COLOR_RED);
 	else
 	  draw_color_char(I(ii), J(ii), 'X', GG_COLOR_BLACK);
 	break;
 
       case WHITE:
-	if (dragon[ii].matcher_status == CRITICAL)
+	if (dragon[ii].status == CRITICAL)
 	  draw_color_char(I(ii), J(ii), 'O', GG_COLOR_RED);
 	else
 	  draw_color_char(I(ii), J(ii), 'O', GG_COLOR_BLACK);
@@ -506,7 +506,7 @@ estimate_score(float *upper, float *lower)
 
 
 /* We do not count dead stones inside the eyespace as territory. Such a
- * stone is characterized as having matcher_status DEAD yet having only
+ * stone is characterized as having status DEAD yet having only
  * DEAD dragons as neighbors.
  *
  * Thus in this situation:
@@ -531,20 +531,20 @@ captured_territory(int pos, int color)
   int d;
 
   if (board[pos] == EMPTY 
-      || dragon[pos].matcher_status == ALIVE
-      || dragon[pos].matcher_status == UNKNOWN
-      || (board[pos] == color && dragon[pos].matcher_status == CRITICAL))
+      || dragon[pos].status == ALIVE
+      || dragon[pos].status == UNKNOWN
+      || (board[pos] == color && dragon[pos].status == CRITICAL))
     return 0;
 
   if (DRAGON2(pos).neighbors == 0
-      && dragon[pos].matcher_status == DEAD)
+      && dragon[pos].status == DEAD)
     return 1;
 
   for (d = 0; d < DRAGON2(pos).neighbors; d++)
     if (DRAGON(DRAGON2(pos).adjacent[d]).color == OTHER_COLOR(board[pos])
-	&& (DRAGON(DRAGON2(pos).adjacent[d]).matcher_status == ALIVE
+	&& (DRAGON(DRAGON2(pos).adjacent[d]).status == ALIVE
 	|| (board[pos] != color
-	    && DRAGON(DRAGON2(pos).adjacent[d]).matcher_status == CRITICAL)))
+	    && DRAGON(DRAGON2(pos).adjacent[d]).status == CRITICAL)))
       return 1;
 
   return 0;

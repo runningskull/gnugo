@@ -1527,16 +1527,17 @@ gtp_dragon_status(char *s, int id)
   /* FIXME: We should also call the semeai module. */
 
   if (dragon[POS(i, j)].owl_status == UNCHECKED) {
-    if (dragon[POS(i, j)].status == ALIVE)
+    if (dragon[POS(i, j)].crude_status == ALIVE)
       return gtp_success(id, "alive");
   
-    if (dragon[POS(i, j)].status == DEAD)
+    if (dragon[POS(i, j)].crude_status == DEAD)
       return gtp_success(id, "dead");
   
-    if (dragon[POS(i, j)].status == UNKNOWN)
+    if (dragon[POS(i, j)].crude_status == UNKNOWN)
       return gtp_success(id, "unknown");
 
-    assert(dragon[POS(i, j)].status == CRITICAL); /* Only remaining possibility. */
+    /* Only remaining possibility. */
+    assert(dragon[POS(i, j)].crude_status == CRITICAL); 
     return gtp_success(id, "critical");
   }
 
@@ -2729,13 +2730,13 @@ gtp_matcher_status(char *s, int id)
         struct dragon_data *d = &dragon[pos];
 	gtp_print_vertex(I(pos), J(pos));
 	gtp_printf(": ");
-	gtp_printf("%s\n", status_to_string(d->matcher_status));
+	gtp_printf("%s\n", status_to_string(d->status));
       }
     gtp_printf("\n");
     return GTP_OK;
   }
   else {
-    gtp_printf("%s\n", status_to_string(dragon[pos].matcher_status));
+    gtp_printf("%s\n", status_to_string(dragon[pos].status));
     gtp_printf("\n");
     return GTP_OK;
   }

@@ -802,9 +802,9 @@ revise_semeai(int color)
     if (ON_BOARD(pos)
 	&& dragon[pos].color == other
 	&& DRAGON2(pos).semeai
-	&& dragon[pos].matcher_status == DEAD) {
+	&& dragon[pos].status == DEAD) {
       found_one = 1;
-      dragon[pos].matcher_status = UNKNOWN;
+      dragon[pos].status = UNKNOWN;
       if (dragon[pos].origin == pos)
 	TRACE("revise_semeai: changed status of dragon %1m from DEAD to UNKNOWN\n",
 	      pos);
@@ -838,13 +838,13 @@ revise_thrashing_dragon(int color, float advantage)
 
   if (disable_threat_computation
       || !thrashing_dragon 
-      || dragon[thrashing_dragon].matcher_status != DEAD)
+      || dragon[thrashing_dragon].status != DEAD)
     return 0;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos)
 	&& is_same_dragon(pos, thrashing_dragon))
-      dragon[pos].matcher_status = UNKNOWN;
+      dragon[pos].status = UNKNOWN;
 
   DRAGON2(thrashing_dragon).safety = WEAKLY_ALIVE;
   compute_initial_influence(color, 1);

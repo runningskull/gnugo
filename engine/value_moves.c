@@ -644,7 +644,7 @@ examine_move_safety(int color)
 	      if (DRAGON(DRAGON2(aa).adjacent[m]).color == color) {
 		our_color_neighbors++;
 		bb = dragon2[DRAGON2(aa).adjacent[m]].origin;
-		if (dragon[bb].matcher_status == ALIVE) {
+		if (dragon[bb].status == ALIVE) {
 		  tactical_safety = 1;
 		  safety = 1;
 		}
@@ -688,7 +688,7 @@ examine_move_safety(int color)
 	  /* If the attacker is thought to be alive, we trust that
 	   * sentiment.
 	   */
-	  if (dragon[bb].matcher_status == ALIVE) {
+	  if (dragon[bb].status == ALIVE) {
 	    tactical_safety = 1;
 	    safety = 1;
 	    break;
@@ -712,7 +712,7 @@ examine_move_safety(int color)
 	{
 	  int aa = worms[what];
 	  
-	  if (dragon[aa].matcher_status == ALIVE)
+	  if (dragon[aa].status == ALIVE)
 	    /* It would be better if this never happened, but it does
 	     * sometimes. The owl reading can be very slow then.
 	     */
@@ -743,9 +743,9 @@ examine_move_safety(int color)
 	    safety = 1;
 	  }
 	  else if ((dragon[aa].owl_status == UNCHECKED
-		    && dragon[aa].status == ALIVE)
+		    && dragon[aa].crude_status == ALIVE)
 		   || (dragon[bb].owl_status == UNCHECKED
-		       && dragon[bb].status == ALIVE)) {
+		       && dragon[bb].crude_status == ALIVE)) {
 	    tactical_safety = 1;
 	    safety = 1;
 	  }
@@ -1014,10 +1014,10 @@ adjusted_worm_attack_value(int pos, int ww)
   for (s = 0; s < num_adj; s++) {
     int adj = adjs[s];
 
-    if (dragon[adj].matcher_status != DEAD)
+    if (dragon[adj].status != DEAD)
       has_live_neighbor = 1;
 
-    if (dragon[adj].matcher_status == DEAD
+    if (dragon[adj].status == DEAD
 	&& 2*dragon[adj].effective_size > adjustment_up)
       adjustment_up = 2*dragon[adj].effective_size;
 
@@ -1197,7 +1197,7 @@ estimate_territorial_value(int pos, int color, float score)
       /* If the stones are dead, there is only a secondary value in
        * capturing them tactically as well.
        */
-      if (dragon[aa].matcher_status == DEAD) {
+      if (dragon[aa].status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m:   %f (secondary) - attack on %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
@@ -1245,7 +1245,7 @@ estimate_territorial_value(int pos, int color, float score)
        * territorial. Admittedly this make more sense for attacks on
        * dead stones.
        */
-      if (dragon[aa].matcher_status == DEAD) {
+      if (dragon[aa].status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m:   %f (secondary) - defense of %1m (dead)\n",
 	      pos, 0.2 * this_value, aa);
@@ -1296,7 +1296,7 @@ estimate_territorial_value(int pos, int color, float score)
       /* Make sure this is a threat to attack opponent stones. */
       ASSERT1(board[aa] == other, aa);
       
-      if (dragon[aa].matcher_status == DEAD) {
+      if (dragon[aa].status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "    %1m: 0.0 - threatens to capture %1m (dead)\n", pos, aa);
 	break;
@@ -1378,7 +1378,7 @@ estimate_territorial_value(int pos, int color, float score)
 	  if (same_string(pos, adj))
 	    continue;
 	  if (dragon[adj].color == color
-	      && dragon[adj].matcher_status == DEAD
+	      && dragon[adj].status == DEAD
 	      && 2*dragon[adj].effective_size > adjustment_up)
 	    adjustment_up = 2*dragon[adj].effective_size;
 	  if (dragon[adj].color == color
@@ -1575,7 +1575,7 @@ estimate_territorial_value(int pos, int color, float score)
     case OWL_ATTACK_THREAT:
       aa = dragons[move_reasons[r].what];
 
-      if (dragon[aa].matcher_status == DEAD) {
+      if (dragon[aa].status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "    %1m: 0.0 - threatens to owl attack %1m (dead)\n", pos, aa);
 	break;
@@ -1600,7 +1600,7 @@ estimate_territorial_value(int pos, int color, float score)
 	  int adj = dragon2[d].origin;
 
 	  if (dragon[adj].color == color
-	      && dragon[adj].matcher_status == CRITICAL
+	      && dragon[adj].status == CRITICAL
 	      && dragon2[d].safety != INESSENTIAL
 	      && !owl_defense_move_reason_known(pos, find_dragon(adj)))
 	    value = 0.0;
@@ -1842,7 +1842,7 @@ estimate_strategical_value(int pos, int color, float score)
 	     * have already counted the points as territorial value,
 	     * unless it's assumed to be dead.
 	     */
-	    if (dragon[bb].matcher_status != DEAD
+	    if (dragon[bb].status != DEAD
 		&& dragon[bb].size == worm[bb].size
 		&& (attack_move_reason_known(pos, find_worm(bb))
 		    || defense_move_reason_known(pos, find_worm(bb))))
@@ -1887,8 +1887,8 @@ estimate_strategical_value(int pos, int color, float score)
 	bb = worms[worm2];
 
 	/* If both worms are dead, this move reason has no value. */
-	if (dragon[aa].matcher_status == DEAD 
-	    && dragon[bb].matcher_status == DEAD)
+	if (dragon[aa].status == DEAD 
+	    && dragon[bb].status == DEAD)
 	  break;
 
 	/* Also if there is a combination attack, we assume it covers
@@ -1905,7 +1905,7 @@ estimate_strategical_value(int pos, int color, float score)
 	      pos, this_value, aa, aa_value, bb, bb_value);
 
 	/* FIXME: The restriction to this_value > 0 
-	 * should not be necessary. See century-2002:30.
+	 * should not be necessary. See century-2002:30 and nngs2:160.
 	 * Debugging this example might show a deeper problem
 	 * with EITHER_MOVE reasons.
 	 */
@@ -1921,8 +1921,8 @@ estimate_strategical_value(int pos, int color, float score)
 	bb = worms[worm2];
 
 	/* If both worms are dead, this move reason has no value. */
-	if (dragon[aa].matcher_status == DEAD 
-	    && dragon[bb].matcher_status == DEAD)
+	if (dragon[aa].status == DEAD 
+	    && dragon[bb].status == DEAD)
 	  break;
 
 	/* Also if there is a combination attack, we assume it covers
@@ -1963,7 +1963,7 @@ estimate_strategical_value(int pos, int color, float score)
 	  cc = get_last_opponent_move(color);
 	  
 	  if (cc != NO_MOVE
-	      && dragon[cc].matcher_status == DEAD
+	      && dragon[cc].status == DEAD
 	      && are_neighbor_dragons(aa, cc)
 	      && are_neighbor_dragons(bb, cc)) {
 	    if (aa == bb)
@@ -2073,7 +2073,7 @@ estimate_strategical_value(int pos, int color, float score)
 	  break;
 	}
 
-       if (dragon[bb].matcher_status == CRITICAL) {
+       if (dragon[bb].status == CRITICAL) {
 	  this_value = ???
          TRACE("  %1m: %f - vital for %1m\n",
                pos, this_value, bb);
@@ -2128,7 +2128,7 @@ estimate_strategical_value(int pos, int color, float score)
 	    int adj = dragon2[d].origin;
 	    
 	    if (dragon[adj].color == color
-		&& dragon[adj].matcher_status == CRITICAL
+		&& dragon[adj].status == CRITICAL
 		&& dragon2[d].safety != INESSENTIAL
 		&& !owl_defense_move_reason_known(pos, find_dragon(adj)))
 	      this_value = 0.0;
@@ -2157,7 +2157,7 @@ estimate_strategical_value(int pos, int color, float score)
 	  int found_one = 0;
 	  
 	  for (d = 0; d < DRAGON2(aa).neighbors; d++)
-	    if (DRAGON(DRAGON2(aa).adjacent[d]).matcher_status == CRITICAL)
+	    if (DRAGON(DRAGON2(aa).adjacent[d]).status == CRITICAL)
 	      found_one = 1;
 	  if (found_one)
 	    break;
@@ -2194,7 +2194,7 @@ estimate_strategical_value(int pos, int color, float score)
      * already counted the points as territorial value, unless
      * it's assumed to be dead.
      */
-    if (dragon[aa].matcher_status != DEAD
+    if (dragon[aa].status != DEAD
 	&& dragon[aa].size == worm[aa].size
 	&& (attack_move_reason_known(pos, find_worm(aa))
 	    || defense_move_reason_known(pos, find_worm(aa)))) {

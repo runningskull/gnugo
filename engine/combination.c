@@ -426,9 +426,9 @@ compute_aa_status(int color, int saved_dragons[BOARDMAX],
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == other) {
-      if (dragon[pos].matcher_status == DEAD)
+      if (dragon[pos].status == DEAD)
 	aa_status[pos] = DEAD;
-      else if (dragon[pos].matcher_status == CRITICAL
+      else if (dragon[pos].status == CRITICAL
 	       && (!saved_dragons || !saved_dragons[pos]))
 	aa_status[pos] = CRITICAL;
       else if (worm[pos].attack_codes[0] != 0) {

@@ -728,7 +728,7 @@ struct dragon_data {
                 /* dragon iff they have same origin.                         */
   int size;     /* size of the dragon                                        */
   float effective_size; /* stones and surrounding spaces                     */
-  int status;   /* (ALIVE, DEAD, UNKNOWN, CRITICAL)                          */
+  int crude_status;   /* (ALIVE, DEAD, UNKNOWN, CRITICAL)                    */
   int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
   int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
   int owl_attack_point;    /* vital point for attack                         */
@@ -738,13 +738,12 @@ struct dragon_data {
   int owl_attack_codes[MAX_TACTICAL_POINTS];
 #endif
   int owl_attack_certain;  /* 0 if owl reading node limit is reached         */
-
   int owl_second_attack_point;/* if attacker gets both attack points, wins   */
   int owl_defense_point;   /* vital point for defense                        */
   int owl_defense_code;    /* ko result code                                 */
   int owl_defense_certain; /* 0 if owl reading node limit is reached         */
   int owl_second_defense_point;/* if defender gets both attack points, wins  */
-  int matcher_status;  /* status used by pattern matching                    */
+  int status;              /* best trusted status                            */
 };
 
 extern struct dragon_data dragon[BOARDMAX];

@@ -54,6 +54,32 @@ loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 214
 100 gg_genmove black
 #? [H5]*
 
+loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 34
+110 gg_genmove black
+#? [B14|B13]
+
+loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 42
+120 gg_genmove black
+#? [E12|D13]
+
+loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 100
+130 gg_genmove black
+#? [S13]
+
+loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 130
+140 gg_genmove black
+#? [P5]
+
+loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
+150 gg_genmove black
+#? [M3|L3]
+
+# same bug as century-2002:30
+loadsgf games/nngs/gnugo-3.3.2-Programmer-200206021522.sgf 52
+160 gg_genmove black
+#? [J14]
+
+
 
 ############ End of Tests #################
 

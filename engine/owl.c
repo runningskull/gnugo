@@ -295,9 +295,9 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
   }
   if (stackp > 0)
     semeai_focus = NO_MOVE;
-  else if (dragon[bpos].matcher_status == CRITICAL)
+  else if (dragon[bpos].status == CRITICAL)
     semeai_focus = bpos;
-  else if (dragon[apos].matcher_status == CRITICAL)
+  else if (dragon[apos].status == CRITICAL)
     semeai_focus = apos;
   else
     semeai_focus = NO_MOVE;
@@ -3225,8 +3225,8 @@ owl_mark_boundary(struct local_owl_data *owl)
 	int pos2 = pos + delta[k];
 	if (board[pos2] == owl->color
 	    && !owl->goal[pos2]
-	    && ((dragon[pos2].status != DEAD && countstones(pos2) > 2)
-		|| dragon[pos2].status == ALIVE)) {
+	    && ((dragon[pos2].crude_status != DEAD && countstones(pos2) > 2)
+		|| dragon[pos2].crude_status == ALIVE)) {
 	  mark_string(pos, owl->boundary, 2);
 	  break;
 	}
@@ -3382,7 +3382,7 @@ owl_reasons(int color)
     if (!ON_BOARD(pos) || board[pos] == EMPTY)
       continue;
     if (dragon[pos].origin == pos
-	&& dragon[pos].matcher_status == CRITICAL
+	&& dragon[pos].status == CRITICAL
 	&& dragon[pos].owl_attack_point != NO_MOVE) {
       if (board[pos] == color) {
 	if (dragon[pos].owl_defense_point != NO_MOVE) {
@@ -3417,7 +3417,7 @@ owl_reasons(int color)
 	  for (k = 0; k < DRAGON2(pos).neighbors; k++) {
 	    int d = DRAGON2(pos).adjacent[k];
 	    if (DRAGON(d).color == color) {
-	      if (DRAGON(d).matcher_status == ALIVE) {
+	      if (DRAGON(d).status == ALIVE) {
 		safe = 1;
 		break;
 	      }
@@ -4164,7 +4164,7 @@ owl_substantial(int str)
 
     adj = chainlinks(str, adjs);
     for (k = 0; k < adj; k++) {
-      if (dragon[adjs[k]].matcher_status == ALIVE)
+      if (dragon[adjs[k]].status == ALIVE)
 	return 1;
       for (m = 0; m < board_size; m++)
 	for (n = 0; n < board_size; n++)
@@ -4406,9 +4406,9 @@ compute_owl_escape_values(struct local_owl_data *owl)
     for (n = 0; n < board_size; n++) {
       pos = POS(m, n);
       if (dragon[pos].color == owl->color) {
-	if (dragon[pos].status == ALIVE)
+	if (dragon[pos].crude_status == ALIVE)
 	  owl->escape_values[pos] = 6;
-	else if (dragon[pos].status == UNKNOWN
+	else if (dragon[pos].crude_status == UNKNOWN
 		 && (DRAGON2(pos).escape_route > 5
 		     || DRAGON2(pos).moyo_size_pre_owl > 5))
 	  owl->escape_values[pos] = 4;

@@ -618,7 +618,7 @@ struct dragon_data @{
   int origin;
   int size;
   float effective_size;
-  int status;
+  int crude_status;
   int owl_threat_status;
   int owl_status;
   int owl_attack_point;
@@ -629,7 +629,7 @@ struct dragon_data @{
   int owl_defense_code;
   int owl_defense_certain;
   int owl_second_defense_point;
-  int matcher_status;
+  int status;
 @};
 
 extern struct dragon_data dragon[BOARDMAX];
@@ -746,8 +746,8 @@ dragon can escape, so finding two eyes locally becomes less
 urgent. Further documentation may be found else where
 (@pxref{Escape}).
 @end quotation
-@item @code{status}
-@cindex status (dragon)
+@item @code{crude_status}
+@cindex crude_status (dragon)
 @findex compute_dragon_status
 @quotation
 An attempt is made to classify the dragons as @code{ALIVE},
@@ -755,17 +755,17 @@ An attempt is made to classify the dragons as @code{ALIVE},
 classification means that the fate of the dragon depends on who moves first in
 the area. The exact definition is in the function 
 @code{compute_dragon_status()}. If the dragon is found to be surrounded, 
-the status is @code{DEAD} if it has less than 1.5 eyes or if the reading
+the crude_status is @code{DEAD} if it has less than 1.5 eyes or if the reading
 code determines that it can be killed, @code{ALIVE} if it has 2 or more
 eyes, and @code{CRITICAL} if it has 1.5 eyes. A lunch generally counts
 as a half eye in these calculations. If it has less than 2 eyes but
-seems possibly able to escape, the status may be @code{UNKNOWN}.
+seems possibly able to escape, the crude_status may be @code{UNKNOWN}.
 @end quotation
 @item @code{owl_status}
 @quotation
 @cindex status, owl (dragon)
-@cindex owl status
-This is a classification similar to @code{dragon.status}, but
+@cindex owl_status
+This is a classification similar to @code{dragon.crude_status}, but
 based on the life and death reading in @file{owl.c}.
 The owl code (@pxref{The Owl Code}) is only run on dragons with 
 dragon.escape_route>5 and dragon2.moyo>10. If
@@ -814,9 +814,9 @@ If the owl code finds that the dragon can be defended, this is the move.
 @item @code{owl_second_defense_point}
 Similar to @code{owl_attack_certain} and
 @code{owl_second_attack_point}.
-@item @code{matcher_status}
+@item @code{status}
 @quotation
-@cindex matcher status (dragon)
+@cindex status (dragon)
 This is the status used by the pattern matcher. If @code{owl_status}
 is available (not @code{UNCHECKED}) this is used. Otherwise, we
 use the @code{status} field, except that we upgrade @code{DEAD} to
@@ -851,7 +851,7 @@ Size of the surrounding influence moyo. Computed by
 @end quotation
 @item @code{safety}
 @quotation
-This is a finer measure of dragon safety than @code{matcher_status}.
+This is a finer measure of dragon safety than @code{status}.
 In addition to the values @code{ALIVE}, @code{DEAD} and @code{CRITICAL} 
 it can take the values @code{INESSENTIAL}, @code{TACTICALLY_DEAD}, 
 @code{WEAK}, @code{WEAKLY_ALIVE}, @code{ALIVE_IN_SEKI}, @code{STRONGLY_ALIVE}

@@ -55,7 +55,7 @@ static void add_adjacent_dragons(int a, int b);
 static void add_adjacent_dragon(int a, int b);
 static int dragon_invincible(int pos);
 static int dragon_looks_inessential(int origin);
-static int compute_dragon_status(int pos);
+static int compute_crude_status(int pos);
 static void dragon_eye(int pos, struct eye_data[BOARDMAX]);
 static int compute_escape(int pos, int dragon_status_known);
 static void compute_surrounding_moyo_sizes(int opposite,
@@ -335,11 +335,11 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str)) {
       if (dragon[str].origin == str && board[str]) {
-	dragon[str].status = compute_dragon_status(str);
-	sgffile_dragon_status(I(str), J(str), dragon[str].status);
+	dragon[str].crude_status = compute_crude_status(str);
+	sgffile_dragon_status(I(str), J(str), dragon[str].crude_status);
       }
     }
-  time_report(2, "  compute_dragon_status", NO_MOVE, 1.0);
+  time_report(2, "  compute_crude_status", NO_MOVE, 1.0);
   
   /* We must update the dragon status at every intersection before we
    * call the owl code. This updates all fields.
@@ -447,22 +447,22 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     if (ON_BOARD(str)) {
       if (IS_STONE(board[str])) {
 	if (dragon[str].owl_status != UNCHECKED)
-	  dragon[str].matcher_status = dragon[str].owl_status;
-	else if (dragon[str].status == DEAD 
-		 || dragon[str].status == CRITICAL) {
+	  dragon[str].status = dragon[str].owl_status;
+	else if (dragon[str].crude_status == DEAD 
+		 || dragon[str].crude_status == CRITICAL) {
 	  /* If a dragon has sufficient escape potential or
 	   * surrounding moyo to stop the owl code from being run, the
-	   * matcher_status should be no worse than UNKNOWN,
+	   * status should be no worse than UNKNOWN,
 	   * regardless what the static life and death analysis
 	   * guesses.
 	   */
-	  dragon[str].matcher_status = UNKNOWN;
+	  dragon[str].status = UNKNOWN;
 	}
 	else {
 	  /* And if the static life and death analysis said UNKNOWN,
            * we are most likely ALIVE.
 	   */
-	  dragon[str].matcher_status = ALIVE;
+	  dragon[str].status = ALIVE;
 	}
       }
     }
@@ -486,7 +486,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 
   last_move = get_last_move();
   if (last_move != NO_MOVE
-      && dragon[last_move].matcher_status == DEAD) {
+      && dragon[last_move].status == DEAD) {
     thrashing_dragon = dragon[last_move].origin;
     if (save_verbose)
       gprintf("thrashing dragon found at %1m\n", thrashing_dragon);
@@ -603,15 +603,15 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 
   time_report(2, "  semeai module", NO_MOVE, 1.0);
 
-  /* The matcher_status is now correct at the origin of each dragon
+  /* The status is now correct at the origin of each dragon
    * but we need to copy it to every vertex.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
     if (ON_BOARD(str))
-      dragon[str].matcher_status = dragon[dragon[str].origin].matcher_status;
+      dragon[str].status = dragon[dragon[str].origin].status;
 
   /* Revise essentiality of critical worms. Specifically, a critical
-   * worm which is adjacent to no enemy dragon with matcher_status
+   * worm which is adjacent to no enemy dragon with status
    * better than DEAD, is considered INESSENTIAL.
    */
   for (str = BOARDMIN; str < BOARDMAX; str++)
@@ -627,7 +627,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 	
 	neighbors = chainlinks(str, adjs);
 	for (r = 0; r < neighbors; r++)
-	  if (dragon[adjs[r]].matcher_status != DEAD) {
+	  if (dragon[adjs[r]].status != DEAD) {
 	    essential = 1;
 	    break;
 	  }
@@ -645,7 +645,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   lively_white_dragons = 0;
   lively_black_dragons = 0;
   for (d = 0; d < number_of_dragons; d++)
-    if (DRAGON(d).status != DEAD) {
+    if (DRAGON(d).crude_status != DEAD) {
       if (DRAGON(d).color == WHITE)
 	lively_white_dragons++;
       else
@@ -675,8 +675,8 @@ initialize_dragon_data(void)
       dragon[str].owl_defense_code   = 0;
       dragon[str].owl_defense_certain = 1;
       dragon[str].owl_status         = UNCHECKED;
-      dragon[str].status             = UNKNOWN;
-      dragon[str].matcher_status     = UNKNOWN;
+      dragon[str].crude_status       = UNKNOWN;
+      dragon[str].status     = UNKNOWN;
       dragon[str].owl_threat_status  = UNCHECKED;
       dragon[str].owl_second_attack_point  = NO_MOVE;
       dragon[str].owl_second_defense_point = NO_MOVE;
@@ -1048,7 +1048,7 @@ dragon_looks_inessential(int origin)
   for (k = 0; k < DRAGON2(origin).neighbors; k++) {
     d = DRAGON2(origin).adjacent[k];
     if (DRAGON(d).color != board[origin]
-	&& (DRAGON(d).matcher_status != DEAD
+	&& (DRAGON(d).status != DEAD
 	    || dragon2[d].escape_route > 0))
       return 0;
   }
@@ -1165,8 +1165,8 @@ show_dragons(void)
 	      d2->genus,
 	      d2->heyes,
 	      d2->escape_route,
+	      snames[dd->crude_status],
 	      snames[dd->status],
-	      snames[dd->matcher_status],
 	      d2->moyo_size_pre_owl,
 	      safety_names[d2->safety]);
       gprintf(", owl status %s\n", snames[dd->owl_status]);
@@ -1293,7 +1293,7 @@ join_dragons(int d1, int d2)
 
 
 /*
- * compute_dragon_status(pos) tries to determine whether the dragon
+ * compute_crude_status(pos) tries to determine whether the dragon
  * at (pos) is ALIVE, DEAD, or UNKNOWN. The algorithm is not perfect
  * and can give incorrect answers.
  *
@@ -1302,7 +1302,7 @@ join_dragons(int d1, int d2)
  * be easily captured. Otherwise it is judged UNKNOWN.  */
 
 static int 
-compute_dragon_status(int pos)
+compute_crude_status(int pos)
 {
   int true_genus = 2*DRAGON2(pos).genus + DRAGON2(pos).heyes;
   int lunch = DRAGON2(pos).lunch;
@@ -1579,9 +1579,9 @@ compute_escape(int pos, int dragon_status_known)
       ii = POS(i, j);
 
       if (dragon_status_known) {
-	if (dragon[ii].status == ALIVE)
+	if (dragon[ii].crude_status == ALIVE)
 	  escape_value[ii] = 6;
-	else if (dragon[ii].status == UNKNOWN
+	else if (dragon[ii].crude_status == UNKNOWN
 		 && (DRAGON2(ii).escape_route > 5
 		     || DRAGON2(ii).moyo_size_pre_owl  > 5))
 	  escape_value[ii] = 4;
@@ -1811,16 +1811,16 @@ are_neighbor_dragons(int d1, int d2)
  */
 
 int
-dragon_status(int pos)
+crude_status(int pos)
 {
-  return dragon[pos].status;
+  return dragon[pos].crude_status;
 }
 
 
 int
-matcher_status(int pos)
+dragon_status(int pos)
 {
-  return dragon[pos].matcher_status;
+  return dragon[pos].status;
 }
 
 
@@ -1886,11 +1886,11 @@ report_dragon(FILE *outfile, int pos)
   gfprintf(outfile,"escape_route            %d\n", d2->escape_route);
   gfprintf(outfile,"lunch                   %1m\n", d2->lunch);
   gfprintf(outfile,"status                  %s\n",
-	   status_to_string(d->status));
+	   status_to_string(d->crude_status));
   gfprintf(outfile,"owl_status              %s\n",
 	   status_to_string(d->owl_status));
-  gfprintf(outfile,"matcher_status          %s\n",
-	   status_to_string(d->matcher_status));
+  gfprintf(outfile,"status          %s\n",
+	   status_to_string(d->status));
   gfprintf(outfile,"owl_threat_status       %s\n",
 	   status_to_string(d->owl_threat_status));
   gfprintf(outfile,"owl_attack              %1m\n", d->owl_attack_point);
