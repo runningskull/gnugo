@@ -21,7 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-#define DUMP_GTP_PIPES		1
+#define DUMP_GTP_PIPES		0
 
 
 int
