@@ -116,7 +116,7 @@ loadsgf games/seki06.sgf
 #? [B2]
 
 # Both A2 and B1 lead to seki. Strictly speaking A2 is a better move
-# since it leaves black the option to take sente and let black make a
+# since it leaves black the option to take sente and let white make a
 # thousand-year ko. For now we accept both.
 play white B2
 203 reg_genmove black

@@ -144,3 +144,7 @@ loadsgf games/nngs/gnugo-3.3.11-rcde05-200211090008.sgf 271
 loadsgf games/filllib12.sgf
 43 reg_genmove black
 #? [C6]
+
+loadsgf games/filllib13.sgf
+44 reg_genmove black
+#? [F4]

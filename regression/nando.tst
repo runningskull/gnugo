@@ -57,7 +57,7 @@ loadsgf games/nando/auto008.sgf
 #CATEGORY=OWL/OPTICS
 loadsgf games/nando/auto009.sgf
 11 owl_attack S8
-#? [1 (S2|T2|S1)]
+#? [1 (S2|T2|S1|T4|T3)]
 
 #CATEGORY=OWL/OPTICS
 # Note that K12 connects out (sacrificing L11 if necessary).

@@ -8,8 +8,9 @@ loadsgf games/gwe.sgf 231
 # strictly speaking tenuki is possible here. Q1 is of course bad
 # tm - Indeed GNU Go has finally figured out that tenuki is best!
 # tm - yes, Q1 is bad.  T5 also wastes a point.
+# gf - However, policy is to restrain thrashing dragons, so T5 is correct.
 151 reg_genmove white
-#? [!(Q1|T5)]*
+#? [T5]*
 
 loadsgf games/gwe.sgf 241
 152 reg_genmove white
@@ -179,7 +180,7 @@ loadsgf games/xxlin.sgf 76
 
 loadsgf games/xxlin.sgf 106
 184 reg_genmove black
-#? [H13|F15]*
+#? [H13|F15|Q13]
 
 # We may want to move this to a dedicated seki or semeai test suite in
 # the future.
@@ -202,10 +203,8 @@ loadsgf games/pooo.sgf 24
 188 reg_genmove black
 #? [B6|C4]
 
-# The dragon at A2 is misclassified as inessential.
-
 loadsgf games/pooo.sgf 50
-189 reg_genmove black
+189 restricted_genmove black A14 C14 D14 E14 D15 E15 C19
 #? [E14]*
 
 loadsgf games/pooo.sgf 52

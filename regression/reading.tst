@@ -805,6 +805,11 @@ loadsgf games/reading44.sgf
 193 defend D3
 #? [1 F3]
 
+# See also strategy:13.
+loadsgf games/incident108b.sgf 292
+194 attack L16
+#? [0]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

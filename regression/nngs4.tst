@@ -170,7 +170,7 @@ loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 65
 
 # G12 allows white to live.
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 185
-430 reg_genmove black
+430 restricted_genmove black H10 G9 G10 G11 M6 L7 K7 G12 H12 F9 L12 M12
 #? [H10|G9|G10|G11|M6|L7|K7]*
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 20

@@ -236,6 +236,45 @@ loadsgf games/gunnar/gunnar12.sgf
 42 reg_genmove white
 #? [B19]
 
+# Q19 lets white make seki. T17 dies.
+loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 130
+43 reg_genmove black
+#? [R18|S18]
+
+# T18 still gives seki. T17 dies.
+loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 132
+44 reg_genmove black
+#? [T18]
+
+# The played move here was H13, caused by incorrect delta territory
+# but ultimately by a bug in break_through(). Naturally there is no
+# way for white to break through G13, H14, G15.
+loadsgf games/nngs/Minori-gnugo-3.5.2gf1-200312161433.sgf 254
+45 reg_genmove black
+#? [Q7|Q6|J16|J17|E7|N4]
+
+# Don't leave aji around, capture the white stones solidly.
+loadsgf games/nngs/joshj-gnugo-3.5.2gf1-200312171536.sgf 140
+46 restricted_genmove black O11 O9 N10 N9 M9
+#? [O11]
+
+# F15 is about 6 points plus some reverse followup. A4 is three points
+# reverse sente.
+loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 114
+47 restricted_genmove white F15 A4
+#? [F15]
+
+# Saving M13 is small compared to stopping a black incursion.
+loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 114
+48 restricted_genmove white M12 P11
+#? [P11]
+
+# In 3.5.2 the breakin code hallucinates that white A10 would suddenly
+# let black break into the territory around F6.
+loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 164
+49 reg_genmove white
+#? [A10]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

@@ -71,6 +71,7 @@ loadsgf games/incident108b.sgf 270
 #? [N4]
 
 # incident 113
+# See also reading:194
 loadsgf games/incident108b.sgf 292
 13 reg_genmove black
 #? [N18]

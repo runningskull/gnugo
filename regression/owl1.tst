@@ -298,6 +298,18 @@ loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 126
 333 owl_defend C17
 #? [0]*
 
+loadsgf games/nngs/joshj-gnugo-3.5.2gf1-200312171536.sgf 119
+334 owl_attack F5
+#? [1 (E7|F6)]
+
+loadsgf games/nngs/joshj-gnugo-3.5.2gf1-200312171536.sgf 180
+335 owl_defend K12
+#? [1 O6]
+
+loadsgf games/nngs/gnugo-3.5.2gf1-G28-200312282240.sgf 203
+336 owl_attack M5
+#? [1 (N2|O1)]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

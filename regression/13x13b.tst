@@ -121,7 +121,7 @@ loadsgf games/mertin13x13/GHGN2.sgf 48
 10 reg_genmove white
 #? [!M6]
 
-# Most other moves are better than the game move at M6.
+# L6 urgent.
 loadsgf games/mertin13x13/GHGN2.sgf 52
 11 reg_genmove white
 #? [L6]

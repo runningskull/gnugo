@@ -78,8 +78,8 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
 
 # same bug as century-2002:30
 loadsgf games/nngs/gnugo-3.3.2-Programmer-200206021522.sgf 52
-160 reg_genmove black
-#? [J14]*
+160 reg_genmove white
+#? [J14]
 
 # R9 is clearly worse than Q9.
 loadsgf games/nngs/kumu-gnugo-3.2-200205070903.sgf 116
@@ -115,10 +115,14 @@ loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 160
 240 reg_genmove black
 #? [F17]
 
-loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 196
-250 reg_genmove black
-#? [T18]*
+# # T18 is not very big, maybe a few points. There are clearly bigger
+# # points on the board. Removed.
+# loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 196
+# 250 reg_genmove black
+# #? [T18]*
 
+# White can't kill or make seki but black may be forced to play
+# several moves inside own territory to remove white's stones later.
 loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 204
 260 reg_genmove black
 #? [S18]*
@@ -186,10 +190,10 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 196
 #? [J4|K2|K3|K4|K5|L2]*
 
 #CATEGORY=SEMEAI
-# If we move first, black can only get a ko in the semeai.
+# K1 wins the semeai. Other moves let black get ko.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 212
 470 reg_genmove white
-#? [H6|H5|H3]*
+#? [K1]*
 
 # H4 only forces black to connect. H3 is locally more interesting, or
 # a move to secure life.
@@ -245,7 +249,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 122
 
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 152
 580 reg_genmove white
-#? [K19]*
+#? [N19]*
 
 # We still can live.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192319.sgf 224
