@@ -161,3 +161,7 @@ loadsgf games/kisei28_g7.sgf 280
 33 reg_genmove white
 #? [!H6|J1]*
 
+# Fills a common liberty in a seki similar to blunder:32.
+loadsgf games/kgs/2004-04-28-R-dokuganryu-GnuGoCVS.sgf 302
+34 gg_genmove black
+#? [!A19|C19]
