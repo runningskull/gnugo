@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- removed unneeded and potentially inportable timing code
 - removed forward declaration of pattern arrays to avoid compiler warnings
 - removed pattern databases for experimental reading
 - added -pedantic to GCC flags

@@ -75,17 +75,6 @@ static int init = 0;
 
 #endif /* TERMINFO */
 
-/* for gg_cputime */
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-#ifdef HAVE_SYS_TIMES_H
-#include <sys/times.h>
-#elif defined(WIN32)
-#include <windows.h>
-#endif
-
 void
 gg_init_color()
 {
@@ -231,30 +220,10 @@ gg_snprintf(char *dest, unsigned long len, const char *fmt, ...)
   va_end(args);
 }
 
-/* Get the time of day, calling gettimeofday from sys/time.h
- * if available, otherwise substituting a workaround for portability.
- */
-
-int
-gg_gettimeofday2(struct timeval *tv, void *p)
-{
-#ifdef HAVE_GETTIMEOFDAY
-  return gettimeofday(tv, NULL);
-#else
-  if (tv != NULL) {
-    tv->tv_sec  = time(NULL);
-    tv->tv_usec = 0;
-  }
-  return 1;
-#endif
-}
-
 double
 gg_gettimeofday(void)
 {
-  struct timeval tv;
-  gg_gettimeofday2(&tv, NULL);
-  return tv.tv_sec + 1.e-6*tv.tv_usec;
+  return 0.0;
 }
 
 const char *
@@ -268,33 +237,12 @@ gg_version(void)
 double
 gg_cputime(void)
 {
-#if HAVE_SYS_TIMES_H && HAVE_TIMES && HAVE_UNISTD_H
-    struct tms t;
-    times(&t);
-    return (t.tms_utime + t.tms_stime + t.tms_cutime + t.tms_cstime)
-            / ((double) sysconf(_SC_CLK_TCK));
-#elif defined(WIN32)
-    FILETIME creationTime, exitTime, kernelTime, userTime;
-    ULARGE_INTEGER uKernelTime, uUserTime, uElapsedTime;
-    GetProcessTimes(GetCurrentProcess(), &creationTime, &exitTime,
-                    &kernelTime, &userTime);
-    uKernelTime.LowPart = kernelTime.dwLowDateTime;
-    uKernelTime.HighPart = kernelTime.dwHighDateTime;
-    uUserTime.LowPart = userTime.dwLowDateTime;
-    uUserTime.HighPart = userTime.dwHighDateTime;
-    uElapsedTime.QuadPart = uKernelTime.QuadPart + uUserTime.QuadPart;
-    /*_ASSERTE(0 && "Debug Times");*/
-    /* convert from multiples of 100nanosecs to seconds: */
-    return (signed __int64)(uElapsedTime.QuadPart) * 1.e-7;
-#else
-    static int warned = 0;
-    if (!warned) {
-      fprintf(stderr, "CPU timing unavailable - returning wall time.");
-      warned = 1;
-    }
-    /* return wall clock seconds */
-    return gg_gettimeofday();
-#endif
+  static int warned = 0;
+  if (!warned) {
+    fprintf(stderr, "All timing disabled.");
+    warned = 1;
+  }
+  return 0.0;
 }
 
 /* Before we sort floating point values (or just compare them) we
