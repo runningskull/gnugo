@@ -2,7 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.5.7 released June 8, 2004
+3.5.8 released June 8, 2004
 
 - make `mkpat' detect duplicate pattern names
 - duplicate pattern names renamed
