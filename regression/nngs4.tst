@@ -15,7 +15,7 @@ loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 26
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 36
 30 gg_genmove white
-#? [C5|C6]*
+#? [C5|C6]
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 46
 40 gg_genmove white

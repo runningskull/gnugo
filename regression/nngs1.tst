@@ -147,7 +147,7 @@ loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 30
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 44
 35 gg_genmove white
-#? [D13]
+#? [D13]*
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203230525.sgf 64
 36 gg_genmove white
@@ -188,7 +188,7 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 46
 # defense of the top right is urgent
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
 46 gg_genmove white
-#? [!J5]
+#? [!J5]*
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 12
 47 gg_genmove white

@@ -1,3 +1,53 @@
+======================= 3.3.12 pre 1  =========================
+
+./regress.sh . reading.tst 
+176 unexpected FAIL: Correct '0', got '1 A5'
+177 unexpected FAIL: Correct '1 N1', got '0'
+./regress.sh . connection.tst 
+96 unexpected FAIL: Correct '0', got '1'
+97 unexpected FAIL: Correct '1 O5', got '0'
+./regress.sh . nngs1.tst 
+35 unexpected FAIL: Correct 'D13', got 'O6'
+46 unexpected FAIL: Correct '!J5', got 'J5'
+./regress.sh . golife.tst 
+2 unexpected PASS!
+./regress.sh . viking.tst 
+1 unexpected PASS!
+./regress.sh . trevorb.tst 
+160 unexpected FAIL: Correct '1 ..*', got '0'
+./regress.sh . trevor.tst 
+360 unexpected FAIL: Correct '(2|3) J9', got '1 E9'
+./regress.sh . tactics.tst 
+101 unexpected FAIL: Correct '1 D12', got '0'
+102 unexpected FAIL: Correct '0', got '1'
+./regress.sh . strategy3.tst 
+105 unexpected PASS!
+./regress.sh . global.tst 
+32 unexpected PASS!
+./regress.sh . strategy4.tst 
+179 unexpected PASS!
+./regress.sh . nngs2.tst 
+480 unexpected PASS!
+./regress.sh . nngs4.tst 
+30 unexpected PASS!
+./regress.sh . tactics1.tst 
+10 unexpected FAIL: Correct '!T9', got 'T9'
+20 unexpected FAIL: Correct '1 A17', got '0'
+./regress.sh . manyfaces1.tst 
+10 unexpected FAIL: Correct 'C17|H15|D9', got 'D5'
+20 unexpected FAIL: Correct 'F12|G14|G13|C17|C12|E13', got 'D2'
+30 unexpected FAIL: Correct 'C14', got 'B10'
+36 unexpected FAIL: Correct 'P16', got 'S11'
+40 unexpected FAIL: Correct 'P15', got 'O11'
+50 unexpected FAIL: Correct '1 .*', got '0'
+60 unexpected FAIL: Correct 'N18|G18', got 'C3'
+70 unexpected FAIL: Correct 'M10|L9|L8|K7', got 'F18'
+80 unexpected FAIL: Correct 'J17|N18|D18', got 'G16'
+90 unexpected FAIL: Correct '!A10', got 'A10'
+100 unexpected FAIL: Correct '!B13', got 'B13'
+150 unexpected FAIL: Correct 'N5|O6', got 'M1'
+160 unexpected FAIL: Correct 'O5', got 'P7'
+
 ======================= 3.3.11  =========================
 
 ./regress.sh . owl.tst 

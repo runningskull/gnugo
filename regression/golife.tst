@@ -8,7 +8,7 @@ loadsgf games/golife.sgf 16
 
 loadsgf games/golife.sgf 26
 2 gg_genmove white
-#? [H5]*
+#? [H5]
 
 # In this position the monkey jump can be cut with ko and is smaller
 # than a move at the bottom anyway.

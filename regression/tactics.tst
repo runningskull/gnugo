@@ -35,7 +35,7 @@ trymove white C13
 trymove white C12
 trymove black C11
 101 attack_either C11 D12
-#? [1 D12]
+#? [1 D12]*
 popgo
 popgo
 popgo
@@ -45,7 +45,7 @@ popgo
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
 trymove black L4
 102 defend_both N7 K4
-#? [0]
+#? [0]*
 popgo
 
 

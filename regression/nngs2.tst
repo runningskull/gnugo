@@ -195,7 +195,7 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 212
 # a move to secure life.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 73
 480 gg_genmove white
-#? [!H4]*
+#? [!H4]
 
 # R14 also helps black to connect. More interesting to play S14 or a
 # monkey jump.

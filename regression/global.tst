@@ -135,7 +135,7 @@ loadsgf golois/GoStar991114-1.sgf
 
 loadsgf golois/Indigo-Golois-991105-1.sgf
 32 gg_genmove black
-#? [G8]*
+#? [G8]
 
 loadsgf golois/Jimmy990906-1.sgf
 33 gg_genmove black
