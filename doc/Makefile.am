@@ -8,7 +8,7 @@ gnugo_TEXINFOS = analyze.texi api.texi board.texi copying.texi dfa.texi \
                  influence.texi introduction.texi move_generation.texi \
                  moyo.texi overview.texi owl.texi patterns.texi \
                  reading.texi regression.texi sgf.texi using.texi \
-                 utils.texi install.texi incremental.texi
+                 utils.texi install.texi 
 
 man_MANS = gnugo.6
 

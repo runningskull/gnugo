@@ -97,7 +97,6 @@ GNU Go Internals
 * Influence::                   Influence Function
 * Moyo::                        Estimation of Moyos : Bouzy's 5/21 algorithm
 * Utility Functions::           @file{utils.c} and @file{printutils.c}
-* Incremental Board::           Incremental Algorithms in Reading
 * GTP::                         The Go Text Protocol
 * Regression::                  Regression testing
 
@@ -199,11 +198,6 @@ Indices
 @chapter Utility Functions
 
 @include utils.texi
-
-@node Incremental Board
-@chapter Incremental Algorithms in Reading
-
-@include incremental.texi
 
 @node GTP
 @chapter The Go Text Protocol
