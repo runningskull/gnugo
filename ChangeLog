@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- no buffering on stdout in ascii mode
 - roadmap to engine files in overview.texi updated
 - move DEBUG_func to showbord.c
 - pattern tuning: remove "t" classification from various patterns
