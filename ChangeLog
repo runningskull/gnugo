@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.21 released June 3, 2003
+
 - revision of owl_strong_dragon()
 - extra care is now taken not to waste points on tiny ko threats
 - ko threats with large followups always preferred to large reverse followups
