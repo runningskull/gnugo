@@ -1,9 +1,11 @@
-VERSION 3.5.9
+VERSION 3.6 pre4
 
 New in 3.6 (since 3.4)
 
-- slightly stronger than 3.4, many small improvements
+- stronger than 3.4
+- many small improvements
 - GNU Go can now resign games
+- emacs mode can display the board graphically using xpms
 - basic knowledge of how to break out of mirror go
 
 New in 3.4 (since 3.2)

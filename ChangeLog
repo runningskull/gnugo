@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl threats disabled as a command line option
+- EXIT_SUCCESS and EXIT_FAILURE used in transpat.c and sgfgen.c
 - revised interface to all genmove() type functions
 - new global variable depth_offset
 - only cache safe_move() results when reading depth is unmodified

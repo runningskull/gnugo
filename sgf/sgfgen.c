@@ -94,5 +94,5 @@ main(void)
   }
   
   /* Needs 0 exit status or else make fails. */
-  return 0;
+  return EXIT_SUCCESS;
 }

@@ -222,90 +222,119 @@ if you are not running Emacs 21.x or later) you can get
 switch to a graphical Go board by typing `i'. You can also
 get help at any time by typing `?'.
 
-Here are the default keybindings:
+You play a move either by moving to the location with the
+arrow keys, then hitting the SPACE key, or by clicking on
+the location with the mouse. You can save or load a game,
+and undo moves. You can get an estimate of the score at
+any time by typing @samp{!}.
+
+You can also enter commands directly to the GTP engine.
+
+Although a grid is not displayed you can get the board
+position with a grid by entering @command{: showboard RET}.
+This will enter the GTP @command{showboard} command to
+draw an ascii map of the board, which includes a grid.
 
 @itemize @bullet
-@item @samp{?}
+@item
 @quotation
-View this help.
+@samp{?} Gets help.
 @end quotation
-@item @code{RET} or @code{SPC}
+@item  @code{RET} or @code{SPC}    
 @quotation
-Select point as the next move. An error is signalled for
-invalid locations. You may also use the mouse to play the
-move.
+Enters a move at the current position of the cursor,
+or mouse cursor in the graphical mode.
 @end quotation
-@item @samp{q} or @samp{Q}
+@item @samp{q} or @samp{Q}        
 @quotation
 Quit (the latter without confirmation).
 @end quotation
-@item @samp{R}
+@item @samp{R}             
 @quotation
-Resign
+Resign.
 @end quotation
-@item @code{C-l}
+@samp{u}             
 @quotation
-Refresh board. Actually, while the subprocess is thinking,
-this only refreshes the mode line.  
+Undo one move. If you undo an odd number of moves, you
+switch colors with your computer opponent.
 @end quotation
-@item @samp{_} or @code{M-_}
+@samp{U}          
 @quotation
-Bury the Board buffer (when the boss is near).
+Undo back to the location of the mouse cursor. After a
+move this is the last move just played, and (since you
+cannot enter this command until the computer has replied)
+the default behavior is to undo two moves. Alternatively,
+you can move the cursor to the move you want to undo
+before entering 'U', or use the prefix @command{C-} to
+enter the number of moves you want to undo. Then all
+moves are undone back to the move you selected.
 @end quotation
-@item @samp{P}
+@command{C-l}
 @quotation
-Pass; i.e., select no location for your move.
+Redraw the board.
 @end quotation
-@item @samp{i}
+@samp{_} or @command{M-_}
+@quotation
+Bury the Board buffer.
+@end quotation
+@samp{P}
+@quotation
+Pass.
+@end quotation
+@samp{i}
 @quotation
 Toggle display using XPM images (if supported).
 @end quotation
-@item @samp{W}
+@samp{w}
 @quotation
-Display current position's worm data in another buffer.
+Run `gnugo-worm-stones'.
 @end quotation
-@item @samp{D}
+@samp{d}
 @quotation
-Display current position's dragon data in another buffer.
+Run `gnugo-dragon-stones'.
 @end quotation
-@item @samp{t}
+@samp{W}
 @quotation
-Toggle dead groups (when the game is over).
+Run `gnugo-worm-data'.
 @end quotation
-@item @samp{!}
+@samp{D}
 @quotation
-Estimate score (at any time).
+Run `gnugo-dragon-data'.
 @end quotation
-@item @samp{:} or @samp{;}
+@samp{t}
 @quotation
-This can be any Gtp command (@pxref{GTP}). Type in a string
-to be passed (quite indirectly) to the GNU Go subprocess.
-Output and emacs behavior depend on which command is given.
-Try @code{help} to get a list of all commands.  Note that
-some commands may confuse @code{gnugo.el.}  
+Run `gnugo-toggle-dead-group'.
 @end quotation
-@item @samp{=}
+@samp{!}
 @quotation
-Display board position under point (if valid).
+Get GNU Go's score estimate.
 @end quotation
-@item @samp{h}
+@samp{:} or @samp{;}
 @quotation
-Display in the echo area "(N moves)" followed by the
-move history, most recent move first. This line is
+Enter a command directly to the GTP engine.
+@end quotation
+@samp{=}
+@quotation
+Display board position at the cursor point.
+@end quotation
+@samp{h}
+@quotation
+Display in the echo area \"(N moves)\" followed by the
+move history, most recent move first.  This line is
 subsequently available in the *Messages* buffer.
-@end quotation
-@item @samp{F}
+@end quotation        
+@samp{F}
 @quotation
-Switch to *GNUGO Final Score* buffer and display the
-final score there. If the game is still in play, Emacs
-confirms that you wish to stop play.
+Run `gnugo-display-final-score'.
 @end quotation
-@item @samp{s} or @command{C-x C-w} or @command{C-x C-s}
+@samp{s} or @command{C-x C-w} or @command{C-x C-s}
 @quotation
-Save the game history to a file (even if the game is not
-finished). If the file already exists, Emacs confirms
-that you wish to overwrite it.
-@end quotation 
+Run `gnugo-write-sgf-file'.
+@end quotation
+@samp{l}
+@quotation
+Run `gnugo-read-sgf-file'."
+@end quotation
 @end itemize
 
 @node GMP and GTP
