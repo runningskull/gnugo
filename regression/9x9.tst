@@ -153,3 +153,12 @@ loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 28
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 30
 350 owl_defend C3
 #? [0]*
+
+loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312292348.sgf 8
+360 reg_genmove black
+#? [F4|E6|D5]
+
+#E7 appears to be a losing move
+loadsgf games/nngs/gnugo-3.5.2gf1-Kiskol-200401021557.sgf 10
+370 reg_genmove white
+#? [G7]

@@ -322,6 +322,111 @@ loadsgf games/nngs/gnugo-3.4-nailer-200308230714.sgf 32
 750 reg_genmove white
 #? [C7]*
 
+loadsgf games/nngs/joshj-gnugo-3.5.2-200312100558.sgf 14
+760 reg_genmove black
+#? [Q15]
+
+#something better than Q14
+loadsgf games/nngs/gnugo-3.5.2gf1-vincentkuo-200312162312.sgf 30
+770 reg_genmove white
+#? [Q2|C13|L3|L4|K4|F16|F17]
+
+loadsgf games/nngs/gnugo-3.5.2gf1-vincentkuo-200312162312.sgf 40
+780 restricted_genmove white F15 F16 F17 C13
+#? [!F15]
+
+loadsgf games/nngs/gnugo-3.5.2gf1-vincentkuo-200312162312.sgf 66
+790 reg_genmove white
+#? [E15]
+
+#the cut is not yet dangerous
+loadsgf games/nngs/gnugo-3.5.2gf1-vincentkuo-200312162312.sgf 194
+800 reg_genmove white
+#? [E4]
+
+#O5 is bad
+loadsgf games/nngs/gnugo-3.5.2gf1-thi-200312210524.sgf 8
+810 reg_genmove white
+#? [D10|K4|K3|R6|Q6|Q2]
+
+#some kind of base for the invasion is urgent
+loadsgf games/nngs/gnugo-3.5.2gf1-thi-200312210524.sgf 20
+820 reg_genmove white
+#? [Q12]
+
+#K14 fails
+loadsgf games/nngs/gnugo-3.5.2gf1-thi-200312210524.sgf 104
+830 owl_defend J12
+#? [1 L15]
+
+#save the big dragon
+#owl sees it, but the move doesn't get valued (as of 3.5.2)
+loadsgf games/nngs/gnugo-3.5.2gf1-thi-200312210524.sgf 158
+840 reg_genmove white
+#? [T13]
+
+#something vaguely related to the cut would be good
+loadsgf games/nngs/GoFuN-gnugo-3.5.2gf1-200312230328.sgf 12
+850 reg_genmove black
+#? [M10|J10|L7|K7|K8|G7|G8|H8]
+
+#last chance to defend
+loadsgf games/nngs/GoFuN-gnugo-3.5.2gf1-200312230328.sgf 20
+860 reg_genmove black
+#? [J10]
+
+loadsgf games/nngs/GoFuN-gnugo-3.5.2gf1-200312230328.sgf 74
+870 reg_genmove black
+#? [C3|C4|D3]
+
+#M17 is bad; deal with one of the important groups
+loadsgf games/nngs/gnugo-3.5.2gf1-guest-200312260740.sgf 22
+880 reg_genmove white
+#? [O4|O5|R3|P3|R12|R11|O14|P13]
+
+loadsgf games/nngs/gnugo-3.5.2gf1-guest-200312260740.sgf 34
+890 reg_genmove white
+#? [!B18]
+
+loadsgf games/nngs/chuck-gnugo-3.5.2gf1-200312261847.sgf 88
+900 reg_genmove black
+#? [!Q18]
+
+loadsgf games/nngs/evand-gnugo-3.5.2gf1-200401072036.sgf 48
+910 owl_attack M11
+#? [0]
+
+#something other than D8
+loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 8
+920 reg_genmove white
+#? [E3|E4|F3|Q4|O4|R14|J3]
+
+#high approach (O16) is bad here
+loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 12
+930 reg_genmove white
+#? [O17|R14|Q4]
+
+#defend the top group
+loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 18
+940 reg_genmove white
+#? [M17|L17]
+
+loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 50
+950 reg_genmove white
+#? [D9|D7|D10|C9]
+
+loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 52
+960 reg_genmove white
+#? [D7|E10|C8]
+
+#game move at L13 is awful
+loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 60
+970 reg_genmove white
+#? [E6|E5|C6]
+
+loadsgf games/nngs/gnugo-3.5.3-Scorpion-200401080502.sgf 78
+980 reg_genmove white
+#? [!E5]
 
 ############ End of Tests #################
 
