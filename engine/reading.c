@@ -6265,74 +6265,35 @@ naive_ladder(int str, int *move)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int apos, bpos;
-  int acount = 0, bcount = 0;
   int liberties;
   int libs[2];
+  int scores[2];
+  int k;
   
   ASSERT1(board[str] != EMPTY, str);
   ASSERT1(countlib(str) == 2, str);
   DEBUG(DEBUG_READING, "naive_ladder(%1m)\n", str);
 
-  RTRACE("checking ladder attack on %1m with 2 liberties\n", str);
-
   /* Get the two liberties of (str) into (apos) and (bpos). */ 
   liberties = findlib(str, 2, libs);
   ASSERT1(liberties == 2, str);
-  apos = libs[0];
-  bpos = libs[1];
 
-  /* if (bpos) looks more promising we wish to switch the two liberties.
-   * We check whether (bpos) is adjacent to more open liberties than
-   * (apos).
-   *
-   * FIXME: Use order_moves() instead.
-   */
+  scores[0] = 0;
+  scores[1] = 0;
+  order_moves(str, 2, libs, scores, color, "naive_ladder");
 
-  if (board[SOUTH(apos)] == EMPTY)
-    acount++;
-  if (board[WEST(apos)] == EMPTY)
-    acount++;
-  if (board[NORTH(apos)] == EMPTY)
-    acount++;
-  if (board[EAST(apos)] == EMPTY)
-    acount++;
-  if (board[SOUTH(bpos)] == EMPTY)
-    bcount++;
-  if (board[WEST(bpos)] == EMPTY)
-    bcount++;
-  if (board[NORTH(bpos)] == EMPTY)
-    bcount++;
-  if (board[EAST(bpos)] == EMPTY)
-    bcount++;
-
-  if (bcount > acount) {
-    apos = libs[1];
-    bpos = libs[0];
+  for (k = 0; k < 2; k++) {
+    if (trymove(libs[k], other, "naive_ladder-A", str, EMPTY, 0)) {
+      if (!naive_ladder_defense(str, libs[k], libs[1-k], color, other)) {
+	popgo();
+	if (move)
+	  *move = libs[k];
+	return WIN;
+      }
+      popgo();
+    }
   }
-
-  RTRACE("considering atari at %1m\n", apos);
   
-  if (trymove(apos, other, "naive_ladder-A", str, EMPTY, 0)) {
-    if (!naive_ladder_defense(str, apos, bpos, color, other)) {
-      popgo();
-      if (move)
-	*move = apos;
-      return WIN;
-    }
-    popgo();
-  }
-	  
-  if (trymove(bpos, other, "naive_ladder-B", str, EMPTY, 0)) {
-    if (!naive_ladder_defense(str, bpos, apos, color, other)) {
-      popgo();
-      if (move)
-	*move = bpos;
-      return WIN;
-    }
-    popgo();
-  }
-
   /* Neither move worked. */
   return 0;
 }
@@ -6379,16 +6340,20 @@ naive_ladder_defense(int str, int apos, int bpos, int color, int other)
   if (naive_ladder_break_through(str, SE(bpos), color, other))
     return WIN;
 
-  if (naive_ladder_break_through(str, SS(bpos), color, other))
+  if (ON_BOARD(SOUTH(bpos))
+      && naive_ladder_break_through(str, SS(bpos), color, other))
     return WIN;
 
-  if (naive_ladder_break_through(str, WW(bpos), color, other))
+  if (ON_BOARD(WEST(bpos))
+      && naive_ladder_break_through(str, WW(bpos), color, other))
     return WIN;
 
-  if (naive_ladder_break_through(str, NN(bpos), color, other))
+  if (ON_BOARD(NORTH(bpos))
+      && naive_ladder_break_through(str, NN(bpos), color, other))
     return WIN;
 
-  if (naive_ladder_break_through(str, EE(bpos), color, other))
+  if (ON_BOARD(EAST(bpos))
+      && naive_ladder_break_through(str, EE(bpos), color, other))
     return WIN;
 
   /* Nothing worked. */
@@ -6399,7 +6364,9 @@ naive_ladder_defense(int str, int apos, int bpos, int color, int other)
 /* Try to break out of the ladder by capturing (apos). We must first
  * verify that there is an opponent stone there and that it is in
  * atari so we can capture it immediately. After the capture we count
- * liberties for (str) to see if the ladder is decided yet.
+ * liberties for (str) to see if the ladder is decided yet. This
+ * function may be called with (apos) off the board, but no further
+ * than diagonally away.
  */
 static int
 naive_ladder_break_through(int str, int apos, int color, int other)
