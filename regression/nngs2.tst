@@ -102,6 +102,48 @@ loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 148
 210 gg_genmove black
 #? [F15]*
 
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 54
+220 gg_genmove black
+#? [S9]
+
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 158
+230 gg_genmove black
+#? [G17]
+
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 160
+240 gg_genmove black
+#? [F17]
+
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 196
+250 gg_genmove black
+#? [T18]
+
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 204
+260 gg_genmove black
+#? [S18]
+
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 206
+270 gg_genmove black
+#? [S19]
+
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 216
+280 gg_genmove black
+#? [!A13]
+
+# B16 is maybe not playable.
+# C17 is in any case better than the game move C18.
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 220
+290 gg_genmove black
+#? [C17|B16]
+
+# Hey, Q19 is dead and Q13 doesn't threaten anything.
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 232
+300 gg_genmove black
+#? [!Q13]
+
+loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 240
+310 gg_genmove black
+#? [M11]
 
 ############ End of Tests #################
 
