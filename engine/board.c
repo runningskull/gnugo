@@ -1904,7 +1904,7 @@ is_edge_vertex(int pos)
   return 0;
 }
 
-
+/* Distance to the edge. */
 int
 edge_distance(int pos)
 {

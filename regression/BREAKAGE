@@ -1,3 +1,27 @@
+========================== 3.3.23 pre 2 =====================================
+
+./regress.sh . ld_owl.tst 
+314 unexpected FAIL: Correct '1 P18', got '1 Q18'
+315 unexpected FAIL: Correct '1 P18', got '0'
+316 unexpected FAIL: Correct '1 T16', got '1 P19'
+406 unexpected FAIL: Correct '1 R3', got '2 R3'
+407 unexpected FAIL: Correct '0', got '3 S3'
+408 unexpected FAIL: Correct '1 T3', got '2 T3'
+409 unexpected FAIL: Correct '0', got '3 R1'
+410 unexpected FAIL: Correct '1 T2', got '2 R3'
+411 unexpected FAIL: Correct '0', got '1 T4'
+412 unexpected FAIL: Correct '1 (R3|T2)', got '0'
+413 unexpected FAIL: Correct '0', got '1 T3'
+414 unexpected FAIL: Correct '1 S2', got '0'
+./regress.sh . owl1.tst 
+319 unexpected FAIL: Correct '1 S6', got '0'
+./regress.sh . nngs4.tst 
+640 unexpected FAIL: Correct '!R7', got 'R7'
+650 unexpected FAIL: Correct 'Q2', got 'G12'
+./regress.sh . joseki.tst 
+20 unexpected FAIL: Correct 'B4', got 'E6'
+30 unexpected FAIL: Correct 'F13', got 'F16'
+
 ========================== 3.3.23 pre 1 =====================================
 
 ./regress.sh . owl.tst 
