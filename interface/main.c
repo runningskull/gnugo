@@ -1391,7 +1391,7 @@ Main Options:\n\
                          If no terminal is detected GMP (Go Modem Protocol)\n\
                          will be assumed.\n\
        --quiet           Don't print copyright and informational messages\n\
-       --level <amount>  strength (default %d, up to 10 supported)\n\
+       --level <amount>  strength (default %d)\n\
        --gtp-input <file>Read gtp commands from file instead of stdin\n\
    -l, --infile <file>   Load name sgf file\n\
    -L, --until <move>    Stop loading just before move is played. <move>\n\

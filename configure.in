@@ -54,7 +54,7 @@ AC_ARG_ENABLE(cache-size,
   [  --enable-cache-size=n       reserve n Mb RAM for caching (8 default)])
 
 AC_ARG_ENABLE(level,
-  [  --enable-level=n            n = default level (up to 10 supported)])
+  [  --enable-level=n            n = default level (10 standard)])
 
 AC_ARG_ENABLE(semeai-node-limit,
   [  --enable-semeai-node-limit=n        n = semeai variations (500 standard)])

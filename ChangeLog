@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- convert break-in reading to use new cache implementation
 - new GTP command unconditional_status
 - estimate_lunch_eye_value() revised	
 - avoid calling owl_substantial() when not needed in aa_compute_status()
