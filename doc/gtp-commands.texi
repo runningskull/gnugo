@@ -1102,6 +1102,18 @@
 
 @end example
 
+@cindex analyze_eyegraph
+@item analyze_eyegraph
+
+@example
+
+ Function:  Compute an eyevalue and vital points for an eye graph
+ Arguments: Eyeshape encoded in string
+ Fails:     Bad eyeshape, analysis failed
+ Returns:   Eyevalue, vital points
+
+@end example
+
 @cindex cputime
 @item cputime
 

@@ -709,6 +709,8 @@ int is_proper_eye_space(int pos);
 int is_marginal_eye_space(int pos);
 int max_eye_value(int pos);
 void test_eyeshape(int eyesize, int *eye_vertices);
+int analyze_eyegraph(const char *coded_eyegraph, struct eyevalue *value,
+		     char *analyzed_eyegraph);
 
 
 /* debugging support */

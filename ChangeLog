@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new GTP command analyze_eyegraph
+- new functions analyze_eyegraph(), evaluate_eyespace(), tactical_life(),
+  tactical_life_attack(), and tactical_life_defend() in optics.c
 - new functions set_/get_/update_/reuse_random_seed()
 - save and restore random_seed where it is set to zero in deterministic
   GTP commands

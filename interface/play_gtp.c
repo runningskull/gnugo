@@ -54,6 +54,7 @@ static void rotate_on_output(int ai, int aj, int *bi, int *bj);
 
 DECLARE(gtp_aa_confirm_safety);
 DECLARE(gtp_all_legal);
+DECLARE(gtp_analyze_eyegraph);
 DECLARE(gtp_attack);
 DECLARE(gtp_attack_either);
 DECLARE(gtp_clear_board);
@@ -170,6 +171,7 @@ DECLARE(gtp_worm_stones);
 static struct gtp_command commands[] = {
   {"aa_confirm_safety",       gtp_aa_confirm_safety},
   {"all_legal",        	      gtp_all_legal},
+  {"analyze_eyegraph", 	      gtp_analyze_eyegraph},
   {"attack",           	      gtp_attack},
   {"attack_either",           gtp_attack_either},
   {"black",            	      gtp_playblack},
@@ -2983,6 +2985,25 @@ gtp_test_eyeshape(char *s)
   test_eyeshape(eyesize, eye_vertices);
 
   return gtp_success("");
+}
+
+
+/* Function:  Compute an eyevalue and vital points for an eye graph
+ * Arguments: Eyeshape encoded in string
+ * Fails:     Bad eyeshape, analysis failed
+ * Returns:   Eyevalue, vital points
+ */
+static int
+gtp_analyze_eyegraph(char *s)
+{
+  struct eyevalue value;
+  char analyzed_eyegraph[1024];
+  int result = analyze_eyegraph(s, &value, analyzed_eyegraph);
+
+  if (result == 0)
+    return gtp_failure("failed to analyze");
+
+  return gtp_success("%s\n%s", eyevalue_to_string(&value), analyzed_eyegraph);
 }
 
 
