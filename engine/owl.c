@@ -335,7 +335,12 @@ clear_cut_list(int cuts[MAX_CUTS])
 /* Called when (apos) and (bpos) point to adjacent dragons
  * of the opposite color, both with matcher_status DEAD or
  * CRITICAL, analyzes the semeai, assuming that the player
- * of the (apos) dragon moves first.
+ * of the (apos) dragon moves first. The results returned
+ * by *resulta and *resultb are the results of the defense 
+ * of the apos dragon and the attack of the bpos dragon,
+ * respectively. Thus if these results are 1 and 0,
+ * respectively, the usual meaning is that a move by the
+ * apos player produces seki.
  *
  * owl determines whether owl moves are being generated
  * or simple liberty filling is taking place.
