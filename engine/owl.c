@@ -2121,6 +2121,16 @@ do_owl_defend(int str, int *move, int *wormid,
     }
   }
   else {
+    /* In this case we don't recompute eyes. However, to avoid accessing
+     * partially-random data left on stack, we copy eye data from the
+     * previous depth level. It must be reasonably close to the actual
+     * state of eyes.
+     */
+    memcpy(owl->my_eye, owl_stack[owl->restore_from].my_eye,
+	   sizeof(owl->my_eye));
+    memcpy(owl->half_eye, owl_stack[owl->restore_from].half_eye,
+	   sizeof(owl->half_eye));
+
     vital_moves[0].pos = 0;
     vital_moves[0].value = -1;
     set_eyevalue(&probable_eyes, 0, 0, 0, 0);
