@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- infrastructure to cut owl goal dragons
+- new owl pattern class C: threaten to cut owl goal dragon
 - view.pike enhancement: owl_does_defend/attack
 - crash in owl_hotspots() fixed
 - view.pike enhancement: directly start sgf viewer
