@@ -24,42 +24,11 @@
 # Boston, MA 02111, USA.                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
-# twogtp info:
-#
-# Here is a small perlscript twogtp. Its purpose is to run
-# two programs against each other. Both must support the Go
-# Text Protocol. For example GNU Go 2.7.241 or higher works.
-#
-# It is easier to implement this program in gtp than gmp.
-# The script is almost trivial. It also works with cygwin on
-# windows.
-#
-# Run with:
-#
-# twogtp --white '<path to program 1> --mode gtp <options>' \
-#        --black '<path to program 2> --mode gtp <options>' \
-#        [twogtp options]
-#
-# Possible twogtp options:
-#
-#   --verbose 1 (to list moves) or --verbose 2 (to draw board)
-#   --komi <amount>
-#   --handicap <amount>
-#   --size <board size>                     (default 19)
-#   --games <number of games to play>       (-1 to play forever)
-#   --sgffile <filename>
-#
-#
 # matcher_status info:
 #
-# plays two gtp programs against each other, and watches for bad
-# matcher_status transitions.  Currently, one data structure is
-# used for each program, this should probably be made optional.
-# However, it might be a good idea to use only one (catch which
-# program saw the attack that changed it).
+# plays one gtp program against itself, and watches for bad
+# matcher_status transitions.
 #
-# FIXME: optionally, separate statuses for each program. (ie 2 match_hist
-# structures)
 # FIXME: allow analysis of sgf files
 # FIXME: if the vertex by which a dragon is named ever changes,
 # the hash table used will consider it new.  therefore, if the
@@ -87,20 +56,16 @@ my $vertex;
 my $first;
 my $sgfmove;
 my $sgffilename;
-my $pidw;
-my $pidb;
+my $pidp;
 my $sgffile;
 my $handicap_stones;
-my $resultw;
-my $resultb;
+my $result;
 my @vertices;
 my $second;
 my %game_list;
 #end of "use strict" repairs
 
-
-my $white;
-my $black;
+my $program;
 my $size = 19;
 my $verbose = 0;
 my $komi = 5.5;
@@ -116,8 +81,7 @@ my $helpstring = "
 
 Run with:
 
-twogtp --white \'<path to program 1> --mode gtp [program options]\' \\
-       --black \'<path to program 2> --mode gtp [program options]\' \\
+twogtp --program \'<path to program> --mode gtp [program options]\' \\
        [twogtp options]
 
 Possible twogtp options:
@@ -127,14 +91,13 @@ Possible twogtp options:
   --handicap <amount>
   --size <board size>                     (default 19)
   --games <number of games to play>       (-1 to play forever)
-  --sgffile <filename>
+  --sgffile <filename>			  (file to save games as)
   --help                                  (show this)
 
 ";
 
 GetOptions(
-           "white|w=s"              => \$white,
-           "black|b=s"              => \$black,
+           "program|p=s"            => \$program,
            "verbose|v=i"            => \$verbose,
            "komi|k=f"               => \$komi,
            "handicap|h=i"           => \$handicap,
@@ -150,28 +113,20 @@ if ($wanthelp) {
 }
 
 
-if (!$white) {
-  $white = '../gnugo.exe --mode gtp --quiet';
-  warn "Defaulting white to: $white";
-}
-if (!$black) {
-  $black = '../gnugo.exe --mode gtp --quiet';
-  warn "Defaulting black to: $black";
+if (!$program) {
+  $program = '../gnugo --mode gtp --quiet';
+  warn "Defaulting program to: $program\n";
 }
 
-die $helpstring unless defined $white and defined $black;
+die $helpstring unless defined $program;
 
 # create FileHandles
-my $black_in  = new FileHandle;		# stdin of black player
-my $black_out = new FileHandle;		# stdout of black player
-my $white_in  = new FileHandle;		# stdin of white player
-my $white_out = new FileHandle;		# stdout of white player
+my $prog_in  = new FileHandle;		# stdin of program
+my $prog_out = new FileHandle;		# stdout of program
 
 while ($games > 0) {
-    $pidb = open2($black_out, $black_in, $black);
-    print "black pid: $pidb\n" if $verbose;
-    $pidw = open2($white_out, $white_in, $white);
-    print "white pid: $pidw\n" if $verbose;
+    $pidp = open2($prog_out, $prog_in, $program);
+    print "program pid: $pidp\n" if $verbose;
 
     $sgffile = rename_sgffile($games, $sgffilename) if defined $sgffilename;
 
@@ -180,15 +135,10 @@ while ($games > 0) {
 	undef($sgffilename);
     }
 
-    print $black_in  "boardsize $size\n";
-    eat_no_response($black_out);
-    print $black_in  "komi $komi\n";
-    eat_no_response($black_out);
-
-    print $white_in  "boardsize $size\n";
-    eat_no_response($white_out);
-    print $white_in  "komi $komi\n";
-    eat_no_response($white_out);
+    print $prog_in  "boardsize $size\n";
+    eat_no_response($prog_out);
+    print $prog_in  "komi $komi\n";
+    eat_no_response($prog_out);
 
     print SGFFILEHANDLE "(;GM[1]FF[4]RU[Japanese]SZ[$size]HA[$handicap]KM[$komi]"
 	if defined $sgffilename;
@@ -201,75 +151,52 @@ while ($games > 0) {
     }
     else {
 	$toplay = 'W';
-	print $black_in "fixed_handicap $handicap\n";
-	$handicap_stones = eat_handicap($black_out);
+	print $prog_in "fixed_handicap $handicap\n";
+	$handicap_stones = eat_handicap($prog_out);
 	if (defined $sgffilename) {
 	    print SGFFILEHANDLE $handicap_stones;
 	}
-	print $white_in "fixed_handicap $handicap\n";
-	$handicap_stones = eat_handicap($white_out);
     }
 
     $movenum = 1;
     while ($pass < 2) {
 	if ($toplay eq 'B') {
-	    print $black_in "genmove_black\n";
-	    $move = eat_move($black_out);
-	    $sgfmove = standard_to_sgf($move);
-	    print SGFFILEHANDLE ";B[$sgfmove]\n" if defined $sgffilename;
-	    print "Black plays $move\n" if $verbose;
-	    if ($move =~ /PASS/i) {
-		$pass++;
-	    } else {
-		$pass = 0;
-	    }
-	    print $white_in "black $move\n";
-	    eat_no_response($white_out);
-	    if ($verbose > 1) {
-		print $white_in "showboard\n";
-		eat_no_response($white_out);
-	    }
+	    print $prog_in "genmove_black\n";
+	    print "$toplay plays $move\n" if $verbose;
 
-	    #check matcher_status here
-	    check_matcher($black_in, $black_out);
 	    $toplay = 'W';
 	} else {
-	    print $white_in "genmove_white\n";
-	    $move = eat_move($white_out);
-	    $sgfmove = standard_to_sgf($move);
-	    print SGFFILEHANDLE ";W[$sgfmove]\n" if defined $sgffilename;
-	    print "White plays $move\n" if $verbose;
-	    if ($move =~ /PASS/i) {
-		$pass++;
-	    } else {
-		$pass = 0;
-	    }
-	    print $black_in "white $move\n";
-	    eat_no_response($black_out);
-	    if ($verbose > 1) {
-		print $black_in "showboard\n";
-		eat_no_response($black_out);
-	    }
+	    print $prog_in "genmove_white\n";
+	    print "$toplay plays $move\n" if $verbose;
 
-	    #check matcher_status here
-	    check_matcher($white_in, $white_out);
 	    $toplay = 'B';
 	}
+
+	$move = eat_move($prog_out);
+	$sgfmove = standard_to_sgf($move);
+	print SGFFILEHANDLE ";{$toplay}[$sgfmove]\n" if defined $sgffilename;
+	if ($move =~ /PASS/i) {
+	    $pass++;
+	} else {
+	    $pass = 0;
+	}
+	if ($verbose > 1) {
+	    print $prog_in "showboard\n";
+	    eat_no_response($prog_out);
+	}
+
+	check_matcher($prog_in, $prog_out);
 	$movenum++;	#next move
     }
-    print $white_in "estimate_score\n";
-    $resultw = eat_score($white_out);
-    print "Result according to W: $resultw\n";
-    print $black_in "new_score\n";
-    $resultb = eat_score($black_out);
-    print "Result according to B: $resultb\n";
-    print $white_in "quit\n";
-    print $black_in "quit\n";
+    print $prog_in "estimate_score\n";
+    $result = eat_score($prog_out);
+    print "Result: $result\n";
+    print $prog_in "quit\n";
     if (defined $sgffilename) {
 	print "sgf file: $sgffile\n";
 	print SGFFILEHANDLE ")";
 	close SGFFILEHANDLE;
-	$game_list{$sgffile} = $resultw . "|" . $resultb
+	$game_list{$sgffile} = $result;
     }
     $games-- if $games > 0;
     print "games remaining: $games\n";
@@ -281,8 +208,8 @@ if (defined $sgffilename) {
   print $index_out
 "<HTML><HEAD><TITLE>game results</TITLE></HEAD>
 <BODY><H3>Game Results</H3>
-<H4>White: ".html_encode($white)."</H4>
-<H4>Black: ".html_encode($black)."</H4>
+<H4>White: ".html_encode($program)."</H4>
+<H4>Black: ".html_encode($program)."</H4>
 <TABLE border=1>
  <TR>
   <TD>SGF file</TD>
