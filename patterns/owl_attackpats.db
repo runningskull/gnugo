@@ -1657,7 +1657,7 @@ XOX         destroy eye
 .*.
 ---
 
-:8,s,value(35)
+:|,s,value(35)
 
 
 Pattern A610
@@ -2195,23 +2195,25 @@ Pattern A904
 
 
 Pattern A905
+# gf Increased value slightly. (3.1.14)
 
 |O.X        try to form nakade
 |XOX
 |*..
 +---
 
-:8,s,value(35)
+:8,s,value(36)
 
 
-Pattern A906
-
-|O.X        try to form nakade
-|XOX
-|*..
-+---
-
-:8,s,value(35)
+# Pattern A906
+# # gf We don't need two copies of this pattern. Removed one. (3.1.14)
+# 
+# |O.X        try to form nakade
+# |XOX
+# |*..
+# +---
+# 
+# :8,s,value(35)
 
 
 Pattern A907
@@ -3669,7 +3671,7 @@ Pattern A1343
 |.*.x
 +----
 
-:8,s,value(45)
+:8,s,value(46)
 
 
 #########################################################

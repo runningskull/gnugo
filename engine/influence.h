@@ -96,6 +96,7 @@ struct influence_data
   int number_of_regions;
 
   float territory_value[MAX_BOARD][MAX_BOARD];
+  int non_territory[MAX_BOARD][MAX_BOARD];
 
   int color_to_move; /* Which color is in turn to move. */
   

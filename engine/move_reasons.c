@@ -3489,15 +3489,25 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      */
     if (tot_value >= 0.5) {
       float old_tot_value = tot_value;
-      tot_value += gg_min(tot_value, 0.5 * move[pos].followup_value);
-      if (move[pos].followup_value != 0.0)
-	TRACE("  %1m: %f - followup\n", pos, move[pos].followup_value);
+      float contribution;
+      /* The usual rule is that a sente move should count at double
+       * value. But if we have a 1 point move with big followup (i.e.
+       * sente) we want to play that before a 2 point gote move. Hence
+       * the factor 1.1 below.
+       */
+      contribution = gg_min(1.1 * tot_value, 0.5 * move[pos].followup_value);
+      tot_value += contribution;
       
-      tot_value += gg_min(0.75* tot_value, 
-			  0.4 * move[pos].reverse_followup_value);
+      if (move[pos].followup_value != 0.0)
+	TRACE("  %1m: %f - followup (out of %f)\n", pos,
+	      contribution, move[pos].followup_value);
+
+      contribution = gg_min(0.75* tot_value, 
+			    0.4 * move[pos].reverse_followup_value);
+      tot_value += contribution;
       if (move[pos].reverse_followup_value != 0.0)
-	TRACE("  %1m: %f - reverse followup\n", 
-	      pos, move[pos].reverse_followup_value);
+	TRACE("  %1m: %f - reverse followup (out of %f)\n", pos,
+	      contribution, move[pos].reverse_followup_value);
 
       /* If a ko fight is going on, we should use the full followup
        * and reverse followup values in the total value. We save the

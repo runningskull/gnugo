@@ -50,6 +50,7 @@ loadsgf games/FSF-neurogo.sgf 136
 10 gg_genmove white
 #? [!A3]
 
+# Semeai problem.
 loadsgf games/FSF-neurogo.sgf 148
 11 gg_genmove white
 #? [N5]
@@ -68,10 +69,12 @@ loadsgf games/FSF-neurogo.sgf 178
 14 gg_genmove white
 #? [Q4]*
 
+# White A16 is about three points reverse sente. G19 is two points
+# double sente, but black can get in A16 in sente before answering
+# G19. We accept both moves as being correct.
 loadsgf games/FSF-neurogo.sgf 230
-# double sente
 15 gg_genmove white
-#? [A16]
+#? [A16|G19]
 
 # This test may be at the wrong move number.
 loadsgf games/FSF-neurogo.sgf 275

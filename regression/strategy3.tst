@@ -133,6 +133,7 @@ loadsgf games/incident74.sgf 236
 127 gg_genmove black
 #? [!(S5|T4|T7)]
 
+# Semeai problem.
 loadsgf games/strategy30.sgf 171
 128 gg_genmove black
 #? [O8]

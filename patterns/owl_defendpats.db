@@ -3764,6 +3764,25 @@ X*.
 :8,b,value(5)
 
 
+Pattern D1137
+# gf New pattern. (3.1.14)
+# See buzco:6
+
+?oo
+?..
+X*.
+O.?
+
+:8,B,value(65)
+
+?oc?
+?..d
+B*.o
+Oa??
+
+;lib(B)<=4 && owl_escape_value(c) + owl_escape_value(d) > 0
+;&& oplay_attack_either(*,a,a,B)
+
 
 ########################################################
 #                                                       #

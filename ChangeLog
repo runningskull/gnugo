@@ -2,7 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-
+- non-territory patterns introduced in the influence code
+- revised formula for addition of followup_value
+- better trace output for followup_value and reverse_followup_value
 - typo fixed (whose_moyo for whose_area) in value_territory()
 - new debug flag DEBUG_TERRITORY
 - computation of change in territory, moyo, and area in influence.c
@@ -32,6 +34,7 @@
 - connection tuning
 - eye tuning
 - owl tuning
+- influence tuning
 - revision of rot tests
 - ld_owl_life.tst removed
 - new and revised regression tests

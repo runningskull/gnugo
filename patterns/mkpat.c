@@ -249,7 +249,9 @@ static struct autohelper_func autohelper_functions[] = {
   {"owl_threatens",   2, "owl_threatens_attack(%s,%s)"},
   {"o_aa_attack",     2, "atari_atari_try_combination(color,%s,%s)"},
   {"x_aa_attack",     2, "atari_atari_try_combination(OTHER_COLOR(color),%s,%s)"},
-  {"replace",         2, "add_replacement_move(%s,%s)"}
+  {"replace",         2, "add_replacement_move(%s,%s)"},
+  {"non_oterritory",  1, "influence_mark_non_territory(%s, color)"},
+  {"non_xterritory",  1, "influence_mark_non_territory(%s, OTHER_COLOR(color))"}
 };
 
 

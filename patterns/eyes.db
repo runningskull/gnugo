@@ -1385,6 +1385,14 @@ XXX.
 
 
 Pattern 654
+
+.X
+xXX.
+
+:1,1
+
+
+Pattern 655
 # Certain instances of this pattern are 1,1 on the edge.
 
 .x
@@ -1393,7 +1401,7 @@ x*x!
 :2,1
 
 
-Pattern 655
+Pattern 656
 # This pattern must be matched before 653.
 
 XX
@@ -1402,7 +1410,7 @@ X*x!
 :2,1
 
 
-Pattern 656
+Pattern 657
 
 Xx
 x.x!
@@ -1410,7 +1418,7 @@ x.x!
 :1,1
 
 
-Pattern 657
+Pattern 658
 
 xx
 xX.!
@@ -1418,7 +1426,7 @@ xX.!
 :1,1
 
 
-Pattern 658
+Pattern 659
 
 .x
 xXX@
@@ -1426,7 +1434,7 @@ xXX@
 :1,0
 
 
-Pattern 659
+Pattern 660
 
 @X
 xXX.
@@ -1438,7 +1446,7 @@ xXX.
 # Topology: ...
 #
 
-Pattern 660
+Pattern 661
 
 xXx
 x*x
@@ -1446,7 +1454,7 @@ x*x
 :2,1
 
 
-Pattern 661
+Pattern 662
 
 XX*
 .XX
@@ -1454,7 +1462,7 @@ XX*
 :2,1
 
 
-Pattern 662
+Pattern 663
 
 xXx
 xXx

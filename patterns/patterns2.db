@@ -2131,6 +2131,17 @@ Pattern Shape60b
 :8,-,shape(1)
 
 
+Pattern Shape60c
+# gf New pattern. (3.1.14)
+
+..OX?        usually we want to avoid this connection too
+...OX
+...*O
+-----
+
+:8,-,shape(-1)
+
+
 Pattern Shape61
 
 xX...       connecting preferred to alternative defenses
@@ -2290,6 +2301,34 @@ Xba.
 ----
 
 ;!oplay_defend_both(*,a,b,c)
+
+
+Pattern Shape73
+# gf New pattern. (3.1.14)
+
+?OO      cancel empty triangle negative shape when we create an eye
+O.*
+OoO
+
+:8,-,shape(2)
+
+?OO
+Oa*
+OoO
+
+;!proper_eye(a)
+
+
+Pattern Shape74
+# gf New pattern. (3.1.14)
+
+o..?     don't leave cutting points around
+O...
+X.Ox
+?*.x
+oO.?
+
+:8,-,shape(-1)
 
 
 ###########################
@@ -2573,6 +2612,22 @@ fg*
 
 ;lib(a)>1 && o_somewhere(e,f,g) && !attack(B) && !attack(C)
 ;&& !oplay_defend_both(*,?,d,B,C)
+
+
+Pattern Sente16
+# gf New pattern. (3.1.14)
+
+.O?
+.*X
+---
+
+:8,OX,reverse_followup(5)
+
+bO?
+a*X
+---
+
+;xplay_attack(*,a,b,*) && xplay_defend_both(*,a,b,*,b)
 
 
 ########################################################

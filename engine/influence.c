@@ -57,6 +57,9 @@ static int influence_color = EMPTY;
 /* Influence used for estimation of escape potential. */
 static struct influence_data escape_influence;
 
+/* Pointer to influence data used during pattern matching. */
+static struct influence_data *current_influence = NULL;
+
 /* Cache of delta_territory_values. */
 static float delta_territory_cache[BOARDMAX];
 
@@ -363,6 +366,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
       q->white_strength[i][j] = 0.0;
       q->black_strength[i][j] = 0.0;
       q->p[i][j] = board[pos];
+      q->non_territory[i][j] = EMPTY;
 
       /* FIXME: Simplify the code below! */
       
@@ -437,6 +441,7 @@ init_influence(struct influence_data *q, int color, int dragons_known,
  * A - Barrier pattern, where O plays first and X tries to block influence.
  * D - Barrier pattern, where O plays first and O tries to block influence.
  * B - Intrusion patterns, adding a low intensity influence source.
+ * t - Non-territory patterns, marking vertices as not territory.
  * I - Invasion patterns, adding a low intensity influence source.
  * e - Escape bonus. Used together with I to increase the value substantially
  *     if escape influence is being computed.
@@ -491,19 +496,19 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
   /* Require that all O stones in the pattern are tactically safe for
    * territorial connection patterns of type D and X stones for type
    * A. Both colors must be tactically safe for patterns of class B.
-   * For patterns of class B, D and E, O stones must have non-zero
-   * influence strength. Similarly for patterns of class A, X stones
-   * must have non-zero influence strength.
+   * For patterns of class B, t, D and E, O stones must have non-zero
+   * influence strength. Similarly for patterns of class A and t, X
+   * stones must have non-zero influence strength.
    *
    * Patterns also having class s are an exception from this rule.
    */
-  if ((pattern->class & (CLASS_D | CLASS_A | CLASS_B | CLASS_E))
+  if ((pattern->class & (CLASS_D | CLASS_A | CLASS_B | CLASS_E | CLASS_t))
       && !(pattern->class & CLASS_s)) {
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
       if ((pattern->patn[k].att == ATT_O
-	   && (pattern->class & (CLASS_D | CLASS_B | CLASS_E)))
+	   && (pattern->class & (CLASS_D | CLASS_B | CLASS_E | CLASS_t)))
 	  || (pattern->patn[k].att == ATT_X
-	      && (pattern->class & (CLASS_A | CLASS_B)))) {
+	      && (pattern->class & (CLASS_A | CLASS_B | CLASS_t)))) {
 	/* transform pattern real coordinate */
 	int x, y;
 	TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
@@ -514,21 +519,22 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	      || (color == BLACK && q->black_strength[x][y] == 0.0))
 	    return; /* Match failed. */
 	}
-	else if (!(pattern->class & CLASS_D)) {
+	/* FIXME: This test is probably not necessary any more. */
+	else if (!(pattern->class & (CLASS_D | CLASS_B | CLASS_t))) {
 	  if ((stackp == 0 && worm[POS(x, y)].attack_codes[0] != 0)
 	      || attack(POS(x, y), NULL) != 0)
 	    return; /* Match failed */
 	}
-	/* One test left for class B. */
-	if ((pattern->class & CLASS_B)
+	/* One test left for class B and t. */
+	if ((pattern->class & (CLASS_B | CLASS_t))
 	    && pattern->patn[k].att == ATT_O) {
 	  if ((color == WHITE && q->white_strength[x][y] == 0.0)
 	      || (color == BLACK && q->black_strength[x][y] == 0.0))
 	    return; /* Match failed. */
 	}
 	
-	if (pattern->class & CLASS_A) {
-	  gg_assert(pattern->patn[k].att == ATT_X);
+	if ((pattern->class & (CLASS_A | CLASS_t))
+	    && pattern->patn[k].att == ATT_X) {
 	  if ((color == BLACK && q->white_strength[x][y] == 0.0)
 	      || (color == WHITE && q->black_strength[x][y] == 0.0))
 	    return; /* Match failed. */
@@ -572,6 +578,13 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
   DEBUG(DEBUG_INFLUENCE, "influence pattern '%s'+%d matched at %1m\n",
 	pattern->name, ll, POS(m, n));
 
+  /* For t patterns, everything happens in the action. */
+  if ((pattern->class & CLASS_t)
+      && (pattern->autohelper_flag & HAVE_ACTION)) {
+    pattern->autohelper(pattern, ll, POS(ti, tj), color, 1);
+  }
+  
+  
   /* For I patterns, add a low intensity, both colored, influence
    * source at *.
    */
@@ -626,7 +639,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
   
   /* Loop through pattern elements and perform necessary actions
-   * for A, D, and B patterns.
+   * for A, D, B, and t patterns.
    */
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     if ((   (pattern->class & (CLASS_D | CLASS_A))
@@ -666,6 +679,16 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
   }
 }
 
+/* Called from actions for t patterns. Marks (pos) as not being
+ * territory for (color).
+ */
+void
+influence_mark_non_territory(int pos, int color)
+{
+  DEBUG(DEBUG_INFLUENCE, "  non-territory for %C at %1m\n", color, pos);
+  current_influence->non_territory[I(pos)][J(pos)] |= color;
+}
+
 /* Match the patterns in influence.db and barriers.db in order to add
  * influence barriers, add extra influence sources at possible
  * invasion and intrusion points, and add extra influence induced by
@@ -676,6 +699,7 @@ find_influence_patterns(struct influence_data *q, int color)
 {
   int m, n;
 
+  current_influence = q;
   matchpat(influence_callback, ANCHOR_COLOR, &influencepat_db, q, NULL);
   if (color != EMPTY)
     matchpat(influence_callback, color, &barrierspat_db, q, NULL);
@@ -770,7 +794,6 @@ compute_influence(struct influence_data *q, int color, int m, int n,
       if (q->black_strength[i][j] > 0.0)
 	accumulate_influence(q, i, j, BLACK);
     }
-  value_territory(q);
   segment_influence(q);
   /* FIXME: The "board_size - 19" stuff below is an ugly workaround for a bug
    *        in main.c
@@ -935,6 +958,18 @@ value_territory(struct influence_data *q)
 	      q->territory_value[i][j] = 0.13;
 	  }
 	}
+
+	/* If marked as non-territory for the color currently owning
+         * it, reset the territory value.
+	 */
+	if (q->territory_value[i][j] > 0.0
+	    && (q->non_territory[i][j] & WHITE))
+	  q->territory_value[i][j] = 0.0;
+
+	if (q->territory_value[i][j] < 0.0
+	    && (q->non_territory[i][j] & BLACK))
+	  q->territory_value[i][j] = 0.0;
+	
 	/* Dead stone, add one to the territory value. */
 	if (BOARD(i, j) == BLACK)
 	  q->territory_value[i][j] += 1.0;
@@ -1071,6 +1106,7 @@ compute_initial_influence(int color, int dragons_known)
   int i, j;
   compute_influence(&initial_influence, OTHER_COLOR(color), -1, -1,
 		    dragons_known, NULL, NULL);
+  value_territory(&initial_influence);
   compute_influence(&initial_opposite_influence, color, -1, -1,
 		    dragons_known, NULL, NULL);
   /* Invalidate information in move_influence. */
@@ -1110,6 +1146,7 @@ compute_move_influence(int m, int n, int color,
 		      NULL, saved_stones);
     decrease_depth_values();
     popgo();
+    value_territory(&move_influence);
   }
   else {
     gprintf("Computing influence for illegal move %m (move number %d)\n",
