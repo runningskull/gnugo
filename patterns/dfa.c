@@ -469,7 +469,6 @@ copy_dfa(dfa_t *p_to, dfa_t *p_from)
 }
 
 
-
 /*
  * print c dfa:
  * print the dfa in c format.
@@ -486,28 +485,43 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
     exit(2);
   }
 
-  if (pdfa->lastState > 65535) {
+  assert (dfa_minmax_delta(pdfa, -1, 1) > 0);
+  if (dfa_minmax_delta(pdfa, -1, 0)  > 65535) {
     fprintf(of, "#error too many states");
-    fprintf(stderr, "Error: The dfa has too many states. Can't fit into a short.\n");
+    fprintf(stderr, "Error: The dfa states are too disperse. Can't fit delta into a short.\n");
     exit(2);
   }
+
+  if (pdfa->lastIndex + 1 > 65535) {
+    fprintf(of, "#error too many states");
+    fprintf(stderr, "Error: Too many index entries. Can't fit delta into a short.\n");
+    exit(2);
+  }
+
 
   fprintf(of, "\n#include \"dfa.h\"\n");
 
   fprintf(of, "static const state_rt_t state_%s[%d] = {\n", name, pdfa->lastState + 1);
   for (i = 0; i != pdfa->lastState + 1; i++) {
+    int j;
     fprintf(of, "{%d,", pdfa->states[i].att);
-    fprintf(of, "{%d,", pdfa->states[i].next[0]);
-    fprintf(of, "%d,", pdfa->states[i].next[1]);
-    fprintf(of, "%d,", pdfa->states[i].next[2]);
-    fprintf(of, "%d}},\n", pdfa->states[i].next[3]);
+    fprintf(of, "{");
+    for (j=0;j<4;j++) {
+      int n = pdfa->states[i].next[j];
+      assert ((n == 0) || ( (n - i > 0) && (n - i < 65535) ));
+      fprintf(of, "%d", n ? n - i : 0);
+      if (j != 3)
+        fprintf(of, ",");
+    }
+    fprintf(of, "}},%s", ((i+1)%3 ? "\t" : "\n") );
   }
   fprintf(of, "};\n\n");
 
 
   fprintf(of, "static const attrib_rt_t idx_%s[%d] = {\n", name, pdfa->lastIndex + 1);
   for (i = 0; i != pdfa->lastIndex + 1; i++)
-    fprintf(of, "{%d,%d},\n", pdfa->indexes[i].val, pdfa->indexes[i].next);
+    fprintf(of, "{%d,%d},%s", pdfa->indexes[i].val, pdfa->indexes[i].next,
+                              ((i+1)%4 ? "\t" : "\n"));
   fprintf(of, "};\n\n");
 
   fprintf(of, "static dfa_rt_t dfa_%s = {\n", name);
@@ -834,6 +848,116 @@ dfa_end(void)
     kill_dfa(&(aux_dfa[j]));
   kill_dfa(&aux_temp);
   dfa_was_initialized--;
+}
+
+
+/*
+ * Returns max or min jump distance from state to next[next_index] for
+ * all states.  If next_index < 0, then max/min for all for states.
+ */
+
+int 
+dfa_minmax_delta(dfa_t *pdfa, int next_index, int isMin) {
+
+  int ret, i, j;
+  assert(next_index <= 3);
+ 
+  if (isMin) {
+    ret = 99999;
+  } else {
+    ret = -1;
+  }
+
+  for (i=0; i<=pdfa->lastState; i++) {
+    for (j=0; j<4; j++) {
+      if (j == next_index || next_index < 0) { 
+        int next = pdfa->states[i].next[j];
+        if (!next)
+          continue;
+        if (isMin) {
+          if (ret > next - i) {
+            ret = next - i;
+          } 
+        } else {
+          if (ret < next - i) {
+            ret = next - i;
+          } 
+        }
+      }
+    }
+  }
+
+  return ret;
+
+
+}
+
+
+/*
+ * Re-orders DFA into a canonical form, which does a half-hearted 
+ * attempt to reduce the size of jumps for all states entries, and
+ * guarantees the jumps are all forward-only.
+ */
+void
+dfa_shuffle(dfa_t *pdfa)
+{
+  struct state *oldStates;
+  int *stateTo;
+  int *stateFrom;
+  int *queue1;
+  int *queue2;
+  int *tempq;
+  int nextNewState;
+  int q1p;
+  int q2p;
+  int i, j;
+
+  stateTo = calloc(pdfa->lastState+1, sizeof(int));
+  stateFrom = calloc(pdfa->lastState+1, sizeof(int));
+
+  queue1 = malloc((pdfa->lastState+1) * sizeof(int));
+  queue2 = malloc((pdfa->lastState+1) * sizeof(int));
+  q1p = 1;
+  q2p = 0;
+  queue1[0] = 1;  /* i.e. start at state 1. */
+  stateFrom[0] = stateTo[0] = 0;
+  stateFrom[1] = stateTo[1] = 1;
+  nextNewState = 2;
+
+  while (q1p) {
+    for (i=0;i<q1p;i++) {
+      for (j=0;j<4;j++) {
+        int n = pdfa->states[queue1[i]].next[j];
+        if (n && !stateTo[n]) {
+          stateTo[n] = nextNewState;
+          stateFrom[nextNewState] = n;
+          nextNewState++;
+          queue2[q2p++] = n;
+        }
+      }
+    }
+    tempq = queue1;
+    queue1 = queue2;
+    queue2 = tempq;
+    q1p = q2p;
+    q2p = 0;
+  }
+
+  oldStates = malloc((pdfa->lastState+1) * sizeof(struct state));
+  for (i=1; i<=pdfa->lastState; i++) {
+    for (j=0;j<4;j++) {
+      oldStates[i].next[j] = pdfa->states[i].next[j];
+      oldStates[i].att = pdfa->states[i].att;
+    }
+  }
+  for (i=1; i<=pdfa->lastState; i++) {
+    for (j=0;j<4;j++) {
+      assert(stateTo[i]>0);
+      pdfa->states[i].next[j] = stateTo[oldStates[stateFrom[i]].next[j]];
+    } 
+    pdfa->states[i].att = oldStates[stateFrom[i]].att;
+  } 
+
 }
 
 

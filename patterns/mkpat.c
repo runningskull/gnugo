@@ -1543,7 +1543,7 @@ write_elements(FILE *outfile, char *name)
 
     fprintf(outfile, "   {%d,%d,%d}%s",
 	    elements[node].x - ci, elements[node].y - cj, elements[node].att,
-	    node < el-1 ? ",\n" : "};\n\n");
+            node < el-1 ?  ((node + 1) % 4 ? ",\t" : ",\n")  : "};\n\n");
   }
 
 #if EXPERIMENTAL_READING
@@ -2462,6 +2462,7 @@ main(int argc, char *argv[])
 
     dfa.pre_rotated = pre_rotate;
     dfa_finalize(&dfa);
+    dfa_shuffle(&dfa);
 
     fprintf(stderr, "dfa for %s\n", argv[gg_optind]);
     fprintf(stderr, "size: %d kB for ", dfa_size(&dfa));

@@ -95,7 +95,6 @@ typedef struct dfa
 dfa_t;
 
 
-
 /* The run-time data structures are different from those used
  * internally to build the DFA */
 
@@ -159,6 +158,8 @@ int dfa_size(dfa_t *pdfa);	/* in kB */
 void save_dfa(const char *f_name, dfa_t *pdfa);
 dfa_t *load_dfa(const char *f_path, const char *f_name, dfa_t **ppdfa);
 void dfa_finalize(dfa_t *pdfa);
+void dfa_shuffle(dfa_t *pdfa);
+int dfa_minmax_delta(dfa_t *pdfa, int next_index, int isMin);
 void dump_dfa(FILE *f, dfa_t *pdfa);
 
 struct pattern;

@@ -949,7 +949,7 @@ dump_dfa_board(int m, int n)
 static int
 scan_for_patterns(dfa_rt_t *pdfa, int l, int m, int n, int *pat_list)
 {
-  int state, att, id, row;
+  int state, att, id, row, delta;
   int dfa_pos;
 
   dfa_pos = DFA_POS(m, n) + DFA_OFFSET;
@@ -957,7 +957,7 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int m, int n, int *pat_list)
   row = 0; /* initial row */
   id = 0; /* position in id_list */ 
   
-  while (state != 0) {/* while not on error state */
+  do {
     /* collect patterns indexes */
     att = pdfa->states[state].att;
     while (att != 0) {
@@ -971,9 +971,10 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int m, int n, int *pat_list)
     }
       
     /* go to next state */
-    state = pdfa->states[state].next[dfa_p[dfa_pos + spiral[l][row]]];
+    delta = pdfa->states[state].next[dfa_p[dfa_pos + spiral[l][row]]];
+    state += delta;
     row++;
-  }
+  } while (delta != 0); /* while not on error state */
 
   ASSERT2(row < MAX_ORDER, m, n);
   return id;
