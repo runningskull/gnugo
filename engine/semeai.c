@@ -29,7 +29,6 @@
 
 #define INFINITY 1000
 
-static void small_semeai_analyzer(int str1, int str2, int save_verbose);
 static void update_status(int dr, int new_status, int new_safety);
 
 
@@ -242,83 +241,6 @@ update_status(int dr, int new_status, int new_safety)
     DRAGON2(dr).safety = new_safety;
   }
 }
-
-
-/* small_semeai() addresses a deficiency in the reading code:
- * for reasons of speed, savestone3 and savestone4 do not
- * sufficiently check whether there may be an adjoining string
- * which can be attacked. So they may overlook a defensive
- * move which consists of attacking an adjoining string.
- *
- * small_semeai() generates all pairs of adjacent attackable
- * worms, then calls owl_analyze_semeai in tactical (non-owl)
- * mode to find out what really happens.
- */
-
-void
-small_semeai(int save_verbose)
-{
-  int apos, bpos;
-
-  /* Generate all adjacent pairs of attackable worms */
-
-  for (apos = BOARDMIN; apos < BOARDMAX; apos++) {
-
-    if (!ON_BOARD(apos) || board[apos] == EMPTY)
-      continue;
-    if (worm[apos].origin != apos)
-      continue;
-    if (worm[apos].attack_codes[0] == 0)
-      continue;
-
-    for (bpos = BOARDMIN; bpos < BOARDMAX; bpos++) {
-      if (!ON_BOARD(bpos) || board[bpos] == EMPTY)
-	continue;
-      if (worm[bpos].origin != bpos)
-	continue;
-      if (bpos == apos)
-	continue;
-      if (worm[bpos].attack_codes[0] == 0)
-	continue;
-      if (!adjacent_strings(apos, bpos))
-	continue;
-      if (worm[apos].liberties < 3 && worm[bpos].liberties < 3)
-	continue;
-      if (save_verbose && apos < bpos)
-	gprintf("small semeai found at %1m, %1m\n", apos, bpos);
-      small_semeai_analyzer(apos, bpos, save_verbose);
-    }
-  }
-}
-
-/* Helper function for small_semeai. Tries to resolve the
- * semeai between (apos) and (bpos), possibly revising points
- * of attack and defense.
- *
- */
-
-static void
-small_semeai_analyzer(int apos, int bpos, int save_verbose)
-{
-  int move;
-  int resulta, resultb;
-  int dummy;
-
-  /* FIXME: Not ko aware yet (since owl_analyze_semeai isn't).
-   * Should be more careful if there is already a defense point.
-   */
-
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0, &dummy);
-  if (resulta != 0
-      && worm[apos].defense_codes[0] == 0
-      && move != NO_MOVE) {
-    if (save_verbose)
-      gprintf("small semeai: changing defense of %1m to %1m\n",
-	      apos, move);
-    change_defense(apos, move, WIN);
-  }
-}
-
 
 
 /*

@@ -562,7 +562,6 @@ int free_handicap_total_stones(void);
 /* Various different strategies for finding a move */
 void fuseki(int color);
 void semeai(void);
-void small_semeai(int save_verbose);
 void semeai_move_reasons(int color);
 void shapes(int color);
 void endgame(int color);
