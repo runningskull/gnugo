@@ -28,11 +28,11 @@ loadsgf games/arb/game02.sgf 71
 
 loadsgf games/arb/dumonteil-1.sgf 184
 150 gg_genmove white
-#? [J5]*
+#? [J5]
 
 loadsgf games/arb/dumonteil-2.sgf 229
 200 gg_genmove black
-#? [F14]
+#? [F14]*
 
 loadsgf games/arb/dumonteil-2.sgf 247
 201 gg_genmove black
@@ -67,7 +67,7 @@ loadsgf games/arb/dumonteil-5.sgf 125
 
 loadsgf games/arb/dumonteil-6.sgf 33
 231 gg_genmove black
-#? [F5]*
+#? [F5]
 
 loadsgf games/arb/game03.sgf 109
 232 gg_genmove black
@@ -75,7 +75,7 @@ loadsgf games/arb/game03.sgf 109
 
 loadsgf games/arb/game04.sgf 43
 233 gg_genmove black
-#? [J9]*
+#? [J9]
 
 
 # Report number of nodes visited by the tactical reading

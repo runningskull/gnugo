@@ -15,7 +15,7 @@ loadsgf games/incident85.sgf 104
 3 owl_attack B11
 #? [1 (C12|B14)]
 4 owl_defend B11
-#? [1 C12]*
+#? [1 C12]
 
 # incident 159
 loadsgf games/incident156.sgf 246
@@ -796,7 +796,7 @@ loadsgf games/owl28.sgf 199
 
 loadsgf games/filllib9.sgf 119
 219 owl_defend K19
-#? [0]*
+#? [0]
 
 loadsgf games/filllib9.sgf 121
 220 owl_defend K19
@@ -839,7 +839,7 @@ loadsgf games/nicklas/nicklas18.sgf 17
 
 loadsgf games/incident240.sgf 69
 229 owl_attack B12
-#? [1 D9]*
+#? [1 D9]
 
 ########### end of tests #####################
 

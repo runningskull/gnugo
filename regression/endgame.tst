@@ -32,11 +32,11 @@ loadsgf games/endgame1.sgf 6
 # J3 is 0 points double sente.
 loadsgf games/endgame1.sgf 7
 107 gg_genmove black
-#? [J3|A7]*
+#? [J3|A7]
 
 loadsgf games/endgame1.sgf 8
 108 gg_genmove white
-#? [G1]
+#? [G1]*
 
 loadsgf games/endgame1.sgf 9
 109 gg_genmove black

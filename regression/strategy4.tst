@@ -45,7 +45,7 @@ loadsgf games/strategy38.sgf 117
 
 loadsgf games/strategy38.sgf 133
 160 gg_genmove black
-#? [K2|L2|L3]
+#? [K2|L2|L3]*
 
 loadsgf games/strategy38.sgf 197
 161 gg_genmove black
@@ -54,7 +54,7 @@ loadsgf games/strategy38.sgf 197
 # First live then attack. This should probably be analyzed as a semeai.
 loadsgf games/strategy39.sgf 156
 162 gg_genmove white
-#? [O7|Q7|N7]*
+#? [O7|Q7|N7]
 
 # First live then attack. This should probably be analyzed as a semeai.
 loadsgf games/strategy39.sgf 158
@@ -144,7 +144,7 @@ loadsgf games/xxlin.sgf 8
 # should be added. /gf
 loadsgf games/xxlin.sgf 16
 178 gg_genmove black
-#? [P4|P3]*
+#? [P4|P3]
 
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
@@ -185,11 +185,11 @@ loadsgf games/owl29.sgf 134
 
 loadsgf games/pooo.sgf 16
 187 gg_genmove black
-#? [!C1]*
+#? [!C1]
 
 loadsgf games/pooo.sgf 24
 188 gg_genmove black
-#? [B6|C4]
+#? [B6|C4]*
 
 # The dragon at A2 is misclassified as inessential.
 
@@ -203,7 +203,7 @@ loadsgf games/pooo.sgf 52
 
 loadsgf games/pooo.sgf 56
 191 gg_genmove black
-#? [C12]*
+#? [C12]
 
 loadsgf games/pooo.sgf 74
 192 gg_genmove black
@@ -233,7 +233,7 @@ loadsgf games/bretz.sgf 130
 
 loadsgf games/bretz.sgf 148
 198 gg_genmove black
-#? [C10]
+#? [C10]*
 
 loadsgf games/bretz.sgf 164
 199 gg_genmove black

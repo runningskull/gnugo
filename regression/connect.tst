@@ -20,7 +20,7 @@ loadsgf golois/Connecter990424-1.sgf
 
 loadsgf golois/Connecter990424-2.sgf
 6 disconnect C7 B5
-#? [0]*
+#? [0]
 
 loadsgf golois/Connecter990426-1.sgf
 7 disconnect G6 G8
@@ -92,7 +92,7 @@ loadsgf golois/Connecter990628-1.sgf
 
 loadsgf golois/Connecter990628-2.sgf
 24 disconnect G15 F17
-#? [0]*
+#? [0]
 
 loadsgf golois/Connecter990628-2.sgf
 25 connect E2 J3
@@ -104,7 +104,7 @@ loadsgf golois/Connecter990630-1.sgf
 
 loadsgf golois/Goemate990902-11.sgf
 27 disconnect L13 K15
-#? [0]*
+#? [0]
 
 loadsgf golois/Goemate990902-3.sgf
 28 disconnect J6 G6
@@ -188,7 +188,7 @@ loadsgf golois/Handtalk980802.sgf
 
 loadsgf golois/Handtalk980803-2.sgf
 48 disconnect F13 H12
-#? [0]*
+#? [0]
 
 loadsgf golois/Handtalk980803-2.sgf
 49 disconnect B14 D14
@@ -269,7 +269,7 @@ loadsgf golois/Indigo-Golois-991106-1.sgf
 # The ladder works, so F11 is also okay.
 loadsgf golois/Indigo-Golois-991106-2.sgf
 68 connect F8 F12
-#? [1 (E11|F11)]*
+#? [1 (E11|F11)]
 
 # The ladder works, so F11 is also okay.
 loadsgf golois/Indigo-Golois-991106-2.sgf

@@ -2,7 +2,7 @@
 
 loadsgf games/arion.sgf 33
 1 gg_genmove black
-#? [Q6]
+#? [Q6]*
 
 loadsgf games/arion.sgf 63
 2 gg_genmove black

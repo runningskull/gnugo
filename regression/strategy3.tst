@@ -27,7 +27,7 @@ loadsgf games/strategy27.sgf 12
 
 loadsgf games/strategy27.sgf 62
 105 gg_genmove white
-#? [J2]*
+#? [J2]
 
 loadsgf games/strategy27.sgf 152
 106 gg_genmove white
@@ -53,7 +53,7 @@ loadsgf games/strategy27.sgf 220
 
 loadsgf games/me.sgf 44
 111 gg_genmove black
-#? [K3]*
+#? [K3]
 
 loadsgf games/me.sgf 84
 112 gg_genmove black
@@ -162,7 +162,7 @@ loadsgf games/strategy31.sgf 50
 # R10 is clearly superior to S10
 loadsgf games/strategy31.sgf 158
 134 gg_genmove white
-#? [!S10]*
+#? [!S10]
 
 loadsgf games/strategy31.sgf 188
 135 gg_genmove white
@@ -170,11 +170,11 @@ loadsgf games/strategy31.sgf 188
 
 loadsgf games/strategy32.sgf 19
 136 gg_genmove black
-#? [E2]*
+#? [E2]
 
 loadsgf games/mf1.sgf 29
 137 gg_genmove black
-#? [F5]
+#? [F5]*
 
 loadsgf games/manner.sgf 12
 138 gg_genmove white

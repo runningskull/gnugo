@@ -172,7 +172,7 @@ loadsgf games/trevor/trevor_16.sgf 67
 # B6 should be valued much much lower than B5
 loadsgf games/trevor/trevor_17.sgf 22
 170 gg_genmove white
-#? [B5]*
+#? [B5]
 
 # C8 is terrible.
 loadsgf games/trevor/trevor_17.sgf 28
@@ -233,12 +233,12 @@ loadsgf games/trevor/trevor_24.sgf 33
 # G2 is a gift to white.
 loadsgf games/trevor/trevor_25.sgf 31
 250 gg_genmove black
-#? [!G2]*
+#? [!G2]
 
 # G1 is another gift to white.
 loadsgf games/trevor/trevor_25.sgf 33
 251 gg_genmove black
-#? [!G1]*
+#? [!G1]
 
 
 # Should connect further back, at least, but of course
@@ -317,7 +317,7 @@ loadsgf games/trevor/trevor_31.sgf
 
 loadsgf games/trevor/trevor_32.sgf
 320 gg_genmove black
-#? [J2]*
+#? [J2]
 
 loadsgf games/trevor/trevor_33.sgf
 330 owl_defend L9
@@ -359,7 +359,7 @@ loadsgf games/trevor/trevor_37.sgf
 #SEVERITY=2
 loadsgf games/trevor/trevor_38.sgf 22
 380 gg_genmove white
-#? [!E4]*
+#? [!E4]
 
 #CATEGORY=READING
 #DESCRIPTION=C6 is wrong way to protect the cut.  Loses one point.
@@ -418,7 +418,7 @@ loadsgf games/trevor/trevor_41.sgf 29
 #SEVERITY=10
 loadsgf games/trevor/trevor_41.sgf 35
 411 gg_genmove black
-#? [!A3]*
+#? [!A3]
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=D4 worm is more important to save than B2.
@@ -437,7 +437,7 @@ loadsgf games/trevor/trevor_41.sgf 37
 #  Attachment is the SGF file.
 loadsgf games/trevor/trevor_42.sgf 211
 420 gg_genmove black
-#? [G16]
+#? [G16]*
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=Minus 1 point, attacking very dead stone.
@@ -469,7 +469,7 @@ loadsgf games/trevor/trevor_44.sgf
 #SEVERITY=10
 loadsgf games/trevor/trevor_45.sgf
 450 owl_attack E4
-#? [1 D4]*
+#? [1 D4]
 
 
 #CATEGORY=OWL_TUNING
@@ -478,11 +478,11 @@ loadsgf games/trevor/trevor_45.sgf
 #SEE_ALSO=owl:170
 loadsgf games/trevor/trevor_46.sgf
 460 owl_attack B14
-#? [1 E14]*
+#? [1 E14]
 
 #SEE_ALSO trevor:460
 461 gg_genmove black
-#? [E14]*
+#? [E14]
 
 
 #CATEGORY=OWL_TUNING
@@ -504,7 +504,7 @@ loadsgf games/trevor/trevor_47.sgf
 #Shouldn't the move valuator include counting of the eye spaces?
 loadsgf games/trevor/trevor_48.sgf
 480 gg_genmove black
-#? [C9]*
+#? [C9]
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Does OWL really need to get this one right?

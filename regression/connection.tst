@@ -43,9 +43,9 @@ loadsgf games/incident240.sgf 69
 
 loadsgf games/connection2.sgf 177
 11 same_dragon G6 J7
-#? [0]*
+#? [0]
 12 same_dragon G8 J7
-#? [0]*
+#? [0]
 
 loadsgf games/strategy29.sgf 204
 13 same_dragon O6 Q8

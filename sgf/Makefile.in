@@ -87,7 +87,7 @@ noinst_HEADERS =  	sgftree.h 	sgf_properties.h
 GGBUILTSOURCES = sgf_properties.h
 
 # Remove these files here... they are created locally
-# don'e clean up sgfproperties.h
+# don't clean up sgfproperties.h
 DISTCLEANFILES = *~
 
 INCLUDES =  	-I$(top_srcdir)/engine 	-I$(top_srcdir)/utils 	-I$(top_srcdir)/interface

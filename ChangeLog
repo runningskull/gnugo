@@ -10,13 +10,11 @@
 - owl attacks induce strategical defenses of friendly neighbors
 - connection values revised
 - territorial value of attacks, defenses, owl attacks, and owl
-  defenses computed through influence function instead of using
-  effective_size heuristic
+  defenses computed through influence function, not effective_size
 - bugfix in computing effects of min and max territory values
-- played stone not automatically included in goal array in
-  owl_does_defend(), owl_confirm_safety(), and owl_connection_defends()
-- gtp commands debug_influence, debug_move_influence, and move_influence
-  removed
+- played stone not automatically in goal array in owl_does_defend(), 
+  owl_confirm_safety(), and owl_connection_defends()
+- gtp commands debug_influence, debug_move_influence, move_influence removed
 - cleanup in mkpat.c
 - malformed line warning turned into error in mkpat
 - 1D documentation revisions.
@@ -33,6 +31,7 @@
 - tuning
 - owl tuning
 - influence tuning
+- gtp_set_boardsize resets the engine and stack
 - new and revised regression tests
 - new command-line option --orientation
 - -l and decide-* options can be combined with --orientation

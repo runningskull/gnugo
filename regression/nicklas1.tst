@@ -30,7 +30,7 @@ loadsgf games/nicklas/nicklas2.sgf 23
 
 loadsgf games/nicklas/nicklas2.sgf 39
 204 gg_genmove black
-#? [F8]
+#? [F8]*
 
 loadsgf games/nicklas/nicklas2.sgf 55
 205 dragon_status G1
@@ -42,11 +42,11 @@ loadsgf games/nicklas/nicklas3.sgf 49
 
 loadsgf games/nicklas/nicklas5.sgf 23
 501 gg_genmove black
-#? [G7]
+#? [G7]*
 
 loadsgf games/nicklas/nicklas5.sgf 27
 502 gg_genmove black
-#? [G5]
+#? [G5]*
 
 loadsgf games/nicklas/nicklas6.sgf 31
 # semeai problem
@@ -158,7 +158,7 @@ loadsgf games/nicklas/nicklas11.sgf 274
 
 loadsgf games/nicklas/nicklas12.sgf 103
 1206 gg_genmove black
-#? [C15]*
+#? [C15]
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=Needless 2 point loss for B.
@@ -181,12 +181,12 @@ loadsgf games/nicklas/nicklas12.sgf 123
 
 loadsgf games/nicklas/nicklas12.sgf 203
 1213 gg_genmove black
-#? [N4]
+#? [N4]*
 
 # Added A6 among the correct moves. /gf (2.7.203)
 loadsgf games/nicklas/nicklas12.sgf 215
 1214 gg_genmove black
-#? [A1|A6]
+#? [A1|A6]*
 
 # H3 doesn't seem critical. /gf
 loadsgf games/nicklas/nicklas12.sgf 259
@@ -248,7 +248,7 @@ loadsgf games/nicklas/nicklas15.sgf 232
 
 loadsgf games/nicklas/nicklas15.sgf 258
 1509 gg_genmove black
-#? [!L1]
+#? [!L1]*
 
 loadsgf games/nicklas/nicklas15.sgf 284
 1510 gg_genmove black
@@ -273,7 +273,7 @@ loadsgf games/nicklas/nicklas16.sgf 28
 # Missed connection. See also connection:26,27
 loadsgf games/nicklas/nicklas16.sgf 38
 1603 gg_genmove black
-#? [B4]*
+#? [B4]
 
 loadsgf games/nicklas/nicklas16.sgf 62
 1604 gg_genmove black

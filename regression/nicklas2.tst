@@ -71,7 +71,7 @@ loadsgf games/nicklas/nicklas9.sgf 50
 
 loadsgf games/nicklas/nicklas10.sgf 18
 1001 gg_genmove black
-#? [B7]
+#? [B7]*
 
 loadsgf games/nicklas/nicklas13.sgf 49
 1301 gg_genmove black
@@ -145,7 +145,7 @@ loadsgf games/nicklas/nicklas21.sgf 72
 #See also nicklas2.tst?2102
 loadsgf games/nicklas/nicklas21.sgf 74
 2103 gg_genmove black
-#? [PASS]*
+#? [PASS]
 
 loadsgf games/nicklas/nicklas21.sgf 76
 2104 gg_genmove black
@@ -157,7 +157,7 @@ loadsgf games/nicklas/nicklas22.sgf 42
 
 loadsgf games/nicklas/nicklas22.sgf 50
 2202 gg_genmove black
-#? [B1]
+#? [B1]*
 
 #CATEGORY=ATARI_ATARI
 #DESCRIPTION=Black must defend here - yikes!

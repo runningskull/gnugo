@@ -13,14 +13,13 @@ loadsgf games/ego.sgf 30
 2 gg_genmove white
 #? [!E5]
 
-
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=K17 misses H18 threat.
 #SEVERITY=8
 # K18 is unreasonable. H18 is the only move locally.
 loadsgf games/ego.sgf 52
 3 gg_genmove white
-#? [H18]*
+#? [H18]
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=Possible replacement pattern appropriate?
@@ -30,7 +29,6 @@ loadsgf games/ego.sgf 52
 loadsgf games/ego.sgf 54
 4 gg_genmove white
 #? [!(G19|H19|K17)]*
-
 
 #CATEGORY=
 #DESCRIPTION=Why is B15 so bad?  -Trevor
@@ -49,13 +47,12 @@ loadsgf games/ego.sgf 96
 7 gg_genmove white
 #? [!Q1]
 
-
 #CATEGORY=BORDER_PROTECTION
 #DESCRIPTION=Tough moyo protection.
 #SEVERITY=5
 loadsgf games/ego.sgf 112
 8 gg_genmove white
-#? [F12]*
+#? [F12]
 
 loadsgf games/ego.sgf 180
 9 gg_genmove white

@@ -320,6 +320,8 @@ gtp_set_boardsize(char *s, int id)
   board_size = boardsize;
   clear_board();
   gtp_internal_set_boardsize(boardsize);
+  reset_engine();
+  move_stack_pointer = 0;
   store_position(&starting_position);
   return gtp_success(id, "");
 }

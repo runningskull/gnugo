@@ -10,7 +10,7 @@ loadsgf games/mfgg1.sgf 43
 
 loadsgf games/mfgg1.sgf 49
 2 gg_genmove black
-#? [S16]
+#? [S16]*
 
 #CATEGORY=PATTERN_TUNING
 #DESCRIPTION=No terribly serious consequences, S11 not optimal.
@@ -52,7 +52,7 @@ loadsgf games/mfgg2.sgf 45
 #GG often messes up in this type of corner position.
 loadsgf games/mfgg2.sgf 117
 8 gg_genmove black
-#? [T2]*
+#? [T2]
 
 loadsgf games/mfgg3.sgf 42
 9 gg_genmove black

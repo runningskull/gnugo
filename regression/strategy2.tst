@@ -18,11 +18,11 @@ loadsgf games/strategy14.sgf 33
 
 loadsgf games/strategy14.sgf 53
 53 gg_genmove white
-#? [S15]
+#? [S15]*
 
 loadsgf games/strategy14.sgf 81
 54 gg_genmove white
-#? [P6]
+#? [P6]*
 
 loadsgf games/strategy14.sgf 125
 55 gg_genmove white
@@ -124,7 +124,7 @@ loadsgf games/semeai2.sgf 116
 
 loadsgf games/semeai2.sgf 118
 74 gg_genmove white
-#? [F7]
+#? [F7]*
 
 loadsgf games/semeai2.sgf 150
 # If Q11 is not undervalued F7 is acceptable (though not correct)
@@ -153,7 +153,7 @@ loadsgf games/strategy14a.sgf
 # This is essentially a semeai problem
 loadsgf games/strategy22.sgf
 80 gg_genmove white
-#? [P4|Q4|Q3]
+#? [P4|Q4|Q3]*
 
 # Looks to me like B12 is also effective, although much more
 # complicated. /gf
@@ -163,7 +163,7 @@ loadsgf games/strategy23.sgf
 
 loadsgf games/dragon1.sgf 206
 82 gg_genmove black
-#? [L5]*
+#? [L5]
 
 loadsgf games/heikki/heikki01.sgf 17
 # P15 is a joseki, but GNU should at least see that P14 is urgent
@@ -173,7 +173,7 @@ loadsgf games/heikki/heikki01.sgf 17
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
 84 gg_genmove black
-#? [J18]
+#? [J18]*
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white
@@ -198,7 +198,7 @@ loadsgf games/strategy25.sgf 45
 
 loadsgf games/strategy25.sgf 55
 89 gg_genmove black
-#? [(D16|B7|G13)]*
+#? [(D16|B7|G13)]
 
 # Connecting with ko at B14 looks best. Cutting at D17 might be
 # considered. B17 (game move) is inferior.
