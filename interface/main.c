@@ -90,6 +90,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_SEMEAI_VARIATIONS,
       OPT_EXPERIMENTAL_CONNECTIONS,
       OPT_EXPERIMENTAL_INFLUENCE,
+      OPT_ALTERNATE_CONNECTIONS,
       OPT_STANDARD_SEMEAI,
       OPT_STANDARD_CONNECTIONS,
       OPT_STANDARD_INFLUENCE,
@@ -206,7 +207,9 @@ static struct gg_option const long_options[] =
   {"no-owl-threats",  no_argument,      0, OPT_NO_OWL_THREATS},
   {"experimental-influence",  no_argument, 0, OPT_EXPERIMENTAL_INFLUENCE},
   {"standard-influence",  no_argument, 0, OPT_STANDARD_INFLUENCE},
+  {"standard-connections",  no_argument, 0, OPT_STANDARD_CONNECTIONS},
   {"standard_semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
+  {"alternate-connections",  no_argument, 0, OPT_ALTERNATE_CONNECTIONS},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
   {"play-out-aftermath", no_argument,   0, OPT_PLAY_OUT_AFTERMATH},
@@ -466,6 +469,10 @@ main(int argc, char *argv[])
 
       case OPT_STANDARD_CONNECTIONS: 
 	experimental_connections = 0;
+	break;
+
+      case OPT_ALTERNATE_CONNECTIONS: 
+	alternate_connections = !alternate_connections;
 	break;
 
       case OPT_EXPERIMENTAL_INFLUENCE:

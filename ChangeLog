@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- alternate connection reading algorithm appended to readconnect.c
+- new option --alternate-connections to toggle between the two connection
+  reading algorithms
 - Zobrist hashing implemented in owl_analyze_semeai
 - do_owl_analyze_semeai no longer considers unsafe outside liberties
 - small_semeai reimplemented

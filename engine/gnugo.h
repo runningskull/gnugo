@@ -251,10 +251,13 @@ extern int last_moves[2];
 #define HASH_OWL_ATTACK   0x0100
 #define HASH_OWL_DEFEND   0x0200
 #define HASH_SEMEAI       0x0400
+#define HASH_CONNECT      0x0800
+#define HASH_DISCONNECT   0x1000
 #define HASH_NOTHING      0
 #define HASH_ALL          0xffff
 #define HASH_DEFAULT      (HASH_ATTACK | HASH_FIND_DEFENSE\
-			   | HASH_OWL_ATTACK | HASH_OWL_DEFEND | HASH_SEMEAI)
+			   | HASH_OWL_ATTACK | HASH_OWL_DEFEND | HASH_SEMEAI\
+                           | HASH_CONNECT | HASH_DISCONNECT)
 
 extern int debug;		/* debug flags */
 extern int hashflags;		/* hash flags */

@@ -245,10 +245,8 @@ extern Hashtable *movehash;
 
 int get_read_result(int routine, int komaster, int kom_pos,
 		    int *str, Read_result **read_result);
-int
-get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
-		 Read_result **read_result);
-
+int get_read_result2(int routine, int komaster, int kom_pos,
+		     int *str1, int *str2, Read_result **read_result);
 
 /* ================================================================ */
 
@@ -340,8 +338,11 @@ get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
 #define OWL_DEFEND      9
 #define SEMEAI         10
 
-#define MAX_ROUTINE     SEMEAI
-#define NUM_ROUTINES    (MAX_ROUTINE+1)
+#define CONNECT        11
+#define DISCONNECT     12
+
+#define MAX_ROUTINE     DISCONNECT
+#define NUM_ROUTINES    (MAX_ROUTINE + 1)
   
 #endif
 
