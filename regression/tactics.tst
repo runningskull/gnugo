@@ -8,6 +8,11 @@ loadsgf games/tactics01.sgf
 1 gg_genmove black
 #? [C15|D15|B13|B11|B14]*
 
+loadsgf games/tactics02.sgf
+2 gg_genmove black
+#? [S11|S12]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
