@@ -283,6 +283,7 @@ DECLARE(reinforce_helper);
 DECLARE(throw_in_atari_helper);
 DECLARE(ugly_cutstone_helper);
 DECLARE(cutstone2_helper);
+DECLARE(thrash_around_helper);
 
 /* autohelper fns */
 int seki_helper(int str);

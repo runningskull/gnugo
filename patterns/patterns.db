@@ -14277,4 +14277,268 @@ Pattern RE14
 >replace(a,*)
 
 
+######################################################################
+#
+# Thrashing patterns.
+#
+# Patterns to force early moves when playing white against high
+# handicaps instead of passing because all stones look dead.
+# These patterns are disabled by the thrash_around_helper when white has
+# managed to get living stones or when at least 40% of the board is
+# covered.
+#
+######################################################################
+
+Pattern Th1
+
+.....
+X.*.X
+.....
+.....
+-----
+
+:|,-,value(5),thrash_around_helper
+
+
+Pattern Th2
+
+xxXxx
+o...o
+o.*.o
+.....
+.....
+-----
+
+:|,-,value(5),thrash_around_helper
+
+
+Pattern Th3
+
+oo.oo
+.X*.x
+.....
+.....
+.....
+-----
+
+:8,-,value(3),thrash_around_helper
+
+
+Pattern Th4
+
+ooXoo
+o.*.o
+.....
+.....
+-----
+
+:|,-,value(3),thrash_around_helper
+
+
+Pattern Th5
+
+X..o
+..*.
+....
+oooo
+
+:8,-,value(1),thrash_around_helper
+
+
+Pattern Th6
+
+...o
+X.*.
+....
+oooo
+
+:8,-,value(1),thrash_around_helper
+
+
+Pattern Th7
+
+....x
+.X.o.
+.*.o.
+....x
+
+:8,s,value(4),thrash_around_helper
+
+....x
+.X.a.
+.*.b.
+....x
+
+;o_somewhere(a,b)
+
+
+Pattern Th8
+
+oo..?
+*X.o.
+.O.o.
+....x
+
+:8,-,value(5),thrash_around_helper
+
+oo..?
+*X.a.
+.O.b.
+....x
+
+;o_somewhere(a,b)
+
+
+Pattern Th9
+
+....
+O.*.
+...x
+
+:8,-,value(3),thrash_around_helper
+
+
+Pattern Th10
+
+?x?
+.*x
+O.O
+?o?
+
+:8,-,value(3),thrash_around_helper
+
+
+Pattern Th11
+
+?x?
+o*?
+O.O
+?o?
+
+:8,-,value(2),thrash_around_helper
+
+
+Pattern Th12
+
+?.?
+.*.
+...
+O.O
+
+:|,-,value(3),thrash_around_helper
+
+
+Pattern Th13
+
+.O.
+...
+O.*
+
+:8,-,value(3),thrash_around_helper
+
+
+Pattern Th14
+
+x*O
+o..
+O.O
+
+:8,-,value(2),thrash_around_helper
+
+
+Pattern Th15
+
+xO*
+o..
+O.O
+
+:8,-,value(2),thrash_around_helper
+
+
+Pattern Th16
+
+?.O.?
+x*.O?
+??..x
+
+:8,-,value(3),thrash_around_helper
+
+
+Pattern Th17
+# FIXME: Give value to all attack threats.
+
+?O?
+*XO
+?.?
+
+:8,-,value(4),thrash_around_helper
+
+
+Pattern Th18
+# FIXME: Give value to all attack threats.
+
+?O?
+*XO
+?.?
+
+:8,s,value(0.5),thrash_around_helper
+
+
+Pattern Th19
+
+*Ox
+O.O
+.O.
+
+:8,n,value(1),thrash_around_helper
+
+
+Pattern Th20
+
+?.o.
+.*X.
+?...
+
+:8,s,value(0.5),thrash_around_helper
+
+
+Pattern Th21
+
+.O?
+*XO
+.Oo
+
+:8,s,value(1),thrash_around_helper
+
+
+Pattern Th22
+
+..O
+*..
+...
+---
+
+:8,s,value(4),thrash_around_helper
+
+
+Pattern Th23
+
+?X?
+.*O
+...
+---
+
+:8,s,value(2),thrash_around_helper
+
+
+Pattern Th24
+
+.*x
+.XO
+...
+---
+
+:8,s,value(3),thrash_around_helper
+
+
 # END OF FILE

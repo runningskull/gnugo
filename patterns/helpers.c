@@ -793,6 +793,40 @@ backfill_replace(int move, int str)
   }
 }
 
+
+/* True if
+ * 1. White to move.
+ * 2. All white stones look dead.
+ * 3. Less than 40% of the board is filled or less than 20% of the
+ *    board is filled with white stones.
+ *
+ * This is intended for patterns forcing white to thrash around early
+ * in high handicap games, instead of passing because it looks like no
+ * stones can live.
+ */
+int 
+thrash_around_helper(ARGS)
+{
+  int d;
+  UNUSED(pattern);
+  UNUSED(trans);
+  UNUSED(move);
+  
+  if (doing_scoring
+      || (stones_on_board(BLACK | WHITE) > board_size * board_size * 2 / 5
+	  && stones_on_board(WHITE) > board_size * board_size / 5)
+      || color == BLACK)
+    return 0;
+
+  for (d = 0; d < number_of_dragons; d++)
+    if (DRAGON(d).color == WHITE
+	&& DRAGON(d).status != DEAD)
+      return 0;
+
+  return 1;
+}
+
+
 /*
  * LOCAL Variables:
  * tab-width: 8
