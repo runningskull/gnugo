@@ -176,7 +176,7 @@ int
 tt_get(Transposition_table *table, 
        int komaster, int kom_pos, enum routine_id routine, int target, 
        int remaining_depth,
-       int *result, int *move)
+       int *result, int *move, Hash_data *extra_hash)
 {
   Hash_data      hashval;
   Hashentry_ng  *entry;
@@ -185,6 +185,8 @@ tt_get(Transposition_table *table,
   /* Get the combined hash value. */
   calculate_hashval_for_tt(komaster, kom_pos, routine, target,
 			   &hashval);
+  if (extra_hash)
+    hashdata_xor(hashval, *extra_hash);
 
   /* Sanity check. */
   if (remaining_depth < 0)

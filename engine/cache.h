@@ -101,7 +101,8 @@ void tt_free(Transposition_table *table);
 int  tt_get(Transposition_table *table, 
 	    int komaster, int kom_pos, enum routine_id routine,
 	    int target, int remaining_depth,
-	    int *result, int *move);
+	    int *result, int *move,
+	    Hash_data *extra_hash);
 void tt_update(Transposition_table *table,
 	       int komaster, int kom_pos, enum routine_id routine,
 	       int target, int remaining_depth,
