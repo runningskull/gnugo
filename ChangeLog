@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- twogtp closes the sgf file if an engine crashes
 - global variable last_moves[] removed
 - move history added to board state
 - static function undo_move() in board.c renamed to undo_trymove()

@@ -44,7 +44,7 @@ sub exec_cmd {
     my $line;
     $line = <$hout>;
     print STDERR $line if ($debug);
-    die "No response!\n" unless (defined $line);
+    return "ERROR" unless (defined $line);
     $line =~ s/\s*$//;
     my ($repchar, $result) = split(' ', $line, 2);
     if ($repchar eq '=') {
@@ -257,6 +257,7 @@ sub writesgf {
     $handle->close;
 }
 
+
 sub play {
 
     my $self = shift;
@@ -299,6 +300,10 @@ sub play {
 	if ($toplay eq 'B') {
 
 	    $move = $self->black->genmove("black");
+	    if ($move eq "ERROR") {
+    		$self->writesgf($sgffile) if defined $sgffile;
+		die "No response!";
+	    }
 	    push @{$self->moves}, $move;
 	    print "Black plays $move\n" if $verbose;
 	    $pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
@@ -311,6 +316,10 @@ sub play {
         } else {
 
 	    $move = $self->white->genmove("white");
+	    if ($move eq "ERROR") {
+    		$self->writesgf($sgffile) if defined $sgffile;
+		die "No response!";
+	    }
 	    push @{$self->moves}, $move;
 	    print "White plays $move\n" if $verbose;
 	    $pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
