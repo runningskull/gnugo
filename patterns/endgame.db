@@ -209,30 +209,14 @@ XO?       descend to edge
 :8,OXe,terri(0.1)
 
 
+
 Pattern EE6
-# gf Added followup value. (3.1.14)
 
 .OOOXX
 ...*..
 ------
 
-:8,OXeFY,terri(2),followup(1)
-
-.OOOXX
-..a*bc
-------
-
-; proper_eye(a) && !oplay_attack(*,*) && oplay_attack(b,*,a,c,*,a)
-; && xplay_attack(*,a,b,a)
-
-
-Pattern EE6Y
-
-.OOOXX
-...*..
-------
-
-:8,OXeY,terri(2)
+:8,OXe,terri(2)
 
 .OOOXX
 ..a*bc
@@ -365,22 +349,7 @@ Pattern EE105
 ..*..
 -----
 
-:8,OXeFY,terri(2),followup(6)
-
-?OE..
-bc*a.
------
-
-;proper_eye(a) && proper_eye(b) && oplay_attack_either(*,a,c,a,E)
-
-
-Pattern EE105Y
-
-?OX..      three points sente
-..*..
------
-
-:8,OXeY,terri(2)
+:8,OXe,terri(2)
 
 ?OE..
 bc*a.
@@ -442,23 +411,6 @@ O*a
 ;marginal_eye(*) && proper_eye(a) && max_eye_value(a) > 0
 
 
-Pattern EE201a
-# tm New Pattern (3.1.19)
-
-XX?                     first line followup.
-*..
----
-
-:8,OXFY,followup(1)
-
-XX?
-*a.
----
-
-;marginal_eye(*) && proper_eye(a) && max_eye_value(a) > 0
-;&& !oplay_attack(*,a,*)
-
-
 Pattern EE202
 
 OXX.           endgame move
@@ -480,23 +432,7 @@ OXX.           1 point double sente
 .O*.
 ----
 
-:8,OXeFY,terri(1),followup(4),reverse_followup(2)
-
-ODDc
-bO*a
-----
-
-;marginal_eye(*) && marginal_eye(a) && marginal_eye(c)
-;&& (oplay_attack(*,a,b,a) || oplay_attack(*,a,b,D))
-
-
-Pattern EE203Y
-
-OXX.           1 point double sente
-.O*.
-----
-
-:8,OXeY,terri(1),reverse_followup(2)
+:8,OXe,terri(1),reverse_followup(2)
 
 ODDc
 bO*a
@@ -998,22 +934,6 @@ Xa...
 # third line moves
 ##################
 
-Pattern EE1001
-
-OO*?       one point sente (at least)
-XX.X       sente endgame move
-....
-----       
-
-:8,OXeFY,terri(1),followup(3)
-
-OO*?
-XX.X
-....
-----
-
-;olib(*)>2
-
 
 Pattern EE1002
 
@@ -1050,101 +970,6 @@ O*X?
 ----
 
 ;lib(A)==3 && proper_eye(b)
-
-
-######################################################################
-#
-# Edge followup patterns
-#
-# Patterns on the edge which enhance the precision of the EE patterns.
-#
-######################################################################
-
-
-# proper followups
-######################################
-
-Pattern EF1
-# Only gives followup value if * is not gote.
-
-?x?	Possible to jump into other territory. Possibly bigger followup.
-x.X
-..*
----
-
-:8,OXFY,followup(4)
-
-?b?
-a.X
-.c*
----
-
-;!(x_somewhere(a) && x_somewhere(b)) && !oplay_attack(*,c,*)
-
-
-# Bigger and bigger the more space there is.
-
-Pattern EF2
-
-?XX.
-O*..
-----
-
-:8,OXFY,followup(2)
-
-?XX.
-O*ab
-----
-
-;proper_eye(b) && !oplay_attack(*,?,a,b,a) && oplay_attack(*,?,a,b,b)
-
-
-Pattern EF2b
-
-?XX..
-O*...
------
-
-:8,OXFY,followup(4)
-
-?XX..
-O*ab.
------
-
-;proper_eye(b) && !oplay_attack(*,?,a,b,a) && oplay_attack(*,?,a,b,b)
-
-
-Pattern EF2c
-
-?XX...
-O*....
-------
-
-:8,OXFY,followup(6)
-
-?XX...
-O*ab..
-------
-
-;proper_eye(b) && !oplay_attack(*,?,a,b,a) && oplay_attack(*,?,a,b,b)
-
-
-Pattern EF3
-# tm New Pattern (3.1.18)
-
-..X?	    hane in sente, after saving stone.
-.XO*
-....
-----
-
-:8,XFY,followup(3)
-
-..X?
-.DO*
-Bac.
-----
-
-; oplay_attack_either(*,?,a,B,c,B,D)
 
 
 # reverse followups
@@ -1314,22 +1139,7 @@ Pattern CE15
 .*.       one point sente
 X.O
 
-:8,OXeFY,terri(1),followup(2)
-
-.X?
-a*.
-X.O
-
-;marginal_eye(*) && proper_eye(a)
-
-
-Pattern CE15Y
-
-.X?       sente endgame move
-.*.       one point sente
-X.O
-
-:8,OXeY,terri(1)
+:8,OXe,terri(1)
 
 .X?
 a*.
@@ -1359,22 +1169,7 @@ Pattern CE16
 .*O       one point sente
 X??
 
-:8,OXeFY,terri(1),followup(2)
-
-.X?
-a*O
-X??
-
-;marginal_eye(*) && proper_eye(a) && olib(*)>2
-
-
-Pattern CE16Y
-
-.X?       sente endgame move
-.*O       one point sente
-X??
-
-:8,OXeY,terri(1)
+:8,OXe,terri(1)
 
 .X?
 a*O
@@ -1404,22 +1199,7 @@ XO          endgame move
 .*          one point sente
 xX
 
-:8,OXeFY,terri(1),followup(2)
-
-XO
-a*
-xX
-
-;marginal_eye(*) && proper_eye(a) && olib(*)>2
-
-
-Pattern CE17Y
-
-XO          endgame move
-.*          one point sente
-xX
-
-:8,OXeY,terri(1)
+:8,OXe,terri(1)
 
 XO
 a*
@@ -1621,41 +1401,6 @@ d*A
 # Patterns in the center which enhance the precision of the CE patterns.
 #
 ######################################################################
-
-
-Pattern CF1
-# gf Revised pattern. (3.1.20)
-
-?X?	Threaten to destroy another point.
-*..
-?X?
-
-:-,XFY,followup(1)
-
-?X?
-*a.
-?X?
-
-;proper_eye(a)
-
-
-Pattern CF2
-# tm New Pattern (3.1.19)  (see trevorc:130)
-#   see comment for Patterm CF1 on over-generality
-# gf Corrected symmetry. (3.1.23)
-
-xxx
-x.x
-X*X
-
-:|,XFY,followup(2)
-
-xBx
-AdC
-X*X
-
-; proper_eye(d)
-; && (x_somewhere(A) + x_somewhere(B) + x_somewhere(C) <=1)
 
 
 Pattern CF3

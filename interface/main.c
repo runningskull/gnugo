@@ -210,8 +210,6 @@ static struct gg_option const long_options[] =
   {"experimental-connections",  no_argument, 0, OPT_EXPERIMENTAL_CONNECTIONS},
   {"owl-threats",     no_argument,      0, OPT_OWL_THREATS},
   {"no-owl-threats",  no_argument,      0, OPT_NO_OWL_THREATS},
-  {"experimental-influence",  no_argument, 0, OPT_EXPERIMENTAL_INFLUENCE},
-  {"standard-influence",  no_argument, 0, OPT_STANDARD_INFLUENCE},
   {"standard-connections",  no_argument, 0, OPT_STANDARD_CONNECTIONS},
   {"standard_semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"alternate-connections",  no_argument, 0, OPT_ALTERNATE_CONNECTIONS},
@@ -329,7 +327,6 @@ main(int argc, char *argv[])
     owl_threats = 0;
   experimental_semeai = EXPERIMENTAL_SEMEAI;
   experimental_connections = EXPERIMENTAL_CONNECTIONS;
-  experimental_influence = EXPERIMENTAL_INFLUENCE;
 
   allow_suicide = 0;
   capture_all_dead = 0;
@@ -402,9 +399,6 @@ main(int argc, char *argv[])
 	break;
 	
       case OPT_OPTIONS:
-	if (EXPERIMENTAL_INFLUENCE)
-	  fprintf(stderr,
-		  "configure option enabled: experimental influence\n");
 	if (EXPERIMENTAL_CONNECTIONS)
 	  fprintf(stderr,
 		  "configure option enabled: experimental connections\n");
@@ -508,14 +502,6 @@ main(int argc, char *argv[])
 
       case OPT_ALTERNATE_CONNECTIONS: 
 	alternate_connections = !alternate_connections;
-	break;
-
-      case OPT_EXPERIMENTAL_INFLUENCE:
-	experimental_influence = 1;
-	break;
-
-      case OPT_STANDARD_INFLUENCE: 
-	experimental_influence = 0;
 	break;
 
       case OPT_ALLOW_SUICIDE:

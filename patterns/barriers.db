@@ -1026,7 +1026,7 @@ Pattern Intrusion5b
 .QX
 !X.
 
-:8,BY,value(30)
+:8,BT,value(30)
 
 bfE
 aDc
@@ -1056,7 +1056,7 @@ QX.
 .!!
 X.x
 
-:8,FBY,value(30)
+:8,BW,value(30)
 
 cA.
 b!!
@@ -1071,7 +1071,7 @@ Pattern Intrusion7b
 QX
 !!
 
-:8,BY,value(30)
+:8,BT,value(30)
 
 cC
 ba
@@ -1178,7 +1178,7 @@ oQo
 .X!
 ...
 
-:8,OBY,value(30)
+:8,OBT,value(30)
 
 odb
 .Ca

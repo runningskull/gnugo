@@ -26,13 +26,17 @@
 
 #include "liberty.h"
 
-/* default attenuation coefficient. */
+/* Default attenuation coefficient.
+ * The "TERR_.."-values are used in the influence computations used
+ * for territory evaluation. (initial_influence with dragons_known,
+ * move_influence)
+ */
 #define DEFAULT_ATTENUATION 3.0
-#define EXP_DEFAULT_ATTENUATION 2.4
+#define TERR_DEFAULT_ATTENUATION 2.4
 
 /* Extra damping coefficient for spreading influence diagonally. */
 #define DIAGONAL_DAMPING 2.0
-#define EXP_DIAGONAL_DAMPING 1.7
+#define TERR_DIAGONAL_DAMPING 1.7
 
 /* Default strength of the influence from a stone. May be lowered if
  * it is unsafe.
@@ -40,7 +44,6 @@
 #define DEFAULT_STRENGTH 100.0
 
 /* Smallest amount of influence that we care about distributing. */
-/*#define INFLUENCE_CUTOFF 0.02*/
 #define INFLUENCE_CUTOFF 0.02
 
 /* Value in delta_territory_cache indicating that the value has not
@@ -102,6 +105,10 @@ struct influence_data
   int region_type[MAX_REGIONS];
   int region_size[MAX_REGIONS];
   int number_of_regions;
+
+  int dragons_known;  /* True if this is a post-owl influence computation. */
+  int is_territorial_influence; /* True for post-owl initial_influence,
+				 * move_influence, but not escape_influence.*/
 
   float territory_value[MAX_BOARD][MAX_BOARD];
   int non_territory[MAX_BOARD][MAX_BOARD];

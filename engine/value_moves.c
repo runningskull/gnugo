@@ -1732,11 +1732,8 @@ estimate_territorial_value(int pos, int color, float score)
   
   /* tm added move_safety check (3.1.22) (see trevorc:880) */
   if (does_block && move[pos].move_safety) {
-    if (experimental_influence)
-      this_value = influence_delta_territory(pos, color, saved_stones,
-                                             &move[pos].influence_followup_value);
-    else
-      this_value = influence_delta_territory(pos, color, saved_stones, NULL);
+    this_value = influence_delta_territory(pos, color, saved_stones,
+					   &move[pos].influence_followup_value);
     if (this_value != 0.0)
       TRACE("  %1m: %f - change in territory\n", pos, this_value);
     else
@@ -2296,15 +2293,12 @@ value_move_reasons(int pos, int color, float pure_threat_value,
   if (tot_value > 0.0) {
     int c;
     float followup_value;
-    if (experimental_influence) {
-      followup_value = move[pos].followup_value
-                       + move[pos].influence_followup_value;
-      TRACE("  %1m:   %f - total followup value, added %f as territorial followup\n",
-            pos, followup_value, move[pos].influence_followup_value);
-    }
-    else
-      followup_value = move[pos].followup_value;
-    
+
+    followup_value = move[pos].followup_value
+		     + move[pos].influence_followup_value;
+    TRACE("  %1m:   %f - total followup value, added %f as territorial followup\n",
+	  pos, followup_value, move[pos].influence_followup_value);
+
     /* In the endgame, there are a few situations where the value can
      * be 0 points + followup.  But we want to take the intersections first
      * were we actually get some points.  0.5 points is a 1 point ko which
@@ -2313,7 +2307,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      *      point move. 
      */
     if (tot_value >= 0.5 
-        || (move[pos].reverse_followup_value >= 1.0)) {
+	|| (move[pos].reverse_followup_value >= 1.0)) {
       float old_tot_value = tot_value;
       float contribution;
       /* We adjust the value according to followup and reverse followup
@@ -2336,8 +2330,8 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       
       if (contribution != 0.0) {
 	TRACE("  %1m: %f - added due to followup (%f) and reverse followup values (%f)\n",
-              pos, contribution, followup_value,
-              move[pos].reverse_followup_value);
+	      pos, contribution, followup_value,
+	      move[pos].reverse_followup_value);
       }
 
       /* If a ko fight is going on, we should use the full followup

@@ -133,9 +133,6 @@ int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 int alternate_connections = ALTERNATE_CONNECTIONS;
 int owl_threats = OWL_THREATS;          /* compute owl threats */
 
-/* use experimental influence module */
-int experimental_influence = EXPERIMENTAL_INFLUENCE;
-
 int allow_suicide       = 0;    /* allow opponent to make suicide moves */
 int capture_all_dead    = 0;    /* capture all dead opponent stones */
 int play_out_aftermath  = 0;    /* make everything unconditionally settled */

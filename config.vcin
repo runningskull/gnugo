@@ -24,9 +24,6 @@
 /* Connection module. Default standard. */
 #define EXPERIMENTAL_CONNECTIONS 1
 
-/* Influence module. Default experimental. */
-#define EXPERIMENTAL_INFLUENCE 1
-
 /* Experimental pattern based reading. Disabled by default. */
 #define EXPERIMENTAL_READING 0
 
