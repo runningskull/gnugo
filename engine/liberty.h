@@ -313,6 +313,7 @@ void draw_reading_shadow(void);
 
 /* persistent.c */
 void purge_persistent_reading_cache(void);
+void clear_persistent_reading_cache(void);
 int search_persistent_reading_cache(int routine, int str, int *result,
 				    int *move);
 void store_persistent_reading_cache(int routine, int str, int result,
@@ -320,6 +321,7 @@ void store_persistent_reading_cache(int routine, int str, int result,
 void delete_persistent_reading_entry(int index);
 void reading_hotspots(float values[BOARDMAX]);
 void purge_persistent_owl_cache(void);
+void clear_persistent_owl_cache(void);
 int search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
 				int *result, int *move, int *move2,
 				int *certain);

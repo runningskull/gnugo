@@ -264,6 +264,12 @@ purge_persistent_reading_cache()
   }
 }
 
+void
+clear_persistent_reading_cache()
+{
+  persistent_reading_cache_size = 0;
+}
+
 
 /* Look for a valid read result in the persistent cache.
  * Return index of the entry found if there is a match, -1 if no match.
@@ -641,6 +647,12 @@ purge_persistent_owl_cache()
       persistent_owl_cache_size--;
     }
   }
+}
+
+void
+clear_persistent_owl_cache()
+{
+  persistent_owl_cache_size = 0;
 }
 
 int

@@ -405,6 +405,19 @@
 
 @end example
 
+
+@cindex clear_cache
+@item clear_cache
+
+@example
+
+ Function:  clear the caches.
+ Arguments: none.
+ Fails:     never.
+ Returns:   nothing.
+
+@end example
+
 @cindex attack
 @item attack
 

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- mew gtp command clear_cache
+- new functions clear_persistent_owl_cache, clear_persistent_reading_cache
 - joseki preparations: mkpat cleaning
 - joseki preparations: some currently unused mkpat options changed
 - joseki preparations: autohelpers no longer take `patt' argument

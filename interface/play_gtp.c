@@ -58,6 +58,7 @@ DECLARE(gtp_all_legal);
 DECLARE(gtp_attack);
 DECLARE(gtp_attack_either);
 DECLARE(gtp_clear_board);
+DECLARE(gtp_clear_cache);
 DECLARE(gtp_combination_attack);
 DECLARE(gtp_connect);
 DECLARE(gtp_countlib);
@@ -176,6 +177,7 @@ static struct gtp_command commands[] = {
   {"boardsize",        	      gtp_set_boardsize},
   {"captures",        	      gtp_captures},
   {"clear_board",      	      gtp_clear_board},
+  {"clear_cache",	      gtp_clear_cache},
   {"color",            	      gtp_what_color},
   {"combination_attack",      gtp_combination_attack},
   {"connect",         	      gtp_connect},
@@ -1099,6 +1101,24 @@ gtp_popgo(char *s)
   return gtp_success("");
 }
 
+/*********************
+ * Caching	     *
+ *********************/
+
+/* Function:  clear the caches.
+ * Arguments: none.
+ * Fails:     never.
+ * Returns:   nothing.
+ */
+
+static int
+gtp_clear_cache(char *s)
+{
+  UNUSED(s);
+  clear_persistent_reading_cache();
+  clear_persistent_owl_cache();
+  return gtp_success("");
+}
 
 /*********************
  * Tactical reading. *
