@@ -3814,14 +3814,17 @@ xx..
 #      suspect that vital_chain works differently called from there??? -tm
 #      see 13x13:52 --decide-dragon K10
 Pattern A1107
+# spl never on edge (3.3.23)
 
-O*          defend the surrounding chain
-YO
+???          defend the surrounding chain
+O*?
+YO?
 
 :/,-,value(95)
 
-a*
-Yb
+???
+a*?
+Yb?
 
 ; vital_chain(a) && vital_chain(b)
 ; && !xplay_defend_both(*,a,b)

@@ -484,13 +484,15 @@ OOa..
 Pattern D123
 # tm New Pattern (3.1.17)
 # tm Modified (3.1.18)
+# spl modified (3.3.23)
 
-??*??	expand eye shape, not in corner
-?O.O?
+??x??
+??*O?  expand eye shape, not in corner
+oO.O?
 ?...?
 -----
 
-:|,-,value(65)
+:8,-,value(65)
 
 
 Pattern D124
