@@ -94,6 +94,7 @@ DECLARE(gtp_fixed_handicap);
 DECLARE(gtp_genmove);
 DECLARE(gtp_genmove_black);
 DECLARE(gtp_genmove_white);
+DECLARE(gtp_get_connection_node_counter);
 DECLARE(gtp_get_life_node_counter);
 DECLARE(gtp_get_owl_node_counter);
 DECLARE(gtp_get_reading_node_counter);
@@ -124,6 +125,7 @@ DECLARE(gtp_query_boardsize);
 DECLARE(gtp_query_orientation);
 DECLARE(gtp_quit);
 DECLARE(gtp_report_uncertainty);
+DECLARE(gtp_reset_connection_node_counter);
 DECLARE(gtp_reset_life_node_counter);
 DECLARE(gtp_reset_owl_node_counter);
 DECLARE(gtp_reset_reading_node_counter);
@@ -180,6 +182,7 @@ static struct gtp_command commands[] = {
   {"fixed_handicap",   	      gtp_fixed_handicap},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
+  {"get_connection_node_counter", gtp_get_connection_node_counter},
   {"get_life_node_counter",   gtp_get_life_node_counter},
   {"get_owl_node_counter",    gtp_get_owl_node_counter},
   {"get_reading_node_counter",gtp_get_reading_node_counter},
@@ -211,6 +214,7 @@ static struct gtp_command commands[] = {
   {"query_orientation",       gtp_query_orientation},
   {"quit",             	      gtp_quit},
   {"report_uncertainty",      gtp_report_uncertainty},
+  {"reset_connection_node_counter", gtp_reset_connection_node_counter},
   {"reset_life_node_counter", gtp_reset_life_node_counter},
   {"reset_owl_node_counter",  gtp_reset_owl_node_counter},
   {"reset_reading_node_counter", gtp_reset_reading_node_counter},
@@ -2108,6 +2112,34 @@ static int
 gtp_get_trymove_counter(char *s, int id)
 {
   int nodes = get_trymove_counter();
+  UNUSED(s);
+  return gtp_success(id, "%d", nodes);
+}
+
+
+/* Function:  Reset the count of connection nodes.
+ * Arguments: none
+ * Fails:     never
+ * Returns:   nothing
+ */
+static int
+gtp_reset_connection_node_counter(char *s, int id)
+{
+  UNUSED(s);
+  reset_connection_node_counter();
+  return gtp_success(id, "");
+}
+
+
+/* Function:  Retrieve the count of connection nodes.
+ * Arguments: none
+ * Fails:     never
+ * Returns:   number of connection nodes
+ */
+static int
+gtp_get_connection_node_counter(char *s, int id)
+{
+  int nodes = get_connection_node_counter();
   UNUSED(s);
   return gtp_success(id, "%d", nodes);
 }

@@ -383,6 +383,8 @@ void reset_reading_node_counter(void);
 int  get_reading_node_counter(void);
 void reset_trymove_counter(void);
 int  get_trymove_counter(void);
+void reset_connection_node_counter(void);
+int  get_connection_node_counter(void);
 
 
 /* ================================================================ */

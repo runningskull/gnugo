@@ -110,9 +110,10 @@ loadsgf golois/Goemate990902-11.sgf
 27 disconnect L13 K15
 #? [0]
 
+# G7 allows white to make two eyes, but it does disconnect. /gf
 loadsgf golois/Goemate990902-3.sgf
 28 disconnect J6 G6
-#? [1 J7]
+#? [1 (J7|G7)]
 
 loadsgf golois/Goemate990902-7.sgf
 29 disconnect P8 Q11

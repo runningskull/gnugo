@@ -45,7 +45,8 @@ static int prevent_connection_two_moves(int *moves, int str1, int str2);
 #if 0
 static int connected_two_moves(int str1, int str2);
 #endif
-static int moves_to_connect_in_three_moves(int *moves, int str1, int str2);
+static int moves_to_connect_in_three_moves(int *moves, int str1, int str2,
+					   int does_connect);
 #if 0
 static int simple_connection_three_moves(int str1, int str2);
 static int prevent_simple_connection_three_moves(int *moves,
@@ -62,9 +63,14 @@ static int prevent_capture_one_move(int *moves, int str1);
 static int recursive_transitivity(int str1, int str2, int str3, int *move);
 static int recursive_non_transitivity(int str1, int str2, int str3, int *move);
 static void order_connection_moves(int *moves, int str1, int str2,
-				   int color_to_move);
+				   int color_to_move, const char *funcname);
 
-int nodes_connect=0,max_nodes_connect=2000,max_connect_depth=64;
+int nodes_connect = 0;
+int max_nodes_connect = 2000;
+int max_connect_depth = 64;
+
+/* Statistics. */
+static int global_connection_node_counter = 0;
 
 /* Adds an integer to an array of integers if it is not already there.
  * The number of elements of the array is in array[0].
@@ -216,7 +222,8 @@ static int connected_one_move (int str1, int str2) {
   
   moves[0] = 0;
   if (prevent_connection_one_move(moves, str1, str2)) {
-    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]));
+    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]),
+			   "connected_one_move");
     res = WIN;
     for (r = 1; ((r < moves[0] + 1) && res); r++) {
       if (trymove(moves[r], OTHER_COLOR(board[str1]),
@@ -382,7 +389,8 @@ static int connection_two_moves (int str1, int str2) {
   moves[0]=0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return WIN;
-  order_connection_moves(moves, str1, str2, board[str1]);
+  order_connection_moves(moves, str1, str2, board[str1],
+			 "connection_two_moves");
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
     if (trymove(moves[r], board[str1],
 		"connection_two_moves", str1, EMPTY, 0)) {
@@ -427,7 +435,8 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
     possible_moves[0]=0;
     moves_to_prevent_connection_in_two_moves(possible_moves, str1, str2);
     order_connection_moves(possible_moves, str1, str2,
-			   OTHER_COLOR(board[str1]));
+			   OTHER_COLOR(board[str1]),
+			   "prevent_connection_two_moves");
     for (r = 1; r < possible_moves[0] + 1; r++) {
       if (trymove(possible_moves[r], OTHER_COLOR(board[str1]), 
 		  "prevent_connection_two_moves", str1, EMPTY, 0)) {
@@ -457,35 +466,65 @@ static int prevent_connection_two_moves (int *moves, int str1, int str2) {
  * A function that computes the second order liberties of a string is
  * needed as well as a function that checks efficiently if an
  * intersection is a second order liberty of a given string.
+ *
+ * If does_connect is 1, generate moves to connect, otherwise generate
+ * moves to disconnect.
  */
 
-static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
+static int moves_to_connect_in_three_moves(int *moves, int str1, int str2,
+					   int does_connect) {
   int r, s;
   int liberties, libs[MAXLIBS];
+  int liberties2, libs2[MAXLIBS];
   int adj, adjs[MAXCHAIN];
   int adjadj, adjadjs[MAXCHAIN];
   int move;
   int k;
-  int mx[BOARDMAX];
+  int secondlib1[BOARDMAX];
+  int secondlib2[BOARDMAX];
+  int pos;
   
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return 1;
 
+  /* Find second order liberties of str1. */
+  memset(secondlib1, 0, sizeof(secondlib1));
+  liberties = findlib(str1, MAXLIBS, libs);
+  for (r = 0; r < liberties; r++)
+    for (k = 0; k < 4; k++) {
+      int pos = libs[r] + delta[k];
+      if (board[pos] == EMPTY)
+	secondlib1[pos] = 1;
+      else if (board[pos] == board[str1]) {
+	liberties2 = findlib(pos, MAXLIBS, libs2);
+	for (s = 0; s < liberties2; s++)
+	  secondlib1[libs2[s]] = 1;
+      }
+    }
+  
+  /* Find second order liberties of str2.
+   */
+  memset(secondlib2, 0, sizeof(secondlib2));
+  liberties = findlib(str2, MAXLIBS, libs);
+  for (r = 0; r < liberties; r++)
+    for (k = 0; k < 4; k++) {
+      int pos = libs[r] + delta[k];
+      if (board[pos] == EMPTY)
+	secondlib2[pos] = 1;
+      else if (board[pos] == board[str2]) {
+	liberties2 = findlib(pos, MAXLIBS, libs2);
+	for (s = 0; s < liberties2; s++)
+	  secondlib2[libs2[s]] = 1;
+      }
+    }
+  
   /* Second order liberties of str1 that are second order liberties
    * of str2 and vice versa.
    */
-  memset(mx, 0, sizeof(mx));
-  liberties = findlib(str1, MAXLIBS, libs);
-  for (r = 0; r < liberties; r++)
-    for (k = 0; k < 4; k++)
-      if (board[libs[r] + delta[k]] == EMPTY)
-	mx[libs[r] + delta[k]] = 1;
-  
-  liberties = findlib(str2, MAXLIBS, libs);
-  for (r = 0; r < liberties; r++)
-    for (k = 0; k < 4; k++)
-      if (ON_BOARD(libs[r] + delta[k]) && mx[libs[r] + delta[k]])
-	add_array(moves, libs[r] + delta[k]);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (secondlib1[pos] && secondlib2[pos])
+      add_array(moves, pos);
+  }
 
   /* Capture a neighbor of str1 which is in atari. The captured string
    * must in turn have a neighbor which can connect to str2 easily.
@@ -544,8 +583,20 @@ static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
   for (r = 0; r < adj; r++) {
     if (have_common_lib(adjs[r], str2, NULL)) {
       liberties = findlib(adjs[r], 3, libs);
-      for (s = 0; s < liberties; s++)
-	add_array(moves, libs[s]);
+      for (s = 0; s < liberties; s++) {
+	/* If generating a connecting move, require the liberty to be
+         * no further than diagonal to a second order liberty of one
+         * of the strings.
+	 */
+	for (k = 0; k < 8; k++) {
+	  if (!does_connect
+	      || secondlib1[libs[s] + delta[k]]
+	      || secondlib2[libs[s] + delta[k]]) {
+	    add_array(moves, libs[s]);
+	    break;
+	  }
+	}
+      }
     }
   }
 
@@ -554,8 +605,20 @@ static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
   for (r = 0; r < adj; r++) {
     if (have_common_lib(adjs[r], str1, NULL)) {
       liberties = findlib(adjs[r], 3, libs);
-      for (s = 0; s < liberties; s++)
-	add_array(moves, libs[s]);
+      for (s = 0; s < liberties; s++) {
+	/* If generating a connecting move, require the liberty to be
+         * no further than diagonal to a second order liberty of one
+         * of the strings.
+	 */
+	for (k = 0; k < 8; k++) {
+	  if (!does_connect
+	      || secondlib1[libs[s] + delta[k]]
+	      || secondlib2[libs[s] + delta[k]]) {
+	    add_array(moves, libs[s]);
+	    break;
+	  }
+	}
+      }
     }
   }
   
@@ -571,7 +634,7 @@ static int moves_to_connect_in_three_moves (int *moves, int str1, int str2) {
 
 static int moves_to_prevent_connection_in_three_moves (int *moves,
 						       int str1, int str2) {
-  if (moves_to_connect_in_three_moves(moves, str1, str2))
+  if (moves_to_connect_in_three_moves(moves, str1, str2, 0))
     return 1;
   return 0;
 }
@@ -597,7 +660,8 @@ static int simply_connected_two_moves (int str1, int str2) {
   moves[0] = 0;
   if (prevent_connection_one_move(moves, str1, str2)) {
     res = WIN;
-    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]));
+    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]),
+			   "simply_connected_two_moves");
     for (r = 1; ((r < moves[0] + 1) && res); r++) {
       if (trymove(moves[r], OTHER_COLOR(board[str1]),
 		  "simply_connected_two_moves", str1, EMPTY, 0)) {
@@ -622,7 +686,8 @@ static int simple_connection_three_moves (int str1, int str2) {
   moves[0]=0;
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return WIN;
-  order_connection_moves(moves, str1, str2, board[str1]);
+  order_connection_moves(moves, str1, str2, board[str1],
+			 "simple_connection_three_moves");
   for (r = 1; ((r < moves[0] + 1) && !res); r++) {
     if (trymove(moves[r], board[str1],
 		"simple_connection_three_moves", str1, EMPTY, 0)) {
@@ -660,7 +725,8 @@ static int prevent_simple_connection_three_moves (int *moves, int str1, int str2
     res = WIN;
     possible_moves[0]=0;
     moves_to_prevent_connection_in_three_moves(possible_moves, str1, str2);
-    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]));
+    order_connection_moves(moves, str1, str2, OTHER_COLOR(board[str1]),
+			   "prevent_simple_connection_three_moves");
     for (r = 1; r < possible_moves[0] + 1; r++) {
       if (trymove(possible_moves[r], OTHER_COLOR(board[str1]), 
 		  "prevent_simple_connection_three_moves", str1, EMPTY, 0)) {
@@ -749,7 +815,8 @@ static int recursive_connect (int str1, int str2, int *move) {
   }
 
   nodes_connect++;
-
+  global_connection_node_counter++;
+  
   if (quiescence_connect (str1, str2, move)) {
     SGFTRACE2(*move, WIN, "quiescence_connect");
     return WIN;
@@ -777,7 +844,7 @@ static int recursive_connect (int str1, int str2, int *move) {
    * because the function that prevent connection in one
    * and two moves are called at AND nodes.
    */
-  moves_to_connect_in_three_moves (Moves, str1, str2);
+  moves_to_connect_in_three_moves(Moves, str1, str2, 1);
 
   /* if there are some forced moves to prevent the capture
    * of one of the two strings, then we only look at
@@ -787,7 +854,8 @@ static int recursive_connect (int str1, int str2, int *move) {
   if ( (ForcedMoves[0] != 0) && (Moves[0] != 0) )
     intersection_array(Moves, ForcedMoves);
 
-  order_connection_moves(Moves, str1, str2, board[str1]);
+  order_connection_moves(Moves, str1, str2, board[str1],
+			 "recursive_connect");
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
     if (trymove(Moves[i], board[str1], "recursive_connect", str1, EMPTY, 0)) {
       if (!recursive_disconnect(str1, str2, move)) {
@@ -820,7 +888,8 @@ int disconnect(int str1, int str2, int *move) {
   moves_to_prevent_connection_in_three_moves (Moves, str1, str2);
   if (Moves[0] > 0)
     res = 0;
-  order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]));
+  order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
+			 "disconnect");
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
     if (trymove(Moves[i], OTHER_COLOR(board[str1]),
 		"disconnect", str1, EMPTY, 0)) {
@@ -871,13 +940,15 @@ static int recursive_disconnect (int str1, int str2, int *move) {
   }
   
   nodes_connect++;
-
+  global_connection_node_counter++;
+  
   /* we are at an and node
    * only look at forced moves here,
    * it ensures that the result of recursive_disconnect
    * is proved if it returns 0 (that is connections are proved)
    */
   Moves[0] = 0;
+
   if (prevent_connection_one_move(Moves, str1, str2))
     res = 0;
   else if (prevent_connection_two_moves(Moves, str1, str2))
@@ -886,7 +957,8 @@ static int recursive_disconnect (int str1, int str2, int *move) {
     res = 0;
   
   if (res == 0)
-    order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]));
+    order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
+			   "recursive_disconnect");
     for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
       if (trymove(Moves[i], OTHER_COLOR(board[str1]),
 		  "recursive_disconnect", str1, EMPTY, 0)) {
@@ -997,7 +1069,8 @@ static int recursive_transitivity (int str1, int str2, int str3, int *move) {
   }
 
   nodes_connect++;
-
+  global_connection_node_counter++;
+  
   if (same_string(str1, str2))
     if (quiescence_connect (str1, str3, move)) {
       SGFTRACE2(*move, WIN, "quiescence_connect");
@@ -1038,7 +1111,8 @@ static int recursive_transitivity (int str1, int str2, int str3, int *move) {
   if ( (ForcedMoves[0] != 0) && (Moves[0] != 0) )
     intersection_array(Moves, ForcedMoves);
 
-  order_connection_moves(Moves, str1, str2, board[str1]);
+  order_connection_moves(Moves, str1, str2, board[str1],
+			 "recursive_transitivity");
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
     if (trymove(Moves[i], board[str1], "recursive_transitivity", 
 		str1, EMPTY, 0)) {
@@ -1070,7 +1144,8 @@ int non_transitivity(int str1, int str2, int str3, int *move) {
   moves_to_prevent_connection_in_three_moves (Moves, str1, str3);
   if (Moves[0] > 0)
     res = 0;
-  order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]));
+  order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
+			 "non_transitivity");
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
     if (trymove(Moves[i], OTHER_COLOR(board[str1]),
 		"non_transitivity", str1, EMPTY, 0)) {
@@ -1126,7 +1201,8 @@ static int recursive_non_transitivity (int str1, int str2, int str3,
   }
   
   nodes_connect++;
-
+  global_connection_node_counter++;
+  
   /* We are at an and node. Only look at forced moves. */
   Moves[0] = 0;
   if (prevent_connection_one_move(Moves, str1, str3))
@@ -1137,7 +1213,8 @@ static int recursive_non_transitivity (int str1, int str2, int str3,
     res = 0;
   
   if (res == 0)
-    order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]));
+    order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
+			   "recursive_non_transitivity");
     for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
       if (trymove(Moves[i], OTHER_COLOR(board[str1]),
 		  "recursive_non_transitivity", str1, EMPTY, 0)) {
@@ -1158,13 +1235,142 @@ static int recursive_non_transitivity (int str1, int str2, int str3,
   return res;
 }
 
+
+/* Order the moves so that we try the ones likely to succeed early. */
 static void
-order_connection_moves(int *moves, int str1, int str2, int color_to_move)
+order_connection_moves(int *moves, int str1, int str2, int color_to_move,
+		       const char *funcname)
 {
-  UNUSED(moves);
-  UNUSED(str1);
+  int scores[MAX_MOVES];
+  int r;
+  int i, j;
   UNUSED(str2);
   UNUSED(color_to_move);
+
+  for (r = 1; r <= moves[0]; r++) {
+    int move = moves[r];
+
+    /* Look at the neighbors of this move and count the things we
+     * find. Friendly and opponent stones are related to color, i.e.
+     * the player to move, not to the color of the string.
+     *
+     * We don't use all these values. They are only here so we can
+     * reuse incremental_order_moves() which was developed for the
+     * tactical reading.
+     */
+    int number_edges       = 0; /* outside board */
+    int number_same_string = 0; /* the string being attacked */
+    int number_own         = 0; /* friendly stone */
+    int number_opponent    = 0; /* opponent stone */
+    int captured_stones    = 0; /* number of stones captured by this move */
+    int threatened_stones  = 0; /* number of stones threatened by this move */
+    int saved_stones       = 0; /* number of stones in atari saved */
+    int number_open        = 0; /* empty intersection */
+    int libs;
+
+    /* We let the incremental board code do the heavy work. */
+    incremental_order_moves(move, color_to_move, str1, &number_edges,
+			    &number_same_string, &number_own,
+			    &number_opponent, &captured_stones,
+			    &threatened_stones, &saved_stones, &number_open);
+
+    if (0)
+      gprintf("%o %1m values: %d %d %d %d %d %d %d %d\n", move, number_edges,
+	      number_same_string, number_own, number_opponent, captured_stones,
+	      threatened_stones, saved_stones, number_open);
+
+    scores[r] = 0;
+    libs = approxlib(move, color_to_move, 10, NULL);
+
+    /* Avoid self atari. */
+    if (libs == 1 && captured_stones == 0)
+      scores[r] -= 10;
+
+    /* Good to get many liberties. */
+    if (libs < 4)
+      scores[r] += libs;
+    else
+      scores[r] += 4;
+
+    /* Very good to capture opponent stones. */
+    if (captured_stones > 0)
+      scores[r] += 5 + captured_stones;
+
+    /* Good to threaten opponent stones. */
+    if (threatened_stones > 0)
+      scores[r] += 3;
+
+    /* Extremely good to save own stones. */
+    if (saved_stones > 0)
+      scores[r] += 10 + saved_stones;
+  }
+  
+  /* Now sort the moves.  We use selection sort since this array will
+   * probably never be more than 10 moves long.  In this case, the
+   * overhead imposed by quicksort will probably overshadow the gains
+   * given by the O(n*log(n)) behaviour over the O(n^2) behaviour of
+   * selection sort.
+   */
+  for (i = 1; i <= moves[0]; i++) {
+    /* Find the move with the biggest score. */
+    int maxscore = scores[i];
+    int max_at = i;
+    for (j = i+1; j <= moves[0]; j++) {
+      if (scores[j] > maxscore) {
+	maxscore = scores[j];
+	max_at = j;
+      }
+    }
+
+    /* Now exchange the move at i with the move at max_at.
+     * Don't forget to exchange the scores as well.
+     */
+    if (max_at != i) {
+      int temp = moves[i];
+      int tempmax = scores[i];
+
+      moves[i] = moves[max_at];
+      scores[i] = scores[max_at];
+
+      moves[max_at] = temp;
+      scores[max_at] = tempmax;
+    }
+  }
+
+  if (0) {
+    gprintf("%oVariation %d:\n", count_variations);
+    for (i = 1; i <= moves[0]; i++)
+      gprintf("%o  %1M %d\n", moves[i], scores[i]);
+  }
+
+  if (sgf_dumptree) {
+    char buf[500];
+    char *pos;
+    int chars;
+    sprintf(buf, "Move order for %s: %n", funcname, &chars);
+    pos = buf + chars;
+    for (i = 1; i <= moves[0]; i++) {
+      sprintf(pos, "%c%d (%d) %n", J(moves[i]) + 'A' + (J(moves[i]) >= 8),
+	      board_size - I(moves[i]), scores[i], &chars);
+      pos += chars;
+    }
+    sgftreeAddComment(sgf_dumptree, NULL, buf);
+  }
+}
+
+/* Clear statistics. */
+void
+reset_connection_node_counter()
+{
+  global_connection_node_counter = 0;
+}
+
+
+/* Retrieve statistics. */
+int
+get_connection_node_counter()
+{
+  return global_connection_node_counter;
 }
 
 /*

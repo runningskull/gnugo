@@ -153,6 +153,17 @@ loadsgf games/connection4.sgf
 47 disconnect B2 G1
 #? [1 (C1|E1)]
 
+loadsgf games/trevor/auto/a038.sgf 34
+48 disconnect C3 G3
+#? [1 D2|F2]
+
+loadsgf games/trevor/trevor_15.sgf 
+49 disconnect D7 G6
+#? [1 (E7|G7)]
+
+loadsgf games/trevor/auto/a014.sgf 16
+50 disconnect B5 C2
+#? [1 B4]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
