@@ -3384,7 +3384,7 @@ AOX
 .*.
 ---
 
-; does_attack(*,A)
+; does_attack(*,A) && defend(A)
 
 
 Pattern D904
@@ -4087,7 +4087,7 @@ OOX.
 OX..
 X..?
 
-:8,b,value(86)
+:8,-b,value(86)
 
 oB*o
 OOXa
