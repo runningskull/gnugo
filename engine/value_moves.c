@@ -1325,7 +1325,7 @@ examine_move_safety(int color)
  *        rather where it's called.
  */
 
-static float
+float
 dragon_weakness(int dr, int ignore_dead_dragons)
 {
   int dragon_safety = DRAGON2(dr).safety;

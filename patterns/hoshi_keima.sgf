@@ -39,7 +39,10 @@ GN[Hoshi+keima joseki database]
 )
 
 (;B[qd]C[S]MA[ij];C[#b blocks below];W[pc]C[S]MA[mj]
-(;B[od]C[S]MA[mi];W[rd]C[S]MA[mi];B[re]C[S]MA[mi];W[rc]C[S]MA[mi]
+(;B[od]C[S
+:-,reverse_followup(10),followup(15)
+]MA[mi];W[rd]C[S]
+MA[mi];B[re]C[S]MA[mi];W[rc]C[S]MA[mi]
 (;B[qe]C[S]MA[mi];W[nc]C[S]MA[mi];B[pf]C[S]MA[mj])
 
 (;B[oc]C[0
@@ -351,17 +354,15 @@ W[qa]MA[mi]C[0];B[oa]MA[mi]C[U])
 W[pb]MA[mi]C[0];B[oa]MA[li]C[U])
 
 (;W[qc]MA[mi]C[0];B[rc]MA[mi]C[U];W[qa]MA[mi]C[0];B[oa]MA[mi]C[U];
-W[pb]MA[mi]C[0];B[oa]MA[mi]C[S];W[pa]MA[mi]C[0];B[tt];W[se]
-MA[mi]C[0];B[tt];W[ma]MA[kb]C[0];B[lb]MA[jb]C[U];W[la]MA[jb]
-C[0];B[kb]MA[jb]C[U])
+W[pb]MA[mi]C[0];B[oa]MA[mi]C[S];W[pa]MA[mi]C[0];B[tt];W[se]MA[mi]C[0];
+B[tt];W[ma]MA[kb]C[0];B[lb]MA[jb]C[U];W[la]MA[jb]C[0];B[kb]MA[jb]C[U])
 
 (;W[se]MA[mi]C[0];B[qc]MA[mi]C[U];W[rc]MA[mi]C[0];B[sc]MA[mi]C[U]
 (;W[pb]MA[mi]C[0];B[ma]MA[mi]C[U];W[qa]MA[mi]C[0];B[oa]MA[mi]C[U];
 W[na]MA[mi]C[0];B[oa]MA[mi]C[U])
 
 (;W[qa]MA[mi]C[0];B[oa]MA[mi]C[U];W[pb]MA[mi]C[0];B[oa]MA[mi]C[U];
-W[pa]MA[mi]C[0];B[tt];W[ma]MA[ke]C[0];B[lb]MA[ke]C[U];W[la]
-MA[jc]C[0]
+W[pa]MA[mi]C[0];B[tt];W[ma]MA[ke]C[0];B[lb]MA[ke]C[U];W[la]MA[jc]C[0]
 (;B[kb])
 
 (;B[ka]MA[jb]C[0])

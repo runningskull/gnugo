@@ -3329,7 +3329,7 @@ X.*..
 .....
 -----
 
-;!weak(a)
+;weakness(a)<0.7
 
 
 Pattern ES3b

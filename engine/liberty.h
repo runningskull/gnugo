@@ -300,6 +300,7 @@ int vital_chain(int pos);
 int confirm_safety(int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);
 int dragon_weak(int pos);
+float dragon_weakness(int pos, int ignore_dead_dragons);
 int size_of_biggest_critical_dragon(void);
 float blunder_size(int move, int color, int *defense_point,
 		   char safe_stones[BOARDMAX]);

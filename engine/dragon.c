@@ -2411,8 +2411,6 @@ dragon_weak(int pos)
 }
 
 
-
-
 /* Returns the size of the biggest critical dragon on the board. */
 
 int  

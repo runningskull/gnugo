@@ -296,6 +296,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"does_attack",		2, 0, 1.00, "does_attack(%s, %s)"},
   {"attack",			1, 0, 1.00, "ATTACK_MACRO(%s)"},
   {"defend",			1, 0, 1.00, "DEFEND_MACRO(%s)"},
+  {"weakness",			1, 0, 0.01, "dragon_weakness(%s, 0)"},
   {"weak",			1, 0, 0.01, "dragon_weak(%s)"},
   {"safe_xmove", 		1, 0, 1.00, "safe_move(%s, OTHER_COLOR(color))"},
   {"safe_omove", 		1, 0, 1.00, "safe_move(%s, color)"},
@@ -1555,8 +1556,9 @@ parse_constraint_or_action(char *line, float *cost)
 	    break;
 	  }
 	  fprintf(stderr,
-		  "%s(%d) : error : Syntax error in constraint or action, '(' expected (pattern %s).\n", 
-		  current_file, current_line_number, pattern_names[patno]);
+		  "%s(%d) : error : Syntax error in constraint or action, '(' expected (pattern %s, autohelper %s).\n", 
+		  current_file, current_line_number, pattern_names[patno],
+		  autohelper_functions[n].name);
 	  fatal_errors++;
 	  return;
 	}
