@@ -681,7 +681,7 @@ Optional Features:
   --disable-grid-opt          disable the grid optimisation
   --enable-cache-size=n       reserve n Mb RAM for caching (16 default)
   --enable-level=n            n = default level (up to 10 supported)
-  --enable-semeai-variations=n        n = semeai variations (500 standard)
+  --enable-semeai-node-limit=n        n = semeai variations (500 standard)
   --enable-owl-node-limit=n           n = owl node limit (1000 standard)
   --disable-dfa               use old non-dfa pattern matcher
   --enable-chinese-rules      use Chinese (area) counting
@@ -1370,7 +1370,7 @@ fi;
 
 default_cache_size=8
 default_level=10
-default_semeai_variations=500
+default_semeai_node_limit=500
 default_owl_node_limit=1000
 
 # Check whether --enable-cache-size or --disable-cache-size was given.
@@ -1385,9 +1385,9 @@ if test "${enable_level+set}" = set; then
 
 fi;
 
-# Check whether --enable-semeai-variations or --disable-semeai-variations was given.
-if test "${enable_semeai_variations+set}" = set; then
-  enableval="$enable_semeai_variations"
+# Check whether --enable-semeai-node-limit or --disable-semeai-node-limit was given.
+if test "${enable_semeai_node_limit+set}" = set; then
+  enableval="$enable_semeai_node_limit"
 
 fi;
 
@@ -4774,14 +4774,14 @@ EOF
 
 fi
 
-if test "$enable_semeai_variations" ; then
+if test "$enable_semeai_node_limit" ; then
    cat >>confdefs.h <<EOF
-#define DEFAULT_SEMEAI_VARIATIONS $enable_semeai_variations
+#define SEMEAI_NODE_LIMIT $enable_semeai_node_limit
 EOF
 
 else
    cat >>confdefs.h <<EOF
-#define DEFAULT_SEMEAI_VARIATIONS $default_semeai_variations
+#define SEMEAI_NODE_LIMIT $default_semeai_node_limit
 EOF
 
 fi

@@ -78,6 +78,12 @@ int owl_distrust_depth;   /* below this owl trusts the optics code */
 int owl_branch_depth;     /* below this owl tries only one variation */
 int owl_reading_depth;    /* owl does not read below this depth */
 int owl_node_limit;       /* maximum number of nodes considered */
+int semeai_branch_depth;
+int semeai_branch_depth2;
+int semeai_node_limit;
+int connect_depth;	/* Used by Tristan Cazenave's connection reader. */
+int connect_depth2;     /* Used by alternater connection reader. */
+int connection_node_limit;
 int mandated_depth;             /* deep reading cut off, mandated value */
 int mandated_backfill_depth;    /* deep reading cut off, mandated value */
 int mandated_backfill2_depth;   /* deep reading cut off, mandated value */
@@ -90,6 +96,7 @@ int mandated_owl_distrust_depth;
 int mandated_owl_branch_depth;  
 int mandated_owl_reading_depth; 
 int mandated_owl_node_limit;    
+
 
 /* Miscellaneous. */
 int quiet             = 0;  /* minimal output */
@@ -128,7 +135,6 @@ int doing_scoring              = 0;
 int chinese_rules       = 0;    /* ruleset choice for GMP connection */
 /* use experimental semeai module */
 int experimental_semeai = EXPERIMENTAL_SEMEAI;
-int semeai_variations   = DEFAULT_SEMEAI_VARIATIONS;
 /* use experimental connection module */
 int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 /* use alternate connection reading algorithm */

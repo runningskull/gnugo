@@ -81,9 +81,6 @@ static void order_connection_moves(int *moves, int str1, int str2,
 				   int color_to_move, const char *funcname);
 
 static int nodes_connect = 0;
-static int max_nodes_connect = 2000;
-static int max_connect_depth = 64;
-static int max_connect_depth2 = 20; /* Used by the alternate algorithm. */
 
 /* Used by alternate connections. */
 static char connection_shadow[BOARDMAX];
@@ -1181,12 +1178,12 @@ recursive_connect(int str1, int str2, int *move)
     return WIN;
   }
 
-  if (nodes_connect > max_nodes_connect) {
+  if (nodes_connect > connection_node_limit) {
     SGFTRACE2(PASS_MOVE, 0, "connection node limit reached");
     return 0;
   }
   
-  if (stackp == max_connect_depth) {
+  if (stackp == connect_depth) {
     SGFTRACE2(PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
@@ -1387,12 +1384,12 @@ recursive_disconnect(int str1, int str2, int *move)
     return 0;
   }
   
-  if (nodes_connect > max_nodes_connect) {
+  if (nodes_connect > connection_node_limit) {
     SGFTRACE2(PASS_MOVE, WIN, "connection node limit reached");
     return WIN;
   }
   
-  if (stackp == max_connect_depth) {
+  if (stackp == connect_depth) {
     SGFTRACE2(PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }
@@ -1523,12 +1520,12 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
     return WIN;
   }
 
-  if (nodes_connect > max_nodes_connect) {
+  if (nodes_connect > connection_node_limit) {
     SGFTRACE2(PASS_MOVE, 0, "connection node limit reached");
     return 0;
   }
   
-  if (stackp == max_connect_depth) {
+  if (stackp == connect_depth) {
     SGFTRACE2(PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
@@ -1658,12 +1655,12 @@ recursive_non_transitivity(int str1, int str2, int str3, int *move)
     return 0;
   }
   
-  if (nodes_connect > max_nodes_connect) {
+  if (nodes_connect > connection_node_limit) {
     SGFTRACE2(PASS_MOVE, WIN, "connection node limit reached");
     return WIN;
   }
   
-  if (stackp == max_connect_depth) {
+  if (stackp == connect_depth) {
     SGFTRACE2(PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }
@@ -1948,12 +1945,12 @@ recursive_connect2(int str1, int str2, int *move, int komaster, int kom_pos,
     return WIN;
   }
 
-  if (nodes_connect > max_nodes_connect) {
+  if (nodes_connect > connection_node_limit) {
     SGFTRACE2(PASS_MOVE, 0, "connection node limit reached");
     return 0;
   }
   
-  if (stackp > max_connect_depth2) {
+  if (stackp > connect_depth2) {
     SGFTRACE2(PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
@@ -2084,12 +2081,12 @@ recursive_disconnect2(int str1, int str2, int *move, int komaster, int kom_pos,
     return 0;
   }
   
-  if (nodes_connect > max_nodes_connect) {
+  if (nodes_connect > connection_node_limit) {
     SGFTRACE2(PASS_MOVE, WIN, "connection node limit reached");
     return WIN;
   }
   
-  if (stackp > max_connect_depth2) {
+  if (stackp > connect_depth2) {
     SGFTRACE2(PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }

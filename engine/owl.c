@@ -57,7 +57,6 @@
 
 #define MAX_MOVES 3           /* maximum number of branches at each node */
 #define MAX_SEMEAI_MOVES 6    /* semeai branch factor */
-#define SEMEAI_BRANCH_DEPTH 12 /* Only one move considered below this depths.*/
 #define MAX_SEMEAI_DEPTH 100  /* Don't read below this depth */
 #define MAX_LUNCHES 10
 #define MAX_GOAL_WORMS 15  /* maximum number of worms in a dragon to be cataloged */
@@ -437,7 +436,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   ASSERT1(board[apos] == owla->color, apos);
   ASSERT1(board[bpos] == owlb->color, bpos);
 
-  if (stackp <= SEMEAI_BRANCH_DEPTH && (hashflags & HASH_SEMEAI)
+  if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
       && !pass && owl_phase) {
     if (get_read_result2(SEMEAI, EMPTY, 0, &apos, &bpos, &read_result)) {
       TRACE_CACHED_RESULT2(*read_result);
@@ -769,8 +768,8 @@ do_owl_analyze_semeai(int apos, int bpos,
     int mpos = moves[k].pos;
 
     if (tested_moves > 2
-	|| (stackp > 6 && tested_moves > 1)
-	|| (stackp > SEMEAI_BRANCH_DEPTH && tested_moves > 0)) {
+	|| (stackp > semeai_branch_depth2 && tested_moves > 1)
+	|| (stackp > semeai_branch_depth && tested_moves > 0)) {
       /* If allpats, try and pop to get the move in the sgf record. */
       if (allpats && mpos!= NO_MOVE
 	  && trymove(mpos, color, moves[k].name, apos, komaster, kom_pos)) {
@@ -780,7 +779,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       continue;
     }
     if (mpos != NO_MOVE 
-	&& count_variations < semeai_variations
+	&& count_variations < semeai_node_limit
 	&& stackp < MAX_SEMEAI_DEPTH
 	&& komaster_trymove(mpos, color, moves[k].name, apos,
 			    komaster, kom_pos,
@@ -828,7 +827,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  this_resultb = KO_B;
       }
 
-      if (count_variations >= semeai_variations) {
+      if (count_variations >= semeai_node_limit) {
 	TRACE("Out of nodes, claiming win.\n");
 	result_certain = 0;
 	this_resulta = WIN;
@@ -5187,7 +5186,7 @@ reduced_init_owl(struct local_owl_data **owl, int at_bottom_of_stack)
   if (owl_stack_size == 0) {
     if (experimental_semeai)
       owl_stack_size = gg_max(owl_reading_depth + 2,
-	  		      2 * SEMEAI_BRANCH_DEPTH + 4);
+	  		      2 * semeai_branch_depth + 4);
     else
       owl_stack_size = owl_reading_depth + 2;
     owl_stack = malloc(owl_stack_size * sizeof(*owl_stack));

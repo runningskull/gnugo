@@ -770,6 +770,12 @@ extern int owl_distrust_depth;  /* below this owl trusts the optics code */
 extern int owl_branch_depth;    /* below this owl tries only one variation */
 extern int owl_reading_depth;   /* owl does not read below this depth */
 extern int owl_node_limit;      /* maximum number of nodes considered */
+extern int semeai_branch_depth;
+extern int semeai_branch_depth2;
+extern int semeai_node_limit;
+extern int connect_depth;
+extern int connect_depth2;
+extern int connection_node_limit;
 extern int level;               /* controls the strength of play */
 extern int semeai_variations;   /* max variations considered reading semeai */
 extern float best_move_values[10];

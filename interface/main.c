@@ -88,7 +88,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_DECIDE_ORACLE,
       OPT_EXPERIMENTAL_SEMEAI,
       OPT_EXPERIMENTAL_OWL_EXT,
-      OPT_SEMEAI_VARIATIONS,
+      OPT_SEMEAI_NODE_LIMIT,
       OPT_EXPERIMENTAL_CONNECTIONS,
       OPT_EXPERIMENTAL_INFLUENCE,
       OPT_ALTERNATE_CONNECTIONS,
@@ -219,7 +219,7 @@ static struct gg_option const long_options[] =
   {"japanese-rules", no_argument,       0, OPT_JAPANESE_RULES},
   {"experimental-semeai",  no_argument, 0, OPT_EXPERIMENTAL_SEMEAI},
   {"experimental-owl-ext",  no_argument, 0, OPT_EXPERIMENTAL_OWL_EXT},
-  {"semeai-variations",   required_argument, 0, OPT_SEMEAI_VARIATIONS},
+  {"semeai-node-limit",   required_argument, 0, OPT_SEMEAI_NODE_LIMIT},
   {"experimental-connections",  no_argument, 0, OPT_EXPERIMENTAL_CONNECTIONS},
   {"owl-threats",     no_argument,      0, OPT_OWL_THREATS},
   {"no-owl-threats",  no_argument,      0, OPT_NO_OWL_THREATS},
@@ -309,7 +309,6 @@ main(int argc, char *argv[])
   komi = 0.0;
   
   level = DEFAULT_LEVEL;
-  semeai_variations = DEFAULT_SEMEAI_VARIATIONS;
 
   mandated_depth               = -1;
   mandated_backfill_depth      = -1;
@@ -453,6 +452,8 @@ main(int argc, char *argv[])
 		  "configure option enabled: owl threats\n");
 	fprintf(stderr,
 		"Owl node limit: %d\n", OWL_NODE_LIMIT);
+	fprintf(stderr,
+		"Semeai node limit: %d\n", SEMEAI_NODE_LIMIT);
 
 	return EXIT_SUCCESS;
 	break;
@@ -527,8 +528,8 @@ main(int argc, char *argv[])
 	experimental_semeai = 1;
 	break;
 
-      case OPT_SEMEAI_VARIATIONS:
-	semeai_variations = atoi(gg_optarg);
+      case OPT_SEMEAI_NODE_LIMIT:
+	semeai_node_limit = atoi(gg_optarg);
 	break;
 
       case OPT_STANDARD_SEMEAI: 

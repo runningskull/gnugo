@@ -626,6 +626,13 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 #define OWL_DISTRUST_DEPTH    6
 #define OWL_BRANCH_DEPTH      8
 #define OWL_READING_DEPTH    20
+#define SEMEAI_BRANCH_DEPTH  12
+#define SEMEAI_BRANCH_DEPTH2  6
+
+/* Connecton reading */
+#define CONNECT_NODE_LIMIT 2000
+#define CONNECT_DEPTH        64
+#define CONNECT_DEPTH2       20
 
 /* Set the various reading depth parameters. If mandated_depth_value
  * is not -1 that value is used; otherwise the depth values are
@@ -649,12 +656,14 @@ set_depth_values(int level)
    * genmove.c:     >=  8: call estimate_score().
    * owl.c:         >=  9: use vital attack pattern database
    *                >= 10: increase depth values in owl_substantial
+   *                >= 10: don't turn off owl_phase in semeai reading
    * reading.c:     >= 10: Use superstrings and do more backfilling. (*)
    * value_moves.c: >=  6: try to find more owl attacks/defenses
    *
    * Those two marked (*) are particular expensive. Hence we don't change
    * most depth values between levels 7 and 8 resp. 9 and 10.
-   * FIXME: This isn't correct for owl threats anymore.
+   * FIXME: This isn't correct. Owl threats are turned off anyway, and
+   * superstring doesn't cause a big time difference.
    *
    * depth_level indicates the correction compared to the default settings
    * at level 10 for most reading depths.
@@ -713,6 +722,13 @@ set_depth_values(int level)
     owl_node_limit      = gg_max(20, owl_node_limit);
   }
 
+  semeai_branch_depth  = gg_max(2, (2*SEMEAI_BRANCH_DEPTH  + depth_level) / 2);
+  semeai_branch_depth2 = gg_max(2, (2*SEMEAI_BRANCH_DEPTH2 + depth_level) / 2);
+  semeai_node_limit    = SEMEAI_NODE_LIMIT * pow(1.5, depth_level);
+
+  connect_depth         = gg_max(2, CONNECT_DEPTH  + 2 * depth_level);
+  connect_depth2        = gg_max(2, CONNECT_DEPTH2 + 2 * depth_level);
+  connection_node_limit = CONNECT_NODE_LIMIT * pow(1.5, depth_level);
 
   if (mandated_depth != -1)
     depth = mandated_depth;
