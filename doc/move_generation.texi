@@ -124,13 +124,12 @@ Attack or defend a worm.
 @item ATTACK_THREAT_MOVE
 @itemx DEFEND_THREAT_MOVE
 Threaten to attack or defend a worm.
-@item NON_ATTACK_MOVE
-@itemx NON_DEFEND_MOVE
-a non-attacking or non-defending move.
-@item ATTACK_EITHER_MOVE
-a move that attacks either on of two worms.
-@item DEFEND_BOTH_MOVE
-a move that simultaneously defends two worms.
+@item EITHER_MOVE
+A move that either achieves one goal or another (at the moment this only
+used for attacks on worms).
+@item ALL_MOVE
+At the moment this is used for a move that defends two worms threatened
+by a double attack.
 @item CONNECT_MOVE
 @itemx CUT_MOVE
 Connect or cut two worms.
@@ -141,35 +140,40 @@ Declare an antisuji or forbidden move.
 Win or threaten to win a semeai.
 @item EXPAND_TERRITORY_MOVE
 @itemx BLOCK_TERRITORY_MOVE
-a move that expands our territory or blocks opponents expansion.
 @item EXPAND_MOYO_MOVE
-a move expanding a moyo.
+Move expanding/blocking our territory/moyo. These reasons are at the
+moment treated identically.
 @item VITAL_EYE_MOVE
-a vital point for life and death.
+A vital point for life and death.
 @item STRATEGIC_ATTACK_MOVE
 @itemx STRATEGIC_DEFEND_MOVE
 Moves added by 'a' and 'd' class patterns (@pxref{Pattern Classification})
 which (perhaps intangibly) attack or defend a dragon.
 @item OWL_ATTACK_MOVE
 @itemx OWL_DEFEND_MOVE
-an owl attack or defense move.
+An owl attack or defense move.
 @item OWL_ATTACK_THREAT
 @itemx OWL_DEFEND_THREAT
-a threat to owl attack or defend a group.
+A threat to owl attack or defend a group.
 @item OWL_PREVENT_THREAT
-a move to remove an owl threat.
+A move to remove an owl threat.
 @item UNCERTAIN_OWL_ATTACK
 @itemx UNCERTAIN_OWL_DEFENSE
-an uncertain owl attack or defense.
+An uncertain owl attack or defense. This means that the owl code could
+not decide the outcome, because the owl node limit was reached.
 @item MY_ATARI_ATARI_MOVE
-a move that starts a chain of ataris, eventually leading to a
+A move that starts a chain of ataris, eventually leading to a
 capture.
 @item YOUR_ATARI_ATARI_MOVE
-a move that if played by the opponent starts a chain of ataris for the
+A move that if played by the opponent starts a chain of ataris for the
 opponent, leading to capture, which is also a safe move for us. Preemptively
 playing such a move almost always defends the threat.
 @end table
 
+The attack and defend move types can have a suffix to denote moves whose
+result depends on a ko, e.g. @code{OWL_ATTACK_MOVE_GOOD_KO}. Here
+@code{..._GOOD_KO} and @code{..._BAD_KO} correspond to @code{KO_A} and
+@code{KO_B} as explained in @ref{Ko}.
 See @file{engine/move_reasons.h} for the full of move reasons.
 
 @strong{NOTE:} Some of these are reasons for @strong{not} playing a move.
@@ -183,7 +187,6 @@ next section.
 @menu
 * Attack and Defense::             Worm Attack and Defense
 * Threats to Attack or Defend::    Worm Threats
-* Non-Working Moves::              Marking attacks and defenses as failing
 * Multi Attack or Defense::        Combined Attacks and Defenses
 * Cutting and Connecting::         Cutting and Connecting moves
 * Semeai::                         Semeai winning moves
@@ -221,7 +224,7 @@ which match the A (attack) and D (defense) class patterns in
 moves which fill some purpose at all are tested whether they additionally
 attacks or defends some worm. (Only unstable worms are analyzed.)
 
-@node Threats to Attack or Defend, Non-Working Moves , Attack and Defense, MG Details
+@node Threats to Attack or Defend, Multi Attack or Defense, Attack and Defense, MG Details
 @comment  node-name,  next,  previous,  up
 @subsection Threats to Attack or Defend
 
@@ -235,16 +238,7 @@ captured if the attacker doesn't tenuki.
 Threats found by the owl code are called @strong{owl threats} and they
 have their own owl reasons.
 
-@node Non-Working Moves , Multi Attack or Defense, Threats to Attack or Defend, MG Details
-@comment  node-name,  next,  previous,  up
-@subsection Not working attack and defense moves
-
-The tactical reading may come up with ineffective attacks or defenses
-occasionally. When these can be detected by patterns, it's possible to
-cancel the attack and/or defense potential of the moves by using these
-move reasons. This can only be done by action lines in the patterns.
-
-@node Multi Attack or Defense, Cutting and Connecting, Non-Working Moves , MG Details
+@node Multi Attack or Defense, Cutting and Connecting, Threats to Attack or Defend, MG Details
 @comment  node-name,  next,  previous,  up
 @subsection Multiple attack or defense moves
 
@@ -382,11 +376,10 @@ usual methods of counting used by human Go players,
 as explained for example in @emph{The Endgame} by Ogawa
 and Davies.
 
-Moves are valued with respect to five different criteria. These are
+Moves are valued with respect to four different criteria. These are
 
 @itemize @bullet
 @item territorial value
-@item influence value
 @item strategical value
 @item shape value,
 @item secondary value. 
@@ -395,18 +388,15 @@ Moves are valued with respect to five different criteria. These are
 All of these are floats and should be measured in terms of actual
 points.
 
-Territorial value is the amount of secure territory generated (or
-saved) by the move. Attack and defense moves have territorial values
-given by twice the number of stones in the worm plus adjacent empty
-space.
+The territorial value is the total change of expected territory caused
+by this move. This includes changes in the status of groups if the move
+is an attack or a defense move.
 
-Influence value is an estimation of the move's effect on the size of
-potential territory and possibly ``area''. This is currently implemented by
-using @code{delta_moyo_simple()}. This can probably be improved quite a
-bit. If the move captures some stones, this fact should be taken into account
-when computing moyo/area. Beginning with GNU Go 3.2, the influence
-function plays an important role in estimating
-territory (@pxref{Influence and Territory}).
+Beginning with GNU Go 3.0, the influence function plays an important role
+in estimating territory (@pxref{Influence and Territory}). It is used
+to make a guess at each intersection how likely it is that it will become
+black or white territory. The territorial value sums up the changes
+in these valuations.
 
 Strategical value is a measure of the effect the move has on the
 safety of all groups on the board. Typically cutting and connecting
@@ -416,10 +406,9 @@ strategical value should be the sum of a fraction of the territorial
 value of the involved dragons. The fraction is determined by the
 change in safety of the dragon.
 
-Shape value is a purely local shape analysis, which primarily is
-intended to choose between moves having the same set of reasons. An
+Shape value is a purely local shape analysis. An
 important role of this measure is to offset mistakes made by the
-estimation of territorial and influence values. In open positions it's
+estimation of territorial values. In open positions it's
 often worth sacrificing a few points of (apparent) immediate profit to
 make good shape. Shape value is implemented by pattern matching, the
 Shape patterns.
@@ -434,7 +423,6 @@ a final move value. This value is used to decide the move.
 
 @menu
 * Territorial value::		  How much territory does a move gain
-* Influence value::		  How much influence does a move gain
 * Strategical value::             Strategical gains from a move
 * Shape factor::		  Local shape
 * Minimum Value::                 Minimum value
@@ -442,45 +430,26 @@ a final move value. This value is used to decide the move.
 * Threats and Followup Value::    Valuation of attack and defense threats
 @end menu
 
-@node Territorial value, Influence value, , Valuation
+@node Territorial value, Strategical value, , Valuation
 @comment  node-name,  next,  previous,  up
 @subsection Territorial Value
 @findex estimate_territorial_value
 
 The algorithm for computing territorial value is in the function
 @code{estimate_territorial_value}. As the name suggests, it seeks
-to estimate the amount the move adds to secure territory.
+to estimate the change in territory.
 
-This function examines every reason for the move and takes into account the
-safety of different dragons. For example if the reason for the move is that it
-attacks and kills a worm, no value is assigned if the worm is already DEAD. If
-the worm is not DEAD the value of the move is twice the effective size of the
-worm.
+It considers all groups that are changed from alive to death or vice-versa
+due to this move. Also, it makes an assumption whether the move should be
+considered safe. If so, the influence module is called:  The function
+@code{influence_delta_territory} estimates the territorial effect of
+both the stone played and of the changes of group status'.
 
-In addition to such additions to territory, if the move is
-found to be a block or expanding move, the function
-@code{influence_delta_territory} is consulted to find areas
-where after the move the influence function becomes so strong
-that these are counted as secure territory, or where the
-influence function is sufficiently weakened that these are
-removed from the secure territory of the opponent
-(@pxref{Influential Functions}).
+The result returned by the influence module is subject to a number of
+corrections. This is because some move reasons cannot be evaluated by a
+single call to the influence function, such as moves depending on a ko.
 
-@node Influence value, Strategical value, Territorial value, Valuation
-@comment  node-name,  next,  previous,  up
-@subsection Influence Value
-@findex estimate_influence_value
-
-The function @code{estimate_influence_value} attempts to assign
-a value to the influence a move. The functions
-@code{influence_delta_strict_moyo}
-@code{influence_delta_strict_area} are called to find areas
-where after the move the influence function becomes strong
-enough that these are counted as friendly moyo or area, or
-which are taken away from the opponent's moyo or area
-(@pxref{Influential Functions}).
-
-@node Strategical value, Shape factor, Influence value, Valuation
+@node Strategical value, Shape factor, Territorial value, Valuation
 @comment  node-name,  next,  previous,  up
 @subsection Strategical Value
 
@@ -541,16 +510,17 @@ can tip the scales if all other factors are equal.
 @subsection Threats and Followup Value
 
 Followup value refers to value which may acrue if we get two
-moves in a row in a local area. It is assigned by the function
-@code{add_followup_value}, for example through the
-@code{followup_value} autohelper macro.
+moves in a row in a local area. It is assigned for moves that threaten
+to attack or defend a worm or dragon. Also, since GNU Go 3.2 the influence
+module makes an assessment of the possible purely territorial followup
+moves.  In cases where these two heuristics are not sufficient we
+add patterns with a @code{followup_value} autohelper macro.
 
-Attack and defense threats, including owl threats are usually
-given a small amount of weight, as is followup value.
-
-If the largest move on the board is a ko which we cannot legally
-take, then such a move becomes attractive as a ko threat and
-the followup value or the value of the threat are taken in full.
+Usually, the followup value gives only a small contribution; e.g. if
+it the followup value is very large, then GNU Go treats the move as sente by
+doubling its value.  However, if the largest move on the board is a ko
+which we cannot legally take, then such a move becomes attractive as a ko
+threat and the full followup value is taken into account.
 
 @node Move Generation Functions, Move Valuation Functions, Valuation, Move Generation
 @comment  node-name,  next,  previous,  up

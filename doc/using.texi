@@ -375,7 +375,7 @@ accuracy.
 @item @option{-D}, @option{--depth @var{depth}}
 @cindex depth
 @quotation
-Deep reading cutoff. When reading beyond this depth (default 14) GNU
+Deep reading cutoff. When reading beyond this depth (default 16) GNU
 Go assumes that any string which can obtain 3 liberties is alive. Thus
 GNU Go can read ladders to an arbitrary depth, but will miss other
 types of capturing moves.
@@ -389,7 +389,7 @@ is inhibited, so fewer variations are considered.
 @end quotation
 @item @option{-B}, @option{--backfill-depth @var{depth}}
 @quotation
-Deep reading cutoff. Beyond this depth (default 9) GNU Go will no 
+Deep reading cutoff. Beyond this depth (default 12) GNU Go will no 
 longer try backfilling moves in its reading.
 @end quotation
 @item @option{--backfill2-depth @var{depth}}
@@ -401,7 +401,7 @@ parameter has a lower default.
 @end quotation
 @item @option{-F}, @option{--fourlib-depth @var{depth}}
 @quotation
-Deep reading cutoff. When reading beyond this depth (default 5) GNU
+Deep reading cutoff. When reading beyond this depth (default 7) GNU
 Go assumes that any string which can obtain 4 liberties is alive.
 @end quotation
 @item @option{-K}, @option{--ko-depth @var{depth}}
@@ -483,7 +483,7 @@ Move 13 (white): GNU Go plays C6 (20.60) - Game move F4 (20.60)
 
 This option is useful if one wants to confirm that a change such as a
 speedup or other optimization has not affected the behavior of the
-engine. Note that when the several moves have the same top value (or
+engine. Note that when several moves have the same top value (or
 nearly equal) the move generated is not deterministic (though it can be
 made deterministic by starting with the same random seed). Thus a few
 deviations from the move in the sgf file are to be expected. Only if the
@@ -555,7 +555,7 @@ Print more information about worm data.
 @item @option{-m}, @option{--moyo @var{level}} 
 @quotation
 moyo debugging, show moyo board. The @var{level} is fully
-documented elsewhere (@pxref{Colored Display}).
+documented elsewhere (@pxref{Influential Display}).
 @end quotation
 @item @option{-b}, @option{--benchmark @var{number}} 
 @quotation
