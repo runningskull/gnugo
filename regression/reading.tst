@@ -745,6 +745,11 @@ loadsgf games/nngs/halti-gnugo-3.3.17-200303162357.sgf 228
 180 defend P1
 #? [2 Q3]*
 
+# See also trevora:480. F5 doesn't work.
+loadsgf games/trevor/auto/a031.sgf 40
+181 defend E3
+#? [1 E4]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

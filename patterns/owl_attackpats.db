@@ -566,6 +566,18 @@ O..
 :8,-,value(35)
 
 
+Pattern A208c
+# gf New pattern. (3.3.18)
+
+?Xx
+O.X
+.*Y
+.oo
+---
+
+:8,-,value(56)
+
+
 Pattern A209
 
 ?Ooo
@@ -4120,6 +4132,34 @@ Pattern A1130
 ...o?
 
 :8,-,value(65)
+
+
+Pattern A1131
+# gf New pattern. (3.3.18)
+
+XO.Y
+?*.?
+----
+
+:8,-,value(90)
+
+AO.B
+?*.?
+----
+
+;owl_strong_dragon(A) && !xplay_disconnect(*,A,B)
+
+
+Pattern A1132
+# gf New pattern. (3.3.18)
+
+|.O??        save one lunch and make one a false eye
+|OYX?
+|*OXX
+|..OX
++----
+
+:8,-,value(70)
 
 
 #########################################################

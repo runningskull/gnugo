@@ -4603,13 +4603,24 @@ x*x.@
 
 Pattern 74500
 
+|.
+|X
+|XX.
+|.X
++--
+
+:1111
+
+
+Pattern 74510
+
  ..
 .X*.!
 
 :1122
 
 
-Pattern 74501
+Pattern 74511
 
  xx
 .*x.!
@@ -4617,7 +4628,7 @@ Pattern 74501
 :1122
 
 
-Pattern 74502
+Pattern 74512
 
  Xx
 .Xx.!
@@ -4625,7 +4636,7 @@ Pattern 74502
 :1111
 
 
-Pattern 74503
+Pattern 74513
 
  xx
 !.x.!
@@ -5039,6 +5050,37 @@ x*.
 :1122
 
 
+Pattern 78520
+
+|.
+|X.
+|XX
+|.X
++--
+
+:1111
+
+
+Pattern 78521
+
+|X.
+|XX
+|.X.
++---
+
+:1111
+
+
+Pattern 78522
+
+|X
+|XX.
+|.X.
++---
+
+:1111
+
+
 Pattern 78550
 
 x.x
@@ -5060,6 +5102,16 @@ x*.!
 #           ...
 
 Pattern 79000
+
+|X.
+|XX.
+|.X
++--
+
+:1111
+
+
+Pattern 79010
 # Big nakade.
  x
 .X.
@@ -5068,7 +5120,7 @@ Pattern 79000
 :1122
 
 
-Pattern 79001
+Pattern 79011
 # Big nakade.
  .
 .X.
@@ -5077,7 +5129,7 @@ Pattern 79001
 :1122
 
 
-Pattern 79002
+Pattern 79012
 # Big nakade.
 
  x
@@ -5087,7 +5139,7 @@ xX.
 :1122
 
 
-Pattern 79003
+Pattern 79013
 # X here may give ko.
 
  .
@@ -5097,7 +5149,7 @@ x*.
 :1122
 
 
-Pattern 79004
+Pattern 79014
 # O here gives ko.
 
  x
@@ -5107,7 +5159,7 @@ xX.
 :1122
 
 
-Pattern 79005
+Pattern 79015
 # Big nakade.
 
  x
@@ -5117,7 +5169,7 @@ x*.
 :1122
 
 
-Pattern 79006
+Pattern 79016
 # Big nakade.
 
  x
@@ -5127,7 +5179,7 @@ XXx
 :1122
 
 
-Pattern 79007
+Pattern 79017
 # Big nakade.
 
  x
@@ -5137,7 +5189,7 @@ XX*
 :1122
 
 
-Pattern 79008
+Pattern 79018
 # Big nakade.
 
  X
@@ -5147,7 +5199,7 @@ xX*
 :1122
 
 
-Pattern 79009
+Pattern 79019
 # Big nakade.
 
  x
@@ -5157,7 +5209,7 @@ xXx
 :1111
 
 
-Pattern 79010
+Pattern 79020
 # Big nakade.
 
  .
@@ -5167,7 +5219,7 @@ xX.
 :1111
 
 
-Pattern 79011
+Pattern 79021
 # Big nakade.
 
  x
@@ -5177,7 +5229,7 @@ xX.
 :1111
 
 
-Pattern 79012
+Pattern 79022
 # Big nakade.
 
  x
@@ -5187,7 +5239,7 @@ xX.
 :1111
 
 
-Pattern 79013
+Pattern 79023
 # Big nakade.
 
  x
@@ -5383,9 +5435,9 @@ Pattern 80701
 :1111
 
 
-#           . .
-#Topology:  . .
-#          ....
+#            . .
+# Topology:  . .
+#           ....
 
 Pattern 80800
 # tm New Pattern (3.1.20) (see viking:9)
@@ -5395,6 +5447,66 @@ Pattern 80800
  .X..
 
 :1122
+
+
+#            .
+# Topology: ...
+#           ....
+
+Pattern 80900
+# gf New pattern. (3.3.18)
+
+  .
+|XX.
+|.XX.
++----
+
+:1111
+
+
+#           . 
+# Topology: ...
+#           ....
+
+Pattern 81000
+# gf New pattern. (3.3.18)
+
+|. 
+|XX.
+|.XX.
++----
+
+:1111
+
+
+#           ..
+# Topology: ..
+#           ....
+
+Pattern 81100
+# gf New pattern. (3.3.18)
+
+|..
+|XX
+|.XX.
++----
+
+:1111
+
+
+#           ..
+# Topology: ...
+#           ...
+
+Pattern 81200
+# gf New pattern. (3.3.18)
+
+|..
+|XX.
+|.XX
++---
+
+:1111
 
 
 ###############################

@@ -354,6 +354,10 @@ loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 16
 #? [E17]*
 
 
+# FIXME: Test cases 790-860 all need revision to take the semeai in
+# the upper left corner into account. Restricted genmove would be
+# appropriate in most cases. (gf 3.3.18)
+
 loadsgf games/nngs/Lazarus-gnugo-3.2-200205011927.sgf 80
 790 gg_genmove black
 #? [D5]

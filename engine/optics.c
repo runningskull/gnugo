@@ -1117,7 +1117,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
   if (eye_color == WHITE_BORDER)
     eye_color = WHITE;
 
-  if (eye[pos].esize-eye[pos].msize > 7)
+  if (eye[pos].esize-eye[pos].msize > 8)
     return 0;
 
   if (eye[pos].msize > MAXEYE)

@@ -308,6 +308,7 @@ loadsgf games/trevor/auto/a031.sgf 28
 
 
 #Sacrificing these two for the rest seems best.
+# See also reading:181.
 loadsgf games/trevor/auto/a031.sgf 40
 480 gg_genmove white
 #? [E4]
