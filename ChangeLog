@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- redistribution consistency checking disabled for stable release
 - gg_genmove replaced by reg_genmove almost everywhere in the regressions
 - twogtp.py and twogtp.pike added to gtp_examples/README
 - twogtp and twogtp-a made GTP version 2 compliant
