@@ -1126,7 +1126,7 @@ gtp_trymove(char *s)
   if (!gtp_decode_move(s, &color, &i, &j) || POS(i, j) == PASS_MOVE)
     return gtp_failure("invalid color or coordinate");
 
-  if (!trymove(POS(i, j), color, "gtp_trymove", NO_MOVE, EMPTY, NO_MOVE))
+  if (!trymove(POS(i, j), color, "gtp_trymove", NO_MOVE))
     return gtp_failure("illegal move");
 
   return gtp_success("");
@@ -1146,7 +1146,7 @@ gtp_tryko(char *s)
   if (!gtp_decode_move(s, &color, &i, &j) || POS(i, j) == PASS_MOVE)
     return gtp_failure("invalid color or coordinate");
 
-  if (!tryko(POS(i, j), color, "gtp_tryko", EMPTY, NO_MOVE))
+  if (!tryko(POS(i, j), color, "gtp_tryko"))
     return gtp_failure("illegal move");
 
   return gtp_success("");

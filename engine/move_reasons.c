@@ -1518,8 +1518,7 @@ mark_changed_dragon(int pos, int color, int affected, int affected2,
 	if (worm[ii].attack_codes[0] == NO_MOVE
 	    || defense_move_reason_known(pos, ii))
 	  worm_is_safe = 1;
-	else if (trymove(pos, color, "mark-changed-dragon", ii,
-			 EMPTY, NO_MOVE)) {
+	else if (trymove(pos, color, "mark-changed-dragon", ii)) {
 	    if (REVERSE_RESULT(attack(ii, NULL)) >= result_to_beat)
 	      worm_is_safe = 1;
 	    popgo();

@@ -59,7 +59,7 @@ change_dragon_status(int dr, int status)
 int
 defend_against(int move, int color, int apos)
 {
-  if (trymove(move, color, "defend_against", NO_MOVE, EMPTY, NO_MOVE)) {
+  if (trymove(move, color, "defend_against", NO_MOVE)) {
     if (safe_move(apos, OTHER_COLOR(color)) == 0) {
       popgo();
       return 1;
@@ -116,12 +116,11 @@ does_attack(int move, int str)
       return 0;
   }
   
-  if (trymove(move, other, "does_attack-A", str, EMPTY, NO_MOVE)) {
+  if (trymove(move, other, "does_attack-A", str)) {
     if (!board[str] || !find_defense(str, NULL)) {
       result = WIN;
       increase_depth_values();
-      if (spos != NO_MOVE && trymove(spos, color, "does_attack-B", str,
-				     EMPTY, NO_MOVE)) {
+      if (spos != NO_MOVE && trymove(spos, color, "does_attack-B", str)) {
 	if (board[str] && !attack(str, NULL))
 	  result = 0;
 	popgo();
@@ -160,11 +159,11 @@ does_defend(int move, int str)
 
   gg_assert(spos != NO_MOVE);
   
-  if (trymove(move, color, "does_defend-A", str, EMPTY, NO_MOVE)) {
+  if (trymove(move, color, "does_defend-A", str)) {
     if (!attack(str, NULL)) {
       result = 1;
       increase_depth_values();
-      if (trymove(spos, other, "does_defend-B", str, EMPTY, NO_MOVE)) {
+      if (trymove(spos, other, "does_defend-B", str)) {
 	if (!board[str] || !find_defense(str, NULL))
 	  result = 0;
 	popgo();
@@ -311,9 +310,8 @@ play_break_through_n(int color, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_break_through_n", NO_MOVE,
-		    EMPTY, NO_MOVE)
-	    || tryko(apos, mcolor, "play_break_through_n", EMPTY, NO_MOVE)))
+	&& (trymove(apos, mcolor, "play_break_through_n", NO_MOVE)
+	    || tryko(apos, mcolor, "play_break_through_n")))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -382,9 +380,8 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE,
-		    EMPTY, NO_MOVE)
-	    || tryko(apos, mcolor, "play_attack_defend_n", EMPTY, NO_MOVE)))
+	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE)
+	    || tryko(apos, mcolor, "play_attack_defend_n")))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -468,9 +465,8 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE,
-		    EMPTY, NO_MOVE)
-	    || tryko(apos, mcolor, "play_attack_defend_n", EMPTY, NO_MOVE)))
+	&& (trymove(apos, mcolor, "play_attack_defend_n", NO_MOVE)
+	    || tryko(apos, mcolor, "play_attack_defend_n")))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -544,9 +540,8 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
     apos = va_arg(ap, int);
 
     if (apos != NO_MOVE
-	&& (trymove(apos, mcolor, "play_connect_n", NO_MOVE,
-		    EMPTY, NO_MOVE)
-	    || tryko(apos, mcolor, "play_connect_n", EMPTY, NO_MOVE)))
+	&& (trymove(apos, mcolor, "play_connect_n", NO_MOVE)
+	    || tryko(apos, mcolor, "play_connect_n")))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -1119,7 +1114,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
   int ii;
   int current_verbose = save_verbose;
 
-  if (!trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE))
+  if (!trymove(move, color, NULL, NO_MOVE))
     return;
   
   /* Need to increase the depth values during this reading to avoid
@@ -1195,7 +1190,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
 	}
       }
       
-      trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
+      trymove(move, color, NULL, NO_MOVE);
       increase_depth_values();
       
       if (defense_effective && defense_point) {
@@ -1213,7 +1208,7 @@ detect_tactical_blunder(int move, int color, int *defense_point,
 	    attack(pos, defense_point);
 
 	  /* Redo the move, we know that it won't fail. */
-	  trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
+	  trymove(move, color, NULL, NO_MOVE);
 	}
 	else {
 	  verbose = save_verbose;
@@ -1302,7 +1297,7 @@ double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])
 	&& BOARD(m+dm, n) == other
 	&& (!safe_stones
 	    || (safe_stones[POS(m, n+dn)] && safe_stones[POS(m+dm, n)]))
-	&& trymove(move, color, "double_atari", NO_MOVE, EMPTY, NO_MOVE)) {
+	&& trymove(move, color, "double_atari", NO_MOVE)) {
       if (countlib(move) > 1
 	  && (BOARD(m, n+dn) == EMPTY || BOARD(m+dm, n) == EMPTY 
 	      || !defend_both(POS(m, n+dn), POS(m+dm, n)))) {
@@ -1358,7 +1353,7 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
       liberties = findlib(pos, MAXLIBS, libs);
       save_moves = moves_played;
       for (k = 0; k < liberties; k++) {
-	if (trymove(libs[k], other, "unconditional_life", pos, EMPTY, 0))
+	if (trymove(libs[k], other, "unconditional_life", pos))
 	  moves_played++;
       }
       
@@ -1379,7 +1374,7 @@ capture_non_invincible_strings(int color, int exceptions[BOARDMAX])
 	 * |.XO.O|
 	 * +-----+
 	 */
-	int success = tryko(libs[0], other, "unconditional_life", EMPTY, 0);
+	int success = tryko(libs[0], other, "unconditional_life");
 	gg_assert(success);
 	moves_played++;
 	something_captured = 1;
@@ -1652,7 +1647,7 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     /* Play as many liberties as we can. */
     liberties = findlib(pos, MAXLIBS, libs);
     for (k = 0; k < liberties; k++) {
-      if (trymove(libs[k], other, "unconditional_life", pos, EMPTY, 0))
+      if (trymove(libs[k], other, "unconditional_life", pos))
 	moves_played++;
     }
   }
@@ -1671,7 +1666,7 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
 	
       /* Try to extend the string at (m, n). */
       findlib(pos, 1, libs);
-      if (trymove(libs[0], other, "unconditional_life", pos, EMPTY, 0)) {
+      if (trymove(libs[0], other, "unconditional_life", pos)) {
 	moves_played++;
 	found_one = 1;
       }
@@ -1698,12 +1693,10 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
 	if (board[pos + right] != EMPTY || board[pos + up - right] != EMPTY)
 	  continue;
 	if (board[pos - right] == EMPTY
-	    && trymove(pos - right, other, "unconditional_life", pos,
-		       EMPTY, NO_MOVE))
+	    && trymove(pos - right, other, "unconditional_life", pos))
 	  locally_played_moves++;
 	if (board[pos + up + right] == EMPTY
-	    && trymove(pos + up + right, other, "unconditional_life", pos,
-		       EMPTY, NO_MOVE))
+	    && trymove(pos + up + right, other, "unconditional_life", pos))
 	  locally_played_moves++;
 	if (board[pos - right] == other && board[pos + up + right] == other
 	    && same_string(pos - right, pos + up + right)) {
@@ -1714,7 +1707,7 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
 	    popgo();
 	    locally_played_moves--;
 	  }
-	  trymove(pos - up, color, "unconditional_life", pos, EMPTY, NO_MOVE);
+	  trymove(pos - up, color, "unconditional_life", pos);
 	  moves_played++;
 	  break;
 	}
@@ -1737,7 +1730,7 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     /* Play as many liberties as we can. */
     liberties = findlib(pos, MAXLIBS, libs);
     for (k = 0; k < liberties; k++) {
-      if (trymove(libs[k], other, "unconditional_life", pos, EMPTY, NO_MOVE))
+      if (trymove(libs[k], other, "unconditional_life", pos))
 	moves_played++;
     }
   }
@@ -1775,11 +1768,11 @@ unconditional_life(int unconditional_territory[BOARDMAX], int color)
     blib  = approxlib(bpos, other, 4, NULL);
     
     if (aopen > bopen || (aopen == bopen && alib >= blib)) {
-      trymove(apos, other, "unconditional_life", pos, EMPTY, 0);
+      trymove(apos, other, "unconditional_life", pos);
       moves_played++;
     }
     else {
-      trymove(bpos, other, "unconditional_life", pos, EMPTY, 0);
+      trymove(bpos, other, "unconditional_life", pos);
       moves_played++;
     }
   }

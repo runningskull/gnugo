@@ -172,7 +172,7 @@ static int
 oracle_trymove(int pos, int color, const char *message, int str,
 	       int komaster, int kom_pos)
 {
-  if (!trymove(pos, color, message, str, komaster, kom_pos))
+  if (!trymove(pos, color, message, str))
     return 0;
   if (debug & DEBUG_ORACLE_STREAM)
     gfprintf(stderr, "%o%s %1m\n", 

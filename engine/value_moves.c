@@ -179,8 +179,7 @@ find_more_attack_and_defense_moves(int color)
     /* Try the move at (ii) and see what happens. */
     cursor_at_start_of_line = 0;
     TRACE("%1m ", ii);
-    if (trymove(ii, color, "find_more_attack_and_defense_moves",
-		NO_MOVE, EMPTY, NO_MOVE)) {
+    if (trymove(ii, color, "find_more_attack_and_defense_moves", NO_MOVE)) {
       for (k = 0; k < N; k++) {
 	int aa = unstable_worms[k];
 	
@@ -197,7 +196,7 @@ find_more_attack_and_defense_moves(int color)
 	    int defense_works = 1;
 	    
 	    if (trymove(worm[aa].attack_points[0], other, 
-			"find_more_attack_and_defense_moves", 0, EMPTY, 0)) {
+			"find_more_attack_and_defense_moves", 0)) {
 	      if (!board[aa])
 		defense_works = 0;
 	      else {
@@ -241,7 +240,7 @@ find_more_attack_and_defense_moves(int color)
 
 	    if (attack(aa, NULL) >= worm[aa].attack_codes[0]) {
 	      if (trymove(worm[aa].defense_points[0], other, 
-			  "find_more_attack_and_defense_moves", 0, EMPTY, 0)) {
+			  "find_more_attack_and_defense_moves", 0)) {
 		int this_dcode = REVERSE_RESULT(attack(aa, NULL));
 		if (this_dcode > dcode) {
 		  dcode = this_dcode;
@@ -594,7 +593,7 @@ induce_secondary_move_reasons(int color)
 	      continue;
 
 	    if (trymove(pos, color_to_move, "induce_secondary_move_reasons",
-			aa, EMPTY, NO_MOVE)) {
+			aa)) {
 	      if (attack_move
 		  && board[adj1] != board[aa]
 		  && !disconnect(adj1, adj2, NULL)) {
@@ -715,7 +714,7 @@ induce_secondary_move_reasons(int color)
 		  && !is_same_worm(pos3, worm1)
 		  && !is_same_worm(pos3, worm2)) {
 		if (trymove(pos, color, "induce_secondary_move_reasons-B",
-			    worm1, EMPTY, NO_MOVE)) {
+			    worm1)) {
 		  if (!disconnect(pos3, worm1, NULL)) {
 		    add_connection_move(pos, pos3, worm1);
 		    do_find_more_owl_attack_and_defense_moves(color, pos, CONNECT_MOVE,
@@ -1415,7 +1414,7 @@ adjacent_to_nondead_stone(int pos, int color)
     popgo();
   }
 
-  if (trymove(pos, color, NULL, EMPTY, NO_MOVE, EMPTY)) {
+  if (trymove(pos, color, NULL, EMPTY)) {
     for (k = 0; k < 12; k++) {
       int pos2;
       if (k < 8)
@@ -1437,7 +1436,7 @@ adjacent_to_nondead_stone(int pos, int color)
   }
 
   while (stackp < saved_stackp)
-    tryko(stack[stackp], move_color[stackp], NULL, NO_MOVE, EMPTY);
+    tryko(stack[stackp], move_color[stackp], NULL);
   
   return result;
 }
@@ -1639,8 +1638,7 @@ estimate_territorial_value(int pos, int color, float our_score,
        *        a structured manner.
        */
 
-      if (trymove(pos, color, "estimate_territorial_value-A",
-		  NO_MOVE, EMPTY, NO_MOVE)) {
+      if (trymove(pos, color, "estimate_territorial_value-A", NO_MOVE)) {
 	int adjs[MAXCHAIN];
 	float adjusted_value = 2 * worm[aa].effective_size;
 	float adjustment_up = 0.0;
@@ -1676,8 +1674,7 @@ estimate_territorial_value(int pos, int color, float our_score,
 	    && defense_move != NO_MOVE) {
 	  int bad_followup;
 	  if (trymove(defense_move, other,
-		      "estimate_territorial_value-b", NO_MOVE,
-		      EMPTY, NO_MOVE)) {
+		      "estimate_territorial_value-b", NO_MOVE)) {
 	    if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
 	      popgo();
 	      popgo();
@@ -1691,8 +1688,8 @@ estimate_territorial_value(int pos, int color, float our_score,
 	    int lib;
 	    if (countlib(adjs[s]) == 1) {
 	      findlib(adjs[s], 1, &lib);
-	      if (trymove(lib, other, "estimate_territorial_value-c", NO_MOVE,
-			  EMPTY, NO_MOVE)) {
+	      if (trymove(lib, other,
+		    	  "estimate_territorial_value-c", NO_MOVE)) {
 		if (!attack(aa, NULL)
 		    && (board[pos] == EMPTY || attack(pos, NULL) != 0)) {
 		  popgo();
@@ -1763,15 +1760,13 @@ estimate_territorial_value(int pos, int color, float our_score,
        * FIXME: This is somewhat halfhearted since only one attack
        * move is tested.
        */
-      if (trymove(pos, color, "estimate_territorial_value-A",
-		  NO_MOVE, EMPTY, NO_MOVE)) {
+      if (trymove(pos, color, "estimate_territorial_value-A", NO_MOVE)) {
 	int attack_move;
 	if (move[pos].move_safety == 1
 	    && attack(aa, &attack_move) == WIN
 	    && attack_move != NO_MOVE) {
 	  if (trymove(attack_move, other,
-		      "estimate_territorial_value-b", NO_MOVE,
-		      EMPTY, NO_MOVE)) {
+		      "estimate_territorial_value-b", NO_MOVE)) {
 	    if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
 	      popgo();
 	      popgo();
@@ -2054,7 +2049,7 @@ estimate_territorial_value(int pos, int color, float our_score,
    * an owl defense).
    */
   if (does_block
-      && tryko(pos, color, "estimate_territorial_value", EMPTY, NO_MOVE)) {
+      && tryko(pos, color, "estimate_territorial_value")) {
     Hash_data safety_hash = goal_to_hashvalue(safe_stones);
     if (disable_delta_territory_cache
 	|| !retrieve_delta_territory_cache(pos, color, &this_value, 
@@ -3117,8 +3112,7 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
     if (type == -1)
       threat_does_work = 1;
     else {
-      if (trymove(pos, color, "reevaluate_ko_threats", ko_move,
-		  EMPTY, ko_move)) {
+      if (trymove(pos, color, "reevaluate_ko_threats", ko_move)) {
 	ASSERT_ON_BOARD1(ko_stone);
 	if (!find_defense(ko_stone, &opp_ko_move))
 	  threat_does_work = 1;
@@ -3128,7 +3122,7 @@ reevaluate_ko_threats(int ko_move, int color, float ko_value)
 	    threat_wastes_point = 1;
 
 	  if (trymove(opp_ko_move, OTHER_COLOR(color),
-		      "reevaluate_ko_threats", ko_move, EMPTY, NO_MOVE)) {
+		      "reevaluate_ko_threats", ko_move)) {
 	    switch (type) {
 	    case ATTACK_THREAT:
 	      threat_does_work = attack(what, NULL);

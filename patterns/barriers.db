@@ -826,17 +826,18 @@ bA.c
 
 
 Pattern Barrier56
+# ab generalized (3.5.5)
 
 xXOo
-XOX,
-...,
+xOX,
+.x.,
 ----
 
 :8,sD
 
 xXbo
-XOXa
-...,
+xOXa
+.x.,
 ----
 
 ;!oplay_attack(a,b)

@@ -304,6 +304,8 @@ static int do_remove_string(int s);
 static void do_commit_suicide(int pos, int color);
 static void do_play_move(int pos, int color);
 
+static int komaster, kom_pos;
+
 
 /* Statistics. */
 static int trymove_counter = 0;
@@ -417,6 +419,9 @@ clear_board(void)
   white_captured = 0;
   black_captured = 0;
 
+  komaster = EMPTY;
+  kom_pos = NO_MOVE;
+
   initial_board_ko_pos = NO_MOVE;
   initial_white_captured = 0;
   initial_black_captured = 0;
@@ -477,8 +482,7 @@ static Hash_data hashdata_stack[MAXSTACK];
  */
 
 int 
-trymove(int pos, int color, const char *message, int str,
-	int komaster, int kom_pos)
+trymove(int pos, int color, const char *message, int str)
 {
   /* Do the real work elsewhere. */
   if (!do_trymove(pos, color, 0))
@@ -537,8 +541,7 @@ trymove(int pos, int color, const char *message, int str,
  */
 
 int 
-tryko(int pos, int color, const char *message, int komaster,
-      int kom_pos)
+tryko(int pos, int color, const char *message)
 {
   /* Do the real work elsewhere. */
   if (!do_trymove(pos, color, 1))
@@ -906,6 +909,7 @@ play_move(int pos, int color)
   ASSERT1(color == WHITE || color == BLACK, pos);
   ASSERT1(pos == PASS_MOVE || ON_BOARD1(pos), pos);
   ASSERT1(pos == PASS_MOVE || board[pos] == EMPTY, pos);
+  ASSERT1(komaster == EMPTY && kom_pos == NO_MOVE, pos);
 
   if (move_history_pointer >= MAX_MOVE_HISTORY) {
     /* The move history is full. We resolve this by collapsing the
@@ -1173,8 +1177,6 @@ is_illegal_ko_capture(int pos, int color)
  */
 int
 komaster_trymove(int pos, int color, const char *message, int str,
-		 int komaster, int kom_pos,
-		 int *new_komaster, int *new_kom_pos,
 		 int *is_conditional_ko, int consider_conditional_ko)
 {
   int other = OTHER_COLOR(color);
@@ -1197,21 +1199,21 @@ komaster_trymove(int pos, int color, const char *message, int str,
 	  && (IS_STONE(board[kom_pos])
 	      || (!is_ko(kom_pos, WHITE, NULL)
 		  && is_suicide(kom_pos, WHITE))))) {
+    PUSH_VALUE(komaster);
+    PUSH_VALUE(kom_pos);
     komaster = EMPTY;
     kom_pos = NO_MOVE;
   }
-
-  /* Usually the komaster parameters are unchanged. */
-  *new_komaster = komaster;
-  *new_kom_pos = kom_pos;
 
   *is_conditional_ko = 0;
   ko_move = is_ko(pos, color, &kpos);
 
   if (!ko_move) {
     if (komaster == WEAK_KO) {
-      *new_komaster = EMPTY;
-      *new_kom_pos = NO_MOVE;
+      PUSH_VALUE(komaster);
+      PUSH_VALUE(kom_pos);
+      komaster = EMPTY;
+      kom_pos = NO_MOVE;
     }
   }
   else {
@@ -1236,19 +1238,21 @@ komaster_trymove(int pos, int color, const char *message, int str,
     }
   }
 
-  if (!trymove(pos, color, message, str, komaster, kom_pos)) {
+  if (!trymove(pos, color, message, str)) {
     if (!consider_conditional_ko)
       return 0;
 
-    if (!tryko(pos, color, message, komaster, kom_pos))
+    if (!tryko(pos, color, message))
       return 0; /* Suicide. */
       
     *is_conditional_ko = 1;
 
     /* Conditional ko capture, set komaster parameters. */
     if (komaster == EMPTY || komaster == WEAK_KO) {
-      *new_komaster = color;
-      *new_kom_pos = kpos;
+      PUSH_VALUE(komaster);
+      PUSH_VALUE(kom_pos);
+      komaster = color;
+      kom_pos = kpos;
       return 1;
     }
   }
@@ -1256,28 +1260,43 @@ komaster_trymove(int pos, int color, const char *message, int str,
   if (!ko_move)
     return 1;
 
+  PUSH_VALUE(komaster);
+  PUSH_VALUE(kom_pos);
+
   if (komaster == other) {
     if (color == WHITE)
-      *new_komaster = GRAY_BLACK;
+      komaster = GRAY_BLACK;
     else
-      *new_komaster = GRAY_WHITE;
+      komaster = GRAY_WHITE;
   }
   else if (komaster == color) {
     /* This is where we update kom_pos after a nested capture. */
-    *new_kom_pos = kpos;
+    kom_pos = kpos;
   }
   else {
     /* We can reach here when komaster is EMPTY or WEAK_KO. If previous
      * move was also a ko capture, we now set komaster to WEAK_KO.
      */
     if (previous_board_ko_pos != NO_MOVE) {
-      *new_komaster = WEAK_KO;
-      *new_kom_pos = previous_board_ko_pos;
+      komaster = WEAK_KO;
+      kom_pos = previous_board_ko_pos;
     }
   }
   
   return 1;
 }
+
+int
+get_komaster()
+{
+  return komaster;
+}
+
+int get_kom_pos()
+{
+  return kom_pos;
+}
+
 
 /* Determine whether vertex is on the edge. */
 int

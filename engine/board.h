@@ -239,16 +239,14 @@ int get_last_opponent_move(int color);
 int stones_on_board(int color);
 
 /* Functions handling the variable board state. */
-int trymove(int pos, int color, const char *message, int str,
-            int komaster, int kom_pos);
-int tryko(int pos, int color, const char *message,
-          int komaster, int kom_pos);
+int trymove(int pos, int color, const char *message, int str);
+int tryko(int pos, int color, const char *message);
 void popgo(void);
 int komaster_trymove(int pos, int color,
 		     const char *message, int str,
-		     int komaster, int kom_pos,
-		     int *new_komaster, int *new_kom_pos,
 		     int *is_conditional_ko, int consider_conditional_ko);
+int get_komaster(void);
+int get_kom_pos(void);
 
 int move_in_stack(int pos, int cutoff);
 void get_move_from_stack(int k, int *move, int *color);

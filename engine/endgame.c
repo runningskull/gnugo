@@ -137,7 +137,7 @@ endgame_analyze_worm_liberties(int pos, int color)
    */
   for (k = 0; k < inessential_liberties; k++) {
     if (!safe_move(inessential_libs[k], other)
-	|| !trymove(inessential_libs[k], other, "endgame", pos, EMPTY, 0))
+	|| !trymove(inessential_libs[k], other, "endgame", pos))
       break;
   }
 
@@ -154,7 +154,7 @@ endgame_analyze_worm_liberties(int pos, int color)
 	int lib = essential_libs[k];
 
 	if (safe_move(lib, worm_color) && safe_move(lib, other)
-	    && trymove(lib, other, "endgame", pos, EMPTY, 0)) {
+	    && trymove(lib, other, "endgame", pos)) {
 	  if (attack(pos, NULL) != 0) {
 	    int dpos;
 
@@ -326,7 +326,7 @@ endgame_analyze_worm_liberties(int pos, int color)
    * trust them.
    */
   for (k = 0; k < inessential_liberties; k++) {
-    if (!trymove(inessential_libs[k], worm_color, "endgame", pos, EMPTY, 0))
+    if (!trymove(inessential_libs[k], worm_color, "endgame", pos))
       break;
   }
 
@@ -334,7 +334,7 @@ endgame_analyze_worm_liberties(int pos, int color)
   if (k == inessential_liberties && board[pos] != EMPTY) {
     if (countlib(pos) > 1) {
       for (k = 0; k < num_attacks2; k++) {
-	if (trymove(attacks[k], other, "endgame", pos, EMPTY, 0)) {
+	if (trymove(attacks[k], other, "endgame", pos)) {
 	  if (attack(pos, NULL) != 0) {
 	    TRACE("  endgame move with territorial value %d.0 found at %1m\n",
 		  1, attacks[k]);
@@ -409,8 +409,7 @@ endgame_find_backfilling_dame(int str, int color_to_move)
       break;
     for (k = 0; k < inessential_liberties; k++) {
       if (!safe_move(inessential_libs[k], other)
-	  || !trymove(inessential_libs[k], other,
-		      "endgame", str, EMPTY, NO_MOVE))
+	  || !trymove(inessential_libs[k], other, "endgame", str))
 	continue;
       if (board[str] == EMPTY)
 	break;
@@ -418,7 +417,7 @@ endgame_find_backfilling_dame(int str, int color_to_move)
 	if (worm[dpos].color == EMPTY) 
 	  move = dpos;
 	forced_backfilling_moves[dpos] = 1;
-	trymove(dpos, color, "endgame", str, EMPTY, NO_MOVE);
+	trymove(dpos, color, "endgame", str);
 	loop_again = 1;
 	break;
       }

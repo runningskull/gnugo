@@ -225,7 +225,7 @@ fill_liberty(int *move, int color)
     }
     
     /* Try to play the move. */
-    if (trymove(pos, color, "fill_liberty", NO_MOVE, EMPTY, NO_MOVE)) {
+    if (trymove(pos, color, "fill_liberty", NO_MOVE)) {
       popgo();
       /* Legal, but not safe. Look for backfilling move. */
       DEBUG(DEBUG_FILLLIB,
@@ -368,7 +368,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
   int opponent_libs;
   
   /* Play (move) and identify all liberties and adjacent strings. */
-  if (!trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE))
+  if (!trymove(move, color, "find_backfilling_move", move))
     return 0; /* This shouldn't happen, I believe. */
 
   /* The move wasn't safe, so there must be an attack for the
@@ -455,7 +455,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
   
   /* If no luck so far, try with superstring liberties. */
   if (!found_one) {
-    trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE);
+    trymove(move, color, "find_backfilling_move", move);
     find_proper_superstring_liberties(move, &liberties, libs, 0);
     popgo();
     for (k = 0; k < liberties; k++) {
@@ -469,7 +469,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
 
   /* If no luck so far, try attacking superstring neighbors. */
   if (!found_one) {
-    trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE);
+    trymove(move, color, "find_backfilling_move", move);
     superstring_chainlinks(move, &neighbors, adjs, 4);
     popgo();
     for (k = 0; k < neighbors; k++) {
@@ -484,13 +484,11 @@ find_backfilling_move(int move, int color, int *backfill_move)
 
   if (found_one) {
   
-    if (!trymove(*backfill_move, color, "find_backfilling_move", move,
-		 EMPTY, NO_MOVE))
+    if (!trymove(*backfill_move, color, "find_backfilling_move", move))
       return 0; /* This really shouldn't happen. */
     
     /* Allow opponent to get a move in here. */
-    if (trymove(apos, OTHER_COLOR(color), "find_backfilling_move", move, 
-		EMPTY, NO_MOVE))
+    if (trymove(apos, OTHER_COLOR(color), "find_backfilling_move", move))
       extra_pop = 1;
     
     /* If still not safe, recurse to find a new backfilling move. */

@@ -121,7 +121,7 @@ find_double_threats(int color)
     num_a_threatened_groups = get_attack_threats(ii, MAX_THREATENED_STRINGS,
 						 a_threatened_groups);
     if (num_a_threatened_groups > 1) {
-      if (trymove(ii, color, "find_double_threats-A", ii, EMPTY, NO_MOVE)) {
+      if (trymove(ii, color, "find_double_threats-A", ii)) {
 	for (k = 0; k < num_a_threatened_groups - 1; ++k)
 	  for (l = k + 1; l < num_a_threatened_groups; ++l) {
 	    /* Note: If we used attack_either() here instead of trymove()
@@ -314,7 +314,7 @@ atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
       if (!ON_BOARD(pos) || !defense_moves[pos])
 	continue;
 
-      if (!trymove(pos, other, "atari_atari", NO_MOVE, EMPTY, NO_MOVE)) {
+      if (!trymove(pos, other, "atari_atari", NO_MOVE)) {
 	defense_moves[pos] = 0;
 	if (save_verbose)
 	  gprintf("%1m deleted defense point, illegal\n", pos);
@@ -390,7 +390,7 @@ atari_atari_blunder_size(int color, int move, int *defense,
   compute_aa_values(other);
 
   /* Accept illegal ko capture here. */
-  if (!tryko(move, color, NULL, EMPTY, NO_MOVE))
+  if (!tryko(move, color, NULL))
     /* Really shouldn't happen. */
     abortgo(__FILE__, __LINE__, "trymove", move);
   increase_depth_values();
@@ -682,7 +682,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     int bpos;
     int r;
     
-    if (!trymove(apos, color, "do_atari_atari-A", str, EMPTY, NO_MOVE))
+    if (!trymove(apos, color, "do_atari_atari-A", str))
       continue;
     
     if (all_potential_defenses) {
@@ -723,7 +723,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
       if (all_potential_defenses)
 	all_potential_defenses[bpos] = 1;
 
-      if (trymove(bpos, other, "do_atari_atari-B", str, EMPTY, NO_MOVE)) {
+      if (trymove(bpos, other, "do_atari_atari-B", str)) {
 	int new_aa_val;
 	char new_goal[BOARDMAX];
 	/* These moves may have been irrelevant for later
@@ -992,7 +992,7 @@ atari_atari_attack_callback(int anchor, int color,
       /*
        * Play (move) and see if there is an attack.
        */
-      if (trymove(move, color, "attack_callback", str, EMPTY, NO_MOVE)) {
+      if (trymove(move, color, "attack_callback", str)) {
 	int acode;
 	int attack_point = NO_MOVE;
 
@@ -1071,8 +1071,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
     liberties = findlib(str, 4, libs);
     for (k = 0; k < liberties; k++) {
       if (!mx[libs[k]]
-	  && trymove(libs[k], board[str], "aa_defend-A", str,
-		     EMPTY, NO_MOVE)) {
+	  && trymove(libs[k], board[str], "aa_defend-A", str)) {
 	if (attack(str, NULL) == 0) {
 	  moves[num_moves++] = libs[k];
 	  mx[libs[k]] = 1;
@@ -1102,8 +1101,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
 	for (s = 0; s < liberties; s++) {
 	  if (!mx[libs[s]]
 	      && !is_self_atari(libs[s], board[str])
-	      && trymove(libs[s], board[str], "aa_defend-B", str,
-			 EMPTY, NO_MOVE)) {
+	      && trymove(libs[s], board[str], "aa_defend-B", str)) {
 	    if (attack(str, NULL) == 0) {
 	      moves[num_moves++] = libs[s];
 	      mx[libs[s]] = 1;

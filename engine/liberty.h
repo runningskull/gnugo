@@ -204,9 +204,9 @@ int defend_both(int astr, int bstr);
 int break_through(int apos, int bpos, int cpos);
 int attack_threats(int pos, int max_points, int moves[], int codes[]);
 
-int restricted_defend1(int str, int *move, int komaster, int kom_pos,
+int restricted_defend1(int str, int *move,
 		       int num_forbidden_moves, int *forbidden_moves);
-int restricted_attack2(int str, int *move, int komaster, int kom_pos,
+int restricted_attack2(int str, int *move,
 		       int num_forbidden_moves, int *forbidden_moves);
 
 int simple_ladder(int str, int *move);

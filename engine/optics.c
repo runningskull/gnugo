@@ -2551,8 +2551,7 @@ test_eyeshape(int eyesize, int *eye_vertices)
  * does not capture any stones.
  */
 static int
-eyegraph_trymove(int pos, int color, const char *message, int str,
-		 int komaster, int kom_pos)
+eyegraph_trymove(int pos, int color, const char *message, int str)
 {
   static Hash_data remembered_board_hashes[MAXSTACK];
   int k;
@@ -2560,7 +2559,7 @@ eyegraph_trymove(int pos, int color, const char *message, int str,
   
   remembered_board_hashes[stackp] = hashdata;
   
-  if (!trymove(pos, color, message, str, komaster, kom_pos))
+  if (!trymove(pos, color, message, str))
     return 0;
 
   if (does_capture)
@@ -2779,8 +2778,8 @@ tactical_life_attack(int str, int num_vertices, int *vertices,
 				   OTHER_COLOR(board[str]), moves);
   for (k = 0; k < num_moves; k++) {
     int move = moves[k];
-    if (eyegraph_trymove(move, OTHER_COLOR(board[str]), "tactical_life_attack",
-			 str, EMPTY, NO_MOVE)) {
+    if (eyegraph_trymove(move, OTHER_COLOR(board[str]),
+	  		 "tactical_life_attack", str)) {
       /* We were successful if the white stones were captured or if no
        * defense can be found.
        */
@@ -2849,8 +2848,7 @@ tactical_life_defend(int str, int num_vertices, int *vertices,
     int move = moves[k];
     if ((!is_suicide(move, OTHER_COLOR(board[str]))
 	 || does_capture_something(move, board[str]))
-	&& eyegraph_trymove(move, board[str], "tactical_life_defend", str,
-			    EMPTY, NO_MOVE)) {
+	&& eyegraph_trymove(move, board[str], "tactical_life_defend", str)) {
       /* We were successful if no attack can be found. */
       result = !tactical_life_attack(str, num_vertices, vertices, results);
       
@@ -2911,8 +2909,7 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
    * suicide the white stones can be considered dead.
    */
   if (!have_eye) {
-    if (!eyegraph_trymove(POS(0, 0), WHITE, "tactical_life-A", NO_MOVE,
-			  EMPTY, NO_MOVE)) {
+    if (!eyegraph_trymove(POS(0, 0), WHITE, "tactical_life-A", NO_MOVE)) {
       *attack_code = WIN;
       *defense_code = 0;
       return;
@@ -2946,7 +2943,7 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
       for (k = 0; k < num_moves; k++) {
 	int move = moves[k];
 	if (eyegraph_trymove(move, OTHER_COLOR(board[str]), "tactical_life-B",
-			     str, EMPTY, NO_MOVE)) {
+			     str)) {
 	  if (board[str] == EMPTY
 	      || !tactical_life_defend(str, num_vertices, vertices, results))
 	    attack_points[(*num_attacks)++] = move;
@@ -2961,8 +2958,7 @@ tactical_life(int have_eye, int num_vertices, int *vertices,
 				       moves);
       for (k = 0; k < num_moves; k++) {
 	int move = moves[k];
-	if (eyegraph_trymove(move, board[str], "tactical_life-C", str, EMPTY,
-			     NO_MOVE)) {
+	if (eyegraph_trymove(move, board[str], "tactical_life-C", str)) {
 	  if (!tactical_life_attack(str, num_vertices, vertices, results))
 	    defense_points[(*num_defenses)++] = move;
 	  popgo();
@@ -3036,8 +3032,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
     for (k = 0; k < num_moves; k++) {
       int acode, dcode;
       int move = moves[k];
-      if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-A", NO_MOVE,
-			   EMPTY, NO_MOVE)) {
+      if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-A", NO_MOVE)) {
 	tactical_life(0, num_vertices, vertices, &acode, NULL, NULL,
 		      &dcode, NULL, NULL, tactical_life_results);
 	if (acode != 0) {
@@ -3097,8 +3092,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
       int a = 1;
       for (k = 0; k < num_attacks; k++) {
 	int move = attack_points[k];
-	if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-B", NO_MOVE,
-			     EMPTY, NO_MOVE)) {
+	if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-B", NO_MOVE)) {
 	  evaluate_eyespace(&result2, num_vertices, vertices,
 			    &num_vital_attacks2, vital_attacks2,
 			    &num_vital_defenses2, vital_defenses2,
@@ -3152,8 +3146,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
       for (k = 0; k < num_moves; k++) {
 	int acode, dcode;
 	int move = moves[k];
-	if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-C", NO_MOVE,
-			     EMPTY, NO_MOVE)) {
+	if (eyegraph_trymove(move, BLACK, "evaluate_eyespace-C", NO_MOVE)) {
 	  tactical_life(1, num_vertices, vertices, &acode, NULL, NULL,
 			&dcode, NULL, NULL, tactical_life_results);
 	  if (acode != 0) {
@@ -3177,8 +3170,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
       for (k = 0; k < num_moves; k++) {
 	int acode, dcode;
 	int move = moves[k];
-	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-D", NO_MOVE,
-			     EMPTY, NO_MOVE)) {
+	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-D", NO_MOVE)) {
 	  tactical_life(0, num_vertices, vertices, &acode, NULL, NULL,
 			&dcode, NULL, NULL, tactical_life_results);
 	  if (dcode != 0) {
@@ -3220,8 +3212,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
 	vital_attacks[(*num_vital_attacks)++] = attack_points[k];
       for (k = 0; k < num_defenses; k++) {
 	int move = defense_points[k];
-	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-E", NO_MOVE,
-			     EMPTY, NO_MOVE)) {
+	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-E", NO_MOVE)) {
 	  evaluate_eyespace(&result2, num_vertices, vertices,
 			    &num_vital_attacks2, vital_attacks2,
 			    &num_vital_defenses2, vital_defenses2,
@@ -3263,8 +3254,7 @@ evaluate_eyespace(struct eyevalue *result, int num_vertices, int *vertices,
       for (k = 0; k < num_moves; k++) {
 	int acode, dcode;
 	int move = moves[k];
-	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-F", NO_MOVE,
-			     EMPTY, NO_MOVE)) {
+	if (eyegraph_trymove(move, WHITE, "evaluate_eyespace-F", NO_MOVE)) {
 	  tactical_life(1, num_vertices, vertices, &acode, NULL, NULL,
 			&dcode, NULL, NULL, tactical_life_results);
 	  if (dcode != 0) {

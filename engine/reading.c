@@ -58,9 +58,9 @@ int defend_by_pattern = 0;
 int attack_by_pattern = 1;
 
 static int do_tactical_pat(int is_attack, int str, int *move, 
-			   int komaster, int kom_pos);
-static int do_defend_pat(int str, int *move, int komaster, int kom_pos);
-static int do_attack_pat(int str, int *move, int komaster, int kom_pos);
+			    int kom_pos);
+static int do_defend_pat(int str, int *move);
+static int do_attack_pat(int str, int *move);
 
 #endif
 
@@ -149,17 +149,12 @@ static int do_attack_pat(int str, int *move, int komaster, int kom_pos);
     int k;								\
 									\
     for (k = moves.num_tried; k < moves.num; k++) {			\
-      int new_komaster;							\
-      int new_kom_pos;							\
       int ko_move;							\
       int dpos = moves.pos[k];						\
 									\
-      if (komaster_trymove(dpos, color, moves.message[k], str,		\
-			   komaster, kom_pos,				\
-			   &new_komaster, &new_kom_pos, &ko_move,	\
+      if (komaster_trymove(dpos, color, moves.message[k], str, &ko_move,\
 			   stackp <= ko_depth && savecode == 0)) {	\
-	int acode = do_attack(str, (attack_hint),			\
-			      new_komaster, new_kom_pos);		\
+	int acode = do_attack(str, (attack_hint));			\
 	popgo();							\
 									\
 	if (!ko_move) {							\
@@ -191,20 +186,15 @@ static int do_attack_pat(int str, int *move, int komaster, int kom_pos);
     int k;								\
 									\
     for (k = moves.num_tried; k < moves.num; k++) {			\
-      int new_komaster;							\
-      int new_kom_pos;							\
       int ko_move;							\
       int apos = moves.pos[k];						\
 									\
-      if (komaster_trymove(apos, other, moves.message[k], str,		\
-			   komaster, kom_pos,				\
-			   &new_komaster, &new_kom_pos, &ko_move,	\
+      if (komaster_trymove(apos, other, moves.message[k], str,&ko_move,	\
 			   stackp <= ko_depth && savecode == 0)) {	\
-	int dcode = do_find_defense(str, (defense_hint),		\
-				    new_komaster, new_kom_pos);		\
+	int dcode = do_find_defense(str, (defense_hint));		\
 									\
 	if (REVERSE_RESULT(dcode) > savecode				\
-	    && do_attack(str, NULL, new_komaster, new_kom_pos)) {	\
+	    && do_attack(str, NULL)) {	\
 	  if (!ko_move) {						\
 	    if (dcode == 0) {						\
 	      popgo();							\
@@ -251,11 +241,11 @@ struct reading_moves
  * set NULL in which case these values are not returned.
  */
 
-static int do_find_defense(int str, int *move, int komaster, int kom_pos);
-static int defend1(int str, int *move, int komaster, int kom_pos);
-static int defend2(int str, int *move, int komaster, int kom_pos);
-static int defend3(int str, int *move, int komaster, int kom_pos);
-static int defend4(int str, int *move, int komaster, int kom_pos);
+static int do_find_defense(int str, int *move);
+static int defend1(int str, int *move);
+static int defend2(int str, int *move);
+static int defend3(int str, int *move);
+static int defend4(int str, int *move);
 static void special_rescue_moves(int str, int lib,
     				 struct reading_moves *moves);
 static void bamboo_rescue_moves(int str, int num_libs, int libs[], 
@@ -273,11 +263,11 @@ static void special_rescue6_moves(int str, int libs[3],
 static void set_up_snapback_moves(int str, int lib,
     				  struct reading_moves *moves);
 static void edge_clamp_moves(int str, struct reading_moves *moves);
-static int do_attack(int str, int *move, int komaster, int kom_pos);
-static int attack1(int str, int *move, int komaster, int kom_pos);
-static int attack2(int str, int *move, int komaster, int kom_pos);
-static int attack3(int str, int *move, int komaster, int kom_pos);
-static int attack4(int str, int *move, int komaster, int kom_pos);
+static int do_attack(int str, int *move);
+static int attack1(int str, int *move);
+static int attack2(int str, int *move);
+static int attack3(int str, int *move);
+static int attack4(int str, int *move);
 static void find_cap_moves(int str, struct reading_moves *moves);
 static void special_attack2_moves(int str, int libs[2],
 				  struct reading_moves *moves);
@@ -315,8 +305,7 @@ static void double_atari_chain2_moves(int str,
     				      struct reading_moves *moves);
 static void order_moves(int str, struct reading_moves *moves,
 			int color, const char *funcname, int killer);
-static int simple_ladder_attack(int str, int *move, int komaster, int kom_pos);
-static int simple_ladder_defend(int str, int *move, int komaster, int kom_pos);
+static int simple_ladder_defend(int str, int *move);
 static int in_list(int move, int num_moves, int *moves);
 
 
@@ -381,7 +370,7 @@ attack(int str, int *move)
   }
 
   memset(shadow, 0, sizeof(shadow));
-  result = do_attack(str, &the_move, EMPTY, 0);
+  result = do_attack(str, &the_move);
   nodes = reading_node_counter - nodes_when_called;
 
   if (debug & DEBUG_READING_PERFORMANCE) {
@@ -450,7 +439,7 @@ find_defense(int str, int *move)
   }
 
   memset(shadow, 0, sizeof(shadow));
-  result = do_find_defense(str, &the_move, EMPTY, 0);
+  result = do_find_defense(str, &the_move);
   nodes = reading_node_counter - nodes_when_called;
 
   if (debug & DEBUG_READING_PERFORMANCE) {
@@ -599,14 +588,12 @@ attack_either(int astr, int bstr)
      * has only 2, and try each atari in turn.
      */
     if (alib == 2) {
-      if (trymove(alibs[0], other, "attack_either-A", astr,
-		  EMPTY, NO_MOVE)) {
+      if (trymove(alibs[0], other, "attack_either-A", astr)) {
 	defended0 = defend_both(astr, bstr);
 	popgo();
       }
       if (defended0 
-	  && trymove(alibs[1], other, "attack_either-B", astr,
-		     EMPTY, NO_MOVE)) {
+	  && trymove(alibs[1], other, "attack_either-B", astr)) {
 	defended1 = defend_both(astr, bstr);
 	popgo();
       }
@@ -627,16 +614,14 @@ attack_either(int astr, int bstr)
 	alibs[1] = NO_MOVE;
 
       if (blibs[0] != alibs[0] && blibs[0] != alibs[1]
-	  && trymove(blibs[0], other, "attack_either-C", bstr,
-		     EMPTY, NO_MOVE)) {
+	  && trymove(blibs[0], other, "attack_either-C", bstr)) {
 	int defended = defend_both(astr, bstr);
 	defended0 = gg_min(defended0, defended);
 	popgo();
       }
       if (defended0 
 	  && blibs[1] != alibs[0] && blibs[1] != alibs[1]
-	  && trymove(blibs[1], other, "attack_either-D", bstr,
-		     EMPTY, NO_MOVE)) {
+	  && trymove(blibs[1], other, "attack_either-D", bstr)) {
 	int defended = defend_both(astr, bstr);
 	defended1 = gg_min(defended1, defended);
 	popgo();
@@ -719,7 +704,7 @@ defend_both(int astr, int bstr)
    * somewhat pessimistic estimation.
    */
 
-  if (trymove(a_savepos, color, "defend_both-A", astr, EMPTY, NO_MOVE)) {
+  if (trymove(a_savepos, color, "defend_both-A", astr)) {
     if (board[bstr] && !attack(bstr, NULL)) {
       popgo();
       return WIN;
@@ -727,7 +712,7 @@ defend_both(int astr, int bstr)
     popgo();
   }
   
-  if (trymove(b_savepos, color, "defend_both-B", bstr, EMPTY, NO_MOVE)) {
+  if (trymove(b_savepos, color, "defend_both-B", bstr)) {
     if (board[astr] && !attack(astr, NULL)) {
       popgo();
       return WIN;
@@ -763,7 +748,7 @@ defend_both(int astr, int bstr)
 	  continue;   /* No, it wasn't. */
 
 	if (attack(epos, &fpos)) {
-	  if (trymove(fpos, color, "defend_both-C", astr, EMPTY, NO_MOVE)) {
+	  if (trymove(fpos, color, "defend_both-C", astr)) {
 	    if (board[astr] && board[bstr]
 		&& !attack(astr, NULL) 
 		&& !attack(bstr, NULL)) {
@@ -868,11 +853,11 @@ break_through(int apos, int bpos, int cpos)
    */
   success2 = 0;
   if (attack_and_defend(Fpos, NULL, NULL, NULL, &gpos)) {
-    if (trymove(gpos, other, "break_through-A", Fpos, EMPTY, NO_MOVE)) {
+    if (trymove(gpos, other, "break_through-A", Fpos)) {
       /* Now we let O defend his position by playing either d or e.
        * FIXME: There may be other plausible moves too.
        */
-      if (trymove(dpos, color, "break_through-B", Fpos, EMPTY, NO_MOVE)) {
+      if (trymove(dpos, color, "break_through-B", Fpos)) {
 	/* O connects at d, so X cuts at e. */
 	if (safe_move(epos, other)) {
 	  success2 = CUT;
@@ -882,8 +867,7 @@ break_through(int apos, int bpos, int cpos)
 	popgo();
       }
 
-      if (success2 > 0 && trymove(epos, color, "break_through-C", Fpos,
-				  EMPTY, NO_MOVE)) {
+      if (success2 > 0 && trymove(epos, color, "break_through-C", Fpos)) {
 	/* O connects at e, so X cuts at d. */
 	if (safe_move(dpos, other)) {
 	  /* success2 is already WIN or CUT. */
@@ -916,7 +900,7 @@ break_through_helper(int apos, int bpos, int cpos,
   int success = 0;
   int gpos;
 
-  if (trymove(dpos, other, "break_through_helper-A", Fpos, EMPTY, NO_MOVE)) {
+  if (trymove(dpos, other, "break_through_helper-A", Fpos)) {
     /* If F can be attacked we can't start in this way. */
     if (!attack(Fpos, NULL)) {
       /* If d is safe too, we have at least managed to break through. */
@@ -928,8 +912,7 @@ break_through_helper(int apos, int bpos, int cpos,
        * O at e is sufficient to capture d.
        */
       else {
-	if (trymove(epos, color, "break_through_helper-E", Fpos,
-		    EMPTY, NO_MOVE)) {
+	if (trymove(epos, color, "break_through_helper-E", Fpos)) {
 	  if (!board[dpos] || !find_defense(dpos, NULL)) {
 	    popgo();
 	    popgo();
@@ -943,10 +926,8 @@ break_through_helper(int apos, int bpos, int cpos,
 	  return 0;
 	}
 	
-	if (trymove(gpos, color, "break_through_helper-F", Fpos,
-		    EMPTY, NO_MOVE)) {
-	  if (trymove(epos, other, "break_through_helper-G", Fpos,
-		      EMPTY, NO_MOVE)) {
+	if (trymove(gpos, color, "break_through_helper-F", Fpos)) {
+	  if (trymove(epos, other, "break_through_helper-G", Fpos)) {
 	    if (!attack(epos, NULL)) {
 	      success = CUT;
      	      /* Make sure b and c are safe.  If not, back up & let O try 
@@ -992,8 +973,7 @@ break_through_helper(int apos, int bpos, int cpos,
 	int attack_on_b = 0;
 	int attack_on_a = 0;
 	
-	if (trymove(epos, color, "break_through_helper-B", Fpos, 
-		    EMPTY, NO_MOVE)) {
+	if (trymove(epos, color, "break_through_helper-B", Fpos)) {
 	  if (attack(bpos, NULL))
 	    attack_on_b = 1;
 	  else if (attack(apos, NULL))
@@ -1008,13 +988,11 @@ break_through_helper(int apos, int bpos, int cpos,
 	  if (((attack_on_a && find_defense(apos, &hpos))
 	       || (attack_on_b && find_defense(bpos, &hpos)))
 	      && hpos != NO_MOVE
-	      && trymove(hpos, color, "break_through_helper-C", Fpos,
-			 EMPTY, NO_MOVE)) {
+	      && trymove(hpos, color, "break_through_helper-C", Fpos)) {
 	    /* Now we make a second cut at e, trying to capture
 	     * either b or c.
 	     */
-	    if (trymove(epos, other, "break_through_helper-D", Fpos,
-			EMPTY, NO_MOVE)) {
+	    if (trymove(epos, other, "break_through_helper-D", Fpos)) {
 	      if (!board[bpos]
 		  || !board[cpos] 
 		  || !defend_both(bpos, cpos))
@@ -1088,7 +1066,7 @@ attack_threats(int str, int max_points, int moves[], int codes[])
       int aa = libs[k];
 
       /* Try to threaten on the liberty. */
-      if (trymove(aa, other, "attack_threats-A", str, EMPTY, NO_MOVE)) {
+      if (trymove(aa, other, "attack_threats-A", str)) {
        int acode = attack(str, NULL);
        if (acode != 0)
 	 movelist_change_point(aa, acode, max_points, moves, codes);
@@ -1104,7 +1082,7 @@ attack_threats(int str, int max_points, int moves[], int codes[])
            || liberty_of_string(bb, str))
          continue;
 
-       if (trymove(bb, other, "attack_threats-B", str, EMPTY, NO_MOVE)) {
+       if (trymove(bb, other, "attack_threats-B", str)) {
          int acode = attack(str, NULL);
          if (acode != 0)
 	   movelist_change_point(bb, acode, max_points, moves, codes);
@@ -1147,7 +1125,7 @@ attack_threats(int str, int max_points, int moves[], int codes[])
       }
 
       /* Test the move and see if it is a threat. */
-      if (trymove(bb, other, "attack_threats-C", str, EMPTY, NO_MOVE)) {
+      if (trymove(bb, other, "attack_threats-C", str)) {
 	if (board[str] == EMPTY)
 	  acode = WIN;
 	else
@@ -1175,12 +1153,12 @@ attack_threats(int str, int max_points, int moves[], int codes[])
 
 
 /* Like find_defense, but takes the komaster argument. If the
- * opponent is komaster, reading functions will not try
+ * opponent is reading functions will not try
  * to take ko.
  */
 
 static int
-do_find_defense(int str, int *move, int komaster, int kom_pos)
+do_find_defense(int str, int *move)
 {
   int xpos = NO_MOVE;
   int dcode = 0;
@@ -1224,7 +1202,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 #if USE_HASHTABLE_NG
 
   if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)
-      && tt_get(&ttable, komaster, kom_pos, FIND_DEFENSE, str, NO_MOVE, 
+      && tt_get(&ttable, FIND_DEFENSE, str, NO_MOVE, 
 		depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
     /* Note that if return value is 1 (too small depth), the move will
@@ -1239,7 +1217,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 #else
 
   if ((stackp <= depth) && (hashflags & HASH_FIND_DEFENSE)) {
-    found_read_result = get_read_result(FIND_DEFENSE, komaster, kom_pos, 
+    found_read_result = get_read_result(FIND_DEFENSE, 
 					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
@@ -1257,24 +1235,24 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 
 #if EXPERIMENTAL_READING
   if (defend_by_pattern) {
-    dcode = do_defend_pat(str, &xpos, komaster, kom_pos);
+    dcode = do_defend_pat(str, &xpos);
     /* We set liberties to 0 to pass over the non-pattern code below. */
     liberties = 0;
   }
 #endif
 
   if (liberties == 1)
-    dcode = defend1(str, &xpos, komaster, kom_pos);
+    dcode = defend1(str, &xpos);
   else if (liberties == 2)
-    dcode = defend2(str, &xpos, komaster, kom_pos);
+    dcode = defend2(str, &xpos);
   else if (liberties == 3)
-    dcode = defend3(str, &xpos, komaster, kom_pos);
+    dcode = defend3(str, &xpos);
   else if (liberties == 4)
-    dcode = defend4(str, &xpos, komaster, kom_pos);
+    dcode = defend4(str, &xpos);
 
   if (dcode) {
 #if USE_HASHTABLE_NG
-    READ_RETURN_NG(komaster, kom_pos, FIND_DEFENSE, str, depth - stackp, 
+    READ_RETURN_NG(FIND_DEFENSE, str, depth - stackp, 
 		   move, xpos, dcode);
 #else
     READ_RETURN(read_result, move, xpos, dcode);
@@ -1282,7 +1260,7 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
   }
     
 #if USE_HASHTABLE_NG
-  READ_RETURN0_NG(komaster, kom_pos, FIND_DEFENSE, str, depth - stackp);
+  READ_RETURN0_NG(FIND_DEFENSE, str, depth - stackp);
 #else
   READ_RETURN0(read_result);
 #endif
@@ -1333,7 +1311,7 @@ fast_defense(int str, int liberties, int *libs, int *move)
  * */
 
 static int
-defend1(int str, int *move, int komaster, int kom_pos)
+defend1(int str, int *move)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -1390,8 +1368,8 @@ defend1(int str, int *move, int komaster, int kom_pos)
       for (k = 0; k < liberties; k++) {
 	int apos = libs2[k];
 	if ((liberties == 1 || !is_self_atari(apos, other))
-	    && trymove(apos, color, "defend1-C", str, komaster, kom_pos)) {
-	  int acode = do_attack(str, NULL, komaster, kom_pos);
+	    && trymove(apos, color, "defend1-C", str)) {
+	  int acode = do_attack(str, NULL);
 	  popgo();
 	  CHECK_RESULT(savecode, savemove, acode, apos, move, "backfilling");
 	}
@@ -1416,7 +1394,7 @@ defend1(int str, int *move, int komaster, int kom_pos)
  */
 
 static int 
-defend2(int str, int *move, int komaster, int kom_pos)
+defend2(int str, int *move)
 {
   int color, other;
   int xpos = NO_MOVE;
@@ -1555,7 +1533,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
  */
 
 static int 
-defend3(int str, int *move, int komaster, int kom_pos)
+defend3(int str, int *move)
 {
   int color, other;
   int xpos = NO_MOVE;
@@ -1627,7 +1605,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	  if (s < moves.num)
 	    continue;
 	  
-	  if (trymove(xpos, color, "defend3-D", str, komaster, kom_pos)) {
+	  if (trymove(xpos, color, "defend3-D", str)) {
 	    int acode;
 	    /* If the newly placed stone is in atari, we give up
              * without fight.
@@ -1635,7 +1613,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	    if (countlib(xpos) == 1)
 	      acode = WIN;
 	    else
-	      acode = do_attack(str, NULL, komaster, kom_pos);
+	      acode = do_attack(str, NULL);
 
 	    popgo();
 	    CHECK_RESULT(savecode, savemove, acode, xpos, move,
@@ -1656,8 +1634,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	      continue;
 	    
 	    if (!is_self_atari(xpos, color)
-		&& trymove(xpos, color, "defend2-G", str, komaster, kom_pos)) {
-	      int acode = do_attack(str, NULL, komaster, kom_pos);
+		&& trymove(xpos, color, "defend2-G", str)) {
+	      int acode = do_attack(str, NULL);
 	      popgo();
 	      CHECK_RESULT(savecode, savemove, acode, xpos, move
 			   "backfill effective");
@@ -1719,7 +1697,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
  */
 
 static int 
-defend4(int str, int *move, int komaster, int kom_pos)
+defend4(int str, int *move)
 {
   int color, other;
   int xpos = NO_MOVE;
@@ -2745,20 +2723,20 @@ set_larger_goal_worm(int str, char goal[BOARDMAX])
 }
 
 static int
-do_attack_pat(int str, int *move, int komaster, int kom_pos)
+do_attack_pat(int str, int *move)
 {
-  return do_tactical_pat(1, str, move, komaster, kom_pos);
+  return do_tactical_pat(1, str, move);
 }
 
 static int
-do_defend_pat(int str, int *move, int komaster, int kom_pos)
+do_defend_pat(int str, int *move)
 {
-  return do_tactical_pat(0, str, move, komaster, kom_pos);
+  return do_tactical_pat(0, str, move);
 }
 
 
 static int
-do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
+do_tactical_pat(int is_attack, int str, int *move)
 {
   char goal[BOARDMAX];
   struct reading_move_data moves[MAX_READING_MOVES];
@@ -2767,8 +2745,6 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
   int next_color = is_attack ? OTHER_COLOR(color) : color;
   int best_other_tactic = WIN;
   int best_move = 0;
-  int new_komaster = 0;
-  int new_kom_pos = 0;
   int ko_move = 0;
   int libs;
   int skipped = 0;
@@ -2794,16 +2770,16 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 
   if (libs == 1) {
     if (is_attack)
-      return attack1(str, move, komaster, kom_pos);
+      return attack1(str, move);
     else
-      return defend1(str, move, komaster, kom_pos);
+      return defend1(str, move);
   }
 
   if (libs == 4) {
     if (is_attack)
-      return attack4(str, move, komaster, kom_pos);
+      return attack4(str, move);
     else
-      return defend4(str, move, komaster, kom_pos);
+      return defend4(str, move);
   }
 
   memset(goal, 0, BOARDMAX);
@@ -2860,7 +2836,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
     gg_snprintf(namebuf, 128, "%s(%d)", moves[k].name, moves[k].value);
     if (k > 3 + skipped && k > 12 - stackp + skipped) {
       if (sgf_dumptree) {
-        if (trymove(moves[k].pos, next_color, namebuf, str, 0, 0)) {
+        if (trymove(moves[k].pos, next_color, namebuf, str)) {
           sgftreeAddComment(sgf_dumptree, "move trimmed to reduce variations");
           popgo();
         }
@@ -2868,32 +2844,28 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
       continue;
     }
 
-    if (komaster_trymove(moves[k].pos, next_color, namebuf, str, 
-			 komaster, kom_pos,
-			 &new_komaster, &new_kom_pos,
-			 &ko_move, 
+    if (komaster_trymove(moves[k].pos, next_color, namebuf, str, &ko_move, 
 			 stackp <= ko_depth && best_other_tactic == WIN)) {
       int other_tactic;
       ASSERT1(countlib(str) >= 1, str);
       if (sgf_dumptree) {
         char buf[500];
-        sprintf(buf, "tactical_pat komaster: %d %s  new_komaster: %d %s ko_move: %d", 
-		komaster, location_to_string(kom_pos), new_komaster, 
-		location_to_string(new_kom_pos), ko_move);
+        sprintf(buf, "tactical_pat komaster: %d %1m  ko_move: %d", 
+		get_komaster(), get_kom_pos(), ko_move);
         sgftreeAddComment(sgf_dumptree, buf);
       }
       
       if (stackp > 100) {
         popgo();
-        gprintf("komaster: %d %1m  new_komaster: %d %1m ko_move: %d\n", 
-		komaster, kom_pos, new_komaster, new_kom_pos, ko_move);
+        gprintf("komaster: %d %1m  ko_move: %d\n", 
+		get_komaster(), get_kom_pos(), ko_move);
         continue;  /* Short circuit */
       }
       
       if (is_attack)
-        other_tactic = do_find_defense(str, 0, new_komaster, new_kom_pos);
+        other_tactic = do_find_defense(str, 0);
       else
-        other_tactic = do_attack(str, 0, new_komaster, new_kom_pos);
+        other_tactic = do_attack(str, 0);
 
       if (is_attack && other_tactic != WIN) {
         int same_tactic;
@@ -2901,9 +2873,9 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
          *    (not positive of problem number) */
         if (stackp < depth + 6 || countlib(str) <= 2) {
           if (is_attack)
-     	    same_tactic = do_attack(str, 0, new_komaster, new_kom_pos);
+     	    same_tactic = do_attack(str, 0);
 	  else
-     	    same_tactic = do_find_defense(str, 0, new_komaster, new_kom_pos);
+     	    same_tactic = do_find_defense(str, 0);
 
 	  if (!ko_move && other_tactic == 0 && same_tactic != 0) {
 	    *move = moves[k].pos;
@@ -2955,7 +2927,7 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
   if (!is_attack) {
     /* Force attacker to capture - i.e. might be seki. */
     int attack;
-    attack = do_attack(str, 0, new_komaster, new_kom_pos);
+    attack = do_attack(str, 0);
     if (attack < best_other_tactic) {
       best_move = PASS_MOVE;
       best_other_tactic = attack;
@@ -2972,12 +2944,11 @@ do_tactical_pat(int is_attack, int str, int *move, int komaster, int kom_pos)
 #endif /*EXPERIMENTAL_READING*/
 
 
-/* Like attack, but takes the komaster argument. If the
- * opponent is komaster, reading functions will not try
+/* Like attack. If the opponent is komaster reading functions will not try
  * to take ko.
  */
 static int 
-do_attack(int str, int *move, int komaster, int kom_pos)
+do_attack(int str, int *move)
 {
   int color = board[str];
   int xpos = NO_MOVE;
@@ -3026,7 +2997,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
    * still be used for move ordering.
    */
   if ((stackp <= depth) && (hashflags & HASH_ATTACK)
-      && tt_get(&ttable, komaster, kom_pos, ATTACK, str, NO_MOVE, 
+      && tt_get(&ttable, ATTACK, str, NO_MOVE, 
 		depth - stackp, NULL, 
 		&retval, NULL, &xpos) == 2) {
     SGFTRACE(xpos, retval, "cached");
@@ -3038,7 +3009,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
 #else
 
   if ((stackp <= depth) && (hashflags & HASH_ATTACK)) {
-    found_read_result = get_read_result(ATTACK, komaster, kom_pos, 
+    found_read_result = get_read_result(ATTACK, 
 					&str, &read_result);
     if (found_read_result) {
       TRACE_CACHED_RESULT(*read_result);
@@ -3056,7 +3027,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
 
 #if EXPERIMENTAL_READING
   if (attack_by_pattern) {
-    result = do_attack_pat(str, &xpos, komaster, kom_pos);
+    result = do_attack_pat(str, &xpos);
     /* Set liberties to 0 to pass over the non-pattern code below. */
     liberties = 0;
   }
@@ -3065,31 +3036,31 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   /* Treat the attack differently depending on how many liberties the 
      string at (str) has. */
   if (liberties == 1)
-    result = attack1(str, &xpos, komaster, kom_pos);
+    result = attack1(str, &xpos);
   else if (liberties == 2) {
     if (stackp > depth + 10)
-      result = simple_ladder_attack(str, &xpos, komaster, kom_pos);
+      result = simple_ladder(str, &xpos);
     else
-      result = attack2(str, &xpos, komaster, kom_pos);
+      result = attack2(str, &xpos);
   }
   else if (liberties == 3)
-    result = attack3(str, &xpos, komaster, kom_pos);
+    result = attack3(str, &xpos);
   else if (liberties == 4)
-    result = attack4(str, &xpos, komaster, kom_pos);
+    result = attack4(str, &xpos);
 
 
   ASSERT1(result >= 0 && result <= WIN, str);
   
   if (result)
 #if USE_HASHTABLE_NG
-    READ_RETURN_NG(komaster, kom_pos, ATTACK, str, depth - stackp, 
+    READ_RETURN_NG(ATTACK, str, depth - stackp, 
 		   move, xpos, result);
 #else
     READ_RETURN(read_result, move, xpos, result);
 #endif
 
 #if USE_HASHTABLE_NG
-  READ_RETURN0_NG(komaster, kom_pos, ATTACK, str, depth - stackp);
+  READ_RETURN0_NG(ATTACK, str, depth - stackp);
 #else
   READ_RETURN0(read_result);
 #endif
@@ -3144,7 +3115,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
  */
 
 static int
-attack1(int str, int *move, int komaster, int kom_pos)
+attack1(int str, int *move)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -3175,7 +3146,7 @@ attack1(int str, int *move, int komaster, int kom_pos)
   /* Try to play on the liberty. This fails if and only if it is an
    * illegal ko capture.
    */
-  if (trymove(xpos, other, "attack1-A", str, komaster, kom_pos)) {
+  if (trymove(xpos, other, "attack1-A", str)) {
     /* Is the attacker in atari? If not the attack was successful. */
     if (countlib(xpos) > 1) {
       popgo();
@@ -3187,13 +3158,13 @@ attack1(int str, int *move, int komaster, int kom_pos)
      * a ko threat first.
      */
     else if (countstones(xpos) == 1) {
-      if (komaster != other) {
+      if (get_komaster() != other) {
 	/* If the defender is allowed to take the ko the result is KO_A. */
 	CHECK_RESULT_UNREVERSED(savecode, savemove, KO_A, xpos, move,
 				"last liberty - ko");
       }
       else {
-	/* But if the attacker is komaster, the attack was successful. */
+	/* But if the attacker is the attack was successful. */
 	popgo();
 	RETURN_RESULT(WIN, xpos, move, "last liberty");
       }
@@ -3203,7 +3174,7 @@ attack1(int str, int *move, int komaster, int kom_pos)
      * at (str) since we have already established that this string
      * was a single stone.
      */
-    else if (trymove(str, color, "attack1-B", str, komaster, kom_pos)) {
+    else if (trymove(str, color, "attack1-B", str)) {
       /* If this was a proper snapback, (str) will now have more
        * than one liberty.
        */
@@ -3220,7 +3191,7 @@ attack1(int str, int *move, int komaster, int kom_pos)
     popgo();
   }
   else {/* Illegal ko capture. */
-    if (komaster != color) {
+    if (get_komaster() != color) {
       CHECK_RESULT_UNREVERSED(savecode, savemove, KO_B, xpos, move,
 			      "last liberty - ko");
     }
@@ -3234,9 +3205,9 @@ attack1(int str, int *move, int komaster, int kom_pos)
     for (k = 0; k < liberties; k++) {
       apos = libs[k];
       if (!is_self_atari(apos, other)
-	  && trymove(apos, other, "attack1-C", str, komaster, kom_pos)) {
-	int dcode = do_find_defense(str, NULL, komaster, kom_pos);
-	if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
+	  && trymove(apos, other, "attack1-C", str)) {
+	int dcode = do_find_defense(str, NULL);
+	if (dcode != WIN && do_attack(str, NULL)) {
 	  if (dcode == 0) {
 	    popgo();
 	    RETURN_RESULT(WIN, apos, move, "backfilling");
@@ -3252,20 +3223,16 @@ attack1(int str, int *move, int komaster, int kom_pos)
     int adj2;
     adj2 = chainlinks2(adjs[0], adjs2, 1);
     for (k = 0; k < adj2; k++) {
-      int new_komaster;
-      int new_kom_pos;
       int ko_move;
       if (adjs2[k] == str)
 	continue;
       findlib(adjs2[k], 1, &apos);
-      if (komaster_trymove(apos, other, "attack1-D", str, komaster,
-			   kom_pos, &new_komaster, &new_kom_pos,
+      if (komaster_trymove(apos, other, "attack1-D", str,
 			   &ko_move, stackp <= ko_depth && savecode == 0)) {
 	if (!ko_move) {
-	  int dcode = do_find_defense(str, NULL, new_komaster,
-				      new_kom_pos);
+	  int dcode = do_find_defense(str, NULL);
 	  if (dcode != WIN
-	      && do_attack(str, NULL, new_komaster, new_kom_pos)) {
+	      && do_attack(str, NULL)) {
 	    popgo();
 	    CHECK_RESULT(savecode, savemove, dcode, apos, move,
 			 "attack effective");
@@ -3274,9 +3241,8 @@ attack1(int str, int *move, int komaster, int kom_pos)
 	    popgo();
 	}
 	else {
-	  if (do_find_defense(str, NULL, new_komaster,
-			      new_kom_pos) != WIN
-	      && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	  if (do_find_defense(str, NULL) != WIN
+	      && do_attack(str, NULL) != 0) {
 	    savemove = apos;
 	    savecode = KO_B;
 	  }
@@ -3311,7 +3277,7 @@ attack1(int str, int *move, int komaster, int kom_pos)
  */
 
 static int 
-attack2(int str, int *move, int komaster, int kom_pos)
+attack2(int str, int *move)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -3494,7 +3460,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
  */
 
 static int 
-attack3(int str, int *move, int komaster, int kom_pos)
+attack3(int str, int *move)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -3624,7 +3590,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
 /* attack4 tries to capture a string with 4 liberties. */
 
 static int 
-attack4(int str, int *move, int komaster, int kom_pos)
+attack4(int str, int *move)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -3966,7 +3932,7 @@ special_attack4_moves(int str, int libs[2], struct reading_moves *moves)
 
 
 /* 
- * If (str) points to a string, draw_back(str, &move, komaster)
+ * If (str) points to a string, draw_back(str, &moves)
  * looks for a move in the following configuration which attacks
  * the string:
  *
@@ -4839,7 +4805,7 @@ double_atari_chain2_moves(int str, struct reading_moves *moves)
  * not considering moves from the list.
  */
 int
-restricted_defend1(int str, int *move, int komaster, int kom_pos,
+restricted_defend1(int str, int *move,  
 		   int num_forbidden_moves, int *forbidden_moves)
 {
   int color = board[str];
@@ -4892,8 +4858,8 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
     else
       ko_capture = 0;
 
-    if ((komaster != other || !ko_capture)
-	&& trymove(xpos, color, moves.message[k], str, komaster, kom_pos)) {
+    if ((get_komaster() != other || !ko_capture)
+	&& trymove(xpos, color, moves.message[k], str)) {
       int libs = countlib(str);
       if (libs > 2) {
 	popgo();
@@ -4906,10 +4872,10 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
 	int acode;
 
 	if (!ko_capture)
-	  acode = restricted_attack2(str, NULL, komaster, kom_pos,
+	  acode = restricted_attack2(str, NULL,
 				     num_forbidden_moves, forbidden_moves);
 	else
-	  acode = restricted_attack2(str, NULL, color, xpos,
+	  acode = restricted_attack2(str, NULL,
 				     num_forbidden_moves, forbidden_moves);
 	popgo();
 	if (acode == 0) {
@@ -4930,11 +4896,11 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
       int ko_pos;
       if (stackp <= ko_depth
 	  && savecode == 0 
-	  && (komaster == EMPTY
-	      || (komaster == color
-		  && kom_pos == xpos))
+	  && (get_komaster() == EMPTY
+	      || (get_komaster() == color
+		  && get_kom_pos() == xpos))
 	  && is_ko(xpos, color, &ko_pos)
-	  && tryko(xpos, color, "restricted_defend1-B", color, ko_pos)) {
+	  && tryko(xpos, color, "restricted_defend1-B")) {
 	int libs = countlib(str);
 	if (libs > 2) {
 	  popgo();
@@ -4942,7 +4908,7 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
 	}
 	else if (libs == 2) {
 	  int acode;
-	  acode = restricted_attack2(str, NULL, color, xpos,
+	  acode = restricted_attack2(str, NULL,
 				     num_forbidden_moves, forbidden_moves);
 	  popgo();
 	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
@@ -4970,7 +4936,7 @@ restricted_defend1(int str, int *move, int komaster, int kom_pos,
  * not considering moves from the list.
  */
 int
-restricted_attack2(int str, int *move, int komaster, int kom_pos,
+restricted_attack2(int str, int *move,  
 		   int num_forbidden_moves, int *forbidden_moves)
 {
   int color = board[str];
@@ -5011,14 +4977,13 @@ restricted_attack2(int str, int *move, int komaster, int kom_pos,
     else
       ko_capture = 0;
 
-    if ((komaster != color || !ko_capture)
-	&& trymove(apos, other, "restricted_attack2", str,
-		   komaster, kom_pos)) {
+    if ((get_komaster() != color || !ko_capture)
+	&& trymove(apos, other, "restricted_attack2", str)) {
       if ((!ko_capture 
-	   && !restricted_defend1(str, NULL, komaster, kom_pos,
+	   && !restricted_defend1(str, NULL,
 				  num_forbidden_moves, forbidden_moves))
 	  || (ko_capture
-	      && !restricted_defend1(str, NULL, other, ko_pos,
+	      && !restricted_defend1(str, NULL,
 				     num_forbidden_moves, forbidden_moves))) {
 	popgo();
 	SGFTRACE(apos, WIN, "attack effective");
@@ -5029,11 +4994,11 @@ restricted_attack2(int str, int *move, int komaster, int kom_pos,
       popgo();
     }
     else if (savecode == 0
-	     && (komaster == EMPTY
-		 || (komaster == other
-		     && kom_pos == apos))
-	     && tryko(apos, other, "restricted_attack2", komaster, kom_pos)) {
-      if (!restricted_defend1(str, NULL, other, ko_pos,
+	     && (get_komaster() == EMPTY
+		 || (get_komaster() == other
+		     && get_kom_pos() == apos))
+	     && tryko(apos, other, "restricted_attack2")) {
+      if (!restricted_defend1(str, NULL,
 			      num_forbidden_moves, forbidden_moves)) {
 	popgo();
 	savecode = KO_B;
@@ -5459,6 +5424,7 @@ safe_move(int move, int color)
 {
   int safe = 0;
   static int initialized = 0;
+  int ko_move;
   
   if (!initialized) {
     clear_safe_move_cache();
@@ -5471,16 +5437,10 @@ safe_move(int move, int color)
     return safe_move_cache[move][color == BLACK];
 
   /* Otherwise calculate the value... */
-  if (trymove(move, color, "safe_move-A", 0, EMPTY, 0)) {
+  if (komaster_trymove(move, color, "safe_move", 0, &ko_move, 1)) {
     safe = REVERSE_RESULT(attack(move, NULL));
-    popgo();
-  }
-  else if (is_ko(move, color, NULL)
-	   && tryko(move, color, "safe_move-B", EMPTY, 0)) {
-    if (do_attack(move, NULL, color, move) != WIN)
+    if (ko_move && safe != 0)
       safe = KO_B;
-    else
-      safe = 0;
     popgo();
   }
 
@@ -5509,7 +5469,7 @@ int
 does_secure(int color, int move, int pos)
 {
   int result = 0;
-  if (trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
+  if (trymove(move, color, NULL, NO_MOVE)) {
     if (is_self_atari(pos, OTHER_COLOR(color)))
       result = 1;
     popgo();
@@ -5630,12 +5590,6 @@ draw_reading_shadow()
 int
 simple_ladder(int str, int *move)
 {
-  return simple_ladder_attack(str, move, EMPTY, NO_MOVE);
-}
-
-static int
-simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
-{
   int color = board[str];
   int other = OTHER_COLOR(color);
   int apos;
@@ -5646,7 +5600,7 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
   int k;
   struct reading_moves moves;
 
-  SETUP_TRACE_INFO("simple_ladder_attack", str);
+  SETUP_TRACE_INFO("simple_ladder", str);
   reading_node_counter++;
   moves.num = 0;
   moves.num_tried = 0;
@@ -5656,7 +5610,7 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
   ASSERT1(countlib(str) == 2, str);
 
   /* Give up if we attacked depending on ko for too long. */
-  if (stackp > depth + 20 && komaster == OTHER_COLOR(board[str])) {
+  if (stackp > depth + 20 && get_komaster() == OTHER_COLOR(board[str])) {
     SGFTRACE(0, 0, NULL);
     if (move)
       *move = PASS_MOVE;
@@ -5672,23 +5626,20 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
    */
 
   if (approxlib(libs[0], color, 4, NULL) <= 3)
-    ADD_CANDIDATE_MOVE(libs[1], 0, moves, "simple_ladder_attack");
+    ADD_CANDIDATE_MOVE(libs[1], 0, moves, "simple_ladder");
   if (approxlib(libs[1], color, 4, NULL) <= 3)
-    ADD_CANDIDATE_MOVE(libs[0], 0, moves, "simple_ladder_attack");
+    ADD_CANDIDATE_MOVE(libs[0], 0, moves, "simple_ladder");
 
   order_moves(str, &moves, other, read_function_name, NO_MOVE);
 
   for (k = 0; k < moves.num; k++) {
-    int new_komaster;
-    int new_kom_pos;
     int ko_move;
 
     apos = moves.pos[k];
     if (komaster_trymove(apos, other, moves.message[k], str,
-			 komaster, kom_pos, &new_komaster, &new_kom_pos,
 			 &ko_move, savecode == 0)) {
       if (!ko_move) {
-	dcode = simple_ladder_defend(str, NULL, new_komaster, new_kom_pos);
+	dcode = simple_ladder_defend(str, NULL);
 	if (dcode != WIN) {
 	  if (dcode == 0) {
 	    popgo();
@@ -5701,7 +5652,7 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
 	}
       }
       else {
-	if (simple_ladder_defend(str, NULL, new_komaster, new_kom_pos) != WIN) {
+	if (simple_ladder_defend(str, NULL) != WIN) {
 	  savemove = apos;
 	  savecode = KO_B;
 	}
@@ -5715,7 +5666,7 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
 
 
 static int
-simple_ladder_defend(int str, int *move, int komaster, int kom_pos)
+simple_ladder_defend(int str, int *move)
 {
   int color = board[str];
   int xpos;
@@ -5744,14 +5695,10 @@ simple_ladder_defend(int str, int *move, int komaster, int kom_pos)
   order_moves(str, &moves, color, read_function_name, NO_MOVE);
 
   for (k = 0; k < moves.num; k++) {
-    int new_komaster;
-    int new_kom_pos;
     int ko_move;
 
     xpos = moves.pos[k];
     if (komaster_trymove(xpos, color, moves.message[k], str,
-			 komaster, kom_pos,
-			 &new_komaster, &new_kom_pos,
 			 &ko_move, savecode == 0)) {
       int acode;
       int new_libs = countlib(str);
@@ -5760,7 +5707,7 @@ simple_ladder_defend(int str, int *move, int komaster, int kom_pos)
       else if (new_libs < 2)
 	acode = WIN;
       else
-	acode = simple_ladder_attack(str, NULL, new_komaster, new_kom_pos);
+	acode = simple_ladder(str, NULL);
       popgo();
       
       if (!ko_move)

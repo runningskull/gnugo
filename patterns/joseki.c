@@ -366,7 +366,7 @@ analyze_node(SGFNode *node, const char *prefix)
   /* Traverse child, if any. */
   if (node->child) {
     if (SAFE_ON_BOARD(movei, movej))
-      tryko(POS(movei, movej), color, NULL, EMPTY, NO_MOVE);
+      tryko(POS(movei, movej), color, NULL);
     analyze_node(node->child, prefix);
     if (SAFE_ON_BOARD(movei, movej))
       popgo();

@@ -760,7 +760,7 @@ test_symmetry_after_move(int move, int color)
 
   if (board[move] != EMPTY)
     return 0;
-  if (!trymove(move, color, "find_mirror_move", NO_MOVE, EMPTY, NO_MOVE))
+  if (!trymove(move, color, "find_mirror_move", NO_MOVE))
     return 0;
   
   for (pos = BOARDMIN; pos <= MIRROR_MOVE(pos); pos++) {

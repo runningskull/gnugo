@@ -270,7 +270,7 @@ make_worms(void)
 	  continue;
 	
 	/* Try to play color at pos and see what it leads to. */
-	if (!trymove(pos, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE))
+	if (!trymove(pos, color, "make_worms", NO_MOVE))
 	  continue;
 	  
 	/* We must read to the same depth that was used in the
@@ -313,7 +313,7 @@ make_worms(void)
 	      if (attack(str, NULL) >= worm[str].attack_codes[0]) {
 		if (worm[str].defense_codes[0] != 0
 		    && trymove(worm[str].defense_points[0],
-			       OTHER_COLOR(color), "make_worms", 0, EMPTY, 0)) {
+			       OTHER_COLOR(color), "make_worms", 0)) {
 		  int this_dcode = REVERSE_RESULT(attack(str, NULL));
 		  if (this_dcode > dcode) {
 		    dcode = this_dcode;
@@ -352,7 +352,7 @@ make_worms(void)
 	       */
 	      if (worm[str].attack_codes[0] != 0
 		  && trymove(worm[str].attack_points[0],
-			     OTHER_COLOR(color), "make_worms", 0, EMPTY, 0)) {
+			     OTHER_COLOR(color), "make_worms", 0)) {
 		int this_acode;
 		if (board[str] == EMPTY)
 		  this_acode = WIN;
@@ -791,8 +791,7 @@ find_worm_attacks_and_defenses()
 	 */
 	attack_point = worm[str].attack_points[0];
 	if (!liberty_of_string(attack_point, str))
-	  if (trymove(attack_point, worm[str].color, "make_worms", NO_MOVE,
-		      EMPTY, NO_MOVE)) {
+	  if (trymove(attack_point, worm[str].color, "make_worms", NO_MOVE)) {
 	    int acode = attack(str, NULL);
 	    if (acode != WIN) {
 	      change_defense(str, attack_point, REVERSE_RESULT(acode));
@@ -835,7 +834,7 @@ find_worm_attacks_and_defenses()
       int pos = libs[k];
       if (!attack_move_known(pos, str)) {
 	/* Try to attack on the liberty. */
-	if (trymove(pos, other, "make_worms", str, EMPTY, NO_MOVE)) {
+	if (trymove(pos, other, "make_worms", str)) {
 	  if (board[str] == EMPTY || attack(str, NULL)) {
 	    if (board[str] == EMPTY)
 	      dcode = 0;
@@ -851,7 +850,7 @@ find_worm_attacks_and_defenses()
       /* Try to defend at the liberty. */
       if (!defense_move_known(pos, str)) {
 	if (worm[str].defense_codes[0] != 0)
-	  if (trymove(pos, color, "make_worms", NO_MOVE, EMPTY, NO_MOVE)) {
+	  if (trymove(pos, color, "make_worms", NO_MOVE)) {
 	    acode = attack(str, NULL);
 	    if (acode != WIN)
 	      change_defense(str, pos, REVERSE_RESULT(acode));
@@ -933,7 +932,7 @@ find_worm_threats()
 	int aa = libs[k];
 	
 	/* Try to threaten on the liberty. */
-	if (trymove(aa, color, "threaten defense", NO_MOVE, EMPTY, NO_MOVE)) {
+	if (trymove(aa, color, "threaten defense", NO_MOVE)) {
 	  if (attack(str, NULL) == WIN) {
 	    int dcode = find_defense(str, NULL);
 	    if (dcode != 0)
@@ -951,7 +950,7 @@ find_worm_threats()
 	      || liberty_of_string(bb, str))
 	    continue;
 	  
-	  if (trymove(bb, color, "threaten defense", str, EMPTY, NO_MOVE)) {
+	  if (trymove(bb, color, "threaten defense", str)) {
 	    if (attack(str, NULL) == WIN) {
 	      int dcode = find_defense(str, NULL);
 	      if (dcode != 0)
@@ -1609,7 +1608,7 @@ attack_callback(int anchor, int color, struct pattern *pattern, int ll,
       /* FIXME: Don't attack the same string more than once.
        * Play (move) and see if there is a defense.
        */
-      if (trymove(move, color, "attack_callback", str, EMPTY, NO_MOVE)) {
+      if (trymove(move, color, "attack_callback", str)) {
 	int dcode;
 	if (!board[str])
 	  dcode = 0;
@@ -1688,7 +1687,7 @@ defense_callback(int anchor, int color, struct pattern *pattern, int ll,
        *        the proposed move happens to refute the attack.
        * Play (move) and see if there is an attack.
        */
-      if (trymove(move, color, "defense_callback", str, EMPTY, NO_MOVE)) {
+      if (trymove(move, color, "defense_callback", str)) {
 	int acode = attack(str, NULL);
 
 	popgo();

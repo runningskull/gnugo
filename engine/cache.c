@@ -92,13 +92,12 @@ keyhash_init(void)
 }
 
 static void
-calculate_hashval_for_tt(int komaster, int kom_pos, int routine, 
-			 int target1, int target2,
+calculate_hashval_for_tt(int routine, int target1, int target2,
 			 Hash_data *hashdata2)
 { 
   *hashdata2 = hashdata;                /* from globals.c */
-  hashdata_xor(*hashdata2, komaster_hash[komaster]);
-  hashdata_xor(*hashdata2, kom_pos_hash[kom_pos]);
+  hashdata_xor(*hashdata2, komaster_hash[get_komaster()]);
+  hashdata_xor(*hashdata2, kom_pos_hash[get_kom_pos()]);
   hashdata_xor(*hashdata2, routine_hash[routine]);
   hashdata_xor(*hashdata2, target1_hash[target1]);
   if (target2 != NO_MOVE)
@@ -177,7 +176,7 @@ tt_free(Transposition_table *table)
  
 int
 tt_get(Transposition_table *table, 
-       int komaster, int kom_pos, enum routine_id routine, 
+       enum routine_id routine, 
        int target1, int target2, int remaining_depth,
        Hash_data *extra_hash,
        int *value1, int *value2, int *move)
@@ -187,8 +186,7 @@ tt_get(Transposition_table *table,
   Hashnode_ng   *node;
  
   /* Get the combined hash value. */
-  calculate_hashval_for_tt(komaster, kom_pos, routine, target1, target2,
-			   &hashval);
+  calculate_hashval_for_tt(routine, target1, target2, &hashval);
   if (extra_hash)
     hashdata_xor(hashval, *extra_hash);
 
@@ -230,8 +228,7 @@ tt_get(Transposition_table *table,
 
 void
 tt_update(Transposition_table *table,
-	  int komaster, int kom_pos, enum routine_id routine, 
-	  int target1, int target2, 
+	  enum routine_id routine, int target1, int target2, 
 	  int remaining_depth,
 	  Hash_data *extra_hash, 
 	  int value1, int value2, int move)
@@ -243,7 +240,7 @@ tt_update(Transposition_table *table,
   unsigned int data;
 
   /* Get the combined hash value. */
-  calculate_hashval_for_tt(komaster, kom_pos, routine, target1, target2,
+  calculate_hashval_for_tt(routine, target1, target2,
 			   &hashval);
   if (extra_hash)
     hashdata_xor(hashval, *extra_hash);
@@ -343,7 +340,6 @@ static void hashnode_unlink_closed_results(Hashnode *node,
 					   int statistics[][20]);
 static void hashtable_partially_clear(Hashtable *table);
 static int do_get_read_result(enum routine_id routine,
-    			      int komaster, int kom_pos,
 			      int str1, int str2, Read_result **read_result,
 		   	      Hash_data *hashmodifier);
 
@@ -971,7 +967,6 @@ reading_cache_clear()
 
 int
 get_read_result_hash_modified(enum routine_id routine,
-    			      int komaster, int kom_pos,
     			      int *str, Hash_data *hashmodifier,
 			      Read_result **read_result)
 {
@@ -988,7 +983,7 @@ get_read_result_hash_modified(enum routine_id routine,
    */
   *str = find_origin(*str);
   
-  return do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
+  return do_get_read_result(routine, *str, NO_MOVE,
 			    read_result, hashmodifier);
 }
 
@@ -997,7 +992,7 @@ get_read_result_hash_modified(enum routine_id routine,
  * For performance, the location is changed to the origin of the string.
  */
 int
-get_read_result(enum routine_id routine, int komaster, int kom_pos, int *str,
+get_read_result(enum routine_id routine, int *str,
 		Read_result **read_result)
 {
   /* Only store the result if stackp <= depth. Above that, there
@@ -1013,8 +1008,7 @@ get_read_result(enum routine_id routine, int komaster, int kom_pos, int *str,
    */
   *str = find_origin(*str);
   
-  return do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
-			    read_result, NULL);
+  return do_get_read_result(routine, *str, NO_MOVE, read_result, NULL);
 }
 
 
@@ -1022,8 +1016,7 @@ get_read_result(enum routine_id routine, int komaster, int kom_pos, int *str,
  * Variant with two calling strings.
  */
 int
-get_read_result2(enum routine_id routine, int komaster, int kom_pos,
-    		 int *str1, int *str2,
+get_read_result2(enum routine_id routine, int *str1, int *str2,
 		 Read_result **read_result)
 {
   /* Only store the result if stackp <= depth. Above that, there
@@ -1040,18 +1033,18 @@ get_read_result2(enum routine_id routine, int komaster, int kom_pos,
   *str1 = find_origin(*str1);
   *str2 = find_origin(*str2);
   
-  return do_get_read_result(routine, komaster, kom_pos, *str1, *str2,
+  return do_get_read_result(routine, *str1, *str2,
 			    read_result, NULL);
 }
 
 
 static int
-do_get_read_result(enum routine_id routine, int komaster, int kom_pos,
+do_get_read_result(enum routine_id routine,
 		   int str1, int str2, Read_result **read_result,
 		   Hash_data *hashmodifier)
 {
   Hashnode *node;
-  unsigned int data1 = rr_input_data1(routine, komaster, kom_pos,
+  unsigned int data1 = rr_input_data1(routine, get_komaster(), get_kom_pos(),
 				      str1, depth - stackp);
   unsigned int data2 = rr_input_data2(str2);
   Hash_data modified_hash;

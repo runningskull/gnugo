@@ -98,13 +98,11 @@ extern Transposition_table  ttable;
 void tt_init(Transposition_table *table, int memsize);
 void tt_clear(Transposition_table *table);
 void tt_free(Transposition_table *table);
-int  tt_get(Transposition_table *table, 
-	    int komaster, int kom_pos, enum routine_id routine,
+int  tt_get(Transposition_table *table, enum routine_id routine,
 	    int target1, int target2, int remaining_depth,
 	    Hash_data *extra_hash,
 	    int *value1, int *value2, int *move);
-void tt_update(Transposition_table *table,
-	       int komaster, int kom_pos, enum routine_id routine,
+void tt_update(Transposition_table *table, enum routine_id routine,
 	       int target, int target2, int remaining_depth,
 	       Hash_data *extra_hash,
 	       int value1, int value2, int move);
@@ -337,13 +335,12 @@ void sgf_trace_semeai(const char *func, int str1, int str2, int move,
 	             result1, result2, message)
 
 
-int get_read_result(enum routine_id routine, int komaster, int kom_pos,
+int get_read_result(enum routine_id routine,
 		    int *str, Read_result **read_result);
 int get_read_result_hash_modified(enum routine_id routine,
-				  int komaster, int kom_pos,
 		    		  int *str, Hash_data *hash_modifier,
 				  Read_result **read_result);
-int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
+int get_read_result2(enum routine_id routine,
 		     int *str1, int *str2, Read_result **read_result);
 
 
@@ -355,53 +352,53 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
  * store the result in the hash table at the same time.
  */
 
-#define READ_RETURN0_NG(komaster, kom_pos, routine, str, remaining_depth) \
+#define READ_RETURN0_NG(routine, str, remaining_depth) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, NO_MOVE, \
+    tt_update(&ttable, routine, str, NO_MOVE, \
               remaining_depth, NULL,\
 	      0, 0, NO_MOVE);\
    return 0; \
   } while (0)
 
-#define READ_RETURN_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value) \
+#define READ_RETURN_NG(routine, str, remaining_depth, point, move, value) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, NO_MOVE, \
+    tt_update(&ttable, routine, str, NO_MOVE, \
               remaining_depth, NULL,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
   } while (0)
 
-#define READ_RETURN_SEMEAI_NG(komaster, kom_pos, routine, str1, str2, remaining_depth, point, move, value1, value2) \
+#define READ_RETURN_SEMEAI_NG(routine, str1, str2, remaining_depth, point, move, value1, value2) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str1, str2, \
+    tt_update(&ttable, routine, str1, str2, \
               remaining_depth, NULL, \
               value1, value2, move); \
     if ((value1) != 0 && (point) != 0) *(point) = (move); \
     return; \
   } while (0)
 
-#define READ_RETURN_CONN_NG(komaster, kom_pos, routine, str1, str2, remaining_depth, point, move, value) \
+#define READ_RETURN_CONN_NG(routine, str1, str2, remaining_depth, point, move, value) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str1, str2, \
+    tt_update(&ttable, routine, str1, str2, \
               remaining_depth, NULL,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
   } while (0)
 
-#define READ_RETURN_HASH_NG(komaster, kom_pos, routine, str, remaining_depth, hash, point, move, value) \
+#define READ_RETURN_HASH_NG(routine, str, remaining_depth, hash, point, move, value) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, NO_MOVE, \
+    tt_update(&ttable, routine, str, NO_MOVE, \
               remaining_depth, hash,\
               value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
   } while (0)
 
-#define READ_RETURN2_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value1, value2) \
+#define READ_RETURN2_NG(routine, str, remaining_depth, point, move, value1, value2) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, NO_MOVE, \
+    tt_update(&ttable, routine, str, NO_MOVE, \
               remaining_depth, NULL,\
               value1, value2, move);\
     if ((value1) != 0 && (point) != 0) *(point) = (move); \

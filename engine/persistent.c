@@ -297,8 +297,7 @@ purge_persistent_reading_cache()
 	if (apos == 0)
 	  break;
 	if (board[apos] == EMPTY
-	    && trymove(apos, color, "purge_persistent_reading_cache", 0,
-		       EMPTY, 0))
+	    && trymove(apos, color, "purge_persistent_reading_cache", 0))
 	  played_moves++;
 	else {
 	  entry_ok = 0;
@@ -729,8 +728,7 @@ purge_persistent_connection_cache()
 	if (apos == 0)
 	  break;
 	if (board[apos] == EMPTY
-	    && trymove(apos, color, "purge_persistent_connection_cache", 0,
-		       EMPTY, 0))
+	    && trymove(apos, color, "purge_persistent_connection_cache", 0))
 	  played_moves++;
 	else {
 	  entry_ok = 0;
@@ -1079,8 +1077,7 @@ purge_persistent_breakin_cache()
 	if (apos == 0)
 	  break;
 	if (board[apos] == EMPTY
-	    && trymove(apos, color, "purge_persistent_breakin_cache", 0,
-		       EMPTY, 0))
+	    && trymove(apos, color, "purge_persistent_breakin_cache", 0))
 	  played_moves++;
 	else {
 	  entry_ok = 0;

@@ -578,8 +578,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	    break;
 	}
 	if (k < 4) {
-	  if (trymove(move, color, "aftermath-B", move + delta[k],
-		      EMPTY, NO_MOVE)) {
+	  if (trymove(move, color, "aftermath-B", move + delta[k])) {
 	    int adjs[MAXCHAIN];
 	    int neighbors;
 	    int r;
@@ -649,7 +648,7 @@ aftermath_genmove(int *aftermath_move, int color,
      * a dead opponent string at (target).
      */
     
-    if (!trymove(pos, color, "aftermath-A", target, EMPTY, NO_MOVE))
+    if (!trymove(pos, color, "aftermath-A", target))
       continue;
     
     /* It is frequently necessary to sacrifice own stones in order
@@ -697,7 +696,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	int lib;
 	findlib(pos, 1, &lib);
 	move = lib;
-	if (!trymove(move, color, "aftermath-B", target, EMPTY, NO_MOVE))
+	if (!trymove(move, color, "aftermath-B", target))
 	  break;
       }
       
