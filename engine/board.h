@@ -394,7 +394,11 @@ void simple_showboard(FILE *outfile);
 /* Our own abort() which prints board state on the way out.
  * (pos) is a "relevant" board position for info.
  */
-void abortgo(const char *file, int line, const char *msg, int pos);
+void abortgo(const char *file, int line, const char *msg, int pos)
+#ifdef __GNUC__
+	__attribute__ ((noreturn))
+#endif
+	;
 
 #ifdef GG_TURN_OFF_ASSERTS
 #define ASSERT2(x, i, j)
