@@ -557,8 +557,7 @@ sub check_matcher {
 	#now try to do something with it
 	if ($oa_result eq "= 0" and $oda_result ne "= 0") {
 	    print "found a missed attack.\n\n";
-	    my $m = $movenum - 1;
-	    print "loadsgf $sgffile $m\n";
+	    print "loadsgf $sgffile $movenum\n";
 	    print "owl_attack $il_vertex\n";
 	    print "#$oa_result\n";
 	    print "#? [1 $move]*\n\n";
