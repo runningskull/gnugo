@@ -141,6 +141,8 @@ my $black_in  = new FileHandle;		# stdin of black player
 my $black_out = new FileHandle;		# stdout of black player
 my $white_in  = new FileHandle;		# stdin of white player
 my $white_out = new FileHandle;		# stdout of white player
+my $b_gtp_ver;				# gtp version of black player
+my $w_gtp_ver;				# gtp version of white player
 
 while ($games > 0) {
     $pidb = open2($black_out, $black_in, $black);
@@ -164,6 +166,8 @@ while ($games > 0) {
 	}
     }
 
+    print $black_in  "protocol_version\n";
+    $b_gtp_ver = eat_gtp_ver($black_out);
     print $black_in  "boardsize $size\n";
     eat_no_response($black_out);
     print $black_in  "clear_board\n";
@@ -171,6 +175,8 @@ while ($games > 0) {
     print $black_in  "komi $komi\n";
     eat_no_response($black_out);
 
+    print $white_in  "protocol_version\n";
+    $w_gtp_ver = eat_gtp_ver($white_out);
     print $white_in  "boardsize $size\n";
     eat_no_response($white_out);
     print $white_in  "clear_board\n";
@@ -199,7 +205,11 @@ while ($games > 0) {
     }
     while ($pass < 2) {
 	if ($toplay eq 'B') {
-	    print $black_in "genmove black\n";
+	    if ($b_gtp_ver eq 1) {
+		print $black_in "genmove_black\n";
+	    } else {
+		print $black_in "genmove black\n";
+	    }
 	    $move = eat_move($black_out);
 	    $sgfmove = standard_to_sgf($move);
 	    print SGFFILEHANDLE ";B[$sgfmove]\n" if defined $sgffilename;
@@ -209,15 +219,27 @@ while ($games > 0) {
 	    } else {
 		$pass = 0;
 	    }
-	    print $white_in "play black $move\n";
+	    if ($w_gtp_ver eq 1) {
+		print $white_in "black $move\n";
+	    } else {
+		print $white_in "play black $move\n";
+	    }
 	    eat_no_response($white_out);
 	    if ($verbose > 1) {
 		print $white_in "showboard\n";
-		eat_no_response($white_out);
+		if ($w_gtp_ver eq 2) {
+		    eat_showboard($white_out);
+		} else {
+		    eat_no_response($white_out);
+		}
 	    }
 	    $toplay = 'W';
 	} else {
-	    print $white_in "genmove white\n";
+	    if ($w_gtp_ver eq 1) {
+		print $white_in "genmove_white\n";
+	    } else {
+		print $white_in "genmove white\n";
+	    }
 	    $move = eat_move($white_out);
 	    $sgfmove = standard_to_sgf($move);
 	    print SGFFILEHANDLE ";W[$sgfmove]\n" if defined $sgffilename;
@@ -227,11 +249,19 @@ while ($games > 0) {
 	    } else {
 		$pass = 0;
 	    }
-	    print $black_in "play white $move\n";
+	    if ($b_gtp_ver eq 1) {
+		print $black_in "white $move\n";
+	    } else {
+		print $black_in "play white $move\n";
+	    }
 	    eat_no_response($black_out);
 	    if ($verbose > 1) {
 		print $black_in "showboard\n";
-		eat_no_response($black_out);
+		if ($b_gtp_ver eq 2) {
+		    eat_showboard($black_out);
+		} else {
+		    eat_no_response($black_out);
+		}
 	    }
 	    $toplay = 'B';
 	}
@@ -371,6 +401,40 @@ sub eat_score {
     my ($equals, $result) = split(' ', $line, 2);
     $line = <$h>;
     return $result;
+}
+
+sub eat_gtp_ver {
+    my $h = shift;
+    my $line = "";
+
+    while ($line eq "") {
+	chop($line = <$h>) or die "No response!";
+	$line =~ s/^\s*//msg;
+	$line =~ s/\s*$//msg;
+    }
+    $line =~ s/\s*$//;
+    my ($equals, $result) = split(' ', $line, 2);
+    $line = <$h>;
+    return $result;
+}
+
+sub eat_showboard {
+    my $h = shift;
+    my $line = "";
+
+    while ($line eq "") {
+	chop($line = <$h>) or die "No response!";
+	$line =~ s/^\s*//msg;
+	$line =~ s/\s*$//msg;
+    }
+    $line =~ s/\s*$//;
+    my ($equals, $result) = split(' ', $line, 2);
+
+    while (!($line =~ /^\s*$/)) {
+	$result .= $line;
+	$line = <$h>;
+    }
+    print STDERR $result;
 }
 
 sub standard_to_sgf {
