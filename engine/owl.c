@@ -930,7 +930,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     /* If no move has been found yet, see if we can fill opponent's
      * eye (i.e. put more stones in "bulky five" shape).
      */
-    if (min_eyes(&probable_eyes_b) >= 1) {
+    if (min_eyes(&probable_eyes_b) == 1) {
       int move = semeai_propose_eyespace_filling_move(owla, owlb);
 
       if (move) {
