@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- tests results updated; CVS tag SPEC-tests_update
 - hardwire number of reading cache entries to 400000
 - remove alternate hashing schemes and other debugging code in cache.c
 - remove configure code related to memory size and choice of hashing scheme
