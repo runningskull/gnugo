@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new fast_defense() looks for fast ways to get liberties
+- switch strings sometimes in defend_both
 - atari_atari tuning
 - influence tuning
 - tuning

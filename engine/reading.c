@@ -503,6 +503,15 @@ defend_both(int astr, int bstr)
   ASSERT1(IS_STONE(color) , astr);
   ASSERT1(color == board[bstr], bstr);
 
+  /* This probably helps here too...
+   * (see attack_either)
+   */
+  if (countlib(astr) > countlib(bstr)) {
+    int t = astr;
+    astr = bstr;
+    bstr = t;
+  }
+
   attack_and_defend(astr, &acode, NULL, &dcode, &a_savepos);
   if (acode != 0) {
     a_threatened = 1;
@@ -1064,6 +1073,35 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 }
 
 
+/* Called by the defendN functions.
+ * Don't think too much if there's an easy way to get enough liberties
+ */
+
+static int
+fast_defense(int str, int liberties, int *libs, int *move)
+{
+  int color = board[str];
+  int k;
+  int newlibs;
+
+  ASSERT1(libs != NULL, str);
+  ASSERT1(move != NULL, str);
+
+  for (k = 0; k < liberties; k++) {
+    /* accuratelib() to be seems more effective than fastlib() here.
+     * (probably because it catches more cases). And since 5 liberties
+     * is enough for our purpose, no need to ask for more.
+     */
+    newlibs = accuratelib(libs[k], color, 5, NULL);
+    if (newlibs > 4
+	|| (newlibs == 4 && stackp > fourlib_depth)) {
+      *move = libs[k];
+      return 1;
+    }
+  }
+  return 0;
+}
+
 /* If str points to a string with exactly one liberty, defend1 
  * determines whether it can be saved by extending or capturing
  * a boundary chain having one liberty. The function returns WIN if the string
@@ -1105,6 +1143,9 @@ defend1(int str, int *move, int komaster, int kom_pos)
   /* lib will be the liberty of the string. */
   liberties = findlib(str, 1, &lib);
   ASSERT1(liberties == 1, str);
+
+  if (fast_defense(str, liberties, &lib, &xpos))
+    RETURN_RESULT(WIN, xpos, move, "fast defense");
 
   /* Collect moves to try in the first batch.
    * 1. First order liberty.
@@ -1213,6 +1254,9 @@ defend2(int str, int *move, int komaster, int kom_pos)
 
   liberties = findlib(str, 2, libs);
   ASSERT1(liberties == 2, str);
+
+  if (fast_defense(str, liberties, libs, &xpos))
+    RETURN_RESULT(WIN, xpos, move, "fast defense");
 
   /* Collect moves to try in the first batch.
    * 1. First order liberties.
@@ -1438,6 +1482,9 @@ defend3(int str, int *move, int komaster, int kom_pos)
 
   liberties = findlib(str, 3, libs);
   ASSERT1(liberties == 3, str);
+
+  if (fast_defense(str, liberties, libs, &xpos))
+    RETURN_RESULT(WIN, xpos, move, "fast defense");
 
   /* Collect moves to try in the first batch.
    * 1. First order liberties.
@@ -1705,6 +1752,9 @@ defend4(int str, int *move, int komaster, int kom_pos)
 
   liberties = findlib(str, 4, libs);
   ASSERT1(liberties == 4, str);
+
+  if (fast_defense(str, liberties, libs, &xpos))
+    RETURN_RESULT(WIN, xpos, move, "fast defense");
 
   /* Collect moves to try in the first batch.
    * 1. First order liberties.
