@@ -81,6 +81,10 @@ static int lunch_dragon[MAX_LUNCHES]; /* eater */
 static int lunch_worm[MAX_LUNCHES];   /* food */
 static int next_lunch;
 
+/* Point redistribution */
+static int replacement_mapi[MAX_BOARD][MAX_BOARD];
+static int replacement_mapj[MAX_BOARD][MAX_BOARD];
+
 /* Initialize move reason data structures. */
 void
 clear_move_reasons(void)
@@ -99,6 +103,7 @@ clear_move_reasons(void)
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       move[i][j].value                  = 0.0;
+      move[i][j].final_value            = 0.0;
       move[i][j].additional_ko_value    = 0.0;
       move[i][j].territorial_value      = 0.0;
       move[i][j].strategical_value      = 0.0;
@@ -125,6 +130,10 @@ clear_move_reasons(void)
        * regression tests.
        */
       move[i][j].random_number          = gg_drand();
+
+      /* Do not send away the points (yet). */
+      replacement_mapi[i][j] = -1;
+      replacement_mapj[i][j] = -1;
     }
 }
 
@@ -978,6 +987,64 @@ set_maximum_territorial_value(int ti, int tj, float value)
     move[ti][tj].max_territory = value;
 }
 
+/* 
+ * Add a point redistribution rule, sending the points from (ai, aj)
+ * to (bi, bj). 
+ */
+void
+add_replacement_move(int ai, int aj, int bi, int bj)
+{
+  int ci, cj;
+  int m, n;
+  ASSERT_ON_BOARD(ai, aj);
+  ASSERT_ON_BOARD(bi, bj);
+  ci = replacement_mapi[bi][bj];
+  cj = replacement_mapj[bi][bj];
+
+  /* First check for an incompatible redistribution rule. */
+  if (replacement_mapi[ai][aj] != -1) {
+    int di = replacement_mapi[ai][aj];
+    int dj = replacement_mapj[ai][aj];
+    /* Crash if the old rule isn't compatible with the new one. */
+    ASSERT((bi == di && bj == dj)
+	   || (bi == replacement_mapi[di][dj]
+	       && bj == replacement_mapj[di][dj]), ai, aj);
+    /* There already is a compatible redistribution in effect so we
+     * have nothing more to do.
+     */
+    return;
+  }
+
+  TRACE("Move at %m is replaced by %m.\n", ai, aj, bi, bj);    
+
+  /* Verify that we don't introduce a cyclic redistribution. */
+  if (ci == ai && cj == aj) {
+    gprintf("Cyclic point redistribution detected.\n");
+    ASSERT(0, ai, aj);
+  }
+
+  /* Update the replacement map. Make sure that all replacements
+   * always are directed immediately to the final destination.
+   */
+  if (ci != -1) {
+    replacement_mapi[ai][aj] = ci;
+    replacement_mapj[ai][aj] = cj;
+  }
+  else {
+    replacement_mapi[ai][aj] = bi;
+    replacement_mapj[ai][aj] = bj;
+  }
+  
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      if (replacement_mapi[m][n] == ai
+	  && replacement_mapj[m][n] == aj) {
+	replacement_mapi[m][n] = replacement_mapi[ai][aj];
+	replacement_mapj[m][n] = replacement_mapj[ai][aj];
+      }
+    }
+}
+
 /* Test all moves which defend, attack, connect or cut to see if they
  * also attack or defend some other worm.
  *
@@ -1207,13 +1274,16 @@ do_remove_false_attack_and_defense_moves(void)
 
 /* Test all moves which strategically attack or defend some owl
  * critical dragon and see whether the move is an effective owl attack
- * or owl defense for this dragon.
+ * or owl defense for this dragon. We also test whether tactical
+ * attacks on a part of a critical dragon do owl attack the entire
+ * dragon.
  */
 static void
 find_more_owl_attack_and_defense_moves(void)
 {
   int m, n;
   int k;
+  int di, dj;
   
   TRACE("\nTrying to upgrade strategical attack and defense moves.\n");
   
@@ -1227,25 +1297,34 @@ find_more_owl_attack_and_defense_moves(void)
 	what = move_reasons[r].what;
 	if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE
 	    || move_reasons[r].type == STRATEGIC_DEFEND_MOVE) {
-	  int di = dragoni[what];
-	  int dj = dragonj[what];
+	  di = dragoni[what];
+	  dj = dragonj[what];
+	}
+	else if (move_reasons[r].type == ATTACK_MOVE
+		 || move_reasons[r].type == DEFEND_MOVE) {
+	  di = wormi[what];
+	  dj = wormi[what];
+	}
+	else
+	  continue;
 
-	  if (dragon[di][dj].owl_status != CRITICAL)
-	    continue;
+	if (dragon[di][dj].owl_status != CRITICAL)
+	  continue;
 
-	  if (move_reasons[r].type == STRATEGIC_ATTACK_MOVE 
-	      && !move_reason_known(m, n, OWL_ATTACK_MOVE, what)
-	      && owl_does_attack(m, n, di, dj)) {
-	    add_owl_attack_move(m, n, di, dj);
-	    TRACE("Move at %m owl attacks %m.\n", m, n, di, dj);
-	  }
-	  
-	  if (move_reasons[r].type == STRATEGIC_DEFEND_MOVE 
-	      && !move_reason_known(m, n, OWL_DEFEND_MOVE, what)
-	      && owl_does_defend(m, n, di, dj)) {
-	    add_owl_defense_move(m, n, di, dj);
-	    TRACE("Move at %m owl defends %m.\n", m, n, di, dj);
-	  }
+	if ((move_reasons[r].type == STRATEGIC_ATTACK_MOVE 
+	     || move_reasons[r].type == ATTACK_MOVE)
+	    && !move_reason_known(m, n, OWL_ATTACK_MOVE, what)
+	    && owl_does_attack(m, n, di, dj)) {
+	  add_owl_attack_move(m, n, di, dj);
+	  TRACE("Move at %m owl attacks %m.\n", m, n, di, dj);
+	}
+	
+	if ((move_reasons[r].type == STRATEGIC_DEFEND_MOVE
+	     || move_reasons[r].type == DEFEND_MOVE)
+	    && !move_reason_known(m, n, OWL_DEFEND_MOVE, what)
+	    && owl_does_defend(m, n, di, dj)) {
+	  add_owl_defense_move(m, n, di, dj);
+	  TRACE("Move at %m owl defends %m.\n", m, n, di, dj);
 	}
       }
     }
@@ -3211,6 +3290,7 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
 		   float score)
 {
   float tot_value;
+  float shape_factor;
   char saved_stones[MAX_BOARD][MAX_BOARD];
 
   gg_assert (stackp == 0);
@@ -3247,6 +3327,8 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
 	       + move[m][n].strategical_value
 	       + move[m][n].influence_value);
 
+  shape_factor = compute_shape_factor(m, n);
+
   if (tot_value > 0.0) {
     int c;
     
@@ -3282,7 +3364,8 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
     }
     else {
       move[m][n].additional_ko_value =
-	move[m][n].followup_value + move[m][n].reverse_followup_value;
+	shape_factor *
+	(move[m][n].followup_value + move[m][n].reverse_followup_value);
     }
 
     tot_value += 0.05 * move[m][n].secondary_value;
@@ -3291,7 +3374,7 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
 	    m, n, 0.05 * move[m][n].secondary_value);
 
     if (move[m][n].numpos_shape + move[m][n].numneg_shape > 0) {
-      float shape_factor = compute_shape_factor(m, n);
+      /* shape_factor has already been computed. */
       float old_value = tot_value;
       tot_value *= shape_factor;
       if (verbose) {
@@ -3308,22 +3391,24 @@ value_move_reasons(int m, int n, int color, float pure_threat_value,
     /* Add a special shape bonus for moves which connect strings. */
     c = move_connects_strings(m, n, color);
     if (c > 0) {
-      float shape_factor = pow(1.02, (float) c) - 1;
+      float shape_factor2 = pow(1.02, (float) c) - 1;
       float base_value = gg_max(gg_min(tot_value, 5.0), 1.0);
       if (verbose) {
 	/* Should all have been TRACE, except we want field sizes. */
 	gprintf("  %m: %f - connects strings ", m, n,
-		base_value * shape_factor);
+		base_value * shape_factor2);
 	fprintf(stderr, "(connect value %d, shape factor %5.3f)\n", c,
-		shape_factor);
+		shape_factor2);
       }
-      tot_value += base_value * shape_factor;
+      tot_value += base_value * shape_factor2;
     }
   }
   else {
     move[m][n].additional_ko_value =
-      move[m][n].followup_value + 
-      gg_min(move[m][n].followup_value, move[m][n].reverse_followup_value);
+      shape_factor *
+      (move[m][n].followup_value +
+       gg_min(move[m][n].followup_value,
+	      move[m][n].reverse_followup_value));
   }
 
   /* If the move is valued 0 or small, but has followup values and is
@@ -3430,10 +3515,10 @@ print_top_moves(void)
    */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if (move[m][n].value <= 0.0)
+      if (move[m][n].final_value <= 0.0)
 	continue;
       
-      tval = move[m][n].value;
+      tval = move[m][n].final_value;
 
       for (k = 9; k >= 0; k--)
 	if (tval > best_move_values[k]) {
@@ -3449,7 +3534,7 @@ print_top_moves(void)
     }
 
   TRACE("\nTop moves:\n");
-  for (k = 0; k < 10 && best_move_values[k]>0.0; k++) {
+  for (k = 0; k < 10 && best_move_values[k] > 0.0; k++) {
     TRACE("%d. %M %f\n", k+1, best_movei[k], best_movej[k],
 	  best_move_values[k]);
   }
@@ -3468,6 +3553,30 @@ reevaluate_ko_threats(void)
 	      move[m][n].value + move[m][n].additional_ko_value);
 	move[m][n].value += move[m][n].additional_ko_value;
       }
+}
+
+static void
+redistribute_points(void)
+{
+  int m, n;
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) 
+      move[m][n].final_value = move[m][n].value;
+  
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      int i = replacement_mapi[m][n];
+      int j = replacement_mapj[m][n];
+      if (i == -1)
+	continue;
+      TRACE("Redistributing points from %m to %m.\n", m, n, i, j);
+      if (move[i][j].final_value < move[m][n].final_value) {
+	TRACE("%m is now valued %f.\n", i, j, move[m][n].final_value);
+	move[i][j].final_value = move[m][n].final_value;
+      }
+      TRACE("%m is now valued 0.\n", m, n);
+      move[m][n].final_value = 0.0;
+    }
 }
 
 /*
@@ -3571,6 +3680,9 @@ review_move_reasons(int *i, int *j, float *val, int color,
     t1 = t2;
   }
 
+  /* Perform point redistribution */
+  redistribute_points();
+
   /* Search through all board positions for the 10 highest valued
    * moves and print them.
    */
@@ -3584,7 +3696,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
     /* Search through all board positions for the highest valued move. */
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (move[m][n].value == 0.0)
+	if (move[m][n].final_value == 0.0)
 	  continue;
 	
 	tval = move[m][n].value;
@@ -3598,6 +3710,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
 	  else {
 	    TRACE("Move at %m would be suicide.\n", m, n);
 	    move[m][n].value = 0.0;
+	    move[m][n].final_value = 0.0;
 	  }
 	}
       }
@@ -3621,6 +3734,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
     if (bestval > 0.0 && is_illegal_ko_capture(best_i, best_j, color)) {
       TRACE("Move at %m would be an illegal ko capture.\n", best_i, best_j);
       reevaluate_ko_threats();
+      redistribute_points();
       if (showtime) {
 	t2 = gg_gettimeofday();
 	if (t2-t1 > 1.)
@@ -3630,6 +3744,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
       }
       ko_values_have_been_added = 1;
       move[best_i][best_j].value = 0.0;
+      move[best_i][best_j].final_value = 0.0;
       print_top_moves();
       good_move_found = 0;
     }
@@ -3642,6 +3757,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
 				color, allowed_blunder_size, NULL, NULL)) {
       TRACE("Move at %m would be a blunder.\n", best_i, best_j);
       move[best_i][best_j].value = 0.0;
+      move[best_i][best_j].final_value = 0.0;
       good_move_found = 0;
     }
     else
@@ -3666,5 +3782,3 @@ review_move_reasons(int *i, int *j, float *val, int color,
  * c-basic-offset: 2
  * End:
  */
-
-

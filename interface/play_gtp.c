@@ -104,6 +104,7 @@ DECLARE(gtp_playwhite);
 DECLARE(gtp_popgo);
 DECLARE(gtp_captures);
 DECLARE(gtp_protocol_version);
+DECLARE(gtp_query_boardsize);
 DECLARE(gtp_quit);
 DECLARE(gtp_report_uncertainty);
 DECLARE(gtp_reset_life_node_counter);
@@ -171,6 +172,7 @@ static struct gtp_command commands[] = {
   {"popgo",            	      gtp_popgo},
   {"captures",        	      gtp_captures},
   {"protocol_version",        gtp_protocol_version},
+  {"query_boardsize",         gtp_query_boardsize},
   {"quit",             	      gtp_quit},
   {"report_uncertainty",      gtp_report_uncertainty},
   {"reset_life_node_counter", gtp_reset_life_node_counter},
@@ -194,7 +196,7 @@ static struct gtp_command commands[] = {
 
 /* Start playing using the Go Text Protocol. */
 void
-play_gtp()
+play_gtp(FILE *gtp_input)
 {
   /* Try to make sure that we have a useful level of buffering of stdout. */
 #ifdef HAVE_SETLINEBUF
@@ -211,7 +213,7 @@ play_gtp()
   reset_engine();
   move_stack_pointer = 0;
   store_position(&starting_position);
-  gtp_main_loop(commands);
+  gtp_main_loop(commands, gtp_input);
 }
 
 
@@ -301,6 +303,21 @@ gtp_set_boardsize(char *s, int id)
   store_position(&starting_position);
   return gtp_success(id, "");
 }
+
+/* Function:  Find the current boardsize
+ * Arguments: none
+ * Fails:     never
+ * Returns:   board_size
+ */
+static int
+gtp_query_boardsize(char *s, int id)
+{
+  UNUSED(s);
+
+  return gtp_success(id, "%d", board_size);
+}
+
+
 
 
 /***************************
@@ -1124,7 +1141,7 @@ gtp_top_moves_white(char *s, int id)
       gtp_print_vertex(best_movei[k], best_movej[k]);
       gtp_printf(" %.2f ", best_move_values[k]);
     }
-  gtp_printf("\n");
+  gtp_printf("\n\n");
   return GTP_OK;
 }
 
@@ -1140,7 +1157,7 @@ gtp_top_moves_black(char *s, int id)
       gtp_print_vertex(best_movei[k], best_movej[k]);
       gtp_printf(" %.2f ", best_move_values[k]);
     }
-  gtp_printf("\n");
+  gtp_printf("\n\n");
   return GTP_OK;
 }
 
@@ -1469,14 +1486,13 @@ gtp_estimate_score(char *s, int id)
   
   score = estimate_score(&upper_bound, &lower_bound);
   gtp_printid(id, GTP_SUCCESS);
-  if (score > 0.0) 
+  /* Traditionally W wins jigo */
+  if (score >= 0.0) 
     gtp_printf("W+%3.1f (upper bound: %3.1f, lower: %3.1f)", 
 	       score, upper_bound, lower_bound);
   else if (score < 0.0)
     gtp_printf("B+%3.1f (upper bound: %3.1f, lower: %3.1f)", 
 	       -score, upper_bound, lower_bound);
-  else
-    gtp_printf("0");
   return gtp_finish_response();
 }  
 

@@ -82,7 +82,7 @@ loadsgf games/filllib6.sgf 261
 
 loadsgf games/filllib7.sgf 72
 25 gg_genmove white
-#? [J3|J5]
+#? [J3|J5]*
 26 gg_genmove black
 #? [J5|H7|J7]
 

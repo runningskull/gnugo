@@ -1247,7 +1247,7 @@ show_dragons(void)
 
       if (((d->origini)==m) && ((d->originj)==n)) {
 	if (p[m][n]) {
-	  gprintf("%m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, status %s%s, matcher status %s, moyo size %d safety %s",
+	  gprintf("%m : %s dragon size %d (%f), genus %d, half eyes %d, escape factor %d, status %s, matcher status %s, moyo size %d safety %s",
 		  m,n,
 		  p[m][n]==BLACK ? "B" : "W",
 		  d->size,

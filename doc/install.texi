@@ -80,6 +80,7 @@ number MUST be 1.9.1 at least or it won't work. CGoban 2 will not work.
 @xref{Jago}, for Jago.
 
 @node Configure Options, Windows and MS-DOS, GNU/Linux and Unix, Installation
+@section Configure Options
 
 There are three options which you should consider configuring,
 particularly if you are dissatisfied with GNU Go's performance.

@@ -76,6 +76,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_INFILE,
       OPT_OUTFILE, 
       OPT_QUIET,
+      OPT_GTP_INPUT,
       OPT_SHOWCOPYRIGHT,
       OPT_REPLAY_GAME,
       OPT_DECIDE_STRING,
@@ -144,6 +145,7 @@ static struct option const long_options[] =
   {"replay",         required_argument, 0, OPT_REPLAY_GAME},
   {"quiet",          no_argument,       0, OPT_QUIET},
   {"silent",         no_argument,       0, OPT_QUIET},
+  {"gtp-input",      required_argument, 0, OPT_GTP_INPUT},
   {"infile",         required_argument, 0, 'l'},
   {"until",          required_argument, 0, 'L'},
   {"outfile",        required_argument, 0, 'o'},
@@ -225,6 +227,7 @@ main(int argc, char *argv[])
   char *infilename = NULL;
   char *untilstring = NULL;
   char *outfile = NULL;
+  char *gtpfile = NULL;
   
   char *printsgffile = NULL;
   
@@ -234,6 +237,7 @@ main(int argc, char *argv[])
   
   int benchmark = 0;  /* benchmarking mode (-b) */
   float komi = 0.0;
+  FILE *gtp_input_FILE;
   
   int seed = 0;      /* If seed is zero, GNU Go will play a different game 
 			each time. If it is set using -r, GNU Go will play the
@@ -328,6 +332,10 @@ main(int argc, char *argv[])
 	
       case OPT_QUIET:
 	quiet = 1;
+	break;
+	
+      case OPT_GTP_INPUT:
+	gtpfile = optarg;
 	break;
 	
       case OPT_SHOWTIME:
@@ -829,7 +837,16 @@ main(int argc, char *argv[])
   case MODE_GTP:  
     if (!sgftree.root)
       sgftreeCreateHeaderNode(&sgftree, boardsize, komi);
-    play_gtp();
+    if (gtpfile != NULL) {
+      gtp_input_FILE = fopen(gtpfile, "r");
+      if (gtp_input_FILE == NULL) {
+	fprintf(stderr, "gnugo: Cannot open file %s\n", gtpfile);
+	return (EXIT_FAILURE);
+      } 
+    } else {
+      gtp_input_FILE = stdin;
+    }
+    play_gtp(gtp_input_FILE);
     break;
 
   case MODE_ASCII_EMACS:  
@@ -923,10 +940,11 @@ Main Options:\n\
                          If no terminal is detected GMP (Go Modem Protocol)\n\
                          will be assumed.\n\
        --quiet           Don't print copyright and informational messages\n\
+       --gtp-input <file>Read gtp commands from file instead of stdin\n\
    -l, --infile <file>   Load name sgf file\n\
    -L, --until <move>    Stop loading just before move is played. <move>\n\
                          can be the move number or location (eg L10).\n\
-   -o, --outfile file    Write sgf output to file\n\
+   -o, --outfile <file>  Write sgf output to file\n\
    --printsgf <file>     Write position as a diagram to file (use with -l)\n\
 \n\
 Options that affect strength (higher = stronger, slower):\n\

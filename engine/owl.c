@@ -196,6 +196,12 @@ static int liberty_of_goal(int i, int j, struct local_owl_data *owl);
 static int matches_found;
 static char found_matches[MAX_BOARD][MAX_BOARD];
 
+static struct local_owl_data *owl_stack = NULL;
+static int owl_stack_size = 0;
+static int owl_stack_pointer = 0;
+static void push_owl(struct local_owl_data *owl);
+static void pop_owl(struct local_owl_data *owl);
+
 /* Called when (ai,aj) and (bi,bj) point to adjacent dragons
  * of the opposite color, both with matcher_status DEAD or
  * CRITICAL, analyzes the semeai, assuming that the player
@@ -873,7 +879,6 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
   struct owl_move_data shape_moves[MAX_MOVES];
   struct owl_move_data *moves;
   char mw[MAX_BOARD][MAX_BOARD];
-  char saved_owl_boundary[MAX_BOARD][MAX_BOARD];
   int number_tried_moves = 0;
   int pass;
   int k;
@@ -953,7 +958,6 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
   {
     SGFTree *save_sgf_dumptree = sgf_dumptree;
     int save_count_variations = count_variations;
-    int i, j;
     
     sgf_dumptree = NULL;
     count_variations = 0;
@@ -971,13 +975,10 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
 
     matches_found = 0;
     memset(found_matches, 0, sizeof(found_matches));
-    if (level >= 9) {
-      for (i = 0; i < board_size; i++)
-	for (j = 0; j < board_size; j++)
-	  if (p[i][j])
-	    matchpat(i, j, owl_shapes_callback, other, 
-		     &owl_vital_apat_db, vital_moves, owl->goal);
-    }
+    if (level >= 9)
+      global_matchpat(owl_shapes_callback, other, 
+		      &owl_vital_apat_db, vital_moves, owl->goal);
+    
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
     
@@ -995,8 +996,6 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
     }
   }
 
-  memcpy(saved_owl_boundary, owl->boundary, sizeof(saved_owl_boundary));
-  
   /* We try moves in five passes.
    *                                stackp==0   stackp>0
    * 0. Vital moves in the interval  [70..]      [45..]
@@ -1176,6 +1175,7 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
       TRACE("Trying %C %m\n", other, mi, mj);
       
       /* We have now made a move. Analyze the new position. */
+      push_owl(owl);
       mw[mi][mj] = 1;
       number_tried_moves++;
       owl->lunches_are_current = 0;
@@ -1212,9 +1212,7 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
 			      new_kom_i, new_kom_j);
       if (!ko_move) {
 	if (dcode == 0) {
-	  owl->lunches_are_current = 0;
-	  memcpy(owl->boundary, saved_owl_boundary,
-		 sizeof(saved_owl_boundary));
+	  pop_owl(owl);
 	  popgo();
 	  if (om == -1) {
 	    SGFTRACE(mi, mj, WIN, "all original stones captured");
@@ -1248,8 +1246,7 @@ do_owl_attack(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
 	}
       }
     
-      owl->lunches_are_current = 0;
-      memcpy(owl->boundary, saved_owl_boundary, sizeof(saved_owl_boundary));
+      pop_owl(owl);
       popgo();
     }
   }
@@ -1455,7 +1452,6 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
   char mw[MAX_BOARD][MAX_BOARD];
   int number_tried_moves = 0;
   int pass;
-  char saved_goal[MAX_BOARD][MAX_BOARD];
   int k;
   int savei = -1;
   int savej = -1;
@@ -1549,7 +1545,6 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
   {
     SGFTree *save_sgf_dumptree = sgf_dumptree;
     int save_count_variations = count_variations;
-    int i, j;
     
     sgf_dumptree = NULL;
     count_variations = 0;
@@ -1579,13 +1574,10 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
 
     matches_found = 0;
     memset(found_matches, 0, sizeof(found_matches));
-    if (level >= 9) {
-      for (i = 0; i < board_size; i++)
-	for (j = 0; j < board_size; j++)
-	  if (p[i][j])
-	    matchpat(i, j, owl_shapes_callback, other, 
-		   &owl_vital_apat_db, shape_moves, owl->goal);
-    }
+    if (level >= 9) 
+      global_matchpat(owl_shapes_callback, other, 
+		      &owl_vital_apat_db, shape_moves, owl->goal);
+
     true_genus -= matches_found;
 
     sgf_dumptree = save_sgf_dumptree;
@@ -1603,8 +1595,6 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
     }
   }
 
-  memcpy(saved_goal, owl->goal, sizeof(saved_goal));
-  
   /* We try moves in four passes.
    *                                stackp==0   stackp>0
    * 0. Vital moves in the interval  [70..]      [45..]
@@ -1729,6 +1719,7 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
       TRACE("Trying %C %m\n", color, mi, mj);
 
       /* We have now made a move. Analyze the new position. */
+      push_owl(owl);
       mw[mi][mj] = 1;
       number_tried_moves++;
       owl->lunches_are_current = 0;
@@ -1742,8 +1733,7 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
 	acode = do_owl_attack(m, n, NULL, NULL, owl,
 			      new_komaster, new_kom_i, new_kom_j);
 	if (!acode) {
-	  owl->lunches_are_current = 0;
-	  memcpy(owl->goal, saved_goal, sizeof(saved_goal));
+	  pop_owl(owl);
 	  popgo();
 	  SGFTRACE(mi, mj, WIN, "defense effective - A");
 	  READ_RETURN(read_result, ui, uj, mi, mj, WIN);
@@ -1760,8 +1750,7 @@ do_owl_defend(int m, int n, int *ui, int *uj, struct local_owl_data *owl,
       }
       
       /* Undo the tested move. */
-      owl->lunches_are_current = 0;
-      memcpy(owl->goal, saved_goal, sizeof(saved_goal));
+      pop_owl(owl);
       popgo();
     }
   }
@@ -2218,7 +2207,6 @@ static int
 owl_shapes(struct owl_move_data moves[MAX_MOVES], int color,
 	   struct local_owl_data *owl, struct pattern_db *type)
 {
-  int m, n; /* iterate over all board positions */
   int k;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
@@ -2239,11 +2227,7 @@ owl_shapes(struct owl_move_data moves[MAX_MOVES], int color,
    * pattern matching. The cache is used by owl_shapes_callback().
    */
   memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
-
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (p[m][n])
-	matchpat(m, n, owl_shapes_callback, color, type, moves, owl->goal);
+  global_matchpat(owl_shapes_callback, color, type, moves, owl->goal);
 
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
@@ -3073,6 +3057,25 @@ owl_connection_defends(int ti, int tj, int ai, int aj, int bi, int bj)
  *    does not belong to the goal dragon.
  * 4. No neighbor of the liberty belonging to the goal dragon can be
  *     tactically captured.
+ *
+ * There is a weakness with this characterization though, which can be
+ * seen in this position:
+ *
+ * --------
+ * OX..OOX.
+ * OX.X.XOO
+ * OX.XX.O.
+ * O.XXOOO.
+ * .OOOO...
+ *
+ * The two O stones intruding in X's eyespace cannot be tactically
+ * captured and their liberties satisfy the requirements above. Still
+ * it doesn't make any sense to count those stones as
+ * inessential. Therefore we add another requirement on the stones
+ * themself:
+ *
+ * 5. No neighbor of the stones does not belong to the goal or can be
+ * tactically captured.
  */
 
 static void
@@ -3151,6 +3154,9 @@ owl_find_lunches(struct local_owl_data *owl)
 	  }
 	  else if (!owl->inessential[li][lj]) {
 	    /* Test for inessentiality. */
+	    int adj;
+	    int adji[MAXCHAIN];
+	    int adjj[MAXCHAIN];
 	    int stones;
 	    int stonei[MAX_BOARD*MAX_BOARD];
 	    int stonej[MAX_BOARD*MAX_BOARD];
@@ -3160,6 +3166,20 @@ owl_find_lunches(struct local_owl_data *owl)
 	    int r;
 	    int essential = 0;
 	    int superstring[MAX_BOARD][MAX_BOARD];
+
+	    /* First check the neighbors of the string. */
+	    adj = chainlinks(li, lj, adji, adjj);
+	    for (r = 0; r < adj; r++) {
+	      int bi = adji[r];
+	      int bj = adjj[r];
+	      if (!owl->goal[bi][bj] || attack(bi, bj, NULL, NULL) != 0) {
+		essential = 1;
+		break;
+	      }
+	    }
+	    
+	    if (essential)
+	      continue;
 
 	    find_superstring_stones_and_liberties(li, lj, &stones,
 						  stonei, stonej,
@@ -3683,6 +3703,49 @@ static int
 owl_escape_route(struct local_owl_data *owl)
 {
   return dragon_escape(owl->goal, owl->color, owl->escape_values);
+}
+
+
+/***********************
+ * Storage of owl data
+ ***********************/
+
+/* Push owl data onto a stack. The stack is dynamically reallocated if
+ * it is too small.
+ */
+static void
+push_owl(struct local_owl_data *owl)
+{
+  int new_size = owl_stack_size;
+
+  /* Do we need to enlarge the stack. */
+  if (owl_stack_size == 0)
+    new_size = owl_reading_depth;
+  else if (owl_stack_pointer == owl_stack_size)
+    new_size++;
+
+  /* If so, reallocate space. */
+  if (new_size > owl_stack_size) {
+    owl_stack = realloc(owl_stack, new_size * sizeof(*owl_stack));
+    gg_assert(owl_stack != NULL);
+    owl_stack_size = new_size;
+  }
+
+  /* Store the owl data. */
+  owl_stack[owl_stack_pointer] = *owl;
+  owl_stack_pointer++;
+}
+
+/* Retrieve owl data from the stack. The local_owl_node_counter field
+ * is not reset.
+ */
+static void
+pop_owl(struct local_owl_data *owl)
+{
+  int nodes = owl->local_owl_node_counter;
+  owl_stack_pointer--;
+  *owl = owl_stack[owl_stack_pointer];
+  owl->local_owl_node_counter = nodes;
 }
 
 /***********************

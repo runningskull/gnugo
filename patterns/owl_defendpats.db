@@ -2534,6 +2534,26 @@ Pattern D829
 
 
 Pattern D830
+# gf New pattern. (3.1.1)
+
+|OO?          special corner shape, setting up ko
+|..O
+|XOo
+|*.O
++---
+
+:8,-,value(55)
+
+|aa?
+|..O
+|XOo
+|*.O
++---
+
+;lib(a)==2
+
+
+Pattern D831
 
 |OOo?        (at least) ko
 |.XOo

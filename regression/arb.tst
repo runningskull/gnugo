@@ -49,7 +49,7 @@ loadsgf games/arb/dumonteil-3.sgf 193
 # the root of the problem at test 203 lies at move 185
 loadsgf games/arb/dumonteil-3.sgf 185
 204 gg_genmove black
-#? [S7]*
+#? [S7]
 
 loadsgf games/arb/dumonteil-4.sgf 189
 210 gg_genmove black

@@ -2475,19 +2475,6 @@ Pattern A1201
 ; (lib(a)==1) && (lib(B)==1)
 
 
-# Pattern A1202
-# 
-# ?.           atari inside eyespace
-# X*
-# 
-# :8,s,value(65)
-# 
-# ?.?
-# A*.
-# 
-# ; lib(A)==2 && olib(*)>1 && !safe_omove(*)
-
-
 Pattern A1203
 
 ?*?         capture 3 stones
@@ -3065,6 +3052,24 @@ Pattern A1335
 +----
 
 ;oplay_attack(a,a) != 0 && !oplay_attack(a,b)
+
+
+Pattern A1335b
+# gf New pattern. (3.1.1)
+
+|..X?         vital point
+|*OXO
+|.X.O
++----
+
+:8,s,value(41)
+
+|..X?
+|*cXO
+|.XaO
++----
+
+;oplay_attack(a,c) != 0 || oplay_attack(a,a)
 
 
 Pattern A1336

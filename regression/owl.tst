@@ -790,9 +790,9 @@ loadsgf games/FSF-neurogo.sgf 286
 
 loadsgf games/owl28.sgf 199
 217 owl_attack C14
-#? [1 A16]*
+#? [1 A16]
 218 owl_defend C14
-#? [1 A16]*
+#? [1 A16]
 
 ########### end of tests #####################
 

@@ -654,15 +654,11 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 static void
 find_influence_patterns(struct influence_data *q, int color)
 {
-  int m, n;
-  
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (p[m][n]) {
-	matchpat(m, n, influence_callback, p[m][n], &influencepat_db, q, NULL);
-	if (color != EMPTY)
-	  matchpat(m, n, influence_callback, color, &barrierspat_db, q, NULL);
-      }
+  int m,n;
+
+  global_matchpat(influence_callback, ANCHOR_COLOR, &influencepat_db, q, NULL);
+  if (color != EMPTY)
+    global_matchpat(influence_callback, color, &barrierspat_db, q, NULL);
 
   /* When color == EMPTY, we introduce a weaker kind of barriers
    * manually instead of searching for patterns.

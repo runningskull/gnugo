@@ -147,6 +147,17 @@ extern char dfa_val2asc[4];
 #define ASC2VAL(c) (c<90?dfa_asc2val[(int)c]:3)
 #define VAL2ASC(n) (n<4?dfa_val2asc[n]:'!')
 
+extern int reverse_spiral[8][DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
+
+/* incremental macro */
+
+#define BASE DFA_MAX_BOARD * 2
+
+/* Give the row in spiral order of (i,j) when the scan start at (i0,j0) */
+#define GIVE_SPIRAL_ROW(ll,i0, j0, i, j) \
+ (reverse_spiral[ll][BASE + (i) - (i0)][BASE + (j) - (j0)])
+
+
 
 /********************************
  *    global variables          *

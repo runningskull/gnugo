@@ -1003,6 +1003,7 @@ produces the correct result.
 
 @node Another Ko Example, Alternate Komaster Schemes, A Ko Example, Tactical Reading
 @comment  node-name,  next,  previous,  up
+@section Another Ko Example
 
 We now consider an example to show why the komaster is reset
 to EMPTY if the ko is resolved in the komaster's favor. This
@@ -1063,6 +1064,7 @@ no way to finish off B.
 
 @node Alternate Komaster Schemes, Superstrings, Another Ko Example,  Tactical Reading
 @comment  node-name,  next,  previous,  up
+@section Alternate Komaster Schemes
 
 The following alternate schemes have been proposed. It is assumed
 that @samp{O} is the player about to move.

@@ -9,6 +9,7 @@ a number of useful things. Most can be displayed visually using
 the @option{-m} option (@pxref{Colored Display}).
 
 @node Moyo history, Bouzy, Moyo, Moyo
+@section Moyo history
 
 In GNU Go 2.6 extensive use was made of an algorithm from
 Bruno Bouzy's dissertation, which is available at:

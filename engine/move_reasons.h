@@ -62,7 +62,8 @@ struct move_reason {
 };
 
 struct move_data {
-  float value;    /* final comparison value, computed at the very end */
+  float value;    /* total comparison value, computed at the very end */
+  float final_value; /* value after point redistribution. */
   float additional_ko_value; /* Additional threat value if ko fight going on.*/
 
   float territorial_value; /* Value in terms of actual profit. */

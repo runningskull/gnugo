@@ -520,6 +520,7 @@ Secondary move reasons are weighed very slightly. Such a move
 can tip the scales if all other factors are equal.
 
 @node Threats and Followup Value, , Secondary Value, Valuation
+@subsection Threats and Followup Value
 
 Followup value refers to value which may acrue if we get two
 moves in a row in a local area. It is assigned by the function

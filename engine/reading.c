@@ -852,7 +852,7 @@ atari_atari(int color, int *i, int *j, int save_verbose)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (p[m][n] == other) {
-	if (dragon[m][n].status == DEAD)
+	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)
@@ -906,30 +906,37 @@ atari_atari(int color, int *i, int *j, int save_verbose)
       }
   }
 
-  /* We try excluding the first atari found and see if the
-   * combination still works.
-   */
   aa_val = do_atari_atari(color, &fi, &fj, NULL, NULL, -1, -1,
 			  save_verbose, 0);
-  if (aa_val > 0) {
+
+  if (aa_val == 0)
+    return 0;
+
+  /* We try excluding the first atari found and see if the
+   * combination still works. Repeat until failure.
+   */
+  while (1) {
+    int new_aa_val;
     forbidden[fi][fj] = 1;
-    /* try dropping moves from the combination and see
-     * if it still works 
-     */
-    while(do_atari_atari(color, &fi, &fj, NULL, NULL, -1, -1,
-			 save_verbose, 0) >= aa_val)
-      forbidden[fi][fj] = 1;
+    new_aa_val = do_atari_atari(color, &fi, &fj, NULL, NULL, -1, -1,
+				save_verbose, aa_val);
 
     /* The last do_atari_atari call fails. When do_atari_atari fails,
      * it does not change the value of (fi, fj), so these correspond
      * to a move that works and is necessary.
      */
-    if (i) *i = fi;
-    if (j) *j = fj;
-    return aa_val;
+    if (new_aa_val == 0) {
+      if (i) *i = fi;
+      if (j) *j = fj;
+      return aa_val;
+    }
+    aa_val = new_aa_val;
   }
-  else
-    return 0;
+
+  /* We'll never get here, but the compiler may be more happy if it
+   * looks like we're returning something.
+   */
+  return 0;
 }
 
 
@@ -979,6 +986,13 @@ do_atari_atari(int color, int *attacki, int *attackj,
   if (debug & DEBUG_ATARI_ATARI) {
     gprintf("%odo_atari_atari: ");
     dump_stack();
+    gprintf("%oforbidden moves: ");
+    for (m = 0; m < board_size; m++)
+      for (n = 0; n < board_size; n++) {
+	if (forbidden[m][n])
+	  gprintf("%o%m ", m, n);
+      }
+    gprintf("\n");
   }
 
   /* First look for strings adjacent to the last friendly move played
@@ -1017,6 +1031,8 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	  if (defendi)
 	    find_defense(m, n, defendi, defendj);
 
+	  DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
+		countstones(m, n), m, n);
 	  return countstones(m, n);
 	}
       }
@@ -1067,6 +1083,9 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	     * useful defense point if it returns non-zero. Usually we
 	     * would need to call attack_and_defend() to be certain of
 	     * this.
+	     *
+	     * On the other hand, if there is no defense we have
+	     * already been successful.
 	     */
 	    if (find_defense(m, n, &bi, &bj)
 		&& trymove(bi, bj, other, "do_atari_atari-B", m, n,
@@ -1083,6 +1102,24 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	      decrease_depth_values();
 	      popgo();
 	    }
+	    else {
+	      /* No way to save the ataried stone. We have been successful. */
+	      popgo();
+	      if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
+		gprintf("%oThe worm %m can be attacked at %m after ", m, n,
+			ai, aj);
+		dump_stack();
+	      }	  
+	      if (attacki) *attacki = ai;
+	      if (attackj) *attackj = aj;
+	      if (defendi)
+		find_defense(m, n, defendi, defendj);
+	      
+	      DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
+		    countstones(m, n), m, n);
+	      return countstones(m, n);
+	    }
+
 	    if (aa_val) {
 	      /* The atari at (ai,aj) seems to work but we still
 	       * must check there is not a better defense.
@@ -1105,7 +1142,10 @@ do_atari_atari(int color, int *attacki, int *attackj,
 		if (attacki) *attacki = ai;
 		if (attackj) *attackj = aj;
 		popgo();
-		return gg_min(aa_val, countstones(m,n));
+		DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (min %d, %d (%m))\n",
+		      gg_min(aa_val, countstones(m, n)), aa_val,
+		      countstones(m, n), m, n);
+		return gg_min(aa_val, countstones(m, n));
 	      }
 	    }
 	    popgo();
@@ -1150,7 +1190,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (p[m][n] == color) {
-	if (dragon[m][n].status == DEAD)
+	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)
@@ -1208,25 +1248,27 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
     /* Really shouldn't happen. */
     abortgo(__FILE__, __LINE__, "trymove", ti, tj); 
 
-  /* We try excluding the first atari found and see if the
-   * combination still works.
-   */
   aa_val = do_atari_atari(other, &fi, &fj, i, j, -1, -1, 0, minsize);
-  if (aa_val > 0) {
-    forbidden[fi][fj] = 1;
-    /* try dropping moves from the combination and see
-     * if it still works 
-     */ 
-    while (do_atari_atari(other, &fi, &fj, i, j, -1, -1,
-			  0, minsize) >= aa_val) {
-      forbidden[fi][fj] = 1;
-    }
+  
+  /* No sufficiently large combination attack, so the move is safe from
+   * this danger.
+   */
+  if (aa_val == 0) {
     popgo();
-    return 0;
+    return 1;
+  }
+
+  while (aa_val > 0) {
+    /* Try dropping moves from the combination and see if it still
+     * works. What we really want is to get the proper defense move
+     * into (*i, *j).
+     */
+    forbidden[fi][fj] = 1;
+    aa_val = do_atari_atari(other, &fi, &fj, i, j, -1, -1, 0, aa_val);
   }
 
   popgo();
-  return 1;
+  return 0;
 }
 
 
@@ -1255,7 +1297,7 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (p[m][n] == other) {
-	if (dragon[m][n].status == DEAD)
+	if (dragon[m][n].matcher_status == DEAD)
 	  aa_status[m][n] = DEAD;
 	else if (worm[m][n].attack_code != 0) {
 	  if (worm[m][n].defend_code != 0)

@@ -91,7 +91,6 @@ int printmoyo        = 0;  /* print moyo board each move */
 int printboard       = 0;  /* print board each move */
 int board_size       = 19; /* board size */
 int count_variations = 0;  /* used by decide_string */
-int sgf_dump         = 0;  /* used by decide_string */
 SGFTree *sgf_dumptree = NULL;
 int loading          = 0;  /* TRUE if last loaded move comes from file */
 int life             = 0;  /* use eye reading code */

@@ -16,7 +16,7 @@ loadsgf games/ego.sgf 30
 # K18 is unreasonable. H18 is the only move locally.
 loadsgf games/ego.sgf 52
 3 gg_genmove white
-#? [H18]
+#? [H18]*
 
 # The descent at G19 is bad shape because it leaves much aji around
 # E18 and gives black an endgame sente move at H19.

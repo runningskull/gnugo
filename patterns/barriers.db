@@ -1277,4 +1277,19 @@ oX
 ;safe_omove(a)
 
 
+Pattern Intrusion38
+
+X?
+!O
+--
+
+:8,B,value(5)
+
+XX
+aO
+--
+
+;safe_omove(a)
+
+
 # END OF FILE

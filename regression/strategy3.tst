@@ -47,11 +47,11 @@ loadsgf games/strategy27.sgf 216
 
 loadsgf games/strategy27.sgf 220
 110 gg_genmove white
-#? [A8]
+#? [A8]*
 
 loadsgf games/me.sgf 44
 111 gg_genmove black
-#? [K3]*
+#? [K3]
 
 loadsgf games/me.sgf 84
 112 gg_genmove black
@@ -77,7 +77,7 @@ loadsgf games/incident278.sgf 212
 # incident 282
 loadsgf games/incident278.sgf 252
 117 gg_genmove black
-#? [M2]*
+#? [M2]
 
 loadsgf games/incident240.sgf 65
 118 gg_genmove black
@@ -91,7 +91,7 @@ loadsgf games/incident240.sgf 69
 # incident 221
 loadsgf games/incident221.sgf 35
 120 gg_genmove black
-#? [C7]*
+#? [C7]
 
 # incident 222
 loadsgf games/incident221.sgf 39
@@ -257,6 +257,7 @@ loadsgf games/ssstator.sgf 136
 157 gg_genmove white
 #? [B14|B16]*
 
+# E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51
 158 gg_genmove black
 #? [!E16]
@@ -273,10 +274,12 @@ loadsgf games/strategy38.sgf 197
 161 gg_genmove black
 #? [E12]*
 
+# First live then attack.
 loadsgf games/strategy39.sgf 156
 162 gg_genmove white
 #? [O7|Q7|N7]*
 
+# First live then attack.
 loadsgf games/strategy39.sgf 158
 163 gg_genmove white
 #? [O7]*
@@ -294,6 +297,67 @@ loadsgf games/strategy39.sgf 178
 loadsgf games/incident94.sgf 114
 166 gg_genmove white
 #? [D11]*
+
+# Tenuki instead of urgent edge joseki move.
+loadsgf games/strategy40.sgf 10
+167 gg_genmove black
+#? [D4]
+
+# Safety must come first.
+loadsgf games/strategy40.sgf 30
+168 gg_genmove black
+#? [A3|A4]*
+
+# Both J7 and J9 rescue the threatened stones, but J7 is the proper
+# choice since it leaves a smaller ko threat behind. (That there's no
+# risk for ko in this position is irrelevant. There's still no reason
+# to choose J9 over J7.)
+loadsgf games/strategy41.sgf
+169 gg_genmove black
+#? [J7]
+
+# White can't play G19. Locally this move must be at G18.
+loadsgf games/strategy42.sgf 174
+170 gg_genmove white
+#? [!G19]*
+
+# T19 is out of the question. Locally T17 is better but the correct
+# move is A5.
+loadsgf games/strategy42.sgf 188
+171 gg_genmove white
+#? [A5]*
+
+# It's correct to make a ko threat, but N9 is inefficient because it
+# doesn't utilize the full ko potential of the position. Locally M8 is
+# superior.
+loadsgf games/strategy42.sgf 214
+172 gg_genmove white
+#? [!N9]*
+
+# There's no way to win the ko by making atari from above. This move
+# must be at A9. This is a good example showing why only having the
+# difference between a ko where we make the first threat or not is
+# insufficient.
+loadsgf games/strategy42.sgf 218
+173 gg_genmove white
+#? [A9]*
+
+# Always take the ko at least once.
+loadsgf games/strategy42.sgf 248
+174 gg_genmove white
+#? [S19]*
+
+# This example shows that we need to find additional owl attack
+# points. Currently only K15 is found to owl attack N19, but clearly
+# the J14 move also does this, without sacrificing K13.
+loadsgf games/strategy43.sgf 271
+175 gg_genmove white
+#? [J14]*
+
+# Best to capture with snapback.
+loadsgf games/strategy44.sgf
+176 gg_genmove black
+#? [D9]
 
 ############ End of Tests #################
 

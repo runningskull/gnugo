@@ -18,8 +18,9 @@ loadsgf games/FSF-neurogo.sgf 22
 
 loadsgf games/FSF-neurogo.sgf 34
 3 gg_genmove white
-#? [K3|K4]*
+#? [H3|K3|K4]*
 
+# Tenuki is acceptable. In the local area the game move is bad.
 loadsgf games/FSF-neurogo.sgf 40
 4 gg_genmove white
 #? [D6]*
@@ -28,6 +29,7 @@ loadsgf games/FSF-neurogo.sgf 50
 5 gg_genmove white
 #? [!F8]
 
+# Tenuki is perhaps acceptable.
 loadsgf games/FSF-neurogo.sgf 86
 6 gg_genmove white
 #? [C14]*
@@ -42,7 +44,7 @@ loadsgf games/FSF-neurogo.sgf 92
 
 loadsgf games/FSF-neurogo.sgf 124
 9 gg_genmove white
-#? [S10]*
+#? [A18]*
 
 loadsgf games/FSF-neurogo.sgf 136
 10 gg_genmove white
@@ -60,7 +62,7 @@ loadsgf games/FSF-neurogo.sgf 176
 # This may be hard to fix at this point but since we
 # can't win the ko we shouldn't start it.
 13 gg_genmove white
-#? [!P7]
+#? [!P7]*
 
 loadsgf games/FSF-neurogo.sgf 178
 14 gg_genmove white
@@ -69,8 +71,9 @@ loadsgf games/FSF-neurogo.sgf 178
 loadsgf games/FSF-neurogo.sgf 230
 # double sente
 15 gg_genmove white
-#? [G13]*
+#? [A16]*
 
+# This test may be at the wrong move number.
 loadsgf games/FSF-neurogo.sgf 275
 16 gg_genmove white
 #? [H17|K17|H15|L16]*

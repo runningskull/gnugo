@@ -162,9 +162,9 @@ typedef void (*matchpat_callback_fn_ptr)(int m, int n, int color,
 typedef void (*fullboard_matchpat_callback_fn_ptr)(int ti, int tj,
                                                    struct fullboard_pattern *,
                                                    int rotation);
-void matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
-              struct pattern_db *pdb, void *callback_data,
-              char goal[MAX_BOARD][MAX_BOARD]);
+void global_matchpat(matchpat_callback_fn_ptr callback, int color,
+		     struct pattern_db *pdb, void *callback_data,
+		     char goal[MAX_BOARD][MAX_BOARD]);
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
 
@@ -266,6 +266,7 @@ void set_maximum_territorial_value(int ti, int tj, float value);
 void add_shape_value(int ti, int tj, float value);
 void add_followup_value(int ti, int tj, float value);
 void add_reverse_followup_value(int ti, int tj, float value);
+void add_replacement_move(int ai, int aj, int bi, int bj);
 
 void find_stones_saved_by_move(int i, int j, int color,
                                char saved_stones[MAX_BOARD][MAX_BOARD]);
@@ -424,8 +425,6 @@ void move_considered(int i, int j, float value);
 
 
 /* SGF routines for debugging purposes in sgffile.c */
-void begin_sgfdump(const char *filename);
-void end_sgfdump(void);
 int  sgffile_write_line(const char *, ...);
 void sgffile_dragon_status(int, int, int );
 void goaldump(char goal[MAX_BOARD][MAX_BOARD]);
@@ -477,7 +476,6 @@ extern int chinese_rules;
 
 extern int stackp;                /* stack pointer */
 extern int count_variations;      /* count (decidestring) */
-extern int sgf_dump;              /* writing file (decidestring) */
 extern SGFTree *sgf_dumptree;
 
 

@@ -70,6 +70,7 @@ char dfa_val2asc[4] = {
 
 /* the private board */
 int dfa_p[DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
+int reverse_spiral[8][DFA_MAX_BOARD * 4][DFA_MAX_BOARD * 4];
 
 /* auxiliary dfa's for high level functions */
 static dfa_t aux_dfa1;		/* used to store strings */
@@ -152,6 +153,9 @@ buildSpiralOrder (order_t order[8][MAX_ORDER])
   int top = 0, end = 0;
   int i, j, k, ll;
   int di, dj;
+  int delta;
+
+  
 
   if (dfa_verbose > 1)
     fprintf (stderr, "Building spiral order\n");
@@ -159,7 +163,15 @@ buildSpiralOrder (order_t order[8][MAX_ORDER])
   /* First we build the basic (pseudo)spiral order */
 
   /* initialization */
-  memset (Mark, 1, sizeof (Mark));
+
+  for(i = 0; i != DFA_MAX_BOARD * 4; i++)
+    for(j = 0; j != DFA_MAX_BOARD * 4; j++)
+      {
+	for(ll = 0; ll != 8; ll++)
+	  reverse_spiral[ll][i][j] = MAX_ORDER;
+	Mark[i][j] = 1;
+      }
+
   for (i = DFA_MAX_BOARD; i != DFA_MAX_BOARD * 3; i++)
     for (j = DFA_MAX_BOARD; j != DFA_MAX_BOARD * 3; j++)
       Mark[i][j] = 0;
@@ -177,6 +189,7 @@ buildSpiralOrder (order_t order[8][MAX_ORDER])
       j = fifo[end].j;
       order[0][end].i = i - DFA_MAX_BOARD * 2;
       order[0][end].j = j - DFA_MAX_BOARD * 2;
+      reverse_spiral[0][i][j] = end;
       end++;
 
       for (k = 0; k != 4; k++)
@@ -198,8 +211,12 @@ buildSpiralOrder (order_t order[8][MAX_ORDER])
      on this order */
   for (ll = 1; ll != 8; ll++)
     for (k = 0; k != MAX_ORDER; k++)
-      TRANSFORM (order[0][k].i, order[0][k].j,
-		 &(order[ll][k].i), &(order[ll][k].j), ll);
+      {
+	delta = DFA_MAX_BOARD * 2;
+	TRANSFORM (order[0][k].i, order[0][k].j,
+		   &(order[ll][k].i), &(order[ll][k].j), ll);
+	reverse_spiral[ll][order[ll][k].i + delta][order[ll][k].j + delta] = k;
+      }
 
 }
 

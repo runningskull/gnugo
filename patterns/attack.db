@@ -207,4 +207,19 @@ A.*
 ; lib(A)==1
 
 
+Pattern Attack16
+
+?*X?	Capture with snapback
+O.OX
+?XX?
+
+:8,A
+
+?*X?
+b.OX
+?AA?
+
+;lib(A)==1 && olib(*)>1 && lib(b)>1
+
+
 # END OF FILE

@@ -11,3 +11,11 @@ ttgo.pm   : required by 2ptkgo.pl
 
 gtp2_6    : patch to GNU Go 2.6 allowing use of the gtp with a
             limited command set sufficient to use twogtp.
+
+vanilla.c : Not useful by itself, this program shows how to spawn a gtp
+            process using fork() and exec(). It behaves just like GNU Go
+            and could be modified into any number of useful programs such
+            as a gtp/gmp mediator.
+
+
+

@@ -155,6 +155,7 @@ For exact specification of their arguments and results we refer to the
 comments of the functions in @file{interface/play_gtp.c}.
 
 @node Protocol applications, Protocol conventions, The Go Text Protocol, GTP
+@section Protocol applications
 
 The protocol is asymmetric and involves two parties, which we may
 call @samp{A} and @samp{B}. @samp{A} is typically some kind of arbiter or
@@ -218,6 +219,7 @@ implementing setup 3 are also distributed with GNU Go (the files
 @file{interface/gtp_examples/2ptkgo.pl}).
 
 @node Protocol conventions, Regression with GTP, Protocol applications, GTP
+@section Protocol conventions
 
 The GTP is currently unfinished and unstandardized. It is hoped that it
 will grow to fill the needs currently served by the GMP and perhaps

@@ -153,9 +153,14 @@ report_pattern_profiling()
 /* Forward declarations. */
 
 static void fixup_patterns_for_board_size(struct pattern *pattern);
+static void prepare_for_match (int color);
 static void do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
 			int color, struct pattern *database,
 			void *callback_data, char goal[MAX_BOARD][MAX_BOARD]);
+static void matchpat_loop(matchpat_callback_fn_ptr callback, 
+			  int color, int anchor,
+			  struct pattern_db *pdb, void *callback_data,
+			  char goal[MAX_BOARD][MAX_BOARD]);
 void transform(int i, int j, int *ti, int *tj, int trans);
 void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 
@@ -276,6 +281,32 @@ fixup_patterns_for_board_size(struct pattern *pattern)
 
 }
 
+
+/* 
+ * prepare a pattern matching for color point of view
+ */
+static void
+prepare_for_match(int color)
+{
+  int other = OTHER_COLOR(color);
+
+  /* Basic sanity checks. */
+  gg_assert(color != EMPTY);
+
+  /* If we set one of class_mask[XXX][color] and
+   * class_mask[XXX][other], we have to explicitly set or reset the
+   * other as well, since 'color' may change between calls.
+   */
+  class_mask[DEAD][color]     = CLASS_O;
+  class_mask[DEAD][other]     = CLASS_X;
+  class_mask[CRITICAL][color] = CLASS_O;
+  class_mask[CRITICAL][other] = 0;       /* Need to reset this. */
+  class_mask[ALIVE][color]    = CLASS_o;
+  class_mask[ALIVE][other]    = CLASS_x;
+}
+
+
+
 /* Compute the transform of (i,j) under transformation number trans.
  * *ti and *tj point to the transformed coordinates.
  * ORDER MATTERS : see texinfo documentation for details
@@ -336,25 +367,10 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 	    struct pattern *pattern, void *callback_data,
 	    char goal[MAX_BOARD][MAX_BOARD]) 
 {
-  const int other = OTHER_COLOR(color);
   const int anchor_test = p[m][n] ^ color;  /* see below */
   int merged_val;
 
-  /* If we set one of class_mask[XXX][color] and
-   * class_mask[XXX][other], we have to explicitly set or reset the
-   * other as well, since 'color' may change between calls. Since
-   * class_mask is static, it is only initialized when the program is
-   * first started.
-   */
-  class_mask[DEAD][color] = CLASS_O;
-  class_mask[DEAD][other] = CLASS_X;
-  class_mask[CRITICAL][color] = CLASS_O;
-  class_mask[CRITICAL][other] = 0;       /* Need to reset this. */
-  class_mask[ALIVE][color] = CLASS_o;
-  class_mask[ALIVE][other] = CLASS_x;
-
   /* Basic sanity checks. */
-  gg_assert(color != EMPTY);
   ASSERT_ON_BOARD(m, n);
 
   /* calculate the merged value around [m][n] for the grid opt */
@@ -586,6 +602,26 @@ do_matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
 }
 
 
+/*
+ * Scan the board to get patterns anchored by anchor from color
+ * point of view.
+ * the board must be prepared by dfa_prepare_for_match(color) !
+ */
+static void
+matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
+	 struct pattern_db *pdb, void *callback_data,
+	 char goal[MAX_BOARD][MAX_BOARD]) 
+{
+  int i,j;
+
+  for (i = 0; i != board_size; i++)
+    for (j = 0; j != board_size; j++)
+      if (p[i][j] == anchor)
+	do_matchpat(i, j, callback, color, 
+			pdb->patterns, callback_data, goal);
+}
+
+
 /**************************************************************************/
 /* DFA matcher:                                                           */
 /**************************************************************************/
@@ -607,7 +643,7 @@ const int convert[3][4];
 
 /* Forward declarations. */
 void        dfa_match_init(void);
-static void dfa_compile_for_match (int color);
+static void dfa_prepare_for_match (int color);
 static int  read_board (int ll, int m, int n, int row);
 static int  scan_for_patterns(dfa_t *pdfa, int l, int m, int n, 
 			      int *pat_list);
@@ -623,14 +659,17 @@ static void check_pattern_light (int m, int n,
 		int color, struct pattern *pattern, int ll,
 		void *callback_data,
 		char goal[MAX_BOARD][MAX_BOARD]);
-
+static void dfa_matchpat_loop(matchpat_callback_fn_ptr callback, 
+			      int color, int anchor,
+			      struct pattern_db *pdb, void *callback_data,
+			      char goal[MAX_BOARD][MAX_BOARD]);
 
 
 /***********************************************************************/
 
 
 
-/* prepare the dfa board */
+/* prepare the dfa board (gnugo initialization) */
 static const char *s=" --> using dfa\n";
 
 void
@@ -663,13 +702,12 @@ dfa_match_init(void)
   dfa_board_size = -1;
 }
 
-
 /* 
  * copy the board on a private board with adapted colors 
  * and adapted size 
  */
 static void
-dfa_compile_for_match(int color)
+dfa_prepare_for_match(int color)
 {
   int i,j;
     
@@ -686,7 +724,8 @@ dfa_compile_for_match(int color)
     for (j = 0; j!= dfa_board_size; j++)
       dfa_p[DFA_MAX_BOARD+i][DFA_MAX_BOARD+j] = 
 	EXPECTED_COLOR(color, p[i][j]);
-    
+
+  prepare_for_match(color);
 }
 
 
@@ -762,6 +801,8 @@ scan_for_patterns(dfa_t *pdfa, int l, int m, int n, int *pat_list)
       /* go to next state */
       state = pdfa->states[state].next[read_board(l,m,n,row)];
       row++;
+      
+
     }
 
   ASSERT(row < MAX_ORDER,m,n);
@@ -788,7 +829,6 @@ do_dfa_matchpat(dfa_t *pdfa,
 		int color, struct pattern *database,
 		void *callback_data, char goal[MAX_BOARD][MAX_BOARD])
 {
-  int other = OTHER_COLOR(color);
   int ll;      /* Iterate over transformations (rotations or reflections)  */
   int matched; /* index in database[] of the matched pattern */
 
@@ -796,22 +836,12 @@ do_dfa_matchpat(dfa_t *pdfa,
   int *preorder = reorder;
   int maxr = 0, k;
 
-  class_mask[DEAD][color]     = CLASS_O;
-  class_mask[DEAD][other]     = CLASS_X;
-  class_mask[CRITICAL][color] = CLASS_O;
-  class_mask[CRITICAL][other] = 0;       /* Need to reset this. */
-  class_mask[ALIVE][color]    = CLASS_o;
-  class_mask[ALIVE][other]    = CLASS_x;
-
   /* Basic sanity checks. */
-  gg_assert(color != EMPTY);
   ASSERT_ON_BOARD(m, n);
 
-
   /* Geometrical pattern matching */
-
-  dfa_compile_for_match(color); 
   maxr = 0;
+
   /* one scan by transformation */
   for(ll = 0; ll != 8; ll++)
     {
@@ -927,11 +957,27 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 } /* check_pattern_light */
 
 
+/*
+ * Scan the board to get patterns anchored by anchor from color
+ * point of view.
+ * the board must be prepared by dfa_prepare_for_match(color) !
+ */
+static void
+dfa_matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
+	 struct pattern_db *pdb, void *callback_data,
+	 char goal[MAX_BOARD][MAX_BOARD]) 
+{
+  int i,j;
+
+  for (i = 0; i != board_size; i++)
+    for (j = 0; j != board_size; j++)
+      if (p[i][j] == anchor)
+	do_dfa_matchpat(pdb->pdfa,i, j, callback, color, pdb->patterns, 
+			callback_data, goal);
+}
+
+
 #endif /* DFA_ENABLED */
-
-
-
-
 
 
 
@@ -939,35 +985,73 @@ check_pattern_light(int m, int n, matchpat_callback_fn_ptr callback, int color,
 /* Main functions:                                                        */
 /**************************************************************************/
 
-/* Select which matcher (standard or dfa) will be used
- * and call the appropriate internal function.
- * Check also if the pattern database has been 
- * prepared for matching on a board of this size.
+
+typedef void (*loop_fn_ptr_t)(matchpat_callback_fn_ptr callback, 
+			 int color, int anchor,
+			 struct pattern_db *pdb, void *callback_data,
+			 char goal[MAX_BOARD][MAX_BOARD]);
+
+typedef void (*prepare_fn_ptr_t)(int color);
+
+/* same as the old matchpat but for all the board with
+ * preparation.
+ *
+ * 4 possible values for color argument:
+ * WHITE or BLACK: matchpat is called from this color point of view.
+ * ANCHOR_COLOR  : matchpat is called from the anchor's point of view.
+ * ANCHOR_OTHER  : matchpat is called from the opposite color of the 
+ *                 anchor's point of view.
  */
+
 void
-matchpat(int m, int n, matchpat_callback_fn_ptr callback, int color,
+global_matchpat(matchpat_callback_fn_ptr callback, int color,
 	 struct pattern_db *pdb, void *callback_data,
 	 char goal[MAX_BOARD][MAX_BOARD]) 
 {
+  loop_fn_ptr_t loop = matchpat_loop;
+  prepare_fn_ptr_t prepare = prepare_for_match;
 
+  /* check board size */
   if (pdb->fixed_for_size != board_size) {
     fixup_patterns_for_board_size(pdb->patterns);
     pdb->fixed_for_size = board_size;
   }
 
+  /* select pattern matching strategy */
 #if DFA_ENABLED > 0
-
-  if (pdb->pdfa != NULL) {
-    /* dfa matcher */
-    
-    do_dfa_matchpat(pdb->pdfa,m, n, callback, color, pdb->patterns, 
-		    callback_data, goal);
-    return;
-  }
+  if (pdb->pdfa != NULL)
+    { 
+      loop = dfa_matchpat_loop;
+      prepare = dfa_prepare_for_match;
+    }
 #endif
-  
-  /* standard matcher */
-  do_matchpat(m, n, callback, color, pdb->patterns, callback_data, goal);
+
+  /* select strategy */
+  switch(color)
+    {
+    case ANCHOR_COLOR:
+      { /* match pattern for the color of their anchor */
+	prepare (WHITE);
+	loop(callback, WHITE, WHITE, pdb, callback_data, goal);
+	prepare (BLACK);
+	loop(callback, BLACK, BLACK, pdb, callback_data, goal);
+      }
+      break;
+    case ANCHOR_OTHER:
+      { /* match pattern for the opposite color of their anchor */
+	prepare (WHITE);
+	loop(callback, WHITE, BLACK, pdb, callback_data, goal);
+	prepare (BLACK);
+	loop(callback, BLACK, WHITE, pdb, callback_data, goal);
+      }
+      break;
+    default:
+      { /* match all patterns for color */
+	prepare (color);
+	loop(callback, color, WHITE, pdb, callback_data, goal);
+	loop(callback, color, BLACK, pdb, callback_data, goal);
+      }
+    }
 }
 
 

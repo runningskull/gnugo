@@ -58,9 +58,9 @@
  */
 static int gtp_boardsize = -1;
 
-/* Read stdin linewise and interpret as GTP commands. */
+/* Read filehandle gtp_input linewise and interpret as GTP commands. */
 void
-gtp_main_loop(struct gtp_command commands[])
+gtp_main_loop(struct gtp_command commands[], FILE *gtp_input)
 {
   char line[GTP_BUFSIZE];
   char command[GTP_BUFSIZE];
@@ -71,8 +71,8 @@ gtp_main_loop(struct gtp_command commands[])
   int status = GTP_OK;
   
   while (status == GTP_OK) {
-    /* Read a line from stdin. */
-    if (!fgets(line, GTP_BUFSIZE, stdin))
+    /* Read a line from gtp_input. */
+    if (!fgets(line, GTP_BUFSIZE, gtp_input))
       break; /* EOF or some error */
 
     /* Remove comments. */
