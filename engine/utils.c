@@ -685,9 +685,6 @@ set_depth_values(int level, int report_levels)
 
   /*
    * Other policies depending on level:
-   * aftermath.c:   >=  8: call estimate_score().
-   * dragon.c:      >=  8: compute owl threats (currently disabled)
-   * genmove.c:     >=  8: call estimate_score().
    * owl.c:         >=  9: use vital attack pattern database
    *                >=  8: increase depth values in owl_substantial
    *                >=  8: don't turn off owl_phase in semeai reading
@@ -1467,7 +1464,7 @@ who_wins(int color, FILE *outfile)
   }
 #endif
 
-  result = estimate_score(NULL, NULL);
+  result = (white_score + black_score)/2.0;
   if (result == 0.0)
     fprintf(outfile, "Result: jigo   ");
   else

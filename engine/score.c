@@ -343,7 +343,7 @@ print_new_moyo(int dilations, int erosions)
  */
 
 float
-estimate_score(float *upper, float *lower)
+old_estimate_score(float *upper, float *lower)
 {
   int gb[BOARDMAX];
 

@@ -2105,11 +2105,8 @@ influence_delta_territory(const struct influence_data *base,
 
 
 /* Estimate the score. A positive value means white is ahead. The
- * score is estimated from the initial_influence, which must have been
- * computed in advance. The score estimate does not include captured
- * stones (i.e., the ones having been removed from the board) or komi.
- * moyo_coeff and area_coeff are the relative weights to be used for
- * the moyo and area difference respectively.
+ * score is estimated influence data *q, which must have been
+ * computed in advance.
  */
 float
 influence_score(const struct influence_data *q)
@@ -2120,7 +2117,7 @@ influence_score(const struct influence_data *q)
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii))
       score += q->territory_value[ii];
-  score += black_captured - white_captured;
+  score += black_captured - white_captured + komi;
 
   return score;
 }

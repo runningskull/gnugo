@@ -909,7 +909,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_MOYO;
 	  examine_position(EXAMINE_DRAGONS);
-	  print_moyo();
 	  printmoyo = tmp;
 	  break;
 
@@ -917,7 +916,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_TERRITORY;
 	  examine_position(EXAMINE_DRAGONS);
-	  print_moyo();
 	  printmoyo = tmp;
 	  break;
 
@@ -925,7 +923,6 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	  tmp = printmoyo;
 	  printmoyo = PRINTMOYO_AREA;
 	  examine_position(EXAMINE_DRAGONS);
-	  print_moyo();
 	  printmoyo = tmp;
 	  break;
 
@@ -1028,7 +1025,7 @@ ascii_endgame(Gameinfo *gameinfo, int reason)
     gnugo_who_wins(gameinfo->computer_player, stdout);
     printf("\nIf you disagree, we may count the game together.\n");
 
-    sgftreeWriteResult(&sgftree, estimate_score(NULL, NULL), 1);
+    sgftreeWriteResult(&sgftree, (white_score + black_score)/2.0, 1);
   }
   else {
     int color = OTHER_COLOR(gameinfo->to_move);

@@ -669,7 +669,6 @@ void break_territories(int color_to_move, struct influence_data *q,
 void clear_break_in_list(void);
 void break_in_move_reasons(int color);
 
-float estimate_score(float *upper, float *lower);
 void choose_strategy(int color, float our_score, float game_status);
 
 /* Eye space functions. */
@@ -950,6 +949,7 @@ struct dragon_data2 *dragon2_func(int pos);
 
 #define DRAGON(d) dragon[dragon2[d].origin]
 
+extern float white_score, black_score;
 
 /* Global variables to tune strategy. */
 

@@ -370,9 +370,6 @@ int crude_status(int pos);
 int dragon_status(int pos);
 int same_dragon(int dr1, int dr2);
 
-/* moyo functions */
-void print_moyo(void);
-
 /* debugging functions */
 void prepare_pattern_profiling(void);
 void report_pattern_profiling(void);

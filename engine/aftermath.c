@@ -831,7 +831,6 @@ reduced_genmove(int color)
 {
   float value;
   int save_verbose;
-  float upper_bound, lower_bound;
   float our_score;
   int move;
 
@@ -845,29 +844,13 @@ reduced_genmove(int color)
   /* Find out information about the worms and dragons. */
   examine_position(EXAMINE_ALL);
 
-  /* Make a score estimate. This can be used in later stages of the 
-   * move generation.  If we are ahead, we can play safely and if
-   * we are behind, we have to play more daringly.
-   */
-  estimate_score(&upper_bound, &lower_bound);
-  if (verbose || showscore) {
-    if (lower_bound == upper_bound)
-      gprintf("\nScore estimate: %s %f\n",
-	      lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound));
-    else
-      gprintf("\nScore estimate: %s %f to %s %f\n",
-	      lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound),
-	      upper_bound > 0 ? "W " : "B ", gg_abs(upper_bound));
-    fflush(stderr);
-  }
-
   /* The score will be used to determine when we are safely
    * ahead. So we want the most conservative score.
    */
   if (color == WHITE)
-    our_score = lower_bound;
+    our_score = black_score;
   else
-    our_score = -upper_bound;
+    our_score = -white_score;
 
   gg_assert(stackp == 0);
   

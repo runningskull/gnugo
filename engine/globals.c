@@ -131,6 +131,8 @@ int gtp_version         = 2;    /* Use GTP version 2 by default. */
 
 float best_move_values[10];
 int   best_moves[10];
+float white_score;
+float black_score;
 
 int close_worms[BOARDMAX][4];
 int number_close_worms[BOARDMAX];

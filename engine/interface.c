@@ -353,7 +353,9 @@ float
 gnugo_estimate_score(float *upper, float *lower)
 {
   silent_examine_position(EXAMINE_DRAGONS);
-  return estimate_score(upper, lower);
+  *upper = white_score;
+  *lower = black_score;
+  return ((white_score + black_score)/2.0);
 }
 
 

@@ -3379,9 +3379,7 @@ gtp_estimate_score(char *s)
   float upper_bound, lower_bound;
   UNUSED(s);
 
-  silent_examine_position(EXAMINE_DRAGONS);
-  
-  score = estimate_score(&upper_bound, &lower_bound);
+  score = gnugo_estimate_score(&upper_bound, &lower_bound);
   gtp_start_response(GTP_SUCCESS);
   /* Traditionally W wins jigo */
   if (score >= 0.0) 
@@ -3416,7 +3414,7 @@ gtp_experimental_score(char *s)
     return gtp_failure("invalid color");
 
   genmove_conservative(color, NULL);
-  estimate_score(&upper_bound, &lower_bound);
+  gnugo_estimate_score(&upper_bound, &lower_bound);
 
   if (debug & DEBUG_SCORING)
     fprintf(stderr, "upper = %3.1f, lower = %3.1f, best = %3.1f\n",

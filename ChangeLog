@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- use influence-based score estimate instead of Bouzy's algorithm
+- new global variable white_score, black_score
+- should_resign() now depends on optimistic_score instead of average_score
 - added support for GTP over TCP/IP sockets on Windows
 - new static function all_own_neighbors_inessential() in aftermath.c
 - do_aftermath_genmove() revised

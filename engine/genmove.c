@@ -54,7 +54,8 @@ static int revise_thrashing_dragon(int color, float our_score,
 
 static void break_mirror_go(int color);
 static int find_mirror_move(int *move, int color);
-static int should_resign(int color, float our_score, int move);
+static int should_resign(int color, float optimistic_score, int move);
+static void compute_scores(void);
 
 
 /* Reset some things in the engine. 
@@ -148,6 +149,7 @@ examine_position(int how_much)
     
     if (NEEDS_UPDATE(dragons_examined)) {
       make_dragons(0);
+      compute_scores();
       /* We have automatically done a partial dragon analysis as well. */
       dragons_examined_without_owl = position_number;
     }
@@ -161,6 +163,7 @@ examine_position(int how_much)
 	   || how_much == EXAMINE_DRAGONS
 	   || how_much == EXAMINE_ALL) {
     initialize_dragon_data();
+    compute_scores();
     verbose = save_verbose;
     gg_assert(test_gray_border() < 0);
     return;
@@ -292,8 +295,7 @@ static int
 do_genmove(int color, float pure_threat_value,
 	   int allowed_moves[BOARDMAX], float *value, int *resign)
 {
-  float upper_bound, lower_bound;
-  float average_score, our_score;
+  float average_score, pessimistic_score, optimistic_score;
   int save_verbose;
   int save_depth;
   int move;
@@ -345,27 +347,6 @@ do_genmove(int color, float pure_threat_value,
   examine_position(EXAMINE_ALL);
   time_report(1, "examine position", NO_MOVE, 1.0);
 
-  /* Make a score estimate. This can be used in later stages of the 
-   * move generation.  If we are ahead, we can play safely and if
-   * we are behind, we have to play more daringly.
-   */
-  estimate_score(&upper_bound, &lower_bound);
-  if (verbose || showscore) {
-    if (lower_bound == upper_bound)
-      gprintf("\nScore estimate: %s %f\n",
-	      lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound));
-    else
-      gprintf("\nScore estimate: %s %f to %s %f\n",
-	      lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound),
-	      upper_bound > 0 ? "W " : "B ", gg_abs(upper_bound));
-    fflush(stderr);
-  }
-  time_report(1, "estimate score", NO_MOVE, 1.0);
-  if (color == WHITE)
-    average_score = (upper_bound + lower_bound)/2.0;
-  else
-    average_score = -(upper_bound + lower_bound)/2.0;
-  choose_strategy(color, average_score, game_status(color));
 
   /* The score will be used to determine when we are safely
    * ahead. So we want the most conservative score.
@@ -373,17 +354,21 @@ do_genmove(int color, float pure_threat_value,
    * We always want to have the score from our point of view. So
    * negate it if we are black.
    */
-  if (color == WHITE)
-    our_score = lower_bound;
-  else
-    our_score = -upper_bound;
+  if (color == WHITE) {
+    pessimistic_score = black_score;
+    optimistic_score = white_score;
+  }
+  else {
+    pessimistic_score = -white_score;
+    optimistic_score = -black_score;
+  }
 
-  /*
-   * Print some of the information if the user wants to.
-   */
-  if (printmoyo)
-    print_moyo();
-  
+  if (color == WHITE)
+    average_score = (white_score + black_score)/2.0;
+  else
+    average_score = -(white_score + black_score)/2.0;
+  choose_strategy(color, average_score, game_status(color));
+
   if (printboard) {
     if (printboard == 1)
       fprintf(stderr, "\n          dragon_status display:\n\n");
@@ -427,7 +412,7 @@ do_genmove(int color, float pure_threat_value,
    */
   if (!doing_scoring && !limit_search)
     use_thrashing_dragon_heuristics
-      = revise_thrashing_dragon(color, our_score, 5.0);
+      = revise_thrashing_dragon(color, pessimistic_score, 5.0);
   
   /* The general pattern database. */
   shapes(color);
@@ -441,7 +426,7 @@ do_genmove(int color, float pure_threat_value,
 
   /* Review the move reasons and estimate move values. */
   if (review_move_reasons(&move, value, color, 
-			  pure_threat_value, our_score, allowed_moves,
+			  pure_threat_value, pessimistic_score, allowed_moves,
 			  use_thrashing_dragon_heuristics))
     TRACE("Move generation likes %1m with value %f\n", move, *value);
   gg_assert(stackp == 0);
@@ -453,8 +438,8 @@ do_genmove(int color, float pure_threat_value,
     endgame_shapes(color);
     endgame(color);
     gg_assert(stackp == 0);
-    if (review_move_reasons(&move, value, color, pure_threat_value, our_score,
-			    allowed_moves,
+    if (review_move_reasons(&move, value, color, pure_threat_value,
+	  		    pessimistic_score, allowed_moves,
 			    use_thrashing_dragon_heuristics))
       TRACE("Move generation likes %1m with value %f\n", move, *value);
     gg_assert(stackp == 0);
@@ -470,7 +455,7 @@ do_genmove(int color, float pure_threat_value,
       shapes(color);
       endgame_shapes(color);
       if (review_move_reasons(&move, value, color, pure_threat_value,
-			      our_score, allowed_moves,
+			      pessimistic_score, allowed_moves,
 			      use_thrashing_dragon_heuristics)) {
 	TRACE("Upon reconsideration move generation likes %1m with value %f\n",
 	      move, *value); 
@@ -500,7 +485,7 @@ do_genmove(int color, float pure_threat_value,
   if (move == PASS_MOVE && !doing_scoring) {
     if (play_out_aftermath 
 	|| capture_all_dead 
-	|| (thrashing_dragon && our_score > 15.0))
+	|| (thrashing_dragon && pessimistic_score > 15.0))
       move = aftermath_genmove(color, 0, allowed_moves);
       
     /* If we're instructed to capture all dead opponent stones, generate
@@ -530,7 +515,7 @@ do_genmove(int color, float pure_threat_value,
   /* Maybe time to resign...
    */
   if (resign && resign_allowed
-      && *value < 10.0 && should_resign(color, our_score, move)) {
+      && *value < 10.0 && should_resign(color, optimistic_score, move)) {
     TRACE("... though, genmove() thinks the position is hopeless\n");
     *resign = 1;
   }
@@ -709,6 +694,37 @@ find_mirror_move(int *move, int color)
   return 0;
 }
 
+/* Computer two territory estimates: for *upper, the status of all
+ * cricital stones gets resolved in White's favor; vice verso for
+ * black.
+ */
+static void
+compute_scores()
+{
+  char safe_stones[BOARDMAX];
+  float strength[BOARDMAX];
+
+  set_strength_data(WHITE, safe_stones, strength);
+  compute_influence(EMPTY, safe_stones, strength, &move_influence,
+      		    NO_MOVE, "White territory estimate");
+  white_score = influence_score(&move_influence);
+  set_strength_data(BLACK, safe_stones, strength);
+  compute_influence(EMPTY, safe_stones, strength, &move_influence,
+      		    NO_MOVE, "White territory estimate");
+  black_score = influence_score(&move_influence);
+
+  if (verbose || showscore) {
+    if (white_score == black_score)
+      gprintf("Score estimate: %s %f\n",
+	      black_score > 0 ? "W " : "B ", gg_abs(black_score));
+    else
+      gprintf("Score estimate: %s %f to %s %f\n",
+	      black_score > 0 ? "W " : "B ", gg_abs(black_score),
+	      white_score > 0 ? "W " : "B ", gg_abs(white_score));
+    fflush(stderr);
+  }
+}
+
 
 /* Detect if a white opponent has played mirror go for at least 10
  * moves and if so play on tengen.
@@ -733,7 +749,7 @@ break_mirror_go(int color)
 /* Helper to decide whether GG should resign a game
  */
 static int
-should_resign(int color, float our_score, int move)
+should_resign(int color, float optimistic_score, int move)
 {
   float status;
   int d;
@@ -750,7 +766,7 @@ should_resign(int color, float our_score, int move)
   
   if (move == PASS_MOVE
       || board_size < 19
-      || our_score > -45.0)
+      || optimistic_score > -45.0)
     return 0;
   /* Check dragon statuses. If a friendly dragon is critical, we are
    * possibly not that much behind after we save it. If some hostile

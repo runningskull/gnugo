@@ -3772,14 +3772,12 @@ choose_strategy(int color, float our_score, float game_status)
 void
 prepare_move_influence_debugging(int pos, int color)
 {
-  float lower_bound, upper_bound;
   float our_score;
   
-  estimate_score(&upper_bound, &lower_bound);
   if (color == WHITE)
-    our_score = lower_bound;
+    our_score = black_score;
   else
-    our_score = -upper_bound;
+    our_score = -white_score;
 
   estimate_territorial_value(pos, color, our_score, 1);
 }
