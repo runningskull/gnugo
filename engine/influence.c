@@ -1087,6 +1087,98 @@ find_influence_patterns(struct influence_data *q, int color)
   reset_unblocked_blocks(q);
 }
 
+/* This function checks whether we have two or more adjacent blocks for
+ * influence of color next to pos. If yes, it returns the position of the
+ * least valuable blocks; otherwise, it returns NO_MOVE.
+ */
+static int
+check_double_block(int color, int pos, const struct influence_data *q)
+{
+  int k;
+  int block_neighbors = 0;
+  const float *permeability = ((color == BLACK) ? q->black_permeability :
+						  q->white_permeability);
+
+  /* Count neighboring blocks. */
+  for (k = 0; k < 4; k++)
+    if (board[pos + delta[k]] == EMPTY && permeability[pos + delta[k]] == 0.0)
+      block_neighbors++;
+
+  if (block_neighbors >= 2) {
+    /* Search for least valuable block. */
+    float smallest_value = 4.0 * MAX_BOARD * MAX_BOARD;
+    int smallest_block = NO_MOVE;
+    /* We count opponent's territory as positive. */
+    float sign = ((color == WHITE) ? -1.0 : 1.0);
+    for (k = 0; k < 4; k++) {
+      int neighbor = pos + delta[k];
+      if (board[neighbor] == EMPTY && permeability[neighbor] == 0.0) {
+	/* Value is sum of opponents territory at this and all 4 neighboring
+	 * intersections.
+	 */
+	float this_value = sign * q->territory_value[neighbor];
+	int j;
+	for (j = 0; j < 4; j++)
+	  if (ON_BOARD(neighbor + delta[j]))
+	    this_value += sign * q->territory_value[neighbor + delta[j]];
+	/* We use an artifical tie breaker to avoid possible platform
+	 * dependency.
+	 */
+	if (this_value + 0.0005 < smallest_value) {
+	  smallest_block = neighbor;
+	  smallest_value = this_value;
+	}
+      }
+    }
+    ASSERT1(ON_BOARD1(smallest_block), pos);
+    return smallest_block;
+  }
+  return NO_MOVE;
+}
+
+#define MAX_DOUBLE_BLOCKS 20 
+
+
+/* This function checks for the situation where an influence source for
+ * the color to move is direclty neighbored by 2 or more influence blocks.
+ * It then removes the least valuable of these blocks, and re-runs the
+ * influence accumulation for this position.
+ *
+ * See endgame:840 for an example where this is essential.
+ */
+static void
+remove_double_blocks(struct influence_data *q,
+    		     const char inhibited_sources[BOARDMAX])
+{
+  int ii;
+  float *strength = ((q->color_to_move == WHITE) ? q->white_strength :
+      						   q->black_strength);
+  int double_blocks[MAX_DOUBLE_BLOCKS];
+  int num_blocks = 0;
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (board[ii] == EMPTY
+	&& !(inhibited_sources && inhibited_sources[ii])
+	&& strength[ii] > 0.0) {
+      double_blocks[num_blocks] = check_double_block(q->color_to_move, ii, q);
+      if (double_blocks[num_blocks] != NO_MOVE) {
+	num_blocks++;
+	if (num_blocks == MAX_DOUBLE_BLOCKS)
+	  break;
+      }
+    }
+  {
+    int k;
+    float *permeability = ((q->color_to_move == BLACK)
+			   ? q->black_permeability : q->white_permeability);
+    for (k = 0; k < num_blocks; k++) {
+      DEBUG(DEBUG_INFLUENCE, "Removing block for %s at %1m.\n",
+	    q->color_to_move, double_blocks[k]);
+      permeability[double_blocks[k]] = 1.0;
+      accumulate_influence(q, double_blocks[k], q->color_to_move);
+    }
+  }
+}
+
 
 /* Do the real work of influence computation. This is called from
  * compute_influence and compute_escape_influence.
@@ -1114,6 +1206,9 @@ do_compute_influence(int color, const char safe_stones[BOARDMAX],
       if (q->black_strength[ii] > 0.0)
 	accumulate_influence(q, ii, BLACK);
     }
+
+  value_territory(q);
+  remove_double_blocks(q, inhibited_sources);
 
   value_territory(q);
   segment_influence(q);

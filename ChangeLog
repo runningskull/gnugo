@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new functions remove_double_blocks(), check_double_block() to improve
+  territorial evaluation at places where an intrusion is possible
 - stop using worm data at stackp==0 in does_attack() and does_defend()
 - concerns_noncritical_dragon() revised
 - BOARD_MIN reduced to 2
