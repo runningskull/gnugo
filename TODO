@@ -71,18 +71,12 @@ order of perceived difficulty.
    half_eye_data, worm and dragon to use the same structure as the
    dragon2 array.
 
- * Implement persistent caching in the semeai code. 
-
  * Support for ko in eyes.db and optics.c.
 
  * Integrate the time handling code in play_gtp.c with the autolevel
    code in clock.c. Alternatively, replace them both with something
    better. Basing it on some solid system identification theory and/or
    control theory wouldn't hurt.
-
- * Create a paradigm for handling other types of ko (approach move ko,
-   multi-step ko, etc) and then write code that handles them. 
-   (Difficult!)
 
  * Write a script which plays through the joseki databases and checks
    that the engine really generates a joseki move for all positions in
@@ -178,16 +172,11 @@ are presented here for inspiration.
  * Making the engine use many machines loosely connected on the
    internet or in a cluster.
 
- * Think on the opponents time.
+ * Think on the opponent's time.
 
  * A global alpha-beta reader.  This would probably be very slow and
    could only read 2 or 3 moves ahead.  Still it could find fatal
    errors and improve the moves that GNU Go makes.
-
- * A pattern based tactical reader instead of the hard coded one.
-   This could be made stronger than the current by taking into account
-   more moves.  The challenge is to keep it on focus so that the
-   reading does not take forever.
 
  * A strategic module that identifies high-level goals and then gives
    these goals to the rest of the engine.  It should be able to
@@ -215,3 +204,7 @@ are presented here for inspiration.
    in doing machine learning experiments with GNU Go could try
    working with fuseki. This may be one of the areas with most
    potential for substantial and reasonably quick improvements.
+
+ * Create a paradigm for handling other types of ko (approach move ko,
+   multi-step ko, etc) and then write code that handles them. 
+
