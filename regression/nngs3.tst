@@ -531,4 +531,7 @@ loadsgf games/nngs/gnugo-3.3.8-evand-200209130704.sgf 162
 1130 gg_genmove white
 #? [S7]*
 
-
+# Owl mistake. Semeai module is not called.
+loadsgf games/nngs/gnugo-3.3.9-joshj-200210181607.sgf 102
+1140 gg_genmove white
+#? [B19]*
