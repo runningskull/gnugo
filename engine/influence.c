@@ -1842,9 +1842,6 @@ retrieve_delta_territory_cache(int pos, int color, float *move_value,
   ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), pos);
 
-#if 1
-  return 0;
-#endif
   /* We check whether the color, the board position, or the base influence
    * data has changed since the cache entry got entered.
    */
