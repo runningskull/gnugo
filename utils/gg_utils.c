@@ -29,7 +29,8 @@
 #include <glib.h>
 #endif
 
-#define UNUSED(x)  x=x
+/* Avoid compiler warnings with unused parameters */
+#define UNUSED(x)  (void)x
 
 /* Define TERMINFO or ANSI_COLOR to enable coloring of pieces.
  * This is normally done in config.h.

@@ -30,7 +30,7 @@
 #define gg_min(a, b) ((a)<(b) ? (a) : (b))
 #define gg_max(a, b) ((a)<(b) ? (b) : (a))
 
-/* not sure if this is the best way of doing this, but... */
+/* Avoid compiler warnings with unused parameters */
 #define UNUSED(x)  (void)x
 
 

@@ -345,7 +345,8 @@ show_current_info()
 
 #else /* !CURSES */
 
-#define UNUSED(x) x=x;
+/* Avoid compiler warnings with unused parameters */
+#define UNUSED(x)  (void)x
 
 int
 main(int argc, char *argv[])

@@ -93,8 +93,8 @@ Usage : mkpat [-cvh] <prefix>\n\
 #define MAXPARAMS 15
 #define MAX_INPUT_FILE_NAMES 10
 
-#define UNUSED(x)  x=x
-
+/* Avoid compiler warnings with unused parameters */
+#define UNUSED(x)  (void)x
 
 /* valid characters that can appear in a pattern
  * position in string is att value to store
