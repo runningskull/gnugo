@@ -254,7 +254,7 @@ void reading_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 int liberty_of_string(int pos, int str);
 int neighbor_of_string(int pos, int str);
 int same_string(int str1, int str2);
-int are_neighbor_strings(int str1, int str2);
+int adjacent_strings(int str1, int str2);
 int is_ko(int pos, int color, int *ko_pos);
 int is_ko_point(int pos);
 int komaster_trymove(int pos, int color,
@@ -292,6 +292,8 @@ void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 void find_cuts(void);
 void find_connections(void);
 void modify_eye_spaces(void);
+int recursive_connect (int str1, int str2, int connect_depth);
+int recursive_disconnect (int str1, int str2, int connect_depth);
 
 /* functions to add (or remove) move reasons */
 void clear_move_reasons(void);

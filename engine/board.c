@@ -1650,7 +1650,7 @@ same_string(int str1, int str2)
  */
 
 int
-are_neighbor_strings(int str1, int str2)
+adjacent_strings(int str1, int str2)
 {
   int s1, s2;
   int k;

@@ -34,6 +34,7 @@ libengine_a_SOURCES = \
       optics.c \
       owl.c \
       printutils.c \
+      readconnect.c \
       reading.c \
       score.c \
       semeai.c \
