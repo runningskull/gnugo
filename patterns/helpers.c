@@ -426,12 +426,23 @@ threaten_to_save_helper(int move, int str)
  * XXXXO.
  *
  * where X can get out of atari with profit by capturing three O stones.
+ *
+ * Another case where we don't award the followup value is when the
+ * opponent can defend with a threat against our move, e.g. in this
+ * position:
+ *
+ * .OOOXX.
+ * .OXXO.X
+ * ..*.X..
+ * ..XX...
+ * 
  */
 
 void
 threaten_to_capture_helper(int move, int str)
 {
   int adj, adjs[MAXCHAIN];
+  int defense_move;
   int k;
   
   adj = chainlinks2(str, adjs, 1);
@@ -439,8 +450,23 @@ threaten_to_capture_helper(int move, int str)
     if (worm[adjs[k]].defend_codes[0] != 0
 	&& !does_defend(move, adjs[k]))
       return;
-    
+
+  if (!TRYMOVE(move, OTHER_COLOR(board[str])))
+    return;
+  if (find_defense(str, &defense_move) != 0
+      && defense_move != NO_MOVE
+      && TRYMOVE(defense_move, board[str])) {
+    if (board[move] == EMPTY || attack(move, NULL) != 0) {
+      popgo();
+      popgo();
+      return;
+    }
+    popgo();
+  }
+  popgo();
+  
   add_followup_value(move, 2.0 * worm[str].effective_size);
+  TRACE("...followup value %f\n", 2.0 * worm[str].effective_size);
 }
 
 

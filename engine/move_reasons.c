@@ -2732,6 +2732,9 @@ estimate_territorial_value(int pos, int color, float score)
        * attacking that worm. We make at most one adjustment
        * of each type.
        *
+       * No followup value is awarded if the defense move is a threat
+       * back on our move because we're likely to end in gote then.
+       *
        * FIXME: It might be possible that parts of the dragon
        *        can be cut in the process of capturing the (aa)
        *        worm. In that case, not the entire size of the 
@@ -2747,14 +2750,15 @@ estimate_territorial_value(int pos, int color, float score)
        *        a structured manner.
        */
 
-      if (trymove(pos, color, "estimate_territorial_value",
-		   NO_MOVE, EMPTY, NO_MOVE)) {
+      if (trymove(pos, color, "estimate_territorial_value-A",
+		  NO_MOVE, EMPTY, NO_MOVE)) {
 	int adjs[MAXCHAIN];
 	float adjusted_value = 2 * worm[aa].effective_size;
 	float adjustment_up = 0.0;
 	float adjustment_down = 0.0;
 	int s;
 	int num_adj;
+	int defense_move;
 
 	/* In rare cases it may happen that the trymove() above
          * actually removed the string at aa.
@@ -2764,6 +2768,27 @@ estimate_territorial_value(int pos, int color, float score)
 	else
 	  num_adj = chainlinks(aa, adjs);
 
+	/* No followup value if string can be defended with threat
+         * against our move.
+	 *
+	 * FIXME: This is somewhat halfhearted since only one defense
+	 * move is tested.
+	 */
+	if (board[aa] != EMPTY
+	    && find_defense(aa, &defense_move) != 0
+	    && defense_move != NO_MOVE) {
+	  if (trymove(defense_move, OTHER_COLOR(color),
+		      "estimate_territorial_value-b", NO_MOVE,
+		      EMPTY, NO_MOVE)) {
+	    if (board[pos] == EMPTY || attack(pos, NULL) != 0) {
+	      popgo();
+	      popgo();
+	      break;
+	    }
+	    popgo();
+	  }
+	}
+	
 	for (s = 0; s < num_adj; s++) {
 	  int adj = adjs[s];
 
@@ -3038,7 +3063,7 @@ estimate_territorial_value(int pos, int color, float score)
    */
   this_value = 0.0;
 
-  if (move[pos].move_safety == 1)
+  if (move[pos].move_safety == 1 && safe_move(pos, color) == WIN)
     saved_stones[pos] = INFLUENCE_SAVED_STONE;
   else
     saved_stones[pos] = INFLUENCE_CAPTURED_STONE;
