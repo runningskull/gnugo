@@ -2,7 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.5.10 released August 7, 2004
+- compile fix for VC/Tru64
+
+3.5.11 released September 11, 2004
 
 - use int arrays instead of char arrays to mark eyes in 
   owl_determine_life() and dependent functions
