@@ -380,6 +380,19 @@
 
 @end example
 
+@cindex move_history
+@item move_history
+
+@example
+
+ Function:  Print the move history in reverse order
+ Arguments: none
+ Fails:     never
+ Returns:   List of moves played in reverse order in format: 
+            color move (one move per line)
+
+@end example
+
 @cindex trymove
 @item trymove
 

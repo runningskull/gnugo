@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- copyright notices added to xpm files
+- gnugo.el brought up to Thi's gnugo.el-2.2.8
+- new gtp_move_history() for use with gnugo.el
+- minor doc revision
 - capture_non_invincible_strings() and unconditional_life() moved from
   utils.c to unconditional.c
 - resignation option reverted from GTP commands genmove_black and
