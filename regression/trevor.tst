@@ -4,11 +4,39 @@ loadsgf games/trevor/trevor_01.sgf 28
 #? [G5]
 
 #probably a screwed up fuseki library!
+#CATEGORY=JOSEKI_DATABASE
+#DIFFICULTY=1
 loadsgf games/trevor/trevor_02.sgf
 2 gg_genmove white
 #? [!PASS]*
 
 # underlying reading problem
+#Gunnar wrote:
+#
+#> ./gnugo --quiet -a -w -t -l ../regression/games/unsorted_03.sgf -L 29
+#> --decide-string E4 -o vars.sgf
+#> 
+#> giving the result
+#> 
+#> | E4 cannot be attacked (874 variations)
+#> 
+#> So here's the problem. Usually GNU Go is quite strong at tactical
+#> reading and it might be expected to read this position correctly.
+#> Closer analysis of the vars.sgf file shows that GNU Go is confused by
+#> a few meaningless stalling moves from white (like throwin at D5 and
+#> atari at F6) and the corner ko potential. This can probably be fixed,
+#> but it's not easy and it may involve complex tradeoffs between speed
+#> and accuracy.
+#
+#If you increase the level, it sees the attack but misses that
+#it is unconditional. It sees a ko in the corner after
+#
+#B:G4 W:F2 B:H2 W:H3 B:H4 W:H1 B:J3 etc.
+#
+#Dan
+#CATEGORY=TACTICAL_READING
+#DIFFICULTY=8
+#PREDECESSOR=reading.tst.154
 loadsgf games/trevor/trevor_03.sgf 28
 3 gg_genmove white
 #? [!E3]*
@@ -19,7 +47,42 @@ loadsgf games/trevor/trevor_04.sgf 30
 #? [G1]*
 
 #E5 is the only move.  Is GnuGo playing somewhat randomly here?
-loadsgf games/trevor/trevor_05.sgf 6
+#Dan said:
+#Looking at unsorted test 5, a typical way to solve this would be
+#to add an edge Joseki pattern, such as this:
+#
+#Pattern EJ84
+#
+#......       Atari before connecting
+#..*...
+#X.XO..
+#.XO...
+#......
+#......
+#------
+#
+#:8,J
+#
+#One should also add a pattern or two for followup. A pattern
+#with type J is given a weight of 27 on a 19x19 board, which
+#means that it is played automatically unless there is something
+#really huge on the board.
+#
+#Unfortunately, this does not work. The problem is that the values of
+#J patterns are scaled. From shapes.c:
+#
+#  if (class & CLASS_J) {
+#    TRACE("...joseki standard move\n");
+#    add_expand_territory_move(ti, tj);
+#    TRACE("...expands territory\n");
+#    add_expand_moyo_move(ti, tj);
+#    TRACE("...expands moyo\n");
+#    set_minimum_move_value(ti, tj, 27 * board_size / 19.0);
+#    TRACE("... minimum move value %f\n", 27 * board_size / 19.0);
+#  }
+#CATEGORY=JOSEKI_DATABASE
+#DIFFICULTY=8
+#loadsgf games/trevor/trevor_05.sgf 6
 5 gg_genmove white
 #? [E5]*
 
@@ -31,6 +94,10 @@ loadsgf games/trevor/trevor_06.sgf 22
 #B5 is certainly better than C5 here.  This is a terrible
 #game for white, but it's hard to narrow down the obvious
 #blunders.
+#Per Dan:  This needs to be fixed. It is probably a
+#matter of owl tuning and may require some thought.
+#CATEGORY=OWL_TUNING
+#DIFFICULTY=6
 loadsgf games/trevor/trevor_07.sgf 32
 7 gg_genmove white
 #? [!C5]*
@@ -41,6 +108,10 @@ loadsgf games/trevor/trevor_08.sgf 24
 #? [!B9]
 
 #E5 (or some defence of D4 worm) is necessary.
+#Dan: This should be solved by a reading connection
+#analyzer. Tristan Cazenave is working on such a project.
+#This test should be moved to connections.tst.
+#CATEGORY=DYNAMIC_CONNECTION
 loadsgf games/trevor/trevor_09.sgf
 9 gg_genmove white
 #? [E5]*
@@ -158,17 +229,11 @@ loadsgf games/trevor/trevor_23.sgf 27
 
 
 # Connect the dragons!  One eye is not enough, anyway.
-# gnugo.exe -l games/trevor/trevor_24.sgf -L 33 -t
-# shows:
-#Top moves:
-#1. H9  16.51   (Terrible)
-#2. E8  16.51   (much better!)
-#Even selects H9, though invoked here, gg picks E8.
-#I put FAIL as the match, to force a failure, until H9
-#is ranked much lower (about -1, or so!)
+# Thanks to Gunnar, for the random seed to force failure!
+# See also owl.tst 221
 loadsgf games/trevor/trevor_24.sgf 33
-240 gg_genmove black
-#? [FAIL]*
+240 gg_genmove black 1
+#? [E8|D8]*
 
 
 
@@ -185,11 +250,19 @@ loadsgf games/trevor/trevor_25.sgf 33
 
 # Should connect further back, at least, but of course
 # blocking at C1 is much bigger.
+# 3.1.8 reports:
+#  Move at C1 strategically or tactically unsafe
+#  Move at F9 strategically or tactically unsafe
 loadsgf games/trevor/trevor_26.sgf 33
 260 gg_genmove black
 #? [C1|F9]*
 
-# Connecting is safe.  Is black worried about the cut?
+#Here's the problem:
+#Top moves:
+#1. F9  16.22
+#2. A2  8.28
+#Checking safety of a black move at F9
+#Move at F9 would be a blunder.
 loadsgf games/trevor/trevor_26.sgf 39
 261 gg_genmove black
 #? [F9]*
@@ -207,6 +280,8 @@ loadsgf games/trevor/trevor_28.sgf 27
 #? [D4]*
 
 # F6 is much better and safer to boot than H6.
+# culprit seems to be pattern LE4 (matches H6) - min. value 12.
+# Perhaps need to replace H6 w/ F6?
 loadsgf games/trevor/trevor_28.sgf 36
 281 gg_genmove white
 #? [F6]*
@@ -229,7 +304,6 @@ loadsgf games/trevor/trevor_30.sgf
 loadsgf games/trevor/trevor_30.sgf
 301 gg_genmove black
 #? [!PASS]*
-
 
 
 
