@@ -474,6 +474,16 @@ O*b
 ;marginal_eye(*) && proper_eye(a) && proper_eye(b)
 
 
+Pattern EE206
+# gf New pattern. (3.1.20)
+
+X.
+O*
+--
+
+:8,eOX
+
+
 
 # first line blocks (except in corner)
 ######################################

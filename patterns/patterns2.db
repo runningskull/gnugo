@@ -2436,6 +2436,24 @@ XO.
 :8,-,shape(1)
 
 
+Pattern Shape79
+# gf New pattern. (3.1.20) (see trevord:610,630,640)
+
+OOo       Almost always better to block on second line
+X..
+*..
+---
+
+:8,O,shape(-2)
+
+OOo
+A..
+*..
+---
+
+;lib(A)==2
+
+
 ###########################
 #
 # Followup moves. 
@@ -2878,6 +2896,7 @@ A*B
 
 
 Pattern DD7
+# gf Revised constraint. (3.1.20)
 
 *OX
 ?XO
@@ -2888,6 +2907,7 @@ Pattern DD7
 ?Bc
 
 ;lib(d)<4 && (xlib(*)>1 || lib(d)<3)
+;&& oplay_defend(*,A) && oplay_defend(*,B)
 ;&& !oplay_defend_both(*,A,B) && !oplay_attack(*,c)
 
 >add_attack_either_move(A,B);

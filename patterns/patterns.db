@@ -13031,15 +13031,16 @@ Pattern LE6
 # At move 96 of ego.tst, this is matched at J8.
 # tm - revised (3.1.15) (see trevora:330)
 #   added left-hand ?s
+# gf Revised. (3.1.20)
 
-??????
+?oo???
 ?..*.x
 ?....X
 ?..O??
 
 :8,OX,value(8)
 
-??cbd?
+?ocbd?
 ?..*.x
 ?a...X
 ?..O??

@@ -1130,7 +1130,7 @@ ooo
 b*a
 ooo
 
-; oplay_attack(*,a,a) && oplay_attack(*,b)
+;oplay_attack(*,b) && oplay_attack(*,a,a)
 
 
 Pattern D309a
@@ -2396,7 +2396,7 @@ o.O
 oaB
 ?o?
 
-; does_attack(*,B) && owl_topological_eye(a,B)==3
+;owl_topological_eye(a,B)==3 && does_attack(*,B)
 
 
 Pattern D704
@@ -2411,8 +2411,8 @@ oOb
 Ba*
 ?o?
 
-; safe_xmove(b) && safe_xmove(*) && oplay_attack(*,b,b)
-; && owl_topological_eye(a,B)==3
+; owl_topological_eye(a,B)==3
+; && safe_xmove(b) && safe_xmove(*) && oplay_attack(*,b,b)
 
 
 Pattern D704b
@@ -3696,7 +3696,7 @@ OX
 ba
 Oc
 
-; !oplay_defend_both(a,b,c) && vital_chain(b) && vital_chain(c)
+;vital_chain(b) && vital_chain(c) && !oplay_defend_both(a,b,c)
 
 
 Pattern D1101
@@ -4337,9 +4337,9 @@ e?f?
 .B*?
 AOCd
 
-; (vital_chain(A) || owl_escape_value(e) > 0)
-; && (vital_chain(C) || owl_escape_value(f) > 0)
-; && lib(C) == 2
+; lib(C) == 2
+; && (owl_escape_value(e) > 0 || vital_chain(A))
+; && (owl_escape_value(f) > 0 || vital_chain(C))
 ; && oplay_attack_either(*,d,B,A)
 
 
@@ -5799,7 +5799,7 @@ Pattern D1378
 X*X   breakout & attack
 ?O?
 
-:8,-,value(55)
+:|,-,value(55)
 
 A*B
 ?O?

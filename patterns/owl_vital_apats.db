@@ -74,7 +74,7 @@ A.d?
 cX*a
 XbX?
 
-; lib(a)>2 && oplay_attack(*,d) && owl_topological_eye(b,A)==2 && owl_topological_eye(c,A)==2
+; lib(a)>2 && owl_topological_eye(b,A)==2 && owl_topological_eye(c,A)==2 && oplay_attack(*,d)
 
 
 Pattern VA2
@@ -805,7 +805,7 @@ XO
 a*
 Xb
 
-; !xplay_defend_both(*,a,b) && vital_chain(a) && vital_chain(b)
+;vital_chain(a) && vital_chain(b) && !xplay_defend_both(*,a,b)
 
 
 Pattern VA47

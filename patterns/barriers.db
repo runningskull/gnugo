@@ -791,6 +791,32 @@ O?
 ;lib(A)==1
 
 
+Pattern Barrier58
+
+o,o
+OXO
+
+:8,Ds
+
+o,o
+bAc
+
+;lib(A)<=2 && lib(b)>1 && lib(c)>1
+
+
+Pattern Barrier59
+
+,.
+XO
+
+:8,Ds
+
+ab
+XO
+
+;oplay_attack(a,b,b)
+
+
 Pattern Intrusion1
 
 xxxx
@@ -1410,6 +1436,21 @@ bXOo
 ;(o_somewhere(e) || !safe_xmove(e)) && !oplay_defend(a,b,c,D)
 
 
+Pattern Intrusion43
+
+??XO
+..XO
+?!!o
+
+:8,B,value(50)
+
+?OAO
+.cAO
+?dbo
+
+;lib(A)==2 && !attack(A) && !oplay_attack(b,c,d,d)
+
+
 Pattern Nonterritory1
 
 OxO
@@ -1815,6 +1856,43 @@ ab
 ;attack(b) && oplay_attack(*,b)
 
 >non_oterritory(a);
+
+
+Pattern Nonterritory21
+
+..
+.X
+O?
+
+:8,t
+
+cb
+aX
+O?
+
+;!oplay_attack(a,b,b) && !oplay_attack(b,a,a)
+
+>non_oterritory(a);
+>non_oterritory(b);
+>non_oterritory(c);
+
+
+Pattern Nonterritory22
+
+.?
+*X
+O?
+
+:8,t
+
+a?
+*X
+O?
+
+;safe_omove(*)
+
+>non_xterritory(*);
+>non_xterritory(a);
 
 
 # END OF FILE

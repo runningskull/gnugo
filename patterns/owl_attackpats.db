@@ -2091,7 +2091,7 @@ x.X
 xaB
 ?x?
 
-; does_attack(*,B) && owl_topological_eye(a,B)==3
+;owl_topological_eye(a,B)==3 && does_attack(*,B)
 
 
 Pattern A709
@@ -2106,8 +2106,8 @@ xXb
 Aa*
 ?x?
 
-; safe_omove(b) && safe_omove(*) && xplay_attack(*,b,b)
-; && (owl_topological_eye(a,A)==3)
+; owl_topological_eye(a,A)==3
+; && safe_omove(b) && safe_omove(*) && xplay_attack(*,b,b)
 
 
 Pattern A710
@@ -3089,8 +3089,8 @@ XO
 ba
 Xc
 
-;lib(c)>2 && !xplay_defend_both(a,b,c) && vital_chain(b)
-;&& vital_chain(c) && oplay_attack(*,a,a)
+;lib(c)>2 && vital_chain(b) && vital_chain(c)
+;&& oplay_attack(*,a,a) && !xplay_defend_both(a,b,c)
 
 
 Pattern A1107c
@@ -3106,25 +3106,8 @@ XO
 ba
 Xc
 
-;lib(c)>2 && !xplay_defend_both(a,b,c) && vital_chain(b)
-;&& vital_chain(c) && oplay_attack(*,a,a)
-
-
-Pattern A1107c
-# tm New pattern. (3.1.17)
-   
-.*       defend the surrounding chain
-O.
-XO
-
-:8,-,value(96)
-
-.*
-ba
-Xc
-
-;lib(c)>2 && !xplay_defend_both(a,b,c) && vital_chain(b)
-;&& vital_chain(c) && oplay_attack(*,a,a)
+;lib(c)>2 && vital_chain(b) && vital_chain(c)
+;&& oplay_attack(*,a,a) && !xplay_defend_both(a,b,c)
 
 
 Pattern A1108
