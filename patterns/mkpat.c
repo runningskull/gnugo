@@ -2068,11 +2068,11 @@ write_patterns(FILE *outfile)
 
 #if EXPERIMENTAL_READING
   if (database_type == DB_TREE)
-    tree_write_patterns(outfile, prefix);
+    tree_write_patterns(outfile);
   else
     fprintf(outfile, "\nvoid\ninit_tree_%s(void)\n{\n"
 	    "  /* nothing to do - tree option not compiled */\n"
-	    "}\n\n", name);
+	    "}\n\n", prefix);
 #endif
 
   /* Write out the patterns. */
