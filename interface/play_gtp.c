@@ -68,11 +68,13 @@ static int move_stack_pointer = 0;
 DECLARE(gtp_all_legal);
 DECLARE(gtp_attack);
 DECLARE(gtp_combination_attack);
+DECLARE(gtp_connect);
 DECLARE(gtp_countlib);
 DECLARE(gtp_debug_influence);
 DECLARE(gtp_debug_move_influence);
 DECLARE(gtp_decrease_depths);
 DECLARE(gtp_defend);
+DECLARE(gtp_disconnect);
 DECLARE(gtp_dragon_data);
 DECLARE(gtp_dragon_status);
 DECLARE(gtp_dragon_stones);
@@ -137,11 +139,13 @@ static struct gtp_command commands[] = {
   {"boardsize",        	      gtp_set_boardsize},
   {"color",            	      gtp_what_color},
   {"combination_attack",      gtp_combination_attack},
+  {"connect",         	      gtp_connect},
   {"countlib",         	      gtp_countlib},
   {"debug_influence",         gtp_debug_influence},
   {"debug_move_influence",    gtp_debug_move_influence},
   {"decrease_depths",  	      gtp_decrease_depths},
   {"defend",           	      gtp_defend},
+  {"disconnect",       	      gtp_disconnect},
   {"dragon_data",             gtp_dragon_data},
   {"dragon_status",    	      gtp_dragon_status},
   {"dragon_stones",           gtp_dragon_stones},
@@ -836,6 +840,84 @@ gtp_owl_defend(char *s, int id)
   }
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
+  return gtp_finish_response();
+}  
+
+
+/***********************
+ * Connection reading. *
+ ***********************/
+
+/* Function:  Try to connect two strings.
+ * Arguments: vertex, vertex
+ * Fails:     invalid vertex, empty vertex, vertices of different colors
+ * Returns:   connect result followed by connect point if successful.
+ */
+static int
+gtp_connect(char *s, int id)
+{
+  int ai, aj;
+  int bi, bj;
+  int connect_move = PASS_MOVE;
+  int result;
+  int n;
+  
+  n = gtp_decode_coord(s, &ai, &aj);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  if (!gtp_decode_coord(s + n, &bi, &bj))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  if (BOARD(ai, aj) != BOARD(bi, bj))
+    return gtp_failure(id, "vertices must have same color");
+
+  result = recursive_connect(POS(ai, aj), POS(bi, bj), &connect_move);
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_printf("%d", result);
+  if (result != 0)
+    gtp_mprintf(" %m", I(connect_move), J(connect_move));
+
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Try to disconnect two strings.
+ * Arguments: vertex, vertex
+ * Fails:     invalid vertex, empty vertex, vertices of different colors
+ * Returns:   disconnect result followed by disconnect point if successful.
+ */
+static int
+gtp_disconnect(char *s, int id)
+{
+  int ai, aj;
+  int bi, bj;
+  int disconnect_move = PASS_MOVE;
+  int result;
+  int n;
+  
+  n = gtp_decode_coord(s, &ai, &aj);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  if (!gtp_decode_coord(s + n, &bi, &bj))
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  if (BOARD(ai, aj) != BOARD(bi, bj))
+    return gtp_failure(id, "vertices must have same color");
+
+  result = recursive_disconnect(POS(ai, aj), POS(bi, bj), &disconnect_move);
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_printf("%d", result);
+  if (result != 0)
+    gtp_mprintf(" %m", I(disconnect_move), J(disconnect_move));
+
   return gtp_finish_response();
 }  
 

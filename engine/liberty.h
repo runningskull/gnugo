@@ -253,8 +253,8 @@ void purge_persistent_reading_cache(void);
 void reading_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 
 /* readconnect.c */
-int recursive_connect(int str1, int str2, int connect_depth);
-int recursive_disconnect(int str1, int str2, int connect_depth);
+int recursive_connect(int str1, int str2, int *move);
+int recursive_disconnect(int str1, int str2, int *move);
 
 
 int liberty_of_string(int pos, int str);
@@ -298,8 +298,6 @@ void offset(int i, int j, int basei, int basej, int *ti, int *tj, int trans);
 void find_cuts(void);
 void find_connections(void);
 void modify_eye_spaces(void);
-int recursive_connect (int str1, int str2, int connect_depth);
-int recursive_disconnect (int str1, int str2, int connect_depth);
 
 /* functions to add (or remove) move reasons */
 void clear_move_reasons(void);

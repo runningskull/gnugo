@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new gtp functions connect and disconnect
 - naive_ladder() made global
 - warnings eliminated from readconnect.c
 - most functions in readconnect.c made static

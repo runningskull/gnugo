@@ -321,7 +321,7 @@ static int quiescence_connect(int str1, int str2) {
 
 /* returns 1 if str1 and str2 can be connected */
 
-int recursive_connect (int str1, int str2, int connect_depth) {
+int recursive_connect (int str1, int str2, int *move) {
   int i, res = 0, Moves[MAX_MOVES], ForcedMoves[MAX_MOVES];
   
   if ( (board[str1] == EMPTY) || (board[str2] == EMPTY) )
@@ -330,7 +330,7 @@ int recursive_connect (int str1, int str2, int connect_depth) {
     return 1;
   if (nodes_connect > max_nodes_connect)
     return 0;
-  if (connect_depth == max_connect_depth)
+  if (stackp == max_connect_depth)
     return 0;
 
   nodes_connect++;
@@ -356,7 +356,7 @@ int recursive_connect (int str1, int str2, int connect_depth) {
 
   for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++) {
     if (trymove(Moves[i], board[str1], NULL, 0, EMPTY, 0)) {
-      if (!recursive_disconnect(str1, str2, connect_depth+1))
+      if (!recursive_disconnect(str1, str2, move))
 	res = 1;
       popgo();
     }
@@ -366,7 +366,7 @@ int recursive_connect (int str1, int str2, int connect_depth) {
   
 /* returns 1 if str1 and str2 can be disconnected */
 
-int recursive_disconnect (int str1, int str2, int connect_depth) {
+int recursive_disconnect (int str1, int str2, int *move) {
   int i, res = 1, Moves[MAX_MOVES];
   
   if ((board[str1] == EMPTY) || (board[str2] == EMPTY))
@@ -381,7 +381,7 @@ int recursive_disconnect (int str1, int str2, int connect_depth) {
     return 0;
   if (nodes_connect > max_nodes_connect)
     return 1;
-  if (connect_depth == max_connect_depth)
+  if (stackp == max_connect_depth)
     return 1;
   
   nodes_connect++;
@@ -398,7 +398,7 @@ int recursive_disconnect (int str1, int str2, int connect_depth) {
   if (res == 0)
     for (i = 1; ((i < Moves[0] + 1) && (res == 0)); i++)
       if (trymove(Moves[i], OTHER_COLOR(board[str1]), NULL, 0, EMPTY, 0)) {
-	if (!recursive_connect(str1, str2, connect_depth + 1))
+	if (!recursive_connect(str1, str2, move))
 	  res=1;
 	popgo();
       }
