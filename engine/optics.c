@@ -1808,16 +1808,24 @@ topological_eye(int pos, int color,
 	for (r = 0; r < 4; r++) {
 	  if (attack_values[r] < attack_value) {
 	    int tmp_value = attack_values[r];
-	    int tmp_point = heye[pos].attack_point[r];
+	    int tmp_point;
+	    if (tmp_value)
+	      tmp_point = heye[pos].attack_point[r];
+	    else
+	      tmp_point = 0;
 	    attack_values[r] = attack_value;
 	    heye[pos].attack_point[r] = attack_point;
 	    attack_value = tmp_value;
 	    attack_point = tmp_point;
 	  }
-	
+	  
 	  if (defense_values[r] < defense_value) {
 	    int tmp_value = defense_values[r];
-	    int tmp_point = heye[pos].defense_point[r];
+	    int tmp_point;
+	    if (tmp_value)
+	      tmp_point = heye[pos].defense_point[r];
+	    else
+	      tmp_point = 0;
 	    defense_values[r] = defense_value;
 	    heye[pos].defense_point[r] = defense_point;
 	    defense_value = tmp_value;
