@@ -34,7 +34,7 @@
 
 
 /* 
- * decide_string tries to attack and defend the string at (m, n),
+ * decide_string tries to attack and defend the string at (pos),
  * and then writes the number of variations considered in the attack
  * and defence to the sgf file.
  */
@@ -42,7 +42,7 @@
 void
 decide_string(int pos, const char *sgf_output)
 {
-  int apos, dpos;
+  int aa, dd;
   int acode, dcode;
   SGFTree  tree;
   
@@ -58,17 +58,17 @@ decide_string(int pos, const char *sgf_output)
   reset_engine();
 
   count_variations = 1;
-  acode = attack(pos, &apos);
+  acode = attack(pos, &aa);
   if (acode) {
     if (acode == WIN)
       gprintf("%1m can be attacked at %1m (%d variations)\n", 
-	      pos, apos, count_variations);
+	      pos, aa, count_variations);
     else if (acode == KO_A)
 	gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n", 
-	      pos, apos, count_variations);
+	      pos, aa, count_variations);
     else if (acode == KO_B)
 	gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
-		pos, apos, count_variations);
+		pos, aa, count_variations);
 
     if (debug & DEBUG_READING_PERFORMANCE) {
       gprintf("Reading shadow: \n");
@@ -76,17 +76,17 @@ decide_string(int pos, const char *sgf_output)
     }
 
     count_variations = 1;
-    dcode = find_defense(pos, &dpos);
+    dcode = find_defense(pos, &dd);
     if (dcode) {
       if (dcode == WIN)
 	gprintf("%1m can be defended at %1m (%d variations)\n", 
-		pos, dpos, count_variations);
+		pos, dd, count_variations);
       else if (dcode == KO_A)
 	gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n", 
-		pos, dpos, count_variations);
+		pos, dd, count_variations);
       else if (dcode == KO_B)
 	gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n", 
-		pos, dpos, count_variations);
+		pos, dd, count_variations);
     }
     else
       gprintf("%1m cannot be defended (%d variations)\n", 
@@ -115,7 +115,7 @@ decide_string(int pos, const char *sgf_output)
 
 /* 
  * decide_connection tries to connect and disconnect the strings at
- * (ai, aj) and (bi, bj), and then writes the number of variations
+ * (apos) and (bpos), and then writes the number of variations
  * considered in the attack and defence to the sgf file.
  */
 
@@ -181,7 +181,7 @@ decide_connection(int apos, int bpos, const char *sgf_output)
 
 
 /* 
- * decide_dragon tries to attack and defend the dragon at (m, n),
+ * decide_dragon tries to attack and defend the dragon at (pos),
  * and then writes the number of variations considered in the attack
  * and defence to the sgf file.
  */

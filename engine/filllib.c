@@ -203,11 +203,11 @@ fill_liberty(int *move, int color)
 	  return 1;
 	}
 	else if (defense_point != NO_MOVE) {
-	  /* Safety not confirmed because the move at (m, n) would set
-           * up a double threat. (di, dj) is assumed to defend against
-           * this threat.
+	  /* Safety not confirmed because the move at (pos) would set
+           * up a double threat. (defense_point) is assumed to defend
+           * against this threat.
 	   *
-	   * FIXME: We should verify that (di, dj) really is effective.
+	   * FIXME: We should verify that (defense_point) really is effective.
 	   */
 	  DEBUG(DEBUG_FILLLIB,
 		"Filllib: Safety not confirmed, but %1m defends.\n",
@@ -449,7 +449,6 @@ find_backfilling_move(int move, int color, int *backfill_move)
       }
     }
   }
-
 
   if (found_one) {
   

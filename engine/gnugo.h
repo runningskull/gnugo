@@ -300,6 +300,7 @@ extern int mandated_owl_branch_depth;
 extern int mandated_owl_reading_depth;
 extern int mandated_owl_node_limit; 
 
+/* Keep this as 2D until we change the entire API. */
 extern float potential_moves[MAX_BOARD][MAX_BOARD];
 
 extern volatile int time_to_die;   /* set by signal handlers */
@@ -328,9 +329,10 @@ void showboard(int xo);  /* ascii rep. of board to stdout */
 /* printutils.c */
 void gprintf(const char *fmt, ...);
 void mprintf(const char *fmt, ...);
+void gfprintf(FILE *outfile, const char *fmt, ...);
 const char *color_to_string(int color);
 const char *location_to_string(int pos);
-void location_to_buffer(int pos, char *buf);
+void        location_to_buffer(int pos, char *buf);
 const char *status_to_string(int status);
 const char *safety_to_string(int status);
 const char *result_to_string(int result);

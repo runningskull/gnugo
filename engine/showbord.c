@@ -78,7 +78,9 @@ static const int colors[3][5] = {
 
 static const int domain_colors[4] = {5, 1, 2, 3}; /* gray, black, white, both */
 
-/* True if the coordinate is a hoshi point. */
+
+/* True if the coordinate is a hoshi point.
+ */
 static int
 is_hoshi_point(int m, int n)
 {

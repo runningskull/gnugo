@@ -61,6 +61,7 @@ hash_rand(void)
 {
   int i;
   Hashvalue h = 0;
+
   for (i = 0; 32*i < (int) (CHAR_BIT*sizeof(Hashvalue)); i++)
     h |= (Hashvalue) gg_urand() << 32*i;
 
@@ -154,15 +155,14 @@ hashposition_dump(Hashposition *pos, FILE *outfile)
 {
   int i;
 
-  fprintf(outfile, "Board:  ");
+  gfprintf(outfile, "Board:  ");
   for (i = 0; i < (int) COMPACT_BOARD_SIZE; ++i)
-     fprintf(outfile, " %lx", (unsigned long) pos->board[i]);
+    gfprintf(outfile, " %lx", (unsigned long) pos->board[i]);
 
   if (pos->ko_pos == 0)
-    fprintf(outfile, "  No ko");
+    gfprintf(outfile, "  No ko");
   else
-    fprintf(outfile, "  Ko position: (%d, %d)",
-	    I(pos->ko_pos), J(pos->ko_pos));
+    gfprintf(outfile, "  Ko position: %1m", pos->ko_pos);
 }
 
 
@@ -222,7 +222,7 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
     }
 
     if (!bits) {
-      /* this means the bit fell off the left side */
+      /* This means the bit fell off the left side. */
       bits = 1;
       index++;
       if (index < COMPACT_BOARD_SIZE)
@@ -384,12 +384,10 @@ hashdata_diff_dump(Hash_data *hd1, Hash_data *hd2)
   if (hd1->hashpos.ko_pos == 0 && hd2->hashpos.ko_pos == 0)
     fprintf(stderr, "\nNo ko\n");
   else if (hd1->hashpos.ko_pos == hd2->hashpos.ko_pos)
-    fprintf(stderr, "\nEqual Ko position:[%c%d]\n",
-	    letter[I(hd1->hashpos.ko_pos)], J(hd1->hashpos.ko_pos));
+    gfprintf(stderr, "\nEqual Ko position:[%1m]\n", hd1->hashpos.ko_pos);
   else
-    fprintf(stderr, "\nDifferent Ko position:[%c%d] <==> [%c%d]\n",
-	    letter[I(hd1->hashpos.ko_pos)], J(hd1->hashpos.ko_pos),
-	    letter[I(hd2->hashpos.ko_pos)], J(hd2->hashpos.ko_pos));
+    gfprintf(stderr, "\nDifferent Ko position:[%1m] <==> [%1m]\n",
+	    hd1->hashpos.ko_pos, hd2->hashpos.ko_pos);
 
   fprintf(stderr, "Total [%d,%d,%d,%d]",
 	  count1[0], count1[1], count1[2], count1[3]);

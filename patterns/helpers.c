@@ -270,7 +270,7 @@ not_lunch_helper(int apos, int bpos)
 
 /* This is intended for use in autohelpers. */
 
-/* Check whether the string at (ai, aj) can attack any surrounding
+/* Check whether the string at (str) can attack any surrounding
  * string. If so, return false as the move to create a seki (probably)
  * wouldn't work.
  */
@@ -403,7 +403,7 @@ edge_double_sente_helper(ARGS)
 /*
  * This is intended for use in autohelpers.
  *
- * Give a conservative estimate of the value of saving the string (ai, aj)
+ * Give a conservative estimate of the value of saving the string (str)
  * by capturing one opponent stone.
  */
 
@@ -418,7 +418,7 @@ threaten_to_save_helper(int move, int str)
 /*
  * This is intended for use in autohelpers.
  *
- * Estimate the value of capturing the string (ai, aj) and add this as
+ * Estimate the value of capturing the string (str) and add this as
  * a followup value. We don't do this for too stupid looking threats,
  * however, e.g. in a position like
  *
@@ -531,26 +531,26 @@ amalgamate_most_valuable_helper(int apos, int bpos, int cpos)
 /*
  * This is intended for use in autohelpers.
  *
- * Returns 1 if (ai, aj) is adjacent to a stone which can be captured by ko.
+ * Returns 1 if (pos) is adjacent to a stone which can be captured by ko.
  */
 
 int
-finish_ko_helper(int apos)
+finish_ko_helper(int pos)
 {
   int adj, adjs[MAXCHAIN];
   int k;
 
-  adj = chainlinks2(apos, adjs, 1);
+  adj = chainlinks2(pos, adjs, 1);
   for (k = 0; k < adj; k++) {
-    int bpos = adjs[k];
-    int xpos;
-    if (countstones(bpos) == 1) {
-      findlib(bpos, 1, &xpos);
-      if (is_ko(xpos, board[apos], NULL))
+    int aa = adjs[k];
+    int xx;
+
+    if (countstones(aa) == 1) {
+      findlib(aa, 1, &xx);
+      if (is_ko(xx, board[pos], NULL))
 	return 1;
     }
   }
-
   return 0;
 }
 
@@ -562,18 +562,18 @@ finish_ko_helper(int apos)
  */
 
 int
-squeeze_ko_helper(int apos)
+squeeze_ko_helper(int pos)
 {
   int libs[2];
   int liberties;
   int k;
 
-  liberties = findlib(apos, 2, libs);
-  ASSERT1(liberties == 2, apos);
+  liberties = findlib(pos, 2, libs);
+  ASSERT1(liberties == 2, pos);
 
   for (k = 0; k < liberties; k++) {
-    int bpos = libs[k];
-    if (is_ko(bpos, OTHER_COLOR(board[apos]), NULL))
+    int aa = libs[k];
+    if (is_ko(aa, OTHER_COLOR(board[pos]), NULL))
       return 1;
   }
 

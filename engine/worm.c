@@ -745,7 +745,7 @@ compute_effective_worm_sizes()
 static void
 compute_unconditional_status()
 {
-  int unconditional_territory[MAX_BOARD][MAX_BOARD];
+  int unconditional_territory[BOARDMAX];
   int m, n;
   int color;
   int other;
@@ -755,23 +755,24 @@ compute_unconditional_status()
     unconditional_life(unconditional_territory, color);
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	int pos = POS(m, n);
-	if (!unconditional_territory[m][n])
+	int ii = POS(m, n);
+
+	if (!unconditional_territory[ii])
 	  continue;
 	
-	if (board[pos] == color) {
-	  worm[pos].unconditional_status = ALIVE;
-	  if (unconditional_territory[m][n] == 1)
-	    worm[pos].invincible = 1;
+	if (board[ii] == color) {
+	  worm[ii].unconditional_status = ALIVE;
+	  if (unconditional_territory[ii] == 1)
+	    worm[ii].invincible = 1;
 	}
-	else if (board[pos] == EMPTY) {
+	else if (board[ii] == EMPTY) {
 	  if (color == WHITE)
-	    worm[pos].unconditional_status = WHITE_BORDER;
+	    worm[ii].unconditional_status = WHITE_BORDER;
 	  else
-	    worm[pos].unconditional_status = BLACK_BORDER;
+	    worm[ii].unconditional_status = BLACK_BORDER;
 	}
 	else
-	  worm[pos].unconditional_status = DEAD;
+	  worm[ii].unconditional_status = DEAD;
       }
   }
   gg_assert(stackp == 0);

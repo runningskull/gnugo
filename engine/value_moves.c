@@ -2315,7 +2315,7 @@ print_top_moves(void)
 static void
 reevaluate_ko_threats(int ko_move, int color)
 {
-  int ko_stone;
+  int ko_stone = 0;
   int opp_ko_move;
   int m, n;
   int pos;
@@ -2333,6 +2333,7 @@ reevaluate_ko_threats(int ko_move, int color)
     if (ON_BOARD(ko_stone) && countlib(ko_stone))
       break;
   }
+  ASSERT_ON_BOARD1(ko_stone);
   
   TRACE("Reevaluating ko threats.\n");
   for (m = 0; m < board_size; m++)

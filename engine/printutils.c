@@ -160,6 +160,20 @@ vgprintf(FILE* outputfile, const char *fmt, va_list ap)
 
 
 /*
+ * required wrapper around vgprintf, writes to outfile.
+ */
+
+void 
+gfprintf(FILE *outfile, const char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+  vgprintf(outfile, fmt, ap);
+  va_end(ap);
+}
+
+
+/*
  * required wrapper around vgprintf, writes to stderr.
  */
 

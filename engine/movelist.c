@@ -27,9 +27,9 @@
 
 #include "liberty.h"
 
+
 static void movelist_sort_points(int max_points, int points[], int codes[]);
 static void swap_points_and_codes(int points[], int codes[], int m, int n);
-
 
 
 /* Return the code for the move if it is known.
@@ -66,7 +66,7 @@ movelist_change_point(int move, int code, int max_points,
     if (points[k] == move)
       break;
 
-  /* Yes, we did. */
+  /* Yes, we do. */
   if (k < max_points) {
     if (codes[k] <= code)
       return; /* Old news. */

@@ -23,7 +23,7 @@ the person assigned to task for further discussion.
 // General
 //--------------------------------------------------------------
 
-1. If you can, send us bug FIXES as well as bug reports. If you see
+ * If you can, send us bug FIXES as well as bug reports. If you see
    some bad behavior, figure out what causes it, and what to do about
    fixing it. And send us a patch! If you find an interesting bug and
    cannot tell us how to fix it, we would be happy to have you tell us
@@ -45,28 +45,28 @@ member.  Some of them are bigger and demand a deeper knowledge of the
 engine internals.  The issues are presented here in an approximate
 order of perceived difficulty.
 
-1. Add a check in patterns/mkpat.c that the main diagram and the
+ * Add a check in patterns/mkpat.c that the main diagram and the
    constraint diagram are consistent. Currently it is only verified
    that they have the same size.
 
-2. Complete the conversion to 1-dimensional representation.
+ * Complete the conversion to 1-dimensional representation.
    Check all comments before functions to make them agree with
    the actual function header.  In some cases these comments were
    missed when the function was converted to 1D.
 
-3. Break out handling of movelists into its own file and generalize it.
+ * Break out handling of movelists into its own file and generalize it.
    This is started in 3.1.16. Move lists are used, among other places, 
    in worms.c where it is used to store moves that capture, save, 
    threaten to capture and threaten to save the worm.
 
-4. Implement move lists storing important moves for dragons and eyes
+ * Implement move lists storing important moves for dragons and eyes
    in the same way as it is used for worms.  Half eyes are already
    halfway done.  The moves are stored, but not the attack and defend
    codes (LOSE, KO_A, KO_B and WIN).
 
-5. Make the cache not waste storage on 64 bit systems.
+ * Make the cache not waste storage on 64 bit systems.
 
-6. a) Add move history for "permanent" moves (i.e. ones done with
+ * a) Add move history for "permanent" moves (i.e. ones done with
    play_move(), in contrast to temporary moves done by
    trymove()/tryko()) in the board code. Notice that the move history
    must be added to the state in the Position struct.
@@ -79,35 +79,38 @@ order of perceived difficulty.
    probably only want this optionally in play_move() and in a variant
    of is_legal().
 
-7. The dragon data is split into two arrays, dragon[] and dragon2[].
+ * The dragon data is split into two arrays, dragon[] and dragon2[].
    The dragon2 array only have one entry per dragon, in contrast to
    the dragon array where all the data is stored once for every
    intersection of the board.  Complete the conversion of eye_data,
    half_eye_data, worm and dragon to use the same structure as the
    dragon2 array.
 
-8. Support for ko in eyes.db and optics.c.
+ * Implement hashing and persistent caching in the semeai code. 
 
-9. Support for constraints in the eye patterns.
+ * Support for ko in eyes.db and optics.c.
 
-10. Create a paradigm for handling other types of ko (approach move ko,
-    multi-step ko, etc) and then write code that handles them. (Difficult!)
+ * Support for constraints in the eye patterns.
 
-11. GNU Go should be able to resign some games. This feature should
-    be able to be turned on or off since we don't want it during
-    tournament play. If all dragons are settled and GNU Go is
-    behind by a lot, it should be able to resign.
+ * Create a paradigm for handling other types of ko (approach move ko,
+   multi-step ko, etc) and then write code that handles them. 
+   (Difficult!)
 
-12. Implement hashing and persistent caching in the semeai code. 
+ * GNU Go should be able to resign some games. This feature should be
+   able to be turned on or off since we don't want it during
+   tournament play. If all dragons are settled and GNU Go is behind by
+   a lot, it should be able to resign.
+
 
 //--------------------------------------------------------------
 // long term issues
 //--------------------------------------------------------------
 
+
 These issues are strategic in nature. They will help us to improve the
 playing strength of the program and/or enhance certain aspects of it.
 
-1. Extend the regression test suites.
+ * Extend the regression test suites.
    See the texinfo manual in the doc directory for a description of
    how to do this. In particular it would be useful with test suites
    for common life and death problems. Currently second line groups, L
@@ -116,32 +119,33 @@ playing strength of the program and/or enhance certain aspects of it.
    square, and so on. Other areas where test suites would be most
    welcome are fuseki, tesuji, and endgame.
 
-2. Tuning the pattern databases. These are under constant revision 
+ * Tuning the pattern databases. These are under constant revision 
    This is a sort of art. It is not
    necessary to do any programming to do this since most of the
    patterns do not require helpers. We would like it if a few more Dan
    level players would learn this skill.
 
-3. Extend and tune the Joseki database.
+ * Extend and tune the Joseki database.
 
-4. The semeai module is vastly in need of improvement. In fact, semeai
+ * The semeai module is vastly in need of improvement. In fact, semeai
    can probably only be analyzed by reading to discover what
-   backfilling is needed before we can make atari. (This is underway.)
+   backfilling is needed before we can make atari. 
+   (This is underway.)
 
-5. The connection analysis is today completely static and has a hard
+ * The connection analysis is today completely static and has a hard
    time identifying mutually dependent connections or moves that
    simultaneously threatens two or more connections. This could be
    improved by writing a connection reader, which like the owl code
    uses pattern matching to find a small amount of key moves to try.
    (This is underway.)
 
-6. GNU Go has a problem with opponents that build big moyos.  This is
+ * GNU Go has a problem with opponents that build big moyos.  This is
    because there is no move generator that tries explicitly to neither
    build nor enter opponent moyos. Such a move generator could be
    built using the same type of code that is used in the owl life and
    death reader, or the connection reader mentioned in point 5 above.
 
-7. A much improved combination module.  The combination module of
+ * A much improved combination module.  The combination module of
    today only finds combinations of threats to capture enemy groups.
    A more useful combination module would e.g. find combinations of
    threats to capture a group or enter opponent territory.  It would
@@ -151,7 +155,7 @@ playing strength of the program and/or enhance certain aspects of it.
    using ordinary tree search algorithms. (Revision of combination.c
    is underway.)
 
-8. Speed up the tactical reading. GNU Go is reasonably accurate when
+ * Speed up the tactical reading. GNU Go is reasonably accurate when
    it comes to tactical reading, but not always very fast. The main
    problem is that too many ineffective moves are tested, leading to
    strange variations that shouldn't need consideration. To improve
@@ -159,7 +163,7 @@ playing strength of the program and/or enhance certain aspects of it.
    refined. Some improvements should also be possible to obtain by
    tuning the move ordering.
 
-9. Create a way to quickly assess the safety of a group.  This might
+ * Create a way to quickly assess the safety of a group.  This might
    take into account number of eyes / half eyes, moyo in corners, moyo
    along the edge, moyo in the center, proximity to living friendly
    groups, weak opponent groups etc.  The point is that it should
@@ -168,34 +172,35 @@ playing strength of the program and/or enhance certain aspects of it.
    group and/or weakens an opponent group and how strong/weak groups
    influence each other.
 
-10. A move generator that identifies invasions or places to make
-    reducing moves (and of course threats to make invasions).
+ * A move generator that identifies invasions or places to make
+   reducing moves (and of course threats to make invasions).
 
-11. In some positions GNU Go may report a group as alive or connected
-    with a living group. But after the opponent has placed one stone
-    GNU Go may change the status to dead, without going through a
-    critical status. It would be nice if these positions could be
-    identified and logged for later analysis of the GNU Go
-    team.
+ * In some positions GNU Go may report a group as alive or connected
+   with a living group. But after the opponent has placed one stone
+   GNU Go may change the status to dead, without going through a
+   critical status. It would be nice if these positions could be
+   identified and logged for later analysis of the GNU Go team.
 
-12. Automatic search for missing patterns by analysing games from
-    NNGS.
+ * Automatic search for missing patterns by analysing games from
+   NNGS.
+
 
 //--------------------------------------------------------------
 // Ideas
 //--------------------------------------------------------------
 
+
 These are some ideas that have been floated on the mailing list.  Some
 of them are down-to-earth, and some are just blue sky ramblings.  They
 are presented here for inspiration.
 
-1. A good GUI.
+ * A good GUI.
    A start is being made with GoThic, a goban widget based on the QT
    toolkit.  This is linked from the GNU Go development web page on
    gnu.org. Other starts have been made based on GTK, but so far
    nothing more than a start has been attempted.
 
-2. A graphical pattern editor.
+ * A graphical pattern editor.
    This would make it much easier for non-programmers to improve the
    strength of GNU Go.  It could also be used as a debugging tool for
    the programmers.  This project has the GUI as a prerequisite.
@@ -203,24 +208,24 @@ are presented here for inspiration.
    create patterns but to make it easier to overview and maintain the
    database.
 
-3. Make the engine thread safe and use multiple CPUs on an SMP
+ * Make the engine thread safe and use multiple CPUs on an SMP
    machine.
 
-4. Making the engine use many machines loosely connected on the
+ * Making the engine use many machines loosely connected on the
    internet or in a cluster.
 
-5. Think on the opponents time.
+ * Think on the opponents time.
 
-6. A global alpha-beta reader.  This would probably be very slow and
+ * A global alpha-beta reader.  This would probably be very slow and
    could only read 2 or 3 moves ahead.  Still it could find fatal
    errors and improve the moves that GNU Go makes.
 
-7. A pattern based tactical reader instead of the hard coded one.
+ * A pattern based tactical reader instead of the hard coded one.
    This could be made stronger than the current by taking into account
    more moves.  The challenge is to keep it on focus so that the
    reading does not take forever.
 
-8. A strategic module that identifies high-level goals and then gives
+ * A strategic module that identifies high-level goals and then gives
    these goals to the rest of the engine.  It should be able to
    identify if we are ahead in territory or thickness, if we should
    play safe or if we should play daringly (e.g. if behind).  It
@@ -228,13 +233,13 @@ are presented here for inspiration.
    should defend.  Maybe this module doesn't have to be written in C.
    Maybe PROLOG, LISP or some other AI language would be better.
 
-9. A parameter that makes GNU Go play different styles.  Such styles
+ * A parameter that makes GNU Go play different styles.  Such styles
    could be 'play for territory', 'play aggressively', 'play tricky
    moves (hamete)', and so on.  It could be used to present human
    users with different kinds of opponents or to tell GNU Go how to
    play certain computer opponents in tournaments.
 
-10.Generalize representation and handling of threats so that we have a
+ * Generalize representation and handling of threats so that we have a
    graph representation of threats that can be searched to see how
    different threats interact.
 

@@ -28,6 +28,7 @@
 #include "liberty.h"
 #include "sgftree.h"
 
+
 /* Return one if x doesn't equal position_number and 0 otherwise.
  * After using this macro x will always have the value
  * position_number.
@@ -38,8 +39,8 @@ static int get_level(int *level);
 static int do_genmove(int *move, int color, float pure_threat_value);
 
 static double slowest_time = 0.;
-static int slowest_move = NO_MOVE;
-static int slowest_movenum = 0;
+static int    slowest_move = NO_MOVE;
+static int    slowest_movenum = 0;
 static double total_time = 0.;
 
 /* Position numbers for which various examinations were last made. */
@@ -48,6 +49,7 @@ static int initial_influence_examined = -1;
 static int dragons_examined_without_owl = -1;
 static int dragons_examined = -1;
 static int initial_influence2_examined = -1;
+static int opponent_not_passing(int color, int score);
 
 void sgfShowConsideredMoves(void);
 
@@ -213,6 +215,7 @@ old_estimate_score(int color, float *lower_bound, float *upper_bound)
     /* Find out information about the worms and dragons. */
     examine_position(color, EXAMINE_ALL);
     compute_initial_influence(OTHER_COLOR(color), 1);
+
     /* The coefficients should match those close to the end of
      * estimate_influence_value() in move_reasons.c.
      */
@@ -295,7 +298,7 @@ genmove_conservative(int *i, int *j, int color)
  *   Go took some really unnecessary risks in passing over & over.
  *   http://www.britgo.org/results/computer/egc01/tg-gg.sgf
  */
-int
+static int
 opponent_not_passing(int color, int score)
 {
   /* Feel free to pass if we're losing. */
@@ -366,6 +369,7 @@ do_genmove(int *move, int color, float pure_threat_value)
 	gprintf("\nScore estimate: %s %f to %s %f\n",
 		lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound),
 		upper_bound > 0 ? "W " : "B ", gg_abs(upper_bound));
+      fflush(stderr);
     }
     time_report(1, "estimate score", NO_MOVE, 1.0);
 

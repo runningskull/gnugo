@@ -22,7 +22,6 @@
 
 
 
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -32,6 +31,7 @@
 
 #include "sgftree.h"
 
+
 /* Pointless to do fuseki database pattern matching after this number
  * of stones have been placed on the board.
  *
@@ -40,6 +40,7 @@
  * particular include handicap stones.
  */
 #define MAX_FUSEKI_DATABASE_STONES 19
+
 
 #define UPPER_LEFT  0
 #define UPPER_RIGHT 1
@@ -56,18 +57,20 @@
 static int 
 openregion(int i1, int i2, int j1, int j2)
 {
- int x, y;
+  int x, y;
 
- if (i1 > i2)
-   return openregion(i2, i1, j1, j2);
- if (j1 > j2)
-   return openregion(i1, i2, j2, j1);
- for (x = i1; x <= i2; x++)
-     for (y = j1; y <= j2; y++)
-       if (BOARD(x, y) != EMPTY)
-	 return 0;
- return 1;
+  if (i1 > i2)
+    return openregion(i2, i1, j1, j2);
+  if (j1 > j2)
+    return openregion(i1, i2, j2, j1);
+
+  for (x = i1; x <= i2; x++)
+    for (y = j1; y <= j2; y++)
+      if (BOARD(x, y) != EMPTY)
+	return 0;
+  return 1;
 }
+
 
 /* The corner moves. */
 
@@ -243,7 +246,7 @@ search_fuseki_database(int color)
     return 0;
 
   /* Choose randomly with respect to relative weights for matched moves. */
-  /* do not choose moves with less value than 20% of the best move */
+  /* Do not choose moves with less value than 20% of the best move */
   best_fuseki_value = fuseki_value[0];
   q = gg_rand() % fuseki_total_value;
   for (k = 0; k < num_fuseki_moves; k++) {

@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- cleanup of clock.c, filllib.c, fuseki.c, genmove.c, globals.c,
+  gnugo.h, hash.h, printutils.c, reading.c, showbord.c, utils.c,
+  worm.c
+- New function gfprintf in printutils.c
 - AFFINE_TRANSFORM() macro
 - new (stub) function opponent_not_passing
 - new function sgffile_write_circle_mark

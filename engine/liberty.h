@@ -369,8 +369,7 @@ int owl_big_eyespace(int apos, int bpos);
 int owl_proper_eye(int apos, int bpos);
 void owl_reasons(int color);
 
-void unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
-			int color);
+void unconditional_life(int unconditional_territory[BOARDMAX], int color);
 void find_superstring(int str, int *num_stones, int *stones);
 void find_superstring_liberties(int str, int *liberties, int *libs,
                                 int liberty_cap);

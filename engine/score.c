@@ -20,9 +20,11 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+
 #include <string.h>
 #include "liberty.h"
 #include "gg_utils.h"
+
 
 static int dilate_erode(int dilations, int erosions, 
 			int gb[BOARDMAX], int color);
@@ -30,7 +32,9 @@ static void print_new_moyo(int dilations, int erosions);
 static void close_bubbles(int gb[BOARDMAX]);
 static int captured_territory(int pos, int color);
 
+
 #define ARRAYSIZE MAX_BOARD*MAX_BOARD
+
 
 /* As explained in the Texinfo documentation, this function
  * takes the characteristic function of the live groups,
@@ -45,8 +49,7 @@ static int captured_territory(int pos, int color);
  */
 
 static int
-dilate_erode(int dilations, int erosions, int gb[BOARDMAX],
-	     int color)
+dilate_erode(int dilations, int erosions, int gb[BOARDMAX], int color)
 {
   int i, j;
   int ii;
@@ -320,6 +323,7 @@ static void
 print_new_moyo(int dilations, int erosions)
 {
   int gb[BOARDMAX];
+
   dilate_erode(dilations, erosions, gb, WHITE);
   close_bubbles(gb);
   print_regions(gb);
@@ -456,9 +460,9 @@ estimate_score(float *upper, float *lower)
 }
 
 
-/* We do not count dead stones inside the eyespace as territory. Such a stone
- * is characterized as having matcher_status DEAD yet having only DEAD
- * dragons as neighbors.
+/* We do not count dead stones inside the eyespace as territory. Such a
+ * stone is characterized as having matcher_status DEAD yet having only
+ * DEAD dragons as neighbors.
  *
  * If (pos) is the location of a stone which is DEAD and which is
  * not an exception of this type then it is safe to count it as

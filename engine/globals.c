@@ -70,9 +70,9 @@ int mandated_depth;             /* deep reading cut off, mandated value */
 int mandated_backfill_depth;    /* deep reading cut off, mandated value */
 int mandated_backfill2_depth;   /* deep reading cut off, mandated value */
 int mandated_superstring_depth; /* deep reading cut off, mandated value */
-int mandated_fourlib_depth;   /* deep reading cut off, mandated value */
-int mandated_ko_depth;        /* deep reading cut off, mandated value */
-int mandated_branch_depth;    /* deep reading cut off, mandated value */
+int mandated_fourlib_depth;     /* deep reading cut off, mandated value */
+int mandated_ko_depth;          /* deep reading cut off, mandated value */
+int mandated_branch_depth;      /* deep reading cut off, mandated value */
 int mandated_aa_depth;
 int mandated_aa_threat_depth = -1;
 int mandated_owl_distrust_depth;  
@@ -116,7 +116,7 @@ int doing_scoring              = 0;
 int chinese_rules       = 0;    /* ruleset choice for GMP connection */
 /* use experimental semeai module */
 int experimental_semeai = EXPERIMENTAL_SEMEAI;
-int semeai_variations = DEFAULT_SEMEAI_VARIATIONS;
+int semeai_variations   = DEFAULT_SEMEAI_VARIATIONS;
 /* use experimental connection module */
 int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 /* use alternate connection reading algorithm */
@@ -131,7 +131,7 @@ int capture_all_dead    = 0;    /* capture all dead opponent stones */
 int play_out_aftermath  = 0;    /* make everything unconditionally settled */
 
 float best_move_values[10];
-int best_moves[10];
+int   best_moves[10];
 
 /* Various statistics are collected here. */
 struct stats_data stats;
