@@ -1,3 +1,69 @@
+Results after the patches:
+
+heikki_1_23.3. Supercedes heikki_1_23.1 and heikki_1_23.2. 
+arend_1_23.4. Experimental influence. 
+arend_1_23.5. Owl threats. 
+inge_1_23.4. Removal of DEFEND_BOTH_MOVE. 
+gunnar_1_23.5. Test revisions. 
+gunnar_1_23.4. Two groups in hash key. 
+trevor_1_23.3. Test corrections. 
+arend_1_23.3. Hoshi tuning. 
+teun_1_23.3. Don't check constraint diagram when patno == 0 
+trevor_1_23.2a. Regression view enhancements. 
+gunnar_1_23.3. Bugfixes in worm.c and value_moves.c. 
+readconnect_1_23.1. Connection through ponnuki and more. 
+inge_1_23.3. Revaluation of some worms. 
+trevor_1_23.1.tar.gz. Makes VC run the DFA. 
+teun_1_23.2. Turns up some array bound violations. 
+teun_1_23.1. Pattern consistency checking. 
+gunnar_1_23.2. Tuning and pattern bugfixes. 
+gunnar_1_23.1. Atari_atari revision. 
+inge_1_23.2. ALL_MOVE. 
+inge_1_23.1. Removal of ATTACK_EITHER_MOVE. 
+arend_1_23.2. NNGS tests. 
+brandsma_1_22.1. VC revision. 
+teun_1_22.1. Revised config.vcin. 
+
+./regress.sh . ld_owl.tst
+12 unexpected PASS!
+./regress.sh . connection.tst
+44 unexpected PASS!
+./regress.sh . ego.tst
+6 unexpected PASS!
+./regress.sh . dniwog.tst
+5 unexpected FAIL: Correct 'H4|G4', got 'J2'
+./regress.sh . trevorb.tst
+360 unexpected FAIL: Correct 'K3', got 'H5'
+760 unexpected PASS!
+770 unexpected PASS!
+./regress.sh . nicklas1.tst
+1206 unexpected PASS!
+./regress.sh . nngs.tst
+270 unexpected PASS!
+1630 unexpected PASS!
+1750 unexpected PASS!
+./regress.sh . trevorc.tst
+310 unexpected PASS!
+840 unexpected PASS!
+1040 unexpected PASS!
+1080 unexpected PASS!
+1160 unexpected PASS!
+1370 unexpected PASS!
+1470 unexpected PASS!
+./regress.sh . strategy3.tst
+142 unexpected PASS!
+./regress.sh . 13x13.tst
+7 unexpected PASS!
+29 unexpected PASS!
+38 unexpected PASS!
+./regress.sh . trevord.tst
+370 unexpected PASS!
+420 unexpected PASS!
+470 unexpected PASS!
+490 unexpected FAIL: Correct 'D5', got 'L3'
+890 unexpected PASS!
+
+
 ========================== 3.1.22 =========================
 
 ./regress.sh . reading.tst
