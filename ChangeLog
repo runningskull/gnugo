@@ -19,6 +19,10 @@
 - bugfix in owl_substantial()
 - merge superstring related tactical move generators into superstring_moves()
 - resigning of hopeless games implemented (over GTP and in replay mode)
+- ascii interface revised to support resignation
+- twogtp.py revised to support game resignations and endgame contests
+- ascii_endgame() renamed ascii_count()
+- new ascii_endgame() in play_ascii.c
 - new command-line option --resign-allowed
 - twogtp script updated to understand resignation
 - owl_* fields moved from struct dragon_data to struct dragon_data2
