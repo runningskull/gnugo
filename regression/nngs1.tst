@@ -12,7 +12,7 @@ loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 30
 #CATEGORY=OWL_TUNING
 loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 70
 2 gg_genmove black
-#? [K18|K19]*
+#? [K18|K19]
 
 loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 74
 3 gg_genmove black
@@ -126,7 +126,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
 30 gg_genmove white
-#? [P17|O18]*
+#? [P17|O18]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 18
 31 gg_genmove white

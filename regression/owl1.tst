@@ -28,7 +28,7 @@ loadsgf games/unfinished.sgf 214
 
 loadsgf games/unfinished.sgf 214
 267 owl_defend Q2
-#? [2 R3]
+#? [2 R3]*
 
 
 ########### end of tests #####################

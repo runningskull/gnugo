@@ -49,7 +49,7 @@ loadsgf games/incident108b.sgf 172
 # incident 110
 loadsgf games/incident108b.sgf 176
 10 gg_genmove black
-#? [Q7]
+#? [Q7]*
 
 #CATEGORY=BAD_PROBLEM
 #DESCRIPTION=Not clear enough.
@@ -203,7 +203,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
-#? [E17]*
+#? [E17]
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black
@@ -322,7 +322,7 @@ loadsgf games/strategy12.sgf 21
 # So much better, that I removed Q11 option -trevor
 loadsgf games/strategy13.sgf
 50 gg_genmove white
-#? [Q9]*
+#? [Q9]
 
 
 

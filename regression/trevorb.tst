@@ -111,7 +111,7 @@ loadsgf games/trevor/auto/b16.sgf 74
 
 loadsgf games/trevor/auto/b16.sgf 86
 270 gg_genmove white
-#? [G11]*
+#? [G11]
 
 
 #B4 is a better ko threat than A4
@@ -569,12 +569,12 @@ loadsgf games/trevor/auto/b83.sgf 64
 
 loadsgf games/trevor/auto/b83.sgf 92
 920 gg_genmove white
-#? [!B11]*
+#? [!B11]
 
 
 loadsgf games/trevor/auto/b83.sgf 94
 930 gg_genmove white
-#? [!A12]*
+#? [!A12]
 
 
 

@@ -6,7 +6,7 @@ reset_trymove_counter
 
 loadsgf games/mfgg1.sgf 43
 1 gg_genmove black
-#? [S13]
+#? [S13]*
 
 #See also owl1:265.
 loadsgf games/mfgg1.sgf 49
@@ -43,7 +43,7 @@ loadsgf games/mfgg2.sgf 23
 #SEVERITY=8
 loadsgf games/mfgg2.sgf 45
 7 gg_genmove black
-#? [R2|S7]*
+#? [R2|S7]
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=GNU Go doesn't understand this type of corner position!

@@ -69,7 +69,7 @@ loadsgf golois/Goemate990903-6.sgf
 #SEVERITY=
 loadsgf golois/Goemate990903-7.sgf
 17 gg_genmove black
-#? [P9]*
+#? [P9]
 
 loadsgf golois/Goemate990903-9.sgf
 18 gg_genmove black

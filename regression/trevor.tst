@@ -187,7 +187,7 @@ loadsgf games/trevor/trevor_18.sgf 32
 # Whoops, don't let go of the dragon's tail!
 loadsgf games/trevor/trevor_19.sgf 12
 190 gg_genmove white
-#? [B7]*
+#? [B7]
 
 # W should connect his two dragons.
 loadsgf games/trevor/trevor_20.sgf 14
@@ -450,7 +450,7 @@ loadsgf games/trevor/trevor_41.sgf 37
 #  Attachment is the SGF file.
 loadsgf games/trevor/trevor_42.sgf 211
 420 gg_genmove black
-#? [G16]*
+#? [G16]
 
 #CATEGORY=TACTICAL_READING
 #DESCRIPTION=Minus 1 point, attacking very dead stone.

@@ -169,7 +169,7 @@ loadsgf games/xxlin.sgf 20
 
 loadsgf games/xxlin.sgf 38
 181 gg_genmove black
-#? [F3]*
+#? [F3]
 
 loadsgf games/xxlin.sgf 48
 182 gg_genmove black
@@ -341,7 +341,7 @@ loadsgf games/handtalk/handtalk1.sgf 49
 # locally F12 is better. Similar problem at move 51
 loadsgf games/handtalk/handtalk1.sgf 55
 218 gg_genmove black
-#? [!E12]*
+#? [!E12]
 
 # lots of good problems in this game
 loadsgf games/nngs/gnugo-3.1.30-morlvera-200204041921.sgf 154
@@ -350,7 +350,7 @@ loadsgf games/nngs/gnugo-3.1.30-morlvera-200204041921.sgf 154
 
 loadsgf games/nngs/gnugo-3.1.30-merlin-200204041428.sgf 189
 220 gg_genmove white
-#? [R6]*
+#? [R6]
 
 
 ############ End of Tests #################
