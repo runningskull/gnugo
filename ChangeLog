@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in unconditional_life()
 - owl_update_goal() overrides same_dragon == 0 in obvious cases
 - new and revised tests
 
