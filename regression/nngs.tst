@@ -862,4 +862,48 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 205
 1920 gg_genmove black
 #? [!L11]
 
+#CATEGORY=TERRITORIAL_VALUATION
+# Not E9 as played by GNU Go! -ab
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201162038.sgf 15
+1930 gg_genmove white 4
+#? [K15|L3|K3|F17|O17]*
+
+#CATEGORY=TERRITORIAL_VALUATION
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201162038.sgf 23
+1940 gg_genmove white
+#? [!N5|O5]*
+
+# Have to defend M16/O17.
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201162038.sgf 29
+1950 gg_genmove white
+#? [!Q11|S10|N17|M17|N16]*
+
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 15
+1955 gg_genmove white
+#? [D3]*
+
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 27
+1960 gg_genmove white
+#? [M15]*
+
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 33
+1970 gg_genmove white
+#? [P7|L3]*
+
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 35
+1980 gg_genmove white
+#? [!G17]*
+
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 39
+2000 gg_genmove white
+#? [P13|P7|L3|M10]*
+
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 43
+2010 gg_genmove white
+#? [P13|M10|O6]*
+
+loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 51
+2020 gg_genmove white
+#? [L2|H6|H7|J6|J7]*
+
 
