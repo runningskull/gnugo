@@ -690,24 +690,46 @@ eX*d
 
 
 Pattern A220
+# tm Modified (3.1.23)
 
-?xx.              prevent jump
+????              prevent jump
+?xx.
 xX*.
 ....
 ----
 
 :8,-,value(45)
 
+??bc
+?xad
+xX*.
+....
+----
+
+; (owl_escape_value(b) <= 0 && owl_escape_value(c) <= 0) ||
+; !oplay_attack(*,a,d)
+
 
 Pattern A221
 # tm Modified (3.1.20) - added right hand ?s
+# tm Modified (3.1.23)
 
-?xx.?             back off to prevent jump
+?????             back off to prevent jump
+?xx.?
 xX.*?
 ....?
 -----
 
 :8,-,value(50)
+
+???a?             back off to prevent jump
+?xx.?
+xX.*?
+....?
+-----
+
+;owl_escape_value(a) < 1
+
 
 
 Pattern A222
@@ -3494,6 +3516,72 @@ XOXo
 ?X.?
 
 :8,-,value(76)
+
+
+Pattern A1126
+# tm New Pattern (3.1.23)  (see Pattern D1378)
+
+O*O   prevent breakout & attack
+?X?
+
+:|,-,value(55)
+
+A*B
+?X?
+
+; vital_chain(A) && vital_chain(B)
+; && xplay_attack_either(*,A,B)
+
+
+Pattern A1127
+# tm New Pattern (3.1.23)  (see Pattern D1001)
+#   Note: there's no reason to cut the goal dragon up.
+
+O*X       prevent connection
+?XO
+
+:8,n,value(70)
+
+O*b
+?cA
+
+; (attack(A) != WIN || (wormsize(A)<=2 && does_attack(*,A)))
+; && (!owl_goal_dragon(b) || !owl_goal_dragon(c))
+
+
+Pattern A1128
+# tm New Pattern (3.1.23)
+#   see also CB14
+
+OX*X	cut off from home
+X.X.
+
+:8,-,value(80)
+
+Ob*a
+XcXd
+
+; owl_escape_value(a) > 0
+; && oplay_attack(*,b)
+; && !oplay_attack(*,c,d,d)
+
+
+Pattern A1129
+# tm New Pattern (3.1.23) (see D1123)
+
+xO*x      stop break through
+XXO.
+XO..
+O..?
+
+:8,b,value(86)
+
+xB*x
+XXOa
+XO..
+O..?
+
+;xplay_attack(*,a,B)
 
 
 #########################################################

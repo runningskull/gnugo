@@ -1209,12 +1209,13 @@ ooo
 Pattern D309a
 # tm modified (3.1.16)
 # tm modified (3.1.22)
+# tm modified (3.1.23) (added b attribute)
 
 ?O?        block off area
 X*.
 ooo
 
-:8,-,value(60)
+:8,b,value(60)
 
 ?O?
 X*a
@@ -3711,6 +3712,7 @@ Pattern D1004
 # Less attractive when making empty triangle.
 # gf Added n classification. (3.1.14)
 # tm Modified constraint (3.1.16)
+# tm Modified constraint (3.1.23)
 
 ????
 ?*.O       hanging connection to protect eyespace
@@ -3723,7 +3725,7 @@ Pattern D1004
 ?OOc
 
 ;(lib(b)>1 && oplay_attack(*,a,a) && !xplay_attack_either(*,?,a,a,c))
-;&& (!x_somewhere(D) || oplay_attack(*,D))
+;&& (!x_somewhere(D) || oplay_attack(*,a,D))
 
 
 Pattern D1004b
@@ -4511,7 +4513,6 @@ OX.
 a*.
 
 ; lib(a) == 2 || oplay_attack(*,a)
-
 
 
 ########################################################
@@ -6109,6 +6110,24 @@ A..
 
 ; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
 ; && (!x_somewhere(c) || oplay_attack_either(*,d,c,d))
+
+Pattern D1385
+# tm New Pattern (3.1.23)
+
+.O    escape or capture
+..
+X*
+?O
+
+:8,-,value(75)
+
+fB    escape or capture
+dc
+e*
+?A
+
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
+; && (oplay_attack(*,c,d,f,e) && oplay_attack(*,c,d,f,f))
 
 
 #########################################################

@@ -3184,7 +3184,7 @@ owl_confirm_safety(int move, int target, int *defense_point)
   int tactical_nodes;
   int origin;
   int defense = 0;
-  double start;
+  double start = 0.;
   owl.local_owl_node_counter = 0;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
@@ -3259,7 +3259,7 @@ owl_does_attack(int move, int target)
   int tactical_nodes;
   int origin;
   int dcode;
-  double start;
+  double start = 0.;
   owl.local_owl_node_counter = 0;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
@@ -3342,7 +3342,7 @@ owl_connection_defends(int move, int target1, int target2)
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
-  double start;
+  double start = 0.;
   static struct local_owl_data owl;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
@@ -3700,7 +3700,7 @@ owl_substantial(int str)
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
   int result;
-  double start;
+  double start = 0.;
   static struct local_owl_data owl;
 
   if (debug & DEBUG_OWL_PERFORMANCE)

@@ -1567,6 +1567,21 @@ X*X
 ; && (x_somewhere(A) + x_somewhere(B) + x_somewhere(C) <=1)
 
 
+Pattern CF3
+# tm New Pattern (3.1.23) (see arend:36)
+# FIXME: Perhaps better in patterns.db?
+
+O*.O  threaten to save
+
+:-,-
+
+b*ca
+
+; dead(a) && !dead(b) && oplay_disconnect(*,*,a) && !oplay_attack(*,?,c,a)
+
+> threaten_to_save(a)
+
+
 ######################################################################
 #
 # Eye patterns

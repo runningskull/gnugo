@@ -1280,11 +1280,13 @@ aO
 
 
 Pattern Shape3
+# tm modified (3.1.23) (reduce shape penalty)
+#  see blunder:15, trevord:800
 
 O*      dango
 OO
 
-:/,-,shape(-2)
+:/,-,shape(-1)
 
 O*
 OO

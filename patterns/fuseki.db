@@ -854,6 +854,8 @@ Pattern F404
 
 
 Pattern F405
+# FIXME: This seems overconcentrated.  See also F406
+#   Probably best to remove this pattern.
 
 ?.....o?
 ...*..O?  make 3 space extension from two stones
@@ -864,18 +866,29 @@ O.....O?
 
 :8,Fted
 
-
-Pattern F406
-#FIXME: Often overconcentrated - see trevord:1000
-
-......o?  make 3 space extension from two stones
-O..*..O?
-......O?
-.......o
+?.....o?
+...*..O?
+O..a..O?
+........
 ........
 --------
 
-:8,FtEd
+;!oterri(*) && !oterri(a)
+
+
+# tm Removed (3.1.24)  This is just overconcentrated.
+#Pattern F406
+## dee trevord:1000
+#
+#......o?  make 2 space extension from two stones
+#O..*..O?
+#......O?
+#.......o
+#........
+#--------
+#
+#:8,FtEd
+
 
 
 Pattern F407
@@ -893,6 +906,8 @@ Pattern F407
 
 
 Pattern F408
+#FIXME: Make sure we're not inside our moyo
+# see 13x13:12
 
 .......        extend
 oO..*..

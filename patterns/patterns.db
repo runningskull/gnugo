@@ -7693,6 +7693,7 @@ XX*.     block! this can be life or death
 Pattern CB237
 # FIXME:  Need a connection helper to verify
 #   that * can't be cut off & die in X moyo. (see viking:13)
+# tm Modified (3.1.23)
 
 ??x?          extend
 O..X
@@ -7700,6 +7701,14 @@ O..X
 ?.o?
 
 :8,OXe
+
+??x?
+A..X
+..*.
+?.o?
+
+; oplay_connect(*,A,*)
+
 
 
 Pattern CB238
@@ -8615,14 +8624,22 @@ X.X*.
 
 
 Pattern CB314
-# FIXME: See global:8 for unexpected match.
+# tm modified (3.1.23)
+# FIXED: See global:8 for unexpected match.
 
-xX..          block!
+xX..          jump!
 ?...
 O.*.
 ?o??
 
 :8,OXe
+
+xX..          jump!
+?...
+A.*.
+?o??
+
+; !oplay_disconnect(*,A,*)
 
 
 Pattern CB315
@@ -11702,6 +11719,7 @@ bXOO
 
 
 Pattern EJ46
+# tm modified (3.1.23)  (see arend:3)
 
 .X.      Defend after the peep
 O*O
@@ -11710,7 +11728,7 @@ O*O
 ...
 ---
 
-:8,JX
+:8,ebdCX
 
 
 Pattern EJ47

@@ -655,6 +655,43 @@ Fbx
 ; && xplay_defend_both(*,b,a,a,F)
 
 
+Pattern CB14
+# tm New Pattern (3.1.23)  (see arend:32)
+# FIXME: only one of these points should be marginal
+#   is it safe to use amalgamate_most_valuable helper here? How?
+
+XO*O	double cut.
+O!O!
+
+:8,BX
+
+XA*O	double cut.
+ObOc
+
+; xplay_attack(*,A) && !xplay_attack(*,b,c,c)
+; && (gprintf("CB14 matched: %1m %1m",b,c),1)
+
+
+Pattern CB15
+# tm New Pattern (3.1.23)  (see global:17, )
+#   careful not to break trevord:730
+# FIXME:  Need to use amalgamate_most_valuable helper.
+# xplay_disconnect helper also might be useful here.
+
+?*?   save cutting stone.
+OXO
+!O!
+
+:8,B
+
+?*?   save cutting stone.
+OXO
+aOb
+
+; !xplay_attack_either(*,b,a,*,a) &&
+; !xplay_attack_either(*,a,b,*,b)
+
+
 ########################
 #
 # C patterns on the edge
@@ -947,16 +984,21 @@ O
 
 
 Pattern CC205
+# tm Modified (3.1.23)
 
-XO
-O.
+???
+?XO
+?O.
 
 :\,C
 
-AO
-OB
+?c?
+dAO
+?OB
 
-;attack(A) || (!safe_xmove(B) && !ko(B) && !xcut(B))
+; (((x_somewhere(c) || o_somewhere(c) || !xcut(c))
+;    && (x_somewhere(d) || o_somewhere(c) || !xcut(d))) && attack(A))
+; || (!ko(B) && !xcut(B) && !safe_xmove(B))
 
 
 Pattern CC206
