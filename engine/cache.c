@@ -21,8 +21,6 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-
-
 #include "gnugo.h"
 
 #include <stdio.h>
@@ -45,27 +43,26 @@ static void hashtable_clear(Hashtable *table);
 static Hashnode *hashtable_enter_position(Hashtable *table, Hash_data *hd);
 static Hashnode *hashtable_search(Hashtable *table, Hash_data *hd);
 
-static Read_result *hashnode_search(Hashnode *node, int routine, int komaster,
-				    int kom_pos, int str1, int str2);
+static Read_result *hashnode_search(Hashnode *node,
+				    unsigned int query_data1,
+				    unsigned int query_data2);
 static Read_result *hashnode_new_result(Hashtable *table, Hashnode *node, 
-					int routine, int komaster,
-					int kom_pos, int str1, int str2);
+					unsigned int input_data1,
+					unsigned int input_data2);
 
-static void hashtable_unlink_closed_results(Hashnode *node, 
-					    int exclusions, 
-					    unsigned int stackplimit,
-					    int statistics[][20]);
+static void hashnode_unlink_closed_results(Hashnode *node, 
+					   int exclusions, 
+					   unsigned int stackplimit,
+					   int statistics[][20]);
 static void hashtable_partially_clear(Hashtable *table);
 static int do_get_read_result(int routine, int komaster, int kom_pos,
 			      int str1, int str2, Read_result **read_result);
+
 
 /*
  * Dump an ASCII representation of the contents of a Read_result onto
  * the FILE outfile. 
  */
-
-
-
 void
 read_result_dump(Read_result *result, FILE *outfile)
 {
@@ -121,9 +118,10 @@ hashtable_dump(Hashtable *table, FILE *outfile)
 
   /* Data about the table itself. */
   fprintf(outfile, "Dump of hashtable\n");
-  fprintf(outfile, "Total size: %d\n", table->num_nodes);
+  fprintf(outfile, "Total size: %d\n", table->node_limit - table->all_nodes);
   fprintf(outfile, "Size of hash table: %d\n", table->hashtablesize);
-  fprintf(outfile, "Number of positions in table: %d\n", table->free_node);
+  fprintf(outfile, "Number of positions in table: %d\n",
+	  table->free_node - table->all_nodes);
 
   /* Data about the contents. */
   for (i = 0; i < table->hashtablesize; ++i) {
@@ -152,6 +150,9 @@ static void
 hashtable_dump2(Hashtable *table, FILE *outfile)
 {
   int i;
+  Hashnode *node;
+  Read_result *result;
+
   for (i = 0; i < table->hashtablesize; i++) {
     fprintf(outfile, "bucket %d: ", i);
     if (table->hashtable[i] == NULL)
@@ -160,8 +161,7 @@ hashtable_dump2(Hashtable *table, FILE *outfile)
       fprintf(outfile, "%d\n", table->hashtable[i] - table->all_nodes);
   }
 
-  for (i = 0; i < table->num_nodes; i++) {
-    Hashnode *node = &(table->all_nodes[i]);
+  for (node = table->all_nodes; node < table->node_limit; node++) {
     if (node->results == NULL)
       continue;
     fprintf(outfile, "node %d: ", i);
@@ -174,9 +174,8 @@ hashtable_dump2(Hashtable *table, FILE *outfile)
     else
       fprintf(outfile, "%d\n", node->next - table->all_nodes);
   }
-  
-  for (i = 0; i < table->num_results; i++) {
-    Read_result *result = &(table->all_results[i]);
+
+  for (result = table->all_results; result < table->result_limit; result++) {
     if (rr_get_status(*result) == 0)
       continue;
     fprintf(outfile, "result %d ", i);
@@ -214,16 +213,15 @@ hashtable_init(Hashtable *table,
   }
 
   /* Allocate memory for the nodes. */
-  table->num_nodes = num_nodes;
   table->all_nodes = (Hashnode *) malloc(num_nodes * sizeof(Hashnode));
   if (table->all_nodes == NULL) {
     free(table->hashtable);
     free(table);
     return 0;
   }
+  table->node_limit = table->all_nodes + num_nodes;
 
   /* Allocate memory for the results. */
-  table->num_results = num_results;
   table->all_results = (Read_result *) malloc(num_results 
 					      * sizeof(Read_result));
   if (table->all_results == NULL) {
@@ -232,6 +230,7 @@ hashtable_init(Hashtable *table,
     free(table);
     return 0;
   }
+  table->result_limit = table->all_results + num_results;
 
   /* Initialize the table and all nodes to the empty state . */
   hashtable_clear(table);
@@ -277,70 +276,70 @@ static void
 hashtable_clear(Hashtable *table)
 {
   int bucket;
-  int i;
-  
+  Hashnode *node;
+  Read_result *result;
+
   if (!table)
     return;
-  
+
   /* Initialize all hash buckets to the empty list. */
   for (bucket = 0; bucket < table->hashtablesize; ++bucket)
     table->hashtable[bucket] = NULL;
 
-  /* Mark all read_results as free. */
-  for (i = 0; i < table->num_results; i++)
-    table->all_results[i].data2 = 0;
-  
   /* Mark all nodes as free. */
-  for (i = 0; i < table->num_nodes; i++)
-    table->all_nodes[i].results = NULL;
-  
-  table->free_node = 0;
-  table->free_result = 0;
+  table->free_node = table->all_nodes;
+  for (node = table->all_nodes; node < table->node_limit; node++)
+    node->results = NULL;
+
+  /* Mark all read_results as free. */
+  table->free_result = table->all_results;
+  for (result = table->all_results; result < table->result_limit; result++)
+    result->data2 = 0;
 }
 
 
-/*
- * Unlink the closed results from the linked list of results at a node.
+/* Unlink all closed results except for those which has `routine' value marked
+ * in `exceptions' or large enough `stackp' from the linked list of results at
+ * a node. It is assumed that the node contains at least one result.
  */
-
 static void
-hashtable_unlink_closed_results(Hashnode *node, 
-				int exclusions, unsigned int stackplimit,
-				int statistics[][20])
+hashnode_unlink_closed_results(Hashnode *node, 
+			       int exclusions, unsigned int stackplimit,
+			       int statistics[][20])
 {
-  Read_result *previous_result = NULL;
-  Read_result *current_result = node->results;
-  
-  while (current_result != NULL) {
-    int stackp;
-    int routine;
+  Read_result *result = node->results;
+  Read_result **link = &node->results;
 
-    stackp = depth - rr_get_stackp(*current_result);
-    if (stackp > 19)
-      stackp = 19;
-    if (stackp < 0)
-      stackp = 0;
+  /* Traverse all node results. */
+  do {
+    unsigned int result_stackp = depth - rr_get_stackp(*result);
+    int result_routine = rr_get_routine(*result);
 
-    routine = rr_get_routine(*current_result);
-    gg_assert(routine >= 0 && routine < NUM_ROUTINES);
-    statistics[routine][stackp]++;
+    if (debug & DEBUG_READING_PERFORMANCE) {
+      int stat_stackp = result_stackp;
 
-    if (rr_get_status(*current_result) == 2
-	&& ((1 << rr_get_routine(*current_result)) & exclusions) == 0
-	&& depth - rr_get_stackp(*current_result) >= stackplimit) {
-      if (previous_result == NULL)
-	node->results = current_result->next;
-      else
-	previous_result->next = current_result->next;
-      current_result->data2 = 0;
+      if (stat_stackp > 19)
+	stat_stackp = 19;
+      if (stat_stackp < 0)
+	stat_stackp = 0;
+
+      gg_assert(result_routine >= 0 && result_routine < NUM_ROUTINES);
+      statistics[result_routine][result_stackp]++;
+    }
+
+    if (rr_get_status(*result) == 2	/* Closed. */
+	&& ((1 << result_routine) & exclusions) == 0
+	&& result_stackp >= stackplimit) {
+      /* Unlink the result and mark it as free. */
+      *link = result->next;
+      result->data2 = 0;
     }
     else
-      previous_result = current_result;
+      link = &result->next;
 
-    current_result = current_result->next;
-  }
+    result = result->next;
+  } while (result != NULL);
 }
-
 
 
 /*
@@ -350,66 +349,67 @@ hashtable_unlink_closed_results(Hashnode *node,
  * afterwards in order to simplify distribution of new nodes and
  * results. The read result pointers out in reading.c and owl.c will
  * never know that you moved them around.
+ *
+ * (comment) The above is only true about open results. All nodes can
+ *	     be moved as long as you fix links as well. However, it's
+ *	     doubtful that moving nodes will help anything.
  */
 
 static void
 hashtable_partially_clear(Hashtable *table)
 {
-  Hashnode *node;
-  int bucket;
-  Hashnode *previous;
-  Hashnode *current;
   int k, l;
-  
+  Hashnode *node;
+
   int statistics[NUM_ROUTINES][20];
 
-  DEBUG(DEBUG_READING_PERFORMANCE,
-	"Hashtable cleared because it was full.\n");
+  if (debug & DEBUG_READING_PERFORMANCE) {
+    gprintf("Hashtable cleared because it became full.\n");
 
-  for (k = 0; k < NUM_ROUTINES; ++k)
-    for (l = 0; l < 20; ++l)
-      statistics[k][l] = 0;
+    for (k = 0; k < NUM_ROUTINES; ++k)
+      for (l = 0; l < 20; ++l)
+	statistics[k][l] = 0;
+  }
 
-  /* Walk through all_nodes. Closed nodes are unlinked from the
-   * linked lists and marked as free.
+  /* Walk through all_nodes. Since we free most of the nodes, it might seem
+   * faster to walk through all buckets. This approach really speeds up this
+   * function, but drastically slows down hashnode_unlink_closed_results()
+   * for in the first case results go almost continuously in the memory and
+   * in the second they are scattered randomly - very bad for memory caching.
    */
-  for (k = 0; k < table->num_nodes; k++) {
-    node = &(table->all_nodes[k]);
-
+  for (node = table->all_nodes; node < table->node_limit; node++) {
     /* If there are no results attached, this node is not in the table. */
     if (node->results == NULL)
       continue;
 
-    bucket = node->key.hashval[0] % table->hashtablesize;
-    previous = NULL;
-    current = table->hashtable[bucket];
+    /* Remove all closed results for this node except OWL_{ATTACK,DEFEND} 
+     * and SEMEAI.
+     */
+    hashnode_unlink_closed_results(node, 
+				   (1 << OWL_ATTACK | 1 << OWL_DEFEND
+				    | 1 << SEMEAI), 3,
+				   statistics);
 
-    /* Remove all closed results for this node except OWL_{ATTACK,DEFEND}. */
-    hashtable_unlink_closed_results(node, 
-				    (1 << OWL_ATTACK | 1 << OWL_DEFEND
-				     | 1 << SEMEAI), 3,
-				    statistics);
-    if (node->results != NULL)
-      continue;
+    if (node->results == NULL) {
+      int bucket = node->key.hashval[0] % table->hashtablesize;
+      Hashnode *bucket_node = table->hashtable[bucket];
+      Hashnode **link = &table->hashtable[bucket];
 
-    /* Find the node in the linked list and unlink. */
-    while (current != NULL) {
-      if (current != node) {
-	previous = current;
-	current = current->next;
+      /* Since all node results has been freed, we can free the node itself. */
+      while (bucket_node != node) {
+	link = &bucket_node->next;
+	bucket_node = bucket_node->next;
       }
-      else {
-	if (previous == NULL)
-	  table->hashtable[bucket] = current->next;
-	else
-	  previous->next = current->next;
-	break;
-      }
+
+      /* Unlink the node. It is already free, since node->results == NULL. */
+      *link = node->next;
     }
   }
 
   if (debug & DEBUG_READING_PERFORMANCE) {
-    /* FIXME: These names should be where the constants are defined. */
+    /* FIXME: These names should be where the constants are defined.
+     *	      They also look a bit outdated, check against cache.h.
+     */
     const char *routines[] = {
       "find_defense", "defend1",    "defend2", "defend3",
       "defend4",      "attack",     "attack2", "attack3",
@@ -435,49 +435,54 @@ hashtable_partially_clear(Hashtable *table)
     }
   }
 
-
   /* FIXME: This is not entirely safe although it probably works more
    * than 99.999% of all cases.  If result no 0 or node no 0 is not
    * free after the partial clearing, this will explode into our face.
+   *
+   * (answer) We check if a node or result is free before allocating,
+   *	      so these statements are ok.
    */
-  table->free_result = 0;
-  table->free_node = 0;
+  table->free_node = table->all_nodes;
+  table->free_result = table->all_results;
 }
 
 
 /*
  * Enter a position with a given hash value into the table.  Return 
- * a pointer to the hash node where it was stored.  If it is already
- * there, don't enter it again, but return a pointer to the old one.
+ * a pointer to the hash node where it was stored. It is assumed that
+ * there is no such position in the table yet.
  */
-
 static Hashnode *
 hashtable_enter_position(Hashtable *table, Hash_data *hd)
 {
   Hashnode *node;
   int bucket;
 
-  /* If the position is already in the table, return a pointer to it. */
-  node = hashtable_search(table, hd);
-  if (node != NULL) {
-    return node;
+  /* If the first node is not free, skip until we find one which is free. */
+  while (table->free_node < table->node_limit
+	 && table->free_node->results != NULL)
+    table->free_node++;
+
+  if (table->free_node == table->node_limit) {
+    /* If the table is full, try to clean it up. */
+    hashtable_partially_clear(table);
+
+    while (table->free_node < table->node_limit
+	   && table->free_node->results != NULL)
+      table->free_node++;
+
+    if (table->free_node == table->node_limit) {
+      /* This shouldn't happen, at least with reasonably large tables. */
+      return NULL;
+    }
   }
 
-  /* If the next node is not free, skip until we find one which is free. */
-  while (table->free_node < table->num_nodes
-	 && table->all_nodes[table->free_node].results != NULL)
-    table->free_node++;
-  
-  /* If the table is full, return NULL */
-  if (table->free_node == table->num_nodes)
-    return NULL;
-
-  /* It wasn't there and there is still room. Allocate a new node for it... */
-  node = &(table->all_nodes[table->free_node++]);
+  /* We have found a free node. Allocate it for the position. */
+  node = table->free_node++;
   node->key = *hd;
   node->results = NULL;
 
-  /* ...and enter it into the table. */
+  /* And link it into the corresponding bucket list. */
   bucket = hd->hashval[0] % table->hashtablesize;
   node->next = table->hashtable[bucket];
   table->hashtable[bucket] = node;
@@ -521,33 +526,25 @@ hashtable_search(Hashtable *table, Hash_data *hd)
       break;
 #endif
   }
+
   return node;
 }
 
 
-/* 
- * Search the result list in a hash node for a particular result. This
- * result is from ROUTINE (e.g. readlad1) at (str1) and reading depth
- * stackp.
- *
- * All these numbers must be unsigned, and 0 <= x <= 255).
+/* Search the result list in a hash node for a particular result. This
+ * function accepts parameters in the same form as they are stored in
+ * Read_result structure. Use rr_input_data1() and rr_input_data2()
+ * macros to evaluate them.
  */
-
 static Read_result *
-hashnode_search(Hashnode *node, int routine, int komaster, int kom_pos,
-		int str1, int str2)
+hashnode_search(Hashnode *node,
+		unsigned int query_data1, unsigned int query_data2)
 {
   Read_result *result;
-  unsigned int search_for1;
-  unsigned int search_for2;
-
-  search_for1 = rr_input_data1(routine, komaster, kom_pos, str1,
-			       depth - stackp);
-  search_for2 = rr_input_data2(str2);
 
   for (result = node->results; result != NULL; result = result->next) {
-    if (result->data1 == search_for1
-	&& (result->data2 & RR_INPUT_DATA2) == search_for2)
+    if (result->data1 == query_data1
+	&& (result->data2 & RR_INPUT_DATA2) == query_data2)
       break;
     }
 
@@ -555,43 +552,58 @@ hashnode_search(Hashnode *node, int routine, int komaster, int kom_pos,
 }
 
 
-/*
- * Enter a new Read_result into a Hashnode.
+/* Enter a new Read_result into a Hashnode.
  * We already have the node, now we just want to enter the result itself.
- * We will fill in the result itself later, so we only need the routine
- * number for now.
+ * The result is completed later. This function enters search information
+ * only (target string(s), routine, ko information, remaining depth).
  */
-
 static Read_result *
-hashnode_new_result(Hashtable *table, Hashnode *node, int routine, 
-		    int komaster, int kom_pos, int str1, int str2)
+hashnode_new_result(Hashtable *table, Hashnode *node,
+		    unsigned int input_data1, unsigned int input_data2)
 {
   Read_result *result;
 
-  /* If the next result is not free, skip until we find one which is free. */
-  while (table->free_result < table->num_results
-	 && rr_get_status(table->all_results[table->free_result]) != 0)
+  /* If the first result is not free, skip until we find one which is free. */
+  while (table->free_result < table->result_limit
+	 && rr_get_status(*(table->free_result)) != 0)
     table->free_result++;
   
-  /* If the table is full, return NULL */
-  if (table->free_result == table->num_results)
-    return NULL;
+  if (table->free_result == table->result_limit) {
+    Read_result *node_results = node->results;
 
-  /* There is still room. Allocate a new node for it... */
-  result = &(table->all_results[table->free_result++]);
+    /* If the table is full, try to clean it up. */
+    hashtable_partially_clear(table);
 
-  /* ...and enter it into the table. */
+    if (node_results != NULL && node->results == NULL) {
+      /* If the node got freed, we need to reallocate it. */
+      int bucket = node->key.hashval[0] % table->hashtablesize;
+      node->next = table->hashtable[bucket];
+      table->hashtable[bucket] = node;
+    }
+
+    while (table->free_result < table->result_limit
+	   && rr_get_status(*(table->free_result)) != 0)
+      table->free_result++;
+
+    if (table->free_result == table->result_limit) {
+      /* This shouldn't happen, at least with reasonably large tables. */
+      return NULL;
+    }
+  }
+
+  /* We have found a free result entry. Allocate and initialize it. */
+  result = table->free_result++;
+  result->data1 = input_data1;
+  result->data2 = input_data2 | RR_STATUS_OPEN;
+
+  /* Link the result into the node's list. */
   result->next = node->results;
   node->results = result;
 
-  /* Now, put the input data into it. This also sets status to open. */
-  rr_set_input_data2(*result, routine, komaster, kom_pos, str1, str2,
-		     depth - stackp);
-
   stats.read_result_entered++;
   return result;
-
 }
+
 
 /* Initialize the cache for read results, using at most the given
  * number of bytes of memory. If the memory isn't sufficient to
@@ -627,6 +639,7 @@ reading_cache_init(int bytes)
   }
 }
 
+
 /* Clear the cache for read results. */
 void
 reading_cache_clear()
@@ -634,16 +647,15 @@ reading_cache_clear()
   hashtable_clear(movehash);
 }
 
+
 /*
  * Return a Read_result for the current position, routine and location.
  * For performance, the location is changed to the origin of the string.
  */
-
 int
 get_read_result(int routine, int komaster, int kom_pos, int *str,
 		Read_result **read_result)
 {
-  int result;
   /* Only store the result if stackp <= depth. Above that, there
    * is no branching, so we won't gain anything.
    */
@@ -652,31 +664,23 @@ get_read_result(int routine, int komaster, int kom_pos, int *str,
     return 0;
   }
   
-  /* Find the origin of the string containing (si, sj),
-   * in order to make the caching of read results work better.
+  /* Find the origin of the string in order to make the caching of read
+   * results work better.
    */
   *str = find_origin(*str);
   
-  result = do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
-			      read_result);
-  if (*read_result == NULL) {
-    /* Clean up the hashtable and try once more. */
-    hashtable_partially_clear(movehash);
-    result = do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
-				read_result);
-  }
-  return result;
+  return do_get_read_result(routine, komaster, kom_pos, *str, NO_MOVE,
+			    read_result);
 }
+
 
 /*
  * Variant with two calling strings.
  */
-
 int
 get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
 		 Read_result **read_result)
 {
-  int result;
   /* Only store the result if stackp <= depth. Above that, there
    * is no branching, so we won't gain anything.
    */
@@ -685,21 +689,14 @@ get_read_result2(int routine, int komaster, int kom_pos, int *str1, int *str2,
     return 0;
   }
   
-  /* Find the origin of the string containing (si, sj),
-   * in order to make the caching of read results work better.
+  /* Find the origin of the strings in order to make the caching of read
+   * results work better.
    */
   *str1 = find_origin(*str1);
   *str2 = find_origin(*str2);
   
-  result = do_get_read_result(routine, komaster, kom_pos, *str1, *str2,
-			      read_result);
-  if (*read_result == NULL) {
-    /* Clean up the hashtable and try once more. */
-    hashtable_partially_clear(movehash);
-    result = do_get_read_result(routine, komaster, kom_pos, *str1, *str2,
-				read_result);
-  }
-  return result;
+  return do_get_read_result(routine, komaster, kom_pos, *str1, *str2,
+			    read_result);
 }
 
 
@@ -707,13 +704,15 @@ static int
 do_get_read_result(int routine, int komaster, int kom_pos,
 		   int str1, int str2, Read_result **read_result)
 {
-  Hashnode *hashnode;
-  int retval;
+  Hashnode *node;
+  unsigned int data1 = rr_input_data1(routine, komaster, kom_pos,
+				      str1, depth - stackp);
+  unsigned int data2 = rr_input_data2(str2);
 
 #if CHECK_HASHING
   Hash_data    key;
 
-  /* Check the hash table to see if we have had this position before. */
+  /* Assert that hash data really corresponds to the state of the board. */
   hashdata_recalc(&key, board, board_ko_pos);
 #if FULL_POSITION_IN_HASH
   gg_assert(hashdata_diff_dump(&key, &hashdata) == 0);
@@ -721,68 +720,59 @@ do_get_read_result(int routine, int komaster, int kom_pos,
   gg_assert(hashdata_compare(&key, &hashdata) == 0);
 #endif
 
-  /* Find this position in the table.  If it wasn't found, enter it. */
-  hashnode = hashtable_search(movehash, &hashdata);
-  if (hashnode != NULL) {
+#endif /* CHECK_HASHING */
+
+  /* First try to look this position up in the table. */
+  node = hashtable_search(movehash, &hashdata);
+  if (node != NULL) {
+    Read_result *result;
+
     stats.position_hits++;
     DEBUG(DEBUG_READING_CACHE, "We found position %H in the hash table...\n",
 	  (unsigned long) hashdata.hashval);
+
+    /* The position is found. So, maybe the result is already in the table? */
+    result = hashnode_search(node, data1, data2);
+    if (result != NULL) {
+      *read_result = result;
+      return 1;
+    }
+
+    DEBUG(DEBUG_READING_CACHE,
+	  "...but no previous result for routine %d and (%1m, %1m)...",
+	  routine, str1, str2);
   }
   else {
-    hashnode = hashtable_enter_position(movehash, &hashdata);
-    if (hashnode)
+    node = hashtable_enter_position(movehash, &hashdata);
+    if (node) {
       DEBUG(DEBUG_READING_CACHE, "Created position %H in the hash table...\n",
 	    (unsigned long) hashdata.hashval);
-  }
-#else
-  /* Find this position in the table.  If it wasn't found, enter it. */
-  hashnode = hashtable_search(movehash, &hashdata);
-  if (hashnode != NULL) {
-    stats.position_hits++;
-    DEBUG(DEBUG_READING_CACHE, "We found position %H in the hash table...\n",
-	  (unsigned long) hashdata.hashval);
-  }
-  else {
-    hashnode = hashtable_enter_position(movehash, &hashdata);
-    if (hashnode)
-      DEBUG(DEBUG_READING_CACHE, "Created position %H in the hash table...\n",
-	    (unsigned long) hashdata.hashval);
-  }
-#endif
-
-  retval = 0;
-  if (hashnode == NULL) {
-    /* No hash node, so we can't enter a result into it. */
-    *read_result = NULL;
-
-  }
-  else {
-
-    /* We found it!  Now see if we can find a previous result. */
-    *read_result = hashnode_search(hashnode, routine, komaster, kom_pos,
-				   str1, str2);
-
-    if (*read_result != NULL) {
-      stats.read_result_hits++;
-      retval = 1;
     }
     else {
-      DEBUG(DEBUG_READING_CACHE,
-	    "...but no previous result for routine %d and (%1m, %1m)...",
-	    routine, str1, str2);
-
-      *read_result = hashnode_new_result(movehash, hashnode, routine,
-					 komaster, kom_pos, str1, str2);
-      
-      if (*read_result == NULL)
-	DEBUG(DEBUG_READING_CACHE,
-	      "%o...and unfortunately there was no room for one.\n");
-      else
-	DEBUG(DEBUG_READING_CACHE, "%o...so we allocate a new one.\n");
+      DEBUG(DEBUG_READING_CACHE, "Unable to clean up the hash table!\n");
+      *read_result = NULL;
+      return 0;
     }
   }
 
-  return retval;
+  /* Enter the result into the table. */
+  *read_result = hashnode_new_result(movehash, node, data1, data2);
+      
+  if (*read_result != NULL)
+    DEBUG(DEBUG_READING_CACHE, "...allocated a new result.\n");
+  else {
+    /* If this ever happens and the node contains no results (can only be true
+     * if the node is newly allocated), we unlink the node from its bucket.
+     */
+    if (node->results == NULL) {
+      int bucket = node->key.hashval[0] % movehash->hashtablesize;
+      movehash->hashtable[bucket] = node->next;
+    }
+
+    DEBUG(DEBUG_READING_CACHE, "Unable to clean up the hash table!\n");
+  }
+
+  return 0;
 }
 
 

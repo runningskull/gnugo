@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- speed optimizations in cache.c
+- hashtable_unlink_closed_results() renamed hashnode_unlink_closed_results()
 - check for snapback/oiotoshi reactivated in check_self_atari()
 - joseki patterns are matched using corner matcher
 - symmetrical joseki patterns no longer match twice

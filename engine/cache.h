@@ -77,7 +77,11 @@ typedef struct read_result_t {
 } Read_result;
 
 /* Bit mask for the input bits in the data2 field. */
-#define RR_INPUT_DATA2 0x3ff
+#define RR_INPUT_DATA2		0x3ff
+
+/* Read_result entry status. */
+#define RR_STATUS_OPEN		(1 << 28)
+#define RR_STATUS_CLOSED	(2 << 28)
 
 /* Get parts of a Read_result identifying the input data. */
 #define rr_get_komaster(rr)   (((rr).data1  >> 29) & 0x07)
@@ -91,24 +95,8 @@ typedef struct read_result_t {
 /* Set corresponding parts. */
 #define rr_input_data1(routine, komaster, kom_pos, str1, stackp) \
 	(((((((((komaster) << 10) | (kom_pos)) << 4) \
-	  | (routine)) << 10) | (str1)) << 5) | (stackp));
+	  | (routine)) << 10) | (str1)) << 5) | (stackp))
 #define rr_input_data2(str2) (str2) \
-
-/* Set input data fields and at the same time set status to open. */
-#define rr_set_input_data(rr, routine, komaster, kom_pos, str, stackp) \
-       do { \
-         (rr).data1 = rr_input_data1(routine, komaster, kom_pos, str, stackp);\
-         (rr).data2 = (((rr).data2 & ~0x300003ff) | (1 << 28));\
-       } while (0)
-
-/* Variation for two distinct strings. */
-#define rr_set_input_data2(rr, routine, komaster, kom_pos, str1, str2, stackp)\
-       do { \
-         (rr).data1 = rr_input_data1(routine, komaster, kom_pos, \
-                                     str1, stackp); \
-         (rr).data2 = (((rr).data2 & ~0x3ff) | (1 << 28) \
-                       | rr_input_data2(str2)); \
-       } while (0)
 
 /* Get parts of a Read_result constituting the result of a search. */
 #define rr_get_status(rr)      (((rr).data2 >> 28) & 0x03)
@@ -117,14 +105,14 @@ typedef struct read_result_t {
 #define rr_get_move(rr)        (((rr).data2 >> 10) & 0x3ff)
 #define rr_get_result(rr)      rr_get_result1(rr)
 
-/* Set corresponding parts. */
+/* Set corresponding parts. Closes the result entry. */
 #define rr_set_result_move(rr, result, move) \
-	(rr).data2 = (((rr).data2 & 0x3ff) \
-          | (2 << 28) | (((result) & 0x0f) << 24) | (((move) & 0x3ff) << 10))
+	(rr).data2 = (((rr).data2 & 0x3ff) | RR_STATUS_CLOSED \
+		      | (((result) & 0x0f) << 24) | (((move) & 0x3ff) << 10))
 
 /* Variation with two results. */
 #define rr_set_result_move2(rr, result1, result2, move) \
-	(rr).data2 = (((rr).data2 & 0x3ff) | (2 << 28) \
+	(rr).data2 = (((rr).data2 & 0x3ff) | RR_STATUS_CLOSED \
                       | (((result1) & 0x0f) << 24) \
                       | (((result2) & 0x0f) << 20) \
                       | (((move) & 0x3ff) << 10))
@@ -158,16 +146,16 @@ typedef struct hashnode_t {
  */
 
 typedef struct hashtable {
-  int            hashtablesize;	/* Number of hash buckets */
-  Hashnode     **hashtable;	/* Pointer to array of hashnode lists */
+  int		 hashtablesize;	/* Number of hash buckets. */
+  Hashnode     **hashtable;	/* Pointer to array of hashnode lists. */
 
-  int            num_nodes;	/* Total number of hash nodes */
-  Hashnode      *all_nodes;	/* Pointer to all allocated hash nodes. */
-  int            free_node;	/* Index to next free node. */
+  Hashnode	*all_nodes;	/* Pointer to all allocated hash nodes. */
+  Hashnode	*node_limit;	/* Pointer to the end of all_nodes[] array. */
+  Hashnode	*free_node;	/* Pointer to the first free node. */
 
-  int            num_results;	/* Total number of results */
-  Read_result   *all_results;	/* Pointer to all allocated results. */
-  int            free_result;	/* Index to next free result. */
+  Read_result	*all_results;	/* Pointer to all allocated results. */
+  Read_result	*result_limit;	/* Pointer to the enf of all_results[] array. */
+  Read_result	*free_result;	/* Pointer to the first free result. */
 } Hashtable;
 
 
@@ -252,6 +240,7 @@ int get_read_result(int routine, int komaster, int kom_pos,
 		    int *str, Read_result **read_result);
 int get_read_result2(int routine, int komaster, int kom_pos,
 		     int *str1, int *str2, Read_result **read_result);
+
 
 /* ================================================================ */
 
