@@ -4810,6 +4810,24 @@ a*.
 ; lib(a) == 2 || oplay_attack(*,a)
 
 
+Pattern D1142
+# pp New pattern (3.5.3).  See nngs4:420.
+
+?X?	    split boundary in hope that it will help;
+*OX	    low value because it's not guaranteed it will
+?XO
+
+:-,b,value(30)
+
+?C?
+*AX
+?DB
+
+; does_defend(*,A) && !oplay_attack(*,B)
+; && !same_string(B,C) && vital_chain(B) && vital_chain(C)
+; && (oplay_attack(*,B) || oplay_attack(*,C)) && !oplay_connect(*,B,C)
+
+
 ########################################################
 #                                                       #
 #                       Kikashi                         #

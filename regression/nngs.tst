@@ -533,7 +533,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 158
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 42
 1140 owl_defend B13
-#? [1 (A11|B11)]
+#? [1 (A11|B11|B10)]
 
 
 loadsgf games/nngs/gnugo-3.1.18-gopriest-200201072104.sgf 54

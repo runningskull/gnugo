@@ -67,10 +67,13 @@ struct local_owl_data {
   char goal[BOARDMAX];
   char boundary[BOARDMAX];
 
-  /* FIXME: escape_values[] are never recomputed. Consider moving this array
-   *	    from stack to a static or dynamic variable so it is not copied
-   *	    around in do_push_owl(). Be aware of semeai code though.
+  /* FIXME: neighbors[] and escape_values[] are never recomputed.
+   *	    Consider moving these arrays from stack to a static or
+   *	    dynamic variable so it is not copied around in
+   *	    do_push_owl().  Be aware of semeai code though.
    */
+  char neighbors[BOARDMAX];
+
   char escape_values[BOARDMAX];
   int color;
 
@@ -3739,30 +3742,59 @@ owl_mark_worm(int apos, int bpos, struct local_owl_data *owl)
 static void
 owl_mark_boundary(struct local_owl_data *owl)
 {
-  int pos;
-  int other = OTHER_COLOR(owl->color);
   int k;
+  int pos;
+  int color = owl->color;
+  int other = OTHER_COLOR(color);
   
   memset(owl->boundary, 0, sizeof(owl->boundary));
-  /* first find all boundary strings. */
+  memset(owl->neighbors, 0, sizeof(owl->neighbors));
+
+  /* Find all friendly neighbors of the dragon in goal. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == color && owl->goal[pos]) {
+      for (k = 0; k < 4; k++) {
+	if (board[pos + delta[k]] == EMPTY
+	    && board[pos + 2 * delta[k]] == color
+	    && !owl->neighbors[pos + 2 * delta[k]])
+	  mark_string(pos + 2 * delta[k], owl->neighbors, 1);
+      }
+
+      for (; k < 8; k++) {
+	int pos2 = pos + delta[k];
+
+	if (board[pos2] == color
+	    && !owl->neighbors[pos2]
+	    && (board[SOUTH(gg_min(pos, pos2))] == EMPTY
+		|| board[NORTH(gg_max(pos, pos2))] == EMPTY))
+	  mark_string(pos2, owl->neighbors, 1);
+      }
+    }
+  }
+
+  /* First find all boundary strings (including those adjacent not to
+   * the goal dragon, but one of its neighbors).
+   */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (board[pos] == other && !owl->boundary[pos]) {
       for (k = 0; k < 8; k++)
-	if (ON_BOARD(pos + delta[k]) && owl->goal[pos + delta[k]]) {
+	if (ON_BOARD(pos + delta[k])
+	    && (owl->goal[pos + delta[k]] || owl->neighbors[pos + delta[k]])) {
 	  mark_string(pos, owl->boundary, 1);
 	  break;
 	}
     }
-  
+
   /* Upgrade the mark of a boundary string if it adjoins a safe
    * friendly dragon.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (board[pos] == other && owl->boundary[pos] == 1) {
-      for (k = 0; k < 4; k++) {
+    if (owl->boundary[pos] == 1) {
+      for (k = 0; k < 8; k++) {
 	int pos2 = pos + delta[k];
-	if (board[pos2] == owl->color
+	if (board[pos2] == color
 	    && !owl->goal[pos2]
+	    && !owl->neighbors[pos2]
 	    && ((dragon[pos2].crude_status != DEAD && countstones(pos2) > 2)
 		|| dragon[pos2].crude_status == ALIVE)) {
 	  mark_string(pos, owl->boundary, 2);
@@ -3798,7 +3830,7 @@ owl_mark_boundary(struct local_owl_data *owl)
 	int d = DRAGON2(pos).adjacent[k];
 	int apos = dragon2[d].origin;
 	
-	if (board[apos] == owl->color && !owl->goal[apos]) {
+	if (board[apos] == color && !owl->goal[apos]) {
 	  owl->boundary[pos] = 2;
 	  break;
 	}
@@ -3878,22 +3910,19 @@ owl_update_boundary_marks(int pos, struct local_owl_data *owl)
 
   for (k = 0; k < 4; k++) {
     int pos2 = pos + delta[k];
+
     if (ON_BOARD(pos2) && owl->boundary[pos2] > boundary_mark)
       boundary_mark = owl->boundary[pos2];
+
     if (board[pos2] == owl->color
 	&& dragon[pos2].color == owl->color
 	&& dragon[pos2].status == ALIVE
-	&& !owl->goal[pos2])
+	&& !owl->goal[pos2]
+	&& !owl->neighbors[pos2])
       boundary_mark = 2;
   }
-  owl->boundary[pos] = boundary_mark;
 
-  for (k = 0; k < 4; k++) {
-    int pos2 = pos + delta[k];
-    if (board[pos2] == board[pos]
-	&& owl->boundary[pos2] < boundary_mark)
-      mark_string(pos2, owl->boundary, boundary_mark);
-  }
+  mark_string(pos, owl->boundary, boundary_mark);
 }
 
 /* Lists the goal array. For use in GDB:
@@ -5490,6 +5519,7 @@ do_push_owl(struct local_owl_data **owl)
   /* Copy the owl data. */
   memcpy(new_owl->goal, (*owl)->goal, sizeof(new_owl->goal));
   memcpy(new_owl->boundary, (*owl)->boundary, sizeof(new_owl->boundary));
+  memcpy(new_owl->neighbors, (*owl)->neighbors, sizeof(new_owl->neighbors));
   memcpy(new_owl->escape_values, (*owl)->escape_values,
 	 sizeof(new_owl->escape_values));
   new_owl->color = (*owl)->color;

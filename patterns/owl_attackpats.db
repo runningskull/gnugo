@@ -4487,6 +4487,23 @@ cd??
 ;owl_escape_value(c) + owl_escape_value(d) > 0
 
 
+Pattern A1134
+# pp New pattern (3.5.3).  See trevorb:120.
+# FIXME: is it better to do this algorithmically with owl boundaries?
+
+XOX	    prevent escaping by capturing
+.*O
+---
+
+:8,-,value(75)
+
+BOX
+.*A
+---
+
+; lib(A) == 1 && owl_escape_value(B) > 0
+
+
 #########################################################
 #                                                       #
 #       Kill or threaten a worm of the dragon           #
