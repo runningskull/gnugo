@@ -85,6 +85,11 @@
 #
 
 
+goal_elements none
+# FIXME: try to make callback_data pattern category specific
+callback_data XOxo
+
+
 ##########################
 #
 # Cutting and Connecting patterns

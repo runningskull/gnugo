@@ -43,6 +43,11 @@
 #
 ##################################################################
 
+
+goal_elements none
+callback_data O
+
+
 Pattern Def1
 
 X*

@@ -67,11 +67,19 @@
 #
 ###################################
 
+
+goal_elements none
+# callback_data is dependent on pattern class in this database
+
+
 ########################
 #
 # B patterns on the edge
 #
 ########################
+
+callback_data X!
+
 
 Pattern EB1
 
@@ -474,6 +482,9 @@ b*d
 # B patterns in the center
 #
 ##########################
+
+callback_data X!
+
 
 Pattern CB1
 
@@ -899,6 +910,10 @@ B.?
 #
 ########################
 
+# Static connections needs almost everything
+callback_data .Oxo,!
+
+
 Pattern EC1
 
 ??oo??
@@ -1006,6 +1021,10 @@ cbdf
 # CC1xx - patterns without reading constraints
 #
 ##############################################
+
+# Static connections needs almost everything
+callback_data .Oxo,!
+
 
 Pattern CC101
 
@@ -1712,6 +1731,9 @@ ac
 # lunch invalidating patterns
 #
 #############################
+
+callback_data X
+
 
 Pattern Lunch1
 # O stone on edge is not lunch!

@@ -37,6 +37,20 @@
 #  E - Enhance influence.
 #  I - Invasion points.
 
+
+goal_elements none
+# callback_data is pattern class dependent for this database
+
+
+########################
+#
+# Enhancement patterns
+#
+########################
+
+callback_data O
+
+
 Pattern Enhance1
 
 o..?
@@ -384,6 +398,15 @@ Pattern Enhance26
 |..oo..
 
 :8,E,value(15)
+
+
+########################
+#
+# Invasion patterns
+#
+########################
+
+callback_data none
 
 
 Pattern Invade1

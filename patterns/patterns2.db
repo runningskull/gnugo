@@ -38,6 +38,12 @@
 #
 ##############################
 
+
+goal_elements none
+# FIXME: try to make callback_data pattern category specific
+callback_data XOxo
+
+
 ##############################
 #
 # Connection of one space jump

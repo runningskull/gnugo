@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- goal_elements and callback_data added to all relevant databases to
+  drop unnecessary pattern elements
 - add missing break in main.c
 - do_owl_analyze_semeai doesn't crash on certain inconsistent eye results
 - bugfix in adjacent_to_nondead_stone()

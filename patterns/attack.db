@@ -43,6 +43,11 @@
 #
 ##################################################################
 
+
+goal_elements none
+callback_data X
+
+
 Pattern Attack1
 # Even if a ladder works (and is found by the tactical reading) we
 # also want to consider the geta capture.

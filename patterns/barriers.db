@@ -55,6 +55,10 @@
 # documentation for explanation and influence.c for details.
 
 
+goal_elements none
+callback_data XO,!
+
+
 Pattern Barrier1
 
 O,O

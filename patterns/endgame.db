@@ -101,6 +101,12 @@
 #
 ######################################################################
 
+
+goal_elements none
+# Several patterns here have a or d class, so we need these elements.
+callback_data XOxo
+
+
 # first line descents (except in corner)
 ########################################
 
