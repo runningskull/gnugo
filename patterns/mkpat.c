@@ -1240,7 +1240,7 @@ compare_elements(const void *a, const void *b)
  */
 
 static void
-write_elements(char *name)
+write_elements(FILE *outfile, char *name)
 {
   int node;
 
@@ -1249,11 +1249,11 @@ write_elements(char *name)
   /* sort the elements so that least-likely elements are tested first. */
   qsort(elements, el, sizeof(struct patval), compare_elements);
 
-  printf("static struct patval %s%d[]={\n",name,patno);
+  fprintf(outfile, "static struct patval %s%d[]={\n",name,patno);
 
   /* This may happen for fullboard patterns. */
   if (el == 0) {
-    printf("    {0,0,-1}}; /* Dummy element, not used. */\n\n");
+    fprintf(outfile, "    {0,0,-1}}; /* Dummy element, not used. */\n\n");
     return;
   }
   
@@ -1261,7 +1261,7 @@ write_elements(char *name)
     assert(elements[node].x >= mini && elements[node].y >= minj);
     assert(elements[node].x <= maxi && elements[node].y <= maxj);
 
-    printf("   {%d,%d,%d}%s",
+    fprintf(outfile, "   {%d,%d,%d}%s",
 	   elements[node].x - ci, elements[node].y - cj, elements[node].att,
 	   node < el-1 ? ",\n" : "};\n\n");
   }
@@ -1278,21 +1278,21 @@ write_elements(char *name)
 
 /* sort and write out the patterns */
 static void
-write_patterns(char *name)
+write_patterns(FILE *outfile, char *name)
 {
   int j;
 
   /* Write out the patterns. */
   if (fullboard)
-    printf("struct fullboard_pattern %s[]={\n", name);
+    fprintf(outfile, "struct fullboard_pattern %s[]={\n", name);
   else
-    printf("struct pattern %s[]={\n", name);
+    fprintf(outfile, "struct pattern %s[]={\n", name);
 
   for (j = 0; j < patno; ++j) {
     struct pattern *p = pattern + j;
 
     if (fullboard) {
-      printf("  {%s%d,%d,\"%s\",%2d,%2d,%f},\n", name, j, p->patlen,
+      fprintf(outfile, "  {%s%d,%d,\"%s\",%2d,%2d,%f},\n", name, j, p->patlen,
 	     pattern_names[j], p->movei, p->movej, p->value);
       continue;
     }
@@ -1304,7 +1304,7 @@ write_patterns(char *name)
      * as the elements.
      */
     
-    printf("  {%s%d,%d,%d, \"%s\",%d,%d,%d,%d,%d,%d,0x%x,%d,%d",
+    fprintf(outfile, "  {%s%d,%d,%d, \"%s\",%d,%d,%d,%d,%d,%d,0x%x,%d,%d",
 	     name, j,
 	     p->patlen,
 	     p->trfno,
@@ -1318,20 +1318,20 @@ write_patterns(char *name)
 
 
 #if GRID_OPT
-    printf(",\n    {");
+    fprintf(outfile, ",\n    {");
     {
       int ll;
 
       for (ll = 0; ll < 8; ++ll)
-	printf(" 0x%08x%s", p->and_mask[ll], ll<7 ? "," : "");
-      printf("},\n    {");
+	fprintf(outfile, " 0x%08x%s", p->and_mask[ll], ll<7 ? "," : "");
+      fprintf(outfile, "},\n    {");
       for (ll = 0; ll < 8; ++ll)
-	printf(" 0x%08x%s", p->val_mask[ll], ll<7 ? "," : "");
+	fprintf(outfile, " 0x%08x%s", p->val_mask[ll], ll<7 ? "," : "");
     }
-    printf("}\n   ");
+    fprintf(outfile, "}\n   ");
 #endif
 
-    printf(", 0x%x,%f,%f,%f,%f,%f,%f,%f,%d,%s,",
+    fprintf(outfile, ", 0x%x,%f,%f,%f,%f,%f,%f,%f,%d,%s,",
 	   p->class,
 	   p->value,
 	   p->maxvalue,
@@ -1343,18 +1343,18 @@ write_patterns(char *name)
 	   p->autohelper_flag,
 	   helper_fn_names[j]);
     if (p->autohelper)
-      printf("autohelper%s%d", name, j);
+      fprintf(outfile, "autohelper%s%d", name, j);
     else
-      printf("NULL");
-    printf(",%d", p->anchored_at_X);
+      fprintf(outfile, "NULL");
+    fprintf(outfile, ",%d", p->anchored_at_X);
 #if PROFILE_PATTERNS
-    printf(",0,0");
+    fprintf(outfile, ",0,0");
 #if DFA_ENABLED
-    printf(",0");
+    fprintf(outfile, ",0");
 #endif /* DFA_ENABLED */
 #endif
 
-    printf("},\n");
+    fprintf(outfile, "},\n");
   }
 
   if (fullboard) {
@@ -1379,24 +1379,24 @@ write_patterns(char *name)
 
 /* Write out the pattern db */
 static void
-write_pattern_db(char *name)
+write_pattern_db(FILE *outfile, char *name)
 {
   /* Don't want this for fullboard patterns. */
   if (fullboard)
     return;
   
   /* Write out the pattern database. */
-  printf("\n");
-  printf("struct pattern_db %s_db = {\n", name);
-  printf("  -1,\n");
-  printf("  %s\n", name);
+  fprintf(outfile, "\n");
+  fprintf(outfile, "struct pattern_db %s_db = {\n", name);
+  fprintf(outfile, "  -1,\n");
+  fprintf(outfile, "  %s\n", name);
 #if DFA_ENABLED
   if (dfa_c_output)
-    printf(" ,& dfa_%s\n", name); /* pointer to the wired dfa */
+    fprintf(outfile, " ,& dfa_%s\n", name); /* pointer to the wired dfa */
   else
-    printf(" , NULL\n"); /* pointer to a possible dfa */
+    fprintf(outfile, " , NULL\n"); /* pointer to a possible dfa */
 #endif
-  printf("};\n");
+  fprintf(outfile, "};\n");
 }
 
 
@@ -1404,13 +1404,17 @@ int
 main(int argc, char *argv[])
 {
   char line[MAXLINE];  /* current line from file */
+  char *input_file_name = NULL;
+  char *output_file_name = NULL;
+  FILE *input_FILE;
+  FILE *output_FILE;
   int state = 0;
   int i;
   
   {
     /* parse command-line args */
 #if DFA_ENABLED
-    while ( (i=gg_getopt(argc, argv, "V:vcbXfmtD")) != EOF) {
+    while ( (i=gg_getopt(argc, argv, "i:o:V:vcbXfmtD")) != EOF) {
 #else
     while ( (i=gg_getopt(argc, argv, "vcbXfm")) != EOF) {
 #endif
@@ -1421,6 +1425,8 @@ main(int argc, char *argv[])
       case 'X': anchor = ANCHOR_X; break;
       case 'f': fullboard = 1; break;
       case 'm': choose_best_anchor = 1; break;
+      case 'i': input_file_name = gg_optarg; break;
+      case 'o': output_file_name = gg_optarg; break;
 #if DFA_ENABLED
       case 'D':
 	dfa_generate = 1; dfa_c_output = 1; 
@@ -1431,6 +1437,24 @@ main(int argc, char *argv[])
       default:
 	fprintf(stderr, "Invalid argument ignored\n");
       }
+    }
+  }
+  
+  if (input_file_name == NULL) {
+    input_FILE = stdin;
+  } else {
+    if ((input_FILE = fopen(input_file_name, "r")) == NULL) {
+      fprintf(stderr, "Cannot open file %s\n", input_file_name);
+      exit(1);
+    }
+  }
+  
+  if (output_file_name == NULL) {
+    output_FILE = stdout;
+  } else {
+    if ((output_FILE = fopen(output_file_name, "w")) == NULL) {
+      fprintf(stderr, "Cannot write to file %s\n", output_file_name);
+      exit(1);
     }
   }
 
@@ -1447,7 +1471,7 @@ main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  printf(PREAMBLE);
+  fprintf(output_FILE, PREAMBLE);
 
   /* Parse the input file, output pattern elements as as we find them,
    * and store pattern entries for later output.
@@ -1476,7 +1500,7 @@ main(int argc, char *argv[])
    *
    */
   
-  while (fgets(line, MAXLINE, stdin)) {
+  while (fgets(line, MAXLINE, input_FILE)) {
 
     if (line[strlen(line)-1] != '\n') {
       fprintf(stderr, "mkpat: line truncated: %s, length %d\n", line,
@@ -1566,7 +1590,7 @@ main(int argc, char *argv[])
     else if (line[0] == ':') {
       if (state == 2 || state == 3) {
 	finish_pattern(line);
-	write_elements(argv[gg_optind]);
+	write_elements(output_FILE, argv[gg_optind]);
 #if DFA_ENABLED
 	if (dfa_generate)
 	  write_to_dfa(patno);
@@ -1638,7 +1662,7 @@ main(int argc, char *argv[])
   /* Write the autohelper code. */
   printf("%s", autohelper_code);
 
-  write_patterns(argv[gg_optind]);
+  write_patterns(output_FILE, argv[gg_optind]);
 
 #if DFA_ENABLED
   if (dfa_generate) {
@@ -1660,7 +1684,7 @@ main(int argc, char *argv[])
 #endif
 
 
-  write_pattern_db(argv[gg_optind]);
+  write_pattern_db(output_FILE, argv[gg_optind]);
 
   return fatal_errors ? 1 : 0;
 }

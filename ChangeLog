@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- gtp_worm_stones can be run with stackp>0 and can take a color argument
+- mkpat can take -i and -o options
+
 3.1.8 released October 1, 2001
 
 - defend2() revised

@@ -1944,7 +1944,7 @@ gtp_worm_data(char *s, int id)
 }
 
 /* Function:  List the stones of a worm
- * Arguments: the location
+ * Arguments: the location, "BLACK" or "WHITE"
  * Fails:     if called on an empty or off-board location
  * Returns:   list of stones
  */
@@ -1953,30 +1953,35 @@ gtp_worm_stones(char *s, int id)
 {
   int i = -1;
   int j = -1;
+  int color = EMPTY;
   int m, n;
   int u, v;
 
-  if (sscanf(s, " %*c") >= 0 && !gtp_decode_coord(s, &i, &j))
-    return gtp_failure(id, "invalid coordinate");
-
+  if (sscanf(s, " %*c") >= 0) {
+    if (!gtp_decode_coord(s, &i, &j)
+	&& !gtp_decode_color(s, &color))
+      return gtp_failure(id, "invalid coordinate");
+  }
+    
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "worm_stones called on an empty vertex");
-
-  examine_position(EMPTY, EXAMINE_WORMS);
 
   gtp_printid(id, GTP_SUCCESS);
   
   for (u = 0; u < board_size; u++)
     for (v = 0; v < board_size; v++) {
-      if (BOARD(u, v) == EMPTY)
+      if (BOARD(u, v) == EMPTY
+	  || (color != EMPTY && BOARD(u, v) != color))
 	continue;
-      if (worm[POS(u, v)].origin != POS(u, v))
+      if (find_origin(POS(u, v)) != POS(u, v))
 	continue;
-      if (ON_BOARD2(i, j) && worm[POS(i, j)].origin != POS(u, v))
+      if (ON_BOARD2(i, j) 
+	  && !same_string(POS(u, v), POS(i, j)))
 	continue;
       for (m = 0; m < board_size; m++)
 	for (n = 0; n < board_size; n++)
-	  if (worm[POS(m, n)].origin == POS(u, v))
+	  if (BOARD(m, n) != EMPTY
+	      && same_string(POS(m, n), POS(u, v)))
 	    gtp_mprintf("%m ", m, n);
       gtp_printf("\n");
     }
@@ -2022,6 +2027,9 @@ gtp_dragon_data(char *s, int id)
 
   if (sscanf(s, " %*c") >= 0 && !gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
+
+  if (stackp > 0)
+    return gtp_failure(id, "dragon data unavailable when stackp > 0");
 
   examine_position(EMPTY, EXAMINE_DRAGONS);
 
