@@ -157,6 +157,9 @@ loadsgf games/nngs/halti-gnugo-3.3.17-200303162357.sgf 228
 299 owl_defend P3
 #? [1 Q1]*
 
+loadsgf games/nngs/wingjk-gnugo-3.3.17-200304070910.sgf
+300 owl_defend Q4
+#? [1 S5|S2]
 
 ########### end of tests #####################
 

@@ -2522,6 +2522,7 @@ OX.x
 
 Pattern A715
 # gf New pattern. (3.1.11)
+# evand Modified. (3.3.18)
 
 ?*YX        attack eye shape and possibly threaten to cut
 x..x
@@ -2530,10 +2531,10 @@ x..x
 :8,-,value(60)
 
 ?*YX
-x.bx
+x..x
 ?xXa
 
-;owl_eyespace(b) && !owl_proper_eye(*) && !attack(a)
+;!owl_proper_eye(*) && !attack(a)
 
 
 Pattern A716

@@ -2848,6 +2848,22 @@ O*X
 :8,-,value(55)
 
 
+Pattern D722
+# evand New pattern. (3.3.18)
+
+?O*X       #half eye in sente
+O.O?
+?O??
+
+:8,-,value(65)
+
+?O*A
+ObO?
+?O??
+
+;!obvious_false_oeye(b) && oplay_attack(*,A)
+
+
 #########################################################
 #                                                       #
 #           Make eyeshape in the corner                 #
