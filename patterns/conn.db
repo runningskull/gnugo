@@ -811,6 +811,7 @@ aXb
 
 
 Pattern CB16
+# gf Revised constraint. (3.3.13)
 
 ?O
 x*          fragile double connection 
@@ -824,7 +825,7 @@ x*
 XO
 b!
 
-;!xplay_connect(*,a,b)
+;xplay_connect(a,b) && !xplay_connect(*,a,b)
 
 
 Pattern CB17

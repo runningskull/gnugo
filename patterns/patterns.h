@@ -169,7 +169,7 @@ typedef int (*autohelper_fn_ptr)(struct pattern *, int rotation,
 
 /* Collection of the classes inducing move reasons. */
 #define CLASS_MOVE_REASONS (CLASS_C | CLASS_B | CLASS_b | \
-                            CLASS_e | CLASS_E | CLASS_a | CLASS_d | \
+                            CLASS_e | CLASS_E | CLASS_I | CLASS_a | CLASS_d | \
 			    CLASS_J | CLASS_j | CLASS_U | CLASS_T | CLASS_t | \
                             CLASS_W | CLASS_c | CLASS_F)
 

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new autohelpers omoyo_opposite and xmoyo_opposite
+- CLASS_I added to CLASS_MOVE_REASONS in patterns.h
 - compactify_att() removes duplicates from attribute list in DFA
 - dfa_rt_t.next now stores offset to next state
 - new fucntion dfa_shuffle() to minimize jump sizes between DFA states
@@ -11,9 +13,13 @@
 - new parameter allowed_moves[] to do_genmove(), review_move_reasons(),
   and find_best_move()
 - always call init_board() when reaching a new_position()
-- new tests
 - eyes.db revised
 - bugfixes in cut_connect_callback() in connections.c
+- tuning
+- owl tuning
+- influence tuning
+- connection tuning
+- new tests
 
 3.3.12 released November 20, 2002
 

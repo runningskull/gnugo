@@ -219,10 +219,14 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
     if (pattern->class & CLASS_B) {
       if (pattern->patn[k].att != ATT_not)
 	break; /* The inhibition points are guaranteed to come first. */
-      if (color == WHITE && white_eye[pos].color == WHITE_BORDER)
+      if (color == WHITE && white_eye[pos].color == WHITE_BORDER) {
 	white_eye[pos].type |= INHIBIT_CONNECTION;
-      else if (color == BLACK && black_eye[pos].color == BLACK_BORDER)
+	DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
+      }
+      else if (color == BLACK && black_eye[pos].color == BLACK_BORDER) {
 	black_eye[pos].type |= INHIBIT_CONNECTION;
+	DEBUG(DEBUG_DRAGONS, "inhibiting connection at %1m\n", pos);
+      }
     }
   } /* loop over elements */
 }

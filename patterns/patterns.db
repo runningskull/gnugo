@@ -2470,6 +2470,7 @@ Pattern EC78
 #  see trevora:610
 #FIXME: There's still a problem here, in that this sacrifice
 #       is deemed unsafe, and not played....
+# gf Is this really a cut pattern? (3.3.13)
 
 OOO	block or cut into black's territory.
 ...
@@ -2487,6 +2488,17 @@ a..
 
 ; safe_omove(*)
 ; || !oplay_attack(*,a,b,b)
+
+
+Pattern EC79
+# gf New Pattern (3.3.13)
+
+X.O      connect
+X*.
+O..
+---
+
+:8,C
 
 
 ##############################################
@@ -4505,6 +4517,24 @@ Pattern EB615
 ---
 
 :8,OXe
+
+
+Pattern EB615b
+# gf New pattern. (3.3.13)
+
+.O?            Prevent monkey jump or other incursion
+.*X
+...
+---
+
+:8,OXed
+
+.O?
+a*X
+...
+---
+
+;omoyo_opposite(a)
 
 
 Pattern EB616
@@ -6869,6 +6899,7 @@ Pattern EB2003
 
 
 Pattern CB1
+# gf Removed d classification (pattern too general). (3.3.13)
 
 ????????           jump into empty space
 .......?
@@ -6876,10 +6907,11 @@ Pattern CB1
 .......?
 ????????
 
-:-,OEd,jump_out_helper
+:-,OE,jump_out_helper
 
 
 Pattern CB2
+# gf Removed d classification (pattern too general). (3.3.13)
 
 ??????             jump into empty space
 ?....x
@@ -6887,7 +6919,7 @@ Pattern CB2
 ?....x
 ??????
 
-:8,OEd,jump_out_helper
+:8,OE,jump_out_helper
 
 
 Pattern CB3
@@ -6903,6 +6935,7 @@ Pattern CB3
 
 
 Pattern CB4
+# gf Removed d classification (pattern too general). (3.3.13)
 
 ?????		Jump out if starting to get surrounded
 ?...?
@@ -6910,10 +6943,11 @@ Pattern CB4
 ?...?
 ?.OO?
 
-:8,OEd,jump_out_helper
+:8,Oe,jump_out_helper
 
 
 Pattern CB5
+# gf Removed d classification (pattern too general). (3.3.13)
 
 ?????          jump out
 ?...O
@@ -6921,10 +6955,11 @@ Pattern CB5
 ??..?
 ?????
 
-:8,OEd,jump_out_helper
+:8,Oe,jump_out_helper
 
 
 Pattern CB6
+# gf Removed d classification (pattern too general). (3.3.13)
 
 ??????         jump out
 ?...Oo
@@ -6932,7 +6967,7 @@ Pattern CB6
 ??..Oo
 ??????
 
-:8,OEd,jump_out_helper
+:8,Oe,jump_out_helper
 
 
 Pattern CB7
@@ -8178,6 +8213,7 @@ O.XO         bend around
 
 
 Pattern CB258
+# gf Added constraint. (3.3.13)
 
 ??????          jump! (But not down to second line)
 ?....?
@@ -8187,15 +8223,24 @@ oO.*.?
 
 :8,OXd
 
+??????
+?....?
+oa.*.?
+?....?
+?X...?
+
+;is_surrounded(a)
+
 
 Pattern CB259
+# gf Removed d classification (pattern too general). (3.3.13)
 
 ?....           jump!
 oO.*.
 ?....
 ?X.X.
 
-:8,OXd
+:8,OX
 
 
 Pattern CB261
@@ -10587,6 +10632,24 @@ Pattern ED93
 > replace(a,*)
 
 
+Pattern ED94
+# gf New pattern. (3.3.13)
+
+oo.O?     Significant improvement of eyespace.
+.*.OX     Often sufficient for local life.
+..OXX
+-----
+
+:8,dX
+
+oo.b?
+.*abD
+..cDD
+-----
+
+;!attack(D) && !xplay_defend_both(a,b,c)
+
+
 #####################################################################
 #
 # Center defend/attack patterns
@@ -11495,6 +11558,28 @@ X.*.X
 -----
 
 ;!xmoyo(a)
+
+
+Pattern EJ13b
+# gf New pattern. (3.3.13)
+
+o......     invade
+o......
+O.X.*.X
+o......
+o......
+-------
+
+:8,Ia
+
+o......
+o......
+a.X.*.X
+o......
+o......
+-------
+
+;!weak(a)
 
 
 Pattern EJ14

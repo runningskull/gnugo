@@ -3017,6 +3017,22 @@ aC
 ;owl_escape_value(C)>0 && xplay_attack_either(*,a,a,b)
 
 
+Pattern A1005b
+# gf Need to consider both directions. (3.3.13)
+
+X?          cut!
+*O
+.Y
+
+:8,-,value(90)
+
+C?
+*b
+aY
+
+;owl_escape_value(C)>0 && xplay_attack_either(*,a,a,b)
+
+
 Pattern A1006
 
 XOY        push out

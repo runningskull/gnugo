@@ -953,6 +953,19 @@ xb.
 ;oplay_attack(a,b,C)
 
 
+Pattern Barrier66
+# gf New pattern. (3.3.13)
+
+|..X...
+|......
+|..XO..
+|..,,..
+|..,...
+|......
++------
+
+:8,D
+
 
 Pattern Intrusion1
 

@@ -1452,11 +1452,17 @@ O.
 Pattern CE29
 # tm New Pattern (3.1.20)  (see trevord:950)
 # FIXME: this pattern better in patterns.db?
+# gf Added constraint. (3.3.13) (see gunnar:18)
 
 X*X	Wedge
 O.X
 
 :8,OXe
+
+B*X
+OaX
+
+;oplay_attack_either(*,a,a,B)
 
 
 Pattern CE30

@@ -2977,6 +2977,25 @@ a*bX
 ;alive(d) && !xplay_defend_both(*,a,b,?,c,a,d)
 
 
+Pattern Sente18
+# gf New pattern. (3.3.13)
+# The reverse followup value is probably often bigger than 5 points.
+
+X..O..
+XOX*..
+......
+------
+
+:8,X,reverse_followup(5)
+
+C..b..
+COX*.a
+......
+------
+
+;omoyo_opposite(a) && alive(b) && alive(C)
+
+
 ########################################################
 #
 # Double threat moves and defense against double threats
