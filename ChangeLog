@@ -11,7 +11,8 @@
 - regress.plx includes "unexpected result" list
 - new gtp_example/sgf2tst.pl
 - tuning
-- a few test revisions
+- test revisions
+- new trevora tests
 
 3.1.14 released November 17, 2001
 

@@ -29,7 +29,6 @@
 # This is a script which converts a game record annotated with test cases to
 # the *.tst format.
 # 
-# 
 # The script currently only processes SGF files without variations, but that's
 # quite useful enough when annotating games.
 #
@@ -43,6 +42,8 @@
 #  3) Otherwise, a single line is interpreted as the correct answer, with
 #     the appropriate "gg_genmove" directive added automatically.
 # 
+# See regression/trevora.tst for examples. The sgf files for this test
+# are in regression/games/trevor/auto .
 
 use strict;
 use warnings;
