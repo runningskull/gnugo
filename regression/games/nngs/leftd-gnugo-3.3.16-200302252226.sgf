@@ -1,0 +1,47 @@
+(;GM[1]FF[4]
+SZ[19]HA[9]KM[0.5]
+PW[leftd]WR[2k*]
+PB[GnuGo (GNU Go 3.3.16)]BR[10k*]
+PC[NNGS]DT[2003-02-25]AP[gnugoclient:2.0]
+RE[W+21.5]
+AB[dd][jd][pd][dj][jj][pj][dp][jp][pp]
+;W[qf];B[qe];W[oe];B[pf];W[pe];B[re];W[rf];B[md];W[qd];B[of];W[rd]
+;B[pc];W[nf];B[ne];W[od];B[oc];W[se];B[ng];W[mf];B[mg];W[lf];B[kg]
+;W[lg];B[lh];W[og];B[pg];W[oh];B[nd];W[qe];B[ph];W[oi];B[kf];W[mh]
+;B[pm];W[pi];B[qj];W[cn];B[co];W[dn];B[fp];W[cj];B[ck];W[dk];B[di]
+;W[ci];B[ek];W[dl];B[bk];W[ch];B[mi];W[nh];B[mj];W[oj];B[nl];W[ol]
+;B[om];W[nk];B[mk];W[pl];B[ql];W[nm];B[ml];W[qm];B[qn];W[rm];B[ln]
+;W[pn];B[on];W[po];B[oo];W[qo];B[qp];W[ro];B[rp];W[op];B[np];W[oq]
+;B[mo];W[sp];B[pq];W[pr];B[or];W[rq];B[nq];W[kh];B[li];W[ld];B[le]
+;W[ke];B[jg];W[me];B[rb];W[mc];B[nc];W[lb];B[nb];W[qc];B[qb];W[pa]
+;B[fn];W[fm];B[gm];W[gn];B[em];W[fo];B[en];W[eo];B[fl];W[do];B[bo]
+;W[ep];B[go];W[gp];B[dq];W[ho];B[fq];W[eq];B[er];W[fr];B[gq];W[dr]
+;B[cr];W[es];B[hq];W[br];B[bq];W[cs];B[in];W[cq];B[bm];W[cl];B[fc]
+;W[dh];B[cf];W[eh];B[fi];W[bl];B[qr];W[rl];B[ff];W[fh];B[gi];W[io]
+;B[jo];W[hn];B[hm];W[jn];B[im];W[ir];B[hr];W[ip];B[iq];W[jq];B[kq]
+;W[jr];B[kr];W[je];B[id];W[ig];B[jh];W[cc];B[dc];W[db];B[eb];W[bd]
+;B[be];W[bb];B[da];W[ca];B[cb];W[hs];B[gs]C[L:8];W[db];B[cd]C[L:9]
+;W[ea];B[fa]C[L:10];W[da];B[jb];W[gb];B[fb];W[hd];B[if]C[L:9];W[he]
+;B[ie]C[L:10];W[hf];B[gc];W[gg];B[hc];W[ei];B[ej];W[rr];B[ad];W[bc]
+;B[bg];W[bh];B[mb];W[lc];B[rs];W[pb];B[qa];W[sb];B[sc];W[rc];B[sa]
+;W[sd];B[ma];W[sb];B[ob];W[ra];B[la];W[kb];B[ka];W[hh];B[hi];W[ih]
+;B[ii];W[jf];B[ki];W[ee];B[fe];W[ef];B[ed];W[gd];B[gh];W[fg];B[hg]
+;W[fd];B[qq];W[so];B[kd];W[le];B[dm];W[cm];B[el];W[ac];B[ah];W[ai]
+;B[kc];W[af];B[ag];W[ae];B[cg];W[dg];B[de];W[df];B[oa];W[nj];B[gr]
+;W[fs];B[is];W[sr];B[ni];W[];B[ok];W[qk];B[ec];W[pk];B[ce];W[];B[bf]
+;W[ad];B[js];W[];B[hp];W[go];B[qs];W[];B[ss];W[sq];B[]
+C[final_score: W+21.5
+G18 removed
+F15 removed
+P14 removed
+Q10 removed
+B9 removed
+B7 removed
+O7 removed
+K6 removed
+R6 removed
+B5 removed
+D4 removed
+B3 removed
+Q2 removed]
+)
