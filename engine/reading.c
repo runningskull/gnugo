@@ -1306,22 +1306,28 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   while (aa_val > 0) {
     /* Try dropping moves from the combination and see if it still
      * works. What we really want is to get the proper defense move
-     * into (*i, *j).
+     * into (defendi, defendj).
      */
     forbidden[fi][fj] = 1;
-    aa_val = do_atari_atari(other, &fi, &fj, i, j, -1, -1, 0, aa_val);
+    aa_val = do_atari_atari(other, &fi, &fj, &defendi, &defendj,
+			    -1, -1, 0, aa_val);
   }
 
   popgo();
+
+  if (i) *i = defendi;
+  if (j) *j = defendj;
+  
+  
   /* We know that a combination exists, but we don't know if
    * the original move at (ai, aj) was really relevant. So we
    * try omitting it and see if a combination is still found.
    */
   if (do_atari_atari(other, NULL, NULL, NULL, NULL,
-			  -1, -1, 0, minsize) >= aa_val)
-    return 1;
-  else
+		     -1, -1, 0, minsize) >= aa_val)
     return 0;
+  else
+    return 1;
 }
 
 
