@@ -157,8 +157,8 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
 #if TRACE_READ_RESULTS
 
 #define TRACE_CACHED_RESULT(rr) \
-      gprintf("%o%s %m %d %d %m (cached) ", read_function_name, \
-	      qi, qj, stackp, \
+      gprintf("%o%s %1m %d %d %1m (cached) ", read_function_name, \
+	      q, stackp, \
 	      rr_get_result(rr), \
 	      rr_get_result_move(rr)); \
       dump_stack();
@@ -229,7 +229,7 @@ int get_read_result(int routine, int komaster, int kom_pos,
     if (read_result) { \
       rr_set_result_ri_rj(*(read_result), 0, 0); \
     } \
-    gprintf("%o%s %m %d 0 0 0 ", read_function_name, q, stackp); \
+    gprintf("%o%s %1m %d 0 0 0 ", read_function_name, q, stackp); \
     dump_stack(); \
     return 0; \
   } while (0)
@@ -240,7 +240,7 @@ int get_read_result(int routine, int komaster, int kom_pos,
     if (read_result) { \
       rr_set_result_ri_rj(*(read_result), (value), (move)); \
     } \
-    gprintf("%o%s %m %d %d %d ", read_function_name, q, stackp, \
+    gprintf("%o%s %1m %d %d %d ", read_function_name, q, stackp, \
 	    (value), (move)); \
     dump_stack(); \
     return (value); \

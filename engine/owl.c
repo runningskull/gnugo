@@ -2751,7 +2751,7 @@ owl_does_defend(int ti, int tj, int m, int n)
     return 0;
 
   opos = dragon[m][n].origin;
-  TRACE("owl_does_defend %m %m(%m)\n", ti, tj, m, n, opos);
+  TRACE("owl_does_defend %m %m(%1m)\n", ti, tj, m, n, opos);
 
   if (search_persistent_owl_cache(OWL_DOES_DEFEND, move, str, 0,
 				  &result, NULL, NULL, NULL))
