@@ -750,6 +750,31 @@ loadsgf games/trevor/auto/a031.sgf 40
 181 defend E3
 #? [1 E4]*
 
+# A18 only attacks with bad ko (extremely bad since the whole semeai
+# is lost if white ignores the ko threat). A17 also attacks with bad
+# ko but here a lost ko means seki. A19 gives a good ko but losing it
+# costs the whole semeai.
+# The distinction between these results is too subtle for the tactical
+# reading code so for now we only check that it realizes that there is
+# no attack without ko.
+loadsgf games/reading41.sgf 118
+182 attack C19
+#? [(2|3) (A17|A19|A18)]
+183 defend C19
+#? [1 (A19|E11)]
+
+# Playing E11 immedidately gives bad ko. A18 obviously is totally
+# ineffective. Necessary to start at A16
+loadsgf games/reading41.sgf 130
+184 attack C19
+#? [2 A16]
+185 attack A19
+#? [2 A16]
+186 defend C19
+#? [1 E11]
+187 defend A19
+#? [1 E11]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

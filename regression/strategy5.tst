@@ -110,6 +110,11 @@ loadsgf games/vaughn.sgf 44
 278 gg_genmove black
 #? [!J11]*
 
+# Really, anything is better than A18. (B13 and B12 are quite
+# ineffective too but can at least not be repeated...)
+loadsgf games/reading41.sgf 130
+279 gg_genmove black
+#? [!A18]
 
 ############ End of Tests #################
 

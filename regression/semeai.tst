@@ -258,6 +258,20 @@ loadsgf games/nngs/jypower-gnugo-3.3.17-200304150031.sgf 166
 50 analyze_semeai O7 L7
 #? [1 1 (J5|J6|K7|J4|G5|G6|H7)]
 
+# See reading:182,183 for comments.
+loadsgf games/reading41.sgf 118
+51 analyze_semeai C19 B16
+#? [1 0 (A19|E11)]
+52 analyze_semeai B16 C19
+#? [1 3 A17]
+
+# See reading:184-187 for comments.
+loadsgf games/reading41.sgf 130
+53 analyze_semeai C19 B16
+#? [1 0 E11]
+54 analyze_semeai B16 C19
+#? [1 2 A16]
+
 
 ########### end of semeai tests #################
 
