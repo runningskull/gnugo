@@ -307,3 +307,7 @@ loadsgf games/trevor/trevor_30.sgf
 loadsgf games/trevor/trevor_30.sgf
 301 gg_genmove black
 #? [!PASS]*
+
+loadsgf games/trevor/trevor_32.sgf
+320 gg_genmove black
+#? [J2]*
