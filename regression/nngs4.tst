@@ -34,6 +34,20 @@ loadsgf games/nngs/evand-gnugo-3.3.11-200211151742.sgf 142
 70 owl_defend J11
 #? [1 S12]
 
+loadsgf games/nngs/gnugo-3.3.12-jimm-200211261724.sgf 20
+80 restricted_genmove white M7 J6
+#? [J6]*
+
+loadsgf games/nngs/gnugo-3.3.12-jimm-200211261724.sgf 170
+90 gg_genmove white
+#? [D12|C11|E14]*
+
+loadsgf games/nngs/leftd-gnugo-3.3.12-200211292017.sgf 184
+100 gg_genmove black
+#? [F18|G18]*
+
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
