@@ -1209,7 +1209,7 @@ XO.*.
 XXO..
 .....
 
-:8,XeCad,shape(5)
+:8,XCad,shape(5)
 
 ?a.xx
 Xa.*.
@@ -2466,6 +2466,7 @@ Pattern EC77
 
 Pattern EC78
 #tm New Pattern (3.1.18)
+# gf Revised constraint. (3.3.12)
 #  see trevora:610
 #FIXME: There's still a problem here, in that this sacrifice
 #       is deemed unsafe, and not played....
@@ -2484,7 +2485,7 @@ a..
 ...
 ---
 
-; !oplay_attack(*)
+; safe_omove(*)
 ; || !oplay_attack(*,a,b,b)
 
 
@@ -2903,7 +2904,7 @@ X..O
 .*..
 O.??
 
-:8,Xead
+:8,OXead
 
 
 Pattern CS3
@@ -3547,7 +3548,7 @@ Pattern EB203
 ......
 ------
 
-:8,E
+:8,Oe
 
 
 Pattern EB204
@@ -3560,7 +3561,7 @@ X.O.
 ....
 ----
 
-:8,E
+:8,OE
 
 
 Pattern EB205
@@ -4005,7 +4006,7 @@ XXO..?
 .....?
 ------
 
-:8,eEad
+:8,ad
 
 
 Pattern EB411
@@ -4018,7 +4019,7 @@ XXO..oo
 .....oo
 -------
 
-:8,eEad,shape(7)
+:8,ead,shape(7)
 
 ...??oo
 O....oo
@@ -4041,7 +4042,7 @@ OXX.
 ....
 ----
 
-:8,OXeEd,shape(3)
+:8,OXed,shape(3)
 
 
 ##############################
@@ -4081,7 +4082,7 @@ Pattern EB502
 ......
 ------
 
-:8,e,followup(5)
+:8,Oe,followup(5)
 
 
 Pattern EB503
@@ -4092,7 +4093,7 @@ Pattern EB503
 ......
 ------
 
-:8,e
+:8,Oe
 
 
 Pattern EB504
@@ -4103,7 +4104,7 @@ xX*.o
 .....
 -----
 
-:8,e
+:8,Oe
 
 
 Pattern EB505
@@ -4115,7 +4116,7 @@ O.OO.
 ?....
 -----
 
-:8,e
+:8,Oe
 
 
 Pattern EB506
@@ -4127,7 +4128,7 @@ x.OO.
 ?....
 -----
 
-:8,e
+:8,Oe
 
 ??.??
 .*B..
@@ -4149,7 +4150,7 @@ X*..
 ....
 ----
 
-:8,eE,shape(3)
+:8,Oe,shape(3)
 
 
 Pattern EB507a
@@ -4162,10 +4163,11 @@ O...
 ....
 ----
 
-:8,eE,shape(4)
+:8,Oe,shape(4)
 
 
 Pattern EB508
+# gf FIXME: This pattern seems to need more context or a constraint. (3.3.12)
 
 ..O.   Block opponent's extension on third line
 ....
@@ -4174,7 +4176,7 @@ Pattern EB508
 ....
 ----
 
-:8,e
+:8,OE
 
 
 Pattern EB509
@@ -4186,7 +4188,7 @@ X*..
 ....
 ----
 
-:8,e
+:8,Oe
 
 
 Pattern EB510
@@ -4197,7 +4199,7 @@ X*..
 ....
 ----
 
-:8,e
+:8,Oe
 
 
 Pattern EB511
@@ -4230,7 +4232,7 @@ X.X*..
 ......
 ------
 
-:8,e
+:8,Oe
 
 
 Pattern EB514
@@ -4254,7 +4256,7 @@ Pattern EB515
 .....
 -----
 
-:8,e
+:8,Oe
 
 
 Pattern EB516
@@ -4266,7 +4268,7 @@ O.....o
 .......
 -------
 
-:8,e
+:8,Oe
 
 
 Pattern EB517
@@ -4311,7 +4313,7 @@ XO...
 .....
 -----
 
-:8,e
+:8,Oe
 
 .....
 XO...
@@ -4324,6 +4326,7 @@ XO...
 
 
 Pattern EB521
+# gf FIXME: This fixed value looks dangerous. (3.3.12)
 
 ..O?        urgent atari
 ..OX
@@ -4553,41 +4556,43 @@ oOa?
 
 
 Pattern EB624
+# gf Unified with EB625. (3.3.12)
 
 ?O??        block
-..OX
+?.OX
 .*X.
 ....
 ----
 
-:8,e
+:8,Oe
 
-?O??
-..aX
+?b??
+?.aX
 .*X.
 ....
 ----
 
-;lib(a)>1
+;lib(a)>1 && !oplay_disconnect(*,*,b)
 
 
-Pattern EB625
-
-???O?        block after opponent hanes
-?XO.?
-..X*.
-.....
------
-
-:8,e
-
-???O?
-?Xa.?
-..X*.
-.....
------
-
-;lib(a)>1
+# Pattern EB625
+# # gf Redundant, removed. (3.3.12)
+# 
+# ???O?        block after opponent hanes
+# ?XO.?
+# ..X*.
+# .....
+# -----
+# 
+# :8,Oe
+# 
+# ???O?
+# ?Xa.?
+# ..X*.
+# .....
+# -----
+# 
+# ;lib(a)>1
 
 
 Pattern EB626
@@ -4609,7 +4614,7 @@ X*....
 ......
 ------
 
-:8,e
+:8,Oe
 
 
 Pattern EB628
@@ -4620,7 +4625,7 @@ Pattern EB628
 ....
 ----
 
-:8,Xe
+:8,OXe
 
 
 Pattern EB629
@@ -4641,7 +4646,7 @@ Pattern EB630
 ..X.X.
 ------
 
-:8,e
+:8,Oe
 
 
 Pattern EB631
@@ -4652,7 +4657,7 @@ o*XOX
 o..X.
 -----
 
-:8,e
+:8,Oe
 
 oOb??
 o.ac?
@@ -4664,8 +4669,7 @@ o..X.
 
 
 Pattern EB632
-# FIXME: tm - This is not really a b pattern, right?
-# gf It's a workaround for incorrect amalgamation, I think.
+# gf Revised pattern. (3.3.12)
 
 ?oO??          clamp on second
 ?O..X
@@ -4673,15 +4677,15 @@ XOX*.
 .X...
 -----
 
-:8,e
+:8,Oe
 
 ?oO??
-?dbaX
-XdC*.
+?a..X
+XaX*.
 .X...
 -----
 
-;lib(d)>=3 && !oplay_defend_both(*,a,b,a,C)
+;!oplay_disconnect(*,*,a)
 
 
 Pattern EB633
@@ -4704,7 +4708,7 @@ Pattern EB634
 .....x
 ------
 
-:8,Xe
+:8,OXe
 
 
 Pattern EB635
@@ -4869,7 +4873,7 @@ Pattern EB642
 
 Pattern EB701
 
-|.OX        Descending in the corner for profit and life
+|.OX        Descending in the corner for profit and eyespace
 |.OX
 |.*.
 +---
@@ -5172,36 +5176,33 @@ Xb.
 
 
 Pattern EB801
-# Not to first line. (Maybe not to second either?)
+# Not to first line.
 
 O.X.?    jump under on second line
 .O.*?
 ....?
 -----
 
-:8,e
+:8,Oe
 
 
 Pattern EB802
-# gf FIXME: Change this to an oplay_connect() when that is reliable. (3.1.23)
+# gf Revised pattern and constraint. (3.3.12)
 
-ooxxxx    monkey jump
-oO....
+??xxxx    monkey jump
+?O....
 o...*.
 ------
 
 :8,OXe
 
-CDxABx
-Ehdea.
-ofcb*g
+bcEFGx
+da....
+o...*.
 ------
 
-;!weak(h) && x_alive_somewhere(A,B) && o_alive_somewhere(C,D,E)
-;&& xplay_attack(d,c,f,f) == WIN
-;&& !oplay_attack_either(*,d,c,h,c)
-;&& !oplay_attack(*,a,b,c,d,e,f,g,c,h)
-;&& !oplay_attack(*,e,b,d,c,h)
+;!weak(a) && o_alive_somewhere(b,c,d) && x_alive_somewhere(E,F,G)
+;&& !oplay_disconnect(*,*,a)
 
 
 Pattern EB803
@@ -5314,10 +5315,11 @@ O...
 
 
 Pattern EB913
+# gf Unified with EB916. (3.3.12)
 
 ??X.           don't let opponent block
 ?O*.
-....
+o...
 ....
 ----
 
@@ -5377,15 +5379,15 @@ OAOOa.
 > antisuji(a);
 
 
-Pattern EB916
-
-??X.           less urgent in this case
-?O*.
-O...
-....
-----
-
-:8,OXe
+# Pattern EB916
+# # gf Redundant, removed. (3.3.12)
+# ??X.           less urgent in this case
+# ?O*.
+# O...
+# ....
+# ----
+# 
+# :8,OXe
 
 
 Pattern EB917
@@ -5438,7 +5440,7 @@ Pattern EB920
 .......
 -------
 
-:8,e
+:8,Oe
 
 
 Pattern EB921
@@ -5719,7 +5721,7 @@ OXO*.
 .....
 -----
 
-:8,e
+:8,Oe
 
 ?OA..
 aXO*.
@@ -5737,7 +5739,7 @@ O.O*
 o...
 ----
 
-:8,e
+:8,Oe
 
 
 Pattern EB1018
@@ -5747,7 +5749,7 @@ XOoO*.
 oooo..
 ------
 
-:8,Xed
+:8,OXed
 
 
 Pattern EB1019
@@ -5821,6 +5823,7 @@ Pattern EB1201
 
 
 Pattern EB1202
+# gf FIXME: Too high value? (3.3.12)
 
 ?...?       hane
 O.X*.
@@ -5828,19 +5831,27 @@ O.X*.
 ....?
 -----
 
-:8,OXeECad,value(25)
+:8,OXeCad,value(25)
 
 
 Pattern EB1203
-# Almost but not quite guarantees connection (exceptions are rare)
+# gf Added constraint. (3.3.12)
 
-?..X.       extend to defend
+?..X.       extend to defend and connect
 O.XO*
 ..O..
 .....
 -----
 
-:8,OXeECad,value(25)
+:8,OXeCad,value(25)
+
+?..X.
+a.XO*
+..O..
+.....
+-----
+
+;!oplay_disconnect(*,*,a)
 
 
 ##################
@@ -6132,7 +6143,7 @@ oo*.?
 ....?
 -----
 
-:8,OXEad
+:8,OXead
 
 
 Pattern EB1503
@@ -6145,7 +6156,7 @@ x*..
 ....
 ----
 
-:8,OXEd
+:8,OXed
 
 
 ########
@@ -6435,7 +6446,7 @@ Pattern EB1707
 ....
 ----
 
-:8,OXEd
+:8,OXed
 
 
 Pattern EB1708
@@ -6953,7 +6964,7 @@ Pattern CB12
 .*XO
 X.O.
 
-:8,OXeEBad,shape(2)
+:8,OXeBad,shape(2)
 
 ..a.
 .*XO
@@ -7000,7 +7011,7 @@ Pattern CB14a
 .X*O
 ...?
 
-:8,OXEd,shape(3)
+:8,OXed,shape(3)
 
 ?o??
 ..aO
@@ -7019,7 +7030,7 @@ Pattern CB14b
 .X.O
 ...?
 
-:8,OXEd,shape(2)
+:8,OXed,shape(2)
 
 ?o??
 ..*O
@@ -7037,7 +7048,7 @@ xx*.
 xXO.
 xxXO
 
-:8,ECd,shape(2)
+:8,Oed,shape(2)
 
 .bO.
 ac*.
@@ -7138,9 +7149,141 @@ Pattern CB106
 #> replace(a,*)
 
 
-###############
-# Miscellaneous
-###############
+########################
+# Connect attacked keima
+########################
+
+Pattern CB207
+# gf Merge with CB208. (3.1.23)
+
+??x      threaten connection
+O*.
+.XO
+
+:8,nOXea,shape(2)
+
+??x
+O*.
+.ba
+
+;(lib(a)>1) && (!attack(b) || defend(b))
+
+
+Pattern CB209
+
+??O      connect
+O*.
+.XO
+
+:8,nOXe
+
+??a
+O*.
+.Xb
+
+;lib(a)>1 && lib(b)>1
+
+
+Pattern CB210
+
+??.?      connect
+O*.O
+?XO?
+
+:8,nOXea
+
+??.?
+O*.O
+?Xa?
+
+;lib(a)>1
+
+
+Pattern CB217
+
+?.O               block
+.*X
+?OX
+
+:8,OXecd
+
+?.a
+.*X
+?OX
+
+;lib(a)>1
+
+
+Pattern CB217a
+
+?.O           block attacking
+.*X
+?OX
+
+:8,a
+
+?.O
+.*A
+?OA
+
+; owl_threatens(*,A)
+
+
+Pattern CB277
+
+.*O           connect or threaten to connect
+OX?
+
+:8,nOXed
+
+.*O
+aX?
+
+;lib(a)>1
+
+
+Pattern CB327
+# gf Reduced shape value. (3.1.23)
+# See nngs:1750
+# ab increased shape value (3.1.29)
+# gf Added constraint. (3.3.3)
+
+?.?         seal opponent in
+...      
+.*O
+OX?
+
+:8,OXecd,shape(3)
+
+?.?
+...
+.*O
+OA?
+
+;!attack(A) || !oplay_defend(*,A)
+
+
+Pattern CB328
+#ab Revised constraint (3.3.3)
+
+?.?         seal opponent in and connect
+...      
+.*O
+OX?
+
+:8,OXC,shape(10)
+
+?.?
+...
+a*O
+OB?
+
+; oplay_attack_either(*,a,a,B) && (!attack(B) || does_attack(*,B))
+
+
+######
+# Hane 
+######
 
 Pattern CB202
 
@@ -7150,8 +7293,495 @@ Pattern CB202
 ....
 ..X.
 
-:8,OXeE
+:8,OXE
 
+
+Pattern CB212
+# constraint is complementary to CB213.
+
+.X.O.?    hane to defend
+...X*.
+
+:8,OXd
+
+.X.Oa?
+...B*.
+
+;!oplay_attack_either(*,a,a,B)
+
+
+Pattern CB213
+
+.X.O.?    extra value if X can't cut
+...X*.
+
+:8,OXed,shape(2)
+
+.X.Oa?
+...B*.
+
+;oplay_attack_either(*,a,a,B)
+
+
+Pattern CB216
+
+OX..     connect if invaded
+.*.O
+...?
+
+:8,OXecd
+
+aX..
+.*.b
+...?
+
+;lib(a)>=2 && lib(b)>=2
+
+
+Pattern CB219
+
+....O            hane
+..O..
+.*X.X
+.....
+
+:8,OXE
+
+
+Pattern CB220
+# gf Added missing '-' placeholder for classification. (3.1.18)
+
+*.
+XO	hane at head of two stones.
+XO
+..
+
+:8,-,shape(2)
+
+
+Pattern CB221
+
+????O?            hane
+.XOO..
+..XX*?
+??..??
+
+:8,OXe
+
+
+Pattern CB223
+
+ooo      form eye to protect
+O.O
+.*X
+
+:8,OXed
+
+ooo
+O.a
+.*X
+
+;lib(a)>1
+
+
+Pattern CB231
+
+?ooo            form eye to protect
+?O.*
+o.OX
+?o??
+
+:8,OXed
+
+
+Pattern CB232
+
+?ooo            form eye to protect
+?O.*
+o.OX
+?OXX
+
+:8,OXed,shape(1)
+
+
+Pattern CB236
+
+XX*.     block! this can be life or death    
+?O.O
+??O?
+
+:8,OXed
+
+
+Pattern CB240
+
+..            block off area
+.*
+OX
+
+:8,OXe
+
+ab
+.*
+cD
+
+;!xarea(a) && !xarea(b) && lib(c)>2 && lib(D)<3
+
+
+Pattern CB241a
+
+..            block off area
+.*
+OX
+O?
+
+:8,OXe
+
+..
+a*
+OX
+O?
+
+;odefend_against(*,a)
+
+
+Pattern CB241b
+
+..            block off area
+.*
+OX
+.x
+
+:8,OXe
+
+..
+a*
+OX
+.x
+
+; odefend_against(*,a)
+
+
+Pattern CB244
+
+?...?        hane at the head of three stones
+OXXX*
+?OOO.
+
+:8,OXe
+
+
+Pattern CB245
+# tm modified (3.1.18)
+#   see trevorb:750
+
+?..??        hane at the head of two stones
+OXX*?
+?OO.?
+
+:8,OXe
+
+?..??
+cXe*F
+?bbAD
+
+; lib(c)>1
+; && !oplay_attack(*,b)
+; && oplay_defend_both(*,A,*,b)
+; && (oplay_attack(*,A,e) || !x_alive_somewhere(D,F))
+
+
+Pattern CB247
+
+?O..       hane
+XO..
+.X*.
+....
+
+:8,OXe
+
+
+Pattern CB262
+
+..o?       hane is urgent
+.*..
+.XOO
+..XO
+
+:8,OXe
+
+
+Pattern CB271
+
+?OX.?       hane is urgent
+..OX.
+?O.*.
+??...
+
+:8,OXe
+
+
+Pattern CB275
+
+?.X         make shape
+?..
+O.O
+X*.
+?..
+?.O
+
+:8,OXecd
+
+
+Pattern CB281
+
+O.??            block!
+O.??
+X*.?
+...?
+Ooo?
+
+:8,OXe
+
+
+Pattern CB288
+
+?...        block and expand
+..*.
+OOX.
+?X..
+
+:8,OXe
+
+
+Pattern CB296
+
+Oooo         block
+.*.o
+OX??
+
+:8,OXe
+
+
+Pattern CB297
+
+Oooo         block in sente
+.*.o
+OX??
+
+:8,OXe,followup(5)
+
+Oooo
+.*.o
+OA??
+
+;!attack(A) && oplay_attack(*,A)
+
+
+Pattern CB298
+
+O.Oo     protect by drawing back
+XO..
+XX*O
+
+:8,nOXed
+
+
+Pattern CB307
+
+X..?            atari 
+OX*.
+XO..
+
+:8,-,followup(5)
+
+X..?
+aX*.
+Xb..
+
+; dead(a) && !dead(b)
+
+
+Pattern CB309
+
+?..XO         hane, threatening atari
+..XOo
+..*.O
+?...?
+
+:8,OXed
+
+
+Pattern CB310
+
+?..?          hane
+.*X.
+..O?
+?Oo?
+
+:8,OXed
+
+
+Pattern CB313
+
+?.O..         block!
+X.X*.
+.....
+
+:8,OXE
+
+
+Pattern CB323
+
+O.?        block
+X*O
+
+:8,OXe
+
+
+Pattern CB329a
+# db added (3.3.6)
+
+?.??         atari
+.*.?
+OX.X
+oOX?
+
+:8,OXe,followup(5),shape(2)
+
+
+Pattern CB335
+# gf New pattern. (3.1.18)
+
+x.O           block
+X*.
+O.o
+
+:8,OXe
+
+
+Pattern CB339
+# gf New pattern. (3.3.4)
+
+?x?
+x.O
+.*X
+
+:8,OXe
+
+?x?
+xaO
+c*B
+
+;xterri(c) && oplay_attack_either(*,a,a,B)
+
+
+########
+# Kosumi
+########
+
+Pattern CB205
+
+.....        kosumi to claim space
+.....
+.*...
+O....
+?X...
+
+:8,OXe
+
+
+Pattern CB225
+# Move out diagonally instead
+
+?????        diagonal move to reduce
+.....
+.....
+..*..
+.O.X.
+.....
+
+:8,OXe
+
+?????
+.....
+ab...
+..*..
+.O.X.
+.....
+
+;xarea(a) || xarea(b)
+
+
+Pattern CB235
+
+..X.     extend and block
+O...
+.*..
+?...
+
+:8,OXe
+
+
+Pattern CB251
+
+..O?         diagonal move      
+.*..
+...X
+...X
+
+:8,OXe
+
+
+Pattern CB256
+
+..O            diagonal extension if nothing better
+.*.
+..X
+
+:8,OXe
+
+
+Pattern CB257
+
+X..O           move out
+..*.
+...X
+
+:8,OXea
+
+
+Pattern CB260
+
+....        Take opponent's vital point for moving out
+O...
+X.*.
+X..O
+
+:8,OXea
+
+
+Pattern CB267
+
+OXOX         prevent sealing
+XO..
+X.*.
+
+:8,Oed
+
+
+Pattern CB289
+
+..O.         reinforce and block
+.*.O
+.X.?
+
+:8,OXed
+
+
+###############
+# Miscellaneous
+###############
 
 Pattern CB203
 
@@ -7160,7 +7790,7 @@ Pattern CB203
 .*..
 ..X.
 
-:8,XeEa,followup(20)
+:8,Xea,followup(20)
 
 .ae.
 .fXX
@@ -7210,17 +7840,6 @@ Oa...
 ;!xmoyo(e) && oplay_attack(*,a,b,c,c)
 
 
-Pattern CB205
-
-.....        kosumi to claim space
-.....
-.*...
-O....
-?X...
-
-:8,OXE
-
-
 Pattern CB206
 
 .....        block solid to claim space -- 
@@ -7229,7 +7848,7 @@ Pattern CB206
 O*...
 ?X...
 
-:8,OXE
+:8,OXe
 
 .....
 .....
@@ -7238,79 +7857,6 @@ O*a..
 ?Xb..
 
 ;!oplay_attack(*,a,b,b) || !oplay_attack(*,a,c,d,*)
-
-
-Pattern CB207
-# gf Merge with CB208. (3.1.23)
-
-??x      threaten connection
-O*.
-.XO
-
-:8,nOXea,shape(2)
-
-??x
-O*.
-.ba
-
-;(lib(a)>1) && (!attack(b) || defend(b))
-
-
-Pattern CB209
-
-??O      threaten connection
-O*.
-.XO
-
-:8,nOXe
-
-??a
-O*.
-.Xb
-
-;lib(a)>1 && lib(b)>1
-
-
-Pattern CB210
-
-??.?      connect
-O*.O
-?XO?
-
-:8,nOXea
-
-??.?
-O*.O
-?Xa?
-
-;lib(a)>1
-
-
-Pattern CB212
-# constraint is complementary to CB213.
-
-.X.O.?    hane to defend
-...X*.
-
-:8,OXeEd
-
-.X.Oa?
-...B*.
-
-;!oplay_attack_either(*,a,a,B)
-
-
-Pattern CB213
-
-.X.O.?    extra value if X can't cut
-...X*.
-
-:8,-,shape(2)
-
-.X.Oa?
-...B*.
-
-;oplay_attack_either(*,a,a,B)
 
 
 Pattern CB214
@@ -7328,52 +7874,7 @@ Pattern CB215
 O.*.O
 o...?
 
-:8,OXeEcd
-
-
-Pattern CB216
-
-OX..     connect if invaded
-.*.O
-...?
-
 :8,OXecd
-
-aX..
-.*.b
-...?
-
-;lib(a)>=2 && lib(b)>=2
-
-
-Pattern CB217
-
-?.O               block
-.*X
-?OX
-
-:8,OXecd
-
-?.a
-.*X
-?OX
-
-;lib(a)>1
-
-
-Pattern CB217a
-
-?.O           block attacking
-.*X
-?OX
-
-:8,a
-
-?.O
-.*A
-?OA
-
-; owl_threatens(*,A)
 
 
 Pattern CB218
@@ -7395,52 +7896,6 @@ OX?
 ;!attack(A) || does_attack(*,A)
 
 
-Pattern CB219
-
-....O            hane
-..O..
-.*X.X
-.....
-
-:8,OXe
-
-
-Pattern CB220
-# gf Added missing '-' placeholder for classification. (3.1.18)
-
-*.
-XO	hane at head of two stones.
-XO
-..
-
-:8,-,shape(2)
-
-
-Pattern CB221
-
-????O?            hane
-.XOO..
-..XX*?
-??..??
-
-:8,OXe
-
-
-Pattern CB223
-
-ooo      form eye to protect
-O.O
-.*X
-
-:8,OXed
-
-ooo
-O.a
-.*X
-
-;lib(a)>1
-
-
 Pattern CB224
 
 ?????        knight's move to claim space
@@ -7460,28 +7915,6 @@ ab*..
 .....
 
 ;!xarea(a) && !xarea(b)
-
-
-Pattern CB225
-# Move out diagonally instead
-
-?????        diagonal move to reduce
-.....
-.....
-..*..
-.O.X.
-.....
-
-:8,OXE
-
-?????
-.....
-ab...
-..*..
-.O.X.
-.....
-
-;xarea(a) || xarea(b)
 
 
 Pattern CB226
@@ -7547,27 +7980,7 @@ Pattern CB230
 ...O.
 ??XXO
 
-:8,OXeEd
-
-
-Pattern CB231
-
-?ooo            form eye to protect
-?O.*
-o.OX
-?o??
-
 :8,OXed
-
-
-Pattern CB232
-
-?ooo            form eye to protect
-?O.*
-o.OX
-?OXX
-
-:8,OXed,shape(1)
 
 
 Pattern CB233
@@ -7597,29 +8010,11 @@ O.*.
 :8,OXe
 
 
-Pattern CB235
-
-..X.     extend and block
-O...
-.*..
-?...
-
-:8,OXe
-
-
-Pattern CB236
-
-XX*.     block! this can be life or death    
-?O.O
-??O?
-
-:8,OXed
-
-
 Pattern CB237
 # FIXME:  Need a connection helper to verify
 #   that * can't be cut off & die in X moyo. (see viking:13)
 # tm Modified (3.1.23)
+# gf Corrected constraint. (3.3.12)
 
 ??x?          extend
 O..X
@@ -7629,11 +8024,11 @@ O..X
 :8,OXe
 
 ??x?
-A..X
+a..X
 ..*.
 ?.o?
 
-; oplay_connect(*,A,*)
+; !oplay_disconnect(*,*,a)
 
 
 Pattern CB238
@@ -7662,55 +8057,6 @@ a*b
 ; !same_dragon(a,b)
 
 
-Pattern CB240
-
-..            block off area
-.*
-OX
-
-:8,OXe
-
-ab
-.*
-cD
-
-;!xarea(a) && !xarea(b) && lib(c)>2 && lib(D)<3
-
-
-Pattern CB241a
-
-..            block off area
-.*
-OX
-O?
-
-:8,OXe
-
-..
-a*
-OX
-O?
-
-;odefend_against(*,a)
-
-
-Pattern CB241b
-
-..            block off area
-.*
-OX
-.x
-
-:8,OXe
-
-..
-a*
-OX
-.x
-
-; odefend_against(*,a)
-
-
 Pattern CB241c
 
 ..            block off area
@@ -7737,35 +8083,6 @@ Pattern CB242
 :8,OXe
 
 
-Pattern CB244
-
-?...?        hane at the head of three stones
-OXXX*
-?OOO.
-
-:8,OXe
-
-
-Pattern CB245
-# tm modified (3.1.18)
-#   see trevorb:750
-
-?..??        hane at the head of two stones
-OXX*?
-?OO.?
-
-:8,OXe
-
-?..??
-cXe*F
-?bbAD
-
-; lib(c)>1
-; && !oplay_attack(*,b)
-; && oplay_defend_both(*,A,*,b)
-; && (oplay_attack(*,A,e) || !x_alive_somewhere(D,F))
-
-
 Pattern CB246
 
 .O.O.?      block opponent
@@ -7774,16 +8091,6 @@ Pattern CB246
 .....?
 
 :8,OXed
-
-
-Pattern CB247
-
-?O..       hane
-XO..
-.X*.
-....
-
-:8,OXe
 
 
 Pattern CB248
@@ -7810,16 +8117,6 @@ Pattern CB250
 ?..?
 
 ;lib(A)==3
-
-
-Pattern CB251
-
-..O?         diagonal move      
-.*..
-...X
-...X
-
-:8,OXe
 
 
 Pattern CB252
@@ -7858,24 +8155,6 @@ O.XO         bend around
 :8,OXe
 
 
-Pattern CB256
-
-..O            diagonal extension if nothing better
-.*.
-..X
-
-:8,OXeE
-
-
-Pattern CB257
-
-X..O           move out
-..*.
-...X
-
-:8,OXea
-
-
 Pattern CB258
 
 ??????          jump! (But not down to second line)
@@ -7897,16 +8176,6 @@ oO.*.
 :8,OXd
 
 
-Pattern CB260
-
-....        Take opponent's vital point for moving out
-O...
-X.*.
-X..O
-
-:8,OXea
-
-
 Pattern CB261
 
 ?O.?       knight's move to block center
@@ -7915,16 +8184,6 @@ X...
 X.*.
 
 :8,OXea
-
-
-Pattern CB262
-
-..o?       hane is urgent
-.*..
-.XOO
-..XO
-
-:8,OXe
 
 
 Pattern CB263
@@ -7975,15 +8234,6 @@ O..XO
 :8,OXea
 
 
-Pattern CB267
-
-OXOX         prevent sealing
-XO..
-X.*.
-
-:8,OEd
-
-
 Pattern CB268
 
 O....      sketch a connection
@@ -8020,16 +8270,6 @@ OX??
 X???
 
 :8,OXed
-
-
-Pattern CB271
-
-?OX.?       hane is urgent
-..OX.
-?O.*.
-??...
-
-:8,OXe
 
 
 Pattern CB272
@@ -8076,18 +8316,6 @@ Pattern CB274
 :8,OXed
 
 
-Pattern CB275
-
-?.X         make shape
-?..
-O.O
-X*.
-?..
-?.O
-
-:8,OXecd
-
-
 Pattern CB276
 
 ?...?       knight's move expansion
@@ -8095,20 +8323,7 @@ O..*.
 oO..?
 ?XX??
 
-:8,OXE
-
-
-Pattern CB277
-
-.*O           connect or threaten to connect
-OX?
-
-:8,nOXed
-
-.*O
-aX?
-
-;lib(a)>1
+:8,OXe
 
 
 Pattern CB278
@@ -8148,17 +8363,6 @@ Pattern CB280
 XO?
 X.?
 XO?
-
-:8,OXe
-
-
-Pattern CB281
-
-O.??            block!
-O.??
-X*.?
-...?
-Ooo?
 
 :8,OXe
 
@@ -8205,7 +8409,7 @@ Pattern CB285
 O...O
 ?X.X?
 
-:|,OXeEc
+:|,OXEc
 
 
 Pattern CB286
@@ -8215,7 +8419,7 @@ Pattern CB286
 X...X
 ?O.O?
 
-:|,OXeE
+:|,OXe
 
 
 Pattern CB287
@@ -8230,25 +8434,6 @@ O.?
 :8,OXEca
 
 
-Pattern CB288
-
-?...        block and expand
-..*.
-OOX.
-?X..
-
-:8,OXe
-
-
-Pattern CB289
-
-..O.         reinforce and block
-.*.O
-.X.?
-
-:8,OXed
-
-
 Pattern CB290
 
 ?....        jump out
@@ -8257,7 +8442,7 @@ Pattern CB290
 .XOO?
 ?.XO?
 
-:8,OXEd
+:8,OXed
 
 
 Pattern CB291
@@ -8286,11 +8471,12 @@ Pattern CB292
 .*.X?
 ...??
 
-:8,OXeE
+:8,OXE
 
 
 Pattern CB293
 # db reduced shape value (3.1.8)
+# gf Revised constraint. (3.3.12)
 
 ?O..              knight's move
 ?O..
@@ -8298,15 +8484,15 @@ X...
 ..*.
 ?x.?
 
-:8,OXeEad,shape(3)
+:8,OXead,shape(3)
 
-?O..
-?Oc.
-Xab.
+?a..
+?a..
+X...
 ..*.
 ?x.?
 
-;oplay_attack(*,a,b,c,c)
+;!oplay_disconnect(*,*,a)
 
 
 Pattern CB294
@@ -8327,40 +8513,7 @@ oOo?           attach
 .*X.
 ...?
 
-:8,OXe
-
-
-Pattern CB296
-
-Oooo         block
-.*.o
-OX??
-
-:8,OXe
-
-
-Pattern CB297
-
-Oooo         block in sente
-.*.o
-OX??
-
-:8,OXe,followup(5)
-
-Oooo
-.*.o
-OA??
-
-;!attack(A) && oplay_attack(*,A)
-
-
-Pattern CB298
-
-O.Oo     protect by drawing back
-XO..
-XX*O
-
-:8,nOXed
+:8,OXE
 
 
 Pattern CB299
@@ -8425,7 +8578,7 @@ Pattern CB304
 OO*.
 ?X..
 
-:-,OXeE
+:-,OXe
 
 
 Pattern CB305
@@ -8434,7 +8587,7 @@ Pattern CB305
 o.O*.
 ?OX..
 
-:-,OXeE
+:-,OXe
 
 
 Pattern CB306
@@ -8443,22 +8596,7 @@ Pattern CB306
 O.O*.
 ?OX..
 
-:8,OXeE
-
-
-Pattern CB307
-
-X..?            atari 
-OX*.
-XO..
-
-:8,-,followup(5)
-
-X..?
-aX*.
-Xb..
-
-; dead(a) && !dead(b)
+:8,OXe
 
 
 Pattern CB308
@@ -8478,26 +8616,6 @@ O*a.
 ;lib(A)==3 && !xdefend_against(a,b)
 
 
-Pattern CB309
-
-?..XO         hane, threatening atari
-..XOo
-..*.O
-?...?
-
-:8,OXed
-
-
-Pattern CB310
-
-?..?          hane
-.*X.
-..O?
-?Oo?
-
-:8,OXed
-
-
 Pattern CB311
 
 ....         prevent escape
@@ -8514,15 +8632,6 @@ Pattern CB312
 O.OX
 ..*.
 ????
-
-:8,OXE
-
-
-Pattern CB313
-
-?.O..         block!
-X.X*.
-.....
 
 :8,OXe
 
@@ -8580,7 +8689,7 @@ XO*.
 O..X
 ooo?
 
-:8,OXeEd
+:8,OXed
 
 
 Pattern CB318
@@ -8589,7 +8698,7 @@ o.X           break out
 O*.
 X..
 
-:8,OXeEd
+:8,OXed
 
 o.X
 O*.
@@ -8606,7 +8715,7 @@ Pattern CB319
 ?.XO
 ??.X
 
-:8,OXeEd
+:8,OXed
 
 
 Pattern CB320
@@ -8677,14 +8786,6 @@ xxA.*.?
 ;!xterri(*) && weak(A) && o_alive_somewhere(b,c,d,e,f,g)
 
 
-Pattern CB323
-
-O.?        block
-X*O
-
-:8,OXe
-
-
 Pattern CB324
 
 xxX?       block
@@ -8710,7 +8811,7 @@ Pattern CB326
 O.*.
 OXXO
 
-:8,OXeE,shape(7)
+:8,OXe,shape(7)
 
 ?.??
 .bc.
@@ -8718,74 +8819,6 @@ Ba*d
 BAAO
 
 ;lib(A)<=3 && lib(B)>=3 && oplay_attack(*,a,b,c,d,?,A)
-
-
-Pattern CB327
-# gf Reduced shape value. (3.1.23)
-# See nngs:1750
-# ab increased shape value (3.1.29)
-# gf Added constraint. (3.3.3)
-
-?.?         seal opponent in
-...      
-.*O
-OX?
-
-:8,OXeEcd,shape(3)
-
-?.?
-...
-.*O
-OA?
-
-;!attack(A) || !oplay_defend(*,A)
-
-
-Pattern CB328
-#ab Revised constraint (3.3.3)
-
-?.?         seal opponent in and connect
-...      
-.*O
-OX?
-
-:8,OXC,shape(10)
-
-?.?
-...
-a*O
-OB?
-
-; oplay_attack_either(*,a,a,B) && (!attack(B) || does_attack(*,B))
-
-
-#tm - removed this pattern (3.1.20)
-# Pattern CB329
-## FIXME: This could be very bad aji-keshi.
-##   For a not great example, see trevorb:490
-## FIXME: This is actually much worse than that.
-##   See, for example, trevord:410
-#
-#.*          first atari, then connect
-#OX
-#
-#:8,OXe
-#
-#.*
-#bA
-#
-#;lib(A)==2 && lib(b)>1
-
-
-Pattern CB329a
-# db added (3.3.6)
-
-?.??         atari
-.*.?
-OX.X
-oOX?
-
-:8,OXE,followup(5),shape(2)
 
 
 Pattern CB330
@@ -8796,7 +8829,7 @@ Pattern CB330
 X*X
 ?O?
 
-:|,OXeE,shape(3)
+:|,OXe,shape(3)
 
 
 Pattern CB331
@@ -8806,7 +8839,7 @@ Pattern CB331
 X*X
 o.O
 
-:8,OXeE
+:8,OXe
 
 ?.?
 ...
@@ -8823,7 +8856,7 @@ Pattern CB332
 ?.*..O
 ?....o
 
-:8,OXeE
+:8,OXE
 
 
 Pattern CB333
@@ -8854,16 +8887,6 @@ Pattern CB334
 O.Xx
 
 :8,OX,shape(2)
-
-
-Pattern CB335
-# gf New pattern. (3.1.18)
-
-x.O           block
-X*.
-O.o
-
-:8,OXe
 
 
 Pattern CB336
@@ -8921,22 +8944,6 @@ abh
 
 ;(x_alive_somewhere(d,e,f,g,h) || xarea(f))
 ;&& !oplay_disconnect(*,b,*,a) && !oplay_disconnect(*,c,*,a)
-
-
-Pattern CB339
-# gf New pattern. (3.3.4)
-
-?x?
-x.O
-.*X
-
-:8,OXe
-
-?x?
-xaO
-c*B
-
-;xterri(c) && oplay_attack_either(*,a,a,B)
 
 
 ######################################################################
@@ -9404,7 +9411,7 @@ o.....
 ......
 ------
 
-:8,OXeEd
+:8,OXed
 
 
 Pattern ED32
@@ -9723,7 +9730,7 @@ X.O..
 .....
 -----
 
-:8,eBad,value(20)
+:8,OeBad,value(20)
 
 
 Pattern ED51
@@ -9736,7 +9743,7 @@ oo......O
 .........
 ---------
 
-:8,OXEad,shape(10)
+:8,OXead,shape(10)
 
 
 Pattern ED52
@@ -9922,7 +9929,7 @@ XXO*.
 .....
 -----
 
-:8,OXeEad,shape(5)
+:8,OXead,shape(5)
 
 ....?
 OOb.?
@@ -9960,7 +9967,7 @@ XXO..
 .....
 -----
 
-:8,OXeECad,shape(2)
+:8,OXead,shape(2)
 
 ..a..
 .O*..
@@ -10155,7 +10162,7 @@ AOX
 
 Pattern ED75
 
-O..     don't descent if X can cut
+O..     don't descend if X can cut
 XOX
 .*.
 ---
@@ -10318,7 +10325,7 @@ Pattern ED83
 |.*.x
 |..O?
 
-:8,eCd,shape(2)
+:8,ed,shape(2)
 
 |xXX?
 |XOOX
@@ -10338,7 +10345,7 @@ Pattern ED84
 |.*.O
 |...o
 
-:8,OXCd,shape(2)
+:8,OXd,shape(2)
 
 |xXXx
 |XOOX
@@ -10972,7 +10979,7 @@ Pattern CD92a
 OX*
 .Ox
 
-:8,XEad,shape(1)
+:8,OXead,shape(1)
 
 
 Pattern CD92b
@@ -10981,7 +10988,7 @@ Pattern CD92b
 OX*
 .OX
 
-:8,Ead,shape(3),reverse_followup(8)
+:8,Oead,shape(3),reverse_followup(8)
 
 aO.
 OX*
@@ -11016,7 +11023,7 @@ Pattern CD94
 X...????
 ?.O..???
 
-:8,OXead,shape(4)
+:8,OXEad,shape(4)
 
 ????????
 ????????
@@ -11176,7 +11183,7 @@ Pattern CD104a
 OX.
 XO?
 
-:8,eEd
+:8,Ed
 
 ...
 .*.
@@ -11302,7 +11309,7 @@ x.O..
 ?....
 -----
 
-:8,edJ
+:8,OedJ
 
 
 Pattern EJ2b
