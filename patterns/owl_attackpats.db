@@ -2939,6 +2939,26 @@ Pattern A812
 ;owl_eyespace(*)
 
 
+Pattern A813
+#spl added 3.5.1 see century2002:80
+# gf Revised constraint. (3.5.1)
+
+X*.
+OXO sacrifice to eliminate eye
+.X.
+---
+
+:8,s,value(85)
+
+X*.
+aXb
+cXd
+---
+
+;(!attack(a) && olib(d)>=3)
+;|| (!attack(b) && olib(c)>=3)
+
+
 #########################################################
 #                                                       #
 #                Nakade patterns                        #
