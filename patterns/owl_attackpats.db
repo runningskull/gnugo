@@ -2617,6 +2617,17 @@ X.*o
 ; && (x_somewhere(b) || !safe_omove(b))
 
 
+Pattern A623
+# gf New pattern. (3.5.5)
+
+|.xY.O
+|....O	    monkey jump into the corner
+|.*...
++-----
+
+:8,-,value(65)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves in the center             #
