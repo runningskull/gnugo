@@ -5,43 +5,61 @@ reset_reading_node_counter
 reset_trymove_counter
 
 loadsgf games/mfgg1.sgf 43
-1 genmove_black
+1 gg_genmove black
 #? [S13]
 
 loadsgf games/mfgg1.sgf 49
-2 genmove_black
+2 gg_genmove black
 #? [S16]
 
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=No terribly serious consequences, S11 not optimal.
+#SEVERITY=3
 loadsgf games/mfgg1.sgf 65
-3 genmove_black
+3 gg_genmove black
 #? [S12]*
 
 loadsgf games/mfgg1.sgf 97
-4 genmove_black
+4 gg_genmove black
 #? [!T6]
 
+#CATEGORY=FUSEKI_STRATEGY
+#DESCRIPTION=N6 is not terrible - right concept.
+#SEVERITY=2
 loadsgf games/mfgg2.sgf 19
-5 genmove_black
+5 gg_genmove black
 #? [M5|M15|R3|R17]*
 
+
+#CATEGORY=FUSEKI_STRATEGY
+#DESCRIPTION=E6 really misses the point.
+#SEVERITY=9
 loadsgf games/mfgg2.sgf 23
-6 genmove_black
+6 gg_genmove black
 #? [R3]*
 
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=Q5 dragon is under severe pressure.
+#SEVERITY=8
 loadsgf games/mfgg2.sgf 45
-7 genmove_black
+7 gg_genmove black
 #? [R2|S7]*
 
+
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=GnuGo doesn't understand this type of corner position!
+#SEVERITY=10
+#GG often messes up in this type of corner position.
 loadsgf games/mfgg2.sgf 117
-8 genmove_black
+8 gg_genmove black
 #? [T2]*
 
 loadsgf games/mfgg3.sgf 42
-9 genmove_black
+9 gg_genmove black
 #? [!P12]
 
 loadsgf games/mfgg3.sgf 44
-10 genmove_black
+10 gg_genmove black
 #? [N3]*
 
 

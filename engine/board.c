@@ -3070,6 +3070,52 @@ incremental_order_moves(int move, int color, int str,
 #endif
 }
 
+/* Reorientation of point (i,j) into (*ri, *rj) */
+void  rotate2(int i, int j, int *ri, int *rj, int rot) {
+  ASSERT2(rot >= 0 && rot < 8, i, j);
+  if (is_pass(POS(i, j))) {
+    *ri = i;
+    *rj = j;
+    return;
+  }
+  ASSERT_ON_BOARD2(i, j);
+  rotate(i, j, ri, rj, board_size, rot);
+}
+
+/* inverse reorientation of reorientation rot */
+void  inv_rotate2(int i, int j, int *ri, int *rj, int rot) {
+  ASSERT2(rot >= 0 && rot < 8, i, j);
+  if (is_pass(POS(i, j))) {
+    *ri = i;
+    *rj = j;
+    return;
+  }
+  ASSERT_ON_BOARD2(i, j);
+  inv_rotate(i, j, ri, rj, board_size, rot);
+}
+
+/* 1D board: return reorientation of point pos */
+int  rotate1(int pos, int rot) {
+   int i, j;
+   ASSERT1(rot >= 0 && rot < 8, pos);
+   if (is_pass(pos))
+      return PASS_MOVE;
+   ASSERT_ON_BOARD1(pos);
+   rotate2(I(pos), J(pos), &i, &j, rot);
+   return POS(i, j);
+}
+
+/* 1D board: return inverse reorientation of point pos */
+int  inv_rotate1(int pos, int rot) {
+   int i, j;
+   ASSERT1(rot >= 0 && rot < 8, pos);
+   if (is_pass(pos))
+      return PASS_MOVE;
+   ASSERT_ON_BOARD1(pos);
+   inv_rotate2(I(pos), J(pos), &i, &j, rot);
+   return POS(i, j);
+}
+
 
 /*
  * Local Variables:

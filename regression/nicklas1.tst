@@ -21,6 +21,9 @@ loadsgf games/nicklas/nicklas2.sgf 9
 202 gg_genmove black
 #? [!H8]
 
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=Combination threat to live / connect.
+#SEVERITY=4
 loadsgf games/nicklas/nicklas2.sgf 23
 203 gg_genmove black
 #? [J5]*
@@ -74,10 +77,13 @@ loadsgf games/nicklas/nicklas8.sgf 224
 810 gg_genmove black
 #? [!C19]
 
-# Moved K15 to K14. /gf
+# Moved K15 to K14. /gf ; Added back K14 - both work.
+#SEVERITY=7
+#CATEGORY=CONNECTION_TUNING
+#DESCRIPTION=Is GnuGo misreading the cut?
 loadsgf games/nicklas/nicklas8.sgf 240
 811 gg_genmove black
-#? [K14]*
+#? [K14|K15]*
 
 loadsgf games/nicklas/nicklas9.sgf 28
 901 gg_genmove black
@@ -119,6 +125,9 @@ loadsgf games/nicklas/nicklas11.sgf 208
 1106 gg_genmove black
 #? [!F6]
 
+#CATEGORY=WASTED_MOVE
+#DESCRIPTION=GnuGo 3.1.8 gets N2 on next move;  R3 benign ko threat loss.
+#SEVERITY=2
 loadsgf games/nicklas/nicklas11.sgf 242
 1107 gg_genmove black
 #? [N2]*
@@ -151,6 +160,9 @@ loadsgf games/nicklas/nicklas12.sgf 103
 1206 gg_genmove black
 #? [C15]
 
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=Needless 2 point loss for B.
+#SEVERITY=7
 loadsgf games/nicklas/nicklas12.sgf 113
 1207 gg_genmove black
 #? [C17]*
@@ -268,6 +280,9 @@ loadsgf games/nicklas/nicklas16.sgf 64
 1605 gg_genmove black
 #? [J1]
 
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=No reason to give W a chance for ko here.
+#SEVERITY=6
 loadsgf games/nicklas/nicklas18.sgf 15
 1801 gg_genmove black
 #? [D2]*

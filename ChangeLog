@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- add point reorientation functions
+- add some comments to dfa.c
+- new interface/GoImage/Stone.pm
 - struct eye_data arrays changed from 2D to 1D
 - 9x9 case revised in fuseki()
 - bugfix in goal detection in matchpat, don't accept empty goal vertices

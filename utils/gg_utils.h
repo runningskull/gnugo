@@ -64,6 +64,11 @@ double gg_gettimeofday(void);
 
 const char *gg_version(void);
 
+/* prototypes for basic reorientation functions */
+
+void  rotate(int i, int j, int *ri, int *rj, int bs, int rot);
+void  inv_rotate(int i, int j, int *ri, int *rj, int bs, int rot);
+
 #endif /* _GG_UTILS_H_ */
 
 

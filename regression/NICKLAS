@@ -1,3 +1,8 @@
+****GnuGo 3.1.8 still misses these 4 problems.
+****10/5/01 - moved comments into nicklas2.tst.
+****This file now should be considerred obsolete.
+
+
 nicklas1.tst: all these tests should pass
 nicklas2.tst: 9x9 games where gnugo should do better.
 nicklas3.tst: 9x9 games with harder problems
@@ -8,7 +13,7 @@ nicklas5.tst: 19x19 games (harder)
 			     NICKLAS2.TST
 
 #102: LOW PRIORITY; DIFFICULTY HARD; DEFER
-gnugo --quiet -l niclas1.sgf -L29 -t
+gnugo --quiet -l nicklas1.sgf -L29 -t
 
     This is not as clear cut as it may seem. 2.7.228 values the endgame 
     move at A7 to 6.66 points which seems about correct. The fact that 

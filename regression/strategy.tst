@@ -5,7 +5,7 @@ reset_reading_node_counter
 reset_trymove_counter
 
 loadsgf games/strategy1.sgf
-1 genmove_white
+1 gg_genmove white
 #? [Q13]
 
 loadsgf games/strategy2.sgf 5

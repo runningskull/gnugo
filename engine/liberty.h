@@ -170,6 +170,13 @@ void ascii_report_worm(char *string);
 void report_dragon(int m, int n);
 void ascii_report_dragon(char *string);
 
+/* prototypes for reorientation functions */
+
+void  rotate2(int i, int j, int *ri, int *rj, int rot);
+void  inv_rotate2(int i, int j, int *ri, int *rj, int rot);
+int  rotate1(int pos, int rot);
+int  inv_rotate1(int pos, int rot);
+
 /* Is this point inside the board? */
 #if 0
 #define ON_BOARD2(i, j) ((i)>=0 && (j)>=0 && (i)<board_size && (j)<board_size)

@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #include "gg_utils.h"
 
@@ -231,6 +232,63 @@ const char *
 gg_version(void) {
   return VERSION;
 }
+
+/* Reorientation of point (i,j) into (*ri, *rj) */
+void rotate(int i, int j, int *ri, int *rj, int bs, int rot) {
+  assert (bs > 0);
+  assert (i >= 0 && i < bs);
+  assert (j >= 0 && j < bs);
+  assert (ri != NULL && rj != NULL);
+  assert (rot >= 0 && rot < 8);
+
+  if (rot == 0) {
+    /* identity map */
+    *ri = i;
+    *rj = j;
+  } else if (rot == 1) {
+    /* rotation over 90 degrees */
+    *ri = bs - j;
+    *rj = i;
+  } else if (rot == 2) {
+    /* rotation over 180 degrees */
+    *ri = bs - i;
+    *rj = bs - j;
+  } else if (rot == 3) {
+    /* rotation over 270 degrees */
+    *ri = j;
+    *rj = bs - i;
+  } else if (rot == 4) {
+    /* flip along diagonal */
+    *ri = j;
+    *rj = i;
+  } else if (rot == 5) {
+    /* flip */
+    *ri = bs - i;
+    *rj = j;
+  } else if (rot == 6) {
+    /* flip along diagonal */
+    *ri = bs - j;
+    *rj = bs - i;
+  } else if (rot == 7) {
+    /* flip */
+    *ri = i;
+    *rj = bs - j;
+  }
+}
+
+/* inverse reorientation of reorientation rot */
+void inv_rotate(int i, int j, int *ri, int *rj, int bs, int rot) {
+  /* every reorientation is it's own inverse except rotations
+     over 90 and 270 degrees */
+  if (rot == 1) {
+    rotate(i, j, ri, rj, bs, 3);
+  } else if (rot == 3) {
+    rotate(i, j, ri, rj, bs, 1);
+  } else {
+    rotate(i, j, ri, rj, bs, rot);
+  }
+}
+
 
 
 /*

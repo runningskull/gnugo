@@ -287,9 +287,12 @@ loadsgf games/trevor/trevor_28.sgf 36
 #? [F6]*
 
 
-
-# Yikes, short of liberties!
-loadsgf games/trevor/trevor_29.sgf 54
+#CATEGORY=OWL_TUNING
+#DESCRIPTION=Black still dead after D1!
+#SEVERITY=10
+loadsgf games/trevor/trevor_31.sgf
+310 gg_genmove black
+#? [A8]*
 290 gg_genmove white
 #? [!A9]*
 

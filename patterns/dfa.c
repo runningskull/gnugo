@@ -627,6 +627,7 @@ new_test_array(test_array_t *pta)
     pta->hash[h] = NULL;
 }
 
+/* Searh for (l,r) in the linked list plist */
 static int 
 get_from_entry_list(entry_t *plist, int l, int r)
 {
@@ -648,11 +649,14 @@ get_from_test_array(test_array_t *pta, int l, int r)
 }
 
 
+/* insert a new entry at the beginning of the linked list pplist */
 static void
 add_to_entry_list(entry_t **pplist, int l, int r, int val)
 {
   entry_t *new_entry;
 
+  /* make sure val > 0: val = 0 is used in get_from_entry_list */
+  gg_assert(val > 0);
   gg_assert(!get_from_entry_list(*pplist, l, r));
 
   new_entry = malloc(sizeof(entry_t));
@@ -675,6 +679,7 @@ add_to_test_array(test_array_t *pta, int l, int r, int val)
   add_to_entry_list(&(pta->hash[(l+r) % MAX_HASH_VALUE]), l, r, val);
 }
 
+/* free the elements of the linked list plist */
 static void
 free_entry_list(entry_t *plist)
 {
@@ -693,8 +698,10 @@ free_test_array(test_array_t *pta)
 {
   int h;
 
-  for (h=0; h!=MAX_HASH_VALUE; h++)
+  for (h=0; h!=MAX_HASH_VALUE; h++) {
     free_entry_list(pta->hash[h]);
+    pta->hash[h] = NULL;
+  }
 }
 
 

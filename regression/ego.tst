@@ -13,11 +13,18 @@ loadsgf games/ego.sgf 30
 2 gg_genmove white
 #? [!E5]
 
+
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=K17 misses H18 threat.
+#SEVERITY=8
 # K18 is unreasonable. H18 is the only move locally.
 loadsgf games/ego.sgf 52
 3 gg_genmove white
 #? [H18]*
 
+#CATEGORY=PATTERN_TUNING
+#DESCRIPTION=Possible replacement pattern appropriate?
+#SEVERITY=8
 # The descent at G19 is bad shape because it leaves much aji around
 # E18 and gives black an endgame sente move at H19.
 loadsgf games/ego.sgf 54
@@ -38,6 +45,10 @@ loadsgf games/ego.sgf 96
 7 gg_genmove white
 #? [!Q1]
 
+
+#CATEGORY=BORDER_PROTECTION
+#DESCRIPTION=Tough moyo protection.
+#SEVERITY=5
 loadsgf games/ego.sgf 112
 8 gg_genmove white
 #? [F12]*
@@ -50,6 +61,10 @@ loadsgf games/ego.sgf 190
 10 gg_genmove white
 #? [S18]
 
+
+#CATEGORY=KO_READING
+#DESCRIPTION=Tough - Black pushthrough is troublesome.
+#SEVERITY=3
 loadsgf games/ego.sgf 198
 11 gg_genmove white
 #? [T18]*
