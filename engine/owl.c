@@ -1193,11 +1193,12 @@ do_owl_attack(int str, int *move, int *wormid,
 	  *move = rr_get_move(*read_result);
       }
       if (rr_get_result(*read_result) == GAIN) {
-	if (wormid)
+	if (wormid) {
 	  if (goal_worms_computed)
 	    *wormid = rr_get_result2(*read_result);
 	  else
 	    *wormid = MAX_GOAL_WORMS;
+	}
       }
 
       if (rr_get_result(*read_result) == WIN)
@@ -1615,7 +1616,7 @@ do_owl_attack(int str, int *move, int *wormid,
 		size = worm[owl_goal_worm[l]].size;
 	      }
 	  }
-	  if (w != MAX_GOAL_WORMS)
+	  if (w != MAX_GOAL_WORMS) {
 	    if (GAIN > savecode) {
   	      /* if new result better, just update */
 	      dcode = LOSS;
@@ -1627,6 +1628,7 @@ do_owl_attack(int str, int *move, int *wormid,
 	      if (size > worm[wpos].size)
   		saveworm = w;
 	    }
+	  }
 	}
 	UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, mpos);
       }
@@ -1903,11 +1905,12 @@ do_owl_defend(int str, int *move, int *wormid,
 	  *move = rr_get_move(*read_result);
       }
       if (rr_get_result(*read_result) == LOSS) {
-	if (wormid)
+	if (wormid) {
 	  if (goal_worms_computed)
 	    *wormid = rr_get_result2(*read_result);
 	  else
 	    *wormid = MAX_GOAL_WORMS;
+	}
       }
 
       if (rr_get_result(*read_result) == WIN
