@@ -508,6 +508,14 @@ da
 ;eye(a) && eye(b) && oplay_defend_both(a,b,a,c)
 
 
+Pattern EE303
+
+OXO
+.*.
+---
+:8,bOX,terri(2)
+
+
 # first line corner moves
 #########################
 
@@ -1071,7 +1079,8 @@ X*.
 Pattern EF102
 # tm New Pattern (3.1.16)
 # tm modified (3.1.17)
-# FIXME: see endgame:218
+# tm modified (3.1.20)
+# FIXME: see endgame:218, trevord:1030, trevorc:430
 
 O.
 *O
@@ -1079,10 +1088,10 @@ O.
 :8,O,terri(1),reverse_followup(3)
 
 Ac
-*B
+DB
 
 ;proper_eye(c) && oterri(c) && !oplay_attack(*,*)
-;&& safe_xmove(*) && xplay_attack_either(*,A,B) 
+;&& !xplay_attack(*,*) && xplay_attack_either(*,A,B) 
 
 
 ######################################################################
@@ -1370,12 +1379,13 @@ xXO
 
 
 Pattern CE24
+#tm revised terri from 5 to 4 (3.1.20) (see trevord:180 O6)
 
 ??OX        rescue one stone making territory
 X*.O
 ?O..
 
-:8,X,terri(5)
+:8,X,terri(4)
 
 ??OX
 X*.A
@@ -1421,6 +1431,33 @@ A*C
 ?O?
 
 ; xmoyo(b) && oplay_break_through(*,b,A,b,C) == WIN
+
+
+Pattern CE28
+# tm New Pattern (3.1.20)
+
+OX
+.*
+O.
+
+:8,nOXb,terri(1)
+
+OX
+A*
+OB
+
+; eye(A) &&
+; oplay_attack(*,B,B)
+
+
+Pattern CE29
+# tm New Pattern (3.1.20)  (see trevord:950)
+# FIXME: this pattern better in patterns.db?
+
+X*X	Wedge
+O.X
+
+:8,OXb
 
 
 ######################################################################

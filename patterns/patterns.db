@@ -5110,6 +5110,21 @@ cXA*.
 ; !oplay_attack_either(*,B,*)
 
 
+Pattern EB718
+# tm New Pattern (3.1.20)
+
+O.*    jump back to block
+X..
+---
+
+:8,OXb
+
+ac*    jump back to block
+Xb.
+---
+
+;!oplay_defend_both(b,c,a,b) && oplay_defend_both(*,c,a,*)
+
 
 ############################################################
 # Monkey jump and other intrusions on first and second lines
@@ -5189,6 +5204,7 @@ oO....
 
 
 Pattern EB808
+# tm added defend_against_atari
 
 ?xxx?       jump out on first line
 OX..?
@@ -5199,11 +5215,12 @@ OX..?
 
 ?xxx?
 aX..?
-bO.*.
+bC.*.
 -----
 
 ;!weak(a) && oplay_attack(*,b,b)
 
+>defend_against_atari(C)
 
 ###########################
 # Third line push or extend
@@ -8753,19 +8770,22 @@ OB?
 ; oplay_attack(*,a,a) && (!attack(B) || does_attack(*,B))
 
 
-Pattern CB329
-# FIXME: This could be very bad aji-keshi.
-#   For a not great example, see trevorb:490
-
-.*          first atari, then connect
-OX
-
-:8,OXe
-
-.*
-bA
-
-;lib(A)==2 && lib(b)>1
+#tm - removed this pattern (3.1.20)
+#Pattern CB329
+## FIXME: This could be very bad aji-keshi.
+##   For a not great example, see trevorb:490
+## FIXME: This is actually much worse than that.
+##   See, for example, trevord:410
+#
+#.*          first atari, then connect
+#OX
+#
+#:8,OXe
+#
+#.*
+#bA
+#
+#;lib(A)==2 && lib(b)>1
 
 
 Pattern CB330
@@ -12106,6 +12126,7 @@ XOO.*.
 
 
 Pattern EJ75
+#FIXME:  see trevorc:420
 
 .X.??           connect under
 O*.oo
@@ -12847,6 +12868,8 @@ X..
 
 
 Pattern Reinforce101
+#FIXME: This should at least be contingent on being ahead.
+#  see trevorc:1170
 
 oO?      Eliminate aji
 .*X
@@ -13139,27 +13162,28 @@ Pattern LE13
 ; oplay_attack(*,a,a)
 
 
-Pattern LE14
-# FIXME: This pattern looks way to general/overvalued
-#   see global:27, strategy4:212
-
-xxx      safe jump into opponent's moyo
-..x
-.*.
-...
-o.O
-
-
-:8,OE,value(9)
-
-abc
-..d
-.*h
-.fe
-ogO
-
-;(xmoyo(a) || xmoyo(b) || xmoyo(c) || xmoyo(d)) && oplay_attack(*,e,f,g,g)
-; && oplay_attack(*,f,e,h,f)
+##tm Removed this pattern (3.1.20)
+#Pattern LE14
+## FIXME: This pattern looks way to general/overvalued
+##   see global:27, strategy4:212, trevorc:1190
+#
+#xxx      safe jump into opponent's moyo
+#..x
+#.*.
+#...
+#o.O
+#
+#
+#:8,OE,value(9)
+#
+#abc
+#..d
+#.*h
+#.fe
+#ogO
+#
+#;(xmoyo(a) || xmoyo(b) || xmoyo(c) || xmoyo(d)) && oplay_attack(*,e,f,g,g)
+#; && oplay_attack(*,f,e,h,f)
 
 
 Pattern LE15

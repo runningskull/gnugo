@@ -353,7 +353,7 @@ O..o
 ....
 ----
 
-:8,-,value(75)
+:8,-,value(76)
 
 ?X.?
 ?b*.
@@ -1091,11 +1091,12 @@ O.OD?
 
 Pattern D308
 # tm added b category (3.1.17)
+# tm increased value (3.1.20)
 
 o.O         chimera
 .*X
 
-:8,nsb,value(71)
+:8,nsb,value(77)
 
 ocO
 b*X
@@ -5555,6 +5556,7 @@ Pattern D1360
 
 
 Pattern D1361
+# too generic; see resultant A1121, see also trevor:1050
 
 X.X         push to expose weakness
 O*.

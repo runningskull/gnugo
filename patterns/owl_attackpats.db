@@ -3317,6 +3317,35 @@ Dcb
 ;&& ((o_somewhere(E) || x_somewhere(E)) || owl_escape_value(a) < 0)
 
 
+Pattern A1120
+# tm New Pattern (3.1.20)
+#   see also D1380
+
+?..	block escape
+.*.
+X.?
+
+:8,-,value(65)
+
+?AB
+.*C
+X.?
+
+; owl_escape_value(A) + owl_escape_value(B) + owl_escape_value(C) > 3
+
+
+Pattern A1121
+# tm New Pattern (3.1.20)  
+#   see also Pattern D1361 (both this and that are too generic)
+#   see trevorc:550, trevor:1050
+
+O.O         block to protect weakness
+X*.
+?O?
+ 
+:8,-,value(35)
+
+
 #########################################################
 #                                                       #
 #       Kill or threaten a worm of the dragon           #

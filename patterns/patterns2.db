@@ -180,6 +180,22 @@ Oa?
 ;oplay_attack_either(*,a,a,B)
 
 
+Pattern Conn206
+# see trevord:740
+
+..O   very indirect connection
+.OX
+*X.
+
+:8,C
+
+.aO
+.OX
+*X.
+
+;oplay_attack(*,a,a)
+
+
 #####################
 #
 # Connection of keima
@@ -2630,6 +2646,7 @@ Pattern Sente12
 # For performance reason this pattern has s classification and an
 # explicit safety test in the constraint. Thus the safety test can be
 # shortcut by the preceding liberty test.
+# tm removed attack in ko from constraint.  (3.1.20) (see trevorc:310)
 
 *X
 
@@ -2637,7 +2654,7 @@ Pattern Sente12
 
 *A
 
-;lib(A) == 2 && !attack(A) && safe_omove(*)
+;lib(A) == 2 && !attack(A) && !oplay_attack(*,*)
 # Action adds a followup value unless the threat is considered ineffective.
 >threaten_to_capture(A)
 

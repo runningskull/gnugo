@@ -430,6 +430,25 @@ Pattern EB24
 ;!xplay_defend(*,a)
 
 
+Pattern EB25
+# tm New Pattern (3.1.20)
+
+O!.  cutable keima on edge.
+.!O
+.!.
+---
+
+:8,B
+
+Obc
+daf
+.!.
+---
+
+; !xplay_attack_either(a,b,c,a,c) ||
+; !xplay_attack_either(b,a,d,b,d)
+
+
 ##########################
 #
 # B patterns in the center
@@ -939,6 +958,9 @@ OB
 
 
 Pattern CC206
+# tm modified (3.1.20)
+#   FIXME: Should dragons be connectable via ko?
+#   see trevord:260
 
 O..
 ..O
@@ -947,13 +969,15 @@ ooo
 :8,C
 
 Obc
-daf
+daO
 ooo
 
-;xplay_attack_either(a,b,c,a,c) && xplay_attack_either(b,a,d,b,d)
+; xplay_attack_either(a,b,c,a,c) == WIN && 
+; xplay_attack_either(b,a,d,b,d) == WIN
 
 
-Pattern CC206
+Pattern CC206a
+# tm removed duplicate name (3.1.20)
 
 oOO..
 .....
@@ -1027,6 +1051,9 @@ cab
 ###########################
 
 Pattern CC311
+# tm modified (3.1.20)
+#   FIXME: Should dragons be connectable via ko?
+#   see trevord:260
 
 O..
 ..O
@@ -1037,7 +1064,8 @@ Ebc
 daF
 
 ;lib(E)>2 && lib(F)>2
-;&& xplay_attack_either(a,b,c,a,c) && xplay_attack_either(b,a,d,b,d)
+;&& xplay_attack_either(a,b,c,a,c)==WIN
+;&& xplay_attack_either(b,a,d,b,d)==WIN
 
 
 
@@ -1061,6 +1089,9 @@ oO
 
 
 Pattern CC313
+# tm modified (3.1.20)
+#   FIXME: Should dragons be connectable via ko?
+#   see trevord:260
 
 O..
 ..O
@@ -1072,8 +1103,8 @@ Obc
 daf
 .e.
 
-;xplay_attack_either(a,b,c,a,c)
-;&& (xplay_attack_either(b,a,d,b,d) || !xplay_break_through(b,d,a,e,d,e,f))
+;xplay_attack_either(a,b,c,a,c) == WIN
+;&& (xplay_attack_either(b,a,d,b,d) == WIN || !xplay_break_through(b,d,a,e,d,e,f))
 
 
 ####################################

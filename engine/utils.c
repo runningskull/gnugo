@@ -418,17 +418,20 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
   modify_depth_values(played_moves);
 #endif
   
+
+  /* FIXME: tm - Should be able to return Ko status as well.  Should be
+     a simple fix.  For now, returning WIN (used to return 1) (3.1.20) */
   if (do_attack) {
     if (board[ypos] == EMPTY
 	|| board[zpos] == EMPTY
 	|| attack_either(ypos, zpos))
-      success = 1;
+      success = WIN;
   }
   else {
     if (board[ypos] != EMPTY
 	&& board[zpos] != EMPTY
 	&& defend_both(ypos, zpos))
-      success = 1;
+      success = WIN;
   }
 
 #if 0
