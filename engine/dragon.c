@@ -1589,14 +1589,14 @@ compute_surrounding_moyo_sizes(int opposite)
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       int moyo_number = moyos.segmentation[pos];
       if (moyo_number == 0
-         || board[pos] != DRAGON(d).color
-         || dragon[pos].id != d
-         || moyos.owner[moyo_number] != board[pos])
-       continue;
+          || board[pos] != DRAGON(d).color
+          || dragon[pos].id != d
+          || moyos.owner[moyo_number] != board[pos])
+        continue;
 
       if (mx[moyo_number] != d + 1) {
-       mx[moyo_number] = d + 1;
-       this_moyo_size += moyos.size[moyo_number];
+        mx[moyo_number] = d + 1;
+        this_moyo_size += moyos.size[moyo_number];
       }
     }
 
