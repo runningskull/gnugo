@@ -3548,7 +3548,6 @@ review_move_reasons(int *the_move, float *val, int color,
     time_report(2, "  find_large_scale_owl_attack_moves", NO_MOVE, 1.0);
   }
 
-  reading_cache_clear();
   if (level >= 6) {
     find_more_owl_attack_and_defense_moves(color);
     time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);
