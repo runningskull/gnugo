@@ -135,7 +135,7 @@ sgftreeCreateHeaderNode(SGFTree *tree, int boardsize, float komi)
 SGFNode *
 sgftreeAddComment(SGFTree *tree, SGFNode *node, const char *comment)
 {
-  assert(tree->root);
+  assert(tree && tree->root);
 
   node = sgftreeNodeCheck(tree, node);
   sgfAddComment(node, comment);

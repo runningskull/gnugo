@@ -20,6 +20,7 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "gnugo.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -804,9 +805,9 @@ revise_semeai(int color)
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (ON_BOARD(pos)
+	&& dragon[pos].color == other
 	&& DRAGON2(pos).semeai
-	&& dragon[pos].matcher_status == DEAD
-	&& dragon[pos].color == other) {
+	&& dragon[pos].matcher_status == DEAD) {
       found_one = 1;
       dragon[pos].matcher_status = UNKNOWN;
       if (dragon[pos].origin == pos)

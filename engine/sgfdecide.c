@@ -26,6 +26,8 @@
 /*      Show status for a string, a dragon, etc in an SGF file.     */
 /* ================================================================ */
 
+#include "gnugo.h"
+
 #include <stdio.h>
 #include <string.h>
 

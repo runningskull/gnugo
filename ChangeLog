@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- re-order conditions in revise_semeai to insure valid DRAGON2 data
+- organize include file order to facilitate pre-compiled headers.
+- use location_to_string in replay_node()
+- improve assertion in sgftreeAddComment()
+
 3.1.26 released February 24, 2002
 
 - experimental influence, experimental and alternate connections are default

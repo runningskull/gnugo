@@ -20,6 +20,7 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "gnugo.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +33,6 @@
 #include "liberty.h" /* to get to the stats */
 
 #include "sgftree.h"
-#include "gnugo.h"
 #include "random.h"
 #include "gg_utils.h"
 

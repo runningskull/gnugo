@@ -25,10 +25,11 @@
  * especially, combinations of threats.
  */
 
+#include "gnugo.h"
+
 #include <string.h>
 
 #include "liberty.h"
-#include "gnugo.h"
 #include "gg_utils.h"
 #include "patterns.h"
 

@@ -20,6 +20,8 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "gnugo.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>

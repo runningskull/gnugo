@@ -67,6 +67,7 @@
  *   will have to use some scheme like this.
  */
 
+#include "gnugo.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -20,9 +20,7 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "gnugo.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +28,6 @@
 #include <assert.h>
 #include <ctype.h>
 
-#include "gnugo.h"
 #include "liberty.h"
 #include "interface.h"
 #include "sgftree.h"

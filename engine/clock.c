@@ -36,6 +36,7 @@
 /*                                                               */
 /* ============================================================= */
 
+#include "gnugo.h"
 
 #include <liberty.h>
 #include <gg_utils.h>

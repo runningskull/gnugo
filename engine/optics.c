@@ -21,7 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-
+#include "gnugo.h"
 
 #include <stdio.h>
 #include <stdlib.h>

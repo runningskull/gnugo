@@ -20,14 +20,13 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
-
 #include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
 #include "liberty.h"
 #include "patterns.h"
+
+
+#include <stdlib.h>
+#include <assert.h>
 
 /* Try to match all (permutations of) connection patterns at (m,n).
  * For each match, if it is a B pattern, set cutting point in worm
