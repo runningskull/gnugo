@@ -808,4 +808,14 @@ Xb
 ; !xplay_defend_both(*,a,b) && vital_chain(a) && vital_chain(b)
 
 
+Pattern VA47
+# tm New Pattern (3.1.18)
+
++----
+|.*..
+|XX.O
+
+:8,s,value(75)
+
+
 # END OF FILE

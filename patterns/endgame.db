@@ -994,6 +994,24 @@ O*ab..
 ;proper_eye(b) && !oplay_attack(*,?,a,b,a) && oplay_attack(*,?,a,b,b)
 
 
+Pattern EF3
+# tm New Pattern (3.1.18)
+
+..X?	    hane in sente, after saving stone.
+.XO*
+....
+----
+
+:8,X,followup(3)
+
+..X?
+.DO*
+Bac.
+----
+
+; oplay_attack_either(*,?,a,B,c,B,D)
+
+
 # reverse followups
 ######################################
 
@@ -1351,6 +1369,22 @@ O*O
 X.X
 
 :|,bOX
+
+
+Pattern CE27
+# tm New Pattern (3.1.18)
+
+...   moyo breakin worth a lot.
+X*X
+?O?
+
+:8,-,terri(3)
+
+.b.   
+A*C
+?O?
+
+; xmoyo(b) && oplay_break_through(*,b,A,b,C) == WIN
 
 
 ######################################################################

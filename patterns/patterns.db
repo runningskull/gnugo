@@ -1152,18 +1152,19 @@ O..X
 
 
 Pattern CC77
+# tm: reduced shape value from 8 to 3 (3.1.18)
 
 X?           prevent connection
 *O
 .X
 
-:8,OB,shape(8)
+:8,OB,shape(3)
 
 C?
 *b
 aD
 
-; xplay_attack_either(*,a,a,b) && !same_dragon(C,D)
+; !same_dragon(C,D) && xplay_attack_either(*,a,a,b) 
 
 
 Pattern CC78
@@ -2153,14 +2154,43 @@ Pattern EC59
 
 
 Pattern EC60
+# tm added constraint (3.1.18)
 
-?O..           cut
+?O..           protect cut
 XO*X
 XXO.
 ....
 ----
 
 :8,BO
+
+?O..
+XO*X
+XXcA
+...B
+----
+
+; xplay_attack(A,B,c) || xplay_attack(*,c)
+
+
+Pattern EC60a
+# tm New Pattern (3.1.18)
+
+?O..           indirectly protect cut
+XO.X
+XXO*
+....
+----
+
+:8,BO
+
+?b..
+XOaX
+XXO*
+....
+----
+
+; oplay_defend_both(*,a,*,b)
 
 
 Pattern EC61
@@ -2401,7 +2431,7 @@ Pattern EC77
 #tm New Pattern (3.1.16)
 #tm modified (3.1.17)
 
-|..x
+|..x	  clamp!
 |.*.
 |.X.
 |XOO
@@ -2415,6 +2445,29 @@ Pattern EC77
 
 ;oplay_defend(*,A) != WIN
 
+
+Pattern EC78
+#tm New Pattern (3.1.18)
+#  see trevora:610
+#FIXME: There's still a problem here, in that this sacrifice
+#       is deemed unsafe, and not played....
+
+OOO	block or cut into black's territory.
+...
+*X.
+...
+---
+
+:8,sOXb
+
+OOO
+a..
+*Xb
+...
+---
+
+; !oplay_attack(*)
+; || !oplay_attack(*,a,b,b)
 
 ##############################################
 # First line, one space, cuts and connections.
@@ -7713,19 +7766,23 @@ OXXX*
 
 
 Pattern CB245
+# tm modified (3.1.18)
+#   see trevorb:750
 
-?..?        hane at the head of two stones
-OXX*
-?OO.
+?..??        hane at the head of two stones
+OXX*?
+?OO.?
 
 :8,OXeb
 
-?..?
-cXXa
-?bb.
+?..??
+cXe*F
+?bbAD
 
-;lib(c)>1 && !oplay_attack(a,b)
-
+; lib(c)>1 
+; && !oplay_attack(*,b)
+; && oplay_defend_both(*,A,*,b) 
+; && (oplay_attack(*,A,e) || !x_somewhere(D,F))
 
 Pattern CB246
 
@@ -8694,6 +8751,8 @@ OB?
 
 
 Pattern CB329
+# FIXME: This could be very bad aji-keshi.
+#   For a not great example, see trevorb:490
 
 .*          first atari, then connect
 OX
@@ -9808,8 +9867,11 @@ xxx..
 
 
 Pattern ED66
+# tm Modified (3.1.18) (see trevorb:610)
+# FIXME: Is this just too generic?
 
-O.X         draw back for safety
+?x?         draw back for safety
+O.X
 .*O
 ...
 ...
@@ -9817,6 +9879,7 @@ O.X         draw back for safety
 
 :8,JO
 
+?x?
 OaB
 .*O
 ...
@@ -9827,8 +9890,12 @@ OaB
 
 
 Pattern ED67
+# tm Modified (3.1.18) (see trevorb:610)
+# FIXME: Is this just too generic?
+#   Identical to ED66, but with j attribute instead of J
 
-O.X         draw back for safety
+?x?         draw back for safety
+O.X
 .*O
 ...
 ...
@@ -9836,6 +9903,7 @@ O.X         draw back for safety
 
 :8,jO
 
+?x?
 OaB
 .*O
 ...
@@ -10963,20 +11031,22 @@ O.XO.
 
 
 Pattern EJ4
+#tm modified (3.1.18)
+#   added ? column.
 
-...*.     continuation -- never play 'a' here
-.OOX.
-..XOX
-.....
------
+...*.?     continuation -- never play 'a' here
+.OOX.o
+..XOX?
+.....?
+------
 
 :8,jEd
 
-...*.
-.OOX.
-.aXOX
-.....
------
+...*.?
+.OOX.o
+.aXOX?
+.....?
+------
 
 >antisuji(a);
 
@@ -13100,6 +13170,8 @@ Pattern LE13
 
 
 Pattern LE14
+# FIXME: This pattern looks way to general/overvalued
+#   see global:27
 
 xxx      safe jump into opponent's moyo
 ..x
@@ -13254,6 +13326,48 @@ OO.|
 OOa|
 
 ; oplay_attack(*,a,B)
+
+> replace(a,*)
+
+
+Pattern RE5
+# tm New pattern (3.1.18)  (see trevorb:440)
+
+OX?	threaten snapback
+X.X
+X.*
+?O.
+??o
+
+:8,-
+
+OX?
+B.X
+Xa*
+?O.
+??o
+
+; lib(B) == 2
+
+> replace(a,*)
+
+
+Pattern RE6
+# tm New Pattern (3.1.18)  (see trevorb:400)
+
+-----
+.*...	take it off, don't leave atari followup
+OXOX?
+?OOX?
+
+:8,-
+
+-----
+.*a..
+OXOX?
+?OBX?
+
+; lib(B) == 1
 
 > replace(a,*)
 

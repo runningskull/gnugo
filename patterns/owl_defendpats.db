@@ -476,13 +476,14 @@ OOa..
 
 Pattern D123
 # tm New Pattern (3.1.17)
+# tm Modified (3.1.18)
 
-?*?	expand eye shape
-O.O
-...
----
+??*??	expand eye shape, not in corner
+?O.O?
+?...?
+-----
 
-:8,-,value(65)
+:|,-,value(65)
 
 
 #########################################################
@@ -2210,13 +2211,14 @@ Pattern D629
 Pattern D630
 # tm New Pattern (3.1.15)
 # gf This was classified as a 0 (zero) pattern. Removed class. (3.1.18)
+# tm added b category (3.1.18)
 
 .*O    Cut off black stone
 OX?
 ???
 ---
 
-:8,-,value(65)
+:8,b,value(65)
 
 .*O
 OA?
@@ -2647,21 +2649,23 @@ OO.
 :8,-,value(60)
 
 
-Pattern D719
-# tm New patern (3.1.16)
-# gf This pattern is way too general. (3.1.17)
-
-?X	wedge
-?*
-OX
-
-:8,b,value(75)
-
-?B
-C*
-OA
-
-; !ko(*) && !ko(C) && (oplay_attack(*,A) || oplay_attack(*,B))
+## tm removing the wedge pending better constraint.
+##  see, for example, trevorb:560
+#Pattern D719
+## tm New patern (3.1.16)
+## gf This pattern is way too general. (3.1.17)
+#
+#?X	wedge
+#?*
+#OX
+#
+#:8,b,value(75)
+#
+#?B
+#C*
+#OA
+#
+#; !ko(*) && !ko(C) && (oplay_attack(*,A) || oplay_attack(*,B))
 
 
 Pattern D720
@@ -4224,11 +4228,12 @@ D*
 
 Pattern D1132
 # db added (3.1.7)
+# tm reduced value (3.1.18)  (see trevorb:590)
 
 ?X*O          cut to find defects
 OOX.
 
-:8,b,value(80)
+:8,b,value(45)
 
 ?A*O
 OOB.
@@ -4850,7 +4855,6 @@ O*O      connect to friendly dragon
 a*b
 
 ;!owl_goal_dragon(a) || !owl_goal_dragon(b)
-
 
 
 Pattern D1321
