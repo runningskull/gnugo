@@ -2,7 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- missing files added to EXTRADIST in Makefile.* in doc/ and regression/
+- new file logo-36.pdf
 - DFA micro optimizations
+- Test results updated: cvs tag rel-3-7-1-pre-1
 - use int arrays instead of char arrays to mark eyes in
   owl_determine_life() and dependent functions
 - added .eps-version of new logo
