@@ -3482,6 +3482,130 @@ prepare_move_influence_debugging(int pos, int color)
   estimate_territorial_value(pos, color, our_score, 1);
 }
 
+
+/* Compute probabilities of each move being played.  It is assumed
+ * that the `move[]' array is filled with proper values (i.e. that
+ * one of the genmove*() functions has been called).
+ *
+ * The value of each move `V_k' should be a uniformly distributed
+ * random variable (`k' is a unique move index).  Let it have values
+ * from the interval [l_k; u_k] .  Then move value has constant
+ * probability density on the interval:
+ *
+ *		1
+ *   d_k = -----------.
+ *	    u_k - l_k
+ *
+ * We need to determine the probability of `V_k' being the largest of
+ * {V_1, V_2, ..., V_n}.  Probability density is like follows:
+ *
+ *   D_k(t) = d_k * Product(P{V_i < t} for i != k), l_k <= t <= u_k,
+ *
+ * where P{A} is the probability of event `A'.  By integrating D_k(t)
+ * from `l_k' to `u_k' we can find the probability in question:
+ *
+ *   P{V_k > V_i for i != k} = Integrate(D_k(t) dt from l_k to u_k).
+ *
+ * Function D_k(t) is a polynomial on each of subintervals produced by
+ * points `l_k', `u_k', k = 1, ..., n.  When t < min(l_k), D_k(t) is
+ * zero.  On other subintervals it can be evaluated by taking into
+ * account that
+ *
+ *  P{V_i < t} = d_i * (t - l_i)  if t < u_i;
+ *  P{V_i < t} = 1		  if t >= u_i.
+ */
+void
+compute_move_probabilities(float probabilities[BOARDMAX])
+{
+  int k;
+  int pos;
+  int num_moves = 0;
+  int moves[BOARDMAX];
+  double lower_values[BOARDMAX];
+  double upper_values[BOARDMAX];
+  double densities[BOARDMAX];
+  double common_lower_limit = 0.0;
+
+  /* Find all moves with positive values. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    probabilities[pos] = 0.0;
+
+    if (ON_BOARD(pos)) {
+      /* FIXME: what about point redistribution? */
+      if (move[pos].final_value > 0.0) {
+	double scale = 0.01 * (double) move[pos].randomness_scaling;
+
+	moves[num_moves] = pos;
+	lower_values[num_moves] = ((double) move[pos].final_value
+				   - (scale * move[pos].random_number));
+	upper_values[num_moves] = lower_values[num_moves] + scale;
+	densities[num_moves] = 1.0 / scale;
+
+	if (lower_values[num_moves] > common_lower_limit)
+	  common_lower_limit = lower_values[num_moves];
+
+	num_moves++;
+      }
+    }
+  }
+
+  /* Compute probability of each move. */
+  for (k = 0; k < num_moves; k++) {
+    int i;
+    double lower_limit = common_lower_limit;
+
+    /* Iterate over subintervals for integration. */
+    while (lower_limit < upper_values[k]) {
+      int j;
+      double upper_limit = upper_values[k];
+      double span_power;
+      double polynomial[BOARDMAX];
+      int degree;
+
+      degree = 0;
+      polynomial[0] = 1.0;
+
+      for (i = 0; i < num_moves; i++) {
+	/* See if we need to decrease current subinterval. */
+	if (upper_values[i] > lower_limit && upper_values[i] < upper_limit)
+	  upper_limit = upper_values[i];
+      }
+
+      /* Build the probability density polynomial for the current
+       * subinterval.
+       */
+      for (i = 0; i < num_moves; i++) {
+	if (i != k && upper_values[i] >= upper_limit) {
+	  polynomial[++degree] = 0.0;
+	  for (j = degree; j > 0; j--) {
+	    polynomial[j] = (densities[i]
+			     * (polynomial[j - 1]
+				+ ((lower_limit - lower_values[i])
+				   * polynomial[j])));
+	  }
+
+	  polynomial[0] *= densities[i] * (lower_limit - lower_values[i]);
+	}
+      }
+
+      /* And compute the integral of the polynomial on the current
+       * subinterval.
+       */
+      span_power = 1.0;
+      for (j = 0; j <= degree; j++) {
+	span_power *= upper_limit - lower_limit;
+	probabilities[moves[k]] += (polynomial[j] * span_power) / (j + 1);
+      }
+
+      /* Go on to the next subinterval. */
+      lower_limit = upper_limit;
+    }
+
+    probabilities[moves[k]] *= densities[k];
+  }
+}
+
+
 /*
  * Local Variables:
  * tab-width: 8

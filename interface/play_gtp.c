@@ -134,6 +134,7 @@ DECLARE(gtp_list_commands);
 DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
 DECLARE(gtp_move_influence);
+DECLARE(gtp_move_probabilities);
 DECLARE(gtp_move_reasons);
 DECLARE(gtp_name);
 DECLARE(gtp_owl_attack);
@@ -272,6 +273,7 @@ static struct gtp_command commands[] = {
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
   {"move_influence",          gtp_move_influence},
+  {"move_probabilities",      gtp_move_probabilities},
   {"move_reasons",            gtp_move_reasons},
   {"name",                    gtp_name},
   {"new_score",               gtp_estimate_score},
@@ -3730,6 +3732,39 @@ gtp_move_influence(char *s)
   prepare_move_influence_debugging(POS(i, j), color);
   
   return print_influence_data(&move_influence, s + n);
+}
+
+
+/* Function:  List probabilities of each move being played (when non-zero).
+ * Arguments: none
+ * Fails:     never
+ * Returns:   Move, probabilty pairs, one per row.
+ */
+static int
+gtp_move_probabilities(char *s)
+{
+  float probabilities[BOARDMAX];
+  int pos;
+  int any_moves_printed = 0;
+
+  UNUSED(s);
+
+  compute_move_probabilities(probabilities);
+
+  gtp_start_response(GTP_SUCCESS);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos) && probabilities[pos] != 0.0) {
+      gtp_mprintf("%m ", I(pos), J(pos));
+      gtp_printf("%.4f\n", probabilities[pos]);
+      any_moves_printed = 1;
+    }
+  }
+
+  if (!any_moves_printed)
+    gtp_printf("\n");
+  gtp_printf("\n");
+
+  return GTP_OK;
 }
 
 

@@ -396,6 +396,7 @@ void print_all_move_values(void);
 void record_top_move(int move, float val);
 void remove_top_move(int move);
 void scale_randomness(int pos, float scaling);
+void compute_move_probabilities(float probabilities[BOARDMAX]);
 
 void register_good_attack_threat(int move, int target);
 int is_known_good_attack_threat(int move, int target);
