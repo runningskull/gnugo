@@ -5047,12 +5047,13 @@ O.O.
 
 
 Pattern D1315
+# db generalized (3.3.14)
 
 o.o
 O.O     run away
 ...
 .*.
-...
+?oo
 
 :8,E,value(50)
 
@@ -5060,9 +5061,9 @@ o.o
 O.O
 ...
 .*.
-.a.
+?ab
 
-;owl_escape_value(a) > 0
+; owl_escape_value(a) > 0 || owl_escape_value(b) > 0
 
 
 Pattern D1316

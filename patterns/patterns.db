@@ -13019,6 +13019,17 @@ o.e.....
 > replace(e,*)
 
 
+Pattern EJ100
+# db added (3.3.14)
+
+|...O...     seal the opponent
+|.......
+|...X*..
+|...XO..
+|..XOO..
+
+:8,jda
+
 
 ######################################################################
 #
@@ -13987,6 +13998,29 @@ x.O*
 #
 #; alive(b) && lib(c) == 2 && oplay_attack(*,a,c)
 #> replace(a,*)
+
+
+Pattern RE12
+# db added (3.3.14)
+# See ninestones:20, where hane is a bogus owl defense.
+
+???OX.      kosumi defense
+O.XO..
+....*.
+......
+------
+
+:8,-,shape(3)
+
+???aC.
+O.Ba..
+..d.*.
+......
+------
+
+; lib(a)==2 && lib(B)>=2 && !oplay_attack(*,a)
+> replace(d,*)
+
 
 
 # END OF FILE

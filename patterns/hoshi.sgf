@@ -18,7 +18,6 @@ Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111, USA.
 
 
-
 (;GM[1]FF[3]
 RU[Japanese]SZ[19]HA[0]KM[5.5]
 GN[Hoshi joseki variations]
@@ -390,6 +389,9 @@ C[S];W[ph]MA[mi]C[S])
 
 (;W[og];B[qe]MA[mi]C[U
 ])
+
+(;W[qc];B[pc]MA[mi];W[qd]MA[mi];B[qe]MA[mi];W[re]MA[mi]PL[B];B[pe]
+MA[mi];W[rg]MA[mi];B[og]MA[li])
 )
 
 (;B[qe]MA[mh]C[S];C[#osae];W[of]MA[nh]C[U
