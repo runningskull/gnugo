@@ -327,10 +327,10 @@ loadsgf games/gunnar/gunnar16.sgf
 57 restricted_genmove black J13 J12 H11 J11 K11 Q19
 #? [Q19]
 
-# No territory to contest around J15. E12 worth one point.
+# No territory to contest around J15. Filling ko at Q19 bigger.
 loadsgf games/gunnar/gunnar17.sgf
-58 reg_genmove black
-#? [E12]
+58 reg_genmove white
+#? [Q19]
 
 # Do not defend against combination attack inside potential territory
 # unless we have to.
