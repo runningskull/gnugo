@@ -91,6 +91,7 @@ enum {OPT_BOARDSIZE=2,
       OPT_EXPERIMENTAL_CONNECTIONS,
       OPT_EXPERIMENTAL_INFLUENCE,
       OPT_ALTERNATE_CONNECTIONS,
+      OPT_OPTIONS,
       OPT_STANDARD_SEMEAI,
       OPT_STANDARD_CONNECTIONS,
       OPT_STANDARD_INFLUENCE,
@@ -210,6 +211,7 @@ static struct gg_option const long_options[] =
   {"standard-connections",  no_argument, 0, OPT_STANDARD_CONNECTIONS},
   {"standard_semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"alternate-connections",  no_argument, 0, OPT_ALTERNATE_CONNECTIONS},
+  {"options",        no_argument, 0, OPT_OPTIONS},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
   {"play-out-aftermath", no_argument,   0, OPT_PLAY_OUT_AFTERMATH},
@@ -394,6 +396,28 @@ main(int argc, char *argv[])
 	}
 	break;
 	
+      case OPT_OPTIONS:
+	if (EXPERIMENTAL_INFLUENCE)
+	  fprintf(stderr,
+		  "configure option enabled: experimental influence\n");
+	if (EXPERIMENTAL_CONNECTIONS)
+	  fprintf(stderr,
+		  "configure option enabled: experimental connections\n");
+	if (ALTERNATE_CONNECTIONS)
+	  fprintf(stderr,
+		  "configure option enabled: alternate connections\n");
+	if (EXPERIMENTAL_SEMEAI)
+	  fprintf(stderr,
+		  "configure option enabled: experimental semeai\n");
+	if (EXPERIMENTAL_READING)
+	  fprintf(stderr,
+		  "configure option enabled: experimental reading\n");
+	if (OWL_THREATS)
+	  fprintf(stderr,
+		  "configure option enabled: owl threats\n");
+	return EXIT_SUCCESS;
+	break;
+
       case OPT_SHOWTIME:
 	showtime = 1;
 	break;
