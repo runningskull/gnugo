@@ -4141,7 +4141,7 @@ catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS])
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       int pos = POS(m, n);
-      if (owl->goal[pos]) {
+      if (owl->goal[pos] && board[pos]) {
 	int origin = find_origin(pos);
 	int found_one = 1;
 
