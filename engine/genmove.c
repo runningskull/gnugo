@@ -49,6 +49,7 @@ static int initial_influence_examined = -1;
 static int dragons_examined_without_owl = -1;
 static int dragons_examined = -1;
 static int initial_influence2_examined = -1;
+static int dragons_refinedly_examined = -1;
 
 static int revise_semeai(int color);
 static int revise_thrashing_dragon(int color, float advantage);
@@ -81,6 +82,7 @@ reset_engine()
   dragons_examined_without_owl = -1;
   dragons_examined = -1;
   initial_influence2_examined = -1;
+  dragons_refinedly_examined = -1;
 
   /* Prepare our table of move reasons. */
   clear_move_reasons();
@@ -165,15 +167,24 @@ examine_position(int color, int how_much)
   
   verbose = save_verbose;
 
-  if (printworms)
-    show_dragons();
-
-  if (NEEDS_UPDATE(initial_influence2_examined))
+  if (NEEDS_UPDATE(initial_influence2_examined)) {
     compute_initial_influence(color, 1);
+  }
   if (how_much == EXAMINE_INITIAL_INFLUENCE2) {
     gg_assert(test_gray_border() < 0);
     return;
   }
+
+  if (NEEDS_UPDATE(dragons_refinedly_examined)) {
+    compute_refined_dragon_weaknesses();
+  }
+  if (how_much == FULL_EXAMINE_DRAGONS) {
+    gg_assert(test_gray_border() < 0);
+    return;
+  }
+
+  if (printworms)
+    show_dragons();
 }
 
 

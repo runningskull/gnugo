@@ -397,9 +397,9 @@ display_eye(int color, struct eye_data eyedata[BOARDMAX], int pos)
   gg_wprintw(info_window, "%d  ", eyedata[pos].marginal);
 
   wmove(info_window, 4, 55);
-  gg_wprintw(info_window, "%d ", eyedata[pos].maxeye);
+  gg_wprintw(info_window, "%d ", eyedata[pos].value.maxeye);
   wmove(info_window, 5, 55);
-  gg_wprintw(info_window, "%d ", eyedata[pos].mineye);
+  gg_wprintw(info_window, "%d ", eyedata[pos].value.mineye);
 
   wmove(info_window, 6, 55);
   if (eyedata[pos].attack_point == NO_MOVE)

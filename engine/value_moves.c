@@ -771,7 +771,8 @@ examine_move_safety(int color)
 
 
 /*
- * An attempt to estimate the safety of a dragon.
+ * Returns the pre-computed weakness of a dragon, with corrections
+ * according to ignore_dead_draggons.
  *
  * FIXME: Important to test more exactly how effective a strategical
  *        attack or defense of a weak dragon is. This can be done by
@@ -782,18 +783,6 @@ examine_move_safety(int color)
  *        rather where it's called.
  */
 
-static float safety_values[10] = {
-/* DEAD        */  0.0,
-/* ALIVE       */  0.9,
-/* CRITICAL    */  0.1,
-/* INESSENTIAL */  1.0,   /* Yes, 1.0. We simply don't worry about it. */
-/* TACT. DEAD  */  0.0,
-/* WEAK        */  0.4,
-/* WEAK ALIVE  */  0.6,
-/* SEKI        */  0.8,
-/* STR. ALIVE  */  1.0,
-/* INVINCIBLE  */  1.0};
-		  
 static float
 dragon_safety(int dr, int ignore_dead_dragons)
 {
@@ -812,28 +801,7 @@ dragon_safety(int dr, int ignore_dead_dragons)
   if (doing_scoring && dragon_safety == ALIVE)
     return 1.0;
   
-  /* More detailed guesses for WEAK and WEAKLY_ALIVE dragons. */
-  if (dragon_safety == WEAK || dragon_safety == WEAKLY_ALIVE) {
-    int escape = DRAGON2(dr).escape_route;
-    int moyo = DRAGON2(dr).moyo;
-    /* If escape <= 5 and moyo <= 10, the dragon won't be WEAK, since
-     * the owl code has been run.
-     */
-    if (escape < 10 && moyo < 5)
-      return 0.1;
-    else if (escape < 15 && moyo < 5)
-      return 0.2;
-    else if (escape < 10 && moyo < 10)
-      return 0.3;
-    else if (escape < 5 && moyo < 15)
-      return 0.4;
-    else if (escape < 15 && moyo < 15)
-      return 0.7;
-    else
-      return 0.9;
-  }
-  
-  return safety_values[dragon_safety];
+  return (1.0 - DRAGON2(dr).weakness);
 }
 
 /*
@@ -935,7 +903,7 @@ connection_value(int dragona, int dragonb, int tt, float margin)
    * assume it doesn't help dragon a to connect to b.
    */
   if (safety2 == CRITICAL && true_genus2 == 0
-      && DRAGON2(dragonb).moyo == 0)
+      && DRAGON2(dragonb).moyo_size_pre_owl == 0)
     return 0.0;
   
 

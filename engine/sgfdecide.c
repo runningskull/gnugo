@@ -295,7 +295,7 @@ decide_dragon_data(int pos)
     return ;
   }
   reset_engine();
-  silent_examine_position(board[pos], EXAMINE_DRAGONS);
+  silent_examine_position(board[pos], FULL_EXAMINE_DRAGONS);
 
   gprintf("Dragon at %1m:\n", pos);
   report_dragon(stderr, pos);
@@ -504,7 +504,7 @@ void
 decide_eye(int pos, const char *sgf_output)
 {
   int color;
-  char max, min;
+  struct eyevalue value;
   int attack_point;
   int defense_point;
   int eyepos;
@@ -535,20 +535,23 @@ decide_eye(int pos, const char *sgf_output)
   
   if (black_eye[pos].color == BLACK_BORDER) {
     eyepos = black_eye[pos].origin;
-    compute_eyes(eyepos, &max, &min, &attack_point, &defense_point,
+    compute_eyes(eyepos, &value, &attack_point, &defense_point,
 		 black_eye, half_eye, 0, EMPTY);
-    gprintf("Black eyespace at %1m: min=%d, max=%d\n", eyepos, min, max);
-    if (max != min) {
+    gprintf("Black eyespace at %1m: min=%d, max=%d\n", eyepos,
+	    value.mineye, value.maxeye);
+    if (value.maxeye != value.mineye) {
       gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
 	      defense_point);
     }
   }
+  
   if (white_eye[pos].color == WHITE_BORDER) {
     eyepos = white_eye[pos].origin;
-    compute_eyes(eyepos, &max, &min, &attack_point, &defense_point,
+    compute_eyes(eyepos, &value, &attack_point, &defense_point,
 		 white_eye, half_eye, 0, EMPTY);
-    gprintf("White eyespace at %1m: min=%d, max=%d\n", eyepos, min, max);
-    if (max != min) {
+    gprintf("White eyespace at %1m: min=%d, max=%d\n", eyepos,
+	    value.mineye, value.maxeye);
+    if (value.maxeye != value.mineye) {
       gprintf("  vital points: %1m (attack) %1m (defense)\n", attack_point,
 	      defense_point);
     }

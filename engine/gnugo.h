@@ -373,6 +373,7 @@ int DEBUG_func(int level, const char *fmt, ...);
 #define EXAMINE_DRAGONS             4
 #define EXAMINE_OWL_REASONS         5
 #define EXAMINE_INITIAL_INFLUENCE2  6
+#define FULL_EXAMINE_DRAGONS        7
 
 #define EXAMINE_ALL                 99
 
@@ -449,6 +450,7 @@ void make_worms(int save_verbose);
 
 /* dragon.c */
 void make_dragons(int color, int stop_before_owl, int save_verbose);
+void compute_refined_dragon_weaknesses(void);
 void initialize_dragon_data(void);
 void show_dragons(void);
 int dragon_status(int pos);

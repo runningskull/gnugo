@@ -2,6 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.3 released June 19, 2002
+
+- segment_regions also computes territorial value of regions if available
+- dragon2.moyo_size_pre_owl andmoyo_size_post_owl replace dragon2.moyo
+- new dragon2.moyo_territorial_value, weakness
+- strategic dragon evaluation rewritten, setting dragon2[].weakness
+- moved interpolate to gg_interpolate in gg_utils.c
+- new struct eyevalue
 - moves to connect two dragons which are both adjacent to a thrashing
   dragon are appreciated by the move valuation
 - experimental connections off by default in VC build

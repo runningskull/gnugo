@@ -1084,6 +1084,9 @@ compute_influence(struct influence_data *q, int color, int m, int n,
       if (q->black_strength[i][j] > 0.0)
 	accumulate_influence(q, i, j, BLACK);
     }
+
+  if (q->is_territorial_influence)
+    value_territory(q, m, n, color);
   segment_influence(q);
   
   if (((q == &initial_influence || q == &initial_opposite_influence)
@@ -1211,34 +1214,6 @@ whose_area(struct influence_data *q, int m, int n)
   return EMPTY;
 }
 
-#define MAX_INTERPOLATION_STEPS 20
-struct interpolation_data
-{
-  int sections;
-  float range_lowerbound;
-  float range_upperbound;
-  float values[MAX_INTERPOLATION_STEPS + 1];
-};
-
-static float
-interpolate(struct interpolation_data *f, float x)
-{
-  int i;
-  float ratio;
-  float diff;
-  if (x < f->range_lowerbound)
-    return f->values[0];
-  else if (x > f->range_upperbound)
-    return f->values[f->sections];
-  else {
-    ratio = ((float) f->sections) * (x - f->range_lowerbound)
-              /(f->range_upperbound - f->range_lowerbound);
-    i = ratio;
-    diff = ratio - ((float)i);
-    return ((1-diff)*f->values[i] + diff* f->values[i+1]);
-  }
-}
-
 /* This curve determines how much influence is needed at least to claim
  * an intersection as territory, in dependence of the "center value".
  * (In the center, more effort is needed to get territory!)
@@ -1295,8 +1270,8 @@ value_territory(struct influence_data *q, int m, int n, int color)
 	  dist_j = gg_min(4, dist_j);
 	central = (float) 2 * gg_min(dist_i, dist_j) + dist_i + dist_j;
         ratio = gg_max(q->black_influence[i][j], q->white_influence[i][j])
-                / interpolate(&min_infl_for_territory, central);
-        first_guess[i][j] *= interpolate(&territory_correction, ratio);
+                / gg_interpolate(&min_infl_for_territory, central);
+        first_guess[i][j] *= gg_interpolate(&territory_correction, ratio);
 
 	/* Dead stone, upgrade to territory. Notice that this is not
          * the point for a prisoner, which is added later. Instead
@@ -1382,11 +1357,12 @@ value_territory(struct influence_data *q, int m, int n, int color)
    * for the color playing it. Ideally this should never happen, but
    * currently we need this workaround.
    */
-  ASSERT2(color == EMPTY || ON_BOARD2(m, n), m, n);
-  if (color == BLACK && q->territory_value[m][n] < 0.0)
-    q->territory_value[m][n] = 0.0;
-  else if (color == WHITE && q->territory_value[m][n] > 0.0)
-    q->territory_value[m][n] = 0.0;
+  if (ON_BOARD2(m,n)) {
+    if (color == BLACK && q->territory_value[m][n] < 0.0)
+      q->territory_value[m][n] = 0.0;
+    else if (color == WHITE && q->territory_value[m][n] > 0.0)
+      q->territory_value[m][n] = 0.0;
+  }
 }
 
 
@@ -1409,6 +1385,7 @@ segment_region(struct influence_data *q, owner_function_ptr region_owner,
          * the rest of the region.
 	 */
 	int size = 0;
+	float terr_val = 0.0;
 	int queue_start = 0;
 	int queue_end = 1;
 	int color = region_owner(q, m, n);
@@ -1421,8 +1398,11 @@ segment_region(struct influence_data *q, owner_function_ptr region_owner,
 	  int j = q->queuej[queue_start];
 	  int k;
 	  queue_start++;
-	  if (q->p[i][j] != color)
+	  if (q->p[i][j] != color) {
 	    size++;
+	    if (q->is_territorial_influence)
+	      terr_val += gg_abs(q->territory_value[i][j]);
+	  }
 	  segmentation[i][j] = q->number_of_regions;
 	  for (k = 0; k < 4; k++) {
 	    int di = deltai[k];
@@ -1442,6 +1422,7 @@ segment_region(struct influence_data *q, owner_function_ptr region_owner,
 	else
 	  q->region_type[q->number_of_regions] = BLACK_REGION | type;
 	q->region_size[q->number_of_regions] = size;
+	q->region_territorial_value[q->number_of_regions] = terr_val;
 	if (0)
 	  gprintf("Region %d of type %d (color %s) at %m. Size %d\n",
 		  q->number_of_regions, q->region_type[q->number_of_regions],
@@ -1550,6 +1531,8 @@ influence_get_moyo_segmentation(int opposite, struct moyo_data *moyos)
   /* Export size and owner info. */
   for (i = min_moyo_id; i <= max_moyo_id; i++) {
     moyos->size[i - min_moyo_id + 1] = q->region_size[i];
+    moyos->territorial_value[i - min_moyo_id + 1]
+        = q->region_territorial_value[i];
     if (q->region_type[i] & BLACK_REGION)
       moyos->owner[i - min_moyo_id + 1] = BLACK;
     else
@@ -1586,7 +1569,6 @@ compute_initial_influence(int color, int dragons_known)
   compute_influence(&initial_influence, OTHER_COLOR(color), -1, -1,
 		    NULL, NULL);
   if (dragons_known) {
-    value_territory(&initial_influence, -1, -1, EMPTY);
     if ((printmoyo & PRINTMOYO_VALUE_TERRITORY)
 	&& (printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
       print_influence_territory(&initial_influence,
@@ -1695,6 +1677,7 @@ compute_followup_influence(int m, int n, int color,
              > move_influence.white_strength[i][j]))
         accumulate_influence(&followup_influence, i, j, color);
 
+  value_territory(&followup_influence, m, n, color);
 }
 
 /* Let color play at (m, n) and compute the influence after this move,
@@ -1720,9 +1703,6 @@ compute_move_influence(int m, int n, int color,
     compute_followup_influence(m, n, color, saved_stones);
     decrease_depth_values();
     popgo();
-
-    value_territory(&move_influence, m, n, color);
-    value_territory(&followup_influence, m, n, color);
 
     if (m == debug_influence_i
 	&& n == debug_influence_j && m >= 0) {

@@ -604,7 +604,7 @@ prepare_eyespace(int pos, struct eye_data eyedata[BOARDMAX],
 
 int
 recognize_eye2(int pos, int *attack_point, int *defense_point,
-	       char *max, char *min, 
+	       struct eyevalue *value,
 	       struct eye_data eyedata[BOARDMAX],
 	       struct half_eye_data heye[BOARDMAX],
  	       int add_moves, int color)
@@ -676,16 +676,16 @@ recognize_eye2(int pos, int *attack_point, int *defense_point,
   DEBUG(DEBUG_EYES, "Max: ko_master %C, eyes=%d, ko=%d, defense: %1m\n",
 	OTHER_COLOR(eye_color), max2b, ko2b, eye[defense_point2b]);
   
-  *min = min1a;
-  *max = max2b;
+  value->mineye = min1a;
+  value->maxeye = max2b;
 
   /* Ignore the distinction between seki and two proper eyes for now. */
-  if (*min == 3)
-    *min = 2;
-  if (*max == 3)
-    *max = 2;
+  if (value->mineye == 3)
+    value->mineye = 2;
+  if (value->maxeye == 3)
+    value->maxeye = 2;
   
-  if (*min != *max) {
+  if (value->mineye != value->maxeye) {
     if (attack_point)
       *attack_point = eye[attack_point1a];
     if (defense_point)
@@ -698,8 +698,8 @@ recognize_eye2(int pos, int *attack_point, int *defense_point,
    * deal with chimeras. As a workaround we report the eyespace as one
    * and a half eye instead.
    */
-  if (*max - *min == 2)
-    *min = 1;
+  if (value->maxeye - value->mineye == 2)
+    value->mineye = 1;
   
   gg_assert(stackp == save_stackp);
 

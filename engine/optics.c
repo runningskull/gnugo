@@ -65,13 +65,13 @@ static void originate_eye(int origin, int pos,
 			  int *esize, int *msize,
 			  struct eye_data eye[BOARDMAX]);
 static int recognize_eye(int pos, int *attack_point, int *defense_point,
-			 char *max, char *min, 
+			 struct eyevalue *value,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX],
 			 int add_moves, int color);
 static void guess_eye_space(int pos, int effective_eyesize, int margins,
 			    struct eye_data eye[BOARDMAX],
-			    char *max, char *min, char *pessimistic_min);
+			    struct eyevalue *value, char *pessimistic_min);
 static void first_map(int q, int map[MAXEYE]);
 static int next_map(int *q, int map[MAXEYE], int esize);
 static void print_eye(struct eye_data eye[BOARDMAX],
@@ -98,8 +98,8 @@ clear_eye(struct eye_data *eye)
   eye->esize = 0;
   eye->msize = 0;
   eye->origin = NO_MOVE;
-  eye->maxeye = 0;
-  eye->mineye = 0;
+  eye->value.maxeye = 0;
+  eye->value.mineye = 0;
   eye->attack_point = NO_MOVE;
   eye->defense_point = NO_MOVE;
   eye->marginal = 0;
@@ -592,8 +592,7 @@ propagate_eye(int origin, struct eye_data eye[BOARDMAX])
       eye[pos].esize         = eye[origin].esize;
       eye[pos].msize         = eye[origin].msize;
       eye[pos].origin        = eye[origin].origin;
-      eye[pos].maxeye        = eye[origin].maxeye;
-      eye[pos].mineye        = eye[origin].mineye;
+      eye[pos].value         = eye[origin].value;
       eye[pos].attack_point  = eye[origin].attack_point;
       eye[pos].defense_point = eye[origin].defense_point;
     }
@@ -744,7 +743,7 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
  */
 
 void
-compute_eyes(int pos, char *max, char *min,
+compute_eyes(int pos, struct eyevalue *value,
 	     int *attack_point, int *defense_point,
 	     struct eye_data eye[BOARDMAX],
 	     struct half_eye_data heye[BOARDMAX],
@@ -762,12 +761,12 @@ compute_eyes(int pos, char *max, char *min,
   
   /* First we try to let the life code evaluate the eye space. */
   if (life && eye[pos].esize <= life_eyesize) {
-    char max1, min1;
+    struct eyevalue value1;
     int attack_point1;
     int defense_point1;
     int status;
 
-    if (recognize_eye2(pos, attack_point, defense_point, max, min,
+    if (recognize_eye2(pos, attack_point, defense_point, value,
 		       eye, heye, add_moves, color)) {
 
       /* made these printouts contingent on DEBUG_EYES /gf */
@@ -776,12 +775,13 @@ compute_eyes(int pos, char *max, char *min,
 	showboard(2);
 	
 	status = recognize_eye(pos, &attack_point1, &defense_point1,
-			       &max1, &min1, eye, heye, 0, EMPTY);
+			       &value1, eye, heye, 0, EMPTY);
 	
 	if (status) {
 	  gprintf("Number of eyes:  --life: (%d, %d)  old: (%d, %d) at %1m\n", 
-		  *max, *min, max1, min1, pos);
-	  if (*min != *max) {
+		  value->maxeye, value->mineye, value1.maxeye, value1.mineye,
+		  pos);
+	  if (value->mineye != value->maxeye) {
 	    gprintf("  vital point:     attack: %1m   defense: %1m\n",
 		    *attack_point, *defense_point);
 	    gprintf("  old vital point: attack: %1m   defense: %1m\n",
@@ -789,8 +789,9 @@ compute_eyes(int pos, char *max, char *min,
 	  }
 	}
 	else {
-	  gprintf("Number of eyes:  new: (%d, %d) at %1m\n", *max, *min, pos);
-	  if (*min != *max)
+	  gprintf("Number of eyes:  new: (%d, %d) at %1m\n",
+		  value->maxeye, value->mineye, pos);
+	  if (value->mineye != value->maxeye)
 	    gprintf("  vital point:   attack: %1m   defense: %1m\n",
 		    *attack_point, *defense_point);
 	}
@@ -803,7 +804,7 @@ compute_eyes(int pos, char *max, char *min,
   /* Fall back on the graphs database if the eye is too big or the
    * life code is disabled.
    */
-  if (recognize_eye(pos, attack_point, defense_point, max, min,
+  if (recognize_eye(pos, attack_point, defense_point, value,
 		    eye, heye, add_moves, color))
     return;
 
@@ -822,17 +823,17 @@ compute_eyes(int pos, char *max, char *min,
    * some additional heuristics to guess the values of unknown
    * eyespaces.
    */
-  if (eye[pos].esize-2*eye[pos].msize > 3) {
-    *min = 2;
-    *max = 2;
+  if (eye[pos].esize - 2*eye[pos].msize > 3) {
+    value->mineye = 2;
+    value->maxeye = 2;
   }
-  else if (eye[pos].esize-2*eye[pos].msize > 0) {
-    *min = 1;
-    *max = 1;
+  else if (eye[pos].esize - 2*eye[pos].msize > 0) {
+    value->mineye = 1;
+    value->maxeye = 1;
   }
   else {
-    *min = 0;
-    *max = 0;
+    value->mineye = 0;
+    value->maxeye = 0;
   }
 }
 
@@ -844,7 +845,7 @@ compute_eyes(int pos, char *max, char *min,
  * been removed.
  */
 void
-compute_eyes_pessimistic(int pos, char *max, char *min,
+compute_eyes_pessimistic(int pos, struct eyevalue *value,
 			 char *pessimistic_min,
 			 int *attack_point, int *defense_point,
 			 struct eye_data eye[BOARDMAX],
@@ -897,19 +898,19 @@ compute_eyes_pessimistic(int pos, char *max, char *min,
   /* First we try to let the life code evaluate the eye space. */
   if (life
       && eye[pos].esize <= life_eyesize
-      && recognize_eye2(pos, attack_point, defense_point, max, min,
+      && recognize_eye2(pos, attack_point, defense_point, value,
 			eye, heye, 0, EMPTY)) {
-    *pessimistic_min = *min - margins;
+    *pessimistic_min = value->mineye - margins;
 
     DEBUG(DEBUG_EYES, "  life - max=%d, min=%d, pessimistic_min=%d\n",
-	  *max, *min, *pessimistic_min);
+	  value->maxeye, value->mineye, *pessimistic_min);
   }
   /* Fall back on the graphs database if the eye is too big or the
    * life code is disabled.
    */
-  else if (recognize_eye(pos, attack_point, defense_point, max, min,
+  else if (recognize_eye(pos, attack_point, defense_point, value,
 			 eye, heye, 0, EMPTY)) {
-    *pessimistic_min = *min - margins;
+    *pessimistic_min = value->mineye - margins;
 
     /* A single point eye which is part of a ko can't be trusted. */
     if (eye[pos].esize == 1
@@ -918,7 +919,7 @@ compute_eyes_pessimistic(int pos, char *max, char *min,
 
     DEBUG(DEBUG_EYES,
 	  "  graph matching - max=%d, min=%d, pessimistic_min=%d\n",
-	  *max, *min, *pessimistic_min);
+	  value->maxeye, value->mineye, *pessimistic_min);
   }
   
   /* Ideally any eye space that hasn't been matched yet should be two
@@ -928,9 +929,9 @@ compute_eyes_pessimistic(int pos, char *max, char *min,
    */
   else {
     guess_eye_space(pos, effective_eyesize, margins, eye,
-		    max, min, pessimistic_min); 
+		    value, pessimistic_min); 
     DEBUG(DEBUG_EYES, "  guess_eye - max=%d, min=%d, pessimistic_min=%d\n",
-	  *max, *min, *pessimistic_min);
+	  value->maxeye, value->mineye, *pessimistic_min);
   }
 
   if (*pessimistic_min < 0) {
@@ -948,7 +949,7 @@ compute_eyes_pessimistic(int pos, char *max, char *min,
   
   if (attack_point
       && *attack_point == NO_MOVE
-      && *max != *pessimistic_min) {
+      && value->maxeye != *pessimistic_min) {
     /* Find one marginal vertex and set as attack and defense point.
      *
      * We make some effort to find the best marginal vertex by giving
@@ -1015,11 +1016,11 @@ compute_eyes_pessimistic(int pos, char *max, char *min,
 static void
 guess_eye_space(int pos, int effective_eyesize, int margins,
 		struct eye_data eye[BOARDMAX],
-		char *max, char *min, char *pessimistic_min)
+		struct eyevalue *value, char *pessimistic_min)
 {
   if (effective_eyesize > 3) {
-    *min = 2;
-    *max = 2;
+    value->mineye = 2;
+    value->maxeye = 2;
     if ((margins == 0 && effective_eyesize > 7)
 	|| (margins > 0 && effective_eyesize > 9))
       *pessimistic_min = 2;
@@ -1027,19 +1028,19 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
       *pessimistic_min = 1;
   }
   else if (effective_eyesize > 0) {
-    *min = 1;
-    *max = 1;
+    value->mineye = 1;
+    value->maxeye = 1;
     if (margins > 0)
       *pessimistic_min = 0;
     else
       *pessimistic_min = 1;
   }
   else {
-    *min = 0;
+    value->mineye = 0;
     if (eye[pos].esize - margins > 2)
-      *max = 1;
+      value->maxeye = 1;
     else
-      *max = 0;
+      value->maxeye = 0;
     *pessimistic_min = 0;
   }
 }
@@ -1062,7 +1063,7 @@ guess_eye_space(int pos, int effective_eyesize, int margins,
 
 static int
 recognize_eye(int pos, int *attack_point, int *defense_point,
-	      char *max, char *min, 
+	      struct eyevalue *value,
 	      struct eye_data eye[BOARDMAX], 
 	      struct half_eye_data heye[BOARDMAX], 
 	      int add_moves, int color)
@@ -1243,9 +1244,9 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 
     /* We have found a match! Now sort out the vital moves. */
     if (q == eye_size) {
-      *max = graphs[graph].max;
-      *min = graphs[graph].min;
-      if (*max != *min) {
+      value->maxeye = graphs[graph].max;
+      value->mineye = graphs[graph].min;
+      if (value->maxeye != value->mineye) {
 	/* Collect all attack and defense points in the pattern. */
 	int attack_points[4 * MAXEYE];
 	int defense_points[4 * MAXEYE];
@@ -1456,10 +1457,10 @@ max_eye_value(int pos)
   int max_black = 0;
   
   if (white_eye[pos].color == WHITE_BORDER)
-    max_white = white_eye[pos].maxeye;
+    max_white = white_eye[pos].value.maxeye;
 
   if (black_eye[pos].color == BLACK_BORDER)
-    max_black = black_eye[pos].maxeye;
+    max_black = black_eye[pos].value.maxeye;
 
   return gg_max(max_white, max_black);
 }

@@ -1455,7 +1455,7 @@ static int
 gtp_eval_eye(char *s, int id)
 {
   int m, n;
-  char max, min;
+  struct eyevalue value;
   int attack_point;
   int defense_point;
   int pos;
@@ -1467,12 +1467,12 @@ gtp_eval_eye(char *s, int id)
   
   if (black_eye[POS(m, n)].color == BLACK_BORDER) {
     pos = black_eye[POS(m, n)].origin;
-    compute_eyes(pos, &max, &min, &attack_point, &defense_point,
+    compute_eyes(pos, &value, &attack_point, &defense_point,
 		 black_eye, half_eye, 0, EMPTY);
   }
   else if (white_eye[POS(m, n)].color == WHITE_BORDER) {
     pos = white_eye[POS(m, n)].origin;
-    compute_eyes(pos, &max, &min, &attack_point, &defense_point,
+    compute_eyes(pos, &value, &attack_point, &defense_point,
 		 white_eye, half_eye, 0, EMPTY);
   }
   else
@@ -1480,8 +1480,8 @@ gtp_eval_eye(char *s, int id)
     return gtp_success(id, "-1");
 
   gtp_printid(id, GTP_SUCCESS);
-  gtp_printf("%d %d", min, max);
-  if (max != min) {
+  gtp_printf("%d %d", value.mineye, value.maxeye);
+  if (value.maxeye != value.mineye) {
     gtp_printf(" ");
     gtp_print_vertex(I(attack_point), J(attack_point));
     gtp_printf(" ");
@@ -2624,7 +2624,7 @@ gtp_dragon_data(char *s, int id)
   if (stackp > 0)
     return gtp_failure(id, "dragon data unavailable when stackp > 0");
 
-  examine_position(EMPTY, EXAMINE_DRAGONS);
+  examine_position(EMPTY, FULL_EXAMINE_DRAGONS);
 
   gtp_printid(id, GTP_SUCCESS);
 

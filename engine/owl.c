@@ -2212,7 +2212,8 @@ owl_determine_life(struct local_owl_data *owl,
   signed char mx[BOARDMAX]; /* mark potential half or false eyes */
   int vital_values[BOARDMAX];
   int true_genus = 0;
-  char max, min, pessimistic_min;
+  struct eyevalue eyevalue;
+  char pessimistic_min;
   int attack_point;
   int defense_point;
   int m, n;
@@ -2378,7 +2379,7 @@ owl_determine_life(struct local_owl_data *owl,
 	int value = 0;
 	const char *reason = "";
 	int i, j;
-	compute_eyes_pessimistic(pos, &max, &min, &pessimistic_min,
+	compute_eyes_pessimistic(pos, &eyevalue, &pessimistic_min,
 				 &attack_point, &defense_point,
 				 eye, owl->half_eye);
 	/* If this eyespace includes an owl inessential string, we
@@ -2392,11 +2393,11 @@ owl_determine_life(struct local_owl_data *owl,
 	      pessimistic_min = 0;
 	
 	true_genus += pessimistic_min;
-	*probable_min += min;
-	*probable_max += max;
+	*probable_min += eyevalue.mineye;
+	*probable_max += eyevalue.maxeye;
 
-	/* Fill in the maxeye field for use by the owl_eyespace() function. */
-	eye[pos].maxeye = max;
+	/* Fill in the value field for use by the owl_eyespace() function. */
+	eye[pos].value = eyevalue;
 	
 	/* This shortcut has been disabled for two reasons:
 	 * 1. Due to the vital attack moves being able to later reduce
@@ -2413,16 +2414,16 @@ owl_determine_life(struct local_owl_data *owl,
 	}
 #endif
 	
-	if (max != min) {
+	if (eyevalue.maxeye != eyevalue.mineye) {
 	  value = 50;
-	  if (max - min == 2)
+	  if (eyevalue.maxeye - eyevalue.mineye == 2)
 	    value = 70;
-	  else if (max - pessimistic_min == 2)
+	  else if (eyevalue.maxeye - pessimistic_min == 2)
 	    value = 60;
 	  reason = "vital move";
 	}
-	else if (max != pessimistic_min) {
-	  if (max - pessimistic_min == 2)
+	else if (eyevalue.maxeye != pessimistic_min) {
+	  if (eyevalue.maxeye - pessimistic_min == 2)
 	    value = 40;
 	  else
 	    value = 30;
@@ -2438,8 +2439,8 @@ owl_determine_life(struct local_owl_data *owl,
 	    }
 	    
 	    TRACE("%s at %1m, score %d (eye at %1m, max %d, min %d, pessimistic_min %d)\n",
-		  reason, attack_point, value, pos, max, min,
-		  pessimistic_min);
+		  reason, attack_point, value,
+		  pos, eyevalue.maxeye, eyevalue.mineye, pessimistic_min);
 	    
 	    if (eye[attack_point].marginal
 		&& modify_stupid_eye_vital_point(&attack_point))
@@ -2487,8 +2488,8 @@ owl_determine_life(struct local_owl_data *owl,
 	    }
 	    
 	    TRACE("%s at %1m, score %d (eye at %1m, max %d, min %d, pessimistic_min %d)\n",
-		  reason, defense_point, value, pos, max, min,
-		  pessimistic_min);
+		  reason, defense_point, value, pos,
+		  eyevalue.maxeye, eyevalue.mineye, pessimistic_min);
 
 	    if (eye[defense_point].marginal
 		&& modify_stupid_eye_vital_point(&defense_point))
@@ -4364,7 +4365,8 @@ compute_owl_escape_values(struct local_owl_data *owl)
 	if (dragon[pos].status == ALIVE)
 	  owl->escape_values[pos] = 6;
 	else if (dragon[pos].status == UNKNOWN
-		 && (DRAGON2(pos).escape_route > 5 || DRAGON2(pos).moyo > 5))
+		 && (DRAGON2(pos).escape_route > 5
+		     || DRAGON2(pos).moyo_size_pre_owl > 5))
 	  owl->escape_values[pos] = 4;
       }
       DEBUG(DEBUG_ESCAPE, "%o%d", owl->escape_values[pos]);
@@ -4416,7 +4418,7 @@ owl_eyespace(int pos)
   return (ON_BOARD(origin)
 	  && (current_owl_data->my_eye[origin].color
 	      == BORDER_COLOR(current_owl_data->color))
-	  && current_owl_data->my_eye[origin].maxeye > 0);
+	  && current_owl_data->my_eye[origin].value.maxeye > 0);
 }
 
 
@@ -4434,7 +4436,7 @@ owl_big_eyespace(int pos)
   return (ON_BOARD(origin) 
 	  && (current_owl_data->my_eye[origin].color
 	      == BORDER_COLOR(current_owl_data->color))
-	  && current_owl_data->my_eye[origin].maxeye == 2);
+	  && current_owl_data->my_eye[origin].value.maxeye == 2);
 }
 
 

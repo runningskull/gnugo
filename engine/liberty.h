@@ -524,6 +524,7 @@ struct moyo_data
   int segmentation[BOARDMAX]; /* Numbers the moyos. */
   int size[MAX_MOYOS];
   int owner[MAX_MOYOS];
+  float territorial_value[MAX_MOYOS];
 };
 
 /* Influence functions. */
@@ -758,8 +759,11 @@ struct dragon_data2 {
   int adjacent[MAX_NEIGHBOR_DRAGONS]; /* adjacent dragons                    */
   int neighbors;                      /* number of adjacent dragons          */
   int hostile_neighbors;              /* neighbors of opposite color         */
-  int moyo;                           /* size of surrounding influence moyo  */
+  int moyo_size_pre_owl;              /* size of surrounding influence moyo  */
+  int moyo_size_post_owl;             /* size of surrounding influence moyo, */
+  float moyo_territorial_value;       /* ...and its territorial value */
   int safety;                         /* a more detailed status estimate     */
+  float weakness; /* A new (3.3.x) continuos estimate of the dragon's safety */
   int escape_route; /* a measurement of likelihood of escape                 */
   int genus;    /* the number of eyes (approximately)                        */
   int heyes;    /* the number of half eyes                                   */
@@ -800,13 +804,17 @@ struct aftermath_data {
   int final_status[BOARDMAX];
 };
 
+struct eyevalue {
+  char maxeye;       /* number of eyes if defender plays first               */
+  char mineye;       /* number of eyes if attacker plays first               */
+};
+
 struct eye_data {
   int color;/* BLACK, WHITE, BLACK_BORDERED, WHITE_BORDERED or GRAY_BORDERED */
   int esize;         /* size of the eyespace                                 */
   int msize;         /* number of marginal vertices                          */
   int origin;        /* The origin                                           */
-  char maxeye;       /* number of eyes if defender plays first               */
-  char mineye;       /* number of eyes if attacker plays first               */
+  struct eyevalue value; /* Number of eyes.                                  */
   int attack_point;  /* vital point for attack                               */
   int defense_point; /* vital point for defense                              */
 
@@ -821,8 +829,6 @@ struct eye_data {
   char cut;                  /* Opponent can cut at vertex.                */
 };
 
-typedef struct eye_data row_of_eye_data[BOARDMAX];
-
 extern struct eye_data white_eye[BOARDMAX];
 extern struct eye_data black_eye[BOARDMAX];
 
@@ -830,18 +836,18 @@ extern struct eye_data black_eye[BOARDMAX];
  * definition of struct eye_data or struct half_eye_data.
  */
 
-void compute_eyes(int pos, char *max, char *min,
+void compute_eyes(int pos, struct eyevalue *value,
                   int *attack_point, int *defense_point,
                   struct eye_data eye[BOARDMAX],
                   struct half_eye_data heye[BOARDMAX],
                   int add_moves, int color);
-void compute_eyes_pessimistic(int pos, char *max, char *min,
+void compute_eyes_pessimistic(int pos, struct eyevalue *value,
                               char *pessimistic_min,
                               int *attack_point, int *defense_point,
                               struct eye_data eye[BOARDMAX],
                               struct half_eye_data heye[BOARDMAX]);
 int recognize_eye2(int pos, int *attack_point,
-		   int *defense_point, char *max, char *min,
+		   int *defense_point, struct eyevalue *value,
 		   struct eye_data eye[BOARDMAX],
 		   struct half_eye_data heye[BOARDMAX],
                     int add_moves, int color);

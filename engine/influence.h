@@ -104,6 +104,7 @@ struct influence_data
   int area_segmentation[MAX_BOARD][MAX_BOARD];
   int region_type[MAX_REGIONS];
   int region_size[MAX_REGIONS];
+  float region_territorial_value[MAX_REGIONS];
   int number_of_regions;
 
   int dragons_known;  /* True if this is a post-owl influence computation. */
