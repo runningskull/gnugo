@@ -1124,7 +1124,9 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 			    komaster, kom_pos, &new_komaster, &new_kom_pos,
 			    &ko_move, savecode == 0))
 	continue;
-      TRACE("Trying %C %1m\n", other, mpos);
+
+      TRACE("Trying %C %1m.  Current stack: ", other, mpos);
+      if (verbose) dump_stack();
 
       /* We have now made a move. Analyze the new position. */
       push_owl(owl);
@@ -1663,7 +1665,8 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 			    &ko_move, savecode == 0))
 	continue;
 
-      TRACE("Trying %C %1m\n", color, mpos);
+      TRACE("Trying %C %1m.  Current stack: ", color, mpos);
+      if (verbose) dump_stack();
 
       /* We have now made a move. Analyze the new position. */
       push_owl(owl);
@@ -2164,9 +2167,9 @@ modify_stupid_eye_vital_point(int *vital_point, int color)
 	|| board[*vital_point - right] != EMPTY)
       continue;
 
-    if (board[*vital_point + 2 * up] == color
-	|| board[*vital_point + up + right] == color
-	|| board[*vital_point + up - right] == color) {
+    if (board[*vital_point + 2 * up] != EMPTY
+	|| board[*vital_point + up + right] != EMPTY
+	|| board[*vital_point + up - right] != EMPTY) {
       *vital_point += up;
       return 1;
     }

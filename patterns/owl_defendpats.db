@@ -525,13 +525,21 @@ O*..
 
 Pattern D204
 # tm Pattern revised. (3.1.13)
+# tm Pattern revised. (3.1.14)
 
-?X?          push
-O*.
-.x.
----
+??X?          push
+?O*.
+?.x.
+----
 
 :8,-,value(60)
+
+??X?          push
+AO*.
+?.x.
+----
+
+;!x_somewhere(A) || !defend(A)
 
 
 Pattern D205
@@ -546,11 +554,12 @@ O.*
 
 
 Pattern D206
+#tm revised 3.1.14
 
-XxX?        extend
-O*?x
-....
-----
+?XxX?        extend
+oO*?x
+?....
+-----
 
 :8,-,value(65)
 
@@ -687,6 +696,27 @@ O.*.     expand eyespace
 ----
 
 :8,-,value(60)
+
+
+Pattern D217a
+# tm Pattern added (3.1.14)
+# see owl:170
+
+?...
+O.*.
+.x..
+----
+
+:8,-,value(50)
+
+?...
+O.*.
+.A..
+----
+
+; !oplay_defend(*,A)
+
+
 
 
 Pattern D217b
@@ -2305,6 +2335,18 @@ OAOX
 O.*x
 
 ;!oplay_defend(*,A)
+
+
+Pattern D718
+# tm New pattern (3.1.14)
+# see owl:111
+
+?X?
+O*O       Expand eye space
+...
+OO.
+
+:8,-,value(60)
 
 
 #########################################################

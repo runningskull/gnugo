@@ -214,9 +214,11 @@ loadsgf games/strategy25.sgf 61
 # Connecting with ko at B14 is still best. The game move at B13 is
 # nothing but horrible. G13 would of course be superior if it killed
 # white, but this looks unlikely.
+# tm: Whether G13 kill or not, sealing white in is best.  G13 is fine.
+# tm added G13 (3.1.14)
 loadsgf games/strategy25.sgf 63
 91 gg_genmove black
-#? [B14]
+#? [B14|G13]
 
 loadsgf games/strategy25.sgf 67
 92 gg_genmove black

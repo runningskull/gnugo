@@ -515,3 +515,14 @@ loadsgf games/trevor/trevor_48.sgf
 481 owl_attack C8
 #? [1 B8]*
 
+
+
+#CATEGORY=OWL_EYES
+#DESCRIPTION=Fixed by eye pattern 402
+#SEVERITY=10
+#Simplified from owl:111
+#Note the difficulty here, because the (only) correct vital point
+#is also matched by many patterns.
+loadsgf games/trevor/owl111a.sgf
+1001 owl_defend C6
+#? [1 (B8|K9)]

@@ -174,10 +174,6 @@ SOURCE=.\eyes.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\hoshi.db
-# End Source File
-# Begin Source File
-
 SOURCE=.\komoku.db
 # End Source File
 # Begin Source File
@@ -240,7 +236,7 @@ IntDir=.\Release
 InputPath=.\barriers.db
 
 "barriers.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c -b barrierspat <barriers.db >barriers.c
+	$(IntDir)\mkpat -c -b barrierspat -i barriers.db -o barriers.c
 
 # End Custom Build
 
@@ -509,6 +505,41 @@ InputPath=.\fuseki9.db
 # End Source File
 # Begin Source File
 
+SOURCE=.\hoshi.db
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"komoku.db"	"sansan.db"	"mokuhazushi.db"	"takamoku.db"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\hoshi.db
+
+"josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy hoshi.db + komoku.db + sansan.db + mokuhazushi.db + takamoku.db tmp.db 
+	$(IntDir)\mkpat -b joseki < tmp.db > josekidb.c 
+	del tmp.db 
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__HOSHI="$(IntDir)\mkpat.exe"	"komoku.db"	"sansan.db"	"mokuhazushi.db"	"takamoku.db"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\hoshi.db
+
+"josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy hoshi.db + komoku.db + sansan.db + mokuhazushi.db + takamoku.db tmp.db 
+	$(IntDir)\mkpat -b joseki < tmp.db > josekidb.c 
+	del tmp.db 
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\influence.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
@@ -520,7 +551,7 @@ InputPath=.\influence.db
 
 "influence.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -c influencepat <influence.db >influence.c
-
+	
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
@@ -532,41 +563,6 @@ InputPath=.\influence.db
 
 "influence.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -c influencepat <influence.db >influence.c
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\joseki.db
-
-!IF  "$(CFG)" == "patterns - Win32 Release"
-
-USERDEP__JOSEK="$(IntDir)\mkpat.exe"	
-# Begin Custom Build
-IntDir=.\Release
-InputPath=.\joseki.db
-
-"josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy hoshi.db + komoku.db + sansan.db + mokuhazushi.db + takamoku.db tmp.db 
-	$(IntDir)\mkpat -b joseki < tmp.db > josekidb.c 
-	del tmp.db 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
-
-USERDEP__JOSEK="$(IntDir)\mkpat.exe"	
-# Begin Custom Build
-IntDir=.\Debug
-InputPath=.\joseki.db
-
-"josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy hoshi.db + komoku.db + sansan.db + mokuhazushi.db + takamoku.db tmp.db 
-	$(IntDir)\mkpat -b joseki < tmp.db > josekidb.c 
-	del tmp.db 
 	
 # End Custom Build
 
@@ -585,7 +581,7 @@ IntDir=.\Release
 InputPath=.\owl_attackpats.db
 
 "owl_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_attackpat <owl_attackpats.db > owl_attackpat.c
+	$(IntDir)\mkpat -b owl_attackpat -i owl_attackpats.db -o owl_attackpat.c
 
 # End Custom Build
 
@@ -598,6 +594,7 @@ InputPath=.\owl_attackpats.db
 
 "owl_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(IntDir)\mkpat -b owl_attackpat -i ..\patterns\owl_attackpats.db > owl_attackpat.c
+
 
 # End Custom Build
 
@@ -616,7 +613,7 @@ IntDir=.\Release
 InputPath=.\owl_defendpats.db
 
 "owl_defendpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_defendpat <owl_defendpats.db > owl_defendpat.c
+	$(IntDir)\mkpat -b owl_defendpat -i owl_defendpats.db -o owl_defendpat.c
 
 # End Custom Build
 
@@ -711,7 +708,7 @@ SOURCE=.\hoshi.sgf
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__HOSHI="$(IntDir)\joseki.exe"	
+USERDEP__HOSHI_="$(IntDir)\joseki.exe"	
 # Begin Custom Build
 IntDir=.\Release
 InputPath=.\hoshi.sgf
@@ -723,7 +720,7 @@ InputPath=.\hoshi.sgf
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__HOSHI="$(IntDir)\joseki.exe"	
+USERDEP__HOSHI_="$(IntDir)\joseki.exe"	
 # Begin Custom Build
 IntDir=.\Debug
 InputPath=.\hoshi.sgf

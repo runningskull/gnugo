@@ -1026,16 +1026,19 @@ Xa..
 
 
 Pattern A402
+# tm Modified (3.1.14) - doesn't make sense to match at edge.
 
 O*.?        fall back to confine
 X...
 ?..?
+????
 
 :8,-,value(70)
 
 b*.?
 Xa..
 ?..?
+????
 
 ;lib(b)<=2 || xlib(*)>2
 
@@ -2446,19 +2449,20 @@ Pattern A1003
 ; !safe_omove(a) && !oplay_attack_either(*,?,a,a,c)
 
 
-Pattern A1004
-
-----
-?*.X     threaten to cut
-??XO
-
-:8,-,value(50)
-
-----
-?*aX
-??Xc
-
-; !safe_omove(a) && !oplay_attack_either(*,?,a,a,c)
+#tm removed 3.1.14
+#Pattern A1004
+#
+#----
+#?*.X     threaten to cut
+#??XO
+#
+#:8,-,value(50)
+#
+#----
+#?*aX
+#??Xc
+#
+#; !safe_omove(a) && !oplay_attack_either(*,?,a,a,c)
 
 
 Pattern A1005

@@ -410,6 +410,7 @@ sub summarizeTestFile {
   <TH>got</TH>
   <TH>gtp</TH>
   <TH><A href="?tstfile=$tstfile&sortby=cputime">cputime</A></TH>
+  <TH><A href="?tstfile=$tstfile&sortby=owl_node">owl_node</A></TH>
 </TR>\n@;
 
   my @files = glob("html/$tstfile/*.xml");
@@ -436,6 +437,8 @@ sub summarizeTestFile {
       if $content =~ m@<ANSWER>(.*?)</ANSWER>@s;
     my $cputime = $1
       if $content =~ m@<TIME.*?CPU=((\d|\.)*)@s;
+    my $owl_node = $1
+      if $content =~ m@<COUNTER[^>]*owl_node="?(\d+)@s;
     $cputime =~ s/0*$//;
     $files{$curfile} = {
       gtp_all => $gtp_all,
@@ -445,7 +448,8 @@ sub summarizeTestFile {
       expected => $expected,
       got => $got,
       result => $result,
-      cputime => $cputime
+      cputime => $cputime,
+      owl_node => $owl_node,
     }
   }
  
@@ -459,6 +463,10 @@ sub summarizeTestFile {
     $files{$b}{cputime} <=> $files{$a}{cputime}
     or byfilepos();
   }
+  sub byowl_node {
+    $files{$b}{owl_node} <=> $files{$a}{owl_node}
+    or byfilepos();
+  }
   
   sub filesby {
     $_ = shift;
@@ -466,8 +474,11 @@ sub summarizeTestFile {
     return bynum if /num/i;
     return byresult if /result/i;
     return bycputime if /cputime/i;
+    return byowl_node if /owl_node/i || /owlnode/i;
     $files{$a}{$_} <=> $files{$b}{$_};   
   }
+  
+  my %totals = (cputime=>0, owl_node=>0);
   
   foreach my $curfile (sort {filesby($sortby)} keys %files) {
     my %h = %{$files{$curfile}};
@@ -475,9 +486,13 @@ sub summarizeTestFile {
     my $r = $h{result};
     $r =~ s@^([A-Z]*)$@<B>$1</B>@;
     print TF "<TR><TD>$h{filepos}</TD><TD>$numURL</TD><TD>$r</TD><TD>$h{expected}</TD>"
-        . "<TD>$h{got}</TD><TD>$h{gtp}</TD><TD>$h{cputime}</TD></TR>\n";
+        . "<TD>$h{got}</TD><TD>$h{gtp}</TD><TD>$h{cputime}</TD><TD>$h{owl_node}</TD></TR>\n";
+    $totals{cputime} += $h{cputime};
+    $totals{owl_node} += $h{owl_node};
   }
-
+  print TF "<TR><TD>Total</TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD>"
+    . "<TD>&nbsp;</TD><TD>&nbsp;</TD><TD>$totals{cputime}</TD><TD>$totals{owl_node}</TD></TR>\n";
+  print TF "</TABLE>";
   #close TF;
 }
 
