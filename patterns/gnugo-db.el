@@ -36,7 +36,9 @@
 (defvar gnugo-db-mode-map nil)
 (unless gnugo-db-mode-map
   (setq gnugo-db-mode-map (make-sparse-keymap))
-  (define-key gnugo-db-mode-map "\C-xp" 'gnugo-db-insert-pattern))
+  (define-key gnugo-db-mode-map "\C-c\C-p" 'gnugo-db-insert-pattern)
+  (define-key gnugo-db-mode-map "\C-c\C-c"
+    'gnugo-db-copy-main-diagram-to-constraint))
 
 (defvar gnugo-db-mode-abbrev-table nil)
 (define-abbrev-table 'gnugo-db-mode-abbrev-table ())
@@ -135,19 +137,23 @@ This function heavily depends on correctness of the current pattern."
 	    (setq first-name (match-string-no-properties 1)
 		  middle-name (match-string-no-properties 2)
 		  last-name (match-string-no-properties 3)))
-	  (re-search-forward "^:" (buffer-size) t)
+	  (re-search-forward "^:" (1+ (buffer-size)) t)
+	  (backward-char)
 	  (forward-line 2)
-	  (unless (memq (char-after) '(?# ?\n 32 9))
-	    (re-search-forward "^[;>]" (buffer-size) t)
+	  (unless (memq (char-after) '(?\n 32 9))
+	    (re-search-forward "^[;>]" (1+ (buffer-size)) t)
+	    (backward-char)
 	    (while (looking-at "[;>]")
 	      (forward-line))
-	    (forward-line 2)
+	    (forward-line)
 	    (when (looking-at "[;>]")
 	      (while (looking-at "[;>]")
 		(forward-line))
-	      (forward-line 2)))
-	  (forward-line))
-      (re-search-forward "^Pattern " (buffer-size) t)
+	      (forward-line)))
+	  (when (= (forward-line) 1)
+	    (end-of-line)
+	    (insert "\n")))
+      (re-search-forward "^Pattern " (1+ (buffer-size)) t)
       (beginning-of-line))
 
     (insert "Pattern \n")
@@ -161,7 +167,7 @@ This function heavily depends on correctness of the current pattern."
 			 (char-to-string (1+ (string-to-char last-name)))))))
 	  (when (string= last-name "")
 	    (when (save-excursion
-		    (re-search-forward "^Pattern " (buffer-size) t)
+		    (re-search-forward "^Pattern " (1+ (buffer-size)) t)
 		    (or (looking-at pattern-name)
 			(looking-at (concat first-name middle-name))))
 	      (setq pattern-name (concat first-name middle-name "a"))))
@@ -175,5 +181,53 @@ This function heavily depends on correctness of the current pattern."
       (goto-char move-to-point))))
 
 
-(provide 'gnugo-db)
+(defun gnugo-db-copy-main-diagram-to-constraint()
+  "Copies pattern diagram to constraint and inserts a dummy constraint line"
+  (interactive)
+  (let ((start-point (point)))
+    (end-of-line)
+    (unless (re-search-backward "^Pattern " 0 t)
+      (re-search-forward "^Pattern" (1+ (buffer-size)) t)
+      (beginning-of-line))
 
+    (forward-line)
+    (while (not (looking-at "[-+|.XOxo,a!*?QY]"))
+      (forward-line))
+
+    (let ((diagram-beginning (point)))
+      (while (looking-at "[-+|.XOxo,a!*?QY]")
+	(forward-line))
+
+      (let ((diagram (buffer-substring diagram-beginning  (point))))
+	(re-search-forward "^:" (1+ (buffer-size)) t)
+	(backward-char)
+	(forward-line)
+	(while (looking-at "#")
+	  (forward-line))
+	(when (memq (char-after) '(?\n 32 9))
+	  (forward-line))
+
+	(when (looking-at "[-+|.XOxo,a!*?QY;>]")
+	  (goto-char start-point)
+	  (error "Pattern already seems to have a constraint"))
+
+	(let ((constraint-diagram-beginning (point)))
+	  (insert diagram)
+	  (let ((constraint-diagram-end (point)))
+	    (goto-char constraint-diagram-beginning)
+	    (while (not (= (point) constraint-diagram-end))
+	      (while (not (memq (char-after) '(?\n 32 9)))
+		(forward-char))
+	      (unless (= (char-after) ?\n)
+		(let ((diagram-line-end (point)))
+		  (end-of-line)
+		  (setq constraint-diagram-end
+			(- constraint-diagram-end (- (point) diagram-line-end)))
+		  (delete-region diagram-line-end (point))))
+	      (forward-char))
+
+	    (insert "\n; \n\n")
+	    (goto-char constraint-diagram-beginning)))))))
+
+
+(provide 'gnugo-db)
