@@ -151,7 +151,7 @@ examine_position(int color, int how_much)
   else if (how_much == EXAMINE_INITIAL_INFLUENCE
 	   || how_much == EXAMINE_DRAGONS
 	   || how_much == EXAMINE_ALL) {
-    initialize_dragon_data;
+    initialize_dragon_data();
     verbose = save_verbose;
     gg_assert(test_gray_border() < 0);
     return;

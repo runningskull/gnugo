@@ -9,13 +9,13 @@
 - analyze_neighbor() in filllib.c revised
 - size of persistent owl cache increased from 100 to 150 entires
 - bugfix in owl_confirm_safety()
-- territorial value computed also for tactical attacks of dead or
-  defenseless stones
+- territorial value computed for tactical attacks of dead or defenseless stones
 - caching of recent compute_escape_influence() results
-- tuning
 - reading cache stores depth-stackp instead of stackp
-- infl_followup_value in struct move_data renamed to
-  influence_followup_value and initialized
+- infl_followup_value renamed influence_followup_value and initialized
+- initialize_dragon_data broken out of make_dragons
+- dragon_data initialized even on empty board
+- tuning
 
 3.1.31 released April 4, 2002
 
