@@ -18,8 +18,7 @@ my %defaults =
    EXPERIMENTAL_INFLUENCE => 1,
    EXPERIMENTAL_READING => 0,
    GRID_OPT => 1,
-   OWL_THREATS => 0,
-   ORACLE => 0);
+   OWL_THREATS => 0 );
 
 my @skip = qw/
   GNU_PACKAGE 

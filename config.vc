@@ -46,6 +46,7 @@
 /* Owl Threats. 0 standard. */
 #define OWL_THREATS 0
 
+
 /* Version number of package */
 #define PACKAGE "gnugo"
 
@@ -57,9 +58,6 @@
 
 /* The number of bytes in a long.  */
 #define SIZEOF_LONG 4
-
-/* Use Oracle module (UNIX and GNU/Unix only) */
-#define ORACLE 0
 
 /* Version number of package */
 #define VERSION "3.3.11"

@@ -312,8 +312,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"false_eye",        		1, 0.01, "is_false_eye(half_eye,%s)"},
   {"is_surrounded",             1, 0.01, "is_surrounded(%s, 0, 0)"},
   {"does_surround",             2, 1.00, "does_surround(%s, %s)"},
-  {"surround_map",              2, 0.01, "surround_map(%s, %s)"},
-  {"oracle_threatens",          2, 0.01, "oracle_threatens(%s, %s)"}
+  {"surround_map",              2, 0.01, "surround_map(%s, %s)"}
 };
 
 

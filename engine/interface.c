@@ -98,14 +98,7 @@ gnugo_is_pass(int i, int j)
 void
 gnugo_play_move(int i, int j, int color)
 {
-#if ORACLE
-  if (metamachine && oracle_exists)
-    oracle_play_move(POS(i, j), color);
-  else
-    play_move(POS(i, j), color);
-#else
   play_move(POS(i, j), color);
-#endif
   clock_push_button(color);
 }
 

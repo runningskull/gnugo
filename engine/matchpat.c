@@ -97,7 +97,6 @@ prepare_pattern_profiling()
   clear_profile(owl_vital_apat_db.patterns);
   clear_profile(owl_defendpat_db.patterns);
   clear_profile(fusekipat_db.patterns);
-  clear_profile(oracle_db.patterns);
 #else
   fprintf(stderr,
 	  "Warning, no support for pattern profiling in this binary.\n");
@@ -128,7 +127,6 @@ report_pattern_profiling()
   print_profile(owl_vital_apat_db.patterns, &hits, &nodes, &dfa_hits);
   print_profile(owl_defendpat_db.patterns, &hits, &nodes, &dfa_hits);
   print_profile(fusekipat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(oracle_db.patterns, &hits, &nodes, &dfa_hits);
   fprintf(stderr, "------ ---------\n");
   fprintf(stderr, "%6d, %6d %9d\n", dfa_hits, hits, nodes);
 #endif

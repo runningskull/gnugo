@@ -139,9 +139,6 @@
 /* Owl Threats. 0 standard. */
 #undef OWL_THREATS
 
-/* Compile the Oracle module */
-#undef ORACLE
-
 /* Name of package */
 #undef PACKAGE
 

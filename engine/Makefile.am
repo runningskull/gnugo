@@ -35,7 +35,6 @@ libengine_a_SOURCES = \
       move_reasons.c \
       movelist.c \
       optics.c \
-      oracle.c \
       owl.c \
       persistent.c \
       printutils.c \

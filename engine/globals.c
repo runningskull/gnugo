@@ -120,7 +120,6 @@ char outfilename[128] = ""; /* output file (-o option) */
 int output_flags      = OUTPUT_DEFAULT; /* amount of output to outfile */
 int limit_search      = 0;  /* limit search to a portion of the board */
 int metamachine       = 0;  /* use metamachine_genmove */
-int oracle_exists     = 0;  /* oracle is available for consultation   */
 
 int disable_threat_computation = 0;
 int disable_endgame_patterns   = 0;

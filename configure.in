@@ -75,13 +75,9 @@ AC_ARG_ENABLE(chinese-rules,
  [  --enable-chinese-rules      use Chinese (area) counting
   --disable-chinese-rules     use Japanese counting (default)])
 
-AC_ARG_ENABLE(chinese-rules,
- [  --enable-chinese-rules      use Chinese (area) counting
-  --disable-chinese-rules     use Japanese counting (default)])
-
-AC_ARG_ENABLE(oracle,
- [  --enable-oracle           enable oracle
-  --disable-oracle         don't enable oracle (default)])
+AC_ARG_ENABLE(owl-threats,
+ [  --enable-owl-threats        compute owl threats
+  --disable-owl-threats       don't compute owl threats (default)])
 
 AC_ARG_ENABLE(experimental-semeai,
  [  --enable-experimental-semeai       use the experimental semeai module
@@ -397,17 +393,6 @@ if test "$enable_chinese_rules" = "yes" ; then
    AC_DEFINE(CHINESE_RULES, 1)
 else
    AC_DEFINE(CHINESE_RULES, 0)
-fi
-
-dnl ------------ Chinese Rules -------------------
-
-AH_TEMPLATE([ORACLE],
-[Oracle. Default not enabled.])
-
-if test "$enable_oracle" = "yes" ; then
-   AC_DEFINE(ORACLE, 1)
-else
-   AC_DEFINE(ORACLE, 0)
 fi
 
 dnl ------------ Semeai -------------------

@@ -153,9 +153,6 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   next = gameinfo->to_move;
   sgftree = gameinfo->game_record;
 
-  if (metamachine)
-    sgffile_begindump(&sgftree);
-
   move_val = gnugo_genmove(&i, &j, next);
 
   if (is_pass(POS(i, j)))
@@ -163,15 +160,11 @@ load_and_analyze_sgf_file(Gameinfo *gameinfo)
   else
     gprintf("%s move %m\n", next == WHITE ? "white (O)" : "black (X)", i, j);
 
-  if (metamachine)
-    sgffile_enddump(outfilename);
-  else {
-    gnugo_play_move(i, j, next);
-    sgftreeAddPlay(&sgftree, next, i, j);
-    sgftreeAddComment(&sgftree, "load and analyze mode");
-    sgffile_add_debuginfo(sgftree.lastnode, move_val);
-    sgffile_output(&sgftree);
-  }
+  gnugo_play_move(i, j, next);
+  sgftreeAddPlay(&sgftree, next, i, j);
+  sgftreeAddComment(&sgftree, "load and analyze mode");
+  sgffile_add_debuginfo(sgftree.lastnode, move_val);
+  sgffile_output(&sgftree);
 }
 
 

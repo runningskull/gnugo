@@ -317,9 +317,8 @@ extern float potential_moves[MAX_BOARD][MAX_BOARD];
 
 extern volatile int time_to_die;   /* set by signal handlers */
 
-extern int limit_search;  /* limit move search to a portion of the board */
-extern int oracle_exists; /* oracle is available for consultation        */
-extern int metamachine;   /* use metamachine_genmove                     */
+extern int limit_search; /* limit move search to a portion of the board */
+extern int metamachine;  /* use metamachine_genmove                     */
 
 /* ================================================================ */
 /*                 tracing and debugging functions                  */
