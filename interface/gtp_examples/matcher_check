@@ -363,8 +363,8 @@ while ($games > 0) {
     #make sure gnugo dies correctly.
     close $prog_in;
     close $prog_out;
-    close $stable_in;
-    close $stable_out;
+    close $stable_in if defined($stable);
+    close $stable_out if defined($stable);
     waitpid $pidp, 0;
     waitpid $pids, 0;
 
