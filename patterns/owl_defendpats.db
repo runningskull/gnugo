@@ -942,6 +942,17 @@ OX*o
 ;owl_eyespace(a,b)
 
 
+Pattern D230
+# tm New Pattern (3.1.16)
+
+OO...	expand along edge.
+....*
+.....
+-----
+
+:8,-,value(80)
+
+
 #########################################################
 #                                                       #
 #          Expanding moves in the center                #
@@ -1084,7 +1095,23 @@ b*A
 
 
 Pattern D309
-# tm modified (3.1.15)
+# tm modified (3.1.16)
+
+?O?        block off area
+X*.
+ooo
+
+:8,-,value(80)
+
+?O?
+b*a
+ooo
+
+; oplay_attack(*,a,a) && oplay_attack(*,b)
+
+
+Pattern D309a
+# tm modified (3.1.16)
 
 ?O?        block off area
 X*.
@@ -2595,6 +2622,22 @@ OO.
 :8,-,value(60)
 
 
+Pattern D719
+# tm New patern (3.1.16)
+
+?X	wedge
+?*
+OX
+
+:8,b,value(75)
+
+?B
+C*
+OA
+
+; !ko(*) && !ko(C) && (oplay_attack(*,A) || oplay_attack(*,B))
+
+
 #########################################################
 #                                                       #
 #           Make eyeshape in the corner                 #
@@ -3184,7 +3227,22 @@ Pattern D836
 |.*
 +--
 
-; xplay_attack(A,A)
+; oplay_attack(*,A,A)
+
+
+Pattern D837
+# tm New Pattern (3.1.16)
+#    see trevor:200 
+
+??oO.|	    special corner defend at 2-2
+?O...|
+o.X..|
+O..*.|
+.....|
+-----+	 
+
+:8,-,value(55)
+
 
 #########################################################
 #                                                       #
@@ -3442,6 +3500,7 @@ Pattern D1003
 Pattern D1004
 # Less attractive when making empty triangle.
 # gf Added n classification. (3.1.14)
+# tm Modified constraint (3.1.16)
 
 ????
 ?*.O       hanging connection to protect eyespace
@@ -3449,11 +3508,12 @@ Pattern D1004
 
 :8,n,value(69)
 
-????
+??D?
 ?*ab
 ??Oc
 
-;lib(b)>1 && oplay_attack(*,a,a) && !xplay_attack_either(*,?,a,a,c)
+;(lib(b)>1 && oplay_attack(*,a,a) && !xplay_attack_either(*,?,a,a,c))
+;&& (!x_somewhere(D) || oplay_attack(*,D)) 
 
 
 Pattern D1004b
@@ -3561,12 +3621,13 @@ b*c
 
 
 Pattern D1102
+# tm reduced value (3.1.16)
 
 ...        create cutting points
 X*X
 ?O?
 
-:|,-,value(70)
+:|,-,value(50)
 
 ...
 A*B
@@ -5553,6 +5614,22 @@ O?.?  connect out w/ atari.
 
 ; defend(A)
 
+
+Pattern D1376
+# tm New Pattern (3.1.16)
+
+OoX?
+x.*O
+----
+
+:8,-,value(75)
+
+bdF?
+ec*a
+----
+
+; (owl_escape_value(a) > 0 || owl_escape_value(b) > 0) &&
+; oplay_attack_either(*,c,d,c,F)
 
 #########################################################
 #                                                       #

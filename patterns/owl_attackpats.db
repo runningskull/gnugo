@@ -234,6 +234,7 @@ OXx
 
 
 Pattern A109
+# tm Constraint added (3.1.16)
 
 oOo         block on third line
 X*.
@@ -242,6 +243,16 @@ X*.
 ---
 
 :8,-,value(79)
+
+aOb
+X*.
+...
+...
+---
+
+#Pattern A232 is almost certainly better if this
+#constraint fails (avoid empty triangle)
+; (o_somewhere(a) || !o_somewhere(b))
 
 
 Pattern A110
@@ -471,8 +482,22 @@ Pattern A208
 # where X can play above * and get miai between capturing * and
 # escaping through the gap towards the center.
 
-O.X         third line kosumi
-.*X
+# tm removed (3.1.16)
+# 
+# ???         third line kosumi
+# O.X
+# .*X
+# ...
+# ---
+# 
+# :8,-,value(55)
+
+
+Pattern A208a
+# tm New Pattern (3.1.16) 
+
+O.X
+*.X
 ...
 ---
 
@@ -1088,6 +1113,8 @@ X.X
 
 
 Pattern A405
+# FIXME: Bad pattern.  Probably can be deleted.
+#   See vie:19 for unnecessary blocking.
 
 ???
 ?..         center block
@@ -1534,7 +1561,11 @@ Pattern A512
 Pattern A513
 # tm New pattern. (3.1.15) (see trevora:620)
 #   This may be just too generic, though often useful.
+# tm Modified (3.1.16)
+#   Added ??? rows, make sure not at upper edge.
 
+???|
+???|
 X..|
 O*.|
 
@@ -2536,6 +2567,8 @@ Ba
 
 
 Pattern A1001b
+# Sometimes cut of small useless tail 
+# i.e.:  gq -l games/niki.sgf -L 158 --decide-dragon S8 -o x.sgf
 
 XO          cut if safe
 *X

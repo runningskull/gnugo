@@ -2358,6 +2358,25 @@ bOXx
 ;(x_somewhere(D) || oplay_attack(*,?,D,D)) && !oplay_defend(*,a,b,c,*)
 
 
+Pattern Shape 76
+# tm New Pattern. (3.1.16) (see trevor:220)
+
+----
+....
+....
+O.*.
+
+:8,-,shape(-4)
+
+----
+....
+CbE.
+DA*.
+
+; xlib(A) > 2 &&
+; oplay_attack(*,A,b,C,D) &&
+; oplay_attack(*,A,b,E,C,*)
+
 ###########################
 #
 # Followup moves. 

@@ -658,4 +658,54 @@ x..
 ;owl_big_eyespace(*,A) && !oplay_defend(*,A)
 
 
+
+Pattern VA38
+# tm New Pattern (3.1.16)
+
+XO*|	  atari to kill eye
+.XX|
+XOO|
+
+:8,s,value(95)
+
+XO*|	  atari to kill eye
+ABX|
+XOO|
+
+; owl_eyespace(A,B)
+
+
+Pattern VA39
+# tm New Pattern (3.1.16) (see trevora:550)
+
+OXx	  Threaten snapback inside eyespace.
+X..
+X.*
+X..
+
+:8,s,value(95)
+
+OXx
+X..
+A.*
+X..
+
+; lib(A) == 3
+
+
+Pattern VA40
+# tm New Pattern (3.1.16)
+
+XXO
+.*X
+..X
+
+:8,s,value(95)
+
+XBO
+.*A
+..X
+
+;lib(A) ==2 || lib(B) == 2
+
 # END OF FILE
