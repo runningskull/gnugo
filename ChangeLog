@@ -2,7 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.3.6 released Autust 13, 2002
+- bug fix in adjusted_worm_attack_value()
+- FIXME added regarding several EITHER_MOVE reasons
+
+3.3.6 released August 13, 2002
 
 - extended_chainlinks() revised
 - MAX_REASONS increased from 80 to 100

@@ -1026,7 +1026,6 @@ compute_shape_factor(int pos)
 static float
 adjusted_worm_attack_value(int pos, int ww)
 {
-  int color;
   int num_adj;
   int adjs[MAXCHAIN];
   int has_live_neighbor = 0;
@@ -1035,7 +1034,6 @@ adjusted_worm_attack_value(int pos, int ww)
   float adjustment_down = 0.0;
   int s;
 
-  color = OTHER_COLOR(board[ww]);
   num_adj = chainlinks(ww, adjs);
   for (s = 0; s < num_adj; s++) {
     int adj = adjs[s];
@@ -1048,7 +1046,7 @@ adjusted_worm_attack_value(int pos, int ww)
       adjustment_up = 2*dragon[adj].effective_size;
 
     if (worm[adj].attack_codes[0] != 0
-	&& !does_defend(pos, ww)
+	&& !does_defend(pos, adj)
 	&& 2*worm[adj].effective_size > adjustment_down)
       adjustment_down = 2*worm[adj].effective_size;
   }
@@ -1057,7 +1055,14 @@ adjusted_worm_attack_value(int pos, int ww)
     adjusted_value += adjustment_up;
   adjusted_value -= adjustment_down;
 
-  return adjusted_value;
+  /* It can happen that the adjustment down was larger than the effective
+   * size we started with. In this case we simply return 0.0. (This means
+   * we ignore the respective EITHER_MOVE reason.)
+   */
+  if (adjusted_value > 0.0)
+    return adjusted_value;
+  else
+    return 0.0;
 }
 
 
@@ -1909,6 +1914,9 @@ estimate_strategical_value(int pos, int color, float score)
 
       case EITHER_MOVE:
 	/* FIXME: Generalize this to more types of threats. */
+	/* FIXME: We need a policy if a move has several EITHER_MOVE
+	 * reasons. Most likely not all of them can be achieved.
+	 */
 	worm1 = either_data[move_reasons[r].what].what1;
 	worm2 = either_data[move_reasons[r].what].what2;
 	aa = worms[worm1];
@@ -1932,13 +1940,7 @@ estimate_strategical_value(int pos, int color, float score)
 	TRACE("  %1m: %f - either attacks %1m (%f) or attacks %1m (%f)\n",
 	      pos, this_value, aa, aa_value, bb, bb_value);
 
-	/* FIXME: The restriction to this_value > 0 
-	 * should not be necessary. See century-2002:30 and nngs2:160.
-	 * Debugging this example might show a deeper problem
-	 * with EITHER_MOVE reasons.
-	 */
-	if (this_value > 0)
-	  tot_value += this_value;
+	tot_value += this_value;
 	break;
 	
       case ALL_MOVE:
