@@ -882,10 +882,10 @@ X*.?
 :8,-,value(75)
 
 
+Pattern A234
+# tm new pattern (3.1.13) 
 # Descend to attack. Possibly defend vulnerable stone.
 # Useful in arb:231
-# new pattern (3.1.13) -trevor
-Pattern A234
 
 xX	  defend vulnerable stone.
 XO
@@ -3560,9 +3560,9 @@ Pattern A1340
 :8,s,value(40)
 
 
-# Useful for manyfaces:8
-# new pattern 3.1.13 -trevor
 Pattern A1341
+# tm new pattern 3.1.13
+# Useful for manyfaces:8
 
 ?X?|	  vital corner point
 X.X|

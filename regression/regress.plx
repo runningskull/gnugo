@@ -31,6 +31,15 @@
 # It is designed to be run as a CGI script.
 
 
+
+#BEGIN {
+#  use CGI::Carp qw(carpout);
+#  my $errfile = "C:/temp/web.err";
+#  #open (WEBERR, ">$errfile") or die "Couldn't open $errfile.";
+#  carpout(STDOUT);
+#}
+#
+
 use strict;
 use warnings;
 use FindBin;
@@ -38,10 +47,9 @@ use lib "$FindBin::Bin/../interface";
 
 use GoImage::Stone;
 
+#use CGI::Carp;
 use CGI qw/:standard/;
 
-
-print "Content-type: text/html\n\n";
 
 my %colors = ("ALIVE", "green",
 	"DEAD", "cyan",
@@ -50,22 +58,56 @@ my %colors = ("ALIVE", "green",
 	"UNCHECKED", "magenta");
 
 my $query = new CGI;
+my ($tstfile, $num, $sortby, $sgf, $reset, $trace);
 
-my $tstfile = $query->param("tstfile");
-if ($tstfile && !($tstfile =~ /^[a-zA-Z0-9_]+\.tst$/)) {
-  print "bad test file: $tstfile\n";
+($tstfile, $num) = ($query->query_string() =~ /keywords=(.*)%3A(.*)/);
+
+if (!$tstfile) {
+  $tstfile = $query->param("tstfile");
+  $num = $query->param("num");
+  $sortby = $query->param("sortby");
+  $sgf = $query->param("sgf");
+  $reset = $query->param("reset");
+  $trace = $query->param("trace");
 }
 
-my $num = $query->param("num");
-my $sortby = $query->param("sortby");
 
-my $reset = $query->param("reset");
+
+print "HTTP/1.0 200 OK\r\n";
+print "Content-type: " .
+        do {
+          my $plain = $trace;
+          if ($sgf) { "application/x-go-sgf" }
+          elsif ($plain) { "text/plain" }
+          else {"text/html"; }
+        } . "\r\n\r\n";
+
+if ($tstfile) {
+  $tstfile .= '.tst' if $tstfile !~ /.tst$/;
+}
+if ($tstfile && !($tstfile =~ /^[a-zA-Z0-9_]+\.tst$/)) {
+  print "bad test file: $tstfile\n";
+  exit;
+}
 
 if ($reset) {
   unlink glob("html/*.html");
   unlink glob("html/*/*.html");
   print "Cleaned up!<HR>\n";
 }
+
+if ($trace) {
+  open (TRACER, "html/$tstfile/$num.trace") or
+    do {print "Couldn't find trace file: $!";  exit;};
+  while (<TRACER>) {
+    print;
+  }
+  close TRACER;
+  exit;
+}
+
+
+
 
 my %points;
 my %attribs;
@@ -115,7 +157,7 @@ sub createIndex {
   @totHash{@pflist} = (0,0,0,0);
 
   foreach my $k1 (sort keys %hha) { #$k1 = filename
-    print I qq@<TR>\n <TD><A href="regress.plx?tstfile=$k1&sortby=result">$k1</A></TD>\n@;
+    print I qq@<TR>\n <TD><A href="?tstfile=$k1&sortby=result">$k1</A></TD>\n@;
     foreach my $k2 (@pflist) {
       my $c = 0;
       $c = @{$hha{$k1}{$k2}} if $hha{$k1}{$k2};
@@ -123,7 +165,7 @@ sub createIndex {
       if (!($k2 =~ /passed/) and $c) {
         print I " <TD>$c:<BR>\n";
         foreach (sort {$a<=>$b} @{$hha{$k1}{$k2}}) {
-          print I qq@  <A HREF="regress.plx?tstfile=$k1&num=$_">$_</A>\n@;
+          print I qq@  <A HREF="?tstfile=$k1&num=$_">$_</A>\n@;
         }
         print I " </TD>\n";
       } else {
@@ -158,6 +200,7 @@ sub fptonum {
   $_;
 }
  
+my @counters = qw/life_node owl_node reading_node trymove/;
 
 if ($num) {
 #CASE 2 - problem detail.
@@ -167,18 +210,41 @@ if ($num) {
   close FILE;
   game_parse($content);
   
+  if ($sgf) {
+    &sgfFile;
+    exit;
+  }
+  
   print qq@<HTML><HEAD><TITLE>$tstfile test $attribs{"num"} details.</TITLE></HEAD>\n@;
   print qq@<BODY><TABLE border=1>\n@;
-  print qq@<TR><TD>number:</TD><TD>$attribs{"num"}</TD></TR>\n@;
-  print qq@<TR><TD>status:</TD><TD>$attribs{"status"}</TD></TR>\n@;
-  print qq@<TR><TD>correct:</TD><TD>$attribs{"correct"}</TD></TR>\n@;
-  print qq@<TR><TD>answer:</TD><TD>$attribs{"answer"}</TD></TR>\n@;
-  print qq@<TR><TD>gtp:</TD><TD>$attribs{"gtp_command"}</TD></TR>\n@;
-  print qq@<TR><TD>description:</TD><TD>$attribs{"description"}</TD></TR>\n@;
-  print qq@<TR><TD>category:</TD><TD>$attribs{"category"}</TD></TR>\n@;
-  print qq@<TR><TD>severity:</TD><TD>$attribs{"severity"}</TD></TR>\n@;
-  print qq@</TABLE>\n\n@;
+  print qq@
+ <TR>
+   <TD>number:</TD><TD>$attribs{"num"}</TD><TD>&nbsp;</TD>
+   <TD>cputime:</TD><TD>$attribs{"cputime"}</TD>
+ </TR><TR>
+   <TD>status:</TD><TD>$attribs{"status"}</TD><TD>&nbsp;</TD>
+   <TD>$counters[0]:</TD><TD>$attribs{"$counters[0]_counter"}</TD>
+ <TR>
+   <TD>correct:</TD><TD>$attribs{"correct"}</TD><TD>&nbsp;</TD>
+   <TD>$counters[1]:</TD><TD>$attribs{"$counters[1]_counter"}</TD>
+ <TR>
+   <TD>answer:</TD><TD>$attribs{"answer"}</TD><TD>&nbsp;</TD>
+    <TD>$counters[2]:</TD><TD>$attribs{"$counters[2]_counter"}</TD>
+ <TR>
+   <TD>gtp:</TD><TD>$attribs{"gtp_command"}</TD><TD>&nbsp;</TD>
+   <TD>$counters[3]:</TD><TD>$attribs{"$counters[3]_counter"}</TD>
+ </TR><TR><TD>category:</TD><TD>$attribs{"category"}</TD>
+ </TR><TR><TD>severity:</TD><TD>$attribs{"severity"}</TD>
+ </TR><TR><TD>description:</TD><TD>$attribs{"description"}</TD>
+ </TR>
+</TABLE>\n\n@;
   print qq@<HR>\n\n@;
+  print qq@
+<TABLE border=0>
+<TR><TD><A HREF="?tstfile=$tstfile&num=$num&sgf=1">SGF File</A>
+</TD><TD>&nbsp;&nbsp;&nbsp;<A HREF="?tstfile=$tstfile&num=$num&trace=1">Trace File</A>
+</TD></TR></TABLE>
+@;
 
   my $boardsize = $attribs{"boardsize"};  #need to add to export.
 
@@ -226,22 +292,23 @@ if ($num) {
   my $gtpall = $attribs{gtp_all};
   $gtpall  =~ s/<BR>//mg;
   $gtpall  =~ s/\s+$//mg;
-  $gtpall  =~ m@loadsgf\s+ ((?:\w|[-.\\/])+)  \s* (\d*) @xm or die  $attribs{gtp_all};
+  $gtpall  =~ m@loadsgf\s+ ((?:\w|[-.\\/])+)  \s* (\d*) @xm 
+    or $gtpall =~m/(.*?)/;  #Problems!!!!  
+  
   my $cmdline = "gq -l $1 " . ($2 ? "-L $2 " : "");
-  if ($gtpall =~ m@ .* (owl_[attackdefend]*) \s* ([A-Z]\d{1,2}) \s* $ @x) {
+  if ($gtpall =~ m@ .* (owl_(?:attack|defend)*) \s* ([A-Z]\d{1,2}) \s* $ @x) {
     $cmdline .= "--decide-dragon $2 -o x.sgf" ;
   } elsif ($gtpall =~ m@ .* (gg_genmove\s+[whiteblack]*)  \s* $@x) {
     $cmdline .= "-t";
-  } elsif ($gtpall =~ m@ .* ([attackdefend]*) \s* ([A-Z]\d{1,2}) \s* $ @x) {
+  } elsif ($gtpall =~ m@ .* (attack|defend) \s* ([A-Z]\d{1,2}) \s* $ @x) {
     $cmdline .= "--decide-string $2 -o x.sgf";
   } else {
-    $cmdline .= " <BR> (directive unrecognized): '$gtpall'";
+    $cmdline .= " <BR> (directive unrecognized)";
   }
   print qq@<HR>\n\n@;
   print qq@<TABLE border=1>\n@;
   print qq@ <TR><TD>CMD Line Hint:</TD><TD>$cmdline</TD></TR>\n@;
   print qq@ <TR><TD>Full GTP:</TD><TD>$attribs{gtp_all}</TD></TR>\n</TABLE>\n@;
-  print qq@<HR>\nSGF board not generated - does anybody care?@;
   
   print "\n\n</HTML>";
  # print %attribs;
@@ -275,13 +342,13 @@ sub summarizeTestFile {
   print TF "<H3>$tstfile regression results - _VERSION_</H3>\n";
   print TF qq@<TABLE border=1>
 <tr>
-  <TH><A HREF="regress.plx?tstfile=$tstfile&sortby=filepos">line</A></TH>
-  <TH><A href="regress.plx?tstfile=$tstfile&sortby=num">number</A></TH>
-  <TH><A href="regress.plx?tstfile=$tstfile&sortby=result">result</A></TH>
+  <TH><A HREF="?tstfile=$tstfile&sortby=filepos">line</A></TH>
+  <TH><A href="?tstfile=$tstfile&sortby=num">number</A></TH>
+  <TH><A href="?tstfile=$tstfile&sortby=result">result</A></TH>
   <TH>expected </TH>
   <TH>got</TH>
   <TH>gtp</TH>
-  <TH><A href="regress.plx?tstfile=$tstfile&sortby=cputime">cputime</A></TH>
+  <TH><A href="?tstfile=$tstfile&sortby=cputime">cputime</A></TH>
 </TR>\n@;
 
   my @files = glob("html/$tstfile/*.xml");
@@ -343,7 +410,7 @@ sub summarizeTestFile {
   
   foreach my $curfile (sort {filesby($sortby)} keys %files) {
     my %h = %{$files{$curfile}};
-    my $numURL = qq@<A HREF="regress.plx?tstfile=$tstfile&num=$h{num}">$h{num}</A>@;
+    my $numURL = qq@<A HREF="?tstfile=$tstfile&num=$h{num}">$h{num}</A>@;
     my $r = $h{result};
     $r =~ s@^([A-Z]*)$@<B>$1</B>@;
     print TF "<TR><TD>$h{filepos}</TD><TD>$numURL</TD><TD>$r</TD><TD>$h{expected}</TD>"
@@ -393,8 +460,14 @@ sub game_parse {
     if $content =~ m@<SEVERITY>(.*?)</SEVERITY>@s;
   $attribs{"gtp_command"} = $1
     if $content =~ m@<GTP_COMMAND>(.*?)</GTP_COMMAND>@s;
+  $attribs{"cputime"} = $1
+    if $content =~ m@<TIME.*?CPU=((\d|\.)*)@s;
   $attribs{"boardsize"} = $1
     if $content =~ m@<BOARD[^>]*size=(\d+)@s;
+  foreach (@counters) {
+    $attribs{$_."_counter"} = $1
+      if $content =~ m@<COUNTER[^>]*$_="?(\d+)@s;
+  }
   $content =~ s@.*?<POINT@<POINT@s;
   while ($content =~ s@<POINT(.*?)></POINT>@@s) {
     my $pattr = $1;
@@ -423,16 +496,45 @@ sub colorboard_letter_row {
 }
 
 
+sub sgfFile() {
+  my $boardsize = $attribs{"boardsize"};  #need to add to export.
 
-#sub GTPtoSGF {
-#  $_ = shift;
-#  if (! /([A-Z])([0-9]{1,2})/) {
-#    return ;
-#  }
-#  $_ = ord($1) - ord("A") + 1;
-#  if ($_ > (ord("I") - ord("A") + 1)) { $_--; }
-#  chr(ord("a") + $_ - 1) . chr(ord("a") + $boardsize - $2);
-#}
-#
-#
+  my $ret="";
+  $ret .= "(;\nFF[4]GM[1]SZ[$boardsize]\nAP[regress.plx]\n";
+   
+  for (my $j = $boardsize; $j > 0; $j--) {
+    my $jA = $j;
+    $jA .= " " if ($j <= 9);
+    for (my $i = 1; $i <= $boardsize; $i++) {
+      my $iA = ord('A') + $i - 1;
+      if ($iA >= ord('I')) { $iA++; }
+      $iA = chr($iA);  
+      my $coord = $iA.$j;
+      my $bw = pval($coord, "stone");
+      
+      if ($bw eq "black") {
+        $ret .= "AB\[" . GTPtoSGF($coord, $boardsize) . "]";
+      } elsif ($bw eq "white") {
+        $ret .= "AW\[" . GTPtoSGF($coord, $boardsize) . "]";
+      }
+    }
+  }
+  $ret.=")";
+  
+  $ret =~ s/((A[BW]\[..\]){12})/$1\n/g;
+  
+  print $ret;
+}
+
+
+sub GTPtoSGF {
+  local $_ = shift;
+  my $boardsize = shift;
+  if (! /([A-Z])([0-9]{1,2})/) {
+    return ;
+  }
+  $_ = ord($1) - ord("A") + 1;
+  if ($_ > (ord("I") - ord("A") + 1)) { $_--; }
+  chr(ord("a") + $_ - 1) . chr(ord("a") + $boardsize - $2);
+}
 

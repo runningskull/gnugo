@@ -36,7 +36,6 @@
 
 package REGRESS;
 
-use IPC::Open2;
 use IPC::Open3;
 use IO::Handle;
 use Getopt::Long;
@@ -47,6 +46,7 @@ use FindBin;
 use strict;
 use warnings;
 
+use Carp;
 
 STDOUT->autoflush(1);
 
@@ -84,7 +84,7 @@ my %categories =
   "KO_READING", ""
  );
 
-
+my $trace_output="";
 my $cur_passed;
 my $result;
 my $correct_re;
@@ -111,6 +111,7 @@ my $num;
 my $filepos;
 my $goprog_in ;		# stdin of computer player
 my $goprog_out;		# stdout of computer player
+my $goprog_err;		# stderr of computer player
 my $passes;
 my $unexpected_pass;
 my $failures;
@@ -132,6 +133,9 @@ my $one_gg_process = 0;
 my @failed_links;
 my @FAILED_links;
 
+my @counters = qw/life_node owl_node reading_node trymove/;
+
+my %counters;
 
 my $next_cmd = "";
 my $prev_cmd = "";
@@ -148,6 +152,10 @@ GetOptions(
 if ($make_images) {
   make_images();
   exit;
+}
+
+if (!$goprog) {
+  $goprog = "../interface/gnugo.exe --mode gtp --quiet -t";  
 }
 
 die $helpstring unless defined $goprog;
@@ -171,20 +179,20 @@ use File::stat;
 # create FileHandles
 $goprog_in  = new FileHandle;		# stdin of computer player
 $goprog_out = new FileHandle;		# stdout of computer player
-$pidg = open2($goprog_out, $goprog_in, $goprog);
+$goprog_err = new FileHandle;		# stdout of computer player
+print "Go program: $goprog\n" if $verbose > 1;
+$pidg = open3($goprog_in, $goprog_out, $goprog_err, $goprog);
 print "goprog pid: $pidg\n" if $verbose > 1;
 my ($goprog_exe) = split (" ", $goprog);
 $goprog_timestamp = (stat $goprog_exe)->mtime;
 
 go_command("name");
-#print $goprog_in "name\n";
 $_ = <$goprog_out>;
 if (/^=\s*(.*)/) {
   ($goprog_name = $1) =~ s/\s*$//;
 }
 <$goprog_out>;
 go_command("version");
-#print $goprog_in "version\n";
 $_ = <$goprog_out>;
 if (/^=\s*(.*)/) {
   ($goprog_version = $1) =~ s/\s*$//;
@@ -194,7 +202,7 @@ if (/^=\s*(.*)/) {
 print "Name: " .  $goprog_name ." ". $goprog_version . "\n" if $verbose > 1;
 
 if ($one_gg_process) {
-  go_command("quit");#print $goprog_in "quit\n";
+  go_command("quit");
   print "waiting\n" if $verbose > 2;
   waitpid $pidg, 0;
   print "done waiting\n" if $verbose > 2;
@@ -229,16 +237,45 @@ exit;
 
 
 sub regress_file {
+  $testfile = shift;
+  print "$testfile\n" if $verbose;
+  
+  foreach (@counters) {
+    go_command("reset_${_}_counter");
+    eat();
+  }
+
+  -e "html" or mkdir "html" or die "Couldn't create html";
+  -e "html/$testfile" or mkdir "html/$testfile" or die "Couldn't create html/$testfile";
+  
+  my $childpid;
   unless ($one_gg_process) {
     $goprog_in  = new FileHandle;		# stdin of computer player
     $goprog_out = new FileHandle;		# stdout of computer player
-    $pidg = open2($goprog_out, $goprog_in, $goprog);
+    $goprog_err = new FileHandle;		# stderr of computer player
+    $pidg = open3($goprog_in, $goprog_out, $goprog_err, $goprog);
     print "goprog pid: $pidg\n" if $verbose > 1;
+    unless ($childpid = fork) {
+      #Child.
+      chdir "html/$testfile" ;
+      open (TRACER, ">tracer.ttt");
+      while (<$goprog_err>) {
+        print TRACER $_;
+        if (/^FINISHED PROBLEM: (.*)/) {
+          close TRACER or die "Couldn't close temp trace file";
+          my $thisgtp = $1;
+          my ($num) = $thisgtp =~ /^(\d+)/ or die "Missing number: $thisgtp";
+          rename "tracer.ttt", "$num.trace"
+              or die "Couldn't rename tracer: $testfile, $num";
+          open (TRACER, ">tracer.ttt");
+        }
+      }
+      close TRACER;
+      exit;
+  }
   }
   
   
-  $testfile = shift;
-  print "$testfile\n" if $verbose;
 
   #main bit.
   $pidt = open ($testfile_out,"<$testfile");
@@ -257,10 +294,10 @@ sub regress_file {
   $filepos = 0;
   go_command("cputime");
   $cputime = <$goprog_out>;
-  print "cputime: $cputime\n" if $verbose > 1 or 1;
+  print "cputime: $cputime\n" if $verbose > 1;
   ($cputime) = ($cputime =~ /((\d|\.)+)/);
-  print "cputime: $cputime\n" if $verbose > 1 or 1;
   <$goprog_out>;  
+  
   my $skipping = 0;
   while (defined($next_cmd))
   {
@@ -279,6 +316,9 @@ sub regress_file {
           $correct_re = $2;
           if ($3) { $fail = 1} else { $fail = 0};
           if ($4) {$ignore = 1} else {$ignore = 0};
+
+          go_command("echo_err FINISHED PROBLEM: $prev_cmd\n");
+          eat();  #ignore output!
 
           my $old_skipping = $skipping;
           $skipping = $numbers && ($num =~ $numbers);
@@ -327,9 +367,9 @@ sub regress_file {
 	    $top_moves = 1;
 	  }
 	}
- 	go_command($next_cmd); #print $goprog_in "$next_cmd\n";
+ 	go_command($next_cmd); 
  	if ($top_moves) {
- 	  $top_moves = eat_move($goprog_out);
+ 	  $top_moves = eat_one();
  	  if ($top_moves) {
  	    ($result, $_) = split(/ /, $top_moves, 2);
  	  } else {
@@ -338,7 +378,7 @@ sub regress_file {
  	  }
  	  print "TopMoves:$top_moves\n" if $verbose > 1;
  	} else {
-	  $result = eat_move($goprog_out);
+	  $result = eat_one();
 	  if (!defined($result)) {$result="";}
 	}
 	print "RES: $result\n" if $verbose > 1;
@@ -365,7 +405,7 @@ sub regress_file {
        . "$unexpected_fail unexpected $fail_string\n";
 
   unless ($one_gg_process) {
-    go_command("quit");#print $goprog_in "quit\n";
+    go_command("quit");
     print "waiting\n" if $verbose > 2;
     waitpid $pidg, 0;
     print "done waiting\n" if $verbose > 2;
@@ -405,18 +445,33 @@ sub tally_result {
       if (defined($1)) {$astxt = $1;} else {$astxt = "";};
       print $brd "<$listval>$astxt</$listval>\n";
     }
-    print $brd "<NODES owl=123 reading=123>\n";
+    print $brd "<COUNTERS ";
+    foreach (@counters) {
+      go_command("get_${_}_counter");
+      my $counts = eat_one();
+      defined($counts) or confess "Missing count";
+      defined($counters{$_}) or confess "Missing counter";
+      my $countdelta = $counts - $counters{$_};
+      $counters{$_} = $counts;
+      print $brd qq@\n  $_="$countdelta"@;
+    }
+    print $brd ">\n";
+
 
     go_command("cputime");
     my $new_cputime = <$goprog_out>;
     ($new_cputime) = ($new_cputime =~ /((\d|\.)+)/);
-    print "cputime: ".$new_cputime."\n" if $verbose > 1 or 1;
+    print "cputime: ".$new_cputime."\n" if $verbose > 1;
     <$goprog_out>;  
-    print $brd "<TIME wall=0.123 CPU=" . sprintf("%.5f", $new_cputime - $cputime) .  ">\n";
+    print $brd "<TIME wall=0.0 CPU=" . sprintf("%.5f", $new_cputime - $cputime) .  ">\n";
     $cputime = $new_cputime;
 
     print $brd "<GTP_COMMAND>$prev_cmd</GTP_COMMAND>\n";
     print $brd $brdout;
+    
+    print $brd "<TRACE_OUTPUT>$trace_output</TRACE_OUTPUT>\n";
+    $trace_output= "";
+    
     print $brd "</GOPROB>\n";
     close $brd;
   }
@@ -433,11 +488,7 @@ sub html_encode {
 
 sub eat_board {
   go_command("query_boardsize");
-  my $line = "";
-  while ($line eq "") {
-    chop($line = <$goprog_out>) or die "No response!";
-  }
-  <$goprog_out>;
+  my $line = eat();
   (undef, $boardsize) = split(' ', $line, 2);
   $boardsize = $boardsize + 0;
   my $linesleft = $boardsize + 2;
@@ -665,23 +716,32 @@ sub eat_board {
 }
   
 
-sub eat_move {
-    my $h = shift;
-# ignore empty lines
+sub eat() {
+  # ignore empty lines
     my $line = "";
     while ($line eq "") {
-	chop($line = <$h>) or die "No response!";
+    chop($line = <$goprog_out>) or die "No response!";
+    $line =~ s/\s*$//smg;
     }
-    $line =~ s/\s*$//;
-    my ($equals, $move) = split(' ', $line, 2);
-    $line = <$h>;
+  <$goprog_out>;
+  return $line;
+}  
+
+
+sub eat_one {
+    my ($equals, $move) = split(' ', eat(), 2);
     return $move;
 }
 
 sub go_command {
-  $_ = shift;
-  print $goprog_in "$_\n";
-  print "CMD:$_\n" if $verbose > 1;
+  my $cmd = shift;
+  print $goprog_in "$cmd\n";
+  print "CMD:$cmd\n" if $verbose > 1;
+  foreach (@counters) {
+    if ($cmd =~ /reset_${_}_counter/) {
+      $counters{$_} = 0;
+    }
+  }
 }
 
 

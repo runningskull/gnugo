@@ -82,6 +82,7 @@ DECLARE(gtp_dragon_status);
 DECLARE(gtp_dragon_stones);
 DECLARE(gtp_dump_stack);
 DECLARE(gtp_echo);
+DECLARE(gtp_echo_err);
 DECLARE(gtp_eval_eye);
 DECLARE(gtp_final_score);
 DECLARE(gtp_final_status);
@@ -157,6 +158,7 @@ static struct gtp_command commands[] = {
   {"dragon_stones",           gtp_dragon_stones},
   {"dump_stack",       	      gtp_dump_stack},
   {"echo" ,                   gtp_echo},
+  {"echo_err" ,               gtp_echo_err},
   {"estimate_score",          gtp_estimate_score},
   {"eval_eye",         	      gtp_eval_eye},
   {"final_score",             gtp_final_score},
@@ -283,6 +285,8 @@ gtp_name(char *s, int id)
   UNUSED(s);
   return gtp_success(id, "GNU Go");
 }
+
+
 
 
 /* Function:  Report the version number of the program.
@@ -2297,6 +2301,19 @@ gtp_tune_move_ordering(char *s, int id)
 static int
 gtp_echo(char *s, int id)
 {
+  return gtp_success(id, "%s", s);
+}
+
+
+/* Function:  Echo the parameter to stdout AND stderr
+ * Arguments: string
+ * Fails:     never
+ * Returns:   nothing
+ */
+static int
+gtp_echo_err(char *s, int id)
+{
+  fprintf(stderr, "%s", s);
   return gtp_success(id, "%s", s);
 }
 

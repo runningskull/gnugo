@@ -699,6 +699,18 @@ O.*.     expand eyespace
 :8,-,value(80)
 
 
+Pattern D217c
+# tm added (3.1.14)
+# see trevor:401
+# Possible to sacrifice to gain tempo here.
+
+O.X?     expand eye-space
+O.*.
+.x..
+
+:8,s,value(10)
+
+
 Pattern D218
 
 xx...X.        slide (usually inferior to play on third line)
@@ -909,7 +921,7 @@ O*..
 
 
 Pattern D303
-# The B classification inhibits the addition of * to the dragon.
+# The b classification inhibits the addition of * to the dragon.
 
 XX.?         hane to try to escape
 OOX.
@@ -1941,6 +1953,22 @@ Pattern D623
 
 ; !x_somewhere(a) || !x_somewhere(b)
 
+
+
+
+Pattern D624
+# tm added (3.1.14)
+# Needed in trevor:403
+
+O.??	   Block on first line to make eye.
+O.OX
+ox*?
+----
+
+:8,-,value(40)
+
+
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #
@@ -2752,9 +2780,9 @@ Pattern D832
 ;oplay_defend(*,A) != WIN
 
 
-#useful in manyfaces:8
-#new pattern 3.1.13 -trevor
 Pattern D833
+# tm added (3.1.13)
+# useful in manyfaces:8
 
 ?O?|	  vital corner point.
 O.O|
@@ -3589,6 +3617,34 @@ oO..
 ----
 
 ;owl_escape_value(a)>0
+
+Pattern D1134
+# tm new pattern (3.1.14)
+# Give a very low value, unless add lots of constraints.
+# See trevor:520.
+
+XXO      Cut!
+O*X
+OX.
+?..
+
+:8,b,value(5)
+
+
+Pattern D1135
+# tm new pattern (3.1.14)
+# See trevor:330
+
+O*.	connect out, threaten cut
+X.?
+
+:8,-,value(35)
+
+O*a
+cB?
+
+; owl_escape_value(a)>0 &&
+; oplay_attack(*,a,c)
 
 
 ########################################################
