@@ -514,9 +514,10 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 224
 #? [!S6]*
 
 
-loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 244
-1100 gg_genmove white
-#? [!N9]*
+# Moved to filllib:41.
+# loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 244
+# 1100 gg_genmove white
+# #? [!N9]*
 
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209122040.sgf 38
@@ -535,3 +536,24 @@ loadsgf games/nngs/gnugo-3.3.8-evand-200209130704.sgf 162
 loadsgf games/nngs/gnugo-3.3.9-joshj-200210181607.sgf 102
 1140 gg_genmove white
 #? [B19]*
+
+# G13 is the only move. J13 pointlessly lets black have a ko.
+loadsgf games/nngs/gnugo-3.3.9-Ayoye-200209301535.sgf 76
+1150 gg_genmove white
+#? [G13]
+
+# B1 is the only move. After A4 or B4 black can play B6 and white can
+# no longer capture both A3 and B6
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 240
+1160 gg_genmove white
+#? [B1]
+
+# B1 minimizes the losses.
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
+1170 gg_genmove white
+#? [B1]
+
+# A5 is very odd.
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 244
+1180 gg_genmove white
+#? [A6]

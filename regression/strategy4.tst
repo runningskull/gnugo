@@ -34,7 +34,7 @@ loadsgf games/ssstator.sgf 133
 
 loadsgf games/ssstator.sgf 136
 157 gg_genmove white
-#? [B14|B16]*
+#? [B14|B16|C18]*
 
 # E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51

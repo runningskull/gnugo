@@ -133,3 +133,7 @@ loadsgf games/nngs/gnugo-3.1.34-guest1-200204242025.sgf 86
 #? [G12|F12|G13]
 40 gg_genmove black
 #? [K13]
+
+loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 244
+41 gg_genmove white
+#? [M8]*
