@@ -552,7 +552,7 @@ loadsgf games/FSF-neurogo.sgf 40
 # There might be an attack at G13, but it looks like it fails.
 loadsgf games/strategy25.sgf 63
 150 owl_attack D15
-#? [0]
+#? [0]*
 
 # Now G13 works.
 loadsgf games/strategy25.sgf 67
@@ -949,7 +949,7 @@ loadsgf games/handtalk/handtalk23.sgf 186
 # See also 13x13:15.
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 262 owl_defend E7
-#? [0]*
+#? [0]
 
 ########### end of tests #####################
 

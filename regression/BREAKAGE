@@ -1,3 +1,24 @@
+========================== 3.3.20 pre 1 =====================================
+
+./regress.sh . owl.tst 
+150 unexpected FAIL: Correct '0', got '1 G13'
+262 unexpected PASS!
+./regress.sh . strategy.tst 
+34 unexpected FAIL: Correct 'E17', got 'N15'
+./regress.sh . strategy2.tst 
+90 unexpected FAIL: Correct 'B14|D17', got 'G13'
+./regress.sh . trevorc.tst 
+1020 unexpected FAIL: Correct 'G2|G3', got 'B8'
+1030 unexpected FAIL: Correct 'G3', got 'B8'
+1440 unexpected FAIL: Correct 'E12|F11', got 'E10'
+./regress.sh . global.tst 
+4 unexpected PASS!
+5 unexpected PASS!
+./regress.sh . strategy4.tst 
+199 unexpected FAIL: Correct 'N5|S18', got 'B2'
+./regress.sh . century2002.tst 
+200 unexpected PASS!
+
 ============================= 3.3.19 =====================================
 
 ./regress.sh . ld_owl.tst 
