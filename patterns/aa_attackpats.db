@@ -293,4 +293,24 @@ o*AA
 ;lib(A)==3 && olib(*)>=2
 
 
+Pattern A18
+# gf New pattern. (3.3.17)
+
+??.?
+?X*.
+OOX.
+?X..
+??.?
+
+:8,-
+
+??.?
+?C*.
+eeXa
+?Db.
+??.?
+
+;!oplay_attack(*,e) && oplay_attack(*,a,C) && oplay_attack(b,a,D)
+
+
 # END OF FILE

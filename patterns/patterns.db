@@ -10153,6 +10153,10 @@ xxx..
 Pattern ED66
 # tm Modified (3.1.18) (see trevorb:610)
 # FIXME: Is this just too generic?
+# gf This pattern is way too general, see e.g. 13x13b:8.
+#    Furthermore the second half of the constraint doesn't really make
+#    sense. Consider removal. (3.3.17)
+
 
 ?x?         draw back for safety
 O.X
@@ -10177,6 +10181,7 @@ Pattern ED67
 # tm Modified (3.1.18) (see trevorb:610)
 # FIXME: Is this just too generic?
 #   Identical to ED66, but with j attribute instead of J
+# gf See comments for ED66. This pattern is redundant anyway. (3.3.17)
 
 ?x?         draw back for safety
 O.X

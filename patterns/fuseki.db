@@ -1024,8 +1024,8 @@ Pattern F407
 
 
 Pattern F408
-#FIXME: Make sure we're not inside our moyo
-# see 13x13:12
+# gf Added constraint to avoid overconcentration. See 13x13:12,
+#    13x13b:42. (3.3.17)
 
 .......        extend
 oO..*..
@@ -1034,6 +1034,14 @@ oO..*..
 -------
 
 :8,edt
+
+.....a.
+oO..*..
+.......
+.......
+-------
+
+;!omoyo(a)
 
 
 Pattern F409
@@ -1529,16 +1537,17 @@ o......
 
 
 Pattern F709
+# gf Revised and devalued. See 13x13b:26.
 
-......      urgent jump
-..*..?
-X....?
-..O..X
-......
-......
-------
+?......      urgent jump
+?..*..?
+xX....?
+x..O..X
+x......
+.......
+-------
 
-:8,FEJ
+:8,FEj
 
 
 ############################################
