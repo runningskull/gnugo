@@ -150,7 +150,8 @@ oracle_loadsgf(char *infilename, char *untilstring)
 void
 dismiss_oracle(void)
 {
-  TELL_ORACLE("quit\n");
+  if (oracle_exists)
+    TELL_ORACLE("quit\n");
   oracle_exists = 0;
 }
 
@@ -337,9 +338,7 @@ oracle_add_move(struct oracle_move_data moves[MAX_ORACLE_MOVES],
 #define SECOND_LEVEL_MOVES 2
 
 static float
-do_metamachine_genmove(int *i, int *j, int color, int depth, int width);
-
-/* consider up to width moves and call recursively with depth decremented. */
+do_metamachine_genmove(int *i, int *j, int color, int width);
 
 int
 metamachine_genmove(int *i, int *j, int color)
@@ -360,14 +359,14 @@ metamachine_genmove(int *i, int *j, int color)
       }	
   }
   count_variations = 1;
-  value = do_metamachine_genmove(i, j, color, 1, search_width());
+  value = do_metamachine_genmove(i, j, color, search_width());
   sgffile_enddump(outfilename);
   count_variations = 0;
   return value;
 }
 
 static float
-do_metamachine_genmove(int *i, int *j, int color, int depth, int width)
+do_metamachine_genmove(int *i, int *j, int color, int width)
 {
   int k, moves_considered;
   float move_value[10];
@@ -419,7 +418,9 @@ do_metamachine_genmove(int *i, int *j, int color, int depth, int width)
   }
   for (k = 0; k < moves_considered; k++) {
     if (oracle_trymove(POS(move_i[k], move_j[k]), color, "", 0, 0, NO_MOVE)) {
-      if (depth == 0) {
+      int new_width = search_width();
+
+      if (new_width == 0) {
 	TELL_ORACLE("experimental_score %s\n", 
 		    color == BLACK ? "black" : "white");
 	ask_oracle();
@@ -427,8 +428,7 @@ do_metamachine_genmove(int *i, int *j, int color, int depth, int width)
       }
       else {
 	score[k] =
-	  do_metamachine_genmove(i, j, OTHER_COLOR(color), depth - 1, 
-				 search_width());
+	  do_metamachine_genmove(i, j, OTHER_COLOR(color), new_width);
       }
       if (verbose)
 	dump_stack();
@@ -458,8 +458,9 @@ search_width(void)
 {
   if (stackp == 0)
     return 3;
-  else
+  else if (stackp == 1)
     return 2;
+  else return 0;
 }
 
 
