@@ -10745,7 +10745,7 @@ oo.b?
 ..cDD
 -----
 
-;!attack(D) && !xplay_defend_both(a,b,c)
+;!attack(D) && safe_xmove(a)
 
 
 Pattern ED95

@@ -64,6 +64,10 @@ loadsgf games/tactics08.sgf
 106 gg_genmove white
 #? [F8|F6]*
 
+loadsgf games/edge_defense1.sgf
+107 gg_genmove white
+#? [B13|B14]
+
 
 ############ End of Tests #################
 
