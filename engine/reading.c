@@ -52,8 +52,7 @@ static int do_attack_pat(int str, int *move, int komaster, int kom_pos);
     int u;\
     for (u = 0; u < (moves).num; u++)\
       if ((moves).pos[u] == (move)) {\
-        if ((moves).score[u] < this_score)\
-          (moves).score[u] = this_score;\
+	(moves).score[u] += this_score;\
 	break;\
       }\
     if ((u == (moves).num) && ((moves).num < MAX_MOVES)) {\
@@ -4391,7 +4390,7 @@ break_chain_moves(int str, struct reading_moves *moves)
   
   for (r = 0; r < adj; r++) {
     findlib(adjs[r], 1, &xpos);
-    ADD_CANDIDATE_MOVE(xpos, 0, *moves);
+    ADD_CANDIDATE_MOVE(xpos, 1, *moves);
   }
 }
 
@@ -4491,10 +4490,10 @@ do_find_break_chain2_efficient_moves(int str, int adj,
     return;
 
   if (is_edge_vertex(libs[0]) && !is_self_atari(libs[1], color))
-    ADD_CANDIDATE_MOVE(libs[1], 0, *moves);
+    ADD_CANDIDATE_MOVE(libs[1], 1, *moves);
 
   if (is_edge_vertex(libs[1]) && !is_self_atari(libs[0], color))
-    ADD_CANDIDATE_MOVE(libs[0], 0, *moves);
+    ADD_CANDIDATE_MOVE(libs[0], 1, *moves);
 }
 
 /*
@@ -4739,7 +4738,7 @@ double_atari_chain2_moves(int str, struct reading_moves *moves)
          * is safe for the defender.
 	 */
 	if (!is_self_atari(libs[k], board[str]))
-	  ADD_CANDIDATE_MOVE(libs[k], 0, *moves);
+	  ADD_CANDIDATE_MOVE(libs[k], 1, *moves);
       }
     }
   }
@@ -5020,22 +5019,22 @@ in_list(int move, int num_moves, int *moves)
  */
 
 /*                                              0   1   2   3   4  >4  */
-static int defend_lib_score[6]              = {-5, -4,  0,  2,  5, 20};
-static int defend_not_adjacent_lib_score[5] = { 0,  0,  2,  4,  6};
+static int defend_lib_score[6]              = {-5, -4,  0,  3,  5, 50};
+static int defend_not_adjacent_lib_score[5] = { 0,  0,  2,  3,  5};
 static int defend_capture_score[6]          = { 0,  6,  9, 13, 18, 24};
-static int defend_atari_score[6]            = { 0,  2,  4,  6,  8, 10};
+static int defend_atari_score[6]            = { 0,  2,  4,  6,  7, 8};
 static int defend_save_score[6]             = { 0,  3,  6,  8, 10, 12};
 static int defend_open_score[5]             = { 0,  1,  2,  3,  4};
 static int attack_own_lib_score[5]          = {10, -4,  2,  3,  4};
-static int attack_string_lib_score[6]       = {-5,  1,  3,  7, 12, 20};
+static int attack_string_lib_score[6]       = {-5,  2,  3,  7, 10, 19};
 static int attack_capture_score[6]          = {-4,  4, 10, 15, 20, 25};
-static int attack_save_score[6]             = { 0, 11, 15, 18, 21, 24};
-static int attack_open_score[5]             = { 0,  1,  2,  3,  4};
+static int attack_save_score[6]             = { 0, 10, 13, 18, 21, 24};
+static int attack_open_score[5]             = { 0,  0,  2,  4,  4};
 static int defend_not_edge_score            = 5;
 static int attack_not_edge_score            = 1;
 static int attack_ko_score                  = -15;
 static int cannot_defend_penalty            = -20;
-static int safe_atari_score                 = 5;
+static int safe_atari_score                 = 8;
 
 
 /* The string at (str) is under attack. The moves.num moves in

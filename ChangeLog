@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- tactical move ordering tuned
 - complete rewrite of interface to influence.c
 - new macros INITIAL_INFLUENCE(color), OPPOSITE_INFLUENCE(color)
 - new functions compute_worm_influence(), get_lively_stones(),
