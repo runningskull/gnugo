@@ -2604,12 +2604,10 @@ owl_determine_life(struct local_owl_data *owl,
 	  || (mw[pos] < 3 * mz[pos] && mz[pos] > 5))
 	pessimistic_min = 0;
 
+      /* It appears that this policy is needed no longer. */
+#if 0
       /* If this eyespace includes an owl inessential string, we must assume
-       * assume that the pessimistic min is 0.
-       *
-       * See owl1:304 for an example where this policy is important.
-       * FIXME: However, a better approach would be to improve inessential
-       *	strings detection (S13 in owl1:304 must count as essential).
+       * that the pessimistic min is 0.
        */
       if (pessimistic_min > 0) {
 	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
@@ -2621,6 +2619,7 @@ owl_determine_life(struct local_owl_data *owl,
 	  }
 	}
       }
+#endif
 
       eyes_attack_points[num_eyes] = NO_MOVE;
       eyevalue_list[num_eyes] = eyevalue;
@@ -3758,10 +3757,10 @@ owl_reasons(int color)
 	 * dies because the victim only formed a nakade shape.
 	 *
 	 * FIXME: This code overlaps heavily with some code in
-	   * examine_move_safety() in move_reasons.c. The caching
-	   * scheme should minimize the performance hit, but of course
-	   * it's unfortunate to have the code duplication.
-	   */
+	 *	  examine_move_safety() in move_reasons.c. The caching
+	 *	  scheme should minimize the performance hit, but of course
+	 *	  it's unfortunate to have the code duplication.
+	 */
 	int move = DRAGON2(pos).owl_attack_point;
 	
 	/* No worries if we catch something big. */
