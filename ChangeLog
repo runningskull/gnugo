@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function is_corner_vertex() in board.c
+- mark_dragon() changed from static to global
+- global variable time_to_die removed
 - revision of new_semeai()
 - endgame move generator beginnings implemented in endgame.c
 - endgame() in ascii.c renamed ascii_endgame()

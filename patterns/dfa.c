@@ -588,8 +588,8 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
  * Create a linear dfa from a string and an attributes value
  * and resize the dfa if needed.
  *
- * For eg.
- * create_dfa (pdfa, "Oo?.", 2001)
+ * For example:
+ * create_dfa(pdfa, "Oo?.", 2001)
  * gives:
  *
  *           1              0,1            0,1,2             0

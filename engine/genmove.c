@@ -122,6 +122,7 @@ examine_position(int color, int how_much)
     make_worms();
     time_report(0, "  make worms", NO_MOVE, 1.0);
   }
+
   if (how_much == EXAMINE_WORMS) {
     verbose = save_verbose;
     gg_assert(test_gray_border() < 0);
@@ -231,7 +232,7 @@ genmove(int *i, int *j, int color)
 #if ORACLE
   if (metamachine) {
     retval = metamachine_genmove(i, j, color);
-    gg_assert (stackp == 0);
+    gg_assert(stackp == 0);
     if (*i != -1)
       return 1;
   }

@@ -982,9 +982,7 @@ detect_owl_blunder(int move, int color, int *defense_point,
 	verbose = current_verbose;
 	*return_value += 2.0 * dragon[bpos].effective_size;
 	if (safe_stones)
-	  for (ii = first_worm_in_dragon(bpos); ii != NO_MOVE; 
-	       ii = next_worm_in_dragon(ii))
-	    mark_string(ii, safe_stones, 0);
+	  mark_dragon(bpos, safe_stones, 0);
       }
       else if (acode == LOSS) {
 	verbose = save_verbose;
@@ -1887,7 +1885,7 @@ superstring_add_string(int str,
 
 /* Internal timers for assessing time spent on various tasks. */
 #define NUMBER_OF_TIMERS 4
-double timers[NUMBER_OF_TIMERS];
+static double timers[NUMBER_OF_TIMERS];
 
 /* Start a timer. */
 void

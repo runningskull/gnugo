@@ -241,8 +241,8 @@ finish_goal_list(int *flag, int *wpos, int list[MAX_GOAL_WORMS], int index);
 /* Semeai worms are worms whose capture wins the semeai. */
 
 #define MAX_SEMEAI_WORMS 20
-int s_worms = 0;
-int semeai_worms[MAX_SEMEAI_WORMS];
+static int s_worms = 0;
+static int semeai_worms[MAX_SEMEAI_WORMS];
 
 /* Called when (apos) and (bpos) point to adjacent dragons
  * of the opposite color, both with matcher_status DEAD or
@@ -312,7 +312,7 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
     sgf_dumptree = save_sgf_dumptree;
   }
 
-  gg_assert(board[apos] == OTHER_COLOR(board[bpos]));
+  ASSERT1(board[apos] == OTHER_COLOR(board[bpos]), apos);
   count_variations = 1;
   TRACE("owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
   if (owl) {
@@ -407,8 +407,8 @@ do_owl_analyze_semeai(int apos, int bpos,
   global_owl_node_counter++;
   local_owl_node_counter++;
 
-  gg_assert(board[apos] == owla->color);
-  gg_assert(board[bpos] == owlb->color);
+  ASSERT1(board[apos] == owla->color, apos);
+  ASSERT1(board[bpos] == owlb->color, bpos);
 
   if (stackp <= owl_branch_depth && (hashflags & HASH_SEMEAI)
       && !pass && owl_phase) {
@@ -468,7 +468,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     moves[k].name = NULL;
     moves[k].same_dragon = 2;
   }
-  gg_assert(other == board[bpos]);
+  ASSERT1(other == board[bpos], bpos);
   memset(mw, 0, sizeof(mw));
 
   /* Look for a tactical attack. We seek a semeai worm of owlb
@@ -555,7 +555,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       /* FIXME: This is kind of quick and dirty. */
       if (probable_eyes_a.b > matches_found)
 	probable_eyes_a.b -= matches_found;
-      else probable_eyes_a.b = 0;
+      else
+	probable_eyes_a.b = 0;
     }
 
     owl_determine_life(owlb, owla, komaster, 1, vital_offensive_moves,
@@ -569,7 +570,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       /* FIXME: This is kind of quick and dirty. */
       if (probable_eyes_b.b > matches_found)
 	probable_eyes_b.b -= matches_found;
-      else probable_eyes_b.b = 0;
+      else
+	probable_eyes_b.b = 0;
     }
 
     /* Certain cases can be handled immediately. */
@@ -1000,7 +1002,7 @@ semeai_move_value(int move, struct local_owl_data *owla,
   int color = owla->color;
   int save_verbose = verbose;
 
-  gg_assert(board[move] == EMPTY);
+  ASSERT1(board[move] == EMPTY, move);
   verbose = 0;
   if (safe_move(move, color)) {
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -2327,7 +2329,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
  * This function calls owl_determine_life() to get an eye estimate,
  * and matchpat() for vital attack moves, and decides according to
  * various policies (depth-dependant) whether the dragon should thus
- * be considered alife.
+ * be considered alive.
  */
 static int
 owl_estimate_life(struct local_owl_data *owl,
@@ -4170,7 +4172,7 @@ owl_connection_defends(int move, int target1, int target2)
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = gg_cputime();
 
-  gg_assert(board[target2] == color);
+  ASSERT1(board[target2] == color, target2);
   TRACE("owl_connection_defends %1m %1m %1m\n", move, target1, target2);
 
   if (worm[target1].unconditional_status == DEAD)
@@ -4431,20 +4433,6 @@ owl_find_lunches(struct local_owl_data *owl)
 }
 
 
-/* Returns true if and only if `pos' is a corner (1-1) point.
- */
-static int
-corner_point(int pos)
-{
-  ASSERT_ON_BOARD1(pos);
-  
-  return pos == POS(0, 0)
-	 || pos == POS(0, board_size - 1)
-	 || pos == POS(board_size - 1, 0)
-	 || pos == POS(board_size - 1, board_size - 1);
-}
-
-
 /* Try to improve the move to attack a lunch. Essentially we try to
  * avoid unsafe moves when there are less risky ways to attack.
  *
@@ -4467,7 +4455,7 @@ improve_lunch_attack(int lunch, int attack_point)
   int adj[MAXCHAIN];
 
   if (safe_move(attack_point, color)) {
-    if (countstones(lunch) == 1 && corner_point(attack_point)
+    if (countstones(lunch) == 1 && is_corner_vertex(attack_point)
 	&& chainlinks2(lunch, adj, 1) == 0) {
       for (k = 0; k < 4; k++) {
 	int apos = attack_point + delta[k];
@@ -4668,7 +4656,6 @@ int
 owl_substantial(int str)
 {
   int k;
-  int m, n;
   int libs[MAX_SUBSTANTIAL_LIBS + 1];
   int liberties = findlib(str, MAX_SUBSTANTIAL_LIBS+1, libs);
   int reading_nodes_when_called = get_reading_node_counter();
@@ -4698,10 +4685,8 @@ owl_substantial(int str)
   
   if (liberties > MAX_SUBSTANTIAL_LIBS)
     return 0;
-  
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      owl->goal[POS(m, n)] = 0;
+
+  memset(owl->goal, 0, sizeof(owl->goal));
   /* Mark the neighbors of the string. If one is found which is alive, return
    * true. */
   {
@@ -4712,10 +4697,7 @@ owl_substantial(int str)
     for (k = 0; k < adj; k++) {
       if (dragon[adjs[k]].status == ALIVE)
 	return 1;
-      for (m = 0; m < board_size; m++)
-	for (n = 0; n < board_size; n++)
-	  if (is_same_dragon(POS(m, n), adjs[k]))
-	    owl->goal[POS(m, n)] = 1;
+      mark_dragon(adjs[k], owl->goal, 1);
     }
   }
 

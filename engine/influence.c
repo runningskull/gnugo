@@ -150,7 +150,7 @@ accumulate_influence(struct influence_data *q, int pos, int color)
   float b;
   float inv_attenuation;
   float inv_diagonal_damping;
-  float (*permeability_array);
+  float *permeability_array;
 
   /* Clear the queue. Entry 0 is implicitly (m, n). */
   int queue_start = 0;

@@ -56,7 +56,6 @@ static void add_adjacent_dragons(int a, int b);
 static void add_adjacent_dragon(int a, int b);
 static int dragon_invincible(int pos);
 static int dragon_looks_inessential(int origin);
-static void mark_dragon(int pos, char mx[BOARDMAX], char mark);
 static void identify_thrashing_dragons(void);
 static void analyze_false_eye_territory(void);
 static int connected_to_eye(int pos, int str, int color, int eye_color,
@@ -249,7 +248,7 @@ make_dragons(int color, int stop_before_owl)
 	&& find_eye_dragons(black_eye[str].origin, black_eye,
 			    BLACK, &dr, 1) == 1) {
       
-      gg_assert(board[dr] == BLACK);
+      ASSERT1(board[dr] == BLACK, dr);
       TRACE("eye at %1m found for dragon at %1m--augmenting genus\n",
 	    str, dr);
       if (eye_move_urgency(&black_eye[str].value)
@@ -264,7 +263,7 @@ make_dragons(int color, int stop_before_owl)
 	&& find_eye_dragons(white_eye[str].origin, white_eye,
 			    WHITE, &dr, 1) == 1) {
       
-      gg_assert(board[dr] == WHITE);
+      ASSERT1(board[dr] == WHITE, dr);
       TRACE("eye at %1m found for dragon at %1m--augmenting genus\n",
 	    str, dr);
       if (eye_move_urgency(&white_eye[str].value)
@@ -949,8 +948,8 @@ find_neighbor_dragons()
 static void
 add_adjacent_dragons(int a, int b)
 {
-  gg_assert(a >= 0 
-	    && a < number_of_dragons && b >= 0 && b < number_of_dragons);
+  gg_assert(a >= 0 && a < number_of_dragons
+	    && b >= 0 && b < number_of_dragons);
   if (a == b)
     return;
   add_adjacent_dragon(a, b);
@@ -962,8 +961,8 @@ static void
 add_adjacent_dragon(int a, int b)
 {
   int i;
-  gg_assert(a >= 0 
-	    && a < number_of_dragons && b >= 0 && b < number_of_dragons);
+  gg_assert(a >= 0 && a < number_of_dragons
+	    && b >= 0 && b < number_of_dragons);
   /* If the array of adjacent dragons already is full, ignore
    * additional neighbors.
    */
@@ -998,7 +997,7 @@ dragon_invincible(int dr)
   int strong_eyes = 0;
   int mx[BOARDMAX];
   
-  gg_assert(IS_STONE(board[dr]));
+  ASSERT1(IS_STONE(board[dr]), dr);
 
   /* First look for invincible strings in the dragon. */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
@@ -1112,17 +1111,6 @@ get_alive_stones(int color, char safe_stones[BOARDMAX])
 }
 
 
-/* Mark the stones of a dragon. */
-static void
-mark_dragon(int pos, char mx[BOARDMAX], char mark)
-{
-  int w;
-  for (w = first_worm_in_dragon(dragon[pos].origin); w != NO_MOVE;
-       w = next_worm_in_dragon(w))
-    mark_string(w, mx, mark);
-}
-
-
 /* If the opponent's last move is a dead dragon, this is called a
  * *thrashing dragon*. We must be careful because the opponent may be
  * trying to trick us, so even though GNU Go thinks the stone is dead,
@@ -1173,7 +1161,7 @@ identify_thrashing_dragons()
 	  DEBUG(DEBUG_DRAGONS,
 		"neighbor at distance %d of thrashing dragon found at %1m\n",
 		dist + 1, DRAGON(d).origin);
-	  mark_dragon(DRAGON(d).origin, thrashing_stone, (char)(dist + 1));
+	  mark_dragon(DRAGON(d).origin, thrashing_stone, dist + 1);
 	}
       }
     }
@@ -1594,7 +1582,7 @@ dragon_eye(int pos, struct eye_data eye[BOARDMAX])
   if (eye[pos].color == BLACK_BORDER)
     color = BLACK;
   else {
-    gg_assert(eye[pos].color == WHITE_BORDER);
+    ASSERT1(eye[pos].color == WHITE_BORDER, pos);
     color = WHITE;
   }
 
@@ -1641,9 +1629,9 @@ join_dragons(int d1, int d2)
   if (d1 == d2)
     return;
   
-  gg_assert(board[d1] == board[d2]);
+  ASSERT1(board[d1] == board[d2], d1);
   gg_assert(dragon2_initialized == 0);
-  gg_assert(IS_STONE(board[d1]));
+  ASSERT1(IS_STONE(board[d1]), d1);
 
   /* We want to have the origin pointing to the largest string of
    * the dragon.  If this is not unique, we take the "upper
@@ -2124,7 +2112,7 @@ crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
   weakness_value[2] = gg_interpolate(&genus2weakness, true_genus);
 
   DEBUG(DEBUG_DRAGONS,
-	"  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f,\n",
+	"  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f\n",
 	moyo_value, weakness_value[0],
 	escape_route, weakness_value[1],
 	true_genus, weakness_value[2]);
@@ -2257,6 +2245,17 @@ are_neighbor_dragons(int d1, int d2)
 }
 
 
+/* Mark the stones of a dragon. */
+void
+mark_dragon(int pos, char mx[BOARDMAX], char mark)
+{
+  int w;
+  for (w = first_worm_in_dragon(dragon[pos].origin); w != NO_MOVE;
+       w = next_worm_in_dragon(w))
+    mark_string(w, mx, mark);
+}
+
+
 /* The following two functions allow to traverse all worms in a dragon:
  * for (ii = first_worm_in_dragon(pos); ii != NO_MOVE;
  *      ii = next_worm_in_dragon(ii);)
@@ -2273,7 +2272,7 @@ first_worm_in_dragon(int w)
 int
 next_worm_in_dragon(int w)
 {
-  gg_assert(worm[w].origin == w);
+  ASSERT1(worm[w].origin == w, w);
   return next_worm_list[w];
 }
 

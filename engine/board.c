@@ -1935,6 +1935,19 @@ is_edge_vertex(int pos)
 }
 
 
+/* Determine whether vertex is a corner. */
+int
+is_corner_vertex(int pos)
+{
+  ASSERT_ON_BOARD1(pos);
+  if ((!ON_BOARD(WEST(pos)) || !ON_BOARD(EAST(pos)))
+      && (!ON_BOARD(SOUTH(pos)) || !ON_BOARD(NORTH(pos))))
+    return 1;
+  
+  return 0;
+}
+
+
 
 /* Count the number of liberties of the string at pos. pos must not be
  * empty.
@@ -2120,7 +2133,7 @@ fastlib(int pos, int color, int ignore_captures)
       if (LIBERTY(EAST(pos)))
 	fast_liberties++;
     }
-    else if(ally2 < 0) {		/* One ally */
+    else if (ally2 < 0) {		/* One ally */
       if (LIBERTY(SOUTH(pos))
 	  && !NON_SOUTH_NEIGHBOR_OF_STRING(SOUTH(pos), ally1, color))
 	fast_liberties++;
@@ -2271,7 +2284,8 @@ fastlib_old(int pos, int color, int ignore_capture)
 }
 
 
-int fastlib(int pos, int color, int ignore_captures)
+int
+fastlib(int pos, int color, int ignore_captures)
 {
   int liberties1 = fastlib_old(pos, color, ignore_captures);
   int liberties2 = fastlib_new(pos, color, ignore_captures);

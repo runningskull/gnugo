@@ -3063,7 +3063,6 @@ o.*
 ba*
 ?OX
 
-
 ;((!o_somewhere(b) && oterri(b))
 ; || (!o_somewhere(c) && oterri(c)))
 ;&& safe_xmove(*) && !xplay_attack(*,a,*)

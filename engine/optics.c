@@ -69,7 +69,7 @@ static void guess_eye_space(int pos, int effective_eyesize, int margins,
 			    struct eye_data eye[BOARDMAX],
 			    struct eyevalue *value, int *pessimistic_min);
 static void reset_map(int size);
-static void first_map(int* map_value);
+static void first_map(int *map_value);
 static int next_map(int *q, int map[MAXEYE]);
 static void print_eye(struct eye_data eye[BOARDMAX],
 		      struct half_eye_data heye[BOARDMAX], int pos);
@@ -121,7 +121,6 @@ make_domains(struct eye_data b_eye[BOARDMAX],
 	     struct eye_data w_eye[BOARDMAX],
 	     int owl_call)
 {
-  int i, j;
   int k;
   int pos;
   int lively[BOARDMAX];
@@ -149,68 +148,69 @@ make_domains(struct eye_data b_eye[BOARDMAX],
    * each eye shape.
    */
 
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      pos = POS(i, j);
-      if (board[pos] == EMPTY || !lively[pos]) {
-	if (black_domain[pos] == 0 && white_domain[pos] == 0) {
-	  if (w_eye)
-	    w_eye[pos].color = GRAY;
-	  if (b_eye)
-	    b_eye[pos].color = GRAY;
-	}
-	else if (black_domain[pos] == 1 && white_domain[pos] == 0 && b_eye) {
-	  b_eye[pos].color = BLACK_BORDER;
-	  for (k = 0; k < 4; k++) {
-	    int apos = pos + delta[k];
-	    if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
-	      b_eye[pos].marginal = 1;
-	      break;
-	    }
-	  }
-	}
-	else if (black_domain[pos] == 0 && white_domain[pos] == 1 && w_eye) {
-	  w_eye[pos].color = WHITE_BORDER;
-	  for (k = 0; k < 4; k++) {
-	    int apos = pos + delta[k];
-	    if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
-	      w_eye[pos].marginal = 1;
-	      break;
-	    }
-	  }
-	}
-	else if (black_domain[pos] == 1 && white_domain[pos] == 1) {
-	  if (b_eye) {
-	    for (k = 0; k < 4; k++) {
-	      int apos = pos + delta[k];
-	      if (ON_BOARD(apos) && black_domain[apos]
-		  && !white_domain[apos]) {
-		b_eye[pos].marginal = 1;
-		b_eye[pos].color = BLACK_BORDER;
-		break;
-	      }
-	    }
-	    if (k == 4)
-	      b_eye[pos].color = GRAY;
-	  }
-
-	  if (w_eye) {
-	    for (k = 0; k < 4; k++) {
-	      int apos = pos + delta[k];
-	      if (ON_BOARD(apos) && white_domain[apos]
-		  && !black_domain[apos]) {
-		w_eye[pos].marginal = 1;
-		w_eye[pos].color = WHITE_BORDER;
-		break;
-	      }
-	    }
-	    if (k == 4)
-	      w_eye[pos].color = GRAY;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    
+    if (board[pos] == EMPTY || !lively[pos]) {
+      if (black_domain[pos] == 0 && white_domain[pos] == 0) {
+	if (w_eye)
+	  w_eye[pos].color = GRAY;
+	if (b_eye)
+	  b_eye[pos].color = GRAY;
+      }
+      else if (black_domain[pos] == 1 && white_domain[pos] == 0 && b_eye) {
+	b_eye[pos].color = BLACK_BORDER;
+	for (k = 0; k < 4; k++) {
+	  int apos = pos + delta[k];
+	  if (ON_BOARD(apos) && white_domain[apos] && !black_domain[apos]) {
+	    b_eye[pos].marginal = 1;
+	    break;
 	  }
 	}
       }
+      else if (black_domain[pos] == 0 && white_domain[pos] == 1 && w_eye) {
+	w_eye[pos].color = WHITE_BORDER;
+	for (k = 0; k < 4; k++) {
+	  int apos = pos + delta[k];
+	  if (ON_BOARD(apos) && black_domain[apos] && !white_domain[apos]) {
+	    w_eye[pos].marginal = 1;
+	    break;
+	  }
+	}
+      }
+      else if (black_domain[pos] == 1 && white_domain[pos] == 1) {
+	if (b_eye) {
+	  for (k = 0; k < 4; k++) {
+	    int apos = pos + delta[k];
+	    if (ON_BOARD(apos) && black_domain[apos]
+		&& !white_domain[apos]) {
+	      b_eye[pos].marginal = 1;
+	      b_eye[pos].color = BLACK_BORDER;
+	      break;
+	    }
+	  }
+	  if (k == 4)
+	    b_eye[pos].color = GRAY;
+	}
+	
+	if (w_eye) {
+	  for (k = 0; k < 4; k++) {
+	    int apos = pos + delta[k];
+	    if (ON_BOARD(apos) && white_domain[apos]
+		&& !black_domain[apos]) {
+	      w_eye[pos].marginal = 1;
+	      w_eye[pos].color = WHITE_BORDER;
+	      break;
+	    }
+	  }
+	  if (k == 4)
+	    w_eye[pos].color = GRAY;
+	}
+      }
     }
-
+  }
+  
   /* 
    * If called from make_dragons, search connection database for cutting
    * points, which may modify the eyespace in order to avoid amalgamation and
@@ -614,8 +614,8 @@ propagate_eye(int origin, struct eye_data eye[BOARDMAX])
 
 
 /* Find the dragon or dragons surrounding an eye space. Up to
-   max_dragons dragons adjacent to the eye space are added to
-   the dragon array, and the number of dragons found is returned.
+ * max_dragons dragons adjacent to the eye space are added to
+ * the dragon array, and the number of dragons found is returned.
  */
 
 int
@@ -663,6 +663,7 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
 	  int pos)
 {
   int m, n;
+  int pos2;
   int mini, maxi;
   int minj, maxj;
   int origin = eye[pos].origin;
@@ -670,35 +671,36 @@ print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
   gprintf("Eyespace at %1m: color=%C, esize=%d, msize=%d\n",
 	  pos, eye[pos].color, eye[pos].esize, eye[pos].msize);
   
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos2 = POS(m, n);
-      if (eye[pos2].origin != pos) 
-	continue;
-      
-      if (eye[pos2].marginal && IS_STONE(board[pos2]))
-	gprintf("%1m (X!)\n", pos2);
-      else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2])) {
-	if (heye[pos2].value == 3.0)
-	  gprintf("%1m (XH)\n", pos2);
-	else
-	  gprintf("%1m (XH) (topological eye value = %f)\n", pos2,
-		  heye[pos2].value);
-      }
-      else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
-	gprintf("%1m (X)\n", pos2);
-      else if (eye[pos2].marginal && board[pos2] == EMPTY)
-	gprintf("%1m (!)\n", pos2);
-      else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY) {
-	if (heye[pos2].value == 3.0)
-	  gprintf("%1m (H)\n", pos2);
-	else
-	  gprintf("%1m (H) (topological eye value = %f)\n", pos2,
-		  heye[pos2].value);
-      }
+  for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
+    if (!ON_BOARD(pos2))
+      continue;
+    
+    if (eye[pos2].origin != pos) 
+      continue;
+    
+    if (eye[pos2].marginal && IS_STONE(board[pos2]))
+      gprintf("%1m (X!)\n", pos2);
+    else if (is_halfeye(heye, pos2) && IS_STONE(board[pos2])) {
+      if (heye[pos2].value == 3.0)
+	gprintf("%1m (XH)\n", pos2);
       else
-	gprintf("%1m\n", pos2);
+	gprintf("%1m (XH) (topological eye value = %f)\n", pos2,
+		heye[pos2].value);
     }
+    else if (!eye[pos2].marginal && IS_STONE(board[pos2]))
+      gprintf("%1m (X)\n", pos2);
+    else if (eye[pos2].marginal && board[pos2] == EMPTY)
+      gprintf("%1m (!)\n", pos2);
+    else if (is_halfeye(heye, pos2) && board[pos2] == EMPTY) {
+      if (heye[pos2].value == 3.0)
+	gprintf("%1m (H)\n", pos2);
+      else
+	gprintf("%1m (H) (topological eye value = %f)\n", pos2,
+		heye[pos2].value);
+    }
+    else
+      gprintf("%1m\n", pos2);
+  }
   gprintf("\n");
   
   /* Determine the size of the eye. */
@@ -809,7 +811,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 			 struct eye_data eye[BOARDMAX],
 			 struct half_eye_data heye[BOARDMAX])
 {
-  int m, n;
+  int pos2;
   int margins = 0;
   int halfeyes = 0;
   int margins_adjacent_to_margin = 0;
@@ -820,21 +822,21 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
    */
   int interior_stones = 0;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos2 = POS(m, n);
-      if (eye[pos2].origin != pos)
-	continue;
-      if (eye[pos2].marginal || is_halfeye(heye, pos2)) {
-	margins++;
-	if (eye[pos2].marginal && eye[pos2].marginal_neighbors > 0)
-	  margins_adjacent_to_margin++;
-	if (is_halfeye(heye, pos2))
-	  halfeyes++;
-      }
-      else if (IS_STONE(board[pos2]))
-	interior_stones++;
+  for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
+    if (!ON_BOARD(pos2))
+      continue;
+    if (eye[pos2].origin != pos)
+      continue;
+    if (eye[pos2].marginal || is_halfeye(heye, pos2)) {
+      margins++;
+      if (eye[pos2].marginal && eye[pos2].marginal_neighbors > 0)
+	margins_adjacent_to_margin++;
+      if (is_halfeye(heye, pos2))
+	halfeyes++;
     }
+    else if (IS_STONE(board[pos2]))
+      interior_stones++;
+  }
 
   /* This is a measure based on the simplified assumption that both
    * players only cares about playing the marginal eye spaces. It is
@@ -905,7 +907,6 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
     int best_attack_point = NO_MOVE;
     int best_defense_point = NO_MOVE;
     float score = 0.0;
-    int pos2;
     
     for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
       if (ON_BOARD(pos2) && eye[pos2].origin == pos) {
@@ -1095,7 +1096,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	      struct half_eye_data heye[BOARDMAX], 
 	      struct vital_points *vp)
 {
-  int m, n;
+  int pos2;
   int eye_color;
   int eye_size = 0;
   int num_marginals = 0;
@@ -1123,48 +1124,49 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
     return 0;
 
   /* Create list of eye vertices */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos2 = POS(m, n);
-      if (eye[pos2].origin == pos) {
-	vpos[eye_size] = pos2;
-	marginal[eye_size] = eye[pos2].marginal;
+  for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
+    if (!ON_BOARD(pos2))
+      continue;
+    if (eye[pos2].origin == pos) {
+      vpos[eye_size] = pos2;
+      marginal[eye_size] = eye[pos2].marginal;
+      if (marginal[eye_size])
+	num_marginals++;
+      neighbors[eye_size] = eye[pos2].neighbors;
+      if (0) {
 	if (marginal[eye_size])
-	  num_marginals++;
-	neighbors[eye_size] = eye[pos2].neighbors;
-	if (0) {
-	  if (marginal[eye_size])
-	    TRACE("(%1m)", vpos[eye_size]);
-	  else
-	    TRACE(" %1m ", vpos[eye_size]);
-	  TRACE("\n");
-	}
-
-	edge[eye_size] = 0;
-	if (m == 0 || m == board_size-1)
-	  edge[eye_size]++;
-	if (n == 0 || n == board_size-1)
-	  edge[eye_size]++;
-	
-	if (is_halfeye(heye, pos2)) {
-	  neighbors[eye_size]++;      /* Increase neighbors of half eye. */
-	  eye_size++;
-	  /* Use a virtual marginal vertex for mapping purposes. We set it
-	   * to be at NO_MOVE so it won't accidentally count as a
-	   * neighbor for another vertex. Note that the half eye precedes
-	   * the virtual marginal vertex in the list.
-	   */
-	  vpos[eye_size] = NO_MOVE;
-	  marginal[eye_size] = 1;
-	  num_marginals++;
-	  edge[eye_size] = 0;
-	  neighbors[eye_size] = 1;
-	}
-
-	eye_size++;
+	  TRACE("(%1m)", vpos[eye_size]);
+	else
+	  TRACE(" %1m ", vpos[eye_size]);
+	TRACE("\n");
       }
+      
+      if (is_corner_vertex(pos2))
+	edge[eye_size] = 2;
+      else if (is_edge_vertex(pos2))
+	edge[eye_size] = 1;
+      else 
+	edge[eye_size] = 0;
+      
+      if (is_halfeye(heye, pos2)) {
+	neighbors[eye_size]++;      /* Increase neighbors of half eye. */
+	eye_size++;
+	/* Use a virtual marginal vertex for mapping purposes. We set it
+	 * to be at NO_MOVE so it won't accidentally count as a
+	 * neighbor for another vertex. Note that the half eye precedes
+	 * the virtual marginal vertex in the list.
+	 */
+	vpos[eye_size] = NO_MOVE;
+	marginal[eye_size] = 1;
+	num_marginals++;
+	edge[eye_size] = 0;
+	neighbors[eye_size] = 1;
+      }
+      
+      eye_size++;
     }
-
+  }
+  
   /* We attempt to construct a map from the graph to the eyespace
    * preserving the adjacency structure. If this can be done, we've
    * identified the eyeshape.
@@ -1565,6 +1567,52 @@ is_false_eye(struct half_eye_data heye[BOARDMAX], int pos)
 {
   return heye[pos].type == FALSE_EYE;
 }
+
+
+/* Find topological half eyes and false eyes by analyzing the
+ * diagonal intersections, as described in the Texinfo
+ * documentation (Eyes/Eye Topology).
+ */
+void
+find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
+			 struct half_eye_data heye[BOARDMAX],
+			 char find_mask[BOARDMAX])
+{
+  int eye_color = (color == WHITE ? WHITE_BORDER : BLACK_BORDER);
+  int pos;
+  float sum;
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    /* skip eyespaces which owl doesn't want to be searched */
+    if (!ON_BOARD(pos) || (find_mask && find_mask[eye[pos].origin] <= 1))
+      continue;
+    
+    /* skip every vertex which can't be a false or half eye */
+    if (eye[pos].color != eye_color
+        || eye[pos].marginal
+        || eye[pos].neighbors > 1)
+      continue;
+    
+    sum = topological_eye(pos, color, eye, heye);
+    if (sum >= 4.0) {
+      /* false eye */
+      heye[pos].type = FALSE_EYE;
+      if (eye[pos].esize == 1
+          || is_legal(pos, OTHER_COLOR(color))
+          || board[pos] == OTHER_COLOR(color))
+        add_false_eye(pos, eye, heye);
+    }
+    else if (sum > 2.0) {
+      /* half eye */
+      heye[pos].type = HALF_EYE;
+      ASSERT1(heye[pos].num_attacks > 0, pos);
+      ASSERT_ON_BOARD1(heye[pos].attack_point[0]);
+      ASSERT1(heye[pos].num_defends > 0, pos);
+      ASSERT_ON_BOARD1(heye[pos].defense_point[0]);
+    }
+  }
+}
+
 
 /* See Texinfo documentation (Eyes:Eye Topology). Returns:
  * - 2 or less if (pos) is a proper eye for (color);
@@ -2199,51 +2247,6 @@ test_eyeshape(int eyesize, int *eye_vertices)
     }
   }
   verbose = save_verbose;
-}
-
-
-/* Find topological half eyes and false eyes by analyzing the
- * diagonal intersections, as described in the Texinfo
- * documentation (Eyes/Eye Topology).
- */
-void
-find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
-			 struct half_eye_data heye[BOARDMAX],
-			 char find_mask[BOARDMAX])
-{
-  int eye_color = (color == WHITE ? WHITE_BORDER : BLACK_BORDER);
-  int pos;
-  float sum;
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    /* skip eyespaces which owl doesn't want to be searched */
-    if (!ON_BOARD(pos) || (find_mask && find_mask[eye[pos].origin] <= 1))
-      continue;
-    
-    /* skip every vertex which can't be a false or half eye */
-    if (eye[pos].color != eye_color
-        || eye[pos].marginal
-        || eye[pos].neighbors > 1)
-      continue;
-    
-    sum = topological_eye(pos, color, eye, heye);
-    if (sum >= 4.0) {
-      /* false eye */
-      heye[pos].type = FALSE_EYE;
-      if (eye[pos].esize == 1
-          || is_legal(pos, OTHER_COLOR(color))
-          || board[pos] == OTHER_COLOR(color))
-        add_false_eye(pos, eye, heye);
-    }
-    else if (sum > 2.0) {
-      /* half eye */
-      heye[pos].type = HALF_EYE;
-      ASSERT1(heye[pos].num_attacks > 0, pos);
-      ASSERT_ON_BOARD1(heye[pos].attack_point[0]);
-      ASSERT1(heye[pos].num_defends > 0, pos);
-      ASSERT_ON_BOARD1(heye[pos].defense_point[0]);
-    }
-  }
 }
 
 

@@ -107,21 +107,15 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   char mn[BOARDMAX]; /* neighbor dragons */
   int  sd[BOARDMAX]; /* distances to the goal */
   
+  if (DRAGON2(pos).hostile_neighbors == 0)
+    return(0);
+  
   memset(mf, 0, sizeof(mf));
   memset(mn, 0, sizeof(mn));
   memset(sd, 0, sizeof(sd));
   
-  /* mark dragon */
+  mark_dragon(pos, mf, 1);
 
-  for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-    if (ON_BOARD(dpos)
-	&& worm[dpos].origin == dpos
-	&& is_same_dragon(dpos, pos))
-      mark_string(dpos, mf, 1);
-  
-  if (DRAGON2(pos).hostile_neighbors == 0)
-    return(0);
-  
   /* mark hostile neighbors */
 
   for (k = 0; k < DRAGON2(pos).neighbors; k++) {
@@ -130,11 +124,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
     if (board[nd] != color) {
       if (0)
 	gprintf("neighbor: %1m\n", nd);
-      for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-	if (ON_BOARD(dpos)
-	    && worm[dpos].origin == dpos
-	    && is_same_dragon(dpos, nd))
-	  mark_string(dpos, mn, 1);
+      mark_dragon(nd, mn, 1);
     }
   }
 
@@ -193,7 +183,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
               break;
           }
       }
-  } while(found_some);
+  } while (found_some);
 
   /* prepare corner array */
 
@@ -217,10 +207,10 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 
   gg_sort(corner, corners, sizeof(int), compare_angles);
 
-  /* if apos is non NULL, mark it. */
+  /* if apos is not NO_MOVE, mark it. */
 
-  if (apos) {
-    gg_assert(ON_BOARD(apos));
+  if (apos != NO_MOVE) {
+    ASSERT_ON_BOARD1(apos);
     mn[apos] = 1;
   }
   
@@ -276,7 +266,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	    best_slope = slope;
 	  }
 	}
-    gg_assert(ON_BOARD(best_found));
+    ASSERT_ON_BOARD1(best_found);
     left_corner[left_corners] = best_found;
   }
   
@@ -308,7 +298,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	}
       }
     }
-    gg_assert(ON_BOARD(best_found));
+    ASSERT_ON_BOARD1(best_found);
     right_corner[right_corners] = best_found;
   }
   
@@ -324,9 +314,11 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   
   for (n = J(left_corner[0]); n <= J(right_corner[0]); n++)
     mn[POS(top_row, n)] = 1;
+
   for (n = J(left_corner[left_corners-1]); 
        n <= J(right_corner[right_corners-1]); n++)
     mn[POS(bottom_row, n)] = 1;
+
   for (m = top_row+1; m < bottom_row; m++) {
     int left_boundary = -1, right_boundary = -1;
     for (k = 1; k < left_corners; k++) {
@@ -346,6 +338,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	break;
       }
     }
+
     for (k = 1; k < right_corners; k++) {
       if (I(right_corner[k]) > m) {
 	float ti = I(right_corner[k-1]);
@@ -362,6 +355,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	break;
       }
     }
+
     for (n = left_boundary; n <= right_boundary; n++)
       mn[POS(m, n)] = 1;
   }
@@ -478,55 +472,37 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   /* revise the status if an ikken tobi jumps out. */
 
   if (surrounded) {
-    for (dpos = BOARDMIN; dpos < BOARDMAX && surrounded; dpos++)
-      if (ON_BOARD(dpos) && mf[dpos]) {
-	if ((ON_BOARD(NORTH(dpos)) 
-	     && board[NORTH(dpos)] == EMPTY
-	     && ON_BOARD(NORTH(NORTH(dpos)))
-	     && board[NORTH(NORTH(dpos))] == color
-	     && mn[NORTH(NORTH(dpos))] != 1
-	     && ON_BOARD(EAST(NORTH(dpos)))
-	     && board[EAST(NORTH(dpos))] != other
-	     && ON_BOARD(WEST(NORTH(dpos)))
-	     && board[WEST(NORTH(dpos))] != other)
-	    || (ON_BOARD(SOUTH(dpos))
-		&& board[SOUTH(dpos)] == EMPTY
-		&& ON_BOARD(SOUTH(SOUTH(dpos)))
-		&& board[SOUTH(SOUTH(dpos))] == color
-		&& mn[SOUTH(SOUTH(dpos))] != 1
-		&& ON_BOARD(EAST(SOUTH(dpos)))
-		&& board[EAST(SOUTH(dpos))] != other
-		&& ON_BOARD(WEST(SOUTH(dpos)))
-		&& board[WEST(SOUTH(dpos))] != other)
-	    || (ON_BOARD(EAST(dpos)) 
-		&& board[EAST(dpos)] == EMPTY
-		&& ON_BOARD(EAST(EAST(dpos)))
-		&& board[EAST(EAST(dpos))] == color
-		&& mn[EAST(EAST(dpos))] != 1
-		&& ON_BOARD(NORTH(EAST(dpos)))
-		&& board[NORTH(EAST(dpos))] != other
-		&& ON_BOARD(SOUTH(EAST(dpos)))
-		&& board[SOUTH(EAST(dpos))] != other)
-	    || (ON_BOARD(WEST(dpos)) 
-		&& board[WEST(dpos)] == EMPTY
-		&& ON_BOARD(WEST(WEST(dpos)))
-		&& board[WEST(WEST(dpos))] == color
-		&& mn[WEST(WEST(dpos))] != 1
-		&& ON_BOARD(NORTH(WEST(dpos)))
-		&& board[NORTH(WEST(dpos))] != other
-		&& ON_BOARD(SOUTH(WEST(dpos)))
-		&& board[SOUTH(WEST(dpos))] != other))
+    for (dpos = BOARDMIN; dpos < BOARDMAX && surrounded; dpos++) {
+      if (!ON_BOARD(dpos) || !mf[dpos])
+	continue;
+
+      for (k = 0; k < 4; k++) {
+	int up = delta[k];
+	int right = delta[(k + 1) % 4];
+	if (board[dpos + up] == EMPTY
+	    && board[dpos + 2*up] == color
+	    && mn[dpos + 2*up] != 1
+	    && ON_BOARD(dpos + up + right)
+	    && board[dpos + up + right] != other
+	    && ON_BOARD(dpos + up - right)
+	    && board[dpos + up - right] != other) {
 	  surrounded = 0;
+	  break;
+	}
       }
+    }
   }
+
   if (showboard == 1 || (showboard == 2 && surrounded)) {
     show_surround_map(mf, mn);
   }
+
   if (!apos && surrounded && surround_pointer < MAX_SURROUND) {
     memcpy(surroundings[surround_pointer].surround_map, mn, sizeof(mn));
     surroundings[surround_pointer].dragon_number = dragon[pos].id;
     surround_pointer++;
   }
+
   if (surround_size) {
     int pos;
 
@@ -535,6 +511,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
       if (ON_BOARD(pos) && mn[pos] == 1)
 	(*surround_size)++;
   }
+
   return surrounded;
 }
 
@@ -616,7 +593,6 @@ compare_angles(const void *a, const void *b)
     else
       return 0;
   }
-
 }
 
 

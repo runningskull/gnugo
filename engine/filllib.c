@@ -375,7 +375,7 @@ find_backfilling_move(int move, int color, int *backfill_move)
    * opponent. Save it for later use.
    */
   acode = attack(move, &apos);
-  gg_assert(acode != 0 && apos > NO_MOVE);
+  gg_assert(acode != 0 && apos != NO_MOVE);
   
   /* Find liberties. */
   liberties = findlib(move, MAXLIBS, libs);

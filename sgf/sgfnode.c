@@ -70,7 +70,7 @@ xalloc(unsigned int size)
 
   if (!pt) {
     fprintf(stderr, "xalloc: Out of memory!\n");
-    exit(2);
+    exit(EXIT_FAILURE);
   }
 
   memset(pt, 0, (unsigned long) size);
@@ -84,7 +84,7 @@ xrealloc(void *pt, unsigned int size)
 
   if (!ptnew) {
     fprintf(stderr, "xrealloc: Out of memory!\n");
-    exit(2);
+    exit(EXIT_FAILURE);
   }
   return ptnew;
 }

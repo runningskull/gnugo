@@ -1020,7 +1020,7 @@ ascii_endgame(Gameinfo *gameinfo)
       return; /* EOF or some error */
     
     for (i = 0; i < 12; i++)
-      line[i] = (isupper ((int) line[i]) ? tolower ((int) line[i]) : line[i]);
+      line[i] = tolower((int) line[i]);
     if (!strncmp(line, "done", 4))
       done = 1;
     else if (!strncmp(line, "quit", 4))
@@ -1158,7 +1158,7 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
       if (!fgets(line, 80, stdin))
         return; /* EOF or some error */
       for (i = 0; i < 80; i++)
-        line[i] = (isupper ((int) line[i]) ? tolower ((int) line[i]) : line[i]);
+        line[i] = tolower((int) line[i]);
 
       if (!strncmp(line, "undo", 4)) {
         if (!handi)
@@ -1175,8 +1175,8 @@ ascii_free_handicap(Gameinfo *gameinfo, char *handicap)
       }
       else if (!strncmp(line, "done", 4)) {
 	if (handi == 1) /* Don't bother with checks later */
-	  printf ("\nHandicap cannot be one stone. Either add "
-		  "some more, or delete the only stone.\n");
+	  printf("\nHandicap cannot be one stone. Either add "
+		 "some more, or delete the only stone.\n");
 	else
 	  break;
       }

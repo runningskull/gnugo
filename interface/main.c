@@ -28,6 +28,7 @@
 #include <ctype.h>
 
 #ifdef HAVE_UNISTD_H
+/* For isatty(). */
 #include <unistd.h>
 #else
 #include <io.h>
@@ -266,8 +267,6 @@ static struct gg_option const long_options[] =
   {NULL, 0, NULL, 0}
 };
 
-float memory = (float) DEFAULT_MEMORY;	  /* Megabytes used for hash table. */
-
 
 int
 main(int argc, char *argv[])
@@ -296,6 +295,8 @@ main(int argc, char *argv[])
   int benchmark = 0;  /* benchmarking mode (-b) */
   FILE *gtp_input_FILE, *output_check;
   int orientation = 0;
+
+  float memory = (float) DEFAULT_MEMORY; /* Megabytes used for hash table. */
 
   /* If seed is zero, GNU Go will play a different game each time. If
    * it is set using -r, GNU Go will play the same game each time.
@@ -1061,12 +1062,14 @@ main(int argc, char *argv[])
       }
       
       if (!string_to_location(board_size, decide_this, &ai, &aj)) {
-	fprintf(stderr, "usage: --decide-connection [first string]/[second string]\n");
+	fprintf(stderr,
+		"usage: --decide-connection [first string]/[second string]\n");
 	return EXIT_FAILURE;
       }
       
       if (!string_to_location(board_size, decide_that, &bi, &bj)) {
-	fprintf(stderr, "usage: --decide-connection [first string]/[second string]\n");
+	fprintf(stderr,
+		"usage: --decide-connection [first string]/[second string]\n");
 	return EXIT_FAILURE;
       }
 

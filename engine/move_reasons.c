@@ -814,7 +814,7 @@ add_connection_move(int pos, int w1, int w2)
 
   ASSERT_ON_BOARD1(w1);
   ASSERT_ON_BOARD1(w2);
-  gg_assert(worm[w1].color == worm[w2].color);
+  ASSERT1(worm[w1].color == worm[w2].color, w1);
   if (worm[w1].origin == worm[w2].origin)
     return;
   
@@ -834,7 +834,7 @@ add_cut_move(int pos, int w1, int w2)
 
   ASSERT_ON_BOARD1(w1);
   ASSERT_ON_BOARD1(w2);
-  gg_assert(worm[w1].color == worm[w2].color);
+  ASSERT1(worm[w1].color == worm[w2].color, w1);
   if (worm[w1].origin == worm[w2].origin)
     return;
   connection = find_connection(worm[w1].origin, worm[w2].origin);
@@ -1541,7 +1541,7 @@ mark_changed_string(int affected, char safe_stones[BOARDMAX],
   float new_strength;
   int ii;
 
-  gg_assert(IS_STONE(board[affected]));
+  ASSERT1(IS_STONE(board[affected]), affected);
 
   if (new_status == 0)
     new_strength = 0.0;
@@ -1577,12 +1577,8 @@ get_saved_dragons(int pos, char saved[BOARDMAX])
      * confirm_safety routines spot an attack with ko and thinks the
      * move is unsafe.
      */
-    if (move_reasons[r].type == OWL_DEFEND_MOVE) {
-      int ii;
-      for (ii = first_worm_in_dragon(what); ii != NO_MOVE;
-	   ii = next_worm_in_dragon(ii))
-	mark_string(ii, saved, 1);
-    }
+    if (move_reasons[r].type == OWL_DEFEND_MOVE)
+      mark_dragon(what, saved, 1);
   }    
 }
 

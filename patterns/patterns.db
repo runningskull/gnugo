@@ -1360,8 +1360,8 @@ O.XO?      connect under
 
 :8,C
 
-hbEg?
-ca*df
+ObEO?
+ca*dO
 .....
 -----
 
@@ -1380,8 +1380,8 @@ O.*.O
 
 :8,C
 
-eXXg?
-ea*df
+eXXO?
+ea*dO
 .b...
 -----
 
@@ -1783,13 +1783,13 @@ Pattern EC27
 
 :8,-,shape(5)
 
-?X*b
-?XOD
-..ac
+?X*O
+?XOB
+..aO
 ....
 ----
 
-; !attack(D) && oplay_attack(*,a,a)
+; !attack(B) && oplay_attack(*,a,a)
 
 
 Pattern EC28
@@ -1803,7 +1803,7 @@ o..*.
 :8,-
 
 caXO?
-cXdXO
+cXOXO
 ob.*.
 -----
 

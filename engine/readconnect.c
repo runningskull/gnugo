@@ -80,10 +80,10 @@ static int recursive_non_transitivity(int str1, int str2, int str3, int *move);
 static void order_connection_moves(int *moves, int str1, int str2,
 				   int color_to_move, const char *funcname);
 
-int nodes_connect = 0;
-int max_nodes_connect = 2000;
-int max_connect_depth = 64;
-int max_connect_depth2 = 20; /* Used by the alternate algorithm. */
+static int nodes_connect = 0;
+static int max_nodes_connect = 2000;
+static int max_connect_depth = 64;
+static int max_connect_depth2 = 20; /* Used by the alternate algorithm. */
 
 /* Used by alternate connections. */
 static char connection_shadow[BOARDMAX];
@@ -1341,7 +1341,7 @@ disconnect(int str1, int str2, int *move)
   }
 
   Moves[0] = 0;
-  moves_to_prevent_connection_in_three_moves (Moves, str1, str2);
+  moves_to_prevent_connection_in_three_moves(Moves, str1, str2);
   if (Moves[0] > 0)
     res = 0;
   order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),
@@ -1565,8 +1565,8 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
    * because the function that prevents connection in one
    * move is called at and nodes.
    */
-  moves_to_connect_in_two_moves (Moves, str1, str2);
-  moves_to_connect_in_two_moves (Moves, str2, str3);
+  moves_to_connect_in_two_moves(Moves, str1, str2);
+  moves_to_connect_in_two_moves(Moves, str2, str3);
 
   /* If there are some forced moves to prevent the capture
    * of one of the two strings, then we only look at
@@ -1608,7 +1608,7 @@ non_transitivity(int str1, int str2, int str3, int *move)
   
   nodes_connect = 0;
   *move = PASS_MOVE;
-  moves_to_prevent_connection_in_three_moves (Moves, str1, str3);
+  moves_to_prevent_connection_in_three_moves(Moves, str1, str3);
   if (Moves[0] > 0)
     res = 0;
   order_connection_moves(Moves, str1, str2, OTHER_COLOR(board[str1]),

@@ -1253,11 +1253,10 @@ defend2(int str, int *move, int komaster, int kom_pos)
   color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(IS_STONE(board[str]));
-  gg_assert(countlib(str) == 2);
+  ASSERT1(IS_STONE(board[str]), str);
+  ASSERT1(countlib(str) == 2, str);
 
   liberties = findlib(str, 2, libs);
-  ASSERT1(liberties == 2, str);
 
   if (fast_defense(str, liberties, libs, &xpos))
     RETURN_RESULT(WIN, xpos, move, "fast defense");
@@ -1488,11 +1487,10 @@ defend3(int str, int *move, int komaster, int kom_pos)
   color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(IS_STONE(board[str]));
-  gg_assert(countlib(str) == 3);
+  ASSERT1(IS_STONE(board[str]), str);
+  ASSERT1(countlib(str) == 3, str);
 
   liberties = findlib(str, 3, libs);
-  ASSERT1(liberties == 3, str);
 
   if (fast_defense(str, liberties, libs, &xpos))
     RETURN_RESULT(WIN, xpos, move, "fast defense");
@@ -1765,11 +1763,10 @@ defend4(int str, int *move, int komaster, int kom_pos)
   color = board[str];
   other = OTHER_COLOR(color);
 
-  gg_assert(IS_STONE(board[str]));
-  gg_assert(countlib(str) == 4);
+  ASSERT1(IS_STONE(board[str]), str);
+  ASSERT1(countlib(str) == 4, str);
 
   liberties = findlib(str, 4, libs);
-  ASSERT1(liberties == 4, str);
 
   if (fast_defense(str, liberties, libs, &xpos))
     RETURN_RESULT(WIN, xpos, move, "fast defense");
@@ -2227,6 +2224,51 @@ special_rescue6_moves(int str, int libs[3], struct reading_moves *moves)
     }
   }
 }
+
+/*
+ * set_up_snapback_moves() is called with (str) a string having a
+ * single liberty at (lib).
+ *
+ * This adds moves which may defend a string in atari by capturing a
+ * neighbor in a snapback. One example is this position:
+ *
+ * OOOOO
+ * OXXXO
+ * OX.OX
+ * OXOXX
+ * OX*..
+ * -----
+ *
+ * This code also finds the move * to defend the lone O stone with ko
+ * in this position:
+ *
+ * |XXXXX
+ * |XOOOX
+ * |OX.OO
+ * |.*...
+ * +-----
+ *
+ */
+
+static void
+set_up_snapback_moves(int str, int lib, struct reading_moves *moves)
+{
+  int color = board[str];
+  int other = OTHER_COLOR(color);
+  int libs2[2];
+
+  ASSERT1(countlib(str) == 1, str);
+
+  /* This can only work if our string is a single stone and the
+   * opponent is short of liberties.
+   */
+  if (stackp <= backfill_depth
+      && countstones(str) == 1
+      && approxlib(lib, other, 2, libs2) == 1
+      && !is_self_atari(libs2[0], color))
+    ADD_CANDIDATE_MOVE(libs2[0], 0, *moves);
+}
+
 
 
 /* In positions like
@@ -3396,7 +3438,7 @@ attack3(int str, int *move, int komaster, int kom_pos)
   reading_node_counter++;
   moves.num = 0;
   
-  gg_assert(IS_STONE(board[str]));
+  ASSERT1(IS_STONE(board[str]), str);
   
   if (stackp > depth)
     RETURN_RESULT(0, 0, move, "stackp > depth");
@@ -3614,7 +3656,7 @@ attack4(int str, int *move, int komaster, int kom_pos)
 
   SETUP_TRACE_INFO("attack4", str);
   
-  gg_assert(IS_STONE(board[str]));
+  ASSERT1(IS_STONE(board[str]), str);
   reading_node_counter++;
   moves.num = 0;
   
@@ -3854,7 +3896,7 @@ special_attack3_moves(int str, int libs[2], struct reading_moves *moves)
   int bpos;
   int k;
 
-  gg_assert(countlib(str) == 2);
+  ASSERT1(countlib(str) == 2, str);
 
   for (k = 0; k < 2; k++) {
     apos = libs[k];
@@ -3913,7 +3955,7 @@ special_attack4_moves(int str, int libs[2], struct reading_moves *moves)
   int elibs;
   int k, s, t;
 
-  gg_assert(countlib(str) == 2);
+  ASSERT1(countlib(str) == 2, str);
 
   /* To avoid making this too general, we require that both
    * liberties are self ataris for X.
@@ -5272,51 +5314,6 @@ tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS])
   }
 }
 
-/*
- * set_up_snapback_moves() is called with (str) a string having a
- * single liberty at (lib).
- *
- * This adds moves which may defend a string in atari by capturing a
- * neighbor in a snapback. One example is this position:
- *
- * OOOOO
- * OXXXO
- * OX.OX
- * OXOXX
- * OX*..
- * -----
- *
- * This code also finds the move * to defend the lone O stone with ko
- * in this position:
- *
- * |XXXXX
- * |XOOOX
- * |OX.OO
- * |.*...
- * +-----
- *
- */
-
-static void
-set_up_snapback_moves(int str, int lib, struct reading_moves *moves)
-{
-  int color = board[str];
-  int other = OTHER_COLOR(color);
-  int libs2[2];
-
-  ASSERT1(countlib(str) == 1, str);
-
-  /* This can only work if our string is a single stone and the
-   * opponent is short of liberties.
-   */
-  if (stackp <= backfill_depth
-      && countstones(str) == 1
-      && approxlib(lib, other, 2, libs2) == 1
-      && !is_self_atari(libs2[0], color))
-    ADD_CANDIDATE_MOVE(libs2[0], 0, *moves);
-}
-
-
 
 
 /* ================================================================ */
@@ -5614,7 +5611,7 @@ simple_ladder_defend(int str, int *move, int komaster, int kom_pos)
   reading_node_counter++;
   moves.num = 0;
   
-  gg_assert(IS_STONE(board[str]));
+  ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(countlib(str) == 1, str);
 
   /* lib will be the liberty of the string. */

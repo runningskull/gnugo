@@ -120,9 +120,9 @@ If output file is not specified, writes to stdout.\n\
 /* valid characters that can appear in a pattern
  * position in string is att value to store
  */
-const char VALID_PATTERN_CHARS[]     = ".XOxo,a!*?QY";
-const char VALID_EDGE_CHARS[]        = "+-|";
-const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPRSTUVWZ";
+static const char VALID_PATTERN_CHARS[]     = ".XOxo,a!*?QY";
+static const char VALID_EDGE_CHARS[]        = "+-|";
+static const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPRSTUVWZ";
 
 
 /* the offsets into the list are the ATT_* defined in patterns.h
@@ -139,44 +139,44 @@ const char VALID_CONSTRAINT_LABELS[] = "abcdefghijklmnpqrstuvwyzABCDEFGHIJKLMNPR
  * Modify them using `goal_elements ...' and `callback_data ..'
  * commands in a database. By default, we don't drop any elements.
  */
-int nongoal[8]		 = {0, 0, 0, 0, 0, 0, 0, 0};
-int callback_unneeded[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+static int nongoal[8]	        = {0, 0, 0, 0, 0, 0, 0, 0};
+static int callback_unneeded[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 /* stuff used in reading/parsing pattern rows */
-int maxi, maxj;                 /* (i,j) offsets of largest element */
-int mini, minj;                 /* offset of top-left element
+static int maxi, maxj;          /* (i,j) offsets of largest element */
+static int mini, minj;          /* offset of top-left element
 				   (0,0) unless there are edge constraints */
-int movei, movej;
-unsigned int where;             /* NORTH_EDGE | WEST_EDGE, etc */
-int el;                         /* next element number in current pattern */
-struct patval_b elements[MAX_BOARD*MAX_BOARD]; /* elements of current pattern */
-int num_stars;
+static int movei, movej;
+static unsigned int where;      /* NORTH_EDGE | WEST_EDGE, etc */
+static int el;                  /* next element number in current pattern */
+static struct patval_b elements[MAX_BOARD*MAX_BOARD]; /* elements of current pattern */
+static int num_stars;
 
-int ci = -1, cj = -1;           /* position of origin (first piece element)
+static int ci = -1, cj = -1;    /* position of origin (first piece element)
 				   relative to top-left */
-int patno;		        /* current pattern */
-int discard_pattern = 0;	/* Set to nonzero to discard a pattern (if e.g.
+static int patno;		/* current pattern */
+static int discard_pattern = 0;	/* Set to nonzero to discard a pattern (if e.g.
 				 * it is too large or duplicated). */
-int pats_with_constraints = 0;  /* just out of interest */
-int label_coords[256][2];       /* Coordinates for labeled stones in the 
-				   autohelper patterns. */
-int current_c_i;		/* Counter for the line number of a 
+static int pats_with_constraints = 0;  /* just out of interest */
+static int label_coords[256][2]; /* Coordinates for labeled stones in the 
+				    autohelper patterns. */
+static int current_c_i;		/* Counter for the line number of a 
 				   constraint diagram. */
-char constraint[MAXCONSTRAINT]; /* Store constraint lines. */
-char action[MAXCONSTRAINT];     /* Store action lines. */
+static char constraint[MAXCONSTRAINT]; /* Store constraint lines. */
+static char action[MAXCONSTRAINT];     /* Store action lines. */
 static char diagram[MAX_BOARD+2][MAX_BOARD+3];
 				/* store pattern diagram*/
 static char constraint_diagram[MAX_BOARD+2][MAX_BOARD+3];
 				/* store pattern constraint diagram */
 
 /* stuff to maintain info about patterns while reading */
-char *prefix;
-struct pattern pattern[MAXPATNO];  /* accumulate the patterns into here */
-char pattern_names[MAXPATNO][80];  /* with optional names here, */
-char helper_fn_names[MAXPATNO][80]; /* helper fn names here */
-char autohelper_code[MAXPATNO*300]; /* code for automatically generated */
+static char *prefix;
+static struct pattern pattern[MAXPATNO]; /* accumulate the patterns into here */
+static char pattern_names[MAXPATNO][80]; /* with optional names here, */
+static char helper_fn_names[MAXPATNO][80]; /* helper fn names here */
+static char autohelper_code[MAXPATNO*300]; /* code for automatically generated */
                                     /* helper functions here */
-char *code_pos;                     /* current position in code buffer */
+static char *code_pos;              /* current position in code buffer */
 struct autohelper_func {
   const char *name;
   int params;
@@ -192,8 +192,8 @@ struct autohelper_func {
 /*
  * current_* are useful for debugging broken patterns.
  */
-const char *current_file = 0;
-int current_line_number = 0;
+static const char *current_file = NULL;
+static int current_line_number = 0;
 
 /* ================================================================ */
 /*                                                                  */
@@ -402,27 +402,27 @@ dummyhelper(int transformation, int move, int color, int action)
 #include \"patterns.h\"\n\n\
 "
 
-int fatal_errors = 0;
+static int fatal_errors = 0;
 
 /* options */
-int verbose = 0;	/* -v */
-int database_type = 0;  /* -p (default), -c, -f, -C, -D or -T */
-int anchor = 0; 	/* Whether both O and/or X may be anchors.
-			* -b for both. -X for only X.
-			*/
+int verbose = 0;	       /* -v */
+static int database_type = 0;  /* -p (default), -c, -f, -C, -D or -T */
+static int anchor = 0; 	       /* Whether both O and/or X may be anchors.
+				* -b for both. -X for only X.
+				*/
 
-int choose_best_anchor = 0;  /* -m */
+static int choose_best_anchor = 0;  /* -m */
 /* FIXME: `fixed anchor' option doesn't work properly yet.
  *	  Probably the first thing to implement is to add
  *	  checks for anchor validity.
  */
-int fixed_anchor = 0;        /* -a */
-int pre_rotate = 0;          /* -p */
+static int fixed_anchor = 0;        /* -a */
+static int pre_rotate = 0;          /* -p */
 
-dfa_t dfa;
-dfa_patterns dfa_pats;
+static dfa_t dfa;
+static dfa_patterns dfa_pats;
 
-int transformation_hint = 0;
+static int transformation_hint = 0;
 
 /**************************
  *
@@ -1029,6 +1029,7 @@ finish_pattern(char *line)
     char class[80];
     char entry[80];
     char *p = line;
+    char *p2;
     int n;
     float v = 0.0;
     
@@ -1101,47 +1102,44 @@ finish_pattern(char *line)
       }
     }
 
-    {
-      char *p;
-      for (p = class; *p; p++) {
-	switch (*p) {
-	  case 's': pattern[patno].class |= CLASS_s; break;
-	  case 'O': pattern[patno].class |= CLASS_O; break;
-	  case 'o': pattern[patno].class |= CLASS_o; break;
-	  case 'X': pattern[patno].class |= CLASS_X; break;
-	  case 'x': pattern[patno].class |= CLASS_x; break;
-	  case 'D': pattern[patno].class |= CLASS_D; break;
-	  case 'C': pattern[patno].class |= CLASS_C; break;
-	  case 'c': pattern[patno].class |= CLASS_c; break;
-	  case 'n': pattern[patno].class |= CLASS_n; break;
-	  case 'B': pattern[patno].class |= CLASS_B; break;
-	  case 'A': pattern[patno].class |= CLASS_A; break;
-	  case 'b': pattern[patno].class |= CLASS_b; break;
-	  case 'e': pattern[patno].class |= CLASS_e; break;
-	  case 'E': pattern[patno].class |= CLASS_E; break;
-	  case 'a': pattern[patno].class |= CLASS_a; break;
-	  case 'd': pattern[patno].class |= CLASS_d; break;
-	  case 'I': pattern[patno].class |= CLASS_I; break;
-	  case 'J': pattern[patno].class |= CLASS_J; break;
-	  case 'j': pattern[patno].class |= CLASS_j; break;
-	  case 't': pattern[patno].class |= CLASS_t; break;
-	  case 'T': pattern[patno].class |= CLASS_T; break;
-	  case 'U': pattern[patno].class |= CLASS_U; break;
-	  case 'W': pattern[patno].class |= CLASS_W; break;
-	  case 'F': pattern[patno].class |= CLASS_F; break;
-	  case 'N': pattern[patno].class |= CLASS_N; break;
-	  case 'Y': pattern[patno].class |= CLASS_Y; break;
-	  case '-': break;
-	  default:
-	    if (!isgraph((int) *p))
-	      break;
-	    fprintf(stderr,
-		    "%s(%d) : error : Unknown classification letter %c. (pattern %s).\n", 
-		    current_file, current_line_number, *p,
-		    pattern_names[patno]);
-	    fatal_errors++;
+    for (p2 = class; *p2; p2++) {
+      switch (*p2) {
+	case 's': pattern[patno].class |= CLASS_s; break;
+	case 'O': pattern[patno].class |= CLASS_O; break;
+	case 'o': pattern[patno].class |= CLASS_o; break;
+	case 'X': pattern[patno].class |= CLASS_X; break;
+	case 'x': pattern[patno].class |= CLASS_x; break;
+	case 'D': pattern[patno].class |= CLASS_D; break;
+	case 'C': pattern[patno].class |= CLASS_C; break;
+	case 'c': pattern[patno].class |= CLASS_c; break;
+	case 'n': pattern[patno].class |= CLASS_n; break;
+	case 'B': pattern[patno].class |= CLASS_B; break;
+	case 'A': pattern[patno].class |= CLASS_A; break;
+	case 'b': pattern[patno].class |= CLASS_b; break;
+	case 'e': pattern[patno].class |= CLASS_e; break;
+	case 'E': pattern[patno].class |= CLASS_E; break;
+	case 'a': pattern[patno].class |= CLASS_a; break;
+	case 'd': pattern[patno].class |= CLASS_d; break;
+	case 'I': pattern[patno].class |= CLASS_I; break;
+	case 'J': pattern[patno].class |= CLASS_J; break;
+	case 'j': pattern[patno].class |= CLASS_j; break;
+	case 't': pattern[patno].class |= CLASS_t; break;
+	case 'T': pattern[patno].class |= CLASS_T; break;
+	case 'U': pattern[patno].class |= CLASS_U; break;
+	case 'W': pattern[patno].class |= CLASS_W; break;
+	case 'F': pattern[patno].class |= CLASS_F; break;
+	case 'N': pattern[patno].class |= CLASS_N; break;
+	case 'Y': pattern[patno].class |= CLASS_Y; break;
+	case '-': break;
+	default:
+	  if (!isgraph((int) *p2))
 	    break;
-	}
+	  fprintf(stderr,
+		  "%s(%d) : error : Unknown classification letter %c. (pattern %s).\n", 
+		  current_file, current_line_number, *p2,
+		  pattern_names[patno]);
+	  fatal_errors++;
+	  break;
       }
     }
   }
@@ -1255,7 +1253,7 @@ generate_autohelper_code(int funcno, int number_of_params, int *labels)
 {
   int i;
   char varnames[MAXPARAMS][8];
-  char pattern[MAXLINE];
+  char pattern_id[MAXLINE];
 
   for (i = 0; i < number_of_params; i++) {
     if (labels[i] == (int) '*')
@@ -1325,24 +1323,24 @@ generate_autohelper_code(int funcno, int number_of_params, int *labels)
     /* A very special case. We add the address of the current pattern
      * before the actual parameters. So far, used only by `value'.
      */
-    sprintf(pattern, "(%s + %d)", prefix, patno);
+    sprintf(pattern_id, "(%s + %d)", prefix, patno);
 
     switch (number_of_params) {
     case 0:
       code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
-			  pattern);
+			  pattern_id);
       break;
     case 1:
       code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
-			  pattern, varnames[0]);
+			  pattern_id, varnames[0]);
       break;
     case 2:
       code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
-			  pattern, varnames[0], varnames[1]);
+			  pattern_id, varnames[0], varnames[1]);
       break;
     case 3:
       code_pos += sprintf(code_pos, autohelper_functions[funcno].code,
-			  pattern, varnames[0], varnames[1], varnames[2]);
+			  pattern_id, varnames[0], varnames[1], varnames[2]);
       break;
     default:
       fprintf(stderr, "%s(%d) : error : unknown number of parameters (pattern %s)",
@@ -2250,9 +2248,9 @@ corner_init(void)
  * quickly as possible (based on num_stones field value). The latter
  * can still be improved if a need arises.
  */
-static int corner_best_element(struct corner_element *el, int n,
-			       struct corner_variation_b *variations,
-			       int color)
+static int
+corner_best_element(struct corner_element *el, int n,
+		    struct corner_variation_b *variations, int color)
 {
   int k;
   int i;
@@ -2940,7 +2938,7 @@ main(int argc, char *argv[])
       /* Remove trailing white space from `line' */
       {
 	int i = strlen(line) - 2;  /* Start removing backwards just before newline */
-	while (i >= 0 && isspace(line[i]))
+	while (i >= 0 && isspace((int) line[i]))
 	  i--;
 	line[i+1] = '\n';
 	line[i+2] = '\0';

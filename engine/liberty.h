@@ -167,8 +167,9 @@ int extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors);
 extern int position_number;
 
 
-/* Detect vertex on edge. */
+/* Detect vertex on edge or corner. */
 int is_edge_vertex(int pos);
+int is_corner_vertex(int pos);
 
 
 /* Count and/or find liberties at (pos). */
@@ -402,6 +403,7 @@ float crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
 			    float moyo_value, float escape_route);
 int is_same_dragon(int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
+void mark_dragon(int pos, char mx[BOARDMAX], char mark);
 int first_worm_in_dragon(int w);
 int next_worm_in_dragon(int w);
 int lively_dragon_exists(int color);

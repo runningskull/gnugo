@@ -57,7 +57,7 @@ int pfd_b[2];
 #define TELL_ORACLE(x, args...) do { \
               if (debug & DEBUG_ORACLE_STREAM) fprintf(stderr, x, ##args);  \
                 if (fprintf(to_gnugo_stream, x, ##args) < 0) \
-                   error ("can't write command in to_gnugo_stream"); \
+                   error("can't write command in to_gnugo_stream"); \
                 fflush(to_gnugo_stream); \
               } while (0)
 
@@ -224,7 +224,7 @@ tell_oracle(const char *fmt, ...)
   va_start(ap, fmt);
   if (debug & DEBUG_ORACLE_STREAM) fprintf(stderr, fmt, ap);
   if (fprintf(to_gnugo_stream, fmt, ap) < 0)
-    error ("can't write command in to_gnugo_stream");
+    error("can't write command in to_gnugo_stream");
   fflush(to_gnugo_stream);
   va_end(ap);
 }

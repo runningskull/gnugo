@@ -113,7 +113,7 @@ make_worms(void)
       int lib1, lib2, lib3, lib4;
       
       ping_cave(pos, &lib1, &lib2, &lib3, &lib4);
-      gg_assert(worm[pos].liberties == lib1);
+      ASSERT1(worm[pos].liberties == lib1, pos);
       worm[pos].liberties2 = lib2;
       worm[pos].liberties3 = lib3;
       worm[pos].liberties4 = lib4;
@@ -636,7 +636,7 @@ do_compute_effective_worm_sizes(int color, int (*cw)[MAX_CLOSE_WORMS],
 		break;
 	      }
 	    if (!already_counted) {
-	      gg_assert(nworms[pos] < 2*(board_size-1));
+	      ASSERT1(nworms[pos] < 2*(board_size-1), pos);
 	      worms[pos][nworms[pos]] = worms[pos2][k];
 	      nworms[pos]++;
 	    }
@@ -1178,8 +1178,8 @@ change_tactical_point(int str, int move, int code,
 		      int points[MAX_TACTICAL_POINTS],
 		      int codes[MAX_TACTICAL_POINTS])
 {
-  gg_assert(ON_BOARD(str));
-  gg_assert(str == worm[str].origin);
+  ASSERT_ON_BOARD1(str);
+  ASSERT1(str == worm[str].origin, str);
   
   movelist_change_point(move, code, MAX_TACTICAL_POINTS, points, codes);
   propagate_worm2(str);
