@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- added more robust handling of .dtr files
+- removed option to build pre-rotated DFAs
 - unconditional_status in struct worm_data changed to enum dragon_status
 - final_status in the aftermath code changed to use enum dragon_status
 - enum dragon_status extended with BLACK_TERRITORY, WHITE_TERRITORY,

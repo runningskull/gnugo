@@ -886,11 +886,10 @@ dump_dfa_board(int m, int n)
 #endif
 
 
-/* 
- * Scan the board with a dfa to get 
- * all patterns matching at (m, n) with transformation l.
- * Store patterns indexes + transformation in pat_list.
- * Return the number of patterns found.
+/*
+ * Scan the board with a DFA to get all patterns matching at
+ * `dfa_pos' with transformation l.  Store patterns indexes
+ * `pat_list'.  Return the number of patterns found.
  */
 static int
 scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos, int *pat_list)
@@ -898,8 +897,8 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos, int *pat_list)
   int delta;
   int state = 1; /* initial state */
   int row = 0; /* initial row */
-  int id = 0; /* position in id_list */ 
-  
+  int id = 0; /* position in id_list */
+
   do {
     /* collect patterns indexes */
     int att = pdfa->states[state].att;
@@ -908,7 +907,7 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos, int *pat_list)
       id++;
       att = pdfa->indexes[att].next;
     }
-      
+
     /* go to next state */
     delta = pdfa->states[state].next[dfa_pos[spiral[row][l]]];
     state += delta;
@@ -920,51 +919,49 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int *dfa_pos, int *pat_list)
 }
 
 
-/* Perform pattern matching with dfa filtering. */
-static void 
+/* Perform pattern matching with DFA filtering. */
+static void
 do_dfa_matchpat(dfa_rt_t *pdfa,
 		int anchor, matchpat_callback_fn_ptr callback,
 		int color, struct pattern *database,
 		void *callback_data, char goal[BOARDMAX],
-                int anchor_in_goal)
+		int anchor_in_goal)
 {
-  int k = 0;
+  int k;
   int ll;      /* Iterate over transformations (rotations or reflections)  */
-  int patterns[DFA_MAX_MATCHED];
-  int *ll_patterns = patterns;
+  int patterns[DFA_MAX_MATCHED + 8];
   int num_matched = 0;
-  int num_transformations = (pdfa->pre_rotated ? 1 : 8);
-  int transformation_end[8];
   int *dfa_pos = dfa_p + DFA_POS(I(anchor), J(anchor)) + DFA_OFFSET;
 
   /* Basic sanity checks. */
   ASSERT_ON_BOARD1(anchor);
 
   /* One scan by transformation */
-  for (ll = 0; ll < num_transformations; ll++) {
-    int ll_matched = scan_for_patterns(pdfa, ll, dfa_pos,
-				       patterns + num_matched);
-    
-    ll_patterns += ll_matched;
-    num_matched += ll_matched;
-    transformation_end[ll] = num_matched;
+  for (ll = 0; ll < 8; ll++) {
+    num_matched += scan_for_patterns(pdfa, ll, dfa_pos,
+				     patterns + num_matched);
+    patterns[num_matched++] = -1;
   }
 
-  ASSERT1(num_matched <= DFA_MAX_MATCHED, anchor);
+  ASSERT1(num_matched <= DFA_MAX_MATCHED + 8, anchor);
 
   /* Constraints and other tests. */
-  for (ll = 0; ll < num_transformations; ll++) {
-    while (k < transformation_end[ll]) {
-      int matched = patterns[k];
+  for (ll = 0, k = 0; ll < 8; k++) {
+    int matched;
+
+    if (patterns[k] == -1) {
+      ll++;
+      continue;
+    }
+
+    matched = patterns[k];
 
 #if PROFILE_PATTERNS
-      database[matched].dfa_hits++;
+    database[matched].dfa_hits++;
 #endif
-    
-      check_pattern_light(anchor, callback, color, database + matched,
-			  ll, callback_data, goal, anchor_in_goal);
-      k++;
-    }
+
+    check_pattern_light(anchor, callback, color, database + matched,
+			ll, callback_data, goal, anchor_in_goal);
   }
 }
 

@@ -79,8 +79,7 @@ typedef struct dfa
 {
   /* file header */
   char name[80];
-  int pre_rotated;
-  
+
   /* transition graph */
   state_t *states;
   int max_states;
@@ -114,8 +113,7 @@ typedef struct dfa_rt
 {
   /* file header */
   const char name[80];
-  const int pre_rotated;
-  
+
   /* transition graph */
   const state_rt_t *states;
 

@@ -48,26 +48,25 @@ Usage : mkpat [options] <prefix>\n\
   General options:\n\
 	-i = one or more input files (typically *.db)\n\
 	-o = output file (typically *.c)\n\
-	-t = dfa transformations file (typically *.dtr)\n\
+	-t = DFA transformations file (typically *.dtr)\n\
 	-v = verbose\n\
-	-V <level> = dfa verbiage level\n\
+	-V <level> = DFA verbiage level\n\
   Database type:\n\
 	-p = compile general pattern database (the default)\n\
 	-c = compile connections database\n\
 	-f = compile a fullboard pattern database\n\
 	-C = compile a corner pattern database\n\
-	-D = compile a dfa database (allows fast matching)\n\
+	-D = compile a DFA database (allows fast matching)\n\
 	-T = compile a tree based pattern database (even faster)\n\
-	-d <iterations> = don't generate database, but optimize a dfa\n\
+	-d <iterations> = don't generate database, but optimize a DFA\n\
 			  transformation file instead\n\
   Pattern generation options:\n\
 	-O = allow only O to be anchor (the default)\n\
 	-X = allow only X to be anchor\n\
 	-b = allow both colors to be anchor\n\
 	-m = try to place the anchor in the center of the pattern\n\
-	     (works best with dfa databases)\n\
+	     (works best with DFA databases)\n\
 	-a = require anchor in all patterns. Sets fixed_anchor flag in db\n\
-	-r = pre-rotate patterns before storing in database (dfa only)\n\
 If no input files specified, reads from stdin.\n\
 If output file is not specified, writes to stdout.\n\
 "
@@ -106,13 +105,14 @@ If output file is not specified, writes to stdout.\n\
 #define ANCHOR_X    ATT_X
 #define ANCHOR_BOTH (ATT_O | ATT_X)
 
-#define MAXLINE 500
-#define MAXCONSTRAINT 10000
-#define MAXACTION 10000
-#define MAXPATNO 5000
-#define MAXLABELS 20
-#define MAXPARAMS 15
-#define MAX_INPUT_FILE_NAMES 10
+#define MAXLINE			500
+#define MAXCONSTRAINT		10000
+#define MAXACTION		10000
+#define MAXPATNO		5000
+#define MAXLABELS		20
+#define MAXPARAMS		15
+#define MAX_INPUT_FILE_NAMES	10
+#define MAXNAME			80
 
 /* Avoid compiler warnings with unused parameters */
 #define UNUSED(x)  (void)x
@@ -172,10 +172,10 @@ static char constraint_diagram[MAX_BOARD+2][MAX_BOARD+3];
 /* stuff to maintain info about patterns while reading */
 static char *prefix;
 static struct pattern pattern[MAXPATNO]; /* accumulate the patterns into here */
-static char pattern_names[MAXPATNO][80]; /* with optional names here, */
-static char helper_fn_names[MAXPATNO][80]; /* helper fn names here */
+static char pattern_names[MAXPATNO][MAXNAME]; /* with optional names here, */
+static char helper_fn_names[MAXPATNO][MAXNAME]; /* helper fn names here */
 static char autohelper_code[MAXPATNO*300]; /* code for automatically generated */
-                                    /* helper functions here */
+					   /* helper functions here */
 static char *code_pos;              /* current position in code buffer */
 struct autohelper_func {
   const char *name;
@@ -194,6 +194,7 @@ struct autohelper_func {
  */
 static const char *current_file = NULL;
 static int current_line_number = 0;
+
 
 /* ================================================================ */
 /*                                                                  */
@@ -423,12 +424,58 @@ static int choose_best_anchor = 0;  /* -m */
  *	  checks for anchor validity.
  */
 static int fixed_anchor = 0;        /* -a */
-static int pre_rotate = 0;          /* -p */
 
 static dfa_t dfa;
 static dfa_patterns dfa_pats;
 
-static int transformation_hint = 0;
+static int transformation_hint;
+
+
+struct hint_data {
+  char		    name[MAXNAME];
+  int		    transformation_hint;
+  struct hint_data  *next;
+};
+
+static struct hint_data *first_hint = NULL;
+
+
+static void
+parse_transformations_file(FILE *file)
+{
+  struct hint_data **link = &first_hint;
+
+  while (!feof(file)) {
+    int n;
+    struct hint_data *hint = malloc(sizeof(struct hint_data));
+
+    n = fscanf(file, "%s %d", hint->name, &hint->transformation_hint);
+    if (n == 2) {
+      hint->next = NULL;
+      *link = hint;
+      link = &hint->next;
+    }
+    else
+      free(hint);
+  }
+}
+
+
+static int
+find_transformation_hint(const char *pattern_name)
+{
+  struct hint_data *hint;
+
+  if (database_type == DB_DFA || database_type == OPTIMIZE_DFA) {
+    for (hint = first_hint; hint; hint = hint->next) {
+      if (!strcmp(hint->name, pattern_name))
+	return hint->transformation_hint;
+    }
+  }
+
+  return database_type == OPTIMIZE_DFA ? -1 : 0;
+}
+
 
 /**************************
  *
@@ -566,16 +613,12 @@ static void
 write_to_dfa(int index)
 {
   char str[MAX_ORDER + 1], strrot[MAX_ORDER + 1];
-  float ratio;
-  int ll;
-  int rot_start = 0;
-  int rot_stop = 1;
-  
+
   assert(ci != -1 && cj != -1);
 #if 0
   pattern[index].patn = elements; /* a little modification : keep in touch! */
 #endif
-  pattern[index].name = &(pattern_names[index][0]); 
+  pattern[index].name = &(pattern_names[index][0]);
 
   /* First we create the string from the actual pattern. */
   pattern_2_string(pattern + index, elements, str, ci, cj);
@@ -583,47 +626,45 @@ write_to_dfa(int index)
   if (verbose)
     fprintf(stderr, "Add   :%s\n", pattern[index].name);
 
-  if (pre_rotate || database_type == OPTIMIZE_DFA) {
-    if (pattern[index].trfno != 5)
-      rot_stop = pattern[index].trfno;
-    else {
+  if (database_type == DB_DFA) {
+    float ratio;
+
+    dfa_rotate_string(strrot, str, transformation_hint);
+    ratio = ((dfa_add_string(&dfa, strrot, index, transformation_hint) - 1.0)
+	     * 100);
+
+    /* Complain when there is more than 10% of increase */
+    if (dfa_size(&dfa) > 100 && ratio > 10.0) {
+      fprintf(stderr, "Pattern %s => %3.1f%% increase: ",
+	      pattern[index].name, ratio);
+      fprintf(stderr, "another orientation may save memory.\n");
+    }
+    if (dfa_verbose > 2)
+      dump_dfa(stderr, &dfa);
+  }
+  else {
+    int ll;
+    int rot_start = 0;
+    int rot_stop = pattern[index].trfno;
+
+    assert(database_type == OPTIMIZE_DFA);
+
+    if (rot_stop == 5) {
       rot_start = 2;
       rot_stop = 6;
     }
-  }
-  else {
-    rot_start = transformation_hint;
-    rot_stop = transformation_hint + 1;
-  }
 
-  for (ll = rot_start; ll < rot_stop; ll++) {
-    /* Create appropriate transformation of `str'. */
-    dfa_rotate_string(strrot, str, ll);
-
-    if (database_type != OPTIMIZE_DFA) {
-      /* Then We add this string to the DFA */
-      ratio = (dfa_add_string(&dfa, strrot, index, ll) - 1)*100;
-
-      /* Complain when there is more than 10% of increase */ 
-      if (dfa_size(&dfa) > 100 && ratio > 10.0) {
-	fprintf(stderr, "Pattern %s => %3.1f%% increase: ",
-		pattern[index].name, ratio);
-	fprintf(stderr, "another orientation may save memory.\n");
-      }
-      if (dfa_verbose > 2)
-	dump_dfa(stderr, &dfa);
-    }
-    else
+    for (ll = rot_start; ll < rot_stop; ll++) {
+      dfa_rotate_string(strrot, str, ll);
       dfa_patterns_add_pattern(&dfa_pats, strrot, index);
-  }
+    }
 
-  if (database_type == OPTIMIZE_DFA) {
     if (transformation_hint == -1)
       dfa_patterns_select_shortest_variation(&dfa_pats);
-    else if (pattern[index].trfno != 5)
-      dfa_patterns_set_last_pattern_variation(&dfa_pats, transformation_hint);
-    else
-      dfa_patterns_set_last_pattern_variation(&dfa_pats, transformation_hint - 2);
+    else {
+      dfa_patterns_set_last_pattern_variation(&dfa_pats, (transformation_hint
+							  - rot_start));
+    }
   }
 }
 
@@ -659,6 +700,7 @@ compute_grids(void)
       TRANSFORM2(elements[k].x - ci, elements[k].y - cj, &ti, &tj,
 		 transformation_hint);
       TRANSFORM2(ti, tj, &di, &dj, ll);
+
       ++di;
       ++dj;
       if (di >= 0 && di < 4 && dj >= 0 && dj < 4) {
@@ -1207,8 +1249,6 @@ finish_pattern(char *line)
 	      "%s(%d) : Warning : symmetry inconsistent with edge constraints (pattern %s)\n",
 	      current_file, current_line_number, pattern_names[patno]);
     pattern[patno].trfno = 5;  /* Ugly special convention. */
-    if (database_type == DB_DFA)
-      transformation_hint += 2;
     break;
 
   default:
@@ -2605,16 +2645,6 @@ write_patterns(FILE *outfile)
      * the pattern, relative to the pattern origin. These just transform same
      * as the elements.
      */
-    if (transformation_hint == 1 || transformation_hint == 3
-	|| transformation_hint == 4 || transformation_hint == 6) {
-      int temp = p->mini;
-      p->mini = p->minj;
-      p->minj = temp;
-      temp = p->maxi;
-      p->maxi = p->maxj;
-      p->maxj = temp;
-    }
-    
     fprintf(outfile, "  {%s%d,%d,%d, \"%s\",%d,%d,%d,%d,%d,%d,0x%x,%d",
 	    prefix, j,
 	    p->patlen,
@@ -2751,7 +2781,7 @@ main(int argc, char *argv[])
     int multiple_anchor_options = 0;
 
     /* Parse command-line options */
-    while ((i = gg_getopt(argc, argv, "i:o:t:vV:pcfCDTd:OXbmar")) != EOF) {
+    while ((i = gg_getopt(argc, argv, "i:o:t:vV:pcfCDTd:A:OXbma")) != EOF) {
       switch (i) {
       case 'i': 
 	if (input_files == MAX_INPUT_FILE_NAMES) {
@@ -2780,8 +2810,13 @@ main(int argc, char *argv[])
 	  return 1;
 	}
 	database_type = i;
-	if (i == 'd')
+	if (i == 'd') {
 	  iterations = strtol(gg_optarg, NULL, 10);
+	  if (iterations < 0) {
+	    fprintf(stderr, "Error : Expected a non-negative number of iterations\n");
+	    return 1;
+	  }
+	}
 
 #if EXPERIMENTAL_READING == 0
 	if (i == 'T') {
@@ -2808,18 +2843,16 @@ main(int argc, char *argv[])
 	anchor = ANCHOR_BOTH;
 	break;
 
-      case 'm': 
-        choose_best_anchor = 1;
-        if (fixed_anchor)
-          fprintf(stderr, "Warning : -m and -a are mutually exclusive.\n");
+      case 'm':
+	choose_best_anchor = 1;
+	if (fixed_anchor)
+	  fprintf(stderr, "Warning : -m and -a are mutually exclusive.\n");
 	break;
-      case 'a': 
-        fixed_anchor = 1; 
-        if (choose_best_anchor)
-          fprintf(stderr, "Warning : -m and -a are mutually exclusive.\n");
-        break;
-
-      case 'r': pre_rotate = 1; break;
+      case 'a':
+	fixed_anchor = 1;
+	if (choose_best_anchor)
+	  fprintf(stderr, "Warning : -m and -a are mutually exclusive.\n");
+	break;
 
       default:
 	fprintf(stderr, "\b ; ignored\n");
@@ -2843,7 +2876,11 @@ main(int argc, char *argv[])
     if (transformations_file_name
 	&& (database_type == DB_DFA || database_type == OPTIMIZE_DFA)) {
       transformations_FILE = fopen(transformations_file_name, "r");
-      if (transformations_FILE == NULL && database_type == DB_DFA) {
+      if (transformations_FILE) {
+	parse_transformations_file(transformations_FILE);
+	fclose(transformations_FILE);
+      }
+      else if (database_type == DB_DFA) {
 	fprintf(stderr, "Error : Cannot read file %s\n",
 		transformations_file_name);
 	return 1;
@@ -2864,7 +2901,6 @@ main(int argc, char *argv[])
   if (database_type == DB_DFA) {
     dfa_init();
     new_dfa(&dfa, "mkpat's dfa");
-    dfa.pre_rotated = pre_rotate;
   }
 
   if (database_type == DB_CORNER)
@@ -2909,9 +2945,6 @@ main(int argc, char *argv[])
 
   for (ifc = 0; ifc < input_files && !fatal_errors; ifc++) {
     char line[MAXLINE];  /* current line from file */
-    int have_pending_name = 0;
-    char pending_name[MAXLINE];
-    int pending_transformation;
 
     if (input_file_names[ifc] != stdin_name) {
       input_FILE = fopen(input_file_names[ifc], "r");
@@ -2993,30 +3026,14 @@ main(int argc, char *argv[])
 	    code_pos = save_code_pos;
 	  reset_pattern();
 
-	  if (strlen(command_data) > 79) {
+	  if (strlen(command_data) > MAXNAME - 1) {
 	    fprintf(stderr, "%s(%d) : Warning : pattern name is too long, truncated\n",
 		    current_file, current_line_number);
-	    command_data[79] = 0;
+	    command_data[MAXNAME - 1] = 0;
 	  }
 	  strcpy(pattern_names[patno], command_data);
 
-	  /* Special case. Choose shortest transformation later. */
-	  if (database_type == OPTIMIZE_DFA)
-	    transformation_hint = -1;
-
-	  if (transformations_FILE) {
-	    if (!have_pending_name && !feof(transformations_FILE)) {
-	      fscanf(transformations_FILE, "%s %d", pending_name,
-		     &pending_transformation);
-	      have_pending_name = 1;
-	    }
-
-	    transformation_hint = 0;
-	    if (have_pending_name && !strcmp(pending_name, command_data)) {
-	      transformation_hint = pending_transformation;
-	      have_pending_name = 0;
-	    }
-	  }
+	  transformation_hint = find_transformation_hint(pattern_names[patno]);
 
 	  state = 1;
 	  discard_pattern = 0;
@@ -3222,13 +3239,10 @@ main(int argc, char *argv[])
       dfa_finalize(&dfa);
       dfa_shuffle(&dfa);
 
-      fprintf(stderr, "dfa for %s\n", prefix);
+      fprintf(stderr, "DFA for %s\n", prefix);
       fprintf(stderr, "size: %d kB for ", dfa_size(&dfa));
       fprintf(stderr, "%d patterns", patno);
-      fprintf(stderr, "(%d states)\n", dfa.last_state);
-
-      if (0 && dfa.pre_rotated)
-	dump_dfa(stderr, &dfa);
+      fprintf(stderr, " (%d states)\n", dfa.last_state);
 
       strcpy(dfa.name, prefix);
       print_c_dfa(output_FILE, prefix, &dfa);
@@ -3266,8 +3280,6 @@ main(int argc, char *argv[])
     int k;
     int *optimized_variations;
 
-    if (transformations_FILE)
-      fclose(transformations_FILE);
     transformations_FILE = fopen(transformations_file_name, "wb");
     if (transformations_FILE == NULL) {
       fprintf(stderr, "error : cannot write to file %s\n",
@@ -3295,4 +3307,3 @@ main(int argc, char *argv[])
  * c-basic-offset: 2
  * End:
  */
-

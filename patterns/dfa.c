@@ -576,11 +576,9 @@ print_c_dfa(FILE *of, const char *name, dfa_t *pdfa)
 
   fprintf(of, "static dfa_rt_t dfa_%s = {\n", name);
   fprintf(of, " \"%s\",\n", name);
-  fprintf(of, " %d,\n", pdfa->pre_rotated);
   fprintf(of, "state_%s,\n", name);
   fprintf(of, "idx_%s", name);
   fprintf(of, "};\n");
-
 }
 
 
@@ -1057,9 +1055,6 @@ dfa_add_string(dfa_t *pdfa, const char *str, int pattern_index, int ll)
   assert(dfa_was_initialized > 0);
   assert(pdfa != NULL);
 
-  if (pdfa->pre_rotated)
-    pattern_index = pattern_index * 8 + ll;
-
   create_dfa(&aux_temp, str, pattern_index);
 
   /* then we do the synchronization product with dfa */
@@ -1285,12 +1280,12 @@ pattern_2_string(struct pattern *pat, struct patval_b *elements,
 
 
 /**************************************
- *	Experimental dfa builder      *
+ *	Experimental DFA builder      *
  **************************************/
 
 /* This builder differs from the one above in that it builds the whole dfa
  * at once. That is, it must have all the patterns to build and cannot add
- * pattern by pattern. Currently, it is only used in dfa size optimization
+ * pattern by pattern. Currently, it is only used in DFA size optimization
  * (it seems to be significantly faster).
  */
 
@@ -1359,7 +1354,7 @@ dfa_attrib_array_clear(dfa_attrib_array *array)
 }
 
 
-/* Allocate a new dfa_node structure in a dfa graph. */
+/* Allocate a new dfa_node structure in a DFA graph. */
 static dfa_node *
 dfa_node_new(dfa_graph *graph)
 {
@@ -1382,7 +1377,7 @@ dfa_node_new(dfa_graph *graph)
 }
 
 
-/* This is a hash table used to quickly find a dfa node using a linked list
+/* This is a hash table used to quickly find a DFA node using a linked list
  * of its attributes as a key.
  */
 static dfa_hash_entry *dfa_hash_table[DFA_HASH_TABLE_SIZE];
@@ -1490,7 +1485,7 @@ dfa_hash_add_node(dfa_node *node)
 }
 
 
-/* Dfa iterator. Used to walk the array of nodes in backward direction. */
+/* DFA iterator. Used to walk the array of nodes in backward direction. */
 static dfa_node_block *dfa_iterator_block;
 static int dfa_iterator_node_num;
 
@@ -1545,7 +1540,7 @@ dfa_graph_reset(dfa_graph *graph)
 }
 
 
-/* Free all resources associated with the specified dfa graph. */
+/* Free all resources associated with the specified DFA graph. */
 static void
 dfa_graph_clear(dfa_graph *graph)
 {
@@ -1634,7 +1629,7 @@ dfa_graph_build_level(dfa_graph *graph, char **strings, int level,
       else {
 	/* If the string ends at this level, add its index to the list of
 	 * matched strings of the current node. Not used at the moment,
-	 * since this builder isn't used for actual dfa building.
+	 * since this builder isn't used for actual DFA building.
 	 */
 	*link = dfa_attrib_new(&(graph->attributes), index);
 	link = &((*link)->next);
@@ -1676,9 +1671,9 @@ dfa_graph_build_level(dfa_graph *graph, char **strings, int level,
 
 	dfa_hash_add_node(new_node);
       }
- 
+
       /* At this moment we convert the masks to actual transitions. These are
-       * also unused till we use this builder for actual dfa creation.
+       * also unused till we use this builder for actual DFA creation.
        */
       for (i = 0; i < 4; i++) {
 	if (mask[k] & (1 << i))
@@ -1688,7 +1683,7 @@ dfa_graph_build_level(dfa_graph *graph, char **strings, int level,
   }
 
   /* Free the lists of passing strings for the previous level. Useful if we
-   * building an exceptionally huge dfa (e.g. a pre-rotated one).
+   * building an exceptionally huge DFA.
    */
   dfa_attrib_array_partially_clear(cutoff_point);
 
@@ -1809,7 +1804,7 @@ dfa_patterns_add_pattern(dfa_patterns *patterns, const char *string, int index)
 }
 
 
-/* Set the variation of the last pattern. Can be used in actual dfa building
+/* Set the variation of the last pattern. Can be used in actual DFA building
  * or to set a hint (results of the previous optimization) for optimization.
  */
 void
@@ -1823,7 +1818,7 @@ dfa_patterns_set_last_pattern_variation(dfa_patterns *patterns, int variation)
 
 
 /* Make the shortest variation of the last pattern its current variation. It
- * is used as a starting point in dfa optimization process.
+ * is used as a starting point in DFA optimization process.
  */
 void
 dfa_patterns_select_shortest_variation(dfa_patterns *patterns)
@@ -1846,7 +1841,7 @@ dfa_patterns_select_shortest_variation(dfa_patterns *patterns)
 }
 
 
-/* Build a dfa graph for a list of patterns. */
+/* Build a DFA graph for a list of patterns. */
 void
 dfa_patterns_build_graph(dfa_patterns *patterns)
 {
@@ -1889,7 +1884,7 @@ dfa_patterns_build_graph(dfa_patterns *patterns)
 }
 
 
-/* dfa_patterns_optimize_variations() tries to reduce the size of dfa by
+/* dfa_patterns_optimize_variations() tries to reduce the size of DFA by
  * altering pattern variations (in fact, transformations). The algorithm
  * is to change several patterns' variations and if this happens to give
  * size reduction, to keep the change, otherwise, revert.
@@ -1923,7 +1918,7 @@ dfa_patterns_optimize_variations(dfa_patterns *patterns, int iterations)
   num_nodes_original = patterns->graph.num_nodes;
   min_nodes_so_far = num_nodes_original;
 
-  fprintf(stderr, "Original number of dfa states: %d\n", min_nodes_so_far - 1);
+  fprintf(stderr, "Original number of DFA states: %d\n", min_nodes_so_far - 1);
   fprintf(stderr, "Trying to optimize in %d iterations\n", iterations);
 
   gg_srand(num_nodes_original + patterns->num_patterns);
@@ -1934,7 +1929,7 @@ dfa_patterns_optimize_variations(dfa_patterns *patterns, int iterations)
     
     /* Randomly change some variations. */
     for (pattern = patterns->patterns; pattern; pattern = pattern->next, k++) {
-      if (gg_drand() < change_probability && pattern->num_variations != 1) {
+      if (gg_drand() < change_probability && pattern->num_variations > 1) {
 	int new_variation = gg_rand() % (pattern->num_variations - 1);
 	if (new_variation >= pattern->current_variation)
 	  new_variation++;
