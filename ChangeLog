@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- normalize apos, bpos in do_owl_analyze_semeai
 - find_cuts() called from make_dragons() instead of make_domains()
 - new function compute_new_dragons() and new static function
   join_new_dragons() in dragon.c

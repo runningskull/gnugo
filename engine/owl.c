@@ -576,6 +576,9 @@ do_owl_analyze_semeai(int apos, int bpos,
   ASSERT1(board[apos] == owla->color, apos);
   ASSERT1(board[bpos] == owlb->color, bpos);
 
+  apos = find_origin(apos);
+  bpos = find_origin(bpos);
+
   if (stackp <= semeai_branch_depth && (hashflags & HASH_SEMEAI)
       && !pass && owl_phase
       && tt_get(&ttable, SEMEAI, apos, bpos, depth - stackp, NULL,
