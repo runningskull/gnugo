@@ -336,6 +336,15 @@ Pattern 426
 #
 
 Pattern 431
+# Must be matched before 432.
+
+*X
+X.
+
+:2,1
+
+
+Pattern 432
 
 xx
 xx
@@ -343,7 +352,7 @@ xx
 :1,1
 
 
-Pattern 432
+Pattern 433
 
 @x
 xx
@@ -351,7 +360,7 @@ xx
 :1,0
 
 
-Pattern 433
+Pattern 434
 
 !@
 .x
@@ -464,10 +473,10 @@ Pattern 504
 
 Pattern 505
 # Bent four in the corner. The attack depends on ko and sufficiently
-# few outer liberties.
+# few outer liberties if the corner vertex is empty.
 
 |.
-|.*X.
+|x*X.
 +---
 
 :2,1
@@ -490,7 +499,7 @@ Pattern 507
 
 |.
 |*
-|.X.
+|xX.
 +---
 
 :2,1
@@ -542,7 +551,7 @@ Pattern 512
 # pattern because there is no '*' or '@'.
 
 |.X>
-|* X
+|< X
 +---
 
 :2,1
@@ -553,6 +562,42 @@ Pattern 513
 |XXX
 |. .
 +---
+
+:1,1
+
+
+Pattern 514
+
+|.X
+| X*.
++----
+
+:2,1
+
+
+Pattern 515
+
+|.X
+| *X.
++----
+
+:2,1
+
+
+Pattern 516
+
+|.*
+| XX.
++----
+
+:2,1
+
+
+Pattern 517
+
+|.X
+| XX.
++----
 
 :1,1
 
@@ -841,8 +886,8 @@ x*x
 
 Pattern 562
 
-XX
-.XX
+Xx
+xXX
 
 :2,2
 
@@ -885,22 +930,6 @@ xx
 x.!
  
 :1,1
-
-
-# FIXME PRE3.0: Pattern 
-#
-# !X
-# !XX
-
-
-# Pattern 568
-# # gf This eyespace is no different from 569 and should be a certain eye
-# #    unless there's a shortage of liberties. Removed. (3.1.11)
-# 
-# !@
-# .>x
-# 
-# :1,0
 
 
 Pattern 569
@@ -1023,7 +1052,7 @@ xX!
 # Topology: ......
 #
 
-Pattern 600
+Pattern 6000
 # Bent four in the corner.
 
 |.
@@ -1034,7 +1063,7 @@ Pattern 600
 :2,1
 
 
-Pattern 601
+Pattern 6001
 # Bent four in the corner.
 
 |.
@@ -1044,7 +1073,7 @@ Pattern 601
 :2,1
 
 
-Pattern 602
+Pattern 6002
 # Bent four in the corner.
 
  !
@@ -1055,7 +1084,7 @@ Pattern 602
 :1,1
 
 
-Pattern 603
+Pattern 6003
 # Special corner shape
 
 |*X.
@@ -1065,98 +1094,98 @@ Pattern 603
 :2,1
 
 
-Pattern 604
+Pattern 6004
 
 xxxxxx
 
 :2,2
 
 
-Pattern 605
+Pattern 6005
 
 !....x
 
 :2,2
 
 
-Pattern 606
+Pattern 6006
 
 @..xXx
 
 :2,1
 
 
-Pattern 607
+Pattern 6007
 
 @.XX>.
 
 :2,1
 
 
-Pattern 608
+Pattern 6008
 
 !..X.X
 
 :2,2
 
 
-Pattern 609
+Pattern 6009
 
 !.X...
 
 :2,2
 
 
-Pattern 610
+Pattern 6010
 
 !.XxxX
 
 :2,2
 
 
-Pattern 611
+Pattern 6011
 
 @.XxX.
 
 :2,1
 
 
-Pattern 612
+Pattern 6012
 
 @X.xxx
 
 :2,1
 
 
-Pattern 613
+Pattern 6013
 
 @Xx.xx
 
 :2,1
 
 
-Pattern 614
+Pattern 6014
 
 @Xxx.x
 
 :2,1
 
 
-Pattern 615
+Pattern 6015
 
 @XXXXx
 
 :2,0
 
 
-Pattern 616
+Pattern 6016
 
 !.xx.!
 
 :1,1
 
 
-Pattern 617
+Pattern 6017
 
 (.@x.x
 
@@ -1167,21 +1196,21 @@ Pattern 617
 #                points.
 
 
-Pattern 618
+Pattern 6018
 
 @XX>X!
 
 :1,0
 
 
-Pattern 619
+Pattern 6019
 
 @XXX.!
 
 :1,0
 
 
-Pattern 620
+Pattern 6020
 
 .@.).!
 
@@ -1192,7 +1221,7 @@ Pattern 620
 # Topology: .....
 #
 
-Pattern 621
+Pattern 6101
 
  x
 x*xx)
@@ -1200,8 +1229,8 @@ x*xx)
 :2,1
 
 
-Pattern 622
-# must be matched before 623
+Pattern 6102
+# must be matched before 6103
 
  X
 XX*X@
@@ -1209,7 +1238,7 @@ XX*X@
 :2,1
 
 
-Pattern 623
+Pattern 6103
 
  x
 x*>x@
@@ -1217,7 +1246,7 @@ x*>x@
 :2,1
 
 
-Pattern 624
+Pattern 6104
 
  x
 xXx.!
@@ -1225,7 +1254,7 @@ xXx.!
 :1,1
 
 
-Pattern 625
+Pattern 6105
 
  !
 x*x.!
@@ -1237,7 +1266,7 @@ x*x.!
 # Topology: .....
 #
 
-Pattern 631
+Pattern 6201
 
   x
 x*X.!
@@ -1245,7 +1274,7 @@ x*X.!
 :2,1
 
 
-Pattern 632
+Pattern 6202
 
   x
 xX*.!
@@ -1253,7 +1282,7 @@ xX*.!
 :2,1
 
 
-Pattern 633
+Pattern 6203
 
   x
 .XX.!
@@ -1261,7 +1290,7 @@ Pattern 633
 :1,1
 
 
-Pattern 634
+Pattern 6204
 
   x
 !x*x!
@@ -1269,7 +1298,7 @@ Pattern 634
 :2,1
 
 
-Pattern 635
+Pattern 6205
 
   !
 !x..!
@@ -1278,7 +1307,7 @@ Pattern 635
 :0,0
 
 
-Pattern 636
+Pattern 6206
 
   !
 @x*.!
@@ -1290,7 +1319,23 @@ Pattern 636
 # Topology: ....
 #
 
-Pattern 641
+Pattern 6301
+
+ xx
+XXXX
+
+:2,2
+
+
+Pattern 6302
+
+ *x
+XXX.
+
+:2,1
+
+
+Pattern 6303
 
  xx
 xXXx
@@ -1298,7 +1343,7 @@ xXXx
 :1,1
 
 
-Pattern 642
+Pattern 6304
 
  xx
 x*Xx
@@ -1306,7 +1351,7 @@ x*Xx
 :2,1
 
 
-Pattern 643
+Pattern 6305
 
  xx
 !.*x
@@ -1314,7 +1359,7 @@ Pattern 643
 :2,1
 
 
-Pattern 644
+Pattern 6306
 
  XX
 !*XX
@@ -1322,7 +1367,7 @@ Pattern 644
 :2,1
 
 
-Pattern 645
+Pattern 6307
 
  !!
 !.*.
@@ -1330,7 +1375,7 @@ Pattern 645
 :1,0
 
 
-Pattern 646
+Pattern 6308
 
  .@
 !..!
@@ -1338,7 +1383,7 @@ Pattern 646
 :1,0
 
 
-Pattern 647
+Pattern 6309
 
  !! 
 !xx!
@@ -1349,16 +1394,43 @@ Pattern 647
 # Topology: ....
 #
 
-Pattern 650
+Pattern 6400
 
 |.x
-|.X*.
+|xX*.
 +----
 
 :2,1
 
 
-Pattern 651
+Pattern 6401
+
+|XX
+|<XX>
++----
+
+:2,1
+
+
+Pattern 6402
+
+|.x
+|X.*.
++----
+
+:2,1
+
+
+Pattern 6403
+
+|.X
+|x.*.
++----
+
+:2,1
+
+
+Pattern 6404
 # Not possible to do better than bent four in the corner.
 
 |..
@@ -1368,7 +1440,27 @@ Pattern 651
 :1,1
 
 
-Pattern 652
+Pattern 6405
+# Nothing to do.
+
+|.X
+|..X.
++----
+
+:1,1
+
+
+Pattern 6406
+# Nothing to do.
+
+|.x
+|X.X.
++----
+
+:1,1
+
+
+Pattern 6410
 
 xX
 X*X.
@@ -1376,7 +1468,31 @@ X*X.
 :2,1
 
 
-Pattern 653
+Pattern 6411
+
+.*
+xXX.
+
+:2,1
+
+
+Pattern 6412
+
+XX
+*XX>
+
+:2,1
+
+
+Pattern 6413
+
+X*
+XXX.
+
+:2,1
+
+
+Pattern 6414
 
 xX
 XXX.
@@ -1384,15 +1500,15 @@ XXX.
 :1,1
 
 
-Pattern 654
+Pattern 6415
 
-.X
-xXX.
+xX
+XX*.
 
-:1,1
+:2,1
 
 
-Pattern 655
+Pattern 6416
 # Certain instances of this pattern are 1,1 on the edge.
 
 .x
@@ -1401,8 +1517,8 @@ x*x!
 :2,1
 
 
-Pattern 656
-# This pattern must be matched before 653.
+Pattern 6417
+# This pattern must be matched before 6418.
 
 XX
 X*x!
@@ -1410,7 +1526,7 @@ X*x!
 :2,1
 
 
-Pattern 657
+Pattern 6418
 
 Xx
 x.x!
@@ -1418,7 +1534,7 @@ x.x!
 :1,1
 
 
-Pattern 658
+Pattern 6419
 
 xx
 xX.!
@@ -1426,7 +1542,7 @@ xX.!
 :1,1
 
 
-Pattern 659
+Pattern 6420
 
 .x
 xXX@
@@ -1434,7 +1550,7 @@ xXX@
 :1,0
 
 
-Pattern 660
+Pattern 6421
 
 @X
 xXX.
@@ -1446,7 +1562,43 @@ xXX.
 # Topology: ...
 #
 
-Pattern 661
+Pattern 6501
+
+>XX
+X<X
+---
+
+:2,1
+
+
+Pattern 6502
+
+.*.
+..X
+---
+
+:2,1
+
+
+Pattern 6503
+
+.x.
+X.X
+---
+
+:1,1
+
+
+Pattern 6504
+
+.X.
+x.X
+---
+
+:1,1
+
+
+Pattern 6511
 
 xXx
 x*x
@@ -1454,7 +1606,7 @@ x*x
 :2,1
 
 
-Pattern 662
+Pattern 6512
 
 XX*
 .XX
@@ -1462,7 +1614,7 @@ XX*
 :2,1
 
 
-Pattern 663
+Pattern 6513
 
 xXx
 xXx
@@ -1474,7 +1626,7 @@ xXx
 # Topology: ...
 #
 
-Pattern 671
+Pattern 6601
 # FIXME PRE/POST3.0: Do all patterns of this type.
 
  ...
@@ -1483,7 +1635,7 @@ Pattern 671
 :2,2
 
 
-Pattern 672
+Pattern 6602
 
  *Xx
 .XX
@@ -1491,7 +1643,7 @@ Pattern 672
 :2,1
 
 
-Pattern 673
+Pattern 6603
 
  X*X
 .XX
@@ -1499,7 +1651,15 @@ Pattern 673
 :2,1
 
 
-Pattern 674
+Pattern 6604
+
+ X*.
+xXX
+
+:2,1
+
+
+Pattern 6605
 
  XXx
 .XX
@@ -1507,7 +1667,7 @@ Pattern 674
 :1,1
 
 
-Pattern 675
+Pattern 6606
 
  x*x
 !.x
@@ -1515,7 +1675,7 @@ Pattern 675
 :2,1
 
 
-Pattern 676
+Pattern 6607
 
  xXx
 !.x
@@ -1526,7 +1686,34 @@ Pattern 676
 # Topology: ....
 #            .
 
-Pattern 681
+Pattern 6701
+
+ x
+xX*.
+ x
+
+:2,1
+
+
+Pattern 6702
+
+ x
+x*X.
+ x
+
+:2,1
+
+
+Pattern 6703
+
+ x
+xXX.
+ x
+
+:1,1
+
+
+Pattern 6704
 
  x
 x*x)
@@ -1539,7 +1726,7 @@ x*x)
 # Topology: ....
 #             .
 
-Pattern 682
+Pattern 6801
 
  x
 xX*!
@@ -1553,8 +1740,8 @@ xX*!
 #            .
 
 
-Pattern 683
-# This pattern must be matched before 684.
+Pattern 6901
+# This pattern must be matched before 6902.
 
 XX
 X.X
@@ -1563,7 +1750,7 @@ X.X
 :2,2
 
 
-Pattern 684
+Pattern 6902
 
 xx
 x*x
@@ -1572,36 +1759,23 @@ x*x
 :2,1
 
 
-Pattern 685
-# This pattern must be matched before 686.
+Pattern 6903
+# This pattern must be matched before 6904.
 
-XX
+Xx
 *Xx
  x
 
 :2,1
 
 
-Pattern 686
+Pattern 6904
 
 xx
 xXx
  x
 
 :1,1
-
-
-#
-# Trivially dead patterns
-#
-
-Pattern 691
-
- !
-!.!
-.!
-
-:0,0
 
 
 ###############################
@@ -1612,7 +1786,7 @@ Pattern 691
 # Topology: .......
 #
 
-Pattern 700
+Pattern 7000
 # There is some ko potential here.
 
  .
@@ -1624,7 +1798,7 @@ Pattern 700
 :2,1
 
 
-Pattern 701
+Pattern 7001
 
 @..>..@
 
@@ -1635,7 +1809,7 @@ Pattern 701
 # Topology: ......
 #
 
-Pattern 702
+Pattern 7010
 
  x
 !*xxx!
@@ -1643,7 +1817,7 @@ Pattern 702
 :2,1
 
 
-Pattern 703
+Pattern 7011
 
  )
 )*x..x
@@ -1655,7 +1829,7 @@ Pattern 703
 # Topology: ......
 #
 
-Pattern 710
+Pattern 7020
 
   !
 @.>XxX
@@ -1663,7 +1837,7 @@ Pattern 710
 :2,1
 
 
-Pattern 711
+Pattern 7021
 # Defending the other marginal vertex is sometimes incorrect,
 # see regression/games/owl27.sgf.
 
@@ -1673,7 +1847,7 @@ Pattern 711
 :2,1
 
 
-Pattern 712
+Pattern 7022
 # Defending the other marginal vertex is always incorrect.
 
   !
@@ -1682,7 +1856,7 @@ Pattern 712
 :2,1
 
 
-Pattern 713
+Pattern 7023
 
   . @|
 !...x|
@@ -1691,7 +1865,7 @@ Pattern 713
 :2,1
 
 
-Pattern 714
+Pattern 7024
 
   x
 !x*xx!
@@ -1699,7 +1873,7 @@ Pattern 714
 :2,1
 
 
-Pattern 715
+Pattern 7025
 
   )
 ..>..@
@@ -1707,7 +1881,7 @@ Pattern 715
 :2,1
 
 
-Pattern 716
+Pattern 7026
 
   !
 !..x.!
@@ -1719,7 +1893,7 @@ Pattern 716
 # Topology: ....
 #
 
-Pattern 720
+Pattern 7040
 
 ---
 X.X
@@ -1728,7 +1902,7 @@ X.X
 :1,1
 
 
-Pattern 721
+Pattern 7041
 
 ---
 X.X
@@ -1737,7 +1911,7 @@ X.X
 :2,1
 
 
-Pattern 722
+Pattern 7042
 
 ----
 X.X.
@@ -1746,7 +1920,7 @@ X.X.
 :1,1
 
 
-Pattern 723
+Pattern 7043
 
 ----
 X.X.
@@ -1755,7 +1929,7 @@ xX.
 :1,1
 
 
-Pattern 724
+Pattern 7044
 
 ----
 X.*.
@@ -1764,7 +1938,7 @@ X.*.
 :2,1
 
 
-Pattern 725
+Pattern 7045
 
 ----
 X.*.
@@ -1773,7 +1947,7 @@ xX.
 :2,1
 
 
-Pattern 726
+Pattern 7046
 
 ----
 *.X.
@@ -1782,7 +1956,7 @@ Pattern 726
 :2,1
 
 
-Pattern 727
+Pattern 7047
 
 ----
 *.X.
@@ -1791,7 +1965,7 @@ xX.
 :2,1
 
 
-Pattern 728
+Pattern 7048
 
 ----
 X.X.
@@ -1800,7 +1974,7 @@ X.X.
 :2,1
 
 
-Pattern 729
+Pattern 7049
 
 ----
 X.X.
@@ -1809,7 +1983,7 @@ x*.
 :2,1
 
 
-Pattern 730
+Pattern 7050
 
 x.x
 x..@
@@ -1817,7 +1991,7 @@ x..@
 :2,1
 
 
-Pattern 731
+Pattern 7051
 
 .xx
 x*.!
@@ -1829,7 +2003,7 @@ x*.!
 # Topology: .....
 #
 
-Pattern 740
+Pattern 7070
 
  ..
 .X*.!
@@ -1837,7 +2011,7 @@ Pattern 740
 :2,1
 
 
-Pattern 741
+Pattern 7071
 
  xx
 .*x.!
@@ -1845,7 +2019,7 @@ Pattern 741
 :2,1
 
 
-Pattern 742
+Pattern 7072
 
  Xx
 .Xx.!
@@ -1853,7 +2027,7 @@ Pattern 742
 :1,1
 
 
-Pattern 743
+Pattern 7073
 
  xx
 !.x.!
@@ -1866,7 +2040,7 @@ Pattern 743
 #
 
 
-Pattern 750
+Pattern 7080
 
  . !
 !*..!
@@ -1878,7 +2052,7 @@ Pattern 750
 # Topology:   .
 #           .....
 
-Pattern 751
+Pattern 7090
 
   @
   .
@@ -1887,7 +2061,7 @@ x...@
 :2,1
 
 
-Pattern 752
+Pattern 7091
 
   !
   .
@@ -1900,7 +2074,7 @@ Pattern 752
 # Topology: ....
 #
 
-Pattern 753
+Pattern 7100
 
 |.
 |X
@@ -1911,7 +2085,7 @@ Pattern 753
 :2,1
 
 
-Pattern 754
+Pattern 7101
 
 |.
 |*
@@ -1922,7 +2096,18 @@ Pattern 754
 :2,1
 
 
-Pattern 755
+Pattern 7102
+
+|.
+|*
+|XX
+|x.!
++---
+
+:2,1
+
+
+Pattern 7103
 
 |.
 |X
@@ -1933,7 +2118,7 @@ Pattern 755
 :1,1
 
 
-Pattern 756
+Pattern 7104
 
   xXx
 @..x
@@ -1941,7 +2126,7 @@ Pattern 756
 :2,1
 
 
-Pattern 757
+Pattern 7105
 
   x.!
 !.xx
@@ -1953,7 +2138,7 @@ Pattern 757
 # Topology:  ..
 #           ....
 
-Pattern 760
+Pattern 7120
 
  !
  .x
@@ -1966,7 +2151,7 @@ Pattern 760
 # Topology: .....
 #            .
 
-Pattern 761
+Pattern 7140
 
  x
 x*X.!
@@ -1975,7 +2160,7 @@ x*X.!
 :2,1
 
 
-Pattern 762
+Pattern 7141
 
  x
 x*.x@
@@ -1984,16 +2169,11 @@ x*.x@
 :2,1
 
 
-# ..!
-# !.!
-#  ! 
-
-
 #           ..
 # Topology: .....
 #
 
-Pattern 763
+Pattern 7150
 # Bent four in the corner
 
 |..
@@ -2003,8 +2183,8 @@ Pattern 763
 :2,1
 
 
-Pattern 764
-# This pattern must be matched before 765.
+Pattern 7151
+# This pattern must be matched before 7152.
 
 XX
 X.x.!
@@ -2012,7 +2192,7 @@ X.x.!
 :2,2
 
 
-Pattern 765
+Pattern 7152
 
 Xx
 x*x.@
@@ -2024,41 +2204,359 @@ x*x.@
 # Topology: ...
 #           ...
 
-Pattern 770
+Pattern 7170
 # Big nakade.
- .
+ x
 .X.
 .*.
 
 :2,1
 
 
-Pattern 771
+Pattern 7171
+# Big nakade.
+ .
+.X.
+.*X
+
+:2,1
+
+
+Pattern 7172
 # Big nakade.
 
  x
 x*x
-.X.
+xX.
 
 :2,1
 
 
-Pattern 772
+Pattern 7173
+# X here may give ko.
+
+ .
+X.X
+x*.
+
+:2,1
+
+
+Pattern 7174
+# O here gives ko.
+
+ x
+X*X
+xX.
+
+:2,1
+
+
+Pattern 7175
 # Big nakade.
 
  x
 XXx
-.*.
+x*.
 
 :2,1
 
 
-Pattern 773
+Pattern 7176
+# Big nakade.
+
+ x
+XXx
+.*x
+
+:2,1
+
+
+Pattern 7177
+# Big nakade.
+
+ x
+XX*
+.XX
+
+:2,1
+
+
+Pattern 7178
+# Big nakade.
+
+ X
+xX*
+.XX
+
+:2,1
+
+
+Pattern 7179
 # Big nakade.
 
  x
 xXx
 .X.
+
+:1,1
+
+
+Pattern 7180
+# Big nakade.
+
+ .
+xX.
+xX.
+
+:1,1
+
+
+Pattern 7181
+# Big nakade.
+
+ x
+xX.
+.X.
+
+:1,1
+
+
+Pattern 7182
+# Big nakade.
+
+ x
+XXX
+xX.
+
+:1,1
+
+
+Pattern 7183
+# Big nakade.
+
+ x
+XXx
+XX.
+
+:1,1
+
+
+#            .
+# Topology: ...
+#            ...
+
+Pattern 7200
+
+ x
+x*X
+ XX.
+
+:2,1
+
+
+Pattern 7201
+
+ x
+xXX
+ X*.
+
+:2,1
+
+
+Pattern 7202
+
+ x
+xX*
+ XX.
+
+:2,1
+
+
+Pattern 7203
+
+ x
+xXX
+ XX.
+
+:1,1
+
+
+#           ..
+# Topology: ....
+#            .
+
+Pattern 7220
+
+xX
+XX*.
+ x
+
+:2,1
+
+
+Pattern 7221
+# O here may give ko.
+
+xX
+X*X.
+ x
+
+:2,1
+
+
+Pattern 7222
+# X here gives ko.
+
+.*
+X.X.
+ x
+
+:2,1
+
+
+Pattern 7223
+# X here gives ko.
+
+.X
+*.X.
+ x
+
+:2,1
+
+
+Pattern 7224
+# X here gives ko.
+
+.X
+X.*.
+ x
+
+:2,1
+
+
+Pattern 7225
+
+xX
+*XX.
+ x
+
+:2,1
+
+
+Pattern 7226
+
+xX
+XXX.
+ x
+
+:1,1
+
+
+#            ..
+# Topology: ....
+#            .
+
+Pattern 7240
+
+ Xx
+x*X.
+ x
+
+:2,1
+
+
+Pattern 7241
+
+ Xx
+xX*.
+ x
+
+:2,1
+
+
+Pattern 7242
+
+ *x
+xXX.
+ x
+
+:2,1
+
+
+Pattern 7243
+
+ Xx
+xXX.
+ x
+
+:1,1
+
+
+#           ..
+# Topology: ...
+#            ..
+
+Pattern 7260
+
+.*
+xXx
+ X.
+
+:2,1
+
+
+Pattern 7261
+# This must be matched before 7262 and 7263.
+
+.X
+x.X
+ X.
+
+:1,1
+
+
+Pattern 7262
+
+.X
+x*x
+ X.
+
+:2,1
+
+
+Pattern 7263
+
+.x
+x*X
+ Xx
+
+:2,1
+
+
+Pattern 7264
+
+.x
+xX*
+ Xx
+
+:2,1
+
+
+Pattern 7360
+
+.X
+xXx
+ X.
+
+:1,1
+
+
+Pattern 7361
+
+.x
+xXX
+ Xx
 
 :1,1
 
@@ -2071,7 +2569,7 @@ xXx
 # Topology: ........
 #
 
-Pattern 800
+Pattern 8000
 # Bent four in the corner, some ko potential
 
  !
@@ -2087,7 +2585,7 @@ Pattern 800
 # Topology:  ....
 #
 
-Pattern 801
+Pattern 8001
 
 !...
  ...!
@@ -2099,7 +2597,7 @@ Pattern 801
 # Topology:   .
 #           ......
 
-Pattern 802
+Pattern 8002
 
   ! 
   . 
@@ -2108,7 +2606,7 @@ Pattern 802
 :2,1
 
 
-Pattern 803
+Pattern 8003
 
   !
   .
@@ -2117,7 +2615,7 @@ Pattern 803
 :2,1
 
 
-Pattern 804
+Pattern 8004
 
   !
   .
@@ -2126,7 +2624,7 @@ Pattern 804
 :2,1
 
 
-Pattern 805
+Pattern 8005
 
   !
   .
@@ -2139,7 +2637,7 @@ Pattern 805
 # Topology: ......
 #
 
-Pattern 806
+Pattern 8006
 
   ..
 @.>>.@
@@ -2147,7 +2645,7 @@ Pattern 806
 :2,1
 
 
-Pattern 807
+Pattern 8007
 
   ..
 !.X*.!
@@ -2161,7 +2659,7 @@ Pattern 807
 #
 
 
-Pattern 808
+Pattern 8008
 
  xx
 !.*x.!
@@ -2173,7 +2671,7 @@ Pattern 808
 # Topology:  .....
 #
 
-Pattern 809
+Pattern 8009
 
  !
 |.
@@ -2185,7 +2683,7 @@ Pattern 809
 :2,1
 
 
-Pattern 810
+Pattern 8010
 
 !.x
  x.x.@
@@ -2193,7 +2691,7 @@ Pattern 810
 :2,1
 
 
-Pattern 811
+Pattern 8011
 # in some cases this could become seki
 
 !.x
@@ -2206,7 +2704,7 @@ Pattern 811
 # Topology: .......
 #
 
-Pattern 821
+Pattern 8021
 
    !
 (..*..(
@@ -2218,7 +2716,7 @@ Pattern 821
 # Topology: ....
 #
 
-Pattern 830
+Pattern 8030
 
 |.
 |*
@@ -2229,7 +2727,7 @@ Pattern 830
 :2,1
 
 
-Pattern 831
+Pattern 8031
 
 |.
 |X
@@ -2245,7 +2743,7 @@ Pattern 831
 ###############################
 
 
-Pattern 901
+Pattern 9001
 
 @.>..
   ...!
@@ -2253,7 +2751,7 @@ Pattern 901
 :2,1
 
 
-Pattern 902
+Pattern 9002
 
   ! .
 !...*.!
@@ -2261,7 +2759,7 @@ Pattern 902
 :2,1
 
 
-Pattern 903
+Pattern 9003
 
   !
   .
@@ -2271,7 +2769,7 @@ Pattern 903
 :2,1
 
 
-Pattern 904
+Pattern 9004
 
  !
  ..
@@ -2280,7 +2778,7 @@ Pattern 904
 :2,1
 
 
-Pattern 905
+Pattern 9005
 
  .....!
 !..
@@ -2296,7 +2794,7 @@ Pattern 905
 # :2,1
 
  
-Pattern 906
+Pattern 9006
 
  !
 |.
@@ -2314,7 +2812,7 @@ Pattern 906
 ###############################
 
 
-Pattern 1001
+Pattern 10001
 
  !
  .
@@ -2326,7 +2824,7 @@ xX.
 :2,1
 
 
-Pattern 1002
+Pattern 10002
 
    !
  ! .
@@ -2336,7 +2834,7 @@ Pattern 1002
 :2,1
 
 
-Pattern 1003
+Pattern 10003
 
 
   !
@@ -2347,7 +2845,7 @@ Pattern 1003
 :2,1
 
 
-Pattern 1004
+Pattern 10004
 
    !
   ..
@@ -2357,7 +2855,7 @@ Pattern 1004
 :2,1
 
 
-Pattern 1005
+Pattern 10005
 
   !
 @..
