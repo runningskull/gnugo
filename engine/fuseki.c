@@ -299,12 +299,15 @@ search_fuseki_database(int color)
   if (num_fuseki_moves == 0)
     return 0;
 
-  /* Choose randomly with respect to relative weights for matched moves. */
-  /* Do not choose moves with less value than 20% of the best move */
+  /* Choose randomly with respect to relative weights for matched moves.
+   * Do not choose moves with less value than 20% of the best move
+   * if there are more than two moves on board.
+   */
   best_fuseki_value = fuseki_value[0];
   q = gg_rand() % fuseki_total_value;
   for (k = 0; k < num_fuseki_moves; k++) {
-    if (fuseki_value[k] < (best_fuseki_value / 5))
+    if (stones_on_board(BLACK | WHITE) > 2
+	&& fuseki_value[k] < (best_fuseki_value / 5))
       break;
     q -= fuseki_value[k];
     if (q < 0)
