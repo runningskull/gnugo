@@ -2878,7 +2878,8 @@ redistribute_points(void)
  * for the best move.
  */
 static int
-find_best_move(int *the_move, float *val, int color)
+find_best_move(int *the_move, float *val, int color,
+	       int allowed_moves[BOARDMAX])
 {
   int good_move_found = 0;
   int ko_values_have_been_added = 0;
@@ -2896,8 +2897,10 @@ find_best_move(int *the_move, float *val, int color)
     /* Search through all board positions for the highest valued move. */
     for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
       float tval = move[pos].final_value;
+      if (allowed_moves && !allowed_moves[pos])
+	continue;
       if (!ON_BOARD(pos) || move[pos].final_value == 0.0)
-	  continue;
+	continue;
 	
       if (tval > bestval) {
 	if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
@@ -2975,10 +2978,14 @@ find_best_move(int *the_move, float *val, int color)
  * which only threatens to capture or kill something. The reason for
  * playing these is that the move may be effective because we have
  * misevaluated the dangers or because the opponent misplays.
+ *
+ * The array allowed_moves restricts which moves may be considered. If
+ * NULL any move is allowed.
  */
 int
 review_move_reasons(int *the_move, float *val, int color,
-		    float pure_threat_value, float score)
+		    float pure_threat_value, float score,
+		    int allowed_moves[BOARDMAX])
 {
   int save_verbose;
   
@@ -3023,7 +3030,7 @@ review_move_reasons(int *the_move, float *val, int color,
   print_top_moves();
 
   /* Select the highest valued move and return it. */
-  return find_best_move(the_move, val, color);
+  return find_best_move(the_move, val, color, allowed_moves);
 }
 
 

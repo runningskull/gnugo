@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new GTP command restricted_genmove
+- new function genmove_restricted() in genmove.c
+- new parameter allowed_moves[] to do_genmove(), review_move_reasons(),
+  and find_best_move()
 - always call init_board() when reaching a new_position()
 - new tests
 - eyes.db revised

@@ -130,6 +130,7 @@ DECLARE(gtp_protocol_version);
 DECLARE(gtp_query_boardsize);
 DECLARE(gtp_query_orientation);
 DECLARE(gtp_quit);
+DECLARE(gtp_restricted_genmove);
 DECLARE(gtp_reg_genmove);
 DECLARE(gtp_report_uncertainty);
 DECLARE(gtp_reset_connection_node_counter);
@@ -252,6 +253,7 @@ static struct gtp_command commands[] = {
   {"query_boardsize",         gtp_query_boardsize},
   {"query_orientation",       gtp_query_orientation},
   {"quit",             	      gtp_quit},
+  {"restricted_genmove",      gtp_restricted_genmove},
   {"reg_genmove",             gtp_reg_genmove},
   {"report_uncertainty",      gtp_report_uncertainty},
   {"reset_connection_node_counter", gtp_reset_connection_node_counter},
@@ -2161,6 +2163,61 @@ gtp_gg_genmove(char *s)
   gtp_print_vertex(i, j);
   return gtp_finish_response();
 }
+
+
+/* Function:  Generate the supposedly best move for either color from a
+ *            choice of allowed vertices.
+ * Arguments: color to move, allowed vertices
+ * Fails:     invalid color, invalid vertex, no vertex listed
+ * Returns:   a move coordinate (or "PASS")
+ */
+static int
+gtp_restricted_genmove(char *s)
+{
+  int i, j;
+  int color;
+  int n;
+  int allowed_moves[BOARDMAX];
+  int number_allowed_moves = 0;
+  memset(allowed_moves, 0, sizeof(allowed_moves));
+
+  n = gtp_decode_color(s, &color);
+  if (!n)
+    return gtp_failure("invalid color");
+
+  s += n;
+  while (1) {
+    n = gtp_decode_coord(s, &i, &j);
+    if (n > 0) {
+      allowed_moves[POS(i, j)] = 1;
+      number_allowed_moves++;
+      s += n;
+    }
+    else if (sscanf(s, "%*s") != EOF)
+      return gtp_failure("invalid coordinate");
+    else
+      break;
+  }
+
+  if (number_allowed_moves == 0)
+    return gtp_failure("no allowed vertex");
+
+  if (stackp > 0)
+    return gtp_failure("genmove cannot be called when stackp > 0");
+
+  /* This is intended for regression purposes and should therefore be
+   * deterministic. The best way to ensure this is to reset the random
+   * number generator before calling genmove(). It is always seeded by
+   * 0.
+   */
+  random_seed = 0;
+  
+  genmove_restricted(&i, &j, color, allowed_moves);
+  gtp_start_response(GTP_SUCCESS);
+  gtp_print_vertex(i, j);
+  return gtp_finish_response();
+}
+
 
 /* Function : Generate a list of the best moves in the previous genmove
  *            command (either of genmove_black, genmove_white, gg_genmove).

@@ -497,7 +497,8 @@ int atari_atari_blunder_size(int color, int tpos, int *move,
 			     const char safe_stones[BOARDMAX]);
 
 int review_move_reasons(int *move, float *val, int color,
-			float pure_threat_value, float lower_bound);
+			float pure_threat_value, float lower_bound,
+			int allowed_moves[BOARDMAX]);
 int fill_liberty(int *move, int color);
 int aftermath_genmove(int *aftermath_move, int color,
 		      int under_control[BOARDMAX],
@@ -527,6 +528,8 @@ int oracle_threatens(int move, int target);
 int within_search_area(int pos);
 int metamachine_genmove(int *i, int *j, int color);
 void draw_search_area(void);
+
+int genmove_restricted(int *i, int *j, int color, int allowed_moves[BOARDMAX]);
 
 void change_attack(int str, int move, int acode);
 void change_defense(int str, int move, int dcode);

@@ -785,6 +785,19 @@
 
 @end example
 
+@cindex restricted_genmove
+@item restricted_genmove
+
+@example
+
+ Function:  Generate the supposedly best move for either color from a
+            choice of allowed vertices.
+ Arguments: color to move, allowed vertices
+ Fails:     invalid color, invalid vertex, no vertex listed
+ Returns:   a move coordinate (or "PASS")
+
+@end example
+
 @cindex level
 @item level
 
