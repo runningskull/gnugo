@@ -2883,7 +2883,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   int num_moves;
   float distance = 0.0;
   int k;
-  int xpos = NO_MOVE;
+  int xpos;
   int savemove = NO_MOVE;
   int savecode = 0;
   int tried_moves = 0;
@@ -3001,7 +3001,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
     SGFTRACE(NO_MOVE, WIN, "no move, probably connected");
 #if USE_HASHTABLE_NG
     READ_RETURN_HASH_NG(BREAK_IN, str, depth - stackp, 
-		        goal_hash, move, xpos, WIN);
+                       goal_hash, move, NO_MOVE, WIN);
 #else
     READ_RETURN(read_result, move, NO_MOVE, WIN);
 #endif
@@ -3011,7 +3011,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
     SGFTRACE(savemove, savecode, "saved move");
 #if USE_HASHTABLE_NG
     READ_RETURN_HASH_NG(BREAK_IN, str, depth - stackp, 
-		        goal_hash, move, xpos, savecode);
+                       goal_hash, move, savemove, savecode);
 #else
     READ_RETURN(read_result, move, savemove, savecode);
 #endif
@@ -3020,7 +3020,7 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
   SGFTRACE(0, 0, NULL);
 #if USE_HASHTABLE_NG
   READ_RETURN_HASH_NG(BREAK_IN, str, depth - stackp, 
-		      goal_hash, move, xpos, 0);
+                     goal_hash, move, NO_MOVE, 0);
 #else
   READ_RETURN(read_result, move, NO_MOVE, 0);
 #endif
@@ -3039,7 +3039,7 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
   int num_moves;
   float distance = 0.0;
   int k;
-  int xpos = NO_MOVE;
+  int xpos;
   int savemove = NO_MOVE;
   int savecode = 0;
   int tried_moves = 0;

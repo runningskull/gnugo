@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- fix bugs in recursive_break() 
+
 3.5.6 released April 23, 2004
 
 - new configure and runtime option large-scale
