@@ -294,15 +294,15 @@ need this option.
 @end quotation
 @item @option{--resign-allowed}
 @quotation
-GNU Go will resign games if this option is enabled. Unfortunately
+GNU Go will resign games if this option is enabled. This is the default unless
+you build the engine with the configure option
+@option{--disable-resignation-allowed}. Unfortunately
 the Go Modem Protocol has no provision for passing a resignation,
 so this option has no effect in GMP mode.
 @end quotation
 @item @option{--never-resign}
 @quotation
-GNU Go will not resign games. This is the default unless you
-build the engine with the configure option 
-@option{--enable-resignation-allowed}.
+GNU Go will not resign games.
 @end quotation
 @end itemize
 
