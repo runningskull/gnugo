@@ -46,7 +46,7 @@ arend: arend.tst
 	$(srcdir)/eval.sh arend.tst $(GG_OPTIONS)
 
 arend2: arend2.tst
-	$(srcdir)/eval.sh arend.tst $(GG_OPTIONS)
+	$(srcdir)/eval.sh arend2.tst $(GG_OPTIONS)
 
 arion: arion.tst
 	$(srcdir)/eval.sh arion.tst $(GG_OPTIONS)
