@@ -80,22 +80,12 @@ hash_init_zobrist_array(Hash_data *array, int size)
 void
 hash_init(void)
 {
-  struct gg_rand_state state;
-
   if (is_initialized)
     return;
   
-  /* Since the hash initialization consumes a varying number of random
-   * numbers depending on the size of the Hash_data struct, we save the
-   * state of the random generator now and restore it afterwards.
-   */
-  gg_get_rand_state(&state);
-
   hash_init_zobrist_array(black_hash, BOARDMAX);
   hash_init_zobrist_array(white_hash, BOARDMAX);
   hash_init_zobrist_array(ko_hash, BOARDMAX);
-
-  gg_set_rand_state(&state);
   
   is_initialized = 1;
 }

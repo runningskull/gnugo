@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- don't restore random state in hash_init() and keyhash_init()
 - major `view.pike' revision, added new "single window" mode
 - break_chain2_moves() revised to generate more backfilling moves
 - atari_atari_blunder_size() revised to return multiple defense moves

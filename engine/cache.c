@@ -64,12 +64,6 @@ keyhash_init(void)
   static int is_initialized = 0;
   
   if (!is_initialized) {
-    struct gg_rand_state state;
-    /* Since the hash initialization consumes a varying number of random
-     * numbers depending on the size of the Hash_data struct, we save the
-     * state of the random generator now and restore it afterwards.
-     */
-    gg_get_rand_state(&state);
     
     INIT_ARRAY(komaster_hash);
     INIT_ARRAY(kom_pos_hash);
@@ -77,7 +71,6 @@ keyhash_init(void)
     INIT_ARRAY(target2_hash);
     INIT_ARRAY(routine_hash);
     
-    gg_set_rand_state(&state);
     is_initialized = 1;
   }
 }
