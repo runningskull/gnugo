@@ -158,7 +158,7 @@ loadsgf games/connection4.sgf
 
 loadsgf games/trevor/auto/a038.sgf 34
 48 disconnect C3 G3
-#? [1 D2|F2]
+#? [1 (D2|F2)]
 
 loadsgf games/trevor/trevor_15.sgf 
 49 disconnect D7 G6
@@ -247,7 +247,7 @@ loadsgf games/trevor/auto/b20.sgf 38
 78 same_dragon D2 G2
 #? [0]*
 
-loadsgf games/nngs/gnugo-3.1.34-viking4-200204240801.sgf
+loadsgf games/nngs/gnugo-3.1.34-viking4-200204240801.sgf 134
 79 connect S4 R7
 #? [1 S6]*
 80 connect R2 R7
@@ -280,9 +280,8 @@ loadsgf games/connection1.sgf
 
 # See also trevorb:670.
 loadsgf games/trevor/auto/b64.sgf 44
-88 disconnect E6/H5
+88 disconnect E6 H5
 #? [0]*
-
 
 loadsgf games/ego.sgf 191
 89 same_dragon M12 Q11
@@ -299,6 +298,11 @@ loadsgf games/trevor/auto/c18.sgf 82
 loadsgf games/olympiad2002/game1-19-goint-gnugo-1-0.sgf 91
 92 same_dragon P15 Q14
 #? [1]
+
+# See also nngs2:130
+loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 124
+93 disconnect K2 L3
+#? [3 L2]*
 
 
 # Report number of nodes visited by the tactical reading

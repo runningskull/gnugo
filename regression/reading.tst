@@ -672,6 +672,27 @@ loadsgf games/trevor/auto/b28.sgf 80
 169 defend F12
 #? [0]*
 
+# See also owl:237
+loadsgf games/owl33.sgf 212
+170 attack S13
+#? [0]*
+
+# See also connect:4,54,55
+loadsgf golois/Basique990715-1.sgf
+trymove W Q4
+trymove B R4
+trymove W P4
+trymove B R5
+trymove W R3
+171 attack R3
+#? [1 R2]*
+popgo
+popgo
+popgo
+popgo
+popgo
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

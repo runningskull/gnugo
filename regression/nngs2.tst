@@ -62,6 +62,7 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 42
 120 gg_genmove black
 #? [E12|D13]
 
+# See also connection:93
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 100
 130 gg_genmove black
 #? [S13]
@@ -79,6 +80,27 @@ loadsgf games/nngs/gnugo-3.3.2-Programmer-200206021522.sgf 52
 160 gg_genmove black
 #? [J14]
 
+# R9 is clearly worse than Q9.
+loadsgf games/nngs/kumu-gnugo-3.2-200205070903.sgf 116
+170 gg_genmove black
+#? [Q9]*
+
+# G17 is clearly worse than G16.
+loadsgf games/nngs/gnugo-3.3.2-mr23-200205120953.sgf 132
+180 gg_genmove white
+#? [G16]*
+
+loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 86
+190 gg_genmove black
+#? [!S8]*
+
+loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 124
+200 gg_genmove black
+#? [G2]*
+
+loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 148
+210 gg_genmove black
+#? [F15]*
 
 
 ############ End of Tests #################
