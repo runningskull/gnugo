@@ -323,8 +323,10 @@ int stones_on_board(int color);
 int obvious_false_eye(int pos, int color);
 int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
-int confirm_safety(int move, int color, int size, int *defense_point,
-		   int saved_dragons[BOARDMAX], int saved_worms[BOARDMAX]);
+int confirm_safety(int move, int color, int *defense_point,
+		   char safe_stones[BOARDMAX]);
+float blunder_size(int move, int color, int *defense_point,
+		   char safe_stones[BOARDMAX]);
 void set_depth_values(int level);
 void modify_depth_values(int n);
 void increase_depth_values(void);
@@ -406,8 +408,12 @@ void add_all_move(int pos, int reason1, int target1,
 
 int get_attack_threats(int pos, int max_strings, int strings[]);
 int get_defense_threats(int pos, int max_strings, int strings[]);
-void get_saved_worms(int pos, int saved[BOARDMAX]);
-void get_saved_dragons(int pos, int saved[BOARDMAX]);
+void get_saved_worms(int pos, char saved[BOARDMAX]);
+void get_saved_dragons(int pos, char saved[BOARDMAX]);
+void mark_safe_stones(int color, int move_pos,
+		      const char saved_dragons[BOARDMAX],
+		      const char saved_worms[BOARDMAX],
+		      char safe_stones[BOARDMAX]);
 
 
 int owl_lively(int pos);
@@ -451,9 +457,12 @@ void endgame_shapes(int color);
 void combinations(int color);
 int atari_atari(int color, int *attack_move, int *defense_move,
 		int save_verbose);
-int atari_atari_confirm_safety(int color, int tpos, int *move,
-			       int minsize, int saved_dragons[BOARDMAX],
-			       int saved_worms[BOARDMAX]);
+int atari_atari_confirm_safety(int color, int tpos, int *move, int minsize,
+			       const char saved_dragons[BOARDMAX],
+			       const char saved_worms[BOARDMAX]);
+
+int atari_atari_blunder_size(int color, int tpos, int *move,
+			     const char safe_stones[BOARDMAX]);
 
 int review_move_reasons(int *move, float *val, int color,
 			float pure_threat_value, float lower_bound);
@@ -489,7 +498,8 @@ void worm_reasons(int color);
 
 int does_attack(int move, int str);
 int does_defend(int move, int str);
-int double_atari(int move, int color);
+int double_atari(int move, int color, float *value,
+		 char safe_stones[BOARDMAX]);
 int play_attack_defend_n(int color, int do_attack, int num_moves, ...);
 int play_attack_defend2_n(int color, int do_attack, int num_moves, ...);
 int play_break_through_n(int color, int num_moves, ...);

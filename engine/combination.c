@@ -212,13 +212,10 @@ struct aa_move {
 #define AA_MAX_MOVES MAX_BOARD * MAX_BOARD  
 static int aa_status[BOARDMAX]; /* ALIVE, DEAD or CRITICAL */
 static int forbidden[BOARDMAX];
-static int vital_string[BOARDMAX]; /* May not sacrifice these stones. */
 static int aa_values[BOARDMAX];
-static void compute_aa_status(int color, int saved_dragons[BOARDMAX],
-			      int saved_worms[BOARDMAX]);
+static void compute_aa_status(int color, const char safe_stones[BOARDMAX]);
 static void compute_aa_values(int color);
 static int get_aa_status(int pos);
-static int is_vital_string(int str);
 static int do_atari_atari(int color, int *attack_point,
 			  int *defense_point, int last_friendly,
 			  int save_verbose, int minsize,
@@ -267,7 +264,7 @@ atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
     return 0;
   memset(forbidden, 0, sizeof(forbidden));
 
-  compute_aa_status(color, NULL, NULL);
+  compute_aa_status(color, NULL);
   compute_aa_values(color);
   
   aa_val = do_atari_atari(color, &apos, &dpos, NO_MOVE,
@@ -308,20 +305,34 @@ atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
 }
 
 
-/* Ask the atari_atari code whether there appears any combination
- * attack which would capture at least minsize stones after playing at
- * (move). If this happens, (*defense) points to a move which prevents
- * this blunder.
- *
+/* Wrapper around atari_atari_blunder_size. Check whether a
+ * combination attack of size at least minsize appears after move
+ * at (move) has been made.
  * The arrays saved_dragons[] and saved_worms[] should be one for
  * stones belonging to dragons or worms respectively, which are
- * supposedly saved by (move). These may be NULL if no stones are
- * supposed to having been saved.
+ * supposedly saved by (move).
  */
 int
 atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
-			   int saved_dragons[BOARDMAX],
-			   int saved_worms[BOARDMAX])
+			   const char saved_dragons[BOARDMAX],
+			   const char saved_worms[BOARDMAX])
+{
+  char safe_stones[BOARDMAX];
+
+  mark_safe_stones(color, move, saved_dragons, saved_worms, safe_stones);
+
+  return (atari_atari_blunder_size(color, move, defense, safe_stones)
+	  >= minsize);
+}
+ 
+
+/* This function checks whether any new combination attack appears after
+ * move at (move) has been made, and returns its size (in points).
+ * safe_stones marks which of our stones are supposedly safe after this move.
+ */
+int
+atari_atari_blunder_size(int color, int move, int *defense,
+			 const char safe_stones[BOARDMAX])
 {
   int apos;
   int defense_point = NO_MOVE, after_defense_point = NO_MOVE;
@@ -332,11 +343,12 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
    * so in this respect the move is safe enough.
    */
   if (aa_depth < 2)
-    return 1;
+    return 0;
 
   memset(forbidden, 0, sizeof(forbidden));
 
-  compute_aa_status(other, saved_dragons, saved_worms);
+  /* FIXME: Maybe these should be moved after the tryko() below? */
+  compute_aa_status(other, safe_stones);
   compute_aa_values(other);
 
   /* Accept illegal ko capture here. */
@@ -345,8 +357,7 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
     abortgo(__FILE__, __LINE__, "trymove", I(move), J(move));
   increase_depth_values();
 
-  aa_val = do_atari_atari(other, &apos, &defense_point, NO_MOVE, 0, minsize,
-			  NULL);
+  aa_val = do_atari_atari(other, &apos, &defense_point, NO_MOVE, 0, 0, NULL);
   after_aa_val = aa_val;
 
   if (aa_val == 0 || defense_point == NO_MOVE) {
@@ -361,7 +372,7 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
 
     popgo();
     decrease_depth_values();
-    return 1;
+    return 0;
   }
 
   while (aa_val >= after_aa_val) {
@@ -381,16 +392,16 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
    * the original move at (aa) was really relevant. So we
    * try omitting it and see if a combination is still found.
    */
-  compute_aa_status(other, NULL, NULL);
+  compute_aa_status(other, NULL);
   compute_aa_values(other);
-  if (do_atari_atari(other, NULL, NULL, NO_MOVE,
-		     0, minsize, NULL) >= after_aa_val)
-    return 1;
-  else {
+  aa_val = do_atari_atari(other, NULL, NULL, NO_MOVE, 0, 0, NULL);
+  if (after_aa_val - aa_val > 0) {
     if (defense)
       *defense = after_defense_point;
-    return 0;
+    return after_aa_val - aa_val;
   }
+  else
+    return 0;
 }
 
 
@@ -399,13 +410,12 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
 /* ---------------------------------------------------------------- */
 
 
-/* Helper function for computing the aa_status for a string. It also
- * sets up the vital_string[] array.
+/* Helper function for computing the aa_status for all opponent's strings.
+ * If safe_stones is given, we just copy the information from there.
  */
 
 static void
-compute_aa_status(int color, int saved_dragons[BOARDMAX],
-		  int saved_worms[BOARDMAX])
+compute_aa_status(int color, const char safe_stones[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int pos;
@@ -426,23 +436,26 @@ compute_aa_status(int color, int saved_dragons[BOARDMAX],
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (board[pos] == other) {
-      if (dragon[pos].status == DEAD)
-	aa_status[pos] = DEAD;
-      else if (dragon[pos].status == CRITICAL
-	       && (!saved_dragons || !saved_dragons[pos]))
-	aa_status[pos] = CRITICAL;
-      else if (worm[pos].attack_codes[0] != 0) {
-	if (worm[pos].defend_codes[0] != 0) {
-	  if (saved_worms && saved_worms[pos])
-	    aa_status[pos] = ALIVE;
-	  else
-	    aa_status[pos] = CRITICAL;
-	}
+      if (safe_stones) {
+	if (safe_stones[pos])
+	  aa_status[pos] = ALIVE;
 	else
 	  aa_status[pos] = DEAD;
       }
-      else
-	aa_status[pos] = ALIVE;
+      else {
+	if (dragon[pos].status == DEAD)
+	  aa_status[pos] = DEAD;
+	else if (dragon[pos].status == CRITICAL)
+	  aa_status[pos] = CRITICAL;
+	else if (worm[pos].attack_codes[0] != 0) {
+	  if (worm[pos].defend_codes[0] != 0)
+	    aa_status[pos] = CRITICAL;
+	  else
+	    aa_status[pos] = DEAD;
+	}
+	else
+	  aa_status[pos] = ALIVE;
+      }
     }
     else if (ON_BOARD(pos))
       aa_status[pos] = UNKNOWN;
@@ -483,22 +496,6 @@ compute_aa_status(int color, int saved_dragons[BOARDMAX],
     }
   }
 
-  /* Set up the vital strings array. This contains stones we can't be
-   * allowed to sacrifice. This is used by
-   * atari_atari_confirm_safety() to make sure that stones which are
-   * supposedly saved by the move can't be captured in a combination
-   * attack.
-   */
-
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (ON_BOARD(pos)
-	&& ((saved_dragons && saved_dragons[pos])
-	    || (saved_worms && saved_worms[pos])))
-      vital_string[pos] = 1;
-    else
-      vital_string[pos] = 0;
-  }
-  
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
   verbose = save_verbose;
@@ -531,23 +528,6 @@ get_aa_status(int pos)
   return UNKNOWN;
 }
 
-
-/* Helper function to examine whether a stone is part of a vital
- * string. Since the vital_string[] array was generated at stackp == 0
- * new stones may have appeared on the board.
- */
-static int
-is_vital_string(int str)
-{
-  int stones[MAX_BOARD * MAX_BOARD];
-  int n = findstones(str, MAX_BOARD * MAX_BOARD, stones);
-  int k;
-  for (k = 0; k < n; k++)
-    if (vital_string[stones[k]])
-      return 1;
-
-  return 0;
-}
 
 
 /* Helper function for atari_atari. Here worms is the number of
@@ -762,8 +742,7 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
        continue;
 
       if (minsize > 0
-	  && get_aa_value(ii) < minsize
-	  && !is_vital_string(ii))
+	  && get_aa_value(ii) < minsize)
        continue;
 
       if (get_aa_status(ii) != ALIVE)
@@ -920,8 +899,7 @@ atari_atari_attack_callback(int m, int n, int color,
 					     pattern->patn[k].y, ll, m, n));
 
       if (current_minsize > 0
-	  && get_aa_value(str) < current_minsize
-	  && !is_vital_string(str))
+	  && get_aa_value(str) < current_minsize)
 	continue;
 
       if (aa_move_known(current_attacks, move, str))
@@ -1076,7 +1054,7 @@ atari_atari_find_defense_moves(int targets[AA_MAX_TARGETS_PER_MOVE],
       gprintf("%o\n");
     }
   }
-  
+
   return num_moves;
 }
 

@@ -808,39 +808,46 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
 }
 
 
+int
+confirm_safety(int move, int color, int *defense_point,
+	       char safe_stones[BOARDMAX])
+{
+  return (blunder_size(move, color, defense_point, safe_stones)
+      	  == 0.0);
+}
+
 /* This function will detect some blunders. If the move reduces the
  * number of liberties of an adjacent friendly string, there is a
  * danger that the move could backfire, so the function checks that no
  * friendly worm which was formerly not attackable becomes attackable,
  * and it checks that no opposing worm which was not defendable
- * becomes defendable. Only worms with worm.size>size are checked.
+ * becomes defendable.
  *
- * The arrays saved_dragons[] and saved_worms[] should be one for
- * stones belonging to dragons or worms respectively, which are
- * supposedly saved by (move). These may be NULL if no stones are
- * supposed to gaving been saved.
+ * It returns the estimated size of the blunder, or 0.0 if nothing
+ * bad has happened.
+ *
+ * The array safe_stones[] contains the stones that are supposedly
+ * safe after (move). It may be NULL.
  *
  * For use when called from fill_liberty, this function may optionally
  * return a point of defense, which, if taken, will presumably make
  * the move at (move) safe on a subsequent turn.
- *
- * FIXME: Most TRACE calls below are ineffective because we have
- * decreased the verbose value to avoid traces in the owl code.
  */
 
-int
-confirm_safety(int move, int color, int size, int *defense_point,
-	       int saved_dragons[BOARDMAX], int saved_worms[BOARDMAX])
+float
+blunder_size(int move, int color, int *defense_point,
+	     char safe_stones[BOARDMAX])
 {
   int libs[5];
   int liberties = accurate_approxlib(move, color, 5, libs);
   int other = OTHER_COLOR(color);
-  int issafe = 1;
   int pos;
   int apos;
   int trouble = 0;
   int k;
+  int ii;
   int save_verbose = verbose;
+  float return_value = 0.0;
 
   if (defense_point)
     *defense_point = NO_MOVE;
@@ -849,45 +856,41 @@ confirm_safety(int move, int color, int size, int *defense_point,
 
   if (verbose > 0)
     verbose--;
-  
-  if (!atari_atari_confirm_safety(color, move, &apos, size,
-				  saved_dragons, saved_worms)) {
-    ASSERT_ON_BOARD1(apos);
-    if (defense_point)
-      *defense_point = apos;
-    verbose = save_verbose;
-    TRACE("Combination attack appears at %1m.\n", apos);
-    return 0;
-  }
 
-  if (liberties > 4) {
-    verbose = save_verbose;
-    return 1;
-  }
+  if (liberties > 4)
+    goto atari_atari;
 
+  /* We start by looking whether we have killed a dragon. If this happens,
+   * we mark its stones as no longer safe, and remember the dragon's size.
+   */
   for (k = 0; k < 4; k++) {
     int bpos = move + delta[k];
     if (board[bpos] == color
 	&& liberties <= worm[bpos].liberties) {
       trouble = 1;
       if ((dragon[bpos].status == ALIVE
-	   || (dragon[bpos].status == CRITICAL
-	       && saved_dragons != NULL
-	       && saved_dragons[bpos]))
+	   || (safe_stones 
+	       && safe_stones[bpos]))
 	  && DRAGON2(bpos).safety != INVINCIBLE
 	  && DRAGON2(bpos).safety != STRONGLY_ALIVE
-	  && dragon[bpos].size >= size
 	  && !owl_confirm_safety(move, bpos, defense_point)) {
 	verbose = save_verbose;
-	return 0;
+	TRACE("Dragon at %1m becomes attackable.\n", bpos);
+	if (verbose > 0)
+	  verbose--;
+	return_value += 2.0 * dragon[bpos].effective_size;
+	if (safe_stones)
+	  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+	    if (ON_BOARD(ii) && dragon[ii].origin == dragon[bpos].origin)
+	      safe_stones[ii] = 0;
       }
     }
   }
 
-  if (!trouble) {
-    verbose = save_verbose;
-    return 1;
-  }
+  verbose = save_verbose;
+
+  if (!trouble)
+    goto atari_atari;
 
   /* Need to increase the depth values during this reading to avoid
    * horizon effects.
@@ -895,63 +898,71 @@ confirm_safety(int move, int color, int size, int *defense_point,
   increase_depth_values();
   
   if (trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
-    for (pos = BOARDMIN; issafe && pos < BOARDMAX; pos++)
-      if (issafe
-	  && IS_STONE(board[pos])
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (IS_STONE(board[pos])
 	  && worm[pos].origin == pos
 	  && pos != move) {
+	/* First, we look for a new tactical attack. */
 	if (board[pos] == color
-	    && worm[pos].attack_codes[0] == 0
-	    && worm[pos].size >= size
+	    && ((safe_stones && safe_stones[pos])
+	        || (!safe_stones && worm[pos].attack_codes[0] == 0))
 	    && attack(pos, NULL)) {
+	  /* A safe worm of ours has become attackable. */
 	  if (defense_point)
 	    find_defense(pos, defense_point);
-	  issafe = 0;
 	  TRACE("After %1m Worm at %1m becomes attackable.\n", move, pos);
+	  return_value += worm[pos].effective_size;
+	  if (safe_stones) /* Can't use mark_string. */
+	    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+	      if (worm[ii].origin == worm[pos].origin)
+		safe_stones[ii] = 0;
 	}
 	else if (board[pos] == other
+	    	 && worm[pos].origin == pos
 		 && worm[pos].attack_codes[0] != 0
 		 && worm[pos].defend_codes[0] == 0
-		 && worm[pos].size >= size
 		 && find_defense(pos, NULL)) {
-	  /* Also ask the owl code whether the string can live
+	  /* A dead opponent's worm has become defendable.
+	   * Also ask the owl code whether the string can live
 	   * strategically. To do this we need to temporarily undo
 	   * the trymove().
 	   */
+	  int owl_attacks;
+
 	  popgo();
 	  decrease_depth_values();
-	  if (owl_does_attack(move, pos) != WIN)
-	    issafe = 0;
+	  owl_attacks = owl_does_attack(move, pos);
+	  if (owl_attacks != WIN) {
+	    return_value += worm[pos].effective_size;
+	    TRACE("After %1m worm at %1m becomes defendable.\n",
+		  move, pos);
+	  }
 	  trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
 	  increase_depth_values();
 	  
-	  if (!issafe) {
-	    if (defense_point) {
-	      int dpos;
-	      if (attack(pos, &dpos))
-		*defense_point = dpos;
-	      else
-		TRACE("No attack found (unexpectedly) on %1m after move at %1m.\n",
-		      pos, move);
-	    }
-	    
-	    TRACE("After %1m worm at %1m becomes defendable.\n",
-		  move, pos);
+	  if (owl_attacks != WIN && defense_point) {
+	    int dpos;
+	    if (attack(pos, &dpos))
+	      *defense_point = dpos;
+	    else
+	      TRACE("No attack found (unexpectedly) on %1m after move at %1m.\n",
+		    pos, move);
 	  }
 	}
       }
     
     if (liberties == 2) {
-      if (double_atari(libs[0], other)) {
+      float d_a_blunder_size;
+      if (double_atari(libs[0], other, &d_a_blunder_size, safe_stones)) {
 	if (defense_point && safe_move(libs[0], color) == WIN)
 	  *defense_point = libs[0];
-	issafe = 0;
+	return_value += d_a_blunder_size;
 	TRACE("Double threat appears at %1m.\n", libs[0]);
       }
-      else if (double_atari(libs[1], other)) {
+      else if (double_atari(libs[1], other, &d_a_blunder_size, safe_stones)) {
 	if (defense_point && safe_move(libs[1], color) == WIN)
 	  *defense_point = libs[1];
-	issafe = 0;
+	return_value += d_a_blunder_size;
 	TRACE("Double threat appears at %1m.\n", libs[1]);
       }
     }
@@ -960,8 +971,21 @@ confirm_safety(int move, int color, int size, int *defense_point,
   
   /* Reset the depth values. */
   decrease_depth_values();
-  verbose = save_verbose;
-  return issafe;
+
+  /* We call the atari-atari code last to avoid duplicate blunder reports. */
+atari_atari:
+  {
+    int atari = atari_atari_blunder_size(color, move, &apos, safe_stones);
+    if (atari) {
+      ASSERT_ON_BOARD1(apos);
+      if (defense_point)
+	*defense_point = apos;
+      TRACE("Combination attack appears at %1m.\n", apos);
+      return_value += (float) atari;
+    }
+  }
+
+  return return_value;
 }
 
 
@@ -975,10 +999,16 @@ confirm_safety(int move, int color, int size, int *defense_point,
  * misnomer since this includes attacks which are not necessarily
  * double ataris, though the common double atari is the most
  * important special case.
+ * 
+ * If safe_stones != NULL, then only attacks on stones marked as safe are
+ * tried.
+ *
+ * The value of the double atari attack is returned in *value (unless
+ * value is NULL), and the attacked stones are marked unsafe.
  */
 
 int
-double_atari(int move, int color)
+double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])
 {
   int other = OTHER_COLOR(color);
   int k;
@@ -996,15 +1026,32 @@ double_atari(int move, int color)
     /* because (m, n) and (m+dm, n+dn) are opposite
      * corners of a square, ON_BOARD2(m, n) && ON_BOARD2(m+dm, n+dn)
      * implies ON_BOARD2(m+dm, n) and ON_BOARD2(n, n+dn)
+     *
+     * Only try to attack supposedly safe stones.
      */
     if (BOARD(m+dm, n+dn) == color
 	&& BOARD(m, n+dn) == other
 	&& BOARD(m+dm, n) == other
+	&& (!safe_stones
+	    || (safe_stones[POS(m, n+dn)] && safe_stones[POS(m+dm, n)]))
 	&& trymove(move, color, "double_atari", NO_MOVE, EMPTY, NO_MOVE)) {
       if (countlib(move) > 1
 	  && (BOARD(m, n+dn) == EMPTY || BOARD(m+dm, n) == EMPTY 
 	      || !defend_both(POS(m, n+dn), POS(m+dm, n)))) {
 	popgo();
+	if (value) {
+	  if (worm[POS(m, n+dn)].effective_size
+	      > worm[POS(m+dm, n)].effective_size) {
+	    *value = 2.0 * worm[POS(m, n+dn)].effective_size;
+	    if (safe_stones)
+	      mark_string(POS(m, n+dn), safe_stones, 0);
+	  }
+	  else {
+	    *value = 2.0 * worm[POS(m+dm, n)].effective_size;
+	    if (safe_stones)
+	      mark_string(POS(m+dm, n), safe_stones, 0);
+	  }
+	}
 	return 1;
       }
       popgo();

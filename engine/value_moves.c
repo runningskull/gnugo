@@ -91,19 +91,26 @@ move_connects_strings(int pos, int color)
   return own_strings + fewlibs;
 }
 
-
-/* Find saved dragons and worms, then call confirm_safety(). */
-static int
-value_moves_confirm_safety(int move, int color, int minsize)
+/* Find saved dragons and worms, then call blunder_size(). */
+static float
+value_moves_get_blunder_size(int move, int color)
 {
-  int saved_dragons[BOARDMAX];
-  int saved_worms[BOARDMAX];
+  char saved_dragons[BOARDMAX];
+  char saved_worms[BOARDMAX];
+  char safe_stones[BOARDMAX];
 
   get_saved_dragons(move, saved_dragons);
   get_saved_worms(move, saved_worms);
+
+  mark_safe_stones(color, move, saved_dragons, saved_worms, safe_stones);
   
-  return confirm_safety(move, color, minsize, NULL,
-			saved_dragons, saved_worms);
+  return blunder_size(move, color, NULL, safe_stones);
+}
+
+static int
+value_moves_confirm_safety(int move, int color)
+{
+  return (value_moves_get_blunder_size(move, color) == 0.0);
 }
 
 
@@ -2452,7 +2459,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       && board[pos] == EMPTY
       && move[pos].additional_ko_value > 0.0
       && is_legal(pos, color)
-      && value_moves_confirm_safety(pos, color, 0)) {
+      && value_moves_confirm_safety(pos, color)) {
     float new_tot_value = gg_min(pure_threat_value,
 				 tot_value
 				 + 0.25 * move[pos].additional_ko_value);
@@ -2577,7 +2584,7 @@ print_top_moves(void)
 
 /* Add a move to the list of top moves (if it is among the top ten) */
 
-  void
+void
 record_top_move(int move, float val)
 {
   int k;
@@ -2771,6 +2778,102 @@ redistribute_points(void)
   }
 }
 
+/* This selects the best move available according to their valuations.
+ * If the best move is an illegal ko capture, we add ko threat values.
+ * If the best move is a blunder, it gets devalued and continue to look
+ * for the best move.
+ */
+static int
+find_best_move(int *the_move, float *val, int color)
+{
+  int good_move_found = 0;
+  int ko_values_have_been_added = 0;
+  char blunder_tested[BOARDMAX];
+  float bestval;
+  int best_move;
+  int pos;
+
+  memset(blunder_tested, 0, sizeof(blunder_tested));
+
+  while (!good_move_found) {
+    bestval = 0.0;
+    best_move = NO_MOVE;
+
+    /* Search through all board positions for the highest valued move. */
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos) || move[pos].final_value == 0.0)
+	  continue;
+	
+      float tval = move[pos].final_value;
+	
+      if (tval > bestval) {
+	if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
+	  bestval = tval;
+	  best_move = pos;
+	}
+	else {
+	  TRACE("Move at %1m would be suicide.\n", pos);
+	  remove_top_move(pos);
+	  move[pos].value = 0.0;
+	  move[pos].final_value = 0.0;
+	}
+      }
+    }
+    
+    /* If the best move is an illegal ko capture, reevaluate ko
+     * threats and search again.
+     */
+    if (bestval > 0.0 && is_illegal_ko_capture(best_move, color)) {
+      TRACE("Move at %1m would be an illegal ko capture.\n", best_move);
+      reevaluate_ko_threats(best_move, color);
+      redistribute_points();
+      time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
+      ko_values_have_been_added = 1;
+      remove_top_move(best_move);
+      move[best_move].value = 0.0;
+      move[best_move].final_value = 0.0;
+      print_top_moves();
+      good_move_found = 0;
+    }
+    /* Call blunder_size() to check that we're not about to make a
+     * blunder. Otherwise devalue this move and scan through all move
+     * values once more.
+     */
+    else if (bestval > 0.0) {
+      if (!blunder_tested[best_move]) {
+	float blunder_size = value_moves_get_blunder_size(best_move, color);
+	if (blunder_size > 0.0) {
+	  TRACE("Move at %1m is a blunder, subtracting %f.\n", best_move,
+		blunder_size);
+	  remove_top_move(best_move);
+	  move[best_move].value -= blunder_size;
+	  move[best_move].final_value -= blunder_size;
+	  TRACE("Move at %1m is now valued %f.\n", best_move,
+		move[best_move].final_value);
+	  record_top_move(best_move, move[best_move].final_value);
+	  good_move_found = 0;
+	  blunder_tested[best_move] = 1;
+	}
+	else
+	  good_move_found = 1; /* Best move was not a blunder. */
+      }
+      else /* The move apparently was a blunder, but still the best move. */
+	good_move_found = 1;
+    }
+    else
+      good_move_found = 1; /* It's best to pass. */
+  }
+  
+  if (bestval > 0.0 
+      && best_move != NO_MOVE) {
+    *the_move = best_move;
+    *val = bestval;
+    return 1;
+  }
+
+  return 0;
+}
+
 
 /*
  * Review the move reasons to find which (if any) move we want to play.
@@ -2784,14 +2887,6 @@ int
 review_move_reasons(int *the_move, float *val, int color,
 		    float pure_threat_value, float score)
 {
-  int pos;
-  float tval;
-  float bestval = 0.0;
-  int best_move = NO_MOVE;
-  int ko_values_have_been_added = 0;
-  int allowed_blunder_size = 0;
-
-  int good_move_found = 0;
   int save_verbose;
   
   start_timer(2);
@@ -2833,85 +2928,9 @@ review_move_reasons(int *the_move, float *val, int color,
    * moves and print them.
    */
   print_top_moves();
-  while (!good_move_found) {
-    bestval = 0.0;
-    best_move = NO_MOVE;
 
-    /* Search through all board positions for the highest valued move. */
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos) || move[pos].final_value == 0.0)
-	  continue;
-	
-      tval = move[pos].final_value;
-	
-      if (tval > bestval) {
-	if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
-	  bestval = tval;
-	  best_move = pos;
-	}
-	else {
-	  TRACE("Move at %1m would be suicide.\n", pos);
-	  remove_top_move(pos);
-	  move[pos].value = 0.0;
-	  move[pos].final_value = 0.0;
-	}
-      }
-    }
-    
-    /* Compute the size of strings we can allow to lose due to blunder
-     * effects. If ko threat values have been added, only the base
-     * value of the move must be taken into account here.
-     */
-    if (!ko_values_have_been_added || !ON_BOARD(best_move))
-      allowed_blunder_size = (int) (bestval / 2 - 1);
-    else {
-      int base_value;
-
-      ASSERT_ON_BOARD1(best_move);
-      base_value = bestval - move[best_move].additional_ko_value;
-      allowed_blunder_size = (int) (base_value / 2 - 1);
-    }
-    
-    /* If the best move is an illegal ko capture, reevaluate ko
-     * threats and search again.
-     */
-    if (bestval > 0.0 && is_illegal_ko_capture(best_move, color)) {
-      TRACE("Move at %1m would be an illegal ko capture.\n", best_move);
-      reevaluate_ko_threats(best_move, color);
-      redistribute_points();
-      time_report(2, "  reevaluate_ko_threats", NO_MOVE, 1.0);
-      ko_values_have_been_added = 1;
-      remove_top_move(best_move);
-      move[best_move].value = 0.0;
-      move[best_move].final_value = 0.0;
-      print_top_moves();
-      good_move_found = 0;
-    }
-    /* Call confirm_safety() to check that we're not about to make a
-     * blunder. Otherwise reject this move and scan through all move
-     * values once more.
-     */
-    else if (bestval > 0.0
-	     && !value_moves_confirm_safety(best_move, color,
-					    allowed_blunder_size)) {
-      TRACE("Move at %1m would be a blunder.\n", best_move);
-      remove_top_move(best_move);
-      move[best_move].value = 0.0;
-      move[best_move].final_value = 0.0;
-      good_move_found = 0;
-    }
-    else
-      good_move_found = 1;
-  }
-  
-  if (bestval > 0.0 
-      && best_move != NO_MOVE) {
-    *the_move = best_move;
-    *val = bestval;
-    return 1;
-  }
-
-  return 0;
+  /* Select the highest valued move and return it. */
+  return find_best_move(the_move, val, color);
 }
 
 

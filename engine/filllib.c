@@ -548,7 +548,7 @@ filllib_confirm_safety(int move, int color, int *defense_point)
     return 0;
   verbose = save_verbose;
   
-  return confirm_safety(move, color, 0, defense_point, NULL, NULL);
+  return confirm_safety(move, color, defense_point, NULL);
 }
 
 

@@ -1400,7 +1400,7 @@ add_replacement_move(int from, int to)
 
 /* Find worms rescued by a move at (pos). */
 void
-get_saved_worms(int pos, int saved[BOARDMAX])
+get_saved_worms(int pos, char saved[BOARDMAX])
 {
   int k;
   memset(saved, 0, sizeof(saved[0]) * BOARDMAX);
@@ -1417,13 +1417,8 @@ get_saved_worms(int pos, int saved[BOARDMAX])
      * confirm_safety routines spot an attack with ko and thinks the
      * move is unsafe.
      */
-    if (move_reasons[r].type == DEFEND_MOVE) {
-      int origin = worm[worms[what]].origin;
-      int ii;
-      for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-	if (IS_STONE(board[ii]) && worm[ii].origin == origin)
-	  saved[ii] = 1;
-    }
+    if (move_reasons[r].type == DEFEND_MOVE)
+      mark_string(worm[worms[what]].origin, saved, 1);
   }    
 }
 
@@ -1511,7 +1506,7 @@ mark_changed_dragon(int pos, int color, int affected_dragon,
 
 /* Find dragons rescued by a move at (pos). */
 void
-get_saved_dragons(int pos, int saved[BOARDMAX])
+get_saved_dragons(int pos, char saved[BOARDMAX])
 {
   int k;
   memset(saved, 0, sizeof(saved[0]) * BOARDMAX);
@@ -1536,6 +1531,44 @@ get_saved_dragons(int pos, int saved[BOARDMAX])
 	  saved[ii] = 1;
     }
   }    
+}
+
+
+/* If a move has saved the dragons in saved_dragons[] and worms in
+ * saved_worms[], this functions writes the stones now supposedly safe
+ * in the array safe_stones[].
+ *
+ * The safety of the played move itself is set according to
+ * move[pos].move_safety.
+ */
+void
+mark_safe_stones(int color, int move_pos, const char saved_dragons[BOARDMAX],
+    		 const char saved_worms[BOARDMAX], char safe_stones[BOARDMAX])
+{
+  int pos; 
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == OTHER_COLOR(color)) {
+      if (dragon[pos].status == DEAD
+	  || (worm[pos].attack_codes[0] != 0
+	      && worm[pos].defend_codes[0] == 0))
+	safe_stones[pos] = 0;
+      else
+	safe_stones[pos] = 1;
+    }
+    else if (board[pos] == color) {
+      if (dragon[pos].status == DEAD
+	  || (dragon[pos].status == CRITICAL && !saved_dragons[pos])
+	  || (worm[pos].attack_codes[0] != 0
+	      && (worm[pos].defend_codes[0] == 0 || !saved_worms[pos])))
+	safe_stones[pos] = 0;
+      else
+	safe_stones[pos] = 1;
+    }
+    else
+      safe_stones[pos] = 0;
+  }
+  safe_stones[move_pos] = move[move_pos].move_safety;
 }
 
 

@@ -1677,8 +1677,8 @@ gtp_aa_confirm_safety(char *s)
   int minsize = 0;
   int result;
   int defense_point = NO_MOVE;
-  int saved_dragons[BOARDMAX];
-  int saved_worms[BOARDMAX];
+  char saved_dragons[BOARDMAX];
+  char saved_worms[BOARDMAX];
 
   n = gtp_decode_move(s, &color, &i, &j);
   if (n == 0)

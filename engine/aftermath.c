@@ -560,7 +560,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	|| (DRAGON2(bb).safety != INVINCIBLE
 	    && DRAGON2(bb).safety != STRONGLY_ALIVE
 	    && owl_does_defend(move, bb) != WIN)
-	|| (!confirm_safety(move, color, 0, NULL, NULL, NULL))) {
+	|| (!confirm_safety(move, color, NULL, NULL))) {
       score[move] = 0;
     }
     else {
@@ -731,7 +731,7 @@ aftermath_genmove(int *aftermath_move, int color,
       /* If we don't allow self atari, also call confirm safety to
        * avoid setting up combination attacks.
        */
-      if (!self_atari_ok && !confirm_safety(move, color, 0, NULL, NULL, NULL))
+      if (!self_atari_ok && !confirm_safety(move, color, NULL, NULL))
 	continue;
 	  
       *aftermath_move = move;
