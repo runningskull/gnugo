@@ -2,6 +2,7 @@ loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 30
 1 gg_genmove black
 #? [!A16]
 
+#CATEGORY=OWL_TUNING
 loadsgf games/nngs/looknglass-gnugo-3.1.26-200203042158.sgf 70
 2 gg_genmove black
 #? [K18|K19]*
@@ -29,7 +30,7 @@ loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 24
 
 loadsgf games/nngs/gnugo-3.1.26-journeyman-200203020154.sgf 32
 8 gg_genmove white
-#? [M10]*
+#? [M10|L9]*
 
 loadsgf games/nngs/camel-gnugo-3.1.26-200203022335.sgf 44
 9 gg_genmove black

@@ -7213,6 +7213,26 @@ Pattern CB106
 :|,OE,shape(2),jump_out_far_helper
 
 
+Pattern CB107
+# db New pattern (3.1.28)
+
+?Oxxxx       defend the cut before leaping
+..O...
+?*....
+?.....
+
+:8,O
+
+?Oxxxx
+.bO...
+?*c.a.
+?.....
+
+; oplay_defend(a,b,c,b)
+> replace(a,*)
+
+
+
 ###############
 # Miscellaneous
 ###############
@@ -7958,12 +7978,13 @@ OX?
 
 Pattern CB254
 # gf Revised classification and constraint. (3.1.14)
+# db added shape value (3.1.28)
 
 ..O
 o*X
 ..O
 
-:-,Xbd
+:-,Xbda,shape(3)
 
 ..a
 o*X
@@ -10388,6 +10409,71 @@ Pattern ED86
 :8,Xd
 
 
+Pattern ED87
+# db New pattern (3.1.28)
+
+ooOo?         Don't leave aji
+...*X
+...OX
+.....
+-----
+
+:8,-,shape(2)
+
+ooOo?
+...*X
+...OX
+..ba.
+-----
+
+>replace(a,*);
+>replace(b,*);
+
+
+Pattern ED87a
+# db New pattern (3.1.28)
+
+ooOX?         Don't leave aji
+..*.X
+...OX
+.....
+-----
+
+:8,-,shape(2)
+
+ooOX?
+..*.X
+...OX
+..ba.
+-----
+
+>replace(a,*);
+>replace(b,*);
+
+
+Pattern ED88
+# db New pattern (3.1.28)
+
+??...X?          take territory on the fourth line
+oo..*OX
+oo....O
+......o
+.......
+-------
+
+:8,-,shape(2)
+
+??...X?
+oo..*OX
+oo..b.a
+......o
+.......
+-------
+
+; lib(a)>2
+> replace(b,a)
+
+
 #####################################################################
 #
 # Center defend/attack patterns
@@ -12526,6 +12612,32 @@ Pattern EJ91
 ------
 
 :8,J
+
+
+Pattern EJ92
+# db new pattern (3.1.28)
+
+oo.........       extend to build moyo
+oo.....*...
+oooo...OXX.
+ooo.....O.X
+.........ox
+...........
+-----------
+
+:8,j
+
+oo.........
+oo.....*...
+abcg..iOXX.
+def.....O.X
+.........hx
+...........
+-----------
+
+; o_somewhere(a,b,c,d,e,f,g)
+> replace(h,*);
+> replace(i,*)
 
 
 ######################################################################

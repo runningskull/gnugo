@@ -2690,20 +2690,19 @@ modify_stupid_eye_vital_point(int *vital_point)
 
 	
 /* 
- * Generates up to max_moves moves, attempting to attack or defend the
- * dragon at (goali, goalj). The found moves are put in moves, an
- * array of owl_move_data structs, starting in the position 'initial'.
- * The entries in the array are sorted by value with moves[initial] 
- * having highest priority. When no more moves are
- * available this is indicated by value and coordinates in the
- * array being -1.
+ * Generates up to max_moves moves, attempting to attack or defend the goal
+ * dragon. The found moves are put in moves, an array of owl_move_data
+ * structs, starting in the position 'initial'.  The entries in the array are
+ * sorted by value with moves[initial] having highest priority. When no more
+ * moves are available this is indicated by value and coordinates in the array
+ * being -1.
  *
  * This function automatically initializes the owl_safe_move cache and,
  * if PATTERN_CHECK_ON_DEMAND is set, the pattern list. WATCH OUT: This has
  * to be matched with a call to close_pattern_list(pattern_list)!!!
  *
- * Returns 1 if at least one move is found, or 0 if no move is found. 
- */
+ * Returns 1 if at least one move is found, or 0 if no move is found.  */
+
 static int 
 owl_shapes(
 #if PATTERN_CHECK_ON_DEMAND
@@ -3030,7 +3029,7 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
 
 /* This function takes an array of already found moves (passed as
  * 'data') and looks for moves to replace these. Only moves near
- * (goali, goalj) are considered.
+ * the goal dragon are considered.
  */
 static void
 owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
@@ -3399,133 +3398,134 @@ goaldump(char goal[BOARDMAX])
 void
 owl_reasons(int color)
 {
-  int m, n;
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      if (dragon[pos].origin == pos
-	  && dragon[pos].matcher_status == CRITICAL
-	  && dragon[pos].owl_attack_point != NO_MOVE) {
-	if (board[pos] == color) {
-	  if (dragon[pos].owl_defense_point != NO_MOVE) {
-	    add_owl_defense_move(dragon[pos].owl_defense_point, pos,
-				 dragon[pos].owl_defense_code);
-	    DEBUG(DEBUG_OWL, "owl: %1m defends %1m at move %d\n",
-		  dragon[pos].owl_defense_point, pos, movenum+1);
-	  }
+  int pos;
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    if (dragon[pos].origin == pos
+	&& dragon[pos].matcher_status == CRITICAL
+	&& dragon[pos].owl_attack_point != NO_MOVE) {
+      if (board[pos] == color) {
+	if (dragon[pos].owl_defense_point != NO_MOVE) {
+	  add_owl_defense_move(dragon[pos].owl_defense_point, pos,
+			       dragon[pos].owl_defense_code);
+	  DEBUG(DEBUG_OWL, "owl: %1m defends %1m at move %d\n",
+		dragon[pos].owl_defense_point, pos, movenum+1);
 	}
-	else { /* opponent's dragon */
-	  /* We don't want to add this move reason if the attacker
-	   * dies because the victim only formed a nakade shape.
-	   *
-	   * FIXME: This code overlaps heavily with some code in
+      }
+      else { /* opponent's dragon */
+	/* We don't want to add this move reason if the attacker
+	 * dies because the victim only formed a nakade shape.
+	 *
+	 * FIXME: This code overlaps heavily with some code in
 	   * examine_move_safety() in move_reasons.c. The caching
 	   * scheme should minimize the performance hit, but of course
 	   * it's unfortunate to have the code duplication.
 	   */
-	  int move = dragon[pos].owl_attack_point;
-
-	  /* No worries if we catch something big. */
-	  if (dragon[pos].effective_size < 8) {
-	    /* Look through the neighbors of the victim for dragons of
-             * our color. If we find at least one being thought alive
-             * everything is ok. Otherwise we keep track of the
+	int move = dragon[pos].owl_attack_point;
+	
+	/* No worries if we catch something big. */
+	if (dragon[pos].effective_size < 8) {
+	  /* Look through the neighbors of the victim for dragons of
+	   * our color. If we find at least one being thought alive
+	   * everything is ok. Otherwise we keep track of the
              * largest one for further examination.
 	     */
-	    int largest = 0;
-	    int k;
-	    int bpos = NO_MOVE;
-	    int safe = 0;
-	    for (k = 0; k < DRAGON2(pos).neighbors; k++) {
-	      int d = DRAGON2(pos).adjacent[k];
-	      if (DRAGON(d).color == color) {
-		if (DRAGON(d).matcher_status == ALIVE) {
-		  safe = 1;
-		  break;
-		}
-		if (DRAGON(d).size > largest) {
-		  bpos = dragon2[d].origin;
-		  largest = DRAGON(d).size;
-		}
+	  int largest = 0;
+	  int k;
+	  int bpos = NO_MOVE;
+	  int safe = 0;
+	  for (k = 0; k < DRAGON2(pos).neighbors; k++) {
+	    int d = DRAGON2(pos).adjacent[k];
+	    if (DRAGON(d).color == color) {
+	      if (DRAGON(d).matcher_status == ALIVE) {
+		safe = 1;
+		break;
 	      }
-	    }
-
-	    /* It may occasionally happen that no neighbor of our
-	     * color was found. Assume safe in that case.
-	     */
-	    if (bpos == NO_MOVE)
-	      safe = 1;
-
-	    /* If not yet thought safe, ask the owl code whether the
-	     * owl attack defends the (largest) attacker.
-	     */
-	    if (!safe && owl_does_defend(move, bpos) != WIN) {
-	      DEBUG(DEBUG_OWL,
-		    "owl: %1m attacks %1m at move %d, but the attacker dies.\n",
-		    move, pos, movenum+1);
-	      DRAGON2(pos).safety = INESSENTIAL;
-	      continue;
+	      if (DRAGON(d).size > largest) {
+		bpos = dragon2[d].origin;
+		largest = DRAGON(d).size;
+	      }
 	    }
 	  }
 	  
-	  /* If we've reached this far, the attack is okay. */
-	  add_owl_attack_move(move, pos, dragon[pos].owl_attack_code);
-	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m at move %d\n", move, pos,
-		movenum+1);
+	  /* It may occasionally happen that no neighbor of our
+	   * color was found. Assume safe in that case.
+	   */
+	  if (bpos == NO_MOVE)
+	    safe = 1;
+	  
+	    /* If not yet thought safe, ask the owl code whether the
+	     * owl attack defends the (largest) attacker.
+	     */
+	  if (!safe && owl_does_defend(move, bpos) != WIN) {
+	    DEBUG(DEBUG_OWL,
+		  "owl: %1m attacks %1m at move %d, but the attacker dies.\n",
+		  move, pos, movenum+1);
+	    DRAGON2(pos).safety = INESSENTIAL;
+	    continue;
+	  }
 	}
+	
+	/* If we've reached this far, the attack is okay. */
+	add_owl_attack_move(move, pos, dragon[pos].owl_attack_code);
+	DEBUG(DEBUG_OWL, "owl: %1m attacks %1m at move %d\n", move, pos,
+	      movenum+1);
       }
-      else if (dragon[pos].origin == pos
-	       && dragon[pos].owl_status == DEAD
-	       && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE) {
-	if (board[pos] == color 
-	    && dragon[pos].owl_defense_point != NO_MOVE)
-	  add_owl_defense_threat_move(dragon[pos].owl_defense_point, pos, WIN);
-	if (board[pos] == color
-	    && dragon[pos].owl_second_defense_point != NO_MOVE
-	    && is_legal(dragon[pos].owl_second_defense_point, color))
-	  add_owl_defense_threat_move(dragon[pos].owl_second_defense_point,
-				      pos, WIN);
-	/* If the opponent can threaten to live, an attacking
-	 * move gets a small value to make sure it's really dead.
-	 */
-	if (board[pos] == OTHER_COLOR(color)
-	    && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE
-	    && dragon[pos].owl_attack_point != NO_MOVE)
-	  add_owl_prevent_threat_move(dragon[pos].owl_attack_point, pos);
-      }
-      else if (dragon[pos].origin == pos
-	       && dragon[pos].owl_status == ALIVE
-	       && board[pos] == OTHER_COLOR(color)
-	       && dragon[pos].owl_threat_status == CAN_THREATEN_ATTACK) {
-	if (dragon[pos].owl_attack_point != NO_MOVE)
-	  add_owl_attack_threat_move(dragon[pos].owl_attack_point, pos, WIN);
-	if (dragon[pos].owl_second_attack_point != NO_MOVE
-	    && is_legal(dragon[pos].owl_second_attack_point, color))
-	  add_owl_attack_threat_move(dragon[pos].owl_second_attack_point, pos,
-				     WIN);
-      }
-      /* The owl code found the friendly dragon alive, but was uncertain,
-       * and an extra point of defense was found, so this might
-       * be a good place to play.
-       */
-      else if (dragon[pos].origin == pos
-	       && dragon[pos].owl_status == ALIVE
-	       && board[pos] == color
-	       && !dragon[pos].owl_attack_certain
-	       && dragon[pos].owl_defense_certain
-	       && ON_BOARD(dragon[pos].owl_defense_point))
-	add_owl_uncertain_defense_move(dragon[pos].owl_defense_point, pos);
-      /* The owl code found the dragon dead, but was uncertain,
-       * and an extra point of attack was found, so this might
-       * be a good place to play.
-       */
-      else if (dragon[pos].origin == pos
-	       && dragon[pos].owl_status == DEAD
-	       && board[pos] == OTHER_COLOR(color)
-	       && !dragon[pos].owl_attack_certain
-	       && ON_BOARD(dragon[pos].owl_attack_point))
-	add_owl_uncertain_defense_move(dragon[pos].owl_attack_point, pos);
     }
+    else if (dragon[pos].origin == pos
+	     && dragon[pos].owl_status == DEAD
+	     && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE) {
+      if (board[pos] == color 
+	  && dragon[pos].owl_defense_point != NO_MOVE)
+	add_owl_defense_threat_move(dragon[pos].owl_defense_point, pos, WIN);
+      if (board[pos] == color
+	    && dragon[pos].owl_second_defense_point != NO_MOVE
+	  && is_legal(dragon[pos].owl_second_defense_point, color))
+	add_owl_defense_threat_move(dragon[pos].owl_second_defense_point,
+				    pos, WIN);
+      /* If the opponent can threaten to live, an attacking
+       * move gets a small value to make sure it's really dead.
+       */
+      if (board[pos] == OTHER_COLOR(color)
+	  && dragon[pos].owl_threat_status == CAN_THREATEN_DEFENSE
+	  && dragon[pos].owl_attack_point != NO_MOVE)
+	add_owl_prevent_threat_move(dragon[pos].owl_attack_point, pos);
+    }
+    else if (dragon[pos].origin == pos
+	     && dragon[pos].owl_status == ALIVE
+	     && board[pos] == OTHER_COLOR(color)
+	     && dragon[pos].owl_threat_status == CAN_THREATEN_ATTACK) {
+      if (dragon[pos].owl_attack_point != NO_MOVE)
+	add_owl_attack_threat_move(dragon[pos].owl_attack_point, pos, WIN);
+      if (dragon[pos].owl_second_attack_point != NO_MOVE
+	  && is_legal(dragon[pos].owl_second_attack_point, color))
+	add_owl_attack_threat_move(dragon[pos].owl_second_attack_point, pos,
+				   WIN);
+    }
+    /* The owl code found the friendly dragon alive, but was uncertain,
+     * and an extra point of defense was found, so this might
+     * be a good place to play.
+     */
+    else if (dragon[pos].origin == pos
+	     && dragon[pos].owl_status == ALIVE
+	     && board[pos] == color
+	     && !dragon[pos].owl_attack_certain
+	     && dragon[pos].owl_defense_certain
+	     && ON_BOARD(dragon[pos].owl_defense_point))
+      add_owl_uncertain_defense_move(dragon[pos].owl_defense_point, pos);
+    /* The owl code found the dragon dead, but was uncertain,
+     * and an extra point of attack was found, so this might
+     * be a good place to play.
+     */
+    else if (dragon[pos].origin == pos
+	     && dragon[pos].owl_status == DEAD
+	     && board[pos] == OTHER_COLOR(color)
+	     && !dragon[pos].owl_attack_certain
+	     && ON_BOARD(dragon[pos].owl_attack_point))
+      add_owl_uncertain_defense_move(dragon[pos].owl_attack_point, pos);
+  }
 }
 
 /* Use the owl code to determine whether the move at (move) makes

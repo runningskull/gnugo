@@ -1925,7 +1925,7 @@ estimate_strategical_value(int pos, int color, float score)
 	    || (color == WHITE && score < 0.0))
 	  this_value = 0.0;
 	else 
-	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(score/2));
+	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(.65*score));
 	
 	if (this_value > dragon_value[d1]) {
 	  dragon_value[d1] = this_value;

@@ -362,15 +362,17 @@ analyze_semeai(int my_dragon, int your_dragon)
 	DEBUG(DEBUG_SEMEAI, "added owl defense of %1m at %1m with code %d\n",
 	      my_dragon, dragon[your_dragon].owl_attack_point, dcode);
 	if (dragon[my_dragon].owl_status == DEAD) {
-	  for (m = 0; m < board_size; m++)
-	    for (n = 0; n < board_size; n++) {
-	      int pos = POS(m, n);
-	      if (board[pos] == board[my_dragon]
-		  && is_same_dragon(pos, my_dragon)) {
-		dragon[pos].owl_status = CRITICAL;
-		dragon[pos].matcher_status = CRITICAL;
-	      }
+	  int pos;
+
+	  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+	    if (!ON_BOARD(pos))
+	      continue;
+	    if (board[pos] == board[my_dragon]
+		&& is_same_dragon(pos, my_dragon)) {
+	      dragon[pos].owl_status = CRITICAL;
+	      dragon[pos].matcher_status = CRITICAL;
 	    }
+	  }
 	  DEBUG(DEBUG_SEMEAI,
 		"changed owl_status and matcher_status of %1m to CRITICAL\n",
 		my_dragon);
