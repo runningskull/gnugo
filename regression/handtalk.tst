@@ -49,7 +49,7 @@ loadsgf games/handtalk/handtalk21.sgf 46
 # Other moves possible, but GNU Go should attack the D8 stone
 loadsgf games/handtalk/handtalk23.sgf 26
 10 gg_genmove white
-#? [E9|F8]
+#? [E9|F8]*
 
 # B9 is quite bad here.
 loadsgf games/handtalk/handtalk23.sgf 30

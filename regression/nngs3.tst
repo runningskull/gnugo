@@ -469,7 +469,7 @@ loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 160
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 202
 1000 gg_genmove black
-#? [L17]*
+#? [L17]
 
 
 loadsgf games/nngs/gerula-gnugo-3.2-200205041756.sgf 216

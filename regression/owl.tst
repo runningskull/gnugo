@@ -306,7 +306,7 @@ loadsgf games/incident291.sgf 86
 # incident 297
 loadsgf games/incident297.sgf 95
 80 owl_attack G5
-#? [1 J2]*
+#? [1 J2]
 
 loadsgf games/strategy5.sgf 40
 81 owl_attack R6

@@ -1,3 +1,18 @@
+========================== 3.3.23 pre 1 =====================================
+
+./regress.sh . owl.tst 
+80 unexpected PASS!
+./regress.sh . lazarus.tst 
+16 unexpected PASS!
+./regress.sh . handtalk.tst 
+10 unexpected FAIL: Correct 'E9|F8', got 'C11'
+./regress.sh . nngs3.tst 
+1000 unexpected PASS!
+./regress.sh . nngs4.tst 
+470 unexpected PASS!
+./regress.sh . nando.tst 
+11 unexpected PASS!
+
 ========================== 3.3.22 pre 2 =====================================
 
 ./regress.sh . owl.tst 
