@@ -71,10 +71,7 @@ Usage : mkpat [-cvh] <prefix>\n\
 
 #include "patterns.h"
 #include "gg-getopt.h"
-/* FIXME: Debug build of Visual C breaks with this include. */
-#if !(_DEBUG && HAVE_VISUAL_C)
- #include "gg_utils.h"
-#endif
+#include "gg_utils.h"
 
 #include "dfa.h"
 
