@@ -157,6 +157,8 @@ typedef unsigned char Intersection;
 #define BOARD(i, j)   board[POS(i, j)]
 
 
+#define MIRROR_MOVE(pos) POS(board_size - 1 - I(pos), board_size - 1 - J(pos))
+
 /* ================================================================ */
 /*                         global variables                         */
 /* ================================================================ */

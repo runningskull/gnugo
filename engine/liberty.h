@@ -80,7 +80,6 @@ enum routine_id {
   OWL_CONNECTION_DEFENDS,
   OWL_SUBSTANTIAL,
   OWL_CONFIRM_SAFETY,
-  ANALYZE_SEMEAI,
   NUM_CACHE_ROUTINES
 };
 
@@ -100,8 +99,7 @@ enum routine_id {
   "owl_does_attack", \
   "owl_connection_defends", \
   "owl_substantial", \
-  "owl_confirm_safety", \
-  "analyze_semeai"
+  "owl_confirm_safety"
 
 /* To prioritize between different types of reading, we give a cost
  * ranking to each of the routines above:
@@ -115,7 +113,7 @@ enum routine_id {
  * -1 is left at the end for a consistency check.
  */
 #define ROUTINE_COSTS \
-  3, 3, 4, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, -1
+  3, 3, 4, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, -1
   
 
 const char *routine_id_to_string(enum routine_id routine);
@@ -270,18 +268,6 @@ void store_persistent_owl_cache(enum routine_id routine,
 				int tactical_nodes, char goal[BOARDMAX],
 				int goal_color);
 void owl_hotspots(float values[BOARDMAX]);
-int search_persistent_semeai_cache(enum routine_id routine,
-			           int apos, int bpos, int cpos, int color,
-				   Hash_data *goal_hash,
-				   int *resulta, int *resultb,
-				   int *move, int *certain);
-void store_persistent_semeai_cache(enum routine_id routine,
-				   int apos, int bpos, int cpos, int color,
-				   Hash_data *goal_hash,
-				   int resulta, int resultb,
-				   int move, int certain, int tactical_nodes,
-				   char goala[BOARDMAX], char goalb[BOARDMAX]);
-
 
 /* readconnect.c */
 int string_connect(int str1, int str2, int *move);
@@ -545,6 +531,7 @@ int cut_possible(int pos, int color);
 int defend_against(int move, int color, int apos);
 int somewhere(int color, int check_alive, int num_moves, ...);
 int visible_along_edge(int color, int apos, int bpos);
+int test_symmetry_after_move(int move, int color, int strict);
 
 /* Printmoyo values, specified by -m flag. */
 #define PRINTMOYO_TERRITORY         0x01

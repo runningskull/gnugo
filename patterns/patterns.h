@@ -331,6 +331,7 @@ void test_attack_either_move(int move, int color, int worma, int wormb);
 int adjacent_to_stone_in_atari(int str);
 int adjacent_to_defendable_stone_in_atari(int str);
 void backfill_replace(int move, int str);
+int break_mirror_helper(int str, int color);
 
 
 void init_tree_conn(void);
