@@ -66,6 +66,9 @@ auto_handtalk: auto_handtalk.tst
 blunder: blunder.tst
 	$(srcdir)/eval.sh blunder.tst $(GG_OPTIONS)
 
+break_in: break_in.tst
+	$(srcdir)/eval.sh break_in.tst $(GG_OPTIONS)
+
 buzco: buzco.tst
 	$(srcdir)/eval.sh buzco.tst $(GG_OPTIONS)
 
@@ -118,10 +121,13 @@ gunnar: gunnar.tst
 	$(srcdir)/eval.sh gunnar.tst $(GG_OPTIONS)
 
 handtalk: handtalk.tst
-	$(srcdir)/eval.sh handtalk.tst
+	$(srcdir)/eval.sh handtalk.tst $(GG_OPTIONS)
 
 heikki: heikki.tst
 	$(srcdir)/eval.sh heikki.tst $(GG_OPTIONS)
+
+joseki: joseki.tst
+	$(srcdir)/eval.sh joseki.tst $(GG_OPTIONS)
 
 lazarus: lazarus.tst
 	$(srcdir)/eval.sh lazarus.tst $(GG_OPTIONS)
@@ -305,6 +311,7 @@ first_batch:
 	$(srcdir)/regress.sh $(srcdir) filllib.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) atari_atari.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) connection.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) break_in.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) blunder.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) trevora.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) nngs1.tst $(GG_OPTIONS)
@@ -373,3 +380,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) nando.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) thrash.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) 13x13b.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) joseki.tst $(GG_OPTIONS)
