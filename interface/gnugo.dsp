@@ -42,8 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /W3 /GX /O2 /I "." /I ".." /I "..\sgf" /I "..\patterns" /I "..\utils" /I "../engine" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /FD /c
-# SUBTRACT CPP /nologo /Fr /YX
+# ADD CPP /GX /Zi /O2 /I "." /I ".." /I "..\sgf" /I "..\patterns" /I "..\utils" /I "../engine" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /Fr"Release/gnugo/" /Fd"Release/gnugo" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -51,7 +50,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 ..\sgf\Release\sgf.lib ..\engine\Release\engine.lib ..\patterns\Release\patterns.lib ..\utils\Release\utils.lib wsock32.lib ..\patterns\Release\dfa.lib /nologo /subsystem:console /incremental:yes /debug /machine:I386 /out:"gnugo.exe"
+# ADD LINK32 ..\sgf\Release\sgf.lib ..\engine\Release\engine.lib ..\patterns\Release\patterns.lib ..\utils\Release\utils.lib wsock32.lib ..\patterns\Release\dfa.lib /nologo /subsystem:console /profile /debug /machine:I386 /out:"gnugo.exe"
 # SUBTRACT LINK32 /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
@@ -68,8 +67,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /W3 /Gm /GX /ZI /Od /I "." /I ".." /I "..\sgf" /I "..\patterns" /I "..\utils" /I "../engine" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /FR /FD /I /GZ /c
-# SUBTRACT CPP /nologo /YX
+# ADD CPP /W2 /Gm /GX /Zi /Od /I "." /I ".." /I "..\sgf" /I "..\patterns" /I "..\utils" /I "../engine" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "HAVE_CONFIG_H" /FR /Fd"Debug/gnugo" /FD /I /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -77,7 +75,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\patterns\Debug\patterns.lib ..\utils\Debug\utils.lib ..\sgf\Debug\sgf.lib ..\engine\Debug\engine.lib wsock32.lib ..\patterns\Debug\dfa.lib /nologo /subsystem:console /debug /machine:I386 /out:"gnugo.exe" /pdbtype:sept
+# ADD LINK32 ..\patterns\Debug\patterns.lib ..\utils\Debug\utils.lib ..\sgf\Debug\sgf.lib ..\engine\Debug\engine.lib wsock32.lib ..\patterns\Debug\dfa.lib /nologo /subsystem:console /profile /debug /machine:I386 /out:"gnugo.exe"
 # SUBTRACT LINK32 /nodefaultlib
 
 !ENDIF 
@@ -100,30 +98,93 @@ SOURCE=..\interface\gtp.c
 # Begin Source File
 
 SOURCE=..\interface\main.c
-# End Source File
-# Begin Source File
 
-SOURCE=..\engine\owl.c
+!IF  "$(CFG)" == "gnugo - Win32 Release"
+
+# ADD CPP /YX"gnugo.h"
+
+!ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\interface\play_ascii.c
+
+!IF  "$(CFG)" == "gnugo - Win32 Release"
+
+# ADD CPP /YX"gnugo.h"
+
+!ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\interface\play_gmp.c
+
+!IF  "$(CFG)" == "gnugo - Win32 Release"
+
+# ADD CPP /YX"gnugo.h"
+
+!ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\interface\play_gtp.c
+
+!IF  "$(CFG)" == "gnugo - Win32 Release"
+
+# ADD CPP /YX"gnugo.h"
+
+!ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\interface\play_solo.c
+
+!IF  "$(CFG)" == "gnugo - Win32 Release"
+
+# ADD CPP /YX"gnugo.h"
+
+!ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\interface\play_test.c
+
+!IF  "$(CFG)" == "gnugo - Win32 Release"
+
+# ADD CPP /YX"gnugo.h"
+
+!ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\x.c
+
+!IF  "$(CFG)" == "gnugo - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header Files"

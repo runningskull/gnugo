@@ -54,19 +54,16 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
+    Project_Dep_Name sgf
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name sgfgen
+    End Project Dependency
+    Begin Project Dependency
     Project_Dep_Name engine
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name patterns
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name sgf
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name utils
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name sgfgen
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name dfa

@@ -41,8 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /W3 /GX /O2 /I "." /I ".." /I "..\engine" /I "../sgf" /I "../utils" /D "WIN32" /D "NDEBUG" /D "HAVE_CONFIG_H" /D "_MBCS" /D "_LIB" /FD /c
-# SUBTRACT CPP /nologo /YX
+# ADD CPP /GX /Zi /O2 /I "." /I ".." /I "..\engine" /I "../sgf" /I "../utils" /D "WIN32" /D "NDEBUG" /D "HAVE_CONFIG_H" /D "_MBCS" /D "_LIB" /YX"patterns.h" /Fd"Release/patterns" /FD /Zm1100 /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -65,8 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /W3 /Gm /GX /ZI /Od /I "." /I ".." /I "..\engine" /I "../sgf" /I "../utils" /D "WIN32" /D "_DEBUG" /D "HAVE_CONFIG_H" /D "_MBCS" /D "_LIB" /FR /FD /GZ /c
-# SUBTRACT CPP /nologo /YX
+# ADD CPP /W2 /Gm /GX /Zi /Od /I "." /I ".." /I "..\engine" /I "../sgf" /I "../utils" /D "WIN32" /D "_DEBUG" /D "HAVE_CONFIG_H" /D "_MBCS" /D "_LIB" /FR /YX"patterns.h" /Fd"Debug/patterns" /FD /GZ /Zm1000 /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -116,6 +114,7 @@ SOURCE=.\endgame.c
 # Begin Source File
 
 SOURCE=.\eyes.c
+# SUBTRACT CPP /YX
 # End Source File
 # Begin Source File
 
@@ -152,6 +151,15 @@ SOURCE=.\owl_attackpat.c
 # Begin Source File
 
 SOURCE=.\owl_defendpat.c
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+# ADD CPP /Zi /O2 /YX
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -160,6 +168,36 @@ SOURCE=.\owl_vital_apat.c
 # Begin Source File
 
 SOURCE=.\patterns.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\read_attack.c
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+# ADD CPP /O2 /YX
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+# ADD CPP /YX
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\read_defend.c
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+# ADD CPP /O2 /YX
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+# ADD CPP /YX
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -550,10 +588,8 @@ IntDir=.\Release
 InputPath=.\hoshi.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy hoshi.db + komoku.db + sansan.db + mokuhazushi.db + takamoku.db tmp.db 
-	$(IntDir)\mkpat -b joseki < tmp.db > josekidb.c 
-	del tmp.db 
-	
+	$(IntDir)\mkpat -b joseki -i hoshi.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
@@ -564,10 +600,8 @@ IntDir=.\Debug
 InputPath=.\hoshi.db
 
 "josekidb.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy hoshi.db + komoku.db + sansan.db + mokuhazushi.db + takamoku.db tmp.db 
-	$(IntDir)\mkpat -b joseki < tmp.db > josekidb.c 
-	del tmp.db 
-	
+	$(IntDir)\mkpat -b joseki -i hoshi.db -i komoku.db -i sansan.db -i mokuhazushi.db -i takamoku.db -o josekidb.c
+
 # End Custom Build
 
 !ENDIF 
@@ -703,30 +737,88 @@ SOURCE=.\patterns.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__PATTE="$(IntDir)\mkpat.exe"	"patterns.db"	"patterns2.db"	
+USERDEP__PATTE="$(IntDir)\mkpat.exe"	"patterns2.db"	
 # Begin Custom Build
 IntDir=.\Release
 InputPath=.\patterns.db
 
 "patterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy patterns.db +  patterns2.db temp.db 
-	$(IntDir)\mkpat -b pat <temp.db >patterns.c 
-	del temp.db 
-	
+	$(IntDir)\mkpat -b pat -i patterns.db -i patterns2.db -o patterns.c
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__PATTE="$(IntDir)\mkpat.exe"	
+USERDEP__PATTE="$(IntDir)\mkpat.exe"	"patterns2.db"	
 # Begin Custom Build
 IntDir=.\Debug
 InputPath=.\patterns.db
 
 "patterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy patterns.db +  patterns2.db temp.db 
-	$(IntDir)\mkpat -b pat <temp.db >patterns.c 
-	del temp.db 
-	
+	$(IntDir)\mkpat -b pat -i patterns.db -i patterns2.db -o patterns.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\read_attack.db
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__READ_="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\read_attack.db
+
+"read_attack.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b -T read_attack -i ..\patterns\read_attack.db -o read_attack.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__READ_="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\read_attack.db
+
+"read_attack.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b -T read_attack -i ..\patterns\read_attack.db -o read_attack.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\read_defend.db
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__READ_D="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\read_defend.db
+
+"read_defend.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b -T read_defend -i ..\patterns\read_defend.db -o read_defend.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__READ_D="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\read_defend.db
+
+"read_defend.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b -T read_defend -i ..\patterns\read_defend.db -o read_defend.c
+
 # End Custom Build
 
 !ENDIF 

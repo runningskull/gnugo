@@ -122,6 +122,7 @@ my $testfile_out;
 my $all_batches;
 my $make_images;
 my $cputime;
+my $generate_sgf = 1;
 
 my $goprog_name = "unknown";
 my $goprog_version = "0";
@@ -149,7 +150,8 @@ GetOptions(
            "all_batches|all-batches|a=i" => \$all_batches,
            "make_images|m=i"    => \$make_images,
            "problemset|ps|p=s"  => \$problem_set,
-           "help"               => \$wantshelp
+           "help"               => \$wantshelp,
+           "sgf|sgf|s=i"        => \$generate_sgf,
 );
 
 if ($make_images) {
@@ -447,7 +449,9 @@ sub regress_file {
 	    $top_moves = 1;
 	  }
 	}
-	if (defined($this_number) && $next_cmd =~ /attack|defend/) {
+	if (defined($this_number) 
+	    && $next_cmd =~ /attack|defend/
+	    && $generate_sgf) {
 	  go_command("start_sgftrace");
 	  eat(); #ignore output
 	}
@@ -467,8 +471,12 @@ sub regress_file {
 	}
 	print "RES: $result\n" if $verbose > 1;
 	if (defined($this_number) && $next_cmd =~ /attack|defend/) {
-	  go_command("finish_sgftrace html$s$testfile$s$this_number.sgf");
-	  eat(); #ignore output
+	  if ($generate_sgf) {
+	    go_command("finish_sgftrace html$s$testfile$s$this_number.sgf");
+	    eat(); #ignore output
+	  } else {
+	    unlink "html$s$testfile$s$this_number.sgf";
+	  }
 	}
       }
       if (defined $this_number) {$num = $this_number;}

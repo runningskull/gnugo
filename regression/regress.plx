@@ -225,7 +225,11 @@ sub createIndex {
 
   open I, ">html/index.html";
 
-  print I '<HTML><HEAD><TITLE>Regression test summary - </TITLE></HEAD>
+  print I '<HTML>
+ <HEAD>
+  <TITLE>Regression test summary - </TITLE>
+  <META NAME="ROBOTS" CONTENT="NOFOLLOW">
+ </HEAD>
  <BODY>
  <H3> Regression test summary - </H3>
  Program: _CMDLINE_TBD_ <BR>
@@ -329,7 +333,11 @@ if ($move) {
     exit;
   }
   
-  print "<HTML><HEAD><TITLE>$tstfile:$num move $move</TITLE></HEAD><BODY>\n";
+  print qq@<HTML>
+  <HEAD>
+  <TITLE>$tstfile:$num move $move</TITLE>
+  <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+  </HEAD><BODY>\n@;
   
   open (FILE, "html/$tstfile.tst/$num.trace") or die "couldn't open trace file $tstfile, $num: $!.";
   #local $/; undef($/);
@@ -384,7 +392,10 @@ if ($num) {
     exit;
   }
   
-  print qq@<HTML><HEAD><TITLE>$tstfile:$num details.</TITLE></HEAD>\n@;
+  print qq@<HTML><HEAD>
+    <TITLE>$tstfile:$num details.</TITLE>
+    <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    </HEAD>\n@;
   print qq@<BODY><TABLE border=1>\n@;
   print qq@
  <TR>
@@ -592,7 +603,10 @@ sub summarizeTestFile {
  #   or print "couldn't open for output; $!\n", die;
  *TF = *STDOUT;
   
-  print TF "<HTML><HEAD><TITLE>$tstfile regression results - _VERSION_</TITLE>\n";
+  print TF qq@<HTML><HEAD>
+        <TITLE>$tstfile regression results - _VERSION_</TITLE>
+        <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+      </HEAD>\n@;
   print TF "<BODY>\n";
   print TF "<H3>$tstfile regression results - _VERSION_</H3>\n";
   print TF qq@<TABLE border=1>
@@ -852,7 +866,11 @@ sub printslow {
   }
   
 
-  print "<HTML><HEAD><TITLE>Slow results - GNU Go</TITLE></HEAD>\n";
+  print qq@<HTML>
+  <HEAD>
+    <TITLE>Slow results - GNU Go</TITLE>
+    <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+  </HEAD>\n@;
   print "<BODY><H4>Slow results</H4>";
   print "<TABLE border=1>";
   print "<TR><TD><B>Problem</B></TD><TD><B>Status</B></TD><TD>CPU Time</TD></TR>\n";
@@ -887,7 +905,10 @@ sub printspecial {
   my (%special);
   my $sfile = "special";
 
-    print "<HTML><HEAD><TITLE>Special results - GNU Go</TITLE></HEAD>\n";
+    print qq@<HTML>
+         <HEAD><TITLE>Special results - GNU Go</TITLE>
+         <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+       </HEAD>\n@;
     print "<BODY><H4>Special results</H4>";
 
     print "<TABLE border=1>";
@@ -928,10 +949,21 @@ sub printunexpected{
     my @passes; my @upasses;     
 
 
-    print "<HTML><HEAD><TITLE>Unexpected results - GNU Go</TITLE></HEAD>\n";
+    print qq@<HTML><HEAD>
+            <TITLE>Unexpected results - GNU Go</TITLE>
+            <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+          </HEAD>\n@;
     print "<BODY><H4>Unexpected results</H4>";
 
-    foreach my $k (sort keys %h) {
+    sub bynamenumber {
+      my ($aname, $anumber) = $a =~ /(.*):(.*)/;
+      my ($bname, $bnumber) = $b =~ /(.*):(.*)/;
+      $aname cmp $bname or
+        $anumber <=> $bnumber or
+        $a cmp $b;
+    }
+
+    foreach my $k (sort bynamenumber keys %h) {
       my $status = %{$h{$k}}->{status};
       defined $status or do { warn "missing status for $k"; next;};
       if ($status eq 'FAILED') {
@@ -1056,7 +1088,10 @@ sub printbycategory {
       $s+0;
     }
     
-    print "<HTML><HEAD><TITLE>Failures by category - GNU Go</TITLE></HEAD>\n";
+    print qq@<HTML><HEAD>
+       <TITLE>Failures by category - GNU Go</TITLE>
+       <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+      </HEAD>\n@;
     print "<BODY><H4>Failures by category</H4>";
     print qq@<A href="?">main index</A>@;
     

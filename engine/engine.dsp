@@ -41,8 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /W3 /GX /O2 /I "." /I ".." /I "..\sgf" /I "..\interface" /I "..\patterns" /I "..\utils" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /D "HAVE_CONFIG_H" /FD /c
-# SUBTRACT CPP /nologo /YX
+# ADD CPP /GX /Zi /O2 /I "." /I ".." /I "..\sgf" /I "..\interface" /I "..\patterns" /I "..\utils" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /D "HAVE_CONFIG_H" /YX"gnugo.h" /Fd"Release/engine" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -65,8 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /W3 /Gm /GX /ZI /Od /I "." /I ".." /I "..\sgf" /I "..\interface" /I "..\patterns" /I "..\utils" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "HAVE_CONFIG_H" /FR /FD /GZ /c
-# SUBTRACT CPP /nologo /YX
+# ADD CPP /W2 /Gm /GX /ZI /Od /I "." /I ".." /I "..\sgf" /I "..\interface" /I "..\patterns" /I "..\utils" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "HAVE_CONFIG_H" /FR /YX"gnugo.h" /Fd"Debug/engine" /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -88,126 +86,405 @@ LIB32=link.exe -lib
 # Begin Source File
 
 SOURCE=.\aftermath.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\board.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\cache.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\clock.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\combination.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\dragon.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\filllib.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\fuseki.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\genmove.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\globals.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\hash.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\influence.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\interface.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\life.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\matchpat.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\move_reasons.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\movelist.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\optics.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\owl.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\printutils.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\readconnect.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\reading.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\score.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\semeai.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\sgfdecide.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\sgffile.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\shapes.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\showbord.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\utils.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\value_moves.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\worm.c
+
+!IF  "$(CFG)" == "engine - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "engine - Win32 Debug"
+
+# ADD CPP /YX"gnugo.h"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header Files"

@@ -9,6 +9,11 @@
 - removes a bogus "," from Pattern D305
 - read_attack.db tuning
 - new read_defend.db
+- VC builds uses precompiled headers
+- VC Release builds generate debug symbols
+- new '-s' option to regress.pl to control creation of sgf files.
+- instruct robots not to follow regress.plx links.
+- unexpected results page orders results correctly
 
 3.1.26 released February 24, 2002
 

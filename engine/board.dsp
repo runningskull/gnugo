@@ -41,8 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /W3 /GX /O2 /I "." /I ".." /I "..\sgf" /I "..\interface" /I "..\patterns" /I "..\utils" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /D "HAVE_CONFIG_H" /FD /c
-# SUBTRACT CPP /nologo /YX
+# ADD CPP /GX /Zi /O2 /I "." /I ".." /I "..\sgf" /I "..\interface" /I "..\patterns" /I "..\utils" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /D "HAVE_CONFIG_H" /YX"gnugo.h" /Fd"Release/board" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -65,8 +64,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /W3 /Gm /GX /ZI /Od /I "." /I ".." /I "..\sgf" /I "..\interface" /I "..\patterns" /I "..\utils" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "HAVE_CONFIG_H" /D "_LIB" /FR /FD /GZ /c
-# SUBTRACT CPP /nologo /YX
+# ADD CPP /W2 /Gm /GX /ZI /Od /I "." /I ".." /I "..\sgf" /I "..\interface" /I "..\patterns" /I "..\utils" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "HAVE_CONFIG_H" /D "_LIB" /FR /YX"gnugo.h" /Fd"Debug/board" /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
