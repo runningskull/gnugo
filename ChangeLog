@@ -4,6 +4,8 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- remove all colored debugging support from curses.c; remove corresponding
+  configure tests (HAVE_CURSES, HAVE_TERMINFO, ...)
 - removed unused compiler switches in matchpat.c: DFA_SORT, PROFILE_MATCHER,
   PROFILE_PATTERNS
 - removed USE_BDIST option from owl.c

@@ -24,19 +24,6 @@ AC_DEFINE_UNQUOTED(GNU_PACKAGE, "$GNU_PACKAGE")
 
 AM_MAINTAINER_MODE
 
-dnl See if user has expressed a preference for use of curses and/or color
-dnl These set variables $enable_color and $with_curses to "no" if disabled
-dnl "yes" if enabled, or undefined if not specified
-
-AC_ARG_WITH(curses,
- [  --with-curses       try to use curses for colored debugging output (default)
-  --without-curses    do not use curses for colored debugging output])
-
-AC_ARG_ENABLE(color,
- [  --enable-color              use curses or ansi escape sequences for colored
-                                   debug output
-  --disable-color             do not try to generated colored debug output])
-
 dnl and look to see if they want to disable the grid optimisation
 
 AC_ARG_ENABLE(grid-opt,
@@ -110,23 +97,6 @@ AC_HEADER_TIME
 AC_C_CONST
 
 AC_CHECK_HEADERS(unistd.h)
-AC_CHECK_HEADERS(curses.h term.h ncurses/curses.h ncurses/term.h)
-
-if test "$ac_cv_header_curses_h" = "yes";then
-   curses_header="curses.h"
-elif test "$ac_cv_header_ncurses_curses_h" = "yes";then
-   curses_header="ncurses/curses.h"
-else
-   curses_header="no"
-fi
-
-if test "$ac_cv_header_term_h" = "yes";then
-   term_header="term.h"
-elif test "$ac_cv_header_ncurses_term_h" = "yes";then
-   term_header="ncurses/term.h"
-else
-   term_header="no"
-fi
 
 AC_PATH_PROG(perl, perl)
 
@@ -151,73 +121,6 @@ if test "$gnugo_cv_c___function__" = "yes";then
 fi
 
 dnl check for a working curses library for use in debugboard
-
-AH_TEMPLATE([CURSES],
-[Define to use curses for color debugging])
-
-AH_TEMPLATE([HAVE_CURSES_ARROWS],
-[Define if the curses headers defines  KEY_{UP,DOWN,LEFT,RIGHT}])
-
-if test "$curses_header" != "no";then
-  AC_SEARCH_LIBS(initscr,ncurses curses pdcurses termcap terminfo termlib)
-  if test "$ac_cv_search_initscr" != "no";then
-    AC_DEFINE(CURSES)
-    AC_CHECK_FUNCS(vwprintw keypad)
-    AC_CACHE_CHECK(
-	[for KEY_UP],
-	gnugo_cv_decl_key_up,
-	AC_TRY_COMPILE([#include <$curses_header>],
-		[int c=KEY_UP],
-		gnugo_cv_decl_key_up="yes",
-		gnugo_cv_decl_key_up="no")
-    )
-    if test "$gnugo_cv_decl_key_up" = "yes";then
-      AC_DEFINE(HAVE_CURSES_ARROWS)
-    fi
-  fi
-fi
-
-dnl -------- color debugging support -----------
-
-AH_TEMPLATE([TERMINFO],
-[Define to 1 if termcap/terminfo is available.])
-
-AH_TEMPLATE([ANSI_COLOR],
-[Define to use ansi escape sequences for color debugging])
-
-tmp_color_result="none"
-
-if test "$with_curses" != no -a "$enable_color" != no ; then
-  tmp_color_result="none (curses failed)"
-
-  dnl Do a separate test for curses and termcap
-  dnl DJGPP does have pdcurses, but not termcap
-
-  dnl make sure that both curses.h and term.h are available
-  dnl FIXME: better to actually figure out here what headers
-  dnl are really required
-  if test "$term_header" != "no" -a "$curses_header" != "no" ; then
-
-    dnl check for a working termcap library
-    AC_SEARCH_LIBS(tparm,ncurses curses pdcurses termcap terminfo termlib)
-
-    if test "$ac_cv_search_tparm" != "no" ; then
-      AC_DEFINE(TERMINFO)
-    tmp_color_result="curses"
-    fi
-  fi
-fi
-
-
-if test "$with_curses" = no -a "$enable_color" != no ; then
-  dnl we asked for color, but there is no termcap
-  AC_DEFINE(ANSI_COLOR)
-  tmp_color_result="ANSI color"
-
-fi
-
-AC_MSG_CHECKING(for color support)
-AC_MSG_RESULT($tmp_color_result)
 
 dnl ---------- grid optimisation ------------
 

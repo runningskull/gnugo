@@ -29,158 +29,18 @@
 /* Avoid compiler warnings with unused parameters */
 #define UNUSED(x)  (void)x
 
-/* Define TERMINFO or ANSI_COLOR to enable coloring of pieces.
- * This is normally done in config.h.
- */
-
-/* enabling color */
-
-/* linux console :
- *  0=black
- *  1=red
- *  2=green
- *  3=yellow/brown
- *  4=blue
- *  5=magenta
- *  6=cyan
- *  7=white
- */
-
-#ifdef TERMINFO
-
-#ifdef _AIX
-#define _TPARM_COMPAT
-#endif
-
-#if HAVE_CURSES_H
-#include <curses.h>
-#elif HAVE_NCURSES_CURSES_H
-#include <ncurses/curses.h>
-#else
-#endif
-
-#if HAVE_TERM_H
-#include <term.h>
-#elif HAVE_NCURSES_TERM_H
-#include <ncurses/term.h>
-#else
-#endif
-
-
-/* terminfo attributes */
-static char *setaf;		/* terminfo string to set color */
-static int   max_color;		/* terminfo max colour */
-
-static int init = 0;
-
-#endif /* TERMINFO */
-
 void
 gg_init_color()
 {
-#ifdef TERMINFO
-
-/* compiler is set to make string literals  const char *
- * But system header files dont prototype things correctly.
- * These are equivalent to a non-const string literals
- */
-
-  static char setaf_literal[] = "setaf";
-  static char colors_literal[] = "colors";
-  static char empty_literal[] = "";
-
-  if (init)
-    return;
-  
-  init = 1;
-
-  setupterm(NULL, 2, NULL);
-  setaf = tigetstr(setaf_literal);
-  if (!setaf)
-    setaf = empty_literal;
-  max_color = tigetnum(colors_literal) - 1;
-  if (max_color < 1)
-    max_color = 1;
-  else if (max_color > 30)
-    max_color = 30;
-  
-#endif /* TERMINFO */
+  /* Left dummy function for SPEC. /ab. */
 }
 
 
-
-#ifdef WIN32
-#ifdef VC
-#include <crtdbg.h>
-
-verifyW32(BOOL b)
-{
-  if (!b) {
-    _ASSERTE(0 && "Win32 Error");
-    fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
-  }
-}
-
-#else
-/* mingw32 lacks crtdbg.h and _ASSERTE */
-verifyW32(BOOL b)
-{
-  if (!b) {
-    fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
-  }
-}
-
-#endif
-
-#endif
 
 void 
 write_color_char_no_space(int c, int x)
 {
-#ifdef TERMINFO
-
-  fprintf(stderr, "%s%c", tparm(setaf, c, 0, 0, 0, 0, 0, 0, 0, 0), x);
-  fputs(tparm(setaf, max_color, 0, 0, 0, 0, 0, 0, 0, 0), stderr);
-
-#elif defined(ANSI_COLOR)
-
-  fprintf(stderr, "\033[%dm%c\033[0m", 30+c, x);
-
-#elif defined(WIN32)
-  
-  static HANDLE hStdErr = 0;
-  DWORD iCharsWritten;
-  BOOL succeed32;
-  CONSOLE_SCREEN_BUFFER_INFO bufInfo;
-  if (!hStdErr) {
-    hStdErr = GetStdHandle(STD_ERROR_HANDLE);
-    if (hStdErr == INVALID_HANDLE_VALUE) {
-      fprintf(stderr, "Unable to open stderr.\n");
-    }
-  }
-
-  /* Red & Blue are switched from what MS-Windows wants:
-   *   FOREGROUND_BLUE      0x0001 // text color contains blue.
-   *   FOREGROUND_GREEN     0x0002 // text color contains green.
-   *   FOREGROUND_RED       0x0004 // text color contains red
-   * This magic switches the bits back:
-   */
-  c = (c & 1) * 4 + (c & 2) + (c & 4) / 4;
-  c += FOREGROUND_INTENSITY;
-  succeed32 = GetConsoleScreenBufferInfo(hStdErr, &bufInfo);
-  if (!succeed32) {  /* Probably redirecting output, just give plain text. */
-    fprintf(stderr, "%c", x);
-    return;
-  }
-  verifyW32(SetConsoleTextAttribute(hStdErr, (WORD) c));
-  verifyW32(WriteConsole(hStdErr, &x, 1, &iCharsWritten, 0));
-  verifyW32(SetConsoleTextAttribute(hStdErr, bufInfo.wAttributes));
-
-#else
-
   fprintf(stderr, "%c", x);
-
-#endif
 }
 
 void
@@ -237,11 +97,6 @@ gg_version(void)
 double
 gg_cputime(void)
 {
-  static int warned = 0;
-  if (!warned) {
-    fprintf(stderr, "All timing disabled.");
-    warned = 1;
-  }
   return 0.0;
 }
 

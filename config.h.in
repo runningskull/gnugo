@@ -3,14 +3,8 @@
 /* Connection module. Default standard. */
 #undef ALTERNATE_CONNECTIONS
 
-/* Define to use ansi escape sequences for color debugging */
-#undef ANSI_COLOR
-
 /* Ruleset. Default Japanese */
 #undef CHINESE_RULES
-
-/* Define to use curses for color debugging */
-#undef CURSES
 
 /* Default level (strength). Up to 10 supported */
 #undef DEFAULT_LEVEL
@@ -37,26 +31,11 @@
    */
 #undef GRID_OPT
 
-/* Define if the curses headers defines KEY_{UP,DOWN,LEFT,RIGHT} */
-#undef HAVE_CURSES_ARROWS
-
-/* Define if you have the <curses.h> header file. */
-#undef HAVE_CURSES_H
-
 /* Define if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define if you have the `keypad' function. */
-#undef HAVE_KEYPAD
-
 /* Define if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
-
-/* Define if you have the <ncurses/curses.h> header file. */
-#undef HAVE_NCURSES_CURSES_H
-
-/* Define if you have the <ncurses/term.h> header file. */
-#undef HAVE_NCURSES_TERM_H
 
 /* Define if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -76,14 +55,8 @@
 /* Define if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* Define if you have the <term.h> header file. */
-#undef HAVE_TERM_H
-
 /* Define if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
-
-/* Define if you have the `vwprintw' function. */
-#undef HAVE_VWPRINTW
 
 /* Define if the preprocessor recognizes __FUNCTION__ */
 #undef HAVE___FUNCTION__
@@ -111,9 +84,6 @@
 
 /* Define if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Define to 1 if termcap/terminfo is available. */
-#undef TERMINFO
 
 /* Define if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
