@@ -235,3 +235,35 @@ loadsgf games/kgs/evand-TheGNUGo.sgf 270
 500 reg_genmove black
 #? [O15|P13]*
 
+# P8 seems the most reasonable move here.
+loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 16
+510 reg_genmove black
+#? [P8]
+
+# R9 makes life.
+loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 34
+520 reg_genmove black
+#? [R9]
+
+# Black has at least the Q6 threat and should fight the ko.
+loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 52
+530 reg_genmove black
+#? [P14]
+
+# The game move A8 is funny. A stone at A5 or A11 would maybe
+# have a chance to influence something around.
+loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 78
+540 reg_genmove black
+#? [A5|A11]
+
+# I believe there are better chances to save something with a
+# move like Q2 which threatens to make an eye around Q3.
+loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 96
+550 reg_genmove black
+#? [Q2]
+
+# A classic, should be attempted.
+loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 126
+560 reg_genmove black
+#? [B2]
+
