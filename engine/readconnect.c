@@ -2998,7 +2998,11 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
     }
   }
 
-  if (tried_moves == 0 && distance < 1.0) {
+  /* Because of a couple differences between the break-in and the
+   * connection reading code, we can't afford to be as optimistic
+   * as in recursive_connect2() here. See nando:32
+   */
+  if (tried_moves == 0 && distance < 0.89) {
     SGFTRACE(NO_MOVE, WIN, "no move, probably connected");
 #if USE_HASHTABLE_NG
     READ_RETURN_HASH_NG(BREAK_IN, str, depth - stackp, 
