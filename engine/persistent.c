@@ -215,11 +215,11 @@ draw_active_area(char board[BOARDMAX], int apos)
 	c = '.';
       else if (board[pos] == WHITE)
 	c = cw;
-      else if (board[pos] & 3 == WHITE)
+      else if ((board[pos] & 3) == WHITE)
 	c = 'O';
       else if (board[pos] == BLACK)
 	c = cb;
-      else if (board[pos] & 3 == BLACK)
+      else if ((board[pos] & 3) == BLACK)
 	c = 'X';
       if (board[pos] == GRAY)
 	c = '?';
@@ -1117,7 +1117,6 @@ find_persistent_breakin_cache_entry(int routine, int str,
     				    Hash_data goal_hash)
 {
   int k;
-  int color;
   ASSERT1(str == find_origin(str), str);
 
   for (k = 0; k < persistent_breakin_cache_size; k++) {
