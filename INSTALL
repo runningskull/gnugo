@@ -17,11 +17,11 @@ As an example
 
    ./configure --enable-cache-size=32 --enable-level=8
 
-creates a 48 Mb cache in RAM and sets the level to 8.  Both these
+creates a 32 Mb cache in RAM and sets the level to 8.  Both these
 defaults can be overridden at run time.
 
 If you do not specify any options, the default level is 10 (highest
-supported) and the default cache size is 16. These defaults are
+supported) and the default cache size is 8. These defaults are
 probably suitable for most systems unless GNU Go seems too slow.
 
 You have now made a binary called interface/gnugo. Now
@@ -32,7 +32,12 @@ You have now made a binary called interface/gnugo. Now
 to install gnugo in /usr/local/bin. This will also install the man
 page gnugo.6 into /usr/man/man6. Fuller documentation can be found
 in the doc/ directory. (See THE MANUAL below.)
+  
+After you have installed GNU Go, you can save disk space (and still keep
+the source files) by typing:
 
+  make clean
+  
 There are different methods of using GNU Go. You may run it from the
 command line by just typing:
 
@@ -49,7 +54,7 @@ See the README file for instructions on how to run GNU Go from Cgoban.
 
                           RAM CACHE
 
-By default, GNU Go makes a cache of 16 Megabytes in RAM for its
+By default, GNU Go makes a cache of 8 Megabytes in RAM for its
 internal use. The cache is used to store intermediate results during
 its analysis of the position.
 
@@ -72,7 +77,7 @@ To set the cache size to n. For example
    ./configure --enable-cache-size=48
 
 creates a cache of size 48. If you omit this, your default
-cache size will be 16. You must recompile and reinstall GNU Go
+cache size will be 8. You must recompile and reinstall GNU Go
 after reconfiguring it by running make and make install.
 
 You may override the compile-time defaults by running gnugo with
@@ -94,7 +99,7 @@ can set the default level with the configure option
 ./configure --enable-level=9
 
 sets the default level to 9. If you omit this parameter,
-the compiler sets the default level to 8. We recommend
+the compiler sets the default level to 10. We recommend
 using level 10 unless you find it too slow. If you decide
 you want to change the default you may rerun configure
 and recompile the program.

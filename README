@@ -4,6 +4,7 @@ This is GNU Go, a Go program. Development versions of GNU Go may be
 found at http://www.gnu.org/software/gnugo/devel.html. Consult TODO if
 you are interested in helping.
 
+
                           Installation
 
 In short, './configure; make' will build GNU Go; optionally (running
@@ -30,6 +31,7 @@ makeinfo --html gnugo.texi.
 
 Contact us at gnugo@gnu.org if you are interested in helping to
 develop this program.
+
 
                     Running GNU Go via CGoban
 
@@ -189,7 +191,7 @@ gnugo --help.
 
 
 * `-M', `--cache-size MEGS'
-     Memory in megabytes used for hashing. The default size is 16
+     Memory in megabytes used for hashing. The default size is 8
      unless you configure gnugo with the command `configure
      --enable-cache-size=SIZE' before compiling to make SIZE
      the default.

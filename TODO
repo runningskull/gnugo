@@ -45,9 +45,8 @@ member.  Some of them are bigger and demand a deeper knowledge of the
 engine internals.  The issues are presented here in an approximate
 order of perceived difficulty.
 
- * Add a check in patterns/mkpat.c that the main diagram and the
-   constraint diagram are consistent. Currently it is only verified
-   that they have the same size.
+ * Add more checks in patterns/mkpat.c testing whether the main diagram and
+   the constraint diagram are consistent.
 
  * Complete the conversion to 1-dimensional representation.
    Check all comments before functions to make them agree with
@@ -66,16 +65,7 @@ order of perceived difficulty.
 
  * Make the cache not waste storage on 64 bit systems.
 
- * a) Add move history for "permanent" moves (i.e. ones done with
-   play_move(), in contrast to temporary moves done by
-   trymove()/tryko()) in the board code. Notice that the move history
-   must be added to the state in the Position struct.
-
-   b) Implement undo for "permanent" moves in the board code and
-   replace various other undo implementations in play_gtp.c,
-   play_ascii.c, and play_gmp.c with this.
-
-   c) Implement detection of superko violation in the board code. We
+ * Implement detection of superko violation in the board code. We
    probably only want this optionally in play_move() and in a variant
    of is_legal().
 
@@ -86,7 +76,7 @@ order of perceived difficulty.
    half_eye_data, worm and dragon to use the same structure as the
    dragon2 array.
 
- * Implement hashing and persistent caching in the semeai code. 
+ * Implement persistent caching in the semeai code. 
 
  * Support for ko in eyes.db and optics.c.
 
@@ -119,30 +109,26 @@ playing strength of the program and/or enhance certain aspects of it.
    square, and so on. Other areas where test suites would be most
    welcome are fuseki, tesuji, and endgame.
 
- * Tuning the pattern databases. These are under constant revision 
-   This is a sort of art. It is not
-   necessary to do any programming to do this since most of the
-   patterns do not require helpers. We would like it if a few more Dan
-   level players would learn this skill.
+ * Tuning the pattern databases. These are under constant revision.  This
+   is a sort of art. It is not necessary to do any programming to do this
+   since most of the patterns do not require helpers. We would like it if
+   a few more Dan level players would learn this skill.
 
- * Extend and tune the Joseki database.
+ * Extend and tune the Joseki database. It might be very useful to implement
+   a semi-automatic way of doing this.
 
- * The semeai module is vastly in need of improvement. In fact, semeai
-   can probably only be analyzed by reading to discover what
-   backfilling is needed before we can make atari. 
+ * The semeai module is still in need of improvement.
    (This is underway.)
 
  * The connection analysis is today completely static and has a hard
    time identifying mutually dependent connections or moves that
    simultaneously threatens two or more connections. This could be
-   improved by writing a connection reader, which like the owl code
-   uses pattern matching to find a small amount of key moves to try.
+   improved by writing a connection reader.
    (This is underway.)
 
- * GNU Go has a problem with opponents that build big moyos.  This is
-   because there is no move generator that tries explicitly to neither
-   build nor enter opponent moyos. Such a move generator could be
-   built using the same type of code that is used in the owl life and
+ * GNU Go does not have a move generator that tries explicitly to build
+   moyos, or reduce/invade opponent's moyos. Such a move generator could
+   be built using the same type of code that is used in the owl life and
    death reader, or the connection reader mentioned in point 5 above.
 
  * A much improved combination module.  The combination module of
@@ -152,16 +138,16 @@ playing strength of the program and/or enhance certain aspects of it.
    also be strong enough to find combinations of strategic moves and
    more indirect threats (a threat to a threat).  Possibly it could
    combine threats in AND-OR trees (DAGs?) that could be searched
-   using ordinary tree search algorithms. (Revision of combination.c
+   using ordinary tree search algorithms.  (Revision of combination.c
    is underway.)
 
  * Speed up the tactical reading. GNU Go is reasonably accurate when
-   it comes to tactical reading, but not always very fast. The main
+   it comes to tactical reading, but not always very fast.  The main
    problem is that too many ineffective moves are tested, leading to
-   strange variations that shouldn't need consideration. To improve
-   this the move generation heuristics in the reading code needs to be
-   refined. Some improvements should also be possible to obtain by
-   tuning the move ordering.
+   strange variations that shouldn't need consideration.  To improve
+   one could refine the move generation heuristics in the reading.
+   Also, one should implement some more of the standard tree search
+   optimizations used in alpha-beta readers.
 
  * Create a way to quickly assess the safety of a group.  This might
    take into account number of eyes / half eyes, moyo in corners, moyo
@@ -172,13 +158,10 @@ playing strength of the program and/or enhance certain aspects of it.
    group and/or weakens an opponent group and how strong/weak groups
    influence each other.
 
- * A move generator that identifies invasions or places to make
-   reducing moves (and of course threats to make invasions).
-
  * In some positions GNU Go may report a group as alive or connected
-   with a living group. But after the opponent has placed one stone
+   with a living group.  But after the opponent has placed one stone
    GNU Go may change the status to dead, without going through a
-   critical status. It would be nice if these positions could be
+   critical status.  It would be nice if these positions could be
    identified and logged for later analysis of the GNU Go team.
 
  * Automatic search for missing patterns by analysing games from
