@@ -1,0 +1,907 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       #
+# http://www.gnu.org/software/gnugo/ for more information.          #
+#                                                                   #
+# Copyright 1999, 2000, 2001, 2002 the Free Software Foundation.    #
+#                                                                   #
+# This program is free software; you can redistribute it and/or     #
+# modify it under the terms of the GNU General Public License       #
+# as published by the Free Software Foundation - version 2.         #
+#                                                                   #
+# This program is distributed in the hope that it will be useful,   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of    #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU #
+# General Public License in file COPYING for more details.          #
+#                                                                   #
+# You should have received a copy of the GNU General Public License #
+# along with this program; if not, write to the Free Software       #
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111,  #
+# USA.                                                              #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  The General Fuseki Pattern Database, fuseki.db
+#
+#  Further documentation may be found in the Texinfo documentation
+#
+#  First there is a pattern title of the form: Pattern [string]. The
+#  string is used for identifying the pattern while tuning or debugging.
+#
+#  Then a block of the following characters representing the pattern
+#  itself.
+#  
+#  ?     : don't care
+#  .     : empty
+#  X     : your piece,
+#  O     : my piece,
+#  x     : your piece or empty
+#  o     : my piece or empty
+#  *     : my next move
+#  -, |  : edge of board
+#  +     : corner of board
+#  !     : additional stones to be placed on the board (together with *)
+#
+#  If a pattern must not match at the edge of the board,
+#  an extra row of ?'s in the pattern may be added. (This
+#  will not add to the time taken to check the pattern.)
+#
+#################
+#
+#  After the pattern, some supplementary information in the format:
+#
+# :trfno, classification, [values], helper_function
+#   
+#  These and other aspects of the pattern database are documented
+#  in the Texinfo documentation.
+#
+#################
+#
+#  Any line beginning with #, or any part of a line following
+#  whitespace is a comment. 
+#
+#  This database has the special property that there are stones
+#  temporarily added at the very corners of the board when
+#  called. This allows us to use pattern matching for the first real
+#  stones in an empty corner but also means that the extreme corner
+#  stones must be included in all corner patterns.
+#
+#  There are no meaningful classifications that can be used in this
+#  database. All patterns need to have a specified value, which is
+#  related to the probability that the pattern will be used. Basically
+#  a pattern which has a value being N higher than another pattern is
+#  2^N times more probable to be chosen. Additionally there are some
+#  cutoffs involved, see engine/handicap.c for details.
+
+
+Pattern H1
+
+|.....       4-4 in empty corner
+|...*.
+|.....
+|.....
+|O....
++-----
+
+:/,-,value(25)
+
+
+Pattern H2
+
+|....        3-3 in empty corner
+|..*.
+|....
+|O...
++----
+
+:/,-,value(23)
+
+
+Pattern H3
+
+|.....       3-4 in empty corner
+|...*.
+|.....
+|O....
++-----
+
+:8,-,value(24)
+
+
+Pattern H4
+
+|.....
+|...*.       5-4 in empty corner
+|.....
+|.....
+|.....
+|O....
++-----
+
+:8,-,value(23)
+
+
+Pattern H5
+
+|.....
+|..*..       5-3 in empty corner
+|.....
+|.....
+|.....
+|O....
++-----
+
+:8,-,value(23)
+
+
+Pattern H6
+
+|......
+|....*.      5-5 in empty corner
+|......
+|......
+|......
+|O.....
++------
+
+:8,-,value(18)
+
+
+Pattern H7
+
+|......
+|...*..      ponnuki in corner
+|..!.!.
+|...!..
+|......
+|O.....
++------
+
+:8,-,value(23)
+
+|......
+|...*..
+|..!.!.
+|...!..
+|......
+|O.....
++------
+
+;remaining_handicap_stones() > 20
+
+
+Pattern H10
+
+|.....
+|..*..       shimari
+|.....
+|...O.
+|.....
+|O....
++-----
+
+:8,-,value(21)
+
+
+Pattern H11
+
+|.....
+|...*.       shimari
+|.....
+|...O.
+|.....
+|O....
++-----
+
+:8,-,value(21)
+
+
+Pattern H12
+
+|.....
+|..*..
+|.....       shimari
+|.....
+|...O.
+|.....
+|O....
++-----
+
+:8,-,value(19)
+
+
+Pattern H13
+
+|.....
+|...*.
+|.....       shimari
+|.....
+|...O.
+|.....
+|O....
++-----
+
+:8,-,value(19)
+
+
+Pattern H14
+
+|.....
+|..O..       shimari
+|.....
+|...*.
+|.....
+|O....
++-----
+
+:8,-,value(21)
+
+
+Pattern H15
+
+|.....
+|..O..       shimari
+|.....
+|..*..
+|.....
+|O....
++-----
+
+:8,-,value(18)
+
+
+Pattern H16
+
+|.....
+|...O.       shimari
+|.....
+|...*.
+|.....
+|O....
++-----
+
+:8,-,value(21)
+
+
+Pattern H17
+
+|.....
+|...O.       shimari
+|.....
+|..*..
+|.....
+|O....
++-----
+
+:8,-,value(18)
+
+
+Pattern H18
+
+|......
+|...*..	      shimari
+|......
+|..O...
+|......
+|O.....
++------
+
+:8,-,value(18)
+
+
+Pattern H19
+
+|......
+|...*..
+|......	      shimari
+|......
+|..O...
+|......
+|O.....
++------
+
+:8,-,value(19)
+
+
+Pattern H20
+
+|......
+|...*..
+|......	      shimari
+|...O..
+|......
+|......
+|O.....
++------
+
+:8,-,value(19)
+
+
+Pattern H21
+
+|......
+|..*...
+|......	      shimari
+|...O..
+|......
+|......
+|O.....
++------
+
+:8,-,value(19)
+
+
+Pattern H22
+
+|......
+|..O.*.	      make shimari extra strong
+|......
+|...O..
+|......
+|O.....
++------
+
+:8,-,value(12)
+
+
+Pattern H23
+
+|......
+|..O...
+|......	      close corner
+|...O..
+|...*..
+|......
+|O.....
++------
+
+:8,-,value(11)
+
+
+Pattern H24
+
+|......
+|...O..
+|......	      close corner
+|...O..
+|..*...
+|......
+|O.....
++------
+
+:8,-,value(11)
+
+
+Pattern H30
+
+|...................|    san-ren-sei
+|...O.....*.....O...|
+|...................|
+|...................|
+|O.................O|
++-------------------+
+
+:8,-,value(22)
+
+
+Pattern H31
+
+|...................|    low chinese
+|..O............O...|
+|........*..........|
+|...................|
+|O.................O|
++-------------------+
+
+:8,-,value(24)
+
+
+Pattern H32
+
+|...................|    high chinese
+|..O.....*......O...|
+|...................|
+|...................|
+|O.................O|
++-------------------+
+
+:8,-,value(24)
+
+
+Pattern H40
+
+|............    extend from shimari
+|..oo........
+|.........*..
+|..oo........
+|............
+|O...........
++------------
+
+:8,-,value(20)
+
+|............
+|..ab........
+|.........*..
+|..cd........
+|............
+|O...........
++------------
+
+;o_somewhere(a,b) && o_somewhere(c,d)
+
+
+Pattern H41
+
+|............    extend from shimari
+|..oo........
+|............
+|..oo.....*..
+|............
+|O...........
++------------
+
+:8,-,value(20)
+
+|............
+|..ab........
+|............
+|..cd.....*..
+|............
+|O...........
++------------
+
+;o_somewhere(a,b) && o_somewhere(c,d)
+
+
+Pattern H42
+
+|............    extend from shimari
+|............
+|..o......*..
+|..o.O.......
+|............
+|O...........
++------------
+
+:8,-,value(17)
+
+|............
+|............
+|..a......*..
+|..b.O.......
+|............
+|O...........
++------------
+
+;o_somewhere(a,b)
+
+
+Pattern H43
+
+|............    extend from shimari
+|............
+|..o.O.......
+|..o......*..
+|............
+|O...........
++------------
+
+:8,-,value(17)
+
+|............
+|............
+|..a.O.......
+|..b......*..
+|............
+|O...........
++------------
+
+;o_somewhere(a,b)
+
+
+Pattern H44
+
+|..oo........    extend from hoshi
+|............
+|...O........
+|.........*..
+|............
+|O...........
++------------
+
+:8,-,value(17)
+
+
+Pattern H45
+
+|..oo........    extend from hoshi
+|............
+|...O.....*..
+|............
+|............
+|O...........
++------------
+
+:8,-,value(17)
+
+
+Pattern H50
+
+|..oooo........     early edge move
+|..ooo....*....
+|..............
+|O.............
++--------------
+
+:8,-,value(16)
+
+
+Pattern H51
+
+|..oooo........
+|..ooo....*....     early edge move
+|..oooo........
+|..............
+|O.............
++--------------
+
+:8,-,value(16)
+
+
+Pattern H52
+
+|..ooo........
+|..ooo....O...     iron pillar
+|..ooo....*...
+|.............
+|O............
++-------------
+
+:8,-,value(12)
+
+
+Pattern H53
+
+|..ooo....*...
+|..ooo........     jump
+|..ooo....O...
+|.............
+|O............
++-------------
+
+:8,-,value(12)
+
+
+Pattern H60
+
+|..............
+|..............
+|..............
+|..ooo.........
+|..ooo....*....     early center move
+|..ooo.........
+|..............
+|..............
+|..............
+|..ooo...ooo...
+|..ooo...ooo...
+|..ooo...ooo...
+|..............
+|O.............
++--------------
+
+:/,-,value(14)
+
+
+Pattern H61
+
+|..............
+|..............
+|..............
+|..ooo.........
+|..ooo....*....     early center move
+|..ooo.........
+|..............
+|..............
+|..............
+|..ooo...ooo...
+|..ooo...ooo...
+|..ooo...ooo...
+|..............
+|O.............
++--------------
+
+:/,-,value(19)
+
+|..............
+|..............
+|..............
+|..ooo.........
+|..ooo....*....
+|..ooo.........
+|..............
+|..............
+|..............
+|..ooo...ooo...
+|..ooo...ooo...
+|..ooo...ooo...
+|..............
+|O.............
++--------------
+
+;remaining_handicap_stones() > 4
+
+
+Pattern H62
+
+|..............
+|..............
+|..............
+|..ooo.........
+|..ooo...*.!...     early center formation
+|..ooo.........
+|..............
+|..............
+|..............
+|..ooo...ooo...
+|..ooo...ooo...
+|..ooo...ooo...
+|..............
+|O.............
++--------------
+
+:8,-,value(19)
+
+|..............
+|..............
+|..............
+|..ooo.........
+|..ooo...*.!...
+|..ooo.........
+|..............
+|..............
+|..............
+|..ooo...ooo...
+|..ooo...ooo...
+|..ooo...ooo...
+|..............
+|O.............
++--------------
+
+;remaining_handicap_stones() > 9
+
+
+Pattern H63
+
+|..............
+|..............
+|..............
+|..ooo....!....
+|..ooo...*.!...     early center ponnuki
+|..ooo....!....
+|..............
+|..............
+|..............
+|..ooo...ooo...
+|..ooo...ooo...
+|..ooo...ooo...
+|..............
+|O.............
++--------------
+
+:/,-,value(19)
+
+|..............
+|..............
+|..............
+|..ooo....!....
+|..ooo...*.!...
+|..ooo....!....
+|..............
+|..............
+|..............
+|..ooo...ooo...
+|..ooo...ooo...
+|..ooo...ooo...
+|..............
+|O.............
++--------------
+
+;total_handicap_stones() > 18
+
+
+Pattern H70
+
++-------------------+
+|O.................O|    special influence oriented pattern
+|...................|
+|...................|
+|.........!.........|
+|...................|
+|...................|
+|...................|
+|...................|
+|...................|
+|...!.....*.....!...|	  
+|...................|
+|...................|
+|...................|
+|...................|
+|...................|
+|.........!.........|
+|...................|
+|...................|
+|O.................O|
++-------------------+
+
+:8,-,value(19)
+
++-------------------+
+|O.................O|
+|...................|
+|...................|
+|.........!.........|
+|...................|
+|...................|
+|...................|
+|...................|
+|...................|
+|...!.....*.....!...|	  
+|...................|
+|...................|
+|...................|
+|...................|
+|...................|
+|.........!.........|
+|...................|
+|...................|
+|O.................O|
++-------------------+
+
+;total_handicap_stones() >= 5
+
+
+Pattern H71
+
++-------------------+
+|O.................O|    great wall!
+|...................|
+|...................|
+|.........!.........|
+|...................|
+|...................|
+|..........!........|
+|...................|
+|...................|
+|.........*.........|	  
+|...................|
+|...................|
+|........!..........|
+|...................|
+|...................|
+|.........!.........|
+|...................|
+|...................|
+|O.................O|
++-------------------+
+
+:8,-,value(19)
+
++-------------------+
+|O.................O|
+|...................|
+|...................|
+|.........!.........|
+|...................|
+|...................|
+|..........!........|
+|...................|
+|...................|
+|.........*.........|	  
+|...................|
+|...................|
+|........!..........|
+|...................|
+|...................|
+|.........!.........|
+|...................|
+|...................|
+|O.................O|
++-------------------+
+
+;total_handicap_stones() >= 5
+
+
+Pattern H80
+
+......
+...O..	    strengthen connection
+O.....
+...*..
+.....o
+....oo
+
+:8,-,value(8)
+
+
+Pattern H81
+
+....oo
+......
+O.....	    jump out
+...*..
+O.....
+......
+....oo
+
+:8,-,value(8)
+
+
+Pattern H82
+
+....oo
+O...oo	    jump out
+......
+O..*..
+......
+....oo
+
+:8,-,value(8)
+
+
+Pattern H83
+
+....oo
+.....o
+O.....	    jump out
+O..*..
+......
+....oo
+
+:8,-,value(8)
+
+
+Pattern H84
+
+o...oo	    one space jump
+......
+O.*...
+......
+o...oo
+
+:8,-,value(5)
+
+
+Pattern H85
+
+......	    strengthen
+......
+..O*..
+......
+......
+
+:8,-,value(5)
+
+
+Pattern H86
+
+o..o	    one space jump
+....
+O.*.
+....
+o..o
+
+:8,-,value(1)
+
+
+Pattern H87
+
+...o	    strengthen
+....
+.O*.
+....
+...o
+
+:8,-,value(1)
+
+
+# END OF FILE

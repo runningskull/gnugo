@@ -156,14 +156,14 @@ libengine_a_LIBADD =
 am_libengine_a_OBJECTS = aftermath.$(OBJEXT) board.$(OBJEXT) \
 	cache.$(OBJEXT) clock.$(OBJEXT) combination.$(OBJEXT) \
 	dragon.$(OBJEXT) filllib.$(OBJEXT) fuseki.$(OBJEXT) \
-	genmove.$(OBJEXT) globals.$(OBJEXT) handicap.$(OBJEXT) hash.$(OBJEXT) \
-	influence.$(OBJEXT) interface.$(OBJEXT) life.$(OBJEXT) \
-	matchpat.$(OBJEXT) move_reasons.$(OBJEXT) movelist.$(OBJEXT) \
-	optics.$(OBJEXT) owl.$(OBJEXT) printutils.$(OBJEXT) \
-	readconnect.$(OBJEXT) reading.$(OBJEXT) score.$(OBJEXT) \
-	semeai.$(OBJEXT) sgfdecide.$(OBJEXT) sgffile.$(OBJEXT) \
-	shapes.$(OBJEXT) showbord.$(OBJEXT) utils.$(OBJEXT) \
-	value_moves.$(OBJEXT) worm.$(OBJEXT)
+	genmove.$(OBJEXT) globals.$(OBJEXT) handicap.$(OBJEXT) \
+	hash.$(OBJEXT) influence.$(OBJEXT) interface.$(OBJEXT) \
+	life.$(OBJEXT) matchpat.$(OBJEXT) move_reasons.$(OBJEXT) \
+	movelist.$(OBJEXT) optics.$(OBJEXT) owl.$(OBJEXT) \
+	printutils.$(OBJEXT) readconnect.$(OBJEXT) reading.$(OBJEXT) \
+	score.$(OBJEXT) semeai.$(OBJEXT) sgfdecide.$(OBJEXT) \
+	sgffile.$(OBJEXT) shapes.$(OBJEXT) showbord.$(OBJEXT) \
+	utils.$(OBJEXT) value_moves.$(OBJEXT) worm.$(OBJEXT)
 libengine_a_OBJECTS = $(am_libengine_a_OBJECTS)
 
 DEFS = @DEFS@
@@ -177,17 +177,17 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/combination.Po $(DEPDIR)/dragon.Po \
 @AMDEP_TRUE@	$(DEPDIR)/filllib.Po $(DEPDIR)/fuseki.Po \
 @AMDEP_TRUE@	$(DEPDIR)/genmove.Po $(DEPDIR)/globals.Po \
-@AMDEP_TRUE@	$(DEPDIR)/handicap.Po $(DEPDIR)/hash.Po $(DEPDIR)/influence.Po \
-@AMDEP_TRUE@	$(DEPDIR)/interface.Po $(DEPDIR)/life.Po \
-@AMDEP_TRUE@	$(DEPDIR)/matchpat.Po $(DEPDIR)/move_reasons.Po \
-@AMDEP_TRUE@	$(DEPDIR)/movelist.Po $(DEPDIR)/optics.Po \
-@AMDEP_TRUE@	$(DEPDIR)/owl.Po $(DEPDIR)/printutils.Po \
-@AMDEP_TRUE@	$(DEPDIR)/readconnect.Po $(DEPDIR)/reading.Po \
-@AMDEP_TRUE@	$(DEPDIR)/score.Po $(DEPDIR)/semeai.Po \
-@AMDEP_TRUE@	$(DEPDIR)/sgfdecide.Po $(DEPDIR)/sgffile.Po \
-@AMDEP_TRUE@	$(DEPDIR)/shapes.Po $(DEPDIR)/showbord.Po \
-@AMDEP_TRUE@	$(DEPDIR)/utils.Po $(DEPDIR)/value_moves.Po \
-@AMDEP_TRUE@	$(DEPDIR)/worm.Po
+@AMDEP_TRUE@	$(DEPDIR)/handicap.Po $(DEPDIR)/hash.Po \
+@AMDEP_TRUE@	$(DEPDIR)/influence.Po $(DEPDIR)/interface.Po \
+@AMDEP_TRUE@	$(DEPDIR)/life.Po $(DEPDIR)/matchpat.Po \
+@AMDEP_TRUE@	$(DEPDIR)/move_reasons.Po $(DEPDIR)/movelist.Po \
+@AMDEP_TRUE@	$(DEPDIR)/optics.Po $(DEPDIR)/owl.Po \
+@AMDEP_TRUE@	$(DEPDIR)/printutils.Po $(DEPDIR)/readconnect.Po \
+@AMDEP_TRUE@	$(DEPDIR)/reading.Po $(DEPDIR)/score.Po \
+@AMDEP_TRUE@	$(DEPDIR)/semeai.Po $(DEPDIR)/sgfdecide.Po \
+@AMDEP_TRUE@	$(DEPDIR)/sgffile.Po $(DEPDIR)/shapes.Po \
+@AMDEP_TRUE@	$(DEPDIR)/showbord.Po $(DEPDIR)/utils.Po \
+@AMDEP_TRUE@	$(DEPDIR)/value_moves.Po $(DEPDIR)/worm.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

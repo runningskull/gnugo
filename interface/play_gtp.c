@@ -105,6 +105,7 @@ DECLARE(gtp_owl_does_defend);
 DECLARE(gtp_owl_substantial);
 DECLARE(gtp_owl_threaten_attack);
 DECLARE(gtp_owl_threaten_defense);
+DECLARE(gtp_place_free_handicap);
 DECLARE(gtp_playblack);
 DECLARE(gtp_playwhite);
 DECLARE(gtp_popgo);
@@ -209,6 +210,7 @@ static struct gtp_command commands[] = {
   {"popgo",            	      gtp_popgo},
   {"orientation",     	      gtp_set_orientation},
   {"protocol_version",        gtp_protocol_version},
+  {"place_free_handicap",     gtp_place_free_handicap},
   {"query_boardsize",         gtp_query_boardsize},
   {"query_orientation",       gtp_query_orientation},
   {"quit",             	      gtp_quit},
@@ -537,8 +539,44 @@ gtp_fixed_handicap(char *s)
     return gtp_failure("handicap not an integer");
   
   clear_board();
-  if (placehand(handicap) != handicap)
+  if (place_fixed_handicap(handicap) != handicap)
     return gtp_failure("invalid handicap");
+
+  gtp_start_response(GTP_SUCCESS);
+
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++)
+      if (BOARD(m, n) != EMPTY) {
+	if (!first)
+	  gtp_printf(" ");
+	else
+	  first = 0;
+	gtp_mprintf("%m", m, n);
+      }
+  
+  return gtp_finish_response();
+}
+
+
+/* Function:  Set up free placement handicap stones.
+ * Arguments: number of handicap stones
+ * Fails:     invalid number of stones
+ * Returns:   list of vertices with handicap stones
+ */
+static int
+gtp_place_free_handicap(char *s)
+{
+  int m, n;
+  int first = 1;
+  int handicap;
+  if (sscanf(s, "%d", &handicap) < 1)
+    return gtp_failure("handicap not an integer");
+  
+  clear_board();
+  if (handicap < 0 || handicap == 1)
+    return gtp_failure("invalid handicap");
+
+  place_free_handicap(handicap);
 
   gtp_start_response(GTP_SUCCESS);
 

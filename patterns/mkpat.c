@@ -301,7 +301,9 @@ static struct autohelper_func autohelper_functions[] = {
   {"non_oterritory",  		1, 0.0,
 		"influence_mark_non_territory(%s, color)"},
   {"non_xterritory",  		1, 0.0,
-		"influence_mark_non_territory(%s, OTHER_COLOR(color))"}
+		"influence_mark_non_territory(%s, OTHER_COLOR(color))"},
+  {"remaining_handicap_stones",	0, 0.0, "free_handicap_remaining_stones()"},
+  {"total_handicap_stones",	0, 0.0, "free_handicap_total_stones()"}
 };
 
 
@@ -1349,6 +1351,7 @@ finish_constraint_and_action(char *name)
   float cost;
   int have_constraint = (pattern[patno].autohelper_flag & HAVE_CONSTRAINT);
   int have_action = (pattern[patno].autohelper_flag & HAVE_ACTION);
+  int no_labels = 1;
 
   /* Mark that this pattern has an autohelper. */
   pattern[patno].autohelper = dummyhelper;
@@ -1383,13 +1386,19 @@ finish_constraint_and_action(char *name)
   for (i = 0; i < sizeof(VALID_CONSTRAINT_LABELS); i++) {
     int c = (int) VALID_CONSTRAINT_LABELS[i];
 
-    if (label_coords[c][0] != -1)
+    if (label_coords[c][0] != -1) {
       code_pos += sprintf(code_pos,
 			  "\n  %c = offset(%d, %d, move, transformation);",
 			  c,
 			  label_coords[c][0] - ci - pattern[patno].movei,
 			  label_coords[c][1] - cj - pattern[patno].movej);
+      no_labels = 0;
+    }
   }
+
+  /* move might be unused. Add an UNUSED statement to avoid warnings. */
+  if (no_labels)
+    code_pos += sprintf(code_pos, "\n  UNUSED(move);");
 
   code_pos += sprintf(code_pos, "\n\n");
   if (have_constraint && have_action)

@@ -434,7 +434,10 @@ void superstring_chainlinks(int str, int *num_adj, int adj[MAXCHAIN],
 void proper_superstring_chainlinks(int str, int *num_adj, 
                                    int adj[MAXCHAIN], int liberty_cap);
 
-int placehand(int handicap);          /* place stones on board only */
+int place_fixed_handicap(int handicap); /* place stones on board only */
+int place_free_handicap(int handicap); /* place stones on board only */
+int free_handicap_remaining_stones(void);
+int free_handicap_total_stones(void);
 
 
 /* Various different strategies for finding a move */

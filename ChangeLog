@@ -2,6 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- placehand() renamed to place_fixed_handicap()
+- new function place_free_handicap() in handicap.c with associated
+  static functions find_free_handicap_pattern() and
+  free_handicap_callback()
+- new GTP command place_free_handicap
+- new pattern database handicap.db
+- new autohelper functions remaining_handicap_stones and
+  total_handicap_stones, useful from handicap.db
+- mkpat.c revised to avoid compiler warnings for constraints using no
+  labels
 - new file engine/handicap.c
 - placehand() moved from genmove.c to handicap.c
 - bug fix in adjusted_worm_attack_value()

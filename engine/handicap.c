@@ -22,6 +22,7 @@
 #include "gnugo.h"
 
 #include "liberty.h"
+#include "patterns.h"
 #include "random.h"
 
 /* ================================================================ */
@@ -131,11 +132,12 @@ static const int places[][2] = {
 
 
 /*
- * Sets up handicap stones, returning the number of placed handicap stones.
+ * Sets up fixed handicap placement stones, returning the number of
+ * placed handicap stones.
  */
 
 int
-placehand(int handicap)
+place_fixed_handicap(int handicap)
 {
   int x;
   int maxhand;
@@ -193,6 +195,236 @@ placehand(int handicap)
   return retval;
 }
 
+
+/* ================================================================ */
+/*       Set up free placement handicap stones for black side       */
+/* ================================================================ */
+
+
+/*
+ * Sets up free handicap placement stones, returning the number of
+ * placed handicap stones.
+ */
+
+static int remaining_handicap_stones = -1;
+static int total_handicap_stones = -1;
+
+static int find_free_handicap_pattern(void);
+static void free_handicap_callback(int m, int n, int color,
+				   struct pattern *pattern,
+				   int ll, void *data);
+
+int
+place_free_handicap(int handicap)
+{
+  gg_assert(handicap == 0 || handicap >= 2);
+
+  if (handicap == 0)
+    return 0;
+
+  total_handicap_stones = handicap;
+  remaining_handicap_stones = handicap;
+
+  /* First place black stones in the four corners to enable the
+   * pattern matching scheme.
+   */
+  add_stone(POS(0, 0), BLACK);
+  add_stone(POS(0, board_size - 1), BLACK);
+  add_stone(POS(board_size - 1, 0), BLACK);
+  add_stone(POS(board_size - 1, board_size - 1), BLACK);
+
+  /* Find and place free handicap stones by pattern matching. */
+  while (remaining_handicap_stones > 0) {
+    if (!find_free_handicap_pattern())
+      break;
+  }
+
+  /* Remove the artificial corner stones. */
+  remove_stone(POS(0, 0));
+  remove_stone(POS(0, board_size - 1));
+  remove_stone(POS(board_size - 1, 0));
+  remove_stone(POS(board_size - 1, board_size - 1));
+
+  /* Find and place additional free handicap stones by the aftermath
+   * algorithm.
+   */
+  while (remaining_handicap_stones > 0) {
+    int move;
+    /* Call genmove_conservative() in order to prepare the engine for
+     * an aftermath_genmove() call. We discard the genmove result.
+     */
+    genmove_conservative(NULL, NULL, BLACK);
+    if (aftermath_genmove(&move, BLACK, NULL, 0) > 0) {
+      add_stone(move, BLACK);
+      remaining_handicap_stones--;
+    }
+    else
+      break;
+  }
+
+  /* Set handicap to the number of actually placed stones. */
+  handicap -= remaining_handicap_stones;
+
+  /* Reset these to invalid values, so that improper used of handicap
+   * helper functions can be detected.
+   */
+  total_handicap_stones = -1;
+  remaining_handicap_stones = -1;
+  
+  return handicap;
+}
+
+struct handicap_match {
+  int value;
+  int m;
+  int n;
+  struct pattern *pattern;
+  int ll;
+};
+
+#define MAX_HANDICAP_MATCHES 40
+
+static struct handicap_match handicap_matches[MAX_HANDICAP_MATCHES];
+static int number_of_matches;
+
+static int
+find_free_handicap_pattern()
+{
+  int k;
+  int highest_value = -1;
+  int sum_values = 0;
+  int r;
+  int m;
+  int n;
+  struct pattern *pattern;
+  int ll;
+  int move;
+
+  number_of_matches = 0;
+  matchpat(free_handicap_callback, BLACK, &handipat_db, NULL, NULL);
+
+  if (number_of_matches == 0)
+    return 0;
+
+  /* Find the highest value among the matched patterns. */
+  for (k = 0; k < number_of_matches; k++)
+    if (highest_value < handicap_matches[k].value)
+      highest_value = handicap_matches[k].value;
+
+  /* Replace the values by 2^(value - highest_value + 10) and compute
+   * the sum of these values. Fractional values are discarded.
+   */
+  for (k = 0; k < number_of_matches; k++) {
+    if (handicap_matches[k].value < highest_value - 10)
+      handicap_matches[k].value = 0;
+    else
+      handicap_matches[k].value = 1 << (handicap_matches[k].value
+					- highest_value + 10);
+    sum_values += handicap_matches[k].value;
+  }
+
+  /* Pick a random number between 0 and sum_values. Don't bother with
+   * the fact that lower numbers will tend to be very slightly
+   * overrepresented.
+   */
+  r = gg_rand() % sum_values;
+  
+  /* Find the chosen pattern. */
+  for (k = 0; k < number_of_matches; k++) {
+    r -= handicap_matches[k].value;
+    if (r < 0)
+      break;
+  }
+
+  /* Place handicap stones according to pattern k. */
+  m = handicap_matches[k].m;
+  n = handicap_matches[k].n;
+  pattern = handicap_matches[k].pattern;
+  ll = handicap_matches[k].ll;
+  
+  /* Pick up the location of the move */
+  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+  add_stone(move, BLACK);
+  remaining_handicap_stones--;
+
+  /* Add stones at all '!' in the pattern. */
+  for (k = 0; k < pattern->patlen; k++) { 
+    if (pattern->patn[k].att == ATT_not) {
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+				 ll, m, n);
+      add_stone(pos, BLACK);
+      remaining_handicap_stones--;
+    }
+  }
+
+  return 1;
+}
+
+static void
+free_handicap_callback(int m, int n, int color, struct pattern *pattern,
+		       int ll, void *data)
+{
+  int r = -1;
+  int k;
+  int number_of_stones = 1;
+
+  /* Pick up the location of the move */
+  int move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
+
+  UNUSED(data);
+
+  /* Check how many stones are placed by the pattern. This must not be
+   * larger than the number of remaining handicap stones.
+   */
+  for (k = 0; k < pattern->patlen; k++) { 
+    if (pattern->patn[k].att == ATT_not)
+      number_of_stones++;
+  }
+  if (number_of_stones > remaining_handicap_stones)
+    return;
+
+  /* If the pattern has a constraint, call the autohelper to see
+   * if the pattern must be rejected.
+   */
+  if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
+    if (!pattern->autohelper(pattern, ll, move, color, 0))
+      return;
+  }
+  
+  if (number_of_matches < MAX_HANDICAP_MATCHES) {
+    r = number_of_matches;
+    number_of_matches++;
+  }
+  else {
+    int least_value = handicap_matches[0].value + 1;
+    for (k = 0; k < number_of_matches; k++) {
+      if (handicap_matches[k].value < least_value) {
+	r = k;
+	least_value = handicap_matches[k].value;
+      }
+    }
+  }
+  gg_assert(r >= 0 && r < MAX_HANDICAP_MATCHES);
+  handicap_matches[r].value   = pattern->value;
+  handicap_matches[r].m       = m;
+  handicap_matches[r].n       = n;
+  handicap_matches[r].pattern = pattern;
+  handicap_matches[r].ll      = ll;
+}
+
+int
+free_handicap_remaining_stones()
+{
+  gg_assert(remaining_handicap_stones >= 0);
+  return remaining_handicap_stones;
+}
+
+int
+free_handicap_total_stones()
+{
+  gg_assert(total_handicap_stones >= 0);
+  return total_handicap_stones;
+}
 
 /*
  * Local Variables:

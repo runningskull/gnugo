@@ -330,9 +330,6 @@ void init_tree_owl_attackpat(void);
 void init_tree_owl_vital_apat(void);
 void init_tree_owl_defendpat(void);
 void init_tree_fusekipat(void);
-void init_tree_fuseki9(void);
-void init_tree_fuseki13(void);
-void init_tree_fuseki19(void);
 void init_tree_joseki(void);
 void init_tree_read_attack(void);
 void init_tree_read_defend(void);
@@ -351,6 +348,8 @@ extern struct pattern_db endpat_db;
 extern struct pattern_db influencepat_db;
 extern struct pattern_db barrierspat_db;
 extern struct pattern_db fusekipat_db;
+extern struct pattern_db handipat_db;
+
 extern struct fullboard_pattern fuseki19[];
 extern struct fullboard_pattern fuseki13[];
 extern struct fullboard_pattern fuseki9[];

@@ -239,7 +239,7 @@ gnugo_is_suicide(int i, int j, int color)
 int
 gnugo_placehand(int handicap)
 {
-  return placehand(handicap);
+  return place_fixed_handicap(handicap);
 }
 
 
@@ -256,7 +256,7 @@ gnugo_recordboard(SGFNode *root)
 int
 gnugo_sethand(int handicap, SGFNode *node)
 {
-  int stones = placehand(handicap);
+  int stones = place_fixed_handicap(handicap);
   sgffile_recordboard(node);
   return stones;
 }

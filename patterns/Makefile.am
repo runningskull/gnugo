@@ -27,6 +27,7 @@ EXTRA_DIST = $(DSP)\
 	fuseki9.db\
 	fuseki13.db\
 	fuseki19.db\
+	handicap.db\
 	read_attack.db\
 	read_defend.db
 
@@ -62,7 +63,7 @@ GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  owl_attackpat.c\
 		 owl_vital_apat.c owl_defendpat.c fusekipat.c\
                  fuseki9.c fuseki13.c fuseki19.c josekidb.c\
-		 read_attack.c read_defend.c
+		 read_attack.c read_defend.c handipat.c
 
 DBBUILT = hoshi.db komoku.db sansan.db mokuhazushi.db takamoku.db
 
@@ -146,6 +147,9 @@ fuseki13.c : $(srcdir)/fuseki13.db mkpat$(EXEEXT)
 
 fuseki19.c : $(srcdir)/fuseki19.db mkpat$(EXEEXT)
 	./mkpat -b -f fuseki19 < $(srcdir)/fuseki19.db >fuseki19.c
+
+handipat.c : $(srcdir)/handicap.db mkpat$(EXEEXT)
+	./mkpat -b handipat < $(srcdir)/handicap.db >handipat.c
 
 read_attack.c : $(srcdir)/read_attack.db mkpat$(EXEEXT)
 	./mkpat -b read_attack < $(srcdir)/read_attack.db >read_attack.c
