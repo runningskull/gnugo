@@ -10,6 +10,11 @@ loadsgf games/tactics05.sgf
 10 gg_genmove white
 #? [!T9]
 
+loadsgf games/tactics06.sgf
+20 owl_defend C19
+#? [1 A17]
+
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

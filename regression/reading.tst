@@ -718,6 +718,23 @@ loadsgf games/reading39.sgf
 175 defend O3
 #? [1 (N1|N2)]*
 
+# See also nngs3:1170
+loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
+trymove white B1
+176 attack B1
+#? [0]
+
+loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
+trymove black L4
+trymove white N3
+trymove black N2
+177 defend K4
+#? [1 N1]
+popgo
+popgo
+popgo
+
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
