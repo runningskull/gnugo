@@ -77,6 +77,8 @@ my %match_hist;
 my $loadfile;
 my $movenum;
 my $movecount;
+my $move;
+my $toplay;
 
 my $helpstring = "
 
@@ -132,6 +134,10 @@ my $prog_out = new FileHandle;		# stdout of program
 
 if ($loadfile)
 {
+
+    print "--loadsgf not currently supported.\n";
+    exit;
+
     #we need to analyze an sgf file
     if (not defined $movecount) {
 	print "Error: When analyzing an sgf file with --loadsgf <filename>, you also need to
@@ -180,7 +186,7 @@ while ($games > 0) {
 	if defined $sgffilename;
 
     my $pass = 0;
-    my ($move, $toplay);
+    $move = "";
 
     if ($handicap < 2) {
 	$toplay = 'B';
@@ -196,20 +202,21 @@ while ($games > 0) {
 
     $movenum = 1;
     while ($pass < 2) {
-	if ($toplay eq 'B') {
+        if ($toplay eq 'B') {
 	    print $prog_in "genmove_black\n";
-#	    FIXME: we want this debug code in, but fixed.
-#	    print "$toplay plays $move\n" if $verbose;
-
-	    $toplay = 'W';
 	} else {
 	    print $prog_in "genmove_white\n";
-#	    print "$toplay plays $move\n" if $verbose;
-
-	    $toplay = 'B';
 	}
 
 	$move = eat_move($prog_out);
+	print "$toplay plays $move\n" if $verbose;
+
+	if ($toplay eq 'B') {
+	    $toplay = 'W';
+	} else {
+	    $toplay = 'B';
+	}
+
 	$sgfmove = standard_to_sgf($move);
 	print SGFFILEHANDLE ";$toplay\[$sgfmove\]\n" if defined $sgffilename;
 	if ($move =~ /PASS/i) {
@@ -236,8 +243,12 @@ while ($games > 0) {
 	$game_list{$sgffile} = $result;
     }
     $games-- if $games > 0;
+
+    #make sure gnugo dies correctly.
     close $prog_in;
     close $prog_out;
+    waitpid $pidp, 0;
+
     print "games remaining: $games\n";
 }
 
@@ -262,6 +273,7 @@ if (defined $sgffilename) {
   print $index_out "</TABLE></BODY></HTML>\n";
 }
 
+exit;
 #all done here.
 
 sub game_result {
@@ -292,8 +304,6 @@ sub html_encode {
   return $r;
 }
 
-
-
 sub eat_no_response {
     my $h = shift;
 
@@ -303,6 +313,18 @@ sub eat_no_response {
 	chop($line = <$h>) or die "No response!";
         $line =~ s/(\s|\n)*$//smg;
     }
+}
+
+sub eat_one_line {
+    my $h = shift;
+
+# ignore empty lines
+    my $line = "";
+    while ($line eq "") {
+	chop($line = <$h>) or die "No response!";
+        $line =~ s/(\s|\n)*$//smg;
+    }
+    return $line;
 }
 
 sub eat_move {
@@ -396,6 +418,9 @@ sub check_matcher {
     my $legality = "illegal";
     my $vertex = " ";
     my $new_status = " ";
+    my $old_status;
+    my $il_vertex = "";
+    my $il_move = "";
 
     #send command
     print $in "dragon_status\n";
@@ -408,14 +433,13 @@ sub check_matcher {
 
     while ($line ne "")
     {
-#       print "parsing a line\n";
+        print "parsing a line\n" if ($verbose);
         $line =~ s/= //g;	#zap the "= " at the front of the response
 	$line =~ s/\n//g;	#zap newlines...
 	$line =~ s/://g;	#zap the :
 	print $line . "\n" if ($verbose);
 	($vertex, $new_status) = split(" ", $line);	#and split on spaces
 							#extra get trashed
-	my $old_status;
 	$old_status = $match_hist{$vertex} if (exists($match_hist{$vertex}));
 
 	#debug output
@@ -442,6 +466,9 @@ sub check_matcher {
 	if ($old_status eq "unknown") {
 	    if ($new_status eq "alive") {$legality = "legal";}
 	    if ($new_status eq "critical") {$legality = "legal";}
+	}
+	if ($old_status eq "alive" and $new_status eq "dead") {
+	    $legality = "killed";
 	}
 
 	if ($match_hist{$vertex} eq $new_status)
@@ -474,12 +501,62 @@ sub check_matcher {
 		print "Old Status: $old_status\n";
 		print "New Status: $new_status\n";
 		print "\n";
+
+		#now print gtp output
+		#FIXME: doesn't work with --loadsgf because we don't have
+		#the move list available (it's hidden by using GTP loadsgf).
+		#FIXME: currently, only produces GTP output for one transition
+		#per move.  This is because we have to finish parsing the
+		#entire output of dragon_status before dealing with finding
+		#missed attacks.  Using arrays instead would fix it.
+		if ($legality eq "killed" and !defined($loadfile)) {
+        	    #The type we deal with now.
+		    #FIXME: check for defensive errors too.
+		    $il_move = $move;
+		    $il_vertex = $vertex;
+		}
 	    }
 	    $match_hist{$vertex} = $new_status;
 	}
     } continue {
         chop($line = <$out>);
     }
+
+    if ($il_move ne "") {
+        print "attempting gtp output.\n";
+        #undo the move, check owl_does_attack
+        #and owl_attack, if they disagree,
+        #output a regression test.
+        print $in "undo\n";
+        eat_no_response($out);
+        my $oa_result = "";
+        my $oda_result = "";
+        print $in "owl_attack $vertex\n";
+        $oa_result = eat_one_line($out);
+        print "owl_attack $vertex\: $oa_result\n";
+        print $in "owl_does_attack $move $vertex\n";
+	$oda_result = eat_one_line($out);
+	print "owl_does_attack $move $vertex\: $oda_result\n";
+
+	#now try to do something with it
+	if ($oa_result eq "= 0" and $oda_result ne "= 0") {
+	    print "found a missed attack.\n\n";
+	    my $m = $movenum - 1;
+	    print "loadsgf $sgffile $m\n";
+	    print "owl_attack $vertex\n";
+	    print "#$oa_result\n";
+	    print "#? [1 $move]*\n\n";
+	} else {
+	    print "no missed attack found.\n\n";
+	}
+
+	#cancel the undo
+	my $last_played = "B";
+	if ($toplay eq "B") { $last_played = "W"; }
+	print $in "gg_genmove $last_played\n";
+	eat_move($out);
+    }
+
     print "\n" if ($verbose > 0);
 }
 
