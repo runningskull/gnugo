@@ -581,12 +581,12 @@ loadsgf games/trevor/auto/d47.sgf 100
 
 loadsgf games/trevor/auto/d48.sgf 80
 1100 gg_genmove white
-#? [N5]*
+#? [N5]
 
 
 loadsgf games/trevor/auto/d48.sgf 150
 1110 gg_genmove white
-#? [O17]
+#? [O17]*
 
 
 #Mostly, !Q7
