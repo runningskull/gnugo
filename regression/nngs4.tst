@@ -314,6 +314,14 @@ loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 220
 740 reg_genmove black
 #? [D2]
 
+#Gnugo 3.4 played at D5, then black happily answered at C6
+#C7 simply restricted the move of C5 and prevent black to
+#build territory on left side.
+
+loadsgf games/nngs/gnugo-3.4-nailer-200308230714.sgf 32
+750 reg_genmove white
+#? [C7]
+
 
 ############ End of Tests #################
 
