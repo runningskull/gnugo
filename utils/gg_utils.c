@@ -272,7 +272,9 @@ double gg_cputime(void)
 {
 #if HAVE_SYS_TIMES_H && HAVE_TIMES
     struct tms t;
-    return times(&t) / ((double) CLOCKS_PER_SEC);
+    times(&t);
+    return (t.tms_utime + t.tms_stime + t.tms_cutime + t.tms_cstime)
+            / ((double) CLOCKS_PER_SEC);
 #elif defined(WIN32)
     FILETIME creationTime, exitTime, kernelTime, userTime;
     ULARGE_INTEGER uKernelTime,uUserTime,uElapsedTime;
@@ -287,6 +289,11 @@ double gg_cputime(void)
     /* convert from multiples of 100nanosecs to seconds: */
     return (signed __int64)(uElapsedTime.QuadPart) * 1.e-7;
 #else
+    static int warned = 0;
+    if (!warned) {
+      fprintf(stderr, "CPU timing unavailable - returning wall time.");
+      warned = 1;
+    }
     /* return wall clock seconds */
     return gg_gettimeofday();
 #endif
