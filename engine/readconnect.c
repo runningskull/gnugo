@@ -2376,8 +2376,8 @@ compute_connection_distances(int str, struct connection_data *conn)
 	}
 	
 	/* Case 2. "a" is empty and would be self atari for the opponent. */
-	if (conn->distances[apos] > distance + 0.1
-	    && board[apos] == EMPTY
+	if (board[apos] == EMPTY
+	    && conn->distances[apos] > distance + 0.1
 	    && is_self_atari(apos, other)) {
 	  ENQUEUE(conn, apos, distance + 0.1, 0.1);
 	}
@@ -2398,9 +2398,11 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 4. Diagonal connection to another stone "b" through
 	 * empty vertices "a" and "g".
 	 */
-	if (conn->distances[bpos] > distance + 0.2
-	    && board[bpos] == color
-	    && board[apos] == EMPTY && board[gpos] == EMPTY) {
+	if (board[bpos] == color
+	    && board[apos] == EMPTY
+	    && board[gpos] == EMPTY
+	    && conn->distances[bpos] > distance + 0.2
+	    ) {
 	  ENQUEUE(conn, apos, distance + 0.2, 0.2);
 	  ENQUEUE(conn, gpos, distance + 0.2, 0.2);
 	}
@@ -2408,9 +2410,9 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 5. Almost bamboo joint.
 	 * 
 	 */
-	if (conn->distances[gpos] > distance + 0.2
-	    && board[gpos] == EMPTY
+	if (   board[gpos] == EMPTY
 	    && board[epos] == color
+            && conn->distances[gpos] > distance + 0.2
 	    && approxlib(gpos, other, 3, NULL) <= 2
 	    && ((board[bpos] == EMPTY
 		 && approxlib(bpos, color, 3, NULL) >= 3
@@ -2434,17 +2436,18 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 6. "a" is empty and an opponent move can be captured in
 	 * a ladder.
 	 */
-	if (conn->distances[apos] > distance + 0.7
-	    && board[apos] == EMPTY
+	if (board[apos] == EMPTY
+	    && conn->distances[apos] > distance + 0.7
 	    && ladder_capturable(apos, other)) {
 	  ENQUEUE(conn, apos, distance + 0.7, 0.7);
 	}
 
 	/* Case 7. "a" is empty or occupied by opponent.
 	 */
-	if (conn->distances[apos] > distance + 1.0
-	    && (board[apos] == EMPTY
-		|| board[apos] == other)) {
+	if ((board[apos] == EMPTY
+		|| board[apos] == other)
+	    && conn->distances[apos] > distance + 1.0
+	    ) {
 	  ENQUEUE(conn, apos, distance + 1.0, 1.0);
 	}
 
@@ -2452,60 +2455,64 @@ compute_connection_distances(int str, struct connection_data *conn)
 	 * empty vertex "a" or "g", which makes "a" or "g" self_atari
 	 * for opponent.
 	 */
-	if (conn->distances[bpos] > distance + 1.1
-	    && board[bpos] == EMPTY
-	    && board[apos] == EMPTY && does_secure(color, bpos, apos)) {
+	if (   board[bpos] == EMPTY
+	    && board[apos] == EMPTY
+	    && conn->distances[bpos] > distance + 1.1
+	    && does_secure(color, bpos, apos)) {
 	  ENQUEUE(conn, bpos, distance + 1.1, 1.0);
 	}
 
-	if (conn->distances[bpos] > distance + 1.1
-	    && board[bpos] == EMPTY
-	    && board[gpos] == EMPTY && does_secure(color, bpos, gpos)) {
+	if (   board[bpos] == EMPTY
+	    && board[gpos] == EMPTY
+	    &&conn->distances[bpos] > distance + 1.1
+	    && does_secure(color, bpos, gpos)) {
 	  ENQUEUE(conn, bpos, distance + 1.1, 1.0);
 	}
 
 	/* Case 9. One-space jump to empty vertex "e" through empty
 	 * vertex "g", which makes "g" self_atari for opponent.
 	 */
-	if (conn->distances[epos] > distance + 1.1
-	    && board[gpos] == EMPTY
-	    && board[epos] == EMPTY && does_secure(color, epos, gpos)) {
+	if (   board[gpos] == EMPTY
+	    && board[epos] == EMPTY
+	    && conn->distances[epos] > distance + 1.1
+	    && does_secure(color, epos, gpos)) {
 	  ENQUEUE(conn, epos, distance + 1.1, 1.0);
 	}
 
 	/* Case 10. Diagonal connection to empty vertex "b" through
 	 * empty vertices "a" and "g".
 	 */
-	if (conn->distances[bpos] > distance + 1.3
-	    && board[bpos] == EMPTY
-	    && board[apos] == EMPTY && board[gpos] == EMPTY) {
+	if (   board[bpos] == EMPTY
+	    && board[apos] == EMPTY && board[gpos] == EMPTY
+            && conn->distances[bpos] > distance + 1.3
+	    ) {
 	  ENQUEUE(conn, bpos, distance + 1.3, 1.0);
 	}
 
 	/* Case 11. Keima to f or j on edge and one space jump on
 	 * first or second line.
 	 */
-	if ((conn->distances[fpos] > distance + 1.3
-	     || conn->distances[epos] > distance + 1.5)
-	    && countlib(pos) >= 3
-	    && board[apos] == EMPTY
+	if (   board[apos] == EMPTY
 	    && board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && board[epos] == EMPTY
 	    && board[fpos] == EMPTY
+	    && (conn->distances[fpos] > distance + 1.3
+	     || conn->distances[epos] > distance + 1.5)
+	    && countlib(pos) >= 3
 	    && (!ON_BOARD(cpos) || !ON_BOARD(hpos))) {
 	  ENQUEUE(conn, fpos, distance + 1.3, 1.0);
 	  ENQUEUE(conn, epos, distance + 1.3, 1.0);
 	}
 
-	if ((conn->distances[jpos] > distance + 1.3
-	     || conn->distances[epos] > distance + 1.5)
-	    && countlib(pos) >= 3
+	if (countlib(pos) >= 3
 	    && board[hpos] == EMPTY
 	    && board[ipos] == EMPTY
 	    && board[gpos] == EMPTY
 	    && board[epos] == EMPTY
 	    && board[jpos] == EMPTY
+	    && (conn->distances[jpos] > distance + 1.3
+	     || conn->distances[epos] > distance + 1.5)
 	    && (!ON_BOARD(apos) || !ON_BOARD(kpos))) {
 	  ENQUEUE(conn, jpos, distance + 1.3, 1.0);
 	  ENQUEUE(conn, epos, distance + 1.3, 1.0);
@@ -2515,16 +2522,16 @@ compute_connection_distances(int str, struct connection_data *conn)
 	 * empty vertex "a" or "g", which allows opponent move at "a"
 	 * or "g" to be captured in a ladder.
 	 */
-	if (conn->distances[bpos] > distance + 1.2
-	    && board[bpos] == EMPTY
+	if (   board[bpos] == EMPTY
 	    && board[apos] == EMPTY
+	    && conn->distances[bpos] > distance + 1.2
 	    && does_secure_through_ladder(color, bpos, apos)) {
 	  ENQUEUE(conn, bpos, distance + 1.2, 1.0);
 	}
 
-	if (conn->distances[bpos] > distance + 1.2
-	    && board[bpos] == EMPTY
+	if (   board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
+	    && conn->distances[bpos] > distance + 1.2
 	    && does_secure_through_ladder(color, bpos, gpos)) {
 	  ENQUEUE(conn, bpos, distance + 1.2, 1.0);
 	}
@@ -2532,15 +2539,16 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 13. Diagonal connection to empty vertex "b" through
 	 * empty vertex "a" or "g", with no particular properties.
 	 */
-	if (conn->distances[bpos] > distance + 1.8
-	    && board[bpos] == EMPTY
-	    && board[apos] == EMPTY) {
+	if (   board[bpos] == EMPTY
+	    && board[apos] == EMPTY
+	    && conn->distances[bpos] > distance + 1.8
+	    ) {
 	  ENQUEUE(conn, bpos, distance + 1.8, 0.9);
 	}
 
-	if (conn->distances[bpos] > distance + 1.8
-	    && board[bpos] == EMPTY
+	if (   board[bpos] == EMPTY
 	    && board[gpos] == EMPTY
+	    && conn->distances[bpos] > distance + 1.8
 	    && does_secure_through_ladder(color, bpos, gpos)) {
 	  ENQUEUE(conn, bpos, distance + 1.8, 0.9);
 	}
@@ -2548,10 +2556,10 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 14. Diagonal connection to empty vertex "b" through
 	 * opponent stones "a" or "g" with few liberties.
 	 */
-	if (conn->distances[bpos] > distance + 2.0
-	    && board[bpos] == EMPTY
+	if (   board[bpos] == EMPTY
 	    && board[apos] == other
 	    && board[gpos] == other
+	    && conn->distances[bpos] > distance + 2.0
 	    && (countlib(apos) + countlib(gpos) <= 6)) {
 	  ENQUEUE(conn, bpos, distance + 2.0, 1.0);
 	}
@@ -2559,18 +2567,18 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 15. Diagonal connection to own stone "b" through
 	 * opponent stones "a" or "g" with few liberties.
 	 */
-	if (conn->distances[bpos] > distance + 2.0
-	    && board[bpos] == color
+	if (   board[bpos] == color
 	    && board[apos] == other
 	    && board[gpos] == other
+	    && conn->distances[bpos] > distance + 2.0
 	    && (countlib(apos) + countlib(gpos) <= 5)) {
 	  ENQUEUE(conn, bpos, distance + 2.0, 1.0);
 	}
 
 	/* Case 16. Adjacent opponent stone at "a" which can't avoid atari.
 	 */
-	if (conn->distances[apos] > distance + 0.1
-	    && board[apos] == other
+	if (board[apos] == other
+	    && conn->distances[apos] > distance + 0.1
 	    && no_escape_from_atari(apos)) {
 	  ENQUEUE(conn, apos, distance + 0.1, 0.1);
 	}
@@ -2578,8 +2586,8 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 17. Adjacent opponent stone at "a" which can't avoid
 	 * ladder capture.
 	 */
-	if (conn->distances[apos] > distance + 0.3
-	    && board[apos] == other
+	if (board[apos] == other
+	    && conn->distances[apos] > distance + 0.3
 	    && no_escape_from_ladder(apos)) {
 	  ENQUEUE(conn, apos, distance + 0.3, 0.3);
 	}
@@ -2627,18 +2635,20 @@ compute_connection_distances(int str, struct connection_data *conn)
 	/* Case 1. Diagonal connection to empty vertex "b" through
 	 * empty vertices "a" and "g".
 	 */
-	if (conn->distances[bpos] > distance + 1.5
-	    && board[bpos] == EMPTY
-	    && board[apos] == EMPTY && board[gpos] == EMPTY) {
+	if (   board[bpos] == EMPTY
+	    && board[apos] == EMPTY
+	    && board[gpos] == EMPTY
+            && conn->distances[bpos] > distance + 1.5) {
 	  ENQUEUE(conn, bpos, distance + 1.5, 1.0);
 	}
 	
 	/* Case 2. Diagonal connection to friendly stone at "b" through
 	 * empty vertices "a" and "g".
 	 */
-	if (conn->distances[bpos] > distance + 1.3
-	    && board[bpos] == color
-	    && board[apos] == EMPTY && board[gpos] == EMPTY) {
+	if (   board[bpos] == color
+	    && board[apos] == EMPTY
+	    && board[gpos] == EMPTY
+	    && conn->distances[bpos] > distance + 1.3) {
 	  ENQUEUE(conn, bpos, distance + 1.3, 1.0);
 	}
       }
