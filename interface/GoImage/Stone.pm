@@ -4,7 +4,8 @@
 # Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/ #
 # for more information.                                         #
 #                                                               #
-# Copyright 2001, 2002, 2003 by Code Bus, Inc.                  #
+# Copyright 2001, 2002, 2003, 2004                              #
+# by the Free Software Foundation.                              #
 #                                                               #
 # This program is free software; you can redistribute it and/or #
 # modify it under the terms of the GNU General Public License   #
@@ -42,7 +43,7 @@ BEGIN {
       # set the version for version checking
       $VERSION     = 0.01;
       # if using RCS/CVS, this may be preferred (???-tm)
-      $VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
+      $VERSION = do { my @r = (q$Revision: 1.7 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r }; # must be all one line, for MakeMaker
       @ISA         = qw(Exporter);
       @EXPORT      = qw(&createPngFile &parseFileName);
       %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
