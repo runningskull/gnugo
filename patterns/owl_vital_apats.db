@@ -708,4 +708,22 @@ XBO
 
 ;lib(A) ==2 || lib(B) == 2
 
+
+Pattern VA41
+# tm New Pattern (3.1.16)
+
+X*X	double attack on safe eye
+.X.
+X.X
+OXX
+
+:8,-,value(75)
+
+b*c
+.X.
+XAX
+DXX
+
+;!attack(D) && oplay_attack(*,b) && oplay_attack(*,c)
+
 # END OF FILE

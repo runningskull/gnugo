@@ -359,6 +359,24 @@ Pattern EE107
 
 ; defend(B) && !oplay_defend(*,B) && safe_xmove(*)
 
+Pattern EE107
+#tm New Pattern (3.1.16)
+#   see trevor:163
+
++--	very special corner position
+|.*
+|.O
+|OX
+
+:8,aO
+
++--
+|.*
+|.O
+|OB
+
+; defend(B) && !oplay_defend(*,B) && safe_xmove(*)
+
 # first line pushes (except in corner)
 ######################################
 
@@ -1013,6 +1031,18 @@ X*.
 
 ;marginal_eye(*) && proper_eye(a) && oplay_attack(*,a,a)
 
+
+Pattern EF102
+#tm New Pattern (3.1.16)
+O.
+*O
+
+:8,O,reverse_followup(1)
+
+Ac
+*B
+
+;proper_eye(c) && !oplay_attack(*,*) && xplay_attack_either(*,A,B) 
 
 ######################################################################
 #

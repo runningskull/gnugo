@@ -138,7 +138,7 @@ loadsgf games/semeai/semeai9.sgf
 loadsgf golois/Goemate990902-1.sgf
 
 23 owl_analyze_semeai G12 G13
-#? [ALIVE ALIVE (F13|G13|H13|PASS)]*
+#? [ALIVE DEAD (F15|G16|H16|PASS)]*
 
 24 owl_analyze_semeai G13 G12
 #? [DEAD DEAD PASS]*
@@ -154,8 +154,9 @@ loadsgf golois/Goemate990902-1.sgf
 
 # If this semeai is treated as a strictly local
 # problem (ignoring the R8 dragon) then R7 can't live.
-# So it's unclear what the correct answer should be.
-# A similar remark holds with problem 27.
+# But the semeai code treats it as a local problem by
+# design!  So it's unclear what the correct answer
+# should be.  A similar remark holds with problem 27.
 28 owl_analyze_semeai R7 Q7
 #? [ALIVE DEAD S9]*
 

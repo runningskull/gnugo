@@ -367,20 +367,25 @@ XXOOb
 ; oplay_attack(a,b,b) || !oplay_attack(a,b,c,d,a)
 
 
-Pattern A202
 
-O?               second line block
-*X
-..
---
+# tm Removed (3.1.16)
+#   too many false matches.
+#Pattern A202
+#
+#O?               second line block
+#*X
+#..
+#--
+#
+#:8,-,value(39)
 
-:8,-,value(39)
 
 
 Pattern A203
+# tm Modified (3.1.16)
 
 ?O??              second line block
-x*X?
+x*Xx
 ...X
 ----
 
@@ -498,7 +503,7 @@ Pattern A208a
 
 O.X
 *.X
-...
+.oo
 ---
 
 :8,-,value(55)
@@ -2173,20 +2178,21 @@ X.X
 
 
 Pattern A803
+# tm modified(3.1.16)
 
 xxX?      connect under
-.OXO
+oOXO
 ..*.
 ----
 
 :8,-,value(80)
 
 xxX?
-.AOO
+oAXO
 ..*.
 ----
 
-; !oplay_attack(*,A) && attack(A)
+; attack(A) && !oplay_attack(*,A) 
 
 
 Pattern A804
@@ -2207,7 +2213,7 @@ A*oo
 Pattern A805
 
 XxxX?       connect under
-..OXO
+.oOXO
 ...*.
 -----
 

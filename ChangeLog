@@ -3,6 +3,12 @@
 -------------------------------------------------------------------------
 
 - readconnect.c revised
+- take into account followup values if reverse_followup >= 1
+- try a little harder in attack_either
+- break_through_helper improved.
+- tuning
+- owl tuning
+- test revisions
 
 3.1.16 released December 9, 2001
 

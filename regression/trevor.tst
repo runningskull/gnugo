@@ -463,7 +463,7 @@ loadsgf games/trevor/trevor_43.sgf
 #So, gg_genmove defends appropriately.
 loadsgf games/trevor/trevor_44.sgf
 440 owl_attack E6
-#? [1 F4]*
+#? [1 (F4|F5|E4)]*
 
 #CATEGORY=owl_tuning
 #DESCRIPTION=Double-threat to eye-space missed.
@@ -492,11 +492,11 @@ loadsgf games/trevor/trevor_46.sgf
 #SEE_ALSO=owl:181
 loadsgf games/trevor/trevor_47.sgf
 470 owl_attack G9
-#? [2 G6]*
+#? [(2|3) G6]*
 
 #SEE_ALSO=trevor:470
 471 owl_attack A7
-#? [2 A3]*
+#? [(2|3) A3]*
 
 
 #CATEGORY=pattern_tuning
@@ -535,6 +535,15 @@ loadsgf games/trevor/trevor_60.sgf 2
 loadsgf games/trevor/trevor_63.sgf
 630 owl_attack G13
 #? [1 H13]*
+
+#CATEGORY=OWL
+#DESCRIPTION=Perhaps a semeai problem???
+#SEVERITY=10
+#SEE_ALSO=niki:9
+loadsgf games/trevor/trevor_64.sgf
+640 owl_defend G11
+#? [1 (..+)]*
+
 
 #CATEGORY=OWL_EYES
 #DESCRIPTION=Fixed by eye pattern 402

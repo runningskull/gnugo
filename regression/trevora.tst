@@ -322,7 +322,7 @@ loadsgf games/trevor/auto/a031.sgf 40
 #Locally, D2 is best.
 loadsgf games/trevor/auto/a033.sgf 26
 500 gg_genmove white
-#? [D2]*
+#? [D2|D1]*
 
 
 

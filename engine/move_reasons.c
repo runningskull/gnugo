@@ -3580,8 +3580,10 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * be 0 points + followup.  But we want to take the intersections first
      * were we actually get some points.  0.5 points is a 1 point ko which
      * is the smallest value that is actually worth something.
+     * tm - But with reverse_followup values, we may want to play a 0 point move.
      */
-    if (tot_value >= 0.5) {
+    if (tot_value >= 0.5 
+        || (move[pos].reverse_followup_value >= 1)) {
       float old_tot_value = tot_value;
       float contribution;
       /* We adjust the value according to followup and reverse followup
@@ -3590,7 +3592,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       contribution = gg_min( gg_min(
         0.5 * move[pos].followup_value
              + 0.5 * move[pos].reverse_followup_value,
-        tot_value +  move[pos].followup_value),
+        1    * tot_value + move[pos].followup_value),
         1.1 * tot_value + move[pos].reverse_followup_value);
       tot_value += contribution;
       /* The first case applies to gote vs gote situation, the

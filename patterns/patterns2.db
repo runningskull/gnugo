@@ -2377,6 +2377,25 @@ DA*.
 ; oplay_attack(*,A,b,C,D) &&
 ; oplay_attack(*,A,b,E,C,*)
 
+Pattern Shape 76
+# tm New Pattern. (3.1.16) (see trevor:220)
+
+----
+....
+....
+O.*.
+
+:8,-,shape(-4)
+
+----
+....
+CbE.
+DA*.
+
+; xlib(A) > 2 &&
+; oplay_attack(*,A,b,C,D) &&
+; oplay_attack(*,A,b,E,C,*)
+
 ###########################
 #
 # Followup moves. 

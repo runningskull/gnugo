@@ -391,6 +391,8 @@ attack_and_defend(int str,
 int
 attack_either(int astr, int bstr)
 {
+  int asuccess = 0;
+  int bsuccess = 0;
   int color = board[astr];
   ASSERT1(IS_STONE(color) , astr);
   ASSERT1(color == board[bstr], bstr);
@@ -398,10 +400,45 @@ attack_either(int astr, int bstr)
   /* Start by attacking the string with the fewest liberties. On
    * average this seems to be slightly more efficient.
    */
-  if (countlib(astr) <= countlib(bstr))
-    return attack(astr, NULL) || attack(bstr, NULL);
-  else
-    return attack(bstr, NULL) || attack(astr, NULL);
+  if (countlib(astr) > countlib(bstr)) {
+    int t = astr;
+    astr = bstr;
+    bstr = t;
+  }
+
+  asuccess = attack(astr, NULL);
+  if (asuccess == WIN) {
+    return asuccess;
+  }
+  bsuccess = attack(bstr, NULL);
+  if (asuccess || bsuccess) {
+    return (asuccess > bsuccess) ? asuccess : bsuccess;
+  }
+
+  /* Try (a little) harder */
+  {
+    int libs[2];
+    int alibs = findlib(astr, 2, libs);
+    int defended0 = WIN;
+    int defended1 = WIN;
+    int attackable = 0;
+    int othercolor = 3 - board[astr];
+    /* Let's just try the case where the group with the fewest liberties
+     * has only 2, and try each atari in turn.*/
+    if (alibs ==2) {
+      if (trymove(libs[0], othercolor, "attack_either_0", NO_MOVE, EMPTY, NO_MOVE)) {
+	defended0 = defend_both(astr, bstr);
+	popgo();
+      }
+      if (defended0 
+	  && trymove(libs[1], othercolor, "attack_either_1", NO_MOVE, EMPTY, NO_MOVE)) {
+	defended1 = defend_both(astr, bstr);
+	popgo();
+      }
+    }
+    return 3 - ( (defended0 > defended1) ? defended1 : defended0);
+  }
+
 }
 
 
@@ -667,10 +704,59 @@ break_through_helper(int apos, int bpos, int cpos,
   if (trymove(dpos, other, "break_through_helper-A", Fpos, EMPTY, NO_MOVE)) {
     /* If F can be attacked we can't start in this way. */
     if (!attack(Fpos, NULL)) {
+      int can_attack_d=1;
       /* If d is safe too, we have at least managed to break through. */
       if (!attack(dpos, &gpos)) {
 	success = CUT;
-	/* So now we can try to capture something. */
+
+      }
+
+      /* Too bad, d could be attacked. We let O play the attack and
+       * then try to make a second cut at e. But first we must test if
+       * O at e is sufficient to capture d.
+       */
+      else {
+	if (trymove(epos, color, "break_through_helper-E", Fpos,
+		    EMPTY, NO_MOVE)) {
+	  if (!board[dpos] || !find_defense(dpos, NULL)) {
+	    popgo();
+	    popgo();
+	    return 0;
+	  }
+	  popgo();
+	}
+	
+	if (gpos == epos) {
+	  popgo();
+	  return 0;
+	}
+
+	if (trymove(gpos, color, "break_through_helper-F", Fpos,
+		    EMPTY, NO_MOVE)) {
+	  if (trymove(epos, other, "break_through_helper-G", Fpos,
+		      EMPTY, NO_MOVE)) {
+	    if (!attack(epos, NULL)) {
+	      success = CUT;
+     	      /* Make sure b and c are safe.  If not, back up & let O try 
+	       * to defend in a different way. */
+	      if (board[bpos] 
+		  && board[cpos] 
+		  && defend_both(bpos, cpos)) {
+		/* Can't do better than CUT. */
+		popgo();  
+		popgo();
+		popgo();
+		return CUT;
+	      }
+	    }
+	    popgo();
+	  }
+	  popgo();
+	}
+      }
+      
+      /* By now, we're sure a cut works, so now we can try 
+       * to capture something. */
 	if (!board[apos] || !board[bpos] || !defend_both(apos, bpos))
 	  success = WIN;
 	else {
@@ -714,44 +800,6 @@ break_through_helper(int apos, int bpos, int cpos,
 	    else
 	      success = WIN; /* This should have been covered by
 			      * defend_both(), so probably unnecessary. */
-	  }
-	}
-      }
-
-      /* Too bad, d could be attacked. We let O play the attack and
-       * then try to make a second cut at e. But first we must test if
-       * O at e is sufficient to capture d.
-       */
-      else {
-	if (trymove(epos, color, "break_through_helper-E", Fpos,
-		    EMPTY, NO_MOVE)) {
-	  if (!board[dpos] || !find_defense(dpos, NULL)) {
-	    popgo();
-	    popgo();
-	    return 0;
-	  }
-	  popgo();
-	}
-	
-	if (gpos == epos) {
-	  popgo();
-	  return 0;
-	}
-
-	if (trymove(gpos, color, "break_through_helper-F", Fpos,
-		    EMPTY, NO_MOVE)) {
-	  if (trymove(epos, other, "break_through_helper-G", Fpos,
-		      EMPTY, NO_MOVE)) {
-	    if (!attack(epos, NULL)) {
-	      success = CUT;
-	      if (!board[bpos] 
-		  || !board[cpos] 
-		  || !defend_both(bpos, cpos))
-		success = WIN;
-	    }
-	    popgo();
-	  }
-	  popgo();
 	}
       }
     }

@@ -1073,7 +1073,7 @@ Pattern D308
 o.O         chimera
 .*X
 
-:8,ns,value(65)
+:8,ns,value(71)
 
 ocO
 b*X
@@ -2730,13 +2730,25 @@ Pattern D805
 # tm modified (3.1.15)
 #   s category incorrectly necessary - see ld_owl:53
 #   see also trevor:590 for underlying problem.
+# tm modified back (3.1.16)
+#   trevor:590 solved.
 
 |oOO?
 |...O         try to secure corner
 |.*.o
 +----
 
-:8,s,value(98)
+:8,-,value(98)
+
+
+Pattern D805a
+
+|oOOo
+|...o         try to secure corner
+|.*.o
++----
+
+:8,-,value(65)
 
 
 Pattern D805b
@@ -3242,6 +3254,26 @@ O..*.|
 -----+	 
 
 :8,-,value(55)
+
+
+Pattern D838
+# tm New Pattern (3.1.16)
+
+|.*?
+|.XO
+|OXO
+|.O?
++---
+
+:8,-,value(55)
+
+|.*?
+|.AO
+|OXO
+|.O?
++---
+
+;oplay_attack(*,A)
 
 
 #########################################################
@@ -4589,7 +4621,7 @@ Pattern D1311
 oooo
 o.oo    try to escape
 .*.o
-XOX?
+xOX?
 
 :8,-,value(80)
 
@@ -4771,6 +4803,7 @@ aCb
 Pattern D1323
 #    without more context this is often an inferior
 #    solution (for example games/manner.sgf move 12).
+# tm Modified (3.1.17)
 
 O*O      connect to escape
 
@@ -4778,7 +4811,27 @@ O*O      connect to escape
 
 a*b
 
-;owl_escape_value(a)>0 || owl_escape_value(b)>0
+;(owl_escape_value(a)>0 || owl_escape_value(b)>0) && safe_xmove(*)
+
+
+Pattern D1323a
+# tm New Pattern (3.1.17)
+
+??X      connect out in sente
+?O*
+?.O
+
+:8,n,value(55)
+
+
+BCd
+AO*
+?.O
+
+;(owl_escape_value(A) > 0 ||
+; owl_escape_value(B) > 0 ||
+; owl_escape_value(C) > 0)
+;&& oplay_attack(*,d)
 
 
 Pattern D1324
@@ -5085,13 +5138,14 @@ o...
 
 
 Pattern D1343a
+#tm reduced value (3.1.16)
 
 ooo?           escape into center
 o..X
 o.*.
 ?x.O
 
-:8,-,value(80)
+:8,-,value(60)
 
 obo?
 a..X
@@ -5102,13 +5156,14 @@ o.*o
 
 
 Pattern D1343b
+#tm reduced value (3.1.16)
 
 ooo?           escape into center
 o..X
 o.*o
 ?XoO
 
-:8,-,value(80)
+:8,-,value(60)
 
 obo?
 a..X
@@ -5119,13 +5174,14 @@ o.*o
 
 
 Pattern D1343c
+#tm reduced value (3.1.16)
 
 ooo?           escape into center
 o..X
 o*.o
 ?.oO
 
-:8,-,value(80)
+:8,-,value(60)
 
 obo?
 a..X
@@ -5136,13 +5192,14 @@ o*.c
 
 
 Pattern D1343d
+#tm reduced value (3.1.16)
 
 ooo?           escape into center
 o..X
 o*..
 ?..O
 
-:8,B,value(75)
+:8,B,value(55)
 
 obo?
 a..X
@@ -5190,7 +5247,7 @@ X.*.
 x...
 oooo
 
-:8,-,value(90)
+:8,-,value(65)
 
 ?O.X
 X.*.
@@ -5230,17 +5287,18 @@ a.?
 ;owl_escape_value(a)>0 || owl_escape_value(b)>0
 
 
-Pattern D1349
-
-O.?
-.*O      connect to friendly dragon to escape
-
-:8,-,value(36)
-
-a.?
-.*b
-
-;owl_escape_value(a)>0 || owl_escape_value(b)>0
+# tm Removed 3.1.17 (duplicate of D1348)
+#Pattern D1349
+#
+#O.?
+#.*O      connect to friendly dragon to escape
+#
+#:8,-,value(36)
+#
+#a.?
+#.*b
+#
+#;owl_escape_value(a)>0 || owl_escape_value(b)>0
 
 
 Pattern D1350
@@ -5263,7 +5321,7 @@ XO?
 .*X
 o.?
 
-:8,-,value(85)
+:8,-,value(65)
 
 XO?
 .*X
@@ -5304,7 +5362,7 @@ X...x
 ?OOO?
 
 
-:8,-,value(75)
+:8,-,value(65)
 
 ?abc?
 ?.*.?
@@ -5350,7 +5408,7 @@ O....
 O.*..
 ?OXOo
 
-:8,-,value(81)
+:8,-,value(61)
 
 o...a
 O...b
@@ -5365,7 +5423,7 @@ Pattern D1358
 O..?         connect to escape
 O.*O
 
-:8,-,value(81)
+:8,-,value(61)
 
 bde?
 bc*a
@@ -5382,7 +5440,7 @@ Pattern D1359
 ?..OX
 ?.Oo?
 
-:8,-,value(85)
+:8,-,value(65)
 
 ?bc.?
 a....
@@ -5401,7 +5459,7 @@ Pattern D1360
 ...x
 .O.x
 
-:8,-,value(85)
+:8,-,value(65)
 
 ??ac
 ..*b

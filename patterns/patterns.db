@@ -2397,6 +2397,24 @@ Pattern EC76
 ;alive(b) && oplay_attack(*,a,a)
 
 
+Pattern EC77
+#tm New Pattern (3.1.16)
+
+|..x
+|.*.
+|.X.
+|XOO
+
+:8,OXb
+
+|..x
+|.*.
+|.A.
+|XOO
+
+;oplay_attack(*,A)
+
+
 ##############################################
 # First line, one space, cuts and connections.
 ##############################################
@@ -4573,6 +4591,7 @@ o..X.
 
 
 Pattern EB632
+# FIXME: tm - This is not really a b pattern, right?
 
 ?oO??          clamp on second
 ?O..X
