@@ -1944,9 +1944,10 @@ store_delta_territory_cache(int pos, int color,
 			    const struct influence_data *base,
 			    Hash_data safety_hash)
 {
+  int i;
+
   ASSERT_ON_BOARD1(pos);
   ASSERT1(IS_STONE(color), pos);
-  int i;
 
   if (territory_cache_position_number != position_number
       || territory_cache_color != color
