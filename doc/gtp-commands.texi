@@ -815,7 +815,7 @@
  Function:  Generate and play the supposedly best black move.
  Arguments: none
  Fails:     never
- Returns:   a move coordinate or "PASS" (or "resign" if resignation_allowed).
+ Returns:   a move coordinate or "PASS"
 
  Status:    Obsolete GTP version 1 command.
 
@@ -829,7 +829,7 @@
  Function:  Generate and play the supposedly best white move.
  Arguments: none
  Fails:     never
- Returns:   a move coordinate (or "PASS")
+ Returns:   a move coordinate or "PASS"
 
  Status:    Obsolete GTP version 1 command.
 
@@ -843,7 +843,7 @@
  Function:  Generate and play the supposedly best move for either color.
  Arguments: color to move
  Fails:     invalid color
- Returns:   a move coordinate (or "PASS")
+ Returns:   a move coordinate or "PASS" (or "resign" if resignation_allowed)
 
  Status:    GTP version 2 standard command.
 

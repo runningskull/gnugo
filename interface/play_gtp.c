@@ -2339,7 +2339,7 @@ gtp_aa_confirm_safety(char *s)
 /* Function:  Generate and play the supposedly best black move.
  * Arguments: none
  * Fails:     never
- * Returns:   a move coordinate or "PASS" (or "resign" if resignation_allowed).
+ * Returns:   a move coordinate or "PASS"
  *
  * Status:    Obsolete GTP version 1 command.
  */
@@ -2347,18 +2347,12 @@ static int
 gtp_genmove_black(char *s)
 {
   int i, j;
-  float val;
   UNUSED(s);
 
   if (stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  val = genmove(&i, &j, BLACK);
-
-  if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
-    return gtp_success("resign");
-  }
-
+  genmove(&i, &j, BLACK);
   play_move(POS(i, j), BLACK);
 
   gtp_start_response(GTP_SUCCESS);
@@ -2369,7 +2363,7 @@ gtp_genmove_black(char *s)
 /* Function:  Generate and play the supposedly best white move.
  * Arguments: none
  * Fails:     never
- * Returns:   a move coordinate (or "PASS")
+ * Returns:   a move coordinate or "PASS"
  *
  * Status:    Obsolete GTP version 1 command.
  */
@@ -2377,18 +2371,12 @@ static int
 gtp_genmove_white(char *s)
 {
   int i, j;
-  float val;
   UNUSED(s);
 
   if (stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  val = genmove(&i, &j, WHITE);
-
-  if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
-    return gtp_success("resign");
-  }
-
+  genmove(&i, &j, WHITE);
   play_move(POS(i, j), WHITE);
 
   gtp_start_response(GTP_SUCCESS);
@@ -2399,7 +2387,7 @@ gtp_genmove_white(char *s)
 /* Function:  Generate and play the supposedly best move for either color.
  * Arguments: color to move
  * Fails:     invalid color
- * Returns:   a move coordinate (or "PASS")
+ * Returns:   a move coordinate or "PASS" (or "resign" if resignation_allowed)
  *
  * Status:    GTP version 2 standard command.
  */
