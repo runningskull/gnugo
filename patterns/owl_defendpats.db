@@ -5162,16 +5162,26 @@ o...
 ;owl_escape_value(a)>0
 
 
-# Pattern D1318
-# # gf Too vague, reduced. (3.1.9)
-# # gf Still too vague, removed. (3.1.14)
-# 
-# ??...      try to run towards center
-# ??...
-# ??.*.
-# ??..O
-# 
-# :8,-,value(65)
+Pattern D1318
+# gf Too vague, reduced. (3.1.9)
+# gf Still too vague, removed. (3.1.14)
+# evand modified and reinstated, with lower value. (3.3.18)
+
+??....      try to run towards center
+??....
+??..*.
+??...O
+
+:8,-,value(50)
+
+??bce.
+??a...
+??d.*.
+??...O
+
+;owl_escape_value(a) > 0 || owl_escape_value(b) > 0
+;|| owl_escape_value(c) > 0 || owl_escape_value(d) > 0
+;|| owl_escape_value(e) > 0
 
 
 Pattern D1319
