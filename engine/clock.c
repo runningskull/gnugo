@@ -505,7 +505,7 @@ estimate_time_by_move(int color, int move)
 
   res = 0;
   for (i = 0 ; i < 5 ; i++)
-    res += coef[i] * (clk.date[move-9+i] - clk.date[move-10+i]);
+    res += coef[i] * (clk.date[move-9+i*2] - clk.date[move-10+i*2]);
   
   return res;
 }

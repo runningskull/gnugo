@@ -1269,6 +1269,7 @@ Game Options: (--mode ascii)\n\
 \n\
 Informative Output:\n\
    -v, --version         Display the version of GNU Go\n\
+   --options             Display configure options\n\
    -h, --help            Display this help message\n\
        --help debug      Display help about debugging options\n\
        --copyright       Display copyright notice\n\
@@ -1316,6 +1317,7 @@ Debugging Options:\n\
    -S, --statistics              print statistics (for debugging purposes)\n\n\
    -t, --trace                   verbose tracing\n\
    --showtime                    print timing diagnostic\n\
+   --replay <color>              replay game. Use with -o.\n\
    --showscore                   print estimated score\n\
    -r, --seed number             set random number seed\n\
 "

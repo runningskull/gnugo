@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in estimate_time_by_move
+- replay added to debug helpstring
 - revised nonvariadic versions of TRACE and allies
 - increased MAXSTACK to MAX_BOARD*MAX_BOARD again
 - experimental influence taken down for initial influence when dragons unknown
