@@ -119,6 +119,7 @@ DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
 DECLARE(gtp_known_command);
 DECLARE(gtp_ladder_attack);
+DECLARE(gtp_last_move);
 DECLARE(gtp_set_search_diamond);
 DECLARE(gtp_reset_search_mask);
 DECLARE(gtp_limit_search);
@@ -250,6 +251,7 @@ static struct gtp_command commands[] = {
   {"komi",        	      gtp_set_komi},
   {"get_komi",        	      gtp_get_komi},
   {"ladder_attack",    	      gtp_ladder_attack},
+  {"last_move",    	      gtp_last_move},
   {"level",        	      gtp_set_level},
   {"set_search_diamond",      gtp_set_search_diamond},
   {"reset_search_mask",       gtp_reset_search_mask},
@@ -1066,6 +1068,30 @@ gtp_captures(char *s)
     return gtp_success("%d", white_captured);
   else
     return gtp_success("%d", black_captured);
+}
+
+
+/* Function:  Return the last move.
+ * Arguments: none
+ * Fails:     no previous move known
+ * Returns:   Color and vertex of last move.
+ */
+static int
+gtp_last_move(char *s)
+{
+  int pos;
+  int color;
+  UNUSED(s);
+  
+  if (move_history_pointer <= 0)
+    return gtp_failure("no previous move known");
+  
+  pos = move_history_pos[move_history_pointer - 1];
+  color = move_history_color[move_history_pointer - 1];
+  
+  gtp_start_response(GTP_SUCCESS);
+  gtp_mprintf("%C %m", color, I(pos), J(pos));
+  return gtp_finish_response();
 }
 
 

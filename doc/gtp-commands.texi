@@ -368,6 +368,18 @@
 
 @end example
 
+@cindex last_move
+@item last_move
+
+@example
+
+ Function:  Return the last move.
+ Arguments: none
+ Fails:     no previous move known
+ Returns:   Color and vertex of last move.
+
+@end example
+
 @cindex trymove
 @item trymove
 
