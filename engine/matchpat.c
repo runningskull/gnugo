@@ -1241,7 +1241,7 @@ static const int corner_y[8] = {0, 1, 1, 0, 1, 0, 0, 1};
 /* The number of stones in "corner area" for each board position. For example,
  * corner area for position E3 when anchoring at A1 corner, looks like this:
  *
- *   |........		In general, num_stones[pos] is the number of stones
+ *   |........		In general, NUM_STONES(pos) is the number of stones
  *   |........		which are closer to the corner (stone at pos, if any,
  * 3 |#####...		counts too) than pos. Note, that say G2 is not closer
  *   |#####...		to the corner than E3, the reverse isn't true either.
@@ -1251,12 +1251,10 @@ static const int corner_y[8] = {0, 1, 1, 0, 1, 0, 0, 1};
  *
  * Note that we need these values in at most MAX_BOARD x MAX_BOARD array.
  * However, it may be anchored at any corner of the board, so if the board is
- * small, we may calculate num_stones[] at negative coordinates. In addition,
- * this array must have the same coordinate system as board[] (it must be
- * (MAX_BOARD + 1 elements "wide"). That's why such a strange array allocation.
+ * small, we may calculate NUM_STONES() at negative coordinates.
  */
-static int real_num_stones[2*BOARDMAX];
-static int *const num_stones = real_num_stones + BOARDMAX;
+static int num_stones[2*BOARDMAX];
+#define NUM_STONES(pos) num_stones[(pos) + BOARDMAX]
 
 /* Stone locations are stored in this array. They might be needed by callback
  * function.
@@ -1284,7 +1282,7 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
       int second_corner
 	  = AFFINE_TRANSFORM(pattern->second_corner_offset, trans, anchor);
 
-      if (num_stones[second_corner] == stones
+      if (NUM_STONES(second_corner) == stones
 	  && (!pattern->symmetric || trans < 4)) {
 	/* We have found a matching pattern. */
 	ASSERT1(board[move] == EMPTY, move);
@@ -1294,7 +1292,7 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
     }
 
     if (variation->num_variations
-	&& num_stones[move] == variation->num_stones
+	&& NUM_STONES(move) == variation->num_stones
 	&& board[move] == color_check) {
       /* A matching variation. */
       pattern_stones[stones] = move;
@@ -1326,24 +1324,24 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     int pos;
     struct corner_variation *variation = database->top_variations;
 
-    /* Fill in the num_stones[] array. We use `max_width' and `max_height'
+    /* Fill in the NUM_STONES() array. We use `max_width' and `max_height'
      * fields of database structure to stop working as early as possible.
      */
-    num_stones[anchor] = IS_STONE(board[anchor]);
+    NUM_STONES(anchor) = IS_STONE(board[anchor]);
 
     pos = anchor;
     for (i = 1; i < database->max_height; i++) {
       pos += dx;
       if (!ON_BOARD(pos)) {
 	do {
-	  num_stones[pos] = BOARDMAX;
+	  NUM_STONES(pos) = BOARDMAX;
 	  pos += dx;
 	} while (++i < database->max_height);
 
 	break;
       }
 
-      num_stones[pos] = num_stones[pos - dx] + IS_STONE(board[pos]);
+      NUM_STONES(pos) = NUM_STONES(pos - dx) + IS_STONE(board[pos]);
     }
 
     pos = anchor;
@@ -1351,24 +1349,24 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
       pos += dy;
       if (!ON_BOARD(pos)) {
 	do {
-	  num_stones[pos] = BOARDMAX;
+	  NUM_STONES(pos) = BOARDMAX;
 	  pos += dy;
 	} while (++j < database->max_width);
 
 	break;
       }
       
-      num_stones[pos] = num_stones[pos - dy] + IS_STONE(board[pos]);
+      NUM_STONES(pos) = NUM_STONES(pos - dy) + IS_STONE(board[pos]);
     }
     
     for (i = 1; i < database->max_height; i++) {
       pos = anchor + i * dy;
       for (j = 1; j < database->max_width; j++) {
 	pos += dx;
-	num_stones[pos] = num_stones[pos - dx] + num_stones[pos - dy]
-			- num_stones[pos - dx - dy];
+	NUM_STONES(pos) = NUM_STONES(pos - dx) + NUM_STONES(pos - dy)
+			- NUM_STONES(pos - dx - dy);
 	if (ON_BOARD1(pos) && IS_STONE(board[pos]))
-	  num_stones[pos]++;
+	  NUM_STONES(pos)++;
       }
     }
 
@@ -1378,7 +1376,7 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     for (i = 0; i < database->num_top_variations; i++) {
       int move = AFFINE_TRANSFORM(variation->move_offset, k, anchor);
 
-      if (num_stones[move] == 1 && IS_STONE(board[move])) {
+      if (NUM_STONES(move) == 1 && IS_STONE(board[move])) {
 	pattern_stones[0] = move;
 	do_corner_matchpat(variation->num_variations, variation->variations,
 			   board[move], callback, color, k, anchor, 1);

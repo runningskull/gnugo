@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- num_stones pointer in do_corner_matchpat() replaced with macro
+
 3.3.18 released April 22, 2003
 
 - don't even try 'wrong' liberties in simple_ladder_attack()
