@@ -4639,14 +4639,14 @@ owl_update_goal(int pos, int same_dragon, int lunch,
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
   
-  if (same_dragon == 0)
-    return;
 
   /* Turn off sgf output during find_superstring(). */
   sgf_dumptree = NULL;
   count_variations = 0;
   
-  if (semeai_call)
+  if (same_dragon == 0)
+    num_stones = findstones(pos, MAX_BOARD*MAX_BOARD, stones);
+  else if (semeai_call)
     find_superstring_conservative(pos, &num_stones, stones);
   else
     find_superstring(pos, &num_stones, stones);
@@ -4658,7 +4658,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
   /* If same_dragon field is 1, only add if the played stone
    * clearly is in contact with the goal dragon.
    */
-  if (same_dragon == 1) {
+  if (same_dragon <= 1) {
     do_add = 0;
     for (k = 0; k < num_stones; k++)
       if (owl->goal[stones[k]] != 0) {
@@ -4688,7 +4688,7 @@ owl_update_goal(int pos, int same_dragon, int lunch,
 	mark_string(adjs[k], owl->goal, 2);
   }
 
-  if (0)
+  if (1 && verbose)
     goaldump(owl->goal);
 }
 
