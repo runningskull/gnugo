@@ -1479,7 +1479,9 @@ main(int argc, char *argv[])
   while (fgets(line, MAXLINE, stdin)) {
 
     if (line[strlen(line)-1] != '\n') {
-      	fprintf(stderr, "mkpat: line truncated: %s, length %d\n", line,strlen(line));
+      fprintf(stderr, "mkpat: line truncated: %s, length %d\n", line,
+	      (int) strlen(line));
+
       fatal_errors++;
     }
 
