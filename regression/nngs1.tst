@@ -59,8 +59,16 @@ loadsgf games/nngs/gnugo-3.1.26-farrell-200203051803.sgf 84
 15 gg_genmove white
 #? [F12|G14]
 
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 14
+16 gg_genmove white
+#? [M4]
 
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 34
+17 gg_genmove white
+#? [L3|L4|J3]
 
-
+loadsgf games/nngs/gnugo-3.1.27-guestn-200203061902.sgf 38
+18 gg_genmove white
+#? [!L2]
 
 
