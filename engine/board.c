@@ -61,12 +61,17 @@ struct string_data {
   int origin;                      /* Coordinates of "origin", i.e. */
                                    /* "upper left" stone. */
   int liberties;                   /* Number of liberties. */
-  int libs[MAX_LIBERTIES];         /* Coordinates of liberties. */
   int neighbors;                   /* Number of neighbor strings */
-  int neighborlist[MAXCHAIN];      /* List of neighbor string numbers. */
   int mark;                        /* General purpose mark. */
 };
 
+struct string_liberties_data {
+  int list[MAX_LIBERTIES];         /* Coordinates of liberties. */
+};
+
+struct string_neighbors_data {
+  int list[MAXCHAIN];              /* List of neighbor string numbers. */
+};
 
 /* we keep the address and the old value */
 struct change_stack_entry {
@@ -130,6 +135,8 @@ struct vertex_stack_entry {
 
 /* Main array of string information. */
 static struct string_data string[MAX_STRINGS];
+static struct string_liberties_data string_libs[MAX_STRINGS];
+static struct string_neighbors_data string_neighbors[MAX_STRINGS];
 
 /* Stacks and stack pointers. */
 static struct change_stack_entry change_stack[STACK_SIZE];
@@ -248,20 +255,20 @@ static int next_stone[BOARDMAX];
 #define ADD_LIBERTY(s, pos)\
   do {\
     if (string[s].liberties < MAX_LIBERTIES)\
-      string[s].libs[string[s].liberties] = pos;\
+      string_libs[s].list[string[s].liberties] = pos;\
     string[s].liberties++;\
   } while (0)
 
 #define ADD_AND_MARK_LIBERTY(s, pos)\
   do {\
     if (string[s].liberties < MAX_LIBERTIES)\
-      string[s].libs[string[s].liberties] = pos;\
+      string_libs[s].list[string[s].liberties] = pos;\
     string[s].liberties++;\
     ml[pos] = liberty_mark;\
   } while (0)
 
 #define ADD_NEIGHBOR(s, pos)\
-  string[s].neighborlist[string[s].neighbors++] = string_number[pos]
+  string_neighbors[s].list[string[s].neighbors++] = string_number[pos]
 
 #define DO_ADD_STONE(pos, color)\
   do {\
@@ -1429,7 +1436,7 @@ findlib(int str, int maxlib, int *libs)
      * incrementally updated list.
      */
     for (k = 0; k < maxlib && k < liberties; k++)
-      libs[k] = string[s].libs[k];
+      libs[k] = string_libs[s].list[k];
   }
   else {
     /* The harder case, where we have to traverse the stones in the
@@ -1783,7 +1790,7 @@ do_approxlib(int pos, int color, int maxlib, int *libs)
   else if (board[SOUTH(pos)] == color) {
     int s = string_number[SOUTH(pos)];
     for (k = 0; k < string[s].liberties; k++) {
-      int lib = string[s].libs[k];
+      int lib = string_libs[s].list[k];
       if (UNMARKED_LIBERTY(lib)) {
 	if (libs != NULL)
 	  libs[liberties] = lib;
@@ -1807,7 +1814,7 @@ do_approxlib(int pos, int color, int maxlib, int *libs)
   else if (board[WEST(pos)] == color) {
     int s = string_number[WEST(pos)];
     for (k = 0; k < string[s].liberties; k++) {
-      int lib = string[s].libs[k];
+      int lib = string_libs[s].list[k];
       if (UNMARKED_LIBERTY(lib)) {
 	if (libs != NULL)
 	  libs[liberties] = lib;
@@ -1831,7 +1838,7 @@ do_approxlib(int pos, int color, int maxlib, int *libs)
   else if (board[NORTH(pos)] == color) {
     int s = string_number[NORTH(pos)];
     for (k = 0; k < string[s].liberties; k++) {
-      int lib = string[s].libs[k];
+      int lib = string_libs[s].list[k];
       if (UNMARKED_LIBERTY(lib)) {
 	if (libs != NULL)
 	  libs[liberties] = lib;
@@ -1857,7 +1864,7 @@ do_approxlib(int pos, int color, int maxlib, int *libs)
   else if (board[EAST(pos)] == color) {
     int s = string_number[EAST(pos)];
     for (k = 0; k < string[s].liberties; k++) {
-      int lib = string[s].libs[k];
+      int lib = string_libs[s].list[k];
       if (UNMARKED_LIBERTY(lib)) {
 	if (libs != NULL)
 	  libs[liberties] = lib;
@@ -2069,13 +2076,14 @@ do_accuratelib(int pos, int color, int maxlib, int *libs)
     else if (UNMARKED_COLOR_STRING(pos2, color)) {
       /* An own neighbor string */
       struct string_data *s = &string[string_number[pos2]];
+      struct string_liberties_data *sl = &string_libs[string_number[pos2]];
 
       if (s->liberties <= MAX_LIBERTIES || maxlib <= MAX_LIBERTIES - 1) {
 	/* The easy case - we already have all (necessary) liberties of
 	 * the string listed
 	 */
 	for (l = 0; l < s->liberties; l++) {
-	  lib = s->libs[l];
+	  lib = sl->list[l];
 	  if (UNMARKED_LIBERTY(lib)) {
 	    if (libs)
 	      libs[liberties] = lib;
@@ -2228,7 +2236,7 @@ count_common_libs(int str1, int str2)
 
   if (liberties1 <= MAX_LIBERTIES) {
     /* Speed optimization: don't copy liberties with findlib */
-    libs1 = string[n].libs;
+    libs1 = string_libs[n].list;
     n = string_number[str2];
     liberties2 = string[n].liberties;
     
@@ -2239,7 +2247,7 @@ count_common_libs(int str1, int str2)
       for (k = 0; k < liberties1; k++)
 	MARK_LIBERTY(libs1[k]);
 
-      libs1 = string[n].libs;
+      libs1 = string_libs[n].list;
       for (k = 0; k < liberties2; k++)
 	if (!UNMARKED_LIBERTY(libs1[k]))
 	  commonlibs++;
@@ -2296,7 +2304,7 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
   
   if (liberties1 <= MAX_LIBERTIES) {
     /* Speed optimization: don't copy liberties with findlib */
-    libs1 = string[n].libs;
+    libs1 = string_libs[n].list;
     n = string_number[str2];
     liberties2 = string[n].liberties;
 
@@ -2307,7 +2315,7 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
       for (k = 0; k < liberties1; k++)
 	MARK_LIBERTY(libs1[k]);
       
-      libs1 = string[n].libs;
+      libs1 = string_libs[n].list;
       for (k = 0; k < liberties2; k++)
 	if (!UNMARKED_LIBERTY(libs1[k])) {
           if (commonlibs < maxlib)
@@ -2362,7 +2370,7 @@ have_common_lib(int str1, int str2, int *lib)
   
   if (liberties1 <= MAX_LIBERTIES)
     /* Speed optimization: don't copy liberties with findlib */
-    libs1 = string[n].libs;
+    libs1 = string_libs[n].list;
   else {
     findlib(str1, MAXLIBS, all_libs1);
     libs1 = all_libs1;
@@ -2468,6 +2476,7 @@ int
 chainlinks(int str, int adj[MAXCHAIN])
 {
   struct string_data *s;
+  struct string_neighbors_data *sn;
   int k;
 
   ASSERT1(IS_STONE(board[str]), str);
@@ -2476,8 +2485,9 @@ chainlinks(int str, int adj[MAXCHAIN])
    * desired information.
    */
   s = &string[string_number[str]];
+  sn = &string_neighbors[string_number[str]];
   for (k = 0; k < s->neighbors; k++)
-    adj[k] = string[s->neighborlist[k]].origin;
+    adj[k] = string[sn->list[k]].origin;
 
   return s->neighbors;
 }
@@ -2492,6 +2502,7 @@ int
 chainlinks2(int str, int adj[MAXCHAIN], int lib)
 {
   struct string_data *s, *t;
+  struct string_neighbors_data *sn;
   int k;
   int neighbors;
 
@@ -2502,8 +2513,9 @@ chainlinks2(int str, int adj[MAXCHAIN], int lib)
    */
   neighbors = 0;
   s = &string[string_number[str]];
+  sn = &string_neighbors[string_number[str]];
   for (k = 0; k < s->neighbors; k++) {
-    t = &string[s->neighborlist[k]];
+    t = &string[sn->list[k]];
     if (t->liberties == lib)
       adj[neighbors++] = t->origin;
   }
@@ -2520,6 +2532,7 @@ int
 chainlinks3(int str, int adj[MAXCHAIN], int lib)
 {
   struct string_data *s, *t;
+  struct string_neighbors_data *sn;
   int k;
   int neighbors;
 
@@ -2530,8 +2543,9 @@ chainlinks3(int str, int adj[MAXCHAIN], int lib)
    */
   neighbors = 0;
   s = &string[string_number[str]];
+  sn = &string_neighbors[string_number[str]];
   for (k = 0; k < s->neighbors; k++) {
-    t = &string[s->neighborlist[k]];
+    t = &string[sn->list[k]];
     if (t->liberties <= lib)
       adj[neighbors++] = t->origin;
   }
@@ -2551,6 +2565,7 @@ int
 extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors)
 {
   struct string_data *s;
+  struct string_neighbors_data *sn;
   int n;
   int k;
   int r;
@@ -2563,9 +2578,10 @@ extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors)
    * copy it and mark the strings.
    */
   s = &string[string_number[str]];
+  sn = &string_neighbors[string_number[str]];
   string_mark++;
   for (n = 0; n < s->neighbors; n++) {
-    adj[n] = string[s->neighborlist[n]].origin;
+    adj[n] = string[sn->list[n]].origin;
     MARK_STRING(adj[n]);
   }
 
@@ -2808,7 +2824,7 @@ adjacent_strings(int str1, int str2)
   s2 = string_number[str2];
 
   for (k = 0; k < string[s1].neighbors; k++)
-    if (string[s1].neighborlist[k] == s2)
+    if (string_neighbors[s1].list[k] == s2)
       return 1;
 
   return 0;
@@ -2909,8 +2925,9 @@ is_ko_point(int pos)
   }
   else {
     struct string_data *s = &string[string_number[pos]];
+    struct string_liberties_data *sl = &string_libs[string_number[pos]];
     if (s->liberties == 1 && s->size == 1
-	&& is_ko(s->libs[0], OTHER_COLOR(s->color), NULL))
+	&& is_ko(sl->list[0], OTHER_COLOR(s->color), NULL))
       return 1;
   }
 
@@ -3084,6 +3101,8 @@ new_position(void)
   CLEAR_STACKS();
 
   memset(string, 0, sizeof(string));
+  memset(string_libs, 0, sizeof(string_libs));
+  memset(string_neighbors, 0, sizeof(string_neighbors));
   memset(ml, 0, sizeof(ml));
   VALGRIND_MAKE_WRITABLE(next_stone, sizeof(next_stone));
 
@@ -3275,7 +3294,7 @@ update_liberties(int s)
   /* Push the old information. */
   PUSH_VALUE(string[s].liberties);
   for (k = 0; k < string[s].liberties && k < MAX_LIBERTIES; k++) {
-    PUSH_VALUE(string[s].libs[k]);
+    PUSH_VALUE(string_libs[s].list[k]);
   }
   string[s].liberties = 0;
 
@@ -3319,15 +3338,16 @@ remove_neighbor(int str_number, int n)
   int k;
   int done = 0;
   struct string_data *s = &string[str_number];
+  struct string_neighbors_data *sn = &string_neighbors[str_number];
   for (k = 0; k < s->neighbors; k++)
-    if (s->neighborlist[k] == n) {
+    if (sn->list[k] == n) {
       /* We need to push the last entry too because it may become
        * destroyed later.
        */
-      PUSH_VALUE(s->neighborlist[s->neighbors - 1]);
-      PUSH_VALUE(s->neighborlist[k]);
+      PUSH_VALUE(sn->list[s->neighbors - 1]);
+      PUSH_VALUE(sn->list[k]);
       PUSH_VALUE(s->neighbors);
-      s->neighborlist[k] = s->neighborlist[s->neighbors - 1];
+      sn->list[k] = sn->list[s->neighbors - 1];
       s->neighbors--;
       done = 1;
       break;
@@ -3346,19 +3366,20 @@ remove_liberty(int str_number, int pos)
 {
   int k;
   struct string_data *s = &string[str_number];
+  struct string_liberties_data *sl = &string_libs[str_number];
   
   if (s->liberties > MAX_LIBERTIES)
     update_liberties(str_number);
   else {
     for (k = 0; k < s->liberties; k++)
-      if (s->libs[k] == pos) {
+      if (sl->list[k] == pos) {
 	/* We need to push the last entry too because it may become
 	 * destroyed later.
 	 */
-	PUSH_VALUE(s->libs[s->liberties - 1]);
-	PUSH_VALUE(s->libs[k]);
+	PUSH_VALUE(sl->list[s->liberties - 1]);
+	PUSH_VALUE(sl->list[k]);
 	PUSH_VALUE(s->liberties);
-	s->libs[k] = s->libs[s->liberties - 1];
+	sl->list[k] = sl->list[s->liberties - 1];
 	s->liberties--;
 	break;
       }
@@ -3394,13 +3415,13 @@ do_remove_string(int s)
    */
   if (size == 1) {
     for (k = 0; k < string[s].neighbors; k++) {
-      int neighbor = string[s].neighborlist[k];
+      int neighbor = string_neighbors[s].list[k];
 
       remove_neighbor(neighbor, s);
       PUSH_VALUE(string[neighbor].liberties);
 
       if (string[neighbor].liberties < MAX_LIBERTIES)
-	string[neighbor].libs[string[neighbor].liberties] = pos;
+	string_libs[neighbor].list[string[neighbor].liberties] = pos;
       string[neighbor].liberties++;
     }
   }
@@ -3409,28 +3430,28 @@ do_remove_string(int s)
     int pos2 = NEXT_STONE(pos);
 
     for (k = 0; k < string[s].neighbors; k++) {
-      int neighbor = string[s].neighborlist[k];      
+      int neighbor = string_neighbors[s].list[k];      
 
       remove_neighbor(neighbor, s);
       PUSH_VALUE(string[neighbor].liberties);
 
       if (NEIGHBOR_OF_STRING(pos, neighbor, other)) {
 	if (string[neighbor].liberties < MAX_LIBERTIES)
-	  string[neighbor].libs[string[neighbor].liberties] = pos;
+	  string_libs[neighbor].list[string[neighbor].liberties] = pos;
 	string[neighbor].liberties++;
       }
 
       if (NEIGHBOR_OF_STRING(pos2, neighbor, other)) {
 	if (string[neighbor].liberties < MAX_LIBERTIES)
-	  string[neighbor].libs[string[neighbor].liberties] = pos2;
+	  string_libs[neighbor].list[string[neighbor].liberties] = pos2;
 	string[neighbor].liberties++;
       }
     }
   }
   else {
     for (k = 0; k < string[s].neighbors; k++) {
-      remove_neighbor(string[s].neighborlist[k], s);
-      update_liberties(string[s].neighborlist[k]);
+      remove_neighbor(string_neighbors[s].list[k], s);
+      update_liberties(string_neighbors[s].list[k]);
     }
   }
 
@@ -3580,7 +3601,7 @@ extend_neighbor_string(int pos, int s)
   /* Mark old neighbors of the string. */
   string_mark++;
   for (k = 0; k < string[s].neighbors; k++)
-    string[string[s].neighborlist[k]].mark = string_mark;
+    string[string_neighbors[s].list[k]].mark = string_mark;
 
   /* Look at the neighbor locations of pos for new liberties and/or
    * neighbor strings.
@@ -3691,7 +3712,7 @@ assimilate_string(int s, int pos)
    */
   if (string[s2].liberties <= MAX_LIBERTIES) {
     for (k = 0; k < string[s2].liberties; k++) {
-      int pos2 = string[s2].libs[k];
+      int pos2 = string_libs[s2].list[k];
       if (UNMARKED_LIBERTY(pos2)) {
 	ADD_AND_MARK_LIBERTY(s, pos2);
       }
@@ -3718,12 +3739,12 @@ assimilate_string(int s, int pos)
    * function is called.
    */
   for (k = 0; k < string[s2].neighbors; k++) {
-    int t = string[s2].neighborlist[k];
+    int t = string_neighbors[s2].list[k];
     remove_neighbor(t, s2);
     if (string[t].mark != string_mark) {
       PUSH_VALUE(string[t].neighbors);
-      string[t].neighborlist[string[t].neighbors++] = s;
-      string[s].neighborlist[string[s].neighbors++] = t;
+      string_neighbors[t].list[string[t].neighbors++] = s;
+      string_neighbors[s].list[string[s].neighbors++] = t;
       string[t].mark = string_mark;
     }
   }
@@ -3970,7 +3991,7 @@ do_play_move(int pos, int color)
     /* In case of a double ko: clear old ko position first. */
     if (board_ko_pos != NO_MOVE)
       hashdata_invert_ko(&board_hash, board_ko_pos);
-    board_ko_pos = string[s].libs[0];
+    board_ko_pos = string_libs[s].list[0];
     hashdata_invert_ko(&board_hash, board_ko_pos);
   }
 }
@@ -4060,7 +4081,7 @@ incremental_order_moves(int move, int color, int str,
 	struct string_data *t; \
 	(*captured_stones) += string[s].size; \
 	for (r = 0; r < string[s].neighbors; r++) { \
-	  t = &string[string[s].neighborlist[r]]; \
+	  t = &string[string_neighbors[s].list[r]]; \
 	  if (t->liberties == 1) \
 	    (*saved_stones) += t->size; \
 	} \
