@@ -58,10 +58,9 @@ the GMP does not have any provision for communicating the komi.
 Because of this misfeature, unless you set the komi at the command
 line GNU Go will have to guess it. It assumes the komi is 5.5 for
 even games, 0.5 for handicap games. If this is not what you want,
-you can specify the komi at the command line with the
-@option{--komi} option, in the Go Modem Protocol Setup window.
-You have to set the komi again in the Game Setup window, which
-comes up next.
+you can specify the komi at the command line with the --komi
+option, in the Go Modem Protocol Setup window.  You have to set
+the komi again in the Game Setup window, which comes up next.
 
 Click OK and you are ready to go.
 

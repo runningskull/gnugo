@@ -2224,7 +2224,7 @@ gtp_aa_confirm_safety(char *s)
 /* Function:  Generate and play the supposedly best black move.
  * Arguments: none
  * Fails:     never
- * Returns:   a move coordinate (or "PASS")
+ * Returns:   a move coordinate or "PASS" (or "resign" if resignation_allowed).
  *
  * Status:    Obsolete GTP version 1 command.
  */

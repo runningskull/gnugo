@@ -22,22 +22,25 @@ Untar the sources, change to the directory gnugo-3.4. Now do:
    make
 @end example
 
-Several configure options will be explained in detail in the next
-section (@pxref{Configure Options}). You do not need to set these unless
-you are dissatisfied with GNU Go's performance or wish to vary
-the experimental options.
+Several configure options will be explained in the next section. You do not
+need to set these unless you are dissatisfied with GNU Go's performance or
+wish to vary the experimental options.
 
 As an example,
 
 @example
-   ./configure --enable-experimental-semeai --enable-owl-threats
+   ./configure --enable-level=9 --enable-cosmic-gnugo
 @end example
 
 @noindent
-turns on two experimental options.
+will make a binary in which the default level is 9, and the experimental
+``cosmic''' option is enabled. A list of all configure options can be
+obtained by running @command{./configure --help}. Further information
+about the experimental options can be found in the next section
+(@pxref{Configure Options}).
 
-You have now made a binary called @file{interface/gnugo}. Now 
-(running as root) type
+After running configure and make, you have now made a binary called
+@file{interface/gnugo}. Now (running as root) type
 
 @example
    make install
@@ -57,9 +60,11 @@ command line by just typing:
 but it is nicer to run it using CGoban 1 (under X-Windows) or Jago
 (on any platform with a Java runtime environment).
 
-You can get the most recent version of CGoban 1 from Bill Shubert's web site:
-@url{http://www.igoweb.org/~wms/comp/cgoban/index.html} The CGoban version
-number MUST be 1.9.1 at least or it won't work. CGoban 2 will not work.
+   You can get the most recent version of CGoban 1 from 
+@url{http://sourceforge.net/projects/cgoban1/}. The earlier version
+1.12 is available from @url{http://www.igoweb.org/~wms/comp/cgoban/index.html}.
+The CGoban version number MUST be 1.9.1 at least or it won't work. CGoban 2
+will not work.
 
 @xref{CGoban}, for instructions on how to run GNU Go from Cgoban, or
 @xref{Jago}, for Jago.
@@ -80,7 +85,7 @@ particularly if you are dissatisfied with GNU Go's performance.
 @node Ram Cache
 @subsection Ram Cache
 
-By default, GNU Go makes a cache of 16 Megabytes in RAM for its
+By default, GNU Go makes a cache of 8 Megabytes in RAM for its
 internal use. The cache is used to store intermediate results during
 its analysis of the position.
 

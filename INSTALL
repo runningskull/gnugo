@@ -3,53 +3,48 @@
 Get the most recent tar file from ftp.gnu.org or a mirror (see
 http://www.gnu.org/order/ftp.html for a list).
 
-Untar the sources, change to the directory gnugo-3.2. Now do:
+Untar the sources, change to the directory gnugo-3.4. Now do:
 
-   ./configure [OPTIONS]
-   make
+        ./configure [OPTIONS]
+        make
 
-Several configure options will be explained in detail below.
-You do not need to set these unless you are dissatisfied
-with GNU Go's performance or wish to vary the experimental
-options.
+Several configure options will be explained below. You do not need to set
+these unless you are dissatisfied with GNU Go's performance or wish to vary
+the experimental options.
 
-As an example
+   As an example,
 
-   ./configure --enable-cache-size=32 --enable-level=8
+        ./configure --enable-level=9 --enable-cosmic-gnugo
 
-creates a 32 Mb cache in RAM and sets the level to 8. Both these
-defaults can be overridden at run time. If you do not specify any
-options, the default level is 10 (highest supported) and the
-default cache size is 8. These defaults are probably suitable for
-most systems unless GNU Go seems too slow.
+will make a binary in which the default level is 9, and the experimental
+"cosmic"' option is enabled. A list of all configure options can be obtained
+by running `./configure --help'. Further information about the experimental
+options can be found in the next section.
 
-You have now made a binary called interface/gnugo. Now
-(running as root) type
+   After running configure and make, you have now made a binary called
+`interface/gnugo'. Now (running as root) type
 
-   make install
+        make install
 
-to install gnugo in /usr/local/bin. This will also install the man
-page gnugo.6 into /usr/man/man6. Fuller documentation can be found
-in the doc/ directory. (See THE MANUAL below.)
-  
-After you have installed GNU Go, you can save disk space (and still keep
-the source files) by typing:
+to install gnugo in `/usr/local/bin'.
 
-  make clean
-  
-There are different methods of using GNU Go. You may run it from the
+   There are different methods of using GNU Go. You may run it from the
 command line by just typing:
 
-   gnugo
+        gnugo
 
-but it is nicer to run it using CGoban 1 (under X-Windows) or Jago
-(on any platform with a Java runtime environment).
+but it is nicer to run it using CGoban 1 (under X-Windows) or Jago (on
+any platform with a Java runtime environment).
 
-Obtain the most recent version of CGoban 1 from Bill Shubert's web site:
-http://www.igoweb.org/~wms/comp/cgoban/index.html. The CGoban version number
-MUST be 1.9.1 at least or it won't work. CGoban 2 will not work.
+   You can get the most recent version of CGoban 1 from 
+http://sourceforge.net/projects/cgoban1/. The earlier version
+1.12 is available from http://www.igoweb.org/~wms/comp/cgoban/index.html.
+The CGoban version number MUST be 1.9.1 at least or it won't work. CGoban 2
+will not work.
 
-See the README file for instructions on how to run GNU Go from Cgoban.
+   See the file README for instructions on how to run GNU Go from Cgoban, or
+for Jago.
+
 
                           RAM CACHE
 
