@@ -1912,9 +1912,9 @@ is_edge_vertex(int pos)
 int
 edge_distance(int pos)
 {
-  ASSERT_ON_BOARD1(pos);
   int i = I(pos);
   int j = J(pos);
+  ASSERT_ON_BOARD1(pos);
   return gg_min(gg_min(i, board_size-1 - i), gg_min(j, board_size-1 - j));
 }
 
