@@ -98,7 +98,6 @@ enum {OPT_BOARDSIZE=127,
       OPT_NOFUSEKI,
       OPT_NOJOSEKIDB,
       OPT_LEVEL,
-      OPT_LIMIT_SEARCH,
       OPT_SHOWTIME,
       OPT_SHOWSCORE,
       OPT_DEBUG_INFLUENCE,
@@ -190,7 +189,6 @@ static struct gg_option const long_options[] =
   {"owl-reading",    required_argument, 0, OPT_OWL_READING},
   {"owl-node-limit", required_argument, 0, OPT_OWL_NODE_LIMIT},
   {"level",          required_argument, 0, OPT_LEVEL},
-  {"limit-search",   required_argument, 0, OPT_LIMIT_SEARCH},
   {"clock",          required_argument, 0, OPT_CLOCK_TIME},
   {"byo-time",       required_argument, 0, OPT_CLOCK_BYO_TIME},
   {"byo-period",     required_argument, 0, OPT_CLOCK_BYO_PERIOD},
@@ -313,7 +311,6 @@ main(int argc, char *argv[])
   allow_suicide = 0;
   capture_all_dead = 0;
   play_out_aftermath = 0;
-  limit_search = 0;
 
   /* Default parameters for clock and auto level systems. */
   clock_init(3600, 0, 0);      /* One hour sudden death. */
@@ -679,19 +676,6 @@ main(int argc, char *argv[])
 	
       case OPT_LEVEL:
 	level = atoi(gg_optarg);
-	break;
-
-      case OPT_LIMIT_SEARCH:
-	{
-	  int m, n;
-
-	  if (!string_to_location(board_size, gg_optarg, &m, &n)) {
-	    fprintf(stderr, "gnugo: use --limit-search <pos>\n");
-	    return EXIT_FAILURE;
-	  }
-	  rotate(m, n, &m, &n, board_size, orientation);
-	  set_search_diamond(POS(m, n));
-	}
 	break;
 
       case OPT_CLOCK_TIME:

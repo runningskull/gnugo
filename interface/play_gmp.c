@@ -83,11 +83,6 @@ play_gmp(Gameinfo *gameinfo)
   gameinfo->handicap = gmp_handicap(ge);
   gnugo_clear_board(gmp_size(ge));
 
-#if ORACLE
-  if (metamachine && oracle_exists)
-    oracle_clear_board(gnugo_get_boardsize());
-#endif
-
   /* 
    * The specification of the go modem protocol doesn't even discuss
    * komi. So we have to guess the komi. If the komi is set on the
@@ -227,11 +222,6 @@ play_gmp(Gameinfo *gameinfo)
     if (message == gmp_err)
       break;
   }
-
-#if ORACLE
-  if (metamachine && oracle_exists)
-    dismiss_oracle();
-#endif
 
   if (!quiet)
     fprintf(stderr, "gnugo going down\n");

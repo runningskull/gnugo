@@ -82,9 +82,6 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   /* Pick up the location of the move */
   move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   
-  if (limit_search && !within_search_area(move))
-    return;
-
   /* For some classes of patterns we need to find all dragons present
    * in the pattern.
    */

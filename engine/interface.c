@@ -58,10 +58,6 @@ gnugo_clear_board(int boardsize)
   gg_assert(MIN_BOARD <= boardsize && boardsize <= MAX_BOARD);
   board_size = boardsize;
   clear_board();
-#if 0
-  if (metamachine && oracle_exists)
-    oracle_clear_board(boardsize);
-#endif
 }
 
 /* Set the komi */

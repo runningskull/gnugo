@@ -403,8 +403,7 @@ do_genmove(int *move, int color, float pure_threat_value,
   verbose = save_verbose;
   
   /* Try to find empty corner moves. */
-  if (!limit_search)
-    fuseki(color);
+  fuseki(color);
   gg_assert(stackp == 0);
 
   /* The general pattern database. */
@@ -429,7 +428,7 @@ do_genmove(int *move, int color, float pure_threat_value,
    * dragon dangerous and change its status from DEAD to
    * UNKNOWN. This may generate a move.
    */
-  if (val < 10.0 && !doing_scoring && !limit_search) {
+  if (val < 10.0 && !doing_scoring) {
     if (revise_thrashing_dragon(color, 15.0)) {
       shapes(color);
       if (!disable_endgame_patterns)
@@ -444,7 +443,7 @@ do_genmove(int *move, int color, float pure_threat_value,
   }
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
-  if (val <= 6.0 && !disable_endgame_patterns && !limit_search) {
+  if (val <= 6.0 && !disable_endgame_patterns) {
     endgame_shapes(color);
     gg_assert(stackp == 0);
     if (review_move_reasons(move, &val, color, pure_threat_value, score,
@@ -746,93 +745,6 @@ test_symmetry_after_move(int move, int color)
   return result;
 }
 
-/*********************************************************************\
- *                Mark a limited search area                         *
-\*********************************************************************/
-
-/* Mark a limited search area. Only affects the engine if the
- * global variable limit_search is nonzero. In this case, genmove
- * will only return moves within the area marked by the array
- * search_mask.
- */
-
-static int search_mask[BOARDMAX];
-
-/* The following function marks a diamond of radius 6 with center pos.
- */
-
-void
-set_search_diamond(int pos)
-{
-  int i = I(pos);
-  int j = J(pos);
-  int m, n;
-  
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (gg_abs(m - i) + gg_abs(n - j) <= 6)
-	search_mask[POS(m, n)] = 1;
-      else
-	search_mask[POS(m, n)] = 0;      
-    }
-  limit_search = pos;
-  if (0) draw_search_area();
-}
-
-/* unmarks the entire board */
-
-void
-reset_search_mask()
-{
-  memset(search_mask, 0, sizeof(search_mask));
-}
-
-/* marks a single vertex */
-
-void
-set_search_limit(int pos, int value)
-{
-  search_mask[pos] = value;
-}
-
-/* displays the search area */
-
-void
-draw_search_area(void)
-{
-  int m, n;
-
-  start_draw_board();
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int col, c;
-	
-      if (search_mask[POS(m,n)])
-	col = GG_COLOR_RED;
-      else
-	col = GG_COLOR_BLACK;
-      
-      if (board[POS(m, n)] == BLACK)
-	c = 'X';
-      else if (board[POS(m, n)] == WHITE)
-	c = 'O';
-      else if (search_mask[POS(m, n)])
-	c = '*';
-      else
-	c = '.';
-      draw_color_char(m, n, c, col);
-    }
-  end_draw_board();
-}
-
-/* returns true if the position is within the search area */
-int
-within_search_area(int pos)
-{
-  if (!limit_search)
-    return 1;
-  return search_mask[pos];
-}
 
 /*
  * Local Variables:

@@ -310,7 +310,6 @@ void init_tree_fusekipat(void);
 void init_tree_joseki(void);
 void init_tree_read_attack(void);
 void init_tree_read_defend(void);
-void init_tree_oracle(void);
 
 /* pattern arrays themselves */
 extern struct pattern_db pat_db;
@@ -327,7 +326,6 @@ extern struct pattern_db influencepat_db;
 extern struct pattern_db barrierspat_db;
 extern struct pattern_db fusekipat_db;
 extern struct pattern_db handipat_db;
-extern struct pattern_db oracle_db;
 
 extern struct fullboard_pattern fuseki19[];
 extern struct fullboard_pattern fuseki13[];

@@ -117,7 +117,6 @@ int debug             = 0;  /* controls debug output */
 int verbose           = 0;  /* trace level */
 char outfilename[128] = ""; /* output file (-o option) */
 int output_flags      = OUTPUT_DEFAULT; /* amount of output to outfile */
-int limit_search      = 0;  /* limit search to a portion of the board */
 
 int disable_threat_computation = 0;
 int disable_endgame_patterns   = 0;

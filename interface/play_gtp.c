@@ -99,11 +99,6 @@ DECLARE(gtp_influence);
 DECLARE(gtp_is_legal);
 DECLARE(gtp_known_command);
 DECLARE(gtp_ladder_attack);
-DECLARE(gtp_set_search_diamond);
-DECLARE(gtp_reset_search_mask);
-DECLARE(gtp_limit_search);
-DECLARE(gtp_set_search_limit);
-DECLARE(gtp_draw_search_area);
 DECLARE(gtp_list_commands);
 DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
@@ -225,12 +220,6 @@ static struct gtp_command commands[] = {
   {"get_komi",        	      gtp_get_komi},
   {"ladder_attack",    	      gtp_ladder_attack},
   {"level",        	      gtp_set_level},
-  {"set_search_diamond",      gtp_set_search_diamond},
-  {"reset_search_mask",       gtp_reset_search_mask},
-  {"limit_search",            gtp_limit_search},
-  {"set_search_limit",        gtp_set_search_limit},
-  {"draw_search_area",        gtp_draw_search_area},
-  {"limit_search",     	      gtp_limit_search},
   {"list_commands",    	      gtp_list_commands},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
@@ -3653,90 +3642,6 @@ gtp_surround_map(char *s)
   silent_examine_position(BOARD(di, dj), EXAMINE_DRAGONS);
   return gtp_success("%d", surround_map(POS(di, dj), POS(mi, mj)));
 }
-
-/***************
- * search area *
- ***************/
-
-/* Function:  limit search, and establish a search diamond
- * Arguments: pos
- * Fails:     invalid value
- * Returns:   nothing
- */
-static int
-gtp_set_search_diamond(char *s)
-{
-  int i, j;
-
-  if (!gtp_decode_coord(s, &i, &j))
-    return gtp_failure("invalid coordinate");
-  
-  limit_search = 1;
-  set_search_diamond(POS(i, j));
-  return gtp_success("");
-}
-
-/* Function:  unmark the entire board for limited search
- * Arguments: none
- * Fails:     never
- * Returns:   nothing
- */
-static int
-gtp_reset_search_mask(char *s)
-{
-  UNUSED(s);
-
-  reset_search_mask();
-  return gtp_success("");
-}
-  
-/* Function:  sets the global variable limit_search
- * Arguments: value
- * Fails:     invalid arguments
- * Returns:   nothing
- */
-static int
-gtp_limit_search(char *s)
-{
-  int value;
-
-  if (sscanf(s, "%d", &value) < 1)
-    return gtp_failure("invalid value for search limit");
-  limit_search = value;
-  return gtp_success("");
-}
-
-/* Function:  mark a vertex for limited search
- * Arguments: position
- * Fails:     invalid arguments
- * Returns:   nothing
- */
-static int
-gtp_set_search_limit(char *s)
-{
-  int i, j;
-
-  gtp_decode_coord(s, &i, &j);
-  set_search_limit(POS(i, j), 1);
-  return gtp_success("");
-}
-  
-/* Function:  Draw search area. Writes to stderr.
- * Arguments: none
- * Fails:     never
- * Returns:   nothing
- */
-static int
-gtp_draw_search_area(char *s)
-{
-  UNUSED(s);
-
-  gtp_start_response(GTP_SUCCESS);
-  gtp_printf("\n");
-  draw_search_area();
-  return gtp_finish_response();
-}
-
 
 
 /*

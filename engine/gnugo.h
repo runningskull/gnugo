@@ -243,7 +243,6 @@ extern int output_flags;       /* amount of output to outfile */
 #define DEBUG_OWL_PERSISTENT_CACHE  0x200000
 #define DEBUG_TOP_MOVES             0x400000
 #define DEBUG_MISCELLANEOUS         0x800000
-#define DEBUG_ORACLE_STREAM         0x1000000
 
 /* hash flag bits 
  *
@@ -311,10 +310,6 @@ extern int mandated_owl_node_limit;
 extern float potential_moves[MAX_BOARD][MAX_BOARD];
 
 extern volatile int time_to_die;   /* set by signal handlers */
-
-extern int limit_search;  /* limit move search to a portion of the board */
-extern int oracle_exists; /* oracle is available for consultation        */
-extern int metamachine;   /* use metamachine_genmove                     */
 
 /* ================================================================ */
 /*                 tracing and debugging functions                  */
@@ -409,8 +404,6 @@ void debug_influence_move(int i, int j);
 #define TRACE_TOP_MOVES		!(debug & DEBUG_TOP_MOVES) ? \
 				 (void)0 : (void)gprintf 
 #define TRACE_MISCELLANEOUS	!(debug & DEBUG_MISCELLANEOUS) ? \
-				 (void)0 : (void)gprintf 
-#define TRACE_ORACLE_STREAM	!(debug & DEBUG_ORACLE_STREAM) ? \
 				 (void)0 : (void)gprintf 
 
 
@@ -530,11 +523,6 @@ void decide_position(int color);
 void decide_eye(int pos);
 void decide_combination(int color);
 void decide_surrounded(int pos);
-void decide_oracle(Gameinfo *gameinfo, char *infilename, char *untilstring);
-
-/*oracle.c*/
-void dismiss_oracle(void);
-void oracle_clear_board(int boardsize);
 
 #endif  /* _GNUGO_H_ */
 
