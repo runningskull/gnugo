@@ -512,7 +512,7 @@ for details.
 @end quotation
 @item @file{score.c}
 @quotation
-Implements the Bouzy algorithms (@pxref{Moyo}) and contains
+Implements the Bouzy algorithms (@pxref{Alternative Moyo}) and contains
 code for scoring the game.
 @end quotation
 @item @file{semeai.c}

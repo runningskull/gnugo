@@ -26,6 +26,7 @@ the tactical reading code, which is in @file{engine/reading.c}.
 * Alternate Komaster Schemes::   Alternate Komaster Schemes
 * Superstrings::                 Superstrings
 * Debugging::                    Debugging the reading code
+* Connection Reading::           Connection Reading
 @end menu
 
 @node Reading Basics
@@ -1114,3 +1115,43 @@ jt $arg0
 end
 
 @end example
+
+@node Connection Reading
+@section Connection Reading
+
+GNU Go does reading to determine if strings can be connected.  The algorithms
+for this are in @file{readconnect.c}. As with the reading code, the connection
+code is not pattern based.
+
+The connection code is invoked by the engine through the functions:
+
+@itemize
+@item @code{int string_connect(int str1, int str2, int *move)}
+@findex string_connect
+@quotation
+Returns @code{WIN} if @code{str1} and @code{str2} can be connected. 
+@end quotation
+@item @code{int disconnect(int str1, int str2, int *move)}
+@findex disconnect
+@quotation
+Returns @code{WIN} if @code{str1} and @code{str2} can be disconnected. 
+@end quotation
+@end itemize
+
+To see the connection code in action, you may try the
+following example.
+
+@example
+gnugo --quiet -l connection3.sgf --decide-connection M3/N7 -o vars.sgf
+@end example
+
+(The file @file{connection3.sgf} is in @file{regression/games}.)
+Examine the sgf file produced by this to see what kind of reading
+is done by the functions @code{string_connect()} and
+@code{string_disconnect()}, which are called by the function
+@code{decide_connection}. 
+
+One use of the connection code is used is through the autohelper macros
+@code{oplay_connect}, @code{xplay_connect}, @code{oplay_disconnect} and
+@code{xplay_disconnect} which are used in the connection databases.
+

@@ -164,9 +164,9 @@ move here could not be captured.
 @item @samp{O}
 @quotation
 It is checked that every friendly (@samp{O}) stone of the pattern belongs to a
-dragon which has matcher_status (@pxref{Dragons}) @code{ALIVE} or
+dragon which has status (@pxref{Dragons}) @code{ALIVE} or
 @code{UNKNOWN}. The @code{CRITICAL} matcher status is excluded. It is possible
-for a string to have @code{ALIVE} matcher_status and still be tactically
+for a string to have @code{ALIVE} status and still be tactically
 critical, since it might be amalgamated into an ALIVE dragon, and the matcher
 status is constant on the dragon.  Therefore, an additional test is performed:
 if the pattern contains a string which is tactically critical, and if @samp{*}
@@ -180,7 +180,7 @@ belongs to a dragon which is classified as @code{DEAD} or @code{UNKNOWN}.
 @item @samp{X}
 @quotation
 It is checked that every opponent (@samp{X}) stone of the pattern
-belongs to a dragon with matcher_status @code{ALIVE}, @code{UNKNOWN} or 
+belongs to a dragon with status @code{ALIVE}, @code{UNKNOWN} or 
 @code{CRITICAL}. Note that there is an asymmetry with @samp{O} patterns, where
 @code{CRITICAL} dragons are rejected.
 @end quotation
@@ -514,6 +514,51 @@ action can be used in the same pattern. If the action only needs to
 refer to @samp{*}, no constraint diagram is required. Like constraints,
 actions can span multiple lines.
 
+Here is a partial list of the autohelper macros which are typically
+called from action lines. This list is not complete. If you cannot find an
+autohelper macro in an action line in this list, consult @file{mkpat.c} to
+find out what function in the engine is actually called. If no
+macro exists which does what you want, you can add macros by
+editing the list in @file{mkpat.c}.
+
+@itemize
+@item @code{antisuji(a);}
+@quotation
+Mark @samp{a} as an antisuji, that is, a move that must never
+be played.
+@end quotation
+@item @code{replace(a,*)}
+@quotation
+This is appropriate if the move at @samp{*} is definitely better
+than the move at @samp{a}. The macro adds a point redistribution rule. Any 
+points which are assigned to @samp{a} during the move generation
+by any move reason are redistributed to @samp{*}.
+@end quotation
+@item @code{prevent_attack_threat(a)}
+@quotation
+Add a reverse followup value because the opponent's move here
+would threaten to capture @samp{a}.
+@end quotation
+@item @code{threaten_to_save(a)}
+@quotation
+Add a followup value because the move at @samp{*} threatens to
+rescue the dead string at @samp{a}.
+@end quotation
+@item @code{defend_against_atari(a)}
+@quotation
+Estimate the value of defending the string @samp{a} which can be put into
+atari and add this as a reverse followup value.
+@end quotation
+@item @code{add_defend_both_move(a,b);}
+@quotation
+@end quotation
+@item @code{add_cut_move(c,d);}
+@quotation
+Add to the move reasons that the move at @samp{*} threatens to cut
+@samp{c} and @samp{d}.
+@end quotation
+@end itemize
+
 @node  Autohelper Functions
 @section Autohelper Functions
 
@@ -602,14 +647,15 @@ value against 0, 1, or 2.
 
 @end example
 
-Functions related to various kinds of influence and territory
-estimations, as described in @xref{Moyo}. xarea(x) evaluates to true if
-x is either a living enemy stone or an empty point within his "area".
-@code{oarea(x)} is analogous but with respect to our stones and area.
- The main difference between area, moyo, and terri is that area is a 
-very far reaching kind of influence, moyo gives a more realistic 
-estimate of what may turn in to territory, and terri gives the points 
-that already are believed to be secure territory.
+These functions call @code{whose_territory()}, @code{whose_moyo()}
+and @code{whose_area()} (@pxref{Territory and Moyo}). For example
+@code{xarea(x)} evaluates to true if @samp{x} is either a living enemy stone
+or an empty point within the opponent's ``area''. The function @code{oarea(x)}
+is analogous but with respect to our stones and area.  The main difference
+between area, moyo, and terri is that area is a very far reaching kind of
+influence, moyo gives a more realistic estimate of what may turn in to
+territory, and terri gives the points that already are believed to be secure
+territory.
 
 @example
 @code{weak(x)}
@@ -747,6 +793,21 @@ which captures at least one of the two strings. In its
 current implementation @code{attack_either} only looks
 for uncoordinated attacks and would thus miss a double
 atari.
+
+@example
+@code{xplay_connect(a,b,c,...,y,z)}
+@code{oplay_connect(a,b,c,...,y,z)}
+@code{xplay_disconnect(a,b,c,...,y,z)}
+@code{oplay_disconnect(a,b,c,...,y,z)}
+
+@end example
+
+The function @code{xplay_connect(a,b,c,...,y,z)} begins
+with an @samp{X} move at @samp{a}, then an @samp{O}
+move at @samp{b}, and so forth, then finally calls
+@code{string_connect()} to determine whether
+@samp{x} and @samp{y} can be connected. The other
+functions are similar (@pxref{Connection Reading}).
 
 @example
 

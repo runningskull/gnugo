@@ -114,6 +114,8 @@ connect or disconnect, it is assumed that the connection has failed. If
 one or more of the moves to play turns out to be illegal for some
 reason, the rest of the sequence is played anyway, and
 connection/disconnection is tested as if nothing special happened.
+Ultimately the connection is decided by the functions 
+@code{string_connect} and @code{disconnect} (@pxref{Connection Reading}).
 @end quotation
 @item @code{void set_depth_values(int level)}
 @findex set_depth_values

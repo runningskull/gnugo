@@ -262,9 +262,21 @@ display of the eyespaces, with marginal eye spaces marked @samp{!}
 @cindex moyo display
 
 The option @option{-m @var{level}} can give colored displays of the
-various quantities which are computed in @file{engine/moyo.c}.
+various quantities which are computed in @file{engine/moyo.c}. 
 
-The regions found by Bouzy's algorithm (@pxref{Moyo}) can be
+GNU Go contains two distinct implementations of the concepts of Territory,
+Moyo and Area (@pxref{Territory and Moyo}). Primarily GNU Go computes
+Territory, Moyo and Area using the influence code, and reports them
+with the functions @code{whose_territory()}, @code{whose_moyo()} and
+@code{whose_area()}. To get a colored display of the influence regions
+found by this module, use @option{-m 0x18} to see the initial influence,
+and e.g. @option{-m 0x10 --debug-influence D5} to see the influence
+after having made the move D5. There are various other options available
+for numerical displays influence; for a detailed description see
+@ref{Influential Display}.
+
+The regions found by Bouzy's algorithm (@pxref{Alternative Moyo}) are
+used only in the function @code{estimate_score()}. These can be
 displayed with the following options:
 
 @example
@@ -277,16 +289,6 @@ displayed with the following options:
 @end group
 @end example
 
-These data are today only used in the score estimation. 
-
-The rest of the engine uses instead the new influence algorithm explained
-in @xref{Influence}.  To get a colored display of the influence regions
-found by this module, use @option{-m 0x18} to see the initial influence,
-and e.g. @option{-m 0x10 --debug-influence D5} to see the influence
-after having made the move D5. There are various other options available
-for numerical displays influence; for a detailed description see
-@xref{Influential Display}.
-
 @noindent
-These options can be combined by adding the levels.
+The @option{-m} options can be combined by adding the levels.
 

@@ -901,7 +901,8 @@ Other useful colored displays may be obtained by using instead:
 
 @itemize @bullet
 @item the option -E to display eye spaces (@pxref{Eyes}).
-@item the option -m 1 to display territory (@pxref{Moyo}).
+@item the option -m 0x0180 to display territory, moyo and area 
+(@pxref{Territory and Moyo}).
 @end itemize
 
 The colored displays are documented elsewhere (@pxref{Colored Display}).

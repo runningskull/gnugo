@@ -4,13 +4,15 @@
 * Bouzy::                       Bouzy's algorithm
 @end menu
 
-The file @file{score.c} contains algorithms for the computation of
-a number of useful things. These algorithms are used in
-@code{estimate_score()} but apart from that are generally 
-@strong{not} used in the rest of the engine since the
-concepts of Territory, Moyo and Area were reimplemented
-using the influence code. This chapter is therefore of
-limited interest
+The file @file{score.c} contains alternative algorithms for the
+computation of Territory and Moyos. These algorithms are used in
+@code{estimate_score()} but apart from that are generally
+@strong{not} used in the rest of the engine since the concepts of
+Territory, Moyo and Area were reimplemented using the influence
+code (@pxref{Territory and Moyo}). The function @code{estimate_score()},
+which is the only way this code is used in the engine, could
+easily be replaced with a function such as
+@code{influence_score()} based on the influence code.
 
 @node Moyo history
 @section Moyo history

@@ -699,13 +699,14 @@ game are also stored.
 @item estimate
 @quotation
 Examine the status of all groups on the board, then give a quick
-estimate of the score using the Bouzy 5/21 algorithm (@pxref{Moyo}).
+estimate of the score using the Bouzy 5/21 algorithm 
+(@pxref{Alternative Moyo}).
 @end quotation
 @item finish
 @quotation
 Finish the game by selfplaying until two passes, then determine the
 status of all stones and estimate territory using the Bouzy 5/21
-algorithm (@pxref{Moyo}).
+algorithm (@pxref{Alternative Moyo}).
 @end quotation
 @item aftermath
 @quotation

@@ -1083,8 +1083,9 @@ quiescence_connect(int str1, int str2, int *move)
 #define USE_PERSISTENT_CONNECTION_CACHE 0
 
 
-/* Externally callable frontend to recursive_connect(). */
-
+/* Externally callable frontend to recursive_connect().
+ * Returns WIN if str1 and str2 can be connected. 
+ */
 int
 string_connect(int str1, int str2, int *move)
 {
@@ -1260,8 +1261,9 @@ recursive_connect(int str1, int str2, int *move)
 }
   
 
-/* Externally callable frontend to recursive_disconnect(). */
-
+/* Externally callable frontend to recursive_disconnect().
+ * Returns WIN if str1 and str2 can be disconnected. 
+ */
 int
 disconnect(int str1, int str2, int *move)
 {
@@ -1605,7 +1607,22 @@ recursive_transitivity(int str1, int str2, int str3, int *move)
   return res;
 }
   
-/* Externally callable frontend to recursive_non_transitivity(). */
+/* It is often assumed that if str1 connects to str2 and str2 
+ * connects to str3 then str1 connects to str3. This is called
+ * TRANSITIVITY. However there are exceptions such as this
+ * situation:
+ * 
+ *     XXXXX            XXXXX
+ *     OO.OO            AA*CC
+ *     ..O..            ..B..
+ *     XXXXX            XXXXX
+ *
+ * Although strings A and B are connected, and strings B and C
+ * are connected, a move at * disconnects strings A and C.
+ *
+ * This function is a public frontend to recursive_non_transitivity(). 
+ * Returns WIN if str1, str2 and str3 can be disconnected.
+*/
 
 int
 non_transitivity(int str1, int str2, int str3, int *move)

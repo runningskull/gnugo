@@ -76,33 +76,33 @@ are respected.
 
 @menu
 User's manual
-* Introduction::                What is GNU Go ?
-* Installation::                Installing GNU Go 
-* User Guide::                  Using GNU Go
+* Introduction::                 What is GNU Go ?
+* Installation::                 Installing GNU Go 
+* User Guide::                   Using GNU Go
 
 An introduction to the GNU Go engine
-* Overview::                    Overview of the GNU Go engine
-* Analyzing::                   Analyzing GNU Go's moves
-* Move Generation::             How GNU Go generates moves
-* Worms and Dragons::           Dragons and Worms
-* Eyes::                        Eyes and half eyes
-* Patterns::                    Pattern database
-* Tactical Reading::            Tactical Reading
-* Pattern Based Reading::       Pattern Based Reading: Owl and Combinations
-* Influence::                   Influence Function
-* Moyo::                        Estimation of Moyos : Bouzy's 5/21 algorithm
+* Overview::                     Overview of the GNU Go engine
+* Analyzing::                    Analyzing GNU Go's moves
+* Move Generation::              How GNU Go generates moves
+* Worms and Dragons::            Dragons and Worms
+* Eyes::                         Eyes and half eyes
+* Patterns::                     Pattern database
+* Tactical Reading::             Tactical and Connection Reading
+* Pattern Based Reading::        Pattern Based Reading: Owl and Combinations
+* Influence::                    Influence Function
+* Alternative Moyo::             Another approach to Moyos : Bouzy's algorithm
 
 Infrastructure and Interfaces
-* Libboard::                    The basic go board library.
-* SGF::                         Handling SGF trees in memory
-* DFA::                         The DFA Pattern Matcher
-* Utility Functions::           @file{utils.c} and @file{printutils.c}
-* API::                         API to the GNU Go engine
-* GTP::                         The Go Text Protocol
-* Regression::                  Regression testing
+* Libboard::                     The basic go board library.
+* SGF::                          Handling SGF trees in memory
+* DFA::                          The DFA Pattern Matcher
+* Utility Functions::            @file{utils.c} and @file{printutils.c}
+* API::                          API to the GNU Go engine
+* GTP::                          The Go Text Protocol
+* Regression::                   Regression testing
 
 Appendices
-* Copying::                     Software and Documentation Licenses
+* Copying::                      Software and Documentation Licenses
 
 Indices
 * Concept Index::               Concept Index
@@ -176,8 +176,8 @@ Indices
 
 @include influence.texi
 
-@node Moyo
-@chapter Moyo
+@node Alternative Moyo
+@chapter Another approach to Moyos : Bouzy's 5/21 algorithm
 
 @include moyo.texi
 
