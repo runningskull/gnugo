@@ -82,7 +82,8 @@ reset_reading_node_counter
 
 ############## semeai tests #################
 #
-# These tests do not call genmove. Genmove tests below node counts.
+# These tests do not call genmove. Genmove tests and status tests come
+# at the bottom of the test suite.
 
 loadsgf games/semeai/semeai6.sgf
 1 analyze_semeai C1 E1
@@ -351,6 +352,30 @@ loadsgf games/semeai/semeai14.sgf
 80 analyze_semeai F7 F9
 #? [1 0 (PASS|E9|E8|J9|H5)]*
 
+########### semeai gen_move tests #################
+
+# A6 gives an unfavorable ko while F10 gives seki.
+# Since there are no ko threats, and F10 is enough to win, it is preferred.
+loadsgf games/semeai/semeaiko1.sgf
+29 reg_genmove black
+#? [F10]*
+
+########### semeai status tests #################
+
+loadsgf games/semeai/semeai15.sgf
+81 dragon_status H7
+#? [dead]
+82 dragon_status J7
+#? [alive]
+83 dragon_status J9
+#? [dead]
+84 dragon_status E13
+#? [dead]
+85 dragon_status A13
+#? [alive]
+86 dragon_status C13
+#? [critical A2 A2]
+
 ########### end of semeai tests #################
 
 # Report number of nodes visited by the tactical reading
@@ -360,12 +385,4 @@ loadsgf games/semeai/semeai14.sgf
 # Report number of nodes visited by the owl code
 10001 get_owl_node_counter
 #? [0]&
-
-########### semeai gen_move tests #################
-
-# A6 gives an unfavorable ko while F10 gives seki.
-# Since there are no ko threats, and F10 is enough to win, it is preferred.
-loadsgf games/semeai/semeaiko1.sgf
-29 reg_genmove black
-#? [F10]*
 

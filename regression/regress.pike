@@ -229,6 +229,8 @@ void run_testsuite(string suite_name, array(string) program_args,
 	continue;
       if (test_numbers && !has_value(test_numbers, number))
 	continue;
+      if (correct_results[(int) number])
+	write("Repeated test number " + number + ".\n");
       Send("reset_reading_node_counter");
       Send("reset_owl_node_counter");
       Send("reset_connection_node_counter");
