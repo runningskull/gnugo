@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- support for ranges in sgf files
 - time summaries reported with --showtime in gmp mode
 - TODO revised.
 - clock_init_autolevel() retired

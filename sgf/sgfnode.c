@@ -361,21 +361,17 @@ sgfRoot(SGFNode *node)
 /*
  * Make an SGF property.
  */
-
-SGFProperty *
-sgfMkProperty(const char *name, const  char *value,
-	      SGFNode *node, SGFProperty *last)
+static SGFProperty *
+do_sgf_make_property(short sgf_name,  const char *value,
+		     SGFNode *node, SGFProperty *last)
 {
   SGFProperty *prop;
 
   prop = (SGFProperty *) xalloc(sizeof(SGFProperty));
-  prop->value = xalloc(strlen(value)+1);
-  prop->next = NULL;
-  if (strlen(name) == 1) 
-    prop->name = name[0] | (short) (' ' << 8);
-  else
-    prop->name = name[0] | name[1] << 8;
+  prop->name = sgf_name;
+  prop->value = xalloc(strlen(value) + 1);
   strcpy(prop->value, value);
+  prop->next = NULL;
 
   if (last == NULL)
     node->props = prop;
@@ -384,6 +380,65 @@ sgfMkProperty(const char *name, const  char *value,
 
   return prop;
 }
+
+
+/* Make an SGF property.  In case of a property with a range it
+ * expands it and makes several properties instead.
+ */
+SGFProperty *
+sgfMkProperty(const char *name, const  char *value,
+	      SGFNode *node, SGFProperty *last)
+{
+  static const short properties_allowing_ranges[12] = {
+    /* Board setup properties. */
+    SGFAB, SGFAW, SGFAE,
+
+    /* Markup properties. */
+    SGFCR, SGFMA, SGFSQ, SGFTR, SGFDD, SGFSL,
+
+    /* Miscellaneous properties. */
+    SGFVW,
+
+    /* Go-specific properties. */
+    SGFTB, SGFTW
+  };
+
+  int k;
+  short sgf_name;
+
+  if (strlen(name) == 1)
+    sgf_name = name[0] | (short) (' ' << 8);
+  else
+    sgf_name = name[0] | name[1] << 8;
+
+  for (k = 0; k < 12; k++) {
+    if (properties_allowing_ranges[k] == sgf_name)
+      break;
+  }
+
+  if (k < 12
+      && strlen(value) == 5
+      && value[2] == ':') {
+    char x1 = value[0];
+    char y1 = value[1];
+    char x2 = value[3];
+    char y2 = value[4];
+    char new_value[] = "xy";
+
+    if (x1 <= x2 && y1 <= y2) {
+      for (new_value[0] = x1; new_value[0] <= x2; new_value[0]++) {
+	for (new_value[1] = y1; new_value[1] <= y2; new_value[1]++)
+	  last = do_sgf_make_property(sgf_name, new_value, node, last);
+      }
+
+      return last;
+    }
+  }
+
+  /* Not a range property. */
+  return do_sgf_make_property(sgf_name, value, node, last);
+}
+
 
 /*
  * Recursively free an SGF property.
