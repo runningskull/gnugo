@@ -2,14 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- GTP command dragon_status revised
 - bug fix in estimate_strategical_value: EITHER_MOVE negative values
-- j patter value increased from 22.0 to 24.0
+- j pattern value increased from 22.0 to 24.0
 - new gtp experimental_score for metamachine
 - new DEBUG_MISCELLANEOUS used only in find_eye_dragons
 - connection tunning
 - B patterns found by find_cuts inhibit C patterns by find_connections
 - new connection tests
-- new GTP command matcher_status
 - strategic_penalty() adds negative strategical move value a bit more often
 - revise_thrashing_dragons() revised
 - tuning

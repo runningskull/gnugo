@@ -91,7 +91,6 @@ DECLARE(gtp_is_legal);
 DECLARE(gtp_ladder_attack);
 DECLARE(gtp_list_stones);
 DECLARE(gtp_loadsgf);
-DECLARE(gtp_matcher_status);
 DECLARE(gtp_name);
 DECLARE(gtp_new_game);
 DECLARE(gtp_estimate_score);
@@ -194,7 +193,6 @@ static struct gtp_command commands[] = {
   {"level",        	      gtp_set_level},
   {"list_stones",    	      gtp_list_stones},
   {"loadsgf",          	      gtp_loadsgf},
-  {"matcher_status",          gtp_matcher_status},
   {"name",                    gtp_name},
   {"new_game",                gtp_new_game},
   {"new_score",               gtp_estimate_score},
@@ -1500,67 +1498,67 @@ gtp_eval_eye(char *s, int id)
  *****************/
 
 /* Function:  Determine status of a dragon.
- * Arguments: vertex
+ * Arguments: optional vertex
  * Fails:     invalid vertex, empty vertex
  * Returns:   status ("alive", "critical", "dead", or "unknown"),
  *            attack point, defense point. Points of attack and
- *            defense are only given if the status is critical and the
- *            owl code is enabled.
+ *            defense are only given if the status is critical.
+ *            If no vertex is given, the status is listed for all
+ *            dragons, one per row in the format "A4: alive".
  *
  * FIXME: Should be able to distinguish between life in seki
- *        and life with territory. Should also be able to identify ko.
+ *        and independent life. Should also be able to identify ko.
  */
 
 static int
 gtp_dragon_status(char *s, int id)
 {
   int i, j;
+  int str = NO_MOVE;
+  int pos;
 
-  if (!gtp_decode_coord(s, &i, &j))
+  if (gtp_decode_coord(s, &i, &j)) {
+    str = POS(i, j);
+    if (board[str] == EMPTY)
+      return gtp_failure(id, "vertex must not be empty");
+  }
+  else if (sscanf(s, "%*s") != EOF)
     return gtp_failure(id, "invalid coordinate");
-
-  if (BOARD(i, j) == EMPTY)
-    return gtp_failure(id, "vertex must not be empty");
 
   silent_examine_position(BLACK, EXAMINE_DRAGONS);
   
-  /* FIXME: We should also call the semeai module. */
+  gtp_printid(id, GTP_SUCCESS);
 
-  if (dragon[POS(i, j)].owl_status == UNCHECKED) {
-    if (dragon[POS(i, j)].crude_status == ALIVE)
-      return gtp_success(id, "alive");
-  
-    if (dragon[POS(i, j)].crude_status == DEAD)
-      return gtp_success(id, "dead");
-  
-    if (dragon[POS(i, j)].crude_status == UNKNOWN)
-      return gtp_success(id, "unknown");
-
-    /* Only remaining possibility. */
-    assert(dragon[POS(i, j)].crude_status == CRITICAL); 
-    return gtp_success(id, "critical");
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (ON_BOARD(pos)
+	&& (pos == str
+	    || (str == NO_MOVE
+		&& board[pos] != EMPTY
+		&& dragon[pos].origin == pos))) {
+      if (str == NO_MOVE)
+	gtp_mprintf("%m: ", I(pos), J(pos));
+      
+      if (dragon[pos].status == ALIVE)
+	gtp_printf("alive\n");
+      else if (dragon[pos].status == DEAD)
+	gtp_printf("dead\n");
+      else if (dragon[pos].status == UNKNOWN)
+	gtp_printf("unknown\n");
+      else {
+	/* Only remaining possibility. */
+	assert(dragon[pos].status == CRITICAL); 
+	/* Status critical, need to return attack and defense point as well. */
+	gtp_mprintf("critical %m %m\n", 
+		   I(dragon[pos].owl_attack_point),
+		   J(dragon[pos].owl_attack_point),
+		   I(dragon[pos].owl_defense_point),
+		   J(dragon[pos].owl_defense_point));
+      }
+    }
   }
 
-  /* Owl code active. */
-  if (dragon[POS(i, j)].owl_status == ALIVE)
-    return gtp_success(id, "alive");
-  
-  if (dragon[POS(i, j)].owl_status == DEAD)
-    return gtp_success(id, "dead");
-  
-  if (dragon[POS(i, j)].owl_status == UNKNOWN)
-    return gtp_success(id, "unknown");
-  
-  assert(dragon[POS(i, j)].owl_status == CRITICAL);
-  /* Status critical, need to return attack and defense point as well. */
-  gtp_printid(id, GTP_SUCCESS);
-  gtp_printf("critical ");
-  gtp_print_vertex(I(dragon[POS(i, j)].owl_attack_point),
-		   J(dragon[POS(i, j)].owl_attack_point));
-  gtp_printf(" ");
-  gtp_print_vertex(I(dragon[POS(i, j)].owl_defense_point),
-		   J(dragon[POS(i, j)].owl_defense_point));
-  return gtp_finish_response();
+  gtp_printf("\n");
+  return GTP_OK;
 }
 
 
@@ -2692,54 +2690,6 @@ gtp_dragon_data(char *s, int id)
   }
   gtp_printf("\n");
   return GTP_OK;
-}
-
-/* Function:  List the matcher status of all dragons
- * Arguments: optional vertex
- * Fails:     never
- * Returns:   With no parameter, matcher statuses for all dragons in format:
- *            D4: ALIVE
- *            With one vertex as parameter, prints matcher statuses, format:
- *            ALIVE
- */
-static int
-gtp_matcher_status(char *s, int id)
-{
-  int pos, i, j;
-
-  if (sscanf(s, "%*c") >= 0) {
-    if (!gtp_decode_coord(s, &i, &j))
-      return gtp_failure(id, "invalid coordinate");
-    if (i != -1)
-      pos = POS(i, j);
-    if (board[pos] == EMPTY)
-      return gtp_failure(id, "empty vertex");
-  }
-  else
-    pos = PASS_MOVE;
-
-  examine_position(EMPTY, EXAMINE_DRAGONS);
-
-  gtp_printid(id, GTP_SUCCESS);
-  
-  if (pos == PASS_MOVE) {
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-      if (ON_BOARD(pos) 
-	  && board[pos] != EMPTY
-	  && dragon[pos].origin == pos) {
-        struct dragon_data *d = &dragon[pos];
-	gtp_print_vertex(I(pos), J(pos));
-	gtp_printf(": ");
-	gtp_printf("%s\n", status_to_string(d->status));
-      }
-    gtp_printf("\n");
-    return GTP_OK;
-  }
-  else {
-    gtp_printf("%s\n", status_to_string(dragon[pos].status));
-    gtp_printf("\n");
-    return GTP_OK;
-  }
 }
 
 /* Function:  List the stones of a dragon

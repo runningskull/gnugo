@@ -24,10 +24,10 @@
 # Boston, MA 02111, USA.                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
-# matcher_status info:
+# matcher_check info:
 #
 # plays one gtp program against itself, and watches for bad
-# matcher_status transitions.
+# status transitions.
 #
 # FIXME: allow analysis of sgf files
 # FIXME: if the vertex by which a dragon is named ever changes,
@@ -357,7 +357,7 @@ sub check_matcher {
     my $legality = "illegal";
 
     #send command
-    print $in "matcher_status\n";
+    print $in "dragon_status\n";
 
     #ignore empty lines
     #while ($line eq "")
@@ -396,12 +396,12 @@ sub check_matcher {
 	#ok, so it's old
 
 	$legality = "illegal";
-	if ($old_status eq "CRITICAL") {$legality = "legal"};
-	if ($new_status eq "CRITICAL") {$legality = "legal"};
-	if ($new_status eq "UNKNOWN") {$legality = "legal"};
-	if ($old_status eq "UNKNOWN") {
-	    if ($new_status eq "ALIVE") {$legality = "legal";}
-	    if ($new_status eq "CRITICAL") {$legality = "legal";}
+	if ($old_status eq "critical") {$legality = "legal"};
+	if ($new_status eq "critical") {$legality = "legal"};
+	if ($new_status eq "unknown") {$legality = "legal"};
+	if ($old_status eq "unknown") {
+	    if ($new_status eq "alive") {$legality = "legal";}
+	    if ($new_status eq "critical") {$legality = "legal";}
 	}
 
 	if ($match_hist{$vertex} eq $new_status)
@@ -426,7 +426,7 @@ sub check_matcher {
 		}
 	    } else
 	    {
-	        #illegal state change -- ALIVE to DEAD or vice versa
+	        #illegal state change -- alive to dead or vice versa
 		print "Illegal state change:\n";
 		print "Games remaining: $games\n";
 		print "Move: $movenum\n";
