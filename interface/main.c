@@ -366,16 +366,15 @@ main(int argc, char *argv[])
   else
     owl_threats = 0;
   experimental_owl_ext = EXPERIMENTAL_OWL_EXT;
-  experimental_semeai = EXPERIMENTAL_SEMEAI;
   experimental_connections = EXPERIMENTAL_CONNECTIONS;
   cosmic_gnugo = COSMIC_GNUGO;
   large_scale = LARGE_SCALE;
+  resign_allowed = RESIGNATION_ALLOWED;
 
   allow_suicide = 0;
   capture_all_dead = 0;
   play_out_aftermath = 0;
   limit_search = 0;
-  resign_allowed = RESIGNATION_ALLOWED;
 
   /* Default parameters for clock and auto level systems. */
   clock_init(3600, 0, 0);      /* One hour sudden death. */
@@ -468,36 +467,41 @@ main(int argc, char *argv[])
 	
       case OPT_OPTIONS:
 	if (USE_BREAK_IN)
-	  fprintf(stderr,
+	  fprintf(stdout,
 		  "configure option enabled: experimental break-ins\n");
 	if (COSMIC_GNUGO)
-	  fprintf(stderr,
+	  fprintf(stdout,
 		  "configure option enabled: cosmic GNU Go \n");
 	if (LARGE_SCALE)
-	  fprintf(stderr,
+	  fprintf(stdout,
 		  "configure option enabled: large scale captures \n");
 	if (EXPERIMENTAL_CONNECTIONS)
-	  fprintf(stderr,
+	  fprintf(stdout,
 		  "configure option enabled: experimental connections\n");
 	if (ALTERNATE_CONNECTIONS)
-	  fprintf(stderr,
+	  fprintf(stdout,
 		  "configure option enabled: alternate connections\n");
-	if (EXPERIMENTAL_SEMEAI)
-	  fprintf(stderr,
-		  "configure option enabled: experimental semeai\n");
 	if (EXPERIMENTAL_OWL_EXT)
-	  fprintf(stderr,
+	  fprintf(stdout,
 		  "configure option enabled: experimental GAIN/LOSS codes\n");
 	if (EXPERIMENTAL_READING)
-	  fprintf(stderr,
+	  fprintf(stdout,
 		  "configure option enabled: experimental reading\n");
 	if (OWL_THREATS)
-	  fprintf(stderr,
+	  fprintf(stdout,
 		  "configure option enabled: owl threats\n");
-	fprintf(stderr,
+	if (RESIGNATION_ALLOWED)
+	  fprintf(stdout,
+		  "configure option enabled: resination allowed\n");
+	if (ORACLE)
+	  fprintf(stdout,
+		  "configure option enabled: oracle\n");
+	fprintf(stdout,
 		"Owl node limit: %d\n", OWL_NODE_LIMIT);
-	fprintf(stderr,
+	fprintf(stdout,
 		"Semeai node limit: %d\n", SEMEAI_NODE_LIMIT);
+	fprintf(stdout,
+		"Cache size: %d MB\n", DEFAULT_MEMORY);
 
 	return EXIT_SUCCESS;
 	break;
@@ -568,16 +572,8 @@ main(int argc, char *argv[])
 	experimental_owl_ext = 1;
 	break;
 
-      case OPT_EXPERIMENTAL_SEMEAI:
-	experimental_semeai = 1;
-	break;
-
       case OPT_SEMEAI_NODE_LIMIT:
 	semeai_node_limit = atoi(gg_optarg);
-	break;
-
-      case OPT_STANDARD_SEMEAI: 
-	experimental_semeai = 0;
 	break;
 
       case OPT_EXPERIMENTAL_CONNECTIONS:

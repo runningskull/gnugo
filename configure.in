@@ -1,5 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
 
+dnl *****************************************************************
+dnl IMPORTANT: Don't forget to add corresponding output for --options
+dnl if you add a non-trivial configure option here.
+dnl *****************************************************************
+
 dnl this is to determine if the config script is running in the proper place
 dnl just give it one file relative to where it should be
 AC_INIT
@@ -83,10 +88,6 @@ AC_ARG_ENABLE(oracle,
  [  --enable-oracle                    enable oracle
   --disable-oracle                   don't enable oracle (default)])
 
-AC_ARG_ENABLE(experimental-semeai,
- [  --enable-experimental-semeai       use the semeai module (default)
-  --disable-experimental-semeai      use old semeai module])
-
 AC_ARG_ENABLE(experimental-break-in,
  [  --enable-experimental-break-in     use the breakin module (default)
   --disable-experimental-break-in    don't use the breakin module])
@@ -117,10 +118,6 @@ AC_ARG_ENABLE(alternate-connections,
                                          analysis
   --disable-alternate-connections    use primary experimental connection 
                                          analysis (default)])
-
-AC_ARG_ENABLE(experimental-hashing,
- [  --enable-experimental-hashing      use experimental hashing scheme (default)
-  --disable-experimental-hashing     use old hashing scheme])
 
 AC_ARG_ENABLE(profile,
  [  --enable-profile                   compile gnugo with gprof option ])
@@ -418,17 +415,6 @@ if test "$enable_experimental_break_in" = "no" ; then
    AC_DEFINE(USE_BREAK_IN, 0)
 else
    AC_DEFINE(USE_BREAK_IN, 1)
-fi
-
-dnl ------------ Semeai -------------------
-
-AH_TEMPLATE([EXPERIMENTAL_SEMEAI],
-[Semeai module. Default standard.])
-
-if test "$enable_experimental_semeai" = "no" ; then
-   AC_DEFINE(EXPERIMENTAL_SEMEAI, 0)
-else
-   AC_DEFINE(EXPERIMENTAL_SEMEAI, 1)
 fi
 
 dnl ------------ Owl extensions ------------

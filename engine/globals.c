@@ -106,8 +106,6 @@ int disable_endgame_patterns   = 0;
 int doing_scoring              = 0;
 
 int chinese_rules       = 0;    /* ruleset choice for GMP connection */
-/* use experimental semeai module */
-int experimental_semeai = EXPERIMENTAL_SEMEAI;
 /* use experimental connection module */
 int experimental_connections = EXPERIMENTAL_CONNECTIONS;
 /* use alternate connection reading algorithm */
