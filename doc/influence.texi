@@ -85,7 +85,7 @@ and it is used as an important information for guessing the strength of
 dragons. For example,
 a dragon that is part of a moyo of size 25 is immediately considered alive.
 For dragons with a smaller moyo size, a life-and-death analysis will be
-done by the owl code (see @ref{Life and Death Reading}). A dragon with a
+done by the owl code (see @ref{Pattern Based Reading}). A dragon with a
 moyo size of only 5 will be considered weak, even if the owl code has
 decided that it cannot be killed.
 

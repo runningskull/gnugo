@@ -9,8 +9,8 @@
 * GNU go: (gnugo).          The GNU Go program
 @end direntry
 
-@set EDITION 3.2
-@set VERSION 3.2
+@set EDITION 3.4
+@set VERSION 3.4
 
 @titlepage
 @subtitle Documentation for the GNU Go Project
@@ -23,9 +23,10 @@
 @author Gunnar Farneb@"ack, Thomas Traber, Tanguy Urvoy, Inge Wallin
 @sp 1
 @page
-@title{GNU GO 3.2}
+@title{GNU GO 3.4}
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+Copyright @copyright{} 1999, 2000, 2001, 2002, 2003 by the Free 
+Software Foundation, Inc.
 @sp 2
 
 This is Edition @value{EDITION} of @cite{The GNU Go Project documentation}, @*
@@ -92,7 +93,7 @@ GNU Go Internals
 * Patterns::                    Pattern database
 * DFA::                         The DFA Pattern Matcher
 * Tactical Reading::            Tactical Reading
-* Life and Death Reading::      Life and Death reading: Owl and Life
+* Pattern Based Reading::       Pattern Based Reading: Owl and Combinations
 * Influence::                   Influence Function
 * Moyo::                        Estimation of Moyos : Bouzy's 5/21 algorithm
 * Utility Functions::           @file{utils.c} and @file{printutils.c}
@@ -184,19 +185,19 @@ Indices
 
 @include dfa.texi
 
-@node Tactical Reading, Life and Death Reading, DFA, Top
+@node Tactical Reading, Pattern Based Reading, DFA, Top
 @comment  node-name,  next,  previous,  up
 @chapter Tactical reading
 
 @include reading.texi
 
-@node Life and Death Reading, Influence, Tactical Reading, Top
+@node Pattern Based Reading, Influence, Tactical Reading, Top
 @comment  node-name,  next,  previous,  up
 @chapter Life and Death Reading
 
 @include owl.texi
 
-@node Influence, Moyo, Life and Death Reading, Top
+@node Influence, Moyo, Pattern Based Reading, Top
 @comment  node-name,  next,  previous,  up
 @chapter Influence Function
 

@@ -293,6 +293,13 @@ be either the move number or location.
 @quotation
 Write sgf output to file
 @end quotation
+@item @option{-O}, @option{--output-flags @var{flags}}
+@quotation
+Add useful information to the sgf file. Flags can be 'd', 'v' or
+both (i.e. 'dv'). If 'd' is specified, dead and critical dragons
+are marked in the sgf file. If 'v' is specified, move valuations
+around the board are indicated.
+@end quotation
 @item @option{--mode @var{mode}} 
 @quotation
 Force the playing mode ('ascii', 'emacs,' 'gmp' or 'gtp'). The default is
@@ -337,9 +344,12 @@ Use Japanese Rules. This is the default unless you specify
 @item @option{--version} or @option{-v}: Print the version number
 @item @option{--printsgf @var{filename}}: 
 @quotation
-Create an SGF file
-containing a diagram of the board. Useful with @option{-L} to
-create diagrams from games.
+Create an SGF file containing a diagram of the board. Useful with 
+@option{-l} and @option{-L} to create a diagram of the board from
+another sgf file. Illegal moves are indicated with the private
+@code{IL} property.  This property is not used in the FF4 SGF
+specification, so we are free to preempt it. This feature is used
+in the CGI interface in @file{interface/html/gg.cgi}.  
 @end quotation
 @item @option{--options}
 @quotation 
@@ -380,13 +390,6 @@ Go assumes that any string which can obtain 3 liberties is alive. Thus
 GNU Go can read ladders to an arbitrary depth, but will miss other
 types of capturing moves.
 @end quotation
-@item @option{--branch-depth}
-@quotation
-This sets the @code{branch_depth}, typically a little below the
-@code{depth}. Between @code{branch_depth} and @code{depth}, 
-attacks on strings with 3 liberties are considered but branching
-is inhibited, so fewer variations are considered.	
-@end quotation
 @item @option{-B}, @option{--backfill-depth @var{depth}}
 @quotation
 Deep reading cutoff. Beyond this depth (default 12) GNU Go will no 
@@ -411,9 +414,12 @@ tries very hard to analyze kos.
 @end quotation
 @item @option{--branch-depth @var{depth}} 
 @quotation
-Deep reading cutoff. Below
-this depth (default 8), GNU Go still tries to attack strings with only 3
-liberties, but only tries one move at each node.
+This sets the @code{branch_depth}, typically a little below the
+@code{depth}. Between @code{branch_depth} and @code{depth},
+attacks on strings with 3 liberties are considered but branching
+is inhibited, so fewer variations are considered.  Below this
+depth (default 13), GNU Go still tries to attack strings with only
+3 liberties, but only tries one move at each node.
 @end quotation
 @item @option{--aa_depth @var{depth}}
 @quotation
@@ -437,9 +443,10 @@ The preceeding options are documented with the reading code
 (@pxref{Reading Basics}).
 
 @itemize @bullet
-@item @option{--owl-branch} Below this depth Owl only considers one move. Default 8.
-@item @option{--owl-reading} Below this depth Owl assumes the dragon has escaped.
-Default 20.
+@item @option{--owl-branch} Below this depth Owl only considers
+one move. Default 8.
+@item @option{--owl-reading} Below this depth Owl assumes the
+dragon has escaped.  Default 20.
 @item @option{--owl-node-limit}
 @quotation
 If the number of variations exceeds this limit, Owl assumes the dragon can
@@ -503,7 +510,7 @@ be more informative.
 @quotation
 Use rxvt, xterm or Linux Console. (@pxref{Colored Display})
 @end quotation
-@item @option{-E}: colored display of eye spaces
+@item @option{-E}, @option{printeyes}: colored display of eye spaces
 @quotation
 Use rxvt, xterm or Linux Console. (@pxref{Colored Display})
 @end quotation
@@ -539,11 +546,16 @@ hexadecimal:
   DEBUG_TERRITORY             0x100000
   DEBUG_OWL_PERSISTENT_CACHE  0X200000
   DEBUG_TOP_MOVES             0x400000
+  DEBUG_MISCELLANEOUS         0x800000
+  DEBUG_ORACLE_STREAM         0x1000000
 @end example
 
 These debug flags are additive. If you want to turn on both
 dragon and worm debugging you can use @option{-d0x420}.
-
+@end quotation
+@item @option{--debug-flags}
+@quotation
+Print the list of debug flags
 @end quotation
 @item @option{-H}, @option{--hash @var{level}} 
 @quotation
@@ -583,11 +595,57 @@ whether the string at @var{location} can be captured, and if so, whether it
 can be defended. If used with @option{-o}, this will produce a variation tree
 in SGF.
 @end quotation
-@item @option{--decide-dragon @var{location}}
+@item @option{--decide-owl @var{location}}
 @quotation
 Invoke the owl code (@pxref{The Owl Code}) to decide whether the dragon at
 @var{location} can be captured, and whether it can be defended. If used with
 @option{-o}, this will produce a variation tree in SGF.  
+@end quotation
+@item @option{--decide-connection @var{location1}/@var{location2}}
+@quotation
+Decide whether dragons at @var{location1} and @var{location2} can be connected.
+Useful in connection with @option{-o} to write the variations to an SGF file.
+@end quotation
+@item @option{--decide-dragon-data @var{location}}
+@quotation
+Print complete information about the status of the dragon at @var{location}.
+@end quotation
+@item @option{--decide-semeai @var{location1}/@var{location2}}
+@quotation
+At @var{location1} and @var{location2} are adjacent dragons of the
+opposite color. Neither is aliveby itself, and their fate (alive,
+dead or seki) depends on the outcome of a semeai (capturing race).
+Decide what happens.  Useful in connection with @option{-o} to
+write the variations to an SGF file.
+@end quotation
+@item @option{--decide-tactical-semeai @var{location1}/@var{location2}}
+@quotation
+Similar to @option{--decide-semeai}, except that moves proposed by the
+owl code are not considered.
+@end quotation
+@item @option{--decide-position}
+@quotation
+Try to attack and defend every dragon with dragon.escape<6. If
+used with @option{-o}, writes the variations to an sgf file.
+@end quotation
+@item @option{--decide-eyes @var{location}}
+@quotation
+Evaluates the eyespace at @var{location} and prints a report. You can get
+more information by adding @option{-d0x02} to the command line. 
+(@pxref{Eye Local Game Values}.)
+@end quotation
+@item @option{--decide-surrounded @var{location}}
+@quotation
+A dragon is @emph{surrounded} if it is contained in the convex hull of
+its unfriendly neighbor dragons. This does not mean that it cannot escape,
+but it is often a good indicator that the dragon is under attack. This
+option draws the convex hull of the neighbor dragons and decides whether
+the dragon at @var{location} is surrounded.
+@end quotation
+@item @option{--decide-combination}
+@quotation
+Calls the function @code{atari_atari} to decide whether there
+exist combinations on the board.
 @end quotation
 @item @option{--score @var{method}}
 @quotation
@@ -624,14 +682,6 @@ end of the game, so if you want an estimate of the score in the
 middle, use this method.
 @end quotation
 @end itemize
-@end quotation
-@item @option{--printsgf @var{output file}} 
-@quotation
-load SGF file, output final position (requires @option{-l}) as another
-SGF file. Illegal moves are indicated with the private @code{IL} property.
-This property is not used in the FF4 SGF specification, so we are
-free to preempt it. This feature is used in the CGI interface in
-@file{interface/html/gg.cgi}.
 @end quotation
 @end itemize
 

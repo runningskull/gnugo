@@ -487,7 +487,7 @@ void sgffile_recordboard(SGFNode *node);
 /* sgfdecide.c */
 void decide_string(int pos);
 void decide_connection(int apos, int bpos);
-void decide_dragon(int pos);
+void decide_owl(int pos);
 void decide_dragon_data(int pos);
 void decide_semeai(int apos, int bpos);
 void decide_tactical_semeai(int apos, int bpos);

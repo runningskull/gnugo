@@ -1,29 +1,49 @@
-GNU Go does two very different types of life and death reading. First,
-there is the OWL code (Optics with Limit Negotiation) which
-attempts to read out to a point where the code in
-@file{engine/optics.c} (@pxref{Eyes}) can be used to evaluate it.
+In the tactical reading code in @file{reading.c}, the 
+code generating the moves which are tried are all hand
+coded in C, for efficiency. There is much to be said for
+another type of reading, in which the moves to be tried are
+generated from a pattern database.
 
-Secondly, there is the code in @file{engine/life.c} which
-is a potential replacement for the code in @file{optics.c}.
-It attempts to evaluate eyespaces more accurately than the
-code in @file{optics.c}, but since it is fairly slow,
-it is partially disabled unless you run GNU Go with the
-option @option{--life}. The default use of the life code
-is that it can be called from @file{optics.c} when the graph
-based life and death code concludes that it needs an expert
-opinion.
-
+GNU Go does three very different types of pattern based
+reading. First, there is the OWL code (Optics with Limit
+Negotiation) which attempts to read out to a point where the code
+in @file{engine/optics.c} (@pxref{Eyes}) can be used to evaluate it.
 Like the tactical reading code, a persistent cache is
 employed to maintain some of the owl data from move to
 move. This is an essential speedup without which GNU Go
 would play too slowly.
 
+Secondly, there is the @file{engine/combination.c} which
+attempts to find combinations---situations where a series
+of threats eventually culminates in one that cannot be
+parried.
+
+Finally, there is the connection code. GNU Go has three
+distinct implementations of code to determine whether
+two strings are connected. There are controlled by
+the parameters @code{experimental_connections} and
+@code{alternate_connections}. If @code{experimental_connections}
+is true, GNU Go uses reading to try to determine whether
+worms and dragons are (or can be) connected. Otherwise,
+less reliable heuristics based on static analysis (no
+reading) are employed. Two different reading algorithms are
+contained in this file. Default values of 
+@code{experimental_connections} and @code{alternate_connections}
+are both 1 in GNU Go 3.4. (So the ``experimental connections''
+are no longer considered experimental.) The default values,
+defined as EXPERIMENTAL_CONNECTIONS and ALTERNATE_CONNECTIONS
+in @file{config.h} can be changed with the configure options
+@option{--disable-experimental-connections} and 
+@option{--disable-alternate-connections}.
+
 @menu
 * The Owl Code::                Life and death reading
 * Owl Functions::               Functions in @file{owl.c}
+* Combinations::                Combinations
+* Connections::                 Connections
 @end menu
 
-@node The Owl Code, Owl Functions, , Life and Death Reading
+@node The Owl Code, Owl Functions, , Pattern Based Reading
 @comment  node-name,  next,  previous,  up
 @section The Owl Code
 
@@ -133,7 +153,7 @@ the dragon at @var{location} is checked, or both.
 @option{--decideposition} performs the same analysis for all
 dragons with small escape route. 
 
-@node Owl Functions, , The Owl Code, Life and Death Reading
+@node Owl Functions, Combinations, The Owl Code, Pattern Based Reading
 @comment  node-name,  next,  previous,  up
 @section Functions in @file{owl.c}
 @cindex owl functions, how to write
@@ -272,3 +292,91 @@ Retrieve topological eye values stored in the @code{half_eye[]} array of
 the current owl data.
 @end quotation
 @end itemize
+
+@node Combinations, Connections, Owl Functions, Pattern Based Reading
+
+It may happen that no single one of a set of worms can be killed,
+yet there is a move that guarantees that at least one can be captured. 
+The simplest example is a double atari.  The purpose of the code in
+@file{combination.c} is to find such moves.
+
+For example, consider the following situation:
+
+@example
+
++---------
+|....OOOOX
+|....OOXXX
+|..O.OXX..
+|.OXO.OX..
+|.OX..OO..
+|.XXOOOXO.
+|..*XXOX..
+|....XOX..
+|.XX..X...
+|X........
+
+@end example
+
+Every @samp{X} stone in this position is alive. However the move
+at @samp{*} produces a position in which at least one of four
+strings will get captured. This is a @emph{combination}.
+
+The driving function is called @code{atari_atari} because typically
+a combination involves a sequence of ataris culminating in a capture,
+though sometimes the moves involved are not ataris. For example in
+the above example, the first move at @samp{*} is @emph{not} an
+atari, though after @samp{O} defends the four stones above, a
+sequence of ataris ensues resulting in the capture of some
+string.
+
+Like the owl functions @code{atari_atari} does pattern-based
+reading. The database generating the attacking moves is
+@file{aa_attackpats.db}. One danger with this function is
+that the first atari tried might be irrelevant to the actual
+combination.  To detect this possibility, once we've found a
+combination, we mark that first move as forbidden, then try
+again. If no combination of the same size or larger turns
+up, then the first move was indeed essential.
+
+@itemize @bullet
+@item @code{void combinations(int color)}
+@findex combinations
+@quotation
+Generate move reasons for combination attacks and defenses against
+them. This is one of the move generators called from genmove().
+@end quotation
+@item @code{int atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX], int save_verbose)}
+@findex atari_atari
+@quotation
+Look for a combination for @code{color}. For the purpose of
+the move generation, returns the size of the smallest of the
+worms under attack.
+@end quotation
+@item @code{int atari_atari_confirm_safety(int color, int move, int *defense, int minsize, const char saved_dragons[BOARDMAX], const char saved_worms[BOARDMAX])}
+@findex atari_atari_confirm_safety
+@quotation
+Tries to determine whether a move is a blunder.  Wrapper
+around atari_atari_blunder_size. Check whether a combination
+attack of size at least @code{minsize} appears after move at
+@code{move} has been made.  The arrays @code{saved_dragons[]} and
+@code{saved_worms[]} should be one for stones belonging to dragons
+or worms respectively, which are supposedly saved by @code{move}.
+@end quotation
+@item @code{int atari_atari_blunder_size(int color, int move, int *defense, const char safe_stones[BOARDMAX])}
+@findex atari_atari_blunder_size
+@quotation
+This function checks whether any new combination attack appears after
+move at (move) has been made, and returns its size (in points).
+@code{safe_stones} marks which of our stones are supposedly safe
+after this move.
+@end quotation
+@end itemize
+
+@node Connections, , Combinations, Pattern Based Reading
+
+
+
+
+
+

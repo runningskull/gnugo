@@ -12,6 +12,7 @@ accurate. You can enable it by using the option @option{--life}.
 * Eye Example::                 An example
 * Graphs::                      Underlying graphs
 * Eye Shape::                   Pattern matching
+* Eye Local Game Values::       Pattern matching
 * Eye Topology::                False eyes and half eyes
 * Eye Topology with Ko::        False eyes and half eyes with ko
 * False Margins::               False margins
@@ -21,6 +22,12 @@ accurate. You can enable it by using the option @option{--life}.
 @node Local Games, Eye Space, Eyes, Eyes
 @comment  node-name,  next,  previous,  up
 @section Local games
+
+The fundamental paradigm of combinatorial game theory is that games
+can be added and in fact form a group. If @samp{G} and @samp{H} are
+games, then @samp{G+H} is a game in which each player on his turn
+has the option of playing in either move. We say that the game
+@samp{G+H} is the sum of the local games @samp{G} and @samp{H}.
 
 Each connected eyespace of a dragon affords a local game which yields
 a local game tree. The score of this local game is the number of eyes
@@ -164,9 +171,9 @@ For example, we have:
 Pattern 548
 
  x
-x*x!
+xX.!
 
-:2,1
+:0111
 
 @end group
 @end example
@@ -416,8 +423,7 @@ The graph of the eye_shape, ostensibly @samp{.....} is modified by replacing
 the left @samp{.} by @samp{!}. This is made directly in the eye data,
 not only during graph matching.
 
-
-@node Eye Shape, Eye Topology, Graphs, Eyes
+@node Eye Shape, Eye Local Game Values, Graphs, Eyes
 @comment  node-name,  next,  previous,  up
 @section Eye shape analysis
 
@@ -449,7 +455,114 @@ matched against the graphs in @file{eyes.c}.  If a match is found, the
 result of the local game is known. If a graph cannot be matched, its
 local game is assumed to be @{2|2@}.
 
-@node Eye Topology, Eye Topology with Ko, Eye Shape, Eyes
+@node Eye Local Game Values, Eye Topology, Eye Shape, Eyes
+
+The game values in @file{eyes.db} are given in a simplified scheme which is
+flexible enough to represent most possibilities in a useful way.
+
+The colon line below the pattern gives the eye value of the matched
+eye shape. This consists of four digits, each of which is the number
+of eyes obtained during the following conditions:
+
+@enumerate
+@item The attacker moves first and is allowed yet another move because
+the defender plays tenuki.
+@item The attacker moves first and the defender responds locally.
+@item The defender moves first and the attacker responds locally.
+@item The defender moves first and is allowed yet another move because
+the attacker plays tenuki.
+@end enumerate
+
+The first case does @strong{not} necessarily mean that the attacker is
+allowed two consecutive moves. This is explained with an example
+later.
+
+Also, since two eyes suffice to live, all higher numbers also count
+as two.
+
+The following 15 cases are of interest:
+
+@itemize @bullet
+@item 0000 0 eyes.
+@item 0001 0 eyes, but the defender can threaten to make one eye.
+@item 0002 0 eyes, but the defender can threaten to make two eyes.
+@item 0011 1/2 eye, 1 eye if defender moves first, 0 eyes if attacker does.
+@item 0012 3/4 eyes, 3/2 eyes if defender moves first, 0 eyes if attacker does.
+@item 0022 1* eye, 2 eyes if defender moves first, 0 eyes if attacker does.
+@item 0111 1 eye, attacker can threaten to destroy the eye.
+@item 0112 1 eye, attacker can threaten to destroy the eye, defender can threaten to make another eye.
+@item 0122 5/4 eyes, 2 eyes if defender moves first, 1/2 eye if attacker does.
+@item 0222 2 eyes, attacker can threaten to destroy both.
+@item 1111 1 eye.
+@item 1112 1 eye, defender can threaten to make another eye.
+@item 1122 3/2 eyes, 2 eyes if defender moves first, 1 eye if attacker does.
+@item 1222 2 eyes, attacker can threaten to destroy one eye.
+@item 2222 2 eyes.
+@end itemize
+
+The 3/4, 5/4, and 1* eye values are the same as in Howard Landman's paper
+Eyespace Values in Go. Attack and defense points are only marked in
+the patterns when they have definite effects on the eye value,
+i.e. pure threats are not marked.
+
+Examples of all different cases can be found among the patterns in
+this file. Some of them might be slightly counterintuitive, so we
+explain one important case here. Consider
+
+@example
+Pattern 6141
+
+ X
+XX.@@x
+
+:1122
+@end example
+
+which e.g. matches in this position:
+
+@example
+.OOOXXX
+OOXOXOO
+OXXba.O
+OOOOOOO
+@end example
+
+Now it may look like @samp{X} could take away both eyes by playing @samp{a}
+followed by @samp{b}, giving 0122 as eye value. This is where the subtlety
+of the definition of the first digit in the eye value comes into
+play. It does not say that the attacker is allowed two consecutive
+moves but only that he is allowed to play "another move". The
+crucial property of this shape is that when @samp{X} plays at a to destroy
+(at least) one eye, @samp{O} can answer at @samp{b}, giving:
+
+@example
+
+.OOOXXX
+OO.OXOO
+O.cOX.O
+OOOOOOO
+
+@end example
+
+Now @samp{X} has to continue at @samp{c} in order to keep @samp{O}
+at one eye. After this @samp{O} plays tenuki and @samp{X} cannot
+destroy the remaining eye by another move. Thus the eye value is
+indeed 1122.
+
+As a final note, some of the eye values indicating a threat depend
+on suicide to be allowed, e.g.
+
+Pattern 301
+ 
+X.X
+
+:1222
+
+We always assume suicide to be allowed in this database. It is easy
+enough to sort out such moves at a higher level when suicide is
+disallowed.
+
+@node Eye Topology, Eye Topology with Ko, Eye Local Game Values, Eyes
 @comment  node-name,  next,  previous,  up
 @section Topology of Half Eyes and False Eyes
 

@@ -188,13 +188,13 @@ decide_connection(int apos, int bpos)
 
 
 /* 
- * decide_dragon tries to attack and defend the dragon at (pos),
- * and then writes the number of variations considered in the attack
- * and defence to the sgf file.
+ * decide_owl (formerly called decide_dragon) tries to attack and defend 
+ * the dragon at (pos), and then writes the number of variations considered 
+ * in the attack and defence to the sgf file.
  */
 
 void
-decide_dragon(int pos)
+decide_owl(int pos)
 {
   int move = NO_MOVE;
   int acode, dcode;
@@ -502,7 +502,8 @@ decide_position(int color)
 
 
 /*
- * Evaluates the eyespace at (pos) and prints a report.
+ * Evaluates the eyespace at (pos) and prints a report. You can get
+ * more information by adding -d0x02 to the command line.
  */
 
 void

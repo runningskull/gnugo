@@ -78,7 +78,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_REPLAY_GAME,
       OPT_DECIDE_STRING,
       OPT_DECIDE_CONNECTION,
-      OPT_DECIDE_DRAGON,
+      OPT_DECIDE_OWL,
       OPT_DECIDE_DRAGON_DATA,
       OPT_DECIDE_SEMEAI,
       OPT_DECIDE_SURROUNDED,
@@ -147,7 +147,7 @@ enum mode {
   MODE_REPLAY,
   MODE_DECIDE_STRING,
   MODE_DECIDE_CONNECTION,
-  MODE_DECIDE_DRAGON,
+  MODE_DECIDE_OWL,
   MODE_DECIDE_DRAGON_DATA,
   MODE_DECIDE_SEMEAI,
   MODE_DECIDE_TACTICAL_SEMEAI,
@@ -190,6 +190,7 @@ static struct gg_option const long_options[] =
   {"version",        no_argument,       0, 'v'},
   {"allpats",        no_argument,       0, 'a'},
   {"printboard",     no_argument,       0, 'T'},
+  {"printeyes",      no_argument,       0, 'E'},
   {"debug",          required_argument, 0, 'd'},
   {"debug-flags",    no_argument,       0,  OPT_DEBUG_FLAGS},
   {"depth",          required_argument, 0, 'D'},
@@ -219,7 +220,7 @@ static struct gg_option const long_options[] =
   {"owl-threats",     no_argument,      0, OPT_OWL_THREATS},
   {"no-owl-threats",  no_argument,      0, OPT_NO_OWL_THREATS},
   {"standard-connections",  no_argument, 0, OPT_STANDARD_CONNECTIONS},
-  {"standard_semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
+  {"standard-semeai", no_argument,      0, OPT_STANDARD_SEMEAI},
   {"alternate-connections",  no_argument, 0, OPT_ALTERNATE_CONNECTIONS},
   {"options",        no_argument, 0, OPT_OPTIONS},
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
@@ -235,7 +236,8 @@ static struct gg_option const long_options[] =
   {"seed",           required_argument, 0, 'r'},
   {"decide-string",  required_argument, 0, OPT_DECIDE_STRING},
   {"decide-connection", required_argument, 0, OPT_DECIDE_CONNECTION},
-  {"decide-dragon",  required_argument, 0, OPT_DECIDE_DRAGON},
+  {"decide-dragon",  required_argument, 0, OPT_DECIDE_OWL},
+  {"decide-owl",     required_argument, 0, OPT_DECIDE_OWL},
   {"decide-dragon-data",  required_argument, 0, OPT_DECIDE_DRAGON_DATA},
   {"decide-semeai",  required_argument, 0, OPT_DECIDE_SEMEAI},
   {"decide-tactical-semeai", required_argument, 0, OPT_DECIDE_TACTICAL_SEMEAI},
@@ -595,13 +597,13 @@ main(int argc, char *argv[])
 	playmode = MODE_DECIDE_CONNECTION;
 	break;
 	
-      case OPT_DECIDE_DRAGON:
+      case OPT_DECIDE_OWL:
 	if (strlen(gg_optarg) > 3) {
 	  fprintf(stderr, "Invalid board coordinate: %s\n", gg_optarg);
 	  exit(EXIT_FAILURE);
 	}
 	strcpy(decide_this, gg_optarg);
-	playmode = MODE_DECIDE_DRAGON;
+	playmode = MODE_DECIDE_OWL;
 	break;
 	
       case OPT_DECIDE_DRAGON_DATA:
@@ -1061,7 +1063,7 @@ main(int argc, char *argv[])
     }
   break;
   
-  case MODE_DECIDE_DRAGON:
+  case MODE_DECIDE_OWL:
     {
       int m, n;
       
@@ -1076,7 +1078,7 @@ main(int argc, char *argv[])
       }
 
       rotate(m, n, &m, &n, board_size, orientation);
-      decide_dragon(POS(m, n));
+      decide_owl(POS(m, n));
     }
     break;
   
@@ -1392,7 +1394,7 @@ Debugging Options:\n\
                      both:  replay all moves\n\
    -a, --allpats                 test all patterns\n\
    -T, --printboard              colored display of dragons\n\
-   -E                            colored display of eye spaces\n\
+   -E, --printeyes               colored display of eye spaces\n\
    -d, --debug <flags>           debugging output (see next item for bits)\n\
    --debug-flags                 print the debug flags for previous item\n\
    -H, --hash <level>            hash (see gnugo.h for bits)\n\
