@@ -66,6 +66,11 @@
 struct local_owl_data {
   char goal[BOARDMAX];
   char boundary[BOARDMAX];
+
+  /* FIXME: escape_values[] are never recomputed. Consider moving this array
+   *	    from stack to a static or dynamic variable so it is not copied
+   *	    around in do_push_owl(). Be aware of semeai code though.
+   */
   char escape_values[BOARDMAX];
   int color;
 
@@ -84,7 +89,7 @@ struct local_owl_data {
 
   char safe_move_cache[BOARDMAX];
 
- /* This is used to organize the owl stack. */
+  /* This is used to organize the owl stack. */
   int restore_from;
   int number_in_stack;
 };
@@ -814,8 +819,6 @@ do_owl_analyze_semeai(int apos, int bpos,
       push_owl(&owla, &owlb);
       
       owl_update_goal(mpos, moves[k].same_dragon, owla, 1);
-      owla->lunches_are_current = 0;
-      owlb->lunches_are_current = 0;
       owl_update_boundary_marks(mpos, owlb);
 
       /* Do a recursive call to read the semeai after the move we just
@@ -1631,7 +1634,6 @@ do_owl_attack(int str, int *move, int *wormid,
       push_owl(&owl, NULL);
       mw[mpos] = 1;
       number_tried_moves++;
-      owl->lunches_are_current = 0;
       owl_update_boundary_marks(mpos, owl);
       
       /* If the origin of the dragon has been captured, we look
@@ -2200,7 +2202,6 @@ do_owl_defend(int str, int *move, int *wormid,
       push_owl(&owl, NULL);
       mw[mpos] = 1;
       number_tried_moves++;
-      owl->lunches_are_current = 0;
 
       /* Add the stone just played to the goal dragon, unless the
        * pattern explicitly asked for not doing this.
@@ -4502,7 +4503,6 @@ improve_lunch_attack(int lunch, int attack_point)
   int color = OTHER_COLOR(board[lunch]);
   int defense_point;
   int k;
-  int adj[MAXCHAIN];
 
   if (safe_move(attack_point, color)) {
     if (is_edge_vertex(lunch)
@@ -5261,19 +5261,27 @@ init_owl(struct local_owl_data **owl, int target1, int target2, int move,
 static void
 do_push_owl(struct local_owl_data **owl)
 {
+  struct local_owl_data *new_owl = &owl_stack[++owl_stack_pointer];
+
   gg_assert(&owl_stack[(*owl)->number_in_stack] == *owl);
 
   /* Copy the owl data. */
-  owl_stack_pointer++;
-  owl_stack[owl_stack_pointer] = **owl;
+  memcpy(new_owl->goal, (*owl)->goal, sizeof(new_owl->goal));
+  memcpy(new_owl->boundary, (*owl)->boundary, sizeof(new_owl->boundary));
+  memcpy(new_owl->escape_values, (*owl)->escape_values,
+	 sizeof(new_owl->escape_values));
+  new_owl->color = (*owl)->color;
+
+  new_owl->lunches_are_current = 0;
 
   /* Needed for stack organization: */
-  owl_stack[owl_stack_pointer].number_in_stack = owl_stack_pointer;
-  owl_stack[owl_stack_pointer].restore_from = (*owl)->number_in_stack;
+  new_owl->number_in_stack = owl_stack_pointer;
+  new_owl->restore_from = (*owl)->number_in_stack;
 
   /* Finally move the *owl pointer. */
-  *owl = &owl_stack[owl_stack_pointer];
+  *owl = new_owl;
 }
+
 
 /* Push owl data one step upwards in the stack. The stack is dynamically
  * reallocated if it is too small. Second argument is used from the
