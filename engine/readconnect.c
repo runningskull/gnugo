@@ -2750,7 +2750,8 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
       && (hashflags & HASH_BREAK_IN)
       && !has_passed
       && tt_get(&ttable, komaster, kom_pos, BREAK_IN, str,
-		depth - stackp, &retval, &xpos, goal_hash) == 2) {
+		depth - stackp, goal_hash,
+		&retval, NULL, &xpos) == 2) {
     /* FIXME: Use move for move ordering if tt_get() returned 1 */
     SGFTRACE(xpos, retval, "cached");
     if (move)

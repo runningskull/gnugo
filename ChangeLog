@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- converted owl to use new cache implementation
 - new tests
 
 3.5.4 released January 23, 2004

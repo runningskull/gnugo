@@ -51,8 +51,8 @@
  *
  *   RESERVED       :  5 bits
  *   remaining_depth:  5 bits (depth - stackp)  NOTE: HN_MAX_REMAINING_DEPTH
- *   result1        :  4 bits
- *   result2        :  4 bits
+ *   value1         :  4 bits
+ *   value2         :  4 bits
  *   move           : 10 bits
  *   flags          :  4 bits
  */
@@ -73,15 +73,15 @@ typedef struct {
 
 /* Hn is for hash node. */
 #define hn_get_remaining_depth(hn)  (((hn).data >> 22) & 0x1f)
-#define hn_get_result1(hn)          (((hn).data >> 18) & 0x0f)
-#define hn_get_result2(hn)          (((hn).data >> 14) & 0x0f)
+#define hn_get_value1(hn)           (((hn).data >> 18) & 0x0f)
+#define hn_get_value2(hn)           (((hn).data >> 14) & 0x0f)
 #define hn_get_move(hn)             (((hn).data >>  4) & 0x3ff)
 #define hn_get_flags(hn)            (((hn).data >>  0) & 0x0f)
 
-#define hn_create_data(remaining_depth, result1, result2, move, flags) \
+#define hn_create_data(remaining_depth, value1, value2, move, flags) \
   (((remaining_depth & 0x1f)  << 22) \
-   | (((result1)     & 0x0f)  << 18) \
-   | (((result2)     & 0x0f)  << 14) \
+   | (((value1)      & 0x0f)  << 18) \
+   | (((value2)      & 0x0f)  << 14) \
    | (((move)        & 0x3ff) << 4) \
    | (((flags)       & 0x0f)  << 0))
 
@@ -101,12 +101,13 @@ void tt_free(Transposition_table *table);
 int  tt_get(Transposition_table *table, 
 	    int komaster, int kom_pos, enum routine_id routine,
 	    int target, int remaining_depth,
-	    int *result, int *move,
-	    Hash_data *extra_hash);
+	    Hash_data *extra_hash,
+	    int *value1, int *value2, int *move);
 void tt_update(Transposition_table *table,
 	       int komaster, int kom_pos, enum routine_id routine,
 	       int target, int remaining_depth,
-	       int result, int move);
+	       Hash_data *extra_hash,
+	       int value1, int value2, int move);
 
 
 /* ================================================================ */
@@ -357,16 +358,28 @@ int get_read_result2(enum routine_id routine, int komaster, int kom_pos,
 
 #define READ_RETURN0_NG(komaster, kom_pos, routine, str, remaining_depth) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, 0, 0);\
+    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, NULL,\
+              0, 0, NO_MOVE);\
     return 0; \
   } while (0)
 
 #define READ_RETURN_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value) \
   do { \
-    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, value, move);\
+    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, NULL,\
+              value, 0, move);\
     if ((value) != 0 && (point) != 0) *(point) = (move); \
     return (value); \
   } while (0)
+
+#define READ_RETURN2_NG(komaster, kom_pos, routine, str, remaining_depth, point, move, value1, value2) \
+  do { \
+    tt_update(&ttable, komaster, kom_pos, routine, str, remaining_depth, NULL,\
+              value1, value2, move);\
+    if ((value1) != 0 && (point) != 0) *(point) = (move); \
+    return (value1); \
+  } while (0)
+
+/* ---------------- */
 
 #define READ_RETURN0(read_result) \
   do { \

@@ -194,6 +194,9 @@ extern int output_flags;       /* amount of output to outfile */
  * Regarding HASH_DEFAULT:
  * Hashing all functions saves time, but wastes table space, which is
  * bad when the reading is complicated. HASH_DEFAULT is a compromise. 
+ *
+ * FIXME: This is no longer true with the newer transposition table
+ *        and its fancy replacement scheme. We can now hash everything.
  */
 
 #define HASH_FIND_DEFENSE 0x0001  /* NOTE : can specify -d0x... */

@@ -176,15 +176,15 @@ int
 tt_get(Transposition_table *table, 
        int komaster, int kom_pos, enum routine_id routine, int target, 
        int remaining_depth,
-       int *result, int *move, Hash_data *extra_hash)
+       Hash_data *extra_hash,
+       int *value1, int *value2, int *move)
 {
   Hash_data      hashval;
   Hashentry_ng  *entry;
   Hashnode_ng   *node;
  
   /* Get the combined hash value. */
-  calculate_hashval_for_tt(komaster, kom_pos, routine, target,
-			   &hashval);
+  calculate_hashval_for_tt(komaster, kom_pos, routine, target, &hashval);
   if (extra_hash)
     hashdata_xor(hashval, *extra_hash);
 
@@ -210,8 +210,10 @@ tt_get(Transposition_table *table,
   if (move)
     *move = hn_get_move(*node);
   if ((unsigned) remaining_depth <= hn_get_remaining_depth(*node)) {
-    if (result)
-      *result = hn_get_result1(*node);
+    if (value1)
+      *value1 = hn_get_value1(*node);
+    if (value2)
+      *value2 = hn_get_value2(*node);
     return 2;
   }
 
@@ -225,7 +227,9 @@ tt_get(Transposition_table *table,
 void
 tt_update(Transposition_table *table,
 	  int komaster, int kom_pos, enum routine_id routine, int target, 
-	  int remaining_depth, int result, int move)
+	  int remaining_depth,
+	  Hash_data *extra_hash, 
+	  int value1, int value2, int move)
 {
   Hash_data hashval;
   Hashentry_ng *entry;
@@ -235,7 +239,16 @@ tt_update(Transposition_table *table,
 
   /* Get the combined hash value. */
   calculate_hashval_for_tt(komaster, kom_pos, routine, target, &hashval);
-  data = hn_create_data(remaining_depth, result, 0, move, 0);
+  if (extra_hash)
+    hashdata_xor(hashval, *extra_hash);
+
+  /* Sanity check. */
+  if (remaining_depth < 0)
+    remaining_depth = 0;
+  if (remaining_depth > HN_MAX_REMAINING_DEPTH)
+    remaining_depth = HN_MAX_REMAINING_DEPTH;
+
+  data = hn_create_data(remaining_depth, value1, value2, move, 0);
 
   /* Get the entry and nodes. */ 
   entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
