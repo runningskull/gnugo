@@ -1775,7 +1775,6 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
   int k;
   int ii;
   int save_debug = debug;
-  VALGRIND_MAKE_WRITABLE(&escape_influence, sizeof(escape_influence));
 
   /* IMPORTANT: The caching relies on the fact that safe_stones[] and
    * strength[] will currently always be identical for identical board[]
@@ -1786,6 +1785,8 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
   static int active_caches[2] = {0, 0};
 
   int cache_number = (color == WHITE);
+
+  VALGRIND_MAKE_WRITABLE(&escape_influence, sizeof(escape_influence));
 
   if (!goal) {
     /* Encode the values of color and dragons_known into an integer
