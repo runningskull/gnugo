@@ -72,16 +72,16 @@ Pattern EB112
   :8,ed,NULL
 @end example
 
-Here 'O' marks a friendly stone, 'X' marks an enemy stone, '.' marks
-an empty vertex, '*' marks O's next move, 'o' marks a square either
-containing 'O' or empty but not X. (The symbol 'x', which does not
-appear in this pattern, means 'X' or '.'.) Finally '?' Indicates a
+Here \samp{O} marks a friendly stone, @samp{X} marks an enemy stone, @samp{.} marks
+an empty vertex, @samp{*} marks O's next move, @samp{o} marks a square either
+containing @samp{O} or empty but not @samp{X}. (The symbol @samp{x}, which does not
+appear in this pattern, means @samp{X} or @samp{.}.) Finally @samp{?} Indicates a
 location where we don't care what is there, except that it cannot be
 off the edge of the board.
 
-The line of -'s along the bottom in this example is the edge of the
+The line of @samp{-}'s along the bottom in this example is the edge of the
 board itself---this is an edge pattern. Corners can also be indicated.
-Elements are not generated for '?' markers, but they are not
+Elements are not generated for @samp{?} markers, but they are not
 completely ignored - see below.
         
 The line beginning @samp{:} describes various attributes of the pattern, such
@@ -104,9 +104,10 @@ After the pattern, there is some supplementary information in the format:
 @end example
 
 Here trfno represents the number of transformations of the pattern to
-consider, usually 8 (no symmetry, for historical reasons), or one of |
-\ / - + X, where the line represents the axis of symmetry. (E.g. |
-means symmetrical about a vertical axis.)
+consider, usually @samp{8} (no symmetry, for historical reasons), or one of 
+@samp{|}, @samp{\}, @samp{/}, @samp{-}, @samp{+}, @samp{X}, where the line 
+represents the axis of symmetry. (E.g. @samp{|} means symmetrical about a
+vertical axis.)
 
 The above pattern could equally well be written on the left edge:
 
@@ -162,32 +163,31 @@ move here could not be captured.
 @end quotation
 @item @samp{O}
 @quotation
-It is checked that every friendly (@samp{O}) stone of the pattern
-belongs to a dragon which has matcher_status (@pxref{Dragons}) 
-ALIVE or UNKNOWN. The CRITICAL matcher status is excluded. It
-is possible for a string to have ALIVE matcher_status and still
-be tactically critical, since it might be amalgamated into an
-ALIVE dragon, and the matcher status is constant on the dragon.
-Therefore, an additional test is performed: if the pattern contains
-a string which is tactically critical, and if @samp{*} does not
-rescue it, the pattern is rejected.
+It is checked that every friendly (@samp{O}) stone of the pattern belongs to a
+dragon which has matcher_status (@pxref{Dragons}) @code{ALIVE} or
+@code{UNKNOWN}. The @code{CRITICAL} matcher status is excluded. It is possible
+for a string to have @code{ALIVE} matcher_status and still be tactically
+critical, since it might be amalgamated into an ALIVE dragon, and the matcher
+status is constant on the dragon.  Therefore, an additional test is performed:
+if the pattern contains a string which is tactically critical, and if @samp{*}
+does not rescue it, the pattern is rejected.
 @end quotation
 @item @samp{o}
 @quotation
 It is checked that every friendly (@samp{O}) stone of the pattern
-belongs to a dragon which is classified as DEAD or UNKNOWN.
+belongs to a dragon which is classified as @code{DEAD} or @code{UNKNOWN}.
 @end quotation
 @item @samp{X}
 @quotation
 It is checked that every opponent (@samp{X}) stone of the pattern
-belongs to a dragon with matcher_status ALIVE, UNKNOWN or CRITICAL.
-Note that there is an asymmetry with @samp{O} patterns, where
-CRITICAL dragons are rejected.
+belongs to a dragon with matcher_status @code{ALIVE}, @code{UNKNOWN} or 
+@code{CRITICAL}. Note that there is an asymmetry with @samp{O} patterns, where
+@code{CRITICAL} dragons are rejected.
 @end quotation
 @item @samp{x}
 @quotation
 It is checked that every opponent (@samp{X}) stone of the pattern
-belongs to a dragon which is classified as DEAD or UNKNOWN
+belongs to a dragon which is classified as @code{DEAD} or @code{UNKNOWN}
 @end quotation
 @end itemize
 
@@ -210,7 +210,7 @@ appropriate for weak connection patterns.
 @end quotation
 @item @samp{B}
 @quotation
-If two or more distinct X dragons occur in the pattern, the
+If two or more distinct @samp{X} dragons occur in the pattern, the
 move is given the move reasons that it cuts each pair of
 dragons.
 @end quotation
@@ -236,7 +236,7 @@ the move reason being valued to zero.
 @end quotation
 @item @samp{a}
 @quotation
-The move strategically attacks all X dragons in the pattern.
+The move strategically attacks all @samp{X} dragons in the pattern.
 @end quotation
 @item @samp{J}
 @quotation
@@ -273,12 +273,12 @@ accepted value of 40.
 @end quotation
 @end itemize
 
-A commonly used class is OX (which rejects pattern if either side
+A commonly used class is @code{OX} (which rejects pattern if either side
 has dead stones). The string @samp{-} may be used as a placeholder. (In
 fact any characters other than the above and @samp{,} are ignored.)
 
-The types o and O could conceivably appear in a class, meaning it 
-applies only to UNKNOWN. X and x could similarly be used together.
+The types @samp{o} and @samp{O} could conceivably appear in a class, meaning it 
+applies only to @code{UNKNOWN}. @samp{X} and @samp{x} could similarly be used together.
 All classes can be combined arbitrarily.
 
 @node  Pattern Values, Helper Functions, Pattern Classification, Patterns
@@ -456,8 +456,8 @@ O*a
 Here we have given the label @samp{a} to the empty spot to the right of
 the considered move and the label @samp{B} to the @samp{X} stone in the
 pattern. In addition to these, @samp{*} can also be used as a label. A
-label may be any lowercase or uppercase ascii letter except OoXxt. By
-convention we use uppercase letters for X stones and lowercase for O
+label may be any lowercase or uppercase ascii letter except @code{OoXxt}. By
+convention we use uppercase letters for @samp{X} stones and lowercase for @samp{O}
 stones and empty intersections. When labeling a stone that's part of a
 larger string in the pattern, all stones of the string should be marked
 with the label. (These conventions are not enforced by the pattern
@@ -552,7 +552,7 @@ definitions.
 @end example
 
 The number of liberties that an enemy or own stone, respectively,
-would obtain if played at the empty intersection x.
+would obtain if played at the empty intersection @samp{x}.
 
 @example
 @code{xcut(x)}
@@ -560,13 +560,13 @@ would obtain if played at the empty intersection x.
 @end example
 
 Calls @code{cut_possible} (@pxref{General Utilities}) to determine
-whether @samp{X} or @samp{O} can cut at the empty intersection x. 
+whether @samp{X} or @samp{O} can cut at the empty intersection @samp{x}. 
 
 @example
 @code{ko(x)}
 @end example
 
-True if x is either a stone or an empty point involved in a ko
+True if @samp{x} is either a stone or an empty point involved in a ko
 position.
 
 @example
@@ -634,9 +634,9 @@ given in @xref{Moyo}.
 
 @end example
 
-Results of tactical reading. attack(x) is true if the worm can be
-captured, defend(x) is true if there also is a defending move. Please
-notice that defend(x) will return false if there is no attack on the
+Results of tactical reading. @code{attack(x)} is true if the worm can be
+captured, @code{defend(x)} is true if there also is a defending move. Please
+notice that @code{defend(x)} will return false if there is no attack on the
 worm.
 
 @example
@@ -647,7 +647,7 @@ worm.
 @end example
 
 True if an enemy or friendly stone, respectively, can safely be played at
-x. By safe it is understood that the move is legal and that it cannot
+@samp{x}. By safe it is understood that the move is legal and that it cannot
 be captured right away.
 
 @example
@@ -676,8 +676,8 @@ xdefend_against(x,y)
 
 @end example
 
-True if an own stone at x would stop the enemy from safely playing at
-y, and conversely for the second function.
+True if an own stone at @samp{x} would stop the enemy from safely playing at
+@samp{y}, and conversely for the second function.
 
 @example
 
@@ -686,9 +686,9 @@ y, and conversely for the second function.
 
 @end example
 
-True if a move at x defends/attacks the worm at y. For defense a move
-of the same color as y is tried and for attack a move of the opposite
-color.
+True if a move at @samp{x} defends/attacks the worm at @samp{y}. For 
+defense a move of the same color as @samp{y} is tried and for attack a move of
+the opposite color.
 
 @example
 
@@ -1100,7 +1100,7 @@ OaOB
 
 After this pattern is found, the @code{xcut} autohelper macro will return
 true at any of the points @samp{*}, @samp{a} and @samp{b}. Thus the
-patterns CB204 and CB205 will not be matched, and the dragons will
+patterns @code{CB204} and @code{CB205} will not be matched, and the dragons will
 not be amalgamated.
 
 @node Connection Functions, Tuning, Connections Database, Patterns
@@ -1117,7 +1117,7 @@ Here are the public functions in @file{connections.c}.
 Try to match all (permutations of) connection patterns at @code{(m,n)}.
 For each match, if it is a B pattern, set cutting point in worm
 data structure and make eye space marginal for the connection
-inhibiting entries of the pattern. If it is a C pattern, amalgamate
+inhibiting entries of the pattern. If it is a @samp{C} pattern, amalgamate
 the dragons in the pattern.
 @end quotation
 @item @code{void find_cuts(void)}
