@@ -1424,6 +1424,56 @@ O.*.O
 ;x_alive_somewhere(a,b,c)
 
 
+Pattern F604a
+#evand new pattern. (3.5.2)
+#see nngs4:750
+
+.....o	    pincer a stone against a wall
+.....o
+.....o
+..*.XO
+.....o
+.....o
+------
+
+:8,Fae
+
+.....a
+.....b
+f....c
+e.*.XG
+.....o
+.....o
+------
+
+;o_alive_somewhere(a,b,c) && !omoyo(e) && !omoyo(f) && !weak(G)
+
+
+Pattern F604b
+#evand new pattern. (3.5.2)
+#see nngs4:750
+
+.......o	    pincer a stone against a wall
+.......o
+.......o
+...*..XO
+.......o
+.......o
+--------
+
+:8,Fae
+
+.......a
+.......b
+f......c
+e..*..XG
+.......o
+.......o
+--------
+
+;o_alive_somewhere(a,b,c) && !omoyo(e) && !omoyo(f) && !weak(G)
+
+
 #####################################
 # Invasions in the middle of the edge
 #####################################
@@ -1480,24 +1530,26 @@ X.......X    invade
 Pattern F704
 # gf Added constraint. (3.1.22)
 # See nngs:1030.
+# evand revised. (3.5.2)
+# See nngs4:750
 
-???????
-?.....?       invade 4 space extension
-.X.....
-....*.X
-.......
-.......
--------
+????????
+?.....??       invade 4 space extension
+.X......
+....*.X.
+........
+........
+--------
 
 :8,sFIt,shape(-1)
 
-???c?d?
-?.....?
-.A.....
-....*.B
-.......
-.......
--------
+???c?d??
+?.....??
+.A......
+....*.B.
+........
+........
+--------
 
 ;weak(A) || weak(B) || !xmoyo(c) || !xmoyo(d)
 
