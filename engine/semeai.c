@@ -199,6 +199,9 @@ new_semeai(int color)
 		apos, bpos);
 	  owl_analyze_semeai(apos, bpos,
 			     best_result_a+k, worst_result_b+k, move+k, 1);
+	  DEBUG(DEBUG_SEMEAI, "Result1: %s %s %1m, ",
+	        safety_to_string(best_result_a[k]),
+	        safety_to_string(worst_result_b[k]), move[k]);
 	  if (a_best_status == DEAD
 	      || a_best_status == UNKNOWN
 	      || (a_best_status == ALIVE_IN_SEKI 
@@ -208,6 +211,9 @@ new_semeai(int color)
 	  }
 	  owl_analyze_semeai(bpos, apos, 
 			     best_result_b+k, worst_result_a+k, NULL, 1);
+	  DEBUG(DEBUG_SEMEAI, "Result2 %s %s.\n",
+	        safety_to_string(best_result_b[k]),
+	        safety_to_string(worst_result_a[k]));
 	  if (b_best_status == DEAD
 	      || b_best_status == UNKNOWN
 	      || (b_best_status == ALIVE_IN_SEKI
@@ -281,19 +287,23 @@ static void
 update_status(int dr, int new_status, int new_safety)
 {
   int pos;
-  if (dragon[dr].matcher_status != new_status)
+
+  if (dragon[dr].matcher_status != new_status
+      && (dragon[dr].matcher_status != CRITICAL || new_status != DEAD))  {
     DEBUG(DEBUG_SEMEAI, "Changing matcher_status of %1m from %s to %s.\n", dr,
 	  status_to_string(dragon[dr].matcher_status),
 	  status_to_string(new_status));
-  if (DRAGON2(dr).safety != new_safety)
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (IS_STONE(board[pos]) && is_same_dragon(dr, pos))
+	dragon[pos].matcher_status = new_status;
+  }
+
+  if (DRAGON2(dr).safety != new_safety
+      && (DRAGON2(dr).safety != CRITICAL || new_safety != DEAD)) {
     DEBUG(DEBUG_SEMEAI, "Changing safety of %1m from %s to %s.\n", dr,
 	  safety_to_string(DRAGON2(dr).safety), safety_to_string(new_safety));
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (IS_STONE(board[pos]) && is_same_dragon(dr, pos))
-      dragon[pos].matcher_status = new_status;
-
-  DRAGON2(dr).safety = new_safety;
+    DRAGON2(dr).safety = new_safety;
+  }
 }
 
 
