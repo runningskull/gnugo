@@ -96,10 +96,15 @@ gg_init_color()
 #endif /* TERMINFO */
 }
 
+
+
 #ifdef WIN32
+#include <crtdbg.h>
+
 verifyW32(BOOL b)
 {
   if (!b) {
+    _ASSERTE(0 && "Win32 Error");
     fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
   }
 }
@@ -122,6 +127,7 @@ write_color_char_no_space(int c, int x)
   
   static HANDLE hStdErr=0;
   DWORD iCharsWritten;
+  BOOL succeed32;
   CONSOLE_SCREEN_BUFFER_INFO bufInfo;
   if (!hStdErr) {
     hStdErr = GetStdHandle(STD_ERROR_HANDLE);
@@ -137,7 +143,11 @@ write_color_char_no_space(int c, int x)
    *This magic switches the bits back: */
   c = (c & 1) * 4 + (c & 2) + (c & 4) / 4;
   c += FOREGROUND_INTENSITY;
-  verifyW32(GetConsoleScreenBufferInfo(hStdErr, &bufInfo));
+  succeed32 = GetConsoleScreenBufferInfo(hStdErr, &bufInfo);
+  if (!succeed32) {  //Probably redirecting output, just give plain text.
+    fprintf(stderr, "%c", x);
+    return;
+  }
   verifyW32(SetConsoleTextAttribute(hStdErr, (WORD)c) );
   verifyW32(WriteConsole(hStdErr, &x, 1, &iCharsWritten, 0));
   verifyW32(SetConsoleTextAttribute(hStdErr, bufInfo.wAttributes));
