@@ -77,12 +77,10 @@ SGFNode *
 sgftreeAddStone(SGFTree *tree, SGFNode *node, int color, int movex, int movey)
 {
   node = sgftreeNodeCheck(tree, node);
-  sgftreeAddStone(tree, node, color, movex, movey);
+  sgfAddStone(node, color, movex, movey);
 
   return node;
 }
-
-
 /*
  * Add a move to the gametree.
  */
