@@ -3,7 +3,7 @@
 #Extend along side bigger.  Probably C7
 loadsgf games/trevor/auto/d01.sgf 22
 100 gg_genmove white
-#? [!E10]*
+#? [!E10]
 
 
 #Other moves possible, !P6
@@ -19,7 +19,7 @@ loadsgf games/trevor/auto/d01.sgf 36
 
 loadsgf games/trevor/auto/d01.sgf 46
 130 gg_genmove white
-#? [!O9]*
+#? [!O9]
 
 
 # around L7|L8 looks right.
@@ -30,7 +30,7 @@ loadsgf games/trevor/auto/d01.sgf 52
 
 loadsgf games/trevor/auto/d01.sgf 54
 150 gg_genmove white
-#? [!F9]*
+#? [!F9]
 
 
 loadsgf games/trevor/auto/d01.sgf 144
@@ -154,7 +154,7 @@ loadsgf games/trevor/auto/d03.sgf 210
 
 loadsgf games/trevor/auto/d08.sgf 48
 360 gg_genmove white
-#? [K3|K4]*
+#? [K3|K4]
 
 
 #K10 better than J9
@@ -340,7 +340,7 @@ loadsgf games/trevor/auto/d29.sgf 182
 
 loadsgf games/trevor/auto/d29.sgf 187
 690 gg_genmove black
-#? [!PASS]*
+#? [!PASS]
 
 
 loadsgf games/trevor/auto/d29.sgf 188
@@ -359,7 +359,7 @@ loadsgf games/trevor/auto/d32.sgf 90
 
 loadsgf games/trevor/auto/d32.sgf 94
 720 gg_genmove white
-#? [!K4]*
+#? [!K4]
 
 
 loadsgf games/trevor/auto/d32.sgf 106
@@ -476,7 +476,7 @@ loadsgf games/trevor/auto/d39.sgf 170
 
 loadsgf games/trevor/auto/d39.sgf 196
 930 gg_genmove white
-#? [!P19]*
+#? [!P19]
 
 
 loadsgf games/trevor/auto/d39.sgf 198
@@ -567,7 +567,7 @@ loadsgf games/trevor/auto/d46.sgf 228
 
 loadsgf games/trevor/auto/d47.sgf 22
 1080 gg_genmove white
-#? [!O16]*
+#? [!O16]
 
 
 loadsgf games/trevor/auto/d47.sgf 100
@@ -586,7 +586,7 @@ loadsgf games/trevor/auto/d48.sgf 80
 
 loadsgf games/trevor/auto/d48.sgf 150
 1110 gg_genmove white
-#? [O17]*
+#? [O17]
 
 
 #Mostly, !Q7

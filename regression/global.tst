@@ -62,7 +62,7 @@ loadsgf golois/Goemate990903-10.sgf
 
 loadsgf golois/Goemate990903-6.sgf
 16 gg_genmove black
-#? [O10]
+#? [O10]*
 
 loadsgf golois/Goemate990903-7.sgf
 17 gg_genmove black
@@ -149,7 +149,7 @@ loadsgf golois/MeilleurCoup0002.sgf
 
 loadsgf golois/MeilleurCoup0003.sgf
 37 gg_genmove black
-#? [B6]*
+#? [B6]
 
 loadsgf golois/MeilleurCoup0004.sgf
 38 gg_genmove black
@@ -165,7 +165,7 @@ loadsgf golois/MeilleurCoup0006.sgf
 
 loadsgf golois/MeilleurCoup0007.sgf
 41 gg_genmove black
-#? [B4]*
+#? [B4]
 
 loadsgf golois/MeilleurCoup0008.sgf
 42 gg_genmove black
