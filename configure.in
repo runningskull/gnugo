@@ -413,7 +413,7 @@ dnl ------------ Resignation allowed-------------------
 AH_TEMPLATE([RESIGNATION_ALLOWED],
 [Allow resignation. Default enabled])
 
-if test "$disable_resignation_allowed" = "yes" ; then
+if test "$enable_resignation_allowed" = "no" ; then
    AC_DEFINE(RESIGNATION_ALLOWED, 0)
 else
    AC_DEFINE(RESIGNATION_ALLOWED, 1)
