@@ -324,6 +324,13 @@ loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 90
 339 owl_defend O17
 #? [0]
 
+# Both dragons could be saved.
+loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 224
+340 owl_defend B10
+#? [1 A11]
+341 owl_defend G13
+#? [1 K8]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading
