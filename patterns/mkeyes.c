@@ -75,7 +75,7 @@ main(void)
  * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *\n\
  * http://www.gnu.org/software/gnugo/ for more information.          *\n\
  *                                                                   *\n\
- * Copyright 1999, 2000, 2001, 2002 and 2003                         *\n\
+ * Copyright 1999, 2000, 2001, 2002, 2003 and 2004                   *\n\
  * by the Free Software Foundation.                                  *\n\
  *                                                                   *\n\
  * This program is free software; you can redistribute it and/or     *\n\
