@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- optimzation in compute_connection_distances()
 - owl code reorganization
 - new clear_owl_move_data() set_single_owl_move(), 
 - break out reading_limit_reached(), owl_estimate_life() 

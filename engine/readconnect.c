@@ -1767,7 +1767,7 @@ struct connection_data {
 
 static int find_connection_moves(int str1, int str2, int color_to_move,
 				 int moves[MAX_MOVES], float *total_distance);
-static void compute_connection_distances(int str,
+static void compute_connection_distances(int str, int target,
 					 struct connection_data *conn);
 static void print_connection_distances(struct connection_data *conn);
 static int trivial_connection(int str1, int str2, int *move);
@@ -2101,8 +2101,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
   sgf_dumptree = NULL;
   count_variations = 0;
 
-  compute_connection_distances(str1, &conn1);
-  compute_connection_distances(str2, &conn2);
+  compute_connection_distances(str1, str2, &conn1);
+  compute_connection_distances(str2, str1, &conn2);
 
   if (findlib(str1, 1, &lib) == 1) {
     conn1.distances[lib] = 0;
@@ -2377,6 +2377,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
             conn->queue[conn->queue_end++] = stones[r]; \
           conn->distances[stones[r]] = dist; \
           conn->deltas[stones[r]] = delta; \
+         if (stones[r] == target && dist < cutoff_distance) \
+           cutoff_distance = dist - 0.0001; \
 	} \
       } \
     } \
@@ -2402,10 +2404,14 @@ find_connection_moves(int str1, int str2, int color_to_move,
  * the previous ones were worse. When a stone is entered, all stones
  * of the string are added to the queue simultaneously.
  *
- * The propagation is inhibited when the distance becomes too large.
+ * (target) is the other string when called from find_connection_moves().
+ * (It can be set to NO_MOVE otherwise.)
+ *
+ * The propagation is inhibited when the distance becomes too large,
+ * or larger than the shortest path found to the target so far.
  */
 static void
-compute_connection_distances(int str, struct connection_data *conn)
+compute_connection_distances(int str, int target, struct connection_data *conn)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -2414,6 +2420,7 @@ compute_connection_distances(int str, struct connection_data *conn)
   float distance;
   int stones[MAX_BOARD * MAX_BOARD];
   int num_stones = findstones(str, MAX_BOARD * MAX_BOARD, stones);
+  float cutoff_distance = 3.0001;
   
   conn->queue_start = 0;
   conn->queue_end = 0;
@@ -2460,7 +2467,7 @@ compute_connection_distances(int str, struct connection_data *conn)
     distance = conn->distances[pos];
 
     /* No further propagation if the distance is too large. */
-    if (distance > 3.0)
+    if (distance > cutoff_distance)
       break;
 
     /* Search for new vertices to propagate to. */
