@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- sgfnode.c (readsgffile): Do not fclose stdin.
 - gtp.texi (GTP command reference): Add @cindex.
 - gtp-commands.sed: Use @verbatim. Tighten output. 
 - gtp-commands.sed: Move `Function' field into @item line, sans field name.

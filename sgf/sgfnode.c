@@ -1179,6 +1179,7 @@ readsgffilefuseki(const char *filename, int moves_per_game)
 /*
  * Wrapper around readsgf which reads from a file rather than a string.
  * Returns NULL if file will not open, or some other parsing error.
+ * Filename "-" means read from stdin, and leave it open when done.
  */
 
 SGFNode *
@@ -1199,7 +1200,8 @@ readsgffile(const char *filename)
   nexttoken();
   gametree(&root, NULL, LAX_SGF);
 
-  fclose(sgffile);
+  if (sgffile != stdin)
+    fclose(sgffile);
 
   if (sgferr) {
     fprintf(stderr, "Parse error: %s at position %d\n", sgferr, sgferrpos);
