@@ -1259,7 +1259,7 @@ compute_dragon_influence()
  * This function loops over the topologically false and half eye
  * vertices and calls connected_to_eye() for each adjoining string to
  * determine whether they all have external connection to an eye. The
- * result is stored in the array false_eye_territory[] array.
+ * result is stored in the false_eye_territory[] array.
  */
 static void
 analyze_false_eye_territory(void)

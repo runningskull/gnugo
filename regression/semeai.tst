@@ -243,6 +243,12 @@ loadsgf games/semeai/semeai12.sgf
 45 owl_analyze_semeai B5 A9
 #? [ALIVE DEAD C1]*
 
+loadsgf games/semeai/semeai9.sgf
+46 owl_analyze_semeai Q12 S11
+#? [ALIVE ALIVE (PASS|R8|R9|T11|T9|R11|R10)]
+47 owl_analyze_semeai S11 Q12
+#? [ALIVE ALIVE (PASS|T11|T9|R9|T10|R10|R11)]
+
 # The opposite semeai is not very interesting (black clearly can kill white).
 loadsgf games/nngs/jypower-gnugo-3.3.17-200304150031.sgf 166
 50 owl_analyze_semeai O7 L7

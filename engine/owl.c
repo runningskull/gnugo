@@ -346,8 +346,13 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
   do_owl_analyze_semeai(apos, bpos, owla, owlb, EMPTY, NO_MOVE,
 			resulta, resultb, move, 0, owl);
 
-  *semeai_result_certain = result_certain;
+  if (semeai_result_certain)
+    *semeai_result_certain = result_certain;
 
+  /* FIXME: We throw away information about ko results here. We need
+   * to do this until the callers are prepared to deal with ko
+   * results.
+   */
   if (resulta) {
     if (*resulta != 0)
       *resulta = ALIVE;
@@ -427,12 +432,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (!move)
     move = &dummy_move;
   
-  shape_offensive_patterns.initialized = 0;
-  shape_defensive_patterns.initialized = 0;
-  
-  global_owl_node_counter++;
-  local_owl_node_counter++;
-
   ASSERT1(board[apos] == owla->color, apos);
   ASSERT1(board[bpos] == owlb->color, bpos);
 
@@ -443,6 +442,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 
       if (rr_get_result1(*read_result) != 0)
 	*move = rr_get_move(*read_result);
+      
       *resulta = rr_get_result1(*read_result);
       *resultb = rr_get_result2(*read_result);
 
@@ -457,6 +457,12 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
   }
 
+  global_owl_node_counter++;
+  local_owl_node_counter++;
+
+  shape_offensive_patterns.initialized = 0;
+  shape_defensive_patterns.initialized = 0;
+  
 #if 0
   wormsa = catalog_goal(owla, goal_wormsa);
   wormsb = catalog_goal(owlb, goal_wormsb);
@@ -466,9 +472,6 @@ do_owl_analyze_semeai(int apos, int bpos,
   common_liberty.pos = NO_MOVE;
   backfill_outside_liberty.pos = NO_MOVE;
   backfill_common_liberty.pos = NO_MOVE;
-  /* turn off the sgf file and variation counting */
-  sgf_dumptree = NULL;
-  count_variations = 0;
   for (k = 0; k < MAX_SEMEAI_MOVES; k++) {
     moves[k].pos = 0;
     moves[k].value = -1;
@@ -478,8 +481,14 @@ do_owl_analyze_semeai(int apos, int bpos,
   ASSERT1(other == board[bpos], bpos);
   memset(mw, 0, sizeof(mw));
 
-  /* Look for a tactical attack. We seek a semeai worm of owlb
-   * which can be attacked. If such exists, we declare victory.  
+  /* Turn off the sgf file and variation counting. */
+  sgf_dumptree = NULL;
+  count_variations = 0;
+  
+  /* Look for a tactical attack. We seek a semeai worm of owlb which
+   * can be attacked. If such exists and is considered critical, we
+   * declare victory. If it's not considered critical we add the
+   * attacking move as a high priority move to try.
    */
 
   {
@@ -498,8 +507,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 	  sgf_dumptree = save_sgf_dumptree;
 	  count_variations = save_count_variations;
 	  SGFTRACE_SEMEAI(upos, WIN, WIN, "tactical win found");
-	  close_pattern_list(color, &shape_defensive_patterns);
-	  close_pattern_list(color, &shape_offensive_patterns);
 	  READ_RETURN_SEMEAI(read_result, move, upos, WIN, WIN);
 	}
 	else if (find_defense(semeai_worms[sworm], NULL)) {
@@ -630,10 +637,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	break;
     
     /* Now we review the moves already considered, while collecting
-     * them into a single list. If no owl moves are found, we end the owl
-     * phase. If no owl move of value > 30 is found, we want to be sure that we
-     * have included a move that fills a liberty. If no such move is found, we
-     * will have to add it later.
+     * them into a single list. 
      */
 
     if (!I_look_alive) {
@@ -665,25 +669,29 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
 
     if (level < 10) {
-     /* If no owl moves were found on two consecutive moves,
-	turn off the owl phase. */
-     if (moves[0].pos == NO_MOVE) {
-       if (owl_phase == 1)
- 	  owl_phase = 2;
- 	else if (owl_phase == 2)
- 	  owl_phase = 0;
-     }
-     else owl_phase = 1;
-   }
+      /* If no owl moves were found on two consecutive moves,
+       * turn off the owl phase.
+       */
+      if (moves[0].pos == NO_MOVE) {
+	if (owl_phase == 1)
+	  owl_phase = 2;
+	else if (owl_phase == 2)
+	  owl_phase = 0;
+      }
+      else
+	owl_phase = 1;
+    }
   }
-  /* now we look for a move to fill a liberty.
-   */
 
   if (1 && verbose) {
     showboard(0);
     goaldump(owla->goal);
     goaldump(owlb->goal);
   }
+  
+  /* Now we look for a move to fill a liberty. This is only
+   * interesting if the opponent doesn't already have two eyes.
+   */
   if (!you_look_alive
       && !safe_outside_liberty_found && moves[0].value < 100) {
     int pos;
@@ -719,6 +727,12 @@ do_owl_analyze_semeai(int apos, int bpos,
     }
   }
 
+  /* Add the best liberty filling move available. We first want to
+   * play outer liberties, second backfilling moves required before
+   * filling an outer liberty. If no such moves are available we try
+   * to fill a mutual liberty or play a corresponding backfilling
+   * move.
+   */
   if (!you_look_alive) {
     if (safe_outside_liberty_found
 	&& outside_liberty.pos != NO_MOVE) {
@@ -766,20 +780,24 @@ do_owl_analyze_semeai(int apos, int bpos,
   tested_moves = 0;
   for (k = 0; k < MAX_SEMEAI_MOVES; k++) {
     int mpos = moves[k].pos;
+    if (mpos == NO_MOVE)
+      break;
 
+    /* Do not try too many moves. */
+    /* FIXME: Replace the hardcoded 6 below with a proper DEPTH constant. */
     if (tested_moves > 2
 	|| (stackp > semeai_branch_depth2 && tested_moves > 1)
 	|| (stackp > semeai_branch_depth && tested_moves > 0)) {
       /* If allpats, try and pop to get the move in the sgf record. */
-      if (allpats && mpos!= NO_MOVE
-	  && trymove(mpos, color, moves[k].name, apos, komaster, kom_pos)) {
+      if (!allpats)
+	break;
+      else if (trymove(mpos, color, moves[k].name, apos, komaster, kom_pos)) {
 	semeai_add_sgf_comment(moves[k].value, owl_phase);
 	popgo();
       }
       continue;
     }
-    if (mpos != NO_MOVE 
-	&& count_variations < semeai_node_limit
+    if (count_variations < semeai_node_limit
 	&& stackp < MAX_SEMEAI_DEPTH
 	&& komaster_trymove(mpos, color, moves[k].name, apos,
 			    komaster, kom_pos,
@@ -800,7 +818,14 @@ do_owl_analyze_semeai(int apos, int bpos,
       owlb->lunches_are_current = 0;
       owl_update_boundary_marks(mpos, owlb);
 
+      /* Do a recursive call to read the semeai after the move we just
+       * tried. If dragon b was captured by the move, call
+       * do_owl_attack() to see whether it sufficed for us to live.
+       */
       if (board[bpos] == EMPTY) {
+	/* FIXME: Are all owl_data fields and relevant static
+         * variables properly set up for a call to do_owl_attack()?
+	 */
 	this_resulta = REVERSE_RESULT(do_owl_attack(apos, NULL, NULL, owla,
 						    new_komaster, new_kom_pos,
 						    0));
@@ -820,6 +845,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       
       popgo();
 
+      /* Does success require ko? */
       if (ko_move) {
 	if (this_resulta != 0)
 	  this_resulta = KO_B;
@@ -835,6 +861,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       }
       
       if (this_resultb == WIN && this_resulta == WIN) {
+	/* Ideal result, no need to try any more moves. */
 	*resulta = WIN;
 	*resultb = WIN;
 	*move = mpos;
@@ -844,6 +871,13 @@ do_owl_analyze_semeai(int apos, int bpos,
 	close_pattern_list(color, &shape_offensive_patterns);
 	READ_RETURN_SEMEAI(read_result, move, mpos, WIN, WIN);
       }
+      /* We consider our own safety most important and attacking the
+       * opponent as a secondary aim. This means that we prefer seki
+       * over a ko for life and death.
+       *
+       * FIXME: If our dragon is considerably smaller than the
+       * opponent dragon, we should probably prefer ko over seki.
+       */
       else if (this_resulta > best_resulta
 	       || (this_resulta == best_resulta
 		   && this_resultb > best_resultb)) {
@@ -879,7 +913,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, WIN, 0);
   }
   
-  /* If no move was found, then pass */
+  /* If no move was found, then pass. */
   if (tested_moves == 0) {
     do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster, kom_pos,
 			  resultb, resulta, NULL, 1, owl_phase);
@@ -948,8 +982,15 @@ semeai_trust_tactical_attack(int str)
 
   return 0;
 }
-      
-  
+
+
+/* Review the moves in owl_moves[] and add them into semeai_moves[].
+ * This is used to merge multiple sets of owl moves into one move
+ * list, while revising the values for use in semeai reading.
+ *
+ * We also record whether the moves include an outer or common liberty
+ * in the semeai.
+ */
 static void
 semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
 			struct local_owl_data *owla,
@@ -961,27 +1002,31 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
 			int guess_same_dragon, int value_bonus,
 			int *critical_semeai_worms)
 {
-  int upos;
+  int move;
   int move_value;
   int same_dragon;
   int k;
   
   for (k = 0; k < MAX_MOVES-1; k++) {
-    upos = owl_moves[k].pos;
-    if (upos == NO_MOVE)
+    move = owl_moves[k].pos;
+    if (move == NO_MOVE)
       break;
-	
-    if (liberty_of_goal(upos, owlb)
-	&& safe_move(upos, color)) {
-      if (!liberty_of_goal(upos, owla))
+
+    /* Does the move fill a liberty in the semeai? */
+    if (liberty_of_goal(move, owlb)
+	&& safe_move(move, color)) {
+      if (!liberty_of_goal(move, owla))
 	*safe_outside_liberty_found = 1;
       else
 	*safe_common_liberty_found = 1;
     }
 
+    /* For some types of owl moves we don't have same_dragon
+     * information recorded and need to guess.
+     */
     if (guess_same_dragon) {
-      if (liberty_of_goal(upos, owla)
-	  || second_liberty_of_goal(upos, owla))
+      if (liberty_of_goal(move, owla)
+	  || second_liberty_of_goal(move, owla))
 	same_dragon = 1;
       else
 	same_dragon = 0;
@@ -989,20 +1034,21 @@ semeai_review_owl_moves(struct owl_move_data owl_moves[MAX_MOVES],
     else
       same_dragon = owl_moves[k].same_dragon;
 
-    mw[upos] = 1;
-    move_value = (semeai_move_value(upos, owla, owlb, owl_moves[k].value,
+    mw[move] = 1;
+    move_value = (semeai_move_value(move, owla, owlb, owl_moves[k].value,
 				    critical_semeai_worms)
 		  + value_bonus);
-    owl_add_move(semeai_moves, upos, move_value, owl_moves[k].name, 
+    owl_add_move(semeai_moves, move, move_value, owl_moves[k].name, 
 		 same_dragon, owl_moves[k].escape,
 		 NO_MOVE, MAX_SEMEAI_MOVES);
-    TRACE("Added %1m %d\n", upos, move_value);
+    TRACE("Added %1m %d\n", move, move_value);
   }
 }
 
-/* Returns the number of liberties gained by the first goal minus the
- * number of liberties lost by the second goal when a move is played
- * at move (if positive, zero otherwise). Used for sorting the moves.
+/* Try to estimate the value of a semeai move. This has two
+ * components. The first is the change in the total number of
+ * liberties for strings involved in the semeai. The second is a bonus
+ * for attacks and defenses of critical semeai worms.
  */
 
 static int
@@ -1073,10 +1119,7 @@ semeai_move_value(int move, struct local_owl_data *owla,
 
 
 
-/* If (pos) points to an empty intersection, returns true if
- * this spot is adjacent to an element of the owl goal.
- */
-
+/* Is the vertex at pos adjacent to an element of the owl goal? */
 static int
 liberty_of_goal(int pos, struct local_owl_data *owl)
 {
@@ -1088,6 +1131,7 @@ liberty_of_goal(int pos, struct local_owl_data *owl)
   return 0;
 }
 
+/* Is the vertex at pos a second liberty of the owl goal? */
 static int
 second_liberty_of_goal(int pos, struct local_owl_data *owl)
 {

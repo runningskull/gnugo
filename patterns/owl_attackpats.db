@@ -3624,6 +3624,7 @@ AO*
 
 
 Pattern A1105
+# gf Added n classification. (3.3.20)
 
 O..
 XO*        connect against double threat
@@ -3631,7 +3632,7 @@ xYO
 x..
 ---
 
-:8,-,value(85)
+:8,n,value(85)
 
 Oa.
 XO*

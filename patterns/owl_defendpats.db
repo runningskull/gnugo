@@ -2499,6 +2499,23 @@ AA..
 ;!oplay_defend(*,A)
 
 
+Pattern D640
+# gf New pattern. (3.3.20)
+# Compare D720.
+
+?O*.o       try to make eye on edge
+O....
+-----
+
+:8,-,value(56)
+
+?O*bo
+Oa...
+-----
+
+;!obvious_false_oeye(a) && !oplay_attack(b,*,*)
+
+
 #########################################################
 #                                                       #
 #            Make eyeshape in the center                #
@@ -4649,12 +4666,13 @@ AOCd
 
 Pattern D1139
 # tm New Pattern (3.1.20) (see nngs:110)
+# gf Added n classification. (3.3.20)
 
 ?*
 XO
 OX
 
-:8,bE,value(75)
+:8,bEn,value(75)
 
 ?*
 aO

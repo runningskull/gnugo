@@ -166,11 +166,15 @@ B[rd])
 )
 
 (;B[pf]MA[lh]
-(;W[qc]MA[lh]C[:-,shape(3)];B[rc]MA[lh];W[pc]MA[lh]C[U]
+(;W[qc]MA[lh]C[:-,shape(3)]
+(;B[rc]MA[lh];W[pc]MA[lh]C[U]
 (;B[re]MA[lh]C[:-,shape(8)];W[kc]MA[jg]C[
 ])
 
 (;B[rb]MA[kg];W[kc]MA[jg];B[qj]MA[jk])
+)
+
+(;B[pc]MA[lh]C[0])
 )
 
 (;W[lc]MA[lh]C[0])
