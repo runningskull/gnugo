@@ -310,6 +310,7 @@ loadsgf games/trevor/trevor_30.sgf
 loadsgf games/trevor/trevor_30.sgf
 black G3
 302 gg_genmove white
+#? [!PASS]*
 
 #CATEGORY=OWL_TUNING
 #DESCRIPTION=Black still dead after D1!
@@ -322,3 +323,31 @@ loadsgf games/trevor/trevor_31.sgf
 loadsgf games/trevor/trevor_32.sgf
 320 gg_genmove black
 #? [J2]*
+
+loadsgf games/trevor/trevor_33.sgf
+330 owl_defend L9
+#? [1 P9]*
+
+#CATEGORY=owl_tuning
+#DESCRIPTION=Very simple to threaten eye or run out here.
+#SEVERITY=10
+#SEE_ALSO=owl.tst@226
+loadsgf games/trevor/trevor_34.sgf
+340 owl_defend J10
+#? [1 P9]*
+
+#CATEGORY=owl_tuning
+#DESCRIPTION=Very simple Ko missed here.
+#SEVERITY=10
+#SEE_ALSO=owl.tst#226
+loadsgf games/trevor/trevor_35.sgf
+350 owl_defend J10
+#? [(2|3) L8]*
+
+#CATEGORY=
+#DESCRIPTION=
+#SEVERITY=
+loadsgf games/trevor/trevor_36.sgf
+360 owl_defend G8
+#? [(2|3) J9]*
+
