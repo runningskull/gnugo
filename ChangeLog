@@ -12,15 +12,13 @@
 - better trace output for followup_value and reverse_followup_value
 - typo fixed (whose_moyo for whose_area) in value_territory()
 - new debug flag DEBUG_TERRITORY
-- computation of change in territory, moyo, and area in influence.c
-  restructured 
+- delta computation of territory, moyo, and area in influence.c restructured 
 - influence_value part of move valuation removed
 - new function is_edge_vertex() in board.c
 - guess_eye_space() revised
 - compute_eyes_pessimistic revised
 - do_owl_defend() revised
-- move stupid vital marginal eye points from first line to second line
-  in owl_determine_life()
+- move stupid vital marginals from first to second line in owl_determine_life()
 - patterns.dsp doesn't reference invalid file
 - regress.pl deals with threads better on Win32
 - regress.plx supports view by category
@@ -28,18 +26,19 @@
 - add file & line numbers to more warnings in mkpat.c
 - comments in reading.c made 1D
 - DFA_ENABLE ifdefs removed
+- remove *.dfa stuff from makefiles keeping only DFA_FLAGS for mkpat.
+- configure --enable-dfa touches .db files.
 - bugfix in find_double_threats()
 - global_matchpat() renamed matchpat()
 - regression view includes node counts, SGF link, and -t output.
 - GTP echo_err added to allow echoing to STDERR.
 - atari_atari moved to combination.c
 - restricted_defend1 and restricted attack2 now public functions
-- in find_double_threats, remove threat reasons after remaking 
-  them into an attack_either reason
+- in find_double_threats, make threat reasons into attack_either reasons
 - old disabled function remove_move_reason() now enabled
 - some simple cleaning
 - genmove now 1D
-- Some tests in endgame.tst corrected.
+- out of bounds array violation in showbord.c fixed.
 - tuning
 - connection tuning
 - eye tuning
@@ -48,6 +47,7 @@
 - revision of rot tests
 - ld_owl_life.tst removed
 - new and revised regression tests
+- Some tests in endgame.tst corrected.
 
 3.1.13 released November 6, 2001
 

@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4a from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -46,10 +46,9 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -86,31 +85,9 @@ EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	
 mkpat_SOURCES = mkpat.c transform.c
 
 mkpat_LDADD = ./libdfa.a ../utils/libutils.a
-
-# dfas in DFA_INST are made and installed in $prefix/share/gnugo
-
-@DFA_ENABLED_TRUE@DFA_INST = 	owl_attackpat.dfa owl_defendpat.dfa owl_vital_apat.dfa 
-
-# dfas in DFA_NOINST are neither built nor installed
-
-@DFA_ENABLED_TRUE@DFA_NOINST = 	pat.dfa joseki.dfa conn.dfa attpat.dfa defpat.dfa endpat.dfa 	influencepat.dfa barrierspat.dfa fusekipat.dfa
-
-@DFA_ENABLED_TRUE@pkgdata_DATA = $(DFA_INST)
-
-# uncomment dependencies when these dfas are built
-
-# pat.dfa: patterns.c
-# joseki.dfa : joseki.c
-# attpat.dfa: apatterns.c
-# defpat.dfa: dpatterns.c
-# conn.dfa: conn.c
-# endpat.dfa: endgame.c
-# influencepat.dfa: influence.c
-# barrierspat.dfa: barriers.c
-# fusekipat.dfa: fuseki.c
-
 @DFA_ENABLED_TRUE@DFAFLAGS = -D -m
 @DFA_ENABLED_FALSE@DFAFLAGS = 
+
 transpat_SOURCES = transpat.c patlib.c transform.c
 transpat_LDADD = 
 joseki_SOURCES = joseki.c 
@@ -185,8 +162,6 @@ CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-DATA =  $(pkgdata_DATA)
-
 HEADERS =  $(noinst_HEADERS)
 
 DIST_COMMON =  README Makefile.am Makefile.in
@@ -281,25 +256,6 @@ extract_fuseki$(EXEEXT): $(extract_fuseki_OBJECTS) $(extract_fuseki_DEPENDENCIES
 	@rm -f extract_fuseki$(EXEEXT)
 	$(LINK) $(extract_fuseki_LDFLAGS) $(extract_fuseki_OBJECTS) $(extract_fuseki_LDADD) $(LIBS)
 
-install-pkgdataDATA: $(pkgdata_DATA)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(pkgdatadir)
-	@list='$(pkgdata_DATA)'; for p in $$list; do \
-	  if test -f $(srcdir)/$$p; then \
-	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(pkgdatadir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(pkgdatadir)/$$p; \
-	  else if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(pkgdatadir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(pkgdatadir)/$$p; \
-	  fi; fi; \
-	done
-
-uninstall-pkgdataDATA:
-	@$(NORMAL_UNINSTALL)
-	list='$(pkgdata_DATA)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(pkgdatadir)/$$p; \
-	done
-
 tags: TAGS
 
 ID: $(HEADERS) $(SOURCES) $(LISP)
@@ -393,20 +349,19 @@ installcheck: installcheck-am
 install-exec-am:
 install-exec: install-exec-am
 
-install-data-am: install-pkgdataDATA
+install-data-am:
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-pkgdataDATA
+uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS)
+all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS)
 all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(pkgdatadir)
 
 
 mostlyclean-generic:
@@ -451,22 +406,15 @@ clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
 mostlyclean-compile distclean-compile clean-compile \
 maintainer-clean-compile mostlyclean-noinstPROGRAMS \
 distclean-noinstPROGRAMS clean-noinstPROGRAMS \
-maintainer-clean-noinstPROGRAMS uninstall-pkgdataDATA \
-install-pkgdataDATA tags mostlyclean-tags distclean-tags clean-tags \
-maintainer-clean-tags distdir mostlyclean-depend distclean-depend \
-clean-depend maintainer-clean-depend info-am info dvi-am dvi check \
-check-am installcheck-am installcheck install-exec-am install-exec \
-install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
+maintainer-clean-noinstPROGRAMS tags mostlyclean-tags distclean-tags \
+clean-tags maintainer-clean-tags distdir mostlyclean-depend \
+distclean-depend clean-depend maintainer-clean-depend info-am info \
+dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
+install-exec install-data-am install-data install-am install \
+uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
-
-# dependencies for the dfas from DFA_INST
-
-@DFA_ENABLED_TRUE@owl_attackpat.dfa: owl_attackpat.c
-@DFA_ENABLED_TRUE@owl_vital_apat.dfa: owl_vital_apat.c
-@DFA_ENABLED_TRUE@owl_defendpat.dfa: owl_defendpat.c
 
 dist-hook:
 	cd $(distdir) && rm $(GGBUILTSOURCES)

@@ -305,6 +305,9 @@ dnl ------------ dfa -------------------
 
 AM_CONDITIONAL(DFA_ENABLED, test "$enable_dfa" = "yes")
 
+dnl force owl c files rebuild
+touch patterns/owl*.db
+
 
 dnl ------------ gnugo_path -------------------
 

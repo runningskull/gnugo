@@ -32,46 +32,12 @@ mkpat_SOURCES  = mkpat.c transform.c
 mkpat_LDADD = ./libdfa.a ../utils/libutils.a
 
 if DFA_ENABLED
-
-# dfas in DFA_INST are made and installed in $prefix/share/gnugo
-
-DFA_INST = \
-	owl_attackpat.dfa owl_defendpat.dfa owl_vital_apat.dfa 
-
-# dfas in DFA_NOINST are neither built nor installed
-
-DFA_NOINST = \
-	pat.dfa joseki.dfa conn.dfa attpat.dfa defpat.dfa endpat.dfa \
-	influencepat.dfa barrierspat.dfa fusekipat.dfa
-
-pkgdata_DATA = $(DFA_INST)
-
-# additional mkpat flags for the dfas from DFA_INST
-# add $(DFAFLAGS) to the mkpat commands that should generate dfas
-
 DFAFLAGS = -D -m
-
-# dependencies for the dfas from DFA_INST
-
-owl_attackpat.dfa: owl_attackpat.c
-owl_vital_apat.dfa: owl_vital_apat.c
-owl_defendpat.dfa: owl_defendpat.c
-
-# uncomment dependencies when these dfas are built
-
-# pat.dfa: patterns.c
-# joseki.dfa : joseki.c
-# attpat.dfa: apatterns.c
-# defpat.dfa: dpatterns.c
-# conn.dfa: conn.c
-# endpat.dfa: endgame.c
-# influencepat.dfa: influence.c
-# barrierspat.dfa: barriers.c
-# fusekipat.dfa: fuseki.c
-
 else
 DFAFLAGS =
 endif
+
+
 transpat_SOURCES = transpat.c patlib.c transform.c
 transpat_LDADD = 
 joseki_SOURCES = joseki.c 

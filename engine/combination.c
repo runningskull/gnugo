@@ -25,6 +25,7 @@
  * especially, combinations of threats.
  */
 
+#include <string.h>
 
 #include "liberty.h"
 #include "gnugo.h"

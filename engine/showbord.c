@@ -255,8 +255,11 @@ end_draw_board()
 static void 
 showchar(int i, int j, int empty, int xo)
 {
-  struct dragon_data *d = &(dragon[POS(i, j)]);  /* dragon data at i,j */
-  int x = BOARD(i, j);
+  struct dragon_data *d;  /* dragon data at i,j */
+  int x;
+  ASSERT_ON_BOARD2(i, j);
+  x = BOARD(i, j);
+  d = &(dragon[POS(i, j)]);
 
   if (x == EMPTY) {
     if (xo != 2)
@@ -292,13 +295,17 @@ showchar(int i, int j, int empty, int xo)
     }
   }
   else {
+    int w;
+
+    if (xo == 0 || ! ON_BOARD1(d->origin)) {
+      fprintf(stderr, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
+      return;
+    }
+
     /* Figure out ascii character for this dragon. This is the
      * dragon number allocated to the origin of this worm. */
-    int w = dragon_num[I(d->origin)][J(d->origin)];
 
-    if (xo == 0)
-      fprintf(stderr, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
-
+    w = dragon_num[I(d->origin)][J(d->origin)];
     if (!w) {
       /* Not yet allocated - allocate next one. */
       /* Count upwards for black, downwards for white to reduce confusion. */
