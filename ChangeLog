@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- retire move_safety check in value_moves.c for territorial move valuation
 - read_eye() revised
 - `num_defends' field of half_eye_data strtucture renamed `num_defenses'
 - maximum 15 points of territorial_value will get shape bonus

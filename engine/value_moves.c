@@ -1933,8 +1933,11 @@ estimate_territorial_value(int pos, int color, float score)
     strength[pos] = 0.0;
   }
   
-  /* tm added move_safety check (3.1.22) (see trevorc:880) */
-  if (does_block && move[pos].move_safety
+  /* We don't check for move safety here. This enables a territorial
+   * evaluation for sacrifice moves that enable a break-through (or
+   * an owl defense).
+   */
+  if (does_block
       && tryko(pos, color, "estimate_territorial_value", EMPTY, NO_MOVE)) {
     if (!retrieve_delta_territory_cache(pos, color, &this_value, 
 	  				&move[pos].influence_followup_value,
