@@ -815,6 +815,12 @@ loadsgf games/test4lose.sgf
 195 defend H6
 #? [1 J4]
 
+# Standard corner tesuji (sacrifice two stones at H8 and J8 later). /ab
+# Maybe F9 works, too?
+loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312130817.sgf 28
+196 attack E8
+#? [1 (H8|E9)]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
