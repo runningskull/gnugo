@@ -139,7 +139,7 @@ enum mode {
  * help string, for maintenance purposes only.
  */
 
-static struct option const long_options[] =
+static struct gg_option const long_options[] =
 {
   {"mode",           required_argument, 0, OPT_MODE},
   {"replay",         required_argument, 0, OPT_REPLAY_GAME},
@@ -291,7 +291,7 @@ main(int argc, char *argv[])
   umove = BLACK;
   
   /* Now weed through all of the command line options. */
-  while ((i=getopt_long(argc, argv, 
+  while ((i=gg_getopt_long(argc, argv, 
 			"-ab:B:d:D:EF:gh::H:K:l:L:M:m:o:p:r:fsStTvw",
 			long_options, NULL)) != EOF)
     {

@@ -1303,7 +1303,7 @@ find_more_owl_attack_and_defense_moves(void)
 	else if (move_reasons[r].type == ATTACK_MOVE
 		 || move_reasons[r].type == DEFEND_MOVE) {
 	  di = wormi[what];
-	  dj = wormi[what];
+	  dj = wormj[what];
 	}
 	else
 	  continue;
@@ -1533,10 +1533,8 @@ examine_move_safety(int color)
 {
   int i, j;
   int k;
-  double t1 = 0., t2 = 0.;
   
-  if (showtime)
-    t1 = gg_gettimeofday();
+  start_timer(3);
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++) {
       int safety = 0;
@@ -1745,14 +1743,8 @@ examine_move_safety(int color)
 	move[i][j].move_safety = 1;
       else
 	move[i][j].move_safety = 0;
-      if (showtime) {
-	t2 = gg_gettimeofday();
-	if (t2-t1 > 1.0) {
-	  gprintf("    examine_move_safety: %m:", i, j);
-	  fprintf(stderr, " %.2f sec\n", t2-t1);
-	}
-	t1 = t2;
-      }
+
+      time_report(3, "    examine_move_safety: ", i, j);
     }
 }
 
@@ -3600,85 +3592,42 @@ review_move_reasons(int *i, int *j, float *val, int color,
 
   int good_move_found = 0;
   int save_verbose;
-  double t1 = 0., t2 = 0.;
   
-  if (showtime)
-    t1 = gg_gettimeofday();
+  start_timer(2);
   if (!urgent || allpats) {
     find_more_attack_and_defense_moves(color);
-    if (showtime) {
-      t2 = gg_gettimeofday();
-      if (t2-t1 > 1.)
-	fprintf(stderr, 
-		"  find_more_attack_and_defense_moves: %.2f sec\n", t2-t1);
-      t1 = t2;
-    }
+    time_report(2, "  find_more_attack_and_defense_moves", -1, -1);
   }
+
   remove_opponent_attack_and_defense_moves(color);
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, 
-	      "  remove_opponent_attack_and_defense_moves: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  remove_opponent_attack_and_defense_moves", -1, -1);
+
   do_remove_false_attack_and_defense_moves();
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr,
-	      "  do_remove_false_attack_and_defense_moves: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  do_remove_false_attack_and_defense_moves", -1, -1);
 
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
   if (level > 5) {
     find_more_owl_attack_and_defense_moves();
-    if (showtime) {
-      t2 = gg_gettimeofday();
-      if (t2-t1 > 1.)
-	fprintf(stderr,
-		"  find_more_owl_attack_and_defense_moves: %.2f sec\n", t2-t1);
-      t1 = t2;
-    }
+    time_report(2, "  find_more_owl_attack_and_defense_moves", -1, -1);
   }
   verbose = save_verbose;
 
   induce_secondary_move_reasons(color);
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr,
-	      "  induce_secondary_move_reasons: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  induce_secondary_move_reasons", -1, -1);
   
   if (verbose > 0)
     verbose--;
   examine_move_safety(color);
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr,
-	      "  examine_move_safety: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
-  verbose = save_verbose;
+  time_report(2, "  examine_move_safety", -1, -1);
 
   if (printworms || verbose)
     list_move_reasons(color);
 
   /* Evaluate all moves with move reasons. */
   value_moves(color, pure_threat_value, score);
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr,
-	      "  value_moves: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  value_moves", -1, -1);
 
   /* Perform point redistribution */
   redistribute_points();
@@ -3735,13 +3684,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
       TRACE("Move at %m would be an illegal ko capture.\n", best_i, best_j);
       reevaluate_ko_threats();
       redistribute_points();
-      if (showtime) {
-	t2 = gg_gettimeofday();
-	if (t2-t1 > 1.)
-	  fprintf(stderr,
-		  "  reevaluate_ko_threats: %.2f sec\n", t2-t1);
-	t1 = t2;
-      }
+      time_report(2, "  reevaluate_ko_threats", -1, -1);
       ko_values_have_been_added = 1;
       move[best_i][best_j].value = 0.0;
       move[best_i][best_j].final_value = 0.0;

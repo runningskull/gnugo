@@ -339,8 +339,6 @@ sgfMkProperty(const char *name, const  char *value,
     prop->name = name[0] | name[1] << 8;
   strcpy(prop->value, value);
 
-  if(*value==0) *(prop->value + 1) = 0;
-
   if (last == NULL)
     node->props = prop;
   else

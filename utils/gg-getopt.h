@@ -81,7 +81,7 @@ extern int gg_optopt;
    one).  For long options that have a zero `flag' field, `getopt'
    returns the contents of the `val' field.  */
 
-struct option
+struct gg_option
 {
 # if defined __STDC__ && __STDC__
   const char *name;
@@ -138,23 +138,23 @@ extern int gg_getopt (int argc, char *const *argv, const char *shortopts);
 # endif /* __GNU_LIBRARY__ */
 
 # ifndef __need_getopt
-extern int getopt_long (int argc, char *const *argv, const char *shortopts,
-		        const struct option *longopts, int *longind);
-extern int getopt_long_only (int argc, char *const *argv,
+extern int gg_getopt_long (int argc, char *const *argv, const char *shortopts,
+		        const struct gg_option *longopts, int *longind);
+extern int gg_getopt_long_only (int argc, char *const *argv,
 			     const char *shortopts,
-		             const struct option *longopts, int *longind);
+		             const struct gg_option *longopts, int *longind);
 
 /* Internal only.  Users should not call this directly.  */
 extern int _getopt_internal (int argc, char *const *argv,
 			     const char *shortopts,
-		             const struct option *longopts, int *longind,
+		             const struct gg_option *longopts, int *longind,
 			     int long_only);
 # endif
 #else /* not __STDC__ */
-extern int getopt ();
+extern int gg_getopt ();
 # ifndef __need_getopt
-extern int getopt_long ();
-extern int getopt_long_only ();
+extern int gg_getopt_long ();
+extern int gg_getopt_long_only ();
 
 extern int _getopt_internal ();
 # endif

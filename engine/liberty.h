@@ -300,6 +300,8 @@ void proper_superstring_chainlinks(int m, int n, int *adj,
 
 int placehand(int handicap);          /* place stones on board only */
 
+void start_timer(int n);
+double time_report(int n, const char *occupation, int i, int j);
 
 /* Various different strategies for finding a move */
 void fuseki(int color);

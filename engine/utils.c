@@ -1770,6 +1770,44 @@ superstring_add_string(int m, int n,
   }
 }
 
+/* Internal timers for assessing time spent on various tasks. */
+#define NUMBER_OF_TIMERS 4
+double timers[NUMBER_OF_TIMERS];
+
+/* Start a timer. */
+void
+start_timer(int n)
+{
+  gg_assert(n >= 0 && n < NUMBER_OF_TIMERS);
+  if (!showtime)
+    return;
+
+  timers[n] = gg_gettimeofday();
+}
+
+/* Report time spent and restart the timer. */
+double
+time_report(int n, const char *occupation, int i, int j)
+{
+  double t;
+  double dt;
+  gg_assert(n >= 0 && n < NUMBER_OF_TIMERS);
+  if (!showtime)
+    return 0.0;
+
+  t = gg_gettimeofday();
+  dt = t - timers[n];
+  if (dt > 1.0) {
+    gprintf("%s", occupation);
+    if (!is_pass(i, j))
+      gprintf("%m", i, j);
+    fprintf(stderr, ": %.2f sec\n", dt);
+  }
+  timers[n] = t;
+  return dt;
+}
+
+
 
 /*
  * Local Variables:

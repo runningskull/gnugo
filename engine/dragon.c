@@ -61,10 +61,8 @@ make_dragons(int color, int stop_before_owl)
   int m, n;
   int i, j;
   int d;
-  double t1 = 0., t2 = 0.;
 
-  if (showtime)
-    t1 = gg_gettimeofday();
+  start_timer(2);
   dragon2_initialized = 0;
   
   /* We start with the dragon data copied from the worm data, then
@@ -165,30 +163,15 @@ make_dragons(int color, int stop_before_owl)
       }
     }
 
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to make dragons: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to make dragons", -1, -1);
   make_domains(black_eye, white_eye, 0);
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to make domains: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to make domains", -1, -1);
 
   /* Find explicit connections patterns in database and amalgamate
    * involved dragons.
    */
   find_connections();
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to find connections: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to find connections", -1, -1);
   
   /* Amalgamate dragons sharing an eyespace (not ko). At the same time
    * we decide to which dragon an eyespace belongs. Ko eyespaces
@@ -250,26 +233,14 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
     }
-
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to amalgamate dragons: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to amalgamate dragons", -1, -1);
 
   /* At this time, all dragons have been finalized and we can
    * initialize the dragon2[] array. After that we can no longer allow
    * amalgamation of dragons.
    */
   initialize_supplementary_dragon_data();
-
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to initialize dragon2: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to initialize dragon2", -1, -1);
   
   /* Find adjacent worms which can be easily captured: */
   for (m = 0; m < board_size; m++)
@@ -328,12 +299,7 @@ make_dragons(int color, int stop_before_owl)
 	= dragon[dragon[i][j].origini][dragon[i][j].originj].lunchj;
     }
   
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to find lunches: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to find lunches", -1, -1);
 
   /* In case origins of dragons got moved, put the dragons of eyes aright. */
   for (i = 0; i < board_size; i++)
@@ -356,13 +322,7 @@ make_dragons(int color, int stop_before_owl)
 	  white_eye[i][j].dragonj = dj;
       }
     }
-
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to fix origins: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to fix origins", -1, -1);
 
   /* Find topological half eyes and false eyes by analyzing the
    * diagonal intersections, as described in the Texinfo
@@ -458,13 +418,7 @@ make_dragons(int color, int stop_before_owl)
 	propagate_eye(i, j, white_eye);
       }
     }
-
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to find eyes: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to find eyes", -1, -1);
 
   /* Now we compute the genus. */
   for (i = 0; i < board_size; i++)
@@ -511,12 +465,7 @@ make_dragons(int color, int stop_before_owl)
       dragon[i][j].genus
 	= dragon[dragon[i][j].origini][dragon[i][j].originj].genus;
 
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to compute genus: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to compute genus", -1, -1);
 
   /* Compute the escape route measure. */
   for (m = 0; m < board_size; m++)
@@ -527,12 +476,7 @@ make_dragons(int color, int stop_before_owl)
 	dragon[m][n].escape_route = compute_escape(m, n, 0);
       }
 
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  time to compute escape: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  time to compute escape", -1, -1);
 
   /* Update the segmentation of the initial influence before we
    * compute the surrounding moyo sizes. The reason for this is that
@@ -540,13 +484,7 @@ make_dragons(int color, int stop_before_owl)
    * into account.
    */
   resegment_initial_influence();
-  
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  resegment_initial_influence: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  resegment_initial_influence", -1, -1);
 
   /* Compute the surrounding moyo sizes. */
   for (d = 0; d < number_of_dragons; d++) {
@@ -554,13 +492,7 @@ make_dragons(int color, int stop_before_owl)
 					      dragon2[d].originj,
 					      DRAGON(d).color, 1);
   }
-  
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  influence_get_moyo_size: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  influence_get_moyo_size", -1, -1);
 
   /* Determine status: ALIVE, DEAD, CRITICAL or UNKNOWN */
   for (m = 0; m < board_size; m++)
@@ -572,13 +504,7 @@ make_dragons(int color, int stop_before_owl)
 	  sgffile_dragon_status(m, n, dragon[m][n].status);
 	}
     }
-
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  compute_dragon_status: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  compute_dragon_status", -1, -1);
 
   /* We must update the dragon status at every intersection before we
    * call the owl code. This updates all fields.
@@ -590,12 +516,7 @@ make_dragons(int color, int stop_before_owl)
     }
   
   find_neighbor_dragons();
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  find_neighbor_dragons: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  find_neighbor_dragons", -1, -1);
 
   if (stop_before_owl)
     return;
@@ -614,7 +535,6 @@ make_dragons(int color, int stop_before_owl)
       int defendj = -1;
       int second_defendi = -1;
       int second_defendj = -1;
-      double t3 = 0., t4 = 0.;
       
       if (p[m][n] == EMPTY
 	  || (dragon[m][n].origini != m)
@@ -639,8 +559,7 @@ make_dragons(int color, int stop_before_owl)
 	dragon[m][n].owl_second_defendj = -1;
       }
       else {
-	if (showtime)
-	  t3 = gg_gettimeofday();
+	start_timer(3);
 	if (owl_attack(m, n, &attacki, &attackj, 
 		       &dragon[m][n].owl_attack_certain)) {
 	  dragon[m][n].owl_attacki = attacki;
@@ -713,22 +632,11 @@ make_dragons(int color, int stop_before_owl)
 	      dragon[m][n].owl_threat_status = ALIVE;
 	  }
 	}
-	if (showtime) {
-	  t4 = gg_gettimeofday();
-	  if (t4-t3 > 0.5) {
-	    gprintf("    owl reading time for dragon at %m: ", m, n);
-	    fprintf(stderr, "%.2f sec\n", t4-t3);
-	  }
-	}
+	time_report(3, "    owl reading for dragon at ", m, n);
       }
     }
 
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  owl reading: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  owl reading", -1, -1);
 
   /* The dragon data is now correct at the origin of each dragon but
    * we need to copy it to every vertex.  
@@ -761,12 +669,7 @@ make_dragons(int color, int stop_before_owl)
 	  dragon[m][n].matcher_status = dragon[m][n].status;
       }
 
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  compute matcher status: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  compute matcher status", -1, -1);
 
   /* Compute the safety value. */
   for (d = 0; d < number_of_dragons; d++) {
@@ -812,22 +715,11 @@ make_dragons(int color, int stop_before_owl)
       dragon2[d].safety = ALIVE;
   }
 
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  compute dragon safety: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  compute dragon safety", -1, -1);
 
   /* Resolve semeais. This may revise the safety and status fields. */
   semeai(color);
-  
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  semeai module: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  semeai module", -1, -1);
 
   /* The matcher_status is now correct at the origin of each dragon
    * but we need to copy it to every vertex.
@@ -867,12 +759,7 @@ make_dragons(int color, int stop_before_owl)
 	}
       }
   
-  if (showtime) {
-    t2 = gg_gettimeofday();
-    if (t2-t1 > 1.)
-      fprintf(stderr, "  revise inessentiality: %.2f sec\n", t2-t1);
-    t1 = t2;
-  }
+  time_report(2, "  revise inessentiality", -1, -1);
 
   /* Count the non-dead dragons. */
   lively_white_dragons = 0;

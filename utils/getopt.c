@@ -504,7 +504,7 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
      int argc;
      char *const *argv;
      const char *optstring;
-     const struct option *longopts;
+     const struct gg_option *longopts;
      int *longind;
      int long_only;
 {
@@ -627,8 +627,8 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	  || (long_only && (argv[gg_optind][2] || !my_index (optstring, argv[gg_optind][1])))))
     {
       char *nameend;
-      const struct option *p;
-      const struct option *pfound = NULL;
+      const struct gg_option *p;
+      const struct gg_option *pfound = NULL;
       int exact = 0;
       int ambig = 0;
       int indfound = -1;
@@ -785,8 +785,8 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
     if (temp[0] == 'W' && temp[1] == ';')
       {
 	char *nameend;
-	const struct option *p;
-	const struct option *pfound = NULL;
+	const struct gg_option *p;
+	const struct gg_option *pfound = NULL;
 	int exact = 0;
 	int ambig = 0;
 	int indfound = 0;

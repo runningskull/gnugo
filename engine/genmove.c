@@ -84,7 +84,6 @@ examine_position(int color, int how_much)
 {
   int save_verbose;
   int m, n;
-  double t1 = 0., t2 = 0.;
 
   /* Position numbers for which various examinations were last made. */
   static int worms_examined = -1;
@@ -104,13 +103,9 @@ examine_position(int color, int how_much)
     --verbose;
 
   if (NEEDS_UPDATE(worms_examined)) {
-    if (showtime)
-      t1 = gg_gettimeofday();
+    start_timer(0);
     make_worms();
-    if (showtime) {
-      t2 = gg_gettimeofday();
-      fprintf(stderr, "  make worms: %.2f sec\n", t2-t1);
-    }
+    time_report(0, "  make worms", -1, -1);
   }
   if (how_much == EXAMINE_WORMS) {
     verbose = save_verbose;
@@ -266,11 +261,8 @@ static int
 do_genmove(int *i, int *j, int color, float pure_threat_value)
 {
   float val;
-  double t1 = 0., t2 = 0.;
-  double t3 = 0., t4 = 0.;
 
-  if (showtime)
-    t1 = gg_gettimeofday();
+  start_timer(0);
   
   /* Prepare our table of moves considered. */
   memset(potential_moves, 0, sizeof(potential_moves));
@@ -297,14 +289,9 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   reset_engine();
 
   /* Find out information about the worms and dragons. */
-  if (showtime)
-    t3 = gg_gettimeofday();
+  start_timer(1);
   examine_position(color, EXAMINE_ALL);
-  if (showtime) {
-    t4 = gg_gettimeofday();
-    fprintf(stderr, "EXAMINE POSITION took %.2f sec\n", t4-t3);
-    t3 = t4;
-  }
+  time_report(1, "examine position", -1, -1);
   if (level >= 8) {
     estimate_score(&lower_bound, &upper_bound);
     if (verbose || showscore) {
@@ -316,11 +303,8 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
 		lower_bound > 0 ? "W " : "B ", gg_abs(lower_bound),
 		upper_bound > 0 ? "W " : "B ", gg_abs(upper_bound));
     }
-    if (showtime) {
-      t4 = gg_gettimeofday();
-      fprintf(stderr, "ESTIMATE SCORE took %.2f sec\n", t4-t3);
-      t3 = t4;
-    }
+    time_report(1, "estimate score", -1, -1);
+
     /* The score will be used to determine when we are safely
      * ahead. So we want the most conservative score.
      */
@@ -361,14 +345,9 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   gg_assert(stackp == 0);
 
   /* Pattern matcher. */
-  if (showtime)
-    t3 = gg_gettimeofday();
+  start_timer(1);
   shapes(color);
-  if (showtime) {
-    t4 = gg_gettimeofday();
-    fprintf(stderr, "SHAPES took %.2f sec\n", t4-t3);
-    t3 = t4;
-  }
+  time_report(1, "shapes", -1, -1);
   gg_assert(stackp == 0);
 
   /* Look for combination attacks. */
@@ -391,22 +370,14 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
       add_your_atari_atari_move(ai, aj, aa_val);
     verbose = save_verbose;
   }
-  if (showtime) {
-    t4 = gg_gettimeofday();
-    fprintf(stderr, "ATARI ATARI took %.2f sec\n", t4-t3);
-    t3 = t4;
-  }
+  time_report(1, "atari atari", -1, -1);
 
   /* Review the move reasons and estimate move values. */
   if (review_move_reasons(i, j, &val, color, 
 			  pure_threat_value, lower_bound))
     TRACE("Move generation likes %m with value %f\n", *i, *j, val);
   gg_assert(stackp == 0);
-  if (showtime) {
-    t4 = gg_gettimeofday();
-    fprintf(stderr, "REVIEW MOVE REASONS took %.2f sec\n", t4-t3);
-    t3 = t4;
-  }
+  time_report(1, "review move reasons", -1, -1);
 
   /* If the move value is 6 or lower, we look for endgame patterns too. */
   if (val <= 6.0 && !disable_endgame_patterns) {
@@ -415,12 +386,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     if (review_move_reasons(i, j, &val, color, pure_threat_value, score))
       TRACE("Move generation likes %m with value %f\n", *i, *j, val);
     gg_assert(stackp == 0);
-    if (showtime) {
-      t4 = gg_gettimeofday();
-      if (t4-t3 > 1.)
-	fprintf(stderr, "ENDGAME took %.2f sec\n", t4-t3);
-      t3 = t4;
-    }
+    time_report(1, "endgame", -1, -1);
   }
   
   /* If no move found yet, revisit any semeai and change the
@@ -436,14 +402,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
 	      *i, *j, val); 
       }
     }
-    if (showtime) {
-      t4 = gg_gettimeofday();
-      if (t4-t3 > 1.)
-	fprintf(stderr, 
-		"MOVE REASONS WITH REVISED SEMEAI STATUS took %.2f sec\n", 
-		t4-t3);
-      t3 = t4;
-    }
+    time_report(1, "move reasons with revised semeai status", -1, -1);
   }
 
   /* If still no move, fill a remaining liberty. This should pick up
@@ -454,11 +413,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     val = 1.0;
     TRACE("Filling a liberty at %m\n", *i, *j);
     move_considered(*i, *j, val);
-    if (showtime) {
-      t4 = gg_gettimeofday();
-      fprintf(stderr, "FILL LIBERTY took %.2f sec\n", t4-t3);
-      t3 = t4;
-    }
+    time_report(1, "fill liberty", -1, -1);
   }
 
   /* If we're instructed to play out the aftermath or capture all dead
@@ -471,11 +426,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     val = 1.0;
     TRACE("Aftermath move at %m\n", *i, *j);
     move_considered(*i, *j, val);
-    if (showtime) {
-      t4 = gg_gettimeofday();
-      fprintf(stderr, "AFTERMATH_GENMOVE took %.2f sec\n", t4-t3);
-      t3 = t4;
-    }
+    time_report(1, "aftermath_genmove", -1, -1);
   }
 
   /* If we're instructed to capture all dead opponent stones, generate
@@ -488,11 +439,7 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
     val = 1.0;
     TRACE("Aftermath move at %m\n", *i, *j);
     move_considered(*i, *j, val);
-    if (showtime) {
-      t4 = gg_gettimeofday();
-      fprintf(stderr, "AFTERMATH_GENMOVE took %.2f sec\n", t4-t3);
-      t3 = t4;
-    }
+    time_report(1, "aftermath_genmove", -1, -1);
   }
 
   /* If no move is found then pass. */
@@ -515,12 +462,10 @@ do_genmove(int *i, int *j, int color, float pure_threat_value)
   }
 
   if (showtime) {
-    t2 = gg_gettimeofday();
-    gprintf("*** TIME to generate move at %m: ", *i, *j);
-    fprintf(stderr, "%.2f sec\n", t2-t1);
-    total_time += t2-t1;
-    if (t2-t1 > slowest_time) {
-      slowest_time = t2-t1;
+    double spent = time_report(0, "TIME to generate move at ", *i, *j);
+    total_time += spent;
+    if (spent > slowest_time) {
+      slowest_time = spent;
       slowest_i = *i;
       slowest_j = *j;
       slowest_movenum = movenum+1;
