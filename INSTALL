@@ -3,7 +3,7 @@
 Get the most recent tar file from ftp.gnu.org or a mirror (see
 http://www.gnu.org/order/ftp.html for a list).
 
-Untar the sources, change to the directory gnugo-3.4. Now do:
+Untar the sources, change to the directory gnugo-3.6. Now do:
 
         ./configure [OPTIONS]
         make

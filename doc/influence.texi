@@ -190,7 +190,7 @@ However, of course this move is sente once it is worth playing, and should
 therefore (in miai counting) be awarded an effective value of 2. Hence we
 need to recognize the followup value of a move. GNU Go 3.0 took care of
 this by using patterns in @code{patterns.db} that enforced an explicit
-followup value. Versions 3.2 and 3.4 instead compute a seperate followup
+followup value. Versions from 3.2 on instead compute a seperate followup
 influence to each move considered. In the above example, an intrusion source
 will be added at @samp{a} as a followup move to @samp{*}. This destroys all of
 Black's territory and hence gives a followup value of 3.
@@ -299,8 +299,9 @@ may seem to claim. But it should give a fairly good idea of how the design
 is intended.
 
 Another matter is that so far we have only considered the change in secure
-territory. GNU Go 3.2 and 3.4 use a revised heuristic, which is explained in
-the next section, to assign probable territory to each player.
+territory. GNU Go 3.2 and later versions use a revised heuristic, which
+is explained in the next section, to assign probable territory to each
+player.
 
 @node Territorial Details
 @section Details of the Territory Valuation
@@ -745,8 +746,8 @@ is called for each break in, adding a move reason.
 The break in code is slow, and only changes a few moves by the engine
 per game. Nevertheless we believe that it contributes substantially
 to the strength of the program. The break in code is enabled by default 
-in GNU Go 3.4 at level 10, and disabled at level 9. In fact, this is the
-@strong{only} difference between levels 9 and 10 in GNU Go 3.4.
+in GNU Go 3.6 at level 10, and disabled at level 9. In fact, this is the
+@strong{only} difference between levels 9 and 10 in GNU Go 3.6.
 
 @node Surrounded Dragons
 @section Surrounded Dragons

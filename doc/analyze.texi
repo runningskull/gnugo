@@ -12,7 +12,7 @@ as an sgf file, and you want to know why it made a
 certain move.
 
 @menu
-* Traces::			Analyzing traces in GNU Go 3.4
+* Traces::			Analyzing traces in GNU Go 3.6
 * Output File::			The Output File
 * Decide string::		Checking the reading code
 * Decide dragon::		Checking the owl code
@@ -34,7 +34,7 @@ gnugo -l @var{filename} -t -L @var{move number}
 @end example
 
 (You may also want to add @option{--quiet} to suppress the copyright
-message.) In GNU Go 3.4, the moves together with their reasons are
+message.) In GNU Go 3.6, the moves together with their reasons are
 listed, followed by a numerical analysis of the values given to each
 move.
 

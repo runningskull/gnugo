@@ -651,7 +651,7 @@ filled then the komaster reverts to @code{EMPTY}.
 @end itemize
 @end itemize
 
-In GNU Go 3.2 and 3.4 komaster scheme 5 is used. It may be described as
+In GNU Go 3.2 and later, komaster scheme 5 is used. It may be described as
 follows.
 
 @itemize @bullet

@@ -17,7 +17,8 @@ simpler, more powerful, and more flexible than the Go Modem
 Protocol.
 
 There are two versions of the protocol. Version 1 was used with
-GNU Go 3.0 and 3.2. GNU Go 3.4 uses version 2. The specification 
+GNU Go 3.0 and 3.2. GNU Go 3.4 and later versions uses version 2.
+The specification 
 is available at @url{http:http://www.lysator.liu.se/~gunnar/gtp/}.
 
 The GTP has two principal current applications: it is used

@@ -1,5 +1,5 @@
 
-This is GNU Go 3.4, a Go program. Development versions of GNU Go may be
+This is GNU Go 3.6, a Go program. Development versions of GNU Go may be
 found at @url{http://www.gnu.org/software/gnugo/devel.html}. Contact
 us at @email{gnugo@@gnu.org} if you are interested in helping.
 
@@ -26,9 +26,8 @@ To be sure, existing Go programs are strong enough to be interesting
 as opponents, and the hope exists that some day soon a truly
 strong program can be written. 
 
-GNU Go is getting stronger. For one thing, we've paid a lot of
-attention to life and death. GNU Go 3.4 plays at about the level of
-10 kyu.
+GNU Go is getting stronger. GNU Go 3.6 plays at about the level of
+9 kyu.
 
 Until now, Go programs have always been distributed as binaries
 only. The algorithms in these proprietary programs are secret. No-one

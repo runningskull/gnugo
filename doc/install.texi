@@ -15,7 +15,7 @@ about newer versions and get other information at
 @section GNU/Linux and Unix
 @cindex installation
 
-Untar the sources, change to the directory gnugo-3.4. Now do:
+Untar the sources, change to the directory gnugo-3.6. Now do:
 
 @example
    ./configure [OPTIONS]
@@ -239,7 +239,7 @@ the experimental connection analysis. @strong{Enabled by default.}
 @section Compiling GNU Go on Microsoft platforms
 
 GNU Go is being developed on Unix variants. GNU Go is easy to build
-and install on those platforms. GNU Go 3.4 has support for building
+and install on those platforms. GNU Go 3.6 has support for building
 on MS-DOS, Windows 3.x, Windows NT/2000 and Windows 95/98.
 
 There are two approaches to building GNU Go on Microsoft platforms.
@@ -301,12 +301,12 @@ DJGPP ftp archive on simtel:
 @url{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/}
 
 Once you have a working DJGPP environment and you have downloaded
-the gnugo source available as gnugo-3.4.tar.gz you can build the
+the gnugo source available as gnugo-3.6.tar.gz you can build the
 executable as follows:
 
 @example
-       tar zxvf gnugo-3.4.tar.gz
-       cd gnugo-3.4
+       tar zxvf gnugo-3.6.tar.gz
+       cd gnugo-3.6
        ./configure
        make
 @end example
@@ -322,11 +322,11 @@ versions of Cygwin install very easily with the setup program available
 from the cygwin homepage.  @url{http://sources.redhat.com/cygwin/}.
 GNU Go compiles out-of-the box using the standard Unix build procedure
 on the Cygwin environment. After installation of cygwin and fetching
-@file{gnugo-3.4.tar.gz} you can type:
+@file{gnugo-3.6.tar.gz} you can type:
 
 @example
-  tar zxvf gnugo-3.4.tar.gz
-  cd gnugo-3.4
+  tar zxvf gnugo-3.6.tar.gz
+  cd gnugo-3.6
   ./configure
   make
 @end example
@@ -350,8 +350,8 @@ than the Cygwin executable. To build on cygwin an executable suitable
 for the win32 platform type the following at your cygwin prompt:
 
 @example
-  tar zxvf gnugo-3.4.tar.gz
-  cd gnugo-3.4
+  tar zxvf gnugo-3.6.tar.gz
+  cd gnugo-3.6
   env CC='gcc -mno-cygwin' ./configure
   make
 @end example

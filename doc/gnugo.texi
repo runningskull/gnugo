@@ -9,8 +9,8 @@
 * GNU go: (gnugo).          The GNU Go program
 @end direntry
 
-@set EDITION 3.4
-@set VERSION 3.4
+@set EDITION 3.6
+@set VERSION 3.6
 
 @finalout
 @titlepage
@@ -26,7 +26,7 @@
 
 @sp 1
 @page
-@title{GNU GO 3.4}
+@title{GNU GO 3.6}
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1999, 2000, 2001, 2002, 2003 by the Free 
 Software Foundation, Inc.
