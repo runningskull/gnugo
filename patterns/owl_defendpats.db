@@ -5009,12 +5009,15 @@ O.*a
 
 
 Pattern D1314
+# nn Modified (3.3.13)
+#   It's rather pointless to match at the edge
 
 o.o?
 O.O.     run away
 ....
 ....
 .*..
+????
 
 :8,E,value(55)
 
@@ -5023,6 +5026,7 @@ O.O.
 ....
 ....
 .*..
+????
 
 ;owl_escape_value(*) > 0
 
@@ -5747,18 +5751,38 @@ aXXb
 
 
 Pattern D1356
+# nn Modified (3.3.13) see also D1356a
 
 o....         jump towards safety
 O.*..
 o....
 
-:8,E,value(80)
+:-,E,value(90)
 
 o..a.
-O.*b.
+d.*b.
 o..c.
 
-; owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
+; (owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0)
+; && !oplay_disconnect(*,d,*)
+
+
+Pattern D1356a
+# nn New pattern (3.3.13)
+#   B attribute since cut possible
+
+o....         jump towards safety
+O.*..
+o....
+
+:-,BE,value(80)
+
+o..a.
+d.*b.
+o..c.
+
+; (owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0)
+; && oplay_disconnect(*,d,*)
 
 
 Pattern D1357

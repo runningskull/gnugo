@@ -214,6 +214,9 @@ X.YO
 :8,-,value(60)
 
 
+# nn Removal candidate (3.3.13)
+#   Success rate in regressions : 2.88% (53/1786)
+
 Pattern A107
 # gf Not on second line without known support. See trevora:290. (3.1.15)
 
@@ -482,6 +485,9 @@ a.*.xx
 
 ;!x_somewhere(a) || attack(a)
 
+
+# nn Removal candidate (3.3.13)
+#   Success rate in regressions : 2.61% (15/560)
 
 Pattern A207d
 # nn New pattern (3.3.11) penalty for being gote
@@ -1288,20 +1294,24 @@ OY?
 
 
 Pattern A406b
+# nn Modifed (3.3.13)
 
-xxx
-...         center block
-.*O
-.Y?
+?xxx?
+o...o         center block
+..*Oo
+o.Y??
 
 :8,-,value(80)
 
-xax
-...
-.*O
-.Y?
+?xax?
+o...o
+..*Od
+o.Ybc
 
 ;owl_escape_value(a)>0
+;&& (!x_somewhere(b,c) 
+;    || o_somewhere(b,d)
+;    || (o_somewhere(c) && !safe_xmove(d)))
 
 
 Pattern A406c
@@ -1720,7 +1730,6 @@ bc*a
 ??O?
 
 ;(owl_escape_value(b) > 0)
-
 
 
 #########################################################
@@ -2160,6 +2169,9 @@ OXAXO
 
 ;lib(A) == 3
 
+
+# nn Removal candidate (3.3.13)
+#   Success rate in regressions : 0.75 % (2/268)
 
 Pattern A616
 # tm New Pattern (3.1.15)
@@ -3525,7 +3537,8 @@ YO
 a*
 Yb
 
-; !xplay_defend_both(*,a,b) && vital_chain(a) && vital_chain(b)
+; vital_chain(a) && vital_chain(b)
+; && !xplay_defend_both(*,a,b)
 
 
 Pattern A1107b
@@ -3547,6 +3560,8 @@ Yc
 ;lib(c)>2 && vital_chain(b) && vital_chain(c)
 ;&& oplay_attack(*,a,a) && !xplay_defend_both(a,b,c)
 
+# nn Removal candidate (3.3.13)
+#   Success rate in regressions : 0.9 % (23/2562)
 
 Pattern A1107c
 # tm New pattern. (3.1.17)
@@ -4884,16 +4899,18 @@ Y...|       don't let opponent live easily in the corner
 
 :8,-,value(46)
 
-
-Pattern A1402
-
-..Y..|       contest the corner territory
-*....|
-.....|
-.....|
------+
-
-:8,-,value(45)
+# nn Removed (3.3.13)
+#   Success rate in regressions : 0% (0/40)
+# 
+# Pattern A1402
+# 
+# ..Y..|       contest the corner territory
+# *....|
+# .....|
+# .....|
+# -----+
+# 
+# :8,-,value(45)
 
 
 #########################################################
@@ -4964,6 +4981,24 @@ OXO
 ?O?
 
 ;owl_escape_value(A) > 0 || owl_escape_value(B) > 0
+
+
+Pattern A1504
+
+OXXXO         threaten to take an eye by ko
+.OX.X
+*..X.
+-----
+
+:8,-,value(60)
+
+OXXXa
+bcX.X
+*..X.
+-----
+
+;!attack(a) && !xplay_defend(b,c)
+
 
 #########################################################
 #                                                       #
@@ -5110,6 +5145,9 @@ xXYO?      atari to reduce eyespace, with further reduction as followup
 
 :8,s,value(50)
 
+
+# nn Removal candidate (3.3.13)
+#   Success rate in regressions : 0% (0/35)
 
 Pattern A1609
 
