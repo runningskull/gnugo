@@ -513,32 +513,32 @@ takamoku.db : $(srcdir)/takamoku.sgf joseki$(EXEEXT)
 	./joseki JT $(srcdir)/takamoku.sgf >takamoku.db
 
 patterns.c : $(srcdir)/patterns.db $(srcdir)/patterns2.db mkpat$(EXEEXT)
-       ./mkpat -b pat -i $(srcdir)/patterns.db -i$(srcdir)/patterns2.db \
+	./mkpat -b pat -i $(srcdir)/patterns.db -i$(srcdir)/patterns2.db \
                -o patterns.c
 
 josekidb.c : $(DBBUILT) mkpat$(EXEEXT)
-       ./mkpat -C joseki $(DBBUILT_INPUT) -o josekidb.c
+	./mkpat -C joseki $(DBBUILT_INPUT) -o josekidb.c
 
 apatterns.c : $(srcdir)/attack.db mkpat$(EXEEXT)
-       ./mkpat -X attpat -i $(srcdir)/attack.db -o apatterns.c
+	./mkpat -X attpat -i $(srcdir)/attack.db -o apatterns.c
 
 dpatterns.c : $(srcdir)/defense.db mkpat$(EXEEXT)
-       ./mkpat defpat -i $(srcdir)/defense.db -o dpatterns.c
+	./mkpat defpat -i $(srcdir)/defense.db -o dpatterns.c
 
 conn.c : $(srcdir)/conn.db mkpat$(EXEEXT)
-       ./mkpat -c conn -i $(srcdir)/conn.db -o conn.c
+	./mkpat -c conn -i $(srcdir)/conn.db -o conn.c
 
 endgame.c : $(srcdir)/endgame.db mkpat$(EXEEXT)
-       ./mkpat -b endpat -i $(srcdir)/endgame.db -o endgame.c
+	./mkpat -b endpat -i $(srcdir)/endgame.db -o endgame.c
 
 eyes.c: $(srcdir)/eyes.db mkeyes$(EXEEXT)
 	./mkeyes < $(srcdir)/eyes.db >eyes.c
 
 influence.c : $(srcdir)/influence.db mkpat$(EXEEXT)
-       ./mkpat -c influencepat -i $(srcdir)/influence.db -o influence.c
+	./mkpat -c influencepat -i $(srcdir)/influence.db -o influence.c
 
 barriers.c : $(srcdir)/barriers.db mkpat$(EXEEXT)
-       ./mkpat -c -b barrierspat -i $(srcdir)/barriers.db -o barriers.c
+	./mkpat -c -b barrierspat -i $(srcdir)/barriers.db -o barriers.c
 
 aa_attackpat.c : $(srcdir)/aa_attackpats.db $(srcdir)/aa_attackpats.dtr mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b -t $(srcdir)/aa_attackpats.dtr aa_attackpat \
@@ -549,7 +549,7 @@ owl_attackpat.c : $(srcdir)/owl_attackpats.db $(srcdir)/owl_attackpats.dtr mkpat
                -i $(srcdir)/owl_attackpats.db -o owl_attackpat.c
 
 oraclepat.c : $(srcdir)/oracle.db mkpat$(EXEEXT)
-       ./mkpat -b oracle -i $(srcdir)/oracle.db -o oraclepat.c
+	./mkpat -b oracle -i $(srcdir)/oracle.db -o oraclepat.c
 
 owl_vital_apat.c : $(srcdir)/owl_vital_apats.db $(srcdir)/owl_vital_apats.dtr mkpat$(EXEEXT)
 	./mkpat $(DFAFLAGS) -b -t $(srcdir)/owl_vital_apats.dtr owl_vital_apat \
@@ -560,25 +560,25 @@ owl_defendpat.c : $(srcdir)/owl_defendpats.db $(srcdir)/owl_defendpats.dtr mkpat
                -i $(srcdir)/owl_defendpats.db -o owl_defendpat.c
 
 fusekipat.c : $(srcdir)/fuseki.db mkpat$(EXEEXT)
-       ./mkpat -b fusekipat -i $(srcdir)/fuseki.db -o fusekipat.c
+	./mkpat -b fusekipat -i $(srcdir)/fuseki.db -o fusekipat.c
 
 fuseki9.c : $(srcdir)/fuseki9.db mkpat$(EXEEXT)
-       ./mkpat -b -f fuseki9 -i $(srcdir)/fuseki9.db -o fuseki9.c
+	./mkpat -b -f fuseki9 -i $(srcdir)/fuseki9.db -o fuseki9.c
 
 fuseki13.c : $(srcdir)/fuseki13.db mkpat$(EXEEXT)
-       ./mkpat -b -f fuseki13 -i $(srcdir)/fuseki13.db -o fuseki13.c
+	./mkpat -b -f fuseki13 -i $(srcdir)/fuseki13.db -o fuseki13.c
 
 fuseki19.c : $(srcdir)/fuseki19.db mkpat$(EXEEXT)
-       ./mkpat -b -f fuseki19 -i $(srcdir)/fuseki19.db -o fuseki19.c
+	./mkpat -b -f fuseki19 -i $(srcdir)/fuseki19.db -o fuseki19.c
 
 handipat.c : $(srcdir)/handicap.db mkpat$(EXEEXT)
-       ./mkpat -b handipat -i $(srcdir)/handicap.db -o handipat.c
+	./mkpat -b handipat -i $(srcdir)/handicap.db -o handipat.c
 
 read_attack.c : $(srcdir)/read_attack.db mkpat$(EXEEXT)
-       ./mkpat -b read_attack -i $(srcdir)/read_attack.db -o read_attack.c
+	./mkpat -b read_attack -i $(srcdir)/read_attack.db -o read_attack.c
 
 read_defend.c : $(srcdir)/read_defend.db mkpat$(EXEEXT)
-       ./mkpat -b read_defend -i $(srcdir)/read_defend.db -o read_defend.c
+	./mkpat -b read_defend -i $(srcdir)/read_defend.db -o read_defend.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
