@@ -320,6 +320,10 @@ loadsgf games/owl50.sgf
 338 owl_defend F18
 #? [1 M16]*
 
+loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 90
+339 owl_defend O17
+#? [0]
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

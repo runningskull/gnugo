@@ -337,7 +337,7 @@ loadsgf games/life_and_death/mixed1.sgf
 300 owl_attack  C17
 #? [1 (E19|D19|C19|B18|B19|A18|A19)]
 301 owl_defend  C17
-#? [3 B18]
+#? [1 C19]
 302 dragon_status R17
 #? [critical T19 (Q19|R18)]
 303 dragon_status R3

@@ -405,8 +405,9 @@ loadsgf games/seki13.sgf
 902 reg_genmove black
 #? [B2]
 
-# Black probably have more moves to make seki but C2 looks most
-# natural. C1 is also good enough
+# Black probably have more moves to make seki in sente but C2 looks most
+# natural. C1 is also good enough. B1 suffices to make sente seki as well
+# but loses one point compared to C2 or C1.
 play white B2
 903 reg_genmove black
 #? [C2|C1]
