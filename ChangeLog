@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in show_dragons()
 - redistribution consistency checking disabled for stable release
 - gg_genmove replaced by reg_genmove almost everywhere in the regressions
 - twogtp.py and twogtp.pike added to gtp_examples/README
@@ -22,6 +23,7 @@
 - doc: Consistently use hierarchical structure instead of next/previous/up
 - tuning
 - owl tuning
+- eye tuning
 - doc: complete rewrite of first sections of overview.texi
 - doc: subsection on 1D board array moved to board.texi
 - doc: references to cavities in dragon amalgamation removed
