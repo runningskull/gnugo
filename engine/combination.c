@@ -197,7 +197,7 @@ find_double_threats(int color)
  * size of the smallest of the worms under attack.
  */
 
-#define USE_ATARI_ATARI_PATTERNS 0
+#define USE_ATARI_ATARI_PATTERNS 1
 
 static int aa_status[BOARDMAX]; /* ALIVE, DEAD or CRITICAL */
 static int forbidden[BOARDMAX];
@@ -246,6 +246,12 @@ atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
    */
   while (1) {
     int new_aa_val;
+    
+    if (attack_move)
+      *attack_move = apos;
+    if (defense_move)
+      *defense_move = dpos;
+    
     forbidden[apos] = 1;
     new_aa_val = do_atari_atari(color, &apos, &dpos, NO_MOVE,
 				save_verbose, aa_val);
@@ -254,14 +260,10 @@ atari_atari(int color, int *attack_move, int *defense_move, int save_verbose)
      * it does not change the value of (apos), so these correspond
      * to a move that works and is necessary.
      */
-    if (new_aa_val == 0) {
-      if (attack_move)
-	*attack_move = apos;
-      if (defense_move)
-	*defense_move = dpos;
+    if (new_aa_val == 0)
       return aa_val;
-    }
-    aa_val = new_aa_val;
+    else
+      aa_val = new_aa_val;
   }
 
   /* We'll never get here, but the compiler may be more happy if it
@@ -599,8 +601,12 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
 				   last_friendly, save_verbose, minsize);
     sgf_dumptree = save_sgf_dumptree;
     count_variations = save_count_variations;
-    if (retval != 0)
+    if (retval != 0) {
+      if (sgf_dumptree)
+	/* FIXME: Better message. */
+	sgftreeAddComment(sgf_dumptree, NULL, "attack found");
       return retval;
+    }
   }
 
   if (stackp > aa_depth)
@@ -673,10 +679,14 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
       continue;
 
     /* atari_atari successful */
-    if (num_defense_moves == 0
-	&& (save_verbose || (debug & DEBUG_ATARI_ATARI))) {
-      gprintf("%oThe worm %1m can be attacked at %1m after ", str, apos);
-      dump_stack();
+    if (num_defense_moves == 0) {
+      if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
+	gprintf("%oThe worm %1m can be attacked at %1m after ", str, apos);
+	dump_stack();
+      }
+      if (sgf_dumptree)
+	/* FIXME: Better message. */
+	sgftreeAddComment(sgf_dumptree, NULL, "attack found");
     }
 
     if (attack_point)
@@ -796,64 +806,72 @@ atari_atari_find_attack_moves(int color, int minsize,
   int mx[BOARDMAX];
 
   if (USE_ATARI_ATARI_PATTERNS)
-    return atari_atari_attack_patterns(color, minsize, moves, targets);
-  
-  /* We set mx to 0 for every move added to the moves[] array. */
-  memset(mx, 0, sizeof(mx));
-  
-  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] != other) 
-      continue;
+    num_moves = atari_atari_attack_patterns(color, minsize, moves, targets);
+  else {
+    /* We set mx to 0 for every move added to the moves[] array. */
+    memset(mx, 0, sizeof(mx));
     
-    if (pos != find_origin(pos))
-      continue;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (board[pos] != other) 
+	continue;
       
-    if (minsize > 0 && countstones(pos) < minsize && !is_vital_string(pos))
-      continue;
-
-    if (get_aa_status(pos) != ALIVE)
-      continue;
-
-    /* Pick up general threat moves or simple ataris. */
-    if (stackp < aa_threat_depth) {
-      memset(threat_moves, 0, sizeof(threat_moves));
-      memset(threat_codes, 0, sizeof(threat_codes));
-      num_threat_moves = attack_threats(pos, MAX_THREAT_MOVES,
-					threat_moves, threat_codes);
-      if ((debug & DEBUG_ATARI_ATARI)
-	  && num_moves > 0) {
-	int i;
-	gprintf("Threats on %1m: ", pos);
-	for (i = 0; i < num_moves; i++)
-	  gprintf("%1m ", moves[i]);
-	gprintf("\n");
+      if (pos != find_origin(pos))
+	continue;
+      
+      if (minsize > 0 && countstones(pos) < minsize && !is_vital_string(pos))
+	continue;
+      
+      if (get_aa_status(pos) != ALIVE)
+	continue;
+      
+      /* Pick up general threat moves or simple ataris. */
+      if (stackp < aa_threat_depth) {
+	memset(threat_moves, 0, sizeof(threat_moves));
+	memset(threat_codes, 0, sizeof(threat_codes));
+	num_threat_moves = attack_threats(pos, MAX_THREAT_MOVES,
+					  threat_moves, threat_codes);
+	if ((debug & DEBUG_ATARI_ATARI)
+	    && num_threat_moves > 0) {
+	  int i;
+	  gprintf("Threats on %1m: ", pos);
+	  for (i = 0; i < num_threat_moves; i++)
+	    gprintf("%1m ", threat_moves[i]);
+	  gprintf("\n");
+	}
+      }
+      else {
+	num_threat_moves = findlib(pos, 2, threat_moves);
+	if (num_threat_moves != 2)
+	  continue;
+      }
+      
+      /* Add the threats on (pos) to the moves[] array, unless forbidden
+       * or assumed to be ineffective.
+       */
+      for (k = 0; k < num_threat_moves; k++) {
+	int move = threat_moves[k];
+	
+	if (mx[move] != 0 || forbidden[move])
+	  continue;
+	
+	if ((is_self_atari(move, color)
+	     || !is_atari(move, color))
+	    && !safe_move(move, color))
+	  continue;
+	
+	moves[num_moves] = move;
+	targets[num_moves] = pos;
+	num_moves++;
+	mx[move] = 1;
       }
     }
-    else {
-      num_threat_moves = findlib(pos, 2, threat_moves);
-      if (num_threat_moves != 2)
-	continue;
-    }
+  }
 
-    /* Add the threats on (pos) to the moves[] array, unless forbidden
-     * or assumed to be ineffective.
-     */
-    for (k = 0; k < num_threat_moves; k++) {
-      int move = threat_moves[k];
-	
-      if (mx[move] != 0 || forbidden[move])
-	continue;
-
-      if ((is_self_atari(move, color)
-	   || !is_atari(move, color))
-	  && !safe_move(move, color))
-	continue;
-
-      moves[num_moves] = move;
-      targets[num_moves] = pos;
-      num_moves++;
-      mx[move] = 1;
-    }
+  if (debug & DEBUG_ATARI_ATARI) {
+    gprintf("Attack moves:");
+    for (k = 0; k < num_moves; k++)
+      gprintf("%o %1m(%1m)", moves[k], targets[k]);
+    gprintf("%o\n");
   }
 
   return num_moves;
@@ -1042,11 +1060,11 @@ atari_atari_find_defense_moves(int str, int moves[MAX_BOARD * MAX_BOARD])
   }
 #endif
 
-  if (0) {
-    gprintf("defense moves for %1m:", str);
+  if (debug & DEBUG_ATARI_ATARI) {
+    gprintf("Defense moves for %1m:", str);
     for (k = 0; k < num_moves; k++)
       gprintf("%o %1m", moves[k]);
-    gprintf("\n");
+    gprintf("%o\n");
   }
   
   return num_moves;
