@@ -364,15 +364,16 @@ XbX
 
 Pattern VA21
 # gf New pattern. (3.1.14)
+# gf Revised pattern. (3.1.17)
 
-XO.       bogus eyespace
+XO?       bogus eyespace
 .*X
 ...
 ---
 
 :8,-,value(75)
 
-XO.
+XO?
 .*B
 .a.
 ---

@@ -2652,6 +2652,7 @@ OO.
 
 Pattern D719
 # tm New patern (3.1.16)
+# gf This pattern is way too general. (3.1.17)
 
 ?X	wedge
 ?*
@@ -3384,7 +3385,7 @@ AOX
 .*.
 ---
 
-; does_attack(*,A) && defend(A)
+; does_attack(*,A)
 
 
 Pattern D904
@@ -4087,7 +4088,7 @@ OOX.
 OX..
 X..?
 
-:8,-b,value(86)
+:8,b,value(86)
 
 oB*o
 OOXa

@@ -962,6 +962,17 @@ value_territory(struct influence_data *q)
 	  }
 	}
 
+	/* Dead stone, upgrade to territory. Notice that this is not
+         * the point for a prisoner, which is added later. Instead
+         * this is to make sure that the vertex is not regarded as
+         * moyo or area. Also notice that the non-territory
+         * degradation below may over-rule this decision.
+	 */
+	if (BOARD(i, j) == BLACK)
+	  q->territory_value[i][j] = 1.0;
+	else if (BOARD(i, j) == WHITE)
+	  q->territory_value[i][j] = -1.0;
+
 	/* If marked as non-territory for the color currently owning
          * it, reset the territory value.
 	 */

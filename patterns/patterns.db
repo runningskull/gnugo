@@ -6294,6 +6294,18 @@ Pattern EB1702
 :8,OXd,shape(3)
 
 
+Pattern EB1702b
+# gf New pattern. (3.1.17)
+
+...*.X    jump up when kicked
+...OX.
+......
+......
+------
+
+:8,OXa,reverse_followup(8)
+
+
 Pattern EB1703
 
 O.*X    Strengthen stone on second line
@@ -9951,6 +9963,8 @@ XOX
 
 
 Pattern ED76
+# gf The negative shape value is a temporary measure to avoid
+#    overvaluation. (3.1.17)
 
 oOo?     stop expansion and undermine
 o..X
@@ -9958,7 +9972,7 @@ o.*.
 ....
 ----
 
-:8,OXba
+:8,OXba,shape(-3)
 
 oOo?
 obaX
@@ -10786,6 +10800,7 @@ Pattern CD103a
 
 
 Pattern CD104
+# gf Revised constraint.
 
 ...          atari using dead stone
 .*.
@@ -10796,10 +10811,10 @@ XO?
 
 ...
 .*.
-OX.
+bX.
 XA?
 
-; attack(A) && !defend(A)
+;lib(b)>1 && attack(A) && !defend(A)
 
 
 Pattern CD105
@@ -11591,10 +11606,11 @@ X...*....cd
 
 
 Pattern EJ49
+# gf Revised. (3.1.17)
 
 .....         cut
-O*X.O
-.XO..
+O*X.o
+.XO.o
 .....
 .....
 -----
@@ -11602,14 +11618,16 @@ O*X.O
 :8,sjE
 
 .....
-O*X.O
-.XOb.
+O*X.c
+.XObd
 ..a..
 .....
 -----
 
->antisuji(a);
->antisuji(b);
+;o_somewhere(c,d)
+
+>replace(a,*);
+>replace(b,*)
 
 
 Pattern EJ49b
@@ -12104,7 +12122,7 @@ Pattern EJ79
 
 :8,j
 
-|..X??b        make a base
+|..X??b
 |.O.X.a
 |......
 |..O...
@@ -12255,6 +12273,33 @@ Pattern EJ87
 
 :8,J
 
+
+Pattern EJ88
+# gf New pattern. (3.1.17)
+
+......       connect after invasion
+......
+.O.*.O
+...X.O
+......
+......
+------
+
+:8,J
+
+
+Pattern EJ89
+# gf New pattern. (3.1.17)
+
+......       connect after invasion
+......
+.O.X.O
+...*.O
+......
+......
+------
+
+:8,J
 
 
 ######################################################################

@@ -521,6 +521,7 @@ Pattern F110
 #######################################
 
 Pattern F201
+# gf Increased value. (3.1.17)
 
 |...O.........    wide extension from ikken shimari
 |.............
@@ -529,10 +530,11 @@ Pattern F201
 |.............
 +-------------
 
-:8,FtEe,shape(3)
+:8,FjEe,shape(0.5)
 
 
 Pattern F202
+# gf Increased value. (3.1.17)
 
 |..O..........    wide extension from kogeima shimari
 |.............
@@ -541,7 +543,7 @@ Pattern F202
 |.............
 +-------------
 
-:8,FtEe,shape(3)
+:8,FjEe,shape(0.5)
 
 
 Pattern F203

@@ -72,7 +72,7 @@ loadsgf games/blunder11.sgf 44
 
 loadsgf games/blunder12.sgf 252
 16 gg_genmove white
-#? [R5]
+#? [R5|Q5|R6|S6|S7|R7]
 
 loadsgf games/blunder12.sgf 258
 17 gg_genmove white
