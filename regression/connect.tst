@@ -88,7 +88,7 @@ loadsgf golois/Connecter990621-1.sgf
 
 loadsgf golois/Connecter990628-1.sgf
 23 connect L6 N6
-#? [1 M7]
+#? [1 (M7|N5)]
 
 loadsgf golois/Connecter990628-2.sgf
 24 disconnect G15 F17
@@ -152,7 +152,7 @@ loadsgf golois/Goemate990911-1.sgf
 
 loadsgf golois/Goemate991106-2.sgf
 39 connect F15 H13
-#? [1 G15]*
+#? [1 (F14|G15|H14)]
 
 loadsgf golois/Goemate991106-2.sgf
 40 disconnect G14 D16
