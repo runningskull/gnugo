@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- floats normalized in finish_pattern() in mkpat.c
 - put GNU Go's passes in permanent move history
 - assertion in compute_connection_distances corrected
 

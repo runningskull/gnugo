@@ -855,14 +855,20 @@ finish_pattern(char *line)
     float d, min_d = 361.0;
     int k, min_k = -1;
       
-    /* we seek the element of suitable value minimizing
-     * the distance to the middle */
+    /* We seek the element of suitable value minimizing
+     * the distance to the middle.
+     *
+     * FIXME: What's the purpose of this 0.01 offset? It introduces
+     * potential for platform dependency in the floating point
+     * calculations.
+     */
     mi = ((float)maxi - 1.0) / 2.0;
     mj = ((float)maxj - 1.0) / 2.0 - 0.01;
     for (k = 0; k != el; k++)
       if (elements[k].att < 3 && (elements[k].att & anchor) != 0) {
 	d = gg_abs((float)elements[k].x - mi)
 	  + gg_abs((float)elements[k].y - mj);
+	d = gg_normalize_float(d, 0.01);
 	if (d < min_d) {
 	  min_k = k;
 	  min_d = d;
