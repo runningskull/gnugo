@@ -46,7 +46,6 @@
 #include <ctype.h>
 
 #include "liberty.h"
-#include "patterns.h"
 
 static void initialize_supplementary_dragon_data(void);
 static void find_neighbor_dragons(void);

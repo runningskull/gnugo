@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- AFFINE_TRANSFORM() macro
 - new (stub) function opponent_not_passing
 - new function sgffile_write_circle_mark
 - gg_cputime used for time statistics consistently.

@@ -41,19 +41,15 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 		     int ll, void *data)
 {
   int anchor = POS(m, n);
-  int stari, starj;
   int move;
   int k;
   int first_dragon  = NO_MOVE;
   int second_dragon = NO_MOVE;
 
-  int other=OTHER_COLOR(color);
+  int other = OTHER_COLOR(color);
   UNUSED(data);
   
-  TRANSFORM(pattern->movei, pattern->movej, &stari, &starj, ll);
-  stari += m;
-  starj += n;
-  move = POS(stari, starj);
+  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
   
   if ((pattern->class & CLASS_B) && !safe_move(move, other))
     return;
@@ -64,14 +60,9 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
    */
   if (pattern->class & CLASS_C) {
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-      int x, y; /* absolute (board) co-ords of (transformed) pattern element */
-      int pos;
-      
       /* transform pattern real coordinate */
-      TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-      x += m;
-      y += n;
-      pos = POS(x, y);
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+				 ll, m, n);
       
       /* Look for distinct dragons. */
       if (pattern->patn[k].att == ATT_O) {
@@ -111,13 +102,8 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
       if (pattern->patn[k].att == ATT_X) {
 	/* transform pattern real coordinate */
-	int x, y;
-	int pos;
-	
-	TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-	x += m;
-	y += n;
-	pos = POS(x, y);
+	int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+				   ll, m, n);
 
 	if (worm[pos].attack_codes[0] == WIN
 	  && (move == NO_MOVE
@@ -177,19 +163,14 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
   first_dragon  = NO_MOVE;
   second_dragon = NO_MOVE;
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-    int x, y; /* absolute (board) co-ords of (transformed) pattern element */
-    int pos;
-    
     /* transform pattern real coordinate */
-    TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-    x += m;
-    y += n;
-    pos = POS(x, y);
+    int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+			       ll, m, n);
 
     /* Look for dragons to amalgamate. Never amalgamate stones which
      * can be attacked.
      */
-    if ((pattern->class & CLASS_C) && (BOARD(x, y) == color)
+    if ((pattern->class & CLASS_C) && (board[pos] == color)
 	&& (worm[pos].attack_codes[0] == 0)) {
       if (first_dragon == NO_MOVE)
 	first_dragon = dragon[pos].origin;

@@ -2569,16 +2569,13 @@ static void
 owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
 		    int ll, void *data)
 {
-  int ti, tj, tval;  /* trial move and its value */
+  int tval;  /* trial move and its value */
   int move;
   struct owl_move_data *moves = data; /* considered moves passed as data */
   int same_dragon;
 
   /* Pick up the location of the move */
-  TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
-  ti += m;
-  tj += n;
-  move = POS(ti, tj);
+  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
 
   /* Before we do any expensive reading, check whether this move
    * already is known with a higher value or if there are too many

@@ -599,9 +599,9 @@ static void
 influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 		   void *data)
 {
-  int ti, tj;
+  int pos;
   int k;
-  int saved_pos;
+  int saved_pos = NO_MOVE;
   struct influence_data *q = data;
   
   /* Patterns marked FY get ignored in experimental influence,
@@ -710,15 +710,13 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
     }
   }
 
-  TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
-  ti += m;
-  tj += n;
+  pos = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
 
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
    */
   if (pattern->autohelper_flag & HAVE_CONSTRAINT) {
-    if (!pattern->autohelper(pattern, ll, POS(ti, tj), color, 0))
+    if (!pattern->autohelper(pattern, ll, pos, color, 0))
       return;
   }
 
@@ -726,10 +724,10 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * be rejected.
    */
   if (pattern->helper) {
-    if (!pattern->helper(pattern, ll, POS(ti, tj), color)) {
+    if (!pattern->helper(pattern, ll, pos, color)) {
       DEBUG(DEBUG_INFLUENCE,
 	    "Influence pattern %s+%d rejected by helper at %1m\n",
-	    pattern->name, ll, POS(ti, tj));
+	    pattern->name, ll, pos);
       return;
     }
   }
@@ -740,7 +738,7 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
   /* For t patterns, everything happens in the action. */
   if ((pattern->class & CLASS_t)
       && (pattern->autohelper_flag & HAVE_ACTION)) {
-    pattern->autohelper(pattern, ll, POS(ti, tj), color, 1);
+    pattern->autohelper(pattern, ll, pos, color, 1);
   }
   
   
@@ -756,14 +754,14 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
     /* Increase strength if we're computing escape influence. */
     if (q == &escape_influence && (pattern->class & CLASS_e))
-      add_influence_source(POS(ti, tj), this_color,
+      add_influence_source(pos, this_color,
 			   20 * pattern->value, 1.5, q);
     else
-      add_influence_source(POS(ti, tj), this_color, pattern->value, 1.5, q);
+      add_influence_source(pos, this_color, pattern->value, 1.5, q);
 
     DEBUG(DEBUG_INFLUENCE,
-	  "  low intensity influence source at %m, strength %f, color %C\n",
-	  ti, tj, pattern->value, this_color);
+	  "  low intensity influence source at %1m, strength %f, color %C\n",
+	  pos, pattern->value, this_color);
     return;
   }
   
@@ -771,11 +769,11 @@ influence_callback(int m, int n, int color, struct pattern *pattern, int ll,
    * pattern defined strength at *.
    */
   if (pattern->class & CLASS_E) {
-    add_influence_source(POS(ti, tj), color,
+    add_influence_source(pos, color,
 			 pattern->value, DEFAULT_ATTENUATION, q);
     DEBUG(DEBUG_INFLUENCE,
-	  "  extra %C source at %m, strength %f\n", color,
-	  ti, tj, pattern->value);
+	  "  extra %C source at %1m, strength %f\n", color,
+	  pos, pattern->value);
     return;
   }
   
@@ -856,16 +854,15 @@ followup_influence_callback(int m, int n, int color, struct pattern *pattern,
   for (k = 0; k < pattern->patlen; ++k)  /* match each point */
     if (pattern->patn[k].att == ATT_not) {
       /* transform pattern real coordinate */
-      int x, y;
-      TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-      x += m;
-      y += n;
+      int pos;
+      pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+			     ll, m, n);
 
       /* Low intensity influence source for the color in turn to move. */
-      enter_intrusion_source(saved_stone, POS(x, y), pattern->value,
+      enter_intrusion_source(saved_stone, pos, pattern->value,
 			     EXP_DEFAULT_ATTENUATION, &followup_influence);
-      DEBUG(DEBUG_INFLUENCE, "  followup for %m: intrusion at %m\n",
-            m, n, x, y);
+      DEBUG(DEBUG_INFLUENCE, "  followup for %m: intrusion at %1m\n",
+            m, n, pos);
     }
 }
 

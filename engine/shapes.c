@@ -41,7 +41,6 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 		void *data)
 {
   int k, l;
-  int ti, tj;  /* trial move and its value */
   int move;
   
   /* Dragons of our color. */
@@ -59,10 +58,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   UNUSED(data);
   
   /* Pick up the location of the move */
-  TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
-  ti += m;
-  tj += n;
-  move = POS(ti, tj);
+  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
   
   /* For some classes of patterns we need to find all dragons present
    * in the pattern.
@@ -74,7 +70,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
     /* Match each point. */
     for (k = 0; k < pattern->patlen; ++k) { 
-      int x, y; /* absolute (board) co-ords of (transformed) pattern element */
+      int pos; /* absolute (board) co-ord of (transformed) pattern element */
       int origin; /* dragon origin */
       
       /* all the following stuff (currently) applies only at occupied cells */
@@ -82,9 +78,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	continue;
 
       /* transform pattern real coordinate */
-      TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-      x += m;
-      y += n;
+      pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, ll, m, n);
 
       /* Already, matchpat rejects O patterns containing a friendly stone with
        * DEAD or CRITICAL matcher_status. If the stone is tactically
@@ -95,13 +89,13 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
        * known by matchpat().
        */
       if ((class & CLASS_O)
-	  && BOARD(x, y) == color
-	  && worm[POS(x, y)].attack_points[0] != 0
-	  && !does_defend(move, POS(x, y)))
+	  && board[pos] == color
+	  && worm[pos].attack_points[0] != 0
+	  && !does_defend(move, pos))
 	return;
 
-      origin = dragon[POS(x, y)].origin;
-      if (BOARD(x, y) == color && my_ndragons < MAX_DRAGONS_PER_PATTERN) {
+      origin = dragon[pos].origin;
+      if (board[pos] == color && my_ndragons < MAX_DRAGONS_PER_PATTERN) {
 	for (l = 0; l < my_ndragons; l++) {
 	  if (my_dragons[l] == origin)
 	    break;
@@ -111,8 +105,8 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
            * rather the underlying worm) cannot be tactically
            * captured before adding it to the list of my_dragons.  
 	   */
-	  if (worm[POS(x, y)].attack_codes[0] == 0
-	      || does_defend(move, POS(x, y))) {
+	  if (worm[pos].attack_codes[0] == 0
+	      || does_defend(move, pos)) {
 	    /* Ok, add the dragon to the list. */
 	    my_dragons[l] = origin;
 	    my_ndragons++;
@@ -120,7 +114,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	}
       }
 
-      if (BOARD(x, y) == other && your_ndragons < MAX_DRAGONS_PER_PATTERN) {
+      if (board[pos] == other && your_ndragons < MAX_DRAGONS_PER_PATTERN) {
 	for (l = 0; l < your_ndragons; l++) {
 	  if (your_dragons[l] == origin)
 	    break;

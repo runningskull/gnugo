@@ -1636,15 +1636,11 @@ static void
 attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
 		void *data)
 {
-  int ti, tj;
   int move;
   int k;
   UNUSED(data);
 
-  TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
-  ti += m;
-  tj += n;
-  move = POS(ti, tj);
+  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
 
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
@@ -1670,13 +1666,10 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     if (pattern->patn[k].att == ATT_X) {
       /* transform pattern real coordinate */
-      int x, y;
-      int str;
-      TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-      x += m;
-      y += n;
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+				 ll, m, n);
 
-      str = worm[POS(x, y)].origin;
+      int str = worm[pos].origin;
 
       /* A string with 5 liberties or more is considered tactically alive. */
       if (countlib(str) > 4)
@@ -1732,15 +1725,11 @@ static void
 defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
 		 void *data)
 {
-  int ti, tj;
   int move;
   int k;
   UNUSED(data);
 
-  TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
-  ti += m;
-  tj += n;
-  move = POS(ti, tj);
+  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
   
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
@@ -1766,13 +1755,9 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     if (pattern->patn[k].att == ATT_O) {
       /* transform pattern real coordinate */
-      int x, y;
-      int str;
-      TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-      x += m;
-      y += n;
-
-      str = worm[POS(x, y)].origin;
+      int pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+				 ll, m, n);
+      int str = worm[pos].origin;
 
       if (worm[str].attack_codes[0] == 0
 	  || defense_move_known(move, str))

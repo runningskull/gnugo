@@ -83,6 +83,16 @@ do { \
   *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
 } while (0)
 
+/* The ordinary TRANSFORM plus translation with (m, n), returned as a
+ * 1D coordinate.
+ */
+#define AFFINE_TRANSFORM(i, j, trans, m, n) \
+  POS((m) + transformations[trans][0][0] * (i) \
+          + transformations[trans][0][1] * (j), \
+      (n) + transformations[trans][1][0] * (i) \
+          + transformations[trans][1][1] * (j))
+
+
 #define ATTACK_MACRO(pos) ((stackp==0) ? (worm[pos].attack_codes[0]) : attack(pos, NULL))
 #define DEFEND_MACRO(pos) ((stackp==0) ? (worm[pos].defend_codes[0]) : find_defense(pos, NULL))
 #define DRAGON_WEAK(pos) (DRAGON2(pos).safety != ALIVE \

@@ -2692,16 +2692,12 @@ reading_attack_callback(int m, int n, int color,
 			    struct pattern *pattern, int ll, void *data)
 {
   int k;
-  int ti, tj;
   int move;
   int value = pattern->value;
   struct reading_move_data *moves = data;
   UNUSED(data);
 
-  TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
-  ti += m;
-  tj += n;
-  move = POS(ti, tj);
+  move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
 
   for (k = 0; k < MAX_READING_MOVES; k++) {
     if (moves[k].pos) {
@@ -2761,13 +2757,8 @@ reading_attack_callback(int m, int n, int color,
     for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     if (pattern->patn[k].att == ATT_X) {
       /* transform pattern real coordinate */
-      int x, y;
-      int str;
-      TRANSFORM(pattern->patn[k].x, pattern->patn[k].y, &x, &y, ll);
-      x += m;
-      y += n;
-
-      str = find_origin(POS(x, y));
+      int str = find_origin(AFFINE_TRANSFORM(pattern->patn[k].x,
+					     pattern->patn[k].y, ll, m, n));
       readpat_tried[str] = 1;
       /*gprintf("Matched at %1m\n", str);*/
     }
