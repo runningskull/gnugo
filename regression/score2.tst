@@ -113,3 +113,7 @@ loadsgf games/scoring/score58.sgf
 loadsgf games/nngs/gnugo-3.3.8-evand-200209090532.sgf
 59 final_score
 #? [W\+15.5]
+
+loadsgf games/nngs/silverado-gnugo-3.3.8-200209120723.sgf
+60 final_score
+#? [B\+19.5]

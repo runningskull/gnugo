@@ -63,6 +63,8 @@ reset_reading_node_counter
 # Strategy4 168
 # Strategy4 185
 # Strategy4 206
+# Strategy5 275
+# Strategy5 276
 
 # for any of these problems, if PASS is a solution it is the best
 # solution. However the other solutions are acceptable.

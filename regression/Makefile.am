@@ -115,9 +115,6 @@ ld_owl: ld_owl.tst
 ld_owl_rot: ld_owl_rot.tst
 	$(srcdir)/eval.sh ld_owl_rot.tst $(GG_OPTIONS)
 
-life: life.tst
-	$(srcdir)/eval.sh life.tst --life $(GG_OPTIONS)
-
 manyfaces: manyfaces.tst
 	$(srcdir)/eval.sh manyfaces.tst $(GG_OPTIONS)
 

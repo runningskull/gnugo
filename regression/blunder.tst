@@ -96,3 +96,34 @@ loadsgf games/handtalk/handtalk13.sgf 123
 loadsgf games/handtalk/handtalk13.sgf 131
 21 gg_genmove black
 #? [L9]
+
+# R18 is suicidal
+loadsgf games/blunder15.sgf
+22 gg_genmove black
+#? [!R18|R19]
+
+# Don't play an outer liberty and let white have a ko.
+loadsgf games/blunder16.sgf
+23 gg_genmove black
+#? [!F4|F5|F6]
+
+# Don't play the outer liberty and let white make seki.
+loadsgf games/blunder17.sgf
+24 gg_genmove black
+#? [!P5]
+
+# Don't play an outer liberty and let white make seki or better.
+loadsgf games/blunder18.sgf
+25 gg_genmove black
+#? [!P9|M5|T9]
+
+# Don't play an outer liberty and let black make seki or better.
+loadsgf games/blunder19.sgf
+26 gg_genmove white
+#? [!D19|F17]
+
+# R3 lets black play T2 and get seki.
+loadsgf games/blunder20.sgf
+27 gg_genmove white
+#? [!R3]
+

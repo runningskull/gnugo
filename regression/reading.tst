@@ -693,6 +693,10 @@ popgo
 popgo
 popgo
 
+loadsgf games/reading38.sgf
+172 defend N14
+#? [1 Q10]
+
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
