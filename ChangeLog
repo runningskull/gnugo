@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- corrects quoting of special characters in regress.plx
 - sgffile_loadandprint() renamed to sgffile_printsgf() and revised
 - use EOF rather than -1 the code to read sgf files in sgfnode.c
 - major revision of code to write an sgf tree to file in sgfnode.c

@@ -173,8 +173,8 @@ my %fullHash;
 
 sub insinglequote {
   my $s = shift;
-  $s =~ s@\\@\\\\@;
-  $s =~ s@'@\\'@;
+  $s =~ s@\\@\\\\@g;
+  $s =~ s@'@\\'@g;
   return "'$s'";
 }
 
