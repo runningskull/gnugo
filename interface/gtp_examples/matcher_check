@@ -26,10 +26,9 @@
 #
 # matcher_check info:
 #
-# plays one gtp program against itself, and watches for bad
-# status transitions.
+# Plays one gtp program against itself or lets it analzye a saved .sgf-file,
+# and watches for bad status transitions.
 #
-# FIXME: allow analysis of sgf files
 # FIXME: if the vertex by which a dragon is named ever changes,
 # the hash table used will consider it new.  therefore, if the
 # vertex changes at the same time an illegal state change occurs,
@@ -134,6 +133,12 @@ my $prog_out = new FileHandle;		# stdout of program
 if ($loadfile)
 {
     #we need to analyze an sgf file
+    if (not defined $movecount) {
+	print "Error: When analyzing an sgf file with --loadsgf <filename>, you also need to
+specify the number of moves to check with --movecount <n>.
+";
+	exit;
+    }
     $pidp = open2($prog_out, $prog_in, $program);
     print "program pid: $pidp\n" if $verbose;
 
