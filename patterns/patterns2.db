@@ -1289,12 +1289,19 @@ Pattern Shape5
 
 
 Pattern Shape6
+# gf Added constraint. (3.1.15)
 
-*.O     classical good shape
+*.O     classical good shape, unless it leaves a double atari
 ..O
 OOX
 
 :\,-,shape(2)
+
+*.O
+.aO
+OOX
+
+;oplay_attack(*,a,a)
 
 
 Pattern Shape6b
@@ -2331,6 +2338,26 @@ oO.?
 :8,-,shape(-1)
 
 
+Pattern Shape75
+# gf New pattern. (3.1.15)
+
+?Xxx
+.OXx
+..*.
+....
+----
+
+:8,-,shape(-1)
+
+?XDx
+bOXx
+.a*c
+....
+----
+
+;(o_somewhere(D) || oplay_attack(*,?,D,D)) && !oplay_defend(*,a,b,c,*)
+
+
 ###########################
 #
 # Followup moves. 
@@ -2628,6 +2655,22 @@ a*X
 ---
 
 ;xplay_attack(*,a,b,*) && xplay_defend_both(*,a,b,*,b)
+
+
+Pattern Sente17
+# gf New pattern. (3.1.15)
+
+.OXx
+.*oX
+----
+
+:8,X,reverse_followup(5)
+
+cdXx
+a*bX
+----
+
+;alive(d) && !xplay_defend_both(*,a,b,?,c,a,d)
 
 
 ########################################################

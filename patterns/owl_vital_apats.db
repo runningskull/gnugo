@@ -585,6 +585,25 @@ XOX
 ; oplay_defend_both(*,A,*)
 
 
+Pattern VA29
+# gf New pattern. (3.1.15)
+# See trevora:25
+
+??O
+x..           capture a string at the edge of an eyespace
+.*X
+...
+---
+
+:8,-,value(80)
+
+??O
+x..
+.*A
+...
+---
+
+;owl_big_eyespace(*,A) && !oplay_defend(*,A)
+
+
 # END OF FILE
-
-

@@ -45,6 +45,7 @@
 - handling of tactical moves in worm.c no longer static
 - tuning
 - influence tuning
+- connection_tuning
 - owl tuning
 - test revisions
 - new trevora tests

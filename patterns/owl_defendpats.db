@@ -932,16 +932,17 @@ OX*o
 
 
 Pattern D300
+# gf Revised pattern. (3.1.15)
 
-X..?          push into the open
-O*..
-x..?
+X..??          push into the open
+O*..?
+x..??
 
 :8,-,value(80)
 
-X..?
-O*.a
-x..?
+X..??
+O*.a?
+x..??
 
 ;owl_escape_value(a) > 1
 
@@ -2205,6 +2206,7 @@ Ba*
 
 
 Pattern D704b
+# gf Revised constraint. (3.1.15)
 
 oO.         half eye sometimes missed
 O.*
@@ -2212,12 +2214,12 @@ O.*
 
 :8,-,value(35)
 
-oOb
-Ba*
+cOb
+Oa*
 ---
 
 ; safe_xmove(b) && safe_xmove(*) && oplay_attack(*,b,b)
-; && owl_topological_eye(a,B)==3
+; && (o_somewhere(c) || !safe_xmove(c))
 
 
 Pattern D705
@@ -2377,6 +2379,22 @@ O*           defend against atari inside eyespace
 a*
 
 ; lib(a)==2 && xlib(*)>1 && owl_big_eyespace(*,a)
+
+
+Pattern D715b
+# gf New pattern. (3.1.15)
+
+O.*
+XO.           defend against atari inside eyespace on edge
+---
+
+:8,-,value(36)
+
+O.*
+Xab
+---
+
+;xlib(b)>1 && owl_big_eyespace(b,a) && oplay_attack(*,b,b)
 
 
 Pattern D716
@@ -3158,6 +3176,35 @@ O*           stop capture inside eyespace, not ko
 a*
 
 ;lib(a)==1 && owl_eyespace(*,a) && olib(*) > 0
+
+
+Pattern D910a
+# gf New pattern. (3.1.15)
+
+o.O.X        block
+.*X..
+.....
+-----
+
+:8,-,value(65)
+
+
+Pattern D910b
+# gf New pattern. (3.1.15)
+
+o.O.X        block in sente
+.*X..
+.....
+-----
+
+:8,-,value(75)
+
+obO.X
+.*Xa.
+.....
+-----
+
+;xplay_attack(a,*,b,b)
 
 
 #########################################################
@@ -4110,6 +4157,7 @@ f*ag
 
 
 Pattern D1302
+# gf Revised constraint. (3.1.15)
 
 OX?        try to connect out
 .*O
@@ -4119,9 +4167,10 @@ OX?        try to connect out
 
 bX?
 a*c
-.??
+.de
 
-;(!owl_goal_dragon(b) || !owl_goal_dragon(c)) && oplay_attack(*,a,a)
+;!(o_somewhere(d) && o_somewhere(e))
+;&& (!owl_goal_dragon(b) || !owl_goal_dragon(c)) && oplay_attack(*,a,a)
 
 
 Pattern D1303
@@ -4214,20 +4263,21 @@ X.O.?
 
 
 Pattern D1308
+# gf Not towards edge. (3.1.15)
 
-oooo
-O.*o    try to escape
-....
-....
-----
+oooo?
+O.*o?	 try to escape
+....?
+....?
+-----
 
 :8,-,value(75)
 
-ooob
-O.*a
-....
-....
-----
+ooob?
+O.*a?
+....?
+....?
+-----
 
 ;owl_escape_value(a) + owl_escape_value(b) > 0
 

@@ -212,12 +212,13 @@ X.XO
 
 
 Pattern A107
+# gf Not on second line without known support. See trevora:290. (3.1.15)
 
-....      block on third line
-X.*.
-....
-....
-----
+....?	   block on third line
+X.*.?
+....?
+....?
+-----
 
 :8,-,value(50)
 
@@ -1758,6 +1759,24 @@ X.D?
 ----
 
 ;oplay_attack(*,a,b,c,D)
+
+
+Pattern A614
+# gf New pattern. (3.1.15)
+
+XXO?        destroy eyespace when we can't capture
+..XO
+X.*.
+----
+
+:8,-,value(65)
+
+XXO?
+.aXO
+X.*.
+----
+
+;!oplay_attack(a,*,*)
 
 
 #########################################################

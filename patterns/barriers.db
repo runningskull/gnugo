@@ -1374,6 +1374,25 @@ O!
 ;lib(A)==1
 
 
+Pattern Intrusion42
+
+?Ooo
+.XOo
+.!X.
+....
+----
+
+:8,B,value(30)
+
+?Oeo
+bXOo
+.aDc
+....
+----
+
+;(o_somewhere(e) || !safe_xmove(e)) && !oplay_defend(a,b,c,D)
+
+
 Pattern Nonterritory1
 
 OxO
@@ -1704,6 +1723,46 @@ Pattern Nonterritory17
 
 >non_oterritory(a);
 >non_oterritory(c);
+
+
+Pattern Nonterritory18a
+
+.XOo
+..xO
+----
+
+:8,t
+
+dEOo
+bacO
+----
+
+;!oplay_defend_both(a,b,c,?,d,b,E)
+
+>non_xterritory(a);
+>non_xterritory(b);
+>non_xterritory(d);
+
+
+Pattern Nonterritory18b
+
+..XOo
+...xO
+-----
+
+:8,t
+
+fbXOo
+dcaeO
+-----
+
+;!oplay_defend_both(a,b,c,d,e,?,f,d,b)
+
+>non_xterritory(a);
+>non_xterritory(b);
+>non_xterritory(c);
+>non_xterritory(d);
+>non_xterritory(f);
 
 
 # END OF FILE

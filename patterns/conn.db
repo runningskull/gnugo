@@ -411,6 +411,25 @@ O.X
 :8,B
 
 
+Pattern EB24
+
+??X
+?!.
+.*O
+.!.
+---
+
+:8,B
+
+??X
+?!.
+.*a
+.!.
+---
+
+;!xplay_defend(*,a)
+
+
 ##########################
 #
 # B patterns in the center
@@ -1146,34 +1165,6 @@ Xaf
 >  amalgamate(e,f);
 >else
 >  amalgamate_most_valuable_helper(e,f,g);
-
-
-##############################
-#
-# eye space modifying patterns
-#
-##############################
-
-# Pattern Eye1
-# Taken out because it caused a crash. 
-# Experiment with patterns that modify the eye space computed
-# by make_domains.
-# 
-# XXOO?
-# XO.OX
-# .....
-# -----
-# 
-# :8,e
-# 
-# ?XOO?
-# XOaOX
-# .....
-# -----
-# 
-# ;marginal_eye(a)
-# 
-# >make_proper_eye(a)
 
 
 #############################
