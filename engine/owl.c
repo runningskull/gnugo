@@ -111,6 +111,7 @@ struct owl_move_data {
   const char *name; /* name of the pattern suggesting the move */
   int same_dragon;  /* whether the move extends the dragon or not */
   int escape;       /* true if an escape pattern is matched */
+  int defense_pos;  /* defense coordinate for vital owl attack patterns. */
 };
 
 struct matched_pattern_data {
@@ -153,7 +154,8 @@ static void owl_shapes_callback(int m, int n, int color,
 				struct pattern *pattern_db,
 				int ll, void *data);
 static void owl_add_move(struct owl_move_data *moves, int move, int value,
-			 const char *reason, int same_dragon, int escape);
+			 const char *reason, int same_dragon, int escape,
+			 int defense_pos);
 static void owl_determine_life(struct local_owl_data *owl,
 			       struct local_owl_data *second_owl,
 			       int komaster, int does_attack,
@@ -632,7 +634,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       owl_add_move(moves, vital_defensive_moves[k].pos,
 		   move_value, "vital defensive move", 
 		   vital_defensive_moves[k].same_dragon,
-		   vital_defensive_moves[k].escape);
+		   vital_defensive_moves[k].escape, NO_MOVE);
     }
     for (k = 0; 
 	 k < MAX_SEMEAI_MOVES && vital_offensive_moves[k].pos != NO_MOVE;
@@ -662,7 +664,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       owl_add_move(moves, vital_offensive_moves[k].pos,
 		   move_value, vital_offensive_moves[k].name,
 		   same_dragon,
-		   vital_offensive_moves[k].escape);
+		   vital_offensive_moves[k].escape, NO_MOVE);
     }
     for (k = 0; 
 	 k < MAX_SEMEAI_MOVES && shape_defensive_moves[k].pos != NO_MOVE;
@@ -689,7 +691,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 		   move_value,
 		   shape_defensive_moves[k].name,
 		   shape_defensive_moves[k].same_dragon,
-		   shape_defensive_moves[k].escape);
+		   shape_defensive_moves[k].escape, NO_MOVE);
     }
     for (k = 0; 
 	 k < MAX_SEMEAI_MOVES && shape_offensive_moves[k].pos != NO_MOVE;
@@ -720,7 +722,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 		   move_value,
 		   shape_offensive_moves[k].name,
 		   same_dragon,
-		   shape_offensive_moves[k].escape);
+		   shape_offensive_moves[k].escape, NO_MOVE);
     }
     /* If no owl moves were found, turn off the owl phase */
     if (moves[0].pos == 0)
@@ -810,20 +812,20 @@ do_owl_analyze_semeai(int apos, int bpos,
     move_value = semeai_move_value(outside_liberty.pos,
 				   owla, owlb, 50);
     owl_add_move(moves, outside_liberty.pos, move_value,
-		 "safe outside liberty", 0, 0);
+		 "safe outside liberty", 0, 0, NO_MOVE);
   }
   else if (backfilling_move_found && backfilling_move.pos != NO_MOVE) {
     move_value = semeai_move_value(backfilling_move.pos,
 				   owla, owlb, 50);
     owl_add_move(moves, backfilling_move.pos, move_value,
-		 "backfilling move", 0, 0);
+		 "backfilling move", 0, 0, NO_MOVE);
   }
   else if (safe_common_liberty_found
 	   && common_liberty.pos != NO_MOVE) {
     move_value = semeai_move_value(common_liberty.pos,
 				   owla, owlb, 10);
     owl_add_move(moves, common_liberty.pos, move_value,
-		 "safe common liberty", 1, 0);
+		 "safe common liberty", 1, 0, NO_MOVE);
   }
   /* Now we are ready to try moves. Turn on the sgf output ... */
   sgf_dumptree = save_sgf_dumptree;
@@ -1868,6 +1870,7 @@ do_owl_defend(int str, int *move, int *wormid,
   int eyemin = -1;               /* Lower bound on the number of eyes. */
   int eyemax = -1;               /* Upper bound on the number of eyes. */
   struct eyevalue probable_eyes; /* Best guess of eyevalue. */
+  int escape_route;
   const char *live_reason;
   int move_cutoff;
   Read_result *read_result = NULL;
@@ -1912,7 +1915,8 @@ do_owl_defend(int str, int *move, int *wormid,
    * FIXME: Should introduce a new owl depth value rather than having
    *        this hardwired value.
    */
-  if (stackp > 2 && owl_escape_route(owl) >= 5) {
+  escape_route = owl_escape_route(owl);
+  if (stackp > 2 && escape_route >= 5) {
     /* FIXME: We probably should make distinction in the returned
      * result whether the dragon lives by making two eyes or by
      * escaping.
@@ -1984,6 +1988,12 @@ do_owl_defend(int str, int *move, int *wormid,
 	READ_RETURN(read_result, move, shape_moves[0].pos, WIN);
       }
       moves = shape_moves;
+
+      if (eyemax == 0 && escape_route == 0)
+	move_cutoff = 67;
+      else if (eyemax <= 1 && escape_route <= 2)
+	move_cutoff = 32;
+
       break;
 
     case 0:
@@ -2325,8 +2335,22 @@ owl_estimate_life(struct local_owl_data *owl,
       gg_assert(0);
     return 1;
   }
-  else
-    return 0;
+
+  if (!does_attack
+      && (*eyemin + matches_found >= 2
+	  || (*eyemin + matches_found == 1 && min_eyes(probable_eyes) >= 4)
+      || (stackp > owl_distrust_depth
+	  && min_eyes(probable_eyes) >= 2))) {
+    /* We are not yet alive only due to owl vital attack patterns matching.
+     * Let's try to defend against it.
+     */
+    owl_add_move(vital_moves, dummy_moves[0].defense_pos,
+		 dummy_moves[0].value, dummy_moves[0].name, 2, 0, NO_MOVE);
+  }
+
+    
+      
+  return 0;
 }
 
 
@@ -2577,7 +2601,7 @@ owl_determine_life(struct local_owl_data *owl,
 	      TRACE("vital point looked stupid, moved it to %1m\n",
 		    attack_point);
 	    
-	    owl_add_move(moves, attack_point, value, reason, 1, 0);
+	    owl_add_move(moves, attack_point, value, reason, 1, 0, NO_MOVE);
 	    vital_values[attack_point] = value;
 	    eyes_attack_points[num_eyes] = attack_point;
 	  }
@@ -2628,7 +2652,7 @@ owl_determine_life(struct local_owl_data *owl,
 	      TRACE("vital point looked stupid, moved it to %1m\n",
 		    defense_point);
 	    
-	    owl_add_move(moves, defense_point, value, reason, 1, 0);
+	    owl_add_move(moves, defense_point, value, reason, 1, 0, NO_MOVE);
 	    vital_values[defense_point] = value;
 	  }
 	}
@@ -2706,14 +2730,16 @@ owl_determine_life(struct local_owl_data *owl,
 
 	  TRACE("save lunch at %1m with %1m, score %d\n",
 		owl->lunch[lunch], defense_point, value);
-	  owl_add_move(moves, defense_point, value, "save lunch", 1, 0);
+	  owl_add_move(moves, defense_point, value,
+	      	       "save lunch", 1, 0, NO_MOVE);
 	}
 	else {
 	  attack_point = improve_lunch_attack(owl->lunch[lunch],
 					      owl->lunch_attack_point[lunch]);
 	  TRACE("eat lunch at %1m with %1m, score %d\n",
 		owl->lunch[lunch], attack_point, value);
-	  owl_add_move(moves, attack_point, value, "eat lunch", 1, 0);
+	  owl_add_move(moves, attack_point, value, "eat lunch",
+	      	       1, 0, NO_MOVE);
 	  num_lunch++;
 	  eyevalue_list[num_eyes++] = e;
 	}
@@ -3243,6 +3269,7 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
   struct owl_move_data *moves = data; /* considered moves passed as data */
   int same_dragon = 1;
   int escape = 0;
+  int defense_pos;
 
   /* Pick up the location of the move */
   move = AFFINE_TRANSFORM(pattern->movei, pattern->movej, ll, m, n);
@@ -3307,8 +3334,19 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
     escape = 1;
   else 
     escape = 0;
+
+  /* Finally, check for position of defense move. */
+  {
+    int k;
+    defense_pos = move;
+    for (k = 0; k < pattern->patlen; k++)
+      if (pattern->patn[k].att == ATT_not)
+	defense_pos = AFFINE_TRANSFORM(pattern->patn[k].x, pattern->patn[k].y,
+				       ll, m, n);
+  }
   
-  owl_add_move(moves, move, tval, pattern->name, same_dragon, escape);
+  owl_add_move(moves, move, tval, pattern->name, same_dragon, escape,
+	       defense_pos);
 }
 
 
@@ -3316,7 +3354,7 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
 
 static void
 owl_add_move(struct owl_move_data *moves, int move, int value,
-	     const char *reason, int same_dragon, int escape)
+	     const char *reason, int same_dragon, int escape, int defense_pos)
 {
   int k;
 
@@ -3363,6 +3401,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
 	 */
 	moves[k].same_dragon = same_dragon;
 	moves[k].escape = escape;
+	moves[k].defense_pos = defense_pos;
       }
       break;
     }

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- owl vital attack patterns now also used for owl defense
 - major revision of connection_value(), using new function
   crude_dragon_weakness()
 - reading.c: new move for defend1(): try to set up snap back

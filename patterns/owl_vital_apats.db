@@ -40,6 +40,7 @@
 #  x     : your piece or empty
 #  o     : my piece or empty
 #  *     : my next move
+#  !	 : your defense move against * (if different)
 #  -, |  : edge of board
 #  +     : corner of board
 #
@@ -203,7 +204,7 @@ XOOXXx
 
 ?XX???
 XaaXXx
-.aX*.x
+!aX*.x
 ------
 
 ;attack(a) && !defend(a)
@@ -227,7 +228,7 @@ Pattern VA13
 |XX?        take ko to maybe kill
 |*XX
 |XOX
-|O.O
+|O!O
 +---
 
 :8,s,value(85)
@@ -244,7 +245,7 @@ Pattern VA13
 Pattern VA14
 
 ?OX         force X to defend inside own eyespace
-OX.
+OX!
 *XO
 ---
 
@@ -293,7 +294,7 @@ X..?
 Pattern VA17
 
 xXXOo         exploit shortage of liberties
-.O*XO
+!O*XO
 .X.Xo
 
 :8,s,value(35)
@@ -307,7 +308,7 @@ aO*XO
 
 Pattern VA18
 
-XX.O       throw in to kill an eye
+XX!O       throw in to kill an eye
 .*X?
 XXO?
 
@@ -445,7 +446,7 @@ Pattern VA26
 # gf New pattern. (3.1.15)
 
 ??XX?       making nakade is only chance to kill, unless we can capture
-?XO.X       some of the wall
+?XO!X       some of the wall
 X*XOX
 X.OX?
 ?XX??
@@ -509,7 +510,7 @@ Pattern VA29
 # gf New pattern. (3.1.15)
 
 |XXX?        not two certain eyes
-|.O.X
+|!O.X
 |OX*x
 +----
 
@@ -519,7 +520,7 @@ Pattern VA29
 Pattern VA30
 # gf New pattern. (3.1.15)
 
-?XX.         atari to destroy eye
+?XX!         atari to destroy eye
 X.*X
 ?XX?
 
@@ -538,7 +539,7 @@ Pattern VA31
 ?O.|
 OX.|
 X.X|
-X.*|
+X!*|
 ??.|
 
 :8,s,value(76)
@@ -548,7 +549,7 @@ Pattern VA32
 # tm New pattern (3.1.15)  (see maeda0:60)
 
 ?O*|
-OX.|
+OX!|
 X.X|
 XXO|
 
@@ -560,7 +561,7 @@ Pattern VA33
 
 ?X|
 XO|
-.O|
+!O|
 *X|
 
 :8,-,value(76)
@@ -572,7 +573,7 @@ Pattern VA34
 
 ?X?
 XOX
-.OX
+!OX
 *XO
 
 :8,-,value(76)
@@ -620,7 +621,7 @@ Pattern VA37
 
 ?xXO?
 ?X.XO
-O.X.*
+O.X!*
 -----
 
 :8,-,value(45)
@@ -638,7 +639,7 @@ Pattern VA38
 # See trevora:25
 
 ??O
-x..           capture a string at the edge of an eyespace
+x!.           capture a string at the edge of an eyespace
 .*X
 ...
 ---
@@ -658,7 +659,7 @@ Pattern VA39
 # tm New Pattern (3.1.16)
 
 XO*|	  atari to kill eye
-.XX|
+!XX|
 XOO|
 
 :8,s,value(95)
@@ -693,7 +694,7 @@ Pattern VA41
 
 XXO
 .*X
-..X
+!.X
 
 :8,s,value(95)
 
@@ -811,7 +812,7 @@ Pattern VA48
 
 +----
 |.*..
-|XX.O
+|XX!O
 
 :8,s,value(75)
 
