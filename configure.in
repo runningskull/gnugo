@@ -303,14 +303,6 @@ fi
 
 dnl ------------ dfa -------------------
 
-AH_TEMPLATE([DFA_ENABLED],
-[Define as 1 to enable the DFA pattern matcher])
-
-if test "$enable_dfa" = "yes" ; then
-   AC_DEFINE(DFA_ENABLED, 1)
-else
-   AC_DEFINE(DFA_ENABLED, 0)
-fi
 AM_CONDITIONAL(DFA_ENABLED, test "$enable_dfa" = "yes")
 
 

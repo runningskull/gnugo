@@ -14,24 +14,12 @@ INCLUDES = \
 	-I$(top_srcdir)/engine \
 	-I$(top_srcdir)/utils
 
-if DFA_ENABLED
-
 LDADD = \
 	../engine/libengine.a \
 	../patterns/libpatterns.a \
 	../patterns/libdfa.a \
 	../sgf/libsgf.a \
 	../utils/libutils.a
-
-else
-
-LDADD = \
-	../engine/libengine.a \
-	../patterns/libpatterns.a \
-	../sgf/libsgf.a \
-	../utils/libutils.a
-
-endif
 
 gnugo_SOURCES = \
 	main.c \

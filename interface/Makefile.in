@@ -89,8 +89,8 @@ DISTCLEANFILES = *~
 INCLUDES =  	-I$(top_srcdir)/sgf 	-I$(top_srcdir)/engine 	-I$(top_srcdir)/utils
 
 
-@DFA_ENABLED_TRUE@LDADD = 	../engine/libengine.a 	../patterns/libpatterns.a 	../patterns/libdfa.a 	../sgf/libsgf.a 	../utils/libutils.a
-@DFA_ENABLED_FALSE@LDADD = 	../engine/libengine.a 	../patterns/libpatterns.a 	../sgf/libsgf.a 	../utils/libutils.a
+LDADD =  	../engine/libengine.a 	../patterns/libpatterns.a 	../patterns/libdfa.a 	../sgf/libsgf.a 	../utils/libutils.a
+
 
 gnugo_SOURCES =  	main.c 	play_ascii.c 	play_gmp.c 	play_gtp.c 	play_solo.c 	play_test.c 	gmp.c 	gtp.c
 
@@ -110,12 +110,8 @@ LIBS = @LIBS@
 gnugo_OBJECTS =  main.o play_ascii.o play_gmp.o play_gtp.o play_solo.o \
 play_test.o gmp.o gtp.o
 gnugo_LDADD = $(LDADD)
-@DFA_ENABLED_TRUE@gnugo_DEPENDENCIES =  ../engine/libengine.a \
-@DFA_ENABLED_TRUE@../patterns/libpatterns.a ../patterns/libdfa.a \
-@DFA_ENABLED_TRUE@../sgf/libsgf.a ../utils/libutils.a
-@DFA_ENABLED_FALSE@gnugo_DEPENDENCIES =  ../engine/libengine.a \
-@DFA_ENABLED_FALSE@../patterns/libpatterns.a ../sgf/libsgf.a \
-@DFA_ENABLED_FALSE@../utils/libutils.a
+gnugo_DEPENDENCIES =  ../engine/libengine.a ../patterns/libpatterns.a \
+../patterns/libdfa.a ../sgf/libsgf.a ../utils/libutils.a
 gnugo_LDFLAGS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

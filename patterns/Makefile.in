@@ -85,6 +85,18 @@ EXTRA_DIST = $(DSP) 	dfa.c 	hoshi.sgf 	komoku.sgf 	mokuhazushi.sgf 	sansan.sgf 	
 
 mkpat_SOURCES = mkpat.c transform.c
 
+mkpat_LDADD = ./libdfa.a ../utils/libutils.a
+
+# dfas in DFA_INST are made and installed in $prefix/share/gnugo
+
+@DFA_ENABLED_TRUE@DFA_INST = 	owl_attackpat.dfa owl_defendpat.dfa owl_vital_apat.dfa 
+
+# dfas in DFA_NOINST are neither built nor installed
+
+@DFA_ENABLED_TRUE@DFA_NOINST = 	pat.dfa joseki.dfa conn.dfa attpat.dfa defpat.dfa endpat.dfa 	influencepat.dfa barrierspat.dfa fusekipat.dfa
+
+@DFA_ENABLED_TRUE@pkgdata_DATA = $(DFA_INST)
+
 # uncomment dependencies when these dfas are built
 
 # pat.dfa: patterns.c
@@ -97,18 +109,6 @@ mkpat_SOURCES = mkpat.c transform.c
 # barrierspat.dfa: barriers.c
 # fusekipat.dfa: fuseki.c
 
-@DFA_ENABLED_TRUE@mkpat_LDADD = ./libdfa.a ../utils/libutils.a
-@DFA_ENABLED_FALSE@mkpat_LDADD = ../utils/libutils.a
-
-# dfas in DFA_INST are made and installed in $prefix/share/gnugo
-
-@DFA_ENABLED_TRUE@DFA_INST = 	owl_attackpat.dfa owl_defendpat.dfa owl_vital_apat.dfa 
-
-# dfas in DFA_NOINST are neither built nor installed
-
-@DFA_ENABLED_TRUE@DFA_NOINST = 	pat.dfa joseki.dfa conn.dfa attpat.dfa defpat.dfa endpat.dfa 	influencepat.dfa barrierspat.dfa fusekipat.dfa
-
-@DFA_ENABLED_TRUE@pkgdata_DATA = $(DFA_INST)
 @DFA_ENABLED_TRUE@DFAFLAGS = -D -m
 @DFA_ENABLED_FALSE@DFAFLAGS = 
 transpat_SOURCES = transpat.c patlib.c transform.c
@@ -166,8 +166,7 @@ transpat_OBJECTS =  transpat.o patlib.o transform.o
 transpat_DEPENDENCIES = 
 transpat_LDFLAGS = 
 mkpat_OBJECTS =  mkpat.o transform.o
-@DFA_ENABLED_TRUE@mkpat_DEPENDENCIES =  ./libdfa.a ../utils/libutils.a
-@DFA_ENABLED_FALSE@mkpat_DEPENDENCIES =  ../utils/libutils.a
+mkpat_DEPENDENCIES =  ./libdfa.a ../utils/libutils.a
 mkpat_LDFLAGS = 
 joseki_OBJECTS =  joseki.o
 joseki_DEPENDENCIES =  ../engine/libboard.a ../sgf/libsgf.a \

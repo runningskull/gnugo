@@ -29,9 +29,9 @@ EXTRA_DIST = $(DSP)\
 
 mkpat_SOURCES  = mkpat.c transform.c
 
-if DFA_ENABLED
-
 mkpat_LDADD = ./libdfa.a ../utils/libutils.a
+
+if DFA_ENABLED
 
 # dfas in DFA_INST are made and installed in $prefix/share/gnugo
 
@@ -70,7 +70,6 @@ owl_defendpat.dfa: owl_defendpat.c
 # fusekipat.dfa: fuseki.c
 
 else
-mkpat_LDADD = ../utils/libutils.a
 DFAFLAGS =
 endif
 transpat_SOURCES = transpat.c patlib.c transform.c

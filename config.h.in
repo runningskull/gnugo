@@ -15,9 +15,6 @@
 /* Default hash table size in megabytes */
 #undef DEFAULT_MEMORY
 
-/* Define as 1 to enable the DFA pattern matcher */
-#undef DFA_ENABLED
-
 /* Give the directory where gnugo was compiled */
 #undef GNUGO_PATH
 
