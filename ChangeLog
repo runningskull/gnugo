@@ -2,8 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.6 pre 3 released October 26, 2004
+
 - doc revision
 - revision of configure options (some experimental options removed)
+- removed thrashing_dragon test from owl threat loop in make_dragons()
+- removed owl-ext runtime option
 - removed pattern matcher from oracle.c
 - removed patterns/oracle.db
 - renamed configure option --enable-oracle --enable-metamachine

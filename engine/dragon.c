@@ -400,8 +400,7 @@ make_dragons(int stop_before_owl)
 	
 	if (level >= 8
 	    && !disable_threat_computation
-	    && (owl_threats 
-		|| thrashing_stone[str])) {
+	    && owl_threats) {
 	  if (acode && !dcode && DRAGON2(str).owl_attack_point != NO_MOVE) {
 	    if (owl_threaten_defense(str, &defense_point,
 				     &second_defense_point)) {
