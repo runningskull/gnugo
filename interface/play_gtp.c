@@ -2201,13 +2201,14 @@ static int
 gtp_unconditional_status(char *s)
 {
   int i, j;
+  enum dragon_status status;
 
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure("invalid coordinate");
 
   silent_examine_position(BLACK, EXAMINE_WORMS);
   
-  enum dragon_status status = worm[POS(i, j)].unconditional_status;
+  status = worm[POS(i, j)].unconditional_status;
   if (status == UNKNOWN)
     return gtp_success("undecided");
   return gtp_success("%s", status_to_string(status));
