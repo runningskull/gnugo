@@ -4897,7 +4897,7 @@ Y...|       don't let opponent live easily in the corner
 ....|
 ----+
 
-:8,-,value(46)
+:\,-,value(46)
 
 # nn Removed (3.3.13)
 #   Success rate in regressions : 0% (0/40)
@@ -4912,6 +4912,16 @@ Y...|       don't let opponent live easily in the corner
 # 
 # :8,-,value(45)
 
+Pattern A1403
+#evand new pattern 3.3.13
+
+Y.O.|
+.*..|
+o...|
+....|
+----+
+
+:8,-,value(55)
 
 #########################################################
 #                                                       #

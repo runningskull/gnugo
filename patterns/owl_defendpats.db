@@ -1530,6 +1530,16 @@ Pattern D408
 
 :8,-,value(30)
 
+Pattern D409
+#evand new pattern (3.3.13)
+
+oO.X.|        move to corner to make life
+..*..|
+.....|
+.....|
+-----+
+
+:8,-,value(45)
 
 #########################################################
 #                                                       #
