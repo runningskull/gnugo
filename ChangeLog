@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function edge_distance() in board.c
 - CPU time reported by twogtp.py
 - new static function endgame_find_backfilling_dame() in endgame.c
 - new static function endgame_find_liberties() broken out of

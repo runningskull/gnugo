@@ -171,6 +171,7 @@ extern int position_number;
 /* Detect vertex on edge or corner. */
 int is_edge_vertex(int pos);
 int is_corner_vertex(int pos);
+int edge_distance(int pos);
 
 
 /* Count and/or find liberties at (pos). */
