@@ -1,3 +1,42 @@
+3.1.17 compiled with --enable-experimental-semeai gives the
+following failures:
+
+./regress.sh . strategy.tst
+37 unexpected FAIL: Correct '!A17|A18|C19', got 'A18'
+./regress.sh . arb.tst
+104 unexpected FAIL: Correct 'A7|B7', got 'B10'
+./regress.sh . golife.tst
+4 unexpected FAIL: Correct 'H5', got 'E3'
+./regress.sh . strategy2.tst
+72 unexpected PASS!
+73 unexpected PASS!
+./regress.sh . nicklas1.tst
+501 unexpected FAIL: Correct 'G7', got 'F6'
+1405 unexpected FAIL: Correct 'B7', got 'PASS'
+./regress.sh . nicklas2.tst
+1401 unexpected FAIL: Correct 'B3', got 'A2'
+./regress.sh . nicklas3.tst
+602 unexpected PASS!
+./regress.sh . strategy3.tst
+126 unexpected FAIL: Correct 'B19', got 'G10'
+./regress.sh . global.tst
+16 unexpected FAIL: Correct 'O10', got 'O13'
+46 unexpected PASS!
+./regress.sh . 13x13.tst
+1 unexpected PASS!
+25 unexpected FAIL: Correct 'J5', got 'L4'
+48 unexpected FAIL: Correct 'K7', got 'K6'
+./regress.sh . trevora.tst
+530 unexpected PASS!
+./regress.sh . trevorb.tst
+290 unexpected PASS!
+./regress.sh . semeai.tst
+./regress.sh . strategy4.tst
+168 unexpected FAIL: Correct 'A3|A4', got 'B7'
+197 unexpected FAIL: Correct 'K3|S18', got 'T18'
+199 unexpected FAIL: Correct 'N5|S18', got 'T18'
+200 unexpected FAIL: Correct 'P6|P7|Q7|S18', got 'Q8'
+
 ========================== 3.1.17 =========================
 
 ./regress.sh . owl.tst

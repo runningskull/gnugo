@@ -31,7 +31,7 @@
 - readconnect.c revised
 - take into account followup values if reverse_followup >= 1
 - try a little harder in attack_either
-- break_through_helper improved.
+- break_through_helper improved
 - tuning
 - owl tuning
 - eye tuning, adding many patterns with occupied margins

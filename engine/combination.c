@@ -640,7 +640,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
     if (!IS_STONE(board[str])) {
       /* Error situation. This could be caused by a wrong matcher status. */
       if (save_verbose || (debug & DEBUG_ATARI_ATARI))
-	gprintf("%oError condition found by atari_atari\n", str, apos);
+	gprintf("%oError condition found by atari_atari\n");
       popgo();
       return 0;
     }
