@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- a connection move where amalgamtion is inhibited by cut_possible() may
+  induce further connection moves
 - new oracle.c and oracle.db
 - oracle is a second gnugo process communicating with the gtp by unix pipes
 - experimental alternative move generation --metamachine using oracle
