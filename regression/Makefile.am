@@ -1,15 +1,15 @@
 TST =  13x13.tst arb.tst arend.tst arion.tst atari_atari.tst auto01.tst \
-       auto02.tst auto03.tst auto04.tst blunder.tst buzco.tst \
-       capture.tst century2002.tst connect.tst connect_rot.tst \
+       auto02.tst auto03.tst auto04.tst auto_handtalk.tst blunder.tst \
+       buzco.tst capture.tst century2002.tst connect.tst connect_rot.tst \
        connection.tst connection_rot.tst cutstone.tst dniwog.tst \
        ego.tst endgame.tst endgame_rot.tst filllib.tst global.tst \
        golife.tst handtalk.tst heikki.tst lazarus.tst ld_owl.tst \
-       ld_owl_rot.tst life.tst manyfaces.tst neurogo.tst newscore.tst \
-       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
-       niki.tst nngs.tst nngs1.tst nngs2.tst optics.tst optics_rot.tst \
-       owl.tst owl1.tst owl_rot.tst reading.tst reading_rot.tst \
-       rosebud.tst score.tst score2.tst score_rot.tst semeai.tst \
-       semeai2.tst strategy.tst strategy2.tst strategy3.tst \
+       ld_owl_rot.tst life.tst manyfaces.tst neurogo.tst \
+       newscore.tst nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst \
+       nicklas5.tst niki.tst nngs.tst nngs1.tst nngs2.tst optics.tst \
+       optics_rot.tst owl.tst owl1.tst owl_rot.tst reading.tst \
+       reading_rot.tst rosebud.tst score.tst score2.tst score_rot.tst \
+       semeai.tst semeai2.tst strategy.tst strategy2.tst strategy3.tst \
        strategy4.tst strategy5.tst strategy_rot.tst tactics.tst \
        trevor.tst trevora.tst trevorb.tst trevorc.tst trevord.tst \
        vie.tst viking.tst
@@ -49,6 +49,9 @@ auto: auto01.tst auto02.tst auto03.tst auto04.tst
 	$(srcdir)/eval.sh auto03.tst $(GG_OPTIONS)
 	$(srcdir)/eval.sh auto04.tst $(GG_OPTIONS)
       
+auto_handtalk: auto_handtalk.tst
+	$(srcdir)/eval.sh auto_handtalk.tst
+
 blunder: blunder.tst
 	$(srcdir)/eval.sh blunder.tst $(GG_OPTIONS)
 
@@ -317,3 +320,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) auto02.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) auto03.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) auto04.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) auto_handtalk.tst $(GG_OPTIONS)
