@@ -2,7 +2,7 @@ bin_PROGRAMS = gnugo
 
 SUBDIRS = debugboard
 
-EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el make-xpms-file.el GoImage
+EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el make-xpms-file.el GoImage xpms
 
 GGBUILTSOURCES = gnugo-xpms.el
 
