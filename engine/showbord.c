@@ -294,7 +294,7 @@ showchar(int i, int j, int empty, int xo)
   else {
     /* Figure out ascii character for this dragon. This is the
      * dragon number allocated to the origin of this worm. */
-    int w = dragon_num[d->origini][d->originj];
+    int w = dragon_num[I(d->origin)][J(d->origin)];
 
     if (xo == 0)
       fprintf(stderr, " %c", BOARD(i, j) == BLACK ? 'X' : 'O');
@@ -303,9 +303,9 @@ showchar(int i, int j, int empty, int xo)
       /* Not yet allocated - allocate next one. */
       /* Count upwards for black, downwards for white to reduce confusion. */
       if (BOARD(i, j) == BLACK)
-	w = dragon_num[d->origini][d->originj] = next_black++;
+	w = dragon_num[I(d->origin)][J(d->origin)] = next_black++;
       else
-	w = dragon_num[d->origini][d->originj] = next_white--; 
+	w = dragon_num[I(d->origin)][J(d->origin)] = next_white--; 
     }
 
     w = w%26 + (BOARD(i, j) == BLACK ? 'A' : 'a');

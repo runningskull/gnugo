@@ -272,8 +272,7 @@ decideposition(int color, const char *sgf_output)
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if ((dragon[m][n].origini != m)
-	  || (dragon[m][n].originj != n)
+      if ((dragon[m][n].origin != POS(m, n))
 	  || (BOARD(m, n) == EMPTY)
 	  || (dragon[m][n].escape_route >= 6))
 	continue;

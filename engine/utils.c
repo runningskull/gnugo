@@ -41,13 +41,11 @@ void
 change_matcher_status(int m, int n, int status)
 {
   int i, j;
-  int origini = dragon[m][n].origini;
-  int originj = dragon[m][n].originj;
+  int origin = dragon[m][n].origin;
 
   for (i = 0; i < board_size; i++) 
     for (j = 0; j < board_size; j++) {
-      if (dragon[i][j].origini == origini
-	  && dragon[i][j].originj == originj)
+      if (dragon[i][j].origin == origin)
 	dragon[i][j].matcher_status = status;
     }
 }
@@ -87,8 +85,7 @@ change_defense(int str, int tpos, int dcode)
 
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
-	if ((dragon[m][n].origini == dragon[I(str)][J(str)].origini) 
-	    && (dragon[m][n].originj == dragon[I(str)][J(str)].originj))
+	if (dragon[m][n].origin == dragon[I(str)][J(str)].origin)
 	  dragon[m][n].status = DEAD;
   }
   worm[I(origin)][J(origin)].defend_code = dcode;

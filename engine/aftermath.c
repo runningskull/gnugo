@@ -422,8 +422,8 @@ aftermath_genmove(int *i, int *j, int color,
 	}
 	
 	if (BOARD(m+dm, n+dn) == other) {
-	  int oi = dragon[m+dm][n+dn].origini;
-	  int oj = dragon[m+dm][n+dn].originj;
+	  int oi = I(dragon[m+dm][n+dn].origin);
+	  int oj = J(dragon[m+dm][n+dn].origin);
 
 	  if (k < 4) {
 	    if (dragon[m+dm][n+dn].matcher_status == ALIVE) {

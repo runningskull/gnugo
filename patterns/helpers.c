@@ -267,12 +267,11 @@ not_lunch_helper(int ai, int aj, int bi, int bj)
   /* Tell the move generation code about the change in status. */
   remove_lunch(bi, bj, ai, aj);
   
-  if ((dragon[bi][bj].lunchi==ai) && (dragon[bi][bj].lunchj==aj))
+  if (dragon[bi][bj].lunch == POS(ai, aj))
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
-	if (dragon[m][n].origini==dragon[bi][bj].origini &&
-	    dragon[m][n].originj==dragon[bi][bj].originj)
-	  dragon[m][n].lunchi=-1;
+	if (dragon[m][n].origin == dragon[bi][bj].origin)
+	  dragon[m][n].lunch = NO_MOVE;
 
   return 0;
 }

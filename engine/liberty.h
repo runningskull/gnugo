@@ -597,20 +597,21 @@ extern struct worm_data worm[MAX_BOARD][MAX_BOARD];
 struct dragon_data {
   int color;    /* its color                                                 */
   int id;       /* the index into the dragon2 array, not valid for caves     */
-  int origini;  /* (origini,originj) is the origin of the string. Two        */
-  int originj;  /* vertices are in the same dragon iff they have same origin.*/
-  int borderi;  /* if color=BLACK_BORDER or WHITE_BORDER the worm is a cavity*/
-  int borderj;  /* surrounded by the BLACK or WHITE dragon with origin       */
-                /* (borderi,borderj)                                         */
+  int origin;   /* the origin of the string. Two vertices are in the same    */
+                /* dragon iff they have same origin.                         */
+
+  /* FIXME: Border is never used.  Remove? */
+  int border;   /* if color=BLACK_BORDER or WHITE_BORDER the worm is a cavity*/
+                /* surrounded by the BLACK or WHITE dragon with origin border*/
+
   int size;     /* size of the dragon                                        */
   float effective_size; /* stones and surrounding spaces                     */
   int heyes;    /* the number of half eyes                                   */
-  int heyei;    /* coordinates of a half eye                                 */
-  int heyej;
+  int heye;     /* coordinates of a half eye                                 */
   int genus;    /* the number of eyes (approximately)                        */
   int escape_route; /* a measurement of likelihood of escape                 */
-  int lunchi;   /* if lunchi != -1 then (lunchi,lunchj) points to a boundary */
-  int lunchj;   /* worm which can be captured easily.                        */
+  int lunch;    /* if lunch != 0 then lunch points to a boundary worm which  */
+                /* can be captured easily.                                   */
   int status;   /* (ALIVE, DEAD, UNKNOWN, CRITICAL)                          */
   int owl_threat_status;   /* CAN_THREATEN_ATTACK or CAN_THREATEN_DEFENSE    */
   int owl_status;          /* (ALIVE, DEAD, UNKNOWN, CRITICAL, UNCHECKED)    */
@@ -638,8 +639,7 @@ extern struct dragon_data dragon[MAX_BOARD][MAX_BOARD];
 #define MAX_NEIGHBOR_DRAGONS 10
 
 struct dragon_data2 {
-  int origini;  /* (origini,originj) is the origin of the dragon             */
-  int originj;
+  int origin;                         /* the origin of the dragon            */
   int adjacent[MAX_NEIGHBOR_DRAGONS]; /* adjacent dragons                    */
   int neighbors;                      /* number of adjacent dragons          */
   int moyo;                           /* size of surrounding influence moyo  */
@@ -654,7 +654,7 @@ extern struct dragon_data2 *dragon2;
  * the dragon data with a dragon id.
  */
 #define DRAGON2(m, n) dragon2[dragon[m][n].id]
-#define DRAGON(d) dragon[dragon2[d].origini][dragon2[d].originj]
+#define DRAGON(d) dragon[I(dragon2[d].origin)][J(dragon2[d].origin)]
 
 struct aftermath_data {
   int white_captured;

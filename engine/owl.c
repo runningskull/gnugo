@@ -2464,9 +2464,9 @@ owl_mark_boundary(struct local_owl_data *owl)
 
 	for (k = 0; k < DRAGON2(i, j).neighbors; k++) {
 	  int d = DRAGON2(i, j).adjacent[k];
-	  int ai = dragon2[d].origini;
-	  int aj = dragon2[d].originj;
-	  if (BOARD(ai, aj) == owl->color && !owl->goal[ai][aj]) {
+	  int apos = dragon2[d].origin;
+
+	  if (board[apos] == owl->color && !owl->goal[I(apos)][J(apos)]) {
 	    owl->boundary[i][j] = 2;
 	    break;
 	  }
@@ -2598,8 +2598,7 @@ owl_reasons(int color)
   int m, n;
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
-      if ((dragon[m][n].origini == m)
-	  && (dragon[m][n].originj == n)
+      if ((dragon[m][n].origin == POS(m, n))
 	  && (dragon[m][n].matcher_status == CRITICAL)
 	  && (dragon[m][n].owl_attacki != -1)
 	  && (dragon[m][n].owl_attackj != -1)) {
@@ -2643,8 +2642,8 @@ owl_reasons(int color)
 		  break;
 		}
 		if (DRAGON(d).size > largest) {
-		  bi = dragon2[d].origini;
-		  bj = dragon2[d].originj;
+		  bi = I(dragon2[d].origin);
+		  bj = J(dragon2[d].origin);
 		  largest = DRAGON(d).size;
 		}
 	      }
@@ -2674,8 +2673,7 @@ owl_reasons(int color)
 		movenum+1);
 	}
       }
-      else if ((dragon[m][n].origini == m)
-	       && (dragon[m][n].originj == n)
+      else if ((dragon[m][n].origin == POS(m, n))
 	       && (dragon[m][n].owl_status == DEAD)
 	       && (dragon[m][n].owl_threat_status == CAN_THREATEN_DEFENSE)) {
 	if (BOARD(m, n) == color
@@ -2700,8 +2698,7 @@ owl_reasons(int color)
 				      dragon[m][n].owl_attackj,
 				      m, n);
       }
-      else if (dragon[m][n].origini == m
-	       && dragon[m][n].originj == n
+      else if (dragon[m][n].origin == POS(m, n)
 	       && dragon[m][n].owl_status == ALIVE
 	       && BOARD(m, n) == OTHER_COLOR(color)
 	       && dragon[m][n].owl_threat_status == CAN_THREATEN_ATTACK) {
@@ -2720,8 +2717,7 @@ owl_reasons(int color)
        * and an extra point of defense was found, so this might
        * be a good place to play.
        */
-      else if (dragon[m][n].origini == m
-	       && dragon[m][n].originj == n
+      else if (dragon[m][n].origin == POS(m, n)
 	       && dragon[m][n].owl_status == ALIVE
 	       && BOARD(m, n) == color
 	       && !dragon[m][n].owl_attack_certain
@@ -2735,8 +2731,7 @@ owl_reasons(int color)
        * and an extra point of attack was found, so this might
        * be a good place to play.
        */
-      else if (dragon[m][n].origini == m
-	       && dragon[m][n].originj == n
+      else if (dragon[m][n].origin == POS(m, n)
 	       && dragon[m][n].owl_status == DEAD
 	       && BOARD(m, n) == OTHER_COLOR(color)
 	       && !dragon[m][n].owl_attack_certain
@@ -2766,15 +2761,14 @@ owl_does_defend(int ti, int tj, int m, int n)
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
-  int oi, oj;
+  int opos;
   owl.local_owl_node_counter = 0;
 
   if (worm[m][n].unconditional_status == DEAD)
     return 0;
 
-  oi = dragon[m][n].origini;
-  oj = dragon[m][n].originj;
-  TRACE("owl_does_defend %m %m(%m)\n", ti, tj, m, n, oi, oj);
+  opos = dragon[m][n].origin;
+  TRACE("owl_does_defend %m %m(%m)\n", ti, tj, m, n, opos);
 
   if (search_persistent_owl_cache(OWL_DOES_DEFEND, move, str, 0,
 				  &result, NULL, NULL, NULL))
@@ -2782,7 +2776,7 @@ owl_does_defend(int ti, int tj, int m, int n)
 
   if (trymove(move, color, "owl_does_defend", str, EMPTY, 0)) {
     /* Check if a compatible owl_attack() is cached. */
-    if (search_persistent_owl_cache(OWL_ATTACK, POS(oi, oj), 0, 0,
+    if (search_persistent_owl_cache(OWL_ATTACK, opos, 0, 0,
 				    &result, NULL, NULL, NULL)) {
       popgo();
       if (!result)
@@ -2806,8 +2800,8 @@ owl_does_defend(int ti, int tj, int m, int n)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_does_defend %1m %1m(%m), result %d (%d, %d nodes)\n",
-	move, str, oi, oj, result,
+	"owl_does_defend %1m %1m(%1m), result %d (%d, %d nodes)\n",
+	move, str, opos, result,
 	owl.local_owl_node_counter, tactical_nodes);
 
   store_persistent_owl_cache(OWL_DOES_DEFEND, move, str, 0,
@@ -2836,16 +2830,15 @@ owl_confirm_safety(int ti, int tj, int m, int n, int *di, int *dj)
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
-  int oi, oj;
+  int opos;
   int defense = 0;
   owl.local_owl_node_counter = 0;
 
   if (worm[m][n].unconditional_status == DEAD)
     return 0;
 
-  oi = dragon[m][n].origini;
-  oj = dragon[m][n].originj;
-  TRACE("owl_confirm_safety %m %m(%m)\n", ti, tj, m, n, oi, oj);
+  opos = dragon[m][n].origin;
+  TRACE("owl_confirm_safety %m %m(%1m)\n", ti, tj, m, n, opos);
 
   if (search_persistent_owl_cache(OWL_CONFIRM_SAFETY, move, str, 0,
 				  &result, &defense, NULL, NULL)) {
@@ -2856,7 +2849,7 @@ owl_confirm_safety(int ti, int tj, int m, int n, int *di, int *dj)
 
   if (trymove(move, color, "owl_confirm_safety", str, EMPTY, 0)) {
     /* Check if a compatible owl_attack() is cached. */
-    if (search_persistent_owl_cache(OWL_ATTACK, POS(oi, oj), 0, 0,
+    if (search_persistent_owl_cache(OWL_ATTACK, opos, 0, 0,
 				    &result, &defense, NULL, NULL)) {
       popgo();
       if (di) *di = I(defense);
@@ -2882,8 +2875,8 @@ owl_confirm_safety(int ti, int tj, int m, int n, int *di, int *dj)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_confirm_safety %1m %1m(%m), result %d %1m (%d, %d nodes)\n",
-	move, str, oi, oj, result, defense,
+	"owl_confirm_safety %1m %1m(%1m), result %d %1m (%d, %d nodes)\n",
+	move, str, opos, result, defense,
 	owl.local_owl_node_counter, tactical_nodes);
 
   store_persistent_owl_cache(OWL_DOES_DEFEND, move, str, 0,

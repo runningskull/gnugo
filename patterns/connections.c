@@ -42,8 +42,8 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 {
   int stari, starj;
   int k;
-  int first_dragoni=-1, first_dragonj=-1;
-  int second_dragoni=-1, second_dragonj=-1;
+  int first_dragon  = NO_MOVE;
+  int second_dragon = NO_MOVE;
 
   int other=OTHER_COLOR(color);
   UNUSED(data);
@@ -69,21 +69,17 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
       
       /* Look for distinct dragons. */
       if (pattern->patn[k].att == ATT_O) {
-	if (first_dragoni == -1) {
-	  first_dragoni = dragon[x][y].origini;
-	  first_dragonj = dragon[x][y].originj;
-	}
-	else if ((second_dragoni == -1)
-		 && ((dragon[x][y].origini != first_dragoni)
-		     || (dragon[x][y].originj != first_dragonj))) {
-	  second_dragoni = dragon[x][y].origini;
-	  second_dragonj = dragon[x][y].originj;
+	if (first_dragon == NO_MOVE)
+	  first_dragon = dragon[x][y].origin;
+	else if (second_dragon == NO_MOVE
+		 && dragon[x][y].origin != first_dragon) {
+	  second_dragon = dragon[x][y].origin;
 	  /* A second dragon found, no need to continue looping. */
 	  break;
 	}
       }
     }
-    if (second_dragoni == -1)
+    if (second_dragon == NO_MOVE)
       return; /* Nothing to amalgamate. */
   }
     
@@ -165,10 +161,8 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
    * If it is a B pattern, find eye space points to inhibit connection
    * through.
    */
-  first_dragoni = -1;
-  first_dragonj = -1;
-  second_dragoni = -1;
-  second_dragonj = -1;
+  first_dragon  = NO_MOVE;
+  second_dragon = NO_MOVE;
   for (k = 0; k < pattern->patlen; ++k) { /* match each point */
     int x, y; /* absolute (board) co-ords of (transformed) pattern element */
 
@@ -182,26 +176,19 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
      */
     if ((pattern->class & CLASS_C) && (BOARD(x, y) == color)
 	&& (worm[x][y].attack_code == 0)) {
-      if (first_dragoni == -1) {
-	first_dragoni = dragon[x][y].origini;
-	first_dragonj = dragon[x][y].originj;
-      }
-      else if ((second_dragoni == -1)
-	       && ((dragon[x][y].origini != first_dragoni)
-		   || (dragon[x][y].originj != first_dragonj))) {
-	second_dragoni = dragon[x][y].origini;
-	second_dragonj = dragon[x][y].originj;
+      if (first_dragon == NO_MOVE)
+	first_dragon = dragon[x][y].origin;
+      else if (second_dragon == NO_MOVE
+	       && dragon[x][y].origin != first_dragon) {
+	second_dragon = dragon[x][y].origin;
 	/* A second dragon found, we amalgamate them at once. */
-	TRACE("Pattern %s joins dragons %m, %m\n",
-	      pattern->name, first_dragoni, first_dragonj,
-	      second_dragoni, second_dragonj);
-	join_dragons(second_dragoni, second_dragonj,
-		     first_dragoni, first_dragonj);
+	TRACE("Pattern %s joins dragons %1m, %1m\n",
+	      pattern->name, first_dragon, second_dragon);
+	join_dragons(I(second_dragon), J(second_dragon),
+		     I(first_dragon), J(first_dragon));
 	/* Now look for another second dragon. */
-	second_dragoni = -1;
-	second_dragonj = -1;
-	first_dragoni = dragon[x][y].origini;
-	first_dragonj = dragon[x][y].originj;
+	second_dragon = NO_MOVE;
+	first_dragon = dragon[x][y].origin;
       }
     }
 

@@ -186,8 +186,7 @@ display_dragon(int i, int j)
 	     location_to_string2(i, j),
 	     color_to_string(dragon[i][j].color));
   gg_wprintw(info_window, "(origin %s)  id %d   ",
-	     location_to_string2(dragon[i][j].origini,
-				dragon[i][j].originj),
+	     location_to_string(dragon[i][j].origin),
 	     dragon[i][j].id);
 
   wmove(info_window, 3, 16);
@@ -199,7 +198,7 @@ display_dragon(int i, int j)
   wmove(info_window, 8, 21);
   if (dragon[i][j].heyes > 0)
     gg_wprintw(info_window, "[%s] ", 
-	       location_to_string2(dragon[i][j].heyei, dragon[i][j].heyej));
+	       location_to_string(dragon[i][j].heye));
   else
     gg_wprintw(info_window, "[---]");
 
@@ -208,12 +207,11 @@ display_dragon(int i, int j)
   wmove(info_window, 10, 18);
   gg_wprintw(info_window, "%d  ", dragon[i][j].escape_route);
   wmove(info_window, 11, 18);
-  if (dragon[i][j].lunchi == -1)
+  if (dragon[i][j].lunch == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%3s", 
-	    location_to_string2(dragon[i][j].lunchi,
-			       dragon[i][j].lunchj));
+	       location_to_string(dragon[i][j].lunch));
 
   wmove(info_window, 3, 55);
   gg_wprintw(info_window, "%s     ", status_to_string(dragon[i][j].status));

@@ -100,8 +100,8 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 	  && !does_defend(ti, tj, x, y))
 	return;
 
-      di = dragon[x][y].origini;
-      dj = dragon[x][y].originj;
+      di = I(dragon[x][y].origin);
+      dj = J(dragon[x][y].origin);
       if (BOARD(x, y) == color && my_ndragons < MAX_DRAGONS_PER_PATTERN) {
 	for (l = 0; l < my_ndragons; l++) {
 	  if (my_dragoni[l] == di && my_dragonj[l] == dj)

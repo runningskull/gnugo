@@ -267,7 +267,8 @@ void
 add_lunch(int ai, int aj, int bi, int bj)
 {
   int k;
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
   int worm1   = find_worm(worm[bi][bj].origin);
   ASSERT_ON_BOARD2(ai, aj);
   ASSERT_ON_BOARD2(bi, bj);
@@ -292,7 +293,8 @@ void
 remove_lunch(int ai, int aj, int bi, int bj)
 {
   int k;
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
   int worm1   = find_worm(worm[bi][bj].origin);
   ASSERT_ON_BOARD2(ai, aj);
   ASSERT_ON_BOARD2(bi, bj);
@@ -553,8 +555,10 @@ defense_threat_move_known(int ti, int tj, int ai, int aj)
 void
 add_connection_move(int ti, int tj, int ai, int aj, int bi, int bj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  int dragon2 = find_dragon(dragon[bi][bj].origini, dragon[bi][bj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
+  int dragon2 = find_dragon(I(dragon[bi][bj].origin),
+			    J(dragon[bi][bj].origin));
   int connection;
   ASSERT_ON_BOARD2(ai, aj);
   ASSERT_ON_BOARD2(bi, bj);
@@ -573,8 +577,10 @@ add_connection_move(int ti, int tj, int ai, int aj, int bi, int bj)
 void
 add_cut_move(int ti, int tj, int ai, int aj, int bi, int bj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
-  int dragon2 = find_dragon(dragon[bi][bj].origini, dragon[bi][bj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
+  int dragon2 = find_dragon(I(dragon[bi][bj].origin),
+			    J(dragon[bi][bj].origin));
   int connection;
   ASSERT_ON_BOARD2(ai, aj);
   ASSERT_ON_BOARD2(bi, bj);
@@ -616,7 +622,8 @@ add_antisuji_move(int ti, int tj)
 void
 add_semeai_move(int ti, int tj, int ai, int aj)
 {
-  int the_dragon = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int the_dragon = find_dragon(I(dragon[ai][aj].origin),
+			       J(dragon[ai][aj].origin));
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, SEMEAI_MOVE, the_dragon);
 }
@@ -631,7 +638,8 @@ add_semeai_move(int ti, int tj, int ai, int aj)
 void
 add_semeai_threat(int ti, int tj, int ai, int aj)
 {
-  int the_dragon = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int the_dragon = find_dragon(I(dragon[ai][aj].origin), 
+			       J(dragon[ai][aj].origin));
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, SEMEAI_THREAT, the_dragon);
 }
@@ -799,7 +807,9 @@ compute_shape_factor(int m, int n)
 void
 add_strategical_attack_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin), 
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, STRATEGIC_ATTACK_MOVE, dragon1);
 }
@@ -811,7 +821,9 @@ add_strategical_attack_move(int ti, int tj, int ai, int aj)
 void
 add_strategical_defense_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, STRATEGIC_DEFEND_MOVE, dragon1);
 }
@@ -823,7 +835,9 @@ add_strategical_defense_move(int ti, int tj, int ai, int aj)
 void
 add_owl_attack_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin), 
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_ATTACK_MOVE, dragon1);
 }
@@ -835,7 +849,9 @@ add_owl_attack_move(int ti, int tj, int ai, int aj)
 void
 add_owl_defense_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin), 
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_DEFEND_MOVE, dragon1);
 }
@@ -849,7 +865,9 @@ add_owl_defense_move(int ti, int tj, int ai, int aj)
 void
 add_owl_attack_threat_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_ATTACK_THREAT, dragon1);
   add_worthwhile_threat_move(ti, tj);
@@ -863,7 +881,9 @@ add_owl_attack_threat_move(int ti, int tj, int ai, int aj)
 void
 add_owl_uncertain_defense_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, UNCERTAIN_OWL_DEFENSE, dragon1);
 }
@@ -876,7 +896,9 @@ add_owl_uncertain_defense_move(int ti, int tj, int ai, int aj)
 void
 add_owl_uncertain_attack_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, UNCERTAIN_OWL_ATTACK, dragon1);
 }
@@ -890,7 +912,9 @@ add_owl_uncertain_attack_move(int ti, int tj, int ai, int aj)
 void
 add_owl_defense_threat_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_DEFENSE_THREAT, dragon1);
   add_worthwhile_threat_move(ti, tj);
@@ -930,7 +954,9 @@ add_your_atari_atari_move(int ti, int tj, int size)
 void
 add_owl_prevent_threat_move(int ti, int tj, int ai, int aj)
 {
-  int dragon1 = find_dragon(dragon[ai][aj].origini, dragon[ai][aj].originj);
+  int dragon1 = find_dragon(I(dragon[ai][aj].origin),
+			    J(dragon[ai][aj].origin));
+
   ASSERT_ON_BOARD2(ai, aj);
   add_move_reason(ti, tj, OWL_PREVENT_THREAT, dragon1);
 }
@@ -1476,8 +1502,8 @@ induce_secondary_move_reasons(int color)
 	      continue;
 	    
 	    if (DRAGON(d).size > biggest) {
-	      di = DRAGON(d).origini;
-	      dj = DRAGON(d).originj;
+	      di = I(DRAGON(d).origin);
+	      dj = J(DRAGON(d).origin);
 	      biggest = DRAGON(d).size;
 	    }
 	  }
@@ -1487,8 +1513,8 @@ induce_secondary_move_reasons(int color)
 	  
 	  for (i = 0; i < DRAGON2(ai, aj).neighbors; i++) {
 	    int d = DRAGON2(ai, aj).adjacent[i];
-	    int ei = DRAGON(d).origini;
-	    int ej = DRAGON(d).originj;
+	    int ei = I(DRAGON(d).origin);
+	    int ej = J(DRAGON(d).origin);
 	    if (DRAGON(d).color == dragon[ai][aj].color)
 	      continue;
 	    
@@ -1528,8 +1554,8 @@ induce_secondary_move_reasons(int color)
 	    if (dragon[adji][adjj].color == dragon[ai][aj].color)
 	      continue;
 	    if (dragon[adji][adjj].size > biggest) {
-	      di = dragon[adji][adjj].origini;
-	      dj = dragon[adji][adjj].originj;
+	      di = I(dragon[adji][adjj].origin);
+	      dj = J(dragon[adji][adjj].origin);
 	      biggest = dragon[adji][adjj].size;
 	    }
 	  }
@@ -1540,8 +1566,8 @@ induce_secondary_move_reasons(int color)
 	  for (i = 0; i < adj; i++) {
 	    int adji = I(adjs[i]);
 	    int adjj = J(adjs[i]);
-	    int ei = dragon[adji][adjj].origini;
-	    int ej = dragon[adji][adjj].originj;
+	    int ei = I(dragon[adji][adjj].origin);
+	    int ej = J(dragon[adji][adjj].origin);
 	    if (dragon[adji][adjj].color == dragon[ai][aj].color)
 	      continue;
 	    
@@ -1676,8 +1702,8 @@ examine_move_safety(int color)
 	      for (k = 0; k < DRAGON2(ai, aj).neighbors; k++)
 		if (DRAGON(DRAGON2(ai, aj).adjacent[k]).color == color) {
 		  our_color_neighbors++;
-		  bi = dragon2[DRAGON2(ai, aj).adjacent[k]].origini;
-		  bj = dragon2[DRAGON2(ai, aj).adjacent[k]].originj;
+		  bi = I(dragon2[DRAGON2(ai, aj).adjacent[k]].origin);
+		  bj = J(dragon2[DRAGON2(ai, aj).adjacent[k]].origin);
 		}
 	    }
 	    
@@ -2204,10 +2230,8 @@ connection_value(int ai, int aj, int bi, int bj, int ti, int tj, float margin)
   if (true_genus1 < 4 && true_genus2 < 4) {
     if (true_genus1 + true_genus2 >= 4
 	||  (true_genus1 + true_genus2 >= 3
-	     && ((dragon[ai][aj].heyei == ti
-		  && dragon[ai][aj].heyej == tj)
-		 || (dragon[bi][bj].heyei == ti
-		     && dragon[bi][bj].heyej == tj))))
+	     && (dragon[ai][aj].heye == POS(ti, tj)
+		 || dragon[bi][bj].heye == POS(ti, tj))))
       safety2 = ALIVE;
   }
 

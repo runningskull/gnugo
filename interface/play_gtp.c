@@ -1985,15 +1985,15 @@ gtp_dragon_data(char *s, int id)
 	gtp_printf(":\n");
 	gtp_printf("color                   %s\n",   
 		   color_to_string(d->color));
-	gtp_mprintf("origin                  %m\n",  d->origini, d->originj);
-	gtp_mprintf("border                  %m\n",  d->borderi, d->borderj);
+	gtp_mprintf("origin                  %1m\n", d->origin);
+	gtp_mprintf("border                  %1m\n", d->border);
 	gtp_printf("size                    %d\n",   d->size);
 	gtp_printf("effective_size          %.2f\n", d->effective_size);
 	gtp_printf("heyes                   %d\n",   d->heyes);
-	gtp_mprintf("heye                    %m\n",  d->heyei, d->heyej);
+	gtp_mprintf("heye                    %1m\n", d->heye);
 	gtp_printf("genus                   %d\n",   d->genus);
 	gtp_printf("escape_route            %d\n",   d->escape_route);
-	gtp_mprintf("lunch                   %m\n",  d->lunchi, d->lunchj);
+	gtp_mprintf("lunch                   %1m\n", d->lunch);
 	gtp_printf("status                  %s\n",   
 		   status_to_string(d->status));
 	gtp_printf("owl_status              %s\n",   
@@ -2020,9 +2020,8 @@ gtp_dragon_data(char *s, int id)
 		   d->semeai_margin_of_safety);
 	gtp_printf("neighbors:              ");
 	for (k = 0; k < DRAGON2(m, n).neighbors; k++)
-	  gtp_mprintf("%m ", 
-		      DRAGON(DRAGON2(m, n).adjacent[k]).origini,
-		      DRAGON(DRAGON2(m, n).adjacent[k]).originj);
+	  gtp_mprintf("%1m ", 
+		      DRAGON(DRAGON2(m, n).adjacent[k]).origin);
 	gtp_printf("\n");
 	gtp_printf("moyo:                   %d\n", DRAGON2(m, n).moyo);
 	gtp_printf("safety:                 %s\n", 

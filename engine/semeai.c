@@ -70,10 +70,10 @@ semeai(int color)
       /* Dragons d1 (our) and d2 (opponent) are adjacent and both DEAD
        * or CRITICAL.
        */
-      ai = DRAGON(d1).origini;
-      aj = DRAGON(d1).originj;
-      bi = DRAGON(d2).origini;
-      bj = DRAGON(d2).originj;
+      ai = I(DRAGON(d1).origin);
+      aj = J(DRAGON(d1).origin);
+      bi = I(DRAGON(d2).origin);
+      bj = J(DRAGON(d2).origin);
 
       /* Ignore inessential worms or dragons */
       if (worm[ai][aj].inessential 
@@ -101,23 +101,19 @@ liberty_of_dragon(int i, int j, int m, int n)
     return 0;
 
   if (i > 0
-      && dragon[i-1][j].origini == m
-      && dragon[i-1][j].originj == n)
+      && dragon[i-1][j].origin == POS(m, n))
     return 1;
 
   if (i < board_size - 1
-      && dragon[i+1][j].origini == m
-      && dragon[i+1][j].originj == n)
+      && dragon[i+1][j].origin == POS(m, n))
     return 1;
 
   if (j > 0
-      && dragon[i][j-1].origini == m
-      && dragon[i][j-1].originj == n)
+      && dragon[i][j-1].origin == POS(m, n))
     return 1;
 
   if (j < board_size - 1
-      && dragon[i][j+1].origini == m
-      && dragon[i][j+1].originj == n)
+      && dragon[i][j+1].origin == POS(m, n))
     return 1;
 
   return 0;
@@ -287,11 +283,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
     for (n = 0; n < board_size; n++) {
       if (worm[m][n].origin == POS(m, n)
 	  && worm[m][n].attack_code == WIN)
-	if ((dragon[m][n].origini == ai
-	     && dragon[m][n].originj == aj)
-	    ||
-	    (dragon[m][n].origini == bi
-	     && dragon[m][n].originj == bj)) {
+	if (dragon[m][n].origin == POS(ai, aj)
+	    || dragon[m][n].origin == POS(bi, bj)) {
 	  int adj;
 	  int adjs[MAXCHAIN];
 	  int r;
@@ -300,10 +293,8 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 	  for (r = 0; r < adj; r++) {
 	    int ci = I(adjs[r]);
 	    int cj = J(adjs[r]);
-	    if ((dragon[ci][cj].origini == ai
-		 && dragon[ci][cj].originj == aj)
-		|| (dragon[ci][cj].origini == bi
-		    && dragon[ci][cj].originj == bj))
+	    if (dragon[ci][cj].origin == POS(ai, aj)
+		|| dragon[ci][cj].origin == POS(bi, bj))
 	      if (owl_substantial(m, n)) {
 		DEBUG(DEBUG_SEMEAI, "...tactical situation detected, exiting\n");
 		return;
@@ -655,13 +646,13 @@ analyze_semeai(int ai, int aj, int bi, int bj)
 				   margin_of_safety);
     else if (commonlibs > 1) {
       if (dragon[ai][aj].heyes > 0)
-	add_appropriate_semeai_moves(dragon[ai][aj].heyei,
-				     dragon[ai][aj].heyej,
+	add_appropriate_semeai_moves(I(dragon[ai][aj].heye),
+				     J(dragon[ai][aj].heye),
 				     ai, aj, bi, bj, my_status, your_status,
 				     margin_of_safety);
       if (dragon[bi][bj].heyes > 0)
-	add_appropriate_semeai_moves(dragon[bi][bj].heyei,
-				     dragon[bi][bj].heyej,
+	add_appropriate_semeai_moves(I(dragon[bi][bj].heye),
+				     J(dragon[bi][bj].heye),
 				     ai, aj, bi, bj, my_status, your_status,
 				     margin_of_safety);
     }
@@ -740,7 +731,7 @@ revise_semeai(int color)
       {
 	found_one = 1;
 	dragon[m][n].matcher_status = UNKNOWN;
-	if (dragon[m][n].origini == m && dragon[m][n].originj == n)
+	if (dragon[m][n].origin == POS(m, n))
 	  TRACE("revise_semeai: changed status of dragon %m from DEAD to UNKNOWN\n",
 		m, n);
       }
