@@ -333,6 +333,10 @@ loadsgf games/nngs/gnugo-3.3.10-jimm-200210222018.sgf 140
 100 disconnect L12 M13
 #? [(2|3) J15]*
 
+loadsgf games/nngs/Temnik-gnugo-3.3.15-200301161937.sgf 232
+101 disconnect N2 L5
+#? [1 M3]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&
