@@ -1,4 +1,4 @@
-;; This file is distributed with GNU GO, a Go program.
+;; This file is distributed with GNU Go, a Go program.
 ;;
 ;; Copyright 2003 by the Free Software Foundation.
 ;;

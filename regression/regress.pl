@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# This program is distributed with GNU GO, a Go program.        #
+# This program is distributed with GNU Go, a Go program.        #
 #                                                               #
 # Write gnugo@gnu.org or see http://www.gnu.org/software/gnugo/ #
 # for more information.                                         #

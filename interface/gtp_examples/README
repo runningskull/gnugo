@@ -34,4 +34,6 @@ matcher_check : A perl script that plays a gnugo process against itself,
 		It flags these for further analysis by a person, and attempts
 		to generate regression tests from them.
                 
-
+gnugo.el   : This alternative to interface/gnugo.el can use XPM's to
+             display the board, but it is not finished. Use 
+             interface/gnugo.el instead.

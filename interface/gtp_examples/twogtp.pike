@@ -1,7 +1,7 @@
 #! /usr/bin/env pike
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This program is distributed with GNU GO, a Go program.            *
+ * This program is distributed with GNU Go, a Go program.            *
  *                                                                   *
  * Copyright 2003 by the Free Software Foundation.                   *
  *                                                                   *

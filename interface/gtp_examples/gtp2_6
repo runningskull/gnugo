@@ -1,3 +1,8 @@
+This patch to GNU Go 2.6 allows it to play with the Go Text Protocol.
+
+
+
+
 diff -u -N -r -x *\.orig -x *\.info* ./configure.in ../gnugo-2.6.1/gnugo-2.6.1/configure.in
 --- ./configure.in	Sun Feb 13 03:02:11 2000
 +++ ../gnugo-2.6.1/gnugo-2.6.1/configure.in	Sat Aug  4 00:10:58 2001

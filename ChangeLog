@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- regress.pike added to EXTRADIST
+- revision of copyright notices
 - warnings fixed on some platforms
 
 3.3.23 released July 15, 2003

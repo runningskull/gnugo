@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       *
+ * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
  * Copyright 1999, 2000, 2001, 2002 and 2003                         *
@@ -383,7 +383,7 @@ dummyhelper(int transformation, int move, int color, int action)
 
 #define PREAMBLE "\
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n\
- * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       *\n\
+ * This is GNU Go, a Go program. Contact gnugo@gnu.org, or see       *\n\
  * http://www.gnu.org/software/gnugo/ for more information.          *\n\
  *                                                                   *\n\
  * Copyright 1999, 2000, 2001, 2002 and 2003                         *\n\
