@@ -84,7 +84,7 @@ engine.
 @menu
 * Getting Started::          How to use the engine in your program
 * Basic Data Structures::    Basic Data Structures in the Engine
-* The Position Struct::      The Position `struct'
+* The Board State::          The board_state `struct'
 * Positional Functions::     Functions which manipulate a Position
 @end menu
 
@@ -107,7 +107,7 @@ the internal hash table. In addition to this the engine will use a few
 megabytes for other purposes such as data describing groups (liberties,
 life status, etc), eyes and so on.
 
-@node Basic Data Structures, The Position Struct, Getting Started, API
+@node Basic Data Structures, The Board State, Getting Started, API
 @cindex data structures
 @cindex position struct
 
@@ -143,106 +143,58 @@ other color than the parameter. This macro can only be used on @code{WHITE}
 or @code{BLACK}, but not on @code{EMPTY} or one of the border colors.
 @findex OTHER_COLOR
 
-@node The Position Struct, Positional Functions, Basic Data Structures, API
+GNU Go uses two different representations of the board, for
+most purposes a one-dimensional one, but for a few purposes a
+two dimensional one (@pxref{The Board}). The one-dimensional
+board was introduced before GNU Go 3.2, while the two-dimensional
+board dates back to the ancestral program written by Man Lung Li
+before 1995. The API still uses the one-dimensional board, so
+the API functions have not changed much since GNU Go 3.0.
 
-@section The Position Struct
-@cindex position struct
+@node The Board State, Positional Functions, Basic Data Structures, API
 
-The basic data structure in the interface to the engine is the
-@code{Position}. A @code{Position} is used to store the current position
-of a game including the location of all black and white stones, a
-possible ko, and the number of captured stones on each side.  Here is
-the definition of @code{Position}:
+@section The board_state struct
+@cindex board_state
+
+A basic data structure in the engine is the @code{board_state} struct. 
+This structure is internal to the engine and is defined in @file{liberty.h}.
 
 @example 
 
      typedef unsigned char Intersection;
      
-     typedef struct @{
-       int          boardsize;
-       Intersection board[MAX_BOARD][MAX_BOARD];
-       int          ko_pos;
-       int          last[2];
+     struct board_state @{
+       int board_size;
      
-       float        komi;
-       int          white_captured;
-       int          black_captured;
-     @} Position;
-
+       Intersection board[BOARDSIZE];
+       int board_ko_pos;
+       int black_captured;
+       int white_captured;
+     
+       Intersection initial_board[BOARDSIZE];
+       int initial_board_ko_pos;
+       int initial_white_captured;
+       int initial_black_captured;
+       int move_history_color[MAX_MOVE_HISTORY];
+       int move_history_pos[MAX_MOVE_HISTORY];
+       int move_history_pointer;
+     
+       float komi;
+       int move_number;
+     @};
 @end example
 
 Here @code{Intersection} stores @code{EMPTY}, @code{WHITE} or
 @code{BLACK}. It is currently defined as an @code{unsigned char} to make
-it reasonably efficient in both storage and access time. The position
-stores a two-dimensional array of Intersections with the size
-@code{MAX_BOARD}. @code{MAX_BOARD} is the value of the biggest board
-size that the engine supports; it is currently set to 21. There is also
-a @code{MIN_BOARD} which is set to 3.
+it reasonably efficient in both storage and access time. The board state
+contains an array of @code{Intersection}'s representing the board.
+The move history is contained in the struct. Also contained in
+the struct is the location of a ko (@code{EMPTY}) if the last
+move was not a ko capture, the komi, the number of captures, and
+corresponding data for the initial position at the beginning
+of the move history.
 
-To indicate what board size is actually used, there is a member,
-@code{boardsize}, which should be in the range between @code{MIN_BOARD}
-and @code{MAX_BOARD}.
-
-A location on the board is represented by a pair of integers in the range
-@code{[0 ... boardsize-1]}. The convention used within GNU Go is that the
-first integer indicates the row number from the top and the second integer
-indicates the column number from the left. Thus the coordinate (2,5) is F5 (A)
-in the small diagram below.
-
-@example
-@group
-
-           A B C D E F G
-         7 . . . . . . . 7
-         6 . . . . . . . 6
-         5 . . . . . A . 5
-         4 . . . . . . . 4
-         3 . . . . . . . 3
-         2 . . . . . . . 2
-         1 . . . . . . . 1
-           A B C D E F G
-
-@end group
-@end example
-
-A pass move is represented by the pair @code{(-1,-1)}.  A convention
-within the code is to use the suffix @samp{i} and @samp{j} for the first and
-the last coordinate.
-
-   If there is a ko present on the board, that is if one stone was
-captured the last move and the capturing stone can be recaptured, the
-pair @code{(ko_i, ko_j)} points at the empty intersection where the stone was
-just captured (@samp{a} in the diagram below).
-
-@example 
-@group
-
-           A B C D E F G
-         7 . . . . . . . 7
-         6 . . . . . . . 6
-         5 . . . O X . . 5
-         4 . . O a O X . 4
-         3 . . . O X . . 3
-         2 . . . . . . . 2
-         1 . . . . . . . 1
-           A B C D E F G
-
-@end group
-@end example
-
-If no ko is present, @code{ko_i} should be set to @code{-1}.
-
-The last two moves played are stored in @code{(last_i[], last_j[])}.
-
-As the game progresses the number of prisoners on each side are
-maintained in the members @code{white_captured} and @code{black_captured}.
-
-The komi used in the ongoing game is also stored in the @code{Position}.
-The reason for this is that in some instances, GNU Go plays differently
-whether it is ahead, behind or the position is even.  So the komi is an
-important input to the move generation.
-
-@node Positional Functions, , The Position Struct, API
+@node Positional Functions, , The Board State, API
 
 @section Functions which manipulate a Position
 
@@ -251,173 +203,175 @@ prefixed by @code{gnugo_}. These functions still use the two-dimensional
 representation of the board (@pxref{The Board}). Here is a complete list, as
 prototyped in @file{gnugo.h}:
 
-@subsection Functions which manipulate the go position
-
 @itemize
-@item @code{void gnugo_clear_position(Position *pos, int boardsize, float komi)}
-@findex gnugo_clear_position
+@item @code{void init_gnugo(float memory)}
+@findex init_gnugo
 @quotation
-Clear the position setting the board size to @code{boardsize} and the
-komi to @code{komi}.
+Initialize the gnugo engine. This needs to be called 
+once only.
 @end quotation
-
-@item @code{void gnugo_copy_position(Position *dest, Position *src)}
-@findex gnugo_copy_position
+@item @code{void gnugo_clear_board(int boardsize)}
+@findex gnugo_clear_board
 @quotation
-Copy position @code{src} to position @code{dest}. This is the same
-convention that is used in @code{memcpy(3)}.
+Clear the board.
 @end quotation
-
-@item @code{void gnugo_add_stone(Position *pos, int i, int j, int color)}
+@item @code{void gnugo_set_komi(float new_komi)}
+@findex gnugo_set_komi
+@quotation
+Set the komi.
+@end quotation
+@item @code{void gnugo_add_stone(int i, int j, int color)}
 @findex gnugo_add_stone
 @quotation
-Add a stone of @code{color} at @code{(i,j)} to the position.
+Place a stone on the board
 @end quotation
-
-@item @code{void gnugo_remove_stone(Position *pos, int i, int j)}
+@item @code{void gnugo_remove_stone(int i, int j)}
 @findex gnugo_remove_stone
 @quotation
-Remove the stone at @code{(i,j)} from the position. No check is
-done that there actually is a stone there.
+Remove a stone from the board
 @end quotation
-
-@item @code{void gnugo_play_move(Position *pos, int i, int j, int color)}
+@item @code{int gnugo_is_pass(int i, int j)}
+@findex gnugo_is_pass
+@quotation
+Return true if (i,j) is PASS_MOVE
+@end quotation
+@item @code{void gnugo_play_move(int i, int j, int color)}
 @findex gnugo_play_move
 @quotation
-Play a stone of color color at @code{(i, j)} in the position removing
-captured stones if any. No check is done if the move is legal; to do
-that, call @code{gnugo_is_legal()}. Suicide is legal.
+Play a move and start the clock
 @end quotation
-
-@item @code{int gnugo_play_sgfnode(Position *pos, SGFNode *node, int to_move)}
+@item @code{int gnugo_undo_move(int n)}
+@findex gnugo_undo_move
+@quotation
+Undo n permanent moves. Returns 1 if successful and 0 if it fails.
+If n moves cannot be undone, no move is undone.
+@end quotation
+@item @code{int gnugo_play_sgfnode(SGFNode *node, int to_move)}
 @findex gnugo_play_sgfnode
 @quotation
-Place all the stones in and play all the moves in the SGF node
-@code{node} (@pxref{SGF}.) Return whose turn it is to move after this is
-done.
+Perform the moves and place the stones from the SGF node on the 
+board. Return the color of the player whose turn it is to move.
 @end quotation
-
-@item @code{int gnugo_play_sgftree(Position *pos, SGFNode *root, int *until, SGFNode **curnode)}
+@item @code{int gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode)}
 @findex gnugo_play_sgftree
 @quotation
-Clear the position and play through the moves in SGF tree @code{root}
-until the move number @code{until} has been reached.  Return whose turn
-it is to move after this is done. The parameter @code{curnode} will be
-set to the current node in the tree, i.e. the one which was played
-last. 
+Play the moves in ROOT UNTIL movenumber is reached.  Return the color of the
+player whose turn it is to move.  
 @end quotation
-
-@item @code{int gnugo_is_legal(Position *pos, int i, int j, int color)}
+@item @code{int gnugo_is_legal(int i, int j, int color)}
 @findex gnugo_is_legal
 @quotation
-Return 1 if the move at @code{(i,j)} would be legal; otherwise return
-0. The rule set used is standard japanese rules where suicide is
-illegal. If there is a ko point set (@code{ko_i != -1}), then the ko
-point is also illegal to play on.
+Interface to @code{is_legal()}.
 @end quotation
-
-@item @code{int gnugo_is_suicide(Position *pos, int i, int j, int color)}
+@item @code{int gnugo_is_suicide(int i, int j, int color)}
 @findex gnugo_is_suicide
 @quotation
-Return 1 if the move at @code{(i,j)} would be suicide; otherwise return 0.
+Interface to @code{is_suicide()}.
 @end quotation
-
-@item @code{int gnugo_placehand(Position *pos, int handicap)}
+@item @code{int gnugo_placehand(int handicap)}
 @findex gnugo_placehand
 @quotation
-Sets up handicap stones, returning the number of placed handicap stones.
-Maximum handicap supported is 0 for board sizes below 7, 4 for board
-sizes 7 or 8 and 9 for board sizes from 9 and up.
+Interface to placehand. Sets up handicap pieces and
+returns the number of placed handicap stones.
 @end quotation
-
-@item @code{int gnugo_sethand(Position *pos, int handicap, struct SGFNode_t *root)}
-@findex gnugo_sethand
-@quotation
-Sets up handicap pieces and returns the number of placed
-handicap stones, updating the SGF file.
-@end quotation
-
-@item @code{void gnugo_recordboard(Position *pos, struct SGFNode_t *node)}
+@item @code{void gnugo_recordboard(SGFNode *root)}
 @findex gnugo_recordboard
 @quotation
-Records the position in the SGF node (@pxref{SGF}).
+Interface to @code{sgffile_recordboard()}
 @end quotation
-
-@item @code{int gnugo_genmove(Position *pos, int *i, int *j, int color, int move_number)}
+@item @code{int gnugo_sethand(int handicap, SGFNode *node)}
+@findex gnugo_sethand
+@quotation
+Interface to placehand. Sets up handicap stones and
+returns the number of placed handicap stones, updating the sgf file
+@end quotation
+@item @code{int gnugo_genmove(int *i, int *j, int color)}
 @findex gnugo_genmove
 @quotation
-Generate a move for color @code{color} and return it in
-@code{(*i,*j)}. The parameter @code{move_number} is the number of the
-current move. This is mostly used for debugging reasons, as the game
-handling functions all work on top of the move generation part of the
-engine. (@pxref{Move Generation Basics}.).
+Interface to @code{genmove()}.
 @end quotation
-
-@item @code{float gnugo_estimate_score(Position *pos, float *upper, float *lower)}
-
-@findex gnugo_estimate_score
-@quotation
-Evaluate the approximate score. The score is given as an interval with a
-lower and upper bound.  A positive score means that white is leading,
-while a negative score is good for black.  When the lower bound is
-estimated, CRITICAL dragons are awarded to white; when estimating the
-lower bound, they are awarded to black.
-
-The estimation is returned through the pointers @code{*upper} and
-@code{*lower}, and the mean between them is returned as the functions
-value.
-@end quotation
-
-@item @code{void gnugo_who_wins(Position *pos, int color, FILE *outfile)}
-@findex gnugo_who_wins
-@quotation
-Score the game and determine the winner.
-@end quotation
-@end itemize
-
-@subsection Status functions
-
-These functions examines the position in different ways and tells the
-status of groups and other items.  
-
-@itemize
-@item @code{int gnugo_attack(Position *pos, int m, int n, int *i, int *j)}
+@item @code{int gnugo_attack(int m, int n, int *i, int *j)}
 @findex gnugo_attack
 @quotation
-Calls the tactical reading function @code{attack} to determine whether
-the string at @code{(m, n)} can be captured (@pxref{Tactical Reading}).
+Interface to @code{attack()}.
 @end quotation
-
-@item @code{int gnugo_find_defense(Position *pos, int m, int n, int *i, int *j)}
+@item @code{int gnugo_find_defense(int m, int n, int *i, int *j)}
 @findex gnugo_find_defense
 @quotation
-Calls the tactical reading function @code{find_defense} to determine
-whether the string at @code{(m, n)} can be rescued (@pxref{Tactical
-Reading}).
+Interface to @code{find_defense()}.
 @end quotation
-@end itemize
-
-@subsection Special functions
-
-These functions are only used in special situations, such as when the
-program wants to access internal data structures within the engine. They
-should only be used when the programmer has a good knowledge of the
-internals of GNU Go.
-
-@itemize
-
-@item @code{void gnugo_force_to_globals(Position *pos)}
-@findex gnugo_force_to_globals
+@item @code{void gnugo_who_wins(int color, FILE *outfile)}
+@findex gnugo_who_wins
 @quotation
-Put the values in @code{pos} into the global variables which is the
-equivalent of the @code{Position}.
+Interface to @code{who_wins()}.
 @end quotation
-
-@item @code{void gnugo_examine_position(Position *pos, int color, int how_much)}
+@item @code{float gnugo_estimate_score(float *upper, float *lower)}
+@findex gnugo_estimate_score
+@quotation
+Put upper and lower score estimates into @code{*upper}, @code{*lower} and
+return the average. A positive score favors white. In computing
+the upper bound, @code{CRITICAL} dragons are awarded to white; in
+computing the lower bound, they are awarded to black.
+@end quotation
+@item @code{void gnugo_examine_position(int color, int how_much)}
 @findex gnugo_examine_position
 @quotation
-Calls @code{examine_position()}, doing much prelimary analysis of
-the board position (@pxref{Move Generation Basics}).
+Interface to @code{examine_position}.
+@end quotation
+@item @code{int gnugo_get_komi()}
+@findex gnugo_get_komi
+@quotation
+Report the komi.
+@end quotation
+@item @code{void gnugo_get_board(int b[MAX_BOARD][MAX_BOARD])}
+@findex gnugo_get_board
+@quotation
+Place the board into the @samp{b} array.
+@end quotation
+@item @code{int gnugo_get_boardsize()}
+@findex gnugo_get_boardsize
+@quotation
+Report the board size.
+@end quotation
+@item @code{int gnugo_get_move_number()}
+@findex gnugo_get_move_number
+@quotation
+Report the move number.
+@end quotation
+@item @code{void gameinfo_clear(Gameinfo *ginfo, int boardsize, float komi)}
+@findex gameinfo_clear
+@quotation
+Initialize the @code{Gameinfo} structure.
+@end quotation
+@item @code{void gameinfo_print(Gameinfo *ginfo)}
+@findex gameinfo_print
+@quotation
+Print a gameinfo.
+@end quotation
+@item @code{void gameinfo_load_sgfheader(Gameinfo *gameinfo, SGFNode *head)}
+@findex gameinfo_load_sgfheader
+@quotation
+Reads header info from sgf structure and sets the appropriate variables.
+@end quotation
+@item @code{void gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)}
+@findex gameinfo_play_move
+@quotation
+Make a move in the game. Return 1 if the move was legal. In that
+case the move is actually done. Otherwise return 0.
+@end quotation
+@item @code{int gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head, const char *untilstr, int orientation)}
+@findex gameinfo_play_sgftree_rot
+@quotation
+Play the moves in an SGF tree. Walk the main variation, actioning the
+properties into the playing board. Returns the color of the next move to be
+made. Head is a sgf tree. Untilstr is an optional string of the form either
+'L12' or '120' which tells it to stop playing at that move or move
+number. When debugging, this is the location of the move being examined.
+@end quotation
+@item @code{int gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)}
+@findex gameinfo_play_sgftree
+@quotation
+Same as previous function, using standard orientation.
 @end quotation
 @end itemize
 

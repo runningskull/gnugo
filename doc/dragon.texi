@@ -6,7 +6,6 @@
 * Dragons::                           Union of WORMS.
 * Dragons in Color::                  Colored display of DRAGONS.
 * Worm and Dragon Functions::         Worm and Dragon Functions.
-* Dragon2::                           The Second Dragon Array.
 @end menu
 
 Before considering its move, GNU Go collects some data in several
@@ -166,6 +165,7 @@ of the same color. The stones placed at distance >1 may
 not touch a group of the opposite color. Connections through
 ko are not permitted. Thus in the following configuration:
 @example
+
           .XX...    We label the     .XX.4.
           XO....    liberties of     XO1234
           XO....    order < 5 of     XO1234
@@ -173,6 +173,7 @@ ko are not permitted. Thus in the following configuration:
           .X.X..                     .X.X..
 
 @end example
+
 The convention that liberties of order >1 may not touch a
 group of the opposite color means that knight's moves and
 one space jumps are perceived as impenetrable barriers.
@@ -196,39 +197,15 @@ We say that n is the @dfn{distance} of the liberty of order n from the dragon.
 @item @code{lunch}
 @quotation
 @cindex lunch (worm)
-If @code{lunchi != 0} then @code{lunch} points to a boundary worm
-which can be easily captured.  (It does not matter whether or not the string
-can be defended.)
-@end quotation
-@item @code{defend}: 
-@quotation
-@cindex defense point (worm)
-If there is an attack on the string (stored in the @code{attack}
-field defined above), and there is a move which defends the
-string, this move is stored in @code{(defendi, defendj)}.  Otherwise
-@code{defend_code == 0}.
+If nonzero, @code{lunch} points to a boundary worm which can be easily
+captured.  (It does not matter whether or not the string can be
+defended.)
 @end quotation
 @end itemize
 
 We have two distinct notions of cutting stone, which we keep track
 of in the separate fields @code{worm.cutstone} and @code{worm.cutstone2}.
-We maintain both fields because the historically older cutstone
-field is needed to deal with the fact that e.g. in the position
-
-@example
-   OXX.O
-   .OOXO
-   OXX.O
-@end example
-
-@noindent
-the X stones are amalgamated into one dragon because neither cut
-works as long as the two O stones are in atari. Therefore we add
-one to the cutstone field for each potential cutting point,
-indicating that these O stones are indeed worth rescuing.
-
-For the time being we use both concepts in parallel. It's
-possible we also old concept for correct handling of lunches.  
+We use currently use both concepts in parallel.
 
 @itemize
 @item @code{cutstone}: 
@@ -268,30 +245,9 @@ database. Proper cuts are handled by the fact that attacking and
 defending moves also count as moves cutting or connecting the
 surrounding dragons.  The @code{cutstone2} field is set during 
 @code{find_cuts()}, called from @code{make_domains()}.
+@end quotation
 @findex find_cuts
 @findex make_domains
-
-The @code{cutstone2} field is needed to deal with the fact that e.g. in the
-position
-
-@example        
-
-           OXX.O
-           .OOXO
-           OXX.O
-
-@end example
-        
-@noindent
-the X stones are amalgamated into one dragon because neither cut
-works as long as the two O stones are in atari. Therefore we add
-one to the cutstone field for each potential cutting point,
-indicating that these O stones are indeed worth rescuing.
-
-For the time being we use both concepts in parallel, with the new
-concept stored in @code{cutstone2}. It's possible that we have to keep the
-old concept for correct handling of lunches.
-@end quotation
 @item @code{genus}: 
 @quotation
 @cindex genus (worm)
@@ -302,25 +258,6 @@ dragons. The dragon notion is more important, so
 to the number of eyes. The @dfn{genus} of a string is the number
 of connected components of its complement, minus one. It is
 an approximation to the number of eyes of the string.
-@end quotation
-@item @code{ko}: 
-@quotation
-@cindex ko
-For every ko, the flag @code{ko} is set to 1 at the ko stone
-which is in atari, and also at the ko cavity adjacent
-to it. Thus in this situation:
-
-@example
-
-             XO
-            X.XO
-             XO
-
-@end example
-
-@noindent
-the flag @code{ko} is set to 1 at the rightmost X stone, and also
-at the cavity to its left.
 @end quotation
 @item @code{inessential}: 
 @quotation
@@ -380,44 +317,29 @@ which strictly follows the definitions above, calls such seki groups
 unconditionally dead, which of course is a misfeature. It is possible to
 avoid this problem by making the algorithm slightly more complex, but
 this is left for a later revision.
-
 @end quotation
-@item @code{attack_points[MAX_TACTICAL_POINTS]}
-@quotation
-Tracks up to @code{MAX_TACTICAL_POINTS} attack points for
-the worm. Often only the first, @code{attack_points[0]} is
-significant.
-@end quotation
+@item @code{int attack_points[MAX_TACTICAL_POINTS]}
 @item @code{attack_codes[MAX_TACTICAL_POINTS]}
+@item @code{int defense_points[MAX_TACTICAL_POINTS];}
+@item @code{int defend_codes[MAX_TACTICAL_POINTS];}
 @quotation
-This can be 0, @code{WIN}, @code{KO_A} or @code{KO_B}. It
-is the outcome of an attack at the corresponding attack point.
+If the tactical reading code (@pxref{Tactical Reading}) finds that the
+worm can be attacked, @code{attack_points[0]} is a point of attack, and
+@code{attack_codes[0]} is the attack code, WIN, KO_A or KO_B. If
+multiple attacks are known, @code{attack_points[k]} and
+@code{attack_codes[k]} are used. Similarly with the defense
+codes and defense points.
 @end quotation
-@item @code{defense_points[MAX_TACTICAL_POINTS]}
-@quotation
-Tracks up to @code{MAX_TACTICAL_POINTS} defense points for
-the worm. Often only the first, @code{defense_points[0]} is
-significant.
-@end quotation
-@item @code{defend_codes[MAX_TACTICAL_POINTS]}
-@quotation
-This can be 0, @code{WIN}, @code{KO_A} or @code{KO_B}. It
-is the outcome of a defense at the corresponding defense point.
-@end quotation
-@item @code{int attack_threat_codes[MAX_TACTICAL_POINTS]}
-@item @code{int attack_threat_codes[MAX_TACTICAL_POINTS]; }
+@item @code{int attack_threat_points[MAX_TACTICAL_POINTS];}
+@item @code{int attack_threat_codes[MAX_TACTICAL_POINTS];}
 @item @code{int defense_threat_points[MAX_TACTICAL_POINTS];}
 @item @code{int defense_threat_codes[MAX_TACTICAL_POINTS];}
 @quotation
-These are points with threaten to attack or defend the worm.
+These are points that threaten to attack or defend a worm.
 @end quotation
 @end itemize
 
-The function @code{makeworms()} will generate data for all worms. For
-empty worms, the following fields are significant: @code{color},
-@code{size}, @code{origini} and @code{originj}. The @code{liberty},
-@code{attack}, @code{defend}, @code{cutstone}, @code{genus} and
-@code{inessential} fields have significance only for nonempty worms.
+The function @code{makeworms()} will generate data for all worms.
 
 @node  Amalgamation, Connection, Worms, Worms and Dragons
 @comment  node-name,  next,  previous,  up
@@ -650,8 +572,10 @@ is described elsewhere (@pxref{Eye Topology}).
 The half eye data is collected in the dragon array. Before this is done,
 however, an auxiliary array called half_eye_data is filled with
 information. The field @code{type} is 0, or else @code{HALF_EYE} or 
-@code{FALSE_EYE} depending on which type is found; and
-@code{(ki, kj)} points to a move to kill the half eye.
+@code{FALSE_EYE} depending on which type is found; the fields
+@code{attack_point[]} point to up to 4 points to attack
+the half eye, and similarly @code{defense_point[]} gives points
+to defend the half eye.
 
 @example
 @group
@@ -659,13 +583,12 @@ information. The field @code{type} is 0, or else @code{HALF_EYE} or
 struct half_eye_data half_eye[MAX_BOARD];
 
 struct half_eye_data @{
+  float value;      /* Topological eye value. */
   int type;         /* HALF_EYE or FALSE_EYE; */
   int num_attacks;  /* number of attacking points */
-  int num_defends;  /* number of defending points */
-  int ai[4];        /* (ai, aj) attacks a topological halfeye */
-  int aj[4];
-  int di[4];        /* (di, dj) defends a topological halfeye */
-  int dj[4];
+  int attack_point[4];  /* the move to attack a topological halfeye */
+  int num_defends;      /* number of defending points */
+  int defense_point[4]; /* the move to defend a topological halfeye */
 @};
 
 @end group
@@ -690,42 +613,85 @@ dragon.
 @example
 
 struct dragon_data @{
-  int color;   
+  int color;
   int id;
-  int origini; 
-  int originj; 
-  int borderi; 
-  int borderj; 
+  int origin;
   int size;
   float effective_size;
-  int heyes;
-  int heyei;
-  int heyej;
-  int genus;
-  int escape_route;
-  int lunchi;       
-  int lunchj;
   int status;
+  int owl_threat_status;
   int owl_status;
-  int owl_attacki;
-  int owl_attackj;
+  int owl_attack_point;
+  int owl_attack_code;
   int owl_attack_certain;
-  int owl_second_attacki;
-  int owl_second_attackj;
-  int owl_defendi;
-  int owl_defendj;
-  int owl_defend_certain;
-  int owl_second_defendi;
-  int owl_second_defendj;
-  int old_safety;
+  int owl_second_attack_point;
+  int owl_defense_point;
+  int owl_defense_code;
+  int owl_defense_certain;
+  int owl_second_defense_point;
   int matcher_status;
+@};
+
+extern struct dragon_data dragon[BOARDMAX];
+
+@end example
+
+Other fields attached to the dragon are contained in the @code{dragon_data2}
+struct array. 
+
+@example
+
+struct dragon_data2 @{
+  int origin;
+  int adjacent[MAX_NEIGHBOR_DRAGONS];
+  int neighbors;
+  int hostile_neighbors;
+  int moyo;
+  int safety;
+  int escape_route;
+  int genus;
+  int heyes;
+  int heye;
+  int lunch;
   int semeai;
   int semeai_margin_of_safety;
 @};
 
+extern struct dragon_data2 *dragon2;
+
 @end example
 
-Here are the definitions of each field.
+The difference between the two arrays is that the @code{dragon} array 
+is indexed by the board, and there is a copy of the dragon data 
+at every stone in the dragon, while there is only one copy of of
+the dragon2 data. The dragons are numbered, and the @code{id} field
+of the dragon is a key into the dragon2 array. Two macros DRAGON
+and DRAGON2 are provided for gaining access to the two arrays.
+
+@example
+#define DRAGON2(pos) dragon2[dragon[pos].id]
+#define DRAGON(d) dragon[dragon2[d].origin]
+@end example
+
+Thus if you know the position @code{pos} of a stone in the dragon
+you can access the dragon array directly, for example accessing the
+origin with @code{dragon[pos].origin}. However if you need a field
+from the dragon2 array, you can access it using the DRAGON2 macro,
+for example you can access its neighor dragons by
+
+@example
+   for (k = 0; k < DRAGON2(pos).neighbors; k++) @{
+      int d = DRAGON2(pos).adjacent[k];
+      int apos = dragon2[d].origin;
+      do_something(apos);	
+   @}
+@end example
+
+Similarly if you know the dragon number (which is @code{dragon[pos].id})
+then you can access the @code{dragon2} array directly, or you can
+access the @code{dragon} array using the DRAGON macro.
+
+Here are the definitions of each field in the @code{dragon} arrray.
 
 @itemize @bullet 
 @item @code{color}: 
@@ -737,10 +703,9 @@ For caves, it is @code{BLACK_BORDER}, @code{WHITE_BORDER} or
 @end quotation
 @item @code{id}:
 @quotation
-This is a pointer to the dragon's field in the @code{dragon2} array
-(@pxref{Dragon2}).
+The dragon number. This is a key into the @code{dragon2} array.
 @end quotation
-@item @code{(origini, originj)}
+@item @code{origin}
 @quotation
 @cindex origin (dragon)
 The origin of the dragon is a unique particular vertex
@@ -749,14 +714,6 @@ to the same dragon. Before amalgamation the worm origins are
 copied to the dragon origins. Amalgamation of two dragons
 amounts to changing the origin of one.
 @end quotation        
-@item @code{(borderi, borderj)}
-@quotation
-@cindex border (cave)
-This field is relevant for caves. If the color of the
-cave is @code{BLACK_BORDER} or @code{WHITE_BORDER} then the surrounding worms
-all have the same color @code{BLACK} or @code{WHITE} and these have been
-amalgamated into a dragon with origin @code{(borderi, borderj)}.
-@end quotation
 @item @code{size}: 
 @quotation
 @cindex size (dragon)
@@ -770,18 +727,6 @@ Remembering that vertices equidistant between two or more worms are
 counted fractionally in @code{worm.effective_size}, this equals the
 cardinality of the dragon plus the number of empty vertices which are
 nearer this dragon than any other.
-@end quotation
-@item @code{heyes}: 
-@quotation
-@cindex half eye (dragon)
-This is the number of half eyes the dragon has. A @dfn{half eye} is a
-pattern where an eye may or may not materialize, depending on
-who moves first.
-@end quotation
-@item @code{(heyi,heyj)}:
-@quotation
-If any half eyes are found, @code{(heyi,heyj)} points to a move which will
-create an eye.
 @end quotation
 @item @code{genus}: 
 @quotation
@@ -801,27 +746,19 @@ dragon can escape, so finding two eyes locally becomes less
 urgent. Further documentation may be found else where
 (@pxref{Escape}).
 @end quotation
-
-@item @code{(lunchi, lunchj)}
-@quotation
-@cindex lunch (dragon)
-If @code{lunchi != -1}, then @code{(lunchi, lunchj)} points to a
-boundary worm which can be captured easily. In contrast with the worm version
-of this parameter, we exclude strings which cannot be saved.
-@end quotation
-@item @code{status}: 
-@quotation
 @cindex status (dragon)
+@findex compute_dragon_status
+@quotation
 An attempt is made to classify the dragons as @code{ALIVE},
 @code{DEAD}, @code{CRITICAL} or @code{UNKNOWN}. The @code{CRITICAL}
 classification means that the fate of the dragon depends on who moves first in
-the area. The exact definition is in the function @code{dragon_status()}. If
-the dragon is found to be surrounded, the status is @code{DEAD} if it has less
-than 1.5 eyes or if the reading code determines that it can be killed,
-@code{ALIVE} if it has 2 or more eyes, and @code{CRITICAL} if it has 1.5
-eyes. A lunch generally counts as a half eye in these calculations. If it has
-less than 2 eyes but seems possibly able to escape, the status may be
-@code{UNKNOWN}.
+the area. The exact definition is in the function 
+@code{compute_dragon_status()}. If the dragon is found to be surrounded, 
+the status is @code{DEAD} if it has less than 1.5 eyes or if the reading
+code determines that it can be killed, @code{ALIVE} if it has 2 or more
+eyes, and @code{CRITICAL} if it has 1.5 eyes. A lunch generally counts
+as a half eye in these calculations. If it has less than 2 eyes but
+seems possibly able to escape, the status may be @code{UNKNOWN}.
 @end quotation
 @item @code{owl_status}
 @quotation
@@ -830,59 +767,130 @@ less than 2 eyes but seems possibly able to escape, the status may be
 This is a classification similar to @code{dragon.status}, but
 based on the life and death reading in @file{owl.c}.
 The owl code (@pxref{The Owl Code}) is only run on dragons with 
-dragon.escape_route>5 and dragon2.moyo>10 (@pxref{Dragon2}). If
+dragon.escape_route>5 and dragon2.moyo>10. If
 these conditions are not met, the owl status is @code{UNCHECKED}.
 If @code{owl_attack()} determines that the dragon cannot be
 attacked, it is classified as @code{ALIVE}. Otherwise,
 @code{owl_defend()} is run, and if it can be defended it
 is classified as @code{CRITICAL}, and if not, as @code{DEAD}.
 @end quotation
-@item @code{(owl_attacki, owl_attackj)}
+@item @code{owl_attack_code}
 @quotation
 If the owl code finds that the dragon can be attacked, this is the
-move. This may be tenuki (i.e. @code{(-1,-1)}) if the owl code thinks
-the group is dead as it stands.
+attack code. It may be @code{WIN}, @code{KO_A}, @code{KO_B}, or (if the
+dragon cannot be attacked) 0.
+@end quotation
+@item @code{owl_attack_point}
+@quotation
+If the owl code finds that the dragon can be attacked, this is the point
+of attack.
 @end quotation
 @item @code{owl_attack_certain}
 @quotation
-The function @code{owl_attack}, which is used to set 
-@code{(owl_attacki, owl_attackj)}, is given an upper bound
-of @code{owl_node_limit} in the number of nodes it is allowed 
-to generate. If this is exceeded the result is considered
-uncertain and this flag is set.
+The function @code{owl_attack}, which is used to set @code{owl_attack_code} 
+and @code{owl_attack_point}, is given an upper bound of 
+@code{owl_node_limit} in the number of nodes it is allowed to
+generate. If this is exceeded the result is considered uncertain and
+this flag is set.
 @end quotation
-@item @code{(owl_second_attack_i, owl_second_attack_j)}
+@item @code{owl_second_attack_point}
 @quotation
-If the level is at least 8, and if a dragon is not owl attackable,
-the owl function @code{owl_threaten_attack} is asked if the dragon
-can be killed with two moves in a row. If two such killing moves
-are found, they are cached in @code{(owl_attacki, owl_attackj)} and
-@code{(owl_second_attack_i, owl_second_attack_j)}.
+Under certain circumstances the owl function @code{owl_threaten_attack}
+is asked if the dragon can be killed with two moves in a row. If two
+such killing moves are found, they are cached in @code{owl_attacki_point}
+@code{(owl_second_attack_point}.
 @end quotation
-@item @code{(owl_defendi, owl_defendj)}
+@item @code{owl_defense_code}
 @quotation
 If the owl code finds that the dragon can be defended, this is the
-move.
+defense code (WIN, KO_A, KO_B); otherwise it is 0.
 @end quotation
-@item @code{owl_defend_certain}
-@item @code{(owl_second_defend_i, owl_second_defend_j)}
+@item @code{owl_defense_point}
+@quotation
+If the owl code finds that the dragon can be defended, this is the move.
+@end quotation
+@item @code{owl_defense_certain}
+@item @code{owl_second_defense_point}
 Similar to @code{owl_attack_certain} and
-@code{(owl_second_attack_i, owl_second_attack_j)}
+@code{owl_second_attack_point}.
 @item @code{matcher_status}
 @quotation
 @cindex matcher status (dragon)
 This is the status used by the pattern matcher. If @code{owl_status}
 is available (not @code{UNCHECKED}) this is used. Otherwise, we
 use the @code{status} field, except that we upgrade @code{DEAD} to
-@end quotation
 @code{UNKNOWN}.
+@end quotation
+@end itemize
+
+Here are definitions of each field in the @code{dragon2} array.
+
+@itemize @bullet
+@item @code{origin}
+@quotation
+Duplicates the origin field from the dragon array.
+@end quotation
+@item @code{adjacent[MAX_NEIGHBOR_DRAGONS]}
+@quotation
+An array of adjacent dragons.
+@end quotation
+@item @code{neighbors}
+@quotation
+The number of adjacent dragons.
+@end quotation
+@item @code{hostile_neighbors}
+@quotation
+The number of adjacent dragons of the opposite color.
+@end quotation
+@item @code{moyo}
+@quotation
+@findex compute_surrounding_moyo_sizes
+Size of the surrounding influence moyo. Computed by
+@code{compute_surrounding_moyo_sizes()}, calling the influence code.
+@end quotation
+@item @code{safety}
+@quotation
+This is a finer measure of dragon safety than @code{matcher_status}.
+In addition to the values ALIVE, DEAD and CRITICAL it can take the
+values INESSENTIAL, TACTICALLY_DEAD, WEAK, WEAKLY_ALIVE, ALIVE_IN_SEKI,
+STRONGLY_ALIVE and INVINCIBLE.
+@end quotation
+@item @code{escape_route}
+@quotation
+A measure of the escape potential of the dragon. Further documentation
+may be found elsewhere (@pxref{Escape}).
+@end quotation
+@item @code{genus}
+@quotation
+The "genus" of a nonempty dragon consists of the number of
+distinct adjacent caves whose bordercolor is the color of the
+dragon, minus the number of false eyes found. The genus is a
+computable approximation to the number of eyes a dragon has.
+@end quotation
+@item @code{heyes}
+@quotation
+This is the number of half eyes the dragon has. A "half eye"
+is a pattern where an eye may or may not materialize,
+depending on who moves first.
+@end quotation
+@item @code{heye}
+@quotation
+If any half eyes are found, this field points to a move
+which will create an eye.
+@end quotation
+@item @code{lunch}
+@quotation
+If nonzero, this field points to the location of a boundary worm
+which can be easily capture. In contrast with the worm version of
+this parameter we exclude strings which cannot be saved.
+@end quotation
 @item @code{semeai}
 @quotation
 True if the dragon is part of a semeai.
 @end quotation
 @item @code{semeai_margin_of_safety}
 @quotation
-Small if the semeai is close. Somewhat unreliable.
+Small if the semeai is close. Currently not reliable.
 @end quotation
 @end itemize
 
@@ -924,7 +932,7 @@ Other useful colored displays may be obtained by using instead:
 
 The colored displays are documented elsewhere (@pxref{Colored Display}).
 
-@node Worm and Dragon Functions, Dragon2, Dragons in Color, Worms and Dragons
+@node Worm and Dragon Functions, , Dragons in Color, Worms and Dragons
 @comment  node-name,  next,  previous,  up
 @section Worm and Dragon Functions
 
@@ -1026,83 +1034,44 @@ Here are the public functions in @file{engine/dragon.c}:
 @item @code{void make_dragons(int color, int stop_before_owl, int save_verbose)}
 @findex make_dragons
 @quotation
-This basic function finds all dragons and collects some basic information
-about them in the dragon array. @code{color} is the player in turn to
-move. This does in no way affect the information collected about the dragons,
-but it does affect what information is passed on to the move generation
-code. If @code{color == EMPTY} no information at all is passed on to the move
-generation.
+This basic function finds all dragons and collects some basic
+information about them in the dragon array. @code{color} is the player
+in turn to move. This does in no way affect the information collected
+about the dragons, but it does affect what information is passed on to
+the move generation code. If @code{color == EMPTY} no information at all
+is passed on to the move generation.
 @end quotation
 @item @code{void show_dragons(void)}
 @findex show_dragons
 @quotation
-print status info on all dragons. (Can be invoked from gdb) 
-@end quotation
-@item @code{void join_dragons(int d1, int d2)}
-@findex join_dragons
-@quotation
-Amalgamates the dragon at (d1) to the dragon at (d2).
-@end quotation
-@item @code{int dragon_escape(char goal[BOARDMAX], int color, int escape_value[BOARDMAX])}
-@findex dragon_escape
-@quotation
-Computes the dragon escape measure (@pxref{Escape}). The marked
-dragon is in the @code{goal} array.
+print status info on all dragons. (Can be invoked from gdb).
 @end quotation
 @item @code{int is_same_dragon(int d1, int d2)}
-@findex int is_same_dragon(int d1, int d2)
+@findex is_same_dragon
 @quotation
 Test whether two dragons are the same. Used by autohelpers and elsewhere.
 @end quotation
 @item @code{int are_neighbor_dragons(int d1, int d2)}
-@findex int are_neighbor_dragons(int d1, int d2)
+@findex are_neighbor_dragons
 @quotation
 Test whether two dragons are neighbors.
 @end quotation
 @item @code{void ascii_report_dragon(char *string)}
-@findex void ascii_report_dragon(char *string)
+@item @code{void report_dragon(int m, int n)}
+@findex ascii_report_dragon
+@findex report_dragon
 @quotation
-For use in gdb, print details of the dragon named by @code{*string}.
+For use in gdb, print details of the dragon.
 Add this to your @file{.gdbinit} file:
 @example
+
 define dragon
 set ascii_report_dragon("$arg0")
 end
+
 @end example
+
 Now 'dragon S8' will report the details of the S8 dragon.
 @end quotation
-@item @code{void report_dragon(int m, int n)}
-@findex void report_dragon(int m, int n)
-@quotation
-Prints details of the dragon at @code{(m,n)}
-@end quotation
 @end itemize
-
-@node Dragon2, , Worm and Dragon Functions, Worms and Dragons
-@section The Second Dragon Array.
-@cindex dragon2 array
-
-In addition to @code{dragon[]} there is a second complementary dragon
-data array @code{dragon2[]}. In contrast to @code{dragon[]}, the
-information in this one is not duplicated to every intersection of the
-board. Instead the dragons are numbered, using the new field id in
-@code{dragon[]}, and this number is used as index into the
-@code{dragon2[]} array. This number can of course not be assigned until
-all dragon amalgamations have been finished. Neither is the
-@code{dragon2[]} array initialized until this has been done.
-
-The first thing this array contains is a list of neighbor dragons. The
-intention of this information is to be able to modify the perceived
-safety of a dragon with respect to the strength of its neighbors. The
-list of neighbors should be useful for other purposes too.
-
-For the algorithm we refer to the source code and its comments, in the
-function @code{compute_supplementary_dragon_data()} in @file{dragon.c}.
-
-To access the @code{dragon[]} array given a dragon id number or the
-@code{dragon2[]} array given a board coordinate, there are the two handy
-macros @code{DRAGON(d)} and @code{DRAGON2(m, n)}. Also notice that the
-@code{dragon2[]} data and the id number only are valid for non-empty
-dragons, i.e. not for caves.
-
 

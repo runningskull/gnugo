@@ -1219,7 +1219,7 @@ int komaster_trymove(int pos, int color, const char *message, int str,
 /* Replace komaster_trymove implementation with komaster_trymove_trace */
 #define komaster_trymove komaster_trymove_ORIGINAL
 
-#endif KOMASTER_TRACE
+#endif /* KOMASTER_TRACE */
 
 
 #if KOMASTER_SCHEME == 1

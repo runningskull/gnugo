@@ -65,7 +65,7 @@ application with @code{libboard.a}.
 @section Board Data structures
 
 The basic data structures of the board correspond tightly to the
-@code{Position} struct described in @xref{The Position Struct}. They are all
+@code{board_state} struct described in @xref{The Board State}. They are all
 stored in global variables for efficiency reasons, the most important of which
 are:
 
@@ -73,9 +73,8 @@ are:
 @group
 
 int           board_size;
-Intersection  board[MAX_BOARD][MAX_BOARD];
-int           board_ko;
-int           last[2];
+Intersection  board[MAXSIZE];
+int           board_ko_pos;
 
 float         komi;
 int           white_captured;
@@ -359,9 +358,9 @@ incremental data structures behind the scene.
 @item @code{void find_origin(int str)}
 @findex find_origin
 @quotation
-Finds the origin of a worm or a cavity, i.e. the point with smallest
-@samp{i} coordinate and in the case of a tie with smallest @samp{j} coordinate.
-The idea is to have a canonical reference point for a string. (@pxref{Worms})
+Find the origin of a worm or a cavity, i.e. the point with the
+smallest 1D board coordinate. The idea is to have a canonical
+reference point for a string (@pxref{Worms}).
 @end quotation
 
 @item @code{int findstones(int str, int maxstones, int *stones)}

@@ -63,7 +63,6 @@ static int dragon2_initialized;
 static int lively_white_dragons;
 static int lively_black_dragons;
 
-/* FIXME: Not sure where best to put this! */
 /* Alternative for DRAGON2 macro with asserts. */
 struct dragon_data2 *
 dragon2_func(int pos)

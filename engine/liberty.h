@@ -768,7 +768,7 @@ extern struct dragon_data2 *dragon2;
 /* Macros for accessing the dragon2 data with board coordinates and
  * the dragon data with a dragon id.
  */
-#if 0 /* Trust DRAGON2 accesses? */
+#if 1 /* Trust DRAGON2 accesses */
 #define DRAGON2(pos) dragon2[dragon[pos].id]
 #else
 struct dragon_data2 * dragon2_func(int pos);

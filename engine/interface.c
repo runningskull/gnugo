@@ -59,11 +59,15 @@ gnugo_clear_board(int boardsize)
   clear_board();
 }
 
+/* Set the komi */
 
-void gnugo_set_komi(float new_komi)
+void
+gnugo_set_komi(float new_komi)
 {
   komi = new_komi;
 }
+
+/* Place a stone on the board */
 
 void
 gnugo_add_stone(int i, int j, int color)
@@ -71,6 +75,7 @@ gnugo_add_stone(int i, int j, int color)
   add_stone(POS(i, j), color);
 }
 
+/* Remove a stone from the board */
 
 void
 gnugo_remove_stone(int i, int j)
@@ -78,11 +83,15 @@ gnugo_remove_stone(int i, int j)
   remove_stone(POS(i, j));
 }
 
+/* Return true if (i,j) is PASS_MOVE */
+
 int
 gnugo_is_pass(int i, int j)
 {
   return is_pass(POS(i, j));
 }
+
+/* Play a move and start the clock */
 
 void
 gnugo_play_move(int i, int j, int color)
@@ -90,6 +99,10 @@ gnugo_play_move(int i, int j, int color)
   play_move(POS(i, j), color);
   clock_push_button(color);
 }
+
+/* Undo n permanent moves. Returns 1 if successful and 0 if it fails.
+ * If n moves cannot be undone, no move is undone.
+ */
 
 int
 gnugo_undo_move(int n)
@@ -100,7 +113,7 @@ gnugo_undo_move(int n)
 
 /*
  * Perform the moves and place the stones from the SGF node on the 
- * board.  Return whose turn it is to move (WHITE or BLACK).
+ * board. Return the color of the player whose turn it is to move.
  */
 
 int
@@ -148,7 +161,7 @@ gnugo_play_sgfnode(SGFNode *node, int to_move)
 
 /*
  * Play the moves in ROOT UNTIL movenumber is reached.
- * Return whose turn it is to move (WHITE or BLACK).
+ * Return the color of the player whose turn it is to move.
  */
 int
 gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode)
@@ -203,7 +216,7 @@ gnugo_play_sgftree(SGFNode *root, int *until, SGFNode **curnode)
 }
 
 
-/* Interface to is_legal. */
+/* Interface to is_legal(). */
 int
 gnugo_is_legal(int i, int j, int color)
 {
@@ -211,7 +224,7 @@ gnugo_is_legal(int i, int j, int color)
 }
 
 
-/* Interface to is_suicide. */
+/* Interface to is_suicide(). */
 int
 gnugo_is_suicide(int i, int j, int color)
 {
@@ -247,14 +260,14 @@ gnugo_sethand(int handicap, SGFNode *node)
 }
 
 
-/* Interface to genmove */
+/* Interface to genmove() */
 int
 gnugo_genmove(int *i, int *j, int color)
 {
   return genmove(i, j, color);
 }
 
-/* Interface to attack */
+/* Interface to attack() */
 int
 gnugo_attack(int m, int n, int *i, int *j)
 {
@@ -272,7 +285,7 @@ gnugo_attack(int m, int n, int *i, int *j)
 }
 
 
-/* Interface to find_defense */
+/* Interface to find_defense() */
 int
 gnugo_find_defense(int m, int n, int *i, int *j)
 {
@@ -311,21 +324,28 @@ gnugo_estimate_score(float *upper, float *lower)
 }
 
 
+/* Interface to examine_position(). */
+
 void
 gnugo_examine_position(int color, int how_much)
 {
   examine_position(color, how_much);
 }
 
-
 /* Accessor functions for internal board state. */
 
-int gnugo_get_komi()
+/* Report the komi. */
+
+int 
+gnugo_get_komi()
 {
   return komi;
 }
 
-void gnugo_get_board(int b[MAX_BOARD][MAX_BOARD])
+/* Place the board into the b array */
+
+void
+gnugo_get_board(int b[MAX_BOARD][MAX_BOARD])
 {
   int i, j;
   for (i = 0; i < board_size; i++)
@@ -333,12 +353,14 @@ void gnugo_get_board(int b[MAX_BOARD][MAX_BOARD])
       b[i][j] = BOARD(i, j);
 }
 
-int gnugo_get_boardsize()
+int
+gnugo_get_boardsize()
 {
   return board_size;
 }
 
-int gnugo_get_move_number()
+int
+gnugo_get_move_number()
 {
   return movenum;
 }
@@ -455,8 +477,7 @@ gameinfo_play_move(Gameinfo *ginfo, int i, int j, int color)
  * Head is a sgf tree. 
  * Untilstr is an optional string of the form either 'L12' or '120'
  * which tells it to stop playing at that move or move-number.
- * When debugging, this will probably be a particularly bad move,
- * and we want to know why.
+ * When debugging, this is the location of the move being examined.
  */
 
 int
@@ -619,6 +640,8 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
   gameinfo->to_move = next;
   return next;
 }
+
+/* Same as previous function, using standard orientation */
 
 int
 gameinfo_play_sgftree(Gameinfo *gameinfo, SGFNode *head, const char *untilstr)
