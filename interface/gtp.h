@@ -54,6 +54,9 @@
 /* Function pointer for callback functions. */
 typedef int (*gtp_fn_ptr)(char *s, int id);
 
+/* Function pointer for vertex transform functions. */
+typedef void (*gtp_transform_ptr)(int ai, int aj, int *bi, int *bj);
+
 /* Elements in the array of commands required by gtp_main_loop. */
 struct gtp_command {
   const char *name;
@@ -62,8 +65,8 @@ struct gtp_command {
 
 void gtp_main_loop(struct gtp_command commands[], FILE *gtp_input);
 void gtp_internal_set_boardsize(int size);
-void gtp_internal_set_orientation(int orient);
-int gtp_internal_get_orientation(void);
+void gtp_set_vertex_transform_hooks(gtp_transform_ptr in,
+                                   gtp_transform_ptr out);
 void gtp_mprintf(const char *format, ...);
 void gtp_printf(const char *format, ...);
 void gtp_printid(int id, int status);

@@ -37,6 +37,7 @@
 #include "liberty.h"
 #include "gtp.h"
 #include "random.h"
+#include <gg_utils.h>
 
 /* Internal state that's not part of the engine. */
 int color_to_move;
@@ -50,6 +51,9 @@ print_influence(float white_influence[MAX_BOARD][MAX_BOARD],
 static void gtp_print_code(int c);
 static void gtp_print_vertices2(int n, int *moves);
 static int report_uncertainty = 0;
+static int gtp_orientation = 0;
+static void rotate_on_input(int ai, int aj, int *bi, int *bj);
+static void rotate_on_output(int ai, int aj, int *bi, int *bj);
 
 /* For undo, we keep the starting position, and a stack
  * listing all moves made.
@@ -355,7 +359,8 @@ gtp_set_orientation(char *s, int id)
     return gtp_failure(id, "unacceptable orientation");
 
   clear_board();
-  gtp_internal_set_orientation(orientation);
+  gtp_orientation = orientation;
+  gtp_set_vertex_transform_hooks(rotate_on_input, rotate_on_output);
   store_position(&starting_position);
   return gtp_success(id, "");
 }
@@ -370,7 +375,7 @@ gtp_query_orientation(char *s, int id)
 {
   UNUSED(s);
 
-  return gtp_success(id, "%d", gtp_internal_get_orientation());
+  return gtp_success(id, "%d", gtp_orientation);
 }
 
 /***************************
@@ -512,7 +517,7 @@ gtp_loadsgf(char *s, int id)
   char untilstring[GTP_BUFSIZE];
   SGFNode *sgf;
   Gameinfo gameinfo;
-  int nread, orient;
+  int nread;
   
   nread = sscanf(s, "%s %s", filename, untilstring);
   if (nread < 1)
@@ -524,12 +529,12 @@ gtp_loadsgf(char *s, int id)
   gameinfo_clear(&gameinfo, 19, 5.5); /* Probably unnecessary. */
   gameinfo_load_sgfheader(&gameinfo, sgf);
 
-  orient = gtp_internal_get_orientation();
   if (nread == 1)
-    color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, NULL, orient);
+    color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, NULL,
+                                             gtp_orientation);
   else
     color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, untilstring,
-                                              orient);
+                                              gtp_orientation);
 
   gnugo_force_to_globals(&gameinfo.position);
   movenum = gameinfo.move_number;
@@ -2420,6 +2425,15 @@ gtp_print_vertices2(int n, int *moves)
   gtp_print_vertices(n, movei, movej);
 }
 
+static void rotate_on_input(int ai, int aj, int *bi, int *bj)
+{
+  rotate(ai, aj, bi, bj, board_size, gtp_orientation);
+}
+
+static void rotate_on_output(int ai, int aj, int *bi, int *bj)
+{
+  inv_rotate(ai, aj, bi, bj, board_size, gtp_orientation);
+}
 
 /*
  * Local Variables:

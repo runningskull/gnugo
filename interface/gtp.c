@@ -41,7 +41,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
-#include <gg_utils.h>
 
 #include "gtp.h"
 
@@ -58,7 +57,10 @@
  * unnecessarily inconvenient.
  */
 static int gtp_boardsize = -1;
-static int gtp_orientation = 0;
+
+/* Vertex transformation hooks. */
+static gtp_transform_ptr vertex_transform_input_hook = NULL;
+static gtp_transform_ptr vertex_transform_output_hook = NULL;
 
 /* Read filehandle gtp_input linewise and interpret as GTP commands. */
 void
@@ -118,18 +120,16 @@ gtp_internal_set_boardsize(int size)
   gtp_boardsize = size;
 }
 
-/* Set the orientation used in coordinate conversions. */
+/* If you need to transform the coordinates on input or output, use
+ * this functions to set hook functions which are called any time
+ * coordinates are read or about to be written. In GNU Go this is used
+ * to simulate rotated boards in regression tests.
+ */
 void
-gtp_internal_set_orientation(int orient)
+gtp_set_vertex_transform_hooks(gtp_transform_ptr in, gtp_transform_ptr out)
 {
-  gtp_orientation = orient;
-}
-
-/* Set the orientation used in coordinate conversions. */
-int
-gtp_internal_get_orientation(void)
-{
-  return gtp_orientation;
+  vertex_transform_input_hook = in;
+  vertex_transform_output_hook = out;
 }
 
 /*
@@ -335,7 +335,9 @@ gtp_decode_coord(char *s, int *i, int *j)
   if (*i < 0 || *i >= gtp_boardsize || *j < 0 || *j >= gtp_boardsize)
     return 0;
 
-  rotate(*i, *j, i, j, gtp_boardsize, gtp_orientation);
+  if (vertex_transform_input_hook != NULL)
+    (*vertex_transform_input_hook)(*i, *j, i, j);
+
   return n;
 }
 
@@ -406,7 +408,12 @@ gtp_print_vertices(int n, int movei[], int movej[])
 	     || movej[k] < 0 || movej[k] >= gtp_boardsize)
       gtp_printf("??");
     else {
-      inv_rotate(movei[k], movej[k], &ri, &rj, gtp_boardsize, gtp_orientation);
+      if (vertex_transform_output_hook != NULL)
+       (*vertex_transform_output_hook)(movei[k], movej[k], &ri, &rj);
+      else {
+       ri = movei[k];
+       rj = movej[k];
+      }
       gtp_printf("%c%d", 'A' + rj + (rj >= 8), gtp_boardsize - ri);
     }
   }
