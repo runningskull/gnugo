@@ -457,6 +457,10 @@ loadsgf games/life_and_death/invasion4.sgf
 517 owl_defend C3
 #? [1 C8]*
 
+loadsgf games/life_and_death/ld20.sgf
+520 owl_defend B4
+#? [2 B3]
+
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
