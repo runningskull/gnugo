@@ -454,10 +454,10 @@ dnl ------------ Reading -------------------
 AH_TEMPLATE([COSMIC_GNUGO],
 [Center oriented influence. Disabled by default.])
 
-if test "$enable_cosmic_gnugo" = "yes" ; then
-   AC_DEFINE(COSMIC_GNUGO, 1)
-else
+if test "$enable_cosmic_gnugo" = "no" ; then
    AC_DEFINE(COSMIC_GNUGO, 0)
+else
+   AC_DEFINE(COSMIC_GNUGO, 1)
 fi
 
 dnl ------------ Connections -------------------
