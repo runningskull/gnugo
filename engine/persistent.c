@@ -34,9 +34,10 @@
  * active area may cause an incorrect read result to be retrieved from
  * the cache.
  *
- * Persistent caching has so far been implemented for tactical reading
- * and owl reading (with connection reading and semeai reading planned
- * for the future). Since different data is stored for the different
+ * Persistent caching has so far been implemented for tactical reading,
+ * owl reading, connection reading and break-in reading (with semeai
+ * reading planned for the future).
+ * Since different data is stored for the different
  * types of reading, similar but different data structures and
  * functions are implemented for each cache.
  *
@@ -111,6 +112,28 @@ static struct connection_cache
 persistent_connection_cache[MAX_CONNECTION_CACHE_SIZE];
 static int persistent_connection_cache_size = 0;
 
+#define MAX_BREAKIN_CACHE_SIZE 150
+#define MAX_BREAKIN_CACHE_DEPTH 1
+
+struct breakin_cache {
+  int boardsize;
+  char board[BOARDMAX];
+  int movenum;
+  int nodes;
+  int score;
+  int remaining_depth;
+  int routine;			/* BREAK_IN or BLOCK_OFF */
+  int str;			/* string to connect (origin) */
+  Hash_data goal_hash;		/* hash of the goal to which to connect to */
+  int result;
+  int move;
+  int stack[MAX_CONNECTION_CACHE_DEPTH];
+  int move_color[MAX_CONNECTION_CACHE_DEPTH];
+};
+
+static struct breakin_cache
+persistent_breakin_cache[MAX_BREAKIN_CACHE_SIZE];
+static int persistent_breakin_cache_size = 0;
 
 /* Owl reading cache. */
 
@@ -153,6 +176,11 @@ static void mark_string_hotspot_values(float values[BOARDMAX],
 static int find_persistent_connection_cache_entry(int routine,
 						  int str1, int str2);
 static void print_persistent_connection_cache_entry(int k);
+
+/* Breakin reading functions. */
+static int find_persistent_breakin_cache_entry(int routine, int str, 
+    					       Hash_data goal_hash);
+static void print_persistent_breakin_cache_entry(int k);
 
 /* Owl functions. */
 static void print_persistent_owl_cache_entry(int k);
@@ -992,6 +1020,330 @@ print_persistent_connection_cache_entry(int k)
   gprintf("%oroutine         = %d\n",  entry->routine);
   gprintf("%ostr1            = %1m\n", entry->str1);
   gprintf("%ostr2            = %1m\n", entry->str2);
+  gprintf("%oresult          = %d\n",  entry->result);
+  gprintf("%omove            = %1m\n", entry->move);
+  
+  for (r = 0; r < MAX_CONNECTION_CACHE_DEPTH; r++) {
+    if (entry->stack[r] == 0)
+      break;
+    gprintf("%ostack[%d]      = %C %1m\n", r, entry->move_color[r],
+	    entry->stack[r]);
+  }
+
+  draw_active_area(entry->board, NO_MOVE);
+}
+
+/* ================================================================ */
+/*                   Break-in reading functions                     */
+/* ================================================================ */
+
+/* Remove persistent cache entries which are no longer current. */
+void
+purge_persistent_breakin_cache()
+{
+  int k;
+  int r;
+  static int last_purge_position_number = -1;
+  gg_assert(stackp == 0);
+
+  /* Never do this more than once per move. */
+  if (last_purge_position_number == position_number)
+    return;
+  else
+    last_purge_position_number = position_number;
+
+  for (k = 0; k < persistent_breakin_cache_size; k++) {
+    int entry_ok = 1;
+    int played_moves = 0;
+
+    if (persistent_breakin_cache[k].boardsize != board_size)
+      entry_ok = 0;
+    else {
+      for (r = 0; r < MAX_CONNECTION_CACHE_DEPTH; r++) {
+	int apos = persistent_breakin_cache[k].stack[r];
+	int color = persistent_breakin_cache[k].move_color[r];
+	if (apos == 0)
+	  break;
+	if (board[apos] == EMPTY
+	    && trymove(apos, color, "purge_persistent_breakin_cache", 0,
+		       EMPTY, 0))
+	  played_moves++;
+	else {
+	  entry_ok = 0;
+	  break;
+	}
+      }
+    }
+
+    if (!entry_ok 
+	|| !verify_stored_board(persistent_breakin_cache[k].board)) {
+      /* Move the last entry in the cache here and back up the loop
+       * counter to redo the test at this position in the cache.
+       */
+      if (0)
+	gprintf("Purging entry %d from cache.\n", k);
+      if (k < persistent_breakin_cache_size - 1)
+	persistent_breakin_cache[k] 
+	  = persistent_breakin_cache[persistent_breakin_cache_size - 1];
+      k--;
+      persistent_breakin_cache_size--;
+    }
+    else {
+      /* This is to retire older cache entries that no longer get used. */
+      persistent_breakin_cache[k].score *= 3;
+      persistent_breakin_cache[k].score /= 4;
+    }
+
+    while (played_moves--)
+      popgo();
+  }
+}
+
+void
+clear_persistent_breakin_cache()
+{
+  persistent_breakin_cache_size = 0;
+}
+
+
+/* Locate a matching entry in the persistent breakin cache. Return the
+ * entry number or -1 if none found.
+ */
+static int
+find_persistent_breakin_cache_entry(int routine, int str,
+    				    Hash_data goal_hash)
+{
+  int k;
+  ASSERT1(str == find_origin(str), str);
+
+  for (k = 0; k < persistent_breakin_cache_size; k++) {
+    /* Check that everything matches. */
+    struct breakin_cache *entry = &(persistent_breakin_cache[k]);
+    int j;
+    if (entry->routine != routine
+	|| entry->str != str
+	|| entry->boardsize != board_size
+	|| entry->remaining_depth < (depth - stackp))
+      continue;
+    for (j = 0; j < NUM_HASHVALUES; j++)
+      if (entry->goal_hash.hashval[j] != goal_hash.hashval[j])
+	break;
+    if (j < NUM_HASHVALUES)
+      continue;
+    
+    if (!verify_stored_board(entry->board))
+      continue;
+
+    return k;
+  }
+  
+  return -1;
+}
+
+
+/* Look for a valid read result in the persistent breakin cache.
+ * Return 1 if found, 0 otherwise.
+ */
+int
+search_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
+				int *result, int *move)
+{
+  int k;
+  struct breakin_cache *entry;
+
+  k = find_persistent_breakin_cache_entry(routine, str, goal_hash);
+  if (k == -1)
+    return 0;
+
+  /* Match found. Increase score and fill in the answer. */
+  entry = &(persistent_breakin_cache[k]);
+  entry->score += entry->nodes;
+  if (result)
+    *result = entry->result;
+  if (move)
+    *move = entry->move;
+  ASSERT1(entry->result == 0
+	  || entry->move == NO_MOVE
+	  || ON_BOARD(entry->move),
+	  entry->move);
+  
+  return 1;
+}
+
+
+/* Store a new breakin result in the persistent cache. */
+void
+store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
+			       int result, int move, int tactical_nodes,
+			       char breakin_shadow[BOARDMAX])
+{
+  char active[BOARDMAX];
+  int k;
+  int r;
+  struct breakin_cache *entry;
+  int other = OTHER_COLOR(board[str]);
+  int pos;
+
+  ASSERT1(result == 0 || (move == 0) || ON_BOARD(move), move);
+
+
+  /* If cache is still full, consider kicking out an old entry. */
+  if (persistent_breakin_cache_size == MAX_BREAKIN_CACHE_SIZE) {
+    int worst_entry = -1;
+    int worst_score = score;
+    
+    for (k = 1; k < persistent_breakin_cache_size; k++) {
+      if (persistent_breakin_cache[k].score < worst_score) {
+	worst_score = persistent_breakin_cache[k].score;
+	worst_entry = k;
+      }
+    }
+
+    if (worst_entry != -1) {
+      /* Move the last entry in the cache here to make space.
+       */
+      if (worst_entry < persistent_breakin_cache_size - 1)
+	persistent_breakin_cache[worst_entry] 
+	  = persistent_breakin_cache[persistent_breakin_cache_size - 1];
+      persistent_breakin_cache_size--;
+    }
+    else
+      return;
+  }
+
+  entry = &(persistent_breakin_cache[persistent_breakin_cache_size]);
+  entry->boardsize       = board_size;
+  entry->movenum         = movenum;
+  entry->nodes           = tactical_nodes;
+  entry->score           = tactical_nodes;
+  entry->remaining_depth = depth - stackp;
+  entry->routine         = routine;
+  entry->str	         = str;
+  entry->goal_hash	 = goal_hash;
+  entry->result          = result;
+  entry->move	         = move;
+
+  for (r = 0; r < MAX_BREAKIN_CACHE_DEPTH; r++) {
+    if (r < stackp)
+      get_move_from_stack(r, &(entry->stack[r]), &(entry->move_color[r]));
+    else {
+      entry->stack[r] = 0;
+      entry->move_color[r] = EMPTY;
+    }
+  }
+  
+  /* Remains to set the board. We let the active area be
+   * the two strings to connect +
+   * the breakin shadow +
+   * distance two expansion through empty intersections and own stones +
+   * adjacent opponent strings +
+   * liberties of adjacent opponent strings with less than five liberties +
+   * liberties of low liberty neighbors of adjacent opponent strings
+   * with less than five liberties.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    active[pos] = breakin_shadow[pos];
+
+  mark_string(str, active, 1);
+
+  /* To be safe, also add the successful move. */
+  if (result != 0 && move != 0)
+    active[move] = 1;
+
+  /* Distance two expansion through empty intersections and own stones. */
+  for (k = 1; k < 3; k++) {
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++){
+      if (!ON_BOARD(pos) || board[pos] == other || active[pos] != 0) 
+	continue;
+      if ((ON_BOARD(SOUTH(pos)) && active[SOUTH(pos)] == k)
+	  || (ON_BOARD(WEST(pos)) && active[WEST(pos)] == k)
+	  || (ON_BOARD(NORTH(pos)) && active[NORTH(pos)] == k)
+	  || (ON_BOARD(EAST(pos)) && active[EAST(pos)] == k)) {
+	if (board[pos] == EMPTY)
+	  active[pos] = k + 1;
+	else
+	  mark_string(pos, active, (char) (k + 1));
+      }
+    }
+  }
+  
+  /* Adjacent opponent strings. */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] != other || active[pos] != 0) 
+      continue;
+    for (r = 0; r < 4; r++) {
+      int pos2 = pos + delta[r];
+      if (ON_BOARD(pos2) && board[pos2] != other && active[pos2] != 0) {
+	mark_string(pos, active, (char) 1);
+	break;
+      }
+    }
+  }
+  
+  /* Liberties of adjacent opponent strings with less than five liberties +
+   * liberties of low liberty neighbors of adjacent opponent strings
+   * with less than five liberties.
+   */
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == other && active[pos] != 0 && countlib(pos) < 5) {
+      int libs[4];
+      int liberties = findlib(pos, 4, libs);
+      int adjs[MAXCHAIN];
+      int adj;
+      for (r = 0; r < liberties; r++)
+	active[libs[r]] = 1;
+      
+      /* Also add liberties of neighbor strings if these are three
+       * or less.
+       */
+      adj = chainlinks(pos, adjs);
+      for (r = 0; r < adj; r++) {
+	if (countlib(adjs[r]) <= 3) {
+	  int s;
+	  liberties = findlib(adjs[r], 3, libs);
+	  for (s = 0; s < liberties; s++)
+	    active[libs[s]] = 1;
+	}
+      }
+    }
+  }
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int value = board[pos];
+    if (!ON_BOARD(pos))
+      continue;
+    if (!active[pos])
+      value = GRAY;
+    else if (IS_STONE(board[pos]) && countlib(pos) > 4)
+      value |= HIGH_LIBERTY_BIT;
+    
+    persistent_breakin_cache[persistent_breakin_cache_size].board[pos] =
+      value;
+  }
+
+  if (0) {
+    gprintf("%o Stored result in cache (entry %d):\n",
+	    persistent_breakin_cache_size);
+    print_persistent_breakin_cache_entry(persistent_breakin_cache_size);
+  }
+  
+  persistent_breakin_cache_size++;
+}
+
+
+/* For debugging purposes. */
+static void
+print_persistent_breakin_cache_entry(int k)
+{
+  struct breakin_cache *entry = &(persistent_breakin_cache[k]);
+  int r;
+  gprintf("%oboardsize       = %d\n",  entry->boardsize);
+  gprintf("%omovenum         = %d\n",  entry->movenum);
+  gprintf("%onodes           = %d\n",  entry->nodes);
+  gprintf("%oscore           = %d\n",  entry->score);
+  gprintf("%oremaining_depth = %d\n",  entry->remaining_depth);
+  gprintf("%oroutine         = %d\n",  entry->routine);
+  gprintf("%ostr             = %1m\n", entry->str);
   gprintf("%oresult          = %d\n",  entry->result);
   gprintf("%omove            = %1m\n", entry->move);
   

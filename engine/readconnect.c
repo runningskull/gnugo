@@ -92,6 +92,8 @@ static int nodes_connect = 0;
 /* Used by alternate connections. */
 static char connection_shadow[BOARDMAX];
 
+static char breakin_shadow[BOARDMAX];
+
 
 /* Statistics. */
 static int global_connection_node_counter = 0;
@@ -2596,6 +2598,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
 	&& board[conn1.queue[k]] == color) {
       str2 = conn1.queue[k];
       TRACE("%oUsing %1m as secondary target.\n", str2);
+      mark_string(str2, breakin_shadow, 1);
       break;
     }
 
@@ -2632,7 +2635,7 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
   num_moves = find_connection_moves(str, str2, color_to_move,
       				    &conn1, &conn2, max_dist1, max_dist2,
       			   	    moves, *total_distance);
-  
+
   {
     int move;
     if (num_moves < MAX_MOVES
@@ -2641,16 +2644,12 @@ find_break_moves(int str, const char goal[BOARDMAX], int color_to_move,
       moves[num_moves++] = move;
     }
   }
+  for (k = 0; k < num_moves; k++)
+    breakin_shadow[moves[k]] = 1;
 
   return num_moves;
 }
 
-
-/* These depth values are set relative to the standard readconnnect depth
- * limits at each call of break_in()/block_off().
- * */
-static int break_in_node_limit;
-static int break_in_depth;
 
 /* Can (str) connect to goal[] if the other color moves first? */
 static int
@@ -2682,12 +2681,12 @@ recursive_break(int str, const char goal[BOARDMAX], int *move,
     return 0;
   }
   
-  if (nodes_connect > break_in_node_limit) {
+  if (nodes_connect > breakin_node_limit) {
     SGFTRACE(PASS_MOVE, 0, "connection node limit reached");
     return 0;
   }
   
-  if (stackp > break_in_depth) {
+  if (stackp > breakin_depth) {
     SGFTRACE(PASS_MOVE, 0, "connection depth limit reached");
     return 0;
   }
@@ -2806,12 +2805,12 @@ recursive_block(int str, const char goal[BOARDMAX], int *move,
   }
 #endif
   
-  if (nodes_connect > break_in_node_limit) {
+  if (nodes_connect > breakin_node_limit) {
     SGFTRACE(PASS_MOVE, WIN, "connection node limit reached");
     return WIN;
   }
   
-  if (stackp > break_in_depth) {
+  if (stackp > breakin_depth) {
     SGFTRACE(PASS_MOVE, WIN, "connection depth limit reached");
     return WIN;
   }
@@ -2909,9 +2908,6 @@ break_in(int str, const char goal[BOARDMAX], int *move)
   int tactical_nodes;
   Hash_data goal_hash = goal_to_hashvalue(goal);
 
-  break_in_node_limit = connection_node_limit / 5;
-  break_in_depth = connect_depth2 - 5;
-
   if (move == NULL)
     move = &dummy_move;
   
@@ -2922,11 +2918,21 @@ break_in(int str, const char goal[BOARDMAX], int *move)
     return 0;
   str = find_origin(str);
 
+  if (search_persistent_breakin_cache(BREAK_IN, str, goal_hash,
+				         &result, move)) {
+    if (debug & DEBUG_TERRITORY) {
+      gprintf("Break-in from %1m to:\n", str);
+      goaldump(goal);
+      gprintf("Result cached: %r %1m\n", result, *move);
+    }
+    return result;
+  }
+
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
   start = gg_cputime();
-  memset(connection_shadow, 0, sizeof(connection_shadow));
+  memcpy(breakin_shadow, goal, sizeof(breakin_shadow));
   result = recursive_break(str, goal, move, EMPTY, NO_MOVE, 0, &goal_hash);
   verbose = save_verbose;
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
@@ -2942,6 +2948,8 @@ break_in(int str, const char goal[BOARDMAX], int *move)
     dump_stack();
     goaldump(goal);
   }
+  store_persistent_breakin_cache(BREAK_IN, str, goal_hash, result, *move,
+				 tactical_nodes, breakin_shadow);
 
   return result;
 }
@@ -2962,9 +2970,6 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   int tactical_nodes;
   Hash_data goal_hash = goal_to_hashvalue(goal);
   
-  break_in_node_limit = connection_node_limit / 5;
-  break_in_depth = connect_depth2 - 5;
-
   if (move == NULL)
     move = &dummy_move;
   
@@ -2972,12 +2977,21 @@ block_off(int str, const char goal[BOARDMAX], int *move)
   *move = PASS_MOVE;
   
   str = find_origin(str);
+  if (search_persistent_breakin_cache(BLOCK_OFF, str, goal_hash,
+				         &result, move)) {
+    if (debug & DEBUG_TERRITORY) {
+      gprintf("Blocking off %1m from:\n", str);
+      goaldump(goal);
+      gprintf("Result cached: %r %1m\n", result, *move);
+    }
+    return result;
+  }
 
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
   start = gg_cputime();
-  memset(connection_shadow, 0, sizeof(connection_shadow));
+  memcpy(breakin_shadow, goal, sizeof(breakin_shadow));
   result = recursive_block(str, goal, move, EMPTY, NO_MOVE, 0,
       			   &goal_hash);
   verbose = save_verbose;
@@ -2995,6 +3009,8 @@ block_off(int str, const char goal[BOARDMAX], int *move)
     goaldump(goal);
     dump_stack();
   }
+  store_persistent_breakin_cache(BLOCK_OFF, str, goal_hash, result, *move,
+				 tactical_nodes, breakin_shadow);
 
   return result;
 }

@@ -83,6 +83,8 @@ enlarge_goal(char goal[BOARDMAX])
 
 /* The "smaller goal" is the intersection of the goal with what is
  * stored in the queue of the connection_data conn.
+ * Plus we need a couple of extra careful modifications in the case
+ * of "blocking off", i.e. when color_to_move == owner.
  */
 static void
 compute_smaller_goal(int owner, int color_to_move,
@@ -134,7 +136,61 @@ compute_smaller_goal(int owner, int color_to_move,
     if (goal_neighbors > 1)
       smaller_goal[pos] = 1;
   }
+
+  /* Finally, in the case of blocking off, we only want one connected
+   * component.
+   */
+  if (owner == color_to_move) {
+    char marked[BOARDMAX];
+    int sizes[BOARDMAX / 2];
+    char mark = 0;
+    int biggest_region = 1;
+    memset(marked, 0, BOARDMAX);
+    for (k = 0; k < conn->queue_end; k++) {
+      int pos = conn->queue[k];
+      if (ON_BOARD(pos) && smaller_goal[pos] && !marked[pos]) {
+	/* Floodfill the connected component of (pos) in the goal. */
+	int queue_start = 0;
+	int queue_end = 1;
+	int queue[BOARDMAX];
+	mark++;
+	sizes[(int) mark] = 1;
+	marked[pos] = mark;
+	queue[0] = pos;
+	while (queue_start < queue_end) {
+	  test_gray_border();
+	  for (k = 0; k < 4; k++) {
+	    int pos2 = queue[queue_start] + delta[k];
+	    if (!ON_BOARD(pos2))
+	      continue;
+	    ASSERT1(marked[pos2] == 0 || marked[pos2] == mark, pos2);
+	    if (smaller_goal[pos2]
+		&& !marked[pos2]) {
+	      sizes[(int) mark]++;
+	      marked[pos2] = mark;
+	      queue[queue_end++] = pos2;
+	    }
+	  }
+	  queue_start++;
+	}
+      }
+    }
+    /* Now selected the biggest connected component. (In case of
+     * equality, take the first one.
+     */
+    for (k = 1; k <= mark; k++) {
+      if (sizes[k] > sizes[biggest_region])
+	biggest_region = k;
+    }
+    memset(smaller_goal, 0, BOARDMAX);
+    for (k = 0; k < conn->queue_end; k++) {
+      int pos = conn->queue[k];
+      if (marked[pos] == biggest_region)
+	smaller_goal[pos] = 1;
+    }
+  }
 }
+
 
 /* Try to intrude from str into goal. If successful, we shrink the goal,
  * store the non-territory fields in the non_territory array, and
@@ -223,10 +279,10 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
   if (debug & DEBUG_TERRITORY)
     goaldump(goal);
   /* Compute nearby fields of goal. */
-  init_connection_data(owner, goal, &conn);
+  init_connection_data(intruder, goal, &conn);
   k = conn.queue_end;
   spread_connection_distances(intruder, NO_MOVE, &conn, 3.01, 1);
-  if (debug & DEBUG_TERRITORY)
+  if (0 && (debug & DEBUG_TERRITORY))
     print_connection_distances(&conn);
 
   /* Look for nearby stones. */
@@ -274,7 +330,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
 
   for (k = 0; k < num_non_territory; k++)
     influence_erase_territory(q, non_territory[k], owner);
-  if (1 && num_non_territory > 0 && (debug & DEBUG_TERRITORY))
+  if (0 && num_non_territory > 0 && (debug & DEBUG_TERRITORY))
     showboard(0);
 }
 

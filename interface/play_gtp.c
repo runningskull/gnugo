@@ -1126,6 +1126,8 @@ gtp_clear_cache(char *s)
   UNUSED(s);
   clear_persistent_reading_cache();
   clear_persistent_owl_cache();
+  clear_persistent_connection_cache();
+  clear_persistent_breakin_cache();
   return gtp_success("");
 }
 

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- compute_smaller_goal() makes the goal even smaller in the block_off case
+- persistent caching for break_in()/block_off()
 - inessential dragons handled differently in estimate_territorial_value()
 - use smaller goal area when trying to break into territories
 - semeai_trymove_and_recurse() propagetes back changes to &owla, &owlb

@@ -634,6 +634,9 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 #define CONNECT_DEPTH        64
 #define CONNECT_DEPTH2       20
 
+#define BREAKIN_NODE_LIMIT  400
+#define BREAKIN_DEPTH	     15
+
 /* Set the various reading depth parameters. If mandated_depth_value
  * is not -1 that value is used; otherwise the depth values are
  * set as a function of level. The parameter mandated_depth_value
@@ -729,6 +732,8 @@ set_depth_values(int level)
   connect_depth         = gg_max(2, CONNECT_DEPTH  + 2 * depth_level);
   connect_depth2        = gg_max(2, CONNECT_DEPTH2 + 2 * depth_level);
   connection_node_limit = CONNECT_NODE_LIMIT * pow(1.5, depth_level);
+  breakin_depth 	= gg_max(2, BREAKIN_DEPTH + 2 * depth_level);
+  breakin_node_limit 	= BREAKIN_NODE_LIMIT * pow(1.5, depth_level);
 
   if (mandated_depth != -1)
     depth = mandated_depth;

@@ -339,6 +339,14 @@ void store_persistent_connection_cache(int routine, int str1, int str2,
 				       int result, int move,
 				       int tactical_nodes,
 				       char connection_shadow[BOARDMAX]);
+int search_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
+				    int *result, int *move);
+void store_persistent_breakin_cache(int routine, int str, Hash_data goal_hash,
+				    int result, int move,
+				    int tactical_nodes,
+				    char breakin_shadow[BOARDMAX]);
+void purge_persistent_breakin_cache(void);
+void clear_persistent_breakin_cache(void);
 void purge_persistent_owl_cache(void);
 void clear_persistent_owl_cache(void);
 int search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
@@ -801,6 +809,8 @@ extern int semeai_node_limit;
 extern int connect_depth;
 extern int connect_depth2;
 extern int connection_node_limit;
+extern int breakin_depth;
+extern int breakin_node_limit;
 extern int level;               /* controls the strength of play */
 extern int semeai_variations;   /* max variations considered reading semeai */
 extern float best_move_values[10];

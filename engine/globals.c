@@ -83,7 +83,9 @@ int semeai_branch_depth2;
 int semeai_node_limit;
 int connect_depth;	/* Used by Tristan Cazenave's connection reader. */
 int connect_depth2;     /* Used by alternater connection reader. */
-int connection_node_limit;
+int connection_node_limit; 
+int breakin_node_limit; /* Reading limits for break_in/block_off reading */
+int breakin_depth;
 int mandated_depth;             /* deep reading cut off, mandated value */
 int mandated_backfill_depth;    /* deep reading cut off, mandated value */
 int mandated_backfill2_depth;   /* deep reading cut off, mandated value */
