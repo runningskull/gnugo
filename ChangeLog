@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function owl_proper_eye() and autohelper with the same name
+- valuation of uncertain owl defense moves revised
+- evaluate_diagonal_intersection() revised
+- new pattern class b in owl_defendpats.db
+- handling of same_dragon field in struct owl_data revised
+- do_atari_atari() revised
+- bugfixes in make_worms()
 - 1D revisions all over the engine
 - new debug flag DEBUG_READING_CACHE
 - same_dragon() renamed is_same_dragon()
@@ -22,6 +29,8 @@
 - top_move functionality added to regress.pl
 - filllib.c and semeai.c made 1-dimensional
 - tuning
+- owl tuning
+- eye tuning
 
 3.1.10 released October 14, 2001
 

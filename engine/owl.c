@@ -292,7 +292,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     moves[k].pos = 0;
     moves[k].value = -1;
     moves[k].name = NULL;
-    moves[k].same_dragon = 1;
+    moves[k].same_dragon = 2;
   }
   gg_assert(other == board[bpos]);
   memset(mw, 0, sizeof(mw));
@@ -479,7 +479,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       }
       mw[vital_offensive_moves[k].pos] = 1;
       if (liberty_of_goal(vital_offensive_moves[k].pos, owla))
-	same_dragon = 1;
+	same_dragon = 2;
       else
 	same_dragon = 0;
       owl_add_move(moves, vital_offensive_moves[k].pos,
@@ -526,7 +526,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       }
       mw[shape_offensive_moves[k].pos] = 1;
       if (liberty_of_goal(shape_offensive_moves[k].pos, owla))
-	same_dragon = 1;
+	same_dragon = 2;
       else
 	same_dragon = 0;
       owl_add_move(moves, shape_offensive_moves[k].pos,
@@ -1029,7 +1029,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	shape_moves[0].pos         = apos;
 	shape_moves[0].value       = 25;
 	shape_moves[0].name        = "tactical attack";
-	shape_moves[0].same_dragon = 2;
+	shape_moves[0].same_dragon = 1;
 	shape_moves[1].value       = 0;
 	moves = shape_moves;
       }
@@ -1057,7 +1057,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	shape_moves[0].pos         = dpos;
 	shape_moves[0].value       = 25;
 	shape_moves[0].name        = "defense move";
-	shape_moves[0].same_dragon = 2;
+	shape_moves[0].same_dragon = 1;
 	shape_moves[1].value       = 0;
 	moves = shape_moves;
       }
@@ -1511,7 +1511,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       shape_moves[k].pos = 0;
       shape_moves[k].value = -1;
       shape_moves[k].name = NULL;
-      shape_moves[k].same_dragon = 1;
+      shape_moves[k].same_dragon = 2;
     }
 
     matches_found = 0;
@@ -1608,7 +1608,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	shape_moves[0].pos         = dpos;
 	shape_moves[0].value       = 25;
 	shape_moves[0].name        = "tactical defense";
-	shape_moves[0].same_dragon = 2;
+	shape_moves[0].same_dragon = 1;
 	shape_moves[1].value       = 0;
 	moves = shape_moves;
       }
@@ -1830,7 +1830,7 @@ owl_determine_life(struct local_owl_data *owl,
     moves[k].pos = 0;
     moves[k].value = -1;
     moves[k].name = NULL;
-    moves[k].same_dragon = 1;
+    moves[k].same_dragon = 2;
   }
   
   if (!owl->lunches_are_current)
@@ -2130,7 +2130,7 @@ owl_shapes(struct owl_move_data moves[MAX_MOVES], int color,
     moves[k].pos = 0;
     moves[k].value = -1;
     moves[k].name = NULL;
-    moves[k].same_dragon = 1;
+    moves[k].same_dragon = 2;
   }
 
   /* We must reset the owl_safe_move_cache before starting the
@@ -2162,6 +2162,7 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
   int ti, tj, tval;  /* trial move and its value */
   int move;
   struct owl_move_data *moves = data; /* considered moves passed as data */
+  int same_dragon;
 
   /* Pick up the location of the move */
   TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
@@ -2252,8 +2253,14 @@ owl_shapes_callback(int m, int n, int color, struct pattern *pattern,
 
   TRACE("Pattern %s found at %1m with value %d\n", pattern->name, move, tval);
 
-  owl_add_move(moves, move, tval, pattern->name,
-	       (pattern->class & CLASS_B) == 0);
+  if (pattern->class & CLASS_B)
+    same_dragon = 0;
+  else if (pattern->class & CLASS_b)
+    same_dragon = 1;
+  else
+    same_dragon = 2;
+  
+  owl_add_move(moves, move, tval, pattern->name, same_dragon);
 }
 
 
@@ -2279,8 +2286,8 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
     if (moves[k].value == -1)
       break;
     if (moves[k].pos == move) {
-      if (same_dragon)
-	moves[k].same_dragon = 1;
+      if (same_dragon > moves[k].same_dragon)
+	moves[k].same_dragon = same_dragon;
       break;
     }
   }
@@ -2301,7 +2308,7 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
 	moves[k].pos = move;
 	moves[k].value = value;
 	moves[k].name = reason;
-	/* If B class pattern, this move shouldn't be added to the
+	/* If B or b class pattern, this move shouldn't be added to the
          * dragon under consideration.
 	 */
 	moves[k].same_dragon = same_dragon;
@@ -2422,11 +2429,11 @@ owl_mark_boundary(struct local_owl_data *owl)
     }
 }
 
-/* Add the stone just played to the goal dragon, unless same_dragon is
- * 0. We also add all stones belonging to the same generalized string
- * to the goal. If same_dragon is 2, we only add the stones if at
+/* Add the stone just played to the goal dragon if same_dragon is
+ * 2. We also add all stones belonging to the same generalized string
+ * to the goal. If same_dragon is 1, we only add the stones if at
  * least one stone of the generalized string already was part of the
- * goal.
+ * goal. If same_dragon is 0, we don't add any stones at all.
  */
 static void
 owl_update_goal(int pos, int same_dragon, struct local_owl_data *owl)
@@ -2451,10 +2458,10 @@ owl_update_goal(int pos, int same_dragon, struct local_owl_data *owl)
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
   
-  /* If same_dragon field is 2, only add if the played stone
+  /* If same_dragon field is 1, only add if the played stone
    * clearly is in contact with the goal dragon.
    */
-  if (same_dragon == 2) {
+  if (same_dragon == 1) {
     do_add = 0;
     for (k = 0; k < num_stones; k++)
       if (owl->goal[stones[k]] != 0) {
@@ -3533,6 +3540,25 @@ owl_big_eyespace(int apos, int bpos)
 	    && current_owl_data->black_eye[origin].color == BLACK_BORDER
 	    && current_owl_data->black_eye[origin].maxeye == 2);
   }
+}
+  
+
+/* Used by autohelpers.
+ * Returns 1 if (apos) is a non-marginal eyespace for the color having
+ * a stone at (bpos).
+ */
+int
+owl_proper_eye(int apos, int bpos)
+{
+  ASSERT1(IS_STONE(board[bpos]), bpos);
+  ASSERT_ON_BOARD1(apos);
+
+  if (board[bpos] == WHITE)
+    return (current_owl_data->white_eye[apos].color == WHITE_BORDER
+	    && !current_owl_data->white_eye[apos].marginal);
+  else
+    return (current_owl_data->black_eye[apos].color == BLACK_BORDER
+	    && !current_owl_data->black_eye[apos].marginal);
 }
   
 

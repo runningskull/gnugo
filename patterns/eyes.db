@@ -893,18 +893,21 @@ x.!
 # !XX
 
 
-Pattern 568
-
-!@
-.>x
-
-:1,0
+# Pattern 568
+# # gf This eyespace is no different from 569 and should be a certain eye
+# #    unless there's a shortage of liberties. Removed. (3.1.11)
+# 
+# !@
+# .>x
+# 
+# :1,0
 
 
 Pattern 569
+# gf Generalized. (3.1.11)
 
 !.
-!..
+!.x
 
 :1,1
 

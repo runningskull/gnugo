@@ -321,4 +321,22 @@ XXO?
 ; oplay_attack(*,a,a)
 
 
+Pattern VA19
+# gf New pattern. (3.1.11)
+
+OX.x       peep at edge
+X.*.
+XX..
+----
+
+:8,s,value(75)
+
+OX.x
+A.*.
+AA.x
+----
+
+;lib(A)==2 && owl_big_eyespace(*,A)
+
+
 # END OF FILE

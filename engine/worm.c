@@ -326,7 +326,7 @@ make_worms(void)
 		      && worm[pos2].attack_codes[0] != 0
 		      && worm[pos2].defend_codes[0] != 0) {
 		    int dcode = find_defense(pos2, NULL);
-		    if (dcode != WIN) {
+		    if (dcode < worm[pos2].defend_codes[0]) {
 		      int attack_works = 1;
 		      /* Sometimes find_defense() fails to find a
 		       * defense which has been found by other means.
@@ -407,7 +407,7 @@ make_worms(void)
 		      && worm[pos2].attack_codes[0] != 0 
 		      && worm[pos2].defend_codes[0] != 0) {
 		    int dcode = find_defense(pos2, NULL);
-		    if (dcode != WIN) {
+		    if (dcode < worm[pos2].defend_codes[0]) {
 		    
 		      int attack_works = 1;
 		      /* Sometimes find_defense() fails to find a
@@ -1828,8 +1828,13 @@ attack_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
 	popgo();
 
-	if (dcode != WIN) {
-	  change_attack(str, move, 3-dcode);
+	/* Do not pick up suboptimal attacks at this time. Since we
+         * don't know whether the string can be defended it's quite
+         * possible that it only has a ko defense and then we would
+         * risk to find an irrelevant move to attack with ko.
+	 */
+	if (dcode != WIN && 3 - dcode >= worm[str].attack_codes[0]) {
+	  change_attack(str, move, 3 - dcode);
 	  DEBUG(DEBUG_WORMS,
 		"Attack pattern %s+%d found attack on %1m at %1m with code %d\n",
 		pattern->name, ll, str, move, 3 - dcode);
@@ -1904,7 +1909,7 @@ defense_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
 	popgo();
 	
-	if (acode != WIN) {
+	if (acode < worm[str].attack_codes[0]) {
 	  change_defense(str, move, 3 - acode);
 	  DEBUG(DEBUG_WORMS,
 		"Defense pattern %s+%d found defense of %1m at %1m with code %d\n",

@@ -1402,21 +1402,25 @@ O.cd?
 ; x_somewhere(a,b,c,d)
 
 
-Pattern EC7a
-
-?O.X      break connection in sente
-X*..
-....
-----
-
-:8,OBda,value(20)
-
-?O.X
-A*..
-....
-----
-
-; oplay_attack(*,A)
+# Pattern EC7a
+# # gf Where does this pattern come from? It's completely unreasonable
+# #    to have a big fixed value without checking whether the X stones
+# #    can live, as can be seen in test case trevor:421.
+# #    Pattern removed. (3.1.11)
+# 
+# ?O.X      break connection in sente
+# X*..
+# ....
+# ----
+# 
+# :8,OBda,value(20)
+# 
+# ?O.X
+# A*..
+# ....
+# ----
+# 
+# ; oplay_attack(*,A)
 
 
 

@@ -533,6 +533,26 @@ XXO
 :8,-,value(50)
 
 
+Pattern A216b
+# gf New pattern. (3.1.11)
+
+??O              hane with support
+XXO
+.*.
+...
+---
+
+:8,-,value(60)
+
+??O
+XXO
+a*.
+...
+---
+
+;!oplay_attack(*,a,*)
+
+
 Pattern A217
 
 ?OXX            sometimes more effective to just descend
@@ -1363,6 +1383,35 @@ OXO*.
 :8,-,value(55)
 
 
+Pattern A511
+# gf New pattern. (3.1.11)
+
+?X.x       undermine eyespace
+O*.x
+...x
+----
+
+:8,-,value(35)
+
+?B.x
+O*ax
+...x
+----
+
+;owl_eyespace(a,B)
+
+
+Pattern A512
+# gf New pattern. (3.1.11)
+
+.O??        attack eye shape and stop expansion
+.*Xx
+..oX
+----
+
+:8,-,value(70)
+
+
 #########################################################
 #                                                       #
 #          Eye reducing moves on the first line         #
@@ -1474,6 +1523,21 @@ b*.
 ---
 
 ;!oplay_attack(*,a) && !obvious_false_xeye(b)
+
+
+Pattern A607b
+
+xXO        the push is also deadly
+.*O
+---
+
+:8,-,value(55)
+
+xCa
+b*a
+---
+
+;!oplay_attack(*,b,a) && owl_eyespace(b,C)
 
 
 Pattern A608
@@ -1624,12 +1688,13 @@ OXOX
 
 
 Pattern A705
+# gf Reduced value. (3.1.11)
 
 ?*?        attack eye shape
 X.X
 ?.?
 
-:|,-,value(60)
+:|,-,value(58)
 
 ?*?
 X.B
@@ -1781,6 +1846,22 @@ A*.x
 OX.x
 
 ;lib(A)==1
+
+
+Pattern A715
+# gf New pattern. (3.1.11)
+
+?*XX        attack eye shape and possibly threaten to cut
+x..x
+?xXO
+
+:8,-,value(60)
+
+?*XX
+x.bx
+?xCa
+
+;owl_eyespace(b,C) && !owl_proper_eye(*,C) && !attack(a)
 
 
 #########################################################
@@ -2666,6 +2747,20 @@ xCx
 ;owl_escape_value(C)>0 && owl_goal_dragon(D) && !xplay_defend_both(*,a,b)
 
 
+Pattern A1117
+# gf New pattern. (3.1.11)
+
+X*O         don't let defender cut and capture to escape
+?OX
+
+:8,n,value(80)
+
+C*b
+?aD
+
+;!xplay_defend_both(*,a,b)
+
+
 #########################################################
 #                                                       #
 #       Kill or threaten a worm of the dragon           #
@@ -3048,6 +3143,26 @@ Pattern A1319b
 +---
 
 :8,s,value(30)
+
+
+Pattern A1319c
+# gf New pattern. (3.1.11)
+
+|.XO?        critical point, might give ko
+|O.X?
+|X*Xx
+|....
++----
+
+:8,s,value(61)
+
+|.AO?
+|O.X?
+|X*Xx
+|....
++----
+
+;!attack(A)
 
 
 Pattern A1320
@@ -3572,6 +3687,24 @@ OX.*.
 -----
 
 :8,s,value(35)
+
+
+Pattern A1610
+# gf New pattern. (3.1.11)
+
+OXXX?      edge tesuji
+X...O
+.X.*.
+-----
+
+:8,-,value(45)
+
+bAAA?      edge tesuji
+XedfO
+.Xc*.
+-----
+
+;lib(A)==3 && !attack(b) && !oplay_attack(*,c,d,e,f,f)
 
 
 # END OF FILE

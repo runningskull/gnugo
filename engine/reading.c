@@ -925,24 +925,22 @@ get_aa_status(int pos)
 }
 
 /* Helper function for atari_atari. Here worms is the number of
- * opponent worms involved in the combination, and (ci, cj) is
+ * opponent worms involved in the combination, and (last_friendly) is
  * the location of the last friendly move played. Moves marked
  * with the forbidden array are not tried. If no move is found,
  * the values of *i and *j are not changed.
  *
- * If not NULL, *attacki, *attackj are left pointing to the location
- * of the attacking move, and *defendi, *defendj point to to
- * a move defending the combination. In rare cases a defensive
- * move might not be found. If a non-static function calling
- * do_atari_atari gets a return value of 1 but -1,-1 as the
- * defense point, this should be treated as equivalent to
- * a return value of 0.
+ * If not NULL, *attack_point is left pointing to the location of the
+ * attacking move, and *defense_point points to a move defending the
+ * combination. In rare cases a defensive move might not be found. If
+ * a non-static function calling do_atari_atari gets a return value of
+ * 1 but NO_MOVE as the defense point, this should be treated as
+ * equivalent to a return value of 0.
  */
 
 static int
-do_atari_atari(int color, 
-	       int *attack_point, int *defense_point, int cpos,
-	       int save_verbose, int minsize)
+do_atari_atari(int color, int *attack_point, int *defense_point,
+	       int last_friendly, int save_verbose, int minsize)
 {
   int m, n;
   int k;
@@ -962,29 +960,31 @@ do_atari_atari(int color,
   }
 
   /* First look for strings adjacent to the last friendly move played
-   * which can be unexpectedly attacked.
+   * (or to another stone in the same string) which can be
+   * unexpectedly attacked.
    */
-  if (cpos != NO_MOVE)
+  if (last_friendly != NO_MOVE)
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
+	int pos = POS(m, n);
 	int apos;
 
 	if (BOARD(m, n) != other)
 	  continue;
 
-	if (POS(m, n) != find_origin(POS(m, n)))
+	if (pos != find_origin(pos))
 	  continue;
 
-	if (minsize > 0 && countstones(POS(m, n)) < minsize)
+	if (minsize > 0 && countstones(pos) < minsize)
 	  continue;
 
-	if (get_aa_status(POS(m, n)) != ALIVE
-	    || !neighbor_of_string(cpos, POS(m, n)))
+	if (get_aa_status(pos) != ALIVE
+	    || !adjacent_strings(last_friendly, pos))
 	  continue;
 	
 	if (debug & DEBUG_ATARI_ATARI)
 	  gprintf("Considering attack of %m. depth = %d.\n", m, n, depth);
-	if (attack(POS(m, n), &apos)) {
+	if (attack(pos, &apos)) {
 	  if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
 	    gprintf("%oThe worm %m can be attacked at %1m after ", m, n,
 		    apos);
@@ -998,7 +998,7 @@ do_atari_atari(int color,
 	   * it probably defends.
 	   */
 	  if (defense_point) {
-	    if (!find_defense(POS(m, n), defense_point)) {
+	    if (!find_defense(pos, defense_point)) {
 	      if (safe_move(apos, other)) {
 		*defense_point = apos;
 	      }
@@ -1010,8 +1010,8 @@ do_atari_atari(int color,
 	  }
 
 	  DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
-		countstones(POS(m, n)), m, n);
-	  return countstones(POS(m, n));
+		countstones(pos), m, n);
+	  return countstones(pos);
 	}
       }
 

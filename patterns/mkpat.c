@@ -237,6 +237,7 @@ static struct autohelper_func autohelper_functions[] = {
   {"owl_goal_dragon", 1, "owl_goal_dragon(POS(%ci,%cj))"},
   {"owl_eyespace",    2, "owl_eyespace(POS(%ci,%cj),POS(%ci,%cj))"},
   {"owl_big_eyespace",2, "owl_big_eyespace(POS(%ci,%cj),POS(%ci,%cj))"},
+  {"owl_proper_eye",  2, "owl_proper_eye(POS(%ci,%cj),POS(%ci,%cj))"},
   {"has_aji",1,"(dragon[POS(%ci,%cj)].owl_threat_status==CAN_THREATEN_DEFENSE)"},
   {"finish_ko_helper",1, "finish_ko_helper(POS(%ci,%cj))"},
   {"squeeze_ko_helper",1,"squeeze_ko_helper(POS(%ci,%cj))"},

@@ -2282,54 +2282,7 @@ estimate_territorial_value(int pos, int color,
       break;
 
     case UNCERTAIN_OWL_DEFENSE:
-      aa = dragons[move_reasons[r].what];
-      
-      if (DRAGON2(aa).safety == INESSENTIAL) {
-	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: 0 - owl attack/defend for inessential dragon %1m\n",
-	      pos, aa);
-	break;
-      }
-
-      /* If the dragon is a single ko stone we don't award any
-       * territorial value for it. This isn't exactly right but a
-       * reasonable workaround to avoid or at least limit overvaluation.
-       */
-      if (dragon[aa].size == 1 && is_ko_point(aa)) {
-	DEBUG(DEBUG_MOVE_REASONS,
-	      "  %1m: 0 - owl attack/defend for ko stone (workaround) %1m\n",
-	      pos, aa);
-	break;
-      }
-
-      /* If there is an adjacent dragon which is critical we should
-       * skip this type of move reason, since attacking or defending
-       * the critical dragon is more urgent.
-       */
-      {
-	int d;
-	int found_one = 0;
-
-	for (d = 0; d < DRAGON2(aa).neighbors; d++)
-	  if (DRAGON(DRAGON2(aa).adjacent[d]).matcher_status == CRITICAL)
-	    found_one = 1;
-	if (found_one)
-	  break;
-      }
-
-      /* If we are behind, we should skip this type of move reason. 
-       * If we are ahead, we should value it more. 
-       */
-      if ((color == BLACK && score > 0.)
-	  || (color == WHITE && score < 0.))
-	this_value = 0.;
-      else 
-	this_value = gg_min(2*dragon[aa].effective_size, gg_abs(score/2));
-
-      TRACE("  %1m: %f - owl uncertain attack/defend for %1m\n",
-	    pos, this_value, aa);
-      tot_value += this_value;
-      does_block = 1;
+      /* This move reason is valued as a strategical value. */
       break;
       
     case CONNECT_MOVE:
@@ -2880,6 +2833,46 @@ estimate_strategical_value(int pos, int color, float score)
 	 */
 	this_value *= 0.75;
 
+	if (this_value > dragon_value[d1])
+	  dragon_value[d1] = this_value;
+
+	break;
+
+      case UNCERTAIN_OWL_DEFENSE:
+	d1 = move_reasons[r].what;
+	aa = dragons[d1];
+	
+	if (DRAGON2(aa).safety == INESSENTIAL) {
+	  DEBUG(DEBUG_MOVE_REASONS,
+		"  %1m: 0 - uncertain owl attack/defend for inessential dragon %1m\n",
+		pos, aa);
+	  break;
+	}
+	
+	/* If there is an adjacent dragon which is critical we should
+	 * skip this type of move reason, since attacking or defending
+	 * the critical dragon is more urgent.
+	 */
+	{
+	  int d;
+	  int found_one = 0;
+	  
+	  for (d = 0; d < DRAGON2(aa).neighbors; d++)
+	    if (DRAGON(DRAGON2(aa).adjacent[d]).matcher_status == CRITICAL)
+	      found_one = 1;
+	  if (found_one)
+	    break;
+	}
+	
+	/* If we are behind, we should skip this type of move reason. 
+	 * If we are ahead, we should value it more. 
+	 */
+	if ((color == BLACK && score > 0.0)
+	    || (color == WHITE && score < 0.0))
+	  this_value = 0.0;
+	else 
+	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(score/2));
+	
 	if (this_value > dragon_value[d1])
 	  dragon_value[d1] = this_value;
 

@@ -55,6 +55,12 @@
 # n  :  In addition to usual check that an O stone here cannot be
 #       captured, check also that an X move cannot be captured.
 #
+# B  :  This move is not connected to the goal dragon and should
+#       therefore not be included in the goal.
+#
+# b  :  This move is maybe not connected to the goal dragon and should
+#       therefore be included only after closer examination.
+#
 #################
 #
 # The patterns in this database are sorted into the following
@@ -847,7 +853,7 @@ OOX.
 ?.*.
 ??.?
 
-:8,B,value(70)
+:8,b,value(70)
 
 
 Pattern D304
@@ -1605,6 +1611,22 @@ oOOX
 ;does_attack(*,A)
 
 
+Pattern D608b
+# gf New pattern. (3.1.11)
+
+ooO.X          eat lunch in the right direction
+.X*..
+-----
+
+:8,-,value(50)
+
+oob.X
+aC*..
+-----
+
+;owl_eyespace(a,b) && does_attack(*,C)
+
+
 Pattern D609
 
 ?X?           preserve eyespace 
@@ -2111,6 +2133,21 @@ a*
 
 ; lib(a)==2 && xlib(*)>1 && owl_big_eyespace(*,a)
 
+
+Pattern D716
+# gf New pattern. (3.1.11)
+
+?*OO        secure eye
+O..o
+?oOX
+
+:8,-,value(60)
+
+?*OO
+o.bo
+?oaX
+
+;owl_eyespace(b,a) && !owl_big_eyespace(b,a)
 
 
 #########################################################
@@ -2814,6 +2851,7 @@ x.O..
 
 Pattern D1002
 # Smaller value if opponent can't cut.
+# gf Revised constraint. (3.1.11)
 
 X*O       connect
 ?OX
@@ -2823,7 +2861,7 @@ X*O       connect
 X*O
 ?Oa
 
-; !attack(a)
+; !attack(a) && xlib(*) > 1
 
 
 Pattern D1003
@@ -2870,12 +2908,13 @@ Pattern D1005
 
 
 Pattern D1006
+# gf Added n classification. (3.1.11)
 
 OXO            connect underneath
 .*.
 ---
 
-:|,-,value(60)
+:|,n,value(60)
 
 aXb
 .*.
@@ -2912,7 +2951,7 @@ Pattern D1100
 X*          attack the surrounding chain
 OX
 
-:/,B,value(90)
+:/,b,value(90)
 
 ba
 Oc
@@ -2998,7 +3037,7 @@ OOXo
 ....
 ----
 
-:8,B,value(35)
+:8,b,value(35)
 
 
 Pattern D1106
@@ -3083,7 +3122,7 @@ OOX.         double atari
 OX*.
 X..?
 
-:8,B,value(75)
+:8,b,value(75)
 
 OOB.
 OX*.
@@ -3314,7 +3353,7 @@ Pattern D1124
 OXO        double atari
 X*?
 
-:8,B,value(90)
+:8,b,value(90)
 
 OAc
 B*?
@@ -3346,7 +3385,7 @@ OX.      cut to capture something
 X*.
 ..?
 
-:8,B,value(82)
+:8,b,value(82)
 
 cB.
 A*.
@@ -3363,7 +3402,7 @@ X*X
 OX.
 oO?
 
-:8,B,value(35)
+:8,b,value(35)
 
 .O.
 X*X
@@ -3432,7 +3471,7 @@ Pattern D1132
 ?X*O          cut to find defects
 OOX.
 
-:8,B,value(80)
+:8,b,value(80)
 
 ?A*O
 OOB.
@@ -4150,7 +4189,7 @@ XOX
 *XO
 ?O?
 
-:8,B,value(90)
+:8,-,value(90)
 
 ?O?
 AdX
@@ -4395,7 +4434,7 @@ Pattern D1345
 OXO        atari to connect
 .*.
 
-:8,B,value(85)
+:8,b,value(85)
 
 cDe
 a*b
@@ -4691,6 +4730,7 @@ OX*
 
 Pattern D1366
 # db added (3.1.8)
+# gf Revised. (3.1.11)
 
 XOO?         try to break out
 OXO?
@@ -4698,7 +4738,15 @@ OXO?
 o...
 ?o..
 
-:8,B,value(85)
+:8,-,value(85)
+
+Xaa?
+OXa?
+.X*x
+o...
+?o..
+
+;owl_goal_dragon(a)
 
 
 Pattern D1367

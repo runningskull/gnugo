@@ -51,12 +51,12 @@ loadsgf games/strategy38.sgf 197
 161 gg_genmove black
 #? [E12]
 
-# First live then attack.
+# First live then attack. This should probably be analyzed as a semeai.
 loadsgf games/strategy39.sgf 156
 162 gg_genmove white
 #? [O7|Q7|N7]*
 
-# First live then attack.
+# First live then attack. This should probably be analyzed as a semeai.
 loadsgf games/strategy39.sgf 158
 163 gg_genmove white
 #? [O7]*
@@ -80,7 +80,7 @@ loadsgf games/strategy40.sgf 10
 167 gg_genmove black
 #? [D4]
 
-# Safety must come first.
+# Safety must come first. This is almost a whole-board semeai.
 loadsgf games/strategy40.sgf 30
 168 gg_genmove black
 #? [A3|A4]*

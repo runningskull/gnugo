@@ -41,10 +41,12 @@ loadsgf games/strategy27.sgf 208
 108 gg_genmove white
 #? [C15]
 
+# Important semeai example.
 loadsgf games/strategy27.sgf 216
 109 gg_genmove white
 #? [A9|C7]*
 
+# Important semeai example.
 loadsgf games/strategy27.sgf 220
 110 gg_genmove white
 #? [A8]*
@@ -134,6 +136,7 @@ loadsgf games/strategy30.sgf 171
 128 gg_genmove black
 #? [O8]
 
+# Semeai problem.
 loadsgf games/strategy30.sgf 201
 129 gg_genmove black
 #? [Q9]*

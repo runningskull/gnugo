@@ -326,6 +326,7 @@ int owl_escape_value(int pos);
 int owl_goal_dragon(int pos);
 int owl_eyespace(int apos, int bpos);
 int owl_big_eyespace(int apos, int bpos);
+int owl_proper_eye(int apos, int bpos);
 void owl_reasons(int color);
 
 void unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],

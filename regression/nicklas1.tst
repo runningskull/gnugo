@@ -188,6 +188,7 @@ loadsgf games/nicklas/nicklas12.sgf 215
 1214 gg_genmove black
 #? [A1|A6]
 
+# H3 doesn't seem critical. /gf
 loadsgf games/nicklas/nicklas12.sgf 259
 1216 gg_genmove black
 #? [H3]
@@ -212,6 +213,7 @@ loadsgf games/nicklas/nicklas14.sgf 55
 1405 gg_genmove black
 #? [B7]
 
+# Semeai problem
 loadsgf games/nicklas/nicklas14.sgf 57
 1406 gg_genmove black
 #? [B6]*
