@@ -107,8 +107,9 @@ MA[ii]C[U];B[ke]MA[ii];W[hc]MA[fi];B[lg]MA[fi];W[oi]MA[fk];B[qi]MA[fk])
 ])
 )
 
-(;B[re]MA[mg];W[rd]MA[mg]C[U];B[qc]MA[mg]C[U];W[rf]MA[mg]C[U];B[nd]
-MA[lg]C[:-,shape(6)];W[pf]MA[lg]C[:-,shape(6)]
+(;B[re]MA[mg]
+(;W[rd]MA[mg]C[U];B[qc]MA[mg]C[U];W[rf]MA[mg]C[U];B[nd]MA[lg]
+C[:-,shape(6)];W[pf]MA[lg]C[:-,shape(6)]
 (;B[of]C[t
 ]MA[lh]
 (;W[og]C[U
@@ -134,17 +135,22 @@ C[:-,shape(8)
 ]MA[lg]
 (;B[mc]MA[lg]C[:-,shape(8)
 ])
-
 (;B[of]MA[lh];W[og]MA[lh];B[ng]MA[lh];W[oh]MA[li];B[ne]MA[li];W[pe]
 MA[li];B[lc]MA[ki])
 )
 )
-
+(;W[rf]C[0
+]
+(;B[rd]MA[lh]C[J
+])
+(;B[pe]MA[lh]C[0
+])
+)
+)
 (;B[rd]MA[mg]C[0
 #not very good for b.])
 )
 )
-
 (;B[pf]MA[lh]
 (;W[qc]MA[lh]C[:-,shape(3)];B[rc]MA[lh];W[pc]MA[lh]C[U]
 (;B[re]MA[lh]C[:-,shape(8)]
