@@ -18,7 +18,7 @@ loadsgf games/cgf2002/gnu-har.sgf 19
 
 loadsgf games/cgf2002/gnu-har.sgf 21
 4 gg_genmove black
-#? [G14|E13|C17]*
+#? [G14|E13|F13|C17]*
 
 loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203080451.sgf 42
 5 gg_genmove white
