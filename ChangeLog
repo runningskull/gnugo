@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- enlarge owl goal when it has had lunch
 - komaster and kom_pos made static variables in board.c
 - edge_block_moves() proposes more moves
 - don't try to undo when stackp is not zero (GTP mode)

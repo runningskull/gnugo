@@ -2511,7 +2511,7 @@ extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors)
 
 
 /*
- * Find the origin of a worm or a cavity, i.e. the point with the
+ * Find the origin of a worm, i.e. the point with the
  * smallest 1D board coordinate. The idea is to have a canonical
  * reference point for a string.
  */
