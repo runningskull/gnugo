@@ -878,7 +878,6 @@ find_worm_attacks_and_defenses()
    */
   {
     static int libs[MAXLIBS];
-    int k;
     int color;
     int other;
     int liberties;

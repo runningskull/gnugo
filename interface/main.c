@@ -287,7 +287,8 @@ main(int argc, char *argv[])
    */
   int seed = 0;
 
-  board_size = 19;
+  board_size = gg_min(19, MAX_BOARD);
+
   komi = 0.0;
   
   /* Set SIGTERM handler. */

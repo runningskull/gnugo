@@ -399,6 +399,11 @@ main(int argc, char *argv[])
 
   printf(PREAMBLE);
 
+  if (board_size > MAX_BOARD) {
+    fprintf(stderr, "Board too big\n");
+    return -1;
+  }
+
   /* Call the engine to setup and clear the board. */
   clear_board();
   

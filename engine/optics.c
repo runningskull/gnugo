@@ -394,7 +394,6 @@ compute_primary_domains(int color, int domain[BOARDMAX],
   } while (found_one);
   
   if (0 && (debug & DEBUG_EYES)) {
-    int i, j;
     start_draw_board();
     for (i = 0; i < board_size; i++)
       for (j = 0; j < board_size; j++) {

@@ -716,9 +716,9 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   int adjadj, adjadjs[MAXCHAIN];
   int move;
   int k;
+  int pos;
   int secondlib1[BOARDMAX];
   int secondlib2[BOARDMAX];
-  int pos;
   
   if (moves_to_connect_in_two_moves(moves, str1, str2))
     return 1;
@@ -728,7 +728,7 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   liberties = findlib(str1, MAXLIBS, libs);
   for (r = 0; r < liberties; r++)
     for (k = 0; k < 4; k++) {
-      int pos = libs[r] + delta[k];
+      pos = libs[r] + delta[k];
       if (board[pos] == EMPTY)
 	secondlib1[pos] = 1;
       else if (board[pos] == board[str1]) {
@@ -744,7 +744,7 @@ moves_to_connect_in_three_moves(int *moves, int str1, int str2,
   liberties = findlib(str2, MAXLIBS, libs);
   for (r = 0; r < liberties; r++)
     for (k = 0; k < 4; k++) {
-      int pos = libs[r] + delta[k];
+      pos = libs[r] + delta[k];
       if (board[pos] == EMPTY)
 	secondlib2[pos] = 1;
       else if (board[pos] == board[str2]) {

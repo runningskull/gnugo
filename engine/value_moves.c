@@ -669,8 +669,8 @@ examine_move_safety(int color)
 	    int aa = NO_MOVE;
 	    int bb = NO_MOVE;
 	    int size;
+	    int m;
 	    int our_color_neighbors;
-	    int k;
 	    
 	    if (type == ATTACK_MOVE
 		|| type == ATTACK_MOVE_GOOD_KO
@@ -708,20 +708,20 @@ examine_move_safety(int color)
 	      int num_adj, adjs[MAXCHAIN];
 
 	      num_adj = chainlinks(aa, adjs);
-	      for (k = 0; k < num_adj; k++) {
-		int adj = adjs[k];
+	      for (m = 0; m < num_adj; m++) {
+		int adj = adjs[m];
 
 		if (board[adj] == color) {
 		  /* Check whether this string is part of the same
                    * dragon as an earlier string. We only want to
                    * count distinct neighbor dragons.
 		   */
-		  int l;
+		  int n;
 
-		  for (l = 0; l < k; l++)
-		    if (dragon[adjs[l]].id == dragon[adj].id)
+		  for (n = 0; n < m; n++)
+		    if (dragon[adjs[n]].id == dragon[adj].id)
 		      break;
-		  if (l == k) {
+		  if (n == m) {
 		    /* New dragon. */
 		    our_color_neighbors++;
 		    bb = adj;
@@ -730,10 +730,10 @@ examine_move_safety(int color)
 	      }
 	    }
 	    else {
-	      for (k = 0; k < DRAGON2(aa).neighbors; k++)
-		if (DRAGON(DRAGON2(aa).adjacent[k]).color == color) {
+	      for (m = 0; m < DRAGON2(aa).neighbors; m++)
+		if (DRAGON(DRAGON2(aa).adjacent[m]).color == color) {
 		  our_color_neighbors++;
-		  bb = dragon2[DRAGON2(aa).adjacent[k]].origin;
+		  bb = dragon2[DRAGON2(aa).adjacent[m]].origin;
 		  if (dragon[bb].matcher_status == ALIVE) {
 		    tactical_safety = 1;
 		    safety = 1;

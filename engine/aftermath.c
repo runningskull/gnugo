@@ -256,9 +256,9 @@ aftermath_genmove(int *aftermath_move, int color,
 		  && libs == countlib(pos + dir)))
 	  && (DRAGON2(pos + dir).safety == INVINCIBLE
 	      || DRAGON2(pos + dir).safety == STRONGLY_ALIVE)) {
-	int score = 20 * (owl_hotspot[pos] + reading_hotspot[pos]);
-	if (score > best_score) {
-	  best_score = score;
+	int this_score = 20 * (owl_hotspot[pos] + reading_hotspot[pos]);
+	if (this_score > best_score) {
+	  best_score = this_score;
 	  best_scoring_move = pos;
 	}
       }
@@ -465,14 +465,14 @@ aftermath_genmove(int *aftermath_move, int color,
 	    int important = 0;
 	    int safe_atari = 0;
 	    for (r = 0; r < 4; r++) {
-	      int d = delta[r];
-	      if (!ON_BOARD(apos+d))
+	      int dlt = delta[r];
+	      if (!ON_BOARD(apos+dlt))
 		continue;
-	      if (board[apos+d] == other
-		  && dragon[apos+d].matcher_status == DEAD)
+	      if (board[apos+dlt] == other
+		  && dragon[apos+dlt].matcher_status == DEAD)
 		important = 1;
-	      else if (board[apos+d] == EMPTY
-		       && !is_self_atari(apos+d, other))
+	      else if (board[apos+dlt] == EMPTY
+		       && !is_self_atari(apos+dlt, other))
 		safe_atari = 1;
 	    }
 	    if (approxlib(pos, color, 3, NULL) > 2) {
@@ -620,7 +620,6 @@ aftermath_genmove(int *aftermath_move, int color,
    * dragons, carefully checking against mistakes.
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    int move;
     int target;
     int cc = NO_MOVE;
     int self_atari_ok = 0;

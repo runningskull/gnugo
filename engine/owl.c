@@ -2346,7 +2346,6 @@ owl_determine_life(struct local_owl_data *owl,
     owl_find_lunches(owl);
   
   if (0) {
-    int k;
     for (k = 0; k < MAX_LUNCHES; k++)
       if (owl->lunch[k] != NO_MOVE)
 	gprintf("owl lunch %1m, attack %1m, defend %1m\n",
@@ -2447,7 +2446,6 @@ owl_determine_life(struct local_owl_data *owl,
              * been examined.
 	     */
 	    if (!previously_marginal) {
-	      int k;
 	      for (k = 4; k < 8; k++) {
 		int i = m + deltai[k];
 		int j = n + deltaj[k];
@@ -3281,7 +3279,6 @@ owl_mark_boundary(struct local_owl_data *owl)
    */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (board[pos] == other && owl->boundary[pos] == 0) {
-      int k;
       /* If a lunch has been amalgamated into a larger dragon, we
        * have to back out now.
        *

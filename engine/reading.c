@@ -3841,13 +3841,13 @@ attack3(int str, int *move, int komaster, int kom_pos)
    * super_string.
    */
   if (level >= 10 && stackp <= backfill2_depth) {
-    int liberties;
-    int libs[MAX_LIBERTIES + 4];
+    int ss_liberties;
+    int ss_libs[MAX_LIBERTIES + 4];
 
-    find_superstring_liberties(str, &liberties, libs, 3);
-    if (liberties <= 5) {
-      for (k = 0; k < liberties; k++) {
-	int apos = libs[k];
+    find_superstring_liberties(str, &ss_liberties, ss_libs, 3);
+    if (ss_liberties <= 5) {
+      for (k = 0; k < ss_liberties; k++) {
+	int apos = ss_libs[k];
 	
 	if (liberty_of_string(apos, str))
 	  continue;

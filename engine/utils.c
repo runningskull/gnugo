@@ -1598,10 +1598,10 @@ do_find_superstring(int str, int *num_stones, int *stones,
 	    int lunch_stones[MAX_BOARD*MAX_BOARD];
 	    int num_lunch_stones = findstones(upos, MAX_BOARD*MAX_BOARD,
 					      lunch_stones);
-	    int r, s;
-	    for (r = 0; r < num_lunch_stones; r++)
-	      for (s = 0; s < 8; s++) {
-		int vpos = lunch_stones[r] + delta[s];
+	    int m, n;
+	    for (m = 0; m < num_lunch_stones; m++)
+	      for (n = 0; n < 8; n++) {
+		int vpos = lunch_stones[m] + delta[n];
 		if (board[vpos] == color && !mx[vpos])
 		  superstring_add_string(vpos,
 					 &num_my_stones, my_stones,
