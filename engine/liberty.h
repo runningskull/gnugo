@@ -665,7 +665,7 @@ int influence_considered_lively(const struct influence_data *q, int pos);
 void influence_erase_territory(struct influence_data *q, int pos, int color);
 
 void break_territories(int color_to_move, struct influence_data *q,
-			 int store);
+		       int store, int pos);
 void clear_break_in_list(void);
 void break_in_move_reasons(int color);
 

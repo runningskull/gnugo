@@ -2491,7 +2491,7 @@ estimate_territorial_value(int pos, int color, float our_score,
       compute_influence(OTHER_COLOR(color), safe_stones, strength, 
 	  		&move_influence, pos, "after move");
       increase_depth_values();
-      break_territories(OTHER_COLOR(color), &move_influence, 0);
+      break_territories(OTHER_COLOR(color), &move_influence, 0, pos);
       decrease_depth_values();
       this_value = influence_delta_territory(OPPOSITE_INFLUENCE(color),
 	   				     &move_influence, color, pos);

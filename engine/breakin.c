@@ -218,7 +218,7 @@ compute_smaller_goal(int owner, int color_to_move,
 static int
 break_in_goal_from_str(int str, char goal[BOARDMAX],
     		      int *num_non_territory, int non_territory[BOARDMAX],
-    		      int color_to_move)
+    		      int color_to_move, int info_pos)
 {
   int move = NO_MOVE;
   int saved_move = NO_MOVE;
@@ -256,7 +256,11 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
     int cut_off_distance = FP(3.5);
     if (ON_BOARD(move) && goal[move]) {
       non_territory[(*num_non_territory)++] = move;
-      DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", move);
+      if (info_pos)
+	DEBUG(DEBUG_TERRITORY, "%1m: Erasing territory at %1m -a.\n",
+	      info_pos, move);
+      else
+	DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -a.\n", info_pos, move);
     }
 
     for (k = 0; k < conn.queue_end; k++) {
@@ -267,7 +271,11 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 	  && (!ON_BOARD(conn.coming_from[pos])
 	      || !goal[conn.coming_from[pos]])) {
 	non_territory[(*num_non_territory)++] = pos;
-	DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -b.\n", pos);
+	if (info_pos)
+	  DEBUG(DEBUG_TERRITORY, "%1m: Erasing territory at %1m -b.\n",
+		info_pos, pos);
+	else
+	  DEBUG(DEBUG_TERRITORY, "Erasing territory at %1m -b.\n", pos);
 	if (conn.distances[pos] < cut_off_distance)
 	  cut_off_distance = conn.distances[pos];
       }
@@ -312,7 +320,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 
 static void
 break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
-    	      struct influence_data *q, int store)
+    	      struct influence_data *q, int store, int info_pos)
 {
   struct connection_data conn;
   int k;
@@ -373,7 +381,7 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
   for (k = 0; k < candidates; k++) {
     int move = break_in_goal_from_str(candidate_strings[k], goal,
   		                     &num_non_territory, non_territory,
-				     color_to_move);
+				     color_to_move, info_pos);
     if (store && ON_BOARD(move) && num_break_ins < MAX_BREAK_INS) {
       /* Remember the move as a possible move candidate for later. */
       break_in_list[num_break_ins].str = candidate_strings[k];
@@ -396,7 +404,8 @@ break_in_goal(int color_to_move, int owner, char goal[BOARDMAX],
  * later gets used to generate move reasons).
  */
 void
-break_territories(int color_to_move, struct influence_data *q, int store)
+break_territories(int color_to_move, struct influence_data *q, int store,
+    		  int info_pos)
 {
   struct moyo_data territories;
   int k;
@@ -422,7 +431,8 @@ break_territories(int color_to_move, struct influence_data *q, int store)
 
     if (color_to_move == OTHER_COLOR(territories.owner[k]))
       enlarge_goal(goal);
-    break_in_goal(color_to_move, territories.owner[k], goal, q, store);
+    break_in_goal(color_to_move, territories.owner[k], goal, q, store,
+		  info_pos);
   }
 }
 
