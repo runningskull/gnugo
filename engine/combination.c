@@ -33,6 +33,11 @@
 
 
 static void find_double_threats(int color);
+static int atari_atari_find_attack_moves(int color, int minsize,
+					 int moves[MAX_BOARD * MAX_BOARD],
+					 int targets[MAX_BOARD * MAX_BOARD]);
+static int atari_atari_find_defense_moves(int str,
+					  int moves[MAX_BOARD * MAX_BOARD]);
 static int is_atari(int pos, int color);
 
 /* Generate move reasons for combination attacks and defenses against
@@ -266,8 +271,7 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
     abortgo(__FILE__, __LINE__, "trymove", I(tpos), J(tpos));
   increase_depth_values();
 
-  aa_val = do_atari_atari(other, &fpos, &defense_point,
-                         NO_MOVE, 0, minsize);
+  aa_val = do_atari_atari(other, &fpos, &defense_point, NO_MOVE, 0, minsize);
   after_aa_val = aa_val;
 
   if (aa_val == 0 || defense_point == NO_MOVE) {
@@ -292,8 +296,7 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
      */
     after_defense_point = defense_point;
     forbidden[fpos] = 1;
-    aa_val = do_atari_atari(other, &fpos, &defense_point,
-                           NO_MOVE, 0, aa_val);
+    aa_val = do_atari_atari(other, &fpos, &defense_point, NO_MOVE, 0, aa_val);
   }
 
   popgo();
@@ -464,20 +467,22 @@ static int
 do_atari_atari(int color, int *attack_point, int *defense_point,
 	       int last_friendly, int save_verbose, int minsize)
 {
-  int m, n;
-  int k;
-  
   int other = OTHER_COLOR(color);
-
+  int k;
+  int num_attack_moves;
+  int attack_moves[MAX_BOARD * MAX_BOARD];
+  int targets[MAX_BOARD * MAX_BOARD];
+  int num_defense_moves;
+  int defense_moves[MAX_BOARD * MAX_BOARD];
+  int pos;
+  
   if (debug & DEBUG_ATARI_ATARI) {
     gprintf("%odo_atari_atari: ");
     dump_stack();
     gprintf("%oforbidden moves: ");
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	if (forbidden[POS(m, n)])
-	  gprintf("%o%1m ", POS(m, n));
-      }
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (ON_BOARD(pos) && forbidden[pos])
+	gprintf("%o%1m ", pos);
     gprintf("\n");
   }
 
@@ -488,7 +493,7 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
    */
   if (last_friendly != NO_MOVE) {
     int retval = atari_atari_succeeded(color, attack_point, defense_point,
-                                      last_friendly, save_verbose, minsize);
+				       last_friendly, save_verbose, minsize);
     if (retval != 0)
       return retval;
   }
@@ -496,162 +501,93 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
   if (stackp > aa_depth)
     return 0;
 
-  /* Next look for a string, not insubstantial, having exactly two
-   * liberties and no boundary stones in atari. Atari, fill, then try
-   * again. If that doesn't work, try the other atari.
+  /* Find attack moves. These are typically ataris but may also be
+   * more general.
    */
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      int pos = POS(m, n);
-      int num_moves;
-      int moves[MAX_THREAT_MOVES];
-      int codes[MAX_THREAT_MOVES];
-      int status;
-      int aa_val;
+  num_attack_moves = atari_atari_find_attack_moves(color, minsize,
+						   attack_moves, targets);
 
-      if (board[pos] != other) 
-	continue;
+  /* Try the attacking moves and let the opponent defend. Then call
+   * ourselves recursively.
+   */
+  for (k = 0; k < num_attack_moves; k++) {
+    int aa_val;
+    int str = targets[k];
+    int apos = attack_moves[k];
+    int bpos;
+    int r;
+    
+    if (!trymove(apos, color, "do_atari_atari-A", str, EMPTY, NO_MOVE))
+      continue;
+	
+    /* Try to defend the stone (str) which is threatened. */
+    aa_val = countstones(str);
 
-      if (pos != find_origin(pos))
-	continue;
-      
-      if (minsize > 0 && countstones(pos) < minsize)
-	continue;
+    /* Pick up defense moves. */
+    num_defense_moves = atari_atari_find_defense_moves(str, defense_moves);
+    
+    for (r = 0; r < num_defense_moves; r++) {
+      bpos = defense_moves[r];
 
-      status = get_aa_status(pos);
-      if (status != ALIVE)
-	continue;
-
-      if (stackp < aa_threat_depth) {
-       num_moves = attack_threats(pos, moves, codes);
-       if ((debug & DEBUG_ATARI_ATARI)
-	   && (num_moves > 0)) {
-	 int i;
-         gprintf("Threats on %1m: ", pos);
-         for (i = 0; i < num_moves; i++)
-           gprintf("%1m ", moves[i]);
-         gprintf("\n");
-       }
+      if (trymove(bpos, other, "do_atari_atari-B", str, EMPTY, NO_MOVE)) {
+	int new_aa_val;
+	/* These moves may have been irrelevant for later
+	 * reading, so in order to avoid horizon problems, we
+	 * need to temporarily increase the depth values.
+	 */
+	modify_depth_values(2);
+	new_aa_val = do_atari_atari(color, NULL, defense_point,
+				    apos, save_verbose, minsize);
+	modify_depth_values(-2);
+	if (new_aa_val < aa_val)
+	  aa_val = new_aa_val;
+	popgo();
       }
-      else {
-       num_moves = findlib(pos, 2, moves);
-       if (num_moves != 2)
-         continue;
-      }
 
-      for (k = 0; k < num_moves; k++) {
-       int apos = moves[k];
-	int bpos;
-
-       if (forbidden[apos])
-         continue;
-
-       if ((accurate_approxlib(apos, color, 2, NULL) < 2
-	     || !is_atari(apos, color))
-	   && !safe_move(apos, color))
-         continue;
-
-       if (!trymove(apos, color, "do_atari_atari-A", pos,
-                    EMPTY, NO_MOVE))
-         continue;
-
-       /* try to defend the stone (m,n) which is in atari */
-       aa_val = 0;
-
-       /* Because we know (pos) is threatened there is a trivial
-        * attack and we can be sure find_defense() will give a
-        * useful defense point if it returns non-zero. Usually we
-        * would need to call attack_and_defend() to be certain of
-        * this.
-        *
-        * On the other hand, if there is no defense we have
-        * already been successful.
-        */
-       if (find_defense(pos, &bpos)
-           && trymove(bpos, other, "do_atari_atari-B", pos,
-		       EMPTY, NO_MOVE)) {
-         /* These moves may have been irrelevant for later
-          * reading, so in order to avoid horizon problems, we
-          * need to temporarily increase the depth values.
-          */
-         modify_depth_values(2);
-         aa_val = do_atari_atari(color, NULL, defense_point,
-                                 apos, save_verbose, minsize);
-         modify_depth_values(-2);
-         popgo();
-       }
-       else {
-         /* No way to save the ataried stone. We have been successful. */
-         popgo();
-         if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
-           gprintf("%oThe worm %m can be attacked at %1m after ", m, n,
-                   apos);
-           dump_stack();
-         }
-         if (attack_point) *attack_point = apos;
-         if (defense_point && !find_defense(pos, defense_point))
-           *defense_point = NO_MOVE;
-
-         DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
-               countstones(pos), m, n);
-         return countstones(pos);
-       }
-
-       if (aa_val) {
-         /* The atari at (apos) seems to work but we still
-          * must check if there is not a better defense.
-          */
-         int cpos;
-         int res;
-
-         if (countlib(pos) == 1)
-           res = restricted_defend1(pos, &cpos, EMPTY, 0, 1, &bpos);
-         else
-           res = 0;  /* FIXME: Find other defense points. */
-
-         if (res) {
-           if (trymove(cpos, other, "do_atari_atari-C",
-                       pos, EMPTY, NO_MOVE)) {
-             modify_depth_values(2);
-             if (!do_atari_atari(color, NULL, defense_point,
-                                 apos, save_verbose, minsize))
-               aa_val = 0;
-             modify_depth_values(-2);
-	      popgo();
-	    }
-         }
-
-         if (aa_val) {
-           if (attack_point) *attack_point = apos;
-	    popgo();
-           DEBUG(DEBUG_ATARI_ATARI,
-                 "%oreturn value:%d (min %d, %d (%m))\n",
-                 gg_min(aa_val, countstones(pos)), aa_val,
-                 countstones(pos), m, n);
-           /* If no defense point is known and (ai,aj) is a safe
-            * move for other, it probably defends the combination.
-            */
-           if (defense_point
-               && (*defense_point == NO_MOVE
-                   || !safe_move(*defense_point, other))
-               && safe_move(apos, other)) {
-             *defense_point = apos;
-           }
-           return gg_min(aa_val, countstones(pos));
-	  }
-	}
-
-       popgo();
-      }
+      /* Defense successful, no need to try any further. */
+      if (aa_val == 0)
+	break;
     }
 
+    /* Undo the attacking move. */
+    popgo();
+
+    if (aa_val == 0)
+      continue;
+
+    /* atari_atari successful */
+    if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
+      gprintf("%oThe worm %1m can be attacked at %1m after ", str, apos);
+      dump_stack();
+    }
+
+    if (attack_point)
+      *attack_point = apos;
+
+    if (defense_point) {
+      if (!find_defense(str, defense_point))
+	*defense_point = NO_MOVE;
+
+      /* If no defense point is known and (apos) is a safe
+       * move for other, it probably defends the combination.
+       */
+      if ((*defense_point == NO_MOVE || !safe_move(*defense_point, other))
+	  && safe_move(apos, other))
+	*defense_point = apos;
+    }
+    
+    DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n", aa_val, str);
+    return aa_val;
+  }
+    
+  /* No atari_atari attack. */
   return 0;
 }
 
 
 static int
 atari_atari_succeeded(int color, int *attack_point, int *defense_point,
-                     int last_friendly, int save_verbose, int minsize)
+		      int last_friendly, int save_verbose, int minsize)
 {
   int m, n;
   int other = OTHER_COLOR(color);
@@ -674,51 +610,148 @@ atari_atari_succeeded(int color, int *attack_point, int *defense_point,
        continue;
 
       if (board[last_friendly] != EMPTY
-         && !adjacent_strings(last_friendly, ii))
+	  && !adjacent_strings(last_friendly, ii))
        continue;
 
       if (board[last_friendly] == EMPTY
-         && !liberty_of_string(last_friendly, ii))
+	  && !liberty_of_string(last_friendly, ii))
        continue;
 
       if (debug & DEBUG_ATARI_ATARI)
-       gprintf("Considering attack of %1m. depth = %d.\n", ii, depth);
+	gprintf("Considering attack of %1m. depth = %d.\n", ii, depth);
 
       if (attack(ii, &aa)) {
-       if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
-         gprintf("%oThe worm %1m can be attacked at %1m after ", ii, aa);
-         dump_stack();
-       }
-       if (attack_point) *attack_point = aa;
+	if (save_verbose || (debug & DEBUG_ATARI_ATARI)) {
+	  gprintf("%oThe worm %1m can be attacked at %1m after ", ii, aa);
+	  dump_stack();
+	}
+	if (attack_point) *attack_point = aa;
 
-       /* We look for a move defending the combination.
-        * Normally this is found by find_defense but failing
-        * that, if the attacking move is a safe move for color,
-        * it probably defends.
-        */
-       if (defense_point) {
-         if (!find_defense(ii, defense_point)) {
-           if (safe_move(aa, other)) {
-             *defense_point = aa;
-           }
-           /* No defense is found */
-           else {
-             *defense_point = NO_MOVE;
-           }
-         }
-       }
-
-       DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n",
-             countstones(ii), ii);
-       return countstones(ii);
+	/* We look for a move defending the combination.
+	 * Normally this is found by find_defense but failing
+	 * that, if the attacking move is a safe move for color,
+	 * it probably defends.
+	 */
+	if (defense_point) {
+	  if (!find_defense(ii, defense_point)) {
+	    if (safe_move(aa, other)) {
+	      *defense_point = aa;
+	    }
+	    /* No defense is found */
+	    else {
+	      *defense_point = NO_MOVE;
+	    }
+	  }
+	}
+	
+	DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%1m)\n",
+	      countstones(ii), ii);
+	return countstones(ii);
       }
     }
-
+  
   return 0;
 }
 
+static int
+atari_atari_find_attack_moves(int color, int minsize,
+			      int moves[MAX_BOARD * MAX_BOARD],
+			      int targets[MAX_BOARD * MAX_BOARD])
+{
+  int other = OTHER_COLOR(color);
+  int pos;
+  int k;
+  int num_moves = 0;
+  int num_threat_moves;
+  int threat_moves[MAX_THREAT_MOVES];
+  int threat_codes[MAX_THREAT_MOVES];
+  int mx[BOARDMAX];
 
-/* Returns true of a move by (color) at (pos) is atari on something
+  /* We set mx to 0 for every move added to the moves[] array. */
+  memset(mx, 0, sizeof(mx));
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] != other) 
+      continue;
+    
+    if (pos != find_origin(pos))
+      continue;
+      
+    if (minsize > 0 && countstones(pos) < minsize)
+      continue;
+
+    if (get_aa_status(pos) != ALIVE)
+      continue;
+
+    /* Pick up general threat moves or simple ataris. */
+    if (stackp < aa_threat_depth) {
+      num_threat_moves = attack_threats(pos, threat_moves, threat_codes);
+      if ((debug & DEBUG_ATARI_ATARI)
+	  && num_moves > 0) {
+	int i;
+	gprintf("Threats on %1m: ", pos);
+	for (i = 0; i < num_moves; i++)
+	  gprintf("%1m ", moves[i]);
+	gprintf("\n");
+      }
+    }
+    else {
+      num_threat_moves = findlib(pos, 2, threat_moves);
+      if (num_threat_moves != 2)
+	continue;
+    }
+
+    /* Add the threats on (pos) to the moves[] array, unless forbidden
+     * or assumed to be ineffective.
+     */
+    for (k = 0; k < num_threat_moves; k++) {
+      int move = threat_moves[k];
+	
+      if (mx[move] != 0 || forbidden[move])
+	continue;
+
+      if ((accurate_approxlib(move, color, 2, NULL) < 2
+	   || !is_atari(move, color))
+	  && !safe_move(move, color))
+	continue;
+
+      moves[num_moves] = move;
+      targets[num_moves] = pos;
+      num_moves++;
+      mx[move] = 1;
+    }
+  }
+
+  return num_moves;
+}
+
+
+static int
+atari_atari_find_defense_moves(int str, int moves[MAX_BOARD * MAX_BOARD])
+{
+  int num_moves = 0;
+  int move;
+  int move2;
+
+  /* Because we know (str) is threatened there is an
+   * attack and we can be sure find_defense() will give a
+   * useful defense point if it returns non-zero. Usually we
+   * would need to call attack_and_defend() to be certain of
+   * this.
+   */
+  if (!find_defense(str, &move))
+    return 0;
+  moves[num_moves++] = move;
+
+  /* Look for additional defense moves. */
+  if (countlib(str) == 1
+      && restricted_defend1(str, &move2, EMPTY, 0, 1, &move))
+    moves[num_moves++] = move2;
+
+  return num_moves;
+}
+
+/* Returns true if a move by (color) at (pos) is atari on something.
  * FIXME: Move this to an appropriate location.
  */
 
