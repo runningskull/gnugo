@@ -1,3 +1,33 @@
+========================== 3.3.16 pre 3 ============================
+
+./regress.sh . connection.tst 
+101 unexpected FAIL: Correct '1 M3', got '0'
+./regress.sh . owl1.tst 
+296 unexpected FAIL: Correct '1 E5|D8', got '0'
+./regress.sh . strategy5.tst 
+226 unexpected FAIL: Correct 'F5', got 'S3'
+./regress.sh . nando.tst
+1 unexpected FAIL: Correct 'M12', got 'O18'
+2 unexpected FAIL: Correct '0', got '1'
+3 unexpected FAIL: Correct '1 A12', got '0'
+4 unexpected FAIL: Correct '1 S10|T9', got '0'
+5 unexpected FAIL: Correct '0', got '1'
+6 unexpected FAIL: Correct '0', got '1'
+7 unexpected FAIL: Correct 'N16', got 'PASS'
+8 unexpected FAIL: Correct 'M16|N16', got 'PASS'
+110 unexpected FAIL: Correct '0', got '1 B17'
+111 unexpected FAIL: Correct '0', got '1 B17'
+112 unexpected FAIL: Correct '!P7', got 'P7'
+140 unexpected FAIL: Correct '1 P2', got '0'
+141 unexpected PASS!
+142 unexpected FAIL: Correct '0', got '1'
+150 unexpected FAIL: Correct '1 P4', got '0'
+151 unexpected FAIL: Correct '0', got '1 P5'
+210 unexpected FAIL: Correct 'D3', got 'C4'
+211 unexpected FAIL: Correct 'D5', got 'O17'
+212 unexpected FAIL: Correct 'E3', got 'O17'
+213 unexpected FAIL: Correct '0', got '1 C5'
+
 ========================== 3.3.16 pre 2 ============================
 
 ./regress.sh . reading.tst 

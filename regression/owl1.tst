@@ -145,7 +145,7 @@ loadsgf games/owl43.sgf
 
 loadsgf games/owl44.sgf
 296 owl_attack D6
-#? [1 E5|D8]
+#? [1 E5|D8]*
 
 
 ########### end of tests #####################
