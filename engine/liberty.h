@@ -980,22 +980,19 @@ struct aftermath_data {
 #define MAX_EYE_ATTACKS 3
 
 struct eye_data {
-  int color;/* BLACK, WHITE, BLACK_BORDERED, WHITE_BORDERED or GRAY_BORDERED */
-  int esize;         /* size of the eyespace                                 */
-  int msize;         /* number of marginal vertices                          */
-  int origin;        /* The origin                                           */
-  struct eyevalue value; /* Number of eyes.                                  */
-  int attack_point;  /* vital point for attack */
-  int defense_point; /* vital point for defense	*/
+  int color;             /* BLACK, WHITE, or GRAY                     */
+  int esize;             /* size of the eyespace                      */
+  int msize;             /* number of marginal vertices               */
+  int origin;            /* The origin                                */
+  struct eyevalue value; /* Number of eyes.                           */
 
-  /* The above fields are constant on the whole eyespace. */
+  /* The above fields are constant on the whole eyespace.             */
   /* ---------------------------------------------------------------- */
-  /* The below fields are not. */
+  /* The below fields are not.                                        */
 
-  char marginal;             /* This vertex is marginal                    */
-  char type;                 /* Various characteristics of the eyespace    */
-  char neighbors;            /* number of neighbors in eyespace            */
-  char marginal_neighbors;   /* number of marginal neighbors               */
+  char marginal;             /* This vertex is marginal               */
+  char neighbors;            /* number of neighbors in eyespace       */
+  char marginal_neighbors;   /* number of marginal neighbors          */
 };
 
 struct vital_eye_points {
@@ -1032,11 +1029,6 @@ void compute_eyes_pessimistic(int pos, struct eyevalue *value,
 void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
 int find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
 		     int dragons[], int max_dragons);
-float topological_eye(int pos, int color,
-		      struct eye_data my_eye[BOARDMAX],
-		      struct half_eye_data heye[BOARDMAX]);
-void add_false_eye(int pos, struct eye_data eye[BOARDMAX], 
-		   struct half_eye_data heye[BOARDMAX]);
 void make_domains(struct eye_data b_eye[BOARDMAX],
                   struct eye_data w_eye[BOARDMAX],
 		  int owl_call);

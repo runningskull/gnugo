@@ -612,7 +612,7 @@ find_more_owl_attack_and_defense_moves(int color)
     if (!ON_BOARD(pos))
       continue;
     if (our_eyes[pos].origin == pos
-	&& our_eyes[pos].defense_point != NO_MOVE) {
+	&& our_vital_points[pos].defense_points[0] != NO_MOVE) {
       int k, dr;
       find_eye_dragons(pos, our_eyes, color, &dr, 1);
       for (k = 0; k < MAX_EYE_ATTACKS; k++) {
@@ -624,7 +624,7 @@ find_more_owl_attack_and_defense_moves(int color)
       }
     }
     if (your_eyes[pos].origin == pos
-	&& your_eyes[pos].attack_point != NO_MOVE) {
+	&& your_vital_points[pos].attack_points[0] != NO_MOVE) {
       int k, dr;
       find_eye_dragons(pos, your_eyes, OTHER_COLOR(color), &dr, 1);
       for (k = 0; k < MAX_EYE_ATTACKS; k++) {

@@ -72,10 +72,15 @@ static void first_map(int *map_value);
 static int next_map(int *q, int map[MAXEYE]);
 static void print_eye(struct eye_data eye[BOARDMAX],
 		      struct half_eye_data heye[BOARDMAX], int pos);
-static float 
-evaluate_diagonal_intersection(int m, int n, int color,
-			       int *attack_point, int *defense_point,
-			       struct eye_data my_eye[BOARDMAX]);
+static void add_false_eye(int pos, struct eye_data eye[BOARDMAX], 
+			  struct half_eye_data heye[BOARDMAX]);
+static float topological_eye(int pos, int color,
+			     struct eye_data my_eye[BOARDMAX],
+			     struct half_eye_data heye[BOARDMAX]);
+static float evaluate_diagonal_intersection(int m, int n, int color,
+					    int *attack_point,
+					    int *defense_point,
+					    struct eye_data my_eye[BOARDMAX]);
 
 
 /* These are used during the calculations of eye spaces. */
@@ -99,10 +104,7 @@ clear_eye(struct eye_data *eye)
   eye->msize = 0;
   eye->origin = NO_MOVE;
   set_eyevalue(&eye->value, 0, 0, 0, 0);
-  eye->attack_point = NO_MOVE;
-  eye->defense_point = NO_MOVE;
   eye->marginal = 0;
-  eye->type = 0;
   eye->neighbors = 0;
   eye->marginal_neighbors = 0;
 }
@@ -588,8 +590,6 @@ propagate_eye(int origin, struct eye_data eye[BOARDMAX])
       eye[pos].msize         = eye[origin].msize;
       eye[pos].origin        = eye[origin].origin;
       eye[pos].value         = eye[origin].value;
-      eye[pos].attack_point  = eye[origin].attack_point;
-      eye[pos].defense_point = eye[origin].defense_point;
     }
 }
 
@@ -1614,7 +1614,7 @@ next_map(int *q, int map[MAXEYE])
 
 /* add_false_eye() turns a proper eyespace into a margin. */
 
-void
+static void
 add_false_eye(int pos, struct eye_data eye[BOARDMAX],
 	      struct half_eye_data heye[BOARDMAX])
 {
@@ -1749,7 +1749,7 @@ find_half_and_false_eyes(int color, struct eye_data eye[BOARDMAX],
  * my_eye is the eye space information with respect to (color).
  */
 
-float
+static float
 topological_eye(int pos, int color,
 		struct eye_data my_eye[BOARDMAX],
 		struct half_eye_data heye[BOARDMAX])

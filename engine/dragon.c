@@ -572,8 +572,6 @@ eye_computations()
       DEBUG(DEBUG_EYES, "Black eyespace at %1m: %s\n", str,
 	    eyevalue_to_string(&value));
       black_eye[str].value = value;
-      black_eye[str].attack_point = attack_point;
-      black_eye[str].defense_point = defense_point;
       propagate_eye(str, black_eye);
     }
     
@@ -587,8 +585,6 @@ eye_computations()
       DEBUG(DEBUG_EYES, "White eyespace at %1m: %s\n", str,
 	    eyevalue_to_string(&value));
       white_eye[str].value = value;
-      white_eye[str].attack_point = attack_point;
-      white_eye[str].defense_point = defense_point;
       propagate_eye(str, white_eye);
     }
   }
@@ -1311,7 +1307,7 @@ compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude)
 	if (eye_to_exclude == NO_MOVE
 	    && (eye_move_urgency(&black_eye[pos].value)
 		> eye_move_urgency(genus)))
-	  DRAGON2(d).heye = black_eye[pos].defense_point;
+	  DRAGON2(d).heye = black_vital_points[pos].defense_points[0];
 
 	add_eyevalues(genus, &black_eye[pos].value, genus);
       }
@@ -1334,7 +1330,7 @@ compute_dragon_genus(int d, struct eyevalue *genus, int eye_to_exclude)
 	if (eye_to_exclude == NO_MOVE
 	    && (eye_move_urgency(&white_eye[pos].value)
 		> eye_move_urgency(genus)))
-	  DRAGON2(d).heye = white_eye[pos].defense_point;
+	  DRAGON2(d).heye = white_vital_points[pos].defense_points[0];
 
 	add_eyevalues(genus, &white_eye[pos].value, genus);
       }

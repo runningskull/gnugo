@@ -4204,12 +4204,7 @@ gtp_eye_data(char *s)
   gtp_printf("esize                %d\n", e->esize);
   gtp_printf("msize                %d\n", e->msize);
   gtp_printf("value                %s\n", eyevalue_to_string(&e->value));
-  gtp_mprintf("attack_point         %m\n",  
-	      I(e->attack_point), J(e->attack_point));
-  gtp_mprintf("defense_point        %m\n",  
-	      I(e->defense_point), J(e->defense_point));
   gtp_printf("marginal             %d\n", e->marginal);
-  gtp_printf("type                 %d\n", e->type);
   gtp_printf("neighbors            %d\n", e->neighbors);
   gtp_printf("marginal_neighbors   %d\n", e->marginal_neighbors);
   
