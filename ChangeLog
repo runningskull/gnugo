@@ -4,6 +4,7 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- added SPEC Makefile
 - backport bugfix in do_owl_analyze_semeai() from semeai_3_1[67].1
 - backport bugfix in value_moves.c and move_reasons.[ch] from gunnar_3_16.6
 - make GTP default playing mode (so we don't need options to start gnugo
