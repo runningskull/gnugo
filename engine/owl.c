@@ -67,7 +67,7 @@
 struct local_owl_data {
   char goal[BOARDMAX];
   char boundary[BOARDMAX];
-  int escape_values[BOARDMAX];
+  char escape_values[BOARDMAX];
   int color;
 
   struct eye_data my_eye[BOARDMAX];

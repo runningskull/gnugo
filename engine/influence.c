@@ -1768,7 +1768,7 @@ compute_move_influence(int m, int n, int color,
 
 void
 compute_escape_influence(char goal[BOARDMAX], int color,
-			 int escape_value[BOARDMAX],
+			 char escape_value[BOARDMAX],
 			 int dragons_known)
 {
   int i, j;
@@ -1779,7 +1779,7 @@ compute_escape_influence(char goal[BOARDMAX], int color,
    * parameter currently is not used.
    */
   static int cached_board[BOARDMAX];
-  static int escape_values[BOARDMAX][4];
+  static char escape_values[BOARDMAX][4];
   static int active_caches[4];
 
   /* Encode the values of color and dragons_known into an integer

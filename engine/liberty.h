@@ -353,7 +353,7 @@ void set_temporary_depth_values(int d, int b, int f, int k,
 void restore_depth_values(void);
 int safe_move(int move, int color);
 void join_dragons(int d1, int d2);
-int dragon_escape(char goal[BOARDMAX], int color, int escape_value[BOARDMAX]);
+int dragon_escape(char goal[BOARDMAX], int color, char escape_value[BOARDMAX]);
 int is_same_dragon(int d1, int d2);
 int are_neighbor_dragons(int d1, int d2);
 int first_worm_in_dragon(int w);
@@ -598,7 +598,7 @@ void get_move_influence(int move, int color, char saved_stones[BOARDMAX],
                         float black_influence[BOARDMAX],
                         int influence_regions[BOARDMAX]);
 void compute_escape_influence(char goal[BOARDMAX], int color,
-                              int escape_value[BOARDMAX], int dragons_known);
+                              char escape_value[BOARDMAX], int dragons_known);
 
 /* Eye space functions. */
 int is_eye_space(int pos);

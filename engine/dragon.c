@@ -1605,7 +1605,7 @@ compute_crude_status(int pos)
  */
 int
 dragon_escape(char goal[BOARDMAX], int color,
-	      int escape_value[BOARDMAX])
+	      char escape_value[BOARDMAX])
 {
   int ii;
   int k;
@@ -1765,7 +1765,7 @@ compute_escape(int pos, int dragon_status_known)
 {
   int ii;
   char goal[BOARDMAX];
-  int escape_value[BOARDMAX];
+  char escape_value[BOARDMAX];
 
   ASSERT1(IS_STONE(board[pos]), pos);
 
