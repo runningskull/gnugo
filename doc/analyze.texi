@@ -324,12 +324,13 @@ The regions found by Bouzy's algorithm (@pxref{Moyo}) can be
 displayed with the following options:
 
 @example
-
+@group
 @option{-m @var{level}}
  use or (hexadecimal)   cumulative values for printing these reports :
     1       0x01         ascii printing of territorial evaluation (5/21)
     2       0x02         ascii printing of moyo evaluation (5/10)
     4       0x04         ascii printing of area (4/0)
+@end group
 @end example
 
 These data are today only used in the score estimation. 

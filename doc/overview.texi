@@ -54,6 +54,7 @@ representation clear, this figure shows how the 1D indices correspond
 to the 2D indices when MAX_BOARD is 7.
 
 @example
+@group
   j  -1   0   1   2   3   4   5   6
 i +----------------------------------
 -1|   0   1   2   3   4   5   6   7
@@ -65,6 +66,7 @@ i +----------------------------------
  5|  48  49  50  51  52  53  54  55
  6|  56  57  58  59  60  61  62  63
  7|  64  65  66  67  68  69  70  71  72
+@end group
 @end example
 
 To convert between a 1D index @code{pos} and a 2D index @code{(i,j)},
@@ -82,6 +84,7 @@ of board marker value @code{GRAY}. Thus if @code{board_size} and
 @code{MAX_BOARD} both are 7, this looks like
 
 @example
+@group
   j  -1   0   1   2   3   4   5   6
 i +----------------------------------
 -1|   #   #   #   #   #   #   #   #
@@ -93,12 +96,14 @@ i +----------------------------------
  5|   #   .   .   .   .   .   .   .
  6|   #   .   .   .   .   .   .   .
  7|   #   #   #   #   #   #   #   #   #
+@end group
 @end example
 
 The indices marked @samp{#} have value @code{GRAY}.
 If @code{MAX_BOARD} is 7 and @code{board_size} is only 5:
 
 @example
+@group
   j  -1   0   1   2   3   4   5   6
 i +----------------------------------
 -1|   #   #   #   #   #   #   #   #
@@ -110,6 +115,7 @@ i +----------------------------------
  5|   #   #   #   #   #   #   #   #
  6|   #   #   #   #   #   #   #   #
  7|   #   #   #   #   #   #   #   #   #
+@end group
 @end example
 
 Navigation on the board is done by the @code{SOUTH}, @code{WEST},

@@ -17,12 +17,11 @@ As an example
 
    ./configure --enable-cache-size=32 --enable-level=8
 
-creates a 32 Mb cache in RAM and sets the level to 8.  Both these
-defaults can be overridden at run time.
-
-If you do not specify any options, the default level is 10 (highest
-supported) and the default cache size is 8. These defaults are
-probably suitable for most systems unless GNU Go seems too slow.
+creates a 32 Mb cache in RAM and sets the level to 8. Both these
+defaults can be overridden at run time. If you do not specify any
+options, the default level is 10 (highest supported) and the
+default cache size is 8. These defaults are probably suitable for
+most systems unless GNU Go seems too slow.
 
 You have now made a binary called interface/gnugo. Now
 (running as root) type

@@ -31,6 +31,7 @@ Figure 1 describes the structure of a program using the GNU Go
 engine.
 
 @example
+@group
                  +-----------------------------------+
                  |                                   |
                  |          Go application           |
@@ -52,6 +53,7 @@ engine.
      
         Figure 1: The structure of a program using the GNU Go engine
 
+@end group
 @end example
 
 The foundation is a library called @code{libboard.a} which provides 
@@ -115,24 +117,28 @@ everywhere. The most important of these are the numeric declarations of
 colors. Each intersection on the board is represented by one of these:
 
 @example
+@group
 
      color              value
      EMPTY                0
      WHITE                1
      BLACK                2
 
+@end group
 @end example
 
 In addition to these, the following values can be used in special
 places, such as describing the borders of eyes:
 
 @example
+@group
 
      color                     value
      GRAY (GRAY_BORDER)          3
      WHITE_BORDER                4
      BLACK_BORDER                5
 
+@end group
 @end example
 
 There is a macro, @code{OTHER_COLOR(color)} which can be used to get the
@@ -157,6 +163,7 @@ A basic data structure in the engine is the @code{board_state} struct.
 This structure is internal to the engine and is defined in @file{liberty.h}.
 
 @example 
+@group
 
      typedef unsigned char Intersection;
      
@@ -179,6 +186,8 @@ This structure is internal to the engine and is defined in @file{liberty.h}.
        float komi;
        int move_number;
      @};
+
+@end group
 @end example
 
 Here @code{Intersection} stores @code{EMPTY}, @code{WHITE} or

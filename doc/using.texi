@@ -271,7 +271,18 @@ are not supressed.
 @end quotation
 @item @option{-l}, @option{--infile @var{filename}}
 @quotation
-Load the named SGF file
+Load the named SGF file. GNU Go will generate a move for
+the player who is about to move. If you want to override this
+and generate a move for the other player you may add the
+option @option{color @var{<color>}} where @var{<color>} is
+@code{black} or @code{white}.
+@end quotation
+@item @option{--orientation @var{n}}
+@quotation
+Combine with @option{-l}. The Go board can be oriented in 8 different
+ways, counting reflections and rotations of the position; this option
+selects an orientation (default 0). The parameter @samp{n} is an integer
+between 0 and 7.
 @end quotation
 @item @option{-L}, @option{--until @var{move}}
 @quotation
@@ -298,7 +309,7 @@ need this option.
 @cindex cache-size
 @cindex cache
 Memory in megabytes used for caching of read results. The default size
-is 16 unless you configure gnugo with the command @command{configure
+is 8 unless you configure gnugo with the command @command{configure
 --enable-cache-size=@var{size}} before compiling to make @var{size} the
 default (@pxref{Installation}). GNU Go stores results of its reading
 calculations in a Hash table (@pxref{Hashing}). If the Hash table is
@@ -310,7 +321,7 @@ occurs. Swapping may be detected on GNU/Linux machines using the program
 to be a problem you may want to increase the size of the cache using
 this option.
 @end quotation
-@item @option{--chinese-rules} 
+@item @option{--chinese-rules}
 @quotation
 Use Chinese rules. This means that the Chinese or Area Counting is
 followed. It may affect the score of the game by one point in even
@@ -324,24 +335,41 @@ Use Japanese Rules. This is the default unless you specify
 @end quotation
 @item @option{--copyright}: Display the copyright notice
 @item @option{--version} or @option{-v}: Print the version number
-@item @option{--printsgf @var{filename}}: Create an SGF file
+@item @option{--printsgf @var{filename}}: 
+@quotation
+Create an SGF file
 containing a diagram of the board. Useful with @option{-L} to
 create diagrams from games.
+@end quotation
+@item @option{--options}
+@quotation 
+Print which experimental configure options were compiled into the program
+(@pxref{Experimental Options}).
+@end quotation
 @end itemize
 
 @subsection Other options affecting strength and speed
 
-The single parameter @option{--level} is a convenient way of
-choosing whether to play stronger or faster. This single
-parameter controls a host of other parameters which may
-optionally be set individually at the command line.  The
-default values of these parameters may be found by running
-@command{gnugo --help}. Unless you are working on the program
-you probably don't need these options. Instead, just adjust the
-single variable @option{--level}.
+@itemize @bullet
+@item @option{--level @var{amount}}
+@cindex level
+@quotation
+The higher the level, the deeper GNU Go reads. Level 10 is the default.
+If GNU Go plays too slowly on your machine, you may want to decrease it.
+@end quotation
+@end itemize
 
-These options are of use to developers tuning the program
-for performance and accuracy.
+This single parameter @option{--level} is the best way of
+choosing whether to play stronger or faster. It controls
+a host of other parameters which may themselves be set
+individually at the command line.  The default values of
+these parameters may be found by running @command{gnugo --help}. 
+
+Unless you are working on the program you probably don't
+need these options. Instead, just adjust the single
+variable @option{--level}. The remaining options are of
+use to developers tuning the program for performance and
+accuracy.
 
 @itemize @bullet
 @item @option{-D}, @option{--depth @var{depth}}
@@ -412,15 +440,12 @@ The preceeding options are documented with the reading code
 @item @option{--owl-branch} Below this depth Owl only considers one move. Default 8.
 @item @option{--owl-reading} Below this depth Owl assumes the dragon has escaped.
 Default 20.
-@item @option{--owl-node-limit} If the number of variations exceeds this limit,
-Owl assumes the dragon can make life. Default 1000.  We caution the user that
-increasing @code{owl_node_limit} does not necessarily increase the strength of
-the program.
-@item @option{--level @var{amount}}
-@cindex level
+@item @option{--owl-node-limit}
 @quotation
-The higher the level, the deeper GNU Go reads. Level 10 is the default.
-If GNU Go plays too slowly on your machine, you may want to decrease it.
+If the number of variations exceeds this limit, Owl assumes the dragon can
+make life. Default 1000.  We caution the user that increasing
+@code{owl_node_limit} does not necessarily increase the strength of the
+program.  
 @end quotation
 @end itemize
 
@@ -429,7 +454,7 @@ If GNU Go plays too slowly on your machine, you may want to decrease it.
 @itemize
 @item @option{--color @var{color}}
 @quotation
-Choose your color ('black' or 'white')
+Choose your color ('black' or 'white').
 @end quotation
 @item @option{--handicap @var{number}}
 @quotation
@@ -485,22 +510,39 @@ Use rxvt, xterm or Linux Console. (@pxref{Colored Display})
 @item @option{-d}, @option{--debug @var{level}}
 @quotation
 Produce debugging output. The debug level is given in hexadecimal, using the
-bits defined in the following table from @file{engine/gnugo.h}.
+bits defined in the following table from @file{engine/gnugo.h}. A list of
+these may be produced using @option{--debug-flags}. Here they are in
+hexadecimal:
+
 @cindex debugging options
-@itemize
-@item DEBUG_INFLUENCE    0x0001
-@item DEBUG_EYES         0x0002
-@item DEBUG_OWL          0x0004
-@item DEBUG_ESCAPE       0x0008
-@item DEBUG_MATCHER      0x0010
-@item DEBUG_DRAGONS      0x0020
-@item DEBUG_SEMEAI       0x0040
-@item DEBUG_LOADSGF      0x0080
-@item DEBUG_HELPER       0x0100
-@item DEBUG_READING      0x0200
-@item DEBUG_WORMS        0x0400
-@item DEBUG_MOVE_REASONS 0x0800
-@end itemize
+@example
+  DEBUG_INFLUENCE             0x0001
+  DEBUG_EYES                  0x0002
+  DEBUG_OWL                   0x0004
+  DEBUG_ESCAPE                0x0008
+  DEBUG_MATCHER               0x0010
+  DEBUG_DRAGONS               0x0020
+  DEBUG_SEMEAI                0x0040
+  DEBUG_LOADSGF               0x0080
+  DEBUG_HELPER                0x0100
+  DEBUG_READING               0x0200
+  DEBUG_WORMS                 0x0400
+  DEBUG_MOVE_REASONS          0x0800
+  DEBUG_OWL_PERFORMANCE       0x1000
+  DEBUG_LIFE                  0x2000
+  DEBUG_FILLLIB               0x4000
+  DEBUG_READING_PERFORMANCE   0x8000
+  DEBUG_SCORING               0x010000
+  DEBUG_AFTERMATH             0x020000
+  DEBUG_ATARI_ATARI           0x040000
+  DEBUG_READING_CACHE         0x080000
+  DEBUG_TERRITORY             0x100000
+  DEBUG_OWL_PERSISTENT_CACHE  0X200000
+@end example
+
+These debug flags are additive. If you want to turn on both
+dragon and worm debugging you can use @option{-d0x420}.
+
 @end quotation
 @item @option{-H}, @option{--hash @var{level}} 
 @quotation

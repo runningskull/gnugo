@@ -113,8 +113,9 @@ Thanks to Gary Boos, Peter Gucwa, Martijn van der Kooij, Michael
 Margolis, Trevor Morris, M@aa{}ns Ullerstam, Don Wagner and Yin Zheng for help
 with Visual C++.
 
-And thanks to Alan Crossman, Stephan Somogyi, Pierce Wetter and Mathias Wagner
-for help with Macintosh.
+Thanks to Alan Crossman, Stephan Somogyi, Pierce Wetter and Mathias Wagner
+for help with Macintosh. And thanks to Marco Scheurer and Shigeru Mabuchi for
+helping us find various problems.
 
 Special thanks to Ebba Berggren for creating our logo, based on a
 design by Tanguy Urvoy and comments by Alan Crossman. The old
