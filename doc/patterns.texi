@@ -452,16 +452,16 @@ O*a
 
 @end example
 
-Here we have given the label @samp{a} to the empty spot to the right of the
-considered move and the label @samp{B} to the @samp{X} stone in the pattern. In
-addition to these, @samp{*} can also be used as a label. A label may be any
-lowercase or uppercase ascii letter except OoXxt. By convention we use
-uppercase letters for X stones and lowercase for O stones and empty
-intersections. When labeling a stone that's part of a larger string in
-the pattern, all stones of the string should be marked with the label.
-(These conventions are not enforced by the pattern compiler, but to
-make the database consistent and easy to read they should be
-followed.)
+Here we have given the label @samp{a} to the empty spot to the right of
+the considered move and the label @samp{B} to the @samp{X} stone in the
+pattern. In addition to these, @samp{*} can also be used as a label. A
+label may be any lowercase or uppercase ascii letter except OoXxt. By
+convention we use uppercase letters for X stones and lowercase for O
+stones and empty intersections. When labeling a stone that's part of a
+larger string in the pattern, all stones of the string should be marked
+with the label. (These conventions are not enforced by the pattern
+compiler, but to make the database consistent and easy to read they
+should be followed.)
 
 The labels can now be used in the constraint expression. In this
 example we have a reading constraint which should be interpreted as
