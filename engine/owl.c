@@ -89,18 +89,10 @@ struct local_owl_data {
 
   /* Node limitation. */
   int local_owl_node_counter;
+
+  char safe_move_cache[BOARDMAX];
 };
 
-#if PATTERN_CHECK_ON_DEMAND
-/* Cache for owl_safe_move when called from owl_shapes. */
-static int *owl_safe_move_cache_stack;
-/* Cache for owl_safe_move when called for vital attack moves. */
-static int owl_safe_move_cache_size = 0;
-/* Set this before calling owl_shapes_callback or get_next_move_from_list. */
-static int *current_owl_safe_move_cache;
-#endif
-
-static int owl_safe_move_cache[BOARDMAX];
 static int result_certain;
 
 /* Statistics. */
@@ -1248,10 +1240,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 				      &probable_min, &probable_max);
     
     current_owl_data = owl;
-    memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
-#if PATTERN_CHECK_ON_DEMAND
-    current_owl_safe_move_cache = owl_safe_move_cache;
-#endif
+    memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
 
     matches_found = 0;
     memset(found_matches, 0, sizeof(found_matches));
@@ -1905,10 +1894,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 				      &probable_min, &probable_max);
     
     current_owl_data = owl;
-    memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
-#if PATTERN_CHECK_ON_DEMAND
-    current_owl_safe_move_cache = owl_safe_move_cache;
-#endif
+    memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
 
     /* We don't care about the moves, just whether matches are found.
      * The content of shape_moves[] will be discarded when we call
@@ -2750,25 +2736,14 @@ owl_shapes(
     moves[k].same_dragon = 2;
   }
 
-  /* We must reset the owl_safe_move_cache before starting the
+  /* We must reset the owl safe_move_cache before starting the
    * pattern matching. The cache is used by owl_shapes_callback().
    */
+  memset(owl->safe_move_cache, 0, sizeof(owl->safe_move_cache));
 #if PATTERN_CHECK_ON_DEMAND
   init_pattern_list(pattern_list);
-  if (stackp >= owl_safe_move_cache_size) {
-    int new_size = gg_max(stackp+1, owl_reading_depth);
-    owl_safe_move_cache_stack
-      = realloc(owl_safe_move_cache_stack, new_size * BOARDMAX * sizeof(int));
-    if (0)
-      gprintf("New size for owl safe move cache stack: %d\n", new_size);
-    gg_assert(owl_safe_move_cache_stack != NULL);
-    owl_safe_move_cache_size = new_size;
-  }
-  memset(&owl_safe_move_cache_stack[stackp * BOARDMAX],
-         0, BOARDMAX * sizeof(int));
   matchpat(collect_owl_shapes_callbacks, color, type, pattern_list, owl->goal);
 #else
-  memset(owl_safe_move_cache, 0, sizeof(owl_safe_move_cache));
   matchpat(owl_shapes_callback, color, type, moves, owl->goal);
 #endif
 
@@ -2790,11 +2765,33 @@ owl_shapes(
 static int
 check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
 {
+  int constraint_checked = 0;
+  int safe_move_checked = 0;
+
+  /* The very first check is whether we can disregard the pattern due
+   * due to an owl safe_move_cache lookup.
+   */
+  if (! (pattern->class & CLASS_s))
+    if (current_owl_data->safe_move_cache[move]) {
+      if (current_owl_data->safe_move_cache[move] == 1)
+        return 0;
+      else
+        safe_move_checked = 1;
+    }
+
+  /* If the constraint is cheap to check, we do this first. */
+  if ((pattern->autohelper_flag & HAVE_CONSTRAINT)
+      && (pattern->constraint_cost < 0.45)) {
+    if (!pattern->autohelper(pattern, ll, move, color, 0))
+      return 0;
+    constraint_checked = 1;
+  }
+
   /* For sacrifice patterns, the survival of the stone to be played is
    * not checked. Otherwise we discard moves which can be captured. 
    * Illegal ko captures are accepted for ko analysis.
    */
-  if (! (pattern->class & CLASS_s)) {
+  if ((!(pattern->class & CLASS_s)) && (!safe_move_checked)) {
     if (!owl_safe_move(move, color)) {
       if (0)
 	TRACE("  move at %1m wasn't safe, discarded\n", move);
@@ -2823,7 +2820,7 @@ check_pattern_hard(int move, int color, struct pattern *pattern, int ll)
   /* If the pattern has a constraint, call the autohelper to see
    * if the pattern must be rejected.
    */
-  if (pattern->autohelper_flag & HAVE_CONSTRAINT)
+  if (pattern->autohelper_flag & HAVE_CONSTRAINT && (!constraint_checked))
     if (!pattern->autohelper(pattern, ll, move, color, 0))
       return 0;
   return 1;
@@ -2956,9 +2953,6 @@ get_next_move_from_list(struct matched_patterns_list_data *list, int color,
     
   sgf_dumptree = NULL;
   count_variations = 0;
-
-  gg_assert(owl_safe_move_cache_size > stackp);
-  current_owl_safe_move_cache = &owl_safe_move_cache_stack[stackp * BOARDMAX];
 
   /* The patterns above list->used have already been either discarded or
    * used by the calling function.
@@ -4098,14 +4092,6 @@ owl_safe_move(int move, int color)
 {
   int acode, safe = 0;
 
-#if PATTERN_CHECK_ON_DEMAND
-  if (current_owl_safe_move_cache[move])
-    return current_owl_safe_move_cache[move]-1;
-#else
-  if (owl_safe_move_cache[move])
-    return owl_safe_move_cache[move]-1;
-#endif
-
   if (trymove(move, color, "owl_safe_move", 0, EMPTY, 0)) {
     acode = attack(move, NULL);
     if (acode != WIN)
@@ -4115,11 +4101,7 @@ owl_safe_move(int move, int color)
     current_owl_data->lunches_are_current = 0;
     popgo();
   }
-#if PATTERN_CHECK_ON_DEMAND
-  current_owl_safe_move_cache[move] = safe+1;
-#else
-  owl_safe_move_cache[move] = safe+1;
-#endif
+  current_owl_data->safe_move_cache[move] = safe+1;
   return safe;
 }
   

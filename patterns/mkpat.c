@@ -151,6 +151,7 @@ char *code_pos;                     /* current position in code buffer */
 struct autohelper_func {
   const char *name;
   int params;
+  float cost;
   const char *code;
 };
 
@@ -173,102 +174,128 @@ int current_line_number = 0;
  * by "lib2", "lib3", and "lib4".
  */
 static struct autohelper_func autohelper_functions[] = {
-  {"lib2",            1, "worm[%s].liberties2"},
-  {"lib3",            1, "worm[%s].liberties3"},
-  {"lib4",            1, "worm[%s].liberties4"},
-  {"goallib",         0, "goallib"},
-  {"lib",             1, "countlib(%s)"},
-  {"alive",           1, "(dragon[%s].matcher_status == ALIVE)"},
-  {"unknown",         1, "(dragon[%s].matcher_status == UNKNOWN)"},
-  {"critical",        1, "(dragon[%s].matcher_status == CRITICAL)"},
-  {"dead",            1, "(dragon[%s].matcher_status == DEAD)"},
-  {"status",          1, "dragon[%s].matcher_status"},
-  {"ko",              1, "is_ko_point(%s)"},
-  {"xdefend_against", 2, "defend_against(%s,OTHER_COLOR(color),%s)"},
-  {"odefend_against", 2, "defend_against(%s,color,%s)"},
-  {"defend_against_atari",1,"defend_against_atari_helper(move,%s)"},
-  {"does_defend",     2, "does_defend(%s,%s)"},
-  {"does_attack",     2, "does_attack(%s,%s)"},
-  {"attack",          1, "ATTACK_MACRO(%s)"},
-  {"defend",          1, "DEFEND_MACRO(%s)"},
-  {"weak",            1, "DRAGON_WEAK(%s)"},
-  {"safe_xmove",      1, "safe_move(%s,OTHER_COLOR(color))"},
-  {"safe_omove",      1, "safe_move(%s,color)"},
-  {"legal_xmove",     1, "is_legal(%s,other)"},
-  {"legal_omove",     1, "is_legal(%s,color)"},
-  {"x_somewhere",     -1, "somewhere(OTHER_COLOR(color), %d"},
-  {"o_somewhere",     -1, "somewhere(color, %d"},
-  {"xmoyo",           1, "(influence_moyo_color(%s) == OTHER_COLOR(color))"},
-  {"omoyo",           1, "(influence_moyo_color(%s) == color)"},
-  {"xarea",           1, "(influence_area_color(%s) == OTHER_COLOR(color))"},
-  {"oarea",           1, "(influence_area_color(%s) == color)"},
-  {"xterri",          1, "(influence_territory_color(%s) == OTHER_COLOR(color))"},
-  {"oterri",          1, "(influence_territory_color(%s) == color)"},
-  {"genus",           1, "dragon[%s].genus"},
-  {"approx_xlib",     1, "approxlib(%s,OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
-  {"approx_olib",     1, "approxlib(%s,color, MAX_LIBERTIES, NULL)"},
-  {"xlib",            1, "accurate_approxlib(%s,OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
-  {"olib",            1, "accurate_approxlib(%s,color, MAX_LIBERTIES, NULL)"},
-  {"xcut",            1, "cut_possible(%s,OTHER_COLOR(color))"},
-  {"ocut",            1, "cut_possible(%s,color)"},
-  {"edge_double_sente",    4, "edge_double_sente_helper(%s, %s, %s, %s)"},
-  {"xplay_defend_both",   -2,
-   "play_attack_defend2_n(OTHER_COLOR(color), 0, %d"},
-  {"oplay_defend_both",   -2, "play_attack_defend2_n(color, 0, %d"},
-  {"xplay_attack_either", -2,
-   "play_attack_defend2_n(OTHER_COLOR(color), 1, %d"},
-  {"oplay_attack_either", -2, "play_attack_defend2_n(color, 1, %d"},
-  {"xplay_defend",   -1, "play_attack_defend_n(OTHER_COLOR(color), 0, %d"},
-  {"oplay_defend",   -1, "play_attack_defend_n(color, 0, %d"},
-  {"xplay_attack",   -1, "play_attack_defend_n(OTHER_COLOR(color), 1, %d"},
-  {"oplay_attack",   -1, "play_attack_defend_n(color, 1, %d"},
-  {"xplay_break_through", -3, "play_break_through_n(OTHER_COLOR(color), %d"},
-  {"oplay_break_through", -3, "play_break_through_n(color, %d"},
-  {"oplay_connect", -2, "play_connect_n(color, 1, %d"},
-  {"xplay_connect", -2, "play_connect_n(OTHER_COLOR(color), 1, %d"},
-  {"oplay_disconnect", -2, "play_connect_n(color, 0, %d"},
-  {"xplay_disconnect", -2, "play_connect_n(OTHER_COLOR(color), 0, %d"},
-  {"seki_helper",     1, "seki_helper(%s)"},
-  {"threaten_to_save",1,"threaten_to_save_helper(move,%s)"},
-  {"threaten_to_capture",1,"threaten_to_capture_helper(move,%s)"},
-  {"not_lunch",       2, "not_lunch_helper(%s,%s)"},
-  {"eye",             1, "is_eye_space(%s)"},
-  {"proper_eye",      1, "is_proper_eye_space(%s)"},
-  {"marginal_eye",    1, "is_marginal_eye_space(%s)"},
-  {"halfeye",         1, "is_halfeye(half_eye,%s)"},
-  {"max_eye_value",   1, "max_eye_value(%s)"},
-  {"owl_topological_eye", 2, "owl_topological_eye(%s,board[%s])"},
-  {"obvious_false_oeye", 1, "obvious_false_eye(%s,color)"},
-  {"obvious_false_xeye", 1, "obvious_false_eye(%s,OTHER_COLOR(color))"},
-  {"antisuji",        1, "add_antisuji_move(%s)"},
-  {"add_connect_move",2, "add_connection_move(move,%s,%s)"},
-  {"add_cut_move",    2, "add_cut_move(move,%s,%s)"},
-  {"add_attack_either_move",2,"add_either_move(move,ATTACK_STRING,%s,ATTACK_STRING,%s)"},
-  {"add_defend_both_move",2, "add_all_move(move,DEFEND_STRING,%s,DEFEND_STRING,%s)"},
-  {"same_dragon",     2, "is_same_dragon(%s,%s)"},
-  {"same_string",     2, "same_string(%s,%s)"},
-  {"dragonsize",      1, "dragon[%s].size"},
-  {"wormsize",        1, "countstones(%s)"},
-  {"effective_size",  1, "dragon[%s].effective_size"},
-  {"vital_chain",     1, "vital_chain(%s)"},
-  {"potential_cutstone",1,"worm[%s].cutstone2>1"},
-  {"amalgamate_most_valuable_helper",3,
-   "amalgamate_most_valuable_helper(%s,%s,%s)"},
-  {"amalgamate",      2, "join_dragons(%s,%s)"},
-  {"owl_escape_value",1, "owl_escape_value(%s)"},
-  {"owl_goal_dragon", 1, "owl_goal_dragon(%s)"},
-  {"owl_eyespace",    2, "owl_eyespace(%s,%s)"},
-  {"owl_big_eyespace",2, "owl_big_eyespace(%s,%s)"},
-  {"owl_proper_eye",  2, "owl_proper_eye(%s,%s)"},
-  {"has_aji",1,"(dragon[%s].owl_threat_status==CAN_THREATEN_DEFENSE)"},
-  {"finish_ko_helper",1, "finish_ko_helper(%s)"},
-  {"squeeze_ko_helper",1,"squeeze_ko_helper(%s)"},
-  {"backfill_helper", 3, "backfill_helper(%s, %s, %s)"},
-  {"connect_and_cut_helper", 3, "connect_and_cut_helper(%s, %s, %s)"},
-  {"owl_threatens",   2, "owl_threatens_attack(%s,%s)"},
-  {"replace",         2, "add_replacement_move(%s,%s)"},
-  {"non_oterritory",  1, "influence_mark_non_territory(%s, color)"},
-  {"non_xterritory",  1, "influence_mark_non_territory(%s, OTHER_COLOR(color))"}
+  {"lib2",            		1, 0.01, "worm[%s].liberties2"},
+  {"lib3",            		1, 0.01, "worm[%s].liberties3"},
+  {"lib4",            		1, 0.01, "worm[%s].liberties4"},
+  {"goallib",         		0, 0.01, "goallib"},
+  {"lib",             		1, 0.01, "countlib(%s)"},
+  {"alive",           		1, 0.01,
+		"(dragon[%s].matcher_status == ALIVE)"},
+  {"unknown",         		1, 0.01,
+		"(dragon[%s].matcher_status == UNKNOWN)"},
+  {"critical",        		1, 0.01,
+		"(dragon[%s].matcher_status == CRITICAL)"},
+  {"dead",            		1, 0.01, "(dragon[%s].matcher_status == DEAD)"},
+  {"status",          		1, 0.01, "dragon[%s].matcher_status"},
+  {"ko",              		1, 0.01, "is_ko_point(%s)"},
+  {"xdefend_against", 		2, 1.00,
+		"defend_against(%s,OTHER_COLOR(color),%s)"},
+  {"odefend_against", 		2, 1.00, "defend_against(%s,color,%s)"},
+  {"defend_against_atari", 	1, 1.00,
+		"defend_against_atari_helper(move,%s)"},
+  {"does_defend",     		2, 1.00, "does_defend(%s,%s)"},
+  {"does_attack",     		2, 1.00, "does_attack(%s,%s)"},
+  {"attack",          		1, 1.00, "ATTACK_MACRO(%s)"},
+  {"defend",          		1, 1.00, "DEFEND_MACRO(%s)"},
+  {"weak",            		1, 0.01, "DRAGON_WEAK(%s)"},
+  {"safe_xmove",      		1, 1.00, "safe_move(%s,OTHER_COLOR(color))"},
+  {"safe_omove",      		1, 1.00, "safe_move(%s,color)"},
+  {"legal_xmove",     		1, 0.05, "is_legal(%s,other)"},
+  {"legal_omove",     		1, 0.05, "is_legal(%s,color)"},
+  {"x_somewhere",	       -1, 0.01, "somewhere(OTHER_COLOR(color), %d"},
+  {"o_somewhere",	       -1, 0.01, "somewhere(color, %d"},
+  {"xmoyo",           		1, 0.01,
+		"(influence_moyo_color(%s) == OTHER_COLOR(color))"},
+  {"omoyo",           		1, 0.01,
+		"(influence_moyo_color(%s) == color)"},
+  {"xarea",           		1, 0.01,
+		"(influence_area_color(%s) == OTHER_COLOR(color))"},
+  {"oarea",           		1, 0.01, "(influence_area_color(%s) == color)"},
+  {"xterri",          		1, 0.01,
+		"(influence_territory_color(%s) == OTHER_COLOR(color))"},
+  {"oterri",          		1, 0.01,
+		"(influence_territory_color(%s) == color)"},
+  {"genus",           		1, 0.01, "dragon[%s].genus"},
+  {"approx_xlib",     		1, 0.03,
+		"approxlib(%s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
+  {"approx_olib",     		1, 0.03,
+		"approxlib(%s, color, MAX_LIBERTIES, NULL)"},
+  {"xlib",            		1, 0.05,
+	"accurate_approxlib(%s, OTHER_COLOR(color), MAX_LIBERTIES, NULL)"},
+  {"olib",            		1, 0.05,
+	"accurate_approxlib(%s,color, MAX_LIBERTIES, NULL)"},
+  {"xcut",            		1, 0.01, "cut_possible(%s,OTHER_COLOR(color))"},
+  {"ocut",            		1, 0.05, "cut_possible(%s,color)"},
+  {"edge_double_sente", 	4, 3.00,
+		"edge_double_sente_helper(%s, %s, %s, %s)"},
+  {"xplay_defend_both",        -2, 3.00,
+		"play_attack_defend2_n(OTHER_COLOR(color), 0, %d"},
+  {"oplay_defend_both",        -2, 3.00, "play_attack_defend2_n(color, 0, %d"},
+  {"xplay_attack_either",      -2, 3.00,
+		"play_attack_defend2_n(OTHER_COLOR(color), 1, %d"},
+  {"oplay_attack_either",      -2, 3.00, "play_attack_defend2_n(color, 1, %d"},
+  {"xplay_defend",             -1, 1.00,
+		"play_attack_defend_n(OTHER_COLOR(color), 0, %d"},
+  {"oplay_defend",             -1, 1.00, "play_attack_defend_n(color, 0, %d"},
+  {"xplay_attack",             -1, 1.00,
+		"play_attack_defend_n(OTHER_COLOR(color), 1, %d"},
+  {"oplay_attack",             -1, 1.00, "play_attack_defend_n(color, 1, %d"},
+  {"xplay_break_through",      -3, 5.00,
+		"play_break_through_n(OTHER_COLOR(color), %d"},
+  {"oplay_break_through",      -3, 5.00, "play_break_through_n(color, %d"},
+  {"oplay_connect",            -2,10.00, "play_connect_n(color, 1, %d"},
+  {"xplay_connect",            -2,10.00,
+		"play_connect_n(OTHER_COLOR(color), 1, %d"},
+  {"oplay_disconnect",         -2,10.00, "play_connect_n(color, 0, %d"},
+  {"xplay_disconnect",         -2,10.00,
+		"play_connect_n(OTHER_COLOR(color), 0, %d"},
+  {"seki_helper",     		1, 0.0, "seki_helper(%s)"},
+  {"threaten_to_save",		1, 0.0, "threaten_to_save_helper(move,%s)"},
+  {"threaten_to_capture",	1, 0.0, "threaten_to_capture_helper(move,%s)"},
+  {"not_lunch",       		2, 0.0, "not_lunch_helper(%s,%s)"},
+  {"eye",             		1, 0.01, "is_eye_space(%s)"},
+  {"proper_eye",      		1, 0.01, "is_proper_eye_space(%s)"},
+  {"marginal_eye",    		1, 0.01, "is_marginal_eye_space(%s)"},
+  {"halfeye",         		1, 0.01, "is_halfeye(half_eye,%s)"},
+  {"max_eye_value",   		1, 0.01, "max_eye_value(%s)"},
+  {"owl_topological_eye", 	2, 0.01, "owl_topological_eye(%s,board[%s])"},
+  {"obvious_false_oeye", 	1, 0.01, "obvious_false_eye(%s,color)"},
+  {"obvious_false_xeye", 	1, 0.01,
+		"obvious_false_eye(%s,OTHER_COLOR(color))"},
+  {"antisuji",        		1, 0.0, "add_antisuji_move(%s)"},
+  {"add_connect_move",		2, 0.0, "add_connection_move(move,%s,%s)"},
+  {"add_cut_move",    		2, 0.0, "add_cut_move(move,%s,%s)"},
+  {"add_attack_either_move",	2, 0.0,
+		"add_either_move(move,ATTACK_STRING,%s,ATTACK_STRING,%s)"},
+  {"add_defend_both_move",	2, 0.0,
+		"add_all_move(move,DEFEND_STRING,%s,DEFEND_STRING,%s)"},
+  {"same_dragon",     		2, 0.01, "is_same_dragon(%s,%s)"},
+  {"same_string",     		2, 0.01, "same_string(%s,%s)"},
+  {"dragonsize",     		1, 0.01, "dragon[%s].size"},
+  {"wormsize",        		1, 0.01, "countstones(%s)"},
+  {"effective_size",  		1, 0.01, "dragon[%s].effective_size"},
+  {"vital_chain",     		1, 0.05, "vital_chain(%s)"},
+  {"potential_cutstone",	1, 0.01, "worm[%s].cutstone2>1"},
+  {"amalgamate_most_valuable_helper", 3, 0.0,
+   		"amalgamate_most_valuable_helper(%s,%s,%s)"},
+  {"amalgamate",      		2, 0.0, "join_dragons(%s,%s)"},
+  {"owl_escape_value",		1, 0.01, "owl_escape_value(%s)"},
+  {"owl_goal_dragon", 		1, 0.01, "owl_goal_dragon(%s)"},
+  {"owl_eyespace",    		2, 0.01, "owl_eyespace(%s,%s)"},
+  {"owl_big_eyespace",		2, 0.01, "owl_big_eyespace(%s,%s)"},
+  {"owl_proper_eye",  		2, 0.01, "owl_proper_eye(%s,%s)"},
+  {"has_aji",         		1, 0.01,
+		"(dragon[%s].owl_threat_status==CAN_THREATEN_DEFENSE)"},
+  {"finish_ko_helper",		1, 0.05, "finish_ko_helper(%s)"},
+  {"squeeze_ko_helper",		1, 0.03, "squeeze_ko_helper(%s)"},
+  {"backfill_helper", 		3, 1.50, "backfill_helper(%s, %s, %s)"},
+  {"connect_and_cut_helper", 	3, 3.00, "connect_and_cut_helper(%s, %s, %s)"},
+  {"owl_threatens",   		2, 0.01, "owl_threatens_attack(%s,%s)"},
+  {"replace",         		2, 0.0, "add_replacement_move(%s,%s)"},
+  {"non_oterritory",  		1, 0.0,
+		"influence_mark_non_territory(%s, color)"},
+  {"non_xterritory",  		1, 0.0,
+		"influence_mark_non_territory(%s, OTHER_COLOR(color))"}
 };
 
 
@@ -1163,7 +1190,7 @@ generate_autohelper_code(int funcno, int number_of_params, int *labels)
  * We use a small state machine.
  */
 static void
-parse_constraint_or_action(char *line)
+parse_constraint_or_action(char *line, float *cost)
 {
   int state = 0;
   char *p;
@@ -1172,6 +1199,9 @@ parse_constraint_or_action(char *line)
   int labels[MAXLABELS];
   int N = sizeof(autohelper_functions)/sizeof(struct autohelper_func);
   int number_of_params = 0;
+  float cost_factor = 1.0;
+
+  *cost = 0.0;
   for (p = line; *p; p++)
   {
     switch (state) {
@@ -1181,6 +1211,8 @@ parse_constraint_or_action(char *line)
 		      strlen(autohelper_functions[n].name)) == 0) {
 	    state = 1;
 	    p += strlen(autohelper_functions[n].name)-1;
+	    *cost += autohelper_functions[n].cost * cost_factor;
+	    cost_factor *= 0.6;
 	    break;
 	  }
 	}
@@ -1304,6 +1336,7 @@ static void
 finish_constraint_and_action(char *name)
 {
   unsigned int i;
+  float cost;
   int have_constraint = (pattern[patno].autohelper_flag & HAVE_CONSTRAINT);
   int have_action = (pattern[patno].autohelper_flag & HAVE_ACTION);
 
@@ -1353,12 +1386,13 @@ finish_constraint_and_action(char *name)
     code_pos += sprintf(code_pos, "  if (!action)\n  ");
   if (have_constraint) {
     code_pos += sprintf(code_pos, "  return ");
-    parse_constraint_or_action(constraint);
+    parse_constraint_or_action(constraint, &cost);
+    pattern[patno].constraint_cost = cost;
     code_pos += sprintf(code_pos, ";\n");
   }
   if (have_action) {
     code_pos += sprintf(code_pos, "  ");
-    parse_constraint_or_action(action);
+    parse_constraint_or_action(action, &cost);
     code_pos += sprintf(code_pos, ";\n");
     code_pos += sprintf(code_pos, "\n  return 0;\n");
   }
@@ -1984,6 +2018,7 @@ write_patterns(FILE *outfile, char *name)
     else
       fprintf(outfile, "NULL");
     fprintf(outfile, ",%d", p->anchored_at_X);
+    fprintf(outfile, ",%f", p->constraint_cost);
 #if PROFILE_PATTERNS
     fprintf(outfile, ",0,0");
     fprintf(outfile, ",0");
@@ -2002,7 +2037,7 @@ write_patterns(FILE *outfile, char *name)
 #if GRID_OPT
   fprintf(outfile, ",{0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0}");
 #endif
-  fprintf(outfile, ",0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,NULL,NULL,0");
+  fprintf(outfile, ",0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,NULL,NULL,0,0.0");
 #if PROFILE_PATTERNS
   fprintf(outfile, ",0,0");
     fprintf(outfile, ",0");
@@ -2198,7 +2233,8 @@ main(int argc, char *argv[])
 	    break;
 	  case 7:
 	  case 8:
-	    finish_constraint_and_action(argv[gg_optind]); /* fall through */
+	    finish_constraint_and_action(argv[gg_optind]);
+							/* fall through */
 	  case 0:
 	  case 4:
 	    check_constraint_diagram();

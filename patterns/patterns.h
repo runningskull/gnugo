@@ -252,6 +252,9 @@ struct pattern {
                                  /* function, or NULL */
 
   int anchored_at_X;    /* 3 if the pattern has 'X' at the anchor posn */
+
+  float constraint_cost; /* mkpat's estimate of the constraint complexity.*/
+
 #if PROFILE_PATTERNS
   int hits;
   int dfa_hits;

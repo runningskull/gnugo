@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- heuristics to estimate cost of pattern constraint introduced
+- constraint cost used in owl callback for speedup
 - twogtp and twogtp-a close the sgf file if an engine crashes
 - twogtp-a had coordinates reversed
 - global variable last_moves[] removed
