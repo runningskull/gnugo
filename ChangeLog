@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- regress.pike measures uncertainty of moves
 - global variable hashdata renamed to board_hash
 - hashdata_compare() function removed
 - fields in struct stats_data updated for new cache

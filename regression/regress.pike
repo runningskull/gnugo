@@ -66,6 +66,7 @@ class Testsuite
   int connection_nodes;
   float time;
   float cputime;
+  float uncertainty;
   
   array(int) pass;
   array(int) fail;
@@ -78,6 +79,7 @@ class Testsuite
     reading_nodes = 0;
     owl_nodes = 0;
     connection_nodes = 0;
+    uncertainty = 0.0;
     time = 0.0;
     pass = ({});
     fail = ({});
@@ -135,7 +137,7 @@ static void program_reader(object f)
     int number;
     string answer;
     if (sscanf(s, "=%d %s", number, answer)) {
-      if (number < 10000 || number > 10004) {
+      if (number < 10000 || number > 10005) {
 	test_number = (int) number;
 	string correct = correct_results[test_number];
 	if (!correct) {
@@ -177,6 +179,8 @@ static void program_reader(object f)
 	current_testsuite->connection_nodes += (int) answer;
       else if (number == 10003)
 	current_testsuite->cputime = (float) answer;
+      else if (number == 10005)
+	current_testsuite->uncertainty += (float) answer;
       else if (number == 10004)
 	break;
     }
@@ -287,6 +291,8 @@ void run_testsuite(string suite_name, string engine,
       send("reset_owl_node_counter");
       send("reset_connection_node_counter");
       send(s);
+      if (sscanf(s, "%*sreg_genmove%*s") == 2)
+	send("10005 move_uncertainty");
       send("10000 get_reading_node_counter");
       send("10001 get_owl_node_counter");
       send("10002 get_connection_node_counter");
@@ -310,6 +316,7 @@ void final_report()
 {
   float total_time = 0.0;
   float total_cputime = 0.0;
+  float total_uncertainty = 0.0;
   int reading_nodes = 0;
   int owl_nodes = 0;
   int connection_nodes = 0;
@@ -319,6 +326,7 @@ void final_report()
   foreach (testsuites, Testsuite t) {
     total_time       += t->time;
     total_cputime    += t->cputime;
+    total_uncertainty += t->uncertainty;
     reading_nodes    += t->reading_nodes;
     owl_nodes        += t->owl_nodes;
     connection_nodes += t->connection_nodes;
@@ -328,6 +336,7 @@ void final_report()
   write("Total nodes: %d %d %d\n", reading_nodes, owl_nodes,
 	connection_nodes);
   write("Total time: %.2f (%.2f)\n", total_cputime, total_time);
+  write("Total uncertainty: %.2f\n", total_uncertainty);
   if (number_unexpected_pass > 0)
     write("%d PASS\n", number_unexpected_pass);
   if (number_unexpected_fail > 0)
