@@ -916,12 +916,9 @@ loadsgf games/owl34.sgf 211
 
 #CATEGORY=CONNECTION_IN_OWL
 # Simple mistake. See also 13x13:60 or 13x13:23.
-loadsgf games/games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
+loadsgf games/mertin13x13/gnugo-katsunari1.B+21.sgf 15
 256 owl_attack K12
 #? [1 J12]
-
-loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 21
-257 owl_does_defend 
 
 ########### end of tests #####################
 
