@@ -43,7 +43,9 @@ the Smart Go format.
 GNU Go default is a simple alpha-numeric board display, but you can use
 a client such as B<CGoban>.
 
-The game of Go Go is a game of strategy between two players usually played on a
+=head2 The game of Go
+
+Go is a game of strategy between two players usually played on a
 19x19 grid called B<goban>. The two players put black and white B<stones> on
 the goban to enclose B<territory>. Go was invented about 4000 years ago in
 ancient China. Other names for this game are (Chinese) B<Wei Chi>, (Korean)
