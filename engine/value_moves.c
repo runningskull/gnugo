@@ -1553,10 +1553,14 @@ estimate_territorial_value(int pos, int color, float score)
          * isn't safe anyway and we play this only for the followup
          * value, typically as a ko threat.
 	 *
+	 * This rule may be overwritten with patterns. See pattern
+	 * Sente22 and related test trevord:950 for an example.
+	 *
 	 * FIXME: This is somewhat halfhearted since only one defense
 	 * move is tested.
 	 */
-	if (board[aa] != EMPTY
+	if (!is_known_good_attack_threat(pos, aa)
+	    && board[aa] != EMPTY
 	    && (move[pos].move_safety == 1
 		|| adjacent_to_nondead_stone(pos, color))
 	    && find_defense(aa, &defense_move) == WIN

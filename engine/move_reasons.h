@@ -132,14 +132,15 @@ struct move_data {
  * FIXME: Many of these could be optimized more for size (e.g. MAX_EYES)
  */
 
-#define MAX_MOVE_REASONS  1000
-#define MAX_WORMS         2*MAX_BOARD*MAX_BOARD/3
-#define MAX_DRAGONS       MAX_WORMS
-#define MAX_CONNECTIONS   4*MAX_WORMS
-#define MAX_EYES          MAX_BOARD*MAX_BOARD/2
-#define MAX_LUNCHES       MAX_WORMS
-#define MAX_EITHER        100
-#define MAX_ALL           100
+#define MAX_MOVE_REASONS	1000
+#define MAX_WORMS		2*MAX_BOARD*MAX_BOARD/3
+#define MAX_DRAGONS		MAX_WORMS
+#define MAX_CONNECTIONS 	4*MAX_WORMS
+#define MAX_EYES		MAX_BOARD*MAX_BOARD/2
+#define MAX_LUNCHES		MAX_WORMS
+#define MAX_EITHER		100
+#define MAX_ALL 		100
+#define MAX_ATTACK_THREATS	6
 
 
 extern struct move_data move[BOARDMAX];
@@ -198,6 +199,9 @@ void mark_changed_dragon(int pos, int color, int affected, int affected2,
 			 float strength[BOARDMAX], float *effective_size);
 void mark_changed_string(int affected, char changed_stones[BOARDMAX],
 			 float strength[BOARDMAX], char new_status);
+
+void register_good_attack_threat(int move, int target);
+int is_known_good_attack_threat(int move, int target);
 
 /*
  * Local Variables:

@@ -3151,6 +3151,24 @@ ba*
 ;oterri(b) && oterri(c) && oterri(d) && safe_xmove(*) && !xplay_attack(*,a,*)
 
 
+Pattern Sente22
+# pp New pattern, see trevord:950 (3.3.20)
+
+?OX?
+O.*.
+?XX?
+
+:8,OX
+
+?OX?
+Oa*b
+?AA?
+
+; oplay_attack(*,A) && oplay_attack(*,a,A) && oplay_attack(*,b,a,A)
+
+> good_attack_threat(*,A)
+
+
 ########################################################
 #
 # Double threat moves and defense against double threats

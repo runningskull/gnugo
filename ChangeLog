@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new pattern action good_attack_threat overrides heuristics in
+  value_moves.c
+- new global known_good_attack_threats[][]
+- new functions register_good_attack_threat(), is_known_good_attack_threat()
 - make delta territory cache aware of base influence recomputation
 - owl_find_lunches() revised
 - owl_determine_life() bugfixed

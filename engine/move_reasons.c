@@ -63,6 +63,10 @@ int next_lunch;
 /* Point redistribution */
 int replacement_map[BOARDMAX];
 
+/* Attack threats that are known to be sente locally. */
+static int known_good_attack_threats[BOARDMAX][MAX_ATTACK_THREATS];
+
+
 /* Helper functions to check conditions in discard rules. */
 typedef int (*discard_condition_fn_ptr)(int pos, int what);
 
@@ -122,6 +126,11 @@ clear_move_reasons(void)
       /* Do not send away the points (yet). */
       replacement_map[pos] = NO_MOVE;
     }
+  }
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    for (k = 0; k < MAX_ATTACK_THREATS; k++)
+      known_good_attack_threats[pos][k] = NO_MOVE;
   }
 }
 
@@ -1934,6 +1943,62 @@ scale_randomness(int pos, float scaling)
 {
   if (scaling > move[pos].randomness_scaling)
     move[pos].randomness_scaling = scaling;
+}
+
+
+/* Register the given `move' as a good attack threat against `target'. By
+ * "good" we mean a threat which is effectively a sente for the player.
+ * E.g. in this position the threat is good, because it results in four
+ * sente moves locally (trevord:950):
+ *
+ *  ..OX..
+ *  .O.*..
+ *  .OXX..
+ *  .OOX..
+ *  ------
+ *
+ * We use this list of good threats for performance reasons so that
+ * estimate_territorial_value() in valuemoves.c doesn't have to read
+ * through all the moves. Such threats are found with patterns.
+ */
+void
+register_good_attack_threat(int move, int target)
+{
+  int k;
+  ASSERT_ON_BOARD1(move);
+  ASSERT_ON_BOARD1(target);
+  ASSERT1(IS_STONE(worm[target].color), move);
+
+  target = worm[target].origin;
+  for (k = 0; k < MAX_ATTACK_THREATS; k++) {
+    if (known_good_attack_threats[move][k] == target)
+      break;
+    if (known_good_attack_threats[move][k] == NO_MOVE) {
+      known_good_attack_threats[move][k] = target;
+      break;
+    }
+  }
+}
+
+
+/* Determine if an attack threat is registered as good (see above). */
+int
+is_known_good_attack_threat(int move, int target)
+{
+  int k;
+  ASSERT_ON_BOARD1(move);
+  ASSERT_ON_BOARD1(target);
+  ASSERT1(IS_STONE(worm[target].color), move);
+
+  target = worm[target].origin;
+  for (k = 0; k < MAX_ATTACK_THREATS; k++) {
+    if (known_good_attack_threats[move][k] == target)
+      return 1;
+    if (known_good_attack_threats[move][k] == NO_MOVE)
+      break;
+  }
+
+  return 0;
 }
 
 
