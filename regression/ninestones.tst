@@ -70,7 +70,7 @@ loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 108
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 118
 230 restricted_genmove black P11 K2 H13
-#? [!P11]*
+#? [!P11]
 
 loadsgf games/nngs/thor-gnugo-3.3.12-200212170003.sgf 154
 240 reg_genmove black
@@ -129,7 +129,7 @@ loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 76
 
 loadsgf games/nngs/leftd-gnugo-3.3.16-200302072009.sgf 78
 370 reg_genmove black
-#? [R5]*
+#? [R5]
 
 loadsgf games/nngs/juka-gnugo-3.3.16-200302072106.sgf 4
 380 reg_genmove black
@@ -215,7 +215,7 @@ loadsgf games/splee.sgf 62
 
 loadsgf games/ninestones/emanuel-1.sgf 182
 650 reg_genmove black
-#? [Q5]
+#? [Q5]*
 
 loadsgf games/ninestones/emanuel-1.sgf 200
 660 reg_genmove black

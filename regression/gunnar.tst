@@ -185,7 +185,7 @@ loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 184
 # The game move at P7 is worthless. M4 or M5 take the last point.
 loadsgf games/nngs/gnugo-3.3.18-overziel7-200304281000.sgf 234
 34 reg_genmove white
-#? [M4|M5]*
+#? [M4|M5]
 
 # D5 is a ko threat which loses two points. Better let black connect
 # the ko.
@@ -313,14 +313,14 @@ loadsgf games/gunnar/gunnar13.sgf
 loadsgf games/gunnar/gunnar14.sgf
 play black B1
 55 restricted_genmove white C13 D13 C1
-#? [D13]
+#? [D13]*
 
 # White must find a ko threat. A11 is neither a ko threat, nor worth a
 # point.
 loadsgf games/gunnar/gunnar15.sgf
 play black R1
 56 reg_genmove white
-#? [P18|E15|O12|N11|T12|T10|S7|T5]
+#? [P18|E15|O12|N11|T12|T10|S7|T5]*
 
 ############ End of Tests #################
 

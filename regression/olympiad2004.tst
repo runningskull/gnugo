@@ -7,7 +7,7 @@ loadsgf games/olympiad2004/19x19/gnu-ind.sgf 5
 # G14 looks more natural than the played move at G12.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 65
 2 restricted_genmove black G14 G12
-#? [G14]*
+#? [G14]
 
 # Q10 looks too small and overly conservative. There are many
 # larger moves on the board.
@@ -88,14 +88,14 @@ loadsgf games/olympiad2004/19x19/gnu-ind.sgf 281
 # the semeai.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 287
 16 reg_genmove black
-#? [A7|A6|E4|A5]*
+#? [A7|A6|E4|A5]
 
 # The semeai still needs settling. White can live or get a ko for the
 # life and death of both by the combination of A1 and A7, followed by
 # D4.
 loadsgf games/olympiad2004/19x19/gnu-ind.sgf 289
 17 reg_genmove black
-#? [A7|A6|E4|A5]*
+#? [A7|A6|E4|A5]
 
 # Force black into bad shape or allowing a ponnuki.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 8
@@ -105,12 +105,12 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 8
 # Force black into bad shape or allowing a ponnuki.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 10
 102 reg_genmove white
-#? [E2]*
+#? [E2]
 
 # C18 is mandatory after D18
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 18
 103 reg_genmove white
-#? [C18]*
+#? [C18]
 
 # Must at least settle the shape (in sente) before tenuki.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 20
@@ -120,7 +120,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 20
 # Can't tenuki before connecting. Forcing with T17 is also okay.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 28
 105 reg_genmove white
-#? [O17|N17|T17]*
+#? [O17|N17|T17]
 
 # K4 is overconcentrated. Which moves more than D14 are good here?
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 42
@@ -162,7 +162,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 96
 # the center.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 104
 113 reg_genmove white
-#? [!Q10]*
+#? [!Q10]
 
 # K19 is an overplay. After black M18 white has to abandon K19 or risk
 # a ko in the corner.
@@ -206,7 +206,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 194
 # H6 is completely worthless. The other atari is clearly better.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 196
 121 restricted_genmove white H6 G5
-#? [G5]*
+#? [G5]
 
 # The ko can at least be captured once before connecting.
 loadsgf games/olympiad2004/19x19/int-gnu.sgf 202
@@ -222,7 +222,7 @@ loadsgf games/olympiad2004/19x19/int-gnu.sgf 242
 # More important to build towards center than closing off edge.
 loadsgf games/olympiad2004/19x19/gnu-int.sgf 67
 201 restricted_genmove black C11 E11 E12
-#? [E11]
+#? [E11]*
 
 # Really bad shape at G7.
 loadsgf games/olympiad2004/19x19/gnu-int.sgf 113
@@ -232,33 +232,33 @@ loadsgf games/olympiad2004/19x19/gnu-int.sgf 113
 # O10 protects against both cuts!
 loadsgf games/olympiad2004/19x19/gnu-int.sgf 205
 203 restricted_genmove black M13 O10
-#? [O10]
+#? [O10]*
 
 # Black will break through somewhere after D4.
 loadsgf games/olympiad2004/9x9/gnu-int.sgf 9
 301 reg_genmove black
-#? [D4]
+#? [D4]*
 
 # H6 is bigger than J7.
 loadsgf games/olympiad2004/9x9/int-gnu.sgf 42
 401 reg_genmove white
-#? [H6]
+#? [H6]*
 
 # Better to allow G7 to get cut off than E3.
 loadsgf games/olympiad2004/9x9/gnu-mag.sgf 9
 501 reg_genmove black
-#? [F3]
+#? [F3]*
 
 # Hane at A6 leads nowhere. The clamp at B5 has more potential.
 # The cut at C6 is captured right out in a ladder.
 loadsgf games/olympiad2004/9x9/gnu-mag.sgf 25
 502 restricted_genmove black A6 B5 C6
-#? [B5]
+#? [B5]*
 
 # Wrong atari. F6 is better than E7.
 loadsgf games/olympiad2004/9x9/gnu-mag.sgf 35
 503 restricted_genmove black E7 F6
-#? [F6]
+#? [F6]*
 
 # F6 really bad shape.
 loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 11
@@ -268,9 +268,9 @@ loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 11
 # G6 about as bad shape as one can get. E6 has more promise.
 loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 23
 602 reg_genmove black
-#? [E6]
+#? [E6]*
 
 # Always connect from the secure end. A1 goes before A4.
 loadsgf games/olympiad2004/9x9/gnu-dbg.sgf 63
 603 reg_genmove black
-#? [A1]
+#? [A1]*

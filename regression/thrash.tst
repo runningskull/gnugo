@@ -26,14 +26,14 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302050206.sgf 204
 # D14 is way more solid than C13. Other moves are conceivable.
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 78
 7 reg_genmove black
-#? [D14]*
+#? [D14]
 
 # H10 effectively destroys white's eye shape and development
 # potential. The game move at N4 has almost no effect on the thrashing
 # dragon.
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310140825.sgf 140
 8 reg_genmove black
-#? [H10]*
+#? [H10]
 
 # The N19 dragon should possibly be critical.
 loadsgf games/nngs/ccwills-gnugo-3.5.2-200312112026.sgf 95
@@ -59,7 +59,7 @@ loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 204
 # the natural constraining move is P11.
 loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 210
 13 reg_genmove white
-#? [P11]*
+#? [P11]
 
 # N17 more constraining than L18.
 loadsgf games/nngs/gnugo-3.5.4-chpr-200403201748.sgf 274

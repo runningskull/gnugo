@@ -237,4 +237,4 @@ loadsgf games/cgf2003/GnuGo-Katsunari.sgf 177
 # Don't let H8 get away.
 loadsgf games/cgf2003/GnuGo-Katsunari.sgf 179
 704 reg_genmove black
-#? [D3|C2]*
+#? [D3|C2]

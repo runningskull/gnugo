@@ -1,6 +1,6 @@
 loadsgf golois/Aya991113-11.sgf
 1 reg_genmove black
-#? [B3]*
+#? [B3]
 
 loadsgf golois/Aya991113-12.sgf
 2 reg_genmove black
@@ -12,11 +12,11 @@ loadsgf golois/Aya991113-13.sgf
 
 loadsgf golois/Aya991113-1.sgf
 4 reg_genmove black
-#? [Q6]*
+#? [Q6]
 
 loadsgf golois/Aya991113-2.sgf
 5 reg_genmove black
-#? [O4]*
+#? [O4]
 
 loadsgf golois/Aya991113-3.sgf
 6 reg_genmove black
@@ -183,7 +183,7 @@ loadsgf golois/MeilleurCoup0009.sgf
 
 loadsgf golois/MeilleurCoup0010.sgf
 44 reg_genmove black
-#? [D5]*
+#? [D5]
 
 # gf This is a duplicate of 44, removed. (3.3.17)
 # loadsgf golois/MeilleurCoup990428-1.sgf

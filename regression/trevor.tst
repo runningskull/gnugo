@@ -151,7 +151,7 @@ loadsgf games/trevor/trevor_15.sgf
 # test is restricted to the upper left corner.
 loadsgf games/trevor/trevor_16.sgf 53
 160 restricted_genmove black A7 A8 A9 B8 B9 C7 C8 C9 D8
-#? [B8|C8]
+#? [B8|C8]*
 
 # Protecting lower left group better.
 loadsgf games/trevor/trevor_16.sgf 54

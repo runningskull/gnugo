@@ -215,7 +215,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
 42 reg_genmove white
-#? [N3|N2|L4|L3|L2|L1|M1|N1|M4]*
+#? [N3|N2|L4|L3|L2|L1|M1|N1|M4]
 
 #CATEGORY=ENDGAME_TUNING
 # A correction in this shape would need subtle tuning, as leaving

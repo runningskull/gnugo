@@ -467,7 +467,7 @@ loadsgf games/semeai/semeai17.sgf 64
 114 dragon_status G8
 #? [alive]
 115 dragon_status H2
-#? [alive]*
+#? [alive]
 
 ########### end of semeai tests #################
 

@@ -92,7 +92,7 @@ loadsgf games/incident240.sgf 65
 # incident 241
 loadsgf games/incident240.sgf 69
 119 reg_genmove black
-#? [D9|J3]
+#? [D9|J3]*
 
 # incident 221
 loadsgf games/incident221.sgf 35

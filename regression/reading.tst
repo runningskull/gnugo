@@ -241,9 +241,9 @@ loadsgf games/reading01.sgf
 # Still it's a very tough problem for a computer.
 loadsgf games/reading02.sgf
 52 attack C3
-#? [1 H2]*
+#? [1 H2]
 53 attack D1
-#? [1 H2]*
+#? [1 H2]
 54 defend E2
 #? [1 H2]
 
@@ -856,7 +856,7 @@ popgo
 loadsgf games/trevor/auto/c51.sgf 82
 trymove W E12
 202 attack E13
-#? [2 F13]
+#? [2 F13]*
 popgo
 
 # Report number of nodes visited by the tactical reading

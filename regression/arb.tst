@@ -46,7 +46,7 @@ loadsgf games/arb/dumonteil-2.sgf 251
 
 loadsgf games/arb/dumonteil-3.sgf 193
 203 reg_genmove black
-#? [T7]
+#? [T7]*
 
 # the root of the problem at test 203 lies at move 185
 loadsgf games/arb/dumonteil-3.sgf 185

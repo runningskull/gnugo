@@ -5,11 +5,11 @@ loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 4
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 6
 20 reg_genmove black
-#? [!D5]*
+#? [!D5]
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 10
 30 reg_genmove black
-#? [D7]
+#? [D7]*
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 26
 40 reg_genmove black

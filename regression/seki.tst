@@ -502,7 +502,7 @@ play white B1
 
 play black C2
 1106 reg_genmove white
-#? [C1]*
+#? [C1]
 
 
 loadsgf games/FSGCBot-dr.sgf 234
@@ -511,7 +511,7 @@ loadsgf games/FSGCBot-dr.sgf 234
 
 loadsgf games/seki_nakade1.sgf
 2020 dragon_status D9
-#? [alive]*
+#? [alive]
 
 loadsgf games/seki_nakade2.sgf
 2030 dragon_status F9
@@ -523,4 +523,4 @@ play white G7
 play white G9
 
 2050 dragon_status G8
-#? [alive]*
+#? [alive]

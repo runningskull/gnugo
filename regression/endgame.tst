@@ -176,7 +176,7 @@ loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 110
 
 loadsgf games/nngs/gnugo-3.3.17-Shindou-200304162217.sgf 140
 850 restricted_genmove white K4 J4 L4 P5
-#? [K4|J4|L4]*
+#? [K4|J4|L4]
 
 # Defending T12 is large and R15 is clearly the best way.
 loadsgf games/endgame9.sgf
@@ -202,11 +202,11 @@ loadsgf games/nngs/gnugo-3.3.21-joshj-200306270402.sgf 222
 
 loadsgf games/kgs/yagr-eddyy.sgf 198
 910 reg_genmove white
-#? [T2]*
+#? [T2]
 
 loadsgf games/kgs/yagr-gab9.sgf 205
 920 reg_genmove white
-#? [C4]*
+#? [C4]
 
 
 

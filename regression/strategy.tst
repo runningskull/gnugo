@@ -156,7 +156,7 @@ loadsgf games/incident291.sgf 250
 
 loadsgf games/strategy5.sgf 12
 26 reg_genmove black
-#? [D3]*
+#? [D3]
 
 
 #CATEGORY=PATTERN_TUNING

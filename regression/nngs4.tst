@@ -196,7 +196,7 @@ loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 6
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 12
 485 gg_genmove black 3
-#? [D17]*
+#? [D17]
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 28
 487 reg_genmove black
@@ -231,7 +231,7 @@ loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 40
 # New failure (3.3.18)
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 66
 560 restricted_genmove white B13 F7
-#? [B13]*
+#? [B13]
 
 # New failure (3.3.18)
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 86
@@ -275,7 +275,7 @@ loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 16
 
 loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 42
 650 reg_genmove black
-#? [Q2]*
+#? [Q2]
 
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 4
 660 reg_genmove black

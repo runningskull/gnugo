@@ -380,7 +380,7 @@ loadsgf games/owl49.sgf 7
 
 loadsgf games/life_and_death/mixed2.sgf
 317 owl_attack C13
-#? [1 E13]
+#? [1 E13]*
 318 owl_attack L12
 #? [1 L10]
 319 owl_defend C3
@@ -468,7 +468,7 @@ loadsgf games/life_and_death/invasion4.sgf
 
 loadsgf games/life_and_death/ld20.sgf
 520 owl_defend B4
-#? [2 B3]
+#? [2 B3]*
 
 
 # Report number of nodes visited by the tactical reading

@@ -52,7 +52,7 @@ loadsgf games/century21-2002/goint-gnugo.sgf 161
 # the biggest move.
 loadsgf games/century21-2002/goint-gnugo.sgf 209
 85 reg_genmove black 
-#? [B17]
+#? [B17]*
 86 restricted_genmove black N9 T15 A13 Q7 Q6 N10 N8 L13 G19 G15
 #? [N9]
 
@@ -106,7 +106,7 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 235
 # prevent the seki
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 253
 180 reg_genmove black
-#? [T9]*
+#? [T9]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 26
 190 reg_genmove white

@@ -25,7 +25,7 @@ loadsgf games/kgs/yagr4.sgf 184
 # Given the stage of the game, B2 is huge.
 loadsgf games/kgs/yagr5.sgf 153
 70 reg_genmove white
-#? [B2]*
+#? [B2]
 
 # Black could win the semeai, white must defend
 loadsgf games/kgs/20040507-GnuGoCVS-read.sgf 212
@@ -77,7 +77,7 @@ loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 64
 # fight or the ladder is better than the move made in the game.
 loadsgf games/kgs/2004-04-10-GnuGoCVS-inuyasha34.sgf 94
 160 reg_genmove white
-#? [G12|H8|J7|G7]*
+#? [G12|H8|J7|G7]
 
 # Again the move made in the game doesn't help the fight in the slightest
 # nor resolve the ladder.
@@ -211,7 +211,7 @@ loadsgf games/kgs/evand-TheGNUGo.sgf 70
 
 loadsgf games/kgs/evand-TheGNUGo.sgf 84
 450 reg_genmove black
-#? [L15]*
+#? [L15]
 
 #fight the ko
 loadsgf games/kgs/evand-TheGNUGo.sgf 98
@@ -238,32 +238,32 @@ loadsgf games/kgs/evand-TheGNUGo.sgf 270
 # P8 seems the most reasonable move here.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 16
 510 reg_genmove black
-#? [P8]
+#? [P8]*
 
 # R9 makes life.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 34
 520 reg_genmove black
-#? [R9]
+#? [R9]*
 
 # Black has at least the Q6 threat and should fight the ko.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 52
 530 reg_genmove black
-#? [P14]
+#? [P14]*
 
 # The game move A8 is funny. A stone at A5 or A11 would maybe
 # have a chance to influence something around.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 78
 540 reg_genmove black
-#? [A5|A11]
+#? [A5|A11]*
 
 # I believe there are better chances to save something with a
 # move like Q2 which threatens to make an eye around Q3.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 96
 550 reg_genmove black
-#? [Q2]
+#? [Q2]*
 
 # A classic, should be attempted.
 loadsgf games/kgs/20040525-fanfan-GnuGoBot.sgf 126
 560 reg_genmove black
-#? [B1]
+#? [B1]*
 
