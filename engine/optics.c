@@ -576,10 +576,6 @@ originate_eye(int origin, int pos,
   if (eye[pos].marginal)
     (*msize)++;
 
-  if (!experimental_connections)
-    if (eye[pos].type & INHIBIT_CONNECTION)
-      return;
-  
   for (k = 0; k < 4; k++) {
     int pos2 = pos + delta[k];
     if (ON_BOARD(pos2)

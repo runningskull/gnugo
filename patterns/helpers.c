@@ -41,60 +41,6 @@
 
 
 
-/*
- *
- *  XO     cb
- *  O*     a*
- *
- * Check whether a cut is feasible and effective.
- *
- */
-
-int 
-basic_cut_helper(ARGS)
-{
-  int apos, bpos, cpos;
-  int acolor, ccolor;
-  UNUSED(pattern);
-  
-  apos = OFFSET_BY(0, -1);  /* O to west */
-  bpos = OFFSET_BY(-1, 0);  /* O to north */
-  cpos = OFFSET_BY(-1, -1); /* X to northwest */
-
-  acolor = board[apos];
-  ccolor = OTHER_COLOR(acolor);
-
-  ASSERT1(board[apos] != EMPTY, apos);
-  ASSERT1(board[bpos] == acolor, bpos);
-  ASSERT1(board[cpos] == ccolor, cpos);
-
-  /* If c is a ko stone, assume that we would lose the ko. */
-  if (worm[cpos].attack_codes[0] != 0
-      && (ccolor == color
-	  || is_ko_point(cpos)))
-    return 0;
-  if (is_ko_point(move))
-    return 0;
-
-  if (TRYMOVE(move, ccolor)) {
-    if ((attack(move, NULL) == WIN)
-	|| (attack(cpos, NULL) == WIN)) {
-      popgo();
-      return 0;
-    }
-    popgo();
-  }
-  else
-    return 0;
-
-  if (safe_move(move, acolor) == 0)
-    return 0;
-
-  /* Cut ok. */
-  return 1;
-}
-
-
 /* Jump out into nothingness. To avoid jumping into our own territory,
  * we use the "area" measure. Also we never ever jump into our own
  * established eyespace.
@@ -253,28 +199,6 @@ seki_helper(int str)
       return 0;
 
   return 1;
-}
-
-
-/*
- *
- *  XO     aO
- *  O*     O*
- *
- * Used in a connection pattern to ensure that X is a cutstone.
- */
-
-int 
-ugly_cutstone_helper(ARGS)
-{
-  int apos;
-  UNUSED(pattern);
-  UNUSED(color);
-  
-  apos = OFFSET_BY(-1, -1);
-  
-  worm[apos].cutstone++;
-  return 0;
 }
 
 

@@ -64,7 +64,6 @@ static void connected_to_eye_recurse(int pos, int str, int color,
 				     int eye_color, struct eye_data *eye,
 				     char *mx, char *me, int *halfeyes);
 static int compute_crude_status(int pos);
-static void dragon_eye(int pos, struct eye_data[BOARDMAX]);
 static int compute_escape(int pos, int dragon_status_known);
 static void compute_surrounding_moyo_sizes(const struct influence_data *q);
 
@@ -116,29 +115,6 @@ make_dragons(int color, int stop_before_owl)
    */
   find_connections();
   time_report(2, "  time to find connections", NO_MOVE, 1.0);
-
-  if (!experimental_connections) {
-    /* Amalgamate dragons sharing an eyespace (not ko). */
-
-    for (str = BOARDMIN; str < BOARDMAX; str++)
-      if (ON_BOARD(str)) {
-
-	if (black_eye[str].color == BLACK_BORDER
-	    && black_eye[str].origin == str) {
-	  if (!is_ko_point(str)
-	      || black_eye[str].esize > 1) /* Only exclude living kos. */
-	    dragon_eye(str, black_eye);
-	}
-	
-	if (white_eye[str].color == WHITE_BORDER
-	    && white_eye[str].origin == str) {
-	  if (!is_ko_point(str)
-	      || white_eye[str].esize > 1) /* Only exclude living kos. */
-	    dragon_eye(str, white_eye);
-	}
-      }
-    time_report(2, "  time to amalgamate dragons", NO_MOVE, 1.0);
-  }
 
   /* At this time, all dragons have been finalized and we can
    * initialize the dragon2[] array. After that we can no longer allow
@@ -1564,61 +1540,6 @@ show_dragons(void)
 }
 
 
-
-/*
- * dragon_eye(pos, eye_data) is invoked with (pos) the origin of an
- * eyespace. It unites all the worms adjacent to non-marginal points
- * of the eyespace into a single dragon.. In addition to marginal eye
- * space points, amalgamation is inhibited for points with the
- * INHIBIT_CONNECTION type set.
- *
- * This is based on the older function dragon_ring.
- */
-
-static void
-dragon_eye(int pos, struct eye_data eye[BOARDMAX])
-{
-  int ii;
-  int dr = NO_MOVE;
-  int color;
-  int k;
-
-  /* don't amalgamate across ikken tobi */
-  if (eye[pos].esize == 3 && eye[pos].msize > 1)
-    return;
-
-  DEBUG(DEBUG_DRAGONS, "amalgamate dragons around %1m\n", pos);
-  if (eye[pos].color == BLACK_BORDER)
-    color = BLACK;
-  else {
-    ASSERT1(eye[pos].color == WHITE_BORDER, pos);
-    color = WHITE;
-  }
-
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (!ON_BOARD(ii))
-      continue;
-    
-    if (eye[ii].origin == pos
-	&& !eye[ii].marginal
-	&& !(eye[ii].type & INHIBIT_CONNECTION)) {
-      for (k = 0; k < 4; k++) {
-	int d = delta[k];
-	
-	if (board[ii+d] == color) {
-	  if (dr == NO_MOVE)
-	    dr = dragon[ii+d].origin;
-	  else if (dragon[ii+d].origin != dr) {
-	    join_dragons(ii+d, dr);
-	    dr = dragon[ii+d].origin;
-	  }
-	}
-      }
-    }
-  }
-}
-
-
 /* 
  * join_dragons amalgamates the dragon at (d1) to the
  * dragon at (d2).
@@ -2003,89 +1924,56 @@ compute_surrounding_moyo_sizes(const struct influence_data *q)
   int pos;
   int d;
 
-  if (!experimental_connections) {
-    int mx[MAX_MOYOS + 1];
-    struct moyo_data moyos;
+  int k;
+  int moyo_color[BOARDMAX];
+  float territory_value[BOARDMAX];
+  float moyo_sizes[BOARDMAX];
+  float moyo_values[BOARDMAX];
+    
+  influence_get_moyo_data(q, moyo_color, territory_value);
 
-    influence_get_moyo_segmentation(q, &moyos);
-
-    memset(mx, 0, sizeof(mx));
-    for (d = 0; d < number_of_dragons; d++) {
-      int this_moyo_size = 0;
-      float this_moyo_value = 0.0;
-      for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-	int moyo_number = moyos.segmentation[pos];
-	if (board[pos] != DRAGON(d).color
-	    || moyo_number == 0
-	    || dragon[pos].id != d
-	    || moyos.owner[moyo_number] != board[pos])
-	  continue;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    moyo_sizes[pos] = 0.0;
+    moyo_values[pos] = 0.0;
+  }
+  
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    
+    if (moyo_color[pos] == board[pos])
+      continue;
+    
+    if (moyo_color[pos] == WHITE) {
+      for (k = 0; k < number_close_white_worms[pos]; k++) {
+	int w = close_white_worms[pos][k];
+	int dr = dragon[w].origin;
 	
-	if (mx[moyo_number] != d + 1) {
-	  mx[moyo_number] = d + 1;
-	  this_moyo_size += moyos.size[moyo_number];
-	  this_moyo_value += moyos.territorial_value[moyo_number];
-	}
+	moyo_sizes[dr] += 1.0 / number_close_white_worms[pos];
+	moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
+			    / number_close_white_worms[pos]);
       }
-      
-      if (this_moyo_size < dragon2[d].moyo_size) {
-	dragon2[d].moyo_size = this_moyo_size;
-	dragon2[d].moyo_territorial_value = this_moyo_value;
+    }
+    
+    if (moyo_color[pos] == BLACK) {
+      for (k = 0; k < number_close_black_worms[pos]; k++) {
+	int w = close_black_worms[pos][k];
+	int dr = dragon[w].origin;
+	
+	moyo_sizes[dr] += 1.0 / number_close_black_worms[pos];
+	moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
+			    / number_close_black_worms[pos]);
       }
     }
   }
-  else {
-    int k;
-    int moyo_color[BOARDMAX];
-    float territory_value[BOARDMAX];
-    float moyo_sizes[BOARDMAX];
-    float moyo_values[BOARDMAX];
+  
+  for (d = 0; d < number_of_dragons; d++) {
+    int this_moyo_size = (int) moyo_sizes[dragon2[d].origin];
+    float this_moyo_value = moyo_values[dragon2[d].origin];
     
-    influence_get_moyo_data(q, moyo_color, territory_value);
-
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      moyo_sizes[pos] = 0.0;
-      moyo_values[pos] = 0.0;
-    }
-    
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      if (!ON_BOARD(pos))
-	continue;
-      
-      if (moyo_color[pos] == board[pos])
-	continue;
-      
-      if (moyo_color[pos] == WHITE) {
-	for (k = 0; k < number_close_white_worms[pos]; k++) {
-	  int w = close_white_worms[pos][k];
-	  int dr = dragon[w].origin;
-	  
-	  moyo_sizes[dr] += 1.0 / number_close_white_worms[pos];
-	  moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
-			      / number_close_white_worms[pos]);
-	}
-      }
-      
-      if (moyo_color[pos] == BLACK) {
-	for (k = 0; k < number_close_black_worms[pos]; k++) {
-	  int w = close_black_worms[pos][k];
-	  int dr = dragon[w].origin;
-	  
-	  moyo_sizes[dr] += 1.0 / number_close_black_worms[pos];
-	  moyo_values[dr] += (gg_min(territory_value[pos], 1.0)
-			      / number_close_black_worms[pos]);
-	}
-      }
-    }
-
-    for (d = 0; d < number_of_dragons; d++) {
-      int this_moyo_size = (int) moyo_sizes[dragon2[d].origin];
-      float this_moyo_value = moyo_values[dragon2[d].origin];
-      
-      if (this_moyo_size < dragon2[d].moyo_size) {
-	dragon2[d].moyo_size = this_moyo_size;
-	dragon2[d].moyo_territorial_value = this_moyo_value;
-      }
+    if (this_moyo_size < dragon2[d].moyo_size) {
+      dragon2[d].moyo_size = this_moyo_size;
+      dragon2[d].moyo_territorial_value = this_moyo_value;
     }
   }
 }

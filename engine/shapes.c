@@ -186,15 +186,11 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
   } /* if we need to loop over the elements */
 
   /* Nothing to connect. Remove C class bit. */
-  if (my_ndragons < 2 && !experimental_connections)
-    class &= ~CLASS_C;
-  if (my_nstrings < 2 && experimental_connections)
+  if (my_nstrings < 2)
     class &= ~CLASS_C;
 
   /* Nothing to cut. Remove B class bit. */
-  if (your_ndragons < 2 && !experimental_connections)
-    class &= ~CLASS_B;
-  if (your_nstrings < 2 && experimental_connections)
+  if (your_nstrings < 2)
     class &= ~CLASS_B;
   
   /*
@@ -292,17 +288,8 @@ shapes_callback(int anchor, int color, struct pattern *pattern, int ll,
       }
   }
 
-  /* Pattern class C, connect all combinations of our dragons. */
-  if ((class & CLASS_C) && !experimental_connections) {
-    for (k = 0; k < my_ndragons; k++)
-      for (l = k+1; l < my_ndragons; l++) {
-	add_connection_move(move, my_dragons[k], my_dragons[l]);
-	TRACE("...connects dragons %1m, %1m\n", my_dragons[k], my_dragons[l]);
-      }
-  }
-
   /* Pattern class C, try to connect all combinations of our strings. */
-  if ((class & CLASS_C) && experimental_connections) {
+  if (class & CLASS_C) {
     for (k = 0; k < my_nstrings; k++)
       for (l = k+1; l < my_nstrings; l++) {
 	if (disconnect(my_strings[k], my_strings[l], NULL)

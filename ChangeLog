@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- old amalgamation (!experimental_connections) code and patterns removed
+- dragon_eye() removed
+- basic_cut_helper() and ugly_cutstone_helper() removed
 - komaster schemes 1-4 removed
 - komaster_is_empty() retired
 - komaster_to_string() revised

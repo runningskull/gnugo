@@ -44,14 +44,6 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
   int other = OTHER_COLOR(color);
   UNUSED(data);
 
-  /* Only match W patterns with standard connections. */
-  if ((pattern->class & CLASS_W) && experimental_connections)
-    return;
-
-  /* Only match Y patterns with experimental connections. */
-  if ((pattern->class & CLASS_Y) && !experimental_connections)
-    return;
-  
   move = AFFINE_TRANSFORM(pattern->move_offset, ll, anchor);
   
   if ((pattern->class & CLASS_B) && !safe_move(move, other))
@@ -62,23 +54,6 @@ cut_connect_callback(int anchor, int color, struct pattern *pattern,
    */
 
   if (pattern->class & CLASS_C) {
-    if (!experimental_connections) {
-      for (k = 0; k < pattern->patlen; ++k) { /* match each point */
-	/* transform pattern real coordinate */
-	int pos = AFFINE_TRANSFORM(pattern->patn[k].offset, ll, anchor);
-	if (board[pos]==EMPTY
-	    && ((color == WHITE
-		 && (white_eye[pos].type & INHIBIT_CONNECTION))
-		|| (color == BLACK
-		  && (black_eye[pos].type & INHIBIT_CONNECTION)))) {
-	  DEBUG(DEBUG_DRAGONS, 
-		"Connection pattern of type %s inhibited at %1m\n",
-		pattern->name, pos);
-	  return;
-	}
-      }
-    }
-
     /* If C pattern, test if there are more than one dragon in this
      * pattern so that there is something to connect, before doing any
      * expensive reading.

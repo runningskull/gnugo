@@ -275,13 +275,11 @@ struct fullboard_pattern {
 
 #define DECLARE(x) int x(struct pattern *pattern, int transformation, int move, int color)
 
-DECLARE(basic_cut_helper);
 DECLARE(jump_out_helper);
 DECLARE(jump_out_far_helper);
 DECLARE(high_handicap_helper);
 DECLARE(reinforce_helper);
 DECLARE(throw_in_atari_helper);
-DECLARE(ugly_cutstone_helper);
 DECLARE(cutstone2_helper);
 DECLARE(thrash_around_helper);
 

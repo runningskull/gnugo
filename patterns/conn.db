@@ -46,8 +46,6 @@
 # Additionally there are a few acceptance modifiers. 
 #
 #  s - Accept even if the pattern includes tactically unsafe strings
-#  W - Only used with standard connections.
-#  Y - Only used with experimental connections.
 #
 ###################################
 #
@@ -80,402 +78,6 @@ goal_elements none
 callback_data X!
 
 
-Pattern EB1
-
-?XO
-O*!
----
-
-:8,BW
-
-
-Pattern EB2
-
-?XO
-O*!
-.!.
----
-
-:8,BW
-
-
-Pattern EB3
-# second line clamp
-
-x.!?
-XO*!
-x.!?
-----
-
-:8,BW
-
-
-Pattern EB4
-# db split (3.3.6)
-
-X.O?
-.*!x
-..!!
-----
-
-:8,BW
-
-
-Pattern EB4a
-# db split (3.3.6)
-# do not inhibit a potential connection
-
-X.Ox
-.*.O
-..!!
-----
-
-:8,BW
-
-
-Pattern EB5
-
-OXO
-!*!
-.!.
----
-
-:|,BW
-
-
-Pattern EB6
-
-?XO
-O*!
-.!.
-.!.
----
-
-:8,BW
-
-?XO
-O*!
-cab
-.!.
----
-
-;!xplay_attack(*,a,b,b) || !xplay_attack(*,a,c,c)
-
-
-Pattern EB7
-
-Xx?
-O*O
-.!.
-.!.
----
-
-:8,BW
-
-Xx?
-c*O
-ba.
-.!.
----
-
-;xplay_attack(*,a,c) && !xplay_attack(*,b,a,a)
-
-
-Pattern EB8
-
-?O?
-X*!
-O!.
----
-
-:8,BW
-
-
-Pattern EB9
-
-?X?
-XOX
-O*O
-.!.
----
-
-:8,BW
-
-?X?
-XOX
-a*b
-.!.
----
-
-;xplay_attack(*,a) || xplay_attack(*,b)
-
-
-Pattern EB10
-
-O.X
-!*O
-.!.
----
-
-:8,BW
-
-OaX
-!*b
-.!.
----
-
-;xplay_attack(*,a,b)
-
-
-Pattern EB11
-
-?XX?
-O*O.
-!!!.
-.!..
-----
-
-:8,BW
-
-?XX?
-O*Oc
-!ab.
-.!..
-----
-
-;xplay_attack_either(*,a,b,c,a,c)
-
-
-Pattern EB12
-
-??X?
-O.*O
-.!!.
-..!.
-----
-
-:8,BW
-
-??X?
-Oc*O
-.ba.
-..!.
-----
-
-;xplay_attack(*,a,b,c,a)
-
-
-Pattern EB13
-
-?X?
-O*O
-o!o
----
-
-:|,BW
-
-?X?
-b*c
-oao
----
-
-;xplay_attack_either(*,a,b,c)
-
-
-Pattern EB14
-
-??X?
-O.*O
-.!!.
-.!!.
-..!.
-----
-
-:8,BW
-
-??X?
-Oc*O
-.bad
-.!ef
-..!.
-----
-
-;!xplay_attack_either(*,a,b,c,d,e,f,*,f)
-
-
-Pattern EB15
-
-?OX?
-.!*O
-..!O
-----
-
-:8,BW
-
-
-Pattern EB16
-
-??X?
-O.*O
-..!o
-----
-
-:8,BW
-
-??X?
-Oc*O
-.bao
-----
-
-;xplay_attack_either(*,a,b,c,a,c)
-
-
-Pattern EB17
-
-?X?
-OXO
-!*!
-!!!
-.!.
----
-
-:8,BW
-
-
-Pattern EB18
-
-X.O
-O*!
-.!.
----
-
-:8,BW
-
-XaO
-d*b
-.c.
----
-
-;xplay_attack_either(*,a,a,d)
-;&& (xplay_attack(*,b,d) || xplay_attack_either(*,b,c,a,a,d))
-
-
-Pattern EB19
-
-X!O
-O*.
----
-
-:8,BW
-
-XaO
-b*.
----
-
-;xplay_attack_either(*,a,a,b)
-
-
-Pattern EB20
-
-?X??
-OX.?
-!*!O
-!!!?
-.!.?
-----
-
-:8,BW
-
-
-Pattern EB21
-
-??X?
-.O*O
-.!!!
-..!.
-----
-
-:8,BW
-
-??X?
-.D*O
-.!!!
-..!.
-----
-
-; lib(D)==3
-
-
-Pattern EB22
-
-??X?
-?XOX
-.O*O
-.!!!
-..!.
-----
-
-:8,BW
-
-??X?
-?XOX
-.D*O
-.!!!
-..!.
-----
-
-; lib(D)==3
-
-
-Pattern EB23
-
-O.X
-!*.
-.!O
----
-
-:8,BW
-
-
-Pattern EB24
-# gf Revised pattern. (3.1.22)
-
-??X
-?!.
-.*O
-.!o
----
-
-:8,BW
-
-??X
-?!.
-.*a
-.!o
----
-
-;!xplay_defend(*,a)
-
-
-Pattern EB25
-# tm New Pattern (3.1.22)
-
-O!.  cutable keima on edge
-.*O
-.!.
----
-
-:8,BW
-
-ca.
-b*d
-.!.
----
-
-; xplay_attack_either(*,a,c,d)
-; && xplay_attack_either(*,b,c,d)
-
-
 ##########################
 #
 # B patterns in the center
@@ -485,51 +87,19 @@ b*d
 callback_data X!
 
 
-Pattern CB1
-
-?O.          fragile double connection 
-X*O
-?O.
-
-:8,BW
-
-?Oa
-X*O
-?Ob
-
-;!xplay_attack_either(*,a,b,*,b) && !xplay_attack_either(*,b,a,*,a)
-
-
 Pattern CB1b
 
 ?O.          fragile double connection 
 X*O
 ?O.
 
-:8,BY
+:8,B
 
 ?b.
 X*O
 ?a.
 
 ;!xplay_connect(*,a,b)
-
-
-Pattern CB2
-
-?O.
-?..          fragile double connection 
-X*O
-?O.
-
-:8,BW
-
-?O.
-?ca
-X*O
-?Ob
-
-;!xplay_attack_either(*,a,b,*,b) && xplay_defend_both(*,b,a,c,*,a)
 
 
 Pattern CB2b
@@ -539,7 +109,7 @@ Pattern CB2b
 X*O
 ?O.
 
-:8,BY
+:8,B
 
 ?b.
 ?..
@@ -549,76 +119,19 @@ X*O
 ;!xplay_connect(*,a,b)
 
 
-Pattern CB3
-
-O!O
-!*X
-.O?
-
-:8,BW
-
-O!a
-!*X
-.b?
-
-;lib(a)==2 || lib(b) == 2
-
-
 Pattern CB3b
 
 O!O
 .*X
 .O?
 
-:8,BY
+:8,B
 
 O!a
 .*X
 .b?
 
 ;!xplay_connect(*,a,b)
-
-
-Pattern CB4
-
-XO?
-O*!
-?!?
-
-:\,BW,basic_cut_helper
-
-
-Pattern CB5
-# This pattern is needed to inhibit connection in a position like
-#
-# .XO..
-# .XOXX
-# OO.OX
-# .XOOX
-# .XXXX
-#
-
-XO
-O*
-
-:\,BW,basic_cut_helper
-
-
-Pattern CB6
-# This pattern is an ugly way to ensure that the X stone is at least
-# regarded as a potential cutting stone. The helper returns 0 so the
-# pattern does not fire as a B pattern. With an improved connectivity
-# analysis, this pattern should no longer be needed.
-
-XO
-O*
-
-:\,BW,ugly_cutstone_helper
-
-AO
-O*
-
-;attack(A) && safe_xmove(*)
 
 
 Pattern CB7
@@ -637,65 +150,6 @@ O*
 ;attack(A)
 
 
-Pattern CB8
-
-?O?
-.*X
-.!O
-xOo
-
-:8,BW
-
-
-Pattern CB9
-
-X.O
-O*.
-O!.
-?XX
-
-:8,BW
-
-BaO
-O*.
-O!.
-?XX
-
-;xplay_defend_both(*,a,*,B)
-
-
-Pattern CB10
-
-o!X
-O*O
-X!o
-
-:8,BW
-
-oaB
-O*O
-Cdo
-
-;xplay_defend_both(*,a,*,B) && xplay_defend_both(*,d,*,C)
-
-
-Pattern CB11
-
-?OX?
-O!OX
-?*!O
-??O?
-
-:8,BW
-
-?OA?
-OaOB
-?*bO
-??O?
-
-;!attack(A) && !attack(B) && !xplay_attack(*,a,b,*) && !xplay_attack(*,b,a,*)
-
-
 Pattern CB11b
 
 ?OX?
@@ -703,7 +157,7 @@ O!OX
 ?*!O
 ??O?
 
-:8,BY
+:8,B
 
 ?bX?
 O!OX
@@ -711,95 +165,6 @@ O!OX
 ??O?
 
 ;!xplay_connect(*,a,b)
-
-
-Pattern CB12
-# tm New pattern. (3.1.13)
-# db modified (3.3.6)
-
-?xx         another way to cut!
-O*.
-X!O
-
-:8,BW
-
-?xx
-O*.
-BaO
-
-;xplay_defend_both(*,a,*,B)
-
-
-Pattern CB12a
-# db added (3.3.6)
-
-.!O         another way to cut!
-O*.
-X!O
-
-:8,BW
-
-baO
-O*.
-X!O
-
-;xplay_defend_both(*,a,b,*,b)
-
-
-Pattern CB13
-# tm New pattern (3.1.18)
-
-xxx	cut!
-.!.
-O*O
-Xxx
-
-:8,BW
-
-xxx
-dae
-O*O
-Fbx
-
-; xplay_defend_both(*,a,b,d,e)
-; && xplay_defend_both(*,a,b,e,d)
-; && xplay_defend_both(*,b,a,a,F)
-
-
-Pattern CB14
-# tm New Pattern (3.1.23)  (see arend:32)
-# FIXME: only one of these points should be marginal
-#   is it safe to use amalgamate_most_valuable helper here? How?
-
-XO*O	double cut.
-O!O!
-
-:8,XBW
-
-XA*O
-ObOc
-
-; xplay_attack(*,A) && !xplay_attack_either(*,b,c,c,*)
-
-
-Pattern CB15
-# tm New Pattern (3.1.23)  (see global:17, )
-#   careful not to break trevord:730
-# FIXME:  Need to use amalgamate_most_valuable helper.
-# xplay_disconnect helper also might be useful here.
-
-?*?   save cutting stone.
-OXO
-!O!
-
-:8,BW
-
-?*?
-OXO
-aOb
-
-; !xplay_attack_either(*,b,a,*,a)
-; && !xplay_attack_either(*,a,b,*,b)
 
 
 Pattern CB15b
@@ -812,7 +177,7 @@ Pattern CB15b
 OXO
 !O!
 
-:8,BY
+:8,B
 
 ?*?
 aXb
@@ -829,7 +194,7 @@ x*          fragile double connection
 XO
 O!
 
-:8,BY
+:8,B
 
 ?a
 x*
@@ -845,7 +210,7 @@ O!O
 !*?        fragile double connection 
 O??
 
-:\,BY
+:\,B
 
 O!a
 !*?
@@ -861,7 +226,7 @@ X.X        workaround for ko contingent connection
 OXO
 ?O*
 
-:8,BY
+:8,B
 
 ?X?
 XbX
@@ -869,38 +234,6 @@ OAd
 ?c*
 
 ;xplay_attack(*,A)<WIN && !xplay_connect(*,?,b,c,d)
-
-
-Pattern CB19
-# db added (3.3.6)
-
-OX?
-!OX
-*!O
-
-:8,BW
-
-OA?
-dOB
-*cO
-
-; !attack(A) && !attack(B) && !xplay_attack(*,c,d,*) && !xplay_attack(*,d,c,*)
-
-
-Pattern CB20
-# db added (3.3.6)
-
-X.o
-O*o
-X.?
-
-:8,BW
-
-A.a
-O*b
-B.?
-
-; !attack(A) && !attack(B) && o_somewhere(a,b)
 
 
 ########################
@@ -936,23 +269,6 @@ o......o
 :|,C
 
 
-Pattern EC2
-
-O.O
-...
-...
----
-
-:|,CW
-
-OaO
-dbc
-...
----
-
-;!xplay_defend(a,b,c,d,c) && !xplay_defend(a,b,d,c,d)
-
-
 Pattern EC3a
 
 o...o
@@ -972,43 +288,6 @@ o...o
 -----
 
 ;omoyo(a)
-
-
-Pattern EC3b
-
-o...?
-.O.O?
-.....
-....o
-....o
------
-
-:8,CW
-
-ojc.?
-iOaO?
-febd.
-hg..o
-....o
------
-
-;!xplay_attack(a,b,c,d,e,f,g,h,i,j,j)
-
-
-Pattern EC4
-
-O..?     monkey jump connection
-...O
-----
-
-:8,CW
-
-Oae?
-cbdf
-----
-
-;xplay_attack_either(a,b,c,c,a) && !xplay_attack(d,e,f)
-;&& !xplay_attack(b,a,e,d,d)
 
 
 ##########################
@@ -1036,15 +315,6 @@ aO
 Ob
 
 ;!xcut(a) && !xcut(b)
-
-
-Pattern CC102
-
-OO
-..
-OO
-
-:+,CW
 
 
 Pattern CC103
@@ -1143,161 +413,6 @@ c.oo
 #
 ##########################################################
 
-Pattern CC201
-
-OO
-..
-O.
-
-:8,CW
-
-OO
-ab
-Oc
-
-;xplay_attack_either(a,b,c,a,c)
-
-
-Pattern CC202
-
-OO
-..
-OX
-
-:8,CW
-
-OO
-ab
-OC
-
-;!xplay_defend_both(a,b,a,C)
-
-
-Pattern CC203
-
-XO
-..
-OX
-
-:8,CW
-
-DO
-ab
-OC
-
-;!xplay_defend_both(a,b,C,D) && !xplay_defend_both(b,a,C,D)
-
-
-Pattern CC204
-
-O
-.
-O
-
-:+,CW
-
-O
-A
-O
-
-;!safe_xmove(A) && !ko(A) && !xcut(A)
-
-
-Pattern CC205
-# tm Modified (3.1.23)
-
-???
-?XO
-?O.
-
-:\,CW
-
-?c?
-dAO
-?OB
-
-; (((x_somewhere(c) || o_somewhere(c) || !xcut(c))
-;    && (x_somewhere(d) || o_somewhere(c) || !xcut(d))) && attack(A))
-; || (!ko(B) && !xcut(B) && !safe_xmove(B))
-
-
-Pattern CC206
-# tm modified (3.1.20)
-#   FIXME: Should dragons be connectable via ko?
-#   see trevord:260
-
-O..
-..O
-ooo
-
-:8,CW
-
-Obc
-daO
-ooo
-
-; xplay_attack_either(a,b,c,a,c) == WIN
-; && xplay_attack_either(b,a,d,b,d) == WIN
-
-
-Pattern CC206a
-# tm removed duplicate name (3.1.20)
-
-oOO..
-.....
-.O..O
-
-:8,CW
-
-oOO..
-feca.
-gOdbO
-
-;xplay_attack_either(a,b,c,d,e,f,g,a,g)
-
-
-Pattern CC207
-
-XO
-OX
-
-:X,CW
-
-AO
-OB
-
-;attack(A) && attack(B) && !oplay_defend_both(A,B)
-
-
-Pattern CC208
-
-OX
-.O
-
-:8,CW
-
-OB
-aO
-
-; xplay_attack_either(a,a,B) == WIN
-
-
-Pattern CC209
-
-OO
-XO
-..
-O.
-
-:8,CW
-
-OO
-DO
-ab
-Oc
-
-; xplay_attack_either(a,b,c,a,c) && !xplay_defend(b,a,D)
-
 #############################################
 #
 # CC3xx - patterns with expensive constraints
@@ -1308,133 +423,17 @@ Oc
 #
 ####################################
 
-Pattern CC302
-
-?O.
-...
-?O.
-
-:-,CW
-
-?gd
-cab
-?fe
-
-;olib(c)>1 && (xplay_attack(a,b,c,d,e,e) || xplay_attack(a,b,c,e,d,d))
-;&& !xplay_attack(a,b,f) && !xplay_attack(a,b,g)
-
-
 ###########################
 #
 # CC31x - keima connections
 #
 ###########################
 
-Pattern CC311
-# tm modified (3.1.20)
-#   FIXME: Should dragons be connectable via ko?
-#   see trevord:260
-
-O..
-..O
-
-:8,CW
-
-Ebc
-daF
-
-;lib(E)>2 && lib(F)>2
-;&& xplay_attack_either(a,b,c,a,c)==WIN
-;&& xplay_attack_either(b,a,d,b,d)==WIN
-
-
-Pattern CC312
-
-.O
-..
-O.
-oO
-
-:8,CW
-
-dO
-ab
-Oc
-oO
-
-;(xplay_attack(a,b,c,a) || xplay_attack(a,b,c,c))
-;&& (xplay_attack(b,a,d,b) || xplay_attack(b,a,d,d))
-;&& !xcut(c)
-
-
-Pattern CC313
-# tm modified (3.1.20)
-#   FIXME: Should dragons be connectable via ko?
-#   see trevord:260
-
-O..
-..O
-...
-
-:8,CW
-
-Obc
-daf
-.e.
-
-;xplay_attack_either(a,b,c,a,c) == WIN
-;&& (xplay_attack_either(b,a,d,b,d) == WIN || !xplay_break_through(b,d,a,e,d,e,f))
-
-
 ####################################
 #
 # CC32x - two space jump connections
 #
 ####################################
-
-Pattern CC321
-
-O..O
-O..O
-
-:+,CW
-
-OadO
-ObcO
-
-;!xplay_defend_both(a,b,c,d,a,c) && !xplay_defend_both(b,a,d,c,b,d)
-
-
-Pattern CC322
-
-O..O
-O...
-
-:8,CW
-
-OacO
-Obde
-
-;xplay_attack_either(a,b,c,d,e,c,e) && !xplay_defend_both(a,b,d,c,a,d)
-;&& xplay_attack(b,a,c,c)
-
-
-Pattern CC323
-
-O..O
-O...
-
-:8,CW
-
-Oadf
-Obce
-
-;!xplay_defend_both(a,b,c,d,a,c) && xplay_attack_either(a,b,d,c,e,d,e)
-;&& (!xplay_defend(d,c,b,a,d)
-;    || (xplay_attack(d,c,b,a,e,d) && xplay_attack(d,c,b,a,e,b)
-;        && xplay_attack(a,c,b,a,e,e)))
-;&& xplay_defend_both(d,c,e,c,f)
-
 
 ############################
 #
@@ -1535,7 +534,7 @@ Pattern CC501
 xO
 O.
 
-:\,sCY
+:\,sC
 
 xO
 Oc
@@ -1549,7 +548,7 @@ Pattern CC502
 XO
 O.
 
-:\,sCY
+:\,sC
 
 Xb
 ac
@@ -1563,7 +562,7 @@ Pattern CC502b
 .O
 O.
 
-:\,sCY
+:\,sC
 
 db
 ac
@@ -1578,7 +577,7 @@ O
 .
 O
 
-:+,CY
+:+,C
 
 c
 a
@@ -1592,7 +591,7 @@ Pattern CC504
 XO
 O.
 
-:\,CY
+:\,C
 
 Xb
 ca
@@ -1605,7 +604,7 @@ Pattern CC505
 XO
 OX
 
-:X,CY
+:X,C
 
 Bc
 dA
@@ -1620,7 +619,7 @@ O
 .
 O
 
-:+,CY
+:+,C
 
 c
 a
@@ -1637,7 +636,7 @@ Xo
 ..
 O.
 
-:8,CY
+:8,C
 
 c.
 Eo
@@ -1653,7 +652,7 @@ Ox
 ..
 xO
 
-:O,CY
+:O,C
 
 cx
 ab
@@ -1668,7 +667,7 @@ O?
 .X
 xO
 
-:8,CY
+:8,C
 
 b?
 aX
@@ -1684,7 +683,7 @@ Ox
 ..
 xO
 
-:O,CY
+:O,C
 
 ex
 ab
@@ -1694,30 +693,13 @@ xf
 ;!xcut(a) && !xcut(b) && !xcut(c) && !xcut(d) && !oplay_disconnect(e,f)
 
 
-# Pattern CC510
-# 
-# O?
-# .x
-# .X
-# ?O
-# 
-# :8,CY
-# 
-# c?
-# ax
-# bX
-# ?d
-# 
-# ;!xcut(a) && !xcut(b) && !oplay_disconnect(c,d)
-
-
 Pattern CC511
 # Connect even if stones not tactically safe.
 
 .O
 O.
 
-:\,sCY
+:\,sC
 
 db
 ac
