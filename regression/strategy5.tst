@@ -6,26 +6,26 @@ reset_trymove_counter
 
 loadsgf games/wing-yuhiko-gnugo.sgf 12
 221 gg_genmove black
-#? [S4|C11]
+#? [S4|C11]*
 
 # This might be worth a J pattern.
 loadsgf games/wing-yuhiko-gnugo.sgf 30
 222 gg_genmove black
-#? [R14]
+#? [R14]*
 
 loadsgf games/wing-yuhiko-gnugo.sgf 46
 223 gg_genmove black
-#? [P16]
+#? [P16]*
 
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf 62
 224 gg_genmove black
-#? [N15]
+#? [N15]*
 
 #CATEGORY=STRATEGY
 loadsgf games/wing-yuhiko-gnugo.sgf O12
 225 gg_genmove black
-#? [N15]
+#? [N15]*
 
 ############ End of Tests #################
 

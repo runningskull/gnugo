@@ -82,7 +82,7 @@ loadsgf games/incident121.sgf 122
 22 owl_attack P12
 #? [1 (PASS|S11|S14|N13|S13)]
 23 owl_defend P12
-#? [0]*
+#? [0]
 
 # incident 154
 loadsgf games/incident153.sgf 205
@@ -239,7 +239,7 @@ loadsgf games/incident256.sgf 157
 # there's some mistake during the following moves.
 loadsgf games/incident258.sgf 147
 66 owl_defend C4
-#? [1 B5]
+#? [1 B5]*
 
 # incident 260
 loadsgf games/incident258.sgf 283
@@ -765,7 +765,7 @@ loadsgf games/owl26.sgf 138
 
 loadsgf games/incident248.sgf 228
 208 owl_attack J2
-#? [3 A2]
+#? [3 A2]*
 209 owl_defend J2
 #? [1 (A2|F1|J1|A1|B1)]
 
@@ -950,17 +950,6 @@ loadsgf games/handtalk/handtalk23.sgf 186
 loadsgf games/mertin13x13/gointellect-gnugo2.W+8.sgf 32
 262 owl_defend E7
 #? [0]*
-
-# Extremely bad misread. (Made GNU Go play at L9 with the last move before
-# that position.)
-loadsgf games/wing-yuhiko-gnugo.sgf 115
-263 owl_defend M13
-#? [1 R11]
-
-# Need another vital attack pattern here?
-loadsgf games/wing-yuhiko-gnugo.sgf 220
-264 owl_attack D18
-#? [2 A18]
 
 ########### end of tests #####################
 

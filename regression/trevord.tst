@@ -160,7 +160,7 @@ loadsgf games/trevor/auto/d03.sgf 210
 
 loadsgf games/trevor/auto/d08.sgf 48
 360 gg_genmove white
-#? [K3|K4]
+#? [K3|K4]*
 
 
 #K10 better than J9

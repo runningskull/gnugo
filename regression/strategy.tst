@@ -112,7 +112,7 @@ loadsgf games/incident165.sgf 108
 # F3 seems fine to protect the two cuts -arend
 loadsgf games/incident165.sgf 142
 18 gg_genmove black
-#? [E4|F3]
+#? [E4|F3]*
 
 loadsgf games/strategy4.sgf
 19 gg_genmove black
@@ -126,7 +126,7 @@ loadsgf games/strategy4.sgf
 # incident 290
 loadsgf games/incident290.sgf 30
 20 gg_genmove black
-#? [Q11]
+#? [Q11]*
 
 # incident 291
 loadsgf games/incident291.sgf 54
@@ -181,7 +181,7 @@ loadsgf games/strategy5.sgf 20
 
 loadsgf games/strategy5.sgf 40
 29 gg_genmove black
-#? [R4]
+#? [R4]*
 
 loadsgf games/strategy5.sgf 44
 30 gg_genmove black

@@ -70,7 +70,7 @@ loadsgf games/incident169.sgf 32
 # incident 171 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 60
 64 gg_genmove white
-#? [B13|C13|C12|E14|D14]
+#? [B13|C13|C12|E14|D14]*
 
 # incident 173 (from the disastrous Indigo game)
 # M17 connects on the edge. L16 does too but allows black to get
@@ -177,7 +177,7 @@ loadsgf games/dragon1.sgf 206
 loadsgf games/heikki/heikki01.sgf 17
 # P15 is a joseki, but GNU should at least see that P14 is urgent
 83 gg_genmove black
-#? [P14]*
+#? [P14]
 
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko

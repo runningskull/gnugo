@@ -53,7 +53,7 @@ loadsgf games/FSF-neurogo.sgf 136
 # Semeai problem.
 loadsgf games/FSF-neurogo.sgf 148
 11 gg_genmove white
-#? [N5]*
+#? [N5]
 
 loadsgf games/FSF-neurogo.sgf 152
 12 gg_genmove white
@@ -99,7 +99,7 @@ loadsgf games/FSF-neurogo.sgf 12
 19 owl_attack Q17
 #? [1 S16]
 20 owl_defend Q17
-#? [1 S16]*
+#? [1 S16]
 21 gg_genmove white
 #? [S16]
 

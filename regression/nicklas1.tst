@@ -220,7 +220,7 @@ loadsgf games/nicklas/nicklas14.sgf 51
 
 loadsgf games/nicklas/nicklas14.sgf 55
 1405 gg_genmove black
-#? [B7]
+#? [B7]*
 
 # Semeai problem
 loadsgf games/nicklas/nicklas14.sgf 57

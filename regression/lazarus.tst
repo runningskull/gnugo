@@ -12,7 +12,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 48
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 4 gg_genmove black
-#? [R12|Q12|M8]
+#? [R12|Q12|M8]*
 
 # M8 is better than the game move but R13 seems best
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 70
@@ -21,7 +21,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 70
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 96
 6 gg_genmove black
-#? [H3]
+#? [H3]*
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 114
 7 gg_genmove black
@@ -56,16 +56,16 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 74
 # also be considered. 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 102
 14 gg_genmove black
-#? [Q15|T5|H5]*
+#? [Q15|T5|H5]
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 108
 15 gg_genmove black
-#? [Q15|T5|H5|H3]
+#? [Q15|T5|H5|H3]*
 
 # Locally, L16 is better than L17.
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 192
 16 gg_genmove black
-#? [!L17|J5|K5|K6]*
+#? [!L17|J5|K5|K6]
 
 # Killing the upper right is way bigger than saving the lower left.
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 254

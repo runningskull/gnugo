@@ -27,7 +27,7 @@ loadsgf games/strategy27.sgf 12
 
 loadsgf games/strategy27.sgf 62
 105 gg_genmove white
-#? [J2]*
+#? [J2]
 
 loadsgf games/strategy27.sgf 152
 106 gg_genmove white

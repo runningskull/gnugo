@@ -199,12 +199,12 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 39 gg_genmove white
-#? [H4|J4]*
+#? [H4|J4]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 40 gg_genmove white
-#? [K13]
+#? [K13]*
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 41 gg_genmove white

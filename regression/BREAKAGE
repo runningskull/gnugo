@@ -1,3 +1,69 @@
+======================= 3.3.2 pre 1 =========================
+
+./regress.sh . owl.tst 
+23 unexpected PASS!
+66 unexpected FAIL: Correct '1 B5', got '1 D2'
+208 unexpected FAIL: Correct '3 A2', got '2 F1'
+./regress.sh . owl_rot.tst 
+66 unexpected FAIL: Correct '1 B5', got '1 D2'
+./regress.sh . nngs1.tst 
+30 unexpected PASS!
+45 unexpected PASS!
+47 unexpected PASS!
+48 unexpected PASS!
+50 unexpected PASS!
+53 unexpected PASS!
+./regress.sh . strategy.tst 
+18 unexpected FAIL: Correct 'E4|F3', got 'N11'
+20 unexpected FAIL: Correct 'Q11', got 'C11'
+29 unexpected FAIL: Correct 'R4', got 'E16'
+./regress.sh . neurogo.tst 
+11 unexpected PASS!
+20 unexpected PASS!
+./regress.sh . lazarus.tst 
+4 unexpected FAIL: Correct 'R12|Q12|M8', got 'T5'
+6 unexpected FAIL: Correct 'H3', got 'J8'
+14 unexpected PASS!
+15 unexpected FAIL: Correct 'Q15|T5|H5|H3', got 'S13'
+16 unexpected PASS!
+./regress.sh . strategy2.tst 
+64 unexpected FAIL: Correct 'B13|C13|C12|E14|D14', got 'P12'
+83 unexpected PASS!
+./regress.sh . nicklas1.tst 
+1405 unexpected FAIL: Correct 'B7', got 'B6'
+./regress.sh . manyfaces.tst 
+7 unexpected FAIL: Correct 'R2|S7', got 'H3'
+./regress.sh . trevor.tst 
+220 unexpected PASS!
+./regress.sh . nngs.tst 
+1700 unexpected PASS!
+./regress.sh . trevorc.tst 
+1080 unexpected FAIL: Correct '!L8|K10|K9', got 'L8'
+1440 unexpected PASS!
+./regress.sh . strategy3.tst 
+105 unexpected PASS!
+./regress.sh . global.tst 
+7 unexpected FAIL: Correct 'A5', got 'G9'
+34 unexpected PASS!
+./regress.sh . arend.tst 
+29 unexpected PASS!
+./regress.sh . 13x13.tst 
+39 unexpected PASS!
+40 unexpected FAIL: Correct 'K13', got 'B9'
+./regress.sh . semeai.tst 
+./regress.sh . trevord.tst 
+360 unexpected FAIL: Correct 'K3|K4', got 'K9'
+./regress.sh . strategy4.tst 
+./regress.sh . owl1.tst 
+263 unexpected FAIL: Correct '1 R11', got '0'
+264 unexpected FAIL: Correct '2 A18', got '0'
+./regress.sh . strategy5.tst 
+221 unexpected FAIL: Correct 'S4|C11', got 'Q7'
+222 unexpected FAIL: Correct 'R14', got 'O16'
+223 unexpected FAIL: Correct 'P16', got 'Q7'
+224 unexpected FAIL: Correct 'N15', got 'B9'
+225 unexpected FAIL: Correct 'N15', got 'B9'
+
 ======================= 3.3.2 =========================
 
 ./regress.sh . owl.tst 

@@ -119,7 +119,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 6
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
 30 gg_genmove white
-#? [P17|O18]*
+#? [P17|O18]
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 18
 31 gg_genmove white
@@ -176,7 +176,7 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 36
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 46
 45 gg_genmove white
-#? [!B10]*
+#? [!B10]
 
 # defense of the top right is urgent
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
@@ -185,11 +185,11 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281540.sgf 54
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 12
 47 gg_genmove white
-#? [G15|F15|G16]*
+#? [G15|F15|G16]
 
 loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 16
 48 gg_genmove white
-#? [R16]*
+#? [R16]
 
 # W is trying to live with S14 but B:T14 threatens the corner.
 # Meanwhile B17 is urgent.
@@ -199,7 +199,7 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 54
 
 loadsgf games/nngs/gnugo-3.1.29-merlin-200203281708.sgf 33
 50 gg_genmove white
-#? [O10]*
+#? [O10]
 
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 26
 51 gg_genmove white
@@ -211,7 +211,7 @@ loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 28
 
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 30
 53 gg_genmove white
-#? [L4]*
+#? [L4]
 
 loadsgf games/nngs/gnugo-3.1.31-niki-200204131518.sgf 14
 54 gg_genmove white
