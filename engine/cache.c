@@ -371,13 +371,14 @@ hashtable_partially_clear(Hashtable *table)
    */
   for (k = 0; k < table->num_nodes; k++) {
     node = &(table->all_nodes[k]);
-    bucket = node->key.hashval[0] % table->hashtablesize;
-    previous = NULL;
-    current = table->hashtable[bucket];
 
     /* If there are no results attached, this node is not in the table. */
     if (node->results == NULL)
       continue;
+
+    bucket = node->key.hashval[0] % table->hashtablesize;
+    previous = NULL;
+    current = table->hashtable[bucket];
 
     /* Remove all closed results for this node except OWL_{ATTACK,DEFEND}. */
     hashtable_unlink_closed_results(node, 

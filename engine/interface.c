@@ -568,7 +568,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	/* following really should not be needed for proper sgf file */
 	if (movenum != 0 && !addstone) {
 	  gnugo_sethand(gameinfo->handicap, 0);
-	  sgfOverwritePropertyInt(head, "HA", handicap);
+	  sgfOverwritePropertyInt(head, "HA", gameinfo->handicap);
 	}
 
 	/* Due to a bad comment in the SGF FF3 definition (in the
@@ -590,7 +590,7 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFNode *head,
 	/* following really should not be needed for proper sgf file */
 	if (movenum != 0 && !addstone) {
 	  gnugo_sethand(gameinfo->handicap, 0);
-	  sgfOverwritePropertyInt(head, "HA", handicap);
+	  sgfOverwritePropertyInt(head, "HA", gameinfo->handicap);
 	}
 
 	if (movenum == until - 1) {

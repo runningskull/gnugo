@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in hashtable_partially_clear()
+- bugfix in gameinfo_play_sgftree_rot()
 - bugfix (reading uninitialized memory) in sniff_lunch()
 - bugfix (EXPERIMENTAL_CONNECTIONS) in cut_connect_callback()
 - bugfix (gameinfo_load_sgfheader) in play_ascii()
