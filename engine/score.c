@@ -352,51 +352,77 @@ estimate_score(float *upper, float *lower)
 
   critical = dilate_erode(5, 21, gb, WHITE);
   close_bubbles(gb);
+  if (debug & DEBUG_SCORING)
+    print_regions(gb);
+
   for (i = 0; i < board_size; i++) {
+    int black_territory_in_row = 0;
+    int white_territory_in_row = 0;
+    int white_area_in_row = 0;
+    int black_area_in_row = 0;
     for (j = 0; j < board_size; j++) {
       ii = POS(i, j);
-
+      
       if (board[ii] == BLACK) {
 	if (captured_territory(ii, WHITE)) {
 	  white_territory += 2;
 	  white_area++;
+	  white_territory_in_row += 2;
+	  white_area_in_row++;
 	}
-	else
+	else {
 	  black_area++;
+	  black_area_in_row++;
+	}
       }
       else if (board[ii] == WHITE) {
 	if (captured_territory(ii, WHITE)) {
 	  black_territory += 2;
 	  black_area++;
-	}
-	else
+	  black_territory_in_row += 2;
+	  black_area_in_row++;
+	} 
+	else {
 	  white_area++;
+	  white_area_in_row++;
+	}
       }
       else {
 	if (gb[ii] > 0.0) {
 	  white_territory++;
 	  white_area++;
+	  white_territory_in_row++;
+	  white_area_in_row++;
 	}
 	else if (gb[ii] < 0.0) {
 	  black_territory++;
 	  black_area++;
+	  black_territory_in_row++;
+	  black_area_in_row++;
 	}
       }
     }
-    if (0)
-      fprintf(stderr, "in row %d, white territory=%.1f, black=%.1f\n",
-	      board_size - i, white_territory, black_territory);
-    if (0)
-      fprintf(stderr, "in row %d, white area =%.1f, black=%.1f\n",
-	      board_size - i, white_area, black_area);
+    if (chinese_rules) {
+      DEBUG(DEBUG_SCORING,
+	    "in row %d, white area=%d, black=%d\n",
+	  board_size - i, white_area_in_row, black_area_in_row);
+    }
+    else {
+      DEBUG(DEBUG_SCORING, 
+	    "in row %d, white territory=%d, black=%d\n",
+	    board_size - i, white_territory_in_row, black_territory_in_row);
+    }
   }
 
   if (chinese_rules)
     u = white_area - black_area + komi;
-  else
+  else {
+    DEBUG(DEBUG_SCORING,
+	  "black captured: %d\nwhite captured: %d\nkomi: %f\n",
+	  black_captured, white_captured, komi);
     u = white_territory 
       + black_captured - black_territory - white_captured + komi;
-
+  }
   if (critical) {
     white_territory = 0.0;
     black_territory = 0.0;
@@ -406,20 +432,30 @@ estimate_score(float *upper, float *lower)
     dilate_erode(5, 21, gb, BLACK);
     close_bubbles(gb);
     for (i = 0; i < board_size; i++) {
+      int black_territory_in_row = 0;
+      int white_territory_in_row = 0;
+      int white_area_in_row = 0;
+      int black_area_in_row = 0;
       for (j = 0; j < board_size; j++) {
 	ii = POS(i, j);
 
 	if (board[ii] == BLACK) {
 	  if (captured_territory(ii, BLACK)) {
 	    white_territory += 2;
+	    white_territory_in_row += 2;
 	    white_area++;
+	    white_area_in_row++;
 	  }
-	  else
+	  else {
 	    black_area++;
+	    black_area_in_row++;
+	  }
 	}
 	else if (board[ii] == WHITE) {
 	  if (captured_territory(ii, BLACK)) {
 	    black_territory += 2;
+	    black_area++;
+	    black_territory_in_row += 2;
 	    black_area++;
 	  }
 	}
@@ -427,28 +463,37 @@ estimate_score(float *upper, float *lower)
 	  if (gb[ii] > 0.0) {
 	    white_territory++;
 	    white_area++;
+	    white_territory_in_row++;
+	    white_area++;
 	  }
 	  else if (gb[ii] < 0.0) {
 	    black_territory++;
 	    black_area++;
-	    
+	    black_territory_in_row++;
+	    black_area_in_row++;
 	  }
 	}
       }
-      
-      if (0)
-	fprintf(stderr, "in row %d, white territory=%.1f, black=%.1f\n",
-		board_size-i, white_territory, black_territory);
-      if (0)
-	fprintf(stderr, "in row %d, white area =%.1f, black=%.1f\n",
-		board_size-i, white_area, black_area);
+      if (chinese_rules) {
+	DEBUG(DEBUG_SCORING, "in row %d, white area=%d, black=%d\n",
+	      board_size-i, white_area_in_row, black_area_in_row);
+      }
+      else {
+	DEBUG(DEBUG_SCORING, 
+	      "in row %d, white territory=%d, black=%d\n",
+	      board_size-i, white_territory_in_row, black_territory_in_row);
+      }
     }
 
     if (chinese_rules)
       l = white_area - black_area + komi;
-    else
+    else {
+      DEBUG(DEBUG_SCORING,
+	  "black captured: %d\nwhite captured: %d\nkomi: %f\n",
+	    black_captured, white_captured, komi);
       l = white_territory 
 	+ black_captured - black_territory - white_captured + komi;
+    }
   }
   else
     l = u;
@@ -464,6 +509,14 @@ estimate_score(float *upper, float *lower)
  * stone is characterized as having matcher_status DEAD yet having only
  * DEAD dragons as neighbors.
  *
+ * Thus in this situation:
+ * 
+ * XXXXXXX  We do not count the X stone in the center as
+ * XOOOOOX  territory for O since the surrounding O dragon is
+ * XO.X.OX  dead.
+ * XOOOOOX
+ * XXXXXXX
+ * 
  * If (pos) is the location of a stone which is DEAD and which is
  * not an exception of this type then it is safe to count it as
  * two points territory for the opponent. This function tests for
@@ -482,6 +535,10 @@ captured_territory(int pos, int color)
       || dragon[pos].matcher_status == UNKNOWN
       || (board[pos] == color && dragon[pos].matcher_status == CRITICAL))
     return 0;
+
+  if (DRAGON2(pos).neighbors == 0
+      && dragon[pos].matcher_status == DEAD)
+    return 1;
 
   for (d = 0; d < DRAGON2(pos).neighbors; d++)
     if (DRAGON(DRAGON2(pos).adjacent[d]).color == OTHER_COLOR(board[pos])
