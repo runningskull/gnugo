@@ -83,12 +83,13 @@ my $stable;
 my $pids;
 my $stable_move = "";
 my $noilcheck;
+my $color;
 
 my $helpstring = "
 
 Run with:
 
-twogtp --program \'<path to program> --mode gtp [program options]\' \\
+matchercheck --program \'<path to program> --mode gtp [program options]\' \\
        [matcher_check options]
 
 Possible matcher_check options:
@@ -104,6 +105,8 @@ Possible matcher_check options:
   --randseed <number>			  (sets the random seed)
   --stable \'<path to stable version> --mode gtp [program options]\'
   --noilcheck				  (turns off illegal transition checks)
+  --color <color>		          (only replay for color; has no effect
+  					   without --noilcheck and --loadsgf)
   --help                                  (show this)
 
 
@@ -122,6 +125,7 @@ GetOptions(
 	   "randseed=i"		    => \$randseed,
 	   "stable=s"		    => \$stable,
 	   "noilcheck"		    => \$noilcheck,
+	   "color=s"		    => \$color,
            "help"                   => \$wanthelp,
 );
 
@@ -135,6 +139,12 @@ if (!$program) {
     $program = '../gnugo --mode gtp --quiet';
     warn "Defaulting program to: $program\n";
 }
+
+if (defined($color) and (!defined($noilcheck) or !defined($loadfile))) {
+    print "Error: --color requires --noilcheck and --loadsgf";
+    exit;
+}
+
 
 # create FileHandles
 my $prog_in  = new FileHandle;		# stdin of program
@@ -191,17 +201,23 @@ specify the number of moves to check with --movecount <n>.
             $toplay = eat_one_line($stable_out);
             $toplay =~ s/^=//smg;
             $toplay =~ s/ //smg;
-            print $prog_in "genmove_$toplay\n";
-            print $stable_in "genmove_$toplay\n";
-            $move = eat_move($prog_out);
-            $stable_move = eat_move($stable_out);
-            if ($move ne $stable_move and defined ($stable)) {
-                print "At move $movenum, $toplay\:\n";
-                print "Test version played   $move\n";
-                print "Stable version played $stable_move\n";
-            } else {
-                print "$toplay plays $move\n" if $verbose;
-            }
+	    if (!defined($color) or ($color eq $toplay)) {
+		print $prog_in "genmove_$toplay\n";
+		print $stable_in "genmove_$toplay\n";
+		$move = eat_move($prog_out);
+		$stable_move = eat_move($stable_out);
+		if ($move ne $stable_move and defined ($stable)) {
+		    print "At move $movenum, $toplay\:\n";
+		    print "Test version played   $move\n";
+		    print "Stable version played $stable_move\n";
+		    if ($verbose eq 2) {
+			print $prog_in "showboard\n";
+			print eat_response($prog_out);
+		    }
+		} else {
+		    print "$toplay plays $move\n" if $verbose;
+		}
+	    }
         }
     }
 
@@ -316,6 +332,10 @@ while ($games > 0) {
 	    print "At move $movenum, $toplay\:\n";
 	    print "Test version played   $move\n";
 	    print "Stable version played $stable_move\n";
+	    if ($verbose eq 2) {
+		print $prog_in "showboard\n";
+		print eat_response($prog_out);
+	    }
 	} else {
 	    print "$toplay plays $move\n" if $verbose;
 	}
@@ -446,9 +466,25 @@ sub eat_no_response {
     }
 }
 
+sub eat_response {
+    my $h = shift;
+    my $response = "";
+# ignore empty lines
+    my $line = "";
+    while ($line eq "") {
+	chop($line = <$h>) or die "No response!";
+        $line =~ s/(\s|\n)*$//smg;
+    }
+    while ($line ne "") {
+	$response = "$response$line\n";
+	chop($line = <$h>) or die "No response!";
+        $line =~ s/(\s|\n)*$//smg;
+    }
+    return $response;
+}
+
 sub eat_one_line {
     my $h = shift;
-
 # ignore empty lines
     my $line = "";
     while ($line eq "") {
