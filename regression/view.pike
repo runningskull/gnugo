@@ -53,6 +53,8 @@ class SimpleGtp
     Stdio.File engine_in;
     Stdio.FILE engine_out;
     Stdio.FILE engine_err;
+
+    string command_line;
     
     int id_number = 1;
     
@@ -119,6 +121,7 @@ class SimpleGtp
     void create(array(string) program_start_array,
 		function|void crash_callback_)
     {
+	command_line = program_start_array * " ";
 	crash_callback = crash_callback_;
 	engine_in = Stdio.File();
 	engine_out = Stdio.FILE();
@@ -501,9 +504,9 @@ class RegressionViewer
     SimpleGtp engine;
     array(string) traces;
 
-    string windowtitle;
-    GTK.Window board_window;
-    GTK.Window data_window;
+    GTK.Widget goban_widget;
+    GTK.Widget data_widget;
+
     GTK.ScrolledWindow scrolled_data_window;
     array(GTK.Window) all_windows = ({});
     GTK.Image gtk_image;
@@ -521,7 +524,7 @@ class RegressionViewer
 
     function on_board_click_callback;
 
-    static void create(SimpleGtp engine_, string title,
+    static void create(SimpleGtp engine_,
 		       array(string) fulltest_, string testcase_command_,
 		       function callback, Controller parent_)
     {
@@ -533,43 +536,33 @@ class RegressionViewer
 	load_testcase();
 	werror("%s\n", send_command("showboard"));
 	int boardsize = (int) send_command("query_boardsize");
-        windowtitle = title;
 	on_board_click_callback = callback;
 
 	foreach (send_command("worm_stones") / "\n", string worm)
 	    worms[(worm / " ")[0]] = worm / " " - ({""});
 	
-	board_window = GTK.Window(GTK.WindowToplevel);
-	board_window->signal_connect("destroy", exit, 0);
 	goban = Goban(boardsize, 600);
 	goban->add_stones("WHITE", send_command("list_stones white") / " ");
 	goban->add_stones("BLACK", send_command("list_stones black") / " ");
 	Image.Image im = goban->draw_board();
 	gdk_image = GDK.Image(0)->set(im);
 	gtk_image = GTK.Image(gdk_image);
-	board_window->add_events(GDK.ButtonPressMask);
-	board_window->add_events(GDK.KeyPressMask);
-	board_window->signal_connect_new("button_press_event",
+	goban_widget = GTK.EventBox()->add(gtk_image);
+	goban_widget->add_events(GDK.ButtonPressMask);
+	goban_widget->add_events(GDK.KeyPressMask);
+	goban_widget->signal_connect_new("button_press_event",
 					 button_pressed_on_board);
-	board_window->signal_connect_new("key_press_event",
+	goban_widget->signal_connect_new("key_press_event",
 					 key_pressed_on_board);
-	board_window->add(gtk_image);
-	board_window->set_title(windowtitle);
-	board_window->show_all();
-	
-	data_window = GTK.Window(GTK.WindowToplevel);
+
 	scrolled_data_window = GTK.ScrolledWindow();
 	scrolled_data_window->set_policy(GTK.POLICY_AUTOMATIC,
 					 GTK.POLICY_AUTOMATIC);
-	scrolled_data_window->set_usize(300,400);
 
-	all_windows = ({board_window, data_window});
+	all_windows = ({});
 	
 	clist = GTK.Clist(3);
-	data_window->add(scrolled_data_window);
 	scrolled_data_window->add(clist);
-	data_window->set_title(windowtitle);
-	data_window->show_all();
 	
 //	thread_create(handle_testcase);
 	handle_testcase();
@@ -763,8 +756,9 @@ class RegressionViewer
 		}
 	    }
 	    clist->columns_autosize();
-	    data_window->set_title("Delta territory for "
-				   + parent->delta_territory_move);
+	    parent->set_title(this_object(),
+			      ("Delta territory for "
+			       + parent->delta_territory_move));
 	}
     }
 
@@ -971,7 +965,7 @@ class RegressionViewer
 	    clist->append(({field, value, ""}));
 	}
 	clist->columns_autosize();
-	data_window->set_title("Worm data for " + vertex);
+	parent->set_title(this_object(), "Worm data for " + vertex);
     }
 
     void show_dragon_data(string vertex, int part)
@@ -991,7 +985,7 @@ class RegressionViewer
 	    clist->append(({field, value, ""}));
 	}
 	clist->columns_autosize();
-	data_window->set_title("Dragon data for " + vertex);
+	parent->set_title(this_object(), "Dragon data for " + vertex);
     }
 
     void show_move_reasons(string vertex)
@@ -1047,7 +1041,7 @@ class RegressionViewer
 	}
 
 	clist->columns_autosize();
-	data_window->set_title("Move reasons for " + vertex);
+	parent->set_title(this_object(), "Move reasons for " + vertex);
     }
     
     void show_eye_data(string vertex)
@@ -1079,7 +1073,7 @@ class RegressionViewer
 	}
 	
 	clist->columns_autosize();
-	data_window->set_title(color + " eye data for " + vertex);
+	parent->set_title(this_object(), color + " eye data for " + vertex);
     }
 
    
@@ -1100,9 +1094,9 @@ class RegressionViewer
     string send_command(string command)
     {
 	string result;
-	all_windows->set_cursor(GDK.Watch);
+	//all_windows->set_cursor(GDK.Watch);
 	result = engine->send_command(command)->text;
-	all_windows->set_cursor(GDK.TopLeftArrow);
+	//all_windows->set_cursor(GDK.TopLeftArrow);
 	return result;
     }
 
@@ -1153,20 +1147,26 @@ class RegressionViewer
 	if (sgffilename != "")
 	    send_command("finish_sgftrace " + sgffilename);
 	clist->columns_autosize();
-	data_window->set_title("Reading result");
+	parent->set_title(this_object(), "Reading result");
      }
 }
 
 
 class Controller
 {
+    static int single_window_mode = 1;
+
     array(RegressionViewer) viewers = ({});
+    array(GTK.Widget) viewer_title_widgets = ({});
 
     string current_move_color = "";
     
-    GTK.Window notebook_window;
-    GTK.Notebook notebook;
-    
+    GTK.Window main_window;
+    GTK.Notebook controller_notebook;
+    GTK.Notebook gobans_notebook;
+    GTK.Notebook data_notebook;
+    GTK.Notebook selector_notebook;
+
     GTK.RadioButton worm_data_button;
     GTK.RadioButton dragon_data1_button;
     GTK.RadioButton dragon_data2_button;
@@ -1210,6 +1210,7 @@ class Controller
     GTK.Entry sgf_filename_entry;
     GTK.Button new_engine_button;
     GTK.Entry engine_path_entry;
+    GTK.Entry engine_name_entry;
     
     string delta_territory_move = "PASS";
     string move_influence_move = "PASS";
@@ -1236,25 +1237,52 @@ class Controller
 	}
 	testcase_name = testcase;
 
-        viewers += ({RegressionViewer(engine_, testcase, complete_testcase,
-				      testcase_command,
-				      button_pressed_on_a_board,
-				      this_object())});
+	GTK.Widget testcase_label = (GTK.Label(full_testcase * "\n")
+				     ->set_justify(GTK.JUSTIFY_LEFT));
 
-	notebook_window = GTK.Window(GTK.WindowToplevel);
-	notebook = GTK.Notebook();
-	notebook->set_tab_pos(GTK.POS_LEFT);
-	notebook_window->add(GTK.Vbox(0, 0)
-			     ->add(GTK.Label(full_testcase * "\n")
-				   ->set_justify(GTK.JUSTIFY_LEFT))
-			     ->add(notebook));
-	notebook_window->set_title(testcase);
-	notebook_window->signal_connect("destroy", exit, 0);
+	main_window = GTK.Window(GTK.WindowToplevel);
+	controller_notebook = GTK.Notebook();
+	controller_notebook->set_tab_pos(GTK.POS_LEFT);
+
+	if (single_window_mode) {
+	    gobans_notebook   = (GTK.Notebook()
+				 ->set_show_tabs(0));
+	    data_notebook     = (GTK.Notebook()
+				 ->set_show_tabs(0)
+				 ->set_show_border(0));
+	    selector_notebook = (GTK.Notebook()
+				 ->set_tab_pos(GTK.POS_TOP));
+	    selector_notebook->signal_connect_new("switch_page", change_engine);
+
+	    GTK.Widget main_window_contents
+		= (GTK.Vbox(0, 0)
+		   ->pack_start(GTK.Hbox(0, 24)
+				->pack_start(testcase_label, 0, 0, 24)
+				->pack_start(GTK.Alignment(0.0, 0.5, 0.0, 0.0)
+					     ->add(selector_notebook),
+					     0, 0, 0),
+				0, 0, 0)
+		   ->add(GTK.Hbox(0, 2)
+			 ->add(GTK.Vbox(0, 6)
+			       ->pack_start(controller_notebook, 0, 0, 0)
+			       ->add(data_notebook))
+			 ->pack_start(GTK.Alignment(0.0, 0.0, 0.0, 0.0)
+				      ->add(gobans_notebook),
+				      0, 0, 0)));
+	    main_window->add(main_window_contents);
+	}
+	else {
+	    main_window->add(GTK.Vbox(0, 0)
+			     ->add(testcase_label)
+			     ->add(controller_notebook));
+	}
+
+	main_window->set_title(testcase);
+	main_window->signal_connect("destroy", exit, 0);
 	
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove"))
 	{
-//	    notebook->set_page(1);
 	    sscanf(testcase_command, "%*s %s", string color);
 	    if (lower_case(color[0..0]) == "w")
 		current_move_color = "white";
@@ -1283,7 +1311,7 @@ class Controller
 	top_moves_button = GTK.RadioButton("top moves");
 	all_moves_button = GTK.RadioButton("all moves", top_moves_button);
 	delta_territory_button_text = GTK.Label("delta territory for PASS");
-	delta_territory_button_text->set_justify(GTK.JUSTIFY_LEFT);
+	delta_territory_button_text->set_alignment(0.0, 0.0);
 	delta_territory_button = GTK.RadioButton(0, top_moves_button);
 	delta_territory_button->add(delta_territory_button_text);
 	top_moves_button->signal_connect_new("clicked", markup_button_pressed);
@@ -1292,7 +1320,7 @@ class Controller
 						   markup_button_pressed);
 
 	white_eyes_button = GTK.RadioButton("white eyes");
-	black_eyes_button = GTK.RadioButton("black_eyes", white_eyes_button);
+	black_eyes_button = GTK.RadioButton("black eyes", white_eyes_button);
 	white_eyes_button->signal_connect_new("clicked",
 					      markup_button_pressed);
 	black_eyes_button->signal_connect_new("clicked",
@@ -1310,13 +1338,13 @@ class Controller
 			    initial_w_influence_dragons_known_button);
 	after_move_influence_button_text =
 	    GTK.Label("after move influence for PASS");
-	after_move_influence_button_text->set_justify(GTK.JUSTIFY_LEFT);
+	after_move_influence_button_text->set_alignment(0.0, 0.0);
 	after_move_influence_button =
 	    GTK.RadioButton(0, initial_w_influence_dragons_known_button);
 	after_move_influence_button->add(after_move_influence_button_text);
 	followup_influence_button_text =
 	    GTK.Label("followup influence for PASS");
-	followup_influence_button_text->set_justify(GTK.JUSTIFY_LEFT);
+	followup_influence_button_text->set_alignment(0.0, 0.0);
 	followup_influence_button =
 	    GTK.RadioButton(0, initial_w_influence_dragons_known_button);
 	followup_influence_button->add(followup_influence_button_text);
@@ -1366,7 +1394,8 @@ class Controller
 						    tactical_reading_button);
 	semeai_reading_button = GTK.RadioButton("semeai reading",
 						tactical_reading_button);
-	sgf_traces_button = GTK.CheckButton("save sgf traces to");
+	sgf_traces_button = (GTK.CheckButton("save sgf traces to")
+			     ->set_active(1));
 	sgf_filename_entry = GTK.Entry();
 	sgf_filename_entry->set_text("vars.sgf");
 	sgf_filename_entry->set_editable(1);
@@ -1374,70 +1403,110 @@ class Controller
 	engine_path_entry = GTK.Entry();
 	engine_path_entry->set_text("../interface/gnugo");
 	engine_path_entry->set_editable(1);
+
+	if (single_window_mode) {
+	    engine_name_entry = GTK.Entry();
+	    engine_name_entry->set_text("Engine 2");
+	    engine_name_entry->set_editable(1);
+	}
+
 	new_engine_button = GTK.Button("Start new engine");
 	new_engine_button->signal_connect_new("clicked", select_new_engine);
-	
-	notebook->append_page(GTK.Vbox(0, 0)
-			      ->pack_start(worm_data_button, 0, 0, 0)
-			      ->pack_start(dragon_data1_button, 0, 0, 0)
-			      ->pack_start(dragon_data2_button, 0, 0, 0)
-			      ->pack_start(GTK.Label(""), 0, 0, 0)
-			      ->pack_start(worm_status_button, 0, 0, 0)
-			      ->pack_start(dragon_status_button, 0, 0, 0)
-			      ->pack_start(dragon_safety_button, 0, 0, 0),
-			      GTK.Label("worms and dragons"));
-	notebook->append_page(GTK.Vbox(0, 0)
-			      ->pack_start(top_moves_button, 0, 0, 0)
-			      ->pack_start(all_moves_button, 0, 0, 0)
-			      ->pack_start(delta_territory_button, 0, 0, 0),
-			      GTK.Label("move generation"));
-	notebook->append_page(GTK.Vbox(0, 0)
-			      ->pack_start(white_eyes_button, 0, 0, 0)
-			      ->pack_start(black_eyes_button, 0, 0, 0),
-			      GTK.Label("eyes"));
-	notebook->append_page(GTK.Vbox(0, 0)
-//			      ->add(initial_w_influence_dragons_unknown_button)
-//			      ->add(initial_b_influence_dragons_unknown_button)
-			      ->add(initial_w_influence_dragons_known_button)
-			      ->add(initial_b_influence_dragons_known_button)
-			      ->add(after_move_influence_button)
-			      ->add(followup_influence_button)
-			      ->add(GTK.Label(""))
-			      ->add(influence_regions_button)
-			      ->add(territory_value_button)
-			      ->add(non_territory_button)
-			      ->add(white_influence_button)
-			      ->add(black_influence_button)
-			      ->add(white_strength_button)
-			      ->add(black_strength_button)
-			      ->add(white_permeability_button)
-			      ->add(black_permeability_button)
-			      ->add(white_attenuation_button)
-			      ->add(black_attenuation_button),
-			      GTK.Label("influence"));
-	notebook->append_page(GTK.Vbox(0, 0)
-			      ->pack_start(tactical_reading_button, 0, 0, 0)
-			      ->pack_start(owl_reading_button, 0, 0, 0)
-			      ->pack_start(connection_reading_button, 0, 0, 0)
-			      ->pack_start(semeai_reading_button, 0, 0, 0)
-			      ->pack_start(GTK.Label(""), 0, 0, 0)
-			      ->pack_start(GTK.Hbox(0, 0)
-					   ->pack_start(sgf_traces_button,
-							0, 0, 0)
-					   ->pack_start(sgf_filename_entry,
-							0, 0, 0), 0, 0, 0),
-			      GTK.Label("reading"));
-	notebook->append_page(GTK.Vbox(0, 0)
-			      ->pack_start(engine_path_entry, 0, 0, 0)
-			      ->pack_start(new_engine_button, 0, 0, 0),
-			      GTK.Label("Engines"));
-	notebook->signal_connect_new("switch_page", add_markup);
+
+	GTK.Widget worms_and_dragons_page
+	    = (GTK.Vbox(0, 0)
+	       ->pack_start(worm_data_button, 0, 0, 0)
+	       ->pack_start(dragon_data1_button, 0, 0, 0)
+	       ->pack_start(dragon_data2_button, 0, 0, 0)
+	       ->pack_start(GTK.Label(""), 0, 0, 0)
+	       ->pack_start(worm_status_button, 0, 0, 0)
+	       ->pack_start(dragon_status_button, 0, 0, 0)
+	       ->pack_start(dragon_safety_button, 0, 0, 0));
+	controller_notebook->append_page(worms_and_dragons_page,
+					 GTK.Label("worms and dragons"));
+
+	GTK.Widget move_generation_page
+	    = (GTK.Vbox(0, 0)
+	       ->pack_start(top_moves_button, 0, 0, 0)
+	       ->pack_start(all_moves_button, 0, 0, 0)
+	       ->pack_start(delta_territory_button, 0, 0, 0));
+	controller_notebook->append_page(move_generation_page,
+					 GTK.Label("move generation"));
+
+	GTK.Widget eyes_page = (GTK.Vbox(0, 0)
+				->pack_start(white_eyes_button, 0, 0, 0)
+				->pack_start(black_eyes_button, 0, 0, 0));
+	controller_notebook->append_page(eyes_page, GTK.Label("eyes"));
+
+	GTK.Widget influence_page
+	    = (GTK.Vbox(0, 0)
+	       ->pack_start(GTK.Vbox(0,0)
+// 			    ->add(initial_w_influence_dragons_unknown_button)
+// 			    ->add(initial_b_influence_dragons_unknown_button)
+			    ->add(initial_w_influence_dragons_known_button)
+			    ->add(initial_b_influence_dragons_known_button)
+			    ->add(after_move_influence_button)
+			    ->add(followup_influence_button), 0, 0, 0)
+	       ->pack_start(GTK.Label(""), 0, 0, 0)
+	       ->pack_start(GTK.Hbox(0,12)
+			    ->add(GTK.Vbox(0,0)
+				  ->pack_start(influence_regions_button, 0, 0, 0)
+				  ->pack_start(territory_value_button, 0, 0, 0)
+				  ->pack_start(non_territory_button, 0, 0, 0)
+				  ->pack_start(white_influence_button, 0, 0, 0)
+				  ->pack_start(black_influence_button, 0, 0, 0))
+			    ->add(GTK.Vbox(0,0)
+				  ->pack_start(white_strength_button, 0, 0, 0)
+				  ->pack_start(black_strength_button, 0, 0, 0)
+				  ->pack_start(white_permeability_button, 0, 0, 0)
+				  ->pack_start(black_permeability_button, 0, 0, 0)
+				  ->pack_start(white_attenuation_button, 0, 0, 0)
+				  ->pack_start(black_attenuation_button, 0, 0, 0)),
+			    0, 0, 0));
+	controller_notebook->append_page(influence_page,
+					 GTK.Label("influence"));
+
+	GTK.Widget reading_page
+	    = (GTK.Vbox(0, 0)
+	       ->pack_start(tactical_reading_button, 0, 0, 0)
+	       ->pack_start(owl_reading_button, 0, 0, 0)
+	       ->pack_start(connection_reading_button, 0, 0, 0)
+	       ->pack_start(semeai_reading_button, 0, 0, 0)
+	       ->pack_start(GTK.Label(""), 0, 0, 0)
+	       ->pack_start(GTK.Hbox(0, 0)
+			    ->pack_start(sgf_traces_button,
+					 0, 0, 0)
+			    ->pack_start(sgf_filename_entry,
+					 0, 0, 0), 0, 0, 0));
+	controller_notebook->append_page(reading_page, GTK.Label("reading"));
+
+	GTK.Widget engines_page
+	    = (GTK.Vbox(0, 12)
+	       ->pack_start(engine_path_entry, 0, 0, 0));
+	if (single_window_mode)
+	    engines_page->pack_start(engine_name_entry, 0, 0, 0);
+	engines_page->pack_start(GTK.Alignment(1.0, 0.0, 0.0, 0.0)
+				 ->add(new_engine_button), 0, 0, 0);
+	controller_notebook->append_page(engines_page->set_border_width(12),
+					 GTK.Label("engines"));
+
+	controller_notebook->signal_connect_new("switch_page", add_markup);
 
 	if (has_prefix(testcase_command, "reg_genmove")
-	    || has_prefix(testcase_command, "restricted_genmove"))
-	    notebook->set_page(1);
+	    || has_prefix(testcase_command, "restricted_genmove")) {
+	    controller_notebook->show_all();
+	    controller_notebook->set_page(1);
+	}
 
-	notebook_window->show_all();
+	main_window->show_all();
+
+        add_regression_viewer(RegressionViewer(engine_,
+					       complete_testcase,
+					       testcase_command,
+					       button_pressed_on_a_board,
+					       this_object()),
+			      "Default engine");
+	add_markup(controller_notebook->get_current_page());
     }
 
     static void select_new_engine()
@@ -1446,30 +1515,99 @@ class Controller
 	SimpleGtp new_engine = SimpleGtp((new_engine_path + " --quiet --mode gtp -w -t -d0x101840") / " ");
     	if (!new_engine)
 	    werror("Failed to start new engine.\n");
-	else
-	    viewers += ({RegressionViewer(new_engine,
-					  testcase_name, full_testcase,
-					  testcase_command,
-					  button_pressed_on_a_board,
-					  this_object())});
+	else {
+	    add_regression_viewer(RegressionViewer(new_engine,
+						   full_testcase,
+						   testcase_command,
+						   button_pressed_on_a_board,
+						   this_object()),
+				  (single_window_mode
+				   ? engine_name_entry->get_text() : ""));
+	}
+
+	if (single_window_mode) {
+	    engine_name_entry->set_text(sprintf("Engine %d",
+						sizeof(viewers) + 1));
+	}
+    }
+
+    static void add_regression_viewer(RegressionViewer viewer, string name)
+    {
+	viewers += ({ viewer });
+	if (single_window_mode) {
+	    viewer->goban_widget->show_all();
+	    gobans_notebook->append_page(viewer->goban_widget, 0);
+
+	    GTK.Widget title_label = GTK.Label("");
+	    viewer_title_widgets += ({ title_label });
+
+	    GTK.Widget data_page = (GTK.Vbox(0, 2)
+				    ->pack_start(title_label, 0, 0, 0)
+				    ->add(viewer->scrolled_data_window)
+				    ->show_all());
+	    data_notebook->append_page(data_page, 0);
+
+	    selector_notebook
+		->append_page((GTK.Alignment(0.0, 0.5, 0.0, 0.0)
+			       ->set_border_width(4)
+			       ->add(GTK.Label(viewer->engine->command_line))),
+			      GTK.Label(name));
+	    selector_notebook->show_all();
+	    selector_notebook->set_page(sizeof(viewers) - 1);
+	}
+	else {
+	    GTK.Widget board_window = GTK.Window(GTK.WindowToplevel);
+	    board_window->signal_connect("destroy", exit, 0);
+
+	    board_window->add(viewer->goban_widget);
+	    board_window->set_title(testcase_name);
+	    board_window->show_all();
+
+	    GTK.Widget data_window = GTK.Window(GTK.WindowToplevel);
+	    viewer->scrolled_data_window->set_usize(300,400);
+	    data_window->add(viewer->scrolled_data_window);
+	    data_window->set_title(testcase_name);
+	    data_window->show_all();
+
+	    viewer_title_widgets += ({ data_window });
+	}
+    }
+
+    void set_title(RegressionViewer viewer, string title)
+    {
+	for (int k = 0; k < sizeof(viewers); k++) {
+	    if (viewers[k] == viewer) {
+		if (single_window_mode)
+		    viewer_title_widgets[k]->set_text(title);
+		else
+		    viewer_title_widgets[k]->set_title(title);
+	    }
+	}
     }
 
     static void markup_button_pressed(mixed ... foo)
     {
-	add_markup(notebook->get_current_page());
+	add_markup(controller_notebook->get_current_page());
     }
 
     static void add_markup(int mode)
     {
 	viewers->add_markup(mode);
     }
+
+    static void change_engine(int engine_index)
+    {
+	gobans_notebook->set_page(engine_index);
+	data_notebook->set_page(engine_index);
+    }
     
     void button_pressed_on_a_board(string vertex)
     {
 	if (vertex == "")
 	    return;
-	if (notebook->get_current_page() == 0)
-	{
+
+	switch (controller_notebook->get_current_page()) {
+	case 0:
 	    // Worms and dragons.
 	    if (worm_data_button->get_active())
 		viewers->show_worm_data(vertex);
@@ -1477,9 +1615,9 @@ class Controller
 		viewers->show_dragon_data(vertex, 1);
 	    else
 		viewers->show_dragon_data(vertex, 2);
-	}
-	else if (notebook->get_current_page() == 1)
-	{
+	    break;
+
+	case 1:
 	    // Move generation.
 	    if (!delta_territory_button->get_active())
 		viewers->show_move_reasons(vertex);
@@ -1488,14 +1626,14 @@ class Controller
 		delta_territory_move = vertex;
 		markup_button_pressed();
 	    }
-	}
-	else if (notebook->get_current_page() == 2)
-	{
+	    break;
+
+	case 2:
 	    // Eyes.
 	    viewers->show_eye_data(vertex);
-	}
-	else if (notebook->get_current_page() == 3)
-	{
+	    break;
+
+	case 3:
 	    // Influence.
 	    if (after_move_influence_button->get_active()
 		|| followup_influence_button->get_active())
@@ -1507,9 +1645,9 @@ class Controller
 		    ->set_text("followup influence for " + vertex);
 		markup_button_pressed();
 	    }
-	}
-	else if (notebook->get_current_page() == 4)
-	{
+	    break;
+
+	case 4:
 	    // Reading.
 	    string sgffilename;
 	    string reset_counter, get_counter;
@@ -1584,6 +1722,7 @@ class Controller
 		    first_semeai_or_connection_vertex = "";
 		}
 	    }
+	    break;
 	}
     }
 
@@ -1657,3 +1796,11 @@ class Controller
 	write("Debug callback:%O\n", args);
     }
 }
+
+
+/*
+ * Local Variables:
+ * tab-width: 8
+ * c-basic-offset: 4
+ * End:
+ */
