@@ -72,7 +72,7 @@ extern Hash_data    hashdata;
 #define MAX_STRINGS (2 * MAX_BOARD * MAX_BOARD / 3)
 
 /* VC builds choke at stackp around 304 in reading code. */
-#define MAXSTACK  MAX_BOARD * MAX_BOARD * 2 / 3
+#define MAXSTACK  MAX_BOARD * MAX_BOARD
 #define MAXCHAIN  160
 
 /* 1D board macros.
