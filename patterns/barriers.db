@@ -59,6 +59,13 @@ goal_elements none
 callback_data XO,!
 
 
+#########################################################
+#                                                       #
+#        Influence blocking patterns (barriers)         #
+#                                                       #
+#########################################################
+
+
 Pattern Barrier1
 
 O,O
@@ -1029,6 +1036,13 @@ Pattern Intrusion1a
 
 ;safe_omove(c)
 >return (lib(a)>2 || (lib(a) == 2 && connect_and_cut_helper(a,b,c)));
+
+
+#########################################################
+#                                                       #
+#   Intrusion patterns (secondary influence sources)    #
+#                                                       #
+#########################################################
 
 
 Pattern Intrusion1b
@@ -2011,6 +2025,8 @@ Pattern Intrusion51b
 # intrusion is allowed to happen.
 # Due to reading depth limitations, oplay_break_through == CUT is not
 # sufficient (see nngs1:40).
+# pp Revised constraint (3.5.1)
+# Ko checks prevent 0.5 point "breaks through" with no further threat.
 
 ?O?
 XQX
@@ -2020,9 +2036,11 @@ XQX
 
 ?O?
 aQc
-!b!
+dbe
 
-;(oplay_break_through(a,b,c)==WIN)
+; (oplay_break_through(a,b,c)==WIN
+;  && (!ko(a) || oplay_attack_either(d,b,c))
+;  && (!ko(c) || oplay_attack_either(e,b,a)))
 
 
 Pattern Intrusion52
@@ -2168,6 +2186,23 @@ Pattern Intrusion59
 |.oo?
 
 ;!attack(A) && oplay_disconnect(A,B) && !attack(B)
+
+
+Pattern Intrusion60
+#pp New pattern (3.5.1)
+
+OQ?	    this pattern should prevent attempts to cut bamboo joint
+X.!
+OO?
+
+:-,B,value(20)
+
+
+#########################################################
+#                                                       #
+#                 Nonterritory patterns                 #
+#                                                       #
+#########################################################
 
 
 Pattern Nonterritory1
