@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- find_backfilling_move() in filllib.c revised
 - dfa made standard
 - comments added, cleanup around discard_redundant_move_reasons
 - unsafe tactical moves now taken care by discard_redundant_move_reasons

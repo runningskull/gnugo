@@ -435,6 +435,21 @@ find_backfilling_move(int move, int color, int *backfill_move)
     }
   }
 
+  /* If no luck so far, try attacking superstring neighbors. */
+  if (!found_one) {
+    trymove(move, color, "find_backfilling_move", move, EMPTY, NO_MOVE);
+    superstring_chainlinks(move, &neighbors, adjs, 4);
+    popgo();
+    for (k = 0; k < neighbors; k++) {
+      if (attack(adjs[k], &bpos) == WIN) {
+	if (liberty_of_string(bpos, adjs[k])) {
+	  *backfill_move = bpos;
+	  return 1;
+	}
+      }
+    }
+  }
+
 
   if (found_one) {
   
