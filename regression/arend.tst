@@ -71,7 +71,7 @@ loadsgf games/arend/gnugo-gnugo2.sgf 163
 # GNU Go does not see that P17 helps his group as well, and plays O13.
 loadsgf games/arend/gnugo-gnugo4.sgf 27
 14 gg_genmove black
-#? [P17]
+#? [P17]*
 
 #CATEGORY=FUSEKI_STRATEGY
 # C6 is clearly the wrong side for approaching LL corner.
@@ -131,7 +131,7 @@ loadsgf games/arend/gnugo-gnugo5.sgf 105
 # Low Shimari clearly better here
 loadsgf games/arend/gnugo-gnugo6.sgf 20
 24 gg_genmove white 4
-#? [!P16]
+#? [!P16]*
 
 #CATEGORY=ENDGAME_TUNING
 # C19 is either double sente, or worth at least 5 pts in reverse sente,
@@ -144,7 +144,7 @@ loadsgf games/arend/gnugo-gnugo6.sgf 174
 # D17 is wrong direction; in this position this is really bad.
 loadsgf games/arend/gnugo-gnugo7.sgf 17
 28 gg_genmove black
-#? [C16]*
+#? [C16]
 
 #CATEGORY=FUSKEI_STRATEGY
 # Black C15 is sente here, so W C14 is mandatory.
@@ -168,11 +168,11 @@ loadsgf games/arend/gnugo-gnugo7.sgf 81
 #SEVERITY=9
 loadsgf games/arend/gnugo-gnugo7.sgf 137
 32 gg_genmove black
-#? [F9|E8]
+#? [F9|E8]*
  
 loadsgf games/arend/gnugo-gnugo7.sgf 140
 33 gg_genmove white
-#? [F9]
+#? [F9]*
  
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/arend/gnugo-gnugo7.sgf 173

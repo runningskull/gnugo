@@ -284,7 +284,7 @@ loadsgf games/trevor/auto/a027.sgf 40
 #Must defend G3 group.
 loadsgf games/trevor/auto/a029.sgf 14
 450 gg_genmove white
-#? [G2|G4]*
+#? [G2|G4]
 
 
 
@@ -304,7 +304,7 @@ loadsgf games/trevor/auto/a030.sgf 22
 #For a ko threat, D3 is better.
 loadsgf games/trevor/auto/a031.sgf 28
 470 gg_genmove white
-#? [!E2]
+#? [!E2]*
 
 
 #Sacrificing these two for the rest seems best.
@@ -348,7 +348,7 @@ loadsgf games/trevor/auto/a035.sgf 28
 #Have to try.
 loadsgf games/trevor/auto/a035.sgf 42
 530 gg_genmove white
-#? [H4]*
+#? [H4]
 
 #Excellect simple semeai problem.
 loadsgf games/trevor/auto/a035.sgf 42

@@ -10,7 +10,7 @@ loadsgf games/strategy14a.sgf
 # modification of move 17 in strategy14.sgf: Ladder works for W, urgent
 # move in lower left removed.
 51 gg_genmove white
-#? [P3]
+#? [P3]*
 
 loadsgf games/strategy14.sgf 33
 52 gg_genmove white
@@ -172,7 +172,7 @@ loadsgf games/strategy23.sgf
 
 loadsgf games/dragon1.sgf 206
 82 gg_genmove black
-#? [L5]
+#? [L5]*
 
 loadsgf games/heikki/heikki01.sgf 17
 # P15 is a joseki, but GNU should at least see that P14 is urgent
@@ -187,7 +187,7 @@ loadsgf games/heikki/heikki01.sgf 35
 
 loadsgf games/strategy24.sgf
 85 gg_genmove white
-#? [O2]
+#? [O2]*
 
 # A very tricky semeai problem.
 # Maybe we should move this and other semeai problems to a separate
@@ -214,7 +214,7 @@ loadsgf games/strategy25.sgf 55
 # considered. B17 (game move) is inferior.
 loadsgf games/strategy25.sgf 61
 90 gg_genmove black
-#? [B14|D17]
+#? [B14|D17]*
 
 # Connecting with ko at B14 is still best. The game move at B13 is
 # nothing but horrible. G13 would of course be superior if it killed
@@ -223,7 +223,7 @@ loadsgf games/strategy25.sgf 61
 # tm added G13 (3.1.14)
 loadsgf games/strategy25.sgf 63
 91 gg_genmove black
-#? [B14|G13]
+#? [B14|G13]*
 
 loadsgf games/strategy25.sgf 67
 92 gg_genmove black

@@ -1,5 +1,5 @@
 
-This is GNU Go 3.0, a Go program. Development versions of GNU Go may be
+This is GNU Go 3.2, a Go program. Development versions of GNU Go may be
 found at @url{http://www.gnu.org/software/gnugo/devel.html}. Contact
 us at @email{gnugo@@gnu.org} if you are interested in helping.
 
@@ -30,7 +30,8 @@ strong program can be written.
 GNU Go is getting stronger. For one thing, we've paid a lot of
 attention to life and death. GNU Go 3.0 can consistently give
 GNU Go 2.6 a four stone handicap. In a four stone game against
-GNU Go 2.6, GNU Go 3.0 very often kills a group.
+GNU Go 2.6, GNU Go 3.0 very often kills a group. GNU Go 3.2 is
+even stronger than 3.0.
 
 Until now, Go programs have always been distributed as binaries
 only. The algorithms in these proprietary programs are secret. No-one
@@ -75,6 +76,9 @@ The files @file{gtp.c} and @file{gtp.h} are copyright the Free Software
 Foundation. In the interests of promoting the Go Text Protocol these
 two files are licensed under a less restrictive license than the GPL
 and are free for unrestricted use (@pxref{GTP License}).
+
+The files @file{regression/games/golois/*sgf} are copyright Tristan
+Cazenave.
 
 The files @file{interface/html/*} are not part of GNU Go but are a separate
 program and are included in the distribution for the convenience of anyone

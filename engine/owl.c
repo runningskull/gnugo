@@ -133,6 +133,9 @@ struct matched_patterns_list_data {
   int list_size;	
   struct matched_pattern_data *pattern_list;
 };
+
+void dump_pattern_list(struct matched_patterns_list_data *list);
+
 #endif
 
 /* Persistent owl result cache to reuse owl results between moves. */
@@ -2880,8 +2883,7 @@ close_pattern_list(struct matched_patterns_list_data *list)
 }
 
 /* Can be called from gdb for debugging:
- * (gdb) print dump_pattern_list(&shape_patterns);
- * or similar.
+ * (gdb) set dump_pattern_list(&shape_patterns)
  */
 void
 dump_pattern_list(struct matched_patterns_list_data *list)
@@ -4430,7 +4432,7 @@ compute_owl_escape_values(struct local_owl_data *owl)
   for (m = 0; m < board_size; m++) {
     for (n = 0; n < board_size; n++) {
       pos = POS(m, n);
-      if (board[pos] == owl->color) {
+      if (dragon[pos].color == owl->color) {
 	if (dragon[pos].status == ALIVE)
 	  owl->escape_values[pos] = 6;
 	else if (dragon[pos].status == UNKNOWN

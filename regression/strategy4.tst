@@ -258,7 +258,7 @@ loadsgf games/bretz.sgf 164
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 212
 200 gg_genmove black
-#? [P6|P7|Q7|S18]*
+#? [P6|P7|Q7|S18]
 
 loadsgf games/juka1.sgf 8
 201 gg_genmove black
@@ -274,7 +274,7 @@ loadsgf games/juka1.sgf 18
 
 loadsgf games/juka1.sgf 28
 204 gg_genmove black
-#? [B2]
+#? [B2]*
 
 loadsgf games/juka1.sgf 48
 205 gg_genmove black
@@ -292,7 +292,7 @@ loadsgf games/strategy45.sgf
 # T6 fails badly. Locally S9 looks best.
 loadsgf games/owl30.sgf 84
 207 gg_genmove black
-#? [!T6]*
+#? [!T6]
 
 loadsgf games/lordofpi.sgf 36
 208 gg_genmove black
@@ -301,7 +301,7 @@ loadsgf games/lordofpi.sgf 36
 # A4 allows W to make seki
 loadsgf games/lordofpi.sgf 46
 209 gg_genmove black
-#? [!A4]*
+#? [!A4]
 
 loadsgf games/lordofpi.sgf 52
 210 gg_genmove black

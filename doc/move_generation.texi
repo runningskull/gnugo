@@ -7,7 +7,7 @@
 * MG Details::                  Detailed Descriptions of Move Reasons
 * Valuation:: 			Valuating the moves
 * Move Generation Functions::   Move Generation Functions
-* Local MG Functions::		Static Functions
+* Move Valuation Functions::	Move Valuation Functions
 * End Game::			Endgame move generation
 @end menu
 
@@ -90,15 +90,15 @@ order:
 @quotation
 Collect information about all connected sets of stones
 (strings) and cavities.  This information is stored in
-the @code{worm[][]} array.
+the @code{worm} array.
 @end quotation
 @item @code{make_dragons}
 @quotation
 Collect information about connected strings, which are
 called dragons.  Important information here is number
 of eyes, life status, and connectedness between
-strings. The information is stored mainly in the array
-@code{dragon[][]} but also in @code{dragon2[][]}. @end quotation
+strings. The information is stored in the arrays
+@code{dragon} but also in @code{dragon2}. @end quotation
 @end itemize
 
 @xref{Examining the Position}, for a more exact itinerary of the
@@ -114,7 +114,7 @@ information-gathering portion of the move-generation proces.
 Each move generator suggests a number of moves.  It justifies each move
 suggestion with one or move @dfn{move reasons}.  These move reasons
 are collected at each intersection where the moves are suggested for
-later valuation.  The different kinds of move reasons considered by GNU
+later valuation.  A partial list of of move reasons considered by GNU
 Go are:
 
 @table @code
@@ -169,6 +169,8 @@ a move that if played by the opponent starts a chain of ataris for the
 opponent, leading to capture, which is also a safe move for us. Preemptively
 playing such a move almost always defends the threat.
 @end table
+
+See @file{engine/move_reasons.h} for the full of move reasons.
 
 @strong{NOTE:} Some of these are reasons for @strong{not} playing a move.
 
@@ -553,11 +555,11 @@ If the largest move on the board is a ko which we cannot legally
 take, then such a move becomes attractive as a ko threat and
 the followup value or the value of the threat are taken in full.
 
-@node Move Generation Functions, Local MG Functions, Valuation, Move Generation
+@node Move Generation Functions, Move Valuation Functions, Valuation, Move Generation
 @comment  node-name,  next,  previous,  up
 @section Move Generation Functions
 
-The following functions are defined in @file{move_reasons.c}. 
+The following functions are defined in @file{move_reasons.c}.
 
 @itemize @bullet
 @item @code{void clear_move_reasons(void)}
@@ -565,339 +567,512 @@ The following functions are defined in @file{move_reasons.c}.
 @quotation
 Initialize move reason data structures.
 @end quotation
-@item @code{void add_lunch(int ai, int aj, int bi, int bj)}
+@item @code{void add_lunch(int eater, int food)}
 @findex add_lunch
 @quotation
 See if a lunch is already in the list of lunches, otherwise add a new
 entry. A lunch is in this context a pair of eater (a dragon) and food
 (a worm).
 @end quotation
-@item @code{void remove_lunch(int ai, int aj, int bi, int bj)}
+@item @code{void remove_lunch(int eater, int food)}
 @findex remove_lunch
 @quotation
-Remove a lunch from the list of lunches.
+Remove a lunch from the list of lunches.  A lunch is in this context a
+pair of eater (a dragon) and food (a worm).
 @end quotation
-@item @code{void add_defense_move(int ti, int tj, int ai, int aj)}
+@item @code{int move_reason_known(int pos, int type, int what)}
+@findex move_reason_known
+@quotation
+Check whether a move reason already is recorded for a move.
+Negative value for @code{what} means only match @code{type}.
+@end quotation
+@item @code{int attack_move_reason_known(int pos, int what)}
+@findex attack_move_reason_known
+@quotation
+Check whether an attack move reason already is recorded for a move.
+Negative value for @code{what} means only match @code{type}.
+@end quotation
+@item @code{int defense_move_reason_known(int pos, int what)}
+@findex defense_move_reason_known
+@quotation
+Check whether a defense move reason already is recorded for a move.
+Negative value for @code{what} means only match @code{type}.
+@end quotation
+@item @code{int owl_defense_move_reason_known(int pos, int what)}
+@findex owl_defense_move_reason_known
+@quotation
+Check whether an owl defense move reason already is recorded for a move.
+Negative value for @code{what} means only match @code{type}.
+@end quotation
+@item @code{void add_attack_move(int pos, int ww, int code)}
+@findex add_attack_move
+@quotation
+Add to the reasons for the move at (pos) that it attacks the worm
+at (ww).
+@end quotation
+@item @code{void add_defense_move(int pos, int ww, int code)}
 @findex add_defense_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it defends the worm
-at (ai, aj).
+Add to the reasons for the move at (pos) that it defends the worm
+at (ww).
 @end quotation
-@item @code{int defense_move_known(int ti, int tj, int ai, int aj)}
-@findex defense_move_known
+@item @code{void add_attack_threat_move(int pos, int ww, int code)}
+@findex add_attack_threat_move
 @quotation
-Query whether a defense move is already known.
-Add to the reasons for the move at (ti, tj) that it attacks the worm
-at (ai, aj).
+Add to the reasons for the move at (pos) that it threatens to
+attack the worm at (ww).
 @end quotation
-@item @code{int attack_move_known(int ti, int tj, int ai, int aj)}
-@findex attack_move_known
+@item @code{void remove_attack_threat_move(int pos, int ww)}
+@findex remove_attack_threat_move
 @quotation
-Query whether an attack move is already known.
+Remove an attack threat move reason.
 @end quotation
-@item @code{void remove_defense_move(int ti, int tj, int ai, int aj)}
-@findex remove_defense_move
+@item @code{void add_defense_threat_move(int pos, int ww, int code)}
+@findex add_defense_threat_move
 @quotation
-Remove from the reasons for the move at (ti, tj) that it defends
-the worm at (ai, aj). We do this by adding a NON_DEFEND move
-reason and wait until later to actually remove it. Otherwise it
-may be added again. We must also check that there do exist a
-defense move reason for this worm. Otherwise we may end up in an
-infinite loop when trying to actually remove it.
+Add to the reasons for the move at (pos) that it defends the worm
+at (ww).
 @end quotation
-@item @code{void remove_attack_move(int ti, int tj, int ai, int aj)}
-@findex remove_attack_move
+@item @code{int get_attack_threats(int pos, int max_strings, int strings[])}
+@findex get_attack_threats
 @quotation
-Remove from the reasons for the move at (ti, tj) that it attacks
-the worm at (ai, aj). We do this by adding a NON_ATTACK move
-reason and wait until later to actually remove it. Otherwise it may
-be added again.
+Report all, or up to max_strings, strings that are threatened 
+at (pos).
 @end quotation
-@item @code{void add_connection_move(int ti, int tj, int ai, int aj, int bi, int bj)}
+@item @code{int get_defense_threats(int pos, int max_strings, int strings[])}
+@findex get_defense_threats
+@quotation
+Report all, or up to max_strings, strings that might be defended 
+at (pos).
+@end quotation
+@item @code{int get_biggest_owl_target(int pos)}
+@findex get_biggest_owl_target
+@quotation
+Report the biggest dragon that is owl-affected (possibily with ko)
+by a move at (pos).
+@end quotation
+@item @code{void add_connection_move(int pos, int dr1, int dr2)}
 @findex add_connection_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it connects the
-dragons at (ai, aj) and (bi, bj). Require that the dragons are
+Add to the reasons for the move at (pos) that it connects the
+dragons at (dr1) and (dr2). Require that the dragons are
 distinct.
 @end quotation
-@item @code{void add_cut_move(int ti, int tj, int ai, int aj, int bi, int bj)}
+@item @code{void add_cut_move(int pos, int dr1, int dr2)}
 @findex add_cut_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it cuts the
-dragons at (ai, aj) and (bi, bj). Require that the dragons are
+Add to the reasons for the move at (pos) that it cuts the
+dragons at (dr1) and (dr2). Require that the dragons are
 distinct.
 @end quotation
-@item @code{void add_antisuji_move(int ti, int tj)}
+@item @code{void add_antisuji_move(int pos)}
 @findex add_antisuji_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it is an anti-suji.
-This means that it's a locally inferior move or for some other reason
+Add to the reasons for the move at (pos that it is an anti-suji.
+This means that it is a locally inferior move, or for some other reason,
 must @strong{not} be played.
 @end quotation
-@item @code{void add_semeai_move(int ti, int tj, int ai, int aj, int bi, int bj)}
+@item @code{void add_semeai_move(int pos, int dr)}
 @findex add_semeai_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it wins a semeai
-between my worm at (ai, aj) and your worm at (bi, bj).
+Add to the reasons for the move at (pos) that it wins the
+dragon (friendly or not) at (dr) in semeai. Since it is
+possible that in some semeai one player can kill but the
+other can only make seki, it is possible that one dragon
+is already alive in seki. Therefore separate move reasons
+must be added for the two dragons.
 @end quotation
-@item @code{void add_vital_eye_move(int ti, int tj, int ai, int aj, int color)}
+@item @code{void add_semeai_threat(int pos, int dr)}
+@findex add_semeai_threat
+@quotation
+Add to the reasons for the move at (pos) that given two
+moves in a row a move here can win the dragon (friendly or
+not) at (dr) in semeai. Such a move can be used as a 
+ko threat, and it is also given some value due to uncertainty
+in the counting of liberties.
+@end quotation
+@item @code{void add_vital_eye_move(int pos, int eyespace, int color)}
 @findex add_vital_eye_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it's the vital
-point for the eye space at (ai, aj) of color color.
+Add to the reasons for the move at (pos) that its the vital
+point for the eye space at (eyespace) of color.
 @end quotation
-@item @code{void add_attack_either_move(int ti, int tj, int ai, int aj, int bi, int bj)}
-@findex add_attack_either_move
+@item @code{void add_either_move(int pos, int reason1, int target1, int reason2, int target2)}
+@findex add_either_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it attacks either
-(ai, aj) or (bi, bj) (e.g. a double atari). This move reason is
-only used for double attacks on opponent stones.  Before accepting
-the move reason, check that the worms are distinct and that neither
-is undefendable.
+Add to the reasons for the move at (pos) that it will accomplish
+one of two things: either (reason1) on (target1) or (reason2) on 
+(target2). At this time, (reason) can only be ATTACK_STRING.
+More reasons will be implemented in the future.
 @end quotation
-@item @code{void add_defend_both_move(int ti, int tj, int ai, int aj, int bi, int bj)}
-@findex add_defend_both_move
+@item @code{void add_all_move(int pos, int reason1, int target1, int reason2, int target2)}
+@findex add_all_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it defends
-both (ai, aj) and (bi, bj) (e.g. from a double atari). This move
-reason is only used for defense of own stones.
+Add to the reasons for the move at (pos) that it will accomplish
+both of two things: (reason1) on (target1) and (reason2) on 
+(target2). At this time, (reason) can only be DEFEND_STRING.
+More reasons will be implemented in the future.
 @end quotation
-@item @code{void add_block_territory_move(int ti, int tj)}
+@item @code{void add_block_territory_move(int pos)}
 @findex add_block_territory_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it secures
+Add to the reasons for the move at (pos) that it secures
 territory by blocking.
 @end quotation
-@item @code{void add_expand_territory_move(int ti, int tj)}
+@item @code{void add_block_territory_move(int pos)}
+@findex add_block_territory_move
+@quotation
+Add to the reasons for the move at (pos) that it secures
+territory by blocking.
+@end quotation
+@item @code{void add_expand_territory_move(int pos)}
 @findex add_expand_territory_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it expands
+Add to the reasons for the move at (pos) that it expands
 territory.
 @end quotation
-@item @code{void add_expand_moyo_move(int ti, int tj)}
+@item @code{void add_expand_moyo_move(int pos) }
 @findex add_expand_moyo_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it expands
-moyo.
+Add to the reasons for the move at (pos) that it expands moyo.
 @end quotation
-@item @code{void add_shape_value(int ti, int tj, float value)}
+@item @code{void add_shape_value(int pos, float value)}
 @findex add_shape_value
 @quotation
-Increase or decrease the shape value for the move at (ti, tj).
+This function is called when a shape value for the move at (pos)
+is found. We keep track of the largest positive shape value found, and the
+total number of positive contributions, as well as the largest
+negative shape value found, and the total number of negative
+shape contributions.
 @end quotation
-@item @code{void add_strategical_attack_move(int ti, int tj, int ai, int aj)}
+@item @code{void add_worthwhile_threat_move(int pos)}
+@findex add_worthwhile_threat_move
+@quotation
+Flag that this move is worthwhile to play as a pure threat move.
+@end quotation
+@item @code{float compute_shape_factor(int pos) }
+@findex float compute_shape_factor
+@quotation
+This function computes the shape factor, which multiplies the score of
+a move. We take the largest positive contribution to shape and add 1
+for each additional positive contribution found. Then we take the
+largest negative contribution to shape, and add 1 for each additional
+negative contribution. The resulting number is raised to the power
+1.05. The rationale behind this complicated scheme is that every shape
+point is very significant. If two shape contributions with values
+(say) 5 and 3 are found, the second contribution should be devalued to
+1. Otherwise the engine is too difficult to tune since finding
+multiple contributions to shape can cause significant overvaluing of a
+move.
+@end quotation
+@item @code{void add_strategical_attack_move(int pos, int dr)}
 @findex add_strategical_attack_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it attacks
-the dragon (ai, aj) on a strategical level.
+Add to the reasons for the move at (pos) that it attacks
+the dragon (dr) on a strategical level.
 @end quotation
-@item @code{void add_strategical_defense_move(int ti, int tj, int ai, int aj)}
+@item @code{void add_strategical_defense_move(int pos, int dr)}
 @findex add_strategical_defense_move
 @quotation
-Add to the reasons for the move at (ti, tj) that it defends
-the dragon (ai, aj) on a strategical level.
+Add to the reasons for the move at (pos) that it defends
+the dragon (dr) on a strategical level.
 @end quotation
-@item @code{void add_followup_value(int ti, int tj, float value)}
+@item @code{void add_owl_attack_move(int pos, int dr, int code)}
+@findex add_owl_attack_move
+@quotation
+Add to the reasons for the move at (pos) that the owl
+code reports an attack on the dragon (dr).
+@end quotation
+@item @code{void add_owl_defense_move(int pos, int dr, int code)}
+@findex add_owl_defense_move
+@quotation
+Add to the reasons for the move at (pos) that the owl
+code reports a defense of the dragon (dr).
+@end quotation
+@item @code{void add_owl_attack_threat_move(int pos, int dr, int code)}
+@findex add_owl_attack_threat_move
+@quotation
+Add to the reasons for the move at (pos) that the owl
+code reports a move threatening to attack the dragon enemy (dr).
+That is, if the attacker is given two moves in a row, (pos)
+can be the first move.
+@end quotation
+@item @code{void add_owl_uncertain_defense_move(int pos, int dr)}
+@findex add_owl_uncertain_defense_move
+@quotation
+The owl code found the friendly dragon alive, or the unfriendly dragon
+dead, and an extra point of attack or defense was found, so this might be a
+good place to play.
+@end quotation
+@item @code{void add_owl_uncertain_attack_move(int pos, int dr)}
+@findex add_owl_uncertain_attack_move
+@quotation
+The owl code found the opponent dragon alive, or the friendly
+dragon dead, but was uncertain, and this move reason propose
+an attack or defense which is expected to fail but might succeed.
+@end quotation
+@item @code{void add_owl_defense_threat_move(int pos, int dr, int code)}
+@findex add_owl_defense_threat_move
+@quotation
+Add to the reasons for the move at (pos) that the owl
+code reports a move threatening to rescue the dragon (dr).
+That is, if the defender is given two moves in a row, (pos)
+can be the first move.
+@end quotation
+@item @code{void add_my_atari_atari_move(int pos, int size)}
+@findex add_my_atari_atari_move
+@quotation
+Add to the reasons for the move at (pos) that it captures
+at least one of a set of worms which individually are tactically
+safe (such as a double atari). Only one such move reason is
+permitted per move.
+@end quotation
+@item @code{void add_your_atari_atari_move(int pos, int size)}
+@findex add_your_atari_atari_move
+@quotation
+Add to the reasons for the move at (pos) that it stops a
+combination attack for the opponent.
+@end quotation
+@item @code{void add_owl_prevent_threat_move(int pos, int dr) }
+@findex add_owl_prevent_threat_move
+@quotation
+Add to the reasons for the move at (pos) that the owl code reports a
+move threatening to defend the dragon enemy (dr), and that (pos) is a
+move which attacks the dragon.  That is, if the defender is given two
+moves in a row, (pos) can be the first move. Hopefully playing at
+(pos) makes it harder for the dragon to live.
+@end quotation
+@item @code{void add_followup_value(int pos, float value)}
 @findex add_followup_value
 @quotation
-Add value of followup moves. 
+Add value of followup moves.
 @end quotation
-@item @code{void set_minimum_move_value(int ti, int tj, float value)}
+@item @code{void add_reverse_followup_value(int pos, float value)}
+@findex add_reverse_followup_value
+@quotation
+Add value of inverse followup moves.
+@end quotation
+@item @code{int set_minimum_move_value(int pos, float value)}
 @findex set_minimum_move_value
 @quotation
 Set a minimum allowed value for the move.
 @end quotation
-@item @code{void set_maximum_move_value(int ti, int tj, float value)}
-@findex set_maximum_move_value
-@quotation
-Set a maximum allowed value for the move.
-@end quotation
-@item @code{void set_minimum_territorial_value(int ti, int tj, float value)}
+@item @code{void set_minimum_territorial_value(int pos, float value)}
 @findex set_minimum_territorial_value
 @quotation
 Set a minimum allowed territorial value for the move.
 @end quotation
-@item @code{void set_maximum_territorial_value(int ti, int tj, float value)}
+@item @code{void set_maximum_territorial_value(int pos, float value)}
 @findex set_maximum_territorial_value
 @quotation
 Set a maximum allowed territorial value for the move.
 @end quotation
-@item @code{int review_move_reasons(int *i, int *j, float *val, int color)}
-@findex review_move_reasons
+@item @code{void add_replacement_move(int from, int to)}
+@findex add_replacement_move
 @quotation
-Review the move reasons to find which (if any) move we want to play.
+Add a point redistribution rule, sending the points from (from)
+to (to).
+@end quotation
+@item @code{void get_saved_worms(int pos, int saved[BOARDMAX])}
+@findex get_saved_worms
+@quotation
+Find worms rescued by a move at (pos).
+@end quotation
+@item @code{void get_saved_dragons(int pos, int saved[BOARDMAX])}
+@findex get_saved_dragons
+@quotation
+Find dragons rescued by a move at (pos).
+@end quotation
+@item @code{void list_move_reasons(int color)}
+@findex list_move_reasons
+@quotation
+List the move reasons for (color).
+@end quotation
+@item @code{void discard_redundant_move_reasons(int pos)}
+@findex discard_redundant_move_reasons
+@quotation
+This function checks the list of move reasons for redundant move
+reasons and marks them accordingly in their status field.
+@end quotation
+@item @code{int is_antisuji_move(int pos)}
+@findex is_antisuji_move
+@quotation
+Look through the move reasons to see whether (pos) is an antisuji move.
+@end quotation
+@item @code{int move_connects_strings(int pos, int color)}
+@findex move_connects_strings
+@quotation
+Count how many distinct strings are (solidly) connected by the move
+at (pos). Add a bonus for strings with few liberties. Also add
+bonus for opponent strings put in atari or removed.
+@end quotation
+@item @code{int move_reasons_confirm_safety(int move, int color, int minsize)}
+@findex move_reasons_confirm_safety
+@quotation
+Find saved dragons and worms, then call confirm_safety().
 @end quotation
 @end itemize
 
-@node Local MG Functions, End Game, Move Generation Functions, Move Generation
+@node Move Valuation Functions, End Game, Move Generation Functions, Move Generation
 @comment  node-name,  next,  previous,  up
-@section Local Move Generation Functions
+@section Move Valuation Functions
 
-The following functions in @file{move_reasons.c} are declared
-static. Their scope is limited to that file.
+The file @file{value_moves.c} contains the function
+@code{int review_move_reasons(int *the_move, float *val, int color,
+float pure_threat_value, float score)} which assigns values to all the
+moves.  The parameter pure_threat_value is the value assigned to a move
+which only threatens to capture or kill something. The reason for
+playing these is that the move may be effective because we have
+misevaluated the dangers or because the opponent misplays.
+
+Apart from this function, the functions in this file are declared
+static. However they are so important that we document many of them
+here.
 
 @itemize @bullet
-@item @code{static int find_worm(int ai, int aj)}
-@findex find_worm
-@quotation
-Find the index of a worm in the list of worms. If necessary,
-add a new entry. (ai, aj) must point to the origin of the worm.
-@end quotation
-@item @code{static int find_dragon(int ai, int aj)}
-@findex find_dragon
-@quotation
-Find the index of a dragon in the list of dragons. If necessary,
-add a new entry. (ai, aj) must point to the origin of the dragon.
-@end quotation
-@item @code{static int find_connection(int dragon1, int dragon2)}
-@findex find_connection
-@quotation
-Find the index of a connection in the list of connections.
-If necessary, add a new entry.
-@end quotation
-@item @code{static int find_semeai(int myworm, int yourworm)}
-@findex find_semeai
-@quotation
-Find the index of a semeai in the list of semeais.
-If necessary, add a new entry.
-@end quotation
-@item @code{static int find_worm_pair(int worm1, int worm2)}
-@findex find_worm_pair
-@quotation
-Find the index of an unordered pair of worms in the list of worm pairs.
-If necessary, add a new entry.
-@end quotation
-@item @code{static int find_eye(int i, int j, int color)}
-@findex find_eye
-@quotation
-Find the index of an eye space in the list of eye spaces.
-If necessary, add a new entry.
-@end quotation
-@item @code{static int find_reason(int type, int what)}
-@findex find_reason
-@quotation
-Find a reason in the list of reasons. If necessary, add a new entry.
-@end quotation
-@item @code{static void add_move_reason(int ti, int tj, int type, int what)}
-@findex add_move_reason
-@quotation
-Add a move reason for (ti, tj) if it's not already there or the
-table is full.
-@end quotation
-@item @code{static void remove_move_reason(int ti, int tj, int type, int what)}
-@findex remove_move_reason
-@quotation
-Remove a move reason for (ti, tj). Ignore silently if the reason
-wasn't there.
-@end quotation
-@item @code{static int move_reason_known(int ti, int tj, int type, int what)}
-@findex move_reason_known
-@quotation
-Check whether a move reason already is recorded for a move.
-@end quotation
 @item @code{static void find_more_attack_and_defense_moves(int color)}
-@findex find_more_attack_and_defense_moves
+@findex static void find_more_attack_and_defense_moves(int color)
 @quotation
-Test all moves that defends, attacks, connects or cuts to see if
-they also attack or defend some other worm.
+Test all moves which defend, attack, connect or cut to see if they
+also attack or defend some other worm.
 @end quotation
-@item @code{static void remove_opponent_attack_and_defense_moves(int color)}
-@findex remove_opponent_attack_and_defense_moves
+@item @code{static void find_more_owl_attack_and_defense_moves(int color)}
+@findex static void find_more_owl_attack_and_defense_moves(int color)
 @quotation
-Remove attacks on own stones and defense of opponent stones, i.e.
-moves which are only relevant for the opponent. It might seem
-useful to take these into account (proverb "my enemy's vital point
-is my vital point") but now it seems they only lead to trouble. 
-It's easiest just to remove them altogether.
+Test certain moves to see whether they (too) can owl attack or
+defend an owl critical dragon. Tested moves are
+@enumerate
+@item Strategical attacks or defenses for the dragon.
+@item Vital eye points for the dragon.
+@item Tactical attacks or defenses for a part of the dragon.
+@item Moves connecting the dragon to something else.
+@end enumerate
 @end quotation
-@item @code{static void do_remove_false_attack_and_defense_moves(void)}
-@findex do_remove_false_attack_and_defense_moves
-@quotation
-Remove attacks and defenses that have earlier been marked as
-NON_ATTACK or NON_DEFEND respectively, because they actually don't
-work.
-@end quotation
-@item @code{static int strategically_sound_defense(int ai, int aj, int ti, int tj)}
-@findex strategically_sound_defense
+@item @code{static int strategically_sound_defense(int aa, int tt)}
+@findex static int strategically_sound_defense(int aa, int tt)
 @quotation
 It's often bad to run away with a worm that is in a strategically
 weak position. This function gives heuristics for determining
-whether a move at (ti, tj) to defend the worm (ai, aj) is
-strategically sound. These heuristics need improvement. The
-biggest weakness is that they sometimes fail to detect when we're
-running away towards open ground. It would help much to have a
-reliable escape route mechanism.
+whether a move at (tt) to defend the worm (aa) is
+strategically sound.
 @end quotation
 @item @code{static void induce_secondary_move_reasons(int color)}
-@findex induce_secondary_move_reasons
+@findex static void induce_secondary_move_reasons(int color)
 @quotation
 Any move that captures or defends a worm also connects or cuts
 the surrounding dragons. Find these secondary move reasons.
+We also let an owl attack count as a strategical defense of our
+neighbors of the owl attacked dragon. We only do this for
+tactically safe dragons, however, because otherwise the effects of
+capturing has already been taken into account elsewhere.
+@end quotation
+@item @code{static void examine_move_safety(int color)}
+@findex static void examine_move_safety(int color)
+@quotation
+Examine the strategical and tactical safety of the moves. This is
+used to decide whether or not the stone should generate influence
+when the move is evaluated. The idea is to avoid overestimating the
+value of strategically unsafe defense moves and connections of dead
+dragons. This sets the move.move_safety field.
+@end quotation
+@item @code{static float dragon_safety(int dr, int ignore_dead_dragons)}
+@findex static float dragon_safety(int dr, int ignore_dead_dragons)
+@quotation
+An attempt to estimate the safety of a dragon. Safety values are:
 @itemize @minus
-@item There is a certain amount of optimizations that could be done here.
-@item Even when we defend a worm, it's possible that the opponent
-still can secure a connection, e.g. underneath a string with
-few liberties. Thus a defense move isn't necessarily a cut move.
-@item Connections are transitive. If a move connects A with B and B
-with C, we should infer that it connects A with C as well.
+@item DEAD
+@item ALIVE
+@item CRITICAL
+@item INESSENTIAL
+@item TACTICALLY DEAD
+@item WEAK
+@item WEAKLY ALIVE
+@item SEKI
+@item STRONGLY ALIVE
+@item INVINCIBLE
+@item INSUBSTANTIAL
 @end itemize
 @end quotation
-@item @code{static float effective_dragon_size(int ai, int aj)}
-@findex effective_dragon_size
+@item @code{static float connection_value(int dragona, int dragonb, int tt, float margin)}
+@findex static float connection_value(int dragona, int dragonb, int tt, float margin)
 @quotation
-Measure the "effective" size of a dragon. This measure is a
-reasonable approximation of how much area a dragon cover, including
-some amount of surrounding empty spaces.
+Strategical value of connecting (or cutting) the dragon at (dragona)
+to the dragon at (dragonb). Notice that this function is assymetric.
+This is because connection_value(a, b) is intended to measure the
+strategical value on the a dragon from a connection to the b dragon.
+The parameter 'margin' is the margin by which we are ahead.
+If this exceeds 20 points we use the cautious impact values
+which value connections more.  This is because we can afford
+to waste a move making sure of safety. If the margin is between
+0 and 20 points we interpret linearly between the two sets of
+impact values. (See @file{value_moves.c} for more information.)
 @end quotation
-@item @code{static float dragon_safety(int ai, int aj, int ignore_dead_dragons)}
-@findex dragon_safety
+@item @code{static float adjusted_worm_attack_value(int pos, int ww)}
+@findex static float adjusted_worm_attack_value(int pos, int ww)
 @quotation
-An attempt to estimate the safety of a dragon. This should be
-possible to improve considerably. The resulting value is
-interpreted so that 1.0 means a fully safe dragon while 0.0 is an
-almost dead dragon.
+Usually the value of attacking a worm is twice its effective size,
+but when evaluating certain move reasons we need to adjust this to
+take effects on neighbors into account, e.g. for an attack_either
+move reason. This does not apply to the attack and defense move
+reasons, however, because then the neighbors already have separate
+attack or defense move reasons (if such apply).
+If the worm has an adjacent (friendly) dead dragon we add its
+value. At least one of the surrounding dragons must be alive. 
+If not, the worm must produce an eye of sufficient size, and that 
+should't be accounted for here.  As a guess, we suppose that
+a critical dragon is alive for our purpose here.
+On the other hand if it has an adjacent critical worm, and
+if (pos) does not defend that worm, we subtract the value of the
+worm, since (pos) may be defended by attacking that worm. We make at
+most one adjustment of each type.
 @end quotation
-@item @code{static float connection_value2(int ai, int aj, int bi, int bj, int ti, int tj)}
-@findex connection_value2
+@item @code{static void estimate_territorial_value(int pos, int color, float score)}
+@findex static void estimate_territorial_value(int pos, int color, float score)
 @quotation
-Strategical value of connecting (or cutting) the dragon at (ai, aj)
-to the dragon at (bi, bj). This function is assymetric.
+Estimate the direct territorial value of a move at (pos).
 @end quotation
-@item @code{static void estimate_territorial_value(int m, int n, int color)}
-@findex estimate_territorial_value
+@item @code{static void estimate_strategical_value(int pos, int color, float score)}
+@findex static void estimate_strategical_value(int pos, int color, float score)
 @quotation
-Estimate the direct territorial value of a move at (m,n).
+Estimate the strategical value of a move at (pos).
 @end quotation
-@item @code{static void estimate_influence_value(int m, int n, int color)}
-@findex estimate_influence_value
+@item @code{static int compare_move_reasons(const void *p1, const void *p2)}
+@findex static int compare_move_reasons(const void *p1, const void *p2)
 @quotation
-Estimate the influence value of a move at (m,n).
+Compare two move reasons, used for sorting before presentation. */
 @end quotation
-@item @code{static void estimate_strategical_value(int m, int n, int color)}
-@findex estimate_strategical_value
+@item @code{static float value_move_reasons(int pos, int color, float pure_threat_value, float score)}
+@findex static float value_move_reasons(int pos, int color, float pure_threat_value, float score)
 @quotation
-Estimate the strategical value of a move at (m,n).
+Combine the reasons for a move at (pos) into a simple numerical value.
 @end quotation
-@item @code{static int is_antisuji_move(int m, int n)}
-@findex is_antisuji_move
-@quotation
-Look through the move reasons to see whether (m, n) is an antisuji move.
-@end quotation
-@item @code{static float value_move_reasons(int m, int n, int color)}
-@findex value_move_reasons
-@quotation
-Combine the reasons for a move at (m, n) into an old style value.
-These heuristics are now somewhat less ad hoc but probably still
-need a lot of improvement.
-@end quotation
-@item @code{static void value_moves(int color)}
-@findex value_moves
+@item @code{static void value_moves(int color, float pure_threat_value, float score)}
+@findex static void value_moves(int color, float pure_threat_value, float score)
 @quotation
 Loop over all possible moves and value the move reasons for each.
 @end quotation
+@item @code{static void print_top_moves(void)}
+@findex static void print_top_moves(void)
+@quotation
+Search through all board positions for the 10 highest valued
+moves and print them.
+@end quotation
+@item @code{static void reevaluate_ko_threats(int ko_move, int color)}
+@findex static void reevaluate_ko_threats(int ko_move, int color)
+@quotation
+This function is called if the biggest move on board was an illegal
+ko capture.
+@end quotation
+@item @code{static void redistribute_points(void)}
+@findex static void redistribute_points(void)
+@quotation
+Redistribute points. When one move is declared a replacement for
+another by a replacement move reason, the move values for the
+inferior move are transferred to the replacement.
+@end quotation
 @end itemize
 
-@node End Game,  , Local MG Functions, Move Generation
+@node End Game,  , Move Valuation Functions, Move Generation
 @comment  node-name,  next,  previous,  up
 @section End Game
 

@@ -39,7 +39,7 @@ loadsgf games/strategy27.sgf 190
 
 loadsgf games/strategy27.sgf 208
 108 gg_genmove white
-#? [C15]*
+#? [C15]
 
 #CATEGORY=SEMEAI
 #DESCRIPTION=

@@ -11,7 +11,7 @@ loadsgf games/viking1.sgf 23
 
 loadsgf games/viking1.sgf 65
 3 gg_genmove white 
-#? [M15|B7]
+#? [M15|B7]*
 
 loadsgf games/viking1.sgf 135
 4 gg_genmove white 
@@ -28,7 +28,7 @@ loadsgf games/viking1.sgf 189
 # Locally S5 is the only move.
 loadsgf games/viking3.sgf 79
 7 gg_genmove white
-#? [!T7]*
+#? [!T7]
 
 # A1 is of course inferior to B3
 loadsgf games/viking3.sgf 93
@@ -38,7 +38,7 @@ loadsgf games/viking3.sgf 93
 # The position cries out for a move at J13.
 loadsgf games/viking3.sgf 103
 9 gg_genmove white
-#? [J13]*
+#? [J13]
 
 # K15 leaves too many cutting points.
 loadsgf games/viking3.sgf 113

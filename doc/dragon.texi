@@ -68,38 +68,36 @@ assumptions which can be refined in later implementations.
 @section Worms
 @cindex worm
 
-The array @code{struct worm_data worm[MAX_BOARD][MAX_BOARD]} collects information about the
-worms. We will give definitions of the various fields. Each field has
+The array @code{struct worm_data worm[MAX_BOARD]} collects information about
+the worms. We will give definitions of the various fields. Each field has
 constant value at each vertex of the worm. We will define each field.
 
 @example
 
 struct worm_data @{
-  int color;       
-  int size;        
+  int color;
+  int size;
   float effective_size;
-  int origini;     
-  int originj;     
-  int liberties;   
-  int liberties2;  
-  int liberties3;  
-  int liberties4;  
-  int attacki;     
-  int attackj;     
-  int attack_code;
-  int defendi;
-  int defendj;
-  int defend_code;
-  int lunchi;
-  int lunchj;
+  int origin;
+  int liberties;
+  int liberties2;
+  int liberties3;
+  int liberties4;
+  int lunch;
   int cutstone;
   int cutstone2;
   int genus;
-  int value;
-  int ko;     
-  int inessential; 
+  int inessential;
   int invincible;
   int unconditional_status;
+  int attack_points[MAX_TACTICAL_POINTS];
+  int attack_codes[MAX_TACTICAL_POINTS];
+  int defense_points[MAX_TACTICAL_POINTS];
+  int defend_codes[MAX_TACTICAL_POINTS];
+  int attack_threat_points[MAX_TACTICAL_POINTS];
+  int attack_threat_codes[MAX_TACTICAL_POINTS]; 
+  int defense_threat_points[MAX_TACTICAL_POINTS];
+  int defense_threat_codes[MAX_TACTICAL_POINTS];
 @};
 @end example
 
@@ -134,20 +132,22 @@ fractional values for each worm. This measures the direct territorial
 value of capturing a worm. @dfn{effective_size} is a floating point number.
 Only intersections at a distance of 4 or less are counted.
 @end quotation
-@item @code{(origini, originj)}
+@item @code{origin}
 @quotation
 @cindex origin (worm)
-Each worm has a distinguished member, called its @dfn{origin}. Its
-coordinates are @code{(origini, originj)}. The purpose of this field is to
-make it easy to determine when two vertices lie in the same worm: we compare
-their origin. Also if we wish to perform some test once for each worm, we
-simply perform it at the origin and ignore the other vertices. The origin is
-characterized by the test:
+Each worm has a distinguished member, called its @dfn{origin}.
+The purpose of this field is to make it easy to determine when two vertices
+lie in the same worm: we compare their origin. Also if we wish to perform some
+test once for each worm, we simply perform it at the origin and ignore the
+other vertices. The origin is characterized by the test:
 @example
-(worm[m][n].origini == m) && (worm[m][n].originj == n).
+worm[pos].origin == pos.
 @end example
 @end quotation
 @item @code{liberties}
+@item @code{liberties2}
+@item @code{liberties3}
+@item @code{liberties4}
 @quotation
 @cindex liberties (worm)
 @cindex liberties, higher order (worm)
@@ -193,26 +193,10 @@ left by the two X stones in the following situation:
 @cindex distance from liberty to dragon
 We say that n is the @dfn{distance} of the liberty of order n from the dragon.
 @end quotation
-@item @code{(attacki, attackj)}:
-@quotation
-@cindex attack point (worm)
-If it is determined that the string may be easily captured, @code{(attacki,
-attackj)} points to an attacking move. This is only used for strings with <5
-liberties. If no attacking move is found, then @code{attack_code == 0}.
-@end quotation
-@item @code{attack_code}
-@quotation
-@cindex attack code (worm)
-1 if the worm can be captured unconditionally, 2 or 3 if it can be
-captured with ko. If it can be captured provided the attacker is willing
-to ignore any ko threat, then the @code{attack_code == 2}. If it can be
-captured provided the attacker can come up with a sufficiently
-large ko threat, then the @code{attack_code == 3}.
-@end quotation
 @item @code{lunch}
 @quotation
 @cindex lunch (worm)
-If @code{lunchi != -1} then @code{(lunchi, lunchj)} points to a boundary worm
+If @code{lunchi != 0} then @code{lunch} points to a boundary worm
 which can be easily captured.  (It does not matter whether or not the string
 can be defended.)
 @end quotation
@@ -223,16 +207,6 @@ If there is an attack on the string (stored in the @code{attack}
 field defined above), and there is a move which defends the
 string, this move is stored in @code{(defendi, defendj)}.  Otherwise
 @code{defend_code == 0}.
-@end quotation
-@item @code{defend_code}
-@quotation
-@cindex defense code (worm)
-1 if the worm can be defended unconditionally, 2 or 3 if it can be
-defended with ko. If it can be defended provided the defender is willing
-to ignore any ko threat, then the @code{defend_code == 2}. If it can be
-captured provided the defender can come up with a sufficiently
-large ko threat, then the @code{defend_code == 3}. If there is no
-attack, @code{defend_code} is 0.
 @end quotation
 @end itemize
 
@@ -284,16 +258,18 @@ share a liberty. For example, X in:
 
 @end example
 
-For cutting strings we set @code{worm[m][n].cutstone=2}. For
-potential cutting strings we set @code{worm[m][n].cutstone=1}.
+For cutting strings we set @code{worm[].cutstone=2}. For
+potential cutting strings we set @code{worm[].cutstone=1}.
 @end quotation
 @item @code{cutstone2}: 
 @quotation
 Cutting points are identified by the patterns in the connections
 database. Proper cuts are handled by the fact that attacking and
 defending moves also count as moves cutting or connecting the
-surrounding dragons.  The cutstone2 field is set during find_cuts(),
-called from make_domains().
+surrounding dragons.  The @code{cutstone2} field is set during 
+@code{find_cuts()}, called from @code{make_domains()}.
+@findex find_cuts
+@findex make_domains
 
 The @code{cutstone2} field is needed to deal with the fact that e.g. in the
 position
@@ -321,8 +297,8 @@ old concept for correct handling of lunches.
 @cindex genus (worm)
 There are two separate notions of @dfn{genus} for worms and
 dragons. The dragon notion is more important, so
-@code{dragon[m][n].genus} is a far more useful field than
-@code{worm[m][n].genus}. Both fields are intended as approximations
+@code{dragon[pos].genus} is a far more useful field than
+@code{worm[pos].genus}. Both fields are intended as approximations
 to the number of eyes. The @dfn{genus} of a string is the number
 of connected components of its complement, minus one. It is
 an approximation to the number of eyes of the string.
@@ -367,7 +343,7 @@ support of S together with certain other empty worms
 which we call the @dfn{boundary components} of S.
 
 The inessential strings are used in the amalgamation of
-cavities in @code{make_dragon()}.
+cavities in @code{make_dragons()}.
 @end quotation
 @findex unconditional_life
 @item @code{invincible}: 
@@ -406,6 +382,35 @@ avoid this problem by making the algorithm slightly more complex, but
 this is left for a later revision.
 
 @end quotation
+@item @code{attack_points[MAX_TACTICAL_POINTS]}
+@quotation
+Tracks up to @code{MAX_TACTICAL_POINTS} attack points for
+the worm. Often only the first, @code{attack_points[0]} is
+significant.
+@end quotation
+@item @code{attack_codes[MAX_TACTICAL_POINTS]}
+@quotation
+This can be 0, @code{WIN}, @code{KO_A} or @code{KO_B}. It
+is the outcome of an attack at the corresponding attack point.
+@end quotation
+@item @code{defense_points[MAX_TACTICAL_POINTS]}
+@quotation
+Tracks up to @code{MAX_TACTICAL_POINTS} defense points for
+the worm. Often only the first, @code{defense_points[0]} is
+significant.
+@end quotation
+@item @code{defend_codes[MAX_TACTICAL_POINTS]}
+@quotation
+This can be 0, @code{WIN}, @code{KO_A} or @code{KO_B}. It
+is the outcome of a defense at the corresponding defense point.
+@end quotation
+@item @code{int attack_threat_codes[MAX_TACTICAL_POINTS]}
+@item @code{int attack_threat_codes[MAX_TACTICAL_POINTS]; }
+@item @code{int defense_threat_points[MAX_TACTICAL_POINTS];}
+@item @code{int defense_threat_codes[MAX_TACTICAL_POINTS];}
+@quotation
+These are points with threaten to attack or defend the worm.
+@end quotation
 @end itemize
 
 The function @code{makeworms()} will generate data for all worms. For
@@ -427,8 +432,8 @@ strings if they have been amalgamated into a single dragon.
 The function @code{make_dragons()} will amalgamate worms into dragons by
 maintaining separate arrays @code{worm[]} and @code{dragon[]} containing
 similar data. Each dragon is a union of worms. Just as the data maintained in
-@code{worm[][]} is constant on each worm, the data in
-@code{dragon[][]} is constant on each dragon.
+@code{worm[]} is constant on each worm, the data in
+@code{dragon[]} is constant on each dragon.
 
 @dfn{Amalgamation} of two worms means means in practice replacing the origin
 of one worm by the origin of the other.  Amalgamation takes place in
@@ -651,7 +656,7 @@ information. The field @code{type} is 0, or else @code{HALF_EYE} or
 @example
 @group
 
-struct half_eye_data half_eye[MAX_BOARD][MAX_BOARD];
+struct half_eye_data half_eye[MAX_BOARD];
 
 struct half_eye_data @{
   int type;         /* HALF_EYE or FALSE_EYE; */
@@ -666,7 +671,7 @@ struct half_eye_data @{
 @end group
 @end example
 
-The array @code{struct half_eye_data half_eye[MAX_BOARD][MAX_BOARD]} 
+The array @code{struct half_eye_data half_eye[MAX_BOARD]} 
 contains information about half and false eyes.  If the type is
 @code{HALF_EYE} then up to four moves are recorded which can
 either attack or defend the eye. In rare cases the attack points
@@ -677,7 +682,7 @@ could be different from the defense points.
 @section Dragons
 @cindex dragons
 
-The array @code{struct dragon_data dragon[MAX_BOARD][MAX_BOARD]}
+The array @code{struct dragon_data dragon[MAX_BOARD]}
 collects information about the dragons. We will give definitions of the
 various fields. Each field has constant value at each vertex of the
 dragon.
@@ -926,75 +931,150 @@ The colored displays are documented elsewhere (@pxref{Colored Display}).
 Here are the public functions in @file{engine/worm.c}:
 
 @itemize @bullet
-@item @code{void make_worms(void)}
-@findex make_worms
+@item @code{void make_worms(int save_verbose)}
+@findex void make_worms(int save_verbose)
 @quotation
-Each worm is marked with an origin, having coordinates @code{(origini,
-originj)}. This is an arbitrarily chosen element of the worm, in
-practice the algorithm puts the origin at the first element when they
-are given the lexicographical order, though its location is irrelevant
-for applications. To see if two stones lie in the same worm, compare
-their origins.
+This function finds all worms and assembles some data about them.
+Each worm is marked with an origin.  This is an arbitrarily chosen
+element of the worm, in practice the algorithm puts the origin at
+the first element when they are given the lexicographical order,
+though its location is irrelevant for applications. To see if two
+stones lie in the same worm, compare their origins.
 @end quotation
-@item @code{void propagate_worm(int m, int n)}
-@findex propagate_worm
+@item @code{int is_same_worm(int w1, int w2) }
+@findex int is_same_worm(int w1, int w2) 
 @quotation
-@code{propagate_worm()} takes the worm data at one stone and copies it to 
-the remaining members of the worm. 
+Test whether two worms are the same. Used by autohelpers.
+Before this function can be called, build_worms must have been run.
+@end quotation 
+@item @code{int is_worm_origin(int w, int pos)}
+@findex int is_worm_origin(int w, int pos)
+@quotation
+Test whether the origin of the worm at (w) is (pos).
 @end quotation
-@item @code{int examine_cavity(int m, int n, int *edge, int *size, int *vertexi, int *vertexj)}
-@findex examine_cavity
+@item @code{void change_defense(int str, int move, int dcode)}
+@findex void change_defense(int str, int move, int dcode)
 @quotation
-If @code{(m, n)} is EMPTY, this function examines the cavity at
-@code{(m, n)}, determines its size and returns its bordercolor,
-which can be @code{BLACK_BORDER}, @code{WHITE_BORDER} or
-@code{GRAY_BORDER}. The edge parameter is set to the number of
-edge vertices in the cavity. @code{(vertexi[], vertexj[])} hold the
-vertices of the cavity. @code{vertexi[]} and @code{vertexj[]} should be
-dimensioned to be able to hold the whole board.
-
-If @code{(m, n)} is nonempty, it returns the same result, imagining that
-the string at @code{(m, n)} is removed. The edge parameter is set to the
-number of vertices where the cavity meets the edge in a point outside
-the removed string.
+@code{change_defense(str, move, dcode)} is used to add and remove defense
+points. It can also be used to change the defense code. The meaning
+of the call is that the string (str) can be defended by (move) with
+defense code (dcode). If (dcode) is zero, the move is removed from
+the list of defense moves if it was previously listed.
+@end quotation
+@item @code{void change_attack(int str, int move, int acode)}
+@findex void change_attack(int str, int move, int acode)
+@quotation
+@code{change_attack(str, move, acode)} is used to add and remove attack
+points. It can also be used to change the attack code. The meaning
+of the call is that the string (str) can be attacked by (move) with
+attack code (acode). If (acode) is zero, the move is removed from
+the list of attack moves if it was previously listed.
+@end quotation
+@item @code{void change_defense_threat(int str, int move, int dcode)}
+@findex void change_defense_threat(int str, int move, int dcode)
+@quotation
+Used to add and remove defense threat points. It can also be used to
+change the defense threat code. The meaning of the call is that the
+string (str) can threaten to be defended by (move) with defense threat
+code (dcode). If (dcode) is zero, the move is removed from the list
+of defense threat moves if it was previously listed.
+@end quotation  
+@item @code{void change_attack_threat(int str, int move, int acode)}
+@findex void change_attack_threat(int str, int move, int acode)
+@quotation
+Used to add and remove attack threat points. It can also be used to
+change the attack threat code. The meaning of the call is that the
+string (str) can threaten to be attacked by (move) with attack threat
+code (acode). If (acode) is zero, the move is removed from the list
+of attack threat moves if it was previously listed.
+@end quotation
+@item @code{int attack_move_known(int move, int str)}
+@findex int attack_move_known(int move, int str)
+@quotation
+Check whether (move) is listed as an attack point for (str) and
+return the attack code. If (move) is not listed, return 0.
+@end quotation
+@item @code{int defense_move_known(int move, int str)}
+@findex int defense_move_known(int move, int str)
+@quotation
+Check whether (move) is listed as a defense point for (str) and
+return the defense code. If (move) is not listed, return 0.
+@end quotation
+@item @code{int attack_threat_move_known(int move, int str)}
+@findex int attack_threat_move_known(int move, int str)
+@quotation
+Check whether (move) is listed as an attack threat point for (str)
+and return the attack threat code. If (move) is not listed, return  * 0.
+@end quotation
+@item @code{int defense_threat_move_known(int move, int str)}
+@findex int defense_threat_move_known(int move, int str)
+@quotation
+Check whether (move) is listed as a defense threat point for (str)
+and return the defense threat code. If (move) is not listed, return 0.
+@end quotation
+@item @code{void propagate_worm(int pos)}
+@findex void propagate_worm(int pos)
+@quotation
+propagate_worm() takes the worm data at one stone and copies it to 
+the remaining members of the worm.
 @end quotation
 @end itemize
 
 Here are the public functions in @file{engine/dragon.c}:
 
 @itemize @bullet
-@item @code{void make_dragons()}
+@item @code{void make_dragons(int color, int stop_before_owl, int save_verbose)}
 @findex make_dragons
 @quotation
 This basic function finds all dragons and collects some basic information
-about them in the dragon array. 
+about them in the dragon array. @code{color} is the player in turn to
+move. This does in no way affect the information collected about the dragons,
+but it does affect what information is passed on to the move generation
+code. If @code{color == EMPTY} no information at all is passed on to the move
+generation.
 @end quotation
 @item @code{void show_dragons(void)}
 @findex show_dragons
 @quotation
-Print status info on all dragons. (Can be invoked from gdb) 
+print status info on all dragons. (Can be invoked from gdb) 
 @end quotation
-@item @code{void join_dragons(int ai, int aj, int bi, int bj)}
+@item @code{void join_dragons(int d1, int d2)}
 @findex join_dragons
 @quotation
-Amalgamates the dragon at @code{(ai, aj)} to the dragon at @code{(bi,
-bj)}.
+Amalgamates the dragon at (d1) to the dragon at (d2).
 @end quotation
-@item @code{static int compute_dragon_status(int i, int j)}
-@findex compute_dragon_status
+@item @code{int dragon_escape(char goal[BOARDMAX], int color, int escape_value[BOARDMAX])}
+@findex dragon_escape
 @quotation
-Tries to determine whether the dragon at @code{(i, j)} is @code{ALIVE},
-@code{DEAD}, or @code{UNKNOWN}. The algorithm is not perfect and can
-give incorrect answers. The dragon is judged alive if its genus is >1.
-It is judged dead if the genus is <2, it has no escape route, and no
-adjoining string can be easily captured. Otherwise it is judged
-@code{UNKNOWN}.
+Computes the dragon escape measure (@pxref{Escape}). The marked
+dragon is in the @code{goal} array.
 @end quotation
-@item @code{void compute_escape_potential(void)}
-@findex compute_escape_potential
+@item @code{int is_same_dragon(int d1, int d2)}
+@findex int is_same_dragon(int d1, int d2)
 @quotation
-Compute the escape potential for the @code{escape2} field
-(@pxref{Dragons}).
+Test whether two dragons are the same. Used by autohelpers and elsewhere.
+@end quotation
+@item @code{int are_neighbor_dragons(int d1, int d2)}
+@findex int are_neighbor_dragons(int d1, int d2)
+@quotation
+Test whether two dragons are neighbors.
+@end quotation
+@item @code{void ascii_report_dragon(char *string)}
+@findex void ascii_report_dragon(char *string)
+@quotation
+For use in gdb, print details of the dragon named by @code{*string}.
+Add this to your @file{.gdbinit} file:
+@example
+define dragon
+set ascii_report_dragon("$arg0")
+end
+@end example
+Now 'dragon S8' will report the details of the S8 dragon.
+@end quotation
+@item @code{void report_dragon(int m, int n)}
+@findex void report_dragon(int m, int n)
+@quotation
+Prints details of the dragon at @code{(m,n)}
 @end quotation
 @end itemize
 
@@ -1002,11 +1082,11 @@ Compute the escape potential for the @code{escape2} field
 @section The Second Dragon Array.
 @cindex dragon2 array
 
-In addition to @code{dragon[][]} there is a second complementary dragon
-data array @code{dragon2[]}. In contrast to @code{dragon[][]}, the
+In addition to @code{dragon[]} there is a second complementary dragon
+data array @code{dragon2[]}. In contrast to @code{dragon[]}, the
 information in this one is not duplicated to every intersection of the
 board. Instead the dragons are numbered, using the new field id in
-@code{dragon[][]}, and this number is used as index into the
+@code{dragon[]}, and this number is used as index into the
 @code{dragon2[]} array. This number can of course not be assigned until
 all dragon amalgamations have been finished. Neither is the
 @code{dragon2[]} array initialized until this has been done.
@@ -1019,7 +1099,7 @@ list of neighbors should be useful for other purposes too.
 For the algorithm we refer to the source code and its comments, in the
 function @code{compute_supplementary_dragon_data()} in @file{dragon.c}.
 
-To access the @code{dragon[][]} array given a dragon id number or the
+To access the @code{dragon[]} array given a dragon id number or the
 @code{dragon2[]} array given a board coordinate, there are the two handy
 macros @code{DRAGON(d)} and @code{DRAGON2(m, n)}. Also notice that the
 @code{dragon2[]} data and the id number only are valid for non-empty

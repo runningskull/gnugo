@@ -222,7 +222,7 @@ performed by @code{examine_position}, which in turn calls:
 @quotation
 Collect information about all connected sets of stones
 (strings) and cavities.  This information is stored in
-the @code{worm[][]} array. (@pxref{Worms})
+the @code{worm[]} array. (@pxref{Worms})
 @end quotation
 @item @code{compute_initial_influence()}
 @findex compute_initial_influence
@@ -246,7 +246,7 @@ string. (@pxref{Dragons}.)
 
 A more detailed
 
-@subsection Move generation in GNU Go 3.0
+@subsection Move generation in GNU Go 3.2
 @cindex move generation
 @cindex move generators
 @cindex move reasons
@@ -258,7 +258,7 @@ do not set the values of the moves, but enumerate justifications for
 them, called @dfn{move reasons}. The valuation of the moves comes
 last, after all moves and their reasons have been generated.
 
-The move generators in version 3.0 are:
+The move generators in version 3.2 are:
 
 @itemize @bullet
 
@@ -927,19 +927,19 @@ in comments to denote known bugs, etc.
 
 If you are using Emacs, you may find it fast and convenient to use
 Emacs' built-in facility for navigating the source. Switch to the
-root directory @file{gnugo-3.0.x/} and execute the command:
+root directory @file{gnugo-3.2.x/} and execute the command:
 
 @example
 find . -print|grep "\.[ch]$"|xargs etags
 @end example
 
-This will build a file called @file{gnugo-3.0.x/TAGS}. Now to
+This will build a file called @file{gnugo-3.2.x/TAGS}. Now to
 find any GNU Go function, type @command{M-.} and enter the
 command which you wish to find, or just @command{RET} if 
 the cursor is at the name of the function sought. 
 
 The first time you do this you will be prompted for the location
-of the TAGS table.  Enter the path to @file{gnugo-3.0.x/TAGS}, and
+of the TAGS table.  Enter the path to @file{gnugo-3.2.x/TAGS}, and
 henceforth you will be able to find any function with a minimum
 of keystrokes. 
 

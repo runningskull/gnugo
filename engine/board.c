@@ -1707,8 +1707,8 @@ findstones(int str, int maxstones, int *stones)
 }
 
 
-/* chainlinks returns (in adj array) the chains surrounding
- * the string at str. The number of chains is returned.
+/* chainlinks returns (in the (adj) array) the chains surrounding
+ * the string at (str). The number of chains is returned.
  */
 
 int 

@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.26 released February 24, 2002
+
+- experimental influence, experimental and alternate connections are default
 - caching code revised to once more work with TRACE_READ_RESULT enabled
 - added EXPERIMENTAL_READING to config.vc(in)
 - updated makevcdist.pl
@@ -13,6 +16,7 @@
 - spelling fixes
 - verbosity revisions with alternate connections in readconnect.c
 - bugfix in close_bubbles()
+- bugfix in compute_owl_escape_values()
 - revised "stepped on a bug" message
 - bugfix in update_status in semeai.c
 - bugfix in estimate_time_by_move
@@ -20,6 +24,7 @@
 - revised nonvariadic versions of TRACE and allies
 - increased MAXSTACK to MAX_BOARD*MAX_BOARD again
 - experimental influence taken down for initial influence when dragons unknown
+- doc revision
 
 3.1.25 released February 14, 2002
 

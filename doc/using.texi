@@ -204,7 +204,7 @@ any Go program can be done entirely through CGoban. The programmer can
 concentrate on the real issues without worrying about drawing stones,
 resizing the board and other distracting issues.
 
-GNU Go 3.0 introduces a new protocol, the Go Text Protocol
+GNU Go 3.0 introduced a new protocol, the Go Text Protocol
 (@pxref{GTP}) which we hope can serve the functions currently 
 used by the GMP.
 

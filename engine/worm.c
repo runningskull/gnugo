@@ -54,7 +54,7 @@ static void attack_callback(int m, int n, int color,
 static void find_defense_patterns(void);
 static void defense_callback(int m, int n, int color,
 			     struct pattern *pattern, int ll, void *data);
-
+static void build_worms(void);
 
 /* A STRING is a maximal connected set of stones of the same color, 
  * black or white. A WORM is the same thing as a string, except that
@@ -600,7 +600,7 @@ make_worms(int save_verbose)
  * This is a substep of make_worms().
  */
 
-void
+static void
 build_worms()
 {
   int m, n;
@@ -1117,7 +1117,7 @@ is_same_worm(int w1, int w2)
 
 
 /*
- * Test whether the origin of the worm at (wi, wj) is (i, j).
+ * Test whether the origin of the worm at (w) is (pos).
  */
 
 int

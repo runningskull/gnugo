@@ -99,7 +99,7 @@ loadsgf games/FSF-neurogo.sgf 12
 19 owl_attack Q17
 #? [1 S16]
 20 owl_defend Q17
-#? [1 S16]
+#? [1 S16]*
 21 gg_genmove white
 #? [S16]
 

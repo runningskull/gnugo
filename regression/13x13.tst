@@ -99,7 +99,7 @@ loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 24
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gointellect-gnugo3.B+1.sgf 32
 17 gg_genmove white
-#? [L5|L3]
+#? [L5|L3]*
 
 #CATEGORY=OWL_TUNING
 # This got broke between 3.0.0 and 3.1.14.
@@ -169,7 +169,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 64
 # A nice tesuji by GNU Go worth remembering!
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 74
 33 gg_genmove white
-#? [E7]*
+#? [E7]
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 82
@@ -193,12 +193,12 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 12
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 38 gg_genmove white
-#? [G11]
+#? [G11]*
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 44
 39 gg_genmove white
-#? [H4|J4]
+#? [H4|J4]*
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
@@ -207,7 +207,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 41 gg_genmove white
-#? [!C8]
+#? [!C8]*
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
@@ -219,7 +219,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126
 # the gap at D7 (by playing D6) should often be bad.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 25
 43 gg_genmove black
-#? [D6]
+#? [D6]*
 
 #CATEGORY=ENDGAME_TUNING
 # To get better evaluation for B6 one would need to
@@ -404,7 +404,7 @@ loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 13
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 17
 76 gg_genmove black
-#? [K6|L6|J3]
+#? [K6|L6|J3]*
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 19
@@ -445,7 +445,7 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 25
 
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 29
 85 gg_genmove black
-#? [D2]
+#? [D2]*
 
 #CATEGORY=OWL_TUNING
 # New failure (comparing 3.1.15 with 3.0.0)
@@ -463,7 +463,7 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 65
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 69
 88 gg_genmove black 3
-#? [!A9]*
+#? [!A9]
 
 #CATEGORY=OWL_TUNING
 # New failure (comparing 3.1.15 with 3.0.0)

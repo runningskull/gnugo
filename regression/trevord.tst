@@ -14,7 +14,7 @@ loadsgf games/trevor/auto/d01.sgf 28
 
 loadsgf games/trevor/auto/d01.sgf 36
 120 gg_genmove white
-#? [B9]
+#? [B9]*
 
 
 loadsgf games/trevor/auto/d01.sgf 46
@@ -77,13 +77,13 @@ loadsgf games/trevor/auto/d02.sgf 64
 #Other moves possible.  !F2
 loadsgf games/trevor/auto/d02.sgf 68
 230 gg_genmove white
-#? [G6]*
+#? [G6]
 
 
 #Must reduce the moyo.
 loadsgf games/trevor/auto/d02.sgf 72
 240 gg_genmove white
-#? [!T17]*
+#? [!T17]
 
 
 #Other moves also possible.
@@ -266,7 +266,7 @@ loadsgf games/trevor/auto/d24.sgf 66
 
 loadsgf games/trevor/auto/d24.sgf 80
 550 gg_genmove white
-#? [T8]
+#? [T8]*
 
 
 loadsgf games/trevor/auto/d24.sgf 98
@@ -426,7 +426,7 @@ loadsgf games/trevor/auto/d33.sgf 40
 
 loadsgf games/trevor/auto/d33.sgf 62
 830 gg_genmove white
-#? [!G6|E6]*
+#? [!G6|E6]
 
 
 loadsgf games/trevor/auto/d33.sgf 186

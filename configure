@@ -1272,7 +1272,7 @@ fi
 
 # Define the identity of the package.
 PACKAGE=gnugo
-VERSION=3.1.25
+VERSION=3.1.26
 
 cat >>confdefs.h <<EOF
 #define PACKAGE "$PACKAGE"
@@ -4702,26 +4702,26 @@ EOF
 
 fi
 
-if test "$enable_experimental_connections" = "yes" ; then
-   cat >>confdefs.h <<\EOF
-#define EXPERIMENTAL_CONNECTIONS 1
-EOF
-
-else
+if test "$enable_experimental_connections" = "no" ; then
    cat >>confdefs.h <<\EOF
 #define EXPERIMENTAL_CONNECTIONS 0
 EOF
 
+else
+   cat >>confdefs.h <<\EOF
+#define EXPERIMENTAL_CONNECTIONS 1
+EOF
+
 fi
 
-if test "$enable_alternate_connections" = "yes" ; then
+if test "$enable_alternate_connections" = "no" ; then
    cat >>confdefs.h <<\EOF
-#define ALTERNATE_CONNECTIONS 1
+#define ALTERNATE_CONNECTIONS 0
 EOF
 
 else
    cat >>confdefs.h <<\EOF
-#define ALTERNATE_CONNECTIONS 0
+#define ALTERNATE_CONNECTIONS 1
 EOF
 
 fi
@@ -4738,14 +4738,14 @@ EOF
 
 fi
 
-if test "$enable_experimental_influence" = "yes" ; then
+if test "$enable_experimental_influence" = "no" ; then
    cat >>confdefs.h <<\EOF
-#define EXPERIMENTAL_INFLUENCE 1
+#define EXPERIMENTAL_INFLUENCE 0
 EOF
 
 else
    cat >>confdefs.h <<\EOF
-#define EXPERIMENTAL_INFLUENCE 0
+#define EXPERIMENTAL_INFLUENCE 1
 EOF
 
 fi

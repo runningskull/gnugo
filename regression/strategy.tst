@@ -126,7 +126,7 @@ loadsgf games/strategy4.sgf
 # incident 290
 loadsgf games/incident290.sgf 30
 20 gg_genmove black
-#? [Q11]*
+#? [Q11]
 
 # incident 291
 loadsgf games/incident291.sgf 54
@@ -136,7 +136,7 @@ loadsgf games/incident291.sgf 54
 # incident 292
 loadsgf games/incident291.sgf 70
 22 gg_genmove black
-#? [K3]
+#? [K3]*
 
 # incident 294
 loadsgf games/incident291.sgf 88
@@ -173,7 +173,7 @@ loadsgf games/strategy5.sgf 12
 #
 loadsgf games/strategy5.sgf 14
 27 gg_genmove black
-#? [C3]
+#? [C3]*
 
 loadsgf games/strategy5.sgf 20
 28 gg_genmove black
@@ -203,7 +203,7 @@ loadsgf games/strategy8.sgf 283
 
 loadsgf games/nicklas/nicklas8.sgf 72
 34 gg_genmove black
-#? [E17]
+#? [E17]*
 
 loadsgf games/nicklas/nicklas8.sgf 80
 35 gg_genmove black
@@ -291,7 +291,7 @@ loadsgf games/strategy11.sgf 77
 # G17/G18 and C1 are both huge.
 loadsgf games/strategy11.sgf 127
 45 gg_genmove black
-#? [G17|G18|C1]
+#? [G17|G18|C1]*
 
 loadsgf games/strategy11.sgf 245
 46 gg_genmove black

@@ -82,7 +82,7 @@ loadsgf games/incident121.sgf 122
 22 owl_attack P12
 #? [1 (PASS|S11|S14|N13|S13)]
 23 owl_defend P12
-#? [0]
+#? [0]*
 
 # incident 154
 loadsgf games/incident153.sgf 205
@@ -487,7 +487,7 @@ loadsgf games/owl14.sgf 250
 
 loadsgf games/owl15.sgf
 132 owl_attack Q3
-#? [(1|2) R4]*
+#? [(1|2) R4]
 133 owl_defend O3
 #? [1 M3]
 

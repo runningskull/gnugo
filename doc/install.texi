@@ -16,22 +16,22 @@ about newer versions and get other information at
 @section GNU/Linux and Unix
 @cindex installation
 
-Untar the sources, change to the directory gnugo-3.0.0. Now do:
+Untar the sources, change to the directory gnugo-3.2. Now do:
 
 @example
    ./configure [OPTIONS]
    make
 @end example
 
-The most important configure options, cache size, default level
-and dfa will be explained in detail in the next section (@pxref{Configure
-Options}). Probably you do not need to set these unless you are
-dissatisfied with GNU Go's performance for any reason.
+Several configure options will be explained in detail in the next
+section (@pxref{Configure Options}). You do not need to set these unless
+you are dissatisfied with GNU Go's performance or wish to vary
+the experimental options.
 
 As an example,
 
 @example
-   ./configure --enable-cache-size=32 --enable-level=8
+   ./configure --enable-cache-size=48 --enable-level=8
 @end example
 
 @noindent
@@ -89,6 +89,7 @@ particularly if you are dissatisfied with GNU Go's performance.
 * Ram Cache::                 Ram Cache
 * Default Level::             Default Level
 * DFA Option::                DFA Option
+* Experimental Options::      Experimental Options
 @end menu
 
 @node Ram Cache, Default Level, , Configure Options
@@ -155,21 +156,46 @@ using level 10 unless you find it too slow. If you decide
 you want to change the default you may rerun configure
 and recompile the program.
 
-@node DFA Option, , Default Level, Configure Options
+@node DFA Option, Experimental Options , Default Level, Configure Options
 @subsection DFA Configure Option
 
-If you @command{./configure --enable-dfa} you get the experimental DFA
-(Discrete Finite-State Automata) pattern matcher. This will result in a
-larger but somewhat faster engine. The option is considered experimental
-because it is new and harder to debug but sufficiently tested that it is
-probably safe.
+There are two distinct implementations of the pattern matcher in GNU
+Go. The DFA (Discrete Finite-state Automata) option was considered
+experimental in GNU Go 3.0 but is now standard. You can disable it by
+with the configure option @command{./configure --disable-dfa}.  The
+option is harder to debug than the old matcher but significantly
+faster (@pxref{DFA}).
+
+@node Experimental Options, , DFA Option, Configure Options
+
+There are a number of experimental configure options. For example
+you can @command{./configure --enable-experimental-semeai} or
+@command{./configure --disable-experimental-semeai} to turn
+the experimental reading module on or off. If you want to
+find out what experimental options were compiled into your
+GNU Go binary you can run @command{gnugo --options} to find
+out.
+
+@itemize @bullet
+@item @code{experimental-semeai}. Use the new semeai module based on
+the owl code.
+@item @code{experimental-influence}. Use the experimental influence
+module. @strong{Enabled by default.}
+@item @code{experimental-connections}. Use the experimental connection
+analysis. @strong{Enabled by default.}
+@item @code{alternate-connections}. Use in conjunction with
+@code{experimental-connections}. Uses an alternative implementation of
+the experimental connection analysis. @strong{Enabled by default.}
+@item @code{owl-threats}. Compute owl threats. This is a good idea
+but sometimes slow, so enable this option if you have a fast CPU.
+@end itemize
 
 @node Windows and MS-DOS, Macintosh, Configure Options, Installation
 @comment  node-name,  next,  previous,  up
 @section Compiling GNU Go on Microsoft platforms
 
 GNU Go is being developed on Unix variants. GNU Go is easy to build
-and install on those platforms. GNU Go 3.0 has support for building
+and install on those platforms. GNU Go 3.2 has support for building
 on MS-DOS, Windows 3.x, Windows NT/2000 and Windows 95/98.
 
 There are two approaches to building GNU Go on Microsoft platforms.
@@ -231,12 +257,12 @@ DJGPP ftp archive on simtel:
 @url{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/}
 
 Once you have a working DJGPP environment and you have downloaded
-the gnugo source available as gnugo-3.0.0.tar.gz you can build the
+the gnugo source available as gnugo-3.2.tar.gz you can build the
 executable as follows:
 
 @example
-       tar zxvf gnugo-3.0.0.tar.gz
-       cd gnugo-3.0.0
+       tar zxvf gnugo-3.2.tar.gz
+       cd gnugo-3.2
        ./configure
        make
 @end example
@@ -252,11 +278,11 @@ versions of Cygwin install very easily with the setup program available
 from the cygwin homepage.  @url{<http://sourceware.cygnus.com/cygwin/}.
 GNU Go compiles out-of-the box using the standard Unix build procedure
 on the Cygwin environment. After installation of cygwin and fetching
-@file{gnugo-3.0.0.tar.gz} you can type:
+@file{gnugo-3.2.tar.gz} you can type:
 
 @example
-  tar zxvf gnugo-3.0.0.tar.gz
-  cd gnugo-3.0.0
+  tar zxvf gnugo-3.2.tar.gz
+  cd gnugo-3.2
   ./configure
   make
 @end example
@@ -280,8 +306,8 @@ than the Cygwin executable. To build on cygwin an executable suitable
 for the win32 platform type the following at your cygwin prompt:
 
 @example
-  tar zxvf gnugo-3.0.0.tar.gz
-  cd gnugo-3.0.0
+  tar zxvf gnugo-3.2.tar.gz
+  cd gnugo-3.2
   env CC='gcc -mno-cygwin' ./configure
   make
 @end example

@@ -705,6 +705,8 @@ add_attack_threat_move(int pos, int ww, int code)
   add_move_reason(pos, ATTACK_THREAT, worm_number);
 }
 
+/* Remove an attack threat move reason. */
+
 void
 remove_attack_threat_move(int pos, int ww)
 {
@@ -729,7 +731,7 @@ add_defense_threat_move(int pos, int ww, int code)
 }
 
 
-/* Report, or up to max_strings all the strings that are threatened 
+/* Report all, or up to max_strings, strings that are threatened 
  * at (pos).
  */
 int
@@ -754,7 +756,7 @@ get_attack_threats(int pos, int max_strings, int strings[])
   return num_strings;
 }
 
-/* Report all, or up to max_strings, the strings that might be defended 
+/* Report all, or up to max_strings, strings that might be defended 
  * at (pos).
  */
 int
@@ -865,7 +867,7 @@ add_cut_move(int pos, int dr1, int dr2)
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it is an anti-suji.
+ * Add to the reasons for the move at (pos) that it is an anti-suji.
  * This means that it's a locally inferior move or for some other reason
  * must *not* be played.
  */
@@ -1062,7 +1064,7 @@ add_block_territory_move(int pos)
 }
 
 /*
- * Add to the reasons for the move at (ti, tj) that it expands
+ * Add to the reasons for the move at (pos) that it expands
  * territory.
  */
 void
@@ -1082,7 +1084,7 @@ add_expand_moyo_move(int pos)
 }
 
 /*
- * This function is called when a shape value for the move at (ti, tj)
+ * This function is called when a shape value for the move at (pos)
  * is found. 
  * 
  * We keep track of the largest positive shape value found, and the
@@ -1229,7 +1231,6 @@ add_owl_attack_threat_move(int pos, int dr, int code)
  * dead, and an extra point of attack or defense was found, so this might be a
  * good place to play.  
  */
-
 void
 add_owl_uncertain_defense_move(int pos, int dr)
 {
@@ -1243,7 +1244,6 @@ add_owl_uncertain_defense_move(int pos, int dr)
  * dragon dead, but was uncertain, and this move reason propose
  * an attack or defense which is expected to fail but might succeed.
  */
-
 void
 add_owl_uncertain_attack_move(int pos, int dr)
 {
@@ -1270,7 +1270,7 @@ add_owl_defense_threat_move(int pos, int dr, int code)
   add_worthwhile_threat_move(pos);
 }
 
-/* Add to the reasons for the move at (ti, tj) that it captures
+/* Add to the reasons for the move at (pos) that it captures
  * at least one of a set of worms which individually are tactically
  * safe (such as a double atari). Only one such move reason is
  * permitted per move.
@@ -1281,7 +1281,7 @@ add_my_atari_atari_move(int pos, int size)
   add_move_reason(pos, MY_ATARI_ATARI_MOVE, size);
 }
 
-/* Add to the reasons for the move at (ti, tj) that it stops a
+/* Add to the reasons for the move at (pos) that it stops a
  * combination attack for the opponent.
  */
 void
@@ -1320,7 +1320,7 @@ add_followup_value(int pos, float value)
 }
 
 /*
- * Add value of inverse followup moves. 
+ * Add value of reverse followup moves. 
  */
 void
 add_reverse_followup_value(int pos, float value)
@@ -1429,6 +1429,7 @@ add_replacement_move(int from, int to)
 }
 
 
+/* Find worms rescued by a move at (pos). */
 void
 get_saved_worms(int pos, int saved[BOARDMAX])
 {
@@ -1458,6 +1459,7 @@ get_saved_worms(int pos, int saved[BOARDMAX])
 }
 
 
+/* Find dragons rescued by a move at (pos). */
 void
 get_saved_dragons(int pos, int saved[BOARDMAX])
 {
@@ -1487,7 +1489,7 @@ get_saved_dragons(int pos, int saved[BOARDMAX])
 }
 
 
-
+/* List the move reasons for (color). */
 void
 list_move_reasons(int color)
 {

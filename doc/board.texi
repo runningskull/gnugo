@@ -73,11 +73,9 @@ are:
 @group
 
 int           board_size;
-Intersection  p[MAX_BOARD][MAX_BOARD];
-int           board_ko_i;
-int           board_ko_j;
-int           last_moves_i[2];
-int           last_moves_j[2];
+Intersection  board[MAX_BOARD][MAX_BOARD];
+int           board_ko;
+int           last[2];
 
 float         komi;
 int           white_captured;
@@ -116,24 +114,24 @@ actually playing out moves.
 @item @code{void clear_board()}
 @findex clear_board
 @quotation
-Clears the internal board (@code{p[][]}), resets the ko position,
+Clears the internal board (@code{board[]}), resets the ko position,
 captured stones and recalculates the hash value.
 @end quotation
 
-@item @code{void setup_board(Intersection new_p[MAX_BOARD][MAX_BOARD], int koi, int koj, int *last_i, int *last_j, float new_komi, int w_captured, int b_captured)}
+@item @code{void setup_board(Intersection new_board[MAX_BOARD][MAX_BOARD], int ko_pos, int *last, float new_komi, int w_captured, int b_captured)}
 @findex setup_board
 @quotation
 Set up a new board position using the parameters.
 @end quotation
 
-@item @code{void add_stone(int i, int j, int color)}
+@item @code{void add_stone(int pos, int color)}
 @findex add_stone
 @quotation
 Place a stone on the board and update the hashdata.  No captures are
 done. 
 @end quotation
 
-@item @code{void remove_stone(int i, int j)}
+@item @code{void remove_stone(int pos)}
 @findex remove_stone
 @quotation
 Remove a stone from the board and update the hashdata.
@@ -163,7 +161,7 @@ Thus the correct way of using this function is:
 @example
 @group
 
-  if (trymove(i, j, color, [message], k, l, komaster, kom_i, kom_j)) @{
+  if (trymove(pos, color, ... )) @{
        ...    [potentially lots of code here]
        popgo();
   @}   
@@ -175,33 +173,35 @@ Thus the correct way of using this function is:
 Here the @code{komaster} is only set if a conditional ko capture has been made
 at an earlier move. This feature of the tactical and owl reading code in GNU
 Go is used to prevent redundant reading when there is a ko on the board
-(@pxref{Ko}). If komaster is not defined then take the last three parameters
-to be @code{EMPTY}, and @code{-1, -1}.  
+(@pxref{Ko}).
 
 @itemize @bullet
-@item @code{void play_move(int i, int j, int color)}
+@item @code{void play_move(int pos, int color)}
 @findex play_move
 @quotation
-Play a move at @code{(i, j)}. If you want to test for legality you
+Play a move at @code{(pos)}. If you want to test for legality you
 should first call @code{is_legal()}. This function strictly follows the
-algorithm:@*
-1. Place a stone of given color on the board.@*
-2. If there are any adjacent opponent strings without liberties, remove
-them and increase the prisoner count.@*
-3. If the newly placed stone is part of a string without liberties,
+algorithm:
+@enumerate
+@item Place a stone of given color on the board.
+@item If there are any adjacent opponent strings without liberties, remove
+them and increase the prisoner count.
+@item If the newly placed stone is part of a string without liberties,
 remove it and increase the prisoner count.
+@end enumerate
 @end quotation
 
-@item @code{int trymove(int i, int j, int color, const char *message, int k, int l, int komaster, int kom_i, int kom_j)}
+@item @code{int trymove(int pos, int color, const char *message, int str, int komaster, int kom_pos)}
 @findex trymove
 @quotation
-Returns true if @code{(i,j)} is a legal move for @code{color}. In that
+Returns true if @code{(pos)} is a legal move for @code{color}. In that
 case, it pushes the board on the stack and makes the move, incrementing
 @code{stackp}. If the reading code is recording reading variations (as
 with @option{--decide-string} or with @option{-o}), the string
 @code{*message} will be inserted in the SGF file as a comment. The
-comment will also refer to the string at @code{(k,l)} if these are not
-@code{(-1,-1)}. 
+comment will also refer to the string at @code{str} if this is not
+@code{0}. The komaster and ko position variables are described 
+elsewhere (@pxref{Ko})
 @end quotation
 @item @code{int TRY_MOVE()}
 @findex TRY_MOVE
@@ -209,11 +209,11 @@ comment will also refer to the string at @code{(k,l)} if these are not
 Wrapper around trymove which suppresses @code{*message} and @code{(k,l)}.
 Used in @file{helpers.c}
 @end quotation
-@item @code{int tryko(int i, int j, int color, const char *message, int komaster, kom_i, kom_j)}
+@item @code{int tryko(int pos, int color, const char *message, int komaster, int kom_pos)}
 @findex tryko
 @quotation
 @code{tryko()} pushes the position onto the stack, and makes a move
-@code{(i, j)} of @code{color}. The move is allowed even if it is an
+@code{pos} of @code{color}. The move is allowed even if it is an
 illegal ko capture. It is to be imagined that @code{color} has made an
 intervening ko threat which was answered and now the continuation is to
 be explored. Return 1 if the move is legal with the above
@@ -233,11 +233,7 @@ before the call.
 move was not legal, you must @strong{not} call @code{popgo}.
 @end quotation
 
-@item @code{int komaster_trymove(int i, int j, int color,
- const char *message, int si, int sj, 
- int komaster, int kom_i, int kom_j,
- int *new_komaster, int *new_kom_i, int *new_kom_j,
- int *is_conditional_ko, int consider_conditional_ko)}
+@item @code{int komaster_trymove(int pos, int color, const char *message, int str, int komaster, int kom_pos, int *new_komaster, int *new_kom_pos, int *is_conditional_ko, int consider_conditional_ko)}
 @findex komaster_trymove
 @quotation
 Variation of @code{trymove}/@code{tryko} where ko captures (both
@@ -245,18 +241,18 @@ conditional and unconditional) must follow a komaster scheme
 (@pxref{Ko}).
 @end quotation
 
-@item @code{int move_in_stack(int m, int n, int cutoff)}
+@item @code{int move_in_stack(int pos, int cutoff)}
 @findex move_in_stack
 @quotation
-Returns true if at least one move been played at @code{(m, n)}
+Returns true if at least one move been played at @code{(pos)}
 at deeper than level 'cutoff' in the reading tree.
 @end quotation
 
-@item @code{void get_move_from_stack(int k, int *i, int *j, int *color)}
+@item @code{void void get_move_from_stack(int k, int *move, int *color)}
 @findex get_move_from_stack
 @quotation
 Retrieve the move number @code{k} from the move stack.  The move
-location is returned in @code{(*i, *j)}, and the color that made the
+location is returned in @code{(*move)}, and the color that made the
 move is returned in @code{*color}.
 @end quotation
 
@@ -288,55 +284,54 @@ These functions are used for inquiring about properties of the current
 position or of potential moves.
 
 @itemize @bullet
-@item @code{int is_pass(int i, int j)}
+@item @code{int is_pass(int pos)}
 @findex is_pass
 @quotation 
-Returns true if the move @code{(i,j)} is a pass move, i.e. @code{(-1,
--1)}.
+Returns true if the move @code{(pos)} is PASS_MOVE, that is, 0.
 @end quotation
 
-@item @code{int is_legal(int i, int j, int color)}
+@item @code{int is_legal(int pos, int color)}
 @findex is_legal
 @quotation 
-Returns true if a move at @code{(i,j)} is legal for @code{color}.
+Returns true if a move at @code{pos} is legal for @code{color}.
 @end quotation
 
-@item @code{int is_ko(int m, int n, int color, int *ko_i, int *ko_j)}
+@item @code{int is_ko(int pos, int color, int *ko_pos)}
 @findex is_ko
 @quotation
-Return true if the move @code{(i,j)} by @code{color} is a ko capture
+Return true if the move @code{pos} by @code{color} is a ko capture
 whether capture is a legal ko capture on this move or not. If
-@code{(*ko_i,*ko_j)} are non-@code{NULL}, then the location of the
-captured ko stone are returned through @code{(*ko_i,*ko_j)}. If the move
-is not a ko capture, @code{(*ko_i,*ko_j)} is set to @code{(-1, -1)}.
+@code{*ko_pos} are non-@code{NULL}, then the location of the
+captured ko stone are returned through @code{*ko_pos}. If the move
+is not a ko capture, @code{*ko_pos} is set to 0.
 @end quotation
 
-@item @code{int is_illegal_ko_capture(int i, int j, int color)}
+@item @code{int is_illegal_ko_capture(int pos, int color)}
 @findex is_illegal_ko_capture
 @quotation
-Return true if the move @code{(i,j)} by @code{color} would be an illegal
+Return true if the move @code{POS} by @code{color} would be an illegal
 ko capture.  There is no need to call both @code{is_ko} and
 @code{is_illegal_ko_capture}. 
 @end quotation
 
-@item @code{int is_self_atari(int i, int j, int color)}
+@item @code{int is_self_atari(int pos, int color)}
 @findex is_self_atari
 @quotation
-Return true if a move by @code{color} at @code{(i, j)} would be a self
+Return true if a move by @code{color} at @code{pos} would be a self
 atari, i.e. whether it would get only one liberty. This function returns
 true also for the case of a suicide move.
 @end quotation
 
-@item @code{int is_suicide(int i, int j, int color)}
+@item @code{int is_suicide(int pos, int color)}
 @findex is_suicide
 @quotation 
-Returns true if a move at @code{(i,j)} is suicide for @code{color}.
+Returns true if a move at @code{pos} is suicide for @code{color}.
 @end quotation
 
-@item @code{int does_capture_something(int i, int j, int color)}
+@item @code{int does_capture_something(int pos, int color)}
 @findex does_capture_something
 @quotation 
-Returns true if a move at @code{(i,j)} does capture any stone for the
+Returns true if a move at @code{pos} does capture any stone for the
 other side.
 @end quotation
 
@@ -361,102 +356,135 @@ incremental data structures behind the scene.
 
 @itemize @bullet
 
-@item @code{void find_origin(int i, int j, int *origini, int *originj)}
+@item @code{void find_origin(int str)}
 @findex find_origin
 @quotation
-Find the origin of a worm or a cavity, i.e. the point with smallest
+Finds the origin of a worm or a cavity, i.e. the point with smallest
 @samp{i} coordinate and in the case of a tie with smallest @samp{j} coordinate.
-The idea is to have a canonical reference point for a string.
+The idea is to have a canonical reference point for a string. (@pxref{Worms})
 @end quotation
 
-@item @code{int findstones(int m, int n, int maxstones, int *stonei, int *stonej)}
+@item @code{int findstones(int str, int maxstones, int *stones)}
 @findex findstones
 @quotation
-Find the stones of the string at @code{(m, n)}. @code{(m, n)} must not
+Find the stones of the string at @code{str}. @code{str} must not
 be empty. The locations of up to @code{maxstones} stones are written into
-@code{(stonei[], stonej[])}. The full number of stones is returned.
+@code{*stone}. The full number of stones is returned.
 @end quotation
 
-@item @code{int countstones(int m, int n)}
+@item @code{int countstones(int str)}
 @findex countstones
 @quotation
 Count the number of stones in a string.
 @end quotation
-
-@item @code{void mark_string(int i, int j, char mx[MAX_BOARD][MAX_BOARD], char mark)}
+@item @code{void mark_string(int str, char mx[BOARDMAX], char mark)}
 @findex mark_string
 @quotation
-For each stone in the string at @code{(i, j)}, set @code{mx} to value 
-@code{mark}. If some of the stones in the string are marked prior to calling
-this function, only the connected unmarked stones starting from @code{(i, j)}
-are guaranteed to become marked. The rest of the string may or may not become
-marked.
+For each stone in the string at pos, set mx to value mark. If
+some of the stones in the string are marked prior to calling this
+function, only the connected unmarked stones starting from pos
+are guaranteed to become marked. The rest of the string may or may
+not become marked. (In the current implementation, it will.)
 @end quotation
 
-@item @code{int liberty_of_string(int ai, int aj, int si, int sj)}
+@item @code{int liberty_of_string(int pos, int str)}
 @findex liberty_of_string
 @quotation
-Returns true if @code{(ai, aj)} is a liberty of the string at @code{(si, sj)}.
+Returns true if @code{pos} is a liberty of the string at @code{str}.
 @end quotation
 
-@item @code{int neighbor_of_string(int ai, int aj, int si, int sj)}
+@item @code{int neighbor_of_string(int pos, int str)}
 @findex neighbor_of_string
 @quotation
-Returns true if @code{(ai, aj)} is adjacent to the string at @code{(si, sj)}.
+Returns true if pos is adjacent to the string at str.
 @end quotation
 
-@item @code{int same_string(int ai, int aj, int bi, int bj)}
+@item @code{int same_string(int str1, int str2)}
 @findex same_string
 @quotation
-Returns true if @code{(ai, aj)} is a stone in the same string as
-@code{(bi, bj)}.
+Returns true if @code{str1} and @code{str2} belong to the same string.
 @end quotation
 
-@item @code{int findlib(int m, int n, int maxlib, int *libi, int *libj)}
-@findex findlib
+@item @code{int findlib(int str, int maxlib, int *libs)}
+int findlib
 @quotation
-Find the liberties of the string at @code{(m, n)}, which must not be
+Find the liberties of the string at str. str must not be
 empty. The locations of up to maxlib liberties are written into
-@code{(libi[], libj[])}. The full number of liberties is returned.
+@code{libs[]}. The full number of liberties is returned.
 If you want the locations of all liberties, whatever their number,
 you should pass @code{MAXLIBS} as the value for maxlib and allocate space
-for @code{libi[], libj[]} accordingly.
+for @code{libs[]} accordingly.
 @end quotation
 
-@item @code{int countlib(int m, int n)}
+@item @code{int countlib(int str)}
 @findex countlib
 @quotation
-Count the number of liberties of the string at @code{(m,n)}, which
+Count the number of liberties of the string at @code{str}, which
 must not be empty.
 @end quotation
 
-@item @code{int approxlib(int m, int n, int maxlib, int *libi, int *libj)}
+@item @code{int fastlib(int pos, int color, int ignore_capture)}
+@findex fastlib
+@quotation
+Count the liberties a stone of the given color would get if played at
+@code{pos}.  Captures are ignored based on the ignore_capture flag.  (pos)
+must be empty.  It will fail if there is more than one string neighbor of the
+same color.  In this case, the return value is -1.  Captures are not handled,
+so if ignore_capture is 0, and a capture is required, -1 is returned. The
+intent of this function is to be as fast as possible, not necessarily
+complete.
+@end quotation
+
+@item @code{int approxlib(int pos, int color, int maxlib, int *libs)}
 @findex approxlib
 @quotation
-Find the liberties a stone of the given color would get if played at @code{(m,
-n)}, ignoring possible captures of opponent stones.  @code{(m, n)} must be
-empty. If @code{libi!=NULL}, the locations of up to maxlib liberties are
-written into @code{(libi[], libj[])}. The counting of liberties may or may not
-be halted when maxlib is reached. The number of liberties found is
-returned. If you want the number or the locations of all liberties, however
-many they are, you should pass @code{MAXLIBS} as the value for maxlib and
-allocate space for @code{libi[], libj[]} accordingly.
+Find the liberties a stone of the given color would get if played
+at @code{pos}, ignoring possible captures of opponent stones. 
+@code{pos} must be empty. If @code{libs != NULL}, the locations of up to 
+@code{maxlib} liberties are written into @code{libs[]}. The counting of
+liberties may or may not be halted when maxlib is reached. The
+number of liberties found is returned. If you want the number or the locations
+of all liberties, however many they are, you should pass @code{MAXLIBS} as the
+value for @code{maxlib} and allocate space for @code{libs[]} accordingly.
 @end quotation
 
-@item @code{int chainlinks(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN])}:
-@findex chainlinks
+@item @code{int count_common_libs(int str1, int str2)}
+@findex count_common_libs
 @quotation
-Returns (in @code{adji[]}, @code{adjj[]} arrays) the chain (strings)
-surrounding the string at @code{(m, n)}.  The chain is defined as the
-set of strings in immediate connection to the @code{(m, n)} string.
-Return value is the number of strings in the chain.
+Find the number of common liberties of the two strings at str1 and str2.
 @end quotation
 
-@item @code{void chainlinks2(int m, int n, int adji[MAXCHAIN], int adjj[MAXCHAIN], int lib)}
-@findex chainlinks2
+@item @code{int find_common_libs(int str1, int str2, int maxlib, int *libs)}
+@findex find_common_libs
 @quotation
-Returns (in @code{adji[]}, @code{adjj[]} arrays) the strings surrounding
-the string at @code{(m, n)}, which have exactly @code{lib} liberties.
+Find the common liberties of the two strings at @code{str1} and
+@code{str2}. The locations of up to maxlib common liberties are written into
+@code{libs[]}.  The full number of common liberties is returned.  If you want
+the locations of all common liberties, whatever their number, you should pass
+@code{MAXLIBS} as the value for maxlib and allocate space for @code{libs[]}
+accordingly.
+@end quotation
+
+@item @code{int have_common_lib(int str1, int str2, int *lib)}
+@findex have_common_lib
+@quotation
+Determine whether two strings have at least one common liberty.
+If they have and @code{lib != NULL}, one common liberty is returned in *lib.
+@end quotation
+
+@code{int chainlinks(int str, int adj[MAXCHAIN])}
+@findex chainlinx
+@quotation
+Returns (in the @code{adj} array) the chains surrounding
+the string at @code{str}. The number of chains is returned.
+@end quotation
+
+@code{int chainlinks2(int str, int adj[MAXCHAIN], int lib)}
+@findex chainlinx
+@quotation
+Returns (in the @code{adj} array) the chains surrounding
+the string at @code{str} having exactly @code{lib} liberties. The number of
+chains is returned.  
 @end quotation
 @end itemize
 
@@ -464,12 +492,7 @@ the string at @code{(m, n)}, which have exactly @code{lib} liberties.
 @subsection Miscellaneous Functions
 
 @itemize @bullet
-@item @code{void incremental_order_moves(int mi, int mj, int color, 
-                            int si, int sj, 
-                            int *number_edges, int *number_same_string,
-                            int *number_own, int *number_opponent, 
-                            int *captured_stones, int *threatened_stones,
-                            int *saved_stones, int *number_open)}
+@item @code{ incremental_order_moves(int move, int color, int str, int *number_edges, int *number_same_string, int *number_own, int *number_opponent, int *captured_stones, int *threatened_stones, int *saved_stones, int *number_open)}
 @findex incremental_order_moves
 @quotation
 Help collect the data needed by @code{order_moves()} in @file{reading.c}.

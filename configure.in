@@ -18,7 +18,7 @@ AH_TEMPLATE([VERSION],
 [Define to the version of the distribution.])
 
 dnl this defines VERSION and PACKAGE
-AM_INIT_AUTOMAKE([gnugo], [3.1.25])
+AM_INIT_AUTOMAKE([gnugo], [3.1.26])
 GNU_PACKAGE="GNU $PACKAGE"
 AC_DEFINE_UNQUOTED(GNU_PACKAGE, "$GNU_PACKAGE")
 
@@ -397,10 +397,10 @@ dnl ------------ Connections -------------------
 AH_TEMPLATE([EXPERIMENTAL_CONNECTIONS],
 [Connection module. Default standard.])
 
-if test "$enable_experimental_connections" = "yes" ; then
-   AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 1)
-else
+if test "$enable_experimental_connections" = "no" ; then
    AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 0)
+else
+   AC_DEFINE(EXPERIMENTAL_CONNECTIONS, 1)
 fi
 
 dnl ------------ Connections -------------------
@@ -408,10 +408,10 @@ dnl ------------ Connections -------------------
 AH_TEMPLATE([ALTERNATE_CONNECTIONS],
 [Connection module. Default standard.])
 
-if test "$enable_alternate_connections" = "yes" ; then
-   AC_DEFINE(ALTERNATE_CONNECTIONS, 1)
-else
+if test "$enable_alternate_connections" = "no" ; then
    AC_DEFINE(ALTERNATE_CONNECTIONS, 0)
+else
+   AC_DEFINE(ALTERNATE_CONNECTIONS, 1)
 fi
 
 dnl ------------ Owl Threats -------------------
@@ -430,10 +430,10 @@ dnl ------------ Influence -------------------
 AH_TEMPLATE([EXPERIMENTAL_INFLUENCE],
 [Influence module. Default standard.])
 
-if test "$enable_experimental_influence" = "yes" ; then
-   AC_DEFINE(EXPERIMENTAL_INFLUENCE, 1)
-else
+if test "$enable_experimental_influence" = "no" ; then
    AC_DEFINE(EXPERIMENTAL_INFLUENCE, 0)
+else
+   AC_DEFINE(EXPERIMENTAL_INFLUENCE, 1)
 fi
 
 dnl  ----------- special-case use of gcc ---------

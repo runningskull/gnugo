@@ -1,3 +1,99 @@
+========================== 3.1.26 =========================
+
+With experimental influence, experimental and alternate connections
+enabled (now the default):
+
+./regress.sh . owl.tst
+23 unexpected FAIL: Correct '0', got '1 S11'
+132 unexpected PASS!
+./regress.sh . owl_rot.tst
+66 unexpected PASS!
+./regress.sh . trevora.tst
+450 unexpected PASS!
+470 unexpected FAIL: Correct '!E2', got 'E2'
+530 unexpected PASS!
+./regress.sh . strategy.tst
+20 unexpected PASS!
+22 unexpected FAIL: Correct 'K3', got 'J11'
+27 unexpected FAIL: Correct 'C3', got 'F2'
+34 unexpected FAIL: Correct 'E17', got 'N15'
+45 unexpected FAIL: Correct 'G17|G18|C1', got 'H1'
+./regress.sh . neurogo.tst
+20 unexpected FAIL: Correct '1 S16', got '1 T18'
+./regress.sh . rosebud.tst
+1 unexpected FAIL: Correct 'E16', got 'E18'
+./regress.sh . golife.tst
+4 unexpected PASS!
+./regress.sh . viking.tst
+3 unexpected FAIL: Correct 'M15|B7', got 'O4'
+7 unexpected PASS!
+9 unexpected PASS!
+./regress.sh . lazarus.tst
+4 unexpected FAIL: Correct 'R12|Q12|M8', got 'T5'
+7 unexpected PASS!
+14 unexpected FAIL: Correct 'Q15|T5|H5', got 'R15'
+16 unexpected PASS!
+./regress.sh . trevorb.tst
+180 unexpected FAIL: Correct 'L12', got 'H3'
+250 unexpected FAIL: Correct 'C2', got 'L8'
+440 unexpected FAIL: Correct 'E6', got 'J6'
+450 unexpected PASS!
+500 unexpected FAIL: Correct '!J11', got 'J11'
+600 unexpected PASS!
+660 unexpected FAIL: Correct 'D3', got 'H5'
+700 unexpected PASS!
+790 unexpected FAIL: Correct 'K6|K5', got 'A6'
+840 unexpected PASS!
+./regress.sh . strategy2.tst
+51 unexpected FAIL: Correct 'P3', got 'N5'
+82 unexpected FAIL: Correct 'L5', got 'Q17'
+85 unexpected FAIL: Correct 'O2', got 'N5'
+90 unexpected FAIL: Correct 'B14|D17', got 'H2'
+91 unexpected FAIL: Correct 'B14|G13', got 'H2'
+./regress.sh . nicklas5.tst
+1202 unexpected PASS!
+./regress.sh . manyfaces.tst
+1 unexpected FAIL: Correct 'S13', got 'N15'
+./regress.sh . niki.tst
+4 unexpected FAIL: Correct 'Q8', got 'R13'
+./regress.sh . trevor.tst
+190 unexpected FAIL: Correct 'B7', got 'F5'
+200 unexpected PASS!
+./regress.sh . global.tst
+1 unexpected FAIL: Correct 'B3', got 'F5'
+5 unexpected FAIL: Correct 'O4', got 'S12'
+8 unexpected FAIL: Correct 'H9', got 'G11'
+28 unexpected PASS!
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+14 unexpected FAIL: Correct 'P17', got 'G13'
+24 unexpected FAIL: Correct '!P16', got 'P16'
+28 unexpected PASS!
+32 unexpected FAIL: Correct 'F9|E8', got 'G8'
+33 unexpected FAIL: Correct 'F9', got 'M5'
+./regress.sh . 13x13.tst
+17 unexpected FAIL: Correct 'L5|L3', got 'G8'
+33 unexpected PASS!
+38 unexpected FAIL: Correct 'G11', got 'G10'
+39 unexpected FAIL: Correct 'H4|J4', got 'E2'
+41 unexpected FAIL: Correct '!C8', got 'C8'
+43 unexpected FAIL: Correct 'D6', got 'B6'
+76 unexpected FAIL: Correct 'K6|L6|J3', got 'J5'
+85 unexpected FAIL: Correct 'D2', got 'B10'
+88 unexpected PASS!
+./regress.sh . semeai.tst
+./regress.sh . trevord.tst
+120 unexpected FAIL: Correct 'B9', got 'F7'
+230 unexpected PASS!
+240 unexpected PASS!
+550 unexpected FAIL: Correct 'T8', got 'J8'
+830 unexpected PASS!
+./regress.sh . strategy4.tst
+200 unexpected PASS!
+204 unexpected FAIL: Correct 'B2', got 'G6'
+207 unexpected PASS!
+209 unexpected PASS!
+
 ========================== 3.1.25 =========================
 
 configure option enabled: experimental connections

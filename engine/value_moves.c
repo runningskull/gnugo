@@ -845,8 +845,8 @@ dragon_safety(int dr, int ignore_dead_dragons)
 }
 
 /*
- * Strategical value of connecting (or cutting) the dragon at (ai, aj)
- * to the dragon at (bi, bj). Notice that this function is assymetric.
+ * Strategical value of connecting (or cutting) the dragon at (dragona)
+ * to the dragon at (dragonb). Notice that this function is assymetric.
  * This is because connection_value(a, b) is intended to measure the
  * strategical value on the a dragon from a connection to the b dragon.
  * 
@@ -891,7 +891,7 @@ dragon_safety(int dr, int ignore_dead_dragons)
  * moves.
  */
 static float impact_values[10][10] = {
-/*        (bi, bj) DEAD ALIV CRIT INES TACT WEAK WE_A SEKI STRO INVI */
+/*      (dragonb) DEAD ALIV CRIT INES TACT WEAK WE_A SEKI STRO INVI */
 /* DEAD        */ {0.0, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
 /* ALIVE       */ {0.0, 0.08,0.05,0.0, 0.0, 0.05,0.07,0.05,0.09,0.1 },
 /* CRITICAL    */ {0.0, 1.04,0.85,0.0, 0.0, 0.75,0.9, 0.85,1.08,1.1 },
@@ -902,10 +902,10 @@ static float impact_values[10][10] = {
 /* SEKI        */ {0.0, 0.2, 0.15,0.0, 0.0, 0.1, 0.15,0.2, 0.25,0.3 },
 /* STR. ALIVE  */ {0.0, 0.01,0.01,0.0, 0.0, 0.01,0.01,0.01,0.01,0.01},
 /* INVINCIBLE  */ {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
-/* (ai, aj)    */
+/* (dragona)    */
 		  
 static float cautious_impact_values[10][10] = {
-/*        (bi, bj) DEAD ALIV CRIT INES TACT WEAK WE_A SEKI STRO INVI */
+/*      (dragonb) DEAD ALIV CRIT INES TACT WEAK WE_A SEKI STRO INVI */
 /* DEAD        */ {0.3, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
 /* ALIVE       */ {0.0, 0.2, 0.05,0.0, 0.0, 0.1,0.15, 0.10,0.2 ,0.2 },
 /* CRITICAL    */ {0.0, 1.04,0.85,0.0, 0.0, 0.75,0.9, 0.85,1.08,1.1 },
@@ -916,7 +916,7 @@ static float cautious_impact_values[10][10] = {
 /* SEKI        */ {0.0, 0.2, 0.15,0.0, 0.0, 0.1, 0.15,0.2, 0.25,0.3 },
 /* STR. ALIVE  */ {0.0, 0.02,0.01,0.0, 0.0, 0.01,0.01,0.01,0.02,0.02},
 /* INVINCIBLE  */ {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
-/* (ai, aj)    */
+/* (dragona)    */
 		  
 static float
 connection_value(int dragona, int dragonb, int tt, float margin)
@@ -2268,6 +2268,10 @@ value_moves(int color, float pure_threat_value, float score)
 }
 
 
+/* Search through all board positions for the 10 highest valued
+ * moves and print them.
+ */
+
 static void
 print_top_moves(void)
 {
@@ -2279,9 +2283,6 @@ print_top_moves(void)
   for (k = 0; k < 10; k++)
     best_move_values[k] = 0.0;
   
-  /* Search through all board positions for the 10 highest valued
-   * moves and print them.
-   */
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       pos = POS(m, n);
@@ -2437,6 +2438,10 @@ reevaluate_ko_threats(int ko_move, int color)
 }
 
 
+/* Redistribute points. When one move is declared a replacement for
+ * another by a replacement move reason, the move values for the
+ * inferior move are transferred to the replacement.
+ */
 static void
 redistribute_points(void)
 {

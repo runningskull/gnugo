@@ -187,12 +187,12 @@ loadsgf games/trevor/trevor_18.sgf 32
 # Whoops, don't let go of the dragon's tail!
 loadsgf games/trevor/trevor_19.sgf 12
 190 gg_genmove white
-#? [B7]
+#? [B7]*
 
 # W should connect his two dragons.
 loadsgf games/trevor/trevor_20.sgf 14
 200 gg_genmove white
-#? [D7|D4]*
+#? [D7|D4]
 
 # W can live on the right pretty easily (i.e. G8)
 loadsgf games/trevor/trevor_20.sgf

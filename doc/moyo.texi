@@ -21,7 +21,7 @@ If n=5 and m=21 this is called the 5/21 algorithm.
 
 The Bouzy 5/21 algorithm is interesting in that it corresponds
 reasonably well to the human concept of territory.  This
-algorithm is still used in GNU Go 3.0 in the function
+algorithm is still used in GNU Go 3.2 in the function
 @code{estimate_score}. Thus we associate the 5/21 algorithm
 with the word @dfn{territory}. Similarly we use words
 @dfn{moyo} and @dfn{area} in reference to the 5/10
@@ -34,7 +34,7 @@ moyo and area concepts have been reimplemented using the
 influence code.
 
 The Bouzy algorithm is briefly reimplemented in the file
-@file{scoring.c} and is used by GNU Go 3.0 in estimating
+@file{scoring.c} and is used by GNU Go 3.2 in estimating
 the score.
 
 Not all features of the old @file{moyo.c} from
