@@ -1599,6 +1599,11 @@ void
 compute_initial_influence(int color, int dragons_known)
 {
   int i, j;
+  int save_experimental_influence;
+
+  save_experimental_influence = experimental_influence;
+  if (!dragons_known)
+    experimental_influence = 0;
   compute_influence(&initial_influence, OTHER_COLOR(color), -1, -1,
 		    dragons_known, NULL, NULL);
   if (experimental_influence)
@@ -1622,6 +1627,8 @@ compute_initial_influence(int color, int dragons_known)
       delta_territory_cache[POS(i, j)] = NOT_COMPUTED;
       followup_territory_cache[POS(i, j)] = NOT_COMPUTED;
     }
+
+  experimental_influence = save_experimental_influence;
 }
 
 /* Redo the segmentation of the initial influence. */

@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revised nonvariadic versions of TRACE and allies
+- increased MAXSTACK to MAX_BOARD*MAX_BOARD again
+- experimental influence taken down for initial influence when dragons unknown
+
 3.1.25 released February 14, 2002
 
 - updated AUTHORS
