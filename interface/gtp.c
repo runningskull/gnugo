@@ -409,10 +409,10 @@ gtp_print_vertices(int n, int movei[], int movej[])
       gtp_printf("??");
     else {
       if (vertex_transform_output_hook != NULL)
-       (*vertex_transform_output_hook)(movei[k], movej[k], &ri, &rj);
+	(*vertex_transform_output_hook)(movei[k], movej[k], &ri, &rj);
       else {
-       ri = movei[k];
-       rj = movej[k];
+	ri = movei[k];
+	rj = movej[k];
       }
       gtp_printf("%c%d", 'A' + rj + (rj >= 8), gtp_boardsize - ri);
     }

@@ -342,7 +342,7 @@ sgffile_printboard(int next)
   start = 0;
   for (i = 0; i < board_size; i++) {
     for (j = 0; j < board_size; j++) {
-      if (BOARD(i, j) == EMPTY && !is_legal2(i, j, next)) {
+      if (BOARD(i, j) == EMPTY && !is_legal(POS(i, j), next)) {
 	if (!start) {
 	  fprintf(sgfout, "IL");
 	  start = 1;

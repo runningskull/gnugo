@@ -1169,8 +1169,8 @@ find_more_owl_attack_and_defense_moves(int color)
 	     || (move_reasons[r].type == VITAL_EYE_MOVE
 		 && board[dd] == OTHER_COLOR(color)))
 	    && !move_reason_known(pos, OWL_ATTACK_MOVE, what)
-	    && owl_does_attack(m, n, I(dd), J(dd))) {
-	  add_owl_attack_move(POS(m, n), dd);
+	    && owl_does_attack(pos, dd)) {
+	  add_owl_attack_move(pos, dd);
 	  TRACE("Move at %1m owl attacks %1m.\n", pos, dd);
 	}
 	
@@ -1179,8 +1179,8 @@ find_more_owl_attack_and_defense_moves(int color)
 	     || (move_reasons[r].type == VITAL_EYE_MOVE
 		 && board[dd] == color))
 	    && !move_reason_known(pos, OWL_DEFEND_MOVE, what)
-	    && owl_does_defend(m, n, I(dd), J(dd))) {
-	  add_owl_defense_move(POS(m, n), dd);
+	    && owl_does_defend(pos, dd)) {
+	  add_owl_defense_move(pos, dd);
 	  TRACE("Move at %1m owl defends %1m.\n", pos, dd);
 	}
       }
@@ -1546,7 +1546,7 @@ examine_move_safety(int color)
 	     *
 	     * FIXME: Might need to involve semeai code too here.
 	     */
-	    if (owl_does_defend(I(pos), J(pos), I(bb), J(bb))) {
+	    if (owl_does_defend(pos, bb)) {
 	      tactical_safety = 1;
 	      safety = 1;
 	    }
@@ -1562,7 +1562,7 @@ examine_move_safety(int color)
 	       */
 	      safety = 1;
 	    
-	    else if (owl_does_defend(I(pos), J(pos), I(aa), J(aa)))
+	    else if (owl_does_defend(pos, aa))
 	      safety = 1;
 	    break;
 	  }
@@ -1590,8 +1590,7 @@ examine_move_safety(int color)
 	      tactical_safety = 1;
 	      safety = 1;
 	    }
-	    else if (owl_connection_defends(I(pos), J(pos), I(aa), J(aa),
-					    I(bb), J(bb))) {
+	    else if (owl_connection_defends(pos, aa, bb)) {
 	      tactical_safety = 1;
 	      safety = 1;
 	    }
@@ -1797,36 +1796,34 @@ list_move_reasons(int color)
  * FIXME: Probably should include DEFEND_BOTH defenses too.
  */
 void
-find_stones_saved_by_move(int m, int n, int color,
-			  char saved_stones[MAX_BOARD][MAX_BOARD])
+find_stones_saved_by_move(int pos, int color,
+			  char saved_stones[BOARDMAX])
 {
   int k;
   
-  memset(saved_stones, 0, MAX_BOARD * MAX_BOARD);
+  memset(saved_stones, 0, BOARDMAX);
   for (k = 0; k < MAX_REASONS; k++) {
-    int r = move[POS(m, n)].reason[k];
+    int r = move[pos].reason[k];
     if (r < 0)
       break;
 
     if (move_reasons[r].type == DEFEND_MOVE) {
-      int ai = I(worms[move_reasons[r].what]);
-      int aj = J(worms[move_reasons[r].what]);
+      int str = worms[move_reasons[r].what];
       
       /* Defense of enemy stones. */
-      if (BOARD(ai, aj) != color)
+      if (board[str] != color)
 	continue;
 
-      mark_string2(ai, aj, saved_stones, 1);
+      mark_string(str, saved_stones, 1);
     }
     else if (move_reasons[r].type == ATTACK_MOVE) {
-      int ai = I(worms[move_reasons[r].what]);
-      int aj = J(worms[move_reasons[r].what]);
+      int str = worms[move_reasons[r].what];
       
       /* Attack on our stones. */
-      if (BOARD(ai, aj) == color)
+      if (board[str] == color)
 	continue;
-
-      mark_string2(ai, aj, saved_stones, 1);
+      
+      mark_string(str, saved_stones, 1);
     }
   }
 }
@@ -2039,7 +2036,7 @@ connection_value(int dragona, int dragonb, int tt, float margin)
  */
 static void
 estimate_territorial_value(int pos, int color,
-			   char saved_stones[MAX_BOARD][MAX_BOARD],
+			   char saved_stones[BOARDMAX],
 			   float score)
 {
   int k;
@@ -2453,7 +2450,7 @@ estimate_territorial_value(int pos, int color,
        * This does not apply if we are doing scoring.
        */
       if (!doing_scoring
-	  && same_dragon(last_moves[0], aa)) {
+	  && is_same_dragon(last_moves[0], aa)) {
 	this_value = 1.5 * dragon[aa].effective_size;
 	TRACE("  %1m: %f - attack last move played, although it seems dead\n",
 	      pos, this_value);
@@ -2489,7 +2486,7 @@ estimate_territorial_value(int pos, int color,
       
     case MY_ATARI_ATARI_MOVE:
       this_value = 2 * move_reasons[r].what+3.;
-      if (influence_territory_color(I(pos), J(pos)) == OTHER_COLOR(color))
+      if (influence_territory_color(pos) == OTHER_COLOR(color))
 	does_expand = 1;
       tot_value += this_value;
       TRACE("  %1m: %f - combination attack kills one of several worms\n",
@@ -2498,7 +2495,7 @@ estimate_territorial_value(int pos, int color,
       
     case YOUR_ATARI_ATARI_MOVE:
       this_value = 2 * move_reasons[r].what+3.;
-      if (influence_territory_color(I(pos), J(pos)) == color)
+      if (influence_territory_color(pos) == color)
 	this_value += 7.;
       tot_value += this_value;
       TRACE("  %1m: %f - defends against combination attack on several worms\n",
@@ -2512,7 +2509,7 @@ estimate_territorial_value(int pos, int color,
    */
   this_value = 0.0;
   if ((does_block || does_expand) && move[pos].move_safety == 1) {
-    this_value = influence_delta_territory(I(pos), J(pos), color, saved_stones);
+    this_value = influence_delta_territory(pos, color, saved_stones);
     if (this_value != 0.0)
       TRACE("  %1m: %f - block or expand territory\n", pos, this_value);
     else
@@ -2552,7 +2549,7 @@ estimate_territorial_value(int pos, int color,
  */
 static void
 estimate_influence_value(int pos, int color,
-			 char saved_stones[MAX_BOARD][MAX_BOARD])
+			 char saved_stones[BOARDMAX])
 {
   int k;
   int does_expand = 0;
@@ -2588,9 +2585,9 @@ estimate_influence_value(int pos, int color,
       return;
     
     move[pos].influence_value =
-      0.35 * influence_delta_strict_moyo(I(pos), J(pos), color, saved_stones);
+      0.35 * influence_delta_strict_moyo(pos, color, saved_stones);
     move[pos].influence_value +=
-      0.13 * influence_delta_strict_area(I(pos), J(pos), color, saved_stones);
+      0.13 * influence_delta_strict_area(pos, color, saved_stones);
   }
   
   if (move[pos].influence_value != 0.0)
@@ -3033,9 +3030,10 @@ value_move_reasons(int pos, int color, float pure_threat_value,
 {
   float tot_value;
   float shape_factor;
-  char saved_stones[MAX_BOARD][MAX_BOARD];
+  char saved_stones[BOARDMAX];
 
-  gg_assert (stackp == 0);
+  gg_assert(stackp == 0);
+  
   /* Is it an antisuji? */
   if (is_antisuji_move(pos))
     return 0.0; /* This move must not be played. End of story. */
@@ -3060,7 +3058,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
      * is significant. Territorial value must be computed before
      * strategical value. See connection_value().
      */
-    find_stones_saved_by_move(I(pos), J(pos), color, saved_stones);
+    find_stones_saved_by_move(pos, color, saved_stones);
     estimate_territorial_value(pos, color, saved_stones, score);
     estimate_strategical_value(pos, color, score);
     estimate_influence_value(pos, color, saved_stones);
@@ -3167,7 +3165,7 @@ value_move_reasons(int pos, int color, float pure_threat_value,
       && board[pos] == EMPTY
       && move[pos].additional_ko_value > 0.0
       && is_legal(pos, color)
-      && confirm_safety(I(pos), J(pos), color, 0, NULL, NULL)) {
+      && confirm_safety(pos, color, 0, NULL)) {
     float new_tot_value = gg_min(pure_threat_value,
 				 tot_value
 				 + 0.25 * move[pos].additional_ko_value);
@@ -3271,19 +3269,16 @@ print_top_moves(void)
 	if (tval > best_move_values[k]) {
 	  if (k < 9) {
 	    best_move_values[k+1] = best_move_values[k];
-	    best_movei[k+1] = best_movei[k];
-	    best_movej[k+1] = best_movej[k];
+	    best_moves[k+1] = best_moves[k];
 	  }
 	  best_move_values[k] = tval;
-	  best_movei[k] = I(pos);
-	  best_movej[k] = J(pos);
+	  best_moves[k] = pos;
 	}
     }
 
   TRACE("\nTop moves:\n");
   for (k = 0; k < 10 && best_move_values[k] > 0.0; k++) {
-    TRACE("%d. %M %f\n", k+1, best_movei[k], best_movej[k],
-	  best_move_values[k]);
+    TRACE("%d. %1M %f\n", k+1, best_moves[k], best_move_values[k]);
   }
 }
 
@@ -3353,7 +3348,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
   int m, n;
   float tval;
   float bestval = 0.0;
-  int best_i = -1, best_j = -1;
+  int best_move = NO_MOVE;
   int ko_values_have_been_added = 0;
   int allowed_blunder_size = 0;
 
@@ -3401,8 +3396,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
   
   while (!good_move_found) {
     bestval = 0.0;
-    best_i = -1;
-    best_j = -1;
+    best_move = NO_MOVE;
 
     /* Search through all board positions for the highest valued move. */
     for (m = 0; m < board_size; m++)
@@ -3415,8 +3409,7 @@ review_move_reasons(int *i, int *j, float *val, int color,
 	if (tval > bestval) {
 	  if (is_legal(POS(m, n), color) || is_illegal_ko_capture(POS(m, n), color)) {
 	    bestval = tval;
-	    best_i = m;
-	    best_j = n;
+	    best_move = POS(m, n);
 	  }
 	  else {
 	    TRACE("Move at %m would be suicide.\n", m, n);
@@ -3430,27 +3423,27 @@ review_move_reasons(int *i, int *j, float *val, int color,
      * effects. If ko threat values have been added, only the base
      * value of the move must be taken into account here.
      */
-    if (!ko_values_have_been_added || !ON_BOARD2(best_i, best_j))
+    if (!ko_values_have_been_added || !ON_BOARD(best_move))
       allowed_blunder_size = (int) (bestval / 2);
     else {
       int base_value;
 
-      ASSERT_ON_BOARD2(best_i, best_j);
-      base_value = bestval - move[POS(best_i, best_j)].additional_ko_value;
+      ASSERT_ON_BOARD1(best_move);
+      base_value = bestval - move[best_move].additional_ko_value;
       allowed_blunder_size = (int) (base_value / 2);
     }
     
     /* If the best move is an illegal ko capture, reevaluate ko
      * threats and search again.
      */
-    if (bestval > 0.0 && is_illegal_ko_capture(POS(best_i, best_j), color)) {
-      TRACE("Move at %m would be an illegal ko capture.\n", best_i, best_j);
+    if (bestval > 0.0 && is_illegal_ko_capture(best_move, color)) {
+      TRACE("Move at %1m would be an illegal ko capture.\n", best_move);
       reevaluate_ko_threats();
       redistribute_points();
       time_report(2, "  reevaluate_ko_threats", -1, -1, 1.0);
       ko_values_have_been_added = 1;
-      move[POS(best_i, best_j)].value = 0.0;
-      move[POS(best_i, best_j)].final_value = 0.0;
+      move[best_move].value = 0.0;
+      move[best_move].final_value = 0.0;
       print_top_moves();
       good_move_found = 0;
     }
@@ -3459,11 +3452,11 @@ review_move_reasons(int *i, int *j, float *val, int color,
      * values once more.
      */
     else if (bestval > 0.0
-	     && !confirm_safety(best_i, best_j, 
-				color, allowed_blunder_size, NULL, NULL)) {
-      TRACE("Move at %m would be a blunder.\n", best_i, best_j);
-      move[POS(best_i, best_j)].value = 0.0;
-      move[POS(best_i, best_j)].final_value = 0.0;
+	     && !confirm_safety(best_move, 
+				color, allowed_blunder_size, NULL)) {
+      TRACE("Move at %1m would be a blunder.\n", best_move);
+      move[best_move].value = 0.0;
+      move[best_move].final_value = 0.0;
       good_move_found = 0;
     }
     else
@@ -3471,10 +3464,10 @@ review_move_reasons(int *i, int *j, float *val, int color,
   }
   
   if (bestval > 0.0 
-      && best_i != -1) {
+      && best_move != NO_MOVE) {
     *val = bestval;
-    *i = best_i;
-    *j = best_j;
+    *i = I(best_move);
+    *j = J(best_move);
     return 1;
   }
   else

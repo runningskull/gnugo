@@ -32,17 +32,18 @@
 #include <sys/times.h>
 #endif
 
-#include "gnugo.h"
 #include "interface.h"
 #include "liberty.h"
 #include "gtp.h"
 #include "random.h"
-#include <gg_utils.h>
+#include "gg_utils.h"
 
 /* Internal state that's not part of the engine. */
-int color_to_move;
 float komi;
 int handicap;
+
+static int report_uncertainty = 0;
+static int gtp_orientation = 0;
 
 static void
 print_influence(float white_influence[MAX_BOARD][MAX_BOARD],
@@ -50,8 +51,6 @@ print_influence(float white_influence[MAX_BOARD][MAX_BOARD],
 		int influence_regions[MAX_BOARD][MAX_BOARD]);
 static void gtp_print_code(int c);
 static void gtp_print_vertices2(int n, int *moves);
-static int report_uncertainty = 0;
-static int gtp_orientation = 0;
 static void rotate_on_input(int ai, int aj, int *bi, int *bj);
 static void rotate_on_output(int ai, int aj, int *bi, int *bj);
 
@@ -93,6 +92,7 @@ DECLARE(gtp_final_score);
 DECLARE(gtp_final_status);
 DECLARE(gtp_final_status_list);
 DECLARE(gtp_findlib);
+DECLARE(gtp_finish_sgftrace);
 DECLARE(gtp_fixed_handicap);
 DECLARE(gtp_genmove);
 DECLARE(gtp_genmove_black);
@@ -130,6 +130,7 @@ DECLARE(gtp_set_orientation);
 DECLARE(gtp_set_komi);
 DECLARE(gtp_set_level);
 DECLARE(gtp_showboard);
+DECLARE(gtp_start_sgftrace);
 DECLARE(gtp_top_moves);
 DECLARE(gtp_top_moves_white);
 DECLARE(gtp_top_moves_black);
@@ -170,6 +171,7 @@ static struct gtp_command commands[] = {
   {"final_status",            gtp_final_status},
   {"final_status_list",       gtp_final_status_list},
   {"findlib",          	      gtp_findlib},
+  {"finish_sgftrace",  	      gtp_finish_sgftrace},
   {"fixed_handicap",   	      gtp_fixed_handicap},
   {"genmove_black",           gtp_genmove_black},
   {"genmove_white",           gtp_genmove_white},
@@ -203,6 +205,7 @@ static struct gtp_command commands[] = {
   {"reset_trymove_counter",   gtp_reset_trymove_counter},
   {"same_dragon",    	      gtp_same_dragon},
   {"showboard",        	      gtp_showboard},
+  {"start_sgftrace",  	      gtp_start_sgftrace},
   {"top_moves",               gtp_top_moves},
   {"top_moves_black",         gtp_top_moves_black},
   {"top_moves_white",         gtp_top_moves_white},
@@ -424,7 +427,7 @@ gtp_playblack(char *s, int id)
   else if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
 
-  if (!is_legal2(i, j, BLACK))
+  if (!is_legal(POS(i, j), BLACK))
     return gtp_failure(id, "illegal move");
 
   play_move(POS(i, j), BLACK);
@@ -458,7 +461,7 @@ gtp_playwhite(char *s, int id)
   else if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
   
-  if (!is_legal2(i, j, WHITE))
+  if (!is_legal(POS(i, j), WHITE))
     return gtp_failure(id, "illegal move");
 
   play_move(POS(i, j), WHITE);
@@ -520,6 +523,7 @@ gtp_loadsgf(char *s, int id)
   SGFNode *sgf;
   Gameinfo gameinfo;
   int nread;
+  int color_to_move;
   
   nread = sscanf(s, "%s %s", filename, untilstring);
   if (nread < 1)
@@ -533,7 +537,7 @@ gtp_loadsgf(char *s, int id)
 
   if (nread == 1)
     color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, NULL,
-                                             gtp_orientation);
+					      gtp_orientation);
   else
     color_to_move = gameinfo_play_sgftree_rot(&gameinfo, sgf, untilstring,
                                               gtp_orientation);
@@ -590,7 +594,7 @@ gtp_countlib(char *s, int id)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  return gtp_success(id, "%d", countlib2(i, j));
+  return gtp_success(id, "%d", countlib(POS(i, j)));
 }
 
 
@@ -633,7 +637,7 @@ gtp_is_legal(char *s, int id)
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure(id, "invalid color or coordinate");
 
-  return gtp_success(id, "%d", is_legal2(i, j, color));
+  return gtp_success(id, "%d", is_legal(POS(i, j), color));
 }
 
 
@@ -656,7 +660,7 @@ gtp_all_legal(char *s, int id)
 
   for (i = 0; i < board_size; i++)
     for (j = 0; j < board_size; j++)
-      if (BOARD(i, j) == EMPTY && is_legal2(i, j, color)) {
+      if (BOARD(i, j) == EMPTY && is_legal(POS(i, j), color)) {
 	movei[moves] = i;
 	movej[moves++] = j;
       }
@@ -704,7 +708,7 @@ gtp_trymove(char *s, int id)
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure(id, "invalid color or coordinate");
 
-  if (!trymove2(i, j, color, "gtp_trymove", -1, -1, EMPTY, -1, -1))
+  if (!trymove(POS(i, j), color, "gtp_trymove", NO_MOVE, EMPTY, NO_MOVE))
     return gtp_failure(id, "illegal move");
 
   return gtp_success(id, "");
@@ -832,7 +836,7 @@ static int
 gtp_owl_attack(char *s, int id)
 {
   int i, j;
-  int ai, aj;
+  int attack_point;
   int attack_code;
   int save_verbose = verbose;
   int result_certain;
@@ -847,12 +851,12 @@ gtp_owl_attack(char *s, int id)
   examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
   
-  attack_code = owl_attack(i, j, &ai, &aj, &result_certain);
+  attack_code = owl_attack(POS(i, j), &attack_point, &result_certain);
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_code(attack_code);
   if (attack_code > 0) {
     gtp_printf(" ");
-    gtp_print_vertex(ai, aj);
+    gtp_print_vertex(I(attack_point), J(attack_point));
   }
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
@@ -869,7 +873,7 @@ static int
 gtp_owl_defend(char *s, int id)
 {
   int i, j;
-  int di, dj;
+  int defense_point;
   int defend_code;
   int save_verbose = verbose;
   int result_certain;
@@ -884,12 +888,12 @@ gtp_owl_defend(char *s, int id)
   examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
 
-  defend_code = owl_defend(i, j, &di, &dj, &result_certain);
+  defend_code = owl_defend(POS(i, j), &defense_point, &result_certain);
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_code(defend_code);
   if (defend_code > 0) {
     gtp_printf(" ");
-    gtp_print_vertex(di, dj);
+    gtp_print_vertex(I(defense_point), J(defense_point));
   }
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
@@ -1268,12 +1272,12 @@ gtp_genmove(char *s, int id)
 static int
 gtp_top_moves(char *s, int id)
 {
-  int i, j, k;
+  int k;
   UNUSED(s);
   gtp_printid(id, GTP_SUCCESS);
   for (k = 0; k < 10; k++)
     if (best_move_values[k] > 0.0) {
-      gtp_print_vertex(best_movei[k], best_movej[k]);
+      gtp_print_vertex(I(best_moves[k]), J(best_moves[k]));
       gtp_printf(" %.2f ", best_move_values[k]);
     }
   gtp_printf("\n\n");
@@ -1295,7 +1299,7 @@ gtp_top_moves_white(char *s, int id)
   gtp_printid(id, GTP_SUCCESS);
   for (k = 0; k < 10; k++)
     if (best_move_values[k] > 0.0) {
-      gtp_print_vertex(best_movei[k], best_movej[k]);
+      gtp_print_vertex(I(best_moves[k]), J(best_moves[k]));
       gtp_printf(" %.2f ", best_move_values[k]);
     }
   gtp_printf("\n\n");
@@ -1311,7 +1315,7 @@ gtp_top_moves_black(char *s, int id)
   gtp_printid(id, GTP_SUCCESS);
   for (k = 0; k < 10; k++)
     if (best_move_values[k] > 0.0) {
-      gtp_print_vertex(best_movei[k], best_movej[k]);
+      gtp_print_vertex(I(best_moves[k]), J(best_moves[k]));
       gtp_printf(" %.2f ", best_move_values[k]);
     }
   gtp_printf("\n\n");
@@ -1882,7 +1886,7 @@ gtp_debug_move_influence(char *s, int id)
   int save_printmoyo = printmoyo;
   int color;
   int i, j;
-  char saved_stones[MAX_BOARD][MAX_BOARD];
+  char saved_stones[BOARDMAX];
   
   if (!gtp_decode_move(s, &color, &i, &j))
     return gtp_failure(id, "invalid color or coordinate");
@@ -1895,12 +1899,12 @@ gtp_debug_move_influence(char *s, int id)
   debug     = save_debug;
   printmoyo = save_printmoyo;
 
-  find_stones_saved_by_move(i, j, color, saved_stones);
+  find_stones_saved_by_move(POS(i, j), color, saved_stones);
   
   /* FIXME: Decide the choice of information from the command. */
   printmoyo |= (PRINTMOYO_NUMERIC_INFLUENCE | PRINTMOYO_PRINT_INFLUENCE
 		| PRINTMOYO_PERMEABILITY | PRINTMOYO_STRENGTH);
-  print_move_influence(i, j, color, saved_stones);
+  print_move_influence(POS(i, j), color, saved_stones);
   printmoyo = save_printmoyo;
 
   return gtp_success(id, "");
@@ -2019,7 +2023,7 @@ gtp_move_influence(char *s, int id)
   int save_printmoyo = printmoyo;
   int color;
   int i, j;
-  char saved_stones[MAX_BOARD][MAX_BOARD];
+  char saved_stones[BOARDMAX];
   float white_influence[MAX_BOARD][MAX_BOARD];
   float black_influence[MAX_BOARD][MAX_BOARD];
   int influence_regions[MAX_BOARD][MAX_BOARD];
@@ -2035,7 +2039,7 @@ gtp_move_influence(char *s, int id)
   debug     = save_debug;
   printmoyo = save_printmoyo;
 
-  find_stones_saved_by_move(i, j, color, saved_stones);
+  find_stones_saved_by_move(POS(i, j), color, saved_stones);
   
   gtp_printid(id, GTP_SUCCESS);
   get_move_influence(i, j, color, saved_stones, white_influence,
@@ -2349,6 +2353,50 @@ gtp_dragon_stones(char *s, int id)
   return GTP_OK;
 }
 
+
+static SGFTree gtp_sgftree;
+
+/* Function:  Start storing moves executed during reading in an sgf
+ *            tree in memory. 
+ * Arguments: none
+ * Fails:     never
+ * Returns:   nothing
+ *
+ * Warning: You had better know what you're doing if you try to use this
+ *          command.
+ */
+static int
+gtp_start_sgftrace(char *s, int id)
+{
+  UNUSED(s);
+  begin_sgftreedump(&gtp_sgftree);
+  count_variations = 1;
+  return gtp_success(id, "");
+}
+
+
+/* Function:  Finish storing moves in an sgf tree and write it to file. 
+ * Arguments: filename
+ * Fails:     never
+ * Returns:   nothing
+ *
+ * Warning: You had better know what you're doing if you try to use this
+ *          command.
+ */
+static int
+gtp_finish_sgftrace(char *s, int id)
+{
+  char filename[GTP_BUFSIZE];
+  int nread;
+  
+  nread = sscanf(s, "%s", filename);
+  if (nread < 1)
+    return gtp_failure(id, "missing filename");
+
+  end_sgftreedump(filename);
+  count_variations = 0;
+  return gtp_success(id, "");
+}
 
 
 /* Function:  Tune the parameters for the move ordering in the tactical

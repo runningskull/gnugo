@@ -146,7 +146,7 @@ static void store_persistent_owl_cache(int routine, int apos,
 				       char goal[BOARDMAX],
 				       int goal_color);
 static void print_persistent_owl_cache_entry(int k);
-static void mark_dragon_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
+static void mark_dragon_hotspot_values(float values[BOARDMAX],
 				       int pos, float contribution);
 
 
@@ -169,7 +169,7 @@ static int owl_determine_life(struct local_owl_data *owl,
 			      int color, int komaster, int does_attack,
 			      struct owl_move_data *moves, int *probable_min,
 			      int *probable_max);
-static void owl_mark_dragon(int ai, int aj, int bi, int bj,
+static void owl_mark_dragon(int apos, int bpos,
 			    struct local_owl_data *owl);
 static void owl_mark_boundary(struct local_owl_data *owl);
 static void owl_update_goal(int pos, int same_dragon,
@@ -220,8 +220,8 @@ owl_analyze_semeai(int ai, int aj, int bi, int bj)
   TRACE("owl_analyze_semeai: %m vs. %m\n", ai, aj, bi, bj);
   owla.lunches_are_current = 0;
   owlb.lunches_are_current = 0;
-  owl_mark_dragon(ai, aj, -1, -1, &owla);
-  owl_mark_dragon(bi, bj, -1, -1, &owlb);
+  owl_mark_dragon(POS(ai, aj), NO_MOVE, &owla);
+  owl_mark_dragon(POS(bi, bj), NO_MOVE, &owlb);
   compute_owl_escape_values(&owla);
   compute_owl_escape_values(&owlb);
   owl_make_domains(&owla, &owlb);
@@ -591,13 +591,13 @@ do_owl_analyze_semeai(int apos, int bpos,
     memset(ma, 0, sizeof(ma));
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++)
-	if ((owlb->goal)[POS(m, n)]) {
+	if (owlb->goal[POS(m, n)]) {
 	  origin = find_origin(POS(m, n));
 	  if (!ma[origin] &&
-	      ((m > 0 && (owla->goal)[POS(m-1, n)])
-	       || (m < board_size-1 && (owla->goal)[POS(m+1, n)])
-	       || (n > 0 && (owla->goal)[POS(m, n-1)])
-	       || (n <board_size-1 && (owla->goal)[POS(m, n+1)]))) {
+	      ((m > 0 && owla->goal[POS(m-1, n)])
+	       || (m < board_size-1 && owla->goal[POS(m+1, n)])
+	       || (n > 0 && owla->goal[POS(m, n-1)])
+	       || (n < board_size-1 && owla->goal[POS(m, n+1)]))) {
 	    if (countlib(origin) < 3 && attack(origin, &upos)) {
 	      *resulta = ALIVE;
 	      *resultb = DEAD;
@@ -637,21 +637,19 @@ do_owl_analyze_semeai(int apos, int bpos,
   memcpy(saved_goal, owla->goal, sizeof(saved_goal));
   for (k = 0; k < 2*MAX_SEMEAI_MOVES+2; k++) {
     int mpos = moves[k].pos;
-    int mi = I(mpos);
-    int mj = J(mpos);
 
-    if (mpos != 0 
+    if (mpos != NO_MOVE
 	&& trymove(mpos, color, moves[k].name, apos, EMPTY, 0)) {
       dump_stack();
       if (moves[k].same_dragon)
-	mark_string(POS(mi, mj), owla->goal, 1);
+	mark_string(mpos, owla->goal, 1);
       owla->lunches_are_current = 0;
       owl_update_boundary_marks(mpos, owla);
       if (liberty_of_goal(mpos, owla))
-	(owla->goal)[POS(mi, mj)] = 1;
+	(owla->goal)[mpos] = 1;
       do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
 			    &this_resultb, &this_resulta, NULL, 0);
-      if ((this_resultb == DEAD) && (this_resulta == ALIVE)) {
+      if (this_resultb == DEAD && this_resulta == ALIVE) {
 	memcpy(owla->goal, saved_goal, sizeof(saved_goal));
 	popgo();
 	owl_phase = save_owl_phase;
@@ -736,13 +734,12 @@ do_owl_analyze_semeai(int apos, int bpos,
 static int
 liberty_of_goal(int pos, struct local_owl_data *owl)
 {
-  int i = I(pos);
-  int j = J(pos);
-  if ((i > 0 && (owl->goal)[POS(i-1, j)])
-      || (i < board_size-1 && (owl->goal)[POS(i+1, j)])
-      || (j > 0 && (owl->goal)[POS(i, j-1)])
-      || (j < board_size-1 && (owl->goal)[POS(i, j+1)]))
+  if ((ON_BOARD(SOUTH(pos)) && owl->goal[SOUTH(pos)])
+      || (ON_BOARD(WEST(pos)) && owl->goal[WEST(pos)])
+      || (ON_BOARD(NORTH(pos)) && owl->goal[NORTH(pos)])
+      || (ON_BOARD(EAST(pos)) && owl->goal[EAST(pos)]))
     return 1;
+  
   return 0;
 }
 
@@ -766,7 +763,7 @@ liberty_of_goal(int pos, struct local_owl_data *owl)
  * */
 
 int
-owl_attack(int m, int n, int *ui, int *uj, int *certain)
+owl_attack(int target, int *attack_point, int *certain)
 {
   int result;
   static struct local_owl_data owl;
@@ -774,50 +771,49 @@ owl_attack(int m, int n, int *ui, int *uj, int *certain)
   clock_t start = 0, end;
   double elapsed;
   int tactical_nodes;
-  int str = POS(m, n);
-  int move = 0;
+  int move = NO_MOVE;
 
   result_certain = 1;
-  if (worm[POS(m, n)].unconditional_status == DEAD) {
-    if (ui) *ui = -1;
-    if (uj) *uj = -1;
+  if (worm[target].unconditional_status == DEAD) {
+    if (attack_point)
+      *attack_point = NO_MOVE;
+    if (certain)
+      *certain = 1;
     return 1;
   }
 
-  if (search_persistent_owl_cache(OWL_ATTACK, str, 0, 0, &result,
-				  &move, NULL, certain)) {
-    if (ui) *ui = I(move);
-    if (uj) *uj = J(move);
+  if (search_persistent_owl_cache(OWL_ATTACK, target, 0, 0, &result,
+				  attack_point, NULL, certain))
     return result;
-  }
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = clock();
   owl.local_owl_node_counter = 0;
-  TRACE("owl_attack %m\n", m, n);
+  TRACE("owl_attack %1m\n", target);
   owl.lunches_are_current = 0;
-  owl_mark_dragon(m, n, -1, -1, &owl);
+  owl_mark_dragon(target, NO_MOVE, &owl);
   compute_owl_escape_values(&owl);
   owl_make_domains(&owl, NULL);
-  result = do_owl_attack(str, &move, &owl, EMPTY, 0);
+  result = do_owl_attack(target, &move, &owl, EMPTY, 0);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   if (debug & DEBUG_OWL_PERFORMANCE) {
     end = clock();
     elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-    gprintf("owl_attack %m, result %d %1m (%d, %d nodes, %f seconds)\n",
-	    m, n, result, move, owl.local_owl_node_counter,
+    gprintf("owl_attack %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+	    target, result, move, owl.local_owl_node_counter,
 	    tactical_nodes, elapsed);
   }
 
-  store_persistent_owl_cache(OWL_ATTACK, str, 0, 0,
+  store_persistent_owl_cache(OWL_ATTACK, target, 0, 0,
 			     result, move, 0,
 			     result_certain, tactical_nodes,
-			     owl.goal, board[str]);
+			     owl.goal, board[target]);
 
-  if (ui) *ui = I(move);
-  if (uj) *uj = J(move);
-  if (certain) *certain = result_certain;
+  if (attack_point)
+    *attack_point = move;
+  if (certain)
+    *certain = result_certain;
 
   return result;
 }
@@ -850,8 +846,6 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
   int found_read_result;
   Read_result *read_result;
   int this_variation_number = count_variations - 1;
-  int m = I(str);
-  int n = J(str);
   
   SETUP_TRACE_INFO("owl_attack", str);
 
@@ -1030,7 +1024,7 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
       
       sgf_dumptree = NULL;
       count_variations = 0;
-      result = attack(POS(m, n), &apos);
+      result = attack(str, &apos);
       if (result == WIN || (result != 0 && probable_min >= 2)) {
 	shape_moves[0].pos         = apos;
 	shape_moves[0].value       = 25;
@@ -1215,12 +1209,11 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
  */
 
 int
-owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)
+owl_threaten_attack(int target, int *attack1, int *attack2)
 {
   struct owl_move_data moves[MAX_MOVES];
   int k;
-  int str = POS(m, n);
-  int other = OTHER_COLOR(board[str]);
+  int other = OTHER_COLOR(board[target]);
   static struct local_owl_data owl;
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
@@ -1232,22 +1225,18 @@ owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)
   int move2 = 0;
 
   result_certain = 1;
-  if (search_persistent_owl_cache(OWL_THREATEN_ATTACK, str, 0, 0,
-				  &result, &move, &move2, NULL)) {
-    if (ui) *ui = I(move);
-    if (uj) *uj = J(move);
-    if (vi) *vi = I(move2);
-    if (vj) *vj = J(move2);
+  if (search_persistent_owl_cache(OWL_THREATEN_ATTACK, target, 0, 0,
+				  &result, attack1, attack2, NULL))
     return result;
-  }
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = clock();
+  
   owl.local_owl_node_counter = 0;
   gg_assert(stackp == 0);
-  TRACE("owl_threaten_attack %m\n", m, n);
+  TRACE("owl_threaten_attack %1m\n", target);
   owl.lunches_are_current = 0;
-  owl_mark_dragon(m, n, -1, -1, &owl);
+  owl_mark_dragon(target, NO_MOVE, &owl);
   memcpy(saved_boundary, owl.boundary, sizeof(saved_boundary));
   compute_owl_escape_values(&owl);
   owl_make_domains(&owl, NULL);
@@ -1256,7 +1245,7 @@ owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)
       int mpos = moves[k].pos;
 
       if (mpos != 0 && moves[k].value > 0)
-	if (trymove(mpos, other, moves[k].name, str, EMPTY, 0)) {
+	if (trymove(mpos, other, moves[k].name, target, EMPTY, 0)) {
 	  int oi, oj;
 	  int origin = 0;
 	  owl.lunches_are_current = 0;
@@ -1268,7 +1257,7 @@ owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)
 	   * such string is found, owl_attack declares victory.
 	   */
 	  
-	  if (board[str] == EMPTY) {
+	  if (board[target] == EMPTY) {
 	    int found_string = 0;
 	    for (oi = 0; oi < board_size && !found_string; oi++)
 	      for (oj = 0; oj < board_size && !found_string; oj++) {
@@ -1287,7 +1276,7 @@ owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)
 	      break;
 	    }
 	  }
-	  else if (do_owl_attack(str, &move2, &owl, EMPTY, 0) == WIN) {
+	  else if (do_owl_attack(target, &move2, &owl, EMPTY, 0) == WIN) {
 	    move = moves[k].pos;
 	    popgo();
 	    gg_assert(stackp == 0);
@@ -1305,19 +1294,21 @@ owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)
   if (debug & DEBUG_OWL_PERFORMANCE) {
     end = clock();
     elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-    gprintf("owl_threaten_attack %m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
-	    m, n, move, move2, result,
+    gprintf("owl_threaten_attack %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
+	    target, move, move2, result,
 	    owl.local_owl_node_counter,
 	    tactical_nodes, elapsed);
   }
 
-  store_persistent_owl_cache(OWL_THREATEN_ATTACK, str, 0, 0,
+  store_persistent_owl_cache(OWL_THREATEN_ATTACK, target, 0, 0,
 			     result, move, move2, 0,
-			     tactical_nodes, owl.goal, board[str]);
-  if (ui) *ui = I(move);
-  if (uj) *uj = J(move);
-  if (vi) *vi = I(move2);
-  if (vj) *vj = J(move2);
+			     tactical_nodes, owl.goal, board[target]);
+
+  if (attack1)
+    *attack1 = move;
+  if (attack2)
+    *attack2 = move2;
+
   return result;
 }
 
@@ -1342,7 +1333,7 @@ owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj)
  * be maintained during reading.  */
 
 int
-owl_defend(int m, int n, int *ui, int *uj, int *certain)
+owl_defend(int target, int *defense_point, int *certain)
 {
   int result;
   static struct local_owl_data owl;
@@ -1351,43 +1342,43 @@ owl_defend(int m, int n, int *ui, int *uj, int *certain)
   double elapsed;
   int tactical_nodes;
   int move = 0;
-  int str = POS(m, n);
 
   result_certain = 1;
-  if (worm[POS(m, n)].unconditional_status == DEAD)
+  if (worm[target].unconditional_status == DEAD)
     return 0;
 
-  if (search_persistent_owl_cache(OWL_DEFEND, str, 0, 0,
-				  &result, &move, NULL, certain)) {
-    if (ui) *ui = I(move);
-    if (uj) *uj = J(move);
+  if (search_persistent_owl_cache(OWL_DEFEND, target, 0, 0,
+				  &result, defense_point, NULL, certain))
     return result;
-  }
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = clock();
+
   owl.local_owl_node_counter = 0;
-  TRACE("owl_defend %m\n", m, n);
+  TRACE("owl_defend %1m\n", target);
   owl.lunches_are_current = 0;
-  owl_mark_dragon(m, n, -1, -1, &owl);
+  owl_mark_dragon(target, NO_MOVE, &owl);
   compute_owl_escape_values(&owl);
   owl_make_domains(&owl, NULL);
-  result = do_owl_defend(str, &move, &owl, EMPTY, 0);
+  result = do_owl_defend(target, &move, &owl, EMPTY, 0);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+
   if (debug & DEBUG_OWL_PERFORMANCE) {
     end = clock();
     elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-    gprintf("owl_defend %m, result %d %1m (%d, %d nodes, %f seconds)\n",
-	    m, n, result, move, owl.local_owl_node_counter,
+    gprintf("owl_defend %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+	    target, result, move, owl.local_owl_node_counter,
 	    tactical_nodes, elapsed);
   }
 
-  store_persistent_owl_cache(OWL_DEFEND, str, 0, 0, result, move, 0,
+  store_persistent_owl_cache(OWL_DEFEND, target, 0, 0, result, move, 0,
 			     result_certain, tactical_nodes, owl.goal,
-			     board[str]);
-  if (ui) *ui = I(move);
-  if (uj) *uj = J(move);
-  if (certain) *certain = result_certain;
+			     board[target]);
+  if (defense_point)
+    *defense_point = move;
+  if (certain)
+    *certain = result_certain;
+  
   return result;
 }
 
@@ -1418,8 +1409,6 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
   int found_read_result;
   Read_result *read_result;
   int this_variation_number = count_variations - 1;
-  int m = I(str);
-  int n = J(str);
   
   SETUP_TRACE_INFO("owl_defend", str);
 
@@ -1613,7 +1602,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
       
       sgf_dumptree = NULL;
       count_variations = 0;
-      if (attack_and_defend(POS(m, n), NULL, NULL, NULL, &dpos)
+      if (attack_and_defend(str, NULL, NULL, NULL, &dpos)
 	  && (approxlib(dpos, color, 2, NULL) > 1
 	      || does_capture_something(dpos, color))) {
 	shape_moves[0].pos         = dpos;
@@ -1726,12 +1715,11 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
  */
 
 int
-owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj)
+owl_threaten_defense(int target, int *defend1, int *defend2)
 {
   struct owl_move_data moves[MAX_MOVES];
   int k;
-  int str = POS(m, n);
-  int color = board[str];
+  int color = board[target];
   int result = 0;
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
@@ -1743,34 +1731,29 @@ owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj)
   int move2 = 0;
 
   result_certain = 1;
-  if (worm[POS(m, n)].unconditional_status == DEAD)
+  if (worm[target].unconditional_status == DEAD)
     return 0;
 
-  if (search_persistent_owl_cache(OWL_THREATEN_DEFENSE, str, 0, 0,
-				  &result, &move, &move2, NULL)) {
-    if (ui) *ui = I(move);
-    if (uj) *uj = J(move);
-    if (vi) *vi = I(move2);
-    if (vj) *vj = J(move2);
+  if (search_persistent_owl_cache(OWL_THREATEN_DEFENSE, target, 0, 0,
+				  &result, defend1, defend2, NULL))
     return result;
-  }
 
   if (debug & DEBUG_OWL_PERFORMANCE)
     start = clock();
   owl.local_owl_node_counter = 0;
-  TRACE("owl_threaten_defense %m\n", m, n);
+  TRACE("owl_threaten_defense %1m\n", target);
   owl.lunches_are_current = 0;
-  owl_mark_dragon(m, n, -1, -1, &owl);
+  owl_mark_dragon(target, NO_MOVE, &owl);
   memcpy(saved_goal, owl.goal, sizeof(saved_goal));
   compute_owl_escape_values(&owl);
   owl_make_domains(&owl, NULL);
   if (owl_shapes(moves, color, &owl, &owl_defendpat_db)) {
     for (k = 0; k < MAX_MOVES; k++) {
       if (moves[k].pos != 0 && moves[k].value > 0)
-	if (trymove(moves[k].pos, color, moves[k].name, str, EMPTY, 0)) {
+	if (trymove(moves[k].pos, color, moves[k].name, target, EMPTY, 0)) {
 	  owl.lunches_are_current = 0;
 	  owl_update_goal(moves[k].pos, moves[k].same_dragon, &owl);
-	  if (do_owl_defend(str, &move2, &owl, EMPTY, 0) == WIN) {
+	  if (do_owl_defend(target, &move2, &owl, EMPTY, 0) == WIN) {
 	    move = moves[k].pos;
 	    popgo();
 	    /* Don't return the second move if occupied before trymove */
@@ -1791,18 +1774,20 @@ owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj)
   if (debug & DEBUG_OWL_PERFORMANCE) {
     end = clock();
     elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-    gprintf("owl_threaten_defense %m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
-	    m, n, move, move2, result, owl.local_owl_node_counter,
+    gprintf("owl_threaten_defense %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
+	    target, move, move2, result, owl.local_owl_node_counter,
 	    tactical_nodes, elapsed);
   }
 
-  store_persistent_owl_cache(OWL_THREATEN_DEFENSE, str, 0, 0,
+  store_persistent_owl_cache(OWL_THREATEN_DEFENSE, target, 0, 0,
 			     result, move, move2, 0,
-			     tactical_nodes, owl.goal, board[str]);
-  if (ui) *ui = I(move);
-  if (uj) *uj = J(move);
-  if (vi) *vi = I(move2);
-  if (vj) *vj = J(move2);
+			     tactical_nodes, owl.goal, board[target]);
+
+  if (defend1)
+    *defend1 = move;
+  if (defend2)
+    *defend2 = move2;
+
   return result;
 }
 
@@ -1881,18 +1866,19 @@ owl_determine_life(struct local_owl_data *owl,
     eye_color = BLACK_BORDER;
 
   for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (BOARD(m, n) && owl->goal[POS(m, n)]) {
+    for (n = 0; n < board_size; n++) {
+      int pos = POS(m, n);
+      if (board[pos] && owl->goal[pos]) {
 	for (k = 0; k < 8; k++) {
-	  int dm = deltai[k];
-	  int dn = deltaj[k];
-	  if (ON_BOARD2(m+dm, n+dn)
-	      && eye[POS(m+dm, n+dn)].color == eye_color
-	      && eye[POS(m+dm, n+dn)].origin != NO_MOVE
-	      && !eye[POS(m+dm, n+dn)].marginal)
-	    mw[eye[POS(m+dm, n+dn)].origin]++;
+	  int pos2 = pos + delta[k];
+	  if (ON_BOARD(pos2)
+	      && eye[pos2].color == eye_color
+	      && eye[pos2].origin != NO_MOVE
+	      && !eye[pos2].marginal)
+	    mw[eye[pos2].origin]++;
 	}
       }
+    }
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
@@ -1907,12 +1893,13 @@ owl_determine_life(struct local_owl_data *owl,
   topological_intersections = 0;
   for (m = 0; m<board_size; m++)
     for (n = 0; n<board_size; n++) {
-      if (eye[POS(m, n)].color == eye_color
-	  && eye[POS(m, n)].origin != NO_MOVE
-	  && mw[eye[POS(m, n)].origin] > 1
-	  && (!eye[POS(m, n)].marginal || life)
-	  && eye[POS(m, n)].neighbors <= 1) {
-	mx[POS(m, n)] = 1;
+      int pos = POS(m, n);
+      if (eye[pos].color == eye_color
+	  && eye[pos].origin != NO_MOVE
+	  && mw[eye[pos].origin] > 1
+	  && (!eye[pos].marginal || life)
+	  && eye[pos].neighbors <= 1) {
+	mx[pos] = 1;
 	topological_intersections++;
       }
     }
@@ -1921,29 +1908,25 @@ owl_determine_life(struct local_owl_data *owl,
   while (topological_intersections > 0) {
     for (m = 0; m<board_size; m++)
       for (n = 0; n<board_size; n++) {
+	int pos = POS(m, n);
 	int sum;
-	int ai = -1;
-	int aj = -1;
-	int di = -1;
-	int dj = -1;
 
-	if (mx[POS(m, n)] <= 0)
+	if (mx[pos] <= 0)
 	  continue;
 
-	mx[POS(m, n)] = -1;
+	mx[pos] = -1;
 	topological_intersections--;
 	
-	sum = topological_eye(m, n, color, &ai, &aj, &di, &dj, 
-			      owl->black_eye, owl->white_eye,
+	sum = topological_eye(pos, color, owl->black_eye, owl->white_eye,
 			      owl->half_eye);
 
 	if (sum >= 4) {
-	  int previously_marginal = eye[POS(m, n)].marginal;
-	  owl->half_eye[POS(m, n)].type = FALSE_EYE;
-	  if (eye[POS(m, n)].esize == 1
-	      || is_legal2(m, n, OTHER_COLOR(color))
-	      || BOARD(m, n) == OTHER_COLOR(color)) {
-	    add_half_eye(m, n, eye, owl->half_eye);
+	  int previously_marginal = eye[pos].marginal;
+	  owl->half_eye[pos].type = FALSE_EYE;
+	  if (eye[pos].esize == 1
+	      || is_legal(pos, OTHER_COLOR(color))
+	      || board[pos] == OTHER_COLOR(color)) {
+	    add_half_eye(pos, eye, owl->half_eye);
 	    
 	    /* Marginal status may have changed. This can change the
              * topological eye evaluation for diagonal neighbors, so
@@ -1955,7 +1938,7 @@ owl_determine_life(struct local_owl_data *owl,
 	      for (k=4; k<8; k++) {
 		int i = m + deltai[k];
 		int j = n + deltaj[k];
-		if (ON_BOARD2(i, j) && mx[POS(i, j)] == -1) {
+		if (ON_BOARD(POS(i, j)) && mx[POS(i, j)] == -1) {
 		  mx[POS(i, j)] = 1;
 		  topological_intersections++;
 		}
@@ -1964,11 +1947,11 @@ owl_determine_life(struct local_owl_data *owl,
 	  }
 	}
 	else if (sum == 3) {
-	  owl->half_eye[POS(m, n)].type = HALF_EYE;
-	  ASSERT1(owl->half_eye[POS(m,n)].num_attacks > 0, POS(m, n));
-	  ASSERT_ON_BOARD1(owl->half_eye[POS(m, n)].attack_point[0]);
-	  ASSERT1(owl->half_eye[POS(m, n)].num_defends > 0, POS(m, n));
-	  ASSERT_ON_BOARD1(owl->half_eye[POS(m, n)].defense_point[0]);
+	  owl->half_eye[pos].type = HALF_EYE;
+	  ASSERT1(owl->half_eye[pos].num_attacks > 0, pos);
+	  ASSERT_ON_BOARD1(owl->half_eye[pos].attack_point[0]);
+	  ASSERT1(owl->half_eye[pos].num_defends > 0, pos);
+	  ASSERT_ON_BOARD1(owl->half_eye[pos].defense_point[0]);
 	}
       }
   }
@@ -1985,9 +1968,7 @@ owl_determine_life(struct local_owl_data *owl,
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       int pos = POS(m, n);
-      if (mw[pos] > 1
-	  && (eye[pos].origin == pos))
-      {
+      if (mw[pos] > 1 && eye[pos].origin == pos) {
 	int value = 0;
 	const char *reason = "";
 	int i, j;
@@ -2080,13 +2061,13 @@ owl_determine_life(struct local_owl_data *owl,
    */
   {
     for (lunch = 0; (lunch < MAX_LUNCHES); lunch++)
-      if ((owl->lunch[lunch] != NO_MOVE) &&
-	  (owl->lunch_defense_point[lunch] != NO_MOVE)) {
+      if (owl->lunch[lunch] != NO_MOVE &&
+	  owl->lunch_defense_point[lunch] != NO_MOVE) {
 	int value = 0;
 	int lunch_min;
 	int lunch_probable;
 	int lunch_max;
-	sniff_lunch(owl->lunch[lunch],
+	sniff_lunch(owl->lunch[lunch], 
 		    &lunch_min, &lunch_probable, &lunch_max, owl);
 
 	*probable_max += lunch_max;
@@ -2106,17 +2087,15 @@ owl_determine_life(struct local_owl_data *owl,
 
 	if (does_attack) {
 	  TRACE("save lunch at %1m with %1m, score %d\n",
-		owl->lunch[lunch],
-		owl->lunch_defense_point[lunch], value);
-	  owl_add_move(moves, owl->lunch_defense_point[lunch],
-		       value, "save lunch", 1);
+		owl->lunch[lunch], owl->lunch_defense_point[lunch], value);
+	  owl_add_move(moves, owl->lunch_defense_point[lunch], value,
+		       "save lunch", 1);
 	}
 	else {
 	  TRACE("eat lunch at %1m with %1m, score %d\n",
-		owl->lunch[lunch],
-		owl->lunch_attack_point[lunch], value);
-	  owl_add_move(moves, owl->lunch_attack_point[lunch],
-		       value, "eat lunch", 1);
+		owl->lunch[lunch], owl->lunch_attack_point[lunch], value);
+	  owl_add_move(moves, owl->lunch_attack_point[lunch], value,
+		       "eat lunch", 1);
 	}
       }
   }
@@ -2349,22 +2328,22 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
  */
 
 static void
-owl_mark_dragon(int ai, int aj, int bi, int bj, struct local_owl_data *owl)
+owl_mark_dragon(int apos, int bpos, struct local_owl_data *owl)
 {
-  int i, j;
-  int color = BOARD(ai, aj);
+  int pos;
+  int color = board[apos];
   
-  gg_assert(bi == -1 || BOARD(bi, bj) == color);
-  
-  for (i = 0; i < board_size; i++) {
-    for (j = 0; j < board_size; j++) {
-      if (same_dragon(POS(i, j), POS(ai, aj)) || same_dragon(POS(i, j), POS(bi, bj)))
-	owl->goal[POS(i, j)] = 1;
+  ASSERT1(bpos == NO_MOVE || board[bpos] == color, bpos);
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos)) {
+      if (is_same_dragon(pos, apos) || is_same_dragon(pos, bpos))
+	owl->goal[pos] = 1;
       else
-	owl->goal[POS(i, j)] = 0;
+	owl->goal[pos] = 0;
     }
-  }
-  (owl->color) = color;
+
+  owl->color = color;
   owl_mark_boundary(owl);
 }
 
@@ -2557,8 +2536,8 @@ owl_reasons(int color)
 	if (board[pos] == color) {
 	  if (dragon[pos].owl_defense_point != NO_MOVE) {
 	    add_owl_defense_move(dragon[pos].owl_defense_point, pos);
-	    DEBUG(DEBUG_OWL, "owl: %1m defends %m at move %d\n",
-		  dragon[pos].owl_defense_point, m, n, movenum+1);
+	    DEBUG(DEBUG_OWL, "owl: %1m defends %1m at move %d\n",
+		  dragon[pos].owl_defense_point, pos, movenum+1);
 	  }
 	}
 	else { /* opponent's dragon */
@@ -2570,8 +2549,7 @@ owl_reasons(int color)
 	   * scheme should minimize the performance hit, but of course
 	   * it's unfortunate to have the code duplication.
 	   */
-	  int ti = I(dragon[pos].owl_attack_point);
-	  int tj = J(dragon[pos].owl_attack_point);
+	  int move = dragon[pos].owl_attack_point;
 
 	  /* No worries if we catch something big. */
 	  if (dragon[pos].effective_size < 8) {
@@ -2582,7 +2560,7 @@ owl_reasons(int color)
 	     */
 	    int largest = 0;
 	    int k;
-	    int bi = -1, bj = -1;
+	    int bpos = NO_MOVE;
 	    int safe = 0;
 	    for (k = 0; k < DRAGON2(pos).neighbors; k++) {
 	      int d = DRAGON2(pos).adjacent[k];
@@ -2592,8 +2570,7 @@ owl_reasons(int color)
 		  break;
 		}
 		if (DRAGON(d).size > largest) {
-		  bi = I(dragon2[d].origin);
-		  bj = J(dragon2[d].origin);
+		  bpos = dragon2[d].origin;
 		  largest = DRAGON(d).size;
 		}
 	      }
@@ -2602,24 +2579,24 @@ owl_reasons(int color)
 	    /* It may occasionally happen that no neighbor of our
 	     * color was found. Assume safe in that case.
 	     */
-	    if (bi == -1)
+	    if (bpos == NO_MOVE)
 	      safe = 1;
 
 	    /* If not yet thought safe, ask the owl code whether the
 	     * owl attack defends the (largest) attacker.
 	     */
-	    if (!safe && !owl_does_defend(ti, tj, bi, bj)) {
+	    if (!safe && !owl_does_defend(move, bpos)) {
 	      DEBUG(DEBUG_OWL,
-		    "owl: %m attacks %1m at move %d, but the attacker dies.\n",
-		    ti, tj, pos, movenum+1);
+		    "owl: %1m attacks %1m at move %d, but the attacker dies.\n",
+		    move, pos, movenum+1);
 	      DRAGON2(pos).safety = INESSENTIAL;
 	      continue;
 	    }
 	  }
 	  
 	  /* If we've reached this far, the attack is okay. */
-	  add_owl_attack_move(POS(ti, tj), pos);
-	  DEBUG(DEBUG_OWL, "owl: %m attacks %1m at move %d\n", ti, tj, pos,
+	  add_owl_attack_move(move, pos);
+	  DEBUG(DEBUG_OWL, "owl: %1m attacks %1m at move %d\n", move, pos,
 		movenum+1);
 	}
       }
@@ -2685,31 +2662,29 @@ owl_reasons(int color)
  */
 
 int
-owl_does_defend(int ti, int tj, int m, int n)
+owl_does_defend(int move, int target)
 {
-  int move = POS(ti, tj);
-  int str = POS(m, n);
-  int color = board[str];
+  int color = board[target];
   int result = 0;
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
-  int opos;
+  int origin;
   owl.local_owl_node_counter = 0;
 
-  if (worm[POS(m, n)].unconditional_status == DEAD)
+  if (worm[target].unconditional_status == DEAD)
     return 0;
 
-  opos = dragon[POS(m, n)].origin;
-  TRACE("owl_does_defend %m %m(%1m)\n", ti, tj, m, n, opos);
+  origin = dragon[target].origin;
+  TRACE("owl_does_defend %1m %1m(%1m)\n", move, target, origin);
 
-  if (search_persistent_owl_cache(OWL_DOES_DEFEND, move, str, 0,
+  if (search_persistent_owl_cache(OWL_DOES_DEFEND, move, target, 0,
 				  &result, NULL, NULL, NULL))
     return result;
 
-  if (trymove(move, color, "owl_does_defend", str, EMPTY, 0)) {
+  if (trymove(move, color, "owl_does_defend", target, EMPTY, 0)) {
     /* Check if a compatible owl_attack() is cached. */
-    if (search_persistent_owl_cache(OWL_ATTACK, opos, 0, 0,
+    if (search_persistent_owl_cache(OWL_ATTACK, origin, 0, 0,
 				    &result, NULL, NULL, NULL)) {
       popgo();
       if (!result)
@@ -2719,10 +2694,10 @@ owl_does_defend(int ti, int tj, int m, int n)
     }
     
     owl.lunches_are_current = 0;
-    owl_mark_dragon(m, n, -1, -1, &owl);
+    owl_mark_dragon(target, NO_MOVE, &owl);
     owl_update_goal(move, 2, &owl);
     compute_owl_escape_values(&owl);
-    if (!do_owl_attack(str, NULL, &owl, EMPTY, 0))
+    if (!do_owl_attack(target, NULL, &owl, EMPTY, 0))
       result = WIN;
     owl.lunches_are_current = 0;
     popgo();
@@ -2734,12 +2709,12 @@ owl_does_defend(int ti, int tj, int m, int n)
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
 	"owl_does_defend %1m %1m(%1m), result %d (%d, %d nodes)\n",
-	move, str, opos, result,
+	move, target, origin, result,
 	owl.local_owl_node_counter, tactical_nodes);
 
-  store_persistent_owl_cache(OWL_DOES_DEFEND, move, str, 0,
+  store_persistent_owl_cache(OWL_DOES_DEFEND, move, target, 0,
 			     result, 0, 0, 0,
-			     tactical_nodes, owl.goal, board[str]);
+			     tactical_nodes, owl.goal, board[target]);
 
   return result;
 }
@@ -2754,39 +2729,32 @@ owl_does_defend(int ti, int tj, int m, int n)
  */
 
 int
-owl_confirm_safety(int ti, int tj, int m, int n, int *di, int *dj)
+owl_confirm_safety(int move, int target, int *defense_point)
 {
-  int move = POS(ti, tj);
-  int str = POS(m, n);
-  int color = board[str];
+  int color = board[target];
   int result = 0;
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
-  int opos;
+  int origin;
   int defense = 0;
   owl.local_owl_node_counter = 0;
 
-  if (worm[POS(m, n)].unconditional_status == DEAD)
+  if (worm[target].unconditional_status == DEAD)
     return 0;
 
-  opos = dragon[POS(m, n)].origin;
-  TRACE("owl_confirm_safety %m %m(%1m)\n", ti, tj, m, n, opos);
+  origin = dragon[target].origin;
+  TRACE("owl_confirm_safety %1m %1m(%1m)\n", move, target, origin);
 
-  if (search_persistent_owl_cache(OWL_CONFIRM_SAFETY, move, str, 0,
-				  &result, &defense, NULL, NULL)) {
-    if (di) *di = I(defense);
-    if (dj) *dj = J(defense);
+  if (search_persistent_owl_cache(OWL_CONFIRM_SAFETY, move, target, 0,
+				  &result, defense_point, NULL, NULL))
     return result;
-  }
 
-  if (trymove(move, color, "owl_confirm_safety", str, EMPTY, 0)) {
+  if (trymove(move, color, "owl_confirm_safety", target, EMPTY, 0)) {
     /* Check if a compatible owl_attack() is cached. */
-    if (search_persistent_owl_cache(OWL_ATTACK, opos, 0, 0,
-				    &result, &defense, NULL, NULL)) {
+    if (search_persistent_owl_cache(OWL_ATTACK, origin, 0, 0,
+				    &result, defense_point, NULL, NULL)) {
       popgo();
-      if (di) *di = I(defense);
-      if (dj) *dj = J(defense);
       if (!result)
 	return WIN;
       else
@@ -2794,10 +2762,10 @@ owl_confirm_safety(int ti, int tj, int m, int n, int *di, int *dj)
     }
     
     owl.lunches_are_current = 0;
-    owl_mark_dragon(m, n, -1, -1, &owl);
+    owl_mark_dragon(target, NO_MOVE, &owl);
     owl_update_goal(move, 2, &owl);
     compute_owl_escape_values(&owl);
-    if (!do_owl_attack(str, &defense, &owl, EMPTY, 0))
+    if (!do_owl_attack(target, &defense, &owl, EMPTY, 0))
       result = WIN;
     owl.lunches_are_current = 0;
     popgo();
@@ -2809,15 +2777,15 @@ owl_confirm_safety(int ti, int tj, int m, int n, int *di, int *dj)
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
 	"owl_confirm_safety %1m %1m(%1m), result %d %1m (%d, %d nodes)\n",
-	move, str, opos, result, defense,
+	move, target, origin, result, defense,
 	owl.local_owl_node_counter, tactical_nodes);
 
-  store_persistent_owl_cache(OWL_DOES_DEFEND, move, str, 0,
+  store_persistent_owl_cache(OWL_DOES_DEFEND, move, target, 0,
 			     result, defense, 0, 0,
-			     tactical_nodes, owl.goal, BOARD(m, n));
+			     tactical_nodes, owl.goal, board[target]);
 
-  if (di) *di = I(defense);
-  if (dj) *dj = J(defense);
+  if (defense_point)
+    *defense_point = defense;
 
   return result;
 }
@@ -2830,37 +2798,36 @@ owl_confirm_safety(int ti, int tj, int m, int n, int *di, int *dj)
  */
 
 int
-owl_does_attack(int ti, int tj, int m, int n)
+owl_does_attack(int move, int target)
 {
-  int move = POS(ti, tj);
-  int str = POS(m, n);
-  int color = board[str];
+  int color = board[target];
   int other = OTHER_COLOR(color);
   int result = 0;
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
   owl.local_owl_node_counter = 0;
   owl.lunches_are_current = 0;
-  owl_mark_dragon(m, n, -1, -1, &owl);
+  owl_mark_dragon(target, NO_MOVE, &owl);
   compute_owl_escape_values(&owl);
-  TRACE("owl_does_attack %m %m\n", ti, tj, m, n);
+  TRACE("owl_does_attack %1m %1m\n", move, target);
   
-  if (trymove(move, other, "owl_does_attack", str, EMPTY, 0)) {
+  if (trymove(move, other, "owl_does_attack", target, EMPTY, 0)) {
     owl_update_boundary_marks(move, &owl);
     /* FIXME: Should also check if part of the dragon was captured,
      *        like do_owl_attack() does.
      */
-    if (board[str] == EMPTY
-	|| !do_owl_defend(str, NULL, &owl, EMPTY, 0))
+    if (board[target] == EMPTY
+	|| !do_owl_defend(target, NULL, &owl, EMPTY, 0))
       result = WIN;
     owl.lunches_are_current = 0;
     popgo();
   }
   
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_does_attack %m %m, result %d (%d, %d nodes)\n",
-	ti, tj, m, n, result, owl.local_owl_node_counter,
+	"owl_does_attack %1m %1m, result %d (%d, %d nodes)\n",
+	move, target, result, owl.local_owl_node_counter,
 	get_reading_node_counter() - reading_nodes_when_called);
+
   return result;
 }
 
@@ -2871,33 +2838,32 @@ owl_does_attack(int ti, int tj, int m, int n)
  */
 
 int
-owl_connection_defends(int ti, int tj, int ai, int aj, int bi, int bj)
+owl_connection_defends(int move, int target1, int target2)
 {
-  int move = POS(ti, tj);
-  int apos = POS(ai, aj);
-  int bpos = POS(bi, bj);
-  int color = board[apos];
+  int color = board[target1];
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
   static struct local_owl_data owl;
 
-  gg_assert(board[bpos] == color);
-  TRACE("owl_connection_defends %m %m %m\n", ti, tj, ai, aj, bi, bj);
+  gg_assert(board[target2] == color);
+  TRACE("owl_connection_defends %1m %1m %1m\n", move, target1, target2);
 
-  if (worm[POS(ai, aj)].unconditional_status == DEAD)
+  if (worm[target1].unconditional_status == DEAD)
+    return 0;
+  if (worm[target2].unconditional_status == DEAD)
     return 0;
 
-  if (search_persistent_owl_cache(OWL_CONNECTION_DEFENDS, move, apos,
-				  bpos, &result, NULL, NULL, NULL))
+  if (search_persistent_owl_cache(OWL_CONNECTION_DEFENDS, move, target1,
+				  target2, &result, NULL, NULL, NULL))
     return result;
 
   owl.local_owl_node_counter = 0;
   owl.lunches_are_current = 0;
-  owl_mark_dragon(ai, aj, bi, bj, &owl);
+  owl_mark_dragon(target1, target2, &owl);
   compute_owl_escape_values(&owl);
 
-  if (trymove(move, color, "owl_connection_defends", apos, EMPTY, 0)) {
+  if (trymove(move, color, "owl_connection_defends", target1, EMPTY, 0)) {
     owl_update_goal(move, 2, &owl);
     if (!do_owl_attack(move, NULL, &owl, EMPTY, 0))
       result = WIN;
@@ -2907,11 +2873,11 @@ owl_connection_defends(int ti, int tj, int ai, int aj, int bi, int bj)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_conn_defends %m %m %m, result %d (%d, %d nodes)\n",
-	ti, tj, ai, aj, bi, bj, result, owl.local_owl_node_counter,
+	"owl_conn_defends %1m %1m %1m, result %d (%d, %d nodes)\n",
+	move, target1, target2, result, owl.local_owl_node_counter,
 	tactical_nodes);
 
-  store_persistent_owl_cache(OWL_CONNECTION_DEFENDS, move, apos, bpos,
+  store_persistent_owl_cache(OWL_CONNECTION_DEFENDS, move, target1, target2,
 			     result, 0, 0, 0, tactical_nodes, owl.goal, color);
 
   return result;
@@ -2994,7 +2960,7 @@ owl_find_lunches(struct local_owl_data *owl)
   memset(already_checked, 0, sizeof(already_checked));
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      if (BOARD(m, n) == color && owl->goal[POS(m, n)]) {
+      if (board[POS(m, n)] == color && owl->goal[POS(m, n)]) {
 	/* Loop over the eight neighbors. */
 	for (k = 0; k < 8; k++) {
 	  int dm = deltai[k];
@@ -3037,7 +3003,7 @@ owl_find_lunches(struct local_owl_data *owl)
 	    int adj;
 	    int adjs[MAXCHAIN];
 	    int num_stones;
-	    int stones[MAX_BOARD*MAX_BOARD];
+	    int stones[MAX_BOARD * MAX_BOARD];
 	    int liberties;
 	    int libs[MAXLIBS];
 	    int r;
@@ -3147,15 +3113,15 @@ owl_make_domains(struct local_owl_data *owla, struct local_owl_data *owlb)
  */
 
 int 
-owl_lively(int i, int j)
+owl_lively(int pos)
 {
   int origin;
   int lunch;
-  ASSERT_ON_BOARD2(i, j);
+  ASSERT_ON_BOARD1(pos);
 
-  if (BOARD(i, j) == EMPTY)
+  if (board[pos] == EMPTY)
     return 0;
-  origin = find_origin(POS(i, j));
+  origin = find_origin(pos);
 
   /* Lunches that can't be saved are dead, so don't report them as lively */
   for (lunch = 0; lunch < MAX_LUNCHES; lunch++)
@@ -3215,9 +3181,8 @@ owl_safe_move(int move, int color)
 #define MAX_SUBSTANTIAL_LIBS 10
 
 int
-owl_substantial(int i, int j)
+owl_substantial(int str)
 {
-  int str = POS(i, j);
   int k;
   int m, n;
   int libs[MAX_SUBSTANTIAL_LIBS + 1];
@@ -3255,7 +3220,7 @@ owl_substantial(int i, int j)
 	return 1;
       for (m = 0; m < board_size; m++)
 	for (n = 0; n < board_size; n++)
-	  if (same_dragon(POS(m, n), adjs[k]))
+	  if (is_same_dragon(POS(m, n), adjs[k]))
 	    owl.goal[POS(m, n)] = 1;
     }
   }
@@ -3308,8 +3273,8 @@ owl_substantial(int i, int j)
 
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_substantial %m, result %d (%d, %d nodes)\n",
-	i, j, result, owl.local_owl_node_counter,
+	"owl_substantial %1m, result %d (%d, %d nodes)\n",
+	str, result, owl.local_owl_node_counter,
 	tactical_nodes);
 
   store_persistent_owl_cache(OWL_SUBSTANTIAL, str, 0, 0, result, 0, 0, 0,
@@ -3440,9 +3405,9 @@ obvious_false_eye(int pos, int color)
 
 /* Trampoline to topological_eye(). */
 int
-owl_topological_eye(int m, int n, int color)
+owl_topological_eye(int pos, int color)
 {
-  return topological_eye(m, n, color, NULL, NULL, NULL, NULL,
+  return topological_eye(pos, color,
 			 current_owl_data->black_eye,
 			 current_owl_data->white_eye,
 			 current_owl_data->half_eye);
@@ -3494,25 +3459,21 @@ compute_owl_escape_values(struct local_owl_data *owl)
 
 /* Used by autohelpers. */
 int
-owl_escape_value(int m, int n)
+owl_escape_value(int pos)
 {
   /* FIXME: Should have a more robust mechanism to avoid 
    * escaping inwards. Returning a negative value is just a kludge.
    */
   int k;
-  if (current_owl_data->goal[POS(m, n)])
+  if (current_owl_data->goal[pos])
     return -10;
 
-  if (BOARD(m, n) == EMPTY) {
-    for (k = 0; k < 8; k++) {
-      int i = m + deltai[k];
-      int j = n + deltaj[k];
-      if (ON_BOARD2(i, j) && current_owl_data->goal[POS(i, j)])
+  if (board[pos] == EMPTY)
+    for (k = 0; k < 8; k++)
+      if (ON_BOARD(pos + delta[k]) && current_owl_data->goal[pos + delta[k]])
 	return -10;
-    }
-  }
   
-  return current_owl_data->escape_values[POS(m, n)];
+  return current_owl_data->escape_values[pos];
 }
 
 
@@ -3528,22 +3489,23 @@ owl_goal_dragon(int pos)
  * at (bi, bj), but only if it's worth at least a half eye.
  */
 int
-owl_eyespace(int ai, int aj, int bi, int bj)
+owl_eyespace(int apos, int bpos)
 {
-  int opos;
-  ASSERT2(IS_STONE(BOARD(bi, bj)), bi, bj);
+  int origin;
+  ASSERT1(IS_STONE(board[bpos]), bpos);
+  ASSERT_ON_BOARD1(apos);
   
-  if (BOARD(bi, bj) == WHITE) {
-    opos = current_owl_data->white_eye[POS(ai, aj)].origin;
-    return (!is_pass(opos)
-        && current_owl_data->white_eye[opos].color == WHITE_BORDER
-	&& current_owl_data->white_eye[opos].maxeye > 0);
+  if (board[bpos] == WHITE) {
+    origin = current_owl_data->white_eye[apos].origin;
+    return (ON_BOARD(origin)
+	    && current_owl_data->white_eye[origin].color == WHITE_BORDER
+	    && current_owl_data->white_eye[origin].maxeye > 0);
   }
   else {
-    opos = current_owl_data->black_eye[POS(ai, aj)].origin;
-    return (!is_pass(opos)
-	&& current_owl_data->black_eye[opos].color == BLACK_BORDER
-	&& current_owl_data->black_eye[opos].maxeye > 0);
+    origin = current_owl_data->black_eye[apos].origin;
+    return (ON_BOARD(origin)
+	    && current_owl_data->black_eye[origin].color == BLACK_BORDER
+	    && current_owl_data->black_eye[origin].maxeye > 0);
   }
 }
   
@@ -3553,24 +3515,23 @@ owl_eyespace(int ai, int aj, int bi, int bj)
  * at (bi, bj), which is possibly worth 2 eyes.
  */
 int
-owl_big_eyespace(int ai, int aj, int bi, int bj)
+owl_big_eyespace(int apos, int bpos)
 {
-  int opos;
-  ASSERT2(IS_STONE(BOARD(bi, bj)), bi, bj);
-  
-  ASSERT_ON_BOARD2(ai, aj);
+  int origin;
+  ASSERT1(IS_STONE(board[bpos]), bpos);
+  ASSERT_ON_BOARD1(apos);
 
-  if (BOARD(bi, bj) == WHITE) {
-    opos = current_owl_data->white_eye[POS(ai, aj)].origin;
-    return (ON_BOARD(opos) 
-	&& current_owl_data->white_eye[opos].color == WHITE_BORDER
-	&& current_owl_data->white_eye[opos].maxeye == 2);
+  if (board[bpos] == WHITE) {
+    origin = current_owl_data->white_eye[apos].origin;
+    return (ON_BOARD(origin) 
+	    && current_owl_data->white_eye[origin].color == WHITE_BORDER
+	    && current_owl_data->white_eye[origin].maxeye == 2);
   }
   else {
-    opos = current_owl_data->black_eye[POS(ai, aj)].origin;
-    return (ON_BOARD(opos)
-	&& current_owl_data->black_eye[opos].color == BLACK_BORDER
-	&& current_owl_data->black_eye[opos].maxeye == 2);
+    origin = current_owl_data->black_eye[apos].origin;
+    return (ON_BOARD(origin)
+	    && current_owl_data->black_eye[origin].color == BLACK_BORDER
+	    && current_owl_data->black_eye[origin].maxeye == 2);
   }
 }
   
@@ -3672,17 +3633,19 @@ draw_active_area(char board[BOARDMAX])
 static int
 verify_stored_board(char p[BOARDMAX])
 {
-  int m, n;
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++)
-      if (p[POS(m, n)] == GRAY)
-	continue;
-      else if ((p[POS(m, n)] & 3) != BOARD(m, n))
-	return 0;
-      else if (!(p[POS(m, n)] & HIGH_LIBERTY_BIT))
-	continue;
-      else if (countlib2(m, n) <= 4)
-	return 0;
+  int pos;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (!ON_BOARD(pos))
+      continue;
+    else if (p[pos] == GRAY)
+      continue;
+    else if ((p[pos] & 3) != board[pos])
+      return 0;
+    else if (!(p[pos] & HIGH_LIBERTY_BIT))
+      continue;
+    else if (countlib(pos) <= 4)
+      return 0;
+  }
   
   return 1;
 }
@@ -3859,7 +3822,7 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
       int value = board[pos];
       if (!active[pos])
 	value = GRAY;
-      else if (IS_STONE(board[pos]) && countlib2(m, n) > 4)
+      else if (IS_STONE(board[pos]) && countlib(pos) > 4)
 	value |= HIGH_LIBERTY_BIT;
 	
       persistent_owl_cache[persistent_owl_cache_size].board[pos] = value;
@@ -3896,8 +3859,7 @@ print_persistent_owl_cache_entry(int k)
 
 /* Helper for the owl_hotspots() function below. */
 static void
-mark_dragon_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
-			   int pos, float contribution)
+mark_dragon_hotspot_values(float values[BOARDMAX], int pos, float contribution)
 {
   int i, j, k;
   ASSERT1(IS_STONE(board[pos]), pos);
@@ -3908,20 +3870,19 @@ mark_dragon_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
       for (k = 0; k < 8; k++) {
 	int di = deltai[k];
 	int dj = deltaj[k];
-	if (ON_BOARD2(i+di, j+dj)
-	    && IS_STONE(BOARD(i+di, j+dj))
-	    && same_dragon(POS(i+di, j+dj), pos)
-	    && (countlib2(i+di, j+dj) <= 4
+	if (IS_STONE(BOARD(i+di, j+dj))
+	    && is_same_dragon(POS(i+di, j+dj), pos)
+	    && (countlib(POS(i+di, j+dj)) <= 4
 		|| i == 0 || i == board_size-1
-		|| j==0 || j == board_size-1)) {
+		|| j == 0 || j == board_size-1)) {
 	  if (k < 4) {
-	    values[i][j] += contribution;
+	    values[POS(i, j)] += contribution;
 	    break;
 	  }
 	  else {
-	    if (BOARD(i+di, j) == EMPTY || countlib2(i+di, j) <= 2
-		|| BOARD(i, j+dj) == EMPTY || countlib2(i, j+dj) <= 2)
-	      values[i][j] += 0.5 * contribution;
+	    if (BOARD(i+di, j) == EMPTY || countlib(POS(i+di, j)) <= 2
+		|| BOARD(i, j+dj) == EMPTY || countlib(POS(i, j+dj)) <= 2)
+	      values[POS(i, j)] += 0.5 * contribution;
 	    break;
 	  }
 	}
@@ -3935,7 +3896,7 @@ mark_dragon_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
  * going on.
  */
 void
-owl_hotspots(float values[MAX_BOARD][MAX_BOARD])
+owl_hotspots(float values[BOARDMAX])
 {
   int m, n, k, r;
   int libs[MAXLIBS];
@@ -3944,7 +3905,7 @@ owl_hotspots(float values[MAX_BOARD][MAX_BOARD])
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      values[m][n] = 0.0;
+      values[POS(m, n)] = 0.0;
   
   /* Compute the total number of tactical nodes for the cached entries. */
   for (k = 0; k < persistent_owl_cache_size; k++)
@@ -3982,7 +3943,7 @@ owl_hotspots(float values[MAX_BOARD][MAX_BOARD])
       /* Only consider the liberties of (ai, aj). */
       liberties = findlib(entry->apos, MAXLIBS, libs);
       for (r = 0; r < liberties; r++)
-	values[I(libs[r])][J(libs[r])] += contribution;
+	values[libs[r]] += contribution;
       break;
     default:
       gg_assert(0); /* Shouldn't happen. */

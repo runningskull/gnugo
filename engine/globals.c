@@ -117,8 +117,7 @@ int capture_all_dead   = 0;    /* capture all dead opponent stones */
 int play_out_aftermath = 0;    /* make everything unconditionally settled */
 
 float best_move_values[10];
-int best_movei[10];
-int best_movej[10];
+int best_moves[10];
 
 /* Various statistics are collected here. */
 struct stats_data stats;

@@ -1148,24 +1148,6 @@ Xaf
 # >make_proper_eye(a)
 
 
-# Pattern Eye2
-# Taken out awaiting a fix to a bug in remove_halfeye().
-#
-# XOO
-# O..
-# OO.
-# 
-# :8,e
-# 
-# XOO
-# Oab
-# OOc
-# 
-# ;halfeye(a) && odefend_against(b,c)
-# 
-# >remove_halfeye(a)
-
-
 #############################
 #
 # lunch invalidating patterns

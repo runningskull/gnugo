@@ -345,8 +345,8 @@ check_vulnerability(int i, int j, int m, int n)
   /* Play the opposite color of (m, n) on the margin and try to
    * capture (m, n)
    */
-  if (!trymove2(i, j, OTHER_COLOR(BOARD(m, n)), "check_vulnerability", m, n,
-	       EMPTY, -1, -1))
+  if (!trymove(POS(i, j), OTHER_COLOR(BOARD(m, n)), "check_vulnerability",
+	       POS(m, n), EMPTY, NO_MOVE))
     return;
 
   if (BOARD(m, n) && attack(POS(m, n), NULL)) {
@@ -362,8 +362,8 @@ check_vulnerability(int i, int j, int m, int n)
     }
     else if (BOARD(m, n) == OTHER_COLOR(eye_color)) {
       if (liberties > 1
-	  || countstones2(m, n) > 6
-	  || eyesize + countstones2(m, n) + 1 > MAX_EYE_SIZE) {
+	  || countstones(POS(m, n)) > 6
+	  || eyesize + countstones(POS(m, n)) + 1 > MAX_EYE_SIZE) {
 	/* Strategy (b). */
 	include_eyepoint(i, j, 0, ATTACKER_PLAY_SAFE);
       }
@@ -761,9 +761,8 @@ life_does_capture_something(int m, int n, int color)
   for (k=0; k<4; k++) {
     int dm = deltai[k];
     int dn = deltaj[k];
-    if (ON_BOARD2(m+dm, n+dn)
-	&& BOARD(m+dm, n+dn) == other
-	&& countlib2(m+dm, n+dn) == 1
+    if (BOARD(m+dm, n+dn) == other
+	&& countlib(POS(m+dm, n+dn)) == 1
 	&& eyeindex[m+dm][n+dn] >= 0)
       return 1;
   }
@@ -988,7 +987,7 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
       continue;
     } 
 
-    if (!is_suicide2(i, j, other)) {
+    if (!is_suicide(POS(i, j), other)) {
       score = 0;
       move[num_moves] = k;
       /* Score the move. We give (preliminarily)
@@ -1079,11 +1078,11 @@ minimize_eyes(struct eye_data eyedata[BOARDMAX],
 	DEBUG(DEBUG_LIFE, "minimize_eyes: trymove %s %m score %d\n",
 	      color_to_string(other), i, j, score);
       if (index == MAX_EYE_SIZE
-	  || trymove2(i, j, other, "minimize_eyes", -1, -1, EMPTY, -1, -1)
+	  || trymove(POS(i, j), other, "minimize_eyes", NO_MOVE, EMPTY, NO_MOVE)
 	  || (ko_master == other
 	      && (ko_in < 3)
 	      && (is_ko = 1)   /* Intentional assignment. */
-	      && tryko2(i, j, other, "minimize_eyes", EMPTY, -1, -1))) {
+	      && tryko(POS(i, j), other, "minimize_eyes", EMPTY, NO_MOVE))) {
 
 	/* The attacker has made his move. Now let's answer him and
 	 * see how many eyes we can get.
@@ -1269,14 +1268,14 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
      *
      * FIXME: Add diagonal test here.
      */
-    if (is_suicide2(i, j, other) && is_small_eye(i, j)) {
+    if (is_suicide(POS(i, j), other) && is_small_eye(i, j)) {
       if (is_true_eye(heye, i, j))
 	num_eyes++;
       continue;
     }
 
     /* Check for own suicide. */
-    if (is_suicide2(i, j, eye_color))
+    if (is_suicide(POS(i, j), eye_color))
       continue;
     
     /* Check certain move restrictions. */
@@ -1359,11 +1358,11 @@ maximize_eyes(struct eye_data eyedata[BOARDMAX],
       if (stackp - stackp_when_called < DEBUG_LIMIT)
 	DEBUG(DEBUG_LIFE, "maximize_eyes: trymove %s %m score %d\n",
 	      color_to_string(eye_color), i, j, score);
-      if (trymove2(i, j, eye_color, "maximize_eyes", -1, -1, EMPTY, -1, -1)
+      if (trymove(POS(i, j), eye_color, "maximize_eyes", NO_MOVE, EMPTY, NO_MOVE)
 	  || (ko_master == eye_color
 	      && (ko_in < 3)
 	      && (is_ko = 1)   /* Intentional assignment. */
-	      && tryko2(i, j, eye_color, "maximize_eyes", EMPTY, -1, -1))) {
+	      && tryko(POS(i, j), eye_color, "maximize_eyes", EMPTY, NO_MOVE))) {
 	
 	/* Ok, we made our move.  Now let the opponent do his, and see
 	 * how many eyes we can get. 

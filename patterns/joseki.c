@@ -254,7 +254,7 @@ make_pattern(int movei, int movej, int color,
     fprintf(stderr, "Warning: Multiple square marks in pattern %s%d\n",
 	    prefix, pattern_number);
 
-  if (is_suicide2(movei, movej, color)) {
+  if (is_suicide(POS(movei, movej), color)) {
     fprintf(stderr, "Error: Illegal move in pattern %s%d\n",
 	    prefix, pattern_number);
     exit(EXIT_FAILURE);
@@ -328,7 +328,7 @@ analyze_node(SGFNode *node, const char *prefix)
   /* Traverse child, if any. */
   if (node->child) {
     if (movei != -1)
-      tryko2(movei, movej, color, NULL, EMPTY, -1, -1);
+      tryko(POS(movei, movej), color, NULL, EMPTY, NO_MOVE);
     analyze_node(node->child, prefix);
     if (movei != -1)
       popgo();

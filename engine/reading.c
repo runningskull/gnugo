@@ -172,7 +172,7 @@ static int search_persistent_reading_cache(int routine, int str,
 static void store_persistent_reading_cache(int routine, int str,
 					   int result, int move, int nodes);
 static void print_persistent_reading_cache_entry(int k);
-static void mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
+static void mark_string_hotspot_values(float values[BOARDMAX],
 				       int m, int n, float contribution);
 
 /* Statistics. */
@@ -838,11 +838,11 @@ atari_atari(int color, int *move, int save_verbose)
 	  && worm[POS(m, n)].origin == POS(m, n)
 	  && worm[POS(m, n)].liberties == 2
 	  && aa_status[POS(m, n)] == ALIVE
-	  && !owl_substantial(m, n)) {
+	  && !owl_substantial(POS(m, n))) {
 	int ti, tj;
 	for (ti = 0; ti < board_size; ti++)
 	  for (tj = 0; tj < board_size; tj++)
-	    if (is_worm_origin2(ti, tj, m, n))
+	    if (is_worm_origin(POS(ti, tj), POS(m, n)))
 	      aa_status[POS(ti, tj)] = INSUBSTANTIAL;
       }
 
@@ -851,7 +851,7 @@ atari_atari(int color, int *move, int save_verbose)
     gprintf("aa_status: (ALIVE worms not listed)\n");
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (BOARD(m, n) == other && is_worm_origin2(m, n, m, n)) {
+	if (BOARD(m, n) == other && is_worm_origin(POS(m, n), POS(m, n))) {
 	  const char *status = "UNKNOWN (shouldn't happen)";
 	  if (aa_status[POS(m, n)] == DEAD)
 	    status = "DEAD";
@@ -975,7 +975,7 @@ do_atari_atari(int color,
 	if (POS(m, n) != find_origin(POS(m, n)))
 	  continue;
 
-	if (minsize > 0 && countstones2(m, n) < minsize)
+	if (minsize > 0 && countstones(POS(m, n)) < minsize)
 	  continue;
 
 	if (get_aa_status(POS(m, n)) != ALIVE
@@ -1010,8 +1010,8 @@ do_atari_atari(int color,
 	  }
 
 	  DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
-		countstones2(m, n), m, n);
-	  return countstones2(m, n);
+		countstones(POS(m, n)), m, n);
+	  return countstones(POS(m, n));
 	}
       }
 
@@ -1033,7 +1033,7 @@ do_atari_atari(int color,
       if (POS(m, n) != find_origin(POS(m, n)))
 	continue;
       
-      if (minsize > 0 && countstones2(m, n) < minsize)
+      if (minsize > 0 && countstones(POS(m, n)) < minsize)
 	continue;
 
       status = get_aa_status(POS(m, n));
@@ -1091,8 +1091,8 @@ do_atari_atari(int color,
 		*defense_point = NO_MOVE;
 	      
 	      DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
-		    countstones2(m, n), m, n);
-	      return countstones2(m, n);
+		    countstones(POS(m, n)), m, n);
+	      return countstones(POS(m, n));
 	    }
 
 	    if (aa_val) {
@@ -1120,8 +1120,8 @@ do_atari_atari(int color,
 		popgo();
 		DEBUG(DEBUG_ATARI_ATARI, 
 		      "%oreturn value:%d (min %d, %d (%m))\n",
-		      gg_min(aa_val, countstones2(m, n)), aa_val,
-		      countstones2(m, n), m, n);
+		      gg_min(aa_val, countstones(POS(m, n))), aa_val,
+		      countstones(POS(m, n)), m, n);
 		/* If no defense point is known and (ai,aj) is a safe
 		 * move for other, it probably defends the combination.
 		 */
@@ -1130,7 +1130,7 @@ do_atari_atari(int color,
 		    && safe_move(apos, other)) {
 		  *defense_point = apos;
 		}
-		return gg_min(aa_val, countstones2(m, n));
+		return gg_min(aa_val, countstones(POS(m, n)));
 	      }
 	    }
 	    popgo();
@@ -1199,11 +1199,11 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
 	  && worm[POS(m, n)].origin == POS(m, n)
 	  && worm[POS(m, n)].liberties == 2
 	  && aa_status[POS(m, n)] == ALIVE
-	  && !owl_substantial(m, n)) {
+	  && !owl_substantial(POS(m, n))) {
 	int ui, uj;
 	for (ui = 0; ui < board_size; ui++)
 	  for (uj = 0; uj < board_size; uj++)
-	    if (is_worm_origin2(ui, uj, m, n))
+	    if (is_worm_origin(POS(ui, uj), POS(m, n)))
 	      aa_status[POS(ui, uj)] = INSUBSTANTIAL;
       }
 
@@ -1212,7 +1212,7 @@ atari_atari_confirm_safety(int color, int tpos, int *move, int minsize)
     gprintf("aa_status: (ALIVE worms not listed)\n");
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
-	if (BOARD(m, n) == color && is_worm_origin2(m, n, m, n)) {
+	if (BOARD(m, n) == color && is_worm_origin(POS(m, n), POS(m, n))) {
 	  const char *status = "UNKNOWN (shouldn't happen)";
 	  if (aa_status[POS(m, n)] == DEAD)
 	    status = "DEAD";
@@ -1328,11 +1328,11 @@ atari_atari_try_combination(int color, int apos, int bpos)
 	  && worm[POS(m, n)].origin == POS(m, n)
 	  && worm[POS(m, n)].liberties == 2
 	  && aa_status[POS(m, n)] == ALIVE
-	  && !owl_substantial(m, n)) {
+	  && !owl_substantial(POS(m, n))) {
 	int ti, tj;
 	for (ti = 0; ti < board_size; ti++)
 	  for (tj = 0; tj < board_size; tj++)
-	    if (is_worm_origin2(ti, tj, m, n))
+	    if (is_worm_origin(POS(ti, tj), POS(m, n)))
 	      aa_status[POS(ti, tj)] = INSUBSTANTIAL;
       }
 
@@ -6130,7 +6130,7 @@ print_persistent_reading_cache_entry(int k)
 
 /* Helper for the reading_hotspots() function below. */
 static void
-mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
+mark_string_hotspot_values(float values[BOARDMAX],
 			   int m, int n, float contribution)
 {
   int i, j, k;
@@ -6141,8 +6141,8 @@ mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
   if (BOARD(m, n) == EMPTY) {
     for (i = -1; i <= 1; i++)
       for (j = -1; j <= 1; j++)
-	if (ON_BOARD2(m+i, n+j) && BOARD(m+i, n+j) == EMPTY)
-	  values[m+i][n+j] += contribution;
+	if (BOARD(m+i, n+j) == EMPTY)
+	  values[POS(m+i, n+j)] += contribution;
     return;
   }
   
@@ -6156,17 +6156,16 @@ mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
       for (k = 0; k < 8; k++) {
 	int di = deltai[k];
 	int dj = deltaj[k];
-	if (ON_BOARD2(i+di, j+dj)
-	    && IS_STONE(BOARD(i+di, j+dj))
+	if (IS_STONE(BOARD(i+di, j+dj))
 	    && same_string(POS(i+di, j+dj), POS(m, n))) {
 	  if (k < 4) {
-	    values[i][j] += contribution;
+	    values[POS(i, j)] += contribution;
 	    break;
 	  }
 	  else {
-	    if (BOARD(i+di, j) == EMPTY || countlib2(i+di, j) <= 2
-		|| BOARD(i, j+dj) == EMPTY || countlib2(i, j+dj) <= 2)
-	      values[i][j] += 1.0 * contribution;
+	    if (BOARD(i+di, j) == EMPTY || countlib(POS(i+di, j)) <= 2
+		|| BOARD(i, j+dj) == EMPTY || countlib(POS(i, j+dj)) <= 2)
+	      values[POS(i, j)] += contribution;
 	    break;
 	  }
 	}
@@ -6180,14 +6179,14 @@ mark_string_hotspot_values(float values[MAX_BOARD][MAX_BOARD],
  * going on.
  */
 void
-reading_hotspots(float values[MAX_BOARD][MAX_BOARD])
+reading_hotspots(float values[BOARDMAX])
 {
   int m, n, k;
   int sum_nodes = 0;
 
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++)
-      values[m][n] = 0.0;
+      values[POS(m, n)] = 0.0;
   
   /* Compute the total number of nodes for the cached entries. */
   for (k = 0; k < persistent_reading_cache_size; k++)

@@ -31,7 +31,8 @@
 #include "patterns.h"
 
 
-#define TRYMOVE(x, y, z) trymove2(x, y, z, "helper", -1, -1, EMPTY, -1, -1)
+#define TRYMOVE2(x, y, z) trymove(POS(x, y), z, "helper", NO_MOVE, EMPTY, NO_MOVE)
+#define TRYMOVE(pos, color) trymove(pos, color, "helper", NO_MOVE, EMPTY, NO_MOVE)
 #define OFFSET(x, y, z, w) offset(x, y, ti, tj, &z, &w, transformation)
 #define ARGS struct pattern *pattern, int transformation, int ti, int tj, int color
 
@@ -83,7 +84,7 @@ basic_cut_helper (ARGS)
   if (is_ko_point(POS(ti, tj)))
     return 0;
 
-  if (TRYMOVE(ti, tj, ccolor)) {
+  if (TRYMOVE2(ti, tj, ccolor)) {
     if ((attack(POS(ti, tj), NULL) == WIN)
 	|| (attack(POS(ci, cj), NULL) == WIN)) {
       popgo();
@@ -119,7 +120,7 @@ jump_out_helper (ARGS)
   else
     own_eyespace = (black_eye[POS(ti, tj)].color == BLACK_BORDER);
   
-  if (influence_area_color(ti, tj) != color && !own_eyespace)
+  if (influence_area_color(POS(ti, tj)) != color && !own_eyespace)
     return 1;
   else
     return 0;
@@ -134,7 +135,7 @@ jump_out_helper (ARGS)
 int 
 jump_out_far_helper (ARGS)
 {
-  if (influence_area_color(ti, tj) != OTHER_COLOR(color))
+  if (influence_area_color(POS(ti, tj)) != OTHER_COLOR(color))
     return jump_out_helper(pattern, transformation, ti, tj, color);
   else
     return 0;
@@ -165,7 +166,7 @@ reinforce_helper (ARGS)
   UNUSED(transformation); UNUSED(pattern);
   
   return (!lively_dragon_exists(OTHER_COLOR(color)) 
-	  && safe_move2(ti, tj, color));
+	  && safe_move(POS(ti, tj), color));
 }
 
 
@@ -220,10 +221,10 @@ throw_in_atari_helper(ARGS)
     bj = J(libs[1]);
   }
   
-  if (TRYMOVE(ti, tj, color)) {
+  if (TRYMOVE2(ti, tj, color)) {
     if (!attack(POS(ci, cj), NULL) &&
 	!(ON_BOARD2(di, dj) && attack(POS(di, dj), NULL))) {
-      if (TRYMOVE(bi, bj, other)) {
+      if (TRYMOVE2(bi, bj, other)) {
 	if (attack(POS(ai, aj), NULL))
 	  success = 1;
 	popgo();
@@ -257,16 +258,16 @@ throw_in_atari_helper(ARGS)
  */
 
 int
-not_lunch_helper(int ai, int aj, int bi, int bj)
+not_lunch_helper(int apos, int bpos)
 {
-  if (worm[POS(ai, aj)].size > 2)
+  if (worm[apos].size > 2)
     return 0;
 
   /* Tell the move generation code about the change in status. */
-  remove_lunch(POS(bi, bj), POS(ai, aj));
+  remove_lunch(bpos, apos);
   
-  if (DRAGON2(POS(bi, bj)).lunch == POS(ai, aj))
-    DRAGON2(POS(bi, bj)).lunch = NO_MOVE;
+  if (DRAGON2(bpos).lunch == apos)
+    DRAGON2(bpos).lunch = NO_MOVE;
 
   return 0;
 }
@@ -280,13 +281,13 @@ not_lunch_helper(int ai, int aj, int bi, int bj)
  */
 
 int 
-seki_helper(int ai, int aj)
+seki_helper(int str)
 {
   int r;
   int adj;
   int adjs[MAXCHAIN];
   
-  adj = chainlinks(POS(ai, aj), adjs);
+  adj = chainlinks(str, adjs);
   for (r = 0; r < adj; r++)
     if (worm[adjs[r]].attack_codes[0] != 0)
       return 0;
@@ -346,10 +347,10 @@ cutstone2_helper (ARGS)
   di = I(worm[POS(ai, aj)].defense_points[0]);
   dj = J(worm[POS(ai, aj)].defense_points[0]);
 
-  if (TRYMOVE(di, dj, BOARD(ai, aj))) {
+  if (TRYMOVE2(di, dj, BOARD(ai, aj))) {
     if (!BOARD(bi, bj) || attack(POS(bi, bj), NULL)
 	|| !BOARD(ci, cj) || attack(POS(ci, cj), NULL)
-	|| safe_move2(ti, tj, BOARD(ai, aj)) != 0) {
+	|| safe_move(POS(ti, tj), BOARD(ai, aj)) != 0) {
       popgo();
       worm[worm[POS(ai, aj)].origin].cutstone2++;
       propagate_worm(worm[POS(ai, aj)].origin);
@@ -384,12 +385,12 @@ edge_double_sente_helper(ARGS)
   OFFSET(-1, 1, bi, bj);
   OFFSET(-1, 0, ci, cj);
 
-  if (TRYMOVE(ti, tj, color)) {
-    if (TRYMOVE(ai, aj, other)) {
-      ASSERT2(countlib2(ti, tj) == 1, ti, tj);
+  if (TRYMOVE2(ti, tj, color)) {
+    if (TRYMOVE2(ai, aj, other)) {
+      ASSERT1(countlib(POS(ti, tj)) == 1, POS(ti, tj));
       findlib(POS(ti, tj), 1, &dpos);
-      if (TRYMOVE(I(dpos), J(dpos), color)) {
-	if (TRYMOVE(bi, bj, color)) {
+      if (TRYMOVE2(I(dpos), J(dpos), color)) {
+	if (TRYMOVE2(bi, bj, color)) {
 	  if (BOARD(ci, cj) == EMPTY || !defend_both(POS(ai, aj), POS(ci, cj)))
 	    success = 1;
 	  popgo();
@@ -413,9 +414,9 @@ edge_double_sente_helper(ARGS)
  */
 
 void
-threaten_to_save_helper(int ti, int tj, int ai, int aj)
+threaten_to_save_helper(int move, int str)
 {
-  add_followup_value(POS(ti, tj), 2 + 2 * worm[POS(ai, aj)].effective_size);
+  add_followup_value(move, 2.0 + 2.0 * worm[str].effective_size);
 }
 
 
@@ -435,18 +436,18 @@ threaten_to_save_helper(int ti, int tj, int ai, int aj)
  */
 
 void
-threaten_to_capture_helper(int ti, int tj, int ai, int aj)
+threaten_to_capture_helper(int move, int str)
 {
   int adj, adjs[MAXCHAIN];
   int k;
   
-  adj = chainlinks2(POS(ai, aj), adjs, 1);
+  adj = chainlinks2(str, adjs, 1);
   for (k = 0; k < adj; k++)
     if (worm[adjs[k]].defend_codes[0] != 0
-	&& !does_defend(POS(ti, tj), adjs[k]))
+	&& !does_defend(move, adjs[k]))
       return;
     
-  add_followup_value(POS(ti, tj), 2 * worm[POS(ai, aj)].effective_size);
+  add_followup_value(move, 2.0 * worm[str].effective_size);
 }
 
 
@@ -458,28 +459,28 @@ threaten_to_capture_helper(int ti, int tj, int ai, int aj)
  */
 
 void
-defend_against_atari_helper(int ti, int tj, int ai, int aj)
+defend_against_atari_helper(int move, int str)
 {
   int adj, adjs[MAXCHAIN];
   int libs[2];
   int k;
 
-  ASSERT2(countlib2(ai, aj) == 2, ai, aj);
+  ASSERT1(countlib(str) == 2, str);
 
   /* No value if the string can capture out of atari. */
-  adj = chainlinks2(POS(ai, aj), adjs, 1);
+  adj = chainlinks2(str, adjs, 1);
   for (k = 0; k < adj; k++)
     if (worm[adjs[k]].defend_codes[0] != 0
-	&& !does_defend(POS(ti, tj), adjs[k]))
+	&& !does_defend(move, adjs[k]))
       return;
 
   /* No value if opponent has no safe atari. */
-  findlib(POS(ai, aj), 2, libs);
-  if (is_self_atari(libs[0], OTHER_COLOR(BOARD(ai, aj)))
-      && is_self_atari(libs[1], OTHER_COLOR(BOARD(ai, aj))))
+  findlib(str, 2, libs);
+  if (is_self_atari(libs[0], OTHER_COLOR(board[str]))
+      && is_self_atari(libs[1], OTHER_COLOR(board[str])))
     return;
   
-  add_reverse_followup_value(POS(ti, tj), 2 * worm[POS(ai, aj)].effective_size);
+  add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
 }
 
 
@@ -494,13 +495,9 @@ defend_against_atari_helper(int ti, int tj, int ai, int aj)
  */
 
 void
-amalgamate_most_valuable_helper(int ai, int aj, int bi, int bj, int ci, int cj)
+amalgamate_most_valuable_helper(int apos, int bpos, int cpos)
 {
-  int apos = POS(ai, aj);
-  int bpos = POS(bi, bj);
-  int cpos = POS(ci, cj);
-
-  if (!same_dragon(apos, bpos) && !same_dragon(bpos, cpos)) {
+  if (!is_same_dragon(apos, bpos) && !is_same_dragon(bpos, cpos)) {
     if (dragon[apos].effective_size >= dragon[cpos].effective_size)
       join_dragons(apos, bpos);
     else
@@ -516,18 +513,18 @@ amalgamate_most_valuable_helper(int ai, int aj, int bi, int bj, int ci, int cj)
  */
 
 int
-finish_ko_helper(int ai, int aj)
+finish_ko_helper(int apos)
 {
   int adj, adjs[MAXCHAIN];
   int k;
 
-  adj = chainlinks2(POS(ai, aj), adjs, 1);
+  adj = chainlinks2(apos, adjs, 1);
   for (k = 0; k < adj; k++) {
     int bpos = adjs[k];
     int xpos;
     if (countstones(bpos) == 1) {
       findlib(bpos, 1, &xpos);
-      if (is_ko(xpos, BOARD(ai, aj), NULL))
+      if (is_ko(xpos, board[apos], NULL))
 	return 1;
     }
   }
@@ -539,22 +536,22 @@ finish_ko_helper(int ai, int aj)
 /*
  * This is intended for use in autohelpers.
  *
- * Returns 1 if (ai, aj) is next to a ko point
+ * Returns 1 if (ai, aj) is next to a ko point.
  */
 
 int
-squeeze_ko_helper(int ai, int aj)
+squeeze_ko_helper(int apos)
 {
   int libs[2];
   int liberties;
   int k;
 
-  liberties = findlib(POS(ai, aj), 2, libs);
-  ASSERT2(liberties==2, ai, aj);
+  liberties = findlib(apos, 2, libs);
+  ASSERT1(liberties == 2, apos);
 
   for (k = 0; k < liberties; k++) {
     int bpos = libs[k];
-    if (is_ko(bpos, OTHER_COLOR(BOARD(ai, aj)), NULL))
+    if (is_ko(bpos, OTHER_COLOR(board[apos]), NULL))
       return 1;
   }
 
@@ -570,16 +567,15 @@ squeeze_ko_helper(int ai, int aj)
  */
 
 int
-backfill_helper(int ai, int aj, int bi, int bj, int ci, int cj)
+backfill_helper(int apos, int bpos, int cpos)
 {
-  int color = BOARD(ci, cj);
+  int color = board[cpos];
   int other = OTHER_COLOR(color);
   int dpos  = NO_MOVE;
 
-
-  if (TRYMOVE(ai, aj, color)) {
-    if (TRYMOVE(bi, bj, other)) {
-      if (attack(POS(ci, cj), NULL) && find_defense(POS(ci, cj), &dpos)) {
+  if (TRYMOVE(apos, color)) {
+    if (TRYMOVE(bpos, other)) {
+      if (attack(cpos, NULL) && find_defense(cpos, &dpos)) {
 	set_minimum_move_value(dpos, 0.1);
 	TRACE("%o...setting min move value of %1m to 0.1\n", dpos);
       }
@@ -595,15 +591,17 @@ backfill_helper(int ai, int aj, int bi, int bj, int ci, int cj)
 /* Returns true if (ai, aj) kills or threatens to kill (bi, bj). */
 
 int
-owl_threatens_attack(int ai, int aj, int bi, int bj)
+owl_threatens_attack(int apos, int bpos)
 {
-  if (dragon[POS(bi, bj)].owl_status == CRITICAL
-      && dragon[POS(bi, bj)].owl_attack_point == POS(ai, aj))
+  if (dragon[bpos].owl_status == CRITICAL
+      && dragon[bpos].owl_attack_point == apos)
     return 1;
-  if (dragon[POS(bi, bj)].owl_threat_status == CAN_THREATEN_ATTACK)
-    if ((dragon[POS(bi, bj)].owl_attack_point == POS(ai, aj))
-	|| (dragon[POS(bi, bj)].owl_second_attack_point == POS(ai, aj)))
+  
+  if (dragon[bpos].owl_threat_status == CAN_THREATEN_ATTACK)
+    if (dragon[bpos].owl_attack_point == apos
+	|| dragon[bpos].owl_second_attack_point == apos)
       return 1;
+  
   return 0;
 }
 

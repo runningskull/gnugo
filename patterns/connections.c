@@ -51,7 +51,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
   TRANSFORM(pattern->movei, pattern->movej, &stari, &starj, ll);
   stari += m;
   starj += n;
-  if ((pattern->class & CLASS_B) && !safe_move2(stari, starj, other))
+  if ((pattern->class & CLASS_B) && !safe_move(POS(stari, starj), other))
     return;
 
   /* If C pattern, test if there are more than one dragon in this

@@ -503,9 +503,9 @@ get_level(int *level)
   char buffer[128];
   FILE *fp;
 
-  const char filename[]="level";
+  const char filename[] = "level";
 
-  if ((fp=fopen(filename,"r"))==NULL)
+  if ((fp = fopen(filename, "r")) == NULL)
     return 0;
 
   if (fgets(buffer, 128, fp)) {

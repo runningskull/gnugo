@@ -189,7 +189,8 @@ decideconnection(int ai, int aj, int bi, int bj, const char *sgf_output)
 void
 decidedragon(int m, int n, const char *sgf_output)
 {
-  int i, j, acode, dcode;
+  int move = NO_MOVE;
+  int acode, dcode;
   int save_verbose = verbose;
   SGFTree tree;
   int result_certain;
@@ -215,49 +216,49 @@ decidedragon(int m, int n, const char *sgf_output)
     begin_sgftreedump(&tree);
 
   count_variations = 1;
-  acode = owl_attack(m, n, &i, &j, &result_certain);
+  acode = owl_attack(POS(m, n), &move, &result_certain);
   if (acode) {
     if (acode == WIN) {
-      if (i == -1)
-	gprintf("%m is dead as it stands", m, n);
+      if (move == NO_MOVE)
+	gprintf("%1m is dead as it stands", POS(m, n));
       else
-	gprintf("%m can be attacked at %m (%d variations)", 
-		m, n, i, j, count_variations);
+	gprintf("%1m can be attacked at %1m (%d variations)", 
+		POS(m, n), move, count_variations);
     }
     else if (acode == KO_A)
-      gprintf("%m can be attacked with ko (good) at %m (%d variations)", 
-	      m, n, i, j, count_variations);
+      gprintf("%1m can be attacked with ko (good) at %1m (%d variations)", 
+	      POS(m, n), move, count_variations);
     else if (acode == KO_B)
-      gprintf("%m can be attacked with ko (bad) at %m (%d variations)", 
-	      m, n, i, j, count_variations);
+      gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)", 
+	      POS(m, n), move, count_variations);
   }
   else 
-    gprintf("%m cannot be attacked (%d variations)", m, n, count_variations);
+    gprintf("%1m cannot be attacked (%d variations)", POS(m, n), count_variations);
   if (result_certain)
     gprintf("\n");
   else
     gprintf(" result uncertain\n");
 
   count_variations = 1;
-  dcode = owl_defend(m, n, &i, &j, &result_certain);
+  dcode = owl_defend(POS(m, n), &move, &result_certain);
   if (dcode) {
     if (dcode == WIN) {
-      if (i == -1)
-	gprintf("%m is alive as it stands", m, n);
+      if (move == NO_MOVE)
+	gprintf("%1m is alive as it stands", POS(m, n));
       else 
-	gprintf("%m can be defended at %m (%d variations)", 
-		m, n, i, j, count_variations);
+	gprintf("%1m can be defended at %1m (%d variations)", 
+		POS(m, n), move, count_variations);
     }
     else if (dcode == KO_A)
-      gprintf("%m can be defended with ko (good) at %m (%d variations)", 
-	      m, n, i, j, count_variations);
+      gprintf("%1m can be defended with ko (good) at %1m (%d variations)", 
+	      POS(m, n), move, count_variations);
     else if (dcode == KO_B)
-      gprintf("%m can be defended with ko (bad) at %m (%d variations)", 
-	      m, n, i, j, count_variations);
+      gprintf("%1m can be defended with ko (bad) at %1m (%d variations)", 
+	      POS(m, n), move, count_variations);
   }
   else
-    gprintf("%m cannot be defended (%d variations)",
-	    m, n, count_variations);
+    gprintf("%1m cannot be defended (%d variations)",
+	    POS(m, n), count_variations);
   if (result_certain)
     gprintf("\n");
   else
@@ -316,7 +317,8 @@ void
 decideposition(int color, const char *sgf_output)
 {
   int m, n;
-  int i, j, acode = 0, dcode = 0;
+  int move = NO_MOVE;
+  int acode = 0, dcode = 0;
   int save_verbose=verbose;
   static const char *snames[] = {"dead", "alive", "critical", "unknown"};
   SGFTree tree;
@@ -345,57 +347,57 @@ decideposition(int color, const char *sgf_output)
 	  || (DRAGON2(POS(m, n)).escape_route >= 6))
 	continue;
 
-      gprintf("\nanalyzing %m\n", m, n);
+      gprintf("\nanalyzing %1m\n", POS(m, n));
       gprintf("status=%s, escape=%d\n", 
 	      snames[dragon[POS(m, n)].status], DRAGON2(POS(m, n)).escape_route);
-      acode = owl_attack(m, n, &i, &j, NULL);
+      acode = owl_attack(POS(m, n), &move, NULL);
       if (acode) {
 	if (acode == WIN) {
-	  if (i == -1)
-	    gprintf("%m is dead as it stands\n", m, n);
+	  if (move == NO_MOVE)
+	    gprintf("%1m is dead as it stands\n", POS(m, n));
 	  else
-	    gprintf("%m can be attacked at %m (%d variations)\n", 
-		    m, n, i, j, count_variations);
+	    gprintf("%1m can be attacked at %1m (%d variations)\n", 
+		    POS(m, n), move, count_variations);
 	}
 	else if (acode == KO_A)
-	  gprintf("%m can be attacked with ko (good) at %m (%d variations)\n", 
-		  m, n, i, j, count_variations);
+	  gprintf("%1m can be attacked with ko (good) at %1m (%d variations)\n", 
+		  POS(m, n), move, count_variations);
 	else if (acode == KO_B)
-	  gprintf("%m can be attacked with ko (bad) at %m (%d variations)\n", 
-		  m, n, i, j, count_variations);
+	  gprintf("%1m can be attacked with ko (bad) at %1m (%d variations)\n", 
+		  POS(m, n), move, count_variations);
 	  
 	count_variations = 1;
-	dcode = owl_defend(m, n, &i, &j, NULL);
+	dcode = owl_defend(POS(m, n), &move, NULL);
 	if (dcode) {
 	  if (dcode == WIN) {
-	    if (i == -1)
-	      gprintf("%m is alive as it stands\n", m, n);
+	    if (move == NO_MOVE)
+	      gprintf("%1m is alive as it stands\n", POS(m, n));
 	    else 
-	      gprintf("%m can be defended at %m (%d variations)\n", 
-		      m, n, i, j, count_variations);
+	      gprintf("%1m can be defended at %1m (%d variations)\n", 
+		      POS(m, n), move, count_variations);
 	  }
 	  else if (dcode == KO_A)
-	    gprintf("%m can be defended with ko (good) at %m (%d variations)\n", 
-		    m, n, i, j, count_variations);
+	    gprintf("%1m can be defended with ko (good) at %1m (%d variations)\n", 
+		    POS(m, n), move, count_variations);
 	  else if (dcode == KO_B)
-	    gprintf("%m can be defended with ko (bad) at %m (%d variations)\n", 
-		    m, n, i, j, count_variations);
+	    gprintf("%1m can be defended with ko (bad) at %1m (%d variations)\n", 
+		    POS(m, n), move, count_variations);
 	}
 	else
-	  gprintf("%m cannot be defended (%d variations)\n", 
-		  m, n, count_variations);
+	  gprintf("%1m cannot be defended (%d variations)\n", 
+		  POS(m, n), count_variations);
       }
       else 
-	gprintf("%m cannot be attacked (%d variations)\n", 
-		m, n, count_variations);
+	gprintf("%1m cannot be attacked (%d variations)\n", 
+		POS(m, n), count_variations);
       if (acode) {
 	if (dcode)
-	  gprintf("status of %m revised to CRITICAL\n", m, n);
+	  gprintf("status of %1m revised to CRITICAL\n", POS(m, n));
 	else
-	  gprintf("status of %m revised to DEAD\n", m, n);
+	  gprintf("status of %1m revised to DEAD\n", POS(m, n));
       }
       else
-	gprintf("status of %m revised to ALIVE\n", m, n);
+	gprintf("status of %1m revised to ALIVE\n", POS(m, n));
     }
 
   if (sgf_output) {

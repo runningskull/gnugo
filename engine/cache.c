@@ -655,28 +655,28 @@ do_get_read_result(int routine, int komaster, int kom_pos,
   hashnode = hashtable_search(movehash, &hashdata);
   if (hashnode != NULL) {
     stats.position_hits++;
-    RTRACE("We found position %H in the hash table...\n",
-	   (unsigned long) hashdata.hashval);
+    DEBUG(DEBUG_READING_CACHE, "We found position %H in the hash table...\n",
+	  (unsigned long) hashdata.hashval);
   }
   else {
     hashnode = hashtable_enter_position(movehash, &hashdata);
     if (hashnode)
-      RTRACE("Created position %H in the hash table...\n",
-	     (unsigned long) hashdata.hashval);
+      DEBUG(DEBUG_READING_CACHE, "Created position %H in the hash table...\n",
+	    (unsigned long) hashdata.hashval);
   }
 #else
   /* Find this position in the table.  If it wasn't found, enter it. */
   hashnode = hashtable_search(movehash, &hashdata);
   if (hashnode != NULL) {
     stats.position_hits++;
-    RTRACE("We found position %H in the hash table...\n",
-	   (unsigned long) hashdata.hashval);
+    DEBUG(DEBUG_READING_CACHE, "We found position %H in the hash table...\n",
+	  (unsigned long) hashdata.hashval);
   }
   else {
     hashnode = hashtable_enter_position(movehash, &hashdata);
     if (hashnode)
-      RTRACE("Created position %H in the hash table...\n",
-	     (unsigned long) hashdata.hashval);
+      DEBUG(DEBUG_READING_CACHE, "Created position %H in the hash table...\n",
+	    (unsigned long) hashdata.hashval);
   }
 #endif
 
@@ -697,16 +697,18 @@ do_get_read_result(int routine, int komaster, int kom_pos,
       retval = 1;
     }
     else {
-      RTRACE("...but no previous result for routine %d and (%1m)...",
-	     routine, *str);
+      DEBUG(DEBUG_READING_CACHE,
+	    "...but no previous result for routine %d and (%1m)...",
+	    routine, *str);
 
       *read_result = hashnode_new_result(movehash, hashnode, routine,
 					 komaster, kom_pos, *str);
       
       if (*read_result == NULL)
-	RTRACE("%o...and unfortunately there was no room for one.\n");
+	DEBUG(DEBUG_READING_CACHE,
+	      "%o...and unfortunately there was no room for one.\n");
       else
-	RTRACE("%o...so we allocate a new one.\n");
+	DEBUG(DEBUG_READING_CACHE, "%o...so we allocate a new one.\n");
     }
   }
 

@@ -42,15 +42,14 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 {
   int k, l;
   int ti, tj;  /* trial move and its value */
-
+  int move;
+  
   /* Dragons of our color. */
-  int my_dragoni[MAX_DRAGONS_PER_PATTERN];
-  int my_dragonj[MAX_DRAGONS_PER_PATTERN];
+  int my_dragons[MAX_DRAGONS_PER_PATTERN];
   int my_ndragons = 0;
 
   /* Dragons of other color. */
-  int your_dragoni[MAX_DRAGONS_PER_PATTERN];
-  int your_dragonj[MAX_DRAGONS_PER_PATTERN];
+  int your_dragons[MAX_DRAGONS_PER_PATTERN];
   int your_ndragons = 0;
 
   /* Make a local copy of the classification that we may modify. */
@@ -63,7 +62,8 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   TRANSFORM(pattern->movei, pattern->movej, &ti, &tj, ll);
   ti += m;
   tj += n;
-
+  move = POS(ti, tj);
+  
   /* For some classes of patterns we need to find all dragons present
    * in the pattern.
    */
@@ -75,7 +75,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     /* Match each point. */
     for (k = 0; k < pattern->patlen; ++k) { 
       int x, y; /* absolute (board) co-ords of (transformed) pattern element */
-      int di, dj; /* dragon origin */
+      int origin; /* dragon origin */
       
       /* all the following stuff (currently) applies only at occupied cells */
       if (pattern->patn[k].att == ATT_dot)
@@ -97,14 +97,13 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
       if ((class & CLASS_O)
 	  && BOARD(x, y) == color
 	  && worm[POS(x, y)].attack_points[0] != 0
-	  && !does_defend(POS(ti, tj), POS(x, y)))
+	  && !does_defend(move, POS(x, y)))
 	return;
 
-      di = I(dragon[POS(x, y)].origin);
-      dj = J(dragon[POS(x, y)].origin);
+      origin = dragon[POS(x, y)].origin;
       if (BOARD(x, y) == color && my_ndragons < MAX_DRAGONS_PER_PATTERN) {
 	for (l = 0; l < my_ndragons; l++) {
-	  if (my_dragoni[l] == di && my_dragonj[l] == dj)
+	  if (my_dragons[l] == origin)
 	    break;
 	}
 	if (l == my_ndragons) {
@@ -113,10 +112,9 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
            * captured before adding it to the list of my_dragons.  
 	   */
 	  if (worm[POS(x, y)].attack_codes[0] == 0
-	      || does_defend(POS(ti, tj), POS(x, y))) {
+	      || does_defend(move, POS(x, y))) {
 	    /* Ok, add the dragon to the list. */
-	    my_dragoni[l] = di;
-	    my_dragonj[l] = dj;
+	    my_dragons[l] = origin;
 	    my_ndragons++;
 	  }
 	}
@@ -124,13 +122,12 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
       if (BOARD(x, y) == other && your_ndragons < MAX_DRAGONS_PER_PATTERN) {
 	for (l = 0; l < your_ndragons; l++) {
-	  if (your_dragoni[l] == di && your_dragonj[l] == dj)
+	  if (your_dragons[l] == origin)
 	    break;
 	}
 	if (l == your_ndragons) {
 	  /* We found another opponent dragon, add it to the list. */
-	  your_dragoni[l] = di;
-	  your_dragonj[l] = dj;
+	  your_dragons[l] = origin;
 	  your_ndragons++;
 	}
       }      
@@ -163,17 +160,17 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (!(class & CLASS_s)) {
     /* Don't allow ko unsafety. */
-    if (safe_move2(ti, tj, color) != WIN) {
+    if (safe_move(move, color) != WIN) {
       if (0)
-	TRACE("  move at %m wasn't safe, discarded\n", ti, tj);
+	TRACE("  move at %1m wasn't safe, discarded\n", move);
       return;
     }
   }
   else {
     /* Allow illegal ko captures at this stage. */
-    if (!is_ko(POS(ti, tj), color, NULL) && !is_legal(POS(ti, tj), color)) {
+    if (!is_ko(move, color, NULL) && !is_legal(move, color)) {
       if (0)
-	TRACE("  move at %m wasn't legal, discarded\n", ti, tj);
+	TRACE("  move at %1m wasn't legal, discarded\n", move);
       return;
     }
   }
@@ -183,9 +180,9 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (class & CLASS_n) {
     /* Allow ko unsafety. */
-    if (safe_move2(ti, tj, OTHER_COLOR(color)) == 0) {
+    if (safe_move(move, OTHER_COLOR(color)) == 0) {
       if (0)
-	TRACE("  opponent can't play safely at %m, move discarded\n", ti, tj);
+	TRACE("  opponent can't play safely at %1m, move discarded\n", move);
       return;
     }
   }
@@ -202,17 +199,17 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   if (pattern->helper) {
     /* ask helper function to consider the move */
     int accepted;
-    DEBUG(DEBUG_HELPER, "  asking helper to consider '%s'+%d at %m\n", 
-	  pattern->name, ll, ti, tj);
+    DEBUG(DEBUG_HELPER, "  asking helper to consider '%s'+%d at %1m\n", 
+	  pattern->name, ll, move);
     accepted = pattern->helper(pattern, ll, ti, tj, color);
     
     if (accepted) {
-      DEBUG(DEBUG_HELPER, "helper likes pattern '%s' at %m\n",
-	    pattern->name, ti, tj);
+      DEBUG(DEBUG_HELPER, "helper likes pattern '%s' at %1m\n",
+	    pattern->name, move);
     }
     else {
-      DEBUG(DEBUG_HELPER,"  helper does not like pattern '%s' at %m\n", 
-	    pattern->name, ti, tj);
+      DEBUG(DEBUG_HELPER,"  helper does not like pattern '%s' at %1m\n", 
+	    pattern->name, move);
       return;  /* pattern matcher does not like it */
     }
   }
@@ -224,17 +221,15 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
 
   /* If using -a, want to see all matches even if not -v */
   if (allpats || verbose) {
-    TRACE("pattern '%s'+%d matched at %m\n", pattern->name, ll, ti, tj);
+    TRACE("pattern '%s'+%d matched at %1m\n", pattern->name, ll, move);
   }
   
   /* Pattern class B, cut all combinations of opponent dragons. */
   if (class & CLASS_B) {
     for (k = 0; k < your_ndragons; k++)
       for (l = k+1; l < your_ndragons; l++) {
-	add_cut_move(POS(ti, tj), POS(your_dragoni[k], your_dragonj[k]),
-		     POS(your_dragoni[l], your_dragonj[l]));
-	TRACE("...cuts dragons %m, %m\n", your_dragoni[k], your_dragonj[k],
-	      your_dragoni[l], your_dragonj[l]);
+	add_cut_move(move, your_dragons[k], your_dragons[l]);
+	TRACE("...cuts dragons %1m, %1m\n", your_dragons[k], your_dragons[l]);
       }
   }
 
@@ -242,10 +237,8 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   if (class & CLASS_C) {
     for (k = 0; k < my_ndragons; k++)
       for (l = k+1; l < my_ndragons; l++) {
-	add_connection_move(POS(ti, tj), POS(my_dragoni[k], my_dragonj[k]),
-			    POS(my_dragoni[l], my_dragonj[l]));
-	TRACE("...connects dragons %m, %m\n", my_dragoni[k], my_dragonj[k],
-	      my_dragoni[l], my_dragonj[l]);
+	add_connection_move(move, my_dragons[k], my_dragons[l]);
+	TRACE("...connects dragons %1m, %1m\n", my_dragons[k], my_dragons[l]);
       }
   }
 
@@ -257,45 +250,45 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (class & CLASS_c) {
     for (k = 0; k < my_ndragons; k++) {
-      add_strategical_defense_move(POS(ti, tj), POS(my_dragoni[k], my_dragonj[k]));
-      TRACE("...strategical defense (weak connection) of %m\n",
-	    my_dragoni[k], my_dragonj[k]);
+      add_strategical_defense_move(move, my_dragons[k]);
+      TRACE("...strategical defense (weak connection) of %1m\n",
+	    my_dragons[k]);
     }
-    add_shape_value(POS(ti, tj), 1);
+    add_shape_value(move, 1);
     TRACE("...shape value 1\n");
   }
 
   /* Pattern class b, block to secure territory. */
   if (class & CLASS_b) {
-    add_block_territory_move(POS(ti, tj));
+    add_block_territory_move(move);
     TRACE("...blocks territory\n");
   }
 
   /* Pattern class e, expand to make territory. */
   if (class & CLASS_e) {
-    add_expand_territory_move(POS(ti, tj));
+    add_expand_territory_move(move);
     TRACE("...expands territory\n");
   }
 
   /* Pattern class E, expand to make moyo. */
   if (class & CLASS_E) {
-    add_expand_moyo_move(POS(ti, tj));
+    add_expand_moyo_move(move);
     TRACE("...expands moyo\n");
   }
 
   /* Pattern class a, strategical level attack on all opponent dragons. */
   if (class & CLASS_a) {
     for (k = 0; k < your_ndragons; k++) {
-      add_strategical_attack_move(POS(ti, tj), POS(your_dragoni[k], your_dragonj[k]));
-      TRACE("...strategical attack on %m\n", your_dragoni[k], your_dragonj[k]);
+      add_strategical_attack_move(move, your_dragons[k]);
+      TRACE("...strategical attack on %1m\n", your_dragons[k]);
     }
   }
   
   /* Pattern class d, strategical level defense of all own dragons. */
   if (class & CLASS_d) {
     for (k = 0; k < my_ndragons; k++) {
-      add_strategical_defense_move(POS(ti, tj), POS(my_dragoni[k], my_dragonj[k]));
-      TRACE("...strategical defense of %m\n", my_dragoni[k], my_dragonj[k]);
+      add_strategical_defense_move(move, my_dragons[k]);
+      TRACE("...strategical defense of %1m\n", my_dragons[k]);
     }
   }
 
@@ -304,11 +297,11 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (class & CLASS_J) {
     TRACE("...joseki standard move\n");
-    add_expand_territory_move(POS(ti, tj));
+    add_expand_territory_move(move);
     TRACE("...expands territory\n");
-    add_expand_moyo_move(POS(ti, tj));
+    add_expand_moyo_move(move);
     TRACE("...expands moyo\n");
-    set_minimum_move_value(POS(ti, tj), 27 * board_size / 19.0);
+    set_minimum_move_value(move, 27 * board_size / 19.0);
     TRACE("... minimum move value %f\n", 27 * board_size / 19.0);
   }
 
@@ -318,9 +311,9 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   if (class & CLASS_j) {
     float fixed_value = 20;
     TRACE("...less urgent joseki move\n");
-    add_expand_territory_move(POS(ti, tj));
+    add_expand_territory_move(move);
     TRACE("...expands territory\n");
-    add_expand_moyo_move(POS(ti, tj));
+    add_expand_moyo_move(move);
     TRACE("...expands moyo\n");
 
     /* Board size modification. */
@@ -334,9 +327,9 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     else
       TRACE("...move value %f\n", fixed_value);
 
-    set_minimum_move_value(POS(ti, tj), fixed_value);
+    set_minimum_move_value(move, fixed_value);
     if (board_size >= 17)
-      set_maximum_move_value(POS(ti, tj), fixed_value);
+      set_maximum_move_value(move, fixed_value);
   }
 
   /* Pattern class t, minor joseki move (tenuki OK). Set the value at 15.
@@ -356,9 +349,9 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     else
       TRACE("...move value %f\n", fixed_value);
     
-    set_minimum_move_value(POS(ti, tj), fixed_value);
+    set_minimum_move_value(move, fixed_value);
     if (board_size >= 17)
-      set_maximum_move_value(POS(ti, tj), fixed_value);
+      set_maximum_move_value(move, fixed_value);
   }
 
   /* Pattern class U, very urgent move joseki. Add strategical defense
@@ -367,17 +360,17 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
   if (class & CLASS_U) {
     TRACE("...joseki urgent move\n");
     for (k = 0; k < my_ndragons; k++) {
-      add_strategical_defense_move(POS(ti, tj), POS(my_dragoni[k], my_dragonj[k]));
-      TRACE("...strategical defense of %m\n", my_dragoni[k], my_dragonj[k]);
+      add_strategical_defense_move(move, my_dragons[k]);
+      TRACE("...strategical defense of %1m\n", my_dragons[k]);
     }
     urgent = 1;
     for (k = 0; k < your_ndragons; k++) {
-      add_strategical_attack_move(POS(ti, tj), POS(your_dragoni[k], your_dragonj[k]));
-      TRACE("...strategical attack on %m\n", your_dragoni[k], your_dragonj[k]);
+      add_strategical_attack_move(move, your_dragons[k]);
+      TRACE("...strategical attack on %1m\n", your_dragons[k]);
     }
-    add_shape_value(POS(ti, tj), 15);
+    add_shape_value(move, 15);
     TRACE("...shape value 15\n");
-    set_minimum_move_value(POS(ti, tj), 40);
+    set_minimum_move_value(move, 40);
     TRACE("...(min) move value %f\n", 40);
   }
 
@@ -386,55 +379,55 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
    */
   if (class & CLASS_T) {
     TRACE("...joseki trick move\n");
-    add_antisuji_move(POS(ti, tj));
+    add_antisuji_move(move);
     TRACE("...antisuji\n");
   }
 
   /* Pattern class W, worthwhile threat move. */
   if (class & CLASS_W) {
     TRACE("...worthwhile threat move\n");
-    add_worthwhile_threat_move(POS(ti, tj));
+    add_worthwhile_threat_move(move);
   }
 
   /* Minimum move value specified. */
   if (class & VALUE_MINVAL) {
-    set_minimum_move_value(POS(ti, tj), pattern->value);
+    set_minimum_move_value(move, pattern->value);
     TRACE("...(min) move value %f\n", pattern->value);
   }
 
   /* Maximum move value specified. */
   if (class & VALUE_MAXVAL) {
-    set_maximum_move_value(POS(ti, tj), pattern->maxvalue);
+    set_maximum_move_value(move, pattern->maxvalue);
     TRACE("...max move value %f\n", pattern->maxvalue);
   }
 
   /* Minimum territorial value specified. */
   if (class & VALUE_MINTERRITORY) {
-    set_minimum_territorial_value(POS(ti, tj), pattern->minterritory);
+    set_minimum_territorial_value(move, pattern->minterritory);
     TRACE("...(min) territorial value %f\n", pattern->minterritory);
   }
 
   /* Maximum territorial value specified. */
   if (class & VALUE_MAXTERRITORY) {
-    set_maximum_territorial_value(POS(ti, tj), pattern->maxterritory);
+    set_maximum_territorial_value(move, pattern->maxterritory);
     TRACE("...max territorial value %f\n", pattern->maxterritory);
   }
 
   /* Shape value specified. */
   if (class & VALUE_SHAPE) {
-    add_shape_value(POS(ti, tj), pattern->shape);
+    add_shape_value(move, pattern->shape);
     TRACE("...shape value %f\n", pattern->shape);
   }
 
   /* Followup value specified. */
   if (class & VALUE_FOLLOWUP) {
-    add_followup_value(POS(ti, tj), pattern->followup);
+    add_followup_value(move, pattern->followup);
     TRACE("...followup value %f\n", pattern->followup);
   }
 
   /* Reverse followup value specified. */
   if (class & VALUE_REV_FOLLOWUP) {
-    add_reverse_followup_value(POS(ti, tj), pattern->reverse_followup);
+    add_reverse_followup_value(move, pattern->reverse_followup);
     TRACE("...reverse followup value %f\n", pattern->reverse_followup);
   }
 }

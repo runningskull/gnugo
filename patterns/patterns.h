@@ -282,17 +282,17 @@ DECLARE(cutstone2_helper);
 DECLARE(edge_double_sente_helper);
 
 /* autohelper fns */
-int not_lunch_helper(int ai, int aj, int bi, int bj);
-int seki_helper(int ai, int aj);
-void threaten_to_save_helper(int ti, int tj, int ai, int aj);
-void threaten_to_capture_helper(int ti, int tj, int ai, int aj);
-void defend_against_atari_helper(int ti, int tj, int ai, int aj);
-void amalgamate_most_valuable_helper(int ai, int aj, int bi, int bj,
-				     int ci, int cj);
-int finish_ko_helper(int ai, int aj);
-int squeeze_ko_helper(int ai, int aj);
-int backfill_helper(int ai, int aj, int bi, int bj, int ci, int cj);
-int owl_threatens_attack(int ai, int aj, int bi, int bj);
+int not_lunch_helper(int apos, int bpos);
+int seki_helper(int str);
+void threaten_to_save_helper(int move, int str);
+void threaten_to_capture_helper(int move, int str);
+void defend_against_atari_helper(int move, int str);
+void amalgamate_most_valuable_helper(int apos, int bpos,
+				     int cpos);
+int finish_ko_helper(int apos);
+int squeeze_ko_helper(int apos);
+int backfill_helper(int apos, int bpos, int cpos);
+int owl_threatens_attack(int apos, int bpos);
 
 
 /* pattern arrays themselves */

@@ -609,6 +609,12 @@ loadsgf games/reading32.sgf
 155 attack G9
 #? [0]*
 
+loadsgf games/reading33.sgf
+156 attack B3
+#? [1 B2]*
+157 attack R3
+#? [0]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

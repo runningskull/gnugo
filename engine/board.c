@@ -1919,24 +1919,6 @@ mark_string(int str, char mx[BOARDMAX], char mark)
   } while (pos != str);
 }
 
-/* Preliminary workaround while transitioning 2D to 1D board. */
-void
-mark_string2(int m, int n, char mx[MAX_BOARD][MAX_BOARD], char mark)
-{
-  int str = POS(m, n);
-  int pos = str;
-
-  ASSERT1(IS_STONE(board[str]), str);
-
-  if (!strings_initialized)
-    init_board();
-
-  do {
-    mx[I(pos)][J(pos)] = mark;
-    pos = NEXT_STONE(pos);
-  } while (pos != str);
-}
-
 
 /* Returns true if at least one move has been played at pos
  * at deeper than level 'cutoff' in the reading tree.

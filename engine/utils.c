@@ -56,10 +56,10 @@ change_matcher_status(int m, int n, int status)
  */
 
 int
-defend_against(int ti, int tj, int color, int ai, int aj)
+defend_against(int move, int color, int apos)
 {
-  if (trymove2(ti, tj, color, "defend_against", -1, -1, EMPTY, -1, -1)) {
-    if (safe_move2(ai, aj, OTHER_COLOR(color)) == 0) {
+  if (trymove(move, color, "defend_against", NO_MOVE, EMPTY, NO_MOVE)) {
+    if (safe_move(apos, OTHER_COLOR(color)) == 0) {
       popgo();
       return 1;
     }
@@ -76,14 +76,14 @@ defend_against(int ti, int tj, int color, int ai, int aj)
  */
 
 int
-cut_possible(int i, int j, int color)
+cut_possible(int pos, int color)
 {
   if (color == WHITE)
-    return (black_eye[POS(i, j)].cut
-	    || (black_eye[POS(i, j)].type & INHIBIT_CONNECTION));
+    return (black_eye[pos].cut
+	    || (black_eye[pos].type & INHIBIT_CONNECTION));
   else
-    return (white_eye[POS(i, j)].cut
-	    || (white_eye[POS(i, j)].type & INHIBIT_CONNECTION));
+    return (white_eye[pos].cut
+	    || (white_eye[pos].type & INHIBIT_CONNECTION));
 }
 
 
@@ -246,10 +246,10 @@ play_break_through_n(int color, int num_moves, ...)
     ai = va_arg(ap, int);
     aj = va_arg(ap, int);
 
-    if (ai != -1 && (trymove2(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
-			     EMPTY, -1, -1)
-		     || tryko2(ai, aj, mcolor, "play_attack_defend_n",
-			      EMPTY, -1, -1)))
+    if (ai != -1 && (trymove(POS(ai, aj), mcolor, "play_break_through_n", NO_MOVE,
+			     EMPTY, NO_MOVE)
+		     || tryko(POS(ai, aj), mcolor, "play_break_through_n",
+			      EMPTY, NO_MOVE)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -320,10 +320,10 @@ play_attack_defend_n(int color, int do_attack, int num_moves, ...)
     ai = va_arg(ap, int);
     aj = va_arg(ap, int);
 
-    if (ai != -1 && (trymove2(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
-			     EMPTY, -1, -1)
-		     || tryko2(ai, aj, mcolor, "play_attack_defend_n",
-			      EMPTY, -1, -1)))
+    if (ai != -1 && (trymove(POS(ai, aj), mcolor, "play_attack_defend_n", NO_MOVE,
+			     EMPTY, NO_MOVE)
+		     || tryko(POS(ai, aj), mcolor, "play_attack_defend_n",
+			      EMPTY, NO_MOVE)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -409,10 +409,10 @@ play_attack_defend2_n(int color, int do_attack, int num_moves, ...)
     ai = va_arg(ap, int);
     aj = va_arg(ap, int);
 
-    if (ai != -1 && (trymove2(ai, aj, mcolor, "play_attack_defend_n", -1, -1,
-			     EMPTY, -1, -1)
-		     || tryko2(ai, aj, mcolor, "play_attack_defend_n",
-			      EMPTY, -1, -1)))
+    if (ai != -1 && (trymove(POS(ai, aj), mcolor, "play_attack_defend_n", NO_MOVE,
+			     EMPTY, NO_MOVE)
+		     || tryko(POS(ai, aj), mcolor, "play_attack_defend_n",
+			      EMPTY, NO_MOVE)))
       played_moves++;
     mcolor = OTHER_COLOR(mcolor);
   }
@@ -731,11 +731,10 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
  */
 
 int
-confirm_safety(int i, int j, int color, int size, int *di, int *dj)
+confirm_safety(int move, int color, int size, int *defense_point)
 {
-  int pos = POS(i, j);
   int libs[5];
-  int liberties = accurate_approxlib(pos, color, 5, libs);
+  int liberties = accurate_approxlib(move, color, 5, libs);
   int other = OTHER_COLOR(color);
   int issafe = 1;
   int m, n;
@@ -744,19 +743,18 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
   int k;
   int save_verbose = verbose;
 
-  if (di) *di = -1;
-  if (dj) *dj = -1;
+  if (defense_point)
+    *defense_point = NO_MOVE;
 
-  TRACE("Checking safety of a %s move at %m\n", 
-	color_to_string(color), i, j);
+  TRACE("Checking safety of a %s move at %1m\n", color_to_string(color), move);
 
   if (verbose > 0)
     verbose--;
   
-  if (!atari_atari_confirm_safety(color, POS(i, j), &apos, size)) {
+  if (!atari_atari_confirm_safety(color, move, &apos, size)) {
     ASSERT_ON_BOARD1(apos);
-    if (di) *di = I(apos);
-    if (dj) *dj = J(apos);
+    if (defense_point)
+      *defense_point = apos;
     TRACE("Combination attack appears at %1m.\n", apos);
     verbose = save_verbose;
     return 0;
@@ -768,17 +766,15 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
   }
 
   for (k = 0; k < 4; k++) {
-    int bi = i + deltai[k];
-    int bj = j + deltaj[k];
-    if (ON_BOARD2(bi, bj)
-	&& BOARD(bi, bj) == color
-	&& liberties <= worm[POS(bi, bj)].liberties) {
+    int bpos = move + delta[k];
+    if (board[bpos] == color
+	&& liberties <= worm[bpos].liberties) {
       trouble = 1;
-      if (dragon[POS(bi, bj)].matcher_status == ALIVE
-	  && DRAGON2(POS(bi, bj)).safety != INVINCIBLE
-	  && DRAGON2(POS(bi, bj)).safety != STRONGLY_ALIVE
-	  && dragon[POS(bi, bj)].size >= size
-	  && !owl_confirm_safety(i, j, bi, bj, di, dj)) {
+      if (dragon[bpos].matcher_status == ALIVE
+	  && DRAGON2(bpos).safety != INVINCIBLE
+	  && DRAGON2(bpos).safety != STRONGLY_ALIVE
+	  && dragon[bpos].size >= size
+	  && !owl_confirm_safety(move, bpos, defense_point)) {
 	verbose = save_verbose;
 	return 0;
       }
@@ -795,25 +791,21 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
    */
   increase_depth_values();
   
-  if (trymove2(i, j, color, NULL, -1, -1, EMPTY, -1, -1)) {
+  if (trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
     for (m = 0; issafe && m < board_size; m++)
       for (n = 0; issafe && n < board_size; n++)
 	if (issafe
-	    && BOARD(m, n)
+	    && IS_STONE(BOARD(m, n))
 	    && worm[POS(m, n)].origin == POS(m, n)
-	    && (m != i || n != j)) {
+	    && POS(m, n) != move) {
 	  if (BOARD(m, n) == color
 	      && worm[POS(m, n)].attack_codes[0] == 0
 	      && worm[POS(m, n)].size >= size
 	      && attack(POS(m, n), NULL)) {
-	    if (di) {
-	      int  dpos;
-	      find_defense(POS(m, n), &dpos);
-	      if (di) *di = I(dpos);
-	      if (dj) *dj = J(dpos);
-	    }
+	    if (defense_point)
+	      find_defense(POS(m, n), defense_point);
 	    issafe = 0;
-	    TRACE("After %m Worm at %m becomes attackable.\n", i, j, m, n);
+	    TRACE("After %1m Worm at %1m becomes attackable.\n", move, POS(m, n));
 	  }
 	  else if (BOARD(m, n) == other
 		   && worm[POS(m, n)].attack_codes[0] != 0
@@ -822,43 +814,35 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
 		   && find_defense(POS(m, n), NULL)) {
 	    /* Also ask the owl code whether the string can live
 	     * strategically. To do this we need to temporarily undo
-	     * the trymove2().
+	     * the trymove().
 	     */
 	    popgo();
 	    decrease_depth_values();
-	    if (owl_does_attack(i, j, m, n) != WIN)
+	    if (owl_does_attack(move, POS(m, n)) != WIN)
 	      issafe = 0;
-	    trymove2(i, j, color, NULL, -1, -1, EMPTY, -1, -1);
+	    trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE);
 	    increase_depth_values();
 	    
 	    if (!issafe) {
-	      if (di) {
-		int  dpos;
-		attack(POS(m, n), &dpos);
-	      if (di) *di = I(dpos);
-	      if (dj) *dj = J(dpos);
-	      }
+	      if (defense_point)
+		attack(POS(m, n), defense_point);
 	      
-	      TRACE("After %m worm at %m becomes defendable.\n",
-		    i, j, m, n);
+	      TRACE("After %1m worm at %1m becomes defendable.\n",
+		    move, POS(m, n));
 	    }
 	  }
 	}
     
     if (liberties == 2) {
-      if (double_atari(I(libs[0]), J(libs[0]), other)) {
-	if (di && safe_move(libs[0], color) == WIN) {
-	  *di = I(libs[0]);
-	  *dj = J(libs[0]);
-	}
+      if (double_atari(libs[0], other)) {
+	if (defense_point && safe_move(libs[0], color) == WIN)
+	  *defense_point = libs[0];
 	issafe = 0;
 	TRACE("Double threat appears at %1m.\n", libs[0]);
       }
-      else if (double_atari(I(libs[1]), J(libs[1]), other)) {
-	if (di && safe_move(libs[1], color) == WIN) {
-	  *di = I(libs[1]);
-	  *dj = J(libs[1]);
-	}
+      else if (double_atari(libs[1], other)) {
+	if (defense_point && safe_move(libs[1], color) == WIN)
+	  *defense_point = libs[1];
 	issafe = 0;
 	TRACE("Double threat appears at %1m.\n", libs[1]);
       }
@@ -886,12 +870,14 @@ confirm_safety(int i, int j, int color, int size, int *di, int *dj)
  */
 
 int
-double_atari(int m, int n, int color)
+double_atari(int move, int color)
 {
   int other = OTHER_COLOR(color);
   int k;
+  int m = I(move);
+  int n = J(move);
 
-  if (!ON_BOARD2(m, n))
+  if (!ON_BOARD(move))
     return 0;
 
   /* Loop over the diagonal directions. */
@@ -903,12 +889,11 @@ double_atari(int m, int n, int color)
      * corners of a square, ON_BOARD2(m,n) && ON_BOARD2(m+dm,n+dn)
      * implies ON_BOARD2(m+dm,n) and ON_BOARD2(n,n+dn)
      */
-    if (ON_BOARD2(m+dm, n+dn) && ON_BOARD2(m, n)
-        && BOARD(m+dm, n+dn) == color
+    if (BOARD(m+dm, n+dn) == color
 	&& BOARD(m, n+dn) == other
 	&& BOARD(m+dm, n) == other
-	&& trymove2(m, n, color, "double_atari", -1, -1, EMPTY, -1, -1)) {
-      if (countlib2(m, n) > 1
+	&& trymove(move, color, "double_atari", NO_MOVE, EMPTY, NO_MOVE)) {
+      if (countlib(move) > 1
 	  && (BOARD(m, n+dn) == EMPTY || BOARD(m+dm, n) == EMPTY 
 	      || !defend_both(POS(m, n+dn), POS(m+dm, n)))) {
 	popgo();

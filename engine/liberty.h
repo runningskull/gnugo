@@ -101,19 +101,6 @@ extern Hash_data    hashdata;
 
 #define BOARD(i, j)  board[POS(i, j)]
 
-/* 2D workaround macros for 1D functions. */
-#define countlib2(m, n) countlib(POS(m, n))
-#define countstones2(m, n) countstones(POS(m, n))
-#define safe_move2(m, n, color) safe_move(POS(m, n), color)
-#define is_legal2(m, n, color) is_legal(POS(m, n), color)
-#define is_suicide2(m, n, color) is_suicide(POS(m, n), color)
-#define trymove2(m, n, color, message, i, j, komaster, kom_i, kom_j) \
-        trymove(POS(m, n), color, message, POS(i, j), \
-                komaster, POS(kom_i, kom_j))
-#define tryko2(m, n, color, message, komaster, kom_i, kom_j) \
-        tryko(POS(m, n), color, message, komaster, POS(kom_i, kom_j))
-#define is_worm_origin2(wi, wj, i, j) is_worm_origin(POS(wi, wj), POS(i, j))
-
 /* board utility functions */
 
 int find_origin(int str);
@@ -241,7 +228,7 @@ int naive_ladder(int str, int *move);
 void tune_move_ordering(int params[MOVE_ORDERING_PARAMETERS]);
 void draw_reading_shadow(void);
 void purge_persistent_reading_cache(void);
-void reading_hotspots(float values[MAX_BOARD][MAX_BOARD]);
+void reading_hotspots(float values[BOARDMAX]);
 
 /* readconnect.c */
 int string_connect(int str1, int str2, int *move);
@@ -261,14 +248,13 @@ int komaster_trymove(int pos, int color,
 		     int *is_conditional_ko, int consider_conditional_ko);
 int does_capture_something(int pos, int color);
 void mark_string(int str, char mx[BOARDMAX], char mark);
-void mark_string2(int m, int n, char mx[MAX_BOARD][MAX_BOARD], char mark);
 int move_in_stack(int pos, int cutoff);
 void get_move_from_stack(int k, int *move, int *color);
 int stones_on_board(int color);
 int obvious_false_eye(int pos, int color);
-int owl_topological_eye(int i, int j, int color);
+int owl_topological_eye(int pos, int color);
 int vital_chain(int pos);
-int confirm_safety(int m, int n, int color, int size, int *di, int *dj);
+int confirm_safety(int move, int color, int size, int *defense_point);
 void set_depth_values(int level);
 void modify_depth_values(int n);
 void increase_depth_values(void);
@@ -279,7 +265,7 @@ void restore_depth_values(void);
 int safe_move(int move, int color);
 void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, int escape_value[BOARDMAX]);
-int same_dragon(int d1, int d2);
+int is_same_dragon(int d1, int d2);
 int lively_dragon_exists(int color);
 int is_same_worm(int w1, int w2);
 int is_worm_origin(int w, int pos);
@@ -332,14 +318,14 @@ void add_shape_value(int pos, float value);
 void add_followup_value(int pos, float value);
 void add_reverse_followup_value(int pos, float value);
 
-void find_stones_saved_by_move(int i, int j, int color,
-                               char saved_stones[MAX_BOARD][MAX_BOARD]);
+void find_stones_saved_by_move(int pos, int color,
+			       char saved_stones[BOARDMAX]);
 
-int owl_lively(int i, int j);
-int owl_escape_value(int i, int j);
+int owl_lively(int pos);
+int owl_escape_value(int pos);
 int owl_goal_dragon(int pos);
-int owl_eyespace(int ai, int aj, int bi, int bj);
-int owl_big_eyespace(int ai, int aj, int bi, int bj);
+int owl_eyespace(int apos, int bpos);
+int owl_big_eyespace(int apos, int bpos);
 void owl_reasons(int color);
 
 void unconditional_life(int unconditional_territory[MAX_BOARD][MAX_BOARD],
@@ -364,7 +350,6 @@ int placehand(int handicap);          /* place stones on board only */
 void fuseki(int color);
 void semeai(int color);
 void small_semeai(void);
-void small_semeai_analyzer(int, int, int, int);
 void shapes(int color);
 void endgame_shapes(int color);
 
@@ -381,18 +366,18 @@ int aftermath_genmove(int *aftermath_move, int color,
 		      int do_capture_dead_stones);
 int revise_semeai(int color);
 
-int owl_attack(int m, int n, int *ui, int *uj, int *certain);
-int owl_defend(int m, int n, int *ui, int *uj, int *certain);
-int owl_threaten_attack(int m, int n, int *ui, int *uj, int *vi, int *vj);
-int owl_threaten_defense(int m, int n, int *ui, int *uj, int *vi, int *vj);
-int owl_does_defend(int ti, int tj, int m, int n);
-int owl_confirm_safety(int ti, int tj, int m, int n, int *di, int *dj);
-int owl_does_attack(int ti, int tj, int m, int n);
-int owl_connection_defends(int ti, int tj, int ai, int aj, int bi, int bj);
-int owl_substantial(int i, int j);
+int owl_attack(int target, int *attack_point, int *certain);
+int owl_defend(int target, int *defense_point, int *certain);
+int owl_threaten_attack(int target, int *attack1, int *attack2);
+int owl_threaten_defense(int target, int *defend1, int *defend2);
+int owl_does_defend(int move, int target);
+int owl_confirm_safety(int move, int target, int *defense_point);
+int owl_does_attack(int move, int target);
+int owl_connection_defends(int move, int target1, int target2);
+int owl_substantial(int str);
 void owl_analyze_semeai(int ai, int aj, int bi, int bj);
 void purge_persistent_owl_cache(void);
-void owl_hotspots(float values[MAX_BOARD][MAX_BOARD]);
+void owl_hotspots(float values[BOARDMAX]);
 
 void change_attack(int str, int move, int acode);
 void change_defense(int str, int move, int dcode);
@@ -406,25 +391,13 @@ void worm_reasons(int color);
 
 int does_attack(int move, int str);
 int does_defend(int move, int str);
-int double_atari(int m, int n, int color);
+int double_atari(int move, int color);
 int play_attack_defend_n(int color, int do_attack, int num_moves, ...);
 int play_attack_defend2_n(int color, int do_attack, int num_moves, ...);
 int play_break_through_n(int color, int num_moves, ...);
-int cut_possible(int i, int j, int color);
-int defend_against(int ti, int tj, int color, int ai, int aj);
+int cut_possible(int pos, int color);
+int defend_against(int move, int color, int apos);
 int somewhere(int color, int num_moves, ...);
-
-/* moyo.c */
-int area_color(int m, int n);
-int moyo_color(int m, int n);
-int terri_color(int m, int n);
-int delta_moyo(int ti, int tj, int color);
-int delta_moyo_simple(int ti, int tj, int color);
-int delta_terri(int ti, int tj, int color);
-int diff_moyo(int ti, int tj, int color);
-int diff_terri(int ti, int tj, int color);
-int area_stone(int m, int n);
-int area_space(int m, int n);
 
 /* Printmoyo values, specified by -m flag. */
 #define PRINTMOYO_TERRITORY         0x01
@@ -441,34 +414,34 @@ int area_space(int m, int n);
 /* Influence functions. */
 void compute_initial_influence(int color, int dragons_known);
 void resegment_initial_influence(void);
-int influence_delta_territory(int m, int n, int color,
-                              char saved_stones[MAX_BOARD][MAX_BOARD]);
-int influence_delta_moyo(int m, int n, int color,
-                         char saved_stones[MAX_BOARD][MAX_BOARD]);
-int influence_delta_strict_moyo(int m, int n, int color,
-                                char saved_stones[MAX_BOARD][MAX_BOARD]);
-int influence_delta_area(int m, int n, int color,
-                         char saved_stones[MAX_BOARD][MAX_BOARD]);
-int influence_delta_strict_area(int m, int n, int color,
-                                char saved_stones[MAX_BOARD][MAX_BOARD]);
-int influence_territory_color(int m, int n);
-int influence_moyo_color(int m, int n);
-int influence_area_color(int m, int n);
-int influence_get_moyo_size(int m, int n, int color, int initial);
+int influence_delta_territory(int pos, int color,
+                              char saved_stones[BOARDMAX]);
+int influence_delta_moyo(int pos, int color,
+                         char saved_stones[BOARDMAX]);
+int influence_delta_strict_moyo(int pos, int color,
+                                char saved_stones[BOARDMAX]);
+int influence_delta_area(int pos, int color,
+                         char saved_stones[BOARDMAX]);
+int influence_delta_strict_area(int pos, int color,
+                                char saved_stones[BOARDMAX]);
+int influence_territory_color(int pos);
+int influence_moyo_color(int pos);
+int influence_area_color(int pos);
+int influence_get_moyo_size(int pos, int color, int initial);
 float influence_estimate_score(float moyo_coeff, float area_coeff);
 
 void  old_estimate_score(int color, float *lower_bound, float *upper_bound);
 float estimate_score(float *upper, float *lower);
 
 void print_initial_influence(int color, int dragons_known);
-void print_move_influence(int m, int n, int color,
-                          char saved_stones[MAX_BOARD][MAX_BOARD]);
+void print_move_influence(int pos, int color,
+                          char saved_stones[BOARDMAX]);
 void get_initial_influence(int color, int dragons_known,
                            float white_influence[MAX_BOARD][MAX_BOARD],
                            float black_influence[MAX_BOARD][MAX_BOARD],
                            int influence_regions[MAX_BOARD][MAX_BOARD]);
 void get_move_influence(int i, int j, int color,
-                        char saved_stones[MAX_BOARD][MAX_BOARD],
+                        char saved_stones[BOARDMAX],
                         float white_influence[MAX_BOARD][MAX_BOARD],
                         float black_influence[MAX_BOARD][MAX_BOARD],
                         int influence_regions[MAX_BOARD][MAX_BOARD]);
@@ -533,8 +506,7 @@ extern int owl_reading_depth;   /* owl does not read below this depth */
 extern int owl_node_limit;      /* maximum number of nodes considered */
 extern int level;
 extern float best_move_values[10];
-extern int best_movei[10];
-extern int best_movej[10];
+extern int best_moves[10];
 
 extern int chinese_rules;
 
@@ -728,24 +700,18 @@ int recognize_eye2(int pos, int *attack_point,
 		   struct eye_data eye[BOARDMAX],
 		   struct half_eye_data heye[BOARDMAX],
                     int add_moves, int color);
-void propagate_eye (int pos, struct eye_data eye[BOARDMAX]);
-void originate_eye(int i, int j, int m, int n,
-		   int *esize, int *msize,
-		   struct eye_data eye[BOARDMAX]);
-int topological_eye(int m, int n, int color, int *ai, int *aj,
-                    int *di, int *dj, 
+void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
+int topological_eye(int pos, int color,
                     struct eye_data b_eye[BOARDMAX],
                     struct eye_data w_eye[BOARDMAX],
                     struct half_eye_data heye[BOARDMAX]);
-void add_half_eye(int m, int n, struct eye_data eye[BOARDMAX], 
+void add_half_eye(int pos, struct eye_data eye[BOARDMAX], 
                   struct half_eye_data heye[BOARDMAX]);
 void make_domains(struct eye_data b_eye[BOARDMAX],
                   struct eye_data w_eye[BOARDMAX],
 		  int owl_call);
 
 int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);
-void remove_half_eye(struct half_eye_data heye[BOARDMAX],
-                     int i, int j, int color);
 
 /* our own abort() which prints board state on the way out.
  * i,j is a "relevant" board position for info */

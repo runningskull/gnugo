@@ -231,6 +231,7 @@ extern int last_moves[2];
 #define DEBUG_SCORING             0x10000
 #define DEBUG_AFTERMATH           0x20000
 #define DEBUG_ATARI_ATARI         0x40000
+#define DEBUG_READING_CACHE       0x80000
 /* hash flag bits 
  *
  * Regarding HASH_DEFAULT:
@@ -288,10 +289,6 @@ extern int mandated_owl_reading_depth;
 extern int mandated_owl_node_limit; 
 
 extern float potential_moves[MAX_BOARD][MAX_BOARD];
-
-extern float best_move_values[10];
-extern int best_movei[10];
-extern int best_movej[10];
 
 extern volatile int time_to_die;   /* set by signal handlers */
 

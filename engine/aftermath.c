@@ -92,8 +92,8 @@ aftermath_genmove(int *aftermath_move, int color,
   int other = OTHER_COLOR(color);
   int distance[BOARDMAX];
   int score[BOARDMAX];
-  float owl_hotspot[MAX_BOARD][MAX_BOARD];
-  float reading_hotspot[MAX_BOARD][MAX_BOARD];
+  float owl_hotspot[BOARDMAX];
+  float reading_hotspot[BOARDMAX];
   int dragons[BOARDMAX];
   int something_found;
   int closest_opponent = NO_MOVE;
@@ -240,7 +240,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	    && libs > countlib(pos + dir)
 	    && (DRAGON2(pos + dir).safety == INVINCIBLE
 		|| DRAGON2(pos + dir).safety == STRONGLY_ALIVE)) {
-	  int score = 20 * (owl_hotspot[I(pos)][J(pos)] + reading_hotspot[I(pos)][J(pos)]);
+	  int score = 20 * (owl_hotspot[pos] + reading_hotspot[pos]);
 	  if (score > best_score) {
 	    best_score = score;
 	    best_scoring_move = pos;
@@ -497,13 +497,13 @@ aftermath_genmove(int *aftermath_move, int color,
       if (opponent_dragons > 1)
 	score[pos] += 10 * (opponent_dragons - 1);
 
-      score[pos] += (int) (20.0 * owl_hotspot[I(pos)][J(pos)]);
-      score[pos] += (int) (20.0 * reading_hotspot[I(pos)][J(pos)]);
+      score[pos] += (int) (20.0 * owl_hotspot[pos]);
+      score[pos] += (int) (20.0 * reading_hotspot[pos]);
 
       if (1 && (debug & DEBUG_AFTERMATH))
 	gprintf("Score %1M = %d (hotspot bonus %d + %d)\n", pos, score[pos],
-		(int) (20.0 * owl_hotspot[I(pos)][J(pos)]),
-		(int) (20.0 * reading_hotspot[I(pos)][J(pos)]));
+		(int) (20.0 * owl_hotspot[pos]),
+		(int) (20.0 * reading_hotspot[pos]));
     }
 
   while (1) {
@@ -527,8 +527,8 @@ aftermath_genmove(int *aftermath_move, int color,
 	|| !safe_move(move, color)
 	|| (DRAGON2(bb).safety != INVINCIBLE
 	    && DRAGON2(bb).safety != STRONGLY_ALIVE
-	    && !owl_does_defend(I(move), J(move), I(bb), J(bb)))
-	|| (!confirm_safety(I(move), J(move), color, 0, NULL, NULL))) {
+	    && !owl_does_defend(move, bb))
+	|| (!confirm_safety(move, color, 0, NULL))) {
       score[move] = 0;
     }
     else {
@@ -644,7 +644,7 @@ aftermath_genmove(int *aftermath_move, int color,
       /* Consult the owl code to determine whether the considered move
        * really is effective. Blunders should be detected here.
        */
-      if (owl_does_attack(I(bb), J(bb), I(move), J(move))) {
+      if (owl_does_attack(bb, move)) {
 	*aftermath_move = bb;
 	return 1;
       }

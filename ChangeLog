@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- 1D revisions all over the engine
+- new debug flag DEBUG_READING_CACHE
+- same_dragon() renamed is_same_dragon()
+- new gtp commands start_sgftrace and finish_sgftrace
+- new and revised regression tests
 - new gtp command top_moves
 - bugfix in draw_back
 - Add ON_BOARD1 assertions in liberty_of_string and neighbour_of_string

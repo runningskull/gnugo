@@ -29,7 +29,7 @@
 #include "liberty.h"
 
 static int find_backfilling_move(int move, int color, int *backfill_move);
-static int filllib_confirm_safety(int m, int n, int color, int *di, int *dj);
+static int filllib_confirm_safety(int move, int color, int *defense_point);
 
 /* Determine whether a point is adjacent to at least one own string which
  * isn't dead.
@@ -105,7 +105,7 @@ fill_liberty(int *move, int color)
   int m, n;
   int k;
   int other = OTHER_COLOR(color);
-  int di, dj;
+  int defense_point;
   int potential_color[BOARDMAX];
 
   /* We first make a fast scan for intersections which are potential
@@ -198,13 +198,13 @@ fill_liberty(int *move, int color)
        */
       if (safe_move(pos, color) == WIN) {
 	DEBUG(DEBUG_FILLLIB, "Filllib: Tactically safe.\n");
-	if (filllib_confirm_safety(m, n, color, &di, &dj)) {
+	if (filllib_confirm_safety(pos, color, &defense_point)) {
 	  /* Safety confirmed. */
 	  DEBUG(DEBUG_FILLLIB, "Filllib: Safety confirmed.\n");
-	  *move = POS(m, n);
+	  *move = pos;
 	  return 1;
 	}
-	else if (di != -1) {
+	else if (defense_point != NO_MOVE) {
 	  /* Safety not confirmed because the move at (m, n) would set
            * up a double threat. (di, dj) is assumed to defend against
            * this threat.
@@ -212,8 +212,9 @@ fill_liberty(int *move, int color)
 	   * FIXME: We should verify that (di, dj) really is effective.
 	   */
 	  DEBUG(DEBUG_FILLLIB,
-		"Filllib: Safety not confirmed, but %m defends.\n", di, dj);
-	  *move = POS(di, dj);
+		"Filllib: Safety not confirmed, but %1m defends.\n",
+		defense_point);
+	  *move = defense_point;
 	  return 1;
 	}
 	else {
@@ -250,7 +251,7 @@ fill_liberty(int *move, int color)
 	  /* If the move turns out to be strategically unsafe, or
            * setting up a double threat elsewhere, also discard it.
 	   */
-	  if (!filllib_confirm_safety(I(*move), J(*move), color, &di, &dj)) {
+	  if (!filllib_confirm_safety(*move, color, &defense_point)) {
 	    DEBUG(DEBUG_FILLLIB,
 		  "Filllib: Safety not confirmed, discarded.\n");
 	    continue;
@@ -264,12 +265,12 @@ fill_liberty(int *move, int color)
 	  if (does_capture_something(pos, color)) {
 	    DEBUG(DEBUG_FILLLIB,
 		  "Filllib: Not tactically safe, but captures stones.\n");
-	    if (!filllib_confirm_safety(m, n, color, &di, &dj)) {
+	    if (!filllib_confirm_safety(pos, color, &defense_point)) {
 	      DEBUG(DEBUG_FILLLIB,
 		    "Filllib: Safety not confirmed, discarded.\n");
 	      continue;
 	    }
-	    *move = POS(m, n);
+	    *move = pos;
 	    return 1;
 	  }
 	}
@@ -477,35 +478,33 @@ find_backfilling_move(int move, int color, int *backfill_move)
  * owl code to verify the strategical viability of the move.
  */
 static int
-filllib_confirm_safety(int m, int n, int color, int *di, int *dj)
+filllib_confirm_safety(int move, int color, int *defense_point)
 {
   int k;
-  int ai = -1, aj = -1;
+  int apos = NO_MOVE;
   int save_verbose;
 
   gg_assert(stackp == 0);
-  *di = -1;
-  *dj = -1;
+  gg_assert(defense_point != NULL);
+  *defense_point = NO_MOVE;
 
   /* Before we can call the owl code, we need to find a neighbor of
    * our color.
    */
   for (k = 0; k < 4; k++)
-    if (BOARD(m + deltai[k], n + deltaj[k]) == color) {
-      ai = m + deltai[k];
-      aj = n + deltaj[k];
+    if (board[move + delta[k]] == color) {
+      apos = move + delta[k];
       break;
     }
 
   /* If none found, look for a neighbor of an attacked adjacent string. */
-  if (ai == -1)
+  if (apos == NO_MOVE)
     for (k = 0; k < 4; k++) {
-      int i = m + deltai[k];
-      int j = n + deltaj[k];
-      if (BOARD(i, j) == OTHER_COLOR(color)
-	  && !play_attack_defend_n(color, 0, 1, m, n, i, j)) {
+      int pos2 = move + delta[k];
+      if (board[pos2] == OTHER_COLOR(color)
+	  && !play_attack_defend_n(color, 0, 1, I(move), J(move), I(pos2), J(pos2))) {
 	int adj;
-	adj = chainlinks(POS(i, j), adjs);
+	adj = chainlinks(pos2, adjs);
 	/* It seems unlikely that we would ever get adjacent strings
          * here, but if it should happen we simply give up and say the
          * move is unsafe.
@@ -513,8 +512,7 @@ filllib_confirm_safety(int m, int n, int color, int *di, int *dj)
 	if (adj == 0)
 	  return 0;
 	
-	ai = I(adjs[0]);
-	aj = J(adjs[0]);
+	apos = adjs[0];
 	break;
       }
     }
@@ -522,7 +520,7 @@ filllib_confirm_safety(int m, int n, int color, int *di, int *dj)
   /* We should have found something by now. If not something's
    * probably broken elsewhere. Declare the move unsafe if it happens.
    */
-  if (ai == -1)
+  if (apos == NO_MOVE)
     return 0;
 
   /* Ask the owl code whether this move is strategically viable. */
@@ -530,11 +528,11 @@ filllib_confirm_safety(int m, int n, int color, int *di, int *dj)
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  if (!owl_does_defend(m, n, ai, aj))
+  if (!owl_does_defend(move, apos))
     return 0;
   verbose = save_verbose;
   
-  return confirm_safety(m, n, color, 0, di, dj);
+  return confirm_safety(move, color, 0, defense_point);
 }
 
 
