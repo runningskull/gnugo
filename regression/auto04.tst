@@ -1,6 +1,6 @@
 loadsgf games/auto_gen/auto018.sgf 103
 1 owl_attack R14
-#? [!0]*
+#? [!0]
 
 loadsgf games/auto_gen/auto019.sgf 76
 2 owl_defend E18

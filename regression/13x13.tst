@@ -448,7 +448,7 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 25
 
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 29
 85 gg_genmove black
-#? [D2]*
+#? [D2]
 
 #CATEGORY=OWL_TUNING
 # New failure (comparing 3.1.15 with 3.0.0)

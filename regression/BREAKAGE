@@ -1,3 +1,37 @@
+========================== 3.3.13 pre 2 ============================
+
+./regress.sh . filllib.tst 
+42 unexpected PASS!
+./regress.sh . connection.tst 
+19 unexpected PASS!
+99 unexpected FAIL: Correct '0', got '1 O3'
+./regress.sh . nngs1.tst 
+31 unexpected PASS!
+./regress.sh . lazarus.tst 
+15 unexpected PASS!
+./regress.sh . nngs.tst 
+880 unexpected FAIL: Correct 'E6', got 'H6'
+./regress.sh . 13x13.tst 
+85 unexpected PASS!
+./regress.sh . owl1.tst 
+265 unexpected PASS!
+292 unexpected FAIL: Correct '1 T4', got '0'
+./regress.sh . auto04.tst 
+1 unexpected PASS!
+./regress.sh . auto_handtalk.tst 
+9 unexpected PASS!
+./regress.sh . gunnar.tst 
+2 unexpected FAIL: Correct 'E17|E18', got 'D19'
+8 unexpected FAIL: Correct '!O13', got 'O13'
+9 unexpected FAIL: Correct 'F13', got 'C14'
+10 unexpected FAIL: Correct 'R12|R14', got 'Q15'
+14 unexpected FAIL: Correct 'Q11', got 'O13'
+15 unexpected FAIL: Correct 'O6', got 'P6'
+16 unexpected FAIL: Correct 'T5', got 'M9'
+17 unexpected FAIL: Correct 'S7', got 'T6'
+19 unexpected FAIL: Correct 'L4', got 'L3'
+
+
 ========================== 3.3.13 pre 1 ============================
 
 ./regress.sh . ld_owl.tst 

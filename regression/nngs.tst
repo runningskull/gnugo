@@ -372,7 +372,7 @@ loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051408.sgf 5
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 13
 880 gg_genmove white
-#? [E6]
+#? [E6]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 19

@@ -130,7 +130,7 @@ loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 10
 
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 18
 31 gg_genmove white
-#? [N17]*
+#? [N17]
 
 # better to avoid attack on one of the two top groups
 loadsgf games/nngs/gnugo-3.1.27-guestn-200203131735.sgf 34

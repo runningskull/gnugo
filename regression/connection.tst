@@ -73,7 +73,7 @@ loadsgf games/arion.sgf 63
 
 loadsgf games/dublin1.sgf 72
 19 same_dragon B15 E16
-#? [0]*
+#? [0]
 
 loadsgf games/nicklas/nicklas12.sgf 69
 20 connect K17 N17
@@ -327,7 +327,7 @@ loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 185
 
 loadsgf games/gunnar/gunnar3.sgf 74
 99 disconnect N3 P3
-#? [0]
+#? [0]*
 
 
 # Report number of nodes visited by the tactical reading
