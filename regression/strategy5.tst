@@ -96,7 +96,7 @@ loadsgf games/strategy48.sgf
 # Semeai problem. White can make seki, black can kill.
 loadsgf games/strategy49.sgf
 275 gg_genmove white
-#? [A18]*
+#? [A18]
 276 gg_genmove black
 #? [A18]
 

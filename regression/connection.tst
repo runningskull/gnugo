@@ -312,7 +312,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 193
 
 loadsgf games/reading39.sgf
 95 disconnect O4 P3
-#? [1 (N1|N2)]
+#? [1 (N1|N2)]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

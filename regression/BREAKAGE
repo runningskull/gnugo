@@ -1,3 +1,35 @@
+======================= 3.3.11 pre 1  =========================
+
+./regress.sh . reading.tst 
+175 unexpected FAIL: Correct '1 (N1|N2)', got '0'
+./regress.sh . owl_rot.tst 
+118 unexpected FAIL: Correct '0', got '1 H2'
+./regress.sh . atari_atari.tst 
+17 unexpected FAIL: Correct 'S10', got 'PASS'
+./regress.sh . connection.tst 
+95 unexpected FAIL: Correct '1 (N1|N2)', got '0'
+./regress.sh . blunder.tst 
+28 unexpected FAIL: Correct '!(C4|E1)', got 'C4'
+./regress.sh . strategy4.tst 
+157 unexpected PASS!
+209 unexpected PASS!
+./regress.sh . owl1.tst 
+267 unexpected PASS!
+283 unexpected FAIL: Correct '0', got '1 N8'
+287 unexpected PASS!
+./regress.sh . nngs2.tst 
+550 unexpected FAIL: Correct '!H19', got 'H19'
+600 unexpected FAIL: Correct 'B5', got 'D6'
+./regress.sh . nngs3.tst 
+1150 unexpected FAIL: Correct 'G13', got 'J13'
+1160 unexpected FAIL: Correct 'B1', got 'A4'
+1180 unexpected FAIL: Correct 'A6', got 'A5'
+1190 unexpected FAIL: Correct 'D17', got 'E18'
+./regress.sh . strategy5.tst 
+275 unexpected PASS!
+./regress.sh . safety.tst 
+3 unexpected FAIL: Correct 'H15|H16|G14|F13|C17', got 'M3'
+
 ======================= 3.3.10 pre 3  =========================
 
 ./regress.sh . owl.tst 

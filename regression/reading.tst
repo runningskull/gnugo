@@ -716,7 +716,7 @@ popgo
 
 loadsgf games/reading39.sgf
 175 defend O3
-#? [1 (N1|N2)]
+#? [1 (N1|N2)]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

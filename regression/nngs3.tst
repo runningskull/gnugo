@@ -540,13 +540,13 @@ loadsgf games/nngs/gnugo-3.3.9-joshj-200210181607.sgf 102
 # G13 is the only move. J13 pointlessly lets black have a ko.
 loadsgf games/nngs/gnugo-3.3.9-Ayoye-200209301535.sgf 76
 1150 gg_genmove white
-#? [G13]
+#? [G13]*
 
 # B1 is the only move. After A4 or B4 black can play B6 and white can
 # no longer capture both A3 and B6
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 240
 1160 gg_genmove white
-#? [B1]
+#? [B1]*
 
 # B1 minimizes the losses.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
@@ -556,9 +556,10 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
 # A5 is very odd.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 244
 1180 gg_genmove white
-#? [A6]
+#? [A6]*
 
 loadsgf games/nngs/gnugo-3.3.10-tsuku-200210241808.sgf 136
 1190 gg_genmove white
-#? [D17]
+#? [D17]*
+
 

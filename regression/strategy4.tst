@@ -34,7 +34,7 @@ loadsgf games/ssstator.sgf 133
 
 loadsgf games/ssstator.sgf 136
 157 gg_genmove white
-#? [B14|B16|C18]*
+#? [B14|B16|C18]
 
 # E16 is completely aimless and ineffective.
 loadsgf games/strategy38.sgf 51
@@ -301,7 +301,7 @@ loadsgf games/lordofpi.sgf 36
 # A4 allows W to make seki
 loadsgf games/lordofpi.sgf 46
 209 gg_genmove black
-#? [!A4]*
+#? [!A4]
 
 loadsgf games/lordofpi.sgf 52
 210 gg_genmove black

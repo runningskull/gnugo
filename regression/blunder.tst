@@ -130,7 +130,7 @@ loadsgf games/blunder20.sgf
 # C4 lets black make seki with B1. E1 is even worse.
 loadsgf games/blunder22.sgf 1
 28 gg_genmove white
-#? [!(C4|E1)]
+#? [!(C4|E1)]*
 
 # C1 gives a ko that white can't win. Pass gives life in seki. B3 dies
 # right out.

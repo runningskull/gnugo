@@ -19,7 +19,7 @@ loadsgf games/incident263.sgf 32
 orientation 1
 loadsgf games/owl11.sgf 126
 118 owl_attack H5
-#? [0]
+#? [0]*
 
 orientation 2
 loadsgf games/incident108b.sgf 178

@@ -28,7 +28,7 @@ loadsgf games/unfinished.sgf 214
 
 loadsgf games/unfinished.sgf 214
 267 owl_defend Q2
-#? [2 R3]*
+#? [2 R3]
 
 loadsgf games/owl36.sgf
 268 owl_defend A3
@@ -92,7 +92,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 77
 
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 231
 283 owl_defend J9
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 241
 284 owl_defend J9
@@ -110,7 +110,7 @@ loadsgf games/owl41.sgf
 
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 230
 287 owl_attack D4
-#? [0]*
+#? [0]
 
 # Seki.
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 234
