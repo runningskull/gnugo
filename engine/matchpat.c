@@ -1261,16 +1261,32 @@ fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback, int color,
 /* Corner matcher                                                         */
 /**************************************************************************/
 
-#if 0
 /* These arrays specify anchor corner for each transformation. They _must_
  * be in line with transformation2[][] array in patterns/transform.c.
  */
-static const int corner_x[8] = {0, 1, 1, 0, 1, 0, 0, 1};
-static const int corner_y[8] = {0, 0, 1, 1, 1, 1, 0, 0};
+static const int corner_x[8] = {0, 0, 1, 1, 1, 1, 0, 0};
+static const int corner_y[8] = {0, 1, 1, 0, 1, 0, 0, 1};
 
+/* The number of stones in "corner area" for each board position. For example,
+ * corner area for position E3 when anchoring at A1 corner, looks like this:
+ *
+ *   |........		In general, num_stones[pos] is the number of stones
+ *   |........		which are closer to the corner (stone at pos, if any,
+ * 3 |#####...		counts too) than pos. Note, that say G2 is not closer
+ *   |#####...		to the corner than E3, the reverse isn't true either.
+ * 1 |#####...		Their distances are "incomparable" since E < G but
+ *   +--------		3 > 2.
+ *    A   E
+ */
 static int num_stones[BOARDMAX];
 
 
+/* Recursively performs corner matching. This function checks whether
+ * `num_variation' variations pointed by `variation' parameter match.
+ * If any of them do, it calls itself recursively. If any pattern
+ * corresponding to those variations matches, it notifies callback
+ * function.
+ */
 static void
 do_corner_matchpat(int num_variations, struct corner_variation *variation,
 		   int match_color, corner_matchpat_callback_fn_ptr callback,
@@ -1286,6 +1302,7 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
 	  = AFFINE_TRANSFORM(pattern->second_corner_offset, trans, anchor);
 
       if (num_stones[second_corner] == stones) {
+	/* We have found a matching pattern. */
 	ASSERT1(board[move] == EMPTY, move);
 
 	callback(move, callback_color, pattern, trans);
@@ -1295,6 +1312,7 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
     if (variation->num_variations
 	&& num_stones[move] == variation->num_stones
 	&& board[move] == color_check) {
+      /* A matching variation. */
       do_corner_matchpat(variation->num_variations, variation->variations,
 			 match_color, callback, callback_color,
 			 trans, anchor, stones + 1);
@@ -1303,6 +1321,10 @@ do_corner_matchpat(int num_variations, struct corner_variation *variation,
 }
 
 
+/* Perform corner matching at all four corners and both possible
+ * transformations at each corner. `callback' is notified if any
+ * matching pattern is found.
+ */
 void
 corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
 		struct corner_db *database)
@@ -1319,12 +1341,15 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     int pos;
     struct corner_variation *variation = database->top_variations;
 
+    /* Fill in the num_stones[] array. We use `max_width' and `max_height'
+     * fields of database structure to stop working as early as possible.
+     */
     num_stones[anchor] = IS_STONE(board[anchor]);
 
     pos = anchor;
     for (i = 1; i < database->max_height; i++) {
       pos += dx;
-      if (!ON_BOARD1(pos)) {
+      if (!ON_BOARD(pos)) {
 	do {
 	  num_stones[pos] = BOARDMAX;
 	  pos += dx;
@@ -1339,7 +1364,7 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     pos = anchor;
     for (j = 1; j < database->max_width; j++) {
       pos += dy;
-      if (!ON_BOARD1(pos)) {
+      if (!ON_BOARD(pos)) {
 	do {
 	  num_stones[pos] = BOARDMAX;
 	  pos += dy;
@@ -1360,6 +1385,9 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
       }
     }
 
+    /* Try to match top variations. If any of them matches, we call
+     * do_corner_matchpat() to recurse that variation's tree.
+     */
     for (i = 0; i < database->num_top_variations; i++) {
       int move = AFFINE_TRANSFORM(variation->move_offset, k, anchor);
 
@@ -1371,7 +1399,6 @@ corner_matchpat(corner_matchpat_callback_fn_ptr callback, int color,
     }
   }
 }
-#endif
 
 
 /*

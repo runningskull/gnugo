@@ -2157,6 +2157,7 @@ struct corner_element {
 };
 
 
+/* Initialize corner variation tree. */
 static void
 corner_init(void)
 {
@@ -2165,7 +2166,31 @@ corner_init(void)
 }
 
 
-static int corner_best_element(struct corner_element *el, int n, int x, int y,
+/* corner_best_element() chooses the best element from supplied. The best
+ * element is always selected from those which don't have other elements
+ * closer to the corner
+ *
+ * +------	E.g. elements A and B are candidates to become the best
+ * |......	element, while C and D are not (A is closer to the corner
+ * |..A...	than both C and D). Note that A and B are at "incomparable"
+ * |..C.D.	distances from the corner, since their coordinates are in
+ * |.B....	opposite relations.
+ * |......
+ *
+ * If there are existing variations among candidates, all other candidates
+ * are automatically rejected. Once we have a set of candidates, we select
+ * the best candidate as the one which has the best parameters (in order
+ * of decreasing importance):
+ *	1) maximal "corner area" (see function code);
+ *	2) minimal distance to the corner bisector;
+ *	3) those which x coordinate is smaller than y one
+ *
+ * The purpose of this function is to reduce size of variation tree (by
+ * selecting similar variations) and allow rejecting variations as
+ * quickly as possible (based on num_stones field value). The latter
+ * can still be improved if a need arises.
+ */
+static int corner_best_element(struct corner_element *el, int n,
 			       struct corner_variation_b *variations,
 			       int color)
 {
@@ -2179,6 +2204,7 @@ static int corner_best_element(struct corner_element *el, int n, int x, int y,
   int existing_variation[MAX_BOARD * MAX_BOARD];
   int have_existing_variation = 0;
 
+  /* Find candidates and mark those which correspond to existing variations. */
   for (k = 0; k < n; k++) {
     for (i = 0; i < n; i++) {
       if (i == k)
@@ -2209,10 +2235,10 @@ static int corner_best_element(struct corner_element *el, int n, int x, int y,
     }
   }
 
+  /* Select the best move. */
   for (k = 0; k < candidates; k++) {
     int m = candidate[k];
-    int value = 2 * MAX_BOARD * ((el[m].x + 1) * (el[m].y + 1)
-	        - (gg_min(el[m].x, x) + 1) * (gg_min(el[m].y, y) + 1))
+    int value = 2 * MAX_BOARD * (el[m].x + 1) * (el[m].y + 1)
 	        - 2 * gg_abs(el[m].x - el[m].y) + (el[m].x < el[m].y ? 1 : 0);
 
     if (existing_variation[k] == have_existing_variation
@@ -2226,6 +2252,7 @@ static int corner_best_element(struct corner_element *el, int n, int x, int y,
 }
 
 
+/* Dynamically allocates a new variation structure. */
 static struct corner_variation_b*
 corner_variation_new(int move_offset, char xor_att, char num_stones)
 {
@@ -2248,6 +2275,9 @@ corner_variation_new(int move_offset, char xor_att, char num_stones)
 }
 
 
+/* Follow a variation. If such a variation already exists, returns
+ * a pointer to it. Otherwise, creates and initializes a new one.
+ */
 static struct corner_variation_b*
 corner_follow_variation(struct corner_variation_b *variation,
 			int offset, int color, char num_stones)
@@ -2274,6 +2304,7 @@ corner_follow_variation(struct corner_variation_b *variation,
 }
 
 
+/* Adds a pattern to corner database. */
 static void
 corner_add_pattern(void)
 {
@@ -2290,6 +2321,7 @@ corner_add_pattern(void)
   char num_stones;
   struct corner_variation_b *variation = &corner_root;
 
+  /* Check if we have a corner pattern and select appropriate transformation. */
   switch (where) {
     case SOUTH_EDGE | WEST_EDGE: trans = 5; corner_x = maxi; break;
     case WEST_EDGE | NORTH_EDGE: trans = 0; break;
@@ -2308,6 +2340,7 @@ corner_add_pattern(void)
   move_x = I(move_pos);
   move_y = J(move_pos);
 
+  /* Find all pattern elements. */
   for (k = 0; k < el; k++) {
     if (elements[k].att == ATT_X || elements[k].att == ATT_O) {
       TRANSFORM2(elements[k].x, elements[k].y,
@@ -2324,45 +2357,56 @@ corner_add_pattern(void)
     }
   }
 
+  /* Follow variations. */
   for (k = 0; k < stones; k++) {
     int i;
     int best;
     struct corner_element stone_t;
      
     if (k > 0) {
-      best = k + corner_best_element(stone + k, stones - k, stone[k-1].x,
-				     stone[k-1].y, variation->child, color);
+      best = k + corner_best_element(stone + k, stones - k, variation->child,
+				     color);
       stone_t = stone[k];
       stone[k] = stone[best];
       stone[best] = stone_t;
     }
     else {
-      best = corner_best_element(stone, stones, 0, 0, variation->child, color);
+      best = corner_best_element(stone, stones, variation->child, color);
       stone_t = stone[0];
       stone[0] = stone[best];
       stone[best] = stone_t;
       color = stone[0].color;
 
       if (stone[0].x > stone[0].y) {
+	/* To reduce number of variations, swap coordinates of all elements
+	 * unless there is one with mirrored coordinates already.
+	 */
 	int t;
 
-	t = maxi;
-	maxi = maxj;
-	maxj = t;
+	for (i = 1; i < k; i++) {
+	  if (stone[i].x == stone[0].y && stone[i].y == stone[0].x)
+	    break;
+	}
 
-	t = move_x;
-	move_x = move_y;
-	move_y = t;
+	if (i == k) {
+	  t = maxi;
+	  maxi = maxj;
+	  maxj = t;
 
-	for (i = 0; i < stones; i++) {
-	  t = stone[i].x;
-	  stone[i].x = stone[i].y;
-	  stone[i].y = t;
+	  t = move_x;
+	  move_x = move_y;
+	  move_y = t;
+
+	  for (i = 0; i < stones; i++) {
+	    t = stone[i].x;
+	    stone[i].x = stone[i].y;
+	    stone[i].y = t;
+	  }
 	}
       }
     }
 
-    num_stones = 0;
+    num_stones = 1;
     for (i = 0; i < k; i++) {
       if (stone[i].x <= stone[k].x && stone[i].y <= stone[k].y)
 	num_stones++;
@@ -2373,7 +2417,8 @@ corner_add_pattern(void)
 		num_stones);
   }
 
-  num_stones = 0;
+  /* Finally, follow the pattern move as a variation. */
+  num_stones = 1;
   for (k = 0; k < stones; k++) {
     if (stone[k].x <= move_x && stone[k].y <= move_y)
       num_stones++;
@@ -2398,6 +2443,9 @@ corner_add_pattern(void)
 }
 
 
+/* Enumerates all variations so that we know addresses of subvariations
+ * when it is time to write them into a .c file.
+ */
 static int
 corner_pack_variations(struct corner_variation_b *variation, int counter)
 {
@@ -2413,6 +2461,7 @@ corner_pack_variations(struct corner_variation_b *variation, int counter)
 }
 
 
+/* Write variations recursively into an array. */
 static void
 corner_write_variations(struct corner_variation_b *variation, FILE *outfile)
 {                     
@@ -2580,8 +2629,8 @@ write_pattern_db(FILE *outfile)
 
   if (database_type == DB_CORNER) {
     fprintf(outfile, "struct corner_db %s_db = {\n", prefix);
-    fprintf(outfile, "  %d,\n", corner_max_width);
-    fprintf(outfile, "  %d,\n", corner_max_height);
+    fprintf(outfile, "  %d,\n", corner_max_width + 1);
+    fprintf(outfile, "  %d,\n", corner_max_height + 1);
     fprintf(outfile, "  %d,\n", corner_root.num_variations);
     fprintf(outfile, "  %s_variations\n", prefix);
     fprintf(outfile, "};\n");
