@@ -398,7 +398,8 @@ analyze_semeai(int my_dragon, int your_dragon)
 	    if (dragon[cpos].origin == my_dragon
 		|| dragon[cpos].origin == your_dragon)
 	      if (owl_substantial(pos)) {
-		DEBUG(DEBUG_SEMEAI, "...tactical situation detected, exiting\n");
+		DEBUG(DEBUG_SEMEAI, 
+		      "...tactical situation detected, exiting\n");
 		return;
 	      }
 	  }

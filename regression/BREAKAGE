@@ -1,3 +1,70 @@
+After the test results are updated for 3.1.21, recompiling
+with configure --enable-experimental-semeai gives the following
+results:
+
+./regress.sh . reading.tst
+./regress.sh . owl.tst
+./regress.sh . owl_rot.tst
+./regress.sh . ld_owl.tst
+./regress.sh . optics.tst
+./regress.sh . filllib.tst
+./regress.sh . atari_atari.tst
+./regress.sh . connection.tst
+./regress.sh . blunder.tst
+./regress.sh . strategy.tst
+./regress.sh . endgame.tst
+./regress.sh . heikki.tst
+./regress.sh . neurogo.tst
+./regress.sh . arb.tst
+./regress.sh . rosebud.tst
+./regress.sh . golife.tst
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+./regress.sh . ego.tst
+./regress.sh . dniwog.tst
+./regress.sh . lazarus.tst
+./regress.sh . strategy2.tst
+72 unexpected PASS!
+./regress.sh . nicklas1.tst
+1406 unexpected PASS!
+./regress.sh . nicklas2.tst
+./regress.sh . nicklas3.tst
+602 unexpected PASS!
+./regress.sh . nicklas4.tst
+./regress.sh . nicklas5.tst
+1204 unexpected PASS!
+./regress.sh . manyfaces.tst
+./regress.sh . niki.tst
+./regress.sh . trevor.tst
+461 unexpected PASS!
+./regress.sh . tactics.tst
+./regress.sh . buzco.tst
+./regress.sh . nngs.tst
+1600 unexpected PASS!
+1700 unexpected PASS!
+1790 unexpected PASS!
+./regress.sh . strategy3.tst
+./regress.sh . capture.tst
+./regress.sh . connect.tst
+./regress.sh . global.tst
+46 unexpected PASS!
+./regress.sh . vie.tst
+./regress.sh . arend.tst
+31 unexpected FAIL: Correct 'B13|C13', got 'O4'
+./regress.sh . 13x13.tst
+25 unexpected FAIL: Correct 'J5', got 'L4'
+./regress.sh . trevora.tst
+./regress.sh . trevorb.tst
+430 unexpected PASS!
+630 unexpected PASS!
+./regress.sh . trevorc.tst
+800 unexpected PASS!
+./regress.sh . trevord.tst
+./regress.sh . semeai.tst
+./regress.sh . strategy4.tst
+168 unexpected FAIL: Correct 'A3|A4', got 'B7'
+188 unexpected PASS!
+
 ========================== 3.1.21 =========================
 
 ./regress.sh . reading.tst
