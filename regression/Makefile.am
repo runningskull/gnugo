@@ -5,7 +5,7 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst \
       score.tst ld_owl_rot.tst reading_rot.tst endgame_rot.tst manyfaces.tst \
-      cutstone.tst newscore.tst blunder.tst niki.tst trevor.tst
+      cutstone.tst newscore.tst blunder.tst niki.tst trevor.tst tactics.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
@@ -53,6 +53,9 @@ strategy3: strategy3.tst
 
 strategy4: strategy4.tst
 	$(srcdir)/eval.sh strategy3.tst
+
+tactics: tactics.tst
+	$(srcdir)/eval.sh tactics.tst
 
 cutstone: cutstone.tst
 	$(srcdir)/eval.sh cutstone.tst
@@ -173,7 +176,7 @@ second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.t
 	$(srcdir)/regress.sh $(srcdir) ego.tst
 	$(srcdir)/regress.sh $(srcdir) dniwog.tst
 
-third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst
+third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst tactics.tst
 	$(srcdir)/regress.sh $(srcdir) strategy3.tst
 	$(srcdir)/regress.sh $(srcdir) strategy4.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas1.tst
@@ -184,3 +187,4 @@ third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst st
 	$(srcdir)/regress.sh $(srcdir) manyfaces.tst
 	$(srcdir)/regress.sh $(srcdir) niki.tst
 	$(srcdir)/regress.sh $(srcdir) trevor.tst
+	$(srcdir)/regress.sh $(srcdir) tactics.tst

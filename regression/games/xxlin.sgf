@@ -1,0 +1,37 @@
+(;GM[1]FF[3]
+SZ[19]
+PB[GnuGo]
+PW[xxlin]
+KM[0.5]HA[9]US[bump@localhost.localdomain]PC[IGS]
+DT[2001-09-28]
+BR[14k]WR[NR]
+RE[White resigns.]
+;AB[dp][dj][dd][jp][jj][jd][pp][pj][pd]C[..........       Handicap 9];
+W[fp];B[dn];W[cq];B[dq];W[cp];B[co];W[dr];B[nq]C[E2
+];W[rp];B[qo];
+W[ro];B[rn];W[qp];B[qn];W[pq];B[qr]C[P4
+];W[qq];B[rr]C[P4
+];W[op];
+B[no]C[P3
+];W[np];B[po];W[oq];B[mp];W[oo];B[mq];W[nn];B[mo];W[om];
+B[lm]C[Q8
+];W[ql];B[rk];W[rl];B[er];W[ds];B[br]C[F3
+];W[cr];B[gq]
+C[F3
+];W[eq];B[fr];W[gp];B[hp];W[gn];B[fm];W[gm];B[ho];W[fn];B[hl]
+C[E7
+];W[em];B[fl];W[gl];B[gk];W[el];B[fk];W[en];B[cl];W[ek];B[ej];
+W[hm];B[nl];W[ol];B[bo];W[bp];B[ap];W[aq];B[bs];W[il];B[nc]C[H9
+];
+W[rd];B[qc];W[rc];B[rb];W[qf];B[nk];W[ok];B[ri]C[P10
+];W[oj];B[qh];
+W[oh];B[fc];W[bd];B[cc];W[bc];B[bb];W[cf];B[dg];W[cg];B[ch];W[df];
+B[eg];W[ef];B[bh];W[gf];B[af];W[fg];B[gi];W[eh];B[dh];W[hk];B[if];
+W[fj];B[gj];W[fi];B[gh];W[fh];B[mf]C[H13
+];W[hg];B[hi];W[ig];B[jg];W[ii];B[ij];W[ji];B[hj];W[kj]
+;B[jk];W[kl];B[kk];W[li];B[jl];W[km];B[ih];W[jh];B[jm]
+;W[kn];B[hh];W[jn];B[lk];W[ln];B[mn];W[mm];B[nm];W[ll]
+;B[on];W[mk];B[mj];W[ml];B[lj];W[nj];B[ki];W[kh];B[kg]
+;W[lh];B[mh];W[nn];B[im];W[in];B[hn]
+;W[mi]C[----------       White resigns.]
+)
