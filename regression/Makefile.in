@@ -99,9 +99,9 @@ GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps regression/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu regression/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -114,6 +114,11 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = regression
 
 distdir: $(DISTFILES)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(top_distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu regression/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -341,7 +346,6 @@ first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst life.tst fill
 	$(srcdir)/regress.sh $(srcdir) strategy.tst
 
 second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.tst golife.tst arion.tst viking.tst ego.tst dniwog.tst
-	$(srcdir)/regress.sh $(srcdir) strategy2.tst
 	$(srcdir)/regress.sh $(srcdir) endgame.tst
 	$(srcdir)/regress.sh $(srcdir) heikki.tst
 	$(srcdir)/regress.sh $(srcdir) neurogo.tst
@@ -352,10 +356,9 @@ second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.t
 	$(srcdir)/regress.sh $(srcdir) viking.tst
 	$(srcdir)/regress.sh $(srcdir) ego.tst
 	$(srcdir)/regress.sh $(srcdir) dniwog.tst
+	$(srcdir)/regress.sh $(srcdir) strategy2.tst
 
 third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst tactics.tst
-	$(srcdir)/regress.sh $(srcdir) strategy3.tst
-	$(srcdir)/regress.sh $(srcdir) strategy4.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas1.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas2.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas3.tst
@@ -366,13 +369,14 @@ third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst st
 	$(srcdir)/regress.sh $(srcdir) trevor.tst
 	$(srcdir)/regress.sh $(srcdir) tactics.tst
 	$(srcdir)/regress.sh $(srcdir) buzco.tst
+	$(srcdir)/regress.sh $(srcdir) strategy3.tst
 
 fourth_batch: strategy4.tst capture.tst connect.tst global.tst vie.tst
-	$(srcdir)/regress.sh $(srcdir) strategy4.tst
 	$(srcdir)/regress.sh $(srcdir) capture.tst
 	$(srcdir)/regress.sh $(srcdir) connect.tst
 	$(srcdir)/regress.sh $(srcdir) global.tst
 	$(srcdir)/regress.sh $(srcdir) vie.tst
+	$(srcdir)/regress.sh $(srcdir) strategy4.tst
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -171,7 +171,6 @@ first_batch: reading.tst owl.tst owl_rot.tst ld_owl.tst optics.tst life.tst fill
 	$(srcdir)/regress.sh $(srcdir) strategy.tst
 
 second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.tst golife.tst arion.tst viking.tst ego.tst dniwog.tst
-	$(srcdir)/regress.sh $(srcdir) strategy2.tst
 	$(srcdir)/regress.sh $(srcdir) endgame.tst
 	$(srcdir)/regress.sh $(srcdir) heikki.tst
 	$(srcdir)/regress.sh $(srcdir) neurogo.tst
@@ -182,10 +181,9 @@ second_batch: strategy2.tst endgame.tst heikki.tst neurogo.tst arb.tst rosebud.t
 	$(srcdir)/regress.sh $(srcdir) viking.tst
 	$(srcdir)/regress.sh $(srcdir) ego.tst
 	$(srcdir)/regress.sh $(srcdir) dniwog.tst
+	$(srcdir)/regress.sh $(srcdir) strategy2.tst
 
 third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst strategy3.tst manyfaces.tst niki.tst tactics.tst
-	$(srcdir)/regress.sh $(srcdir) strategy3.tst
-	$(srcdir)/regress.sh $(srcdir) strategy4.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas1.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas2.tst
 	$(srcdir)/regress.sh $(srcdir) nicklas3.tst
@@ -196,10 +194,11 @@ third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst st
 	$(srcdir)/regress.sh $(srcdir) trevor.tst
 	$(srcdir)/regress.sh $(srcdir) tactics.tst
 	$(srcdir)/regress.sh $(srcdir) buzco.tst
+	$(srcdir)/regress.sh $(srcdir) strategy3.tst
 
 fourth_batch: strategy4.tst capture.tst connect.tst global.tst vie.tst
-	$(srcdir)/regress.sh $(srcdir) strategy4.tst
 	$(srcdir)/regress.sh $(srcdir) capture.tst
 	$(srcdir)/regress.sh $(srcdir) connect.tst
 	$(srcdir)/regress.sh $(srcdir) global.tst
 	$(srcdir)/regress.sh $(srcdir) vie.tst
+	$(srcdir)/regress.sh $(srcdir) strategy4.tst
