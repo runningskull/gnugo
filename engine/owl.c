@@ -451,7 +451,10 @@ do_owl_analyze_semeai(int apos, int bpos,
       matchpat(owl_shapes_callback, other,
 	       &owl_vital_apat_db, vital_defensive_moves, owla->goal);
       /* FIXME: This is kind of quick and dirty. */
-      probable_eyes_a.b -= matches_found;
+      if (probable_eyes_a.b > matches_found)
+	probable_eyes_a.b -= matches_found;
+      else
+	probable_eyes_a.b -= 0;
     }
 
     owl_determine_life(owlb, owla, komaster, 1, vital_offensive_moves,
@@ -463,7 +466,10 @@ do_owl_analyze_semeai(int apos, int bpos,
       matchpat(owl_shapes_callback, other,
 	       &owl_vital_apat_db, vital_offensive_moves, owla->goal);
       /* FIXME: This is kind of quick and dirty. */
-      probable_eyes_b.b -= matches_found;
+      if (probable_eyes_b.b > matches_found)
+	probable_eyes_b.b -= matches_found;
+      else
+	probable_eyes_b.b = 0;
     }
 
     /* Certain cases can be handled immediately. */
