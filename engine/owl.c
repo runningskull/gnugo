@@ -52,9 +52,6 @@
 #define MAX_LUNCHES 10
 #define MAX_WORMS 10          /* maximum number of worms in a dragon to be cataloged */
 
-/* If set, pattern constraint are only checked if the pattern might produce
- * a candidate move.
- */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -145,16 +142,16 @@ struct owl_cache {
 static struct owl_cache persistent_owl_cache[MAX_OWL_CACHE_SIZE];
 static int persistent_owl_cache_size = 0;
 
-#define OWL_THREATEN_ATTACK    0
-#define OWL_THREATEN_DEFENSE   1
-#define OWL_DOES_DEFEND        2
-#define OWL_DOES_ATTACK        3
-#define OWL_CONNECTION_DEFENDS 4
-#define OWL_SUBSTANTIAL        5
-#define OWL_CONFIRM_SAFETY     6
 /* The following two are defined in cache.h */
-/* #define OWL_ATTACK    8 */
-/* #define OWL_DEFEND    9 */
+/* #define OWL_ATTACK    0 */
+/* #define OWL_DEFEND    1 */
+#define OWL_THREATEN_ATTACK    2
+#define OWL_THREATEN_DEFENSE   3
+#define OWL_DOES_DEFEND        4
+#define OWL_DOES_ATTACK        5
+#define OWL_CONNECTION_DEFENDS 6
+#define OWL_SUBSTANTIAL        7
+#define OWL_CONFIRM_SAFETY     8
 
 static int verify_stored_board(char board[BOARDMAX]);
 static int search_persistent_owl_cache(int routine, int apos,

@@ -350,22 +350,15 @@ int get_read_result2(int routine, int komaster, int kom_pos,
 /* ================================================================ */
 /* Routine numbers. */
 
-#define FIND_DEFENSE    0
-#define DEFEND1         1
-#define DEFEND2         2
-#define DEFEND3         3
-#define DEFEND4         4
+#define OWL_ATTACK      0
+#define OWL_DEFEND      1
+#define SEMEAI          2
 
-#define ATTACK          5
-#define ATTACK2         6
-#define ATTACK3         7
+#define FIND_DEFENSE    3
+#define ATTACK          4
 
-#define OWL_ATTACK      8
-#define OWL_DEFEND      9
-#define SEMEAI         10
-
-#define CONNECT        11
-#define DISCONNECT     12
+#define CONNECT         5
+#define DISCONNECT      6
 
 #define MAX_ROUTINE     DISCONNECT
 #define NUM_ROUTINES    (MAX_ROUTINE + 1)
@@ -398,9 +391,9 @@ int get_read_result2(int routine, int komaster, int kom_pos,
 
 
 #define UPDATE_SAVED_KO_RESULT(savecode, save, code, move) \
-  if (code != 0 && (WIN - code) > savecode) { \
+  if (code != 0 && REVERSE_RESULT(code) > savecode) { \
     save = move; \
-    savecode = WIN - code; \
+    savecode = REVERSE_RESULT(code); \
   } \
 
 /* Same as above, except this should be used when there's no

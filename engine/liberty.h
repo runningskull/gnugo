@@ -111,6 +111,7 @@ extern Hash_data    hashdata;
 		      
 #define BOARD(i, j)   board[POS(i, j)]
 
+#define REVERSE_RESULT(result)		(WIN - result)
 
 /* This struct holds the internal board state.
  */

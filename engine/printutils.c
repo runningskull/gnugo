@@ -402,20 +402,8 @@ routine_to_string(int routine)
 {
   if (routine == FIND_DEFENSE)
     return "FIND_DEFENSE";
-  else if (routine == DEFEND1)
-    return "DEFEND1";
-  else if (routine == DEFEND2)
-    return "DEFEND2";
-  else if (routine == DEFEND3)
-    return "DEFEND3";
-  else if (routine == DEFEND4)
-    return "DEFEND4";
   else if (routine == ATTACK)
     return "ATTACK";
-  else if (routine == ATTACK2)
-    return "ATTACK2";
-  else if (routine == ATTACK3)
-    return "ATTACK3";
   else if (routine == OWL_ATTACK)
     return "OWL_ATTACK";
   else if (routine == OWL_DEFEND)

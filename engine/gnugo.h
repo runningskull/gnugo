@@ -230,13 +230,7 @@ extern int profile_patterns;	/* print statistics of pattern usage */
  */
 
 #define HASH_FIND_DEFENSE 0x0001  /* NOTE : can specify -d0x... */
-#define HASH_DEFEND1      0x0002
-#define HASH_DEFEND2      0x0004
-#define HASH_DEFEND3      0x0008
-#define HASH_DEFEND4      0x0010
 #define HASH_ATTACK       0x0020
-#define HASH_ATTACK2      0x0040
-#define HASH_ATTACK3      0x0080
 #define HASH_OWL_ATTACK   0x0100
 #define HASH_OWL_DEFEND   0x0200
 #define HASH_SEMEAI       0x0400

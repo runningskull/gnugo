@@ -9,7 +9,10 @@
 - bugfix in load_and_score_sgf_file()
 - new test cases
 - edge_block and double_atari_chain2 renamed to *_moves
-- do_attack uses simple_ladder_attack when stackp > depth+5
+- do_attack uses simple_ladder_attack when stackp > depth+10
+- give up simple_ladder_attack below 20 ply when we are komaster
+- unused caching code removed from attack? and defend?
+- macros used to make reading code readable
 - dragon field in struct eye_data removed
 - new function find_eye_dragons() in optics.c
 - dragon_invincible() and genus computation in make_dragons() revised

@@ -79,6 +79,45 @@ static int do_attack_pat(int str, int *move, int komaster, int kom_pos);
   } while (0)
 
 
+/* This macro checks whether the reported result is a loss, so we have won
+ * and can exit, or else if it is the best result so far.
+ * Note that SGFTRACE must have been setup.
+ */
+#define CHECK_RESULT(savecode, savemove, code, move_pos, move_ptr, \
+    	             trace_message) \
+  do {\
+    if (code == 0) {\
+      if (move_ptr) \
+	*(move_ptr) = (move_pos); \
+      SGFTRACE(move_pos, WIN, trace_message); \
+      return WIN; \
+    } \
+    else if (REVERSE_RESULT(code) > savecode) {\
+      savemove = move_pos; \
+      savecode = REVERSE_RESULT(code); \
+    } \
+  } while (0)
+
+/* Reverse of CHECK_RESULT, for results passed from a helper function. */
+#define CHECK_RESULT_UNREVERSED(savecode, savemove, code, move_pos, move_ptr, \
+    	             		trace_message) \
+	CHECK_RESULT(savecode, savemove, REVERSE_RESULT(code), move_pos, \
+	    	     move_ptr, trace_message)
+
+
+#define RETURN_RESULT(savecode, savemove, move_ptr, trace_message) \
+  do {\
+    if (savecode) {\
+      if (move_ptr)\
+	*(move_ptr) = (savemove); \
+      SGFTRACE(savemove, savecode, trace_message); \
+    }\
+    else \
+      SGFTRACE(0, 0, NULL); \
+    return savecode; \
+  } while (0)
+
+
 /*
  * The functions in reading.c are used to read whether groups 
  * can be captured or not. See the Texinfo documentation 
@@ -104,12 +143,12 @@ static int special_rescue3(int str, int libs[3], int *move,
 			   int komaster, int kom_pos);
 static int special_rescue4(int str, int libs[3], int *move, 
 			   int komaster, int kom_pos);
-static void special_rescue5(int str, int libs[3], int moves[MAX_MOVES],
-			    int scores[MAX_MOVES], int *num_moves);
-static void special_rescue6(int str, int libs[3], int moves[MAX_MOVES],
-			    int scores[MAX_MOVES], int *num_moves);
-static void edge_clamp(int str, int moves[MAX_MOVES],
-		       int scores[MAX_MOVES], int *num_moves);
+static void special_rescue5_moves(int str, int libs[3], int moves[MAX_MOVES],
+				  int scores[MAX_MOVES], int *num_moves);
+static void special_rescue6_moves(int str, int libs[3], int moves[MAX_MOVES],
+				  int scores[MAX_MOVES], int *num_moves);
+static void edge_clamp_moves(int str, int moves[MAX_MOVES],
+			     int scores[MAX_MOVES], int *num_moves);
 static int do_attack(int str, int *move, int komaster, int kom_pos);
 static int attack1(int str, int *move, int komaster, int kom_pos);
 static int attack2(int str, int *move, int komaster, int kom_pos);
@@ -466,7 +505,7 @@ attack_either(int astr, int bstr)
 	popgo();
       }
     }
-    return 3 - ((defended0 > defended1) ? defended1 : defended0);
+    return REVERSE_RESULT(gg_min(defended0, defended1));
   }
 
 }
@@ -1083,8 +1122,6 @@ defend1(int str, int *move, int komaster, int kom_pos)
   int savecode = 0;
   int liberties;
   int k;
-  int found_read_result;
-  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("defend1", str);
   reading_node_counter++;
@@ -1092,21 +1129,6 @@ defend1(int str, int *move, int komaster, int kom_pos)
   gg_assert(IS_STONE(board[str]));
   ASSERT1(countlib(str) == 1, str);
   RTRACE("try to escape atari on %1m.\n", str);
-
-  if ((stackp <= depth) && (hashflags & HASH_DEFEND1)) {
-  
-    found_read_result = get_read_result(DEFEND1, komaster, kom_pos,
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0)
-	*move = rr_get_move(*read_result);
-
-      SGFTRACE(rr_get_move(*read_result),
-	       rr_get_result(*read_result), "cached");
-      return rr_get_result(*read_result);
-    }
-  }
 
   /* lib will be the liberty of the string. */
   liberties = findlib(str, 1, &lib);
@@ -1135,14 +1157,8 @@ defend1(int str, int *move, int komaster, int kom_pos)
       if (!ko_move) {
 	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	popgo();
-	if (acode == 0) {
-	  SGFTRACE(xpos, WIN, "defense effective - A");
-	  READ_RETURN(read_result, move, xpos, WIN);
-	}
-	/* if the move works with ko we save it, then look for something
-	 * better.
-	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	CHECK_RESULT(savecode, savemove, acode, xpos, move,
+		     "defense effective - A");
       }
       else {
 	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
@@ -1171,25 +1187,14 @@ defend1(int str, int *move, int komaster, int kom_pos)
 	if ((liberties == 1 || !is_self_atari(apos, other))
 	    && trymove(apos, color, "attack1-C", str, komaster, kom_pos)) {
 	  int acode = do_attack(str, NULL, komaster, kom_pos);
-	  if (acode == 0) {
-	    popgo();
-	    SGFTRACE(apos, WIN, "backfilling");
-	    READ_RETURN(read_result, move, apos, WIN);
-	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, apos);
 	  popgo();
+	  CHECK_RESULT(savecode, savemove, acode, apos, move, "backfilling");
 	}
       }
     }
   }
   
-  if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    READ_RETURN(read_result, move, savemove, savecode);
-  }
-  
-  SGFTRACE(0, 0, NULL);
-  READ_RETURN0(read_result);
+  RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 
@@ -1223,8 +1228,6 @@ defend2(int str, int *move, int komaster, int kom_pos)
   int k;
   int r;
   int s;
-  int found_read_result;
-  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("defend2", str);
   reading_node_counter++;
@@ -1237,21 +1240,6 @@ defend2(int str, int *move, int komaster, int kom_pos)
 
   gg_assert(IS_STONE(board[str]));
   gg_assert(countlib(str) == 2);
-
-  if ((stackp <= depth) && (hashflags & HASH_DEFEND2)) {
-  
-    found_read_result = get_read_result(DEFEND2, komaster, kom_pos,
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0)
-	*move = rr_get_move(*read_result);
-
-      SGFTRACE(rr_get_move(*read_result),
-	       rr_get_result(*read_result), "cached");
-      return rr_get_result(*read_result);
-    }
-  }
 
   liberties = findlib(str, 2, libs);
   ASSERT1(liberties == 2, str);
@@ -1271,7 +1259,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
   break_chain_moves(str, moves, scores, &num_moves);
   break_chain2_efficient_moves(str, moves, scores, &num_moves);
   propose_edge_moves(str, libs, liberties, moves, scores, &num_moves, color);
-  edge_clamp(str, moves, scores, &num_moves);
+  edge_clamp_moves(str, moves, scores, &num_moves);
 
   order_moves(str, num_moves, moves, scores, color, read_function_name);
 
@@ -1288,14 +1276,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
       if (!ko_move) {
 	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	popgo();
-	if (acode == 0) {
-	  SGFTRACE(xpos, WIN, "defense effective - A");
-	  READ_RETURN(read_result, move, xpos, WIN);
-	}
-	/* if the move works with ko we save it, then look for something
-	 * better.
-	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	             "defense effective - A");
       }
       else {
 	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
@@ -1333,11 +1315,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	  }
 
 	  popgo();
-	  if (acode == 0) {
-	    SGFTRACE(xpos, WIN, "backfill effective");
-	    READ_RETURN(read_result, move, xpos, WIN);
-	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	  CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	      	       "backfill effective");
 	}
       }
     }
@@ -1357,11 +1336,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	  int acode = do_attack(str, NULL, komaster, kom_pos);
 	  moves[s] = xpos;
 	  popgo();
-	  if (acode == 0) {
-	    SGFTRACE(xpos, WIN, "backfill effective");
-	    READ_RETURN(read_result, move, xpos, WIN);
-	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	  CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	      	       "backfill effective");
 	}
       }
     }
@@ -1371,31 +1347,22 @@ defend2(int str, int *move, int komaster, int kom_pos)
     for (k = 0; k < liberties; k++) {
       int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos,
 				 moves, num_moves);
-      if (dcode == WIN) {
-	SGFTRACE(xpos, WIN, "special rescue");
-	READ_RETURN(read_result, move, xpos, WIN);
-      }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+      CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+			      "special rescue");
     }
   }
   
   if (stackp <= backfill_depth) {
     int dcode = special_rescue2(str, libs, &xpos, komaster, kom_pos,
 				moves, num_moves);
-    if (dcode == WIN) {
-      SGFTRACE(xpos, WIN, "special rescue2");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+      			    "special rescue2");
   }
   
   if (level >= 10 && stackp <= superstring_depth) {
     int dcode = superstring_breakchain(str, &xpos, komaster, kom_pos, 4);
-    if (dcode == WIN) {
-      SGFTRACE(xpos, WIN, "superstring_breakchain");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+      			    "superstring_breakchain");
   }
 
   /* If nothing else works, we try playing a liberty of the
@@ -1428,11 +1395,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	  moves[s] = apos;
 	}
 	popgo();
-	if (acode == 0) {
-	  SGFTRACE(apos, WIN, "superstring liberty");
-	  READ_RETURN(read_result, move, apos, WIN);
-	}
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, apos);
+	CHECK_RESULT(savecode, savemove, acode, apos, move,
+	    	     "superstring liberty");
       }
     }
     
@@ -1448,11 +1412,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
       
       dcode = special_rescue(str, apos, &xpos, komaster, kom_pos,
 			     moves, num_moves);
-      if (dcode == WIN) {
-	SGFTRACE(xpos, WIN, "special rescue");
-	READ_RETURN(read_result, move, xpos, WIN);
-      }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+      CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+			      "special rescue");
     }
   }
 
@@ -1462,15 +1423,12 @@ defend2(int str, int *move, int komaster, int kom_pos)
    */
   
   bc = break_chain2(str, &xpos, komaster, kom_pos);
-  if (bc == WIN) {
-    SGFTRACE(xpos, bc, "break chain2");
-    READ_RETURN(read_result, move, xpos, bc);
-  }
-  UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
+  CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
+    			  "break chain2");
 
   if (stackp <= backfill_depth) {
     int saved_num_moves = num_moves;
-    special_rescue5(str, libs, moves, scores, &num_moves);
+    special_rescue5_moves(str, libs, moves, scores, &num_moves);
     
     /* Only order and test the new set of moves. */
     order_moves(str, num_moves-saved_num_moves,
@@ -1491,14 +1449,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	if (!ko_move) {
 	  int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	  popgo();
-	  if (acode == 0) {
-	    SGFTRACE(xpos, WIN, "defense effective - A");
-	    READ_RETURN(read_result, move, xpos, WIN);
-	  }
-	  /* if the move works with ko we save it, then look for something
-	   * better.
-	   */
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	  CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	    	       "defense effective - A");
 	}
 	else {
 	  if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
@@ -1513,21 +1465,15 @@ defend2(int str, int *move, int komaster, int kom_pos)
 
   if (stackp <= backfill2_depth) {
     bc = break_chain3(str, &xpos, komaster, kom_pos);
-    if (bc == WIN) {
-      SGFTRACE(xpos, bc, "break chain3");
-      READ_RETURN(read_result, move, xpos, bc);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
+      			    "break chain3");
   }
 
-  if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    READ_RETURN(read_result, move, savemove, savecode);
-  }
+  if (savecode != 0)
+    RETURN_RESULT(savecode, savemove, move, "saved move");
 
   RTRACE("failed to find rescuing move.\n");
-  SGFTRACE(0, 0, NULL);
-  READ_RETURN0(read_result);
+  RETURN_RESULT(savecode, savemove, move, NULL);
 }
 
 
@@ -1550,8 +1496,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
   int savecode = 0;
   int bc;
   int k;
-  int found_read_result;
-  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("defend3", str);
   reading_node_counter++;
@@ -1562,20 +1506,6 @@ defend3(int str, int *move, int komaster, int kom_pos)
 
   gg_assert(IS_STONE(board[str]));
   gg_assert(countlib(str) == 3);
-
-  if ((stackp <= depth) && (hashflags & HASH_DEFEND3)) {
-    found_read_result = get_read_result(DEFEND3, komaster, kom_pos,
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0)
-	*move = rr_get_move(*read_result);
-
-      SGFTRACE(rr_get_move(*read_result),
-	       rr_get_result(*read_result), "cached");
-      return rr_get_result(*read_result);
-    }
-  }
 
   liberties = findlib(str, 3, libs);
   ASSERT1(liberties == 3, str);
@@ -1595,7 +1525,7 @@ defend3(int str, int *move, int komaster, int kom_pos)
   break_chain_moves(str, moves, scores, &num_moves);
   break_chain2_efficient_moves(str, moves, scores, &num_moves);
   propose_edge_moves(str, libs, liberties, moves, scores, &num_moves, color);
-  edge_clamp(str, moves, scores, &num_moves);
+  edge_clamp_moves(str, moves, scores, &num_moves);
 
   order_moves(str, num_moves, moves, scores, color, read_function_name);
 
@@ -1615,14 +1545,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
       if (!ko_move) {
 	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	popgo();
-	if (acode == 0) {
-	  SGFTRACE(xpos, WIN, "defense effective - A");
-	  READ_RETURN(read_result, move, xpos, WIN);
-	}
-	/* if the move works with ko we save it, then look for something
-	 * better.
-	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	  	     "defense effective - A");
       }
       else {
 	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
@@ -1665,11 +1589,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	      acode = do_attack(str, NULL, komaster, kom_pos);
 
 	    popgo();
-	    if (acode == 0) {
-	      SGFTRACE(xpos, WIN, "backfill effective");
-	      READ_RETURN(read_result, move, xpos, WIN);
-	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	    CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	      		 "backfill effective");
 	  }
 	}
       }
@@ -1689,11 +1610,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
 		&& trymove(xpos, color, "defend2-G", str, komaster, kom_pos)) {
 	      int acode = do_attack(str, NULL, komaster, kom_pos);
 	      popgo();
-	      if (acode == 0) {
-		SGFTRACE(xpos, WIN, "backfill effective");
-		READ_RETURN(read_result, move, xpos, WIN);
-	      }
-	      UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	      CHECK_RESULT(savecode, savemove, acode, xpos, move
+			   "backfill effective");
 	    }
 	  }
 	}
@@ -1707,39 +1625,27 @@ defend3(int str, int *move, int komaster, int kom_pos)
     for (k = 0; k < liberties; k++) {
       int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos,
 				 moves, num_moves);
-      if (dcode == WIN) {
-	SGFTRACE(xpos, WIN, "special rescue");
-	READ_RETURN(read_result, move, xpos, WIN);
-      }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+      CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+			      "special rescue");
     }
   }
 
   if (stackp <= backfill_depth) {
     int dcode = special_rescue3(str, libs, &xpos, komaster, kom_pos);
-    if (dcode == WIN) {
-      SGFTRACE(xpos, WIN, "special rescue3");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+      			    "special rescue3");
   }
     
   if (stackp <= backfill_depth) {
     int dcode = special_rescue4(str, libs, &xpos, komaster, kom_pos);
-    if (dcode == WIN) {
-      SGFTRACE(xpos, WIN, "special rescue4");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+      			    "special rescue4");
   }
     
   if (level >= 10 && stackp <= backfill2_depth) {
     int dcode = superstring_breakchain(str, &xpos, komaster, kom_pos, 4);
-    if (dcode == WIN) {
-      SGFTRACE(xpos, WIN, "superstring_breakchain");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+      			    "superstring_breakchain");
   }
 
   /* If nothing else works, we try playing a liberty of the
@@ -1764,11 +1670,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	  acode = do_attack(str, NULL, komaster, kom_pos);
 
 	popgo();
-	if (acode == 0) {
-	  SGFTRACE(apos, WIN, "superstring liberty");
-	  READ_RETURN(read_result, move, apos, WIN);
-	}
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, apos);
+	CHECK_RESULT(savecode, savemove, acode, apos, move,
+	  	     "superstring liberty");
       }
     }
 
@@ -1784,11 +1687,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
       
       dcode = special_rescue(str, apos, &xpos, komaster, kom_pos,
 			     moves, num_moves);
-      if (dcode == WIN) {
-	SGFTRACE(xpos, WIN, "special rescue");
-	READ_RETURN(read_result, move, xpos, WIN);
-      }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, dcode, xpos);
+      CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
+			      "special rescue");
     }
   }
 
@@ -1798,17 +1698,14 @@ defend3(int str, int *move, int komaster, int kom_pos)
    */
   if (stackp <= backfill2_depth) {
     bc = break_chain2(str, &xpos, komaster, kom_pos);
-    if (bc == WIN) {
-      SGFTRACE(xpos, bc, "break chain2");
-      READ_RETURN(read_result, move, xpos, bc);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
+      			    "break chain2");
   }
 
   if (stackp <= backfill_depth) {
     int saved_num_moves = num_moves;
-    special_rescue5(str, libs, moves, scores, &num_moves);
-    special_rescue6(str, libs, moves, scores, &num_moves);
+    special_rescue5_moves(str, libs, moves, scores, &num_moves);
+    special_rescue6_moves(str, libs, moves, scores, &num_moves);
     
     /* Only order and test the new set of moves. */
     order_moves(str, num_moves-saved_num_moves,
@@ -1829,14 +1726,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
 	if (!ko_move) {
 	  int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	  popgo();
-	  if (acode == 0) {
-	    SGFTRACE(xpos, WIN, "defense effective - A");
-	    READ_RETURN(read_result, move, xpos, WIN);
-	  }
-	  /* if the move works with ko we save it, then look for something
-	   * better.
-	   */
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	  CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	    	       "defense effective - A");
 	}
 	else {
 	  if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
@@ -1851,21 +1742,15 @@ defend3(int str, int *move, int komaster, int kom_pos)
     
   if (stackp <= backfill2_depth) {
     bc = break_chain3(str, &xpos, komaster, kom_pos);
-    if (bc == WIN) {
-      SGFTRACE(xpos, bc, "break chain3");
-      READ_RETURN(read_result, move, xpos, bc);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
+      			    "break chain3");
   }
   
-  if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    READ_RETURN(read_result, move, savemove, savecode);
-  }
+  if (savecode != 0)
+    RETURN_RESULT(savecode, savemove, move, "saved move");
 
   RTRACE("failed to find rescuing move.\n");
-  SGFTRACE(0, 0, NULL);
-  READ_RETURN0(read_result);
+  RETURN_RESULT(0, 0, move, NULL);
 }
 
 
@@ -1888,8 +1773,6 @@ defend4(int str, int *move, int komaster, int kom_pos)
   int savemove = 0;
   int savecode = 0;
   int k;
-  int found_read_result;
-  Read_result *read_result = NULL;
   
   SETUP_TRACE_INFO("defend4", str);
   reading_node_counter++;
@@ -1900,20 +1783,6 @@ defend4(int str, int *move, int komaster, int kom_pos)
 
   gg_assert(IS_STONE(board[str]));
   gg_assert(countlib(str) == 4);
-
-  if ((stackp <= depth) && (hashflags & HASH_DEFEND4)) {
-    found_read_result = get_read_result(DEFEND4, komaster, kom_pos,
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0)
-	*move = rr_get_move(*read_result);
-
-      SGFTRACE(rr_get_move(*read_result),
-	       rr_get_result(*read_result), "cached");
-      return rr_get_result(*read_result);
-    }
-  }
 
   liberties = findlib(str, 4, libs);
   ASSERT1(liberties == 4, str);
@@ -1949,14 +1818,8 @@ defend4(int str, int *move, int komaster, int kom_pos)
       if (!ko_move) {
 	int acode = do_attack(str, NULL, new_komaster, new_kom_pos);
 	popgo();
-	if (acode == 0) {
-	  SGFTRACE(xpos, WIN, "defense effective - A");
-	  READ_RETURN(read_result, move, xpos, WIN);
-	}
-	/* if the move works with ko we save it, then look for something
-	 * better.
-	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
+	CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	  	     "defense effective - A");
       }
       else {
 	if (do_attack(str, NULL, new_komaster, new_kom_pos) != WIN) {
@@ -1970,21 +1833,15 @@ defend4(int str, int *move, int komaster, int kom_pos)
 
   if (stackp <= backfill_depth) {
     int bc = break_chain2(str, &xpos, komaster, kom_pos);
-    if (bc == WIN) {
-      SGFTRACE(xpos, WIN, "break chain2");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, bc, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, bc, xpos, move,
+      			    "break chain2");
   }
 
-  if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    READ_RETURN(read_result, move, savemove, savecode);
-  }
+  if (savecode != 0)
+    RETURN_RESULT(savecode, savemove, move, "saved move");
 
   RTRACE("failed to find rescuing move.\n");
-  SGFTRACE(0, 0, NULL);
-  READ_RETURN0(read_result);
+  RETURN_RESULT(0, 0, move, NULL);
 }
 
 
@@ -2037,13 +1894,12 @@ special_rescue(int str, int lib, int *move, int komaster, int kom_pos,
       
       if (trymove(lib + d, color, "special_rescue", str, komaster, kom_pos)) {
 	int acode = do_attack(str, NULL, komaster, kom_pos);
+	popgo();
 	if (acode == 0) {
-	  popgo();
 	  *move = lib + d;
 	  return WIN;
 	}
 	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, lib + d);
-	popgo();
       }
     }
   }
@@ -2105,7 +1961,7 @@ special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos,
 	}
 	break_chain_moves(newstr, moves, scores, &num_moves);
 	break_chain2_efficient_moves(newstr, moves, scores, &num_moves);
-	edge_clamp(newstr, moves, scores, &num_moves);
+	edge_clamp_moves(newstr, moves, scores, &num_moves);
       }
     }
   }
@@ -2337,8 +2193,8 @@ special_rescue4(int str, int libs[3], int *move, int komaster, int kom_pos)
  * returns moves which are potentially useful in these positions.
  */
 static void
-special_rescue5(int str, int libs[3], int moves[MAX_MOVES],
-		int scores[MAX_MOVES], int *num_moves)
+special_rescue5_moves(int str, int libs[3], int moves[MAX_MOVES],
+		      int scores[MAX_MOVES], int *num_moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -2411,8 +2267,8 @@ special_rescue5(int str, int libs[3], int moves[MAX_MOVES],
  *
  */
 static void
-special_rescue6(int str, int libs[3], int moves[MAX_MOVES],
-		int scores[MAX_MOVES], int *num_moves)
+special_rescue6_moves(int str, int libs[3], int moves[MAX_MOVES],
+		      int scores[MAX_MOVES], int *num_moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -2499,8 +2355,8 @@ special_rescue6(int str, int libs[3], int moves[MAX_MOVES],
  */
 
 static void
-edge_clamp(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
-	   int *num_moves)
+edge_clamp_moves(int str, int moves[MAX_MOVES], int scores[MAX_MOVES],
+		 int *num_moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -3157,7 +3013,7 @@ do_attack(int str, int *move, int komaster, int kom_pos)
   if (libs == 1)
     result = attack1(str, &xpos, komaster, kom_pos);
   else if (libs == 2) {
-    if (stackp > depth + 5)
+    if (stackp > depth + 10)
       result = simple_ladder_attack(str, &xpos, komaster, kom_pos);
     else
       result = attack2(str, &xpos, komaster, kom_pos);
@@ -3368,8 +3224,6 @@ attack2(int str, int *move, int komaster, int kom_pos)
   int scores[MAX_MOVES];
   int num_moves = 0;
   int adjacent_liberties = 0;
-  int found_read_result;
-  Read_result *read_result = NULL;
 
   SETUP_TRACE_INFO("attack2", str);
   reading_node_counter++;
@@ -3379,21 +3233,6 @@ attack2(int str, int *move, int komaster, int kom_pos)
   ASSERT1(countlib(str) == 2, str);
 
   RTRACE("checking attack on %1m with 2 liberties\n", str);
-
-  if ((stackp <= depth) && (hashflags & HASH_ATTACK2)) {
-  
-    found_read_result = get_read_result(ATTACK2, komaster, kom_pos,
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0)
-	*move = rr_get_move(*read_result);
-
-      SGFTRACE(rr_get_move(*read_result),
-	       rr_get_result(*read_result), "cached");
-      return rr_get_result(*read_result);
-    }
-  }
 
   /* The attack may fail if a boundary string is in atari and cannot 
    * be defended.  First we must try defending such a string. 
@@ -3408,8 +3247,7 @@ attack2(int str, int *move, int komaster, int kom_pos)
      * be a working ladder, so continue if that is the case.
      */
     if (stackp > depth && countstones(adjs[r]) > 1) {
-      SGFTRACE(0, 0, "boundary in atari");
-      READ_RETURN0(read_result);
+      RETURN_RESULT(0, 0, move, "boundary in atari");
     }
 
     /* Pick up moves breaking the second order chain. */
@@ -3501,13 +3339,12 @@ attack2(int str, int *move, int komaster, int kom_pos)
 	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
 	if (dcode != WIN
 	    && do_attack(str, NULL, new_komaster, new_kom_pos)) {
-	  if (dcode == 0) {
-	    popgo();
-	    SGFTRACE(apos, WIN, "attack effective");
-	    READ_RETURN(read_result, move, apos, WIN);
-	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, apos);
+	  popgo();
+	  CHECK_RESULT(savecode, savemove, dcode, apos, move,
+	    	       "attack effective");
 	}
+	else
+	  popgo();
       }
       else {
 	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
@@ -3515,44 +3352,31 @@ attack2(int str, int *move, int komaster, int kom_pos)
 	  savemove = apos;
 	  savecode = KO_B;
 	}
+        popgo();
       }
-      popgo();
     }
   }
   
   /* The simple ataris didn't work. Try something more fancy. */
   acode = find_cap2(str, libs[0], libs[1], &xpos, komaster, kom_pos);
-  if (acode == WIN) {
-    SGFTRACE(xpos, WIN, "find cap2");
-    READ_RETURN(read_result, move, xpos, WIN);
-  }
-  UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
+  CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move, "find cap2");
 
   if (stackp <= backfill_depth) {
     acode = special_attack2(str, libs, &xpos, komaster, kom_pos);
-    if (acode == WIN) {
-      SGFTRACE(xpos, WIN, "special attack2");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
+      			    "special attack2");
   }
 
   if (stackp <= backfill_depth) {
     acode = special_attack3(str, libs, &xpos, komaster, kom_pos);
-    if (acode == WIN) {
-      SGFTRACE(xpos, WIN, "special attack3");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
+			    "special attack3");
   }
 
   if (stackp <= backfill_depth) {
     acode = special_attack4(str, libs, &xpos, komaster, kom_pos);
-    if (acode == WIN) {
-      SGFTRACE(xpos, WIN, "special attack4");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
+      			    "special attack4");
   }
 
   /* If it is not possible to make a direct atari, we try filling
@@ -3584,14 +3408,12 @@ attack2(int str, int *move, int komaster, int kom_pos)
 	      if (trymove(xpos, other, "attack2-D", str, komaster, kom_pos)) {
 		dcode = do_find_defense(str, NULL, komaster, kom_pos);
 		if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-		  if (dcode == 0) {
-		    popgo();
-		    SGFTRACE(xpos, WIN, "attack effective");
-		    READ_RETURN(read_result, move, xpos, WIN);
-		  }
-		  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
+		  popgo();
+		  CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+		      	       "attack effective");
 		}
-		popgo();
+		else
+		  popgo();
 	      }
 	    }
 	    else
@@ -3601,14 +3423,12 @@ attack2(int str, int *move, int komaster, int kom_pos)
 	    dcode = do_find_defense(str, NULL, komaster, kom_pos);
 	    if (dcode != WIN 
 		&& do_attack(str, NULL, komaster, kom_pos)) {
-	      if (dcode == 0) {
-		popgo();
-		SGFTRACE(apos, WIN, "attack effective");
-		READ_RETURN(read_result, move, apos, WIN);
-	      }
-	      UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, apos);
+	      popgo();
+	      CHECK_RESULT(savecode, savemove, dcode, apos, move,
+			   "attack effective");
 	    }
-	    popgo();
+	    else
+	      popgo();
 	  }
 	}
       }
@@ -3617,12 +3437,11 @@ attack2(int str, int *move, int komaster, int kom_pos)
 
   if (savecode == 0) {
     RTRACE("ALIVE!!\n");
-    SGFTRACE(0, 0, NULL);
-    READ_RETURN0(read_result);
+    RETURN_RESULT(0, 0, move, NULL);
   }
 
-  SGFTRACE(savemove, savecode, "saved move");
-  READ_RETURN(read_result, move, savemove, savecode);
+
+  RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 
@@ -3657,32 +3476,14 @@ attack3(int str, int *move, int komaster, int kom_pos)
   int num_moves = 0;
   int savemove = 0;
   int savecode = 0;
-  int found_read_result;
-  Read_result *read_result = NULL;
   
   SETUP_TRACE_INFO("attack3", str);
   reading_node_counter++;
   
   gg_assert(IS_STONE(board[str]));
   
-  if ((stackp <= depth) && (hashflags & HASH_ATTACK3)) {
-    found_read_result = get_read_result(ATTACK3, komaster, kom_pos,
-					&str, &read_result);
-    if (found_read_result) {
-      TRACE_CACHED_RESULT(*read_result);
-      if (rr_get_result(*read_result) != 0)
-	*move = rr_get_move(*read_result);
-      
-      SGFTRACE(rr_get_move(*read_result),
-	       rr_get_result(*read_result), "cached");
-      return rr_get_result(*read_result);
-    }
-  }
-  
-  if (stackp > depth) {
-    SGFTRACE(0, 0, "stackp > depth");
-    READ_RETURN0(read_result);
-  }
+  if (stackp > depth)
+    RETURN_RESULT(0, 0, move, "stackp > depth");
   
   adj = chainlinks2(str, adjs, 1);
   for (r = 0; r < adj; r++) {
@@ -3753,13 +3554,12 @@ attack3(int str, int *move, int komaster, int kom_pos)
       if (!ko_move) {
 	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
 	if (dcode != WIN && do_attack(str, NULL, new_komaster, new_kom_pos)) {
-	  if (dcode == 0) {
-	    popgo();
-	    SGFTRACE(xpos, WIN, "attack effective");
-	    READ_RETURN(read_result, move, xpos, WIN);
-	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
+	  popgo();
+	  CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+	    	       "attack effective");
 	}
+	else
+	  popgo();
       }
       else {
 	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
@@ -3767,28 +3567,22 @@ attack3(int str, int *move, int komaster, int kom_pos)
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
+	popgo();
       }
-      popgo();
     }
   }
     
   /* The simple ataris didn't work. Try something more fancy. */
   if (stackp <= backfill_depth) {
     int acode = find_cap3(str, &xpos, komaster, kom_pos);
-    if (acode == WIN) {
-      SGFTRACE(xpos, WIN, "find cap3");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
+      			    "find cap3");
   }
 
   if (stackp <= fourlib_depth) {
     int acode = draw_back(str, &xpos, komaster, kom_pos);
-    if (acode == WIN) {
-      SGFTRACE(xpos, WIN, "draw back");
-      READ_RETURN(read_result, move, xpos, WIN);
-    }
-    UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
+    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
+      			    "draw back");
   }
 
   /* Try to defend chain links with two liberties. */
@@ -3826,13 +3620,12 @@ attack3(int str, int *move, int komaster, int kom_pos)
 	  dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
 	  if (dcode != WIN
 	      && do_attack(str, NULL, new_komaster, new_kom_pos)) {
-	    if (dcode == 0) {
-	      popgo();
-	      SGFTRACE(xpos, WIN, "attack effective");
-	      READ_RETURN(read_result, move, xpos, WIN);
-	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
+	    popgo();
+	    CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+			 "attack effective");
 	  }
+	  else
+	    popgo();
 	}
 	else {
 	  if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
@@ -3840,8 +3633,8 @@ attack3(int str, int *move, int komaster, int kom_pos)
 	    savemove = xpos;
 	    savecode = KO_B;
 	  }
+	  popgo();
 	}
-	popgo();
       }
     }
   }
@@ -3869,14 +3662,12 @@ attack3(int str, int *move, int komaster, int kom_pos)
 	      if (trymove(xpos, other, "attack3-F", str, komaster, kom_pos)) {
 		dcode = do_find_defense(str, NULL, komaster, kom_pos);
 		if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-		  if (dcode == 0) {
-		    popgo();
-		    SGFTRACE(xpos, WIN, "attack effective");
-		    READ_RETURN(read_result, move, xpos, WIN);
-		  }
-		  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
+		  popgo();
+		  CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+		    	       "attack effective");
 		}
-		popgo();
+		else
+		  popgo();
 	      }
 	    }
 	    else
@@ -3885,27 +3676,19 @@ attack3(int str, int *move, int komaster, int kom_pos)
 	  else {
 	    dcode = do_find_defense(str, NULL, komaster, kom_pos);
 	    if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-	      if (dcode == 0) {
-		popgo();
-		SGFTRACE(apos, WIN, "attack effective");
-		READ_RETURN(read_result, move, apos, WIN);
-	      }
-	      UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, apos);
+	      popgo();
+	      CHECK_RESULT(savecode, savemove, dcode, apos, move,
+			   "attack effective");
 	    }
-	    popgo();
+	    else
+	      popgo();
 	  }
 	}
       }
     }
   }
 
-  if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    READ_RETURN(read_result, move, savemove, savecode);
-  }
-  
-  SGFTRACE(0, 0, NULL);
-  READ_RETURN0(read_result);
+  RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 
@@ -3928,7 +3711,6 @@ attack4(int str, int *move, int komaster, int kom_pos)
   int moves[MAX_MOVES];
   int scores[MAX_MOVES];
   int num_moves = 0;
-  Read_result *read_result = NULL;
   int savemove = 0;
   int savecode = 0;
 
@@ -4006,13 +3788,12 @@ attack4(int str, int *move, int komaster, int kom_pos)
       if (!ko_move) {
 	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
 	if (dcode != WIN && do_attack(str, NULL, new_komaster, new_kom_pos)) {
-	  if (dcode == 0) {
-	    popgo();
-	    SGFTRACE(xpos, WIN, "attack effective");
-	    READ_RETURN(read_result, move, xpos, WIN);
-	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
+	  popgo();
+	  CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+	    	       "attack effective");
 	}
+	else
+	  popgo();
       }
       else {
 	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
@@ -4020,19 +3801,12 @@ attack4(int str, int *move, int komaster, int kom_pos)
 	  savemove = xpos;
 	  savecode = KO_B;
 	}
+	popgo();
       }
-      popgo();
     }
   }
 
-  if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    *move = savemove;
-    return savecode;
-  }
-
-  SGFTRACE(0, 0, NULL);
-  return 0;
+  RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 
@@ -6617,15 +6391,7 @@ simple_ladder_attack(int str, int *move, int komaster, int kom_pos)
     }
   }
   
-  if (savecode == 0) {
-    SGFTRACE(0, 0, NULL);
-    return 0;
-  }
-
-  SGFTRACE(savemove, savecode, "saved move");
-  if (move)
-    *move = savemove;
-  return savecode;
+  RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 
@@ -6678,18 +6444,9 @@ simple_ladder_defend(int str, int *move, int komaster, int kom_pos)
 	acode = simple_ladder_attack(str, NULL, new_komaster, new_kom_pos);
       popgo();
       
-      if (!ko_move) {
-	if (acode == 0) {
-	  SGFTRACE(xpos, WIN, "defense effective");
-	  if (move)
-	    *move = xpos;
-	  return WIN;
-	}
-	/* if the move works with ko we save it, then look for something
-	 * better.
-	 */
-	UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
-      }
+      if (!ko_move)
+	CHECK_RESULT(savecode, savemove, acode, xpos, move,
+	  	     "defense effective");
       else {
 	if (acode != WIN) {
 	  savemove = xpos;
@@ -6699,15 +6456,7 @@ simple_ladder_defend(int str, int *move, int komaster, int kom_pos)
     }
   }
 
-  if (savecode != 0) {
-    SGFTRACE(savemove, savecode, "saved move");
-    if (move)
-      *move = savemove;
-    return savecode;
-  }
-  
-  SGFTRACE(0, 0, NULL);
-  return 0;
+  RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 
