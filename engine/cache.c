@@ -919,12 +919,12 @@ reading_cache_init(int bytes)
    * table.
    */
 #define NG_PERCENTAGE  95
-  tt_init(&ttable, bytes * NG_PERCENTAGE / 100);
+  tt_init(&ttable, bytes / 100 * NG_PERCENTAGE);
 
   /* Use the rest of the available memory for the old cache where
    * still owl, semeai and readconnect caching takes place.
    */
-  bytes = bytes * (100 - NG_PERCENTAGE) / 100;
+  bytes = bytes / 100 * (100 - NG_PERCENTAGE);
 #endif
   
     

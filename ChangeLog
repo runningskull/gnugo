@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- avoid overflow in reading_cache_init()
 - converted owl to use new cache implementation
 - new tests
 
