@@ -105,11 +105,6 @@ void play_gmp(int boardsize, Gameinfo *gameinfo)
 	gameinfo->position.boardsize, gameinfo->handicap, 
 	gameinfo->position.komi);
 
-  sgffile_write_gameinfo(gameinfo, "gmp");
-  gameinfo->handicap = gnugo_sethand(&(gameinfo->position), gameinfo->handicap,
-				    sgftree.root);
-  sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
-
   if (gameinfo->handicap)
     to_move = WHITE;
   else
@@ -123,6 +118,12 @@ void play_gmp(int boardsize, Gameinfo *gameinfo)
     mycolor = BLACK;
     yourcolor = WHITE;
   }
+
+  gameinfo->computer_player = mycolor;
+  sgffile_write_gameinfo(gameinfo, "gmp");
+  gameinfo->handicap = gnugo_sethand(&(gameinfo->position), gameinfo->handicap,
+				    sgftree.root);
+  sgfOverwritePropertyInt(sgftree.root, "HA", gameinfo->handicap);
 
   /* main GMP loop */
   while (passes < 2 && !time_to_die) {

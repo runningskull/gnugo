@@ -147,10 +147,11 @@ load_and_analyze_sgf_file(SGFNode *head, Gameinfo *gameinfo,
    * for writing.
    */
   gameinfo_load_sgfheader(gameinfo, head); 
-  sgffile_write_gameinfo(gameinfo, "load and analyze");
   next = gameinfo_play_sgftree(gameinfo, head, untilstr);
   if (to_move != EMPTY)
     next = to_move;
+  gameinfo->computer_player = next;
+  sgffile_write_gameinfo(gameinfo, "load and analyze");
 
   if (benchmark) {
     for (r = 0; r < benchmark; ++r) {
