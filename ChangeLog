@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- semeai module sets matcher status to ALIVE instead of ALIVE_IN_SEKI
+- fix arraybound violation in compute_aa_values
 - constraint diagram checking moved to new check_constraint_diagram()
 - Invoke check_constraint_diagram *before* incrementing patno
 - atari_atari_find_defense_moves() revised

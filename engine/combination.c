@@ -1126,14 +1126,14 @@ compute_aa_values(int color)
 	value++;
       }
       for (k = 0; k < 4; k++) {
-	if (!mx[libs[r] + delta[k]]) {
-	  mx[libs[r] + delta[k]] = 1;
-	  if (board[libs[r] + delta[k]] == EMPTY
-	      && (influence_moyo_color(libs[r] + delta[k]) == other
-		  || (influence_moyo_color_opposite(libs[r] + delta[k])
-		      == other)))
-	    value++;
-	}
+	int librd = libs[r] + delta[k];
+	if (!ON_BOARD1(librd) || mx[librd])
+	  continue;
+	mx[librd] = 1;
+	if (board[librd] == EMPTY
+	    && (influence_moyo_color(librd) == other
+		|| (influence_moyo_color_opposite(librd) == other)))
+	  value++;
       }
     }
 
