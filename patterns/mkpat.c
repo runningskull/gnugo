@@ -499,6 +499,8 @@ write_to_dfa(int index)
  * value in the val_mask, we have a match. This test can be
  * applied in parallel : 2 bits per posn x 16 posns = 32 bits.
  * "Don't care" has and_mask = val_mask = 0, which is handy !
+ * FIXME: Looks like element "." (don't care) has and_mask 3, not 0,
+ *    as indicated in the comments above.
  */
 
 static void

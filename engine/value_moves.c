@@ -1462,7 +1462,7 @@ estimate_territorial_value(int pos, int color, float score)
       }
       else if (!doing_scoring && ((color == BLACK && score < 0.0)
 				  || (color == WHITE && score > 0.0))) {
-	/* tm - devalued this bonue (3.1.17) */
+	/* tm - devalued this bonus (3.1.17) */
 	this_value = gg_min(0.9 * dragon[aa].effective_size,
 			    gg_abs(score/2) - board_size/2 - 1);
 	this_value = gg_max(this_value, 0);

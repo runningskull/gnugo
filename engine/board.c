@@ -878,7 +878,7 @@ is_legal(int pos, int color)
  * This is the case if
  * 1. There is no neighboring empty intersection.
  * 2. There is no neighboring opponent string with exactly one liberty.
- * 3. There is a neighboring friendly string with more than one liberty.
+ * 3. There is no neighboring friendly string with more than one liberty.
  *
  */
 int 

@@ -61,6 +61,7 @@
 #include "patterns.h"
 #include "cache.h"
 #include "sgftree.h"
+#include "gg_utils.h"
 
 struct local_owl_data {
   char goal[BOARDMAX];
@@ -1013,8 +1014,7 @@ owl_attack(int target, int *attack_point, int *certain)
   int result;
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
-  clock_t start = 0, end;
-  double elapsed;
+  double start = 0;
   int tactical_nodes;
   int move = NO_MOVE;
 
@@ -1032,7 +1032,7 @@ owl_attack(int target, int *attack_point, int *certain)
     return result;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
-    start = clock();
+    start = gg_cputime();
   owl.local_owl_node_counter = 0;
   TRACE("owl_attack %1m\n", target);
   owl.lunches_are_current = 0;
@@ -1042,13 +1042,10 @@ owl_attack(int target, int *attack_point, int *certain)
   result = do_owl_attack(target, &move, &owl, EMPTY, 0);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-  if (debug & DEBUG_OWL_PERFORMANCE) {
-    end = clock();
-    elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-    gprintf("owl_attack %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
-	    target, result, move, owl.local_owl_node_counter,
-	    tactical_nodes, elapsed);
-  }
+  DEBUG(DEBUG_OWL_PERFORMANCE,
+    "owl_attack %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+    target, result, move, owl.local_owl_node_counter,
+    tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_ATTACK, target, 0, 0,
 			     result, move, 0,
@@ -1482,8 +1479,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
   char saved_boundary[BOARDMAX];
-  clock_t start = 0, end;
-  double elapsed;
+  double start = 0;
   int tactical_nodes;
   int move = 0;
   int move2 = 0;
@@ -1494,7 +1490,7 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
     return result;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
-    start = clock();
+    start = gg_cputime();
   
   owl.local_owl_node_counter = 0;
   gg_assert(stackp == 0);
@@ -1555,14 +1551,10 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   gg_assert(stackp == 0);
 
-  if (debug & DEBUG_OWL_PERFORMANCE) {
-    end = clock();
-    elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-    gprintf("owl_threaten_attack %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
-	    target, move, move2, result,
-	    owl.local_owl_node_counter,
-	    tactical_nodes, elapsed);
-  }
+  DEBUG(DEBUG_OWL_PERFORMANCE,
+    "owl_threaten_attack %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
+    target, move, move2, result, owl.local_owl_node_counter,
+    tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_THREATEN_ATTACK, target, 0, 0,
 			     result, move, move2, 0,
@@ -1602,8 +1594,7 @@ owl_defend(int target, int *defense_point, int *certain)
   int result;
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
-  clock_t start = 0, end;
-  double elapsed;
+  double start = 0;
   int tactical_nodes;
   int move = 0;
 
@@ -1616,7 +1607,7 @@ owl_defend(int target, int *defense_point, int *certain)
     return result;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
-    start = clock();
+    start = gg_cputime();
 
   owl.local_owl_node_counter = 0;
   TRACE("owl_defend %1m\n", target);
@@ -1627,13 +1618,10 @@ owl_defend(int target, int *defense_point, int *certain)
   result = do_owl_defend(target, &move, &owl, EMPTY, 0);
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
-  if (debug & DEBUG_OWL_PERFORMANCE) {
-    end = clock();
-    elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-    gprintf("owl_defend %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
+  DEBUG(DEBUG_OWL_PERFORMANCE,
+    "owl_defend %1m, result %d %1m (%d, %d nodes, %f seconds)\n",
 	    target, result, move, owl.local_owl_node_counter,
-	    tactical_nodes, elapsed);
-  }
+	    tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_DEFEND, target, 0, 0, result, move, 0,
 			     result_certain, tactical_nodes, owl.goal,
@@ -2027,8 +2015,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
   char saved_goal[BOARDMAX];
-  clock_t start = 0, end;
-  double elapsed;
+  double start = 0;
   int tactical_nodes;
   int move = 0;
   int move2 = 0;
@@ -2042,7 +2029,7 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
     return result;
 
   if (debug & DEBUG_OWL_PERFORMANCE)
-    start = clock();
+    start = gg_cputime();
   owl.local_owl_node_counter = 0;
   TRACE("owl_threaten_defense %1m\n", target);
   owl.lunches_are_current = 0;
@@ -2074,13 +2061,10 @@ owl_threaten_defense(int target, int *defend1, int *defend2)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   gg_assert(stackp == 0);
 
-  if (debug & DEBUG_OWL_PERFORMANCE) {
-    end = clock();
-    elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
-    gprintf("owl_threaten_defense %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
+  DEBUG(DEBUG_OWL_PERFORMANCE, 
+    "owl_threaten_defense %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
 	    target, move, move2, result, owl.local_owl_node_counter,
-	    tactical_nodes, elapsed);
-  }
+	    tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_THREATEN_DEFENSE, target, 0, 0,
 			     result, move, move2, 0,
@@ -3131,7 +3115,11 @@ owl_does_defend(int move, int target)
   int tactical_nodes;
   int origin;
   int acode;
+  double start = 0;
   owl.local_owl_node_counter = 0;
+
+  if (debug & DEBUG_OWL_PERFORMANCE)
+    start = gg_cputime();
 
   if (worm[target].unconditional_status == DEAD)
     return 0;
@@ -3166,9 +3154,9 @@ owl_does_defend(int move, int target)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_does_defend %1m %1m(%1m), result %d (%d, %d nodes)\n",
-	move, target, origin, result,
-	owl.local_owl_node_counter, tactical_nodes);
+	"owl_does_defend %1m %1m(%1m), result %d (%d, %d nodes, %f seconds)\n",
+	move, target, origin, result, owl.local_owl_node_counter, 
+	tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_DOES_DEFEND, move, target, 0,
 			     result, 0, 0, 0,
@@ -3196,7 +3184,11 @@ owl_confirm_safety(int move, int target, int *defense_point)
   int tactical_nodes;
   int origin;
   int defense = 0;
+  double start;
   owl.local_owl_node_counter = 0;
+
+  if (debug & DEBUG_OWL_PERFORMANCE)
+    start = gg_cputime();
 
   if (worm[target].unconditional_status == DEAD)
     return 0;
@@ -3234,9 +3226,10 @@ owl_confirm_safety(int move, int target, int *defense_point)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_confirm_safety %1m %1m(%1m), result %d %1m (%d, %d nodes)\n",
+	"owl_confirm_safety %1m %1m(%1m), result %d %1m (%d, %d nodes, %f seconds)\n",
 	move, target, origin, result, defense,
-	owl.local_owl_node_counter, tactical_nodes);
+	owl.local_owl_node_counter, tactical_nodes,
+	gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_DOES_DEFEND, move, target, 0,
 			     result, defense, 0, 0,
@@ -3266,7 +3259,11 @@ owl_does_attack(int move, int target)
   int tactical_nodes;
   int origin;
   int dcode;
+  double start;
   owl.local_owl_node_counter = 0;
+
+  if (debug & DEBUG_OWL_PERFORMANCE)
+    start = gg_cputime();
 
   if (worm[target].unconditional_status == ALIVE)
     return 0;
@@ -3321,9 +3318,9 @@ owl_does_attack(int move, int target)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
 
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_does_attack %1m %1m(%1m), result %d (%d, %d nodes)\n",
-	move, target, origin, result,
-	owl.local_owl_node_counter, tactical_nodes);
+	"owl_does_attack %1m %1m(%1m), result %d (%d, %d nodes, %f seconds)\n",
+	move, target, origin, result, owl.local_owl_node_counter, 
+	tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_DOES_ATTACK, move, target, 0,
 			     result, 0, 0, 0,
@@ -3345,7 +3342,11 @@ owl_connection_defends(int move, int target1, int target2)
   int result = 0;
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
+  double start;
   static struct local_owl_data owl;
+
+  if (debug & DEBUG_OWL_PERFORMANCE)
+    start = gg_cputime();
 
   gg_assert(board[target2] == color);
   TRACE("owl_connection_defends %1m %1m %1m\n", move, target1, target2);
@@ -3374,9 +3375,9 @@ owl_connection_defends(int move, int target1, int target2)
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_conn_defends %1m %1m %1m, result %d (%d, %d nodes)\n",
+	"owl_conn_defends %1m %1m %1m, result %d (%d, %d nodes, %f seconds)\n",
 	move, target1, target2, result, owl.local_owl_node_counter,
-	tactical_nodes);
+	tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_CONNECTION_DEFENDS, move, target1, target2,
 			     result, 0, 0, 0, tactical_nodes, owl.goal, color);
@@ -3698,8 +3699,12 @@ owl_substantial(int str)
   int liberties = findlib(str, MAX_SUBSTANTIAL_LIBS+1, libs);
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
-  static struct local_owl_data owl;
   int result;
+  double start;
+  static struct local_owl_data owl;
+
+  if (debug & DEBUG_OWL_PERFORMANCE)
+    start = gg_cputime();
 
   owl.color = OTHER_COLOR(board[str]);
   owl.local_owl_node_counter = 0;
@@ -3782,9 +3787,9 @@ owl_substantial(int str)
 
   tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_substantial %1m, result %d (%d, %d nodes)\n",
+	"owl_substantial %1m, result %d (%d, %d nodes, %f seconds)\n",
 	str, result, owl.local_owl_node_counter,
-	tactical_nodes);
+	tactical_nodes, gg_cputime() - start);
 
   store_persistent_owl_cache(OWL_SUBSTANTIAL, str, 0, 0, result, 0, 0, 0,
 			     tactical_nodes, owl.goal, owl.color);

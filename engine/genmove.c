@@ -286,6 +286,30 @@ genmove_conservative(int *i, int *j, int color)
 }
 
 
+/* If we're way ahead, and opponent has not been passing when we
+ * think there are not even dame left, let's start playing aftermath
+ * moves, too.  This funtion returns 1 if we should play an aftermath
+ * or capturing move.
+ * See, disaster in games/nngs/gnugo-3.1.22-heeroy-200201252006.sgf
+ * See also TurboGo in the 2001 European Congress (Dublin), where GNU
+ *   Go took some really unnecessary risks in passing over & over.
+ *   http://www.britgo.org/results/computer/egc01/tg-gg.sgf
+ */
+int
+opponent_not_passing(int color, int score)
+{
+  /* Feel free to pass if we're losing. */
+  if ((color == BLACK && score > 0)
+      || (color == WHITE && score < 0))
+    return 0;
+
+  /*FIXME: re-implement... My initial approach caused many
+   * failures in filllib.tst - tm */
+  return 0;
+ /*(last_moves[0] != NO_MOVE*/
+}
+
+
 /* 
  * Perform the actual move generation. 
  */
@@ -452,9 +476,12 @@ do_genmove(int *move, int color, float pure_threat_value)
   /* If we're instructed to play out the aftermath or capture all dead
    * opponent stones, generate an aftermath move.
    */
+
   if (val < 0.0
       && !doing_scoring
-      && (play_out_aftermath || capture_all_dead)
+      && (play_out_aftermath 
+          || capture_all_dead
+          || opponent_not_passing(color, score))
       && aftermath_genmove(move, color, NULL, 0) > 0) {
     ASSERT1(is_legal(*move, color), *move);
     val = 1.0;
@@ -468,7 +495,8 @@ do_genmove(int *move, int color, float pure_threat_value)
    */
   if (val < 0.0
       && !doing_scoring
-      && capture_all_dead
+      && (capture_all_dead 
+          || opponent_not_passing(color, score))
       && aftermath_genmove(move, color, NULL, 1) > 0) {
     ASSERT1(is_legal(*move, color), *move);
     val = 1.0;

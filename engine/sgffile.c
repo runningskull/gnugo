@@ -173,6 +173,18 @@ sgffile_put_stone(int i, int j, int color)
 }
 
 
+/*
+ * Add a circle mark to the SGF file
+ */
+
+void
+sgffile_write_circle_mark(int i, int j)
+{
+  if (sgfout)
+    fprintf(sgfout, "CR[%c%c]", 'a' + j, 'a' + i);
+}
+
+
 /* 
  * Write header information to the sgf file.
  */

@@ -233,6 +233,7 @@ throw_in_atari_helper(ARGS)
   /* The followup is to capture the "a" string. Estimate the value to
      twice the size. */
   add_followup_value(move, 2 * worm[apos].effective_size);
+  TRACE("...followup value %f\n", 2 * worm[apos].effective_size);
 
   return success;
 }
@@ -410,6 +411,7 @@ void
 threaten_to_save_helper(int move, int str)
 {
   add_followup_value(move, 2.0 + 2.0 * worm[str].effective_size);
+  TRACE("...followup value %f\n", 2.0 + 2.0 * worm[str].effective_size);
 }
 
 

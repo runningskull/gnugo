@@ -278,6 +278,9 @@ gnugo %s: You stepped on a bug.\n\
 Please save this game as an sgf file \
 and mail it to gnugo@gnu.org\n\n", gg_version());
 
+  fflush(stderr);
+  fflush(stdout);
+
   abort();  /* cause core dump */
 }
 

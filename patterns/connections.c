@@ -120,7 +120,7 @@ cut_connect_callback(int m, int n, int color, struct pattern *pattern,
 	pos = POS(x, y);
 
 	if (worm[pos].attack_codes[0] == WIN
-	  && (pattern->movei == -1
+	  && (move == NO_MOVE
 	      || !does_defend(move, pos)))
 	  return; /* Match failed */
       }

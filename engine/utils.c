@@ -1718,7 +1718,7 @@ start_timer(int n)
   if (!showtime)
     return;
 
-  timers[n] = gg_gettimeofday();
+  timers[n] = gg_cputime();
 }
 
 /* Report time spent and restart the timer. Make no report if elapsed
@@ -1734,7 +1734,7 @@ time_report(int n, const char *occupation, int move, double mintime)
   if (!showtime)
     return 0.0;
 
-  t = gg_gettimeofday();
+  t = gg_cputime();
   dt = t - timers[n];
   if (dt > mintime) {
     gprintf("%s", occupation);

@@ -29,6 +29,8 @@
 #include "interface.h"
 #include "sgftree.h"
 #include "gnugo.h"
+#include "gg_utils.h"
+#include "liberty.h"
 
 static void replay_node(SGFNode *node, Gameinfo *gameinfo, int color_to_test);
 
@@ -167,6 +169,21 @@ replay_node(SGFNode *node, Gameinfo *gameinfo, int color_to_replay)
       if (!gnugo_is_pass(m, n) && potential_moves[m][n] > 0.0)
 	printf("(%.2f) ", potential_moves[m][n]);
       printf("\n");
+    }
+    if (i != m || j != n) {
+      char buf[127];
+      /* FIXME: Use (or create) gg_snprintf that supports %m syntax to fix 
+       * pass bug here.
+       */
+      gg_snprintf(buf, 127, "GNU Go plays %c%d(%.2f) - Game move %c%d(%.2f)",
+	j + 'A' + (j >= 8), 
+	board_size - i,
+	gnugo_is_pass(i, j) ? 0 : potential_moves[i][j],
+	n + 'A' + (n >=8),
+	board_size - m,
+        gnugo_is_pass(m, n) && potential_moves[m][n] < 0.0 ? 0 : potential_moves[m][n]);
+      sgffile_write_comment(buf);
+      sgffile_write_circle_mark(i,j);
     }
   }
 

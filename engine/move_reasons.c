@@ -1604,6 +1604,9 @@ list_move_reasons(int color)
 	case EITHER_MOVE:
 	case ALL_MOVE:
 	  /* FIXME: Generalize this. */
+	  /* FIMXE: This is broken.  EITHER_MOVE should reference either_data 
+	         see, for example: 
+		 http://www.public32.com/regress/?tstfile=nngs&num=850&move=R9*/
 	  reason1 = all_data[move_reasons[r].what].reason1;
 	  reason2 = all_data[move_reasons[r].what].reason2;
 	  worm1 = all_data[move_reasons[r].what].what1;

@@ -214,16 +214,16 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
     }
   }
       
-  /* does the pattern have an action? */
-  if (pattern->autohelper_flag & HAVE_ACTION) {
-    pattern->autohelper(pattern, ll, move, color, 1);
-  }
-
   /* If using -a, want to see all matches even if not -v */
   if (allpats || verbose) {
     TRACE("pattern '%s'+%d matched at %1m\n", pattern->name, ll, move);
   }
   
+  /* does the pattern have an action? */
+  if (pattern->autohelper_flag & HAVE_ACTION) {
+    pattern->autohelper(pattern, ll, move, color, 1);
+  }
+
   /* Pattern class B, cut all combinations of opponent dragons. */
   if (class & CLASS_B) {
     for (k = 0; k < your_ndragons; k++)

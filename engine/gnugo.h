@@ -464,6 +464,7 @@ int sgffile_open_file(const char *);
 int sgffile_close_file(void);
 int sgffile_write_gameinfo(Gameinfo *gameinfo, const char *);
 void sgffile_write_comment(const char *comment);
+void sgffile_write_circle_mark(int i, int j);
 void sgffile_printboard(int next);
 void sgffile_recordboard(SGFNode *node);
 

@@ -202,7 +202,7 @@ decide_dragon(int pos, const char *sgf_output)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
 
-  silent_examine_position(pos, EXAMINE_DRAGONS_WITHOUT_OWL);
+  silent_examine_position(board[pos], EXAMINE_DRAGONS_WITHOUT_OWL);
   gprintf("finished examine_position\n");
 
   /* We want to see the reading performed, not just a result picked

@@ -73,7 +73,7 @@ play_solo(Gameinfo *gameinfo, int moves)
     } while (--n > 0);
   }
   
-  t1 = gg_gettimeofday();
+  t1 = gg_cputime();
   memset(&totalstats, '\0', sizeof(totalstats));
   while (passes < 2 && --moves >= 0 && !time_to_die) {
     reset_owl_node_counter();
@@ -100,7 +100,7 @@ play_solo(Gameinfo *gameinfo, int moves)
     totalstats.hash_collisions     += stats.hash_collisions;
     total_owl_count                += get_owl_node_counter();
   }
-  t2 = gg_gettimeofday();
+  t2 = gg_cputime();
   
   /* Two passes and it's over. (EMPTY == BOTH) */
   gnugo_who_wins(&gameinfo->position, EMPTY, stdout);
