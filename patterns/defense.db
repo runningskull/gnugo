@@ -385,3 +385,13 @@ aC*
 
 ;lib(a)>1 && lib(b)>1 && lib(C)<=2 && olib(*)>1
 
+
+Pattern Def70
+# pp New Pattern (3.5.1)
+
+OOOO*	  a very specific position (defend the stone on the first line)
+O....
+XO...
+-----
+
+:8,D

@@ -395,6 +395,7 @@ Pattern EE106
 Pattern EE107
 #tm New Pattern (3.1.16)
 #   see trevor:163
+# FIXME: move this pattern to appropriate place
 
 +--	very special corner position
 |.*
@@ -409,6 +410,22 @@ Pattern EE107
 |OB
 
 ; defend(B) && !oplay_defend(*,B) && safe_xmove(*)
+
+
+Pattern EE108
+# pp New pattern (see endgame:890) (3.5.1)
+
+?OX?	    very small endgame move
+O.*.
+----
+
+:8,OXes,value(0.5)
+
+?OX?
+Oa*b
+----
+
+; proper_eye(b) && oplay_attack(*,b,a,a) && oplay_defend(a,*,a)
 
 
 # first line pushes (except in corner)
