@@ -395,6 +395,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
       min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
                           /* get preferred in value_move_reasons */
       set_maximum_move_value(move, min_value);
+      scale_randomness(move, 5.);
       TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
     }
     else 
@@ -422,6 +423,7 @@ shapes_callback(int m, int n, int color, struct pattern *pattern, int ll,
       min_value *= 1.005; /* Otherwise, j patterns not of CLASS_F would */
                           /* get preferred in value_move_reasons */
       set_maximum_move_value(move, min_value);
+      scale_randomness(move, 5.);
       TRACE("...move value %f (shape %f)\n", min_value, pattern->shape);
     }
     else 

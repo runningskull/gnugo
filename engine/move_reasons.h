@@ -106,12 +106,12 @@ struct move_data {
                                       experimental influence. */
   float reverse_followup_value;	/* Value of opponents followup move
 				   (reverse sente). */
-  float secondary_value;   /* Secondary move value. */
-
-  float min_value;         /* Minimum allowed value for the move. */
-  float max_value;         /* Maximum allowed value for the move. */
-  float min_territory;     /* Minimum territorial value. */
-  float max_territory;     /* Maximum territorial value. */
+  float secondary_value;      /* Secondary move value. */
+  float min_value;            /* Minimum allowed value for the move. */
+  float max_value;            /* Maximum allowed value for the move. */
+  float min_territory;        /* Minimum territorial value. */
+  float max_territory;        /* Maximum territorial value. */
+  float randomness_scaling;   /* Increase to randomize this move. */
 
   int reason[MAX_REASONS]; /* List of reasons for a move. */
   int move_safety;         /* Whether the move seems safe. */

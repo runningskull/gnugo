@@ -415,6 +415,7 @@ void add_followup_value(int pos, float value);
 void add_reverse_followup_value(int pos, float value);
 void record_top_move(int move, float val);
 void remove_top_move(int move);
+void scale_randomness(int pos, float scaling);
 
 /* Parameters to add_either_move and add_all_move */
 #define ATTACK_STRING  1

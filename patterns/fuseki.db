@@ -97,6 +97,9 @@
 ################
 
 
+#### Low (keima) kakari
+
+
 Pattern F1
 
 |..???...ooo   approach star
@@ -134,6 +137,33 @@ Pattern F3
 :8,FeEat,shape(1)
 
 
+Pattern F3h
+# db added (3.3.9)
+
+|..........     keima kakari against star, high handicap game
+|...X.....x
+|.....*...x
+|..........
+|..........
++----------
+
+:8,FEj,shape(.025)
+
+|..........
+|...X.....a
+|.....*...b
+|..........
+|..........
++----------
+
+; x_somewhere(a,b)
+
+
+#### High (ikken taka) kakari
+#### not so good in relation to the corner since the
+####     3-3 point relationship is inferior.
+
+
 Pattern F4
 # Made attack dependent on extension space (3.1.25) /ab
 
@@ -159,6 +189,31 @@ Pattern F4a
 :8,FEa
 
 
+Pattern F5d
+# db added (3.3.9)
+
+|..........      high kakari against star
+|...X.*...x
+|.........x
+|..........
+|..........
++----------
+
+:8,FEj
+
+|..........
+|...X.*...a
+|.........b
+|..........
+|..........
++----------
+
+; x_somewhere(a,b)
+
+
+#### Two space high (nikken taka) kakari
+
+
 Pattern F5
 # Made attack dependent on extension space (3.1.25) /ab
 
@@ -182,6 +237,28 @@ Pattern F5a
 +-----------
 
 :8,FEa
+
+
+Pattern F5h
+# db added (3.3.9)
+
+|..........   far high kakari against star
+|...X..*..x
+|.........x
+|..........
+|..........
++----------
+
+:8,FEj,shape(.01)
+
+|..........
+|...X..*..a
+|.........b
+|..........
+|..........
++----------
+
+; x_somewhere(a,b)
 
 
 Pattern F6

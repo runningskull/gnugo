@@ -2540,7 +2540,8 @@ value_moves(int color, float pure_threat_value, float score)
        */
       if (is_legal(pos, color) || is_illegal_ko_capture(pos, color)) {
 	/* Add a random number between 0 and 0.01 to use in comparisons. */
-	move[pos].value += 0.01 * move[pos].random_number;
+	move[pos].value += 
+	  0.01 * move[pos].random_number * move[pos].randomness_scaling;
       }
       else {
 	move[pos].value = 0.0;

@@ -2,8 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- persistent cache code moved from reading.c and owl.c to new file
-  persistent.c
+- new randomness_scaling field in struct move_data and new scale_randomness()
+- moves matching Fj and Ft patterns get extra randomness
+- fuseki pattern tuning for kakaris in high handicap games
+- persistent cache code moved from reading.c and owl.c to new file persistent.c
 - speed optimization in order_moves() in reading.c
 - speed optimizations in fastlib(), count_common_libs(), find_common_libs()
 - duplicate lines removed from safety_to_string()

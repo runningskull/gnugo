@@ -123,6 +123,7 @@ clear_move_reasons(void)
 	move[ii].reason[k]            = -1;
       move[ii].move_safety            = 0;
       move[ii].worthwhile_threat      = 0;
+      move[ii].randomness_scaling     = 1.;
       /* The reason we assign a random number to each move immediately
        * is to avoid dependence on which moves are evaluated when it
        * comes to choosing between multiple moves of the same value.
@@ -1875,6 +1876,16 @@ is_antisuji_move(int pos)
   return 0;
 }
 
+/* Increase the randomness scaling factor.
+ * This causes the move value to be more random.
+ */
+
+void
+scale_randomness(int pos, float scaling)
+{
+  if (scaling > move[pos].randomness_scaling)
+    move[pos].randomness_scaling = scaling;
+}
 
 /*
  * Local Variables:
