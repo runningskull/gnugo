@@ -308,7 +308,7 @@ class GTP_game:
     def swap_players(self):
 	temp = self.whiteplayer
 	self.whiteplayer = self.blackplayer
-	self.blackplayer = self.whiteplayer
+	self.blackplayer = temp
 
     def play(self, sgffile):
         "Play a game"
@@ -508,30 +508,31 @@ class GTP_match:
 
 	    if result[0][0] == last_color:
 		last_streak += 1
-		if last_streak == self.streak_length:
-		    if last_color == "W":
-			self.handicap += 1
-			if self.handicap == 1:
-			    self.handicap = 2
-			print "White wins too often. Increasing handicap to %d" \
-			      % (self.handicap)
-		    else:   
-			if self.handicap > 0:
-			    self.handicap -= 1
-			    if self.handicap == 1:
-			        self.handicap = 0
-			    print "Black wins too often. Decreasing handicap to %d" \
-				  % (self.handicap)
-			else:
-			    self.handicap = 2
-			    game.swap_players()
-			    print "Black looks stronger than white. Swapping colors and setting handicap to 2"
-		    game.set_handicap(self.handicap)
-		    last_color = ""
-		    last_streak = 0
-	    else:
+	    elif result[0][0] != "0":
 		last_color = result[0][0]
 		last_streak = 1
+
+            if last_streak == self.streak_length:
+                if last_color == "W":
+                    self.handicap += 1
+                    if self.handicap == 1:
+                        self.handicap = 2
+                    print "White wins too often. Increasing handicap to %d" \
+                          % (self.handicap)
+                else:   
+                    if self.handicap > 0:
+                        self.handicap -= 1
+                        if self.handicap == 1:
+                            self.handicap = 0
+                        print "Black wins too often. Decreasing handicap to %d" \
+                              % (self.handicap)
+                    else:
+                        self.handicap = 2
+                        game.swap_players()
+                        print "Black looks stronger than white. Swapping colors and setting handicap to 2"
+                game.set_handicap(self.handicap)
+                last_color = ""
+                last_streak = 0
 	    results.append(result)
         game.quit()
         return results
