@@ -557,14 +557,22 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	 * placed on the board.
 	 */
 	rotate(i, j, &i, &j, board_size, orientation);
-	gnugo_add_stone(i, j, BLACK);
+	if (BOARD(i, j) != EMPTY)
+	  gprintf("Illegal SGF! attempt to add a stone at occupied point %m\n",
+		  i, j);
+	else
+	  gnugo_add_stone(i, j, BLACK);
 	addstone = 1;
 	break;
 	      
       case SGFAW:
 	get_moveXY(prop, &i, &j, board_size);
 	rotate(i, j, &i, &j, board_size, orientation);
-	gnugo_add_stone(i, j, WHITE);
+	if (BOARD(i, j) != EMPTY)
+	  gprintf("Illegal SGF! attempt to add a stone at occupied point %m\n",
+		  i, j);
+	else
+	  gnugo_add_stone(i, j, WHITE);
 	addstone = 1;
 	break;
 	      

@@ -160,17 +160,16 @@ static int attack1(int str, int *move, int komaster, int kom_pos);
 static int attack2(int str, int *move, int komaster, int kom_pos);
 static int attack3(int str, int *move, int komaster, int kom_pos);
 static int attack4(int str, int *move, int komaster, int kom_pos);
-static int find_cap2(int str, int alib, int blib, int *move,
-		     int komaster, int kom_pos);
-static int find_cap(int str, int *move, int komaster, int kom_pos);
-static int special_attack2(int str, int libs[2], int *move,
-			   int komaster, int kom_pos);
-static int special_attack3(int str, int libs[2], int *move,
-			   int komaster, int kom_pos);
-static int special_attack4(int str, int libs[2], int *move,
-			   int komaster, int kom_pos);
-static int draw_back(int str, int *move, int komaster, int kom_pos);
-static int edge_closing_backfill(int str, int apos, int *move);
+static void find_cap_moves(int str, struct reading_moves *moves);
+static void special_attack2_moves(int str, int libs[2],
+				 struct reading_moves *moves);
+static void special_attack3_moves(int str, int libs[2],
+				 struct reading_moves *moves);
+static void special_attack4_moves(int str, int libs[2],
+				 struct reading_moves *moves);
+static void draw_back_moves(int str, struct reading_moves *moves);
+static void edge_closing_backfill_moves(int str, int apos,
+					struct reading_moves *moves);
 static void edge_block_moves(int str, int apos,
 			     struct reading_moves *moves);
 static void propose_edge_moves(int str, int *libs, int liberties,
@@ -3097,12 +3096,13 @@ attack2(int str, int *move, int komaster, int kom_pos)
   int adj, adjs[MAXCHAIN];
   int savemove = 0;
   int savecode = 0;
-  int acode;
   int dcode;
   int k;
   int atari_possible = 0;
   struct reading_moves moves;
   int adjacent_liberties = 0;
+  int pass;
+  int saved_num_moves = 0;
 
   SETUP_TRACE_INFO("attack2", str);
   reading_node_counter++;
@@ -3114,203 +3114,208 @@ attack2(int str, int *move, int komaster, int kom_pos)
 
   RTRACE("checking attack on %1m with 2 liberties\n", str);
 
-  /* The attack may fail if a boundary string is in atari and cannot 
-   * be defended.  First we must try defending such a string. 
-   *
-   * We start by trying to defend the boundary string by looking for an
-   * adjacent string which is in atari. 
-   */
-  adj = chainlinks2(str, adjs, 1);
-  for (r = 0; r < adj; r++) {
-    /* if stackp > depth and any boundary chain is in atari, assume safe.
-     * However, if the captured chain is only of size 1, there can still
-     * be a working ladder, so continue if that is the case.
-     */
-    if (stackp > depth && countstones(adjs[r]) > 1) {
-      RETURN_RESULT(0, 0, move, "boundary in atari");
-    }
-
-    /* Pick up moves breaking the second order chain. */
-    if (stackp <= depth)
-      break_chain_moves(adjs[r], &moves);
-    
-    findlib(adjs[r], 1, &hpos);
-    ADD_CANDIDATE_MOVE(hpos, 0, moves);
-  }
-
-  /* Get the two liberties of (str). */
-  liberties = findlib(str, 2, libs);
-  ASSERT1(liberties == 2, str);
-
-  if (libs[0] == SOUTH(libs[1])
-      || libs[0] == WEST(libs[1])
-      || libs[0] == NORTH(libs[1])
-      || libs[0] == EAST(libs[1]))
-    adjacent_liberties = 1;
+  for(pass = 0; pass < 4; pass++) {
   
-  for (k = 0; k < 2; k++) {
-    int apos = libs[k];
-    if (!is_self_atari(apos, other))
-      atari_possible = 1;
-    /* we only want to consider the move at (apos) if:
-     * stackp <= backfill_depth
-     * -or-  stackp <= depth and it is an isolated stone
-     * -or-  it is not in immediate atari
-     */
-    if (stackp <= backfill_depth
-	|| ((stackp <= depth || adjacent_liberties) 
-	    && board[SOUTH(apos)] != other
-	    && board[WEST(apos)] != other
-	    && board[NORTH(apos)] != other
-	    && board[EAST(apos)] != other)
-	|| !is_self_atari(apos, other))
-      ADD_CANDIDATE_MOVE(apos, 0, moves);
+    if (pass == 0) {
+      /* The attack may fail if a boundary string is in atari and cannot
+       * be defended.  First we must try defending such a string.
+       *
+       * We start by trying to defend the boundary string by looking for an
+       * adjacent string which is in atari.
+       */
+      adj = chainlinks2(str, adjs, 1);
+      for (r = 0; r < adj; r++) {
+        /* if stackp > depth and any boundary chain is in atari, assume safe.
+         * However, if the captured chain is only of size 1, there can still
+         * be a working ladder, so continue if that is the case.
+         */
+        if (stackp > depth && countstones(adjs[r]) > 1) {
+          RETURN_RESULT(0, 0, move, "boundary in atari");
+        }
 
-    /* Try backfilling if atari is impossible. */
-    if (stackp <= backfill_depth && approxlib(apos, other, 2, libs2) == 1) {
-      ADD_CANDIDATE_MOVE(libs2[0], 0, moves);
-      /* If there is a neighbor in atari, we also try back-capturing. */
-      for (r = 0; r < 4; r++) {
-	int bpos = libs2[0] + delta[r];
-	if (board[bpos] == other && chainlinks2(bpos, adjs, 1) > 0) {
-	  /* FIXME: If there is more than one neighbor in atari, we
-           * currently just take one randomly. This is maybe not good
-           * enough. We might also want to check against snapback.
-	   */
-	  findlib(adjs[0], 1, &xpos);
-	  ADD_CANDIDATE_MOVE(xpos, 0, moves);
-	}
+        /* Pick up moves breaking the second order chain. */
+        if (stackp <= depth)
+          break_chain_moves(adjs[r], &moves);
+
+        findlib(adjs[r], 1, &hpos);
+        ADD_CANDIDATE_MOVE(hpos, 0, moves);
       }
-    }
-  }
 
-  /* If we can't make a direct atari, look for edge blocking moves. */
-  if (!atari_possible)
-    for (k = 0; k < 2; k++) 
-      edge_block_moves(str, libs[k], &moves);
-    
+      /* Get the two liberties of (str). */
+      liberties = findlib(str, 2, libs);
+      ASSERT1(liberties == 2, str);
 
-  /* If one of the surrounding chains have only two liberties, which
-   * coincide with the liberties of the attacked string, we try to
-   * backcapture.
-   */
-  
-  adj = chainlinks2(str, adjs, 2);
-  for (r = 0; r < adj; r++) {
-    int apos = adjs[r];
-    if (liberty_of_string(libs[0], apos)
-	&& liberty_of_string(libs[1], apos))
-      break_chain_moves(apos, &moves);
-  }
-  
-  propose_edge_moves(str, libs, liberties, &moves, other);
-  order_moves(str, &moves, other, read_function_name, 0);
+      if (libs[0] == SOUTH(libs[1])
+          || libs[0] == WEST(libs[1])
+          || libs[0] == NORTH(libs[1])
+          || libs[0] == EAST(libs[1]))
+        adjacent_liberties = 1;
 
-  for (k = 0; k < moves.num; k++) {
-    int new_komaster;
-    int new_kom_pos;
-    int ko_move;
+      for (k = 0; k < 2; k++) {
+        int apos = libs[k];
+        if (!is_self_atari(apos, other))
+          atari_possible = 1;
+        /* we only want to consider the move at (apos) if:
+         * stackp <= backfill_depth
+         * -or-  stackp <= depth and it is an isolated stone
+         * -or-  it is not in immediate atari
+         */
+        if (stackp <= backfill_depth
+	    || ((stackp <= depth || adjacent_liberties)
+	        && board[SOUTH(apos)] != other
+	        && board[WEST(apos)] != other
+	        && board[NORTH(apos)] != other
+	        && board[EAST(apos)] != other)
+	     || !is_self_atari(apos, other))
+          ADD_CANDIDATE_MOVE(apos, 0, moves);
 
-    int apos = moves.pos[k];
-    if (komaster_trymove(apos, other, "attack2-A", str,
-			 komaster, kom_pos, &new_komaster, &new_kom_pos,
-			 &ko_move, stackp <= ko_depth && savecode == 0)) {
-      if (!ko_move) {
-	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
-	if (dcode != WIN
-	    && do_attack(str, NULL, new_komaster, new_kom_pos)) {
-	  popgo();
-	  CHECK_RESULT(savecode, savemove, dcode, apos, move,
-	    	       "attack effective");
-	}
-	else
-	  popgo();
-      }
-      else {
-	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
-	    && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
-	  savemove = apos;
-	  savecode = KO_B;
-	}
-        popgo();
-      }
-    }
-  }
-  
-  /* The simple ataris didn't work. Try something more fancy. */
-  acode = find_cap2(str, libs[0], libs[1], &xpos, komaster, kom_pos);
-  CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move, "find cap2");
-
-  if (stackp <= backfill_depth) {
-    acode = special_attack2(str, libs, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
-      			    "special attack2");
-  }
-
-  if (stackp <= backfill_depth) {
-    acode = special_attack3(str, libs, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
-			    "special attack3");
-  }
-
-  if (stackp <= backfill_depth) {
-    acode = special_attack4(str, libs, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
-      			    "special attack4");
-  }
-
-  /* If it is not possible to make a direct atari, we try filling
-   * a liberty of the superstring.
-   */
-  if (level >= 10
-      && stackp <= backfill_depth
-      && (stackp <= superstring_depth || !atari_possible)) {
-    int ss_liberties;
-    int ss_libs[MAX_LIBERTIES + 4];
-    int liberty_cap = 2;
-
-    if (stackp <= backfill2_depth)
-      liberty_cap = 3;
-    
-    find_superstring_liberties(str, &ss_liberties, ss_libs, liberty_cap);
-    if (ss_liberties <= 5) {
-      for (k = 0; k < ss_liberties; k++) {
-	int apos = ss_libs[k];
-	
-	if (liberty_of_string(apos, str))
-	  continue;
-	if (trymove(apos, other, "attack2-C", str, komaster, kom_pos)) {
-	  if (countlib(apos) == 1) {
-	    /* can't atari, try backfilling. */
-	    findlib(apos, 1, &xpos);
-	    if (approxlib(xpos, other, 2, NULL) > 1) {
-	      popgo();
-	      if (trymove(xpos, other, "attack2-D", str, komaster, kom_pos)) {
-		dcode = do_find_defense(str, NULL, komaster, kom_pos);
-		if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-		  popgo();
-		  CHECK_RESULT(savecode, savemove, dcode, xpos, move,
-		      	       "attack effective");
-		}
-		else
-		  popgo();
-	      }
+        /* Try backfilling if atari is impossible. */
+        if (stackp <= backfill_depth
+	    && approxlib(apos, other, 2, libs2) == 1) {
+          ADD_CANDIDATE_MOVE(libs2[0], 0, moves);
+          /* If there is a neighbor in atari, we also try back-capturing. */
+          for (r = 0; r < 4; r++) {
+	    int bpos = libs2[0] + delta[r];
+	    if (board[bpos] == other && chainlinks2(bpos, adjs, 1) > 0) {
+	      /* FIXME: If there is more than one neighbor in atari, we
+               * currently just take one randomly. This is maybe not good
+               * enough. We might also want to check against snapback.
+	       */
+	      findlib(adjs[0], 1, &xpos);
+	      ADD_CANDIDATE_MOVE(xpos, 0, moves);
 	    }
-	    else
-	      popgo();
-	  }
-	  else {
-	    dcode = do_find_defense(str, NULL, komaster, kom_pos);
-	    if (dcode != WIN 
-		&& do_attack(str, NULL, komaster, kom_pos)) {
+          }
+        }
+      }
+
+      /* If we can't make a direct atari, look for edge blocking moves. */
+      if (!atari_possible)
+        for (k = 0; k < 2; k++)
+          edge_block_moves(str, libs[k], &moves);
+    
+
+      /* If one of the surrounding chains have only two liberties, which
+       * coincide with the liberties of the attacked string, we try to
+       * backcapture.
+       */
+  
+      adj = chainlinks2(str, adjs, 2);
+      for (r = 0; r < adj; r++) {
+        int apos = adjs[r];
+        if (liberty_of_string(libs[0], apos)
+	    && liberty_of_string(libs[1], apos))
+          break_chain_moves(apos, &moves);
+      }
+
+      propose_edge_moves(str, libs, liberties, &moves, other);
+    }
+  
+    if (pass == 1) {
+      if (stackp <= backfill_depth) {
+        special_attack2_moves(str, libs, &moves);
+        special_attack3_moves(str, libs, &moves);
+	special_attack4_moves(str, libs, &moves);
+      }
+    }
+
+    if (pass == 2) {
+      find_cap_moves(str, &moves);
+    }
+
+    if (pass != 3) {
+      order_moves(str, &moves, other, read_function_name, saved_num_moves);
+
+      for (k = saved_num_moves; k < moves.num; k++) {
+        int new_komaster;
+        int new_kom_pos;
+        int ko_move;
+
+        int apos = moves.pos[k];
+        if (komaster_trymove(apos, other, "attack2-A", str,
+			     komaster, kom_pos, &new_komaster, &new_kom_pos,
+			     &ko_move, stackp <= ko_depth && savecode == 0)) {
+          if (!ko_move) {
+	    dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
+	    if (dcode != WIN
+	        && do_attack(str, NULL, new_komaster, new_kom_pos)) {
 	      popgo();
 	      CHECK_RESULT(savecode, savemove, dcode, apos, move,
-			   "attack effective");
+	    	           "attack effective");
 	    }
 	    else
 	      popgo();
-	  }
-	}
+          }
+          else {
+	    if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
+	        && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	      savemove = apos;
+	      savecode = KO_B;
+	    }
+            popgo();
+          }
+        }
+      }
+      saved_num_moves = moves.num;
+    }
+
+    if (pass == 3) {
+
+      /* If it is not possible to make a direct atari, we try filling
+       * a liberty of the superstring.
+       */
+      if (level >= 10
+          && stackp <= backfill_depth
+          && (stackp <= superstring_depth || !atari_possible)) {
+        int ss_liberties;
+        int ss_libs[MAX_LIBERTIES + 4];
+        int liberty_cap = 2;
+
+        if (stackp <= backfill2_depth)
+          liberty_cap = 3;
+
+        find_superstring_liberties(str, &ss_liberties, ss_libs, liberty_cap);
+        if (ss_liberties <= 5) {
+          for (k = 0; k < ss_liberties; k++) {
+	    int apos = ss_libs[k];
+
+	    if (liberty_of_string(apos, str))
+	      continue;
+	    if (trymove(apos, other, "attack2-C", str, komaster, kom_pos)) {
+	      if (countlib(apos) == 1) {
+	        /* can't atari, try backfilling. */
+	        findlib(apos, 1, &xpos);
+	        if (approxlib(xpos, other, 2, NULL) > 1) {
+	          popgo();
+	          if (trymove(xpos, other, "attack2-D", str, komaster,
+		              kom_pos)) {
+		    dcode = do_find_defense(str, NULL, komaster, kom_pos);
+		    if (dcode != WIN
+		        && do_attack(str, NULL, komaster, kom_pos)) {
+		      popgo();
+		      CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+		      	           "attack effective");
+		    }
+		    else
+		      popgo();
+	          }
+	        }
+	        else
+	          popgo();
+	      }
+	      else {
+	        dcode = do_find_defense(str, NULL, komaster, kom_pos);
+	        if (dcode != WIN
+		    && do_attack(str, NULL, komaster, kom_pos)) {
+	          popgo();
+	          CHECK_RESULT(savecode, savemove, dcode, apos, move,
+			       "attack effective");
+	        }
+	        else
+	          popgo();
+	      }
+	    }
+          }
+        }
       }
     }
   }
@@ -3354,6 +3359,8 @@ attack3(int str, int *move, int komaster, int kom_pos)
   struct reading_moves moves;
   int savemove = 0;
   int savecode = 0;
+  int pass;
+  int saved_num_moves = 0;
   
   SETUP_TRACE_INFO("attack3", str);
   reading_node_counter++;
@@ -3364,158 +3371,134 @@ attack3(int str, int *move, int komaster, int kom_pos)
   if (stackp > depth)
     RETURN_RESULT(0, 0, move, "stackp > depth");
   
-  adj = chainlinks2(str, adjs, 1);
-  for (r = 0; r < adj; r++) {
-    int hpos;
-    break_chain_moves(adjs[r], &moves);
+  for (pass = 0; pass < 4; pass++) {
+
+    if (pass == 0) {
+      adj = chainlinks2(str, adjs, 1);
+      for (r = 0; r < adj; r++) {
+        int hpos;
+        break_chain_moves(adjs[r], &moves);
     
-    findlib(adjs[r], 1, &hpos);
-    ADD_CANDIDATE_MOVE(hpos, 0, moves);
-  }
+        findlib(adjs[r], 1, &hpos);
+        ADD_CANDIDATE_MOVE(hpos, 0, moves);
+      }
   
-  /* Defend against double atari in the surrounding chain early. */
-  double_atari_chain2_moves(str, &moves);
+      /* Defend against double atari in the surrounding chain early. */
+      double_atari_chain2_moves(str, &moves);
   
-  /* Get the three liberties of (str). */
-  liberties = findlib(str, 3, libs);
-  ASSERT1(liberties == 3, str);
+      /* Get the three liberties of (str). */
+      liberties = findlib(str, 3, libs);
+      ASSERT1(liberties == 3, str);
   
-  for (k = 0; k < 3; k++) {
+      for (k = 0; k < 3; k++) {
 #if 0
-    int libs2[2];
+        int libs2[2];
 #endif
-    int apos = libs[k];
-    /* we only want to consider the move at (apos) if:
-     * stackp <= backfill_depth
-     * -or-  stackp <= depth and it is an isolated stone
-     * -or-  it is not in immediate atari
-     */
-    if (stackp <= backfill_depth
-	|| (stackp <= depth
-	    && board[SOUTH(apos)] != other
-	    && board[WEST(apos)] != other
-	    && board[NORTH(apos)] != other
-	    && board[EAST(apos)] != other)
-	|| !is_self_atari(apos, other))
-      ADD_CANDIDATE_MOVE(apos, 0, moves);
+        int apos = libs[k];
+        /* we only want to consider the move at (apos) if:
+         * stackp <= backfill_depth
+         * -or-  stackp <= depth and it is an isolated stone
+         * -or-  it is not in immediate atari
+         */
+        if (stackp <= backfill_depth
+	    || (stackp <= depth
+	        && board[SOUTH(apos)] != other
+	        && board[WEST(apos)] != other
+	        && board[NORTH(apos)] != other
+	        && board[EAST(apos)] != other)
+	    || !is_self_atari(apos, other))
+          ADD_CANDIDATE_MOVE(apos, 0, moves);
 
-    if (edge_closing_backfill(str, apos, &xpos))
-      ADD_CANDIDATE_MOVE(xpos, 0, moves);
+        edge_closing_backfill_moves(str, apos, &moves);
 
 #if 0
-    /* Try backfilling if atari is impossible. */
-    if (stackp <= backfill_depth
-	&& approxlib(apos, other, 2, libs2) == 1) {
-      ADD_CANDIDATE_MOVE(libs2[0], 0, moves);
-    }
+        /* Try backfilling if atari is impossible. */
+        if (stackp <= backfill_depth
+	    && approxlib(apos, other, 2, libs2) == 1) {
+          ADD_CANDIDATE_MOVE(libs2[0], 0, moves);
+        }
 #endif
     
-    /* Look for edge blocking moves. */
-    edge_block_moves(str, apos, &moves);
-  }
+        /* Look for edge blocking moves. */
+        edge_block_moves(str, apos, &moves);
+      }
   
-  /* Pick up some edge moves. */
-  propose_edge_moves(str, libs, liberties, &moves, other);
-  order_moves(str, &moves, other, read_function_name, 0);
+      /* Pick up some edge moves. */
+      propose_edge_moves(str, libs, liberties, &moves, other);
+    }
 
-  /* Try the moves collected so far. */
-  for (k = 0; k < moves.num; k++) {
-    int new_komaster;
-    int new_kom_pos;
-    int ko_move;
-    
-    if (stackp >= branch_depth && k > 0)
-      break;
-    xpos = moves.pos[k];
-    if (komaster_trymove(xpos, other, "attack3-A", str,
-			 komaster, kom_pos, &new_komaster, &new_kom_pos,
-			 &ko_move, stackp <= ko_depth && savecode == 0)) {
-      if (!ko_move) {
-	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
-	if (dcode != WIN && do_attack(str, NULL, new_komaster, new_kom_pos)) {
-	  popgo();
-	  CHECK_RESULT(savecode, savemove, dcode, xpos, move,
-	    	       "attack effective");
-	}
-	else
-	  popgo();
+    if (pass == 1) {
+      /* The simple ataris didn't work. Try something more fancy. */
+      if (stackp <= backfill_depth) {
+        find_cap_moves(str, &moves);
       }
-      else {
-	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
-	    && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
-	  savemove = xpos;
-	  savecode = KO_B;
-	}
-	popgo();
+
+      if (stackp <= fourlib_depth) {
+        draw_back_moves(str, &moves);
       }
     }
-  }
-    
-  /* The simple ataris didn't work. Try something more fancy. */
-  if (stackp <= backfill_depth) {
-    int acode = find_cap(str, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
-      			    "find cap3");
-  }
 
-  if (stackp <= fourlib_depth) {
-    int acode = draw_back(str, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
-      			    "draw back");
-  }
-
-  /* Try to defend chain links with two liberties. */
-  if (stackp <= backfill2_depth) {
-    int saved_num_moves = moves.num;
-    adj = chainlinks2(str, adjs, 2);
-    for (r = 0; r < adj; r++) {
-      int libs2[2];
-      findlib(adjs[r], 2, libs2);
-      if (approxlib(libs2[0], other, 4, NULL) > 3
-	  && approxlib(libs2[1], other, 4, NULL) > 3)
-	continue;
-      break_chain_moves(adjs[r], &moves);
-      break_chain2_moves(adjs[r], &moves, 1);
-      for (k = 0; k < 2; k++)
-	ADD_CANDIDATE_MOVE(libs2[k], 0, moves);
+    if (pass == 2) {
+      /* Try to defend chain links with two liberties. */
+      if (stackp <= backfill2_depth) {
+        adj = chainlinks2(str, adjs, 2);
+        for (r = 0; r < adj; r++) {
+          int libs2[2];
+          findlib(adjs[r], 2, libs2);
+          if (approxlib(libs2[0], other, 4, NULL) > 3
+	      && approxlib(libs2[1], other, 4, NULL) > 3)
+	    continue;
+          break_chain_moves(adjs[r], &moves);
+          break_chain2_moves(adjs[r], &moves, 1);
+          for (k = 0; k < 2; k++)
+	    ADD_CANDIDATE_MOVE(libs2[k], 0, moves);
+        }
+      }
     }
-    /* Only order and test the new set of moves. */
-    order_moves(str, &moves, other, read_function_name, saved_num_moves);
-    for (k = saved_num_moves; k < moves.num; k++) {
-      int new_komaster;
-      int new_kom_pos;
-      int ko_move;
 
-      if (stackp >= branch_depth && k > 0)
-	break;
-      xpos = moves.pos[k];
-      
-      if (komaster_trymove(xpos, other, "attack3-C", str,
-			   komaster, kom_pos, &new_komaster, &new_kom_pos,
-			   &ko_move, stackp <= ko_depth && savecode == 0)) {
-	if (!ko_move) {
-	  dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
-	  if (dcode != WIN
-	      && do_attack(str, NULL, new_komaster, new_kom_pos)) {
+    if (pass == 0 || pass == 1 || pass == 2) {
+
+      order_moves(str, &moves, other, read_function_name, saved_num_moves);
+
+      /* Try the moves collected so far. */
+      for (k = saved_num_moves; k < moves.num; k++) {
+        int new_komaster;
+        int new_kom_pos;
+        int ko_move;
+
+        if (stackp >= branch_depth && k > 0)
+          break;
+        xpos = moves.pos[k];
+        if (komaster_trymove(xpos, other, "attack3-A", str,
+			     komaster, kom_pos, &new_komaster,
+			     &new_kom_pos, &ko_move,
+			     stackp <= ko_depth && savecode == 0)) {
+          if (!ko_move) {
+	    dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
+	    if (dcode != WIN
+	        && do_attack(str, NULL, new_komaster, new_kom_pos)) {
+	      popgo();
+	      CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+	    	           "attack effective");
+	    }
+	    else
+	      popgo();
+          }
+          else {
+	    if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
+	        && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	      savemove = xpos;
+	      savecode = KO_B;
+	    }
 	    popgo();
-	    CHECK_RESULT(savecode, savemove, dcode, xpos, move,
-			 "attack effective");
-	  }
-	  else
-	    popgo();
-	}
-	else {
-	  if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
-	      && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
-	    savemove = xpos;
-	    savecode = KO_B;
-	  }
-	  popgo();
-	}
+          }
+        }
       }
+
+      saved_num_moves = moves.num;
     }
-  }
-    
+
+  if (pass == 3) {
   /* If nothing else works, we try filling a liberty of the
    * super_string.
    */
@@ -3564,7 +3547,8 @@ attack3(int str, int *move, int komaster, int kom_pos)
       }
     }
   }
-
+  }
+  }
   RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
@@ -3588,6 +3572,8 @@ attack4(int str, int *move, int komaster, int kom_pos)
   struct reading_moves moves;
   int savemove = 0;
   int savecode = 0;
+  int pass;
+  int saved_num_moves = 0;
 
   SETUP_TRACE_INFO("attack4", str);
   
@@ -3600,176 +3586,119 @@ attack4(int str, int *move, int komaster, int kom_pos)
     return 0;
   }
 
-  adj = chainlinks2(str, adjs, 1);
-  for (r = 0; r < adj; r++) {
-    int hpos;
-    break_chain_moves(adjs[r], &moves);
-    
-    findlib(adjs[r], 1, &hpos);
-    ADD_CANDIDATE_MOVE(hpos, 0, moves);
-  }
+  for (pass = 0; pass < 2; pass++) {
 
+    if (pass == 0) {
+      adj = chainlinks2(str, adjs, 1);
+      for (r = 0; r < adj; r++) {
+        int hpos;
+        break_chain_moves(adjs[r], &moves);
 
-  /* Defend against double atari in the surrounding chain early. */
-  double_atari_chain2_moves(str, &moves);
-
-  /* Give a score bonus to the chain preserving moves. */
-  for (k = 0; k < moves.num; k++)
-    moves.score[k] += 5;
-  
-  /* Get the four liberties of (str). */
-  liberties = findlib(str, 4, libs);
-  ASSERT1(liberties == 4, str);
-
-  for (k = 0; k < 4; k++) {
-    int apos = libs[k];
-    /* we only want to consider the move at (apos) if:
-     * stackp <= backfill_depth
-     * -or-  stackp <= depth and it is an isolated stone
-     * -or-  it is not in immediate atari
-     */
-    if (stackp <= backfill_depth
-	|| (stackp <= depth
-	    && board[SOUTH(apos)] != other
-	    && board[WEST(apos)] != other
-	    && board[NORTH(apos)] != other
-	    && board[EAST(apos)] != other)
-	|| !is_self_atari(apos, other))
-      ADD_CANDIDATE_MOVE(apos, 0, moves);
-
-    if (edge_closing_backfill(str, apos, &xpos))
-      ADD_CANDIDATE_MOVE(xpos, 10, moves);
-
-    /* Look for edge blocking moves. */
-    edge_block_moves(str, apos, &moves);
-  }
-
-  /* Pick up some edge moves. */
-  propose_edge_moves(str, libs, liberties, &moves, other);
-  order_moves(str, &moves, other, read_function_name, 0);
-
-  /* Try the moves collected so far. */
-  for (k = 0; k < moves.num; k++) {
-    int new_komaster;
-    int new_kom_pos;
-    int ko_move;
-
-    if (stackp >= branch_depth && k > 0)
-      break;
-    xpos = moves.pos[k];
-    /* Conditional ko capture is disabled because it seems to expensive. */
-    if (komaster_trymove(xpos, other, "attack4-A", str,
-			 komaster, kom_pos, &new_komaster, &new_kom_pos,
-			 &ko_move, 0 && stackp <= ko_depth && savecode == 0)) {
-      if (!ko_move) {
-	dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
-	if (dcode != WIN && do_attack(str, NULL, new_komaster, new_kom_pos)) {
-	  popgo();
-	  CHECK_RESULT(savecode, savemove, dcode, xpos, move,
-	    	       "attack effective");
-	}
-	else
-	  popgo();
+        findlib(adjs[r], 1, &hpos);
+        ADD_CANDIDATE_MOVE(hpos, 0, moves);
       }
-      else {
-	if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
-	    && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
-	  savemove = xpos;
-	  savecode = KO_B;
-	}
-	popgo();
+
+
+      /* Defend against double atari in the surrounding chain early. */
+      double_atari_chain2_moves(str, &moves);
+
+      /* Give a score bonus to the chain preserving moves. */
+      for (k = 0; k < moves.num; k++)
+        moves.score[k] += 5;
+
+      /* Get the four liberties of (str). */
+      liberties = findlib(str, 4, libs);
+      ASSERT1(liberties == 4, str);
+
+      for (k = 0; k < 4; k++) {
+        int apos = libs[k];
+        /* we only want to consider the move at (apos) if:
+         * stackp <= backfill_depth
+         * -or-  stackp <= depth and it is an isolated stone
+         * -or-  it is not in immediate atari
+         */
+        if (stackp <= backfill_depth
+	    || (stackp <= depth
+	        && board[SOUTH(apos)] != other
+	        && board[WEST(apos)] != other
+	        && board[NORTH(apos)] != other
+	        && board[EAST(apos)] != other)
+	     || !is_self_atari(apos, other))
+          ADD_CANDIDATE_MOVE(apos, 0, moves);
+
+        edge_closing_backfill_moves(str, apos, &moves);
+
+        /* Look for edge blocking moves. */
+        edge_block_moves(str, apos, &moves);
+      }
+
+      /* Pick up some edge moves. */
+      propose_edge_moves(str, libs, liberties, &moves, other);
+    }
+
+    if (pass == 1) {
+      if (stackp <= backfill_depth) {
+        find_cap_moves(str, &moves);
       }
     }
-  }
 
-  if (stackp <= backfill_depth) {
-    int acode = find_cap(str, &xpos, komaster, kom_pos);
-    CHECK_RESULT_UNREVERSED(savecode, savemove, acode, xpos, move,
-      			    "find cap");
+    if (pass == 0 || pass == 1) {
+      order_moves(str, &moves, other, read_function_name, saved_num_moves);
+
+      /* Try the moves collected so far. */
+      for (k = saved_num_moves; k < moves.num; k++) {
+        int new_komaster;
+        int new_kom_pos;
+        int ko_move;
+
+        if (stackp >= branch_depth && k > 0)
+          break;
+        xpos = moves.pos[k];
+        /* Conditional ko capture is disabled
+	 * because it seems too expensive.
+	 * */
+        if (komaster_trymove(xpos, other, "attack4-A", str,
+			     komaster, kom_pos, &new_komaster,
+			     &new_kom_pos, &ko_move,
+			     0 && stackp <= ko_depth && savecode == 0)) {
+          if (!ko_move) {
+	    dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
+	    if (dcode != WIN && do_attack(str, NULL, new_komaster,
+				          new_kom_pos)) {
+	      popgo();
+	      CHECK_RESULT(savecode, savemove, dcode, xpos, move,
+	    	           "attack effective");
+	    }
+	    else
+	      popgo();
+          }
+          else {
+	    if (do_find_defense(str, NULL, new_komaster, new_kom_pos) != WIN
+	        && do_attack(str, NULL, new_komaster, new_kom_pos) != 0) {
+	      savemove = xpos;
+	      savecode = KO_B;
+	    }
+	    popgo();
+          }
+        }
+      }
+      saved_num_moves = moves.num;
+    }
   }
 
   RETURN_RESULT(savecode, savemove, move, "saved move");
 }
 
 
-/* find_cap2(str, alib, blib, &i, &j, komaster)
- * looks for a configuration of the following type:
- *
- *  X.
- *  .*
- *
- * where X is an element of the string in question. It tries the
- * move at * and returns true this move captures the string, leaving
- * (i, j) pointing to *.
- */
-
-static int
-find_cap2(int str, int alib, int blib, int *move, int komaster, int kom_pos)
-{
-  int ai, aj;
-  int bi, bj;
-
-  /* Check if the two liberties are located like the figure above. */
-  if (alib != SW(blib)
-      && alib != NW(blib)
-      && alib != NE(blib)
-      && alib != SE(blib))
-    return 0;
-
-  ai = I(alib);
-  aj = J(alib);
-  bi = I(blib);
-  bj = J(blib);
-  /* Which of the two corner points should we use? One of them is
-   * always occupied by the string at (str), the other one is either
-   * free or occupied by something else.
-   */
-  if (BOARD(bi, aj) == EMPTY)
-    *move = POS(bi, aj);
-  else if (BOARD(ai, bj) == EMPTY)
-    *move = POS(ai, bj);
-  else
-    return 0;
-
-  /* Ok, we found the spot. Now see if the move works. */
-  RTRACE("trying to capture %1m with capping move at %1m\n", str, *move);
-  if (trymove(*move, OTHER_COLOR(board[str]), "find_cap2", str,
-	      komaster, kom_pos)) {
-    int dcode = do_find_defense(str, NULL, komaster, kom_pos);
-    popgo();
-    switch (dcode) {
-    case 0:
-      RTRACE("cap2 succeeded!\n");
-      return WIN;
-      break;
-    case WIN:
-      RTRACE("cap2 failed!\n");
-      return 0;
-      break;
-    case KO_B:
-      RTRACE("cap2 succeeded with ko return code KO_B\n");
-      return KO_B;
-      break;
-    case KO_A:
-      RTRACE("cap2 succeeded with ko return code KO_A\n");
-      return KO_A;
-      break;
-    }
-  }
-
-  return 0;
-}
-
-
-/* If (str) points to a string with 2 - 4 liberties, find_cap(str, &move)
+/* If (str) points to a string with 2 - 4 liberties,
+ * find_cap_moves(str, &moves)
  * looks for a configuration of the following type:
  *
  *  Xa
  *  b*
  *
  * where X are elements of the string in question and a and b are
- * two of its liberties. It tries the move at * and returns true
- * this move captures the string, leaving (*move) pointing to *.
+ * two of its liberties.
  *
  * For larger strings, this can find moves like
  *
@@ -3782,39 +3711,46 @@ find_cap2(int str, int alib, int blib, int *move, int komaster, int kom_pos)
  * even though they are not capping moves.
  */
 
-static int
-find_cap(int str, int *move, int komaster, int kom_pos)
+static void
+find_cap_moves(int str, struct reading_moves *moves)
 {
   int alib, blib;
   int numlibs;
   int libs[4];
-  int xpos = 0;
   int i,j;
-  int savemove = 0;
-  int savecode = 0;
-  int acode;
+  int ai, aj;
+  int bi, bj;
 
   numlibs = findlib(str, 4, libs);
   if (numlibs > 4 || numlibs < 2)
-    return 0;
+    return;
 
-  for (i = 0; i < numlibs - 1; i++)
+  for (i = 0; i < numlibs - 1; i++) {
     for (j = i + 1; j < numlibs; j++) {
       alib = libs[i];
       blib = libs[j];
 
-      acode = find_cap2(str, alib, blib, &xpos, komaster, kom_pos);
-      if (acode == WIN) {
-        *move = xpos;
-        return WIN;
-      }
-      UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
+      /* Check if the two liberties are located like the figure above. */
+      if (alib != SW(blib)
+          && alib != NW(blib)
+          && alib != NE(blib)
+          && alib != SE(blib))
+        continue;
+
+      ai = I(alib);
+      aj = J(alib);
+      bi = I(blib);
+      bj = J(blib);
+      /* Which of the two corner points should we use? One of them is
+       * always occupied by the string at (str), the other one is either
+       * free or occupied by something else.
+       */
+      if (BOARD(bi, aj) == EMPTY)
+        ADD_CANDIDATE_MOVE(POS(bi, aj), 10, *moves);
+      else if (BOARD(ai, bj) == EMPTY)
+        ADD_CANDIDATE_MOVE(POS(ai, bj), 10, *moves);
     }
-
-  if (savecode != 0)
-    *move = savemove;
-
-  return savecode;
+  }
 }
 
 
@@ -3832,15 +3768,13 @@ find_cap(int str, int *move, int komaster, int kom_pos)
  * fairly similar to this situation.
  */
 
-static int
-special_attack2(int str, int libs[2], int *move, int komaster, int kom_pos)
+static void
+special_attack2_moves(int str, int libs[2], struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
   int newlibs[3];
   int xpos;
-  int savemove = 0;
-  int savecode = 0;
   int k;
 
   for (k = 0; k < 2; k++) {
@@ -3851,26 +3785,11 @@ special_attack2(int str, int libs[2], int *move, int komaster, int kom_pos)
       else
 	xpos = newlibs[1];
 
-      if (!is_self_atari(xpos, other)
-	  && trymove(xpos, other, "special_attack2", str, komaster, kom_pos)) {
-	int dcode = do_find_defense(str, NULL, komaster, kom_pos);
-	if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-	  if (dcode == 0) {
-	    popgo();
-	    *move = xpos;
-	    return WIN;
-	  }
-	  UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
-	}
-	popgo();
+      if (!is_self_atari(xpos, other)) {
+	ADD_CANDIDATE_MOVE(xpos, 0, *moves);
       }
     }
   }
-
-  if (savecode != 0)
-    *move = savemove;
-
-  return savecode;
 }
 
 
@@ -3886,18 +3805,12 @@ special_attack2(int str, int libs[2], int *move, int komaster, int kom_pos)
  * the code that follows can find the attacking move at c.
  */
 
-static int
-special_attack3(int str, int libs[2], int *move, int komaster, int kom_pos)
+static void
+special_attack3_moves(int str, int libs[2], struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int acode;
-  int dcode;
-  int savemove = 0;
-  int savecode = 0;
-  int newlibs[2];
   int xpos;
-  int ypos;
   int apos;
   int bpos;
   int k;
@@ -3925,49 +3838,11 @@ special_attack3(int str, int libs[2], int *move, int komaster, int kom_pos)
 	continue;
     }
     else
-      return 0; /* Incorrect configuration, give up. */
+      return; /* Incorrect configuration, give up. */
 
-    if (is_self_atari(xpos, other)
-	|| !trymove(xpos, other, "special_attack3-A", str, komaster, kom_pos))
-      continue;
-
-    if (countlib(xpos) == 2) {
-      findlib(xpos, 2, newlibs);
-      if (newlibs[0] == apos)
-	ypos = newlibs[1];
-      else
-	ypos = newlibs[0];
-
-      if (!is_self_atari(ypos, color)
-	  && trymove(ypos, color, "special_attack3-B", str,
-		     komaster, kom_pos)) {
-	acode = do_attack(str, NULL, komaster, kom_pos);
-	if (acode == 0) {
-	  popgo();
-	  popgo();
-	  continue;
-	}
-	UPDATE_SAVED_KO_RESULT_UNREVERSED(savecode, savemove, acode, xpos);
-	popgo();
-      }
-    }
-
-    dcode = do_find_defense(str, NULL, komaster, kom_pos);
-    if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-      if (dcode == 0) {
-	popgo();
-	*move = xpos;
-	return WIN;
-      }
-      UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, xpos);
-    }
-    popgo();
+    if (!is_self_atari(xpos, other))
+      ADD_CANDIDATE_MOVE(xpos, 0, *moves);
   }
-
-  if (savecode != 0)
-    *move = savemove;
-
-  return savecode;
 }
 
 
@@ -3982,14 +3857,11 @@ special_attack3(int str, int libs[2], int *move, int komaster, int kom_pos)
  * the code that follows can find the attacking move at *.
  */
 
-static int
-special_attack4(int str, int libs[2], int *move, int komaster, int kom_pos)
+static void
+special_attack4_moves(int str, int libs[2], struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
-  int dcode;
-  int savemove = 0;
-  int savecode = 0;
   int adj, adjs[MAXCHAIN];
   int adj2, adjs2[MAXCHAIN];
   int libs2[2];
@@ -4009,7 +3881,7 @@ special_attack4(int str, int libs[2], int *move, int komaster, int kom_pos)
    */
   if (!is_self_atari(libs[0], other) 
       || !is_self_atari(libs[1], other))
-    return 0;
+    return;
 
   /* Pick up chain links with 2 liberties. */
   adj = chainlinks2(str, adjs, 2);
@@ -4064,27 +3936,10 @@ special_attack4(int str, int libs[2], int *move, int komaster, int kom_pos)
 	if (elibs > dlibs)
 	  continue;
 
-	if (trymove(dpos, other, "special_attack4", str, komaster, kom_pos)) {
-	  dcode = do_find_defense(str, NULL, komaster, kom_pos);
-
-	  if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-	    if (dcode == 0) {
-	      popgo();
-	      *move = dpos;
-	      return WIN;
-	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, dpos);
-	  }
-	  popgo();
-	}
+	ADD_CANDIDATE_MOVE(dpos, 0, *moves);
       }
     }
   }
-
-  if (savecode != 0)
-    *move = savemove;
-
-  return savecode;
 }
 
 
@@ -4101,14 +3956,12 @@ special_attack4(int str, int libs[2], int *move, int komaster, int kom_pos)
  *
  */
 
-static int
-draw_back(int str, int *move, int komaster, int kom_pos)
+static void
+draw_back_moves(int str, struct reading_moves *moves)
 {
   int r, k;
   int adj, adjs[MAXCHAIN];
   int libs[2];
-  int savemove = 0;
-  int savecode = 0;
 
   adj = chainlinks2(str, adjs, 2);
   for (r = 0; r < adj; r++) {
@@ -4123,27 +3976,10 @@ draw_back(int str, int *move, int komaster, int kom_pos)
 	             && liberty_of_string(NORTH(libs[k]), str))
 	      || (ON_BOARD1(EAST(libs[k]))
 	             && liberty_of_string(EAST(libs[k]), str)))) {
-	if (trymove(libs[k], OTHER_COLOR(board[str]), "draw_back", str,
-		    komaster, kom_pos)) {
-	  int dcode = do_find_defense(str, NULL, komaster, kom_pos);
-	  if (dcode != WIN && do_attack(str, NULL, komaster, kom_pos)) {
-	    if (dcode == 0) {
-	      popgo();
-	      *move = libs[k];
-	      return WIN;
-	    }
-	    UPDATE_SAVED_KO_RESULT(savecode, savemove, dcode, libs[k]);
-	  }
-	  popgo();
-	}
+	ADD_CANDIDATE_MOVE(libs[k], 0, *moves);
       }
     }
   }
-
-  if (savecode != 0)
-    *move = savemove;
-
-  return savecode;
 }
 
 /* In the following position the reading is much simplifed if we start
@@ -4166,8 +4002,8 @@ draw_back(int str, int *move, int komaster, int kom_pos)
  * and b and c do not contain more O stones than X stones.
  */
 
-static int
-edge_closing_backfill(int str, int apos, int *move)
+static void
+edge_closing_backfill_moves(int str, int apos, struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -4182,7 +4018,7 @@ edge_closing_backfill(int str, int apos, int *move)
     if (ON_BOARD(apos - up))
       continue;
     if (board[apos + up] != color)
-      return 0;
+      return;
     if (board[apos + right] == EMPTY
 	&& (!ON_BOARD(apos - right) 
 	    || board[apos - right] == color))
@@ -4194,14 +4030,14 @@ edge_closing_backfill(int str, int apos, int *move)
       right = -right;
     }
     else
-      return 0;
+      return;
     
     if (board[apos + up + right] != other)
-      return 0;
+      return;
 
     bpos = apos + up + 2 * right;
     if (!ON_BOARD(bpos))
-      return 0;
+      return;
 
     cpos = apos + 2 * right;
 
@@ -4218,13 +4054,11 @@ edge_closing_backfill(int str, int apos, int *move)
       number_o++;
 
     if (number_o > number_x)
-      return 0;
+      return;
 
-    *move = apos + right;
-    return WIN;
+    ADD_CANDIDATE_MOVE(apos + right, 0, *moves);
+    return;
   }
-
-  return 0;
 }
 
 

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- don't crash reading a bogus sgf file
+- more reading functions use candidate move mechanism
 - new fast_defense() looks for fast ways to get liberties
 - switch strings sometimes in defend_both
 - atari_atari tuning
