@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.31 released April 4, 2002
+
 - boardsize field added to persistent caches in reading.c and owl.c
 - break_chain_efficient_moves() revised
 - new function reduced_init_owl() in owl.c

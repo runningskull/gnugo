@@ -1,0 +1,39 @@
+(;GM[1]FF[4]
+SZ[19]HA[2]KM[0.5]
+PW[GnuGo (GNU Go 3.1.30)]WR[13k*]
+PB[merlin]BR[15k*]
+PC[NNGS]DT[2002-04-04]AP[gnugoclient:2.0]
+RE[W+31.5]
+AB[pd][dp]
+;W[dd];B[qp];W[nc];B[qf];W[pb];B[qc];W[kc];B[pj];W[op];B[pn];W[qq]
+;B[pq];W[pp];B[rp];W[oq]C[L:8];B[fc];W[cn]C[L:9];B[fq];W[bp]C[L:10]
+;B[db];W[kp]C[L:9];B[jq];W[kq]C[L:10];B[cf];W[df];B[de];W[ee]C[L:8]
+;B[ce];W[ck]C[L:7];B[ef];W[dg]C[L:5];B[ed];W[cg]C[L:6];B[fe];W[cq]
+C[L:7];B[dq];W[jr]C[L:8];B[iq];W[hc]C[L:9];B[ol];W[ne]C[L:10];B[oh]
+;W[bg];B[bf];W[rq];B[ir];W[sp];B[ro];W[so];B[sn];W[kr];B[sq];W[sr]
+;B[sp];W[rs];B[mp];W[kn];B[mn];W[kl];B[en];W[ho];B[hg];W[lk];B[lg]
+;W[qb];B[di];W[bi];B[id];W[ic];B[kd];W[rc];B[rd];W[ld];B[le];W[jd]
+;B[ke];W[je];B[md];W[lc]C[L:8];B[nd];W[mc]C[L:9];B[mi];W[od]C[L:10]
+;B[me];W[oe]C[L:7];B[ie];W[rb]C[L:8];B[of];W[jf]C[L:9];B[jg];W[cr]
+C[L:10];B[nf];W[pe];B[qe];W[pc];B[qd];W[dr];B[er];W[hl];B[fm];W[hi]
+;B[fj];W[gj];B[fh];W[ji];B[kj];W[jj];B[kk];W[jk];B[li];W[mm];B[ml]
+;W[no];B[nn];W[mo];B[nm];W[ll];B[lm];W[is];B[hs];W[js]C[L:9];B[hq]
+;W[if];B[he];W[ig]C[L:10];B[ih];W[jh];B[hf];W[dm];B[fl];W[gb];B[fb]
+;W[kf];B[kg];W[hh];B[gh];W[po];B[hm];W[im];B[mk];W[gm];B[gn];W[hn]
+;B[go];W[gl];B[io];W[hp];B[jo];W[jp];B[ip];W[ko];B[gp];W[ln];B[km]
+;W[jm];B[mm];W[lj];B[ki];W[gi];B[fi];W[co];B[do];W[mj];B[nj];W[jl]
+;B[in];W[hm];B[gr];W[pf];B[pg];W[oc];B[lf];W[jc];B[cj];W[bj];B[dk]
+;W[cl];B[dl];W[fk];B[ek];W[gk];B[dn];W[em];B[el];W[cm];B[ci];W[sc]
+;B[sd];W[jn];B[qo];W[eg];B[fg];W[af];B[ae];W[ag];B[eh];W[es];B[fs]
+;W[ds];B[ch];W[bh];B[gc];W[ha];B[hd];W[kh];B[lh];W[fa];B[ea];W[ga]
+;B[ia];W[hb];B[pr];W[or];B[ps];W[on];B[om];W[qn];B[qm];W[pm];B[rn]
+;W[ql];B[pl];W[rm];B[qk];W[rk];B[rj];W[sj];B[si];W[sk];B[ri];W[cp]
+;B[];W[dh];B[];W[]
+C[R5 removed
+Q2 removed
+N4 removed
+J19 removed
+D16 removed
+J12 removed
+final_score: W+31.5]
+)

@@ -1,3 +1,15 @@
+======================= 3.1.31 =========================
+
+./regress.sh . filllib.tst
+34 unexpected PASS!
+./regress.sh . global.tst
+1 unexpected PASS!
+./regress.sh . strategy4.tst
+194 unexpected PASS!
+199 unexpected FAIL: Correct 'N5|S18', got 'B2'
+219 unexpected FAIL: Correct 'K9', got 'M11'
+220 unexpected FAIL: Correct 'R6', got 'M11'
+
 ======================= 3.1.30 =========================
 
 The unexpected FAILs are all new tests.

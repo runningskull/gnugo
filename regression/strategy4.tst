@@ -230,7 +230,7 @@ loadsgf games/bretz.sgf 26
 
 loadsgf games/bretz.sgf 58
 194 gg_genmove black
-#? [A13]*
+#? [A13]
 
 loadsgf games/bretz.sgf 88
 195 gg_genmove black
@@ -253,7 +253,7 @@ loadsgf games/bretz.sgf 148
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 164
 199 gg_genmove black
-#? [N5|S18]
+#? [N5|S18]*
 
 #Tenuki at S18 is not unthinkable. (3.1.14) -trevor
 loadsgf games/bretz.sgf 212
@@ -342,6 +342,16 @@ loadsgf games/handtalk.sgf 49
 loadsgf games/handtalk.sgf 55
 218 gg_genmove black
 #? [!E12]*
+
+# lots of good problems in this game
+loadsgf games/nngs/gnugo-3.1.30-morlvera-200204041921.sgf 154
+219 gg_genmove white
+#? [K9]*
+
+loadsgf nngs/gnugo-3.1.30-merlin-200204041428.sgf 189
+220 gg_genmove white
+#? [R6]*
+
 
 ############ End of Tests #################
 

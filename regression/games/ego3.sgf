@@ -1,0 +1,56 @@
+W is a program of Bruce Wilcox's called superego. It seems
+slower and stronger than ego. This was played after the
+ladder game on April 4, 2002.
+
+(;
+GM[1]US[Brought to you by No Name Go Server]
+CoPyright[
+  This game was played on the No Name Go Server
+  Permission to reproduce this game is given.]
+GN[ego-FSF(B) NNGS]
+EV[None]
+RE[B+Resign]
+PW[ego]WR[NR ]
+PB[FSF (GNU Go 3.1.30)]BR[17k ]
+PC[NNGS Worldwide: nngs.cosmic.org 9696]
+DT[2002-04-04]
+SZ[19]TM[1200]KM[0.5]
+
+;B[qd]C[
+ gunnar started observation.
+]
+;W[dp];B[pq];W[dd];B[oc];W[dj];B[cn];W[jd];B[en];W[fq];B[po];W[df]C[
+ cerrand started observation.
+]
+;B[fc];W[dc];B[jq];W[cl]C[
+ ingwa started observation.
+]
+;B[bp];W[cq];B[qj];W[hc];B[gn];W[mc]C[
+ coco started observation.
+]
+;B[me];W[nd];B[mg];W[mi];B[oj];W[oi];B[qg];W[nj];B[ok];W[og];B[ml];W[fd]
+;B[lh];W[nf];B[ne];W[kc];B[mq];W[nh];B[li];W[oe];B[fj];W[fi];B[gi];W[ei]
+;B[jg];W[od];B[pc];W[hh];B[hi];W[gh];B[hp]C[
+ Micke started observation.
+]
+;W[bq];B[lk];W[bo];B[bn];W[ap];B[fk];W[hq];B[iq];W[hr];B[ir];W[ji];B[ih]
+;W[ii];B[hj];W[jk];B[ij];W[jj]C[
+ duchamp started observation.
+]
+;B[hg];W[kg];B[kf];W[mf];B[lf]C[
+ pem started observation.
+]
+;W[lj];B[kh];W[kj];B[ld];W[ie];B[ph];W[kd];B[pf];W[ng];B[jm];W[ge];B[hs]
+;W[bm];B[gs];W[gq];B[nb];W[lc];B[ka];W[el];B[fl];W[em];B[er];W[kl];B[eq]
+;W[fn];B[ep]C[
+ beckham started observation.
+ guest started observation.
+ morlvera started observation.
+]
+;W[eo];B[fm];W[dn];B[fp];W[an];B[km];W[pi];B[qi];W[nk];B[nl];W[lm];B[ll]
+;W[mk];B[ia];W[gb];B[ik];W[of];B[fo];W[jc];B[jl];W[kk];B[mb];W[ek];B[pk]C[
+ bump started observation.
+]
+;W[jb];B[ja];W[en];B[pe];W[kb];B[lb];W[dr];B[dq];W[cr];B[ds];W[ib];B[ha]
+;W[mn];B[ga]
+;)

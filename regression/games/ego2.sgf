@@ -1,0 +1,51 @@
+On April 4, 2002, GNU Go played with Ego in the 19x19 ladder and won.
+Here is the game record.
+
+(;
+GM[1]US[Brought to you by No Name Go Server]
+CoPyright[
+  This game was played on the No Name Go Server
+  Permission to reproduce this game is given.]
+GN[FSF-ego(B) NNGS]
+EV[None]
+RE[W+131.5]
+PB[FSF (GNU Go 3.1.30)]BR[17k ]
+PB[ego]BR[NR ]
+PC[NNGS Worldwide: nngs.cosmic.org 9696]
+DT[2002-04-04]
+SZ[19]TM[1200]KM[0.5]
+
+;B[qp];W[dp];B[pc];W[oq];B[pq];W[op]C[
+ cerrand started observation.
+]
+;B[cd];W[ec];B[dc];W[ed]C[
+ gunnar started observation.
+]
+;B[df];W[pe];B[qe];W[qf];B[qd];W[pf];B[od];W[qj];B[qm];W[id];B[cq];W[cp]
+;B[dq];W[eq];B[er]C[
+ gunnar 3k : tell 50 No corner for white today. (25)
+]
+;W[fq];B[fr];W[gq];B[bp];W[bo];B[bq];W[cn];B[cg];W[kq];B[pd];W[lc];B[cl]
+;W[ff];B[el];W[dh];B[bi];W[gr];B[om];W[eb];B[db];W[rf];B[re];W[or];B[pr]
+;W[nf];B[rb];W[nk];B[ok];W[oj];B[nj];W[nl];B[ol];W[mj];B[ni];W[mi];B[mk]
+;W[mh];B[oi];W[pj];B[ml];W[nm];B[mn];W[nn];B[no];W[on];B[oo];W[pn];B[og]C[
+ duchamp started observation.
+]
+;W[qn];B[ql];W[rm];B[po];W[mp];B[mo];W[mm];B[rl];W[ro];B[pp];W[nc];B[of]
+;W[pm];B[lm];W[oe];B[oh];W[nd];B[kl];W[ln];B[rj];W[rq];B[eg];W[pl];B[rk]C[
+ coco started observation.
+]
+;W[ko];B[np];W[mq];B[fi];W[hh];B[hi];W[ii];B[hj];W[en];B[gh];W[hg];B[ij]
+;W[ji];B[jj];W[hn];B[eh];W[lj];B[kn];W[lo];B[jo];W[jn];B[kj];W[io];B[ki]
+;W[kk];B[jk];W[lk];B[jl];W[ll];B[km];W[jg];B[kg];W[qh];B[me];W[mf];B[jf]
+;W[kh];B[lh];W[jh];B[lg];W[li];B[mg];W[if];B[je];W[ie];B[jd];W[le];B[jc]
+;W[hb];B[lf];W[ng];B[kf];W[kb];B[ld];W[jb];B[di];W[da];B[ca];W[ea];B[bb]
+;W[bm];B[bl];W[gl];B[gg];W[gf];B[ob];W[nb];B[sf];W[sg];B[se];W[ri];B[fk]
+;W[fs];B[dr];W[fl];B[ek];W[ee];B[em];W[fm];B[dm];W[dn];B[de];W[es];B[ds]
+;W[gs];B[bs];W[oc];B[pb];W[gk];B[ar];W[gj];B[gi];W[oa];B[pa];W[na];B[am]
+;W[an];B[im];W[al];B[bk];W[hm];B[hl];W[hk];B[ik];W[ak];B[aj];W[am];B[in]
+;W[jp];B[ap];W[il];B[jm];W[jo];B[fg];W[fj];B[ej];W[hl];B[dd];W[ao];B[ef]
+;W[cm];B[tt];W[tt]C[
+ bump started observation.
+]
+;)

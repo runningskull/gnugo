@@ -113,4 +113,4 @@ loadsgf games/filllib10.sgf
 33 gg_genmove white
 #? [PASS]
 34 gg_genmove black
-#? [PASS]*
+#? [PASS]
