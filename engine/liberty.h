@@ -582,6 +582,7 @@ int play_connect_n(int color, int do_connect, int num_moves, ...);
 int cut_possible(int pos, int color);
 int defend_against(int move, int color, int apos);
 int somewhere(int color, int check_alive, int num_moves, ...);
+int visible_along_edge(int color, int apos, int bpos);
 
 /* Printmoyo values, specified by -m flag. */
 #define PRINTMOYO_TERRITORY         0x01

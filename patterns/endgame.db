@@ -627,12 +627,14 @@ Pattern EE406
 
 
 Pattern EE407
+# gf Increased value. (3.3.14)
+# Give it a little more than 0.5 points in order to fill before capturing.
 
 |OX?     fill ko at end of game
 |*OX     1/2 point gote
 +---
 
-:8,X,terri(0.5)
+:8,X,terri(0.6)
 
 |aX?
 |*OX
@@ -642,12 +644,14 @@ Pattern EE407
 
 
 Pattern EE408
+# gf Increased value. (3.3.14)
+# Give it a little more than 0.5 points in order to fill before capturing.
 
 |XO?     fill ko at end of game
 |O*O     1/2 point gote
 +---
 
-:8,X,terri(0.5)
+:8,X,terri(0.6)
 
 |Xa?
 |O*O
@@ -731,12 +735,14 @@ Pattern EE414
 ################################
 
 Pattern EE501
+# gf Increased value. (3.3.14)
+# Give it a little more than 0.5 points in order to fill before capturing.
 
 ?OX?     fill ko at end of game
 O*OX     1/2 point gote
 ----
 
-:8,X,terri(0.5)
+:8,X,terri(0.6)
 
 ?aX?
 O*OX
@@ -1044,12 +1050,14 @@ ac
 ######################################################################
 
 Pattern CE1
+# gf Increased value. (3.3.14)
+# Give it a little more than 0.5 points in order to fill before capturing.
 
 ?OX?     fill ko at end of game
 O*OX     1/2 point gote
 ?OX?
 
-:-,X,terri(0.5)
+:-,X,terri(0.6)
 
 ?OX?
 a*OX

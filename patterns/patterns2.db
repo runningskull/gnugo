@@ -3088,6 +3088,7 @@ db*
 
 
 Pattern DD5
+# gf Exclude this pattern when scoring. (3.3.14)
 # This is somewhat wimpy. We should do more exact reading to verify
 # whether it really is necessary.
 
@@ -3101,7 +3102,8 @@ Xcc
 ba.
 b.*
 
-;lib(c)<=4 && xplay_attack(a,b) && safe_xmove(a) && odefend_against(*,a)
+;!doing_scoring
+;&& lib(c)<=4 && xplay_attack(a,b) && safe_xmove(a) && odefend_against(*,a)
 
 >add_defend_both_move(b,c);
 

@@ -2001,6 +2001,18 @@ Pattern 6002
 
 
 Pattern 6003
+# Bent four in the corner.
+
+ !
+|.
+|X
+|.*.
++---
+
+:1122
+
+
+Pattern 6004
 # Special corner shape
 
 |*X.

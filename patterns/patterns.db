@@ -10682,6 +10682,19 @@ oo.b?
 ;!attack(D) && !xplay_defend_both(a,b,c)
 
 
+Pattern ED95
+# gf New pattern. (3.3.14)
+
+...xx
+.O.Xx      fourth line sente kosumi
+..*..
+.....
+.....
+-----
+
+:8,OXea
+
+
 #####################################################################
 #
 # Center defend/attack patterns
@@ -11132,13 +11145,14 @@ DcE.
 
 
 Pattern CD94
+# gf Split and revised. (3.3.14)
 
 ????????       jump out
 ????????
 ........
 ..*.....
 X...????
-?.O..???
+x.O..???
 
 :8,OXEad,shape(4)
 
@@ -11147,9 +11161,31 @@ X...????
 ........
 ..*.....
 X...abcd
-?.O..???
+x.O..???
 
 ; x_alive_somewhere(a,b,c,d)
+
+
+Pattern CD94b
+# gf Split and revised. (3.3.14)
+
+????????       jump out
+????????
+........
+..*.....
+X...????
+O.O..???
+
+:8,OXEad,shape(4)
+
+????????
+????????
+........
+..*.....
+Xe..abcd
+f.O..???
+
+; x_alive_somewhere(a,b,c,d) && oplay_connect(*,e,*,f)
 
 
 Pattern CD95
@@ -12199,7 +12235,7 @@ OO....*.x
 .........
 ---------
 
-:8,seEd,shape(3)
+:8,sed,shape(3)
 
 
 Pattern EJ51
@@ -12688,15 +12724,70 @@ Pattern EJ80
 
 Pattern EJ81
 # db added (3.1.4)
+# gf Revised. (3.3.14)
 
-?....x.       seal the side      
-?O.O...
-o..*.X.
-.......
-.......
--------
+?....x..       seal the side
+?O.O....
+o..*.X.x
+........
+........
+--------
 
 :8,j
+
+?....x..
+?O.O....
+o..*.Abx
+........
+........
+--------
+
+;x_visible_along_edge(A,b)
+
+
+Pattern EJ81b
+# gf New pattern. (3.3.14)
+
+?....X....	 seal the side to attack
+?O.O...ooo
+o..*.X.ooo
+..........
+..........
+----------
+
+:8,j
+
+?....X....
+?O.O...def
+o..*.X.abc
+..........
+..........
+----------
+
+;o_somewhere(a,b,c,d,e,f)
+
+
+Pattern EJ81c
+# gf New pattern. (3.3.14)
+# FIXME: May wish to prefer other pincers in some situations.
+
+?.........	 pincer
+?O.O......
+o....X.*..
+..........
+..........
+----------
+
+:8,j
+
+?.........
+?O.O......
+o....Ab*..
+..........
+..........
+----------
+
+;o_visible_along_edge(A,b)
 
 
 Pattern EJ82
@@ -13547,7 +13638,7 @@ O.Xx      fourth line sente kosumi
 ....
 ----
 
-:8,OXeE
+:8,OXe
 
 
 Pattern LE2

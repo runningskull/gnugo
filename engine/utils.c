@@ -208,6 +208,70 @@ somewhere(int color, int check_alive, int num_moves, ...)
   return 0;
 }
 
+/* Search along the edge for the first visible stone. Start at apos
+ * and move in the direction of bpos. Return 1 if the first visible
+ * stone is of the given color. It is required that apos and bpos are
+ * at the same distance from the edge.
+ *
+ * FIXME: The detection of the first visible stone is quite crude and
+ * probably needs to be improved.
+ */
+int
+visible_along_edge(int color, int apos, int bpos)
+{
+  int ai = I(apos);
+  int aj = J(apos);
+  int bi = I(bpos);
+  int bj = J(bpos);
+  int pos;
+  int forward;
+  int up;
+  ASSERT1((ai == bi) ^ (aj == bj), apos);
+
+  if (ai == bi) {
+    if (aj > bj)
+      forward = WEST(0);
+    else
+      forward = EAST(0);
+
+    if (ai < board_size/2) {
+      pos = POS(0, bj);
+      up = SOUTH(0);
+    }
+    else {
+      pos = POS(board_size - 1, bj);
+      up = NORTH(0);
+    }
+  }
+  else {
+    if (ai > bi)
+      forward = NORTH(0);
+    else
+      forward = SOUTH(0);
+
+    if (aj < board_size/2) {
+      pos = POS(bi, 0);
+      up = EAST(0);
+    }
+    else {
+      pos = POS(bi, board_size - 1);
+      up = WEST(0);
+    }
+  }
+  
+  for (; ON_BOARD(pos); pos += forward) {
+    int k;
+    for (k = 4; k >= 0; k--) {
+      ASSERT_ON_BOARD1(pos + k * up);
+      if (board[pos + k * up] == color)
+	return 1;
+      else if (board[pos + k * up] == OTHER_COLOR(color))
+	return 0;
+    }
+  }
+
+  return 0;
+}
 
 /* The function play_break_through_n() plays a sequence of moves,
  * alternating between the players and starting with color. After
