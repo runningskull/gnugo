@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revision of interface/emacs.el
+- new interface/xpms/*xpm, make-gnugo-xpms.el and gnugo-xpms.el
+
 3.6 pre 3 released October 26, 2004
 
 - doc revision

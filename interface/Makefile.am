@@ -2,7 +2,9 @@ bin_PROGRAMS = gnugo
 
 SUBDIRS = debugboard
 
-EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el GoImage
+EXTRA_DIST = gtp_examples gnugo.dsp gnugo.el make-xpms-file.el GoImage
+
+GGBUILTSOURCES = gnugo-xpms.el
 
 noinst_HEADERS = interface.h gmp.h gtp.h
 
@@ -29,6 +31,9 @@ gnugo_SOURCES = \
 	play_test.c \
 	gmp.c \
 	gtp.c
+
+gnugo-xpms.el : $(shell ls xpms/*.xpm)
+	emacs -batch --no-site-file -l make-xpms-file.el -f make-xpms-file $@ $(shell ls xpms/*.xpm)
 
 AIXOPTS=-O -qmaxmem=16384 -qro -qroconst -qinfo
 
