@@ -529,10 +529,11 @@ Pattern EE404
 
 
 Pattern EE405
+# gf Made main diagram consistent with constraint diagram. (3.1.18)
 
-|XO      endgame move
-|.*      one point gote
-+--
+|XO?      endgame move
+|.*.      one point gote
++---
 
 :8,bOX,terri(1)
 

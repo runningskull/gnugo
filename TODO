@@ -46,8 +46,8 @@ engine internals.  The issues are presented here in an approximate
 order of perceived difficulty.
 
 1. Add a check in patterns/mkpat.c that the main diagram and the
-   constraint diagram are consistent. A partial implementation would
-   only make sure that they have the same size.
+   constraint diagram are consistent. Currently it is only verified
+   that they have the same size.
 
 2. Complete the conversion to 1-dimensional representation.
    Check all comments before functions to make them agree with

@@ -10,6 +10,7 @@
 - combinations() reports multiple defense moves when the opponent
   has an atari_atari attack sequence
 - new gtp commands owl_connection_defends and owl_substantial
+- mkpat checks that main diagram and constraint diagram have the same size 
 - mkpat stricter in parsing of classification field
 - new function gg_sort() in gg_utils.c
 - all calls to qsort() replaced by calls to gg_sort()

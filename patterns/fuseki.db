@@ -914,6 +914,7 @@ Pattern F410a
 
 
 Pattern F410b
+# gf Made constraint diagram consistent with main diagram. (3.1.18)
 
 x........??           extend
 x...O....xx
@@ -924,12 +925,12 @@ x.........?
 
 :8,FjEd,shape(2)
 
-x........?
-a...O....?
-b......*.?
-x.........
-x.........
-----------
+x........??
+a...O....xx
+b......*..?
+x.........?
+x.........?
+-----------
 
 ; x_somewhere(a,b)
 

@@ -351,9 +351,9 @@ find_extents(void)
 
   /* When this is called, elements go from (mini,minj) inclusive to
    * (maxi-1, maxj-1) [ie exclusive]. Make them inclusive.
-   * ie maximum element lies on (maxi,maxj)
+   * Ie maximum element lies on (maxi,maxj).
    */
-
+  
   --maxi;
   --maxj;
 
@@ -666,12 +666,35 @@ read_constraint_diagram_line(char *p)
     }
   }
 
+  /* Now j holds the width of this constraint diagram line. Require
+   * this to match the main diagram width stored in maxj. However,
+   * maxj was modified by find_extents() so we have to compensate for
+   * this.
+   */
+  if (j != maxj + 1) {
+    fprintf(stderr, "%s(%d) : error : Mismatching width of constraint line in pattern %s\n", 
+	    current_file, current_line_number, pattern_names[patno]);
+    fatal_errors++;
+    return;
+  }
+
   current_i++;
 
   return;
 }
 
-
+/* Check that the constraint diagram had the same number of rows as
+ * the main diagram.
+ */
+static void
+check_constraint_diagram_size(void)
+{
+  if (current_i != maxi + 1) {
+    fprintf(stderr, "%s(%d) : error : Mismatching height of constraint diagram in pattern %s\n", 
+	    current_file, current_line_number, pattern_names[patno]);
+    fatal_errors++;
+  }
+}  
 
 /* On reading a line starting ':', finish up and write
  * out the current pattern 
@@ -1518,7 +1541,7 @@ main(int argc, char *argv[])
    *   5     Reading constraint diagram.
    *   6     Waiting for constraint line (";" line).
    *   7     Reading a constraint
-   *   7     Reading an action
+   *   8     Reading an action
    *
    * FIXME: This state machine should be possible to simplify.
    *
@@ -1584,8 +1607,11 @@ main(int argc, char *argv[])
     }
     else if (line[0] == '\n' || line[0] == '#') { 
       /* nothing */
-      if (state == 2 || state == 5)
+      if (state == 2 || state == 5) {
+	if (state == 5)
+	  check_constraint_diagram_size();
 	state++;
+      }
     }
     else if (strchr(VALID_PATTERN_CHARS, line[0])
 	     || strchr(VALID_EDGE_CHARS, line[0])
@@ -1628,6 +1654,9 @@ main(int argc, char *argv[])
       }
     } 
     else if (line[0] == ';') {
+      if (state == 5)
+	check_constraint_diagram_size();
+      
       if (state == 5 || state == 6 || state == 7) {
 	read_constraint_line(line+1);
 	state = 7;
@@ -1639,6 +1668,8 @@ main(int argc, char *argv[])
     } 
     else if (line[0] == '>') {
       if (state == 4 || state == 5 || state == 6 || state == 7 || state == 8) {
+	if (state == 5)
+	  check_constraint_diagram_size();
 	read_action_line(line+1);
 	state = 8;
       }

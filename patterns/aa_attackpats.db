@@ -180,7 +180,8 @@ Pattern A11
 :8,c
 
 *.X
-oXO
+?.X
+?XO
 
 ;olib(*)>3
 
