@@ -367,7 +367,6 @@ showboard(int xo)
     
     for (j = 0; j < board_size; j++)
       showchar(i, j, is_hoshi_point(i, j) ? '+' : '.', xo);
-
     
     fprintf(stderr, " %d", ii);
     

@@ -317,6 +317,24 @@ int dragon_weak(int pos);
  */
 #define set_value(x) patt->value = (x)
 
+void init_graph_conn(void);
+void init_graph_pat(void);
+void init_graph_attpat(void);
+void init_graph_defpat(void);
+void init_graph_influencepat(void);
+void init_graph_barrierspat(void);
+void init_graph_endpat(void);
+void init_graph_aa_attackpat(void);
+void init_graph_owl_attackpat(void);
+void init_graph_owl_vital_apat(void);
+void init_graph_owl_defendpat(void);
+void init_graph_fusekipat(void);
+void init_graph_fuseki9(void);
+void init_graph_fuseki13(void);
+void init_graph_fuseki19(void);
+void init_graph_joseki(void);
+void init_graph_read_attack(void);
+void init_graph_read_defend(void);
 
 /* pattern arrays themselves */
 extern struct pattern_db pat_db;

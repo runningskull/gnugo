@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.1.27 released March 1, 2002
+
 - important bugfix in store_persistent_owl_cache()
 - bugfix in semeai_find_backfilling_move()
 - new command line option --debug-flags
@@ -34,6 +36,7 @@
 - unexpected results page orders results correctly
 - defaults for config.vc(in) made same as 3.1.27 release.
 - new semeai test
+- doc revision
 
 3.1.26 released February 24, 2002
 

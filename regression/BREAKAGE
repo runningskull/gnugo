@@ -1,4 +1,7 @@
+========================== 3.1.27 =========================
 ========================== 3.1.26 =========================
+
+These versions give identical behavior on the regressions.
 
 With experimental influence, experimental and alternate connections
 enabled (now the default):

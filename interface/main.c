@@ -1327,7 +1327,8 @@ Debugging Options:\n\
    -a, --allpats                 test all patterns\n\
    -T, --printboard              colored display of dragons\n\
    -E                            colored display of eye spaces\n\
-   -d, --debug <level>           debugging output (see gnugo.h for bits)\n\
+   -d, --debug <flags>           debugging output (see next item for bits)\n\
+   --debug-flags                 print the debug flags for previous item\n\
    -H, --hash <level>            hash (see gnugo.h for bits)\n\
    -w, --worms                   print worm and dragon data and move reasons\n\
    -m, --moyo <level>            moyo debugging, show moyo board\n\

@@ -1,10 +1,12 @@
-VERSION 3.1.26
+VERSION 3.1.27
 
 New since 3.0
 
 - 1-dimensional board
 - experimental dynamic connection analysis
 - experimental reading semeai module
+- new influence function
+- stronger and more agressive
 - reads to find combinations
 - new html views of the regressions, and many more tests
 

@@ -201,7 +201,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 
 loadsgf games/semeai/semeai10.sgf
 37 owl_analyze_semeai B11 L7
-#? [ALIVE DEAD B12]
+#? [ALIVE DEAD B12]*
 
 ########### end of semeai tests #################
 

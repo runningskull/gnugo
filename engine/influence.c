@@ -1512,7 +1512,7 @@ segment_influence(struct influence_data *q)
   segment_region(q, whose_area,      IS_AREA,      q->area_segmentation);
 }
 
-/* Return the size of the moyo around (m, n).
+/* Return the size of the moyo around (pos).
  */
 int
 influence_get_moyo_size(int pos, int color)

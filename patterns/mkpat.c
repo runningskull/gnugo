@@ -1904,7 +1904,7 @@ tree_write_patterns(FILE *outfile, char *name)
   }
   fprintf(outfile, "};\n\n");
 
-  fprintf(outfile, "void\ninit_graph_%s() {\n", name);
+  fprintf(outfile, "void\ninit_graph_%s(void) {\n", name);
   fprintf(outfile, "  gg_assert(sizeof(gnl_%s) / sizeof(struct graph_node_list) == %d);\n", 
                    name, gnl_count+1);
   fprintf(outfile, "  gg_assert(sizeof(matches_%s) / sizeof(struct match_node) == %d);\n",
@@ -1923,7 +1923,7 @@ write_patterns(FILE *outfile, char *name)
   if (tree_output) {
     tree_write_patterns(outfile, name);
   } else {
-    fprintf(outfile, "\nvoid\ninit_graph_%s() { \n"
+    fprintf(outfile, "\nvoid\ninit_graph_%s(void) { \n"
                      "  /* nothing to do - tree option not compiled */\n"
                      "}\n\n", name);
   }

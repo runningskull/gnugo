@@ -477,7 +477,8 @@ being too optimistic.
 @section Influential Functions
 
 @itemize @bullet 
-@item @code{static void accumulate_influence(struct influence_data *q, int m, int n, int color)}
+@item @code{static void
+accumulate_influence(struct influence_data *q, int m, int n, int color)}
 @findex accumulate_influence
 @quotation
 Limited in scope to @file{influence.c}, this is the core of the influence
@@ -486,6 +487,31 @@ the influence outwards until it hits a barrier or the strength of the
 influence falls under a certain threshold. The radiation is performed by a
 breadth first propagation, implemented by means of an internal queue.
 @end quotation
+@item @code{void add_influence_source(int pos, int color, float strength, float attenuation, struct influence_data *q)}
+@findex add_influence_source
+@quotation
+Adds an influence source at position pos with prescribed strength
+and attenuation. color can be BLACK, WHITE or both. If there
+already exists an influence source of the respective color at pos
+that is stronger than the new one, we do nothing.
+@end quotation
+@item @code{void influence_mark_non_territory(int pos, int color)}
+@findex influence_mark_non_territory
+@quotation
+Called from actions for t patterns. Marks (pos) as not being
+territory for (color).
+@end quotation
+@item @code{int influence_get_moyo_size(int pos, int color)}
+@findex influence_get_moyo_size
+@quotation
+Return the size of the moyo around (pos).
+@end quotation
+@item @code{void influence_get_moyo_segmentation(int opposite, struct moyo_data *moyos)}
+@findex influence_get_moyo_segmentation
+@quotation
+Export the moyo segmentation. If (opposite) is true, then
+initial_opposite_influence is used, otherwise initial_influence.
+@end quotation
 @item @code{void compute_initial_influence(int color, int dragons_known)}
 @findex compute_initial_influence
 @quotation
@@ -493,57 +519,86 @@ Compute the influence before a move has been made, which can
 later be compared to the influence after a move. Assume that
 the other color is in turn to move.
 @end quotation
-@item @code{static void compute_move_influence(int m, int n, int color)}
-@findex compute_move_influence
+@item @code{void resegment_initial_influence()}
+@findex resegment_initial_influence
 @quotation
-Let color play at (m, n) and compute the influence after this move,
-assuming that the other color is in turn to move next.
+Redo the segmentation of the initial influence.
 @end quotation
-@item @code{int influence_territory_color(int m, int n)}
+@item @code{void compute_escape_influence(char goal[BOARDMAX], int color, int escape_value[BOARDMAX], int dragons_known)}
+@findex compute_escape_influence
+@quotation
+Assume that the stones marked by the goal array do not generate
+influence and compute influence. Influence based escape values are
+returned in the escape_value array.  
+@end quotation
+@item @code{int influence_territory_color(int pos)}
 @findex influence_territory_color
 @quotation
-Return the color who has territory at (m, n), or EMPTY.
+Return the color who has territory at @code{pos}, or @code{EMPTY}.
 @end quotation
-@item @code{int influence_moyo_color(int m, int n)}
+@item @code{int influence_moyo_color(int pos)}
 @findex influence_moyo_color
 @quotation
-Return the color who has moyo at (m, n), or EMPTY.
+Return the color who has moyo at @code{pos}, or EMPTY.
 @end quotation
-@item @code{int influence_area_color(int m, int n)}
+@item @code{int influence_moyo_color_opposite(int pos)}
+@findex influence_moyo_color_opposite
+@quotation
+Return the color who has moyo at @code{pos}, or EMPTY, using influence
+computed with the opposite color to move.
+@end quotation
+@item @code{int influence_area_color(int pos)}
 @findex influence_area_color
 @quotation
-Return the color who has area at (m, n), or EMPTY.
+Return the color who has area at @code{pos}, or EMPTY.
 @end quotation
-@item @code{int influence_delta_territory(int m, int n, int color)}
+@item float @code{influence_delta_territory(int pos, int color, char saved_stones[BOARDMAX], float *followup_value)}
 @findex influence_delta_territory
 @quotation
-Compute the difference in territory made by a move by color at (m, n).
+Compute the difference in territory made by a move by color at @code{pos}.  
+This also includes the changes in moyo and area.  In experimental-influence
+mode, followup_value must not be a NULL pointer, and the followup_value will
+be returned there.
 @end quotation
-@item @code{int influence_delta_moyo(int m, int n, int color)}
-@findex influence_delta_moyo
+@item @code{float influence_estimate_score(float moyo_coeff, float area_coeff)}
+@findex influence_estimate_score
 @quotation
-Compute the difference in moyo made by a move by color at (m, n).
-@end quotation
-@item @code{int influence_delta_strict_moyo(int m, int n, int color)}
-@findex influence_delta_strict_moyo
-@quotation
-Compute the difference in strict moyo made by a move by color at (m, n).
-@end quotation
-@item @code{int influence_delta_area(int m, int n, int color)}
-@findex influence_delta_area
-@quotation
-Compute the difference in area made by a move by color at (m, n).
-@end quotation
-@item @code{int influence_delta_strict_area(int m, int n, int color)}
-@findex influence_delta_strict_area
-@quotation
-Compute the difference in strict area made by a move by color at (m, n).
+Estimate the score. A positive value means white is ahead. The
+score is estimated from the initial_influence, which must have been
+computed in advance. The score estimate does not include captured
+stones (i.e., the ones having been removed from the board) or komi.
+moyo_coeff and area_coeff are the relative weights to be used for
+the moyo and area difference respectively.
 @end quotation
 @item @code{void debug_influence_move(int i, int j)}
 @findex debug_influence_move
 @quotation
 Print the influence map when we have computed influence for the
-move at (i, j).
+move at @code{(i, j)}.
+@end quotation
+@item @code{void get_initial_influence(int color, int dragons_known, float white_influence[BOARDMAX], float black_influence[BOARDMAX], int influence_regions[BOARDMAX])}
+@findex get_initial_influence
+@quotation
+Compute initial influence and export it. The color parameter tells
+who is in turn to move.
+@end quotation
+@item @code{void get_move_influence(int move, int color, char saved_stones[BOARDMAX], float white_influence[BOARDMAX], float black_influence[BOARDMAX], int influence_regions[BOARDMAX])}
+@findex get_move_influence
+@quotation
+Compute influence after a move and export it.
+@end quotation
+@item @code{void print_initial_influence(int color, int dragons_known)}
+@findex print_initial_influence
+@quotation
+Compute initial influence and print it. Notice that it's assumed
+that the printmoyo global tells what information to print. The
+color parameter tells who is in turn to move.
+@end quotation
+@item @code{void print_move_influence(int pos, int color, char saved_stones[BOARDMAX])}
+@findex print_move_influence
+@quotation
+Compute influence after doing a move and print it. Notice that it's
+assumed that the printmoyo global tells what information to print.
 @end quotation
 @end itemize
 
