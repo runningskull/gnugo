@@ -507,9 +507,18 @@ do_owl_analyze_semeai(int apos, int bpos,
 	}
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, DEAD);
       }
-      else if (min_eyes(&probable_eyes_b) < 2) {
+      else if (min_eyes(&probable_eyes_b) >= 2) {
+	/* both live */
+	*resulta = ALIVE;
+	*resultb = ALIVE;
+	*move = PASS_MOVE;
+	sgf_dumptree = save_sgf_dumptree;
+	count_variations = save_count_variations;
+	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
+	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
+      }
+      else if (vital_offensive_moves[0].pos != NO_MOVE) {
 	/* I can kill */
-	gg_assert(vital_offensive_moves[0].pos != NO_MOVE);
 	*resulta = ALIVE;
 	*resultb = DEAD;
 	*move = vital_offensive_moves[0].pos;
@@ -525,16 +534,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 	READ_RETURN_SEMEAI(read_result, move, vital_offensive_moves[0].pos,
 			   ALIVE, DEAD);
       }
-      else {
-	/* both live */
-	*resulta = ALIVE;
-	*resultb = ALIVE;
-	*move = PASS_MOVE;
-	sgf_dumptree = save_sgf_dumptree;
-	count_variations = save_count_variations;
-	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
-	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
-      }
     }
     if (min_eyes(&probable_eyes_b) >= 2 || owl_escape_route(owlb) >= 5) {
       /* you are alive */
@@ -548,9 +547,18 @@ do_owl_analyze_semeai(int apos, int bpos,
 	SGFTRACE2(PASS_MOVE, DEAD, "You live, I die");
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, DEAD, ALIVE);
       }
-      else if (min_eyes(&probable_eyes_a) < 2) {
+      else if (min_eyes(&probable_eyes_a) >= 2) {
+	/* I am already alive */
+	*resulta = ALIVE;
+	*resultb = ALIVE;
+	*move = PASS_MOVE;
+	sgf_dumptree = save_sgf_dumptree;
+	count_variations = save_count_variations;
+	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
+	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
+      }
+      else if (vital_defensive_moves[0].pos != NO_MOVE) {
 	/* I can live */
-	gg_assert(vital_defensive_moves[0].pos != NO_MOVE);
 	*resulta = ALIVE;
 	*resultb = ALIVE;
 	*move = vital_defensive_moves[0].pos;
@@ -560,16 +568,6 @@ do_owl_analyze_semeai(int apos, int bpos,
 		  "Both live");
 	READ_RETURN_SEMEAI(read_result, move, vital_defensive_moves[0].pos,
 			   ALIVE, ALIVE);
-      }
-      else {
-	/* I am already alive */
-	*resulta = ALIVE;
-	*resultb = ALIVE;
-	*move = PASS_MOVE;
-	sgf_dumptree = save_sgf_dumptree;
-	count_variations = save_count_variations;
-	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
-	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
       }
     }
     
