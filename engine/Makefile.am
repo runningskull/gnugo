@@ -3,7 +3,8 @@ EXTRA_DIST = engine.dsp board.dsp
 # Remove these files here... they are created locally
 DISTCLEANFILES = *~
 
-INCLUDES = \
+AM_CPPFLAGS = \
+	$(GNU_GO_WARNINGS) \
 	-I../patterns \
 	-I$(top_srcdir)/patterns \
 	-I$(top_srcdir)/sgf \

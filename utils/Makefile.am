@@ -8,5 +8,3 @@ noinst_HEADERS = gg-getopt.h random.h gg_utils.h winsocket.h
 
 # Remove these files here... they are created locally
 DISTCLEANFILES = *~
-
-@NO_WARNINGS@

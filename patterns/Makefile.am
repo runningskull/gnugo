@@ -51,7 +51,7 @@ transpat_SOURCES = transpat.c patlib.c transform.c
 transpat_LDADD = 
 joseki_SOURCES = joseki.c 
 joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a 
-joseki_INCLUDES = -I$(top_srcdir)/sgf
+joseki_AM_CPPFLAGS = $(GNU_GO_WARNINGS) -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
 mkeyes_LDADD = ../utils/libutils.a
 extract_fuseki_SOURCES  = extract_fuseki.c
@@ -59,7 +59,7 @@ extract_fuseki_SOURCES  = extract_fuseki.c
 extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
 		       ../engine/libengine.a libpatterns.a\
                        ../sgf/libsgf.a ../utils/libutils.a
-extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
+extract_fuseki_AM_CPPFLAGS = $(GNU_GO_WARNINGS) -I$(top_srcdir)/sgf
 
 
 noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h dfa-mkpat.h
@@ -90,7 +90,11 @@ dist-hook:
 	cd $(distdir) && rm $(GGBUILTSOURCES)
 
 # source files in this directory get access to private prototypes
-INCLUDES = -I$(top_srcdir)/engine -I$(top_srcdir)/utils -I$(top_srcdir)/sgf
+AM_CPPFLAGS = \
+	$(GNU_GO_WARNINGS) \
+	-I$(top_srcdir)/engine \
+	-I$(top_srcdir)/utils \
+	-I$(top_srcdir)/sgf
 
 noinst_LIBRARIES = libpatterns.a
 

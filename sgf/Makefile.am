@@ -11,8 +11,7 @@ noinst_HEADERS = \
 # Remove these files here... they are created locally
 DISTCLEANFILES = *~
 
-INCLUDES =\
-	-I$(top_srcdir)/utils
+AM_CPPFLAGS = $(GNU_GO_WARNINGS) -I$(top_srcdir)/utils
 
 noinst_LIBRARIES = libsgf.a
 

@@ -10,7 +10,8 @@ noinst_HEADERS = interface.h gmp.h gtp.h
 # Remove these files here... they are created locally
 DISTCLEANFILES = *~
 
-INCLUDES = \
+AM_CPPFLAGS = \
+	$(GNU_GO_WARNINGS) \
 	-I$(top_srcdir)/sgf \
 	-I$(top_srcdir)/engine \
 	-I$(top_srcdir)/utils

@@ -127,9 +127,6 @@ AC_ARG_ENABLE(socket-support,
  [  --disable-socket-support           don't compile GTP over TCP/IP support
   --enable-socket-support            compile TCP/IP support (default)])
 
-AC_ARG_ENABLE(profile,
- [  --enable-profile                   compile gnugo with gprof option ])
-
 AC_PROG_CC
 
 dnl for automake 1.4.x
@@ -553,30 +550,34 @@ dnl  ----------- special-case use of gcc ---------
 
 dnl Not sure if we are supposed to be accessing this variable, but...
 
-AC_SUBST(GCC_ONLY)
-AC_SUBST(GNUGO_SOME_WARNINGS)
-AC_SUBST(GNUGO_ALL_WARNINGS)
-AC_SUBST(NO_WARNINGS)
+AM_CONDITIONAL(GCC_ONLY, test "$ac_compiler_gnu" = "yes")
 
-NO_WARNINGS="CFLAGS=$CFLAGS"
-if test $ac_cv_c_compiler_gnu = yes; then
-  GCC_ONLY=''
-  GGO_SOME_WARNINGS='-Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wundef'
-  GNUGO_SOME_WARNINGS="CFLAGS=$CFLAGS $GGO_SOME_WARNINGS"
-  CFLAGS="$CFLAGS $GGO_SOME_WARNINGS"
-  if test "$enable_profile" = "yes" ; then
-     CFLAGS="-pg $CFLAGS"
+dnl Now lines in Makefile.am can be prefixed @GCC_ONLY@.
+
+AC_SUBST(GCC_MAJOR_VERSION)
+AC_SUBST(GCC_MINOR_VERSION)
+AC_SUBST(GNU_GO_WARNINGS)
+
+if test "$ac_compiler_gnu" = "yes"; then
+
+  dnl M4 escaping of brackets
+  [GCC_VERSION=`$CC --version | sed '1!D;s/^[^0-9]*\([0-9]\+\.[0-9]\+\).*$/\1/'`
+   GCC_MAJOR_VERSION=`echo $GCC_VERSION | sed 's/^\([0-9]\+\).*$/\1/'`
+   GCC_MINOR_VERSION=`echo $GCC_VERSION | sed 's/^[0-9]\+\.\(.*\)$/\1/'`]
+
+  GNU_GO_WARNINGS='-Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wundef'
+
+  if (test $GCC_MAJOR_VERSION -eq 3 && test $GCC_MINOR_VERSION -ge 4) || test $GCC_MAJOR_VERSION -gt 3; then
+    GNU_GO_WARNINGS="$GNU_GO_WARNINGS -Wdeclaration-after-statement"
   fi
+
 else
-  GCC_ONLY='#'
-  GNUGO_SOME_WARNINGS=''
+  GCC_MAJOR_VERSION=0
+  GCC_MINOR_VERSION=0
+  GNU_GO_WARNINGS=''
 fi
 
-
-dnl Now lines in Makefile.am can be prefixed @GCC_ONLY@, and
-dnl we can specify either @GNUGO_SOME_WARNINGS@
-
-dnl FIXME: please add warnings for other compilers !
+dnl FIXME: please add warnings for other compilers!
 
 
 AH_TEMPLATE([ENABLE_SOCKET_SUPPORT],
