@@ -1046,6 +1046,7 @@ adjusted_worm_attack_value(int pos, int ww)
   return adjusted_value;
 }
 
+
 /* The new (3.2) territorial evaluation overvalues moves creating a new
  * group in the opponent's sphere of influence. The influence module cannot
  * see that the opponent will gain by attacking the new (probably weak)
@@ -1081,6 +1082,17 @@ strategic_penalty(int pos, int color)
     case EXPAND_MOYO_MOVE:
     case STRATEGIC_ATTACK_MOVE:
       continue;
+    /* If we find a tactical defense move, we just test whether it concerns
+     * a single-stone-dragon; if not, we stop, if yes, we let the necessary
+     * tests be made in the OWL_DEFEND_MOVE case.
+     */
+    case DEFEND_MOVE:
+      {
+	int target = worms[move_reasons[r].what];
+	if (dragon[target].size > 1)
+	  return 0.0;
+	continue;
+      }
     /* An owl defense of a single stone might be a stupid attempt to run
      * away with an unimportant (kikashi like) stone. We assume this is the
      * case if this single stone has a strong hostile direct neighbor.
@@ -1140,6 +1152,7 @@ strategic_penalty(int pos, int color)
   ret_val = gg_max(0.0, ret_val);
   return ret_val;
 }
+
 
 /*
  * Estimate the direct territorial value of a move at (pos).

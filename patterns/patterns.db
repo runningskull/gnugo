@@ -8868,13 +8868,14 @@ BAAO
 Pattern CB327
 # gf Reduced shape value. (3.1.23)
 # See nngs:1750
+# ab increased shape value (3.1.29)
 
 ?.?         seal opponent in
 ...      
 .*O
 OX?
 
-:8,OXcbeEd,shape(2)
+:8,OXcbeEd,shape(3)
 
 
 Pattern CB328
@@ -10520,6 +10521,7 @@ Pattern ED89
 
 Pattern ED90
 # db New pattern (3.1.28)
+# ab d classification added (3.1.29)
 
 ???..o?          Jump under on the third line
 ???X.oo
@@ -10528,7 +10530,7 @@ Pattern ED90
 o......
 -------
 
-:8,j
+:8,jd
 
 ???..o?
 ???X.oo

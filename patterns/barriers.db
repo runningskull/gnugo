@@ -869,6 +869,15 @@ Pattern Barrier61
 :/,D
 
 
+Pattern Barrier62
+
+?xX?
+...O
+.!..
+
+:8,DOX
+
+
 Pattern Intrusion1
 
 xxxx
@@ -1033,6 +1042,12 @@ X!!
 x..
 
 :8,B,value(30)
+
+?aX
+Xb!
+x..
+
+>return (!xplay_attack(b,a));
 
 
 Pattern Intrusion7a
@@ -1232,11 +1247,12 @@ oQo
 
 :8,B,value(30)
 
-oQo
-aXO
+oeo
+aXd
 cbX
 
 ;!oplay_attack(a,b,c,a)
+>return (lib(d)>2 && lib(e)>2 && !xplay_attack(a,e));
 
 
 Pattern Intrusion16
@@ -1677,7 +1693,7 @@ bae
 ;safe_omove(a)
 ;&& (o_somewhere(e) || oplay_attack(a,e,e))
 ;&& !oplay_defend_both(a,b,c,b,D)
->return (!xplay_attack(e,f));
+>return (!xplay_attack(a,f) && (o_somewhere(e) || (!xplay_attack(e,f))));
 
 
 Pattern Intrusion45

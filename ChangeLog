@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- assymmetry in influence computation reduced
+- case added in strategic_penalty
 - simulation of ko threat + answer in sgf output reinstated in tryko()
 - new function gg_normalize_float() in gg_utils.c
 - platform dependency fixed in readconnect.c by using gg_normalize_float() 
@@ -9,7 +11,9 @@
 - bugfix in gg_cputime()
 - new function influence_initial_territory to export territory valuation
 - negative strategic value added to invasion type moves
-- pattern tuning: keima shape bonus removed
+- keima shape bonus removed in CB204b
+- tuning
+- influence tuning
 - code consistency cleanup
 - THANKS updated
 

@@ -523,7 +523,8 @@ compare_intrusions(const void *p1, const void *p2)
 /* Experimental influence: This function goes through the list of 
  * intrusion sources, and adds the intrusion as influence sources for color. 
  * The strength is corrected so that each stone's intrusions sources
- * can have total strength of at most the strength of the stone.
+ * can have total strength of at most 60%/100% of the strength of the stone.
+ * (100% is if q=&followup_influence, 60% otherwise).
  */
 static void
 add_marked_intrusions(struct influence_data *q, int color)
@@ -534,6 +535,7 @@ add_marked_intrusions(struct influence_data *q, int color)
   float strength_sum;
   float correction;
   float source_strength;
+  float allowed_strength;
   gg_sort(q->intrusions, q->intrusion_counter, sizeof(q->intrusions[0]),
           compare_intrusions);
 
@@ -567,8 +569,12 @@ add_marked_intrusions(struct influence_data *q, int color)
           || q->intrusions[j].strength_pos != q->intrusions[j-1].strength_pos)
         strength_sum += q->intrusions[j].strength;
     }
-    if (strength_sum > source_strength)
-      correction = (source_strength / strength_sum);
+    if (q == &followup_influence)
+      allowed_strength = source_strength;
+    else
+      allowed_strength = 0.6 * source_strength;
+    if (strength_sum > allowed_strength)
+      correction = (allowed_strength / strength_sum);
     else
       correction = 1.0;
 
@@ -1758,8 +1764,8 @@ compute_move_influence(int m, int n, int color,
     }
     else
       value_territory(&move_influence);
-    if (m == (board_size - 19) + debug_influence_i
-	  && n == debug_influence_j && m >= 0) {
+    if (m == debug_influence_i
+	&& n == debug_influence_j && m >= 0) {
       if (printmoyo & PRINTMOYO_VALUE_TERRITORY)
         print_influence_territory(&move_influence,
 	    			  "territory (after move):\n");
