@@ -1,0 +1,40 @@
+(;GM[1]FF[3]
+RU[Japanese]BR[]WR[]SZ[19]HA[2]KM[0.5]
+PW[Handtalk]
+PB[GNU Go 3.1.29]
+GN[White (W) vs. Black (B)]
+DT[2002-03-30]
+SY[Cgoban 1.9.12]TM[1:00:00(5x1:00)]AB[pd][dp]
+RE[B+1.5]
+;W[de];B[pp];W[dc];B[jc];W[jq];B[cg];W[cj];B[eg];W[cm];B[co];W[qj];
+B[be];W[hc];B[mc];W[gq];B[gg];W[qg];B[mq];W[qm];B[qo];W[dr];B[qe];
+W[cq];B[bm];W[bn];B[cn];W[bl];B[dm];W[am];B[fm];W[he];B[fp];W[gp];
+B[bo];W[lr];B[mr];W[og];B[om];W[pn];B[fe];W[fc];B[bc];W[gd];B[fj];
+W[on];B[ok];W[mm];B[mk];W[nl];B[nk];W[ol];B[pk];W[qk];B[hn];W[ed];
+B[kl];W[go];B[ig];W[mg];B[li];W[kd];B[kc];W[ld];B[nc];W[dl];B[el];
+W[ln];B[lg];W[lf];B[kg];W[lq];B[mf];W[jd];B[jn];W[oq];B[pq];W[op];
+B[or];W[pi];B[nf];W[ng];B[dk];W[cl];B[bi];W[bj];B[ci];W[dj];B[rf];
+W[ek];B[fk];W[rg];B[ej];W[di];B[rn];W[lc];B[lb];W[kf];B[rl];W[mp];
+B[ql];W[ni];B[cb];W[pl];B[eb];W[fb];B[sg];W[sh];B[sf];W[ri];B[ls];
+W[rm];B[ks];W[rk];B[ir];W[iq];B[hr];W[gr];B[sm];W[if];B[sl];W[ij];
+B[jg];W[il];B[aj];W[ak];B[gn];W[fo];B[eo];W[ai];B[bh];W[ll];B[lk];
+W[kk];B[km];W[lj];B[mj];W[kj];B[mi];W[ki];B[ml];W[lm];B[jk];W[jl];
+B[kh];W[gl];B[jm];W[fn];B[en];W[gm];B[im];W[ik];B[jo];W[ii];B[ah];
+W[dh];B[dg];W[eh];B[fh];W[gk];B[ao];W[an];B[br];W[bq];B[aq];W[hm];
+B[db];W[hq];B[fa];W[gb];B[qn];W[pm];B[cr];W[dq];B[cs];W[fq];B[ep];
+W[sk];B[sn];W[hg];B[hh];W[hf];B[ih];W[ic];B[jb];W[ib];B[ja];W[mh];
+B[ji];W[jj];B[lh];W[gj];B[gi];W[md];B[of];W[nd];B[oc];W[pf];B[oe];
+W[ds];B[jr];W[kq];B[nq];W[np];B[ck];W[ee];B[ff];W[cd];B[bd];W[cf];
+B[bf];W[jf];B[cc];W[ce];B[ec];W[fd];B[qf];W[eq];B[kr];W[me];B[ga];
+W[ha];B[ea];W[hi];B[gs];W[fs];B[hs];W[oj];B[po];W[oo];B[ch];W[ei];
+B[fi];W[aj];B[jh];W[nj];B[dd];W[bp];B[ap];W[dc];B[pe];W[pg];B[dd];
+W[fl];B[em];W[dc];B[cp];W[dd];B[gf];W[ef];B[od];W[ge];B[ne];W[ia];
+B[ka];W[bk];B[ek];W[pj];B[gh];W[df];B[tt];W[tt];
+TW[hb][gc][hd][id][ie][je][ke][le][nh][oh][ph][qh][rh][oi][qi][si][hj][rj][sj][hk][jk][al][hl][kl][bm][im][jm][km][nm][om][gn][hn][in][jn][kn][mn][nn][ho][io][jo][ko][lo][mo][no][hp][ip][jp][kp][lp][er][fr][es]
+TB[aa][ba][ca][da][la][ma][na][oa][pa][qa][ra][sa][ab][bb][kb][mb][nb][ob][pb][qb][rb][sb][ac][pc][qc][rc][sc][ad][qd][rd][sd][ae][re][se][af][ag][bg][fg][dn][do][ro][so][qp][rp][sp][qq][rq][sq][ar][nr][pr][qr][rr][sr][as][bs][is][js][ms][ns][os][ps][qs][rs][ss]
+C[The game is over.  Final score:
+   White = 52 territory + 14 captures + 0.5 komi = 66.5
+   Black = 65 territory + 3 captures = 68
+Black wins by 1.5.
+]
+)
