@@ -409,6 +409,15 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 		DEBUG(DEBUG_OWL_PERFORMANCE,
 		      "Inconsistent owl attack and defense results for %1m.\n", 
 		      str);
+		/* Let's see whether the attacking move might be the right
+		 * defense:
+		 */
+		dcode = owl_does_defend(dragon[str].owl_attack_point, str);
+		if (dcode != 0) {
+		  dragon[str].owl_defense_point
+		    = dragon[str].owl_attack_point;
+		  dragon[str].owl_defense_code = dcode;
+		}
 	      }
 	    }
 	  }

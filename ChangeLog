@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- In make_dragon(): resolve inconsistent owl result by calling
+  owl_does_defend()
 - add assert on inconsistent do_genmove result() in genmove()
 - life code completely disabled
 - global variables life and life_eyesize removed
