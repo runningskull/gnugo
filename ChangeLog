@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+- dragon table in movereason.c now 1D
+- replacement map in movereason.c now 1D
+- domain calculation in optics.c now 1D
 - new function is_ko_point() in board.c
 - computation of cavities removed from worm.c
 - computation of caves removed from dragon.c
@@ -15,6 +18,8 @@
 - several fields moved from struct dragon_data to struct dragon_data2
 - false_margin field eliminated from struct eye_data
 - cleanup of sgf code
+- revision of extract_fuseki
+- revision of fuseki.c
 - twogtp-a writes html
 - tuning
 - owl tuning
