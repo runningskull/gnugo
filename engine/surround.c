@@ -27,7 +27,7 @@
 #include <math.h>
 
 #include "liberty.h"
-
+#include "gg_utils.h"
 
 /* Forward declarations */
 static int goal_dist(int pos, char goal[BOARDMAX]);
