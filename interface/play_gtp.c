@@ -106,6 +106,7 @@ DECLARE(gtp_name);
 DECLARE(gtp_new_game);
 DECLARE(gtp_estimate_score);
 DECLARE(gtp_owl_analyze_semeai);
+DECLARE(gtp_tactical_analyze_semeai);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_defend);
 DECLARE(gtp_owl_does_attack);
@@ -190,6 +191,7 @@ static struct gtp_command commands[] = {
   {"new_game",                gtp_new_game},
   {"new_score",               gtp_estimate_score},
   {"owl_analyze_semeai",      gtp_owl_analyze_semeai},
+  {"tactical_analyze_semeai", gtp_tactical_analyze_semeai},
   {"owl_attack",     	      gtp_owl_attack},
   {"owl_defend",     	      gtp_owl_defend},
   {"owl_does_attack", 	      gtp_owl_does_attack},
@@ -1036,7 +1038,50 @@ gtp_owl_analyze_semeai(char *s, int id)
   if (sgf_dumptree)
       reading_cache_clear();
 
-  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move);
+  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 1);
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_mprintf("%s %s %m", 
+	      safety_to_string(resulta),
+	      safety_to_string(resultb),
+	      I(move), J(move));
+
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Analyze a semeai, not using owl
+ * Arguments: dragona, dragonb
+ * Fails:     invalid vertices, empty vertices
+ * Returns:   status of dragona, dragonb assuming dragona moves first
+ */
+static int
+gtp_tactical_analyze_semeai(char *s, int id)
+{
+  int i, j;
+  int k;
+  int dragona, dragonb;
+  int resulta, resultb, move;
+  
+  k = gtp_decode_coord(s, &i, &j);
+
+  if (k == 0)
+    return gtp_failure(id, "invalid coordinate");
+  dragona = POS(i, j);
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  if (!gtp_decode_coord(s+k, &i, &j))
+    return gtp_failure(id, "invalid coordinate");
+  dragonb = POS(i, j);
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "vertex must not be empty");
+
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+      reading_cache_clear();
+
+  owl_analyze_semeai(dragona, dragonb, &resulta, &resultb, &move, 0);
   gtp_printid(id, GTP_SUCCESS);
   gtp_mprintf("%s %s %m", 
 	      safety_to_string(resulta),

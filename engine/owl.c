@@ -173,6 +173,8 @@ static int owl_determine_life(struct local_owl_data *owl,
 static int modify_stupid_eye_vital_point(int *vital_point);
 static void owl_mark_dragon(int apos, int bpos,
 			    struct local_owl_data *owl);
+static void owl_mark_worm(int apos, int bpos,
+			  struct local_owl_data *owl);
 static void owl_mark_boundary(struct local_owl_data *owl);
 static void owl_update_goal(int pos, int same_dragon,
 			    struct local_owl_data *owl);
@@ -211,24 +213,29 @@ static int catalog_goal(struct local_owl_data *owl, int goal_worm[MAX_WORMS]);
 static int owl_phase;
 
 void
-owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move)
+owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move,
+		   int owl)
 {
   static struct local_owl_data owla;
   static struct local_owl_data owlb;
-  int color = board[apos];
   
   gg_assert(board[apos] == OTHER_COLOR(board[bpos]));
-  /* Temporarily turn the owl phase off until the tactical semeai analyzer is
-   * working. */
-  owl_phase = 1;
+  owl_phase = owl;
+  count_variations = 1;
   TRACE("owl_analyze_semeai: %1m vs. %1m\n", apos, bpos);
   owla.lunches_are_current = 0;
   owlb.lunches_are_current = 0;
-  owl_mark_dragon(apos, NO_MOVE, &owla);
-  owl_mark_dragon(bpos, NO_MOVE, &owlb);
+  if (owl) {
+    owl_mark_dragon(apos, NO_MOVE, &owla);
+    owl_mark_dragon(bpos, NO_MOVE, &owlb);
   compute_owl_escape_values(&owla);
   compute_owl_escape_values(&owlb);
   owl_make_domains(&owla, &owlb);
+  }
+  else {
+    owl_mark_worm(apos, NO_MOVE, &owla);
+    owl_mark_worm(bpos, NO_MOVE, &owlb);
+  }
   do_owl_analyze_semeai(apos, bpos, &owla, &owlb, EMPTY,
 			resulta, resultb, move, 0);
 }
@@ -237,7 +244,7 @@ owl_analyze_semeai(int apos, int bpos, int *resulta, int *resultb, int *move)
  * determines the best result for both players. The
  * parameter "pass" is 1 if the opponent's last move is
  * pass. In this case, if no move is found but the genus
- * is less than 1, then the position is declared seki.
+ * is less than 2, then the position is declared seki.
  *
  * If a move is needed to get this result, then (*move) is
  * the location, otherwise this field returns PASS.
@@ -286,20 +293,8 @@ do_owl_analyze_semeai(int apos, int bpos,
 
   /* First look for a tactical resolution */
   /* FIXME: This needs to be unified with the tactical code
-   * that comes later in the function. I think that code should
-   * be taken out or moved here.
+   * that comes later in the function.
    */
-
-#if 0
-  gprintf("%oa worms:");
-  for (k = 0; k < wormsa; k++)
-    gprintf("%o %1m", goal_wormsa[k]);
-  gprintf("\n");
-  gprintf("%ob worms:");
-  for (k = 0; k < wormsb; k++)
-    gprintf("%o %1m", goal_wormsb[k]);
-  gprintf("\n");  
-#endif 
 
   /* Look for a tactical win */
 
@@ -658,7 +653,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     for (m = 0; m < board_size; m++)
       for (n = 0; n < board_size; n++) {
 	int pos = POS(m, n);
-	if (owlb->goal[pos]) {
+	if (owlb->goal[pos] && board[pos] == other) {
 	  origin = find_origin(pos);
 	  if (!ma[origin] &&
 	      ((ON_BOARD(SOUTH(pos)) && owla->goal[SOUTH(pos)])
@@ -670,7 +665,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	      *resultb = DEAD;
 	      if (move) *move = upos;
 	      sgf_dumptree = save_sgf_dumptree;
-	      count_variations = save_count_variations;
+
 	      return;
 	    }
 	    /* we mark the strings we've tried and failed to prevent 
@@ -747,59 +742,29 @@ do_owl_analyze_semeai(int apos, int bpos,
       owl_phase = save_owl_phase;
     }
   }
-#if 0
-  /* If the opponent passed and you can't find a safe move, it's seki */
-  if (moves[k].value < 40 && pass == 1) {
+  /* If we can't find a move and opponent passed, it's seki */
+  if (best_resulta == UNKNOWN && pass == 1) {
     *resulta = ALIVE_IN_SEKI;
     *resultb = ALIVE_IN_SEKI;
     if (move) *move = PASS_MOVE;
     return;
   }
-  /* If we can't do better than seki, try passing */
-  if (best_resulta != ALIVE
-      && best_resulta != UNKNOWN) {
+  /* If no move was found, then pass */
+  if (best_resulta == UNKNOWN) {
     do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
-			  &this_resultb, &this_resulta, NULL, 0);
-    if (this_resulta == ALIVE) {
-      *resulta = ALIVE;
-      *resultb = DEAD;
-      if (move) *move = PASS_MOVE;
-      return;
-    }
-    if (this_resulta == DEAD) {
-      if ((best_resulta == DEAD) 
-	  || (best_resulta == UNKNOWN))
-	{
-	  *resulta = DEAD;
-	  *resultb = ALIVE;
-	  if (move) *move = PASS_MOVE;
-	  return;
-	}
-      else {
-	*resulta = best_resulta;
-	*resultb = best_resultb;
-	if (move) *move = best_move;
-      return;
-      }
-    }
-    if (this_resulta == ALIVE_IN_SEKI
-	&& best_resulta != ALIVE) {
-      *resulta = ALIVE_IN_SEKI;
-      *resultb = ALIVE_IN_SEKI;
-      if (move) *move = PASS_MOVE;
-      return;
-    }
-  }
-  else {
-    *resulta = best_resulta;
-    *resultb = best_resultb;
-    if (move) *move = best_move;
+			  resultb, resulta, NULL, 1);
+    if (move) *move = PASS_MOVE;
     return;
   }
-#endif
+
   *resulta = best_resulta;
   *resultb = best_resultb;
-  if (move) *move = best_move;
+  if (move) {
+    if (best_resulta == DEAD)
+      *move = PASS_MOVE;
+    else
+      *move = best_move;
+  }
   return;
 }
 
@@ -2533,6 +2498,30 @@ owl_mark_dragon(int apos, int bpos, struct local_owl_data *owl)
 
   owl->color = color;
   owl_mark_boundary(owl);
+}
+
+
+/* Marks the worms at (apos) and (bpos). If only one worm
+ * needs marking, (bpos) should be passed as (0). 
+ */
+
+static void
+owl_mark_worm(int apos, int bpos, struct local_owl_data *owl)
+{
+  int pos;
+  int color = board[apos];
+  
+  ASSERT1(bpos == NO_MOVE || board[bpos] == color, bpos);
+
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+    if (ON_BOARD(pos)) {
+      if (is_same_worm(pos, apos) || is_same_worm(pos, bpos))
+	owl->goal[pos] = 1;
+      else
+	owl->goal[pos] = 0;
+    }
+
+  owl->color = color;
 }
 
 

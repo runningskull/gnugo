@@ -297,13 +297,13 @@ decidesemeai(int apos, int bpos, const char *sgf_output)
   
   if (sgf_output)
     begin_sgftreedump(&tree);
-  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move);
+  owl_analyze_semeai(apos, bpos, &resulta, &resultb, &move, 0);
   gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
 	  color == BLACK ? "black" : "white",
 	  move,
 	  apos, safety_to_string(resulta),
   	  bpos, safety_to_string(resultb));
-  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move);
+  owl_analyze_semeai(bpos, apos, &resultb, &resulta, &move, 0);
   gprintf("If %s moves first (at %1m), %1m is %s, %1m is %s\n",
 	  color == BLACK ? "white" : "black",
 	  move,

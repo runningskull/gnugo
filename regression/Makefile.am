@@ -8,7 +8,7 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       niki.tst trevor.tst tactics.tst buzco.tst \
       capture.tst connect.tst global.tst vie.tst \
       owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst arend.tst \
-      trevora.tst
+      trevora.tst semeai.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
@@ -179,6 +179,9 @@ arend: arend.tst
 
 trevora: trevora.tst
 	$(srcdir)/eval.sh trevora.tst
+
+semeai: semeai.tst
+	$(srcdir)/eval.sh semeai.tst
 
 all_batches: first_batch second_batch third_batch fourth_batch
 
