@@ -149,7 +149,7 @@ loadsgf games/nicklas/nicklas11.sgf 274
 
 loadsgf games/nicklas/nicklas12.sgf 103
 1206 gg_genmove black
-#? [C15]
+#? [C15]*
 
 loadsgf games/nicklas/nicklas12.sgf 113
 1207 gg_genmove black

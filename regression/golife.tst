@@ -47,7 +47,7 @@ loadsgf games/golife.sgf 38
 #
 loadsgf games/golife.sgf 46
 7 gg_genmove white
-#? [F3]
+#? [F3]*
 
 # Connecting the one point ko at G5 is too small. Either C2 or G1 looks
 # largest.

@@ -268,7 +268,7 @@ loadsgf games/strategy38.sgf 117
 
 loadsgf games/strategy38.sgf 133
 160 gg_genmove black
-#? [K2|L2|L3]*
+#? [K2|L2|L3]
 
 loadsgf games/strategy38.sgf 197
 161 gg_genmove black
@@ -319,20 +319,20 @@ loadsgf games/strategy41.sgf
 # White can't play G19. Locally this move must be at G18.
 loadsgf games/strategy42.sgf 174
 170 gg_genmove white
-#? [!G19]*
+#? [!G19]
 
 # T19 is out of the question. Locally T17 is better but the correct
 # move is A5.
 loadsgf games/strategy42.sgf 188
 171 gg_genmove white
-#? [A5]*
+#? [A5]
 
 # It's correct to make a ko threat, but N9 is inefficient because it
 # doesn't utilize the full ko potential of the position. Locally M8 is
 # superior.
 loadsgf games/strategy42.sgf 214
 172 gg_genmove white
-#? [!N9]*
+#? [!N9]
 
 # There's no way to win the ko by making atari from above. This move
 # must be at A9. This is a good example showing why only having the
@@ -345,7 +345,7 @@ loadsgf games/strategy42.sgf 218
 # Always take the ko at least once.
 loadsgf games/strategy42.sgf 248
 174 gg_genmove white
-#? [S19]*
+#? [S19]
 
 # This example shows that we need to find additional owl attack
 # points. Currently only K15 is found to owl attack N19, but clearly

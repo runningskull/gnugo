@@ -1,3 +1,52 @@
+========================== 3.1.3  =========================
+
+./regress.sh . endgame.tst
+211 unexpected FAIL: Correct 'A5', got 'O2'
+401 unexpected PASS!
+./regress.sh . neurogo.tst
+3 unexpected PASS!
+15 unexpected PASS!
+./regress.sh . rosebud.tst
+1 unexpected PASS!
+./regress.sh . golife.tst
+7 unexpected FAIL: Correct 'F3', got 'E4'
+./regress.sh . arion.tst
+./regress.sh . viking.tst
+3 unexpected FAIL: Correct 'M15|B7', got 'P18'
+./regress.sh . ego.tst
+3 unexpected PASS!
+4 unexpected PASS!
+./regress.sh . nicklas1.tst
+1206 unexpected FAIL: Correct 'C15', got 'F18'
+./regress.sh . strategy3.tst
+160 unexpected PASS!
+170 unexpected PASS!
+171 unexpected PASS!
+172 unexpected PASS!
+174 unexpected PASS!
+
+========================== 3.1.2  =========================
+
+./regress.sh . owl.tst
+217 unexpected PASS!
+218 unexpected PASS!
+./regress.sh . filllib.tst
+25 unexpected FAIL: Correct 'J3|J5', got 'H1'
+./regress.sh . blunder.tst
+14 unexpected PASS!
+./regress.sh . neurogo.tst
+3 unexpected PASS!
+15 unexpected PASS!
+./regress.sh . golife.tst
+7 unexpected FAIL: Correct 'F3', got 'E4'
+./regress.sh . nicklas1.tst
+1213 unexpected FAIL: Correct 'N4', got 'F12'
+1604 unexpected PASS!
+./regress.sh . nicklas2.tst
+904 unexpected FAIL: Correct 'B1|E1', got 'G6'
+./regress.sh . strategy3.tst
+117 unexpected PASS!
+
 ========================== 3.1.1  =========================
 
 ./regress.sh . owl.tst
@@ -28,26 +77,4 @@
 167 unexpected PASS!
 
 Test results updated.
-
-========================== 3.1.2  =========================
-
-./regress.sh . owl.tst
-217 unexpected PASS!
-218 unexpected PASS!
-./regress.sh . filllib.tst
-25 unexpected FAIL: Correct 'J3|J5', got 'H1'
-./regress.sh . blunder.tst
-14 unexpected PASS!
-./regress.sh . neurogo.tst
-3 unexpected PASS!
-15 unexpected PASS!
-./regress.sh . golife.tst
-7 unexpected FAIL: Correct 'F3', got 'E4'
-./regress.sh . nicklas1.tst
-1213 unexpected FAIL: Correct 'N4', got 'F12'
-1604 unexpected PASS!
-./regress.sh . nicklas2.tst
-904 unexpected FAIL: Correct 'B1|E1', got 'G6'
-./regress.sh . strategy3.tst
-117 unexpected PASS!
 
