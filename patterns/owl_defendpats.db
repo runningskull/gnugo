@@ -4885,18 +4885,18 @@ B.?
 ; && oplay_attack(*,a,B)
 
 
-Pattern D1136
-#tm new pattern (3.1.14)
-#See strategy:206
-#FIXME:  This pattern may match inappropriately, and
-#        probably needs a constraint.
-
-OOO	very low value
-..X
-X*.
-???
-
-:8,b,value(5)
+# Pattern D1136
+# #tm new pattern (3.1.14)
+# #See strategy:206
+# #FIXME:  This pattern may match inappropriately, and
+# #        probably needs a constraint.
+# 
+# OOO	very low value
+# ..X
+# X*.
+# ???
+# 
+# :8,b,value(5)
 
 
 Pattern D1137
