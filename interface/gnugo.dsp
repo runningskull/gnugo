@@ -173,19 +173,6 @@ SOURCE=..\interface\play_test.c
 !ENDIF 
 
 # End Source File
-# Begin Source File
-
-SOURCE=..\x.c
-
-!IF  "$(CFG)" == "gnugo - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "gnugo - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
 # End Group
 # Begin Group "Header Files"
 

@@ -64,6 +64,16 @@ static int dragon2_initialized;
 static int lively_white_dragons;
 static int lively_black_dragons;
 
+/* FIXME: Not sure where best to put this! */
+/* Alternative for DRAGON2 macro with asserts. */
+struct dragon_data2 *
+dragon2_func(int pos)
+{
+  ASSERT1(ON_BOARD1(pos)
+          && dragon[pos].id >= 0 
+          && dragon[pos].id < number_of_dragons, pos);
+  return &dragon2[dragon[pos].id];
+}
 
 /* This basic function finds all dragons and collects some basic information
  * about them in the dragon array.
