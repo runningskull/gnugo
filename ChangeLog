@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- evaluate_diagonal_intersection() tries additional moves to defend a diagonal
+- does_secure() made global and moved to reading.c
 - owl_add_move has a new parameter max_moves
 - --allpats works with semeai
 - defend_both() revised to require that both strings can be saved  without ko
@@ -36,6 +38,7 @@
 - tuning
 - eye tuning
 - new game records and regression tests
+- doc revision
 
 3.3.14 released January 1, 2003
 

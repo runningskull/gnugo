@@ -174,7 +174,7 @@ int is_edge_vertex(int pos);
 /* Count and/or find liberties at (pos). */
 int countlib(int str);
 int findlib(int str, int maxlib, int *libs);
-int fastlib(int pos, int color, int ignore_capture);
+int fastlib(int pos, int color, int ignore_captures);
 int approxlib(int pos, int color, int maxlib, int *libs);
 int accuratelib(int pos, int color, int maxlib, int *libs);
 int count_common_libs(int str1, int str2);
@@ -382,6 +382,7 @@ void set_temporary_depth_values(int d, int b, int f, int k,
 void restore_depth_values(void);
 
 int safe_move(int move, int color);
+int does_secure(int color, int move, int pos);
 
 void join_dragons(int d1, int d2);
 int dragon_escape(char goal[BOARDMAX], int color, char escape_value[BOARDMAX]);

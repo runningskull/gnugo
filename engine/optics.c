@@ -1682,6 +1682,11 @@ evaluate_diagonal_intersection(int m, int n, int color,
     return 0.0;
 
   if (board[pos] == EMPTY) {
+    int your_safety = safe_move(pos, other);
+
+    apos = pos;
+    dpos = pos;
+
     /* We should normally have a safe move, but occasionally it may
      * happen that it's not safe. There are complications, however,
      * with a position like this:
@@ -1695,9 +1700,6 @@ evaluate_diagonal_intersection(int m, int n, int color,
      * Therefore we ignore our own safety if opponent's safety depends
      * on ko.
      */
-
-    int your_safety = safe_move(pos, other);
-    
     if (your_safety == 0)
       value = 0.0;
     else if (your_safety != WIN)
@@ -1705,16 +1707,43 @@ evaluate_diagonal_intersection(int m, int n, int color,
     else {                           /* So your_safety == WIN. */
       int our_safety = safe_move(pos, color);
       
-      if (our_safety == 0)
-        value = 2.0;
+      if (our_safety == 0) {
+	int k;
+
+	value = 2.0;
+
+	/* This check is intended to fix a certain special case, but might
+	 * be helpful in other situations as well. Consider this position,
+	 * happened in owl reading deep enough:
+	 *
+	 * |XXXXX
+	 * |XOOXX
+	 * |O.OOX
+	 * |.OXX.
+	 * +-----
+	 *
+	 * Without this check, the corner eye is considered false, not half-
+	 * eye. Thus, owl thinks that the capture gains at most one eye and
+	 * gives up.
+	 */
+	for (k = 4; k < 8; k++) {
+	  int diagonal = pos + delta[k];
+	  int lib;
+
+	  if (board[diagonal] == other && findlib(diagonal, 1, &lib) == 1) {
+	    if (does_secure(color, lib, pos)) {
+	      value = 1.0;
+	      apos = lib;
+	      break;
+	    }
+	  }
+	}
+      }
       else if (our_safety == WIN)
         value = 1.0;
       else                           /* our_safety depends on ko. */
         value = b;
     }
-
-    apos = pos;
-    dpos = pos;
   }
   else if (board[pos] == color) {
     /* This stone had better be safe, otherwise we wouldn't have an

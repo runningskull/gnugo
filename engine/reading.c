@@ -5471,6 +5471,22 @@ safe_move(int move, int color)
 }
 
 
+/* Checks if a move by color makes an opponent move at pos a self atari.
+ */
+int
+does_secure(int color, int move, int pos)
+{
+  int result = 0;
+  if (trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
+    if (is_self_atari(pos, OTHER_COLOR(color)))
+      result = 1;
+    popgo();
+  }
+  
+  return result;
+}
+
+
 /* ===================== Statistics  ============================= */
 
 

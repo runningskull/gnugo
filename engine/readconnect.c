@@ -1783,7 +1783,6 @@ static void compute_connection_distances(int str, int target,
 					 struct connection_data *conn);
 static void print_connection_distances(struct connection_data *conn);
 static int trivial_connection(int str1, int str2, int *move);
-static int does_secure(int color, int move, int pos);
 static int does_secure_through_ladder(int color, int move, int pos);
 static int ladder_capture(int str, int *move);
 static int ladder_capturable(int pos, int color);
@@ -3074,22 +3073,6 @@ trivial_connection(int str1, int str2, int *move)
   /* Turn the sgf traces back on. */
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
-  
-  return result;
-}
-
-
-/* True if a move by color makes an opponent move at pos a self atari.
- */
-static int
-does_secure(int color, int move, int pos)
-{
-  int result = 0;
-  if (trymove(move, color, NULL, NO_MOVE, EMPTY, NO_MOVE)) {
-    if (is_self_atari(pos, OTHER_COLOR(color)))
-      result = 1;
-    popgo();
-  }
   
   return result;
 }
