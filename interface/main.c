@@ -383,12 +383,14 @@ main(int argc, char *argv[])
       case 'r': seed = atoi(gg_optarg); seed_specified = 1; break;
       case 'S': showstatistics = 1; break;
       case 'w': printworms = 1; break;
-      case 'm': printmoyo = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
+      case 'm': printmoyo = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ 
+	break;
       case 'd': debug ^= strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
       case 'D': mandated_depth = atoi(gg_optarg); break;
 
       case 'M': memory = atof(gg_optarg); break; /* floating point number */
-      case 'H': hashflags = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
+      case 'H': hashflags = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ 
+	break;
 
       case 'E': printboard = 2; break;
       case 'B': mandated_backfill_depth = atoi(gg_optarg); break;

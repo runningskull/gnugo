@@ -74,8 +74,8 @@ of the string), and then call helper functions called @code{..._moves}
 which suggest less obvious moves. Which of these functions get called
 depends on the number of liberties and of the current search depth.
 
-@subsection Return codes
-@anchor{retcodes}
+@subsection Return Codes
+@anchor{Return Codes}
 @cindex return codes
 @cindex reading return codes
 
@@ -92,6 +92,13 @@ will get the first ko capture (so the opponent has to make the
 first ko threat). A return code of @code{KO_B} means that the player
 to move will have to make the first ko threat.
 
+If GNU Go is compiled with the configure option
+@option{--enable-experimental-owl-ext} then the owl functions also have
+possible return codes of @code{GAIN} and @code{LOSS}. A code of @code{GAIN}
+means that the attack (or defense) does not succeed, but that in the process
+of trying to attack or defend, an opponent's worm is captured. A code
+of @code{LOSS} means that the attack or defense succeeds, but that another
+friendly worm dies during the attack or defense.
 
 @subsection Reading cutoff and depth parameters
 @anchor{depthparams}
@@ -166,7 +173,7 @@ unless @code{*movei} is a null pointer. (Use null pointers if
 you are interested in the result of the attack but not the
 attacking move itself.) Returns @code{WIN}, if the attack succeeds,
 0 if it fails, and @code{KO_A} or @code{KO_B} if the result depends on ko
-@ref{retcodes}.
+@ref{Return Codes}.
 @end quotation
 @findex find_defense
 @item @code{find_defense(int str, int *move)}
@@ -176,7 +183,7 @@ returns true if such a move is found, with @code{*move} the location
 of the saving move (unless @code{*move} is a null pointer). It is not
 checked that tenuki defends, so this may give an erroneous answer if
 @code{!attack(str)}.  Returns @code{KO_A} or @code{KO_B} if the
-result depends on ko @xref{retcodes}. 
+result depends on ko @xref{Return Codes}. 
 @end quotation
 @findex safe_move
 @item @code{safe_move(int str, int color)} :
@@ -587,7 +594,8 @@ ko captures are not allowed.
 If the ko at @code{kom_pos} is filled, then the komaster
 reverts to @code{EMPTY}.
 
-The komaster scheme used in GNU Go 3.0 is known as komaster scheme 1.
+Several different komaster schemes may be found in @file{board.c}.
+The komaster scheme used in GNU Go 3.0 was known as komaster scheme 1.
 It may be summarized as follows. It is assumed that @samp{O} is about to move.
 
 @itemize @bullet
@@ -617,7 +625,8 @@ filled then the komaster reverts to @code{EMPTY}.
 @end itemize
 @end itemize
 
-In GNU Go 3.2 a new komaster scheme 5 is used. It may be described as follows.
+In GNU Go 3.2 and 3.4 komaster scheme 5 is used. It may be described as
+follows.
 
 @itemize @bullet
 @item 1. Komaster is EMPTY.

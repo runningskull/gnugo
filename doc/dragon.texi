@@ -511,17 +511,53 @@ could be different from the defense points.
 The array @code{struct dragon_data dragon[MAX_BOARD]}
 collects information about the dragons. We will give definitions of the
 various fields. Each field has constant value at each vertex of the
-dragon.
+dragon. (Fields will be discussed below.)
 
 @example
 
 struct dragon_data @{
-  int color;
-  int id;
+  int color;    /* its color                               */
+  int id;       /* the index into the dragon2 array        */
+  int origin;   /* the origin of the dragon. Two vertices  */
+                /* are in the same dragon iff they have    */
+                /* same origin.                            */
+  int size;     /* size of the dragon                      */
+  float effective_size; /* stones and surrounding spaces   */
+  int crude_status;     /* (ALIVE, DEAD, UNKNOWN, CRITICAL)*/
+  int status;           /* best trusted status             */
+@};
+
+extern struct dragon_data dragon[BOARDMAX];
+
+@end example
+
+Other fields attached to the dragon are contained in the @code{dragon_data2}
+struct array. (Fields will be discussed below.)
+
+@example
+
+struct dragon_data2 @{
   int origin;
-  int size;
-  float effective_size;
-  int crude_status;
+  int adjacent[MAX_NEIGHBOR_DRAGONS];
+  int neighbors;
+  int hostile_neighbors;
+  int moyo_size;
+  float moyo_territorial_value;
+  int safety;
+  float weakness;
+  float weakness_pre_owl;
+  int escape_route;
+  struct eyevalue genus;
+  int heye;
+  int lunch;
+  int surround_status;
+  int surround_size;
+  int semeai;
+  int semeai_margin_of_safety;
+  int semeai_defense_point;
+  int semeai_defense_certain;  
+  int semeai_attack_point;
+  int semeai_attack_certain;
   int owl_threat_status;
   int owl_status;
   int owl_attack_point;
@@ -532,32 +568,8 @@ struct dragon_data @{
   int owl_defense_code;
   int owl_defense_certain;
   int owl_second_defense_point;
-  int status;
-@};
-
-extern struct dragon_data dragon[BOARDMAX];
-
-@end example
-
-Other fields attached to the dragon are contained in the @code{dragon_data2}
-struct array. 
-
-@example
-
-struct dragon_data2 @{
-  int origin;
-  int adjacent[MAX_NEIGHBOR_DRAGONS];
-  int neighbors;
-  int hostile_neighbors;
-  int moyo;
-  int safety;
-  int escape_route;
-  int genus;
-  int heyes;
-  int heye;
-  int lunch;
-  int semeai;
-  int semeai_margin_of_safety;
+  int owl_attack_kworm;
+  int owl_defense_kworm;
 @};
 
 extern struct dragon_data2 *dragon2;
@@ -596,7 +608,7 @@ access the @code{dragon} array using the DRAGON macro.
 
 Here are the definitions of each field in the @code{dragon} arrray.
 
-@itemize @bullet 
+@itemize @bullet
 @item @code{color} 
 @quotation
 @cindex color (dragon)
@@ -605,197 +617,255 @@ For caves, it is @code{BLACK_BORDER}, @code{WHITE_BORDER} or
 @code{GRAY_BORDER}. The meaning of these concepts is the same as for worms.
 @end quotation
 @item @code{id}
+@cindex dragon number
 @quotation
-The dragon number. This is a key into the @code{dragon2} array.
+The dragon number, used as a key into the @code{dragon2} array.
 @end quotation
-@item @code{origin}
+@item origin
+@cindex dragon origin
 @quotation
-@cindex origin (dragon)
 The origin of the dragon is a unique particular vertex
 of the dragon, useful for determining when two vertices belong
 to the same dragon. Before amalgamation the worm origins are
 copied to the dragon origins. Amalgamation of two dragons
 amounts to changing the origin of one.
-@end quotation        
-@item @code{size} 
-@quotation
-@cindex size (dragon)
-This is the cardinality of the dragon.
 @end quotation
-@item @code{effective_size}
+@item size
+@cindex dragon size
 @quotation
-@cindex effective size (dragon)
+The number of stones in the dragon.
+@end quotation
+@item effective size
+@cindex effective size
+@quotation
 The sum of the effective sizes of the constituent worms.
 Remembering that vertices equidistant between two or more worms are
 counted fractionally in @code{worm.effective_size}, this equals the
 cardinality of the dragon plus the number of empty vertices which are
 nearer this dragon than any other.
 @end quotation
-@item @code{genus} 
+@item crude_status
 @quotation
-@cindex genus (dragon)
-The @dfn{genus} of a nonempty dragon consists of the number
-of distinct adjacent caves whose bordercolor is the color of
-the dragon, minus the number of false eyes found. The genus
-is a computable approximation to the number of eyes a dragon
-has.
+(ALIVE, DEAD, UNKNOWN, CRITICAL). An early measure of the life
+potential of the dragon. It is computed before the owl code is
+run and is superceded by the status as soon as that becomes
+available.
 @end quotation
-@item @code{escape_route}
+@item status
+@cindex dragon status
 @quotation
-@cindex escape_route (dragon)
-This is a measure of the escape potential of the dragon. If
-@code{dragon.escape_route} is large, GNU Go believes that the
-dragon can escape, so finding two eyes locally becomes less
-urgent. Further documentation may be found else where
-(@pxref{Escape}).
+The dragon status is the best measure of the dragon's health.
+It is computed after the owl code is run, then revised again
+when the semeai code is run.
 @end quotation
-@item @code{crude_status}
-@cindex crude_status (dragon)
-@findex compute_dragon_status
+@end itemize
+
+Here are definitions of the fields in the @code{dragon2} array.
+
+@itemize @bullet
+@item origin
 @quotation
-An attempt is made to classify the dragons as @code{ALIVE},
-@code{DEAD}, @code{CRITICAL} or @code{UNKNOWN}. The @code{CRITICAL}
-classification means that the fate of the dragon depends on who moves first in
-the area. The exact definition is in the function 
-@code{compute_dragon_status()}. If the dragon is found to be surrounded, 
-the crude_status is @code{DEAD} if it has less than 1.5 eyes or if the reading
-code determines that it can be killed, @code{ALIVE} if it has 2 or more
-eyes, and @code{CRITICAL} if it has 1.5 eyes. A lunch generally counts
-as a half eye in these calculations. If it has less than 2 eyes but
-seems possibly able to escape, the crude_status may be @code{UNKNOWN}.
+The origin field is duplicated here.
 @end quotation
-@item @code{owl_status}
+@item adjacent
+@item @code{adjacent[MAX_NEIGHBOR_DRAGONS]}
+@cindex neighbor dragons
+@cindex adjacent dragons
+@findex find_neighbor_dragons
 @quotation
-@cindex status, owl (dragon)
-@cindex owl_status
+Dragons of either color near the given one are called @dfn{neighbors}.
+They are computed by the function @code{find_neighbor_dragons()}.
+The @code{dragon2.adjacent} array gives the dragon numbers of
+these dragons.
+@end quotation
+@item @code{neighbors}
+@cindex neighbor dragons
+@cindex adjacent dragons
+@findex find_neighbor_dragons
+@quotation
+Dragons of either color near the given one are called @dfn{neighbors}.
+They are computed by the function @code{find_neighbor_dragons()}.
+The @code{dragon2.adjacent} array gives the dragon numbers of
+these dragons.
+@end quotation
+@item neighbors
+@quotation
+The number of neighbor dragons.
+@end quotation
+@item hostile_neighbors
+@quotation
+The number of neighbor dragons of the opposite color.
+@end quotation
+@item moyo_size
+@item float moyo_territorial_value
+@findex compute_surrounding_moyo_sizes
+@quotation
+The function @code{compute_surrounding_moyo_sizes()} assigns
+a size and a territorial value to the moyo around
+each dragon (@pxref{Territory and Moyo}). This is the 
+moyo size. They are recorded in these fields.
+@end quotation
+@item safety
+@cindex dragon safety
+@quotation
+The dragon safety can take on one of the values
+@itemize @minus
+@item TACTICALLY_DEAD - a dragon consisting of a single worm found dead by the
+reading code (very reliable)
+@item ALIVE - found alive by the owl or semeai code
+@item STRONGLY_ALIVE - alive without much question
+@item INVINCIBLE - definitively alive even after many tenukis
+@item ALIVE_IN_SEKI - determined to be seki by the semeai code
+@item CRITICAL - lives or dies depending on who moves first
+@item DEAD - found to be dead by the owl code
+@item INESSENTIAL - the dragon is unimportant (e.g. nakade stones) and dead
+@end itemize
+@end quotation
+@item weakness
+@item weakness_pre_owl
+@cindex dragon weakness
+@cindex weakness
+@quotation
+A floating point measure of the safety of a dragon. The dragon
+weakness is a number between 0. and 1., higher numbers for
+dragons in greater need of safety. The field @code{weakness_pre_owl}
+is a preliminary computation before the owl code is run.
+@end quotation
+@item escape_route
+@cindex dragon escape_route
+@cindex escape_route
+@findex compute_escape
+@quotation
+A measure of the dragon's potential to escape towards safety,
+in case it cannot make two eyes locally. Documentation
+may be found in @ref{Escape}.
+@end quotation
+@item struct eyevalue genus
+@cindex dragon genus
+@cindex genus
+@quotation
+The approximate number of eyes the dragon can be expected to
+get. Not guaranteed to be accurate. The eyevalue struct, which
+is used throughout the engine, is declared thus:
+@example
+
+struct eyevalue @{
+  unsigned char a; /* # of eyes if attacker plays twice */
+  unsigned char b; /* # of eyes if attacker plays first */
+  unsigned char c; /* # of eyes if defender plays first */
+  unsigned char d; /* # of eyes if defender plays twice */
+@};
+
+@end example
+@end quotation
+@item heye
+@quotation
+Location of a half eye attached to the dragon.
+@end quotation
+@item lunch
+@cindex dragon lunch
+@cindex lunch
+@quotation
+If nonzero, this is the location of a boundary string which
+can be captured. In contrast with worm lunches, a dragon
+lunch must be able to defend itself.
+@end quotation
+@item surround_status
+@item surround_size
+@cindex surround_status
+@cindex surround_size
+@cindex surround
+@quotation
+In estimating the safety of a dragon it is useful to know if
+it is @dfn{surrounded}. See @ref{Surrounded Dragons} and
+the comments in @file{surround.c} for more information about the
+algorithm.  Used in computing the escape_route, and also callable
+from patterns (currently used by CB258).  
+@end quotation
+@item semeai
+@item semeai_margin_of_safety
+@item semeai_defense_point
+@item semeai_defense_certain
+@item semeai_attack_point
+@item semeai_attack_certain
+@cindex semeai
+@cindex semeai_margin_of_safety
+@cindex semeai_defense_point
+@cindex semeai_defense_certain
+@cindex semeai_attack_point
+@cindex semeai_attack_certain
+@quotation
+If two dragons of opposite color both have the status CRITICAL
+or DEAD they are in a @dfn{semeai} (capturing race), and their
+status must be adjudicated by the function
+@code{owl_analyze_semeai()} in @file{owl.c}, which attempts to
+determine which is alive, which dead, or if the result is
+seki, and whether it is important who moves first. The
+function @file{new_semeai()} in @file{semeai.c} attempts
+to revise the statuses and to generate move reasons based
+on these results. The field @code{dragon2.semeai} is nonzero
+if the dragon is an element of a semeai. The semeai defense
+and attack points are locations the defender or attacker
+must move to win the semeai. The field @code{semeai_margin_of_safety}
+is intended to indicate whether the semeai is close or not
+but currently this field is not maintained. The fields
+@code{semeai_defense_certain} and @code{semeai_attack_certain}
+indicate that the semeai code was able to finish analysis
+without running out of nodes.
+@end quotation
+@item owl_status
+@quotation
 This is a classification similar to @code{dragon.crude_status}, but
 based on the life and death reading in @file{owl.c}.
-The owl code (@pxref{The Owl Code}) is only run on dragons with 
-dragon.escape_route>5 and dragon2.moyo>10. If
-these conditions are not met, the owl status is @code{UNCHECKED}.
+The owl code (@pxref{The Owl Code}) is skipped for dragons
+which appear safe by certain heuristics. If the owl code
+is not run, the owl status is @code{UNCHECKED}.
 If @code{owl_attack()} determines that the dragon cannot be
 attacked, it is classified as @code{ALIVE}. Otherwise,
 @code{owl_defend()} is run, and if it can be defended it
 is classified as @code{CRITICAL}, and if not, as @code{DEAD}.
 @end quotation
-@item @code{owl_attack_code}
+@item owl_attack_point
+@cindex owl_attack_point
 @quotation
-If the owl code finds that the dragon can be attacked, this is the
-attack code. It may be @code{WIN}, @code{KO_A}, @code{KO_B}, or (if the
-dragon cannot be attacked) 0.
+If the dragon can be attacked this is the point to attack the dragon.
 @end quotation
-@item @code{owl_attack_point}
+@item owl_attack_code
+@cindex owl_attack_code
 @quotation
-If the owl code finds that the dragon can be attacked, this is the point
-of attack.
+The owl attack code, It can be WIN, KO_A, KO_B or 0 (@pxref{Return Codes}).
 @end quotation
-@item @code{owl_attack_certain}
+@item owl_attack_certain
+@cindex owl_attack_certain
 @quotation
-The function @code{owl_attack}, which is used to set @code{owl_attack_code} 
-and @code{owl_attack_point}, is given an upper bound of 
-@code{owl_node_limit} in the number of nodes it is allowed to
-generate. If this is exceeded the result is considered uncertain and
-this flag is set.
+The owl reading is able to finish analyzing the attack
+without running out of nodes.
 @end quotation
-@item @code{owl_second_attack_point}
+@item owl_second_attack_point
+@cindex owl_second_attack_point
 @quotation
-Under certain circumstances the owl function @code{owl_threaten_attack}
-is asked if the dragon can be killed with two moves in a row. If two
-such killing moves are found, they are cached in @code{owl_attacki_point}
-@code{(owl_second_attack_point}.
+A second attack point.
 @end quotation
-@item @code{owl_defense_code}
+@item owl_defense_point
+@cindex owl_defense_point
 @quotation
-If the owl code finds that the dragon can be defended, this is the
-defense code (@code{WIN}, @code{KO_A}, @code{KO_B}); otherwise it is 0.
+If the dragon can be defended, this is the place to play.
 @end quotation
-@item @code{owl_defense_point}
+@item owl_defense_code
+@cindex owl_defense_code
 @quotation
-If the owl code finds that the dragon can be defended, this is the move.
+The owl defense code, It can be WIN, KO_A, KO_B or 0 (@pxref{Return Codes}).
 @end quotation
-@item @code{owl_defense_certain}
-@item @code{owl_second_defense_point}
-Similar to @code{owl_attack_certain} and
-@code{owl_second_attack_point}.
-@item @code{status}
+@item owl_defense_certain
+@cindex owl_defense_certain
 @quotation
-@cindex status (dragon)
-This is the status used by the pattern matcher. If @code{owl_status}
-is available (not @code{UNCHECKED}) this is used. Otherwise, we
-use the @code{status} field, except that we upgrade @code{DEAD} to
-@code{UNKNOWN}.
+The owl code is able to finish analyzing the defense without
+running out of nodes.
 @end quotation
-@end itemize
-
-Here are definitions of each field in the @code{dragon2} array.
-
-@itemize @bullet
-@item @code{origin}
+@item owl_second_defense_point
+@cindex owl_second_defense_point
 @quotation
-Duplicates the origin field from the dragon array.
-@end quotation
-@item @code{adjacent[MAX_NEIGHBOR_DRAGONS]}
-@quotation
-An array of adjacent dragons.
-@end quotation
-@item @code{neighbors}
-@quotation
-The number of adjacent dragons.
-@end quotation
-@item @code{hostile_neighbors}
-@quotation
-The number of adjacent dragons of the opposite color.
-@end quotation
-@item @code{moyo}
-@quotation
-@findex compute_surrounding_moyo_sizes
-Size of the surrounding influence moyo. Computed by
-@code{compute_surrounding_moyo_sizes()}, calling the influence code.
-@end quotation
-@item @code{safety}
-@quotation
-This is a finer measure of dragon safety than @code{status}.
-In addition to the values @code{ALIVE}, @code{DEAD} and @code{CRITICAL} 
-it can take the values @code{INESSENTIAL}, @code{TACTICALLY_DEAD}, 
-@code{WEAK}, @code{WEAKLY_ALIVE}, @code{ALIVE_IN_SEKI}, @code{STRONGLY_ALIVE}
-and @code{INVINCIBLE}.
-@end quotation
-@item @code{escape_route}
-@quotation
-A measure of the escape potential of the dragon. Further documentation
-may be found elsewhere (@pxref{Escape}).
-@end quotation
-@item @code{genus}
-@quotation
-The "genus" of a nonempty dragon consists of the number of
-distinct adjacent caves whose bordercolor is the color of the
-dragon, minus the number of false eyes found. The genus is a
-computable approximation to the number of eyes a dragon has.
-@end quotation
-@item @code{heyes}
-@quotation
-This is the number of half eyes the dragon has. A "half eye"
-is a pattern where an eye may or may not materialize,
-depending on who moves first.
-@end quotation
-@item @code{heye}
-@quotation
-If any half eyes are found, this field points to a move
-which will create an eye.
-@end quotation
-@item @code{lunch}
-@quotation
-If nonzero, this field points to the location of a boundary worm
-which can be easily capture. In contrast with the worm version of
-this parameter we exclude strings which cannot be saved.
-@end quotation
-@item @code{semeai}
-@quotation
-True if the dragon is part of a semeai.
-@end quotation
-@item @code{semeai_margin_of_safety}
-@quotation
-Small if the semeai is close. Currently not reliable.
+A second owl defense point.
 @end quotation
 @end itemize
 

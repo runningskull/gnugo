@@ -1326,6 +1326,14 @@ set_single_owl_move(struct owl_move_data moves[MAX_MOVES],
  *
  * - Returns KO_B if attack succeeds provided attacker has a ko threat
  *   which must be answered (the defender makes the first ko capture).
+ *
+ * If GNU Go is compiled with `configure --enable-experimental-owl-ext'
+ * then a return codes of GAIN is also possible.
+ *
+ * - Returns GAIN if the attack fails but another worm of the
+ *   opponent's is captured in during the failed attack. The location
+ *   of the killed worm is returned through the *kworm field.
+ *
  * */
 
 int
@@ -1965,8 +1973,16 @@ owl_threaten_attack(int target, int *attack1, int *attack2)
  * - Returns KO_B if the defense succeeds provided the defender has a ko threat
  *   which must be answered (the attacker makes the first ko capture).
  *
+ * If GNU Go is compiled with `configure --enable-experimental-owl-ext'
+ * then a return codes of GAIN is also possible.
+ *
+ * - Returns LOSS if the defense succeeds but another worm of the
+ *   defender's is captured in during the defense. The location
+ *   of the killed worm is returned through the *kworm field.
+ *
  * The array goal marks the extent of the dragon. This must
- * be maintained during reading.  */
+ * be maintained during reading.  
+ */
 
 int
 owl_defend(int target, int *defense_point, int *certain, int *kworm)

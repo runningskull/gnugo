@@ -1,5 +1,6 @@
 @menu
 * Influential Concepts::        Conceptual Outline of Influence
+* Territory and Moyo::		Territory, Moyo and Area
 * Influence Usage::		Where influence gets used in the engine
 * Influence and Territory::     Influence and Territory
 * Territorial Details::		Details of the Territory Valuation
@@ -14,9 +15,6 @@
 
 @node Influential Concepts
 @section Conceptual Outline of Influence
-@cindex moyo
-@cindex territory
-@cindex area
 
 We define call stones @dfn{lively} if they cannot be tactically
 attacked, or if they have a tactical defense and belong to the player
@@ -56,6 +54,45 @@ by a pattern database, which consists of the two files patterns/influence.db
 and patterns/barriers.db. The details are explained in
 @ref{Influential Patterns}.
 
+@node Territory and Moyo
+@section Territory, Moyo and Area
+@cindex territory
+@cindex moyo
+@cindex area
+
+Using the influence code, empty regions of the board are partitioned
+in three ways. A vertex may be described as White or Black's 
+@dfn{territory}, @dfn{moyo} or @dfn{area}. The functions
+@code{whose_territory()}, @code{whose_moyo()} and @code{whose_area()}
+will return a color, or EMPTY if it belongs to one player or the
+other in one of these classifications.
+
+@itemize @bullet
+@item Territory
+@quotation
+Those parts of the board which are expected to materialize
+as actual points for one player or the other at the end of
+the game are considered @dfn{territory}.
+@end quotation
+@item Moyo
+@quotation
+Those parts of the board which are either already territory or more generally
+places where a territory can easily materialize if the opponent neglects to
+reduce are considered @dfn{moyo}.
+@dfn{moyo}.
+@end quotation
+@item Area
+@quotation
+Those parts of the board where one player or the other has a
+stronger influence than his opponent are considered @dfn{area}.
+@end quotation
+@end itemize
+
+Generally territory is moyo and moyo is area. To get a feeling
+for these concepts, load an sgf file in a middle game position
+with the option @option{-m 0x0180} and examine the resulting
+diagrams (@pxref{Influential Display}).
+
 @node Influence Usage
 @section Where influence gets used in the engine
 
@@ -69,12 +106,11 @@ influence module gets called the first time. Here all lively stones act
 as an influence source of default strength 100. The result is stored in
 the variables @code{initial_influence} and @code{initial_opposite_influence},
 and it is used as an important information for guessing the strength of
-dragons. For example,
-a dragon that is part of a moyo of size 25 is immediately considered alive.
-For dragons with a smaller moyo size, a life-and-death analysis will be
-done by the owl code (see @ref{Pattern Based Reading}). A dragon with a
-moyo size of only 5 will be considered weak, even if the owl code has
-decided that it cannot be killed.
+dragons. For example, a dragon that is part of a moyo of size 25 is
+immediately considered alive.  For dragons with a smaller moyo size, a
+life-and-death analysis will be done by the owl code (see @ref{Pattern Based
+Reading}). A dragon with a moyo size of only 5 will be considered weak, even
+if the owl code has decided that it cannot be killed.
 
 As a tool for both the owl code and the strength estimate of dragons,
 an "escape" influence gets computed for each dragon (@pxref{Escape}).
@@ -101,10 +137,8 @@ the influence module is called again via the function
 @code{compute_move_influence} to assess the likely territorial balance after
 this move, and the result is compared with the state before that move.
 
-There are a number of changes from 3.0 to 3.2 in these influence
-computations relevant for territorial evaluation. Also, now an additional
-influence computation is done in order to compute the followup value of
-a move. Some explainations are in @ref{Territorial Details}.
+An additional influence computation is done in order to compute the followup
+value of a move. Some explainations are in @ref{Territorial Details}.
 
 Some of the public functions from @file{influence.c} which are used
 throughout the engine are listed in @ref{Influence Utilities}.
@@ -155,9 +189,9 @@ However, of course this move is sente once it is worth playing, and should
 therefore (in miai counting) be awarded an effective value of 2. Hence we
 need to recognize the followup value of a move. GNU Go 3.0 took care of
 this by using patterns in @code{patterns.db} that enforced an explicit
-followup value. Version 3.2 instead computes a seperate followup influence
-to each move considered. In the above example, an intrusion source will
-be added at @samp{a} as a followup move to @samp{*}. This destroys all of
+followup value. Versions 3.2 and 3.4 instead compute a seperate followup
+influence to each move considered. In the above example, an intrusion source
+will be added at @samp{a} as a followup move to @samp{*}. This destroys all of
 Black's territory and hence gives a followup value of 3.
 
 The pattern based followup value are still needed at some places, however.
@@ -241,8 +275,8 @@ X.OooOOO
 and we see that @samp{X} has 16 territory fewer and @samp{O}
 has two territory more, for a total difference of 18 points.
 
-That the influence function counts the value of captured stones is new
-in GNU Go 3.2.. Previously this was instead done using the
+That the influence function counts the value of captured stones was
+introduced in GNU Go 3.2.. Previously this was instead done using the
 effective_size heuristic. The effective size is the number of
 stones plus the surrounding empty spaces which are closer to
 this string or dragon than to any other stones. Here the @samp{O}
@@ -264,13 +298,11 @@ may seem to claim. But it should give a fairly good idea of how the design
 is intended.
 
 Another matter is that so far we have only considered the change in secure
-territory. GNU Go 3.2 uses a revised heuristic, which is explained in the
-next section, to assign probable territory to each player.
-
+territory. GNU Go 3.2 and 3.4 use a revised heuristic, which is explained in
+the next section, to assign probable territory to each player.
 
 @node Territorial Details
 @section Details of the Territory Valuation
-
 
 This section explains how GNU Go assigns a territorial value to an
 intersection once the white and black influence have been computed.
@@ -854,6 +886,12 @@ moves that the move generation is considering.
 The other options control which diagrams should be generated in these
 situations. You have to specify at least one of the options above and
 at least one of the options below to generate any output.
+
+@strong{
+The options below must be combined with one of the two previous
+ones, or the diagram will not be printed. For example to print
+the influence diagram, you may combine 0x08 and 0x010, and use
+the option @option{-m 0x018}.}
 
 @itemize @bullet
 @item @option{-m 0x010} or @option{-m 16}

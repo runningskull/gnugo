@@ -37,6 +37,13 @@ static int captured_territory(int pos, int color);
 #define ARRAYSIZE MAX_BOARD*MAX_BOARD
 
 
+/* The code in this file is not much used in the engine,
+ * being largely superceded by the algorithms in influence.c.
+ * The exception is the function estimate_score(), and 
+ * that too could be replaced with influence_score()
+ * in influence.c.
+ */
+
 /* As explained in the Texinfo documentation, this function
  * takes the characteristic function of the live groups,
  * dilates and erodes the required number of times. If
@@ -294,7 +301,10 @@ print_regions(int gb[BOARDMAX])
 
 
 /* Print the moyo regions after a specified number
- * of dilations and erosions.
+ * of dilations and erosions. NOTE: This partitioning
+ * of the board into moyo, territory and area is obsolete,
+ * and except for estimate_score() it is is not used by the 
+ * engine. Use instead print_influence_areas().
  */
 
 void

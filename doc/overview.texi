@@ -798,19 +798,19 @@ in comments to denote known bugs, etc.
 
 If you are using Emacs, you may find it fast and convenient to use
 Emacs' built-in facility for navigating the source. Switch to the
-root directory @file{gnugo-3.2.x/} and execute the command:
+root directory @file{gnugo-3.4.x/} and execute the command:
 
 @example
 find . -print|grep "\.[ch]$" | xargs etags
 @end example
 
-This will build a file called @file{gnugo-3.2.x/TAGS}. Now to
+This will build a file called @file{gnugo-3.4.x/TAGS}. Now to
 find any GNU Go function, type @command{M-.} and enter the
 command which you wish to find, or just @command{RET} if 
 the cursor is at the name of the function sought. 
 
 The first time you do this you will be prompted for the location
-of the TAGS table.  Enter the path to @file{gnugo-3.2.x/TAGS}, and
+of the TAGS table.  Enter the path to @file{gnugo-3.4.x/TAGS}, and
 henceforth you will be able to find any function with a minimum
 of keystrokes. 
 

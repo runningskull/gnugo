@@ -2024,16 +2024,17 @@ findlib(int str, int maxlib, int *libs)
 }
 
 /* Count the liberties a stone of the given color would get if played
- * at (pos).  Captures are ignored based on the ignore_capture flag.
- * (pos) must be empty.  It will fail if there is more than two
- * string neighbor of the same color.  In this case, the return value
- * is -1.  Captures are handled in a very limited way, so if 
- * ignore_capture is 0, and a capture is required, it will often
- * return -1.
+ * at (pos). The location (pos) must be empty.
  *
  * The intent of this function is to be as fast as possible, not
  * necessarily complete. But if it returns a positive value (meaning
  * it has succeeded), the value is guaranteed to be correct.
+ *
+ * Captures are ignored based on the ignore_capture flag.  The function
+ * fails if there are more than two neighbor strings of the same
+ * color.  In this case, the return value is -1.  Captures are handled
+ * in a very limited way, so if ignore_capture is 0, and a capture is
+ * required, it will often return -1.
  *
  * Note well, that it relies on incremental data.
  */
@@ -2902,9 +2903,8 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
 
 
 /* Determine whether two strings have at least one common liberty.
- * If they have and lib != NULL, one common liberty is returned in *lib.
+ * If they do and lib != NULL, one common liberty is returned in *lib.
  */
-
 int
 have_common_lib(int str1, int str2, int *lib)
 {
@@ -3016,8 +3016,8 @@ chainlinks(int str, int adj[MAXCHAIN])
 }
 
 
-/* chainlinks2 returns (in adj array) the chains surrounding
- * the string at str, which has exactly lib liberties. The number
+/* chainlinks2 returns (in adj array) those chains surrounding
+ * the string at str which have exactly lib liberties. The number
  * of such chains is returned.
  */
 
@@ -3044,7 +3044,7 @@ chainlinks2(int str, int adj[MAXCHAIN], int lib)
 }
 
 
-/* chainlinks3 returns (in adj array) the chains surrounding
+/* chainlinks3 returns (in adj array) those chains surrounding
  * the string at str, which have less or equal lib liberties.
  * The number of such chains is returned.
  */

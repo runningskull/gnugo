@@ -780,7 +780,6 @@ ones here.
 Called from actions for @samp{t} patterns in @file{barriers.db}.
 Marks @code{pos} as not being territory for @code{color}.
 @end quotation
-@item @code{void influence_erase_territory(struct influence_data *q, int pos, int color)}
 @item @code{int whose_territory(const struct influence_data *q, int pos)}
 @findex whose_territory
 @quotation
