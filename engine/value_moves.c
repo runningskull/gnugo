@@ -983,14 +983,24 @@ examine_move_safety(int color)
 	 * indicates they are safe.
 	 */
 	break;
-      case SEMEAI_MOVE:
       case OWL_DEFEND_MOVE:
       case OWL_DEFEND_MOVE_GOOD_KO:
       case OWL_DEFEND_MOVE_BAD_KO:
       case OWL_DEFEND_MOVE_LOSS:
-       	/* FIXME: The above imply not necessarily a safe move, if the
-	 * defending move is not connected to the dragon defended.
-	 */
+	{
+	  int ii;
+	  for (ii = first_worm_in_dragon(what); ii != NO_MOVE; 
+	       ii = next_worm_in_dragon(ii)) {
+	    if (!play_connect_n(color, 0, 1, pos, ii, pos))
+	      break;
+	  }
+	  if (ii != NO_MOVE) {
+	    tactical_safety = 1;
+	    safety = 1;
+	  }
+	  break;
+	}
+      case SEMEAI_MOVE:
       case MY_ATARI_ATARI_MOVE:
       case YOUR_ATARI_ATARI_MOVE:
       case EITHER_MOVE:         /* FIXME: More advanced handling? */
@@ -1162,7 +1172,8 @@ examine_move_safety(int color)
 	     */
 	    safety = 1;
 	  
-	  else if (owl_does_defend(pos, aa, NULL))
+	  else if (!play_connect_n(color, 0, 1, pos, aa, pos)
+		   && owl_does_defend(pos, aa, NULL))
 	    safety = 1;
 	  break;
 	}
@@ -1866,7 +1877,9 @@ estimate_territorial_value(int pos, int color, float our_score,
 	/* No followup value if string can be defended with threat
          * against our move. An exception to this is when our move
          * isn't safe anyway and we play this only for the followup
-         * value, typically as a ko threat.
+         * value, typically as a ko threat. Though, "suspicious" owl 
+	 * defenses (move_safety != 1) are still tested for possible
+	 * backfires.
 	 *
 	 * This rule may be overwritten with patterns. See pattern
 	 * Sente22 and related test trevord:950 for an example.
@@ -1877,7 +1890,8 @@ estimate_territorial_value(int pos, int color, float our_score,
 	if (!is_known_good_attack_threat(pos, aa)
 	    && board[aa] != EMPTY
 	    && (move[pos].move_safety == 1
-		|| adjacent_to_nondead_stone(pos, color))
+		|| adjacent_to_nondead_stone(pos, color)
+		|| owl_defense_move_reason_known(pos, -1))
 	    && find_defense(aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
 	  int bad_followup;
@@ -1960,6 +1974,12 @@ estimate_territorial_value(int pos, int color, float our_score,
       /* Make sure this is a threat to defend our stones. */
       ASSERT1(board[aa] == color, aa);
       
+      /* We don't trust tactical defense threats as ko threats, unless
+       * the move is safe.
+       */
+      if (move[pos].move_safety == 0)
+	break;
+
       /* No followup value if string can be attacked with threat
        * against our move. An exception to this is when our move
        * isn't safe anyway and we play this only for the followup
@@ -1986,12 +2006,6 @@ estimate_territorial_value(int pos, int color, float our_score,
 	popgo();
       }
       
-      /* We don't trust tactical defense threats as ko threats, unless
-       * the move is safe.
-       */
-      if (move[pos].move_safety == 0)
-	break;
-
       add_followup_value(pos, 2 * worm[aa].effective_size);
 
       TRACE("  %1m:   %f (followup) - threatens to defend %1m\n",

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- safety checks improved for owl defense moves
 - bugfix in find_neighbor_dragons()
 - attribute "noreturn" for abortgo()
 - don't add child to root node in sgffile_printboard()
