@@ -236,6 +236,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 		  m, left_corner[k-1], left_corner[k]);
 	/* left edge in this row is on segment (ti,tj) -> (bi, bj) */
 	
+	/* FIXME: Rewrite this to avoid floating point arithmetic */
 	left_boundary = ceil(tj + (m - ti) * (bj - tj) / (bi - ti));
 	break;
       }
@@ -250,6 +251,8 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	if (0)
 	  gprintf("(right) %d: %1m %1m\n", 
 		  m, right_corner[k-1], right_corner[k]);
+
+	/* FIXME: Rewrite this to avoid floating point arithmetic */
 	right_boundary = floor(tj + (m - ti) * (bj - tj) / (bi - ti));
 	break;
       }
@@ -261,10 +264,10 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   /* mark the expanded region */
 
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
-    if (ON_BOARD(dpos) && !mn[dpos] && 
-	((mn[NORTH(dpos)]==1) || (mn[SOUTH(dpos)]==1)
-	 || (mn[EAST(dpos)]==1) || (mn[WEST(dpos)]==1)))
-      mn[dpos] = 2;
+    if (ON_BOARD(dpos) && mn[dpos] == 1)
+      for (k = 0; k < 4; k++)
+	if (ON_BOARD(dpos + delta[k]) && !mn[dpos + delta[k]])
+	  mn[dpos + delta[k]] = 2;
       
   /* Mark allied dragons that intersect the (unexpanded) hull.
    * These must all lie entirely within the hull for the
