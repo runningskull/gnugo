@@ -2570,16 +2570,17 @@ Ba*
 Pattern D704b
 # gf Revised constraint. (3.1.15)
 # gf Revised constraint. (3.1.23)
+# pp Revised pattern. (3.3.18)
 
-oO.         half eye sometimes missed
-O.*
----
+oO.?	    half eye sometimes missed
+O.*?
+----
 
 :8,-,value(35)
 
-cOb
-O.*
----
+cOb?
+O.*?
+----
 
 ; (safe_xmove(b) || safe_xmove(*)) && oplay_attack(*,b,b)
 ; && (o_somewhere(c) || !safe_xmove(c))

@@ -17,16 +17,17 @@
 - bugfix in gnugo_estimate_score()
 - reevaluate_ko_threats() revised
 - new helper backfill_replace
-- influence tuning
-- joseki tuning
 - revisions of twogtp.py
 - bugfix in play_move()
 - improved output files from scoring mode
 - traces added to find_double_threats()
-- new test case
 - semeai tracing improved
 - fix arraybound violation in corner_matchpat()
 - tuning
+- influence tuning
+- joseki tuning
+- owl tuning
+- new and revised test cases
 
 3.3.17 released March 2, 2003
 

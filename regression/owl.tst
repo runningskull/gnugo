@@ -831,7 +831,7 @@ loadsgf games/ego.sgf 198
 
 loadsgf games/owl29.sgf 132
 226 owl_attack J10
-#? [1 O8]*
+#? [2 O8]*
 
 loadsgf games/owl30.sgf 172
 227 owl_attack L19

@@ -820,7 +820,7 @@ O.B
 
 Pattern A224
 
-????        block if O can't cut
+????        block if X can't cut
 OO.?
 XY*.
 ....
@@ -1083,6 +1083,24 @@ X..
 xO.
 
 ; !oplay_attack(*,*)
+
+
+Pattern A237
+# pp New pattern (3.3.18) See nngs4:370
+
+??O.	    eliminate an eye in reverse sente
+xY*O
+X..o
+----
+
+:8,-,value(80)
+
+??Oc
+aY*A
+X.bo
+----
+
+; (x_somewhere(a) || ! safe_omove(a)) && !xplay_defend(*,b,c,A)
 
 
 #########################################################
@@ -1740,6 +1758,22 @@ a.*Y
 ??O?
 
 ;(owl_escape_value(a) > 0)
+
+
+Pattern A424
+# pp New pattern (3.3.18)
+
+XYO?	     block and prevent opponent from playing double threat move
+.O.o
+XX*.
+
+:8,-,value(80)
+
+XYO?
+.O.o
+XX*a
+
+;owl_escape_value(a) > 0
 
 
 #########################################################
