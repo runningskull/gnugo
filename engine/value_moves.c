@@ -1501,19 +1501,17 @@ estimate_territorial_value(int pos, int color, float score)
       break;
       
     case MY_ATARI_ATARI_MOVE:
-      this_value = 2 * move_reasons[r].what + 3.0;
-      if (influence_territory_color(pos) == OTHER_COLOR(color))
-	does_block = 1;
+      /* Add 1.0 to compensate for -1.0 penalty because the move is
+       * thought to be a sacrifice.
+       */
+      this_value = move_reasons[r].what + 1.0;
       tot_value += this_value;
       TRACE("  %1m: %f - combination attack kills one of several worms\n",
 	    pos, this_value);
       break;
       
     case YOUR_ATARI_ATARI_MOVE:
-      this_value = 2 * move_reasons[r].what + 3.0;
-      if (influence_territory_color(pos) == color
-	  && !is_self_atari(pos, OTHER_COLOR(color)))
-	this_value += 7.0;
+      this_value = move_reasons[r].what;
       tot_value += this_value;
       TRACE("  %1m: %f - defends against combination attack on several worms\n",
 	    pos, this_value);

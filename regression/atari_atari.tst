@@ -53,3 +53,7 @@ loadsgf games/viking2.sgf 140
 loadsgf games/viking2.sgf 146
 12 combination_attack white
 #? [N13|Q12]
+
+loadsgf games/trevor/auto/c24.sgf 62
+13 combination_attack black
+#? [D8]*

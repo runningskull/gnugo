@@ -1212,11 +1212,9 @@ add_my_atari_atari_move(int pos, int size)
   add_move_reason(pos, MY_ATARI_ATARI_MOVE, size);
 }
 
-/* Add to the reasons for the move at (ti, tj) that an opponent move there
- * would capture at least one of a set of worms which individually are
- * tactically safe (such as a double atari), and that a move there
- * by the defender is safe---presumably it defends the threat.
- * Only one such move reason is permitted per move.  */
+/* Add to the reasons for the move at (ti, tj) that it stops a
+ * combination attack for the opponent.
+ */
 void
 add_your_atari_atari_move(int pos, int size)
 {
@@ -1373,9 +1371,11 @@ get_saved_worms(int pos, int saved[BOARDMAX])
       break;
     
     what = move_reasons[r].what;
-    if (move_reasons[r].type == DEFEND_MOVE
-	|| move_reasons[r].type == DEFEND_MOVE_GOOD_KO
-	|| move_reasons[r].type == DEFEND_MOVE_BAD_KO) {
+    /* We exclude the ko contingent defenses, to avoid that the
+     * confirm_safety routines spot an attack with ko and thinks the
+     * move is unsafe.
+     */
+    if (move_reasons[r].type == DEFEND_MOVE) {
       int origin = worm[worms[what]].origin;
       int ii;
       for (ii = BOARDMIN; ii < BOARDMAX; ii++)
@@ -1400,9 +1400,11 @@ get_saved_dragons(int pos, int saved[BOARDMAX])
       break;
     
     what = move_reasons[r].what;
-    if (move_reasons[r].type == OWL_DEFEND_MOVE
-	|| move_reasons[r].type == OWL_DEFEND_MOVE_GOOD_KO
-	|| move_reasons[r].type == OWL_DEFEND_MOVE_BAD_KO) {
+    /* We exclude the ko contingent defenses, to avoid that the
+     * confirm_safety routines spot an attack with ko and thinks the
+     * move is unsafe.
+     */
+    if (move_reasons[r].type == OWL_DEFEND_MOVE) {
       int origin = dragon[dragons[what]].origin;
       int ii;
       for (ii = BOARDMIN; ii < BOARDMAX; ii++)

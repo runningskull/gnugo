@@ -203,4 +203,23 @@ Pattern A12
 ;lib(A)==2 && olib(*)>3
 
 
+Pattern A13
+
+*O
+.X
+.X
+.x
+--
+
+:8,-
+
+*O
+.A
+.A
+.x
+--
+
+;lib(A)==3 && olib(*)>=3
+
+
 # END OF FILE
