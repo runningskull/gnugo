@@ -44,6 +44,11 @@ int conn_worm1[MAX_CONNECTIONS];
 int conn_worm2[MAX_CONNECTIONS];
 int next_connection;
 
+/* Potential semeai moves. */
+int semeai_target1[MAX_POTENTIAL_SEMEAI];
+int semeai_target2[MAX_POTENTIAL_SEMEAI];
+static int next_semeai;
+
 /* Unordered sets (currently pairs) of move reasons / targets */
 Reason_set either_data[MAX_EITHER];
 int next_either;
@@ -89,6 +94,7 @@ clear_move_reasons(void)
   int k;
   next_reason = 0;
   next_connection = 0;
+  next_semeai = 0;
   next_either = 0;
   next_all = 0;
   next_eye = 0;
@@ -853,6 +859,46 @@ add_semeai_move(int pos, int dr)
 {
   ASSERT_ON_BOARD1(dr);
   add_move_reason(pos, SEMEAI_MOVE, dragon[dr].origin);
+}
+
+/*
+ * Add to the reasons for the move at (pos) that it might
+ * kill/save the dragon at (dr1) in the semeai against (dr2).
+ */
+static void
+add_potential_semeai_move(int pos, int type, int dr1, int dr2)
+{
+  ASSERT1(ON_BOARD(dr1), pos);
+  ASSERT1(ON_BOARD(dr2), pos);
+  if (next_semeai >= MAX_POTENTIAL_SEMEAI)
+    DEBUG(DEBUG_MOVE_REASONS,
+	  "Potential semeai move at %1m dropped as list was full\n", pos);
+  else {
+    semeai_target1[next_semeai] = dr1;
+    semeai_target2[next_semeai] = dr2;
+    add_move_reason(pos, type, next_semeai);
+    next_semeai++;
+  }
+}
+
+/*
+ * Add to the reasons for the move at (pos) that it might
+ * kill the dragon at (dr1) in the semeai against (dr2).
+ */
+void
+add_potential_semeai_attack(int pos, int dr1, int dr2)
+{
+  add_potential_semeai_move(pos, POTENTIAL_SEMEAI_ATTACK, dr1, dr2);
+}
+
+/*
+ * Add to the reasons for the move at (pos) that it might
+ * save the dragon at (dr1) in the semeai against (dr2).
+ */
+void
+add_potential_semeai_defense(int pos, int dr1, int dr2)
+{
+  add_potential_semeai_move(pos, POTENTIAL_SEMEAI_DEFENSE, dr1, dr2);
 }
 
 /*

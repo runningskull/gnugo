@@ -370,6 +370,8 @@ void add_connection_move(int pos, int dr1, int dr2);
 void add_cut_move(int pos, int dr1, int dr2);
 void add_antisuji_move(int pos);
 void add_semeai_move(int pos, int dr);
+void add_potential_semeai_attack(int pos, int dr1, int dr2);
+void add_potential_semeai_defense(int pos, int dr1, int dr2);
 void add_semeai_threat(int pos, int dr);
 
 void add_owl_attack_move(int pos, int dr, int kworm, int code);

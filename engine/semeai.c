@@ -380,7 +380,6 @@ semeai_move_reasons(int color)
   int liberties;
   int libs[MAXLIBS];
   int r;
-  int resulta, resultb, semeai_move, s_result_certain;
 
   for (d = 0; d < number_of_dragons; d++)
     if (dragon2[d].semeais && DRAGON(d).status == CRITICAL) {
@@ -400,9 +399,8 @@ semeai_move_reasons(int color)
 	    && !is_self_atari(dragon2[d].semeai_defense_point, color)) {
 	  
 	  /* If this is a move to fill the non-common liberties of the
-	   * target, and is not a ko or snap-back, then we try all
-	   * non-common liberties of the target and add all winning
-	   * moves to the move list.
+	   * target, and is not a ko or snap-back, then we mark all
+	   * non-common liberties of the target as potential semeai moves.
 	   */
 
           liberties = findlib(dragon2[d].semeai_defense_target, MAXLIBS, libs);
@@ -410,19 +408,9 @@ semeai_move_reasons(int color)
           for (r = 0; r < liberties; r++) {
             if (!neighbor_of_dragon(libs[r], dragon2[d].origin)
 		&& !is_self_atari(libs[r], color)
-		&& libs[r] != dragon2[d].semeai_defense_point) {
-              owl_analyze_semeai_after_move(libs[r], color,
-					    dragon2[d].semeai_defense_target,
-					    dragon2[d].origin,
-					    &resulta, &resultb, &semeai_move,
-					    1, &s_result_certain, 0);
-              if (resulta == 0 && resultb == 0) {
-	        add_semeai_move(libs[r], dragon2[d].origin);
-	        DEBUG(DEBUG_SEMEAI,
-		      "Adding semeai defense move for %1m at %1m\n",
-		      DRAGON(d).origin, libs[r]);
-	      }
-            }
+		&& libs[r] != dragon2[d].semeai_defense_point)
+	      add_potential_semeai_defense(libs[r], dragon2[d].origin,
+					   dragon2[d].semeai_defense_target);
 	  }
 	}
       }
@@ -447,18 +435,9 @@ semeai_move_reasons(int color)
           for (r = 0; r < liberties; r++) {
             if (!neighbor_of_dragon(libs[r], dragon2[d].semeai_attack_target)
 		&& !is_self_atari(libs[r], color)
-		&& libs[r] != dragon2[d].semeai_attack_point) {
-              owl_analyze_semeai_after_move(libs[r], color, dragon2[d].origin,
-					    dragon2[d].semeai_attack_target,
-					    &resulta, &resultb, &semeai_move,
-					    1, &s_result_certain, 0);
-              if (resulta == 0 && resultb == 0) {
-	        add_semeai_move(libs[r], dragon2[d].origin);
-	        DEBUG(DEBUG_SEMEAI,
-		      "Adding semeai attack move for %1m at %1m\n",
-		      DRAGON(d).origin, libs[r]);
-	      }
-            }
+		&& libs[r] != dragon2[d].semeai_attack_point)
+	      add_potential_semeai_attack(libs[r], dragon2[d].origin,
+					  dragon2[d].semeai_attack_target);
 	  }
 	}
       }

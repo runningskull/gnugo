@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new move reasons POTENTIAL_SEMEAI_ATTACK/DEFENSE to defer analysis of
+  possible semeai winning moves until move valuation
 - infrastructure to cut owl goal dragons
 - new owl pattern class C: threaten to cut owl goal dragon
 - view.pike enhancement: owl_does_defend/attack

@@ -39,7 +39,6 @@
 #define SEMEAI_MOVE             18
 #define SEMEAI_THREAT           (SEMEAI_MOVE | THREAT_BIT)
 
-/*      BLOCK_TERRITORY_MOVE    20   OBSOLETE */
 #define EXPAND_TERRITORY_MOVE   20
 #define EXPAND_MOYO_MOVE        22
 #define INVASION_MOVE           24
@@ -64,6 +63,8 @@
 
 #define OWL_ATTACK_MOVE_GAIN    60
 #define OWL_DEFEND_MOVE_LOSS    62
+#define POTENTIAL_SEMEAI_ATTACK	64
+#define POTENTIAL_SEMEAI_DEFENSE 66
 
 #define ANTISUJI_MOVE           70
 
@@ -136,6 +137,7 @@ struct move_data {
 #define MAX_WORMS		2*MAX_BOARD*MAX_BOARD/3
 #define MAX_DRAGONS		MAX_WORMS
 #define MAX_CONNECTIONS 	4*MAX_WORMS
+#define MAX_POTENTIAL_SEMEAI	50
 #define MAX_EYES		MAX_BOARD*MAX_BOARD/2
 #define MAX_LUNCHES		MAX_WORMS
 #define MAX_EITHER		100
@@ -151,6 +153,9 @@ extern int next_reason;
 extern int conn_worm1[MAX_CONNECTIONS];
 extern int conn_worm2[MAX_CONNECTIONS];
 extern int next_connection;
+
+extern int semeai_target1[MAX_POTENTIAL_SEMEAI];
+extern int semeai_target2[MAX_POTENTIAL_SEMEAI];
 
 /* Unordered sets (currently pairs) of move reasons / targets */
 typedef struct {

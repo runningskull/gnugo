@@ -706,6 +706,89 @@ find_more_owl_attack_and_defense_moves(int color)
   verbose = save_verbose;
 }
 
+/* Tests whether the potential semeai move at (pos) with details given via
+ * (*reason) works, and adds a semeai move if applicable.
+ */
+static void
+try_potential_semeai_move(int pos, int color, struct move_reason *reason)
+{
+  int dr1 = semeai_target1[reason->what];
+  int dr2 = semeai_target2[reason->what];
+  int resulta, resultb, certain, old_certain;
+  ASSERT1(IS_STONE(board[dr1]), pos);
+  switch (reason->type) {
+    case POTENTIAL_SEMEAI_ATTACK:
+      owl_analyze_semeai_after_move(pos, color, dr1, dr2,
+				    &resulta, &resultb, NULL,
+				    1, &certain, 0);
+      old_certain = DRAGON2(dr1).semeai_attack_certain;
+      break;
+    case POTENTIAL_SEMEAI_DEFENSE:
+      old_certain = DRAGON2(dr1).semeai_defense_certain;
+      /* In this case other dragon gets to move first after forced move. */
+      owl_analyze_semeai_after_move(pos, color, dr2, dr1,
+				    &resulta, &resultb, NULL,
+				    1, &certain, 0);
+      break;
+    default:
+      ASSERT1(0, pos);
+  }
+  if (resulta == 0 && resultb == 0
+      && (certain || !old_certain)) {
+    add_semeai_move(pos, dr1);
+    DEBUG(DEBUG_SEMEAI,
+	  "Potential semeai move at %1m for dragon at %1m is real\n",
+	  pos, dr1);
+  }
+  else
+    DEBUG(DEBUG_MOVE_REASONS, "Potential semeai move at %1m for %1m discarded\n",
+	  pos, dr1);
+}
+
+/* This functions tests all potential semeai attack moves whether they work,
+ * provided that there is at least one other move reasons stored for the
+ * relevant position.
+ */
+static void
+find_more_semeai_moves(int color)
+{
+  int pos;
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    int k, r;
+    int potential_semeai_move_found = 0;
+    int other_move_reason_found = 0;
+    if (!ON_BOARD1(pos))
+      continue;
+    for (k = 0; k < MAX_REASONS; k++) {
+      r = move[pos].reason[k];
+      if (r < 0)
+	break;
+      switch (move_reasons[r].type) {
+	case POTENTIAL_SEMEAI_ATTACK:
+	case POTENTIAL_SEMEAI_DEFENSE:
+          potential_semeai_move_found = 1;
+	  break;
+	default:
+	  other_move_reason_found = 1;
+      }
+    }
+    if ((r < 0 || k == MAX_REASONS)
+	&& !other_move_reason_found)
+      continue;
+    if (!potential_semeai_move_found)
+      continue;
+
+    for (k = 0; k < MAX_REASONS; k++) {
+      int r = move[pos].reason[k];
+      if (r < 0)
+	break;
+      if (move_reasons[r].type == POTENTIAL_SEMEAI_ATTACK
+	  || move_reasons[r].type == POTENTIAL_SEMEAI_DEFENSE)
+	try_potential_semeai_move(pos, color, &(move_reasons[r]));
+    }
+  }
+}
+
 
 /*
  * Any move that captures or defends a worm also potentially connects
@@ -3559,6 +3642,9 @@ review_move_reasons(int *the_move, float *val, int color,
     find_more_owl_attack_and_defense_moves(color);
     time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);
   }
+
+  find_more_semeai_moves(color);
+  time_report(2, "  find_more_semeai_moves", NO_MOVE, 1.0);
 
   save_verbose = verbose;
   if (verbose > 0)
