@@ -855,6 +855,7 @@ gtp_owl_attack(char *s, int id)
   int attack_code;
   int save_verbose = verbose;
   int result_certain;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
 
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
@@ -863,8 +864,10 @@ gtp_owl_attack(char *s, int id)
     return gtp_failure(id, "vertex must not be empty");
 
   verbose = 0;
+  sgf_dumptree = NULL;
   examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
+  sgf_dumptree = save_sgf_dumptree;
   
   attack_code = owl_attack(POS(i, j), &attack_point, &result_certain);
   gtp_printid(id, GTP_SUCCESS);
@@ -892,6 +895,7 @@ gtp_owl_defend(char *s, int id)
   int defend_code;
   int save_verbose = verbose;
   int result_certain;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
   
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
@@ -900,8 +904,10 @@ gtp_owl_defend(char *s, int id)
     return gtp_failure(id, "vertex must not be empty");
 
   verbose = 0;
+  sgf_dumptree = NULL;
   examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   verbose = save_verbose;
+  sgf_dumptree = save_sgf_dumptree;
 
   defend_code = owl_defend(POS(i, j), &defense_point, &result_certain);
   gtp_printid(id, GTP_SUCCESS);

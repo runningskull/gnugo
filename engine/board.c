@@ -391,7 +391,8 @@ trymove(int pos, int color, const char *message, int str,
     }
     else {
       if (komaster != EMPTY)
-	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
+	gg_snprintf(buf, 100, 
+		    "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
 		    hashdata.hashval, color_to_string(komaster),
 		    location_to_string(kom_pos));
