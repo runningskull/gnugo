@@ -326,6 +326,8 @@ showchar(int i, int j, int empty, int xo)
     }
     else if (xo == 3)
       write_color_char(colors[BOARD(i, j)][d->owl_status], w);
+    else if (xo == 4)
+      write_color_char(colors[BOARD(i, j)][d->matcher_status], w);
   }
 }
 
@@ -339,6 +341,7 @@ showchar(int i, int j, int empty, int xo)
  * xo=1:      colored dragon display
  * xo=2:      colored eye display
  * xo=3:      colored owl display
+ * xo=4:      colored matcher status display
  *
  */
 

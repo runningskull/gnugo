@@ -395,6 +395,8 @@ do_genmove(int *move, int color, float pure_threat_value)
     if (printboard == 1) {
       fprintf(stderr, "\n           owl_status display:\n\n");      
       showboard(3);
+      fprintf(stderr, "\n           matcher_status display:\n\n");      
+      showboard(4);
     }
   }
   
