@@ -105,13 +105,14 @@ oO......
 
 
 Pattern Enhance8
+# gf Corrected symmetry. (3.1.23)
 
 oO....
 o...*.
 o.....
 oO....
 
-:-,E,value(15)
+:8,E,value(15)
 
 
 Pattern Enhance9
@@ -556,6 +557,7 @@ Pattern Invade7b
 
 
 Pattern Invade7c
+# gf Corrected symmetry. (3.1.23)
 
 .......
 .......
@@ -565,7 +567,7 @@ Pattern Invade7c
 .......
 .......
 
-:\,Ie,value(0.2)
+:-,Ie,value(0.2)
 
 
 Pattern Invade7d

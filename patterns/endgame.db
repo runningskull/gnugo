@@ -931,6 +931,24 @@ X.X
 ;marginal_eye(*) && proper_eye(a)
 
 
+Pattern EE903
+# gf New pattern. (3.1.23)
+
+??XO?
+?OO*.
+X....
+-----
+
+:8,bOX
+
+??XO?
+?OO*.
+Xa...
+-----
+
+;!safe_omove(a)
+
+
 # third line moves
 ##################
 
@@ -1533,12 +1551,13 @@ Pattern CF1
 Pattern CF2
 # tm New Pattern (3.1.19)  (see trevorc:130)
 #   see comment for Patterm CF1 on over-generality
+# gf Corrected symmetry. (3.1.23)
 
 xxx
 x.x
 X*X
 
-:-,X,followup(2)
+:|,X,followup(2)
 
 xBx
 AdC

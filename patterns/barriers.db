@@ -47,11 +47,12 @@ O,O
 
 
 Pattern Barrier1b
+# gf Corrected symmetry. (3.1.23)
 
 o,o
 O,O
 
-:+,D
+:|,D
 
 
 Pattern Barrier2
@@ -261,11 +262,12 @@ dbaO
 
 
 Pattern Barrier20
+# gf Corrected symmetry. (3.1.23)
 
 O,,O
 O..o
 
-:|,D
+:8,D
 
 Obae
 Ocdo
@@ -1495,6 +1497,7 @@ XbOo
 
 Pattern Intrusion46
 # gf New pattern. (3.1.22)
+# gf Fixed diagram inconsistency. (3.1.23)
 # FIXME: This pattern exaggerates the intrusion since X can stop it
 #        on one of the sides, but we don't know which one he will
 #        choose. This may or may not be a problem in practice.
@@ -1509,11 +1512,29 @@ x...x
 
 x.dbx
 .cXa.
-.....
-.....
+x...x
+x...x
 -----
 
 ;!oplay_attack(a,b,c,d)
+
+
+Pattern Intrusion47
+# gf New pattern. (3.1.23)
+
+??X.?
+o..!.
+O....
+-----
+
+:8,B,value(20)
+
+??X.?
+o..!.
+a....
+-----
+
+;lib(a)>2
 
 
 Pattern Nonterritory1
@@ -2047,6 +2068,83 @@ xb
 ;safe_omove(a)
 
 >non_xterritory(b);
+
+
+Pattern Nonterritory29
+# gf New pattern. (3.1.23)
+
+?OO.
+X...
+----
+
+:8,t
+
+?OOc
+Xab.
+----
+
+;!safe_omove(a) && oplay_attack(b,a,b)
+
+>non_oterritory(b);
+>non_oterritory(c);
+
+
+Pattern Nonterritory30
+# gf New pattern. (3.1.23)
+
+?XX.
+O...
+----
+
+:8,t
+
+?EEd
+Oabc
+----
+
+;oplay_attack(a,b,b) && !oplay_attack(a,c,b,b) && oplay_attack(a,c,b,E)
+
+>non_xterritory(c);
+>non_xterritory(d);
+
+
+Pattern Nonterritory31
+# gf New pattern. (3.1.23)
+
+?XXX.
+O....
+-----
+
+:8,t
+
+?XXXd
+Oabc.
+-----
+
+;oplay_attack(a,b,b) && oplay_attack(a,c,b,c)
+
+>non_xterritory(c);
+>non_xterritory(d);
+
+
+Pattern Nonterritory32
+# gf New pattern. (3.1.23)
+
+..O
+...
+X..
+
+:/,t
+
+e.O
+da.
+Xbc
+
+;!oplay_attack(a,b,c,d,e,d)
+
+>non_oterritory(a);
+>non_oterritory(c);
+>non_oterritory(e);
 
 
 # END OF FILE

@@ -1247,6 +1247,23 @@ X*B.
 ; !dead(A) && (xplay_attack(*,B) || xplay_attack(*,A))
 
 
+Pattern CC83
+# gf New pattern. (3.1.23)
+# See stragety3:142.
+
+O...
+X.*.
+?X.O
+
+:8,CX
+
+Oac.
+Xb*.
+?X.O
+
+;!oplay_defend(*,a,b,a) && oplay_attack(*,b,a,c,c)
+
+
 ##########################
 #
 # General Edge Connections
@@ -3057,21 +3074,23 @@ o...o
 
 
 Pattern CS19
+# gf Corrected symmetry. (3.1.23)
 
 X...
 O.*.
 O..X
 
-:|,adOX
+:8,adOX
 
 
 Pattern CS20
+# gf Corrected symmetry. (3.1.23)
 
 X..
 O*.
 ?xX
 
-:|,adOX
+:8,adOX
 
 
 Pattern CS21
@@ -5112,6 +5131,7 @@ Xbd
 
 Pattern EB717
 # tm New Pattern (3.1.18)
+# gf FIXME: lib(A)==2 is always true in this pattern. (3.1.23)
 
 ?OO..        prevent incursion
 .XX*.
@@ -5120,7 +5140,7 @@ Pattern EB717
 :8,sOXb
 
 ?OB..
-cXA*.
+.AA*.
 -----
 
 ; lib(A) == 2
@@ -5161,6 +5181,7 @@ O.X.?    jump under on second line
 
 
 Pattern EB802
+# gf FIXME: Change this to an oplay_connect() when that is reliable. (3.1.23)
 
 ooxxxx    monkey jump
 oO....
@@ -5526,15 +5547,16 @@ Pattern EB1001
 :8,OXe
 
 
-Pattern EB1002
-
-?X.?..     extend if opponent attaches!
-.X.O..
-*O....
-......
-------
-
-:8,OXe
+# Pattern EB1002
+# # gf Redundant, strict subset of EB1001. (3.1.23)
+# 
+# ?X.?..     extend if opponent attaches!
+# .X.O..
+# *O....
+# ......
+# ------
+# 
+# :8,OXe
 
 
 Pattern EB1003
@@ -5649,14 +5671,15 @@ O*.
 :8,OXe
 
 
-Pattern EB1010
-
-X...          extend on second line
-O*..
-....
-----
-
-:8,OXe
+# Pattern EB1010
+# # gf Redundant, strict subset of EB1007. (3.1.23)
+# 
+# X...          extend on second line
+# O*..
+# ....
+# ----
+# 
+# :8,OXe
 
 
 Pattern EB1011
@@ -7167,15 +7190,16 @@ Pattern CB106
 # Miscellaneous
 ###############
 
-Pattern CB201
-
-.O.?    large value to override defender
-.*XX
-OXO.
-...X
-..O?
-
-:8,bE
+# Pattern CB201
+# # Too specific and probably redundant anyway. (3.1.23)
+# 
+# .O.?    large value to override defender
+# .*XX
+# OXO.
+# ...X
+# ..O?
+# 
+# :8,bE
 
 
 Pattern CB202
@@ -7276,12 +7300,13 @@ O*a..
 
 
 Pattern CB207
+# gf Merge with CB208. (3.1.23)
 
 ??x      threaten connection
 O*.
 .XO
 
-:8,nOXba
+:8,nOXba,shape(2)
 
 ??x
 O*.
@@ -7290,19 +7315,20 @@ O*.
 ;(lib(a)>1) && (!attack(b) || defend(b))
 
 
-Pattern CB208
-
-??x      threaten connection
-O*.
-.XO
-
-:8,nOX,shape(3)
-
-??x
-O*.
-.ba
-
-;(lib(a)>1) && (!attack(b) || defend(b))
+# Pattern CB208
+# # gf Merged with CB207 and reduced shape value. (3.1.23)
+# 
+# ??x      threaten connection
+# O*.
+# .XO
+# 
+# :8,nOX,shape(3)
+# 
+# ??x
+# O*.
+# .ba
+# 
+# ;(lib(a)>1) && (!attack(b) || defend(b))
 
 
 Pattern CB209
@@ -7685,19 +7711,20 @@ O*o
 :8,OXbe
 
 
-Pattern CB239
-
-...            block off area
-O*O
-?X?
-
-:8,OXb
-
-cab
-O*O
-?X?
-
-;omoyo(b) && omoyo(c) && !xplay_attack(*,a,b,b)
+# Pattern CB239
+# gf Redundant, strict subset of CB238
+# 
+# ...            block off area
+# O*O
+# ?X?
+# 
+# :8,OXb
+# 
+# cab
+# O*O
+# ?X?
+# 
+# ;omoyo(b) && omoyo(c) && !xplay_attack(*,a,b,b)
 
 
 Pattern CB240
@@ -7876,21 +7903,22 @@ Pattern CB251
 
 
 Pattern CB252
+# gf Merged with CB253. (3.1.23)
 
 ...       bend around
 O*.
-OXo
+OX?
 
 :8,OXe
 
 
-Pattern CB253
-
-...       bend around
-O*.
-OXX
-
-:8,OXe
+# Pattern CB253
+# 
+# ...       bend around
+# O*.
+# OXX
+# 
+# :8,OXe
 
 
 Pattern CB254
@@ -8707,6 +8735,7 @@ xxA.*.?
 
 
 Pattern CB322a
+# gf Corrected symmetry. (3.1.23)
 
 ??.ooo?       block to attack
 ??.ooo?
@@ -8715,7 +8744,7 @@ xxX.*.?
 ??....?
 ??.ooo?
 
-:-,XEa
+:8,XEa
 
 ??.bcd?
 ??.efg?
@@ -8771,13 +8800,15 @@ BAAO
 
 
 Pattern CB327
+# gf Reduced shape value. (3.1.23)
+# See nngs:1750
 
 ?.?         seal opponent in
 ...      
 .*O
 OX?
 
-:8,OXcbeEd,shape(5)
+:8,OXcbeEd,shape(2)
 
 
 Pattern CB328
@@ -12644,6 +12675,7 @@ O..*..O
 
 
 Pattern HH2
+# gf Corrected symmetry. (3.1.23)
 
 .......   Add stone where the distance is large.
 .......
@@ -12652,7 +12684,7 @@ O.....O
 .......
 .......
 
-:-,-,value(40),high_handicap_helper
+:|,-,value(40),high_handicap_helper
 
 
 Pattern HH3

@@ -382,6 +382,7 @@ O*X
 
 Pattern D117
 # tm modified (3.1.22)
+# gf Fixed diagram inconsistency. (3.1.23)
 
 ?*O.X           extend on third line
 o...O
@@ -391,7 +392,7 @@ o...O
 :8,-,value(70)
 
 ?*O.X
-?...a
+o...a
 ?....
 -----
 
@@ -744,6 +745,7 @@ O.*.     make eye on edge
 Pattern D217
 # tm Pattern revised. (3.1.13)
 # tm Pattern revised. (3.1.17)
+# gf FIXME: This constraint is weird. (3.1.23)
 
 o...
 O.*.     expand eyespace
@@ -1018,6 +1020,25 @@ ed??
 ; safe_omove(*) ||
 ; ((owl_escape_value(c) > 0 || owl_escape_value(d) >0 || owl_escape_value(e)>0)
 ;  && oplay_attack(*,a,b,a))
+
+
+Pattern D232
+# gf New pattern. (3.1.23)
+# See nngs:1630.
+
+??O??    defend eye against edge descent tesuji
+XO.O*
+..O.X
+-----
+
+:8,-,value(45)
+
+??O??
+XOab*
+cdOeF
+-----
+
+;lib(F)>=3 && owl_topological_eye(a,b)<=2 && !xplay_attack(c,d,e,c)
 
 
 #########################################################
@@ -2493,6 +2514,7 @@ Ba*
 
 Pattern D704b
 # gf Revised constraint. (3.1.15)
+# gf Revised constraint. (3.1.23)
 
 oO.         half eye sometimes missed
 O.*
@@ -2501,10 +2523,10 @@ O.*
 :8,-,value(35)
 
 cOb
-Oa*
+O.*
 ---
 
-; safe_xmove(b) && safe_xmove(*) && oplay_attack(*,b,b)
+; (safe_xmove(b) || safe_xmove(*)) && oplay_attack(*,b,b)
 ; && (o_somewhere(c) || !safe_xmove(c))
 
 
@@ -5011,16 +5033,17 @@ a*b
 
 Pattern D1320a
 # tm New Pattern (3.1.20)
+# gf Changed symmetry to accomodate for asymmetric constraint. (3.1.23)
 
 ?X?
 O*O      connect to friendly dragon
 ...
 
-:|,n,value(70)
+:8,n,value(70)
 
-?f?
+?X?
 A*B
-cde
+cd.
 
 ; (!owl_goal_dragon(A) || !owl_goal_dragon(B))
 ; && !xplay_attack_either(*,d,c,c,*)
