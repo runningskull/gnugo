@@ -225,6 +225,8 @@ try @command{rxvt}.  You may also use the Linux console. The colored display
 will work best if the background color is black; if this is not the case you
 may want to edit your @file{.Xdefaults} file or add the options
 @option{-bg black -fg white} to @command{xterm} or @command{rxvt}.
+On Mac OS X put @command{setenv TERM xterm-color} in your @file{.tcshrc}
+file to enable color in the terminal.
 
 @subsection Dragon Display
 
