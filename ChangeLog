@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- computation of safety and status values in make_dragons() revised to
+  more robustly handle invincible dragons
+- dragon_invincible() revised
 - detect_tactical_blunder() revised
 - owl stack management reimplemented
 - consider semeai worms adjacent to the outside as important in

@@ -522,12 +522,18 @@ make_dragons(int color, int stop_before_owl)
       dragon2[d].safety = TACTICALLY_DEAD;
     else if (0) /* Seki is detected by the call to semeai() below. */
       dragon2[d].safety = ALIVE_IN_SEKI;
+    else if (dragon_invincible(origin)) {
+      dragon2[d].safety = INVINCIBLE;
+      /* Sometimes the owl analysis may have misevaluated invincible
+       * dragons, typically if they live by topologically false eyes.
+       * Therefore we also set the status here.
+       */
+      DRAGON(d).status = ALIVE;
+    }
     else if (dragon2[d].owl_status == DEAD)
       dragon2[d].safety = DEAD;
     else if (dragon2[d].owl_status == CRITICAL)
       dragon2[d].safety = CRITICAL;
-    else if (dragon_invincible(origin))
-      dragon2[d].safety = INVINCIBLE;
     else if (true_genus >= 6 || dragon2[d].moyo_size > 20)
       dragon2[d].safety = STRONGLY_ALIVE;
     else
@@ -953,10 +959,15 @@ add_adjacent_dragon(int a, int b)
 
 /* A dragon is considered invincible if it satisfies either of the two
  * following conditions:
- * a) At least two distinct eyespaces without topological halfeyes or
- * marginal vertices.
+ * a) At least two distinct eyespaces without topological halfeyes,
+ * marginal vertices, or tactically critical or alive opponent strings.
  * b) At least one string which is unconditionally alive according to the
  * unconditional_life() function in utils.c.
+ *
+ * For the requirement on opponent strings in a), see e.g.
+ * seki:404,408,409,413,504,604,908.
+ *
+ * FIXME: This function fails for the lower left corner dragon in seki:1001.
  */
 
 static int
@@ -978,7 +989,6 @@ dragon_invincible(int dr)
   }
 
   /* Examine the eye spaces.
-   * FIXME: The check for half eyes or false eyes may be too weak.
    */
   if (board[dr] == BLACK) {
     eye = black_eye;
@@ -997,17 +1007,23 @@ dragon_invincible(int dr)
 	int pos2 = pos + delta[k];
 	if (ON_BOARD(pos2)
 	    && eye[pos2].color == eye_color
-	    && eye[pos2].origin != NO_MOVE
-	    && !eye[pos2].marginal)
-	  mx[eye[pos2].origin] = 1;
+	    && eye[pos2].origin != NO_MOVE) {
+	  if (eye[pos2].marginal
+	      || is_halfeye(half_eye, pos2))
+	    mx[eye[pos2].origin] = 2; /* bad eye */
+	  else if (mx[eye[pos2].origin] == 0)
+	    mx[eye[pos2].origin] = 1; /* good eye */
+	  
+	  if (board[pos2] == OTHER_COLOR(board[dr])
+	      && (!attack(pos2, NULL) || find_defense(pos2, NULL)))
+	    mx[eye[pos2].origin] = 2; /* bad eye */
+	}
       }
     }
   }
 
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (mx[pos]
-	&& eye[pos].msize == 0
-	&& min_eyes(&eye[pos].value) > 0)
+    if (mx[pos] == 1)
       strong_eyes++;
   }
 
