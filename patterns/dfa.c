@@ -113,24 +113,20 @@ member_att(dfa_t *pdfa, int att, int val)
 static int
 union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
 {
-  int att_aux = 0;
-  int att = 0;
-  int save1 = att1;
-  int save2 = att2;
+  int att;
+  int att_aux;
 
-  if (att1 == 0 && att2 == 0)
-    return 0;
   /* copy att1 in att */
+  att = 0;
   while (att1 != 0) {
     pdfa->last_index++;
     if (pdfa->last_index >= pdfa->max_indexes)
       resize_dfa(pdfa, pdfa->max_states, pdfa->max_indexes + DFA_RESIZE_STEP);
     att_aux = pdfa->last_index;
-    if (!att)
-      att = att_aux;
     
     pdfa->indexes[att_aux].val = pdfa1->indexes[att1].val;
-    pdfa->indexes[att_aux].next = att_aux + 1;
+    pdfa->indexes[att_aux].next = att;
+    att = att_aux;
     att1 = pdfa1->indexes[att1].next;
   }
 
@@ -141,20 +137,12 @@ union_att(dfa_t *pdfa, dfa_t *pdfa1, int att1, dfa_t *pdfa2, int att2)
       if (pdfa->last_index >= pdfa->max_indexes)
 	resize_dfa(pdfa, pdfa->max_states, pdfa->max_indexes + DFA_RESIZE_STEP);
       att_aux = pdfa->last_index;
-      if (!att)
-	att = att_aux;
 
       pdfa->indexes[att_aux].val = pdfa2->indexes[att2].val;
-      pdfa->indexes[att_aux].next = att_aux + 1;
+      pdfa->indexes[att_aux].next = att;
+      att = att_aux;
     }
     att2 = pdfa2->indexes[att2].next;
-  }
-  pdfa->indexes[att_aux].next = 0;
-  if (0 && save1 != 0 && save2 != 0) {
-    fprintf(stderr, "Made union of %d and %d at %d.\n", save1, save2, att);
-    dump_dfa(stderr, pdfa);
-    dump_dfa(stderr, pdfa1);
-    dump_dfa(stderr, pdfa2);
   }
 
   return att;
