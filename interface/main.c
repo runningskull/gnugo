@@ -103,7 +103,6 @@ enum {OPT_BOARDSIZE=127,
       OPT_DEBUG_INFLUENCE,
       OPT_SCORE,
       OPT_PRINTSGF,
-      OPT_PROFILE_PATTERNS,
       OPT_CHINESE_RULES,
       OPT_OWL_THREATS,
       OPT_NO_OWL_THREATS,
@@ -233,7 +232,6 @@ static struct gg_option const long_options[] =
   {"showscore",      no_argument,       0, OPT_SHOWSCORE},
   {"score",          required_argument, 0, OPT_SCORE},
   {"printsgf",       required_argument, 0, OPT_PRINTSGF},
-  {"profile-patterns", no_argument,     0, OPT_PROFILE_PATTERNS},
   {"mirror",         no_argument,       0, OPT_MIRROR},
   {"mirror-limit",   required_argument, 0, OPT_MIRROR_LIMIT},
   {NULL, 0, NULL, 0}
@@ -734,11 +732,6 @@ main(int argc, char *argv[])
 	printsgffile = gg_optarg;
 	break;
 	
-      case OPT_PROFILE_PATTERNS:
-	profile_patterns = 1;
-	prepare_pattern_profiling();
-	break;
-	
       case OPT_COLOR: 
 	if (strcmp(gg_optarg, "white") == 0)
 	  mandated_color = WHITE;
@@ -1150,9 +1143,6 @@ main(int argc, char *argv[])
     break;
   }
   
-  if (profile_patterns)
-    report_pattern_profiling();
-
   clock_report_autolevel(NULL, gameinfo.computer_player);
  
   return 0;

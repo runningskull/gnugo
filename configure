@@ -4395,7 +4395,7 @@ fi
 #AM_GNU_GETTEXT
 #AC_LINK_FILES($nls_cv_header_libgt, $nls_cv_header_intl)
 
-ac_config_files="$ac_config_files Makefile interface/Makefile patterns/Makefile sgf/Makefile utils/Makefile engine/Makefile doc/Makefile regression/Makefile interface/debugboard/Makefile config.vc:config.vcin"
+ac_config_files="$ac_config_files Makefile interface/Makefile patterns/Makefile sgf/Makefile utils/Makefile engine/Makefile doc/Makefile regression/Makefile config.vc:config.vcin"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -4723,11 +4723,10 @@ do
   "engine/Makefile" ) CONFIG_FILES="$CONFIG_FILES engine/Makefile" ;;
   "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
   "regression/Makefile" ) CONFIG_FILES="$CONFIG_FILES regression/Makefile" ;;
-  "interface/debugboard/Makefile" ) CONFIG_FILES="$CONFIG_FILES interface/debugboard/Makefile" ;;
   "config.vc" ) CONFIG_FILES="$CONFIG_FILES config.vc:config.vcin" ;;
   "default-1" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-  *) { { echo "$as_me:4730: error: invalid argument: $ac_config_target" >&5
+  *) { { echo "$as_me:4729: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
   esac
@@ -4966,7 +4965,7 @@ done; }
   esac
 
   if test x"$ac_file" != x-; then
-    { echo "$as_me:4969: creating $ac_file" >&5
+    { echo "$as_me:4968: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
     rm -f "$ac_file"
   fi
@@ -4984,7 +4983,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:4987: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:4986: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -4997,7 +4996,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:5000: error: cannot find input file: $f" >&5
+           { { echo "$as_me:4999: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -5058,7 +5057,7 @@ for ac_file in : $CONFIG_HEADERS; do test "x$ac_file" = x: && continue
   * )   ac_file_in=$ac_file.in ;;
   esac
 
-  test x"$ac_file" != x- && { echo "$as_me:5061: creating $ac_file" >&5
+  test x"$ac_file" != x- && { echo "$as_me:5060: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
 
   # First look for the input files in the build tree, otherwise in the
@@ -5069,7 +5068,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:5072: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:5071: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -5082,7 +5081,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:5085: error: cannot find input file: $f" >&5
+           { { echo "$as_me:5084: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -5199,7 +5198,7 @@ cat >>$CONFIG_STATUS <<\EOF
   rm -f $tmp/in
   if test x"$ac_file" != x-; then
     if cmp -s $ac_file $tmp/config.h 2>/dev/null; then
-      { echo "$as_me:5202: $ac_file is unchanged" >&5
+      { echo "$as_me:5201: $ac_file is unchanged" >&5
 echo "$as_me: $ac_file is unchanged" >&6;}
     else
       ac_dir=`$as_expr X"$ac_file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \

@@ -33,108 +33,6 @@
 
 
 /**************************************************************************/
-/* Pattern profiling functions:                                           */
-/**************************************************************************/
-
-/* define this to see how each phase of pattern rejection is performing */
-/* #define PROFILE_MATCHER */
-
-
-#ifdef PROFILE_MATCHER
-static int totals[6];
-#endif
-
-
-#if PROFILE_PATTERNS
-/* Initialize pattern profiling fields in one pattern struct array. */
-static void
-clear_profile(struct pattern *pattern)
-{
-  for (; pattern->patn; ++pattern) {
-    pattern->hits = 0;
-    pattern->reading_nodes = 0;
-    pattern->dfa_hits = 0;
-  }
-}
-#endif
-
-#if PROFILE_PATTERNS
-/* Print profiling information for one pattern struct array. */
-static void
-print_profile(struct pattern *pattern, int *total_hits,
-	      int *total_nodes, int *total_dfa_hits)
-{
-  for (; pattern->patn; ++pattern)
-    if (pattern->hits > 0) {
-      *total_hits += pattern->hits;
-      *total_nodes += pattern->reading_nodes;
-      *total_dfa_hits += pattern->dfa_hits;
-      fprintf(stderr, "%6d ", pattern->dfa_hits);
-      fprintf(stderr, "%6d %9d %8.1f %s\n", 
-	      pattern->hits,
-	      pattern->reading_nodes,
-	      pattern->reading_nodes / (float) pattern->hits, 
-	      pattern->name);
-    }
-}
-#endif /* PROFILE_PATTERNS */
-
-
-/* Initialize pattern profiling fields in pattern struct arrays. */
-void
-prepare_pattern_profiling()
-{
-#if PROFILE_PATTERNS
-  clear_profile(pat_db.patterns);
-  clear_profile(attpat_db.patterns);
-  clear_profile(defpat_db.patterns);
-  clear_profile(endpat_db.patterns);
-  clear_profile(conn_db.patterns);
-  clear_profile(influencepat_db.patterns);
-  clear_profile(barrierspat_db.patterns);
-  clear_profile(aa_attackpat_db.patterns);
-  clear_profile(owl_attackpat_db.patterns);
-  clear_profile(owl_vital_apat_db.patterns);
-  clear_profile(owl_defendpat_db.patterns);
-  clear_profile(fusekipat_db.patterns);
-#else
-  fprintf(stderr,
-	  "Warning, no support for pattern profiling in this binary.\n");
-#endif
-}
-
-
-/* Report result of pattern profiling. Only patterns with at least one
- * match are listed.
- */
-void
-report_pattern_profiling()
-{
-#if PROFILE_PATTERNS
-  int hits = 0;
-  int dfa_hits = 0;
-  int nodes = 0;
-
-  print_profile(pat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(attpat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(defpat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(endpat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(conn_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(influencepat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(barrierspat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(aa_attackpat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(owl_attackpat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(owl_vital_apat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(owl_defendpat_db.patterns, &hits, &nodes, &dfa_hits);
-  print_profile(fusekipat_db.patterns, &hits, &nodes, &dfa_hits);
-  fprintf(stderr, "------ ---------\n");
-  fprintf(stderr, "%6d, %6d %9d\n", dfa_hits, hits, nodes);
-#endif
-}
-
-
-
-/**************************************************************************/
 /* Standard matcher:                                                      */
 /**************************************************************************/
 
@@ -381,13 +279,7 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
        */
 
       if (anchor_test != pattern->anchored_at_X)
-      {
-#ifdef PROFILE_MATCHER
-	/* oops - need to work out something we deferred */
-        totals[0] += (pattern->trfno == 5 ? 4 : pattern->trfno);
-#endif
 	continue;  /* does not match the anchor */
-      }
 
       ll = 0;  /* first transformation number */
       end_transformation = pattern->trfno;
@@ -398,21 +290,9 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	end_transformation = 6;
       }
       
-#ifdef PROFILE_MATCHER
-      totals[0] += end_transformation - ll;
-#endif
-
       /* try each orientation transformation. Assume at least 1 */
 
       do {
-
-#if PROFILE_PATTERNS
-	int nodes_before;
-#endif
-	
-#ifdef PROFILE_MATCHER
-	++totals[1];
-#endif
 
 #if GRID_OPT == 1
 
@@ -431,9 +311,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 
 #endif /* GRID_OPT == 1 */
 
-#ifdef PROFILE_MATCHER
-	++totals[2];
-#endif
 	/* Next, we do the range check. This applies the edge
 	 * constraints implicitly.
 	 */
@@ -458,10 +335,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 	  if (!ON_BOARD2(m + mi, n + mj) || !ON_BOARD2(m + xi, n + xj))
 	    continue;  /* out of range */
 	}
-
-#ifdef PROFILE_MATCHER	 
-	++totals[3];
-#endif
 
 	/* Now iterate over the elements of the pattern. */
 	found_goal = 0;
@@ -508,35 +381,15 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
 #endif /* we don't trust the grid optimisation */
 
 
-#ifdef PROFILE_MATCHER
-	++totals[4];
-#endif
-
-
 	/* Make it here ==> We have matched all the elements to the board. */
 	if ((goal != NULL) && !found_goal)
 	  goto match_failed;
 	if ((goal != NULL) && ((pattern->class) & CLASS_C) && !found_nongoal)
 	  goto match_failed;
 	
-
-
-#ifdef PROFILE_MATCHER
-	++totals[5];
-#endif
-
-#if PROFILE_PATTERNS
-	pattern->hits++;
-	nodes_before = stats.nodes;
-#endif
-	
 	/* A match!  - Call back to the invoker to let it know. */
 	callback(anchor, color, pattern, ll, callback_data);
 
-#if PROFILE_PATTERNS
-	pattern->reading_nodes += stats.nodes - nodes_before;
-#endif
-	
 	/* We jump to here as soon as we discover a pattern has failed. */
       match_failed:
 	TRACE_MATCHER(
@@ -546,14 +399,6 @@ do_matchpat(int anchor, matchpat_callback_fn_ptr callback, int color,
       } while (++ll < end_transformation); /* ll loop over symmetries */
     } /* if not rejected by maxwt */
   } while ((++pattern)->patn);  /* loop over patterns */
-
-
-#ifdef PROFILE_MATCHER
-  fprintf(stderr, 
-	  "total %d, anchor=%d, grid=%d, edge=%d, matched=%d, accepted=%d\n",
-	  totals[0], totals[1], totals[2], totals[3], totals[4], totals[5]);
-#endif
-
 }
 
 
@@ -581,10 +426,6 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 /* DFA matcher:                                                           */
 /**************************************************************************/
 
-/* If DFA_SORT, all matched patterns are sorted and checked 
- * in the same order as the standard scheme */
-#define DFA_SORT 0
-
 /* Set this to show the dfa board in action */
 /* #define DFA_TRACE 1 */
 
@@ -601,9 +442,6 @@ extern const int convert[3][4];
 static void dfa_prepare_for_match(int color);
 static int scan_for_patterns(dfa_rt_t *pdfa, int l, int dfa_pos,
 			     int *pat_list);
-#if DFA_SORT
-static int compare_int(const void *a, const void *b);
-#endif
 static void do_dfa_matchpat(dfa_rt_t *pdfa,
 			    int anchor, matchpat_callback_fn_ptr callback,
 			    int color, struct pattern *database,
@@ -739,19 +577,6 @@ scan_for_patterns(dfa_rt_t *pdfa, int l, int dfa_pos, int *pat_list)
 }
 
 
-#if DFA_SORT
-/* used to sort patterns */
-static int
-compare_int(const void *a, const void *b)
-{
-  const int *da = (const int *) a;
-  const int *db = (const int *) b;
-     
-  return (*da > *db) - (*da < *db);
-}
-#endif
-
-
 /* perform pattern matching with dfa filtering */
 static void 
 do_dfa_matchpat(dfa_rt_t *pdfa,
@@ -784,23 +609,12 @@ do_dfa_matchpat(dfa_rt_t *pdfa,
 
   ASSERT1(maxr < DFA_MAX_MATCHED, anchor);
 
-  /* Sorting patterns keep the same order as 
-   * standard pattern matching algorithm */
-#if DFA_SORT
-  gg_sort(reorder, maxr, sizeof(int), compare_int);
-#endif /* DFA_SORT */
-
-
   /* Constraints and other tests */
 
   for (k = 0; k != maxr ; k++) {
     matched = reorder[k] / 8;
     ll = reorder[k] % 8;
 
-#if PROFILE_PATTERNS
-    database[matched].dfa_hits++;
-#endif
-    
     check_pattern_light(anchor, callback, color, database+matched, 
 			ll, callback_data, goal, anchor_in_goal);
   }
@@ -822,14 +636,6 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
   int found_goal = 0;
   int found_nongoal = 0;
   
-#if PROFILE_PATTERNS
-  int nodes_before;
-#endif
-  
-#ifdef PROFILE_MATCHER
-  ++totals[1];
-#endif
-
   if (0)
     gprintf("check_pattern_light @ %1m rot:%d pattern: %s\n", 
 	    anchor, ll, pattern->name);
@@ -880,21 +686,8 @@ check_pattern_light(int anchor, matchpat_callback_fn_ptr callback, int color,
       goto match_failed;
   }
 
-#ifdef PROFILE_MATCHER
-  ++totals[4];
-#endif
-
-#if PROFILE_PATTERNS
-  pattern->hits++;
-  nodes_before = stats.nodes;
-#endif
-  
   /* A match!  - Call back to the invoker to let it know. */
   callback(anchor, color, pattern, ll, callback_data);
-  
-#if PROFILE_PATTERNS
-  pattern->reading_nodes += stats.nodes - nodes_before;
-#endif
   
   /* We jump to here as soon as we discover a pattern has failed. */
  match_failed:

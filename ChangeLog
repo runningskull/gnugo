@@ -4,6 +4,8 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- removed unused compiler switches in matchpat.c: DFA_SORT, PROFILE_MATCHER,
+  PROFILE_PATTERNS
 - removed USE_BDIST option from owl.c
 - removed unused search_area code
 - use seed=1 instead of calling time(0)

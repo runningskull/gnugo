@@ -498,10 +498,6 @@ int same_dragon(int dr1, int dr2);
 /* moyo functions */
 void print_moyo(void);
 
-/* debugging functions */
-void prepare_pattern_profiling(void);
-void report_pattern_profiling(void);
-
 /* sgffile.c */
 void sgffile_add_debuginfo(SGFNode *node, int value);
 void sgffile_output(SGFTree *tree);
