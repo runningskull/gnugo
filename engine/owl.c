@@ -205,6 +205,8 @@ static int owl_estimate_life(struct local_owl_data *owl,
 static int modify_stupid_eye_vital_point(struct local_owl_data *owl,
 					 int *vital_point,
 					 int is_attack_point);
+static int estimate_lunch_half_eye_bonus(int lunch,
+			struct half_eye_data half_eye[BOARDMAX]);
 static void owl_mark_dragon(int apos, int bpos,
 			    struct local_owl_data *owl,
 			    int new_dragons[BOARDMAX]);
@@ -6063,9 +6065,44 @@ sniff_lunch(int lunch, int *min, int *probable, int *max,
 
   estimate_lunch_eye_value(lunch, min, probable, max, 1);
 
+  if (*min < 2) {
+    int bonus = estimate_lunch_half_eye_bonus(lunch, owl->half_eye);
+    *min += bonus/2;
+    *probable += bonus;
+    *max += (bonus + 1)/2;
+  }
+
   if (*probable < 2)
     eat_lunch_escape_bonus(lunch, min, probable, max, owl);
 }
+
+/* Capturing a lunch can give eyes by turning a false eye into a proper one,
+ * etc. This function returns the likely increase in half eyes
+ * by capturing the string at (lunch).
+ */
+static int
+estimate_lunch_half_eye_bonus(int lunch,
+    			      struct half_eye_data half_eye[BOARDMAX])
+{
+  int stones[10];
+  int k;
+  int size = findstones(lunch, 10, stones);
+  int half_eyes = 0;
+
+  ASSERT1(size < 10, lunch);
+
+  for (k = 0; k < size; k++) {
+    int stone = stones[k];
+    int d;
+    for (d = 4; d < 8; d++) {
+      int pos = stone + delta[d];
+      if (is_halfeye(half_eye, pos) || is_false_eye(half_eye, pos))
+	half_eyes++;
+    }
+  }
+  return half_eyes;
+}
+
 
 void
 estimate_lunch_eye_value(int lunch, int *min, int *probable, int *max,
