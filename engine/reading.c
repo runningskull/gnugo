@@ -1299,8 +1299,10 @@ fast_defense(int str, int liberties, int *libs, int *move)
     /* What is the total number of liberties of the friendly strings around
      * the lunch?
      */
-    if (++liberty_mark == 0)
+    if (++liberty_mark == 0) {
       memset(lm, 0, sizeof(lm));
+      liberty_mark++;
+    }
     /* Loop over all neighbors of the lunch. */
     adj2 = chainlinks(adjs[j], adjs2);
     for (k = 0; k < adj2; k++) {
