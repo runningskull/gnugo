@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- allow conditional ko capture in attack4()
 - new function is_corner_vertex() in board.c
 - mark_dragon() changed from static to global
 - global variable time_to_die removed

@@ -3733,13 +3733,10 @@ attack4(int str, int *move, int komaster, int kom_pos)
         if (stackp >= branch_depth && k > 0)
           break;
         xpos = moves.pos[k];
-        /* Conditional ko capture is disabled
-	 * because it seems too expensive.
-	 * */
         if (komaster_trymove(xpos, other, "attack4-A", str,
 			     komaster, kom_pos, &new_komaster,
 			     &new_kom_pos, &ko_move,
-			     0 && stackp <= ko_depth && savecode == 0)) {
+			     stackp <= ko_depth && savecode == 0)) {
           if (!ko_move) {
 	    dcode = do_find_defense(str, NULL, new_komaster, new_kom_pos);
 	    if (dcode != WIN
