@@ -209,7 +209,7 @@ IntDir=.\Release
 InputPath=.\aa_attackpats.db
 
 "aa_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b aa_attackpat -i ..\patterns\aa_attackpats.db -o aa_attackpat.c
+	$(IntDir)\mkpat -D -m -b aa_attackpat -i ..\patterns\aa_attackpats.db -o aa_attackpat.c
 
 # End Custom Build
 
@@ -221,7 +221,7 @@ IntDir=.\Debug
 InputPath=.\aa_attackpats.db
 
 "aa_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b aa_attackpat -i ..\patterns\aa_attackpats.db -o aa_attackpat.c
+	$(IntDir)\mkpat -D -m -b aa_attackpat -i ..\patterns\aa_attackpats.db -o aa_attackpat.c
 
 # End Custom Build
 
@@ -240,7 +240,7 @@ IntDir=.\Release
 InputPath=.\attack.db
 
 "apatterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -X  attpat -i attack.db -o apatterns.c
+	$(IntDir)\mkpat -X  attpat -i ..\patterns\attack.db -o apatterns.c
 
 # End Custom Build
 
@@ -252,7 +252,7 @@ IntDir=.\Debug
 InputPath=.\attack.db
 
 "apatterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -X  attpat -i attack.db -o apatterns.c
+	$(IntDir)\mkpat -X  attpat -i ..\patterns\attack.db -o apatterns.c
 
 # End Custom Build
 
@@ -302,7 +302,7 @@ IntDir=.\Release
 InputPath=.\conn.db
 
 "conn.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c conn -i conn.db -o conn.c
+	$(IntDir)\mkpat -c conn -i ..\patterns\conn.db -o conn.c
 
 # End Custom Build
 
@@ -314,7 +314,7 @@ IntDir=.\Debug
 InputPath=.\conn.db
 
 "conn.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c conn -i conn.db -o conn.c
+	$(IntDir)\mkpat -c conn -i ..\patterns\conn.db -o conn.c
 
 # End Custom Build
 
@@ -333,7 +333,7 @@ IntDir=.\Release
 InputPath=.\defense.db
 
 "dpatterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat defpat <defense.db >dpatterns.c
+	$(IntDir)\mkpat defpat -i ..\patterns\defense.db -o dpatterns.c
 
 # End Custom Build
 
@@ -345,7 +345,7 @@ IntDir=.\Debug
 InputPath=.\defense.db
 
 "dpatterns.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat defpat <defense.db >dpatterns.c
+	$(IntDir)\mkpat defpat -i ..\patterns\defense.db -o dpatterns.c
 
 # End Custom Build
 
@@ -364,7 +364,7 @@ IntDir=.\Release
 InputPath=.\endgame.db
 
 "endgame.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b endpat -i endgame.db -o endgame.c
+	$(IntDir)\mkpat -b endpat -i ..\patterns\endgame.db -o endgame.c
 
 # End Custom Build
 
@@ -376,7 +376,7 @@ IntDir=.\Debug
 InputPath=.\endgame.db
 
 "endgame.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b endpat -i endgame.db -o endgame.c
+	$(IntDir)\mkpat -b endpat -i ..\patterns\endgame.db -o endgame.c
 
 # End Custom Build
 
@@ -426,7 +426,7 @@ IntDir=.\Release
 InputPath=.\fuseki.db
 
 "fusekipat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b fusekipat <fuseki.db >fusekipat.c
+	$(IntDir)\mkpat -b fusekipat -i ..\patterns\fuseki.db -o fusekipat.c
 
 # End Custom Build
 
@@ -438,7 +438,7 @@ IntDir=.\Debug
 InputPath=.\fuseki.db
 
 "fusekipat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b fusekipat <fuseki.db >fusekipat.c
+	$(IntDir)\mkpat -b fusekipat -i ..\patterns\fuseki.db -o fusekipat.c
 
 # End Custom Build
 
@@ -457,7 +457,7 @@ IntDir=.\Release
 InputPath=.\fuseki13.db
 
 "fuseki13.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki13 <fuseki13.db >fuseki13.c
+	$(IntDir)\mkpat -b -f fuseki13 -i ..\patterns\fuseki13.db -o fuseki13.c
 
 # End Custom Build
 
@@ -469,7 +469,7 @@ IntDir=.\Debug
 InputPath=.\fuseki13.db
 
 "fuseki13.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki13 <fuseki13.db >fuseki13.c
+	$(IntDir)\mkpat -b -f fuseki13 -i ..\patterns\fuseki13.db -o fuseki13.c
 
 # End Custom Build
 
@@ -488,7 +488,7 @@ IntDir=.\Release
 InputPath=.\fuseki19.db
 
 "fuseki19.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki19 <fuseki19.db >fuseki19.c
+	$(IntDir)\mkpat -b -f fuseki19 -i ..\patterns\fuseki19.db -o fuseki19.c
 
 # End Custom Build
 
@@ -500,7 +500,7 @@ IntDir=.\Debug
 InputPath=.\fuseki19.db
 
 "fuseki19.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki19 <fuseki19.db >fuseki19.c
+	$(IntDir)\mkpat -b -f fuseki19 -i ..\patterns\fuseki19.db -o fuseki19.c
 
 # End Custom Build
 
@@ -519,7 +519,7 @@ IntDir=.\Release
 InputPath=.\fuseki9.db
 
 "fuseki9.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki9 <fuseki9.db >fuseki9.c
+	$(IntDir)\mkpat -b -f fuseki9 -i ..\patterns\fuseki9.db -o fuseki9.c
 
 # End Custom Build
 
@@ -531,7 +531,7 @@ IntDir=.\Debug
 InputPath=.\fuseki9.db
 
 "fuseki9.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b -f fuseki9 <fuseki9.db >fuseki9.c
+	$(IntDir)\mkpat -b -f fuseki9 -i ..\patterns\fuseki9.db -o fuseki9.c
 
 # End Custom Build
 
@@ -585,7 +585,7 @@ IntDir=.\Release
 InputPath=.\influence.db
 
 "influence.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c influencepat <influence.db >influence.c
+	$(IntDir)\mkpat -c influencepat -i ..\patterns\influence.db -o influence.c
 
 # End Custom Build
 
@@ -597,7 +597,7 @@ IntDir=.\Debug
 InputPath=.\influence.db
 
 "influence.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -c influencepat <influence.db >influence.c
+	$(IntDir)\mkpat -c influencepat -i ..\patterns\influence.db -o influence.c
 
 # End Custom Build
 
@@ -616,7 +616,7 @@ IntDir=.\Release
 InputPath=.\owl_attackpats.db
 
 "owl_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_attackpat -i owl_attackpats.db -o owl_attackpat.c
+	$(IntDir)\mkpat -D -m -b owl_attackpat -i ..\patterns\owl_attackpats.db -o owl_attackpat.c
 
 # End Custom Build
 
@@ -628,7 +628,7 @@ IntDir=.\Debug
 InputPath=.\owl_attackpats.db
 
 "owl_attackpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_attackpat -i ..\patterns\owl_attackpats.db > owl_attackpat.c
+	$(IntDir)\mkpat -D -m -b owl_attackpat -i ..\patterns\owl_attackpats.db -o owl_attackpat.c
 
 # End Custom Build
 
@@ -647,7 +647,7 @@ IntDir=.\Release
 InputPath=.\owl_defendpats.db
 
 "owl_defendpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_defendpat -i ..\patterns\owl_defendpats.db -o owl_defendpat.c
+	$(IntDir)\mkpat -D -m -b owl_defendpat -i ..\patterns\owl_defendpats.db -o owl_defendpat.c
 
 # End Custom Build
 
@@ -659,7 +659,7 @@ IntDir=.\Debug
 InputPath=.\owl_defendpats.db
 
 "owl_defendpat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_defendpat -i ..\patterns\owl_defendpats.db -o owl_defendpat.c
+	$(IntDir)\mkpat -D -m -b owl_defendpat -i ..\patterns\owl_defendpats.db -o owl_defendpat.c
 
 # End Custom Build
 
@@ -678,7 +678,7 @@ IntDir=.\Release
 InputPath=.\owl_vital_apats.db
 
 "owl_vital_apat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_vital_apat <owl_vital_apats.db > owl_vital_apat.c
+	$(IntDir)\mkpat -D -m -b owl_vital_apat -i ..\patterns\owl_vital_apats.db -o owl_vital_apat.c
 
 # End Custom Build
 
@@ -690,7 +690,7 @@ IntDir=.\Debug
 InputPath=.\owl_vital_apats.db
 
 "owl_vital_apat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(IntDir)\mkpat -b owl_vital_apat -i ..\patterns\owl_vital_apats.db -o owl_vital_apat.c
+	$(IntDir)\mkpat -D -m -b owl_vital_apat -i ..\patterns\owl_vital_apats.db -o owl_vital_apat.c
 
 # End Custom Build
 

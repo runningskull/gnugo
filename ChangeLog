@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- VC build now DFA compliant
 - semeai module sets matcher status to ALIVE instead of ALIVE_IN_SEKI
 - fix arraybound violation in compute_aa_values
 - constraint diagram checking moved to new check_constraint_diagram()
