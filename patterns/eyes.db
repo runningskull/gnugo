@@ -2010,6 +2010,20 @@ Pattern 6004
 :1122
 
 
+Pattern 6005
+
+$X>.*x
+
+:1122
+
+
+Pattern 6006
+
+$X..Xx
+
+:1112
+
+
 Pattern 6011
 
 xxxxxx

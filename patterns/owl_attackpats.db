@@ -579,6 +579,24 @@ O.X
 :8,-,value(56)
 
 
+Pattern A208d
+# gf New pattern. (3.5.3)
+
+O.X
+.*Y
+.oo
+---
+
+:8,-,value(56)
+
+OaX
+.*Y
+.oo
+---
+
+;!oplay_attack(*,a,*)
+
+
 Pattern A209
 
 ?Ooo

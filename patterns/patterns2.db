@@ -2710,6 +2710,23 @@ AO
 ;oplay_attack_either(*,A,B) && !safe_omove(*)
 
 
+Pattern Shape87
+# gf New pattern. (3.5.3)
+# gf See gifu03:501
+
+.OXx       usually better to extend than atari in cross cut
+.XO.
+.*..
+
+:8,sX,shape(-1)
+
+.aXx
+.Cb.
+.*..
+
+;!dead(a) && !dead(b) && weak(a) && weak(b) && oplay_disconnect(*,a,b)
+
+
 ###########################
 #
 # Followup moves. 

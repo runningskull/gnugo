@@ -63,6 +63,9 @@ int next_lunch;
 /* Point redistribution */
 int replacement_map[BOARDMAX];
 
+/* The color for which we are evaluating moves. */
+int current_color;
+
 /* Attack threats that are known to be sente locally. */
 static int known_good_attack_threats[BOARDMAX][MAX_ATTACK_THREATS];
 
@@ -592,7 +595,8 @@ static int
 move_is_marked_unsafe(int pos, int what)
 {
   UNUSED(what);
-  return !move[pos].move_safety;
+  return (!move[pos].move_safety
+	  && !adjacent_to_nondead_stone(pos, current_color));
 }
 
 /* Check whether a dragon is non-critical. */

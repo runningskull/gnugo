@@ -1298,7 +1298,7 @@ strategic_penalty(int pos, int color)
  * FIXME: Move this somewhere more generally accessible, probably
  *        utils.c
  */
-static int
+int
 adjacent_to_nondead_stone(int pos, int color)
 {
   int k;
@@ -3238,6 +3238,8 @@ review_move_reasons(int *the_move, float *val, int color,
 		    int allowed_moves[BOARDMAX])
 {
   int save_verbose;
+
+  current_color = color;
   
   start_timer(2);
   find_more_attack_and_defense_moves(color);

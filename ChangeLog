@@ -2,6 +2,14 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- move_is_marked_unsafe() in move_reasons.h revised
+- modify_stupid_eye_vital_point() revised
+- eye tuning
+- endgame tuning
+- owl tuning
+- tuning
+- test case revised
+
 3.5.2 released November 5, 2003
 
 - Cosmic GNU Go disabled by default.

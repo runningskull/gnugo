@@ -79,10 +79,10 @@ loadsgf games/cgf2003/GnuGo-GoInt.sgf 41
 301 reg_genmove black
 #? [E2]*
 
-# C1 suffices to live.
+# C1 suffices to live, as does B6.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 59
 302 reg_genmove black
-#? [C1]*
+#? [C1|B6]*
 
 # P18 is clearly superior to Q18.
 loadsgf games/cgf2003/GnuGo-GoInt.sgf 69

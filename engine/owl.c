@@ -2765,10 +2765,12 @@ owl_determine_life(struct local_owl_data *owl,
 	    TRACE("vital point looked stupid, moved it to %1m\n",
 		  attack_point);
 
-	  owl_add_move(moves, attack_point, value, reason, 1, 0, NO_MOVE,
-		       MAX_MOVES);
-	  vital_values[attack_point] = value;
-	  eyes_attack_points[num_eyes] = attack_point;
+	  if (attack_point != NO_MOVE) {
+	    owl_add_move(moves, attack_point, value, reason, 1, 0, NO_MOVE,
+			 MAX_MOVES);
+	    vital_values[attack_point] = value;
+	    eyes_attack_points[num_eyes] = attack_point;
+	  }
 	}
 
 	/* The reason for the last set of tests is that we don't
@@ -2818,9 +2820,11 @@ owl_determine_life(struct local_owl_data *owl,
 	    TRACE("vital point looked stupid, moved it to %1m\n",
 		  defense_point);
 
-	  owl_add_move(moves, defense_point, value, reason, 1, 0, NO_MOVE,
-		       MAX_MOVES);
-	  vital_values[defense_point] = value;
+	  if (defense_point != NO_MOVE) {
+	    owl_add_move(moves, defense_point, value, reason, 1, 0, NO_MOVE,
+			 MAX_MOVES);
+	    vital_values[defense_point] = value;
+	  }
 	}
       }
       num_eyes++;
@@ -3005,6 +3009,18 @@ owl_find_relevant_eyespaces(struct local_owl_data *owl,
  * .XOO|
  * .XXX|
  *
+ * Case 3.
+ *
+ * Playing into a snapback is usually not an effective way to destroy
+ * an eye.
+ *
+ * XOOO|
+ * XOXX|
+ * XXO.|
+ * .XXO|
+ * ....|
+ *
+ * This function changes the attack point to NO_MOVE (i.e. removes it).
  */
 static int
 modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
@@ -3013,6 +3029,7 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
   int up;
   int right;
   int k;
+  int libs[2];
 
   /* Case 1. */
   for (k = 0; k < 4; k++) {
@@ -3050,7 +3067,16 @@ modify_stupid_eye_vital_point(struct local_owl_data *owl, int *vital_point,
       }
     }
   }
-  
+
+  /* Case 3. */
+  if (is_attack_point
+      && does_capture_something(*vital_point, OTHER_COLOR(owl->color))
+      && accuratelib(*vital_point, OTHER_COLOR(owl->color), 2, libs) == 1
+      && !attack(libs[0], NULL)) {
+    *vital_point = NO_MOVE;
+    return 1;
+  }
+
   return 0;
 }
 

@@ -177,7 +177,8 @@ extern int next_lunch;
 /* Point redistribution */
 extern int replacement_map[BOARDMAX];
 
-
+/* The color for which we are evaluating moves. */
+extern int current_color;
 
 int find_worm(int str);
 int find_dragon(int str);
@@ -199,6 +200,7 @@ void mark_changed_dragon(int pos, int color, int affected, int affected2,
 			 float strength[BOARDMAX], float *effective_size);
 void mark_changed_string(int affected, char changed_stones[BOARDMAX],
 			 float strength[BOARDMAX], char new_status);
+int adjacent_to_nondead_stone(int pos, int color);
 
 /*
  * Local Variables:

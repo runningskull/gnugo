@@ -890,12 +890,14 @@ Pattern EE801
 #    We certainly can and should add patterns to deal with the case
 #    that there is more space below, when it very likely is sente,
 #    unless such patterns already exist in the EB class.
+# gf Actually this pattern doesn't even guarantee a single point, see
+#    gifu03:204. Removed fixed territorial value. (3.5.3)
 
 |.O?      endgame move
 |.*X      2.5 points gote
 |..x
 
-:8,OXe,terri(2.5)
+:8,OXe
 
 
 Pattern EE802
