@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- portability fix for MINGW. Don't include crtdbg.h
+- rename connect to string_connect.
 - all move reason handling is 1D
 - owl goal and other date are 1D
 - new and revised test cases

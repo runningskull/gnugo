@@ -100,6 +100,7 @@ gg_init_color()
 
 
 #ifdef WIN32
+#ifdef VC
 #include <crtdbg.h>
 
 verifyW32(BOOL b)
@@ -109,6 +110,17 @@ verifyW32(BOOL b)
     fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
   }
 }
+
+#else
+
+verifyW32(BOOL b)
+{
+  if (!b) {
+    fprintf(stderr, "Win32 Err: %ld\n", GetLastError());
+  }
+}
+
+#endif
 
 #endif
 

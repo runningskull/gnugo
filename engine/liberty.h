@@ -244,7 +244,7 @@ void purge_persistent_reading_cache(void);
 void reading_hotspots(float values[MAX_BOARD][MAX_BOARD]);
 
 /* readconnect.c */
-int connect(int str1, int str2, int *move);
+int string_connect(int str1, int str2, int *move);
 int disconnect(int str1, int str2, int *move);
 
 

@@ -916,7 +916,7 @@ gtp_connect(char *s, int id)
   if (BOARD(ai, aj) != BOARD(bi, bj))
     return gtp_failure(id, "vertices must have same color");
 
-  result = connect(POS(ai, aj), POS(bi, bj), &connect_move);
+  result = string_connect(POS(ai, aj), POS(bi, bj), &connect_move);
   gtp_printid(id, GTP_SUCCESS);
   gtp_print_code(result);
   if (result != 0)

@@ -387,7 +387,7 @@ static int quiescence_connect(int str1, int str2, int *move) {
 /* Externally callable frontend to recursive_connect(). */
 
 int
-connect(int str1, int str2, int *move)
+string_connect(int str1, int str2, int *move)
 {
   nodes_connect = 0;
   *move = PASS_MOVE;

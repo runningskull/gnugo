@@ -146,7 +146,7 @@ decideconnection(int ai, int aj, int bi, int bj, const char *sgf_output)
   reset_engine();
 
   count_variations = 1;
-  result = connect(POS(ai, aj), POS(bi, bj), &move);
+  result = string_connect(POS(ai, aj), POS(bi, bj), &move);
   if (result == WIN) {
     if (move == NO_MOVE)
       gprintf("%m and %m are connected as it stands (%d variations)\n", 
