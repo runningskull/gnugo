@@ -371,10 +371,10 @@ sub check_matcher {
     {
         #print "parsing a line\n";
         if ($line eq "\n") {last;}	#stop at end of response
-        $line =~ s/=//g;	#zap the = at the fron of the response
+        $line =~ s/= //g;	#zap the = at the front of the response
 	$line =~ s/\n//g;	#zap newlines...
-	$line =~ s/\s//g;	#zap whitespace
-	my ($vertex, $new_status) = split(":", $line);
+	my ($vertex, $new_status) = split(": ", $line);
+	$new_status =~ s/ .+//; #zap everything after the status
 	my $old_status;
 	$old_status = $match_hist{$vertex} if (exists($match_hist{$vertex}));
 
