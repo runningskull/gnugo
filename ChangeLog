@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revision of owl_strong_dragon()
 - extra care is now taken not to waste points on tiny ko threats
 - ko threats with large followups always preferred to large reverse followups
 - twogtp.py fixed to handle jigo in endgame contests

@@ -5322,7 +5322,7 @@ owl_strong_dragon(int pos)
   
   return (!current_owl_data->goal[pos]
 	  && dragon[pos].color == board[pos]
-	  && min_eyes(&DRAGON2(pos).genus) >= 2);
+	  && dragon[pos].crude_status == ALIVE);
 }
   
 
