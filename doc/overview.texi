@@ -234,14 +234,14 @@ move goes through a detailed valuation by the function
 up other move reasons that may have been missed.
 
 The most important value of a move is its territorial effect.
-@xref{Influence and Territory} explains in detail how this is determined.
+@pxref{Influence and Territory} explains in detail how this is determined.
 
 This value is modified for all move reasons that cannot be expressed
 directly in terms of territory, such as combination attacks (where it
 is not clear which of several strings will get captured), strategical
 effects, connection moves, etc.  A large set heuristics is necessary
 here, e.g. to avoid duplication of such values. This is explained in
-more detail in @ref{Valuations}.
+more detail in @ref{Valuation}.
 
 
 @node Detailed Sequence of Events, Roadmap, Move Valuation, Overview
