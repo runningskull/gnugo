@@ -1859,6 +1859,13 @@ estimate_territorial_value(int pos, int color, float our_score)
        */
       aa = move_reasons[r].what;
 
+      if (dragon[aa].status != DEAD) {
+       DEBUG(DEBUG_MOVE_REASONS,
+             "    %1m: 0.0 - prevent defense threat (dragon is not dead)\n",
+             pos);
+       break;
+      }
+
       /* If the opponent just added a stone to a dead dragon, then
        * attack it. If we are ahead, add a safety move here, at most
        * half the margin of victory.
