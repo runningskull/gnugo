@@ -194,7 +194,7 @@ static void owl_determine_life(struct local_owl_data *owl,
 			       struct eyevalue *probable_eyes,
 			       int *eyemin, int *eyemax);
 static void owl_find_relevant_eyespaces(struct local_owl_data *owl,
-					char mw[BOARDMAX], char mz[BOARDMAX]);
+					int mw[BOARDMAX], int mz[BOARDMAX]);
 static int owl_estimate_life(struct local_owl_data *owl,
 			     struct local_owl_data *second_owl,
     		  	     struct owl_move_data vital_moves[MAX_MOVES],
@@ -1419,8 +1419,8 @@ semeai_propose_eyespace_filling_move(struct local_owl_data *owla,
 {
   int color = OTHER_COLOR(owlb->color);
   int pos;
-  char mw[BOARDMAX];
-  char mz[BOARDMAX];
+  int mw[BOARDMAX];
+  int mz[BOARDMAX];
 
   owl_find_relevant_eyespaces(owlb, mw, mz);
 
@@ -2945,8 +2945,8 @@ owl_determine_life(struct local_owl_data *owl,
 {
   int color = owl->color;
   struct eye_data *eye = owl->my_eye;
-  char mw[BOARDMAX];  /* mark relevant eye origins */
-  char mz[BOARDMAX];  /* mark potentially irrelevant eye origins */
+  int mw[BOARDMAX];  /* mark relevant eye origins */
+  int mz[BOARDMAX];  /* mark potentially irrelevant eye origins */
   int vital_values[BOARDMAX];
   int dummy_eyemin = 0;
   int dummy_eyemax = 0;
@@ -3300,7 +3300,7 @@ owl_determine_life(struct local_owl_data *owl,
 
 static void
 owl_find_relevant_eyespaces(struct local_owl_data *owl,
-			    char mw[BOARDMAX], char mz[BOARDMAX])
+			    int mw[BOARDMAX], int mz[BOARDMAX])
 {
   int pos;
   int eye_color;
