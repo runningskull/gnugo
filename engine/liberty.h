@@ -220,6 +220,8 @@ void inv_rotate2(int i, int j, int *ri, int *rj, int rot);
 int rotate1(int pos, int rot);
 int inv_rotate1(int pos, int rot);
 
+int square_dist(int pos1, int pos2);
+
 /* Is this point inside the board? */
 #if 0
 #define ON_BOARD2(i, j) ((i)>=0 && (j)>=0 && (i)<board_size && (j)<board_size)

@@ -28,6 +28,16 @@
 
 #include "liberty.h"
 
+
+/* Forward declarations */
+static int goal_dist(int pos, char goal[BOARDMAX]);
+static int compare_angles(const void *a, const void *b);
+static void show_surround_map(char mf[BOARDMAX], char mn[BOARDMAX]);
+
+/* Globals */
+static int gg;      /* stores the gravity center of the goal */
+
+
 /* Returns true if a dragon is enclosed within the convex hull of
  * its hostile neighbor dragons. This is an indication that the dragon is
  * in danger. Stones on the second and first lines are not tested.
@@ -67,8 +77,8 @@
  * with (apos) null, during make_dragons; thereafter the surroundedness
  * will be accessed using the function is_surrounded().
  *
- * If not *surround_size is not a NULL pointer, then surround_size
- * returns the 
+ * If *surround_size is not a NULL pointer, then surround_size
+ * returns the size of the surroundings.
  */
 
 int
@@ -82,18 +92,27 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   
   int left_corner[MAX_BOARD];
   int right_corner[MAX_BOARD];
+  int corner[BOARDMAX];
   int left_corners = 0, right_corners = 0;
+  int corners = 0;
   int top_row, bottom_row;
   int color = board[pos];
   int other = OTHER_COLOR(color);
+  int gi = 0;
+  int gj = 0;
+  int stones = 0;
+  int found_some;
   
   char mf[BOARDMAX]; /* friendly dragon  */
   char mn[BOARDMAX]; /* neighbor dragons */
+  int  sd[BOARDMAX]; /* distances to the goal */
   
   memset(mf, 0, sizeof(mf));
   memset(mn, 0, sizeof(mn));
+  memset(sd, 0, sizeof(sd));
   
   /* mark dragon */
+
   for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
     if (ON_BOARD(dpos)
 	&& worm[dpos].origin == dpos
@@ -104,6 +123,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
     return(0);
   
   /* mark hostile neighbors */
+
   for (k = 0; k < DRAGON2(pos).neighbors; k++) {
     int nd = DRAGON(DRAGON2(pos).adjacent[k]).origin;
     
@@ -118,13 +138,96 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
     }
   }
 
+  /* descend markings from stones lying on the 2nd and third lines */
+
+  for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
+    if (ON_BOARD(dpos) && mn[dpos]) {
+      for (k = 0; k < 4; k++) {
+        int d = delta[k];
+        if (!ON_BOARD(dpos + d))
+          continue;
+        if (!ON_BOARD(dpos + 2*d)) {
+          if (board[dpos + d] == EMPTY)
+            mn[dpos + d] = 1;
+        }
+        else if (!ON_BOARD(dpos + 3*d)) {
+          if (board[dpos + d] == EMPTY
+              && board[dpos + 2*d] == EMPTY)
+            mn[dpos + 2*d] = 1;
+        }
+      }
+    }
+
+  /* compute minimum distances to the goal */
+
+  for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
+    if (ON_BOARD(dpos) && mn[dpos]) 
+      sd[dpos] = goal_dist(dpos, mf);
+
+  /* revise markings */
+
+  do {
+    found_some = 0;
+    for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
+      if (ON_BOARD(dpos) && mn[dpos] && sd[dpos] > 8) {
+        /* discard markings if we can find 2 stones
+         * that verify :
+         * - it is closer to the goal than we are
+         * - it is closer to us than the goal is
+         * - they are closer to each other than we are to the goal
+         */
+        for (i = BOARDMIN; i < BOARDMAX; i++)
+	  if (ON_BOARD(i) && mn[i] && i != dpos
+              && sd[i] < sd[dpos]
+              && square_dist(i, dpos) < sd[dpos]) {
+            for (j = i + 1; j < BOARDMAX; j++)
+	      if (ON_BOARD(j) && mn[j] && j != dpos
+                  && sd[j] < sd[dpos]
+                  && square_dist(j, dpos) < sd[dpos]
+                  && square_dist(i, j) < sd[dpos]) {
+	        mn[dpos] = 0;
+                found_some = 1;
+                break;
+              }
+            if (mn[dpos] == 0)
+              break;
+          }
+      }
+  } while(found_some);
+
+  /* prepare corner array */
+
+  for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
+    if (ON_BOARD(dpos) && mn[dpos])
+      corner[corners++] = dpos;
+
+  /* compute gravity center of the goal */
+
+  for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
+    if (ON_BOARD(dpos) && mf[dpos]) {
+      gi += I(dpos);
+      gj += J(dpos);
+      stones++;
+    }
+  gi /= stones;
+  gj /= stones;
+  gg = POS(gi, gj);
+
+  /* sort the corner array */
+
+  gg_sort(corner, corners, sizeof(int), compare_angles);
+
   /* if apos is non NULL, mark it. */
 
   if (apos) {
     gg_assert(ON_BOARD(apos));
-    mn[apos] =1;
+    mn[apos] = 1;
   }
   
+  if (showboard == 1) {
+    show_surround_map(mf, mn);
+  }
+
   /* find top row of surrounding polyhedron */
   
   top_row = -1;
@@ -138,6 +241,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
 	break;
       }
   }
+
   /* find bottom row */
   
   bottom_row = -1;
@@ -182,7 +286,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
       break;
     }
   
-  /* find the corners on the left side */
+  /* find the corners on the right side */
   
   for (right_corners = 1; I(right_corner[right_corners-1]) < bottom_row; 
        right_corners++) {
@@ -278,34 +382,98 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
    * are not neighbors are less likely to be helpful.
    */
 
-  for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++)
+  for (dpos = BOARDMIN; dpos < BOARDMAX; dpos++) {
+    int mpos;
     if (ON_BOARD(dpos) 
 	&& mn[dpos] == 1
 	&& board[dpos] == color
 	&& are_neighbor_dragons(pos, dpos)
 	&& !mf[dpos]) {
-      int mpos;
 
       for (mpos = BOARDMIN; mpos < BOARDMAX; mpos++)
 	if (ON_BOARD(mpos) && is_same_dragon(mpos, dpos))
 	  mf[mpos] = 2;
     }
+    /* A special case
+     *
+     *  . X X .
+     *  X O . X
+     *  X . O O
+     *  . O . .
+     *
+     * The O stone hasn't been amalgamated and the surround computations
+     * might think this single stone dragon is surrounded, which in turn
+     * can generate overvaluation of moves around this stone.
+     * Consequently, we allow inclusion of the stones at kosumi distance
+     * in the mf (friendly) array.
+     */
+    if (ON_BOARD(dpos) 
+	&& mn[dpos] == 2
+	&& board[dpos] == color
+	&& are_neighbor_dragons(pos, dpos)
+	&& !mf[dpos]) {
+      for (k = 4; k < 8; k++)
+	if (ON_BOARD(dpos + delta[k]) && board[dpos + delta[k]] == color
+	    && mn[dpos + delta[k]] == 1
+	    && board[dpos + delta[k-4]] == EMPTY
+	    && board[dpos + delta[(k-3)%4]] == EMPTY) {
+	  for (mpos = BOARDMIN; mpos < BOARDMAX; mpos++)
+	    if (ON_BOARD(mpos) && is_same_dragon(mpos, dpos))
+	      mf[mpos] = 2;
+	}
+    }
+  }
 
   /* determine the surround status of the dragon */
 
   surrounded = SURROUNDED;
 
-  for (m = 0; m < board_size; m++)
-    for (n = 0; n < board_size; n++) {
-      if (mf[POS(m, n)]) {
-	if (mn[POS(m, n)] == 0) {
-	  surrounded = 0;
-	  break;
-	}
-	else if (mn[POS(m, n)] == 2)
-	  surrounded = WEAKLY_SURROUNDED;
-      }
+  /* Compute the maximum surround status awarded
+   * If distances between enclosing stones are large, reduce to
+   * WEAKLY_SURROUNDED. If (really) too large, then reduce to 0
+   * FIXME: constants chosen completely ad hoc. Possibly better tunings
+   *        can be found.
+   */
+
+  for (k = 0; k < corners - 1; k++) {
+    if (is_edge_vertex(corner[k])
+        && is_edge_vertex(corner[k+1]))
+      continue;
+    if (square_dist(corner[k], corner[k+1]) > 60) {
+      surrounded = 0;
+      break;
     }
+    else if (square_dist(corner[k], corner[k+1]) > 27)
+      surrounded = WEAKLY_SURROUNDED;
+  }
+  if (surrounded
+      && (!is_edge_vertex(corner[0])
+          || !is_edge_vertex(corner[corners-1]))) {
+    if (square_dist(corner[0], corner[corners-1]) > 60)
+      surrounded = 0;
+    else if (square_dist(corner[0], corner[corners-1]) > 27)
+      surrounded = WEAKLY_SURROUNDED;
+  }
+
+  if (surrounded)
+    for (m = 0; m < board_size; m++)
+      for (n = 0; n < board_size; n++) {
+        if (mf[POS(m, n)]) {
+	  if (mn[POS(m, n)] == 0) {
+	    surrounded = 0;
+	    break;
+	  }
+	  else if (mn[POS(m, n)] == 2)
+	    surrounded = WEAKLY_SURROUNDED;
+        }
+      }
+
+  /* revise the status for single stone dragons. */
+
+  if (stones == 1
+      && surrounded == WEAKLY_SURROUNDED
+      && mn[pos] == 2)
+    surrounded = 0;
       
   /* revise the status if an ikken tobi jumps out. */
 
@@ -352,36 +520,7 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
       }
   }
   if (showboard == 1 || (showboard == 2 && surrounded)) {
-    start_draw_board();
-    for (m = 0; m < board_size; m++)
-      for (n = 0; n < board_size; n++) {
-	int col, c;
-	
-	if (mf[POS(m,n)]) {
-	  if (mn[POS(m,n)] ==1 )
-	    col = GG_COLOR_RED;
-	  else if (mn[POS(m,n)] == 2)
-	    col = GG_COLOR_YELLOW;
-	  else
-	    col = GG_COLOR_GREEN;
-	}
-	else if (mn[POS(m,n)] == 1)
-	  col = GG_COLOR_BLUE;
-	else if (mn[POS(m,n)] == 2)
-	  col = GG_COLOR_CYAN;
-	else
-	  col = GG_COLOR_BLACK;
-	if (board[POS(m, n)] == BLACK)
-	  c = 'X';
-	else if (board[POS(m, n)] == WHITE)
-	  c = 'O';
-	else if (mn[POS(m, n)])
-	  c = '*';
-	else
-	  c = '.';
-	draw_color_char(m, n, c, col);
-      }
-    end_draw_board();
+    show_surround_map(mf, mn);
   }
   if (!apos && surrounded && surround_pointer < MAX_SURROUND) {
     memcpy(surroundings[surround_pointer].surround_map, mn, sizeof(mn));
@@ -398,6 +537,127 @@ compute_surroundings(int pos, int apos, int showboard, int *surround_size)
   }
   return surrounded;
 }
+
+
+/* Computes the minimum distance to the goal
+ */
+
+static int
+goal_dist(int pos, char goal[BOARDMAX])
+{
+  int dist = 10000;
+  int ii;
+
+  for (ii = BOARDMIN; ii <BOARDMAX; ii++)
+    if (ON_BOARD(ii) && goal[ii])
+      dist = gg_min(dist, square_dist(ii, pos));
+
+  return dist;
+}
+
+/* Compares angles. Chosen convention:
+ * - SOUTH is "lowest"
+ * - ascending order is done clock-wise (WEST, NORTH, EAST)
+ */
+static int
+compare_angles(const void *a, const void *b)
+{
+  int aa = *((const int *)a);
+  int bb = *((const int *)b);
+
+  int di_a = I(aa) - I(gg);
+  int dj_a = J(aa) - J(gg);
+  int di_b = I(bb) - I(gg);
+  int dj_b = J(bb) - J(gg);
+
+  float sin_a, sin_b;
+
+  if (aa == gg)
+    return 1;
+  if (bb == gg)
+    return -1;
+
+  if (dj_a == 0) {
+    if (di_a > 0) {
+      if (dj_b != 0 || di_b <= 0)
+        return -1;
+      return 0;
+    }
+    else {
+      if (dj_b > 0)
+        return -1;
+      else if (dj_b < 0 || di_b > 0)
+        return 1;
+      else
+        return 0;
+    }
+  }
+
+  sin_a = (float)di_a / sqrt(di_a*di_a + dj_a*dj_a);
+  sin_b = (float)di_b / sqrt(di_b*di_b + dj_b*dj_b);
+
+  if (dj_a > 0) {
+    if (dj_b <= 0)
+      return 1;
+    if (sin_a > sin_b)
+      return 1;
+    else if (sin_a < sin_b)
+      return -1;
+    else
+      return 0;
+  }
+  else { /* if (dj_a < 0) */
+    if (dj_b > 0)
+      return -1;
+    if (sin_a < sin_b)
+      return 1;
+    else if (sin_a > sin_b)
+      return -1;
+    else
+      return 0;
+  }
+
+}
+
+
+static void
+show_surround_map(char mf[BOARDMAX], char mn[BOARDMAX])
+{
+  int m, n;
+
+  start_draw_board();
+  for (m = 0; m < board_size; m++)
+    for (n = 0; n < board_size; n++) {
+      int col, c;
+      
+      if (mf[POS(m,n)]) {
+	if (mn[POS(m,n)] ==1 )
+	  col = GG_COLOR_RED;
+	else if (mn[POS(m,n)] == 2)
+	  col = GG_COLOR_YELLOW;
+	else
+	  col = GG_COLOR_GREEN;
+      }
+      else if (mn[POS(m,n)] == 1)
+	col = GG_COLOR_BLUE;
+      else if (mn[POS(m,n)] == 2)
+	col = GG_COLOR_CYAN;
+      else
+	col = GG_COLOR_BLACK;
+      if (board[POS(m, n)] == BLACK)
+	c = 'X';
+      else if (board[POS(m, n)] == WHITE)
+	c = 'O';
+      else if (mn[POS(m, n)])
+	c = '*';
+      else
+	c = '.';
+      draw_color_char(m, n, c, col);
+    }
+  end_draw_board();
+}
+
+
 
 int
 is_surrounded(int dr)

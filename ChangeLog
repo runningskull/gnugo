@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new corner_point in owl.c
+- revision of improve_lunch_attack
+- surround code revised
+- surround code moved up in in make_dragons() and used to correct escape route 
+- new utility function square_dist() in board.c
 - semeai nodes increased to 500
 - new alternate gnugo.el in interface/gtp_examples
 - owla life accepted on escape in do_owl_analyze_semeai only if stackp>2

@@ -4577,6 +4577,15 @@ incremental_order_moves(int move, int color, int str,
 }
 
 
+int 
+square_dist(int pos1, int pos2)
+{
+  int idist = I(pos1) - I(pos2);
+  int jdist = J(pos1) - J(pos2);
+  return idist*idist + jdist*jdist;
+}
+
+
 /*
  * Local Variables:
  * tab-width: 8

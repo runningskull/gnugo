@@ -309,6 +309,23 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
     }
   
   find_neighbor_dragons();
+
+  for (d = 0; d < number_of_dragons; d++) {
+    dragon2[d].surround_status 
+      = compute_surroundings(dragon2[d].origin, NO_MOVE, 0,
+			     &(dragon2[d].surround_size));
+    if (dragon2[d].surround_status == SURROUNDED) {
+      dragon2[d].escape_route = 0;
+      if (debug & DEBUG_DRAGONS)
+	gprintf ("surrounded dragon found at %1m\n", dragon2[d].origin);
+    }
+    else if (dragon2[d].surround_status == WEAKLY_SURROUNDED) {
+      dragon2[d].escape_route >>= 1;
+      if (debug & DEBUG_DRAGONS)
+	gprintf ("weakly surrounded dragon found at %1m\n", dragon2[d].origin);
+    }
+  }
+
   time_report(2, "  pre-owl dragon data", NO_MOVE, 1.0);
   
   if (stop_before_owl)
@@ -531,18 +548,6 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
 
   time_report(2, "  owl threats ", NO_MOVE, 1.0);
   
-  for (d = 0; d < number_of_dragons; d++) {
-    dragon2[d].surround_status 
-      = compute_surroundings(dragon2[d].origin, NO_MOVE, 0,
-			     &(dragon2[d].surround_size));
-    if (debug & DEBUG_DRAGONS) {
-      if (dragon2[d].surround_status == 1)
-	gprintf ("surrounded dragon found at %1m\n", dragon2[d].origin);
-      if (dragon2[d].surround_status == 2)
-	gprintf ("weakly surrounded dragon found at %1m\n", dragon2[d].origin);
-    }
-  }
-
 
   /* Compute the safety value. */
   for (d = 0; d < number_of_dragons; d++) {

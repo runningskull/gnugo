@@ -457,14 +457,6 @@ find_more_owl_attack_and_defense_moves(int color)
 
 
 
-static int 
-bdist(int pos1, int pos2)
-{
-  int idist = I(pos1) - I(pos2);
-  int jdist = J(pos1) - J(pos2);
-  return idist*idist + jdist*jdist;
-}
-
 /*
  * Any move that captures or defends a worm also potentially connects
  * or cuts the surrounding strings. Find these secondary move reasons
@@ -612,7 +604,7 @@ induce_secondary_move_reasons(int color)
 	for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++)
 	  if (ON_BOARD(pos2) && board[pos2] == EMPTY
 	      && cut_possible(pos2, OTHER_COLOR(color))
-	      && bdist(pos, pos2) <= 5)
+	      && square_dist(pos, pos2) <= 5)
 	    for (j = 0; j < 8; j++) {
 	      int pos3 = pos2 + delta[j];
 	      if (ON_BOARD(pos3) && board[pos3] == color
