@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- mkpat stricter in parsing of classification field
 - new function gg_sort() in gg_utils.c
 - all calls to qsort() replaced by calls to gg_sort()
 - linear_eye_space() removed

@@ -699,37 +699,38 @@ finish_pattern(char *line)
   }
   else if (choose_best_anchor) { 
 
-    /* try to find a better anchor if
-     * the -m option is set */
-      float mi,mj; /* middle */
-      float d, min_d = 361.0;
-      int k, min_k = -1;
+    /* Try to find a better anchor if
+     * the -m option is set.
+     */
+    float mi, mj; /* middle */
+    float d, min_d = 361.0;
+    int k, min_k = -1;
       
-      /* we seek the element of suitable value minimizing
-       * the distance to the middle */
-      mi = ((float)maxi - 1.0) / 2.0;
-      mj = ((float)maxj - 1.0) / 2.0 - 0.01;
-      for (k = 0; k != el; k++)
-	if (elements[k].att < 3 && (elements[k].att & anchor) != 0) {
-	  d = gg_abs((float)elements[k].x - mi)
-	    + gg_abs((float)elements[k].y - mj);
-	  if (d < min_d) {
-	    min_k = k;
-	    min_d = d;
-	  }
+    /* we seek the element of suitable value minimizing
+     * the distance to the middle */
+    mi = ((float)maxi - 1.0) / 2.0;
+    mj = ((float)maxj - 1.0) / 2.0 - 0.01;
+    for (k = 0; k != el; k++)
+      if (elements[k].att < 3 && (elements[k].att & anchor) != 0) {
+	d = gg_abs((float)elements[k].x - mi)
+	  + gg_abs((float)elements[k].y - mj);
+	if (d < min_d) {
+	  min_k = k;
+	  min_d = d;
 	}
-      assert(min_k != -1);
-      ci = elements[min_k].x;
-      cj = elements[min_k].y;
-      pattern[patno].anchored_at_X = (elements[min_k].att == ATT_X) ? 3 : 0;
-
-    }
-    else if (ci == -1 || cj == -1) {
-      fprintf(stderr, "No origin for pattern %s\n", pattern_names[patno]);
-      fatal_errors = 1;
-      ci = 0;
-      cj = 0;
-    }
+      }
+    assert(min_k != -1);
+    ci = elements[min_k].x;
+    cj = elements[min_k].y;
+    pattern[patno].anchored_at_X = (elements[min_k].att == ATT_X) ? 3 : 0;
+    
+  }
+  else if (ci == -1 || cj == -1) {
+    fprintf(stderr, "No origin for pattern %s\n", pattern_names[patno]);
+    fatal_errors = 1;
+    ci = 0;
+    cj = 0;
+  }
 
   /* translate posn of * (or Q) to relative co-ords
    */
@@ -751,7 +752,8 @@ finish_pattern(char *line)
 
   /* Now parse the line. Only the symmetry character and the class
    * field are mandatory. The compiler guarantees that all the fields
-   * are already initialised to 0. */
+   * are already initialised to 0.
+   */
 
   {
     int s;
@@ -816,31 +818,46 @@ finish_pattern(char *line)
     }
       
     {
-      if (strchr(class, 's')) pattern[patno].class |= CLASS_s;
-      if (strchr(class, 'O')) pattern[patno].class |= CLASS_O;
-      if (strchr(class, 'o')) pattern[patno].class |= CLASS_o;
-      if (strchr(class, 'X')) pattern[patno].class |= CLASS_X;
-      if (strchr(class, 'x')) pattern[patno].class |= CLASS_x;
-      if (strchr(class, 'D')) pattern[patno].class |= CLASS_D;
-      if (strchr(class, 'C')) pattern[patno].class |= CLASS_C;
-      if (strchr(class, 'c')) pattern[patno].class |= CLASS_c;
-      if (strchr(class, 'n')) pattern[patno].class |= CLASS_n;
-      if (strchr(class, 'B')) pattern[patno].class |= CLASS_B;
-      if (strchr(class, 'A')) pattern[patno].class |= CLASS_A;
-      if (strchr(class, 'b')) pattern[patno].class |= CLASS_b;
-      if (strchr(class, 'e')) pattern[patno].class |= CLASS_e;
-      if (strchr(class, 'E')) pattern[patno].class |= CLASS_E;
-      if (strchr(class, 'a')) pattern[patno].class |= CLASS_a;
-      if (strchr(class, 'd')) pattern[patno].class |= CLASS_d;
-      if (strchr(class, 'I')) pattern[patno].class |= CLASS_I;
-      if (strchr(class, 'J')) pattern[patno].class |= CLASS_J;
-      if (strchr(class, 'j')) pattern[patno].class |= CLASS_j;
-      if (strchr(class, 't')) pattern[patno].class |= CLASS_t;
-      if (strchr(class, 'T')) pattern[patno].class |= CLASS_T;
-      if (strchr(class, 'U')) pattern[patno].class |= CLASS_U;
-      if (strchr(class, 'W')) pattern[patno].class |= CLASS_W;
+      char *p;
+      for (p = class; *p; p++) {
+	switch (*p) {
+	  case 's': pattern[patno].class |= CLASS_s; break;
+	  case 'O': pattern[patno].class |= CLASS_O; break;
+	  case 'o': pattern[patno].class |= CLASS_o; break;
+	  case 'X': pattern[patno].class |= CLASS_X; break;
+	  case 'x': pattern[patno].class |= CLASS_x; break;
+	  case 'D': pattern[patno].class |= CLASS_D; break;
+	  case 'C': pattern[patno].class |= CLASS_C; break;
+	  case 'c': pattern[patno].class |= CLASS_c; break;
+	  case 'n': pattern[patno].class |= CLASS_n; break;
+	  case 'B': pattern[patno].class |= CLASS_B; break;
+	  case 'A': pattern[patno].class |= CLASS_A; break;
+	  case 'b': pattern[patno].class |= CLASS_b; break;
+	  case 'e': pattern[patno].class |= CLASS_e; break;
+	  case 'E': pattern[patno].class |= CLASS_E; break;
+	  case 'a': pattern[patno].class |= CLASS_a; break;
+	  case 'd': pattern[patno].class |= CLASS_d; break;
+	  case 'I': pattern[patno].class |= CLASS_I; break;
+	  case 'J': pattern[patno].class |= CLASS_J; break;
+	  case 'j': pattern[patno].class |= CLASS_j; break;
+	  case 't': pattern[patno].class |= CLASS_t; break;
+	  case 'T': pattern[patno].class |= CLASS_T; break;
+	  case 'U': pattern[patno].class |= CLASS_U; break;
+	  case 'W': pattern[patno].class |= CLASS_W; break;
+	  case 'F': pattern[patno].class |= CLASS_F; break;
+	  case '-': break;
+	  default:
+	    if (!isgraph((int) *p))
+	      break;
+	    fprintf(stderr,
+		    "%s(%d) : error : Unknown classification letter %c. (pattern %s).\n", 
+		    current_file, current_line_number, *p,
+		    pattern_names[patno]);
+	    fatal_errors++;
+	    break;
+	}
+      }
     }
-
   }
 
       

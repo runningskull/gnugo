@@ -7369,13 +7369,14 @@ Pattern CB219
 
 
 Pattern CB220
+# gf Added missing '-' placeholder for classification. (3.1.18)
 
 *.
 XO	hane at head of two stones.
 XO
 ..
 
-:8,shape(2)
+:8,-,shape(2)
 
 
 Pattern CB221

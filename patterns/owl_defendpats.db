@@ -2209,13 +2209,14 @@ Pattern D629
 
 Pattern D630
 # tm New Pattern (3.1.15)
+# gf This was classified as a 0 (zero) pattern. Removed class. (3.1.18)
 
 .*O    Cut off black stone
 OX?
 ???
 ---
 
-:8,0,value(65)
+:8,-,value(65)
 
 .*O
 OA?
