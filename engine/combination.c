@@ -74,7 +74,7 @@ combinations(int color)
     if (save_verbose)
       gprintf("Combination attack for %C with size %d found at %1m, defense at %1m\n",
 	      other, aa_val, attack_point, defense_point);
-    if (safe_move(defense_point, color))
+    if (defense_point != NO_MOVE && safe_move(defense_point, color))
       add_your_atari_atari_move(defense_point, aa_val);
     /* Playing at the attack point is probably also a defense. */
     if (safe_move(attack_point, color))

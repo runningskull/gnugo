@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in combinations()
 - reduced_init_owl() allocates bigger owl stack with --experimental-semeai
 - bugfix in pop_owl(): don't crash if owl stack has moved
 - reduce reading depth by one in influence pattern matching
