@@ -697,6 +697,13 @@ loadsgf games/reading38.sgf
 172 defend N14
 #? [1 Q10]
 
+# See also nngs2:1.
+loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
+trymove white A4
+173 defend B2
+#? [1 (A2|C7|B1)]
+popgo
+
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

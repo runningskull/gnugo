@@ -5,6 +5,7 @@ reset_reading_node_counter
 reset_trymove_counter
 
 
+# See also reading:173
 loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 1 gg_genmove white
 #? [B1|A2]*

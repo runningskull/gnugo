@@ -430,7 +430,7 @@ loadsgf games/incident169.sgf 210
 
 loadsgf games/ko1.sgf
 115 owl_attack L5
-#? [2 L1]*
+#? [2 (L1|H1)]*
 116 owl_defend L5
 #? [1 L1]
 
