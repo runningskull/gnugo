@@ -518,6 +518,7 @@ void influence_get_moyo_data(const struct influence_data *q,
 void get_influence(const struct influence_data *q,
 		   float white_influence[BOARDMAX],
 		   float black_influence[BOARDMAX],
+		   float territory_value[BOARDMAX],
 		   int regions[BOARDMAX]);
 float influence_score(const struct influence_data *q);
 float game_status(int color);

@@ -58,6 +58,7 @@ static void analyze_time_data(int time_left_data[2], int stones_left_data[2],
 static void adjust_level_offset(int color);
 static void print_influence(float white_influence[BOARDMAX],
 			    float black_influence[BOARDMAX],
+			    float territory_value[BOARDMAX],
 			    int influence_regions[BOARDMAX]);
 static void gtp_print_code(int c);
 static void gtp_print_vertices2(int n, int *moves);
@@ -3431,6 +3432,10 @@ gtp_dump_stack(char *s)
  *                   .
  *                   .
  * 100.00 139.39 100.00 139.39 100.00   0.00   0.00   0.00   0.00
+ * territory value:
+ *		.
+ *		.
+ *		.
  * regions:
  * -1  0  0  1  1  0 -1 -3 -3
  *              .
@@ -3453,6 +3458,7 @@ gtp_influence(char *s)
   int color;
   float white_influence[BOARDMAX];
   float black_influence[BOARDMAX];
+  float territory_value[BOARDMAX];
   int influence_regions[BOARDMAX];
   
   if (!gtp_decode_color(s, &color))
@@ -3462,16 +3468,20 @@ gtp_influence(char *s)
 
   gtp_start_response(GTP_SUCCESS);
   get_influence(OPPOSITE_INFLUENCE(color), white_influence,
-		black_influence, influence_regions);
-  print_influence(white_influence, black_influence, influence_regions);
+		black_influence, territory_value, influence_regions);
+  print_influence(white_influence, black_influence, territory_value,
+		  influence_regions);
+
   /* We already have one newline and thus can't use gtp_finish_response(). */
   gtp_printf("\n");
   return GTP_OK;
 }
 
+
 static void
 print_influence(float white_influence[BOARDMAX],
 		float black_influence[BOARDMAX],
+		float territory_value[BOARDMAX],
 		int influence_regions[BOARDMAX])
 {
   int m, n;
@@ -3491,10 +3501,23 @@ print_influence(float white_influence[BOARDMAX],
     gtp_printf("\n");
   }
 
+  gtp_printf("territory value:\n");
+  for (m = 0; m < board_size; m++) {
+    for (n = 0; n < board_size; n++)
+      gtp_printf("%+6.2f ", territory_value[POS(m, n)]);
+
+    gtp_printf("\n");
+  }
+
   gtp_printf("regions:\n");
   for (m = 0; m < board_size; m++) {
     for (n = 0; n < board_size; n++) {
-      gtp_printf("%2d ", influence_regions[POS(m, n)]);
+      if (influence_regions[POS(m, n)] == 4)
+	gtp_printf(" @ ");	/* 'O' looks too much like '0'. */
+      else if (influence_regions[POS(m, n)] == -4)
+	gtp_printf(" X ");
+      else
+	gtp_printf("%2d ", influence_regions[POS(m, n)]);
     }
     gtp_printf("\n");
   }
