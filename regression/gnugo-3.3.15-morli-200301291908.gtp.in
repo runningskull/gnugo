@@ -1,0 +1,380 @@
+reset_connection_node_counter
+reset_owl_node_counter
+reset_reading_node_counter
+reset_trymove_counter
+
+boardsize 19
+clear_board
+komi 0.5
+
+# White GNU Go 3.3.15
+# Black morli
+# Played on NNGS 29/01/2003
+# B+23.5
+
+play black Q16
+reg_genmove white
+play white D16
+play black D4
+reg_genmove white
+play white Q4
+play black K4
+reg_genmove white
+play white Q14
+play black R15
+reg_genmove white
+play white C6
+play black R14
+reg_genmove white
+play white C9
+play black C14
+reg_genmove white
+play white F3
+play black E3
+reg_genmove white
+play white D14
+play black C15
+reg_genmove white
+play white D15
+play black C13
+reg_genmove white
+play white C16
+play black D12
+reg_genmove white
+play white M3
+play black K3
+reg_genmove white
+play white E2
+play black D2
+reg_genmove white
+play white E4
+play black D3
+reg_genmove white
+play white F2
+play black E5
+reg_genmove white
+play white F4
+play black C5
+reg_genmove white
+play white B6
+play black B5
+reg_genmove white
+play white G6
+play black D6
+reg_genmove white
+play white F8
+play black D8
+reg_genmove white
+play white C8
+play black D9
+reg_genmove white
+play white Q10
+play black O3
+reg_genmove white
+play white O4
+play black P3
+reg_genmove white
+play white P4
+play black Q3
+reg_genmove white
+play white Q13
+play black R7
+reg_genmove white
+play white R4
+play black R3
+reg_genmove white
+play white S6
+play black P7
+reg_genmove white
+play white O6
+play black O7
+reg_genmove white
+play white L5
+play black N3
+reg_genmove white
+play white M2
+play black N4
+reg_genmove white
+play white L3
+play black N6
+reg_genmove white
+play white L4
+play black S7
+reg_genmove white
+play white K5
+play black M6
+reg_genmove white
+play white O17
+play black M17
+reg_genmove white
+play white O15
+play black J17
+reg_genmove white
+play white R13
+play black S13
+reg_genmove white
+play white S12
+play black S14
+reg_genmove white
+play white G16
+play black P17
+reg_genmove white
+play white O18
+play black P18
+reg_genmove white
+play white H18
+play black H17
+reg_genmove white
+play white G17
+play black J18
+reg_genmove white
+play white G18
+play black K16
+reg_genmove white
+play white N14
+play black K14
+reg_genmove white
+play white B16
+play black B15
+reg_genmove white
+play white M16
+play black L17
+reg_genmove white
+play white P1
+play black Q2
+reg_genmove white
+play white N12
+play black K8
+reg_genmove white
+play white G9
+play black C10
+reg_genmove white
+play white N10
+play black S10
+reg_genmove white
+play white D1
+play black C1
+reg_genmove white
+play white E1
+play black B2
+reg_genmove white
+play white J19
+play black K19
+reg_genmove white
+play white H19
+play black N18
+reg_genmove white
+play white P19
+play black Q18
+reg_genmove white
+play white N17
+play black N19
+reg_genmove white
+play white O19
+play black M18
+reg_genmove white
+play white Q19
+play black R18
+reg_genmove white
+play white R19
+play black S18
+reg_genmove white
+play white S11
+play black R10
+reg_genmove white
+play white R11
+play black Q9
+reg_genmove white
+play white P10
+play black P9
+reg_genmove white
+play white T10
+play black S9
+reg_genmove white
+play white K10
+play black G12
+reg_genmove white
+play white A15
+play black A14
+reg_genmove white
+play white A16
+play black B13
+reg_genmove white
+play white J6
+play black B9
+reg_genmove white
+play white M9
+play black O9
+reg_genmove white
+play white L7
+play black O10
+reg_genmove white
+play white O11
+play black L6
+reg_genmove white
+play white K7
+play black M11
+reg_genmove white
+play white L12
+play black J9
+reg_genmove white
+play white H10
+play black N9
+reg_genmove white
+play white N11
+play black M8
+reg_genmove white
+play white L8
+play black M7
+reg_genmove white
+play white F11
+play black F12
+reg_genmove white
+play white S19
+play black K11
+reg_genmove white
+play white J10
+play black L11
+reg_genmove white
+play white K12
+play black J11
+reg_genmove white
+play white J12
+play black H11
+reg_genmove white
+play white G11
+play black H12
+reg_genmove white
+play white M12
+play black J13
+reg_genmove white
+play white L10
+play black M10
+reg_genmove white
+play white H13
+play black L9
+reg_genmove white
+play white K9
+play black M9
+reg_genmove white
+play white H14
+play black M15
+reg_genmove white
+play white N16
+play black L15
+reg_genmove white
+play white J15
+play black K15
+reg_genmove white
+play white E13
+play black E11
+reg_genmove white
+play white F10
+play black E9
+reg_genmove white
+play white N2
+play black O2
+reg_genmove white
+play white O1
+play black M4
+reg_genmove white
+play white K6
+play black F9
+reg_genmove white
+play white G10
+play black G14
+reg_genmove white
+play white G13
+play black F13
+reg_genmove white
+play white F14
+play black D13
+reg_genmove white
+play white J14
+play black K13
+reg_genmove white
+play white T9
+play black T8
+reg_genmove white
+play white T11
+play black K18
+reg_genmove white
+play white Q1
+play black R1
+reg_genmove white
+play white P15
+play black P16
+reg_genmove white
+play white E10
+play black D10
+reg_genmove white
+play white G8
+play black F5
+reg_genmove white
+play white G5
+play black M13
+reg_genmove white
+play white L13
+play black M14
+reg_genmove white
+play white N13
+play black N15
+reg_genmove white
+play white O16
+play black J16
+reg_genmove white
+play white G15
+play black E12
+reg_genmove white
+play white E14
+play black F6
+reg_genmove white
+play white M5
+play black N5
+reg_genmove white
+play white F7
+play black E7
+reg_genmove white
+play white T18
+play black T17
+reg_genmove white
+play white T13
+play black T14
+reg_genmove white
+play white Q15
+play black T12
+reg_genmove white
+play white Q11
+play black S16
+reg_genmove white
+play white T13
+play black T19
+reg_genmove white
+play white T12
+play black T18
+reg_genmove white
+play white H16
+play black P2
+reg_genmove white
+play white N1
+play black L14
+reg_genmove white
+play white L16
+play black E8
+reg_genmove white
+
+showboard
+final_score
+
+# Report number of nodes visited by the tactical reading
+10000 get_reading_node_counter
+
+# Report number of nodes visited by the owl code
+10001 get_owl_node_counter
+
+# Report number of nodes visited by the life code
+10002 get_connection_node_counter
+
+# Report number of trymoves/trykos visited by the test
+10003 get_trymove_counter
+
