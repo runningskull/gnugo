@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- always call init_board() when reaching a new_position()
 - new tests
 - eyes.db revised
 - bugfixes in cut_connect_callback() in connections.c

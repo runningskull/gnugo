@@ -260,11 +260,6 @@ static int next_stone[BOARDMAX];
 /* ---------------------------------------------------------------- */
 
 
-/* True if the data structures are up to date for the current 
- * board position.
- */
-static int strings_initialized = 0;
-
 
 /* Number of the next free string. */
 static int next_string;
@@ -807,7 +802,6 @@ undo_trymove()
     gprintf("%opopgo\n");
   }
 
-  gg_assert(strings_initialized);
   gg_assert(change_stack_pointer - change_stack <= STACK_SIZE);
 
   if (0) {
@@ -1152,9 +1146,6 @@ is_suicide(int pos, int color)
   ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
 
-  if (!strings_initialized)
-    init_board();
-  
   /* Check for suicide. */
   if (LIBERTY(SOUTH(pos))
       || (ON_BOARD(SOUTH(pos))
@@ -1928,9 +1919,6 @@ countlib(int str)
 {
   ASSERT1(IS_STONE(board[str]), str);
   
-  if (!strings_initialized)
-    init_board();
-
   /* We already know the number of liberties. Just look it up. */
   return string[string_number[str]].liberties;
 }
@@ -1955,9 +1943,6 @@ findlib(int str, int maxlib, int *libs)
   ASSERT1(IS_STONE(board[str]), str);
   ASSERT1(libs != NULL, str);
   
-  if (!strings_initialized)
-    init_board();
-
   /* We already have the list of liberties and only need to copy it to
    * libs[].
    *
@@ -2047,9 +2032,6 @@ fastlib(int pos, int color, int ignore_capture)
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
 
-  if (!strings_initialized)
-    init_board();
-
   for (k = 0; k < 4; k++) {
     int neighbor = pos + delta[k];
     if (board[neighbor] == color) {
@@ -2135,9 +2117,6 @@ approxlib(int pos, int color, int maxlib, int *libs)
     if (fast_liberties >= 0)
       return fast_liberties;
   }
-
-  if (!strings_initialized)
-    init_board();
 
   /* Look for empty neighbors and the liberties of the adjacent
    * strings of the given color. The algorithm below won't work
@@ -2293,9 +2272,6 @@ accuratelib(int pos, int color, int maxlib, int *libs)
       return fast_liberties;
   }
   
-  if (!strings_initialized)
-    init_board();
-
   string_mark++;
   liberty_mark++;
   MARK_LIBERTY(pos);
@@ -2531,9 +2507,6 @@ count_common_libs(int str1, int str2)
   ASSERT1(IS_STONE(board[str1]), str1);
   ASSERT1(IS_STONE(board[str2]), str2);
   
-  if (!strings_initialized)
-    init_board();
-
   n = string_number[str1];
   liberties1 = string[n].liberties;
   
@@ -2602,9 +2575,6 @@ find_common_libs(int str1, int str2, int maxlib, int *libs)
   ASSERT1(IS_STONE(board[str2]), str2);
   ASSERT1(libs != NULL, str1);
   
-  if (!strings_initialized)
-    init_board();
-
   n = string_number[str1];
   liberties1 = string[n].liberties;
   
@@ -2672,9 +2642,6 @@ have_common_lib(int str1, int str2, int *lib)
   ASSERT1(IS_STONE(board[str1]), str1);
   ASSERT1(IS_STONE(board[str2]), str2);
   
-  if (!strings_initialized)
-    init_board();
-
   n = string_number[str1];
   liberties1 = string[n].liberties;
   
@@ -2717,9 +2684,6 @@ countstones(int str)
   ASSERT_ON_BOARD1(str);
   ASSERT1(IS_STONE(board[str]), str);
 
-  if (!strings_initialized)
-    init_board();
-
   return COUNTSTONES(str);
 }
 
@@ -2739,9 +2703,6 @@ findstones(int str, int maxstones, int *stones)
   
   ASSERT_ON_BOARD1(str);
   ASSERT1(IS_STONE(board[str]), str);
-
-  if (!strings_initialized)
-    init_board();
 
   s = string_number[str];
   size = string[s].size;
@@ -2769,9 +2730,6 @@ chainlinks(int str, int adj[MAXCHAIN])
 
   ASSERT1(IS_STONE(board[str]), str);
 
-  if (!strings_initialized)
-    init_board();
-
   /* We already have the list ready, just copy it and fill in the
    * desired information.
    */
@@ -2796,9 +2754,6 @@ chainlinks2(int str, int adj[MAXCHAIN], int lib)
   int neighbors;
 
   ASSERT1(IS_STONE(board[str]), str);
-
-  if (!strings_initialized)
-    init_board();
 
   /* We already have the list ready, just copy the strings with the
    * right number of liberties.
@@ -2827,9 +2782,6 @@ chainlinks3(int str, int adj[MAXCHAIN], int lib)
   int neighbors;
 
   ASSERT1(IS_STONE(board[str]), str);
-
-  if (!strings_initialized)
-    init_board();
 
   /* We already have the list ready, just copy the strings with the
    * right number of liberties.
@@ -2864,9 +2816,6 @@ extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors)
   int liberties;
 
   ASSERT1(IS_STONE(board[str]), str);
-
-  if (!strings_initialized)
-    init_board();
 
   /* We already have the list of directly adjacent strings ready, just
    * copy it and mark the strings.
@@ -2911,9 +2860,6 @@ find_origin(int str)
 {
   ASSERT1(IS_STONE(board[str]), str);
 
-  if (!strings_initialized)
-    init_board();
-  
   return string[string_number[str]].origin;
 }
 
@@ -2939,9 +2885,6 @@ is_self_atari(int pos, int color)
   ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
-
-  if (!strings_initialized)
-    init_board();
 
   /* 1. Try first to solve the problem without much work. */
   string_mark++;
@@ -3036,9 +2979,6 @@ is_self_atari(int pos, int color)
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
 
-  if (!strings_initialized)
-    init_board();
-
   /* 1. Try first without really putting the stone on the board. */
   /* FIXME: Integrate incremental_sloppy_self_atari() here. */
   result = incremental_sloppy_self_atari(pos, color);
@@ -3106,9 +3046,6 @@ neighbor_of_string(int pos, int str)
   ASSERT1(IS_STONE(color), str);
   ASSERT_ON_BOARD1(pos);
 
-  if (!strings_initialized)
-    init_board();
-
   s = string_number[str];
   
   if (board[SOUTH(pos)] == color
@@ -3143,9 +3080,6 @@ same_string(int str1, int str2)
   ASSERT1(IS_STONE(board[str1]), str1);
   ASSERT1(IS_STONE(board[str2]), str2);
 
-  if (!strings_initialized)
-    init_board();
-
   return string_number[str1] == string_number[str2];
 }
 
@@ -3164,9 +3098,6 @@ adjacent_strings(int str1, int str2)
   ASSERT_ON_BOARD1(str2);
   ASSERT1(IS_STONE(board[str1]), str1);
   ASSERT1(IS_STONE(board[str2]), str2);
-
-  if (!strings_initialized)
-    init_board();
 
   s1 = string_number[str1];
   s2 = string_number[str2];
@@ -3201,9 +3132,6 @@ is_ko(int pos, int color, int *ko_pos)
   ASSERT_ON_BOARD1(pos);
   ASSERT1(color == WHITE || color == BLACK, pos);
 
-  if (!strings_initialized)
-    init_board();
-  
   if (ON_BOARD(SOUTH(pos))) {
     if (board[SOUTH(pos)] != other)
       return 0;
@@ -3265,9 +3193,6 @@ is_ko_point(int pos)
 {
   ASSERT_ON_BOARD1(pos);
 
-  if (!strings_initialized)
-    init_board();
-  
   if (board[pos] == EMPTY) {
     int color;
     if (ON_BOARD(SOUTH(pos)))
@@ -3297,9 +3222,6 @@ does_capture_something(int pos, int color)
 
   ASSERT1(board[pos] == EMPTY, pos);
 
-  if (!strings_initialized)
-    init_board();
-
   if (board[SOUTH(pos)] == other && LIBERTIES(SOUTH(pos)) == 1)
     return 1;
   
@@ -3328,9 +3250,6 @@ mark_string(int str, char mx[BOARDMAX], char mark)
   int pos = str;
 
   ASSERT1(IS_STONE(board[str]), str);
-
-  if (!strings_initialized)
-    init_board();
 
   do {
     mx[pos] = mark;
@@ -3420,9 +3339,7 @@ get_trymove_counter()
 /* ================================================================ */
 
 
-/* Don't trust the incremental string data until it's reinitialized.
- *
- * This function should be called if the board is modified by other
+/* This function should be called if the board is modified by other
  * means than do_play_move() or undo_trymove().
  * It's also useful to force a recomputation of the strings if we
  * don't have any immediate plans to undo the move, because it recovers
@@ -3430,14 +3347,14 @@ get_trymove_counter()
  */
 
 /* We have reached a new position. Increase the position counter and
- * invalidate the incremental strings.
+ * re-initialize the incremental strings.
  */
 
 static void
 new_position(void)
 {
   position_number++;
-  strings_initialized = 0;
+  init_board();
 }
 
 
@@ -3485,9 +3402,6 @@ init_board()
   for (s = 0; s < next_string; s++) {
     find_liberties_and_neighbors(s);
   }
-
-  /* Now we can trust the information. */
-  strings_initialized = 1;
 }
 
 
@@ -4199,9 +4113,6 @@ do_play_move(int pos, int color)
   int north = NORTH(pos);
   int east = EAST(pos);
   
-  if (!strings_initialized)
-    init_board();
-    
   /* Remove captured stones and check for suicide.*/
   if (board[south] == other && LIBERTIES(south) == 1)
     captured_stones += do_remove_string(string_number[south]);
