@@ -2,7 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new function influence_initial_territory to export territory valuation
+- negative strategic value added to invasion type moves
+- pattern tuning: keima shape bonus removed
 - code consistency cleanup
+- THANKS updated
 
 3.1.28 released March 24, 2002
 

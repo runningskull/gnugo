@@ -1586,6 +1586,18 @@ influence_get_moyo_segmentation(int opposite, struct moyo_data *moyos)
   }
 }
 
+/* Export the territory valuation at an intersection from initial_influence;
+ * it is given from (color)'s point of view.
+ */
+float
+influence_initial_territory(int pos, int color)
+{
+  if (color == WHITE)
+    return initial_influence.territory_value[I(pos)][J(pos)];
+  else
+    return -initial_influence.territory_value[I(pos)][J(pos)];
+}
+
 /* Compute the influence before a move has been made, which can
  * later be compared to the influence after a move. Assume that
  * the other color is in turn to move.
@@ -1601,14 +1613,16 @@ compute_initial_influence(int color, int dragons_known)
     experimental_influence = 0;
   compute_influence(&initial_influence, OTHER_COLOR(color), -1, -1,
 		    dragons_known, NULL, NULL);
-  if (experimental_influence)
-    new_value_territory(&initial_influence);
-  else
-    value_territory(&initial_influence);
-  if ((printmoyo & PRINTMOYO_VALUE_TERRITORY)
-      && (printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
-    print_influence_territory(&initial_influence,
-                              "territory (initial influence):\n");
+  if (dragons_known) {
+    if (experimental_influence)
+      new_value_territory(&initial_influence);
+    else
+      value_territory(&initial_influence);
+    if ((printmoyo & PRINTMOYO_VALUE_TERRITORY)
+	&& (printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
+      print_influence_territory(&initial_influence,
+				"territory (initial influence):\n");
+  }
 
   compute_influence(&initial_opposite_influence, color, -1, -1,
 		    dragons_known, NULL, NULL);
@@ -1746,7 +1760,9 @@ compute_move_influence(int m, int n, int color,
       value_territory(&move_influence);
     if (m == (board_size - 19) + debug_influence_i
 	  && n == debug_influence_j && m >= 0) {
-      print_influence_territory(&move_influence, "territory (after move):\n");
+      if (printmoyo & PRINTMOYO_VALUE_TERRITORY)
+        print_influence_territory(&move_influence,
+	    			  "territory (after move):\n");
       if (experimental_influence) {
         print_influence(&followup_influence, "followup influence");
         if (printmoyo & PRINTMOYO_VALUE_TERRITORY)

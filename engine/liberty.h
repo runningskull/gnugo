@@ -534,6 +534,7 @@ int influence_get_moyo_size(int pos, int color);
 void influence_get_moyo_segmentation(int opposite, struct moyo_data *moyo);
 float influence_estimate_score(float moyo_coeff, float area_coeff);
 void influence_mark_non_territory(int pos, int color);
+float influence_initial_territory(int pos, int color);
 
 void  old_estimate_score(int color, float *lower_bound, float *upper_bound);
 float estimate_score(float *upper, float *lower);

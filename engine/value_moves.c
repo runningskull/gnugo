@@ -1044,6 +1044,100 @@ adjusted_worm_attack_value(int pos, int ww)
   return adjusted_value;
 }
 
+/* The new (3.2) territorial evaluation overvalues moves creating a new
+ * group in the opponent's sphere of influence. The influence module cannot
+ * see that the opponent will gain by attacking the new (probably weak)
+ * group.
+ * This function uses some heuristics to estimate the strategic penalty
+ * of invasion moves, and moves that try to run away with a group of size
+ * 1 in front of opponent's strength.
+ */
+static float
+strategic_penalty(int pos, int color)
+{
+  int k;
+  float ret_val;
+  
+  /* We try to detect support from an alive friendly stone by checking
+   * whether all neighboring intersections belong to the opponent's moyo.
+   */
+  for (k = 0; k < 4; k++)
+    if (board[pos + delta[k]] != OTHER_COLOR(color)
+        && influence_moyo_color(pos + delta[k]) != OTHER_COLOR(color))
+      return 0.0;
+
+  for (k = 0; k < MAX_REASONS; k++) {
+    int r = move[pos].reason[k];
+    if (r == -1)
+      break;
+    /* We assume that invasion moves can only have the move reasons listed
+     * below.
+     */
+    switch (move_reasons[r].type) {
+    case EXPAND_TERRITORY_MOVE:
+    case BLOCK_TERRITORY_MOVE:
+    case EXPAND_MOYO_MOVE:
+    case STRATEGIC_ATTACK_MOVE:
+      continue;
+    /* An owl defense of a single stone might be a stupid attempt to run
+     * away with an unimportant (kikashi like) stone. We assume this is the
+     * case if this single stone has a strong hostile direct neighbor.
+     */
+    case OWL_DEFEND_MOVE:
+      {
+	int target = dragons[move_reasons[r].what];
+	int has_strong_neighbor = 0;
+	int has_weak_neighbor = 0;
+	int i;
+	/* We award no penalty for running away with a cutting stone. */
+	if (dragon[target].size > 1
+	    || worm[target].cutstone > 0
+	    || worm[target].cutstone2 > 0)
+	  return 0.0;
+	/* Third line moves (or lower) are ok -- they try to live, not run
+         * away.
+         */
+        if (gg_min(gg_min(I(pos), board_size-1 - I(pos)),
+                   gg_min(J(pos), board_size-1 - J(pos)))
+            < 3)
+	  return 0.0;
+	for (i = 0; i < 4; i++)
+	  if (board[target + delta[i]] == OTHER_COLOR(color)) {
+	    if (dragon[target + delta[i]].size == 1) {
+	      has_weak_neighbor = 1;
+	      break;
+	    }
+	    switch (DRAGON2(target + delta[i]).safety) {
+	    case INVINCIBLE:
+	    case STRONGLY_ALIVE:
+	      has_strong_neighbor = 1;
+	      break;
+	    case ALIVE:
+	      continue;
+	    default:
+	      has_weak_neighbor = 1;
+	    }
+	  }
+	if (has_weak_neighbor || (!has_strong_neighbor))
+	  return 0.0;
+	else
+	  continue;
+      }
+    default:
+      return 0.0;
+    }  
+  }
+
+  /* We have to make a gues how much the point where we want to play
+   * is dominated by the opponent. The territorial valuation is a
+   * good try here.
+   */
+  ret_val = influence_initial_territory(pos, OTHER_COLOR(color));
+  
+  ret_val *= 12.0;
+  ret_val = gg_max(0.0, ret_val);
+  return ret_val;
+}
 
 /*
  * Estimate the direct territorial value of a move at (pos).
@@ -1986,6 +2080,14 @@ estimate_strategical_value(int pos, int color, float score)
     TRACE("  %1m: %f - strategic effect on %1m\n",
 	  pos, dragon_value[k], dragons[k]);
     tot_value += dragon_value[k];
+  }
+  
+  /* Finally, subtract penalty for invasion type moves. */
+  this_value = strategic_penalty(pos, color);
+  if (this_value > 0.0) {
+    TRACE("  %1m: %f - strategic penalty, considered as invasion.\n",
+	  pos, -this_value);
+    tot_value -= this_value;
   }
 
   move[pos].strategical_value = tot_value;
