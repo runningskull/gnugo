@@ -76,6 +76,9 @@
 /* Define if you have the `times' function. */
 #undef HAVE_TIMES
 
+/* Define if your compiler supports transparent unions */
+#undef HAVE_TRANSPARENT_UNIONS
+
 /* Define if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 

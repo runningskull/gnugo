@@ -2715,7 +2715,7 @@ write_attributes(FILE *outfile)
   int k;
 
   fprintf(outfile, "static struct pattern_attribute attributes[] = {\n");
-  fprintf(outfile, "#ifdef __GNUC__\n");
+  fprintf(outfile, "#ifdef HAVE_TRANSPARENT_UNIONS\n");
 
   for (k = 0; k < num_attributes; k++) {
     fprintf(outfile, "  {%s,", attribute_name[attributes[k].type]);

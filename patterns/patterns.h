@@ -203,7 +203,7 @@ enum attribute_type {
 };
 
 
-#ifdef __GNUC__
+#ifdef HAVE_TRANSPARENT_UNIONS
 
 struct pattern_attribute {
   enum attribute_type type;

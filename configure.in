@@ -222,6 +222,30 @@ if test "$gnugo_cv_cpp_variadic_define" = "yes";then
       AC_DEFINE(HAVE_VARIADIC_DEFINE)
 fi
 
+dnl ------ transparent unions ---------------------
+
+AH_TEMPLATE([HAVE_TRANSPARENT_UNIONS],
+[Define if your compiler supports transparent unions])
+
+AC_CACHE_CHECK(
+	[whether $CC supports transparent unions],
+	gnugo_cv_transparent_unions,
+	AC_TRY_COMPILE([],
+[[  struct {
+    union {
+      int x;
+      float y;
+    }
+  } A = { { .y = 0.0 } };
+  A.y = 1.0;]],
+		gnugo_cv_transparent_unions="yes",
+		gnugo_cv_transparent_unions="no")
+)
+
+if test "$gnugo_cv_transparent_unions" = "yes"; then
+	AC_DEFINE(HAVE_TRANSPARENT_UNIONS)
+fi
+
 dnl check for a working curses library for use in debugboard
 
 AH_TEMPLATE([CURSES],
