@@ -19,7 +19,7 @@ TST = 13x13b.tst 13x13.tst arb.tst arend2.tst arend.tst \
       strategy_rot.tst strategy.tst tactics1.tst tactics.tst \
       thrash.tst trevora.tst trevorb.tst trevorc.tst \
       trevord.tst trevor.tst vie.tst viking.tst gifu03.tst seki.tst \
-      9x9.tst unconditional.tst cgf2004.tst
+      9x9.tst unconditional.tst cgf2004.tst kgs.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh eval3.sh
 
@@ -384,3 +384,4 @@ fifth_batch:
 	$(srcdir)/regress.sh $(srcdir) seki.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) 9x9.tst $(GG_OPTIONS)
 	$(srcdir)/regress.sh $(srcdir) cgf2004.tst $(GG_OPTIONS)
+	$(srcdir)/regress.sh $(srcdir) kgs.tst $(GG_OPTIONS)
