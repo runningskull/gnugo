@@ -1032,8 +1032,7 @@ komaster_trymove(int pos, int color, const char *message, int str,
 
   if (komaster == other)
     *new_komaster = GRAY;
-  else if (komaster == color)
-    *new_kom_pos = kpos;
+  *new_kom_pos = kpos;
 
   return 1;
 }
