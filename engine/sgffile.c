@@ -134,10 +134,12 @@ sgffile_begindump(SGFTree *tree)
 void 
 sgffile_enddump(const char *filename)
 {
-  /* check if we have a valid filename */
-  if (filename && *filename)
+  /* Check if we have a valid filename and a tree. */
+  if (filename && *filename && sgf_dumptree) {
     writesgf(sgf_dumptree->root, filename);
-  sgf_dumptree = NULL;
+    sgfFreeNode(sgf_dumptree->root);
+    sgf_dumptree = NULL;
+  }
 }
 
 
@@ -167,19 +169,18 @@ sgffile_printsgf(int color_to_play, const char *filename)
   
   sgffile_printboard(&sgftree);
   
-  if (color_to_play == EMPTY)
-    return;
+  if (color_to_play != EMPTY) {
+    sgfAddProperty(sgftree.lastnode, "PL",
+		   (color_to_play == WHITE ? "W" : "B"));
 
-  sgfAddProperty(sgftree.lastnode, "PL", (color_to_play == WHITE ? "W" : "B"));
-
-  for (m = 0; m < board_size; ++m)
-    for (n = 0; n < board_size; ++n)
-      if (BOARD(m, n) == EMPTY && !is_legal(POS(m, n), color_to_play)) {
-	gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
-	sgfAddProperty(sgftree.lastnode, "IL", pos);
-      }
-
-
+    for (m = 0; m < board_size; ++m)
+      for (n = 0; n < board_size; ++n)
+        if (BOARD(m, n) == EMPTY && !is_legal(POS(m, n), color_to_play)) {
+	  gg_snprintf(pos, 3, "%c%c", 'a' + n, 'a' + m);
+	  sgfAddProperty(sgftree.lastnode, "IL", pos);
+	}
+  }
+  
   writesgf(sgftree.root, filename);
 }
 

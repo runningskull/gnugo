@@ -100,6 +100,7 @@ main(int argc, char *argv[])
 
   /* Try to open the infile. */
   infilename = argv[1];
+  sgftree_clear(&sgftree);
   if (!sgftree_readfile(&sgftree, infilename)) {
     fprintf(stderr, "Cannot open or parse '%s'\n", infilename);
     exit(1);

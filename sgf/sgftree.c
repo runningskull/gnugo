@@ -41,6 +41,8 @@ sgftree_readfile(SGFTree *tree, const char *infilename)
     tree->root = savetree;
     return 0;
   }
+  
+  sgfFreeNode(savetree);
   tree->lastnode = NULL;
   return 1;
 }

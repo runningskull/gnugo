@@ -583,7 +583,7 @@ gtp_playwhite(char *s)
 }
 
 
-/* Function:  Play a black stone at the given vertex.
+/* Function:  Play a stone of the given color at the given vertex.
  * Arguments: vertex
  * Fails:     invalid vertex, illegal move
  * Returns:   nothing
@@ -632,8 +632,10 @@ gtp_fixed_handicap(char *s)
   if (this_handicap < 2 && (gtp_version > 1 || this_handicap != 0))
     return gtp_failure("invalid handicap");
 
-  if (place_fixed_handicap(this_handicap) != this_handicap)
+  if (place_fixed_handicap(this_handicap) != this_handicap) {
+    clear_board();
     return gtp_failure("invalid handicap");
+  }
 
   handicap = this_handicap;
 
@@ -771,7 +773,8 @@ gtp_loadsgf(char *s)
   nread = sscanf(s, "%s %s", filename, untilstring);
   if (nread < 1)
     return gtp_failure("missing filename");
-  
+
+  sgftree_clear(&sgftree);
   if (!sgftree_readfile(&sgftree, filename))
     return gtp_failure("cannot open or parse '%s'", filename);
 
@@ -1003,7 +1006,7 @@ gtp_tryko(char *s)
 }
 
 
-/* Function:  Undo a trymove.
+/* Function:  Undo a trymove or tryko.
  * Arguments: none
  * Fails:     stack empty
  * Returns:   nothing
@@ -2110,7 +2113,7 @@ gtp_top_moves(char *s)
   return GTP_OK;
 }
 
-/* Function : Generate a list of the best moves for White with weights
+/* Function : Generate a list of the best moves for white with weights
  * Arguments: none
  * Fails:   : never
  * Returns  : list of moves with weights
@@ -2130,6 +2133,12 @@ gtp_top_moves_white(char *s)
     }
   return gtp_finish_response();
 }
+
+/* Function : Generate a list of the best moves for black with weights
+ * Arguments: none
+ * Fails:   : never
+ * Returns  : list of moves with weights
+ */
 
 static int
 gtp_top_moves_black(char *s)
@@ -2222,7 +2231,7 @@ gtp_gg_undo(char *s)
  *
  * Status:    GTP version 2 standard command.
  *
- * FIXME: This command stores the time settings but noone ever takes notice.
+ * FIXME: This command stores the time settings but no one ever takes notice.
  */
 
 static int
@@ -3201,10 +3210,6 @@ gtp_start_sgftrace(char *s)
  *
  * Warning: You had better know what you're doing if you try to use this
  *          command.
- *
- * FIXME: We should free the memory from the sgf tree, now that we are
- *        done. This would be simpler if there were an sgftree
- *        function for this. (sgfFreeNode works on an sgfnode.)
  */
 static int
 gtp_finish_sgftrace(char *s)

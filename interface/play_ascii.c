@@ -561,29 +561,28 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
   setbuf(stdout, NULL); /* else set it to completely UNBUFFERED */
 #endif
   
-  while (state == 1) {
+  sgftree = *tree;
 
-    sgftree = *tree;
-    
+  if (filename) {
+    gameinfo_load_sgfheader(gameinfo, sgftree.root);
+    gameinfo->to_move = gameinfo_play_sgftree(gameinfo, &sgftree, until);
+    sgf_initialized = 1;
+  }
+  else {
+    if (sgfGetIntProperty(sgftree.root, "SZ", &sz)) 
+      gnugo_clear_board(sz);
+    if (gameinfo->handicap == 0)
+      gameinfo->to_move = BLACK;
+    else {
+      gameinfo->handicap = gnugo_placehand(gameinfo->handicap);
+      gameinfo->to_move = WHITE;
+    }
+    sgf_initialized = 0;
+  }
+
+  while (state == 1) {
     /* No score is estimated yet. */
     current_score_estimate = NO_SCORE;
-    
-    if (filename) {
-      gameinfo_load_sgfheader(gameinfo, sgftree.root);
-      gameinfo->to_move = gameinfo_play_sgftree(gameinfo, &sgftree, until);
-      sgf_initialized = 1;
-    }
-    else {
-      if (sgfGetIntProperty(sgftree.root, "SZ", &sz)) 
-	gnugo_clear_board(sz);
-      if (gameinfo->handicap == 0)
-	gameinfo->to_move = BLACK;
-      else {
-	gameinfo->handicap = gnugo_placehand(gameinfo->handicap);
-	gameinfo->to_move = WHITE;
-      }
-      sgf_initialized = 0;
-    }
     
     printf("\nBeginning ASCII mode game.\n\n");
     gameinfo_print(gameinfo);
@@ -926,6 +925,9 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
       gnugo_who_wins(gameinfo->computer_player, stdout);
     printf("\nIf you disagree, we may count the game together.\n");
     printf("You may optionally save the game as an SGF file.\n");
+
+    sgftreeWriteResult(&sgftree, estimate_score(NULL, NULL), 1);
+
     state = 0;
     while (state == 0) {
       printf("\n");
@@ -967,12 +969,19 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	state = 0;
       }
     }
-    sgftreeWriteResult(&sgftree, estimate_score(NULL, NULL), 1);
     sgffile_output(&sgftree);
     passes = 0;
     showdead = 0;
+    
     /* Play a different game next time. */
     update_random_seed();
+
+    /* Free the sgf tree and prepare for a new game. */
+    sgfFreeNode(sgftree.root);
+    sgftree_clear(&sgftree);
+    sgftreeCreateHeaderNode(&sgftree, board_size, komi);
+
+    gameinfo_clear(gameinfo, board_size, komi);
   }
   printf("\nThanks for playing GNU Go.\n\n");
 }

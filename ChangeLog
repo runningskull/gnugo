@@ -2,6 +2,12 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- old sgftree is now freed on successful sgf loading
+- sgftrees are freed when sgf tracing is finished
+- sgffile_printsgf() revised
+- gtp_fixed_handicap revised
+- comments improved in play_gtp.c.
+- play_ascii() revised
 - combinations() revised
 - atari_atari() generates lots of defense moves and validates them
 - do_atari_atari() generates lots of potential defense moves
