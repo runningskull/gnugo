@@ -2,7 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.3.6 released September 4, 2002
+3.3.7 released September 4, 2002
 
 - better ko tracking searching for additional worm attacks and defenses 
   in find_more_attack_and_defense_moves() and make_worms()
