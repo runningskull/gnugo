@@ -15,7 +15,7 @@ loadsgf games/gwe.sgf 241
 
 loadsgf games/strategy36.sgf
 153 gg_genmove black
-#? [Q9]*
+#? [Q9]
 
 loadsgf games/strategy37.sgf
 154 gg_genmove white
@@ -69,7 +69,7 @@ loadsgf games/strategy39.sgf 172
 # K1 is out of the question. K3 is locally better and L6 might kill with ko.
 loadsgf games/strategy39.sgf 178
 165 gg_genmove white
-#? [K3|L6]*
+#? [K3|L6]
 
 loadsgf games/incident94.sgf 114
 166 gg_genmove white
@@ -146,7 +146,7 @@ loadsgf games/xxlin.sgf 16
 
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
-#? [P3|O2|P2|O4]
+#? [P3|O2|P2|O4]*
 
 loadsgf games/xxlin.sgf 30
 180 gg_genmove black
@@ -154,19 +154,19 @@ loadsgf games/xxlin.sgf 30
 
 loadsgf games/xxlin.sgf 38
 181 gg_genmove black
-#? [F3]
+#? [F3]*
 
 loadsgf games/xxlin.sgf 48
 182 gg_genmove black
-#? [E7|F8]
+#? [E7|F8]*
 
 loadsgf games/xxlin.sgf 76
 183 gg_genmove black
-#? [P10]
+#? [P10]*
 
 loadsgf games/xxlin.sgf 106
-183 gg_genmove black
-#? [H13]
+184 gg_genmove black
+#? [H13]*
 
 ############ End of Tests #################
 

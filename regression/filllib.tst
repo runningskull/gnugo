@@ -98,7 +98,7 @@ loadsgf games/filllib8.sgf 303
 # it anyway.
 loadsgf games/filllib9.sgf 235
 29 gg_genmove white
-#? [B1|A1]*
+#? [B1|A1]
 30 gg_genmove black
 #? [A3|A1|B1]
 

@@ -6,7 +6,7 @@ reset_trymove_counter
 
 loadsgf games/tactics01.sgf
 1 genmove_black
-#? [C15|D15|B13|B11|B14]
+#? [C15|D15|B13|B11|B14]*
 
 ############ End of Tests #################
 

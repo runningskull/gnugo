@@ -1,3 +1,40 @@
+========================== 3.1.8 =========================
+
+./regress.sh . reading.tst
+30 unexpected PASS!
+54 unexpected PASS!
+65 unexpected FAIL: Correct '0', got '1 S4'
+94 unexpected PASS!
+95 unexpected PASS!
+96 unexpected PASS!
+139 unexpected PASS!
+147 unexpected FAIL: Correct '1 H1', got '2 H1'
+149 unexpected PASS!
+./regress.sh . owl_rot.tst
+193 unexpected PASS!
+./regress.sh . filllib.tst
+29 unexpected PASS!
+./regress.sh . strategy.tst
+40 unexpected FAIL: Correct 'E5', got 'L14'
+./regress.sh . arb.tst
+204 unexpected FAIL: Correct 'S7', got 'T11'
+./regress.sh . strategy3.tst
+141 unexpected PASS!
+./regress.sh . strategy4.tst
+153 unexpected PASS!
+165 unexpected PASS!
+./regress.sh . nicklas1.tst
+203 unexpected FAIL: Correct 'J5', got 'B6'
+./regress.sh . nicklas3.tst
+401 unexpected PASS!
+./regress.sh . trevor.tst
+12 unexpected PASS!
+./regress.sh . tactics.tst
+
+Test results updated. A few new tests were fixed, too.
+
+========================== 3.1.7 =========================
+
 ./regress.sh . owl.tst
 150 unexpected PASS!
 219 unexpected FAIL: Correct '0', got '1 M19'

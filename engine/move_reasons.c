@@ -1443,6 +1443,7 @@ induce_secondary_move_reasons(int color)
 	  continue;
 	
 	aa = worms[move_reasons[r].what];
+
 	if ((   (move_reasons[r].type == ATTACK_MOVE)
 		&& (board[aa] == color))
 	    || ((move_reasons[r].type == DEFEND_MOVE)
@@ -2160,9 +2161,9 @@ static float impact_values[10][10] = {
 static float cautious_impact_values[10][10] = {
 /*        (bi, bj) DEAD ALIV CRIT INES TACT WEAK WE_A SEKI STRO INVI */
 /* DEAD        */ {0.3, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
-/* ALIVE       */ {0.0, 0.2, 0.05,0.2, 0.0, 0.1,0.15,0.10, 0.2 ,0.2 },
+/* ALIVE       */ {0.0, 0.2, 0.05,0.0, 0.0, 0.1,0.15,0.10, 0.2 ,0.2 },
 /* CRITICAL    */ {0.0, 1.04,0.85,0.0, 0.0, 0.75,0.9, 0.85,1.08,1.1 },
-/* INESSENTIAL */ {0.1, 0.6, 0.0, 0.4, 0.0, 0.3, 0.5, 0.5, 0.6, 0.6 },
+/* INESSENTIAL */ {0.1, 0.6, 0.0, 0.0, 0.0, 0.3, 0.5, 0.5, 0.6, 0.6 },
 /* TACT. DEAD  */ {0.2, 0.9, 0.0, 0.0, 0.0, 0.8, 0.85,0.8, 0.95,1.0 },
 /* WEAK        */ {0.1, 0.6, 0.25,0.0, 0.0, 0.2, 0.25,0.25,0.65,0.65},
 /* WEAK ALIVE  */ {0.0, 0.4, 0.3, 0.0, 0.0, 0.2,0.2, 0.2 ,0.45,0.45},
@@ -2231,6 +2232,15 @@ connection_value(int dragona, int dragonb, int tt, float margin)
     impact = cautious_impact_values[safety1][safety2];
   else impact = 0.05*margin*cautious_impact_values[safety1][safety2]
 	 + (1-0.05*margin)*impact_values[safety1][safety2];
+
+
+  /* Trying to connect an inessential string to something else with a
+   * self atari is almost certainly worthless.
+   */
+  if (impact > 0.0
+      && safety1 == INESSENTIAL
+      && is_self_atari(tt, board[dragona]))
+    impact = 0.0;
   
   return impact * 2.0 * dragon[ai][aj].effective_size;
 }
@@ -3104,7 +3114,8 @@ estimate_strategical_value(int pos, int color, float score)
        * excess value as a bonus.
        */
       float excess_value = (dragon_value[k] - 
-			    2 * dragon[I(dragons[k])][J(dragons[k])].effective_size);
+			    2 * dragon[I(dragons[k])]
+			    [J(dragons[k])].effective_size);
       if (excess_value > 0.0) {
 	TRACE("  %1m: %f - strategic bonus for %1m\n",
 	      pos, excess_value, dragons[k]);
@@ -3115,7 +3126,7 @@ estimate_strategical_value(int pos, int color, float score)
     }
     
     TRACE("  %1m: %f - strategic effect on %1m\n",
-	  pos, dragon_value[k], dragon[k]);
+	  pos, dragon_value[k], dragons[k]);
     tot_value += dragon_value[k];
   }
 

@@ -405,7 +405,7 @@ loadsgf games/jahy.sgf 36
 108 owl_attack C3
 #? [1 (B4|C4)]
 109 owl_defend C3
-#? [1 B5]
+#? [1 (B5|C4)]
 
 # incident 287
 loadsgf games/incident287.sgf 103

@@ -3910,6 +3910,19 @@ XXO..cd
 ; o_somewhere(a,b,c,d)
 
 
+Pattern EB412
+# db added (3.1.8)
+
+X???            push along the edge
+OXX.
+.O*.
+....
+----
+
+:8,deE,shape(3)
+
+
+
 
 ##############################
 # Third and fourth line blocks
@@ -8063,6 +8076,7 @@ Pattern CB292
 
 
 Pattern CB293
+# db reduced shape value (3.1.8)
 
 ?O..              knight's move
 ?O..
@@ -8070,7 +8084,7 @@ X...
 ..*.
 ?x.?
 
-:8,OXEeda,shape(4)
+:8,OXEeda,shape(3)
 
 ?O..
 ?Oc.
@@ -8575,6 +8589,17 @@ BXC
 ?.?
 
 ; !safe_omove(a) && lib(B)>1 && lib(C)>1
+
+
+Pattern CB334
+# db added (3.1.8)
+
+...O       magnificent shape
+...O
+.*OX
+O.Xx
+
+:8,OX,shape(2)
 
 
 
@@ -10594,7 +10619,7 @@ xxxx
 Pattern CD106
 # db added (3.1.7)
 
-?x?
+?x?          make an eye (or die trying!)
 O*O
 O.O
 oOX
@@ -10610,6 +10635,33 @@ bOX
 
 > replace(a,*);
 > if (!o_somewhere(b)) replace(b,*)
+
+
+Pattern CD107
+# db added (3.1.8)
+
+xX..        good shape keima
+..*.
+O...
+
+:8,Xade
+
+xX..        
+.a*.
+Abc.
+
+; !dead(A) && oplay_attack(*,a,b,c,c)
+
+
+Pattern CD108
+# db added (3.1.8)
+# Exception to CD107
+
+?xX..       bad shape keima
+O..*.
+XO...
+
+:8,-,shape(-3)
 
 
 ######################################################################
@@ -11919,6 +11971,19 @@ X.XO..
 ------
 
 :8,J
+
+
+Pattern EJ85
+# db added (3.1.8)
+
+??O.X?        Important sente block
+?XO...
+..X*..
+......
+------
+
+:8,OJ
+
 
 
 

@@ -1735,8 +1735,9 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	}
       }
     }
-    else if (approxlib(libs[k], other, 3, libs2) == 2) {
-      for (r = 0; r < 2; r++) {
+    liberties2 = approxlib(libs[k], other, 3, libs2);
+    if (liberties2 <= 2) {
+      for (r = 0; r < liberties2; r++) {
 	xpos = libs2[r];
 	/* Don't reconsider previously tested moves. */
 	for (s = 0; s < num_moves; s++)
@@ -1744,7 +1745,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	    break;
 	if (s < num_moves)
 	  continue;
-
+	
 	if (!is_self_atari(xpos, color)
 	    && trymove(xpos, color, "defend2-D", str, komaster, kom_pos)) {
 	  int acode = do_attack(str, NULL, komaster, kom_pos);
@@ -1755,7 +1756,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
 	  }
 	  UPDATE_SAVED_KO_RESULT(savecode, savemove, acode, xpos);
 	}
-      }      
+      }
     }
   }
 
@@ -3188,6 +3189,18 @@ attack2(int str, int *move, int komaster, int kom_pos)
     /* Try backfilling if atari is impossible. */
     if (stackp <= backfill_depth && approxlib(apos, other, 2, libs2) == 1) {
       ADD_CANDIDATE_MOVE(libs2[0], 0, moves, scores, num_moves);
+      /* If there is a neighbor in atari, we also try back-capturing. */
+      for (r = 0; r < 4; r++) {
+	int bpos = libs2[0] + delta[r];
+	if (board[bpos] == other && chainlinks2(bpos, adjs, 1) > 0) {
+	  /* FIXME: If there is more than one neighbor in atari, we
+           * currently just take one randomly. This is maybe not good
+           * enough. We might also want to check against snapback.
+	   */
+	  findlib(adjs[0], 1, &xpos);
+	  ADD_CANDIDATE_MOVE(xpos, 0, moves, scores, num_moves);
+	}
+      }
     }
   }
 
@@ -4597,6 +4610,7 @@ break_chain2_moves(int str, int moves[MAX_MOVES],
   int adj;
   int adjs[MAXCHAIN];
   int libs[2];
+  int unsafe[2];
 
   adj = chainlinks2(str, adjs, 2);
   
@@ -4605,15 +4619,27 @@ break_chain2_moves(int str, int moves[MAX_MOVES],
 
     findlib(apos, 2, libs);
     for (k = 0; k < 2; k++) {
-      int unsafe = is_self_atari(libs[k], color);
-      if (!unsafe
+      unsafe[k] = is_self_atari(libs[k], color);
+      if (!unsafe[k]
 	  || (!require_safe
 	      && approxlib(libs[k], other, 5, NULL) < 5))
 	ADD_CANDIDATE_MOVE(libs[k], 0, moves, scores, *num_moves);
     }
 
-    if (stackp <= backfill2_depth)
+    if (stackp <= backfill2_depth) {
       break_chain_moves(apos, moves, scores, num_moves);
+      if (unsafe[0] && unsafe[1]) {
+	int libs2[3];
+	for (k = 0; k < 2; k++) {
+	  if (approxlib(libs[k], other, 3, libs2) == 2) {
+	    int s;
+	    for (s = 0; s < 2; s++)
+	      if (!is_self_atari(libs2[s], color))
+		ADD_CANDIDATE_MOVE(libs2[s], 0, moves, scores, *num_moves);
+	  }
+	}
+      }
+    }
   }
 }
 

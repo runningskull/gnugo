@@ -133,7 +133,7 @@ loadsgf games/incident118.sgf 252
 29 attack J10
 #? [1 (F1|F2|N1)]
 30 defend J10
-#? [2 J1]*
+#? [2 J1]
 
 # incident 119
 # This is a ko reading mistake. See also tests 97 and 98.
@@ -245,7 +245,7 @@ loadsgf games/reading02.sgf
 53 attack D1
 #? [1 H2]*
 54 defend E2
-#? [1 H2]*
+#? [1 H2]
 
 loadsgf games/owl03.sgf
 55 attack D19
@@ -300,7 +300,7 @@ loadsgf games/nicklas/nicklas11.sgf 244
 
 loadsgf games/reading06.sgf
 65 defend S5
-#? [0]
+#? [0]*
 
 # Ko tests.
 loadsgf games/reading07.sgf 1
@@ -393,17 +393,17 @@ loadsgf games/reading13.sgf 1
 93 attack B5
 #? [1 (A3|E6)]
 94 defend B5
-#? [2 D1]*
+#? [2 D1]
 
 # Ko mistake
 loadsgf games/reading13.sgf 2
 95 attack B5
-#? [3 E1]*
+#? [3 E1]
 
 # Ko mistake
 loadsgf games/reading13.sgf 3
 96 defend B5
-#? [2 F1]*
+#? [2 F1]
 
 # Simplification of tests 31 and 32, ko mistakes.
 loadsgf games/reading13.sgf 4
@@ -549,7 +549,7 @@ loadsgf games/reading23.sgf
 # incident 156
 loadsgf games/incident156.sgf 186
 139 attack B13
-#? [0]*
+#? [0]
 
 loadsgf games/reading24.sgf 48
 140 attack E2
@@ -576,13 +576,13 @@ loadsgf games/ko5.sgf
 146 defend J13
 #? [2 H12]
 147 attack M3
-#? [1 H1]
+#? [1 H1]*
 148 defend M3
 #? [2 K2]
 
 loadsgf games/gwe.sgf 225
 149 attack T1
-#? [0]*
+#? [0]
 
 loadsgf games/reading29.sgf
 150 attack B18

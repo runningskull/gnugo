@@ -11,7 +11,7 @@ loadsgf rot1/games/incident263.sgf 32
 
 loadsgf rot1/games/strategy33.sgf 15
 193 owl_attack D4
-#? [0]*
+#? [0]
 
 loadsgf rot1/games/FSF-neurogo.sgf 286
 215 owl_attack L5

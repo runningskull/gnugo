@@ -58,4 +58,4 @@ loadsgf games/trevor/trevor_11.sgf
 #J2 is terrible.  H1 leads at least to a Ko.
 loadsgf games/trevor/trevor_12.sgf
 12 gg_genmove black
-#? [H1]*
+#? [H1]

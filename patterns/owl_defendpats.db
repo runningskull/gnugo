@@ -546,6 +546,7 @@ O.X          second line kosumi
 
 
 Pattern D208
+# db reduced slightly (3.1.8)
 
 ???o      second line keima
 X..O
@@ -553,7 +554,7 @@ X..O
 ....
 ----
 
-:8,-,value(80)
+:8,-,value(78)
 
 
 Pattern D209
@@ -1079,6 +1080,34 @@ OAOX
 O.*.
 
 ; does_attack(*,A)
+
+
+Pattern D319
+# db added (3.1.8)
+
+...X      atari!
+.*XO
+X.Oo
+
+:8,-,value(80)
+
+...X
+.*XA
+X.Oo
+
+; lib(A)>1
+
+
+Pattern D320
+# db added (3.1.8)
+
+.*.?         jump out
+...?
+XO.o
+o.O?
+
+:8,-,value(50)
+
 
 
 #########################################################
@@ -3314,13 +3343,14 @@ Pattern D1128
 
 
 Pattern D1129
+# db added B class (3.1.8)
 
 ..*o       set up multiple ataris
 ..XO
 .OXO
 ?XO?
 
-:8,-,value(45)
+:8,B,value(77)
 
 
 Pattern D1130
@@ -3357,7 +3387,7 @@ D*
 Pattern D1132
 # db added (3.1.7)
 
-?X*O
+?X*O          cut to find defects
 OOX.
 
 :8,B,value(80)
@@ -3366,6 +3396,7 @@ OOX.
 OOB.
 
 ; oplay_attack_either(*,A,B)
+
 
 
 ########################################################
@@ -4549,6 +4580,67 @@ O*.
 ?X?
  
 :8,-,value(65)
+
+
+Pattern D1362
+# db added (3.1.8)
+
+?X..       try to escape
+?.*.
+O...
+o...
+....
+----
+
+:8,-,value(85)
+
+
+Pattern D1363
+# db added (3.1.8)
+
+oOX?          force the opponent to cut, exposing thinness
+.*.?
+.XOO
+..X.
+?...
+
+:8,B,value(75)
+
+
+Pattern D1364
+# db added (3.1.8)
+
+.OX?          atari!
+.XOO
+.*X.
+?...
+
+:8,B,value(85)
+
+
+Pattern D1365
+# db added (3.1.8)
+
+OX?          atari!
+XOO
+OX*
+...
+
+:8,B,value(85)
+
+
+Pattern D1366
+# db added (3.1.8)
+
+XOO?         try to break out
+OXO?
+.X*x
+o...
+?o..
+
+:8,B,value(85)
+
+
 
 
 

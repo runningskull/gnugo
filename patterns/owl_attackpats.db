@@ -109,6 +109,17 @@ Pattern A2
 :8,-,value(65)
 
 
+Pattern A3
+# db added (3.1.8)
+
+.*O?        draw back
+O.XX
+....
+....
+----
+
+:8,-,value(80)
+
 
 #########################################################
 #                                                       #
@@ -232,6 +243,39 @@ XX..
 ----
 
 :8,-,value(85)
+
+
+Pattern A111
+# db added (3.1.8)
+
+?Ooo       try to confine 
+?...
+X.*.
+x...
+....
+----
+
+:8,-,value(50)
+
+
+Pattern A112
+# db added (3.1.8)
+
+..O?        draw back
+O*XX
+....
+....
+----
+
+:8,-,value(79)
+
+..A?
+O*XX
+....
+....
+----
+
+; lib(A)>2
 
 
 #########################################################
@@ -1116,7 +1160,7 @@ Pattern A416
 :8,-,value(65)
 
 
-Pattern D1346
+Pattern A417
 
 ?X.O          prevent center escape
 O.*.
@@ -1132,6 +1176,21 @@ xabc
 
 ;owl_escape_value(a) + owl_escape_value(b) + owl_escape_value(c) > 0
 
+
+Pattern A418
+# db added (3.1.8)
+
+...O       prevent escape
+.*OX
+O.Xx
+
+:8,-,value(80)
+
+...O
+.*OA
+O.Xx
+
+; lib(A)>1
 
 
 
