@@ -305,6 +305,7 @@ sub play {
     $self->white->komi($komi);
 
     my $pass = 0;
+    my $resign = 0;
     my ($move, $toplay, $sgfmove);
 
     $pass = 0;
@@ -324,25 +325,30 @@ sub play {
     }
 
     $#{$self->moves} = -1;
-    while ($pass < 2) {
+    while ($pass < 2 and $resign eq 0) {
 
 	if ($toplay eq 'B') {
 
 	    $move = $self->black->genmove("black");
 	    if ($move eq "ERROR") {
-    		$self->writesgf($sgffile) if defined $sgffile;
+		$self->writesgf($sgffile) if defined $sgffile;
 		die "No response!";
 	    }
-	    push @{$self->moves}, $move;
-	    print "Black plays $move\n" if $verbose;
-	    $pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
-            $self->white->black($move);
+	    $resign = ($move =~ /resign/i) ? 1 : 0;
+	    if ($resign) {
+		print "Black resigns\n" if $verbose;
+	    } else {
+		push @{$self->moves}, $move;
+		print "Black plays $move\n" if $verbose;
+		$pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
+		$self->white->black($move);
+	    }
 	    if ($verbose == 3) {
 		my $black_seed = $self->black->get_random_seed;
 		printf "Black seed $black_seed\n";
 	    }
 	    if ($verbose == 2) {
-	        $self->white->showboard;
+		$self->white->showboard;
 	    }
 
 	    $toplay = 'W';
@@ -351,31 +357,42 @@ sub play {
 
 	    $move = $self->white->genmove("white");
 	    if ($move eq "ERROR") {
-    		$self->writesgf($sgffile) if defined $sgffile;
+		$self->writesgf($sgffile) if defined $sgffile;
 		die "No response!";
 	    }
-	    push @{$self->moves}, $move;
-	    print "White plays $move\n" if $verbose;
-	    $pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
-            $self->black->white($move);
+	    $resign = ($move =~ /resign/i) ? 1 : 0;
+	    if ($resign) {
+		print "White resigns\n" if $verbose;
+	    } else {
+		push @{$self->moves}, $move;
+		print "White plays $move\n" if $verbose;
+		$pass = ($move =~ /PASS/i) ? $pass + 1 : 0;
+		$self->black->white($move);
+	    }
 	    if ($verbose == 3) {
 		my $white_seed = $self->white->get_random_seed;
 		printf "White seed $white_seed\n";
 	    }
 	    if ($verbose == 2) {
-	        $self->black->showboard;
+		$self->black->showboard;
 	    }
 	    $toplay = 'B';
 
         }
     }
 
-    my $resultw = $self->white->estimate_score;
-    my $resultb = $self->black->estimate_score;
+    my $resultb;
+    my $resultw;
+    if ($resign) {
+	$resultb = $toplay eq 'B' ? 'B+R' : 'W+R';
+	$resultw = $resultb;
+    } else {
+	$resultw = $self->white->estimate_score;
+	$resultb = $self->black->estimate_score;
+    }
     if ($resultb eq $resultw) {
 	print "Result: $resultw\n";
-    }
-    else {
+    } else {
 	print "Result according to W: $resultw\n";
 	print "****** according to B: $resultb\n";
     }

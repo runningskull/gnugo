@@ -2040,15 +2040,19 @@ static int
 gtp_genmove_black(char *s)
 {
   int i, j;
+  float val;
   UNUSED(s);
 
   if (stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  if (genmove(&i, &j, BLACK) >= 0)
-    play_move(POS(i, j), BLACK);
-  else
-    play_move(NO_MOVE, BLACK);
+  val = genmove(&i, &j, BLACK);
+
+  if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
+    return gtp_echo("resign");
+  }
+
+  play_move(POS(i, j), BLACK);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(i, j);
@@ -2066,15 +2070,19 @@ static int
 gtp_genmove_white(char *s)
 {
   int i, j;
+  float val;
   UNUSED(s);
 
   if (stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  if (genmove(&i, &j, WHITE) >= 0)
-    play_move(POS(i, j), WHITE);
-  else
-    play_move(NO_MOVE, WHITE);
+  val = genmove(&i, &j, WHITE);
+
+  if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
+    return gtp_echo("resign");
+  }
+
+  play_move(POS(i, j), WHITE);
 
   gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(i, j);
@@ -2094,6 +2102,7 @@ gtp_genmove(char *s)
   int i, j;
   int color;
   int n;
+  float val;
 
   n = gtp_decode_color(s, &color);
   if (!n)
@@ -2102,7 +2111,12 @@ gtp_genmove(char *s)
   if (stackp > 0)
     return gtp_failure("genmove cannot be called when stackp > 0");
 
-  genmove(&i, &j, color);
+  val = genmove(&i, &j, color);
+
+  if (resign_allowed && val < 0.0 && ON_BOARD(POS(i, j))) {
+    return gtp_echo("resign");
+  }
+
   play_move(POS(i, j), color);
 
   gtp_start_response(GTP_SUCCESS);

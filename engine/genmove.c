@@ -40,11 +40,6 @@ static int get_level(int *level);
 static int do_genmove(int *move, int color, float pure_threat_value,
 		      int allowed_moves[BOARDMAX]);
 
-static double slowest_time = 0.0;
-static int    slowest_move = NO_MOVE;
-static int    slowest_movenum = 0;
-static double total_time = 0.0;
-
 /* Position numbers for which various examinations were last made. */
 static int worms_examined = -1;
 static int initial_influence_examined = -1;
@@ -58,6 +53,7 @@ static int revise_thrashing_dragon(int color, float advantage);
 
 static int find_mirror_move(int *move, int color);
 static int test_symmetry_after_move(int move, int color);
+static int should_resign(int color, float score);
 
 void sgfShowConsideredMoves(void);
 
@@ -293,6 +289,9 @@ genmove_restricted(int *i, int *j, int color, int allowed_moves[BOARDMAX])
  * NULL any move is allowed. Pass is always allowed and will be chosen
  * if the move generation doesn't like any of the allowed moves (or
  * overlooks them).
+ *
+ * Resignation is indicated by a negatively valued move (which is not
+ * a pass)
  */
   
 static int
@@ -537,8 +536,16 @@ do_genmove(int *move, int color, float pure_threat_value,
     TRACE("I pass.\n");
     *move = NO_MOVE;
   }
-  else
+  else {
     TRACE("genmove() recommends %1m with value %f\n", *move, val);
+    /* Maybe time to resign...
+     */
+    if (resign_allowed && val < 10.0 && should_resign(color, score)) {
+      TRACE("... though, genmove() thinks the position is hopeless\n" );
+      /* Signal resignation by negating the move value */
+      val = -val;
+    }
+  }
   
   /* If statistics is turned on, this is the place to show it. */
   if (showstatistics) {
@@ -557,15 +564,6 @@ do_genmove(int *move, int color, float pure_threat_value,
       slowest_time = spent;
       slowest_move = *move;
       slowest_movenum = movenum + 1;
-    }
-    if (*move == NO_MOVE) {
-      gprintf("\nSLOWEST MOVE: %d at %1m ", slowest_movenum, slowest_move);
-      fprintf(stderr, "(%.2f seconds)\n", slowest_time);
-      fprintf(stderr, "\nAVERAGE TIME: %.2f seconds per move\n",
-	      total_time / movenum);
-      fprintf(stderr, "\nTOTAL TIME: %.2f seconds\n",
-	      total_time);
-
     }
   }
 
@@ -749,6 +747,53 @@ test_symmetry_after_move(int move, int color)
 
   return result;
 }
+
+/* Helper to decide whether GG should resign a game
+ */
+static int
+should_resign(int color, float score)
+{
+  float status;
+  int d;
+  /* We resign 19x19 games only, smaller board games are fast enough.
+   * We resign only if the margin is bigger than 45 pts and if we are
+   * behind (of course).
+   */
+  if (board_size < 19
+      || gg_abs(score) < 45
+      || (color == WHITE && score >= 0.0)
+      || (color == BLACK && score <= 0.0))
+    return 0;
+  /* Check dragon statuses. If a friendly dragon is critical, we are
+   * possibly not that much behind after we save it. If some hostile
+   * dragon is at least weak, we possibly have a chance to come back
+   * if we can kill it.
+   */
+  for (d = 0; d < number_of_dragons; d++) {
+    /* any friendly critical dragon ? */
+    if (board[dragon2[d].origin] == color
+	&& DRAGON(d).status == CRITICAL)
+      return 0;
+    /* any weak opponent dragon ? */
+    if (board[dragon2[d].origin] == OTHER_COLOR(color)
+	&& DRAGON(d).status != DEAD
+	&& DRAGON(d).effective_size >= 10
+	&& dragon_weak(dragon2[d].origin))
+      return 0;
+  }
+  /* Is it already too late to try something ? */
+  status = game_status(color);
+  if (status < 0.8)
+    /* Still "too early".
+     * Note: the 0.8 constant is very conservative, we actually could give
+     * up a bit earlier.
+     */
+    return 0;
+
+  /* well, it is probably reasonable and polite to give up this game */
+  return 1;
+}
+
 
 /*********************************************************************\
  *                Mark a limited search area                         *

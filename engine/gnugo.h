@@ -286,6 +286,7 @@ extern int experimental_influence;   /* use experimental influence module */
 extern int allow_suicide;            /* allow opponent to make suicide moves */
 extern int capture_all_dead;         /* capture all dead opponent stones */
 extern int play_out_aftermath; /* make everything unconditionally settled */
+extern int resign_allowed;           /* allows GG to resign hopeless games */
 extern int play_mirror_go;           /* try to play mirror go if possible */
 extern int mirror_stones_limit;      /* but stop at this number of stones */
 extern int gtp_version;              /* version of Go Text Protocol */

@@ -129,7 +129,8 @@ enum {OPT_BOARDSIZE=127,
       OPT_DEFEND_BY_PATTERN,
       OPT_MIRROR,
       OPT_MIRROR_LIMIT,
-      OPT_METAMACHINE
+      OPT_METAMACHINE,
+      OPT_RESIGN_ALLOWED
 };
 
 /* names of playing modes */
@@ -261,6 +262,7 @@ static struct gg_option const long_options[] =
   {"mirror",         no_argument,       0, OPT_MIRROR},
   {"mirror-limit",   required_argument, 0, OPT_MIRROR_LIMIT},
   {"metamachine",    no_argument,       0, OPT_METAMACHINE},
+  {"resign-allowed", no_argument,       0, OPT_RESIGN_ALLOWED},
   {NULL, 0, NULL, 0}
 };
 
@@ -551,6 +553,10 @@ main(int argc, char *argv[])
 
       case OPT_PLAY_OUT_AFTERMATH:
 	play_out_aftermath = 1;
+	break;
+
+      case OPT_RESIGN_ALLOWED:
+	resign_allowed = 1;
 	break;
 
       case OPT_MODE: 
@@ -945,6 +951,9 @@ main(int argc, char *argv[])
   switch (playmode) {
   case MODE_GMP:     
     
+    /* not supported by the protocol */
+    resign_allowed = 0;
+
 #if ORACLE
     if (metamachine)
       summon_oracle();
@@ -960,6 +969,9 @@ main(int argc, char *argv[])
     break;
     
   case MODE_SOLO:
+    /* not yet implemented */
+    resign_allowed = 0;
+    
     play_solo(&gameinfo, benchmark);
     break;
     
@@ -1254,6 +1266,9 @@ main(int argc, char *argv[])
     if (mandated_color != EMPTY)
       gameinfo.computer_player = OTHER_COLOR(mandated_color);
     
+    /* not yet implemented */
+    resign_allowed = 0;
+    
     play_ascii_emacs(&sgftree, &gameinfo, infilename, untilstring);
     break;
 
@@ -1261,6 +1276,9 @@ main(int argc, char *argv[])
   default:     
     if (mandated_color != EMPTY)
       gameinfo.computer_player = OTHER_COLOR(mandated_color);
+
+    /* not yet implemented */
+    resign_allowed = 0;
     
     play_ascii(&sgftree, &gameinfo, infilename, untilstring);
     break;

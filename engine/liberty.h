@@ -692,6 +692,7 @@ void get_influence(const struct influence_data *q,
 		   float black_influence[BOARDMAX],
 		   int regions[BOARDMAX]);
 float influence_score(const struct influence_data *q);
+float game_status(int color);
 void resegment_initial_influence(void);
 void influence_mark_non_territory(int pos, int color);
 
@@ -817,6 +818,11 @@ struct stats_data {
 };
 
 extern struct stats_data stats;
+
+extern double slowest_time;      /* Timing statistics */
+extern int    slowest_move;
+extern int    slowest_movenum;
+extern double total_time;
 
 
 struct eyevalue {

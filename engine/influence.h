@@ -120,6 +120,11 @@ struct influence_data
  */
 typedef int (*owner_function_ptr)(const struct influence_data *q, int pos);
 
+/* Used for tuning game advancement algorythm */
+#define WEIGHT_TERRITORY 10
+#define WEIGHT_MOYO       3
+#define WEIGHT_AREA       1
+
 /*
  * Local Variables:
  * tab-width: 8

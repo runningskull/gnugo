@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- resigning of hopeless games implemented (over GTP and in replay mode)
+- new command-line option --resign-allowed
+- twogtp script updated to understand resignation
 - owl_* fields moved from struct dragon_data to struct dragon_data2
 - more trace output in do_atari_atari()
 - update_aa_goal() revised
