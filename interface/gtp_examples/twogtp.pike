@@ -190,7 +190,8 @@ class GtpServer {
   send_command(string command)
   {
 #if DUMP_GTP_PIPES
-    werror(command + "\n");
+    werror("[%s%s] %s\n",
+	   full_engine_name ? full_engine_name + ", " : "", color, command);
 #endif
 
     command = String.trim_all_whites(command);
@@ -198,14 +199,15 @@ class GtpServer {
     if (command[0] == '#' || command == id)
       return ({ 0, "" });
 
-    file_out->write(command + "\n");
+    file_out->write("%s\n", command);
     string response = file_in->gets();
     if (!response) {
       server_is_up = 0;
       error("Engine `%s' playing %s crashed!", command_line, color);
     }
+
 #if DUMP_GTP_PIPES
-    werror(response + "\n");
+    werror("%s\n", response);
 #endif
 
     array result;
@@ -220,6 +222,11 @@ class GtpServer {
     result[1] = String.trim_all_whites(result[1]);
     while (1) {
       response = file_in->gets();
+
+#if DUMP_GTP_PIPES
+      werror("%s\n", response);
+#endif
+
       if (response == "") {
 	if (result[0] < 0) {
 	  werror("Warning, unrecognized response to command `%s':\n", command);
@@ -490,7 +497,8 @@ class GtpServer {
   array(string)
   final_status_list(string status)
   {
-    return (send_command("final_status_list " + status)[1] / " ") - ({""});
+    array result = send_command("final_status_list " + status); 
+    return result[0] ? ({}) : ((result[1] / "\n") * " ") / " " - ({""});
   }
 
 
@@ -499,8 +507,24 @@ class GtpServer {
   {
     if (!is_known_command("final_status_list"))
       return ({});
-    return ({ map(final_status_list("white_territory"), move_to_sgf_notation),
-	      map(final_status_list("black_territory"), move_to_sgf_notation) });
+
+    array(array(string)) result
+      = ({ map(final_status_list("white_territory"), move_to_sgf_notation),
+	   map(final_status_list("black_territory"), move_to_sgf_notation) });
+    if (result[0] == ({}) && result[1] == ({}))
+      return ({});
+
+    if (is_known_command("color")) {
+      array(string) dead_stones = final_status_list("dead");
+      foreach (dead_stones, string stone) {
+	switch (send_command("color " + stone)[1]) {
+	case "black": result[0] += ({ move_to_sgf_notation(stone) }); break;
+	case "white": result[1] += ({ move_to_sgf_notation(stone) }); break;
+	}
+      }
+    }
+
+    return result;
   }
 
 
@@ -663,7 +687,7 @@ class GtpGame {
 
 
   array(string)
-  play(string sgf_file_name)
+  play(string|int sgf_file_name)
   {
     array(string) sgf_moves = ({});
     string special_win = "";
@@ -729,12 +753,13 @@ class GtpGame {
 	if (verbose >= 2) {
 	  string board = white->show_board();
 	  if (board == "")
-	  board = black->show_board();
-	  werror(board + "\n");
+	    board = black->show_board();
+	  werror("%s\n", board);
 	}
 	black_to_play = !black_to_play;
 
-	write_sgf_file(sgf_file_name, sgf_moves, ({ "Void" }));
+	if (sgf_file_name)
+	  write_sgf_file(sgf_file_name, sgf_moves, ({ "Void" }));
       }
     };
 
@@ -744,7 +769,8 @@ class GtpGame {
     array(string) result;
     if (error) {
       result = ({ "Void", error[0] });
-      werror("The game will be saved in file `%s'.\n", sgf_file_name);
+      if (sgf_file_name)
+	werror("The game will be saved in file `%s'.\n", sgf_file_name);
 
       white->restart_if_crashed();
       black->restart_if_crashed();
@@ -763,7 +789,8 @@ class GtpGame {
 	result = ({ special_win });
     }
 
-    write_sgf_file(sgf_file_name, sgf_moves, result);
+    if (sgf_file_name)
+      write_sgf_file(sgf_file_name, sgf_moves, result);
     return result;
   }
 
@@ -912,7 +939,7 @@ class GtpGame {
 void
 run_twogtp_match(GtpGame game, int num_games, int board_size, int handicap,
 		 string handicap_mode, int adjust_handicap, float komi,
-		 int verbose, string sgf_base, int skip_games)
+		 int verbose, string|int sgf_base, int skip_games)
 {
   int white_wins = 0;
   int black_wins = 0;
@@ -925,8 +952,8 @@ run_twogtp_match(GtpGame game, int num_games, int board_size, int handicap,
 
   for (int k = skip_games; k < skip_games + num_games; k++) {
     game->start_new_game(board_size, handicap, handicap_mode, komi);
-    string sgf_file_name = sprintf("%s%03d.sgf", sgf_base, k + 1);
-    array(string) result = game->play(sgf_file_name);
+    array(string) result
+      = game->play(sgf_base ? sprintf("%s%03d.sgf", sgf_base, k + 1) : 0);
 
     write("Game %d: %s\n", k + 1, result * "  ");
     game->print_statistics();
@@ -1018,21 +1045,22 @@ run_twogtp_match(GtpGame game, int num_games, int board_size, int handicap,
 
 void
 endgame_contest(GtpGame game, int endgame_moves, array(string) endgame_files,
-		int verbose, string sgf_base, int skip_games)
+		int verbose, string|int sgf_base, int skip_games)
 {
   array(string) differences = ({});
   for (int k = skip_games; k < sizeof(endgame_files); k++) {
-    string sgf_file_base_name = sprintf("%s%03d_", sgf_base, k + 1);
     int load_up_to = game->init_endgame_contest(endgame_files[k], endgame_moves);
     if (load_up_to) {
       if (verbose)
 	werror("Replaying game `%s'.\n", endgame_files[k]);
 
-      array(string) result1 = game->play(sgf_file_base_name + "1.sgf");
+      array(string) result1
+	= game->play(sgf_base ? sprintf("%s%03d_1.sgf", sgf_base, k + 1) : 0);
       game->print_statistics();
       game->reinit_endgame_contest(endgame_files[k], load_up_to);
 
-      array(string) result2 = game->play(sgf_file_base_name + "2.sgf");
+      array(string) result2
+	= game->play(sgf_base ? sprintf("%s%03d_2.sgf", sgf_base, k + 1) : 0);
       game->print_statistics();
       game->swap_engines();
 
@@ -1087,6 +1115,7 @@ string help_message =
   "      --help                    display this help and exit.\n"
   "      --help-statistics         display help on statistics options and exit.\n"
   "  -v, --verbose=LEVEL           1 - print moves, 2 and higher - draw boards.\n"
+  "      --no-sgf                  do not create SGF game recods.\n"
   "      --sgf-base=FILENAME       create SGF files with FILENAME as base (default\n"
   "                                is `twogtp' or `endgame' depending on mode).\n"
   "  -m, --match                   runs a match between the engines (the default).\n"
@@ -1173,8 +1202,16 @@ main(int argc, array(string) argv)
   int endgame_moves = (int) Getopt.find_option(argv, "e", "endgame",
 					       UNDEFINED, "0");
   int mode = (endgame_moves > 0);
-  string sgf_base = Getopt.find_option(argv, UNDEFINED, "sgf-base",
-				       UNDEFINED, mode ? "endgame" : "twogtp");
+
+  string|int sgf_base = 0;
+  if (!Getopt.find_option(argv, UNDEFINED, "no-sgf")) {
+    sgf_base = Getopt.find_option(argv, UNDEFINED, "sgf-base",
+				  UNDEFINED, mode ? "endgame" : "twogtp");
+  }
+  else {
+    if (Getopt.find_option(argv, UNDEFINED, "sgf-base"))
+      werror("Warning: `--no-sgf' option specified, `--sgf-base' has no effect");
+  }
 
   int skip_games = Getopt.find_option(argv, "c", "continue");
   if (skip_games) {
