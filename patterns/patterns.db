@@ -13778,4 +13778,23 @@ x.O*
 > replace(a,*)
 
 
+Pattern RE11
+# evand new pattern (3.3.9)
+
+|..?
+|X*.
+|OXX
+|.O?
+
+:8,-
+
+|..?
+|X*.
+|Occ
+|ab?
+
+; alive(b) && lib(c) == 2 && oplay_attack(*,a,c)
+> replace(a,*)
+
+
 # END OF FILE

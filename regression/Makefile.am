@@ -61,7 +61,7 @@ buzco: buzco.tst
 capture: capture.tst
 	$(srcdir)/eval.sh capture.tst  $(GG_OPTIONS)
 
-century: century2002.tst
+century2002: century2002.tst
 	$(srcdir)/eval.sh century2002.tst  $(GG_OPTIONS)
 
 connect: connect.tst
