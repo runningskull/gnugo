@@ -82,6 +82,12 @@ order of perceived difficulty.
 
  * Support for constraints in the eye patterns.
 
+ * Implement handling of timing information through the GTP commands
+   time_settings and time_left for real. Currently the information is
+   received but then ignored. This may involve integration with the
+   current autolevel code in engine/clock.c or writing new level
+   adjustment code.
+
  * Create a paradigm for handling other types of ko (approach move ko,
    multi-step ko, etc) and then write code that handles them. 
    (Difficult!)
