@@ -528,18 +528,18 @@ class RegressionViewer
     string name;
     string result;
     string testcase_command;
-    array(string) fulltest;
+    array(string) complete_test;
 
     function on_board_click_callback;
 
     static void create(SimpleGtp engine_,
-		       array(string) fulltest_, string testcase_command_,
+		       array(string) complete_test_, string testcase_command_,
 		       function callback, string name_,
 		       Controller parent_)
     {
 	engine = engine_;
 	parent = parent_;
-	fulltest = fulltest_;
+	complete_test = complete_test_;
         testcase_command = testcase_command_;
 	name = name_;
 
@@ -578,7 +578,7 @@ class RegressionViewer
     }
 
 
-    void new_testcase(array(string) fulltest_, string testcase_command_)
+    void new_testcase(array(string) complete_test_, string testcase_command_)
     {
 	werror("Loading new testcase.\n");
         worms_initialized = 0;
@@ -587,7 +587,7 @@ class RegressionViewer
         worms = ([]);
         dragons = ([]);
 
-        fulltest = fulltest_;
+        complete_test = complete_test_;
 	testcase_command = testcase_command_;
 
 	load_testcase();
@@ -604,7 +604,7 @@ class RegressionViewer
 
     static void load_testcase()
     {
-	foreach(fulltest, string testline) {
+	foreach(complete_test, string testline) {
 	    werror(testline + "\n");
 	    if (!has_value("0123456789 #", testline[0..0]))
 		send_command(testline);
@@ -1593,8 +1593,8 @@ class Controller
 	    werror("Failed to start new engine.\n");
 	else {
 	    add_regression_viewer(
-		RegressionViewer(new_engine, full_testcase, testcase_command,
-			         button_pressed_on_a_board,
+		RegressionViewer(new_engine, complete_testcase,
+				 testcase_command, button_pressed_on_a_board,
 				 (single_window_mode ?
 				  engine_name_entry->get_text() : ""),
 				 this_object()));
@@ -1843,7 +1843,7 @@ class Controller
         testcase_name = new_testcase;
 	main_window->set_title(testcase_name);
 	testcase_label->set_text(full_testcase * "\n");
-        viewers->new_testcase(full_testcase, testcase_command);
+        viewers->new_testcase(complete_testcase, testcase_command);
         viewers->handle_testcase();
     }
 
