@@ -1289,12 +1289,12 @@ fast_defense(int str, int liberties, int *libs, int *move)
      * it has already been done in the first loop of this function.
      */
     num_adjacent_stones = count_adjacent_stones(adjs[j], str, missing);
-    ASSERT1(num_adjacent_stones >= 1, str);
     if (!liberty_of_string(lib, str)
 	&& num_adjacent_stones >= missing) {
       *move = lib;
       return 1;
     }
+    ASSERT1(num_adjacent_stones >= 1, str);
 
     /* What is the total number of liberties of the friendly strings around
      * the lunch?
