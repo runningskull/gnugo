@@ -2191,6 +2191,16 @@ special_rescue5_moves(int str, int libs[3],
  * |.X.   |.c*
  * |.O?   |ab?
  *
+ * It also adds the * move in these configurations:
+ * 
+ * |.X.   |.c*
+ * |.OX   |abX
+ *
+ * |.X.   |.c*
+ * |.O.   |ab.
+ *
+ * Provided that * is not a self atari and that the X strings have
+ * sufficiently few liberties.
  */
 static void
 special_rescue6_moves(int str, int libs[3], struct reading_moves *moves)
@@ -2232,20 +2242,19 @@ special_rescue6_moves(int str, int libs[3], struct reading_moves *moves)
 	if (board[cpos + right] != EMPTY)
 	  continue;
 
-	if (board[apos + up + up] != EMPTY)
-	  continue;
-	
-	if (board[cpos + up] != EMPTY)
-	  continue;
-	
-	if (board[cpos + up + right] != color)
-	  continue;
-	
-	
-	if (!is_self_atari(cpos + right, color))
+	if (board[apos + up + up] == EMPTY
+	    && board[cpos + up] == EMPTY
+	    && board[cpos + up + right] == color) {
 	  ADD_CANDIDATE_MOVE(cpos + right, 0, *moves, "special_rescue6-A");
-	if (!is_self_atari(cpos + up, color))
 	  ADD_CANDIDATE_MOVE(cpos + up, 0, *moves, "special_rescue6-B");
+	}
+	else if (countlib(cpos) <= 3
+		 && (board[bpos + right] == EMPTY
+		     || (board[bpos + right] == other
+			 && countlib(bpos + right) <= 4))
+		 && !is_self_atari(cpos + right, color)) {
+	  ADD_CANDIDATE_MOVE(cpos + right, 0, *moves, "special_rescue6-C");
+	}
       }
     }
   }

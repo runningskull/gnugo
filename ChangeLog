@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- special_rescue6_moves() revised
 - find_connection_moves() revised
 - computation of NUM_HASHVALUES corrected in hash.h
 - hashdata_to_string reimplemented
