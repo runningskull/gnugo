@@ -795,10 +795,11 @@ Pattern D217c
 # tm added (3.1.14)
 # see trevor:401
 # Possible to sacrifice to gain tempo here.
+# nn Modified (3.3.13)
 
 O.X?     expand eye-space
 O.*.
-.x..
+.x.o
 ----
 
 :8,s,value(10)
