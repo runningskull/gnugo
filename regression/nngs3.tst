@@ -555,7 +555,7 @@ loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 240
 # B1 minimizes the losses.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 242
 1170 reg_genmove white
-#? [B1]
+#? [B1]*
 
 # A5 is very odd.
 loadsgf games/nngs/gnugo-3.3.9-nailer-200210192227.sgf 244

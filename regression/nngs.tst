@@ -387,7 +387,7 @@ loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 19
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051823.sgf 21
 900 reg_genmove white
-#? [Q15]
+#? [Q15]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051823.sgf 43
@@ -618,7 +618,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 138
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 248
 1300 reg_genmove white
-#? [M2]*
+#? [M2]
 
 
 

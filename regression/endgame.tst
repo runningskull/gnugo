@@ -202,7 +202,7 @@ loadsgf games/nngs/gnugo-3.3.21-joshj-200306270402.sgf 222
 
 loadsgf games/yagr-eddyy.sgf 198
 910 reg_genmove white
-#? [T2]
+#? [T2]*
 
 
 ############ End of Tests #################

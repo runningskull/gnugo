@@ -143,7 +143,7 @@ loadsgf games/nngs/jypower-gnugo-3.3.22-200307050519.sgf 162
 
 loadsgf games/self_play/354-34-1.sgf 180
 286 reg_genmove white
-#? [K5]
+#? [K5]*
 
 loadsgf games/self_play/354-34-3.sgf 194
 287 reg_genmove white
@@ -153,7 +153,7 @@ loadsgf games/self_play/354-34-3.sgf 194
 # value of a pincer.
 loadsgf games/ab1_fuseki.sgf 32
 288 reg_genmove black
-#? [R12|R11|Q12|Q11]
+#? [R12|R11|Q12|Q11]*
 
 289 restricted_genmove black F4 M16
 #? [M16]

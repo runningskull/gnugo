@@ -360,7 +360,7 @@ loadsgf games/trevor/auto/d29.sgf 188
 
 loadsgf games/trevor/auto/d32.sgf 90
 710 reg_genmove white
-#? [M2|J4|L5]
+#? [M2|J4|L5]*
 
 
 loadsgf games/trevor/auto/d32.sgf 94

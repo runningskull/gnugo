@@ -21,7 +21,7 @@ loadsgf games/nando/auto003.sgf
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto004.sgf
 4 disconnect S7 S11
-#? [1 S10|T9]*
+#? [1 S10|T9]
 5 same_dragon S7 S11
 #? [0]*
 

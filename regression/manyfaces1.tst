@@ -22,7 +22,7 @@ loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 41
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 47
 36 reg_genmove black
-#? [P16]*
+#? [P16]
 
 loadsgf games/nngs/ManyFaces3-gnugo-3.3.11-200211071935.sgf 59
 40 reg_genmove black

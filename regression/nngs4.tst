@@ -94,7 +94,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 204
 # Kill the whole thing, not just a piece.
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 222
 230 reg_genmove black
-#? [Q18]
+#? [Q18]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 242
 240 reg_genmove black
@@ -110,7 +110,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 258
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 292
 270 reg_genmove black
-#? [!P5]
+#? [!P5]*
 
 loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 32
 280 restricted_genmove black F3 H3
@@ -167,7 +167,7 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 174
 
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 65
 420 reg_genmove black
-#? [G6]*
+#? [G6]
 
 # G12 allows white to live.
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 185
@@ -188,7 +188,7 @@ loadsgf games/nngs/juka-gnugo-3.3.16-200303031959.sgf 204
 
 loadsgf games/nngs/looknglass-ggl-200302271041.sgf 99
 470 reg_genmove black
-#? [R8]
+#? [R8]*
 
 loadsgf games/nngs/evand-gnugo-3.3.17-200303201727.sgf 6
 480 gg_genmove black 2

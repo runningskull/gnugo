@@ -269,7 +269,7 @@ loadsgf games/nngs/ccwills-gnugo-3.4-200308231739.sgf 145
 
 loadsgf games/nngs/ccwills-gnugo-3.4-200308231739.sgf 146
 326 owl_defend R18
-#? [3 S18]*
+#? [3 S18]
 
 loadsgf games/nngs/gnugo-3.5.1-viking4-200309231039.sgf 139
 327 owl_attack O18
@@ -314,7 +314,7 @@ loadsgf games/nngs/gnugo-3.5.2gf1-G28-200312282240.sgf 203
 # Must be solved with "bulky eye" heuristic in compute_eyes_pessimistic().
 loadsgf games/self_play/selfplay1.sgf 206
 337 owl_attack E19
-#? [1 C18]
+#? [1 C18]*
 
 ########### end of tests #####################
 

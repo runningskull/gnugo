@@ -273,7 +273,7 @@ loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 114
 # let black break into the territory around F6.
 loadsgf games/nngs/gnugo-3.5.2gf1-wingjk-200312301242.sgf 164
 49 reg_genmove white
-#? [A10]*
+#? [A10]
 
 ############ End of Tests #################
 

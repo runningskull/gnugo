@@ -152,7 +152,7 @@ loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 28
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312241905.sgf 30
 350 owl_defend C3
-#? [0]
+#? [0]*
 
 loadsgf games/nngs/ruud2d-gnugo-3.5.2gf1-200312292348.sgf 8
 360 reg_genmove black

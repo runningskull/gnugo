@@ -376,7 +376,7 @@ play black P17
 
 loadsgf games/owl49.sgf 7
 316 owl_defend Q17
-#? [1 T16]*
+#? [1 T16]
 
 
 # tough under the stones problem from Sensei's Library

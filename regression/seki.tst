@@ -54,7 +54,7 @@ play black B2
 loadsgf games/seki05.sgf
 # C2 gives a sente seki, while B1 gives a gote seki. Other moves fail.
 101 reg_genmove white
-#? [C2]
+#? [C2]*
 102 reg_genmove black
 #? [C2|C1|B2|B1]
 
@@ -165,7 +165,7 @@ loadsgf games/seki07.sgf
 
 play white B2
 303 reg_genmove black
-#? [A2|C1|C2]
+#? [A2|C1|C2]*
 
 play black A2
 304 reg_genmove white
@@ -174,7 +174,7 @@ play black A2
 # Black can start ko with B1 if desperate.
 play white C1
 305 reg_genmove black
-#? [C2]
+#? [C2]*
 
 play black C2
 306 reg_genmove white
@@ -419,7 +419,7 @@ play black C2
 # to C1 the latter is 1 point double sente.
 play white B3
 905 reg_genmove black
-#? [C1]*
+#? [C1]
 
 play black C1
 906 reg_genmove white

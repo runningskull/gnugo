@@ -133,7 +133,7 @@ loadsgf games/connection3.sgf
 37 disconnect M3 N7
 #? [1 (N4|M4|N5|M5|M6|N6)]
 38 connect B2 G1
-#? [1 E1]
+#? [1 E1]*
 39 disconnect B2 G1
 #? [1 (F2|F1|E2|E1|D2|D1|C2|C1|G2|H1|B1)]
 
@@ -183,7 +183,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 164
 55 connect B6 D10
 #? [1 D8|C8]*
 56 connect B6 F9
-#? [1 D8]*
+#? [1 D8]
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 192
 57 connect K14 K16
@@ -223,7 +223,7 @@ loadsgf games/trevor/auto/b67.sgf 58
 68 disconnect M6 L1
 #? [1 M5|M3|M2|M1]
 69 connect M6 L1
-#? [1 M2|M3]*
+#? [1 M2|M3]
 70 same_dragon M6 L3
 #? [0]
 
@@ -276,7 +276,7 @@ loadsgf games/handtalk/handtalk23.sgf 82
 # See also test 2. Possibly some more move works.
 loadsgf games/connection1.sgf
 87 disconnect R12 R9
-#? [1 S10]*
+#? [1 S10]
 
 # See also trevorb:670.
 loadsgf games/trevor/auto/b64.sgf 44
@@ -344,7 +344,7 @@ loadsgf games/nngs/gnugo-3.3.17-joshj-200304172202.sgf 222
 # See also owl:114
 loadsgf games/incident169.sgf 210
 103 connect L2 G4
-#? [1 K2]*
+#? [1 K2]
 
 loadsgf golois/Aya991113-9.sgf
 104 connect G2 L4
@@ -380,7 +380,7 @@ loadsgf games/nngs/gnugo-3.5.1-viking4-200309231039.sgf 123
 # See also nngs4:290
 loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 38
 110 connect E3 G3
-#? [0]*
+#? [0]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

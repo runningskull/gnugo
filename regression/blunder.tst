@@ -58,7 +58,7 @@ loadsgf games/blunder9.sgf
 # Black B3 loses at least five stones.
 loadsgf games/blunder10.sgf 1
 11 reg_genmove black
-#? [D4|E4|E5|F4|C6]*
+#? [D4|E4|E5|F4|C6]
 
 # White D4 kills at least six stones.
 loadsgf games/blunder10.sgf 2

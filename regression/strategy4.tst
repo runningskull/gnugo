@@ -287,7 +287,7 @@ loadsgf games/juka1.sgf 48
 #than O9 group, hense missing importance of cutting off K8.
 loadsgf games/strategy45.sgf
 206 reg_genmove black
-#? [L8]*
+#? [L8]
 
 # T6 fails badly. Locally S9 looks best.
 loadsgf games/owl30.sgf 84

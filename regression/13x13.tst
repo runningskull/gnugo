@@ -240,7 +240,7 @@ loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 27
 # B4 is really huge here, appr. 20 pts.
 loadsgf games/mertin13x13/gnugo-goliath1.W+11.sgf 31
 45 reg_genmove black
-#? [B4]*
+#? [B4]
 
 #CATEGORY=ENDGAME_TUNING
 # L3 is 2pt double sente.

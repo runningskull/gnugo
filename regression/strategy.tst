@@ -74,7 +74,7 @@ loadsgf games/incident108b.sgf 270
 # See also reading:194
 loadsgf games/incident108b.sgf 292
 13 reg_genmove black
-#? [N18]*
+#? [N18]
 
 # incident 121
 # E9 is not necessarily the best move since upper left weak too.
@@ -320,7 +320,7 @@ loadsgf games/strategy12.sgf 21
 # So much better, that I removed Q11 option -trevor
 loadsgf games/strategy13.sgf
 50 reg_genmove white
-#? [Q9]
+#? [Q9]*
 
 
 
