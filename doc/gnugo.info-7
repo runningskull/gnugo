@@ -875,6 +875,9 @@ result.
 
 File: gnugo.info,  Node: Another Ko Example,  Next: Alternate Komaster Schemes,  Prev: A Ko Example,  Up: Tactical Reading
 
+Another Ko Example
+==================
+
    We now consider an example to show why the komaster is reset to
 EMPTY if the ko is resolved in the komaster's favor. This means that
 the ko is filled, or else that is becomes no longer a ko and it is
@@ -922,6 +925,9 @@ finish off B.
 
 
 File: gnugo.info,  Node: Alternate Komaster Schemes,  Next: Superstrings,  Prev: Another Ko Example,  Up: Tactical Reading
+
+Alternate Komaster Schemes
+==========================
 
    The following alternate schemes have been proposed. It is assumed
 that `O' is the player about to move.

@@ -877,7 +877,7 @@ atari_atari(int color, int *i, int *j, int save_verbose)
 	  && worm[m][n].origini == m
 	  && worm[m][n].originj == n
 	  && worm[m][n].liberties == 2
-	  && aa_status[m][n] != DEAD
+	  && aa_status[m][n] == ALIVE
 	  && !owl_substantial(m, n)) {
 	int ti, tj;
 	for (ti = 0; ti < board_size; ti++)
@@ -971,6 +971,14 @@ get_aa_status(int m, int n)
  * the location of the last friendly move played. Moves marked
  * with the forbidden array are not tried. If no move is found,
  * the values of *i and *j are not changed.
+ *
+ * If not NULL, *attacki, *attackj are left pointing to the location
+ * of the attacking move, and *defendi, *defendj point to to
+ * a move defending the combination. In rare cases a defensive
+ * move might not be found. If a non-static function calling
+ * do_atari_atari gets a return value of 1 but -1,-1 as the
+ * defense point, this should be treated as equivalent to
+ * a return value of 0.
  */
 
 static int
@@ -1028,8 +1036,25 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	  }	  
 	  if (attacki) *attacki = ai;
 	  if (attackj) *attackj = aj;
-	  if (defendi)
-	    find_defense(m, n, defendi, defendj);
+	  
+	  /* We look for a move defending the combination.
+	   * Normally this is found by find_defense but failing
+	   * that, if the attacking move is a safe move for color, 
+	   * it probably defends.
+	   */
+	  if (defendi) {
+	    if (!find_defense(m, n, defendi, defendj)) {
+	      if (safe_move(ai, aj, other)) {
+		*defendi = ai;
+		*defendj = aj;
+	      }
+	      /* No defense is found */
+	      else {
+		*defendi = -1;
+		*defendj = -1;
+	      }
+	    }
+	  }
 
 	  DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
 		countstones(m, n), m, n);
@@ -1061,7 +1086,7 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	continue;
 
       status = get_aa_status(m, n);
-      if (status == INSUBSTANTIAL || status == DEAD || status == UNKNOWN)
+      if (status != ALIVE)
 	continue;
 
       if (findlib(m, n, 2, libi, libj) != 2)
@@ -1112,8 +1137,10 @@ do_atari_atari(int color, int *attacki, int *attackj,
 	      }	  
 	      if (attacki) *attacki = ai;
 	      if (attackj) *attackj = aj;
-	      if (defendi)
-		find_defense(m, n, defendi, defendj);
+	      if (defendi && !find_defense(m, n, defendi, defendj)) {
+		*defendi = -1;
+		*defendj = -1;
+	      }
 	      
 	      DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (%m)\n",
 		    countstones(m, n), m, n);
@@ -1142,9 +1169,19 @@ do_atari_atari(int color, int *attacki, int *attackj,
 		if (attacki) *attacki = ai;
 		if (attackj) *attackj = aj;
 		popgo();
-		DEBUG(DEBUG_ATARI_ATARI, "%oreturn value:%d (min %d, %d (%m))\n",
+		DEBUG(DEBUG_ATARI_ATARI, 
+		      "%oreturn value:%d (min %d, %d (%m))\n",
 		      gg_min(aa_val, countstones(m, n)), aa_val,
 		      countstones(m, n), m, n);
+		/* If no defense point is know and (ai,aj) is a safe
+		 * move for other, it probably defends the combination.
+		 */
+		if (defendi 
+		    && *defendi == -1
+		    && safe_move(ai, aj, other)) {
+		  *defendi = ai;
+		  *defendj = aj;
+		}
 		return gg_min(aa_val, countstones(m, n));
 	      }
 	    }
@@ -1170,6 +1207,7 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
 {
   int m, n;
   int fi, fj;
+  int defendi, defendj;
   int aa_val;
   int other = OTHER_COLOR(color);
 
@@ -1214,13 +1252,13 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
 	  && worm[m][n].origini == m
 	  && worm[m][n].originj == n
 	  && worm[m][n].liberties == 2
-	  && aa_status[m][n] != DEAD
+	  && aa_status[m][n] == ALIVE
 	  && !owl_substantial(m, n)) {
-	int ti, tj;
-	for (ti = 0; ti < board_size; ti++)
-	  for (tj = 0; tj < board_size; tj++)
-	    if (is_worm_origin(ti, tj, m, n))
-	      aa_status[ti][tj] = INSUBSTANTIAL;
+	int ui, uj;
+	for (ui = 0; ui < board_size; ui++)
+	  for (uj = 0; uj < board_size; uj++)
+	    if (is_worm_origin(ui, uj, m, n))
+	      aa_status[ui][uj] = INSUBSTANTIAL;
       }
 
   if (debug & DEBUG_ATARI_ATARI) {
@@ -1248,12 +1286,19 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
     /* Really shouldn't happen. */
     abortgo(__FILE__, __LINE__, "trymove", ti, tj); 
 
-  aa_val = do_atari_atari(other, &fi, &fj, i, j, -1, -1, 0, minsize);
-  
+  aa_val = do_atari_atari(other, &fi, &fj, &defendi, &defendj,
+			  -1, -1, 0, minsize);
+
+  if (aa_val == 0 || defendi == -1) {
+
   /* No sufficiently large combination attack, so the move is safe from
    * this danger.
+   *   
+   * On rare occasions do_atari_atari might find a combination
+   * but no defense. In this case we assume that the combination
+   * is illusory.
    */
-  if (aa_val == 0) {
+
     popgo();
     return 1;
   }
@@ -1268,7 +1313,15 @@ atari_atari_confirm_safety(int color, int ti, int tj, int *i, int *j,
   }
 
   popgo();
-  return 0;
+  /* We know that a combination exists, but we don't know if
+   * the original move at (ai, aj) was really relevant. So we
+   * try omitting it and see if a combination is still found.
+   */
+  if (do_atari_atari(other, NULL, NULL, NULL, NULL,
+			  -1, -1, 0, minsize) >= aa_val)
+    return 1;
+  else
+    return 0;
 }
 
 
@@ -1322,7 +1375,7 @@ atari_atari_try_combination(int color, int ai, int aj, int bi, int bj)
 	  && worm[m][n].origini == m
 	  && worm[m][n].originj == n
 	  && worm[m][n].liberties == 2
-	  && aa_status[m][n] != DEAD
+	  && aa_status[m][n] == ALIVE
 	  && !owl_substantial(m, n)) {
 	int ti, tj;
 	for (ti = 0; ti < board_size; ti++)

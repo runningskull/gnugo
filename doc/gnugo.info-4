@@ -330,6 +330,9 @@ tip the scales if all other factors are equal.
 
 File: gnugo.info,  Node: Threats and Followup Value,  Prev: Secondary Value,  Up: Valuation
 
+Threats and Followup Value
+--------------------------
+
    Followup value refers to value which may acrue if we get two moves
 in a row in a local area. It is assigned by the function
 `add_followup_value', for example through the `followup_value'

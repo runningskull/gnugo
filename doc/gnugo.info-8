@@ -831,6 +831,9 @@ option (*note Colored Display::).
 
 File: gnugo.info,  Node: Moyo history,  Next: Bouzy,  Prev: Moyo,  Up: Moyo
 
+Moyo history
+============
+
    In GNU Go 2.6 extensive use was made of an algorithm from Bruno
 Bouzy's dissertation, which is available at:
 <ftp://www.joy.ne.jp/welcome/igs/Go/computer/bbthese.ps.Z> This

@@ -632,6 +632,9 @@ the comments of the functions in `interface/play_gtp.c'.
 
 File: gnugo.info,  Node: Protocol applications,  Next: Protocol conventions,  Prev: The Go Text Protocol,  Up: GTP
 
+Protocol applications
+=====================
+
    The protocol is asymmetric and involves two parties, which we may
 call `A' and `B'. `A' is typically some kind of arbiter or relay and
 `B' is a go engine. All communication is initiated by `A' in form of
@@ -683,6 +686,9 @@ implementing setup 3 are also distributed with GNU Go (the files
 
 
 File: gnugo.info,  Node: Protocol conventions,  Next: Regression with GTP,  Prev: Protocol applications,  Up: GTP
+
+Protocol conventions
+====================
 
    The GTP is currently unfinished and unstandardized. It is hoped that
 it will grow to fill the needs currently served by the GMP and perhaps

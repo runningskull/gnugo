@@ -370,6 +370,9 @@ will not work.
 
 File: gnugo.info,  Node: Configure Options,  Next: Windows and MS-DOS,  Prev: GNU/Linux and Unix,  Up: Installation
 
+Configure Options
+=================
+
    There are three options which you should consider configuring,
 particularly if you are dissatisfied with GNU Go's performance.
 
