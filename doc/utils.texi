@@ -196,7 +196,7 @@ size of the blunder, or 0.0 if nothing bad has happened.  The array
 which, if taken, will presumably make the move at @code{move} safe on a
 subsequent turn.
 @end quotation
-i@item @code{int double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])}
+@item @code{int double_atari(int move, int color, float *value, char safe_stones[BOARDMAX])}
 @findex double_atari
 @quotation
 Returns true if a move by (color) fits the following shape:
