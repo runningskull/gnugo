@@ -42,7 +42,7 @@ loadsgf games/nicklas/nicklas3.sgf 49
 
 loadsgf games/nicklas/nicklas5.sgf 23
 501 gg_genmove black
-#? [G7]
+#? [G7]*
 
 loadsgf games/nicklas/nicklas5.sgf 27
 502 gg_genmove black

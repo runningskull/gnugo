@@ -25,13 +25,13 @@ loadsgf games/niki.sgf 68
 
 loadsgf games/niki.sgf 92
 4 gg_genmove white
-#? [Q8]
+#? [Q8]*
 
 #S10 seems OK, much better than game move of S14. Added it -trevor
 #Hm, should GG3.1.9 get credit for this? I think so! -trevor
 loadsgf games/niki.sgf 94
 5 gg_genmove white
-#? [S9|S10]*
+#? [S9|S10]
 
 loadsgf games/niki.sgf 106
 6 gg_genmove white
@@ -47,12 +47,12 @@ loadsgf games/niki.sgf 110
 
 loadsgf games/niki.sgf 124
 8 gg_genmove white
-#? [G16]*
+#? [G16]
 
 #gg_genmove bug requires reloading game.
 loadsgf games/niki.sgf 124
 9 gg_genmove black
-#? [F15]*
+#? [F15]
 
 loadsgf games/niki.sgf 128
 10 gg_genmove white
