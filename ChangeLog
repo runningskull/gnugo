@@ -4,7 +4,9 @@
 
 - find_backfilling_move() in filllib.c revised
 - dfa made standard
+- owl threat computation made optional (and not default)
 - comments added, cleanup around discard_redundant_move_reasons
+- new (unused) experimental influence configure and run time options
 - unsafe tactical moves now taken care by discard_redundant_move_reasons
 - FIXME added for reevaluate_ko_threats
 - atari_atari_attack_patterns() uses a goal array to limit search area
