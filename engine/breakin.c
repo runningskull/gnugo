@@ -287,7 +287,7 @@ break_in_goal_from_str(int str, char goal[BOARDMAX],
 	goal[pos] = 0;
       }
       for (j = 0; j < 4; j++)
-	if (goal[pos + delta[j]])
+	if (ON_BOARD(pos + delta[j]) && goal[pos + delta[j]])
 	  affected_size++;
       /* Don't kill too much territory at a time. */
       if (affected_size >= 5) {
