@@ -193,6 +193,12 @@ loadsgf games/gunnar/gunnar10.sgf
 35 gg_genmove white
 #? [C7|D7|E7]*
 
+# The break-in code of GNU Go 3.3.21 wants to play J12, H11, or K13.
+# Clearly filling ko at B18 is the only worthwhile move here.
+loadsgf games/gunnar/gunnar11.sgf
+36 gg_genmove white
+#? [B18]*
+
 
 ############ End of Tests #################
 
