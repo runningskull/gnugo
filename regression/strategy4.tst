@@ -136,6 +136,38 @@ loadsgf games/strategy44.sgf
 176 gg_genmove black
 #? [D9]
 
+loadsgf games/xxxlin.sgf 8
+177 gg_genmove black
+#? [E2]
+
+loadsgf games/xxxlin.sgf 16
+178 gg_genmove black
+#? [P4|P3]
+
+loadsgf games/xxxlin.sgf 20
+179 gg_genmove black
+#? [P3|O2|P2|O4]
+
+loadsgf games/xxxlin.sgf 30
+180 gg_genmove black
+#? [Q8]
+
+loadsgf games/xxxlin.sgf 38
+181 gg_genmove black
+#? [F3]
+
+loadsgf games/xxxlin.sgf 48
+182 gg_genmove black
+#? [E7|F8]
+
+loadsgf games/xxxlin.sgf 76
+183 gg_genmove black
+#? [P10]
+
+loadsgf games/xxxlin.sgf 106
+183 gg_genmove black
+#? [H13]
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading
