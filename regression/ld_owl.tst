@@ -400,13 +400,13 @@ loadsgf games/owl47.sgf 10
 #? [0]*
 loadsgf games/owl47.sgf 11
 410 owl_attack Q4
-#? [1 T2]*
+#? [1 (R3|T2)]*
 loadsgf games/owl47.sgf 12
 411 owl_defend Q4
 #? [0]*
 loadsgf games/owl47.sgf 13
 412 owl_attack Q4
-#? [1 (R3|T2)]*
+#? [1 T2]*
 loadsgf games/owl47.sgf 14
 413 owl_defend Q4
 #? [0]*
