@@ -5,7 +5,7 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst \
       filllib.tst arion.tst endgame.tst viking.tst ego.tst atari_atari.tst \
       score.tst ld_owl_rot.tst reading_rot.tst endgame_rot.tst manyfaces.tst \
-      cutstone.tst newscore.tst blunder.tst niki.tst unsorted.tst
+      cutstone.tst newscore.tst blunder.tst niki.tst trevor.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
@@ -142,8 +142,8 @@ nicklas5: nicklas5.tst
 niki: niki.tst
 	$(srcdir)/eval.sh niki.tst
 
-unsorted: unsorted.tst
-	$(srcdir)/eval.sh unsorted.tst
+trevor: trevor.tst
+	$(srcdir)/eval.sh trevor.tst
 
 all_batches: first_batch second_batch third_batch
 
@@ -183,4 +183,4 @@ third_batch: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst st
 	$(srcdir)/regress.sh $(srcdir) nicklas5.tst
 	$(srcdir)/regress.sh $(srcdir) manyfaces.tst
 	$(srcdir)/regress.sh $(srcdir) niki.tst
-	$(srcdir)/regress.sh $(srcdir) unsorted.tst
+	$(srcdir)/regress.sh $(srcdir) trevor.tst
