@@ -3415,4 +3415,44 @@ Ocab
 >non_xterritory(b);
 
 
+Pattern Nonterritory56
+# gf New pattern. (3.7.1)
+# See endgame:920.
+
+...
+X.O
+?O.
+
+:8,t
+
+eac
+XbO
+?Od
+
+;oplay_attack(a,b,c,d,d)
+
+>non_xterritory(e);
+
+
+Pattern Nonterritory57
+# gf New pattern. (3.7.1)
+# See endgame:910.
+
+|..X
+|.XO
+|...
++---
+
+:8,t
+
+|.eX
+|bXO
+|dac
++---
+
+;safe_omove(a) && oplay_attack(a,b,c,d,b)
+
+>non_xterritory(e);
+
+
 # END OF FILE
