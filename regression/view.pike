@@ -40,7 +40,6 @@ class SimpleGtp
 	s = id_number + " " + s + "\n";
 	id_number++;
 	engine_in->write(s);
-	
 	int first_line = 1;
 	GtpResponse response = GtpResponse();
 	while (1)
@@ -560,8 +559,6 @@ class RegressionViewer
 
 	foreach (send_command("worm_stones") / "\n", string worm)
 	    worms[(worm / " ")[0]] = worm / " " - ({""});
-	foreach (send_command("dragon_stones") / "\n", string dragon)
-	    dragons[(dragon / " ")[0]] = dragon / " " - ({""});
 	
 	board_window = GTK.Window(GTK.WindowToplevel);
 	board_window->signal_connect("destroy", exit, 0);
@@ -783,6 +780,11 @@ class RegressionViewer
 	result = send_command(testcase_command);
 	engine->trace_callback = 0;
 
+	// Due to a bug in the examine_position caching, we can't do
+	// this before a genmove call.
+	foreach (send_command("dragon_stones") / "\n", string dragon)
+	    dragons[(dragon / " ")[0]] = dragon / " " - ({""});
+	
 	if (has_prefix(testcase_command, "reg_genmove")
 	    || has_prefix(testcase_command, "restricted_genmove"))
 	{
@@ -1129,8 +1131,10 @@ class RegressionViewer
 			    goban->add_symbol(vertex, "dot", "gray");
 		    }
 		}
-		else if ((float) values[k] != 0.0)
+		else if ((float) values[k] > 0.0)
 		    goban->add_text(vertex, values[k], "blue");
+		else if ((float) values[k] < 0.0)
+		    goban->add_text(vertex, values[k], "red");
 
 		k++;
 	    }
