@@ -2,7 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- new gtp command owl_analyze_semeai
+- persistent caching added to owl_does_attack()
+- owl_does_defend() and owl_does_attack() now understand ko
+- owl_determine_life() revised
+- new function silent_examine_position()
+- find_more_owl_attack_and_defense_moves() revised
+- ko valuation revised
+- 1D revision of print_eye() in optics.c
+- compute_eyes_pessimistic() revised
+- bugfixes in evaluate_diagonal_intersection()
+- new gtp commands owl_analyze_semeai, owl_does_attack, and owl_does_defend
 - revision of owl_analyze_semeai()
 - new static catalog_goal in owl.c
 - sgfdecide functions made 1D
@@ -14,6 +23,8 @@
 - regress.plx includes "unexpected result" list
 - new gtp_example/sgf2tst.pl
 - tuning
+- influence tuning
+- owl tuning
 - test revisions
 - new trevora tests
 - new semeai tests

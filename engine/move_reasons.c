@@ -1182,7 +1182,7 @@ find_more_attack_and_defense_moves(int color)
 	  break;
       }
       
-      if (k<MAX_REASONS && move[ii].reason[k] != -1) {
+      if (k < MAX_REASONS && move[ii].reason[k] != -1) {
 	/* Try the move at (ii) and see what happens. */
 	int cursor_at_start_of_line = 0;
 
@@ -1251,8 +1251,6 @@ find_more_attack_and_defense_moves(int color)
  * 2. Vital eye points for the dragon.
  * 3. Tactical attacks or defenses for a part of the dragon.
  * 4. Moves connecting the dragon to something else.
- *
- * FIXME: Keep track of ko results.
  */
 static void
 find_more_owl_attack_and_defense_moves(int color)
@@ -1332,13 +1330,14 @@ find_more_owl_attack_and_defense_moves(int color)
 	     || move_reasons[r].type == ATTACK_MOVE_BAD_KO
 	     || (move_reasons[r].type == VITAL_EYE_MOVE
 		 && board[dd] == OTHER_COLOR(color)))
-	    && !owl_attack_move_reason_known(pos, find_dragon(dd))
-	    && owl_does_attack(pos, dd)) {
-	  /* FIXME: Report correct ko result code. */
-	  add_owl_attack_move(pos, dd, WIN);
-	  TRACE("Move at %1m owl attacks %1m.\n", pos, dd);
+	    && !owl_attack_move_reason_known(pos, find_dragon(dd))) {
+	  int acode = owl_does_attack(pos, dd);
+	  if (acode >= dragon[dd].owl_attack_code) {
+	    add_owl_attack_move(pos, dd, acode);
+	    TRACE("Move at %1m owl attacks %1m, result %d.\n", pos, dd, acode);
+	  }
 	}
-	  
+	
 	if ((move_reasons[r].type == STRATEGIC_DEFEND_MOVE
 	     || move_reasons[r].type == CONNECT_MOVE
 	     || move_reasons[r].type == DEFEND_MOVE
@@ -1346,11 +1345,12 @@ find_more_owl_attack_and_defense_moves(int color)
 	     || move_reasons[r].type == DEFEND_MOVE_BAD_KO
 	     || (move_reasons[r].type == VITAL_EYE_MOVE
 		 && board[dd] == color))
-	    && !owl_defense_move_reason_known(pos, find_dragon(dd))
-	    && owl_does_defend(pos, dd)) {
-	  /* FIXME: Report correct ko result code. */
-	  add_owl_defense_move(pos, dd, WIN);
-	  TRACE("Move at %1m owl defends %1m.\n", pos, dd);
+	    && !owl_defense_move_reason_known(pos, find_dragon(dd))) {
+	  int dcode = owl_does_defend(pos, dd);
+	  if (dcode >= dragon[dd].owl_defense_code) {
+	    add_owl_defense_move(pos, dd, dcode);
+	    TRACE("Move at %1m owl defends %1m, result %d.\n", pos, dd, dcode);
+	  }
 	}
       }
     }
@@ -1385,16 +1385,20 @@ find_more_owl_attack_and_defense_moves(int color)
 	    }
 	  }
 	}
-	
+
 	if (worth_trying) {
 	  if (board[pos] == color
-	      && !owl_defense_move_reason_known(pos2, find_dragon(pos))
-	      && owl_does_defend(pos2, pos))
-	    add_owl_defense_move(pos2, pos, WIN);
+	      && !owl_defense_move_reason_known(pos2, find_dragon(pos))) {
+	    int dcode = owl_does_defend(pos2, pos);
+	    if (dcode >= dragon[pos].owl_defense_code)
+	      add_owl_defense_move(pos2, pos, dcode);
+	  }
 	  else if (board[pos] != color
-		   && !owl_attack_move_reason_known(pos2, find_dragon(pos))
-		   && owl_does_attack(pos2, pos))
-	    add_owl_attack_move(pos2, pos, WIN);
+		   && !owl_attack_move_reason_known(pos2, find_dragon(pos))) {
+	    int acode = owl_does_attack(pos2, pos);
+	    if (acode >= dragon[pos].owl_attack_code)
+	      add_owl_attack_move(pos2, pos, acode);
+	  }
 	}
       }
     }
@@ -1408,7 +1412,7 @@ find_more_owl_attack_and_defense_moves(int color)
  * whether a move at (ti, tj) to defend the worm (ai, aj) is
  * strategically sound.
  *
- * FIXME: What is the A parameter for? /iw
+ * FIXME: This function has played out its role. Should be eliminated.
  */
 static int
 strategically_sound_defense(int aa, int tt)
@@ -1431,10 +1435,11 @@ strategically_sound_defense(int aa, int tt)
  * FIXME: There is a certain amount of optimizations that could be
  *        done here.
  *
- * FIXME: Even when we defend a worm, it's possible that the
- *        opponent still can secure a connection, e.g. underneath a string
- *        with few liberties. Thus a defense move isn't necessarily a cut
- *        move.
+ * FIXME: Even when we defend a worm, it's possible that the opponent
+ *        still can secure a connection, e.g. underneath a string with
+ *        few liberties. Thus a defense move isn't necessarily a cut
+ *        move. This problem can be solved when we have a working
+ *        connection reader.
  *
  */
 
@@ -2727,18 +2732,15 @@ estimate_territorial_value(int pos, int color, float score)
 	break;
       }
 
-      /* If the dragon is a single ko stone we don't award any
-       * territorial value for it. This isn't exactly right but a
-       * reasonable workaround to avoid or at least limit overvaluation.
+      /* If the dragon is a single ko stone, the owl code currently
+       * won't detect that the owl attack is conditional. As a
+       * workaround we deduct 0.5 points for the move here.
        */
       if (dragon[aa].size == 1
-	  && is_ko_point(aa)
-	  && (move_reasons[r].type == OWL_ATTACK_MOVE
-	      || move_reasons[r].type == OWL_ATTACK_MOVE_GOOD_KO
-	      || move_reasons[r].type == OWL_ATTACK_MOVE_BAD_KO)) {
-	TRACE("  %1m: -1.5 - penalty for ko stone %1m (workaround)\n",
+	  && is_ko_point(aa)) {
+	TRACE("  %1m: -0.5 - penalty for ko stone %1m (workaround)\n",
 	      pos, aa);
-	tot_value -= 1.5;
+	tot_value -= 0.5;
 	break;
       }
 
@@ -2757,6 +2759,25 @@ estimate_territorial_value(int pos, int color, float score)
       }
       TRACE("  %1m: owl attack/defend for %1m\n", pos, aa);
       
+      /* FIXME: How much should we reduce the value for ko attacks? */
+      this_value = 2 * dragon[aa].effective_size;
+      if (move_reasons[r].type == OWL_ATTACK_MOVE
+	  || move_reasons[r].type == OWL_DEFEND_MOVE)
+	this_value = 0.0;
+      else if (move_reasons[r].type == OWL_ATTACK_MOVE_GOOD_KO
+	       || move_reasons[r].type == OWL_DEFEND_MOVE_GOOD_KO) {
+	this_value *= 0.3;
+	TRACE("  %1m: -%f - owl attack/defense of %1m only with good ko\n",
+	      pos, this_value, aa);
+      }	
+      else if (move_reasons[r].type == OWL_ATTACK_MOVE_BAD_KO
+	       || move_reasons[r].type == OWL_DEFEND_MOVE_BAD_KO) {
+	this_value *= 0.5;
+	TRACE("  %1m: -%f - owl attack/defense of %1m only with bad ko\n",
+	      pos, this_value, aa);
+      }
+      
+      tot_value -= this_value;
       does_block = 1;
       break;
 
@@ -2835,8 +2856,8 @@ estimate_territorial_value(int pos, int color, float score)
 	      pos, this_value);
 	tot_value += this_value;
       }
-      else if (!doing_scoring && ((color == BLACK && score < -0.)
-				  || (color == WHITE && score > 0.))) {
+      else if (!doing_scoring && ((color == BLACK && score < 0.0)
+				  || (color == WHITE && score > 0.0))) {
 	this_value = gg_min(1.5 * dragon[aa].effective_size,
 			    gg_abs(score/2));
 	TRACE("  %1m: %f - attack last move played, although it seems dead\n",
@@ -2847,9 +2868,9 @@ estimate_territorial_value(int pos, int color, float score)
 	/* FIXME: Why are we computing a this_value here when it's
          * never used?
 	 */
-	if ((color == BLACK && score > 0.)
-	    || (color == WHITE && score < 0.))
-	  this_value = 0.;
+	if ((color == BLACK && score > 0.0)
+	    || (color == WHITE && score < 0.0))
+	  this_value = 0.0;
 	else 
 	  this_value = gg_min(2*dragon[aa].effective_size, gg_abs(score/2));
 	
@@ -2991,6 +3012,8 @@ estimate_strategical_value(int pos, int color, float score)
 	
 	/* FIXME: This is totally ad hoc, just guessing the value of
          *        potential cutting points.
+	 * FIXME: When worm[aa].cutstone2 == 1 we should probably add
+	 *        a followup value.
 	 */
 	if (worm[aa].cutstone2 > 1) {
 	  this_value = 10.0 * (worm[aa].cutstone2 - 1);
@@ -3016,11 +3039,11 @@ estimate_strategical_value(int pos, int color, float score)
 	    d1 = lunch_dragon[l];
 	    bb = dragons[d1];
 
-	    /* FIXME: This value cannot be computed
-	       without some measurement of how the actual move affects
-	       the dragon. The dragon safety alone is not enough. The 
-	       question is whether the dragon is threatened by the move 
-	       or not. */
+	    /* FIXME: This value cannot be computed without some
+	     * measurement of how the actual move affects the dragon.
+	     * The dragon safety alone is not enough. The question is
+	     * whether the dragon is threatened by the move or not.
+	     */
 	    this_value = (dragon[bb].effective_size
 			  * (1.0 - dragon_safety(bb, 0)));
 

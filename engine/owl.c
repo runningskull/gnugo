@@ -1197,7 +1197,8 @@ do_owl_attack(int str, int *move, struct local_owl_data *owl,
 	continue;
 
       TRACE("Trying %C %1m.  Current stack: ", other, mpos);
-      if (verbose) dump_stack();
+      if (verbose)
+	dump_stack();
 
       /* We have now made a move. Analyze the new position. */
       push_owl(owl);
@@ -1598,7 +1599,7 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
     memset(found_matches, 0, sizeof(found_matches));
     if (level >= 9) 
       matchpat(owl_shapes_callback, other, 
-		      &owl_vital_apat_db, shape_moves, owl->goal);
+	       &owl_vital_apat_db, shape_moves, owl->goal);
 
     DEBUG(DEBUG_EYES, "owl: true_genus=%d matches_found=%d\n",
 	  true_genus, matches_found);
@@ -1744,7 +1745,8 @@ do_owl_defend(int str, int *move, struct local_owl_data *owl,
 	continue;
 
       TRACE("Trying %C %1m.  Current stack: ", color, mpos);
-      if (verbose) dump_stack();
+      if (verbose)
+	dump_stack();
 
       /* We have now made a move. Analyze the new position. */
       push_owl(owl);
@@ -2133,10 +2135,37 @@ owl_determine_life(struct local_owl_data *owl,
 	    owl_add_move(moves, attack_point, value, reason, 1);
 	    vital_values[attack_point] = value;
 	  }
-	  else if (!does_attack && defense_point != NO_MOVE
+	  /* The reason for the last set of tests is that we don't
+	   * want to play a self atari in e.g. this position
+	   *
+	   * |XXX.
+	   * |OOX.
+	   * |.OX.
+	   * |XOXX
+	   * |XOOX
+	   * |O*OX
+	   * +----
+	   *
+	   * but it's okay in this position
+	   * 
+	   * |XXXXX
+	   * |....X
+	   * |OOOOX
+	   * |.XXOX
+	   * |.*XOX
+	   * +-----
+	   *
+	   * In both cases * is the vital point according to the graph
+	   * matching. The significant difference is that in the first
+	   * case the vital point is a margin.
+	   */
+	  else if (!does_attack
+		   && defense_point != NO_MOVE
 		   && board[defense_point] == EMPTY
-		   && (!is_self_atari(defense_point, color)
-		       || is_ko(defense_point, color, NULL))) {
+		   && (!eye[attack_point].marginal
+		       || !is_self_atari(defense_point, color)
+		       || is_ko(defense_point, color, NULL)
+		       || safe_move(defense_point, color) != 0)) {
 	    if (vital_values[defense_point] > 0) {
 	      value += vital_values[defense_point];
 	      if (value > 98)
@@ -2746,7 +2775,7 @@ owl_reasons(int color)
 	    /* If not yet thought safe, ask the owl code whether the
 	     * owl attack defends the (largest) attacker.
 	     */
-	    if (!safe && !owl_does_defend(move, bpos)) {
+	    if (!safe && owl_does_defend(move, bpos) != WIN) {
 	      DEBUG(DEBUG_OWL,
 		    "owl: %1m attacks %1m at move %d, but the attacker dies.\n",
 		    move, pos, movenum+1);
@@ -2832,6 +2861,7 @@ owl_does_defend(int move, int target)
   int reading_nodes_when_called = get_reading_node_counter();
   int tactical_nodes;
   int origin;
+  int acode;
   owl.local_owl_node_counter = 0;
 
   if (worm[target].unconditional_status == DEAD)
@@ -2849,18 +2879,15 @@ owl_does_defend(int move, int target)
     if (search_persistent_owl_cache(OWL_ATTACK, origin, 0, 0,
 				    &result, NULL, NULL, NULL)) {
       popgo();
-      if (!result)
-	return WIN;
-      else
-	return 0;
+      return 3 - result;
     }
     
     owl.lunches_are_current = 0;
     owl_mark_dragon(target, NO_MOVE, &owl);
     owl_update_goal(move, 1, &owl);
     compute_owl_escape_values(&owl);
-    if (!do_owl_attack(target, NULL, &owl, EMPTY, 0))
-      result = WIN;
+    acode = do_owl_attack(target, NULL, &owl, EMPTY, 0);
+    result = 3 - acode;
     owl.lunches_are_current = 0;
     popgo();
   }
@@ -2953,8 +2980,8 @@ owl_confirm_safety(int move, int target, int *defense_point)
 }
 
 
-/* Use the owl code to determine whether the move at (ti, tj) of the
- * string (m, n) is effective, i.e. whether it kills the stones.
+/* Use the owl code to determine whether the attack move at (move) of
+ * the dragon (target) is effective, i.e. whether it kills the stones.
  *
  * Should be called only when stackp==0.
  */
@@ -2967,28 +2994,71 @@ owl_does_attack(int move, int target)
   int result = 0;
   static struct local_owl_data owl;
   int reading_nodes_when_called = get_reading_node_counter();
+  int tactical_nodes;
+  int origin;
+  int dcode;
   owl.local_owl_node_counter = 0;
-  owl.lunches_are_current = 0;
-  owl_mark_dragon(target, NO_MOVE, &owl);
-  compute_owl_escape_values(&owl);
-  TRACE("owl_does_attack %1m %1m\n", move, target);
-  
-  if (trymove(move, other, "owl_does_attack", target, EMPTY, 0)) {
+
+  if (worm[target].unconditional_status == ALIVE)
+    return 0;
+
+  origin = dragon[target].origin;
+  TRACE("owl_does_attack %1m %1m(%1m)\n", move, target, origin);
+
+  if (search_persistent_owl_cache(OWL_DOES_ATTACK, move, target, 0,
+				  &result, NULL, NULL, NULL))
+    return result;
+
+  /* FIXME: We want to do this after the trymove(), but currently
+   * owl_mark_dragon() may crash if the trymove() happens to remove
+   * some stones from the goal dragon from the board.
+   */
+#if 1
+    owl.lunches_are_current = 0;
+    owl_mark_dragon(target, NO_MOVE, &owl);
+    compute_owl_escape_values(&owl);
+#endif
+
+    if (trymove(move, other, "owl_does_attack", target, EMPTY, 0)) {
+    /* Check if a compatible owl_defend() is cached. */
+    if (search_persistent_owl_cache(OWL_DEFEND, origin, 0, 0,
+				    &result, NULL, NULL, NULL)) {
+      popgo();
+      return 3 - result;
+    }
+
+#if 0
+    owl.lunches_are_current = 0;
+    owl_mark_dragon(target, NO_MOVE, &owl);
+#endif
     owl_update_boundary_marks(move, &owl);
+#if 0
+    compute_owl_escape_values(&owl);
+#endif
     /* FIXME: Should also check if part of the dragon was captured,
      *        like do_owl_attack() does.
      */
-    if (board[target] == EMPTY
-	|| !do_owl_defend(target, NULL, &owl, EMPTY, 0))
-      result = WIN;
+    if (board[target] == EMPTY)
+      dcode = 0;
+    else
+      dcode = do_owl_defend(target, NULL, &owl, EMPTY, 0);
+    result = 3 - dcode;
     owl.lunches_are_current = 0;
     popgo();
   }
-  
+  else
+    return 0;  /* Don't cache anything in this case. */
+
+  tactical_nodes = get_reading_node_counter() - reading_nodes_when_called;
+
   DEBUG(DEBUG_OWL_PERFORMANCE,
-	"owl_does_attack %1m %1m, result %d (%d, %d nodes)\n",
-	move, target, result, owl.local_owl_node_counter,
-	get_reading_node_counter() - reading_nodes_when_called);
+	"owl_does_attack %1m %1m(%1m), result %d (%d, %d nodes)\n",
+	move, target, origin, result,
+	owl.local_owl_node_counter, tactical_nodes);
+
+  store_persistent_owl_cache(OWL_DOES_ATTACK, move, target, 0,
+			     result, 0, 0, 0,
+			     tactical_nodes, owl.goal, board[target]);
 
   return result;
 }

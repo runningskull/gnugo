@@ -199,6 +199,7 @@ analyze_semeai(int my_dragon, int your_dragon)
     if (dragon[your_dragon].owl_attack_point
 	== dragon[my_dragon].owl_defense_point)
       return;
+    /* FIXME: Keep track of the return code from owl_does_attack(). */
     if (dragon[my_dragon].owl_defense_point != NO_MOVE
 	&& owl_does_attack(dragon[my_dragon].owl_defense_point, your_dragon)) {
       add_owl_attack_move(dragon[my_dragon].owl_defense_point, your_dragon,
@@ -220,6 +221,7 @@ analyze_semeai(int my_dragon, int your_dragon)
     if (dragon[your_dragon].owl_attack_point
 	== dragon[my_dragon].owl_defense_point)
       return;
+    /* FIXME: Keep track of the return code from owl_does_defend(). */
     if (dragon[your_dragon].owl_attack_point != NO_MOVE
 	&& owl_does_defend(dragon[your_dragon].owl_attack_point, my_dragon)) {
       add_owl_defense_move(dragon[your_dragon].owl_attack_point, my_dragon,

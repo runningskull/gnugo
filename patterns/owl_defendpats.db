@@ -2242,6 +2242,7 @@ oOOx
 
 
 Pattern D710
+# gf Revised constraint. (3.1.15)
 
 OO*             try to make center eye
 O..
@@ -2251,9 +2252,9 @@ O..
 
 OO*
 O.a
-?OO
+?bb
 
-;!obvious_false_oeye(a)
+;!owl_big_eyespace(a,b) && !obvious_false_oeye(a)
 
 
 Pattern D711

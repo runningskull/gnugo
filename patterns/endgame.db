@@ -194,12 +194,13 @@ XO?       descend to edge
 
 
 Pattern EE6
+# gf Added followup value. (3.1.14)
 
 .OOOXX
 ...*..
 ------
 
-:8,OXb,terri(2), followup(1)
+:8,OXb,terri(2),followup(1)
 
 .OOOXX
 ..a*bc

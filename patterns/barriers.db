@@ -1688,4 +1688,22 @@ Pattern Nonterritory16
 >non_xterritory(e);
 
 
+Pattern Nonterritory17
+
+|..
+|XO
+|.X
+
+:8,t
+
+|ac
+|Xd
+|bX
+
+;!oplay_defend_both(a,b,?,c,a,d)
+
+>non_oterritory(a);
+>non_oterritory(c);
+
+
 # END OF FILE

@@ -158,6 +158,34 @@ examine_position(int color, int how_much)
 }
 
 
+/* The same as examine_position(), except that all traces, debug
+ * output, and sgf traces are turned off.
+ */
+void
+silent_examine_position(int color, int how_much)
+{
+  int save_verbose = verbose;
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+  int save_debug = debug;
+  int save_printmoyo = printmoyo;
+  
+  verbose = 0;
+  sgf_dumptree = NULL;
+  count_variations = 0;
+  debug = 0;
+  printmoyo = 0;
+  
+  examine_position(color, how_much);
+
+  verbose = save_verbose;
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+  debug = save_debug;
+  printmoyo = save_printmoyo;
+}
+
+
 /*
  * Estimate the current score using the influence function. The value
  * is positive if white is thought to be ahead and negative otherwise.

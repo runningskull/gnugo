@@ -363,6 +363,7 @@ void DEBUG(int level, const char *fmt, ...);
 
 void reset_engine(void);
 void examine_position(int color, int how_much);
+void silent_examine_position(int color, int how_much);
 
 
 /* ================================================================ */

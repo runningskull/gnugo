@@ -429,7 +429,7 @@ A*
 ;lib(A)==1 && owl_eyespace(*,A) && olib(*) > 0
 
 
-Pattern VA24
+Pattern VA25
 # tm New pattern. (3.1.15)  (see cho1:161)
 
 ?OO|       special corner shape.
@@ -439,6 +439,97 @@ XO.|
 ---+
 
 :8,-,value(76)
+
+
+Pattern VA26
+# gf New pattern. (3.1.15)
+
+??XX?       making nakade is only chance to kill, unless we can capture
+?XO.X       some of the wall
+X*XOX
+X.OX?
+?XX??
+
+:8,s,value(70)
+
+
+Pattern VA26b
+# gf New pattern. (3.1.15)
+# This pattern is entirely bogus. VA25 gives the correct attack point
+# but currently we also need this pattern to get a second match, which
+# is necessary to offset the fact that X is thought to have three
+# eyes.
+
+??XX?       making nakade is only chance to kill, unless we can capture
+?XO.X       some of the wall
+X.XOX
+X*OX?
+?XX??
+
+:8,s,value(0)
+
+
+Pattern VA27
+# gf New pattern. (3.1.15)
+
+XX??        not two certain eyes
+.*xX
+OXOx
+----
+
+:8,s,value(45)
+
+XX??
+.*AX
+OXOB
+----
+
+;x_somewhere(A,B)
+
+
+Pattern VA28
+# gf New pattern. (3.1.15)
+
+XX??        not two certain eyes
+.OxX
+*XOx
+----
+
+:8,s,value(45)
+
+XX??
+.OAX
+*XOB
+----
+
+;x_somewhere(A,B)
+
+
+Pattern VA29
+# gf New pattern. (3.1.15)
+
+|XXX?        not two certain eyes
+|.O.X
+|OX*x
++----
+
+:8,s,value(45)
+
+
+Pattern VA30
+# gf New pattern. (3.1.15)
+
+?XX.         atari to destroy eye
+X.*X
+?XX?
+
+:8,s,value(45)
+
+?XXb
+xa*X
+?CC?
+
+;lib(C)==2 && owl_eyespace(a,C) && oplay_attack(*,a,b,b)!=WIN
 
 
 # END OF FILE

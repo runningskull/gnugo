@@ -320,6 +320,11 @@ loadsgf games/strategy46.sgf 174
 214 gg_genmove white
 #? [D2]
 
+# CD103a incorrectly thinks E7 defends against a combination attack.
+loadsgf games/owl33.sgf 200
+215 gg_genmove black
+#? [!E7]*
+
 ############ End of Tests #################
 
 # Report number of nodes visited by the tactical reading

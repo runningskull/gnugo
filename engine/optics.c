@@ -78,7 +78,7 @@ static int linear_eye_space(int pos, int *vital_point, int *max, int *min,
 static void first_map(int q, int map[MAXEYE]);
 static int next_map(int *q, int map[MAXEYE], int esize);
 static void print_eye(struct eye_data eye[BOARDMAX],
-		      struct half_eye_data heye[BOARDMAX], int i, int j);
+		      struct half_eye_data heye[BOARDMAX], int pos);
 static int 
 evaluate_diagonal_intersection(int m, int n, int color,
 			       int *attack_point, int *defense_point,
@@ -595,14 +595,13 @@ propagate_eye (int origin, struct eye_data eye[BOARDMAX])
  */
 
 static void
-print_eye(struct eye_data eye[BOARDMAX],
-	  struct half_eye_data heye[BOARDMAX],
-	  int i, int j)
+print_eye(struct eye_data eye[BOARDMAX], struct half_eye_data heye[BOARDMAX],
+	  int pos)
 {
   int m, n;
   int mini, maxi;
   int minj, maxj;
-  int origin = eye[POS(i, j)].origin;
+  int origin = eye[pos].origin;
   
   /* Determine the size of the eye. */
   mini = board_size;
@@ -629,17 +628,17 @@ print_eye(struct eye_data eye[BOARDMAX],
   for (m = mini; m <= maxi; m++) {
     gprintf(""); /* Get the indentation right. */
     for (n = minj; n <= maxj; n++) {
-      int pos = POS(m, n);
-      if (eye[pos].origin == origin) {
-	if (board[pos] == EMPTY) {
-	  if (eye[pos].marginal)
+      int pos2 = POS(m, n);
+      if (eye[pos2].origin == origin) {
+	if (board[pos2] == EMPTY) {
+	  if (eye[pos2].marginal)
 	    gprintf("%o!");
-	  else if (is_halfeye(heye, pos))
+	  else if (is_halfeye(heye, pos2))
 	    gprintf("%oh");
 	  else
 	    gprintf("%o.");
 	}
-	else if (is_halfeye(heye, pos))
+	else if (is_halfeye(heye, pos2))
 	  gprintf("%oH");
 	else
 	  gprintf("%oX");
@@ -702,7 +701,7 @@ compute_eyes(int pos, int *max, int *min,
 	  DEBUG(DEBUG_EYES, "%1m\n", pos2);
       }
     DEBUG(DEBUG_EYES, "\n");
-    print_eye(eye, heye, I(pos), J(pos));
+    print_eye(eye, heye, pos);
     DEBUG(DEBUG_EYES, "\n");
   }
   
@@ -759,7 +758,7 @@ compute_eyes(int pos, int *max, int *min,
       gprintf("===========================================================\n");
       gprintf("Unrecognized eye of size %d shape at %1m\n", 
 	      eye[pos].esize, pos);
-      print_eye(eye, heye, I(pos), J(pos));
+      print_eye(eye, heye, pos);
     }
   }
   
@@ -867,7 +866,7 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
 	  DEBUG(DEBUG_EYES, "%1m\n", pos2);
       }
     DEBUG(DEBUG_EYES, "\n");
-    print_eye(eye, heye, I(pos), J(pos));
+    print_eye(eye, heye, pos);
     DEBUG(DEBUG_EYES, "\n");
   }
   
@@ -942,31 +941,48 @@ compute_eyes_pessimistic(int pos, int *max, int *min,
      *
      * We make some effort to find the best marginal vertex by giving
      * priority to ones with more than one neighbor in the eyespace.
+     * We prefer non-halfeye margins and ones which are not self-atari
+     * for the opponent. Margins not on the edge are also favored.
      */
     int best_attack_point = NO_MOVE;
     int best_defense_point = NO_MOVE;
-    float most_neighbors = 0.0;
+    float score = 0.0;
     int pos2;
     
     for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
       if (ON_BOARD(pos2) && eye[pos2].origin == pos) {
-	if (eye[pos2].marginal
-	    && board[pos2] == EMPTY
-	    && (float) eye[pos2].neighbors > most_neighbors) {
-	  best_attack_point = pos2;
-	  best_defense_point = pos2;
-	  most_neighbors = (float) eye[pos2].neighbors;
+	float this_score = 0.0;
+	int this_attack_point = NO_MOVE;
+	int this_defense_point = NO_MOVE;
+	if (eye[pos2].marginal && board[pos2] == EMPTY) {
+	  this_score = eye[pos2].neighbors;
+	  this_attack_point = pos2;
+	  this_defense_point = pos2;
+
+	  if (is_self_atari(pos2,
+			    eye[pos].color == WHITE_BORDER ? BLACK : WHITE))
+	    this_score -= 0.5;
+	  
+	  if (is_edge_vertex(pos2))
+	    this_score -= 0.1;
 	}
-	else if (is_halfeye(heye, pos2) && most_neighbors == 0.0) {
-	  best_defense_point = heye[pos2].defense_point[0];
-	  best_attack_point = heye[pos2].attack_point[0];
-	  /* We prefer other marginal eyespaces than halfeyes. */
-	  most_neighbors = 0.5;
+	else if (is_halfeye(heye, pos2)) {
+	  this_score = 0.75;
+	  this_defense_point = heye[pos2].defense_point[0];
+	  this_attack_point = heye[pos2].attack_point[0];
+	}
+	else
+	  continue;
+	
+	if (this_score > score) {
+	  best_attack_point = this_attack_point;
+	  best_defense_point = this_defense_point;
+	  score = this_score;
 	}
       }
     }
     
-    if (most_neighbors > 0) {
+    if (score > 0.0) {
       if (defense_point)
 	*defense_point = best_defense_point;
       if (attack_point)
@@ -1569,7 +1585,7 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	     * the diagonal in the list of vertices
 	     */
 	    if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
-	      /* add all diagonals as vital */
+	      /* Add all diagonals as vital. */
 	      int ix;
 	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
 	      
@@ -1585,9 +1601,9 @@ recognize_eye(int pos, int *attack_point, int *defense_point,
 	    defense_points[num_defenses++] = vpos[map[k]];
 	  else if (graphs[graph].vertex[k].type == '@'
 		   || graphs[graph].vertex[k].type == ')') {
-	    /* check for marginal matching half eye diagonal */
+	    /* Check for marginal matching half eye diagonal. */
 	    if (map[k] > 0 && is_halfeye(heye, vpos[map[k]-1])) {
-	      /* add all diagonals as vital */
+	      /* Add all diagonals as vital. */
 	      int ix;
 	      struct half_eye_data *this_half_eye = &heye[vpos[map[k]-1]];
 
@@ -1988,8 +2004,12 @@ evaluate_diagonal_intersection(int m, int n, int color,
 
   if (value == 1) {
     if (board[pos] == EMPTY) {
-      *attack_point = pos;
-      *defense_point = pos;
+      if (!safe_move(pos, color))
+	value = 2;
+      else {
+	*attack_point = pos;
+	*defense_point = pos;
+      }
     }
     else {
       /* FIXME:
@@ -1999,8 +2019,13 @@ evaluate_diagonal_intersection(int m, int n, int color,
        */
       ASSERT_ON_BOARD1(apos);
       ASSERT_ON_BOARD1(dpos);
-      *attack_point = apos;
-      *defense_point = dpos;
+      /* Notice:
+       * The point to ATTACK the half eye is the point which DEFENDS
+       * the stones on the diagonal intersection and vice versa. Thus
+       * we must switch attack and defense points here.
+       */
+      *attack_point = dpos;
+      *defense_point = apos;
     }
   }
 

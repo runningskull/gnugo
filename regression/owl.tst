@@ -845,6 +845,27 @@ loadsgf games/owl31.sgf 20
 230 owl_defend G7
 #? [0]
 
+loadsgf games/owl32.sgf
+231 owl_attack A8
+#? [1 (C6|A4)]
+232 owl_defend A8
+#? [3 C6]*
+233 owl_attack F6
+#? [1 H7]*
+234 owl_defend F6
+#? [1 (J7|H7|H6|G6)]
+
+# There are probably additional moves.
+loadsgf games/owl33.sgf 134
+235 owl_attack O4
+#? [1 (S3|T4)]*
+236 owl_defend O4
+#? [1 (R4|S3|R3|S2|Q5|P5)]
+
+loadsgf games/owl33.sgf 212
+237 owl_defend S12
+#? [0]*
+
 ########### end of tests #####################
 
 # Report number of nodes visited by the tactical reading

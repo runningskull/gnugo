@@ -278,7 +278,7 @@ loadsgf games/strategy10.sgf
 #    the bottom at G2 or (worse but still OK) at J2 is better but
 #    I would class this result as ACCEPTABLE.
 #
-#    3.1.9: Best move here is tough.  GNO Go correctly tries
+#    3.1.9: Best move here is tough.  GNU Go correctly tries
 #    to stabilize G3 group.
 #
 # See also reading:158

@@ -105,9 +105,11 @@ DECLARE(gtp_loadsgf);
 DECLARE(gtp_name);
 DECLARE(gtp_new_game);
 DECLARE(gtp_estimate_score);
+DECLARE(gtp_owl_analyze_semeai);
 DECLARE(gtp_owl_attack);
 DECLARE(gtp_owl_defend);
-DECLARE(gtp_owl_analyze_semeai);
+DECLARE(gtp_owl_does_attack);
+DECLARE(gtp_owl_does_defend);
 DECLARE(gtp_playblack);
 DECLARE(gtp_playwhite);
 DECLARE(gtp_popgo);
@@ -187,9 +189,11 @@ static struct gtp_command commands[] = {
   {"name",                    gtp_name},
   {"new_game",                gtp_new_game},
   {"new_score",               gtp_estimate_score},
+  {"owl_analyze_semeai",      gtp_owl_analyze_semeai},
   {"owl_attack",     	      gtp_owl_attack},
   {"owl_defend",     	      gtp_owl_defend},
-  {"owl_analyze_semeai",      gtp_owl_analyze_semeai},
+  {"owl_does_attack", 	      gtp_owl_does_attack},
+  {"owl_does_defend", 	      gtp_owl_does_defend},
   {"popgo",            	      gtp_popgo},
   {"orientation",     	      gtp_set_orientation},
   {"protocol_version",        gtp_protocol_version},
@@ -855,9 +859,7 @@ gtp_owl_attack(char *s, int id)
   int i, j;
   int attack_point;
   int attack_code;
-  int save_verbose = verbose;
   int result_certain;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
 
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
@@ -865,14 +867,11 @@ gtp_owl_attack(char *s, int id)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  verbose = 0;
-  sgf_dumptree = NULL;
-  examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
-  verbose = save_verbose;
-  sgf_dumptree = save_sgf_dumptree;
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
-      reading_cache_clear();
+    reading_cache_clear();
   
   attack_code = owl_attack(POS(i, j), &attack_point, &result_certain);
   gtp_printid(id, GTP_SUCCESS);
@@ -898,9 +897,7 @@ gtp_owl_defend(char *s, int id)
   int i, j;
   int defense_point;
   int defend_code;
-  int save_verbose = verbose;
   int result_certain;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
   
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
@@ -908,14 +905,11 @@ gtp_owl_defend(char *s, int id)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  verbose = 0;
-  sgf_dumptree = NULL;
-  examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
-  verbose = save_verbose;
-  sgf_dumptree = save_sgf_dumptree;
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
-      reading_cache_clear();
+    reading_cache_clear();
 
   defend_code = owl_defend(POS(i, j), &defense_point, &result_certain);
   gtp_printid(id, GTP_SUCCESS);
@@ -926,6 +920,86 @@ gtp_owl_defend(char *s, int id)
   }
   if (!result_certain && report_uncertainty)
     gtp_printf(" uncertain");
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Examine whether a specific move attacks a dragon.
+ * Arguments: vertex (move), vertex (dragon)
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   attack code
+ */
+static int
+gtp_owl_does_attack(char *s, int id)
+{
+  int i, j;
+  int ti, tj;
+  int attack_code;
+  int n;
+
+  n = gtp_decode_coord(s, &ti, &tj);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(ti, tj) != EMPTY)
+    return gtp_failure(id, "move vertex must be empty");
+
+  n = gtp_decode_coord(s + n, &i, &j);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "dragon vertex must not be empty");
+
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+  
+  attack_code = owl_does_attack(POS(ti, tj), POS(i, j));
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_print_code(attack_code);
+  return gtp_finish_response();
+}  
+
+
+/* Function:  Examine whether a specific move defends a dragon.
+ * Arguments: vertex (move), vertex (dragon)
+ * Fails:     invalid vertex, empty vertex
+ * Returns:   defense code
+ */
+static int
+gtp_owl_does_defend(char *s, int id)
+{
+  int i, j;
+  int ti, tj;
+  int defense_code;
+  int n;
+
+  n = gtp_decode_coord(s, &ti, &tj);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(ti, tj) != EMPTY)
+    return gtp_failure(id, "move vertex must be empty");
+
+  n = gtp_decode_coord(s + n, &i, &j);
+  if (n == 0)
+    return gtp_failure(id, "invalid coordinate");
+
+  if (BOARD(i, j) == EMPTY)
+    return gtp_failure(id, "dragon vertex must not be empty");
+
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
+  
+  /* to get the variations into the sgf file, clear the reading cache */
+  if (sgf_dumptree)
+    reading_cache_clear();
+  
+  defense_code = owl_does_defend(POS(ti, tj), POS(i, j));
+  gtp_printid(id, GTP_SUCCESS);
+  gtp_print_code(defense_code);
   return gtp_finish_response();
 }  
 
@@ -942,8 +1016,6 @@ gtp_owl_analyze_semeai(char *s, int id)
   int k;
   int dragona, dragonb;
   int resulta, resultb, move;
-  int save_verbose = verbose;
-  SGFTree *save_sgf_dumptree = sgf_dumptree;
   
   k = gtp_decode_coord(s, &i, &j);
 
@@ -959,11 +1031,7 @@ gtp_owl_analyze_semeai(char *s, int id)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  verbose = 0;
-  sgf_dumptree = NULL;
-  examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
-  verbose = save_verbose;
-  sgf_dumptree = save_sgf_dumptree;
+  silent_examine_position(BOARD(i, j), EXAMINE_DRAGONS_WITHOUT_OWL);
   /* to get the variations into the sgf file, clear the reading cache */
   if (sgf_dumptree)
       reading_cache_clear();
@@ -1078,14 +1146,11 @@ gtp_eval_eye(char *s, int id)
   int attack_point;
   int defense_point;
   int pos;
-  int save_verbose = verbose;
 
   if (!gtp_decode_coord(s, &m, &n))
     return gtp_failure(id, "invalid coordinate");
 
-  verbose = 0;
-  examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
-  verbose = save_verbose;
+  silent_examine_position(BLACK, EXAMINE_DRAGONS_WITHOUT_OWL);
   
   if (black_eye[POS(m, n)].color == BLACK_BORDER) {
     pos = black_eye[POS(m, n)].origin;
@@ -1133,7 +1198,6 @@ static int
 gtp_dragon_status(char *s, int id)
 {
   int i, j;
-  int save_verbose = verbose;
 
   if (!gtp_decode_coord(s, &i, &j))
     return gtp_failure(id, "invalid coordinate");
@@ -1141,9 +1205,7 @@ gtp_dragon_status(char *s, int id)
   if (BOARD(i, j) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  verbose = 0;
-  examine_position(BLACK, EXAMINE_DRAGONS);
-  verbose = save_verbose;
+  silent_examine_position(BLACK, EXAMINE_DRAGONS);
   
   /* FIXME: We should also call the semeai module. */
 
@@ -1195,7 +1257,6 @@ gtp_same_dragon(char *s, int id)
 {
   int ai, aj;
   int bi, bj;
-  int save_verbose = verbose;
   int n;
 
   n = gtp_decode_coord(s, &ai, &aj);
@@ -1208,9 +1269,7 @@ gtp_same_dragon(char *s, int id)
   if (BOARD(ai, aj) == EMPTY || BOARD(bi, bj) == EMPTY)
     return gtp_failure(id, "vertex must not be empty");
 
-  verbose = 0;
-  examine_position(BLACK, EXAMINE_DRAGONS);
-  verbose = save_verbose;
+  silent_examine_position(BLACK, EXAMINE_DRAGONS);
   
   return gtp_success(id, "%d", dragon[POS(ai, aj)].id == dragon[POS(bi, bj)].id);
 }
@@ -1232,16 +1291,13 @@ gtp_combination_attack(char *s, int id)
 {
   int color;
   int pos;
-  int save_verbose = verbose;
   int n;
 
   n = gtp_decode_color(s, &color);
   if (!n)
     return gtp_failure(id, "invalid color");
 
-  verbose = 0;
-  examine_position(BLACK, EXAMINE_ALL);
-  verbose = save_verbose;
+  silent_examine_position(BLACK, EXAMINE_ALL);
 
   if (!atari_atari(color, &pos, verbose))
     pos = NO_MOVE;
@@ -1726,12 +1782,9 @@ gtp_final_status_list(char *s, int id)
 static int
 gtp_estimate_score(char *s, int id)
 {
-  int save_verbose = verbose;
   UNUSED(s);
 
-  verbose = 0;
-  examine_position(WHITE, EXAMINE_DRAGONS);
-  verbose = save_verbose;
+  silent_examine_position(WHITE, EXAMINE_DRAGONS);
   
   score = estimate_score(&upper_bound, &lower_bound);
   gtp_printid(id, GTP_SUCCESS);
@@ -1979,26 +2032,15 @@ gtp_dump_stack(char *s, int id)
 static int
 gtp_influence(char *s, int id)
 {
-  int save_verbose   = verbose;
-  int save_debug     = debug;
-  int save_printmoyo = printmoyo;
   int color;
   float white_influence[BOARDMAX];
   float black_influence[BOARDMAX];
   int influence_regions[BOARDMAX];
-
-
   
   if (!gtp_decode_color(s, &color))
     return gtp_failure(id, "invalid color");
 
-  verbose   = 0;
-  debug     = 0;
-  printmoyo = 0;
-  examine_position(color, EXAMINE_ALL);
-  verbose   = save_verbose;
-  debug     = save_debug;
-  printmoyo = save_printmoyo;
+  silent_examine_position(color, EXAMINE_ALL);
 
   gtp_printid(id, GTP_SUCCESS);
   get_initial_influence(color, 1, white_influence,

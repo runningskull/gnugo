@@ -527,7 +527,7 @@ aftermath_genmove(int *aftermath_move, int color,
 	|| !safe_move(move, color)
 	|| (DRAGON2(bb).safety != INVINCIBLE
 	    && DRAGON2(bb).safety != STRONGLY_ALIVE
-	    && !owl_does_defend(move, bb))
+	    && owl_does_defend(move, bb) != WIN)
 	|| (!confirm_safety(move, color, 0, NULL))) {
       score[move] = 0;
     }
@@ -644,7 +644,7 @@ aftermath_genmove(int *aftermath_move, int color,
       /* Consult the owl code to determine whether the considered move
        * really is effective. Blunders should be detected here.
        */
-      if (owl_does_attack(bb, move)) {
+      if (owl_does_attack(bb, move) == WIN) {
 	*aftermath_move = bb;
 	return 1;
       }
