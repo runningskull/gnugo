@@ -205,13 +205,13 @@ close_bubbles(int gb[BOARDMAX])
 	  
 	  if (bubbles[ii] == BLACK
 	      || (ON_BOARD(SOUTH(ii))
-		  && (gb[SOUTH(ii)] > 0 || bubbles[SOUTH(ii)] == BLACK))
+		  && (gb[SOUTH(ii)] < 0 || bubbles[SOUTH(ii)] == BLACK))
 	      || (ON_BOARD(WEST(ii))
-		  && (gb[WEST(ii)] > 0 || bubbles[WEST(ii)] == BLACK))
+		  && (gb[WEST(ii)] < 0 || bubbles[WEST(ii)] == BLACK))
 	      || (ON_BOARD(NORTH(ii))
-		  && (gb[NORTH(ii)] > 0 || bubbles[NORTH(ii)] == BLACK))
+		  && (gb[NORTH(ii)] < 0 || bubbles[NORTH(ii)] == BLACK))
 	      || (ON_BOARD(EAST(ii))
-		  && (gb[EAST(ii)] > 0 || bubbles[EAST(ii)] == BLACK)))
+		  && (gb[EAST(ii)] < 0 || bubbles[EAST(ii)] == BLACK)))
 	    black_neighbor = 1;
 	  
 	  if (white_neighbor) {
