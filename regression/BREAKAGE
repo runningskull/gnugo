@@ -1,3 +1,23 @@
+========================== 3.3.17 pre 1  ============================
+
+./regress.sh . nngs3.tst 
+1010 unexpected PASS!
+./regress.sh . nando.tst 
+18 unexpected PASS!
+19 unexpected FAIL: Correct '0', got '1'
+20 unexpected FAIL: Correct 'S8|S9|T12', got 'T16'
+21 unexpected FAIL: Correct 'S9|T12', got 'T16'
+22 unexpected PASS!
+23 unexpected FAIL: Correct '0', got '1'
+24 unexpected FAIL: Correct '1 M13', got '0'
+25 unexpected FAIL: Correct '!P16', got 'P16'
+26 unexpected FAIL: Correct '0', got '1'
+27 unexpected FAIL: Correct 'D6', got 'G5'
+28 unexpected PASS!
+29 unexpected FAIL: Correct '0', got '1'
+30 unexpected FAIL: Correct '1 T6', got '0'
+31 unexpected FAIL: Correct '0', got '1 F19'
+
 ========================== 3.3.16  ============================
 
 ./regress.sh . thrash.tst 

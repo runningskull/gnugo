@@ -100,9 +100,9 @@ loadsgf games/nando/auto012.sgf 124
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto013.sgf
 18 disconnect D6 H6
-#? [1 E6]*
+#? [1 E6]
 19 same_dragon D6 H6
-#? [0]
+#? [0]*
 
 # S8, T12 and a lack of liberties are too many weaknesses.
 # W must defend.
@@ -110,66 +110,66 @@ loadsgf games/nando/auto013.sgf
 loadsgf games/nando/auto014.sgf
 black S16
 20 gg_genmove white
-#? [S8|S9|T12]
+#? [S8|S9|T12]*
 # With another move ordering
 loadsgf games/nando/auto014.sgf
 black S8
 white T9
 black S16
 21 gg_genmove white
-#? [S9|T12]
+#? [S9|T12]*
 
 # Another non-transitivity problem.
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto015.sgf
 22 disconnect L3 N2
-#? [1 M3]*
+#? [1 M3]
 23 same_dragon L3 N2
-#? [0]
+#? [0]*
 
 #CATEGORY=OWL
 loadsgf games/nando/auto016.sgf
 24 owl_defend P17
-#? [1 M13]
+#? [1 M13]*
 
 #CATEGORY=BLUNDER
 loadsgf games/nando/auto017.sgf
 white A8
 black A10
 25 gg_genmove white
-#? [!P16]
+#? [!P16]*
 
 # Another lunch "mirage" at N16/O15.
 #CATEGORY=OWL
 loadsgf games/nando/auto018.sgf
 26 owl_does_defend P16 R18
-#? [0]
+#? [0]*
 
 # Move valuation looks way off. No idea what is happening here.
 #CATEGORY=?
 loadsgf games/nando/auto019.sgf
 27 gg_genmove white
-#? [D6]
+#? [D6]*
 
 # Non-transitivity problem (or is it ok to amalgamate by ko ?)
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto020.sgf
 28 disconnect S3 S7
-#? [2 S6]*
+#? [2 S6]
 29 same_dragon S3 S7
-#? [0]
+#? [0]*
 
 # W still can either connect or make 2 eyes
 #CATEGORY=OWL
 loadsgf games/nando/auto020.sgf
 black S6
 30 owl_defend S11
-#? [1 T6]
+#? [1 T6]*
 
 #CATEGORY=CONNECTION
 loadsgf games/nando/auto021.sgf
 31 connect E18 H19
-#? [0]
+#? [0]*
 
 #--------------------------------------------------------------
 # Cascade of chain breakings
