@@ -28,3 +28,4 @@ read_attack.c
 read_defend.c
 handipat.c
 oraclepat.c
+gmon.out
