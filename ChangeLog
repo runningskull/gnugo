@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- avoid giving followup values to non-sente threats in
+  threaten_to_capture_helper() and in estimate_territorial_value()
+- fuseki tuning
+- regression revisions
+- checking of sgf GM and FF properties revised
 - html view enhancements
 
 3.1.19 released January 2, 2002
