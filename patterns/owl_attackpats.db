@@ -1487,6 +1487,23 @@ OX?
 
 ;owl_escape_value(a)>0 || owl_escape_value(b)>0
 
+Pattern A422
+# ab New pattern. (3.3.10)
+
+?Oo?       prevent connection to another dragon
+X*.X
+?xo?
+
+:8,-,value(85)
+
+?Oo?
+a*.b
+?xo?
+
+;(!owl_goal_dragon(a) || !owl_goal_dragon(b))
+;&& !xplay_disconnect(*,a,b)
+
+
 
 Pattern A422
 # db New pattern (3.3.9)
@@ -3504,6 +3521,7 @@ oc*a
 Pattern A1124
 # tm New Pattern (3.1.22) (see nngs:770 decide-dragon K4)
 #   see also D1140
+# ab Revised constraint. (3.3.10)
 
 ?OX
 ?.*
@@ -3516,8 +3534,7 @@ be*
 cd?
 
 ;(owl_escape_value(d) > 0
-; || owl_escape_value(b) > 0
-; || owl_escape_value(c) > 0)
+; || owl_escape_value(b) > 0)
 ;&& oplay_defend_both(*,e,A,*)
 
 

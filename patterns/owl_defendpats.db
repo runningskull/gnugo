@@ -4218,6 +4218,7 @@ X*X.
 
 
 Pattern D1121
+# FIXME: If there is a X stone at "?", then this pattern is nonsense.
 
 OoXo       push into the open
 ?*.o

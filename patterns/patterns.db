@@ -825,7 +825,7 @@ O*aO
 ;odefend_against(*,a)
 
 
-Pattern CC52
+Pattern CC52a
 # Constraint probably needs revision.
 
 OX..     connect if invaded
@@ -838,6 +838,24 @@ c*aO
 
 ;oplay_attack(*,a,b,d) && oplay_attack(*,a,b,a)
 ;&& oplay_attack(*,a,b,e,e) && oplay_attack(*,a,b,c,c)
+
+
+Pattern CC52b
+# ab New pattern. (3.3.10)
+
+?????
+.OX.?     keep loose connection
+..*.O
+?..oo
+
+:8,c
+
+?????
+.aX.? 
+..*.b
+?..oo
+
+;!same_dragon(a,b) && (alive(a) || alive(b))
 
 
 Pattern CC53
@@ -1184,6 +1202,7 @@ O*ba
 
 
 Pattern CC79
+# ab modified (3.3.10)
 
 ?O.xx
 XO.*.
@@ -1197,7 +1216,7 @@ Xa.*.
 XXO..
 .....
 
-; lib(a)>=3 && !oarea(*)
+; lib(a)>=3 && !omoyo(*)
 
 
 Pattern CC80
@@ -7098,24 +7117,25 @@ Pattern CB106
 :|,OE,shape(2),jump_out_far_helper
 
 
-Pattern CB107
-# db New pattern (3.1.28)
-# db corrected (3.1.28)
-
-?OXxxx       defend the cut before leaping
-..O...
-?*....
-?.....
-
-:8,O
-
-?OAxxx
-.bO...
-?*c.a.
-?.....
-
-; oplay_defend(a,b,c,b) && !attack(A)
-> replace(a,*)
+#Pattern CB107
+## db New pattern (3.1.28)
+## db corrected (3.1.28)
+## ab Removed (3.3.10). (Now less important due to Intrusion54.)
+#
+#?OXxxx       defend the cut before leaping
+#..O...
+#?*....
+#?.....
+#
+#:8,O
+#
+#?OAxxx
+#.bO...
+#?*c.a.
+#?.....
+#
+#; oplay_defend(a,b,c,b) && !attack(A)
+#> replace(a,*)
 
 
 ###############

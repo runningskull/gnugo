@@ -547,6 +547,14 @@ OXxx
 
 :8,A
 
+OAbx
+.cdx
+..,x
+----
+
+;lib(A)>3 || (!legal_omove(b))
+;|| (lib(A)>2 && (olib(b) <= 2 || oplay_attack_either(c,d,b,b,c)))
+
 
 Pattern Barrier38
 
@@ -925,6 +933,25 @@ Oab.
 ----
 
 ;!oplay_attack(a,b,c,c)
+
+
+Pattern Barrier65
+# ab New (3.3.10)
+
+?O.
+X,.
+x,.
+---
+
+:8,OD
+
+?O.
+Ca.
+xb.
+---
+
+;oplay_attack(a,b,C)
+
 
 
 Pattern Intrusion1
@@ -1435,6 +1462,12 @@ Q!!
 
 :8,B,value(30)
 
+ba.
+Q!!
+---
+
+>return (!xplay_attack(a,b));
+
 
 Pattern Intrusion25
 
@@ -1943,6 +1976,24 @@ Xa.
 QB!
 
 ;!oplay_defend(a,B)
+
+
+Pattern Intrusion54
+# ab New pattern (3.3.10)
+# X cannot play double hane.
+
+..X?
+.XQo
+!.oo
+
+:8,B,value(40)
+
+.fH?
+gXQb
+edac
+
+;(o_somewhere(a) || o_somewhere(b) || o_somewhere(c))
+;&& (o_somewhere(a) || oplay_attack(d,a,a)) && oplay_attack(f,g,H)
 
 
 Pattern Nonterritory1

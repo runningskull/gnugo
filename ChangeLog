@@ -29,6 +29,7 @@
 - new function is_false_eye() in optics.c
 - new autohelper functions o_captures_something(),
   x_captures_something(), false_eye_territory(), and false_eye()
+- owl_tuning
 - influence tuning
 - tuning
 - new game records and regression tests
