@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- target sgf_properties.h not built by default
 - bugfixes in defend2(), special_rescue(), and special_rescue2()
 - MAX_INTRUSIONS doubled in size
 - intrusions beyond MAX_INTRUSION silently discarded
