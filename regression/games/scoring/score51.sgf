@@ -1,0 +1,45 @@
+(;GM[1]FF[4]
+SZ[19]HA[0]KM[0.5]
+PW[GnuGo (GNU Go 3.1.25)]WR[13k*]
+PB[pentacles]BR[30k]
+PC[NNGS]DT[2002-02-18]AP[gnugoclient:2.0]
+RE[B+75.5]
+;B[pc];W[dp];B[pp];W[dd];B[qi];W[md];B[pe];W[jd];B[df];W[fd];B[dn]
+;W[fp];B[ej];W[qn];B[np];W[rp];B[qq];W[qk];B[jq];W[hp];B[jo];W[hq]
+;B[cp];W[cq];B[co];W[bq];B[cl];W[ce];B[cf];W[bf];B[bg];W[be];B[ch]
+;W[rj];B[ri];W[ir];B[jr];W[rq];B[rr];W[an];B[bn];W[ff];B[nc];W[fh]
+;B[lb];W[ao];B[ap];W[bp];B[am];W[bo];B[bm];W[gi];B[nf];W[lh];B[lf]
+;W[nh];B[pg];W[kh];B[ke];W[kd];B[if];W[hd];B[qj];W[rk];B[ih];W[gm]
+;B[on];W[im]C[L:8];B[jj];W[si]C[L:9];B[sh];W[ji]C[L:5];B[ii];W[sj]
+C[L:6];B[rg];W[mk]C[L:7];B[km];W[kj]C[L:8];B[ij];W[mm]C[L:9];B[kk]
+;W[lk]C[L:6];B[jh];W[om]C[L:7];B[pm];W[ol]C[L:5];B[qm];W[rm]C[L:4]
+;B[rn];W[ro];B[rl];W[sn]C[L:2];B[pk];W[ql]C[L:3];B[pl];W[sl];B[nj]
+;W[kl]C[L:2];B[jk];W[nn]C[L:1];B[oo];W[mj]C[L:0];B[nk];W[nl];B[jl]
+;W[ll]C[L:1];B[lm];W[ln]C[L:2];B[mo];W[mg];B[mf];W[mn]C[L:3];B[ki]
+;W[li];B[ni];W[jm]C[L:4];B[kn];W[ld]C[L:5];B[lo];W[js]C[L:6];B[ks]
+;W[is]C[L:7];B[lr];W[jb]C[L:8];B[mi];W[sr]C[L:9];B[rs];W[pn]C[L:8]
+;B[ok];W[kb];B[mb];W[jn]C[L:9];B[ko];W[io]C[L:8];B[do];W[eo];B[en]
+;W[fn]C[L:9];B[fl];W[hg]C[L:8];B[jf];W[fm]C[L:9];B[el];W[qp];B[pq]
+;W[hh]C[L:10];B[eg];W[fg]C[L:9];B[nd];W[ag]C[L:10];B[ah];W[af];B[eh]
+;W[ei];B[di];W[fi];B[iq];W[hr];B[hl];W[il];B[hm];W[ik];B[hk];W[in]
+;B[go];W[hn]C[L:5];B[fo];W[ep]C[L:6];B[ip];W[hj]C[L:7];B[gl];W[gn]
+C[L:8];B[em];W[ho]C[L:9];B[fj];W[gj]C[L:8];B[hf];W[ig];B[jg];W[la]
+C[L:9];B[ma];W[ka]C[L:10];B[ge];W[fe];B[gd];W[hc]C[L:8];B[gc];W[fc]
+C[L:9];B[gb];W[hb]C[L:10];B[da];W[cb];B[ca];W[db];B[ea];W[eb];B[ba]
+;W[bb];B[fb];W[gf];B[he];W[ie];B[ic];W[ib];B[de];W[je];B[bc];W[ab]
+;B[bd];W[cd];B[ee];W[ed];B[cc];W[gk];B[po];W[qo]C[L:9];B[fk];W[le]
+C[L:10];B[kf];W[me];B[ne];W[ha];B[lc];W[kc];B[mc];W[hi];B[ef];W[aa]
+;B[fa];W[ga];B[qr];W[sq];B[ss];W[]
+C[J17 removed
+B17 removed
+G5 removed
+A4 removed
+O12 removed
+N13 removed
+M12 removed
+L10 removed
+N9 removed
+P8 removed
+N6 removed
+final_score: B+75.5]
+)

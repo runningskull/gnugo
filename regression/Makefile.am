@@ -11,7 +11,7 @@ TST = life.tst owl.tst optics.tst reading.tst strategy.tst \
       owl_rot.tst score_rot.tst strategy_rot.tst connect_rot.tst \
       reading_rot.tst arend.tst \
       trevora.tst trevorb.tst trevorc.tst trevord.tst semeai.tst 13x13.tst \
-      nngs.tst lazarus.tst nngs1.tst
+      nngs.tst lazarus.tst nngs1.tst score2.tst
 
 noinst_SCRIPTS = eval.sh regress.sh test.sh
 
@@ -145,6 +145,9 @@ score_rot: score_rot.tst
 
 newscore: newscore.tst
 	$(srcdir)/eval.sh newscore.tst
+
+score2: score2.tst
+	$(srcdir)/eval.sh score2.tst
 
 nicklas: nicklas1.tst nicklas2.tst nicklas3.tst nicklas4.tst nicklas5.tst
 	$(srcdir)/eval.sh nicklas1.tst
