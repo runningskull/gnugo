@@ -1279,28 +1279,24 @@ do_find_defense(int str, int *move, int komaster, int kom_pos)
 }
 
 
-/* Called by the defendN functions.
- * Don't think too much if there's an easy way to get enough liberties
+/* Called by the defendN functions.  Don't think too much if there's
+ * an easy way to get enough liberties.
  */
-
 static int
 fast_defense(int str, int liberties, int *libs, int *move)
 {
   int color = board[str];
   int k;
-  int newlibs;
+  int goal_liberties = (stackp < fourlib_depth ? 5 : 4);
 
   ASSERT1(libs != NULL, str);
   ASSERT1(move != NULL, str);
 
   for (k = 0; k < liberties; k++) {
-    /* accuratelib() to be seems more effective than fastlib() here.
-     * (probably because it catches more cases). And since 5 liberties
-     * is enough for our purpose, no need to ask for more.
+    /* accuratelib() seems to be more efficient than fastlib() here,
+     * probably because it catches more cases.
      */
-    newlibs = accuratelib(libs[k], color, 5, NULL);
-    if (newlibs > 4
-	|| (newlibs == 4 && stackp > fourlib_depth)) {
+    if (accuratelib(libs[k], color, goal_liberties, NULL) >= goal_liberties) {
       *move = libs[k];
       return 1;
     }
