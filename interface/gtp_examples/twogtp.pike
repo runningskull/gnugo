@@ -289,20 +289,25 @@ class GtpServer {
 
 
   array(string)
-  set_handicap(int handicap, string handicap_mode, GtpServer opponent)
+  set_handicap(int handicap, string handicap_mode,
+	       GtpServer opponent, GtpServer arbiter)
   {
     if (handicap == 0)
       return ({});
 
     if (handicap_mode == "free") {
       array(string) stones = place_free_handicap(handicap);
-      if (opponent)
-	opponent->set_free_handicap(stones);
+      opponent->set_free_handicap(stones);
+      if (arbiter)
+	arbiter->set_free_handicap(stones);
+
       return stones;
     }
     else {
-      if (opponent)
-	opponent->fixed_handicap(handicap);
+      opponent->fixed_handicap(handicap);
+      if (arbiter)
+	arbiter->fixed_handicap(handicap);
+
       return fixed_handicap(handicap);
     }
   }
@@ -588,7 +593,7 @@ class GtpServer {
   final_score()
   {
     array answer = send_command("final_score");
-    return answer[0] ? "" : answer[1];
+    return answer[0] ? "?" : answer[1];
   }
 
 
@@ -628,6 +633,7 @@ class GtpServer {
 class GtpGame {
   private GtpServer white;
   private GtpServer black;
+  private GtpServer arbiter;
   private int verbose;
   private int black_to_play;
   private string sgf_header;
@@ -637,6 +643,7 @@ class GtpGame {
 
   void
   create(string command_line_white, string command_line_black,
+	 string command_line_arbiter,
 	 array(string) statistics_white, array(string) statistics_black,
 	 array(string) reset_white, array(string) reset_black,
 	 int _totals_only, int _verbose,
@@ -649,9 +656,16 @@ class GtpGame {
     if (white) {
       black = GtpServer(command_line_black, statistics_black, reset_black,
 			"black", main_time, byo_yomi_time, byo_yomi_stones);
+
+      if (black && command_line_arbiter != "") {
+	arbiter = GtpServer(command_line_arbiter, ({}), ({}), "arbiter",
+			    -1.0, 0.0, 0);
+      }
+      else
+	arbiter = UNDEFINED;
     }
 
-    if (!white || !black)
+    if (!white || !black || (command_line_arbiter != "" && !arbiter))
       destruct(this_object());
   }
 
@@ -673,10 +687,17 @@ class GtpGame {
   {
     white->set_board_size(board_size);
     black->set_board_size(board_size);
-    array(string) stones = black->set_handicap(handicap, handicap_mode, white);
+    if (arbiter)
+      arbiter->set_board_size(board_size);
+
+    array(string) stones = black->set_handicap(handicap, handicap_mode,
+					       white, arbiter);
     stones = map(stones, black->move_to_sgf_notation);
+
     white->set_komi(komi);
     black->set_komi(komi);
+    if (arbiter)
+      arbiter->set_komi(komi);
 
     black_to_play = (handicap == 0);
     sgf_header = sprintf("(;\nGM[1]FF[4]\nSZ[%d]HA[%d]KM[%.1f]\n",
@@ -690,6 +711,7 @@ class GtpGame {
   play(string|int sgf_file_name)
   {
     array(string) sgf_moves = ({});
+    array(array(string)) move_history = ({});
     string special_win = "";
     GtpServer player;
     GtpServer opponent;
@@ -729,6 +751,8 @@ class GtpGame {
 	opponent->play(player->color, move);
 	sgf_moves += ({ sprintf("%c%s", player->capitalized_color[0],
 				player->move_to_sgf_notation(move)) });
+	if (arbiter)
+	  move_history += ({ ({ player->color, move }) });
 
 	if (move_lower_case == "pass") {
 	  if (verbose)
@@ -774,16 +798,30 @@ class GtpGame {
 
       white->restart_if_crashed();
       black->restart_if_crashed();
+      if (arbiter)
+	arbiter->restart_if_crashed();
     }
     else {
       if (special_win == "") {
 	result = ({ white->final_score(), black->final_score() });
-	if (result[0] == result[1])
+
+	if (result[1] == "?" || result[0] == result[1])
 	  result = ({ result[0] });
+	else if (result[0] == "?")
+	  result = ({ result[1] });
 
 	territory = player->get_territory_as_sgf();
 	if (territory == ({}))
 	  territory = opponent->get_territory_as_sgf();
+
+	if (arbiter && (sizeof(result) == 2 || result[0] == "?")) {
+	  foreach (move_history, array(string) move)
+	    arbiter->play(move[0], move[1]);
+	  result = ({ arbiter->final_score() });
+
+	  if (territory == ({}))
+	    territory = arbiter->get_territory_as_sgf();
+	}
       }
       else
 	result = ({ special_win });
@@ -818,8 +856,11 @@ class GtpGame {
     int load_up_to = max(sizeof(moves) - endgame_moves + 1, 1);
     array white_answer = white->load_sgf(endgame_file_name, load_up_to);
     array black_answer = black->load_sgf(endgame_file_name, load_up_to);
+    array arbiter_answer = (arbiter
+			    ? arbiter->load_sgf(endgame_file_name, load_up_to)
+			    : ({0}));
 
-    if (white_answer[0] || black_answer[0]) {
+    if (white_answer[0] || black_answer[0] || arbiter_answer[0]) {
       werror("File `%s' might be corrupt. Engines refuse to load it.\n",
 	     endgame_file_name);
       return 0;
@@ -832,12 +873,15 @@ class GtpGame {
     array(array(string)) stones = white->get_position_as_sgf();
     if (!stones)
       stones = black->get_position_as_sgf();
+    if (!stones && arbiter)
+      stones = arbiter->get_position_as_sgf();
     if (!stones) {
       stones = ({ ({}), ({}) });
       moves = moves[..load_up_to - 2];
       foreach (moves, string move)
 	stones[move[0] == 'B'] += ({ move[1..] });
     }
+
     sgf_header += list_sgf_positions(stones, ({ "AW", "AB" }));
 
     white->set_random_seed(0);
@@ -854,6 +898,9 @@ class GtpGame {
     swap_engines();
     white->load_sgf(endgame_file_name, load_up_to);
     array black_answer = black->load_sgf(endgame_file_name, load_up_to);
+
+    if (arbiter)
+      arbiter->load_sgf(endgame_file_name, load_up_to);
 
     white->set_random_seed(0);
     black->set_random_seed(0);
@@ -1112,6 +1159,8 @@ string help_message =
   "Options:\n"
   "  -w, --white=COMMAND_LINE\n"
   "  -b, --black=COMMAND_LINE      command lines to run the two engines with.\n\n"
+  "  -A, --arbiter=COMMAND_LINE    command line to run arbiter--program that will\n"
+  "                                score disputed games--with.\n"
   "      --help                    display this help and exit.\n"
   "      --help-statistics         display help on statistics options and exit.\n"
   "  -v, --verbose=LEVEL           1 - print moves, 2 and higher - draw boards.\n"
@@ -1195,6 +1244,8 @@ main(int argc, array(string) argv)
     werror("Black player is not specified.\n" + hint);
     return 1;
   }
+
+  string arbiter = Getopt.find_option(argv, "A", "arbiter", UNDEFINED, "");
 
   int verbose = (int) Getopt.find_option(argv, "v", "verbose",
 					 UNDEFINED, "0");
@@ -1339,7 +1390,8 @@ main(int argc, array(string) argv)
     }
 
 
-    GtpGame game = GtpGame(white, black, statistics_white, statistics_black,
+    GtpGame game = GtpGame(white, black, arbiter,
+			   statistics_white, statistics_black,
 			   reset_white, reset_black, totals_only,
 			   verbose, main_time, byo_yomi_time, byo_yomi_stones);
     if (game) {
@@ -1354,7 +1406,8 @@ main(int argc, array(string) argv)
       return 1;
     }
 
-    GtpGame game = GtpGame(white, black, statistics_white, statistics_black,
+    GtpGame game = GtpGame(white, black, arbiter,
+			   statistics_white, statistics_black,
 			   reset_white, reset_black, totals_only,
 			   verbose, main_time, byo_yomi_time, byo_yomi_stones);
     if (game) {
