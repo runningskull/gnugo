@@ -2946,6 +2946,9 @@ block_off(int str, char goal[BOARDMAX], int *move)
   int tactical_nodes;
   Hash_data goal_hash = goal_to_hashvalue(goal);
   
+  break_in_node_limit = connection_node_limit / 5;
+  break_in_depth = connect_depth2 - 5;
+
   if (move == NULL)
     move = &dummy_move;
   

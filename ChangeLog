@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfixes in breakin.c and block_off()
 - new helper functions goal_to_hashvalue(), xor_hashvalues()
 - new function get_read_result_hash_modified to enable calling functions
   to use a modified hash value when storing/looking up results in cache

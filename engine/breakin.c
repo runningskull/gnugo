@@ -242,7 +242,7 @@ break_territories(int color_to_move, struct influence_data *q, int store)
 	  size++;
       }
     if (size < 10)
-      return;
+      continue;
 
     if (color_to_move == OTHER_COLOR(territories.owner[k]))
       enlarge_goal(goal);
@@ -259,7 +259,9 @@ clear_break_in_list()
 /* The blocking moves should usually already have a move reason.
  *
  * The EXPAND_TERRITORY move reason ensures a territory evaluation of
- * this move, without setting the move.safety field.
+ * this move, without setting the move.safety field. (I.e. the move will
+ * be treated as a sacrifice move unless another move reasons tells us
+ * otherwise.)
  */
 void
 break_in_move_reasons(int color)
