@@ -44,61 +44,57 @@ static void tt_clear(Transposition_table *table);
 /* The transposition table itself. */
 Transposition_table ttable;
 
+
+#define INIT_ARRAY(a) \
+  hash_init_zobrist_array(a, (int) (sizeof(a) / sizeof(a[0])))
+
+/* Arrays with random numbers for Zobrist hashing of input data (other
+ * than the board position). If you add an array here, do not forget
+ * to also initialize it in keyhash_init() below.
+ */
 static Hash_data komaster_hash[NUM_KOMASTER_STATES];
 static Hash_data kom_pos_hash[BOARDMAX];
 static Hash_data target1_hash[BOARDMAX];
 static Hash_data target2_hash[BOARDMAX];
 static Hash_data routine_hash[NUM_CACHE_ROUTINES];
 
-static struct init_struct {
-  Hash_data *array;
-  int array_size;
-} hash_init_values[] = {
-  {komaster_hash, NUM_KOMASTER_STATES},
-  {kom_pos_hash,  BOARDMAX},
-  {target1_hash,  BOARDMAX},
-  {target2_hash,  BOARDMAX},
-  {routine_hash,  NUM_CACHE_ROUTINES},
-  {NULL,          0}
-};
-
-/* Initialize random hash values identifying input data (other than the
- * board position) in a cache entry.
- */
 static void
 keyhash_init(void)
 {
   static int is_initialized = 0;
-  Hash_data *array;
-  int size;
-  int i;
-  int j;
-
-  if (is_initialized)
-    return;
   
-  for (i = 0; hash_init_values[i].array != NULL; i++) {
-    array = hash_init_values[i].array;
-    size  = hash_init_values[i].array_size;
-
-    for (j = 0; j < size; j++)
-      hashdata_init(array[j], gg_urand(), gg_urand()); 
+  if (!is_initialized) {
+    struct gg_rand_state state;
+    /* Since the hash initialization consumes a varying number of random
+     * numbers depending on the size of the Hash_data struct, we save the
+     * state of the random generator now and restore it afterwards.
+     */
+    gg_get_rand_state(&state);
+    
+    INIT_ARRAY(komaster_hash);
+    INIT_ARRAY(kom_pos_hash);
+    INIT_ARRAY(target1_hash);
+    INIT_ARRAY(target2_hash);
+    INIT_ARRAY(routine_hash);
+    
+    gg_set_rand_state(&state);
+    is_initialized = 1;
   }
-
-  is_initialized = 1;
 }
 
 static void
-calculate_hashval_for_tt(int routine, int target1, int target2,
-			 Hash_data *hashdata2)
+calculate_hashval_for_tt(Hash_data *hashdata, int routine, int target1,
+			 int target2, Hash_data *extra_hash)
 { 
-  *hashdata2 = hashdata;                /* from globals.c */
-  hashdata_xor(*hashdata2, komaster_hash[get_komaster()]);
-  hashdata_xor(*hashdata2, kom_pos_hash[get_kom_pos()]);
-  hashdata_xor(*hashdata2, routine_hash[routine]);
-  hashdata_xor(*hashdata2, target1_hash[target1]);
+  *hashdata = board_hash;                /* from globals.c */
+  hashdata_xor(*hashdata, komaster_hash[get_komaster()]);
+  hashdata_xor(*hashdata, kom_pos_hash[get_kom_pos()]);
+  hashdata_xor(*hashdata, routine_hash[routine]);
+  hashdata_xor(*hashdata, target1_hash[target1]);
   if (target2 != NO_MOVE)
-    hashdata_xor(*hashdata2, target2_hash[target2]);
+    hashdata_xor(*hashdata, target2_hash[target2]);
+  if (extra_hash)
+    hashdata_xor(*hashdata, *extra_hash);
 }
 
 
@@ -134,16 +130,10 @@ tt_init(Transposition_table *table, int memsize)
 static void
 tt_clear(Transposition_table *table)
 {
-  Hashentry hash_null = {{hashdata_NULL, 0}, {hashdata_NULL, 0}};
-  unsigned int i;
- 
-  if (table->is_clean)
-    return;
-
-  for (i = 0; i < table->num_entries; i++)
-    table->entries[i] = hash_null;
-
-  table->is_clean = 1;
+  if (!table->is_clean) {
+    memset(table->entries, 0, table->num_entries * sizeof(table->entries[0]));
+    table->is_clean = 1;
+  }
 }
  
  
@@ -174,14 +164,12 @@ tt_get(Transposition_table *table,
   Hashentry *entry;
   Hashnode *node;
  
-  /* Get the combined hash value. */
-  calculate_hashval_for_tt(routine, target1, target2, &hashval);
-  if (extra_hash)
-    hashdata_xor(hashval, *extra_hash);
-
   /* Sanity check. */
   if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
     return 0;
+
+  /* Get the combined hash value. */
+  calculate_hashval_for_tt(&hashval, routine, target1, target2, extra_hash);
 
   /* Get the correct entry and node. */
   entry = &table->entries[hashdata_remainder(hashval, table->num_entries)];
@@ -192,7 +180,7 @@ tt_get(Transposition_table *table,
   else
     return 0;
 
-  stats.position_hits++;
+  stats.read_result_hits++;
 
   /* Return data.  Only set the result if remaining depth in the table
    * is big enough to be trusted.  The move can always be used for move
@@ -200,12 +188,12 @@ tt_get(Transposition_table *table,
    */
   if (move)
     *move = hn_get_move(node->data);
-  if ((unsigned) remaining_depth <= hn_get_remaining_depth(node->data)) {
+  if (remaining_depth <= (int) hn_get_remaining_depth(node->data)) {
     if (value1)
       *value1 = hn_get_value1(node->data);
     if (value2)
       *value2 = hn_get_value2(node->data);
-    stats.read_result_hits++;
+    stats.trusted_read_result_hits++;
     return 2;
   }
 
@@ -218,9 +206,8 @@ tt_get(Transposition_table *table,
 
 void
 tt_update(Transposition_table *table,
-	  enum routine_id routine, int target1, int target2, 
-	  int remaining_depth,
-	  Hash_data *extra_hash, 
+	  enum routine_id routine, int target1, int target2,
+	  int remaining_depth, Hash_data *extra_hash, 
 	  int value1, int value2, int move)
 {
   Hash_data hashval;
@@ -228,19 +215,16 @@ tt_update(Transposition_table *table,
   Hashnode *deepest;
   Hashnode *newest;
   unsigned int data;
-  /* Get routine costs definitions from cache.h. */
+  /* Get routine costs definitions from liberty.h. */
   static const int routine_costs[] = { ROUTINE_COSTS };
   gg_assert(routine_costs[NUM_CACHE_ROUTINES] == -1);
-
-  /* Get the combined hash value. */
-  calculate_hashval_for_tt(routine, target1, target2,
-			   &hashval);
-  if (extra_hash)
-    hashdata_xor(hashval, *extra_hash);
 
   /* Sanity check. */
   if (remaining_depth < 0 || remaining_depth > HN_MAX_REMAINING_DEPTH)
     return;
+
+  /* Get the combined hash value. */
+  calculate_hashval_for_tt(&hashval, routine, target1, target2, extra_hash);
 
   data = hn_create_data(remaining_depth, value1, value2, move,
       		        routine_costs[routine]);
@@ -252,14 +236,14 @@ tt_update(Transposition_table *table,
  
   /* See if we found an already existing node. */
   if (hashdata_is_equal(hashval, deepest->key)
-      && (unsigned) remaining_depth >= hn_get_remaining_depth(deepest->data)) {
+      && remaining_depth >= (int) hn_get_remaining_depth(deepest->data)) {
 
     /* Found deepest */
     deepest->data = data;
 
   }
   else if (hashdata_is_equal(hashval, newest->key)
-           && (unsigned) remaining_depth >= hn_get_remaining_depth(newest->data)) {
+           && remaining_depth >= (int) hn_get_remaining_depth(newest->data)) {
 
     /* Found newest */
     newest->data = data;
@@ -287,7 +271,7 @@ tt_update(Transposition_table *table,
     newest->data = data;
   }
 
-  stats.position_entered++;
+  stats.read_result_entered++;
   table->is_clean = 0;
 }
 

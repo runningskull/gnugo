@@ -44,10 +44,10 @@
 static int is_initialized = 0;
 
 
-/* Random values for the hash function.  For stones and ko position. */
-static Hashvalue white_hash[BOARDMAX][NUM_HASHVALUES];	
-static Hashvalue black_hash[BOARDMAX][NUM_HASHVALUES];	
-static Hashvalue ko_hash[BOARDMAX][NUM_HASHVALUES];
+/* Random values for the board hash function. For stones and ko position. */
+static Hash_data white_hash[BOARDMAX];
+static Hash_data black_hash[BOARDMAX];
+static Hash_data ko_hash[BOARDMAX];
 
 
 /* Get a random Hashvalue, where all bits are used. */
@@ -63,36 +63,37 @@ hash_rand(void)
   return h;
 }
 
+/* Fill an array with random numbers for Zobrist hashing. */
+void
+hash_init_zobrist_array(Hash_data *array, int size)
+{
+  int i, j;
+  for (i = 0; i < size; i++)
+    for (j = 0; j < NUM_HASHVALUES; j++)
+      array[i].hashval[j] = hash_rand();
+}
 
 /*
- * Initialize the entire hash system.
+ * Initialize the board hash system.
  */
 
 void
 hash_init(void)
 {
-  int pos;
-  int i;
   struct gg_rand_state state;
 
   if (is_initialized)
     return;
   
   /* Since the hash initialization consumes a varying number of random
-   * numbers depending on the size of the Hashvalue type, we save the
+   * numbers depending on the size of the Hash_data struct, we save the
    * state of the random generator now and restore it afterwards.
    */
   gg_get_rand_state(&state);
-  
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-      /* Note: We initialize _all_ positions, not just those on board.
-       * This way we don't have to worry about changing board sizes.
-       */
-      black_hash[pos][i] = hash_rand();
-      white_hash[pos][i] = hash_rand();
-      ko_hash[pos][i]    = hash_rand();
-    }
+
+  hash_init_zobrist_array(black_hash, BOARDMAX);
+  hash_init_zobrist_array(white_hash, BOARDMAX);
+  hash_init_zobrist_array(ko_hash, BOARDMAX);
 
   gg_set_rand_state(&state);
   
@@ -117,19 +118,14 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
     target->hashval[i] = 0;
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
-    if (board[pos] == WHITE) {
-      for (i = 0; i < NUM_HASHVALUES; i++)
-	target->hashval[i] ^= white_hash[pos][i];
-    }
-    else if (board[pos] == BLACK) {
-      for (i = 0; i < NUM_HASHVALUES; i++)
-	target->hashval[i] ^= black_hash[pos][i];
-    }
+    if (p[pos] == WHITE)
+      hashdata_xor(*target, white_hash[pos]);
+    else if (p[pos] == BLACK)
+      hashdata_xor(*target, black_hash[pos]);
   }
 
   if (ko_pos != 0)
-    for (i = 0; i < NUM_HASHVALUES; i++)
-      target->hashval[i] ^= ko_hash[ko_pos][i];
+    hashdata_xor(*target, ko_hash[ko_pos]);
 }
 
 
@@ -140,11 +136,8 @@ hashdata_recalc(Hash_data *target, Intersection *p, int ko_pos)
 void
 hashdata_invert_ko(Hash_data *hd, int pos)
 {
-  int i;
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    hd->hashval[i] ^= ko_hash[pos][i];
+  hashdata_xor(*hd, ko_hash[pos]);
 }
-
 
 
 /*
@@ -154,35 +147,18 @@ hashdata_invert_ko(Hash_data *hd, int pos)
 void
 hashdata_invert_stone(Hash_data *hd, int pos, int color)
 {
-  int k;
-
-  if (color == BLACK) {
-    for (k = 0; k < NUM_HASHVALUES; k++)
-      hd->hashval[k] ^= black_hash[pos][k];
-  }
-  else if (color == WHITE) {
-    for (k = 0; k < NUM_HASHVALUES; k++)
-      hd->hashval[k] ^= white_hash[pos][k];
-  }
+  if (color == BLACK)
+    hashdata_xor(*hd, black_hash[pos]);
+  else if (color == WHITE)
+    hashdata_xor(*hd, white_hash[pos]);
 }
 
 
-int
-hashdata_compare(Hash_data *hd1, Hash_data *hd2)
-{
-  int rc = 0;
-  int i;
-
-  for (i = 0; i < NUM_HASHVALUES; i++)
-    if (hd1->hashval[i] != hd2->hashval[i]) 
-      rc = 2;
-  if (rc == 2 && i > 0)
-    stats.hash_collisions++;
-
-  return rc;
-}
-
-/* Compute hash value to identify the goal area. */
+/* Compute hash value to identify the goal area.
+ *
+ * FIXME: It would be cleaner to have a separate zobrist array for the
+ *        goal and xor the values in goal as usual.
+ */
 Hash_data
 goal_to_hashvalue(const char *goal)
 {
@@ -195,7 +171,8 @@ goal_to_hashvalue(const char *goal)
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
     if (ON_BOARD(pos) && goal[pos])
       for (i = 0; i < NUM_HASHVALUES; i++) 
-	return_value.hashval[i] += white_hash[pos][i] + black_hash[pos][i];
+	return_value.hashval[i] += (white_hash[pos].hashval[i]
+				    + black_hash[pos].hashval[i]);
   
   return return_value;
 }
@@ -217,6 +194,19 @@ hashdata_to_string(Hash_data *hashdata)
 
   return buffer;
 }
+
+#if NUM_HASHVALUES > 2
+int
+hashdata_is_equal_func(Hash_data *hd1, Hash_data *hd2)
+{
+  int i;
+  for (i = 0; i < NUM_HASHVALUES; i++)
+    if (hd1->hashval[i] != hd2->hashval[i])
+      return 0;
+
+  return 1;
+}
+#endif
 
 
 /*

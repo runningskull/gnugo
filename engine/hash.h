@@ -24,7 +24,6 @@
 #define _HASH_H_
 
 #include "config.h"
-#include "board.h"
 #include <limits.h>
 
 /*
@@ -79,18 +78,16 @@ typedef struct {
   Hashvalue hashval[NUM_HASHVALUES];
 } Hash_data;
 
-extern Hash_data hashdata;
+extern Hash_data board_hash;
 
 Hash_data goal_to_hashvalue(const char *goal);
 
+void hash_init_zobrist_array(Hash_data *array, int size);
 void hash_init(void);
 
 void hashdata_recalc(Hash_data *hd, Intersection *board, int ko_pos);
-int  hashdata_compare(Hash_data *hd1, Hash_data *hd2);
 void hashdata_invert_ko(Hash_data *hd, int pos);
 void hashdata_invert_stone(Hash_data *hd, int pos, int color);
-
-int hashdata_diff_dump(Hash_data *key1, Hash_data *key2);
 
 char *hashdata_to_string(Hash_data *hashdata);
 
@@ -98,64 +95,48 @@ char *hashdata_to_string(Hash_data *hashdata);
 
 /* ---------------------------------------------------------------- */
 
+/* There is no need to involve all bits in the remainder computation
+ * as long as we only use it to compute a key into a hash table. 32
+ * random bits are sufficient to get an even distribution within any
+ * hashtable of reasonable size. By never using more than 32 bits we
+ * also reduce the platform dependency of the GNU Go engine.
+*/
+#define hashdata_remainder(hd, num) \
+  (((hd).hashval[0] & 0xffffffffU) % (num))
 
 #if NUM_HASHVALUES == 1
-
-#define hashdata_NULL  {{0}}
-#define hashdata_clear(hd) \
-   do { \
-    (hd).hashval[0] = 0; \
-   } while (0)
-#define hashdata_init(hd, uint1, uint2) \
-   do { \
-    (hd).hashval[0] = (((Hashvalue) uint1) << 32 | (uint2)); \
-   } while (0)
 
 #define hashdata_is_equal(hd1, hd2) \
    ((hd1).hashval[0] == (hd2).hashval[0])
 
 #define hashdata_xor(hd1, hd2) \
-   do { \
-    (hd1).hashval[0] ^= (hd2).hashval[0]; \
-   } while (0)
-
-#define hashdata_remainder(hd, num) \
-  ((hd).hashval[0] % (num))
+    (hd1).hashval[0] ^= (hd2).hashval[0]
 
 #elif NUM_HASHVALUES == 2
-
-#define hashdata_NULL  {{0, 0}}
-#define hashdata_clear(hd) \
-   do { \
-    (hd).hashval[0] = 0; \
-    (hd).hashval[1] = 0; \
-   } while (0)
-#define hashdata_init(hd, uint1, uint2) \
-   do { \
-    (hd).hashval[0] = (uint1); \
-    (hd).hashval[1] = (uint2); \
-   } while (0)
 
 #define hashdata_is_equal(hd1, hd2) \
    ((hd1).hashval[0] == (hd2).hashval[0] \
     && (hd1).hashval[1] == (hd2).hashval[1])
+
 #define hashdata_xor(hd1, hd2) \
    do { \
     (hd1).hashval[0] ^= (hd2).hashval[0]; \
     (hd1).hashval[1] ^= (hd2).hashval[1]; \
    } while (0)
 
-/* This is only an approximation. 
- * The real remainder can be calculated by 
- *     (ax+y)%z = (a%z)(x%z)+(y%z)
- * but this is good enough for use in the cache.
- */
-#define hashdata_remainder(hd, num) \
-  (((hd).hashval[0] + (hd).hashval[1]) % (num))
-
 #else
 
-#error NUM_HASHVALUES > 2 not implemented yet
+int hashdata_is_equal_func(Hash_data *hd1, Hash_data *hd2);
+
+#define hashdata_is_equal(hd1, hd2) \
+  hashdata_is_equal_func(&(hd1), &(hd2))
+
+#define hashdata_xor(hd1, hd2) \
+   do { \
+    int i; \
+    for (i = 0; i < NUM_HASHVALUES; i++) \
+      (hd1).hashval[i] ^= (hd2).hashval[i]; \
+   } while (0)
 
 #endif
 

@@ -102,12 +102,11 @@ play_solo(Gameinfo *gameinfo, int moves)
 	      movenum, i, j);
     }
 
-    totalstats.nodes               += stats.nodes;
-    totalstats.position_entered    += stats.position_entered;
-    totalstats.position_hits       += stats.position_hits;
-    totalstats.read_result_entered += stats.read_result_entered;
-    totalstats.hash_collisions     += stats.hash_collisions;
-    total_owl_count                += get_owl_node_counter();
+    totalstats.nodes                    += stats.nodes;
+    totalstats.read_result_entered      += stats.read_result_entered;
+    totalstats.read_result_hits         += stats.read_result_hits;
+    totalstats.trusted_read_result_hits += stats.trusted_read_result_hits;
+    total_owl_count                     += get_owl_node_counter();
   }
   t2 = gg_cputime();
   
@@ -120,22 +119,16 @@ play_solo(Gameinfo *gameinfo, int moves)
   }
   sgffile_output(&sgftree);
 
-#if 0
-  if (t2 == t1)
-    printf("%.3f moves played\n", (double) (save_moves-moves));
-  else
-    printf("%.3f moves/sec\n", (save_moves-moves)/(t2-t1));
-#else
   printf("%10d moves played in %0.3f seconds\n", save_moves-moves, t2-t1);
   if (save_moves != moves)
     printf("%10.3f seconds/move\n", (t2-t1)/(save_moves-moves));
+  
   printf("%10d nodes\n", totalstats.nodes);
-  printf("%10d positions entered\n", totalstats.position_entered);
-  printf("%10d position hits\n", totalstats.position_hits);
   printf("%10d read results entered\n", totalstats.read_result_entered);
-  printf("%10d hash collisions\n", totalstats.hash_collisions);
+  printf("%10d read result hits\n", totalstats.read_result_hits);
+  printf("%10d trusted read result hits\n",
+	 totalstats.trusted_read_result_hits);
   printf("%10d owl nodes\n", total_owl_count);
-#endif
 }
 
 

@@ -104,11 +104,17 @@ enum routine_id {
 
 /* To prioritize between different types of reading, we give a cost
  * ranking to each of the routines above:
- * 3 for owl, 2 for break-in, 1 for connection, 0 for tactical reading.
+ *
+ * 4 semeai
+ * 3 owl
+ * 2 break-in
+ * 1 connection
+ * 0 tactical reading
+ *
  * -1 is left at the end for a consistency check.
  */
 #define ROUTINE_COSTS \
-  3, 3, 3, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, -1
+  3, 3, 4, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, -1
   
 
 const char *routine_id_to_string(enum routine_id routine);

@@ -361,11 +361,10 @@ void sgffile_enddump(const char *filename);
 /* Hashing and Caching statistics. */
 struct stats_data {
   int nodes;                     /* Number of visited nodes while reading */
-  int position_entered;          /* Number of Positions entered. */
-  int position_hits;             /* Number of hits of Positions. */
-  int read_result_entered;       /* Number of Read_results entered. */
-  int read_result_hits;          /* Number of hits of Read_results. */
-  int hash_collisions;           /* Number of hash collisions. */
+  int read_result_entered;       /* Number of read results entered. */
+  int read_result_hits;          /* Number of hits of read results. */
+  int trusted_read_result_hits;  /* Number of hits of read results   */
+                                 /* with sufficient remaining depth. */
 };
 
 extern struct stats_data stats;

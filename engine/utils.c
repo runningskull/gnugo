@@ -2319,23 +2319,19 @@ time_report(int n, const char *occupation, int move, double mintime)
 void
 clearstats()
 {
-  stats.nodes = 0;
-  stats.position_entered    = 0;
-  stats.position_hits       = 0;
-  stats.read_result_entered = 0;
-  stats.read_result_hits    = 0;
-  stats.hash_collisions     = 0;
+  stats.nodes                    = 0;
+  stats.read_result_entered      = 0;
+  stats.read_result_hits         = 0;
+  stats.trusted_read_result_hits = 0;
 }
   
 void
 showstats()
 {
-  gprintf("Nodes:                %d\n", stats.nodes);
-  gprintf("Positions entered:    %d\n", stats.position_entered);
-  gprintf("Position hits:        %d\n", stats.position_hits);
-  gprintf("Read results entered: %d\n", stats.read_result_entered);
-  gprintf("Read result hits:     %d\n", stats.read_result_hits);
-  gprintf("Hash collisions:      %d\n", stats.hash_collisions);
+  gprintf("Nodes:                    %d\n", stats.nodes);
+  gprintf("Read results entered:     %d\n", stats.read_result_entered);
+  gprintf("Read result hits:         %d\n", stats.read_result_hits);
+  gprintf("Trusted read result hits: %d\n", stats.trusted_read_result_hits);
 }
 
 

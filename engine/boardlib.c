@@ -49,7 +49,7 @@ int allow_suicide = 0;  /* allow opponent to make suicide moves */
 Intersection shadow[BOARDMAX];
 
 /* Hashing of positions. */
-Hash_data hashdata;
+Hash_data board_hash;
 
 int stackp;             /* stack pointer */
 int position_number;    /* position number */

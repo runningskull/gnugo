@@ -42,6 +42,7 @@
  *   routine
  *   str1
  *   str2
+ *   extra hashvalue, optional (e.g. encoding a goal array)
  *
  * The data field packs into 32 bits the following
  * fields:
