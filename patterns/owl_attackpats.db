@@ -214,11 +214,9 @@ X.YO
 :8,-,value(60)
 
 
-# nn Removal candidate (3.3.13)
-#   Success rate in regressions : 2.88% (53/1786)
-
 Pattern A107
 # gf Not on second line without known support. See trevora:290. (3.1.15)
+# nn Added constraint (3.3.14)
 
 ....?	   block on third line
 Y.*.?
@@ -227,6 +225,15 @@ Y.*.?
 -----
 
 :8,-,value(50)
+
+#
+# ....?
+# a.*.b
+# ....?
+# ....?
+# -----
+# 
+# ; weak(a) || oarea(b)
 
 
 Pattern A108
@@ -4923,6 +4930,7 @@ o...|
 
 :8,-,value(55)
 
+
 #########################################################
 #                                                       #
 #               Ko patterns                             #
@@ -4994,6 +5002,8 @@ OXO
 
 
 Pattern A1504
+# nn New pattern (3.3.13)
+#   redundant, as long as A1107c isn't removed
 
 OXXXO         threaten to take an eye by ko
 .OX.X

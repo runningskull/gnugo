@@ -162,7 +162,7 @@ loadsgf games/owl02.sgf
 45  owl_attack B3
 #? [1 (E3|F1)]
 46 owl_defend B3
-#? [1 (F1|B1|D2|E3)]
+#? [1 (F1|B1|D2|E3|E1)]
 47  owl_attack F2
 #? [1 (E3|F1)]
 48 owl_defend F2

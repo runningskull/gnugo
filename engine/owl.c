@@ -5033,6 +5033,21 @@ owl_proper_eye(int pos)
   
 
 /* Used by autohelpers.
+ * Returns the effective size of the eyespace at pos.
+ */
+int
+owl_eye_size(int pos)
+{
+  int origin;
+  ASSERT_ON_BOARD1(pos);
+
+  origin = current_owl_data->my_eye[pos].origin;
+  return current_owl_data->my_eye[origin].esize
+	 - current_owl_data->my_eye[origin].msize;
+}
+  
+
+/* Used by autohelpers.
 
  * Returns 1 if (pos) is considered to be a strong dragon. This is
  * intended to be used to decide whether connecting to some external

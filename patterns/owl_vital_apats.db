@@ -172,6 +172,7 @@ AAO
 
 
 Pattern VA9
+# nn Modified constraint (3.3.14)
 
 X*           atari inside eyespace
 
@@ -180,6 +181,7 @@ X*           atari inside eyespace
 A*
 
 ;lib(A)==2 && olib(*)>1 && owl_big_eyespace(*)
+;&& (owl_eye_size(*) <= 8 || !oplay_attack(*,*))
 
 
 Pattern VA10
@@ -241,6 +243,9 @@ Pattern VA13
 
 ;lib(A)<=3 && oplay_attack(a,a)
 
+
+# nn Removal candidate (3.3.14)
+#   Success rate in regressions : 0% (0/131)
 
 Pattern VA14
 
@@ -743,6 +748,7 @@ XXXb
 Pattern VA44
 # tm New Pattern (3.1.17)
 # gf Fixed symmetry. (3.3.6)
+# nn Modified constraint (3.3.14)
 
 XoX
 o*o
@@ -755,6 +761,7 @@ a*c
 ; owl_proper_eye(*)
 ; && (owl_proper_eye(a) + owl_proper_eye(b) + owl_proper_eye(c) > 2)
 ; && safe_xmove(*)
+; && (owl_eye_size(*) <= 8 || !oplay_attack(*,*))
 
 
 Pattern VA45

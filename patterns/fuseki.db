@@ -2481,6 +2481,20 @@ oO.....*...
 :8,j
 
 
+Pattern J46
+# nn added 3.3.14
+
+------+            needed generalization of a hoshi.db pattern
+?.....|
+?.....|
+?.....|
+?.X...|
+...X..|
+.*XO..|
+..O...|
+......|
+
+:8,sFU
 
 
 # END OF FILE
