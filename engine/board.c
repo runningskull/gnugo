@@ -40,14 +40,9 @@
 #include "sgftree.h"
 #include "gg_utils.h"
 
-#define KOMASTER_SCHEME 5
-#define KOMASTER_TRACE 0
-
-static int tracing_inside_komaster = 0;
-
-
 /* This can be used for internal checks w/in board.c that should
- * typically not be necessary (for speed). */
+ * typically not be necessary (for speed).
+ */
 #if 1
 #define PARANOID1(x, pos) ASSERT1(x, pos)
 #else
@@ -469,34 +464,7 @@ static int move_color[MAXSTACK];
 static Hash_data hashdata_stack[MAXSTACK];
 static Hashvalue_ng hashval_ng_stack[MAXSTACK];
 
-
-/* KOMASTER_SCHEME 4 handles empty case differently from other schemes */
-static int
-komaster_is_empty(int komaster, int kom_pos)
-{
-  if (KOMASTER_SCHEME == 4)
-    return kom_pos == PASS_MOVE;
-  else
-    return komaster == EMPTY;
-}
-
-/* KOMASTER_SCHEME 4 handles komaster interpretation differently from 
- * other schemes */
-static const char *
-komaster_to_string(int komaster, int kom_pos)
-{
-#if KOMASTER_SCHEME == 4 
-  const char *b[4] = {"O-Illegal", "X-Illegal", "O-Legal", "X-Legal"};
-  ASSERT1(komaster >= 0 && komaster <= 3, 0);
-  if (kom_pos == PASS_MOVE) 
-    return "EMPTY";
-  return b[komaster];
-#else
-  UNUSED(kom_pos);
-  return color_to_string(komaster);
-#endif
-}
-
+static const char *komaster_to_string(int komaster);
 
 /*
  * trymove pushes the position onto the stack, and makes a move
@@ -531,22 +499,20 @@ trymove(int pos, int color, const char *message, int str,
       message = "UNKNOWN";
 
     if (str == NO_MOVE) {
-      if (!komaster_is_empty(komaster, kom_pos))
+      if (komaster != EMPTY)
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, count_variations, hashval_ng,
-		    komaster_to_string(komaster, kom_pos),
-		    location_to_string(kom_pos));
+		    komaster_to_string(komaster), location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx)", 
 		    message, count_variations, hashval_ng);
     }
     else {
-      if (!komaster_is_empty(komaster, kom_pos))
+      if (komaster != EMPTY)
 	gg_snprintf(buf, 100, 
 		    "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
-		    hashval_ng, 
-                    komaster_to_string(komaster, kom_pos),
+		    hashval_ng, komaster_to_string(komaster),
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx)", 
@@ -587,11 +553,10 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
     char buf[100];
     if (message == NULL)
       message = "UNKNOWN";
-    if (!komaster_is_empty(komaster, kom_pos))
+    if (komaster != EMPTY)
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
 		  message, count_variations, hashval_ng,
-		  komaster_to_string(komaster, kom_pos), 
-                  location_to_string(kom_pos));
+		  komaster_to_string(komaster), location_to_string(kom_pos));
     else
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx)", 
 		  message, count_variations, hashval_ng);
@@ -630,18 +595,6 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
 static int 
 do_trymove(int pos, int color, int ignore_ko)
 {
-  if (0 || KOMASTER_TRACE) {
-    if (tracing_inside_komaster)
-      gprintf("%o  ");
-
-    if (ignore_ko)
-      gprintf("%otryko");
-    else
-      gprintf("%otrymove");
-
-    gprintf("%o %C %1m\n", color, pos);
-  }
-
   /* 1. The move must be inside the board and the color must be BLACK
    * or WHITE.
    */
@@ -784,13 +737,6 @@ silent_popgo(void)
 static void
 undo_trymove()
 {
-  if (0 || KOMASTER_TRACE) {
-    if (tracing_inside_komaster) {
-      gprintf("%o  ");
-    }
-    gprintf("%opopgo\n");
-  }
-
   gg_assert(change_stack_pointer - change_stack <= STACK_SIZE);
 
   if (0) {
@@ -1203,181 +1149,15 @@ is_illegal_ko_capture(int pos, int color)
 /* Variation of trymove()/tryko() where ko captures (both conditional
  * and unconditional) must follow a komaster scheme.
  *
+ * Historical note: Up to GNU Go 3.4 five different komaster schemes
+ * were implemented and could easily be switched between. In GNU Go
+ * 3.5.1 four of them were removed to simplify the code and because it
+ * did no longer seem interesting to be able to switch. The remaining
+ * komaster scheme was previously known as komaster scheme 5 (or V).
+ *
  * FIXME: This function could be optimized by integrating the
  * trymove()/tryko() code.
  */
-
-#if KOMASTER_TRACE
-
-/* This version of komaster_trymove is for tracing the calls to 
- * and return values from komaster_trymove.
- */
-int komaster_trymove_ORIGINAL(int pos, int color,
-			      const char *message, int str,
-			      int komaster, int kom_pos,
-			      int *new_komaster, int *new_kom_pos,
-			      int *is_conditional_ko,
-			      int consider_conditional_ko);
-
-int
-komaster_trymove(int pos, int color, const char *message, int str,
-		 int komaster, int kom_pos,
-		 int *new_komaster, int *new_kom_pos,
-		 int *is_conditional_ko, int consider_conditional_ko)
-{
-  int ret;
-  int traceon = 1;
-  tracing_inside_komaster = 1;
-  if (traceon) {
-    gprintf("%okomaster_trymove %1m %C %s %1m %d\n",
-                pos,
-                color,
-    	        komaster_to_string(komaster, kom_pos),
-	        kom_pos,
-                consider_conditional_ko);
-  }
-  ret = komaster_trymove_ORIGINAL(
-                pos, color, message, str,
-	  	komaster, kom_pos,
-		new_komaster, new_kom_pos,
-		is_conditional_ko, consider_conditional_ko);
-  if (traceon) {
-    if (*is_conditional_ko 
-        || komaster != *new_komaster 
-        || kom_pos  != *new_kom_pos) {
-      char buff[255];
-      gg_snprintf(buff, 255, "komaster:%s@%s->%s@%s is_conditional_ko:%d\n",
-              komaster_to_string(komaster, kom_pos), 
-              location_to_string(kom_pos),
-              komaster_to_string(*new_komaster, *new_kom_pos),
-              location_to_string(*new_kom_pos),
-              *is_conditional_ko);
-      gprintf("%o%s", buff);
-      if (sgf_dumptree) {
-        sgftreeAddComment(sgf_dumptree, NULL, buff);
-      }
-    }
-  }
-  tracing_inside_komaster = 0;
-  return ret;
-}
-
-
-/* Replace komaster_trymove implementation with komaster_trymove_trace */
-#define komaster_trymove komaster_trymove_ORIGINAL
-
-#endif /* KOMASTER_TRACE */
-
-
-#if KOMASTER_SCHEME == 1
-
-/* I. Dan's simple scheme, O to move.
- * 
- * 1. Komaster is EMPTY.
- * 1a) Unconditional ko capture is allowed. Komaster remains EMPTY.
- * 1b) Conditional ko capture is allowed. Komaster is set to O and
- *     kom_pos to the location of the ko, where a stone was
- *     just removed.
- * 
- * 2. Komaster is O:
- * 2a) Only nested ko captures are allowed.
- * 2b) If komaster fills the ko at kom_pos then komaster reverts to
- *     EMPTY.
- * 
- * 3. Komaster is X:
- *    Play at kom_pos is not allowed. Any other ko capture
- *    is allowed. If O takes another ko, komaster becomes GRAY.
- * 
- * 4. Komaster is GRAY:
- *    Ko captures are not allowed. If the ko at kom_pos is
- *    filled then the komaster reverts to EMPTY.
- * 
- */
-int
-komaster_trymove(int pos, int color, const char *message, int str,
-		 int komaster, int kom_pos,
-		 int *new_komaster, int *new_kom_pos,
-		 int *is_conditional_ko, int consider_conditional_ko)
-{
-  int other = OTHER_COLOR(color);
-  int ko_move;
-  int kpos;
-
-  /* First we check whether the ko claimed by komaster has been
-   * resolved. If that is the case, we revert komaster to EMPTY.
-   *
-   * The ko has been resolved in favor of the komaster if it has
-   * been filled, or if it is no longer a ko and an opponent move
-   * there is suicide. If komaster == GRAY we don't remember who
-   * owns the ko so we have to try both colors.
-   */
-  if (komaster != EMPTY
-      && (IS_STONE(board[kom_pos])
-	  || (komaster != GRAY
-	      && !is_ko(kom_pos, OTHER_COLOR(komaster), NULL)
-	      && is_suicide(kom_pos, OTHER_COLOR(komaster)))
-	  || (komaster == GRAY
-	      && !is_ko(kom_pos, BLACK, NULL)
-	      && !is_ko(kom_pos, WHITE, NULL)
-	      && (is_suicide(kom_pos, BLACK)
-		  || is_suicide(kom_pos, WHITE))))) {
-    komaster = EMPTY;
-    kom_pos = 0;
-  }
-
-  /* Usually the komaster parameters are unchanged. */
-  *new_komaster = komaster;
-  *new_kom_pos = kom_pos;
-
-  *is_conditional_ko = 0;
-  ko_move = is_ko(pos, color, &kpos);
-
-  if (ko_move) {
-    /* If opponent is komaster we may not capture his ko. */
-    if (komaster == other && pos == kom_pos)
-      return 0;
-
-    /* If komaster is gray we may not capture ko at all. */
-    if (komaster == GRAY)
-      return 0;
-
-    /* If we are komaster, we may only do nested captures. */
-    if (komaster == color
-	&& !(kpos == SW(kom_pos) || kpos == NW(kom_pos)
-	     || kpos == NE(kom_pos) || kpos == SE(kom_pos)))
-      return 0;
-  }
-
-  if (!trymove(pos, color, message, str, komaster, kom_pos)) {
-    if (!consider_conditional_ko)
-      return 0;
-
-    if (!tryko(pos, color, message, komaster, kom_pos))
-      return 0; /* Suicide. */
-      
-    *is_conditional_ko = 1;
-
-    /* Conditional ko capture, set komaster parameters. */
-    if (komaster == EMPTY) {
-      *new_komaster = color;
-      *new_kom_pos = kpos;
-      return 1;
-    }
-  }
-
-  if (!ko_move)
-    return 1;
-
-  if (komaster == other)
-    *new_komaster = GRAY;
-  *new_kom_pos = kpos;
-
-  return 1;
-}
-
-#endif
-
-#if KOMASTER_SCHEME == 5
 
 #define GRAY_WHITE 4
 #define GRAY_BLACK 5
@@ -1527,387 +1307,26 @@ komaster_trymove(int pos, int color, const char *message, int str,
   return 1;
 }
 
-#endif
 
-#if KOMASTER_SCHEME == 2
-
-/* Simple komaster scheme, equivalent to the one implemented in 2.7.232.
- *
- * (II) Original 2.7.232 scheme, O to move.
- * 
- * 1. Komaster is EMPTY.
- * 1a) Unconditional ko capture is allowed. Komaster remains EMPTY.
- * 1b) Conditional ko capture is allowed. Komaster is set to O and
- *     kom_pos to the location of the ko, where a stone was
- *     just removed.
- * 
- * 2. Komaster is O:
- * 2a) Conditional ko capture is not allowed.
- * 2b) Unconditional ko capture is allowed. Komaster parameters unchanged.
- * 
- * 3. Komaster is X:
- * 3a) Conditional ko capture is not allowed.
- * 3b) Unconditional ko capture is allowed except for a move at kom_pos.
- *     Komaster parameters unchanged.
- * 
- * 4. Komaster is GRAY:
- *    Doesn't happen.
- */
-int
-komaster_trymove(int pos, int color, const char *message, int str,
-		 int komaster, int kom_pos,
-		 int *new_komaster, int *new_kom_pos,
-		 int *is_conditional_ko, int consider_conditional_ko)
+/* Convert a komaster value to a string. */
+static const char *
+komaster_to_string(int komaster)
 {
-  int other = OTHER_COLOR(color);
-  int kpos;
-
-  /* Usually the komaster parameters are unchanged. */
-  *new_komaster = komaster;
-  *new_kom_pos = kom_pos;
-
-  *is_conditional_ko = 0;
-
-  /* If opponent is komaster we may not capture his ko. */
-  if (is_ko(pos, color, &kpos) && komaster == other && pos == kom_pos)
-    return 0;
-
-  if (trymove(pos, color, message, str, komaster, kom_pos))
-    return 1;
-
-  /* Conditional ko captures are only allowed if the komaster is EMPTY. */
-  if (!consider_conditional_ko || komaster != EMPTY)
-    return 0;
-
-  if (tryko(pos, color, message, komaster, kom_pos)) {
-    /* Conditional ko capture, set komaster parameters. */
-    *new_komaster = color;
-    *new_kom_pos = kpos;
-    *is_conditional_ko = 1;
-    return 1;
-  }
-  
-  /* If we come here, the move was a suicide. */
-  return 0;
-}
-
-#endif
-
-#if KOMASTER_SCHEME == 3
-
-/* Slightly more complex komaster scheme.
- *
- * (III) Revised 2.7.232 version, O to move.
- * 
- * 1. Komaster is EMPTY.
- * 1a) Unconditional ko capture is allowed. Komaster remains EMPTY.
- * 1b) Conditional ko capture is allowed. Komaster is set to O and
- *     kom_pos to the location of the ko, where a stone was
- *     just removed.
- * 
- * 2. Komaster is O:
- *    Ko capture (both kinds) is allowed only if after playing the move,
- *    is_ko(kom_pos, X) returns false. In that case, kom_pos
- *    is updated to the new ko position, i.e. the stone captured by this
- *    move. 
- * 
- * 3. Komaster is X:
- * 3a) Conditional ko capture is not allowed.
- * 3b) Unconditional ko capture is allowed except for a move at kom_pos.
- *     Komaster parameters unchanged.
- * 
- * 4. Komaster is GRAY:
- *    Doesn't happen.
- * 
- */
-int
-komaster_trymove(int pos, int color, const char *message, int str,
-		 int komaster, int kom_pos,
-		 int *new_komaster, int *new_kom_pos,
-		 int *is_conditional_ko, int consider_conditional_ko)
-{
-  int other = OTHER_COLOR(color);
-  int ko_move;
-  int kpos;
-
-  /* Usually the komaster parameters are unchanged. */
-  *new_komaster = komaster;
-  *new_kom_pos = kom_pos;
-
-  *is_conditional_ko = 0;
-
-  /* If opponent is komaster we may not capture his ko. */
-  ko_move = is_ko(pos, color, &kpos);
-  if (ko_move && komaster == other && pos == kom_pos)
-    return 0;
-
-  if (!trymove(pos, color, message, str, komaster, kom_pos)) {
-    /* Conditional ko captures are allowed if komaster is EMPTY or our
-     * color.
-     */
-    if (!consider_conditional_ko || komaster == other)
-      return 0;
-
-    if (!tryko(pos, color, message, komaster, kom_pos))
-      return 0; /* Suicide. */
-      
-    *is_conditional_ko = 1;
-
-    /* Conditional ko capture, set komaster parameters. */
-    if (komaster == EMPTY) {
-      *new_komaster = color;
-      *new_kom_pos = kpos;
-    }
-  }
-
-  if (!ko_move)
-    return 1;
-
-  /* Remains to check that if we are komaster, the old ko is gone. */
-  if (komaster != color)
-    return 1;
-  
-  if (!is_ko(kom_pos, other, NULL)) {
-    *new_kom_pos = kpos;
-    return 1;
-  }
-
-  /* The old ko was still around, move not accepted. */
-  popgo();
-  return 0;
-}
-
-#endif
-
-
-#if KOMASTER_SCHEME == 4
-
-/* Returns true if the (pos1) and (pos2) are directly adjacent */
-static int
-is_next_to(int pos1, int pos2)
-{
-  int diff = pos1 - pos2;
-  ASSERT_ON_BOARD1(pos1);
-  ASSERT_ON_BOARD1(pos2);
-  return diff == WE || diff == -WE || diff == NS || diff == -NS;
-}
-
-#define KOMASTER_X 1
-#define KOMASTER_LEGAL 2
-
-/* (IV) A different komaster approach.
- * As of 3.1.27 it's quite slow, and has been tested primarily
- * in the context of pattern-based reading, where the other 
- * komaster schemes weren't sufficient.  It does eliminate all
- * tested cyclic ko problems, but still fails a few regressions.
- *
- * Currently this komaster scheme is slow.
- * 
- * If kom_pos == PASS, then there is no ko restriction in place.
- * This allows us to forgo an empty komaster status.  The extra
- * 1/2 bit gives us room to track some more information.
- * Logically, the komaster can take these values:
- *   KOMASTER_O_legal    0
- *   KOMASTER_X_legal    1
- *   KOMASTER_O_illegal  2
- *   KOMASTER_X_illegal  3
- * These values aren't actually defined, but are built up out
- * of KOMASTER_X and KOMASTER_LEGAL.  They're used in the comments
- * below for simplicity, however.
- *
- * 1. Komaster_pos is PASS:
- *   Move always allowed.
- *   If it's a legal ko capture, then komaster becomes KOMASTER_{OX}_legal, 
- *     and komaster_pos set to (pos). OX determined by color parameter.
- *   If it's an illegal ko capture, komaster becomes KOMASTER_{OX}_illegal,
- *     and komaster_pos set to (pos). OX determined by color parameter.
- *     If !consider_conditional_ko, the move is not allowed.
- *   If it's not a ko, komaster_pos remains PASS.
- *
- * The treatment of KOMASTER_O and KOMASTER_X are always identical,
- * simply with the player to move switched.  Below, only one of the
- * two identical cases is given.
- *
- * 2. Komaster_pos is (pos), komaster is KOMASTER_O_legal:
- * 2a X to play:
- *    if pos takes same ko as komaster_pos:
- *      if legal, komaster becomes KOMASTER_X_illegal (!).
- *      if illegal (ko threat required),
- *        if consider_conditional_ko
- *          komaster becomes KOMASTER_X_illegal.
- *    X may make any other legal move, including kos, and the komaster
- *      does not change.
- * 2b O to play:
- *    O may resolve this ko, or take a related ko.
- *      if it's a related ko, the komaster_pos changes to this related ko.
- *    O may not take an unrelated ko.  He must resolve this one first.  This
- *      avoids triple ko problems.
- *
- * 3. Komaster_pos is (pos), komaster is KOMASTER_O_illegal:
- * 3a X simply resolves to a trymove(), since O's already made a conditional
- *      capture, X may not make a conditional capture too.
- * 3b O's play is identical to the legal case.  The next statment is probably 
- *      bogus: In particular, he may happily re-take this ko at any time, in 
- *      case X took it back (legally).
- */
-
-int
-komaster_trymove(int pos, int color, const char *message, int str,
-		 int komaster, int kom_pos,
-		 int *new_komaster, int *new_kom_pos,
-		 int *is_conditional_ko, int consider_conditional_ko)
-{
-  int other = OTHER_COLOR(color);
-  int ko_move;
-  int kpos;
-  int new_kom_color_flag = (color == BLACK) ? KOMASTER_X : 0;
-  int kom_color = (komaster & KOMASTER_X) ? BLACK : WHITE;
-  int log_illegal_moves = !!sgf_dumptree;
-
-  if (!ON_BOARD1(kom_pos) 
-      || board[kom_pos] != kom_color
-      || !is_ko_point(kom_pos)
-      || !board_ko_pos) {
-    /* Try clearing komaster is the prev. move is not a ko.
-     * i.e. it could have been an internal ko threat.*/
-    /* ko's been resolved clear komaster */
-    komaster = 0;
-    kom_pos = PASS_MOVE;
-  }
-  /* komaster parameters are a typical default. */
-  *new_komaster = komaster;
-  *new_kom_pos = kom_pos;
-  *is_conditional_ko = 0;
-
-  ko_move = is_ko(pos, color, &kpos);
-
-  if (kom_pos == PASS_MOVE) {
-    if (trymove(pos, color, message, str, komaster, kom_pos)) {
-      if (ko_move) {
-        *new_kom_pos = pos;
-        *new_komaster = KOMASTER_LEGAL + new_kom_color_flag;
-      } /* else: legal non-ko move (usual case), no komaster change. */
-      return 1;
-    }
-    else {
-      if (consider_conditional_ko) {
-        if (tryko(pos, color, message, komaster, kom_pos)) {
-          /* Must be an illegal ko capture*/
-          *new_kom_pos = pos;
-          *new_komaster = new_kom_color_flag; /*don't set KOMASTER_LEGAL bit*/
-          *is_conditional_ko = 1;
-          return 1;
-        }
-	else {
-          /* completely illegal move */
-          return 0;
-        }
-      }
-      else {
-        /* don't even try to fake a ko threat. */
-        if (log_illegal_moves) {
-          if (tryko(pos, color, message, komaster, kom_pos)) {
-            sgftreeAddComment(sgf_dumptree, NULL, 
-                "ILLEGAL - Conditional ko capture not requested. (A)");
-            popgo();
-          }
-        }
-        return 0;
-      }
-    }
-  }
-
-  ASSERT_ON_BOARD1(kom_pos);
-
-  /* Different color to move than komaster */
-  if (new_kom_color_flag != (komaster & KOMASTER_X)) {
-    /* if komaster is ILLEGAL, don't allow opponent to retake the ko. */
-    if (!(komaster & KOMASTER_LEGAL)) {
-      if (is_next_to(pos, kom_pos)) {
-        /* don't let color retake an already spoken-for ko. */
-        if (log_illegal_moves) {
-          if (tryko(pos, color, message, komaster, kom_pos)) {
-            sgftreeAddComment(sgf_dumptree, NULL, 
-                "ILLEGAL - Can't retake other player's ko.");
-            popgo();
-          }
-        }
-        return 0;
-      }
-    }
-    /* komaster is LEGAL */
-    if (trymove(pos, color, message, str, komaster, kom_pos)) {
-      if (!is_next_to(pos, kom_pos)) {
-        /* An unrelated legal move (possibly another ko) */
-        return 1;
-      }
-      else {
-        /* legal ko re-capture */
-        *new_kom_pos = pos;
-        /* Might be worth trying to set the legal bit to see what happens. */
-        /* Note we set the komaster to ILLEGAL anyway to avoid loops */
-        *new_komaster = new_kom_color_flag;  /*don't set KOMASTER_LEGAL bit */
-        *is_conditional_ko = 0;  /* Should this be set to 1? */
-        return 1;
-      }
-    }
-    else {
-      if (consider_conditional_ko) {
-        if (tryko(pos, color, message, komaster, kom_pos)) {
-          /* illegal ko re-capture */
-          *new_kom_pos = pos;
-          *new_komaster = new_kom_color_flag;  /*don't set KOMASTER_LEGAL bit */
-          *is_conditional_ko = 1;
-          return 1;
-        }
-	else {
-          /* completely illegal move */
-          return 0;
-        }
-      }
-      else {
-        /* don't even try to fake a ko threat. */
-        if (log_illegal_moves) {
-          if (tryko(pos, color, message, komaster, kom_pos)) {
-            sgftreeAddComment(sgf_dumptree, NULL, 
-                "ILLEGAL - Conditional ko capture not requested. (B)");
-            popgo();
-          }
-        }
-        return 0;
-      }
-    }
-  }
-
-  /* komaster is trying to make a move */
-  ASSERT1(new_kom_color_flag == (komaster & KOMASTER_X), pos);
-
-  /* Same color case: same for LEGAL or ILLEGAL komaster status. */
-  /* If we are komaster, we may only do nested captures. */
-  if (ko_move
-      && kpos != SW(kom_pos) 
-      && kpos != NW(kom_pos)
-      && kpos != NE(kom_pos)
-      && kpos != SE(kom_pos)) {
-    if (log_illegal_moves) {
-      if (tryko(pos, color, message, komaster, kom_pos)) {
-        sgftreeAddComment(sgf_dumptree, NULL, "ILLEGAL - Komaster can't switch kos.");
-        popgo();
-      }
-    }
-    return 0;
-  }
+  if (komaster == EMPTY)
+    return "empty";
+  else if (komaster == WHITE)
+    return "white";
+  else if (komaster == BLACK)
+    return "black";
+  else if (komaster == GRAY_WHITE)
+    return "gray_white";
+  else if (komaster == GRAY_BLACK)
+    return "gray_black";
+  else if (komaster == WEAK_KO)
+    return "weak_ko";
   else
-    return trymove(pos, color, message, str, komaster, kom_pos);
-
-  /* Should have taken care of all cases by here. */
-  gg_assert(0 && "Getting here should not be possible.");
+    return "unknown";
 }
-
-#endif
-
-
-#undef komaster_trymove  /* In case KOMASTER_TRACE munged it */
 
 
 /* Determine whether vertex is on the edge. */

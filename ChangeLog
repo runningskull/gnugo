@@ -2,6 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- komaster schemes 1-4 removed
+- komaster_is_empty() retired
+- komaster_to_string() revised
+- KOMASTER_TRACE functionality removed
 - new GTP command combination_defend
 - don't use stdint.h
 - revised hash table scheme
