@@ -2662,6 +2662,44 @@ Xa*X
 ;owl_mineye(*)==1 && xlib(b)==2 && !attack(c) && !oplay_attack(*,a,b,b)
 
 
+Pattern A720
+# evand New pattern (3.3.20)
+
+?.??
+Y..x	Bamboo connection to reduce eyespace
+X*Ox
+?...
+?OO?
+
+:8,-,value(40)
+
+?c??
+Ya.x
+X*bx
+?...
+?OO?
+
+;(owl_eyespace(a) || owl_eyespace(c))
+;&& oplay_attack(a,a) && xplay_attack(*,a)
+
+
+Pattern A721
+
+?XX.
+Y.*.
+?XX.
+
+:8,s,value(45)
+
+?XXe
+Yd*c
+?AAb
+
+;lib(A) == 3 && !obvious_false_xeye(d)
+;&& oplay_defend(*,b,c,*) && oplay_defend(*,e,c,*)
+;&& oplay_defend_both(*,c,b,d,e,b,e)
+
+
 #########################################################
 #                                                       #
 #            Invade the eye space                       #
@@ -2816,6 +2854,25 @@ XbC
 ; lib(C) <= 3
 ; && owl_proper_eye(a)
 ; && owl_proper_eye(b)
+
+
+Pattern A812
+
+.Y?	clamp to invade eyespace
+..O
+*XO
+..o
+---
+
+:8,-,value(40)
+
+.Y?
+..O
+*XO
+..o
+---
+
+;owl_eyespace(*)
 
 
 #########################################################

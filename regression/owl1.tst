@@ -78,7 +78,7 @@ loadsgf games/owl40.sgf
 #? [1 PASS]*
 
 loadsgf games/nngs/gnugo-3.3.8-Joorin-200209251541.sgf 169
-280 owl_attack E6
+280 owl_attack F6
 #? [1 F4]*
 
 loadsgf games/nngs/gnugo-3.3.8-evand-200209170730.sgf 227
