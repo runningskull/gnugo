@@ -495,7 +495,7 @@ loadsgf games/trevor/trevor_46.sgf
 
 #SEE_ALSO trevor:460
 461 gg_genmove black
-#? [E14]*
+#? [E14]
 
 
 #CATEGORY=OWL_TUNING

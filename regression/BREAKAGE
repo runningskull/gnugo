@@ -1,3 +1,47 @@
+========================== 3.3.14 ============================
+
+./regress.sh . ld_owl.tst 
+161 unexpected PASS!
+./regress.sh . strategy.tst 
+50 unexpected FAIL: Correct 'Q9', got 'Q11'
+./regress.sh . neurogo.tst 
+11 unexpected FAIL: Correct 'N5', got 'R12'
+./regress.sh . viking.tst 
+6 unexpected PASS!
+./regress.sh . lazarus.tst 
+7 unexpected FAIL: Correct 'T5', got 'L12'
+./regress.sh . strategy2.tst 
+54 unexpected FAIL: Correct 'P6', got 'F9'
+72 unexpected PASS!
+80 unexpected FAIL: Correct 'P4|Q4|Q3', got 'H13'
+./regress.sh . nicklas1.tst 
+1213 unexpected PASS!
+./regress.sh . nicklas2.tst 
+903 unexpected FAIL: Correct 'critical (H8|F9) H8', got 'alive'
+./regress.sh . nicklas5.tst 
+1211 unexpected PASS!
+./regress.sh . trevor.tst 
+461 unexpected PASS!
+./regress.sh . nngs.tst 
+2040 unexpected PASS!
+./regress.sh . global.tst 
+3 unexpected FAIL: Correct 'H4', got 'J9'
+34 unexpected FAIL: Correct 'N6', got 'S7'
+./regress.sh . 13x13.tst 
+36 unexpected FAIL: Correct 'C5', got 'B2'
+39 unexpected PASS!
+./regress.sh . strategy4.tst 
+162 unexpected PASS!
+179 unexpected PASS!
+188 unexpected PASS!
+./regress.sh . nngs3.tst 
+240 unexpected FAIL: Correct 'G13|G12', got 'J12'
+./regress.sh . nngs4.tst 
+160 unexpected FAIL: Correct 'K8|L8', got 'J12'
+270 unexpected PASS!
+./regress.sh . ninestones.tst 
+40 unexpected PASS!
+
 ========================== 3.3.14 pre 2 ============================
 
 ./regress.sh . nngs.tst 

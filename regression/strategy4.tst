@@ -56,7 +56,7 @@ loadsgf games/strategy38.sgf 197
 # First live then attack. This should probably be analyzed as a semeai.
 loadsgf games/strategy39.sgf 156
 162 gg_genmove white
-#? [O7|Q7|N7]*
+#? [O7|Q7|N7]
 
 # First live then attack. This should probably be analyzed as a semeai.
 # tm - P8, though not as clean, also kills all the B stones.
@@ -159,7 +159,7 @@ loadsgf games/xxlin.sgf 16
 #Added E2 (3.1.14) -trevor
 loadsgf games/xxlin.sgf 20
 179 gg_genmove black
-#? [P3|O2|P2|O4|E2]*
+#? [P3|O2|P2|O4|E2]
 
 #The point of this problem is that Q8 is locally better than M7.
 #However, GNU Go reasonably tenukis.
@@ -202,7 +202,7 @@ loadsgf games/pooo.sgf 16
 
 loadsgf games/pooo.sgf 24
 188 gg_genmove black
-#? [B6|C4]*
+#? [B6|C4]
 
 # The dragon at A2 is misclassified as inessential.
 

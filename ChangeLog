@@ -2,10 +2,18 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.14 released January 1, 2003
+
+- life.c removed from the distribution
+- semeai module made standard
+- never decrement *eyemin to negative
 - unnecessary patval elements removed from some pattern databases
 - mkpat understands goal_elements and callback_data directives
 - new autohelper : owl_eye_size()
+- tuning
 - owl tuning
+- Copyright notices updated for 2003
+- code maintenance
 
 3.3.13 released December 22, 2002
 

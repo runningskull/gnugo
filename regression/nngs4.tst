@@ -68,7 +68,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 94
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 100
 160 gg_genmove black
-#? [K8|L8]
+#? [K8|L8]*
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 168
 170 gg_genmove black
@@ -110,7 +110,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 258
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 292
 270 gg_genmove black
-#? [!P5]*
+#? [!P5]
 
 loadsgf games/nngs/aburry-gnugo-3.3.12-200212162212.sgf 32
 280 restricted_genmove black F3 H3

@@ -220,7 +220,7 @@ loadsgf games/life_and_death/tripod3.sgf
 160 dragon_status C17
 #? [critical B19 (B18|B19|C19)]
 161 dragon_status R17
-#? [dead]*
+#? [dead]
 162 dragon_status R3
 #? [critical P1 R1]
 163 owl_attack C3

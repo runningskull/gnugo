@@ -30,7 +30,6 @@ libengine_a_SOURCES = \
       hash.c \
       influence.c \
       interface.c \
-      life.c \
       matchpat.c \
       move_reasons.c \
       movelist.c \

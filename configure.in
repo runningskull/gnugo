@@ -18,7 +18,7 @@ AH_TEMPLATE([VERSION],
 [Define to the version of the distribution.])
 
 dnl this defines VERSION and PACKAGE
-AM_INIT_AUTOMAKE([gnugo], [3.3.13])
+AM_INIT_AUTOMAKE([gnugo], [3.3.14])
 GNU_PACKAGE="GNU $PACKAGE"
 AC_DEFINE_UNQUOTED(GNU_PACKAGE, "$GNU_PACKAGE")
 
@@ -84,8 +84,8 @@ AC_ARG_ENABLE(oracle,
   --disable-oracle         don't enable oracle (default)])
 
 AC_ARG_ENABLE(experimental-semeai,
- [  --enable-experimental-semeai       use the experimental semeai module
-  --disable-experimental-semeai      use standard semeai module (default)])
+ [  --enable-experimental-semeai       use the experimental semeai module (default)
+  --disable-experimental-semeai      use standard semeai module])
 
 AC_ARG_ENABLE(experimental-owl-ext,
  [  --enable-experimental-owl-ext      use the experimental GAIN/LOSS codes
@@ -415,10 +415,10 @@ dnl ------------ Semeai -------------------
 AH_TEMPLATE([EXPERIMENTAL_SEMEAI],
 [Semeai module. Default standard.])
 
-if test "$enable_experimental_semeai" = "yes" ; then
-   AC_DEFINE(EXPERIMENTAL_SEMEAI, 1)
-else
+if test "$enable_experimental_semeai" = "no" ; then
    AC_DEFINE(EXPERIMENTAL_SEMEAI, 0)
+else
+   AC_DEFINE(EXPERIMENTAL_SEMEAI, 1)
 fi
 
 dnl ------------ Owl extensions ------------

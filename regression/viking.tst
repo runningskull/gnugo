@@ -23,7 +23,7 @@ loadsgf games/viking1.sgf 187
 
 loadsgf games/viking1.sgf 189
 6 gg_genmove white 
-#? [B17|B18]*
+#? [B17|B18]
 
 # Locally S5 is the only move.
 loadsgf games/viking3.sgf 79

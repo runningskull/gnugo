@@ -28,7 +28,7 @@
 #define EXPERIMENTAL_READING 0
 
 /* Semeai module. Default standard. */
-#define EXPERIMENTAL_SEMEAI 0
+#define EXPERIMENTAL_SEMEAI 1
 
 /* GAIN/LOSS codes. Disabled by default. */
 #define EXPERIMENTAL_OWL_EXT 0

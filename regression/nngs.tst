@@ -925,7 +925,7 @@ loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 16
 # I think B can still get a seki (or life) at the bottom if he plays E5. /ab
 loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 22
 2040 gg_genmove black
-#? [E5]*
+#? [E5]
 
 #CATEGORY=OWL_TUNING + KO
 loadsgf games/nngs/LordOfPi-gnugo-3.1.20-200201202014.sgf 30

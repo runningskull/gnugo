@@ -8,7 +8,7 @@ loadsgf golois/Aya991113-12.sgf
 
 loadsgf golois/Aya991113-13.sgf
 3 gg_genmove black
-#? [H4]
+#? [H4]*
 
 loadsgf golois/Aya991113-1.sgf
 4 gg_genmove black
@@ -143,7 +143,7 @@ loadsgf golois/Jimmy990906-1.sgf
 
 loadsgf golois/Lanka991113-1.sgf
 34 gg_genmove black
-#? [N6]
+#? [N6]*
 
 loadsgf golois/MeilleurCoup0001.sgf
 35 gg_genmove black

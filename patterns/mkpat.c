@@ -2,7 +2,8 @@
  * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       *
  * http://www.gnu.org/software/gnugo/ for more information.          *
  *                                                                   *
- * Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation. *
+ * Copyright 1999, 2000, 2001, 2002 and 2003                         *
+ * by the Free Software Foundation.                                  *
  *                                                                   *
  * This program is free software; you can redistribute it and/or     *
  * modify it under the terms of the GNU General Public License as    *
@@ -369,7 +370,8 @@ dummyhelper(int transformation, int move, int color, int action)
  * This is GNU GO, a Go program. Contact gnugo@gnu.org, or see       *\n\
  * http://www.gnu.org/software/gnugo/ for more information.          *\n\
  *                                                                   *\n\
- * Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation. *\n\
+ * Copyright 1999, 2000, 2001, 2002 and 2003                         *\n\
+ * by the Free Software Foundation.                                  *\n\
  *                                                                   *\n\
  * This program is free software; you can redistribute it and/or     *\n\
  * modify it under the terms of the GNU General Public License as    *\n\

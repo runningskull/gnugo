@@ -22,7 +22,7 @@ loadsgf games/strategy14.sgf 53
 
 loadsgf games/strategy14.sgf 81
 54 gg_genmove white
-#? [P6]
+#? [P6]*
 
 loadsgf games/strategy14.sgf 125
 55 gg_genmove white
@@ -118,7 +118,7 @@ loadsgf games/strategy18.sgf
 # Semeai problem.
 loadsgf games/strategy19.sgf 94
 72 gg_genmove white
-#? [A8]*
+#? [A8]
 
 # I have added R17, as it seems to kill the huge black dragon --arend
 # Note: E7 doesn't work because of B:D9.
@@ -162,7 +162,7 @@ loadsgf games/strategy14a.sgf
 # This is essentially a semeai problem
 loadsgf games/strategy22.sgf
 80 gg_genmove white
-#? [P4|Q4|Q3]
+#? [P4|Q4|Q3]*
 
 # Looks to me like B12 is also effective, although much more
 # complicated. /gf
