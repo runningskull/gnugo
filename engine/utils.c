@@ -808,7 +808,7 @@ blunder_size(int move, int color, int *defense_point,
 	     char safe_stones[BOARDMAX])
 {
   int libs[5];
-  int liberties = accurate_approxlib(move, color, 5, libs);
+  int liberties = accuratelib(move, color, 5, libs);
   int apos;
   int trouble = 0;
   int save_verbose = verbose;

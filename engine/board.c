@@ -2445,7 +2445,12 @@ accuratelib(int pos, int color, int maxlib, int *libs)
 }
 
 
-/* Play a stone at (pos) and count the number of liberties for the
+#if 0
+
+/* Functionally identical to accuratelib(), within the flexibility
+ * allowed by maxlib. Older implementation.
+ *
+ * Play a stone at (pos) and count the number of liberties for the
  * resulting string. This requires (pos) to be empty.
  *
  * This function differs from approxlib() by the fact that it removes
@@ -2466,6 +2471,14 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
   if (!libs) {
     fast_liberties = fastlib(pos, color, 0);
     if (fast_liberties >= 0) {
+      /* uncomment to confirm equivalence with accuratelib */
+      if (0) {
+	int dlibs[MAXLIBS];
+	int accuratelib_result = accuratelib(pos, color, maxlib, dlibs);
+
+	ASSERT1(gg_min(maxlib, fast_liberties)
+		== gg_min(maxlib, accuratelib_result), pos);
+      }
       return fast_liberties;
     } 
   }
@@ -2489,9 +2502,18 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
   sgf_dumptree = save_sgf_dumptree;
   count_variations = save_count_variations;
 
+  /* uncomment to confirm equivalence with accuratelib */
+  if (0) {
+    int dlibs[MAXLIBS];
+    int accuratelib_result = accuratelib(pos, color, maxlib, dlibs);
+
+    ASSERT1(gg_min(maxlib, liberties)
+	    == gg_min(maxlib, accuratelib_result), pos);
+  }
   return liberties;
 }
 
+#endif
 
 /* Find the number of common liberties of the two strings at str1 and str2.
  */
@@ -2996,16 +3018,13 @@ is_self_atari(int pos, int color)
     return 1;
 
   /* 2. It was not so easy.  We use accuratelib() in this case. */
-  return accurate_approxlib(pos, color, 2, NULL) <= 1;
+  return accuratelib(pos, color, 2, NULL) <= 1;
 }
 
 
-#if 0
+/* Alternative implementation */
 
-/* Determine whether a move by color at (pos) would be a self atari,
- * i.e. whether it would get more than one liberty. This function
- * returns true also for the case of a suicide move.
- */
+#if 0
 
 int
 is_self_atari(int pos, int color)

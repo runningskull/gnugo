@@ -4306,8 +4306,8 @@ improve_lunch_defense(int lunch, int defense_point)
       else
 	pos2 = libs[0];
 
-      if (accurate_approxlib(pos2, color, MAXLIBS, NULL)
-	  > accurate_approxlib(defense_point, color, MAXLIBS, NULL)
+      if (accuratelib(pos2, color, MAXLIBS, NULL)
+	  > accuratelib(defense_point, color, MAXLIBS, NULL)
 	  && does_defend(pos2, lunch)) {
 	TRACE("Moved defense of lunch %1m from %1m to %1m.\n",
 	      lunch, defense_point, pos2);

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- revision of CB20 in conn.db
+- calls to accurate_approxlib() replaced by accuratelib()
 - owl_find_lunches() revised
 - eye tuning
 - new game records and regression tests

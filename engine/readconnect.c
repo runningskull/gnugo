@@ -2953,7 +2953,7 @@ no_escape_from_atari(int str)
   if (findlib(str, 1, &lib) > 1)
     return 0;
 
-  if (accurate_approxlib(lib, board[str], 2, NULL) > 1)
+  if (accuratelib(lib, board[str], 2, NULL) > 1)
     return 0;
 
   /* FIXME: Should exclude snapback. */
