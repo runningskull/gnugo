@@ -857,6 +857,7 @@ Pattern EE504
 ######################
 
 Pattern EE601
+# gf Revised constraint to avoid cyclic redistribution. (3.5.1)
 
 ??O?         It's better to push down before blocking
 .X*X
@@ -870,7 +871,7 @@ aA*X
 ....
 ----
 
-; oplay_attack(*,a,A)
+; oplay_attack(*,a,A) && !oplay_attack(a,*,A)
 
 > replace(a,*)
 
