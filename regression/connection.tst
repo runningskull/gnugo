@@ -115,9 +115,10 @@ loadsgf games/incident240.sgf 69
 32 disconnect B12 E9
 #? [1 D9]*
 
+# White can't cut unconditionally but black has to make the first ko threat.
 loadsgf games/trevor/auto/a035.sgf 28
 33 disconnect B4 C6
-#? [1 B5]*
+#? [2 B5]*
 
 # Monkey jumps and relatives.
 loadsgf games/connection3.sgf
@@ -205,6 +206,36 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 238
 loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 258
 63 connect N13 N17
 #? [1 N16|O17|P16]*
+
+loadsgf games/trevor/auto/b72.sgf 30
+64 disconnect G11 K11
+#? [1 H11]
+65 same_dragon G11 K11
+#? [0]*
+
+loadsgf games/trevor/auto/b67.sgf 58
+66 disconnect M6 L3
+#? [1 M5|M3]
+67 connect M6 L3
+#? [1 M3|M2|M5]
+68 disconnect M6 L1
+#? [1 M5|M3|M2|M1]
+69 connect M6 L1
+#? [1 M2|M3]*
+70 same_dragon M6 L3
+#? [0]*
+
+loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
+71 connect D3 G3
+#? [1 (F3|H3|E3|G2|F2|H2|E2)]
+72 disconnect D3 G3
+#? [1 F3]*
+73 connect D3 J2
+#? [1 (F3|H3|E3|G2|F2|H2|E2)]*
+74 disconnect D3 J2
+#? [1 F3]*
+75 same_dragon D3 G3
+#? [0]*
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

@@ -5877,6 +5877,7 @@ O?.?
 
 Pattern D1376
 # tm New Pattern (3.1.16)
+# gf Revised constraint. (3.1.22)
 
 OoX?
 x.*O
@@ -5884,12 +5885,13 @@ x.*O
 
 :8,-,value(75)
 
-bdF?
-ec*a
+bdE?
+xc*a
 ----
 
 ; (owl_escape_value(a) > 0 || owl_escape_value(b) > 0)
-; && oplay_attack_either(*,c,d,c,F)
+; && ((o_somewhere(d) && oplay_attack_either(*,c,c,E))
+;     || (!o_somewhere(d) && !oplay_defend_both(*,c,d,c,E)))
 
 
 Pattern D1377

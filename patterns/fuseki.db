@@ -490,8 +490,39 @@ Pattern F108
 
 
 Pattern F109
+# gf Added constraint. (3.1.22)
+# See nngs:1030.
 
 |.......       enclosure from star
+|..*....
+|.......
+|...O...
+|.......
+|.......
+|.......
++-------
+
+:8,FtE,shape(-2)
+
+|...a...
+|..*....
+|.......
+|...O...
+|.......
+|.......
+|.......
++-------
+
+;!omoyo(a)
+
+
+Pattern F109b
+# gf New pattern. (3.1.22)
+
+|.......       enclosure from star
+|.......
+|.......
+|.......
 |..*....
 |.......
 |...O...
@@ -1285,28 +1316,6 @@ X....*....cd
 ; x_somewhere(a,b,c,d)
 
 
-#Pattern F701
-#..........    invade with space to extend in both directions
-#X....*....
-#..........
-#..........
-#----------
-#
-#:8,sjE
-#
-#
-#
-#Pattern F702
-#
-#X.........    invade with space to extend in both directions
-#.....*....
-#..........
-#..........
-#----------
-#
-#:8,sjE
-#
-
 Pattern F703
 
 X.......X    invade
@@ -1319,7 +1328,10 @@ X.......X    invade
 
 
 Pattern F704
+# gf Added constraint. (3.1.22)
+# See nngs:1030.
 
+???????
 ?.....?       invade 4 space extension
 .X.....
 ....*.X
@@ -1328,6 +1340,16 @@ Pattern F704
 -------
 
 :8,FstE,shape(-1)
+
+???c?d?
+?.....?
+.A.....
+....*.B
+.......
+.......
+-------
+
+;weak(A) || weak(B) || !xmoyo(c) || !xmoyo(d)
 
 
 Pattern F705

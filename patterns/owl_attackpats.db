@@ -2923,6 +2923,25 @@ BfgC
 ; && oplay_defend_both(*,g,f,e,f,*)
 
 
+Pattern A1016
+# gf New pattern. (3.1.22)
+# Converse to D1376. See lazarus:114 for an example.
+
+XxO?
+o.*X
+----
+
+:8,-,value(75)
+
+Bde?
+oc*A
+----
+
+; (owl_escape_value(A) > 0 || owl_escape_value(B) > 0)
+; && ((x_somewhere(d) && xplay_attack_either(*,c,c,e))
+;     || (!x_somewhere(d) && !xplay_defend_both(*,c,d,c,e)))
+
+
 #########################################################
 #                                                       #
 #              Reinforce the perimeter                  #

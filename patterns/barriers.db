@@ -1484,6 +1484,29 @@ XbOo
 ;safe_omove(a) && oplay_attack(a,b,C)
 
 
+Pattern Intrusion46
+# gf New pattern. (3.1.22)
+# FIXME: This pattern exaggerates the intrusion since X can stop it
+#        on one of the sides, but we don't know which one he will
+#        choose. This may or may not be a problem in practice.
+
+x.O.x
+.!X!.
+x...x
+x...x
+-----
+
+:|,B,value(10)
+
+x.dbx
+.cXa.
+.....
+.....
+-----
+
+;!oplay_attack(a,b,c,d)
+
+
 Pattern Nonterritory1
 
 OxO
@@ -1981,6 +2004,36 @@ OX.
 ?aX
 OXb
 ?OX
+
+;safe_omove(a)
+
+>non_xterritory(b);
+
+
+Pattern Nonterritory27
+# gf New Pattern (3.1.22)
+
+O..
+
+:-,t
+
+Oab
+
+;safe_omove(a)
+
+>non_xterritory(b);
+
+
+Pattern Nonterritory28
+# gf New Pattern (3.1.22)
+
+O.
+x.
+
+:8,t
+
+Oa
+xb
 
 ;safe_omove(a)
 

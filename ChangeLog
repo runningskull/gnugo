@@ -15,8 +15,12 @@
 - new function influence_moyo_color_opposite()
 - one trace output reenabled in confirm_safety()
 - bugfix in sgftreeAddStone
+- tuning
 - eye tuning
 - atari_atari tuning
+- connection tuning
+- fuseki tuning
+- owl tuning
 - test revisions
 
 3.1.21 released January 12, 2002
