@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfixes in defend2(), special_rescue(), and special_rescue2()
 - MAX_INTRUSIONS doubled in size
 - intrusions beyond MAX_INTRUSION silently discarded
 - new connect_and_cut_helper2 autohelper macro
@@ -10,7 +11,7 @@
 
 3.1.29 released March 26, 2002
 
-- assymmetry in influence computation reduced
+- asymmetry in influence computation reduced
 - case added in strategic_penalty
 - simulation of ko threat + answer in sgf output reinstated in tryko()
 - new function gg_normalize_float() in gg_utils.c

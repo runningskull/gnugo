@@ -87,9 +87,11 @@ static int defend2(int str, int *move, int komaster, int kom_pos);
 static int defend3(int str, int *move, int komaster, int kom_pos);
 static int defend4(int str, int *move, int komaster, int kom_pos);
 static int special_rescue(int str, int lib, int *move, 
-			  int komaster, int kom_pos, int tried[]);
+			  int komaster, int kom_pos,
+			  int tried[], int num_tried);
 static int special_rescue2(int str, int libs[2], int *move, 
-			   int komaster, int kom_pos, int tried[]);
+			   int komaster, int kom_pos,
+			   int tried[], int num_tried);
 static int special_rescue3(int str, int libs[3], int *move, 
 			   int komaster, int kom_pos);
 static int special_rescue4(int str, int libs[3], int *move, 
@@ -1296,18 +1298,12 @@ defend2(int str, int *move, int komaster, int kom_pos)
     if (is_self_atari(libs[k], other)) {
       liberties2 = approxlib(libs[k], color, 6, libs2);
       for (r = 0; r < liberties2; r++) {
-	int already_tried = 0;
 	xpos = libs2[r];
 	/* Don't reconsider previously tested moves. */
-	for (s = 0; s < MAX_MOVES; s++) {
-	  if (xpos == moves[s]) {
-	    already_tried = 1;
+	for (s = 0; s < num_moves; s++)
+	  if (xpos == moves[s])
 	    break;
-	  }
-	  if (moves[s] == 0)
-	    break;
-	}
-	if (already_tried || s == MAX_MOVES)
+	if (s < num_moves)
 	  continue;
 
 	if (trymove(xpos, color, "defend2-C", str, komaster, kom_pos)) {
@@ -1334,18 +1330,12 @@ defend2(int str, int *move, int komaster, int kom_pos)
     liberties2 = approxlib(libs[k], other, 3, libs2);
     if (liberties2 <= 2) {
       for (r = 0; r < liberties2; r++) {
-	int already_tried = 0;
 	xpos = libs2[r];
 	/* Don't reconsider previously tested moves. */
-	for (s = 0; s < MAX_MOVES; s++) {
-	  if (xpos == moves[s]) {
-	    already_tried = 1;
+	for (s = 0; s < num_moves; s++)
+	  if (xpos == moves[s])
 	    break;
-	  }
-	  if (moves[s] == 0)
-	    break;
-	}
-	if (already_tried || s == MAX_MOVES)
+	if (s < num_moves)
 	  continue;
 
 	if (!is_self_atari(xpos, color)
@@ -1365,7 +1355,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
 
   if (stackp <= depth) {
     for (k = 0; k < liberties; k++) {
-      int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos, moves);
+      int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos,
+				 moves, num_moves);
       if (dcode == WIN) {
 	SGFTRACE(xpos, WIN, "special rescue");
 	READ_RETURN(read_result, move, xpos, WIN);
@@ -1375,7 +1366,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
   }
   
   if (stackp <= backfill_depth) {
-    int dcode = special_rescue2(str, libs, &xpos, komaster, kom_pos, moves);
+    int dcode = special_rescue2(str, libs, &xpos, komaster, kom_pos,
+				moves, num_moves);
     if (dcode == WIN) {
       SGFTRACE(xpos, WIN, "special rescue2");
       READ_RETURN(read_result, move, xpos, WIN);
@@ -1402,18 +1394,14 @@ defend2(int str, int *move, int komaster, int kom_pos)
     find_superstring_liberties(str, &liberties, libs, 3);
     for (k = 0; k < liberties; k++) {
       int apos = libs[k];
-      int already_tried = 0;
+      
       /* Skip if already tried */
-      for (s = 0; s < MAX_MOVES; s++) {
-	if (apos == moves[s]) {
-	  already_tried = 1;
+      for (s = 0; s < num_moves; s++)
+	if (apos == moves[s])
 	  break;
-	}
-	if (moves[s] == 0)
-	  break;
-      }
-      if (already_tried || s == MAX_MOVES)
+      if (s < num_moves)
 	continue;
+      
       if (liberty_of_string(apos, str))
 	continue;
       if (trymove(apos, color, "defend2-E", str, komaster, kom_pos)) {
@@ -1444,7 +1432,8 @@ defend2(int str, int *move, int komaster, int kom_pos)
       if (liberty_of_string(apos, str))
 	continue;
       
-      dcode = special_rescue(str, apos, &xpos, komaster, kom_pos, moves);
+      dcode = special_rescue(str, apos, &xpos, komaster, kom_pos,
+			     moves, num_moves);
       if (dcode == WIN) {
 	SGFTRACE(xpos, WIN, "special rescue");
 	READ_RETURN(read_result, move, xpos, WIN);
@@ -1702,7 +1691,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
   /* If nothing else works, try to defend with second order liberties. */
   if (stackp <= depth) {
     for (k = 0; k < liberties; k++) {
-      int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos, moves);
+      int dcode = special_rescue(str, libs[k], &xpos, komaster, kom_pos,
+				 moves, num_moves);
       if (dcode == WIN) {
 	SGFTRACE(xpos, WIN, "special rescue");
 	READ_RETURN(read_result, move, xpos, WIN);
@@ -1778,7 +1768,8 @@ defend3(int str, int *move, int komaster, int kom_pos)
       if (liberty_of_string(apos, str))
 	continue;
       
-      dcode = special_rescue(str, apos, &xpos, komaster, kom_pos, moves);
+      dcode = special_rescue(str, apos, &xpos, komaster, kom_pos,
+			     moves, num_moves);
       if (dcode == WIN) {
 	SGFTRACE(xpos, WIN, "special rescue");
 	READ_RETURN(read_result, move, xpos, WIN);
@@ -2003,7 +1994,8 @@ defend4(int str, int *move, int komaster, int kom_pos)
  */
 
 static int
-special_rescue(int str, int lib, int *move, int komaster, int kom_pos, int tried[])
+special_rescue(int str, int lib, int *move, int komaster, int kom_pos,
+	       int tried[], int num_tried)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -2015,14 +2007,10 @@ special_rescue(int str, int lib, int *move, int komaster, int kom_pos, int tried
   for (k = 0; k < 4; k++) {
     int d = delta[k];
     if (board[lib + d] == EMPTY) {
-      int already_tried = 0;
-      for (r = 0; r < MAX_MOVES; r++) {
+      for (r = 0; r < num_tried; r++)
 	if (lib + d == tried[r]) 
-	  already_tried = 1;
-	if (tried[r] == 0) 
 	  break;
-      }
-      if (already_tried) 
+      if (r < num_tried)
 	continue;
 
       /* Use approxlib() to test for trivial capture. */
@@ -2068,7 +2056,8 @@ special_rescue(int str, int lib, int *move, int komaster, int kom_pos, int tried
  *   ------
  */
 static int
-special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos, int tried[])
+special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos,
+		int tried[], int num_tried)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
@@ -2108,16 +2097,13 @@ special_rescue2(int str, int libs[2], int *move, int komaster, int kom_pos, int 
   }
 
   for (k = 0; k < num_moves; k++) {
-    int already_tried = 0;
     xpos = moves[k];
-    for (r = 0; r < MAX_MOVES; r++) {
+    for (r = 0; r < num_tried; r++)
       if (xpos == tried[r]) 
-	already_tried = 1;
-      if (tried[r] == 0) 
 	break;
-    }
-    if (already_tried) 
+    if (r < num_tried) 
       continue;
+    
     if (!is_self_atari(xpos, color)
 	&& trymove(xpos, color, "special_rescue2", str, komaster, kom_pos)) {
       int acode = do_attack(str, NULL, komaster, kom_pos);
