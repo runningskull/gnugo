@@ -69,10 +69,17 @@ static gtp_transform_ptr vertex_transform_output_hook = NULL;
  */
 static int current_id;
 
+/* The file all GTP output goes to.  This is made global for the user
+ * of this file may want to use functions other than gtp_printf() etc.
+ * Set by gtp_main_loop().
+ */
+FILE *gtp_output_file = NULL;
+
+
 /* Read filehandle gtp_input linewise and interpret as GTP commands. */
 void
-gtp_main_loop(struct gtp_command commands[], FILE *gtp_input,
-	      FILE *gtp_dump_commands)
+gtp_main_loop(struct gtp_command commands[],
+	      FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands)
 {
   char line[GTP_BUFSIZE];
   char command[GTP_BUFSIZE];
@@ -80,7 +87,9 @@ gtp_main_loop(struct gtp_command commands[], FILE *gtp_input,
   int i;
   int n;
   int status = GTP_OK;
-  
+
+  gtp_output_file = gtp_output;
+
   while (status == GTP_OK) {
     /* Read a line from gtp_input. */
     if (!fgets(line, GTP_BUFSIZE, gtp_input))
@@ -180,25 +189,25 @@ gtp_mprintf(const char *fmt, ...)
       {
 	/* rules of promotion => passed as int, not char */
 	int c = va_arg(ap, int);
-	putc(c, stdout);
+	putc(c, gtp_output_file);
 	break;
       }
       case 'd':
       {
 	int d = va_arg(ap, int);
-	fprintf(stdout, "%d", d);
+	fprintf(gtp_output_file, "%d", d);
 	break;
       }
       case 'f':
       {
 	double f = va_arg(ap, double); /* passed as double, not float */
-	fprintf(stdout, "%f", f);
+	fprintf(gtp_output_file, "%f", f);
 	break;
       }
       case 's':
       {
 	char *s = va_arg(ap, char *);
-	fputs(s, stdout);
+	fputs(s, gtp_output_file);
 	break;
       }
       case 'm':
@@ -212,20 +221,21 @@ gtp_mprintf(const char *fmt, ...)
       {
 	int color = va_arg(ap, int);
 	if (color == WHITE)
-	  fputs("white", stdout);
+	  fputs("white", gtp_output_file);
 	else if (color == BLACK)
-	  fputs("black", stdout);
+	  fputs("black", gtp_output_file);
 	else
-	  fputs("empty", stdout);
+	  fputs("empty", gtp_output_file);
 	break;
       }
       default:
-	fprintf(stdout, "\n\nUnknown format character '%c'\n", *fmt);
+	/* FIXME: Should go to `stderr' instead? */
+	fprintf(gtp_output_file, "\n\nUnknown format character '%c'\n", *fmt);
 	break;
       }
     }
     else
-      putc(*fmt, stdout);
+      putc(*fmt, gtp_output_file);
   }
   va_end(ap);
 }
@@ -237,7 +247,7 @@ gtp_printf(const char *format, ...)
 {
   va_list ap;
   va_start(ap, format);
-  vfprintf(stdout, format, ap);
+  vfprintf(gtp_output_file, format, ap);
   va_end(ap);
 }
 
@@ -278,7 +288,7 @@ gtp_success(const char *format, ...)
   va_list ap;
   gtp_start_response(GTP_SUCCESS);
   va_start(ap, format);
-  vfprintf(stdout, format, ap);
+  vfprintf(gtp_output_file, format, ap);
   va_end(ap);
   return gtp_finish_response();
 }
@@ -291,7 +301,7 @@ gtp_failure(const char *format, ...)
   va_list ap;
   gtp_start_response(GTP_FAILURE);
   va_start(ap, format);
-  vfprintf(stdout, format, ap);
+  vfprintf(gtp_output_file, format, ap);
   va_end(ap);
   return gtp_finish_response();
 }

@@ -412,7 +412,7 @@ void add_shape_value(int pos, float value);
 void add_followup_value(int pos, float value);
 void add_reverse_followup_value(int pos, float value);
 int list_move_reasons(FILE *out, int pos);
-void print_all_move_values(void);
+void print_all_move_values(FILE *output);
 void record_top_move(int move, float val);
 void remove_top_move(int move);
 void scale_randomness(int pos, float scaling);

@@ -119,6 +119,10 @@ AC_ARG_ENABLE(alternate-connections,
   --disable-alternate-connections    use primary experimental connection 
                                          analysis (default)])
 
+AC_ARG_ENABLE(socket-support,
+ [  --disable-socket-support           don't compile GTP over TCP/IP support
+  --enable-socket-support            compile TCP/IP support (default)])
+
 AC_ARG_ENABLE(profile,
  [  --enable-profile                   compile gnugo with gprof option ])
 
@@ -552,12 +556,56 @@ else
   GNUGO_SOME_WARNINGS=''
 fi
 
+
 dnl Now lines in Makefile.am can be prefixed @GCC_ONLY@, and
 dnl we can specify either @GNUGO_SOME_WARNINGS@
 
 dnl FIXME: please add warnings for other compilers !
 
 
+AH_TEMPLATE([ENABLE_SOCKET_SUPPORT],
+[Compile support for GTP communication over TCP/IP channel.])
+
+if test "$enable_socket_support" != "no"; then
+  # Check for all required headers, macros, structures and functions
+  # at once.
+  AC_CACHE_CHECK(
+	[whether socket support can be compiled],
+	gnugo_cv_sockets_supported,
+	AC_TRY_LINK([#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>],
+[[  struct sockaddr_in A;
+  struct hostent *H;
+  A.sin_family = AF_INET;
+  A.sin_addr.s_addr = htonl(INADDR_ANY);
+  A.sin_port = htons(0);
+  gethostbyname(0);
+  socket(PF_INET, SOCK_STREAM, 0);
+  connect(0, 0, 0);
+  bind(0, 0, 0);
+  listen(0, 0);
+  accept(0, 0, 0);]],
+ 	gnugo_cv_sockets_supported="yes",
+	gnugo_cv_sockets_supported="no"))
+
+  if test "$gnugo_cv_sockets_supported" = "yes"; then
+    AC_DEFINE(ENABLE_SOCKET_SUPPORT)
+  else
+    if test "$enable_socket_support" = "yes"; then
+      AC_MSG_ERROR(
+[[
+*** Socket support was requested, but cannot be compiled on your system. ***
+*** If you think this is a mistake, please report it to <gnugo@gnu.org>. ***]]);
+    else
+      AC_MSG_WARN(
+[[
+*** Unable to compile socket support on your system.  It will be disabled. ***
+***  If you think this is a mistake, please report it to <gnugo@gnu.org>.  ***]]);
+    fi
+  fi
+fi
 
 #AM_GNU_GETTEXT
 #AC_LINK_FILES($nls_cv_header_libgt, $nls_cv_header_intl)

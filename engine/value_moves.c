@@ -3203,7 +3203,7 @@ value_moves(int color, float pure_threat_value, float our_score)
 /* Print the values of all moves with values bigger than zero. */
 
 void
-print_all_move_values()
+print_all_move_values(FILE *output)
 {
   int pos;
   
@@ -3211,7 +3211,7 @@ print_all_move_values()
     if (!ON_BOARD(pos) || move[pos].final_value <= 0.0)
       continue;
       
-    mprintf("%1M %f\n", pos, move[pos].final_value);
+    gfprintf(output, "%1M %f\n", pos, move[pos].final_value);
   }
 }
 

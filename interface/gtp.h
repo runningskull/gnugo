@@ -65,8 +65,8 @@ struct gtp_command {
   gtp_fn_ptr function;
 };
 
-void gtp_main_loop(struct gtp_command commands[], FILE *gtp_input,
-		   FILE *gtp_dump_commands);
+void gtp_main_loop(struct gtp_command commands[],
+		   FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands);
 void gtp_internal_set_boardsize(int size);
 void gtp_set_vertex_transform_hooks(gtp_transform_ptr in,
 				    gtp_transform_ptr out);
@@ -82,6 +82,8 @@ int gtp_decode_coord(char *s, int *m, int *n);
 int gtp_decode_move(char *s, int *color, int *i, int *j);
 void gtp_print_vertices(int n, int movei[], int movej[]);
 void gtp_print_vertex(int i, int j);
+
+extern FILE *gtp_output_file;
 
 /*
  * Local Variables:

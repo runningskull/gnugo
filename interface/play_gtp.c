@@ -337,12 +337,15 @@ static struct gtp_command commands[] = {
 
 /* Start playing using the Go Text Protocol. */
 void
-play_gtp(FILE *gtp_input, FILE *gtp_dump_commands, int gtp_initial_orientation)
+play_gtp(FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands,
+	 int gtp_initial_orientation)
 {
-  /* Make sure stdout is unbuffered. (Line buffering is also okay but
-   * not necessary. Block buffering breaks GTP mode.)
+  /* Make sure `gtp_output' is unbuffered. (Line buffering is also
+   * okay but not necessary. Block buffering breaks GTP mode.)
+   *
+   * FIXME: Maybe should go to `gtp.c'?
    */
-  setbuf(stdout, NULL);
+  setbuf(gtp_output, NULL);
 
   /* Inform the GTP utility functions about the board size. */
   gtp_internal_set_boardsize(board_size);
@@ -355,7 +358,7 @@ play_gtp(FILE *gtp_input, FILE *gtp_dump_commands, int gtp_initial_orientation)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
   clearstats();
-  gtp_main_loop(commands, gtp_input, gtp_dump_commands);
+  gtp_main_loop(commands, gtp_input, gtp_output, gtp_dump_commands);
   if (showstatistics)
     showstats();
 }
@@ -2633,7 +2636,7 @@ gtp_move_reasons(char *s)
     return gtp_failure("vertex must not be occupied");
 
   gtp_start_response(GTP_SUCCESS);
-  if (list_move_reasons(stdout, POS(i, j)) == 0)
+  if (list_move_reasons(gtp_output_file, POS(i, j)) == 0)
     gtp_printf("\n");
   gtp_printf("\n");
   return GTP_OK;
@@ -2653,7 +2656,7 @@ gtp_all_move_values(char *s)
 {
   UNUSED(s);
   gtp_start_response(GTP_SUCCESS);
-  print_all_move_values();
+  print_all_move_values(gtp_output_file);
   gtp_printf("\n");
   return GTP_OK;
 }
@@ -3562,7 +3565,7 @@ gtp_showboard(char *s)
   
   gtp_start_response(GTP_SUCCESS);
   gtp_printf("\n");
-  simple_showboard(stdout);
+  simple_showboard(gtp_output_file);
   return gtp_finish_response();
 }
 
@@ -4015,7 +4018,7 @@ gtp_dragon_data(char *s)
 		&& dragon[POS(m, n)].origin == POS(m, n))) {
 	  gtp_print_vertex(m, n);
 	  gtp_printf(":\n");
-	  report_dragon(stdout, POS(m, n));
+	  report_dragon(gtp_output_file, POS(m, n));
 	}
   }
   gtp_printf("\n");
@@ -4281,7 +4284,7 @@ static int
 gtp_echo_err(char *s)
 {
   fprintf(stderr, "%s", s);
-  fflush(stdout);
+  fflush(gtp_output_file);
   fflush(stderr);
   return gtp_success("%s", s);
 }

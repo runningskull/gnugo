@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- added support for GTP communication over TCP/IP socket;  GNU Go can
+  both connect and listen
 - bugfix in break_in_goal_from_str(): check pos+delta on board
 - bugfix in sgfStartVariant
 - constrain thrashing dragons more often

@@ -60,6 +60,14 @@ static void show_help(void);
 static void show_debug_help(void);
 static void show_debug_flags(void);
 
+static void socket_connect_to(const char *host_name, unsigned int port,
+			      FILE **input_file, FILE **output_file);
+static void socket_listen_at(const char *host_name, unsigned int port,
+			     FILE **input_file, FILE **output_file);
+static void socket_close_connection(FILE *input_file, FILE *output_file);
+static void socket_stop_listening(FILE *input_file, FILE *output_file);
+
+
 /* long options which have no short form */
 enum {OPT_BOARDSIZE = 127,
       OPT_HANDICAPSTONES,
@@ -74,6 +82,8 @@ enum {OPT_BOARDSIZE = 127,
       OPT_OUTFILE, 
       OPT_QUIET,
       OPT_GTP_INPUT,
+      OPT_GTP_CONNECT,
+      OPT_GTP_LISTEN,
       OPT_GTP_DUMP_COMMANDS,
       OPT_GTP_INITIAL_ORIENTATION,
       OPT_GTP_VERSION,
@@ -189,6 +199,8 @@ static struct gg_option const long_options[] =
   {"quiet",          no_argument,       0, OPT_QUIET},
   {"silent",         no_argument,       0, OPT_QUIET},
   {"gtp-input",      required_argument, 0, OPT_GTP_INPUT},
+  {"gtp-connect",    required_argument, 0, OPT_GTP_CONNECT},
+  {"gtp-listen",     required_argument, 0, OPT_GTP_LISTEN},
   {"gtp-dump-commands", required_argument, 0, OPT_GTP_DUMP_COMMANDS},
   {"orientation",    required_argument, 0, OPT_GTP_INITIAL_ORIENTATION},
   {"gtp-initial-orientation",
@@ -311,6 +323,8 @@ main(int argc, char *argv[])
   char *outflags = NULL;
   char *gtpfile = NULL;
   char *gtp_dump_commands_file = NULL;
+  int gtp_tcp_ip_mode = 0;
+  char *gtp_tcp_ip_address = NULL;
   
   char *printsgffile = NULL;
   
@@ -319,8 +333,6 @@ main(int argc, char *argv[])
   char debuginfluence_move[4] = "\0";
   
   int benchmark = 0;  /* benchmarking mode (-b) */
-  FILE *gtp_input_FILE;
-  FILE *gtp_dump_commands_FILE = NULL;
   FILE *output_check;
   int orientation = 0;
 
@@ -443,11 +455,25 @@ main(int argc, char *argv[])
       case OPT_QUIET:
 	quiet = 1;
 	break;
-	
+
       case OPT_GTP_INPUT:
-	gtpfile = gg_optarg;
+      case OPT_GTP_CONNECT:
+      case OPT_GTP_LISTEN:
+	if (gtp_tcp_ip_mode != 0 || gtpfile != NULL) {
+	  fprintf(stderr, ("Options `--gtp-input', `--gtp-connect' and `--gtp-listen' "
+			   "are mutually-exclusive\n"));
+	  exit(EXIT_FAILURE);
+	}
+
+	if (i == OPT_GTP_INPUT)
+	  gtpfile = gg_optarg;
+	else {
+	  gtp_tcp_ip_mode = i;
+	  gtp_tcp_ip_address = gg_optarg;
+	}
+
 	break;
-	
+
       case OPT_GTP_DUMP_COMMANDS:
 	gtp_dump_commands_file = gg_optarg;
 	break;
@@ -1340,29 +1366,69 @@ main(int argc, char *argv[])
     }
 #endif
 
-  case MODE_GTP:  
-    if (gtpfile != NULL) {
-      gtp_input_FILE = fopen(gtpfile, "r");
-      if (gtp_input_FILE == NULL) {
-	fprintf(stderr, "gnugo: Cannot open file %s\n", gtpfile);
-	return EXIT_FAILURE;
-      } 
-    }
-    else
-      gtp_input_FILE = stdin;
+  case MODE_GTP:
+    {
+      FILE *gtp_input_FILE = stdin;
+      FILE *gtp_output_FILE = stdout;
+      FILE *gtp_dump_commands_FILE = NULL;
 
-    if (gtp_dump_commands_file != NULL) {
-      gtp_dump_commands_FILE = fopen(gtp_dump_commands_file, "w");
-      if (gtp_dump_commands_FILE == NULL) {
-	fprintf(stderr, "gnugo: Cannot open file %s\n",
-		gtp_dump_commands_file);
-	return EXIT_FAILURE;
-      } 
+      if (gtpfile != NULL) {
+	gtp_input_FILE = fopen(gtpfile, "r");
+	if (gtp_input_FILE == NULL) {
+	  fprintf(stderr, "gnugo: Cannot open file %s\n", gtpfile);
+	  return EXIT_FAILURE;
+	}
+      }
+      else if (gtp_tcp_ip_mode != 0) {
+	unsigned int port = 65536;
+	char *port_string = strchr(gtp_tcp_ip_address, ':');
+	const char *host_name = NULL;
+
+	if (port_string) {
+	  host_name = gtp_tcp_ip_address;
+
+	  *port_string++ = 0;
+	  sscanf(port_string, "%u", &port);
+	}
+	else
+	  sscanf(gtp_tcp_ip_address, "%u", &port);
+
+	if (port > 65535) {
+	  fprintf(stderr, "A valid TCP/IP port number expected\n");
+	  exit(EXIT_FAILURE);
+	}
+
+	if (gtp_tcp_ip_mode == OPT_GTP_CONNECT) {
+	  socket_connect_to(host_name, port,
+			    &gtp_input_FILE, &gtp_output_FILE);
+	}
+	else {
+	  socket_listen_at(host_name, port,
+			   &gtp_input_FILE, &gtp_output_FILE);
+	}
+      }
+
+      if (gtp_dump_commands_file != NULL) {
+	gtp_dump_commands_FILE = fopen(gtp_dump_commands_file, "w");
+	if (gtp_dump_commands_FILE == NULL) {
+	  fprintf(stderr, "gnugo: Cannot open file %s\n",
+		  gtp_dump_commands_file);
+	  return EXIT_FAILURE;
+	}
+      }
+
+      play_gtp(gtp_input_FILE, gtp_output_FILE, gtp_dump_commands_FILE,
+	       orientation);
+
+      if (gtp_dump_commands_FILE)
+	fclose(gtp_dump_commands_FILE);
+
+      if (gtp_tcp_ip_mode == OPT_GTP_CONNECT)
+	socket_close_connection(gtp_input_FILE, gtp_output_FILE);
+      else if (gtp_tcp_ip_mode == OPT_GTP_LISTEN)
+	socket_stop_listening(gtp_input_FILE, gtp_output_FILE);
     }
 
-    play_gtp(gtp_input_FILE, gtp_dump_commands_FILE, orientation);
-    if (gtp_dump_commands_FILE)
-      fclose(gtp_dump_commands_FILE);
     break;
 
   case MODE_ASCII_EMACS:  
@@ -1435,8 +1501,14 @@ Main Options:\n\
        --quiet           Don't print copyright and informational messages\n\
        --level <amount>  strength (default %d)\n\
        --never-resign    Forbid GNU Go to resign\n\
-       --resign-allowed	 Allow resignation (default)\n\
+       --resign-allowed  Allow resignation (default)\n\
        --gtp-input <file>Read gtp commands from file instead of stdin\n\
+       --gtp-connect [HOST:]PORT\n\
+                         Connect to given host (127.0.0.1 if omitted) and port\n\
+                         and receive GTP commands on the established connection\n\
+       --gtp-listen [HOST:]PORT\n\
+                         Wait for the first TCP/IP connection on the given port\n\
+                         (if HOST is specified, only to that host)\n\
    -l, --infile <file>   Load name sgf file\n\
    -L, --until <move>    Stop loading just before move is played. <move>\n\
                          can be the move number or location (eg L10).\n\
@@ -1626,6 +1698,206 @@ show_copyright(void)
 {
   printf(COPYRIGHT);
 }
+
+
+#if ENABLE_SOCKET_SUPPORT
+
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+
+
+static void
+socket_connect_to(const char *host_name, unsigned int port,
+		  FILE **input_file, FILE **output_file)
+{
+  struct sockaddr_in address;
+  int connection_socket;
+  struct hostent *host_data;
+  char **address_pointer;
+
+  if (!host_name)
+    host_name = "127.0.0.1";
+
+  host_data = gethostbyname(host_name);
+  if (!host_data
+      || host_data->h_addrtype != AF_INET
+      || host_data->h_length != sizeof address.sin_addr) {
+    fprintf(stderr, "Failed to resolve host name `%s'\n", host_name);
+    exit(EXIT_FAILURE);
+  }
+
+  connection_socket = socket(PF_INET, SOCK_STREAM, 0);
+  if (connection_socket == -1) {
+    fprintf(stderr, "Unexpected error: failed to create a socket\n");
+    exit(EXIT_FAILURE);
+  }
+
+  address.sin_family = AF_INET;
+  address.sin_port = htons(port);
+
+  for (address_pointer = host_data->h_addr_list; *address_pointer;
+       address_pointer++) {
+    memcpy(&address.sin_addr, *address_pointer, sizeof address.sin_addr);
+    if (connect(connection_socket, (struct sockaddr *) &address,
+		sizeof address) != -1)
+      break;
+  }
+
+  if (! *address_pointer) {
+    fprintf(stderr, "Failed to connect to %s:%d\n", host_data->h_name, port);
+    close(connection_socket);
+    exit(EXIT_FAILURE);
+  }
+
+  *input_file  = fdopen(connection_socket, "r");
+  *output_file = fdopen(dup(connection_socket), "w");
+}
+
+
+static void
+socket_listen_at(const char *host_name, unsigned int port,
+		 FILE **input_file, FILE **output_file)
+{
+  struct sockaddr_in address;
+  int listening_socket;
+  int connection_socket;
+
+  if (host_name) {
+    struct hostent *host_data;
+
+    host_data = gethostbyname(host_name);
+    if (!host_data
+	|| host_data->h_addrtype != AF_INET
+	|| host_data->h_length != sizeof address.sin_addr) {
+      fprintf(stderr, "Failed to resolve host name `%s'\n", host_name);
+      exit(EXIT_FAILURE);
+    }
+
+    host_name = host_data->h_name;
+    memcpy(&address.sin_addr, host_data->h_addr_list[0],
+	   sizeof address.sin_addr);
+  }
+  else
+    address.sin_addr.s_addr = htonl(INADDR_ANY);
+
+  listening_socket = socket(PF_INET, SOCK_STREAM, 0);
+  if (listening_socket == -1) {
+    fprintf(stderr, "Unexpected error: failed to create a socket\n");
+    exit(EXIT_FAILURE);
+  }
+
+  address.sin_family = AF_INET;
+  address.sin_port = htons(port);
+
+  if (verbose) {
+    if (host_name) {
+      fprintf(stderr, "Waiting for a connection on %s:%d...\n",
+	      host_name, port);
+    }
+    else
+      fprintf(stderr, "Waiting for a connection on port %d...\n", port);
+  }
+
+  if (bind(listening_socket,
+	   (struct sockaddr *) &address, sizeof address) == -1
+      || listen(listening_socket, 0) == -1
+      || (connection_socket = accept(listening_socket, NULL, NULL)) == -1) {
+    if (host_name)
+      fprintf(stderr, "Failed to listen on %s:%d\n", host_name, port);
+    else
+      fprintf(stderr, "Failed to listen on port %d\n", port);
+
+    close(listening_socket);
+    exit(EXIT_FAILURE);
+  }
+
+  close(listening_socket);
+
+  *input_file  = fdopen(connection_socket, "r");
+  *output_file = fdopen(dup(connection_socket), "w");
+}
+
+
+static void
+socket_close_connection(FILE *input_file, FILE *output_file)
+{
+  /* When connecting, we close the socket first. */
+  fclose(input_file);
+  fclose(output_file);
+}
+
+
+static void
+socket_stop_listening(FILE *input_file, FILE *output_file)
+{
+  int buffer[0x1000];
+
+  if (verbose)
+    fprintf(stderr, "Waiting for the client to disconnect...\n");
+
+  /* When listening, we wait for the client to disconnect first.
+   * Otherwise, socket doesn't get released properly.
+   */
+  do
+    fread(buffer, sizeof buffer, 1, input_file);
+  while (!feof(input_file));
+
+  fclose(input_file);
+  fclose(output_file);
+}
+
+
+#else  /* not ENABLE_SOCKET_SUPPORT */
+
+
+static void
+socket_connect_to(const char *host_name, unsigned int port,
+		  FILE **input_file, FILE **output_file)
+{
+  UNUSED(host_name);
+  UNUSED(port);
+  UNUSED(input_file);
+  UNUSED(output_file);
+
+  fprintf(stderr, "GNU Go was compiled without socket support, unable to connect\n");
+  exit(EXIT_FAILURE);
+}
+
+
+static void
+socket_listen_at(const char *host_name, unsigned int port,
+		 FILE **input_file, FILE **output_file)
+{
+  UNUSED(host_name);
+  UNUSED(port);
+  UNUSED(input_file);
+  UNUSED(output_file);
+
+  fprintf(stderr, "GNU Go was compiled without socket support, unable to listen\n");
+  exit(EXIT_FAILURE);
+}
+
+
+static void
+socket_close_connection(FILE *input_file, FILE *output_file)
+{
+  UNUSED(input_file);
+  UNUSED(output_file);
+}
+
+
+static void
+socket_stop_listening(FILE *input_file, FILE *output_file)
+{
+  UNUSED(input_file);
+  UNUSED(output_file);
+}
+
+
+#endif	/* not ENABLE_SOCKET_SUPPORT */
 
 
 /*
