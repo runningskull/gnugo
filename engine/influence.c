@@ -997,9 +997,22 @@ compute_influence(int color, const char safe_stones[BOARDMAX],
     	          const float strength[BOARDMAX], struct influence_data *q,
 		  int move, const char *trace_message)
 {
+  int save_debug = debug;
+
   q->is_territorial_influence = 1;
   q->color_to_move = color;
+
+  /* Turn off DEBUG_INFLUENCE for influence computations we are not
+   * interested in.
+   */
+  if ((move == NO_MOVE
+       && !(printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
+      || (move != debug_influence))
+    debug = debug &~ DEBUG_INFLUENCE;
+
   do_compute_influence(color, safe_stones, strength, q, move, trace_message);
+
+  debug = save_debug;
 }
 
 /* Return the color of the territory at (pos). If it's territory for
@@ -1445,6 +1458,7 @@ compute_followup_influence(const struct influence_data *base,
   char goal[BOARDMAX];
   /* This is the color that will get a followup value. */
   int color = OTHER_COLOR(base->color_to_move);
+  int save_debug = debug;
 
   memcpy(q, base, sizeof(*q));
  
@@ -1458,12 +1472,22 @@ compute_followup_influence(const struct influence_data *base,
 	goal[ii] = 0;
     }
 
-  q->intrusion_counter = 0;
 
+  /* Turn off DEBUG_INFLUENCE for influence computations we are not
+   * interested in.
+   */
+  if ((move == NO_MOVE
+       && !(printmoyo & PRINTMOYO_INITIAL_INFLUENCE))
+      || (move != debug_influence))
+    debug = debug &~ DEBUG_INFLUENCE;
+
+  q->intrusion_counter = 0;
   current_influence = q;
   /* Match B patterns for saved stones. */
   matchpat_goal_anchor(followup_influence_callback, color, &barrierspat_db, 
            	       q, goal, 1);
+
+  debug = save_debug;
  
   /* Now add the intrusions. */
   add_marked_intrusions(q, color);
@@ -1497,6 +1521,7 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
 {
   int k;
   int ii;
+  int save_debug = debug;
 
   /* IMPORTANT: The caching relies on the fact that safe_stones[] and
    * strength[] will currently always be identical for identical board[]
@@ -1539,8 +1564,16 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
   escape_influence.is_territorial_influence = 0;
   escape_influence.color_to_move = EMPTY;
 
+  /* Turn off DEBUG_INFLUENCE unless we are specifically interested in
+   * escape computations.
+   */
+  if (!(debug & DEBUG_ESCAPE))
+    debug &= ~DEBUG_INFLUENCE;
+
   do_compute_influence(OTHER_COLOR(color), safe_stones, strength,
       		       &escape_influence, -1, NULL);
+
+  debug = save_debug;
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
