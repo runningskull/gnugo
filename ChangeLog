@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in estimate_territorial_value()
+- bugfix in find_worm_threats()
 - readconnect finds connections through ponnuki
 - readconnect sgf improvements
 - bugfix in estimate_strategical_value(): ALL_MOVE worms were overvalued

@@ -1028,7 +1028,7 @@ find_worm_threats()
 		|| liberty_of_string(bb, pos))
 	      continue;
 
-	    if (trymove(bb, other, "threaten defense", pos, EMPTY, NO_MOVE)) {
+	    if (trymove(bb, color, "threaten defense", pos, EMPTY, NO_MOVE)) {
 	      if (attack(pos, NULL) == WIN) {
 		int dcode = find_defense(pos, NULL);
 		if (dcode != 0)

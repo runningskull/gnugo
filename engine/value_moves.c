@@ -1052,6 +1052,7 @@ adjusted_worm_attack_value(int pos, int ww)
 static void
 estimate_territorial_value(int pos, int color, float score)
 {
+  int other = OTHER_COLOR(color);
   int k;
   int aa = NO_MOVE;
   
@@ -1174,9 +1175,8 @@ estimate_territorial_value(int pos, int color, float score)
     case ATTACK_THREAT:
       aa = worms[move_reasons[r].what];
 
-      /* Threat on our stones. */
-      if (board[aa] == color)
-	break;
+      /* Make sure this is a threat to attack opponent stones. */
+      ASSERT1(board[aa] == other, aa);
       
       if (dragon[aa].matcher_status == DEAD) {
 	DEBUG(DEBUG_MOVE_REASONS,
@@ -1238,7 +1238,7 @@ estimate_territorial_value(int pos, int color, float score)
 	if (board[aa] != EMPTY
 	    && find_defense(aa, &defense_move) == WIN
 	    && defense_move != NO_MOVE) {
-	  if (trymove(defense_move, OTHER_COLOR(color),
+	  if (trymove(defense_move, other,
 		      "estimate_territorial_value-b", NO_MOVE,
 		      EMPTY, NO_MOVE)) {
 	    if (board[pos] == EMPTY || attack(pos, NULL) == WIN) {
@@ -1279,16 +1279,9 @@ estimate_territorial_value(int pos, int color, float score)
     case DEFEND_THREAT:
       aa = worms[move_reasons[r].what];
 
-      /* Threat on our stones. */
-      if (board[aa] == color)
-	break;
+      /* Make sure this is a threat to defend our stones. */
+      ASSERT1(board[aa] == color, aa);
       
-      if (dragon[aa].matcher_status == DEAD) {
-	DEBUG(DEBUG_MOVE_REASONS,
-	      "    %1m: 0.0 - threatens to defend %1m (dead)\n", pos, aa);
-	break;
-      }
-
       add_followup_value(pos, 2 * worm[aa].effective_size);
 
       TRACE("  %1m: %f (followup) - threatens to defend %1m\n",
