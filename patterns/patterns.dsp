@@ -385,11 +385,73 @@ InputPath=.\eyes.db
 # End Source File
 # Begin Source File
 
-SOURCE=.\fuseki19.db
+SOURCE=.\fuseki.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
 USERDEP__FUSEK="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\fuseki.db
+
+"fusekipat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b fusekipat <fuseki.db >fusekipat.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__FUSEK="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\fuseki.db
+
+"fusekipat.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b fusekipat <fuseki.db >fusekipat.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\fuseki13.db
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__FUSEKI="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Release
+InputPath=.\fuseki13.db
+
+"fuseki13.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b -f fuseki13 <fuseki13.db >fuseki13.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
+
+USERDEP__FUSEKI="$(IntDir)\mkpat.exe"	
+# Begin Custom Build
+IntDir=.\Debug
+InputPath=.\fuseki13.db
+
+"fuseki13.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(IntDir)\mkpat -b -f fuseki13 <fuseki13.db >fuseki13.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\fuseki19.db
+
+!IF  "$(CFG)" == "patterns - Win32 Release"
+
+USERDEP__FUSEKI1="$(IntDir)\mkpat.exe"	
 # Begin Custom Build
 IntDir=.\Release
 InputPath=.\fuseki19.db
@@ -401,7 +463,7 @@ InputPath=.\fuseki19.db
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__FUSEK="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI1="$(IntDir)\mkpat.exe"	
 # Begin Custom Build
 IntDir=.\Debug
 InputPath=.\fuseki19.db
@@ -420,7 +482,7 @@ SOURCE=.\fuseki9.db
 
 !IF  "$(CFG)" == "patterns - Win32 Release"
 
-USERDEP__FUSEKI="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI9="$(IntDir)\mkpat.exe"	
 # Begin Custom Build
 IntDir=.\Release
 InputPath=.\fuseki9.db
@@ -432,7 +494,7 @@ InputPath=.\fuseki9.db
 
 !ELSEIF  "$(CFG)" == "patterns - Win32 Debug"
 
-USERDEP__FUSEKI="$(IntDir)\mkpat.exe"	
+USERDEP__FUSEKI9="$(IntDir)\mkpat.exe"	
 # Begin Custom Build
 IntDir=.\Debug
 InputPath=.\fuseki9.db

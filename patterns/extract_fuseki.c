@@ -74,8 +74,7 @@
 #include "random.h"
 
 #define USAGE "\n\
-Usage: extract_fuseki files boardsize moves patterns handicap strength
-\n\
+Usage: extract_fuseki files boardsize moves patterns handicap strength\n\
 files:     The name of a file listing sgf files to examine,\n\
            one filename per line.\n\
 boardsize: Only consider games with this size.\n\
