@@ -281,7 +281,7 @@ loadsgf games/trevor/trevor_27.sgf 35
 # D5 misses a big problem cut.
 loadsgf games/trevor/trevor_28.sgf 27
 280 gg_genmove black
-#? [D4]*
+#? [D4]
 
 # F6 is much better and safer to boot than H6.
 # culprit seems to be pattern LE4 (matches H6) - min. value 12.
@@ -424,7 +424,7 @@ loadsgf games/trevor/trevor_40.sgf 2
 #SEVERITY=5
 loadsgf games/trevor/trevor_41.sgf 29
 410 gg_genmove black
-#? [D5|E5]*
+#? [D5|E5]
 
 #CATEGORY=BLUNDER
 #DESCRIPTION=A3 leaves behind a double-atari.

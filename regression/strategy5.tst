@@ -85,13 +85,13 @@ loadsgf games/nngs/gnugo-3.3.6-evand-200208290255.sgf 73
 # F8 and F7 both fail.
 loadsgf games/strategy47.sgf
 273 gg_genmove white
-#? [E8|E9|F9|E7|F6|E6|D7|C7]*
+#? [E8|E9|F9|E7|F6|E6|D7|C7]
 
 # Black has a combination attack which must be defended correctly against.
 # In particular L5 fails.
 loadsgf games/strategy48.sgf
 274 gg_genmove white
-#? [!L5|M5|N5]*
+#? [!L5|M5|N5]
 
 # Semeai problem. White can make seki, black can kill.
 loadsgf games/strategy49.sgf

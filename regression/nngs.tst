@@ -176,7 +176,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 204
 #E4 better than C4, if must defend.
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 234
 420 gg_genmove black
-#? [!C4|D3|C3|B3]*
+#? [!C4|D3|C3|B3]
 
 
 
@@ -855,7 +855,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 135
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 161
 1890 gg_genmove black
-#? [H16]*
+#? [H16]
 
 
 #Hard to tell whether J18 or F19 are better.

@@ -111,7 +111,7 @@ loadsgf games/owl41.sgf
 # White C4 is a blunder.
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 230
 287 owl_attack D4
-#? [0]
+#? [0]*
 288 owl_defend D4
 #? [1 (PASS|A1|B1|B3)]
 

@@ -341,7 +341,7 @@ loadsgf games/trevor/auto/d25.sgf 178
 
 loadsgf games/trevor/auto/d29.sgf 182
 680 gg_genmove white
-#? [S16]*
+#? [S16]
 
 
 loadsgf games/trevor/auto/d29.sgf 187

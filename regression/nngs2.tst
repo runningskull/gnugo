@@ -101,7 +101,7 @@ loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 124
 
 loadsgf games/nngs/joshj-gnugo-3.3.2-200205310709.sgf 148
 210 gg_genmove black
-#? [F15]*
+#? [F15]
 
 loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 54
 220 gg_genmove black
