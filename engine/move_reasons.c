@@ -1410,8 +1410,9 @@ add_replacement_move(int from, int to)
     /* Abort if the old rule isn't compatible with the new one.
      * (But not in the stable release.)
      */
-    if (0)
+    if (0) {
       ASSERT1(dd == to || to == replacement_map[dd], from);
+    }
     /* There already is a redistribution in effect so we
      * have nothing more to do.
      */
