@@ -158,9 +158,10 @@ loadsgf games/nicklas/nicklas11.sgf 270
 1111 gg_genmove black
 #? [N18]
 
+# Q19 is not a fail, it does work as well. /pp
 loadsgf games/nicklas/nicklas11.sgf 274
 1112 gg_genmove black
-#? [N19]
+#? [N19|Q19]
 
 loadsgf games/nicklas/nicklas12.sgf 103
 1206 gg_genmove black
