@@ -3423,12 +3423,19 @@ Pattern A1121
 # tm New Pattern (3.1.20)  
 #   see also Pattern D1361 (both this and that are too generic)
 #   see trevorc:550, trevor:1050
+# gf Added constraint. (3.1.32)
 
 O.O         block to protect weakness
 X*.
 ?O?
 
 :8,-,value(35)
+
+a.b
+X*.
+?c?
+
+;!same_string(a,b) && (lib(a) <= 4 || lib(b) <= 4 || lib(c) <= 4)
 
 
 Pattern A1122

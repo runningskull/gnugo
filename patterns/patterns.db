@@ -2077,6 +2077,8 @@ bX*.
 
 
 Pattern EC56
+# gf The constraint was too inexact, see match at B9 in score2:34.
+#    Replaced it by a connection constraint. (3.1.32)
 
 X*O?       Prevent opponent's connection under
 ...X
@@ -2084,11 +2086,11 @@ X*O?       Prevent opponent's connection under
 
 :8,BO
 
-X*O?
-.abX
+B*O?
+...A
 ----
 
-;!oplay_attack(*,a,b,b)
+;oplay_connect(A,B) && !oplay_connect(*,A,B)
 
 
 Pattern EC57
@@ -4913,13 +4915,14 @@ Pattern EB702b
 
 
 Pattern EB703
+# gf Added O classification. (3.1.32)
 
 ?O?         block on edge
 O.O
 X*.
 ---
 
-:8,Xb
+:8,OXb
 
 
 Pattern EB704

@@ -5748,12 +5748,19 @@ Pattern D1360
 
 Pattern D1361
 # too generic; see resultant A1121, see also trevor:1050
+# gf Added constraint. (3.1.32)
 
 X.X         push to expose weakness
 O*.
 ?X?
 
 :8,-,value(65)
+
+A.B
+O*.
+?C?
+
+;!same_string(A,B) && (lib(A) <= 4 || lib(B) <= 4 || lib(C) <= 4)
 
 
 Pattern D1362
