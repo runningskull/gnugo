@@ -333,6 +333,7 @@ reset_pattern(void)
 
   if (patno > 0) {
     int have_constraint = (pattern[patno].autohelper_flag & HAVE_CONSTRAINT);
+    
     if (where & NORTH_EDGE)
       ino = 1;
     if (where & SOUTH_EDGE)
@@ -341,20 +342,22 @@ reset_pattern(void)
       jwo = 1;
     if (where & EAST_EDGE)
       jeo = 1;
+    
     if (verbose) {
-      for(i = ino; i <= maxi+ino+iso; i++)
+      for (i = ino; i <= maxi+ino+iso; i++)
         fprintf(stderr, "%02d %s\n", i, diagram[i]);
-      for(i = ino; i <= maxi+ino+iso; i++)
+      for (i = ino; i <= maxi+ino+iso; i++)
         fprintf(stderr, "%02d %s\n", i, constraint_diagram[i]);
     }
+    
     if (have_constraint) {
-      for(i = ino; i <= maxi+ino; i++)
-        for(j = jwo; j <= maxj+jwo; j++) {
-          if(strchr(CHECK_CHARS, constraint_diagram[i][j]) &&
-            constraint_diagram[i][j] != diagram[i][j] ) {
-	      fprintf(stderr, "%s(%d) : Error : xXoO not matched in constraint diagram of pattern pattern_names[patno] %s\n",
-	        current_file, current_line_number, pattern_names[patno]);
-              fatal_errors++;
+      for (i = ino; i <= maxi+ino; i++)
+        for (j = jwo; j <= maxj+jwo; j++) {
+          if (strchr(CHECK_CHARS, constraint_diagram[i][j])
+	      && constraint_diagram[i][j] != diagram[i][j]) {
+	    fprintf(stderr, "%s(%d) : Error : xXoO not matched in constraint diagram of pattern pattern_names[patno] %s\n",
+		    current_file, current_line_number, pattern_names[patno]);
+	    fatal_errors++;
 	  }
         }
     }
@@ -374,8 +377,8 @@ reset_pattern(void)
   current_c_i = 0;
   constraint[0] = 0;
   action[0] = 0;
-  for(i = 0; i < MAX_BOARD+2; i++) {
-    for(j = 0; j < MAX_BOARD+3; j++) {
+  for (i = 0; i < MAX_BOARD+2; i++) {
+    for (j = 0; j < MAX_BOARD+3; j++) {
       diagram[i][j] = '\0';
       constraint_diagram[i][j] = '\0';
     }
