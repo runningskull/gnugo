@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new prevent_attach_threat_helper() adds reverse followup value
+- DEBUG_TERRITORY made less confusing
 - handle suicides in do_commit_suicide(), not in do_play_move()
 - fix prisoner accounting in do_commit_suicide()
 - DEBUG_INFLUENCE made less noisy

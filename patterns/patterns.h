@@ -289,6 +289,7 @@ int not_lunch_helper(int apos, int bpos);
 int seki_helper(int str);
 void threaten_to_save_helper(int move, int str);
 void threaten_to_capture_helper(int move, int str);
+void prevent_attack_threat_helper(int move, int str);
 void defend_against_atari_helper(int move, int str);
 void amalgamate_most_valuable_helper(int apos, int bpos, int cpos);
 int finish_ko_helper(int apos);

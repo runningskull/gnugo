@@ -1931,19 +1931,25 @@ estimate_territorial_value(int pos, int color, float score)
 	  			 pos, "followup");
       this_value = influence_delta_territory(OPPOSITE_INFLUENCE(color),
 	   				     &move_influence, color, pos);
+      if (this_value != 0.0)
+	TRACE("%1m: %f - change in territory\n", pos, this_value);
+      else
+	DEBUG(DEBUG_MOVE_REASONS, "%1m: 0.00 - change in territory\n", pos);
       move[pos].influence_followup_value
 	= influence_delta_territory(&move_influence, &followup_influence,
 	    			    color, pos);
       store_delta_territory_cache(pos, color, this_value,
 	 			  move[pos].influence_followup_value);	
     }
+    else {
+      if (this_value != 0.0)
+	TRACE("%1m: %f - change in territory (cached)\n", pos, this_value);
+      else
+	DEBUG(DEBUG_MOVE_REASONS,
+	      "%1m: 0.00 - change in territory (cached)\n", pos);
+    }
     popgo();
     
-    if (this_value != 0.0)
-      TRACE("  %1m: %f - change in territory\n", pos, this_value);
-    else
-      DEBUG(DEBUG_MOVE_REASONS, "  %1m: 0.00 - change in territory\n", 
-	    pos);
   }
 
   tot_value += this_value;

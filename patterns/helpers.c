@@ -391,6 +391,19 @@ threaten_to_save_helper(int move, int str)
 }
 
 
+/* For use in autohelpers.
+ *
+ * Adds a reverse followup value if the opponent's move here would threaten
+ * to capture (str).
+ */
+void
+prevent_attack_threat_helper(int move, int str)
+{
+  add_reverse_followup_value(move, 2.0 * worm[str].effective_size);
+  TRACE("...reverse followup value %f\n", 2.0 * worm[str].effective_size);
+}
+
+
 /*
  * This is intended for use in autohelpers.
  *

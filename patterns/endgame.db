@@ -240,7 +240,7 @@ Pattern EE7
 ?.X?
 O.*.
 
-:8,sOX,terri(0.75)
+:8,sOXe,terri(0.75)
 
 ?.X?
 O.*a
@@ -735,6 +735,44 @@ Pattern EE414
 +---
 
 :8,OXed,terri(3)
+
+
+Pattern EE415
+# pp New pattern (3.3.18)
+# Currently necessary (see trevorb:170, where N11 is otherwise rejected
+# as "strategically or tactically unsafe) /ab
+
+|*O?
+|OXX
+|.OX
++---
+
+:8,X,terri(0.1),reverse_followup(2)
+
+|*A?
+|OXX
+|.OX
+----
+
+;alive(A)
+
+
+Pattern EE416
+
+|.OO?
+|..*X
++----
+
+:8,OXe
+
+|.BB?
+|..aX
++----
+
+;xplay_attack(a,B) && !oplay_attack(a,B)
+
+>prevent_attack_threat(B)
+
 
 
 # miscellaneous first line moves

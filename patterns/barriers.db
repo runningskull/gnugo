@@ -97,11 +97,29 @@ cad
 ;!(oplay_break_through(a,b,c,b,d)==WIN)
 
 
-Pattern Barrier4
+Pattern Barrier4a
 
 |,O
 
 :-,D
+
+|aO
+
+;!oplay_attack(a,a)
+
+
+Pattern Barrier4b
+
+|,o?
+|.OX
+
+
+:8,OD
+
+|ao?
+|.OX
+
+;!oplay_attack(a,a)
 
 
 Pattern Barrier5
@@ -458,6 +476,12 @@ OO
 --
 
 :8,D
+
+OO
+aX
+--
+
+;!oplay_attack(a,a)
 
 
 Pattern Barrier31
