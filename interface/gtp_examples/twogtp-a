@@ -238,6 +238,12 @@ while ($games > 0) {
 	$game_list{$sgffile} = $resultw . "|" . $resultb
     }
     $games-- if $games > 0;
+    close $black_in;
+    close $black_out;
+    close $white_in;
+    close $white_out;
+    waitpid $pidb, 0;
+    waitpid $pidw, 0;
     print "games remaining: $games\n";
 }
 

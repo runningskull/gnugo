@@ -31,6 +31,7 @@
 - new function mark_changed_dragon() in move_reasons.c
 - only mark owl defended stones as safe if also sufficiently tactically safe
 - matcher_check can analyze existing sgf files
+- twogtp-a kills processes
 - break_chain2_moves() revised
 - placehand() renamed to place_fixed_handicap()
 - new function place_free_handicap() in handicap.c with associated
