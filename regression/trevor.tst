@@ -438,7 +438,7 @@ loadsgf games/trevor/trevor_41.sgf 35
 #SEVERITY=3
 loadsgf games/trevor/trevor_41.sgf 37
 412 gg_genmove black
-#? [C4]*
+#? [C4]
 
 #CATEGORY=KO
 #DESCRIPTION=Terrible confusion on GNU Go's part here.

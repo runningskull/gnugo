@@ -530,7 +530,7 @@ loadsgf games/trevor/auto/c54.sgf 78
 
 loadsgf games/trevor/auto/c55.sgf 58
 940 gg_genmove white
-#? [G1]
+#? [G1]*
 
 
 loadsgf games/trevor/auto/c55.sgf 92

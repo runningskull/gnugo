@@ -210,7 +210,7 @@ loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 50
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 60
 41 gg_genmove white
-#? [!C8]*
+#? [!C8]
 
 #CATEGORY=SEMEAI
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 126

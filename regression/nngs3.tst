@@ -506,7 +506,7 @@ loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 112
 
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 194
 1080 gg_genmove white
-#? [!H7]
+#? [!H7]*
 
 
 loadsgf games/nngs/gnugo-3.2-merlin-200205071828.sgf 224
