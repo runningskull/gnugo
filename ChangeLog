@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- resign rather than pass when all own stones seem dead
+- lively_dragon_exists() based on status rather than crude_status
 - potential_moves[] array converted to 1D
 - distance measures converted from floating to fixed point arithmetic
   in connection reading code.

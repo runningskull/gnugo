@@ -763,13 +763,9 @@ thrash_around_helper(ARGS)
   if (doing_scoring
       || (stones_on_board(BLACK | WHITE) > board_size * board_size * 2 / 5
 	  && stones_on_board(WHITE) > board_size * board_size / 5)
-      || color == BLACK)
+      || color == BLACK
+      || lively_dragon_exists(WHITE))
     return 0;
-
-  for (d = 0; d < number_of_dragons; d++)
-    if (DRAGON(d).color == WHITE
-	&& DRAGON(d).status != DEAD)
-      return 0;
 
   return 1;
 }

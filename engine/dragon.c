@@ -494,7 +494,7 @@ make_dragons(int stop_before_owl)
   lively_white_dragons = 0;
   lively_black_dragons = 0;
   for (d = 0; d < number_of_dragons; d++)
-    if (DRAGON(d).crude_status != DEAD) {
+    if (DRAGON(d).status != DEAD) {
       if (DRAGON(d).color == WHITE)
         lively_white_dragons++;
       else

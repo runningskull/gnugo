@@ -54,7 +54,7 @@ static int revise_thrashing_dragon(int color, float our_score,
 
 static void break_mirror_go(int color);
 static int find_mirror_move(int *move, int color);
-static int should_resign(int color, float our_score);
+static int should_resign(int color, float our_score, int move);
 
 void sgfShowConsideredMoves(void);
 
@@ -533,13 +533,14 @@ do_genmove(int color, float pure_threat_value,
   }
   else {
     TRACE("genmove() recommends %1m with value %f\n", move, *value);
-    /* Maybe time to resign...
-     */
-    if (resign && resign_allowed
-	&& *value < 10.0 && should_resign(color, our_score)) {
-      TRACE("... though, genmove() thinks the position is hopeless\n");
-      *resign = 1;
-    }
+  }
+  
+  /* Maybe time to resign...
+   */
+  if (resign && resign_allowed
+      && *value < 10.0 && should_resign(color, our_score, move)) {
+    TRACE("... though, genmove() thinks the position is hopeless\n");
+    *resign = 1;
   }
   
   /* If statistics is turned on, this is the place to show it. */
@@ -740,16 +741,24 @@ break_mirror_go(int color)
 /* Helper to decide whether GG should resign a game
  */
 static int
-should_resign(int color, float our_score)
+should_resign(int color, float our_score, int move)
 {
   float status;
   int d;
   /* We resign 19x19 games only, smaller board games are fast enough.
    * We resign only if the margin is bigger than 45 pts and if we are
    * behind (of course).
+   *
+   * As an exception to this rule, we resign on any board size if
+   * it looks like all our dragons are dead and the generated move
+   * is a pass.
    */
-  if (board_size < 19
-      || our_score > -45.0) 
+  if (move == PASS_MOVE && !lively_dragon_exists(color))
+    return 1;
+  
+  if (move == PASS_MOVE
+      || board_size < 19
+      || our_score > -45.0)
     return 0;
   /* Check dragon statuses. If a friendly dragon is critical, we are
    * possibly not that much behind after we save it. If some hostile
