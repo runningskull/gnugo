@@ -562,91 +562,85 @@ play_connect_n(int color, int do_connect, int num_moves, ...)
 void
 set_depth_values(int level)
 {
-  static int node_limits[10] = {500, 450, 400, 325, 275,
-				200, 150, 100, 75, 50};
+  static int node_limits[] = {500, 500, 450, 400, 400, 325, 275,
+			      200, 150, 100, 75, 50};
+  int depth_level;
+
+  /*
+   * Other policies depending on level:
+   * aftermath.c:   >=  8: call estimate_score().
+   * dragon.c:      >=  8: compute owl threats (currently disabled) (*)
+   *                >=  8: call owl analysis of semeai (currently disabled)
+   * genmove.c:     >=  8: call estimate_score().
+   * owl.c:         >=  9: use vital attack pattern database
+   *                >= 10: increase depth values in owl_substantial
+   * reading.c:     >= 10: Use superstrings and do more backfilling. (*)
+   * value_moves.c: >=  6: try to find more owl attacks/defenses
+   *
+   * Those two marked (*) are particular expensive. Hence we don't change
+   * most depth values between levels 7 and 8 resp. 9 and 10.
+   * FIXME: This isn't correct for owl threats anymore.
+   *
+   * depth_level indicates the correction compared to the default settings
+   * at level 10 for most reading depths.
+   */
+  if (level >= 10)
+    depth_level = level - 10;
+  else if (level >= 8)
+    depth_level = level - 9;
+  else 
+    depth_level = level - 8;
+
+  depth               = gg_max(6, DEPTH           + depth_level);
+  backfill_depth      = gg_max(2, BACKFILL_DEPTH  + depth_level);
+  backfill2_depth     = gg_max(1, BACKFILL2_DEPTH + depth_level);
+  branch_depth        = gg_max(3, BRANCH_DEPTH    + depth_level);
+  if (level >= 8)
+    owl_distrust_depth  = gg_max(1, (2 * OWL_DISTRUST_DEPTH + depth_level) / 2);
+  else
+    owl_distrust_depth  = gg_max(1, (2*OWL_DISTRUST_DEPTH-1 + depth_level) / 2);
+  owl_branch_depth    = gg_max(2, (2 * OWL_BRANCH_DEPTH   + depth_level) / 2);
+  owl_reading_depth   = gg_max(5, (2 * OWL_READING_DEPTH  + depth_level) / 2);
+  urgent              = 0;
+
+  /* Atari-atari depth levels are unchanged only between levels 7/8: */
+  if (level >= 8) {
+    aa_depth            = gg_max(0, AA_DEPTH        + (level - 10));
+    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH + (level - 10));
+  }
+  else {
+    aa_depth            = gg_max(0, AA_DEPTH        + (level - 9));
+    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH + (level - 9));
+  }
+
+  /* Exceptions:
+   * fourlib_depth: This is constant from levels 7 to 10.
+   * FIXME: ko_depth: jumps strangely at level 7.
+   * superstring_depth: set to 0 below level 10.
+   */
+  if (level >= 10)
+    ko_depth            = gg_max(1, KO_DEPTH + (level - 10));
+  else if (level != 7)
+    ko_depth            = gg_max(1, KO_DEPTH + (level - 9));
+  else /* level == 7 -- FIXME */ 
+    ko_depth            = gg_max(1, KO_DEPTH + (level - 8));
+
+  if (level >= 10)
+    fourlib_depth       = gg_max(1, FOURLIB_DEPTH + (level - 10));
+  else if (level >= 7)
+    fourlib_depth       = gg_max(1, FOURLIB_DEPTH);
+  else
+    fourlib_depth       = gg_max(1, FOURLIB_DEPTH + (level - 7));
+
   if (level >= 10) {
-    depth               = gg_max(6, DEPTH - 10 + level);
-    ko_depth            = gg_max(1, KO_DEPTH - 10 + level);
-    backfill_depth      = gg_max(2, BACKFILL_DEPTH - 10 + level);
-    backfill2_depth     = gg_max(1, BACKFILL2_DEPTH - 10 + level);
-    superstring_depth   = gg_max(1, SUPERSTRING_DEPTH - 10 + level);
-    branch_depth        = gg_max(3, BRANCH_DEPTH - 10 + level);
-    fourlib_depth       = gg_max(1, FOURLIB_DEPTH - 10 + level);
-    aa_depth            = gg_max(0, AA_DEPTH - 10 + level);
-    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH - 10 + level);
-    owl_distrust_depth  = gg_max(1, OWL_DISTRUST_DEPTH - 5 + level/2);
-    owl_branch_depth    = gg_max(2, OWL_BRANCH_DEPTH - 5 + level/2);
-    owl_reading_depth   = gg_max(5, OWL_READING_DEPTH - 5 + level/2);
-    if (level == 10)
-      owl_node_limit    = OWL_NODE_LIMIT;
-    else
-      owl_node_limit    = OWL_NODE_LIMIT * pow(1.5, -10 + level);
-    urgent              = 0;
+    superstring_depth   = gg_max(1, SUPERSTRING_DEPTH + (level - 10));
+    owl_node_limit      = OWL_NODE_LIMIT * pow(1.5, depth_level);
   }
-  else if (level > 7) {
-    depth               = gg_max(6, DEPTH - 9 + level);
-    ko_depth            = gg_max(1, KO_DEPTH - 9 + level);
-    backfill_depth      = gg_max(2, BACKFILL_DEPTH - 9 + level);
-    backfill2_depth     = gg_max(1, BACKFILL2_DEPTH - 9 + level);
-    superstring_depth   = 0 ;
-    branch_depth        = gg_max(3, BRANCH_DEPTH - 9 + level);
-    if (level < 9)
-      fourlib_depth     = gg_max(1, FOURLIB_DEPTH - 8 + level);
-    else
-      fourlib_depth     = gg_max(1, FOURLIB_DEPTH - 9 + level);
-    aa_depth            = gg_max(0, AA_DEPTH - 10 + level);
-    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH - 10 + level);
-    owl_distrust_depth  = gg_max(1, OWL_DISTRUST_DEPTH - 5 
-			      + (level+1)/2);
-    owl_branch_depth    = gg_max(2, OWL_BRANCH_DEPTH - 5 + (level+1)/2);
-    owl_reading_depth   = gg_max(5, OWL_READING_DEPTH - 5 + (level+1)/2);
-    owl_node_limit      = (OWL_NODE_LIMIT * node_limits[9 - level] /
+  else {
+    superstring_depth   = 0;
+    owl_node_limit      = (OWL_NODE_LIMIT * node_limits[10 - level] /
 			   node_limits[0]);
     owl_node_limit      = gg_max(20, owl_node_limit);
-    urgent              = 0;
-  }
-  else if (level == 7) {
-    depth               = gg_max(6, DEPTH - 1);
-    ko_depth            = gg_max(1, KO_DEPTH - 1);
-    backfill_depth      = gg_max(2, BACKFILL_DEPTH - 1);
-    backfill2_depth     = gg_max(1, BACKFILL2_DEPTH - 1);
-    superstring_depth   = 0 ;
-    branch_depth        = gg_max(3, BRANCH_DEPTH - 1);
-    if (level < 9)
-      fourlib_depth     = gg_max(1, FOURLIB_DEPTH);
-    else
-      fourlib_depth     = gg_max(1, FOURLIB_DEPTH - 1);
-    aa_depth            = gg_max(0, AA_DEPTH - 2);
-    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH - 2);
-    owl_distrust_depth  = gg_max(1, OWL_DISTRUST_DEPTH - 1);
-    owl_branch_depth    = gg_max(2, OWL_BRANCH_DEPTH - 5 + (level+1)/2);
-    owl_reading_depth   = gg_max(5, OWL_READING_DEPTH - 5 + (level+1)/2);
-    owl_node_limit      = (OWL_NODE_LIMIT * node_limits[9 - level] /
-			   node_limits[0]);
-    owl_node_limit      = gg_max(20, owl_node_limit);
-    urgent              = 0;
-  }
-  else if (level < 7) {
-    depth               = gg_max(6, DEPTH - 8 + level);
-    ko_depth            = gg_max(1, KO_DEPTH - 9 + level);
-    backfill_depth      = gg_max(2, BACKFILL_DEPTH - 8 + level);
-    backfill2_depth     = gg_max(1, BACKFILL2_DEPTH - 8 + level);
-    superstring_depth   = 0 ;
-    branch_depth        = gg_max(3, BRANCH_DEPTH - 8 + level);
-    if (level < 9)
-      fourlib_depth     = gg_max(1, FOURLIB_DEPTH - 7 + level);
-    else
-      fourlib_depth     = gg_max(1, FOURLIB_DEPTH - 8 + level);
-    aa_depth            = gg_max(0, AA_DEPTH - 9 + level);
-    aa_threat_depth     = gg_max(0, AA_THREAT_DEPTH - 9 + level);
-    owl_distrust_depth  = gg_max(1, OWL_DISTRUST_DEPTH - 5
-			      + (level+1)/2);
-    owl_branch_depth    = gg_max(2, OWL_BRANCH_DEPTH - 4 + level/2);
-    owl_reading_depth   = gg_max(5, OWL_READING_DEPTH - 4 + level/2);
-    owl_node_limit      = (OWL_NODE_LIMIT * node_limits[8 - level] /
-			   node_limits[0]);
-    owl_node_limit      = gg_max(20, owl_node_limit);
-    urgent              = 0;
   }
 
 

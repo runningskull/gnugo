@@ -1352,7 +1352,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
     }
   }
 
-  if (level >= 10 && stackp <= superstring_depth) {
+  if (stackp <= superstring_depth) {
     int dcode = superstring_breakchain(str, &xpos, komaster, kom_pos, 4);
     CHECK_RESULT_UNREVERSED(savecode, savemove, dcode, xpos, move,
       			    "superstring_breakchain");
@@ -1363,7 +1363,7 @@ defend2(int str, int *move, int komaster, int kom_pos)
    * super_string.
    */
   saved_num_moves = moves.num;
-  if (level >= 10 && stackp <= superstring_depth) {
+  if (stackp <= superstring_depth) {
     int ss_liberties;
     int ss_libs[MAX_LIBERTIES + 4];
 

@@ -1741,7 +1741,7 @@ estimate_territorial_value(int pos, int color, float score)
    */
   this_value = 0.0;
 
-  if (move[pos].move_safety == 1 && safe_move(pos, color) == WIN)
+  if (move[pos].move_safety == 1 && safe_move(pos, color))
     saved_stones[pos] = INFLUENCE_SAVED_STONE;
   else
     saved_stones[pos] = INFLUENCE_CAPTURED_STONE;
@@ -2909,7 +2909,7 @@ review_move_reasons(int *the_move, float *val, int color,
   save_verbose = verbose;
   if (verbose > 0)
     verbose--;
-  if (level > 5) {
+  if (level >= 6) {
     find_more_owl_attack_and_defense_moves(color);
     time_report(2, "  find_more_owl_attack_and_defense_moves", NO_MOVE, 1.0);
   }

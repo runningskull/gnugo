@@ -574,7 +574,7 @@ make_dragons(int color, int stop_before_owl, int save_verbose)
   time_report(2, "  compute dragon safety", NO_MOVE, 1.0);
 
   /* Resolve semeais. This may revise the safety and status fields. */
-  if (experimental_semeai && level > 7)
+  if (experimental_semeai && level >= 8)
     new_semeai(color);
   else 
     semeai(color);

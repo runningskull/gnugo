@@ -80,6 +80,7 @@ reset_engine()
   /* Initialize things for hashing of positions. */
   reading_cache_clear();
   hashdata_recalc(&hashdata, board, board_ko_pos);
+
   worms_examined = -1;
   initial_influence_examined = -1;
   dragons_examined_without_owl = -1;
@@ -90,10 +91,7 @@ reset_engine()
   /* Prepare our table of move reasons. */
   clear_move_reasons();
 
-  /* Set up depth values. Level 10 should be more or less the same as level 9
-   * except that the superstring technology is used in the reading code. This
-   * makes us about 10% slower.
-   */
+  /* Set up depth values (see comments there for details). */
   set_depth_values(level);
 }
 
