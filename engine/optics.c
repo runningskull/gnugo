@@ -103,7 +103,6 @@ clear_eye(struct eye_data *eye)
   eye->mineye = 0;
   eye->attack_point = NO_MOVE;
   eye->defense_point = NO_MOVE;
-  eye->dragon = NO_MOVE;
   eye->marginal = 0;
   eye->type = 0;
   eye->neighbors = 0;
@@ -582,10 +581,47 @@ propagate_eye(int origin, struct eye_data eye[BOARDMAX])
       eye[pos].mineye        = eye[origin].mineye;
       eye[pos].attack_point  = eye[origin].attack_point;
       eye[pos].defense_point = eye[origin].defense_point;
-      eye[pos].dragon        = eye[origin].dragon;
     }
 }
 
+
+int
+find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
+		 int dragons[], int max_dragons)
+{
+  int mx[BOARDMAX];
+  int num_dragons = 0;
+  int pos;
+
+  memset(mx, 0, sizeof(mx));
+  if (debug & 0x800000)
+    gprintf("find_eye_dragons: %1m %C\n", origin, eye_color);
+  for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+    if (board[pos] == eye_color
+	&& mx[dragon[pos].origin] == 0
+	&& ((ON_BOARD(SOUTH(pos))
+	     && eye[SOUTH(pos)].origin == origin
+	     && !eye[SOUTH(pos)].marginal)
+	    || (ON_BOARD(WEST(pos))
+		&& eye[WEST(pos)].origin == origin
+		&& !eye[WEST(pos)].marginal)
+	    || (ON_BOARD(NORTH(pos))
+		&& eye[NORTH(pos)].origin == origin
+		&& !eye[NORTH(pos)].marginal)
+	    || (ON_BOARD(EAST(pos))
+		&& eye[EAST(pos)].origin == origin
+		&& !eye[EAST(pos)].marginal))) {
+      if (debug & 0x800000)
+	gprintf("  dragon: %1m %1m\n", pos, dragon[pos].origin);
+      mx[dragon[pos].origin] = 1;
+      if (dragons != NULL && num_dragons < max_dragons)
+	dragons[num_dragons] = dragon[pos].origin;
+      num_dragons++;
+    }
+  }
+  
+  return num_dragons;
+}
 
 /* Print debugging data for the eyeshape at (i,j). Useful with GDB.
  */

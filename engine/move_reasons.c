@@ -1550,11 +1550,9 @@ list_move_reasons(int color)
 	  aa = eyes[move_reasons[r].what];
 	  ecolor = eyecolor[move_reasons[r].what];
 	  if (ecolor == WHITE)
-	    gprintf("Move at %1m vital eye point for dragon %1m (eye %1m)\n",
-		    pos, white_eye[aa].dragon, aa);
+	    gprintf("Move at %1m vital eye point for eye %1m\n", pos, aa);
 	  else
-	    gprintf("Move at %1m vital eye point for dragon %1m (eye %1m)\n",
-		    pos, black_eye[aa].dragon, aa);
+	    gprintf("Move at %1m vital eye point for eye %1m\n", pos, aa);
 	  break;
 	  
 	case EITHER_MOVE:

@@ -279,9 +279,9 @@ find_more_owl_attack_and_defense_moves(int color)
 	int ecolor = eyecolor[move_reasons[r].what];
 	
 	if (ecolor == WHITE)
-	  dd1 = white_eye[ee].dragon;
+	  find_eye_dragons(ee, white_eye, WHITE, &dd1, 1);
 	else
-	  dd1 = black_eye[ee].dragon;
+	  find_eye_dragons(ee, black_eye, BLACK, &dd1, 1);
 	
 	if (dd1 == NO_MOVE) /* Maybe we should assert this not to happen. */
 	  continue;
@@ -1721,7 +1721,6 @@ estimate_strategical_value(int pos, int color, float score)
   int d2 = -1;
   int worm1 = -1;
   int worm2 = -1;
-  int ecolor = 0;
   
   float this_value = 0.0;
   float tot_value = 0.0;
@@ -1962,6 +1961,7 @@ estimate_strategical_value(int pos, int color, float score)
 	break;
 	
       case VITAL_EYE_MOVE:
+#if 0
 	/*
 	 * The value of the threatened group itself has already been
 	 * accounted for in territorial_value. Now we need to determine
@@ -1992,7 +1992,6 @@ estimate_strategical_value(int pos, int color, float score)
 	  break;
 	}
 
-#if 0
        if (dragon[bb].matcher_status == CRITICAL) {
 	  this_value = ???
          TRACE("  %1m: %f - vital for %1m\n",

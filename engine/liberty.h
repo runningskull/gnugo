@@ -807,7 +807,6 @@ struct eye_data {
   int mineye;        /* number of eyes if attacker plays first               */
   int attack_point;  /* vital point for attack                               */
   int defense_point; /* vital point for defense                              */
-  int dragon;        /* origin of the surrounding dragon                     */
 
   /* The above fields are constant on the whole eyespace. */
   /* ---------------------------------------------------------------- */
@@ -845,6 +844,8 @@ int recognize_eye2(int pos, int *attack_point,
 		   struct half_eye_data heye[BOARDMAX],
                     int add_moves, int color);
 void propagate_eye(int pos, struct eye_data eye[BOARDMAX]);
+int find_eye_dragons(int origin, struct eye_data eye[BOARDMAX], int eye_color,
+		     int dragons[], int max_dragons);
 float topological_eye(int pos, int color,
 		      struct eye_data b_eye[BOARDMAX],
 		      struct eye_data w_eye[BOARDMAX],

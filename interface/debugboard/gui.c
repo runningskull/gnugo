@@ -382,12 +382,14 @@ display_eye(int color, struct eye_data eyedata[BOARDMAX], int pos)
   gg_wprintw(info_window, "%d   ", eyedata[pos].esize);
   wmove(info_window, 6, 18);
   gg_wprintw(info_window, "%d   ", eyedata[pos].msize);
+#if 0
   wmove(info_window, 7, 18);
   if (eyedata[pos].dragon == NO_MOVE)
     gg_wprintw(info_window, "---");
   else
     gg_wprintw(info_window, "%s ",
 	       location_to_string(eyedata[pos].dragon));
+#endif
 
   wmove(info_window, 11, 18);
   gg_wprintw(info_window, "%d  ", eyedata[pos].type);
