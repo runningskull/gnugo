@@ -1721,15 +1721,13 @@ ascii_report_dragon(char *string)
 {
   int m, n;
   string_to_location(board_size, string, &m, &n);
-  report_dragon(m, n);
+  report_dragon(stderr, POS(m, n));
 }
 
 
 void
-report_dragon(int m, int n)
+report_dragon(FILE *outfile, int pos)
 {
-  int pos = POS(m, n);
-  int i, j;
   int ii;
   int k;
   struct dragon_data *d = &(dragon[pos]);
@@ -1745,72 +1743,49 @@ report_dragon(int m, int n)
     return;
   }
 
-  gprintf("*** dragon at %1m:\n", pos);
-  gprintf("color: %s; origin: %1m; size: %d; effective size: %f\n",
-	  (d->color == WHITE) ? "WHITE" : "BLACK",
-	  d->origin, d->size, d->effective_size);
+  gfprintf(outfile,"color                   %s\n", color_to_string(dragon[pos].color));
+  gfprintf(outfile,"origin                  %1m\n", dragon[pos].origin);
+  gfprintf(outfile,"size                    %d\n", dragon[pos].size);
+  gfprintf(outfile,"effective_size          %f\n", dragon[pos].effective_size);
+  gfprintf(outfile,"heyes                   %d\n", DRAGON2(pos).heyes);
+  gfprintf(outfile,"heye                    %1m\n", DRAGON2(pos).heye);
+  gfprintf(outfile,"genus                   %d\n", DRAGON2(pos).genus);
+  gfprintf(outfile,"escape_route            %d\n", DRAGON2(pos).escape_route);
+  gfprintf(outfile,"lunch                   %1m\n", DRAGON2(pos).lunch);
+  gfprintf(outfile,"status                  %s\n",
+	     status_to_string(dragon[pos].status));
+  gfprintf(outfile,"owl_status              %s\n",
+	     status_to_string(dragon[pos].owl_status));
+  gfprintf(outfile,"matcher_status          %s\n",
+	     status_to_string(dragon[pos].matcher_status));
+  gfprintf(outfile,"owl_threat_status       %s\n",
+	     status_to_string(dragon[pos].owl_threat_status));
+  gfprintf(outfile,"owl_attack              %1m\n", dragon[pos].owl_attack_point);
+  gfprintf(outfile,"owl_attack_certain      %s\n",
+	     (dragon[pos].owl_attack_certain) ? "YES" : "NO");
+  gfprintf(outfile,"owl_2nd_attack          %1m\n", dragon[pos].owl_second_attack_point);
+  gfprintf(outfile,"owl_defend              %1m\n", dragon[pos].owl_defense_point);
+  gfprintf(outfile,"owl_defense_certain     %s\n",
+	     (dragon[pos].owl_defense_certain) ? "YES" : "NO");
+  gfprintf(outfile,"owl_2nd_defend          %1m\n", dragon[pos].owl_second_defense_point);
+  gfprintf(outfile,"semeai                  %d\n", DRAGON2(pos).semeai);
+  gfprintf(outfile,"semeai_margin_of_safety %d\n",
+	  DRAGON2(pos).semeai_margin_of_safety);
+  gfprintf(outfile,"neighbors               ");
+  for (k = 0; k < DRAGON2(pos).neighbors; k++)
+    gfprintf(outfile,"%1m ", DRAGON(DRAGON2(pos).adjacent[k]).origin);
+  gfprintf(outfile,"\nhostile neighbors       %d\n", d2->hostile_neighbors);
+  gfprintf(outfile,"moyo                    %d\n", DRAGON2(pos).moyo);
+  gfprintf(outfile,"safety                  %s\n",
+	  safety_to_string(DRAGON2(pos).safety));
+  gfprintf(outfile,"strings                 ");
 
-  gprintf("strings:");
-  for (i = 0; i < board_size; i++)
-    for (j = 0; j < board_size; j++) {
-      ii = POS(i, j);
-
-      if (worm[ii].origin == ii
-	  && is_same_dragon(ii, pos))
-	gprintf(" %1m", ii);
-    }
-
-  gprintf("\nhalf eyes: %d, ", d2->heyes);
-  if (d2->heye != NO_MOVE)
-    gprintf("half eye: %1m, ", d2->heye);
-  else
-    gprintf("half eye: NONE,");
-
-  gprintf(" genus %d, escape_route %d,", d2->genus, d2->escape_route);
-  if (d2->lunch != NO_MOVE)
-    gprintf(" lunch at %1m\n", d2->lunch);
-  else
-    gprintf(" no lunch\n");
-
-  gprintf("dragon status %s, owl status %s, matcher status %s, owl threat status %s\n",
-	  status_to_string(d->status),
-	  status_to_string(d->owl_status),
-	  status_to_string(d->matcher_status),
-	  status_to_string(d->owl_threat_status));
-
-  if (d->owl_attack_point != NO_MOVE)
-    gprintf("owl attack point %1m, code %d, ",
-	    d->owl_attack_point, d->owl_attack_code);
-  else
-    gprintf("no owl attack point, ");
-
-  if (d->owl_second_attack_point != NO_MOVE)
-    gprintf("second owl attack point %1m\n", d->owl_second_attack_point);
-  else
-    gprintf("no second owl attack point\n");
-
-  if (d->owl_defense_point != NO_MOVE)
-    gprintf("owl defense point %1m, code %d, ",
-	    d->owl_defense_point, d->owl_defense_code);
-  else
-    gprintf("no owl defense point, ");
-
-  if (d->owl_second_defense_point != NO_MOVE)
-    gprintf("second owl defense point %1m\n", d->owl_second_defense_point);
-  else
-    gprintf("no second owl defense point\n");
-
-  if (d2->semeai)
-    gprintf("This dragon is involved in a semeai. Margin of safety %d\n",
-	    d2->semeai_margin_of_safety);
-  else
-    gprintf("This dragon is not involved in a semeai.\n");
-
-  gprintf("neighbor dragons: ");
-  for (k = 0; k < d2->neighbors; k++)
-    gprintf("%1m ", dragon2[d2->adjacent[k]].origin);
-  gprintf("\nhostile neighbors: %d\n", d2->hostile_neighbors);
-  gprintf("\nmoyo: %d; safety: %d\n", d2->moyo, d2->safety);
+  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+    if (ON_BOARD(ii)
+	&& worm[ii].origin == ii
+	&& is_same_dragon(ii, pos))
+	gfprintf(outfile,"%1m ", ii);
+  gfprintf(outfile,"\n");
 }
 
 
