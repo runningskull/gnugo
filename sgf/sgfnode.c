@@ -770,7 +770,7 @@ sgf_write_header(SGFNode *root, int overwrite, int seed, float komi,
   if (overwrite || !sgfGetIntProperty(root, "DT", &dummy))
     sgfOverwriteProperty(root, "DT", str);
   if (overwrite || !sgfGetIntProperty(root, "AP", &dummy))
-    sgfOverwriteProperty(root, "AP", "GNU Go "VERSION);
+    sgfOverwriteProperty(root, "AP", "GNU Go:"VERSION);
   if (overwrite || !sgfGetIntProperty(root, "RU", &dummy))
     sgfOverwriteProperty(root, "RU", rules ? "Chinese" : "Japanese");
   sgfOverwriteProperty(root, "FF", "4");

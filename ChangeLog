@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- corrected format of AP property in sgf_write_header()
 - new game records and test cases
 
 3.3.21 released June 3, 2003
