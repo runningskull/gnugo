@@ -199,10 +199,10 @@ static int owl_stack_pointer = 0;
 static void push_owl(struct local_owl_data *owl);
 static void pop_owl(struct local_owl_data *owl);
 
-/* Called when (ai,aj) and (bi,bj) point to adjacent dragons
+/* Called when (apos) and (bpos) point to adjacent dragons
  * of the opposite color, both with matcher_status DEAD or
  * CRITICAL, analyzes the semeai, assuming that the player
- * of the (ai,aj) dragon moves first.
+ * of the (apos) dragon moves first.
  */
 
 static int owl_phase;
@@ -235,14 +235,14 @@ owl_analyze_semeai(int apos, int bpos)
   	  bpos, status_to_string(resultb));
 }
 
-/* It is assumed that the (ai,aj) player moves first, and
+/* It is assumed that the 'a' player moves first, and
  * determines the best result for both players. The
  * parameter "pass" is 1 if the opponent's last move is
  * pass. In this case, if no move is found but the genus
  * is less than 1, then the position is declared seki.
  *
- * If a move is needed to get this result, then (*ti,*tj) is
- * the location, otherwise this field returns (-1,-1) (tenuki).
+ * If a move is needed to get this result, then (*move) is
+ * the location, otherwise this field returns PASS.
  */
 
 static void
@@ -354,7 +354,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       *resulta = ALIVE;
       *resultb = DEAD;
       if (move)
-	*move = 0;
+	*move = PASS_MOVE;
       sgf_dumptree = save_sgf_dumptree;
       count_variations =   save_count_variations;
       return;
@@ -366,7 +366,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	/* you are already dead */
 	*resulta = ALIVE;
 	*resultb = DEAD;
-	if (move) *move = 0;
+	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	return;
@@ -386,7 +386,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	/* both live */
 	 *resulta = ALIVE;
 	 *resultb = ALIVE;
-	 if (move) *move = 0;
+	 if (move) *move = PASS_MOVE;
 	 sgf_dumptree = save_sgf_dumptree;
 	 count_variations = save_count_variations;
 	 return;
@@ -398,7 +398,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	/* I am dead */
 	*resulta = DEAD;
 	*resultb = ALIVE;
-	if (move) *move = 0;
+	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	return;
@@ -417,7 +417,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	/* I die */
 	*resulta = DEAD;
 	*resultb = ALIVE;
-	if (move) *move = 0;
+	if (move) *move = PASS_MOVE;
 	sgf_dumptree = save_sgf_dumptree;
 	count_variations = save_count_variations;
 	return;
@@ -652,6 +652,7 @@ do_owl_analyze_semeai(int apos, int bpos,
       owl_update_boundary_marks(mpos, owla);
       if (liberty_of_goal(mpos, owla))
 	owla->goal[mpos] = 1;
+
       do_owl_analyze_semeai(bpos, apos, owlb, owla, komaster,
 			    &this_resultb, &this_resulta, NULL, 0);
       if (this_resultb == DEAD && this_resulta == ALIVE) {
@@ -686,7 +687,7 @@ do_owl_analyze_semeai(int apos, int bpos,
   if (moves[k].value < 40 && pass == 1) {
     *resulta = ALIVE_IN_SEKI;
     *resultb = ALIVE_IN_SEKI;
-    if (move) *move = 0;
+    if (move) *move = PASS_MOVE;
     return;
   }
   /* If we can't do better than seki, try passing */
@@ -697,7 +698,7 @@ do_owl_analyze_semeai(int apos, int bpos,
     if (this_resulta == ALIVE) {
       *resulta = ALIVE;
       *resultb = DEAD;
-      if (move) *move = 0;
+      if (move) *move = PASS_MOVE;
       return;
     }
     if (this_resulta == DEAD) {
@@ -706,7 +707,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	{
 	  *resulta = DEAD;
 	  *resultb = ALIVE;
-	  if (move) *move = 0;
+	  if (move) *move = PASS_MOVE;
 	  return;
 	}
       else {
@@ -720,7 +721,7 @@ do_owl_analyze_semeai(int apos, int bpos,
 	&& best_resulta != ALIVE) {
       *resulta = ALIVE_IN_SEKI;
       *resultb = ALIVE_IN_SEKI;
-      if (move) *move = 0;
+      if (move) *move = PASS_MOVE;
       return;
     }
   }
@@ -2404,8 +2405,8 @@ owl_add_move(struct owl_move_data *moves, int move, int value,
   }
 }  
 
-/* Marks the dragons at (ai, aj) and (bi, bj). If only one dragon
- * needs marking, (bi, bj) should be passed as (0). 
+/* Marks the dragons at (apos) and (bpos). If only one dragon
+ * needs marking, (bpos) should be passed as (0). 
  */
 
 static void
@@ -2917,7 +2918,7 @@ owl_does_attack(int move, int target)
 
 
 /* Use the owl code to determine whether connecting the two dragons
- * (ai, aj) and (bi, bj) by playing at (ti, tj) results in a living
+ * (target1) and (target2) by playing at (move) results in a living
  * dragon. Should be called only when stackp==0.
  */
 
@@ -3567,8 +3568,8 @@ owl_goal_dragon(int pos)
 }
 
 /* Used by autohelpers.
- * Returns 1 if (ai, aj) is an eyespace for the color having a stone
- * at (bi, bj), but only if it's worth at least a half eye.
+ * Returns 1 if (apos) is an eyespace for the color having a stone
+ * at (bpos), but only if it's worth at least a half eye.
  */
 int
 owl_eyespace(int apos, int bpos)
@@ -3593,8 +3594,8 @@ owl_eyespace(int apos, int bpos)
   
 
 /* Used by autohelpers.
- * Returns 1 if (ai, aj) is an eyespace for the color having a stone
- * at (bi, bj), which is possibly worth 2 eyes.
+ * Returns 1 if (apos) is an eyespace for the color having a stone
+ * at (bpos), which is possibly worth 2 eyes.
  */
 int
 owl_big_eyespace(int apos, int bpos)
@@ -4035,7 +4036,7 @@ owl_hotspots(float values[BOARDMAX])
       mark_dragon_hotspot_values(values, entry->cpos, contribution);
       break;
     case OWL_SUBSTANTIAL:
-      /* Only consider the liberties of (ai, aj). */
+      /* Only consider the liberties of (apos). */
       liberties = findlib(entry->apos, MAXLIBS, libs);
       for (r = 0; r < liberties; r++)
 	values[libs[r]] += contribution;

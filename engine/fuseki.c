@@ -46,7 +46,9 @@
 #define LOWER_LEFT  2
 #define LOWER_RIGHT 3
 
-/* This value must be lower than the value for an ongoing joseki. */
+/* This value must be lower than the value for an ongoing joseki. 
+ * (Gets multiplied with board_size / 19.) 
+ */
 #define EMPTY_CORNER_VALUE 25
 
 /* check if region from i1, j1 to i2, j2 is open */
@@ -277,7 +279,7 @@ fuseki(int color)
   int i = -1;
   int j = -1;
   int width;  /* Side of the open region required in the corner. */
-  int empty_corner_value = EMPTY_CORNER_VALUE;
+  int empty_corner_value = EMPTY_CORNER_VALUE * board_size/19;
 
   /* Return immediately if --disable_fuseki option used. */
   if (disable_fuseki)

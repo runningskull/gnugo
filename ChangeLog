@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- new gtp command owl_analyze_semeai
+- commends made 1D in owl.c
+- new gtp_example/sgf2tst.pl
+- empty_corner_value adjusted to board size in fuseki()
+
 3.1.14 released November 17, 2001
 
 - recognize_eye() revised
