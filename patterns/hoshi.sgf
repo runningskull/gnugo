@@ -541,7 +541,8 @@ W[rd]MA[ij];B[qc]MA[ij];W[ri]MA[ij])
 )
 )
 
-(;B[pi]MA[ij]
+(;B[pi]MA[ij]C[j
+]
 (;W[qc]MA[ij];B[qd]MA[ij];W[pc]MA[ij];B[od]MA[ij];W[rd]MA[ij];B[re]
 MA[ij];W[rc]MA[ij];B[qe]MA[ij];W[nc]MA[ij];B[pf]C[j
 ])
