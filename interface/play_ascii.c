@@ -660,7 +660,7 @@ play_ascii(SGFTree *tree, Gameinfo *gameinfo, char *filename, char *until)
 	    printf("\nInvalid command syntax!\n");
 	    break;
 	  }
-	  if (num < 2 || num > 25) {
+	  if (num < MIN_BOARD || num > MAX_BOARD) {
 	    printf("\nInvalid board size: %d\n", num);
 	    break;
 	  }

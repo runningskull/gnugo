@@ -2,7 +2,16 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- bugfix in do_owl_defend()
+- owl stack can now handle two local_owl_data structs
+- semeai code now uses owl stack
+- don't push owl data in owl_analyze_semeai below branch depth
+- Don't change critical dragons to dead due to semeai results
+- DEBUG_SEMEAI trace enhancements
+- semeai refinements
+- owl_phase now local variable in do_owl_analyze_semeai
+- bugfix in do_owl_defend(): computation of escape parameter
+- bugfix in play_ascii.c: don't crash on unusual boardsizes
+- new tests and regressions
 
 3.3.3 released June 19, 2002
 
