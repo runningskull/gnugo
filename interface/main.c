@@ -1366,7 +1366,8 @@ Informative Output:\n\
 #define COPYRIGHT "\n\n\
 This is GNU GO, a Go program. Contact gnugo@gnu.org, or see\n\
 http://www.gnu.org/software/gnugo/ for more information.\n\n\
-Copyright 1999, 2000, 2001, 2002 by the Free Software Foundation.\n\n\
+Copyright 1999, 2000, 2001, 2002 and 2003 by\n\
+the Free Software Foundation.\n\n\
 This program is free software; you can redistribute it and/or\n\
 modify it under the terms of the GNU General Public License\n\
 as published by the Free Software Foundation - version 2.\n\n\
