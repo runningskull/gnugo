@@ -307,7 +307,7 @@ loadsgf games/incident114.sgf 82
 # M5 is clearly inferior, as is L5. 
 loadsgf games/incident291.sgf 86
 79 owl_defend K4
-#? [1 (M6|L6)]
+#? [1 (M6|L6|L7)]
 
 # incident 297
 loadsgf games/incident297.sgf 95

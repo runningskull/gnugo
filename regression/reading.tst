@@ -844,6 +844,13 @@ loadsgf games/kgs/yagr-czarny.sgf 17
 200 attack B4
 #? [1 B2]*
 
+# See also arend:29
+loadsgf games/arend/gnugo-gnugo7.sgf 24
+trymove W E17
+201 attack E17
+#? [1 G17]
+popgo
+
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

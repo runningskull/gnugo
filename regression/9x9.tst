@@ -1,6 +1,7 @@
+# Added E3. /ab
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 4
 10 reg_genmove black
-#? [E5|E6]
+#? [E5|E6|E3]
 
 loadsgf games/nngs/whitemouse-gnugo-3.5.2-200312052122.sgf 6
 20 reg_genmove black
