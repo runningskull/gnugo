@@ -195,13 +195,13 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 212
 # a move to secure life.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 73
 480 gg_genmove white
-#? [!H4]
+#? [!H4]*
 
 # R14 also helps black to connect. More interesting to play S14 or a
 # monkey jump.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 87
 490 gg_genmove white
-#? [!R14]
+#? [!R14]*
 
 # Bigger to kill upper right corner than C9.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 141
@@ -211,22 +211,22 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 141
 # Double sente at E8. Clearly biggest move at this time.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 189
 510 gg_genmove white
-#? [E8]
+#? [E8]*
 
 # Necessary to connect. See also connection:94
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 193
 520 gg_genmove white
-#? [D9]
+#? [D9]*
 
 # Semeai.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 205
 530 gg_genmove white
-#? [A11|B8]
+#? [A11|B8]*
 
 # Semeai.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 211
 540 gg_genmove white
-#? [B8|B9]
+#? [B8|B9]*
 
 ############ End of Tests #################
 

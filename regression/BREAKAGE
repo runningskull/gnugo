@@ -1,3 +1,39 @@
+ ======================= 3.3.9 pre 3  =========================   
+
+./regress.sh . reading.tst 
+173 unexpected FAIL: Correct '1 (A2|C7|B1)', got '0'
+./regress.sh . connection.tst 
+94 unexpected FAIL: Correct '1 D9', got '0'
+./regress.sh . nngs1.tst 
+8 unexpected FAIL: Correct 'M10|L9', got 'S14'
+./regress.sh . strategy2.tst 
+93 unexpected FAIL: Correct 'D11', got 'G12'
+./regress.sh . nngs.tst 
+1700 unexpected FAIL: Correct '!J18', got 'J18'
+./regress.sh . owl1.tst 
+280 unexpected FAIL: Correct '1 F4', got '0'
+281 unexpected FAIL: Correct '1 O12', got '0'
+282 unexpected FAIL: Correct '1 .*', got '0'
+283 unexpected FAIL: Correct '0', got '1 N8'
+./regress.sh . nngs2.tst 
+480 unexpected FAIL: Correct '!H4', got 'H4'
+490 unexpected FAIL: Correct '!R14', got 'R14'
+510 unexpected FAIL: Correct 'E8', got 'K12'
+520 unexpected FAIL: Correct 'D9', got 'T11'
+530 unexpected FAIL: Correct 'A11|B8', got 'C4'
+540 unexpected FAIL: Correct 'B8|B9', got 'C12'
+./regress.sh . nngs3.tst 
+420 unexpected PASS!
+1130 unexpected FAIL: Correct 'S7', got 'T6'
+./regress.sh . century2002.tst 
+130 unexpected PASS!
+170 unexpected FAIL: Correct '0', got '1'
+261 unexpected FAIL: Correct '0', got '1 L11'
+270 unexpected PASS!
+./regress.sh . safety.tst 
+6 unexpected FAIL: Correct 'K6|K7|J6|J7|H4|H3|L5', got 'D8'
+7 unexpected FAIL: Correct 'L5|L6|K6|M5|M3|K7|K6', got 'D13'
+
 ======================= 3.3.9 pre 2  =========================   
 
 ./regress.sh . owl.tst

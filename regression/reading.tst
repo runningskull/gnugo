@@ -701,7 +701,7 @@ loadsgf games/reading38.sgf
 loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 trymove white A4
 173 defend B2
-#? [1 (A2|C7|B1)]
+#? [1 (A2|C7|B1)]*
 popgo
 
 

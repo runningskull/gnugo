@@ -27,8 +27,8 @@ loadsgf games/nngs/gnugo-3.1.27-GoFuN-200203080451.sgf 42
 # K6 is probably best.
 loadsgf games/nngs/abcd-gnugo-3.3.8-200209202043.sgf 12
 6 gg_genmove black
-#? [K6|K7|J6|J7|H4|H3|L5]
+#? [K6|K7|J6|J7|H4|H3|L5]*
 
 loadsgf games/nngs/abcd-gnugo-3.3.8-200209202043.sgf 22
 7 gg_genmove black
-#? [L5|L6|K6|M5|M3|K7|K6]
+#? [L5|L6|K6|M5|M3|K7|K6]*

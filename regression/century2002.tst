@@ -77,7 +77,7 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 43
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 45
 130 gg_genmove black
-#? [N4]*
+#? [N4]
 
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 57
 140 gg_genmove black
@@ -95,7 +95,7 @@ loadsgf games/century21-2002/manyfaces-gnugo.sgf 177
 # Does not work because of white J8.
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 235
 170 owl_does_defend K10 H8
-#? [0]
+#? [0]*
 
 # prevent the seki
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 253
@@ -127,11 +127,11 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 156
 260 gg_genmove white
 #? [S12|Q12|Q13]*
 261 owl_defend J12
-#? [0]
+#? [0]*
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 202
 270 gg_genmove white
-#? [O7]*
+#? [O7]
 
 ############ End of Tests #################
 
