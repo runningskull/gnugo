@@ -1090,13 +1090,6 @@ estimate_territorial_value(int pos, int color, float score)
 	break;
       }
 
-      /* Strategically unsafe move. */
-      if (!move[pos].move_safety) {
-	DEBUG(DEBUG_MOVE_REASONS,
-	      "    %1m: 0.0 - attack on %1m (unsafe move)\n", pos, aa);
-	break;
-      }
-
       this_value = 2 * worm[aa].effective_size;
 
       /* If the stones are dead, there is only a secondary value in
@@ -1142,13 +1135,6 @@ estimate_territorial_value(int pos, int color, float score)
       /* 
        * Estimate value 
        */
-      if (!strategically_sound_defense(aa, pos)) {
-	DEBUG(DEBUG_MOVE_REASONS,
-	      "    %1m: 0.0 - defense of %1m (strategically unsound defense)\n",
-	      pos, aa);
-	break;
-      }	
-
       this_value = 2 * worm[aa].effective_size;
 
       /* If the stones are dead, we use the convention that
@@ -1631,20 +1617,6 @@ estimate_strategical_value(int pos, int color, float score)
 	if (worm[aa].defend_codes[0] == 0)
 	  break;
 
-	/* Require the defense to be strategically viable. */
-	if ((move_reasons[r].type == DEFEND_MOVE
-	     || move_reasons[r].type == DEFEND_MOVE_GOOD_KO
-	     || move_reasons[r].type == DEFEND_MOVE_BAD_KO)
-	    && !strategically_sound_defense(aa, pos))
-	  break;
-
-	/* Do the same for attack moves. */
-	if ((move_reasons[r].type == ATTACK_MOVE
-	     || move_reasons[r].type == ATTACK_MOVE_GOOD_KO
-	     || move_reasons[r].type == ATTACK_MOVE_BAD_KO)
-	    && !move[pos].move_safety)
-	  break;
-	
 	/* FIXME: This is totally ad hoc, just guessing the value of
          *        potential cutting points.
 	 * FIXME: When worm[aa].cutstone2 == 1 we should probably add
@@ -2333,6 +2305,11 @@ print_top_moves(void)
 }
 
 
+/* This function is called if the biggest move on board was an illegal
+ * ko capture.
+ * FIXME: We need a check here whether the threat still works after
+ * the opponent fills in the ko (or resolves it in another way.)
+ */
 static void
 reevaluate_ko_threats(void)
 {

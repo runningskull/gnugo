@@ -77,10 +77,10 @@ int replacement_map[BOARDMAX];
 typedef int (*discard_condition_fn_ptr)(int pos, int what);
 
 struct discard_rule {
-  int reason_type[40];
+  int reason_type[MAX_REASONS];
   discard_condition_fn_ptr condition;
   int flags;
-  char trace_message[160];
+  char trace_message[MAX_TRACE_LENGTH];
 };
 
 
@@ -291,7 +291,9 @@ find_eye(int eye, int color)
 /* Interprets the object of a reason and returns its position.
  * If the object is a pair (of worms or dragons), the position of the first
  * object is returned. (This is only used for trace outputs.) Returns
- * -1 if move does not point to a location.
+ * NO_MOVE if move does not point to a location.
+ * FIXME: This new function produces some code duplication with other
+ * trace output function. Do some code cleanup here.
  */
 static int
 get_pos(int reason, int what)
@@ -338,7 +340,7 @@ get_pos(int reason, int what)
   case EXPAND_MOYO_MOVE:
   case MY_ATARI_ATARI_MOVE:
   case YOUR_ATARI_ATARI_MOVE:
-    return -1;
+    return NO_MOVE;
   }
   /* We shoud never get here: */
   gg_assert(1>2);
@@ -490,6 +492,10 @@ move_reason_known(int pos, int type, int what)
   return 0;
 }
 
+/* ---------------------------------------------------------------- */
+
+/* Functions used in discard_rules follow below. */
+
 /*
  * Check whether an attack move reason already is recorded for a move.
  * A negative value for 'what' means only match 'type'.
@@ -601,6 +607,12 @@ concerns_inessential_dragon(int pos, int what)
   return DRAGON2(dragons[what]).safety == INESSENTIAL; 
 }
 
+static int
+move_is_marked_unsafe(int pos, int what)
+{
+  UNUSED(what);
+  return !move[pos].move_safety;
+}
 
 static int
 either_move_redundant(int pos, int what)
@@ -1623,6 +1635,8 @@ list_move_reasons(int color)
  * The format is:
  * { List of reasons to which the rule applies, condition of the rule,
  * flags to be set, trace message }
+ * The condition must be of type discard_condition_fn_ptr, that is a pointer
+ * to a function with parameters (pos, what).
  */
 
 static struct discard_rule discard_rules[] =
@@ -1658,6 +1672,10 @@ static struct discard_rule discard_rules[] =
       OWL_DEFEND_MOVE_BAD_KO, UNCERTAIN_OWL_DEFENSE, -1 },
     concerns_inessential_dragon, REDUNDANT,
     "  %1m: 0.0 - (uncertain) owl attack/defense of %1m (inessential)\n"},
+  { { ATTACK_MOVE, ATTACK_MOVE_GOOD_KO, ATTACK_MOVE_BAD_KO,
+      DEFEND_MOVE, DEFEND_MOVE_GOOD_KO, DEFEND_MOVE_BAD_KO, -1},
+    move_is_marked_unsafe, REDUNDANT,
+    "  %1m: 0.0 - tactical move vs %1m (unsafe move)\n"},
   { { -1 }, NULL, 0, ""}  /* Keep this entry at end of the list. */
 };
 

@@ -70,13 +70,15 @@
 #define EITHER_MOVE             100
 
 /* Bitmap values for move_reason.status */
-#define ACTIVE 0
-#define TERRITORY_REDUNDANT 1
+#define ACTIVE                  0
+#define TERRITORY_REDUNDANT     1
 #define STRATEGICALLY_REDUNDANT 2
-#define REDUNDANT 3
-#define SECONDARY 4
+#define REDUNDANT               (TERRITORY_REDUNDANT | STRATEGICALLY_REDUNDANT)
+#define SECONDARY               4
 
 #define MAX_REASONS 40
+
+#define MAX_TRACE_LENGTH  160
 
 #define HUGE_MOVE_VALUE 10.0*MAX_BOARD*MAX_BOARD
 
