@@ -81,8 +81,8 @@ AC_ARG_ENABLE(chinese-rules,
   --disable-chinese-rules     use Japanese counting (default)])
 
 AC_ARG_ENABLE(resignation-allowed,
- [  --enable-resignation-allowed       resign lost games
-  --disable-resignation-allowed      never resign (default)])
+ [  --enable-resignation-allowed       resign lost games (default)
+  --disable-resignation-allowed      never resign])
 
 AC_ARG_ENABLE(oracle,
  [  --enable-oracle                    enable oracle
