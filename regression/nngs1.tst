@@ -109,7 +109,7 @@ loadsgf games/nngs/gnugo-3.1.27-wingjk-200203101039.sgf 78
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 26
 26 gg_genmove white
-#? [P3]*
+#? [P3]
 
 loadsgf games/nngs/gnugo-3.1.27-Yuuki-200203131056.sgf 46
 27 gg_genmove white
@@ -206,7 +206,7 @@ loadsgf games/nngs/gnugo-3.1.29-coco-200203281929.sgf 54
 
 loadsgf games/nngs/gnugo-3.1.29-merlin-200203281708.sgf 33
 50 gg_genmove white
-#? [O10]
+#? [O10]*
 
 loadsgf games/nngs/gnugo-3.1.30-Poctim-200204040503.sgf 26
 51 gg_genmove white

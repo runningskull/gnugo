@@ -147,7 +147,7 @@ loadsgf games/endgame2.sgf 17
 
 loadsgf games/endgame2.sgf 18
 218 gg_genmove black
-#? [H1]*
+#? [H1]
 
 loadsgf games/endgame2.sgf 19
 219 gg_genmove white
@@ -189,11 +189,11 @@ loadsgf games/endgame6.sgf 1
 
 loadsgf games/endgame6.sgf 2
 603 gg_genmove black
-#? [C1]
+#? [C1]*
 
 loadsgf games/endgame6.sgf 2
 604 gg_genmove white
-#? [D1]
+#? [D1]*
 
 ############ End of Tests #################
 

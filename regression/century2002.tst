@@ -48,7 +48,7 @@ loadsgf games/century21-2002/goint-gnugo.sgf 161
 
 loadsgf games/century21-2002/goint-gnugo.sgf 209
 85 gg_genmove black 
-#? [N9]*
+#? [N9]
 
 # A17 and A18 produce 10,000 year ko. But A17 is better
 # since B has the option of making seki. B19 is equivalent
@@ -112,12 +112,12 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 36
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 58
 210 gg_genmove white
-#? [!A15]*
+#? [!A15]
 
 # a move in the center is bigger than this monkey jump
 loadsgf games/century21-2002/gnugo-katsunari.sgf 76
 220 gg_genmove white
-#? [!T3]*
+#? [!T3]
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 96
 240 gg_genmove white
@@ -125,7 +125,7 @@ loadsgf games/century21-2002/gnugo-katsunari.sgf 96
 
 loadsgf games/century21-2002/gnugo-katsunari.sgf 156
 260 gg_genmove white
-#? [S12|Q12|Q13]*
+#? [S12|Q12|Q13]
 261 owl_defend J12
 #? [0]*
 

@@ -182,7 +182,7 @@ loadsgf games/trevor/trevor_17.sgf 28
 # Snapback!
 loadsgf games/trevor/trevor_18.sgf 32
 180 gg_genmove white
-#? [!A8]*
+#? [!A8]
 
 # Whoops, don't let go of the dragon's tail!
 loadsgf games/trevor/trevor_19.sgf 12

@@ -165,7 +165,7 @@ loadsgf games/incident239.sgf 58
 # Another ko reading mistake.
 loadsgf games/incident165.sgf 212
 37 attack J14
-#? [2 (L11|K9|L9|N4)]*
+#? [2 (L11|K9|L9|N4)]
 38 defend J14
 #? [1 (N4|O2|P2|N1)]*
 
@@ -553,7 +553,7 @@ loadsgf games/incident156.sgf 186
 
 loadsgf games/reading24.sgf 48
 140 attack E2
-#? [0]*
+#? [0]
 
 # superstring problem with double ko
 loadsgf games/reading26.sgf
@@ -676,7 +676,7 @@ loadsgf games/trevor/auto/b28.sgf 80
 # See also owl:237
 loadsgf games/owl33.sgf 212
 170 attack S13
-#? [0]*
+#? [0]
 
 # See also connect:4,54,55
 loadsgf golois/Basique990715-1.sgf

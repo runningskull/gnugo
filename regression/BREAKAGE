@@ -1,3 +1,56 @@
+======================= 3.3.10 pre 1  =========================   
+
+./regress.sh . reading.tst 
+37 unexpected PASS!
+140 unexpected PASS!
+170 unexpected PASS!
+./regress.sh . owl.tst 
+237 unexpected PASS!
+./regress.sh . trevora.tst 
+480 unexpected FAIL: Correct 'E4', got 'C4'
+./regress.sh . nngs1.tst 
+26 unexpected PASS!
+50 unexpected FAIL: Correct 'O10', got 'N17'
+./regress.sh . endgame.tst 
+218 unexpected PASS!
+603 unexpected FAIL: Correct 'C1', got 'G6'
+604 unexpected FAIL: Correct 'D1', got 'G6'
+./regress.sh . trevorb.tst 
+110 unexpected PASS!
+270 unexpected PASS!
+700 unexpected PASS!
+740 unexpected FAIL: Correct '!H10', got 'H10'
+./regress.sh . nicklas2.tst 
+601 unexpected PASS!
+./regress.sh . trevor.tst 
+180 unexpected PASS!
+./regress.sh . nngs.tst 
+1010 unexpected PASS!
+./regress.sh . trevorc.tst 
+170 unexpected FAIL: Correct 'H5', got 'H8'
+280 unexpected PASS!
+560 unexpected FAIL: Correct 'K2|M1', got 'E12'
+650 unexpected PASS!
+1510 unexpected PASS!
+./regress.sh . 13x13.tst 
+41 unexpected FAIL: Correct '!C8', got 'C8'
+./regress.sh . trevord.tst 
+970 unexpected PASS!
+1090 unexpected PASS!
+./regress.sh . nngs2.tst 
+70 unexpected PASS!
+430 unexpected PASS!
+490 unexpected PASS!
+510 unexpected PASS!
+./regress.sh . nngs3.tst 
+450 unexpected PASS!
+630 unexpected PASS!
+./regress.sh . century2002.tst 
+85 unexpected PASS!
+210 unexpected PASS!
+220 unexpected PASS!
+260 unexpected PASS!
+
 ========================== 3.3.9 ============================   
 
 ./regress.sh . atari_atari.tst 

@@ -870,7 +870,7 @@ loadsgf games/owl33.sgf 134
 #SEE_ALSO=reading:170
 loadsgf games/owl33.sgf 212
 237 owl_defend S12
-#? [0]*
+#? [0]
 
 # See also optics:1801-1812
 loadsgf games/marginal_ko.sgf

@@ -39,7 +39,7 @@ loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 166
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 176
 70 gg_genmove black
-#? [!L18]*
+#? [!L18]
 
 # semeai problem
 loadsgf games/nngs/tobyiii-gnugo-3.3.2-200206041432.sgf 162
@@ -167,7 +167,7 @@ loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 115
 # missed vital snap back after black's mistake.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 116
 430 gg_genmove white
-#? [M11]*
+#? [M11]
 
 # all these moves should kill at least some of black stones
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 144
@@ -201,7 +201,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 73
 # monkey jump.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 87
 490 gg_genmove white
-#? [!R14]*
+#? [!R14]
 
 # Bigger to kill upper right corner than C9.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 141
@@ -211,7 +211,7 @@ loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 141
 # Double sente at E8. Clearly biggest move at this time.
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 189
 510 gg_genmove white
-#? [E8]*
+#? [E8]
 
 # Necessary to connect. See also connection:94
 loadsgf games/nngs/gnugo-3.3.8-viking4-200209250907.sgf 193

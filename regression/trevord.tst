@@ -502,7 +502,7 @@ loadsgf games/trevor/auto/d39.sgf 208
 
 loadsgf games/trevor/auto/d39.sgf 210
 970 gg_genmove white
-#? [J9]*
+#? [J9]
 
 
 loadsgf games/trevor/auto/d39.sgf 222
@@ -578,7 +578,7 @@ loadsgf games/trevor/auto/d47.sgf 22
 
 loadsgf games/trevor/auto/d47.sgf 100
 1090 gg_genmove white
-#? [L7]*
+#? [L7]
 
 
 

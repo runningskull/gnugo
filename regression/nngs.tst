@@ -458,7 +458,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 162
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 180
 1010 gg_genmove white
-#? [Q16]*
+#? [Q16]
 
 
 
