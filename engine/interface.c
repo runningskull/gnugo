@@ -37,9 +37,9 @@
  */
 
 void
-init_gnugo(float memory)
+init_gnugo()
 {
-  reading_cache_init(memory * 1024 * 1024);
+  reading_cache_init();
   clear_board();
 
   transformation_init();

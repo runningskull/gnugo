@@ -4,6 +4,9 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- hardwire number of reading cache entries to 400000
+- remove alternate hashing schemes and other debugging code in cache.c
+- remove configure code related to memory size and choice of hashing scheme
 - extraneous komaster schemes removed
 - replace variadic DEBUG macros with TRACE_EYES etc.
 

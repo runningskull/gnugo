@@ -97,9 +97,6 @@ hashnode_dump(Hashnode *node, FILE *outfile)
 
   /* Data about the node itself. */
   fprintf(outfile, "Hash value: %lx\n", (unsigned long) node->key.hashval);
-#if FULL_POSITION_IN_HASH
-  hashposition_dump(&(node->key.hashpos), outfile);
-#endif
 
   for (result = node->results; result != NULL; result = result->next) {
     read_result_dump(result, outfile);
@@ -139,55 +136,6 @@ hashtable_dump(Hashtable *table, FILE *outfile)
     fprintf(outfile, "\n");
   }
 }
-
-
-#if 0
-/*
- * Dump an alternative representation of the contents of a Hashtable
- * onto the FILE outfile. This one is mainly useful if you have to
- * debug the hashtable implementation itself.
- */
-
-static void
-hashtable_dump2(Hashtable *table, FILE *outfile)
-{
-  int i;
-  for (i = 0; i < table->hashtablesize; i++) {
-    fprintf(outfile, "bucket %d: ", i);
-    if (table->hashtable[i] == NULL)
-      fprintf(outfile, "NULL\n");
-    else
-      fprintf(outfile, "%d\n", table->hashtable[i] - table->all_nodes);
-  }
-
-  for (i = 0; i < table->num_nodes; i++) {
-    Hashnode *node = &(table->all_nodes[i]);
-    if (node->results == NULL)
-      continue;
-    fprintf(outfile, "node %d: ", i);
-    if (node->results == NULL)
-      fprintf(outfile, "NULL ");
-    else
-      fprintf(outfile, "%d ", node->results - table->all_results);
-    if (node->next == NULL)
-      fprintf(outfile, "NULL\n");
-    else
-      fprintf(outfile, "%d\n", node->next - table->all_nodes);
-  }
-  
-  for (i = 0; i < table->num_results; i++) {
-    Read_result *result = &(table->all_results[i]);
-    if (rr_get_status(*result) == 0)
-      continue;
-    fprintf(outfile, "result %d ", i);
-    if (result->next == NULL)
-      fprintf(outfile, "NULL ");
-    else
-      fprintf(outfile, "%d ", result->next - table->all_results);
-    read_result_dump(result, outfile);
-  }
-}
-#endif
 
 
 /*
@@ -514,12 +462,7 @@ hashtable_search(Hashtable *table, Hash_data *hd)
 	break;
       }
     if (i >= NUM_HASHVALUES)
-#if FULL_POSITION_IN_HASH
-      if (hashposition_compare(&hd->hashpos, &node->key.hashpos) == 0)
-	break;
-#else
       break;
-#endif
   }
   return node;
 }
@@ -599,7 +542,7 @@ hashnode_new_result(Hashtable *table, Hashnode *node, int routine,
  * disabled.
  */
 void
-reading_cache_init(int bytes)
+reading_cache_init()
 {
   /* Initialize hash table.
    *
@@ -607,23 +550,18 @@ reading_cache_init(int bytes)
    * and the number of read results.  It was found in a test that this 
    * number varies between 1.15 and 1.4.  Thus we use 1.4.
    */
-  float nodes = ((float) bytes
-		 / (1.5 * sizeof(Hashnode *)
-		    + sizeof(Hashnode)
-		    + 1.4 * sizeof(Read_result)));
+  int nodes = READING_CACHE_ENTRIES;
+
   if (0)
     gprintf("Allocated memory for %d hash nodes. \n", (int) nodes);
-  /* If we get a zero size hash table, disable hashing completely. */
-  if (nodes < 1.0)
-    hashflags = HASH_NOTHING;
   movehash = hashtable_new((int) (1.5 * nodes),  /* table size   */
 			   (int) nodes,          /* nodes        */
 			   (int) (1.4 * nodes)); /* read results */
   
   if (!movehash) {
     fprintf(stderr,
-	    "Warning: failed to allocate hashtable, caching disabled.\n");
-    hashflags = HASH_NOTHING;
+	    "Warning: failed to allocate hashtable, exiting.\n");
+    abort();
   }
 }
 
@@ -710,17 +648,6 @@ do_get_read_result(int routine, int komaster, int kom_pos,
   Hashnode *hashnode;
   int retval;
 
-#if CHECK_HASHING
-  Hash_data    key;
-
-  /* Check the hash table to see if we have had this position before. */
-  hashdata_recalc(&key, board, board_ko_pos);
-#if FULL_POSITION_IN_HASH
-  gg_assert(hashdata_diff_dump(&key, &hashdata) == 0);
-#else
-  gg_assert(hashdata_compare(&key, &hashdata) == 0);
-#endif
-
   /* Find this position in the table.  If it wasn't found, enter it. */
   hashnode = hashtable_search(movehash, &hashdata);
   if (hashnode != NULL) {
@@ -734,21 +661,6 @@ do_get_read_result(int routine, int komaster, int kom_pos,
       TRACE_READING_CACHE("Created position %H in the hash table...\n",
 	    (unsigned long) hashdata.hashval);
   }
-#else
-  /* Find this position in the table.  If it wasn't found, enter it. */
-  hashnode = hashtable_search(movehash, &hashdata);
-  if (hashnode != NULL) {
-    stats.position_hits++;
-    TRACE_READING_CACHE("We found position %H in the hash table...\n",
-	  (unsigned long) hashdata.hashval);
-  }
-  else {
-    hashnode = hashtable_enter_position(movehash, &hashdata);
-    if (hashnode)
-      TRACE_READING_CACHE("Created position %H in the hash table...\n",
-	    (unsigned long) hashdata.hashval);
-  }
-#endif
 
   retval = 0;
   if (hashnode == NULL) {

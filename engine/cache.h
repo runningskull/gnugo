@@ -32,9 +32,6 @@
 #ifndef _CACHE_H_
 #define _CACHE_H_
 
-/* Dump (almost) all read results. */
-#define TRACE_READ_RESULTS 0
-
 /*
  * This struct contains the attack / defense point and the result.
  * It is kept in a linked list, and each position has a list of 
@@ -181,33 +178,6 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
  * results.
  */
 
-#if TRACE_READ_RESULTS
-
-#define TRACE_CACHED_RESULT(rr) \
-      gprintf("%o%s %1m %d %d %1m (cached) ", read_function_name, \
-	      q, stackp, \
-	      rr_get_result(rr), \
-	      rr_get_move(rr)); \
-      dump_stack();
-
-#define TRACE_CACHED_RESULT2(rr) \
-      gprintf("%o%s %1m %1m %d %d %d %1m (cached) ", read_function_name, \
-	      q1, q2, stackp, \
-	      rr_get_result1(rr), \
-	      rr_get_result2(rr), \
-	      rr_get_move(rr)); \
-      dump_stack();
-
-#define SETUP_TRACE_INFO(name, str) \
-  const char *read_function_name = name; \
-  int q = find_origin(str);
-
-#define SETUP_TRACE_INFO2(name, str1, str2) \
-  const char *read_function_name = name; \
-  int q1 = board[str1] == EMPTY ? str1 : find_origin(str1); \
-  int q2 = board[str2] == EMPTY ? str2 : find_origin(str2);
-
-#else
 
 #define TRACE_CACHED_RESULT(rr)
 #define TRACE_CACHED_RESULT2(rr)
@@ -220,8 +190,6 @@ void hashnode_dump(Hashnode *node, FILE *outfile);
   const char *read_function_name = name; \
   int q1 = str1; \
   int q2 = str2;
-
-#endif
 
 /* Trace messages in decidestring/decidedragon sgf file. */
 void sgf_trace(const char *func, int str, int move, int result,
@@ -262,7 +230,6 @@ int get_read_result2(int routine, int komaster, int kom_pos,
  * return a result from a reading function and where we want to
  * store the result in the hash table at the same time.
  */
-#if !TRACE_READ_RESULTS
 
 #define READ_RETURN0(read_result) \
   do { \
@@ -308,68 +275,6 @@ int get_read_result2(int routine, int komaster, int kom_pos,
     return (value_a); \
   } while (0)
 
-#else /* !TRACE_READ_RESULTS */
-
-#define READ_RETURN0(read_result) \
-  do { \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), 0, 0); \
-    } \
-    gprintf("%o%s %1m %d 0 0 ", read_function_name, q, stackp); \
-    dump_stack(); \
-    return 0; \
-  } while (0)
-
-#define READ_RETURN(read_result, point, move, value) \
-  do { \
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), (value), (move)); \
-    } \
-    gprintf("%o%s %1m %d %d %1m ", read_function_name, q, stackp, \
-	    (value), (move)); \
-    dump_stack(); \
-    return (value); \
-  } while (0)
-  
-#define READ_RETURN_SEMEAI(read_result, point, move, value_a, value_b) \
-  do { \
-    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
-    } \
-    gprintf("%o%s %1m %1m %d %d %d %1m ", read_function_name, q1, q2, stackp, \
-	    (value_a), (value_b), (move)); \
-    dump_stack(); \
-    return; \
-  } while (0)
-
-#define READ_RETURN_CONN(read_result, point, move, value) \
-  do { \
-    if ((value) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move(*(read_result), (value), (move)); \
-    } \
-    gprintf("%o%s %1m %1m %d %d %1m ", read_function_name, q1, q2, stackp, \
-	    (value), (move)); \
-    dump_stack(); \
-    return (value); \
-  } while (0)
-
-#define READ_RETURN2(read_result, point, move, value_a, value_b) \
-  do { \
-    if ((value_a) != 0 && (point) != 0) *(point) = (move); \
-    if (read_result) { \
-      rr_set_result_move2(*(read_result), (value_a), (value_b), (move)); \
-    } \
-    gprintf("%o%s %1m %d %d %d ", read_function_name, q, stackp, \
-	    (value_a), (move)); \
-    dump_stack(); \
-    return (value_a); \
-  } while (0)
-
-
-#endif
 
 /* ================================================================ */
 /* Routine numbers. */

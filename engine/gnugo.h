@@ -45,7 +45,9 @@
 
 /* interface.c */
 /* Initialize the whole thing. Should be called once. */
-void init_gnugo(float memory);
+void init_gnugo(void);
+
+#define READING_CACHE_ENTRIES 400000
 
 
 /* ================================================================ */

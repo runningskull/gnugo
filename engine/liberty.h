@@ -295,7 +295,7 @@ void tree_initialize_pointers(struct tree_node_list *tnl,
                               int tnl_size,
                               int matches_size);
 
-void reading_cache_init(int bytes);
+void reading_cache_init(void);
 void reading_cache_clear(void);
 
 /* reading.c */

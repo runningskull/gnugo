@@ -15,9 +15,6 @@
 /* Default level (strength). Up to 10 supported */
 #undef DEFAULT_LEVEL
 
-/* Default hash table size in megabytes */
-#undef DEFAULT_MEMORY
-
 /* Semeai Variations. 250 default */
 #undef DEFAULT_SEMEAI_VARIATIONS
 
@@ -42,9 +39,6 @@
 /* Define as 1 to use the grid optimisation, or 2 to run it in self-test mode
    */
 #undef GRID_OPT
-
-/* Hashing scheme. Default scheme 2 (new). */
-#undef HASHING_SCHEME
 
 /* Define if the curses headers defines KEY_{UP,DOWN,LEFT,RIGHT} */
 #undef HAVE_CURSES_ARROWS

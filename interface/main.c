@@ -227,7 +227,6 @@ static struct gg_option const long_options[] =
   {"allow-suicide",  no_argument,       0, OPT_ALLOW_SUICIDE},
   {"capture-all-dead",   no_argument,   0, OPT_CAPTURE_ALL_DEAD},
   {"play-out-aftermath", no_argument,   0, OPT_PLAY_OUT_AFTERMATH},
-  {"cache-size",     required_argument, 0, 'M'},
   {"hash",           required_argument, 0, 'H'},
   {"worms",          no_argument,       0, 'w'},
   {"moyo",           required_argument, 0, 'm'},
@@ -263,8 +262,6 @@ static struct gg_option const long_options[] =
   {"metamachine",    no_argument,       0, OPT_METAMACHINE},
   {NULL, 0, NULL, 0}
 };
-
-float memory = (float) DEFAULT_MEMORY;	  /* Megabytes used for hash table. */
 
 
 int
@@ -369,7 +366,6 @@ main(int argc, char *argv[])
       case 'd': debug ^= strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
       case 'D': mandated_depth = atoi(gg_optarg); break;
 
-      case 'M': memory = atof(gg_optarg); break; /* floating point number */
       case 'H': hashflags = strtol(gg_optarg, NULL, 0);  /* allows 0x... */ break;
 
       case 'E': printboard = 2; break;
@@ -440,8 +436,6 @@ main(int argc, char *argv[])
 	if (EXPERIMENTAL_READING)
 	  fprintf(stderr,
 		  "configure option enabled: experimental reading\n");
-	if (HASHING_SCHEME != 2)
-	  fprintf(stderr, "hash scheme %d\n", HASHING_SCHEME);
 	if (OWL_THREATS)
 	  fprintf(stderr,
 		  "configure option enabled: owl threats\n");
@@ -893,7 +887,7 @@ main(int argc, char *argv[])
 
   
   /* Initialize the GNU Go engine. */
-  init_gnugo(memory);
+  init_gnugo();
 
   
   /* Read the infile if there is one. Also play up the position. */
@@ -1341,9 +1335,6 @@ Scoring:\n\
    --score aftermath       generate moves to finish, use best algorithm\n\
    --score aftermath --capture-all-dead --chinese-rules   Tromp-Taylor score\n\
 \n\
-Cache size (higher=more memory usage, faster unless swapping occurs):\n\
-   -M, --cache-size <megabytes>  RAM cache for hashing (default %4.1f Mb)\n\
-\n\
 Game Options: (--mode ascii)\n\
        --boardsize num   Set the board size to use (%d--%d)\n\
        --color <color>   Choose your color ('black' or 'white')\n\
@@ -1470,8 +1461,7 @@ show_help(void)
 	  backfill2_depth, superstring_depth, aa_depth, 
 	  owl_distrust_depth, owl_branch_depth,
 	  owl_reading_depth, owl_node_limit, DEFAULT_LEVEL);
-  fprintf(stderr, USAGE1,
-	  (float) DEFAULT_MEMORY, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
+  fprintf(stderr, USAGE1, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }
 
 

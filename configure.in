@@ -45,13 +45,9 @@ AC_ARG_ENABLE(grid-opt,
   --enable-grid-opt=distrust  enable the grid optimsation in non-trusting mode
   --disable-grid-opt          disable the grid optimisation])
 
-default_cache_size=8
 default_level=10
 default_semeai_variations=250
 default_owl_node_limit=1000
-
-AC_ARG_ENABLE(cache-size,
-  [  --enable-cache-size=n       reserve n Mb RAM for caching (16 default)])
 
 AC_ARG_ENABLE(level,
   [  --enable-level=n            n = default level (up to 10 supported)])
@@ -105,10 +101,6 @@ AC_ARG_ENABLE(alternate-connections,
                                        analysis
   --disable-alternate-connections    use primary experimental connection 
                                      analysis (default)])
-
-AC_ARG_ENABLE(experimental-hashing,
- [  --enable-experimental-hashing      use experimental hashing scheme (default)
-  --disable-experimental-hashing     use old hashing scheme])
 
 AC_ARG_ENABLE(profile,
  [  --enable-profile                   compile gnugo with gprof option ])
@@ -456,17 +448,6 @@ if test "$enable_owl_threats" = "yes" ; then
    AC_DEFINE(OWL_THREATS, 1)
 else
    AC_DEFINE(OWL_THREATS, 0)
-fi
-
-dnl ------------ Influence -------------------
-
-AH_TEMPLATE([HASHING_SCHEME],
-[Hashing scheme. Default scheme 2 (new).])
-
-if test "$enable_experimental_hashing" = "no" ; then
-   AC_DEFINE(HASHING_SCHEME, 1)
-else
-   AC_DEFINE(HASHING_SCHEME, 2)
 fi
 
 dnl  ----------- special-case use of gcc ---------
