@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- unnecessary patval elements removed from some pattern databases
+- mkpat understands goal_elements and callback_data directives
+
 3.3.13 released December 22, 2002
 
 - new aa_ pattern A16
