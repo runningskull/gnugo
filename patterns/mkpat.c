@@ -429,6 +429,7 @@ static dfa_t dfa;
 static dfa_patterns dfa_pats;
 
 static int transformation_hint;
+static int labels_transformation = 0;
 
 
 struct hint_data {
@@ -642,6 +643,8 @@ write_to_dfa(int index)
     }
     if (dfa_verbose > 2)
       dump_dfa(stderr, &dfa);
+
+    labels_transformation = transformation_hint;
   }
   else {
     int ll;
@@ -1592,7 +1595,7 @@ finish_constraint_and_action(void)
 
       TRANSFORM2(label_coords[c][0] - ci - movei,
 		 label_coords[c][1] - cj - movej, &x, &y,
-		 transformation_hint);
+		 labels_transformation);
       code_pos += sprintf(code_pos,
 			  "\n  %c = AFFINE_TRANSFORM(%d, trans, move);",
 			  c, OFFSET(x, y));
@@ -2441,6 +2444,9 @@ corner_add_pattern(void)
              - OFFSET_DELTA(corner_x, corner_y), trans, POS(0, 0));
   move_x = I(move_pos);
   move_y = J(move_pos);
+
+  /* We need to transform labels as well. */
+  labels_transformation = trans;
 
   /* Find all pattern elements. */
   for (k = 0; k < el; k++) {
