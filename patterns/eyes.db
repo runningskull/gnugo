@@ -3144,6 +3144,15 @@ Pattern 6403
 
 
 Pattern 6404
+
+|.<
+|.>X.
++----
+
+:1122
+
+
+Pattern 6405
 # Not possible to do better than bent four in the corner.
 
 |..
@@ -3153,7 +3162,7 @@ Pattern 6404
 :1111
 
 
-Pattern 6405
+Pattern 6406
 # Nothing to do.
 
 |.X
@@ -3163,7 +3172,7 @@ Pattern 6405
 :1111
 
 
-Pattern 6406
+Pattern 6407
 # Nothing to do.
 
 |.x
