@@ -21,9 +21,7 @@
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "gnugo.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -46,6 +44,7 @@ init_gnugo(float memory)
   clear_board();
 
   dfa_match_init();
+  tree_match_init();
 }
 
 

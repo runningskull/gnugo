@@ -25,13 +25,28 @@
 /* table for use by TRANSFORM() (patterns.h) */
 
 const int transformations[8][2][2] = {
-  {{ 1,  0}, { 0,  1}}, /* a - identity transformation matrix */
-  {{ 0,  1}, {-1,  0}}, /* g - rotate 270 counter-clockwise */
-  {{-1,  0}, { 0, -1}}, /* d - rotate 180 */
-  {{ 0, -1}, { 1,  0}}, /* f - rotate 90 counter-clockwise */
-  {{ 0, -1}, {-1,  0}}, /* h - rotate 90 and invert */
-  {{-1,  0}, { 0,  1}}, /* b - flip left */
-  {{ 0,  1}, { 1,  0}}, /* e - rotate 90 and flip left */
-  {{ 1,  0}, { 0, -1}}  /* c - invert */
+  { { 1,  0}, 
+    { 0,  1}}, /* a - identity transformation matrix */
+
+  { { 0,  1}, 
+    {-1,  0}}, /* g - rotate 270 counter-clockwise */
+
+  { {-1,  0}, 
+    { 0, -1}}, /* d - rotate 180 */
+  
+  { { 0, -1}, 
+    { 1,  0}}, /* f - rotate 90 counter-clockwise */
+  
+  { { 0, -1}, 
+    {-1,  0}}, /* h - rotate 90 and invert */
+  
+  { {-1,  0}, 
+    { 0,  1}}, /* b - flip left */
+  
+  { { 0,  1}, 
+    { 1,  0}}, /* e - rotate 90 and flip left */
+  
+  { { 1,  0}, 
+    { 0, -1}}  /* c - invert */
 };
 

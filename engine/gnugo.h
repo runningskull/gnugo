@@ -282,7 +282,11 @@ extern int owl_threats;              /* compute owl threats */
 extern int experimental_influence;   /* use experimental influence module */
 extern int allow_suicide;            /* allow opponent to make suicide moves */
 extern int capture_all_dead;         /* capture all dead opponent stones */
-extern int play_out_aftermath;  /* make everything unconditionally settled */
+extern int play_out_aftermath; /* make everything unconditionally settled */
+extern int defend_by_pattern;  /* use patterns for tactical reading defense */
+extern int attack_by_pattern;  /* use patterns for tactical reading attack */
+
+
 
 /* Mandatory values of reading parameters. Normally -1, if set at 
  * these override the values derived from the level. */
@@ -355,18 +359,25 @@ void debug_influence_move(int i, int j);
 #define DEBUG(level, fmt, args...) \
     do { if ((debug & (level))) gprintf(fmt, ##args); } while (0)
 
-#else
+#else /*HAVE_VARIADIC_DEFINE*/
 
-/* These can cause harmless compiler warnings. */
-#define TRACE  (verbose) && gprintf
-#define RTRACE (verbose >= 3) && gprintf
-#define VTRACE (verbose >= 4) && gprintf
+/* Using these without assignment causes compiler warnings on some systems. */
+extern int trace_dummy;
+# ifdef HAVE_VISUAL_C
+#  define TRACE_ASSIGN 
+# else
+#  define TRACE_ASSIGN trace_dummy =
+# endif
+
+#define TRACE  TRACE_ASSIGN (verbose) && gprintf
+#define RTRACE TRACE_ASSIGN (verbose >= 3) && gprintf
+#define VTRACE TRACE_ASSIGN (verbose >= 4) && gprintf
 /* if debug == 0, then can skip the function call. */
-#define DEBUG  (debug) && DEBUG_func
+#define DEBUG  TRACE_ASSIGN (debug) && DEBUG_func
 
 int DEBUG_func(int level, const char *fmt, ...);
 
-#endif
+#endif  /*HAVE_VARIADIC_DEFINE*/
 
 
 /* genmove.c */

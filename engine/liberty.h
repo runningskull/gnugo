@@ -67,11 +67,19 @@ extern Hash_data    hashdata;
 
 
 /* This is an upper bound of the number of strings that can exist on
- * the board simultaneously.
+ * the board simultaneously.  
+ * FIXME: This is not sufficiently large;  above stackp==0, the incremental 
+ *   board code doesn't necessarily re-use all indices.  This is a problem
+ *   only in very pathological cases, and is extremely unlikely to occur in
+ *   practice.
  */
 #define MAX_STRINGS (2 * MAX_BOARD * MAX_BOARD / 3)
 
-/* VC builds choke at stackp around 304 in reading code. */
+/* Per gf: Unconditional_life() can get very close to filling the 
+ * entire board under certain circumstances. This was discussed in 
+ * the list around August 21, 2001, in a thread with the subject 
+ * "gnugo bug logs".
+ */
 #define MAXSTACK  MAX_BOARD * MAX_BOARD
 #define MAXCHAIN  160
 
@@ -208,6 +216,8 @@ struct pattern_db;
 struct fullboard_pattern;
 struct half_eye_data;
 struct movelist;
+struct graph_node_list;
+struct match_node;
 
 /*
  * Try to match a pattern in the database to the board. Callback for
@@ -228,6 +238,11 @@ void matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
 void fullboard_matchpat(fullboard_matchpat_callback_fn_ptr callback,
 			int color, struct fullboard_pattern *pattern);
 void dfa_match_init(void);
+void tree_match_init(void);
+void tree_initialize_pointers(struct graph_node_list *gnl,
+                              struct match_node *matches,
+                              int gnl_size,
+                              int matches_size);
 
 void reading_cache_init(int bytes);
 void reading_cache_clear(void);
@@ -721,7 +736,13 @@ extern struct dragon_data2 *dragon2;
 /* Macros for accessing the dragon2 data with board coordinates and
  * the dragon data with a dragon id.
  */
+#if 0 /* Trust DRAGON2 accesses? */
 #define DRAGON2(pos) dragon2[dragon[pos].id]
+#else
+struct dragon_data2 * dragon2_func(int pos);
+#define DRAGON2(pos) (*dragon2_func(pos))
+#endif
+
 #define DRAGON(d) dragon[dragon2[d].origin]
 
 struct aftermath_data {
@@ -801,13 +822,14 @@ int is_halfeye(struct half_eye_data heye[BOARDMAX], int pos);
  * (i, j) is a "relevant" board position for info. */
 void abortgo(const char *file, int line, const char *msg, int i, int j);
 
-#ifndef NDEBUG
-/* avoid dangling else */
-#define ASSERT2(x, i, j) if (x) ; else abortgo(__FILE__, __LINE__, #x, i, j)
-#define ASSERT1(x, pos) if (x) ; else abortgo(__FILE__, __LINE__, #x, I(pos), J(pos))
-#else
+#if GG_TURN_OFF_ASSERTS
 #define ASSERT2(x, i, j)
 #define ASSERT1(x, pos)
+#else
+/* avoid dangling else */
+/* FIXME: Should probably re-write these using do {...} while (0) idiom. */
+#define ASSERT2(x, i, j) if (x) ; else abortgo(__FILE__, __LINE__, #x, i, j)
+#define ASSERT1(x, pos) if (x) ; else abortgo(__FILE__, __LINE__, #x, I(pos), J(pos))
 #endif
 
 #define gg_assert(x) ASSERT2(x, -1, -1);

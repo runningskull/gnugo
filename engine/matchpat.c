@@ -20,15 +20,12 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
+#include "gnugo.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include <assert.h>
 
 #include "liberty.h"
 #include "gg_utils.h"
@@ -623,6 +620,184 @@ matchpat_loop(matchpat_callback_fn_ptr callback, int color, int anchor,
 		    pdb->patterns, callback_data, goal);
 }
 
+/**************************************************************************/
+/* Tree matcher:                                                           */
+/**************************************************************************/
+static void tree_prepare_for_match(int color);
+static void tree_matchpat_loop(matchpat_callback_fn_ptr callback, 
+			  int color, int anchor,
+			  struct pattern_db *pdb, void *callback_data,
+			  char goal[BOARDMAX], int anchor_in_goal);
+static void tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
+			int color, struct pattern_db *database,
+			void *callback_data, char goal[BOARDMAX]);
+
+
+void tree_match_init(void) {
+  init_graph_read_attack();
+  init_graph_read_defend();
+  init_graph_owl_attackpat();
+  init_graph_owl_defendpat();
+  init_graph_owl_vital_apat();
+}
+
+
+static void 
+tree_prepare_for_match(int color)
+{
+  /* Nothing to prepare! */
+}
+
+static void 
+tree_matchpat_loop(matchpat_callback_fn_ptr callback, 
+			  int color, int anchor,
+			  struct pattern_db *pdb, void *callback_data,
+			  char goal[BOARDMAX], int anchor_in_goal)
+{
+  int i, j;
+
+  for (i = 0; i != board_size; i++)
+    for (j = 0; j != board_size; j++)
+      if (board[POS(i,j)] == anchor
+          && (!anchor_in_goal || goal[POS(i,j)] != 0))
+	tree_do_matchpat(i, j, callback, color, 
+		    pdb, callback_data, goal);
+
+}
+
+/* possibly cheeper to pass a little less recursively.
+ * Note: This could even just be static data, unless the
+ * tree pattern matcher is itself used recursively.*/
+struct rec_data {
+  matchpat_callback_fn_ptr callback;
+  struct pattern_db *database;
+  void *callback_data;
+};
+
+
+/* Recursively walks the tree data structure, calling the callback
+ * for all patterns matched at location (m,n).
+ */
+static void 
+do_tree_matchpat_rec(int color, int m, int n, int goal_found,
+                     char goal[BOARDMAX], 
+                     struct graph_node_list *gnl, 
+                     struct rec_data *pdata) {
+  if (0 && !gnl) {
+    return;
+  }
+  gnl = gnl->next;
+  while (gnl) {
+    struct graph_node *node = &(gnl->node);
+    int x = m + node->x;
+    int y = n + node->y;;
+    if (ON_BOARD2(x,y)) {
+      int att = node->att;
+      int point_color = BOARD(x,y);
+      if ((att == EMPTY && point_color == EMPTY)
+          || (att == ATT_X && point_color == OTHER_COLOR(color) )
+          || (att == ATT_O && point_color == color)) {
+        /* FIXME: Don't need this check if anchor_in_goal */
+        goal_found = goal_found || goal[POS(x,y)];
+        if (node->matches) {
+          struct match_node *match = node->matches->next;
+          while (match) {
+            struct pattern *pattern = 
+              &(pdata->database->patterns[match->patnum]);
+            int ll = match->orientation;
+	    int mi, mj, xi, xj;
+	    TRANSFORM(pattern->mini, pattern->minj, &mi, &mj, ll);
+	    TRANSFORM(pattern->maxi, pattern->maxj, &xi, &xj, ll);
+	    /* now do the range-check */
+            if (!goal_found
+                || !ON_BOARD2(m+mi, n+mj) 
+                || !ON_BOARD2(m+xi, n+xj)) {
+	      ;/* goal not found, or out of range */
+            } else {
+              if (0) {
+                gprintf("  P[%s, %d] matches at %m)\n",
+                  pattern->name, 
+                  match->orientation, x, y);
+              }
+              /* A match! */
+              pdata->callback(m, n, color, pattern, ll, pdata->callback_data);
+            }
+
+            match = match->next;
+          }
+        }
+        if (node->next_list && node->next_list->next) {
+          do_tree_matchpat_rec(color, m, n, goal_found, goal, node->next_list, pdata);
+        }
+      }
+    }
+    gnl = gnl->next;
+  }
+}
+
+/* Stub for matchpat function.  Work done in recursive helper. */
+static void 
+tree_do_matchpat(int m, int n, matchpat_callback_fn_ptr callback,
+			int color, struct pattern_db *database,
+			void *callback_data, char goal[BOARDMAX])
+{
+  struct graph_node_list *tree = database->gnl;
+  struct rec_data data;
+
+  if (0)  {
+    if (0)
+      showboard(0);
+    gprintf("Trying to match at %m\n", m, n);
+  }
+  data.callback = callback;
+  data.callback_data = callback_data;
+  data.database = database;
+
+  /* note: goal_found parameter should be 1 if the database
+   * forces the anchor to be in the goal.
+   */
+  do_tree_matchpat_rec(color, m, n, 0, goal, tree, &data);
+
+}
+
+/**************************************************************************/
+/* Tree initialization helper                                             */
+/**************************************************************************/
+
+/* The tree data structure is output with raw integer offsets
+ * relative to a single array of graph_node_list and match_node
+ * elements.  These offsets need to added to the actual base
+ * address of the list of elements for the pointers to be
+ * meaningful.
+ */
+void 
+tree_initialize_pointers(struct graph_node_list *gnl,
+                         struct match_node *matches,
+                         int gnl_size,
+                         int matches_size)
+{
+  struct graph_node_list *gnl_walk = gnl;
+  struct match_node *matches_walk = matches;
+
+  do {
+    if (gnl_walk->next)
+      gnl_walk->next = gnl + (int)(gnl_walk->next);
+    if (gnl_walk->node.matches)
+      gnl_walk->node.matches = matches + (int)(gnl_walk->node.matches);
+    if (gnl_walk->node.next_list)
+      gnl_walk->node.next_list = gnl + (int)(gnl_walk->node.next_list);
+  } while (++gnl_walk < gnl + gnl_size);
+
+
+  do {
+    if (matches_walk->next)
+      matches_walk->next = matches + (int)(matches_walk->next);
+  } while (++matches_walk < matches + matches_size);
+
+  
+}
+
+
 
 /**************************************************************************/
 /* DFA matcher:                                                           */
@@ -1032,6 +1207,11 @@ matchpat_goal_anchor(matchpat_callback_fn_ptr callback, int color,
   if (pdb->pdfa != NULL) { 
     loop = dfa_matchpat_loop;
     prepare = dfa_prepare_for_match;
+  }
+
+  if (pdb->gnl) {
+    loop = tree_matchpat_loop;
+    prepare = tree_prepare_for_match;
   }
 
   /* select strategy */

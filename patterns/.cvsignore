@@ -25,3 +25,4 @@ extract_fuseki
 owl_vital_apat.c
 owl_defendpat.c
 read_attack.c
+read_defend.c

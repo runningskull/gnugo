@@ -28,6 +28,8 @@
  * for an introduction.
  */
 
+#include "gnugo.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,6 +40,7 @@
 #include "sgftree.h"
 #include "gg_utils.h"
 
+#define KOMASTER_SCHEME 1
 
 /* This can be used for internal checks w/in board.c that should
  * typically not be necessary (for speed). */
@@ -88,7 +91,8 @@ struct vertex_stack_entry {
 
 
 #define CLEAR_STACKS()\
-(change_stack_pointer = change_stack, vertex_stack_pointer = vertex_stack)
+(change_stack_pointer = change_stack, \
+ vertex_stack_pointer = vertex_stack)
 
 /* Begin a record : adress == NULL */
 #define BEGIN_CHANGE_RECORD()\
@@ -109,6 +113,7 @@ struct vertex_stack_entry {
   while ((--change_stack_pointer)->address)\
   *(change_stack_pointer->address) =\
   change_stack_pointer->value
+
 
 #define POP_VERTICES()\
   while ((--vertex_stack_pointer)->address)\
@@ -201,6 +206,9 @@ static int next_stone[BOARDMAX];
   
 #define LIBERTIES(pos)\
   string[string_number[pos]].liberties
+
+#define COUNTSTONES(pos) \
+  string[string_number[pos]].size
 
 #define ADD_LIBERTY(s, pos)\
   do {\
@@ -375,6 +383,34 @@ static int move_color[MAXSTACK];
 static Hash_data hashdata_stack[MAXSTACK];
 
 
+
+/* KOMASTER_SCHEME 4 handles empty case differently from other schemes */
+int
+komaster_is_empty(int komaster, int kom_pos) {
+  if (KOMASTER_SCHEME == 4) {
+    return kom_pos == PASS_MOVE;
+  } else {
+    return komaster == EMPTY;
+  }
+}
+
+/* KOMASTER_SCHEME 4 handles komaster interpretation differently from 
+ * other schemes */
+const char *
+komaster_to_string(int komaster) {
+#if KOMASTER_SCHEME == 4 
+  const char *b[4] = {"O-Illegal", "X-Illegal", "O-Legal", "X-Legal"};
+  ASSERT1(komaster >=0 && komaster <=3, 0);
+  return b[komaster];
+#else
+  return color_to_string(komaster);
+#endif
+}
+
+
+
+
+
 /*
  * trymove pushes the position onto the stack, and makes a move
  * at pos of color. Returns one if the move is legal. The
@@ -408,21 +444,22 @@ trymove(int pos, int color, const char *message, int str,
       message = "UNKNOWN";
 
     if (str == 0) {
-      if (komaster != EMPTY)
+      if (!komaster_is_empty(komaster, kom_pos))
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, count_variations, hashdata.hashval,
-		    color_to_string(komaster),
+		    komaster_to_string(komaster),
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s (variation %d, hash %lx)", 
 		    message, count_variations, hashdata.hashval);
     }
     else {
-      if (komaster != EMPTY)
+      if (!komaster_is_empty(komaster, kom_pos))
 	gg_snprintf(buf, 100, 
 		    "%s at %s (variation %d, hash %lx, komaster %s:%s)", 
 		    message, location_to_string(str), count_variations,
-		    hashdata.hashval, color_to_string(komaster),
+		    hashdata.hashval, 
+                    komaster_to_string(komaster),
 		    location_to_string(kom_pos));
       else
 	gg_snprintf(buf, 100, "%s at %s (variation %d, hash %lx)", 
@@ -508,17 +545,21 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
     char buf[100];
     if (message == NULL)
       message = "UNKNOWN";
-    if (komaster != EMPTY)
+    if (!komaster_is_empty(komaster, kom_pos))
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx, komaster %s:%s)", 
 		  message, count_variations, hashdata.hashval,
-		  color_to_string(komaster), location_to_string(kom_pos));
+		  komaster_to_string(komaster), 
+                  location_to_string(kom_pos));
     else
       gg_snprintf(buf, 100, "tryko: %s (variation %d, %lx)", 
 		  message, count_variations, hashdata.hashval);
-    sgftreeAddPlayLast(sgf_dumptree, NULL, color, -1, -1);
-    sgftreeAddComment(sgf_dumptree, NULL, "tenuki (ko threat)");
-    sgftreeAddPlayLast(sgf_dumptree, NULL, OTHER_COLOR(color), -1, -1);
-    sgftreeAddComment(sgf_dumptree, NULL, "tenuki (answers ko threat)");
+    if (0) {
+      /* tm - I don't find these pass moves helpful in the tree. */
+      sgftreeAddPlayLast(sgf_dumptree, NULL, color, -1, -1);
+      sgftreeAddComment(sgf_dumptree, NULL, "tenuki (ko threat)");
+      sgftreeAddPlayLast(sgf_dumptree, NULL, OTHER_COLOR(color), -1, -1);
+      sgftreeAddComment(sgf_dumptree, NULL, "tenuki (answers ko threat)");
+    }
     sgftreeAddPlayLast(sgf_dumptree, NULL, color, I(pos), J(pos));
     sgftreeAddComment(sgf_dumptree, NULL, buf);
   }
@@ -540,12 +581,22 @@ tryko(int pos, int color, const char *message, int komaster, int kom_pos)
 static int 
 do_trymove(int pos, int color, int ignore_ko)
 {
+  if (0) {
+    if (ignore_ko) {
+      gprintf("tryko");
+    } else {
+      gprintf("trymove");
+    }
+    gprintf("%o %C %1m\n", color, pos);
+  }
+
+
   /* 1. The move must be inside the board and the color must be BLACK
    * or WHITE.
    */
   ASSERT_ON_BOARD1(pos);
   gg_assert(color == BLACK || color == WHITE);
-  
+ 
   /* Update the reading tree shadow. */
   shadow[pos] = 1;
 
@@ -573,7 +624,9 @@ do_trymove(int pos, int color, int ignore_ko)
     fprintf(stderr, 
 	    "gnugo: Truncating search. This is beyond my reading ability!\n");
     /* FIXME: Perhaps it's best to just assert here and be done with it? */
-    /*ASSERT1(0 && "trymove stack overflow", pos);*/
+    if (0) {
+      ASSERT1(0 && "trymove stack overflow", pos);
+    }
     if (verbose > 0) {
       showboard(0);
       dump_stack();
@@ -582,6 +635,7 @@ do_trymove(int pos, int color, int ignore_ko)
     fflush(stderr);
     return 0;
   }
+
 
   /* Only count trymove when we do create a new position. */
   trymove_counter++;
@@ -677,11 +731,16 @@ silent_popgo(void)
 static void
 undo_move()
 {
+  if (0) 
+    gprintf("popgo\n");
+
   gg_assert(strings_initialized);
   gg_assert(change_stack_pointer - change_stack <= STACK_SIZE);
 
-  if (0)
+  if (0) {
     gprintf("Change stack size = %d\n", change_stack_pointer - change_stack);
+    gprintf("Vertex stack size = %d\n", vertex_stack_pointer - vertex_stack);
+  }
 
   POP_MOVE();
   POP_VERTICES();
@@ -868,6 +927,10 @@ is_legal(int pos, int color)
   if (stackp >= MAXSTACK-2) {
     fprintf(stderr, 
 	    "gnugo: Truncating search. This is beyond my reading ability!\n");
+    /* FIXME: Perhaps it's best to just assert here and be done with it? */
+    if (0) {
+      ASSERT1(0 && "is_legal stack overflow", pos);
+    }
     return 0;
   }
 
@@ -948,7 +1011,6 @@ is_illegal_ko_capture(int pos, int color)
  * trymove()/tryko() code.
  */
 
-#define KOMASTER_SCHEME 1
 
 #if KOMASTER_SCHEME == 1
 
@@ -1058,10 +1120,8 @@ komaster_trymove(int pos, int color, const char *message, int str,
 
 #endif
 
-
-
-
 #if KOMASTER_SCHEME == 2
+
 /* Simple komaster scheme, equivalent to the one implemented in 2.7.232.
  *
  * (II) Original 2.7.232 scheme, O to move.
@@ -1123,8 +1183,6 @@ komaster_trymove(int pos, int color, const char *message, int str,
 }
 
 #endif
-
-
 
 #if KOMASTER_SCHEME == 3
 
@@ -1212,6 +1270,225 @@ komaster_trymove(int pos, int color, const char *message, int str,
 
 #endif
 
+/* Returns true if the (pos1) and (pos2) are directly adjacent */
+static int
+is_next_to(int pos1, int pos2) {
+  int diff = pos1 - pos2;
+  ASSERT_ON_BOARD1(pos1);
+  ASSERT_ON_BOARD1(pos2);
+  return diff == WE || diff == -WE || diff == NS || diff == -NS;
+}
+
+#if KOMASTER_SCHEME == 4
+
+#define KOMASTER_X 1
+#define KOMASTER_LEGAL 2
+
+/* (IV) A different komaster approach.
+ * As of 3.1.27 it's quite slow, and has been tested primarily
+ * in the context of pattern-based reading, where the other 
+ * komaster schemes weren't sufficient.  It does eliminate all
+ * tested cyclic ko problems, but still fails a few regressions.
+ *
+ * Currently this komaster scheme is slow.
+ * 
+ * If kom_pos == PASS, then there is no ko restriction in place.
+ * This allows us to forgo an empty komaster status.  The extra
+ * 1/2 bit gives us room to track some more information.
+ * Logically, the komaster can take these values:
+ *   KOMASTER_O_legal    0
+ *   KOMASTER_X_legal    1
+ *   KOMASTER_O_illegal  2
+ *   KOMASTER_X_illegal  3
+ * These values aren't actually defined, but are built up out
+ * of KOMASTER_X and KOMASTER_LEGAL.  They're used in the comments
+ * below for simplicity, however.
+ *
+ * 1. Komaster_pos is PASS:
+ *   Move always allowed.
+ *   If it's a legal ko capture, then komaster becomes KOMASTER_{OX}_legal, 
+ *     and komaster_pos set to (pos). OX determined by color parameter.
+ *   If it's an illegal ko capture, komaster becomes KOMASTER_{OX}_illegal,
+ *     and komaster_pos set to (pos). OX determined by color parameter.
+ *     If !consider_conditional_ko, the move is not allowed.
+ *   If it's not a ko, komaster_pos remains PASS.
+ *
+ * The treatment of KOMASTER_O and KOMASTER_X are always identical,
+ * simply with the player to move switched.  Below, only one of the
+ * two identical cases is given.
+ *
+ * 2. Komaster_pos is (pos), komaster is KOMASTER_O_legal:
+ * 2a X to play:
+ *    if pos takes same ko as komaster_pos:
+ *      if legal, komaster becomes KOMASTER_X_illegal (!).
+ *      if illegal (ko threat required),
+ *        if consider_conditional_ko
+ *          komaster becomes KOMASTER_X_illegal.
+ *    X may make any other legal move, including kos, and the komaster
+ *      does not change.
+ * 2b O to play:
+ *    O may resolve this ko, or take a related ko.
+ *      if it's a related ko, the komaster_pos changes to this related ko.
+ *    O may not take an unrelated ko.  He must resolve this one first.  This
+ *      avoids triple ko problems.
+ *
+ * 3. Komaster_pos is (pos), komaster is KOMASTER_O_illegal:
+ * 3a X simply resolves to a trymove(), since O's already made a conditional
+ *      capture, X may not make a conditional capture too.
+ * 3b O's play is identical to the legal case.  The next statment is probably 
+ *      bogus: In particular, he may happily re-take this ko at any time, in 
+ *      case X took it back (legally).
+ */
+
+int
+komaster_trymove(int pos, int color, const char *message, int str,
+		 int komaster, int kom_pos,
+		 int *new_komaster, int *new_kom_pos,
+		 int *is_conditional_ko, int consider_conditional_ko)
+{
+  int other = OTHER_COLOR(color);
+  int ko_move;
+  int kpos;
+  int new_kom_color_flag = (color == BLACK) ? KOMASTER_X : 0;
+  int kom_color = (komaster & KOMASTER_X) ? BLACK : WHITE;
+  int log_illegal_moves = !!sgf_dumptree;
+
+  if (!ON_BOARD1(kom_pos) 
+      || board[kom_pos] != kom_color
+      || !is_ko_point(kom_pos)
+      || !board_ko_pos) {
+      /* Try clearing komaster is the prev. move is not a ko.
+       * i.e. it could have been an internal ko threat.*/
+    /* ko's been resolved clear komaster */
+    komaster = 0;
+    kom_pos = PASS_MOVE;
+  }
+  /* komaster parameters are a typical default. */
+  *new_komaster = komaster;
+  *new_kom_pos = kom_pos;
+  *is_conditional_ko = 0;
+
+  ko_move = is_ko(pos, color, &kpos);
+
+  if (kom_pos == PASS_MOVE) {
+    if (trymove(pos, color, message, str, komaster, kom_pos)) {
+      if (ko_move) {
+        *new_kom_pos = pos;
+        *new_komaster = KOMASTER_LEGAL + new_kom_color_flag;
+      } /* else: legal non-ko move (usual case), no komaster change. */
+      return 1;
+    } else {
+      if (consider_conditional_ko) {
+        if (tryko(pos, color, message, komaster, kom_pos)) {
+          /* Must be an illegal ko capture*/
+          *new_kom_pos = pos;
+          *new_komaster = new_kom_color_flag; /*don't set KOMASTER_LEGAL bit*/
+          *is_conditional_ko = 1;
+          return 1;
+        } else {
+          /* completely illegal move */
+          return 0;
+        }
+      } else {
+        /* don't even try to fake a ko threat. */
+        if (log_illegal_moves) {
+          if (tryko(pos, color, message, komaster, kom_pos)) {
+            sgftreeAddComment(sgf_dumptree, NULL, 
+                "ILLEGAL - Conditional ko capture not requested. (A)");
+            popgo();
+          }
+        }
+        return 0;
+      }
+    }
+  }
+
+  ASSERT_ON_BOARD1(kom_pos);
+
+  /* Different color to move than komaster */
+  if (new_kom_color_flag != (komaster & KOMASTER_X)) {
+    /* if komaster is ILLEGAL, don't allow opponent to retake the ko. */
+    if (!(komaster & KOMASTER_LEGAL)) {
+      if (is_next_to(pos, kom_pos)) {
+        /* don't let color retake an already spoken-for ko. */
+        if (log_illegal_moves) {
+          if (tryko(pos, color, message, komaster, kom_pos)) {
+            sgftreeAddComment(sgf_dumptree, NULL, 
+                "ILLEGAL - Can't retake other player's ko.");
+            popgo();
+          }
+        }
+        return 0;
+      }
+    }
+    /* komaster is LEGAL */
+    if (trymove(pos, color, message, str, komaster, kom_pos)) {
+      if (!is_next_to(pos, kom_pos)) {
+        /* An unrelated legal move (possibly another ko) */
+        return 1;
+      } else {
+        /* legal ko re-capture */
+        *new_kom_pos = pos;
+        /* Might be worth trying to set the legal bit to see what happens. */
+        /* Note we set the komaster to ILLEGAL anyway to avoid loops */
+        *new_komaster = new_kom_color_flag;  /*don't set KOMASTER_LEGAL bit */
+        *is_conditional_ko = 0;  /* Should this be set to 1? */
+        return 1;
+      }
+    } else {
+      if (consider_conditional_ko) {
+        if (tryko(pos, color, message, komaster, kom_pos)) {
+          /* illegal ko re-capture */
+          *new_kom_pos = pos;
+          *new_komaster = new_kom_color_flag;  /*don't set KOMASTER_LEGAL bit */
+          *is_conditional_ko = 1;
+          return 1;
+        } else {
+          /* completely illegal move */
+          return 0;
+        }
+      } else {
+        /* don't even try to fake a ko threat. */
+        if (log_illegal_moves) {
+          if (tryko(pos, color, message, komaster, kom_pos)) {
+            sgftreeAddComment(sgf_dumptree, NULL, 
+                "ILLEGAL - Conditional ko capture not requested. (B)");
+            popgo();
+          }
+        }
+        return 0;
+      }
+    }
+  }
+
+  /* komaster is trying to make a move */
+  ASSERT1(new_kom_color_flag == (komaster & KOMASTER_X), pos);
+
+  /* Same color case: same for LEGAL or ILLEGAL komaster status. */
+  /* If we are komaster, we may only do nested captures. */
+  if (ko_move
+      && kpos != SW(kom_pos) 
+      && kpos != NW(kom_pos)
+      && kpos != NE(kom_pos)
+      && kpos != SE(kom_pos)) {
+    if (log_illegal_moves) {
+      if (tryko(pos, color, message, komaster, kom_pos)) {
+        sgftreeAddComment(sgf_dumptree, NULL, "ILLEGAL - Komaster can't switch kos.");
+        popgo();
+      }
+    }
+    return 0;
+  } else {
+    return trymove(pos, color, message, str, komaster, kom_pos);
+  }
+
+  /* Should have taken care of all cases by here. */
+  gg_assert(0 & "Getting here should not be possible.");
+}
+
+#endif
+
+
 
 /* Determine whether vertex is on the edge. */
 int
@@ -1230,7 +1507,6 @@ is_edge_vertex(int pos)
 /* Count the number of liberties of the string at pos. pos must not be
  * empty.
  */
-
 int
 countlib(int str)
 {
@@ -1339,16 +1615,18 @@ findlib(int str, int maxlib, int *libs)
  *
  * The intent of this function is to be as fast as possible, not
  * necessarily complete.
+ *
+ * Note well, that it relies on incremental data (?), and the number
+ * of liberties (if over MAX_LIBERTIES) may be inaccurate (?).
  */
 
 int
 fastlib(int pos, int color, int ignore_capture) {
   int k;
-  int ally = 0;
+  int ally1 = 0;
+  int ally2 = 0;
   int fast_liberties = 0;
   int other = OTHER_COLOR(color);
-  int neighbor;
-  int neighbor_color;
 
   ASSERT_ON_BOARD1(pos);
   ASSERT1(board[pos] == EMPTY, pos);
@@ -1358,32 +1636,57 @@ fastlib(int pos, int color, int ignore_capture) {
     init_board();
 
   for (k = 0; k < 4; k++) {
-    neighbor = pos + delta[k];
+    int neighbor = pos + delta[k];
     if (board[neighbor] == color) {
-      if (ally) {
-        if (string_number[ally] != string_number[neighbor]) { 
-          return -1; /* More than 1 ally not implemented (yet).*/
-        }  /* otherwise, do nothing - keep going */
+      if (ally1) {
+        if (string_number[ally1] != string_number[neighbor]) { 
+          if (ally2) {
+            if (string_number[ally2] != string_number[neighbor]) { 
+              return -1; /* More than 2 allies not implemented (yet).*/
+            } else {
+              /* do nothing neighbor string == ally2 string */
+            }
+          } else {
+            ally2 = neighbor;
+          }
+        } else {
+              /* do nothing neighbor string == ally1 string */
+        }
       } else {
-        ally = neighbor;
-        fast_liberties += countlib(ally) - 1;
+        ally1 = neighbor;
       }
     }
   }
   for (k = 0; k < 4; k++) {
-    neighbor = pos + delta[k];
-    neighbor_color = board[neighbor];
+    int neighbor = pos + delta[k];
+    int neighbor_color = board[neighbor];
     if (!ignore_capture
         && neighbor_color == other
-	&& countlib(neighbor) == 1) {
-      return -1;
+	&& LIBERTIES(neighbor) == 1) {
+      int neighbor_size = COUNTSTONES(neighbor);
+      if ((neighbor_size <= 2 && !ally1)
+          || (neighbor_size == 1
+              && ally1 
+              && !ally2
+              && countstones(ally1) == 1)) {
+        /* Here, we can gain only the adjacent new liberty. */
+        fast_liberties++;
+      } else {
+        return -1;
+      }
     }
     if (neighbor_color == EMPTY) {
-      if (!ally || !liberty_of_string(neighbor, ally)) {
+      if ((!ally1 || !liberty_of_string(neighbor, ally1))
+          && (!ally2 || !liberty_of_string(neighbor, ally2))) {
 	fast_liberties++;
       }
     }
   }
+
+  if (ally1)
+    fast_liberties += LIBERTIES(ally1) - 1;
+  if (ally2)
+    fast_liberties += LIBERTIES(ally2) - count_common_libs(ally1, ally2);
   return fast_liberties;
 }
 
@@ -1657,6 +1960,7 @@ have_common_lib(int str1, int str2, int *lib)
 }
 
 
+
 /*
  * Report the number of stones in a string.
  */
@@ -1670,7 +1974,7 @@ countstones(int str)
   if (!strings_initialized)
     init_board();
 
-  return string[string_number[str]].size;
+  return COUNTSTONES(str);
 }
 
 

@@ -20,6 +20,7 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "gnugo.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -767,8 +768,6 @@ restore_depth_values()
   ko_depth          = save_ko_depth;
 }
 
-
-
 /* Play a stone at (m, n) and count the number of liberties for the
  * resulting string. This requires (m, n) to be empty.
  *
@@ -783,21 +782,18 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
   int liberties = 0;
   SGFTree *save_sgf_dumptree = sgf_dumptree;
   int save_count_variations = count_variations;
-  sgf_dumptree = 0;
 
   ASSERT1(board[pos] == EMPTY, pos);
   ASSERT1(IS_STONE(color), pos);
 
   if (!libs) {
     fast_liberties = fastlib(pos, color, 0);
-  /* FIXME: Remove the 0 here, and assert below, when we trust 
-   * fast_liberties. 
-   */
-    if (0 && fast_liberties >= 0) {
+    if (fast_liberties >= 0) {
       return fast_liberties;
     } 
   }
 
+  sgf_dumptree = 0;
   /* Use tryko() since we don't care whether the move would violate
    * the ko rule.
    */
@@ -810,12 +806,7 @@ accurate_approxlib(int pos, int color, int maxlib, int *libs)
   }
 
   if (fast_liberties >= 0 && liberties > 0) {
-    if (fast_liberties != liberties) {
-      gprintf("%oError in " __FILE__ ":%d\n", __LINE__);
-      gprintf("%o  fast:%d regular:%d color:%d pos:%1m\n",
-        fast_liberties, liberties, color, pos);
-      ASSERT1(fast_liberties == liberties, pos);
-    }
+    ASSERT1(fast_liberties == liberties, pos);
   }
 
   sgf_dumptree = save_sgf_dumptree;

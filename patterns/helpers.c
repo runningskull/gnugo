@@ -25,10 +25,11 @@
 
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
 #include "liberty.h"
 #include "patterns.h"
+
+#include <stdlib.h>
+#include <assert.h>
 
 
 #define TRYMOVE(pos, color) trymove(pos, color, "helper", NO_MOVE, EMPTY, NO_MOVE)
@@ -666,6 +667,22 @@ connect_and_cut_helper(int Apos, int bpos, int cpos)
   return result;
 }
 
+
+
+/* replaces macro with assert-enabled function */
+int 
+dragon_weak(int pos)
+{
+  ASSERT_ON_BOARD1(pos);
+  /* FIXME: This should not happen, but avoids a crash.  What is
+   *   the proper fix for calling this at stackp != 0 ?
+   */
+  if (dragon[pos].id < 0 || dragon[pos].id >= number_of_dragons)
+     return 1;
+  return DRAGON2(pos).safety != ALIVE
+         && DRAGON2(pos).safety != STRONGLY_ALIVE \
+	 && DRAGON2(pos).safety != INVINCIBLE;
+}
 
 /*
  * LOCAL Variables:

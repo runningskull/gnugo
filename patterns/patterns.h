@@ -83,6 +83,7 @@ do { \
   *tj = transformations[trans][1][0] * (i) + transformations[trans][1][1] * (j); \
 } while (0)
 
+
 /* The ordinary TRANSFORM plus translation with (m, n), returned as a
  * 1D coordinate.
  */
@@ -95,9 +96,7 @@ do { \
 
 #define ATTACK_MACRO(pos) ((stackp==0) ? (worm[pos].attack_codes[0]) : attack(pos, NULL))
 #define DEFEND_MACRO(pos) ((stackp==0) ? (worm[pos].defend_codes[0]) : find_defense(pos, NULL))
-#define DRAGON_WEAK(pos) (DRAGON2(pos).safety != ALIVE \
-			  && DRAGON2(pos).safety != STRONGLY_ALIVE \
-			  && DRAGON2(pos).safety != INVINCIBLE)
+#define DRAGON_WEAK(pos) dragon_weak(pos)
 
 struct pattern; /* forward reference to keep gcc happy */
 
@@ -262,10 +261,14 @@ struct pattern {
 #endif
 };
 
+
+struct graph_node_list;
+
 struct pattern_db {
   int fixed_for_size;
   struct pattern *patterns;
   struct dfa *pdfa;
+  struct graph_node_list *gnl; /* For tree-based pattern matching */
 };
 
 
@@ -306,6 +309,7 @@ int backfill_helper(int apos, int bpos, int cpos);
 int owl_threatens_attack(int apos, int bpos);
 int connect_and_cut_helper(int Apos, int bpos, int cpos);
 int edge_double_sente_helper(int move, int apos, int bpos, int cpos);
+int dragon_weak(int pos);
 
 
 /* FIXME: My appologies for the set_value macro - needed for 
@@ -335,6 +339,40 @@ extern struct fullboard_pattern fuseki9[];
 /* Experimental reading */
 extern struct pattern_db read_attack_db;
 extern struct pattern_db read_defend_db;
+
+
+/* Tree-based pattern matching structures*/
+/* FIXME: graph_* should be renamed to tree_* */
+
+struct match_node;
+struct graph_node_list;
+
+struct match_node {
+  int patnum;
+  int orientation;
+  struct match_node *next;
+};
+
+
+struct graph_node {
+  struct match_node *matches;
+  int att;
+  int x;
+  int y;
+  struct graph_node_list *next_list;
+};
+
+struct graph_node_list {
+  struct graph_node node;
+  struct graph_node_list *next;
+};
+
+
+struct element_node {
+  struct patval e;
+  struct element_node *next;
+};
+
 
 #endif
 

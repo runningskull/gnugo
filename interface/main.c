@@ -20,8 +20,7 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-#include <config.h>
+#include "gnugo.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -56,7 +55,6 @@
 #include "interface.h"
 #include "gmp.h"
 #include "sgftree.h"
-#include "gnugo.h"
 #include "random.h"
 
 static void show_copyright(void);
@@ -65,7 +63,7 @@ static void show_help(void);
 static void show_debug_help(void);
 
 /* long options which have no short form */
-enum {OPT_BOARDSIZE=2,
+enum {OPT_BOARDSIZE=127,
       OPT_HANDICAPSTONES,
       OPT_COLOR,
       OPT_KOMI,
@@ -124,7 +122,9 @@ enum {OPT_BOARDSIZE=2,
       OPT_JAPANESE_RULES,
       OPT_ALLOW_SUICIDE,
       OPT_CAPTURE_ALL_DEAD,
-      OPT_PLAY_OUT_AFTERMATH
+      OPT_PLAY_OUT_AFTERMATH,
+      OPT_ATTACK_BY_PATTERN,
+      OPT_DEFEND_BY_PATTERN
 };
 
 /* names of playing modes */
@@ -243,6 +243,8 @@ static struct gg_option const long_options[] =
   {"score",          required_argument, 0, OPT_SCORE},
   {"printsgf",       required_argument, 0, OPT_PRINTSGF},
   {"profile-patterns", no_argument,     0, OPT_PROFILE_PATTERNS},
+  {"attack-by-pattern", no_argument,    0, OPT_ATTACK_BY_PATTERN},
+  {"defend-by-pattern", no_argument,    0, OPT_DEFEND_BY_PATTERN},
   {NULL, 0, NULL, 0}
 };
 
@@ -335,7 +337,7 @@ main(int argc, char *argv[])
 
   sgftree_clear(&sgftree);
   gameinfo_clear(&gameinfo, boardsize, komi);
-  
+
   /* Set some standard options. */
   umove = BLACK;
   
@@ -759,6 +761,15 @@ main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 	break;
 	
+      case OPT_ATTACK_BY_PATTERN:
+        attack_by_pattern = 1;
+        break;
+
+      case OPT_DEFEND_BY_PATTERN:
+        defend_by_pattern = 1;
+        break;
+
+
       case 'v':
 	show_version();
 	return EXIT_SUCCESS;
@@ -1323,7 +1334,7 @@ Debugging Options:\n\
 "
 #define USAGE_DEBUG2 "\
        --decide-string <string>  can this string live? (try with -o)\n\
-       --decide-connection <string/string> can these strings be connected? (try with -o)\n\
+       --decide-connection <str/str> can these strings connect? (try with -o)\n\
        --decide-dragon <dragon>  can this dragon live? (try with -o or -t)\n\
        --decide-position         evaluate all dragons (try with -o or -t)\n\
        --decide-eye <string>     evaluate the eye\n\
@@ -1335,7 +1346,9 @@ Debugging Options:\n\
        --nojosekidb              turn off joseki database\n\
        --debuginfluence <move>   print influence map after making a move\n\
        --score <end|last|move>   count or estimate territory\n\
-       --profile-patterns        print statistics for pattern usage.\n\
+       --profile-patterns        print statistics for pattern usage\n\
+       --attack-by-pattern       use pattern-based tactical reading for attack\n\
+       --defend-by-pattern       use pattern-based tactical reading for defense\n\
 "
     
 /*

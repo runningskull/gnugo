@@ -46,7 +46,7 @@
  *                       and (purported) wisdom.
  */
 
-
+#include "gnugo.h"
 
 #define MAX_MOVES 3           /* maximum number of branches at each node */
 #define MAX_SEMEAI_MOVES 2    /* semeai branch factor--must be <= MAX_MOVES */

@@ -20,6 +20,8 @@
  * Boston, MA 02111, USA.                                        *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "gnugo.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -205,49 +207,9 @@ mprintf(const char *fmt, ...)
 
 #ifndef HAVE_VARIADIC_DEFINE
 
-/* Some C compilers allows us to define these as macros in liberty.h */
+/* See gnugo.h for related TRACE family macro definitions */
 
-#if 0
-/* See liberty.h for a simpler non-variadic macro define for these. */
-void 
-TRACE_func(const char *fmt, ...)
-{
-  va_list ap;
-
-  if (verbose) {
-    va_start(ap, fmt);
-    vgprintf(stderr, fmt, ap);
-    va_end(ap);
-  }
-}
-
-
-void 
-VTRACE_func(const char *fmt, ...)
-{
-  va_list ap;
-
-  if (verbose >= 4) {
-    va_start(ap, fmt);
-    vgprintf(stderr, fmt, ap);
-    va_end(ap);
-  }
-}
-
-
-void 
-RTRACE_func(const char *fmt, ...)
-{
-  va_list ap;
-
-  if (verbose >= 3) {
-    va_start(ap, fmt);
-    vgprintf(stderr, fmt, ap);
-    va_end(ap);
-  }
-}
-
-#endif 
+int trace_dummy;
 
 /* Always returns 1 to allow use in short-circuit logical expressions. */
 int 
@@ -264,7 +226,7 @@ DEBUG_func(int flag, const char *fmt, ...)
   return 1;
 }
 
-#endif
+#endif /*HAVE_VARIADIC_DEFINE*/
 
 
 /*
