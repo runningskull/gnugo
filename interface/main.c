@@ -1484,6 +1484,9 @@ Scoring:\n\
 Cache size (higher=more memory usage, faster unless swapping occurs):\n\
    -M, --cache-size <megabytes>  RAM cache for hashing (default %4.1f Mb)\n\
 \n\
+"
+
+#define USAGE2 "\
 Game Options: (--mode ascii)\n\
        --boardsize num   Set the board size to use (%d--%d)\n\
        --color <color>   Choose your color ('black' or 'white')\n\
@@ -1614,8 +1617,8 @@ show_help(void)
 	 backfill2_depth, break_chain_depth, superstring_depth, aa_depth, 
 	 owl_distrust_depth, owl_branch_depth,
 	 owl_reading_depth, owl_node_limit);
-  printf(USAGE1,
-	 (float) DEFAULT_MEMORY, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
+  printf(USAGE1, (float) DEFAULT_MEMORY);
+  printf(USAGE2, MIN_BOARD, MAX_BOARD, MAX_HANDICAP);
 }
 
 

@@ -94,6 +94,9 @@
 /* Define if you have the `vwprintw' function. */
 #undef HAVE_VWPRINTW
 
+/* Large Scale Captures. Disabled by default. */
+#undef LARGE_SCALE
+
 /* Define if `major', `minor', and `makedev' are declared in <mkdev.h>. */
 #undef MAJOR_IN_MKDEV
 
@@ -129,9 +132,6 @@
 
 /* Break-in module. Enabled by default. */
 #undef USE_BREAK_IN
-
-/* Large scale captures. Disabled by default. */
-#undef LARGE_SCALE
 
 /* Version number of package */
 #undef VERSION
