@@ -335,6 +335,7 @@ gnugo_who_wins(int color, FILE *outfile)
 float
 gnugo_estimate_score(float *upper, float *lower)
 {
+  silent_examine_position(WHITE, EXAMINE_DRAGONS);
   return estimate_score(upper, lower);
 }
 

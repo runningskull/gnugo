@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in gnugo_estimate_score()
 - reevaluate_ko_threats() revised
 - new helper backfill_replace
 - influence tuning
