@@ -466,7 +466,7 @@ int atari_atari_confirm_safety(int color, int tpos, int *move, int minsize,
 			       const char saved_dragons[BOARDMAX],
 			       const char saved_worms[BOARDMAX]);
 
-int atari_atari_blunder_size(int color, int tpos, int *move,
+int atari_atari_blunder_size(int color, int tpos, char defense_moves[BOARDMAX],
 			     const char safe_stones[BOARDMAX]);
 
 int review_move_reasons(int *move, float *val, int color,

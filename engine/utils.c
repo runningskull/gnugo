@@ -933,11 +933,11 @@ blunder_size(int move, int color, int *defense_point,
 {
   int libs[5];
   int liberties = accuratelib(move, color, 5, libs);
-  int apos;
   int trouble = 0;
   int save_verbose = verbose;
   float return_value = 0.0;
   int atari;
+  char defense_moves[BOARDMAX];
   
   if (defense_point)
     *defense_point = NO_MOVE;
@@ -973,13 +973,20 @@ blunder_size(int move, int color, int *defense_point,
    * set up some combination attack that didn't exist before. We do
    * this last to avoid duplicate blunder reports.
    */
-  atari = atari_atari_blunder_size(color, move, &apos, safe_stones);
+  atari = atari_atari_blunder_size(color, move, defense_moves, safe_stones);
   if (atari) {
-    ASSERT_ON_BOARD1(apos);
-    if (defense_point)
-      *defense_point = apos;
+    if (defense_point) {
+      /* FIXME: Choose defense point more systematically. */
+      int pos;
+      *defense_point = NO_MOVE;
+      for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+	if (ON_BOARD(pos) && defense_moves[pos]) {
+	  *defense_point = pos;
+	  break;
+	}
+    }
     verbose = save_verbose;
-    TRACE("Combination attack appears at %1m.\n", apos);
+    TRACE("Combination attack appears.\n");
     return_value += (float) atari;
   }
 

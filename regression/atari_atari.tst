@@ -114,3 +114,8 @@ play black T14
 loadsgf games/self_play/354-34-2.sgf 150
 26 combination_defend white
 #? [E11|E12]*
+
+loadsgf games/filllib14.sgf
+play white H5
+27 combination_attack black
+#? [0]

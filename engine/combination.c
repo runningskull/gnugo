@@ -349,6 +349,9 @@ atari_atari(int color, int *attack_move, char defense_moves[BOARDMAX],
  * The arrays saved_dragons[] and saved_worms[] should be one for
  * stones belonging to dragons or worms respectively, which are
  * supposedly saved by (move).
+ *
+ * FIXME: We probably want to change the calling convention of this
+ *        function to return all defense moves.
  */
 int
 atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
@@ -356,26 +359,42 @@ atari_atari_confirm_safety(int color, int move, int *defense, int minsize,
 			   const char saved_worms[BOARDMAX])
 {
   char safe_stones[BOARDMAX];
+  char defense_moves[BOARDMAX];
+  int pos;
+  int blunder_size;
 
   mark_safe_stones(color, move, saved_dragons, saved_worms, safe_stones);
+  blunder_size = atari_atari_blunder_size(color, move, defense_moves,
+					  safe_stones);
 
-  return (atari_atari_blunder_size(color, move, defense, safe_stones)
-	  >= minsize);
+  if (defense) {
+    /* Return one arbitrary defense move. */
+    *defense = NO_MOVE;
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+      if (ON_BOARD(pos) && defense_moves[pos]) {
+	*defense = pos;
+	break;
+      }
+  }
+  
+  return blunder_size >= minsize;
 }
- 
+
 
 /* This function checks whether any new combination attack appears after
  * move at (move) has been made, and returns its size (in points).
  * safe_stones marks which of our stones are supposedly safe after this move.
  */
 int
-atari_atari_blunder_size(int color, int move, int *defense,
+atari_atari_blunder_size(int color, int move, char defense_moves[BOARDMAX],
 			 const char safe_stones[BOARDMAX])
 {
   int apos;
   int defense_point = NO_MOVE, after_defense_point = NO_MOVE;
   int aa_val, after_aa_val;
   int other = OTHER_COLOR(color);
+  char defense_points[BOARDMAX];
+  int last_forbidden = NO_MOVE;
 
   /* If aa_depth is too small, we can't see any combination attacks,
    * so in this respect the move is safe enough.
@@ -384,6 +403,7 @@ atari_atari_blunder_size(int color, int move, int *defense,
     return 0;
 
   memset(forbidden, 0, sizeof(forbidden));
+  memset(defense_points, 0, sizeof(defense_points));
 
   /* FIXME: Maybe these should be moved after the tryko() below? */
   compute_aa_status(other, safe_stones);
@@ -395,7 +415,7 @@ atari_atari_blunder_size(int color, int move, int *defense,
     abortgo(__FILE__, __LINE__, "trymove", move);
   increase_depth_values();
 
-  aa_val = do_atari_atari(other, &apos, &defense_point, NULL,
+  aa_val = do_atari_atari(other, &apos, &defense_point, defense_points,
 			  NO_MOVE, 0, 0, NULL);
   after_aa_val = aa_val;
 
@@ -421,6 +441,7 @@ atari_atari_blunder_size(int color, int move, int *defense,
      */
     after_defense_point = defense_point;
     forbidden[apos] = 1;
+    last_forbidden = apos;
     aa_val = do_atari_atari(other, &apos, &defense_point, NULL,
 			    NO_MOVE, 0, aa_val, NULL);
   }
@@ -433,14 +454,58 @@ atari_atari_blunder_size(int color, int move, int *defense,
    */
   compute_aa_status(other, NULL);
   compute_aa_values(other);
+  forbidden[last_forbidden] = 0;
   aa_val = do_atari_atari(other, NULL, NULL, NULL, NO_MOVE, 0, 0, NULL);
-  if (after_aa_val - aa_val > 0) {
-    if (defense)
-      *defense = after_defense_point;
-    return after_aa_val - aa_val;
-  }
-  else
+  if (aa_val >= after_aa_val)
     return 0;
+
+  /* Try the potential defense moves to see which are effective. */
+  if (defense_moves) {
+    int pos;
+    /* defense_points[] contains potential defense moves. Now we
+     * examine which of them really work.
+     */
+    
+    /* FIXME: Maybe these should be moved after the tryko() below? */
+    compute_aa_status(other, safe_stones);
+    compute_aa_values(other);
+      
+    memcpy(defense_moves, defense_points, sizeof(defense_points));
+    for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
+      if (!ON_BOARD(pos) || !defense_moves[pos])
+	continue;
+
+      if (!trymove(pos, color, "atari_atari", NO_MOVE)) {
+	defense_moves[pos] = 0;
+	continue;
+      }
+      increase_depth_values();
+
+      if (attack(pos, NULL)) {
+	defense_moves[pos] = 0;
+	decrease_depth_values();
+	popgo();
+	continue;
+      }
+      
+      /* Accept illegal ko capture here. */
+      if (!tryko(move, color, NULL))
+	/* Really shouldn't happen. */
+	abortgo(__FILE__, __LINE__, "trymove", move);
+      increase_depth_values();
+      
+      if (do_atari_atari(other, &apos, &defense_point, NULL, NO_MOVE,
+			 0, after_aa_val, NULL) >= after_aa_val)
+	defense_moves[pos] = 0;
+
+      decrease_depth_values();
+      popgo();
+      decrease_depth_values();
+      popgo();
+    }
+  }
+  
+  return after_aa_val - aa_val;
 }
 
 

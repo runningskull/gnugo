@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- atari_atari_blunder_size() revised to return multiple defense moves
+  and also verifies them more carefully
 - remove %r support from gprintf, use result_to_string() instead
 - double_atari_chain2() revised to generate more moves
 - new argument recompute_dragons to owl_analyze_semeai_after_move()
