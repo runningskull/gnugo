@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- t moves degraded to value 16
 - new function edge_distance() in board.c
 - CPU time reported by twogtp.py
 - new static function endgame_find_backfilling_dame() in endgame.c
@@ -36,6 +37,7 @@
   GTP commands
 - adjust conection and semeai depth parameters according to levels
 - don't forget to switch exchange sgf_messages in order_moves()
+- influence tuning
 - tuning
 - joseki tuning
 - owl tuning

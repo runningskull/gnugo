@@ -999,14 +999,14 @@ Pattern Barrier66
 
 Pattern Intrusion1
 
-xxxx
+???x
 ...X
 !!.Q
 ----
 
 :8,B,value(30)
 
-xxxx
+???x
 ..cX
 !!ba
 ----
@@ -1249,21 +1249,22 @@ ba
 
 
 Pattern Intrusion10
+# ab Modified action constraint. (3.3.20)
 
-xxx?
-..XO
-!!.Q
-----
+xxx??
+..XO?
+!!.Q?
+-----
 
 :8,B,value(30)
 
-xxx?
-..CO
-!bad
-----
+xxxef
+..COg
+!badh
+-----
 
 ;oplay_attack_either(a,b,b,C)
->return (!xplay_attack(a,d));
+>return (!xplay_attack(a,d) && o_somewhere(g,e,f,h));
 
 
 Pattern Intrusion11
@@ -2129,6 +2130,27 @@ bXfo
 ?.de
 
 ;!oplay_disconnect(f,g) && !oplay_disconnect(a,b,c,d,e,c,f)
+
+
+Pattern Intrusion59
+# New pattern (3.3.20)
+# It is a little drastic, but see arend2:120 for where it is necessary.
+
+|x!xx
+|.!.x
+|.X.X
+|XQO?
+|.oo?
+
+:8,B,value(30)
+
+|x!xx
+|.!.x
+|.B.C
+|AQO?
+|.oo?
+
+;!attack(A) && oplay_disconnect(A,C) && !attack(C)
 
 
 Pattern Nonterritory1

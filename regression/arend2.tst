@@ -44,3 +44,16 @@ loadsgf games/paul.sgf 91
 100 restricted_genmove white O16 O15
 #? [O16]
 
+loadsgf games/nngs/gnugo-3.3.18-agh-200304291749.sgf 64
+110 restricted_genmove white T7 T8 R8
+#? [R8]*
+
+loadsgf games/nngs/gnugo-3.3.18-joshj-200304242104.sgf 58
+120 restricted_genmove white G19 H17 J17
+#? [H17|J17]*
+
+# See also arend:24
+loadsgf games/arend/gnugo-gnugo6.sgf 20
+130 restricted_genmove white P17 G16 F16 E15
+#? [P17]
+

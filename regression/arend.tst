@@ -129,9 +129,10 @@ loadsgf games/arend/gnugo-gnugo5.sgf 105
 #? [!H10]
 
 # Low Shimari clearly better here
+# See also arend2:130
 loadsgf games/arend/gnugo-gnugo6.sgf 20
-24 gg_genmove white 4
-#? [!P16]*
+24 restricted_genmove white P16 P17
+#? [P17]*
 
 #CATEGORY=ENDGAME_TUNING
 # C19 is either double sente, or worth at least 5 pts in reverse sente,

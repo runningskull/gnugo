@@ -6107,24 +6107,21 @@ x.*.o
 Pattern EB1403
 # gf Revised pattern. (3.1.3)
 # gf Revised constraint. (3.3.13)
+# ab Removed followup value (handled by influence code). (3.3.20)
 
 ?oX??          sente hane
 ..XO?
 ?.*.o
 -----
 
-:8,Xe,followup_value(8)
+:8,Xe
 
 ?oD??
-ecDf?
-?a*bo
+b.Da?
+?.*..
 -----
 
-# The oplay_defend test is a workaround for oplay_defend_both not
-# correctly handling ko results.
-;alive(f) && xmoyo(e)
-;&& (!oplay_defend_both(*,a,b,?,c,a,D) || oplay_defend(*,a,b,?,c,a) != WIN)
-;&& !oplay_attack(*,a,b,c,*)
+;alive(a) && xmoyo(b)
 
 
 Pattern EB1404a
@@ -6138,12 +6135,10 @@ Pattern EB1404a
 # In practice this pattern doesn't always kick in at a high enough
 # value to guarantee that EB1403 will be followed up.
 #
-# This has the same followup value as EB1403 has. This might make
-#    EB1404b superfluous.
-#
 # gf Revised pattern. (3.1.3)
 # eb revised constraint (3.3.13)
 # see nngs3:1110
+# ab FIXME: Is this still necessary?
 
 ?oX??          Connect after hane.
 ..XO?
@@ -6161,11 +6156,13 @@ Pattern EB1404a
 
 
 Pattern EB1404b
-# Second followup to EB1403. This confirms that EB1403 was matched
+# Second followup to EB1403.
 # and guarantees that the move is followed up.
 # gf Revised pattern. (3.1.3)
 # eb revised constraint (3.3.13)
 # see nngs3:1110
+# ab FIMXE: Still needed? Also maybe reuse code from connect_and_cut_helper
+# here?
 
 ?oX??          Connect after hane.
 ..XO?
@@ -7179,17 +7176,19 @@ O.....?	  extend
 :8,OE,shape(-1),jump_out_far_helper
 
 
-Pattern CB102
-
-??O??	   extend
-?...?
-?...?
-?...?
-?.*.?
-?...?
-?????
-
-:|,OE,shape(-1),jump_out_far_helper
+#Pattern CB102
+# ab Removed.
+# (No need for negative shape on 3rd line; CB 104 sufficient.)
+#
+#??O??	   extend
+#?...?
+#?...?
+#?...?
+#?.*.?
+#?...?
+#?????
+#
+#:|,OE,shape(-1),jump_out_far_helper
 
 
 Pattern CB103
@@ -10713,7 +10712,8 @@ oOXx??
 
 Pattern ED93
 # db new pattern (3.3.6)
-# see century-2002:120
+# see century2002:120
+# ab Added e classification (3.3.20)
 
 .....X?        don't make the wrong atari
 ..X...?
@@ -10722,7 +10722,7 @@ Pattern ED93
 .......
 -------
 
-:8,dO
+:8,edO
 
 .....X?
 ..X.a.?
@@ -10773,6 +10773,28 @@ Pattern ED95
 -----
 
 ;!weak(a)
+
+
+Pattern ED96
+# ab New pattern (3.3.20)
+# See arend2:120
+
+?....
+O*.X.
+..OX.
+.....
+-----
+
+:8,OXe
+
+?....
+f*.X.
+hgeXd
+..cab
+-----
+
+;!oplay_connect(a,b,c,d,?,g,?,h,e,f)
+> replace(a,*)
 
 
 #####################################################################
@@ -12279,29 +12301,30 @@ X...*....cd
 # :8,Ed,shape(5)
 
 
-Pattern EJ49
-# gf Revised. (3.1.17)
-
-.....         cut
-O*X.o
-.XO.o
-.....
-.....
------
-
-:8,sEj
-
-.....
-O*X.c
-.XObd
-..a..
-.....
------
-
-;o_alive_somewhere(c,d)
-
->replace(a,*);
->replace(b,*)
+# Pattern EJ49
+# ab Removed (3.3.20)
+# # gf Revised. (3.1.17)
+# 
+# .....         cut
+# O*X.o
+# .XO.o
+# .....
+# .....
+# -----
+# 
+# :8,sEj
+# 
+# .....
+# O*X.c
+# .XObd
+# ..a..
+# .....
+# -----
+# 
+# ;o_alive_somewhere(c,d)
+# 
+# >replace(a,*);
+# >replace(b,*)
 
 
 Pattern EJ49b

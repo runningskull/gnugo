@@ -831,6 +831,8 @@ Pattern VA48
 
 Pattern VA49
 # tm New Pattern (3.1.18) (see trevor:430)
+# FIXME: This is non-sense if the ataried stone has neighbours
+# in atari (see trevorb:360)
 
 X*    atari outside eyespace
 oX

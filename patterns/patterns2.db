@@ -2810,7 +2810,7 @@ oOA.
 .*OB
 ----
 
-;oplay_attack_either(*,A,B)
+;oplay_attack_either(*,A,B) && !attack(B) && !attack(A)
 
 
 Pattern Sente5

@@ -36,7 +36,7 @@
 #define U_VALUE 40.0
 #define J_VALUE 35.0
 #define j_VALUE 24.0
-#define t_VALUE 17.0
+#define t_VALUE 16.0
 
 
 /* 

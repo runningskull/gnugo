@@ -210,12 +210,19 @@ XOO.
 
 Pattern EE5
 
+???
 XO?       descend to edge
 .*?       may quite possibly be 0 points gote
 ---
 
 :8,OXe,terri(0.1)
 
+?ab
+XOc       descend to edge
+.*d       may quite possibly be 0 points gote
+---
+
+;o_somewhere(a,b,c,d)
 
 Pattern EE6
 
@@ -292,7 +299,7 @@ Pattern EE103
 ?.*.
 ----
 
-:8,OXe,terri(1)
+:8,OXe
 
 ?OX?
 ?.*a
@@ -339,7 +346,7 @@ Pattern EE104
 ..*.
 ----
 
-:8,OXe,terri(2)
+:8,OXe
 
 ?OX?
 b.*a
@@ -359,7 +366,7 @@ Pattern EE105
 ..*..
 -----
 
-:8,OXe,terri(2)
+:8,OXe
 
 ?OE..
 bc*a.
@@ -374,7 +381,7 @@ Pattern EE106
 ...*.
 -----
 
-:8,OXe,terri(2),reverse_followup(6)
+:8,OXe,reverse_followup(6)
 
 ..dX?
 .bc*a
@@ -819,7 +826,7 @@ Pattern EE504
 *.O
 ---
 
-:8,Oe,terri(2)
+:8,Oe
 
 ...
 *.O
