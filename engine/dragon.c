@@ -1530,7 +1530,7 @@ compute_escape(int pos, int dragon_status_known)
     }
 
   return dragon_escape(goal, board[pos], escape_value);
-};
+}
 
 /*
  * Sum up the surrounding moyo sizes for each dragon. Write this into
