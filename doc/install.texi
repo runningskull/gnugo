@@ -263,7 +263,7 @@ of snprintf.
 
 On these platforms the Cygwin environment can be installed. Recent
 versions of Cygwin install very easily with the setup program available
-from the cygwin homepage.  @url{<http://sourceware.cygnus.com/cygwin/}.
+from the cygwin homepage.  @url{http://sources.redhat.com/cygwin/}.
 GNU Go compiles out-of-the box using the standard Unix build procedure
 on the Cygwin environment. After installation of cygwin and fetching
 @file{gnugo-3.2.tar.gz} you can type:
@@ -279,7 +279,7 @@ The generated executable is not a stand-alone executable: it needs
 cygwin1.dll that comes with the Cygwin environment. cygwin1.dll
 contains the emulation layer for Unix.
 
-Cygwin Home page: @url{http://sourceware.cygnus.com/cygwin/}
+Cygwin Home page: @url{http://sources.redhat.com/cygwin/}
 
 Optionally you can use glib to get a working version of snprintf.
 Glib builds out of the box on cygwin.

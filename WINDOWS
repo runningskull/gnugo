@@ -74,7 +74,7 @@ B) Windows NT, Windows 95/98 using Cygwin
 
    On these platforms the Cygwin environment can be installed. Recent
 versions of Cygwin install very easily with the setup program available
-from the cygwin homepage.  (<http://sourceware.cygnus.com/cygwin/>).
+from the cygwin homepage.  (<http://sources.redhat.com/cygwin/>).
 GNU Go compiles out-of-the box using the standard Unix build procedure
 on the Cygwin environment. After installation of cygwin and fetching
 `gnugo-3.2.tar.gz' you can type:
@@ -90,7 +90,7 @@ contains the emulation layer for Unix.
 
    Cygwin Home page:
 
-   <http://sourceware.cygnus.com/cygwin/>
+   <http://sources.redhat.com/cygwin/>
 
    Optionally you can use glib to get a working version of snprintf.
 Glib builds out of the box on cygwin.
@@ -173,7 +173,7 @@ part of the Java Development Kit (JDK) and consists of the Java
 virtual machine, Java platform core classes, and supporting files.
 The Java virtual machine that comes with I.E. 5.0 works also.
 
-Jago: <http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html>
+Jago: <http://www.rene-grothmann.de/jago>
 
 1) Invoke GNU Go with `gnugo --quiet --mode gmp'
 
