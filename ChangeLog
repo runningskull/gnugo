@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+3.3.9 released September 5, 2002
+
 - new configure option experimental-owl-ext
 - code simplification in safe_move (use REVERSE_RESULT)
 - new randomness_scaling field in struct move_data and new scale_randomness()

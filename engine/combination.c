@@ -1183,12 +1183,20 @@ update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
     queue[queue_end++] = apos;
   }
 
+#if 0
+  /* Disabled for now, since it does nothing but break atari_atari:16
+   * and trevorc:1540. It could be reactivated when the rest of the
+   * function would be modified in order to garanty that a forbidden
+   * move is strictly equivalent to a played move in terms of goal
+   * mapping. I doubt it would be anything worth though...
+   */
   for (pos = BOARDMIN; pos < BOARDMAX; pos++) {
     if (ON_BOARD(pos) && forbidden[pos]) {
       dists[pos] = 1;
       queue[queue_end++] = pos;
     }
   }
+#endif
 
   if (queue_end == 0)
     return 0;
@@ -1223,6 +1231,8 @@ update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
      */
     for (k = 0; k < 4; k++) {
       int pos2 = pos + delta[k];
+      if (!ON_BOARD(pos2))
+       continue;
       if ((board[pos] == other || pos == apos) && board[pos2] == EMPTY) {
         ENQUEUE(pos2, dists[pos] + 1);
       }

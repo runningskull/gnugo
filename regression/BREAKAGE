@@ -1,4 +1,12 @@
- ======================= 3.3.9 pre 3  =========================   
+========================== 3.3.9 ============================   
+
+./regress.sh . atari_atari.tst 
+16 unexpected PASS!
+./regress.sh . trevorc.tst 
+1540 unexpected PASS!
+
+
+======================= 3.3.9 pre 3  =========================   
 
 ./regress.sh . reading.tst 
 173 unexpected FAIL: Correct '1 (A2|C7|B1)', got '0'

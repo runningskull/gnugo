@@ -68,4 +68,4 @@ loadsgf games/atari_atari05.sgf 291
 
 loadsgf games/atari_atari06.sgf
 16 combination_attack white
-#? [K3]*
+#? [K3]

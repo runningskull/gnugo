@@ -24,14 +24,14 @@
 /* Connection module. Default standard. */
 #undef EXPERIMENTAL_CONNECTIONS
 
+/* GAIN/LOSS codes. Disabled by default. */
+#undef EXPERIMENTAL_OWL_EXT
+
 /* Experimental pattern based reading. Disabled by default. */
 #undef EXPERIMENTAL_READING
 
 /* Semeai module. Default standard. */
 #undef EXPERIMENTAL_SEMEAI
-
-/* GAIN/LOSS codes module. Default disabled. */
-#undef EXPERIMENTAL_OWL_EXT
 
 /* Give the directory where gnugo was compiled */
 #undef GNUGO_PATH
