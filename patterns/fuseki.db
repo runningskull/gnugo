@@ -2447,4 +2447,40 @@ Pattern J43
 > replace(d,*)
 
 
+Pattern J44
+# added 3.3.12 evand
+
+?O....??         fixing this defect is often urgent
+XO.*..??
+xXO...??
+xx....??
+--------
+
+:8,j
+
+?O...ab?
+XO.*..??
+xcO...??
+xx....??
+--------
+
+; (!omoyo(a) || !omoyo(b)) && !attack(c)
+
+
+Pattern J45
+# added 3.3.12 evand
+
+???.....???          develop the side
+??o......??
+?oO........
+oO.....*...
+...........
+...........
+-----------
+
+:8,j
+
+
+
+
 # END OF FILE
