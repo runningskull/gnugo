@@ -100,7 +100,7 @@ loadsgf games/handtalk/handtalk2.sgf 79
 # (Incorrectly rejected move)
 loadsgf games/handtalk/handtalk2.sgf 137
 21 gg_genmove black 
-#? [R6]*
+#? [R6]
 
 
 ############ End of Tests #################

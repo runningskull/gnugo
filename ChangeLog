@@ -2,9 +2,10 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-- keep better track of ko results when searching for additional worm
-  attacks and defenses in find_more_attack_and_defense_moves() and
-  make_worms()
+3.3.6 released September 4, 2002
+
+- better ko tracking searching for additional worm attacks and defenses 
+  in find_more_attack_and_defense_moves() and make_worms()
 - new option --output-flags <flags>
 - output using sgf trees with -o option
 - cleaning and minor bugfixes in play ascii
@@ -44,6 +45,7 @@
 - placehand() moved from genmove.c to handicap.c
 - bug fix in adjusted_worm_attack_value()
 - FIXME added regarding several EITHER_MOVE reasons
+- show_dragons() revised
 - tuning
 - influence tuning
 - connection tuning

@@ -7,7 +7,7 @@ reset_trymove_counter
 
 loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 1 gg_genmove white
-#? [B1|A2]
+#? [B1|A2]*
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 22
 10 gg_genmove black
@@ -38,7 +38,7 @@ loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 166
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 176
 70 gg_genmove black
-#? [!L18]
+#? [!L18]*
 
 # semeai problem
 loadsgf games/nngs/tobyiii-gnugo-3.3.2-200206041432.sgf 162

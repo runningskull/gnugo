@@ -60,7 +60,7 @@ loadsgf games/century21-2002/goint-gnugo.sgf 237
 # A19 is horrible, dying in gote. Before that white couldn't kill without ko.
 loadsgf games/century21-2002/goint-gnugo.sgf 247
 95 gg_genmove black
-#? [!A19]*
+#? [!A19]
 
 # locally B7 is better
 loadsgf games/century21-2002/manyfaces-gnugo.sgf 27

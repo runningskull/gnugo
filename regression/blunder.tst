@@ -95,4 +95,4 @@ loadsgf games/handtalk/handtalk13.sgf 123
 # L9 got incorrectly rejected as a blunder.
 loadsgf games/handtalk/handtalk13.sgf 131
 21 gg_genmove black
-#? [L9]*
+#? [L9]

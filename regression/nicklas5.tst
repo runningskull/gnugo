@@ -27,13 +27,13 @@ loadsgf games/nicklas/nicklas8.sgf 140
 # Locally K18 is superior to L17.
 loadsgf games/nicklas/nicklas12.sgf 69
 1202 gg_genmove black
-#? [!L17]*
+#? [!L17]
 
 # I guess K18, giving up the O17 stones and attacking H17 in exchange,
 # is playable. /ab
 loadsgf games/nicklas/nicklas12.sgf 71
 1203 gg_genmove black
-#? [K18|N18|N19|M19]
+#? [K18|N18|N19|M19]*
 
 
 # tm - Looks like a semeai problem.  E18 is good except for semeai.

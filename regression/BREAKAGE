@@ -1,3 +1,32 @@
+======================= 3.3.7 =========================   
+
+./regress.sh . blunder.tst 
+21 unexpected PASS!
+./regress.sh . nngs1.tst 
+40 unexpected FAIL: Correct 'R6', got 'H16'
+./regress.sh . strategy.tst 
+18 unexpected PASS!
+./regress.sh . nicklas5.tst 
+1202 unexpected PASS!
+1203 unexpected FAIL: Correct 'K18|N18|N19|M19', got 'L19'
+./regress.sh . trevor.tst 
+180 unexpected FAIL: Correct '!A8', got 'A8'
+./regress.sh . nngs.tst 
+390 unexpected PASS!
+600 unexpected FAIL: Correct 'H6', got 'J6'
+1560 unexpected PASS!
+./regress.sh . global.tst 
+1 unexpected PASS!
+./regress.sh . trevord.tst 
+1060 unexpected PASS!
+./regress.sh . handtalk.tst 
+21 unexpected PASS!
+./regress.sh . nngs2.tst 
+1 unexpected FAIL: Correct 'B1|A2', got 'A4'
+70 unexpected FAIL: Correct '!L18', got 'L18'
+./regress.sh . century2002.tst 
+95 unexpected PASS!
+
 ======================= 3.3.7 pre 1  =========================   
 
 ./regress.sh . reading.tst 

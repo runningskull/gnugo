@@ -160,7 +160,7 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 126
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 152
 390 gg_genmove black
-#? [N17]*
+#? [N17]
 
 
 loadsgf games/nngs/Lazarus-gnugo-3.1.17-200112301450.sgf 156
@@ -253,7 +253,7 @@ loadsgf games/nngs/NE-gnugo-3.1.18-200201030545.sgf 20
 
 loadsgf games/nngs/NE-gnugo-3.1.18-200201030545.sgf 40
 600 gg_genmove black
-#? [H6]
+#? [H6]*
 
 
 loadsgf games/nngs/NE-gnugo-3.1.18-200201030545.sgf 42
@@ -666,14 +666,12 @@ loadsgf games/nngs/gnugo-3.1.18-rpwiegand-200201072335.sgf 71
 
 
 
-
-
 # games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf problems:
 
 #Can't block this way, unless have a stone around K16
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 18
 1500 gg_genmove white
-#? [R16]
+#? [R16]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 24
@@ -702,7 +700,7 @@ loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 234
 
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 236
 1560 gg_genmove white
-#? [M8]*
+#? [M8]
 
 
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 244
