@@ -1,0 +1,28 @@
+(;
+GM[1]US[Brought to you by No Name Go Server]
+CoPyright[
+  This game was played on the No Name Go Server
+  Permission to reproduce this game is given.]
+GN[LordOfPi-GnuGo(B) NNGS]
+EV[None]
+RE[W+18.5]
+PW[LordOfPi]WR[12k*]
+PB[GnuGo]BR[14k*]
+PC[NNGS Worldwide: nngs.cosmic.org 9696]
+DT[2001-10-24]
+SZ[9]TM[600]KM[0.5]
+
+HA[2]AB[gc][cg]
+;W[ff]C[
+ kungfu started observation.
+]
+;B[cc]C[
+ bump started observation.
+]
+;W[eg];B[ec];W[ce];B[dh];W[eh];B[bf];W[bh];B[de];W[df];B[be];W[cf];B[ch]
+;W[bd];B[bg];W[cd];B[he];W[gf];B[hf];W[hg];B[ig];W[hh];B[ee];W[gd];B[hd]
+;W[fd];B[fc];W[dd];B[dc];W[ed];B[bc];W[ac];B[ab];W[ad];B[bb];W[ae];B[bi]
+;W[ah];B[di];W[ei];B[ih];W[if];B[ie];W[ge];B[af];W[dg];B[hi];W[gi];B[if]
+;W[ii];B[gg];W[hc];B[hi];W[gh];B[ic];W[hb];B[ib];W[ii];B[gb];W[id];B[ha]
+;W[ia];B[ib];W[ic];B[ga];W[ia];B[ih];W[ib];B[tt];W[tt]
+;)

@@ -270,6 +270,24 @@ loadsgf games/owl30.sgf 84
 207 gg_genmove black
 #? [!T6]*
 
+loadsgf games/lordofpi.sgf 32
+208 gg_genmove black
+#? [A5|A2|B1]
+
+# A4 allows W to make seki
+loadsgf games/lordofpi.sgf 46
+209 gg_genmove black
+#? [!A4]
+
+loadsgf games/lordofpi.sgf 52
+210 gg_genmove black
+#? [H7]
+
+loadsgf games/lordofpi.sgf 56
+211 gg_genmove black
+#? [H8]
+
+
 
 ############ End of Tests #################
 
