@@ -84,6 +84,8 @@ SOURCES   = \
 
 NEED_MATH = 1
 
+BENCH_CFLAGS = -I. -I./engine -I./patterns -I./utils -I./sgf -I./interface
+
 # Include standard template for this suite
 -include ../../../../Makefile.defaults
 -include ../../../Makefile.defaults
