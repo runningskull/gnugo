@@ -2,7 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
-3.5.9 released August 7, 2004
+- don't crash on some .sgf-files from kgs
+- NEWS updated
+- refer to 3.6 instead of 3.4 in docs
+
+3.5.10 released August 7, 2004
 
 - move initalization of ..._vital_points to initialize_dragon_data()
 - persistent caches reorganized to share common code

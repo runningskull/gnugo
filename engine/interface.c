@@ -502,7 +502,6 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
   
   int untilm = -1, untiln = -1;
   int until = 9999;
-  int addstone = 0;          /* handicap stone detector */
   
   if (!sgfGetFloatProperty(tree->root, "KM", &komi)) {
     if (gameinfo->handicap == 0)
@@ -569,7 +568,6 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 		  i, j);
 	else
 	  gnugo_add_stone(i, j, BLACK);
-	addstone = 1;
 	break;
 	      
       case SGFAW:
@@ -580,16 +578,9 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 		  i, j);
 	else
 	  gnugo_add_stone(i, j, WHITE);
-	addstone = 1;
 	break;
 	      
       case SGFPL:
-	/* following really should not be needed for proper sgf file */
-	if (movenum != 0 && !addstone) {
-	  gnugo_sethand(gameinfo->handicap, 0);
-	  sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
-	}
-
 	/* Due to a bad comment in the SGF FF3 definition (in the
          * "Alphabetical list of properties" section) some
          * applications encode the colors with 1 for black and 2 for
@@ -601,13 +592,20 @@ gameinfo_play_sgftree_rot(Gameinfo *gameinfo, SGFTree *tree,
 	  next = WHITE;
 	else
 	  next = BLACK;
+	/* following really should not be needed for proper sgf file */
+	if (stones_on_board(GRAY) == 0
+	    && next == WHITE) {
+	  gnugo_sethand(gameinfo->handicap, 0);
+	  sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
+	}
 	break;
 	      
       case SGFW:
       case SGFB:
 	next = prop->name == SGFW ? WHITE : BLACK;
 	/* following really should not be needed for proper sgf file */
-	if (movenum != 0 && !addstone) {
+	if (stones_on_board(GRAY) == 0
+	    && next == WHITE) {
 	  gnugo_sethand(gameinfo->handicap, 0);
 	  sgfOverwritePropertyInt(tree->root, "HA", gameinfo->handicap);
 	}
