@@ -2,6 +2,13 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- common debug code moved from compute_eyes() and
+  compute_eyes_pessimistic() to print_eyes()
+- inactive support to test the impact of linear_eyes() in
+  compute_eyes_pessimistic()
+- MAXPATNO increased to 400 in mkeyes.c
+- naive_ladder() replaced by simple_ladder()
+- bugfixes in attack_threats()
 - new gtp commands reset_connection_node_counter, get_connection_node_counter
 - removed small valued lunch attacks and defenses in owl_determine_life()
 - new gtp commands owl_threaten_attack, owl_threaten_defense
@@ -15,6 +22,7 @@
 - break_through_helper improved.
 - tuning
 - owl tuning
+- eye tuning, adding many patterns with occupied margins
 - test revisions
 
 3.1.16 released December 9, 2001
