@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- special_rescue_moves() revised to allow self atari moves which may
+  set up a snapback
 - increase search depth after filling liberties in
   endgame_find_backfilling_dame()
 - try harder to find a safe backfilling move in

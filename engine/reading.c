@@ -1840,10 +1840,12 @@ special_rescue_moves(int str, int lib, struct reading_moves *moves)
 {
   int color = board[str];
   int other = OTHER_COLOR(color);
+  int otherlib;
   int k;
 
   /* Use approxlib() to test for trivial capture. */
-  if (approxlib(lib, other, 3, NULL) > 2)
+  otherlib = approxlib(lib, other, 3, NULL);
+  if (otherlib > 2)
     return;
 
   /* Loop over the four neighbours of the liberty, (lib + d). */
@@ -1851,8 +1853,8 @@ special_rescue_moves(int str, int lib, struct reading_moves *moves)
     int d = delta[k];
     if (board[lib + d] == EMPTY) {
 
-      /* Don't play into a self atari. */
-      if (is_self_atari(lib + d, color))
+      /* Don't play into a self atari unless we have a potential snapback. */
+      if (is_self_atari(lib + d, color) && otherlib > 1)
 	continue;
 
       /* Be more demanding when the string has four liberties. (Mostly
