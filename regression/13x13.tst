@@ -47,7 +47,7 @@ loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 44
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 48
 7 reg_genmove white
-#? [L7|M7|M6]*
+#? [L7|M7|M6]
 
 #CATEGORY=ENDGAME_TUNING
 loadsgf games/mertin13x13/goliath-gnugo3.W+0.sgf 54
@@ -153,11 +153,11 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 10
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 12
 28 reg_genmove white
-#? [L10]*
+#? [L10]
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 20
 29 reg_genmove white
-#? [C8]
+#? [C8]*
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 32
 30 reg_genmove white
@@ -165,7 +165,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 32
 
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 64
 31 reg_genmove white
-#? [M4|N4]
+#? [M4|N4]*
 
 # A nice tesuji by GNU Go worth remembering!
 loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 74
@@ -190,7 +190,7 @@ loadsgf games/mertin13x13/katsunari-gnugo1.W+45.sgf 110
 #SEVERITY=8
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 12
 37 reg_genmove white
-#? [E10]
+#? [E10]*
 
 loadsgf games/mertin13x13/katsunari-gnugo2.W+4.sgf 20
 38 reg_genmove white
@@ -255,7 +255,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 7
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 11
 48 reg_genmove black
-#? [K7]
+#? [K7]*
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 13
 49 reg_genmove black
@@ -279,7 +279,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 33
 # GNU Go 3.1.15 wants to play F10 here (although 3.0.0 got H10)
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 35
 52 reg_genmove black
-#? [H10]*
+#? [H10]
 
 #CATEGORY=BLUNDER
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
@@ -296,7 +296,7 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 67
 
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 83
 55 reg_genmove black
-#? [F5]*
+#? [F5]
 
 #CATEGORY=CONNECTION
 loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 99
@@ -405,7 +405,7 @@ loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 13
 #CATEGORY=TERRITORIAL_EVALUATION
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 17
 76 reg_genmove black
-#? [K6|L6|J3]
+#? [K6|L6|J3]*
 
 # New failure (comparing 3.1.15 with 3.0.0)
 loadsgf games/mertin13x13/gnugo-gointellect2.W+2.sgf 19
@@ -446,7 +446,7 @@ loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 25
 
 loadsgf games/mertin13x13/gnugo-gointellect3.W+37.sgf 29
 85 reg_genmove black
-#? [D2]
+#? [D2]*
 
 #CATEGORY=OWL_TUNING
 # New failure (comparing 3.1.15 with 3.0.0)

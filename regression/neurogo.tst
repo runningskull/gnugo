@@ -10,11 +10,11 @@ reset_trymove_counter
 
 loadsgf games/FSF-neurogo.sgf 20
 1 reg_genmove white
-#? [Q3]
+#? [Q3]*
 
 loadsgf games/FSF-neurogo.sgf 22
 2 reg_genmove white
-#? [R3]
+#? [R3]*
 
 loadsgf games/FSF-neurogo.sgf 34
 3 reg_genmove white

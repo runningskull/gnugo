@@ -23,7 +23,7 @@ loadsgf games/strategy26.sgf 285
 # Urgent response.
 loadsgf games/strategy27.sgf 12
 104 reg_genmove white
-#? [P4]
+#? [P4]*
 
 loadsgf games/strategy27.sgf 62
 105 reg_genmove white
@@ -56,7 +56,7 @@ loadsgf games/strategy27.sgf 220
 
 loadsgf games/me.sgf 44
 111 reg_genmove black
-#? [K3]*
+#? [K3]
 
 loadsgf games/me.sgf 84
 112 reg_genmove black
@@ -92,12 +92,12 @@ loadsgf games/incident240.sgf 65
 # incident 241
 loadsgf games/incident240.sgf 69
 119 reg_genmove black
-#? [D9|J3]*
+#? [D9|J3]
 
 # incident 221
 loadsgf games/incident221.sgf 35
 120 reg_genmove black
-#? [C7]
+#? [C7]*
 
 # incident 222
 loadsgf games/incident221.sgf 39
@@ -176,11 +176,11 @@ loadsgf games/strategy31.sgf 188
 
 loadsgf games/strategy32.sgf 19
 136 reg_genmove black
-#? [E2]
+#? [E2]*
 
 loadsgf games/mf1.sgf 29
 137 reg_genmove black
-#? [F5]*
+#? [F5]
 
 loadsgf games/manner.sgf 12
 138 reg_genmove white

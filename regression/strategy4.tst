@@ -17,7 +17,7 @@ loadsgf games/gwe.sgf 241
 
 loadsgf games/strategy36.sgf
 153 reg_genmove black
-#? [Q9]
+#? [Q9]*
 
 loadsgf games/strategy37.sgf
 154 reg_genmove white
@@ -147,7 +147,7 @@ loadsgf games/strategy44.sgf
 
 loadsgf games/xxlin.sgf 8
 177 reg_genmove black
-#? [E2]
+#? [E2]*
 
 # E2 looks somewhat smaller but is still a good move. I think it
 # should be added. /gf
@@ -228,7 +228,7 @@ loadsgf games/bretz.sgf 26
 
 loadsgf games/bretz.sgf 58
 194 reg_genmove black
-#? [A13]*
+#? [A13]
 
 loadsgf games/bretz.sgf 88
 195 reg_genmove black

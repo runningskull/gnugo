@@ -31,7 +31,7 @@ loadsgf games/trevor/auto/a003.sgf 30
 #Best not to give up this ponuki.
 loadsgf games/trevor/auto/a004.sgf 10
 130 reg_genmove white
-#? [F4]
+#? [F4]*
 
 
 
@@ -51,7 +51,7 @@ loadsgf games/trevor/auto/a005.sgf 12
 #Must stay connected.
 loadsgf games/trevor/auto/a006.sgf 12
 150 reg_genmove white
-#? [F6]
+#? [F6]*
 
 
 
@@ -83,7 +83,7 @@ loadsgf games/trevor/auto/a008.sgf 10
 #Can't give up ponuki.
 loadsgf games/trevor/auto/a009.sgf 8
 200 reg_genmove white
-#? [E5]
+#? [E5]*
 
 
 #Full point before ko!
@@ -215,7 +215,7 @@ loadsgf games/trevor/auto/a019.sgf 6
 #Break through important
 loadsgf games/trevor/auto/a021.sgf 16
 370 reg_genmove white
-#? [F6]*
+#? [F6]
 
 
 
@@ -378,7 +378,7 @@ loadsgf games/trevor/auto/a036.sgf 6
 #Breaking into black's area is required.
 loadsgf games/trevor/auto/a036.sgf 10
 570 reg_genmove white
-#? [!B5]
+#? [!B5]*
 
 
 #E6 is bigger, and enough to win.

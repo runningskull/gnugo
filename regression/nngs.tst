@@ -54,7 +54,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 152
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 160
 190 reg_genmove black
-#? [O11|P12]*
+#? [O11|P12]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201070826.sgf 162
@@ -103,7 +103,7 @@ loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 92
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 98
 280 reg_genmove black
-#? [E10]*
+#? [E10]
 
 
 loadsgf games/nngs/AdaGeek-gnugo-3.1.18-200201071333.sgf 104
@@ -290,7 +290,7 @@ loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 116
 
 loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 146
 680 reg_genmove white
-#? [!H13|R13]
+#? [!H13|R13]*
 
 
 loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 152
@@ -304,7 +304,7 @@ loadsgf games/nngs/gnugo-3.1.15-goku-200112081829.sgf 152
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 47
 700 reg_genmove white
-#? [K17]
+#? [K17]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-AdaGeek-200201061015.sgf 57
@@ -387,7 +387,7 @@ loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051411.sgf 19
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051823.sgf 21
 900 reg_genmove white
-#? [Q15]
+#? [Q15]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-Rufus-200201051823.sgf 43
@@ -433,7 +433,7 @@ loadsgf games/nngs/gnugo-3.1.18-dermicha-200201041355.sgf 28
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 10
 960 reg_genmove white
-#? [R16|R17|S16]
+#? [R16|R17|S16]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 38
@@ -467,7 +467,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042031.sgf 180
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 20
 1020 reg_genmove white
-#? [Q2]
+#? [Q2]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 26
@@ -482,7 +482,7 @@ loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 28
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 36
 1050 reg_genmove white
-#? [J10|H10|G10|F10]*
+#? [J10|H10|G10|F10]
 
 
 loadsgf games/nngs/gnugo-3.1.18-goku-200201042350.sgf 52
@@ -612,13 +612,13 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 90
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 138
 1280 reg_genmove white
-#? [D13]
+#? [D13]*
 
 
 
 loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 248
 1300 reg_genmove white
-#? [M2]*
+#? [M2]
 
 
 
@@ -627,7 +627,7 @@ loadsgf games/nngs/gnugo-3.1.18-jimm-200201050556.sgf 248
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 16
 1310 reg_genmove white
-#? [Q15|Q14]
+#? [Q15|Q14]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 20
@@ -637,7 +637,7 @@ loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 20
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 161
 1420 reg_genmove white
-#? [D12]
+#? [D12]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-patch-200201081044.sgf 163
@@ -662,7 +662,7 @@ loadsgf games/nngs/gnugo-3.1.18-rpwiegand-200201072335.sgf 13
 
 loadsgf games/nngs/gnugo-3.1.18-rpwiegand-200201072335.sgf 71
 1480 reg_genmove white
-#? [B1]
+#? [B1]*
 
 
 
@@ -671,7 +671,7 @@ loadsgf games/nngs/gnugo-3.1.18-rpwiegand-200201072335.sgf 71
 #Can't block this way, unless have a stone around K16
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 18
 1500 reg_genmove white
-#? [R16]
+#? [R16]*
 
 
 loadsgf games/nngs/gnugo-3.1.18-wingjk-200201080120.sgf 24
@@ -792,7 +792,7 @@ loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 178
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 192
 1760 reg_genmove black
-#? [N7]
+#? [N7]*
 
 
 loadsgf games/nngs/makoops-gnugo-3.1.18-200201081434.sgf 196
@@ -840,7 +840,7 @@ loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 97
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 117
 1860 reg_genmove black
-#? [!L7|D19]
+#? [!L7|D19]*
 
 
 loadsgf games/nngs/scf-gnugo-3.1.18-200201060027.sgf 125
@@ -891,7 +891,7 @@ loadsgf games/nngs/gnugo-3.1.20-setenza-200201162038.sgf 29
 
 loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 15
 1955 reg_genmove white
-#? [D3]
+#? [D3]*
 
 loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 27
 1960 reg_genmove white
@@ -915,7 +915,7 @@ loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 43
 
 loadsgf games/nngs/gnugo-3.1.20-setenza-200201172131.sgf 51
 2020 reg_genmove white
-#? [L2|H6|H7|J6|J7]*
+#? [L2|H6|H7|J6|J7]
 
 # This is tough. If Black plays J5, then he can win the semeai after
 # E3 - E4 - D3 - D2 - D4 - D5 - E5. /ab

@@ -66,7 +66,7 @@ loadsgf games/tactics08.sgf
 
 loadsgf games/edge_defense1.sgf
 107 reg_genmove white
-#? [B13|B14]
+#? [B13|B14]*
 
 
 ############ End of Tests #################

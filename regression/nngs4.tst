@@ -7,11 +7,11 @@ reset_trymove_counter
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 10
 10 reg_genmove white
-#? [E18]
+#? [E18]*
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 26
 20 reg_genmove white
-#? [Q4|Q6]
+#? [Q4|Q6]*
 
 loadsgf games/nngs/gnugo-3.3.10-niki-200210281349.sgf 36
 30 reg_genmove white
@@ -102,7 +102,7 @@ loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 242
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 246
 250 reg_genmove black
-#? [F7]*
+#? [F7]
 
 loadsgf games/nngs/saphir-gnugo-3.3.12-200212031818.sgf 258
 260 reg_genmove black
@@ -166,7 +166,7 @@ loadsgf games/nngs/uno-gnugo-3.3.16-200302230528.sgf 174
 
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 65
 420 reg_genmove black
-#? [G6]*
+#? [G6]
 
 # G12 allows white to live.
 loadsgf games/nngs/joshj-gnugo-3.3.16-200302232226.sgf 185
@@ -230,7 +230,7 @@ loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 40
 # New failure (3.3.18)
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 66
 560 restricted_genmove white B13 F7
-#? [B13]*
+#? [B13]
 
 # New failure (3.3.18)
 loadsgf games/nngs/gnugo-3.3.9-RikiTiki-200210170706.sgf 86
@@ -274,7 +274,7 @@ loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 16
 
 loadsgf games/nngs/kit-gnugo-3.3.21-200306181940.sgf 42
 650 reg_genmove black
-#? [Q2]*
+#? [Q2]
 
 loadsgf games/nngs/GoFuN-gnugo-3.4-200308030626.sgf 4
 660 reg_genmove black

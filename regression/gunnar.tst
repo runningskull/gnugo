@@ -12,7 +12,7 @@ loadsgf games/nngs/gnugo-3.3.10-viking4-200210261703.sgf 181
 # D19 is locally worse than both E17 and E18.
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 83
 2 restricted_genmove white D19 E18 E17
-#? [E17|E18]
+#? [E17|E18]*
 
 # Just connect at K17. Don't make it difficult.
 loadsgf games/nngs/gnugo-3.3.10-rcde05-200210280427.sgf 157
@@ -56,7 +56,7 @@ loadsgf games/gunnar/gunnar1.sgf 34
 # R12 is probably better than R14 but both get the point.
 loadsgf games/gunnar/gunnar1.sgf 96
 10 reg_genmove white
-#? [R12|R14]*
+#? [R12|R14]
 
 # L8 doesn't suffice for local life.
 loadsgf games/gunnar/gunnar1.sgf 126
@@ -72,7 +72,7 @@ loadsgf games/gunnar/gunnar2.sgf 72
 # E4 is only one point reverse sente.
 loadsgf games/gunnar/gunnar2.sgf 164
 13 reg_genmove white
-#? [Q5|Q12]
+#? [Q5|Q12]*
 
 # Necessary to block at Q11. O13 is a rather bad idea.
 loadsgf games/gunnar/gunnar2.sgf 168

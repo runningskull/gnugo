@@ -12,7 +12,7 @@ loadsgf games/nngs/gnugo-3.3.2-Zahlman-200205221717.sgf 207
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 22
 10 reg_genmove black
-#? [!H6]
+#? [!H6]*
 
 loadsgf games/nngs/Jion-gnugo-3.3.2-200205241928.sgf 96
 20 reg_genmove black
@@ -57,11 +57,11 @@ loadsgf games/nngs/lindq-gnugo-3.3.4-200207051636.sgf 214
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 34
 110 reg_genmove black
-#? [B14|B13]
+#? [B14|B13]*
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 42
 120 reg_genmove black
-#? [E12|D13]
+#? [E12|D13]*
 
 # See also connection:93
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 100
@@ -74,7 +74,7 @@ loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 130
 
 loadsgf games/nngs/silverado-gnugo-3.3.5-200208061810.sgf 138
 150 reg_genmove black
-#? [M3|L3]
+#? [M3|L3]*
 
 # same bug as century-2002:30
 loadsgf games/nngs/gnugo-3.3.2-Programmer-200206021522.sgf 52
@@ -152,7 +152,7 @@ loadsgf games/nngs/huck-gnugo-3.3.6-200209060837.sgf 240
 # C10 is important enough to be saved, D10 only move.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 34
 400 reg_genmove white
-#? [D10]
+#? [D10]*
 
 # stones at C10 are critical, don't tenuki.
 loadsgf games/nngs/gnugo-3.3.8-nailer-200209190045.sgf 42

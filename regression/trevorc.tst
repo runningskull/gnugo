@@ -115,7 +115,7 @@ loadsgf games/trevor/auto/c14.sgf 34
 
 loadsgf games/trevor/auto/c14.sgf 70
 280 reg_genmove white
-#? [!N13]
+#? [!N13]*
 
 
 
@@ -216,7 +216,7 @@ loadsgf games/trevor/auto/c23.sgf 60
 
 loadsgf games/trevor/auto/c23.sgf 72
 450 reg_genmove white
-#? [K5]
+#? [K5]*
 
 
 loadsgf games/trevor/auto/c23.sgf 92
@@ -289,7 +289,7 @@ loadsgf games/trevor/auto/c30.sgf 62
 
 loadsgf games/trevor/auto/c30.sgf 80
 560 reg_genmove white
-#? [K2|M1]*
+#? [K2|M1]
 
 
 loadsgf games/trevor/auto/c30.sgf 92
@@ -616,7 +616,7 @@ loadsgf games/trevor/auto/c62.sgf 14
 
 loadsgf games/trevor/auto/c62.sgf 20
 1080 reg_genmove white
-#? [!L8|K10|K9]
+#? [!L8|K10|K9]*
 
 
 loadsgf games/trevor/auto/c62.sgf 48
@@ -892,7 +892,7 @@ loadsgf games/trevor/auto/c83.sgf 80
 
 loadsgf games/trevor/auto/c83.sgf 112
 1510 reg_genmove white
-#? [L5]
+#? [L5]*
 
 
 #At least win this ko!

@@ -56,7 +56,7 @@ loadsgf games/trevor/auto/b08.sgf 94
 
 loadsgf games/trevor/auto/b09.sgf 10
 180 reg_genmove white
-#? [L12]
+#? [L12]*
 
 
 loadsgf games/trevor/auto/b09.sgf 82
@@ -82,12 +82,12 @@ loadsgf games/trevor/auto/b09.sgf 92
 #J3 locally better than G1
 loadsgf games/trevor/auto/b13.sgf 48
 220 restricted_genmove white J3 G1
-#? [J3]
+#? [J3]*
 
 
 loadsgf games/trevor/auto/b13.sgf 66
 230 reg_genmove white
-#? [L5]
+#? [L5]*
 
 
 loadsgf games/trevor/auto/b13.sgf 68
@@ -101,7 +101,7 @@ loadsgf games/trevor/auto/b13.sgf 68
 
 loadsgf games/trevor/auto/b16.sgf 10
 250 reg_genmove white
-#? [C2]
+#? [C2]*
 
 
 loadsgf games/trevor/auto/b16.sgf 74
@@ -169,7 +169,7 @@ loadsgf games/trevor/auto/b24.sgf 91
 
 loadsgf games/trevor/auto/b25.sgf 10
 340 reg_genmove white
-#? [M11]
+#? [M11]*
 
 
 loadsgf games/trevor/auto/b25.sgf 70

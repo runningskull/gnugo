@@ -10,7 +10,7 @@ loadsgf games/strategy14a.sgf
 # modification of move 17 in strategy14.sgf: Ladder works for W, urgent
 # move in lower left removed.
 51 reg_genmove white
-#? [P3]
+#? [P3]*
 
 loadsgf games/strategy14.sgf 33
 52 reg_genmove white
@@ -18,7 +18,7 @@ loadsgf games/strategy14.sgf 33
 
 loadsgf games/strategy14.sgf 53
 53 reg_genmove white
-#? [S15]*
+#? [S15]
 
 loadsgf games/strategy14.sgf 81
 54 reg_genmove white
@@ -70,7 +70,7 @@ loadsgf games/incident169.sgf 32
 # incident 171 (from the disastrous Indigo game)
 loadsgf games/incident169.sgf 60
 64 reg_genmove white
-#? [B13|C13|C12|E14|D14]
+#? [B13|C13|C12|E14|D14]*
 
 # incident 173 (from the disastrous Indigo game)
 # M17 connects on the edge. L16 does too but allows black to get
@@ -181,7 +181,7 @@ loadsgf games/dragon1.sgf 206
 loadsgf games/heikki/heikki01.sgf 17
 # P15 is a joseki, but GNU should at least see that P14 is urgent
 83 reg_genmove black
-#? [P14]
+#? [P14]*
 
 loadsgf games/heikki/heikki01.sgf 35
 # J18 makes ko
@@ -218,7 +218,7 @@ loadsgf games/strategy25.sgf 55
 # considered. B17 (game move) is inferior.
 loadsgf games/strategy25.sgf 61
 90 reg_genmove black
-#? [B14|D17]
+#? [B14|D17]*
 
 # Connecting with ko at B14 is still best. The game move at B13 is
 # nothing but horrible. G13 would of course be superior if it killed
@@ -227,7 +227,7 @@ loadsgf games/strategy25.sgf 61
 # tm added G13 (3.1.14)
 loadsgf games/strategy25.sgf 63
 91 reg_genmove black
-#? [B14|G13]
+#? [B14|G13]*
 
 loadsgf games/strategy25.sgf 67
 92 reg_genmove black

@@ -2,7 +2,7 @@
 
 loadsgf games/dniwog.sgf 14
 1 reg_genmove white
-#? [D15]
+#? [D15]*
 
 loadsgf games/dniwog.sgf 28
 2 reg_genmove white

@@ -143,7 +143,7 @@ loadsgf games/nando/auto018.sgf
 #CATEGORY=?
 loadsgf games/nando/auto019.sgf
 27 reg_genmove white
-#? [D6]*
+#? [D6]
 
 # Non-transitivity problem (or is it ok to amalgamate by ko ?)
 #CATEGORY=CONNECTION
