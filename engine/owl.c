@@ -5265,19 +5265,40 @@ compute_owl_escape_values(struct local_owl_data *owl)
   char safe_stones[BOARDMAX];
   
   get_lively_stones(OTHER_COLOR(owl->color), safe_stones);
-  compute_escape_influence(owl->color, safe_stones, NULL, owl->escape_values);
-  DEBUG(DEBUG_ESCAPE, "Owl escape values:\n");
+  compute_escape_influence(owl->color, safe_stones, NULL, NULL,
+			   owl->escape_values);
 
+  DEBUG(DEBUG_ESCAPE, "Owl escape values:\n");
   for (m = 0; m < board_size; m++) {
     for (n = 0; n < board_size; n++) {
       pos = POS(m, n);
-      if (dragon[pos].color == owl->color) {
+      if (dragon[pos].color == owl->color && !owl->goal[pos]) {
 	if (dragon[pos].crude_status == ALIVE)
 	  owl->escape_values[pos] = 6;
-	else if (dragon[pos].crude_status == UNKNOWN
-		 && (DRAGON2(pos).escape_route > 5
-		     || DRAGON2(pos).moyo_size > 5))
-	  owl->escape_values[pos] = 4;
+	else if (dragon[pos].crude_status == UNKNOWN) {
+	  if (DRAGON2(pos).moyo_size > 5)
+	    owl->escape_values[pos] = 4;
+	  else if (DRAGON2(pos).escape_route > 5) {
+	    if (pos != DRAGON2(pos).origin)
+	      owl->escape_values[pos] = owl->escape_values[DRAGON2(pos).origin];
+	    else {
+	      int pos2;
+	      char escape_values[BOARDMAX];
+	      char dragon[BOARDMAX];
+
+	      compute_escape_influence(owl->color, safe_stones, owl->goal, NULL,
+				       escape_values);
+
+	      for (pos2 = BOARDMIN; pos2 < BOARDMAX; pos2++) {
+		if (ON_BOARD(pos2))
+		  dragon[pos2] = is_same_dragon(pos2, pos);
+	      }
+
+	      if (dragon_escape(dragon, owl->color, escape_values) > 5)
+		owl->escape_values[pos] = 4;
+	    }
+	  }
+	}
       }
       DEBUG(DEBUG_ESCAPE, "%o%d", owl->escape_values[pos]);
     }

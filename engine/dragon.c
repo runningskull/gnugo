@@ -1867,7 +1867,7 @@ compute_escape(int pos, int dragon_status_known)
    * area (2) or EMPTY (1).  Values may change without notice.
    */
   get_lively_stones(OTHER_COLOR(board[pos]), safe_stones);
-  compute_escape_influence(board[pos], safe_stones, 0, escape_value);
+  compute_escape_influence(board[pos], safe_stones, NULL, 0, escape_value);
 
   /* If we can reach a live group, award 6 points. */
   for (ii = BOARDMIN; ii < BOARDMAX; ii++) {

@@ -1093,6 +1093,7 @@ find_influence_patterns(struct influence_data *q, int color)
  */
 static void
 do_compute_influence(int color, const char safe_stones[BOARDMAX],
+		     const char inhibited_sources[BOARDMAX],
     		     const float strength[BOARDMAX], struct influence_data *q,
 		     int move, const char *trace_message)
 {
@@ -1107,7 +1108,7 @@ do_compute_influence(int color, const char safe_stones[BOARDMAX],
   modify_depth_values(1 - stackp);
   
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii)) {
+    if (ON_BOARD(ii) && !(inhibited_sources && inhibited_sources[ii])) {
       if (q->white_strength[ii] > 0.0)
 	accumulate_influence(q, ii, WHITE);
       if (q->black_strength[ii] > 0.0)
@@ -1164,7 +1165,8 @@ compute_influence(int color, const char safe_stones[BOARDMAX],
   influence_id++;
   q->id = influence_id;
 
-  do_compute_influence(color, safe_stones, strength, q, move, trace_message);
+  do_compute_influence(color, safe_stones, NULL, strength,
+		       q, move, trace_message);
 
   debug = save_debug;
 }
@@ -1765,6 +1767,7 @@ compute_followup_influence(const struct influence_data *base,
 
 void
 compute_escape_influence(int color, const char safe_stones[BOARDMAX],
+			 const char goal[BOARDMAX],
     			 const float strength[BOARDMAX],
     			 char escape_value[BOARDMAX])
 {
@@ -1780,33 +1783,35 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
   static char escape_values[BOARDMAX][2];
   static int active_caches[2] = {0, 0};
 
-  /* Encode the values of color and dragons_known into an integer
-   * between 0 and 3.
-   */
   int cache_number = (color == WHITE);
 
-  int board_was_cached = 1;
+  if (!goal) {
+    /* Encode the values of color and dragons_known into an integer
+     * between 0 and 3.
+     */
+    int board_was_cached = 1;
 
-  /* Notice that we compare the out of board markers as well, in case
-   * the board size should have changed between calls.
-   */
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
-    if (cached_board[ii] != board[ii]) {
-      cached_board[ii] = board[ii];
-      board_was_cached = 0;
+    /* Notice that we compare the out of board markers as well, in
+     * case the board size should have changed between calls.
+     */
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++) {
+      if (cached_board[ii] != board[ii]) {
+	cached_board[ii] = board[ii];
+	board_was_cached = 0;
+      }
     }
-  }
 
-  if (!board_was_cached)
-    for (k = 0; k < 2; k++)
-      active_caches[k] = 0;
-  
-  if (active_caches[cache_number]) {
-    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-      if (ON_BOARD(ii))
-	escape_value[ii] = escape_values[ii][cache_number];
-    
-    return;
+    if (!board_was_cached)
+      for (k = 0; k < 2; k++)
+	active_caches[k] = 0;
+
+    if (active_caches[cache_number]) {
+      for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+	if (ON_BOARD(ii))
+	  escape_value[ii] = escape_values[ii][cache_number];
+
+      return;
+    }
   }
 
   /* Use enhance pattern and higher attenuation for escape influence. */
@@ -1819,7 +1824,7 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
   if (!(debug & DEBUG_ESCAPE))
     debug &= ~DEBUG_INFLUENCE;
 
-  do_compute_influence(OTHER_COLOR(color), safe_stones, strength,
+  do_compute_influence(OTHER_COLOR(color), safe_stones, goal, strength,
       		       &escape_influence, -1, NULL);
 
   debug = save_debug;
@@ -1827,13 +1832,35 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
   for (ii = BOARDMIN; ii < BOARDMAX; ii++)
     if (ON_BOARD(ii)) {
       if (whose_moyo(&escape_influence, ii) == color)
-       escape_value[ii] = 4;
+	escape_value[ii] = 4;
       else if (whose_area(&escape_influence, ii) == color)
-       escape_value[ii] = 2;
-      else if (whose_area(&escape_influence, ii) == EMPTY)
-       escape_value[ii] = 1;
+	escape_value[ii] = 2;
+      else if (whose_area(&escape_influence, ii) == EMPTY) {
+	if (goal) {
+	  escape_value[ii] = 0;
+
+	  if (!goal[ii]) {
+	    int goal_proximity = 0;
+
+	    for (k = 0; k < 8; k++) {
+	      if (ON_BOARD(ii + delta[k])) {
+		goal_proximity += 2 * goal[ii + delta[k]];
+		if (k < 4 && ON_BOARD(ii + 2 * delta[k]))
+		  goal_proximity += goal[ii + delta[k]];
+	      }
+	      else
+		goal_proximity += 1;
+	    }
+
+	    if (goal_proximity < 6)
+	      escape_value[ii] = 1;
+	  }
+	}
+	else
+	  escape_value[ii] = 1;
+      }
       else
-       escape_value[ii] = 0;
+	escape_value[ii] = 0;
     }
 
   if (0 && (debug & DEBUG_ESCAPE) && verbose > 0) {
@@ -1845,11 +1872,13 @@ compute_escape_influence(int color, const char safe_stones[BOARDMAX],
 			    "%3.0f", 3, 1, 1);
   }    
 
-  /* Save the computed values in the cache. */
-  for (ii = BOARDMIN; ii < BOARDMAX; ii++)
-    if (ON_BOARD(ii))
-      escape_values[ii][cache_number] = escape_value[ii];
-  active_caches[cache_number] = 1;
+  if (!goal) {
+    /* Save the computed values in the cache. */
+    for (ii = BOARDMIN; ii < BOARDMAX; ii++)
+      if (ON_BOARD(ii))
+	escape_values[ii][cache_number] = escape_value[ii];
+    active_caches[cache_number] = 1;
+  }
 }
 
 

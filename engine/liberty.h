@@ -572,6 +572,7 @@ void compute_followup_influence(const struct influence_data *base,
 			        struct influence_data *q, 
 		                int move, const char *trace_message);
 void compute_escape_influence(int color, const char safe_stones[BOARDMAX],
+			      const char goal[BOARDMAX],
 			      const float strength[BOARDMAX],
                               char escape_value[BOARDMAX]);
 
