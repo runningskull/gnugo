@@ -56,7 +56,6 @@ by a pattern database, which consists of the two files patterns/influence.db
 and patterns/barriers.db. The details are explained in
 @ref{Influential Patterns}.
 
-
 @node Influence Usage
 @section Where influence gets used in the engine
 
@@ -78,7 +77,7 @@ moyo size of only 5 will be considered weak, even if the owl code has
 decided that it cannot be killed.
 
 As a tool for both the owl code and the strength estimate of dragons,
-an "escape" influence gets computed for each dragon @xref{Escape}.
+an "escape" influence gets computed for each dragon (@pxref{Escape}).
 
 Once all dragons have been evaluated, the influence module is called again
 and the variables @code{initial_influence} and
@@ -107,6 +106,8 @@ computations relevant for territorial evaluation. Also, now an additional
 influence computation is done in order to compute the followup value of
 a move. Some explainations are in @ref{Territorial Details}.
 
+Some of the public functions from @file{influence.c} which are used
+throughout the engine are listed in @ref{Influence Utilities}.
 
 @node Influence and Territory
 @section Influence and Territory

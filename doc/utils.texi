@@ -3,7 +3,9 @@ called from the GNU Go engine.
 
 @menu
 * General Utilities::              Utilities from @file{engine/utils.c}
-* Print Utilities::              Utilities from @file{engine/printutils.c}
+* Print Utilities::                Utilities from @file{engine/printutils.c}
+* Board Utilities::                Utilities from @file{engine/board.c}
+* Influence Utilities::		   Utilities from @file{engine/influence.c}
 @end menu
 
 @node General Utilities
@@ -464,4 +466,342 @@ from the top and @samp{n} is the column. Both coordinates are between 0 and
 @code{boardsize-1}, inclusive. Return 1 if ok, otherwise return 0;
 @end quotation
 @end itemize
+
+@node Board Utilities
+@section Board Utilities
+
+The functions documented in this section are from @file{board.c}. Other
+functions in @file{board.c} are described in @xref{Some Board Functions}.
+
+@itemize @bullet
+@item @code{int is_pass(int pos)}
+@findex is_pass
+@quotation
+Test if the move is a pass or not.  Return 1 if it is.
+@end quotation
+@item @code{int  is_legal(int pos, int color)}
+@findex is_legal
+@quotation
+Determines whether the move @code{color} at @code{pos} is legal.
+@end quotation
+@item @code{int  is_suicide(int pos, int color)}
+@findex is_suicide
+@quotation
+Determines whether the move @code{color} at @code{pos} would be a suicide.
+This is the case if
+@enumerate
+@item There is no neighboring empty intersection.
+@item There is no neighboring opponent string with exactly one liberty.
+@item There is no neighboring friendly string with more than one liberty.
+@end enumerate
+@end quotation
+@item @code{int is_illegal_ko_capture(int pos, int color)}
+@findex is_illegal_ko_capture
+@quotation
+Determines whether the move @code{color} at @code{pos} would be an illegal ko
+capture.
+@end quotation
+@item @code{int is_edge_vertex(int pos)}
+@findex is_edge_vertex
+@quotation
+Determine whether vertex is on the edge.
+@end quotation
+@item @code{int is_corner_vertex(int pos)}
+@findex is_corner_vertex
+@quotation
+Determine whether vertex is a corner.
+@end quotation
+@end itemize
+
+Next we come to @code{countlib()} and its allies, which
+address the problem of determining how many liberties a
+string has. Although @code{countlib()} addresses this
+basic question, other functions can often get the needed
+information more quickly, so there are a number of
+different functions in this family.
+
+@itemize @bullet
+@item @code{int countlib(int str)}
+@findex countlib
+@quotation
+Count the number of liberties of the string at @code{pos}. There
+must be a stone at this location.
+@end quotation
+@item @code{int findlib(int str, int maxlib, int *libs)}
+@findex findlib
+@quotation
+Find the liberties of the string at @code{str}. This location must not be
+empty. The locations of up to maxlib liberties are written into
+@code{libs[]}. The full number of liberties is returned.  If you want the
+locations of all liberties, whatever their number, you should pass
+@code{MAXLIBS} as the value for @code{maxlib} and allocate space for
+@code{libs[]} accordingly.
+@end quotation
+@item @code{int fastlib(int pos, int color, int ignore_captures)}
+@findex fastlib
+@quotation
+Count the liberties a stone of the given color would get if played
+at @code{pos}. The intent of this function is to be as fast as possible, not
+necessarily complete. But if it returns a positive value (meaning
+it has succeeded), the value is guaranteed to be correct. Captures are ignored
+based if the @code{ignore_captures} field is nonzero. The location @code{pos}
+must be empty.  The function fails if there are more than two neighbor strings
+of the same color.  In this case, the return value is -1.  Captures are
+handled in a very limited way, so if ignore_capture is 0, and a capture is
+required, it will often return -1.
+@end quotation
+@item @code{int approxlib(int pos, int color, int maxlib, int *libs)}
+@findex approxlib
+@quotation
+Find the liberties a stone of the given color would get if played at
+@code{pos}, ignoring possible captures of opponent stones.  The location
+@code{pos} must be empty. If @code{libs != NULL}, the locations of up to
+@code{maxlib} liberties are written into @code{libs[]}. The counting of
+liberties may or may not be halted when @code{maxlib} is reached. The number
+of liberties found is returned, which may be less than the total number of
+liberties if @code{maxlib} is small. If you want the number or the locations
+of all liberties, however many they are, you should pass @code{MAXLIBS} as the
+value for maxlib and allocate space for @code{libs[]} accordingly.
+@end quotation
+@item @code{int accuratelib(int pos, int color, int maxlib, int *libs)}
+@findex accuratelib
+@quotation
+Find the liberties a stone of the given color would get if played at
+@code{pos}. This function takes into consideration all captures. Its return
+value is exact in that sense it counts all the liberties, unless @code{maxlib}
+allows it to stop earlier. The location @code{pos} must be empty. If
+@code{libs != NULL}, the locations of up to @code{maxlib} liberties are
+written into @code{libs[]}. The counting of liberties may or may not be halted
+when @code{maxlib} is reached. The number of found liberties is returned.
+This function guarantees that liberties which are not results of captures come
+first in @code{libs[]} array. To find whether all the liberties starting from
+a given one are results of captures, one may use @code{if (board[libs[k]] !=
+EMPTY)} construction.  If you want the number or the locations of all
+liberties, however many they are, you should pass @code{MAXLIBS} as the value
+for @code{maxlib} and allocate space for @code{libs[]} accordingly.
+@end quotation
+@end itemize
+
+Next we have some general utility functions.
+
+@itemize @bullet
+@item @code{int count_common_libs(int str1, int str2)}
+@findex count_common_libs
+@quotation
+Find the number of common liberties of the two strings.
+@end quotation
+@item @code{int find_common_libs(int str1, int str2, int maxlib, int *libs)}
+@findex find_common_libs
+@quotation
+Find the common liberties of the two strings. The locations of up to
+@code{maxlib} common liberties are written into @code{libs[]}.  The full
+number of common liberties is returned.  If you want the locations of all
+common liberties, whatever their number, you should pass @code{MAXLIBS} as the
+value for @code{maxlib} and allocate space for @code{libs[]} accordingly.
+@end quotation
+@item @code{int have_common_lib(int str1, int str2, int *lib)}
+@findex have_common_lib
+@quotation
+Determine whether two strings have at least one common liberty.
+If they do and @code{lib != NULL}, one common liberty is returned in 
+@code{*lib}.
+@end quotation
+@item @code{int countstones(int str)}
+@findex countstones
+@quotation
+Report the number of stones in a string.
+@end quotation
+@item @code{int findstones(int str, int maxstones, int *stones)}
+@findex findstones
+@quotation
+Find the stones of the string at @code{str}. The location must not be
+empty. The locations of up to maxstones stones are written into
+@code{stones[]}. The full number of stones is returned.
+@end quotation
+@item @code{int  chainlinks(int str, int adj[MAXCHAIN])}
+@findex chainlinks
+@quotation
+This very useful function returns (in the @code{adj} array) the chains
+surrounding the string at @code{str}. The number of chains is returned.
+@end quotation
+@item @code{int chainlinks2(int str, int adj[MAXCHAIN], int lib)}
+@findex chainlinks2
+@quotation
+Returns (in @code{adj} array) those chains surrounding the string at
+@code{str}, which has exactly @code{lib} liberties. The number of such chains
+is returned.
+@end quotation
+@item @code{int chainlinks3(int str, int adj[MAXCHAIN], int lib)}
+@findex chainlinks3
+@quotation
+Returns (in @code{adj} array) the chains surrounding
+the string at @code{str}, which have less or equal @code{lib} liberties.
+The number of such chains is returned.
+@end quotation
+@item @code{int extended_chainlinks(int str, int adj[MAXCHAIN], int both_colors)}
+@findex extended_chainlinks
+@quotation
+Returns (in the @code{adj} array) the opponent strings being directly adjacent
+to @code{str} or having a common liberty with @code{str}. The number of such
+strings is returned.  If the both_colors parameter is true, also own strings
+sharing a liberty are returned.
+@end quotation
+@item @code{int find_origin(int str)}
+@findex find_origin
+@quotation
+Find the origin of a worm or a cavity, i.e. the point with the
+smallest 1D board coordinate. The idea is to have a canonical
+reference point for a string.
+@end quotation
+@item @code{int is_self_atari(int pos, int color)}
+@findex is_self_atari
+@quotation
+Determine whether a move by color at @code{pos} would be a self atari,
+i.e. whether it would get more than one liberty. This function
+returns true also for the case of a suicide move.
+@end quotation
+@item @code{int liberty_of_string(int pos, int str)}
+@findex liberty_of_string
+@quotation
+Returns true if @code{pos} is a liberty of the string at @code{str}.
+@end quotation
+@item @code{int second_order_liberty_of_string(int pos, int str)}
+@findex second_order_liberty_of_string
+@quotation
+Returns true if @code{pos} is a second order liberty of the string at str.
+@end quotation
+@item @code{int neighbor_of_string(int pos, int str)}
+@findex neighbor_of_string
+@quotation
+Returns true if @code{pos} is adjacent to the string at @code{str}.
+@end quotation
+@item @code{int has_neighbor(int pos, int color)}
+@findex has_neighbor
+@quotation
+Returns true if @code{pos} has a neighbor of @code{color}.
+@end quotation
+@item @code{int same_string(int str1, int str2)}
+@findex same_string
+@quotation
+Returns true if @code{str1} and @code{str2} belong to the same string.
+@end quotation
+@item @code{int adjacent_strings(int str1, int str2)}
+@findex adjacent_strings
+@quotation
+Returns true if the strings at @code{str1} and @code{str2} are adjacent.
+@end quotation
+@item @code{int is_ko(int pos, int color, int *ko_pos)}
+@findex is_ko
+@quotation
+Return true if the move @code{pos} by @code{color} is a ko capture
+(whether capture is legal on this move or not). If so,
+and if @code{ko_pos} is not a @code{NULL} pointer, then
+@code{*ko_pos} returns the location of the captured ko stone.
+If the move is not a ko capture, @code{*ko_pos} is set to 0.
+A move is a ko capture if and only if
+@enumerate
+@item All neighbors are opponent stones.
+@item The number of captured stones is exactly one.
+@end enumerate
+@end quotation
+@item @code{int is_ko_point(int pos)}
+@findex is_ko_point
+@quotation
+Return true if @code{pos} is either a stone, which if captured would give
+ko, or if @code{pos} is an empty intersection adjacent to a ko stone.
+@end quotation
+@item @code{int does_capture_something(int pos, int color)}
+@findex does_capture_something
+@quotation
+Returns 1 if at least one string is captured when color plays at @code{pos}.
+@end quotation
+@item @code{void mark_string(int str, char mx[BOARDMAX], char mark)}
+@findex mark_string
+@quotation
+For each stone in the string at pos, set @code{mx} to value mark. If
+some of the stones in the string are marked prior to calling this
+function, only the connected unmarked stones starting from pos
+are guaranteed to become marked. The rest of the string may or may
+not become marked. (In the current implementation, it will.)
+@end quotation
+@item @code{int move_in_stack(int pos, int cutoff)}
+@findex move_in_stack
+@quotation
+Returns true if at least one move has been played at pos
+at deeper than level @code{cutoff} in the reading tree.
+@end quotation
+@item @code{int stones_on_board(int color)}
+@findex stones_on_board
+@quotation
+Return the number of stones of the indicated color(s) on the board.
+This only counts stones in the permanent position, not stones placed
+by @code{trymove()} or @code{tryko()}. Use 
+@code{stones_on_board(BLACK | WHITE)} to get
+the total number of stones on the board.
+@end quotation
+@end itemize
+
+@node Influence Utilities
+@section Utilities from @file{engine/influence.c}
+
+We will only list here a portion of the public functions in @code{influence.c}.
+The influence code is invoked through the function @code{compute_influence}
+(@pxref{Influence Usage}). It is invoked as follows.
+
+@itemize @bullet
+@item @code{void compute_influence(int color, const char safe_stones[BOARDMAX], const float strength[BOARDMAX], struct influence_data *q, int move, const char *trace_message)}
+@findex compute_influence
+@quotation
+Compute the influence values for both colors.
+The caller must
+@itemize @minus
+@item set up the @code{board[]} state
+@item mark safe stones with @code{INFLUENCE_SAFE_STONE}, dead stones with 0
+@item mark stones newly saved by a move with @code{INFLUENCE_SAVED_STONE}
+(this is relevant if the influence_data *q is reused to compute
+a followup value for this move).
+@end itemize
+Results will be stored in q.
+@code{move} has no effects except toggling debugging. Set it to -1
+for no debug output at all (otherwise it will be controlled by
+the @option{-m} command line option). It is assumed that @code{color} is in turn to move. (This affects the
+barrier patterns (class A, D) and intrusions (class B)). Color
+@end quotation
+@end itemize
+
+Other functions in @file{influence.c} are of the nature of utilities
+which may be useful throughout the engine. We list the most useful
+ones here.
+
+@itemize @bullet
+@item @code{void influence_mark_non_territory(int pos, int color)}
+@findex influence_mark_non_territory
+@quotation
+Called from actions for @samp{t} patterns in @file{barriers.db}.
+Marks @code{pos} as not being territory for @code{color}.
+@end quotation
+@item @code{void influence_erase_territory(struct influence_data *q, int pos, int color)}
+@item @code{int whose_territory(const struct influence_data *q, int pos)}
+@findex whose_territory
+@quotation
+Return the color of the territory at @code{pos}. If it's territory for
+neither color, @code{EMPTY} is returned.
+@end quotation
+@item @code{int whose_moyo(const struct influence_data *q, int pos)}
+@findex whose_moyo
+@quotation
+Return the color who has a moyo at @code{pos}. If neither color has a
+moyo there, @code{EMPTY} is returned. The definition of moyo in terms of the
+influences is totally ad hoc.
+@end quotation
+@item @code{int whose_area(const struct influence_data *q, int pos)}
+@findex whose_area
+@quotation
+Return the color who has dominating influence (``area'') at @code{pos}.
+If neither color dominates the influence there, EMPTY is returned.
+The definition of area in terms of the influences is totally ad hoc.
+@end quotation
+@end itemize
+
+
 

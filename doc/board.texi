@@ -448,7 +448,6 @@ used as board coordinate and @samp{s} as an index into the
 @code{string} array or sometimes a pointer to an entry in the
 @code{string} array.
 
-
 @node Some Board Functions
 @section Some Board Functions
 
@@ -532,4 +531,40 @@ conditional and unconditional) must follow a komaster scheme
 @end quotation
 
 @end itemize
+
+As you see, @code{trymove()} plays a move which can be easily
+retracted (with @code{popgo()}) and it is call thousands of
+times per actual game move as GNU Go analyzes the board position.
+By contrast the function @code{play_move()} plays a move which
+is intended to be permanent, though it is still possible to
+undo it if, for example, the opponent retracts a move.
+
+@itemize @bullet
+@item @code{void play_move(int pos, int color)}
+@findex play_move
+@quotation
+Play a move. If you want to test for legality you should first call
+@code{is_legal()}. This function strictly follows the algorithm: 
+@enumerate
+@item Place a stone of given color on the board.
+@item If there are any adjacent opponent strings without liberties,
+remove them and increase the prisoner count. 
+@item If the newly placed stone is part of a string without liberties,
+remove it and increase the prisoner count.
+@end enumerate
+In spite of the name ``permanent move'', this move can (usually) be
+unplayed by @code{undo_move()}, but it is significantly more costly than
+unplaying a temporary move. There are limitations on the available
+move history, so under certain circumstances the move may not be
+possible to unplay at a later time.
+@end quotation
+@item @code{int undo_move(int n)}
+@findex undo_move
+@quotation
+Undo @samp{n} permanent moves. Returns 1 if successful and 0 if it fails.
+If @samp{n} moves cannot be undone, no move is undone.
+@end quotation
+@end itemize
+
+Other board functions are documented in @xref{Board Utilities}.
 

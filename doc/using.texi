@@ -269,13 +269,6 @@ and generate a move for the other player you may add the
 option @option{--color @var{<color>}} where @var{<color>} is
 @code{black} or @code{white}.
 @end quotation
-@item @option{--orientation @var{n}}
-@quotation
-Combine with @option{-l}. The Go board can be oriented in 8 different
-ways, counting reflections and rotations of the position; this option
-selects an orientation (default 0). The parameter @samp{n} is an integer
-between 0 and 7.
-@end quotation
 @item @option{-L}, @option{--until @var{move}}
 @quotation
 Stop loading just before the indicated move is played. @var{move} can
@@ -298,6 +291,18 @@ Force the playing mode ('ascii', 'emacs,' 'gmp' or 'gtp'). The default is
 ASCII, but if no terminal is detected GMP (Go Modem Protocol) will be
 assumed. In practice this is usually what you want, so you may never
 need this option.
+@end quotation
+@item @option{--resign-allowed}
+@quotation
+GNU Go will resign games if this option is enabled. Unfortunately
+the Go Modem Protocol has no provision for passing a resignation,
+so this option has no effect in GMP mode.
+@end quotation
+@item @option{--never-resign}
+@quotation
+GNU Go will not resign games. This is the default unless you
+build the engine with the configure option 
+@option{--enable-resignation-allowed}.
 @end quotation
 @end itemize
 
@@ -349,6 +354,13 @@ in the CGI interface in @file{interface/html/gg.cgi}.
 Print which experimental configure options were compiled into the program
 (@pxref{Experimental Options}).
 @end quotation
+@item @option{--orientation @var{n}}
+@quotation
+Combine with @option{-l}. The Go board can be oriented in 8 different
+ways, counting reflections and rotations of the position; this option
+selects an orientation (default 0). The parameter @samp{n} is an integer
+between 0 and 7.
+@end quotation
 @end itemize
 
 @subsection Other options affecting strength and speed
@@ -372,7 +384,7 @@ Unless you are working on the program you probably don't
 need these options. Instead, just adjust the single
 variable @option{--level}. The remaining options are of
 use to developers tuning the program for performance and
-accuracy.
+accuracy. For completeness, here they are.
 
 @itemize @bullet
 @item @option{-D}, @option{--depth @var{depth}}
@@ -414,6 +426,12 @@ is inhibited, so fewer variations are considered.  Below this
 depth (default 13), GNU Go still tries to attack strings with only
 3 liberties, but only tries one move at each node.
 @end quotation
+@item @option{--break_chain-cutoff @var{depth}}
+@quotation
+Set the @code{break_chain_depth}. Beyond this depth, GNU Go abandons
+some attempts to defend groups by trying to capture part of the surrounding
+chain.
+@end quotation
 @item @option{--aa-depth @var{depth}}
 @quotation
 The reading function @code{atari_atari} looks for combinations beginning
@@ -443,9 +461,20 @@ dragon has escaped.  Default 20.
 @item @option{--owl-node-limit}
 @quotation
 If the number of variations exceeds this limit, Owl assumes the dragon can
+make life. Default 1000. We caution the user that increasing
+@code{owl_node_limit} does not necessarily increase the strength of the
+program.
+@end quotation
+@item @option{--owl-node-limit @var{n}}
+@quotation
+If the number of variations exceeds this limit, Owl assumes the dragon can
 make life. Default 1000.  We caution the user that increasing
 @code{owl_node_limit} does not necessarily increase the strength of the
 program.  
+@end quotation
+@item @option{--owl-distrust @var{n}}
+@quotation
+Below this limit some owl reading is truncated.
 @end quotation
 @end itemize
 
@@ -477,6 +506,7 @@ option requires @option{-l @var{filename}}. The color can be:
 @end itemize
 When the move found by genmove differs from the move in the sgf
 file the values of both moves are reported thus:
+
 @example
 Move 13 (white): GNU Go plays C6 (20.60) - Game move F4 (20.60) 
 @end example
@@ -502,6 +532,10 @@ be more informative.
 @item @option{-T}, @option{--printboard}: colored display of dragons.
 @quotation
 Use rxvt, xterm or Linux Console. (@pxref{Colored Display})
+@end quotation
+@item @option{--showtime}
+@quotation
+Print timing information to stderr.
 @end quotation
 @item @option{-E}, @option{--printeyes}: colored display of eye spaces
 @quotation
@@ -624,7 +658,7 @@ owl code are not considered.
 Try to attack and defend every dragon with dragon.escape<6. If
 used with @option{-o}, writes the variations to an sgf file.
 @end quotation
-@item @option{--decide-eyes @var{location}}
+@item @option{--decide-eye @var{location}}
 @quotation
 Evaluates the eyespace at @var{location} and prints a report. You can get
 more information by adding @option{-d0x02} to the command line. 
