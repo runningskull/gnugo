@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- popgo() bugfix to repair sgf traces	
 - do_owl_analyze_semeai() revised
 - emacs variant of ascii interface removed
 - give less bonus to connection moves when scoring

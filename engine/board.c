@@ -702,8 +702,11 @@ popgo()
     char buf[100];
     int is_tryko = 0;
     char *sgf_comment;
-    
-    if (sgfGetCharProperty(sgf_dumptree->lastnode, "C", &sgf_comment)
+
+    /* FIXME: Change the sgfGet*Property() interface so that either
+     * "C" instead of "C " works or the SGFXX symbols are used.
+     */
+    if (sgfGetCharProperty(sgf_dumptree->lastnode, "C ", &sgf_comment)
 	&& strncmp(sgf_comment, "tryko:", 6) == 0)
       is_tryko = 1;
     
