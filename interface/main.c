@@ -61,6 +61,7 @@ static void show_copyright(void);
 static void show_version(void);
 static void show_help(void);
 static void show_debug_help(void);
+static void show_debug_flags(void);
 
 /* long options which have no short form */
 enum {OPT_BOARDSIZE=127,
@@ -100,6 +101,7 @@ enum {OPT_BOARDSIZE=127,
       OPT_BACKFILL2_DEPTH,
       OPT_SUPERSTRING_DEPTH,
       OPT_AA_DEPTH,
+      OPT_DEBUG_FLAGS,
       OPT_OWL_DISTRUST,
       OPT_OWL_BRANCH,
       OPT_OWL_READING,
@@ -182,6 +184,7 @@ static struct gg_option const long_options[] =
   {"allpats",        no_argument,       0, 'a'},
   {"printboard",     no_argument,       0, 'T'},
   {"debug",          required_argument, 0, 'd'},
+  {"debug-flags",    no_argument,       0,  OPT_DEBUG_FLAGS},
   {"depth",          required_argument, 0, 'D'},
   {"backfill-depth", required_argument, 0, 'B'},
   {"branch-depth",   required_argument, 0, OPT_BRANCH_DEPTH},
@@ -797,6 +800,11 @@ main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 	break;
 	
+      case OPT_DEBUG_FLAGS:
+	show_debug_flags();
+	return EXIT_SUCCESS;
+	break;
+
 	/* NOTE: getopt returns '?' if an illegal option is supplied. */
       case '?':
       default:
@@ -1350,7 +1358,32 @@ Debugging Options:\n\
        --attack-by-pattern       use pattern-based tactical reading for attack\n\
        --defend-by-pattern       use pattern-based tactical reading for defense\n\
 "
-    
+
+#define DEBUG_FLAGS "\
+DEBUG_INFLUENCE             0x0001\n\
+DEBUG_EYES                  0x0002\n\
+DEBUG_OWL                   0x0004\n\
+DEBUG_ESCAPE                0x0008\n\
+DEBUG_MATCHER               0x0010\n\
+DEBUG_DRAGONS               0x0020\n\
+DEBUG_SEMEAI                0x0040\n\
+DEBUG_LOADSGF               0x0080\n\
+DEBUG_HELPER                0x0100\n\
+DEBUG_READING               0x0200\n\
+DEBUG_WORMS                 0x0400\n\
+DEBUG_MOVE_REASONS          0x0800\n\
+DEBUG_OWL_PERFORMANCE       0x1000\n\
+DEBUG_LIFE                  0x2000\n\
+DEBUG_FILLLIB               0x4000\n\
+DEBUG_READING_PERFORMANCE   0x8000\n\
+DEBUG_SCORING               0x010000\n\
+DEBUG_AFTERMATH             0x020000\n\
+DEBUG_ATARI_ATARI           0x040000\n\
+DEBUG_READING_CACHE         0x080000\n\
+DEBUG_TERRITORY             0x100000\n\
+DEBUG_OWL_PERSISTENT_CACHE  0X200000\n\
+"
+
 /*
  * Since the maximum string length is 2048 bytes in VC++ we
  * split the help string.
@@ -1376,6 +1409,11 @@ show_debug_help(void)
   fprintf(stderr, USAGE_DEBUG USAGE_DEBUG2);
 }
 
+static void 
+show_debug_flags(void)
+{
+  fprintf(stderr, DEBUG_FLAGS);
+}
 
 static void
 show_copyright(void)

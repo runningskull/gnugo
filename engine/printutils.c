@@ -31,6 +31,7 @@
 #include "liberty.h"
 #include "gnugo.h"
 #include "gg_utils.h"
+#include "cache.h"
 
 /*
  * This function underpins all the TRACE and DEBUG stuff.
@@ -394,6 +395,39 @@ safety_to_string(int status)
     return "CAN_THREATEN_DEFENSE";
   else
     return "ERROR";
+}
+
+/* Convert a routine to a string. */
+const char *
+routine_to_string(int routine)
+{
+  if (routine == FIND_DEFENSE)
+    return "FIND_DEFENSE";
+  else if (routine == DEFEND1)
+    return "DEFEND1";
+  else if (routine == DEFEND2)
+    return "DEFEND2";
+  else if (routine == DEFEND3)
+    return "DEFEND3";
+  else if (routine == DEFEND4)
+    return "DEFEND4";
+  else if (routine == ATTACK)
+    return "ATTACK";
+  else if (routine == ATTACK2)
+    return "ATTACK2";
+  else if (routine == ATTACK3)
+    return "ATTACK3";
+  else if (routine == OWL_ATTACK)
+    return "OWL_ATTACK";
+  else if (routine == OWL_DEFEND)
+    return "OWL_DEFEND";
+  else if (routine == SEMEAI)
+    return "SEMEAI";
+  else if (routine == CONNECT)
+    return "CONNECT";
+  else if (routine == DISCONNECT)
+    return "DISCONNECT";
+  else return "ERROR";
 }
 
 /* Convert a read result to a string */

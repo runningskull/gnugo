@@ -199,6 +199,10 @@ loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
 36 owl_analyze_semeai S9 R11
 #? [ALIVE DEAD R12]*
 
+loadsgf games/semeai/semeai10.sgf
+37 owl_analyze_semeai B11 L7
+#? [ALIVE DEAD B12]
+
 ########### end of semeai tests #################
 
 # Report number of nodes visited by the tactical reading

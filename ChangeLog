@@ -2,6 +2,11 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- bugfix in semeai_find_backfilling_move()
+- new command line option --debug-flags
+- new DEBUG_OWL_PERSISTENT_CACHE
+- owl.c:draw_active_area draws the owl point
+- new printutils.c:routine_to_string()
 - KOMASTER_SCHEME 4 introduced
 - Tree-based pattern matching introduced.
 - pattern-base reading code supports defense by pattern.
@@ -27,6 +32,7 @@
 - instruct robots not to follow regress.plx links.
 - unexpected results page orders results correctly
 - defaults for config.vc(in) made same as 3.1.27 release.
+- new semeai test
 
 3.1.26 released February 24, 2002
 

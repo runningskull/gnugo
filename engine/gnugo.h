@@ -212,27 +212,28 @@ extern int last_moves[2];
 
 /* debug flag bits */
 /* NOTE : can specify -d0x... */
-#define DEBUG_INFLUENCE           0x0001
-#define DEBUG_EYES                0x0002
-#define DEBUG_OWL                 0x0004
-#define DEBUG_ESCAPE              0x0008
-#define DEBUG_MATCHER             0x0010
-#define DEBUG_DRAGONS             0x0020
-#define DEBUG_SEMEAI              0x0040
-#define DEBUG_LOADSGF             0x0080
-#define DEBUG_HELPER              0x0100
-#define DEBUG_READING             0x0200
-#define DEBUG_WORMS               0x0400
-#define DEBUG_MOVE_REASONS        0x0800
-#define DEBUG_OWL_PERFORMANCE     0x1000
-#define DEBUG_LIFE                0x2000
-#define DEBUG_FILLLIB             0x4000
-#define DEBUG_READING_PERFORMANCE 0x8000
-#define DEBUG_SCORING             0x010000
-#define DEBUG_AFTERMATH           0x020000
-#define DEBUG_ATARI_ATARI         0x040000
-#define DEBUG_READING_CACHE       0x080000
-#define DEBUG_TERRITORY           0x100000
+#define DEBUG_INFLUENCE             0x0001
+#define DEBUG_EYES                  0x0002
+#define DEBUG_OWL                   0x0004
+#define DEBUG_ESCAPE                0x0008
+#define DEBUG_MATCHER               0x0010
+#define DEBUG_DRAGONS               0x0020
+#define DEBUG_SEMEAI                0x0040
+#define DEBUG_LOADSGF               0x0080
+#define DEBUG_HELPER                0x0100
+#define DEBUG_READING               0x0200
+#define DEBUG_WORMS                 0x0400
+#define DEBUG_MOVE_REASONS          0x0800
+#define DEBUG_OWL_PERFORMANCE       0x1000
+#define DEBUG_LIFE                  0x2000
+#define DEBUG_FILLLIB               0x4000
+#define DEBUG_READING_PERFORMANCE   0x8000
+#define DEBUG_SCORING               0x010000
+#define DEBUG_AFTERMATH             0x020000
+#define DEBUG_ATARI_ATARI           0x040000
+#define DEBUG_READING_CACHE         0x080000
+#define DEBUG_TERRITORY             0x100000
+#define DEBUG_OWL_PERSISTENT_CACHE  0X200000
 /* hash flag bits 
  *
  * Regarding HASH_DEFAULT:
@@ -340,6 +341,7 @@ void        location_to_buffer(int pos, char *buf);
 const char *status_to_string(int status);
 const char *safety_to_string(int status);
 const char *result_to_string(int result);
+const char *routine_to_string(int routine);
 int string_to_location(int boardsize, char *str, int *m, int *n);
 double gg_gettimeofday(void);
 

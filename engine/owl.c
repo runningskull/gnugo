@@ -1058,7 +1058,7 @@ find_semeai_backfilling_move(int worm, int liberty)
     return NO_MOVE;
 
   if (safe_move(liberty, other))
-    return other;
+    return liberty;
   if (is_self_atari(liberty, other)) {
     int fill;
     if (approxlib(liberty, other, 1, &fill) > 0
@@ -1071,7 +1071,10 @@ find_semeai_backfilling_move(int worm, int liberty)
       popgo();
     }
   }
-  return result;
+  if (ON_BOARD(result) && safe_move(result, other))
+    return result;
+  else
+    return NO_MOVE;
 }
 
 
@@ -4598,7 +4601,7 @@ pop_owl(struct local_owl_data *owl)
 
 /* FIXME: Unify with the same function in reading.c. */
 static void
-draw_active_area(char board[BOARDMAX])
+draw_active_area(char board[BOARDMAX], int apos)
 {
   int i, j, ii;
   int c = ' ';
@@ -4623,7 +4626,12 @@ draw_active_area(char board[BOARDMAX])
       if (board[POS(i, j)] == GRAY)
 	c = '?';
       
-      fprintf(stderr, " %c", c);
+      if (POS(i, j) == apos)
+	fprintf(stderr, "[%c", c);
+      else if (j > 0 && POS(i, j-1) == apos)
+	fprintf(stderr, "]%c", c);
+      else
+	fprintf(stderr, " %c", c);
     }
     
     fprintf(stderr, " %d", ii);
@@ -4704,6 +4712,10 @@ search_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
       if (move) *move = persistent_owl_cache[k].move;
       if (move2) *move2 = persistent_owl_cache[k].move2;
       if (certain) *certain = persistent_owl_cache[k].result_certain;
+      DEBUG(DEBUG_OWL_PERSISTENT_CACHE,
+	    "persistent owl cache hit: routine %s at %1m result %d\n",
+	    routine_to_string(routine), apos, bpos, cpos, 
+	    result_to_string(persistent_owl_cache[k].result));
       return 1;
     }
   }
@@ -4828,7 +4840,7 @@ store_persistent_owl_cache(int routine, int apos, int bpos, int cpos,
     persistent_owl_cache[persistent_owl_cache_size].board[pos] = value;
   }
 
-  if (0) {
+  if (debug & DEBUG_OWL_PERSISTENT_CACHE) {
     gprintf("%o Stored result in cache (entry %d):\n",
 	    persistent_owl_cache_size);
     print_persistent_owl_cache_entry(persistent_owl_cache_size);
@@ -4845,7 +4857,7 @@ print_persistent_owl_cache_entry(int k)
   struct owl_cache *entry = &(persistent_owl_cache[k]);
   gprintf("%omovenum         = %d\n",  entry->movenum);
   gprintf("%otactical_nodes  = %d\n",  entry->tactical_nodes);
-  gprintf("%oroutine         = %d\n",  entry->routine);
+  gprintf("%oroutine         = %s\n",  routine_to_string(entry->routine));
   gprintf("%o(apos)  	     = %1m\n", entry->apos);
   gprintf("%o(bpos)  	     = %1m\n", entry->bpos);
   gprintf("%o(cpos)  	     = %1m\n", entry->cpos);
@@ -4853,7 +4865,7 @@ print_persistent_owl_cache_entry(int k)
   gprintf("%o(move)          = %1m\n", entry->move);
   gprintf("%o(move2)         = %1m\n", entry->move2);
   
-  draw_active_area(entry->board);
+  draw_active_area(entry->board, entry->apos);
 }
 
 
@@ -4920,7 +4932,7 @@ owl_hotspots(float values[BOARDMAX])
   for (k = 0; k < persistent_owl_cache_size; k++) {
     struct owl_cache *entry = &(persistent_owl_cache[k]);
     float contribution = entry->tactical_nodes / (float) sum_tactical_nodes;
-    if (0) {
+    if (DEBUG_OWL_PERSISTENT_CACHE) {
       gprintf("Owl hotspots: %d %1m %f\n", entry->routine, entry->apos,
 	      contribution);
     }
