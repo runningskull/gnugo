@@ -2,12 +2,15 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- don't try to undo when stackp is not zero (GTP mode)
 - support for multiple engines in view.pike
 - more info about semeais in dragon_data2
 - double-check owl attack moves against dragons involved in semeai(s)
+- be less optimistic about large, but bulky eyespaces
 - support for 'make gnugo.pdf' and make 'gnugo.html' in doc/
 - slowest move statistics from regress.pike
 - update usages of time_report()
+- `twogtp.pike' can now use third engine (arbiter) to score games
 - breakin and readconnect fixes
 - first implementation of owl threat combinator--intended for improving
   move ordering
@@ -17,6 +20,12 @@
   pattern attributes
 - common code of shapes_callback() and joseki_callback() is broken into
   new static function handle_joseki_patterns()
+- new function do_find_more_owl_attack_and_defense_moves() broken out
+  of find_more_owl_attack_and_defense_moves()
+- induce_secondary_move_reasons() tries to upgrade induced reasons to
+  owl attacks/defenses with do_find_more_owl_attack_and_defense_moves()
+- strategical attack move reason is induced for saving certain worms
+  adjoining weak opponent dragons
 - major improvement of analyze_eyegraph functionality in optics.c
 - adjust min_level and max_level if --level is set outside their range
 - do not malloc() 0 bytes in pattern_list_build_heap()
