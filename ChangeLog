@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 	
+3.1.4 released September 14, 2001
+
 - do_atari_atari tries harder to find defenses
 - confirm_atari_atari checks to see if tried move really causes the combination
 - changing a group's status from CRITICAL to DEAD does not satisfy atari_atari

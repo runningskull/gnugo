@@ -1,3 +1,5 @@
+========================== 3.1.4  =========================
+
 ./regress.sh . blunder.tst
 15 unexpected FAIL: Correct 'H3', got 'J1'
 ./regress.sh . strategy.tst
@@ -24,11 +26,15 @@
 2001 unexpected PASS!
 ./regress.sh . nicklas2.tst
 904 unexpected PASS!
-./regress.sh . nicklas3.tst
-
-./regress.sh . nicklas4.tst
-./regress.sh . nicklas5.tst
 ./regress.sh . strategy3.tst
+103 unexpected FAIL: Correct 'B16', got 'A15'
+111 unexpected FAIL: Correct 'K3', got 'P2'
+117 unexpected FAIL: Correct 'M2', got 'P2'
+120 unexpected FAIL: Correct 'C7', got 'B7'
+154 unexpected PASS!
+160 unexpected FAIL: Correct 'K2|L2|L3', got 'O6'
+./regress.sh niki.tst
+13 unexpected PASS!
 
 ========================== 3.1.3  =========================
 

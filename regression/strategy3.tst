@@ -18,7 +18,7 @@ loadsgf games/strategy26.sgf 265
 # A15 and C15 both fail badly. C16 allows white to make seki.
 loadsgf games/strategy26.sgf 285
 103 gg_genmove black
-#? [B16]
+#? [B16]*
 
 # Urgent response.
 loadsgf games/strategy27.sgf 12
@@ -51,7 +51,7 @@ loadsgf games/strategy27.sgf 220
 
 loadsgf games/me.sgf 44
 111 gg_genmove black
-#? [K3]
+#? [K3]*
 
 loadsgf games/me.sgf 84
 112 gg_genmove black
@@ -77,7 +77,7 @@ loadsgf games/incident278.sgf 212
 # incident 282
 loadsgf games/incident278.sgf 252
 117 gg_genmove black
-#? [M2]
+#? [M2]*
 
 loadsgf games/incident240.sgf 65
 118 gg_genmove black
@@ -91,7 +91,7 @@ loadsgf games/incident240.sgf 69
 # incident 221
 loadsgf games/incident221.sgf 35
 120 gg_genmove black
-#? [C7]
+#? [C7]*
 
 # incident 222
 loadsgf games/incident221.sgf 39
@@ -242,7 +242,7 @@ loadsgf games/strategy36.sgf
 
 loadsgf games/strategy37.sgf
 154 gg_genmove white
-#? [E8]*
+#? [E8]
 
 # Incident 190.
 loadsgf games/incident189.sgf 186
@@ -268,7 +268,7 @@ loadsgf games/strategy38.sgf 117
 
 loadsgf games/strategy38.sgf 133
 160 gg_genmove black
-#? [K2|L2|L3]
+#? [K2|L2|L3]*
 
 loadsgf games/strategy38.sgf 197
 161 gg_genmove black

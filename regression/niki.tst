@@ -53,7 +53,7 @@ loadsgf games/niki.sgf 212
 
 loadsgf games/niki.sgf 226
 13 gg_genmove white
-#? [F8]*
+#? [F8]
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter

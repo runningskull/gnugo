@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4a from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -46,9 +46,10 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_STRIP_FLAG =
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -163,8 +164,8 @@ transpat_OBJECTS =  transpat.o patlib.o transform.o
 transpat_DEPENDENCIES = 
 transpat_LDFLAGS = 
 mkpat_OBJECTS =  mkpat.o transform.o
-@DFA_ENABLED_FALSE@mkpat_DEPENDENCIES =  ../utils/libutils.a
 @DFA_ENABLED_TRUE@mkpat_DEPENDENCIES =  ./libdfa.a ../utils/libutils.a
+@DFA_ENABLED_FALSE@mkpat_DEPENDENCIES =  ../utils/libutils.a
 mkpat_LDFLAGS = 
 joseki_OBJECTS =  joseki.o
 joseki_DEPENDENCIES =  ../engine/libboard.a ../sgf/libsgf.a \
@@ -194,6 +195,13 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
+DEP_FILES =  .deps/apatterns.P .deps/barriers.P .deps/conn.P \
+.deps/connections.P .deps/dfa.P .deps/dpatterns.P .deps/endgame.P \
+.deps/extract_fuseki.P .deps/eyes.P .deps/fuseki19.P .deps/fuseki9.P \
+.deps/helpers.P .deps/influence.P .deps/joseki.P .deps/josekidb.P \
+.deps/mkeyes.P .deps/mkpat.P .deps/owl_attackpat.P \
+.deps/owl_defendpat.P .deps/owl_vital_apat.P .deps/patlib.P \
+.deps/patterns.P .deps/transform.P .deps/transpat.P
 SOURCES = $(libpatterns_a_SOURCES) $(libdfa_a_SOURCES) $(transpat_SOURCES) $(mkpat_SOURCES) $(joseki_SOURCES) $(mkeyes_SOURCES) $(extract_fuseki_SOURCES)
 OBJECTS = $(libpatterns_a_OBJECTS) $(libdfa_a_OBJECTS) $(transpat_OBJECTS) $(mkpat_OBJECTS) $(joseki_OBJECTS) $(mkeyes_OBJECTS) $(extract_fuseki_OBJECTS)
 
@@ -201,9 +209,9 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps patterns/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu patterns/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -216,9 +224,6 @@ clean-noinstLIBRARIES:
 distclean-noinstLIBRARIES:
 
 maintainer-clean-noinstLIBRARIES:
-
-.c.o:
-	$(COMPILE) -c $<
 
 .s.o:
 	$(COMPILE) -c $<
@@ -328,6 +333,11 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = patterns
 
 distdir: $(DISTFILES)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(top_distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu patterns/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -339,64 +349,38 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 	$(MAKE) $(AM_MAKEFLAGS) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-hook
-apatterns.o: apatterns.c ../engine/liberty.h ../engine/gnugo.h \
-	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
-	../engine/clock.h ../engine/hash.h patterns.h
-barriers.o: barriers.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
-	../engine/hash.h patterns.h
-conn.o: conn.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
-	../engine/hash.h patterns.h
-connections.o: connections.c ../engine/liberty.h ../engine/gnugo.h \
-	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
-	../engine/clock.h ../engine/hash.h patterns.h
-dfa.o: dfa.c patterns.h ../config.h dfa.h
-dpatterns.o: dpatterns.c ../engine/liberty.h ../engine/gnugo.h \
-	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
-	../engine/clock.h ../engine/hash.h patterns.h
-endgame.o: endgame.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
-	../engine/hash.h patterns.h
-extract_fuseki.o: extract_fuseki.c ../sgf/sgftree.h \
-	../sgf/sgf_properties.h ../engine/liberty.h ../engine/gnugo.h \
-	../config.h ../engine/clock.h ../engine/hash.h \
-	../utils/random.h
-eyes.o: eyes.c eyes.h
-fuseki19.o: fuseki19.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
-	../engine/hash.h patterns.h
-fuseki9.o: fuseki9.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
-	../engine/hash.h patterns.h
-helpers.o: helpers.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
-	../engine/hash.h patterns.h
-influence.o: influence.c ../engine/liberty.h ../engine/gnugo.h \
-	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
-	../engine/clock.h ../engine/hash.h patterns.h
-joseki.o: joseki.c ../sgf/sgftree.h ../sgf/sgf_properties.h \
-	../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../engine/clock.h ../engine/hash.h
-josekidb.o: josekidb.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
-	../engine/hash.h patterns.h
-mkeyes.o: mkeyes.c
-mkpat.o: mkpat.c ../config.h patterns.h ../utils/gg-getopt.h
-owl_attackpat.o: owl_attackpat.c ../engine/liberty.h ../engine/gnugo.h \
-	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
-	../engine/clock.h ../engine/hash.h patterns.h
-owl_defendpat.o: owl_defendpat.c ../engine/liberty.h ../engine/gnugo.h \
-	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
-	../engine/clock.h ../engine/hash.h patterns.h
-owl_vital_apat.o: owl_vital_apat.c ../engine/liberty.h ../engine/gnugo.h \
-	../config.h ../sgf/sgftree.h ../sgf/sgf_properties.h \
-	../engine/clock.h ../engine/hash.h patterns.h
-patterns.o: patterns.c ../engine/liberty.h ../engine/gnugo.h ../config.h \
-	../sgf/sgftree.h ../sgf/sgf_properties.h ../engine/clock.h \
-	../engine/hash.h patterns.h
-transform.o: transform.c
 
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
+
+-include $(DEP_FILES)
+
+mostlyclean-depend:
+
+clean-depend:
+
+distclean-depend:
+	-rm -rf .deps
+
+maintainer-clean-depend:
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.c
+	@echo '$(LTCOMPILE) -c $<'; \
+	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
 info-am:
 info: info-am
 dvi-am:
@@ -419,7 +403,7 @@ uninstall: uninstall-am
 all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS)
 all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(pkgdatadir)
 
@@ -436,25 +420,26 @@ distclean-generic:
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
 		mostlyclean-noinstPROGRAMS mostlyclean-tags \
-		mostlyclean-generic
+		mostlyclean-depend mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
 clean-am:  clean-noinstLIBRARIES clean-compile clean-noinstPROGRAMS \
-		clean-tags clean-generic mostlyclean-am
+		clean-tags clean-depend clean-generic mostlyclean-am
 
 clean: clean-am
 
 distclean-am:  distclean-noinstLIBRARIES distclean-compile \
 		distclean-noinstPROGRAMS distclean-tags \
-		distclean-generic clean-am
+		distclean-depend distclean-generic clean-am
 
 distclean: distclean-am
 
 maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
 		maintainer-clean-compile \
 		maintainer-clean-noinstPROGRAMS maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-depend maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -467,8 +452,9 @@ maintainer-clean-compile mostlyclean-noinstPROGRAMS \
 distclean-noinstPROGRAMS clean-noinstPROGRAMS \
 maintainer-clean-noinstPROGRAMS uninstall-pkgdataDATA \
 install-pkgdataDATA tags mostlyclean-tags distclean-tags clean-tags \
-maintainer-clean-tags distdir info-am info dvi-am dvi check check-am \
-installcheck-am installcheck install-exec-am install-exec \
+maintainer-clean-tags distdir mostlyclean-depend distclean-depend \
+clean-depend maintainer-clean-depend info-am info dvi-am dvi check \
+check-am installcheck-am installcheck install-exec-am install-exec \
 install-data-am install-data install-am install uninstall-am uninstall \
 all-redirect all-am all installdirs mostlyclean-generic \
 distclean-generic clean-generic maintainer-clean-generic clean \
