@@ -607,9 +607,18 @@ do_owl_analyze_semeai(int apos, int bpos,
 	}
 	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, DEAD);
       }
-      else if (min_eyes(&probable_eyes_b) < 2) {
+      else if (min_eyes(&probable_eyes_b) >= 2) {
+	/* both live */
+	*resulta = ALIVE;
+	*resultb = ALIVE;
+	if (move) *move = PASS_MOVE;
+	sgf_dumptree = save_sgf_dumptree;
+	count_variations = save_count_variations;
+	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
+	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
+      }
+      else if (vital_offensive_moves[0].pos != NO_MOVE){
 	/* I can kill */
-	gg_assert(vital_offensive_moves[0].pos != NO_MOVE);
 	*resulta = ALIVE;
 	*resultb = DEAD;
 	if (move) *move = vital_offensive_moves[0].pos;
@@ -625,16 +634,11 @@ do_owl_analyze_semeai(int apos, int bpos,
 	READ_RETURN_SEMEAI(read_result, move, vital_offensive_moves[0].pos,
 			   ALIVE, DEAD);
       }
-      else {
-	/* both live */
-	*resulta = ALIVE;
-	*resultb = ALIVE;
-	if (move) *move = PASS_MOVE;
-	sgf_dumptree = save_sgf_dumptree;
-	count_variations = save_count_variations;
-	SGFTRACE2(PASS_MOVE, ALIVE, "Both live");
-	READ_RETURN_SEMEAI(read_result, move, PASS_MOVE, ALIVE, ALIVE);
-      }
+      /* If here, compute_eyes_pessimistic has returned min_eyes<2 
+       * and max_eyes>=2 yet produced no defensive move.
+       */
+      else
+	DEBUG(DEBUG_SEMEAI, "inconsistent eyevalue\n");
     }
     if (min_eyes(&probable_eyes_b) >= 2
 	|| (stackp > 2 && owl_escape_route(owlb) >= 5)) {
@@ -674,7 +678,8 @@ do_owl_analyze_semeai(int apos, int bpos,
       /* If here, compute_eyes_pessimistic has returned min_eyes<2 
        * and max_eyes>=2 yet produced no defensive move.
        */
-      else DEBUG(DEBUG_SEMEAI, "inconsistent eyevalue\n");
+      else
+	DEBUG(DEBUG_SEMEAI, "inconsistent eyevalue\n");
     }
     
     /* Next the shape moves. */
