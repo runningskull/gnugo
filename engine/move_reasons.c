@@ -2427,8 +2427,8 @@ estimate_territorial_value(int pos, int color, float score)
       if (worm[aa].defend_codes[0] == 0) {
 	DEBUG(DEBUG_MOVE_REASONS,
 	      "  %1m: %f (secondary) - attack on %1m (defenseless)\n",
-	      pos, worm[aa].size, aa);
-	secondary_value += worm[aa].size;
+	      pos, worm[aa].effective_size, aa);
+	secondary_value += worm[aa].effective_size;
 	break;
       }
 
