@@ -717,6 +717,8 @@ revise_semeai(int color)
   int found_one = 0;
   int other = OTHER_COLOR(color);
 
+  gg_assert(dragon2 != NULL);
+
   for (m = 0; m < board_size; m++)
     for (n = 0; n < board_size; n++) {
       if (DRAGON2(m, n).semeai
