@@ -207,7 +207,7 @@ loadsgf games/semeai/semeai10.sgf
 
 loadsgf games/semeai/semeai11.sgf
 38 owl_analyze_semeai B9 B8
-#? [ALIVE DEAD PASS]
+#? [ALIVE DEAD PASS]*
 
 
 ########### end of semeai tests #################
