@@ -1,8 +1,6 @@
 bin_PROGRAMS = gnugo
 
-SUBDIRS = debugboard
-
-EXTRA_DIST = html gtp_examples gnugo.dsp gnugo.el GoImage
+EXTRA_DIST = gtp_examples gnugo.el
 
 noinst_HEADERS = interface.h gmp.h gtp.h
 

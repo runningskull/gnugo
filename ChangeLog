@@ -4,6 +4,9 @@
 
 Changes to accomodate GNU Go for SPEC on cvs branch SPEC_branch
 
+- removed gnugo.dsw, */*.dsp, patterns/transpat.c,
+  patterns/extract_fuseki.c, patterns/patlib.[ch],
+  interface/debugboard/*, interface/html/*, interface/GoImage/*
 - removed unneeded and potentially inportable timing code
 - removed forward declaration of pattern arrays to avoid compiler warnings
 - removed pattern databases for experimental reading

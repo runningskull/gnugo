@@ -1,10 +1,6 @@
 noinst_PROGRAMS = mkpat joseki mkeyes
-EXTRA_PROGRAMS = extract_fuseki transpat
 
-DSP = dfa.dsp patterns.dsp joseki.dsp mkeyes.dsp mkpat.dsp fuseki.dsp
-
-EXTRA_DIST = $(DSP)\
-	dfa.c\
+EXTRA_DIST = dfa.c\
 	hoshi.sgf\
 	komoku.sgf\
 	mokuhazushi.sgf\
@@ -39,22 +35,12 @@ else
 DFAFLAGS =
 endif
 
-transpat_SOURCES = transpat.c patlib.c transform.c
-transpat_LDADD = 
 joseki_SOURCES = joseki.c 
 joseki_LDADD = ../engine/libboard.a ../sgf/libsgf.a ../utils/libutils.a 
 joseki_INCLUDES = -I$(top_srcdir)/sgf
 mkeyes_SOURCES = mkeyes.c
-extract_fuseki_SOURCES  = extract_fuseki.c
-# Yes, we currently need duplicate libengine.a and libpatterns.a.
-extract_fuseki_LDADD = ../engine/libengine.a libpatterns.a\
-		       ../engine/libengine.a libpatterns.a\
-                       ../sgf/libsgf.a ../utils/libutils.a\
-		       libdfa.a
-extract_fuseki_INCLUDES = -I$(top_srcdir)/sgf
 
-
-noinst_HEADERS = patterns.h eyes.h patlib.h dfa.h
+noinst_HEADERS = patterns.h eyes.h dfa.h
 
 GGBUILTSOURCES = conn.c patterns.c apatterns.c dpatterns.c eyes.c\
                  influence.c barriers.c endgame.c aa_attackpat.c\
