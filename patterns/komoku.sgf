@@ -186,8 +186,11 @@ MA[li];B[lc]MA[ki])
 )
 
 (;B[ld]MA[ki]C[S]
-(;W[of]MA[ki]C[U];B[qf]MA[ki]C[S];W[oh]MA[ki]C[S];B[qh]MA[ki]C[S];
-W[id]MA[ii]C[S])
+(;W[of]MA[ki]C[U]
+(;B[qf]MA[ki]C[S];W[oh]MA[ki]C[S];B[qh]MA[ki]C[S];W[id]MA[ii]C[S])
+
+(;B[qg]MA[ki];W[oh]MA[kj];B[pi]MA[kk];W[id]MA[gk])
+)
 
 (;W[pg]MA[ki]C[U];B[oe]MA[ki]C[U];W[ne]MA[ki]C[U];B[of]MA[ki]C[U];
 W[pd]MA[ki]C[U]
