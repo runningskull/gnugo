@@ -52,7 +52,10 @@
  * kom_pos : 10 bits (allows MAX_BOARD up to 31)
  * routine :  4 bits (currently 10 different choices)
  * str1    : 10 bits
- * stackp  :  5 bits
+ * stackp  :  5 bits (actually remaining depth, depth - stackp)
+ *
+ * FIXME: Rename stackp to something like remaining_depth at some
+ *        appropriate time.
  *
  * The data2 field packs into 32 bits the following
  * fields:
@@ -86,7 +89,7 @@ typedef struct read_result_t {
 /* Set corresponding parts. */
 #define rr_input_data1(routine, komaster, kom_pos, str1, stackp) \
 	(((((((((komaster) << 10) | (kom_pos)) << 4) \
-	  | (routine)) << 10) | (str1)) << 5) | stackp);
+	  | (routine)) << 10) | (str1)) << 5) | (stackp));
 #define rr_input_data2(str2) (str2) \
 
 /* Set input data fields and at the same time set status to open. */

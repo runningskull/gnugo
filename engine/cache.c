@@ -311,9 +311,11 @@ hashtable_unlink_closed_results(Hashnode *node,
     int stackp;
     int routine;
 
-    stackp = rr_get_stackp(*current_result);
+    stackp = depth - rr_get_stackp(*current_result);
     if (stackp > 19)
       stackp = 19;
+    if (stackp < 0)
+      stackp = 0;
 
     routine = rr_get_routine(*current_result);
     gg_assert(routine >= 0 && routine < NUM_ROUTINES);
@@ -321,7 +323,7 @@ hashtable_unlink_closed_results(Hashnode *node,
 
     if (rr_get_status(*current_result) == 2
 	&& ((1 << rr_get_routine(*current_result)) & exclusions) == 0
-	&& rr_get_stackp(*current_result) >= stackplimit) {
+	&& depth - rr_get_stackp(*current_result) >= stackplimit) {
       if (previous_result == NULL)
 	node->results = current_result->next;
       else
@@ -534,7 +536,8 @@ hashnode_search(Hashnode *node, int routine, int komaster, int kom_pos,
   unsigned int search_for1;
   unsigned int search_for2;
 
-  search_for1 = rr_input_data1(routine, komaster, kom_pos, str1, stackp);
+  search_for1 = rr_input_data1(routine, komaster, kom_pos, str1,
+			       depth - stackp);
   search_for2 = rr_input_data2(str2);
 
   for (result = node->results; result != NULL; result = result->next) {
@@ -577,7 +580,8 @@ hashnode_new_result(Hashtable *table, Hashnode *node, int routine,
   node->results = result;
 
   /* Now, put the input data into it. This also sets status to open. */
-  rr_set_input_data2(*result, routine, komaster, kom_pos, str1, str2, stackp);
+  rr_set_input_data2(*result, routine, komaster, kom_pos, str1, str2,
+		     depth - stackp);
 
   stats.read_result_entered++;
   return result;
