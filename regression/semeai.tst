@@ -67,6 +67,10 @@ reset_reading_node_counter
 # for any of these problems, if PASS is a solution it is the best
 # solution. However the other solutions are acceptable.
 
+############## semeai tests #################
+#
+# These tests do not call genmove. Genmove tests below node counts.
+
 loadsgf games/semeai/semeai6.sgf
 1 owl_analyze_semeai C1 E1
 #? [ALIVE_IN_SEKI ALIVE_IN_SEKI (F1|F2|F3|F4|F5|PASS)]
@@ -164,12 +168,6 @@ loadsgf golois/Goemate990902-1.sgf
 28 owl_analyze_semeai R7 Q7
 #? [ALIVE DEAD S9]*
 
-# A6 gives an unfavorable ko while F10 gives seki.
-# Since there are no ko threats, and F10 is enough to win, it is preferred.
-loadsgf games/semeai/semeaiko1.sgf
-29 gg_genmove black
-#? [F10]*
-
 loadsgf games/strategy11.sgf 127
 30 owl_analyze_semeai B3 G4
 #? [ALIVE DEAD C1]*
@@ -196,7 +194,12 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 35 owl_analyze_semeai M13 M11
 #? [ALIVE DEAD PASS]*
 
-########### end of tests #####################
+# See also reading:166
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
+36 owl_analyze_semeai S9 R11
+#? [ALIVE DEAD R12]
+
+########### end of semeai tests #################
 
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
@@ -205,3 +208,12 @@ loadsgf games/mertin13x13/gnugo-goliath2.W+38.sgf 61
 # Report number of nodes visited by the owl code
 10001 get_owl_node_counter
 #? [0]&
+
+########### semeai gen_move tests #################
+
+# A6 gives an unfavorable ko while F10 gives seki.
+# Since there are no ko threats, and F10 is enough to win, it is preferred.
+loadsgf games/semeai/semeaiko1.sgf
+29 gg_genmove black
+#? [F10]*
+

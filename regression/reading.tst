@@ -651,6 +651,11 @@ loadsgf games/reading36.sgf 23
 165 attack L4
 #? [1 K3|L3]*
 
+# See also semeai:36
+loadsgf games/nngs/Lazarus-gnugo-3.1.19-200201092246.sgf 66
+166 attack R11
+#? [1 R12]
+
 # Report number of nodes visited by the tactical reading
 10000 get_reading_node_counter
 #? [0]&

@@ -232,8 +232,16 @@ new_semeai(int color)
 	if (b_best_status != DEAD && b_worst_status == DEAD)
 	  b_status = CRITICAL;
 	else b_status = b_worst_status;
-	update_status(apos, a_status, dragon[apos].matcher_status);
-	update_status(bpos, b_status, dragon[bpos].matcher_status);
+	{
+	  int a_matcher_status = a_status;
+	  int b_matcher_status = b_status;
+	  if (a_matcher_status == ALIVE_IN_SEKI)
+	    a_matcher_status = ALIVE;
+	  if (b_matcher_status == ALIVE_IN_SEKI)
+	    b_matcher_status = ALIVE;
+	  update_status(apos, a_matcher_status, a_status);
+	  update_status(bpos, b_matcher_status, a_status);
+	}
       }
     }
   }
@@ -276,11 +284,8 @@ update_status(int dr, int new_status, int new_safety)
 	  safety_to_string(DRAGON2(dr).safety), safety_to_string(new_safety));
   
   for (pos = BOARDMIN; pos < BOARDMAX; pos++)
-    if (IS_STONE(board[pos]) && is_same_dragon(dr, pos)) {
-      if (new_status == ALIVE_IN_SEKI)
-	dragon[pos].matcher_status = ALIVE;
-      else dragon[pos].matcher_status = new_status;
-    }
+    if (IS_STONE(board[pos]) && is_same_dragon(dr, pos))
+      dragon[pos].matcher_status = new_status;
 
   DRAGON2(dr).safety = new_safety;
 }
