@@ -12713,6 +12713,7 @@ def.....O.X
 
 Pattern EJ93
 # db new pattern (3.1.32)
+# db modified (3.3.9)
 
 |..xx.......            stand to defend
 |...........
@@ -12728,11 +12729,13 @@ Pattern EJ93
 |...........
 |...X.*..xxx
 |....XO..xxx
-|......a....
+|....cba....
 |...........
 +-----------
 
-> replace(a,*)
+> replace(a,*);
+> replace(b,*);
+> replace(c,*)
 
 
 Pattern EJ94
