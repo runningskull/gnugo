@@ -672,7 +672,12 @@ test_attack_either_move(int move, int color, int worma, int wormb)
   if (trymove(move, color, "test_attack_either_move", worma)) {
     if (board[worma] == OTHER_COLOR(color)
 	&& board[wormb] == OTHER_COLOR(color)) {
-      if (!defend_both(worma, wormb))
+      if (!find_defense(worma, NULL) || !find_defense(wormb, NULL)) {
+	if (0)
+	  gprintf("%1m: Rej. attack_either_move for %1m & %1m (regular attack)\n",
+		  move, worma, wormb);
+      }
+      else if (!defend_both(worma, wormb))
         add_either_move(move, ATTACK_STRING, worma, ATTACK_STRING, wormb);
       else {
 	if (0)

@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- test_attack_either() revised
 - fixed anchor building of owl_attackpats.db repaired
 - thrashing dragon heuristics revised
 - readline support in ASCII mode
