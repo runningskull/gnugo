@@ -74,7 +74,7 @@
 #include "random.h"
 
 #define USAGE "\n\
-Usage: extract_fuseki files boardsize moves patterns handicap strength\n\
+Usage: extract_fuseki files boardsize moves patterns handicap strength half_board [output file]\n\
 files:     The name of a file listing sgf files to examine,\n\
            one filename per line.\n\
 boardsize: Only consider games with this size.\n\
@@ -83,6 +83,7 @@ patterns:  Number of patterns to generate.\n\
 handicap:  0 - no handicap, 1 - any game, 2-9 - two to nine handicap stones\n\
            10 any handicap game\n\
 strength:  The lowest strength of the players (1k-30k)\n\
+half_board: 0 - full board patterns, 1 - half board patterns\n\
 output file: Optional (if this exists, extract_fuseki will sort the games instead)\n\
 "
 
@@ -91,6 +92,9 @@ output file: Optional (if this exists, extract_fuseki will sort the games instea
 
 /* Number of moves to consider in each game, given as argument.*/
 int moves_per_game;
+
+/* Flag checking the setting for generating half board patterns */
+int half_board_patterns = 0;
 
 /* Maximum number of patterns to generate, given as argument.*/
 int patterns_to_extract;
@@ -498,6 +502,40 @@ compare_frequencies(const void *a, const void *b)
   return 0;
 }
 
+/*
+ * find_region answers in what region the move is
+ * there are 9 regions, corners, sides and center
+ */
+
+static int
+find_region(int m, int n)
+{
+  if (m < 7) {
+    if (n < 7)
+      return 0;
+    else if (n > 11)
+      return 1;
+    else if (n > 6 && m < 5)
+      return 6;
+  }
+  else if (m > 11) {
+    if (n < 7)
+      return 2;
+    else if (n > 11)
+      return 3;
+    else if (n > 6 && m > 13)
+      return 7;
+  }
+  else if (m > 6) {
+    if (n < 5)
+      return 4;
+    else if (n > 13)
+      return 5;
+  }
+  /* otherwise in center */
+  return 8;
+}
+
 /* If this situation is listed among the winners, fill in the pattern
  * entry of the winner struct.
  */
@@ -508,28 +546,76 @@ store_pattern_if_winner(struct invariant_hash *pre,
 {
   int k;
   struct situation s;
+  int region = 8;
+  int i, j;
+  int move_number = 1;
   s.pre = *pre;
   s.post = *post;
+
   for (k = 0; k < number_of_winning_moves; k++) {
     if (compare_situations(&situation_table[winning_moves[k].index],
 			   &s) == 0) {
       /* This is a winner. Record the pattern. */
-      int i, j;
       for (i = 0; i < board_size; i++)
 	for (j = 0; j < board_size; j++) {
 	  if (BOARD(i, j) == EMPTY)
 	    winning_moves[k].pattern[i][j] = '.';
-	  else if (BOARD(i, j) == color)
+	  else if (BOARD(i, j) == color) {
 	    winning_moves[k].pattern[i][j] = 'O';
+	    move_number++;
+	  }
 	  else if ((color == WHITE && BOARD(i, j) == BLACK)
-		   || (color == BLACK && BOARD(i, j) == WHITE))
+		   || (color == BLACK && BOARD(i, j) == WHITE)) {
 	    winning_moves[k].pattern[i][j] = 'X';
+	    move_number++;
+	  }
 	  else { /* something is wrong */
 	    fprintf(stderr, "Error in store_pattern_if_winner: %d\n",k);
 	    winning_moves[k].pattern[i][j] = '.';
 	  }
 	}
       winning_moves[k].pattern[m][n] = '*';
+      /* add ? in areas far away from the move */
+      if (half_board_patterns == 1 && move_number > 3 && board_size == 19)
+        region = find_region(m,n);
+      if (region != 8) {
+        for (i = 0; i < board_size; i++) {
+          for (j = 0; j < board_size; j++) {
+            if (region == 0) {
+              if (i + j > 23)
+     	        winning_moves[k].pattern[i][j] = '?';
+     	    }
+            else if (region == 1) {
+              if ((i - j) > 5)
+ 	        winning_moves[k].pattern[i][j] = '?';
+ 	    }
+            else if (region == 2) {
+              if ((i + board_size - j) < 14)
+ 	        winning_moves[k].pattern[i][j] = '?';
+ 	    }
+ 	    else if (region == 3) {
+              if (i + j < 13)
+ 	        winning_moves[k].pattern[i][j] = '?';
+ 	    }
+            else if (region == 4) {
+              if (j > 10)
+ 	        winning_moves[k].pattern[i][j] = '?';
+ 	    }
+            else if (region == 5) {
+              if (j < 8)
+ 	        winning_moves[k].pattern[i][j] = '?';
+ 	    }
+            else if (region == 6) {
+              if (i > 10)
+ 	        winning_moves[k].pattern[i][j] = '?';
+ 	    }
+            else if (region == 7) {
+              if (i < 8)
+ 	        winning_moves[k].pattern[i][j] = '?';
+ 	    }
+          }
+        }
+      }
     }
   }
 }
@@ -1003,6 +1089,11 @@ print_patterns(void)
       printf("# %d/%d\n\n", 
 	     winning_moves[k].move_frequency,
 	     winning_moves[k].position_frequency);
+      printf("+");
+      for (n = 0; n < board_size; n++) {
+	printf("-");
+      }
+      printf("+\n");
       for (m = 0; m < board_size; m++) {
 	printf("|");
 	for (n = 0; n < board_size; n++) {
@@ -1013,12 +1104,13 @@ print_patterns(void)
 	  else
 	    printf("%c", winning_moves[k].pattern[m][n]);
 	}
-	printf("\n");
+	printf("|\n");
       }
       printf("+");
       for (n = 0; n < board_size; n++) {
 	printf("-");
       }
+      printf("+");
       printf("\n\n:8,-,value(%d)\n\n\n", winning_moves[k].move_frequency);
       l++;
     }
@@ -1067,6 +1159,11 @@ main(int argc, char *argv[])
     fprintf(stderr, "Warning: wrong lowest strength: %d.\n",
 	    player_strength);
   
+  half_board_patterns = atoi(argv[7]);
+  if (half_board_patterns != 0 && half_board_patterns != 1) {
+    fprintf(stderr, "Warning: incorrect half_board_flag (0 or 1). Setting the value to 0.\n");
+    half_board_patterns = 0;
+  }
   /* Count the number of sgf files. */
   number_of_games = read_sgf_filenames(argv[1], NULL);
   
@@ -1088,9 +1185,9 @@ main(int argc, char *argv[])
   (void) read_sgf_filenames(argv[1], sgf_names);
   
   /* Save memory by sorting out the games that can be used first */
-  if (argv[7] != NULL) {
+  if (argv[8] != NULL) {
     sort_games();
-    write_sgf_filenames(argv[7], sgf_names);
+    write_sgf_filenames(argv[8], sgf_names);
   }
   
   else {
