@@ -460,6 +460,7 @@ int fill_liberty(int *move, int color);
 int aftermath_genmove(int *aftermath_move, int color,
 		      int under_control[BOARDMAX],
 		      int do_capture_dead_stones);
+enum dragon_status aftermath_final_status(int color, int pos);
 
 int owl_attack(int target, int *attack_point, int *certain, int *kworm);
 int owl_defend(int target, int *defense_point, int *certain, int *kworm);

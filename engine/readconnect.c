@@ -2608,6 +2608,8 @@ find_connection_moves(int str1, int str2, int color_to_move,
     sgftreeAddComment(sgf_dumptree, buf);
   }
 
+  if (num_moves == 0)
+    return num_moves;
 
   /* Filter out moves with distance at least 1.5 more than the best
    * move, or with distance higher than the cutoff specified.
