@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- remove tabs from twogtp.py
+- twogtp.py checks that board is not empty before indexing it
 - active area for persistent breakin cache shrinked
 - new HIGH_LIBERTY_BIT2 in persistent caches, used by breakin cache
 - new function break_chain4_moves()
