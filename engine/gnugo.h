@@ -78,11 +78,6 @@ const char *result_to_string(int result);
 #define SURROUNDED 1
 #define WEAKLY_SURROUNDED 2
 
-/* Final statuses for empty vertices. */
-#define BLACK_TERRITORY 13
-#define WHITE_TERRITORY 14
-#define DAME            15
-
 /* ================================================================ */
 /*                        Board manipulation                        */
 /* ================================================================ */
@@ -360,7 +355,7 @@ int genmove_conservative(int *i, int *j, int color);
 
 /* Play through the aftermath. */
 float aftermath_compute_score(int color, float komi, SGFTree *tree);
-int aftermath_final_status(int color, int pos);
+enum dragon_status aftermath_final_status(int color, int pos);
 
 /* Basic information gathering. */
 /* worm.c */

@@ -1035,7 +1035,7 @@ aftermath_compute_score(int color, float komi, SGFTree *tree)
  * Possible results are ALIVE, DEAD, ALIVE_IN_SEKI, WHITE_TERRITORY,
  * BLACK_TERRITORY, and DAME.
  */
-int
+enum dragon_status
 aftermath_final_status(int color, int pos)
 {
   ASSERT_ON_BOARD1(pos);

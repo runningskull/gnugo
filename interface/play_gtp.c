@@ -2847,9 +2847,10 @@ gtp_time_left(char *s)
  ***********/
 
 static float final_score;
-static int final_status[MAX_BOARD][MAX_BOARD];
-static int status_numbers[6] = {ALIVE, DEAD, ALIVE_IN_SEKI, WHITE_TERRITORY,
-				BLACK_TERRITORY, DAME};
+static enum dragon_status final_status[MAX_BOARD][MAX_BOARD];
+static enum dragon_status status_numbers[6] = {ALIVE, DEAD, ALIVE_IN_SEKI,
+					       WHITE_TERRITORY,
+					       BLACK_TERRITORY, DAME};
 static const char *status_names[6] = {"alive", "dead", "seki",
 				      "white_territory", "black_territory",
 				      "dame"};
@@ -3064,7 +3065,7 @@ gtp_final_status_list(char *s)
   int seed;
   int n;
   int i, j;
-  int status = UNKNOWN;
+  enum dragon_status status = UNKNOWN;
   int k;
   char status_string[GTP_BUFSIZE];
   int first;

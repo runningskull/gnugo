@@ -703,8 +703,12 @@ compute_unconditional_status()
 	if (unconditional_territory[pos] == 1)
 	  worm[pos].invincible = 1;
       }
-      else if (board[pos] == EMPTY)
-	worm[pos].unconditional_status = WHITE;
+      else if (board[pos] == EMPTY) {
+	if (color == WHITE)
+	  worm[pos].unconditional_status = WHITE_TERRITORY;
+	else
+	  worm[pos].unconditional_status = BLACK_TERRITORY;
+      }
       else
 	worm[pos].unconditional_status = DEAD;
     }
@@ -1851,12 +1855,8 @@ report_worm(int m, int n)
   else
     gprintf("invincible: NO, \n");
 
-  if (worm[pos].unconditional_status == ALIVE)
-    gprintf("unconditional status ALIVE\n");
-  else if (worm[pos].unconditional_status == DEAD)
-    gprintf("unconditional status DEAD\n");
-  else if (worm[pos].unconditional_status == UNKNOWN)
-    gprintf("unconditional status UNKNOWN\n");
+  gprintf("unconditional status %s\n",
+	  status_to_string(worm[pos].unconditional_status));
 }
 
 

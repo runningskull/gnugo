@@ -859,7 +859,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 
     /* A single point eye which is part of a ko can't be trusted. */
     if (eye[pos].esize == 1
-	&& is_ko(pos, eye[pos].color, NULL))
+	&& is_ko(pos, OTHER_COLOR(eye[pos].color), NULL))
       *pessimistic_min = 0;
 
     DEBUG(DEBUG_EYES, "  graph matching - %s, pessimistic_min=%d\n",
@@ -915,7 +915,7 @@ compute_eyes_pessimistic(int pos, struct eyevalue *value,
 	  this_attack_point = pos2;
 	  this_defense_point = pos2;
 
-	  if (is_self_atari(pos2, eye[pos].color))
+	  if (is_self_atari(pos2, OTHER_COLOR(eye[pos].color)))
 	    this_score -= 0.5;
 	  
 	  if (is_edge_vertex(pos2))

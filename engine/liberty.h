@@ -103,6 +103,51 @@ enum routine_id {
 const char *routine_id_to_string(enum routine_id routine);
 
 
+/* This is used for both the dragon status and safety fields.
+ * Also used for unconditional status in struct worm_data and for the
+ * final status computed by the aftermath code.
+ */
+enum dragon_status {
+  DEAD,
+  ALIVE,
+  CRITICAL,
+  UNKNOWN,
+  UNCHECKED,
+  CAN_THREATEN_ATTACK,
+  CAN_THREATEN_DEFENSE, 
+  INESSENTIAL,
+  TACTICALLY_DEAD,
+  ALIVE_IN_SEKI,
+  STRONGLY_ALIVE,
+  INVINCIBLE,
+  INSUBSTANTIAL,
+  WHITE_TERRITORY,
+  BLACK_TERRITORY,
+  DAME,
+  NUM_DRAGON_STATUS
+};
+
+#define DRAGON_STATUS_NAMES \
+  "dead", \
+  "alive", \
+  "critical", \
+  "unknown", \
+  "unchecked", \
+  "can threaten attack", \
+  "can threaten defense", \
+  "inessential", \
+  "tactically dead", \
+  "alive in seki", \
+  "strongly alive", \
+  "invincible", \
+  "insubstantial", \
+  "white_territory", \
+  "black_territory", \
+  "dame"
+
+const char *status_to_string(enum dragon_status status);
+
+
 /* Forward struct declarations. */
 struct pattern;
 struct pattern_db;
@@ -738,7 +783,8 @@ struct worm_data {
   int genus;         /* number of connected components of the complement, less one */
   int inessential;   /* 1=inessential worm */
   int invincible;    /* 1=strongly unconditionally non-capturable */
-  int unconditional_status; /* ALIVE, DEAD, WHITE_BORDER, BLACK_BORDER, UNKNOWN */
+  enum dragon_status unconditional_status; /* ALIVE, DEAD, WHITE_TERRITORY,
+					      BLACK_TERRITORY, UNKNOWN */
 
   /* The following arrays keeps track of up to MAX_TACTICAL_POINTS
    * different attack, defense, attack threat, and defense threat
@@ -774,41 +820,6 @@ extern int surround_pointer;
 /*
  * data concerning a dragon. A copy is kept at each stone of the string.
  */
-
-/* This is used for both the dragon status and safety fields. */
-enum dragon_status {
-  DEAD,
-  ALIVE,
-  CRITICAL,
-  UNKNOWN,
-  UNCHECKED,
-  CAN_THREATEN_ATTACK,
-  CAN_THREATEN_DEFENSE, 
-  INESSENTIAL,
-  TACTICALLY_DEAD,
-  ALIVE_IN_SEKI,
-  STRONGLY_ALIVE,
-  INVINCIBLE,
-  INSUBSTANTIAL,
-  NUM_DRAGON_STATUS
-};
-
-#define DRAGON_STATUS_NAMES \
-  "dead", \
-  "alive", \
-  "critical", \
-  "unknown", \
-  "unchecked", \
-  "can threaten attack", \
-  "can threaten defense", \
-  "inessential", \
-  "tactically dead", \
-  "alive in seki", \
-  "strongly alive", \
-  "invincible", \
-  "insubstantial"
-
-const char *status_to_string(enum dragon_status status);
 
 struct dragon_data {
   int color;    /* its color                                                 */
@@ -908,7 +919,7 @@ struct aftermath_data {
   int black_area;
   int white_control[BOARDMAX];
   int black_control[BOARDMAX];
-  int final_status[BOARDMAX];
+  enum dragon_status final_status[BOARDMAX];
 };
 
 struct eye_data {
