@@ -1,4 +1,4 @@
-# This is a collection of blunders of GNU Go in Stefan Mertin's private
+# This is a collection of mistakes by GNU Go in Stefan Mertin's private
 # 13x13 - Computer Go tournament in 2001-2002 (see
 # http://www.geocities.com/comp_go/13x13.html).
 # 

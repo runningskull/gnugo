@@ -403,6 +403,31 @@ C[S];W[sg]MA[mi]C[S];B[nc]MA[mi]C[S])
 (;W[rd];B[qe]MA[nh]C[S];W[re];B[qg]MA[nh]C[S];W[rf];B[pg]MA[nh]C[S])
 
 (;W[qc];B[qe]MA[nh])
+
+(;W[pe]
+(;B[qe]LB[oe:A][qd:B][pf:C]MA[mi]C[;!oplay_attack(*,A,B,C)
+];W[oe];
+B[qd]MA[mi];W[qg];B[nd]MA[mi];W[ne];B[me]MA[li];W[od];B[oc]MA[li];
+W[og];B[md]MA[li])
+
+(;B[oe]MA[mi]LB[qe:A][qd:B][pf:C]C[;!oplay_attack(A,*,B,C)
+];W[qe]
+(;B[od]MA[mi];W[pg];B[of]MA[mi];W[qd];B[qc]MA[mi];W[rc];B[rb]MA[mi];
+W[qb];B[pc]MA[mi]
+(;W[rd];B[pb]MA[mi];W[qj])
+
+(;W[sb];B[qg]MA[mi];W[qh];B[rg]MA[mi];W[ra];B[qi]MA[mj];W[og];B[rh]
+MA[mj];W[ng];B[ld]MA[kj])
+)
+
+(;B[qd]MA[mi]C[0
+];W[od]MA[mi];B[nd];W[oc]MA[mi];B[nc];W[pb]MA[mi];
+B[nb];W[qc]MA[mi];B[rd];W[rc]MA[mi])
+
+(;B[pc]MA[mi]C[0
+])
+)
+)
 )
 
 (;B[nc]MA[lh]C[j

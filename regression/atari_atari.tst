@@ -81,3 +81,9 @@ loadsgf games/nngs/gnugo-3.3.12-guest-200212171626.sgf 148
 loadsgf games/nngs/gnugo-3.3.10-deye-200210211347.sgf 135
 19 combination_attack black
 #? [P9|Q7]
+
+# See also nando:25
+loadsgf games/nando/auto017.sgf
+white P16
+20 combination_attack black
+#? [L17]

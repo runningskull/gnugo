@@ -313,4 +313,52 @@ eeXa
 ;!oplay_attack(*,e) && oplay_attack(*,a,C) && oplay_attack(b,a,D)
 
 
+Pattern A19
+# gf New pattern. (3.3.17)
+
+?*X    threaten snapback
+O..
+?XX
+
+:8,c
+
+?*X
+O..
+?AA
+
+;lib(A)==2 && olib(*)>1
+
+
+Pattern A20
+# gf New pattern. (3.3.17)
+
+|*X    threaten snapback
+|..
+|XX
+
+:8,c
+
+|*X
+|..
+|AA
+
+;lib(A)==2 && olib(*)>1
+
+
+Pattern A21
+# gf New pattern. (3.3.17)
+
+.XO
+*.X
+---
+
+:8,-
+
+.XO
+*.A
+---
+
+;lib(A)==2 && olib(*)>2
+
+
 # END OF FILE

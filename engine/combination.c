@@ -610,6 +610,15 @@ do_atari_atari(int color, int *attack_point, int *defense_point,
       if (ON_BOARD(pos) && forbidden[pos])
 	gprintf("%o%1m ", pos);
     gprintf("\n");
+    gprintf("%ogoal: ");
+    if (!goal)
+      gprintf("none");
+    else {
+      for (pos = BOARDMIN; pos < BOARDMAX; pos++)
+	if (ON_BOARD(pos) && goal[pos])
+	  gprintf("%o%1m ", pos);
+    }
+    gprintf("\n");
   }
 
   /* First look for strings adjacent to the last friendly move played
@@ -1284,7 +1293,7 @@ update_aa_goal(char goal[BOARDMAX], char new_goal[BOARDMAX], int apos,
       int pos2 = pos + delta[k];
       if (!ON_BOARD(pos2))
        continue;
-      if ((board[pos] == other || pos == apos) && board[pos2] == EMPTY) {
+      if ((board[pos] != color || pos == apos) && board[pos2] == EMPTY) {
         ENQUEUE(pos2, dists[pos] + 1);
       }
       else if (board[pos] != other && board[pos2] == other) {

@@ -31,7 +31,7 @@ loadsgf games/nando/auto005.sgf
 6 owl_does_defend S2 Q2
 #? [0]*
 
-#CATEGORY=ATARI_ATARI (?)
+#CATEGORY=ATARI_ATARI
 loadsgf games/nando/auto006.sgf
 7 gg_genmove black
 #? [N16]*
@@ -39,7 +39,7 @@ loadsgf games/nando/auto006.sgf
 #? [M16|N16]*
 
 # Beware of the double snapback.
-#CATEGORY=TACTICAL_READING
+#CATEGORY=ATARI_ATARI
 loadsgf games/nando/auto007.sgf
 white A1
 black B5
@@ -60,7 +60,7 @@ loadsgf games/nando/auto009.sgf
 #? [1 (S2|T2|S1)]*
 
 #CATEGORY=OWL/OPTICS
-# Note that K12 connects out (sacrificing L11 if necessary)
+# Note that K12 connects out (sacrificing L11 if necessary).
 loadsgf games/nando/auto010.sgf
 12 owl_attack L17
 #? [0]*
@@ -100,7 +100,7 @@ loadsgf games/nando/auto013.sgf
 
 # S8, T12 and a lack of liberties are too many weaknesses.
 # W must defend.
-#CATEGORY=TACTICAL_READING
+#CATEGORY=ATARI_ATARI
 loadsgf games/nando/auto014.sgf
 black S16
 20 gg_genmove white

@@ -2,6 +2,8 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- more trace output in do_atari_atari()
+- update_aa_goal() revised
 - new dfa builder implemented in dfa.c
 - dfa size reduction algorithm implemented
 - dfa transformation hints (.dtr) files added to repository
@@ -17,6 +19,8 @@
 - do_owl_analyze_semeai doesn't crash on certain inconsistent eye results
 - bugfix in adjacent_to_nondead_stone()
 - new tests
+- atari_atari tuning
+- joseki tuning
 - owl tuning
 - tuning
 - speed up scan_for_patterns()
