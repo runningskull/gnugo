@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- make RTRACE and VTRACE variatic functions same as macros
 - debug output and valuation of attack on defenseless stones corrected
 - TODO revised
 - fixed value of J patterns no longer scaled with board_size

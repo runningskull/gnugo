@@ -196,12 +196,11 @@ TRACE(const char *fmt, ...)
 {
   va_list ap;
 
-  if (!verbose)
-    return;
-
-  va_start(ap, fmt);
-  vgprintf(stderr, fmt, ap);
-  va_end(ap);
+  if (verbose) {
+    va_start(ap, fmt);
+    vgprintf(stderr, fmt, ap);
+    va_end(ap);
+  }
 }
 
 
@@ -210,12 +209,11 @@ VTRACE(const char *fmt, ...)
 {
   va_list ap;
 
-  if (verbose < 3)
-    return;
-
-  va_start(ap, fmt);
-  vgprintf(stderr, fmt, ap);
-  va_end(ap);
+  if (verbose >= 4) {
+    va_start(ap, fmt);
+    vgprintf(stderr, fmt, ap);
+    va_end(ap);
+  }
 }
 
 
@@ -224,12 +222,11 @@ RTRACE(const char *fmt, ...)
 {
   va_list ap;
 
-  if (verbose < 2)
-    return;
-
-  va_start(ap, fmt);
-  vgprintf(stderr, fmt, ap);
-  va_end(ap);
+  if (verbose >= 3) {
+    va_start(ap, fmt);
+    vgprintf(stderr, fmt, ap);
+    va_end(ap);
+  }
 }
 
 
@@ -238,12 +235,11 @@ DEBUG(int flag, const char *fmt, ...)
 {
   va_list ap;
 
-  if (!(debug & flag))
-    return;
-
-  va_start(ap, fmt);
-  vgprintf(stderr, fmt, ap);
-  va_end(ap);
+  if (debug & flag) {
+    va_start(ap, fmt);
+    vgprintf(stderr, fmt, ap);
+    va_end(ap);
+  }
 }
 
 #endif

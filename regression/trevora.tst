@@ -350,6 +350,10 @@ loadsgf games/trevor/auto/a035.sgf 42
 530 gg_genmove white
 #? [H4]*
 
+#Excellect simple semeai problem.
+loadsgf games/trevor/auto/a035.sgf 42
+531 owl_does_defend H4 E6
+#? [1]*
 
 loadsgf games/trevor/auto/a035.sgf 50
 540 gg_genmove white
