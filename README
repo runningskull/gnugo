@@ -217,23 +217,35 @@ gnugo --help.
 
                    Copyrights and License
 
-Copyright 1999 and 2000 by the Free Software Foundation except for
-the files gmp.c and gmp.h, which are copyrighted by Bill Shubert
-(@email{wms@@hevanet.com}).
+All files Copyright 1999, 2000, 2001 and 2002 by the Free Software 
+Foundation except as noted below.
 
 All files are under the GNU General Public License, which may be
 found in the file COPYING, with the following exceptions.
 
 * The files interface/gtp.c and gtp.h are copyright 2001 by
-  the Free Software Foundation. They are licensed for unrestricted
-  use.
+  the Free Software Foundation. In the interests of promoting 
+  the Go Text Protocol these two files are licensed under a less 
+  restrictive license than the GPL and are free for unrestricted use.
+  The GTP license appears in each file.
 
 * The files gmp.c and gmp.h are copyright Bill Shubert. These
   are free for unrestricted use.
 
-* The files interface/html/* were placed in the public domain
-  by their author, Douglas Ridgway. They are free for unrestricted use.
+* The files interface/html/* are not part of GNU Go but are a separate
+  probram and are included in the distribution for the convenience of anyone
+  looking for a CGI interface to GNU Go. They were placed in the public domain
+  by their author, Douglas Ridgway, and are free for unrestricted use.
 
 * The files regression/golois/* and the tests vie.tst, connect.tst,
-  capture.tst and global.tst are currently copyright Tristan Cazenave.
+  capture.tst and global.tst are copyright Tristan Cazenave and are
+  used with his permission
 
+* The SGF files in regression/games/handtalk are copyright Jessie Annala
+  and are used with permission.
+
+* The SGF files in regression/games/mertin13x13 are copyright Stefan
+  Mertin and are used with permission.
+
+* The remaining SGF files are either copyright by the FSF or are in
+  the public domain.

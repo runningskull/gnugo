@@ -928,7 +928,7 @@ loadsgf games/owl35.sgf
 #? [0]*
 
 # This is quite trivial, but at least GNU Go 3.1.31 fails it.
-loadsgf games/handtalk11.sgf 157
+loadsgf games/handtalk/handtalk11.sgf 157
 258 owl_defend O2
 #? [0]
 

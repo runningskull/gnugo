@@ -1827,7 +1827,7 @@ compute_move_influence(int m, int n, int color,
   }
   else {
     gprintf("Computing influence for illegal move %m (move number %d)\n",
-	    m, n, movenum);
+	    m, n, movenum+1);
     return;
   }
 
