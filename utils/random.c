@@ -58,6 +58,12 @@ static int k;
 /* Set when properly seeded. */
 static int rand_initialized = 0;
 
+/* We use this to detect whether unsigned ints are bigger than 32
+ * bits. If they are we need to clear higher order bits, otherwise we
+ * can optimize by not doing the masking.
+ */
+#define BIG_UINT (UINT_MAX > 0xffffffffU)
+
 
 /* Iterate the TGFSR once to get a new state which can be used to
  * produce another 25 random numbers.
@@ -91,7 +97,7 @@ next_rand(void)
   }
   y = x[k] ^ ((x[k] << s) & b);
   y ^= ((y << t) & c);
-#if (CHAR_BIT * SIZEOF_INT > 32)
+#if BIG_UINT
   y &= 0xffffffffU;
 #endif
   return y;
@@ -114,7 +120,7 @@ gg_srand(unsigned int seed)
 {
   int i;
   for (i=0; i<N; i++) {
-#if (CHAR_BIT * SIZEOF_INT > 32)
+#if BIG_UINT
     seed &= 0xffffffffU;
 #endif
     x[i] = seed;
