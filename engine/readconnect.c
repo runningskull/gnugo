@@ -63,16 +63,15 @@ static int prevent_capture_one_move(int *moves, int str1);
 int nodes_connect=0,max_nodes_connect=2000,max_connect_depth=64;
 
 static int add_array (int *array, int elt) {
-  int r, add = 1;
+  int r;
   
-  for (r = 1; ((r < array[0] + 1) && add); r++)
+  for (r = 1; r < array[0] + 1; r++)
     if (array[r] == elt)
-      add = 0;
-  if (add) {
-    array[0]++;
-    array[array[0]] = elt;
-  }
-  return add;
+      return 0;
+
+  array[0]++;
+  array[array[0]] = elt;
+  return 1;
 }
 
 static int element_array (int *array,int elt) {
@@ -259,19 +258,19 @@ static int moves_to_connect_in_two_moves (int *moves, int str1, int str2) {
 	add_array(moves, WEST(libs[r]));
       }
     }
-    else if (board[EAST(libs[r])] == EMPTY) {
+    if (board[EAST(libs[r])] == EMPTY) {
       if (liberty_of_string(EAST(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, EAST(libs[r]));
       }
     }
-    else if (board[SOUTH(libs[r])] == EMPTY) {
+    if (board[SOUTH(libs[r])] == EMPTY) {
       if (liberty_of_string(SOUTH(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, SOUTH(libs[r]));
       }
     }
-    else if (board[NORTH(libs[r])] == EMPTY) {
+    if (board[NORTH(libs[r])] == EMPTY) {
       if (liberty_of_string(NORTH(libs[r]), str2)) {
 	add_array(moves, libs[r]);
 	add_array(moves, NORTH(libs[r]));
@@ -543,13 +542,28 @@ static int recursive_disconnect (int str1, int str2, int *move) {
 }
  
 static int quiescence_capture (int str, int *move) {
+  SGFTree *save_sgf_dumptree = sgf_dumptree;
+  int save_count_variations = count_variations;
+  int result = 0;
+
+  /* We turn off the sgf traces here to avoid cluttering them up with
+   * naive_ladder moves.
+   */
+  sgf_dumptree = NULL;
+  count_variations = 0;
+
   if (countlib(str) == 1) {
     findlib(str, 1, move);
-    return WIN;
+    result = WIN;
   }
   else if (countlib(str) == 2)
-    return naive_ladder(str, move);
-  return 0;
+    result = naive_ladder(str, move);
+
+  /* Turn the sgf traces back on. */
+  sgf_dumptree = save_sgf_dumptree;
+  count_variations = save_count_variations;
+
+  return result;
 }
 
 /* static int capture_one_move (int str) { */

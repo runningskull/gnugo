@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- add_array() in readconnect.c simplified
+- bugfix in moves_to_connect_in_two_moves()
+- sgf traces turned off in quiescence_capture()
 - new fields owl_attack_code and owl_defense_code in struct dragon_data
 - revised definition of WEAK and WEAKLY_ALIVE dragons in make_dragons()
 - revised computation of size of surrounding moyo for a dragon
