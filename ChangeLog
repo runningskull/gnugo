@@ -2,6 +2,7 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- concerns_noncritical_dragon() revised
 - BOARD_MIN reduced to 2
 - free memory allocated in a failed read of an sgf file
 - extract_fuseki revisions: statistics on outcomes,

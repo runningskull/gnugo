@@ -594,7 +594,8 @@ static int
 concerns_noncritical_dragon(int pos, int what)
 {
   UNUSED(pos);
-  return dragon[what].status != CRITICAL; 
+  return (dragon[what].status != CRITICAL
+	  && worm[what].attack_codes[0] == 0);
 }
 
 
