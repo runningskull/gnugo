@@ -6,6 +6,9 @@
 - organize include file order to facilitate pre-compiled headers.
 - use location_to_string in replay_node()
 - improve assertion in sgftreeAddComment()
+- removes a bogus "," from Pattern D305
+- read_attack.db tuning
+- new read_defend.db
 
 3.1.26 released February 24, 2002
 
