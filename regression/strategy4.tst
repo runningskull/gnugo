@@ -10,7 +10,7 @@ loadsgf games/gwe.sgf 231
 # tm - yes, Q1 is bad.  T5 also wastes a point.
 # gf - However, policy is to restrain thrashing dragons, so T5 is correct.
 151 reg_genmove white
-#? [T5]*
+#? [T5]
 
 loadsgf games/gwe.sgf 241
 152 reg_genmove white

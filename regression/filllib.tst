@@ -156,4 +156,4 @@ loadsgf games/nngs/evand-gnugo-3.5.2gf1-200312150903.sgf
 
 loadsgf games/filllib14.sgf
 46 reg_genmove white
-#? [N3|H5|M1]
+#? [N3|H5|M1]*

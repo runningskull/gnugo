@@ -72,7 +72,7 @@ loadsgf games/poka.sgf 42
 
 loadsgf games/poka.sgf 52
 115 reg_genmove white
-#? [G2]*
+#? [G2]
 
 # incident 281
 # M4 and N5 are okay. O5 is a bad mistake.
@@ -92,7 +92,7 @@ loadsgf games/incident240.sgf 65
 # incident 241
 loadsgf games/incident240.sgf 69
 119 reg_genmove black
-#? [D9|J3]*
+#? [D9|J3]
 
 # incident 221
 loadsgf games/incident221.sgf 35

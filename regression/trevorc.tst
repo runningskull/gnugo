@@ -976,7 +976,7 @@ loadsgf games/trevor/auto/c93.sgf 34
 
 loadsgf games/trevor/auto/c93.sgf 35
 1621 attack E11
-#? [1 D11]*
+#? [1 D11]
 
 
 

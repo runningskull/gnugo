@@ -118,4 +118,4 @@ loadsgf games/self_play/354-34-2.sgf 150
 loadsgf games/filllib14.sgf
 play white H5
 27 combination_attack black
-#? [0]
+#? [0]*

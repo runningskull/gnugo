@@ -131,7 +131,7 @@ loadsgf games/blunder19.sgf
 # R3 lets black play T2 and get seki.
 loadsgf games/blunder20.sgf
 27 reg_genmove white
-#? [!R3]*
+#? [!R3]
 
 # C4 lets black make seki with B1. E1 is even worse.
 loadsgf games/blunder22.sgf 1
@@ -147,7 +147,7 @@ loadsgf games/blunder22.sgf 5
 # See also reading:197.
 loadsgf games/blunder23.sgf
 30 reg_genmove black
-#? [!O7]*
+#? [!O7]
 
 loadsgf games/atari_atari09.sgf
 31 reg_genmove black
@@ -156,19 +156,19 @@ loadsgf games/atari_atari09.sgf
 # E3 and H4 are not blunders, however, H2 is.
 loadsgf games/nngs/gnugo-3.4-viking4-200308191053.sgf 283
 32 reg_genmove white
-#? [E3|H4]*
+#? [E3|H4]
 
 # This needs a detect_semeai_blunder().
 loadsgf games/kisei28_g7.sgf 280
 33 reg_genmove white
-#? [!H6|J1]*
+#? [!H6|J1]
 
 # Fills a common liberty in a seki similar to blunder:32.
 loadsgf games/kgs/2004-04-28-R-dokuganryu-GnuGoCVS.sgf 302
 34 gg_genmove black
-#? [!A19|C19]*
+#? [!A19|C19]
 
 # An example of transforming a won semeai into a seki
 loadsgf games/blunder24.sgf
 35 gg_genmove white
-#? [!G1]*
+#? [!G1]

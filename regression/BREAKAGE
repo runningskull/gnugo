@@ -1,3 +1,44 @@
+========================== 3.5.8 =====================================
+
+./regress.sh . reading.tst 
+188 unexpected PASS!
+./regress.sh . optics.tst 
+1801 unexpected PASS!
+./regress.sh . filllib.tst 
+46 unexpected FAIL: Correct 'N3|H5|M1', got 'G2'
+./regress.sh . atari_atari.tst 
+27 unexpected FAIL: Correct '0', got 'H1'
+./regress.sh . blunder.tst 
+27 unexpected PASS!
+30 unexpected PASS!
+32 unexpected PASS!
+33 unexpected PASS!
+34 unexpected PASS!
+35 unexpected PASS!
+./regress.sh . strategy.tst 
+13 unexpected FAIL: Correct 'N18', got 'L17'
+./regress.sh . nicklas3.tst 
+401 unexpected PASS!
+./regress.sh . nngs.tst 
+1060 unexpected PASS!
+./regress.sh . trevorc.tst 
+1621 unexpected PASS!
+./regress.sh . strategy3.tst 
+115 unexpected PASS!
+119 unexpected PASS!
+./regress.sh . strategy4.tst 
+151 unexpected PASS!
+./regress.sh . gunnar.tst 
+48 unexpected PASS!
+./regress.sh . seki.tst 
+101 unexpected PASS!
+303 unexpected PASS!
+305 unexpected PASS!
+905 unexpected FAIL: Correct 'C1', got 'C9'
+
+
+========================== 3.5.7 =====================================
+
 ./regress.sh . ld_owl.tst 
 301 unexpected FAIL: Correct '1 C19', got '3 B18'
 ./regress.sh . connection.tst 

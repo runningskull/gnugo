@@ -777,7 +777,7 @@ loadsgf games/reading41.sgf 130
 
 loadsgf games/reading40.sgf
 188 defend B4
-#? [1 A2]*
+#? [1 A2]
 
 loadsgf games/nngs/tommmal-gnugo-3.5.1-200310071202.sgf 194
 trymove black A14
