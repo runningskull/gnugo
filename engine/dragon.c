@@ -2124,7 +2124,7 @@ crude_dragon_weakness(int safety, struct eyevalue *genus, int has_lunch,
   weakness_value[2] = gg_interpolate(&genus2weakness, true_genus);
 
   DEBUG(DEBUG_DRAGONS,
-	"  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f,",
+	"  moyo value %f -> %f, escape %f -> %f, eyes %f -> %f,\n",
 	moyo_value, weakness_value[0],
 	escape_route, weakness_value[1],
 	true_genus, weakness_value[2]);
