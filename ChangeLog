@@ -2,6 +2,9 @@
 -- ChangeLog
 -------------------------------------------------------------------------
 
+- request id no longer passed to callbacks in play_gtp.c
+- gtp_printid() renamed to gtp_start_response()
+- new preprocessing of command lines in gtp_main_loop()
 - GTP command dragon_status revised
 - bug fix in estimate_strategical_value: EITHER_MOVE negative values
 - j pattern value increased from 22.0 to 24.0

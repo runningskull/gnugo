@@ -52,7 +52,7 @@
 #define GTP_FAILURE  1
 
 /* Function pointer for callback functions. */
-typedef int (*gtp_fn_ptr)(char *s, int id);
+typedef int (*gtp_fn_ptr)(char *s);
 
 /* Function pointer for vertex transform functions. */
 typedef void (*gtp_transform_ptr)(int ai, int aj, int *bi, int *bj);
@@ -69,10 +69,10 @@ void gtp_set_vertex_transform_hooks(gtp_transform_ptr in,
 				    gtp_transform_ptr out);
 void gtp_mprintf(const char *format, ...);
 void gtp_printf(const char *format, ...);
-void gtp_printid(int id, int status);
+void gtp_start_response(int status);
 int gtp_finish_response(void);
-int gtp_success(int id, const char *format, ...);
-int gtp_failure(int id, const char *format, ...);
+int gtp_success(const char *format, ...);
+int gtp_failure(const char *format, ...);
 void gtp_panic(void);
 int gtp_decode_color(char *s, int *color);
 int gtp_decode_coord(char *s, int *m, int *n);

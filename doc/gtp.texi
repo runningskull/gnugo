@@ -251,16 +251,16 @@ coding a GTP command can be found in @code{gtp_countlib()}:
 
 @example
 static int
-gtp_countlib(char *s, int id)
+gtp_countlib(char *s)
 @{
   int i, j;
   if (!gtp_decode_coord(s, &i, &j))
-    return gtp_failure(id, "invalid coordinate");
+    return gtp_failure("invalid coordinate");
 
   if (p[i][j] == EMPTY)
-    return gtp_failure(id, "vertex must not be empty");
+    return gtp_failure("vertex must not be empty");
 
-  return gtp_success(id, "%d", countlib(POS(i, j)));
+  return gtp_success("%d", countlib(POS(i, j)));
 @}
 @end example
 
@@ -275,25 +275,25 @@ support. Then we have to fall back to the construction in e.g.
 
 @example
 static int
-gtp_genmove_white(char *s, int id)
+gtp_genmove_white(char *s)
 @{
   int i, j;
   UNUSED(s);
   if (genmove(&i, &j, WHITE) >= 0)
     play_move(POS(i, j), WHITE);
 
-  gtp_printid(id, GTP_SUCCESS);
+  gtp_start_response(GTP_SUCCESS);
   gtp_print_vertex(i, j);
   return gtp_finish_response();
 @}
 @end example
 
-Here @code{gtp_printid()} writes the equal sign and the request id while
+Here @code{gtp_start_response()} writes the equal sign and the request id while
 @code{gtp_finish_response()} adds the final two newlines. The next example
 is from @code{gtp_influence()}:
 
 @example
-  gtp_printid(id, GTP_SUCCESS);
+  gtp_start_response(GTP_SUCCESS);
   get_initial_influence(color, 1, white_influence,
 			black_influence, influence_regions);
   print_influence(white_influence, black_influence, influence_regions);
@@ -325,17 +325,17 @@ function is coded thus:
 
 @example
 static int
-gtp_report_uncertainty(char *s, int id)
+gtp_report_uncertainty(char *s)
 @{
   if (!strncmp(s, "on", 2)) @{
     report_uncertainty = 1;
-    return gtp_success(id, "");
+    return gtp_success("");
   @}
   if (!strncmp(s, "off", 3)) @{
     report_uncertainty = 0;
-    return gtp_success(id, "");
+    return gtp_success("");
   @}
-  return gtp_failure(id, "invalid argument");
+  return gtp_failure("invalid argument");
 @}
 @end example
 

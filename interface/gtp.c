@@ -62,6 +62,12 @@ static int gtp_boardsize = -1;
 static gtp_transform_ptr vertex_transform_input_hook = NULL;
 static gtp_transform_ptr vertex_transform_output_hook = NULL;
 
+/* Current id number. We keep track of this internally rather than
+ * pass it to the functions processing the commands, since those can't
+ * do anything useful with it anyway.
+ */
+static int current_id;
+
 /* Read filehandle gtp_input linewise and interpret as GTP commands. */
 void
 gtp_main_loop(struct gtp_command commands[], FILE *gtp_input)
@@ -70,7 +76,6 @@ gtp_main_loop(struct gtp_command commands[], FILE *gtp_input)
   char command[GTP_BUFSIZE];
   char *p;
   int i;
-  int id;
   int n;
   int status = GTP_OK;
   
@@ -79,17 +84,34 @@ gtp_main_loop(struct gtp_command commands[], FILE *gtp_input)
     if (!fgets(line, GTP_BUFSIZE, gtp_input))
       break; /* EOF or some error */
 
-    /* Remove comments. */
-    if ((p = strchr(line, '#')) != NULL)
-      *p = 0;
-    
+    /* Preprocess the line. */
+    for (i = 0, p = line; line[i]; i++) {
+      char c = line[i];
+      /* Convert HT (9) to SPACE (32). */
+      if (c == 9)
+	*p++ = 32;
+      /* Remove CR (13) and all other control characters except for LF (10). */
+      else if ((c > 0 && c <= 9)
+	       || (c >= 11 && c <= 31)
+	       || c == 127)
+	continue;
+      /* Remove comments. */
+      else if (c == '#')
+	break;
+      /* Keep ordinary text. */
+      else
+	*p++ = c;
+    }
+    /* Terminate string. */
+    *p = 0;
+	
     p = line;
 
     /* Look for an identification number. */
-    if (sscanf(p, "%d%n", &id, &n) == 1)
+    if (sscanf(p, "%d%n", &current_id, &n) == 1)
       p += n;
     else
-      id = -1; /* No identification number. */
+      current_id = -1; /* No identification number. */
 
     /* Look for command name. */
     if (sscanf(p, " %s %n", command, &n) < 1)
@@ -101,12 +123,12 @@ gtp_main_loop(struct gtp_command commands[], FILE *gtp_input)
      */
     for (i = 0; commands[i].name != NULL; i++) {
       if (strcmp(command, commands[i].name) == 0) {
-	status = (*commands[i].function)(p, id);
+	status = (*commands[i].function)(p);
 	break;
       }
     }
     if (commands[i].name == NULL)
-      gtp_failure(id, "unknown command: '%s'", command);
+      gtp_failure("unknown command: '%s'", command);
 
     if (status == GTP_FATAL)
       gtp_panic();
@@ -121,7 +143,7 @@ gtp_internal_set_boardsize(int size)
 }
 
 /* If you need to transform the coordinates on input or output, use
- * this functions to set hook functions which are called any time
+ * these functions to set hook functions which are called any time
  * coordinates are read or about to be written. In GNU Go this is used
  * to simulate rotated boards in regression tests.
  */
@@ -217,17 +239,17 @@ gtp_printf(const char *format, ...)
  * given.
  */
 void
-gtp_printid(int id, int status)
+gtp_start_response(int status)
 {
   if (status == GTP_SUCCESS)
     gtp_printf("=");
   else
     gtp_printf("?");
   
-  if (id < 0)
+  if (current_id < 0)
     gtp_printf(" ");
   else
-    gtp_printf("%d ", id);
+    gtp_printf("%d ", current_id);
 }
 
 
@@ -244,10 +266,10 @@ gtp_finish_response()
  * is just like one to printf.
  */
 int
-gtp_success(int id, const char *format, ...)
+gtp_success(const char *format, ...)
 {
   va_list ap;
-  gtp_printid(id, GTP_SUCCESS);
+  gtp_start_response(GTP_SUCCESS);
   va_start(ap, format);
   vfprintf(stdout, format, ap);
   va_end(ap);
@@ -257,10 +279,10 @@ gtp_success(int id, const char *format, ...)
 
 /* Write a full failure response. The call is identical to gtp_success. */
 int
-gtp_failure(int id, const char *format, ...)
+gtp_failure(const char *format, ...)
 {
   va_list ap;
-  gtp_printid(id, GTP_FAILURE);
+  gtp_start_response(GTP_FAILURE);
   va_start(ap, format);
   vfprintf(stdout, format, ap);
   va_end(ap);
