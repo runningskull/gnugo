@@ -153,29 +153,64 @@ specify the number of moves to check with --movecount <n>.
 	exit;
     }
 
-    if (defined($stable)) {
-        warn "When loading a file, --stable is ignored.";
-    }
+    #if (defined($stable)) {
+    #    warn "When loading a file, --stable is ignored.";
+    #}
 
     $pidp = open2($prog_out, $prog_in, $program);
+    $pids = open2($stable_out, $stable_in, $stable) if defined($stable);
     print "program pid: $pidp\n" if $verbose;
+    print "stable pid:  $pids\n" if (defined($stable) and $verbose);
 
     if (defined($randseed)) {
         print $prog_in "set_random_seed $randseed\n";
 	eat_no_response($prog_out);
+        if (defined($stable)) {
+           print $stable_in "set_random_seed $randseed\n";
+           eat_no_response($stable_out);
+       }
     } else {
         print $prog_in "get_random_seed\n";
-	print "random seed " . eat_one_line($prog_out) . "\n";
+       my $rand = eat_one_line($prog_out);
+       print "random seed $rand\n";
+        if (defined($stable)) {
+           $rand =~ s/^= //smg;
+           print $stable_in "set_random_seed $rand\n";
+           eat_no_response($stable_out);
+       }
     }
 
-    for ($movenum = 2; $movenum <= $movecount + 1; $movenum++)
+
+    for ($movenum = 1; $movenum <= $movecount + 1; $movenum++)
     {
         #load the file, check the statuses, next move.
+       my $lmove = $movenum + 1;#number to load up to
 	print "loading move $movenum\n" if $verbose;
-	print $prog_in "loadsgf $loadfile $movenum\n";
+       print $prog_in "loadsgf $loadfile $lmove\n";
 	eat_no_response($prog_out);
-	check_matcher($prog_in, $prog_out);
-	print "done checking status.\n" if ($verbose);
+       if (!defined($noilcheck)) {
+           check_matcher($prog_in, $prog_out);
+           print "done checking status.\n" if ($verbose);
+       }
+
+       #do stable checks
+       if (defined($stable)) {
+           print $stable_in "loadsgf $loadfile $lmove\n";
+           $toplay = eat_one_line($stable_out); #whole word in this case
+           $toplay =~ s/^=//smg;
+           $toplay =~ s/ //smg;
+           print $prog_in "genmove_$toplay\n";
+           print $stable_in "genmove_$toplay\n";
+           $move = eat_move($prog_out);
+           $stable_move = eat_move($stable_out);
+           if ($move ne $stable_move and defined ($stable)) {
+               print "At move $movenum, $toplay\:\n";
+               print "Test version played   $move\n";
+               print "Stable version played $stable_move\n";
+           } else {
+               print "$toplay plays $move\n" if $verbose;
+           }
+       }
     }
 
     print "movenum: $movenum\n" if ($verbose);
